@@ -1,0 +1,26 @@
+   Mule EbMS Adapter
+   Copyright 2011 Clockwork
+
+   This product includes software developed at
+   The Apache Software Foundation (http://www.apache.org/)
+   under Apache License, Version 2.0
+
+   This product includes software developed at
+   MuleSource, Inc. (http://www.mulesource.com)
+   under CPAL v1.0 License
+
+   This product includes the following schemas and specifications
+   developed by the W3C consortium (http://www.w3c.org):
+   - http://www.w3.org/XML/1998/namespace
+   - http://www.w3.org/1999/xlink
+   - http://www.w3.org/2000/09/xmldsig#
+   - http://schemas.xmlsoap.org/soap/envelope/
+   
+   This product includes the following schemas and specifications
+   developed by the OASIS (http://www.oasis-open.org/):
+   - http://www.oasis-open.org/committees/ebxml-cppa/schema/cpp-cpa-2_0.xsd
+   - http://www.oasis-open.org/committees/ebxml-msg/schema/msg-header-2_0.xsd
+
+   This product includes the following schemas and specifications
+   developed by the Logius (http://www.logius.nl/):
+   - http://logius.nl/digipoort/ebms/2.0/afleverservice/1.0/

@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Copyright 2011 Clockwork
+  
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+  
+    http://www.apache.org/licenses/LICENSE-2.0
+  
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+<mule
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns="http://www.mulesource.org/schema/mule/core/2.2" 
+	xmlns:spring="http://www.springframework.org/schema/beans"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:management="http://www.mulesource.org/schema/mule/management/2.2"
+	xsi:schemaLocation="
+		http://www.mulesource.org/schema/mule/core/2.2 http://www.mulesource.org/schema/mule/core/2.2/mule.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd
+		http://www.mulesource.org/schema/mule/management/2.2 http://www.mulesource.org/schema/mule/management/2.2/mule-management.xsd
+	"
+>
+	
+	<management:jmx-default-config port="${jmx.port}"/>
+	<!--management:jmx-log4j /-->
+
+	<!--configuration defaultResponseTimeout="${mule.config.defaultResponseTimeout}" shutdownTimeout="${mule.config.shutdownTimeout}"/-->
+	<configuration defaultResponseTimeout="${mule.config.defaultResponseTimeout}">
+		<!--default-dispatcher-threading-profile maxThreadsActive="${threading.profile.maxThreadsActive}" maxThreadsIdle="${threading.profile.maxThreadsIdle}" threadTTL="${threading.profile.threadTTL}" poolExhaustedAction="WAIT" maxBufferSize="${threading.profile.maxBufferSize}" /-->
+		<!--default-receiver-threading-profile maxThreadsActive="${threading.profile.receiver.maxThreadsActive}" maxThreadsIdle="${threading.profile.receiver.maxThreadsIdle}" threadTTL="${threading.profile.receiver.threadTTL}" poolExhaustedAction="WAIT" maxBufferSize="${threading.profile.receiver.maxBufferSize}" /-->
+	</configuration>
+ 	    
+	<spring:beans xmlns="http://www.springframework.org/schema/beans" default-dependency-check="all">
+
+		<bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+			<property name="ignoreResourceNotFound" value="true" />
+			<property name="locations"> 
+				<list>
+					<value>classpath:nl/clockwork/mule/ebms/default.properties</value>   
+					<value>classpath:nl/clockwork/mule/ebms/stub/ebf/default.local.properties</value>   
+					<value>file:${user.home}/.ebms-stub/ebf.local.properties</value>
+				</list>
+			</property>
+		</bean>
+
+		<import resource="components/constants.ebms.xml" />
+		<import resource="components/constants.ebf.xml" />
+
+		<import resource="components/connector.ebms.http.xml" />
+		<!--import resource="components/connector.ebms.https.xml" /-->
+		<import resource="components/connector.ebms.xml" />
+
+		<!--import resource="components/datasource.ebms.xml" />
+		<import resource="components/dao.ebms.mssql.xml" /-->
+
+		<import resource="components/datasource.ebms.xml" />
+		<import resource="components/dao.ebms.hsqldb.xml" />
+
+		<import resource="flows/file.cpa.in.xml" />
+
+		<import resource="flows/ebms.in.xml" />
+		<import resource="flows/ebms.out.xml" />
+
+		<import resource="components/routing.ebf.xml" />
+
+		<import resource="flows/ebf/afleverService.stub.processing.xml" />
+		<import resource="flows/ebf/aanleverService.stub.in.xml" />
+		<import resource="flows/ebf/aanleverService.stub.out.xml" />
+
+	</spring:beans>
+
+</mule>

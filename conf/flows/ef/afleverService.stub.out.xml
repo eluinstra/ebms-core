@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Copyright 2011 Clockwork
+  
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+  
+    http://www.apache.org/licenses/LICENSE-2.0
+  
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.2"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:spring="http://www.springframework.org/schema/beans"
+	xmlns:file="http://www.mulesource.org/schema/mule/file/2.2" 
+	xmlns:http="http://www.mulesource.org/schema/mule/http/2.2" 
+	xmlns:https="http://www.mulesource.org/schema/mule/https/2.2" 
+	xmlns:cxf="http://www.mulesource.org/schema/mule/cxf/2.2"
+	xmlns:vm="http://www.mulesource.org/schema/mule/vm/2.2"
+	xmlns:jdbc="http://www.mulesource.org/schema/mule/jdbc/2.2"
+	xmlns:script="http://www.mulesource.org/schema/mule/scripting/2.2"
+	xsi:schemaLocation="
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+		http://www.mulesource.org/schema/mule/core/2.2 http://www.mulesource.org/schema/mule/core/2.2/mule.xsd
+		http://www.mulesource.org/schema/mule/file/2.2 http://www.mulesource.org/schema/mule/file/2.2/mule-file.xsd
+		http://www.mulesource.org/schema/mule/http/2.2 http://www.mulesource.org/schema/mule/http/2.2/mule-http.xsd
+		http://www.mulesource.org/schema/mule/https/2.2 http://www.mulesource.org/schema/mule/https/2.2/mule-https.xsd
+		http://www.mulesource.org/schema/mule/cxf/2.2 http://www.mulesource.org/schema/mule/cxf/2.2/mule-cxf.xsd
+		http://www.mulesource.org/schema/mule/vm/2.2 http://www.mulesource.org/schema/mule/vm/2.2/mule-vm.xsd
+		http://www.mulesource.org/schema/mule/jdbc/2.2 http://www.mulesource.org/schema/mule/jdbc/2.2/mule-jdbc.xsd
+		http://www.mulesource.org/schema/mule/scripting/2.2 http://www.mulesource.org/schema/mule/scripting/2.2/mule-scripting.xsd  
+	"
+>
+
+	<file:connector name="connector.file">
+		<file:expression-filename-parser/>
+	</file:connector>
+
+	<model>
+
+		<service name="afleverbericht.stub.file.receive">
+			<inbound>
+				<file:inbound-endpoint connector-ref="connector.file"	path="${dir.base}/afleverService/request" moveToDirectory="${dir.base}/afleverService/request/processed" pollingFrequency="10000">
+					<file:filename-wildcard-filter pattern="*.xml" caseSensitive="false"/>
+					<object-to-string-transformer/>
+				</file:inbound-endpoint>				
+			</inbound>
+			<outbound>
+				<filtering-router>
+					<vm:outbound-endpoint path="afleverbericht.stub.message.transform.in" />
+					<custom-filter class="nl.clockwork.mule.common.filter.XSDValidationFilter">
+						<spring:property name="xsdFile" value="/nl/clockwork/mule/ebms/stub/ef/xsd/Afleveren_ebMS_2.0_v1.xsd" />
+					</custom-filter>
+				</filtering-router>
+				<forwarding-catch-all-strategy>
+				</forwarding-catch-all-strategy>
+			</outbound>
+		</service>
+
+		<service name="afleverbericht.stub.message.transform">
+			<inbound>
+				<vm:inbound-endpoint path="afleverbericht.stub.message.transform.in" synchronous="false">
+					<custom-transformer class="nl.clockwork.mule.ebms.service.stub.enricher.XMLToDataSourceEnricher" />
+					<custom-transformer class="nl.clockwork.mule.ebms.service.stub.transformer.DataSourceToEbMSMessageContent" />
+				</vm:inbound-endpoint>
+			</inbound>
+			<outbound>
+				<pass-through-router>
+					<vm:outbound-endpoint path="ebms.message.send.request.in" />
+				</pass-through-router>
+			</outbound>
+		</service>
+		
+	</model>
+
+</mule>

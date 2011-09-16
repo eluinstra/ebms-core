@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+			xmlns:tns="http://logius.nl/digipoort/ebms/2.0/afleverservice/1.0/"
+			targetNamespace="http://logius.nl/digipoort/ebms/2.0/afleverservice/1.0/"
+			elementFormDefault="qualified">
+			
+			<xsd:element name="bevestigAfleverBericht">
+				<xsd:complexType>
+					<xsd:choice>
+						<xsd:element name="tijdstempelOverheidsdeelnemer" type="xsd:dateTime" nillable="false"/>
+						<xsd:element name="fout" type="tns:foutType"/>
+					</xsd:choice>
+				</xsd:complexType>
+			</xsd:element>
+			
+			
+			<xsd:simpleType name="foutCodeType">
+				<xsd:annotation>
+					<xsd:documentation>
+						Element: foutCodeType
+						Type: Tekst
+						Maximale lengte:
+						20
+
+						Beschrijving:
+						Bevat de code van
+						de opgetreden fout.				
+					</xsd:documentation>
+				</xsd:annotation>
+				<xsd:restriction base="xsd:normalizedString">
+					<xsd:whiteSpace value="collapse"/>
+					<xsd:maxLength value="20"/>
+				</xsd:restriction>
+			</xsd:simpleType>
+			<xsd:simpleType name="foutBeschrijvingType">
+				<xsd:annotation>
+					<xsd:documentation>
+						Element: foutBeschrijvingType
+						Type: Tekst
+						Maximale lengte: 8192
+
+						Beschrijving:
+						Bevat een omschrijving van de opgetreden fout. 				
+					</xsd:documentation>
+				</xsd:annotation>
+				<xsd:restriction base="xsd:normalizedString">
+					<xsd:whiteSpace value="collapse"/>
+					<xsd:maxLength value="8192"/>
+				</xsd:restriction>
+			</xsd:simpleType>
+			<xsd:complexType name="foutType">
+				<xsd:annotation>
+					<xsd:documentation>
+						Element: foutType
+						Type: Combinatie van foutcode en foutomschrijving
+					</xsd:documentation>
+				</xsd:annotation>
+				<xsd:sequence>
+					<xsd:element name="foutCode" type="tns:foutCodeType" nillable="false"/>
+					<xsd:element name="foutBeschrijving" type="tns:foutBeschrijvingType" nillable="false"/>
+				</xsd:sequence>
+			</xsd:complexType>
+			
+			
+			
+</xsd:schema>

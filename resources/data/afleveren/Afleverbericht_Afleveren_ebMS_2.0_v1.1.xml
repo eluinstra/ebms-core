@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tns:afleverBericht xsi:schemaLocation="http://logius.nl/digipoort/ebms/2.0/afleverservice/1.1/ Afleveren_ebMS_2.0_v1.1.xsd" xmlns:tns="http://logius.nl/digipoort/ebms/2.0/afleverservice/1.1/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<tns:kenmerk>kenmerk</tns:kenmerk>
+	<tns:berichtsoort>berichtsoort</tns:berichtsoort>
+	<tns:berichtkenmerk>berichtkenmerk</tns:berichtkenmerk>
+	<tns:aanleverkenmerk>aanleverkenmerk</tns:aanleverkenmerk>
+	<tns:tijdstempelAangeleverd>2001-12-17T09:30:47.0Z</tns:tijdstempelAangeleverd>
+	<tns:identiteitBelanghebbende>
+		<tns:nummer>nummer</tns:nummer>
+		<tns:type>BSN</tns:type>
+	</tns:identiteitBelanghebbende>
+	<tns:rolBelanghebbende>rolBelanghebbende</tns:rolBelanghebbende>
+	<tns:berichtInhoud>
+		<tns:mimeType>mimeType</tns:mimeType>
+		<tns:bestandsnaam>bestandsnaam</tns:bestandsnaam>
+		<tns:inhoud>YWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYQ==</tns:inhoud>
+	</tns:berichtInhoud>
+	<tns:berichtBijlagen>
+		<tns:bijlage>
+			<tns:mimeType>mimeType</tns:mimeType>
+			<tns:bestandsnaam>bestandsnaam</tns:bestandsnaam>
+			<tns:inhoud>YWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYQ==</tns:inhoud>
+		</tns:bijlage>
+	</tns:berichtBijlagen>
+</tns:afleverBericht>

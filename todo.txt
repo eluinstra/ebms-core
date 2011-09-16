@@ -1,0 +1,11 @@
+1.x.x:
+- store routing in db and make routing configurable/loadable through xml definition file
+- change wsdl definition and 'parse' message in Mule. This makes extending the current implemented services easier and also gets rid of the cxf patch
+- change ebms message storage. Store one message per record
+- add MySQL and Oracle database support
+
+2.x.x:
+- update adapter to Mule 3
+
+long term:
+- change ebms-adapter into an ebms-component

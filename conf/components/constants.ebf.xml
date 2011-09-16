@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Copyright 2011 Clockwork
+  
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+  
+    http://www.apache.org/licenses/LICENSE-2.0
+  
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.5.xsd
+	"
+>
+
+	<util:constant id="AFLEVERBERICHT_BERICHTSOORT_EFACTUUR" static-field="nl.clockwork.mule.ebms.stub.Constants.AFLEVERBERICHT_BERICHTSOORT_EFACTUUR" />
+	<util:constant id="AFLEVERBERICHT_ERROR" static-field="nl.clockwork.mule.ebms.stub.Constants.AFLEVERBERICHT_ERROR" />
+
+	<bean id="AFLEVERBERICHT_PROCESSING_ERROR" class="nl.clockwork.mule.ebms.stub.ebf.model.afleveren.bevestiging.FoutType">
+		<property name="foutcode" value="AFS400" />
+		<property name="foutbeschrijving" value="Er is een technische fout in de afleverservice van de Procesinfrastructuur opgetreden. Probeer het later opnieuw of neem contact op met de beheerder van de Procesinfrastructuur." />
+	</bean>
+
+	<bean id="AFLEVERBERICHT_DETERMINATION_ERROR" class="nl.clockwork.mule.ebms.stub.ebf.model.afleveren.bevestiging.FoutType">
+		<property name="foutcode" value="AFS100" />
+		<property name="foutbeschrijving" value="Het verzoek voldoet niet aan de koppelvlakspecificaties en kan hierdoor niet door de Procesinfrastructuur worden verwerkt.\n\nDe volgende fout is opgetreden:\nHet afleverbericht kan niet worden gevonden." />
+	</bean>
+
+	<bean id="AFLEVERBERICHT_XSD_ERROR" class="nl.clockwork.mule.ebms.stub.ebf.model.afleveren.bevestiging.FoutType">
+		<property name="foutcode" value="AFS100" />
+		<property name="foutbeschrijving" value="Het verzoek voldoet niet aan de koppelvlakspecificaties en kan hierdoor niet door de Procesinfrastructuur worden verwerkt.\n\nDe volgende fout is opgetreden:\nHet afleverbericht voldoet niet aan de xsd." />
+	</bean>
+
+	<bean id="AFLEVERBERICHT_BERICHTSOORT_ERROR" class="nl.clockwork.mule.ebms.stub.ebf.model.afleveren.bevestiging.FoutType">
+		<property name="foutcode" value="AFS100" />
+		<property name="foutbeschrijving" value="Het verzoek voldoet niet aan de koppelvlakspecificaties en kan hierdoor niet door de Procesinfrastructuur worden verwerkt.\n\nDe volgende fout is opgetreden:\nDe berichtsoort is onjuist." />
+	</bean>
+
+	<util:constant id="AANLEVERBERICHT_BERICHTSOORT_EFACTUUR" static-field="nl.clockwork.mule.ebms.stub.Constants.AANLEVERBERICHT_BERICHTSOORT_EFACTUUR" />
+	<util:constant id="AANLEVERBERICHT_BERICHTSOORT_ORDER" static-field="nl.clockwork.mule.ebms.stub.Constants.AANLEVERBERICHT_BERICHTSOORT_ORDER" />
+	<util:constant id="AANLEVERBERICHT_ERROR" static-field="nl.clockwork.mule.ebms.stub.Constants.AANLEVERBERICHT_ERROR" />
+
+	<bean id="AANLEVERBERICHT_PROCESSING_ERROR" class="nl.clockwork.mule.ebms.stub.ebf.model.aanleveren.bevestiging.FoutType">
+		<property name="foutcode" value="AFS400" />
+		<property name="foutbeschrijving" value="Er is een technische fout in de afleverservice van de Procesinfrastructuur opgetreden. Probeer het later opnieuw of neem contact op met de beheerder van de Procesinfrastructuur." />
+	</bean>
+
+	<bean id="AANLEVERBERICHT_DETERMINATION_ERROR" class="nl.clockwork.mule.ebms.stub.ebf.model.aanleveren.bevestiging.FoutType">
+		<property name="foutcode" value="AFS100" />
+		<property name="foutbeschrijving" value="Het verzoek voldoet niet aan de koppelvlakspecificaties en kan hierdoor niet door de Procesinfrastructuur worden verwerkt.\n\nDe volgende fout is opgetreden:\nHet afleverbericht kan niet worden gevonden." />
+	</bean>
+
+	<bean id="AANLEVERBERICHT_XSD_ERROR" class="nl.clockwork.mule.ebms.stub.ebf.model.aanleveren.bevestiging.FoutType">
+		<property name="foutcode" value="AFS100" />
+		<property name="foutbeschrijving" value="Het verzoek voldoet niet aan de koppelvlakspecificaties en kan hierdoor niet door de Procesinfrastructuur worden verwerkt.\n\nDe volgende fout is opgetreden:\nHet afleverbericht voldoet niet aan de xsd." />
+	</bean>
+
+	<bean id="AANLEVERBERICHT_BERICHTSOORT_ERROR" class="nl.clockwork.mule.ebms.stub.ebf.model.aanleveren.bevestiging.FoutType">
+		<property name="foutcode" value="AFS100" />
+		<property name="foutbeschrijving" value="Het verzoek voldoet niet aan de koppelvlakspecificaties en kan hierdoor niet door de Procesinfrastructuur worden verwerkt.\n\nDe volgende fout is opgetreden:\nDe berichtsoort is onjuist." />
+	</bean>
+
+</beans>

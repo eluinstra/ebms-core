@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://logius.nl/digipoort/ebms/2.0/afleverservice/1.1/" targetNamespace="http://logius.nl/digipoort/ebms/2.0/afleverservice/1.1/" elementFormDefault="qualified">
+	<xsd:element name="bevestigAfleverBericht">
+		<xsd:complexType>
+			<xsd:sequence>			
+				<xsd:element name="kenmerk" type="tns:kenmerkType" nillable="false"/>
+				<xsd:element name="berichtsoort" type="tns:berichtsoortType" nillable="false" minOccurs="0"/>
+				<xsd:element name="berichtkenmerk" type="tns:berichtkenmerkType" nillable="false"/>
+				<xsd:choice>
+					<xsd:element name="tijdstempelAfgeleverd" type="xsd:dateTime" nillable="false"/>
+					<xsd:element name="fout" type="tns:foutType"/>
+				</xsd:choice>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<!-- lijst van ondersteunde types -->	
+			<xsd:simpleType name="kenmerkType">
+				<xsd:annotation>
+					<xsd:documentation>
+						Element				: 	kenmerkType
+						Type						: 	Tekst
+						Maximale lengte	:	40
+						Beschrijving			:	Het unieke kenmerk van een instantie van het verwerkingsproces. Voor elk aanleververzoek waarvoor nog geen 
+														uniek kenmerk bestaat wordt een nieuw verwerkingsproces gestart. Het kenmerk kan worden gebruikt bij het 
+														opvragen van statussen.
+					</xsd:documentation>
+				</xsd:annotation>
+				<xsd:restriction base="xsd:normalizedString">
+					<xsd:whiteSpace value="collapse"/>
+					<xsd:maxLength value="40"/>
+				</xsd:restriction>
+			</xsd:simpleType>
+			<xsd:simpleType name="berichtsoortType">
+				<xsd:annotation>
+					<xsd:documentation>
+						Element				: 	berichtsoortType
+						Type						:	Tekst
+						Maximale lengte	:	80
+						Beschrijving			:	Het element berichtsoort beschrijft het soort verwerkingsproces dat met een aanleververzoek wordt geïnitieerd. 
+														Het meegegeven element berichtsoort moet van een type zijn wat binnen Digipoort bekend is.
+					</xsd:documentation>
+				</xsd:annotation>
+				<xsd:restriction base="xsd:normalizedString">
+					<xsd:whiteSpace value="collapse"/>
+					<xsd:maxLength value="80"/>
+				</xsd:restriction>
+			</xsd:simpleType>
+			<xsd:simpleType name="berichtkenmerkType">
+				<xsd:annotation>
+					<xsd:documentation>
+						Element				:	berichtkenmerkType
+						Type						:	Tekst
+						Maximale lengte	:	256
+						Beschrijving			:	Het unieke kenmerk (message ID) van het aanleververzoek dat geleid heeft tot het initiëren van het verwerkingsproces.
+					</xsd:documentation>
+				</xsd:annotation>
+				<xsd:restriction base="xsd:normalizedString">
+					<xsd:whiteSpace value="collapse"/>
+					<xsd:maxLength value="256"/>
+				</xsd:restriction>
+			</xsd:simpleType>
+			<xsd:simpleType name="foutcodeType">
+				<xsd:annotation>
+					<xsd:documentation>
+						Element				:	foutcodeType
+						Type						: 	Tekst
+						Maximale lengte	:	20
+						Beschrijving			:	Een unieke code waarmee een fout kan worden geïdentificeerd.				
+					</xsd:documentation>
+				</xsd:annotation>
+				<xsd:restriction base="xsd:normalizedString">
+					<xsd:whiteSpace value="collapse"/>
+					<xsd:maxLength value="20"/>
+				</xsd:restriction>
+			</xsd:simpleType>
+			<xsd:simpleType name="foutbeschrijvingType">
+				<xsd:annotation>
+					<xsd:documentation>
+						Element				:	foutbeschrijvingType
+						Type						:	Tekst
+						Maximale lengte	:	8192
+						Beschrijving			:	Een omschrijving van de fout. 				
+					</xsd:documentation>
+				</xsd:annotation>
+				<xsd:restriction base="xsd:normalizedString">
+					<xsd:whiteSpace value="collapse"/>
+					<xsd:maxLength value="8192"/>
+				</xsd:restriction>
+			</xsd:simpleType>
+			<xsd:complexType name="foutType">
+				<xsd:annotation>
+					<xsd:documentation>
+						Element				:	foutType
+						Type						:	Combinatie van foutcode en foutomschrijving.
+					</xsd:documentation>
+				</xsd:annotation>
+				<xsd:sequence>
+					<xsd:element name="foutcode" type="tns:foutcodeType" nillable="false"/>
+					<xsd:element name="foutbeschrijving" type="tns:foutbeschrijvingType" nillable="false"/>
+				</xsd:sequence>
+			</xsd:complexType>	
+</xsd:schema>

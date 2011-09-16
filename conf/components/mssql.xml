@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Copyright 2011 Clockwork
+  
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+  
+    http://www.apache.org/licenses/LICENSE-2.0
+  
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xsi:schemaLocation="
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.5.xsd
+	"
+>
+
+	<bean id="insertCPA" class="java.lang.String">
+		<constructor-arg value="insert into cpa (cpa_id, cpa) values (#[map-payload:cpa_id], #[map-payload:cpa])" />
+	</bean>
+	<bean id="updateCPA" class="java.lang.String">
+		<constructor-arg value="update cpa set cpa=#[map-payload:cpa] where cpa_id=#[map-payload:cpa_id]" />
+	</bean>
+
+	<bean id="insertEbMSMessage" class="java.lang.String">
+		<constructor-arg value="insert into ebms_message (time_stamp, cpa_id, conversation_id, sequence_nr, message_id, message_type, message_original, message_header, message_manifest, status, status_date) values (#[map-payload:time_stamp], #[map-payload:cpa_id], #[map-payload:conversation_id], #[map-payload:sequence_nr], #[map-payload:message_id], #[map-payload:message_type], #[map-payload:message_original], #[map-payload:message_header], #[map-payload:message_manifest], #[map-payload:status], GETDATE())" />
+	</bean>
+	<bean id="selectEbMSMessageForResend" class="java.lang.String">
+		<constructor-arg value="select id from ebms_message where ack_type is null and next_retry_time &lt; GETDATE()" />
+	</bean>
+	<bean id="selectEbMSMessageForResend.ack" class="java.lang.String">
+		<constructor-arg value="update ebms_message set nr_retries=nr_retries+1, next_retry_time=null where id=#[map-payload:ID]" /> 
+	</bean>
+	<bean id="updateEbMSMessageAcknowledgment" class="java.lang.String">
+		<constructor-arg value="update ebms_message set ack_type=#[map-payload:ack_type], ack_header=#[map-payload:ack_header], ack_content=#[map-payload:ack_content] where id=#[map-payload:id]" /> 
+	</bean>
+	<bean id="updateEbMSAcknowledgment" class="java.lang.String">
+		<constructor-arg value="update ebms_message set ack_type=0, ack_header=#[map-payload:ack_header], ack_content=#[map-payload:ack_content] where id=#[map-payload:id]" /> 
+	</bean>
+	<bean id="updateEbMSMessageError" class="java.lang.String">
+		<constructor-arg value="update ebms_message set ack_type=1, ack_header=#[map-payload:ack_header], ack_content=#[map-payload:ack_content] where id=#[map-payload:id]" /> 
+	</bean>
+	<bean id="updateEbMSMessageStatus" class="java.lang.String">
+		<constructor-arg value="update ebms_message set status=#[map-payload:status], status_date=GETDATE() where id=#[map-payload:id]" /> 
+	</bean>
+	<bean id="updateEbMSNextRetryTime" class="java.lang.String">
+		<constructor-arg value="update ebms_message set next_retry_time=null where id=#[map-payload:id]" /> 
+	</bean>
+
+</beans>
