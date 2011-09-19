@@ -64,13 +64,13 @@ jmx.port=1099
 ========================
 Start remote EbMS stub =
 ========================
-> mule -config main.stub.ebf.remote.xml
+> mule -config nl/clockwork/mule/ebms/stub/ebf/main.remote.xml
 
 
 =======================
 Start local EbMS stub =
 =======================
-> mule -config main.stub.ebf.local.xml
+> mule -config nl/clockwork/mule/ebms/stub/ebf/main.local.xml
 
 
 =======

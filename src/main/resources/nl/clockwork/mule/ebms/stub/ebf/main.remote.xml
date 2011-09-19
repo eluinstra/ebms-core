@@ -36,7 +36,7 @@
 		<!--default-dispatcher-threading-profile maxThreadsActive="${threading.profile.maxThreadsActive}" maxThreadsIdle="${threading.profile.maxThreadsIdle}" threadTTL="${threading.profile.threadTTL}" poolExhaustedAction="WAIT" maxBufferSize="${threading.profile.maxBufferSize}" /-->
 		<!--default-receiver-threading-profile maxThreadsActive="${threading.profile.receiver.maxThreadsActive}" maxThreadsIdle="${threading.profile.receiver.maxThreadsIdle}" threadTTL="${threading.profile.receiver.threadTTL}" poolExhaustedAction="WAIT" maxBufferSize="${threading.profile.receiver.maxBufferSize}" /-->
 	</configuration>
- 	    
+
 	<spring:beans xmlns="http://www.springframework.org/schema/beans" default-dependency-check="all">
 
 		<bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
@@ -44,28 +44,33 @@
 			<property name="locations"> 
 				<list>
 					<value>classpath:nl/clockwork/mule/ebms/default.properties</value>   
-					<value>classpath:nl/clockwork/mule/ebms/stub/ef/default.local.properties</value>   
-					<value>file:${user.home}/.ebms-stub/ef.local.properties</value>
+					<value>classpath:nl/clockwork/mule/ebms/stub/ebf/default.remote.properties</value>   
+					<value>file:${user.home}/.ebms-stub/ebf.remote.properties</value>
 				</list>
 			</property>
 		</bean>
 
-		<import resource="components/constants.ebms.xml" />
-		<import resource="components/constants.ef.xml" />
+		<import resource="classpath:nl/clockwork/mule/ebms/components/constants.xml" />
 
-		<!--import resource="components/connector.ebms.http.xml" /-->
-		<import resource="components/connector.ebms.https.xml" />
-		<import resource="components/connector.ebms.xml" />
+		<import resource="classpath:nl/clockwork/mule/ebms/components/connector.http.xml" />
+		<!--import resource="classpath:nl/clockwork/mule/ebms/components/connector.https.xml" /-->
+		<import resource="classpath:nl/clockwork/mule/ebms/components/connector.xml" />
 
-		<import resource="components/datasource.ebms.xml" />
-		<import resource="components/dao.ebms.hsqldb.xml" />
 
-		<import resource="flows/file.cpa.in.xml" />
+		<import resource="classpath:nl/clockwork/mule/ebms/components/datasource.xml" />
+		<import resource="classpath:nl/clockwork/mule/ebms/components/dao.hsqldb.xml" />
+		<!--import resource="classpath:nl/clockwork/mule/ebms/components/dao.mssql.xml" /-->
 
-		<import resource="flows/ebms.in.xml" />
-		<import resource="flows/ebms.out.xml" />
+		<import resource="classpath:nl/clockwork/mule/ebms/flows/file.cpa.in.xml" />
 
-		<import resource="flows/ef/afleverService.stub.processing.xml" />
+		<import resource="classpath:nl/clockwork/mule/ebms/flows/ebms.in.xml" />
+		<import resource="classpath:nl/clockwork/mule/ebms/flows/ebms.out.xml" />
+
+		<import resource="components/constants.xml" />
+		<import resource="components/routing.xml" />
+		<import resource="flows/afleverService.stub.in.xml" />
+		<import resource="flows/afleverService.stub.out.xml" />
+		<import resource="flows/aanleverService.stub.processing.xml" />
 
 	</spring:beans>
 

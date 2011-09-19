@@ -28,8 +28,14 @@ public class EbMSChannel
 	private Service service;
 	private String action;
 	private String endpoint;
+	private String refId;
 
 	public EbMSChannel(String id, String cpaId, From from, To to, Service service, String action, String endpoint)
+	{
+		this(id,cpaId,from,to,service,action,endpoint,null);
+	}
+	
+	public EbMSChannel(String id, String cpaId, From from, To to, Service service, String action, String endpoint, String refId)
 	{
 		this.cpaId = cpaId;
 		this.id = id;
@@ -38,6 +44,7 @@ public class EbMSChannel
 		this.service = service;
 		this.action = action;
 		this.endpoint = endpoint;
+		this.refId = refId;
 	}
 
 	public String getCpaId()
@@ -75,5 +82,9 @@ public class EbMSChannel
 		return endpoint;
 	}
 	
+	public String getRefId()
+	{
+		return refId;
+	}
 	
 }

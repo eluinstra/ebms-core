@@ -44,35 +44,29 @@
 			<property name="locations"> 
 				<list>
 					<value>classpath:nl/clockwork/mule/ebms/default.properties</value>   
-					<value>classpath:nl/clockwork/mule/ebms/stub/ebf/default.local.properties</value>   
-					<value>file:${user.home}/.ebms-stub/ebf.local.properties</value>
+					<value>classpath:nl/clockwork/mule/ebms/stub/ef/default.remote.properties</value>   
+					<value>file:${user.home}/.ebms-stub/ef.remote.properties</value>
 				</list>
 			</property>
 		</bean>
 
-		<import resource="components/constants.ebms.xml" />
-		<import resource="components/constants.ebf.xml" />
+		<import resource="classpath:nl/clockwork/mule/ebms/components/constants.xml" />
 
-		<import resource="components/connector.ebms.http.xml" />
-		<!--import resource="components/connector.ebms.https.xml" /-->
-		<import resource="components/connector.ebms.xml" />
+		<!--import resource="classpath:nl/clockwork/mule/ebms/components/connector.http.xml" /-->
+		<import resource="classpath:nl/clockwork/mule/ebms/components/connector.https.xml" />
+		<import resource="classpath:nl/clockwork/mule/ebms/components/connector.xml" />
 
-		<!--import resource="components/datasource.ebms.xml" />
-		<import resource="components/dao.ebms.mssql.xml" /-->
+		<import resource="classpath:nl/clockwork/mule/ebms/components/datasource.xml" />
+		<import resource="classpath:nl/clockwork/mule/ebms/components/dao.hsqldb.xml" />
 
-		<import resource="components/datasource.ebms.xml" />
-		<import resource="components/dao.ebms.hsqldb.xml" />
+		<import resource="classpath:nl/clockwork/mule/ebms/flows/file.cpa.in.xml" />
 
-		<import resource="flows/file.cpa.in.xml" />
+		<import resource="classpath:nl/clockwork/mule/ebms/flows/ebms.in.xml" />
+		<import resource="classpath:nl/clockwork/mule/ebms/flows/ebms.out.xml" />
 
-		<import resource="flows/ebms.in.xml" />
-		<import resource="flows/ebms.out.xml" />
-
-		<import resource="components/routing.ebf.xml" />
-
-		<import resource="flows/ebf/afleverService.stub.processing.xml" />
-		<import resource="flows/ebf/aanleverService.stub.in.xml" />
-		<import resource="flows/ebf/aanleverService.stub.out.xml" />
+		<import resource="components/constants.xml" />
+		<import resource="flows/afleverService.stub.in.xml" />
+		<import resource="flows/afleverService.stub.out.xml" />
 
 	</spring:beans>
 
