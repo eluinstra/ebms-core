@@ -1,0 +1,15 @@
+# ignore hidden files/directories
+
+hooks
+.DS_Store
+*~
+\#*
+.#*
+*.jar
+*.log
+*.vgc
+/.settings
+/.classpath
+/.project
+/target
+
