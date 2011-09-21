@@ -36,19 +36,19 @@ import javax.xml.ws.WebServiceFeature;
 
 
 @WebServiceClient(name = "EbMS", 
-                  wsdlLocation = "file:/F:/projects/agnl/ezp/src/main/resources/nl/clockwork/mule/ebms/wsdl/ebms.wsdl",
-                  targetNamespace = "http://www.ez.nl/ebms/v1") 
+                  wsdlLocation = "classpath:nl/clockwork/mule/ebms/wsdl/ebms.wsdl",
+                  targetNamespace = "http://www.clockwork.nl/ebms/v1") 
 public class EbMS extends Service {
 
     public final static URL WSDL_LOCATION;
-    public final static QName SERVICE = new QName("http://www.ez.nl/ebms/v1", "EbMS");
-    public final static QName EbMSPort = new QName("http://www.ez.nl/ebms/v1", "EbMSPort");
+    public final static QName SERVICE = new QName("http://www.clockwork.nl/ebms/v1", "EbMS");
+    public final static QName EbMSPort = new QName("http://www.clockwork.nl/ebms/v1", "EbMSPort");
     static {
         URL url = null;
         try {
-            url = new URL("file:/F:/projects/agnl/ezp/src/main/resources/nl/clockwork/mule/ebms/wsdl/ebms.wsdl");
+            url = new URL("classpath:nl/clockwork/mule/ebms/wsdl/ebms.wsdl");
         } catch (MalformedURLException e) {
-            System.err.println("Can not initialize the default wsdl from file:/F:/projects/agnl/ezp/src/main/resources/nl/clockwork/mule/ebms/wsdl/ebms.wsdl");
+            System.err.println("Can not initialize the default wsdl from classpath:nl/clockwork/mule/ebms/wsdl/ebms.wsdl");
             // e.printStackTrace();
         }
         WSDL_LOCATION = url;

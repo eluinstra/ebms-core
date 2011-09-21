@@ -16,8 +16,8 @@
 -->
 <wsdl:definitions 
 	name="EbMS"
-	targetNamespace="http://www.ez.nl/ebms/v1"
-	xmlns:tns="http://www.ez.nl/ebms/v1"
+	targetNamespace="http://www.clockwork.nl/ebms/v1"
+	xmlns:tns="http://www.clockwork.nl/ebms/v1"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
 	xmlns:xmime="http://www.w3.org/2005/05/xmlmime"
@@ -89,7 +89,7 @@
 	</wsdl:binding>
 	<wsdl:service name="EbMS">
 		<wsdl:port binding="tns:EbMSSOAPBinding" name="EbMSPort">
-			<soap:address location="http://www.ez.nl/ebms"/>
+			<soap:address location="http://www.clockwork.nl/ebms"/>
 		</wsdl:port>
 	</wsdl:service>
 </wsdl:definitions>

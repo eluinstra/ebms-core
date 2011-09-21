@@ -29,7 +29,7 @@ import javax.xml.bind.annotation.XmlSeeAlso;
  * 
  */
  
-@WebService(targetNamespace = "http://www.ez.nl/ebms/v1", name = "EbMSPortType")
+@WebService(targetNamespace = "http://www.clockwork.nl/ebms/v1", name = "EbMSPortType")
 @XmlSeeAlso({nl.clockwork.mule.ebms.model.soap.envelope.ObjectFactory.class,nl.clockwork.mule.ebms.model.ebxml.ObjectFactory.class,nl.clockwork.mule.ebms.model.xml.xlink.ObjectFactory.class,nl.clockwork.mule.ebms.model.xml.xmldsig.ObjectFactory.class})
 @SOAPBinding(parameterStyle = SOAPBinding.ParameterStyle.BARE)
 public interface EbMSPortType {
