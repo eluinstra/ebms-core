@@ -52,8 +52,8 @@
 
 		<import resource="classpath:nl/clockwork/mule/ebms/components/constants.xml" />
 
-		<import resource="classpath:nl/clockwork/mule/ebms/components/connector.http.xml" />
-		<!--import resource="classpath:nl/clockwork/mule/ebms/components/connector.https.xml" /-->
+		<!--import resource="classpath:nl/clockwork/mule/ebms/components/connector.http.xml" /-->
+		<import resource="classpath:nl/clockwork/mule/ebms/components/connector.https.xml" />
 		<import resource="classpath:nl/clockwork/mule/ebms/components/connector.xml" />
 
 
