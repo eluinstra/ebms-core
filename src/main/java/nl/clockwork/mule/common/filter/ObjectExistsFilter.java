@@ -19,24 +19,15 @@ import org.apache.commons.jxpath.JXPathContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.routing.filter.Filter;
 
-public class JXPathFilter implements Filter
+public class ObjectExistsFilter implements Filter
 {
 	private String xPathQuery;
-	private String regEx;
 	
 	@Override
 	public boolean accept(MuleMessage message)
 	{
-		try
-		{
-			JXPathContext context = JXPathContext.newContext(message.getPayload());
-			String s = context.getValue(xPathQuery).toString();
-			return s.matches(regEx);
-		}
-		catch (Exception e)
-		{
-			return false;
-		}
+		JXPathContext context = JXPathContext.newContext(message.getPayload());
+		return context.getValue(xPathQuery) != null;
 	}
 
 	public void setxPathQuery(String xPathQuery)
@@ -44,8 +35,4 @@ public class JXPathFilter implements Filter
 		this.xPathQuery = xPathQuery;
 	}
 
-	public void setRegEx(String regEx)
-	{
-		this.regEx = regEx;
-	}
 }

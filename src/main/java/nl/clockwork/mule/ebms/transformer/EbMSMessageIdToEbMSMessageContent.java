@@ -15,7 +15,9 @@
  ******************************************************************************/
 package nl.clockwork.mule.ebms.transformer;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.activation.DataSource;
 
@@ -24,6 +26,7 @@ import nl.clockwork.mule.ebms.dao.EbMSDAO;
 import nl.clockwork.mule.ebms.model.EbMSMessageContent;
 import nl.clockwork.mule.ebms.model.ebxml.MessageHeader;
 
+import org.apache.commons.jxpath.JXPathContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.transformer.TransformerException;
 import org.mule.transformer.AbstractMessageAwareTransformer;
@@ -31,6 +34,7 @@ import org.mule.transformer.AbstractMessageAwareTransformer;
 public class EbMSMessageIdToEbMSMessageContent extends AbstractMessageAwareTransformer
 {
 	private EbMSDAO ebMSDAO;
+	private String[] properties;
 
 	public EbMSMessageIdToEbMSMessageContent()
 	{
@@ -45,7 +49,11 @@ public class EbMSMessageIdToEbMSMessageContent extends AbstractMessageAwareTrans
 			long messageId = message.getLongProperty(Constants.EBMS_MESSAGE_ID,0);
 			MessageHeader messageHeader = ebMSDAO.getMessageHeader(messageId);
 			List<DataSource> attachments = ebMSDAO.getAttachments(messageId);
-			EbMSMessageContent content = new EbMSMessageContent(messageHeader.getConversationId(),attachments);
+			Map<String,Object> properties = new HashMap<String,Object>();
+			JXPathContext context = JXPathContext.newContext(messageHeader);
+			for (String property : this.properties)
+				properties.put(property,context.getValue(property));
+			EbMSMessageContent content = new EbMSMessageContent(messageHeader.getConversationId(),properties,attachments);
 			message.setPayload(content);
 			return message;
 		}
@@ -58,5 +66,10 @@ public class EbMSMessageIdToEbMSMessageContent extends AbstractMessageAwareTrans
 	public void setEbMSDAO(EbMSDAO ebMSDAO)
 	{
 		this.ebMSDAO = ebMSDAO;
+	}
+	
+	public void setProperties(String properties)
+	{
+		this.properties = properties.split("\\s*,\\s*");
 	}
 }

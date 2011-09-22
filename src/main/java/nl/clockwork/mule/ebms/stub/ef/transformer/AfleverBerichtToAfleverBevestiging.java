@@ -55,8 +55,9 @@ public class AfleverBerichtToAfleverBevestiging extends AbstractMessageAwareTran
 			ds.setName(name);
 			List<DataSource> attachments = new ArrayList<DataSource>();
 			attachments.add(ds);
-			EbMSMessageContent result = new EbMSMessageContent(content.getConversationId(),attachments);
-			return result;
+			content.getAttachments().clear();
+			content.getAttachments().addAll(attachments);
+			return content;
 		}
 		catch (Exception e)
 		{

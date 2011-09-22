@@ -15,7 +15,9 @@
  ******************************************************************************/
 package nl.clockwork.mule.ebms.transformer;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.activation.DataSource;
 
@@ -23,12 +25,15 @@ import nl.clockwork.mule.ebms.model.EbMSMessage;
 import nl.clockwork.mule.ebms.model.EbMSMessageContent;
 import nl.clockwork.mule.ebms.model.ebxml.MessageHeader;
 
+import org.apache.commons.jxpath.JXPathContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.transformer.TransformerException;
 import org.mule.transformer.AbstractMessageAwareTransformer;
 
 public class EbMSMessageToEbMSMessageContent extends AbstractMessageAwareTransformer
 {
+	private String[] properties;
+
 	public EbMSMessageToEbMSMessageContent()
 	{
 		registerSourceType(EbMSMessage.class);
@@ -40,9 +45,17 @@ public class EbMSMessageToEbMSMessageContent extends AbstractMessageAwareTransfo
 		EbMSMessage msg = (EbMSMessage)message.getPayload();
 		MessageHeader messageHeader = msg.getMessageHeader();
 		List<DataSource> attachments = msg.getAttachments();
-		EbMSMessageContent content = new EbMSMessageContent(messageHeader.getConversationId(),attachments);
+		Map<String,Object> properties = new HashMap<String,Object>();
+		JXPathContext context = JXPathContext.newContext(messageHeader);
+		for (String property : this.properties)
+			properties.put(property,context.getValue(property));
+		EbMSMessageContent content = new EbMSMessageContent(messageHeader.getConversationId(),properties,attachments);
 		message.setPayload(content);
 		return message;
 	}
 
+	public void setProperties(String properties)
+	{
+		this.properties = properties.split("\\s*,\\s*");
+	}
 }

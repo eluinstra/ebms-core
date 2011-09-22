@@ -15,24 +15,29 @@
  ******************************************************************************/
 package nl.clockwork.mule.ebms.model;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.activation.DataSource;
 
 public class EbMSMessageContent
 {
 	private String conversationId;
+	//private String messageId;
+	//private boolean relateMessage;
+	private Map<String,Object> properties = new HashMap<String,Object>();
 	private List<DataSource> attachments;
-	//private HashMap<String,Object> properties;
 
 	public EbMSMessageContent(List<DataSource> attachments)
 	{
-		this.attachments = attachments;
+		this(null,null,attachments);
 	}
 
-	public EbMSMessageContent(String conversationId, List<DataSource> attachments)
+	public EbMSMessageContent(String conversationId, Map<String,Object> properties, List<DataSource> attachments)
 	{
 		this.conversationId = conversationId;
+		this.properties = properties == null ? new HashMap<String,Object>() : properties;
 		this.attachments = attachments;
 	}
 
@@ -41,8 +46,14 @@ public class EbMSMessageContent
 		return conversationId;
 	}
 	
+	public Map<String,Object> getProperties()
+	{
+		return properties;
+	}
+
 	public List<DataSource> getAttachments()
 	{
 		return attachments;
 	}
+	
 }

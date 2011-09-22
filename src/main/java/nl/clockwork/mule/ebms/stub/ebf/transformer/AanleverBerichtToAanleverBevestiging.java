@@ -87,7 +87,9 @@ public class AanleverBerichtToAanleverBevestiging extends AbstractMessageAwareTr
 			List<DataSource> attachments = new ArrayList<DataSource>();
 			attachments.add(ds);
 
-			return new EbMSMessageContent(content.getConversationId(),attachments);
+			content.getAttachments().clear();
+			content.getAttachments().addAll(attachments);
+			return content;
 		}
 		catch (Exception e)
 		{

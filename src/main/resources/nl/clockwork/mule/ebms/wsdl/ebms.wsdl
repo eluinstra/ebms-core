@@ -39,23 +39,23 @@
 		<wsdl:part element="eb:AckRequested" name="AckRequested"/>
 		<wsdl:part element="eb:Manifest" name="Manifest"/>
 	</wsdl:message>
-	<wsdl:message name="Acknowledgment">
-		<wsdl:part element="eb:MessageHeader" name="MessageHeader"/>
-		<wsdl:part element="eb:Acknowledgment" name="Acknowledgment"/>
-	</wsdl:message>
 	<wsdl:message name="MessageError">
 		<wsdl:part element="eb:MessageHeader" name="MessageHeader"/>
 		<wsdl:part element="eb:ErrorList" name="ErrorList"/>
+	</wsdl:message>
+	<wsdl:message name="Acknowledgment">
+		<wsdl:part element="eb:MessageHeader" name="MessageHeader"/>
+		<wsdl:part element="eb:Acknowledgment" name="Acknowledgment"/>
 	</wsdl:message>
 	<wsdl:portType name="EbMSPortType">
 		<wsdl:operation name="Message">
 			<wsdl:input message="tns:Message"/>
 		</wsdl:operation>
-		<wsdl:operation name="Acknowledgment">
-			<wsdl:input message="tns:Acknowledgment"/>
-		</wsdl:operation>
 		<wsdl:operation name="MessageError">
 			<wsdl:input message="tns:MessageError"/>
+		</wsdl:operation>
+		<wsdl:operation name="Acknowledgment">
+			<wsdl:input message="tns:Acknowledgment"/>
 		</wsdl:operation>
 	</wsdl:portType>
 	<wsdl:binding name="EbMSSOAPBinding" type="tns:EbMSPortType">
@@ -72,18 +72,18 @@
 				</mime:multipartRelated>
 			</wsdl:input>
 		</wsdl:operation>
-		<wsdl:operation name="Acknowledgment">
-			<soap:operation soapAction="ebXML"/>
-			<wsdl:input>
- 				<soap:header message="tns:Acknowledgment" part="MessageHeader" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />          
-		 		<soap:header message="tns:Acknowledgment" part="Acknowledgment" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />          
-			</wsdl:input>
-		</wsdl:operation>
 		<wsdl:operation name="MessageError">
 			<soap:operation soapAction="ebXML"/>
 			<wsdl:input>
  				<soap:header message="tns:MessageError" part="MessageHeader" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />          
 		 		<soap:header message="tns:MessageError" part="ErrorList" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />          
+			</wsdl:input>
+		</wsdl:operation>
+		<wsdl:operation name="Acknowledgment">
+			<soap:operation soapAction="ebXML"/>
+			<wsdl:input>
+ 				<soap:header message="tns:Acknowledgment" part="MessageHeader" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />          
+		 		<soap:header message="tns:Acknowledgment" part="Acknowledgment" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />          
 			</wsdl:input>
 		</wsdl:operation>
 	</wsdl:binding>
