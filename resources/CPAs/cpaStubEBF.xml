@@ -273,7 +273,7 @@ YM3F2KsfdfzMf0yJ3OPuQ2I8RyqWnXGEicoMBwo=
          </tns:ebXMLReceiverBinding>
       </tns:DocExchange>
    </tns:PartyInfo>
-   <tns:PartyInfo tns:partyName="Remote Party" tns:defaultMshChannelId="OVERHEID_defaultDeliveryChannel_ProfileBestEffortSigned" tns:defaultMshPackageId="defaultPackage">
+   <tns:PartyInfo tns:partyName="Overheid" tns:defaultMshChannelId="OVERHEID_defaultDeliveryChannel_ProfileBestEffortSigned" tns:defaultMshPackageId="defaultPackage">
       <tns:PartyId tns:type="urn:osb:oin">00000000000000000001</tns:PartyId>
       <tns:PartyRef xlink:href=""/>
       <tns:CollaborationRole>
