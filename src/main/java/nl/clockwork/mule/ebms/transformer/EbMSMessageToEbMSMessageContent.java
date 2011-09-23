@@ -32,7 +32,7 @@ import org.mule.transformer.AbstractMessageAwareTransformer;
 
 public class EbMSMessageToEbMSMessageContent extends AbstractMessageAwareTransformer
 {
-	private String[] properties;
+	private Map<String,String> properties = new HashMap<String,String>();
 
 	public EbMSMessageToEbMSMessageContent()
 	{
@@ -47,8 +47,8 @@ public class EbMSMessageToEbMSMessageContent extends AbstractMessageAwareTransfo
 		List<DataSource> attachments = msg.getAttachments();
 		Map<String,Object> properties = new HashMap<String,Object>();
 		JXPathContext context = JXPathContext.newContext(messageHeader);
-		for (String property : this.properties)
-			properties.put(property,context.getValue(property));
+		for (String property : this.properties.keySet())
+			properties.put(property,context.getValue(this.properties.get(property)));
 		EbMSMessageContent content = new EbMSMessageContent(messageHeader.getConversationId(),properties,attachments);
 		message.setPayload(content);
 		return message;
@@ -56,6 +56,11 @@ public class EbMSMessageToEbMSMessageContent extends AbstractMessageAwareTransfo
 
 	public void setProperties(String properties)
 	{
-		this.properties = properties.split("\\s*,\\s*");
+		 String[] p = properties.split("\\s*,\\s*");
+		 for (String s : p)
+		 {
+			 String[] t = s.split("\\s*:\\s*");
+			 this.properties.put(t[0],t[1]);
+		 }
 	}
 }
