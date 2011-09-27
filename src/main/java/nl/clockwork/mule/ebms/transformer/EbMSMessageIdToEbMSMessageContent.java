@@ -24,6 +24,7 @@ import javax.activation.DataSource;
 import nl.clockwork.mule.ebms.Constants;
 import nl.clockwork.mule.ebms.dao.EbMSDAO;
 import nl.clockwork.mule.ebms.model.EbMSMessageContent;
+import nl.clockwork.mule.ebms.model.EbMSMessageContext;
 import nl.clockwork.mule.ebms.model.ebxml.MessageHeader;
 
 import org.apache.commons.jxpath.JXPathContext;
@@ -49,11 +50,13 @@ public class EbMSMessageIdToEbMSMessageContent extends AbstractMessageAwareTrans
 			long messageId = message.getLongProperty(Constants.EBMS_MESSAGE_ID,0);
 			MessageHeader messageHeader = ebMSDAO.getMessageHeader(messageId);
 			List<DataSource> attachments = ebMSDAO.getAttachments(messageId);
+
 			Map<String,Object> properties = new HashMap<String,Object>();
 			JXPathContext context = JXPathContext.newContext(messageHeader);
 			for (String property : this.properties.keySet())
 				properties.put(property,context.getValue(this.properties.get(property)));
-			EbMSMessageContent content = new EbMSMessageContent(messageHeader.getConversationId(),properties,attachments);
+
+			EbMSMessageContent content = new EbMSMessageContent(new EbMSMessageContext(messageHeader.getConversationId()),properties,attachments);
 			message.setPayload(content);
 			return message;
 		}
@@ -77,4 +80,5 @@ public class EbMSMessageIdToEbMSMessageContent extends AbstractMessageAwareTrans
 			 this.properties.put(t[0],t[1]);
 		 }
 	}
+
 }

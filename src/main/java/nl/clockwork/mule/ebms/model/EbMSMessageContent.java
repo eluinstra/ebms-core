@@ -23,9 +23,7 @@ import javax.activation.DataSource;
 
 public class EbMSMessageContent
 {
-	private String conversationId;
-	//private String messageId;
-	//private boolean relateMessage;
+	private EbMSMessageContext context;
 	private Map<String,Object> properties = new HashMap<String,Object>();
 	private List<DataSource> attachments;
 
@@ -34,16 +32,16 @@ public class EbMSMessageContent
 		this(null,null,attachments);
 	}
 
-	public EbMSMessageContent(String conversationId, Map<String,Object> properties, List<DataSource> attachments)
+	public EbMSMessageContent(EbMSMessageContext context, Map<String,Object> properties, List<DataSource> attachments)
 	{
-		this.conversationId = conversationId;
+		this.context = context;
 		this.properties = properties == null ? new HashMap<String,Object>() : properties;
 		this.attachments = attachments;
 	}
 
-	public String getConversationId()
+	public EbMSMessageContext getContext()
 	{
-		return conversationId;
+		return context;
 	}
 	
 	public Map<String,Object> getProperties()

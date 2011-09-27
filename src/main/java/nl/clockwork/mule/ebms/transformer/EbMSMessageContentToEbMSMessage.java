@@ -60,7 +60,7 @@ public class EbMSMessageContentToEbMSMessage extends AbstractMessageAwareTransfo
 			GregorianCalendar calendar = new GregorianCalendar();
 
 			EbMSMessageContent content = (EbMSMessageContent)message.getPayload();
-			EbMSChannel channel = findChannel(channels,(String)message.getProperty("channelId"));
+			EbMSChannel channel = findChannel(channels,(String)message.getProperty(Constants.EBMS_CHANNEL_ID));
 
 			MessageHeader messageHeader = new MessageHeader();
 
@@ -68,7 +68,7 @@ public class EbMSMessageContentToEbMSMessage extends AbstractMessageAwareTransfo
 			messageHeader.setMustUnderstand(true);
 
 			messageHeader.setCPAId(channel.getCpaId());
-			messageHeader.setConversationId(content.getConversationId() != null ? content.getConversationId() : new Date().getTime() + message.getCorrelationId());
+			messageHeader.setConversationId(content.getContext() != null ? content.getContext().getConversationId() : new Date().getTime() + message.getCorrelationId());
 			
 			messageHeader.setFrom(new From());
 			PartyId from = new PartyId();
