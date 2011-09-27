@@ -60,7 +60,7 @@ public class EbMSMessageIdToEbMSDelegateEndpointEnricher extends AbstractMessage
 			for (EbMSChannel channel : channels)
 				if (equalsChannel(channel,messageHeader))
 				{
-					message.setProperty("delegate.path",channel.getEndpoint());
+					message.setProperty(Constants.EBMS_DELEGATE_PATH,channel.getEndpoint());
 					break;
 				}
 			return message;

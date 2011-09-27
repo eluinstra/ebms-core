@@ -244,7 +244,7 @@
 				</vm:inbound-endpoint>
 			</inbound>
 			<outbound>
-				<expression-recipient-list-router evaluator="header" expression="delegate.path" />
+				<expression-recipient-list-router evaluator="header" expression="EBMS.EBMS_DELEGATE_PATH" />
 			</outbound>
 		</service>
 

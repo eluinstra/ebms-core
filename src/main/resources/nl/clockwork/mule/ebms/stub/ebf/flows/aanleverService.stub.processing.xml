@@ -113,7 +113,7 @@
 				<multicasting-router>
 					<vm:outbound-endpoint path="aanleverbericht.response.log.in"/>
 					<vm:outbound-endpoint path="ebms.message.send.response.in">
-						<property key="channelId" value="DIGIPOORT_AanleverDeliveryChannel_ProfileReliableMessagingSigned"/>
+						<property key="EBMS.EBMS_CHANNEL_ID" value="DIGIPOORT_AanleverDeliveryChannel_ProfileReliableMessagingSigned"/>
 					</vm:outbound-endpoint>
 				</multicasting-router>
 			</outbound>

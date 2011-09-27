@@ -128,5 +128,7 @@ public class Constants
 	public static final String CPA_ID = "EBMS.CPA_ID";
 
 	public static final String EBMS_MESSAGE_ID = "EBMS.EBMS_MESSAGE_ID";
+	public static final String EBMS_CHANNEL_ID = "EBMS.EBMS_CHANNEL_ID";
+	public static final String EBMS_DELEGATE_PATH = "EBMS.EBMS_DELEGATE_PATH";
 
 }
