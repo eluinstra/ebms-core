@@ -74,7 +74,7 @@ public class EbMSMessageToEbMSAcknowledgment extends AbstractMessageAwareTransfo
 			
 			acknowledgment.setActor(ActorType.URN_OASIS_NAMES_TC_EBXML_MSG_ACTOR_TO_PARTY_MSH.value());
 			
-			Signature signature = (Signature)message.getProperty(Constants.EBMS_SIGNATURE);
+			Signature signature = msg.getSignature();
 			if (signature != null)
 				for (ReferenceType reference : signature.getSignature().getSignedInfo().getReference())
 					acknowledgment.getReference().add(reference);
@@ -103,7 +103,8 @@ public class EbMSMessageToEbMSAcknowledgment extends AbstractMessageAwareTransfo
 
 			messageHeader.setDuplicateElimination(null);
 
-			message.setPayload(new Object[]{messageHeader,acknowledgment});
+			//FIXME??? remove null values
+			message.setPayload(new Object[]{messageHeader,null,null,null,acknowledgment,null,null,null,null});
 			return message;
 		}
 		catch (DatatypeConfigurationException e)

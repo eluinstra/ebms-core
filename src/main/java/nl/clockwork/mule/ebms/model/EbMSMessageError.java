@@ -36,8 +36,15 @@ public class EbMSMessageError implements EbMSBaseMessage
 		return messageHeader;
 	}
 
+	@Override
+	public Signature getSignature()
+	{
+		return null;
+	}
+
 	public ErrorList getErrorList()
 	{
 		return errorList;
 	}
+
 }

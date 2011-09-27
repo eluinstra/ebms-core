@@ -44,7 +44,8 @@ public class EbMSMessageToAcknowledgment extends AbstractMessageAwareTransformer
 			EbMSMessage msg = (EbMSMessage)message.getPayload();
 			Acknowledgment acknowledgment = ebMSDAO.getAcknowledgment(msg.getMessageHeader().getMessageData().getMessageId());
 			message.setProperty("EBMS.ACKNOWLEDGMENT_TYPE",acknowledgment.getAcknowledgmentType());
-			message.setPayload(new Object[]{acknowledgment.getMessageHeader(),acknowledgment.getAcknowledgment()});
+			//FIXME??? remove null values
+			message.setPayload(new Object[]{acknowledgment.getMessageHeader(),null,null,null,acknowledgment.getAcknowledgment(),null,null,null,null});
 			return message;
 		}
 		catch (DAOException e)

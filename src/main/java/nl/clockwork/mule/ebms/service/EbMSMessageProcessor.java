@@ -21,12 +21,18 @@ import javax.activation.DataSource;
 
 import nl.clockwork.mule.ebms.model.Signature;
 import nl.clockwork.mule.ebms.model.ebxml.AckRequested;
+import nl.clockwork.mule.ebms.model.ebxml.Acknowledgment;
+import nl.clockwork.mule.ebms.model.ebxml.ErrorList;
 import nl.clockwork.mule.ebms.model.ebxml.Manifest;
 import nl.clockwork.mule.ebms.model.ebxml.MessageHeader;
+import nl.clockwork.mule.ebms.model.ebxml.MessageOrder;
+import nl.clockwork.mule.ebms.model.ebxml.StatusRequest;
+import nl.clockwork.mule.ebms.model.ebxml.StatusResponse;
+import nl.clockwork.mule.ebms.model.ebxml.SyncReply;
 
 
 public interface EbMSMessageProcessor
 {
-	void process(byte[] message, MessageHeader messageHeader, AckRequested ackRequested, Manifest manifest, List<DataSource> attachments);
-	void process(byte[] message, MessageHeader messageHeader, AckRequested ackRequested, Manifest manifest, List<DataSource> attachments, Signature signature);
+	//void process(byte[] message, MessageHeader messageHeader, AckRequested ackRequested, Manifest manifest, List<DataSource> attachments);
+	void process(byte[] message, MessageHeader messageHeader, SyncReply syncReply, MessageOrder messageOrder, AckRequested ackRequested, Acknowledgment acknowledgment, ErrorList errorList, StatusRequest statusRequest, StatusResponse statusResponse, Manifest manifest, List<DataSource> attachments, Signature signature);
 }

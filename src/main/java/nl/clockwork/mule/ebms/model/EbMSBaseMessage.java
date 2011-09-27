@@ -20,4 +20,6 @@ import nl.clockwork.mule.ebms.model.ebxml.MessageHeader;
 public interface EbMSBaseMessage
 {
 	public MessageHeader getMessageHeader();
+	//FIXME: remove method from interface
+	public Signature getSignature();
 }

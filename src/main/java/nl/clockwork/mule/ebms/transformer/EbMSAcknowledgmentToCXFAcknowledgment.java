@@ -36,7 +36,8 @@ public class EbMSAcknowledgmentToCXFAcknowledgment extends AbstractMessageAwareT
 	public Object transform(MuleMessage message, String outputEncoding) throws TransformerException
 	{
 		EbMSAcknowledgment acknowledgment = (EbMSAcknowledgment)message.getPayload();
-		message.setPayload(new Object[]{acknowledgment.getMessageHeader(),acknowledgment.getAcknowledgment()});
+		//FIXME??? remove null values
+		message.setPayload(new Object[]{acknowledgment.getMessageHeader(),null,null,null,acknowledgment.getAcknowledgment(),null,null,null,null});
 		return message;
 	}
 

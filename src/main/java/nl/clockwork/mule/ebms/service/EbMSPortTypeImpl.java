@@ -30,6 +30,10 @@ import nl.clockwork.mule.ebms.model.ebxml.Acknowledgment;
 import nl.clockwork.mule.ebms.model.ebxml.ErrorList;
 import nl.clockwork.mule.ebms.model.ebxml.Manifest;
 import nl.clockwork.mule.ebms.model.ebxml.MessageHeader;
+import nl.clockwork.mule.ebms.model.ebxml.MessageOrder;
+import nl.clockwork.mule.ebms.model.ebxml.StatusRequest;
+import nl.clockwork.mule.ebms.model.ebxml.StatusResponse;
+import nl.clockwork.mule.ebms.model.ebxml.SyncReply;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -39,46 +43,24 @@ public class EbMSPortTypeImpl implements EbMSPortType
 {
   protected transient Log logger = LogFactory.getLog(getClass());
   private EbMSMessageProcessor messageProcessor;
-  private EbMSAcknowledgmentProcessor acknowledgmentProcessor;
-  private EbMSMessageErrorProcessor messageErrorProcessor;
 
   //@Resource
 	//private WebServiceContext context;
 
-	@Override
-	public void message(MessageHeader messageHeader, AckRequested ackRequested, Manifest manifest)
-	{
+  @Override
+  public void message(MessageHeader messageHeader, SyncReply syncReply, MessageOrder messageOrder, AckRequested ackRequested, Acknowledgment acknowledgment, ErrorList errorList, StatusRequest statusRequest, StatusResponse statusResponse, Manifest manifest)
+  {
+		//Collection<Attachment> attachments = (Collection<Attachment>)context.getMessageContext().get(SoapMessage.ATTACHMENTS);
 		Collection<Attachment> attachments = AttachmentManager.get();
 		List<DataSource> dataSources = new ArrayList<DataSource>();
 		for (Attachment attachment : attachments)
 			dataSources.add(new EbMSDataSource(attachment.getDataHandler().getDataSource(),attachment.getId(),attachment.getDataHandler().getName()));
-		messageProcessor.process(MessageManager.get(),messageHeader,ackRequested,manifest,dataSources,SignatureManager.get());
-	}
-
-	@Override
-	public void acknowledgment(MessageHeader messageHeader, Acknowledgment acknowledgment)
-	{
-		acknowledgmentProcessor.process(messageHeader,acknowledgment);
-	}
-
-	@Override
-	public void messageError(MessageHeader messageHeader, ErrorList errorList)
-	{
-		messageErrorProcessor.process(messageHeader,errorList);
-	}
-
+		messageProcessor.process(MessageManager.get(),messageHeader,syncReply,messageOrder,ackRequested,acknowledgment,errorList,statusRequest,statusResponse,manifest,dataSources,SignatureManager.get());
+  }
+  
 	public void setMessageProcessor(EbMSMessageProcessor messageProcessor)
 	{
 		this.messageProcessor = messageProcessor;
 	}
 	
-	public void setAcknowledgmentProcessor(EbMSAcknowledgmentProcessor acknowledgmentProcessor)
-	{
-		this.acknowledgmentProcessor = acknowledgmentProcessor;
-	}
-	
-	public void setMessageErrorProcessor(EbMSMessageErrorProcessor messageErrorProcessor)
-	{
-		this.messageErrorProcessor = messageErrorProcessor;
-	}
 }

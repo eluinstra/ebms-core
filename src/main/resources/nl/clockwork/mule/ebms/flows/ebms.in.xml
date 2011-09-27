@@ -61,50 +61,68 @@
 			<component>
 				<singleton-object class="nl.clockwork.mule.ebms.service.EbMSPortTypeImpl" />
 				<binding interface="nl.clockwork.mule.ebms.service.EbMSMessageProcessor" method="process">
-					<vm:outbound-endpoint path="ebms.message.store.in" synchronous="false">
+					<vm:outbound-endpoint path="ebms.message.route.in" synchronous="false">
 						<script:transformer>
 							<script:script engine="groovy">
-								import nl.clockwork.mule.ebms.Constants;
 								import nl.clockwork.mule.ebms.model.EbMSMessage;
 
 								Object[] objects = message.getPayload();
-								message.setProperty(Constants.EBMS_SIGNATURE,objects[5]);
-								EbMSMessage m = new EbMSMessage(objects[0],objects[1],objects[2],objects[3],objects[4]);
+								EbMSMessage m = new EbMSMessage(objects[0],objects[1],objects[2],objects[3],objects[4],objects[5],objects[6],objects[7],objects[8],objects[9],objects[10],objects[11]);
 								message.setPayload(m);
 								return message;
 							</script:script>
 						</script:transformer>
 					</vm:outbound-endpoint>
 				</binding>
-				<binding interface="nl.clockwork.mule.ebms.service.EbMSAcknowledgmentProcessor" method="process">
-					<vm:outbound-endpoint path="ebms.acknowledgment.store.in" synchronous="false">
-						<script:transformer>
-							<script:script engine="groovy">
-								import nl.clockwork.mule.ebms.model.EbMSAcknowledgment;
-
-								Object[] objects = message.getPayload();
-								EbMSAcknowledgment acknowledgment = new EbMSAcknowledgment(objects[0],objects[1]);
-								message.setPayload(acknowledgment);
-								return message;
-							</script:script>
-						</script:transformer>
-					</vm:outbound-endpoint>
-				</binding>
-				<binding interface="nl.clockwork.mule.ebms.service.EbMSMessageErrorProcessor" method="process">
-					<vm:outbound-endpoint path="ebms.messageError.store.in" synchronous="false">
-						<script:transformer>
-							<script:script engine="groovy">
-								import nl.clockwork.mule.ebms.model.EbMSMessageError;
-
-								Object[] objects = message.getPayload();
-								EbMSMessageError messageError = new EbMSMessageError(objects[0],objects[1]);
-								message.setPayload(messageError);
-								return message;
-							</script:script>
-						</script:transformer>
-					</vm:outbound-endpoint>
-				</binding>
 			</component>
+		</service>
+		
+		<service name="ebms.message.route">
+			<inbound>
+				<vm:inbound-endpoint path="ebms.message.route.in" />
+			</inbound>
+			<outbound matchAll="true">
+				<filtering-router>
+<!--        <mule-xml:jxpath-filter pattern="/e:purchaseOrder/e:shipTo/@country"-->
+<!--                            expectedValue="US">-->
+<!--            <mule-xml:namespace prefix="e" uri="http://www.example.com"/>-->
+<!--        </mule-xml:jxpath-filter>-->
+					<vm:outbound-endpoint path="ebms.message.store.in"/>
+					<and-filter>
+						<custom-filter class="nl.clockwork.mule.common.filter.ObjectExistsFilter">
+							<spring:property name="xPathQuery" value="messageHeader" />
+						</custom-filter>
+						<custom-filter class="nl.clockwork.mule.common.filter.ObjectExistsFilter">
+							<spring:property name="xPathQuery" value="manifest" />
+						</custom-filter>
+					</and-filter>
+				</filtering-router>
+				<filtering-router>
+					<vm:outbound-endpoint path="ebms.acknowledgment.store.in"/>
+					<and-filter>
+						<custom-filter class="nl.clockwork.mule.common.filter.ObjectExistsFilter">
+							<spring:property name="xPathQuery" value="messageHeader" />
+						</custom-filter>
+						<custom-filter class="nl.clockwork.mule.common.filter.ObjectExistsFilter">
+							<spring:property name="xPathQuery" value="acknowledgment" />
+						</custom-filter>
+					</and-filter>
+				</filtering-router>
+				<filtering-router>
+					<vm:outbound-endpoint path="ebms.messageError.store.in"/>
+					<and-filter>
+						<custom-filter class="nl.clockwork.mule.common.filter.ObjectExistsFilter">
+							<spring:property name="xPathQuery" value="messageHeader" />
+						</custom-filter>
+						<custom-filter class="nl.clockwork.mule.common.filter.ObjectExistsFilter">
+							<spring:property name="xPathQuery" value="errorList" />
+						</custom-filter>
+					</and-filter>
+				</filtering-router>
+				<forwarding-catch-all-strategy>
+					<vm:outbound-endpoint path="ebms.message.route.unknown" />
+				</forwarding-catch-all-strategy>
+			</outbound>
 		</service>
 		
 		<service name="ebms.message.store">

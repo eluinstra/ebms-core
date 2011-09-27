@@ -35,8 +35,15 @@ public class EbMSAcknowledgment implements EbMSBaseMessage
 		return messageHeader;
 	}
 	
+	@Override
+	public Signature getSignature()
+	{
+		return null;
+	}
+
 	public Acknowledgment getAcknowledgment()
 	{
 		return acknowledgment;
 	}
+
 }

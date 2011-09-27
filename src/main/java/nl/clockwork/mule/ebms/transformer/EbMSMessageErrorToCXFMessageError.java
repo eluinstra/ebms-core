@@ -36,7 +36,8 @@ public class EbMSMessageErrorToCXFMessageError extends AbstractMessageAwareTrans
 	public Object transform(MuleMessage message, String outputEncoding) throws TransformerException
 	{
 		EbMSMessageError messageError = (EbMSMessageError)message.getPayload();
-		message.setPayload(new Object[]{messageError.getMessageHeader(),messageError.getErrorList()});
+		//FIXME??? remove null values
+		message.setPayload(new Object[]{messageError.getMessageHeader(),null,null,null,null,messageError.getErrorList(),null,null,null});
 		return message;
 	}
 

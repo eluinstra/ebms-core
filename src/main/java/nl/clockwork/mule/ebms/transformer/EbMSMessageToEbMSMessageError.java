@@ -89,6 +89,8 @@ public class EbMSMessageToEbMSMessageError extends AbstractMessageAwareTransform
 			errorList.getError().add(error);
 			
 			message.setPayload(new Object[]{messageHeader,errorList});
+			//FIXME??? remove null values
+			message.setPayload(new Object[]{messageHeader,null,null,null,null,errorList,null,null,null});
 			return message;
 		}
 		catch (DatatypeConfigurationException e)

@@ -52,10 +52,10 @@ import org.apache.cxf.staxutils.DepthXMLStreamReader;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.ws.commons.schema.XmlSchemaElement;
 
-public class DocLiteralInInterceptor extends AbstractInDatabindingInterceptor {
+public class DocLiteralInInterceptor1 extends AbstractInDatabindingInterceptor {
     private static final Logger LOG = LogUtils.getL7dLogger(DocLiteralInInterceptor.class);
 
-    public DocLiteralInInterceptor() {
+    public DocLiteralInInterceptor1() {
         super(Phase.UNMARSHAL);
         addAfter(URIMappingInterceptor.class.getName());
         addBefore(WrappedInInterceptor.class.getName());

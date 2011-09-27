@@ -36,26 +36,18 @@
 
 	<wsdl:message name="Message">
 		<wsdl:part element="eb:MessageHeader" name="MessageHeader"/>
+		<wsdl:part element="eb:SyncReply" name="SyncReply"/>
+		<wsdl:part element="eb:MessageOrder" name="MessageOrder"/>
 		<wsdl:part element="eb:AckRequested" name="AckRequested"/>
-		<wsdl:part element="eb:Manifest" name="Manifest"/>
-	</wsdl:message>
-	<wsdl:message name="MessageError">
-		<wsdl:part element="eb:MessageHeader" name="MessageHeader"/>
-		<wsdl:part element="eb:ErrorList" name="ErrorList"/>
-	</wsdl:message>
-	<wsdl:message name="Acknowledgment">
-		<wsdl:part element="eb:MessageHeader" name="MessageHeader"/>
 		<wsdl:part element="eb:Acknowledgment" name="Acknowledgment"/>
+		<wsdl:part element="eb:ErrorList" name="ErrorList"/>
+		<wsdl:part element="eb:StatusRequest" name="StatusRequest"/>
+		<wsdl:part element="eb:StatusResponse" name="StatusResponse"/>
+		<wsdl:part element="eb:Manifest" name="Manifest"/>
 	</wsdl:message>
 	<wsdl:portType name="EbMSPortType">
 		<wsdl:operation name="Message">
 			<wsdl:input message="tns:Message"/>
-		</wsdl:operation>
-		<wsdl:operation name="MessageError">
-			<wsdl:input message="tns:MessageError"/>
-		</wsdl:operation>
-		<wsdl:operation name="Acknowledgment">
-			<wsdl:input message="tns:Acknowledgment"/>
 		</wsdl:operation>
 	</wsdl:portType>
 	<wsdl:binding name="EbMSSOAPBinding" type="tns:EbMSPortType">
@@ -66,24 +58,16 @@
 				<mime:multipartRelated>
 					<mime:part>
 		 				<soap:header message="tns:Message" part="MessageHeader" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />          
+		 				<soap:header message="tns:Message" part="SyncReply" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />          
+		 				<soap:header message="tns:Message" part="MessageOrder" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />          
 		 				<soap:header message="tns:Message" part="AckRequested" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />          
+				 		<soap:header message="tns:Message" part="Acknowledgment" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />          
+				 		<soap:header message="tns:Message" part="ErrorList" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />          
+				 		<soap:header message="tns:Message" part="StatusRequest" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />          
+				 		<soap:header message="tns:Message" part="StatusResponse" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />          
 						<soap:body parts="Message" part="Manifest" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal"/>
 					</mime:part>				
 				</mime:multipartRelated>
-			</wsdl:input>
-		</wsdl:operation>
-		<wsdl:operation name="MessageError">
-			<soap:operation soapAction="ebXML"/>
-			<wsdl:input>
- 				<soap:header message="tns:MessageError" part="MessageHeader" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />          
-		 		<soap:header message="tns:MessageError" part="ErrorList" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />          
-			</wsdl:input>
-		</wsdl:operation>
-		<wsdl:operation name="Acknowledgment">
-			<soap:operation soapAction="ebXML"/>
-			<wsdl:input>
- 				<soap:header message="tns:Acknowledgment" part="MessageHeader" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />          
-		 		<soap:header message="tns:Acknowledgment" part="Acknowledgment" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />          
 			</wsdl:input>
 		</wsdl:operation>
 	</wsdl:binding>

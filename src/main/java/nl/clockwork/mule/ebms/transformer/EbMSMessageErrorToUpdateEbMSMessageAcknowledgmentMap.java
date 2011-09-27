@@ -48,7 +48,7 @@ public class EbMSMessageErrorToUpdateEbMSMessageAcknowledgmentMap extends Abstra
 			map.put("id",message.getStringProperty(Constants.EBMS_MESSAGE_ID,null));
 			map.put("ack_type",Constants.EbMSAcknowledgmentType.MESSAGE_ERROR.id());
 			map.put("ack_header",XMLMessageBuilder.getInstance(MessageHeader.class).handle((MessageHeader)messageError[0]));
-			map.put("ack_content",XMLMessageBuilder.getInstance(ErrorList.class).handle((ErrorList)messageError[1]));
+			map.put("ack_content",XMLMessageBuilder.getInstance(ErrorList.class).handle((ErrorList)messageError[5]));
 			message.setPayload(map);
 		}
 		catch (Exception e)

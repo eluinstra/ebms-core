@@ -41,7 +41,8 @@ public class EbMSMessageIdToEbMSMessage extends AbstractMessageAwareTransformer
 		try
 		{
 			EbMSMessage msg = ebMSDAO.getEbMSMessage(message.getLongProperty(Constants.EBMS_MESSAGE_ID,0));
-			message.setPayload(new Object[]{msg.getMessageHeader(),msg.getAckRequested(),msg.getManifest()});
+			//FIXME??? remove null values
+			message.setPayload(new Object[]{msg.getMessageHeader(),null,null,msg.getAckRequested(),null,null,null,null,msg.getManifest()});
 			return message;
 		}
 		catch (Exception e)

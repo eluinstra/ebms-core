@@ -20,49 +20,109 @@ import java.util.List;
 import javax.activation.DataSource;
 
 import nl.clockwork.mule.ebms.model.ebxml.AckRequested;
+import nl.clockwork.mule.ebms.model.ebxml.Acknowledgment;
+import nl.clockwork.mule.ebms.model.ebxml.ErrorList;
 import nl.clockwork.mule.ebms.model.ebxml.Manifest;
 import nl.clockwork.mule.ebms.model.ebxml.MessageHeader;
+import nl.clockwork.mule.ebms.model.ebxml.MessageOrder;
+import nl.clockwork.mule.ebms.model.ebxml.StatusRequest;
+import nl.clockwork.mule.ebms.model.ebxml.StatusResponse;
+import nl.clockwork.mule.ebms.model.ebxml.SyncReply;
 
 public class EbMSMessage implements EbMSBaseMessage
 {
 	private byte[] message;
 	private MessageHeader messageHeader;
+	private SyncReply syncReply;
+	private MessageOrder messageOrder;
 	private AckRequested ackRequested;
+	private Acknowledgment acknowledgment;
+	private ErrorList errorList;
+	private StatusRequest statusRequest;
+	private StatusResponse statusResponse;
 	private Manifest manifest;
 	private List<DataSource> attachments;
+	private Signature signature;
 
 	public EbMSMessage(byte[] message, MessageHeader messageHeader, AckRequested ackRequested, Manifest manifest, List<DataSource> attachments)
 	{
+		this(message,messageHeader,null,null,ackRequested,null,null,null,null,manifest,attachments,null);
+	}
+
+	public EbMSMessage(byte[] message, MessageHeader messageHeader, SyncReply syncReply, MessageOrder messageOrder, AckRequested ackRequested, Acknowledgment acknowledgment, ErrorList errorList, StatusRequest statusRequest, StatusResponse statusResponse, Manifest manifest, List<DataSource> attachments, Signature signature)
+	{
 		this.message = message;
 		this.messageHeader = messageHeader;
+		this.syncReply = syncReply;
+		this.messageOrder = messageOrder;
 		this.ackRequested = ackRequested;
+		this.acknowledgment = acknowledgment;
+		this.errorList = errorList;
+		this.statusRequest = statusRequest;
+		this.statusResponse = statusResponse;
 		this.manifest = manifest;
 		this.attachments = attachments;
+		this.signature = signature;
 	}
-	
+
 	public byte[] getMessage()
 	{
 		return message;
 	}
-	
-	@Override
+
 	public MessageHeader getMessageHeader()
 	{
 		return messageHeader;
 	}
-	
+
+	public SyncReply getSyncReply()
+	{
+		return syncReply;
+	}
+
+	public MessageOrder getMessageOrder()
+	{
+		return messageOrder;
+	}
+
 	public AckRequested getAckRequested()
 	{
 		return ackRequested;
+	}
+
+	public Acknowledgment getAcknowledgment()
+	{
+		return acknowledgment;
+	}
+
+	public ErrorList getErrorList()
+	{
+		return errorList;
+	}
+
+	public StatusRequest getStatusRequest()
+	{
+		return statusRequest;
+	}
+
+	public StatusResponse getStatusResponse()
+	{
+		return statusResponse;
 	}
 
 	public Manifest getManifest()
 	{
 		return manifest;
 	}
-	
+
 	public List<DataSource> getAttachments()
 	{
 		return attachments;
 	}
+
+	public Signature getSignature()
+	{
+		return signature;
+	}
+
 }

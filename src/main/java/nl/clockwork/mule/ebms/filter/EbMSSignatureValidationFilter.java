@@ -52,7 +52,7 @@ public class EbMSSignatureValidationFilter implements Filter
 					EbMSBaseMessage msg = (EbMSBaseMessage)message.getPayload();
 					MessageHeader messageHeader = msg.getMessageHeader();
 					CollaborationProtocolAgreement cpa = ebMSDAO.getCPA(messageHeader.getCPAId());
-					Signature signature = (Signature)message.getProperty(Constants.EBMS_SIGNATURE);
+					Signature signature = msg.getSignature();
 					if (signature == null)
 					{
 						message.setProperty(Constants.EBMS_ERROR,EbMSMessageUtils.createError("//Header/Signature",Constants.EbMSErrorCode.SECURITY_FAILURE.errorCode(),"No signature found."));

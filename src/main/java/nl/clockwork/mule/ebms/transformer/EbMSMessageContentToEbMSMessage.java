@@ -111,7 +111,8 @@ public class EbMSMessageContentToEbMSMessage extends AbstractMessageAwareTransfo
 
 			manifest.getReference().add(reference);
 			
-			message.setPayload(new Object[]{messageHeader,ackRequested,manifest});
+			//FIXME??? remove null values
+			message.setPayload(new Object[]{messageHeader,null,null,ackRequested,null,null,null,null,manifest});
 
 			return message;
 		}
