@@ -109,7 +109,7 @@
 			<outbound>
 				<pass-through-router>
 					<vm:outbound-endpoint path="ebms.message.send.response.in">
-						<property key="EBMS.EBMS_CHANNEL_ID" value="OVERHEID_AfleverDeliveryChannel_ProfileReliableMessagingSigned"/>
+						<property key="EBMS.EBMS_CHANNEL_ID" value="BevestigAfleveren"/>
 					</vm:outbound-endpoint>
 				</pass-through-router>
 			</outbound>

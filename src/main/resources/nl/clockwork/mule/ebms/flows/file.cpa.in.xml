@@ -63,7 +63,7 @@
 
 		<service name="file.cpa.service">
 			<inbound>
-				<file:inbound-endpoint connector-ref="connector.file.ebms"	path="${dir.upload.cpa}" moveToDirectory="${dir.upload.cpa}/processed" pollingFrequency="30000">
+				<file:inbound-endpoint connector-ref="connector.file.ebms"	path="${dir.upload.cpa}" moveToDirectory="${dir.upload.cpa}/processed" pollingFrequency="${dir.upload.cpa.pollingFrequency}">
 					<file:filename-wildcard-filter pattern="*.xml" caseSensitive="false"/>
 					<!--file:file-to-string-transformer/-->
 					<object-to-string-transformer/>
@@ -83,7 +83,7 @@
 						</message-properties-transformer-->
 						<script:transformer>
             	<script:script engine="groovy">
-								message.setProperty("EBMS.REPORT",message.getProperty("originalFilename") + " contains no CPA!");
+								message.setProperty("EBMS.REPORT",message.getProperty("originalFilename") + " contains no CPA.");
 								return message;
 							</script:script>
 						</script:transformer>
@@ -114,7 +114,20 @@
 					<vm:outbound-endpoint path="file.cpa.report.in">
 						<script:transformer>
             	<script:script engine="groovy">
-								message.setProperty("EBMS.REPORT","Update " + message.getProperty("originalFilename") + " failed!");
+								import java.io.PrintWriter;
+								import java.io.StringWriter;
+								import java.io.Writer;
+	
+								Writer result = new StringWriter();
+								if (message.getExceptionPayload() != null)
+								{
+									PrintWriter pw = new PrintWriter(result);
+									message.getExceptionPayload().getException().printStackTrace(pw);
+								}
+	
+								message.setProperty("EBMS.REPORT","Update " + message.getProperty("originalFilename") + " failed.\n\n" + result.toString());
+								result.close();
+	
 								return message;
 							</script:script>
 						</script:transformer>
@@ -136,7 +149,7 @@
 					<vm:outbound-endpoint path="file.cpa.report.in">
 						<script:transformer>
             	<script:script engine="groovy">
-								message.setProperty("EBMS.REPORT",message.getProperty("originalFilename") + " inserted successfully!");
+								message.setProperty("EBMS.REPORT",message.getProperty("originalFilename") + " inserted successfully.");
 								return message;
 							</script:script>
 						</script:transformer>
@@ -158,7 +171,7 @@
 					<vm:outbound-endpoint path="file.cpa.report.in">
 						<script:transformer>
             	<script:script engine="groovy">
-								message.setProperty("EBMS.REPORT",message.getProperty("originalFilename") + " updated successfully!");
+								message.setProperty("EBMS.REPORT",message.getProperty("originalFilename") + " updated successfully.");
 								return message;
 							</script:script>
 						</script:transformer>

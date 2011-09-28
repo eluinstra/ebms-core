@@ -35,6 +35,7 @@ import nl.clockwork.mule.ebms.Constants.EbMSMessageStatus;
 import nl.clockwork.mule.ebms.Constants.EbMSMessageType;
 import nl.clockwork.mule.ebms.dao.EbMSDAO;
 import nl.clockwork.mule.ebms.model.Acknowledgment;
+import nl.clockwork.mule.ebms.model.Channel;
 import nl.clockwork.mule.ebms.model.EbMSMessage;
 import nl.clockwork.mule.ebms.model.cpp.cpa.CollaborationProtocolAgreement;
 import nl.clockwork.mule.ebms.model.ebxml.AckRequested;
@@ -428,6 +429,68 @@ public class EbMSDAOImpl implements EbMSDAO
 				" where id = ?",
 				new Object[]{nextRetryTime == null ? null : String.format(defaultDateFormat,nextRetryTime),id}
 			);
+		}
+		catch (Exception e)
+		{
+			throw new DAOException(e);
+		}
+	}
+
+	@Override
+	public Channel getChannel(String channelId) throws DAOException
+	{
+		try
+		{
+			return simpleJdbcTemplate.queryForObject(
+				"select id, channel_id, cpa_id, action_id, endpoint" + 
+				" from ebms_channel" + 
+				" where channel_id = ?",
+				new ParameterizedRowMapper<Channel>()
+				{
+					@Override
+					public Channel mapRow(ResultSet rs, int rowNum) throws SQLException
+					{
+						return new Channel(rs.getInt("id"),rs.getString("channel_id"),rs.getString("cpa_id"),rs.getString("action_id"),rs.getString("endpoint"));
+					}
+				},
+				channelId
+			);
+		}
+		catch(EmptyResultDataAccessException e)
+		{
+			return null;
+		}
+		catch (Exception e)
+		{
+			throw new DAOException(e);
+		}
+	}
+
+	@Override
+	public Channel getChannel(String cpaId, String actionId) throws DAOException
+	{
+		try
+		{
+			return simpleJdbcTemplate.queryForObject(
+				"select id, channel_id, cpa_id, action_id, endpoint" + 
+				" from ebms_channel" + 
+				" where cpa_id = ?" +
+				" and action_id = ?",
+				new ParameterizedRowMapper<Channel>()
+				{
+					@Override
+					public Channel mapRow(ResultSet rs, int rowNum) throws SQLException
+					{
+						return new Channel(rs.getInt("id"),rs.getString("channel_id"),rs.getString("cpa_id"),rs.getString("action_id"),rs.getString("endpoint"));
+					}
+				},
+				cpaId,
+				actionId
+			);
+		}
+		catch(EmptyResultDataAccessException e)
+		{
+			return null;
 		}
 		catch (Exception e)
 		{

@@ -107,7 +107,7 @@
 			<outbound>
 				<pass-through-router>
 					<vm:outbound-endpoint path="ebms.message.send.request.in">
-						<property key="EBMS.EBMS_CHANNEL_ID" value="DIGIPOORT_AfleverDeliveryChannel_ProfileReliableMessagingSigned"/>
+						<property key="EBMS.EBMS_CHANNEL_ID" value="Afleveren"/>
 					</vm:outbound-endpoint>
 				</pass-through-router>
 			</outbound>

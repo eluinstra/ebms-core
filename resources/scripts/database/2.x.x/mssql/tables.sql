@@ -5,6 +5,16 @@ CREATE TABLE cpa
 	cpa							TEXT						NOT NULL
 );
 
+CREATE TABLE ebms_channel
+(
+	id								INT						IDENTITY(1,1)	PRIMARY KEY,
+	channel_id				VARCHAR(128)	NOT NULL UNIQUE,
+	cpa_id						VARCHAR(256)	NOT NULL,
+	action_id					VARCHAR(64)		NOT NULL,
+	endpoint					VARCHAR(64)		NULL
+--	ref_id						INT						NULL FOREIGN KEY REFERENCES ebms_channel(id),
+);
+
 CREATE TABLE ebms_message
 (
 	id										INT							IDENTITY(1,1)	PRIMARY KEY,

@@ -165,19 +165,9 @@ public class EbMSMessageHeaderValidationFilter implements Filter
 		return true;
 	}
 
-	private CollaborationRole getCollaborationRoleFrom(CollaborationProtocolAgreement cpa, MessageHeader messageHeader)
-	{
-		return CPAUtils.getCollaborationRole(cpa,messageHeader.getFrom().getPartyId().get(0).getType(),messageHeader.getFrom().getPartyId().get(0).getValue(),messageHeader.getFrom().getRole());
-	}
-
 	private List<CollaborationRole> getCollaborationRolesFrom(CollaborationProtocolAgreement cpa, MessageHeader messageHeader)
 	{
 		return CPAUtils.getCollaborationRoles(cpa,messageHeader.getFrom().getPartyId().get(0).getType(),messageHeader.getFrom().getPartyId().get(0).getValue(),messageHeader.getFrom().getRole());
-	}
-
-	private CollaborationRole getCollaborationRoleTo(CollaborationProtocolAgreement cpa, MessageHeader messageHeader)
-	{
-		return CPAUtils.getCollaborationRole(cpa,messageHeader.getTo().getPartyId().get(0).getType(),messageHeader.getTo().getPartyId().get(0).getValue(),messageHeader.getTo().getRole());
 	}
 
 	private List<CollaborationRole> getCollaborationRolesTo(CollaborationProtocolAgreement cpa, MessageHeader messageHeader)
@@ -185,19 +175,9 @@ public class EbMSMessageHeaderValidationFilter implements Filter
 		return CPAUtils.getCollaborationRoles(cpa,messageHeader.getTo().getPartyId().get(0).getType(),messageHeader.getTo().getPartyId().get(0).getValue(),messageHeader.getTo().getRole());
 	}
 
-	private CanSend canSend(CollaborationRole role, MessageHeader messageHeader)
-	{
-		return CPAUtils.getCanSend(role,messageHeader.getService().getType(),messageHeader.getService().getValue(),messageHeader.getAction());
-	}
-
 	private CanSend canSend(List<CollaborationRole> roles, MessageHeader messageHeader)
 	{
 		return CPAUtils.getCanSend(roles,messageHeader.getService().getType(),messageHeader.getService().getValue(),messageHeader.getAction());
-	}
-
-	private CanReceive canReceive(CollaborationRole role, MessageHeader messageHeader)
-	{
-		return CPAUtils.getCanReceive(role,messageHeader.getService().getType(),messageHeader.getService().getValue(),messageHeader.getAction());
 	}
 
 	private CanReceive canReceive(List<CollaborationRole> roles, MessageHeader messageHeader)

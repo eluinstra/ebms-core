@@ -62,6 +62,7 @@
 		<!--import resource="classpath:nl/clockwork/mule/ebms/components/dao.mssql.xml" /-->
 
 		<import resource="classpath:nl/clockwork/mule/ebms/flows/file.cpa.in.xml" />
+		<import resource="classpath:nl/clockwork/mule/ebms/flows/file.sql.in.xml" />
 
 		<import resource="classpath:nl/clockwork/mule/ebms/flows/ebms.in.xml" />
 		<import resource="classpath:nl/clockwork/mule/ebms/flows/ebms.out.xml" />

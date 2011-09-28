@@ -25,7 +25,7 @@
 			<list>
 				<!-- cpaStubEBF -->
 				<bean class="nl.clockwork.mule.ebms.model.EbMSChannel">
-					<constructor-arg value="DIGIPOORT_AfleverDeliveryChannel_ProfileReliableMessagingSigned"/>
+					<constructor-arg value="Afleveren"/>
 					<constructor-arg value="CPA_EBFStub"/>
 					<constructor-arg>
 						<bean class="nl.clockwork.mule.ebms.model.EbMSChannelFrom">
@@ -61,10 +61,10 @@
 					</constructor-arg>
 					<constructor-arg value="afleveren"/>
 					<constructor-arg value="afleverbericht.processing.service.in"/>
-					<constructor-arg value="OVERHEID_AfleverDeliveryChannel_ProfileReliableMessagingSigned"/>
+					<constructor-arg value="BevestigAfleveren"/>
 				</bean>
 				<bean class="nl.clockwork.mule.ebms.model.EbMSChannel">
-					<constructor-arg value="OVERHEID_AfleverDeliveryChannel_ProfileReliableMessagingSigned"/>
+					<constructor-arg value="BevestigAfleveren"/>
 					<constructor-arg value="CPA_EBFStub"/>
 					<constructor-arg>
 						<bean class="nl.clockwork.mule.ebms.model.EbMSChannelFrom">
@@ -102,7 +102,7 @@
 					<constructor-arg value="afleverbericht.processing.service.in"/>
 				</bean>
 				<bean class="nl.clockwork.mule.ebms.model.EbMSChannel">
-					<constructor-arg value="OVERHEID_AanleverDeliveryChannel_ProfileReliableMessagingSigned"/>
+					<constructor-arg value="Aanleveren"/>
 					<constructor-arg value="CPA_EBFStub"/>
 					<constructor-arg>
 						<bean class="nl.clockwork.mule.ebms.model.EbMSChannelFrom">
@@ -138,10 +138,10 @@
 					</constructor-arg>
 					<constructor-arg value="aanleveren"/>
 					<constructor-arg value="aanleverbericht.processing.service.in"/>
-					<constructor-arg value="DIGIPOORT_AanleverDeliveryChannel_ProfileReliableMessagingSigned"/>
+					<constructor-arg value="BevestigAanleveren"/>
 				</bean>
 				<bean class="nl.clockwork.mule.ebms.model.EbMSChannel">
-					<constructor-arg value="DIGIPOORT_AanleverDeliveryChannel_ProfileReliableMessagingSigned"/>
+					<constructor-arg value="BevestigAanleveren"/>
 					<constructor-arg value="CPA_EBFStub"/>
 					<constructor-arg>
 						<bean class="nl.clockwork.mule.ebms.model.EbMSChannelFrom">
