@@ -36,25 +36,22 @@ import nl.clockwork.mule.ebms.model.cpp.cpa.ReliableMessaging;
 import nl.clockwork.mule.ebms.model.cpp.cpa.SenderNonRepudiation;
 import nl.clockwork.mule.ebms.model.ebxml.MessageHeader;
 
+//FIXME use JXPath
 public class CPAUtils
 {
+	public static String getActionIdReceived(CollaborationProtocolAgreement cpa, MessageHeader messageHeader)
+	{
+		List<CollaborationRole> roles = getCollaborationRoles(cpa,messageHeader.getTo().getPartyId().get(0).getType(),messageHeader.getTo().getPartyId().get(0).getValue(),messageHeader.getTo().getRole());
+		CanReceive canReceive = getCanReceive(roles,messageHeader.getService().getType(),messageHeader.getService().getValue(),messageHeader.getAction());
+		return canReceive.getThisPartyActionBinding().getId();
+	}
+	
 	public static PartyInfo getPartyInfo(CollaborationProtocolAgreement cpa, String partyIdType, String partyId)
 	{
 		for (PartyInfo partyInfo : cpa.getPartyInfo())
 			for (PartyId pId : partyInfo.getPartyId())
 				if (pId.getType().equals(partyIdType) && pId.getValue().equals(partyId))
 					return partyInfo;
-		return null;
-	}
-	
-	public static CollaborationRole getCollaborationRole(CollaborationProtocolAgreement cpa, String partyIdType, String partyId, String roleName)
-	{
-		for (PartyInfo partyInfo : cpa.getPartyInfo())
-			for (PartyId pId : partyInfo.getPartyId())
-				if (pId.getType().equals(partyIdType) && pId.getValue().equals(partyId))
-					for (CollaborationRole role : partyInfo.getCollaborationRole())
-						if ((roleName == null  && role.getRole() == null) || roleName.equals(role.getRole().getName()))
-							return role;
 		return null;
 	}
 	
@@ -73,15 +70,6 @@ public class CPAUtils
 		return result;
 	}
 	
-	public static CanSend getCanSend(CollaborationRole role, String serviceType, String service, String action)
-	{
-		if ((serviceType == null && role.getServiceBinding().getService().getType() == null) || serviceType.equals(role.getServiceBinding().getService().getType()))
-			for (CanSend canSend : role.getServiceBinding().getCanSend())
-				if (canSend.getThisPartyActionBinding().getAction().equals(action))
-					return canSend;
-		return null;
-	}
-	
 	public static CanSend getCanSend(List<CollaborationRole> roles, String serviceType, String service, String action)
 	{
 		for (CollaborationRole role : roles)
@@ -89,15 +77,6 @@ public class CPAUtils
 				for (CanSend canSend : role.getServiceBinding().getCanSend())
 					if (canSend.getThisPartyActionBinding().getAction().equals(action))
 						return canSend;
-		return null;
-	}
-	
-	public static CanReceive getCanReceive(CollaborationRole role, String serviceType, String service, String action)
-	{
-		if ((serviceType == null && role.getServiceBinding().getService().getType() == null) || serviceType.equals(role.getServiceBinding().getService().getType()))
-			for (CanReceive canReceive : role.getServiceBinding().getCanReceive())
-				if (canReceive.getThisPartyActionBinding().getAction().equals(action))
-					return canReceive;
 		return null;
 	}
 	
