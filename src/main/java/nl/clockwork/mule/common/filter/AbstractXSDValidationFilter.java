@@ -19,7 +19,6 @@ import java.io.IOException;
 import java.io.StringReader;
 
 import javax.xml.XMLConstants;
-import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
@@ -29,7 +28,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.api.MuleMessage;
 import org.mule.api.routing.filter.Filter;
-import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 public abstract class AbstractXSDValidationFilter implements Filter
@@ -44,7 +42,12 @@ public abstract class AbstractXSDValidationFilter implements Filter
 		{
 			String content = getContent(message);
 			Validator validator = schema.newValidator();
-			validator.validate(new SAXSource(new InputSource(new StringReader(content))));
+			//quick fix for synchronization problem with validate() method
+			synchronized (this)
+			{
+				//validator.validate(new SAXSource(new InputSource(new StringReader(content))));
+				validator.validate(new StreamSource(new StringReader(content)));
+			}
 			return true;
 		}
 		catch (SAXException e)
