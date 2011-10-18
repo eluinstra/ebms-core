@@ -4,6 +4,7 @@ Introduction =
 
 This version will support the full Digikoppeling EbMS Deployment Profile (see Koppelvlakstandaard ebMS Voor Digikoppeling 2.0 Versie 2.2) which is a subset of the ebXML Message Service 2.0 specification by OASIS.
 
+This project includes 2 stubs that implement the AfleverService and the AanleverService. The 2 stubs can talk to each other. You can use the local stub as a starting point for your project.
 
 ===============
 Prerequisites =
@@ -73,20 +74,28 @@ Start local EbMS stub =
 > mule -config nl/clockwork/mule/ebms/stub/ebf/main.local.xml
 
 
-=======
-Usage =
-=======
-Load CPA in remote EbMS stub:
-	copy ebms-adapter-x.x.x.zip/resources/CPAs/cpaStubEBF.xml to <remote EbMS stub dir.base>/cpa
-		the file will be moved to <remote EbMS stub dir.base>/cpa/processed when it's processed
-		an import report will be written to <remote EbMS stub dir.base>/cpa/reports
-Now the CPA is loaded and the remote EbMS stub is ready to send and receive messages.
-
+===============
+Testing Stubs =
+===============
 Load CPA in local EbMS stub:
 	copy ebms-adapter-x.x.x.zip/resources/CPAs/cpaStubEBF.xml to <local EbMS stub dir.base>/cpa
 		the file will be moved to <local EbMS stub dir.base>/cpa/processed when it's processed
 		an import report will be written to <local EbMS stub dir.base>/cpa/reports
-Now the CPA is loaded and the local EbMS stub is ready to send and receive messages.
+Load Routing Rules in local EbMS stub:
+	copy ebms-adapter-x.x.x.zip/resources/data/routing.cpaStubEBF.local.sql to <local EbMS stub dir.base>/sql
+		the file will be moved to <local EbMS stub dir.base>/sql/processed when it's processed
+		an import report will be written to <local EbMS stub dir.base>/sql/reports
+Now the CPA and Routing Rules are loaded the local EbMS stub is ready to send and receive messages.
+
+Load CPA in remote EbMS stub:
+	copy ebms-adapter-x.x.x.zip/resources/CPAs/cpaStubEBF.xml to <remote EbMS stub dir.base>/cpa
+		the file will be moved to <remote EbMS stub dir.base>/cpa/processed when it's processed
+		an import report will be written to <remote EbMS stub dir.base>/cpa/reports
+Load Routing Rules in remote EbMS stub:
+	copy ebms-adapter-x.x.x.zip/resources/data/routing.cpaStubEBF.remote.sql to <remote EbMS stub dir.base>/sql
+		the file will be moved to <remote EbMS stub dir.base>/sql/processed when it's processed
+		an import report will be written to <remote EbMS stub dir.base>/sql/reports
+Now the CPA and Routing Rules are loaded the remote EbMS stub is ready to send and receive messages.
 
 Send afleverbericht message from remote EbMS stub to local EbMS stub:
 	copy ebms-adapter-x.x.x.zip/resources/data/afleveren/Afleverbericht_Afleveren_ebMS_2.0_v1.1.xml to <remote EbMS stub dir.base>/afleveren/request
@@ -96,11 +105,50 @@ Send aanleverbericht message from local EbMS stub to remote EbMS stub:
 	copy ebms-adapter-x.x.x.zip/resources/data/aanleveren/Aanleverbericht_Aanleveren_ebMS_2.0_v1.1.xml to <local EbMS stub dir.base>/aanleveren/request
 		check <local EbMS stub dir.base>/aanleveren/request for the response message
 
+=======
+Usage =
+=======
+If you want to use the ebms-adapter in your own application you can include this project in your project and configure the adapter into your application.
+Use nl/clockwork/mule/ebms/stub/ebf/main.local.xml as a starting point.
+You will have to generate your own CPAs and application flow, so you have to generate your own Routing Rules and load them into table ebms_channel:
+	id								- primary key
+	channel_id				- channel name (application uses as a reference)
+	cpa_id						- CPA_ID of the CPA this channel/rule applies to
+	action_id					- ActionBindingId from CPA this channel/rule applies to
+	endpoint					- Application endpoint this channel should route to  
+
+At the defined endpoint the application will receive an object of type EbMSMessageContent that contains:
+- EbMSMessageContext (needed to reply on this message)
+- properties (contain the properties from the EbMS Header defined in application property ebms.message.header.properties
+- attachments (the actual EbMS Message content)
+
+The application can instantiate a new message or reply to a received message by calling the vm endpoint ebms.message.send.in.
+The message property EBMS.EBMS_CHANNEL_ID has to be set to the predefined channel_id the message has to be sent to.
+The application should wrap the content of the message in an object of type EbMSMessageContent as attachments.
+If the message is a response to a previous received message, then include the EbMSMessageContext of the previous message.
+The EbMS adapter will then correlate these two messages.
+If the message is a new message, then leave the EbMSMessageContext empty.
+
+You can use nl/clockwork/mule/ebms/stub/ebf/main.remote.xml as a Stub to test your own application.
+
+The EbMS adapter supports different databases:
+- HSQLDB
+- MSSQL
+
+You can configure them by including the right xml inyour project:
+- nl/clockwork/mule/ebms/components/dao.hsqldb.xml
+- nl/clockwork/mule/ebms/components/dao.mssql.xml
+
+If you want to let the adapter use the application datasource exclude the following file:
+- nl/clockwork/mule/ebms/components/datasource.xml
+and add the name ebMSDataSource to the application datasource 
+
 ===========
 Resources =
 ===========
 the reources directory resides in ebms-adapter-x.x.x.zip/resources and contains the following data:
 	CPAs - contains test CPAs
+	data - contains routing data scripts
 	data/aanleveren - contains aanleverbericht test messages
 	data/afleveren - contains afleverbericht test messages
 	scripts/database/hsqldb - contains hsqldb scripts
