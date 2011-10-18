@@ -34,6 +34,7 @@ import nl.clockwork.mule.ebms.model.cpp.cpa.PartyId;
 import nl.clockwork.mule.ebms.model.cpp.cpa.PartyInfo;
 import nl.clockwork.mule.ebms.model.cpp.cpa.ReliableMessaging;
 import nl.clockwork.mule.ebms.model.cpp.cpa.SenderNonRepudiation;
+import nl.clockwork.mule.ebms.model.cpp.cpa.ServiceBinding;
 import nl.clockwork.mule.ebms.model.ebxml.MessageHeader;
 
 //FIXME use JXPath
@@ -44,6 +45,58 @@ public class CPAUtils
 		List<CollaborationRole> roles = getCollaborationRoles(cpa,messageHeader.getTo().getPartyId().get(0).getType(),messageHeader.getTo().getPartyId().get(0).getValue(),messageHeader.getTo().getRole());
 		CanReceive canReceive = getCanReceive(roles,messageHeader.getService().getType(),messageHeader.getService().getValue(),messageHeader.getAction());
 		return canReceive.getThisPartyActionBinding().getId();
+	}
+	
+	public static PartyInfo getPartyInfoSend(CollaborationProtocolAgreement cpa, String actionId)
+	{
+		for (PartyInfo partyInfo : cpa.getPartyInfo())
+			for (CollaborationRole role : partyInfo.getCollaborationRole())
+				for (CanSend canSend : role.getServiceBinding().getCanSend())
+					if (actionId.equals(canSend.getThisPartyActionBinding().getId()))
+					{
+						//return partyInfo;
+						PartyInfo p = new PartyInfo();
+						p.getPartyId().addAll(partyInfo.getPartyId());
+						CollaborationRole r = new CollaborationRole();
+						r.setRole(role.getRole());
+						r.setServiceBinding(new ServiceBinding());
+						r.getServiceBinding().setService(role.getServiceBinding().getService());
+						r.getServiceBinding().getCanSend().add(canSend);
+						p.getCollaborationRole().add(r);
+						return p;
+					}
+		return null;
+	}
+	
+	public static PartyInfo getPartyInfoReceive(CollaborationProtocolAgreement cpa, String actionId)
+	{
+		for (PartyInfo partyInfo : cpa.getPartyInfo())
+			for (CollaborationRole role : partyInfo.getCollaborationRole())
+				for (CanReceive canReceive : role.getServiceBinding().getCanReceive())
+					if (actionId.equals(canReceive.getThisPartyActionBinding().getId()))
+					{
+						//return partyInfo;
+						PartyInfo p = new PartyInfo();
+						p.getPartyId().addAll(partyInfo.getPartyId());
+						CollaborationRole r = new CollaborationRole();
+						r.setRole(role.getRole());
+						r.setServiceBinding(new ServiceBinding());
+						r.getServiceBinding().setService(role.getServiceBinding().getService());
+						r.getServiceBinding().getCanReceive().add(canReceive);
+						p.getCollaborationRole().add(r);
+						return p;
+					}
+		return null;
+	}
+	
+	public static PartyInfo getOtherPartyInfo(CollaborationProtocolAgreement cpa, String actionId)
+	{
+		for (PartyInfo partyInfo : cpa.getPartyInfo())
+			for (CollaborationRole role : partyInfo.getCollaborationRole())
+				for (CanSend canSend : role.getServiceBinding().getCanSend())
+					if (actionId.equals(canSend.getThisPartyActionBinding().getId()))
+						return getPartyInfoReceive(cpa,((ActionBindingType)canSend.getOtherPartyActionBinding()).getId());
+		return null;
 	}
 	
 	public static PartyInfo getPartyInfo(CollaborationProtocolAgreement cpa, String partyIdType, String partyId)

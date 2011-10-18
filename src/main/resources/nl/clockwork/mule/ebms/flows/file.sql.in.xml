@@ -46,7 +46,7 @@
 
 		<service name="file.sql.service">
 			<inbound>
-				<file:inbound-endpoint connector-ref="connector.file.ebms"	path="${dir.upload.sql}" moveToDirectory="${dir.upload.sql}/processed" pollingFrequency="30000">
+				<file:inbound-endpoint connector-ref="connector.file.ebms"	path="${dir.upload.sql}" moveToDirectory="${dir.upload.sql}/processed" pollingFrequency="${dir.upload.sql.pollingFrequency}">
 					<file:filename-wildcard-filter pattern="*.sql" caseSensitive="false"/>
 					<!--file:file-to-string-transformer/-->
 					<object-to-string-transformer/>

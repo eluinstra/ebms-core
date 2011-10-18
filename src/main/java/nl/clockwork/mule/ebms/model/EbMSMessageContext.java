@@ -5,6 +5,8 @@ public class EbMSMessageContext
 	private String conversationId;
 	//private String messageId;
 	//private boolean relateMessage;
+	//private String channelId;
+	//private String refChannelId;
 
 	public EbMSMessageContext(String conversationId)
 	{

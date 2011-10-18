@@ -17,14 +17,16 @@ package nl.clockwork.mule.ebms.transformer;
 
 import java.util.Date;
 import java.util.GregorianCalendar;
-import java.util.List;
 
 import javax.xml.datatype.DatatypeFactory;
 
 import nl.clockwork.mule.ebms.Constants;
-import nl.clockwork.mule.ebms.model.EbMSChannel;
+import nl.clockwork.mule.ebms.dao.EbMSDAO;
+import nl.clockwork.mule.ebms.model.Channel;
 import nl.clockwork.mule.ebms.model.EbMSMessageContent;
 import nl.clockwork.mule.ebms.model.cpp.cpa.ActorType;
+import nl.clockwork.mule.ebms.model.cpp.cpa.CollaborationProtocolAgreement;
+import nl.clockwork.mule.ebms.model.cpp.cpa.PartyInfo;
 import nl.clockwork.mule.ebms.model.ebxml.AckRequested;
 import nl.clockwork.mule.ebms.model.ebxml.From;
 import nl.clockwork.mule.ebms.model.ebxml.Manifest;
@@ -34,6 +36,7 @@ import nl.clockwork.mule.ebms.model.ebxml.PartyId;
 import nl.clockwork.mule.ebms.model.ebxml.Reference;
 import nl.clockwork.mule.ebms.model.ebxml.Service;
 import nl.clockwork.mule.ebms.model.ebxml.To;
+import nl.clockwork.mule.ebms.util.CPAUtils;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -44,8 +47,8 @@ import org.mule.transformer.AbstractMessageAwareTransformer;
 public class EbMSMessageContentToEbMSMessage extends AbstractMessageAwareTransformer
 {
   protected transient Log logger = LogFactory.getLog(getClass());
+  private EbMSDAO ebMSDAO;
 	private String hostname;
-	private List<EbMSChannel> channels;
 
   public EbMSMessageContentToEbMSMessage()
 	{
@@ -60,8 +63,11 @@ public class EbMSMessageContentToEbMSMessage extends AbstractMessageAwareTransfo
 			GregorianCalendar calendar = new GregorianCalendar();
 
 			EbMSMessageContent content = (EbMSMessageContent)message.getPayload();
-			EbMSChannel channel = findChannel(channels,(String)message.getProperty(Constants.EBMS_CHANNEL_ID));
-
+			Channel channel = ebMSDAO.getChannel((String)message.getProperty(Constants.EBMS_CHANNEL_ID));
+			CollaborationProtocolAgreement cpa = ebMSDAO.getCPA(channel.getCpaId());
+			PartyInfo partyInfo = CPAUtils.getPartyInfoSend(cpa,channel.getActionId());
+			PartyInfo otherPartyInfo = CPAUtils.getOtherPartyInfo(cpa,channel.getActionId());
+			
 			MessageHeader messageHeader = new MessageHeader();
 
 			messageHeader.setVersion(Constants.EBMS_VERSION);
@@ -72,22 +78,22 @@ public class EbMSMessageContentToEbMSMessage extends AbstractMessageAwareTransfo
 			
 			messageHeader.setFrom(new From());
 			PartyId from = new PartyId();
-			from.setType(channel.getFrom().getPartyId().get(0).getType());
-			from.setValue(channel.getFrom().getPartyId().get(0).getValue());
+			from.setType(partyInfo.getPartyId().get(0).getType());
+			from.setValue(partyInfo.getPartyId().get(0).getValue());
 			messageHeader.getFrom().getPartyId().add(from);
-			messageHeader.getFrom().setRole(channel.getFrom().getRole());
+			messageHeader.getFrom().setRole(partyInfo.getCollaborationRole().get(0).getRole().getName());
 
 			messageHeader.setTo(new To());
 			PartyId to = new PartyId();
-			to.setType(channel.getTo().getPartyId().get(0).getType());
-			to.setValue(channel.getTo().getPartyId().get(0).getValue());
+			to.setType(otherPartyInfo.getPartyId().get(0).getType());
+			to.setValue(otherPartyInfo.getPartyId().get(0).getValue());
 			messageHeader.getTo().getPartyId().add(to);
-			messageHeader.getTo().setRole(channel.getTo().getRole());
+			messageHeader.getTo().setRole(otherPartyInfo.getCollaborationRole().get(0).getRole().getName());
 			
 			messageHeader.setService(new Service());
-			messageHeader.getService().setType(channel.getService().getType());
-			messageHeader.getService().setValue(channel.getService().getValue());
-			messageHeader.setAction(channel.getAction());
+			messageHeader.getService().setType(partyInfo.getCollaborationRole().get(0).getServiceBinding().getService().getType());
+			messageHeader.getService().setValue(partyInfo.getCollaborationRole().get(0).getServiceBinding().getService().getValue());
+			messageHeader.setAction(partyInfo.getCollaborationRole().get(0).getServiceBinding().getCanSend().get(0).getThisPartyActionBinding().getAction());
 
 			messageHeader.setMessageData(new MessageData());
 			messageHeader.getMessageData().setMessageId(new Date().getTime() + message.getCorrelationId() + "@" + hostname);
@@ -121,21 +127,14 @@ public class EbMSMessageContentToEbMSMessage extends AbstractMessageAwareTransfo
 		}
 	}
 	
-	private EbMSChannel findChannel(List<EbMSChannel> channels, String channelId)
+	public void setEbMSDAO(EbMSDAO ebMSDAO)
 	{
-		for (EbMSChannel channel : channels)
-			if (channelId.equals(channel.getId()))
-				return channel;
-		return null;
+		this.ebMSDAO = ebMSDAO;
 	}
-
+	
 	public void setHostname(String hostname)
 	{
 		this.hostname = hostname;
 	}
 
-	public void setChannels(List<EbMSChannel> channels)
-	{
-		this.channels = channels;
-	}
 }

@@ -37,119 +37,15 @@
 
 	<model>
 
-		<service name="ebms.message.send.response">
-			<inbound>
-				<vm:inbound-endpoint path="ebms.message.send.response.in">
-					<custom-transformer class="nl.clockwork.mule.ebms.enricher.EbMSMessageContentToAttachmentEnricher" />
-					<custom-transformer class="nl.clockwork.mule.ebms.transformer.EbMSMessageContentToEbMSMessage">
-						<spring:property name="hostname" value="${service.host}" />
-						<spring:property name="channels" ref="ebMSChannels" />
-					</custom-transformer>
-				</vm:inbound-endpoint>
-			</inbound>
-			<!--outbound>
-				<pass-through-router>
-					<vm:outbound-endpoint path="ebms.message.send.in" />
-				</pass-through-router>
-			</outbound-->
-			<component>
-				<singleton-object class="nl.clockwork.mule.ebms.component.InsertEbMSMessageOut">
-					<property key="ebMSDAO" value-ref="ebMSDAO"/>
-				</singleton-object>
-			</component>
-			<outbound>
-				<custom-outbound-router class="nl.clockwork.mule.common.router.ChainingRouter">
-					<cxf:outbound-endpoint connector-ref="connector.cxf.ebms.out" protocolConnector="connector.http.ebms.out" address="${service.protocol}://${service.remote.host}:${service.remote.port}${service.remote.url}" clientClass="nl.clockwork.mule.ebms.service.EbMS" wsdlPort="EbMSPort" wsdlLocation="classpath:/nl/clockwork/mule/ebms/wsdl/ebms.wsdl" operation="Message" enableMuleSoapHeaders="false" mtomEnabled="true" synchronous="true">
-						<cxf:inInterceptors>
-							<spring:bean class="org.apache.cxf.interceptor.LoggingInInterceptor" />
-						</cxf:inInterceptors>
-						<cxf:outInterceptors>
-							<spring:bean class="nl.clockwork.common.cxf.AttachmentOutInterceptor" />
-							<spring:bean class="nl.clockwork.mule.ebms.cxf.OracleEbMSXMLPrefixFixingOutInterceptor" />
-<!--							<spring:bean class="nl.clockwork.mule.ebms.cxf.XMLSecSignatureOutInterceptor">-->
-							<spring:bean class="nl.clockwork.mule.ebms.cxf.OracleXMLSecSignatureOutInterceptor">
-								<spring:property name="keyStorePath" value="${signature.keystore.path}" />
-								<spring:property name="keyStorePassword" value="${signature.keystore.password}" />
-								<spring:property name="keyAlias" value="${signature.key.alias}" />
-								<spring:property name="keyPassword" value="${signature.key.password}" />
-							</spring:bean>  
-							<spring:bean class="org.apache.cxf.interceptor.LoggingOutInterceptor" />
-						</cxf:outInterceptors>
-					</cxf:outbound-endpoint>  
-					<jdbc:outbound-endpoint connector-ref="connector.jdbc.ebms" queryKey="updateEbMSMessageStatus">
-						<custom-transformer class="nl.clockwork.mule.ebms.transformer.EbMSMessageIdToUpdateEbMSMessageStatusMap">
-							<spring:property name="ebMSMessageStatus" value="DELIVERED" />
-						</custom-transformer>
-					</jdbc:outbound-endpoint>
-				</custom-outbound-router>
-			</outbound>
-			<default-service-exception-strategy>
-				<jdbc:outbound-endpoint connector-ref="connector.jdbc.ebms" queryKey="updateEbMSMessageStatus">
-					<custom-transformer class="nl.clockwork.mule.ebms.transformer.EbMSMessageIdToUpdateEbMSMessageStatusMap">
-						<spring:property name="ebMSMessageStatus" value="DELIVERY_FAILED" />
-					</custom-transformer>
-				</jdbc:outbound-endpoint>
-			</default-service-exception-strategy>
-		</service>
-
-		<service name="ebms.message.send.request">
-			<inbound>
-				<vm:inbound-endpoint path="ebms.message.send.request.in">
-					<custom-transformer class="nl.clockwork.mule.ebms.enricher.EbMSMessageContentToAttachmentEnricher" />
-					<custom-transformer class="nl.clockwork.mule.ebms.transformer.EbMSMessageContentToEbMSMessage">
-						<spring:property name="hostname" value="${service.host}" />
-						<spring:property name="channels" ref="ebMSChannels" />
-					</custom-transformer>
-				</vm:inbound-endpoint>
-			</inbound>
-			<!--outbound>
-				<pass-through-router>
-					<vm:outbound-endpoint path="ebms.message.send.in" />
-				</pass-through-router>
-			</outbound-->
-			<component>
-				<singleton-object class="nl.clockwork.mule.ebms.component.InsertEbMSMessageOut">
-					<property key="ebMSDAO" value-ref="ebMSDAO"/>
-				</singleton-object>
-			</component>
-			<outbound>
-				<custom-outbound-router class="nl.clockwork.mule.common.router.ChainingRouter">
-					<cxf:outbound-endpoint connector-ref="connector.cxf.ebms.out" protocolConnector="connector.http.ebms.out" address="${service.protocol}://${service.remote.host}:${service.remote.port}${service.remote.url}" clientClass="nl.clockwork.mule.ebms.service.EbMS" wsdlPort="EbMSPort" wsdlLocation="classpath:/nl/clockwork/mule/ebms/wsdl/ebms.wsdl" operation="Message" enableMuleSoapHeaders="false" mtomEnabled="true" synchronous="true">
-						<cxf:inInterceptors>
-							<spring:bean class="org.apache.cxf.interceptor.LoggingInInterceptor" />
-						</cxf:inInterceptors>
-						<cxf:outInterceptors>
-							<spring:bean class="nl.clockwork.common.cxf.AttachmentOutInterceptor" />
-							<spring:bean class="nl.clockwork.mule.ebms.cxf.OracleEbMSXMLPrefixFixingOutInterceptor" />
-<!--							<spring:bean class="nl.clockwork.mule.ebms.cxf.XMLSecSignatureOutInterceptor">-->
-							<spring:bean class="nl.clockwork.mule.ebms.cxf.OracleXMLSecSignatureOutInterceptor">
-								<spring:property name="keyStorePath" value="${signature.keystore.path}" />
-								<spring:property name="keyStorePassword" value="${signature.keystore.password}" />
-								<spring:property name="keyAlias" value="${signature.key.alias}" />
-								<spring:property name="keyPassword" value="${signature.key.password}" />
-							</spring:bean>  
-							<spring:bean class="org.apache.cxf.interceptor.LoggingOutInterceptor" />
-						</cxf:outInterceptors>
-					</cxf:outbound-endpoint>  
-					<jdbc:outbound-endpoint connector-ref="connector.jdbc.ebms" queryKey="updateEbMSMessageStatus">
-						<custom-transformer class="nl.clockwork.mule.ebms.transformer.EbMSMessageIdToUpdateEbMSMessageStatusMap">
-							<spring:property name="ebMSMessageStatus" value="DELIVERED" />
-						</custom-transformer>
-					</jdbc:outbound-endpoint>
-				</custom-outbound-router>
-			</outbound>
-			<default-service-exception-strategy>
-				<jdbc:outbound-endpoint connector-ref="connector.jdbc.ebms" queryKey="updateEbMSMessageStatus">
-					<custom-transformer class="nl.clockwork.mule.ebms.transformer.EbMSMessageIdToUpdateEbMSMessageStatusMap">
-						<spring:property name="ebMSMessageStatus" value="DELIVERY_FAILED" />
-					</custom-transformer>
-				</jdbc:outbound-endpoint>
-			</default-service-exception-strategy>
-		</service>
-
 		<service name="ebms.message.send">
 			<inbound>
-				<vm:inbound-endpoint path="ebms.message.send.in" />
+				<vm:inbound-endpoint path="ebms.message.send.in">
+					<custom-transformer class="nl.clockwork.mule.ebms.enricher.EbMSMessageContentToAttachmentEnricher" />
+					<custom-transformer class="nl.clockwork.mule.ebms.transformer.EbMSMessageContentToEbMSMessage">
+						<spring:property name="ebMSDAO" ref="ebMSDAO" />
+						<spring:property name="hostname" value="${service.host}" />
+					</custom-transformer>
+				</vm:inbound-endpoint>
 			</inbound>
 			<component>
 				<singleton-object class="nl.clockwork.mule.ebms.component.InsertEbMSMessageOut">

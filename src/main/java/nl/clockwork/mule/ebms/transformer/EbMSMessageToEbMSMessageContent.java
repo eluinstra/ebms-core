@@ -21,6 +21,7 @@ import java.util.Map;
 
 import javax.activation.DataSource;
 
+import nl.clockwork.mule.ebms.Constants;
 import nl.clockwork.mule.ebms.model.EbMSMessage;
 import nl.clockwork.mule.ebms.model.EbMSMessageContent;
 import nl.clockwork.mule.ebms.model.EbMSMessageContext;
