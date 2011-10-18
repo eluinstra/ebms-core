@@ -68,7 +68,6 @@
 		<import resource="classpath:nl/clockwork/mule/ebms/flows/ebms.out.xml" />
 
 		<import resource="components/constants.xml" />
-		<import resource="components/routing.xml" />
 		<import resource="flows/afleverService.stub.processing.xml" />
 		<import resource="flows/aanleverService.stub.in.xml" />
 		<import resource="flows/aanleverService.stub.out.xml" />
