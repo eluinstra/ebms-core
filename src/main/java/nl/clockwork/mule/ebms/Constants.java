@@ -113,6 +113,18 @@ public class Constants
 		
   };
 
+  public enum EbMSErrorLocation
+  {
+  	UNKNOWN("Unknown");
+
+		private final String location;
+		
+		EbMSErrorLocation(String location) { this.location = location; }
+		
+		public final String location() { return location; }
+		
+  }
+
   public static final String[] allowedCipherSuites = new String[]{"TLS_DHE_RSA_WITH_AES_128_CBC_SHA","TLS_RSA_WITH_AES_128_CBC_SHA"};
   
 	public static final String DEFAULT_FILENAME = "filename";

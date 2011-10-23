@@ -17,15 +17,21 @@ package nl.clockwork.mule.ebms.util;
 
 import nl.clockwork.mule.ebms.model.ebxml.Description;
 import nl.clockwork.mule.ebms.model.ebxml.Error;
+import nl.clockwork.mule.ebms.model.ebxml.SeverityType;
 
 public class EbMSMessageUtils
 {
 	public static Error createError(String location, String errorCode, String description)
 	{
-		return createError(location,errorCode,description,"en-US");
+		return createError(location,errorCode,description,"en-US",SeverityType.ERROR);
 	}
-
-	public static Error createError(String location, String errorCode, String description, String language)
+	
+	public static Error createError(String location, String errorCode, String description, SeverityType severity)
+	{
+		return createError(location,errorCode,description,"en-US",severity);
+	}
+	
+	public static Error createError(String location, String errorCode, String description, String language, SeverityType severity)
 	{
 		Error error = new Error();
 		error.setCodeContext("urn:oasis:names:tc:ebxml-msg:service:errors");
@@ -34,6 +40,7 @@ public class EbMSMessageUtils
 		error.setDescription(new Description());
 		error.getDescription().setLang(language);
 		error.getDescription().setValue(description);
+		error.setSeverity(severity);
 		return error;
 	}
 

@@ -1,5 +1,5 @@
 /*
- * $Id: ChainingRouter.java 13138 2008-10-27 07:36:57Z rossmason $
+ * $Id: ChainingMulticastingRouter.java 13138 2008-10-27 07:36:57Z rossmason $
  * --------------------------------------------------------------------------------------
  * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
  *
@@ -21,16 +21,20 @@ import org.mule.api.routing.CouldNotRouteOutboundMessageException;
 import org.mule.api.routing.RoutePathNotFoundException;
 import org.mule.api.routing.RoutingException;
 import org.mule.config.i18n.CoreMessages;
-import org.mule.routing.outbound.FilteringOutboundRouter;
+import org.mule.routing.outbound.ChainingRouter;
 import org.mule.transport.NullPayload;
 
 /**
- * <code>ChainingRouter</code> is used to pass a Mule event through multiple
- * endpoints using the result of the first as the input for the second.
+ * <code>ChainingMulticastingRouter</code> is used to pass a Mule event through multiple
+ * endpoints using the same input for all endpoints. If an exception is encountered the
+ * router will not process any more endpoints, but will call the exception endpoint
+ * instead.
  */
 
-public class ChainingRouter extends FilteringOutboundRouter
+public class AsyncChainingMulticastingRouter extends ChainingRouter
 {
+	private String exceptionEndpointName;
+
 
     @Override
     public void initialise() throws InitialisationException
@@ -67,7 +71,7 @@ public class ChainingRouter extends FilteringOutboundRouter
         OutboundEndpoint endpoint = null;
         try
         {
-//patch
+//patchX
 //            MuleMessage intermediaryResult = message;
         		MuleMessage intermediaryResult = new DefaultMuleMessage(message.getPayload(), message);
 
@@ -100,9 +104,7 @@ public class ChainingRouter extends FilteringOutboundRouter
                     {
                         processIntermediaryResult(localResult, intermediaryResult);
                     }
-//patch
-//                    intermediaryResult = localResult;
-                		intermediaryResult = new DefaultMuleMessage(message.getPayload(), message);
+                    intermediaryResult = localResult;
 
                     if (logger.isDebugEnabled())
                     {
@@ -111,16 +113,22 @@ public class ChainingRouter extends FilteringOutboundRouter
                     }
 //patch
 //                    if (intermediaryResult == null || intermediaryResult.getPayload() == NullPayload.getInstance())
-
-//                    if (intermediaryResult.getExceptionPayload() != null)
-//                    {
-//                        // if there was an error in the first link of the chain, make sure we propagate back
-//                        // any exception payloads alongside the NullPayload
+                    if (intermediaryResult.getExceptionPayload() != null)
+                    {
+                        // if there was an error in the first link of the chain, make sure we propagate back
+                        // any exception payloads alongside the NullPayload
+//patch: return async on exception
 //                        resultToReturn = intermediaryResult;
 //                        logger.warn("Chaining router cannot process any further endpoints. "
 //                                    + "There was no result returned from endpoint invocation: " + endpoint);
-//                        break;
-//                    }
+                      	resultToReturn = null;
+                      	logger.warn("Sending intermediary result on to exceptionEndpointName: " + exceptionEndpointName);
+                      	dispatch(session,new DefaultMuleMessage(message.getPayload(), message),muleContext.getRegistry().lookupEndpointFactory().getOutboundEndpoint(exceptionEndpointName));
+                      	//FIXME??? dispatch(session,intermediaryResult,(OutboundEndpoint)new MuleEndpointURI("exceptionEndpointUri"));
+                        break;
+                    }
+//patchX
+              		intermediaryResult = new DefaultMuleMessage(message.getPayload(), message);
                 }
                 else
                 {
@@ -152,31 +160,9 @@ public class ChainingRouter extends FilteringOutboundRouter
         return resultToReturn;
     }
 
-    /**
-     * Process intermediary result of invocation. The method will be invoked
-     * <strong>only</strong> if both local and intermediary results are available
-     * (not null).
-     * <p/>
-     * Overriding methods must call <code>super(localResult, intermediaryResult)</code>,
-     * unless they are modifying the correlation workflow (if you know what that means,
-     * you know what you are doing and when to do it).
-     * <p/>
-     * Default implementation propagates
-     * the following properties:
-     * <ul>
-     * <li>correlationId
-     * <li>correlationSequence
-     * <li>correlationGroupSize
-     * <li>replyTo
-     * </ul>
-     * @param localResult result of the last endpoint invocation
-     * @param intermediaryResult the message travelling across the endpoints
-     */
-    protected void processIntermediaryResult(MuleMessage localResult, MuleMessage intermediaryResult)
-    {
-        localResult.setCorrelationId(intermediaryResult.getCorrelationId());
-        localResult.setCorrelationSequence(intermediaryResult.getCorrelationSequence());
-        localResult.setCorrelationGroupSize(intermediaryResult.getCorrelationGroupSize());
-        localResult.setReplyTo(intermediaryResult.getReplyTo());
-    }
+  	public void setExceptionEndpointName(String exceptionEndpointName)
+  	{
+  		this.exceptionEndpointName = exceptionEndpointName;
+  	}
 }
+

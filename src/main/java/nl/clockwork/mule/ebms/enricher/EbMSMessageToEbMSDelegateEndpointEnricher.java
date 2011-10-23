@@ -13,31 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  ******************************************************************************/
-package nl.clockwork.mule.ebms.transformer;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.activation.DataSource;
+package nl.clockwork.mule.ebms.enricher;
 
 import nl.clockwork.mule.ebms.Constants;
 import nl.clockwork.mule.ebms.dao.EbMSDAO;
-import nl.clockwork.mule.ebms.model.EbMSMessageContent;
-import nl.clockwork.mule.ebms.model.EbMSMessageContext;
+import nl.clockwork.mule.ebms.model.Channel;
+import nl.clockwork.mule.ebms.model.EbMSMessage;
+import nl.clockwork.mule.ebms.model.cpp.cpa.CollaborationProtocolAgreement;
 import nl.clockwork.mule.ebms.model.ebxml.MessageHeader;
+import nl.clockwork.mule.ebms.util.CPAUtils;
 
-import org.apache.commons.jxpath.JXPathContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.transformer.TransformerException;
 import org.mule.transformer.AbstractMessageAwareTransformer;
 
-public class EbMSMessageIdToEbMSMessageContent extends AbstractMessageAwareTransformer
+public class EbMSMessageToEbMSDelegateEndpointEnricher extends AbstractMessageAwareTransformer
 {
 	private EbMSDAO ebMSDAO;
-	private Map<String,String> properties = new HashMap<String,String>();
 
-	public EbMSMessageIdToEbMSMessageContent()
+	public EbMSMessageToEbMSDelegateEndpointEnricher()
 	{
 		//registerSourceType(EbMSMessage.class);
 	}
@@ -47,16 +41,13 @@ public class EbMSMessageIdToEbMSMessageContent extends AbstractMessageAwareTrans
 	{
 		try
 		{
-			long messageId = message.getLongProperty(Constants.EBMS_MESSAGE_ID,0);
-			MessageHeader messageHeader = ebMSDAO.getMessageHeader(messageId);
-			List<DataSource> attachments = ebMSDAO.getAttachments(messageId);
+			EbMSMessage msg = (EbMSMessage)message.getPayload();
+			MessageHeader messageHeader = msg.getMessageHeader();
 
-			Map<String,Object> properties = new HashMap<String,Object>();
-			JXPathContext context = JXPathContext.newContext(messageHeader);
-			for (String property : this.properties.keySet())
-				properties.put(property,context.getValue(this.properties.get(property)));
-
-			message.setPayload(new EbMSMessageContent(new EbMSMessageContext(messageHeader.getConversationId()),properties,attachments));
+			CollaborationProtocolAgreement cpa = ebMSDAO.getCPA(messageHeader.getCPAId());
+			Channel channel = ebMSDAO.getChannel(messageHeader.getCPAId(),CPAUtils.getActionIdReceived(cpa,messageHeader));
+			if (channel != null)
+				message.setProperty(Constants.EBMS_DELEGATE_PATH,channel.getEndpoint());
 			return message;
 		}
 		catch (Exception e)
@@ -70,14 +61,4 @@ public class EbMSMessageIdToEbMSMessageContent extends AbstractMessageAwareTrans
 		this.ebMSDAO = ebMSDAO;
 	}
 	
-	public void setProperties(String properties)
-	{
-		 String[] p = properties.split("\\s*,\\s*");
-		 for (String s : p)
-		 {
-			 String[] t = s.split("\\s*:\\s*");
-			 this.properties.put(t[0],t[1]);
-		 }
-	}
-
 }

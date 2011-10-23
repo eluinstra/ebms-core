@@ -21,7 +21,6 @@ import java.util.Map;
 
 import javax.activation.DataSource;
 
-import nl.clockwork.mule.ebms.Constants;
 import nl.clockwork.mule.ebms.model.EbMSMessage;
 import nl.clockwork.mule.ebms.model.EbMSMessageContent;
 import nl.clockwork.mule.ebms.model.EbMSMessageContext;
@@ -53,8 +52,7 @@ public class EbMSMessageToEbMSMessageContent extends AbstractMessageAwareTransfo
 		for (String property : this.properties.keySet())
 			properties.put(property,context.getValue(this.properties.get(property)));
 
-		EbMSMessageContent content = new EbMSMessageContent(new EbMSMessageContext(messageHeader.getConversationId()),properties,attachments);
-		message.setPayload(content);
+		message.setPayload(new EbMSMessageContent(new EbMSMessageContext(messageHeader.getConversationId()),properties,attachments));
 		return message;
 	}
 

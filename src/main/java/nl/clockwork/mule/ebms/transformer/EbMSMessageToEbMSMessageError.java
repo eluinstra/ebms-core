@@ -85,7 +85,7 @@ public class EbMSMessageToEbMSMessageError extends AbstractMessageAwareTransform
 
 			Error error = (Error)message.getProperty(Constants.EBMS_ERROR);
 			if (error == null)
-				EbMSMessageUtils.createError(Constants.EbMSErrorCode.UNKNOWN.errorCode(),Constants.EbMSErrorCode.UNKNOWN.errorCode(),"An unknown error occurred!");
+				EbMSMessageUtils.createError(Constants.EbMSErrorLocation.UNKNOWN.location(),Constants.EbMSErrorCode.UNKNOWN.errorCode(),"An unknown error occurred!");
 			errorList.getError().add(error);
 			
 			message.setPayload(new Object[]{messageHeader,errorList});

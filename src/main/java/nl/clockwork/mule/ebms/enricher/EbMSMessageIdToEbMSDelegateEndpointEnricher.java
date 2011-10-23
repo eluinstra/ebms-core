@@ -42,6 +42,7 @@ public class EbMSMessageIdToEbMSDelegateEndpointEnricher extends AbstractMessage
 		{
 			long messageId = message.getLongProperty(Constants.EBMS_MESSAGE_ID,0);
 			MessageHeader messageHeader = ebMSDAO.getMessageHeader(messageId);
+
 			CollaborationProtocolAgreement cpa = ebMSDAO.getCPA(messageHeader.getCPAId());
 			Channel channel = ebMSDAO.getChannel(messageHeader.getCPAId(),CPAUtils.getActionIdReceived(cpa,messageHeader));
 			if (channel != null)
