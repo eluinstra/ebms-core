@@ -125,7 +125,7 @@
 			</inbound>
 			<outbound>
 				<pass-through-router>
-					<file:outbound-endpoint connector-ref="connector.file.ebms" path="${dir.base}/aanleverService/request" outputPattern="request_#[function:datestamp:yyyyMMddHHmmSSS].xml">
+					<file:outbound-endpoint connector-ref="connector.file" path="${dir.base}/aanleverService/request" outputPattern="request_#[function:datestamp:yyyyMMddHHmmSSS].xml">
 						<custom-transformer class="nl.clockwork.mule.ebms.stub.ebf.transformer.EbMSMessageContentToMessageContent"/>
 					</file:outbound-endpoint>
 				</pass-through-router>
@@ -138,7 +138,7 @@
 			</inbound>
 			<outbound>
 				<pass-through-router>
-					<file:outbound-endpoint connector-ref="connector.file.ebms" path="${dir.base}/aanleverService/response" outputPattern="response_#[function:datestamp:yyyyMMddHHmmSSS].xml">
+					<file:outbound-endpoint connector-ref="connector.file" path="${dir.base}/aanleverService/response" outputPattern="response_#[function:datestamp:yyyyMMddHHmmSSS].xml">
 						<custom-transformer class="nl.clockwork.mule.ebms.stub.ebf.transformer.EbMSMessageContentToMessageContent"/>
 					</file:outbound-endpoint>
 				</pass-through-router>

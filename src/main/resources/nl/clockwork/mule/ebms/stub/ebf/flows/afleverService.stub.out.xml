@@ -37,10 +37,6 @@
 	"
 >
 
-	<file:connector name="connector.file">
-		<file:expression-filename-parser/>
-	</file:connector>
-
 	<model>
 
 		<service name="afleverbericht.stub.file.receive">

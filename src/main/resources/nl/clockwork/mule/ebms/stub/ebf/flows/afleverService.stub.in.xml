@@ -49,7 +49,7 @@
 			</inbound>
 			<outbound>
 				<pass-through-router>
-					<file:outbound-endpoint connector-ref="connector.file.ebms" path="${dir.base}/afleverService/response" outputPattern="response_#[function:datestamp:yyyyMMddHHmmSSS].xml">
+					<file:outbound-endpoint connector-ref="connector.file" path="${dir.base}/afleverService/response" outputPattern="response_#[function:datestamp:yyyyMMddHHmmSSS].xml">
 						<!--expression-transformer returnClass="java.lang.String">
 							<return-argument evaluator="jxpath" expression="jxpath:/attachments[0]/inputStream"/>
 						</expression-transformer-->
