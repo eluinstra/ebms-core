@@ -4,7 +4,14 @@ Introduction =
 
 This version will support the full Digikoppeling EbMS Deployment Profile (see Koppelvlakstandaard ebMS Voor Digikoppeling 2.0 Versie 2.2) which is a subset of the ebXML Message Service 2.0 specification by OASIS.
 
-This project includes 2 stubs that implement the AfleverService and the AanleverService. The 2 stubs can talk to each other. You can use the local stub as a starting point for your project.
+This ebms-adapter runs on mule-standalone-2.2.1. You can use the ebms-adapter in two ways:
+- include it in your application/project (only possible if your project also runs on mule-standalone-2.2.1)
+- run it standalone and use the tcp bridge to connect to your application
+
+This project includes 2 stubs (local and remote) that implement the AfleverService and the AanleverService. These stubs can communicate with each other.
+The project also includes a standalone ebms-adapter configuration that has a tcp bridge to communicate with an application.
+The project includes a standalone version of the local stub that uses the standalone ebms-adapter (through tcp), that can also communicate with the remote stub.
+You can use the local (standalone) stub as a starting point for your project.
 
 ===============
 Prerequisites =
@@ -16,51 +23,50 @@ move the ebms-adapter-1.0.0.jar to <mule-standalone-2.2.1>/lib/user
 download and move c3p0-0.9.1.2.jar and hsqldb-2.1.0.jar to <mule-standalone-2.2.1>/lib/opt
 
 
-===============
-Configuration =
-===============
+=================
+Configure Stubs =
+=================
 create directory ${user.home}/.ebms-stub
 
 copy ebms-adapter-1.0.0.jar/keystore.jks to ${user.home}/.ebms-stub
 
-
-============================
-Configure remote EbMS stub =
-============================
-create file ${user.home}/.ebms-stub/ebf.remote.properties (this overrides properties from nl/clockwork/mule/ebms/default.properties and nl/clockwork/mule/ebms/stub/ebf/default.remote.properties)
-
-edit and add the following lines to ${user.home}/.ebms-stub/ebf.remote.properties:
-
-service.port=4443
-service.remote.port=443
-
-server.keystore.path=${user.home}/.ebms-stub/keystore.jks
-client.keystore.path=${user.home}/.ebms-stub/keystore.jks
-truststore.path=${user.home}/.ebms-stub/keystore.jks
-signature.keystore.path=${user.home}/.ebms-stub/keystore.jks
-
-dir.base=H:/tmp/ebms-stub/remote
-
-jmx.port=1099
-
-===========================
-Configure local EbMS stub =
-===========================
-create file ${user.home}/.ebms-stub/ebf.local.properties (this overrides properties from nl/clockwork/mule/ebms/default.properties and nl/clockwork/mule/ebms/stub/ebf/default.local.properties)
-
-edit and add the following lines to ${user.home}/.ebms-stub/ebf.local.properties:
-
-service.port=443
-service.remote.port=4443
-
-server.keystore.path=${user.home}/.ebms-stub/keystore.jks
-client.keystore.path=${user.home}/.ebms-stub/keystore.jks
-truststore.path=${user.home}/.ebms-stub/keystore.jks
-signature.keystore.path=${user.home}/.ebms-stub/keystore.jks
-
-dir.base=H:/tmp/ebms-stub/local
-
-jmx.port=1099
+	============================
+	Configure remote EbMS stub =
+	============================
+	create file ${user.home}/.ebms-stub/ebf.remote.properties (this overrides properties from nl/clockwork/mule/ebms/default.properties and nl/clockwork/mule/ebms/stub/ebf/default.remote.properties)
+	
+	edit and add the following lines to ${user.home}/.ebms-stub/ebf.remote.properties:
+	
+	service.port=4443
+	service.remote.port=443
+	
+	server.keystore.path=${user.home}/.ebms-stub/keystore.jks
+	client.keystore.path=${user.home}/.ebms-stub/keystore.jks
+	truststore.path=${user.home}/.ebms-stub/keystore.jks
+	signature.keystore.path=${user.home}/.ebms-stub/keystore.jks
+	
+	dir.base=H:/tmp/ebms-stub/remote
+	
+	jmx.port=1099
+	
+	===========================
+	Configure local EbMS stub =
+	===========================
+	create file ${user.home}/.ebms-stub/ebf.local.properties (this overrides properties from nl/clockwork/mule/ebms/default.properties and nl/clockwork/mule/ebms/stub/ebf/default.local.properties)
+	
+	edit and add the following lines to ${user.home}/.ebms-stub/ebf.local.properties:
+	
+	service.port=443
+	service.remote.port=4443
+	
+	server.keystore.path=${user.home}/.ebms-stub/keystore.jks
+	client.keystore.path=${user.home}/.ebms-stub/keystore.jks
+	truststore.path=${user.home}/.ebms-stub/keystore.jks
+	signature.keystore.path=${user.home}/.ebms-stub/keystore.jks
+	
+	dir.base=H:/tmp/ebms-stub/local
+	
+	jmx.port=1099
 
 ========================
 Start remote EbMS stub =
@@ -131,13 +137,42 @@ If the message is a new message, then leave the EbMSMessageContext empty.
 
 You can use nl/clockwork/mule/ebms/stub/ebf/main.remote.xml as a Stub to test your own application.
 
+
+=====================================
+EbMS Adapter Communication Protocol =
+=====================================
+The EbMS adapter supports to different protocols:
+- HTTP
+- HTTPS
+
+You can configure them by including the right xml in your project:
+- nl/clockwork/mule/ebms/components/connector.http.xml
+- nl/clockwork/mule/ebms/components/connector.https.xml
+
+And you have to configure the right server protocol:
+- service.protocol=http
+- service.protocol=https
+
+=======================
+EbMS Adapter Database =
+=======================
 The EbMS adapter supports different databases:
 - HSQLDB
 - MSSQL
 
-You can configure them by including the right xml inyour project:
+You can configure them by including the right xml in your project:
 - nl/clockwork/mule/ebms/components/dao.hsqldb.xml
 - nl/clockwork/mule/ebms/components/dao.mssql.xml
+
+And you have to configure the right driver and connection string:
+- ebms.jdbc.driverClassName=org.hsqldb.jdbcDriver
+	ebms.jdbc.url=jdbc:hsqldb:mem:<dbname>
+	or
+	ebms.jdbc.url=jdbc:hsqldb:file:<path>
+- ezpoort.jdbc.driverClassName=com.microsoft.sqlserver.jdbc.SQLServerDriver
+	or
+	ezpoort.jdbc.driverClassName=net.sourceforge.jtds.jdbc.Driver
+	ezpoort.jdbc.url=jdbc:sqlserver://<host>:<port>;databaseName=<dbname>;
 
 If you want to let the adapter use the application datasource exclude the following file:
 - nl/clockwork/mule/ebms/components/datasource.xml
