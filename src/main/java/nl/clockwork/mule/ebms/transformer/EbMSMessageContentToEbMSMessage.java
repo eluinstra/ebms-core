@@ -64,6 +64,8 @@ public class EbMSMessageContentToEbMSMessage extends AbstractMessageAwareTransfo
 
 			EbMSMessageContent content = (EbMSMessageContent)message.getPayload();
 			Channel channel = ebMSDAO.getChannel((String)message.getProperty(Constants.EBMS_CHANNEL_ID));
+			if (channel == null)
+				throw new Exception("No channel found with id " + (String)message.getProperty(Constants.EBMS_CHANNEL_ID));
 			CollaborationProtocolAgreement cpa = ebMSDAO.getCPA(channel.getCpaId());
 			PartyInfo partyInfo = CPAUtils.getPartyInfoSend(cpa,channel.getActionId());
 			PartyInfo otherPartyInfo = CPAUtils.getOtherPartyInfo(cpa,channel.getActionId());

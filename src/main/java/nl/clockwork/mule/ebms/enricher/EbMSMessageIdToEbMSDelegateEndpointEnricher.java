@@ -45,8 +45,9 @@ public class EbMSMessageIdToEbMSDelegateEndpointEnricher extends AbstractMessage
 
 			CollaborationProtocolAgreement cpa = ebMSDAO.getCPA(messageHeader.getCPAId());
 			Channel channel = ebMSDAO.getChannel(messageHeader.getCPAId(),CPAUtils.getActionIdReceived(cpa,messageHeader));
-			if (channel != null)
-				message.setProperty(Constants.EBMS_DELEGATE_PATH,channel.getEndpoint());
+			if (channel == null)
+				throw new Exception("No channel found for CPAId " + messageHeader.getCPAId() + " and ActionId " + CPAUtils.getActionIdReceived(cpa,messageHeader));
+			message.setProperty(Constants.EBMS_DELEGATE_PATH,channel.getEndpoint());
 			return message;
 		}
 		catch (Exception e)
