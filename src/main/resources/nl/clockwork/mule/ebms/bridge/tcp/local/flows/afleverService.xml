@@ -52,7 +52,7 @@
 			</inbound>
 			<outbound>
 				<pass-through-router>
-					<tcp:outbound-endpoint host="${tcp.host}" port="${tcp.afleveren.port}">
+					<tcp:outbound-endpoint host="${tcp.host}" port="${tcp.afleveren.port}" synchronous="true">
 						<transformers>
 							<custom-transformer class="nl.clockwork.mule.ebms.bridge.tcp.transformer.EbMSMessageContentSerializer" />
 							<object-to-byte-array-transformer/>

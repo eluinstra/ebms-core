@@ -46,7 +46,7 @@
 
 		<service name="afleverbericht.processing.service.bridge">
 			<inbound>
-				<tcp:inbound-endpoint host="${tcp.host}" port="${tcp.afleveren.port}">
+				<tcp:inbound-endpoint host="${tcp.host}" port="${tcp.afleveren.port}" synchronous="true">
 					<transformers>
 						<byte-array-to-object-transformer/>
 						<custom-transformer class="nl.clockwork.mule.ebms.bridge.tcp.transformer.EbMSMessageContentDeserializer" />
@@ -55,14 +55,14 @@
 			</inbound>
 			<outbound>
 				<pass-through-router>
-					<vm:outbound-endpoint path="afleverbericht.processing.service.in" />
+					<vm:outbound-endpoint path="afleverbericht.processing.service.in" synchronous="false"/>
 				</pass-through-router>
 			</outbound>
 		</service>
 
 		<service name="bevestigAanleverbericht.processing.service.bridge">
 			<inbound>
-				<tcp:inbound-endpoint host="${tcp.host}" port="${tcp.bevestigAanleveren.port}">
+				<tcp:inbound-endpoint host="${tcp.host}" port="${tcp.bevestigAanleveren.port}" synchronous="true">
 					<transformers>
 						<byte-array-to-object-transformer/>
 						<custom-transformer class="nl.clockwork.mule.ebms.bridge.tcp.transformer.EbMSMessageContentDeserializer" />
@@ -71,7 +71,7 @@
 			</inbound>
 			<outbound>
 				<pass-through-router>
-					<vm:outbound-endpoint path="aanleverbericht.processing.service.in" />
+					<vm:outbound-endpoint path="aanleverbericht.processing.service.in" synchronous="false"/>
 				</pass-through-router>
 			</outbound>
 		</service>

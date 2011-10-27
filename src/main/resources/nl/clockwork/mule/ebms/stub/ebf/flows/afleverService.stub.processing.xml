@@ -50,7 +50,7 @@
 			</inbound>
 			<outbound>
 				<pass-through-router>
-					<vm:outbound-endpoint path="afleverbericht.validate.in" />
+					<vm:outbound-endpoint path="afleverbericht.validate.in" synchronous="false"/>
 				</pass-through-router>
 			</outbound>
 		</service>

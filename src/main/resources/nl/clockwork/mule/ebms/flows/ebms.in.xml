@@ -271,7 +271,7 @@
 				</vm:inbound-endpoint>
 			</inbound>
 			<outbound>
-				<expression-recipient-list-router evaluator="header" expression="EBMS.EBMS_DELEGATE_PATH" />
+				<expression-recipient-list-router evaluator="header" expression="EBMS.EBMS_DELEGATE_PATH" synchronous="true"/>
 			</outbound>
 		</service>
 
