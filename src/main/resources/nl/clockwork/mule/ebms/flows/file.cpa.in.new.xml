@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Copyright 2011 Clockwork
+  
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+  
+    http://www.apache.org/licenses/LICENSE-2.0
+  
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+<mule
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:spring="http://www.springframework.org/schema/beans"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+	xmlns:jdbc="http://www.mulesoft.org/schema/mule/jdbc"
+	xmlns:file="http://www.mulesoft.org/schema/mule/file"
+	xmlns:script="http://www.mulesoft.org/schema/mule/scripting"
+	xsi:schemaLocation="
+		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.0.xsd
+		http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.2/mule-vm.xsd
+		http://www.mulesoft.org/schema/mule/jdbc http://www.mulesoft.org/schema/mule/jdbc/3.2/mule-jdbc.xsd
+		http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/3.2/mule-file.xsd
+		http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/3.2/mule-scripting.xsd
+	"
+>
+
+	<spring:beans>
+		<util:constant id="CPA_ID" static-field="nl.clockwork.mule.ebms.Constants.CPA_ID"/>
+	</spring:beans>
+	
+	<script:transformer name="toCPAMap">
+		<script:script engine="groovy">
+			import java.util.HashMap;
+			import nl.clockwork.mule.ebms.Constants;
+
+			HashMap map = new HashMap();
+			map.put("cpa_id",message.getStringProperty(Constants.CPA_ID,null));
+			map.put("cpa",message.getPayload());
+			message.setPayload(map);
+			return message;
+		</script:script>
+	</script:transformer>
+
+	<flow name="file.cpa.service">
+		<file:inbound-endpoint connector-ref="connector.file.ebms"	path="${dir.upload.cpa}" moveToDirectory="${dir.upload.cpa}/processed" pollingFrequency="${dir.upload.cpa.pollingFrequency}">
+			<file:filename-wildcard-filter pattern="*.xml" caseSensitive="false"/>
+			<file:file-to-string-transformer/>
+			<script:transformer>
+         	<script:script engine="groovy">
+					import org.mule.api.transport.PropertyScope;
+
+					message.setProperty("originalFilename",message.getProperty("originalFilename"),PropertyScope.SESSION);
+					return message;
+				</script:script>
+			</script:transformer>
+		</file:inbound-endpoint>
+		<message-filter throwOnUnaccepted="true">
+			<custom-filter class="nl.clockwork.mule.common.filter.XSDValidationFilter">
+				<spring:property name="xsdFile" value="/nl/clockwork/mule/ebms/xsd/cpp-cpa-2_0.xsd" />
+			</custom-filter>
+		</message-filter>
+		<vm:outbound-endpoint path="file.cpa.metadata.in" />
+		<default-exception-strategy>
+			<vm:outbound-endpoint path="file.cpa.report.in">
+				<!--message-properties-transformer>
+					<add-message-property key="EBMS.REPORT" value="#[header:originalFilename] contains no CPA." />
+				</message-properties-transformer-->
+				<script:transformer>
+	         	<script:script engine="groovy">
+						import org.mule.api.transport.PropertyScope;
+	
+						message.setProperty("EBMS.REPORT",message.getProperty("originalFilename") + " contains no CPA.",PropertyScope.SESSION);
+						return message;
+					</script:script>
+				</script:transformer>
+			</vm:outbound-endpoint>
+		</default-exception-strategy>
+	</flow>
+
+	<flow name="file.cpa.metadata">
+		<vm:inbound-endpoint path="file.cpa.metadata.in">
+			<!--message-properties-transformer>
+				<add-message-property key="EBMS.CPA_ID" value="#[xpath:/CollaborationProtocolAgreement/@cpaid]" />
+			</message-properties-transformer-->
+			<custom-transformer class="nl.clockwork.mule.common.enricher.XPathPropertyEnricher">
+				<spring:property name="xpathQueries">
+					<spring:map>
+						<spring:entry key-ref="CPA_ID" value="/CollaborationProtocolAgreement/@cpaid" />
+					</spring:map>
+				</spring:property>
+			</custom-transformer>
+		</vm:inbound-endpoint>
+		<first-successful failureExpression="exception-type:java.lang.Exception">
+			<vm:outbound-endpoint path="file.cpa.insert.in" exchange-pattern="request-response"/>
+			<vm:outbound-endpoint path="file.cpa.update.in" exchange-pattern="request-response"/>
+			<vm:outbound-endpoint path="file.cpa.report.in">
+				<script:transformer>
+          	<script:script engine="groovy">
+						import java.io.PrintWriter;
+						import java.io.StringWriter;
+						import java.io.Writer;
+						import org.mule.api.transport.PropertyScope;
+
+						Writer result = new StringWriter();
+						if (message.getPayload() instanceof org.mule.message.ExceptionMessage)
+						{
+							PrintWriter pw = new PrintWriter(result);
+							//message.getExceptionPayload().getException().printStackTrace(pw);
+							message.getPayload().getException().printStackTrace(pw);
+						}
+
+						message.setProperty("EBMS.REPORT","Update " + message.getProperty("originalFilename",PropertyScope.SESSION) + " failed.\n\n" + result.toString(),PropertyScope.SESSION);
+						result.close();
+
+						return message;
+					</script:script>
+				</script:transformer>
+			</vm:outbound-endpoint>
+		</first-successful>
+	</flow>
+
+	<flow name="file.cpa.insert">
+		<vm:inbound-endpoint path="file.cpa.insert.in" />
+		<jdbc:outbound-endpoint connector-ref="connector.jdbc.ebms" queryKey="query" exchange-pattern="request-response">
+			<transformer ref="toCPAMap"/>
+			<jdbc:query key="query" value-ref="insertCPA" />
+		</jdbc:outbound-endpoint>
+		<vm:outbound-endpoint path="file.cpa.report.in">
+			<script:transformer>
+         	<script:script engine="groovy">
+					import org.mule.api.transport.PropertyScope;
+
+					message.setProperty("EBMS.REPORT",message.getProperty("originalFilename",PropertyScope.SESSION) + " inserted successfully.",PropertyScope.SESSION);
+					return message;
+				</script:script>
+			</script:transformer>
+		</vm:outbound-endpoint>
+	</flow>
+
+	<flow name="file.cpa.update">
+		<vm:inbound-endpoint path="file.cpa.update.in" />
+		<jdbc:outbound-endpoint connector-ref="connector.jdbc.ebms" queryKey="query" exchange-pattern="request-response">
+			<transformer ref="toCPAMap"/>
+			<jdbc:query key="query" value-ref="updateCPA" />
+		</jdbc:outbound-endpoint>
+		<vm:outbound-endpoint path="file.cpa.report.in">
+			<script:transformer>
+         	<script:script engine="groovy">
+					import org.mule.api.transport.PropertyScope;
+
+					message.setProperty("EBMS.REPORT",message.getProperty("originalFilename",PropertyScope.SESSION) + " updated successfully.",PropertyScope.SESSION);
+					return message;
+				</script:script>
+			</script:transformer>
+		</vm:outbound-endpoint>
+	</flow>
+
+	<flow name="file.cpa.report">
+		<vm:inbound-endpoint path="file.cpa.report.in" />
+		<file:outbound-endpoint connector-ref="connector.file.ebms" path="${dir.upload.cpa}/reports" outputPattern="report_#[function:datestamp:yyyyMMddHHmmSSS].txt">
+			<expression-transformer returnClass="java.lang.String">
+				<return-argument evaluator="header" expression="session:EBMS.REPORT"/>
+			</expression-transformer>
+		</file:outbound-endpoint>
+	</flow>
+
+</mule>
