@@ -5,20 +5,21 @@ import java.sql.Statement;
 
 import javax.sql.DataSource;
 
-import nl.clockwork.mule.common.component.Callable;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.mule.api.MuleEventContext;
 import org.mule.api.MuleMessage;
+import org.mule.api.lifecycle.Callable;
 
-public class ExecuteSQL  extends Callable
+public class ExecuteSQL implements Callable
 {
 	protected transient Log logger = LogFactory.getLog(getClass());
 	private DataSource dataSource;
 
 	@Override
-	public Object onCall(MuleMessage message) throws Exception
+	public Object onCall(MuleEventContext eventContext) throws Exception
 	{
+		MuleMessage message = eventContext.getMessage();
 		if (message.getPayload() instanceof String)
 		{
 			Connection c = dataSource.getConnection();
@@ -40,4 +41,5 @@ public class ExecuteSQL  extends Callable
 	{
 		this.dataSource = dataSource;
 	}
+
 }

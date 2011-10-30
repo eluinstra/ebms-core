@@ -16,29 +16,19 @@
 -->
 <mule
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
-	xmlns="http://www.mulesource.org/schema/mule/core/2.2" 
+	xmlns="http://www.mulesoft.org/schema/mule/core" 
 	xmlns:spring="http://www.springframework.org/schema/beans"
-	xmlns:context="http://www.springframework.org/schema/context"
-	xmlns:util="http://www.springframework.org/schema/util"
-	xmlns:vm="http://www.mulesource.org/schema/mule/vm/2.2"
-	xmlns:jdbc="http://www.mulesource.org/schema/mule/jdbc/2.2"
-	xmlns:smtp="http://www.mulesource.org/schema/mule/smtp/2.2"
-	xmlns:file="http://www.mulesource.org/schema/mule/file/2.2" 
-	xmlns:ftp="http://www.mulesource.org/schema/mule/ftp/2.2" 
-	xmlns:mxml="http://www.mulesource.org/schema/mule/xml/2.2"
-	xmlns:script="http://www.mulesource.org/schema/mule/scripting/2.2"
+	xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+	xmlns:jdbc="http://www.mulesoft.org/schema/mule/jdbc"
+	xmlns:file="http://www.mulesoft.org/schema/mule/file" 
+	xmlns:script="http://www.mulesoft.org/schema/mule/scripting"
 	xsi:schemaLocation="
-		http://www.mulesource.org/schema/mule/core/2.2 http://www.mulesource.org/schema/mule/core/2.2/mule.xsd
-		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
-		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd
-		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.5.xsd
-		http://www.mulesource.org/schema/mule/vm/2.2 http://www.mulesource.org/schema/mule/vm/2.2/mule-vm.xsd
-		http://www.mulesource.org/schema/mule/jdbc/2.2 http://www.mulesource.org/schema/mule/jdbc/2.2/mule-jdbc.xsd
-		http://www.mulesource.org/schema/mule/smtp/2.2 http://www.mulesource.org/schema/mule/smtp/2.2/mule-smtp.xsd
-		http://www.mulesource.org/schema/mule/file/2.2 http://www.mulesource.org/schema/mule/file/2.2/mule-file.xsd
-		http://www.mulesource.org/schema/mule/ftp/2.2 http://www.mulesource.org/schema/mule/ftp/2.2/mule-ftp.xsd
-		http://www.mulesource.org/schema/mule/xml/2.2 http://www.mulesource.org/schema/mule/xml/2.2/mule-xml.xsd
-		http://www.mulesource.org/schema/mule/scripting/2.2 http://www.mulesource.org/schema/mule/scripting/2.2/mule-scripting.xsd  
+		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+		http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.2/mule-vm.xsd
+		http://www.mulesoft.org/schema/mule/jdbc http://www.mulesoft.org/schema/mule/jdbc/3.2/mule-jdbc.xsd
+		http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/3.2/mule-file.xsd
+		http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/3.2/mule-scripting.xsd  
 	"
 >
 
@@ -48,8 +38,7 @@
 			<inbound>
 				<file:inbound-endpoint connector-ref="connector.file.ebms"	path="${dir.upload.sql}" moveToDirectory="${dir.upload.sql}/processed" pollingFrequency="${dir.upload.sql.pollingFrequency}">
 					<file:filename-wildcard-filter pattern="*.sql" caseSensitive="false"/>
-					<!--file:file-to-string-transformer/-->
-					<object-to-string-transformer/>
+					<file:file-to-string-transformer/>
 				</file:inbound-endpoint>				
 			</inbound>
 			<component>
@@ -62,16 +51,18 @@
 					<vm:outbound-endpoint path="file.sql.report.in">
 						<script:transformer>
             	<script:script engine="groovy">
-								message.setProperty("EBMS.REPORT",message.getProperty("originalFilename") + " executed successfully.");
+            		import org.mule.api.transport.PropertyScope;
+
+								message.setProperty("EBMS.REPORT",message.getProperty("originalFilename") + " executed successfully.",PropertyScope.SESSION);
 								return message;
 							</script:script>
 						</script:transformer>
 					</vm:outbound-endpoint>
 				</pass-through-router>
 			</outbound>
-			<default-service-exception-strategy>
+			<default-exception-strategy>
 				<vm:outbound-endpoint path="file.sql.report.in">
-					<!--message-properties-transformer>
+					<!--message-properties-transformer scope="session">
 						<add-message-property key="EBMS.REPORT" value="#[header:originalFilename] failed." />
 					</message-properties-transformer-->
 					<script:transformer>
@@ -79,19 +70,21 @@
 							import java.io.PrintWriter;
 							import java.io.StringWriter;
 							import java.io.Writer;
+           		import org.mule.api.transport.PropertyScope;
 
 							Writer result = new StringWriter();
 							PrintWriter pw = new PrintWriter(result);
-							message.getExceptionPayload().getException().printStackTrace(pw);
+							//message.getExceptionPayload().getException().printStackTrace(pw);
+							message.getPayload().getException().printStackTrace(pw);
 
-							message.setProperty("EBMS.REPORT",message.getProperty("originalFilename") + " failed.\n\n" + result.toString());
+							message.setProperty("EBMS.REPORT",message.getProperty("originalFilename") + " failed.\n\n" + result.toString(),PropertyScope.SESSION);
 							result.close();
 
 							return message;
 						</script:script>
 					</script:transformer>
 				</vm:outbound-endpoint>
-			</default-service-exception-strategy>
+			</default-exception-strategy>
 		</service>
 
 		<service name="file.sql.report">
@@ -102,7 +95,7 @@
 				<pass-through-router>
 					<file:outbound-endpoint connector-ref="connector.file.ebms" path="${dir.upload.sql}/reports" outputPattern="report_#[function:datestamp:yyyyMMddHHmmSSS].txt">
 						<expression-transformer returnClass="java.lang.String">
-							<return-argument evaluator="header" expression="EBMS.REPORT"/>
+							<return-argument evaluator="header" expression="session:EBMS.REPORT"/>
 						</expression-transformer>
 					</file:outbound-endpoint>
 				</pass-through-router>
