@@ -15,30 +15,22 @@
   limitations under the License.
 -->
 <mule
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
-	xmlns="http://www.mulesource.org/schema/mule/core/2.2" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
 	xmlns:spring="http://www.springframework.org/schema/beans"
-	xmlns:context="http://www.springframework.org/schema/context"
 	xmlns:util="http://www.springframework.org/schema/util"
-	xmlns:vm="http://www.mulesource.org/schema/mule/vm/2.2"
-	xmlns:jdbc="http://www.mulesource.org/schema/mule/jdbc/2.2"
-	xmlns:smtp="http://www.mulesource.org/schema/mule/smtp/2.2"
-	xmlns:file="http://www.mulesource.org/schema/mule/file/2.2" 
-	xmlns:ftp="http://www.mulesource.org/schema/mule/ftp/2.2" 
-	xmlns:mxml="http://www.mulesource.org/schema/mule/xml/2.2"
-	xmlns:script="http://www.mulesource.org/schema/mule/scripting/2.2"
+	xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+	xmlns:jdbc="http://www.mulesoft.org/schema/mule/jdbc"
+	xmlns:file="http://www.mulesoft.org/schema/mule/file"
+	xmlns:script="http://www.mulesoft.org/schema/mule/scripting"
 	xsi:schemaLocation="
-		http://www.mulesource.org/schema/mule/core/2.2 http://www.mulesource.org/schema/mule/core/2.2/mule.xsd
-		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
-		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd
-		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.5.xsd
-		http://www.mulesource.org/schema/mule/vm/2.2 http://www.mulesource.org/schema/mule/vm/2.2/mule-vm.xsd
-		http://www.mulesource.org/schema/mule/jdbc/2.2 http://www.mulesource.org/schema/mule/jdbc/2.2/mule-jdbc.xsd
-		http://www.mulesource.org/schema/mule/smtp/2.2 http://www.mulesource.org/schema/mule/smtp/2.2/mule-smtp.xsd
-		http://www.mulesource.org/schema/mule/file/2.2 http://www.mulesource.org/schema/mule/file/2.2/mule-file.xsd
-		http://www.mulesource.org/schema/mule/ftp/2.2 http://www.mulesource.org/schema/mule/ftp/2.2/mule-ftp.xsd
-		http://www.mulesource.org/schema/mule/xml/2.2 http://www.mulesource.org/schema/mule/xml/2.2/mule-xml.xsd
-		http://www.mulesource.org/schema/mule/scripting/2.2 http://www.mulesource.org/schema/mule/scripting/2.2/mule-scripting.xsd  
+		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.0.xsd
+		http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.2/mule-vm.xsd
+		http://www.mulesoft.org/schema/mule/jdbc http://www.mulesoft.org/schema/mule/jdbc/3.2/mule-jdbc.xsd
+		http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/3.2/mule-file.xsd
+		http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/3.2/mule-scripting.xsd
 	"
 >
 
@@ -65,8 +57,15 @@
 			<inbound>
 				<file:inbound-endpoint connector-ref="connector.file.ebms"	path="${dir.upload.cpa}" moveToDirectory="${dir.upload.cpa}/processed" pollingFrequency="${dir.upload.cpa.pollingFrequency}">
 					<file:filename-wildcard-filter pattern="*.xml" caseSensitive="false"/>
-					<!--file:file-to-string-transformer/-->
-					<object-to-string-transformer/>
+					<file:file-to-string-transformer/>
+					<script:transformer>
+           	<script:script engine="groovy">
+							import org.mule.api.transport.PropertyScope;
+
+							message.setProperty("originalFilename",message.getProperty("originalFilename"),PropertyScope.SESSION);
+							return message;
+						</script:script>
+					</script:transformer>
 				</file:inbound-endpoint>				
 			</inbound>
 			<outbound>
@@ -83,7 +82,9 @@
 						</message-properties-transformer-->
 						<script:transformer>
             	<script:script engine="groovy">
-								message.setProperty("EBMS.REPORT",message.getProperty("originalFilename") + " contains no CPA.");
+								import org.mule.api.transport.PropertyScope;
+
+								message.setProperty("EBMS.REPORT",message.getProperty("originalFilename") + " contains no CPA.",PropertyScope.SESSION);
 								return message;
 							</script:script>
 						</script:transformer>
@@ -109,23 +110,25 @@
 			</inbound>
 			<outbound>
 				<exception-based-router>
-					<vm:outbound-endpoint path="file.cpa.insert.in" />
-					<vm:outbound-endpoint path="file.cpa.update.in" />
+					<vm:outbound-endpoint path="file.cpa.insert.in" exchange-pattern="request-response"/>
+					<vm:outbound-endpoint path="file.cpa.update.in" exchange-pattern="request-response"/>
 					<vm:outbound-endpoint path="file.cpa.report.in">
 						<script:transformer>
             	<script:script engine="groovy">
 								import java.io.PrintWriter;
 								import java.io.StringWriter;
 								import java.io.Writer;
+								import org.mule.api.transport.PropertyScope;
 	
 								Writer result = new StringWriter();
-								if (message.getExceptionPayload() != null)
+								if (message.getPayload() instanceof org.mule.message.ExceptionMessage)
 								{
 									PrintWriter pw = new PrintWriter(result);
-									message.getExceptionPayload().getException().printStackTrace(pw);
+									//message.getExceptionPayload().getException().printStackTrace(pw);
+									message.getPayload().getException().printStackTrace(pw);
 								}
 	
-								message.setProperty("EBMS.REPORT","Update " + message.getProperty("originalFilename") + " failed.\n\n" + result.toString());
+								message.setProperty("EBMS.REPORT","Update " + message.getProperty("originalFilename",PropertyScope.SESSION) + " failed.\n\n" + result.toString(),PropertyScope.SESSION);
 								result.close();
 	
 								return message;
@@ -142,14 +145,16 @@
 			</inbound>
 			<outbound>
 				<chaining-router>
-					<jdbc:outbound-endpoint connector-ref="connector.jdbc.ebms" queryKey="query">
+					<jdbc:outbound-endpoint connector-ref="connector.jdbc.ebms" queryKey="query" exchange-pattern="request-response">
 						<transformer ref="toCPAMap"/>
 						<jdbc:query key="query" value-ref="insertCPA" />
 					</jdbc:outbound-endpoint>
 					<vm:outbound-endpoint path="file.cpa.report.in">
 						<script:transformer>
             	<script:script engine="groovy">
-								message.setProperty("EBMS.REPORT",message.getProperty("originalFilename") + " inserted successfully.");
+								import org.mule.api.transport.PropertyScope;
+
+								message.setProperty("EBMS.REPORT",message.getProperty("originalFilename",PropertyScope.SESSION) + " inserted successfully.",PropertyScope.SESSION);
 								return message;
 							</script:script>
 						</script:transformer>
@@ -164,14 +169,16 @@
 			</inbound>
 			<outbound>
 				<chaining-router>
-					<jdbc:outbound-endpoint connector-ref="connector.jdbc.ebms" queryKey="query">
+					<jdbc:outbound-endpoint connector-ref="connector.jdbc.ebms" queryKey="query" exchange-pattern="request-response">
 						<transformer ref="toCPAMap"/>
 						<jdbc:query key="query" value-ref="updateCPA" />
 					</jdbc:outbound-endpoint>
 					<vm:outbound-endpoint path="file.cpa.report.in">
 						<script:transformer>
             	<script:script engine="groovy">
-								message.setProperty("EBMS.REPORT",message.getProperty("originalFilename") + " updated successfully.");
+								import org.mule.api.transport.PropertyScope;
+
+								message.setProperty("EBMS.REPORT",message.getProperty("originalFilename",PropertyScope.SESSION) + " updated successfully.",PropertyScope.SESSION);
 								return message;
 							</script:script>
 						</script:transformer>
@@ -188,7 +195,7 @@
 				<pass-through-router>
 					<file:outbound-endpoint connector-ref="connector.file.ebms" path="${dir.upload.cpa}/reports" outputPattern="report_#[function:datestamp:yyyyMMddHHmmSSS].txt">
 						<expression-transformer returnClass="java.lang.String">
-							<return-argument evaluator="header" expression="EBMS.REPORT"/>
+							<return-argument evaluator="header" expression="session:EBMS.REPORT"/>
 						</expression-transformer>
 					</file:outbound-endpoint>
 				</pass-through-router>
