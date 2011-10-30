@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Copyright 2011 Clockwork
+  
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+  
+    http://www.apache.org/licenses/LICENSE-2.0
+  
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+<mule
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:spring="http://www.springframework.org/schema/beans"
+	xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+	xmlns:file="http://www.mulesoft.org/schema/mule/file"
+	xmlns:script="http://www.mulesoft.org/schema/mule/scripting"
+	xsi:schemaLocation="
+		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+		http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.2/mule-vm.xsd
+		http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/3.2/mule-file.xsd
+		http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/3.2/mule-scripting.xsd
+	"
+>
+
+	<flow name="file.sql.service">
+		<file:inbound-endpoint connector-ref="connector.file.ebms"	path="${dir.upload.sql}" moveToDirectory="${dir.upload.sql}/processed" pollingFrequency="${dir.upload.sql.pollingFrequency}">
+			<file:filename-wildcard-filter pattern="*.sql" caseSensitive="false"/>
+			<file:file-to-string-transformer/>
+		</file:inbound-endpoint>
+		<component>
+			<singleton-object class="nl.clockwork.mule.ebms.component.ExecuteSQL">
+				<property key="dataSource" value-ref="ebMSDataSource"/>
+			</singleton-object>
+		</component>
+		<vm:outbound-endpoint path="file.sql.report.in">
+			<script:transformer>
+         	<script:script engine="groovy">
+         		import org.mule.api.transport.PropertyScope;
+
+					message.setProperty("EBMS.REPORT",message.getProperty("originalFilename") + " executed successfully.",PropertyScope.SESSION);
+					return message;
+				</script:script>
+			</script:transformer>
+		</vm:outbound-endpoint>
+		<default-exception-strategy>
+			<vm:outbound-endpoint path="file.sql.report.in">
+				<!--message-properties-transformer scope="session">
+					<add-message-property key="EBMS.REPORT" value="#[header:originalFilename] failed." />
+				</message-properties-transformer-->
+				<script:transformer>
+          	<script:script engine="groovy">
+						import java.io.PrintWriter;
+						import java.io.StringWriter;
+						import java.io.Writer;
+          		import org.mule.api.transport.PropertyScope;
+
+						Writer result = new StringWriter();
+						PrintWriter pw = new PrintWriter(result);
+						//message.getExceptionPayload().getException().printStackTrace(pw);
+						message.getPayload().getException().printStackTrace(pw);
+
+						message.setProperty("EBMS.REPORT",message.getProperty("originalFilename") + " failed.\n\n" + result.toString(),PropertyScope.SESSION);
+						result.close();
+
+						return message;
+					</script:script>
+				</script:transformer>
+			</vm:outbound-endpoint>
+		</default-exception-strategy>
+	</flow>
+
+	<flow name="file.sql.report">
+		<vm:inbound-endpoint path="file.sql.report.in" />
+		<file:outbound-endpoint connector-ref="connector.file.ebms" path="${dir.upload.sql}/reports" outputPattern="report_#[function:datestamp:yyyyMMddHHmmSSS].txt">
+			<expression-transformer returnClass="java.lang.String">
+				<return-argument evaluator="header" expression="session:EBMS.REPORT"/>
+			</expression-transformer>
+		</file:outbound-endpoint>
+	</flow>
+
+
+</mule>
