@@ -61,9 +61,9 @@
 						</cxf:inInterceptors>
 						<cxf:outInterceptors>
 							<spring:bean class="nl.clockwork.common.cxf.AttachmentOutInterceptor" />
-							<spring:bean class="nl.clockwork.mule.ebms.cxf.OracleEbMSXMLPrefixFixingOutInterceptor" />
-<!--							<spring:bean class="nl.clockwork.mule.ebms.cxf.XMLSecSignatureOutInterceptor">-->
-							<spring:bean class="nl.clockwork.mule.ebms.cxf.OracleXMLSecSignatureOutInterceptor">
+							<!--spring:bean class="nl.clockwork.mule.ebms.cxf.OracleEbMSXMLPrefixFixingOutInterceptor" />
+							<spring:bean class="nl.clockwork.mule.ebms.cxf.OracleXMLSecSignatureOutInterceptor"-->
+							<spring:bean class="nl.clockwork.mule.ebms.cxf.XMLSecSignatureOutInterceptor">
 								<spring:property name="keyStorePath" value="${signature.keystore.path}" />
 								<spring:property name="keyStorePassword" value="${signature.keystore.password}" />
 								<spring:property name="keyAlias" value="${signature.key.alias}" />
