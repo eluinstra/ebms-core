@@ -41,7 +41,7 @@
 
 		<service name="aanleverbericht.stub.file.receive">
 			<inbound>
-				<file:inbound-endpoint connector-ref="connector.file"	path="${dir.base}/aanleverService/request" moveToDirectory="${dir.base}/aanleverService/request/processed" pollingFrequency="10000">
+				<file:inbound-endpoint connector-ref="connector.file"	path="${dir.base}/aanleverService/request" moveToDirectory="${dir.base}/aanleverService/request/processed" pollingFrequency="3000">
 					<file:filename-wildcard-filter pattern="*.xml" caseSensitive="false"/>
 					<object-to-string-transformer/>
 				</file:inbound-endpoint>				
