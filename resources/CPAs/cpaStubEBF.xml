@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?><tns:CollaborationProtocolAgreement xmlns:axsl="http://www.w3.org/1999/XSL/TransformAlias" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:functx="http://www.functx.com" xmlns:tns="http://www.oasis-open.org/committees/ebxml-cppa/schema/cpp-cpa-2_0.xsd" xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns:xlink="http://www.w3.org/1999/xlink" xsi:schemaLocation="http://www.oasis-open.org/committees/ebxml-cppa/schema/cpp-cpa-2_0.xsd http://www.oasis-open.org/committees/ebxml-cppa/schema/cpp-cpa-2_0.xsd" tns:cpaid="CPA_EBFStub" tns:version="1.0">
    <tns:Status tns:value="agreed"/>
-   <tns:Start>2010-11-30T00:00:00Z</tns:Start>
-   <tns:End>2011-11-29T00:00:00Z</tns:End>
+   <tns:Start>2011-01-01T00:00:00Z</tns:Start>
+   <tns:End>2016-01-01T00:00:00Z</tns:End>
    <tns:PartyInfo tns:partyName="Logius" tns:defaultMshChannelId="DIGIPOORT_defaultDeliveryChannel_ProfileBestEffortSigned" tns:defaultMshPackageId="defaultPackage">
       <tns:PartyId tns:type="urn:osb:oin">00000000000000000000</tns:PartyId>
       <tns:PartyRef xlink:href=""/>
       <tns:CollaborationRole>
-         <tns:ProcessSpecification tns:name="afleveren" tns:version="1.0" xlink:href="http://www.overheidsservicebus.nl/osr/Afleveren" tns:uuid="urn:overheidsservicebus.nl:osr:Afleveren:OsbAfleveren10$10"/>
+         <tns:ProcessSpecification tns:name="afleveren" tns:version="1.0" xlink:href="http://www.overheidsservicebus.nl/osr/Afleveren" tns:uuid="urn:overheidsservicebus.nl:osr:Afleveren:OsbAfleveren11$10"/>
          <tns:Role tns:name="DIGIPOORT" xlink:href="http://www.overheidsservicebus.nl/osr/"/>
          <tns:ServiceBinding>
-            <tns:Service tns:type="urn:osb:services">afleverservice</tns:Service>
+            <tns:Service tns:type="urn:osb:services">osb:afleveren:1.1$1.0</tns:Service>
             <tns:CanSend>
                <tns:ThisPartyActionBinding tns:id="DIGIPOORT_S_Afleveren" tns:action="afleveren" tns:packageId="defaultPackage">
                   <tns:BusinessTransactionCharacteristics tns:isAuthenticated="transient-and-persistent" tns:timeToPerform="P2D" tns:isAuthorizationRequired="true" tns:isConfidential="transient" tns:isIntelligibleCheckRequired="false" tns:isNonRepudiationReceiptRequired="true" tns:isNonRepudiationRequired="true" tns:isTamperProof="transient-and-persistent"/>
@@ -48,145 +48,141 @@
          </tns:ServiceBinding>
       </tns:CollaborationRole>
       <tns:Certificate tns:certId="DIGIPOORT_SigningCert">
-<KeyInfo xmlns="http://www.w3.org/2000/09/xmldsig#" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+<KeyInfo xmlns="http://www.w3.org/2000/09/xmldsig#">
     <KeyValue>
       <RSAKeyValue>
         <Modulus>
-sCJOmApy3jVp4APR6a4HwVJGRafgVnydo4FtykY8u/EYk+NuXsUj7B8A/mfJ/FhgraOKxBsKpOC0
-10u4PM3rXPVMRc+eYXOxDT3LkUp3vriYESIDtsoUS7cMxHh+VHmu+/CIfWx1hLkTxF04VV3BNsEW
-ISFwgqMJkfIbmWpnHTk=
+          1KkdUYLsAJpvJc/sW+dblxhCP6Xn0UekqW4CEcpYW1AEf5ahth0bQ4+lZobEG2jVzR
+          MA9DFapQf71AafkX8RjE3DYi6J+rl6PLWJ/OSyrUBGS1CEJc6HJS/uLsb020vumCnS
+          BsWkfGPSaBBp9ZaO/mIY97JiUrYlwwEFjbGSHnU=
         </Modulus>
         <Exponent>AQAB</Exponent>
       </RSAKeyValue>
     </KeyValue>
     <X509Data>
       <X509IssuerSerial>
-        <X509IssuerName>CN=www.ez.nl,OU=Clockwork,O=Ordina,L=Groningen,S=Groningen,C=NL</X509IssuerName>
-        <X509SerialNumber>1292366020</X509SerialNumber>
+        <X509IssuerName>CN=www.clockwork.nl,OU=Clockwork,O=Ordina,L=Groningen,ST=Groningen,C=NL</X509IssuerName>
+        <X509SerialNumber>1321267627</X509SerialNumber>
       </X509IssuerSerial>
-      <X509SKI>xxxxxxxxxxxxxxxxxxxxxxxx</X509SKI>
-      <X509SubjectName>CN=www.ez.nl,OU=Clockwork,O=Ordina,L=Groningen,S=Groningen,C=NL</X509SubjectName>
+      <X509SubjectName>CN=www.clockwork.nl,OU=Clockwork,O=Ordina,L=Groningen,ST=Groningen,C=NL</X509SubjectName>
       <X509Certificate>
-MIICUzCCAbygAwIBAgIETQfwxDANBgkqhkiG9w0BAQUFADBuMQswCQYDVQQGEwJOTDESMBAGA1UE
+MIICYTCCAcqgAwIBAgIETsDxqzANBgkqhkiG9w0BAQUFADB1MQswCQYDVQQGEwJOTDESMBAGA1UE
 CBMJR3JvbmluZ2VuMRIwEAYDVQQHEwlHcm9uaW5nZW4xDzANBgNVBAoTBk9yZGluYTESMBAGA1UE
-CxMJQ2xvY2t3b3JrMRIwEAYDVQQDEwl3d3cuZXoubmwwHhcNMTAxMjE0MjIzMzQwWhcNMTEwMzE0
-MjIzMzQwWjBuMQswCQYDVQQGEwJOTDESMBAGA1UECBMJR3JvbmluZ2VuMRIwEAYDVQQHEwlHcm9u
-aW5nZW4xDzANBgNVBAoTBk9yZGluYTESMBAGA1UECxMJQ2xvY2t3b3JrMRIwEAYDVQQDEwl3d3cu
-ZXoubmwwgZ8wDQYJKoZIhvcNAQEBBQADgY0AMIGJAoGBALAiTpgKct41aeAD0emuB8FSRkWn4FZ8
-naOBbcpGPLvxGJPjbl7FI+wfAP5nyfxYYK2jisQbCqTgtNdLuDzN61z1TEXPnmFzsQ09y5FKd764
-mBEiA7bKFEu3DMR4flR5rvvwiH1sdYS5E8RdOFVdwTbBFiEhcIKjCZHyG5lqZx05AgMBAAEwDQYJ
-KoZIhvcNAQEFBQADgYEAdvQGdGBZqr2kzVl8PoQlbHPMzV1sR99xqo6aJ4NANjrqUA2+5KIGV44i
-f4TNe5UzDPPTaUmyoizb4w/lxLuL8JKP9RTXXUYQsPwJwH56ieOTn/yXdB3SPaERnLs3ZjW8DCtX
-YM3F2KsfdfzMf0yJ3OPuQ2I8RyqWnXGEicoMBwo=
+CxMJQ2xvY2t3b3JrMRkwFwYDVQQDExB3d3cuY2xvY2t3b3JrLm5sMB4XDTExMTExNDEwNDcwN1oX
+DTIxMTExMTEwNDcwN1owdTELMAkGA1UEBhMCTkwxEjAQBgNVBAgTCUdyb25pbmdlbjESMBAGA1UE
+BxMJR3JvbmluZ2VuMQ8wDQYDVQQKEwZPcmRpbmExEjAQBgNVBAsTCUNsb2Nrd29yazEZMBcGA1UE
+AxMQd3d3LmNsb2Nrd29yay5ubDCBnzANBgkqhkiG9w0BAQEFAAOBjQAwgYkCgYEA1KkdUYLsAJpv
+Jc/sW+dblxhCP6Xn0UekqW4CEcpYW1AEf5ahth0bQ4+lZobEG2jVzRMA9DFapQf71AafkX8RjE3D
+Yi6J+rl6PLWJ/OSyrUBGS1CEJc6HJS/uLsb020vumCnSBsWkfGPSaBBp9ZaO/mIY97JiUrYlwwEF
+jbGSHnUCAwEAATANBgkqhkiG9w0BAQUFAAOBgQCwDPHKtmuz4jLkEwP3CkfOL9+Q4LxhgUV7GtPm
+1XKIMN4VUey1NkFJUB5qwJXY1I7ql/VtZLjV2mPhS1SZkMKdFZ5uTKEr/KqT9Fazib5mK4YXOvFp
+OcDNBvpKX2SpoHffgXmdrExQshpIDzzofex0y/Kg4mulDQUPwVuIZtbnlQ==
       </X509Certificate>
     </X509Data>
   </KeyInfo>
-		</tns:Certificate>
+      </tns:Certificate>
       <tns:Certificate tns:certId="DIGIPOORT_EncryptionCert">
-<KeyInfo xmlns="http://www.w3.org/2000/09/xmldsig#" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+<KeyInfo xmlns="http://www.w3.org/2000/09/xmldsig#">
     <KeyValue>
       <RSAKeyValue>
         <Modulus>
-sCJOmApy3jVp4APR6a4HwVJGRafgVnydo4FtykY8u/EYk+NuXsUj7B8A/mfJ/FhgraOKxBsKpOC0
-10u4PM3rXPVMRc+eYXOxDT3LkUp3vriYESIDtsoUS7cMxHh+VHmu+/CIfWx1hLkTxF04VV3BNsEW
-ISFwgqMJkfIbmWpnHTk=
+          1KkdUYLsAJpvJc/sW+dblxhCP6Xn0UekqW4CEcpYW1AEf5ahth0bQ4+lZobEG2jVzR
+          MA9DFapQf71AafkX8RjE3DYi6J+rl6PLWJ/OSyrUBGS1CEJc6HJS/uLsb020vumCnS
+          BsWkfGPSaBBp9ZaO/mIY97JiUrYlwwEFjbGSHnU=
         </Modulus>
         <Exponent>AQAB</Exponent>
       </RSAKeyValue>
     </KeyValue>
     <X509Data>
       <X509IssuerSerial>
-        <X509IssuerName>CN=www.ez.nl,OU=Clockwork,O=Ordina,L=Groningen,S=Groningen,C=NL</X509IssuerName>
-        <X509SerialNumber>1292366020</X509SerialNumber>
+        <X509IssuerName>CN=www.clockwork.nl,OU=Clockwork,O=Ordina,L=Groningen,ST=Groningen,C=NL</X509IssuerName>
+        <X509SerialNumber>1321267627</X509SerialNumber>
       </X509IssuerSerial>
-      <X509SKI>xxxxxxxxxxxxxxxxxxxxxxxx</X509SKI>
-      <X509SubjectName>CN=www.ez.nl,OU=Clockwork,O=Ordina,L=Groningen,S=Groningen,C=NL</X509SubjectName>
+      <X509SubjectName>CN=www.clockwork.nl,OU=Clockwork,O=Ordina,L=Groningen,ST=Groningen,C=NL</X509SubjectName>
       <X509Certificate>
-MIICUzCCAbygAwIBAgIETQfwxDANBgkqhkiG9w0BAQUFADBuMQswCQYDVQQGEwJOTDESMBAGA1UE
+MIICYTCCAcqgAwIBAgIETsDxqzANBgkqhkiG9w0BAQUFADB1MQswCQYDVQQGEwJOTDESMBAGA1UE
 CBMJR3JvbmluZ2VuMRIwEAYDVQQHEwlHcm9uaW5nZW4xDzANBgNVBAoTBk9yZGluYTESMBAGA1UE
-CxMJQ2xvY2t3b3JrMRIwEAYDVQQDEwl3d3cuZXoubmwwHhcNMTAxMjE0MjIzMzQwWhcNMTEwMzE0
-MjIzMzQwWjBuMQswCQYDVQQGEwJOTDESMBAGA1UECBMJR3JvbmluZ2VuMRIwEAYDVQQHEwlHcm9u
-aW5nZW4xDzANBgNVBAoTBk9yZGluYTESMBAGA1UECxMJQ2xvY2t3b3JrMRIwEAYDVQQDEwl3d3cu
-ZXoubmwwgZ8wDQYJKoZIhvcNAQEBBQADgY0AMIGJAoGBALAiTpgKct41aeAD0emuB8FSRkWn4FZ8
-naOBbcpGPLvxGJPjbl7FI+wfAP5nyfxYYK2jisQbCqTgtNdLuDzN61z1TEXPnmFzsQ09y5FKd764
-mBEiA7bKFEu3DMR4flR5rvvwiH1sdYS5E8RdOFVdwTbBFiEhcIKjCZHyG5lqZx05AgMBAAEwDQYJ
-KoZIhvcNAQEFBQADgYEAdvQGdGBZqr2kzVl8PoQlbHPMzV1sR99xqo6aJ4NANjrqUA2+5KIGV44i
-f4TNe5UzDPPTaUmyoizb4w/lxLuL8JKP9RTXXUYQsPwJwH56ieOTn/yXdB3SPaERnLs3ZjW8DCtX
-YM3F2KsfdfzMf0yJ3OPuQ2I8RyqWnXGEicoMBwo=
+CxMJQ2xvY2t3b3JrMRkwFwYDVQQDExB3d3cuY2xvY2t3b3JrLm5sMB4XDTExMTExNDEwNDcwN1oX
+DTIxMTExMTEwNDcwN1owdTELMAkGA1UEBhMCTkwxEjAQBgNVBAgTCUdyb25pbmdlbjESMBAGA1UE
+BxMJR3JvbmluZ2VuMQ8wDQYDVQQKEwZPcmRpbmExEjAQBgNVBAsTCUNsb2Nrd29yazEZMBcGA1UE
+AxMQd3d3LmNsb2Nrd29yay5ubDCBnzANBgkqhkiG9w0BAQEFAAOBjQAwgYkCgYEA1KkdUYLsAJpv
+Jc/sW+dblxhCP6Xn0UekqW4CEcpYW1AEf5ahth0bQ4+lZobEG2jVzRMA9DFapQf71AafkX8RjE3D
+Yi6J+rl6PLWJ/OSyrUBGS1CEJc6HJS/uLsb020vumCnSBsWkfGPSaBBp9ZaO/mIY97JiUrYlwwEF
+jbGSHnUCAwEAATANBgkqhkiG9w0BAQUFAAOBgQCwDPHKtmuz4jLkEwP3CkfOL9+Q4LxhgUV7GtPm
+1XKIMN4VUey1NkFJUB5qwJXY1I7ql/VtZLjV2mPhS1SZkMKdFZ5uTKEr/KqT9Fazib5mK4YXOvFp
+OcDNBvpKX2SpoHffgXmdrExQshpIDzzofex0y/Kg4mulDQUPwVuIZtbnlQ==
       </X509Certificate>
     </X509Data>
   </KeyInfo>
-		</tns:Certificate>
+      </tns:Certificate>
       <tns:Certificate tns:certId="DIGIPOORT_ServerCert">
-<KeyInfo xmlns="http://www.w3.org/2000/09/xmldsig#" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+<KeyInfo xmlns="http://www.w3.org/2000/09/xmldsig#">
     <KeyValue>
       <RSAKeyValue>
         <Modulus>
-sCJOmApy3jVp4APR6a4HwVJGRafgVnydo4FtykY8u/EYk+NuXsUj7B8A/mfJ/FhgraOKxBsKpOC0
-10u4PM3rXPVMRc+eYXOxDT3LkUp3vriYESIDtsoUS7cMxHh+VHmu+/CIfWx1hLkTxF04VV3BNsEW
-ISFwgqMJkfIbmWpnHTk=
+          1KkdUYLsAJpvJc/sW+dblxhCP6Xn0UekqW4CEcpYW1AEf5ahth0bQ4+lZobEG2jVzR
+          MA9DFapQf71AafkX8RjE3DYi6J+rl6PLWJ/OSyrUBGS1CEJc6HJS/uLsb020vumCnS
+          BsWkfGPSaBBp9ZaO/mIY97JiUrYlwwEFjbGSHnU=
         </Modulus>
         <Exponent>AQAB</Exponent>
       </RSAKeyValue>
     </KeyValue>
     <X509Data>
       <X509IssuerSerial>
-        <X509IssuerName>CN=www.ez.nl,OU=Clockwork,O=Ordina,L=Groningen,S=Groningen,C=NL</X509IssuerName>
-        <X509SerialNumber>1292366020</X509SerialNumber>
+        <X509IssuerName>CN=www.clockwork.nl,OU=Clockwork,O=Ordina,L=Groningen,ST=Groningen,C=NL</X509IssuerName>
+        <X509SerialNumber>1321267627</X509SerialNumber>
       </X509IssuerSerial>
-      <X509SKI>xxxxxxxxxxxxxxxxxxxxxxxx</X509SKI>
-      <X509SubjectName>CN=www.ez.nl,OU=Clockwork,O=Ordina,L=Groningen,S=Groningen,C=NL</X509SubjectName>
+      <X509SubjectName>CN=www.clockwork.nl,OU=Clockwork,O=Ordina,L=Groningen,ST=Groningen,C=NL</X509SubjectName>
       <X509Certificate>
-MIICUzCCAbygAwIBAgIETQfwxDANBgkqhkiG9w0BAQUFADBuMQswCQYDVQQGEwJOTDESMBAGA1UE
+MIICYTCCAcqgAwIBAgIETsDxqzANBgkqhkiG9w0BAQUFADB1MQswCQYDVQQGEwJOTDESMBAGA1UE
 CBMJR3JvbmluZ2VuMRIwEAYDVQQHEwlHcm9uaW5nZW4xDzANBgNVBAoTBk9yZGluYTESMBAGA1UE
-CxMJQ2xvY2t3b3JrMRIwEAYDVQQDEwl3d3cuZXoubmwwHhcNMTAxMjE0MjIzMzQwWhcNMTEwMzE0
-MjIzMzQwWjBuMQswCQYDVQQGEwJOTDESMBAGA1UECBMJR3JvbmluZ2VuMRIwEAYDVQQHEwlHcm9u
-aW5nZW4xDzANBgNVBAoTBk9yZGluYTESMBAGA1UECxMJQ2xvY2t3b3JrMRIwEAYDVQQDEwl3d3cu
-ZXoubmwwgZ8wDQYJKoZIhvcNAQEBBQADgY0AMIGJAoGBALAiTpgKct41aeAD0emuB8FSRkWn4FZ8
-naOBbcpGPLvxGJPjbl7FI+wfAP5nyfxYYK2jisQbCqTgtNdLuDzN61z1TEXPnmFzsQ09y5FKd764
-mBEiA7bKFEu3DMR4flR5rvvwiH1sdYS5E8RdOFVdwTbBFiEhcIKjCZHyG5lqZx05AgMBAAEwDQYJ
-KoZIhvcNAQEFBQADgYEAdvQGdGBZqr2kzVl8PoQlbHPMzV1sR99xqo6aJ4NANjrqUA2+5KIGV44i
-f4TNe5UzDPPTaUmyoizb4w/lxLuL8JKP9RTXXUYQsPwJwH56ieOTn/yXdB3SPaERnLs3ZjW8DCtX
-YM3F2KsfdfzMf0yJ3OPuQ2I8RyqWnXGEicoMBwo=
+CxMJQ2xvY2t3b3JrMRkwFwYDVQQDExB3d3cuY2xvY2t3b3JrLm5sMB4XDTExMTExNDEwNDcwN1oX
+DTIxMTExMTEwNDcwN1owdTELMAkGA1UEBhMCTkwxEjAQBgNVBAgTCUdyb25pbmdlbjESMBAGA1UE
+BxMJR3JvbmluZ2VuMQ8wDQYDVQQKEwZPcmRpbmExEjAQBgNVBAsTCUNsb2Nrd29yazEZMBcGA1UE
+AxMQd3d3LmNsb2Nrd29yay5ubDCBnzANBgkqhkiG9w0BAQEFAAOBjQAwgYkCgYEA1KkdUYLsAJpv
+Jc/sW+dblxhCP6Xn0UekqW4CEcpYW1AEf5ahth0bQ4+lZobEG2jVzRMA9DFapQf71AafkX8RjE3D
+Yi6J+rl6PLWJ/OSyrUBGS1CEJc6HJS/uLsb020vumCnSBsWkfGPSaBBp9ZaO/mIY97JiUrYlwwEF
+jbGSHnUCAwEAATANBgkqhkiG9w0BAQUFAAOBgQCwDPHKtmuz4jLkEwP3CkfOL9+Q4LxhgUV7GtPm
+1XKIMN4VUey1NkFJUB5qwJXY1I7ql/VtZLjV2mPhS1SZkMKdFZ5uTKEr/KqT9Fazib5mK4YXOvFp
+OcDNBvpKX2SpoHffgXmdrExQshpIDzzofex0y/Kg4mulDQUPwVuIZtbnlQ==
       </X509Certificate>
     </X509Data>
   </KeyInfo>
-		</tns:Certificate>
+      </tns:Certificate>
       <tns:Certificate tns:certId="DIGIPOORT_ClientCert">
-<KeyInfo xmlns="http://www.w3.org/2000/09/xmldsig#" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+<KeyInfo xmlns="http://www.w3.org/2000/09/xmldsig#">
     <KeyValue>
       <RSAKeyValue>
         <Modulus>
-sCJOmApy3jVp4APR6a4HwVJGRafgVnydo4FtykY8u/EYk+NuXsUj7B8A/mfJ/FhgraOKxBsKpOC0
-10u4PM3rXPVMRc+eYXOxDT3LkUp3vriYESIDtsoUS7cMxHh+VHmu+/CIfWx1hLkTxF04VV3BNsEW
-ISFwgqMJkfIbmWpnHTk=
+          1KkdUYLsAJpvJc/sW+dblxhCP6Xn0UekqW4CEcpYW1AEf5ahth0bQ4+lZobEG2jVzR
+          MA9DFapQf71AafkX8RjE3DYi6J+rl6PLWJ/OSyrUBGS1CEJc6HJS/uLsb020vumCnS
+          BsWkfGPSaBBp9ZaO/mIY97JiUrYlwwEFjbGSHnU=
         </Modulus>
         <Exponent>AQAB</Exponent>
       </RSAKeyValue>
     </KeyValue>
     <X509Data>
       <X509IssuerSerial>
-        <X509IssuerName>CN=www.ez.nl,OU=Clockwork,O=Ordina,L=Groningen,S=Groningen,C=NL</X509IssuerName>
-        <X509SerialNumber>1292366020</X509SerialNumber>
+        <X509IssuerName>CN=www.clockwork.nl,OU=Clockwork,O=Ordina,L=Groningen,ST=Groningen,C=NL</X509IssuerName>
+        <X509SerialNumber>1321267627</X509SerialNumber>
       </X509IssuerSerial>
-      <X509SKI>xxxxxxxxxxxxxxxxxxxxxxxx</X509SKI>
-      <X509SubjectName>CN=www.ez.nl,OU=Clockwork,O=Ordina,L=Groningen,S=Groningen,C=NL</X509SubjectName>
+      <X509SubjectName>CN=www.clockwork.nl,OU=Clockwork,O=Ordina,L=Groningen,ST=Groningen,C=NL</X509SubjectName>
       <X509Certificate>
-MIICUzCCAbygAwIBAgIETQfwxDANBgkqhkiG9w0BAQUFADBuMQswCQYDVQQGEwJOTDESMBAGA1UE
+MIICYTCCAcqgAwIBAgIETsDxqzANBgkqhkiG9w0BAQUFADB1MQswCQYDVQQGEwJOTDESMBAGA1UE
 CBMJR3JvbmluZ2VuMRIwEAYDVQQHEwlHcm9uaW5nZW4xDzANBgNVBAoTBk9yZGluYTESMBAGA1UE
-CxMJQ2xvY2t3b3JrMRIwEAYDVQQDEwl3d3cuZXoubmwwHhcNMTAxMjE0MjIzMzQwWhcNMTEwMzE0
-MjIzMzQwWjBuMQswCQYDVQQGEwJOTDESMBAGA1UECBMJR3JvbmluZ2VuMRIwEAYDVQQHEwlHcm9u
-aW5nZW4xDzANBgNVBAoTBk9yZGluYTESMBAGA1UECxMJQ2xvY2t3b3JrMRIwEAYDVQQDEwl3d3cu
-ZXoubmwwgZ8wDQYJKoZIhvcNAQEBBQADgY0AMIGJAoGBALAiTpgKct41aeAD0emuB8FSRkWn4FZ8
-naOBbcpGPLvxGJPjbl7FI+wfAP5nyfxYYK2jisQbCqTgtNdLuDzN61z1TEXPnmFzsQ09y5FKd764
-mBEiA7bKFEu3DMR4flR5rvvwiH1sdYS5E8RdOFVdwTbBFiEhcIKjCZHyG5lqZx05AgMBAAEwDQYJ
-KoZIhvcNAQEFBQADgYEAdvQGdGBZqr2kzVl8PoQlbHPMzV1sR99xqo6aJ4NANjrqUA2+5KIGV44i
-f4TNe5UzDPPTaUmyoizb4w/lxLuL8JKP9RTXXUYQsPwJwH56ieOTn/yXdB3SPaERnLs3ZjW8DCtX
-YM3F2KsfdfzMf0yJ3OPuQ2I8RyqWnXGEicoMBwo=
+CxMJQ2xvY2t3b3JrMRkwFwYDVQQDExB3d3cuY2xvY2t3b3JrLm5sMB4XDTExMTExNDEwNDcwN1oX
+DTIxMTExMTEwNDcwN1owdTELMAkGA1UEBhMCTkwxEjAQBgNVBAgTCUdyb25pbmdlbjESMBAGA1UE
+BxMJR3JvbmluZ2VuMQ8wDQYDVQQKEwZPcmRpbmExEjAQBgNVBAsTCUNsb2Nrd29yazEZMBcGA1UE
+AxMQd3d3LmNsb2Nrd29yay5ubDCBnzANBgkqhkiG9w0BAQEFAAOBjQAwgYkCgYEA1KkdUYLsAJpv
+Jc/sW+dblxhCP6Xn0UekqW4CEcpYW1AEf5ahth0bQ4+lZobEG2jVzRMA9DFapQf71AafkX8RjE3D
+Yi6J+rl6PLWJ/OSyrUBGS1CEJc6HJS/uLsb020vumCnSBsWkfGPSaBBp9ZaO/mIY97JiUrYlwwEF
+jbGSHnUCAwEAATANBgkqhkiG9w0BAQUFAAOBgQCwDPHKtmuz4jLkEwP3CkfOL9+Q4LxhgUV7GtPm
+1XKIMN4VUey1NkFJUB5qwJXY1I7ql/VtZLjV2mPhS1SZkMKdFZ5uTKEr/KqT9Fazib5mK4YXOvFp
+OcDNBvpKX2SpoHffgXmdrExQshpIDzzofex0y/Kg4mulDQUPwVuIZtbnlQ==
       </X509Certificate>
     </X509Data>
-  </KeyInfo>		
-		</tns:Certificate>
+  </KeyInfo>
+      </tns:Certificate>
       <tns:SecurityDetails tns:securityId="DIGIPOORT_Security">
          <tns:TrustAnchors>
             <tns:AnchorCertificateRef tns:certId="DIGIPOORT_SigningCert"/>
@@ -277,10 +273,10 @@ YM3F2KsfdfzMf0yJ3OPuQ2I8RyqWnXGEicoMBwo=
       <tns:PartyId tns:type="urn:osb:oin">00000000000000000001</tns:PartyId>
       <tns:PartyRef xlink:href=""/>
       <tns:CollaborationRole>
-         <tns:ProcessSpecification tns:name="afleveren" tns:version="1.0" xlink:href="http://www.overheidsservicebus.nl/osr/Afleveren" tns:uuid="urn:overheidsservicebus.nl:osr:Afleveren:OsbAfleveren10$10"/>
+         <tns:ProcessSpecification tns:name="afleveren" tns:version="1.0" xlink:href="http://www.overheidsservicebus.nl/osr/Afleveren" tns:uuid="urn:overheidsservicebus.nl:osr:Afleveren:OsbAfleveren11$10"/>
          <tns:Role tns:name="OVERHEID" xlink:href="http://www.overheidsservicebus.nl/osr/"/>
          <tns:ServiceBinding>
-            <tns:Service tns:type="urn:osb:services">afleverservice</tns:Service>
+            <tns:Service tns:type="urn:osb:services">osb:afleveren:1.1$1.0</tns:Service>
             <tns:CanSend>
                <tns:ThisPartyActionBinding tns:id="OVERHEID_S_BevestigAfleveren" tns:action="bevestigAfleveren" tns:packageId="defaultPackage">
                   <tns:BusinessTransactionCharacteristics tns:isAuthenticated="transient-and-persistent" tns:timeToPerform="P2D" tns:isAuthorizationRequired="true" tns:isConfidential="transient" tns:isIntelligibleCheckRequired="false" tns:isNonRepudiationReceiptRequired="true" tns:isNonRepudiationRequired="true" tns:isTamperProof="transient-and-persistent"/>
@@ -319,145 +315,141 @@ YM3F2KsfdfzMf0yJ3OPuQ2I8RyqWnXGEicoMBwo=
          </tns:ServiceBinding>
       </tns:CollaborationRole>
       <tns:Certificate tns:certId="OVERHEID_SigningCert">
-<KeyInfo xmlns="http://www.w3.org/2000/09/xmldsig#" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-<KeyValue>
-<RSAKeyValue>
-  <Modulus>
-sCJOmApy3jVp4APR6a4HwVJGRafgVnydo4FtykY8u/EYk+NuXsUj7B8A/mfJ/FhgraOKxBsKpOC0
-10u4PM3rXPVMRc+eYXOxDT3LkUp3vriYESIDtsoUS7cMxHh+VHmu+/CIfWx1hLkTxF04VV3BNsEW
-ISFwgqMJkfIbmWpnHTk=
-  </Modulus> 
-  <Exponent>AQAB</Exponent> 
-  </RSAKeyValue>
-  </KeyValue>
-<X509Data>
-<X509IssuerSerial>
-  <X509IssuerName>CN=www.ez.nl,OU=Clockwork,O=Ordina,L=Groningen,S=Groningen,C=NL</X509IssuerName> 
-  <X509SerialNumber>1292366020</X509SerialNumber> 
-  </X509IssuerSerial>
-  <X509SKI>xxxxxxxxxxxxxxxxxxxxxxxx</X509SKI> 
-  <X509SubjectName>CN=www.ez.nl,OU=Clockwork,O=Ordina,L=Groningen,S=Groningen,C=NL</X509SubjectName> 
-  <X509Certificate>
-MIICUzCCAbygAwIBAgIETQfwxDANBgkqhkiG9w0BAQUFADBuMQswCQYDVQQGEwJOTDESMBAGA1UE
+<KeyInfo xmlns="http://www.w3.org/2000/09/xmldsig#">
+    <KeyValue>
+      <RSAKeyValue>
+        <Modulus>
+          1KkdUYLsAJpvJc/sW+dblxhCP6Xn0UekqW4CEcpYW1AEf5ahth0bQ4+lZobEG2jVzR
+          MA9DFapQf71AafkX8RjE3DYi6J+rl6PLWJ/OSyrUBGS1CEJc6HJS/uLsb020vumCnS
+          BsWkfGPSaBBp9ZaO/mIY97JiUrYlwwEFjbGSHnU=
+        </Modulus>
+        <Exponent>AQAB</Exponent>
+      </RSAKeyValue>
+    </KeyValue>
+    <X509Data>
+      <X509IssuerSerial>
+        <X509IssuerName>CN=www.clockwork.nl,OU=Clockwork,O=Ordina,L=Groningen,ST=Groningen,C=NL</X509IssuerName>
+        <X509SerialNumber>1321267627</X509SerialNumber>
+      </X509IssuerSerial>
+      <X509SubjectName>CN=www.clockwork.nl,OU=Clockwork,O=Ordina,L=Groningen,ST=Groningen,C=NL</X509SubjectName>
+      <X509Certificate>
+MIICYTCCAcqgAwIBAgIETsDxqzANBgkqhkiG9w0BAQUFADB1MQswCQYDVQQGEwJOTDESMBAGA1UE
 CBMJR3JvbmluZ2VuMRIwEAYDVQQHEwlHcm9uaW5nZW4xDzANBgNVBAoTBk9yZGluYTESMBAGA1UE
-CxMJQ2xvY2t3b3JrMRIwEAYDVQQDEwl3d3cuZXoubmwwHhcNMTAxMjE0MjIzMzQwWhcNMTEwMzE0
-MjIzMzQwWjBuMQswCQYDVQQGEwJOTDESMBAGA1UECBMJR3JvbmluZ2VuMRIwEAYDVQQHEwlHcm9u
-aW5nZW4xDzANBgNVBAoTBk9yZGluYTESMBAGA1UECxMJQ2xvY2t3b3JrMRIwEAYDVQQDEwl3d3cu
-ZXoubmwwgZ8wDQYJKoZIhvcNAQEBBQADgY0AMIGJAoGBALAiTpgKct41aeAD0emuB8FSRkWn4FZ8
-naOBbcpGPLvxGJPjbl7FI+wfAP5nyfxYYK2jisQbCqTgtNdLuDzN61z1TEXPnmFzsQ09y5FKd764
-mBEiA7bKFEu3DMR4flR5rvvwiH1sdYS5E8RdOFVdwTbBFiEhcIKjCZHyG5lqZx05AgMBAAEwDQYJ
-KoZIhvcNAQEFBQADgYEAdvQGdGBZqr2kzVl8PoQlbHPMzV1sR99xqo6aJ4NANjrqUA2+5KIGV44i
-f4TNe5UzDPPTaUmyoizb4w/lxLuL8JKP9RTXXUYQsPwJwH56ieOTn/yXdB3SPaERnLs3ZjW8DCtX
-YM3F2KsfdfzMf0yJ3OPuQ2I8RyqWnXGEicoMBwo=
-  </X509Certificate> 
-  </X509Data>
+CxMJQ2xvY2t3b3JrMRkwFwYDVQQDExB3d3cuY2xvY2t3b3JrLm5sMB4XDTExMTExNDEwNDcwN1oX
+DTIxMTExMTEwNDcwN1owdTELMAkGA1UEBhMCTkwxEjAQBgNVBAgTCUdyb25pbmdlbjESMBAGA1UE
+BxMJR3JvbmluZ2VuMQ8wDQYDVQQKEwZPcmRpbmExEjAQBgNVBAsTCUNsb2Nrd29yazEZMBcGA1UE
+AxMQd3d3LmNsb2Nrd29yay5ubDCBnzANBgkqhkiG9w0BAQEFAAOBjQAwgYkCgYEA1KkdUYLsAJpv
+Jc/sW+dblxhCP6Xn0UekqW4CEcpYW1AEf5ahth0bQ4+lZobEG2jVzRMA9DFapQf71AafkX8RjE3D
+Yi6J+rl6PLWJ/OSyrUBGS1CEJc6HJS/uLsb020vumCnSBsWkfGPSaBBp9ZaO/mIY97JiUrYlwwEF
+jbGSHnUCAwEAATANBgkqhkiG9w0BAQUFAAOBgQCwDPHKtmuz4jLkEwP3CkfOL9+Q4LxhgUV7GtPm
+1XKIMN4VUey1NkFJUB5qwJXY1I7ql/VtZLjV2mPhS1SZkMKdFZ5uTKEr/KqT9Fazib5mK4YXOvFp
+OcDNBvpKX2SpoHffgXmdrExQshpIDzzofex0y/Kg4mulDQUPwVuIZtbnlQ==
+      </X509Certificate>
+    </X509Data>
   </KeyInfo>
-		</tns:Certificate>
+      </tns:Certificate>
       <tns:Certificate tns:certId="OVERHEID_EncryptionCert">
-<KeyInfo xmlns="http://www.w3.org/2000/09/xmldsig#" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-<KeyValue>
-<RSAKeyValue>
-  <Modulus>
-sCJOmApy3jVp4APR6a4HwVJGRafgVnydo4FtykY8u/EYk+NuXsUj7B8A/mfJ/FhgraOKxBsKpOC0
-10u4PM3rXPVMRc+eYXOxDT3LkUp3vriYESIDtsoUS7cMxHh+VHmu+/CIfWx1hLkTxF04VV3BNsEW
-ISFwgqMJkfIbmWpnHTk=
-  </Modulus> 
-  <Exponent>AQAB</Exponent> 
-  </RSAKeyValue>
-  </KeyValue>
-<X509Data>
-<X509IssuerSerial>
-  <X509IssuerName>CN=www.ez.nl,OU=Clockwork,O=Ordina,L=Groningen,S=Groningen,C=NL</X509IssuerName> 
-  <X509SerialNumber>1292366020</X509SerialNumber> 
-  </X509IssuerSerial>
-  <X509SKI>xxxxxxxxxxxxxxxxxxxxxxxx</X509SKI> 
-  <X509SubjectName>CN=www.ez.nl,OU=Clockwork,O=Ordina,L=Groningen,S=Groningen,C=NL</X509SubjectName> 
-  <X509Certificate>
-MIICUzCCAbygAwIBAgIETQfwxDANBgkqhkiG9w0BAQUFADBuMQswCQYDVQQGEwJOTDESMBAGA1UE
+<KeyInfo xmlns="http://www.w3.org/2000/09/xmldsig#">
+    <KeyValue>
+      <RSAKeyValue>
+        <Modulus>
+          1KkdUYLsAJpvJc/sW+dblxhCP6Xn0UekqW4CEcpYW1AEf5ahth0bQ4+lZobEG2jVzR
+          MA9DFapQf71AafkX8RjE3DYi6J+rl6PLWJ/OSyrUBGS1CEJc6HJS/uLsb020vumCnS
+          BsWkfGPSaBBp9ZaO/mIY97JiUrYlwwEFjbGSHnU=
+        </Modulus>
+        <Exponent>AQAB</Exponent>
+      </RSAKeyValue>
+    </KeyValue>
+    <X509Data>
+      <X509IssuerSerial>
+        <X509IssuerName>CN=www.clockwork.nl,OU=Clockwork,O=Ordina,L=Groningen,ST=Groningen,C=NL</X509IssuerName>
+        <X509SerialNumber>1321267627</X509SerialNumber>
+      </X509IssuerSerial>
+      <X509SubjectName>CN=www.clockwork.nl,OU=Clockwork,O=Ordina,L=Groningen,ST=Groningen,C=NL</X509SubjectName>
+      <X509Certificate>
+MIICYTCCAcqgAwIBAgIETsDxqzANBgkqhkiG9w0BAQUFADB1MQswCQYDVQQGEwJOTDESMBAGA1UE
 CBMJR3JvbmluZ2VuMRIwEAYDVQQHEwlHcm9uaW5nZW4xDzANBgNVBAoTBk9yZGluYTESMBAGA1UE
-CxMJQ2xvY2t3b3JrMRIwEAYDVQQDEwl3d3cuZXoubmwwHhcNMTAxMjE0MjIzMzQwWhcNMTEwMzE0
-MjIzMzQwWjBuMQswCQYDVQQGEwJOTDESMBAGA1UECBMJR3JvbmluZ2VuMRIwEAYDVQQHEwlHcm9u
-aW5nZW4xDzANBgNVBAoTBk9yZGluYTESMBAGA1UECxMJQ2xvY2t3b3JrMRIwEAYDVQQDEwl3d3cu
-ZXoubmwwgZ8wDQYJKoZIhvcNAQEBBQADgY0AMIGJAoGBALAiTpgKct41aeAD0emuB8FSRkWn4FZ8
-naOBbcpGPLvxGJPjbl7FI+wfAP5nyfxYYK2jisQbCqTgtNdLuDzN61z1TEXPnmFzsQ09y5FKd764
-mBEiA7bKFEu3DMR4flR5rvvwiH1sdYS5E8RdOFVdwTbBFiEhcIKjCZHyG5lqZx05AgMBAAEwDQYJ
-KoZIhvcNAQEFBQADgYEAdvQGdGBZqr2kzVl8PoQlbHPMzV1sR99xqo6aJ4NANjrqUA2+5KIGV44i
-f4TNe5UzDPPTaUmyoizb4w/lxLuL8JKP9RTXXUYQsPwJwH56ieOTn/yXdB3SPaERnLs3ZjW8DCtX
-YM3F2KsfdfzMf0yJ3OPuQ2I8RyqWnXGEicoMBwo=
-  </X509Certificate> 
-  </X509Data>
+CxMJQ2xvY2t3b3JrMRkwFwYDVQQDExB3d3cuY2xvY2t3b3JrLm5sMB4XDTExMTExNDEwNDcwN1oX
+DTIxMTExMTEwNDcwN1owdTELMAkGA1UEBhMCTkwxEjAQBgNVBAgTCUdyb25pbmdlbjESMBAGA1UE
+BxMJR3JvbmluZ2VuMQ8wDQYDVQQKEwZPcmRpbmExEjAQBgNVBAsTCUNsb2Nrd29yazEZMBcGA1UE
+AxMQd3d3LmNsb2Nrd29yay5ubDCBnzANBgkqhkiG9w0BAQEFAAOBjQAwgYkCgYEA1KkdUYLsAJpv
+Jc/sW+dblxhCP6Xn0UekqW4CEcpYW1AEf5ahth0bQ4+lZobEG2jVzRMA9DFapQf71AafkX8RjE3D
+Yi6J+rl6PLWJ/OSyrUBGS1CEJc6HJS/uLsb020vumCnSBsWkfGPSaBBp9ZaO/mIY97JiUrYlwwEF
+jbGSHnUCAwEAATANBgkqhkiG9w0BAQUFAAOBgQCwDPHKtmuz4jLkEwP3CkfOL9+Q4LxhgUV7GtPm
+1XKIMN4VUey1NkFJUB5qwJXY1I7ql/VtZLjV2mPhS1SZkMKdFZ5uTKEr/KqT9Fazib5mK4YXOvFp
+OcDNBvpKX2SpoHffgXmdrExQshpIDzzofex0y/Kg4mulDQUPwVuIZtbnlQ==
+      </X509Certificate>
+    </X509Data>
   </KeyInfo>
-		</tns:Certificate>
+      </tns:Certificate>
       <tns:Certificate tns:certId="OVERHEID_ServerCert">
-<KeyInfo xmlns="http://www.w3.org/2000/09/xmldsig#" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-<KeyValue>
-<RSAKeyValue>
-  <Modulus>
-sCJOmApy3jVp4APR6a4HwVJGRafgVnydo4FtykY8u/EYk+NuXsUj7B8A/mfJ/FhgraOKxBsKpOC0
-10u4PM3rXPVMRc+eYXOxDT3LkUp3vriYESIDtsoUS7cMxHh+VHmu+/CIfWx1hLkTxF04VV3BNsEW
-ISFwgqMJkfIbmWpnHTk=
-  </Modulus> 
-  <Exponent>AQAB</Exponent> 
-  </RSAKeyValue>
-  </KeyValue>
-<X509Data>
-<X509IssuerSerial>
-  <X509IssuerName>CN=www.ez.nl,OU=Clockwork,O=Ordina,L=Groningen,S=Groningen,C=NL</X509IssuerName> 
-  <X509SerialNumber>1292366020</X509SerialNumber> 
-  </X509IssuerSerial>
-  <X509SKI>xxxxxxxxxxxxxxxxxxxxxxxx</X509SKI> 
-  <X509SubjectName>CN=www.ez.nl,OU=Clockwork,O=Ordina,L=Groningen,S=Groningen,C=NL</X509SubjectName> 
-  <X509Certificate>
-MIICUzCCAbygAwIBAgIETQfwxDANBgkqhkiG9w0BAQUFADBuMQswCQYDVQQGEwJOTDESMBAGA1UE
+<KeyInfo xmlns="http://www.w3.org/2000/09/xmldsig#">
+    <KeyValue>
+      <RSAKeyValue>
+        <Modulus>
+          1KkdUYLsAJpvJc/sW+dblxhCP6Xn0UekqW4CEcpYW1AEf5ahth0bQ4+lZobEG2jVzR
+          MA9DFapQf71AafkX8RjE3DYi6J+rl6PLWJ/OSyrUBGS1CEJc6HJS/uLsb020vumCnS
+          BsWkfGPSaBBp9ZaO/mIY97JiUrYlwwEFjbGSHnU=
+        </Modulus>
+        <Exponent>AQAB</Exponent>
+      </RSAKeyValue>
+    </KeyValue>
+    <X509Data>
+      <X509IssuerSerial>
+        <X509IssuerName>CN=www.clockwork.nl,OU=Clockwork,O=Ordina,L=Groningen,ST=Groningen,C=NL</X509IssuerName>
+        <X509SerialNumber>1321267627</X509SerialNumber>
+      </X509IssuerSerial>
+      <X509SubjectName>CN=www.clockwork.nl,OU=Clockwork,O=Ordina,L=Groningen,ST=Groningen,C=NL</X509SubjectName>
+      <X509Certificate>
+MIICYTCCAcqgAwIBAgIETsDxqzANBgkqhkiG9w0BAQUFADB1MQswCQYDVQQGEwJOTDESMBAGA1UE
 CBMJR3JvbmluZ2VuMRIwEAYDVQQHEwlHcm9uaW5nZW4xDzANBgNVBAoTBk9yZGluYTESMBAGA1UE
-CxMJQ2xvY2t3b3JrMRIwEAYDVQQDEwl3d3cuZXoubmwwHhcNMTAxMjE0MjIzMzQwWhcNMTEwMzE0
-MjIzMzQwWjBuMQswCQYDVQQGEwJOTDESMBAGA1UECBMJR3JvbmluZ2VuMRIwEAYDVQQHEwlHcm9u
-aW5nZW4xDzANBgNVBAoTBk9yZGluYTESMBAGA1UECxMJQ2xvY2t3b3JrMRIwEAYDVQQDEwl3d3cu
-ZXoubmwwgZ8wDQYJKoZIhvcNAQEBBQADgY0AMIGJAoGBALAiTpgKct41aeAD0emuB8FSRkWn4FZ8
-naOBbcpGPLvxGJPjbl7FI+wfAP5nyfxYYK2jisQbCqTgtNdLuDzN61z1TEXPnmFzsQ09y5FKd764
-mBEiA7bKFEu3DMR4flR5rvvwiH1sdYS5E8RdOFVdwTbBFiEhcIKjCZHyG5lqZx05AgMBAAEwDQYJ
-KoZIhvcNAQEFBQADgYEAdvQGdGBZqr2kzVl8PoQlbHPMzV1sR99xqo6aJ4NANjrqUA2+5KIGV44i
-f4TNe5UzDPPTaUmyoizb4w/lxLuL8JKP9RTXXUYQsPwJwH56ieOTn/yXdB3SPaERnLs3ZjW8DCtX
-YM3F2KsfdfzMf0yJ3OPuQ2I8RyqWnXGEicoMBwo=
-  </X509Certificate> 
-  </X509Data>
+CxMJQ2xvY2t3b3JrMRkwFwYDVQQDExB3d3cuY2xvY2t3b3JrLm5sMB4XDTExMTExNDEwNDcwN1oX
+DTIxMTExMTEwNDcwN1owdTELMAkGA1UEBhMCTkwxEjAQBgNVBAgTCUdyb25pbmdlbjESMBAGA1UE
+BxMJR3JvbmluZ2VuMQ8wDQYDVQQKEwZPcmRpbmExEjAQBgNVBAsTCUNsb2Nrd29yazEZMBcGA1UE
+AxMQd3d3LmNsb2Nrd29yay5ubDCBnzANBgkqhkiG9w0BAQEFAAOBjQAwgYkCgYEA1KkdUYLsAJpv
+Jc/sW+dblxhCP6Xn0UekqW4CEcpYW1AEf5ahth0bQ4+lZobEG2jVzRMA9DFapQf71AafkX8RjE3D
+Yi6J+rl6PLWJ/OSyrUBGS1CEJc6HJS/uLsb020vumCnSBsWkfGPSaBBp9ZaO/mIY97JiUrYlwwEF
+jbGSHnUCAwEAATANBgkqhkiG9w0BAQUFAAOBgQCwDPHKtmuz4jLkEwP3CkfOL9+Q4LxhgUV7GtPm
+1XKIMN4VUey1NkFJUB5qwJXY1I7ql/VtZLjV2mPhS1SZkMKdFZ5uTKEr/KqT9Fazib5mK4YXOvFp
+OcDNBvpKX2SpoHffgXmdrExQshpIDzzofex0y/Kg4mulDQUPwVuIZtbnlQ==
+      </X509Certificate>
+    </X509Data>
   </KeyInfo>
-		</tns:Certificate>
+      </tns:Certificate>
       <tns:Certificate tns:certId="OVERHEID_ClientCert">
-<KeyInfo xmlns="http://www.w3.org/2000/09/xmldsig#" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-<KeyValue>
-<RSAKeyValue>
-  <Modulus>
-sCJOmApy3jVp4APR6a4HwVJGRafgVnydo4FtykY8u/EYk+NuXsUj7B8A/mfJ/FhgraOKxBsKpOC0
-10u4PM3rXPVMRc+eYXOxDT3LkUp3vriYESIDtsoUS7cMxHh+VHmu+/CIfWx1hLkTxF04VV3BNsEW
-ISFwgqMJkfIbmWpnHTk=
-  </Modulus> 
-  <Exponent>AQAB</Exponent> 
-  </RSAKeyValue>
-  </KeyValue>
-<X509Data>
-<X509IssuerSerial>
-  <X509IssuerName>CN=www.ez.nl,OU=Clockwork,O=Ordina,L=Groningen,S=Groningen,C=NL</X509IssuerName> 
-  <X509SerialNumber>1292366020</X509SerialNumber> 
-  </X509IssuerSerial>
-  <X509SKI>xxxxxxxxxxxxxxxxxxxxxxxx</X509SKI> 
-  <X509SubjectName>CN=www.ez.nl,OU=Clockwork,O=Ordina,L=Groningen,S=Groningen,C=NL</X509SubjectName> 
-  <X509Certificate>
-MIICUzCCAbygAwIBAgIETQfwxDANBgkqhkiG9w0BAQUFADBuMQswCQYDVQQGEwJOTDESMBAGA1UE
+<KeyInfo xmlns="http://www.w3.org/2000/09/xmldsig#">
+    <KeyValue>
+      <RSAKeyValue>
+        <Modulus>
+          1KkdUYLsAJpvJc/sW+dblxhCP6Xn0UekqW4CEcpYW1AEf5ahth0bQ4+lZobEG2jVzR
+          MA9DFapQf71AafkX8RjE3DYi6J+rl6PLWJ/OSyrUBGS1CEJc6HJS/uLsb020vumCnS
+          BsWkfGPSaBBp9ZaO/mIY97JiUrYlwwEFjbGSHnU=
+        </Modulus>
+        <Exponent>AQAB</Exponent>
+      </RSAKeyValue>
+    </KeyValue>
+    <X509Data>
+      <X509IssuerSerial>
+        <X509IssuerName>CN=www.clockwork.nl,OU=Clockwork,O=Ordina,L=Groningen,ST=Groningen,C=NL</X509IssuerName>
+        <X509SerialNumber>1321267627</X509SerialNumber>
+      </X509IssuerSerial>
+      <X509SubjectName>CN=www.clockwork.nl,OU=Clockwork,O=Ordina,L=Groningen,ST=Groningen,C=NL</X509SubjectName>
+      <X509Certificate>
+MIICYTCCAcqgAwIBAgIETsDxqzANBgkqhkiG9w0BAQUFADB1MQswCQYDVQQGEwJOTDESMBAGA1UE
 CBMJR3JvbmluZ2VuMRIwEAYDVQQHEwlHcm9uaW5nZW4xDzANBgNVBAoTBk9yZGluYTESMBAGA1UE
-CxMJQ2xvY2t3b3JrMRIwEAYDVQQDEwl3d3cuZXoubmwwHhcNMTAxMjE0MjIzMzQwWhcNMTEwMzE0
-MjIzMzQwWjBuMQswCQYDVQQGEwJOTDESMBAGA1UECBMJR3JvbmluZ2VuMRIwEAYDVQQHEwlHcm9u
-aW5nZW4xDzANBgNVBAoTBk9yZGluYTESMBAGA1UECxMJQ2xvY2t3b3JrMRIwEAYDVQQDEwl3d3cu
-ZXoubmwwgZ8wDQYJKoZIhvcNAQEBBQADgY0AMIGJAoGBALAiTpgKct41aeAD0emuB8FSRkWn4FZ8
-naOBbcpGPLvxGJPjbl7FI+wfAP5nyfxYYK2jisQbCqTgtNdLuDzN61z1TEXPnmFzsQ09y5FKd764
-mBEiA7bKFEu3DMR4flR5rvvwiH1sdYS5E8RdOFVdwTbBFiEhcIKjCZHyG5lqZx05AgMBAAEwDQYJ
-KoZIhvcNAQEFBQADgYEAdvQGdGBZqr2kzVl8PoQlbHPMzV1sR99xqo6aJ4NANjrqUA2+5KIGV44i
-f4TNe5UzDPPTaUmyoizb4w/lxLuL8JKP9RTXXUYQsPwJwH56ieOTn/yXdB3SPaERnLs3ZjW8DCtX
-YM3F2KsfdfzMf0yJ3OPuQ2I8RyqWnXGEicoMBwo=
-  </X509Certificate> 
-  </X509Data>
-  </KeyInfo>		
-		</tns:Certificate>
+CxMJQ2xvY2t3b3JrMRkwFwYDVQQDExB3d3cuY2xvY2t3b3JrLm5sMB4XDTExMTExNDEwNDcwN1oX
+DTIxMTExMTEwNDcwN1owdTELMAkGA1UEBhMCTkwxEjAQBgNVBAgTCUdyb25pbmdlbjESMBAGA1UE
+BxMJR3JvbmluZ2VuMQ8wDQYDVQQKEwZPcmRpbmExEjAQBgNVBAsTCUNsb2Nrd29yazEZMBcGA1UE
+AxMQd3d3LmNsb2Nrd29yay5ubDCBnzANBgkqhkiG9w0BAQEFAAOBjQAwgYkCgYEA1KkdUYLsAJpv
+Jc/sW+dblxhCP6Xn0UekqW4CEcpYW1AEf5ahth0bQ4+lZobEG2jVzRMA9DFapQf71AafkX8RjE3D
+Yi6J+rl6PLWJ/OSyrUBGS1CEJc6HJS/uLsb020vumCnSBsWkfGPSaBBp9ZaO/mIY97JiUrYlwwEF
+jbGSHnUCAwEAATANBgkqhkiG9w0BAQUFAAOBgQCwDPHKtmuz4jLkEwP3CkfOL9+Q4LxhgUV7GtPm
+1XKIMN4VUey1NkFJUB5qwJXY1I7ql/VtZLjV2mPhS1SZkMKdFZ5uTKEr/KqT9Fazib5mK4YXOvFp
+OcDNBvpKX2SpoHffgXmdrExQshpIDzzofex0y/Kg4mulDQUPwVuIZtbnlQ==
+      </X509Certificate>
+    </X509Data>
+  </KeyInfo>
+      </tns:Certificate>
       <tns:SecurityDetails tns:securityId="OVERHEID_Security">
          <tns:TrustAnchors>
             <tns:AnchorCertificateRef tns:certId="OVERHEID_SigningCert"/>
