@@ -13,17 +13,56 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  ******************************************************************************/
-package nl.clockwork.mule.ebms.model;
+package nl.clockwork.mule.ebms.channel;
 
-import java.util.List;
 
-import nl.clockwork.mule.ebms.model.ebxml.PartyId;
-import nl.clockwork.mule.ebms.model.ebxml.To;
-
-public class EbMSChannelTo extends To
+public class XMLChannel
 {
-  public void setPartyId(List<PartyId> partyId)
+	private String id;
+	private String service;
+	private String from;
+	private String to;
+	private String action;
+	private String endpoint;
+
+	public XMLChannel(String id, String service, String from, String to, String action, String endpoint)
 	{
-		this.partyId = partyId;
+		this.id = id;
+		this.service = service;
+		this.from = from;
+		this.to = to;
+		this.action = action;
+		this.endpoint = endpoint;
 	}
+	
+	public String getId()
+	{
+		return id;
+	}
+
+	public String getService()
+	{
+		return service;
+	}
+
+	public String getFrom()
+	{
+		return from;
+	}
+
+	public String getTo()
+	{
+		return to;
+	}
+
+	public String getAction()
+	{
+		return action;
+	}
+
+	public String getEndpoint()
+	{
+		return endpoint;
+	}
+	
 }

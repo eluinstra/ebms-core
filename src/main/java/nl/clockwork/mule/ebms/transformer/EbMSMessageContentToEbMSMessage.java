@@ -18,8 +18,9 @@ package nl.clockwork.mule.ebms.transformer;
 import java.util.Date;
 
 import nl.clockwork.mule.ebms.Constants;
+import nl.clockwork.mule.ebms.channel.Channel;
+import nl.clockwork.mule.ebms.channel.ChannelManager;
 import nl.clockwork.mule.ebms.dao.EbMSDAO;
-import nl.clockwork.mule.ebms.model.Channel;
 import nl.clockwork.mule.ebms.model.EbMSMessageContent;
 import nl.clockwork.mule.ebms.model.cpp.cpa.CollaborationProtocolAgreement;
 import nl.clockwork.mule.ebms.model.ebxml.AckRequested;
@@ -36,8 +37,9 @@ import org.mule.transformer.AbstractMessageAwareTransformer;
 
 public class EbMSMessageContentToEbMSMessage extends AbstractMessageAwareTransformer
 {
-  protected transient Log logger = LogFactory.getLog(getClass());
-  private EbMSDAO ebMSDAO;
+	protected transient Log logger = LogFactory.getLog(getClass());
+	private ChannelManager channelManager;
+	private EbMSDAO ebMSDAO;
 	private String hostname;
 
   public EbMSMessageContentToEbMSMessage()
@@ -51,9 +53,7 @@ public class EbMSMessageContentToEbMSMessage extends AbstractMessageAwareTransfo
 		try
 		{
 			EbMSMessageContent content = (EbMSMessageContent)message.getPayload();
-			Channel channel = ebMSDAO.getChannel((String)message.getProperty(Constants.EBMS_CHANNEL_ID));
-			if (channel == null)
-				throw new Exception("No channel found with id " + (String)message.getProperty(Constants.EBMS_CHANNEL_ID));
+			Channel channel = channelManager.getChannel(content.getContext(),(String)message.getProperty(Constants.EBMS_CHANNEL_ID));
 			CollaborationProtocolAgreement cpa = ebMSDAO.getCPA(channel.getCpaId());
 			
 			MessageHeader messageHeader = EbMSMessageUtils.createMessageHeader(cpa,channel.getActionId(),content.getContext() != null ? content.getContext().getConversationId() : new Date().getTime() + message.getCorrelationId(),new Date().getTime() + message.getCorrelationId() + "@" + hostname);
@@ -78,7 +78,12 @@ public class EbMSMessageContentToEbMSMessage extends AbstractMessageAwareTransfo
 			throw new TransformerException(this,e);
 		}
 	}
-	
+
+	public void setChannelManager(ChannelManager channelManager)
+	{
+		this.channelManager = channelManager;
+	}
+
 	public void setEbMSDAO(EbMSDAO ebMSDAO)
 	{
 		this.ebMSDAO = ebMSDAO;

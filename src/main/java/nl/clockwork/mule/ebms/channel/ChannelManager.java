@@ -13,17 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  ******************************************************************************/
-package nl.clockwork.mule.ebms.model;
+package nl.clockwork.mule.ebms.channel;
 
-import java.util.List;
+import nl.clockwork.mule.ebms.model.EbMSMessageContext;
+import nl.clockwork.mule.ebms.model.ebxml.MessageHeader;
 
-import nl.clockwork.mule.ebms.model.ebxml.From;
-import nl.clockwork.mule.ebms.model.ebxml.PartyId;
-
-public class EbMSChannelFrom extends From
+public interface ChannelManager
 {
-  public void setPartyId(List<PartyId> partyId)
-	{
-		this.partyId = partyId;
-	}
+	Channel getChannel(MessageHeader messageHeader) throws Exception;
+	Channel getChannel(EbMSMessageContext messageContext, String channelId) throws Exception;
 }

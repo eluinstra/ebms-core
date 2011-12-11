@@ -42,6 +42,7 @@
 				<vm:inbound-endpoint path="ebms.message.send.in">
 					<custom-transformer class="nl.clockwork.mule.ebms.enricher.EbMSMessageContentToAttachmentEnricher" />
 					<custom-transformer class="nl.clockwork.mule.ebms.transformer.EbMSMessageContentToEbMSMessage">
+						<spring:property name="channelManager" ref="channelManager" />
 						<spring:property name="ebMSDAO" ref="ebMSDAO" />
 						<spring:property name="hostname" value="${service.host}" />
 					</custom-transformer>

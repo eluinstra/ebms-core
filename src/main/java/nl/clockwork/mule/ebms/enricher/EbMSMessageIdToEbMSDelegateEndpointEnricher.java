@@ -16,13 +16,10 @@
 package nl.clockwork.mule.ebms.enricher;
 
 import nl.clockwork.mule.ebms.Constants;
+import nl.clockwork.mule.ebms.channel.Channel;
+import nl.clockwork.mule.ebms.channel.ChannelManager;
 import nl.clockwork.mule.ebms.dao.EbMSDAO;
-import nl.clockwork.mule.ebms.model.Channel;
-import nl.clockwork.mule.ebms.model.cpp.cpa.CanReceive;
-import nl.clockwork.mule.ebms.model.cpp.cpa.CollaborationProtocolAgreement;
-import nl.clockwork.mule.ebms.model.cpp.cpa.PartyInfo;
 import nl.clockwork.mule.ebms.model.ebxml.MessageHeader;
-import nl.clockwork.mule.ebms.util.CPAUtils;
 
 import org.mule.api.MuleMessage;
 import org.mule.api.transformer.TransformerException;
@@ -30,6 +27,7 @@ import org.mule.transformer.AbstractMessageAwareTransformer;
 
 public class EbMSMessageIdToEbMSDelegateEndpointEnricher extends AbstractMessageAwareTransformer
 {
+	private ChannelManager channelManager;
 	private EbMSDAO ebMSDAO;
 
 	public EbMSMessageIdToEbMSDelegateEndpointEnricher()
@@ -44,13 +42,7 @@ public class EbMSMessageIdToEbMSDelegateEndpointEnricher extends AbstractMessage
 		{
 			long messageId = message.getLongProperty(Constants.EBMS_MESSAGE_ID,0);
 			MessageHeader messageHeader = ebMSDAO.getMessageHeader(messageId);
-
-			CollaborationProtocolAgreement cpa = ebMSDAO.getCPA(messageHeader.getCPAId());
-			PartyInfo partyInfo = CPAUtils.getPartyInfo(cpa,messageHeader.getTo().getPartyId());
-			CanReceive canReceive = CPAUtils.getCanReceive(partyInfo,messageHeader.getTo().getRole(),messageHeader.getService(),messageHeader.getAction());
-			Channel channel = ebMSDAO.getChannel(messageHeader.getCPAId(),canReceive.getThisPartyActionBinding().getId());
-			if (channel == null)
-				throw new Exception("No channel found for cpaId " + messageHeader.getCPAId() + " and actionId " + canReceive.getThisPartyActionBinding().getId());
+			Channel channel = channelManager.getChannel(messageHeader);
 			message.setProperty(Constants.EBMS_DELEGATE_PATH,channel.getEndpoint());
 			return message;
 		}
@@ -60,9 +52,13 @@ public class EbMSMessageIdToEbMSDelegateEndpointEnricher extends AbstractMessage
 		}
 	}
 
+	public void setChannelManager(ChannelManager channelManager)
+	{
+		this.channelManager = channelManager;
+	}
+
 	public void setEbMSDAO(EbMSDAO ebMSDAO)
 	{
 		this.ebMSDAO = ebMSDAO;
 	}
-	
 }

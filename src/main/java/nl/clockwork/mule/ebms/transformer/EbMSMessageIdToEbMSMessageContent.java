@@ -56,7 +56,7 @@ public class EbMSMessageIdToEbMSMessageContent extends AbstractMessageAwareTrans
 			for (String property : this.properties.keySet())
 				properties.put(property,context.getValue(this.properties.get(property)));
 
-			message.setPayload(new EbMSMessageContent(new EbMSMessageContext(messageHeader.getConversationId()),properties,attachments));
+			message.setPayload(new EbMSMessageContent(new EbMSMessageContext(messageHeader),properties,attachments));
 			return message;
 		}
 		catch (Exception e)

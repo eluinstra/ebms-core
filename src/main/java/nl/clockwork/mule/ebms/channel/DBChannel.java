@@ -13,59 +13,63 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  ******************************************************************************/
-package nl.clockwork.mule.ebms.model;
+package nl.clockwork.mule.ebms.channel;
 
-import nl.clockwork.mule.ebms.model.ebxml.From;
-import nl.clockwork.mule.ebms.model.ebxml.Service;
-import nl.clockwork.mule.ebms.model.ebxml.To;
-
-public class EbMSChannel
+public class DBChannel
 {
+	private int id;
+	private String channelId;
 	private String cpaId;
-	private From from;
-	private To to;
-	private Service service;
-	private String action;
+	private String actionId;
 	private String endpoint;
 
-	public EbMSChannel(String cpaId, From from, To to, Service service, String action, String endpoint)
+	public DBChannel(int id, String channelId, String cpaId, String actionId, String endpoint)
 	{
+		this.id = id;
+		this.channelId = channelId;
 		this.cpaId = cpaId;
-		this.from = from;
-		this.to = to;
-		this.service = service;
-		this.action = action;
+		this.actionId = actionId;
 		this.endpoint = endpoint;
 	}
-
+	public int getId()
+	{
+		return id;
+	}
+	public void setId(int id)
+	{
+		this.id = id;
+	}
+	public String getChannelId()
+	{
+		return channelId;
+	}
+	public void setChannelId(String channelId)
+	{
+		this.channelId = channelId;
+	}
 	public String getCpaId()
 	{
 		return cpaId;
 	}
-
-	public From getFrom()
+	public void setCpaId(String cpaId)
 	{
-		return from;
+		this.cpaId = cpaId;
 	}
-
-	public To getTo()
+	public String getActionId()
 	{
-		return to;
+		return actionId;
 	}
-
-	public Service getService()
+	public void setActionId(String actionId)
 	{
-		return service;
+		this.actionId = actionId;
 	}
-
-	public String getAction()
-	{
-		return action;
-	}
-
 	public String getEndpoint()
 	{
 		return endpoint;
 	}
-	
+	public void setEndpoint(String endpoint)
+	{
+		this.endpoint = endpoint;
+	}
+
 }

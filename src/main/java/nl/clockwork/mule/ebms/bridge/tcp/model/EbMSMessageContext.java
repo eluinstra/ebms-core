@@ -21,18 +21,24 @@ public class EbMSMessageContext implements Serializable
 {
 	private static final long serialVersionUID = 1L;
 	private String conversationId;
-	//private String messageId;
+	private String messageId;
 	//private boolean relateMessage;
 	//private String channelId;
 	//private String refChannelId;
 
-	public EbMSMessageContext(String conversationId)
+	public EbMSMessageContext(String conversationId, String messageId)
 	{
 		this.conversationId = conversationId;
+		this.messageId = messageId;
 	}
 
 	public String getConversationId()
 	{
 		return conversationId;
+	}
+	
+	public String getMessageId()
+	{
+		return messageId;
 	}
 }
