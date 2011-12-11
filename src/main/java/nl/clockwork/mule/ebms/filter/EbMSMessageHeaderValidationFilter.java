@@ -15,27 +15,31 @@
  ******************************************************************************/
 package nl.clockwork.mule.ebms.filter;
 
-import java.util.ArrayList;
+import java.net.URI;
+import java.util.Date;
 import java.util.List;
 
 import nl.clockwork.common.dao.DAOException;
 import nl.clockwork.mule.ebms.Constants;
 import nl.clockwork.mule.ebms.dao.EbMSDAO;
+import nl.clockwork.mule.ebms.model.EbMSAcknowledgment;
 import nl.clockwork.mule.ebms.model.EbMSBaseMessage;
 import nl.clockwork.mule.ebms.model.EbMSMessage;
-import nl.clockwork.mule.ebms.model.cpp.cpa.CanReceive;
-import nl.clockwork.mule.ebms.model.cpp.cpa.CanSend;
 import nl.clockwork.mule.ebms.model.cpp.cpa.CollaborationProtocolAgreement;
-import nl.clockwork.mule.ebms.model.cpp.cpa.CollaborationRole;
 import nl.clockwork.mule.ebms.model.cpp.cpa.DeliveryChannel;
+import nl.clockwork.mule.ebms.model.cpp.cpa.PartyInfo;
 import nl.clockwork.mule.ebms.model.cpp.cpa.PerMessageCharacteristicsType;
 import nl.clockwork.mule.ebms.model.cpp.cpa.PersistenceLevelType;
+import nl.clockwork.mule.ebms.model.cpp.cpa.StatusValueType;
 import nl.clockwork.mule.ebms.model.cpp.cpa.SyncReplyModeType;
 import nl.clockwork.mule.ebms.model.ebxml.AckRequested;
 import nl.clockwork.mule.ebms.model.ebxml.MessageHeader;
+import nl.clockwork.mule.ebms.model.ebxml.PartyId;
+import nl.clockwork.mule.ebms.model.ebxml.Service;
 import nl.clockwork.mule.ebms.util.CPAUtils;
 import nl.clockwork.mule.ebms.util.EbMSMessageUtils;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.api.MuleMessage;
@@ -63,54 +67,87 @@ public class EbMSMessageHeaderValidationFilter implements Filter
 				EbMSBaseMessage msg = (EbMSBaseMessage)message.getPayload();
 				MessageHeader messageHeader = msg.getMessageHeader();
 				CollaborationProtocolAgreement cpa = ebMSDAO.getCPA(messageHeader.getCPAId());
-				//CollaborationRole from = null;
-				List<CollaborationRole> from = new ArrayList<CollaborationRole>();
-				//CollaborationRole to = null;
-				List<CollaborationRole> to = new ArrayList<CollaborationRole>();
-				CanSend canSend = null;
-				CanReceive canReceive = null;
-				DeliveryChannel deliveryChannel = null;
+				PartyInfo from = null;
+				PartyInfo to = null;
+
+				if (cpa == null)
+				{
+					message.setProperty(Constants.EBMS_ERROR,EbMSMessageUtils.createError("//Header/MessageHeader[@cpaid]",Constants.EbMSErrorCode.VALUE_NOT_RECOGNIZED.errorCode(),""));
+					return false;
+				}
+				if (!StatusValueType.AGREED.equals(cpa.getStatus().getValue()))
+				{
+					message.setProperty(Constants.EBMS_ERROR,EbMSMessageUtils.createError("//Header/MessageHeader[@cpaid]",Constants.EbMSErrorCode.VALUE_NOT_RECOGNIZED.errorCode(),"CPA not agreed."));
+					return false;
+				}
+				Date now = new Date();
+				if (now.compareTo(cpa.getStart().toGregorianCalendar().getTime()) < 0 || now.compareTo(cpa.getEnd().toGregorianCalendar().getTime()) > 0)
+				{
+					message.setProperty(Constants.EBMS_ERROR,EbMSMessageUtils.createError("//Header/MessageHeader[@cpaid]",Constants.EbMSErrorCode.VALUE_NOT_RECOGNIZED.errorCode(),"CPA expired."));
+					return false;
+				}
+
 				if (!Constants.EBMS_VERSION.equals(messageHeader.getVersion()))
 				{
-					message.setProperty(Constants.EBMS_ERROR,EbMSMessageUtils.createError("//Header/MessageHeader[@version]",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Wrong value."));
+					message.setProperty(Constants.EBMS_ERROR,EbMSMessageUtils.createError("//Header/MessageHeader[@version]",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Value invalid."));
 					return false;
 				}
 				if (true != messageHeader.isMustUnderstand())
 				{
-					message.setProperty(Constants.EBMS_ERROR,EbMSMessageUtils.createError("//Header/MessageHeader[@mustUnderstand]",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Wrong value."));
+					message.setProperty(Constants.EBMS_ERROR,EbMSMessageUtils.createError("//Header/MessageHeader[@mustUnderstand]",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Value invalid."));
 					return false;
 				}
-//				if ((from = getCollaborationRoleFrom(cpa,messageHeader)) == null)
-//				{
-//					message.setProperty(Constants.EBMS_ERROR,EbMSMessageUtils.createError("//Header/MessageHeader/From/PartyId",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"PartyId not found."));
-//					return false;
-//				}
-				if ((from = getCollaborationRolesFrom(cpa,messageHeader)).isEmpty())
+
+				if (!isValid(messageHeader.getFrom().getPartyId()))
 				{
-					message.setProperty(Constants.EBMS_ERROR,EbMSMessageUtils.createError("//Header/MessageHeader/From/PartyId",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"PartyId not found."));
+					message.setProperty(Constants.EBMS_ERROR,EbMSMessageUtils.createError("//Header/MessageHeader/From/PartyId",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Value invalid."));
 					return false;
 				}
-//				if ((to = getCollaborationRoleTo(cpa,messageHeader)) == null)
-//				{
-//					message.setProperty(Constants.EBMS_ERROR,EbMSMessageUtils.createError("//Header/MessageHeader/To/PartyId",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"PartyId not found."));
-//					return false;
-//				}
-				if ((to = getCollaborationRolesTo(cpa,messageHeader)) == null)
+				if ((from = CPAUtils.getPartyInfo(cpa, messageHeader.getFrom().getPartyId())) == null)
 				{
-					message.setProperty(Constants.EBMS_ERROR,EbMSMessageUtils.createError("//Header/MessageHeader/To/PartyId",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"PartyId not found."));
+					message.setProperty(Constants.EBMS_ERROR,EbMSMessageUtils.createError("//Header/MessageHeader/From/PartyId",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Value not found."));
 					return false;
 				}
-				if ((canSend = canSend(from,messageHeader)) == null)
+				if (!CPAUtils.canSend(from,messageHeader.getFrom().getRole(),messageHeader.getService(),messageHeader.getAction()))
+				{
+					message.setProperty(Constants.EBMS_ERROR,EbMSMessageUtils.createError("//Header/MessageHeader/Action",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Value not found."));
+					return false;
+				}
+
+				if (!isValid(messageHeader.getTo().getPartyId()))
+				{
+					message.setProperty(Constants.EBMS_ERROR,EbMSMessageUtils.createError("//Header/MessageHeader/To/PartyId",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Value invalid."));
+					return false;
+				}
+				if ((to = CPAUtils.getPartyInfo(cpa, messageHeader.getTo().getPartyId())) == null)
+				{
+					message.setProperty(Constants.EBMS_ERROR,EbMSMessageUtils.createError("//Header/MessageHeader/To/PartyId",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Value not found."));
+					return false;
+				}
+				if (!CPAUtils.canReceive(to,messageHeader.getTo().getRole(),messageHeader.getService(),messageHeader.getAction()))
 				{
 					message.setProperty(Constants.EBMS_ERROR,EbMSMessageUtils.createError("//Header/MessageHeader/Action",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Action not found."));
 					return false;
 				}
-				if ((canReceive = canReceive(to,messageHeader)) == null)
+
+				if (!isValid(messageHeader.getService()))
 				{
-					message.setProperty(Constants.EBMS_ERROR,EbMSMessageUtils.createError("//Header/MessageHeader/Action",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Action not found."));
+					message.setProperty(Constants.EBMS_ERROR,EbMSMessageUtils.createError("//Header/MessageHeader/Service",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Value invalid."));
 					return false;
 				}
-				deliveryChannel = getDeliveryChannel(canSend);
+				
+				List<DeliveryChannel> deliveryChannels = CPAUtils.getDeliveryChannels(from,messageHeader.getFrom().getRole(),messageHeader.getService(),messageHeader.getAction());
+				if (deliveryChannels.size() == 0)
+				{
+					message.setProperty(Constants.EBMS_ERROR,EbMSMessageUtils.createError(Constants.EbMSErrorCode.UNKNOWN.errorCode(),Constants.EbMSErrorCode.UNKNOWN.errorCode(),"No DeviveryChannel found."));
+					return false;
+				}
+				if (deliveryChannels.size() > 1)
+				{
+					message.setProperty(Constants.EBMS_ERROR,EbMSMessageUtils.createError(Constants.EbMSErrorCode.UNKNOWN.errorCode(),Constants.EbMSErrorCode.NOT_SUPPORTED.errorCode(),"Multiple DeviveryChannels not supported."));
+					return false;
+				}
+				DeliveryChannel deliveryChannel = deliveryChannels.get(0);
 				if (!checkDuplicateElimination(deliveryChannel))
 				{
 					message.setProperty(Constants.EBMS_ERROR,EbMSMessageUtils.createError("//Header/MessageHeader/DuplicateElimination",Constants.EbMSErrorCode.NOT_SUPPORTED.errorCode(),"DuplicateElimination value not supported."));
@@ -155,6 +192,10 @@ public class EbMSMessageHeaderValidationFilter implements Filter
 						return false;
 					}
 				}
+				if (message.getPayload() instanceof EbMSAcknowledgment)
+				{
+					//TODO check for AckSignature???
+				}
 				return true;
 			}
 			catch (DAOException e)
@@ -165,29 +206,30 @@ public class EbMSMessageHeaderValidationFilter implements Filter
 		return true;
 	}
 
-	private List<CollaborationRole> getCollaborationRolesFrom(CollaborationProtocolAgreement cpa, MessageHeader messageHeader)
+	private boolean isValid(List<PartyId> partyIds)
 	{
-		return CPAUtils.getCollaborationRoles(cpa,messageHeader.getFrom().getPartyId().get(0).getType(),messageHeader.getFrom().getPartyId().get(0).getValue(),messageHeader.getFrom().getRole());
+		for (PartyId partyId : partyIds)
+			if (!StringUtils.isEmpty(partyId.getType()) || isValidURI(partyId.getValue())/*FIXME replace by: org.apache.commons.validator.UrlValidator.isValid(partyId.getValue())*/)
+				return true;
+		return false;
 	}
 
-	private List<CollaborationRole> getCollaborationRolesTo(CollaborationProtocolAgreement cpa, MessageHeader messageHeader)
+	private boolean isValidURI(String s)
 	{
-		return CPAUtils.getCollaborationRoles(cpa,messageHeader.getTo().getPartyId().get(0).getType(),messageHeader.getTo().getPartyId().get(0).getValue(),messageHeader.getTo().getRole());
+		try
+		{
+			new URI(s);
+			return true;
+		}
+		catch (Exception e)
+		{
+			return false;
+		}
 	}
 
-	private CanSend canSend(List<CollaborationRole> roles, MessageHeader messageHeader)
+	private boolean isValid(Service service)
 	{
-		return CPAUtils.getCanSend(roles,messageHeader.getService().getType(),messageHeader.getService().getValue(),messageHeader.getAction());
-	}
-
-	private CanReceive canReceive(List<CollaborationRole> roles, MessageHeader messageHeader)
-	{
-		return CPAUtils.getCanReceive(roles,messageHeader.getService().getType(),messageHeader.getService().getValue(),messageHeader.getAction());
-	}
-
-	private DeliveryChannel getDeliveryChannel(CanSend canSend)
-	{
-		return CPAUtils.getDeliveryChannel(canSend.getThisPartyActionBinding());
+		return !StringUtils.isEmpty(service.getType()) || isValidURI(service.getValue())/*FIXME replace by: org.apache.commons.validator.UrlValidator.isValid(service.getValue())*/; 
 	}
 	
 	private boolean checkDuplicateElimination(DeliveryChannel deliveryChannel)

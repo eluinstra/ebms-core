@@ -19,7 +19,9 @@ import nl.clockwork.mule.ebms.Constants;
 import nl.clockwork.mule.ebms.dao.EbMSDAO;
 import nl.clockwork.mule.ebms.model.Channel;
 import nl.clockwork.mule.ebms.model.EbMSMessage;
+import nl.clockwork.mule.ebms.model.cpp.cpa.CanReceive;
 import nl.clockwork.mule.ebms.model.cpp.cpa.CollaborationProtocolAgreement;
+import nl.clockwork.mule.ebms.model.cpp.cpa.PartyInfo;
 import nl.clockwork.mule.ebms.model.ebxml.MessageHeader;
 import nl.clockwork.mule.ebms.util.CPAUtils;
 
@@ -45,9 +47,11 @@ public class EbMSMessageToEbMSDelegateEndpointEnricher extends AbstractMessageAw
 			MessageHeader messageHeader = msg.getMessageHeader();
 
 			CollaborationProtocolAgreement cpa = ebMSDAO.getCPA(messageHeader.getCPAId());
-			Channel channel = ebMSDAO.getChannel(messageHeader.getCPAId(),CPAUtils.getActionIdReceived(cpa,messageHeader));
+			PartyInfo partyInfo = CPAUtils.getPartyInfo(cpa,messageHeader.getTo().getPartyId());
+			CanReceive canReceive = CPAUtils.getCanReceive(partyInfo,messageHeader.getTo().getRole(),messageHeader.getService(),messageHeader.getAction());
+			Channel channel = ebMSDAO.getChannel(messageHeader.getCPAId(),canReceive.getThisPartyActionBinding().getId());
 			if (channel == null)
-				throw new Exception("No channel found for CPAId " + messageHeader.getCPAId() + " and ActionId " + CPAUtils.getActionIdReceived(cpa,messageHeader));
+				throw new Exception("No channel found for cpaId " + messageHeader.getCPAId() + " and actionId " + canReceive.getThisPartyActionBinding().getId());
 			message.setProperty(Constants.EBMS_DELEGATE_PATH,channel.getEndpoint());
 			return message;
 		}

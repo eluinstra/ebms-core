@@ -15,9 +15,13 @@
  ******************************************************************************/
 package nl.clockwork.mule.ebms.filter;
 
+import java.util.Date;
+
 import nl.clockwork.common.dao.DAOException;
 import nl.clockwork.mule.ebms.dao.EbMSDAO;
 import nl.clockwork.mule.ebms.model.EbMSBaseMessage;
+import nl.clockwork.mule.ebms.model.cpp.cpa.CollaborationProtocolAgreement;
+import nl.clockwork.mule.ebms.model.cpp.cpa.StatusValueType;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -37,7 +41,13 @@ public class CPAValidationFilter implements Filter
 			try
 			{
 				EbMSBaseMessage msg = (EbMSBaseMessage)message.getPayload();
-				return ebMSDAO.getCPA(msg.getMessageHeader().getCPAId()) != null;
+				Date now = new Date();
+				CollaborationProtocolAgreement cpa = ebMSDAO.getCPA(msg.getMessageHeader().getCPAId());
+				return cpa != null
+					&& StatusValueType.AGREED.equals(cpa.getStatus().getValue())
+					&& now.compareTo(cpa.getStart().toGregorianCalendar().getTime()) >= 0
+					&& now.compareTo(cpa.getEnd().toGregorianCalendar().getTime()) <= 0
+				;
 			}
 			catch (DAOException e)
 			{
