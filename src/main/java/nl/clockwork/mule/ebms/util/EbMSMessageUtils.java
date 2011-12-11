@@ -15,12 +15,87 @@
  ******************************************************************************/
 package nl.clockwork.mule.ebms.util;
 
+import java.util.GregorianCalendar;
+
+import javax.xml.datatype.DatatypeConfigurationException;
+import javax.xml.datatype.DatatypeFactory;
+
+import nl.clockwork.mule.ebms.Constants;
+import nl.clockwork.mule.ebms.model.cpp.cpa.ActorType;
+import nl.clockwork.mule.ebms.model.cpp.cpa.CollaborationProtocolAgreement;
+import nl.clockwork.mule.ebms.model.cpp.cpa.PartyInfo;
+import nl.clockwork.mule.ebms.model.ebxml.AckRequested;
 import nl.clockwork.mule.ebms.model.ebxml.Description;
 import nl.clockwork.mule.ebms.model.ebxml.Error;
+import nl.clockwork.mule.ebms.model.ebxml.From;
+import nl.clockwork.mule.ebms.model.ebxml.Manifest;
+import nl.clockwork.mule.ebms.model.ebxml.MessageData;
+import nl.clockwork.mule.ebms.model.ebxml.MessageHeader;
+import nl.clockwork.mule.ebms.model.ebxml.PartyId;
+import nl.clockwork.mule.ebms.model.ebxml.Service;
 import nl.clockwork.mule.ebms.model.ebxml.SeverityType;
+import nl.clockwork.mule.ebms.model.ebxml.To;
 
 public class EbMSMessageUtils
 {
+
+	public static MessageHeader createMessageHeader(CollaborationProtocolAgreement cpa, String actionId, String conversationId, String messageId) throws DatatypeConfigurationException
+	{
+		PartyInfo partyInfo = CPAUtils.getSendingPartyInfo(cpa,actionId);
+		PartyInfo otherPartyInfo = CPAUtils.getOtherReceivingPartyInfo(cpa,actionId);
+
+		MessageHeader messageHeader = new MessageHeader();
+
+		messageHeader.setVersion(Constants.EBMS_VERSION);
+		messageHeader.setMustUnderstand(true);
+
+		messageHeader.setCPAId(cpa.getCpaid());
+		messageHeader.setConversationId(conversationId);
+		
+		messageHeader.setFrom(new From());
+		PartyId from = new PartyId();
+		from.setType(partyInfo.getPartyId().get(0).getType());
+		from.setValue(partyInfo.getPartyId().get(0).getValue());
+		messageHeader.getFrom().getPartyId().add(from);
+		messageHeader.getFrom().setRole(partyInfo.getCollaborationRole().get(0).getRole().getName());
+
+		messageHeader.setTo(new To());
+		PartyId to = new PartyId();
+		to.setType(otherPartyInfo.getPartyId().get(0).getType());
+		to.setValue(otherPartyInfo.getPartyId().get(0).getValue());
+		messageHeader.getTo().getPartyId().add(to);
+		messageHeader.getTo().setRole(otherPartyInfo.getCollaborationRole().get(0).getRole().getName());
+		
+		messageHeader.setService(new Service());
+		messageHeader.getService().setType(partyInfo.getCollaborationRole().get(0).getServiceBinding().getService().getType());
+		messageHeader.getService().setValue(partyInfo.getCollaborationRole().get(0).getServiceBinding().getService().getValue());
+		messageHeader.setAction(partyInfo.getCollaborationRole().get(0).getServiceBinding().getCanSend().get(0).getThisPartyActionBinding().getAction());
+
+		messageHeader.setMessageData(new MessageData());
+		messageHeader.getMessageData().setMessageId(messageId);
+		messageHeader.getMessageData().setTimestamp(DatatypeFactory.newInstance().newXMLGregorianCalendar(new GregorianCalendar()));
+
+		messageHeader.setDuplicateElimination("");
+		return messageHeader;
+	}
+	
+	public static AckRequested createAckRequested()
+	{
+		AckRequested ackRequested = new AckRequested();
+		ackRequested.setVersion(Constants.EBMS_VERSION);
+		ackRequested.setMustUnderstand(true);
+		ackRequested.setSigned(false);
+		ackRequested.setActor(ActorType.URN_OASIS_NAMES_TC_EBXML_MSG_ACTOR_TO_PARTY_MSH.value());
+		return ackRequested;
+	}
+	
+	public static Manifest createManifest()
+	{
+		Manifest manifest = new Manifest();
+		manifest.setVersion(Constants.EBMS_VERSION);
+		return manifest;
+	}
+	
 	public static Error createError(String location, String errorCode, String description)
 	{
 		return createError(location,errorCode,description,"en-US",SeverityType.ERROR);
