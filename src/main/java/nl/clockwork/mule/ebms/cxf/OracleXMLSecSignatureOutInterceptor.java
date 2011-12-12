@@ -44,10 +44,10 @@ public class OracleXMLSecSignatureOutInterceptor extends XMLSecSignatureOutInter
 		{
 			OutputStream originalOs = message.getContent(OutputStream.class);
 			message.put(OUTPUT_STREAM_HOLDER,originalOs);
-      CachedOutputStream cos = new CachedOutputStream();
-      message.setContent(OutputStream.class,cos); 
+			CachedOutputStream cos = new CachedOutputStream();
+			message.setContent(OutputStream.class,cos); 
 			message.setContent(XMLStreamWriter.class,StaxOutInterceptor.getXMLOutputFactory(message).createXMLStreamWriter(cos,getEncoding(message)));
-	    message.getInterceptorChain().add(new OracleXMLSecSignatureOutEndingInterceptor()); 
+			message.getInterceptorChain().add(new OracleXMLSecSignatureOutEndingInterceptor()); 
 		}
 		catch (Exception e)
 		{

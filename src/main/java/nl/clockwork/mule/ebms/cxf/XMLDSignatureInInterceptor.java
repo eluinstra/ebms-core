@@ -65,7 +65,7 @@ public class XMLDSignatureInInterceptor extends AbstractSoapInterceptor
 		addAfter(StaxInInterceptor.class.getName());
 	}
 
-	private class XMLDsigKeySelector extends KeySelector
+	private class XMLDSigKeySelector extends KeySelector
 	{
 		public KeySelectorResult select(KeyInfo keyInfo, KeySelector.Purpose purpose, AlgorithmMethod method, XMLCryptoContext context) throws KeySelectorException
 		{
@@ -118,7 +118,7 @@ public class XMLDSignatureInInterceptor extends AbstractSoapInterceptor
 		if (nodeList.getLength() > 0)
 		{
 			XMLSignatureFactory signFactory = XMLSignatureFactory.getInstance();
-			DOMValidateContext validateContext = new DOMValidateContext(new XMLDsigKeySelector(),nodeList.item(0));
+			DOMValidateContext validateContext = new DOMValidateContext(new XMLDSigKeySelector(),nodeList.item(0));
 			URIDereferencer dereferencer = new EbMSDataSourceURIDereferencer(dataSources);
 			validateContext.setURIDereferencer(dereferencer);
 			XMLSignature signature = signFactory.unmarshalXMLSignature(validateContext);

@@ -105,12 +105,12 @@ public class XMLSecSignatureOutInterceptor extends AbstractSoapInterceptor
 	{
     try
 		{
-    	OutputStream originalOs = message.getContent(OutputStream.class);
+    		OutputStream originalOs = message.getContent(OutputStream.class);
 			message.put(OUTPUT_STREAM_HOLDER,originalOs);
-      CachedOutputStream cos = new CachedOutputStream();
-      message.setContent(OutputStream.class,cos);
+			CachedOutputStream cos = new CachedOutputStream();
+			message.setContent(OutputStream.class,cos);
 			message.setContent(XMLStreamWriter.class,StaxOutInterceptor.getXMLOutputFactory(message).createXMLStreamWriter(cos,getEncoding(message)));
-	    message.getInterceptorChain().add(new XMLSecSignatureOutEndingInterceptor()); 
+			message.getInterceptorChain().add(new XMLSecSignatureOutEndingInterceptor()); 
 		}
 		catch (XMLStreamException e)
 		{
@@ -168,29 +168,29 @@ public class XMLSecSignatureOutInterceptor extends AbstractSoapInterceptor
 			Element soapHeader = getFirstChildElement(document.getDocumentElement());
 			soapHeader.appendChild(signature.getElement());
 			
-	    EbMSDataSourceResolver resolver = new EbMSDataSourceResolver(dataSources);
-	    signature.getSignedInfo().addResourceResolver(resolver);
+			EbMSDataSourceResolver resolver = new EbMSDataSourceResolver(dataSources);
+			signature.getSignedInfo().addResourceResolver(resolver);
+				
+			Transforms transforms = new Transforms(document);
+			transforms.addTransform(Transforms.TRANSFORM_ENVELOPED_SIGNATURE);
+			Element xpath = document.createElementNS(org.apache.xml.security.utils.Constants.SignatureSpecNS,org.apache.xml.security.utils.Constants._TAG_XPATH);
+			xpath.setAttributeNS(NAMESPACE_URI_XML_NS, "xmlns:" + NAMESPACE_PREFIX_SOAP_ENVELOPE,NAMESPACE_URI_SOAP_ENVELOPE);
+			xpath.appendChild(document.createTextNode(TRANSFORM_XPATH));
+			xpath.setPrefix(NAMESPACE_PREFIX_DS);
+			transforms.addTransform(TRANSFORM_ALGORITHM_XPATH,xpath);
+			transforms.addTransform(Transforms.TRANSFORM_C14N_OMIT_COMMENTS);
 			
-	    Transforms transforms = new Transforms(document);
-	    transforms.addTransform(Transforms.TRANSFORM_ENVELOPED_SIGNATURE);
-	    Element xpath = document.createElementNS(org.apache.xml.security.utils.Constants.SignatureSpecNS,org.apache.xml.security.utils.Constants._TAG_XPATH);
-	    xpath.setAttributeNS(NAMESPACE_URI_XML_NS, "xmlns:" + NAMESPACE_PREFIX_SOAP_ENVELOPE,NAMESPACE_URI_SOAP_ENVELOPE);
-	    xpath.appendChild(document.createTextNode(TRANSFORM_XPATH));
-	    xpath.setPrefix(NAMESPACE_PREFIX_DS);
-	    transforms.addTransform(TRANSFORM_ALGORITHM_XPATH,xpath);
-	    transforms.addTransform(Transforms.TRANSFORM_C14N_OMIT_COMMENTS);
-	    
-	    signature.addDocument("",transforms,org.apache.xml.security.utils.Constants.ALGO_ID_DIGEST_SHA1);
-	    
-	    for (EbMSDataSource dataSource : dataSources)
-	    	signature.addDocument("cid:" + dataSource.getContentId());
-	    
-	    signature.addKeyInfo(keyPair.getPublic());
-	    
-	    Certificate[] certificates = keyStore.getCertificateChain(alias);
-	//    for (Certificate certificate : certificates)
-	//    	signature.addKeyInfo((X509Certificate)certificate);
-	  	signature.addKeyInfo((X509Certificate)certificates[0]);
+			signature.addDocument("",transforms,org.apache.xml.security.utils.Constants.ALGO_ID_DIGEST_SHA1);
+			
+			for (EbMSDataSource dataSource : dataSources)
+				signature.addDocument("cid:" + dataSource.getContentId());
+			
+			signature.addKeyInfo(keyPair.getPublic());
+			
+			Certificate[] certificates = keyStore.getCertificateChain(alias);
+		    //for (Certificate certificate : certificates)
+		    //	signature.addKeyInfo((X509Certificate)certificate);
+			signature.addKeyInfo((X509Certificate)certificates[0]);
 	
 			signature.sign(keyPair.getPrivate());
 		}
