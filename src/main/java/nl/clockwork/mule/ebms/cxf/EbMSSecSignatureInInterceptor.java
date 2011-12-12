@@ -23,15 +23,32 @@ import java.security.cert.CertificateExpiredException;
 import java.security.cert.CertificateNotYetValidException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Enumeration;
+import java.util.Iterator;
 import java.util.List;
 
+import javax.xml.XMLConstants;
+import javax.xml.namespace.NamespaceContext;
 import javax.xml.stream.XMLStreamReader;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpression;
+import javax.xml.xpath.XPathFactory;
 
 import nl.clockwork.common.util.XMLMessageBuilder;
+import nl.clockwork.common.util.XMLUtils;
+import nl.clockwork.mule.ebms.dao.EbMSDAO;
 import nl.clockwork.mule.ebms.model.EbMSDataSource;
 import nl.clockwork.mule.ebms.model.Signature;
+import nl.clockwork.mule.ebms.model.cpp.cpa.CollaborationProtocolAgreement;
+import nl.clockwork.mule.ebms.model.cpp.cpa.DeliveryChannel;
+import nl.clockwork.mule.ebms.model.cpp.cpa.DocExchange;
+import nl.clockwork.mule.ebms.model.cpp.cpa.PartyInfo;
+import nl.clockwork.mule.ebms.model.ebxml.MessageHeader;
 import nl.clockwork.mule.ebms.model.xml.xmldsig.SignatureType;
+import nl.clockwork.mule.ebms.util.CPAUtils;
 import nl.clockwork.mule.ebms.util.SecurityUtils;
 import nl.clockwork.mule.ebms.xmldsig.EbMSDataSourceResolver;
 
@@ -49,13 +66,43 @@ import org.apache.xml.security.signature.XMLSignature;
 import org.apache.xml.security.signature.XMLSignatureException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 public class EbMSSecSignatureInInterceptor extends AbstractSoapInterceptor
 {
-  protected transient Log logger = LogFactory.getLog(getClass());
+	public class EbXMLNamespaceContext implements NamespaceContext
+	{
 
-  private String keyStorePath;
+		public String getNamespaceURI(String prefix)
+		{
+			if (prefix == null)
+				throw new NullPointerException("prefix is null");
+			else if ("soap".equals(prefix))
+				return "http://schemas.xmlsoap.org/soap/envelope/";
+			else if ("ebxml".equals(prefix))
+				return "http://www.oasis-open.org/committees/ebxml-msg/schema/msg-header-2_0.xsd";
+			else if ("ds".equals(prefix))
+				return "http://www.w3.org/2000/09/xmldsig#";
+			return XMLConstants.NULL_NS_URI;
+		}
+
+		public String getPrefix(String uri)
+		{
+			throw new UnsupportedOperationException();
+		}
+
+		public Iterator<Object> getPrefixes(String uri)
+		{
+			throw new UnsupportedOperationException();
+		}
+
+	}
+
+	protected transient Log logger = LogFactory.getLog(getClass());
+
+	private EbMSDAO ebMSDAO;
+  	private String keyStorePath;
 	private String keyStorePassword;
 
 	public EbMSSecSignatureInInterceptor()
@@ -66,42 +113,12 @@ public class EbMSSecSignatureInInterceptor extends AbstractSoapInterceptor
 		org.apache.xml.security.Init.init();
 	}
 
-	private boolean verify(KeyStore keyStore, NodeList signatureNodeList, List<EbMSDataSource> dataSources) throws XMLSignatureException, XMLSecurityException, CertificateExpiredException, CertificateNotYetValidException, KeyStoreException
+	private boolean verify(X509Certificate certificate, NodeList signatureNodeList, List<EbMSDataSource> dataSources) throws XMLSignatureException, XMLSecurityException, CertificateExpiredException, CertificateNotYetValidException, KeyStoreException
 	{
 			XMLSignature signature = new XMLSignature((Element)signatureNodeList.item(0),org.apache.xml.security.utils.Constants.SignatureSpecNS);
-	
 			EbMSDataSourceResolver resolver = new EbMSDataSourceResolver(dataSources);
 			signature.addResourceResolver(resolver);
-	
-			X509Certificate certificate = signature.getKeyInfo().getX509Certificate();
-			if (certificate != null)
-			{
-				certificate.checkValidity();
-				Enumeration<String> aliases = keyStore.aliases();
-				while (aliases.hasMoreElements())
-				{
-					try
-					{
-						Certificate c = keyStore.getCertificate(aliases.nextElement());
-						certificate.verify(c.getPublicKey());
-						return signature.checkSignatureValue(certificate);
-					}
-					catch (KeyStoreException e)
-					{
-						throw e;
-					}
-					catch (Exception e)
-					{
-					}
-				}
-			}
-			else
-			{
-				PublicKey publicKey = signature.getKeyInfo().getPublicKey();
-				if (publicKey != null)
-					return signature.checkSignatureValue(publicKey);
-			}
-			return false;
+			return signature.checkSignatureValue(certificate);
 	}
 
 	@Override
@@ -124,9 +141,20 @@ public class EbMSSecSignatureInInterceptor extends AbstractSoapInterceptor
 			NodeList signatureNodeList = document.getElementsByTagNameNS(org.apache.xml.security.utils.Constants.SignatureSpecNS,org.apache.xml.security.utils.Constants._TAG_SIGNATURE);
 			if (signatureNodeList.getLength() > 0)
 			{
-				boolean isValid = verify(keyStore,signatureNodeList,dataSources);
-				logger.info("Signature valid? " + isValid);
-				SignatureManager.set(new Signature(XMLMessageBuilder.getInstance(SignatureType.class).handle(signatureNodeList.item(0)),isValid));
+				boolean isValid = false;
+				X509Certificate certificate = getCertificate(document);
+				if (certificate != null)
+				{
+					isValid = validateCertificate(keyStore,certificate,new Date()/*TODO get date from message???*/);
+					if (!isValid)
+						logger.info("Certificate invalid.");
+					else
+					{
+						isValid = verify(certificate,signatureNodeList,dataSources);
+						logger.info("Signature" + (isValid ? " " : " in") + "valid.");
+					}
+				}
+				SignatureManager.set(new Signature(certificate,XMLMessageBuilder.getInstance(SignatureType.class).handle(signatureNodeList.item(0)),isValid));
 			}
 			else
 				SignatureManager.set(null);
@@ -137,6 +165,60 @@ public class EbMSSecSignatureInInterceptor extends AbstractSoapInterceptor
 		}
 	}
 
+	private X509Certificate getCertificate(Document document)
+	{
+		try
+		{
+			Node n = (Node)XMLUtils.executeXPathQuery(new EbXMLNamespaceContext(),document,"/soap:Envelope/soap:Header/ebxml:MessageHeader",XPathConstants.NODE);
+			MessageHeader messageHeader = XMLMessageBuilder.getInstance(MessageHeader.class).handle(n);
+			CollaborationProtocolAgreement cpa = ebMSDAO.getCPA(messageHeader.getCPAId());
+			PartyInfo partyInfo = CPAUtils.getPartyInfo(cpa,messageHeader.getFrom().getPartyId());
+			List<DeliveryChannel> channels = CPAUtils.getDeliveryChannels(partyInfo,messageHeader.getFrom().getRole(),messageHeader.getService(),messageHeader.getAction());
+			nl.clockwork.mule.ebms.model.cpp.cpa.Certificate c = CPAUtils.getCertificate(channels.get(0));
+			return CPAUtils.getX509Certificate(c);
+		}
+		catch (Exception e)
+		{
+			logger.info("",e);
+			return null;
+		}
+	}
+
+	private boolean validateCertificate(KeyStore keyStore, X509Certificate certificate, Date date) throws KeyStoreException
+	{
+		try
+		{
+			certificate.checkValidity(date);
+		}
+		catch (Exception e)
+		{
+			return false;
+		}
+		Enumeration<String> aliases = keyStore.aliases();
+		while (aliases.hasMoreElements())
+		{
+			try
+			{
+				Certificate c = keyStore.getCertificate(aliases.nextElement());
+				certificate.verify(c.getPublicKey());
+				return true;
+			}
+			catch (KeyStoreException e)
+			{
+				throw e;
+			}
+			catch (Exception e)
+			{
+			}
+		}
+		return false;
+	}
+
+	public void setEbMSDAO(EbMSDAO ebMSDAO)
+	{
+		this.ebMSDAO = ebMSDAO;
+	}
+	
 	public void setKeyStorePath(String keyStorePath)
 	{
 		this.keyStorePath = keyStorePath;

@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.io.StringReader;
 
 import javax.xml.namespace.NamespaceContext;
+import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -28,7 +29,7 @@ import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
-import org.w3c.dom.Document;
+import org.w3c.dom.Node;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
@@ -51,34 +52,50 @@ public class XMLUtils
 
 	public static String executeXPathQuery(String content, String query) throws ParserConfigurationException, SAXException, IOException, XPathExpressionException
 	{
-    DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-    //factory.setNamespaceAware(true);
-    DocumentBuilder builder = factory.newDocumentBuilder();
-    Document document = builder.parse(new InputSource(new StringReader(content)));
-
-    XPath xpath = XPathFactory.newInstance().newXPath();
-    XPathExpression expr = xpath.compile(query);
-
-    return (String)expr.evaluate(document,XPathConstants.STRING);
+		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+		//factory.setNamespaceAware(true);
+		DocumentBuilder builder = factory.newDocumentBuilder();
+		return executeXPathQuery(builder.parse(new InputSource(new StringReader(content))),query);
+	}
+	
+	public static String executeXPathQuery(Node node, String query) throws ParserConfigurationException, SAXException, IOException, XPathExpressionException
+	{
+		return (String)executeXPathQuery(node,query,XPathConstants.STRING);
+	}
+	
+	public static Object executeXPathQuery(Node node, String query, QName returnType) throws ParserConfigurationException, SAXException, IOException, XPathExpressionException
+	{
+		XPath xpath = XPathFactory.newInstance().newXPath();
+		XPathExpression expr = xpath.compile(query);
+		
+		return expr.evaluate(node,returnType);
 	}
 	
 	public static String executeXPathQuery(NamespaceContext namespaceContext, String content, String query) throws ParserConfigurationException, SAXException, IOException, XPathExpressionException
 	{
-    DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-    factory.setNamespaceAware(true);
-    DocumentBuilder builder = factory.newDocumentBuilder();
-    Document document = builder.parse(new InputSource(new StringReader(content)));
+	    DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+	    factory.setNamespaceAware(true);
+	    DocumentBuilder builder = factory.newDocumentBuilder();
+	    return executeXPathQuery(namespaceContext,builder.parse(new InputSource(new StringReader(content))),query);
+	}
 
-    XPath xpath = XPathFactory.newInstance().newXPath();
-    xpath.setNamespaceContext(namespaceContext);
-    XPathExpression expr = xpath.compile(query);
+	public static String executeXPathQuery(NamespaceContext namespaceContext, Node node, String query) throws ParserConfigurationException, SAXException, IOException, XPathExpressionException
+	{
+	    return (String)executeXPathQuery(node,query,XPathConstants.STRING);
+	}
 
+	public static Object executeXPathQuery(NamespaceContext namespaceContext, Node node, String query, QName returnType) throws ParserConfigurationException, SAXException, IOException, XPathExpressionException
+	{
+	    XPath xpath = XPathFactory.newInstance().newXPath();
+	    xpath.setNamespaceContext(namespaceContext);
+	    XPathExpression expr = xpath.compile(query);
+	
 //		Object result = expr.evaluate(document,XPathConstants.NODESET);
 //		NodeList nodes = (NodeList) result;
 //		for (int i = 0; i < nodes.getLength(); i++)
 //			System.out.println(nodes.item(i).getNodeValue()); 
-
-    return (String)expr.evaluate(document,XPathConstants.STRING);
+	
+	    return expr.evaluate(node,returnType);
 	}
 
 }

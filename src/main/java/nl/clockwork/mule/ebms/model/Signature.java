@@ -15,17 +15,26 @@
  ******************************************************************************/
 package nl.clockwork.mule.ebms.model;
 
+import java.security.cert.X509Certificate;
+
 import nl.clockwork.mule.ebms.model.xml.xmldsig.SignatureType;
 
 public class Signature
 {
+	private X509Certificate certificate;
 	private SignatureType signature;
 	private boolean isValid;
 
-	public Signature(SignatureType signature, boolean isValid)
+	public Signature(X509Certificate certificate, SignatureType signature, boolean isValid)
 	{
+		this.certificate = certificate;
 		this.signature = signature;
 		this.isValid = isValid;
+	}
+	
+	public X509Certificate getCertificate()
+	{
+		return certificate;
 	}
 	
 	public SignatureType getSignature()

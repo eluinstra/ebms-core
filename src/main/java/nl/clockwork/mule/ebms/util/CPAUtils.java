@@ -15,9 +15,14 @@
  ******************************************************************************/
 package nl.clockwork.mule.ebms.util;
 
+import java.io.ByteArrayInputStream;
+import java.security.cert.CertificateException;
+import java.security.cert.CertificateFactory;
+import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.xml.bind.JAXBElement;
 import javax.xml.datatype.Duration;
 
 import nl.clockwork.mule.ebms.model.cpp.cpa.ActionBindingType;
@@ -32,6 +37,7 @@ import nl.clockwork.mule.ebms.model.cpp.cpa.PartyId;
 import nl.clockwork.mule.ebms.model.cpp.cpa.PartyInfo;
 import nl.clockwork.mule.ebms.model.cpp.cpa.ServiceBinding;
 import nl.clockwork.mule.ebms.model.cpp.cpa.ServiceType;
+import nl.clockwork.mule.ebms.model.cpp.cpa.X509DataType;
 import nl.clockwork.mule.ebms.model.ebxml.MessageHeader;
 import nl.clockwork.mule.ebms.model.ebxml.Service;
 
@@ -161,8 +167,32 @@ public class CPAUtils
 		if (serviceBinding != null)
 			for (CanSend canSend : serviceBinding.getCanSend())
 				if (action.equals(canSend.getThisPartyActionBinding().getAction()))
-					result.add((DeliveryChannel)canSend.getThisPartyActionBinding().getChannelId().get(0).getValue());
+					for (JAXBElement<Object> o : canSend.getThisPartyActionBinding().getChannelId())
+						result.add((DeliveryChannel)o.getValue());
 		return result;
+	}
+	
+	public static Certificate getCertificate(DeliveryChannel deliveryChannel)
+	{
+		return (Certificate)((DocExchange)deliveryChannel.getDocExchangeId()).getEbXMLSenderBinding().getSenderNonRepudiation().getSigningCertificateRef().getCertId();
+	}
+	
+	public static X509Certificate getX509Certificate(Certificate certificate) throws CertificateException
+	{
+		for (Object o : certificate.getKeyInfo().getContent())
+		{
+			if (o instanceof JAXBElement<?> && ((JAXBElement<Object>)o).getValue() instanceof X509DataType)
+			{
+				for (Object p : ((X509DataType)((JAXBElement<Object>)o).getValue()).getX509IssuerSerialOrX509SKIOrX509SubjectName())
+				{
+					if (p instanceof JAXBElement<?> && ((JAXBElement<Object>)p).getValue() instanceof byte[])
+					{
+						return (X509Certificate)CertificateFactory.getInstance("X.509").generateCertificate(new ByteArrayInputStream((byte[])((JAXBElement<Object>)p).getValue())); 
+					}
+				}
+			}
+		}
+		return null;
 	}
 
 /*
@@ -302,7 +332,7 @@ public class CPAUtils
 			return null;
 		}
 	}
-
+/*
 	public static Certificate getCertificateById(CollaborationProtocolAgreement cpa, MessageHeader messageHeader, String id)
 	{
 		List<Certificate> certificates = getCertificates(cpa, messageHeader);
@@ -324,5 +354,5 @@ public class CPAUtils
 			return new ArrayList<Certificate>();
 		}
 	}
-
+*/
 }
