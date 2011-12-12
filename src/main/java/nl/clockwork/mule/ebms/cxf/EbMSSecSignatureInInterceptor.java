@@ -17,7 +17,6 @@ package nl.clockwork.mule.ebms.cxf;
 
 import java.security.KeyStore;
 import java.security.KeyStoreException;
-import java.security.PublicKey;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateExpiredException;
 import java.security.cert.CertificateNotYetValidException;
@@ -31,11 +30,7 @@ import java.util.List;
 import javax.xml.XMLConstants;
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.stream.XMLStreamReader;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathExpression;
-import javax.xml.xpath.XPathFactory;
 
 import nl.clockwork.common.util.XMLMessageBuilder;
 import nl.clockwork.common.util.XMLUtils;
@@ -44,7 +39,6 @@ import nl.clockwork.mule.ebms.model.EbMSDataSource;
 import nl.clockwork.mule.ebms.model.Signature;
 import nl.clockwork.mule.ebms.model.cpp.cpa.CollaborationProtocolAgreement;
 import nl.clockwork.mule.ebms.model.cpp.cpa.DeliveryChannel;
-import nl.clockwork.mule.ebms.model.cpp.cpa.DocExchange;
 import nl.clockwork.mule.ebms.model.cpp.cpa.PartyInfo;
 import nl.clockwork.mule.ebms.model.ebxml.MessageHeader;
 import nl.clockwork.mule.ebms.model.xml.xmldsig.SignatureType;
@@ -183,7 +177,22 @@ public class EbMSSecSignatureInInterceptor extends AbstractSoapInterceptor
 			return null;
 		}
 	}
-
+/*
+	private X509Certificate getCertificateOld(Document document)
+	{
+		try
+		{
+			NodeList signatureNodeList = document.getElementsByTagNameNS(org.apache.xml.security.utils.Constants.SignatureSpecNS,org.apache.xml.security.utils.Constants._TAG_SIGNATURE);
+			XMLSignature signature = new XMLSignature((Element)signatureNodeList.item(0),org.apache.xml.security.utils.Constants.SignatureSpecNS);
+			return signature.getKeyInfo().getX509Certificate();
+		}
+		catch (Exception e)
+		{
+			logger.info("",e);
+			return null;
+		}
+	}
+*/
 	private boolean validateCertificate(KeyStore keyStore, X509Certificate certificate, Date date) throws KeyStoreException
 	{
 		try
@@ -213,7 +222,33 @@ public class EbMSSecSignatureInInterceptor extends AbstractSoapInterceptor
 		}
 		return false;
 	}
-
+/*
+	private boolean verifyCertificate(XMLSignature signature, X509Certificate certificate)
+	{
+		boolean result = false;
+		try
+		{
+			X509Certificate c = signature.getKeyInfo().getX509Certificate();
+			result |= certificate.equals(c);
+		}
+		catch (KeyResolverException e)
+		{
+			logger.info("",e);
+		}
+		try
+		{
+			PublicKey publicKey = signature.getKeyInfo().getPublicKey();
+			result |= certificate.getPublicKey().getAlgorithm().equals(publicKey.getAlgorithm())
+				&& certificate.getPublicKey().getFormat().equals(publicKey.getFormat())
+				&& certificate.getPublicKey().getEncoded().equals(publicKey.getEncoded());
+		}
+		catch (KeyResolverException e)
+		{
+			logger.info("",e);
+		}
+		return result;
+	}
+*/
 	public void setEbMSDAO(EbMSDAO ebMSDAO)
 	{
 		this.ebMSDAO = ebMSDAO;

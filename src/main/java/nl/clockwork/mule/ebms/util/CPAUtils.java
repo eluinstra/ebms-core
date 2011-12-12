@@ -172,9 +172,19 @@ public class CPAUtils
 		return result;
 	}
 	
+	public static DocExchange getDocExchange(DeliveryChannel deliveryChannel)
+	{
+		return (DocExchange)deliveryChannel.getDocExchangeId();
+	}
+	
 	public static Certificate getCertificate(DeliveryChannel deliveryChannel)
 	{
-		return (Certificate)((DocExchange)deliveryChannel.getDocExchangeId()).getEbXMLSenderBinding().getSenderNonRepudiation().getSigningCertificateRef().getCertId();
+		return (Certificate)getDocExchange(deliveryChannel).getEbXMLSenderBinding().getSenderNonRepudiation().getSigningCertificateRef().getCertId();
+	}
+	
+	public static boolean isSigned(DeliveryChannel deliveryChannel)
+	{
+		return org.apache.xml.security.utils.Constants.SignatureSpecNS.equals(getDocExchange(deliveryChannel).getEbXMLSenderBinding().getSenderNonRepudiation().getNonRepudiationProtocol().getValue());
 	}
 	
 	public static X509Certificate getX509Certificate(Certificate certificate) throws CertificateException
