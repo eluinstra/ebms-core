@@ -24,8 +24,8 @@ CREATE TABLE ebms_message
 	status						INT							NOT NULL,
 	status_date				TIMESTAMP				NOT NULL,
 	nr_retries				INT							DEFAULT 0 NOT NULL,
-	processing_status	INT							NULL,
-	next_retry_time		TIMESTAMP				NULL
+	next_retry_time		TIMESTAMP				NULL,
+	processing_status	INT							NULL
 );
 
 CREATE TABLE ebms_attachment
