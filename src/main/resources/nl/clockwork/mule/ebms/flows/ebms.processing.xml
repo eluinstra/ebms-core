@@ -17,9 +17,7 @@
 <mule xmlns="http://www.mulesource.org/schema/mule/core/2.2"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xmlns:spring="http://www.springframework.org/schema/beans"
-	xmlns:file="http://www.mulesource.org/schema/mule/file/2.2" 
 	xmlns:http="http://www.mulesource.org/schema/mule/http/2.2" 
-	xmlns:https="http://www.mulesource.org/schema/mule/https/2.2" 
 	xmlns:cxf="http://www.mulesource.org/schema/mule/cxf/2.2"
 	xmlns:vm="http://www.mulesource.org/schema/mule/vm/2.2"
 	xmlns:jdbc="http://www.mulesource.org/schema/mule/jdbc/2.2"
@@ -27,9 +25,7 @@
 	xsi:schemaLocation="
 		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
 		http://www.mulesource.org/schema/mule/core/2.2 http://www.mulesource.org/schema/mule/core/2.2/mule.xsd
-		http://www.mulesource.org/schema/mule/file/2.2 http://www.mulesource.org/schema/mule/file/2.2/mule-file.xsd
 		http://www.mulesource.org/schema/mule/http/2.2 http://www.mulesource.org/schema/mule/http/2.2/mule-http.xsd
-		http://www.mulesource.org/schema/mule/https/2.2 http://www.mulesource.org/schema/mule/https/2.2/mule-https.xsd
 		http://www.mulesource.org/schema/mule/cxf/2.2 http://www.mulesource.org/schema/mule/cxf/2.2/mule-cxf.xsd
 		http://www.mulesource.org/schema/mule/vm/2.2 http://www.mulesource.org/schema/mule/vm/2.2/mule-vm.xsd
 		http://www.mulesource.org/schema/mule/jdbc/2.2 http://www.mulesource.org/schema/mule/jdbc/2.2/mule-jdbc.xsd
@@ -39,45 +35,46 @@
 
 	<model>
 
-		<service name="aanleverbericht.stub.file.receive">
+		<service name="ebms.message.process">
 			<inbound>
-				<file:inbound-endpoint connector-ref="connector.file"	path="${dir.base}/aanleverService/request" moveToDirectory="${dir.base}/aanleverService/request/processed" pollingFrequency="3000">
-					<file:filename-wildcard-filter pattern="*.xml" caseSensitive="false"/>
-					<object-to-string-transformer/>
-				</file:inbound-endpoint>				
+				<jdbc:inbound-endpoint connector-ref="connector.jdbc.ebms" queryKey="selectEbMSMessageForProcessing" pollingFrequency="${ebMSMessage.process.pollingFrequency}">
+					<custom-transformer class="nl.clockwork.mule.common.enricher.MapPropertyEnricher">
+						<spring:property name="keys">
+							<spring:map>
+								<spring:entry key="id" value-ref="EBMS_MESSAGE_ID" />
+							</spring:map>
+						</spring:property>
+					</custom-transformer>
+				</jdbc:inbound-endpoint>
 			</inbound>
 			<outbound>
-				<filtering-router>
-					<vm:outbound-endpoint path="aanleverbericht.stub.message.transform.in" />
-					<custom-filter class="nl.clockwork.mule.common.filter.XSDValidationFilter">
-						<spring:property name="xsdFile" value="/nl/clockwork/mule/ebms/stub/ebf/xsd/Aanleveren_ebMS_2.0_v1.1.xsd" />
-					</custom-filter>
-				</filtering-router>
-				<forwarding-catch-all-strategy>
-				</forwarding-catch-all-strategy>
+				<pass-through-router>
+					<vm:outbound-endpoint path="ebms.delegate.in" />
+				</pass-through-router>
 			</outbound>
 		</service>
 
-		<service name="aanleverbericht.stub.message.transform">
+		<service name="ebms.delegate">
 			<inbound>
-				<vm:inbound-endpoint path="aanleverbericht.stub.message.transform.in" synchronous="false">
-					<custom-transformer class="nl.clockwork.mule.ebms.service.stub.enricher.XMLToDataSourceEnricher" />
-					<custom-transformer class="nl.clockwork.mule.ebms.service.stub.transformer.DataSourceToEbMSMessageContent">
-						<spring:property name="cpaId" value="${aanleverService.cpaId}"/>
-						<spring:property name="service" value="${aanleverService.service}"/>
-						<spring:property name="action" value="${aanleverService.request.action}"/>
+				<vm:inbound-endpoint path="ebms.delegate.in">
+					<custom-transformer class="nl.clockwork.mule.ebms.transformer.EbMSMessageIdToEbMSMessageContent">
+						<spring:property name="ebMSDAO" ref="ebMSDAO" />
+						<spring:property name="properties" value="${ebms.message.header.properties}"/>
 					</custom-transformer>
 				</vm:inbound-endpoint>
 			</inbound>
 			<outbound>
-				<pass-through-router>
-					<vm:outbound-endpoint path="ebms.message.send.in">
-						<property key="EBMS.EBMS_CHANNEL_ID" value="Aanleveren"/>
-					</vm:outbound-endpoint>
-				</pass-through-router>
+				<custom-outbound-router class="nl.clockwork.mule.common.router.ChainingMulticastingRouter">
+					<vm:outbound-endpoint path="${ebms.delegate.out}" synchronous="true"/>
+					<jdbc:outbound-endpoint connector-ref="connector.jdbc.ebms" queryKey="updateEbMSProcessingStatus">
+						<custom-transformer class="nl.clockwork.mule.ebms.transformer.EbMSMessageIdToUpdateEbMSProcessingStatusMap">
+							<spring:property name="ebMSProcessingStatus" value="1" />
+						</custom-transformer>
+					</jdbc:outbound-endpoint>
+				</custom-outbound-router>
 			</outbound>
 		</service>
-		
+
 	</model>
 
 </mule>

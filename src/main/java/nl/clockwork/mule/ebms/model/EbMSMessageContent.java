@@ -27,9 +27,9 @@ public class EbMSMessageContent
 	private Map<String,Object> properties = new HashMap<String,Object>();
 	private List<DataSource> attachments;
 
-	public EbMSMessageContent(List<DataSource> attachments)
+	public EbMSMessageContent(EbMSMessageContext context, List<DataSource> attachments)
 	{
-		this(null,null,attachments);
+		this(context,null,attachments);
 	}
 
 	public EbMSMessageContent(EbMSMessageContext context, Map<String,Object> properties, List<DataSource> attachments)

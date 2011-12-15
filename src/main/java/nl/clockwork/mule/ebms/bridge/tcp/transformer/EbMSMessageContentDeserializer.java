@@ -49,7 +49,7 @@ public class EbMSMessageContentDeserializer extends AbstractMessageAwareTransfor
 			attachments.add(ds);
 		}
 		
-		message.setPayload(new nl.clockwork.mule.ebms.model.EbMSMessageContent(content.getContext() == null ? null : new EbMSMessageContext(content.getContext().getConversationId(),content.getContext().getMessageId()),content.getProperties(),attachments));
+		message.setPayload(new nl.clockwork.mule.ebms.model.EbMSMessageContent(content.getContext() == null ? null : new EbMSMessageContext(content.getContext().getCpaId(),content.getContext().getFrom(),content.getContext().getTo(),content.getContext().getService(),content.getContext().getAction(),content.getContext().getConversationId(),content.getContext().getMessageId(),content.getContext().getRefToMessageId()),content.getProperties(),attachments));
 		return message;
 	}
 

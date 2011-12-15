@@ -39,10 +39,14 @@ public class UpdateEbMSMessageOut extends Callable
 		{
 			Object[] msg = (Object[])message.getPayload();
 
+			Date nextRetryTime = null;
 			CollaborationProtocolAgreement cpa = ebMSDAO.getCPA(((MessageHeader)msg[0]).getCPAId());
 			Duration d = CPAUtils.getDuration(cpa,((MessageHeader)msg[0]));
-			Date nextRetryTime = new Date();
-			d.addTo(nextRetryTime);
+			if (d != null)
+			{
+				nextRetryTime = new Date();
+				d.addTo(nextRetryTime);
+			}
 
 			ebMSDAO.updateMessage(message.getLongProperty(Constants.EBMS_MESSAGE_ID,0),nextRetryTime);
 		}

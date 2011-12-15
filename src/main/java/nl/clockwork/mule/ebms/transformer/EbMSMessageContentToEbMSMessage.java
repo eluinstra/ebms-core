@@ -15,12 +15,8 @@
  ******************************************************************************/
 package nl.clockwork.mule.ebms.transformer;
 
-import java.util.Date;
-
-import nl.clockwork.mule.ebms.Constants;
-import nl.clockwork.mule.ebms.channel.Channel;
-import nl.clockwork.mule.ebms.channel.ChannelManager;
 import nl.clockwork.mule.ebms.dao.EbMSDAO;
+import nl.clockwork.mule.ebms.model.EbMSMessage;
 import nl.clockwork.mule.ebms.model.EbMSMessageContent;
 import nl.clockwork.mule.ebms.model.cpp.cpa.CollaborationProtocolAgreement;
 import nl.clockwork.mule.ebms.model.ebxml.AckRequested;
@@ -38,7 +34,6 @@ import org.mule.transformer.AbstractMessageAwareTransformer;
 public class EbMSMessageContentToEbMSMessage extends AbstractMessageAwareTransformer
 {
 	protected transient Log logger = LogFactory.getLog(getClass());
-	private ChannelManager channelManager;
 	private EbMSDAO ebMSDAO;
 	private String hostname;
 
@@ -53,23 +48,23 @@ public class EbMSMessageContentToEbMSMessage extends AbstractMessageAwareTransfo
 		try
 		{
 			EbMSMessageContent content = (EbMSMessageContent)message.getPayload();
-			Channel channel = channelManager.getChannel(content.getContext(),(String)message.getProperty(Constants.EBMS_CHANNEL_ID));
-			CollaborationProtocolAgreement cpa = ebMSDAO.getCPA(channel.getCpaId());
+			CollaborationProtocolAgreement cpa = ebMSDAO.getCPA(content.getContext().getCpaId());
 			
-			MessageHeader messageHeader = EbMSMessageUtils.createMessageHeader(cpa,channel.getActionId(),content.getContext() != null ? content.getContext().getConversationId() : new Date().getTime() + message.getCorrelationId(),new Date().getTime() + message.getCorrelationId() + "@" + hostname);
+			MessageHeader messageHeader = EbMSMessageUtils.createMessageHeader(cpa,content.getContext(),hostname);
 
 			AckRequested ackRequested = EbMSMessageUtils.createAckRequested();
 			
 			Manifest manifest = EbMSMessageUtils.createManifest();
-
-			Reference reference = new Reference();
-			reference.setHref("cid:1");
-			reference.setType("simple");
-			//reference.setRole("XLinkRole");
-
-			manifest.getReference().add(reference);
+			for (int i = 0; i < content.getAttachments().size(); i++)
+			{
+				Reference reference = new Reference();
+				reference.setHref("cid:" + (i + 1));
+				reference.setType("simple");
+				//reference.setRole("XLinkRole");
+				manifest.getReference().add(reference);
+			}
 			
-			message.setPayload(new Object[]{messageHeader,ackRequested,manifest});
+			message.setPayload(new EbMSMessage(messageHeader,ackRequested,manifest,content.getAttachments()));
 
 			return message;
 		}
@@ -77,11 +72,6 @@ public class EbMSMessageContentToEbMSMessage extends AbstractMessageAwareTransfo
 		{
 			throw new TransformerException(this,e);
 		}
-	}
-
-	public void setChannelManager(ChannelManager channelManager)
-	{
-		this.channelManager = channelManager;
 	}
 
 	public void setEbMSDAO(EbMSDAO ebMSDAO)

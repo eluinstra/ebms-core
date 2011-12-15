@@ -15,12 +15,20 @@
  ******************************************************************************/
 package nl.clockwork.mule.ebms.transformer;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
+import javax.activation.DataSource;
+
+import nl.clockwork.common.cxf.AttachmentManager;
 import nl.clockwork.mule.ebms.Constants;
 import nl.clockwork.mule.ebms.dao.EbMSDAO;
 import nl.clockwork.mule.ebms.model.EbMSMessage;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.cxf.message.Attachment;
 import org.mule.api.MuleMessage;
 import org.mule.api.transformer.TransformerException;
 import org.mule.transformer.AbstractMessageAwareTransformer;
@@ -42,6 +50,13 @@ public class EbMSMessageIdToEbMSMessage extends AbstractMessageAwareTransformer
 		{
 			EbMSMessage msg = ebMSDAO.getEbMSMessage(message.getLongProperty(Constants.EBMS_MESSAGE_ID,0));
 			message.setPayload(new Object[]{msg.getMessageHeader(),msg.getAckRequested(),msg.getManifest()});
+
+			List<DataSource> dataSources = ebMSDAO.getAttachments(message.getLongProperty(Constants.EBMS_MESSAGE_ID,0));
+			Collection<Attachment> attachments = new ArrayList<Attachment>();
+			for (int i = 0; i < dataSources.size(); i++)
+				attachments.add(new nl.clockwork.common.cxf.Attachment("" + (i + 1),dataSources.get(i)));
+			AttachmentManager.set(attachments);
+
 			return message;
 		}
 		catch (Exception e)

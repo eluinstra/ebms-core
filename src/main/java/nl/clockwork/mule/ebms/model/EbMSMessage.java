@@ -31,6 +31,11 @@ public class EbMSMessage implements EbMSBaseMessage
 	private Manifest manifest;
 	private List<DataSource> attachments;
 
+	public EbMSMessage(MessageHeader messageHeader, AckRequested ackRequested, Manifest manifest, List<DataSource> attachments)
+	{
+		this(null,messageHeader,ackRequested,manifest,attachments);
+	}
+	
 	public EbMSMessage(byte[] message, MessageHeader messageHeader, AckRequested ackRequested, Manifest manifest, List<DataSource> attachments)
 	{
 		this.message = message;

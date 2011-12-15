@@ -30,7 +30,7 @@
          <tns:ProcessSpecification tns:name="aanleveren" tns:version="1.0" xlink:href="http://www.overheidsservicebus.nl/osr/Aanleveren" tns:uuid="urn:overheidsservicebus.nl:osr:Aanleveren:OsbAanleveren10$10"/>
          <tns:Role tns:name="DIGIPOORT" xlink:href="http://www.overheidsservicebus.nl/osr/"/>
          <tns:ServiceBinding>
-            <tns:Service tns:type="urn:osb:services">aanleverservice</tns:Service>
+            <tns:Service tns:type="urn:osb:services">osb:aanleveren:1.1$1.0</tns:Service>
             <tns:CanSend>
                <tns:ThisPartyActionBinding tns:id="DIGIPOORT_S_BevestigAanleveren" tns:action="bevestigAanleveren" tns:packageId="defaultPackage">
                   <tns:BusinessTransactionCharacteristics tns:isAuthenticated="transient-and-persistent" tns:timeToPerform="P2D" tns:isAuthorizationRequired="true" tns:isConfidential="transient" tns:isIntelligibleCheckRequired="false" tns:isNonRepudiationReceiptRequired="true" tns:isNonRepudiationRequired="true" tns:isTamperProof="transient-and-persistent"/>
@@ -297,7 +297,7 @@ OcDNBvpKX2SpoHffgXmdrExQshpIDzzofex0y/Kg4mulDQUPwVuIZtbnlQ==
          <tns:ProcessSpecification tns:name="aanleveren" tns:version="1.0" xlink:href="http://www.overheidsservicebus.nl/osr/Aanleveren" tns:uuid="urn:overheidsservicebus.nl:osr:Aanleveren:OsbAanleveren10$10"/>
          <tns:Role tns:name="OVERHEID" xlink:href="http://www.overheidsservicebus.nl/osr/"/>
          <tns:ServiceBinding>
-            <tns:Service tns:type="urn:osb:services">aanleverservice</tns:Service>
+            <tns:Service tns:type="urn:osb:services">osb:aanleveren:1.1$1.0</tns:Service>
             <tns:CanSend>
                <tns:ThisPartyActionBinding tns:id="OVERHEID_S_Aanleveren" tns:action="aanleveren" tns:packageId="defaultPackage">
                   <tns:BusinessTransactionCharacteristics tns:isAuthenticated="transient-and-persistent" tns:timeToPerform="P2D" tns:isAuthorizationRequired="true" tns:isConfidential="transient" tns:isIntelligibleCheckRequired="false" tns:isNonRepudiationReceiptRequired="true" tns:isNonRepudiationRequired="true" tns:isTamperProof="transient-and-persistent"/>

@@ -48,7 +48,7 @@ public class EbMSMessageContentSerializer extends AbstractMessageAwareTransforme
 			for (DataSource dataSource : content.getAttachments())
 				attachments.add(new EbMSDataSource(dataSource.getName(),IOUtils.toByteArray(dataSource.getInputStream()),dataSource.getContentType()));
 
-			message.setPayload(new nl.clockwork.mule.ebms.bridge.tcp.model.EbMSMessageContent(content.getContext() == null ? null : new EbMSMessageContext(content.getContext().getConversationId(),content.getContext().getMessageId()),content.getProperties(),attachments));
+			message.setPayload(new nl.clockwork.mule.ebms.bridge.tcp.model.EbMSMessageContent(content.getContext() == null ? null : new EbMSMessageContext(content.getContext().getCpaId(),content.getContext().getFrom(),content.getContext().getTo(),content.getContext().getService(),content.getContext().getAction(),content.getContext().getConversationId(),content.getContext().getMessageId(),content.getContext().getRefToMessageId()),content.getProperties(),attachments));
 			return message;
 		}
 		catch (IOException e)

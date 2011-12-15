@@ -20,6 +20,7 @@ import java.util.List;
 import javax.activation.DataSource;
 
 import nl.clockwork.mule.ebms.model.EbMSMessageContent;
+import nl.clockwork.mule.ebms.model.EbMSMessageContext;
 
 import org.mule.api.MuleMessage;
 import org.mule.api.transformer.TransformerException;
@@ -27,6 +28,10 @@ import org.mule.transformer.AbstractMessageAwareTransformer;
 
 public class DataSourceToEbMSMessageContent extends AbstractMessageAwareTransformer
 {
+	private String cpaId;
+	private String service;
+	private String action;
+
 	public DataSourceToEbMSMessageContent()
 	{
 		registerSourceType(List.class);
@@ -37,14 +42,27 @@ public class DataSourceToEbMSMessageContent extends AbstractMessageAwareTransfor
 	{
 		try
 		{
-			List<DataSource> ds = (List<DataSource>)message.getPayload();
-			EbMSMessageContent result = new EbMSMessageContent(ds);
-			return result;
+			return new EbMSMessageContent(new EbMSMessageContext(cpaId,service,action),(List<DataSource>)message.getPayload());
 		}
 		catch (Exception e)
 		{
 			throw new TransformerException(this,e);
 		}
+	}
+	
+	public void setCpaId(String cpaId)
+	{
+		this.cpaId = cpaId;
+	}
+	
+	public void setService(String service)
+	{
+		this.service = service;
+	}
+	
+	public void setAction(String action)
+	{
+		this.action = action;
 	}
 
 }

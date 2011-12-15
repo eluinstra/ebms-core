@@ -13,13 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  ******************************************************************************/
-package nl.clockwork.mule.ebms.channel;
+package nl.clockwork.mule.ebms.model;
 
-import nl.clockwork.mule.ebms.model.EbMSMessageContext;
-import nl.clockwork.mule.ebms.model.ebxml.MessageHeader;
 
-public interface ChannelManager
+public class EbMSMessageContentResponse
 {
-	Channel getChannel(MessageHeader messageHeader) throws Exception;
-	Channel getChannel(EbMSMessageContext messageContext, String channelId) throws Exception;
+	private String messageId;
+
+	public EbMSMessageContentResponse()
+	{
+	}
+
+	public EbMSMessageContentResponse(String messageId)
+	{
+		this.messageId = messageId;
+	}
+
+	public String getMessageId()
+	{
+		return messageId;
+	}
+	
 }

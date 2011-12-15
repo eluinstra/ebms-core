@@ -20,11 +20,9 @@ import java.util.List;
 
 import javax.activation.DataSource;
 
-
 import nl.clockwork.common.dao.DAOException;
 import nl.clockwork.mule.ebms.Constants.EbMSMessageStatus;
 import nl.clockwork.mule.ebms.Constants.EbMSMessageType;
-import nl.clockwork.mule.ebms.channel.Channel;
 import nl.clockwork.mule.ebms.model.Acknowledgment;
 import nl.clockwork.mule.ebms.model.EbMSMessage;
 import nl.clockwork.mule.ebms.model.cpp.cpa.CollaborationProtocolAgreement;
@@ -50,7 +48,4 @@ public interface EbMSDAO
 	long insertMessage(Date timeStamp, String cpaId, String conversationId, String messageId, EbMSMessageType messageType, byte[] messageOriginal, MessageHeader messageHeader, AckRequested ackRequested, Manifest manifest, EbMSMessageStatus status, List<DataSource> attachments) throws DAOException;
 	long insertMessage(Date timeStamp, String cpaId, String conversationId, String messageId, EbMSMessageType messageType, byte[] messageOriginal, MessageHeader messageHeader, AckRequested ackRequested, Manifest manifest, EbMSMessageStatus status, List<DataSource> attachments, Date nextRetryTime) throws DAOException;
 	void updateMessage(long id, Date nextRetryTime) throws DAOException;
-	
-	Channel getChannel(String channelId) throws DAOException;
-	Channel getChannel(String cpaId, String actionId) throws DAOException;
 }

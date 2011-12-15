@@ -15,26 +15,14 @@
  ******************************************************************************/
 package nl.clockwork.mule.ebms.component;
 
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
-import javax.activation.DataSource;
-import javax.xml.datatype.Duration;
-
-import nl.clockwork.common.cxf.AttachmentManager;
 import nl.clockwork.mule.common.component.Callable;
-import nl.clockwork.mule.ebms.Constants;
 import nl.clockwork.mule.ebms.Constants.EbMSMessageStatus;
 import nl.clockwork.mule.ebms.Constants.EbMSMessageType;
 import nl.clockwork.mule.ebms.dao.EbMSDAO;
-import nl.clockwork.mule.ebms.model.cpp.cpa.CollaborationProtocolAgreement;
-import nl.clockwork.mule.ebms.model.ebxml.AckRequested;
-import nl.clockwork.mule.ebms.model.ebxml.Manifest;
-import nl.clockwork.mule.ebms.model.ebxml.MessageHeader;
-import nl.clockwork.mule.ebms.util.CPAUtils;
+import nl.clockwork.mule.ebms.model.EbMSMessage;
 
-import org.apache.cxf.message.Attachment;
 import org.mule.api.MuleMessage;
 
 public class InsertEbMSMessageOut extends Callable
@@ -44,25 +32,21 @@ public class InsertEbMSMessageOut extends Callable
 	@Override
 	public Object onCall(MuleMessage message) throws Exception
 	{
-		if (message.getPayload() instanceof Object[])
+		if (message.getPayload() instanceof EbMSMessage)
 		{
-			Object[] msg = (Object[])message.getPayload();
-			List<DataSource> attachments = new ArrayList<DataSource>();
-			for (Attachment a : AttachmentManager.get())
-				attachments.add(a.getDataHandler().getDataSource());
+			EbMSMessage msg = (EbMSMessage)message.getPayload();
+
 			Date date = new Date();
-
 			Date nextRetryTime = null;
-			CollaborationProtocolAgreement cpa = ebMSDAO.getCPA(((MessageHeader)msg[0]).getCPAId());
-			Duration d = CPAUtils.getDuration(cpa,((MessageHeader)msg[0]));
-			if (d != null)
-			{
-				nextRetryTime = new Date();
-				d.addTo(nextRetryTime);
-			}
+//			CollaborationProtocolAgreement cpa = ebMSDAO.getCPA(msg.getMessageHeader().getCPAId());
+//			Duration d = CPAUtils.getDuration(cpa,msg.getMessageHeader());
+//			if (d != null)
+//			{
+//				nextRetryTime = date;
+//				d.addTo(nextRetryTime);
+//			}
 
-			long id = ebMSDAO.insertMessage(date,((MessageHeader)msg[0]).getCPAId(),((MessageHeader)msg[0]).getConversationId(),((MessageHeader)msg[0]).getMessageData().getMessageId(),EbMSMessageType.OUT,new byte[]{},(MessageHeader)msg[0],(AckRequested)msg[1],(Manifest)msg[2],EbMSMessageStatus.STORED,attachments,nextRetryTime);
-			message.setProperty(Constants.EBMS_MESSAGE_ID,id);
+			ebMSDAO.insertMessage(date,msg.getMessageHeader().getCPAId(),msg.getMessageHeader().getConversationId(),msg.getMessageHeader().getMessageData().getMessageId(),EbMSMessageType.OUT,new byte[]{},msg.getMessageHeader(),msg.getAckRequested(),msg.getManifest(),EbMSMessageStatus.STORED,msg.getAttachments(),nextRetryTime);
 		}
 		return message;
 	}

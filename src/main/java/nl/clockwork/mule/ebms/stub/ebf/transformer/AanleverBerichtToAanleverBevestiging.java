@@ -25,6 +25,7 @@ import javax.xml.datatype.DatatypeFactory;
 
 import nl.clockwork.common.util.XMLMessageBuilder;
 import nl.clockwork.mule.ebms.model.EbMSMessageContent;
+import nl.clockwork.mule.ebms.model.EbMSMessageContext;
 import nl.clockwork.mule.ebms.stub.ebf.model.aanleveren.bericht.AanleverBericht;
 import nl.clockwork.mule.ebms.stub.ebf.model.aanleveren.bevestiging.BevestigAanleverBericht;
 import nl.clockwork.mule.ebms.stub.ebf.model.aanleveren.bevestiging.FoutType;
@@ -37,6 +38,10 @@ import org.mule.transformer.AbstractMessageAwareTransformer;
 
 public class AanleverBerichtToAanleverBevestiging extends AbstractMessageAwareTransformer
 {
+	private String cpaId;
+	private String service;
+	private String action;
+
 	public AanleverBerichtToAanleverBevestiging()
 	{
 		registerSourceType(EbMSMessageContent.class);
@@ -87,9 +92,7 @@ public class AanleverBerichtToAanleverBevestiging extends AbstractMessageAwareTr
 			List<DataSource> attachments = new ArrayList<DataSource>();
 			attachments.add(ds);
 
-			content.getAttachments().clear();
-			content.getAttachments().addAll(attachments);
-			return content;
+			return new EbMSMessageContent(new EbMSMessageContext(cpaId,service,action,content.getContext().getConversationId()),attachments);
 		}
 		catch (Exception e)
 		{
@@ -97,4 +100,18 @@ public class AanleverBerichtToAanleverBevestiging extends AbstractMessageAwareTr
 		}
 	}
 
+	public void setCpaId(String cpaId)
+	{
+		this.cpaId = cpaId;
+	}
+	
+	public void setService(String service)
+	{
+		this.service = service;
+	}
+	
+	public void setAction(String action)
+	{
+		this.action = action;
+	}
 }

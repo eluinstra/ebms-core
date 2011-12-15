@@ -106,7 +106,11 @@
 		<service name="aanleverbericht.aanleverbevestiging">
 			<inbound>
 				<vm:inbound-endpoint path="aanleverbericht.aanleverbevestiging.in">
-					<custom-transformer class="nl.clockwork.mule.ebms.stub.ebf.transformer.AanleverBerichtToAanleverBevestiging" />
+					<custom-transformer class="nl.clockwork.mule.ebms.stub.ebf.transformer.AanleverBerichtToAanleverBevestiging">
+						<spring:property name="cpaId" value="${aanleverService.cpaId}"/>
+						<spring:property name="service" value="${aanleverService.service}"/>
+						<spring:property name="action" value="${aanleverService.response.action}"/>
+					</custom-transformer>
 				</vm:inbound-endpoint>
 			</inbound>
 			<outbound>

@@ -16,11 +16,13 @@
 package nl.clockwork.mule.ebms.util;
 
 import java.util.GregorianCalendar;
+import java.util.UUID;
 
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 
 import nl.clockwork.mule.ebms.Constants;
+import nl.clockwork.mule.ebms.model.EbMSMessageContext;
 import nl.clockwork.mule.ebms.model.cpp.cpa.ActorType;
 import nl.clockwork.mule.ebms.model.cpp.cpa.CollaborationProtocolAgreement;
 import nl.clockwork.mule.ebms.model.cpp.cpa.PartyInfo;
@@ -39,10 +41,12 @@ import nl.clockwork.mule.ebms.model.ebxml.To;
 public class EbMSMessageUtils
 {
 
-	public static MessageHeader createMessageHeader(CollaborationProtocolAgreement cpa, String actionId, String conversationId, String messageId) throws DatatypeConfigurationException
+	public static MessageHeader createMessageHeader(CollaborationProtocolAgreement cpa, EbMSMessageContext context, String hostname) throws DatatypeConfigurationException
 	{
-		PartyInfo partyInfo = CPAUtils.getSendingPartyInfo(cpa,actionId);
-		PartyInfo otherPartyInfo = CPAUtils.getOtherReceivingPartyInfo(cpa,actionId);
+		String uuid = UUID.randomUUID().toString();//nameUUIDFromBytes(hostname.getBytes()).toString();
+		PartyInfo partyInfo = CPAUtils.getSendingPartyInfo(cpa,context.getFrom(),context.getService(),context.getAction());
+		PartyInfo otherPartyInfo = CPAUtils.getReceivingPartyInfo(cpa,context.getTo(),context.getService(),context.getAction());
+		//PartyInfo otherPartyInfo = CPAUtils.getOtherReceivingPartyInfo(cpa,context.getFrom(),context.getService(),context.getAction());
 
 		MessageHeader messageHeader = new MessageHeader();
 
@@ -50,7 +54,7 @@ public class EbMSMessageUtils
 		messageHeader.setMustUnderstand(true);
 
 		messageHeader.setCPAId(cpa.getCpaid());
-		messageHeader.setConversationId(conversationId);
+		messageHeader.setConversationId(context.getConversationId() != null ? context.getConversationId() : uuid);
 		
 		messageHeader.setFrom(new From());
 		PartyId from = new PartyId();
@@ -72,7 +76,7 @@ public class EbMSMessageUtils
 		messageHeader.setAction(partyInfo.getCollaborationRole().get(0).getServiceBinding().getCanSend().get(0).getThisPartyActionBinding().getAction());
 
 		messageHeader.setMessageData(new MessageData());
-		messageHeader.getMessageData().setMessageId(messageId);
+		messageHeader.getMessageData().setMessageId(uuid + "@" + hostname);
 		messageHeader.getMessageData().setTimestamp(DatatypeFactory.newInstance().newXMLGregorianCalendar(new GregorianCalendar()));
 
 		messageHeader.setDuplicateElimination("");

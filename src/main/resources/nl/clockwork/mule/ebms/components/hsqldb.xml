@@ -28,10 +28,16 @@
 	<bean id="insertEbMSMessage" class="java.lang.String">
 		<constructor-arg value="insert into ebms_message (time_stamp, cpa_id, conversation_id, sequence_nr, message_id, message_type, message_original, message_header, message_manifest, status, status_date) values (#[map-payload:time_stamp], #[map-payload:cpa_id], #[map-payload:conversation_id], #[map-payload:sequence_nr], #[map-payload:message_id], #[map-payload:message_type], #[map-payload:message_original], #[map-payload:message_header], #[map-payload:message_manifest], #[map-payload:status], NOW())" />
 	</bean>
-	<bean id="selectEbMSMessageForResend" class="java.lang.String">
+	<bean id="selectEbMSMessageForSending" class="java.lang.String">
+		<constructor-arg value="select id from ebms_message where ack_type is null and nr_retries=0 and next_retry_time is null" />
+	</bean>
+	<bean id="selectEbMSMessageForSending.ack" class="java.lang.String">
+		<constructor-arg value="update ebms_message set next_retry_time=null where id=#[map-payload:ID]" /> 
+	</bean>
+	<bean id="selectEbMSMessageForResending" class="java.lang.String">
 		<constructor-arg value="select id from ebms_message where ack_type is null and next_retry_time &lt; NOW()" />
 	</bean>
-	<bean id="selectEbMSMessageForResend.ack" class="java.lang.String">
+	<bean id="selectEbMSMessageForResending.ack" class="java.lang.String">
 		<constructor-arg value="update ebms_message set nr_retries=nr_retries+1, next_retry_time=null where id=#[map-payload:ID]" /> 
 	</bean>
 	<bean id="updateEbMSMessageAcknowledgment" class="java.lang.String">
@@ -48,6 +54,15 @@
 	</bean>
 	<bean id="updateEbMSNextRetryTime" class="java.lang.String">
 		<constructor-arg value="update ebms_message set next_retry_time=null where id=#[map-payload:id]" /> 
+	</bean>
+	<bean id="selectEbMSMessageForProcessing" class="java.lang.String">
+		<constructor-arg value="select id from ebms_message where processing_status=0" />
+	</bean>
+	<bean id="selectEbMSMessageForProcessing.ack" class="java.lang.String">
+		<constructor-arg value="update ebms_message set processing_status=1 where id=#[map-payload:ID]" /> 
+	</bean>
+	<bean id="updateEbMSProcessingStatus" class="java.lang.String">
+		<constructor-arg value="update ebms_message set processing_status=#[map-payload:processing_status] where id=#[map-payload:id]" /> 
 	</bean>
 
 	<bean id="databaseProvider" class="nl.clockwork.mule.ebms.HSQLDatabaseProvider" init-method="init" destroy-method="close">

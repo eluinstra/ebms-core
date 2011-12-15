@@ -33,12 +33,6 @@
 	"
 >
 
-	<vm:endpoint name="ebMSDeliveryException" path="ebms.messageError.send.in">
-		<message-properties-transformer>
-			<add-message-property key="EBMS.EBMS_ERROR" value-ref="EBMS_DELIVERY_ERROR"/>
-		</message-properties-transformer>
-	</vm:endpoint>
-
 	<model>
 
 		<service name="ebms.soap.receive">
@@ -233,51 +227,11 @@
 					</not-filter>
 				</filtering-router>
 				<forwarding-catch-all-strategy>
-					<!-- CLEANUP: REPLACED APPLICATION DELEGATE POINT -->
-					<!--vm:outbound-endpoint path="ebms.acknowledgment.send.in" /-->
-					<vm:outbound-endpoint path="ebms.delegate.1.in" />
+					<vm:outbound-endpoint path="ebms.acknowledgment.send.in" />
 				</forwarding-catch-all-strategy>
 			</outbound>
 		</service>
 		
-		<service name="ebms.delegate.1">
-			<inbound>
-				<vm:inbound-endpoint path="ebms.delegate.1.in"/>
-			</inbound>
-			<outbound>
-				<custom-outbound-router class="nl.clockwork.mule.common.router.AsyncChainingMulticastingRouter">
-					<vm:outbound-endpoint path="ebms.delegate.in" />
-					<vm:outbound-endpoint path="ebms.acknowledgment.send.in" />
-					<spring:property name="exceptionEndpointName" value="ebMSDeliveryException"/>
-				</custom-outbound-router>
-			</outbound>
-		</service>
-				
-		<service name="ebms.delegate">
-			<inbound>
-				<vm:inbound-endpoint path="ebms.delegate.in">
-					<!-- CLEANUP: REPLACED APPLICATION DELEGATE POINT -->
-					<!--custom-transformer class="nl.clockwork.mule.ebms.enricher.EbMSMessageIdToEbMSDelegateEndpointEnricher">
-						<spring:property name="channelManager" ref="channelManager" />
-						<spring:property name="ebMSDAO" ref="ebMSDAO" />
-					</custom-transformer>
-					<custom-transformer class="nl.clockwork.mule.ebms.transformer.EbMSMessageIdToEbMSMessageContent">
-						<spring:property name="ebMSDAO" ref="ebMSDAO" />
-						<spring:property name="properties" value="${ebms.message.header.properties}"/>
-					</custom-transformer-->
-					<custom-transformer class="nl.clockwork.mule.ebms.enricher.EbMSMessageToEbMSDelegateEndpointEnricher">
-						<spring:property name="channelManager" ref="channelManager" />
-					</custom-transformer>
-					<custom-transformer class="nl.clockwork.mule.ebms.transformer.EbMSMessageToEbMSMessageContent">
-						<spring:property name="properties" value="${ebms.message.header.properties}"/>
-					</custom-transformer>
-				</vm:inbound-endpoint>
-			</inbound>
-			<outbound>
-				<expression-recipient-list-router evaluator="header" expression="EBMS.EBMS_DELEGATE_PATH" synchronous="true"/>
-			</outbound>
-		</service>
-
 	</model>
 
 </mule>

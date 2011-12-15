@@ -64,14 +64,13 @@
 		<import resource="classpath:nl/clockwork/mule/ebms/flows/file.cpa.in.xml" />
 		<import resource="classpath:nl/clockwork/mule/ebms/flows/file.sql.in.xml" />
 
-		<import resource="classpath:nl/clockwork/mule/ebms/stub/ebf/components/channels.db.xml" />
-		<!--import resource="classpath:nl/clockwork/mule/ebms/stub/ebf/components/channels.xml.local.xml" /-->
-
 		<import resource="classpath:nl/clockwork/mule/ebms/flows/ebms.in.xml" />
 		<import resource="classpath:nl/clockwork/mule/ebms/flows/ebms.out.xml" />
+		<import resource="classpath:nl/clockwork/mule/ebms/flows/ebms.processing.xml" />
 
 		<import resource="components/constants.xml" />
 		<import resource="components/connector.xml" />
+		<import resource="flows/local.stub.routing.xml" />
 		<import resource="flows/afleverService.stub.processing.xml" />
 		<import resource="flows/aanleverService.stub.in.xml" />
 		<import resource="flows/aanleverService.stub.out.xml" />

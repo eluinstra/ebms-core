@@ -13,46 +13,48 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  ******************************************************************************/
-package nl.clockwork.mule.ebms.enricher;
+package nl.clockwork.mule.ebms.transformer;
+
+import java.util.HashMap;
 
 import nl.clockwork.mule.ebms.Constants;
-import nl.clockwork.mule.ebms.channel.Channel;
-import nl.clockwork.mule.ebms.channel.ChannelManager;
-import nl.clockwork.mule.ebms.model.EbMSMessage;
-import nl.clockwork.mule.ebms.model.ebxml.MessageHeader;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.mule.api.MuleMessage;
 import org.mule.api.transformer.TransformerException;
 import org.mule.transformer.AbstractMessageAwareTransformer;
 
-public class EbMSMessageToEbMSDelegateEndpointEnricher extends AbstractMessageAwareTransformer
+public class EbMSMessageIdToUpdateEbMSProcessingStatusMap extends AbstractMessageAwareTransformer
 {
-	private ChannelManager channelManager;
+  protected transient Log logger = LogFactory.getLog(getClass());
+	private int ebMSProcessingStatus;
 
-	public EbMSMessageToEbMSDelegateEndpointEnricher()
+  public EbMSMessageIdToUpdateEbMSProcessingStatusMap()
 	{
-		//registerSourceType(EbMSMessage.class);
+		//registerSourceType(Object.class);
 	}
-
+  
 	@Override
 	public Object transform(MuleMessage message, String outputEncoding) throws TransformerException
 	{
 		try
 		{
-			EbMSMessage msg = (EbMSMessage)message.getPayload();
-			MessageHeader messageHeader = msg.getMessageHeader();
-			Channel channel = channelManager.getChannel(messageHeader);
-			message.setProperty(Constants.EBMS_DELEGATE_PATH,channel.getEndpoint());
-			return message;
+			HashMap<String,Object> map = new HashMap<String,Object>();
+			map.put("id",message.getLongProperty(Constants.EBMS_MESSAGE_ID,0));
+			map.put("processing_status",ebMSProcessingStatus);
+			message.setPayload(map);
 		}
 		catch (Exception e)
 		{
+			logger.error("",e);
 			throw new TransformerException(this,e);
 		}
+		return message;
 	}
 
-	public void setChannelManager(ChannelManager channelManager)
+	public void setEbMSProcessingStatus(int ebMSProcessingStatus)
 	{
-		this.channelManager = channelManager;
+		this.ebMSProcessingStatus = ebMSProcessingStatus;
 	}
 }
