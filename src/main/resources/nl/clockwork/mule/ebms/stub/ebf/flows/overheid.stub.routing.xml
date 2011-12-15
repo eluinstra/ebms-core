@@ -39,9 +39,9 @@
 
 	<model>
 
-		<service name="local.stub">
+		<service name="overheid.stub">
 			<inbound>
-					<vm:inbound-endpoint path="local.stub.in"/>
+					<vm:inbound-endpoint path="overheid.stub.in"/>
 			</inbound>
 			<outbound>
 				<filtering-router>

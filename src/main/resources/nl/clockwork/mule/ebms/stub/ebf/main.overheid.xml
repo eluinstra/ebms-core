@@ -28,6 +28,10 @@
 	"
 >
 	
+	<custom-transaction-manager class="org.mule.module.spring.transaction.SpringTransactionFactory">
+		<spring:property name="manager" ref="ebMSTXManager" />
+	</custom-transaction-manager>
+ 	    
 	<management:jmx-default-config port="${jmx.port}"/>
 	<!--management:jmx-log4j /-->
 
@@ -36,25 +40,41 @@
 		<!--default-dispatcher-threading-profile maxThreadsActive="${threading.profile.maxThreadsActive}" maxThreadsIdle="${threading.profile.maxThreadsIdle}" threadTTL="${threading.profile.threadTTL}" poolExhaustedAction="WAIT" maxBufferSize="${threading.profile.maxBufferSize}" /-->
 		<!--default-receiver-threading-profile maxThreadsActive="${threading.profile.receiver.maxThreadsActive}" maxThreadsIdle="${threading.profile.receiver.maxThreadsIdle}" threadTTL="${threading.profile.receiver.threadTTL}" poolExhaustedAction="WAIT" maxBufferSize="${threading.profile.receiver.maxBufferSize}" /-->
 	</configuration>
- 	    
+
 	<spring:beans xmlns="http://www.springframework.org/schema/beans" default-dependency-check="all">
 
 		<bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
 			<property name="ignoreResourceNotFound" value="true" />
 			<property name="locations"> 
 				<list>
-					<value>classpath:nl/clockwork/mule/ebms/stub/ebf/default.local.sa.properties</value>   
-					<value>file:${user.home}/.ebms-stub/ebf.local.sa.properties</value>
+					<value>classpath:nl/clockwork/mule/ebms/default.properties</value>   
+					<value>classpath:nl/clockwork/mule/ebms/stub/ebf/default.overheid.properties</value>   
+					<value>file:${user.home}/.ebms-stub/ebf.overheid.properties</value>
 				</list>
 			</property>
 		</bean>
 
+		<import resource="classpath:nl/clockwork/mule/ebms/components/constants.xml" />
+
+		<!--import resource="classpath:nl/clockwork/mule/ebms/components/connector.http.xml" /-->
+		<import resource="classpath:nl/clockwork/mule/ebms/components/connector.https.xml" />
+		<import resource="classpath:nl/clockwork/mule/ebms/components/connector.xml" />
+
+
+		<import resource="classpath:nl/clockwork/mule/ebms/components/datasource.xml" />
+		<import resource="classpath:nl/clockwork/mule/ebms/components/dao.hsqldb.xml" />
+		<!--import resource="classpath:nl/clockwork/mule/ebms/components/dao.mssql.xml" /-->
+
+		<import resource="classpath:nl/clockwork/mule/ebms/flows/file.cpa.in.xml" />
+		<import resource="classpath:nl/clockwork/mule/ebms/flows/file.sql.in.xml" />
+
+		<import resource="classpath:nl/clockwork/mule/ebms/flows/ebms.in.xml" />
+		<import resource="classpath:nl/clockwork/mule/ebms/flows/ebms.out.xml" />
+		<import resource="classpath:nl/clockwork/mule/ebms/flows/ebms.processing.xml" />
+
 		<import resource="components/constants.xml" />
-
 		<import resource="components/connector.xml" />
-
-		<import resource="flows/ebms.bridge.tcp.xml" />
-
+		<import resource="flows/overheid.stub.routing.xml" />
 		<import resource="flows/afleverService.stub.processing.xml" />
 		<import resource="flows/aanleverService.stub.in.xml" />
 		<import resource="flows/aanleverService.stub.out.xml" />

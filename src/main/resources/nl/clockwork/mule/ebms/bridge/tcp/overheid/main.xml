@@ -36,7 +36,7 @@
 		<!--default-dispatcher-threading-profile maxThreadsActive="${threading.profile.maxThreadsActive}" maxThreadsIdle="${threading.profile.maxThreadsIdle}" threadTTL="${threading.profile.threadTTL}" poolExhaustedAction="WAIT" maxBufferSize="${threading.profile.maxBufferSize}" /-->
 		<!--default-receiver-threading-profile maxThreadsActive="${threading.profile.receiver.maxThreadsActive}" maxThreadsIdle="${threading.profile.receiver.maxThreadsIdle}" threadTTL="${threading.profile.receiver.threadTTL}" poolExhaustedAction="WAIT" maxBufferSize="${threading.profile.receiver.maxBufferSize}" /-->
 	</configuration>
-
+ 	    
 	<spring:beans xmlns="http://www.springframework.org/schema/beans" default-dependency-check="all">
 
 		<bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
@@ -44,8 +44,8 @@
 			<property name="locations"> 
 				<list>
 					<value>classpath:nl/clockwork/mule/ebms/default.properties</value>   
-					<value>classpath:nl/clockwork/mule/ebms/stub/ebf/default.remote.properties</value>   
-					<value>file:${user.home}/.ebms-stub/ebf.remote.properties</value>
+					<value>classpath:nl/clockwork/mule/ebms/bridge/tcp/overheid/default.properties</value>   
+					<value>file:${user.home}/.ebms-adapter/ebms-adapter.properties</value>
 				</list>
 			</property>
 		</bean>
@@ -66,14 +66,9 @@
 
 		<import resource="classpath:nl/clockwork/mule/ebms/flows/ebms.in.xml" />
 		<import resource="classpath:nl/clockwork/mule/ebms/flows/ebms.out.xml" />
-		<import resource="classpath:nl/clockwork/mule/ebms/flows/ebms.processing.xml" />
 
-		<import resource="components/constants.xml" />
-		<import resource="components/connector.xml" />
-		<import resource="flows/remote.stub.routing.xml" />
-		<import resource="flows/afleverService.stub.in.xml" />
-		<import resource="flows/afleverService.stub.out.xml" />
-		<import resource="flows/aanleverService.stub.processing.xml" />
+		<import resource="flows/aanleverService.xml" />
+		<import resource="flows/afleverService.xml" />
 
 	</spring:beans>
 

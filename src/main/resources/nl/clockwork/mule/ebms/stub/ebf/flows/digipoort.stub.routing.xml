@@ -39,9 +39,9 @@
 
 	<model>
 
-		<service name="remote.stub">
+		<service name="digipoort.stub">
 			<inbound>
-					<vm:inbound-endpoint path="remote.stub.in"/>
+					<vm:inbound-endpoint path="digipoort.stub.in"/>
 			</inbound>
 			<outbound>
 				<filtering-router>
