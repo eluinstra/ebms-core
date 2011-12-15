@@ -314,61 +314,6 @@
 			</build>
 		</profile>
 		<profile>
-			<id>generate-ef-model</id>
-			<activation>
-	 			<property>
-	  				<name>generate-ef-model</name>
-				</property>  				
-			</activation>
-	  		<build>
-	    		<plugins>
-					<plugin>
-						<groupId>com.sun.tools.xjc.maven2</groupId>
-						<artifactId>maven-jaxb-plugin</artifactId>
-						<version>1.1.1</version>
-						<executions>
-							<execution>
-									<id>generateEFAfleverenModel</id>
-									<goals>
-										<goal>generate</goal>
-									</goals>
-									<phase>
-										generate-sources
-									</phase>	
-									<configuration>
-										<generatePackage>nl.clockwork.mule.ebms.stub.ef.model.afleveren.bericht</generatePackage>
-										<generateDirectory>src/main/java</generateDirectory>
-										<includeSchemas>
-											<includeSchema>nl/clockwork/mule/ebms/stub/ef/xsd/Afleveren_ebMS_2.0_v1.xsd</includeSchema>
-										</includeSchemas>
-										<removeOldOutput>false</removeOldOutput>
-										<verbose>false</verbose>					
-									</configuration>
-							</execution>
-							<execution>
-									<id>generateEFAfleverenBevestigingModel</id>
-									<goals>
-										<goal>generate</goal>
-									</goals>
-									<phase>
-										generate-sources
-									</phase>	
-									<configuration>
-										<generatePackage>nl.clockwork.mule.ebms.stub.ef.model.afleveren.bevestiging</generatePackage>
-										<generateDirectory>src/main/java</generateDirectory>
-										<includeSchemas>
-											<includeSchema>nl/clockwork/mule/ebms/stub/ef/xsd/Afleveren_bevestiging_ebMS_2.0_v1.xsd</includeSchema>
-										</includeSchemas>
-										<removeOldOutput>false</removeOldOutput>
-										<verbose>false</verbose>					
-									</configuration>
-							</execution>
-						</executions>		
-					</plugin>				
-				</plugins>
-			</build>
-		</profile>
-		<profile>
 			<id>generate-ebf-model</id>
 			<activation>
 	 			<property>

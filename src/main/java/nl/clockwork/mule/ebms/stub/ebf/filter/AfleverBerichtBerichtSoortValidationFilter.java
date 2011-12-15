@@ -19,7 +19,7 @@ import javax.activation.DataSource;
 
 import nl.clockwork.common.util.XMLMessageBuilder;
 import nl.clockwork.mule.ebms.model.EbMSMessageContent;
-import nl.clockwork.mule.ebms.stub.ef.model.afleveren.bericht.AfleverBericht;
+import nl.clockwork.mule.ebms.stub.ebf.model.afleveren.bericht.AfleverBericht;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

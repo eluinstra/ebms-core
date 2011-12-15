@@ -117,7 +117,6 @@
 					</custom-filter>
 				</selective-consumer-router>
 				<forwarding-catch-all-strategy>
-					<!-- TODO what if no acknowledgment was generated yet? -->
 					<vm:outbound-endpoint path="ebms.acknowledgment.resend.in" />
 				</forwarding-catch-all-strategy>
 			</inbound>
