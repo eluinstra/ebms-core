@@ -116,9 +116,7 @@
 			<outbound>
 				<multicasting-router>
 					<vm:outbound-endpoint path="aanleverbericht.response.log.in"/>
-					<vm:outbound-endpoint path="ebms.message.send.in">
-						<property key="EBMS.EBMS_CHANNEL_ID" value="BevestigAanleveren"/>
-					</vm:outbound-endpoint>
+					<vm:outbound-endpoint path="ebms.message.send.in"/>
 				</multicasting-router>
 			</outbound>
 		</service>

@@ -57,9 +57,7 @@
 			</inbound>
 			<outbound>
 				<pass-through-router>
-					<vm:outbound-endpoint path="ebms.message.send.in">
-						<property key="EBMS.EBMS_CHANNEL_ID" value="Aanleveren"/>
-					</vm:outbound-endpoint>
+					<vm:outbound-endpoint path="ebms.message.send.in" />
 				</pass-through-router>
 			</outbound>
 		</service>

@@ -88,7 +88,7 @@
 							<object-to-byte-array-transformer/>
 						</transformers>
 					</tcp:outbound-endpoint>
-					<expression-filter evaluator="header" expression="EBMS.EBMS_CHANNEL_ID=BevestigAfleveren"/>
+<!--					<expression-filter evaluator="header" expression="EBMS.EBMS_CHANNEL_ID=BevestigAfleveren"/>-->
 				</filtering-router>
 				<filtering-router>
 					<tcp:outbound-endpoint host="${tcp.host}" port="${tcp.aanleveren.port}">
@@ -97,7 +97,7 @@
 							<object-to-byte-array-transformer/>
 						</transformers>
 					</tcp:outbound-endpoint>
-					<expression-filter evaluator="header" expression="EBMS.EBMS_CHANNEL_ID=Aanleveren"/>
+<!--					<expression-filter evaluator="header" expression="EBMS.EBMS_CHANNEL_ID=Aanleveren"/>-->
 				</filtering-router>
 			</outbound>
 		</service>
