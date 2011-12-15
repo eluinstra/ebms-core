@@ -45,7 +45,7 @@
 			</inbound>
 			<outbound>
 				<filtering-router>
-					<vm:outbound-endpoint path="aanleverbericht.processing.service.in" />
+					<vm:outbound-endpoint path="aanleverbericht.stub.message.receive.in" />
 					<and-filter>
 						<custom-filter class="nl.clockwork.mule.common.filter.JXPathFilter">
 							<spring:property name="xPathQuery" value="context/cpaId" />

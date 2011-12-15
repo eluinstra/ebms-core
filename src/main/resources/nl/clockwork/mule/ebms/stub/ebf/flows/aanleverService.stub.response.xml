@@ -39,15 +39,14 @@
 
 	<model>
 
-		<service name="afleverbericht.processing.service">
+		<service name="aanleverbericht.stub.message.receive">
 			<inbound>
-					<vm:inbound-endpoint path="afleverbericht.processing.service.in">
-						<custom-transformer class="nl.clockwork.mule.ebms.stub.ebf.transformer.EbMSMessageContentToMessageContent"/>
-					</vm:inbound-endpoint>
+					<vm:inbound-endpoint path="aanleverbericht.stub.message.receive.in"/>
 			</inbound>
 			<outbound>
 				<pass-through-router>
-					<file:outbound-endpoint connector-ref="connector.file" path="${dir.base}/afleverService/response" outputPattern="response_#[function:datestamp:yyyyMMddHHmmSSS].xml">
+					<file:outbound-endpoint connector-ref="connector.file" path="${dir.base}/aanleverService/response" outputPattern="response_#[function:datestamp:yyyyMMddHHmmSSS].xml">
+						<custom-transformer class="nl.clockwork.mule.ebms.stub.ebf.transformer.EbMSMessageContentToMessageContent"/>
 						<!--expression-transformer returnClass="java.lang.String">
 							<return-argument evaluator="jxpath" expression="jxpath:/attachments[0]/inputStream"/>
 						</expression-transformer-->

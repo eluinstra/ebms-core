@@ -56,8 +56,8 @@
 		<import resource="flows/ebms.bridge.tcp.xml" />
 
 		<import resource="flows/afleverService.stub.processing.xml" />
-		<import resource="flows/aanleverService.stub.in.xml" />
-		<import resource="flows/aanleverService.stub.out.xml" />
+		<import resource="flows/aanleverService.stub.request.xml" />
+		<import resource="flows/aanleverService.stub.response.xml" />
 
 	</spring:beans>
 

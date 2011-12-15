@@ -65,18 +65,18 @@
 		<import resource="classpath:nl/clockwork/mule/ebms/components/dao.hsqldb.xml" />
 		<!--import resource="classpath:nl/clockwork/mule/ebms/components/dao.mssql.xml" /-->
 
-		<import resource="classpath:nl/clockwork/mule/ebms/flows/file.cpa.in.xml" />
-		<import resource="classpath:nl/clockwork/mule/ebms/flows/file.sql.in.xml" />
+		<import resource="classpath:nl/clockwork/mule/ebms/flows/file.cpa.xml" />
+		<import resource="classpath:nl/clockwork/mule/ebms/flows/file.sql.xml" />
 
-		<import resource="classpath:nl/clockwork/mule/ebms/flows/ebms.in.xml" />
-		<import resource="classpath:nl/clockwork/mule/ebms/flows/ebms.out.xml" />
+		<import resource="classpath:nl/clockwork/mule/ebms/flows/ebms.receive.xml" />
+		<import resource="classpath:nl/clockwork/mule/ebms/flows/ebms.send.xml" />
 		<import resource="classpath:nl/clockwork/mule/ebms/flows/ebms.processing.xml" />
 
 		<import resource="components/constants.xml" />
 		<import resource="components/connector.xml" />
 		<import resource="flows/digipoort.stub.routing.xml" />
-		<import resource="flows/afleverService.stub.in.xml" />
-		<import resource="flows/afleverService.stub.out.xml" />
+		<import resource="flows/afleverService.stub.request.xml" />
+		<import resource="flows/afleverService.stub.response.xml" />
 		<import resource="flows/aanleverService.stub.processing.xml" />
 
 	</spring:beans>
