@@ -70,7 +70,8 @@
 
 		<import resource="classpath:nl/clockwork/mule/ebms/flows/ebms.receive.xml" />
 		<import resource="classpath:nl/clockwork/mule/ebms/flows/ebms.send.xml" />
-		<import resource="classpath:nl/clockwork/mule/ebms/flows/ebms.processing.xml" />
+		<import resource="classpath:nl/clockwork/mule/ebms/flows/ebms.content.send.xml" />
+		<import resource="classpath:nl/clockwork/mule/ebms/flows/ebms.content.receive.xml" />
 
 		<import resource="components/constants.xml" />
 		<import resource="components/connector.xml" />

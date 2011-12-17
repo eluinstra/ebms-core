@@ -35,7 +35,7 @@
 
 	<model>
 
-		<service name="ebms.message.process">
+		<service name="ebms.content.send">
 			<inbound>
 				<jdbc:inbound-endpoint connector-ref="connector.jdbc.ebms" queryKey="selectEbMSMessageForProcessing" pollingFrequency="${ebMSMessage.process.pollingFrequency}">
 					<custom-transformer class="nl.clockwork.mule.common.enricher.MapPropertyEnricher">
