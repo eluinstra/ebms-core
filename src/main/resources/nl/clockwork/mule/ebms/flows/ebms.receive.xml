@@ -234,7 +234,9 @@
 		<service name="ebms.messageError.create">
 			<inbound>
 				<vm:inbound-endpoint path="ebms.messageError.create.in">
-					<custom-transformer class="nl.clockwork.mule.ebms.enricher.EbMSMessageToEbMSMessageProperty"/>
+					<custom-transformer class="nl.clockwork.mule.common.enricher.AddPayloadAsProperty">
+						<spring:property name="propertyName" value="EBMS.EBMS_MESSAGE"/>
+					</custom-transformer>
 					<custom-transformer class="nl.clockwork.mule.ebms.transformer.EbMSMessageToEbMSMessageError">
 						<spring:property name="hostname" value="${service.host}" />
 					</custom-transformer>
@@ -270,7 +272,9 @@
 		<service name="ebms.acknowledgment.create">
 			<inbound>
 				<vm:inbound-endpoint path="ebms.acknowledgment.create.in">
-					<custom-transformer class="nl.clockwork.mule.ebms.enricher.EbMSMessageToEbMSMessageProperty"/>
+					<custom-transformer class="nl.clockwork.mule.common.enricher.AddPayloadAsProperty">
+						<spring:property name="propertyName" value="EBMS.EBMS_MESSAGE"/>
+					</custom-transformer>
 					<custom-transformer class="nl.clockwork.mule.ebms.transformer.EbMSMessageToEbMSAcknowledgment">
 						<spring:property name="hostname" value="${service.host}" />
 					</custom-transformer>

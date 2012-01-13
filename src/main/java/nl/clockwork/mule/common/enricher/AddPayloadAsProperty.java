@@ -13,10 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  ******************************************************************************/
-package nl.clockwork.mule.ebms.enricher;
-
-import nl.clockwork.mule.ebms.Constants;
-import nl.clockwork.mule.ebms.model.EbMSMessage;
+package nl.clockwork.mule.common.enricher;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -24,23 +21,26 @@ import org.mule.api.MuleMessage;
 import org.mule.api.transformer.TransformerException;
 import org.mule.transformer.AbstractMessageAwareTransformer;
 
-public class EbMSMessageToEbMSMessageProperty extends AbstractMessageAwareTransformer
+public class AddPayloadAsProperty extends AbstractMessageAwareTransformer
 {
   protected transient Log logger = LogFactory.getLog(getClass());
+  private String propertyName;
 
-	public EbMSMessageToEbMSMessageProperty()
+	public AddPayloadAsProperty()
 	{
-		registerSourceType(EbMSMessage.class);
-		//FIXME
-		//setReturnClass(EbMSMessage.class);
 	}
 	
 	@Override
 	public Object transform(final MuleMessage message, String outputEncoding) throws TransformerException
 	{
-		EbMSMessage msg = (EbMSMessage)message.getPayload();
-		message.setProperty(Constants.EBMS_MESSAGE,msg);
+		Object o = message.getPayload();
+		message.setProperty(propertyName,o);
 		return message;
+	}
+	
+	public void setPropertyName(String propertyName)
+	{
+		this.propertyName = propertyName;
 	}
 	
 }

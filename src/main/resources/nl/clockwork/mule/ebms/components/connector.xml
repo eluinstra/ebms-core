@@ -43,11 +43,8 @@
 	</cxf:connector>
 
 	<jdbc:connector name="connector.jdbc.ebms" dataSource-ref="ebMSDataSource" createMultipleTransactedReceivers="true" numberOfConcurrentTransactedReceivers="3" validateConnections="${connector.ebms.validateConnections}">
-		<jdbc:query key="insertEbMSMessage" value-ref="insertEbMSMessage" />
-		<jdbc:query key="insertEbMSMessageAttachment" value-ref="insertEbMSMessage" />
 		<jdbc:query key="updateEbMSMessageStatus" value-ref="updateEbMSMessageStatus" /> 
 		<jdbc:query key="addEbMSMessageSendEvent" value-ref="addEbMSMessageSendEvent" />
-		<jdbc:query key="clearEbMSMessageSendEvents" value-ref="clearEbMSMessageSendEvents" />
 		<jdbc:query key="selectEventsForSending" value-ref="selectEventsForSending" />
 		<jdbc:query key="selectEventsForSending.ack" value-ref="selectEventsForSending.ack" />
 		<jdbc:query key="selectEbMSMessageForProcessing" value-ref="selectEbMSMessageForProcessing" /> 

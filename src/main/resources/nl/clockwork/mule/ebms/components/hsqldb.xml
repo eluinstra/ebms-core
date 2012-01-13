@@ -25,14 +25,6 @@
 		<constructor-arg value="update cpa set cpa=#[map-payload:cpa] where cpa_id=#[map-payload:cpa_id]" />
 	</bean>
 
-	<bean id="insertEbMSMessage" class="java.lang.String">
-		<constructor-arg value="insert into ebms_message (time_stamp, cpa_id, conversation_id, sequence_nr, message_id, ref_to_message_id, from_role, to_role, service, action, original, signature, message_header, sync_reply, message_order, ack_requested, content, status, status_time) values (NOW(), #[map-payload:cpa_id], #[map-payload:conversation_id], #[map-payload:sequence_nr], #[map-payload:message_id], #[map-payload:ref_to_message_id], #[map-payload:original], #[map-payload:signature], #[map-payload:message_header], #[map-payload:sync_reply], #[map-payload:message_order], #[map-payload:ack_requested], #[map-payload:content], #[map-payload:status], #[map-payload:status_time])" />
-	</bean>
-	
-	<bean id="insertEbMSMessageAttachment" class="java.lang.String">
-		<constructor-arg value="insert into ebms_attachment (ebms_message_id, name, content_type, content) values (#[map-payload:ebms_message_id], #[map-payload:name], #[map-payload:content_type], #[map-payload:content])" />
-	</bean>
-	
 	<bean id="updateEbMSMessageStatus" class="java.lang.String">
 		<constructor-arg value="update ebms_message set status=#[map-payload:status], status_time=#[map-payload:status_time] where id=#[map-payload:id]" /> 
 	</bean>
@@ -40,10 +32,7 @@
 	<bean id="addEbMSMessageSendEvent" class="java.lang.String">
 		<constructor-arg value="insert into ebms_send_event (ebms_message_id) values (#[map-payload:ID])" /> 
 	</bean>
-	<bean id="clearEbMSMessageSendEvents" class="java.lang.String">
-		<constructor-arg value="update ebms_send_event set status=1, status_time=#[map-payload:status_time] where ebms_message_id=#[map-payload:ID] and status=0" /> 
-		<!--constructor-arg value="delete from ebms_send_event where ebms_message_id=#[map-payload:ID] and status=0 and time&lt;=NOW()" /--> 
-	</bean>
+
 	<bean id="selectEventsForSending" class="java.lang.String">
 		<constructor-arg value="select distinct ebms_message_id from ebms_send_event where status=0 and time&lt;=NOW()" />
 	</bean>

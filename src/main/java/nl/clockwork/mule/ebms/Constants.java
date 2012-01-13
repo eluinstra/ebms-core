@@ -94,15 +94,14 @@ public class Constants
   
 	public static final String DEFAULT_FILENAME = "filename";
 
+	public static final String CPA_ID = "EBMS.CPA_ID";
+
 	public static final String EBMS_VERSION = "2.0";
 	public static final String EBMS_SERVICE = "urn:oasis:names:tc:ebxml-msg:service";
 	public static final String EBMS_MESSAGE_ERROR = "MessageError";
 	public static final String EBMS_ACKNOWLEDGEMENT = "Acknowledgment";
 	public static final String EBMS_ERROR = "EBMS.EBMS_ERROR";
 	public static final String EBMS_SIGNATURE = "EBMS.SIGNATURE";
-	public static final String EBMS_ID = "EBMS.EBMS_ID";
-	public static final String EBMS_DATE = "EBMS.EBMS_DATE";
-	public static final String CPA_ID = "EBMS.CPA_ID";
 
 	public static final String EBMS_MESSAGE = "EBMS.EBMS_MESSAGE";
 	public static final String EBMS_MESSAGE_ID = "EBMS.EBMS_MESSAGE_ID";
