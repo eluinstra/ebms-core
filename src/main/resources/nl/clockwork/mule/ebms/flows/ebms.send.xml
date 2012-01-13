@@ -127,7 +127,7 @@
 							<spring:bean class="org.apache.cxf.interceptor.LoggingInInterceptor" />
 						</cxf:inInterceptors>
 						<cxf:outInterceptors>
-							<spring:bean class="nl.clockwork.mule.ebms.cxf.OracleEbMSXMLPrefixFixingOutInterceptor" />
+							<!--spring:bean class="nl.clockwork.mule.ebms.cxf.OracleEbMSXMLPrefixFixingOutInterceptor" /-->
 							<spring:bean class="org.apache.cxf.interceptor.LoggingOutInterceptor" />
 						</cxf:outInterceptors>
 					</cxf:outbound-endpoint>
@@ -148,7 +148,7 @@
 							<spring:bean class="org.apache.cxf.interceptor.LoggingInInterceptor" />
 						</cxf:inInterceptors>
 						<cxf:outInterceptors>
-							<spring:bean class="nl.clockwork.mule.ebms.cxf.OracleEbMSXMLPrefixFixingOutInterceptor" />
+							<!--spring:bean class="nl.clockwork.mule.ebms.cxf.OracleEbMSXMLPrefixFixingOutInterceptor" /-->
 							<spring:bean class="org.apache.cxf.interceptor.LoggingOutInterceptor" />
 						</cxf:outInterceptors>
 					</cxf:outbound-endpoint>
