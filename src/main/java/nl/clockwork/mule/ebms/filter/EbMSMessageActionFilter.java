@@ -13,44 +13,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  ******************************************************************************/
-package nl.clockwork.mule.ebms.transformer;
+package nl.clockwork.mule.ebms.filter;
 
-import nl.clockwork.mule.ebms.Constants;
-import nl.clockwork.mule.ebms.dao.EbMSDAO;
+import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.api.MuleMessage;
-import org.mule.api.transformer.TransformerException;
-import org.mule.transformer.AbstractMessageAwareTransformer;
+import org.mule.api.routing.filter.Filter;
 
-public class EbMSMessageIdToEbMSMessage extends AbstractMessageAwareTransformer
+public class EbMSMessageActionFilter implements Filter
 {
   protected transient Log logger = LogFactory.getLog(getClass());
-  private EbMSDAO ebMSDAO;
+  private String action;
 
-  public EbMSMessageIdToEbMSMessage()
-	{
-		//registerSourceType(Object.class);
-	}
-  
 	@Override
-	public Object transform(MuleMessage message, String outputEncoding) throws TransformerException
+	public boolean accept(MuleMessage message)
 	{
-		try
+		if (message.getPayload() instanceof Map)
 		{
-			message.setPayload(ebMSDAO.getEbMSMessage(message.getLongProperty(Constants.EBMS_MESSAGE_ID,0)));
-			return message;
+				Map map = (Map)message.getPayload();
+				return "urn:oasis:names:tc:ebxml-msg:service".equals(map.get("service")) && action.equals(map.get("action"));
 		}
-		catch (Exception e)
-		{
-			throw new TransformerException(this,e);
-		}
+		return false;
 	}
-	
-	public void setEbMSDAO(EbMSDAO ebMSDAO)
+
+	public void setAction(String action)
 	{
-		this.ebMSDAO = ebMSDAO;
+		this.action = action;
 	}
-	
 }

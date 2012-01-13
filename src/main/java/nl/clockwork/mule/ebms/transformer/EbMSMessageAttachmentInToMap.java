@@ -16,23 +16,29 @@
 package nl.clockwork.mule.ebms.transformer;
 
 import java.util.HashMap;
+import java.util.Map;
+
+import javax.activation.DataSource;
 
 import nl.clockwork.mule.ebms.Constants;
+import nl.clockwork.mule.ebms.model.EbMSMessage;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.api.MuleMessage;
 import org.mule.api.transformer.TransformerException;
 import org.mule.transformer.AbstractMessageAwareTransformer;
 
-public class EbMSMessageIdToUpdateEbMSProcessingStatusMap extends AbstractMessageAwareTransformer
+public class EbMSMessageAttachmentInToMap extends AbstractMessageAwareTransformer
 {
   protected transient Log logger = LogFactory.getLog(getClass());
-	private int ebMSProcessingStatus;
 
-  public EbMSMessageIdToUpdateEbMSProcessingStatusMap()
+	public EbMSMessageAttachmentInToMap()
 	{
-		//registerSourceType(Object.class);
+		registerSourceType(EbMSMessage.class);
+		//FIXME
+		//setReturnClass(Map.class);
 	}
   
 	@Override
@@ -40,9 +46,19 @@ public class EbMSMessageIdToUpdateEbMSProcessingStatusMap extends AbstractMessag
 	{
 		try
 		{
-			HashMap<String,Object> map = new HashMap<String,Object>();
-			map.put("id",message.getLongProperty(Constants.EBMS_MESSAGE_ID,0));
-			map.put("processing_status",ebMSProcessingStatus);
+			//FIXME get EbMSMessage from payload???
+			EbMSMessage msg = (EbMSMessage)message.getProperty(Constants.EBMS_MESSAGE);
+			Map<String,Object> map = new HashMap<String,Object>();
+
+			DataSource attachment = msg.getAttachments().get(0);
+			if (attachment != null)
+			{
+				map.put("ebms_message_id","");
+				map.put("name",attachment.getName() == null ? Constants.DEFAULT_FILENAME : attachment.getName());
+				map.put("content_type",attachment.getContentType().split(";")[0].trim());
+				map.put("content",IOUtils.toByteArray(attachment.getInputStream()));
+			}
+
 			message.setPayload(map);
 		}
 		catch (Exception e)
@@ -53,8 +69,4 @@ public class EbMSMessageIdToUpdateEbMSProcessingStatusMap extends AbstractMessag
 		return message;
 	}
 
-	public void setEbMSProcessingStatus(int ebMSProcessingStatus)
-	{
-		this.ebMSProcessingStatus = ebMSProcessingStatus;
-	}
 }

@@ -13,11 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  ******************************************************************************/
-package nl.clockwork.mule.ebms.transformer;
+package nl.clockwork.mule.ebms.enricher;
 
 import nl.clockwork.common.dao.DAOException;
+import nl.clockwork.mule.ebms.Constants;
 import nl.clockwork.mule.ebms.dao.EbMSDAO;
-import nl.clockwork.mule.ebms.model.Acknowledgment;
 import nl.clockwork.mule.ebms.model.EbMSMessage;
 
 import org.apache.commons.logging.Log;
@@ -26,25 +26,28 @@ import org.mule.api.MuleMessage;
 import org.mule.api.transformer.TransformerException;
 import org.mule.transformer.AbstractMessageAwareTransformer;
 
-public class EbMSMessageToAcknowledgment extends AbstractMessageAwareTransformer
+public class EbMSResponseMessageToEbMSMessageIdProperty extends AbstractMessageAwareTransformer
 {
   protected transient Log logger = LogFactory.getLog(getClass());
   private EbMSDAO ebMSDAO;
 
-  public EbMSMessageToAcknowledgment()
+	public EbMSResponseMessageToEbMSMessageIdProperty()
 	{
 		registerSourceType(EbMSMessage.class);
+		//FIXME
+		//setReturnClass(EbMSMessage.class);
 	}
-  
+	
 	@Override
-	public Object transform(MuleMessage message, String outputEncoding) throws TransformerException
+	public Object transform(final MuleMessage message, String outputEncoding) throws TransformerException
 	{
 		try
 		{
 			EbMSMessage msg = (EbMSMessage)message.getPayload();
-			Acknowledgment acknowledgment = ebMSDAO.getAcknowledgment(msg.getMessageHeader().getMessageData().getMessageId());
-			message.setProperty("EBMS.ACKNOWLEDGMENT_TYPE",acknowledgment.getAcknowledgmentType());
-			message.setPayload(new Object[]{acknowledgment.getMessageHeader(),acknowledgment.getAcknowledgment()});
+			//FIXME refToMessageId does not have to refer to an Acknowledgment or ErrorMessage
+			long id = ebMSDAO.getIdByMessageId(msg.getMessageHeader().getMessageData().getRefToMessageId());
+			//long id = ebMSDAO.getReponseIdByMessageId(msg.getMessageHeader().getMessageData().getRefToMessageId());
+			message.setProperty(Constants.EBMS_MESSAGE_ID,id);
 			return message;
 		}
 		catch (DAOException e)
@@ -52,7 +55,7 @@ public class EbMSMessageToAcknowledgment extends AbstractMessageAwareTransformer
 			throw new TransformerException(this,e);
 		}
 	}
-
+	
 	public void setEbMSDAO(EbMSDAO ebMSDAO)
 	{
 		this.ebMSDAO = ebMSDAO;

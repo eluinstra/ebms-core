@@ -15,11 +15,11 @@
  ******************************************************************************/
 package nl.clockwork.mule.ebms.service;
 
-import nl.clockwork.mule.ebms.model.EbMSMessageError;
+import nl.clockwork.mule.ebms.model.ebxml.MessageHeader;
 
 
-public interface EbMSMessageErrorProcessor
+public interface EbMSPingProcessor
 {
-	void process(EbMSMessageError messageError);
+	MessageHeader process(MessageHeader messageHeader);
 
 }

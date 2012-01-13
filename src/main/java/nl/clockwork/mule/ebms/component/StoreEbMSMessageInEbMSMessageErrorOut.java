@@ -15,40 +15,28 @@
  ******************************************************************************/
 package nl.clockwork.mule.ebms.component;
 
-import java.util.Date;
-
-import javax.xml.datatype.Duration;
-
 import nl.clockwork.mule.common.component.Callable;
 import nl.clockwork.mule.ebms.Constants;
+import nl.clockwork.mule.ebms.Constants.EbMSMessageStatus;
 import nl.clockwork.mule.ebms.dao.EbMSDAO;
-import nl.clockwork.mule.ebms.model.cpp.cpa.CollaborationProtocolAgreement;
-import nl.clockwork.mule.ebms.model.ebxml.MessageHeader;
-import nl.clockwork.mule.ebms.util.CPAUtils;
+import nl.clockwork.mule.ebms.model.EbMSMessage;
+import nl.clockwork.mule.ebms.model.EbMSMessageError;
 
 import org.mule.api.MuleMessage;
 
-public class UpdateEbMSMessageOut extends Callable
+public class StoreEbMSMessageInEbMSMessageErrorOut extends Callable
 {
 	private EbMSDAO ebMSDAO;
 
 	@Override
 	public Object onCall(MuleMessage message) throws Exception
 	{
-		if (message.getPayload() instanceof Object[])
+		if (message.getPayload() instanceof EbMSMessageError)
 		{
-			Object[] msg = (Object[])message.getPayload();
-
-			Date nextRetryTime = null;
-			CollaborationProtocolAgreement cpa = ebMSDAO.getCPA(((MessageHeader)msg[0]).getCPAId());
-			Duration d = CPAUtils.getDuration(cpa,((MessageHeader)msg[0]));
-			if (d != null)
-			{
-				nextRetryTime = new Date();
-				d.addTo(nextRetryTime);
-			}
-
-			ebMSDAO.updateMessage(message.getLongProperty(Constants.EBMS_MESSAGE_ID,0),nextRetryTime);
+			EbMSMessage msg = (EbMSMessage)message.getProperty(Constants.EBMS_MESSAGE);
+			EbMSMessageStatus status = EbMSMessageStatus.get((String)message.getProperty(Constants.EBMS_MESSAGE_STATUS));
+			EbMSMessageError msgError = (EbMSMessageError)message.getPayload();
+			ebMSDAO.insertMessage(msg,status,msgError);
 		}
 		return message;
 	}

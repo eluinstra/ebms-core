@@ -22,38 +22,72 @@ import javax.activation.DataSource;
 import nl.clockwork.mule.ebms.model.ebxml.AckRequested;
 import nl.clockwork.mule.ebms.model.ebxml.Manifest;
 import nl.clockwork.mule.ebms.model.ebxml.MessageHeader;
+import nl.clockwork.mule.ebms.model.ebxml.MessageOrder;
+import nl.clockwork.mule.ebms.model.ebxml.SyncReply;
+import nl.clockwork.mule.ebms.model.xml.xmldsig.SignatureType;
 
 public class EbMSMessage implements EbMSBaseMessage
 {
-	private byte[] message;
+	private byte[] original;
+	private SignatureType signature;
 	private MessageHeader messageHeader;
+	private SyncReply syncReply;
+	private MessageOrder messageOrder;
 	private AckRequested ackRequested;
 	private Manifest manifest;
 	private List<DataSource> attachments;
 
 	public EbMSMessage(MessageHeader messageHeader, AckRequested ackRequested, Manifest manifest, List<DataSource> attachments)
 	{
-		this(null,messageHeader,ackRequested,manifest,attachments);
+		this(null,null,messageHeader,ackRequested,manifest,attachments);
 	}
 	
-	public EbMSMessage(byte[] message, MessageHeader messageHeader, AckRequested ackRequested, Manifest manifest, List<DataSource> attachments)
+	public EbMSMessage(byte[] message, SignatureType signature, MessageHeader messageHeader, AckRequested ackRequested, Manifest manifest, List<DataSource> attachments)
 	{
-		this.message = message;
+		this(message,signature,messageHeader,null,null,ackRequested,manifest,attachments);
+	}
+	
+	public EbMSMessage(MessageHeader messageHeader, SyncReply syncReply, MessageOrder messageOrder, AckRequested ackRequested, Manifest manifest, List<DataSource> attachments)
+	{
+		this(null,null,messageHeader,syncReply,messageOrder,ackRequested,manifest,attachments);
+	}
+	
+	public EbMSMessage(byte[] original, SignatureType signature, MessageHeader messageHeader, SyncReply syncReply, MessageOrder messageOrder, AckRequested ackRequested, Manifest manifest, List<DataSource> attachments)
+	{
+		this.original = original;
+		this.signature = signature;
 		this.messageHeader = messageHeader;
+		this.syncReply = syncReply;
+		this.messageOrder = messageOrder;
 		this.ackRequested = ackRequested;
 		this.manifest = manifest;
 		this.attachments = attachments;
 	}
 	
-	public byte[] getMessage()
+	public byte[] getOriginal()
 	{
-		return message;
+		return original;
+	}
+	
+	public SignatureType getSignature()
+	{
+		return signature;
 	}
 	
 	@Override
 	public MessageHeader getMessageHeader()
 	{
 		return messageHeader;
+	}
+	
+	public SyncReply getSyncReply()
+	{
+		return syncReply;
+	}
+	
+	public MessageOrder getMessageOrder()
+	{
+		return messageOrder;
 	}
 	
 	public AckRequested getAckRequested()

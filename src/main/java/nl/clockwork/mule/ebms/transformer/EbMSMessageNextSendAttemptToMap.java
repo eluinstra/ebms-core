@@ -15,12 +15,14 @@
  ******************************************************************************/
 package nl.clockwork.mule.ebms.transformer;
 
+import java.util.Date;
 import java.util.HashMap;
 
-import nl.clockwork.common.util.XMLMessageBuilder;
+import javax.xml.datatype.Duration;
+
 import nl.clockwork.mule.ebms.Constants;
-import nl.clockwork.mule.ebms.model.ebxml.Acknowledgment;
-import nl.clockwork.mule.ebms.model.ebxml.MessageHeader;
+import nl.clockwork.mule.ebms.dao.EbMSDAO;
+import nl.clockwork.mule.ebms.model.cpp.cpa.CollaborationProtocolAgreement;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -28,13 +30,14 @@ import org.mule.api.MuleMessage;
 import org.mule.api.transformer.TransformerException;
 import org.mule.transformer.AbstractMessageAwareTransformer;
 
-public class EbMSAcknowledgmentToUpdateEbMSMessageAcknowledgmentMap extends AbstractMessageAwareTransformer
+public class EbMSMessageNextSendAttemptToMap extends AbstractMessageAwareTransformer
 {
   protected transient Log logger = LogFactory.getLog(getClass());
-
-  public EbMSAcknowledgmentToUpdateEbMSMessageAcknowledgmentMap()
+	private EbMSDAO ebMSDAO;
+  
+  public EbMSMessageNextSendAttemptToMap()
 	{
-		//registerSourceType(EbMSAcknowledgment.class);
+		//registerSourceType(Object.class);
 	}
   
 	@Override
@@ -42,13 +45,18 @@ public class EbMSAcknowledgmentToUpdateEbMSMessageAcknowledgmentMap extends Abst
 	{
 		try
 		{
-			//EbMSAcknowledgment acknowledgment = (EbMSAcknowledgment)message.getPayload();
-			Object[] acknowledgment = (Object[])message.getPayload();
 			HashMap<String,Object> map = new HashMap<String,Object>();
-			map.put("id",message.getStringProperty(Constants.EBMS_MESSAGE_ID,null));
-			map.put("ack_type",Constants.EbMSAcknowledgmentType.ACKNOWLEDGMENT.id());
-			map.put("ack_header",XMLMessageBuilder.getInstance(MessageHeader.class).handle((MessageHeader)acknowledgment[0]));
-			map.put("ack_content",XMLMessageBuilder.getInstance(Acknowledgment.class).handle((Acknowledgment)acknowledgment[1]));
+			map.put("id",message.getLongProperty(Constants.EBMS_MESSAGE_ID,0));
+			Date date = new Date();
+			Date nextRetryTime = null;
+			//FIXME!!!
+//			CollaborationProtocolAgreement cpa = ebMSDAO.getCPA(msg.getMessageHeader().getCPAId());
+//			Duration d = CPAUtils.getDuration(cpa,msg.getMessageHeader());
+//			if (d != null)
+//			{
+//				nextRetryTime = date;
+//				d.addTo(nextRetryTime);
+//			}
 			message.setPayload(map);
 		}
 		catch (Exception e)
@@ -58,5 +66,4 @@ public class EbMSAcknowledgmentToUpdateEbMSMessageAcknowledgmentMap extends Abst
 		}
 		return message;
 	}
-
 }

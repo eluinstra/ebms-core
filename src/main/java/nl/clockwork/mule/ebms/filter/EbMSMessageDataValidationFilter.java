@@ -13,44 +13,50 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  ******************************************************************************/
-package nl.clockwork.mule.ebms.transformer;
+package nl.clockwork.mule.ebms.filter;
 
-import nl.clockwork.mule.ebms.Constants;
+import nl.clockwork.common.dao.DAOException;
 import nl.clockwork.mule.ebms.dao.EbMSDAO;
+import nl.clockwork.mule.ebms.model.EbMSBaseMessage;
+import nl.clockwork.mule.ebms.model.ebxml.MessageHeader;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.api.MuleMessage;
-import org.mule.api.transformer.TransformerException;
-import org.mule.transformer.AbstractMessageAwareTransformer;
+import org.mule.api.routing.filter.Filter;
 
-public class EbMSMessageIdToEbMSMessage extends AbstractMessageAwareTransformer
+public class EbMSMessageDataValidationFilter implements Filter
 {
   protected transient Log logger = LogFactory.getLog(getClass());
-  private EbMSDAO ebMSDAO;
+	private EbMSDAO ebMSDAO;
 
-  public EbMSMessageIdToEbMSMessage()
-	{
-		//registerSourceType(Object.class);
-	}
-  
 	@Override
-	public Object transform(MuleMessage message, String outputEncoding) throws TransformerException
+	public boolean accept(MuleMessage message)
 	{
-		try
+		if (message.getPayload() instanceof EbMSBaseMessage)
 		{
-			message.setPayload(ebMSDAO.getEbMSMessage(message.getLongProperty(Constants.EBMS_MESSAGE_ID,0)));
-			return message;
+			try
+			{
+				EbMSBaseMessage msg = (EbMSBaseMessage)message.getPayload();
+				MessageHeader messageHeader = msg.getMessageHeader();
+
+				String refToMessageId = messageHeader.getMessageData().getRefToMessageId();
+				if (!StringUtils.isEmpty(refToMessageId))
+					//FIXME refToMessageId does not have to refer to another message or to an Acknowledgment or ErrorMessage
+					return ebMSDAO.exists(refToMessageId);
+				return true;
+			}
+			catch (DAOException e)
+			{
+				throw new RuntimeException(e);
+			}
 		}
-		catch (Exception e)
-		{
-			throw new TransformerException(this,e);
-		}
+		return true;
 	}
-	
+
 	public void setEbMSDAO(EbMSDAO ebMSDAO)
 	{
 		this.ebMSDAO = ebMSDAO;
 	}
-	
 }

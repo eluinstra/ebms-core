@@ -15,15 +15,13 @@
  ******************************************************************************/
 package nl.clockwork.mule.ebms.transformer;
 
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
 import nl.clockwork.common.util.XMLMessageBuilder;
-import nl.clockwork.mule.ebms.Constants;
-import nl.clockwork.mule.ebms.dao.EbMSDAO;
 import nl.clockwork.mule.ebms.model.EbMSMessage;
-import nl.clockwork.mule.ebms.model.ebxml.Manifest;
+import nl.clockwork.mule.ebms.model.EbMSMessageError;
+import nl.clockwork.mule.ebms.model.ebxml.ErrorList;
 import nl.clockwork.mule.ebms.model.ebxml.MessageHeader;
 
 import org.apache.commons.logging.Log;
@@ -32,12 +30,11 @@ import org.mule.api.MuleMessage;
 import org.mule.api.transformer.TransformerException;
 import org.mule.transformer.AbstractMessageAwareTransformer;
 
-public class EbMSMessageToInsertEbMSMessageMap extends AbstractMessageAwareTransformer
+public class EbMSMessageErrorOutToMap extends AbstractMessageAwareTransformer
 {
   protected transient Log logger = LogFactory.getLog(getClass());
-  private EbMSDAO ebMSDAO;
 
-	public EbMSMessageToInsertEbMSMessageMap()
+	public EbMSMessageErrorOutToMap()
 	{
 		registerSourceType(EbMSMessage.class);
 		//FIXME
@@ -49,24 +46,28 @@ public class EbMSMessageToInsertEbMSMessageMap extends AbstractMessageAwareTrans
 	{
 		try
 		{
-			EbMSMessage msg = (EbMSMessage)message.getPayload();
-			Date date = new Date();
+			EbMSMessageError msg = (EbMSMessageError)message.getPayload();
 			Map<String,Object> map = new HashMap<String,Object>();
 
-			map.put("time_stamp",String.format(ebMSDAO.getDefaultDateFormat(),date));
 			map.put("cpa_id",msg.getMessageHeader().getCPAId());
 			map.put("conversation_id",msg.getMessageHeader().getConversationId());
-			map.put("sequence_nr",0);
-
+			map.put("sequence_nr",0); //TODO use messageOrder
 			map.put("message_id",msg.getMessageHeader().getMessageData().getMessageId());
-			map.put("message_type",Constants.EbMSMessageType.IN.id());
-			map.put("message_original",msg.getMessage());
+			map.put("ref_to_message_id",msg.getMessageHeader().getMessageData().getRefToMessageId());
+			map.put("from_role",msg.getMessageHeader().getFrom().getRole());
+			map.put("to_role",msg.getMessageHeader().getTo().getRole());
+			map.put("service",msg.getMessageHeader().getService().getValue());
+			map.put("action",msg.getMessageHeader().getAction());
+			map.put("message_original",null);
+			map.put("message_signature",null);
 			//map.put("message_header",XMLUtils.objectToXML(msg.getMessageHeader()));
 			map.put("message_header",XMLMessageBuilder.getInstance(MessageHeader.class).handle(msg.getMessageHeader()));
-			//map.put("message_manifest",XMLUtils.objectToXML(msg.getManifest()));
-			map.put("message_manifest",XMLMessageBuilder.getInstance(Manifest.class).handle(msg.getManifest()));
-
-			map.put("status",Constants.EbMSMessageStatus.RECEIVED.id());
+			map.put("message_sync_reply",null);
+			map.put("message_order",null);
+			map.put("message_ack_req",null);
+			map.put("message_content",XMLMessageBuilder.getInstance(ErrorList.class).handle(msg.getErrorList()));
+			map.put("status",null);
+			map.put("status_time",null);
 
 			message.setPayload(map);
 		}
@@ -78,8 +79,4 @@ public class EbMSMessageToInsertEbMSMessageMap extends AbstractMessageAwareTrans
 		return message;
 	}
 
-	public void setEbMSDAO(EbMSDAO ebMSDAO)
-	{
-		this.ebMSDAO = ebMSDAO;
-	}
 }

@@ -16,11 +16,10 @@
 package nl.clockwork.mule.ebms.transformer;
 
 import java.util.HashMap;
+import java.util.Map;
 
-import nl.clockwork.common.util.XMLMessageBuilder;
-import nl.clockwork.mule.ebms.Constants;
-import nl.clockwork.mule.ebms.model.EbMSAcknowledgment;
-import nl.clockwork.mule.ebms.model.ebxml.Acknowledgment;
+import nl.clockwork.mule.ebms.model.EbMSMessageError;
+import nl.clockwork.mule.ebms.model.ebxml.ErrorList;
 import nl.clockwork.mule.ebms.model.ebxml.MessageHeader;
 
 import org.apache.commons.logging.Log;
@@ -29,13 +28,13 @@ import org.mule.api.MuleMessage;
 import org.mule.api.transformer.TransformerException;
 import org.mule.transformer.AbstractMessageAwareTransformer;
 
-public class EbMSAcknowledgmentToUpdateEbMSAcknowledgmentMap extends AbstractMessageAwareTransformer
+public class MapToEbMSMessageError extends AbstractMessageAwareTransformer
 {
   protected transient Log logger = LogFactory.getLog(getClass());
-
-  public EbMSAcknowledgmentToUpdateEbMSAcknowledgmentMap()
+  
+  public MapToEbMSMessageError()
 	{
-		registerSourceType(EbMSAcknowledgment.class);
+		//registerSourceType(Object.class);
 	}
   
 	@Override
@@ -43,19 +42,15 @@ public class EbMSAcknowledgmentToUpdateEbMSAcknowledgmentMap extends AbstractMes
 	{
 		try
 		{
-			EbMSAcknowledgment acknowledgment = (EbMSAcknowledgment)message.getPayload();
-			HashMap<String,Object> map = new HashMap<String,Object>();
-			map.put("id",message.getStringProperty(Constants.EBMS_MESSAGE_ID,null));
-			map.put("ack_header",XMLMessageBuilder.getInstance(MessageHeader.class).handle(acknowledgment.getMessageHeader()));
-			map.put("ack_content",XMLMessageBuilder.getInstance(Acknowledgment.class).handle(acknowledgment.getAcknowledgment()));
-			message.setPayload(map);
+			Map<String,Object> map = (HashMap<String,Object>)message.getPayload();
+			message.setPayload(new EbMSMessageError((MessageHeader)map.get("message_header"),(ErrorList)map.get("message_error")));
+
+			return message;
 		}
 		catch (Exception e)
 		{
-			logger.error("",e);
 			throw new TransformerException(this,e);
 		}
-		return message;
 	}
-
+	
 }

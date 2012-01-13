@@ -20,7 +20,7 @@ import java.util.List;
 import nl.clockwork.common.dao.DAOException;
 import nl.clockwork.mule.ebms.Constants;
 import nl.clockwork.mule.ebms.dao.EbMSDAO;
-import nl.clockwork.mule.ebms.model.EbMSBaseMessage;
+import nl.clockwork.mule.ebms.model.EbMSMessage;
 import nl.clockwork.mule.ebms.model.Signature;
 import nl.clockwork.mule.ebms.model.cpp.cpa.CollaborationProtocolAgreement;
 import nl.clockwork.mule.ebms.model.cpp.cpa.DeliveryChannel;
@@ -42,11 +42,11 @@ public class EbMSSignatureValidationFilter implements Filter
 	@Override
 	public boolean accept(MuleMessage message)
 	{
-		if (message.getPayload() instanceof EbMSBaseMessage)
+		if (message.getPayload() instanceof EbMSMessage)
 		{
 			try
 			{
-				EbMSBaseMessage msg = (EbMSBaseMessage)message.getPayload();
+				EbMSMessage msg = (EbMSMessage)message.getPayload();
 				MessageHeader messageHeader = msg.getMessageHeader();
 				CollaborationProtocolAgreement cpa = ebMSDAO.getCPA(messageHeader.getCPAId());
 				Signature signature = (Signature)message.getProperty(Constants.EBMS_SIGNATURE);

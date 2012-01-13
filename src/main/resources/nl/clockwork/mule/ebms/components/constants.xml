@@ -23,34 +23,12 @@
 	"
 >
 
-	<bean id="EBMS_UNKNOWN_ERROR" class="nl.clockwork.mule.ebms.model.ebxml.Error">
-		<property name="codeContext" value="urn:oasis:names:tc:ebxml-msg:service:errors" />
-		<property name="location" value="Unknown" />
-		<property name="errorCode" value="Unknown" />
-		<property name="description">
-			<bean class="nl.clockwork.mule.ebms.model.ebxml.Description">
-				<property name="lang" value="en-US"/>
-				<property name="value" value="An unknown error occurred!"/>
-			</bean>
-		</property>
-	</bean>
-
-	<bean id="EBMS_DELIVERY_ERROR" class="nl.clockwork.mule.ebms.model.ebxml.Error">
-		<property name="codeContext" value="urn:oasis:names:tc:ebxml-msg:service:errors" />
-		<property name="location" value="Unknown" />
-		<property name="errorCode" value="DeliveryFailure" />
-		<property name="description">
-			<bean class="nl.clockwork.mule.ebms.model.ebxml.Description">
-				<property name="lang" value="en-US"/>
-				<property name="value" value="A delivery error occurred!"/>
-			</bean>
-		</property>
-	</bean>
-
 	<util:constant id="HTTP_STATUS_CODE" static-field="org.mule.transport.http.HttpConnector.HTTP_STATUS_PROPERTY" />
 	<util:constant id="HTTP_SC_OK" static-field="org.mule.transport.http.HttpConstants.SC_OK" />
 	<util:constant id="HTTP_SC_NO_CONTENT" static-field="org.mule.transport.http.HttpConstants.SC_NO_CONTENT" />
+	<util:constant id="HTTP_SC_INTERNAL_SERVER_ERROR" static-field="org.mule.transport.http.HttpConstants.SC_INTERNAL_SERVER_ERROR" />
 
 	<util:constant id="EBMS_MESSAGE_ID" static-field="nl.clockwork.mule.ebms.Constants.EBMS_MESSAGE_ID" />
+	<util:constant id="EBMS_MESSAGE_STATUS" static-field="nl.clockwork.mule.ebms.Constants.EBMS_MESSAGE_STATUS" />
 
 </beans>

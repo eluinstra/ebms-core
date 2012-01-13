@@ -15,19 +15,17 @@
  ******************************************************************************/
 package nl.clockwork.mule.ebms.dao;
 
-import java.util.Date;
 import java.util.List;
 
 import javax.activation.DataSource;
 
 import nl.clockwork.common.dao.DAOException;
 import nl.clockwork.mule.ebms.Constants.EbMSMessageStatus;
-import nl.clockwork.mule.ebms.Constants.EbMSMessageType;
-import nl.clockwork.mule.ebms.model.Acknowledgment;
+import nl.clockwork.mule.ebms.model.EbMSAcknowledgment;
+import nl.clockwork.mule.ebms.model.EbMSBaseMessage;
 import nl.clockwork.mule.ebms.model.EbMSMessage;
+import nl.clockwork.mule.ebms.model.EbMSMessageError;
 import nl.clockwork.mule.ebms.model.cpp.cpa.CollaborationProtocolAgreement;
-import nl.clockwork.mule.ebms.model.ebxml.AckRequested;
-import nl.clockwork.mule.ebms.model.ebxml.Manifest;
 import nl.clockwork.mule.ebms.model.ebxml.MessageHeader;
 
 public interface EbMSDAO
@@ -40,12 +38,12 @@ public interface EbMSDAO
 	long getIdByMessageId(String messageId) throws DAOException;
 	MessageHeader getMessageHeader(long id) throws DAOException;
 	MessageHeader getMessageHeader(String messageId) throws DAOException;
-	Acknowledgment getAcknowledgment(String messageId) throws DAOException;
 	List<DataSource> getAttachments(long messageId) throws DAOException;
 	//List<Attachment> getAttachments(long messageId) throws DAOException;
-	EbMSMessage getEbMSMessage(long messageId) throws DAOException;
-	EbMSMessage getEbMSMessage(long messageId, boolean includeAttachments) throws DAOException;
-	long insertMessage(Date timeStamp, String cpaId, String conversationId, String messageId, EbMSMessageType messageType, byte[] messageOriginal, MessageHeader messageHeader, AckRequested ackRequested, Manifest manifest, EbMSMessageStatus status, List<DataSource> attachments) throws DAOException;
-	long insertMessage(Date timeStamp, String cpaId, String conversationId, String messageId, EbMSMessageType messageType, byte[] messageOriginal, MessageHeader messageHeader, AckRequested ackRequested, Manifest manifest, EbMSMessageStatus status, List<DataSource> attachments, Date nextRetryTime) throws DAOException;
-	void updateMessage(long id, Date nextRetryTime) throws DAOException;
+	EbMSBaseMessage getEbMSMessage(long messageId) throws DAOException;
+	void insertMessage(EbMSMessage message) throws DAOException;
+	void insertMessage(EbMSMessageError messageError, EbMSMessageStatus status) throws DAOException;
+	void insertMessage(EbMSAcknowledgment acknowledgment, EbMSMessageStatus status) throws DAOException;
+	void insertMessage(EbMSMessage message, EbMSMessageStatus status, EbMSMessageError messageError) throws DAOException;
+	void insertMessage(EbMSMessage message, EbMSMessageStatus status, EbMSAcknowledgment acknowledgment) throws DAOException;
 }

@@ -20,14 +20,17 @@
 	xmlns:spring="http://www.springframework.org/schema/beans"
 	xmlns:context="http://www.springframework.org/schema/context"
 	xmlns:management="http://www.mulesource.org/schema/mule/management/2.2"
+	xmlns:jbossts="http://www.mulesource.org/schema/mule/jbossts/2.2"
 	xsi:schemaLocation="
 		http://www.mulesource.org/schema/mule/core/2.2 http://www.mulesource.org/schema/mule/core/2.2/mule.xsd
 		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
 		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd
 		http://www.mulesource.org/schema/mule/management/2.2 http://www.mulesource.org/schema/mule/management/2.2/mule-management.xsd
+		http://www.mulesource.org/schema/mule/jbossts/2.2 http://www.mulesoft.org/schema/mule/jbossts/2.2/mule-jbossts.xsd
 	"
 >
-	
+	<!--jbossts:transaction-manager/-->
+
 	<custom-transaction-manager class="org.mule.module.spring.transaction.SpringTransactionFactory">
 		<spring:property name="manager" ref="ebMSTXManager" />
 	</custom-transaction-manager>

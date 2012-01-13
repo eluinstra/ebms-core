@@ -44,18 +44,14 @@
 
 	<jdbc:connector name="connector.jdbc.ebms" dataSource-ref="ebMSDataSource" createMultipleTransactedReceivers="true" numberOfConcurrentTransactedReceivers="3" validateConnections="${connector.ebms.validateConnections}">
 		<jdbc:query key="insertEbMSMessage" value-ref="insertEbMSMessage" />
-		<jdbc:query key="selectEbMSMessageForSending" value-ref="selectEbMSMessageForSending" />
-		<jdbc:query key="selectEbMSMessageForSending.ack" value-ref="selectEbMSMessageForSending.ack" /> 
-		<jdbc:query key="selectEbMSMessageForResending" value-ref="selectEbMSMessageForResending" />
-		<jdbc:query key="selectEbMSMessageForResending.ack" value-ref="selectEbMSMessageForResending.ack" /> 
-		<jdbc:query key="updateEbMSMessageAcknowledgment" value-ref="updateEbMSMessageAcknowledgment" /> 
-		<jdbc:query key="updateEbMSAcknowledgment" value-ref="updateEbMSAcknowledgment" /> 
-		<jdbc:query key="updateEbMSMessageError" value-ref="updateEbMSMessageError" /> 
+		<jdbc:query key="insertEbMSMessageAttachment" value-ref="insertEbMSMessage" />
 		<jdbc:query key="updateEbMSMessageStatus" value-ref="updateEbMSMessageStatus" /> 
-		<jdbc:query key="updateEbMSNextRetryTime" value-ref="updateEbMSNextRetryTime" /> 
-		<jdbc:query key="selectEbMSMessageForProcessing" value-ref="selectEbMSMessageForProcessing" />
+		<jdbc:query key="addEbMSMessageSendEvent" value-ref="addEbMSMessageSendEvent" />
+		<jdbc:query key="clearEbMSMessageSendEvents" value-ref="clearEbMSMessageSendEvents" />
+		<jdbc:query key="selectEventsForSending" value-ref="selectEventsForSending" />
+		<jdbc:query key="selectEventsForSending.ack" value-ref="selectEventsForSending.ack" />
+		<jdbc:query key="selectEbMSMessageForProcessing" value-ref="selectEbMSMessageForProcessing" /> 
 		<jdbc:query key="selectEbMSMessageForProcessing.ack" value-ref="selectEbMSMessageForProcessing.ack" /> 
-		<jdbc:query key="updateEbMSProcessingStatus" value-ref="updateEbMSProcessingStatus" /> 
 	</jdbc:connector>
 
 	<file:connector name="connector.file.ebms">

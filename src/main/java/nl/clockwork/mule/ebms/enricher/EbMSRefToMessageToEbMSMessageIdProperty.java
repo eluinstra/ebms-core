@@ -13,36 +13,48 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  ******************************************************************************/
-package nl.clockwork.mule.ebms.component;
+package nl.clockwork.mule.ebms.enricher;
 
-import java.util.Date;
-
-import nl.clockwork.mule.common.component.Callable;
+import nl.clockwork.common.dao.DAOException;
 import nl.clockwork.mule.ebms.Constants;
-import nl.clockwork.mule.ebms.Constants.EbMSMessageStatus;
-import nl.clockwork.mule.ebms.Constants.EbMSMessageType;
 import nl.clockwork.mule.ebms.dao.EbMSDAO;
 import nl.clockwork.mule.ebms.model.EbMSMessage;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.mule.api.MuleMessage;
+import org.mule.api.transformer.TransformerException;
+import org.mule.transformer.AbstractMessageAwareTransformer;
 
-public class InsertEbMSMessageIn extends Callable
+public class EbMSRefToMessageToEbMSMessageIdProperty extends AbstractMessageAwareTransformer
 {
-	private EbMSDAO ebMSDAO;
+  protected transient Log logger = LogFactory.getLog(getClass());
+  private EbMSDAO ebMSDAO;
 
-	@Override
-	public Object onCall(MuleMessage message) throws Exception
+	public EbMSRefToMessageToEbMSMessageIdProperty()
 	{
-		if (message.getPayload() instanceof EbMSMessage)
+		registerSourceType(EbMSMessage.class);
+		//FIXME
+		//setReturnClass(EbMSMessage.class);
+	}
+	
+	@Override
+	public Object transform(final MuleMessage message, String outputEncoding) throws TransformerException
+	{
+		try
 		{
 			EbMSMessage msg = (EbMSMessage)message.getPayload();
-			Date date = new Date();
-			long id = ebMSDAO.insertMessage(date,msg.getMessageHeader().getCPAId(),msg.getMessageHeader().getConversationId(),msg.getMessageHeader().getMessageData().getMessageId(),EbMSMessageType.IN,msg.getMessage(),msg.getMessageHeader(),msg.getAckRequested(),msg.getManifest(),EbMSMessageStatus.RECEIVED,msg.getAttachments());
+			//FIXME refToMessageId does not have to refer to an Acknowledgment or ErrorMessage
+			long id = ebMSDAO.getIdByMessageId(msg.getMessageHeader().getMessageData().getRefToMessageId());
 			message.setProperty(Constants.EBMS_MESSAGE_ID,id);
+			return message;
 		}
-		return message;
+		catch (DAOException e)
+		{
+			throw new TransformerException(this,e);
+		}
 	}
-
+	
 	public void setEbMSDAO(EbMSDAO ebMSDAO)
 	{
 		this.ebMSDAO = ebMSDAO;

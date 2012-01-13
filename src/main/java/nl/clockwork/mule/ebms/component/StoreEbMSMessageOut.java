@@ -13,44 +13,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  ******************************************************************************/
-package nl.clockwork.mule.ebms.transformer;
+package nl.clockwork.mule.ebms.component;
 
-import nl.clockwork.mule.ebms.Constants;
+import nl.clockwork.mule.common.component.Callable;
 import nl.clockwork.mule.ebms.dao.EbMSDAO;
+import nl.clockwork.mule.ebms.model.EbMSMessage;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.mule.api.MuleMessage;
-import org.mule.api.transformer.TransformerException;
-import org.mule.transformer.AbstractMessageAwareTransformer;
 
-public class EbMSMessageIdToEbMSMessage extends AbstractMessageAwareTransformer
+public class StoreEbMSMessageOut extends Callable
 {
-  protected transient Log logger = LogFactory.getLog(getClass());
-  private EbMSDAO ebMSDAO;
+	private EbMSDAO ebMSDAO;
 
-  public EbMSMessageIdToEbMSMessage()
-	{
-		//registerSourceType(Object.class);
-	}
-  
 	@Override
-	public Object transform(MuleMessage message, String outputEncoding) throws TransformerException
+	public Object onCall(MuleMessage message) throws Exception
 	{
-		try
+		if (message.getPayload() instanceof EbMSMessage)
 		{
-			message.setPayload(ebMSDAO.getEbMSMessage(message.getLongProperty(Constants.EBMS_MESSAGE_ID,0)));
-			return message;
+			EbMSMessage msg = (EbMSMessage)message.getPayload();
+			ebMSDAO.insertMessage(msg);
 		}
-		catch (Exception e)
-		{
-			throw new TransformerException(this,e);
-		}
+		return message;
 	}
-	
+
 	public void setEbMSDAO(EbMSDAO ebMSDAO)
 	{
 		this.ebMSDAO = ebMSDAO;
 	}
-	
 }

@@ -17,89 +17,54 @@ package nl.clockwork.mule.ebms;
 
 public class Constants
 {
-  public enum EbMSMessageType
+  public static enum EbMSMessageStatus
   {
-  	IN(0), OUT(1);
-		
-		private final int id;
-		
-		EbMSMessageType(int id) { this.id = id; }
-		
-		public final int id() { return id; }
-		
-		public final static EbMSMessageType get(int id)
-		{
-			switch (id)
-			{
-				case 0:
-					return EbMSMessageType.IN;
-				case 1:
-					return EbMSMessageType.OUT;
-				default:
-					return null;
-			}
-		}
-  };
+		UNAUTHORIZED(0,"UnAuthorized"), NOT_RECOGNIZED(1,"NotRecognized"), RECEIVED(2,"Received"), PROCESSED(3,"Processed"), FORWARDED(4,"Forwarded")/*, STORED(10), SENT(11), FAILED(12), ACKNOWLEDGED(13), EXPIRED(14)*/;
 
-  public enum EbMSAcknowledgmentType
-  {
-  	ACKNOWLEDGMENT(0), MESSAGE_ERROR(1);
-		
 		private final int id;
-		
-		EbMSAcknowledgmentType(int id) { this.id = id; }
-		
-		public final int id() { return id; }
-		
-		public final static EbMSAcknowledgmentType get(int id)
-		{
-			switch (id)
-			{
-				case 0:
-					return EbMSAcknowledgmentType.ACKNOWLEDGMENT;
-				case 1:
-					return EbMSAcknowledgmentType.MESSAGE_ERROR;
-				default:
-					return null;
-			}
-		}
-  };
+		private final String statusCode;
 
-  public enum EbMSMessageStatus
-  {
-		RECEIVED(0), STORED(1), DELIVERED(2), DELIVERY_FAILED(3), ACKNOWLEDGED(4), ACKNOWLEDGMENT_FAILED(5), MESSAGE_ERROR_RAISED(6), MESSAGE_ERROR_FAILED(7);
-		
-		private final int id;
-		
-		EbMSMessageStatus(int id) { this.id = id; }
-		
+		EbMSMessageStatus(int id) { this.id = id; this.statusCode = null; }
+		EbMSMessageStatus(int id, String statusCode) { this.id = id; this.statusCode = statusCode; }
+
 		public final int id() { return id; }
-		
+
+		public final String statusCode() { return statusCode; }
+
 		public final static EbMSMessageStatus get(int id)
 		{
 			switch (id)
 			{
 				case 0:
-					return EbMSMessageStatus.RECEIVED;
+					return EbMSMessageStatus.UNAUTHORIZED;
 				case 1:
-					return EbMSMessageStatus.STORED;
+					return EbMSMessageStatus.NOT_RECOGNIZED;
 				case 2:
-					return EbMSMessageStatus.DELIVERED;
+					return EbMSMessageStatus.RECEIVED;
 				case 3:
-					return EbMSMessageStatus.DELIVERY_FAILED;
+					return EbMSMessageStatus.PROCESSED;
 				case 4:
-					return EbMSMessageStatus.ACKNOWLEDGED;
-				case 5:
-					return EbMSMessageStatus.ACKNOWLEDGMENT_FAILED;
-				case 6:
-					return EbMSMessageStatus.MESSAGE_ERROR_RAISED;
-				case 7:
-					return EbMSMessageStatus.MESSAGE_ERROR_FAILED;
+					return EbMSMessageStatus.FORWARDED;
 				default:
 					return null;
 			}
 		}
-  };
+
+		public final static EbMSMessageStatus get(String id)
+		{
+			if (EbMSMessageStatus.UNAUTHORIZED.statusCode.equals(id))
+				return EbMSMessageStatus.UNAUTHORIZED;
+			if (EbMSMessageStatus.NOT_RECOGNIZED.statusCode.equals(id))
+				return EbMSMessageStatus.NOT_RECOGNIZED;
+			if (EbMSMessageStatus.RECEIVED.statusCode.equals(id))
+				return EbMSMessageStatus.RECEIVED;
+			if (EbMSMessageStatus.PROCESSED.statusCode.equals(id))
+				return EbMSMessageStatus.PROCESSED;
+			if (EbMSMessageStatus.FORWARDED.statusCode.equals(id))
+				return EbMSMessageStatus.FORWARDED;
+			return null;
+		}
+};
 
   public enum EbMSErrorCode
   {
@@ -131,15 +96,17 @@ public class Constants
 
 	public static final String EBMS_VERSION = "2.0";
 	public static final String EBMS_SERVICE = "urn:oasis:names:tc:ebxml-msg:service";
-	public static final String EBMS_ACKNOWLEDGEMENT = "Acknowledgment";
 	public static final String EBMS_MESSAGE_ERROR = "MessageError";
+	public static final String EBMS_ACKNOWLEDGEMENT = "Acknowledgment";
 	public static final String EBMS_ERROR = "EBMS.EBMS_ERROR";
 	public static final String EBMS_SIGNATURE = "EBMS.SIGNATURE";
 	public static final String EBMS_ID = "EBMS.EBMS_ID";
 	public static final String EBMS_DATE = "EBMS.EBMS_DATE";
 	public static final String CPA_ID = "EBMS.CPA_ID";
 
+	public static final String EBMS_MESSAGE = "EBMS.EBMS_MESSAGE";
 	public static final String EBMS_MESSAGE_ID = "EBMS.EBMS_MESSAGE_ID";
+	public static final String EBMS_MESSAGE_STATUS = "EBMS.EBMS_MESSAGE_STATUS";
 	public static final String EBMS_DELEGATE_PATH = "EBMS.EBMS_DELEGATE_PATH";
 
 }

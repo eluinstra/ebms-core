@@ -15,8 +15,9 @@
  ******************************************************************************/
 package nl.clockwork.mule.ebms.transformer;
 
+import java.util.HashMap;
+
 import nl.clockwork.mule.ebms.Constants;
-import nl.clockwork.mule.ebms.dao.EbMSDAO;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -24,12 +25,11 @@ import org.mule.api.MuleMessage;
 import org.mule.api.transformer.TransformerException;
 import org.mule.transformer.AbstractMessageAwareTransformer;
 
-public class EbMSMessageIdToEbMSMessage extends AbstractMessageAwareTransformer
+public class EbMSMessageIdPropertyToMap extends AbstractMessageAwareTransformer
 {
   protected transient Log logger = LogFactory.getLog(getClass());
-  private EbMSDAO ebMSDAO;
 
-  public EbMSMessageIdToEbMSMessage()
+  public EbMSMessageIdPropertyToMap()
 	{
 		//registerSourceType(Object.class);
 	}
@@ -39,18 +39,16 @@ public class EbMSMessageIdToEbMSMessage extends AbstractMessageAwareTransformer
 	{
 		try
 		{
-			message.setPayload(ebMSDAO.getEbMSMessage(message.getLongProperty(Constants.EBMS_MESSAGE_ID,0)));
-			return message;
+			HashMap<String,Object> map = new HashMap<String,Object>();
+			map.put("id",message.getLongProperty(Constants.EBMS_MESSAGE_ID,0));
+			message.setPayload(map);
 		}
 		catch (Exception e)
 		{
+			logger.error("",e);
 			throw new TransformerException(this,e);
 		}
+		return message;
 	}
-	
-	public void setEbMSDAO(EbMSDAO ebMSDAO)
-	{
-		this.ebMSDAO = ebMSDAO;
-	}
-	
+
 }

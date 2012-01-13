@@ -15,34 +15,20 @@
  ******************************************************************************/
 package nl.clockwork.mule.ebms.model;
 
-import nl.clockwork.mule.ebms.Constants.EbMSAcknowledgmentType;
 import nl.clockwork.mule.ebms.model.ebxml.MessageHeader;
 
-public class Acknowledgment
+public class EbMSPong implements EbMSBaseMessage
 {
-	private EbMSAcknowledgmentType acknowledgmentType;
 	private MessageHeader messageHeader;
-	private Object acknowledgment;
 
-	public Acknowledgment(EbMSAcknowledgmentType acknowledgmentType, MessageHeader messageHeader, Object acknowledgment)
+	public EbMSPong(MessageHeader messageHeader)
 	{
-		this.acknowledgmentType = acknowledgmentType;
 		this.messageHeader = messageHeader;
-		this.acknowledgment = acknowledgment;
 	}
 
-	public EbMSAcknowledgmentType getAcknowledgmentType()
-	{
-		return acknowledgmentType;
-	}
-
+	@Override
 	public MessageHeader getMessageHeader()
 	{
 		return messageHeader;
-	}
-	
-	public Object getAcknowledgment()
-	{
-		return acknowledgment;
 	}
 }

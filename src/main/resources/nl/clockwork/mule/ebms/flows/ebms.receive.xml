@@ -62,137 +62,127 @@
 			<component>
 				<singleton-object class="nl.clockwork.mule.ebms.service.EbMSPortTypeImpl" />
 				<binding interface="nl.clockwork.mule.ebms.service.EbMSMessageProcessor" method="process">
-					<vm:outbound-endpoint path="ebms.message.store.in" synchronous="false">
+					<vm:outbound-endpoint path="ebms.message.receive.in" synchronous="true">
 						<script:transformer>
 							<script:script engine="groovy">
 								import nl.clockwork.mule.ebms.Constants;
 								import nl.clockwork.mule.ebms.model.EbMSMessage;
 
 								Object[] objects = message.getPayload();
-								message.setProperty(Constants.EBMS_SIGNATURE,objects[5]);
-								EbMSMessage m = new EbMSMessage(objects[0],objects[1],objects[2],objects[3],objects[4]);
-								message.setPayload(m);
-								return message;
-							</script:script>
-						</script:transformer>
-					</vm:outbound-endpoint>
-				</binding>
-				<binding interface="nl.clockwork.mule.ebms.service.EbMSAcknowledgmentProcessor" method="process">
-					<vm:outbound-endpoint path="ebms.acknowledgment.store.in" synchronous="false">
-						<script:transformer>
-							<script:script engine="groovy">
-								import nl.clockwork.mule.ebms.model.EbMSAcknowledgment;
-
-								Object[] objects = message.getPayload();
-								EbMSAcknowledgment acknowledgment = new EbMSAcknowledgment(objects[0],objects[1]);
-								message.setPayload(acknowledgment);
+								message.setProperty(Constants.EBMS_SIGNATURE,objects[1]);
+								message.setPayload(objects[0]);
 								return message;
 							</script:script>
 						</script:transformer>
 					</vm:outbound-endpoint>
 				</binding>
 				<binding interface="nl.clockwork.mule.ebms.service.EbMSMessageErrorProcessor" method="process">
-					<vm:outbound-endpoint path="ebms.messageError.store.in" synchronous="false">
-						<script:transformer>
-							<script:script engine="groovy">
-								import nl.clockwork.mule.ebms.model.EbMSMessageError;
-
-								Object[] objects = message.getPayload();
-								EbMSMessageError messageError = new EbMSMessageError(objects[0],objects[1]);
-								message.setPayload(messageError);
-								return message;
-							</script:script>
-						</script:transformer>
-					</vm:outbound-endpoint>
+					<vm:outbound-endpoint path="ebms.messageError.receive.in" synchronous="true"/>
+				</binding>
+				<binding interface="nl.clockwork.mule.ebms.service.EbMSAcknowledgmentProcessor" method="process">
+					<vm:outbound-endpoint path="ebms.acknowledgment.receive.in" synchronous="true"/>
+				</binding>
+				<binding interface="nl.clockwork.mule.ebms.service.EbMSMessageStatusProcessor" method="process">
+					<vm:outbound-endpoint path="ebms.messageStatus.receive.in" synchronous="true"/>
+				</binding>
+				<binding interface="nl.clockwork.mule.ebms.service.EbMSPingProcessor" method="process">
+					<vm:outbound-endpoint path="ebms.ping.receive.in" synchronous="true"/>
 				</binding>
 			</component>
 		</service>
+
+	</model>
+
+	<model>
+
+		<default-service-exception-strategy>
+			<vm:outbound-endpoint path="ebms.message.receive.async.reply">
+				<message-properties-transformer>
+					<add-message-property key="EBMS.HTTP_STATUS_CODE" value-ref="HTTP_SC_INTERNAL_SERVER_ERROR"/>
+				</message-properties-transformer>
+			</vm:outbound-endpoint>
+		</default-service-exception-strategy>
+
 		
-		<service name="ebms.message.store">
+		<service name="ebms.message.receive">
 			<inbound>
-				<vm:inbound-endpoint path="ebms.message.store.in" />
+				<vm:inbound-endpoint path="ebms.message.receive.in" />
+			</inbound>
+			<outbound>
+				<pass-through-router>
+					<vm:outbound-endpoint path="ebms.message.eliminateDuplicate.in" />
+				</pass-through-router>
+			</outbound>
+			<async-reply failOnTimeout="true" timeout="60000">
+				<vm:inbound-endpoint path="ebms.message.receive.async.reply" />
+				<single-async-reply-router/>
+			</async-reply>
+		</service>
+
+		<service name="ebms.message.eliminateDuplicate">
+			<inbound>
+				<vm:inbound-endpoint path="ebms.message.eliminateDuplicate.in" />
 				<selective-consumer-router>
 					<custom-filter class="nl.clockwork.mule.ebms.filter.EbMSDuplicateMessageFilter">
 						<spring:property name="ebMSDAO" ref="ebMSDAO" />
 					</custom-filter>
 				</selective-consumer-router>
 				<forwarding-catch-all-strategy>
-					<vm:outbound-endpoint path="ebms.acknowledgment.resend.in" />
+					<vm:outbound-endpoint path="ebms.message.validate.in" />
 				</forwarding-catch-all-strategy>
 			</inbound>
-			<component>
-				<singleton-object class="nl.clockwork.mule.ebms.component.InsertEbMSMessageIn">
-					<property key="ebMSDAO" value-ref="ebMSDAO"/>
-				</singleton-object>
-			</component>
 			<outbound>
-				<custom-outbound-router class="nl.clockwork.mule.common.router.ChainingMulticastingRouter">
-					<!--jdbc:outbound-endpoint connector-ref="connector.jdbc.ebms" queryKey="insertEbMSMessage">
-						<custom-transformer class="nl.clockwork.mule.ebms.transformer.EbMSMessageToInsertEbMSMessageMap">
-							<spring:property name="ebMSDAO" ref="ebMSDAO" />
-						</custom-transformer>
-					</jdbc:outbound-endpoint-->
-					<vm:outbound-endpoint path="ebms.validate.in" />
-				</custom-outbound-router>
+				<pass-through-router>
+					<vm:outbound-endpoint path="ebms.response.resend.in" />
+					<!--vm:outbound-endpoint path="ebms.response.get.in" /-->
+				</pass-through-router>
 			</outbound>
-			<default-service-exception-strategy>
-				<vm:outbound-endpoint path="ebms.messageError.send.in" />
-			</default-service-exception-strategy>
 		</service>
 		
-		<service name="ebms.acknowledgment.store">
+<!--		<service name="ebms.message.eliminateDuplicate">-->
+<!--			<inbound>-->
+<!--				<vm:inbound-endpoint path="ebms.message.eliminateDuplicate.in" />-->
+<!--			</inbound>-->
+<!--			<outbound>-->
+<!--				<filtering-router>-->
+<!--					<vm:outbound-endpoint path="ebms.response.resend.in" />-->
+					<!--vm:outbound-endpoint path="ebms.response.get.in" /-->
+<!--					<custom-filter class="nl.clockwork.mule.ebms.filter.EbMSDuplicateMessageFilter">-->
+<!--						<spring:property name="ebMSDAO" ref="ebMSDAO" />-->
+<!--					</custom-filter>-->
+<!--				</filtering-router>-->
+<!--				<forwarding-catch-all-strategy>-->
+<!--					<vm:outbound-endpoint path="ebms.message.validate.in" />-->
+<!--				</forwarding-catch-all-strategy>-->
+<!--			</outbound>-->
+<!--		</service>-->
+		
+		<service name="ebms.response.resend">
 			<inbound>
-				<vm:inbound-endpoint path="ebms.acknowledgment.store.in">
-					<custom-transformer class="nl.clockwork.mule.ebms.enricher.EbMSAcknowledgmentToEbMSMessageIdEnricher">
+				<vm:inbound-endpoint path="ebms.response.resend.in">
+					<custom-transformer class="nl.clockwork.mule.ebms.enricher.EbMSRefToMessageToEbMSMessageIdProperty">
+					<!--custom-transformer class="nl.clockwork.mule.ebms.enricher.EbMSResponseToMessageToEbMSMessageIdProperty"-->
 						<spring:property name="ebMSDAO" ref="ebMSDAO"/>
 					</custom-transformer>
 				</vm:inbound-endpoint>
 			</inbound>
 			<outbound>
-				<custom-outbound-router class="nl.clockwork.mule.common.router.ChainingMulticastingRouter">
-					<jdbc:outbound-endpoint connector-ref="connector.jdbc.ebms" queryKey="updateEbMSAcknowledgment">
-						<custom-transformer class="nl.clockwork.mule.ebms.transformer.EbMSAcknowledgmentToUpdateEbMSAcknowledgmentMap" />
+				<chaining-router>
+					<jdbc:outbound-endpoint connector-ref="connector.jdbc.ebms" queryKey="addEbMSMessageSendEvent">
+						<custom-transformer class="nl.clockwork.mule.ebms.transformer.EbMSMessageIdPropertyToMap" />
 					</jdbc:outbound-endpoint>
-					<jdbc:outbound-endpoint connector-ref="connector.jdbc.ebms" queryKey="updateEbMSMessageStatus">
-						<custom-transformer class="nl.clockwork.mule.ebms.transformer.EbMSMessageIdToUpdateEbMSMessageStatusMap">
-							<spring:property name="ebMSMessageStatus" value="ACKNOWLEDGED" />
-						</custom-transformer>
-					</jdbc:outbound-endpoint>
-					<jdbc:outbound-endpoint connector-ref="connector.jdbc.ebms" queryKey="updateEbMSNextRetryTime">
-						<custom-transformer class="nl.clockwork.mule.ebms.transformer.EbMSMessageIdToUpdateEbMSMessageMap" />
-					</jdbc:outbound-endpoint>
-				</custom-outbound-router>
+					<vm:outbound-endpoint path="ebms.message.receive.async.reply">
+						<message-properties-transformer>
+							<add-message-property key="EBMS.HTTP_STATUS_CODE" value-ref="HTTP_SC_NO_CONTENT"/>
+						</message-properties-transformer>
+					</vm:outbound-endpoint>
+				</chaining-router>
 			</outbound>
 		</service>
-
-		<service name="ebms.messageError.store">
+		
+		<service name="ebms.message.validate">
 			<inbound>
-				<vm:inbound-endpoint path="ebms.messageError.store.in">
-					<custom-transformer class="nl.clockwork.mule.ebms.enricher.EbMSMessageErrorToEbMSMessageIdEnricher">
-						<spring:property name="ebMSDAO" ref="ebMSDAO"/>
-					</custom-transformer>
-				</vm:inbound-endpoint>
-			</inbound>
-			<outbound>
-				<custom-outbound-router class="nl.clockwork.mule.common.router.ChainingMulticastingRouter">
-					<jdbc:outbound-endpoint connector-ref="connector.jdbc.ebms" queryKey="updateEbMSMessageError">
-						<custom-transformer class="nl.clockwork.mule.ebms.transformer.EbMSMessageErrorToUpdateEbMSAcknowledgmentMap" />
-					</jdbc:outbound-endpoint>
-					<jdbc:outbound-endpoint connector-ref="connector.jdbc.ebms" queryKey="updateEbMSMessageStatus">
-						<custom-transformer class="nl.clockwork.mule.ebms.transformer.EbMSMessageIdToUpdateEbMSMessageStatusMap">
-							<spring:property name="ebMSMessageStatus" value="MESSAGE_ERROR_RAISED" />
-						</custom-transformer>
-					</jdbc:outbound-endpoint>
-					<jdbc:outbound-endpoint connector-ref="connector.jdbc.ebms" queryKey="updateEbMSNextRetryTime">
-						<custom-transformer class="nl.clockwork.mule.ebms.transformer.EbMSMessageIdToUpdateEbMSMessageMap" />
-					</jdbc:outbound-endpoint>
-				</custom-outbound-router>
-			</outbound>
-		</service>
-
-		<service name="ebms.validate">
-			<inbound>
-				<vm:inbound-endpoint path="ebms.validate.in" />
+				<vm:inbound-endpoint path="ebms.message.validate.in" />
 			</inbound>
 			<outbound>
 				<filtering-router>
@@ -204,7 +194,11 @@
 					</not-filter>
 				</filtering-router>
 				<filtering-router>
-					<vm:outbound-endpoint path="ebms.messageError.send.in" />
+					<vm:outbound-endpoint path="ebms.messageError.create.in">
+						<message-properties-transformer>
+							<add-message-property key="EBMS.EBMS_MESSAGE_STATUS" value="UnAuthorized"/>
+						</message-properties-transformer>
+					</vm:outbound-endpoint>
 					<not-filter>
 						<custom-filter class="nl.clockwork.mule.ebms.filter.EbMSSignatureValidationFilter">
 							<spring:property name="ebMSDAO" ref="ebMSDAO" />
@@ -212,7 +206,11 @@
 					</not-filter>
 				</filtering-router>
 				<filtering-router>
-					<vm:outbound-endpoint path="ebms.messageError.send.in" />
+					<vm:outbound-endpoint path="ebms.messageError.create.in">
+						<message-properties-transformer>
+							<add-message-property key="EBMS.EBMS_MESSAGE_STATUS" value="UnAuthorized"/>
+						</message-properties-transformer>
+					</vm:outbound-endpoint>
 					<not-filter>
 						<custom-filter class="nl.clockwork.mule.ebms.filter.EbMSMessageHeaderValidationFilter">
 							<spring:property name="ebMSDAO" ref="ebMSDAO" />
@@ -220,17 +218,279 @@
 					</not-filter>
 				</filtering-router>
 				<filtering-router>
-					<vm:outbound-endpoint path="ebms.messageError.send.in" />
+					<vm:outbound-endpoint path="ebms.messageError.create.in">
+						<message-properties-transformer>
+							<add-message-property key="EBMS.EBMS_MESSAGE_STATUS" value="NotRecognized"/>
+						</message-properties-transformer>
+					</vm:outbound-endpoint>
+					<not-filter>
+						<custom-filter class="nl.clockwork.mule.ebms.filter.EbMSMessageDataValidationFilter">
+							<spring:property name="ebMSDAO" ref="ebMSDAO" />
+						</custom-filter>
+					</not-filter>
+				</filtering-router>
+				<filtering-router>
+					<vm:outbound-endpoint path="ebms.messageError.create.in">
+						<message-properties-transformer>
+							<add-message-property key="EBMS.EBMS_MESSAGE_STATUS" value="UnAuthorized"/>
+						</message-properties-transformer>
+					</vm:outbound-endpoint>
 					<not-filter>
 						<custom-filter class="nl.clockwork.mule.ebms.filter.EbMSMessageBodyValidationFilter" />
 					</not-filter>
 				</filtering-router>
 				<forwarding-catch-all-strategy>
-					<vm:outbound-endpoint path="ebms.acknowledgment.send.in" />
+					<vm:outbound-endpoint path="ebms.acknowledgment.create.in">
+						<message-properties-transformer>
+							<add-message-property key="EBMS.EBMS_MESSAGE_STATUS" value="Received"/>
+						</message-properties-transformer>
+					</vm:outbound-endpoint>
 				</forwarding-catch-all-strategy>
 			</outbound>
 		</service>
 		
+		<service name="ebms.messageError.create">
+			<inbound>
+				<vm:inbound-endpoint path="ebms.messageError.create.in">
+					<custom-transformer class="nl.clockwork.mule.ebms.enricher.EbMSMessageToEbMSMessageProperty"/>
+					<custom-transformer class="nl.clockwork.mule.ebms.transformer.EbMSMessageToEbMSMessageError">
+						<spring:property name="hostname" value="${service.host}" />
+					</custom-transformer>
+				</vm:inbound-endpoint>
+			</inbound>
+			<outbound>
+				<pass-through-router>
+					<vm:outbound-endpoint path="ebms.messageError.out.store.in"/>
+				</pass-through-router>
+			</outbound>
+		</service>
+		
+		<service name="ebms.messageError.out.store">
+			<inbound>
+				<vm:inbound-endpoint path="ebms.messageError.out.store.in" />
+			</inbound>
+			<component>
+				<singleton-object class="nl.clockwork.mule.ebms.component.StoreEbMSMessageInEbMSMessageErrorOut">
+					<property key="ebMSDAO" value-ref="ebMSDAO"/>
+				</singleton-object>
+			</component>
+			<outbound>
+				<chaining-router>
+					<!--jdbc:outbound-endpoint connector-ref="connector.jdbc.ebms" queryKey="insertEbMSMessage">
+						<custom-transformer class="nl.clockwork.mule.ebms.transformer.EbMSMessageInToMap"/>
+						<jdbc:transaction action="ALWAYS_BEGIN" timeout="60000"/>
+					</jdbc:outbound-endpoint>
+					<jdbc:outbound-endpoint connector-ref="connector.jdbc.ebms" queryKey="insertEbMSMessageAttachment">
+						<jdbc:transaction action="ALWAYS_JOIN"/>
+					</jdbc:outbound-endpoint>
+					<jdbc:outbound-endpoint connector-ref="connector.jdbc.ebms" queryKey="insertEbMSMessage">
+						<custom-transformer class="nl.clockwork.mule.ebms.transformer.EbMSMessageErrorOutToMap" />
+						<jdbc:transaction action="ALWAYS_JOIN"/>
+					</jdbc:outbound-endpoint>
+					<jdbc:outbound-endpoint connector-ref="connector.jdbc.ebms" queryKey="addEbMSMessageSendEvent">
+						<custom-transformer class="nl.clockwork.mule.ebms.enricher.EbMSRefToMessageToEbMSMessageIdProperty">
+							<spring:property name="ebMSDAO" ref="ebMSDAO"/>
+						</custom-transformer>
+						<custom-transformer class="nl.clockwork.mule.ebms.transformer.EbMSMessageIdPropertyToMap" />
+						<jdbc:transaction action="ALWAYS_JOIN"/>
+					</jdbc:outbound-endpoint-->
+					<vm:outbound-endpoint path="ebms.message.receive.async.reply">
+						<message-properties-transformer>
+							<add-message-property key="EBMS.HTTP_STATUS_CODE" value-ref="HTTP_SC_NO_CONTENT"/>
+						</message-properties-transformer>
+					</vm:outbound-endpoint>
+				</chaining-router>
+			</outbound>
+		</service>
+
+		<service name="ebms.acknowledgment.create">
+			<inbound>
+				<vm:inbound-endpoint path="ebms.acknowledgment.create.in">
+					<custom-transformer class="nl.clockwork.mule.ebms.enricher.EbMSMessageToEbMSMessageProperty"/>
+					<custom-transformer class="nl.clockwork.mule.ebms.transformer.EbMSMessageToEbMSAcknowledgment">
+						<spring:property name="hostname" value="${service.host}" />
+					</custom-transformer>
+				</vm:inbound-endpoint>
+			</inbound>
+			<outbound>
+				<pass-through-router>
+					<vm:outbound-endpoint path="ebms.acknowledgment.out.store.in"/>
+				</pass-through-router>
+			</outbound>
+		</service>
+		
+		<service name="ebms.acknowledgment.out.store">
+			<inbound>
+				<vm:inbound-endpoint path="ebms.acknowledgment.out.store.in" />
+			</inbound>
+			<component>
+				<singleton-object class="nl.clockwork.mule.ebms.component.StoreEbMSMessageInEbMSAcknowledgmentOut">
+					<property key="ebMSDAO" value-ref="ebMSDAO"/>
+				</singleton-object>
+			</component>
+			<outbound>
+				<chaining-router>
+					<!--jdbc:outbound-endpoint connector-ref="connector.jdbc.ebms" queryKey="insertEbMSMessage">
+						<custom-transformer class="nl.clockwork.mule.ebms.transformer.EbMSMessageInToMap"/>
+						<jdbc:transaction action="ALWAYS_BEGIN" timeout="60000"/>
+					</jdbc:outbound-endpoint>
+					<jdbc:outbound-endpoint connector-ref="connector.jdbc.ebms" queryKey="insertEbMSMessageAttachment">
+						<jdbc:transaction action="ALWAYS_JOIN"/>
+					</jdbc:outbound-endpoint>
+					<jdbc:outbound-endpoint connector-ref="connector.jdbc.ebms" queryKey="insertEbMSMessage">
+						<custom-transformer class="nl.clockwork.mule.ebms.transformer.EbMSAcknowledgmentOutToMap" />
+						<jdbc:transaction action="ALWAYS_JOIN"/>
+					</jdbc:outbound-endpoint>
+					<jdbc:outbound-endpoint connector-ref="connector.jdbc.ebms" queryKey="addEbMSMessageSendEvent">
+						<custom-transformer class="nl.clockwork.mule.ebms.enricher.EbMSRefToMessageToEbMSMessageIdProperty">
+							<spring:property name="ebMSDAO" ref="ebMSDAO"/>
+						</custom-transformer>
+						<custom-transformer class="nl.clockwork.mule.ebms.transformer.EbMSMessageIdPropertyToMap" />
+						<jdbc:transaction action="ALWAYS_JOIN"/>
+					</jdbc:outbound-endpoint-->
+					<vm:outbound-endpoint path="ebms.message.receive.async.reply">
+						<message-properties-transformer>
+							<add-message-property key="EBMS.HTTP_STATUS_CODE" value-ref="HTTP_SC_NO_CONTENT"/>
+						</message-properties-transformer>
+					</vm:outbound-endpoint>
+				</chaining-router>
+			</outbound>
+		</service>
+
+	</model>
+
+	<model>
+
+		<default-service-exception-strategy>
+			<vm:outbound-endpoint path="ebms.messageError.receive.async.reply">
+				<message-properties-transformer>
+					<add-message-property key="EBMS.HTTP_STATUS_CODE" value-ref="HTTP_SC_INTERNAL_SERVER_ERROR"/>
+				</message-properties-transformer>
+			</vm:outbound-endpoint>
+		</default-service-exception-strategy>
+
+		<!-- TODO validate message -->
+		<service name="ebms.messageError.receive">
+			<inbound>
+				<vm:inbound-endpoint path="ebms.messageError.receive.in">
+					<custom-transformer class="nl.clockwork.mule.ebms.enricher.EbMSRefToMessageToEbMSMessageIdProperty"/>
+					<!--custom-transformer class="nl.clockwork.mule.ebms.enricher.EbMSBaseMessageToEbMSMessageIdProperty">
+						<spring:property name="ebMSDAO" ref="ebMSDAO"/>
+					</custom-transformer-->
+					<message-properties-transformer>
+						<add-message-property key="EBMS.EBMS_MESSAGE_STATUS" value="nl.clockwork.mule.ebms.Constants.EbMSMessageStatus.RECEIVED"/>
+					</message-properties-transformer>
+				</vm:inbound-endpoint>
+			</inbound>
+			<outbound>
+				<pass-through-router>
+					<vm:outbound-endpoint path="ebms.messageError.in.store.in"/>
+				</pass-through-router>
+			</outbound>
+			<async-reply failOnTimeout="true" timeout="60000">
+				<vm:inbound-endpoint path="ebms.messageError.receive.async.reply" />
+				<single-async-reply-router/>
+			</async-reply>
+		</service>
+		
+		<service name="ebms.messageError.in.store">
+			<inbound>
+				<vm:inbound-endpoint path="ebms.messageError.in.store.in" />
+			</inbound>
+			<component>
+				<singleton-object class="nl.clockwork.mule.ebms.component.StoreEbMSMessageErrorIn">
+					<property key="ebMSDAO" value-ref="ebMSDAO"/>
+				</singleton-object>
+			</component>
+			<outbound>
+				<chaining-router>
+					<!--jdbc:outbound-endpoint connector-ref="connector.jdbc.ebms" queryKey="insertEbMSMessage">
+						<custom-transformer class="nl.clockwork.mule.ebms.transformer.EbMSMessageErrorInToMap" />
+						<jdbc:transaction action="ALWAYS_BEGIN" timeout="60000"/>
+					</jdbc:outbound-endpoint>
+					<jdbc:outbound-endpoint connector-ref="connector.jdbc.ebms" queryKey="clearEbMSMessageSendEvent">
+						<custom-transformer class="nl.clockwork.mule.ebms.enricher.EbMSRefToMessageToEbMSMessageIdProperty">
+							<spring:property name="ebMSDAO" ref="ebMSDAO"/>
+						</custom-transformer>
+						<custom-transformer class="nl.clockwork.mule.ebms.transformer.EbMSMessageIdPropertyToMap" />
+						<jdbc:transaction action="ALWAYS_JOIN"/>
+					</jdbc:outbound-endpoint-->
+					<vm:outbound-endpoint path="ebms.messageError.receive.async.reply">
+						<message-properties-transformer>
+							<add-message-property key="EBMS.HTTP_STATUS_CODE" value-ref="HTTP_SC_NO_CONTENT"/>
+						</message-properties-transformer>
+					</vm:outbound-endpoint>
+				</chaining-router>
+			</outbound>
+		</service>
+
+	</model>
+
+	<model>
+
+		<default-service-exception-strategy>
+			<vm:outbound-endpoint path="ebms.acknowledgment.receive.async.reply">
+				<message-properties-transformer>
+					<add-message-property key="EBMS.HTTP_STATUS_CODE" value-ref="HTTP_SC_INTERNAL_SERVER_ERROR"/>
+				</message-properties-transformer>
+			</vm:outbound-endpoint>
+		</default-service-exception-strategy>
+
+		<!-- TODO validate message -->
+		<service name="ebms.acknowledgment.receive">
+			<inbound>
+				<vm:inbound-endpoint path="ebms.acknowledgment.receive.in">
+					<custom-transformer class="nl.clockwork.mule.ebms.enricher.EbMSRefToMessageToEbMSMessageIdProperty"/>
+					<!--custom-transformer class="nl.clockwork.mule.ebms.enricher.EbMSBaseMessageToEbMSMessageIdProperty">
+						<spring:property name="ebMSDAO" ref="ebMSDAO"/>
+					</custom-transformer-->
+					<message-properties-transformer>
+						<add-message-property key="EBMS.EBMS_MESSAGE_STATUS" value="nl.clockwork.mule.ebms.Constants.EbMSMessageStatus.RECEIVED"/>
+					</message-properties-transformer>
+				</vm:inbound-endpoint>
+			</inbound>
+			<outbound>
+				<pass-through-router>
+					<vm:outbound-endpoint path="ebms.acknowledgment.in.store.in"/>
+				</pass-through-router>
+			</outbound>
+			<async-reply failOnTimeout="true" timeout="60000">
+				<vm:inbound-endpoint path="ebms.acknowledgment.receive.async.reply" />
+				<single-async-reply-router/>
+			</async-reply>
+		</service>
+		
+		<service name="ebms.acknowledgment.in.store">
+			<inbound>
+				<vm:inbound-endpoint path="ebms.acknowledgment.in.store.in" />
+			</inbound>
+			<component>
+				<singleton-object class="nl.clockwork.mule.ebms.component.StoreEbMSAcknowledgmentIn">
+					<property key="ebMSDAO" value-ref="ebMSDAO"/>
+				</singleton-object>
+			</component>
+			<outbound>
+				<chaining-router>
+					<!--jdbc:outbound-endpoint connector-ref="connector.jdbc.ebms" queryKey="insertEbMSMessage">
+						<custom-transformer class="nl.clockwork.mule.ebms.transformer.EbMSAcknowledgmentInToMap" />
+						<jdbc:transaction action="ALWAYS_BEGIN" timeout="60000"/>
+					</jdbc:outbound-endpoint>
+					<jdbc:outbound-endpoint connector-ref="connector.jdbc.ebms" queryKey="clearEbMSMessageSendEvent">
+						<custom-transformer class="nl.clockwork.mule.ebms.enricher.EbMSRefToMessageToEbMSMessageIdProperty">
+							<spring:property name="ebMSDAO" ref="ebMSDAO"/>
+						</custom-transformer>
+						<custom-transformer class="nl.clockwork.mule.ebms.transformer.EbMSMessageIdPropertyToMap" />
+						<jdbc:transaction action="ALWAYS_JOIN"/>
+					</jdbc:outbound-endpoint-->
+					<vm:outbound-endpoint path="ebms.acknowledgment.receive.async.reply">
+						<message-properties-transformer>
+							<add-message-property key="EBMS.HTTP_STATUS_CODE" value-ref="HTTP_SC_NO_CONTENT"/>
+						</message-properties-transformer>
+					</vm:outbound-endpoint>
+				</chaining-router>
+			</outbound>
+		</service>
+
 	</model>
 
 </mule>

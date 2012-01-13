@@ -30,6 +30,13 @@
 		<constructor-arg value="update cpa set cpa=#[map-payload:cpa] where cpa_id=#[map-payload:cpa_id]" />
 	</bean>
 
+	<bean id="resetEbMSMessageResponseSendTime" class="java.lang.String">
+		<constructor-arg value="update ebms_message set send_time=GETDATE() where id=#[map-payload:ID]" /> 
+	</bean>
+	<bean id="clearEbMSMessageResponseSendTime" class="java.lang.String">
+		<constructor-arg value="update ebms_message set send_time=null where id=#[map-payload:ID]" /> 
+	</bean>
+
 	<bean id="insertEbMSMessage" class="java.lang.String">
 		<constructor-arg value="insert into ebms_message (time_stamp, cpa_id, conversation_id, sequence_nr, message_id, message_type, message_original, message_header, message_manifest, status, status_date) values (#[map-payload:time_stamp], #[map-payload:cpa_id], #[map-payload:conversation_id], #[map-payload:sequence_nr], #[map-payload:message_id], #[map-payload:message_type], #[map-payload:message_original], #[map-payload:message_header], #[map-payload:message_manifest], #[map-payload:status], GETDATE())" />
 	</bean>

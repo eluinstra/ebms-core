@@ -43,15 +43,9 @@
 						<spring:property name="hostname" value="${service.host}" />
 					</custom-transformer>
 				</vm:inbound-endpoint>
-				<vm:inbound-endpoint path="ebms.message.send.in" synchronous="true">
-					<custom-transformer class="nl.clockwork.mule.ebms.transformer.EbMSMessageContentToEbMSMessage">
-						<spring:property name="ebMSDAO" ref="ebMSDAO" />
-						<spring:property name="hostname" value="${service.host}" />
-					</custom-transformer>
-				</vm:inbound-endpoint>
 			</inbound>
 			<component>
-				<singleton-object class="nl.clockwork.mule.ebms.component.InsertEbMSMessageOut">
+				<singleton-object class="nl.clockwork.mule.ebms.component.StoreEbMSMessageOut">
 					<property key="ebMSDAO" value-ref="ebMSDAO"/>
 				</singleton-object>
 			</component>

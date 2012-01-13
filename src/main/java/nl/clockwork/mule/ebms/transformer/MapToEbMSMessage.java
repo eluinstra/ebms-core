@@ -16,10 +16,16 @@
 package nl.clockwork.mule.ebms.transformer;
 
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.activation.DataSource;
 
 import nl.clockwork.common.util.XMLMessageBuilder;
-import nl.clockwork.mule.ebms.Constants;
-import nl.clockwork.mule.ebms.model.ebxml.ErrorList;
+import nl.clockwork.mule.ebms.dao.EbMSDAO;
+import nl.clockwork.mule.ebms.model.EbMSMessage;
+import nl.clockwork.mule.ebms.model.ebxml.AckRequested;
+import nl.clockwork.mule.ebms.model.ebxml.Manifest;
 import nl.clockwork.mule.ebms.model.ebxml.MessageHeader;
 
 import org.apache.commons.logging.Log;
@@ -28,13 +34,14 @@ import org.mule.api.MuleMessage;
 import org.mule.api.transformer.TransformerException;
 import org.mule.transformer.AbstractMessageAwareTransformer;
 
-public class EbMSMessageErrorToUpdateEbMSMessageAcknowledgmentMap extends AbstractMessageAwareTransformer
+public class MapToEbMSMessage extends AbstractMessageAwareTransformer
 {
   protected transient Log logger = LogFactory.getLog(getClass());
-
-  public EbMSMessageErrorToUpdateEbMSMessageAcknowledgmentMap()
+  private EbMSDAO ebMSDAO;
+  
+  public MapToEbMSMessage()
 	{
-		//registerSourceType(EbMSMessageError.class);
+		//registerSourceType(Object.class);
 	}
   
 	@Override
@@ -42,21 +49,25 @@ public class EbMSMessageErrorToUpdateEbMSMessageAcknowledgmentMap extends Abstra
 	{
 		try
 		{
-			//EbMSMessageError messageError = (EbMSMessageError)message.getPayload();
-			Object[] messageError = (Object[])message.getPayload();
-			HashMap<String,Object> map = new HashMap<String,Object>();
-			map.put("id",message.getStringProperty(Constants.EBMS_MESSAGE_ID,null));
-			map.put("ack_type",Constants.EbMSAcknowledgmentType.MESSAGE_ERROR.id());
-			map.put("ack_header",XMLMessageBuilder.getInstance(MessageHeader.class).handle((MessageHeader)messageError[0]));
-			map.put("ack_content",XMLMessageBuilder.getInstance(ErrorList.class).handle((ErrorList)messageError[1]));
-			message.setPayload(map);
+			Map<String,Object> map = (HashMap<String,Object>)message.getPayload();
+			List<DataSource> dataSources = ebMSDAO.getAttachments((Long)map.get("ebms_message_id"));
+			message.setPayload(
+					new EbMSMessage(
+							XMLMessageBuilder.getInstance(MessageHeader.class).handle((String)map.get("message_header")),
+							XMLMessageBuilder.getInstance(AckRequested.class).handle((String)map.get("ack_requested")),
+							XMLMessageBuilder.getInstance(Manifest.class).handle((String)map.get("content")),
+					dataSources)
+			);
+			return message;
 		}
 		catch (Exception e)
 		{
-			logger.error("",e);
 			throw new TransformerException(this,e);
 		}
-		return message;
 	}
-
+	
+	public void setEbMSDAO(EbMSDAO ebMSDAO)
+	{
+		this.ebMSDAO = ebMSDAO;
+	}
 }

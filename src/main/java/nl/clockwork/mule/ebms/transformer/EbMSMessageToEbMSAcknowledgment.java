@@ -15,23 +15,21 @@
  ******************************************************************************/
 package nl.clockwork.mule.ebms.transformer;
 
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.GregorianCalendar;
-import java.util.List;
 
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 
 import nl.clockwork.mule.ebms.Constants;
+import nl.clockwork.mule.ebms.model.EbMSAcknowledgment;
 import nl.clockwork.mule.ebms.model.EbMSMessage;
 import nl.clockwork.mule.ebms.model.Signature;
 import nl.clockwork.mule.ebms.model.cpp.cpa.ActorType;
 import nl.clockwork.mule.ebms.model.ebxml.Acknowledgment;
 import nl.clockwork.mule.ebms.model.ebxml.From;
 import nl.clockwork.mule.ebms.model.ebxml.MessageHeader;
-import nl.clockwork.mule.ebms.model.ebxml.PartyId;
 import nl.clockwork.mule.ebms.model.xml.xmldsig.ReferenceType;
+import nl.clockwork.mule.ebms.util.EbMSMessageUtils;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -54,22 +52,22 @@ public class EbMSMessageToEbMSAcknowledgment extends AbstractMessageAwareTransfo
 	{
 		try
 		{
-			GregorianCalendar calendar = new GregorianCalendar();
+			GregorianCalendar timestamp = new GregorianCalendar();
 
 			EbMSMessage msg = (EbMSMessage)message.getPayload();
-			MessageHeader messageHeader = msg.getMessageHeader();
-
+			MessageHeader messageHeader = EbMSMessageUtils.createMessageHeader(msg.getMessageHeader(),hostname,timestamp,Constants.EBMS_ACKNOWLEDGEMENT);
+			
 			Acknowledgment acknowledgment = new Acknowledgment();
 
 			acknowledgment.setVersion(Constants.EBMS_VERSION);
 			acknowledgment.setMustUnderstand(true);
 
-			acknowledgment.setTimestamp(DatatypeFactory.newInstance().newXMLGregorianCalendar(calendar));
-			acknowledgment.setRefToMessageId(messageHeader.getMessageData().getMessageId());
+			acknowledgment.setTimestamp(DatatypeFactory.newInstance().newXMLGregorianCalendar(timestamp));
+			acknowledgment.setRefToMessageId(messageHeader.getMessageData().getRefToMessageId());
 			acknowledgment.setFrom(new From()); //optioneel
-			acknowledgment.getFrom().getPartyId().addAll(messageHeader.getTo().getPartyId());
+			acknowledgment.getFrom().getPartyId().addAll(messageHeader.getFrom().getPartyId());
 			// ebMS specs 1701
-			//acknowledgment.getFrom().setRole(messageHeader.getTo().getRole());
+			//acknowledgment.getFrom().setRole(messageHeader.getFrom().getRole());
 			acknowledgment.getFrom().setRole(null);
 			
 			acknowledgment.setActor(ActorType.URN_OASIS_NAMES_TC_EBXML_MSG_ACTOR_TO_PARTY_MSH.value());
@@ -79,31 +77,7 @@ public class EbMSMessageToEbMSAcknowledgment extends AbstractMessageAwareTransfo
 				for (ReferenceType reference : signature.getSignature().getSignedInfo().getReference())
 					acknowledgment.getReference().add(reference);
 
-			List<PartyId> partyIds = new ArrayList<PartyId>(messageHeader.getFrom().getPartyId());
-
-			messageHeader.getFrom().getPartyId().clear();
-			messageHeader.getFrom().getPartyId().addAll(messageHeader.getTo().getPartyId());
-			// ebMS specs 1701
-			//messageHeader.getFrom().setRole(messageHeader.getTo().getRole());
-			messageHeader.getFrom().setRole(null);
-
-			messageHeader.getTo().getPartyId().clear();
-			messageHeader.getTo().getPartyId().addAll(partyIds);
-			// ebMS specs 1703
-			//messageHeader.getTo().setRole(role);
-			messageHeader.getTo().setRole(null);
-
-			messageHeader.getMessageData().setRefToMessageId(messageHeader.getMessageData().getMessageId());
-			messageHeader.getMessageData().setMessageId(message.getCorrelationId() + "-" + new Date().getTime() + "@" + hostname);
-			messageHeader.getMessageData().setTimestamp(DatatypeFactory.newInstance().newXMLGregorianCalendar(calendar));
-
-			messageHeader.getService().setType(null);
-			messageHeader.getService().setValue(Constants.EBMS_SERVICE);
-			messageHeader.setAction(Constants.EBMS_ACKNOWLEDGEMENT);
-
-			messageHeader.setDuplicateElimination(null);
-
-			message.setPayload(new Object[]{messageHeader,acknowledgment});
+			message.setPayload(new EbMSAcknowledgment(messageHeader,acknowledgment));
 			return message;
 		}
 		catch (DatatypeConfigurationException e)

@@ -15,17 +15,26 @@
  ******************************************************************************/
 package nl.clockwork.mule.ebms.util;
 
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.GregorianCalendar;
-import java.util.UUID;
+import java.util.List;
+//import java.util.UUID;
 
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
+import javax.xml.datatype.Duration;
 
+import org.mule.util.UUID;
+
+import nl.clockwork.common.util.XMLUtils;
 import nl.clockwork.mule.ebms.Constants;
 import nl.clockwork.mule.ebms.model.EbMSMessageContext;
 import nl.clockwork.mule.ebms.model.cpp.cpa.ActorType;
 import nl.clockwork.mule.ebms.model.cpp.cpa.CollaborationProtocolAgreement;
 import nl.clockwork.mule.ebms.model.cpp.cpa.PartyInfo;
+import nl.clockwork.mule.ebms.model.cpp.cpa.ReliableMessaging;
 import nl.clockwork.mule.ebms.model.ebxml.AckRequested;
 import nl.clockwork.mule.ebms.model.ebxml.Description;
 import nl.clockwork.mule.ebms.model.ebxml.Error;
@@ -43,9 +52,9 @@ public class EbMSMessageUtils
 
 	public static MessageHeader createMessageHeader(CollaborationProtocolAgreement cpa, EbMSMessageContext context, String hostname) throws DatatypeConfigurationException
 	{
-		String uuid = UUID.randomUUID().toString();//nameUUIDFromBytes(hostname.getBytes()).toString();
-		PartyInfo partyInfo = CPAUtils.getSendingPartyInfo(cpa,context.getFrom(),context.getService(),context.getAction());
-		PartyInfo otherPartyInfo = CPAUtils.getReceivingPartyInfo(cpa,context.getTo(),context.getService(),context.getAction());
+		String uuid = UUID.getUUID();//UUID.randomUUID().toString();//nameUUIDFromBytes(hostname.getBytes()).toString();
+		PartyInfo partyInfo = CPAUtils.getSendingPartyInfo(cpa,context.getFromRole(),context.getService(),context.getAction());
+		PartyInfo otherPartyInfo = CPAUtils.getReceivingPartyInfo(cpa,context.getToRole(),context.getService(),context.getAction());
 		//PartyInfo otherPartyInfo = CPAUtils.getOtherReceivingPartyInfo(cpa,context.getFrom(),context.getService(),context.getAction());
 
 		MessageHeader messageHeader = new MessageHeader();
@@ -79,10 +88,46 @@ public class EbMSMessageUtils
 		messageHeader.getMessageData().setMessageId(uuid + "@" + hostname);
 		messageHeader.getMessageData().setTimestamp(DatatypeFactory.newInstance().newXMLGregorianCalendar(new GregorianCalendar()));
 
+		ReliableMessaging rm = CPAUtils.getReliableMessaging(cpa,messageHeader);
+		if (rm != null)
+		{
+			GregorianCalendar timestamp = messageHeader.getMessageData().getTimestamp().toGregorianCalendar();
+			Duration d = rm.getRetryInterval().multiply(rm.getRetries().add(new BigInteger("1")).intValue());
+			d.addTo(timestamp);
+			timestamp.add(Calendar.SECOND,1);
+			messageHeader.getMessageData().setTimeToLive(DatatypeFactory.newInstance().newXMLGregorianCalendar(timestamp));
+		}
+
 		messageHeader.setDuplicateElimination("");
+		
 		return messageHeader;
 	}
 	
+	public static MessageHeader createMessageHeader(MessageHeader messageHeader, String hostname, GregorianCalendar timestamp, String action) throws DatatypeConfigurationException
+	{
+		messageHeader = (MessageHeader)XMLUtils.xmlToObject(XMLUtils.objectToXML(messageHeader)); //FIXME: replace by more efficient copy
+		List<PartyId> partyIds = new ArrayList<PartyId>(messageHeader.getFrom().getPartyId());
+		messageHeader.getFrom().getPartyId().clear();
+		messageHeader.getFrom().getPartyId().addAll(messageHeader.getTo().getPartyId());
+		messageHeader.getTo().getPartyId().clear();
+		messageHeader.getTo().getPartyId().addAll(partyIds);
+
+		messageHeader.getFrom().setRole(null);
+		messageHeader.getTo().setRole(null);
+
+		messageHeader.getMessageData().setRefToMessageId(messageHeader.getMessageData().getMessageId());
+		messageHeader.getMessageData().setMessageId(UUID.getUUID() + "@" + hostname);
+		messageHeader.getMessageData().setTimestamp(DatatypeFactory.newInstance().newXMLGregorianCalendar(timestamp));
+
+		messageHeader.getService().setType(null);
+		messageHeader.getService().setValue(Constants.EBMS_SERVICE);
+		messageHeader.setAction(action);
+
+		messageHeader.setDuplicateElimination(null);
+
+		return messageHeader;
+	}
+
 	public static AckRequested createAckRequested()
 	{
 		AckRequested ackRequested = new AckRequested();

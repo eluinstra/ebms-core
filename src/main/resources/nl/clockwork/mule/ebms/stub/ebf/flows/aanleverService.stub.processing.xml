@@ -116,7 +116,7 @@
 			<outbound>
 				<multicasting-router>
 					<vm:outbound-endpoint path="aanleverbericht.response.log.in"/>
-					<vm:outbound-endpoint path="ebms.message.send.in"/>
+					<vm:outbound-endpoint path="ebms.content.receive.in"/>
 				</multicasting-router>
 			</outbound>
 		</service>

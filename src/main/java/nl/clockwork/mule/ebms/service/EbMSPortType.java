@@ -18,6 +18,7 @@ package nl.clockwork.mule.ebms.service;
 import javax.jws.Oneway;
 import javax.jws.WebMethod;
 import javax.jws.WebParam;
+import javax.jws.WebResult;
 import javax.jws.WebService;
 import javax.jws.soap.SOAPBinding;
 import javax.xml.bind.annotation.XmlSeeAlso;
@@ -34,15 +35,28 @@ import javax.xml.bind.annotation.XmlSeeAlso;
 @SOAPBinding(parameterStyle = SOAPBinding.ParameterStyle.BARE)
 public interface EbMSPortType {
 
+  @Oneway
+  @WebMethod(operationName = "Message", action = "ebXML")
+  public void message(
+      @WebParam(partName = "MessageHeader", name = "MessageHeader", targetNamespace = "http://www.oasis-open.org/committees/ebxml-msg/schema/msg-header-2_0.xsd", header = true)
+      nl.clockwork.mule.ebms.model.ebxml.MessageHeader messageHeader,
+      @WebParam(partName = "SyncReply", name = "SyncReply", targetNamespace = "http://www.oasis-open.org/committees/ebxml-msg/schema/msg-header-2_0.xsd", header = true)
+      nl.clockwork.mule.ebms.model.ebxml.SyncReply syncReply,
+      @WebParam(partName = "MessageOrder", name = "MessageOrder", targetNamespace = "http://www.oasis-open.org/committees/ebxml-msg/schema/msg-header-2_0.xsd", header = true)
+      nl.clockwork.mule.ebms.model.ebxml.MessageOrder messageOrder,
+      @WebParam(partName = "AckRequested", name = "AckRequested", targetNamespace = "http://www.oasis-open.org/committees/ebxml-msg/schema/msg-header-2_0.xsd", header = true)
+      nl.clockwork.mule.ebms.model.ebxml.AckRequested ackRequested,
+      @WebParam(partName = "Manifest", name = "Manifest", targetNamespace = "http://www.oasis-open.org/committees/ebxml-msg/schema/msg-header-2_0.xsd")
+      nl.clockwork.mule.ebms.model.ebxml.Manifest manifest
+  );
+
     @Oneway
-    @WebMethod(operationName = "Message", action = "ebXML")
-    public void message(
+    @WebMethod(operationName = "MessageError", action = "ebXML")
+    public void messageError(
         @WebParam(partName = "MessageHeader", name = "MessageHeader", targetNamespace = "http://www.oasis-open.org/committees/ebxml-msg/schema/msg-header-2_0.xsd", header = true)
         nl.clockwork.mule.ebms.model.ebxml.MessageHeader messageHeader,
-        @WebParam(partName = "AckRequested", name = "AckRequested", targetNamespace = "http://www.oasis-open.org/committees/ebxml-msg/schema/msg-header-2_0.xsd", header = true)
-        nl.clockwork.mule.ebms.model.ebxml.AckRequested ackRequested,
-        @WebParam(partName = "Manifest", name = "Manifest", targetNamespace = "http://www.oasis-open.org/committees/ebxml-msg/schema/msg-header-2_0.xsd")
-        nl.clockwork.mule.ebms.model.ebxml.Manifest manifest
+        @WebParam(partName = "ErrorList", name = "ErrorList", targetNamespace = "http://www.oasis-open.org/committees/ebxml-msg/schema/msg-header-2_0.xsd", header = true)
+        nl.clockwork.mule.ebms.model.ebxml.ErrorList errorList
     );
 
     @Oneway
@@ -54,12 +68,23 @@ public interface EbMSPortType {
         nl.clockwork.mule.ebms.model.ebxml.Acknowledgment acknowledgment
     );
 
-    @Oneway
-    @WebMethod(operationName = "MessageError", action = "ebXML")
-    public void messageError(
-        @WebParam(partName = "MessageHeader", name = "MessageHeader", targetNamespace = "http://www.oasis-open.org/committees/ebxml-msg/schema/msg-header-2_0.xsd", header = true)
-        nl.clockwork.mule.ebms.model.ebxml.MessageHeader messageHeader,
-        @WebParam(partName = "ErrorList", name = "ErrorList", targetNamespace = "http://www.oasis-open.org/committees/ebxml-msg/schema/msg-header-2_0.xsd", header = true)
-        nl.clockwork.mule.ebms.model.ebxml.ErrorList errorList
+    @WebMethod(operationName = "MessageStatus", action = "ebXML")
+    public void messageStatus(
+        @WebParam(partName = "RequestMessageHeader", name = "MessageHeader", targetNamespace = "http://www.oasis-open.org/committees/ebxml-msg/schema/msg-header-2_0.xsd", header = true)
+        nl.clockwork.mule.ebms.model.ebxml.MessageHeader requestMessageHeader,
+        @WebParam(partName = "StatusRequest", name = "StatusRequest", targetNamespace = "http://www.oasis-open.org/committees/ebxml-msg/schema/msg-header-2_0.xsd")
+        nl.clockwork.mule.ebms.model.ebxml.StatusRequest statusRequest,
+        @WebParam(partName = "ResponseMessageHeader", mode = WebParam.Mode.OUT, name = "MessageHeader", targetNamespace = "http://www.oasis-open.org/committees/ebxml-msg/schema/msg-header-2_0.xsd", header = true)
+        javax.xml.ws.Holder<nl.clockwork.mule.ebms.model.ebxml.MessageHeader> responseMessageHeader,
+        @WebParam(partName = "StatusResponse", mode = WebParam.Mode.OUT, name = "StatusResponse", targetNamespace = "http://www.oasis-open.org/committees/ebxml-msg/schema/msg-header-2_0.xsd")
+        javax.xml.ws.Holder<nl.clockwork.mule.ebms.model.ebxml.StatusResponse> statusResponse
     );
+
+    @WebResult(name = "MessageHeader", targetNamespace = "http://www.oasis-open.org/committees/ebxml-msg/schema/msg-header-2_0.xsd", partName = "ResponseMessageHeader", header = true)
+    @WebMethod(operationName = "Ping", action = "ebXML")
+    public nl.clockwork.mule.ebms.model.ebxml.MessageHeader ping(
+        @WebParam(partName = "RequestMessageHeader", name = "MessageHeader", targetNamespace = "http://www.oasis-open.org/committees/ebxml-msg/schema/msg-header-2_0.xsd", header = true)
+        nl.clockwork.mule.ebms.model.ebxml.MessageHeader requestMessageHeader
+    );
+
 }

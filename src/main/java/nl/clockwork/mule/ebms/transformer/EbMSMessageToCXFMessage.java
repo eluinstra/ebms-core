@@ -15,46 +15,39 @@
  ******************************************************************************/
 package nl.clockwork.mule.ebms.transformer;
 
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.Collection;
 
-import nl.clockwork.common.util.XMLMessageBuilder;
-import nl.clockwork.mule.ebms.Constants;
-import nl.clockwork.mule.ebms.model.EbMSMessageError;
-import nl.clockwork.mule.ebms.model.ebxml.ErrorList;
-import nl.clockwork.mule.ebms.model.ebxml.MessageHeader;
+import nl.clockwork.common.cxf.AttachmentManager;
+import nl.clockwork.mule.ebms.model.EbMSMessage;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.cxf.message.Attachment;
 import org.mule.api.MuleMessage;
 import org.mule.api.transformer.TransformerException;
 import org.mule.transformer.AbstractMessageAwareTransformer;
 
-public class EbMSMessageErrorToUpdateEbMSAcknowledgmentMap extends AbstractMessageAwareTransformer
+public class EbMSMessageToCXFMessage extends AbstractMessageAwareTransformer
 {
   protected transient Log logger = LogFactory.getLog(getClass());
 
-  public EbMSMessageErrorToUpdateEbMSAcknowledgmentMap()
+  public EbMSMessageToCXFMessage()
 	{
-		registerSourceType(EbMSMessageError.class);
+		registerSourceType(EbMSMessage.class);
 	}
   
 	@Override
 	public Object transform(MuleMessage message, String outputEncoding) throws TransformerException
 	{
-		try
-		{
-			EbMSMessageError messageError = (EbMSMessageError)message.getPayload();
-			HashMap<String,Object> map = new HashMap<String,Object>();
-			map.put("id",message.getStringProperty(Constants.EBMS_MESSAGE_ID,null));
-			map.put("ack_header",XMLMessageBuilder.getInstance(MessageHeader.class).handle(messageError.getMessageHeader()));
-			map.put("ack_content",XMLMessageBuilder.getInstance(ErrorList.class).handle(messageError.getErrorList()));
-			message.setPayload(map);
-		}
-		catch (Exception e)
-		{
-			logger.error("",e);
-			throw new TransformerException(this,e);
-		}
+		EbMSMessage msg = (EbMSMessage)message.getPayload();
+		message.setPayload(new Object[]{msg.getMessageHeader(),null,null,msg.getAckRequested(),msg.getManifest()});
+
+		Collection<Attachment> attachments = new ArrayList<Attachment>();
+		for (int i = 0; i < msg.getAttachments().size(); i++)
+			attachments.add(new nl.clockwork.common.cxf.Attachment("" + (i + 1),msg.getAttachments().get(i)));
+		AttachmentManager.set(attachments);
+
 		return message;
 	}
 

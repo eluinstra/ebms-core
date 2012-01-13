@@ -15,20 +15,16 @@
  ******************************************************************************/
 package nl.clockwork.mule.ebms.transformer;
 
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.GregorianCalendar;
-import java.util.List;
 
 import javax.xml.datatype.DatatypeConfigurationException;
-import javax.xml.datatype.DatatypeFactory;
 
 import nl.clockwork.mule.ebms.Constants;
 import nl.clockwork.mule.ebms.model.EbMSMessage;
+import nl.clockwork.mule.ebms.model.EbMSMessageError;
 import nl.clockwork.mule.ebms.model.ebxml.Error;
 import nl.clockwork.mule.ebms.model.ebxml.ErrorList;
 import nl.clockwork.mule.ebms.model.ebxml.MessageHeader;
-import nl.clockwork.mule.ebms.model.ebxml.PartyId;
 import nl.clockwork.mule.ebms.model.ebxml.SeverityType;
 import nl.clockwork.mule.ebms.util.EbMSMessageUtils;
 
@@ -53,30 +49,11 @@ public class EbMSMessageToEbMSMessageError extends AbstractMessageAwareTransform
 	{
 		try
 		{
-			GregorianCalendar calendar = new GregorianCalendar();
+			GregorianCalendar timestamp = new GregorianCalendar();
 
 			EbMSMessage msg = (EbMSMessage)message.getPayload();
-			MessageHeader messageHeader = msg.getMessageHeader();
-
-			List<PartyId> partyIds = new ArrayList<PartyId>(messageHeader.getFrom().getPartyId());
-			messageHeader.getFrom().getPartyId().clear();
-			messageHeader.getFrom().getPartyId().addAll(messageHeader.getTo().getPartyId());
-			messageHeader.getTo().getPartyId().clear();
-			messageHeader.getTo().getPartyId().addAll(partyIds);
+			MessageHeader messageHeader = EbMSMessageUtils.createMessageHeader(msg.getMessageHeader(),hostname,timestamp,Constants.EBMS_MESSAGE_ERROR);
 			
-			messageHeader.getFrom().setRole(null);
-			messageHeader.getTo().setRole(null);
-
-			messageHeader.getMessageData().setRefToMessageId(messageHeader.getMessageData().getMessageId());
-			messageHeader.getMessageData().setMessageId(message.getCorrelationId() + "-" + new Date().getTime() + "@" + hostname);
-			messageHeader.getMessageData().setTimestamp(DatatypeFactory.newInstance().newXMLGregorianCalendar(calendar));
-
-			messageHeader.getService().setType(null);
-			messageHeader.getService().setValue(Constants.EBMS_SERVICE);
-			messageHeader.setAction(Constants.EBMS_MESSAGE_ERROR);
-
-			messageHeader.setDuplicateElimination(null);
-
 			ErrorList errorList = new ErrorList();
 
 			errorList.setVersion(Constants.EBMS_VERSION);
@@ -88,7 +65,7 @@ public class EbMSMessageToEbMSMessageError extends AbstractMessageAwareTransform
 				EbMSMessageUtils.createError(Constants.EbMSErrorLocation.UNKNOWN.location(),Constants.EbMSErrorCode.UNKNOWN.errorCode(),"An unknown error occurred!");
 			errorList.getError().add(error);
 			
-			message.setPayload(new Object[]{messageHeader,errorList});
+			message.setPayload(new EbMSMessageError(messageHeader,errorList));
 			return message;
 		}
 		catch (DatatypeConfigurationException e)

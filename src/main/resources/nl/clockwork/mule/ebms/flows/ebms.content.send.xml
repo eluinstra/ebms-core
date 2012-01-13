@@ -66,9 +66,10 @@
 			<outbound>
 				<custom-outbound-router class="nl.clockwork.mule.common.router.ChainingMulticastingRouter">
 					<vm:outbound-endpoint path="${ebms.delegate.out}" synchronous="true"/>
-					<jdbc:outbound-endpoint connector-ref="connector.jdbc.ebms" queryKey="updateEbMSProcessingStatus">
-						<custom-transformer class="nl.clockwork.mule.ebms.transformer.EbMSMessageIdToUpdateEbMSProcessingStatusMap">
-							<spring:property name="ebMSProcessingStatus" value="1" />
+					<jdbc:outbound-endpoint connector-ref="connector.jdbc.ebms" queryKey="updateEbMSMessageStatus">
+						<custom-transformer class="nl.clockwork.mule.ebms.transformer.EbMSMessageStatusToMap">
+							<spring:property name="ebMSDAO" ref="ebMSDAO" />
+							<spring:property name="ebMSMessageStatus" value="PROCESSED" />
 						</custom-transformer>
 					</jdbc:outbound-endpoint>
 				</custom-outbound-router>

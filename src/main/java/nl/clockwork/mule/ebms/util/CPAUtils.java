@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.xml.bind.JAXBElement;
-import javax.xml.datatype.Duration;
 
 import nl.clockwork.mule.ebms.model.cpp.cpa.ActionBindingType;
 import nl.clockwork.mule.ebms.model.cpp.cpa.CanReceive;
@@ -35,6 +34,7 @@ import nl.clockwork.mule.ebms.model.cpp.cpa.DeliveryChannel;
 import nl.clockwork.mule.ebms.model.cpp.cpa.DocExchange;
 import nl.clockwork.mule.ebms.model.cpp.cpa.PartyId;
 import nl.clockwork.mule.ebms.model.cpp.cpa.PartyInfo;
+import nl.clockwork.mule.ebms.model.cpp.cpa.ReliableMessaging;
 import nl.clockwork.mule.ebms.model.cpp.cpa.ServiceBinding;
 import nl.clockwork.mule.ebms.model.cpp.cpa.ServiceType;
 import nl.clockwork.mule.ebms.model.cpp.cpa.X509DataType;
@@ -223,13 +223,13 @@ public class CPAUtils
 		return null;
 	}
 
-	public static Duration getDuration(CollaborationProtocolAgreement cpa, MessageHeader messageHeader)
+	public static ReliableMessaging getReliableMessaging(CollaborationProtocolAgreement cpa, MessageHeader messageHeader)
 	{
 		try
 		{
 			PartyInfo partyInfo = getPartyInfo(cpa,messageHeader.getFrom().getPartyId());
 			List<DeliveryChannel> deliveryChannels = getDeliveryChannels(partyInfo,messageHeader.getFrom().getRole(),messageHeader.getService(),messageHeader.getAction());
-			return ((DocExchange)deliveryChannels.get(0).getDocExchangeId()).getEbXMLSenderBinding().getReliableMessaging().getRetryInterval();
+			return ((DocExchange)deliveryChannels.get(0).getDocExchangeId()).getEbXMLSenderBinding().getReliableMessaging();
 		}
 		catch (Exception e)
 		{

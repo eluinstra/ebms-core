@@ -16,9 +16,7 @@
 package nl.clockwork.mule.ebms.transformer;
 
 import java.util.HashMap;
-
-import nl.clockwork.mule.ebms.Constants;
-import nl.clockwork.mule.ebms.Constants.EbMSMessageStatus;
+import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -26,12 +24,11 @@ import org.mule.api.MuleMessage;
 import org.mule.api.transformer.TransformerException;
 import org.mule.transformer.AbstractMessageAwareTransformer;
 
-public class EbMSMessageIdToUpdateEbMSMessageStatusMap extends AbstractMessageAwareTransformer
+public class MapToEbMSAcknowledgment extends AbstractMessageAwareTransformer
 {
   protected transient Log logger = LogFactory.getLog(getClass());
-	private EbMSMessageStatus ebMSMessageStatus;
-
-  public EbMSMessageIdToUpdateEbMSMessageStatusMap()
+  
+  public MapToEbMSAcknowledgment()
 	{
 		//registerSourceType(Object.class);
 	}
@@ -41,21 +38,15 @@ public class EbMSMessageIdToUpdateEbMSMessageStatusMap extends AbstractMessageAw
 	{
 		try
 		{
-			HashMap<String,Object> map = new HashMap<String,Object>();
-			map.put("id",message.getLongProperty(Constants.EBMS_MESSAGE_ID,0));
-			map.put("status",ebMSMessageStatus.id());
-			message.setPayload(map);
+			Map<String,Object> map = (HashMap<String,Object>)message.getPayload();
+			message.setPayload(new Object[]{map.get("message_header"),map.get("message_ack")});
+
+			return message;
 		}
 		catch (Exception e)
 		{
-			logger.error("",e);
 			throw new TransformerException(this,e);
 		}
-		return message;
 	}
-
-	public void setEbMSMessageStatus(EbMSMessageStatus ebMSMessageStatus)
-	{
-		this.ebMSMessageStatus = ebMSMessageStatus;
-	}
+	
 }

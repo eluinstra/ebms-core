@@ -71,7 +71,7 @@
 			</inbound>
 			<outbound>
 				<pass-through-router>
-					<vm:outbound-endpoint path="ebms.message.send.in" />
+					<vm:outbound-endpoint path="ebms.content.receive.in" />
 				</pass-through-router>
 			</outbound>
 		</service>

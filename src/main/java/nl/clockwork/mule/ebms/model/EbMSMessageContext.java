@@ -5,8 +5,8 @@ import nl.clockwork.mule.ebms.model.ebxml.MessageHeader;
 public class EbMSMessageContext
 {
 	private String cpaId;
-	private String from;
-	private String to;
+	private String fromRole;
+	private String toRole;
 	private String service;
 	private String action;
 	private String conversationId;
@@ -33,11 +33,11 @@ public class EbMSMessageContext
 		this(cpaId,from,to,service,action,conversationId,null,null);
 	}
 	
-	public EbMSMessageContext(String cpaId, String from, String to, String service, String action, String conversationId, String messageId, String refToMessageId)
+	public EbMSMessageContext(String cpaId, String fromRole, String toRole, String service, String action, String conversationId, String messageId, String refToMessageId)
 	{
 		this.cpaId = cpaId;
-		this.from = from;
-		this.to = to;
+		this.fromRole = fromRole;
+		this.toRole = toRole;
 		this.service = service;
 		this.action = action;
 		this.conversationId = conversationId;
@@ -50,14 +50,14 @@ public class EbMSMessageContext
 		return cpaId;
 	}
 
-	public String getFrom()
+	public String getFromRole()
 	{
-		return from;
+		return fromRole;
 	}
 	
-	public String getTo()
+	public String getToRole()
 	{
-		return to;
+		return toRole;
 	}
 	
 	public String getService()

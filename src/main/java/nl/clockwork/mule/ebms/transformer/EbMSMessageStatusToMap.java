@@ -13,12 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  ******************************************************************************/
-package nl.clockwork.mule.ebms.enricher;
+package nl.clockwork.mule.ebms.transformer;
 
-import nl.clockwork.common.dao.DAOException;
+import java.util.Date;
+import java.util.HashMap;
+
 import nl.clockwork.mule.ebms.Constants;
 import nl.clockwork.mule.ebms.dao.EbMSDAO;
-import nl.clockwork.mule.ebms.model.EbMSAcknowledgment;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -26,36 +27,43 @@ import org.mule.api.MuleMessage;
 import org.mule.api.transformer.TransformerException;
 import org.mule.transformer.AbstractMessageAwareTransformer;
 
-public class EbMSAcknowledgmentToEbMSMessageIdEnricher extends AbstractMessageAwareTransformer
+public class EbMSMessageStatusToMap extends AbstractMessageAwareTransformer
 {
   protected transient Log logger = LogFactory.getLog(getClass());
   private EbMSDAO ebMSDAO;
-
-	public EbMSAcknowledgmentToEbMSMessageIdEnricher()
+  private Constants.EbMSMessageStatus ebMSMessageStatus;
+  
+  public EbMSMessageStatusToMap()
 	{
-		registerSourceType(EbMSAcknowledgment.class);
-		//FIXME
-		//setReturnClass(EbMSAcknowledgment.class);
+		//registerSourceType(Object.class);
 	}
-	
+  
 	@Override
-	public Object transform(final MuleMessage message, String outputEncoding) throws TransformerException
+	public Object transform(MuleMessage message, String outputEncoding) throws TransformerException
 	{
 		try
 		{
-			EbMSAcknowledgment acknowledgment = (EbMSAcknowledgment)message.getPayload();
-			long id = ebMSDAO.getIdByMessageId(acknowledgment.getMessageHeader().getMessageData().getRefToMessageId());
-			message.setProperty(Constants.EBMS_MESSAGE_ID,id);
-			return message;
+			HashMap<String,Object> map = new HashMap<String,Object>();
+			map.put("id",message.getLongProperty(Constants.EBMS_MESSAGE_ID,0));
+			map.put("status",ebMSMessageStatus.id());
+			map.put("status_time",String.format(ebMSDAO.getDefaultDateFormat(),new Date()));
+			message.setPayload(map);
 		}
-		catch (DAOException e)
+		catch (Exception e)
 		{
+			logger.error("",e);
 			throw new TransformerException(this,e);
 		}
+		return message;
 	}
-	
+
 	public void setEbMSDAO(EbMSDAO ebMSDAO)
 	{
 		this.ebMSDAO = ebMSDAO;
+	}
+	
+	public void setEbMSMessageStatus(Constants.EbMSMessageStatus ebMSMessageStatus)
+	{
+		this.ebMSMessageStatus = ebMSMessageStatus;
 	}
 }

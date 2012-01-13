@@ -26,6 +26,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 
+import org.apache.commons.lang.StringUtils;
 import org.w3c.dom.Node;
 
 
@@ -42,12 +43,14 @@ public class XMLMessageBuilder<T>
 
 	public T handle(String xml) throws JAXBException
 	{
+		if (StringUtils.isEmpty(xml)) return null;
     return handle(new ByteArrayInputStream(xml.getBytes()));
 	}
 
   @SuppressWarnings("unchecked")
 	public T handle(InputStream is) throws JAXBException
 	{
+  	if (is == null) return null;
 		Unmarshaller unmarshaller = context.createUnmarshaller();
     return (T)unmarshaller.unmarshal(is);
 	}
@@ -55,6 +58,7 @@ public class XMLMessageBuilder<T>
 	@SuppressWarnings("unchecked")
 	public T handle(Node n) throws JAXBException
 	{
+		if (n == null) return null;
 		Unmarshaller unmarshaller = context.createUnmarshaller();
 		Object o = unmarshaller.unmarshal(n);
 		if (o instanceof JAXBElement<?>)
@@ -65,6 +69,7 @@ public class XMLMessageBuilder<T>
   
   public String handle(T object) throws JAXBException
   {
+  	if (object == null) return null;
    	StringWriter result = new StringWriter();
 		Marshaller marshaller = context.createMarshaller();
 		marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);

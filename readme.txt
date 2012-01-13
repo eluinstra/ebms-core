@@ -173,3 +173,16 @@ the reources directory resides in ebms-adapter-x.x.x.zip/resources and contains 
 	data/afleveren - contains afleverbericht test messages
 	scripts/database/hsqldb - contains hsqldb scripts
 	scripts/database/mssql - contains mssql scripts
+
+=========
+Changes =
+=========
+ebms.message.send.in changed to ebms.content.receive.in
+
+
+==============
+Restrictions =
+==============
+
+- Actor NextMSH is not supported. Only actor ToPartyMSH is supported
+- Message Acknowledgments as part of another message are not supported. Only Aknowledgment messages with a MessageHeader containing service 'urn:oasis:names:tc:ebxml-msg:service' and action 'Acknowledgment' are supported

@@ -13,12 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  ******************************************************************************/
-package nl.clockwork.mule.ebms.transformer;
-
-import java.util.HashMap;
-import java.util.Map;
+package nl.clockwork.mule.ebms.enricher;
 
 import nl.clockwork.mule.ebms.Constants;
+import nl.clockwork.mule.ebms.model.EbMSMessage;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -26,37 +24,23 @@ import org.mule.api.MuleMessage;
 import org.mule.api.transformer.TransformerException;
 import org.mule.transformer.AbstractMessageAwareTransformer;
 
-public class EbMSMessageIdToUpdateEbMSMessageMap extends AbstractMessageAwareTransformer
+public class EbMSMessageToEbMSMessageProperty extends AbstractMessageAwareTransformer
 {
   protected transient Log logger = LogFactory.getLog(getClass());
-  private Map<String,Object> parameters = new HashMap<String,Object>();
-  
-  public EbMSMessageIdToUpdateEbMSMessageMap()
+
+	public EbMSMessageToEbMSMessageProperty()
 	{
-		//registerSourceType(Object.class);
+		registerSourceType(EbMSMessage.class);
+		//FIXME
+		//setReturnClass(EbMSMessage.class);
 	}
-  
+	
 	@Override
-	public Object transform(MuleMessage message, String outputEncoding) throws TransformerException
+	public Object transform(final MuleMessage message, String outputEncoding) throws TransformerException
 	{
-		try
-		{
-			HashMap<String,Object> map = new HashMap<String,Object>();
-			map.put("id",message.getLongProperty(Constants.EBMS_MESSAGE_ID,0));
-			for (String key : parameters.keySet())
-				map.put(key,parameters.get(key));
-			message.setPayload(map);
-		}
-		catch (Exception e)
-		{
-			logger.error("",e);
-			throw new TransformerException(this,e);
-		}
+		EbMSMessage msg = (EbMSMessage)message.getPayload();
+		message.setProperty(Constants.EBMS_MESSAGE,msg);
 		return message;
 	}
-
-	public void setParameters(Map<String,Object> parameters)
-	{
-		this.parameters = parameters;
-	}
+	
 }

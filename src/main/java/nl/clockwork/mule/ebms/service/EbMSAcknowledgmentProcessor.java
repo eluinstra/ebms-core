@@ -15,12 +15,11 @@
  ******************************************************************************/
 package nl.clockwork.mule.ebms.service;
 
-import nl.clockwork.mule.ebms.model.ebxml.Acknowledgment;
-import nl.clockwork.mule.ebms.model.ebxml.MessageHeader;
+import nl.clockwork.mule.ebms.model.EbMSAcknowledgment;
 
 
 public interface EbMSAcknowledgmentProcessor
 {
-	void process(MessageHeader messageHeader, Acknowledgment acknowledgment);
+	void process(EbMSAcknowledgment acknowledgment);
 
 }

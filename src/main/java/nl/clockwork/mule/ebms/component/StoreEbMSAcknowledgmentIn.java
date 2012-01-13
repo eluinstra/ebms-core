@@ -15,38 +15,26 @@
  ******************************************************************************/
 package nl.clockwork.mule.ebms.component;
 
-import java.util.Date;
-
 import nl.clockwork.mule.common.component.Callable;
+import nl.clockwork.mule.ebms.Constants;
 import nl.clockwork.mule.ebms.Constants.EbMSMessageStatus;
-import nl.clockwork.mule.ebms.Constants.EbMSMessageType;
 import nl.clockwork.mule.ebms.dao.EbMSDAO;
-import nl.clockwork.mule.ebms.model.EbMSMessage;
+import nl.clockwork.mule.ebms.model.EbMSAcknowledgment;
 
 import org.mule.api.MuleMessage;
 
-public class InsertEbMSMessageOut extends Callable
+public class StoreEbMSAcknowledgmentIn extends Callable
 {
 	private EbMSDAO ebMSDAO;
 
 	@Override
 	public Object onCall(MuleMessage message) throws Exception
 	{
-		if (message.getPayload() instanceof EbMSMessage)
+		if (message.getPayload() instanceof EbMSAcknowledgment)
 		{
-			EbMSMessage msg = (EbMSMessage)message.getPayload();
-
-			Date date = new Date();
-			Date nextRetryTime = null;
-//			CollaborationProtocolAgreement cpa = ebMSDAO.getCPA(msg.getMessageHeader().getCPAId());
-//			Duration d = CPAUtils.getDuration(cpa,msg.getMessageHeader());
-//			if (d != null)
-//			{
-//				nextRetryTime = date;
-//				d.addTo(nextRetryTime);
-//			}
-
-			ebMSDAO.insertMessage(date,msg.getMessageHeader().getCPAId(),msg.getMessageHeader().getConversationId(),msg.getMessageHeader().getMessageData().getMessageId(),EbMSMessageType.OUT,new byte[]{},msg.getMessageHeader(),msg.getAckRequested(),msg.getManifest(),EbMSMessageStatus.STORED,msg.getAttachments(),nextRetryTime);
+			EbMSAcknowledgment ack = (EbMSAcknowledgment)message.getPayload();
+			EbMSMessageStatus status = EbMSMessageStatus.get((String)message.getProperty(Constants.EBMS_MESSAGE_STATUS));
+			ebMSDAO.insertMessage(ack,status);
 		}
 		return message;
 	}

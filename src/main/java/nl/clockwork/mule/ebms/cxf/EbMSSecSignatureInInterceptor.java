@@ -96,7 +96,7 @@ public class EbMSSecSignatureInInterceptor extends AbstractSoapInterceptor
 	protected transient Log logger = LogFactory.getLog(getClass());
 
 	private EbMSDAO ebMSDAO;
-  	private String keyStorePath;
+	private String keyStorePath;
 	private String keyStorePassword;
 
 	public EbMSSecSignatureInInterceptor()
@@ -109,10 +109,10 @@ public class EbMSSecSignatureInInterceptor extends AbstractSoapInterceptor
 
 	private boolean verify(X509Certificate certificate, NodeList signatureNodeList, List<EbMSDataSource> dataSources) throws XMLSignatureException, XMLSecurityException, CertificateExpiredException, CertificateNotYetValidException, KeyStoreException
 	{
-			XMLSignature signature = new XMLSignature((Element)signatureNodeList.item(0),org.apache.xml.security.utils.Constants.SignatureSpecNS);
-			EbMSDataSourceResolver resolver = new EbMSDataSourceResolver(dataSources);
-			signature.addResourceResolver(resolver);
-			return signature.checkSignatureValue(certificate);
+		XMLSignature signature = new XMLSignature((Element)signatureNodeList.item(0),org.apache.xml.security.utils.Constants.SignatureSpecNS);
+		EbMSDataSourceResolver resolver = new EbMSDataSourceResolver(dataSources);
+		signature.addResourceResolver(resolver);
+		return signature.checkSignatureValue(certificate);
 	}
 
 	@Override
@@ -218,6 +218,7 @@ public class EbMSSecSignatureInInterceptor extends AbstractSoapInterceptor
 			}
 			catch (Exception e)
 			{
+				logger.debug("",e);
 			}
 		}
 		return false;

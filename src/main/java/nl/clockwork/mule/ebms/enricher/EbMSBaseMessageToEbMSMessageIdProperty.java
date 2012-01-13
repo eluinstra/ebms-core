@@ -18,7 +18,7 @@ package nl.clockwork.mule.ebms.enricher;
 import nl.clockwork.common.dao.DAOException;
 import nl.clockwork.mule.ebms.Constants;
 import nl.clockwork.mule.ebms.dao.EbMSDAO;
-import nl.clockwork.mule.ebms.model.EbMSMessageError;
+import nl.clockwork.mule.ebms.model.EbMSBaseMessage;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -26,16 +26,16 @@ import org.mule.api.MuleMessage;
 import org.mule.api.transformer.TransformerException;
 import org.mule.transformer.AbstractMessageAwareTransformer;
 
-public class EbMSMessageErrorToEbMSMessageIdEnricher extends AbstractMessageAwareTransformer
+public class EbMSBaseMessageToEbMSMessageIdProperty extends AbstractMessageAwareTransformer
 {
   protected transient Log logger = LogFactory.getLog(getClass());
   private EbMSDAO ebMSDAO;
 
-	public EbMSMessageErrorToEbMSMessageIdEnricher()
+	public EbMSBaseMessageToEbMSMessageIdProperty()
 	{
-		registerSourceType(EbMSMessageError.class);
+		registerSourceType(EbMSBaseMessage.class);
 		//FIXME
-		//setReturnClass(EbMSMessageError.class);
+		//setReturnClass(EbMSBaseMessage.class);
 	}
 	
 	@Override
@@ -43,8 +43,8 @@ public class EbMSMessageErrorToEbMSMessageIdEnricher extends AbstractMessageAwar
 	{
 		try
 		{
-			EbMSMessageError messageError = (EbMSMessageError)message.getPayload();
-			long id = ebMSDAO.getIdByMessageId(messageError.getMessageHeader().getMessageData().getRefToMessageId());
+			EbMSBaseMessage msg = (EbMSBaseMessage)message.getPayload();
+			long id = ebMSDAO.getIdByMessageId(msg.getMessageHeader().getMessageData().getRefToMessageId());
 			message.setProperty(Constants.EBMS_MESSAGE_ID,id);
 			return message;
 		}

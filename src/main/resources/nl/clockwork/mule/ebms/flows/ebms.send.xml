@@ -37,40 +37,66 @@
 
 	<model>
 
-		<service name="ebms.message.send">
+		<service name="ebms.send">
 			<inbound>
-				<jdbc:inbound-endpoint connector-ref="connector.jdbc.ebms" queryKey="selectEbMSMessageForSending" pollingFrequency="${ebMSMessage.process.pollingFrequency}">
+				<jdbc:inbound-endpoint connector-ref="connector.jdbc.ebms" queryKey="selectEventsForSending" pollingFrequency="${ebMSMessage.process.pollingFrequency}">
 					<custom-transformer class="nl.clockwork.mule.common.enricher.MapPropertyEnricher">
 						<spring:property name="keys">
 							<spring:map>
-								<spring:entry key="id" value-ref="EBMS_MESSAGE_ID" />
+								<spring:entry key="ebms_message_id" value-ref="EBMS_MESSAGE_ID" />
 							</spring:map>
 						</spring:property>
-					</custom-transformer>
-					<custom-transformer class="nl.clockwork.mule.ebms.transformer.EbMSMessageIdToEbMSMessage">
-						<spring:property name="ebMSDAO" ref="ebMSDAO" />
-					</custom-transformer>
-				</jdbc:inbound-endpoint>
-				<jdbc:inbound-endpoint connector-ref="connector.jdbc.ebms" queryKey="selectEbMSMessageForResending" pollingFrequency="${ebMSMessage.resend.pollingFrequency}">
-					<custom-transformer class="nl.clockwork.mule.common.enricher.MapPropertyEnricher">
-						<spring:property name="keys">
-							<spring:map>
-								<spring:entry key="id" value-ref="EBMS_MESSAGE_ID" />
-							</spring:map>
-						</spring:property>
-					</custom-transformer>
-					<custom-transformer class="nl.clockwork.mule.ebms.transformer.EbMSMessageIdToEbMSMessage">
-						<spring:property name="ebMSDAO" ref="ebMSDAO" />
 					</custom-transformer>
 				</jdbc:inbound-endpoint>
 			</inbound>
-			<component>
-				<singleton-object class="nl.clockwork.mule.ebms.component.UpdateEbMSMessageOut">
-					<property key="ebMSDAO" value-ref="ebMSDAO"/>
-				</singleton-object>
-			</component>
 			<outbound>
-				<custom-outbound-router class="nl.clockwork.mule.common.router.ChainingMulticastingRouter">
+				<pass-through-router>
+					<vm:outbound-endpoint path="ebms.message.route.in">
+						<custom-transformer class="nl.clockwork.mule.ebms.transformer.EbMSMessageIdToEbMSMessage">
+							<spring:property name="ebMSDAO" ref="ebMSDAO" />
+						</custom-transformer>
+					</vm:outbound-endpoint>
+				</pass-through-router>
+			</outbound>
+		</service>
+
+		<service name="ebms.message.route">
+			<inbound>
+				<vm:inbound-endpoint path="ebms.message.route.in" />
+			</inbound>
+			<outbound>
+				<filtering-router>
+					<vm:outbound-endpoint path="ebms.messageError.send.in" />
+					<payload-type-filter expectedType="nl.clockwork.mule.ebms.model.EbMSMessageError"/>
+<!--					<custom-filter class="nl.clockwork.mule.ebms.filter.EbMSMessageActionFilter">-->
+<!--						<spring:property name="action" value="MessageError" />-->
+<!--					</custom-filter>-->
+				</filtering-router>
+				<filtering-router>
+					<vm:outbound-endpoint path="ebms.acknowledgment.send.in" />
+					<payload-type-filter expectedType="nl.clockwork.mule.ebms.model.EbMSAcknowledgment"/>
+<!--					<custom-filter class="nl.clockwork.mule.ebms.filter.EbMSMessageActionFilter">-->
+<!--						<spring:property name="action" value="Acknowledgment" />-->
+<!--					</custom-filter>-->
+				</filtering-router>
+				<forwarding-catch-all-strategy>
+					<!--payload-type-filter expectedType="nl.clockwork.mule.ebms.model.EbMSMessage"/-->
+					<vm:outbound-endpoint path="ebms.message.send.in" />
+				</forwarding-catch-all-strategy>
+			</outbound>
+		</service>
+
+		<service name="ebms.message.send">
+			<inbound>
+				<vm:inbound-endpoint path="ebms.message.send.in">
+<!--					<custom-transformer class="nl.clockwork.mule.ebms.transformer.MapToEbMSMessage">-->
+<!--						<spring:property name="ebMSDAO" ref="ebMSDAO" />-->
+<!--					</custom-transformer>-->
+					<custom-transformer class="nl.clockwork.mule.ebms.transformer.EbMSMessageToCXFMessage"/>
+				</vm:inbound-endpoint>
+			</inbound>
+			<outbound>
+				<pass-through-router>
 					<cxf:outbound-endpoint connector-ref="connector.cxf.ebms.out" protocolConnector="connector.http.ebms.out" address="${service.protocol}://${service.remote.host}:${service.remote.port}${service.remote.url}" clientClass="nl.clockwork.mule.ebms.service.EbMS" wsdlPort="EbMSPort" wsdlLocation="classpath:/nl/clockwork/mule/ebms/wsdl/ebms.wsdl" operation="Message" enableMuleSoapHeaders="false" mtomEnabled="true" synchronous="true">
 						<cxf:inInterceptors>
 							<spring:bean class="org.apache.cxf.interceptor.LoggingInInterceptor" />
@@ -88,39 +114,20 @@
 							<spring:bean class="org.apache.cxf.interceptor.LoggingOutInterceptor" />
 						</cxf:outInterceptors>
 					</cxf:outbound-endpoint>
-					<jdbc:outbound-endpoint connector-ref="connector.jdbc.ebms" queryKey="updateEbMSMessageStatus">
-						<custom-transformer class="nl.clockwork.mule.ebms.transformer.EbMSMessageIdToUpdateEbMSMessageStatusMap">
-							<spring:property name="ebMSMessageStatus" value="DELIVERED" />
-						</custom-transformer>
-					</jdbc:outbound-endpoint>
-				</custom-outbound-router>
+				</pass-through-router>
 			</outbound>
-			<default-service-exception-strategy>
-				<jdbc:outbound-endpoint connector-ref="connector.jdbc.ebms" queryKey="updateEbMSMessageStatus">
-					<custom-transformer class="nl.clockwork.mule.ebms.transformer.EbMSMessageIdToUpdateEbMSMessageStatusMap">
-						<spring:property name="ebMSMessageStatus" value="DELIVERY_FAILED" />
-					</custom-transformer>
-				</jdbc:outbound-endpoint>
-			</default-service-exception-strategy>
 		</service>
 
 		<service name="ebms.messageError.send">
 			<inbound>
 				<vm:inbound-endpoint path="ebms.messageError.send.in">
-					<custom-transformer class="nl.clockwork.mule.ebms.transformer.EbMSMessageToEbMSMessageError">
-						<spring:property name="hostname" value="${service.host}" />
-					</custom-transformer>
+<!--					<custom-transformer class="nl.clockwork.mule.ebms.transformer.MapToEbMSMessageError"/>-->
+					<custom-transformer class="nl.clockwork.mule.ebms.transformer.EbMSMessageErrorToCXFMessageError"/>
 				</vm:inbound-endpoint>
 			</inbound>
 			<outbound>
-				<custom-outbound-router class="nl.clockwork.mule.common.router.ChainingMulticastingRouter">
-					<jdbc:outbound-endpoint connector-ref="connector.jdbc.ebms" queryKey="updateEbMSMessageAcknowledgment">
-						<custom-transformer class="nl.clockwork.mule.ebms.transformer.EbMSMessageErrorToUpdateEbMSMessageAcknowledgmentMap" />
-					</jdbc:outbound-endpoint>
+				<pass-through-router>
 					<cxf:outbound-endpoint connector-ref="connector.cxf.ebms.out" protocolConnector="connector.http.ebms.out" address="${service.protocol}://${service.remote.host}:${service.remote.port}${service.remote.url}" clientClass="nl.clockwork.mule.ebms.service.EbMS" wsdlPort="EbMSPort" wsdlLocation="classpath:/nl/clockwork/mule/ebms/wsdl/ebms.wsdl" operation="MessageError" enableMuleSoapHeaders="false" synchronous="true">
-						<!--custom-transformer class="nl.clockwork.mule.ebms.transformer.EbMSMessageToEbMSMessageError">
-							<spring:property name="hostname" value="${service.host}" />
-						</custom-transformer-->
 						<cxf:inInterceptors>
 							<spring:bean class="org.apache.cxf.interceptor.LoggingInInterceptor" />
 						</cxf:inInterceptors>
@@ -128,105 +135,30 @@
 							<spring:bean class="nl.clockwork.mule.ebms.cxf.OracleEbMSXMLPrefixFixingOutInterceptor" />
 							<spring:bean class="org.apache.cxf.interceptor.LoggingOutInterceptor" />
 						</cxf:outInterceptors>
-					</cxf:outbound-endpoint>  
-					<jdbc:outbound-endpoint connector-ref="connector.jdbc.ebms" queryKey="updateEbMSMessageStatus">
-						<custom-transformer class="nl.clockwork.mule.ebms.transformer.EbMSMessageIdToUpdateEbMSMessageStatusMap">
-							<spring:property name="ebMSMessageStatus" value="MESSAGE_ERROR_RAISED" />
-						</custom-transformer>
-					</jdbc:outbound-endpoint>
-				</custom-outbound-router>
+					</cxf:outbound-endpoint>
+				</pass-through-router>
 			</outbound>
-			<default-service-exception-strategy>
-				<jdbc:outbound-endpoint connector-ref="connector.jdbc.ebms" queryKey="updateEbMSMessageStatus">
-					<custom-transformer class="nl.clockwork.mule.ebms.transformer.EbMSMessageIdToUpdateEbMSMessageStatusMap">
-						<spring:property name="ebMSMessageStatus" value="MESSAGE_ERROR_FAILED" />
-					</custom-transformer>
-				</jdbc:outbound-endpoint>
-			</default-service-exception-strategy>
 		</service>
 
 		<service name="ebms.acknowledgment.send">
 			<inbound>
 				<vm:inbound-endpoint path="ebms.acknowledgment.send.in">
-					<custom-transformer class="nl.clockwork.mule.ebms.transformer.EbMSMessageToEbMSAcknowledgment">
-						<spring:property name="hostname" value="${service.host}" />
-					</custom-transformer>
+<!--					<custom-transformer class="nl.clockwork.mule.ebms.transformer.MapToEbMSAcknowledgment"/>-->
+					<custom-transformer class="nl.clockwork.mule.ebms.transformer.EbMSAcknowledgmentToCXFAcknowledgment"/>
 				</vm:inbound-endpoint>
 			</inbound>
 			<outbound>
-				<custom-outbound-router class="nl.clockwork.mule.common.router.ChainingMulticastingRouter">
-					<!-- FIXME move endpoint to ebms.in.xml -->
-					<jdbc:outbound-endpoint connector-ref="connector.jdbc.ebms" queryKey="updateEbMSProcessingStatus">
-						<custom-transformer class="nl.clockwork.mule.ebms.transformer.EbMSMessageIdToUpdateEbMSProcessingStatusMap">
-							<spring:property name="ebMSProcessingStatus" value="0" />
-						</custom-transformer>
-					</jdbc:outbound-endpoint>
-					<jdbc:outbound-endpoint connector-ref="connector.jdbc.ebms" queryKey="updateEbMSMessageAcknowledgment">
-						<custom-transformer class="nl.clockwork.mule.ebms.transformer.EbMSAcknowledgmentToUpdateEbMSMessageAcknowledgmentMap" />
-					</jdbc:outbound-endpoint>
+				<pass-through-router>
 					<cxf:outbound-endpoint connector-ref="connector.cxf.ebms.out" protocolConnector="connector.http.ebms.out" address="${service.protocol}://${service.remote.host}:${service.remote.port}${service.remote.url}" clientClass="nl.clockwork.mule.ebms.service.EbMS" wsdlPort="EbMSPort" wsdlLocation="classpath:/nl/clockwork/mule/ebms/wsdl/ebms.wsdl" operation="Acknowledgment" enableMuleSoapHeaders="false" synchronous="true">
-						<!--custom-transformer class="nl.clockwork.mule.ebms.transformer.EbMSMessageToEbMSAcknowledgment">
-							<spring:property name="hostname" value="${service.host}" />
-						</custom-transformer-->
 						<cxf:inInterceptors>
 							<spring:bean class="org.apache.cxf.interceptor.LoggingInInterceptor" />
 						</cxf:inInterceptors>
 						<cxf:outInterceptors>
-							<spring:bean class="nl.clockwork.mule.ebms.cxf.OracleEbMSXMLPrefixFixingOutInterceptor" />
-							<spring:bean class="org.apache.cxf.interceptor.LoggingOutInterceptor" />
-						</cxf:outInterceptors>
-					</cxf:outbound-endpoint>  
-					<jdbc:outbound-endpoint connector-ref="connector.jdbc.ebms" queryKey="updateEbMSMessageStatus">
-						<custom-transformer class="nl.clockwork.mule.ebms.transformer.EbMSMessageIdToUpdateEbMSMessageStatusMap">
-							<spring:property name="ebMSMessageStatus" value="ACKNOWLEDGED" />
-						</custom-transformer>
-					</jdbc:outbound-endpoint>
-				</custom-outbound-router>
-			</outbound>
-			<default-service-exception-strategy>
-				<jdbc:outbound-endpoint connector-ref="connector.jdbc.ebms" queryKey="updateEbMSMessageStatus">
-					<custom-transformer class="nl.clockwork.mule.ebms.transformer.EbMSMessageIdToUpdateEbMSMessageStatusMap">
-						<spring:property name="ebMSMessageStatus" value="ACKNOWLEDGMENT_FAILED" />
-					</custom-transformer>
-				</jdbc:outbound-endpoint>
-			</default-service-exception-strategy>
-		</service>
-
-		<service name="ebms.acknowledgment.resend">
-			<inbound>
-				<vm:inbound-endpoint path="ebms.acknowledgment.resend.in">
-					<custom-transformer class="nl.clockwork.mule.ebms.transformer.EbMSMessageToAcknowledgment">
-						<spring:property name="ebMSDAO" ref="ebMSDAO"/>
-					</custom-transformer>
-				</vm:inbound-endpoint>
-			</inbound>
-			<outbound>
-				<filtering-router>
-					<cxf:outbound-endpoint connector-ref="connector.cxf.ebms.out" protocolConnector="connector.http.ebms.out" address="${service.protocol}://${service.remote.host}:${service.remote.port}${service.remote.url}" clientClass="nl.clockwork.mule.ebms.service.EbMS" wsdlPort="EbMSPort" wsdlLocation="classpath:/nl/clockwork/mule/ebms/wsdl/ebms.wsdl" operation="Acknowledgment" enableMuleSoapHeaders="false" mtomEnabled="true" synchronous="true">
-						<cxf:inInterceptors>
-							<spring:bean class="org.apache.cxf.interceptor.LoggingInInterceptor" />
-						</cxf:inInterceptors>
-						<cxf:outInterceptors>
-							<spring:bean class="nl.clockwork.common.cxf.AttachmentOutInterceptor" />
 							<spring:bean class="nl.clockwork.mule.ebms.cxf.OracleEbMSXMLPrefixFixingOutInterceptor" />
 							<spring:bean class="org.apache.cxf.interceptor.LoggingOutInterceptor" />
 						</cxf:outInterceptors>
 					</cxf:outbound-endpoint>
-					<message-property-filter pattern="EBMS.ACKNOWLEDGMENT_TYPE=ACKNOWLEDGMENT"/>  
-				</filtering-router>
-				<filtering-router>
-					<cxf:outbound-endpoint connector-ref="connector.cxf.ebms.out" protocolConnector="connector.http.ebms.out" address="${service.protocol}://${service.remote.host}:${service.remote.port}${service.remote.url}" clientClass="nl.clockwork.mule.ebms.service.EbMS" wsdlPort="EbMSPort" wsdlLocation="classpath:/nl/clockwork/mule/ebms/wsdl/ebms.wsdl" operation="MessageError" enableMuleSoapHeaders="false" mtomEnabled="true" synchronous="true">
-						<cxf:inInterceptors>
-							<spring:bean class="org.apache.cxf.interceptor.LoggingInInterceptor" />
-						</cxf:inInterceptors>
-						<cxf:outInterceptors>
-							<spring:bean class="nl.clockwork.common.cxf.AttachmentOutInterceptor" />
-							<spring:bean class="nl.clockwork.mule.ebms.cxf.OracleEbMSXMLPrefixFixingOutInterceptor" />
-							<spring:bean class="org.apache.cxf.interceptor.LoggingOutInterceptor" />
-						</cxf:outInterceptors>
-					</cxf:outbound-endpoint>  
-					<message-property-filter pattern="EBMS.ACKNOWLEDGMENT_TYPE=MESSAGE_ERROR"/>  
-				</filtering-router>
+				</pass-through-router>
 			</outbound>
 		</service>
 

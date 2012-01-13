@@ -13,13 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  ******************************************************************************/
-package nl.clockwork.mule.ebms.service;
+package nl.clockwork.mule.ebms.model;
 
-import nl.clockwork.mule.ebms.model.EbMSMessageError;
+import nl.clockwork.mule.ebms.model.ebxml.MessageHeader;
 
-
-public interface EbMSMessageErrorProcessor
+public class EbMSPing implements EbMSBaseMessage
 {
-	void process(EbMSMessageError messageError);
+	private MessageHeader messageHeader;
 
+	public EbMSPing(MessageHeader messageHeader)
+	{
+		this.messageHeader = messageHeader;
+	}
+
+	@Override
+	public MessageHeader getMessageHeader()
+	{
+		return messageHeader;
+	}
 }

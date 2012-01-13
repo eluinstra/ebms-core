@@ -15,18 +15,11 @@
  ******************************************************************************/
 package nl.clockwork.mule.ebms.service;
 
-import java.util.List;
-
-import javax.activation.DataSource;
-
+import nl.clockwork.mule.ebms.model.EbMSMessage;
 import nl.clockwork.mule.ebms.model.Signature;
-import nl.clockwork.mule.ebms.model.ebxml.AckRequested;
-import nl.clockwork.mule.ebms.model.ebxml.Manifest;
-import nl.clockwork.mule.ebms.model.ebxml.MessageHeader;
 
 
 public interface EbMSMessageProcessor
 {
-	void process(byte[] message, MessageHeader messageHeader, AckRequested ackRequested, Manifest manifest, List<DataSource> attachments);
-	void process(byte[] message, MessageHeader messageHeader, AckRequested ackRequested, Manifest manifest, List<DataSource> attachments, Signature signature);
+	void process(EbMSMessage message, Signature signature);
 }
