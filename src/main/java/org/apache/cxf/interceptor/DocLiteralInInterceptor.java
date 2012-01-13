@@ -163,6 +163,12 @@ public class DocLiteralInInterceptor extends AbstractInDatabindingInterceptor {
                         		if (findHeader((SoapMessage)message, mpi) != null)
                         			i++;
                         	}
+                        	if (bmsg.getMessageParts().size() == i)
+                        	{
+                        		tmpOP = op;
+                        		tmpBOP = ep.getEndpointInfo().getBinding().getOperation(op);
+                        		break;
+                        	}
                         	if (i == maxNrMatches)
                         	{
                         		tmpOP = null;
@@ -181,7 +187,7 @@ public class DocLiteralInInterceptor extends AbstractInDatabindingInterceptor {
                     {
                       exchange.put(BindingOperationInfo.class, tmpBOP);
                       exchange.put(OperationInfo.class, tmpOP);
-                      //exchange.setOneWay(tmpOP.isOneWay());
+                      exchange.setOneWay(tmpOP.isOneWay());
                     }
                     return;
                 }
