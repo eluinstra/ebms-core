@@ -63,10 +63,8 @@ public class Constants
   };
 
 	public static final String AFLEVERBERICHT_BERICHTSOORT_EFACTUUR = "e-factuur";
-	public static final String AFLEVERBERICHT_ERROR = "STUB.AFLEVERBERICHT_ERROR";
 
 	public static final String AANLEVERBERICHT_BERICHTSOORT_EFACTUUR = "e-factuur";
 	public static final String AANLEVERBERICHT_BERICHTSOORT_ORDER = "order";
-	public static final String AANLEVERBERICHT_ERROR = "STUB.AANLEVERBERICHT_ERROR";
 
 }
