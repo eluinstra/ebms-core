@@ -27,6 +27,9 @@ import nl.clockwork.mule.ebms.model.EbMSMessage;
 import nl.clockwork.mule.ebms.model.ebxml.AckRequested;
 import nl.clockwork.mule.ebms.model.ebxml.Manifest;
 import nl.clockwork.mule.ebms.model.ebxml.MessageHeader;
+import nl.clockwork.mule.ebms.model.ebxml.MessageOrder;
+import nl.clockwork.mule.ebms.model.ebxml.SyncReply;
+import nl.clockwork.mule.ebms.model.xml.xmldsig.ObjectFactory;
 import nl.clockwork.mule.ebms.model.xml.xmldsig.SignatureType;
 
 import org.apache.commons.logging.Log;
@@ -66,11 +69,11 @@ public class EbMSMessageInToMap extends AbstractMessageAwareTransformer
 			map.put("service",msg.getMessageHeader().getService().getValue());
 			map.put("action",msg.getMessageHeader().getAction());
 			map.put("message_original",msg.getOriginal());
-			map.put("message_signature",msg.getSignature() == null ? null : XMLMessageBuilder.getInstance(SignatureType.class).handle(msg.getSignature()));
+			map.put("message_signature",XMLMessageBuilder.getInstance(SignatureType.class).handle(new ObjectFactory().createSignature(msg.getSignature())));
 			//map.put("message_header",XMLUtils.objectToXML(msg.getMessageHeader()));
 			map.put("message_header",XMLMessageBuilder.getInstance(MessageHeader.class).handle(msg.getMessageHeader()));
-			map.put("message_sync_reply",null);
-			map.put("message_order",null);
+			map.put("message_sync_reply",XMLMessageBuilder.getInstance(SyncReply.class).handle(msg.getSyncReply()));
+			map.put("message_order",XMLMessageBuilder.getInstance(MessageOrder.class).handle(msg.getMessageOrder()));
 			map.put("message_ack_req",XMLMessageBuilder.getInstance(AckRequested.class).handle(msg.getAckRequested()));
 			map.put("message_content",XMLMessageBuilder.getInstance(Manifest.class).handle(msg.getManifest()));
 			map.put("status",EbMSMessageStatus.get((String)message.getProperty(Constants.EBMS_MESSAGE_STATUS)).id());

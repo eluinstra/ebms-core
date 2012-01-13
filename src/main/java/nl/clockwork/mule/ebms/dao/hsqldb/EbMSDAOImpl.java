@@ -44,6 +44,8 @@ import nl.clockwork.mule.ebms.model.ebxml.Manifest;
 import nl.clockwork.mule.ebms.model.ebxml.MessageHeader;
 import nl.clockwork.mule.ebms.model.ebxml.MessageOrder;
 import nl.clockwork.mule.ebms.model.ebxml.SyncReply;
+import nl.clockwork.mule.ebms.model.xml.xmldsig.ObjectFactory;
+import nl.clockwork.mule.ebms.model.xml.xmldsig.SignatureType;
 import nl.clockwork.mule.ebms.util.CPAUtils;
 
 import org.apache.commons.io.IOUtils;
@@ -74,6 +76,7 @@ public class EbMSDAOImpl implements EbMSDAO
 		private String service;
 		private String action;
 		private byte[] original;
+		private String signature;
 		private String messageHeader;
 		private String syncReply;
 		private String messageOrder;
@@ -83,20 +86,20 @@ public class EbMSDAOImpl implements EbMSDAO
 
 		public EbMSMessagePreparedStatement(Date timestamp, String cpaId, String conversationId, String messageId, String refToMessageId, String fromRole, String toRole, String service, String action, String messageHeader, String content)
 		{
-			this(timestamp,cpaId,conversationId,null,messageId,refToMessageId,fromRole,toRole,service,action,null,messageHeader,null,null,null,content,null);
+			this(timestamp,cpaId,conversationId,null,messageId,refToMessageId,fromRole,toRole,service,action,null,null,messageHeader,null,null,null,content,null);
 		}
 
 		public EbMSMessagePreparedStatement(Date timestamp, String cpaId, String conversationId, String messageId, String refToMessageId, String fromRole, String toRole, String service, String action, String messageHeader, String content, EbMSMessageStatus status)
 		{
-			this(timestamp,cpaId,conversationId,null,messageId,refToMessageId,fromRole,toRole,service,action,null,messageHeader,null,null,null,content,status);
+			this(timestamp,cpaId,conversationId,null,messageId,refToMessageId,fromRole,toRole,service,action,null,null,messageHeader,null,null,null,content,status);
 		}
 
 		public EbMSMessagePreparedStatement(Date timestamp, String cpaId, String conversationId, Long sequenceNr, String messageId, String refToMessageId, String fromRole, String toRole, String service, String action, String messageHeader, String syncReply, String messageOrder, String ackRequested, String content)
 		{
-			this(timestamp,cpaId,conversationId,sequenceNr,messageId,refToMessageId,fromRole,toRole,service,action,null,messageHeader,syncReply,messageOrder,ackRequested,content,null);
+			this(timestamp,cpaId,conversationId,sequenceNr,messageId,refToMessageId,fromRole,toRole,service,action,null,null,messageHeader,syncReply,messageOrder,ackRequested,content,null);
 		}
 		
-		public EbMSMessagePreparedStatement(Date timestamp, String cpaId, String conversationId, Long sequenceNr, String messageId, String refToMessageId, String fromRole, String toRole, String service, String action, byte[] original, String messageHeader, String syncReply, String messageOrder, String ackRequested, String content, EbMSMessageStatus status)
+		public EbMSMessagePreparedStatement(Date timestamp, String cpaId, String conversationId, Long sequenceNr, String messageId, String refToMessageId, String fromRole, String toRole, String service, String action, byte[] original, String signature, String messageHeader, String syncReply, String messageOrder, String ackRequested, String content, EbMSMessageStatus status)
 		{
 			this.timestamp = timestamp;
 			this.cpaId = cpaId;
@@ -109,6 +112,7 @@ public class EbMSDAOImpl implements EbMSDAO
 			this.service = service;
 			this.action = action;
 			this.original = original;
+			this.signature = signature;
 			this.messageHeader = messageHeader;
 			this.syncReply = syncReply;
 			this.messageOrder = messageOrder;
@@ -133,6 +137,7 @@ public class EbMSDAOImpl implements EbMSDAO
 					"service," +
 					"action," +
 					"original," +
+					"signature," +
 					"message_header," +
 					"sync_reply," +
 					"message_order," +
@@ -140,7 +145,7 @@ public class EbMSDAOImpl implements EbMSDAO
 					"content," +
 					"status," +
 					"status_time" +
-				") values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+				") values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
 				//new String[]{"id"}
 				new int[]{1}
 			);
@@ -159,16 +164,17 @@ public class EbMSDAOImpl implements EbMSDAO
 			ps.setString(9,service);
 			ps.setString(10,action);
 			ps.setBytes(11,original);
-			ps.setString(12,messageHeader);
-			ps.setString(13,syncReply);
-			ps.setString(14,messageOrder);
-			ps.setString(15,ackRequested);
-			ps.setString(16,content);
+			ps.setString(12,signature);
+			ps.setString(13,messageHeader);
+			ps.setString(14,syncReply);
+			ps.setString(15,messageOrder);
+			ps.setString(16,ackRequested);
+			ps.setString(17,content);
 			if (status == null)
-				ps.setNull(17,java.sql.Types.INTEGER);
+				ps.setNull(18,java.sql.Types.INTEGER);
 			else
-				ps.setInt(17,status.id());
-			ps.setString(18,status == null ? null : String.format(defaultDateFormat,timestamp));
+				ps.setInt(18,status.id());
+			ps.setString(19,status == null ? null : String.format(defaultDateFormat,timestamp));
 			return ps;
 		}
 	}
@@ -630,6 +636,7 @@ public class EbMSDAOImpl implements EbMSDAO
 											message.getMessageHeader().getService().getValue(),
 											message.getMessageHeader().getAction(),
 											message.getOriginal(),
+											XMLMessageBuilder.getInstance(SignatureType.class).handle(message.getSignature()),
 											XMLMessageBuilder.getInstance(MessageHeader.class).handle(message.getMessageHeader()),
 											XMLMessageBuilder.getInstance(SyncReply.class).handle(message.getSyncReply()),
 											XMLMessageBuilder.getInstance(MessageOrder.class).handle(message.getMessageOrder()),
@@ -735,6 +742,7 @@ public class EbMSDAOImpl implements EbMSDAO
 											message.getMessageHeader().getService().getValue(),
 											message.getMessageHeader().getAction(),
 											message.getOriginal(),
+											XMLMessageBuilder.getInstance(SignatureType.class).handle(new ObjectFactory().createSignature(message.getSignature())),
 											XMLMessageBuilder.getInstance(MessageHeader.class).handle(message.getMessageHeader()),
 											XMLMessageBuilder.getInstance(SyncReply.class).handle(message.getSyncReply()),
 											XMLMessageBuilder.getInstance(MessageOrder.class).handle(message.getMessageOrder()),

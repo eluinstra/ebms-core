@@ -67,6 +67,17 @@ public class XMLMessageBuilder<T>
 			return (T)o;
 	}
   
+	public String handle(JAXBElement<T> e) throws JAXBException
+	{
+  	if (e == null) return null;
+   	StringWriter result = new StringWriter();
+		Marshaller marshaller = context.createMarshaller();
+		marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
+    marshaller.marshal(e,result);
+    result.flush();
+    return result.toString();
+	}
+  
   public String handle(T object) throws JAXBException
   {
   	if (object == null) return null;
