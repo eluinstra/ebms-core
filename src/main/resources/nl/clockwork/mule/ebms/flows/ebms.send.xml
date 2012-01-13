@@ -68,16 +68,10 @@
 				<filtering-router>
 					<vm:outbound-endpoint path="ebms.messageError.send.in" />
 					<payload-type-filter expectedType="nl.clockwork.mule.ebms.model.EbMSMessageError"/>
-<!--					<custom-filter class="nl.clockwork.mule.ebms.filter.EbMSMessageActionFilter">-->
-<!--						<spring:property name="action" value="MessageError" />-->
-<!--					</custom-filter>-->
 				</filtering-router>
 				<filtering-router>
 					<vm:outbound-endpoint path="ebms.acknowledgment.send.in" />
 					<payload-type-filter expectedType="nl.clockwork.mule.ebms.model.EbMSAcknowledgment"/>
-<!--					<custom-filter class="nl.clockwork.mule.ebms.filter.EbMSMessageActionFilter">-->
-<!--						<spring:property name="action" value="Acknowledgment" />-->
-<!--					</custom-filter>-->
 				</filtering-router>
 				<forwarding-catch-all-strategy>
 					<!--payload-type-filter expectedType="nl.clockwork.mule.ebms.model.EbMSMessage"/-->
@@ -89,12 +83,14 @@
 		<service name="ebms.message.send">
 			<inbound>
 				<vm:inbound-endpoint path="ebms.message.send.in">
-<!--					<custom-transformer class="nl.clockwork.mule.ebms.transformer.MapToEbMSMessage">-->
-<!--						<spring:property name="ebMSDAO" ref="ebMSDAO" />-->
-<!--					</custom-transformer>-->
 					<custom-transformer class="nl.clockwork.mule.ebms.transformer.EbMSMessageToCXFMessage"/>
 				</vm:inbound-endpoint>
 			</inbound>
+<!--			<component>-->
+<!--				<singleton-object class="nl.clockwork.mule.ebms.component.InvokeEbMSMessage">-->
+<!--					<property key="ebMSDAO" value-ref="ebMSDAO"/>-->
+<!--				</singleton-object>-->
+<!--			</component>-->
 			<outbound>
 				<pass-through-router>
 					<cxf:outbound-endpoint connector-ref="connector.cxf.ebms.out" protocolConnector="connector.http.ebms.out" address="${service.protocol}://${service.remote.host}:${service.remote.port}${service.remote.url}" clientClass="nl.clockwork.mule.ebms.service.EbMS" wsdlPort="EbMSPort" wsdlLocation="classpath:/nl/clockwork/mule/ebms/wsdl/ebms.wsdl" operation="Message" enableMuleSoapHeaders="false" mtomEnabled="true" synchronous="true">
@@ -121,7 +117,6 @@
 		<service name="ebms.messageError.send">
 			<inbound>
 				<vm:inbound-endpoint path="ebms.messageError.send.in">
-<!--					<custom-transformer class="nl.clockwork.mule.ebms.transformer.MapToEbMSMessageError"/>-->
 					<custom-transformer class="nl.clockwork.mule.ebms.transformer.EbMSMessageErrorToCXFMessageError"/>
 				</vm:inbound-endpoint>
 			</inbound>
@@ -143,7 +138,6 @@
 		<service name="ebms.acknowledgment.send">
 			<inbound>
 				<vm:inbound-endpoint path="ebms.acknowledgment.send.in">
-<!--					<custom-transformer class="nl.clockwork.mule.ebms.transformer.MapToEbMSAcknowledgment"/>-->
 					<custom-transformer class="nl.clockwork.mule.ebms.transformer.EbMSAcknowledgmentToCXFAcknowledgment"/>
 				</vm:inbound-endpoint>
 			</inbound>

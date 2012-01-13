@@ -19,7 +19,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -33,6 +32,7 @@ import nl.clockwork.mule.ebms.Constants;
 import nl.clockwork.mule.ebms.Constants.EbMSMessageStatus;
 import nl.clockwork.mule.ebms.dao.EbMSDAO;
 import nl.clockwork.mule.ebms.model.EbMSAcknowledgment;
+import nl.clockwork.mule.ebms.model.EbMSBaseMessage;
 import nl.clockwork.mule.ebms.model.EbMSMessage;
 import nl.clockwork.mule.ebms.model.EbMSMessageError;
 import nl.clockwork.mule.ebms.model.cpp.cpa.CollaborationProtocolAgreement;
@@ -344,30 +344,28 @@ public class EbMSDAOImpl implements EbMSDAO
 		}
 	}
 
-	public EbMSMessage getEbMSMessage(long id) throws DAOException
-	{
-		return getEbMSMessage(id,false);
-	}
-
-	public EbMSMessage getEbMSMessage(final long id, final boolean includeAttachments) throws DAOException
+	@Override
+	public EbMSBaseMessage getEbMSMessage(final long id) throws DAOException
 	{
 		try
 		{
 			return simpleJdbcTemplate.queryForObject(
-				"select message_header, ack_requested, content" + 
+				"select service, action, message_header, ack_requested, content" + 
 				" from ebms_message" + 
 				" where id = ?",
-				new ParameterizedRowMapper<EbMSMessage>()
+				new ParameterizedRowMapper<EbMSBaseMessage>()
 				{
 					@Override
-					public EbMSMessage mapRow(ResultSet rs, int rowNum) throws SQLException
+					public EbMSBaseMessage mapRow(ResultSet rs, int rowNum) throws SQLException
 					{
 						try
 						{
-							if (includeAttachments)
-								return new EbMSMessage(null,null,XMLMessageBuilder.getInstance(MessageHeader.class).handle(rs.getString("message_header")),XMLMessageBuilder.getInstance(AckRequested.class).handle(rs.getString("ack_requested")),XMLMessageBuilder.getInstance(Manifest.class).handle(rs.getString("content")),getAttachments(id));
-							else
-								return new EbMSMessage(null,null,XMLMessageBuilder.getInstance(MessageHeader.class).handle(rs.getString("message_header")),XMLMessageBuilder.getInstance(AckRequested.class).handle(rs.getString("ack_requested")),XMLMessageBuilder.getInstance(Manifest.class).handle(rs.getString("content")),new ArrayList<DataSource>());
+								if (Constants.EBMS_SERVICE.equals(rs.getString("service")) && Constants.EBMS_ERROR.equals(rs.getString("action")))
+									return new EbMSMessageError(XMLMessageBuilder.getInstance(MessageHeader.class).handle(rs.getString("message_header")),XMLMessageBuilder.getInstance(ErrorList.class).handle(rs.getString("content")));
+								else if (Constants.EBMS_SERVICE.equals(rs.getString("service")) && Constants.EBMS_ACKNOWLEDGEMENT.equals(rs.getString("action")))
+									return new EbMSAcknowledgment(XMLMessageBuilder.getInstance(MessageHeader.class).handle(rs.getString("message_header")),XMLMessageBuilder.getInstance(Acknowledgment.class).handle(rs.getString("content")));
+								else
+									return new EbMSMessage(XMLMessageBuilder.getInstance(MessageHeader.class).handle(rs.getString("message_header")),XMLMessageBuilder.getInstance(AckRequested.class).handle(rs.getString("ack_requested")),XMLMessageBuilder.getInstance(Manifest.class).handle(rs.getString("content")),getAttachments(id));
 						}
 						catch (JAXBException e)
 						{

@@ -344,6 +344,7 @@ public class EbMSDAOImpl implements EbMSDAO
 		}
 	}
 
+	@Override
 	public EbMSBaseMessage getEbMSMessage(final long id) throws DAOException
 	{
 		try

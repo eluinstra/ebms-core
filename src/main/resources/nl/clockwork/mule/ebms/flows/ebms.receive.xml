@@ -139,24 +139,6 @@
 			</outbound>
 		</service>
 		
-<!--		<service name="ebms.message.eliminateDuplicate">-->
-<!--			<inbound>-->
-<!--				<vm:inbound-endpoint path="ebms.message.eliminateDuplicate.in" />-->
-<!--			</inbound>-->
-<!--			<outbound>-->
-<!--				<filtering-router>-->
-<!--					<vm:outbound-endpoint path="ebms.response.resend.in" />-->
-					<!--vm:outbound-endpoint path="ebms.response.get.in" /-->
-<!--					<custom-filter class="nl.clockwork.mule.ebms.filter.EbMSDuplicateMessageFilter">-->
-<!--						<spring:property name="ebMSDAO" ref="ebMSDAO" />-->
-<!--					</custom-filter>-->
-<!--				</filtering-router>-->
-<!--				<forwarding-catch-all-strategy>-->
-<!--					<vm:outbound-endpoint path="ebms.message.validate.in" />-->
-<!--				</forwarding-catch-all-strategy>-->
-<!--			</outbound>-->
-<!--		</service>-->
-		
 		<service name="ebms.response.resend">
 			<inbound>
 				<vm:inbound-endpoint path="ebms.response.resend.in">
@@ -275,31 +257,13 @@
 				</singleton-object>
 			</component>
 			<outbound>
-				<chaining-router>
-					<!--jdbc:outbound-endpoint connector-ref="connector.jdbc.ebms" queryKey="insertEbMSMessage">
-						<custom-transformer class="nl.clockwork.mule.ebms.transformer.EbMSMessageInToMap"/>
-						<jdbc:transaction action="ALWAYS_BEGIN" timeout="60000"/>
-					</jdbc:outbound-endpoint>
-					<jdbc:outbound-endpoint connector-ref="connector.jdbc.ebms" queryKey="insertEbMSMessageAttachment">
-						<jdbc:transaction action="ALWAYS_JOIN"/>
-					</jdbc:outbound-endpoint>
-					<jdbc:outbound-endpoint connector-ref="connector.jdbc.ebms" queryKey="insertEbMSMessage">
-						<custom-transformer class="nl.clockwork.mule.ebms.transformer.EbMSMessageErrorOutToMap" />
-						<jdbc:transaction action="ALWAYS_JOIN"/>
-					</jdbc:outbound-endpoint>
-					<jdbc:outbound-endpoint connector-ref="connector.jdbc.ebms" queryKey="addEbMSMessageSendEvent">
-						<custom-transformer class="nl.clockwork.mule.ebms.enricher.EbMSRefToMessageToEbMSMessageIdProperty">
-							<spring:property name="ebMSDAO" ref="ebMSDAO"/>
-						</custom-transformer>
-						<custom-transformer class="nl.clockwork.mule.ebms.transformer.EbMSMessageIdPropertyToMap" />
-						<jdbc:transaction action="ALWAYS_JOIN"/>
-					</jdbc:outbound-endpoint-->
+				<pass-through-router>
 					<vm:outbound-endpoint path="ebms.message.receive.async.reply">
 						<message-properties-transformer>
 							<add-message-property key="EBMS.HTTP_STATUS_CODE" value-ref="HTTP_SC_NO_CONTENT"/>
 						</message-properties-transformer>
 					</vm:outbound-endpoint>
-				</chaining-router>
+				</pass-through-router>
 			</outbound>
 		</service>
 
@@ -329,31 +293,13 @@
 				</singleton-object>
 			</component>
 			<outbound>
-				<chaining-router>
-					<!--jdbc:outbound-endpoint connector-ref="connector.jdbc.ebms" queryKey="insertEbMSMessage">
-						<custom-transformer class="nl.clockwork.mule.ebms.transformer.EbMSMessageInToMap"/>
-						<jdbc:transaction action="ALWAYS_BEGIN" timeout="60000"/>
-					</jdbc:outbound-endpoint>
-					<jdbc:outbound-endpoint connector-ref="connector.jdbc.ebms" queryKey="insertEbMSMessageAttachment">
-						<jdbc:transaction action="ALWAYS_JOIN"/>
-					</jdbc:outbound-endpoint>
-					<jdbc:outbound-endpoint connector-ref="connector.jdbc.ebms" queryKey="insertEbMSMessage">
-						<custom-transformer class="nl.clockwork.mule.ebms.transformer.EbMSAcknowledgmentOutToMap" />
-						<jdbc:transaction action="ALWAYS_JOIN"/>
-					</jdbc:outbound-endpoint>
-					<jdbc:outbound-endpoint connector-ref="connector.jdbc.ebms" queryKey="addEbMSMessageSendEvent">
-						<custom-transformer class="nl.clockwork.mule.ebms.enricher.EbMSRefToMessageToEbMSMessageIdProperty">
-							<spring:property name="ebMSDAO" ref="ebMSDAO"/>
-						</custom-transformer>
-						<custom-transformer class="nl.clockwork.mule.ebms.transformer.EbMSMessageIdPropertyToMap" />
-						<jdbc:transaction action="ALWAYS_JOIN"/>
-					</jdbc:outbound-endpoint-->
+				<pass-through-router>
 					<vm:outbound-endpoint path="ebms.message.receive.async.reply">
 						<message-properties-transformer>
 							<add-message-property key="EBMS.HTTP_STATUS_CODE" value-ref="HTTP_SC_NO_CONTENT"/>
 						</message-properties-transformer>
 					</vm:outbound-endpoint>
-				</chaining-router>
+				</pass-through-router>
 			</outbound>
 		</service>
 
@@ -403,24 +349,13 @@
 				</singleton-object>
 			</component>
 			<outbound>
-				<chaining-router>
-					<!--jdbc:outbound-endpoint connector-ref="connector.jdbc.ebms" queryKey="insertEbMSMessage">
-						<custom-transformer class="nl.clockwork.mule.ebms.transformer.EbMSMessageErrorInToMap" />
-						<jdbc:transaction action="ALWAYS_BEGIN" timeout="60000"/>
-					</jdbc:outbound-endpoint>
-					<jdbc:outbound-endpoint connector-ref="connector.jdbc.ebms" queryKey="clearEbMSMessageSendEvent">
-						<custom-transformer class="nl.clockwork.mule.ebms.enricher.EbMSRefToMessageToEbMSMessageIdProperty">
-							<spring:property name="ebMSDAO" ref="ebMSDAO"/>
-						</custom-transformer>
-						<custom-transformer class="nl.clockwork.mule.ebms.transformer.EbMSMessageIdPropertyToMap" />
-						<jdbc:transaction action="ALWAYS_JOIN"/>
-					</jdbc:outbound-endpoint-->
+				<pass-through-router>
 					<vm:outbound-endpoint path="ebms.messageError.receive.async.reply">
 						<message-properties-transformer>
 							<add-message-property key="EBMS.HTTP_STATUS_CODE" value-ref="HTTP_SC_NO_CONTENT"/>
 						</message-properties-transformer>
 					</vm:outbound-endpoint>
-				</chaining-router>
+				</pass-through-router>
 			</outbound>
 		</service>
 
@@ -470,24 +405,13 @@
 				</singleton-object>
 			</component>
 			<outbound>
-				<chaining-router>
-					<!--jdbc:outbound-endpoint connector-ref="connector.jdbc.ebms" queryKey="insertEbMSMessage">
-						<custom-transformer class="nl.clockwork.mule.ebms.transformer.EbMSAcknowledgmentInToMap" />
-						<jdbc:transaction action="ALWAYS_BEGIN" timeout="60000"/>
-					</jdbc:outbound-endpoint>
-					<jdbc:outbound-endpoint connector-ref="connector.jdbc.ebms" queryKey="clearEbMSMessageSendEvent">
-						<custom-transformer class="nl.clockwork.mule.ebms.enricher.EbMSRefToMessageToEbMSMessageIdProperty">
-							<spring:property name="ebMSDAO" ref="ebMSDAO"/>
-						</custom-transformer>
-						<custom-transformer class="nl.clockwork.mule.ebms.transformer.EbMSMessageIdPropertyToMap" />
-						<jdbc:transaction action="ALWAYS_JOIN"/>
-					</jdbc:outbound-endpoint-->
+				<pass-through-router>
 					<vm:outbound-endpoint path="ebms.acknowledgment.receive.async.reply">
 						<message-properties-transformer>
 							<add-message-property key="EBMS.HTTP_STATUS_CODE" value-ref="HTTP_SC_NO_CONTENT"/>
 						</message-properties-transformer>
 					</vm:outbound-endpoint>
-				</chaining-router>
+				</pass-through-router>
 			</outbound>
 		</service>
 
