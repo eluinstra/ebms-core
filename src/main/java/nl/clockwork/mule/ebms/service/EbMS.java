@@ -37,12 +37,12 @@ import javax.xml.ws.WebServiceFeature;
 
 @WebServiceClient(name = "EbMS", 
                   wsdlLocation = "classpath:nl/clockwork/mule/ebms/wsdl/ebms.wsdl",
-                  targetNamespace = "http://www.clockwork.nl/ebms/v1") 
+                  targetNamespace = "http://www.clockwork.nl/ebms/1.0") 
 public class EbMS extends Service {
 
     public final static URL WSDL_LOCATION;
-    public final static QName SERVICE = new QName("http://www.clockwork.nl/ebms/v1", "EbMS");
-    public final static QName EbMSPort = new QName("http://www.clockwork.nl/ebms/v1", "EbMSPort");
+    public final static QName SERVICE = new QName("http://www.clockwork.nl/ebms/1.0", "EbMS");
+    public final static QName EbMSPort = new QName("http://www.clockwork.nl/ebms/1.0", "EbMSPort");
     static {
         URL url = null;
         try {

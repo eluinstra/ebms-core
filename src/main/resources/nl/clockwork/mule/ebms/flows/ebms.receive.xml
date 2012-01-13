@@ -37,7 +37,7 @@
 
 		<service name="ebms.soap.receive">
 			<inbound>
-				<cxf:inbound-endpoint connector-ref="connector.cxf.ebms.in" protocolConnector="connector.http.ebms.in" address="${service.protocol}://${service.host}:${service.port}${service.url}" serviceName="EbMSPortType" namespace="http://www.ez.nl/ebms/v1" enableMuleSoapHeaders="false" mtomEnabled="true" synchronous="true">
+				<cxf:inbound-endpoint connector-ref="connector.cxf.ebms.in" protocolConnector="connector.http.ebms.in" address="${service.protocol}://${service.host}:${service.port}${service.url}" serviceName="EbMSPortType" namespace="http://www.ez.nl/ebms/1.0" enableMuleSoapHeaders="false" mtomEnabled="true" synchronous="true">
 					<response-transformers>
 						<message-properties-transformer>
 							<add-message-property key="EBMS.HTTP_STATUS_CODE" value-ref="HTTP_SC_NO_CONTENT"/>
