@@ -636,7 +636,7 @@ public class EbMSDAOImpl implements EbMSDAO
 											message.getMessageHeader().getService().getValue(),
 											message.getMessageHeader().getAction(),
 											message.getOriginal(),
-											XMLMessageBuilder.getInstance(SignatureType.class).handle(message.getSignature()),
+											XMLMessageBuilder.getInstance(SignatureType.class).handle(new ObjectFactory().createSignature(message.getSignature())),
 											XMLMessageBuilder.getInstance(MessageHeader.class).handle(message.getMessageHeader()),
 											XMLMessageBuilder.getInstance(SyncReply.class).handle(message.getSyncReply()),
 											XMLMessageBuilder.getInstance(MessageOrder.class).handle(message.getMessageOrder()),
