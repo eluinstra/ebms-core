@@ -26,7 +26,7 @@
 	</bean>
 
 	<bean id="updateEbMSMessageStatus" class="java.lang.String">
-		<constructor-arg value="update ebms_message set status=#[map-payload:status], status_time=#[map-payload:status_time] where id=#[map-payload:id]" /> 
+		<constructor-arg value="update ebms_message set status=#[map-payload:status], status_time=NOW() where id=#[map-payload:id]" /> 
 	</bean>
 
 	<bean id="addEbMSMessageSendEvent" class="java.lang.String">

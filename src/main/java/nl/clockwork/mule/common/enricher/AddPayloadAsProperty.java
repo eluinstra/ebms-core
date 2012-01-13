@@ -26,10 +26,6 @@ public class AddPayloadAsProperty extends AbstractMessageAwareTransformer
   protected transient Log logger = LogFactory.getLog(getClass());
   private String propertyName;
 
-	public AddPayloadAsProperty()
-	{
-	}
-	
 	@Override
 	public Object transform(final MuleMessage message, String outputEncoding) throws TransformerException
 	{

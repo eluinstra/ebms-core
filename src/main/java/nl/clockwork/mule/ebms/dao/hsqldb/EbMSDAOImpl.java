@@ -145,12 +145,12 @@ public class EbMSDAOImpl implements EbMSDAO
 					"content," +
 					"status," +
 					"status_time" +
-				") values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+				") values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?," + (status == null ? "null" : NOW) + ")",
 				//new String[]{"id"}
 				new int[]{1}
 			);
 			//ps.setDate(1,new java.sql.Date(timestamp.getTime()));
-			ps.setString(1,String.format(defaultDateFormat,timestamp));
+			ps.setString(1,String.format(DATE_FORMAT,timestamp));
 			ps.setString(2,cpaId);
 			ps.setString(3,conversationId);
 			if (sequenceNr == null)
@@ -174,12 +174,13 @@ public class EbMSDAOImpl implements EbMSDAO
 				ps.setNull(18,java.sql.Types.INTEGER);
 			else
 				ps.setInt(18,status.id());
-			ps.setString(19,status == null ? null : String.format(defaultDateFormat,timestamp));
+			//ps.setString(19,status == null ? null : String.format(DATE_FORMAT,timestamp));
 			return ps;
 		}
 	}
 
-	private static final String defaultDateFormat = "%1$tY-%1$tm-%1$td %1$tH:%1$tM:%1$tS.%1$tL";
+	private static final String DATE_FORMAT = "%1$tY-%1$tm-%1$td %1$tH:%1$tM:%1$tS.%1$tL";
+	private static final String NOW = "NOW()";
 	protected TransactionTemplate transactionTemplate;
 	protected JdbcTemplate jdbcTemplate;
 	protected SimpleJdbcTemplate simpleJdbcTemplate;
@@ -198,12 +199,6 @@ public class EbMSDAOImpl implements EbMSDAO
 		simpleJdbcTemplate = new SimpleJdbcTemplate(dataSource);
 	}
 
-	@Override
-	public String getDefaultDateFormat()
-	{
-		return defaultDateFormat;
-	}
-	
 	@Override
 	public CollaborationProtocolAgreement getCPA(String cpaId) throws DAOException
 	{
@@ -454,14 +449,10 @@ public class EbMSDAOImpl implements EbMSDAO
 									(
 										"insert into ebms_send_event (" +
 										"ebms_message_id," +
-										"time," +
-										"status," +
-										"status_time" +
-										") values (?,?,?,?)",
+										"time" +
+										") values (?,?)",
 										keyHolder.getKey().intValue(),
-										String.format(defaultDateFormat,(Date)sendTime.clone()),
-										0,
-										String.format(defaultDateFormat,timestamp)
+										String.format(DATE_FORMAT,(Date)sendTime.clone())
 									);
 									rm.getRetryInterval().addTo(sendTime);
 								}
@@ -522,9 +513,8 @@ public class EbMSDAOImpl implements EbMSDAO
 							simpleJdbcTemplate.update
 							(
 								"update ebms_send_event" +
-								" set status=1, status_time=?" +
+								" set status=1, status_time=NOW()" +
 								" where ebms_message_id=? and status=0",
-								String.format(defaultDateFormat,timestamp),
 								id
 							);
 
@@ -584,9 +574,8 @@ public class EbMSDAOImpl implements EbMSDAO
 							simpleJdbcTemplate.update
 							(
 								"update ebms_send_event" +
-								" set status=1, status_time=?" +
+								" set status=1, status_time=NOW()" +
 								" where ebms_message_id=? and status=0",
-								String.format(defaultDateFormat,timestamp),
 								id
 							);
 
@@ -686,14 +675,10 @@ public class EbMSDAOImpl implements EbMSDAO
 							(
 								"insert into ebms_send_event (" +
 								"ebms_message_id," +
-								"time," +
-								"status," +
-								"status_time" +
-								") values (?,?,?,?)",
+								"time" +
+								") values (?,?)",
 								keyHolder.getKey().intValue(),
-								String.format(defaultDateFormat,timestamp),
-								0,
-								String.format(defaultDateFormat,timestamp)
+								String.format(DATE_FORMAT,timestamp)
 							);
 
 							return null;
@@ -792,14 +777,10 @@ public class EbMSDAOImpl implements EbMSDAO
 							(
 								"insert into ebms_send_event (" +
 								"ebms_message_id," +
-								"time," +
-								"status," +
-								"status_time" +
-								") values (?,?,?,?)",
+								"time" +
+								") values (?,?)",
 								keyHolder.getKey().intValue(),
-								String.format(defaultDateFormat,timestamp),
-								0,
-								String.format(defaultDateFormat,timestamp)
+								String.format(DATE_FORMAT,timestamp)
 							);
 
 							return null;

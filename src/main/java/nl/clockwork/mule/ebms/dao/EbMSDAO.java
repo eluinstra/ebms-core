@@ -30,8 +30,6 @@ import nl.clockwork.mule.ebms.model.ebxml.MessageHeader;
 
 public interface EbMSDAO
 {
-	String getDefaultDateFormat();
-	
 	CollaborationProtocolAgreement getCPA(String cpaId) throws DAOException;
 
 	boolean exists(String messageId) throws DAOException;

@@ -15,11 +15,9 @@
  ******************************************************************************/
 package nl.clockwork.mule.ebms.transformer;
 
-import java.util.Date;
 import java.util.HashMap;
 
 import nl.clockwork.mule.ebms.Constants;
-import nl.clockwork.mule.ebms.dao.EbMSDAO;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -30,7 +28,6 @@ import org.mule.transformer.AbstractMessageAwareTransformer;
 public class EbMSMessageStatusToMap extends AbstractMessageAwareTransformer
 {
   protected transient Log logger = LogFactory.getLog(getClass());
-  private EbMSDAO ebMSDAO;
   private Constants.EbMSMessageStatus ebMSMessageStatus;
   
   public EbMSMessageStatusToMap()
@@ -46,7 +43,6 @@ public class EbMSMessageStatusToMap extends AbstractMessageAwareTransformer
 			HashMap<String,Object> map = new HashMap<String,Object>();
 			map.put("id",message.getLongProperty(Constants.EBMS_MESSAGE_ID,0));
 			map.put("status",ebMSMessageStatus.id());
-			map.put("status_time",String.format(ebMSDAO.getDefaultDateFormat(),new Date()));
 			message.setPayload(map);
 		}
 		catch (Exception e)
@@ -57,11 +53,6 @@ public class EbMSMessageStatusToMap extends AbstractMessageAwareTransformer
 		return message;
 	}
 
-	public void setEbMSDAO(EbMSDAO ebMSDAO)
-	{
-		this.ebMSDAO = ebMSDAO;
-	}
-	
 	public void setEbMSMessageStatus(Constants.EbMSMessageStatus ebMSMessageStatus)
 	{
 		this.ebMSMessageStatus = ebMSMessageStatus;
