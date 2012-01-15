@@ -39,9 +39,9 @@ public interface Adapter
 	EbMSMessageContent getMessage(@WebParam(name="MessageId") String messageId, @WebParam(name="AutoCommit") boolean autoCommit);
 
 	@WebResult(name="Result")
-	boolean commitId(@WebParam(name="Id") String id);
+	boolean commitMessageId(@WebParam(name="MessageId") String messageId);
 
 	@WebResult(name="Result")
-	boolean commitIds(@WebParam(name="Ids") List<String> ids);
+	boolean commitMessageIds(@WebParam(name="MessageIds") List<String> messageIds);
 
 }

@@ -57,13 +57,13 @@ public class AdapterImpl implements Adapter
 	}
 
 	@Override
-	public boolean commitId(String id)
+	public boolean commitMessageId(String messageId)
 	{
 		return false;
 	}
 
 	@Override
-	public boolean commitIds(List<String> ids)
+	public boolean commitMessageIds(List<String> messageIds)
 	{
 		return false;
 	}
