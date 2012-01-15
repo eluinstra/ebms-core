@@ -20,20 +20,18 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.List;
-//import java.util.UUID;
 
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.Duration;
 
-import org.mule.util.UUID;
-
 import nl.clockwork.common.util.XMLUtils;
 import nl.clockwork.mule.ebms.Constants;
 import nl.clockwork.mule.ebms.model.EbMSMessageContext;
-import nl.clockwork.mule.ebms.model.cpp.cpa.ActorType;
 import nl.clockwork.mule.ebms.model.cpp.cpa.CollaborationProtocolAgreement;
+import nl.clockwork.mule.ebms.model.cpp.cpa.DeliveryChannel;
 import nl.clockwork.mule.ebms.model.cpp.cpa.PartyInfo;
+import nl.clockwork.mule.ebms.model.cpp.cpa.PerMessageCharacteristicsType;
 import nl.clockwork.mule.ebms.model.cpp.cpa.ReliableMessaging;
 import nl.clockwork.mule.ebms.model.ebxml.AckRequested;
 import nl.clockwork.mule.ebms.model.ebxml.Description;
@@ -46,6 +44,8 @@ import nl.clockwork.mule.ebms.model.ebxml.PartyId;
 import nl.clockwork.mule.ebms.model.ebxml.Service;
 import nl.clockwork.mule.ebms.model.ebxml.SeverityType;
 import nl.clockwork.mule.ebms.model.ebxml.To;
+
+import org.mule.util.UUID;
 
 public class EbMSMessageUtils
 {
@@ -98,7 +98,9 @@ public class EbMSMessageUtils
 			messageHeader.getMessageData().setTimeToLive(DatatypeFactory.newInstance().newXMLGregorianCalendar(timestamp));
 		}
 
-		messageHeader.setDuplicateElimination("");
+		DeliveryChannel channel = CPAUtils.getDeliveryChannel(partyInfo.getCollaborationRole().get(0).getServiceBinding().getCanSend().get(0).getThisPartyActionBinding());
+
+		messageHeader.setDuplicateElimination(PerMessageCharacteristicsType.ALWAYS.equals(channel.getMessagingCharacteristics().getDuplicateElimination()) ? "" : null);
 		
 		return messageHeader;
 	}
@@ -128,14 +130,22 @@ public class EbMSMessageUtils
 		return messageHeader;
 	}
 
-	public static AckRequested createAckRequested()
+	public static AckRequested createAckRequested(CollaborationProtocolAgreement cpa, EbMSMessageContext context)
 	{
-		AckRequested ackRequested = new AckRequested();
-		ackRequested.setVersion(Constants.EBMS_VERSION);
-		ackRequested.setMustUnderstand(true);
-		ackRequested.setSigned(false);
-		ackRequested.setActor(ActorType.URN_OASIS_NAMES_TC_EBXML_MSG_ACTOR_TO_PARTY_MSH.value());
-		return ackRequested;
+		PartyInfo partyInfo = CPAUtils.getSendingPartyInfo(cpa,context.getFromRole(),context.getService(),context.getAction());
+		DeliveryChannel channel = CPAUtils.getDeliveryChannel(partyInfo.getCollaborationRole().get(0).getServiceBinding().getCanSend().get(0).getThisPartyActionBinding());
+
+		if (PerMessageCharacteristicsType.ALWAYS.equals(channel.getMessagingCharacteristics().getAckRequested()))
+		{
+			AckRequested ackRequested = new AckRequested();
+			ackRequested.setVersion(Constants.EBMS_VERSION);
+			ackRequested.setMustUnderstand(true);
+			ackRequested.setSigned(PerMessageCharacteristicsType.ALWAYS.equals(channel.getMessagingCharacteristics().getAckSignatureRequested()));
+			ackRequested.setActor(channel.getMessagingCharacteristics().getActor().value());
+			return ackRequested;
+		}
+		else
+			return null;
 	}
 	
 	public static Manifest createManifest()
@@ -158,7 +168,7 @@ public class EbMSMessageUtils
 	public static Error createError(String location, String errorCode, String description, String language, SeverityType severity)
 	{
 		Error error = new Error();
-		error.setCodeContext("urn:oasis:names:tc:ebxml-msg:service:errors");
+		error.setCodeContext(Constants.EBMS_SERVICE + ":errors");
 		error.setLocation(location);
 		error.setErrorCode(errorCode);
 		error.setDescription(new Description());

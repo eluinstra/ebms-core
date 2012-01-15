@@ -23,6 +23,7 @@ import java.sql.Statement;
 import javax.sql.DataSource;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -58,7 +59,8 @@ public class HSQLDatabaseProvider
 				String sql = IOUtils.toString(HSQLDatabaseProvider.class.getResourceAsStream(createTablesScriptFile));
 				s.executeUpdate(sql);
 				sql = IOUtils.toString(HSQLDatabaseProvider.class.getResourceAsStream(createConstraintsScriptFile));
-				s.executeUpdate(sql);
+				if (!StringUtils.isBlank(sql))
+					s.executeUpdate(sql);
 				s.close();
 			}
 			catch (SQLException e)

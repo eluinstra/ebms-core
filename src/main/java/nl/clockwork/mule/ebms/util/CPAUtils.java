@@ -178,6 +178,11 @@ public class CPAUtils
 		return getCanReceive(partyInfo,role,service,action) != null;
 	}
 
+	public static DeliveryChannel getDeliveryChannel(ActionBindingType bindingType)
+	{
+		return (DeliveryChannel)((JAXBElement<Object>)bindingType.getChannelId().get(0)).getValue();
+	}
+	
 	public static List<DeliveryChannel> getDeliveryChannels(PartyInfo partyInfo, String role, Service service, String action)
 	{
 		List<DeliveryChannel> result = new ArrayList<DeliveryChannel>();

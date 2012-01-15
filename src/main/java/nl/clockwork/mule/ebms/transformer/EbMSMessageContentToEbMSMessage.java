@@ -52,7 +52,7 @@ public class EbMSMessageContentToEbMSMessage extends AbstractMessageAwareTransfo
 			
 			MessageHeader messageHeader = EbMSMessageUtils.createMessageHeader(cpa,content.getContext(),hostname);
 
-			AckRequested ackRequested = EbMSMessageUtils.createAckRequested();
+			AckRequested ackRequested = EbMSMessageUtils.createAckRequested(cpa,content.getContext());
 			
 			Manifest manifest = EbMSMessageUtils.createManifest();
 			for (int i = 0; i < content.getAttachments().size(); i++)
