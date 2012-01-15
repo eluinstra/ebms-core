@@ -23,7 +23,6 @@ import javax.xml.datatype.DatatypeFactory;
 import nl.clockwork.mule.ebms.Constants;
 import nl.clockwork.mule.ebms.model.EbMSAcknowledgment;
 import nl.clockwork.mule.ebms.model.EbMSMessage;
-import nl.clockwork.mule.ebms.model.Signature;
 import nl.clockwork.mule.ebms.model.cpp.cpa.ActorType;
 import nl.clockwork.mule.ebms.model.ebxml.Acknowledgment;
 import nl.clockwork.mule.ebms.model.ebxml.From;
@@ -72,9 +71,8 @@ public class EbMSMessageToEbMSAcknowledgment extends AbstractMessageAwareTransfo
 			
 			acknowledgment.setActor(ActorType.URN_OASIS_NAMES_TC_EBXML_MSG_ACTOR_TO_PARTY_MSH.value());
 			
-			Signature signature = (Signature)message.getProperty(Constants.EBMS_SIGNATURE);
-			if (signature != null)
-				for (ReferenceType reference : signature.getSignature().getSignedInfo().getReference())
+			if (msg.getAckRequested().isSigned() && msg.getSignature() != null)
+				for (ReferenceType reference : msg.getSignature().getSignedInfo().getReference())
 					acknowledgment.getReference().add(reference);
 
 			message.setPayload(new EbMSAcknowledgment(messageHeader,acknowledgment));
