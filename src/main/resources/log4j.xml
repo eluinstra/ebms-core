@@ -43,26 +43,11 @@
 		<!--appender-ref ref="FILE"/-->
 	</appender>
 
-	<logger name="nl.ez.ezpoort" additivity="false">
+	<logger name="nl.clockwork.mule.ebms" additivity="false">
 		<level value="debug"/>
 		<appender-ref ref="ASYNC"/>
 	</logger>
 	
-	<logger name="nl.ez.ezpoort.common.logging" additivity="false">
-		<level value="info"/>
-		<appender-ref ref="ASYNC"/>
-	</logger>
-
-	<logger name="nl.ez.ezpoort.dao" additivity="false">
-		<level value="debug"/>
-		<appender-ref ref="ASYNC"/>
-	</logger>
-
-	<logger name="nl.ez.ezpoort.transformer.MessageLogger" additivity="false">
-		<level value="debug"/>
-		<appender-ref ref="ASYNC"/>
-	</logger>
-
 	<logger name="org.apache" additivity="false">
 		<level value="warn"/>
 		<appender-ref ref="ASYNC"/>
