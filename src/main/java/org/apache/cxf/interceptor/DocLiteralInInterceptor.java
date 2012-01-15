@@ -163,7 +163,7 @@ public class DocLiteralInInterceptor extends AbstractInDatabindingInterceptor {
                         		if (findHeader((SoapMessage)message, mpi) != null)
                         			i++;
                         	}
-                        	if (bmsg.getMessageParts().size() == i)
+                        	if (bmsg.getMessageParts().size() == i && ((SoapMessage)message).getHeaders().size() == i)
                         	{
                         		tmpOP = op;
                         		tmpBOP = ep.getEndpointInfo().getBinding().getOperation(op);
