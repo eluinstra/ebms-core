@@ -38,11 +38,6 @@
 		<service name="ebms.soap.receive">
 			<inbound>
 				<cxf:inbound-endpoint connector-ref="connector.cxf.ebms.in" protocolConnector="connector.http.ebms.in" address="${service.protocol}://${service.host}:${service.port}${service.url}" serviceName="EbMSPortType" namespace="http://www.clockwork.nl/ebms/1.0" enableMuleSoapHeaders="false" mtomEnabled="true" synchronous="true">
-					<response-transformers>
-						<message-properties-transformer>
-							<add-message-property key="EBMS.HTTP_STATUS_CODE" value-ref="HTTP_SC_NO_CONTENT"/>
-						</message-properties-transformer>
-					</response-transformers>
 					<cxf:inInterceptors>
 						<spring:bean class="org.apache.cxf.interceptor.LoggingInInterceptor" />
 						<!--spring:bean class="nl.clockwork.mule.ebms.cxf.OracleEbMSContentTypeFixingInInterceptor" /-->
@@ -98,8 +93,9 @@
 		<default-service-exception-strategy>
 			<vm:outbound-endpoint path="ebms.message.receive.async.reply">
 				<message-properties-transformer>
-					<add-message-property key="EBMS.HTTP_STATUS_CODE" value-ref="HTTP_SC_INTERNAL_SERVER_ERROR"/>
+					<add-message-property key="http.status" value-ref="HTTP_SC_INTERNAL_SERVER_ERROR"/>
 				</message-properties-transformer>
+				<custom-transformer class="nl.clockwork.mule.common.transformer.NullPayloadTransformer" />
 			</vm:outbound-endpoint>
 		</default-service-exception-strategy>
 
@@ -155,8 +151,9 @@
 					</jdbc:outbound-endpoint>
 					<vm:outbound-endpoint path="ebms.message.receive.async.reply">
 						<message-properties-transformer>
-							<add-message-property key="EBMS.HTTP_STATUS_CODE" value-ref="HTTP_SC_NO_CONTENT"/>
+							<add-message-property key="http.status" value-ref="HTTP_SC_NO_CONTENT"/>
 						</message-properties-transformer>
+						<custom-transformer class="nl.clockwork.mule.common.transformer.NullPayloadTransformer" />
 					</vm:outbound-endpoint>
 				</chaining-router>
 			</outbound>
@@ -262,8 +259,9 @@
 				<pass-through-router>
 					<vm:outbound-endpoint path="ebms.message.receive.async.reply">
 						<message-properties-transformer>
-							<add-message-property key="EBMS.HTTP_STATUS_CODE" value-ref="HTTP_SC_NO_CONTENT"/>
+							<add-message-property key="http.status" value-ref="HTTP_SC_NO_CONTENT"/>
 						</message-properties-transformer>
+						<custom-transformer class="nl.clockwork.mule.common.transformer.NullPayloadTransformer" />
 					</vm:outbound-endpoint>
 				</pass-through-router>
 			</outbound>
@@ -300,8 +298,9 @@
 				<pass-through-router>
 					<vm:outbound-endpoint path="ebms.message.receive.async.reply">
 						<message-properties-transformer>
-							<add-message-property key="EBMS.HTTP_STATUS_CODE" value-ref="HTTP_SC_NO_CONTENT"/>
+							<add-message-property key="http.status" value-ref="HTTP_SC_NO_CONTENT" />
 						</message-properties-transformer>
+						<custom-transformer class="nl.clockwork.mule.common.transformer.NullPayloadTransformer" />
 					</vm:outbound-endpoint>
 				</pass-through-router>
 			</outbound>
@@ -314,8 +313,9 @@
 		<default-service-exception-strategy>
 			<vm:outbound-endpoint path="ebms.messageError.receive.async.reply">
 				<message-properties-transformer>
-					<add-message-property key="EBMS.HTTP_STATUS_CODE" value-ref="HTTP_SC_INTERNAL_SERVER_ERROR"/>
+					<add-message-property key="http.status" value-ref="HTTP_SC_INTERNAL_SERVER_ERROR"/>
 				</message-properties-transformer>
+				<custom-transformer class="nl.clockwork.mule.common.transformer.NullPayloadTransformer" />
 			</vm:outbound-endpoint>
 		</default-service-exception-strategy>
 
@@ -356,8 +356,9 @@
 				<pass-through-router>
 					<vm:outbound-endpoint path="ebms.messageError.receive.async.reply">
 						<message-properties-transformer>
-							<add-message-property key="EBMS.HTTP_STATUS_CODE" value-ref="HTTP_SC_NO_CONTENT"/>
+							<add-message-property key="http.status" value-ref="HTTP_SC_NO_CONTENT"/>
 						</message-properties-transformer>
+						<custom-transformer class="nl.clockwork.mule.common.transformer.NullPayloadTransformer" />
 					</vm:outbound-endpoint>
 				</pass-through-router>
 			</outbound>
@@ -370,8 +371,9 @@
 		<default-service-exception-strategy>
 			<vm:outbound-endpoint path="ebms.acknowledgment.receive.async.reply">
 				<message-properties-transformer>
-					<add-message-property key="EBMS.HTTP_STATUS_CODE" value-ref="HTTP_SC_INTERNAL_SERVER_ERROR"/>
+					<add-message-property key="http.status" value-ref="HTTP_SC_INTERNAL_SERVER_ERROR"/>
 				</message-properties-transformer>
+				<custom-transformer class="nl.clockwork.mule.common.transformer.NullPayloadTransformer" />
 			</vm:outbound-endpoint>
 		</default-service-exception-strategy>
 
@@ -412,8 +414,9 @@
 				<pass-through-router>
 					<vm:outbound-endpoint path="ebms.acknowledgment.receive.async.reply">
 						<message-properties-transformer>
-							<add-message-property key="EBMS.HTTP_STATUS_CODE" value-ref="HTTP_SC_NO_CONTENT"/>
+							<add-message-property key="http.status" value-ref="HTTP_SC_NO_CONTENT"/>
 						</message-properties-transformer>
+						<custom-transformer class="nl.clockwork.mule.common.transformer.NullPayloadTransformer" />
 					</vm:outbound-endpoint>
 				</pass-through-router>
 			</outbound>
