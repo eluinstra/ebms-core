@@ -39,7 +39,7 @@
 	</cxf:connector>
 
 	<cxf:connector name="connector.cxf.ebms.out" validateConnections="${connector.ebms.validateConnections}">
-		<receiver-threading-profile maxThreadsActive="${threading.profile.receiver.maxThreadsActive}" maxThreadsIdle="${threading.profile.ebms.receiver.maxThreadsIdle}" threadTTL="${threading.profile.ebms.receiver.threadTTL}" poolExhaustedAction="WAIT" maxBufferSize="${threading.profile.ebms.receiver.maxBufferSize}" />
+		<receiver-threading-profile maxThreadsActive="${threading.profile.ebms.receiver.maxThreadsActive}" maxThreadsIdle="${threading.profile.ebms.receiver.maxThreadsIdle}" threadTTL="${threading.profile.ebms.receiver.threadTTL}" poolExhaustedAction="WAIT" maxBufferSize="${threading.profile.ebms.receiver.maxBufferSize}" />
 	</cxf:connector>
 
 	<jdbc:connector name="connector.jdbc.ebms" dataSource-ref="ebMSDataSource" createMultipleTransactedReceivers="true" numberOfConcurrentTransactedReceivers="3" validateConnections="${connector.ebms.validateConnections}">

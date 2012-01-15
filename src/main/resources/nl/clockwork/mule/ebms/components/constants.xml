@@ -23,7 +23,6 @@
 	"
 >
 
-	<util:constant id="HTTP_STATUS_CODE" static-field="org.mule.transport.http.HttpConnector.HTTP_STATUS_PROPERTY" />
 	<util:constant id="HTTP_SC_OK" static-field="org.mule.transport.http.HttpConstants.SC_OK" />
 	<util:constant id="HTTP_SC_NO_CONTENT" static-field="org.mule.transport.http.HttpConstants.SC_NO_CONTENT" />
 	<util:constant id="HTTP_SC_INTERNAL_SERVER_ERROR" static-field="org.mule.transport.http.HttpConstants.SC_INTERNAL_SERVER_ERROR" />
