@@ -27,6 +27,8 @@ import javax.xml.datatype.Duration;
 
 import nl.clockwork.common.util.XMLUtils;
 import nl.clockwork.mule.ebms.Constants;
+import nl.clockwork.mule.ebms.model.EbMSMessage;
+import nl.clockwork.mule.ebms.model.EbMSMessageContent;
 import nl.clockwork.mule.ebms.model.EbMSMessageContext;
 import nl.clockwork.mule.ebms.model.cpp.cpa.CollaborationProtocolAgreement;
 import nl.clockwork.mule.ebms.model.cpp.cpa.DeliveryChannel;
@@ -41,6 +43,7 @@ import nl.clockwork.mule.ebms.model.ebxml.Manifest;
 import nl.clockwork.mule.ebms.model.ebxml.MessageData;
 import nl.clockwork.mule.ebms.model.ebxml.MessageHeader;
 import nl.clockwork.mule.ebms.model.ebxml.PartyId;
+import nl.clockwork.mule.ebms.model.ebxml.Reference;
 import nl.clockwork.mule.ebms.model.ebxml.Service;
 import nl.clockwork.mule.ebms.model.ebxml.SeverityType;
 import nl.clockwork.mule.ebms.model.ebxml.To;
@@ -49,6 +52,23 @@ import org.mule.util.UUID;
 
 public class EbMSMessageUtils
 {
+	public static EbMSMessage ebMSMessageContentToEbMSMessage(CollaborationProtocolAgreement cpa, EbMSMessageContent content, String hostname) throws DatatypeConfigurationException
+	{
+		MessageHeader messageHeader = EbMSMessageUtils.createMessageHeader(cpa,content.getContext(),hostname);
+
+		AckRequested ackRequested = EbMSMessageUtils.createAckRequested(cpa,content.getContext());
+		
+		Manifest manifest = EbMSMessageUtils.createManifest();
+		for (int i = 0; i < content.getAttachments().size(); i++)
+		{
+			Reference reference = new Reference();
+			reference.setHref("cid:" + (i + 1));
+			reference.setType("simple");
+			//reference.setRole("XLinkRole");
+			manifest.getReference().add(reference);
+		}
+		return new EbMSMessage(messageHeader,ackRequested,manifest,content.getAttachments());
+	}
 
 	public static MessageHeader createMessageHeader(CollaborationProtocolAgreement cpa, EbMSMessageContext context, String hostname) throws DatatypeConfigurationException
 	{

@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Copyright 2011 Clockwork
+  
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+  
+    http://www.apache.org/licenses/LICENSE-2.0
+  
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+<mule xmlns="http://www.mulesource.org/schema/mule/core/2.2"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:spring="http://www.springframework.org/schema/beans"
+	xmlns:http="http://www.mulesource.org/schema/mule/http/2.2" 
+	xmlns:soap="http://www.mulesource.org/schema/mule/soap/2.2"
+	xmlns:cxf="http://www.mulesource.org/schema/mule/cxf/2.2"
+	xmlns:mxml="http://www.mulesource.org/schema/mule/xml/2.2"
+	xsi:schemaLocation="
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+		http://www.mulesource.org/schema/mule/core/2.2 http://www.mulesource.org/schema/mule/core/2.2/mule.xsd
+		http://www.mulesource.org/schema/mule/http/2.2 http://www.mulesource.org/schema/mule/http/2.2/mule-http.xsd
+		http://www.mulesource.org/schema/mule/soap/2.2 http://www.mulesource.org/schema/mule/soap/2.2/mule-soap.xsd
+		http://www.mulesource.org/schema/mule/cxf/2.2 http://www.mulesource.org/schema/mule/cxf/2.2/mule-cxf.xsd
+		http://www.mulesource.org/schema/mule/xml/2.2 http://www.mulesource.org/schema/mule/xml/2.2/mule-xml.xsd"
+>
+	<cxf:connector name="adapter.connector.cxf">
+		<receiver-threading-profile maxThreadsActive="${threading.profile.ebms.receiver.maxThreadsActive}" maxThreadsIdle="${threading.profile.ebms.receiver.maxThreadsIdle}" threadTTL="${threading.profile.ebms.receiver.threadTTL}" poolExhaustedAction="WAIT" maxBufferSize="${threading.profile.ebms.receiver.maxBufferSize}" />
+	</cxf:connector>
+
+	<http:connector name="adapter.connector.http">
+		<receiver-threading-profile maxThreadsActive="${threading.profile.ebms.http.receiver.maxThreadsActive}" maxThreadsIdle="${threading.profile.ebms.http.receiver.maxThreadsIdle}" threadTTL="${threading.profile.ebms.http.receiver.threadTTL}" poolExhaustedAction="WAIT" maxBufferSize="${threading.profile.ebms.http.receiver.maxBufferSize}" />
+	</http:connector>
+	
+	<model>
+
+		<service name="ebMSAdapter">
+			<inbound>
+				<cxf:inbound-endpoint connector-ref="adapter.connector.cxf" protocolConnector="adapter.connector.http" address="http://${service.host}:${service.adapter.port}${service.adapter.url}" /> 
+			</inbound>
+			<component>
+				<singleton-object class="nl.clockwork.mule.ebms.adapter.service.AdapterImpl">
+					<property key="ebMSDAO" value-ref="ebMSDAO"/>
+					<property key="hostname" value="${service.host}"/>
+				</singleton-object>
+			</component>
+		</service>
+
+	</model>
+    
+</mule>

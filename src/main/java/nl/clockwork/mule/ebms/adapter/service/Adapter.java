@@ -12,13 +12,16 @@ import nl.clockwork.mule.ebms.model.EbMSMessageContent;
 public interface Adapter
 {
 	@WebResult(name="MessageId")
-	String sendMessage(EbMSMessageContent messageContent);
+	String sendMessage(@WebParam(name="MessageContent") EbMSMessageContent messageContent);
 
 	@WebResult(name="MessageIds")
 	List<String> getMessageIds(@WebParam(name="MaxNr") int maxNr);
 
-	@WebResult(name="MessageIds")
-	List<String> getMessageIds(@WebParam(name="MaxNr") int maxNr, boolean autoCommit);
+//	@WebResult(name="Message")
+//	EbMSMessageContent getMessage(@WebParam(name="MessageId") String messageId);
+
+	@WebResult(name="Message")
+	EbMSMessageContent getMessage(@WebParam(name="MessageId") String messageId, @WebParam(name="AutoCommit") boolean autoCommit);
 
 	@WebResult(name="Result")
 	boolean commitId(@WebParam(name="Id") String id);
@@ -26,6 +29,4 @@ public interface Adapter
 	@WebResult(name="Result")
 	boolean commitIds(@WebParam(name="Ids") List<String> ids);
 
-	@WebResult(name="Message")
-	EbMSMessageContent getMessage(String messageId);
 }

@@ -16,13 +16,8 @@
 package nl.clockwork.mule.ebms.transformer;
 
 import nl.clockwork.mule.ebms.dao.EbMSDAO;
-import nl.clockwork.mule.ebms.model.EbMSMessage;
 import nl.clockwork.mule.ebms.model.EbMSMessageContent;
 import nl.clockwork.mule.ebms.model.cpp.cpa.CollaborationProtocolAgreement;
-import nl.clockwork.mule.ebms.model.ebxml.AckRequested;
-import nl.clockwork.mule.ebms.model.ebxml.Manifest;
-import nl.clockwork.mule.ebms.model.ebxml.MessageHeader;
-import nl.clockwork.mule.ebms.model.ebxml.Reference;
 import nl.clockwork.mule.ebms.util.EbMSMessageUtils;
 
 import org.apache.commons.logging.Log;
@@ -49,22 +44,7 @@ public class EbMSMessageContentToEbMSMessage extends AbstractMessageAwareTransfo
 		{
 			EbMSMessageContent content = (EbMSMessageContent)message.getPayload();
 			CollaborationProtocolAgreement cpa = ebMSDAO.getCPA(content.getContext().getCpaId());
-			
-			MessageHeader messageHeader = EbMSMessageUtils.createMessageHeader(cpa,content.getContext(),hostname);
-
-			AckRequested ackRequested = EbMSMessageUtils.createAckRequested(cpa,content.getContext());
-			
-			Manifest manifest = EbMSMessageUtils.createManifest();
-			for (int i = 0; i < content.getAttachments().size(); i++)
-			{
-				Reference reference = new Reference();
-				reference.setHref("cid:" + (i + 1));
-				reference.setType("simple");
-				//reference.setRole("XLinkRole");
-				manifest.getReference().add(reference);
-			}
-			
-			message.setPayload(new EbMSMessage(messageHeader,ackRequested,manifest,content.getAttachments()));
+			message.setPayload(EbMSMessageUtils.ebMSMessageContentToEbMSMessage(cpa,content,hostname));
 
 			return message;
 		}
