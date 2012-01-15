@@ -33,7 +33,7 @@
 	"
 >
 
-	<model>
+	<model name="content.send">
 
 		<service name="ebms.content.send">
 			<inbound>
@@ -73,6 +73,58 @@
 					</jdbc:outbound-endpoint>
 				</custom-outbound-router>
 			</outbound>
+		</service>
+
+	</model>
+
+	<model name="content.receive">
+
+		<service name="ebms.content.receive">
+			<inbound>
+				<vm:inbound-endpoint path="ebms.content.receive.in" synchronous="true">
+					<custom-transformer class="nl.clockwork.mule.ebms.transformer.EbMSMessageContentToEbMSMessage">
+						<spring:property name="ebMSDAO" ref="ebMSDAO" />
+						<spring:property name="hostname" value="${service.host}" />
+					</custom-transformer>
+				</vm:inbound-endpoint>
+			</inbound>
+			<component>
+				<singleton-object class="nl.clockwork.mule.ebms.component.StoreEbMSMessageOut">
+					<property key="ebMSDAO" value-ref="ebMSDAO"/>
+				</singleton-object>
+			</component>
+<!--			<outbound>-->
+<!--				<pass-through-router>-->
+<!--					<vm:outbound-endpoint path="end">-->
+<!--						<script:transformer>-->
+<!--							<script:script engine="groovy">-->
+<!--								import nl.clockwork.mule.ebms.model.EbMSMessage;-->
+<!--								import nl.clockwork.mule.ebms.model.EbMSMessageContentResponse;-->
+<!--	-->
+<!--								EbMSMessage m = message.getPayload();-->
+<!--								EbMSMessageContentResponse r = new EbMSMessageContentResponse(m.getMessageHeader().getMessageData().getMessageId());-->
+<!--								message.setPayload(r);-->
+<!--								return message;-->
+<!--							</script:script>-->
+<!--						</script:transformer>-->
+<!--					</vm:outbound-endpoint>-->
+<!--				</pass-through-router>-->
+<!--			</outbound>-->
+<!--			<default-service-exception-strategy>-->
+<!--				<vm:outbound-endpoint path="end">-->
+<!--					<script:transformer>-->
+<!--						<script:script engine="groovy">-->
+<!--							import nl.clockwork.mule.ebms.model.EbMSMessage;-->
+<!--							import nl.clockwork.mule.ebms.model.EbMSMessageContentResponse;-->
+<!---->
+<!--							EbMSMessage m = message.getPayload();-->
+<!--							EbMSMessageContentResponse r = new EbMSMessageContentResponse();-->
+<!--							message.setPayload(r);-->
+<!--							return message;-->
+<!--						</script:script>-->
+<!--					</script:transformer>-->
+<!--				</vm:outbound-endpoint>-->
+<!--			</default-service-exception-strategy>-->
 		</service>
 
 	</model>
