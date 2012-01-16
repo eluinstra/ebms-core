@@ -17,8 +17,7 @@ package nl.clockwork.mule.ebms.filter;
 
 import java.util.List;
 
-import javax.activation.DataSource;
-
+import nl.clockwork.mule.ebms.model.EbMSAttachment;
 import nl.clockwork.mule.ebms.model.EbMSMessageContent;
 
 import org.apache.commons.logging.Log;
@@ -36,7 +35,7 @@ public class EbMSMessageContentValidationFilter implements Filter
 		if (message.getPayload() instanceof EbMSMessageContent)
 		{
 			EbMSMessageContent content = (EbMSMessageContent)message.getPayload();
-			List<DataSource> attachments = content.getAttachments();
+			List<EbMSAttachment> attachments = content.getAttachments();
 			return attachments.size() == 1;
 		}
 		return true;

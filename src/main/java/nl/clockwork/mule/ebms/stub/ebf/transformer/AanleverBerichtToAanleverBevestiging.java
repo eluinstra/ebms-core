@@ -19,11 +19,10 @@ import java.util.ArrayList;
 import java.util.GregorianCalendar;
 import java.util.List;
 
-import javax.activation.DataSource;
-import javax.mail.util.ByteArrayDataSource;
 import javax.xml.datatype.DatatypeFactory;
 
 import nl.clockwork.common.util.XMLMessageBuilder;
+import nl.clockwork.mule.ebms.model.EbMSAttachment;
 import nl.clockwork.mule.ebms.model.EbMSMessageContent;
 import nl.clockwork.mule.ebms.model.EbMSMessageContext;
 import nl.clockwork.mule.ebms.stub.ebf.model.aanleveren.bericht.AanleverBericht;
@@ -53,7 +52,7 @@ public class AanleverBerichtToAanleverBevestiging extends AbstractMessageAwareTr
 		try
 		{
 			EbMSMessageContent content = (EbMSMessageContent)message.getPayload();
-			AanleverBericht aanleverBericht = XMLMessageBuilder.getInstance(AanleverBericht.class).handle(content.getAttachments().iterator().next().getInputStream());
+			AanleverBericht aanleverBericht = XMLMessageBuilder.getInstance(AanleverBericht.class).handle(new String(content.getAttachments().iterator().next().getContent()));
 			BevestigAanleverBericht aanleverBevestiging = new BevestigAanleverBericht();
 
 
@@ -87,10 +86,8 @@ public class AanleverBerichtToAanleverBevestiging extends AbstractMessageAwareTr
 			else
 				aanleverBevestiging.setFout(error);
 
-			ByteArrayDataSource ds = new ByteArrayDataSource(XMLMessageBuilder.getInstance(BevestigAanleverBericht.class).handle(aanleverBevestiging),"application/xml");
-			ds.setName(name);
-			List<DataSource> attachments = new ArrayList<DataSource>();
-			attachments.add(ds);
+			List<EbMSAttachment> attachments = new ArrayList<EbMSAttachment>();
+			attachments.add(new EbMSAttachment(name,"application/xml",XMLMessageBuilder.getInstance(BevestigAanleverBericht.class).handle(aanleverBevestiging).getBytes()));
 
 			return new EbMSMessageContent(new EbMSMessageContext(cpaId,service,action,content.getContext().getConversationId()),attachments);
 		}

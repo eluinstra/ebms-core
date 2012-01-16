@@ -15,9 +15,8 @@
  ******************************************************************************/
 package nl.clockwork.mule.ebms.stub.ebf.filter;
 
-import javax.activation.DataSource;
-
 import nl.clockwork.common.util.XMLMessageBuilder;
+import nl.clockwork.mule.ebms.model.EbMSAttachment;
 import nl.clockwork.mule.ebms.model.EbMSMessageContent;
 import nl.clockwork.mule.ebms.stub.ebf.model.aanleveren.bericht.AanleverBericht;
 
@@ -39,8 +38,8 @@ public class AanleverBerichtBerichtSoortValidationFilter implements Filter
 			try
 			{
 				EbMSMessageContent content = (EbMSMessageContent)message.getPayload();
-				DataSource attachment = content.getAttachments().iterator().next();
-				AanleverBericht aanleverBericht = XMLMessageBuilder.getInstance(AanleverBericht.class).handle(attachment.getInputStream());
+				EbMSAttachment attachment = content.getAttachments().iterator().next();
+				AanleverBericht aanleverBericht = XMLMessageBuilder.getInstance(AanleverBericht.class).handle(new String(attachment.getContent()));
 				return berichtSoort.equalsIgnoreCase(aanleverBericht.getBerichtsoort());
 			}
 			catch (Exception e)

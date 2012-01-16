@@ -23,6 +23,7 @@ import javax.activation.DataSource;
 
 import nl.clockwork.mule.ebms.Constants;
 import nl.clockwork.mule.ebms.dao.EbMSDAO;
+import nl.clockwork.mule.ebms.model.EbMSAttachment;
 import nl.clockwork.mule.ebms.model.EbMSMessageContent;
 import nl.clockwork.mule.ebms.model.EbMSMessageContext;
 import nl.clockwork.mule.ebms.model.ebxml.MessageHeader;
@@ -49,7 +50,7 @@ public class EbMSMessageIdToEbMSMessageContent extends AbstractMessageAwareTrans
 		{
 			long messageId = message.getLongProperty(Constants.EBMS_MESSAGE_ID,0);
 			MessageHeader messageHeader = ebMSDAO.getMessageHeader(messageId);
-			List<DataSource> attachments = ebMSDAO.getAttachments(messageId);
+			List<EbMSAttachment> attachments = ebMSDAO.getEbMSAttachments(messageId);
 
 			Map<String,Object> properties = new HashMap<String,Object>();
 			JXPathContext context = JXPathContext.newContext(messageHeader);

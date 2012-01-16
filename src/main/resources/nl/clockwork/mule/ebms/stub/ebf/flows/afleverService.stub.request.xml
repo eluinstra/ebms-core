@@ -96,8 +96,8 @@
 		<service name="afleverbericht.stub.message.transform">
 			<inbound>
 				<vm:inbound-endpoint path="afleverbericht.stub.message.transform.in" synchronous="false">
-					<custom-transformer class="nl.clockwork.mule.ebms.service.stub.enricher.XMLToDataSourceEnricher" />
-					<custom-transformer class="nl.clockwork.mule.ebms.service.stub.transformer.DataSourceToEbMSMessageContent">
+					<custom-transformer class="nl.clockwork.mule.ebms.service.stub.enricher.XMLToEbMSAttachmentEnricher" />
+					<custom-transformer class="nl.clockwork.mule.ebms.service.stub.transformer.EbMSAttachmentToEbMSMessageContent">
 						<spring:property name="cpaId" value="${afleverService.cpaId}"/>
 						<spring:property name="service" value="${afleverService.service}"/>
 						<spring:property name="action" value="${afleverService.request.action}"/>

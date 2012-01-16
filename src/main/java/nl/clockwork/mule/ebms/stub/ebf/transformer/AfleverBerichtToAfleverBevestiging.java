@@ -19,11 +19,10 @@ import java.util.ArrayList;
 import java.util.GregorianCalendar;
 import java.util.List;
 
-import javax.activation.DataSource;
-import javax.mail.util.ByteArrayDataSource;
 import javax.xml.datatype.DatatypeFactory;
 
 import nl.clockwork.common.util.XMLMessageBuilder;
+import nl.clockwork.mule.ebms.model.EbMSAttachment;
 import nl.clockwork.mule.ebms.model.EbMSMessageContent;
 import nl.clockwork.mule.ebms.model.EbMSMessageContext;
 import nl.clockwork.mule.ebms.stub.ebf.model.afleveren.bericht.AfleverBericht;
@@ -51,7 +50,7 @@ public class AfleverBerichtToAfleverBevestiging extends AbstractMessageAwareTran
 		try
 		{
 			EbMSMessageContent content = (EbMSMessageContent)message.getPayload();
-			AfleverBericht afleverBericht = XMLMessageBuilder.getInstance(AfleverBericht.class).handle(content.getAttachments().iterator().next().getInputStream());
+			AfleverBericht afleverBericht = XMLMessageBuilder.getInstance(AfleverBericht.class).handle(new String(content.getAttachments().iterator().next().getContent()));
 			BevestigAfleverBericht afleverBevestiging = new BevestigAfleverBericht();
 
 			afleverBevestiging.setKenmerk(afleverBericht.getKenmerk());
@@ -63,10 +62,8 @@ public class AfleverBerichtToAfleverBevestiging extends AbstractMessageAwareTran
 			else
 				afleverBevestiging.setFout(error);
 
-			ByteArrayDataSource ds = new ByteArrayDataSource(XMLMessageBuilder.getInstance(BevestigAfleverBericht.class).handle(afleverBevestiging),"application/xml");
-			ds.setName(name);
-			List<DataSource> attachments = new ArrayList<DataSource>();
-			attachments.add(ds);
+			List<EbMSAttachment> attachments = new ArrayList<EbMSAttachment>();
+			attachments.add(new EbMSAttachment(name,"application/xml",XMLMessageBuilder.getInstance(BevestigAfleverBericht.class).handle(afleverBevestiging).getBytes()));
 
 			return new EbMSMessageContent(new EbMSMessageContext(cpaId,service,action,content.getContext().getConversationId()),attachments);
 		}

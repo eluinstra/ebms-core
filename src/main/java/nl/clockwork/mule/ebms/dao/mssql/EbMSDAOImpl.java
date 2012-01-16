@@ -32,6 +32,7 @@ import nl.clockwork.mule.ebms.Constants;
 import nl.clockwork.mule.ebms.Constants.EbMSMessageStatus;
 import nl.clockwork.mule.ebms.dao.EbMSDAO;
 import nl.clockwork.mule.ebms.model.EbMSAcknowledgment;
+import nl.clockwork.mule.ebms.model.EbMSAttachment;
 import nl.clockwork.mule.ebms.model.EbMSBaseMessage;
 import nl.clockwork.mule.ebms.model.EbMSMessage;
 import nl.clockwork.mule.ebms.model.EbMSMessageError;
@@ -328,6 +329,32 @@ public class EbMSDAOImpl implements EbMSDAO
 						ByteArrayDataSource result = new ByteArrayDataSource(rs.getBytes("content"),rs.getString("content_type"));
 						result.setName(rs.getString("name"));
 						return result;
+					}
+				},
+				messageId
+			);
+		}
+		catch (Exception e)
+		{
+			throw new DAOException(e);
+		}
+	}
+
+	@Override
+	public List<EbMSAttachment> getEbMSAttachments(long messageId) throws DAOException
+	{
+		try
+		{
+			return simpleJdbcTemplate.query(
+				"select name, content_type, content" + 
+				" from ebms_attachment" + 
+				" where ebms_message_id = ?",
+				new ParameterizedRowMapper<EbMSAttachment>()
+				{
+					@Override
+					public EbMSAttachment mapRow(ResultSet rs, int rowNum) throws SQLException
+					{
+						return new EbMSAttachment(rs.getString("name"),rs.getString("content_type"),rs.getBytes("content"));
 					}
 				},
 				messageId

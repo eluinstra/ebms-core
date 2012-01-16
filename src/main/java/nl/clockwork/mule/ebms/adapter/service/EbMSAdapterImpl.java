@@ -23,7 +23,7 @@ import nl.clockwork.mule.ebms.model.EbMSMessageContent;
 import nl.clockwork.mule.ebms.model.cpp.cpa.CollaborationProtocolAgreement;
 import nl.clockwork.mule.ebms.util.EbMSMessageUtils;
 
-public class AdapterImpl implements Adapter
+public class EbMSAdapterImpl implements EbMSAdapter
 {
 	private EbMSDAO ebMSDAO;
 	private String hostname;
@@ -51,19 +51,19 @@ public class AdapterImpl implements Adapter
 	}
 
 	@Override
-	public EbMSMessageContent getMessage(String messageId, boolean autoCommit)
+	public EbMSMessageContent getMessage(String messageId, boolean process)
 	{
 		return null;
 	}
 
 	@Override
-	public boolean commitMessageId(String messageId)
+	public boolean processMessage(String messageId)
 	{
 		return false;
 	}
 
 	@Override
-	public boolean commitMessageIds(List<String> messageIds)
+	public boolean processMessages(List<String> messageIds)
 	{
 		return false;
 	}

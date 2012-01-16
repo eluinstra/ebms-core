@@ -19,20 +19,18 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.activation.DataSource;
-
 public class EbMSMessageContent
 {
 	private EbMSMessageContext context;
 	private Map<String,Object> properties = new HashMap<String,Object>();
-	private List<DataSource> attachments;
+	private List<EbMSAttachment> attachments;
 
-	public EbMSMessageContent(EbMSMessageContext context, List<DataSource> attachments)
+	public EbMSMessageContent(EbMSMessageContext context, List<EbMSAttachment> attachments)
 	{
 		this(context,null,attachments);
 	}
 
-	public EbMSMessageContent(EbMSMessageContext context, Map<String,Object> properties, List<DataSource> attachments)
+	public EbMSMessageContent(EbMSMessageContext context, Map<String,Object> properties, List<EbMSAttachment> attachments)
 	{
 		this.context = context;
 		this.properties = properties == null ? new HashMap<String,Object>() : properties;
@@ -49,7 +47,7 @@ public class EbMSMessageContent
 		return properties;
 	}
 
-	public List<DataSource> getAttachments()
+	public List<EbMSAttachment> getAttachments()
 	{
 		return attachments;
 	}

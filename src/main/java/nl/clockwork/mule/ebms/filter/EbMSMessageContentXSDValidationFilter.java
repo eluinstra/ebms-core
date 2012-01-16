@@ -17,12 +17,10 @@ package nl.clockwork.mule.ebms.filter;
 
 import java.util.List;
 
-import javax.activation.DataSource;
-
 import nl.clockwork.mule.common.filter.AbstractXSDValidationFilter;
+import nl.clockwork.mule.ebms.model.EbMSAttachment;
 import nl.clockwork.mule.ebms.model.EbMSMessageContent;
 
-import org.apache.commons.io.IOUtils;
 import org.mule.api.MuleMessage;
 
 public class EbMSMessageContentXSDValidationFilter extends AbstractXSDValidationFilter
@@ -34,8 +32,8 @@ public class EbMSMessageContentXSDValidationFilter extends AbstractXSDValidation
 		if (message.getPayload() instanceof EbMSMessageContent)
 		{
 			EbMSMessageContent content = (EbMSMessageContent)message.getPayload();
-			List<DataSource> attachments = content.getAttachments();
-			return IOUtils.toString(attachments.iterator().next().getInputStream());
+			List<EbMSAttachment> attachments = content.getAttachments();
+			return new String(attachments.iterator().next().getContent());
 		}
 		else
 			throw new IllegalArgumentException();

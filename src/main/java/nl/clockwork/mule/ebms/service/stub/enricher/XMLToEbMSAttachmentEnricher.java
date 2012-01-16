@@ -18,9 +18,8 @@ package nl.clockwork.mule.ebms.service.stub.enricher;
 import java.io.IOException;
 import java.util.Arrays;
 
-import javax.mail.util.ByteArrayDataSource;
-
 import nl.clockwork.common.util.Utils;
+import nl.clockwork.mule.ebms.model.EbMSAttachment;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
@@ -29,11 +28,11 @@ import org.mule.api.MuleMessage;
 import org.mule.api.transformer.TransformerException;
 import org.mule.transformer.AbstractMessageAwareTransformer;
 
-public class XMLToDataSourceEnricher extends AbstractMessageAwareTransformer
+public class XMLToEbMSAttachmentEnricher extends AbstractMessageAwareTransformer
 {
   protected transient Log logger = LogFactory.getLog(getClass());
 
-	public XMLToDataSourceEnricher()
+	public XMLToEbMSAttachmentEnricher()
 	{
 		registerSourceType(String.class);
 		//FIXME
@@ -46,9 +45,8 @@ public class XMLToDataSourceEnricher extends AbstractMessageAwareTransformer
 		try
 		{
 			String fileName = message.getStringProperty("originalFilename","message.xml");
-			final ByteArrayDataSource ds = new ByteArrayDataSource((String)message.getPayload(),StringUtils.defaultIfEmpty(Utils.getMimeType(fileName),"application/octet-stream")); //application/xml
-			ds.setName(fileName);
-			message.setPayload(Arrays.asList(ds));
+			EbMSAttachment attachment = new EbMSAttachment(fileName,StringUtils.defaultIfEmpty(Utils.getMimeType(fileName),"application/octet-stream"),((String)message.getPayload()).getBytes()); //application/xml
+			message.setPayload(Arrays.asList(attachment));
 			return message;
 		}
 		catch (IOException e)

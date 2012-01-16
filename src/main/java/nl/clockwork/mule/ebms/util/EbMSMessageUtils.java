@@ -21,12 +21,15 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.List;
 
+import javax.activation.DataSource;
+import javax.mail.util.ByteArrayDataSource;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.Duration;
 
 import nl.clockwork.common.util.XMLUtils;
 import nl.clockwork.mule.ebms.Constants;
+import nl.clockwork.mule.ebms.model.EbMSAttachment;
 import nl.clockwork.mule.ebms.model.EbMSMessage;
 import nl.clockwork.mule.ebms.model.EbMSMessageContent;
 import nl.clockwork.mule.ebms.model.EbMSMessageContext;
@@ -67,7 +70,16 @@ public class EbMSMessageUtils
 			//reference.setRole("XLinkRole");
 			manifest.getReference().add(reference);
 		}
-		return new EbMSMessage(messageHeader,ackRequested,manifest,content.getAttachments());
+		
+		List<DataSource> attachments = new ArrayList<DataSource>();
+		for (EbMSAttachment attachment : content.getAttachments())
+		{
+			ByteArrayDataSource ds = new ByteArrayDataSource(attachment.getContent(),attachment.getContentType());
+			ds.setName(attachment.getName());
+			attachments.add(ds);
+		}
+
+		return new EbMSMessage(messageHeader,ackRequested,manifest,attachments);
 	}
 
 	public static MessageHeader createMessageHeader(CollaborationProtocolAgreement cpa, EbMSMessageContext context, String hostname) throws DatatypeConfigurationException

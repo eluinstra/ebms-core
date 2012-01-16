@@ -18,27 +18,27 @@ package nl.clockwork.mule.ebms.adapter.service;
 import javax.xml.ws.WebFault;
 
 
-@WebFault(name="AdapterException", targetNamespace="http://www.clockwork.nl/ebms/adapter/1.0")
-public class AdapterException extends RuntimeException
+@WebFault(name="EbMSAdapterException", targetNamespace="http://www.clockwork.nl/ebms/adapter/1.0")
+public class EbMSAdapterException extends RuntimeException
 {
 	private static final long serialVersionUID = 1L;
 
-	public AdapterException()
+	public EbMSAdapterException()
 	{
 		super();
 	}
 
-	public AdapterException(String message, Throwable cause)
+	public EbMSAdapterException(String message, Throwable cause)
 	{
 		super(message,cause);
 	}
 
-	public AdapterException(String message)
+	public EbMSAdapterException(String message)
 	{
 		super(message);
 	}
 
-	public AdapterException(Throwable cause)
+	public EbMSAdapterException(Throwable cause)
 	{
 		super(cause);
 	}

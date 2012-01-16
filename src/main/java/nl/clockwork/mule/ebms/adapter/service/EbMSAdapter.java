@@ -24,7 +24,7 @@ import javax.jws.WebService;
 import nl.clockwork.mule.ebms.model.EbMSMessageContent;
 
 @WebService(targetNamespace="http://www.clockwork.nl/ebms/adapter/1.0")
-public interface Adapter
+public interface EbMSAdapter
 {
 	@WebResult(name="MessageId")
 	String sendMessage(@WebParam(name="MessageContent") EbMSMessageContent messageContent);
@@ -36,12 +36,12 @@ public interface Adapter
 //	EbMSMessageContent getMessage(@WebParam(name="MessageId") String messageId);
 
 	@WebResult(name="Message")
-	EbMSMessageContent getMessage(@WebParam(name="MessageId") String messageId, @WebParam(name="AutoCommit") boolean autoCommit);
+	EbMSMessageContent getMessage(@WebParam(name="MessageId") String messageId, @WebParam(name="Process") boolean process);
 
 	@WebResult(name="Result")
-	boolean commitMessageId(@WebParam(name="MessageId") String messageId);
+	boolean processMessage(@WebParam(name="MessageId") String messageId);
 
 	@WebResult(name="Result")
-	boolean commitMessageIds(@WebParam(name="MessageIds") List<String> messageIds);
+	boolean processMessages(@WebParam(name="MessageIds") List<String> messageIds);
 
 }

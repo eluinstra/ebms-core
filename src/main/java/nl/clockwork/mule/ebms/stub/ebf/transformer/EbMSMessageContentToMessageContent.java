@@ -17,7 +17,6 @@ package nl.clockwork.mule.ebms.stub.ebf.transformer;
 
 import nl.clockwork.mule.ebms.model.EbMSMessageContent;
 
-import org.apache.commons.io.IOUtils;
 import org.mule.api.MuleMessage;
 import org.mule.api.transformer.TransformerException;
 import org.mule.transformer.AbstractMessageAwareTransformer;
@@ -35,7 +34,7 @@ public class EbMSMessageContentToMessageContent extends AbstractMessageAwareTran
 		try
 		{
 			EbMSMessageContent content = (EbMSMessageContent)message.getPayload();
-			return IOUtils.toString(content.getAttachments().get(0).getInputStream());
+			return new String(content.getAttachments().get(0).getContent());
 		}
 		catch (Exception e)
 		{
