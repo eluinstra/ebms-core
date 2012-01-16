@@ -32,7 +32,7 @@ public class OracleEbMSContentTypeFixingInInterceptor extends AbstractPhaseInter
 	public OracleEbMSContentTypeFixingInInterceptor()
 	{
 		super(Phase.RECEIVE);
-		addBefore(MessageInInterceptor.class.getName());
+		addBefore(LoggingInInterceptor.class.getName());
 	}
 
 	public OracleEbMSContentTypeFixingInInterceptor(String phase)

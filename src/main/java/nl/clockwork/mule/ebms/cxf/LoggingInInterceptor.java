@@ -24,29 +24,39 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.interceptor.Fault;
+import org.apache.cxf.interceptor.LoggingMessage;
 import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
 
-public class MessageInInterceptor extends AbstractPhaseInterceptor<Message>
+public class LoggingInInterceptor extends AbstractPhaseInterceptor<Message>
 {
   protected transient Log logger = LogFactory.getLog(getClass());
+  private int limit = 100 * 1024;
+	private boolean zipLog;
 
-	public MessageInInterceptor()
+	public LoggingInInterceptor()
 	{
 		super(Phase.RECEIVE);
 	}
 
-	public MessageInInterceptor(String phase)
+	public LoggingInInterceptor(String phase)
 	{
 		super(phase);
 	}
 
 	public void handleMessage(Message message) throws Fault
 	{
-		final StringBuilder buffer = new StringBuilder();
-		buffer.append(message.get(Message.CONTENT_TYPE)).append("\n");
+		final LoggingMessage buffer = new LoggingMessage("Inbound Message\n----------------------------");
+		buffer.getHeader().append(Message.CONTENT_TYPE).append(":").append(message.get(Message.CONTENT_TYPE));
+		String encoding = (String)message.get(Message.ENCODING);
+		if (encoding != null)
+			buffer.getEncoding().append(encoding);
+		Object headers = message.get(Message.PROTOCOL_HEADERS);
+		if (headers != null)
+			buffer.getHeader().append(headers);
+
 		InputStream is = message.getContent(InputStream.class);
 		if (is != null)
 		{
@@ -57,7 +67,7 @@ public class MessageInInterceptor extends AbstractPhaseInterceptor<Message>
 				bos.flush();
 				is.close();
 				message.setContent(InputStream.class,bos.getInputStream());
-				bos.writeCacheTo(buffer);
+				bos.writeCacheTo(buffer.getPayload(),limit);
 				bos.close();
 			}
 			catch (IOException e)
@@ -67,6 +77,7 @@ public class MessageInInterceptor extends AbstractPhaseInterceptor<Message>
 		}
 		try
 		{
+			if (zipLog)
 			MessageManager.set(Utils.zip(buffer.toString()));
 		}
 		catch (IOException e)
@@ -80,4 +91,8 @@ public class MessageInInterceptor extends AbstractPhaseInterceptor<Message>
 			logger.info(buffer.toString());
 	}
 
+	public void setZipLog(boolean zipLog)
+	{
+		this.zipLog = zipLog;
+	}
 }

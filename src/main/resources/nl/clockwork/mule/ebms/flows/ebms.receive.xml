@@ -45,9 +45,10 @@
 <!--						</message-properties-transformer>-->
 <!--					</response-transformers>-->
 					<cxf:inInterceptors>
-						<spring:bean class="org.apache.cxf.interceptor.LoggingInInterceptor" />
 						<!--spring:bean class="nl.clockwork.mule.ebms.cxf.OracleEbMSContentTypeFixingInInterceptor" /-->
-						<spring:bean class="nl.clockwork.mule.ebms.cxf.MessageInInterceptor" />
+						<spring:bean class="nl.clockwork.mule.ebms.cxf.LoggingInInterceptor">
+							<spring:property name="zipLog" value="true"/>
+						</spring:bean>
 						<spring:bean class="nl.clockwork.mule.ebms.cxf.AttachmentInInterceptor" />
 						<spring:bean class="nl.clockwork.mule.ebms.cxf.EbMSSecSignatureInInterceptor">
 							<spring:property name="ebMSDAO" ref="ebMSDAO" />
@@ -55,9 +56,9 @@
 							<spring:property name="keyStorePassword" value="${truststore.password}" />
 						</spring:bean>  
 					</cxf:inInterceptors>
-<!--					<cxf:outInterceptors>-->
-<!--						<spring:bean class="org.apache.cxf.interceptor.LoggingOutInterceptor" />-->
-<!--					</cxf:outInterceptors>-->
+					<cxf:outInterceptors>
+						<spring:bean class="nl.clockwork.mule.ebms.cxf.LoggingOutInterceptor" />
+					</cxf:outInterceptors>
 				</cxf:inbound-endpoint>
 			</inbound>
 			<component>
@@ -448,7 +449,7 @@
 			</inbound>
 			<outbound>
 				<pass-through-router>
-					<vm:outbound-endpoint path="ebms.pong.create.in" synchronous="false"/>
+					<vm:outbound-endpoint path="ebms.pong.create.in" />
 				</pass-through-router>
 			</outbound>
 			<async-reply failOnTimeout="true" timeout="60000">
@@ -459,7 +460,7 @@
 		
 		<service name="ebms.pong.create">
 			<inbound>
-				<vm:inbound-endpoint path="ebms.pong.create.in" synchronous="false"/>
+				<vm:inbound-endpoint path="ebms.pong.create.in" />
 			</inbound>
 			<outbound>
 				<pass-through-router>

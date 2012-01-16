@@ -10,6 +10,32 @@
 
 package org.mule.transport.cxf;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.Reader;
+
+import javax.xml.stream.XMLStreamReader;
+import javax.xml.transform.Source;
+import javax.xml.transform.dom.DOMSource;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.cxf.Bus;
+import org.apache.cxf.endpoint.Server;
+import org.apache.cxf.io.CachedOutputStream;
+import org.apache.cxf.message.ExchangeImpl;
+import org.apache.cxf.message.Message;
+import org.apache.cxf.message.MessageImpl;
+import org.apache.cxf.service.model.EndpointInfo;
+import org.apache.cxf.staxutils.StaxUtils;
+import org.apache.cxf.transport.MessageObserver;
+import org.apache.cxf.transport.local.LocalConduit;
+import org.apache.cxf.transports.http.QueryHandler;
+import org.apache.cxf.transports.http.QueryHandlerRegistry;
+import org.apache.cxf.wsdl.http.AddressType;
 import org.mule.DefaultMuleMessage;
 import org.mule.RequestContext;
 import org.mule.api.ExceptionPayload;
@@ -34,34 +60,6 @@ import org.mule.transport.http.HttpConnector;
 import org.mule.transport.http.HttpConstants;
 import org.mule.transport.soap.SoapConstants;
 import org.mule.util.StringUtils;
-
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.Reader;
-
-import javax.xml.stream.XMLStreamReader;
-import javax.xml.transform.Source;
-import javax.xml.transform.dom.DOMSource;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.apache.cxf.Bus;
-import org.apache.cxf.endpoint.Server;
-import org.apache.cxf.helpers.LoadingByteArrayOutputStream;
-import org.apache.cxf.io.CachedOutputStream;
-import org.apache.cxf.message.ExchangeImpl;
-import org.apache.cxf.message.Message;
-import org.apache.cxf.message.MessageImpl;
-import org.apache.cxf.service.model.EndpointInfo;
-import org.apache.cxf.staxutils.StaxUtils;
-import org.apache.cxf.transport.MessageObserver;
-import org.apache.cxf.transport.local.LocalConduit;
-import org.apache.cxf.transports.http.QueryHandler;
-import org.apache.cxf.transports.http.QueryHandlerRegistry;
-import org.apache.cxf.wsdl.http.AddressType;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
@@ -286,30 +284,6 @@ public class CxfServiceComponent implements Callable, Lifecycle
                     if (contentMsg.getInterceptorChain() != null)
                     	contentMsg.getInterceptorChain().resume();
                     //PATCH 1 END
-
-                    //PATCH 2 START
-//                    Object o = contentMsg.getContent(OutputStream.class);
-//                    if (o instanceof CachedOutputStream)
-//                    	//o = ((CachedOutputStream)o).getOut();
-//                    {
-//                    	CachedOutputStream cache = ((CachedOutputStream)o);
-//                    	out.write(cache.getBytes());
-//                    	//delegate.setOutputStream(???)
-//                    }
-//                    //if (o instanceof LoadingByteArrayOutputStream)
-//                    //	o = ((LoadingByteArrayOutputStream)o).???
-//                    if (o instanceof DelegatingOutputStream)
-//                    {
-//		                  DelegatingOutputStream delegate = (DelegatingOutputStream)o;
-//		                  out.write(((ByteArrayOutputStream)delegate.getOutputStream()).toByteArray());
-//		                  delegate.setOutputStream(out);
-//                    }
-//                  
-//	                  out.flush();
-//                  
-//	                  if (contentMsg.getInterceptorChain() != null)
-//	                  	contentMsg.getInterceptorChain().resume();
-                  //PATCH 2 END
                 }
                 
             };
