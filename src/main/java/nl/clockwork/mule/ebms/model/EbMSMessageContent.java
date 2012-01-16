@@ -25,6 +25,10 @@ public class EbMSMessageContent
 	private Map<String,Object> properties = new HashMap<String,Object>();
 	private List<EbMSAttachment> attachments;
 
+	public EbMSMessageContent()
+	{
+	}
+	
 	public EbMSMessageContent(EbMSMessageContext context, List<EbMSAttachment> attachments)
 	{
 		this(context,null,attachments);
