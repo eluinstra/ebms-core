@@ -15,16 +15,23 @@
  ******************************************************************************/
 package nl.clockwork.mule.ebms.adapter.service;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import nl.clockwork.common.dao.DAOException;
 import nl.clockwork.mule.ebms.dao.EbMSDAO;
+import nl.clockwork.mule.ebms.model.EbMSBaseMessage;
 import nl.clockwork.mule.ebms.model.EbMSMessage;
 import nl.clockwork.mule.ebms.model.EbMSMessageContent;
 import nl.clockwork.mule.ebms.model.cpp.cpa.CollaborationProtocolAgreement;
 import nl.clockwork.mule.ebms.util.EbMSMessageUtils;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 public class EbMSAdapterImpl implements EbMSAdapter
 {
+  protected transient Log logger = LogFactory.getLog(getClass());
 	private EbMSDAO ebMSDAO;
 	private String hostname;
 
@@ -40,6 +47,8 @@ public class EbMSAdapterImpl implements EbMSAdapter
 		}
 		catch (Exception e)
 		{
+			//throw new EbMSAdapterException(e);
+			logger.error("",e);
 			return null;
 		}
 	}
@@ -47,25 +56,69 @@ public class EbMSAdapterImpl implements EbMSAdapter
 	@Override
 	public List<String> getMessageIds(int maxNr)
 	{
-		return null;
+		try
+		{
+			return ebMSDAO.getMessageIds(maxNr);
+		}
+		catch (DAOException e)
+		{
+			//throw new EbMSAdapterException(e);
+			logger.error("",e);
+			return new ArrayList<String>();
+		}
 	}
 
 	@Override
 	public EbMSMessageContent getMessage(String messageId, boolean process)
 	{
-		return null;
+		try
+		{
+			EbMSBaseMessage message = ebMSDAO.getEbMSMessage(messageId);
+			if (message instanceof EbMSMessage)
+			{
+				ebMSDAO.processMessage(messageId);
+				return EbMSMessageUtils.EbMSMessageToEbMSMessageContent((EbMSMessage)message);
+			}
+			return null;
+		}
+		catch (Exception e)
+		{
+			//throw new EbMSAdapterException(e);
+			logger.error("",e);
+			return null;
+		}
 	}
 
 	@Override
 	public boolean processMessage(String messageId)
 	{
-		return false;
+		try
+		{
+			ebMSDAO.processMessage(messageId);
+			return true;
+		}
+		catch (DAOException e)
+		{
+			//throw new EbMSAdapterException(e);
+			logger.error("",e);
+			return false;
+		}
 	}
 
 	@Override
 	public boolean processMessages(List<String> messageIds)
 	{
-		return false;
+		try
+		{
+			ebMSDAO.processMessages(messageIds);
+			return true;
+		}
+		catch (DAOException e)
+		{
+			//throw new EbMSAdapterException(e);
+			logger.error("",e);
+			return false;
+		}
 	}
 
 	public void setEbMSDAO(EbMSDAO ebMSDAO)

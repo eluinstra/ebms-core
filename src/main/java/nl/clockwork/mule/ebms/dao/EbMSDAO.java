@@ -17,17 +17,13 @@ package nl.clockwork.mule.ebms.dao;
 
 import java.util.List;
 
-import javax.activation.DataSource;
-
 import nl.clockwork.common.dao.DAOException;
 import nl.clockwork.mule.ebms.Constants.EbMSMessageStatus;
 import nl.clockwork.mule.ebms.model.EbMSAcknowledgment;
-import nl.clockwork.mule.ebms.model.EbMSAttachment;
 import nl.clockwork.mule.ebms.model.EbMSBaseMessage;
 import nl.clockwork.mule.ebms.model.EbMSMessage;
 import nl.clockwork.mule.ebms.model.EbMSMessageError;
 import nl.clockwork.mule.ebms.model.cpp.cpa.CollaborationProtocolAgreement;
-import nl.clockwork.mule.ebms.model.ebxml.MessageHeader;
 
 public interface EbMSDAO
 {
@@ -35,14 +31,15 @@ public interface EbMSDAO
 
 	boolean exists(String messageId) throws DAOException;
 	long getIdByMessageId(String messageId) throws DAOException;
-	MessageHeader getMessageHeader(long id) throws DAOException;
-	MessageHeader getMessageHeader(String messageId) throws DAOException;
-	List<DataSource> getAttachments(long messageId) throws DAOException;
-	List<EbMSAttachment> getEbMSAttachments(long messageId) throws DAOException;
-	EbMSBaseMessage getEbMSMessage(long messageId) throws DAOException;
+	EbMSBaseMessage getEbMSMessage(long id) throws DAOException;
 	void insertMessage(EbMSMessage message) throws DAOException;
 	void insertMessage(EbMSMessageError messageError, EbMSMessageStatus status) throws DAOException;
 	void insertMessage(EbMSAcknowledgment acknowledgment, EbMSMessageStatus status) throws DAOException;
 	void insertMessage(EbMSMessage message, EbMSMessageStatus status, EbMSMessageError messageError) throws DAOException;
 	void insertMessage(EbMSMessage message, EbMSMessageStatus status, EbMSAcknowledgment acknowledgment) throws DAOException;
+
+	List<String> getMessageIds(int maxNr) throws DAOException;
+	EbMSBaseMessage getEbMSMessage(String messageId) throws DAOException;
+	void processMessage(String messageId) throws DAOException;
+	void processMessages(List<String> messageIds) throws DAOException;
 }

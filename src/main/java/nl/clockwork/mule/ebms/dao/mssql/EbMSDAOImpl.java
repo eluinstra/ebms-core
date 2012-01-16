@@ -32,7 +32,6 @@ import nl.clockwork.mule.ebms.Constants;
 import nl.clockwork.mule.ebms.Constants.EbMSMessageStatus;
 import nl.clockwork.mule.ebms.dao.EbMSDAO;
 import nl.clockwork.mule.ebms.model.EbMSAcknowledgment;
-import nl.clockwork.mule.ebms.model.EbMSAttachment;
 import nl.clockwork.mule.ebms.model.EbMSBaseMessage;
 import nl.clockwork.mule.ebms.model.EbMSMessage;
 import nl.clockwork.mule.ebms.model.EbMSMessageError;
@@ -64,6 +63,31 @@ import org.springframework.transaction.support.TransactionTemplate;
 
 public class EbMSDAOImpl implements EbMSDAO
 {
+	public class EbMSBaseMessageParameterizedRowMapper implements ParameterizedRowMapper<EbMSBaseMessage>
+	{
+		@Override
+		public EbMSBaseMessage mapRow(ResultSet rs, int rowNum) throws SQLException
+		{
+			try
+			{
+					if (Constants.EBMS_SERVICE.equals(rs.getString("service")) && Constants.EBMS_ERROR.equals(rs.getString("action")))
+						return new EbMSMessageError(XMLMessageBuilder.getInstance(MessageHeader.class).handle(rs.getString("message_header")),XMLMessageBuilder.getInstance(ErrorList.class).handle(rs.getString("content")));
+					else if (Constants.EBMS_SERVICE.equals(rs.getString("service")) && Constants.EBMS_ACKNOWLEDGEMENT.equals(rs.getString("action")))
+						return new EbMSAcknowledgment(XMLMessageBuilder.getInstance(MessageHeader.class).handle(rs.getString("message_header")),XMLMessageBuilder.getInstance(Acknowledgment.class).handle(rs.getString("content")));
+					else
+						return new EbMSMessage(XMLMessageBuilder.getInstance(MessageHeader.class).handle(rs.getString("message_header")),XMLMessageBuilder.getInstance(AckRequested.class).handle(rs.getString("ack_requested")),XMLMessageBuilder.getInstance(Manifest.class).handle(rs.getString("content")),getAttachments(rs.getLong("id")));
+			}
+			catch (JAXBException e)
+			{
+				throw new SQLException(e);
+			}
+			catch (DAOException e)
+			{
+				throw new SQLException(e);
+			}
+		}
+	}
+	
 	public class EbMSMessagePreparedStatement implements PreparedStatementCreator
 	{
 		private Date timestamp;
@@ -264,56 +288,7 @@ public class EbMSDAOImpl implements EbMSDAO
 		}
 	}
 	
-	@Override
-	public MessageHeader getMessageHeader(long id) throws DAOException
-	{
-		try
-		{
-			String result = simpleJdbcTemplate.queryForObject(
-				"select message_header" +
-				" from ebms_message" +
-				" where id = ?",
-				String.class,
-				id
-			);
-			return XMLMessageBuilder.getInstance(MessageHeader.class).handle(result);
-		}
-		catch(EmptyResultDataAccessException e)
-		{
-			return null;
-		}
-		catch (Exception e)
-		{
-			throw new DAOException(e);
-		}
-	}
-
-	@Override
-	public MessageHeader getMessageHeader(String messageId) throws DAOException
-	{
-		try
-		{
-			String result = simpleJdbcTemplate.queryForObject(
-				"select message_header" +
-				" from ebms_message" +
-				" where message_id = ?",
-				String.class,
-				messageId
-			);
-			return XMLMessageBuilder.getInstance(MessageHeader.class).handle(result);
-		}
-		catch(EmptyResultDataAccessException e)
-		{
-			return null;
-		}
-		catch (Exception e)
-		{
-			throw new DAOException(e);
-		}
-	}
-
-	@Override
-	public List<DataSource> getAttachments(long messageId) throws DAOException
+	private List<DataSource> getAttachments(long messageId) throws DAOException
 	{
 		try
 		{
@@ -341,64 +316,15 @@ public class EbMSDAOImpl implements EbMSDAO
 	}
 
 	@Override
-	public List<EbMSAttachment> getEbMSAttachments(long messageId) throws DAOException
-	{
-		try
-		{
-			return simpleJdbcTemplate.query(
-				"select name, content_type, content" + 
-				" from ebms_attachment" + 
-				" where ebms_message_id = ?",
-				new ParameterizedRowMapper<EbMSAttachment>()
-				{
-					@Override
-					public EbMSAttachment mapRow(ResultSet rs, int rowNum) throws SQLException
-					{
-						return new EbMSAttachment(rs.getString("name"),rs.getString("content_type"),rs.getBytes("content"));
-					}
-				},
-				messageId
-			);
-		}
-		catch (Exception e)
-		{
-			throw new DAOException(e);
-		}
-	}
-
-	@Override
 	public EbMSBaseMessage getEbMSMessage(final long id) throws DAOException
 	{
 		try
 		{
 			return simpleJdbcTemplate.queryForObject(
-				"select service, action, message_header, ack_requested, content" + 
+				"select id, service, action, message_header, ack_requested, content" + 
 				" from ebms_message" + 
 				" where id = ?",
-				new ParameterizedRowMapper<EbMSBaseMessage>()
-				{
-					@Override
-					public EbMSBaseMessage mapRow(ResultSet rs, int rowNum) throws SQLException
-					{
-						try
-						{
-								if (Constants.EBMS_SERVICE.equals(rs.getString("service")) && Constants.EBMS_ERROR.equals(rs.getString("action")))
-									return new EbMSMessageError(XMLMessageBuilder.getInstance(MessageHeader.class).handle(rs.getString("message_header")),XMLMessageBuilder.getInstance(ErrorList.class).handle(rs.getString("content")));
-								else if (Constants.EBMS_SERVICE.equals(rs.getString("service")) && Constants.EBMS_ACKNOWLEDGEMENT.equals(rs.getString("action")))
-									return new EbMSAcknowledgment(XMLMessageBuilder.getInstance(MessageHeader.class).handle(rs.getString("message_header")),XMLMessageBuilder.getInstance(Acknowledgment.class).handle(rs.getString("content")));
-								else
-									return new EbMSMessage(XMLMessageBuilder.getInstance(MessageHeader.class).handle(rs.getString("message_header")),XMLMessageBuilder.getInstance(AckRequested.class).handle(rs.getString("ack_requested")),XMLMessageBuilder.getInstance(Manifest.class).handle(rs.getString("content")),getAttachments(id));
-						}
-						catch (JAXBException e)
-						{
-							throw new SQLException(e);
-						}
-						catch (DAOException e)
-						{
-							throw new SQLException(e);
-						}
-					}
-				},
+				new EbMSBaseMessageParameterizedRowMapper(),
 				id
 			);
 		}
@@ -827,6 +753,50 @@ public class EbMSDAOImpl implements EbMSDAO
 		{
 			throw new DAOException(e);
 		}
+	}
+
+	@Override
+	public List<String> getMessageIds(int maxNr) throws DAOException
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public EbMSBaseMessage getEbMSMessage(String messageId) throws DAOException
+	{
+		try
+		{
+			return simpleJdbcTemplate.queryForObject(
+				"select id, service, action, message_header, ack_requested, content" + 
+				" from ebms_message" + 
+				" where message_id = ?",
+				new EbMSBaseMessageParameterizedRowMapper(),
+				messageId
+			);
+		}
+		catch(EmptyResultDataAccessException e)
+		{
+			return null;
+		}
+		catch (Exception e)
+		{
+			throw new DAOException(e);
+		}
+	}
+
+	@Override
+	public void processMessage(String messageId) throws DAOException
+	{
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void processMessages(List<String> messageIds) throws DAOException
+	{
+		// TODO Auto-generated method stub
+		
 	}
 
 }

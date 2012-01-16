@@ -16,17 +16,13 @@
 package nl.clockwork.mule.ebms.transformer;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import nl.clockwork.mule.ebms.Constants;
 import nl.clockwork.mule.ebms.dao.EbMSDAO;
-import nl.clockwork.mule.ebms.model.EbMSAttachment;
-import nl.clockwork.mule.ebms.model.EbMSMessageContent;
-import nl.clockwork.mule.ebms.model.EbMSMessageContext;
-import nl.clockwork.mule.ebms.model.ebxml.MessageHeader;
+import nl.clockwork.mule.ebms.model.EbMSMessage;
+import nl.clockwork.mule.ebms.util.EbMSMessageUtils;
 
-import org.apache.commons.jxpath.JXPathContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.transformer.TransformerException;
 import org.mule.transformer.AbstractMessageAwareTransformer;
@@ -46,16 +42,10 @@ public class EbMSMessageIdToEbMSMessageContent extends AbstractMessageAwareTrans
 	{
 		try
 		{
-			long messageId = message.getLongProperty(Constants.EBMS_MESSAGE_ID,0);
-			MessageHeader messageHeader = ebMSDAO.getMessageHeader(messageId);
-			List<EbMSAttachment> attachments = ebMSDAO.getEbMSAttachments(messageId);
+			long id = message.getLongProperty(Constants.EBMS_MESSAGE_ID,0);
+			EbMSMessage msg = (EbMSMessage)ebMSDAO.getEbMSMessage(id);
+			message.setPayload(EbMSMessageUtils.EbMSMessageToEbMSMessageContent(msg,properties));
 
-			Map<String,Object> properties = new HashMap<String,Object>();
-			JXPathContext context = JXPathContext.newContext(messageHeader);
-			for (String property : this.properties.keySet())
-				properties.put(property,context.getValue(this.properties.get(property)));
-
-			message.setPayload(new EbMSMessageContent(new EbMSMessageContext(messageHeader),properties,attachments));
 			return message;
 		}
 		catch (Exception e)

@@ -15,11 +15,14 @@
  ******************************************************************************/
 package nl.clockwork.mule.ebms.util;
 
+import java.io.IOException;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.activation.DataSource;
 import javax.mail.util.ByteArrayDataSource;
@@ -51,37 +54,12 @@ import nl.clockwork.mule.ebms.model.ebxml.Service;
 import nl.clockwork.mule.ebms.model.ebxml.SeverityType;
 import nl.clockwork.mule.ebms.model.ebxml.To;
 
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.jxpath.JXPathContext;
 import org.mule.util.UUID;
 
 public class EbMSMessageUtils
 {
-	public static EbMSMessage ebMSMessageContentToEbMSMessage(CollaborationProtocolAgreement cpa, EbMSMessageContent content, String hostname) throws DatatypeConfigurationException
-	{
-		MessageHeader messageHeader = EbMSMessageUtils.createMessageHeader(cpa,content.getContext(),hostname);
-
-		AckRequested ackRequested = EbMSMessageUtils.createAckRequested(cpa,content.getContext());
-		
-		Manifest manifest = EbMSMessageUtils.createManifest();
-		for (int i = 0; i < content.getAttachments().size(); i++)
-		{
-			Reference reference = new Reference();
-			reference.setHref("cid:" + (i + 1));
-			reference.setType("simple");
-			//reference.setRole("XLinkRole");
-			manifest.getReference().add(reference);
-		}
-		
-		List<DataSource> attachments = new ArrayList<DataSource>();
-		for (EbMSAttachment attachment : content.getAttachments())
-		{
-			ByteArrayDataSource ds = new ByteArrayDataSource(attachment.getContent(),attachment.getContentType());
-			ds.setName(attachment.getName());
-			attachments.add(ds);
-		}
-
-		return new EbMSMessage(messageHeader,ackRequested,manifest,attachments);
-	}
-
 	public static MessageHeader createMessageHeader(CollaborationProtocolAgreement cpa, EbMSMessageContext context, String hostname) throws DatatypeConfigurationException
 	{
 		String uuid = UUID.getUUID();//UUID.randomUUID().toString();//nameUUIDFromBytes(hostname.getBytes()).toString();
@@ -208,6 +186,52 @@ public class EbMSMessageUtils
 		error.getDescription().setValue(description);
 		error.setSeverity(severity);
 		return error;
+	}
+
+	public static EbMSMessage ebMSMessageContentToEbMSMessage(CollaborationProtocolAgreement cpa, EbMSMessageContent content, String hostname) throws DatatypeConfigurationException
+	{
+		MessageHeader messageHeader = EbMSMessageUtils.createMessageHeader(cpa,content.getContext(),hostname);
+
+		AckRequested ackRequested = EbMSMessageUtils.createAckRequested(cpa,content.getContext());
+		
+		Manifest manifest = EbMSMessageUtils.createManifest();
+		for (int i = 0; i < content.getAttachments().size(); i++)
+		{
+			Reference reference = new Reference();
+			reference.setHref("cid:" + (i + 1));
+			reference.setType("simple");
+			//reference.setRole("XLinkRole");
+			manifest.getReference().add(reference);
+		}
+		
+		List<DataSource> attachments = new ArrayList<DataSource>();
+		for (EbMSAttachment attachment : content.getAttachments())
+		{
+			ByteArrayDataSource ds = new ByteArrayDataSource(attachment.getContent(),attachment.getContentType());
+			ds.setName(attachment.getName());
+			attachments.add(ds);
+		}
+
+		return new EbMSMessage(messageHeader,ackRequested,manifest,attachments);
+	}
+
+	public static EbMSMessageContent EbMSMessageToEbMSMessageContent(EbMSMessage message) throws IOException
+	{
+		return EbMSMessageToEbMSMessageContent(message,new HashMap<String,String>());
+	}
+	
+	public static EbMSMessageContent EbMSMessageToEbMSMessageContent(EbMSMessage message, Map<String,String> properties) throws IOException
+	{
+		Map<String,Object> p = new HashMap<String,Object>();
+		JXPathContext context = JXPathContext.newContext(message.getMessageHeader());
+		for (String property : properties.keySet())
+			p.put(property,context.getValue(properties.get(property)));
+
+		List<EbMSAttachment> attachments = new ArrayList<EbMSAttachment>();
+		for (DataSource attachment : message.getAttachments())
+			attachments.add(new EbMSAttachment(attachment.getName(),attachment.getContentType(),IOUtils.toByteArray(attachment.getInputStream())));
+
+		return new EbMSMessageContent(new EbMSMessageContext(message.getMessageHeader()),p,attachments);
 	}
 
 }
