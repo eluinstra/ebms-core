@@ -41,7 +41,11 @@
 
 		<service name="ebMSAdapter">
 			<inbound>
-				<cxf:inbound-endpoint connector-ref="ebms.adapter.connector.cxf" protocolConnector="ebms.adapter.connector.http" address="http://${service.host}:${service.adapter.port}${service.adapter.url}" /> 
+				<cxf:inbound-endpoint connector-ref="ebms.adapter.connector.cxf" protocolConnector="ebms.adapter.connector.http" address="http://${service.host}:${service.adapter.port}${service.adapter.url}" enableMuleSoapHeaders="false" synchronous="true">
+<!--					<cxf:outInterceptors>-->
+<!--						<spring:bean class="org.apache.cxf.interceptor.LoggingOutInterceptor" />-->
+<!--					</cxf:outInterceptors>-->
+				</cxf:inbound-endpoint> 
 			</inbound>
 			<component>
 				<singleton-object class="nl.clockwork.mule.ebms.adapter.service.EbMSAdapterImpl">

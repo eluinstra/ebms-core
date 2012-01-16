@@ -17,6 +17,7 @@ CREATE TABLE ebms_message
 	ref_to_message_id			VARCHAR(256)		NULL,
 	from_role							VARCHAR(256)		NULL,
 	to_role								VARCHAR(256)		NULL,
+	service_type					VARCHAR(256)		NULL,
 	service								VARCHAR(256)		NOT NULL,
 	action								VARCHAR(256)		NOT NULL,
 	original							BLOB						NULL,
@@ -44,5 +45,6 @@ CREATE TABLE ebms_send_event
 	ebms_message_id				BIGINT					NOT NULL FOREIGN KEY REFERENCES ebms_message(id),
 	time									TIMESTAMP				DEFAULT NOW() NOT NULL,
 	status								INT							DEFAULT 0 NOT NULL,
-	status_time						TIMESTAMP				DEFAULT NOW() NOT NULL
+	status_time						TIMESTAMP				DEFAULT NOW() NOT NULL,
+	http_status_code			INT							NULL
 );

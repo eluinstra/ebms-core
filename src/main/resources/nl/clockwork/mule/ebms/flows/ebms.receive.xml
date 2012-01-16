@@ -38,6 +38,12 @@
 		<service name="ebms.soap.receive">
 			<inbound>
 				<cxf:inbound-endpoint connector-ref="connector.cxf.ebms.in" protocolConnector="connector.http.ebms.in" address="${service.protocol}://${service.host}:${service.port}${service.url}" serviceName="EbMSPortType" namespace="http://www.clockwork.nl/ebms/1.0" enableMuleSoapHeaders="false" mtomEnabled="true" synchronous="true">
+<!--					<response-transformers>-->
+<!--						<message-properties-transformer>-->
+<!--							<add-message-property key="Content-Type" value="multipart/related"/>-->
+<!--							<add-message-property key="http.status" value-ref="HTTP_SC_OK"/>-->
+<!--						</message-properties-transformer>-->
+<!--					</response-transformers>-->
 					<cxf:inInterceptors>
 						<spring:bean class="org.apache.cxf.interceptor.LoggingInInterceptor" />
 						<!--spring:bean class="nl.clockwork.mule.ebms.cxf.OracleEbMSContentTypeFixingInInterceptor" /-->
@@ -49,9 +55,9 @@
 							<spring:property name="keyStorePassword" value="${truststore.password}" />
 						</spring:bean>  
 					</cxf:inInterceptors>
-					<cxf:outInterceptors>
-						<spring:bean class="org.apache.cxf.interceptor.LoggingOutInterceptor" />
-					</cxf:outInterceptors>
+<!--					<cxf:outInterceptors>-->
+<!--						<spring:bean class="org.apache.cxf.interceptor.LoggingOutInterceptor" />-->
+<!--					</cxf:outInterceptors>-->
 				</cxf:inbound-endpoint>
 			</inbound>
 			<component>
@@ -417,6 +423,51 @@
 							<add-message-property key="http.status" value-ref="HTTP_SC_NO_CONTENT"/>
 						</message-properties-transformer>
 						<custom-transformer class="nl.clockwork.mule.common.transformer.NullPayloadTransformer" />
+					</vm:outbound-endpoint>
+				</pass-through-router>
+			</outbound>
+		</service>
+
+	</model>
+
+	<model>
+
+		<default-service-exception-strategy>
+			<vm:outbound-endpoint path="ebms.ping.receive.async.reply">
+				<message-properties-transformer>
+					<add-message-property key="http.status" value-ref="HTTP_SC_INTERNAL_SERVER_ERROR"/>
+				</message-properties-transformer>
+				<custom-transformer class="nl.clockwork.mule.common.transformer.NullPayloadTransformer" />
+			</vm:outbound-endpoint>
+		</default-service-exception-strategy>
+
+		<!-- TODO validate message -->
+		<service name="ebms.ping.receive">
+			<inbound>
+				<vm:inbound-endpoint path="ebms.ping.receive.in"/>
+			</inbound>
+			<outbound>
+				<pass-through-router>
+					<vm:outbound-endpoint path="ebms.pong.create.in" synchronous="false"/>
+				</pass-through-router>
+			</outbound>
+			<async-reply failOnTimeout="true" timeout="60000">
+				<vm:inbound-endpoint path="ebms.ping.receive.async.reply" />
+				<single-async-reply-router/>
+			</async-reply>
+		</service>
+		
+		<service name="ebms.pong.create">
+			<inbound>
+				<vm:inbound-endpoint path="ebms.pong.create.in" synchronous="false"/>
+			</inbound>
+			<outbound>
+				<pass-through-router>
+					<vm:outbound-endpoint path="ebms.ping.receive.async.reply">
+						<message-properties-transformer>
+							<add-message-property key="Content-Type" value="multipart/related"/>
+							<add-message-property key="http.status" value-ref="HTTP_SC_OK"/>
+						</message-properties-transformer>
 					</vm:outbound-endpoint>
 				</pass-through-router>
 			</outbound>
