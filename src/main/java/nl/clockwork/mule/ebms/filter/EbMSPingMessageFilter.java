@@ -13,22 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  ******************************************************************************/
-package nl.clockwork.mule.ebms.model;
+package nl.clockwork.mule.ebms.filter;
 
-import nl.clockwork.mule.ebms.model.ebxml.MessageHeader;
+import nl.clockwork.mule.ebms.Constants;
+import nl.clockwork.mule.ebms.model.EbMSPingMessage;
 
-public class EbMSPong implements EbMSBaseMessage
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.mule.api.MuleMessage;
+import org.mule.api.routing.filter.Filter;
+
+public class EbMSPingMessageFilter implements Filter
 {
-	private MessageHeader messageHeader;
-
-	public EbMSPong(MessageHeader messageHeader)
-	{
-		this.messageHeader = messageHeader;
-	}
+  protected transient Log logger = LogFactory.getLog(getClass());
 
 	@Override
-	public MessageHeader getMessageHeader()
+	public boolean accept(MuleMessage message)
 	{
-		return messageHeader;
+		if (message.getPayload() instanceof EbMSPingMessage)
+		{
+			EbMSPingMessage msg = (EbMSPingMessage)message.getPayload();
+			return Constants.EBMS_PING_MESSAGE.equals(msg.getMessageHeader().getAction());
+		}
+		return true;
 	}
 }

@@ -114,7 +114,7 @@ public class EbMSMessageUtils
 		
 		return messageHeader;
 	}
-	
+
 	public static MessageHeader createMessageHeader(MessageHeader messageHeader, String hostname, GregorianCalendar timestamp, String action) throws DatatypeConfigurationException
 	{
 		messageHeader = (MessageHeader)XMLUtils.xmlToObject(XMLUtils.objectToXML(messageHeader)); //FIXME: replace by more efficient copy
@@ -187,14 +187,19 @@ public class EbMSMessageUtils
 		error.setSeverity(severity);
 		return error;
 	}
+	
+	public static MessageHeader ebMSPingMessageToEbMSPongMessage(MessageHeader ping, String hostname) throws DatatypeConfigurationException
+	{
+		return createMessageHeader(ping,hostname,new GregorianCalendar(),Constants.EBMS_PONG_MESSAGE);
+	}
 
 	public static EbMSMessage ebMSMessageContentToEbMSMessage(CollaborationProtocolAgreement cpa, EbMSMessageContent content, String hostname) throws DatatypeConfigurationException
 	{
-		MessageHeader messageHeader = EbMSMessageUtils.createMessageHeader(cpa,content.getContext(),hostname);
+		MessageHeader messageHeader = createMessageHeader(cpa,content.getContext(),hostname);
 
-		AckRequested ackRequested = EbMSMessageUtils.createAckRequested(cpa,content.getContext());
+		AckRequested ackRequested = createAckRequested(cpa,content.getContext());
 		
-		Manifest manifest = EbMSMessageUtils.createManifest();
+		Manifest manifest = createManifest();
 		for (int i = 0; i < content.getAttachments().size(); i++)
 		{
 			Reference reference = new Reference();

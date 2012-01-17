@@ -17,11 +17,11 @@ package nl.clockwork.mule.ebms.model;
 
 import nl.clockwork.mule.ebms.model.ebxml.MessageHeader;
 
-public class EbMSPing implements EbMSBaseMessage
+public class EbMSPongMessage implements EbMSBaseMessage
 {
 	private MessageHeader messageHeader;
 
-	public EbMSPing(MessageHeader messageHeader)
+	public EbMSPongMessage(MessageHeader messageHeader)
 	{
 		this.messageHeader = messageHeader;
 	}

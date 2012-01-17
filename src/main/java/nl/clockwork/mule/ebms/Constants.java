@@ -100,6 +100,8 @@ public class Constants
 	public static final String EBMS_SERVICE = "urn:oasis:names:tc:ebxml-msg:service";
 	public static final String EBMS_MESSAGE_ERROR = "MessageError";
 	public static final String EBMS_ACKNOWLEDGEMENT = "Acknowledgment";
+	public static final String EBMS_PING_MESSAGE = "Ping";
+	public static final String EBMS_PONG_MESSAGE = "Pong";
 
 	public static final String EBMS_ERROR = "EBMS.EBMS_ERROR";
 	public static final String EBMS_SIGNATURE = "EBMS.SIGNATURE";

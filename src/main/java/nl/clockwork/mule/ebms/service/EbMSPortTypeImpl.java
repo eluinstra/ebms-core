@@ -31,6 +31,8 @@ import nl.clockwork.mule.ebms.model.EbMSMessage;
 import nl.clockwork.mule.ebms.model.EbMSMessageError;
 import nl.clockwork.mule.ebms.model.EbMSMessageStatusRequest;
 import nl.clockwork.mule.ebms.model.EbMSMessageStatusResponse;
+import nl.clockwork.mule.ebms.model.EbMSPingMessage;
+import nl.clockwork.mule.ebms.model.EbMSPongMessage;
 import nl.clockwork.mule.ebms.model.ebxml.AckRequested;
 import nl.clockwork.mule.ebms.model.ebxml.Acknowledgment;
 import nl.clockwork.mule.ebms.model.ebxml.ErrorList;
@@ -48,7 +50,6 @@ import org.apache.cxf.message.Attachment;
 public class EbMSPortTypeImpl implements EbMSPortType
 {
   protected transient Log logger = LogFactory.getLog(getClass());
-  //private EbMSProcessor processor;
   private EbMSMessageProcessor messageProcessor;
   private EbMSMessageErrorProcessor messageErrorProcessor;
   private EbMSAcknowledgmentProcessor acknowledgmentProcessor;
@@ -91,8 +92,9 @@ public class EbMSPortTypeImpl implements EbMSPortType
 	@Override
 	public MessageHeader ping(MessageHeader requestMessageHeader)
 	{
-		return pingProcessor.process(requestMessageHeader);
-		//throw new EbMSException("an error occurred!");
+		//FIXME check for NullPayload and return null??, response has to be the same as without fix (so empty)
+		EbMSPongMessage result = pingProcessor.process(new EbMSPingMessage(requestMessageHeader));
+		return result.getMessageHeader();
 	}
 
 	public void setMessageProcessor(EbMSMessageProcessor messageProcessor)
