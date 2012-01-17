@@ -47,7 +47,7 @@
 					<cxf:inInterceptors>
 						<!--spring:bean class="nl.clockwork.mule.ebms.cxf.OracleEbMSContentTypeFixingInInterceptor" /-->
 						<spring:bean class="nl.clockwork.mule.ebms.cxf.LoggingInInterceptor">
-							<spring:property name="zipLog" value="true"/>
+							<spring:property name="logMessage" value="true"/>
 						</spring:bean>
 						<spring:bean class="nl.clockwork.mule.ebms.cxf.AttachmentInInterceptor" />
 						<spring:bean class="nl.clockwork.mule.ebms.cxf.EbMSSecSignatureInInterceptor">
@@ -105,7 +105,6 @@
 				<custom-transformer class="nl.clockwork.mule.common.transformer.NullPayloadTransformer" />
 			</vm:outbound-endpoint>
 		</default-service-exception-strategy>
-
 		
 		<service name="ebms.message.receive">
 			<inbound>

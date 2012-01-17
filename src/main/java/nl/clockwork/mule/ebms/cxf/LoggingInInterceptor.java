@@ -34,7 +34,7 @@ public class LoggingInInterceptor extends AbstractPhaseInterceptor<Message>
 {
   protected transient Log logger = LogFactory.getLog(getClass());
   private int limit = 100 * 1024;
-	private boolean zipLog;
+	private boolean logMessage;
 
 	public LoggingInInterceptor()
 	{
@@ -77,7 +77,7 @@ public class LoggingInInterceptor extends AbstractPhaseInterceptor<Message>
 		}
 		try
 		{
-			if (zipLog)
+			if (logMessage)
 			MessageManager.set(Utils.zip(buffer.toString()));
 		}
 		catch (IOException e)
@@ -91,8 +91,8 @@ public class LoggingInInterceptor extends AbstractPhaseInterceptor<Message>
 			logger.info(buffer.toString());
 	}
 
-	public void setZipLog(boolean zipLog)
+	public void setLogMessage(boolean logMessage)
 	{
-		this.zipLog = zipLog;
+		this.logMessage = logMessage;
 	}
 }
