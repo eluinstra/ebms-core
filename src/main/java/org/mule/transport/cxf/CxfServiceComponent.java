@@ -21,6 +21,8 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.transform.Source;
 import javax.xml.transform.dom.DOMSource;
 
+import nl.clockwork.mule.ebms.cxf.CXFHeaderManager;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.cxf.Bus;
@@ -297,7 +299,18 @@ public class CxfServiceComponent implements Callable, Lifecycle
             
             // invoke the actual web service up until right before we serialize the response
             d.getMessageObserver().onMessage(m);
-            
+
+            //PATCH 2 START
+            if (m.getExchange().getOutMessage() != null)
+            {
+	            String s = (String)m.getExchange().getOutMessage().get("Content-Type");
+	            CXFHeaderManager.setContentType(s);
+	            //???muleReqMsg.setProperty("Content-Type",s,PropertyScope.OUTBOUND);
+            }
+            else
+	            CXFHeaderManager.setStatusCode(204);
+            //PATH 2 END
+           
             // Handle a fault if there is one.
             Message faultMsg = m.getExchange().getOutFaultMessage();
             if (faultMsg != null)
