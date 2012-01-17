@@ -29,10 +29,10 @@ import nl.clockwork.mule.ebms.model.EbMSAcknowledgment;
 import nl.clockwork.mule.ebms.model.EbMSDataSource;
 import nl.clockwork.mule.ebms.model.EbMSMessage;
 import nl.clockwork.mule.ebms.model.EbMSMessageError;
-import nl.clockwork.mule.ebms.model.EbMSMessageStatusRequest;
-import nl.clockwork.mule.ebms.model.EbMSMessageStatusResponse;
-import nl.clockwork.mule.ebms.model.EbMSPingMessage;
-import nl.clockwork.mule.ebms.model.EbMSPongMessage;
+import nl.clockwork.mule.ebms.model.EbMSStatusRequest;
+import nl.clockwork.mule.ebms.model.EbMSStatusResponse;
+import nl.clockwork.mule.ebms.model.EbMSPing;
+import nl.clockwork.mule.ebms.model.EbMSPong;
 import nl.clockwork.mule.ebms.model.ebxml.AckRequested;
 import nl.clockwork.mule.ebms.model.ebxml.Acknowledgment;
 import nl.clockwork.mule.ebms.model.ebxml.ErrorList;
@@ -84,16 +84,16 @@ public class EbMSPortTypeImpl implements EbMSPortType
 	@Override
 	public void messageStatus(MessageHeader requestMessageHeader, StatusRequest statusRequest, Holder<MessageHeader> responseMessageHeader, Holder<StatusResponse> statusResponse)
 	{
-		EbMSMessageStatusResponse response = messageStatusProcessor.process(new EbMSMessageStatusRequest(requestMessageHeader,statusRequest));
+		EbMSStatusResponse response = messageStatusProcessor.process(new EbMSStatusRequest(requestMessageHeader,statusRequest));
 		responseMessageHeader.value = response.getMessageHeader();
 		statusResponse.value = response.getStatusResponse();
 	}
 
 	@Override
-	public MessageHeader ping(MessageHeader requestMessageHeader)
+	public MessageHeader ping(MessageHeader messageHeader)
 	{
 		//FIXME check for NullPayload and return null??, response has to be the same as without fix (so empty)
-		EbMSPongMessage result = pingProcessor.process(new EbMSPingMessage(requestMessageHeader));
+		EbMSPong result = pingProcessor.process(new EbMSPing(messageHeader));
 		return result.getMessageHeader();
 	}
 

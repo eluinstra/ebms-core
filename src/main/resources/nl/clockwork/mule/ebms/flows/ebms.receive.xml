@@ -79,7 +79,7 @@
 					<vm:outbound-endpoint path="ebms.acknowledgment.receive.in" synchronous="true"/>
 				</binding>
 				<binding interface="nl.clockwork.mule.ebms.service.EbMSMessageStatusProcessor" method="process">
-					<vm:outbound-endpoint path="ebms.messageStatus.receive.in" synchronous="true"/>
+					<vm:outbound-endpoint path="ebms.statusRequest.receive.in" synchronous="true"/>
 				</binding>
 				<binding interface="nl.clockwork.mule.ebms.service.EbMSPingProcessor" method="process">
 					<vm:outbound-endpoint path="ebms.ping.receive.in" synchronous="true"/>
@@ -169,7 +169,7 @@
 				<filtering-router>
 					<vm:outbound-endpoint path="ebms.messageError.create.in">
 						<message-properties-transformer>
-							<add-message-property key="EBMS.EBMS_MESSAGE_STATUS" value="UnAuthorized"/>
+							<add-message-property key="EBMS.EBMS_MESSAGE_STATUS" value="UN_AUTHORIZED"/>
 						</message-properties-transformer>
 					</vm:outbound-endpoint>
 					<not-filter>
@@ -181,7 +181,7 @@
 				<filtering-router>
 					<vm:outbound-endpoint path="ebms.messageError.create.in">
 						<message-properties-transformer>
-							<add-message-property key="EBMS.EBMS_MESSAGE_STATUS" value="UnAuthorized"/>
+							<add-message-property key="EBMS.EBMS_MESSAGE_STATUS" value="UN_AUTHORIZED"/>
 						</message-properties-transformer>
 					</vm:outbound-endpoint>
 					<not-filter>
@@ -193,7 +193,7 @@
 				<filtering-router>
 					<vm:outbound-endpoint path="ebms.messageError.create.in">
 						<message-properties-transformer>
-							<add-message-property key="EBMS.EBMS_MESSAGE_STATUS" value="NotRecognized"/>
+							<add-message-property key="EBMS.EBMS_MESSAGE_STATUS" value="NOT_RECOGNIZED"/>
 						</message-properties-transformer>
 					</vm:outbound-endpoint>
 					<not-filter>
@@ -205,7 +205,7 @@
 				<filtering-router>
 					<vm:outbound-endpoint path="ebms.messageError.create.in">
 						<message-properties-transformer>
-							<add-message-property key="EBMS.EBMS_MESSAGE_STATUS" value="UnAuthorized"/>
+							<add-message-property key="EBMS.EBMS_MESSAGE_STATUS" value="UN_AUTHORIZED"/>
 						</message-properties-transformer>
 					</vm:outbound-endpoint>
 					<not-filter>
@@ -215,7 +215,7 @@
 				<forwarding-catch-all-strategy>
 					<vm:outbound-endpoint path="ebms.acknowledgment.create.in">
 						<message-properties-transformer>
-							<add-message-property key="EBMS.EBMS_MESSAGE_STATUS" value="Received"/>
+							<add-message-property key="EBMS.EBMS_MESSAGE_STATUS" value="RECEIVED"/>
 						</message-properties-transformer>
 					</vm:outbound-endpoint>
 				</forwarding-catch-all-strategy>
@@ -403,12 +403,82 @@
 	<model>
 
 		<default-service-exception-strategy>
+			<vm:outbound-endpoint path="ebms.statusRequest.receive.async.reply">
+				<custom-transformer class="nl.clockwork.mule.common.transformer.NullPayloadTransformer" />
+			</vm:outbound-endpoint>
+		</default-service-exception-strategy>
+
+		<service name="ebms.statusRequest.receive">
+			<inbound>
+				<vm:inbound-endpoint path="ebms.statusRequest.receive.in"/>
+			</inbound>
+			<outbound>
+				<pass-through-router>
+					<vm:outbound-endpoint path="ebms.statusRequest.validate.in" />
+				</pass-through-router>
+			</outbound>
+			<async-reply failOnTimeout="true" timeout="60000">
+				<vm:inbound-endpoint path="ebms.statusRequest.receive.async.reply" />
+				<single-async-reply-router/>
+			</async-reply>
+		</service>
+		
+		<service name="ebms.messageStatus.validate">
+			<inbound>
+				<vm:inbound-endpoint path="ebms.statusRequest.validate.in" />
+			</inbound>
+			<outbound>
+				<filtering-router>
+					<vm:outbound-endpoint path="ebms.statusRequest.receive.async.reply">
+						<custom-transformer class="nl.clockwork.mule.common.transformer.NullPayloadTransformer" />
+					</vm:outbound-endpoint>
+					<not-filter>
+						<custom-filter class="nl.clockwork.mule.ebms.filter.CPAValidationFilter">
+							<spring:property name="ebMSDAO" ref="ebMSDAO" />
+						</custom-filter>
+					</not-filter>
+				</filtering-router>
+				<filtering-router>
+					<vm:outbound-endpoint path="ebms.statusRequest.receive.async.reply">
+						<custom-transformer class="nl.clockwork.mule.common.transformer.NullPayloadTransformer" />
+					</vm:outbound-endpoint>
+					<not-filter>
+						<custom-filter class="nl.clockwork.mule.ebms.filter.EbMSMessageActionFilter">
+							<spring:property name="action" value="StatusRequest"/>
+						</custom-filter>
+					</not-filter>
+				</filtering-router>
+				<forwarding-catch-all-strategy>
+					<vm:outbound-endpoint path="ebms.statusResponse.create.in" />
+				</forwarding-catch-all-strategy>
+			</outbound>
+		</service>
+		
+		<service name="ebms.statusResponse.create">
+			<inbound>
+				<vm:inbound-endpoint path="ebms.statusResponse.create.in">
+					<custom-transformer class="nl.clockwork.mule.ebms.transformer.EbMSStatusRequestToEbMSStatusResponse">
+						<spring:property name="hostname" value="${service.host}" />
+					</custom-transformer>
+				</vm:inbound-endpoint>
+			</inbound>
+			<outbound>
+				<pass-through-router>
+					<vm:outbound-endpoint path="ebms.statusRequest.receive.async.reply"/>
+				</pass-through-router>
+			</outbound>
+		</service>
+
+	</model>
+
+	<model>
+
+		<default-service-exception-strategy>
 			<vm:outbound-endpoint path="ebms.ping.receive.async.reply">
 				<custom-transformer class="nl.clockwork.mule.common.transformer.NullPayloadTransformer" />
 			</vm:outbound-endpoint>
 		</default-service-exception-strategy>
 
-		<!-- TODO validate message -->
 		<service name="ebms.ping.receive">
 			<inbound>
 				<vm:inbound-endpoint path="ebms.ping.receive.in"/>
@@ -444,7 +514,9 @@
 						<custom-transformer class="nl.clockwork.mule.common.transformer.NullPayloadTransformer" />
 					</vm:outbound-endpoint>
 					<not-filter>
-						<custom-filter class="nl.clockwork.mule.ebms.filter.EbMSPingMessageFilter"/>
+						<custom-filter class="nl.clockwork.mule.ebms.filter.EbMSMessageActionFilter">
+							<spring:property name="action" value="Ping"/>
+						</custom-filter>
 					</not-filter>
 				</filtering-router>
 				<forwarding-catch-all-strategy>
@@ -456,7 +528,7 @@
 		<service name="ebms.pong.create">
 			<inbound>
 				<vm:inbound-endpoint path="ebms.pong.create.in">
-					<custom-transformer class="nl.clockwork.mule.ebms.transformer.EbMSPingMessageToEbMSPongMessage">
+					<custom-transformer class="nl.clockwork.mule.ebms.transformer.EbMSPingToEbMSPong">
 						<spring:property name="hostname" value="${service.host}" />
 					</custom-transformer>
 				</vm:inbound-endpoint>

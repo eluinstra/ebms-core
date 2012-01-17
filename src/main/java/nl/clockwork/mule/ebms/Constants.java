@@ -15,28 +15,30 @@
  ******************************************************************************/
 package nl.clockwork.mule.ebms;
 
+import nl.clockwork.mule.ebms.model.ebxml.MessageStatusType;
+
 public class Constants
 {
   public static enum EbMSMessageStatus
   {
-		UNAUTHORIZED(0,"UnAuthorized"), NOT_RECOGNIZED(1,"NotRecognized"), RECEIVED(2,"Received"), PROCESSED(3,"Processed"), FORWARDED(4,"Forwarded")/*, STORED(10), SENT(11), FAILED(12), ACKNOWLEDGED(13), EXPIRED(14)*/;
+		UN_AUTHORIZED(0,MessageStatusType.UN_AUTHORIZED), NOT_RECOGNIZED(1,MessageStatusType.NOT_RECOGNIZED), RECEIVED(2,MessageStatusType.RECEIVED), PROCESSED(3,MessageStatusType.PROCESSED), FORWARDED(4,MessageStatusType.FORWARDED)/*, STORED(10), SENT(11), FAILED(12), ACKNOWLEDGED(13), EXPIRED(14)*/;
 
 		private final int id;
-		private final String statusCode;
+		private final MessageStatusType statusCode;
 
 		EbMSMessageStatus(int id) { this.id = id; this.statusCode = null; }
-		EbMSMessageStatus(int id, String statusCode) { this.id = id; this.statusCode = statusCode; }
+		EbMSMessageStatus(int id, MessageStatusType statusCode) { this.id = id; this.statusCode = statusCode; }
 
 		public final int id() { return id; }
 
-		public final String statusCode() { return statusCode; }
+		public final MessageStatusType statusCode() { return statusCode; }
 
 		public final static EbMSMessageStatus get(int id)
 		{
 			switch (id)
 			{
 				case 0:
-					return EbMSMessageStatus.UNAUTHORIZED;
+					return EbMSMessageStatus.UN_AUTHORIZED;
 				case 1:
 					return EbMSMessageStatus.NOT_RECOGNIZED;
 				case 2:
@@ -52,15 +54,15 @@ public class Constants
 
 		public final static EbMSMessageStatus get(String id)
 		{
-			if (EbMSMessageStatus.UNAUTHORIZED.statusCode.equals(id))
-				return EbMSMessageStatus.UNAUTHORIZED;
-			if (EbMSMessageStatus.NOT_RECOGNIZED.statusCode.equals(id))
+			if (EbMSMessageStatus.UN_AUTHORIZED.name().equals(id))
+				return EbMSMessageStatus.UN_AUTHORIZED;
+			if (EbMSMessageStatus.NOT_RECOGNIZED.name().equals(id))
 				return EbMSMessageStatus.NOT_RECOGNIZED;
-			if (EbMSMessageStatus.RECEIVED.statusCode.equals(id))
+			if (EbMSMessageStatus.RECEIVED.name().equals(id))
 				return EbMSMessageStatus.RECEIVED;
-			if (EbMSMessageStatus.PROCESSED.statusCode.equals(id))
+			if (EbMSMessageStatus.PROCESSED.name().equals(id))
 				return EbMSMessageStatus.PROCESSED;
-			if (EbMSMessageStatus.FORWARDED.statusCode.equals(id))
+			if (EbMSMessageStatus.FORWARDED.name().equals(id))
 				return EbMSMessageStatus.FORWARDED;
 			return null;
 		}
@@ -100,8 +102,10 @@ public class Constants
 	public static final String EBMS_SERVICE = "urn:oasis:names:tc:ebxml-msg:service";
 	public static final String EBMS_MESSAGE_ERROR = "MessageError";
 	public static final String EBMS_ACKNOWLEDGEMENT = "Acknowledgment";
-	public static final String EBMS_PING_MESSAGE = "Ping";
-	public static final String EBMS_PONG_MESSAGE = "Pong";
+	public static final String EBMS_STATUS_REQUEST = "StatusRequest";
+	public static final String EBMS_STATUS_RESPONSE = "StatusResponse";
+	public static final String EBMS_PING = "Ping";
+	public static final String EBMS_PONG = "Pong";
 
 	public static final String EBMS_ERROR = "EBMS.EBMS_ERROR";
 	public static final String EBMS_SIGNATURE = "EBMS.SIGNATURE";

@@ -16,27 +16,19 @@
 package nl.clockwork.mule.ebms.model;
 
 import nl.clockwork.mule.ebms.model.ebxml.MessageHeader;
-import nl.clockwork.mule.ebms.model.ebxml.StatusRequest;
 
-public class EbMSMessageStatusRequest implements EbMSBaseMessage
+public class EbMSPong implements EbMSBaseMessage
 {
 	private MessageHeader messageHeader;
-	private StatusRequest statusRequest;
 
-	public EbMSMessageStatusRequest(MessageHeader messageHeader, StatusRequest statusRequest)
+	public EbMSPong(MessageHeader messageHeader)
 	{
 		this.messageHeader = messageHeader;
-		this.statusRequest = statusRequest;
 	}
 
 	@Override
 	public MessageHeader getMessageHeader()
 	{
 		return messageHeader;
-	}
-
-	public StatusRequest getStatusRequest()
-	{
-		return statusRequest;
 	}
 }

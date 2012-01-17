@@ -15,12 +15,12 @@
  ******************************************************************************/
 package nl.clockwork.mule.ebms.service;
 
-import nl.clockwork.mule.ebms.model.EbMSPingMessage;
-import nl.clockwork.mule.ebms.model.EbMSPongMessage;
+import nl.clockwork.mule.ebms.model.EbMSPing;
+import nl.clockwork.mule.ebms.model.EbMSPong;
 
 
 public interface EbMSPingProcessor
 {
-	EbMSPongMessage process(EbMSPingMessage message);
+	EbMSPong process(EbMSPing message);
 
 }

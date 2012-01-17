@@ -15,12 +15,12 @@
  ******************************************************************************/
 package nl.clockwork.mule.ebms.service;
 
-import nl.clockwork.mule.ebms.model.EbMSMessageStatusRequest;
-import nl.clockwork.mule.ebms.model.EbMSMessageStatusResponse;
+import nl.clockwork.mule.ebms.model.EbMSStatusRequest;
+import nl.clockwork.mule.ebms.model.EbMSStatusResponse;
 
 
 public interface EbMSMessageStatusProcessor
 {
-	EbMSMessageStatusResponse process(EbMSMessageStatusRequest request);
+	EbMSStatusResponse process(EbMSStatusRequest request);
 
 }

@@ -32,10 +32,15 @@ import javax.xml.datatype.Duration;
 
 import nl.clockwork.common.util.XMLUtils;
 import nl.clockwork.mule.ebms.Constants;
+import nl.clockwork.mule.ebms.Constants.EbMSMessageStatus;
 import nl.clockwork.mule.ebms.model.EbMSAttachment;
 import nl.clockwork.mule.ebms.model.EbMSMessage;
 import nl.clockwork.mule.ebms.model.EbMSMessageContent;
 import nl.clockwork.mule.ebms.model.EbMSMessageContext;
+import nl.clockwork.mule.ebms.model.EbMSPing;
+import nl.clockwork.mule.ebms.model.EbMSPong;
+import nl.clockwork.mule.ebms.model.EbMSStatusRequest;
+import nl.clockwork.mule.ebms.model.EbMSStatusResponse;
 import nl.clockwork.mule.ebms.model.cpp.cpa.CollaborationProtocolAgreement;
 import nl.clockwork.mule.ebms.model.cpp.cpa.DeliveryChannel;
 import nl.clockwork.mule.ebms.model.cpp.cpa.PartyInfo;
@@ -48,10 +53,13 @@ import nl.clockwork.mule.ebms.model.ebxml.From;
 import nl.clockwork.mule.ebms.model.ebxml.Manifest;
 import nl.clockwork.mule.ebms.model.ebxml.MessageData;
 import nl.clockwork.mule.ebms.model.ebxml.MessageHeader;
+import nl.clockwork.mule.ebms.model.ebxml.MessageStatusType;
 import nl.clockwork.mule.ebms.model.ebxml.PartyId;
 import nl.clockwork.mule.ebms.model.ebxml.Reference;
 import nl.clockwork.mule.ebms.model.ebxml.Service;
 import nl.clockwork.mule.ebms.model.ebxml.SeverityType;
+import nl.clockwork.mule.ebms.model.ebxml.StatusRequest;
+import nl.clockwork.mule.ebms.model.ebxml.StatusResponse;
 import nl.clockwork.mule.ebms.model.ebxml.To;
 
 import org.apache.commons.io.IOUtils;
@@ -188,9 +196,29 @@ public class EbMSMessageUtils
 		return error;
 	}
 	
-	public static MessageHeader ebMSPingMessageToEbMSPongMessage(MessageHeader ping, String hostname) throws DatatypeConfigurationException
+	private static StatusResponse createStatusResponse(StatusRequest statusRequest, EbMSMessageStatus status, GregorianCalendar timestamp) throws DatatypeConfigurationException
 	{
-		return createMessageHeader(ping,hostname,new GregorianCalendar(),Constants.EBMS_PONG_MESSAGE);
+		StatusResponse response = new StatusResponse();
+		response.setVersion(Constants.EBMS_VERSION);
+		response.setRefToMessageId(statusRequest.getRefToMessageId());
+		response.setMessageStatus(status.statusCode());
+		if (MessageStatusType.RECEIVED.equals(status.statusCode()) || MessageStatusType.PROCESSED.equals(status.statusCode()))
+			response.setTimestamp(DatatypeFactory.newInstance().newXMLGregorianCalendar(timestamp));
+		return response;
+	}
+
+	public static EbMSPong ebMSPingToEbMSPong(EbMSPing ping, String hostname) throws DatatypeConfigurationException
+	{
+		EbMSPong pong = new EbMSPong(createMessageHeader(ping.getMessageHeader(),hostname,new GregorianCalendar(),Constants.EBMS_PONG));
+		return pong;
+	}
+
+	public static EbMSStatusResponse ebMSStatusRequestToEbMSStatusResponse(EbMSStatusRequest request, String hostname, EbMSMessageStatus status, GregorianCalendar timestamp) throws DatatypeConfigurationException
+	{
+		MessageHeader messageHeader = createMessageHeader(request.getMessageHeader(),hostname,new GregorianCalendar(),Constants.EBMS_STATUS_RESPONSE);
+		StatusResponse statusResponse = createStatusResponse(request.getStatusRequest(),status,timestamp);
+		EbMSStatusResponse response = new EbMSStatusResponse(messageHeader,statusResponse);
+		return response;
 	}
 
 	public static EbMSMessage ebMSMessageContentToEbMSMessage(CollaborationProtocolAgreement cpa, EbMSMessageContent content, String hostname) throws DatatypeConfigurationException
@@ -201,13 +229,7 @@ public class EbMSMessageUtils
 		
 		Manifest manifest = createManifest();
 		for (int i = 0; i < content.getAttachments().size(); i++)
-		{
-			Reference reference = new Reference();
-			reference.setHref("cid:" + (i + 1));
-			reference.setType("simple");
-			//reference.setRole("XLinkRole");
-			manifest.getReference().add(reference);
-		}
+			manifest.getReference().add(createReference(i + 1));
 		
 		List<DataSource> attachments = new ArrayList<DataSource>();
 		for (EbMSAttachment attachment : content.getAttachments())
@@ -218,6 +240,15 @@ public class EbMSMessageUtils
 		}
 
 		return new EbMSMessage(messageHeader,ackRequested,manifest,attachments);
+	}
+
+	private static Reference createReference(int cid)
+	{
+		Reference reference = new Reference();
+		reference.setHref("cid:" + cid);
+		reference.setType("simple");
+		//reference.setRole("XLinkRole");
+		return reference;
 	}
 
 	public static EbMSMessageContent EbMSMessageToEbMSMessageContent(EbMSMessage message) throws IOException

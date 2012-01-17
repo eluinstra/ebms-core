@@ -15,10 +15,13 @@
  ******************************************************************************/
 package nl.clockwork.mule.ebms.transformer;
 
+import java.util.GregorianCalendar;
+
 import javax.xml.datatype.DatatypeConfigurationException;
 
-import nl.clockwork.mule.ebms.model.EbMSPingMessage;
-import nl.clockwork.mule.ebms.model.EbMSPongMessage;
+import nl.clockwork.mule.ebms.Constants.EbMSMessageStatus;
+import nl.clockwork.mule.ebms.model.EbMSStatusRequest;
+import nl.clockwork.mule.ebms.model.EbMSStatusResponse;
 import nl.clockwork.mule.ebms.util.EbMSMessageUtils;
 
 import org.apache.commons.logging.Log;
@@ -27,14 +30,14 @@ import org.mule.api.MuleMessage;
 import org.mule.api.transformer.TransformerException;
 import org.mule.transformer.AbstractMessageAwareTransformer;
 
-public class EbMSPingMessageToEbMSPongMessage extends AbstractMessageAwareTransformer
+public class EbMSStatusRequestToEbMSStatusResponse extends AbstractMessageAwareTransformer
 {
   protected transient Log logger = LogFactory.getLog(getClass());
 	private String hostname;
 
-  public EbMSPingMessageToEbMSPongMessage()
+  public EbMSStatusRequestToEbMSStatusResponse()
 	{
-		registerSourceType(EbMSPingMessage.class);
+		registerSourceType(EbMSStatusRequest.class);
 	}
   
 	@Override
@@ -42,9 +45,9 @@ public class EbMSPingMessageToEbMSPongMessage extends AbstractMessageAwareTransf
 	{
 		try
 		{
-			EbMSPingMessage msg = (EbMSPingMessage)message.getPayload();
-			EbMSPongMessage result = new EbMSPongMessage(EbMSMessageUtils.ebMSPingMessageToEbMSPongMessage(msg.getMessageHeader(),hostname));
-			message.setPayload(result);
+			EbMSStatusRequest request = (EbMSStatusRequest)message.getPayload();
+			EbMSStatusResponse response = EbMSMessageUtils.ebMSStatusRequestToEbMSStatusResponse(request,hostname,EbMSMessageStatus.PROCESSED,new GregorianCalendar());
+			message.setPayload(response);
 			return message;
 		}
 		catch (DatatypeConfigurationException e)

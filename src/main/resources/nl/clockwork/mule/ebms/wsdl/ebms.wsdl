@@ -49,11 +49,11 @@
 		<wsdl:part element="eb:MessageHeader" name="MessageHeader" />
 		<wsdl:part element="eb:Acknowledgment" name="Acknowledgment" />
 	</wsdl:message>
-	<wsdl:message name="MessageStatusRequest">
+	<wsdl:message name="StatusRequest">
 		<wsdl:part element="eb:MessageHeader" name="RequestMessageHeader" />
 		<wsdl:part element="eb:StatusRequest" name="StatusRequest" />
 	</wsdl:message>
-	<wsdl:message name="MessageStatusResponse">
+	<wsdl:message name="StatusResponse">
 		<wsdl:part element="eb:MessageHeader" name="ResponseMessageHeader" />
 		<wsdl:part element="eb:StatusResponse" name="StatusResponse" />
 	</wsdl:message>
@@ -74,8 +74,8 @@
 			<wsdl:input message="tns:Acknowledgment" />
 		</wsdl:operation>
 		<wsdl:operation name="MessageStatus">
-			<wsdl:input message="tns:MessageStatusRequest" />
-			<wsdl:output message="tns:MessageStatusResponse" />
+			<wsdl:input message="tns:StatusRequest" />
+			<wsdl:output message="tns:StatusResponse" />
 		</wsdl:operation>
 		<wsdl:operation name="Ping">
 			<wsdl:input message="tns:Ping" />
@@ -115,12 +115,12 @@
 		<wsdl:operation name="MessageStatus">
 			<soap:operation soapAction="ebXML" />
 			<wsdl:input>
- 				<soap:header message="tns:MessageStatusRequest" part="RequestMessageHeader" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />          
-		 		<soap:body parts="MessageStatusRequest" part="StatusRequest" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />          
+ 				<soap:header message="tns:StatusRequest" part="RequestMessageHeader" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />          
+		 		<soap:body parts="StatusRequest" part="StatusRequest" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />          
 			</wsdl:input>
 			<wsdl:output>
- 				<soap:header message="tns:MessageStatusResponse" part="ResponseMessageHeader" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />          
-		 		<soap:body parts="MessageStatusResponse" part="StatusResponse" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />          
+ 				<soap:header message="tns:StatusResponse" part="ResponseMessageHeader" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />          
+		 		<soap:body parts="StatusResponse" part="StatusResponse" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />          
 			</wsdl:output>
 		</wsdl:operation>
 		<wsdl:operation name="Ping">
