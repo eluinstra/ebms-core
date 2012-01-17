@@ -19,6 +19,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -49,6 +50,7 @@ import nl.clockwork.mule.ebms.model.xml.xmldsig.SignatureType;
 import nl.clockwork.mule.ebms.util.CPAUtils;
 
 import org.apache.commons.io.IOUtils;
+import org.springframework.dao.DataAccessException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
@@ -170,7 +172,7 @@ public class EbMSDAOImpl implements EbMSDAO
 					"content," +
 					"status," +
 					"status_time" +
-				") values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?," + (status == null ? "null" : NOW) + ")",
+				") values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?," + (status == null ? "null" : "NOW()") + ")",
 				//new String[]{"id"}
 				new int[]{1}
 			);
@@ -205,7 +207,6 @@ public class EbMSDAOImpl implements EbMSDAO
 	}
 
 	private static final String DATE_FORMAT = "%1$tY-%1$tm-%1$td %1$tH:%1$tM:%1$tS.%1$tL";
-	private static final String NOW = "NOW()";
 	protected TransactionTemplate transactionTemplate;
 	protected JdbcTemplate jdbcTemplate;
 	protected SimpleJdbcTemplate simpleJdbcTemplate;
@@ -429,7 +430,7 @@ public class EbMSDAOImpl implements EbMSDAO
 	}
 
 	@Override
-	public void insertMessage(final EbMSMessageError messageError, final EbMSMessageStatus status) throws DAOException
+	public void insertMessage(final EbMSMessage message, final EbMSMessageStatus status) throws DAOException
 	{
 		try
 		{
@@ -447,92 +448,45 @@ public class EbMSDAOImpl implements EbMSDAO
 							jdbcTemplate.update(
 									new EbMSMessagePreparedStatement(
 											timestamp,
-											messageError.getMessageHeader().getCPAId(),
-											messageError.getMessageHeader().getConversationId(),
-											messageError.getMessageHeader().getMessageData().getMessageId(),
-											messageError.getMessageHeader().getMessageData().getRefToMessageId(),
-											messageError.getMessageHeader().getFrom().getRole(),
-											messageError.getMessageHeader().getTo().getRole(),
-											messageError.getMessageHeader().getService().getValue(),
-											messageError.getMessageHeader().getAction(),
-											XMLMessageBuilder.getInstance(MessageHeader.class).handle(messageError.getMessageHeader()),
-											XMLMessageBuilder.getInstance(ErrorList.class).handle(messageError.getErrorList()),
+											message.getMessageHeader().getCPAId(),
+											message.getMessageHeader().getConversationId(),
+											message.getMessageOrder() == null ? null : message.getMessageOrder().getSequenceNumber().getValue().longValue(),
+											message.getMessageHeader().getMessageData().getMessageId(),
+											message.getMessageHeader().getMessageData().getRefToMessageId(),
+											message.getMessageHeader().getFrom().getRole(),
+											message.getMessageHeader().getTo().getRole(),
+											message.getMessageHeader().getService().getValue(),
+											message.getMessageHeader().getAction(),
+											message.getOriginal(),
+											XMLMessageBuilder.getInstance(SignatureType.class).handle(new ObjectFactory().createSignature(message.getSignature())),
+											XMLMessageBuilder.getInstance(MessageHeader.class).handle(message.getMessageHeader()),
+											XMLMessageBuilder.getInstance(SyncReply.class).handle(message.getSyncReply()),
+											XMLMessageBuilder.getInstance(MessageOrder.class).handle(message.getMessageOrder()),
+											XMLMessageBuilder.getInstance(AckRequested.class).handle(message.getAckRequested()),
+											XMLMessageBuilder.getInstance(Manifest.class).handle(message.getManifest()),
 											status
 									),
 									keyHolder
 							);
-
-							long id = getIdByMessageId(messageError.getMessageHeader().getMessageData().getRefToMessageId());
-							simpleJdbcTemplate.update
-							(
-								"update ebms_send_event" +
-								" set status=1, status_time=NOW()" +
-								" where ebms_message_id=? and status=0",
-								id
-							);
-
-							return null;
-						}
-						catch (Exception e)
-						{
-							transactionStatus.setRollbackOnly(); 
-							throw new RuntimeException(e);
-						}
-					}
-	
-				}
-			);
-		}
-		catch (Exception e)
-		{
-			throw new DAOException(e);
-		}
-	}
-
-	@Override
-	public void insertMessage(final EbMSAcknowledgment acknowledgment, final EbMSMessageStatus status) throws DAOException
-	{
-		try
-		{
-			transactionTemplate.execute(
-				new TransactionCallback()
-				{
-	
-					@Override
-					public Object doInTransaction(TransactionStatus transactionStatus)
-					{
-						try
-						{
-							Date timestamp = new Date();
-							KeyHolder keyHolder = new GeneratedKeyHolder();
-							jdbcTemplate.update(
-									new EbMSMessagePreparedStatement(
-											timestamp,
-											acknowledgment.getMessageHeader().getCPAId(),
-											acknowledgment.getMessageHeader().getConversationId(),
-											acknowledgment.getMessageHeader().getMessageData().getMessageId(),
-											acknowledgment.getMessageHeader().getMessageData().getRefToMessageId(),
-											acknowledgment.getMessageHeader().getFrom().getRole(),
-											acknowledgment.getMessageHeader().getTo().getRole(),
-											acknowledgment.getMessageHeader().getService().getValue(),
-											acknowledgment.getMessageHeader().getAction(),
-											XMLMessageBuilder.getInstance(MessageHeader.class).handle(acknowledgment.getMessageHeader()),
-											XMLMessageBuilder.getInstance(Acknowledgment.class).handle(acknowledgment.getAcknowledgment()),
-											status
-									),
-									keyHolder
-							);
-
-							long id = getIdByMessageId(acknowledgment.getMessageHeader().getMessageData().getRefToMessageId());
-							simpleJdbcTemplate.update
-							(
-								"update ebms_send_event" +
-								" set status=1, status_time=NOW()" +
-								" where ebms_message_id=? and status=0",
-								id
-							);
-
-							return null;
+					
+							for (DataSource attachment : message.getAttachments())
+							{
+								simpleJdbcTemplate.update
+								(
+									"insert into ebms_attachment (" +
+									"ebms_message_id," +
+									"name," +
+									"content_type," +
+									"content" +
+									") values (?,?,?,?)",
+									keyHolder.getKey().intValue(),
+									attachment.getName() == null ? Constants.DEFAULT_FILENAME : attachment.getName(),
+									attachment.getContentType().split(";")[0].trim(),
+									IOUtils.toByteArray(attachment.getInputStream())
+								);
+							}
+							
+							return keyHolder.getKey().longValue();
 						}
 						catch (Exception e)
 						{
@@ -755,10 +709,144 @@ public class EbMSDAOImpl implements EbMSDAO
 	}
 
 	@Override
+	public void insertMessage(final EbMSMessageError messageError, final EbMSMessageStatus status) throws DAOException
+	{
+		try
+		{
+			transactionTemplate.execute(
+				new TransactionCallback()
+				{
+	
+					@Override
+					public Object doInTransaction(TransactionStatus transactionStatus)
+					{
+						try
+						{
+							Date timestamp = new Date();
+							KeyHolder keyHolder = new GeneratedKeyHolder();
+							jdbcTemplate.update(
+									new EbMSMessagePreparedStatement(
+											timestamp,
+											messageError.getMessageHeader().getCPAId(),
+											messageError.getMessageHeader().getConversationId(),
+											messageError.getMessageHeader().getMessageData().getMessageId(),
+											messageError.getMessageHeader().getMessageData().getRefToMessageId(),
+											messageError.getMessageHeader().getFrom().getRole(),
+											messageError.getMessageHeader().getTo().getRole(),
+											messageError.getMessageHeader().getService().getValue(),
+											messageError.getMessageHeader().getAction(),
+											XMLMessageBuilder.getInstance(MessageHeader.class).handle(messageError.getMessageHeader()),
+											XMLMessageBuilder.getInstance(ErrorList.class).handle(messageError.getErrorList()),
+											status
+									),
+									keyHolder
+							);
+
+							long id = getIdByMessageId(messageError.getMessageHeader().getMessageData().getRefToMessageId());
+							simpleJdbcTemplate.update
+							(
+								"update ebms_send_event" +
+								" set status=1, status_time=NOW()" +
+								" where ebms_message_id=? and status=0",
+								id
+							);
+
+							return null;
+						}
+						catch (Exception e)
+						{
+							transactionStatus.setRollbackOnly(); 
+							throw new RuntimeException(e);
+						}
+					}
+	
+				}
+			);
+		}
+		catch (Exception e)
+		{
+			throw new DAOException(e);
+		}
+	}
+
+	@Override
+	public void insertMessage(final EbMSAcknowledgment acknowledgment, final EbMSMessageStatus status) throws DAOException
+	{
+		try
+		{
+			transactionTemplate.execute(
+				new TransactionCallback()
+				{
+	
+					@Override
+					public Object doInTransaction(TransactionStatus transactionStatus)
+					{
+						try
+						{
+							Date timestamp = new Date();
+							KeyHolder keyHolder = new GeneratedKeyHolder();
+							jdbcTemplate.update(
+									new EbMSMessagePreparedStatement(
+											timestamp,
+											acknowledgment.getMessageHeader().getCPAId(),
+											acknowledgment.getMessageHeader().getConversationId(),
+											acknowledgment.getMessageHeader().getMessageData().getMessageId(),
+											acknowledgment.getMessageHeader().getMessageData().getRefToMessageId(),
+											acknowledgment.getMessageHeader().getFrom().getRole(),
+											acknowledgment.getMessageHeader().getTo().getRole(),
+											acknowledgment.getMessageHeader().getService().getValue(),
+											acknowledgment.getMessageHeader().getAction(),
+											XMLMessageBuilder.getInstance(MessageHeader.class).handle(acknowledgment.getMessageHeader()),
+											XMLMessageBuilder.getInstance(Acknowledgment.class).handle(acknowledgment.getAcknowledgment()),
+											status
+									),
+									keyHolder
+							);
+
+							long id = getIdByMessageId(acknowledgment.getMessageHeader().getMessageData().getRefToMessageId());
+							simpleJdbcTemplate.update
+							(
+								"update ebms_send_event" +
+								" set status=1, status_time=NOW()" +
+								" where ebms_message_id=? and status=0",
+								id
+							);
+
+							return null;
+						}
+						catch (Exception e)
+						{
+							transactionStatus.setRollbackOnly(); 
+							throw new RuntimeException(e);
+						}
+					}
+	
+				}
+			);
+		}
+		catch (Exception e)
+		{
+			throw new DAOException(e);
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
 	public List<String> getMessageIds(int maxNr) throws DAOException
 	{
-		// TODO Auto-generated method stub
-		return null;
+		try
+		{
+			return jdbcTemplate.queryForList(
+					"select message_id" +
+					" from ebms_message" +
+					" where status = 2",
+					String.class
+			);
+		}
+		catch (Exception e)
+		{
+			throw new DAOException(e);
+		}
 	}
 
 	@Override
@@ -787,15 +875,41 @@ public class EbMSDAOImpl implements EbMSDAO
 	@Override
 	public void processMessage(String messageId) throws DAOException
 	{
-		// TODO Auto-generated method stub
-		
+		try
+		{
+			simpleJdbcTemplate.update
+			(
+				"update ebms_message" +
+				" set status = 3, status_time = NOW()" +
+				" where message_id=?",
+				messageId
+			);
+		}
+		catch (DataAccessException e)
+		{
+			throw new DAOException(e);
+		}
 	}
 
 	@Override
-	public void processMessages(List<String> messageIds) throws DAOException
+	public void processMessages(final List<String> messageIds) throws DAOException
 	{
-		// TODO Auto-generated method stub
-		
+		try
+		{
+			List<Object[]> ids = new ArrayList<Object[]>();
+			for (String messageId : messageIds)
+				ids.add(new Object[]{messageId});
+			simpleJdbcTemplate.batchUpdate(
+					"update ebms_message" +
+					" set status = 3, status_time = NOW()" +
+					" where message_id=?",
+					ids
+			);
+		}
+		catch (Exception e)
+		{
+			throw new DAOException(e);
+		}
 	}
 
 }

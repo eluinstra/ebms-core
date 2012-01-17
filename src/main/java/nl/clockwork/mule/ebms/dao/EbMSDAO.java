@@ -33,10 +33,11 @@ public interface EbMSDAO
 	long getIdByMessageId(String messageId) throws DAOException;
 	EbMSBaseMessage getEbMSMessage(long id) throws DAOException;
 	void insertMessage(EbMSMessage message) throws DAOException;
-	void insertMessage(EbMSMessageError messageError, EbMSMessageStatus status) throws DAOException;
-	void insertMessage(EbMSAcknowledgment acknowledgment, EbMSMessageStatus status) throws DAOException;
+	void insertMessage(EbMSMessage message, EbMSMessageStatus status) throws DAOException;
 	void insertMessage(EbMSMessage message, EbMSMessageStatus status, EbMSMessageError messageError) throws DAOException;
 	void insertMessage(EbMSMessage message, EbMSMessageStatus status, EbMSAcknowledgment acknowledgment) throws DAOException;
+	void insertMessage(EbMSMessageError messageError, EbMSMessageStatus status) throws DAOException;
+	void insertMessage(EbMSAcknowledgment acknowledgment, EbMSMessageStatus status) throws DAOException;
 
 	List<String> getMessageIds(int maxNr) throws DAOException;
 	EbMSBaseMessage getEbMSMessage(String messageId) throws DAOException;
