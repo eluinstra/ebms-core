@@ -65,9 +65,8 @@ public class AfleverBerichtGenerator extends Callable
 			String result = XMLMessageBuilder.getInstance(AfleverBericht.class).handle(afleverBericht);
 			message.setProperty("originalFilename",p.getProperty("berichtInhoud"));
 			message.setPayload(result);
-			return message;
 		}
-		throw new Exception("Invalid Payload Type: Type InputStream required");
+		return message;
 	}
 
 	private void setBerichtInhoud(String baseDir, AfleverBericht afleverBericht, String fileName) throws IOException

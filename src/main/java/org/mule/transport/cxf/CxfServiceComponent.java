@@ -305,7 +305,7 @@ public class CxfServiceComponent implements Callable, Lifecycle
 	            muleResMsg.setProperty(HttpConstants.HEADER_CONTENT_TYPE,s);
             }
             else
-            	muleResMsg.setProperty(HttpConnector.HTTP_STATUS_PROPERTY,204);
+            	muleResMsg.setProperty(HttpConnector.HTTP_STATUS_PROPERTY,HttpConstants.SC_NO_CONTENT);
             //PATH 2 END
            
             // Handle a fault if there is one.

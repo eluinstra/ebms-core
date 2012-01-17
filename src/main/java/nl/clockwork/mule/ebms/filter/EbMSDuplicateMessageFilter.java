@@ -44,8 +44,7 @@ public class EbMSDuplicateMessageFilter implements Filter
 				throw new RuntimeException(e);
 			}
 		}
-		else
-			throw new RuntimeException("Payload does not contain a " + EbMSMessage.class.getCanonicalName());
+		return true;
 	}
 
   public void setEbMSDAO(EbMSDAO ebMSDAO)
