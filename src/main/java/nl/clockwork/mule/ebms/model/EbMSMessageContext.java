@@ -22,6 +22,7 @@ public class EbMSMessageContext
 	private String cpaId;
 	private String fromRole;
 	private String toRole;
+	private String serviceType;
 	private String service;
 	private String action;
 	private String conversationId;
@@ -30,7 +31,7 @@ public class EbMSMessageContext
 
 	public EbMSMessageContext(MessageHeader messageHeader)
 	{
-		this(messageHeader.getCPAId(),messageHeader.getFrom().getRole(),messageHeader.getTo().getRole(),messageHeader.getService().getValue(),messageHeader.getAction(),messageHeader.getConversationId(),messageHeader.getMessageData().getMessageId(),messageHeader.getMessageData().getRefToMessageId());		
+		this(messageHeader.getCPAId(),messageHeader.getFrom().getRole(),messageHeader.getTo().getRole(),messageHeader.getService().getType(),messageHeader.getService().getValue(),messageHeader.getAction(),messageHeader.getConversationId(),messageHeader.getMessageData().getMessageId(),messageHeader.getMessageData().getRefToMessageId());		
 	}
 	
 	public EbMSMessageContext(String cpaId, String service, String action)
@@ -45,14 +46,15 @@ public class EbMSMessageContext
 
 	public EbMSMessageContext(String cpaId, String from, String to, String service, String action, String conversationId)
 	{
-		this(cpaId,from,to,service,action,conversationId,null,null);
+		this(cpaId,from,to,null,service,action,conversationId,null,null);
 	}
 	
-	public EbMSMessageContext(String cpaId, String fromRole, String toRole, String service, String action, String conversationId, String messageId, String refToMessageId)
+	public EbMSMessageContext(String cpaId, String fromRole, String toRole, String serviceType, String service, String action, String conversationId, String messageId, String refToMessageId)
 	{
 		this.cpaId = cpaId;
 		this.fromRole = fromRole;
 		this.toRole = toRole;
+		this.serviceType = serviceType;
 		this.service = service;
 		this.action = action;
 		this.conversationId = conversationId;
@@ -73,6 +75,11 @@ public class EbMSMessageContext
 	public String getToRole()
 	{
 		return toRole;
+	}
+	
+	public String getServiceType()
+	{
+		return serviceType;
 	}
 	
 	public String getService()
