@@ -38,12 +38,6 @@
 		<service name="ebms.soap.receive">
 			<inbound>
 				<cxf:inbound-endpoint connector-ref="connector.cxf.ebms.in" protocolConnector="connector.http.ebms.in" address="${service.protocol}://${service.host}:${service.port}${service.url}" serviceName="EbMSPortType" namespace="http://www.clockwork.nl/ebms/1.0" enableMuleSoapHeaders="false" mtomEnabled="true" synchronous="true">
-<!--					<response-transformers>-->
-<!--						<message-properties-transformer>-->
-<!--							<add-message-property key="Content-Type" value="multipart/related"/>-->
-<!--							<add-message-property key="http.status" value-ref="HTTP_SC_OK"/>-->
-<!--						</message-properties-transformer>-->
-<!--					</response-transformers>-->
 					<cxf:inInterceptors>
 						<!--spring:bean class="nl.clockwork.mule.ebms.cxf.OracleEbMSContentTypeFixingInInterceptor" /-->
 						<spring:bean class="nl.clockwork.mule.ebms.cxf.LoggingInInterceptor">
@@ -465,7 +459,6 @@
 				<pass-through-router>
 					<vm:outbound-endpoint path="ebms.ping.receive.async.reply">
 						<message-properties-transformer>
-							<add-message-property key="Content-Type" value="multipart/related"/>
 							<add-message-property key="http.status" value-ref="HTTP_SC_OK"/>
 						</message-properties-transformer>
 					</vm:outbound-endpoint>

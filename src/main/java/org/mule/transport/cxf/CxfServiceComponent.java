@@ -301,11 +301,11 @@ public class CxfServiceComponent implements Callable, Lifecycle
             //PATCH 2 START
             if (m.getExchange().getOutMessage() != null)
             {
-	            String s = (String)m.getExchange().getOutMessage().get("Content-Type");
-	            muleResMsg.setProperty("Content-Type",s);
+	            String s = (String)m.getExchange().getOutMessage().get(HttpConstants.HEADER_CONTENT_TYPE);
+	            muleResMsg.setProperty(HttpConstants.HEADER_CONTENT_TYPE,s);
             }
             else
-            	muleResMsg.setProperty("http.status",204);
+            	muleResMsg.setProperty(HttpConnector.HTTP_STATUS_PROPERTY,204);
             //PATH 2 END
            
             // Handle a fault if there is one.
