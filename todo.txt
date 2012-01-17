@@ -1,16 +1,18 @@
 2.x.x:
-- implement Ping Service
-- implement MessageStatus Service
+/ implement Ping Service
+/ implement MessageStatus Service
 - implement MessageOrder
 - implement syncReplyMode?
 - implement ackRequested (mode=never)
 - implement duplicateElimination (mode=never)
 - implement Signature (mode=off)
-- implement MySQL support
-- implement Oracle support?
-- implement PostgreSQL support?
-- implement SOAP client interface
+- add MySQL support
+- add Oracle support?
+- add PostgreSQL support?
+/ implement SOAP client interface
 - implement JMS client interface?
+- 
+- optimize DAO's
 
 3.x.x:
 - update adapter to Mule 3
