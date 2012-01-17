@@ -28,10 +28,11 @@ public class EbMSMessageContext
 	private String conversationId;
 	private String messageId;
 	private String refToMessageId;
+	private Integer sequenceNr;
 
 	public EbMSMessageContext(MessageHeader messageHeader)
 	{
-		this(messageHeader.getCPAId(),messageHeader.getFrom().getRole(),messageHeader.getTo().getRole(),messageHeader.getService().getType(),messageHeader.getService().getValue(),messageHeader.getAction(),messageHeader.getConversationId(),messageHeader.getMessageData().getMessageId(),messageHeader.getMessageData().getRefToMessageId());		
+		this(messageHeader.getCPAId(),messageHeader.getFrom().getRole(),messageHeader.getTo().getRole(),messageHeader.getService().getType(),messageHeader.getService().getValue(),messageHeader.getAction(),messageHeader.getConversationId(),messageHeader.getMessageData().getMessageId(),messageHeader.getMessageData().getRefToMessageId(),null);		
 	}
 	
 	public EbMSMessageContext(String cpaId, String service, String action)
@@ -46,10 +47,10 @@ public class EbMSMessageContext
 
 	public EbMSMessageContext(String cpaId, String from, String to, String service, String action, String conversationId)
 	{
-		this(cpaId,from,to,null,service,action,conversationId,null,null);
+		this(cpaId,from,to,null,service,action,conversationId,null,null,null);
 	}
 	
-	public EbMSMessageContext(String cpaId, String fromRole, String toRole, String serviceType, String service, String action, String conversationId, String messageId, String refToMessageId)
+	public EbMSMessageContext(String cpaId, String fromRole, String toRole, String serviceType, String service, String action, String conversationId, String messageId, String refToMessageId, Integer sequenceNr)
 	{
 		this.cpaId = cpaId;
 		this.fromRole = fromRole;
@@ -60,6 +61,7 @@ public class EbMSMessageContext
 		this.conversationId = conversationId;
 		this.messageId = messageId;
 		this.refToMessageId = refToMessageId;
+		this.sequenceNr = sequenceNr;
 	}
 
 	public String getCpaId()
@@ -105,5 +107,10 @@ public class EbMSMessageContext
 	public String getRefToMessageId()
 	{
 		return refToMessageId;
+	}
+	
+	public Integer getSequenceNr()
+	{
+		return sequenceNr;
 	}
 }
