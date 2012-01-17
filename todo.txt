@@ -1,11 +1,20 @@
-1.x.x:
-- store routing in db and make routing configurable/loadable through xml definition file
-- change wsdl definition and 'parse' message in Mule. This makes extending the current implemented services easier and also gets rid of the cxf patch
-- change ebms message storage. Store one message per record
-- add MySQL and Oracle database support
-
 2.x.x:
+- implement Ping Service
+- implement MessageStatus Service
+- implement MessageOrder
+- implement syncReplyMode?
+- implement ackRequested (mode=never)
+- implement duplicateElimination (mode=never)
+- implement Signature (mode=off)
+- implement MySQL support
+- implement Oracle support?
+- implement PostgreSQL support?
+- implement SOAP client interface
+- implement JMS client interface?
+
+3.x.x:
 - update adapter to Mule 3
 
 long term:
-- change ebms-adapter into an ebms-component
+- change wsdl definition to one operation (containing all ebxml elements) and 'parse' message in Mule?
+- replace cxf interface?
