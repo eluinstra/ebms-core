@@ -899,7 +899,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 			return simpleJdbcTemplate.queryForObject(
 				"select id, service, action, message_header, ack_requested, content" + 
 				" from ebms_message" + 
-				" where message_id=? and status=" + EbMSMessageStatus.RECEIVED.id(),
+				" where message_id=?",// and status=" + EbMSMessageStatus.RECEIVED.id(),
 				new EbMSBaseMessageParameterizedRowMapper(),
 				messageId
 			);
