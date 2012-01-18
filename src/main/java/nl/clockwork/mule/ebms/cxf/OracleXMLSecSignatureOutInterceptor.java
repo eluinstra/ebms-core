@@ -27,7 +27,7 @@ import org.apache.cxf.interceptor.StaxOutInterceptor;
 import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.phase.Phase;
 
-public class OracleXMLSecSignatureOutInterceptor extends XMLSecSignatureOutInterceptor
+public class OracleXMLSecSignatureOutInterceptor extends EbMSSecSignatureOutInterceptor
 {
 	protected transient Log logger = LogFactory.getLog(getClass());
 
