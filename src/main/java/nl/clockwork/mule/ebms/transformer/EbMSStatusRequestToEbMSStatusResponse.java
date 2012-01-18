@@ -17,9 +17,8 @@ package nl.clockwork.mule.ebms.transformer;
 
 import java.util.GregorianCalendar;
 
-import javax.xml.datatype.DatatypeConfigurationException;
-
 import nl.clockwork.mule.ebms.Constants.EbMSMessageStatus;
+import nl.clockwork.mule.ebms.dao.EbMSDAO;
 import nl.clockwork.mule.ebms.model.EbMSStatusRequest;
 import nl.clockwork.mule.ebms.model.EbMSStatusResponse;
 import nl.clockwork.mule.ebms.util.EbMSMessageUtils;
@@ -33,6 +32,7 @@ import org.mule.transformer.AbstractMessageAwareTransformer;
 public class EbMSStatusRequestToEbMSStatusResponse extends AbstractMessageAwareTransformer
 {
   protected transient Log logger = LogFactory.getLog(getClass());
+  private EbMSDAO ebMSDAO;
 	private String hostname;
 
   public EbMSStatusRequestToEbMSStatusResponse()
@@ -46,14 +46,21 @@ public class EbMSStatusRequestToEbMSStatusResponse extends AbstractMessageAwareT
 		try
 		{
 			EbMSStatusRequest request = (EbMSStatusRequest)message.getPayload();
-			EbMSStatusResponse response = EbMSMessageUtils.ebMSStatusRequestToEbMSStatusResponse(request,hostname,EbMSMessageStatus.PROCESSED,new GregorianCalendar());
+			EbMSMessageStatus status = ebMSDAO.getEbMSMessageStatus(request.getStatusRequest().getRefToMessageId());
+			//FIXME get timestamp from message
+			EbMSStatusResponse response = EbMSMessageUtils.ebMSStatusRequestToEbMSStatusResponse(request,hostname,status,new GregorianCalendar());
 			message.setPayload(response);
 			return message;
 		}
-		catch (DatatypeConfigurationException e)
+		catch (Exception e)
 		{
 			throw new TransformerException(this,e);
 		}
+	}
+
+	public void setEbMSDAO(EbMSDAO ebMSDAO)
+	{
+		this.ebMSDAO = ebMSDAO;
 	}
 	
 	public void setHostname(String hostname)

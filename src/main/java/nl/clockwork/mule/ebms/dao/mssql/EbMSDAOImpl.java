@@ -340,6 +340,30 @@ public class EbMSDAOImpl implements EbMSDAO
 	}
 	
 	@Override
+	public EbMSMessageStatus getEbMSMessageStatus(String messageId) throws DAOException
+	{
+		try
+		{
+			return EbMSMessageStatus.get(
+					simpleJdbcTemplate.queryForInt(
+						"select status" +
+						" from ebms_message" +
+						" where message_id = ?",
+						messageId
+					)
+			);
+		}
+		catch(EmptyResultDataAccessException e)
+		{
+			return null;
+		}
+		catch (Exception e)
+		{
+			throw new DAOException(e);
+		}
+	}
+
+	@Override
 	public void insertMessage(final EbMSMessage message) throws DAOException
 	{
 		try
