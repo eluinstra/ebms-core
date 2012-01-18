@@ -24,6 +24,8 @@ import java.util.List;
 
 import javax.xml.bind.JAXBElement;
 
+import org.apache.xml.security.signature.XMLSignature;
+
 import nl.clockwork.mule.ebms.model.cpp.cpa.ActionBindingType;
 import nl.clockwork.mule.ebms.model.cpp.cpa.CanReceive;
 import nl.clockwork.mule.ebms.model.cpp.cpa.CanSend;
@@ -37,6 +39,7 @@ import nl.clockwork.mule.ebms.model.cpp.cpa.PartyInfo;
 import nl.clockwork.mule.ebms.model.cpp.cpa.ReliableMessaging;
 import nl.clockwork.mule.ebms.model.cpp.cpa.ServiceBinding;
 import nl.clockwork.mule.ebms.model.cpp.cpa.ServiceType;
+import nl.clockwork.mule.ebms.model.cpp.cpa.SignatureAlgorithm;
 import nl.clockwork.mule.ebms.model.cpp.cpa.X509DataType;
 import nl.clockwork.mule.ebms.model.ebxml.MessageHeader;
 import nl.clockwork.mule.ebms.model.ebxml.Service;
@@ -207,7 +210,10 @@ public class CPAUtils
 	
 	public static boolean isSigned(DeliveryChannel deliveryChannel)
 	{
-		return org.apache.xml.security.utils.Constants.SignatureSpecNS.equals(getDocExchange(deliveryChannel).getEbXMLSenderBinding().getSenderNonRepudiation().getNonRepudiationProtocol().getValue());
+		for (SignatureAlgorithm algorithm : getDocExchange(deliveryChannel).getEbXMLReceiverBinding().getReceiverNonRepudiation().getSignatureAlgorithm())
+			if (XMLSignature.ALGO_ID_SIGNATURE_RSA_SHA1.equals(algorithm.getValue()))
+				return true;
+		return false;
 	}
 	
 	public static X509Certificate getX509Certificate(Certificate certificate) throws CertificateException
