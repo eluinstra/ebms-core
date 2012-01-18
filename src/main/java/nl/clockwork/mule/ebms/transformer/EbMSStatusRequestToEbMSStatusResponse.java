@@ -47,8 +47,10 @@ public class EbMSStatusRequestToEbMSStatusResponse extends AbstractMessageAwareT
 		{
 			EbMSStatusRequest request = (EbMSStatusRequest)message.getPayload();
 			EbMSMessageStatus status = ebMSDAO.getEbMSMessageStatus(request.getStatusRequest().getRefToMessageId());
-			//FIXME get timestamp from message
-			EbMSStatusResponse response = EbMSMessageUtils.ebMSStatusRequestToEbMSStatusResponse(request,hostname,status,new GregorianCalendar());
+			EbMSStatusResponse response = null;
+			if (status != null)
+				//FIXME get timestamp from message
+				response = EbMSMessageUtils.ebMSStatusRequestToEbMSStatusResponse(request,hostname,status,new GregorianCalendar());
 			message.setPayload(response);
 			return message;
 		}
