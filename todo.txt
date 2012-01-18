@@ -9,7 +9,7 @@ X implement Signature (mode=off)
 - add MySQL support
 - add Oracle support?
 - add PostgreSQL support?
-/ implement SOAP client interface
+X implement SOAP client interface
 - implement JMS client interface?
 - implement dynamic cxf outbound endpoints (request url has to be resolved from CPA)?
 X optimize DAO's
