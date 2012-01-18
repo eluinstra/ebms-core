@@ -340,17 +340,26 @@ public class EbMSDAOImpl implements EbMSDAO
 	}
 	
 	@Override
-	public EbMSMessageStatus getEbMSMessageStatus(String messageId) throws DAOException
+	public EbMSMessageStatus getEbMSMessageStatus(String messageId, final Date timestamp) throws DAOException
 	{
 		try
 		{
 			return EbMSMessageStatus.get(
-					simpleJdbcTemplate.queryForInt(
-						"select status" +
-						" from ebms_message" +
-						" where message_id = ?",
-						messageId
-					)
+				simpleJdbcTemplate.queryForObject(
+					"select time_stamp, status" +
+					" from ebms_message" +
+					" where message_id = ?",
+					new ParameterizedRowMapper<Integer>()
+					{
+						@Override
+						public Integer mapRow(ResultSet rs, int rowNum) throws SQLException
+						{
+							timestamp.setTime(rs.getDate("time_stamp").getTime());
+							return rs.getObject("status") == null ? -1 : rs.getInt("status");
+						}
+					},
+					messageId
+				)
 			);
 		}
 		catch(EmptyResultDataAccessException e)

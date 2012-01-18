@@ -15,6 +15,7 @@
  ******************************************************************************/
 package nl.clockwork.mule.ebms.transformer;
 
+import java.util.Date;
 import java.util.GregorianCalendar;
 
 import nl.clockwork.mule.ebms.Constants.EbMSMessageStatus;
@@ -46,11 +47,12 @@ public class EbMSStatusRequestToEbMSStatusResponse extends AbstractMessageAwareT
 		try
 		{
 			EbMSStatusRequest request = (EbMSStatusRequest)message.getPayload();
-			EbMSMessageStatus status = ebMSDAO.getEbMSMessageStatus(request.getStatusRequest().getRefToMessageId());
+			Date date = new Date();
+			EbMSMessageStatus status = ebMSDAO.getEbMSMessageStatus(request.getStatusRequest().getRefToMessageId(),date);
 			EbMSStatusResponse response = null;
-			if (status != null)
-				//FIXME get timestamp from message
-				response = EbMSMessageUtils.ebMSStatusRequestToEbMSStatusResponse(request,hostname,status,new GregorianCalendar());
+			GregorianCalendar timestamp = new GregorianCalendar();
+			timestamp.setTime(date);
+			response = EbMSMessageUtils.ebMSStatusRequestToEbMSStatusResponse(request,hostname,status,timestamp);
 			message.setPayload(response);
 			return message;
 		}

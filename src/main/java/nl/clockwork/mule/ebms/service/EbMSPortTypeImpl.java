@@ -85,8 +85,11 @@ public class EbMSPortTypeImpl implements EbMSPortType
 	public void messageStatus(MessageHeader requestMessageHeader, StatusRequest statusRequest, Holder<MessageHeader> responseMessageHeader, Holder<StatusResponse> statusResponse)
 	{
 		EbMSStatusResponse response = messageStatusProcessor.process(new EbMSStatusRequest(requestMessageHeader,statusRequest));
-		responseMessageHeader.value = response.getMessageHeader();
-		statusResponse.value = response.getStatusResponse();
+		if (response != null)
+		{
+			responseMessageHeader.value = response.getMessageHeader();
+			statusResponse.value = response.getStatusResponse();
+		}
 	}
 
 	@Override

@@ -201,9 +201,12 @@ public class EbMSMessageUtils
 		StatusResponse response = new StatusResponse();
 		response.setVersion(Constants.EBMS_VERSION);
 		response.setRefToMessageId(statusRequest.getRefToMessageId());
-		response.setMessageStatus(status.statusCode());
-		if (MessageStatusType.RECEIVED.equals(status.statusCode()) || MessageStatusType.PROCESSED.equals(status.statusCode()))
-			response.setTimestamp(DatatypeFactory.newInstance().newXMLGregorianCalendar(timestamp));
+		if (status != null)
+		{
+			response.setMessageStatus(status.statusCode());
+			if (MessageStatusType.RECEIVED.equals(status.statusCode()) || MessageStatusType.PROCESSED.equals(status.statusCode()))
+				response.setTimestamp(DatatypeFactory.newInstance().newXMLGregorianCalendar(timestamp));
+		}
 		return response;
 	}
 
