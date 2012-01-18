@@ -11,8 +11,8 @@ X implement Signature (mode=off)
 - add PostgreSQL support?
 / implement SOAP client interface
 - implement JMS client interface?
-- 
-- optimize DAO's
+- implement dynamic cxf outbound endpoints (request url has to be resolved from CPA)?
+X optimize DAO's
 
 3.x.x:
 - update adapter to Mule 3
