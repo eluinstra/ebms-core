@@ -44,4 +44,19 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 		return "NOW()";
 	}
 
+	@Override
+	public String getMessageIdsQuery(int maxNr)
+	{
+		return "select message_id" +
+		" from ebms_message" +
+		" where status = 2" +
+		" order by time_stamp desc" +
+		" limit " + maxNr;
+//		return "select * from (" +
+//		"select message_id" +
+//		" from ebms_message" +
+//		" where status = 2" +
+//		" order by time_stamp desc)" +
+//		" limit " + maxNr;
+	}
 }

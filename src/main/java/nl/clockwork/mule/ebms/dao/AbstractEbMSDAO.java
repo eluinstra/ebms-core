@@ -871,6 +871,8 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 			throw new DAOException(e);
 		}
 	}
+	
+	public abstract String getMessageIdsQuery(int maxNr);
 
 	@SuppressWarnings("unchecked")
 	@Override
@@ -879,9 +881,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 		try
 		{
 			return jdbcTemplate.queryForList(
-					"select message_id" +
-					" from ebms_message" +
-					" where status = 2",
+					getMessageIdsQuery(maxNr),
 					String.class
 			);
 		}
