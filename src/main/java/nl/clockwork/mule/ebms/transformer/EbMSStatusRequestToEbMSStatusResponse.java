@@ -18,10 +18,10 @@ package nl.clockwork.mule.ebms.transformer;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
+import nl.clockwork.mule.ebms.Constants;
 import nl.clockwork.mule.ebms.Constants.EbMSMessageStatus;
 import nl.clockwork.mule.ebms.dao.EbMSDAO;
 import nl.clockwork.mule.ebms.model.EbMSStatusRequest;
-import nl.clockwork.mule.ebms.model.EbMSStatusResponse;
 import nl.clockwork.mule.ebms.util.EbMSMessageUtils;
 
 import org.apache.commons.logging.Log;
@@ -48,12 +48,12 @@ public class EbMSStatusRequestToEbMSStatusResponse extends AbstractMessageAwareT
 		{
 			EbMSStatusRequest request = (EbMSStatusRequest)message.getPayload();
 			Date date = new Date();
-			EbMSMessageStatus status = ebMSDAO.getEbMSMessageStatus(request.getStatusRequest().getRefToMessageId(),date);
-			EbMSStatusResponse response = null;
+			EbMSMessageStatus status = EbMSMessageStatus.get((String)message.getProperty(Constants.EBMS_MESSAGE_STATUS));
+			if (status == null)
+				status = ebMSDAO.getEbMSMessageStatus(request.getStatusRequest().getRefToMessageId(),date);
 			GregorianCalendar timestamp = new GregorianCalendar();
 			timestamp.setTime(date);
-			response = EbMSMessageUtils.ebMSStatusRequestToEbMSStatusResponse(request,hostname,status,timestamp);
-			message.setPayload(response);
+			message.setPayload(EbMSMessageUtils.ebMSStatusRequestToEbMSStatusResponse(request,hostname,status,timestamp));
 			return message;
 		}
 		catch (Exception e)

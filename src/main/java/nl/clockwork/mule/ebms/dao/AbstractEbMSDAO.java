@@ -361,6 +361,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 						{
 							//timestamp.setTime(rs.getTimestamp("time_stamp").getTime());
 							timestamp.setTime(((Date)rs.getObject("time_stamp")).getTime());
+							//return rs.getObject("status") == null ? EbMSMessageStatus.UN_AUTHORIZED.id() : rs.getInt("status");
 							return rs.getObject("status") == null ? -1 : rs.getInt("status");
 						}
 					},
@@ -370,7 +371,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 		}
 		catch(EmptyResultDataAccessException e)
 		{
-			return null;
+			return EbMSMessageStatus.NOT_RECOGNIZED;
 		}
 		catch (Exception e)
 		{
