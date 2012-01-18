@@ -71,9 +71,9 @@ public class EbMSMessageUtils
 	public static MessageHeader createMessageHeader(CollaborationProtocolAgreement cpa, EbMSMessageContext context, String hostname) throws DatatypeConfigurationException
 	{
 		String uuid = UUID.getUUID();//UUID.randomUUID().toString();//nameUUIDFromBytes(hostname.getBytes()).toString();
-		PartyInfo partyInfo = CPAUtils.getSendingPartyInfo(cpa,context.getFromRole(),context.getService(),context.getAction());
-		PartyInfo otherPartyInfo = CPAUtils.getReceivingPartyInfo(cpa,context.getToRole(),context.getService(),context.getAction());
-		//PartyInfo otherPartyInfo = CPAUtils.getOtherReceivingPartyInfo(cpa,context.getFrom(),context.getService(),context.getAction());
+		PartyInfo partyInfo = CPAUtils.getSendingPartyInfo(cpa,context.getFromRole(),context.getServiceType(),context.getService(),context.getAction());
+		PartyInfo otherPartyInfo = CPAUtils.getReceivingPartyInfo(cpa,context.getToRole(),context.getServiceType(),context.getService(),context.getAction());
+		//PartyInfo otherPartyInfo = CPAUtils.getOtherReceivingPartyInfo(cpa,context.getFromRole(),context.getServiceType(),context.getService(),context.getAction());
 
 		MessageHeader messageHeader = new MessageHeader();
 
@@ -150,7 +150,7 @@ public class EbMSMessageUtils
 
 	public static AckRequested createAckRequested(CollaborationProtocolAgreement cpa, EbMSMessageContext context)
 	{
-		PartyInfo partyInfo = CPAUtils.getSendingPartyInfo(cpa,context.getFromRole(),context.getService(),context.getAction());
+		PartyInfo partyInfo = CPAUtils.getSendingPartyInfo(cpa,context.getFromRole(),context.getServiceType(),context.getService(),context.getAction());
 		DeliveryChannel channel = CPAUtils.getDeliveryChannel(partyInfo.getCollaborationRole().get(0).getServiceBinding().getCanSend().get(0).getThisPartyActionBinding());
 
 		if (PerMessageCharacteristicsType.ALWAYS.equals(channel.getMessagingCharacteristics().getAckRequested()))
