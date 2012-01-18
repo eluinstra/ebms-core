@@ -135,6 +135,7 @@ public class EbMSMessageUtils
 		messageHeader.getMessageData().setRefToMessageId(messageHeader.getMessageData().getMessageId());
 		messageHeader.getMessageData().setMessageId(UUID.getUUID() + "@" + hostname);
 		messageHeader.getMessageData().setTimestamp(DatatypeFactory.newInstance().newXMLGregorianCalendar(timestamp));
+		messageHeader.getMessageData().setTimeToLive(null);
 
 		messageHeader.getService().setType(null);
 		messageHeader.getService().setValue(Constants.EBMS_SERVICE);
