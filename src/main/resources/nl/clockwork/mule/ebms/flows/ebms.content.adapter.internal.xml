@@ -59,7 +59,6 @@
 				<vm:inbound-endpoint path="ebms.delegate.in">
 					<custom-transformer class="nl.clockwork.mule.ebms.transformer.EbMSMessageIdToEbMSMessageContent">
 						<spring:property name="ebMSDAO" ref="ebMSDAO" />
-						<spring:property name="properties" value="${ebms.message.header.properties}"/>
 					</custom-transformer>
 				</vm:inbound-endpoint>
 			</inbound>

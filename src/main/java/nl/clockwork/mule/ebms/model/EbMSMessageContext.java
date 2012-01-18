@@ -30,6 +30,10 @@ public class EbMSMessageContext
 	private String refToMessageId;
 	private Integer sequenceNr;
 
+	public EbMSMessageContext()
+	{
+	}
+	
 	public EbMSMessageContext(MessageHeader messageHeader)
 	{
 		this(messageHeader.getCPAId(),messageHeader.getFrom().getRole(),messageHeader.getTo().getRole(),messageHeader.getService().getType(),messageHeader.getService().getValue(),messageHeader.getAction(),messageHeader.getConversationId(),messageHeader.getMessageData().getMessageId(),messageHeader.getMessageData().getRefToMessageId(),null);		
@@ -68,10 +72,20 @@ public class EbMSMessageContext
 	{
 		return cpaId;
 	}
+	
+	public void setCpaId(String cpaId)
+	{
+		this.cpaId = cpaId;
+	}
 
 	public String getFromRole()
 	{
 		return fromRole;
+	}
+	
+	public void setFromRole(String fromRole)
+	{
+		this.fromRole = fromRole;
 	}
 	
 	public String getToRole()
@@ -79,9 +93,19 @@ public class EbMSMessageContext
 		return toRole;
 	}
 	
+	public void setToRole(String toRole)
+	{
+		this.toRole = toRole;
+	}
+	
 	public String getServiceType()
 	{
 		return serviceType;
+	}
+	
+	public void setServiceType(String serviceType)
+	{
+		this.serviceType = serviceType;
 	}
 	
 	public String getService()
@@ -89,9 +113,19 @@ public class EbMSMessageContext
 		return service;
 	}
 	
+	public void setService(String service)
+	{
+		this.service = service;
+	}
+	
 	public String getAction()
 	{
 		return action;
+	}
+	
+	public void setAction(String action)
+	{
+		this.action = action;
 	}
 	
 	public String getConversationId()
@@ -99,9 +133,19 @@ public class EbMSMessageContext
 		return conversationId;
 	}
 	
+	public void setConversationId(String conversationId)
+	{
+		this.conversationId = conversationId;
+	}
+	
 	public String getMessageId()
 	{
 		return messageId;
+	}
+	
+	public void setMessageId(String messageId)
+	{
+		this.messageId = messageId;
 	}
 	
 	public String getRefToMessageId()
@@ -109,8 +153,18 @@ public class EbMSMessageContext
 		return refToMessageId;
 	}
 	
+	public void setRefToMessageId(String refToMessageId)
+	{
+		this.refToMessageId = refToMessageId;
+	}
+	
 	public Integer getSequenceNr()
 	{
 		return sequenceNr;
+	}
+	
+	public void setSequenceNr(Integer sequenceNr)
+	{
+		this.sequenceNr = sequenceNr;
 	}
 }

@@ -15,14 +15,12 @@
  ******************************************************************************/
 package nl.clockwork.mule.ebms.model;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class EbMSMessageContent
 {
+	private static final long serialVersionUID = 1L;
 	private EbMSMessageContext context;
-	private Map<String,Object> properties = new HashMap<String,Object>();
 	private List<EbMSAttachment> attachments;
 
 	public EbMSMessageContent()
@@ -31,13 +29,7 @@ public class EbMSMessageContent
 	
 	public EbMSMessageContent(EbMSMessageContext context, List<EbMSAttachment> attachments)
 	{
-		this(context,null,attachments);
-	}
-
-	public EbMSMessageContent(EbMSMessageContext context, Map<String,Object> properties, List<EbMSAttachment> attachments)
-	{
 		this.context = context;
-		this.properties = properties == null ? new HashMap<String,Object>() : properties;
 		this.attachments = attachments;
 	}
 
@@ -46,14 +38,19 @@ public class EbMSMessageContent
 		return context;
 	}
 	
-	public Map<String,Object> getProperties()
+	public void setContext(EbMSMessageContext context)
 	{
-		return properties;
+		this.context = context;
 	}
-
+	
 	public List<EbMSAttachment> getAttachments()
 	{
 		return attachments;
+	}
+	
+	public void setAttachments(List<EbMSAttachment> attachments)
+	{
+		this.attachments = attachments;
 	}
 	
 }

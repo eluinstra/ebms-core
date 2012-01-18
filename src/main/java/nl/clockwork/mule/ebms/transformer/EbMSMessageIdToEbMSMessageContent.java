@@ -15,9 +15,6 @@
  ******************************************************************************/
 package nl.clockwork.mule.ebms.transformer;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import nl.clockwork.mule.ebms.Constants;
 import nl.clockwork.mule.ebms.dao.EbMSDAO;
 import nl.clockwork.mule.ebms.model.EbMSMessage;
@@ -30,7 +27,6 @@ import org.mule.transformer.AbstractMessageAwareTransformer;
 public class EbMSMessageIdToEbMSMessageContent extends AbstractMessageAwareTransformer
 {
 	private EbMSDAO ebMSDAO;
-	private Map<String,String> properties = new HashMap<String,String>();
 
 	public EbMSMessageIdToEbMSMessageContent()
 	{
@@ -44,7 +40,7 @@ public class EbMSMessageIdToEbMSMessageContent extends AbstractMessageAwareTrans
 		{
 			long id = message.getLongProperty(Constants.EBMS_MESSAGE_ID,0);
 			EbMSMessage msg = (EbMSMessage)ebMSDAO.getEbMSMessage(id);
-			message.setPayload(EbMSMessageUtils.EbMSMessageToEbMSMessageContent(msg,properties));
+			message.setPayload(EbMSMessageUtils.EbMSMessageToEbMSMessageContent(msg));
 
 			return message;
 		}
@@ -59,14 +55,4 @@ public class EbMSMessageIdToEbMSMessageContent extends AbstractMessageAwareTrans
 		this.ebMSDAO = ebMSDAO;
 	}
 	
-	public void setProperties(String properties)
-	{
-		 String[] p = properties.split("\\s*,\\s*");
-		 for (String s : p)
-		 {
-			 String[] t = s.split("\\s*:\\s*");
-			 this.properties.put(t[0],t[1]);
-		 }
-	}
-
 }

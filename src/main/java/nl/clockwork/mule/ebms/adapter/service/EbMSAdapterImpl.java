@@ -76,8 +76,10 @@ public class EbMSAdapterImpl implements EbMSAdapter
 			EbMSBaseMessage message = ebMSDAO.getEbMSMessage(messageId);
 			if (message instanceof EbMSMessage)
 			{
-				ebMSDAO.processMessage(messageId);
-				return EbMSMessageUtils.EbMSMessageToEbMSMessageContent((EbMSMessage)message);
+				EbMSMessageContent result = EbMSMessageUtils.EbMSMessageToEbMSMessageContent((EbMSMessage)message);
+				if (process)
+					ebMSDAO.processMessage(messageId);
+				return result;
 			}
 			return null;
 		}
