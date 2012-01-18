@@ -106,7 +106,7 @@
 					<vm:outbound-endpoint path="ebms.message.eliminateDuplicate.in" />
 				</pass-through-router>
 			</outbound>
-			<async-reply failOnTimeout="true" timeout="60000">
+			<async-reply failOnTimeout="true" timeout="${async.reply.default.timeout}">
 				<vm:inbound-endpoint path="ebms.message.receive.async.reply" />
 				<single-async-reply-router/>
 			</async-reply>
@@ -322,7 +322,7 @@
 					<vm:outbound-endpoint path="ebms.messageError.in.store.in"/>
 				</pass-through-router>
 			</outbound>
-			<async-reply failOnTimeout="true" timeout="60000">
+			<async-reply failOnTimeout="true" timeout="${async.reply.default.timeout}">
 				<vm:inbound-endpoint path="ebms.messageError.receive.async.reply" />
 				<single-async-reply-router/>
 			</async-reply>
@@ -374,7 +374,7 @@
 					<vm:outbound-endpoint path="ebms.acknowledgment.in.store.in"/>
 				</pass-through-router>
 			</outbound>
-			<async-reply failOnTimeout="true" timeout="60000">
+			<async-reply failOnTimeout="true" timeout="${async.reply.default.timeout}">
 				<vm:inbound-endpoint path="ebms.acknowledgment.receive.async.reply" />
 				<single-async-reply-router/>
 			</async-reply>
@@ -417,7 +417,7 @@
 					<vm:outbound-endpoint path="ebms.statusRequest.validate.in" />
 				</pass-through-router>
 			</outbound>
-			<async-reply failOnTimeout="true" timeout="60000">
+			<async-reply failOnTimeout="true" timeout="${async.reply.default.timeout}">
 				<vm:inbound-endpoint path="ebms.statusRequest.receive.async.reply" />
 				<single-async-reply-router/>
 			</async-reply>
@@ -489,7 +489,7 @@
 					<vm:outbound-endpoint path="ebms.ping.validate.in" />
 				</pass-through-router>
 			</outbound>
-			<async-reply failOnTimeout="true" timeout="60000">
+			<async-reply failOnTimeout="true" timeout="${async.reply.default.timeout}">
 				<vm:inbound-endpoint path="ebms.ping.receive.async.reply" />
 				<single-async-reply-router/>
 			</async-reply>
