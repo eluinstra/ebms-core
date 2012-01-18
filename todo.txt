@@ -6,7 +6,7 @@
 - implement ackRequested (mode=never)
 - implement duplicateElimination (mode=never)
 X implement Signature (mode=off)
-- add MySQL support
+/ add MySQL support
 - add Oracle support?
 - add PostgreSQL support?
 X implement SOAP client interface
@@ -17,6 +17,6 @@ X optimize DAO's
 3.x.x:
 - update adapter to Mule 3
 
-long term:
+considerations:
 - change wsdl definition to one operation (containing all ebxml elements) and 'parse' message in Mule?
 - replace cxf interface?
