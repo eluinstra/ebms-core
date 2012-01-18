@@ -25,6 +25,7 @@ public class EbMSMessageContext
 	private String serviceType;
 	private String service;
 	private String action;
+	//private Date timestamp;
 	private String conversationId;
 	private String messageId;
 	private String refToMessageId;

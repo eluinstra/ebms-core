@@ -899,7 +899,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 			return simpleJdbcTemplate.queryForObject(
 				"select id, service, action, message_header, ack_requested, content" + 
 				" from ebms_message" + 
-				" where message_id = ?",
+				" where message_id=? and status=" + EbMSMessageStatus.RECEIVED.id(),
 				new EbMSBaseMessageParameterizedRowMapper(),
 				messageId
 			);
@@ -922,8 +922,8 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 			simpleJdbcTemplate.update
 			(
 				"update ebms_message" +
-				" set status=3, status_time=" + getTimestampFunction() +
-				" where message_id=?",
+				" set status=" + EbMSMessageStatus.PROCESSED.id() +", status_time=" + getTimestampFunction() +
+				" where message_id=? and status=" + EbMSMessageStatus.RECEIVED.id(),
 				messageId
 			);
 		}
@@ -943,8 +943,8 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 				ids.add(new Object[]{messageId});
 			simpleJdbcTemplate.batchUpdate(
 					"update ebms_message" +
-					" set status=3, status_time=" + getTimestampFunction() +
-					" where message_id=?",
+					" set status=" + EbMSMessageStatus.PROCESSED.id() +", status_time=" + getTimestampFunction() +
+					" where message_id=? and status=" + EbMSMessageStatus.RECEIVED.id(),
 					ids
 			);
 		}

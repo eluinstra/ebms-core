@@ -27,13 +27,10 @@ import nl.clockwork.mule.ebms.model.EbMSMessageContent;
 public interface EbMSAdapter
 {
 	@WebResult(name="MessageId")
-	String sendMessage(@WebParam(name="MessageContent") EbMSMessageContent messageContent);
+	String sendMessage(@WebParam(name="Message") EbMSMessageContent messageContent);
 
 	@WebResult(name="MessageIds")
 	List<String> getMessageIds(@WebParam(name="MaxNr") int maxNr);
-
-//	@WebResult(name="Message")
-//	EbMSMessageContent getMessage(@WebParam(name="MessageId") String messageId);
 
 	@WebResult(name="Message")
 	EbMSMessageContent getMessage(@WebParam(name="MessageId") String messageId, @WebParam(name="Process") boolean process);

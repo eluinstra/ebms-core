@@ -15,6 +15,7 @@
  ******************************************************************************/
 package nl.clockwork.mule.ebms.dao.hsqldb;
 
+import nl.clockwork.mule.ebms.Constants.EbMSMessageStatus;
 import nl.clockwork.mule.ebms.dao.AbstractEbMSDAO;
 
 import org.springframework.transaction.PlatformTransactionManager;
@@ -49,13 +50,13 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 	{
 		return "select message_id" +
 		" from ebms_message" +
-		" where status = 2" +
+		" where status=" + EbMSMessageStatus.RECEIVED.id() +
 		" order by time_stamp desc" +
 		" limit " + maxNr;
 //		return "select * from (" +
 //		"select message_id" +
 //		" from ebms_message" +
-//		" where status = 2" +
+//		" where status=" + EbMSMessageStatus.RECEIVED.id() +
 //		" order by time_stamp desc)" +
 //		" limit " + maxNr;
 	}
