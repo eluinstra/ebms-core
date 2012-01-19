@@ -51,13 +51,13 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 		return "select message_id" +
 		" from ebms_message" +
 		" where status=" + EbMSMessageStatus.RECEIVED.id() +
-		" order by time_stamp desc" +
+		" order by time_stamp asc" +
 		" limit " + maxNr;
 //		return "select * from (" +
 //		"select message_id" +
 //		" from ebms_message" +
 //		" where status=" + EbMSMessageStatus.RECEIVED.id() +
-//		" order by time_stamp desc)" +
+//		" order by time_stamp asc)" +
 //		" limit " + maxNr;
 	}
 }

@@ -873,6 +873,26 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 		}
 	}
 	
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<String> getMessageIds() throws DAOException
+	{
+		try
+		{
+			return jdbcTemplate.queryForList(
+					"select message_id" +
+					" from ebms_message" +
+					" where status=" + EbMSMessageStatus.RECEIVED.id() +
+					" order by time_stamp asc",
+					String.class
+			);
+		}
+		catch (Exception e)
+		{
+			throw new DAOException(e);
+		}
+	}
+
 	public abstract String getMessageIdsQuery(int maxNr);
 
 	@SuppressWarnings("unchecked")

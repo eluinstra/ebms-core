@@ -23,6 +23,7 @@ import nl.clockwork.mule.ebms.dao.EbMSDAO;
 import nl.clockwork.mule.ebms.model.EbMSBaseMessage;
 import nl.clockwork.mule.ebms.model.EbMSMessage;
 import nl.clockwork.mule.ebms.model.EbMSMessageContent;
+import nl.clockwork.mule.ebms.model.EbMSMessageContext;
 import nl.clockwork.mule.ebms.model.cpp.cpa.CollaborationProtocolAgreement;
 import nl.clockwork.mule.ebms.util.EbMSMessageUtils;
 
@@ -54,11 +55,14 @@ public class EbMSAdapterImpl implements EbMSAdapter
 	}
 
 	@Override
-	public List<String> getMessageIds(int maxNr)
+	public List<String> getMessageIds(EbMSMessageContext messageContext, Integer maxNr)
 	{
 		try
 		{
-			return ebMSDAO.getMessageIds(maxNr);
+			if (maxNr == null)
+				return ebMSDAO.getMessageIds();
+			else
+				return ebMSDAO.getMessageIds(maxNr);
 		}
 		catch (DAOException e)
 		{
@@ -69,7 +73,7 @@ public class EbMSAdapterImpl implements EbMSAdapter
 	}
 
 	@Override
-	public EbMSMessageContent getMessage(String messageId, boolean process)
+	public EbMSMessageContent getMessage(String messageId, Boolean process)
 	{
 		try
 		{
@@ -77,7 +81,7 @@ public class EbMSAdapterImpl implements EbMSAdapter
 			if (message instanceof EbMSMessage)
 			{
 				EbMSMessageContent result = EbMSMessageUtils.EbMSMessageToEbMSMessageContent((EbMSMessage)message);
-				if (process)
+				if (process != null && process)
 					ebMSDAO.processMessage(messageId);
 				return result;
 			}
