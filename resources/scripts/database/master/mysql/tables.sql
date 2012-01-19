@@ -1,6 +1,5 @@
 CREATE TABLE cpa
 (
-	id								INT							AUTO_INCREMENT PRIMARY KEY,
 	cpa_id						VARCHAR(128)		NOT NULL UNIQUE,
 	cpa								TEXT						NOT NULL
 );
@@ -29,12 +28,11 @@ CREATE TABLE ebms_message
 	content						TEXT						NULL,
 	status						INT							NULL,
 	status_time				TIMESTAMP				NULL
---	FOREIGN KEY (parent_id) REFERENCES ebms_message(id) ON DELETE CASCADE
+--	FOREIGN KEY (parent_id) REFERENCES ebms_message(id)
 );
 
 CREATE TABLE ebms_attachment
 (
-	id								INT							AUTO_INCREMENT PRIMARY KEY,
 	ebms_message_id		INT							NOT NULL,
 	name							VARCHAR(128)		NOT NULL,
 	content_type			VARCHAR(64)			NOT NULL,
@@ -46,9 +44,9 @@ CREATE TABLE ebms_send_event
 (
 --	id								INT							AUTO_INCREMENT PRIMARY KEY,
 	ebms_message_id		INT							NOT NULL,
-	time							TIMESTAMP				DEFAULT '0000-00-00 00:00:00' NOT NULL,
-	status						INT							DEFAULT 0 NOT NULL,
-	status_time				TIMESTAMP				DEFAULT NOW() NOT NULL,
-	http_status_code	INT							NULL,
+	time							TIMESTAMP				NOT NULL DEFAULT '0000-00-00 00:00:00',
+	status						INT							NOT NULL DEFAULT 0,
+	status_time				TIMESTAMP				NOT NULL DEFAULT NOW(),
+--	http_status_code	INT							NULL,
 	FOREIGN KEY (ebms_message_id) REFERENCES ebms_message(id) ON DELETE CASCADE
 );
