@@ -254,6 +254,96 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 		}
 	}
 
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<String> getCPAIds() throws DAOException
+	{
+		try
+		{
+			return jdbcTemplate.queryForList(
+					"select cpa_id" +
+					" from cpa" +
+					" order by cpa_id desc",
+					String.class
+			);
+		}
+		catch (Exception e)
+		{
+			throw new DAOException(e);
+		}
+	}
+
+	@Override
+	public boolean insertCPA(CollaborationProtocolAgreement cpa) throws DAOException
+	{
+		try
+		{
+			simpleJdbcTemplate.update
+			(
+				"insert into cpa (" +
+				"cpa_id," +
+				"cpa" +
+				") values (?,?)",
+				cpa.getCpaid(),
+				XMLMessageBuilder.getInstance(CollaborationProtocolAgreement.class).handle(cpa)
+			);
+			return true;
+		}
+		catch (DataAccessException e)
+		{
+			return false;
+		}
+		catch (JAXBException e)
+		{
+			throw new DAOException(e);
+		}
+	}
+
+	@Override
+	public boolean updateCPA(CollaborationProtocolAgreement cpa) throws DAOException
+	{
+		try
+		{
+			simpleJdbcTemplate.update
+			(
+				"update cpa set" +
+				" cpa=?," +
+				" where cpa_id=?",
+				XMLMessageBuilder.getInstance(CollaborationProtocolAgreement.class).handle(cpa),
+				cpa.getCpaid()
+			);
+			return true;
+		}
+		catch (DataAccessException e)
+		{
+			return false;
+		}
+		catch (JAXBException e)
+		{
+			throw new DAOException(e);
+		}
+	}
+
+	@Override
+	public boolean deleteCPA(String cpaId) throws DAOException
+	{
+		try
+		{
+			return
+				simpleJdbcTemplate.update
+				(
+					"delete from cpa" +
+					" where cpa_id=?",
+					cpaId
+				) > 0
+			;
+		}
+		catch (DataAccessException e)
+		{
+			return false;
+		}
+	}
+
 	@Override
 	public boolean exists(String messageId) throws DAOException
 	{

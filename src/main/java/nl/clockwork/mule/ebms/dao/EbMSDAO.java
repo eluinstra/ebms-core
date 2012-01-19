@@ -28,8 +28,13 @@ import nl.clockwork.mule.ebms.model.cpp.cpa.CollaborationProtocolAgreement;
 
 public interface EbMSDAO
 {
+	//boolean exists(String cpaId) throws DAOException;
 	CollaborationProtocolAgreement getCPA(String cpaId) throws DAOException;
-
+	List<String> getCPAIds() throws DAOException;
+	boolean insertCPA(CollaborationProtocolAgreement cpa) throws DAOException;
+	boolean updateCPA(CollaborationProtocolAgreement cpa) throws DAOException;
+	boolean deleteCPA(String cpaId) throws DAOException;
+	
 	boolean exists(String messageId) throws DAOException;
 	long getIdByMessageId(String messageId) throws DAOException;
 	EbMSBaseMessage getEbMSMessage(long id) throws DAOException;

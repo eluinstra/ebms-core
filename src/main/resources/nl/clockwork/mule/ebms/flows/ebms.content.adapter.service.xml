@@ -41,7 +41,7 @@
 
 		<service name="ebMSAdapter">
 			<inbound>
-				<cxf:inbound-endpoint connector-ref="ebms.adapter.connector.cxf" protocolConnector="ebms.adapter.connector.http" address="http://${service.host}:${service.adapter.port}${service.adapter.url}" enableMuleSoapHeaders="false" synchronous="true">
+				<cxf:inbound-endpoint connector-ref="ebms.adapter.connector.cxf" protocolConnector="ebms.adapter.connector.http" address="http://${service.host}:${service.adapter.port}${service.adapter.url}/ebms" enableMuleSoapHeaders="false" synchronous="true">
 					<cxf:inInterceptors>
 						<spring:bean class="nl.clockwork.mule.ebms.cxf.LoggingInInterceptor" />
 					</cxf:inInterceptors>
@@ -54,6 +54,28 @@
 				<singleton-object class="nl.clockwork.mule.ebms.adapter.service.EbMSAdapterImpl">
 					<property key="ebMSDAO" value-ref="ebMSDAO"/>
 					<property key="hostname" value="${service.host}"/>
+				</singleton-object>
+			</component>
+		</service>
+
+	</model>
+
+	<model>
+
+		<service name="cpaAdapter">
+			<inbound>
+				<cxf:inbound-endpoint connector-ref="ebms.adapter.connector.cxf" protocolConnector="ebms.adapter.connector.http" address="http://${service.host}:${service.adapter.port}${service.adapter.url}/cpa" enableMuleSoapHeaders="false" synchronous="true">
+					<cxf:inInterceptors>
+						<spring:bean class="nl.clockwork.mule.ebms.cxf.LoggingInInterceptor" />
+					</cxf:inInterceptors>
+					<cxf:outInterceptors>
+						<spring:bean class="nl.clockwork.mule.ebms.cxf.LoggingOutInterceptor" />
+					</cxf:outInterceptors>
+				</cxf:inbound-endpoint> 
+			</inbound>
+			<component>
+				<singleton-object class="nl.clockwork.mule.ebms.adapter.service.CPAAdapterImpl">
+					<property key="ebMSDAO" value-ref="ebMSDAO"/>
 				</singleton-object>
 			</component>
 		</service>
