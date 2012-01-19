@@ -219,9 +219,11 @@ public class CPAUtils
 	
 	public static boolean isSigned(DeliveryChannel deliveryChannel)
 	{
-		for (SignatureAlgorithm algorithm : getDocExchange(deliveryChannel).getEbXMLReceiverBinding().getReceiverNonRepudiation().getSignatureAlgorithm())
-			if (XMLSignature.ALGO_ID_SIGNATURE_RSA_SHA1.equals(algorithm.getValue()))
-				return true;
+		DocExchange docExchange = getDocExchange(deliveryChannel);
+		if (docExchange != null && docExchange.getEbXMLReceiverBinding() != null && docExchange.getEbXMLReceiverBinding().getReceiverNonRepudiation() != null && docExchange.getEbXMLReceiverBinding().getReceiverNonRepudiation().getSignatureAlgorithm() != null)
+			for (SignatureAlgorithm algorithm : docExchange.getEbXMLReceiverBinding().getReceiverNonRepudiation().getSignatureAlgorithm())
+				if (XMLSignature.ALGO_ID_SIGNATURE_RSA_SHA1.equals(algorithm.getValue()))
+					return true;
 		return false;
 	}
 	
