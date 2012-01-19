@@ -30,7 +30,7 @@
 	</bean>
 
 	<bean id="addEbMSMessageSendEvent" class="java.lang.String">
-		<constructor-arg value="insert into ebms_send_event (ebms_message_id) values (#[map-payload:ID])" /> 
+		<constructor-arg value="insert into ebms_send_event (ebms_message_id, time) values (#[map-payload:ID], NOW())" /> 
 	</bean>
 
 	<bean id="selectEventsForSending" class="java.lang.String">

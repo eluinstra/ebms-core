@@ -46,9 +46,9 @@ CREATE TABLE ebms_send_event
 (
 --	id								INT							AUTO_INCREMENT PRIMARY KEY,
 	ebms_message_id		INT							NOT NULL,
-	time							TIMESTAMP				DEFAULT NOW() NOT NULL,
+	time							TIMESTAMP				DEFAULT '0000-00-00 00:00:00' NOT NULL,
 	status						INT							DEFAULT 0 NOT NULL,
 	status_time				TIMESTAMP				DEFAULT NOW() NOT NULL,
-	http_status_code	INT							NULL
+	http_status_code	INT							NULL,
 	FOREIGN KEY (ebms_message_id) REFERENCES ebms_message(id) ON DELETE CASCADE
 );
