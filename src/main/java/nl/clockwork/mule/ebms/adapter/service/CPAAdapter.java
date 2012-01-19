@@ -17,6 +17,7 @@ package nl.clockwork.mule.ebms.adapter.service;
 
 import java.util.List;
 
+import javax.jws.WebMethod;
 import javax.jws.WebParam;
 import javax.jws.WebResult;
 import javax.jws.WebService;
@@ -27,12 +28,19 @@ import nl.clockwork.mule.ebms.model.cpp.cpa.CollaborationProtocolAgreement;
 public interface CPAAdapter
 {
 	@WebResult(name="Result")
-	boolean insertCPA(@WebParam(name="CPA") CollaborationProtocolAgreement cpa);
+	@WebMethod(operationName="InsertCPA")
+	boolean insertCPA(@WebParam(name="CPA") CollaborationProtocolAgreement cpa, @WebParam(name="Overwrite") Boolean overwrite);
+
+	@WebResult(name="Result")
+	@WebMethod(operationName="DeleteCPA")
+	boolean deleteCPA(@WebParam(name="CPAId") String cpaId);
 
 	@WebResult(name="MessageIds")
+	@WebMethod(operationName="GetCPAIds")
 	List<String> getCPAIds();
 
 	@WebResult(name="CPA")
+	@WebMethod(operationName="GetCPA")
 	CollaborationProtocolAgreement getCPA(@WebParam(name="CPAId") String cpaId);
 
 }
