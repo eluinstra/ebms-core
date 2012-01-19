@@ -198,3 +198,6 @@ Restrictions =
 - Actor NextMSH is not supported. Only actor ToPartyMSH is supported
 - Message Acknowledgments as part of another message are not supported. Only Aknowledgment messages with a MessageHeader containing service 'urn:oasis:names:tc:ebxml-msg:service' and action 'Acknowledgment' are supported
 - Only supports one Transport at the moment
+
+Starting hsqldb server:
+java -cp hsqldb.jar org.hsqldb.Server -database.0 file:mydb -dbname.0 ebms

@@ -122,6 +122,11 @@
 			<artifactId>sqljdbc4</artifactId>
 			<version>201004</version>
 		</dependency-->
+		<dependency>
+			<groupId>mysql</groupId>
+			<artifactId>mysql-connector-java</artifactId>
+			<version>5.1.18</version>
+		</dependency>
 	</dependencies>
 	<repositories>
 		<repository>
