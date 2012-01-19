@@ -307,7 +307,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 			simpleJdbcTemplate.update
 			(
 				"update cpa set" +
-				" cpa=?," +
+				" cpa=?" +
 				" where cpa_id=?",
 				XMLMessageBuilder.getInstance(CollaborationProtocolAgreement.class).handle(cpa),
 				cpa.getCpaid()

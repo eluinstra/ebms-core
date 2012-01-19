@@ -22,14 +22,12 @@ import javax.jws.WebParam;
 import javax.jws.WebResult;
 import javax.jws.WebService;
 
-import nl.clockwork.mule.ebms.model.cpp.cpa.CollaborationProtocolAgreement;
-
 @WebService(targetNamespace="http://www.clockwork.nl/cpa/adapter/1.0")
 public interface CPAAdapter
 {
 	@WebResult(name="Result")
 	@WebMethod(operationName="InsertCPA")
-	boolean insertCPA(@WebParam(name="CPA") CollaborationProtocolAgreement cpa, @WebParam(name="Overwrite") Boolean overwrite);
+	boolean insertCPA(@WebParam(name="CPA") /*CollaborationProtocolAgreement*/String cpa, @WebParam(name="Overwrite") Boolean overwrite);
 
 	@WebResult(name="Result")
 	@WebMethod(operationName="DeleteCPA")
@@ -41,6 +39,6 @@ public interface CPAAdapter
 
 	@WebResult(name="CPA")
 	@WebMethod(operationName="GetCPA")
-	CollaborationProtocolAgreement getCPA(@WebParam(name="CPAId") String cpaId);
+	/*CollaborationProtocolAgreement*/String getCPA(@WebParam(name="CPAId") String cpaId);
 
 }
