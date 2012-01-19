@@ -101,6 +101,7 @@ public class EbMSMessageUtils
 
 		messageHeader.setMessageData(new MessageData());
 		messageHeader.getMessageData().setMessageId(uuid + "@" + hostname);
+		messageHeader.getMessageData().setRefToMessageId(context.getRefToMessageId());
 		messageHeader.getMessageData().setTimestamp(DatatypeFactory.newInstance().newXMLGregorianCalendar(new GregorianCalendar()));
 
 		ReliableMessaging rm = CPAUtils.getReliableMessaging(cpa,messageHeader);
