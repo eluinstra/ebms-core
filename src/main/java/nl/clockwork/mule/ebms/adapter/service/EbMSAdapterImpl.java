@@ -49,7 +49,7 @@ public class EbMSAdapterImpl implements EbMSAdapter
 		catch (Exception e)
 		{
 			//throw new EbMSAdapterException(e);
-			logger.error("",e);
+			logger.warn("",e);
 			return null;
 		}
 	}
@@ -67,7 +67,7 @@ public class EbMSAdapterImpl implements EbMSAdapter
 		catch (DAOException e)
 		{
 			//throw new EbMSAdapterException(e);
-			logger.error("",e);
+			logger.warn("",e);
 			return new ArrayList<String>();
 		}
 	}
@@ -90,7 +90,7 @@ public class EbMSAdapterImpl implements EbMSAdapter
 		catch (Exception e)
 		{
 			//throw new EbMSAdapterException(e);
-			logger.error("",e);
+			logger.warn("",e);
 			return null;
 		}
 	}
@@ -106,7 +106,7 @@ public class EbMSAdapterImpl implements EbMSAdapter
 		catch (DAOException e)
 		{
 			//throw new EbMSAdapterException(e);
-			logger.error("",e);
+			logger.warn("",e);
 			return false;
 		}
 	}
@@ -122,7 +122,7 @@ public class EbMSAdapterImpl implements EbMSAdapter
 		catch (DAOException e)
 		{
 			//throw new EbMSAdapterException(e);
-			logger.error("",e);
+			logger.warn("",e);
 			return false;
 		}
 	}
