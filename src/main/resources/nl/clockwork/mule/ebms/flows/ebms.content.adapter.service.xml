@@ -41,7 +41,7 @@
 
 		<service name="ebMSAdapter">
 			<inbound>
-				<cxf:inbound-endpoint connector-ref="ebms.adapter.connector.cxf" protocolConnector="ebms.adapter.connector.http" address="http://${service.host}:${service.adapter.port}${service.adapter.url}/ebms" enableMuleSoapHeaders="false" synchronous="true">
+				<cxf:inbound-endpoint connector-ref="ebms.adapter.connector.cxf" protocolConnector="ebms.adapter.connector.http" address="http://${service.adapter.host}:${service.adapter.port}${service.adapter.url}/ebms" enableMuleSoapHeaders="false" synchronous="true">
 					<cxf:inInterceptors>
 						<spring:bean class="nl.clockwork.mule.ebms.cxf.LoggingInInterceptor" />
 					</cxf:inInterceptors>
@@ -64,7 +64,7 @@
 
 		<service name="cpaAdapter">
 			<inbound>
-				<cxf:inbound-endpoint connector-ref="ebms.adapter.connector.cxf" protocolConnector="ebms.adapter.connector.http" address="http://${service.host}:${service.adapter.port}${service.adapter.url}/cpa" enableMuleSoapHeaders="false" synchronous="true">
+				<cxf:inbound-endpoint connector-ref="ebms.adapter.connector.cxf" protocolConnector="ebms.adapter.connector.http" address="http://${service.adapter.host}:${service.adapter.port}${service.adapter.url}/cpa" enableMuleSoapHeaders="false" synchronous="true">
 					<cxf:inInterceptors>
 						<spring:bean class="nl.clockwork.mule.ebms.cxf.LoggingInInterceptor" />
 					</cxf:inInterceptors>
