@@ -157,7 +157,7 @@ public class EbMSSecSignatureOutInterceptor extends AbstractSoapInterceptor
 			CachedOutputStream cos = new CachedOutputStream();
 			message.setContent(OutputStream.class,cos);
 			message.setContent(XMLStreamWriter.class,StaxOutInterceptor.getXMLOutputFactory(message).createXMLStreamWriter(cos,getEncoding(message)));
-			message.getInterceptorChain().add(new XMLSecSignatureOutEndingInterceptor(ebMSDAO)); 
+			message.getInterceptorChain().add(new XMLSecSignatureOutEndingInterceptor()); 
 		}
 		catch (XMLStreamException e)
 		{
@@ -199,15 +199,13 @@ public class EbMSSecSignatureOutInterceptor extends AbstractSoapInterceptor
 		//private static final String TRANSFORM_XPATH = "not(ancestor-or-self::node()[@" + NAMESPACE_PREFIX_SOAP_ENVELOPE + ":actor=\"" + ACTOR_NEXT_MSH_URN + "\"] | ancestor-or-self::node()[@" + NAMESPACE_PREFIX_SOAP_ENVELOPE + ":actor=\"" + ACTOR_NEXT_MSH_SCHEMAS + "\"])";
 		private static final String TRANSFORM_XPATH = "not(ancestor-or-self::node()[@" + NAMESPACE_PREFIX_SOAP_ENVELOPE + ":actor=\"urn:oasis:names:tc:ebxml-msg:service:nextMSH\"]|ancestor-or-self::node()[@" + NAMESPACE_PREFIX_SOAP_ENVELOPE + ":actor=\"http://schemas.xmlsoap.org/soap/actor/next\"])";
 		private static final String NAMESPACE_PREFIX_DS = "ds";
-		private EbMSDAO ebMSDAO;
 	
-		public XMLSecSignatureOutEndingInterceptor(EbMSDAO ebMSDAO)
+		public XMLSecSignatureOutEndingInterceptor()
 		{
 			this(XMLSecSignatureOutEndingInterceptor.class.getName(),Phase.WRITE_ENDING);
 			addAfter(SoapOutInterceptor.SoapOutEndingInterceptor.class.getName());
 			//super(XMLsecSignatureOutEndingInterceptor.class.getName(),Phase.PRE_STREAM_ENDING);
 			//addBefore(StaxOutInterceptor.StaxOutEndingInterceptor.class.getName());
-			this.ebMSDAO = ebMSDAO;
 		}
 	
 		public XMLSecSignatureOutEndingInterceptor(String clazz, String phase)
