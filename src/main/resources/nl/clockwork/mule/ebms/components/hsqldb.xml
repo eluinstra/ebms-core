@@ -48,10 +48,4 @@
 		<constructor-arg value="update ebms_message set status=3, status_time=NOW() where id=#[map-payload:ID]" /> 
 	</bean>
 
-	<bean id="databaseProvider" class="nl.clockwork.mule.ebms.HSQLDatabaseProvider" init-method="init" destroy-method="close">
-		<constructor-arg ref="ebMSDataSource"/>
-		<constructor-arg value="/nl/clockwork/mule/ebms/tables.sql"/>
-		<constructor-arg value="/nl/clockwork/mule/ebms/constraints.sql"/>
-	</bean>
-	
 </beans>
