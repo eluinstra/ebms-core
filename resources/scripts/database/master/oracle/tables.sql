@@ -6,7 +6,7 @@ CREATE TABLE cpa
 
 CREATE TABLE ebms_message
 (
-	id								NUMBER					NOT NULL PRIMARY KEY,
+	id								NUMBER					PRIMARY KEY DEFAULT seq_ebms_message_id.nextval,
 --	parent_id					NUMBER					NULL REFERENCES ebms_message(id),
 	time_stamp				TIMESTAMP				NOT NULL,
 	cpa_id						VARCHAR(256)		NOT NULL,
@@ -40,15 +40,15 @@ CREATE TABLE ebms_attachment
 
 CREATE TABLE ebms_send_event
 (
---	id								NUMBER					NOT NULL PRIMARY KEY,
+--	id								NUMBER					PRIMARY KEY DEFAULT seq_ebms_send_event_id.nextval,
 	ebms_message_id		NUMBER					NOT NULL REFERENCES ebms_message(id),
 	time							TIMESTAMP				NOT NULL DEFAULT SYSDATE,
 	status						NUMBER					NOT NULL DEFAULT 0,
-	status_time				TIMESTAMP				NOT NULL DEFAULT SYSDATE,
+	status_time				TIMESTAMP				NOT NULL DEFAULT SYSDATE
 --	http_status_code	NUMBER				NULL
 );
 
-CREATE sequence SEQ_EBMS_MESSAGE_ID
+CREATE SEQUENCE seq_ebms_message_id
 	START WITH 1
-	INCREMENT by 1
+	INCREMENT BY 1
 	NOMAXVALUE;
