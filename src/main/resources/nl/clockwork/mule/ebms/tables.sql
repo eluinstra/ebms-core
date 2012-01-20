@@ -11,7 +11,7 @@ CREATE TABLE ebms_message
 	time_stamp				TIMESTAMP				NOT NULL,
 	cpa_id						VARCHAR(256)		NOT NULL,
 	conversation_id		VARCHAR(256)		NOT NULL,
-	sequence_nr				BIGINT					NULL,
+	sequence_nr				INT							NULL,
 	message_id				VARCHAR(256)		NOT NULL,
 	ref_to_message_id	VARCHAR(256)		NULL,
 	from_role					VARCHAR(256)		NULL,
