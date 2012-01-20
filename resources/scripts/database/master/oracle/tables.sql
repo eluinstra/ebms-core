@@ -1,3 +1,8 @@
+CREATE SEQUENCE seq_ebms_message_id
+	START WITH 1
+	INCREMENT BY 1
+	NOMAXVALUE;
+
 CREATE TABLE cpa
 (
 	cpa_id						VARCHAR(128)		NOT NULL UNIQUE,
@@ -47,8 +52,3 @@ CREATE TABLE ebms_send_event
 	status_time				TIMESTAMP				NOT NULL DEFAULT SYSDATE
 --	http_status_code	NUMBER				NULL
 );
-
-CREATE SEQUENCE seq_ebms_message_id
-	START WITH 1
-	INCREMENT BY 1
-	NOMAXVALUE;
