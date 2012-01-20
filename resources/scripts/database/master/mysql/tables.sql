@@ -6,12 +6,12 @@ CREATE TABLE cpa
 
 CREATE TABLE ebms_message
 (
-	id								INT							AUTO_INCREMENT PRIMARY KEY,
---	parent_id					INT							NULL FOREIGN,
+	id								INTEGER					AUTO_INCREMENT PRIMARY KEY,
+--	parent_id					INTEGER					NULL REFERENCES ebms_message(id),
 	time_stamp				TIMESTAMP				NOT NULL DEFAULT '0000-00-00 00:00:00',
 	cpa_id						VARCHAR(256)		NOT NULL,
 	conversation_id		VARCHAR(256)		NOT NULL,
-	sequence_nr				INT							NULL,
+	sequence_nr				INTEGER					NULL,
 	message_id				VARCHAR(256)		NOT NULL,
 	ref_to_message_id	VARCHAR(256)		NULL,
 	from_role					VARCHAR(256)		NULL,
@@ -26,27 +26,24 @@ CREATE TABLE ebms_message
 	message_order			TEXT						NULL,
 	ack_requested			TEXT						NULL,
 	content						TEXT						NULL,
-	status						INT							NULL,
+	status						INTEGER					NULL,
 	status_time				TIMESTAMP				NULL
---	FOREIGN KEY (parent_id) REFERENCES ebms_message(id)
 );
 
 CREATE TABLE ebms_attachment
 (
-	ebms_message_id		INT							NOT NULL,
+	ebms_message_id		INTEGER					NOT NULL REFERENCES ebms_message(id),
 	name							VARCHAR(128)		NOT NULL,
 	content_type			VARCHAR(64)			NOT NULL,
 	content						BLOB						NOT NULL,
-	FOREIGN KEY (ebms_message_id) REFERENCES ebms_message(id) ON DELETE CASCADE
 );
 
 CREATE TABLE ebms_send_event
 (
---	id								INT							AUTO_INCREMENT PRIMARY KEY,
-	ebms_message_id		INT							NOT NULL,
+--	id								INTEGER					AUTO_INCREMENT PRIMARY KEY,
+	ebms_message_id		INTEGER					NOT NULL REFERENCES ebms_message(id),
 	time							TIMESTAMP				NOT NULL DEFAULT '0000-00-00 00:00:00',
-	status						INT							NOT NULL DEFAULT 0,
-	status_time				TIMESTAMP				NOT NULL DEFAULT NOW(),
---	http_status_code	INT							NULL,
-	FOREIGN KEY (ebms_message_id) REFERENCES ebms_message(id) ON DELETE CASCADE
+	status						INTEGER					NOT NULL DEFAULT 0,
+	status_time				TIMESTAMP				NOT NULL DEFAULT NOW()
+--	http_status_code	INTEGER					NULL,
 );
