@@ -6,6 +6,7 @@
 - implement ackRequested (mode=never)
 - implement duplicateElimination (mode=never)
 X implement Signature (mode=off)
+- implement Encoding
 X add MySQL support
 - add Oracle support?
 - add PostgreSQL support?
