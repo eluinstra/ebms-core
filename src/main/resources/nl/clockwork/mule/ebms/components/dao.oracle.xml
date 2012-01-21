@@ -18,7 +18,7 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
 
-	<import resource="hsqldb.xml" />
+	<import resource="oracle.xml" />
 
 	<!-- EbMS DAO -->
 	<bean id="ebMSDAO" class="nl.clockwork.mule.ebms.dao.oracle.EbMSDAOImpl">
