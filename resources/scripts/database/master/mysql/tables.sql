@@ -2,7 +2,7 @@ CREATE TABLE cpa
 (
 	cpa_id						VARCHAR(128)		NOT NULL UNIQUE,
 	cpa								TEXT						NOT NULL
-);
+) ;
 
 CREATE TABLE ebms_message
 (
@@ -35,7 +35,7 @@ CREATE TABLE ebms_attachment
 	ebms_message_id		INTEGER					NOT NULL REFERENCES ebms_message(id),
 	name							VARCHAR(128)		NOT NULL,
 	content_type			VARCHAR(64)			NOT NULL,
-	content						BLOB						NOT NULL,
+	content						BLOB						NOT NULL
 );
 
 CREATE TABLE ebms_send_event
@@ -45,5 +45,5 @@ CREATE TABLE ebms_send_event
 	time							TIMESTAMP				NOT NULL DEFAULT '0000-00-00 00:00:00',
 	status						INTEGER					NOT NULL DEFAULT 0,
 	status_time				TIMESTAMP				NOT NULL DEFAULT NOW()
---	http_status_code	INTEGER					NULL,
+--	http_status_code	INTEGER					NULL
 );
