@@ -20,8 +20,21 @@ install mule-standalone-2.2.1
 build or download ebms-adapter-1.0.0.jar
 move the ebms-adapter-1.0.0.jar to <mule-standalone-2.2.1>/lib/user
 
-download and move c3p0-0.9.1.2.jar and hsqldb-2.1.0.jar to <mule-standalone-2.2.1>/lib/opt
+download and copy the following libraries to <mule-standalone-2.2.1>/lib/opt:
+- c3p0-0.9.1.2.jar
+- depending on the database used:
+	- hsqldb-2.1.0.jar
+	- mysql-connector-java-5.1.18.jar
+	- postgresql-9.1-901.jdbc3.jar or postgresql-9.1-901.jdbc4.jar
+	- jtds-1.2.4.jar or sqljdbc4-201004.jar
+	- ojdbc6-11.2.0.1.0.jar (and orai18n-11.2.0.1.0.jar)
 
+supported databases:
+- hsqldb 2.1.0
+- mysql (5.5) (innodb)
+- postgresql (9)
+- mssql
+- oracle (11)(lob > 4k fix (needed for older oracle versions) not implemented!)
 
 =================
 Configure Stubs =
