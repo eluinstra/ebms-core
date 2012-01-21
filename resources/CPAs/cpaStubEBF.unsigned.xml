@@ -84,18 +84,18 @@
          <tns:ebXMLSenderBinding tns:version="2.0">
             <tns:ReliableMessaging>
                <tns:Retries>8</tns:Retries>
-               <tns:RetryInterval>PT3H</tns:RetryInterval>
+               <tns:RetryInterval>PT10M</tns:RetryInterval>
                <tns:MessageOrderSemantics>NotGuaranteed</tns:MessageOrderSemantics>
             </tns:ReliableMessaging>
-            <tns:PersistDuration>P1D</tns:PersistDuration>
+            <tns:PersistDuration>PT3H</tns:PersistDuration>
          </tns:ebXMLSenderBinding>
          <tns:ebXMLReceiverBinding tns:version="2.0">
             <tns:ReliableMessaging>
                <tns:Retries>8</tns:Retries>
-               <tns:RetryInterval>PT3H</tns:RetryInterval>
+               <tns:RetryInterval>PT10M</tns:RetryInterval>
                <tns:MessageOrderSemantics>NotGuaranteed</tns:MessageOrderSemantics>
             </tns:ReliableMessaging>
-            <tns:PersistDuration>P1D</tns:PersistDuration>
+            <tns:PersistDuration>PT3H</tns:PersistDuration>
          </tns:ebXMLReceiverBinding>
       </tns:DocExchange>
    </tns:PartyInfo>
@@ -249,18 +249,18 @@ OcDNBvpKX2SpoHffgXmdrExQshpIDzzofex0y/Kg4mulDQUPwVuIZtbnlQ==
          <tns:ebXMLSenderBinding tns:version="2.0">
             <tns:ReliableMessaging>
                <tns:Retries>8</tns:Retries>
-               <tns:RetryInterval>PT3H</tns:RetryInterval>
+               <tns:RetryInterval>PT10M</tns:RetryInterval>
                <tns:MessageOrderSemantics>NotGuaranteed</tns:MessageOrderSemantics>
             </tns:ReliableMessaging>
-            <tns:PersistDuration>P1D</tns:PersistDuration>
+            <tns:PersistDuration>PT3H</tns:PersistDuration>
          </tns:ebXMLSenderBinding>
          <tns:ebXMLReceiverBinding tns:version="2.0">
             <tns:ReliableMessaging>
                <tns:Retries>8</tns:Retries>
-               <tns:RetryInterval>PT3H</tns:RetryInterval>
+               <tns:RetryInterval>PT10M</tns:RetryInterval>
                <tns:MessageOrderSemantics>NotGuaranteed</tns:MessageOrderSemantics>
             </tns:ReliableMessaging>
-            <tns:PersistDuration>P1D</tns:PersistDuration>
+            <tns:PersistDuration>PT3H</tns:PersistDuration>
          </tns:ebXMLReceiverBinding>
       </tns:DocExchange>
    </tns:PartyInfo>
