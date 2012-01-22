@@ -9,7 +9,7 @@ X implement Signature (mode=off)
 - implement Encoding
 X add MySQL support
 / add Oracle support?
-/ add PostgreSQL support?
+X add PostgreSQL support?
 X implement SOAP Client interface
 - implement JMS Client interface?
 X implement CPA SOAP Client interface
