@@ -33,7 +33,7 @@ supported databases:
 - hsqldb 2.1.0
 - mysql (5.5) (innodb)
 - postgresql (9)
-- mssql
+- mssql 2008 R2
 - oracle (11)(lob > 4k fix (needed for older oracle versions) not implemented!)
 
 =================
