@@ -37,7 +37,7 @@
 		<constructor-arg value="select distinct ebms_message_id from ebms_send_event where status=0 and time&lt;=GETDATE()" />
 	</bean>
 	<bean id="selectEventsForSending.ack" class="java.lang.String">
-		<constructor-arg value="update ebms_send_event set status=1, status_time=GETDATE() where ebms_message_id=#[map-payload:ebms_message_id] and status=0 and time&lt;=NOW()" /> 
+		<constructor-arg value="update ebms_send_event set status=1, status_time=GETDATE() where ebms_message_id=#[map-payload:ebms_message_id] and status=0 and time&lt;=GETDATE()" /> 
 		<!--constructor-arg value="delete from ebms_send_event where ebms_message_id=#[map-payload:ebms_message_id] and status=0 and time&lt;=GETDATE()" /--> 
 	</bean>
 
