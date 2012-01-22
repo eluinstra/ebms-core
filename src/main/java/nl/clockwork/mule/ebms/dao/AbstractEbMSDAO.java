@@ -19,6 +19,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -31,7 +32,6 @@ import nl.clockwork.common.dao.DAOException;
 import nl.clockwork.common.util.XMLMessageBuilder;
 import nl.clockwork.mule.ebms.Constants;
 import nl.clockwork.mule.ebms.Constants.EbMSMessageStatus;
-import nl.clockwork.mule.ebms.dao.EbMSDAO;
 import nl.clockwork.mule.ebms.model.EbMSAcknowledgment;
 import nl.clockwork.mule.ebms.model.EbMSBaseMessage;
 import nl.clockwork.mule.ebms.model.EbMSMessage;
@@ -178,8 +178,9 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 			);
 			//ps.setDate(1,new java.sql.Date(timestamp.getTime()));
 			//ps.setString(1,String.format(getDateFormat(),timestamp));
-			//ps.setTimestamp(1,new Timestamp(timestamp.getTime()));
-			ps.setObject(1,timestamp);
+			ps.setTimestamp(1,new Timestamp(timestamp.getTime()));
+			//ps.setObject(1,timestamp,Types.TIMESTAMP);
+			//ps.setObject(1,timestamp);
 			ps.setString(2,cpaId);
 			ps.setString(3,conversationId);
 			if (sequenceNr == null)
@@ -205,6 +206,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 				ps.setInt(18,status.id());
 			//ps.setString(19,status == null ? null : String.format(getDateFormat(),timestamp));
 			//ps.setTimestamp(19,status == null ? null : new Timestamp(timestamp.getTime()));
+			//ps.setObject(19,status == null ? null : timestamp,Types.TIMESTAMP);
 			//ps.setObject(19,status == null ? null : timestamp);
 			return ps;
 		}
