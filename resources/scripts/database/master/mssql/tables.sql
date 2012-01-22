@@ -42,8 +42,8 @@ CREATE TABLE ebms_send_event
 (
 --	id								INT							IDENTITY(1,1)	PRIMARY KEY,
 	ebms_message_id		INT							NOT NULL FOREIGN KEY REFERENCES ebms_message(id),
-	time							DATETIME				NOT NULL DEFAULT NOW(),
+	time							DATETIME				NOT NULL DEFAULT GETDATE(),
 	status						INT							NOT NULL DEFAULT 0,
-	status_time				DATETIME				NOT NULL DEFAULT NOW()
+	status_time				DATETIME				NOT NULL DEFAULT GETDATE()
 --	http_status_code	INT							NULL
 );
