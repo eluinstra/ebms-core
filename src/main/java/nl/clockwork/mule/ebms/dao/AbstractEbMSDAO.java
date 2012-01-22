@@ -204,6 +204,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 			else
 				ps.setInt(18,status.id());
 			//ps.setString(19,status == null ? null : String.format(getDateFormat(),timestamp));
+			//ps.setTimestamp(19,status == null ? null : new Timestamp(timestamp.getTime()));
 			//ps.setObject(19,status == null ? null : timestamp);
 			return ps;
 		}
@@ -516,7 +517,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 									"content_type," +
 									"content" +
 									") values (?,?,?,?)",
-									keyHolder.getKey().intValue(),
+									keyHolder.getKey().longValue(),
 									attachment.getName() == null ? Constants.DEFAULT_FILENAME : attachment.getName(),
 									attachment.getContentType().split(";")[0].trim(),
 									IOUtils.toByteArray(attachment.getInputStream())
@@ -526,21 +527,24 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 							Date sendTime = (Date)timestamp.clone();
 							CollaborationProtocolAgreement cpa = getCPA(message.getMessageHeader().getCPAId());
 							ReliableMessaging rm = CPAUtils.getReliableMessaging(cpa,message.getMessageHeader());
+							List<Object[]> sendEvents = new ArrayList<Object[]>();
 							if (rm != null)
+							{
 								for (int i = 0; i < rm.getRetries().intValue(); i++)
 								{
-									simpleJdbcTemplate.update
-									(
-										"insert into ebms_send_event (" +
-										"ebms_message_id," +
-										"time" +
-										") values (?,?)",
-										keyHolder.getKey().intValue(),
-										//String.format(getDateFormat(),sendTime)
-										sendTime
-									);
+									sendEvents.add(new Object[]{keyHolder.getKey().longValue(),sendTime.clone()});
+									//retries.add(new Object[]{keyHolder.getKey().longValue(),String.format(getDateFormat(),sendTime)});
 									rm.getRetryInterval().addTo(sendTime);
 								}
+								simpleJdbcTemplate.batchUpdate
+								(
+									"insert into ebms_send_event (" +
+									"ebms_message_id," +
+									"time" +
+									") values (?,?)",
+									sendEvents
+								);
+							}
 
 							return keyHolder.getKey().longValue();
 						}
@@ -610,7 +614,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 									"content_type," +
 									"content" +
 									") values (?,?,?,?)",
-									keyHolder.getKey().intValue(),
+									keyHolder.getKey().longValue(),
 									attachment.getName() == null ? Constants.DEFAULT_FILENAME : attachment.getName(),
 									attachment.getContentType().split(";")[0].trim(),
 									IOUtils.toByteArray(attachment.getInputStream())
@@ -685,7 +689,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 									"content_type," +
 									"content" +
 									") values (?,?,?,?)",
-									keyHolder.getKey().intValue(),
+									keyHolder.getKey().longValue(),
 									attachment.getName() == null ? Constants.DEFAULT_FILENAME : attachment.getName(),
 									attachment.getContentType().split(";")[0].trim(),
 									IOUtils.toByteArray(attachment.getInputStream())
@@ -715,7 +719,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 								"ebms_message_id," +
 								"time" +
 								") values (?,?)",
-								keyHolder.getKey().intValue(),
+								keyHolder.getKey().longValue(),
 								//String.format(getDateFormat(),timestamp)
 								timestamp
 							);
@@ -788,7 +792,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 									"content_type," +
 									"content" +
 									") values (?,?,?,?)",
-									keyHolder.getKey().intValue(),
+									keyHolder.getKey().longValue(),
 									attachment.getName() == null ? Constants.DEFAULT_FILENAME : attachment.getName(),
 									attachment.getContentType().split(";")[0].trim(),
 									IOUtils.toByteArray(attachment.getInputStream())
@@ -818,7 +822,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 								"ebms_message_id," +
 								"time" +
 								") values (?,?)",
-								keyHolder.getKey().intValue(),
+								keyHolder.getKey().longValue(),
 								//String.format(getDateFormat(),timestamp)
 								timestamp
 							);
@@ -884,7 +888,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 								id
 							);
 
-							return null;
+							return keyHolder.getKey().longValue();
 						}
 						catch (Exception e)
 						{
@@ -945,7 +949,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 								id
 							);
 
-							return null;
+							return keyHolder.getKey().longValue();
 						}
 						catch (Exception e)
 						{
