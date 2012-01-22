@@ -113,6 +113,16 @@
 			<version>2.1.0</version>
 		</dependency>
 		<!--dependency>
+			<groupId>mysql</groupId>
+			<artifactId>mysql-connector-java</artifactId>
+			<version>5.1.18</version>
+		</dependency-->
+		<!--dependency>
+			<groupId>postgresql</groupId>
+			<artifactId>postgresql</artifactId>
+			<version>9.1-901.jdbc3</version>
+		</dependency-->
+		<!--dependency>
 			<groupId>net.sourceforge.jtds</groupId>
 			<artifactId>jtds</artifactId>
 			<version>1.2.4</version>
@@ -122,11 +132,6 @@
 			<artifactId>sqljdbc4</artifactId>
 			<version>201004</version>
 		</dependency-->
-		<dependency>
-			<groupId>mysql</groupId>
-			<artifactId>mysql-connector-java</artifactId>
-			<version>5.1.18</version>
-		</dependency>
 		<!--dependency>
 			<groupId>oracle</groupId>
 			<artifactId>ojdbc6</artifactId>
@@ -136,16 +141,6 @@
 			<groupId>oracle</groupId>
 			<artifactId>orai18n</artifactId>
 			<version>11.2.0.1.0</version>
-		</dependency-->
-		<!--dependency>
-			<groupId>postgresql</groupId>
-			<artifactId>postgresql</artifactId>
-			<version>9.1-901.jdbc3</version>
-		</dependency-->
-		<!--dependency>
-			<groupId>postgresql</groupId>
-			<artifactId>postgresql</artifactId>
-			<version>9.1-901.jdbc4</version>
 		</dependency-->
 	</dependencies>
 	<repositories>
