@@ -34,12 +34,10 @@
 	</bean>
 
 	<bean id="selectEventsForSending" class="java.lang.String">
-		<constructor-arg value="select distinct ebms_message_id from ebms_send_event where status=0 and time&lt;=SYSDATE" />
-		<!--constructor-arg value="select ebms_message_id, max(time) as time from ebms_send_event where status=0 and time&lt;=SYSDATE group by ebms_message_id" /-->
+		<constructor-arg value="select ebms_message_id, max(time) as time from ebms_send_event where status=0 and time&lt;=SYSDATE group by ebms_message_id" />
 	</bean>
 	<bean id="selectEventsForSending.ack" class="java.lang.String">
-		<constructor-arg value="update ebms_send_event set status=1, status_time=SYSDATE where ebms_message_id=#[map-payload:ebms_message_id] and status=0 and time&lt;=SYSDATE" /> 
-		<!--constructor-arg value="update ebms_send_event set status=1, status_time=SYSDATE where ebms_message_id=#[map-payload:ebms_message_id] and time=TO_TIMESTAMP(#[map-payload:time],YYYY-MM-DD HH24:MI:SS.FF)" /--> 
+		<constructor-arg value="update ebms_send_event set status=1, status_time=SYSDATE where ebms_message_id=#[map-payload:ebms_message_id] and time=TO_TIMESTAMP(#[map-payload:time])" /> 
 	</bean>
 
 	<bean id="selectEbMSMessageForProcessing" class="java.lang.String">
