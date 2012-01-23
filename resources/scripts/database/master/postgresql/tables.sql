@@ -43,7 +43,6 @@ CREATE TABLE ebms_attachment
 
 CREATE TABLE ebms_send_event
 (
---	id								INTEGER					PRIMARY KEY DEFAULT nextval('seq_ebms_send_event_id'),
 	ebms_message_id		INTEGER					NOT NULL REFERENCES ebms_message(id),
 	time							TIMESTAMP				NOT NULL DEFAULT NOW(),
 	status						INTEGER					NOT NULL DEFAULT 0,

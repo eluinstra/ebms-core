@@ -40,7 +40,6 @@ CREATE TABLE ebms_attachment
 
 CREATE TABLE ebms_send_event
 (
---	id								INTEGER					AUTO_INCREMENT PRIMARY KEY,
 	ebms_message_id		INTEGER					NOT NULL REFERENCES ebms_message(id),
 	time							TIMESTAMP				NOT NULL DEFAULT '0000-00-00 00:00:00',
 	status						INTEGER					NOT NULL DEFAULT 0,
