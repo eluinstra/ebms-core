@@ -472,6 +472,26 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 		}
 	}
 
+	protected PreparedStatementCreator getEbMSMessagePreparedStatement(Date timestamp, String cpaId, String conversationId, Long sequenceNr, String messageId, String refToMessageId, String fromRole, String toRole, String service, String action, String messageHeader, String syncReply, String messageOrder, String ackRequested, String Manifest)
+	{
+		return new EbMSMessagePreparedStatement(timestamp,cpaId,conversationId,sequenceNr,messageId,refToMessageId,fromRole,toRole,service,action,messageHeader,syncReply,messageOrder,ackRequested,Manifest);
+	}
+
+	protected PreparedStatementCreator getEbMSMessagePreparedStatement(Date timestamp, String cpaId, String conversationId, Long sequenceNr, String messageId, String refToMessageId, String fromRole, String toRole, String service, String action, byte[] original, String signature, String messageHeader, String syncReply, String messageOrder, String ackRequested, String Manifest, EbMSMessageStatus status)
+	{
+		return new EbMSMessagePreparedStatement(timestamp,cpaId,conversationId,sequenceNr,messageId,refToMessageId,fromRole,toRole,service,action,original,signature,messageHeader,syncReply,messageOrder,ackRequested,Manifest,status);
+	}
+
+	protected PreparedStatementCreator getEbMSMessagePreparedStatement(Date timestamp, String cpaId, String conversationId, String messageId, String refToMessageId, String fromRole, String toRole, String service, String action, String messageHeader, String content)
+	{
+		return new EbMSMessagePreparedStatement(timestamp,cpaId,conversationId,messageId,refToMessageId,fromRole,toRole,service,action,messageHeader,content);
+	}
+
+	protected PreparedStatementCreator getEbMSMessagePreparedStatement(Date timestamp, String cpaId, String conversationId, String messageId, String refToMessageId, String fromRole, String toRole, String service, String action, String messageHeader, String content, EbMSMessageStatus status)
+	{
+		return new EbMSMessagePreparedStatement(timestamp,cpaId,conversationId,messageId,refToMessageId,fromRole,toRole,service,action,messageHeader,content,status);
+	}
+
 	@Override
 	public void insertMessage(final EbMSMessage message) throws DAOException
 	{
@@ -489,7 +509,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 							Date timestamp = new Date();
 							KeyHolder keyHolder = new GeneratedKeyHolder();
 							jdbcTemplate.update(
-									new EbMSMessagePreparedStatement(
+									getEbMSMessagePreparedStatement(
 											timestamp,
 											message.getMessageHeader().getCPAId(),
 											message.getMessageHeader().getConversationId(),
@@ -583,7 +603,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 							Date timestamp = new Date();
 							KeyHolder keyHolder = new GeneratedKeyHolder();
 							jdbcTemplate.update(
-									new EbMSMessagePreparedStatement(
+									getEbMSMessagePreparedStatement(
 											timestamp,
 											message.getMessageHeader().getCPAId(),
 											message.getMessageHeader().getConversationId(),
@@ -658,7 +678,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 							Date timestamp = new Date();
 							KeyHolder keyHolder = new GeneratedKeyHolder();
 							jdbcTemplate.update(
-									new EbMSMessagePreparedStatement(
+									getEbMSMessagePreparedStatement(
 											timestamp,
 											message.getMessageHeader().getCPAId(),
 											message.getMessageHeader().getConversationId(),
@@ -699,7 +719,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 							}
 							
 							jdbcTemplate.update(
-									new EbMSMessagePreparedStatement(
+									getEbMSMessagePreparedStatement(
 											timestamp,
 											messageError.getMessageHeader().getCPAId(),
 											messageError.getMessageHeader().getConversationId(),
@@ -761,7 +781,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 							Date timestamp = new Date();
 							KeyHolder keyHolder = new GeneratedKeyHolder();
 							jdbcTemplate.update(
-									new EbMSMessagePreparedStatement(
+									getEbMSMessagePreparedStatement(
 											timestamp,
 											message.getMessageHeader().getCPAId(),
 											message.getMessageHeader().getConversationId(),
@@ -802,7 +822,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 							}
 							
 							jdbcTemplate.update(
-									new EbMSMessagePreparedStatement(
+									getEbMSMessagePreparedStatement(
 											timestamp,
 											acknowledgment.getMessageHeader().getCPAId(),
 											acknowledgment.getMessageHeader().getConversationId(),
@@ -864,7 +884,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 							Date timestamp = new Date();
 							KeyHolder keyHolder = new GeneratedKeyHolder();
 							jdbcTemplate.update(
-									new EbMSMessagePreparedStatement(
+									getEbMSMessagePreparedStatement(
 											timestamp,
 											messageError.getMessageHeader().getCPAId(),
 											messageError.getMessageHeader().getConversationId(),
@@ -927,7 +947,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 							Date timestamp = new Date();
 							KeyHolder keyHolder = new GeneratedKeyHolder();
 							jdbcTemplate.update(
-									new EbMSMessagePreparedStatement(
+									getEbMSMessagePreparedStatement(
 											timestamp,
 											acknowledgment.getMessageHeader().getCPAId(),
 											acknowledgment.getMessageHeader().getConversationId(),
