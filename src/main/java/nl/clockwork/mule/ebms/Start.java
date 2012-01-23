@@ -24,8 +24,10 @@ public class Start
 {
 	public static void main(String[] args) throws MuleException
 	{
+		System.getProperties().setProperty("ebms.protocol","http");
+		System.getProperties().setProperty("ebms.database","hsqldb");
 		DefaultMuleContextFactory muleContextFactory = new DefaultMuleContextFactory();
-		SpringXmlConfigurationBuilder configBuilder = new SpringXmlConfigurationBuilder(args.length == 0 ? "main.xml" : args[0]);
+		SpringXmlConfigurationBuilder configBuilder = new SpringXmlConfigurationBuilder(args.length == 0 ? "classpath:nl/clockwork/mule/ebms/adapter/service/main.xml" : args[0]);
 		MuleContext muleContext = muleContextFactory.createMuleContext(configBuilder);
 		muleContext.start();
 	}

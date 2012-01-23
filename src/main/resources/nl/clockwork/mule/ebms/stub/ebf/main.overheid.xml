@@ -59,7 +59,6 @@
 		<!--import resource="classpath:nl/clockwork/mule/ebms/components/connector.https.xml" /-->
 		<import resource="classpath:nl/clockwork/mule/ebms/components/connector.xml" />
 
-
 		<import resource="classpath:nl/clockwork/mule/ebms/components/datasource.xml" />
 		<import resource="classpath:nl/clockwork/mule/ebms/components/dao.hsqldb.xml" />
 		<!--import resource="classpath:nl/clockwork/mule/ebms/components/dao.mysql.xml" /-->
