@@ -21,7 +21,7 @@ public class Constants
 {
   public static enum EbMSMessageStatus
   {
-		UN_AUTHORIZED(0,MessageStatusType.UN_AUTHORIZED), NOT_RECOGNIZED(1,MessageStatusType.NOT_RECOGNIZED), RECEIVED(2,MessageStatusType.RECEIVED), PROCESSED(3,MessageStatusType.PROCESSED), FORWARDED(4,MessageStatusType.FORWARDED)/*, STORED(10), SENT(11), FAILED(12), ACKNOWLEDGED(13), EXPIRED(14)*/;
+		UN_AUTHORIZED(0,MessageStatusType.UN_AUTHORIZED), NOT_RECOGNIZED(1,MessageStatusType.NOT_RECOGNIZED), RECEIVED(2,MessageStatusType.RECEIVED), PROCESSED(3,MessageStatusType.PROCESSED), FORWARDED(4,MessageStatusType.FORWARDED)/*, DELIVERED(10)*/;
 
 		private final int id;
 		private final MessageStatusType statusCode;
