@@ -24,11 +24,11 @@ import org.mule.api.MuleMessage;
 import org.mule.api.transformer.TransformerException;
 import org.mule.transformer.AbstractMessageAwareTransformer;
 
-public class EbMSMessageIdToEbMSMessageContent extends AbstractMessageAwareTransformer
+public class EbMSMessageIdPropertyToEbMSMessageContent extends AbstractMessageAwareTransformer
 {
 	private EbMSDAO ebMSDAO;
 
-	public EbMSMessageIdToEbMSMessageContent()
+	public EbMSMessageIdPropertyToEbMSMessageContent()
 	{
 		//registerSourceType(EbMSMessage.class);
 	}

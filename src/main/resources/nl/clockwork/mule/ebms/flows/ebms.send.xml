@@ -52,7 +52,7 @@
 			<outbound>
 				<pass-through-router>
 					<vm:outbound-endpoint path="ebms.message.route.in">
-						<custom-transformer class="nl.clockwork.mule.ebms.transformer.EbMSMessageIdToEbMSMessage">
+						<custom-transformer class="nl.clockwork.mule.ebms.transformer.EbMSMessageIdPropertyToEbMSMessage">
 							<spring:property name="ebMSDAO" ref="ebMSDAO" />
 						</custom-transformer>
 					</vm:outbound-endpoint>

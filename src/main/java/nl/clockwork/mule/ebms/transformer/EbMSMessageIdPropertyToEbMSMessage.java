@@ -24,12 +24,12 @@ import org.mule.api.MuleMessage;
 import org.mule.api.transformer.TransformerException;
 import org.mule.transformer.AbstractMessageAwareTransformer;
 
-public class EbMSMessageIdToEbMSMessage extends AbstractMessageAwareTransformer
+public class EbMSMessageIdPropertyToEbMSMessage extends AbstractMessageAwareTransformer
 {
   protected transient Log logger = LogFactory.getLog(getClass());
   private EbMSDAO ebMSDAO;
 
-  public EbMSMessageIdToEbMSMessage()
+  public EbMSMessageIdPropertyToEbMSMessage()
 	{
 		//registerSourceType(Object.class);
 	}
