@@ -8,7 +8,7 @@
 X implement Signature (mode=off)
 - implement Encoding
 X add MySQL support
-/ add Oracle support?
+X add Oracle support?
 X add PostgreSQL support?
 X implement SOAP Client interface
 - implement JMS Client interface?
@@ -19,6 +19,8 @@ X optimize DAO's
 
 3.x.x:
 - update adapter to Mule 3
+- support additional protocols besides http(s), like mail, file, etc?
+- store http response status code with ebms send event
 
 considerations:
 - change wsdl definition to one operation (containing all ebxml elements) and 'parse' message in Mule?
