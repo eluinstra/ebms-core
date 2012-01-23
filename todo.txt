@@ -6,10 +6,11 @@
 - implement ackRequested (mode=never)
 - implement duplicateElimination (mode=never)
 X implement Signature (mode=off)
-- implement Encoding
+- implement Encoding?
 X add MySQL support
-X add Oracle support?
-X add PostgreSQL support?
+X add Oracle support
+X add PostgreSQL support
+- add database constraints
 X implement SOAP Client interface
 - implement JMS Client interface?
 X implement CPA SOAP Client interface
