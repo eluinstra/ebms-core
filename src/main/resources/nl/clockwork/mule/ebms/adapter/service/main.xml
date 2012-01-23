@@ -55,18 +55,19 @@
 
 		<import resource="classpath:nl/clockwork/mule/ebms/components/constants.xml" />
 
-		<!--import resource="classpath:nl/clockwork/mule/ebms/components/connector.${ebms.protocol}.xml" /-->
 		<import resource="classpath:nl/clockwork/mule/ebms/components/connector.http.xml" />
 		<!--import resource="classpath:nl/clockwork/mule/ebms/components/connector.https.xml" /-->
 		<import resource="classpath:nl/clockwork/mule/ebms/components/connector.xml" />
 
 		<import resource="classpath:nl/clockwork/mule/ebms/components/datasource.xml" />
-		<!--import resource="classpath:nl/clockwork/mule/ebms/components/dao.${ebms.database}.xml" /-->
 		<import resource="classpath:nl/clockwork/mule/ebms/components/dao.hsqldb.xml" />
 		<!--import resource="classpath:nl/clockwork/mule/ebms/components/dao.mysql.xml" /-->
 		<!--import resource="classpath:nl/clockwork/mule/ebms/components/dao.postgresql.xml" /-->
 		<!--import resource="classpath:nl/clockwork/mule/ebms/components/dao.mssql.xml" /-->
 		<!--import resource="classpath:nl/clockwork/mule/ebms/components/dao.oracle.xml" /-->
+
+		<import resource="classpath:nl/clockwork/mule/ebms/flows/file.cpa.xml" />
+		<!--import resource="classpath:nl/clockwork/mule/ebms/flows/file.sql.xml" /-->
 
 		<import resource="classpath:nl/clockwork/mule/ebms/flows/ebms.receive.xml" />
 		<import resource="classpath:nl/clockwork/mule/ebms/flows/ebms.send.xml" />
