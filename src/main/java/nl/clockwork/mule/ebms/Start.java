@@ -24,10 +24,20 @@ public class Start
 {
 	public static void main(String[] args) throws MuleException
 	{
-		System.getProperties().setProperty("ebms.protocol","http");
-		System.getProperties().setProperty("ebms.database","hsqldb");
+		String protocol = System.getProperty("ebms.protocol");
+		if (protocol == null || (!"http".equals(protocol) && !"https".equals(protocol)))
+		{
+			System.getProperties().setProperty("ebms.protocol","http");
+			System.out.println("No valid value set for property ebms.protocol. Using default value: http");
+		}
+		String database = System.getProperty("ebms.database");
+		if (database == null || (!"hsqldb".equals(database) && !"mysql".equals(database) && !"postgresql".equals(database) && !"mssql".equals(database) && !"oracle".equals(database)))
+		{
+			System.getProperties().setProperty("ebms.database","hsqldb");
+			System.out.println("No valid value set for property ebms.database. Using default value: hsqldb");
+		}
 		DefaultMuleContextFactory muleContextFactory = new DefaultMuleContextFactory();
-		SpringXmlConfigurationBuilder configBuilder = new SpringXmlConfigurationBuilder(args.length == 0 ? "classpath:nl/clockwork/mule/ebms/adapter/service/main.xml" : args[0]);
+		SpringXmlConfigurationBuilder configBuilder = new SpringXmlConfigurationBuilder(args.length == 0 ? "main.xml" : args[0]);
 		MuleContext muleContext = muleContextFactory.createMuleContext(configBuilder);
 		muleContext.start();
 	}
