@@ -17,6 +17,7 @@ X implement CPA SOAP Client interface
 - implement dynamic cxf outbound endpoints (request url has to be resolved from CPA)?
 X optimize DAO's
 - configure DAO caching?
+- store duplicate messages???
 
 3.x.x:
 - update adapter to Mule 3
