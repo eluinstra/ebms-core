@@ -15,6 +15,8 @@
  ******************************************************************************/
 package nl.clockwork.mule.ebms;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.config.spring.SpringXmlConfigurationBuilder;
@@ -22,19 +24,21 @@ import org.mule.context.DefaultMuleContextFactory;
 
 public class Start
 {
+	protected static Log logger = LogFactory.getLog(Start.class);
+	
 	public static void main(String[] args) throws MuleException
 	{
 		String protocol = System.getProperty("ebms.protocol");
 		if (protocol == null || (!"http".equals(protocol) && !"https".equals(protocol)))
 		{
 			System.getProperties().setProperty("ebms.protocol","http");
-			System.out.println("No valid value set for property ebms.protocol. Using default value: http");
+			logger.info("No valid value set for property ebms.protocol. Using default value: http");
 		}
 		String database = System.getProperty("ebms.database");
 		if (database == null || (!"hsqldb".equals(database) && !"mysql".equals(database) && !"postgresql".equals(database) && !"mssql".equals(database) && !"oracle".equals(database)))
 		{
 			System.getProperties().setProperty("ebms.database","hsqldb");
-			System.out.println("No valid value set for property ebms.database. Using default value: hsqldb");
+			logger.info("No valid value set for property ebms.database. Using default value: hsqldb");
 		}
 		DefaultMuleContextFactory muleContextFactory = new DefaultMuleContextFactory();
 		SpringXmlConfigurationBuilder configBuilder = new SpringXmlConfigurationBuilder(args.length == 0 ? "main.xml" : args[0]);
