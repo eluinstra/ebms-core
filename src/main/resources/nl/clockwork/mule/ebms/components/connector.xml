@@ -47,6 +47,7 @@
 		<jdbc:query key="addEbMSMessageSendEvent" value-ref="addEbMSMessageSendEvent" />
 		<jdbc:query key="selectEventsForSending" value-ref="selectEventsForSending" />
 		<jdbc:query key="selectEventsForSending.ack" value-ref="selectEventsForSending.ack" />
+		<jdbc:query key="deleteExpiredEvents" value-ref="deleteExpiredEvents" />
 		<jdbc:query key="selectEbMSMessageForProcessing" value-ref="selectEbMSMessageForProcessing" /> 
 		<jdbc:query key="selectEbMSMessageForProcessing.ack" value-ref="selectEbMSMessageForProcessing.ack" /> 
 	</jdbc:connector>

@@ -47,16 +47,21 @@
 							</spring:map>
 						</spring:property>
 					</custom-transformer>
+					<!--jdbc:transaction action="ALWAYS_BEGIN"/-->
 				</jdbc:inbound-endpoint>
 			</inbound>
 			<outbound>
-				<pass-through-router>
+				<chaining-router>
+					<!-- FIXME -->
+					<jdbc:outbound-endpoint connector-ref="connector.jdbc.ebms" queryKey="deleteExpiredEvents">
+						<!--jdbc:transaction action="ALWAYS_JOIN"/-->
+					</jdbc:outbound-endpoint>
 					<vm:outbound-endpoint path="ebms.message.route.in">
 						<custom-transformer class="nl.clockwork.mule.ebms.transformer.EbMSMessageIdPropertyToEbMSMessage">
 							<spring:property name="ebMSDAO" ref="ebMSDAO" />
 						</custom-transformer>
 					</vm:outbound-endpoint>
-				</pass-through-router>
+				</chaining-router>
 			</outbound>
 		</service>
 

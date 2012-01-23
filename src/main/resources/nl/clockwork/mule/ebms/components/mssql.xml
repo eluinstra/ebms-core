@@ -39,6 +39,9 @@
 	<bean id="selectEventsForSending.ack" class="java.lang.String">
 		<constructor-arg value="update ebms_send_event set status=1, status_time=GETDATE() where ebms_message_id=#[map-payload:ebms_message_id] and time=#[map-payload:time];" /> 
 	</bean>
+	<bean id="deleteExpiredEvents" class="java.lang.String">
+		<constructor-arg value="delete from ebms_send_event where ebms_message_id=#[map-payload:ebms_message_id] and time&lt;#[map-payload:time] and status=0" />
+	</bean>
 
 	<bean id="selectEbMSMessageForProcessing" class="java.lang.String">
 		<constructor-arg value="select id from ebms_message where service!='urn:oasis:names:tc:ebxml-msg:service' and status=2" />
