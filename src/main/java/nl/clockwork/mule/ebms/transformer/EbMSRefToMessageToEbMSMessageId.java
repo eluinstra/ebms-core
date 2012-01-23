@@ -13,12 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  ******************************************************************************/
-package nl.clockwork.mule.ebms.enricher;
+package nl.clockwork.mule.ebms.transformer;
 
 import nl.clockwork.common.dao.DAOException;
-import nl.clockwork.mule.ebms.Constants;
 import nl.clockwork.mule.ebms.dao.EbMSDAO;
-import nl.clockwork.mule.ebms.model.EbMSBaseMessage;
+import nl.clockwork.mule.ebms.model.EbMSMessage;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -26,16 +25,16 @@ import org.mule.api.MuleMessage;
 import org.mule.api.transformer.TransformerException;
 import org.mule.transformer.AbstractMessageAwareTransformer;
 
-public class EbMSBaseMessageToEbMSMessageIdProperty extends AbstractMessageAwareTransformer
+public class EbMSRefToMessageToEbMSMessageId extends AbstractMessageAwareTransformer
 {
   protected transient Log logger = LogFactory.getLog(getClass());
   private EbMSDAO ebMSDAO;
 
-	public EbMSBaseMessageToEbMSMessageIdProperty()
+	public EbMSRefToMessageToEbMSMessageId()
 	{
-		registerSourceType(EbMSBaseMessage.class);
+		registerSourceType(EbMSMessage.class);
 		//FIXME
-		//setReturnClass(EbMSBaseMessage.class);
+		//setReturnClass(EbMSMessage.class);
 	}
 	
 	@Override
@@ -43,9 +42,9 @@ public class EbMSBaseMessageToEbMSMessageIdProperty extends AbstractMessageAware
 	{
 		try
 		{
-			EbMSBaseMessage msg = (EbMSBaseMessage)message.getPayload();
+			EbMSMessage msg = (EbMSMessage)message.getPayload();
 			long id = ebMSDAO.getIdByMessageId(msg.getMessageHeader().getMessageData().getRefToMessageId());
-			message.setProperty(Constants.EBMS_MESSAGE_ID,id);
+			message.setPayload(id);
 			return message;
 		}
 		catch (DAOException e)

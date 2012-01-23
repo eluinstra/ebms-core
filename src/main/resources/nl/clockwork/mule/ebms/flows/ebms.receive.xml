@@ -127,7 +127,6 @@
 			<outbound>
 				<pass-through-router>
 					<vm:outbound-endpoint path="ebms.response.resend.in" />
-					<!--vm:outbound-endpoint path="ebms.response.get.in" /-->
 				</pass-through-router>
 			</outbound>
 		</service>
@@ -135,21 +134,25 @@
 		<service name="ebms.response.resend">
 			<inbound>
 				<vm:inbound-endpoint path="ebms.response.resend.in">
-					<custom-transformer class="nl.clockwork.mule.ebms.enricher.EbMSRefToMessageToEbMSMessageIdProperty">
-					<!--custom-transformer class="nl.clockwork.mule.ebms.enricher.EbMSResponseToMessageToEbMSMessageIdProperty"-->
+					<custom-transformer class="nl.clockwork.mule.ebms.transformer.EbMSRefToMessageToEbMSMessageId">
 						<spring:property name="ebMSDAO" ref="ebMSDAO"/>
 					</custom-transformer>
 				</vm:inbound-endpoint>
 			</inbound>
-			<outbound>
-				<chaining-router>
+			<outbound matchAll="true">
+				<filtering-router>
 					<jdbc:outbound-endpoint connector-ref="connector.jdbc.ebms" queryKey="addEbMSMessageSendEvent">
-						<custom-transformer class="nl.clockwork.mule.ebms.transformer.EbMSMessageIdPropertyToMap" />
+						<custom-transformer class="nl.clockwork.mule.ebms.transformer.EbMSMessageIdToMap" />
 					</jdbc:outbound-endpoint>
+					<not-filter>
+						<payload-type-filter expectedType="org.mule.transport.NullPayload"/>
+					</not-filter>
+				</filtering-router>
+				<filtering-router>
 					<vm:outbound-endpoint path="ebms.message.receive.async.reply">
 						<custom-transformer class="nl.clockwork.mule.common.transformer.NullPayloadTransformer" />
 					</vm:outbound-endpoint>
-				</chaining-router>
+				</filtering-router>
 			</outbound>
 		</service>
 		
@@ -308,10 +311,6 @@
 		<service name="ebms.messageError.receive">
 			<inbound>
 				<vm:inbound-endpoint path="ebms.messageError.receive.in">
-					<custom-transformer class="nl.clockwork.mule.ebms.enricher.EbMSRefToMessageToEbMSMessageIdProperty"/>
-					<!--custom-transformer class="nl.clockwork.mule.ebms.enricher.EbMSBaseMessageToEbMSMessageIdProperty">
-						<spring:property name="ebMSDAO" ref="ebMSDAO"/>
-					</custom-transformer-->
 					<message-properties-transformer>
 						<add-message-property key="EBMS.EBMS_MESSAGE_STATUS" value="nl.clockwork.mule.ebms.Constants.EbMSMessageStatus.RECEIVED"/>
 					</message-properties-transformer>
@@ -360,10 +359,6 @@
 		<service name="ebms.acknowledgment.receive">
 			<inbound>
 				<vm:inbound-endpoint path="ebms.acknowledgment.receive.in">
-					<custom-transformer class="nl.clockwork.mule.ebms.enricher.EbMSRefToMessageToEbMSMessageIdProperty"/>
-					<!--custom-transformer class="nl.clockwork.mule.ebms.enricher.EbMSBaseMessageToEbMSMessageIdProperty">
-						<spring:property name="ebMSDAO" ref="ebMSDAO"/>
-					</custom-transformer-->
 					<message-properties-transformer>
 						<add-message-property key="EBMS.EBMS_MESSAGE_STATUS" value="nl.clockwork.mule.ebms.Constants.EbMSMessageStatus.RECEIVED"/>
 					</message-properties-transformer>

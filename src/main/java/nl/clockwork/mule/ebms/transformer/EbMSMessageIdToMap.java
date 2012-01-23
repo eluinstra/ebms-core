@@ -13,12 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  ******************************************************************************/
-package nl.clockwork.mule.ebms.enricher;
+package nl.clockwork.mule.ebms.transformer;
 
-import nl.clockwork.common.dao.DAOException;
-import nl.clockwork.mule.ebms.Constants;
-import nl.clockwork.mule.ebms.dao.EbMSDAO;
-import nl.clockwork.mule.ebms.model.EbMSMessage;
+import java.util.HashMap;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -26,37 +23,30 @@ import org.mule.api.MuleMessage;
 import org.mule.api.transformer.TransformerException;
 import org.mule.transformer.AbstractMessageAwareTransformer;
 
-public class EbMSRefToMessageToEbMSMessageIdProperty extends AbstractMessageAwareTransformer
+public class EbMSMessageIdToMap extends AbstractMessageAwareTransformer
 {
   protected transient Log logger = LogFactory.getLog(getClass());
-  private EbMSDAO ebMSDAO;
 
-	public EbMSRefToMessageToEbMSMessageIdProperty()
+  public EbMSMessageIdToMap()
 	{
-		registerSourceType(EbMSMessage.class);
-		//FIXME
-		//setReturnClass(EbMSMessage.class);
+		//registerSourceType(Object.class);
 	}
-	
+  
 	@Override
-	public Object transform(final MuleMessage message, String outputEncoding) throws TransformerException
+	public Object transform(MuleMessage message, String outputEncoding) throws TransformerException
 	{
 		try
 		{
-			EbMSMessage msg = (EbMSMessage)message.getPayload();
-			//FIXME refToMessageId does not have to refer to an Acknowledgment or ErrorMessage
-			long id = ebMSDAO.getIdByMessageId(msg.getMessageHeader().getMessageData().getRefToMessageId());
-			message.setProperty(Constants.EBMS_MESSAGE_ID,id);
-			return message;
+			HashMap<String,Object> map = new HashMap<String,Object>();
+			map.put("id",message.getPayload());
+			message.setPayload(map);
 		}
-		catch (DAOException e)
+		catch (Exception e)
 		{
+			logger.error("",e);
 			throw new TransformerException(this,e);
 		}
+		return message;
 	}
-	
-	public void setEbMSDAO(EbMSDAO ebMSDAO)
-	{
-		this.ebMSDAO = ebMSDAO;
-	}
+
 }
