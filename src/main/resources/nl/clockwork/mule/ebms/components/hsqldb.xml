@@ -34,12 +34,10 @@
 	</bean>
 
 	<bean id="selectEventsForSending" class="java.lang.String">
-		<constructor-arg value="select distinct ebms_message_id from ebms_send_event where status=0 and time&lt;=NOW()" />
-		<!--constructor-arg value="select ebms_message_id, max(time) as time from ebms_send_event where status=0 and time&lt;=NOW() group by message_id" /-->
+		<constructor-arg value="select ebms_message_id, max(time) as time from ebms_send_event where status=0 and time&lt;=NOW() group by ebms_message_id" />
 	</bean>
 	<bean id="selectEventsForSending.ack" class="java.lang.String">
-		<constructor-arg value="update ebms_send_event set status=1, status_time=NOW() where ebms_message_id=#[map-payload:ebms_message_id] and status=0 and time&lt;=NOW()" /> 
-		<!--constructor-arg value="update ebms_send_event set status=1, status_time=NOW() where ebms_message_id=#[map-payload:ebms_message_id] and time=#[map-payload:time]; /--> 
+		<constructor-arg value="update ebms_send_event set status=1, status_time=NOW() where ebms_message_id=#[map-payload:ebms_message_id] and time=#[map-payload:time];" /> 
 		<!--constructor-arg value="update ebms_send_event set status=1, status_time=NOW() where ebms_message_id=#[map-payload:ebms_message_id] and time=#[map-payload:time]; delete from ebms_send_event where ebms_message_id=#[map-payload:ebms_message_id] and time&lt;#[map-payload:time] and status=0" /--> 
 	</bean>
 
