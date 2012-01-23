@@ -34,7 +34,7 @@ supported databases:
 - mysql (5.5) (innodb)
 - postgresql (9)
 - mssql 2008 R2
-- oracle (11)(lob > 4k fix (needed for older oracle versions) not implemented!)
+- oracle (11)(lob > 4k fix (needed for older oracle jdbc adapters) not implemented!)
 
 =================
 Configure Stubs =
