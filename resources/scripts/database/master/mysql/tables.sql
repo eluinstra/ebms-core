@@ -2,7 +2,7 @@ CREATE TABLE cpa
 (
 	cpa_id						VARCHAR(128)		NOT NULL UNIQUE,
 	cpa								TEXT						NOT NULL
-) ;
+) ENGINE=InnoDB;
 
 CREATE TABLE ebms_message
 (
@@ -28,21 +28,23 @@ CREATE TABLE ebms_message
 	content						TEXT						NULL,
 	status						INTEGER					NULL,
 	status_time				TIMESTAMP				NULL
-);
+) ENGINE=InnoDB;
 
 CREATE TABLE ebms_attachment
 (
-	ebms_message_id		INTEGER					NOT NULL REFERENCES ebms_message(id),
+	ebms_message_id		INTEGER					NOT NULL,
 	name							VARCHAR(128)		NOT NULL,
 	content_type			VARCHAR(64)			NOT NULL,
-	content						BLOB						NOT NULL
-);
+	content						BLOB						NOT NULL,
+	FOREIGN KEY (ebms_message_id) REFERENCES ebms_message(id)
+) ENGINE=InnoDB;
 
 CREATE TABLE ebms_send_event
 (
 	ebms_message_id		INTEGER					NOT NULL REFERENCES ebms_message(id),
 	time							TIMESTAMP				NOT NULL DEFAULT '0000-00-00 00:00:00',
 	status						INTEGER					NOT NULL DEFAULT 0,
-	status_time				TIMESTAMP				NOT NULL DEFAULT NOW()
---	http_status_code	INTEGER					NULL
-);
+	status_time				TIMESTAMP				NOT NULL DEFAULT NOW(),
+--	http_status_code	INTEGER					NULL,
+	FOREIGN KEY (ebms_message_id) REFERENCES ebms_message(id)
+) ENGINE=InnoDB;
