@@ -1,1 +1,0 @@
-CREATE INDEX i_message_id ON ebms_message (message_id);
