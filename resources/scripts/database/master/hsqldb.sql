@@ -52,4 +52,4 @@ CREATE TABLE ebms_send_event
 
 COMMIT;
 
-CREATE INDEX i_message_id ON ebms_message (message_id);
+CREATE INDEX i_message_id ON ebms_message(message_id);
