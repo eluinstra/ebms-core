@@ -33,64 +33,9 @@
 	</properties>
 	<dependencies>
 		<dependency>
-			<groupId>org.mule.transports</groupId>
-			<artifactId>mule-transport-jersey</artifactId>
-			<version>1.2</version>
-			<exclusions>
-				<exclusion>
-					<groupId>org.mule</groupId>
-					<artifactId>mule-core</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.mule.transports</groupId>
-					<artifactId>mule-transport-http</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.mule.transports</groupId>
-					<artifactId>mule-transport-servlet</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.mule.modules</groupId>
-					<artifactId>mule-module-spring-config</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-		<dependency>
-			<groupId>org.mule.modules</groupId>
-			<artifactId>commonretrypolicies</artifactId>
-			<version>2.2.1</version>
-			<exclusions>
-				<exclusion>
-					<groupId>org.mule</groupId>
-					<artifactId>mule-core</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-		<dependency>
 			<groupId>xalan</groupId>
 			<artifactId>xalan</artifactId>
 			<version>2.7.1</version>
-		</dependency>
-		<dependency>
-			<groupId>commons-lang</groupId>
-			<artifactId>commons-lang</artifactId>
-			<version>2.4</version>
-			<exclusions>
-				<exclusion>
-					<groupId>commons-collections</groupId>
-					<artifactId>commons-collections</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-		<dependency>
-			<groupId>commons-collections</groupId>
-			<artifactId>commons-collections</artifactId>
-			<version>3.2</version>
-		</dependency>
-		<dependency>
-			<groupId>log4j</groupId>
-			<artifactId>log4j</artifactId>
-			<version>1.2.14</version>
 		</dependency>
 		<dependency>
 			<groupId>net.sf.saxon</groupId>
@@ -101,6 +46,11 @@
 			<groupId>net.sf.saxon</groupId>
 			<artifactId>saxon-dom</artifactId>
 			<version>${saxon.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>log4j</groupId>
+			<artifactId>log4j</artifactId>
+			<version>1.2.14</version>
 		</dependency>
 		<dependency>
 			<groupId>c3p0</groupId>
@@ -247,7 +197,7 @@
 					<archive>
 						<manifest>
 							<addDefaultImplementationEntries>true</addDefaultImplementationEntries>
-							<packageName>nl.ez.ezpoort</packageName>
+							<packageName>nl.clockwork.mule.ebms</packageName>
 							<addClasspath>true</addClasspath>
 							<addExtensions />
 							<classpathPrefix />
@@ -266,7 +216,7 @@
 				<configuration>
 					<instrumentation>
 						<ignores>
-							<ignore>nl.ez.ezpoort.dao.stub.*</ignore>
+							<ignore>nl.clockwork.mule.ebms.dao.*</ignore>
 						</ignores>
 					</instrumentation>
 					<systemProperties>
@@ -316,7 +266,7 @@
 										generate-sources
 									</phase>	
 									<configuration>
-										<generatePackage>nl.ez.ezpoort.model.cpp.cpa</generatePackage>
+										<generatePackage>nl.clockwork.mule.ebms.model.cpp.cpa</generatePackage>
 										<generateDirectory>src/main/java</generateDirectory>
 										<includeSchemas>
 											<includeSchema>nl/clockwork/mule/ebms/xsd/cpp-cpa-2_0.xsd</includeSchema>
