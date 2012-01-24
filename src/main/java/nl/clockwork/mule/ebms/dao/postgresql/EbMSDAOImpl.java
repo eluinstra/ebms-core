@@ -131,7 +131,7 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 					"ref_to_message_id," +
 					"from_role," +
 					"to_role," +
-					"serviceType," +
+					"service_type," +
 					"service," +
 					"action," +
 					"original," +
