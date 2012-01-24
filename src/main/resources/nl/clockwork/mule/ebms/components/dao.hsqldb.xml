@@ -28,8 +28,7 @@
 
 	<bean id="databaseProvider" class="nl.clockwork.mule.ebms.HSQLDatabaseProvider" init-method="init" destroy-method="close">
 		<constructor-arg ref="ebMSDataSource"/>
-		<constructor-arg value="/nl/clockwork/mule/ebms/tables.sql"/>
-		<constructor-arg value="/nl/clockwork/mule/ebms/constraints.sql"/>
+		<constructor-arg value="/nl/clockwork/mule/ebms/hsqldb.sql"/>
 	</bean>
 	
 </beans>

@@ -46,3 +46,8 @@ CREATE TABLE ebms_send_event
 	status_time				TIMESTAMP				DEFAULT NOW() NOT NULL
 --	http_status_code	INTEGER					NULL
 );
+
+--COMMIT;
+--SHUTDOWN;
+
+--CREATE INDEX i_message_id ON ebms_message(message_id);

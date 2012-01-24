@@ -23,7 +23,6 @@ import java.sql.Statement;
 import javax.sql.DataSource;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -31,20 +30,18 @@ public class HSQLDatabaseProvider
 {
 	protected transient Log logger = LogFactory.getLog(getClass());
 	private DataSource dataSource;
-	private String createTablesScriptFile;
-	private String createConstraintsScriptFile;
+	private String sqlFile;
 	private boolean execute;
 
-	public HSQLDatabaseProvider(DataSource dataSource, String createTablesScriptFile, String createConstraintsScriptFile)
+	public HSQLDatabaseProvider(DataSource dataSource, String sqlFile)
 	{
-		this(dataSource,createTablesScriptFile,createConstraintsScriptFile,true);
+		this(dataSource,sqlFile,true);
 	}
 	
-	public HSQLDatabaseProvider(DataSource dataSource, String createTablesScriptFile, String createConstraintsScriptFile, boolean execute)
+	public HSQLDatabaseProvider(DataSource dataSource, String sqlFile, boolean execute)
 	{
 		this.dataSource = dataSource;
-		this.createTablesScriptFile = createTablesScriptFile;
-		this.createConstraintsScriptFile = createConstraintsScriptFile;
+		this.sqlFile = sqlFile;
 		this.execute = execute;
 	}
 
@@ -56,11 +53,8 @@ public class HSQLDatabaseProvider
 			try
 			{
 				Statement s = c.createStatement();
-				String sql = IOUtils.toString(HSQLDatabaseProvider.class.getResourceAsStream(createTablesScriptFile));
+				String sql = IOUtils.toString(HSQLDatabaseProvider.class.getResourceAsStream(sqlFile));
 				s.executeUpdate(sql);
-				sql = IOUtils.toString(HSQLDatabaseProvider.class.getResourceAsStream(createConstraintsScriptFile));
-				if (!StringUtils.isBlank(sql))
-					s.executeUpdate(sql);
 				s.close();
 			}
 			catch (SQLException e)
