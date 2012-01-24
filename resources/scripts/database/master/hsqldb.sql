@@ -32,19 +32,22 @@ CREATE TABLE ebms_message
 
 CREATE TABLE ebms_attachment
 (
-	ebms_message_id		INTEGER					NOT NULL FOREIGN KEY REFERENCES ebms_message(id),
+	ebms_message_id		INTEGER					NOT NULL,
 	name							VARCHAR(128)		NOT NULL,
 	content_type			VARCHAR(64)			NOT NULL,
-	content						BLOB						NOT NULL
+	content						BLOB						NOT NULL,
+	FOREIGN KEY (ebms_message_id) REFERENCES ebms_message(id)
 );
 
 CREATE TABLE ebms_send_event
 (
-	ebms_message_id		INTEGER					NOT NULL FOREIGN KEY REFERENCES ebms_message(id),
+	ebms_message_id		INTEGER					NOT NULL,
 	time							TIMESTAMP				DEFAULT NOW() NOT NULL,
 	status						INTEGER					DEFAULT 0 NOT NULL,
-	status_time				TIMESTAMP				DEFAULT NOW() NOT NULL
---	http_status_code	INTEGER					NULL
+	status_time				TIMESTAMP				DEFAULT NOW() NOT NULL,
+--	http_status_code	INTEGER					NULL,
+	FOREIGN KEY (ebms_message_id) REFERENCES ebms_message(id),
+	UNIQUE (ebms_message_id,time)
 );
 
 COMMIT;
