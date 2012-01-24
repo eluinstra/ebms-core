@@ -2,7 +2,7 @@ CREATE TABLE cpa
 (
 	cpa_id						VARCHAR(128)		NOT NULL UNIQUE,
 	cpa								TEXT						NOT NULL
-) ENGINE=InnoDB;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE ebms_message
 (
@@ -27,8 +27,9 @@ CREATE TABLE ebms_message
 	ack_requested			TEXT						NULL,
 	content						TEXT						NULL,
 	status						INTEGER					NULL,
-	status_time				TIMESTAMP				NULL
-) ENGINE=InnoDB;
+	status_time				TIMESTAMP				NULL,
+	INDEX (message_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE ebms_attachment
 (
@@ -37,7 +38,7 @@ CREATE TABLE ebms_attachment
 	content_type			VARCHAR(64)			NOT NULL,
 	content						BLOB						NOT NULL,
 	FOREIGN KEY (ebms_message_id) REFERENCES ebms_message(id)
-) ENGINE=InnoDB;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE ebms_send_event
 (
@@ -46,5 +47,6 @@ CREATE TABLE ebms_send_event
 	status						INTEGER					NOT NULL DEFAULT 0,
 	status_time				TIMESTAMP				NOT NULL DEFAULT NOW(),
 --	http_status_code	INTEGER					NULL,
-	FOREIGN KEY (ebms_message_id) REFERENCES ebms_message(id)
-) ENGINE=InnoDB;
+	FOREIGN KEY (ebms_message_id) REFERENCES ebms_message(id),
+	UNIQUE (ebms_message_id,time)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
