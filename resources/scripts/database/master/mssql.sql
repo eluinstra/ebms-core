@@ -43,6 +43,9 @@ CREATE TABLE ebms_send_event
 	ebms_message_id		INT							NOT NULL FOREIGN KEY REFERENCES ebms_message(id),
 	time							DATETIME				NOT NULL DEFAULT GETDATE(),
 	status						INT							NOT NULL DEFAULT 0,
-	status_time				DATETIME				NOT NULL DEFAULT GETDATE()
---	http_status_code	INT							NULL
+	status_time				DATETIME				NOT NULL DEFAULT GETDATE(),
+--	http_status_code	INT							NULL,
+	UNIQUE (ebms_message_id,time)
 );
+
+CREATE INDEX i_message_id ON ebms_message(message_id);
