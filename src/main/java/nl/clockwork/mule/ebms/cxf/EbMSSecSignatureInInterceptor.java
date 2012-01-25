@@ -166,10 +166,20 @@ public class EbMSSecSignatureInInterceptor extends AbstractSoapInterceptor
 			Node n = (Node)XMLUtils.executeXPathQuery(new EbXMLNamespaceContext(),document,"/soap:Envelope/soap:Header/ebxml:MessageHeader",XPathConstants.NODE);
 			MessageHeader messageHeader = XMLMessageBuilder.getInstance(MessageHeader.class).handle(n);
 			CollaborationProtocolAgreement cpa = ebMSDAO.getCPA(messageHeader.getCPAId());
-			PartyInfo partyInfo = CPAUtils.getPartyInfo(cpa,messageHeader.getFrom().getPartyId());
-			List<DeliveryChannel> channels = CPAUtils.getDeliveryChannels(partyInfo,messageHeader.getFrom().getRole(),messageHeader.getService(),messageHeader.getAction());
-			nl.clockwork.mule.ebms.model.cpp.cpa.Certificate c = CPAUtils.getCertificate(channels.get(0));
-			return CPAUtils.getX509Certificate(c);
+			if (cpa != null)
+			{
+				PartyInfo partyInfo = CPAUtils.getPartyInfo(cpa,messageHeader.getFrom().getPartyId());
+				if (partyInfo != null)
+				{
+					List<DeliveryChannel> channels = CPAUtils.getDeliveryChannels(partyInfo,messageHeader.getFrom().getRole(),messageHeader.getService(),messageHeader.getAction());
+					if (channels.size() == 1)
+					{
+						nl.clockwork.mule.ebms.model.cpp.cpa.Certificate c = CPAUtils.getCertificate(channels.get(0));
+						return CPAUtils.getX509Certificate(c);
+					}
+				}
+			}
+			return null;
 		}
 		catch (Exception e)
 		{
