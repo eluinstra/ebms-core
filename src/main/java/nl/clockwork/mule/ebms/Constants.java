@@ -15,6 +15,7 @@
  ******************************************************************************/
 package nl.clockwork.mule.ebms;
 
+import nl.clockwork.mule.ebms.model.EbMSService;
 import nl.clockwork.mule.ebms.model.ebxml.MessageStatusType;
 
 public class Constants
@@ -66,7 +67,7 @@ public class Constants
 				return EbMSMessageStatus.FORWARDED;
 			return null;
 		}
-};
+  };
 
   public enum EbMSErrorCode
   {
@@ -91,6 +92,46 @@ public class Constants
 		public final String location() { return location; }
 		
   }
+
+  public static enum EbMSMessageType
+  {
+		MESSAGE(0), MESSAGE_ERROR(1,new EbMSService(EBMS_SERVICE,"MessageError")), ACKNOWLEDGMENT(2,new EbMSService(EBMS_SERVICE,"Acknowledgment")), STATUS_REQUEST(3,new EbMSService(EBMS_SERVICE,"StatusRequest")), STATUS_RESPONSE(4,new EbMSService(EBMS_SERVICE,"StatusResponse")), PING(5,new EbMSService(EBMS_SERVICE,"Ping")), PONG(6,new EbMSService(EBMS_SERVICE,"Pong")), SERVICE_MESSAGE(7,new EbMSService(EBMS_SERVICE,null));
+
+		private final int id;
+		private final EbMSService service;
+
+		EbMSMessageType(int id) { this.id = id; this.service = null; }
+		EbMSMessageType(int id, EbMSService service) { this.id = id; this.service = service; }
+
+		public final int id() { return id; }
+
+		public final EbMSService service() { return service; }
+
+		public final static EbMSMessageType get(int id)
+		{
+			switch (id)
+			{
+				case 0:
+					return EbMSMessageType.MESSAGE;
+				case 1:
+					return EbMSMessageType.MESSAGE_ERROR;
+				case 2:
+					return EbMSMessageType.ACKNOWLEDGMENT;
+				case 3:
+					return EbMSMessageType.STATUS_REQUEST;
+				case 4:
+					return EbMSMessageType.STATUS_RESPONSE;
+				case 5:
+					return EbMSMessageType.PING;
+				case 6:
+					return EbMSMessageType.PONG;
+				case 7:
+					return EbMSMessageType.SERVICE_MESSAGE;
+				default:
+					return null;
+			}
+		}
+  };
 
   public static final String[] allowedCipherSuites = new String[]{"TLS_DHE_RSA_WITH_AES_128_CBC_SHA","TLS_RSA_WITH_AES_128_CBC_SHA"};
   
