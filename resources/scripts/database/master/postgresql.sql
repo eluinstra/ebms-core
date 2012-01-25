@@ -1,6 +1,3 @@
-CREATE SEQUENCE seq_ebms_message_id
-	START 1;
-	
 CREATE TABLE cpa
 (
 	cpa_id						VARCHAR(128)		NOT NULL UNIQUE,
@@ -9,7 +6,7 @@ CREATE TABLE cpa
 
 CREATE TABLE ebms_message
 (
-	id								INTEGER					PRIMARY KEY DEFAULT nextval('seq_ebms_message_id'),
+	id								SERIAL					PRIMARY KEY,
 --	parent_id					INTEGER					NULL REFERENCES ebms_message(id),
 	time_stamp				TIMESTAMP				NOT NULL,
 	cpa_id						VARCHAR(256)		NOT NULL,
