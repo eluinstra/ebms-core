@@ -47,18 +47,6 @@
             </tns:CanReceive>
          </tns:ServiceBinding>
       </tns:CollaborationRole>
-      <tns:SecurityDetails tns:securityId="DIGIPOORT_Security">
-         <tns:TrustAnchors>
-            <tns:AnchorCertificateRef tns:certId="DIGIPOORT_SigningCert"/>
-            <tns:AnchorCertificateRef tns:certId="DIGIPOORT_EncryptionCert"/>
-         </tns:TrustAnchors>
-      </tns:SecurityDetails>
-      <tns:SecurityDetails tns:securityId="DIGIPOORT_TransportSecurity">
-         <tns:TrustAnchors>
-            <tns:AnchorCertificateRef tns:certId="DIGIPOORT_ServerCert"/>
-            <tns:AnchorCertificateRef tns:certId="DIGIPOORT_ClientCert"/>
-         </tns:TrustAnchors>
-      </tns:SecurityDetails>
       <tns:DeliveryChannel tns:channelId="DIGIPOORT_defaultDeliveryChannel_ProfileBestEffortSigned" tns:docExchangeId="DIGIPOORT_BestEffort" tns:transportId="DIGIPOORT_transport_HTTP">
          <tns:MessagingCharacteristics tns:syncReplyMode="none" tns:ackRequested="never" tns:actor="urn:oasis:names:tc:ebxml-msg:actor:toPartyMSH" tns:ackSignatureRequested="never" tns:duplicateElimination="never"/>
       </tns:DeliveryChannel>
@@ -142,18 +130,6 @@
             </tns:CanReceive>
          </tns:ServiceBinding>
       </tns:CollaborationRole>
-      <tns:SecurityDetails tns:securityId="OVERHEID_Security">
-         <tns:TrustAnchors>
-            <tns:AnchorCertificateRef tns:certId="OVERHEID_SigningCert"/>
-            <tns:AnchorCertificateRef tns:certId="OVERHEID_EncryptionCert"/>
-         </tns:TrustAnchors>
-      </tns:SecurityDetails>
-      <tns:SecurityDetails tns:securityId="OVERHEID_TransportSecurity">
-         <tns:TrustAnchors>
-            <tns:AnchorCertificateRef tns:certId="OVERHEID_ServerCert"/>
-            <tns:AnchorCertificateRef tns:certId="OVERHEID_ClientCert"/>
-         </tns:TrustAnchors>
-      </tns:SecurityDetails>
       <tns:DeliveryChannel tns:channelId="OVERHEID_defaultDeliveryChannel_ProfileBestEffortSigned" tns:docExchangeId="OVERHEID_BestEffort" tns:transportId="OVERHEID_transport_HTTP">
          <tns:MessagingCharacteristics tns:syncReplyMode="none" tns:ackRequested="never" tns:actor="urn:oasis:names:tc:ebxml-msg:actor:toPartyMSH" tns:ackSignatureRequested="never" tns:duplicateElimination="never"/>
       </tns:DeliveryChannel>
