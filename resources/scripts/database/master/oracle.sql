@@ -48,10 +48,11 @@ CREATE TABLE ebms_send_event
 	ebms_message_id		NUMBER					NOT NULL REFERENCES ebms_message(id),
 	time							TIMESTAMP				DEFAULT SYSDATE NOT NULL,
 	status						NUMBER					DEFAULT 0 NOT NULL,
-	status_time				TIMESTAMP				DEFAULT SYSDATE NOT NULL
---	http_status_code	NUMBER				NULL
+	status_time				TIMESTAMP				DEFAULT SYSDATE NOT NULL,
+--	http_status_code	NUMBER				NULL,
+	UNIQUE (ebms_message_id,time)
 );
 
 COMMIT;
 
-CREATE INDEX i_message_id ON ebms_message (message_id);
+CREATE INDEX i_message_id ON ebms_message(message_id);
