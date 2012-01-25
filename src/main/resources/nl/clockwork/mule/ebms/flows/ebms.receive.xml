@@ -160,7 +160,8 @@
 			</inbound>
 			<outbound>
 				<filtering-router>
-					<vm:outbound-endpoint path="ebms.message.validate.in" />
+					<!--vm:outbound-endpoint path="ebms.message.validate.in" /-->
+					<vm:outbound-endpoint path="ebms.message.receive.async.reply"/>
 					<payload-type-filter expectedType="org.mule.transport.NullPayload"/>
 				</filtering-router>
 				<forwarding-catch-all-strategy>
