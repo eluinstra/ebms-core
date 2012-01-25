@@ -61,9 +61,33 @@
 
 	<model>
 
+		<default-service-exception-strategy>
+			<vm:outbound-endpoint path="file.cpa.report.in" synchronous="false">
+				<script:transformer>
+          	<script:script engine="groovy">
+						import java.io.PrintWriter;
+						import java.io.StringWriter;
+						import java.io.Writer;
+
+						Writer result = new StringWriter();
+						if (message.getExceptionPayload() != null)
+						{
+							PrintWriter pw = new PrintWriter(result);
+							message.getExceptionPayload().getException().printStackTrace(pw);
+						}
+
+						message.setProperty("EBMS.REPORT","Update " + message.getProperty("originalFilename") + " failed.\n\n" + result.toString());
+						result.close();
+
+						return message;
+					</script:script>
+				</script:transformer>
+			</vm:outbound-endpoint>
+		</default-service-exception-strategy>
+
 		<service name="file.cpa.service">
 			<inbound>
-				<file:inbound-endpoint connector-ref="connector.file.ebms"	path="${dir.upload.cpa}" moveToDirectory="${dir.upload.cpa}/processed" pollingFrequency="${dir.upload.cpa.pollingFrequency}">
+				<file:inbound-endpoint connector-ref="connector.file.ebms"	path="${dir.upload.cpa}" moveToDirectory="${dir.upload.cpa}/processed" pollingFrequency="${dir.upload.cpa.pollingFrequency}" synchronous="false">
 					<file:filename-wildcard-filter pattern="*.xml" caseSensitive="false"/>
 					<!--file:file-to-string-transformer/-->
 					<object-to-string-transformer/>
@@ -71,13 +95,13 @@
 			</inbound>
 			<outbound>
 				<filtering-router>
-					<vm:outbound-endpoint path="file.cpa.metadata.in" />
+					<vm:outbound-endpoint path="file.cpa.metadata.in" synchronous="false"/>
 					<custom-filter class="nl.clockwork.mule.common.filter.XSDValidationFilter">
 						<spring:property name="xsdFile" value="/nl/clockwork/mule/ebms/xsd/cpp-cpa-2_0.xsd" />
 					</custom-filter>
 				</filtering-router>
 				<forwarding-catch-all-strategy>
-					<vm:outbound-endpoint path="file.cpa.report.in">
+					<vm:outbound-endpoint path="file.cpa.report.in" synchronous="false">
 						<!--message-properties-transformer>
 							<add-message-property key="EBMS.REPORT" value="#[header:originalFilename] contains no CPA." />
 						</message-properties-transformer-->
@@ -94,7 +118,7 @@
 
 		<service name="file.cpa.metadata">
 			<inbound>
-				<vm:inbound-endpoint path="file.cpa.metadata.in">
+				<vm:inbound-endpoint path="file.cpa.metadata.in" synchronous="false">
 					<!--message-properties-transformer>
 						<add-message-property key="EBMS.CPA_ID" value="#[xpath:/CollaborationProtocolAgreement/@cpaid]" />
 					</message-properties-transformer-->
@@ -108,37 +132,21 @@
 				</vm:inbound-endpoint>
 			</inbound>
 			<outbound>
-				<exception-based-router>
-					<vm:outbound-endpoint path="file.cpa.insert.in" />
-					<vm:outbound-endpoint path="file.cpa.update.in" />
-					<vm:outbound-endpoint path="file.cpa.report.in">
-						<script:transformer>
-            	<script:script engine="groovy">
-								import java.io.PrintWriter;
-								import java.io.StringWriter;
-								import java.io.Writer;
-	
-								Writer result = new StringWriter();
-								if (message.getExceptionPayload() != null)
-								{
-									PrintWriter pw = new PrintWriter(result);
-									message.getExceptionPayload().getException().printStackTrace(pw);
-								}
-	
-								message.setProperty("EBMS.REPORT","Update " + message.getProperty("originalFilename") + " failed.\n\n" + result.toString());
-								result.close();
-	
-								return message;
-							</script:script>
-						</script:transformer>
-					</vm:outbound-endpoint>
-				</exception-based-router>
+				<filtering-router>
+					<vm:outbound-endpoint path="file.cpa.update.in" synchronous="false"/>
+					<custom-filter class="nl.clockwork.mule.ebms.filter.CPAExistsFilter">
+						<spring:property name="ebMSDAO" ref="ebMSDAO" />
+					</custom-filter>
+				</filtering-router>
+				<forwarding-catch-all-strategy>
+					<vm:outbound-endpoint path="file.cpa.insert.in" synchronous="false" />
+				</forwarding-catch-all-strategy>
 			</outbound>
 		</service>
 
 		<service name="file.cpa.insert">
 			<inbound>
-				<vm:inbound-endpoint path="file.cpa.insert.in" />
+				<vm:inbound-endpoint path="file.cpa.insert.in" synchronous="false" />
 			</inbound>
 			<outbound>
 				<chaining-router>
@@ -146,7 +154,7 @@
 						<transformer ref="toCPAMap"/>
 						<jdbc:query key="query" value-ref="insertCPA" />
 					</jdbc:outbound-endpoint>
-					<vm:outbound-endpoint path="file.cpa.report.in">
+					<vm:outbound-endpoint path="file.cpa.report.in" synchronous="false">
 						<script:transformer>
             	<script:script engine="groovy">
 								message.setProperty("EBMS.REPORT",message.getProperty("originalFilename") + " inserted successfully.");
@@ -160,7 +168,7 @@
 
 		<service name="file.cpa.update">
 			<inbound>
-				<vm:inbound-endpoint path="file.cpa.update.in" />
+				<vm:inbound-endpoint path="file.cpa.update.in" synchronous="false" />
 			</inbound>
 			<outbound>
 				<chaining-router>
@@ -168,7 +176,7 @@
 						<transformer ref="toCPAMap"/>
 						<jdbc:query key="query" value-ref="updateCPA" />
 					</jdbc:outbound-endpoint>
-					<vm:outbound-endpoint path="file.cpa.report.in">
+					<vm:outbound-endpoint path="file.cpa.report.in" synchronous="false">
 						<script:transformer>
             	<script:script engine="groovy">
 								message.setProperty("EBMS.REPORT",message.getProperty("originalFilename") + " updated successfully.");
@@ -182,7 +190,7 @@
 
 		<service name="file.cpa.report">
 			<inbound>
-				<vm:inbound-endpoint path="file.cpa.report.in" />
+				<vm:inbound-endpoint path="file.cpa.report.in" synchronous="false" />
 			</inbound>
 			<outbound>
 				<pass-through-router>
