@@ -72,7 +72,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 		{
 			try
 			{
-					if (Constants.EBMS_SERVICE.equals(rs.getString("service")) && Constants.EBMS_ERROR.equals(rs.getString("action")))
+					if (Constants.EBMS_SERVICE.equals(rs.getString("service")) && Constants.EBMS_MESSAGE_ERROR.equals(rs.getString("action")))
 						return new EbMSMessageError(XMLMessageBuilder.getInstance(MessageHeader.class).handle(rs.getString("message_header")),XMLMessageBuilder.getInstance(ErrorList.class).handle(rs.getString("content")));
 					else if (Constants.EBMS_SERVICE.equals(rs.getString("service")) && Constants.EBMS_ACKNOWLEDGEMENT.equals(rs.getString("action")))
 						return new EbMSAcknowledgment(XMLMessageBuilder.getInstance(MessageHeader.class).handle(rs.getString("message_header")),XMLMessageBuilder.getInstance(Acknowledgment.class).handle(rs.getString("content")));
