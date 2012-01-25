@@ -8,7 +8,7 @@
 - implement Encoding?
 - implement JMS Client interface?
 - implement dynamic cxf outbound endpoints (request url has to be resolved from CPA)?
-- configure DAO caching?
+- configure CPA caching?
 / improve duplicate message handling
 - store duplicate messages???
 
