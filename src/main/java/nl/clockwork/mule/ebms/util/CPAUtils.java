@@ -92,7 +92,6 @@ public class CPAUtils
 					for (CanSend canSend : role.getServiceBinding().getCanSend())
 						if (action.equals(canSend.getThisPartyActionBinding().getAction()))
 						{
-							//return partyInfo;
 							PartyInfo p = new PartyInfo();
 							p.getPartyId().addAll(partyInfo.getPartyId());
 							CollaborationRole cr = new CollaborationRole();
@@ -117,7 +116,6 @@ public class CPAUtils
 					for (CanReceive canReceive : role.getServiceBinding().getCanReceive())
 						if (action.equals(canReceive.getThisPartyActionBinding().getAction()))
 						{
-							//return partyInfo;
 							PartyInfo p = new PartyInfo();
 							p.getPartyId().addAll(partyInfo.getPartyId());
 							CollaborationRole r = new CollaborationRole();
@@ -128,35 +126,6 @@ public class CPAUtils
 							p.getCollaborationRole().add(r);
 							return p;
 						}
-		return null;
-	}
-	
-	public static PartyInfo getOtherReceivingPartyInfo(CollaborationProtocolAgreement cpa, String from, String serviceType, String service, String action)
-	{
-		for (PartyInfo partyInfo : cpa.getPartyInfo())
-			for (CollaborationRole role : partyInfo.getCollaborationRole())
-				if ((from == null || from.equals(role.getRole().getName()))
-						&& (serviceType == null || serviceType.equals(role.getServiceBinding().getService().getType()))
-						&& service.equals(role.getServiceBinding().getService().getValue())
-				)
-					for (CanSend canSend : role.getServiceBinding().getCanSend())
-						if (action.equals(canSend.getThisPartyActionBinding().getAction()))
-							for (PartyInfo partyInfo1 : cpa.getPartyInfo())
-								for (CollaborationRole role1 : partyInfo.getCollaborationRole())
-									for (CanReceive canReceive : role.getServiceBinding().getCanReceive())
-										if (((ActionBindingType)canSend.getOtherPartyActionBinding()).getAction().equals(canReceive.getThisPartyActionBinding().getAction()))
-										{
-											//return partyInfo;
-											PartyInfo p = new PartyInfo();
-											p.getPartyId().addAll(partyInfo.getPartyId());
-											CollaborationRole r = new CollaborationRole();
-											r.setRole(role.getRole());
-											r.setServiceBinding(new ServiceBinding());
-											r.getServiceBinding().setService(role.getServiceBinding().getService());
-											r.getServiceBinding().getCanReceive().add(canReceive);
-											p.getCollaborationRole().add(r);
-											return p;
-										}
 		return null;
 	}
 	
