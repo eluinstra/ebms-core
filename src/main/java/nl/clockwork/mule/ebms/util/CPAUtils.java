@@ -51,11 +51,11 @@ public class CPAUtils
 	{
 		for (PartyInfo partyInfo : cpa.getPartyInfo())
 		{
-			boolean result = true;
+			boolean found = true;
 			for (nl.clockwork.mule.ebms.model.ebxml.PartyId partyId : partyIds)
 				for (PartyId cpaPartyId : partyInfo.getPartyId())
-					result &= equals(partyId,cpaPartyId);
-			if (result)
+					found &= equals(partyId,cpaPartyId);
+			if (found)
 				return partyInfo;
 		}
 		return null;
