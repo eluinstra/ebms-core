@@ -238,6 +238,24 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	}
 
 	@Override
+	public boolean existsCPA(String cpaId) throws DAOException
+	{
+		try
+		{
+			return simpleJdbcTemplate.queryForInt(
+				"select count(cpa_id)" +
+				" from cpa" +
+				" where cpa_id = ?",
+				cpaId
+			) > 0;
+		}
+		catch (Exception e)
+		{
+			throw new DAOException(e);
+		}
+	}
+	
+	@Override
 	public CollaborationProtocolAgreement getCPA(String cpaId) throws DAOException
 	{
 		try
@@ -352,7 +370,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	}
 
 	@Override
-	public boolean exists(String messageId) throws DAOException
+	public boolean existsMessage(String messageId) throws DAOException
 	{
 		try
 		{

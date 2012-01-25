@@ -29,14 +29,14 @@ import nl.clockwork.mule.ebms.model.ebxml.MessageHeader;
 
 public interface EbMSDAO
 {
-	//boolean exists(String cpaId) throws DAOException;
+	boolean existsCPA(String cpaId) throws DAOException;
 	CollaborationProtocolAgreement getCPA(String cpaId) throws DAOException;
 	List<String> getCPAIds() throws DAOException;
 	boolean insertCPA(CollaborationProtocolAgreement cpa) throws DAOException;
 	boolean updateCPA(CollaborationProtocolAgreement cpa) throws DAOException;
 	boolean deleteCPA(String cpaId) throws DAOException;
 	
-	boolean exists(String messageId) throws DAOException;
+	boolean existsMessage(String messageId) throws DAOException;
 	Long getEbMSMessageId(String messageId) throws DAOException;
 	MessageHeader getMessageHeader(String messageId) throws DAOException;
 	EbMSBaseMessage getEbMSMessage(long id) throws DAOException;

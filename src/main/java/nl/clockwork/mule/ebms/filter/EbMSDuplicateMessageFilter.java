@@ -37,7 +37,7 @@ public class EbMSDuplicateMessageFilter implements Filter
 			try
 			{
 				EbMSMessage msg = (EbMSMessage)message.getPayload();
-				return msg.getMessageHeader().getDuplicateElimination()!= null && ebMSDAO.exists(msg.getMessageHeader().getMessageData().getMessageId());
+				return msg.getMessageHeader().getDuplicateElimination()!= null && ebMSDAO.existsMessage(msg.getMessageHeader().getMessageData().getMessageId());
 			}
 			catch (DAOException e)
 			{

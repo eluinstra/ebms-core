@@ -18,7 +18,6 @@ package nl.clockwork.mule.ebms.filter;
 import nl.clockwork.common.dao.DAOException;
 import nl.clockwork.mule.ebms.Constants;
 import nl.clockwork.mule.ebms.dao.EbMSDAO;
-import nl.clockwork.mule.ebms.model.cpp.cpa.CollaborationProtocolAgreement;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -36,8 +35,8 @@ public class CPAExistsFilter implements Filter
 		try
 		{
 			String cpaId = (String)message.getProperty(Constants.CPA_ID);
-			CollaborationProtocolAgreement cpa = ebMSDAO.getCPA(cpaId);
-			return cpa != null;
+			boolean result = ebMSDAO.existsCPA(cpaId);
+			return result;
 		}
 		catch (DAOException e)
 		{

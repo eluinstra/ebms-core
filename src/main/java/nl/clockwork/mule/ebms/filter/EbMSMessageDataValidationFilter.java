@@ -44,7 +44,7 @@ public class EbMSMessageDataValidationFilter implements Filter
 				String refToMessageId = messageHeader.getMessageData().getRefToMessageId();
 				if (!StringUtils.isEmpty(refToMessageId))
 					//FIXME refToMessageId does not have to refer to another message or to an Acknowledgment or ErrorMessage
-					return ebMSDAO.exists(refToMessageId);
+					return ebMSDAO.existsMessage(refToMessageId);
 				return true;
 			}
 			catch (DAOException e)
