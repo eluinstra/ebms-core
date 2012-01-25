@@ -65,7 +65,8 @@
 								import nl.clockwork.mule.ebms.model.EbMSMessage;
 
 								Object[] objects = message.getPayload();
-								message.setProperty(Constants.EBMS_SIGNATURE,objects[1]);
+								if (objects[1] != null)
+									message.setProperty(Constants.EBMS_SIGNATURE,objects[1]);
 								message.setPayload(objects[0]);
 								return message;
 							</script:script>
