@@ -13,46 +13,51 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  ******************************************************************************/
-package nl.clockwork.mule.ebms.transformer;
+package nl.clockwork.mule.ebms.filter;
 
 import nl.clockwork.common.dao.DAOException;
 import nl.clockwork.mule.ebms.dao.EbMSDAO;
 import nl.clockwork.mule.ebms.model.EbMSMessage;
+import nl.clockwork.mule.ebms.model.ebxml.MessageHeader;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.api.MuleMessage;
-import org.mule.api.transformer.TransformerException;
-import org.mule.transformer.AbstractMessageAwareTransformer;
+import org.mule.api.routing.filter.Filter;
 
-public class EbMSRefToMessageToEbMSMessageId extends AbstractMessageAwareTransformer
+public class EbMSMessageHeaderCompareFilter implements Filter
 {
   protected transient Log logger = LogFactory.getLog(getClass());
   private EbMSDAO ebMSDAO;
 
-	public EbMSRefToMessageToEbMSMessageId()
-	{
-		registerSourceType(EbMSMessage.class);
-		//FIXME
-		//setReturnClass(EbMSMessage.class);
-	}
-	
 	@Override
-	public Object transform(final MuleMessage message, String outputEncoding) throws TransformerException
+	public boolean accept(MuleMessage message)
 	{
-		try
+		if (message.getPayload() instanceof EbMSMessage)
 		{
-			EbMSMessage msg = (EbMSMessage)message.getPayload();
-			Long id = ebMSDAO.getEbMSMessageId(msg.getMessageHeader().getMessageData().getRefToMessageId());
-			message.setPayload(id);
-			return message;
+			try
+			{
+				EbMSMessage msg = (EbMSMessage)message.getPayload();
+				MessageHeader messageHeader = ebMSDAO.getMessageHeader(msg.getMessageHeader().getMessageData().getMessageId());
+				return compare(msg.getMessageHeader(),messageHeader);
+			}
+			catch (DAOException e)
+			{
+				throw new RuntimeException(e);
+			}
 		}
-		catch (DAOException e)
-		{
-			throw new TransformerException(this,e);
-		}
+		return true;
 	}
-	
+
+  private boolean compare(MessageHeader messageHeader, MessageHeader otherMessageHeader)
+	{
+		return messageHeader.getCPAId().equals(otherMessageHeader.getCPAId())
+				&& messageHeader.getService().getType().equals(otherMessageHeader.getService().getType())
+				&& messageHeader.getService().getValue().equals(otherMessageHeader.getService().getValue())
+				&& messageHeader.getAction().equals(otherMessageHeader.getAction())
+		;
+	}
+
 	public void setEbMSDAO(EbMSDAO ebMSDAO)
 	{
 		this.ebMSDAO = ebMSDAO;

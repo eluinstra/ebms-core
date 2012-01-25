@@ -127,33 +127,61 @@
 			</inbound>
 			<outbound>
 				<pass-through-router>
-					<vm:outbound-endpoint path="ebms.response.resend.in" />
+					<vm:outbound-endpoint path="ebms.message.duplicate.validate.in" />
 				</pass-through-router>
 			</outbound>
 		</service>
 		
-		<service name="ebms.response.resend">
+		<service name="ebms.message.duplicate.validate">
 			<inbound>
-				<vm:inbound-endpoint path="ebms.response.resend.in">
+				<vm:inbound-endpoint path="ebms.message.duplicate.validate.in"/>
+			</inbound>
+			<outbound>
+				<filtering-router>
+					<vm:outbound-endpoint path="ebms.response.find.in" />
+					<custom-filter class="nl.clockwork.mule.ebms.filter.EbMSMessageHeaderCompareFilter"/>
+				</filtering-router>
+				<forwarding-catch-all-strategy>
+					<!--vm:outbound-endpoint path="ebms.message.duplicate.invalid" /-->
+					<vm:outbound-endpoint path="ebms.message.receive.async.reply">
+						<custom-transformer class="nl.clockwork.mule.common.transformer.NullPayloadTransformer" />
+					</vm:outbound-endpoint>
+				</forwarding-catch-all-strategy>
+			</outbound>
+		</service>
+
+		<service name="ebms.response.find">
+			<inbound>
+				<vm:inbound-endpoint path="ebms.response.find.in">
 					<custom-transformer class="nl.clockwork.mule.ebms.transformer.EbMSRefToMessageToEbMSMessageId">
 						<spring:property name="ebMSDAO" ref="ebMSDAO"/>
 					</custom-transformer>
 				</vm:inbound-endpoint>
 			</inbound>
-			<outbound matchAll="true">
+			<outbound>
 				<filtering-router>
+					<vm:outbound-endpoint path="ebms.message.validate.in" />
+					<payload-type-filter expectedType="org.mule.transport.NullPayload"/>
+				</filtering-router>
+				<forwarding-catch-all-strategy>
+					<vm:outbound-endpoint path="ebms.response.resend.in" />
+				</forwarding-catch-all-strategy>
+			</outbound>
+		</service>
+			
+		<service name="ebms.response.resend">
+			<inbound>
+				<vm:inbound-endpoint path="ebms.response.resend.in"/>
+			</inbound>
+			<outbound>
+				<chaining-router>
 					<jdbc:outbound-endpoint connector-ref="connector.jdbc.ebms" queryKey="addEbMSMessageSendEvent">
 						<custom-transformer class="nl.clockwork.mule.ebms.transformer.EbMSMessageIdToMap" />
 					</jdbc:outbound-endpoint>
-					<not-filter>
-						<payload-type-filter expectedType="org.mule.transport.NullPayload"/>
-					</not-filter>
-				</filtering-router>
-				<filtering-router>
 					<vm:outbound-endpoint path="ebms.message.receive.async.reply">
 						<custom-transformer class="nl.clockwork.mule.common.transformer.NullPayloadTransformer" />
 					</vm:outbound-endpoint>
-				</filtering-router>
+				</chaining-router>
 			</outbound>
 		</service>
 		

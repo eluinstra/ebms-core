@@ -370,7 +370,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	}
 	
 	@Override
-	public long getIdByMessageId(String messageId) throws DAOException
+	public Long getEbMSMessageId(String messageId) throws DAOException
 	{
 		try
 		{
@@ -383,7 +383,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 		}
 		catch(EmptyResultDataAccessException e)
 		{
-			return 0;
+			return null;
 		}
 		catch (Exception e)
 		{
@@ -391,6 +391,30 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 		}
 	}
 	
+	@Override
+	public MessageHeader getMessageHeader(String messageId) throws DAOException
+	{
+		try
+		{
+			String result = simpleJdbcTemplate.queryForObject(
+				"select message_header" + 
+				" from ebms_message" + 
+				" where message_id = ?",
+				String.class,
+				messageId
+			);
+			return XMLMessageBuilder.getInstance(MessageHeader.class).handle(result);
+		}
+		catch(EmptyResultDataAccessException e)
+		{
+			return null;
+		}
+		catch (Exception e)
+		{
+			throw new DAOException(e);
+		}
+	}
+
 	private List<DataSource> getAttachments(long messageId) throws DAOException
 	{
 		try
@@ -912,16 +936,14 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 									keyHolder
 							);
 
-							long id = getIdByMessageId(messageError.getMessageHeader().getMessageData().getRefToMessageId());
-							simpleJdbcTemplate.update
-							(
-//								"update ebms_send_event" +
-//								" set status=1, status_time=" + getTimestampFunction() +
-//								" where ebms_message_id=? and status=0",
-								"delete from ebms_send_event" +
-								" where ebms_message_id=? and status=0",
-								id
-							);
+							Long id = getEbMSMessageId(messageError.getMessageHeader().getMessageData().getRefToMessageId());
+							if (id != null)
+								simpleJdbcTemplate.update
+								(
+									"delete from ebms_send_event" +
+									" where ebms_message_id=? and status=0",
+									id
+								);
 
 							return keyHolder.getKey().longValue();
 						}
@@ -976,16 +998,14 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 									keyHolder
 							);
 
-							long id = getIdByMessageId(acknowledgment.getMessageHeader().getMessageData().getRefToMessageId());
-							simpleJdbcTemplate.update
-							(
-//								"update ebms_send_event" +
-//								" set status=1, status_time=" + getTimestampFunction() +
-//								" where ebms_message_id=? and status=0",
-								"delete from ebms_send_event" +
-								" where ebms_message_id=? and status=0",
-								id
-							);
+							Long id = getEbMSMessageId(acknowledgment.getMessageHeader().getMessageData().getRefToMessageId());
+							if (id != null)
+								simpleJdbcTemplate.update
+								(
+									"delete from ebms_send_event" +
+									" where ebms_message_id=? and status=0",
+									id
+								);
 
 							return keyHolder.getKey().longValue();
 						}

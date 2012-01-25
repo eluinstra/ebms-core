@@ -25,6 +25,7 @@ import nl.clockwork.mule.ebms.model.EbMSBaseMessage;
 import nl.clockwork.mule.ebms.model.EbMSMessage;
 import nl.clockwork.mule.ebms.model.EbMSMessageError;
 import nl.clockwork.mule.ebms.model.cpp.cpa.CollaborationProtocolAgreement;
+import nl.clockwork.mule.ebms.model.ebxml.MessageHeader;
 
 public interface EbMSDAO
 {
@@ -36,7 +37,8 @@ public interface EbMSDAO
 	boolean deleteCPA(String cpaId) throws DAOException;
 	
 	boolean exists(String messageId) throws DAOException;
-	long getIdByMessageId(String messageId) throws DAOException;
+	Long getEbMSMessageId(String messageId) throws DAOException;
+	MessageHeader getMessageHeader(String messageId) throws DAOException;
 	EbMSBaseMessage getEbMSMessage(long id) throws DAOException;
 	EbMSMessageStatus getEbMSMessageStatus(String messageId, Date timestamp) throws DAOException;
 	void insertMessage(EbMSMessage message) throws DAOException;

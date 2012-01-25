@@ -638,16 +638,14 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 									new IdExtractor()
 							);
 
-							long id = getIdByMessageId(messageError.getMessageHeader().getMessageData().getRefToMessageId());
-							simpleJdbcTemplate.update
-							(
-//								"update ebms_send_event" +
-//								" set status=1, status_time=" + getTimestampFunction() +
-//								" where ebms_message_id=? and status=0",
-								"delete from ebms_send_event" +
-								" where ebms_message_id=? and status=0",
-								id
-							);
+							Long id = getEbMSMessageId(messageError.getMessageHeader().getMessageData().getRefToMessageId());
+							if (id != null)
+								simpleJdbcTemplate.update
+								(
+									"delete from ebms_send_event" +
+									" where ebms_message_id=? and status=0",
+									id
+								);
 
 							return key;
 						}
@@ -701,16 +699,14 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 									new IdExtractor()
 							);
 
-							long id = getIdByMessageId(acknowledgment.getMessageHeader().getMessageData().getRefToMessageId());
-							simpleJdbcTemplate.update
-							(
-//								"update ebms_send_event" +
-//								" set status=1, status_time=" + getTimestampFunction() +
-//								" where ebms_message_id=? and status=0",
-								"delete from ebms_send_event" +
-								" where ebms_message_id=? and status=0",
-								id
-							);
+							Long id = getEbMSMessageId(acknowledgment.getMessageHeader().getMessageData().getRefToMessageId());
+							if (id != null)
+								simpleJdbcTemplate.update
+								(
+									"delete from ebms_send_event" +
+									" where ebms_message_id=? and status=0",
+									id
+								);
 
 							return key;
 						}
