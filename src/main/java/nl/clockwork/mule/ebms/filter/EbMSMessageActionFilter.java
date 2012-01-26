@@ -27,7 +27,7 @@ public class EbMSMessageActionFilter implements Filter
 {
   protected transient Log logger = LogFactory.getLog(getClass());
   private String service = EbMSMessageType.SERVICE_MESSAGE.action().getService();
-  private String action;
+  private String action = EbMSMessageType.SERVICE_MESSAGE.action().getService();
   
 	@Override
 	public boolean accept(MuleMessage message)
