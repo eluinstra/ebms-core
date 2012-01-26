@@ -15,16 +15,9 @@
  ******************************************************************************/
 package nl.clockwork.mule.ebms.cxf;
 
-import java.io.OutputStream;
-
-import javax.xml.stream.XMLStreamWriter;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.cxf.binding.soap.SoapMessage;
-import org.apache.cxf.interceptor.Fault;
-import org.apache.cxf.interceptor.StaxOutInterceptor;
-import org.apache.cxf.io.CachedOutputStream;
+import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.phase.Phase;
 
 public class OracleXMLSecSignatureOutInterceptor extends EbMSSecSignatureOutInterceptor
@@ -38,23 +31,11 @@ public class OracleXMLSecSignatureOutInterceptor extends EbMSSecSignatureOutInte
 	}
 	
 	@Override
-	public void handleMessage(SoapMessage message) throws Fault
+	protected Interceptor<?> getEndingInterceptor()
 	{
-    try
-		{
-			OutputStream originalOs = message.getContent(OutputStream.class);
-			message.put(OUTPUT_STREAM_HOLDER,originalOs);
-			CachedOutputStream cos = new CachedOutputStream();
-			message.setContent(OutputStream.class,cos); 
-			message.setContent(XMLStreamWriter.class,StaxOutInterceptor.getXMLOutputFactory(message).createXMLStreamWriter(cos,getEncoding(message)));
-			message.getInterceptorChain().add(new OracleXMLSecSignatureOutEndingInterceptor()); 
-		}
-		catch (Exception e)
-		{
-			throw new Fault(e);
-		}
+		return new OracleXMLSecSignatureOutEndingInterceptor();
 	}
-	
+
 	public class OracleXMLSecSignatureOutEndingInterceptor extends XMLSecSignatureOutEndingInterceptor
 	{
 		public OracleXMLSecSignatureOutEndingInterceptor()

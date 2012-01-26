@@ -61,6 +61,7 @@ import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.binding.soap.interceptor.AbstractSoapInterceptor;
 import org.apache.cxf.binding.soap.interceptor.SoapOutInterceptor;
 import org.apache.cxf.interceptor.Fault;
+import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.interceptor.StaxOutInterceptor;
 import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.message.Attachment;
@@ -128,7 +129,12 @@ public class EbMSSecSignatureOutInterceptor extends AbstractSoapInterceptor
 	{
 		super(phase);
 	}
-	
+
+	protected Interceptor<?> getEndingInterceptor()
+	{
+		return new XMLSecSignatureOutEndingInterceptor();
+	}
+
 	protected String getEncoding(Message message)
 	{
 		Exchange ex = message.getExchange();
@@ -157,7 +163,7 @@ public class EbMSSecSignatureOutInterceptor extends AbstractSoapInterceptor
 			CachedOutputStream cos = new CachedOutputStream();
 			message.setContent(OutputStream.class,cos);
 			message.setContent(XMLStreamWriter.class,StaxOutInterceptor.getXMLOutputFactory(message).createXMLStreamWriter(cos,getEncoding(message)));
-			message.getInterceptorChain().add(new XMLSecSignatureOutEndingInterceptor()); 
+			message.getInterceptorChain().add(getEndingInterceptor()); 
 		}
 		catch (XMLStreamException e)
 		{
