@@ -17,6 +17,7 @@ package nl.clockwork.mule.ebms.filter;
 
 import nl.clockwork.mule.ebms.Constants.EbMSMessageType;
 import nl.clockwork.mule.ebms.model.EbMSPing;
+import nl.clockwork.mule.ebms.model.ebxml.Service;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -26,8 +27,8 @@ import org.mule.api.routing.filter.Filter;
 public class EbMSMessageActionFilter implements Filter
 {
   protected transient Log logger = LogFactory.getLog(getClass());
-  private String service = EbMSMessageType.SERVICE_MESSAGE.action().getService();
-  private String action = EbMSMessageType.SERVICE_MESSAGE.action().getService();
+  private Service service = EbMSMessageType.SERVICE_MESSAGE.action().getService();
+  private String action = EbMSMessageType.SERVICE_MESSAGE.action().getAction();
   
 	@Override
 	public boolean accept(MuleMessage message)
@@ -40,7 +41,7 @@ public class EbMSMessageActionFilter implements Filter
 		return true;
 	}
 	
-	public void setService(String service)
+	public void setService(Service service)
 	{
 		this.service = service;
 	}
