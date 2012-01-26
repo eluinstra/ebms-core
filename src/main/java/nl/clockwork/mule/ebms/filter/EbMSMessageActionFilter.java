@@ -15,7 +15,7 @@
  ******************************************************************************/
 package nl.clockwork.mule.ebms.filter;
 
-import nl.clockwork.mule.ebms.Constants;
+import nl.clockwork.mule.ebms.Constants.EbMSMessageType;
 import nl.clockwork.mule.ebms.model.EbMSPing;
 
 import org.apache.commons.logging.Log;
@@ -26,7 +26,7 @@ import org.mule.api.routing.filter.Filter;
 public class EbMSMessageActionFilter implements Filter
 {
   protected transient Log logger = LogFactory.getLog(getClass());
-  private String service = Constants.EBMS_SERVICE;
+  private String service = EbMSMessageType.SERVICE_MESSAGE.action().getService();
   private String action;
   
 	@Override

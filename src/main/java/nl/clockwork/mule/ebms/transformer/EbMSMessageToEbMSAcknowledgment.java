@@ -21,6 +21,7 @@ import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 
 import nl.clockwork.mule.ebms.Constants;
+import nl.clockwork.mule.ebms.Constants.EbMSMessageType;
 import nl.clockwork.mule.ebms.model.EbMSAcknowledgment;
 import nl.clockwork.mule.ebms.model.EbMSMessage;
 import nl.clockwork.mule.ebms.model.cpp.cpa.ActorType;
@@ -54,7 +55,7 @@ public class EbMSMessageToEbMSAcknowledgment extends AbstractMessageAwareTransfo
 			GregorianCalendar timestamp = new GregorianCalendar();
 
 			EbMSMessage msg = (EbMSMessage)message.getPayload();
-			MessageHeader messageHeader = EbMSMessageUtils.createMessageHeader(msg.getMessageHeader(),hostname,timestamp,Constants.EBMS_ACKNOWLEDGEMENT);
+			MessageHeader messageHeader = EbMSMessageUtils.createMessageHeader(msg.getMessageHeader(),hostname,timestamp,EbMSMessageType.ACKNOWLEDGMENT.action());
 			
 			Acknowledgment acknowledgment = new Acknowledgment();
 

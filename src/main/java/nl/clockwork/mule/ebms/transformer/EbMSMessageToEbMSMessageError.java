@@ -20,6 +20,7 @@ import java.util.GregorianCalendar;
 import javax.xml.datatype.DatatypeConfigurationException;
 
 import nl.clockwork.mule.ebms.Constants;
+import nl.clockwork.mule.ebms.Constants.EbMSMessageType;
 import nl.clockwork.mule.ebms.model.EbMSMessage;
 import nl.clockwork.mule.ebms.model.EbMSMessageError;
 import nl.clockwork.mule.ebms.model.ebxml.Error;
@@ -52,7 +53,7 @@ public class EbMSMessageToEbMSMessageError extends AbstractMessageAwareTransform
 			GregorianCalendar timestamp = new GregorianCalendar();
 
 			EbMSMessage msg = (EbMSMessage)message.getPayload();
-			MessageHeader messageHeader = EbMSMessageUtils.createMessageHeader(msg.getMessageHeader(),hostname,timestamp,Constants.EBMS_MESSAGE_ERROR);
+			MessageHeader messageHeader = EbMSMessageUtils.createMessageHeader(msg.getMessageHeader(),hostname,timestamp,EbMSMessageType.MESSAGE_ERROR.action());
 			
 			ErrorList errorList = new ErrorList();
 

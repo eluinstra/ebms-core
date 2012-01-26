@@ -31,6 +31,8 @@ import javax.xml.datatype.Duration;
 import nl.clockwork.common.util.XMLUtils;
 import nl.clockwork.mule.ebms.Constants;
 import nl.clockwork.mule.ebms.Constants.EbMSMessageStatus;
+import nl.clockwork.mule.ebms.Constants.EbMSMessageType;
+import nl.clockwork.mule.ebms.model.EbMSAction;
 import nl.clockwork.mule.ebms.model.EbMSAttachment;
 import nl.clockwork.mule.ebms.model.EbMSMessage;
 import nl.clockwork.mule.ebms.model.EbMSMessageContent;
@@ -121,7 +123,7 @@ public class EbMSMessageUtils
 		return messageHeader;
 	}
 
-	public static MessageHeader createMessageHeader(MessageHeader messageHeader, String hostname, GregorianCalendar timestamp, String action) throws DatatypeConfigurationException
+	public static MessageHeader createMessageHeader(MessageHeader messageHeader, String hostname, GregorianCalendar timestamp, EbMSAction action) throws DatatypeConfigurationException
 	{
 		messageHeader = (MessageHeader)XMLUtils.xmlToObject(XMLUtils.objectToXML(messageHeader)); //FIXME: replace by more efficient copy
 		List<PartyId> partyIds = new ArrayList<PartyId>(messageHeader.getFrom().getPartyId());
@@ -139,8 +141,8 @@ public class EbMSMessageUtils
 		messageHeader.getMessageData().setTimeToLive(null);
 
 		messageHeader.getService().setType(null);
-		messageHeader.getService().setValue(Constants.EBMS_SERVICE);
-		messageHeader.setAction(action);
+		messageHeader.getService().setValue(action.getService());
+		messageHeader.setAction(action.getAction());
 
 		messageHeader.setDuplicateElimination(null);
 
@@ -185,7 +187,7 @@ public class EbMSMessageUtils
 	public static Error createError(String location, String errorCode, String description, String language, SeverityType severity)
 	{
 		Error error = new Error();
-		error.setCodeContext(Constants.EBMS_SERVICE + ":errors");
+		error.setCodeContext(EbMSMessageType.SERVICE_MESSAGE.action().getService() + ":errors");
 		error.setLocation(location);
 		error.setErrorCode(errorCode);
 		error.setDescription(new Description());
@@ -211,13 +213,13 @@ public class EbMSMessageUtils
 
 	public static EbMSPong ebMSPingToEbMSPong(EbMSPing ping, String hostname) throws DatatypeConfigurationException
 	{
-		EbMSPong pong = new EbMSPong(createMessageHeader(ping.getMessageHeader(),hostname,new GregorianCalendar(),Constants.EBMS_PONG));
+		EbMSPong pong = new EbMSPong(createMessageHeader(ping.getMessageHeader(),hostname,new GregorianCalendar(),EbMSMessageType.PONG.action()));
 		return pong;
 	}
 
 	public static EbMSStatusResponse ebMSStatusRequestToEbMSStatusResponse(EbMSStatusRequest request, String hostname, EbMSMessageStatus status, GregorianCalendar timestamp) throws DatatypeConfigurationException
 	{
-		MessageHeader messageHeader = createMessageHeader(request.getMessageHeader(),hostname,new GregorianCalendar(),Constants.EBMS_STATUS_RESPONSE);
+		MessageHeader messageHeader = createMessageHeader(request.getMessageHeader(),hostname,new GregorianCalendar(),EbMSMessageType.STATUS_RESPONSE.action());
 		StatusResponse statusResponse = createStatusResponse(request.getStatusRequest(),status,timestamp);
 		EbMSStatusResponse response = new EbMSStatusResponse(messageHeader,statusResponse);
 		return response;

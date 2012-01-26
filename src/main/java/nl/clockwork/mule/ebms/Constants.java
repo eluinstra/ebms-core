@@ -15,7 +15,7 @@
  ******************************************************************************/
 package nl.clockwork.mule.ebms;
 
-import nl.clockwork.mule.ebms.model.EbMSService;
+import nl.clockwork.mule.ebms.model.EbMSAction;
 import nl.clockwork.mule.ebms.model.ebxml.MessageStatusType;
 
 public class Constants
@@ -95,17 +95,17 @@ public class Constants
 
   public static enum EbMSMessageType
   {
-		MESSAGE(0), MESSAGE_ERROR(1,new EbMSService(EBMS_SERVICE,"MessageError")), ACKNOWLEDGMENT(2,new EbMSService(EBMS_SERVICE,"Acknowledgment")), STATUS_REQUEST(3,new EbMSService(EBMS_SERVICE,"StatusRequest")), STATUS_RESPONSE(4,new EbMSService(EBMS_SERVICE,"StatusResponse")), PING(5,new EbMSService(EBMS_SERVICE,"Ping")), PONG(6,new EbMSService(EBMS_SERVICE,"Pong")), SERVICE_MESSAGE(7,new EbMSService(EBMS_SERVICE,null));
+		MESSAGE(0), MESSAGE_ERROR(1,new EbMSAction(EBMS_SERVICE,"MessageError")), ACKNOWLEDGMENT(2,new EbMSAction(EBMS_SERVICE,"Acknowledgment")), STATUS_REQUEST(3,new EbMSAction(EBMS_SERVICE,"StatusRequest")), STATUS_RESPONSE(4,new EbMSAction(EBMS_SERVICE,"StatusResponse")), PING(5,new EbMSAction(EBMS_SERVICE,"Ping")), PONG(6,new EbMSAction(EBMS_SERVICE,"Pong")), SERVICE_MESSAGE(7,new EbMSAction(EBMS_SERVICE,null));
 
 		private final int id;
-		private final EbMSService service;
+		private final EbMSAction action;
 
-		EbMSMessageType(int id) { this.id = id; this.service = null; }
-		EbMSMessageType(int id, EbMSService service) { this.id = id; this.service = service; }
+		EbMSMessageType(int id) { this.id = id; this.action = null; }
+		EbMSMessageType(int id, EbMSAction action) { this.id = id; this.action = action; }
 
 		public final int id() { return id; }
 
-		public final EbMSService service() { return service; }
+		public final EbMSAction action() { return action; }
 
 		public final static EbMSMessageType get(int id)
 		{
@@ -140,13 +140,7 @@ public class Constants
 	public static final String CPA_ID = "EBMS.CPA_ID";
 
 	public static final String EBMS_VERSION = "2.0";
-	public static final String EBMS_SERVICE = "urn:oasis:names:tc:ebxml-msg:service";
-	public static final String EBMS_MESSAGE_ERROR = "MessageError";
-	public static final String EBMS_ACKNOWLEDGEMENT = "Acknowledgment";
-	public static final String EBMS_STATUS_REQUEST = "StatusRequest";
-	public static final String EBMS_STATUS_RESPONSE = "StatusResponse";
-	public static final String EBMS_PING = "Ping";
-	public static final String EBMS_PONG = "Pong";
+	private static final String EBMS_SERVICE = "urn:oasis:names:tc:ebxml-msg:action";
 
 	public static final String EBMS_ERROR = "EBMS.EBMS_ERROR";
 	public static final String EBMS_SIGNATURE = "EBMS.SIGNATURE";
