@@ -1,4 +1,4 @@
-2.x.x:
+2.0.0:
 - configure CPA caching?
 / improve duplicate message handling
 	- store messages with unknown cpaId???
@@ -6,6 +6,7 @@
 - create documentation/manual
 - get hostname (needed for messageId) from CPA
 
+2.x.x:
 / implement Ping Service
 / implement MessageStatus Service
 - implement MessageOrder
