@@ -140,8 +140,7 @@ public class EbMSMessageUtils
 		messageHeader.getMessageData().setTimestamp(DatatypeFactory.newInstance().newXMLGregorianCalendar(timestamp));
 		messageHeader.getMessageData().setTimeToLive(null);
 
-		messageHeader.getService().setType(action.getService().getType());
-		messageHeader.getService().setValue(action.getService().getValue());
+		messageHeader.setService(action.getService());
 		messageHeader.setAction(action.getAction());
 
 		messageHeader.setDuplicateElimination(null);
