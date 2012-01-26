@@ -1,4 +1,9 @@
 2.x.x:
+- configure CPA caching?
+/ improve duplicate message handling
+- store duplicate messages???
+- create documentation/manual
+
 / implement Ping Service
 / implement MessageStatus Service
 - implement MessageOrder
@@ -8,9 +13,6 @@
 - implement Encoding?
 - implement JMS Client interface?
 - implement dynamic cxf outbound endpoints (request url has to be resolved from CPA)?
-- configure CPA caching?
-/ improve duplicate message handling
-- store duplicate messages???
 
 3.x.x:
 - update adapter to Mule 3
