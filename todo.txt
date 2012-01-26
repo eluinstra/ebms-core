@@ -1,8 +1,10 @@
 2.x.x:
 - configure CPA caching?
 / improve duplicate message handling
-- store duplicate messages???
+	- store messages with unknown cpaId???
+	- store duplicate messages???
 - create documentation/manual
+- get hostname (needed for messageId) from CPA
 
 / implement Ping Service
 / implement MessageStatus Service
