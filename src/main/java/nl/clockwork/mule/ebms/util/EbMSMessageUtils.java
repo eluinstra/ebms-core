@@ -187,7 +187,7 @@ public class EbMSMessageUtils
 	public static Error createError(String location, String errorCode, String description, String language, SeverityType severity)
 	{
 		Error error = new Error();
-		error.setCodeContext(EbMSMessageType.SERVICE_MESSAGE.action().getService() + ":errors");
+		error.setCodeContext(EbMSMessageType.SERVICE_MESSAGE.action().getService().getValue() + ":errors");
 		error.setLocation(location);
 		error.setErrorCode(errorCode);
 		error.setDescription(new Description());
