@@ -28,21 +28,31 @@ public class Start
 	
 	public static void main(String[] args) throws MuleException
 	{
-		String protocol = System.getProperty("ebms.protocol");
-		if (protocol == null || (!"http".equals(protocol) && !"https".equals(protocol)))
-		{
-			System.getProperties().setProperty("ebms.protocol","http");
-			logger.info("No valid value set for property ebms.protocol. Using default value: http");
-		}
-		String database = System.getProperty("ebms.database");
-		if (database == null || (!"hsqldb".equals(database) && !"mysql".equals(database) && !"postgresql".equals(database) && !"mssql".equals(database) && !"oracle".equals(database)))
-		{
-			System.getProperties().setProperty("ebms.database","hsqldb");
-			logger.info("No valid value set for property ebms.database. Using default value: hsqldb");
-		}
+		setProperty("ebms.protocol",new String[]{"normal","oracle"},"normal");
+		setProperty("ebms.protocol",new String[]{"http","https"},"http");
+		setProperty("ebms.database",new String[]{"hsqldb","mysql","postgresql","mssql","oracle"},"hsqldb");
 		DefaultMuleContextFactory muleContextFactory = new DefaultMuleContextFactory();
 		SpringXmlConfigurationBuilder configBuilder = new SpringXmlConfigurationBuilder(args.length == 0 ? "main.xml" : args[0]);
 		MuleContext muleContext = muleContextFactory.createMuleContext(configBuilder);
 		muleContext.start();
 	}
+
+	private static void setProperty(String propertyName, String[] expectedValues, String defaultValue)
+	{
+		String value = System.getProperty(propertyName);
+		if (!findValue(expectedValues,value))
+		{
+			System.getProperties().setProperty(propertyName,"defaultValue");
+			logger.info("No valid value set for property " + propertyName + ". Using default value: " + defaultValue);
+		}
+	}
+	
+	private static boolean findValue(String[] expectedValues, String value)
+	{
+		for (String expectedValue : expectedValues)
+			if (expectedValue.equals(value))
+				return true;
+		return false;
+	}
+
 }

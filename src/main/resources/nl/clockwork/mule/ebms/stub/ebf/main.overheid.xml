@@ -69,6 +69,8 @@
 		<import resource="classpath:nl/clockwork/mule/ebms/flows/file.cpa.xml" />
 		<!--import resource="classpath:nl/clockwork/mule/ebms/flows/file.sql.xml" /-->
 
+		<import resource="classpath:nl/clockwork/mule/ebms/flows/ebms.endpoint.cxf.normal.xml" />
+		<!--import resource="classpath:nl/clockwork/mule/ebms/flows/ebms.endpoint.cxf.oracle.xml" /-->
 		<import resource="classpath:nl/clockwork/mule/ebms/flows/ebms.receive.xml" />
 		<import resource="classpath:nl/clockwork/mule/ebms/flows/ebms.send.xml" />
 		<import resource="classpath:nl/clockwork/mule/ebms/flows/ebms.content.adapter.internal.xml" />
