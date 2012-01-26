@@ -17,24 +17,24 @@ package nl.clockwork.mule.ebms.model;
 
 import nl.clockwork.mule.ebms.model.ebxml.Service;
 
-public class EbMSAction
+public class EbMSService extends Service
 {
-	private Service service;
-	private String action;
-	
-	public EbMSAction(Service service, String action)
+	public EbMSService(String value)
 	{
-		this.service = service;
-		this.action = action;
+		this(null,value);
+	}
+
+	public EbMSService(String type, String value)
+	{
+		this.type = type;
+		this.value = value;
 	}
 	
-	public Service getService()
+	public boolean compare(Service service)
 	{
-		return service;
-	}
-	
-	public String getAction()
-	{
-		return action;
+		if (service == null)
+			return false;
+		return (this.type == service.getType() || (this.type != null && this.type.equals(service.getType())))
+				&& (this.value == null || service.getValue() == null || this.value.equals(service.getValue()));
 	}
 }
