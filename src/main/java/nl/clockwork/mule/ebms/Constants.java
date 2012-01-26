@@ -16,7 +16,9 @@
 package nl.clockwork.mule.ebms;
 
 import nl.clockwork.mule.ebms.model.EbMSAction;
+import nl.clockwork.mule.ebms.model.EbMSService;
 import nl.clockwork.mule.ebms.model.ebxml.MessageStatusType;
+import nl.clockwork.mule.ebms.model.ebxml.Service;
 
 public class Constants
 {
@@ -95,7 +97,7 @@ public class Constants
 
   public static enum EbMSMessageType
   {
-		MESSAGE(0), MESSAGE_ERROR(1,new EbMSAction(EBMS_SERVICE,"MessageError")), ACKNOWLEDGMENT(2,new EbMSAction(EBMS_SERVICE,"Acknowledgment")), STATUS_REQUEST(3,new EbMSAction(EBMS_SERVICE,"StatusRequest")), STATUS_RESPONSE(4,new EbMSAction(EBMS_SERVICE,"StatusResponse")), PING(5,new EbMSAction(EBMS_SERVICE,"Ping")), PONG(6,new EbMSAction(EBMS_SERVICE,"Pong")), SERVICE_MESSAGE(7,new EbMSAction(EBMS_SERVICE,null));
+		MESSAGE(0), MESSAGE_ERROR(1,new EbMSAction(EBMS_SERVICE_MESSAGE,"MessageError")), ACKNOWLEDGMENT(2,new EbMSAction(EBMS_SERVICE_MESSAGE,"Acknowledgment")), STATUS_REQUEST(3,new EbMSAction(EBMS_SERVICE_MESSAGE,"StatusRequest")), STATUS_RESPONSE(4,new EbMSAction(EBMS_SERVICE_MESSAGE,"StatusResponse")), PING(5,new EbMSAction(EBMS_SERVICE_MESSAGE,"Ping")), PONG(6,new EbMSAction(EBMS_SERVICE_MESSAGE,"Pong")), SERVICE_MESSAGE(7,new EbMSAction(EBMS_SERVICE_MESSAGE,null));
 
 		private final int id;
 		private final EbMSAction action;
@@ -140,7 +142,7 @@ public class Constants
 	public static final String CPA_ID = "EBMS.CPA_ID";
 
 	public static final String EBMS_VERSION = "2.0";
-	private static final String EBMS_SERVICE = "urn:oasis:names:tc:ebxml-msg:action";
+	private static final Service EBMS_SERVICE_MESSAGE = new EbMSService("urn:oasis:names:tc:ebxml-msg:service");
 
 	public static final String EBMS_ERROR = "EBMS.EBMS_ERROR";
 	public static final String EBMS_SIGNATURE = "EBMS.SIGNATURE";
