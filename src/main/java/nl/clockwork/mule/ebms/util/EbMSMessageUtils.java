@@ -175,18 +175,18 @@ public class EbMSMessageUtils
 	
 	public static Error createError(String location, String errorCode, String description)
 	{
-		return createError(location,errorCode,description,"en-US",SeverityType.ERROR);
+		return createError(location,errorCode,description,Constants.EBMS_DEFAULT_LANGUAGE,SeverityType.ERROR);
 	}
 	
 	public static Error createError(String location, String errorCode, String description, SeverityType severity)
 	{
-		return createError(location,errorCode,description,"en-US",severity);
+		return createError(location,errorCode,description,Constants.EBMS_DEFAULT_LANGUAGE,severity);
 	}
 	
 	public static Error createError(String location, String errorCode, String description, String language, SeverityType severity)
 	{
 		Error error = new Error();
-		error.setCodeContext(EbMSMessageType.SERVICE_MESSAGE.action().getService().getValue() + ":errors");
+		error.setCodeContext(Constants.EBMS_ERROR_CODE_CONTEXT);
 		error.setLocation(location);
 		error.setErrorCode(errorCode);
 		error.setDescription(new Description());

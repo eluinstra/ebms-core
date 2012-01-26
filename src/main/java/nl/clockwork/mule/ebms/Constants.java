@@ -142,7 +142,10 @@ public class Constants
 	public static final String CPA_ID = "EBMS.CPA_ID";
 
 	public static final String EBMS_VERSION = "2.0";
-	private static final Service EBMS_SERVICE_MESSAGE = new EbMSService("urn:oasis:names:tc:ebxml-msg:service");
+	private static final String EBMS_SERVICE_URL = "urn:oasis:names:tc:ebxml-msg:service";
+	private static final Service EBMS_SERVICE_MESSAGE = new EbMSService(EBMS_SERVICE_URL);
+	public static final String EBMS_ERROR_CODE_CONTEXT = EBMS_SERVICE_URL + ":errors";
+	public static final String EBMS_DEFAULT_LANGUAGE = "en-US";
 
 	public static final String EBMS_ERROR = "EBMS.EBMS_ERROR";
 	public static final String EBMS_SIGNATURE = "EBMS.SIGNATURE";
