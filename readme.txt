@@ -81,17 +81,40 @@ copy ebms-adapter-1.0.0.jar/keystore.jks to ${user.home}/.ebms-stub
 	
 	jmx.port=1099
 
+===========================
+Set Environment Vairables =
+===========================
+> set JAVA_HOME=<jdk6>
+> set MULE_HOME=<mule-standalone-2.2.1>
+> set PATH=%JAVA_HOME%\bin;%MULE_HOME%\bin;%PATH%
+
+> cd %MULE_HOME%\bin
+
 ========================
 Start digipoort EbMS stub =
 ========================
 > mule -config nl/clockwork/mule/ebms/stub/ebf/main.digipoort.xml
-
 
 =======================
 Start overheid EbMS stub =
 =======================
 > mule -config nl/clockwork/mule/ebms/stub/ebf/main.overheid.xml
 
+===============================
+Start EbMS Adapter Standalone =
+===============================
+add the following lines to <mule-standalone-2.2.1>/conf/wrapper.conf
+wrapper.java.additional.3=-Debms.mode=oracle
+wrapper.java.additional.4=-Debms.protocol=http
+wrapper.java.additional.5=-Debms.database=hsqldb
+
+> mule -config nl/clockwork/mule/ebms/main.xml
+
+CPA Webservice:
+http://localhost:8089/adapter/cpa
+
+Messaging Webservice:
+http://localhost:8089/adapter/ebms
 
 ===============
 Testing Stubs =
