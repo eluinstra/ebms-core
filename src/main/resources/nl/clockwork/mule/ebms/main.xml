@@ -47,7 +47,7 @@
 			<property name="locations"> 
 				<list>
 					<value>classpath:nl/clockwork/mule/ebms/default.properties</value>   
-					<value>file:${user.home}/.ebms-adapter/ebms.service.properties</value>
+					<value>file:${user.home}/.ebms-adapter/ebms.adapter.properties</value>
 				</list>
 			</property>
 		</bean>
