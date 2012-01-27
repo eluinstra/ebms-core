@@ -63,7 +63,7 @@
 		<import resource="classpath:nl/clockwork/mule/ebms/flows/ebms.endpoint.cxf.${ebms.mode}.xml" />
 		<import resource="classpath:nl/clockwork/mule/ebms/flows/ebms.receive.xml" />
 		<import resource="classpath:nl/clockwork/mule/ebms/flows/ebms.send.xml" />
-		<import resource="classpath:nl/clockwork/mule/ebms/flows/ebms.content.adapter.service.xml" />
+		<import resource="classpath:nl/clockwork/mule/ebms/flows/ebms.content.adapter.cxf.xml" />
 
 	</spring:beans>
 
