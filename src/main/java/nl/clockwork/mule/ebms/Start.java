@@ -28,7 +28,7 @@ public class Start
 	
 	public static void main(String[] args) throws MuleException
 	{
-		setProperty("ebms.protocol",new String[]{"normal","oracle"},"normal");
+		setProperty("ebms.mode",new String[]{"normal","oracle"},"normal");
 		setProperty("ebms.protocol",new String[]{"http","https"},"http");
 		setProperty("ebms.database",new String[]{"hsqldb","mysql","postgresql","mssql","oracle"},"hsqldb");
 		DefaultMuleContextFactory muleContextFactory = new DefaultMuleContextFactory();
