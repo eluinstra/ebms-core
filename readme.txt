@@ -104,7 +104,7 @@ Start overheid EbMS stub =
 Start EbMS Adapter Standalone =
 ===============================
 add the following lines to <mule-standalone-2.2.1>/conf/wrapper.conf
-wrapper.java.additional.3=-Debms.mode=oracle
+wrapper.java.additional.3=-Debms.mode=normal
 wrapper.java.additional.4=-Debms.protocol=http
 wrapper.java.additional.5=-Debms.database=hsqldb
 
