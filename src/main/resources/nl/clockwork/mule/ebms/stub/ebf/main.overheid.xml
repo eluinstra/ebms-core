@@ -60,11 +60,11 @@
 		<import resource="classpath:nl/clockwork/mule/ebms/components/connector.xml" />
 
 		<import resource="classpath:nl/clockwork/mule/ebms/components/datasource.xml" />
-		<import resource="classpath:nl/clockwork/mule/ebms/components/dao.hsqldb.xml" />
-		<!--import resource="classpath:nl/clockwork/mule/ebms/components/dao.mysql.xml" /-->
-		<!--import resource="classpath:nl/clockwork/mule/ebms/components/dao.postgresql.xml" /-->
-		<!--import resource="classpath:nl/clockwork/mule/ebms/components/dao.mssql.xml" /-->
-		<!--import resource="classpath:nl/clockwork/mule/ebms/components/dao.oracle.xml" /-->
+		<import resource="classpath:nl/clockwork/mule/ebms/components/hsqldb.xml" />
+		<!--import resource="classpath:nl/clockwork/mule/ebms/components/mysql.xml" /-->
+		<!--import resource="classpath:nl/clockwork/mule/ebms/components/postgresql.xml" /-->
+		<!--import resource="classpath:nl/clockwork/mule/ebms/components/mssql.xml" /-->
+		<!--import resource="classpath:nl/clockwork/mule/ebms/components/oracle.xml" /-->
 
 		<import resource="classpath:nl/clockwork/mule/ebms/flows/file.cpa.xml" />
 		<!--import resource="classpath:nl/clockwork/mule/ebms/flows/file.sql.xml" /-->
