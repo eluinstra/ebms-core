@@ -39,7 +39,7 @@ public class EbMSMessageIdPropertyToEbMSMessageContent extends AbstractMessageAw
 		try
 		{
 			long id = message.getLongProperty(Constants.EBMS_MESSAGE_ID,0);
-			EbMSMessage msg = (EbMSMessage)ebMSDAO.getEbMSMessage(id);
+			EbMSMessage msg = (EbMSMessage)ebMSDAO.getMessage(id);
 			message.setPayload(EbMSMessageUtils.EbMSMessageToEbMSMessageContent(msg));
 
 			return message;

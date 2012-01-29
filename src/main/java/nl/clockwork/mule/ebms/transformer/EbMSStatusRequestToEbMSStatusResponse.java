@@ -50,7 +50,7 @@ public class EbMSStatusRequestToEbMSStatusResponse extends AbstractMessageAwareT
 			Date date = new Date();
 			EbMSMessageStatus status = EbMSMessageStatus.get((String)message.getProperty(Constants.EBMS_MESSAGE_STATUS));
 			if (status == null)
-				status = ebMSDAO.getEbMSMessageStatus(request.getStatusRequest().getRefToMessageId(),date);
+				status = ebMSDAO.getMessageStatus(request.getStatusRequest().getRefToMessageId(),date);
 			GregorianCalendar timestamp = new GregorianCalendar();
 			timestamp.setTime(date);
 			message.setPayload(EbMSMessageUtils.ebMSStatusRequestToEbMSStatusResponse(request,hostname,status,timestamp));

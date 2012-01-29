@@ -39,8 +39,8 @@ public interface EbMSDAO
 	boolean existsMessage(String messageId) throws DAOException;
 	Long getEbMSMessageId(String messageId) throws DAOException;
 	MessageHeader getMessageHeader(String messageId) throws DAOException;
-	EbMSBaseMessage getEbMSMessage(long id) throws DAOException;
-	EbMSMessageStatus getEbMSMessageStatus(String messageId, Date timestamp) throws DAOException;
+	EbMSBaseMessage getMessage(long id) throws DAOException;
+	EbMSMessageStatus getMessageStatus(String messageId, Date timestamp) throws DAOException;
 	void insertMessage(EbMSMessage message) throws DAOException;
 	void insertMessage(EbMSMessage message, EbMSMessageStatus status) throws DAOException;
 	void insertMessage(EbMSMessage message, EbMSMessageStatus status, EbMSMessageError messageError) throws DAOException;
@@ -48,9 +48,9 @@ public interface EbMSDAO
 	void insertMessage(EbMSMessageError messageError, EbMSMessageStatus status) throws DAOException;
 	void insertMessage(EbMSAcknowledgment acknowledgment, EbMSMessageStatus status) throws DAOException;
 
-	List<String> getMessageIds() throws DAOException;
-	List<String> getMessageIds(int maxNr) throws DAOException;
-	EbMSBaseMessage getEbMSMessage(String messageId) throws DAOException;
-	void processMessage(String messageId) throws DAOException;
-	void processMessages(List<String> messageIds) throws DAOException;
+	List<String> getReceivedMessageIds() throws DAOException;
+	List<String> getReceivedMessageIds(int maxNr) throws DAOException;
+	EbMSBaseMessage getMessage(String messageId) throws DAOException;
+	void processReceivedMessage(String messageId) throws DAOException;
+	void processReceivedMessages(List<String> messageIds) throws DAOException;
 }

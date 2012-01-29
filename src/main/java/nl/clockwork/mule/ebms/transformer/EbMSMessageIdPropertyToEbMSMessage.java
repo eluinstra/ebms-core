@@ -39,7 +39,7 @@ public class EbMSMessageIdPropertyToEbMSMessage extends AbstractMessageAwareTran
 	{
 		try
 		{
-			message.setPayload(ebMSDAO.getEbMSMessage(message.getLongProperty(Constants.EBMS_MESSAGE_ID,0)));
+			message.setPayload(ebMSDAO.getMessage(message.getLongProperty(Constants.EBMS_MESSAGE_ID,0)));
 			return message;
 		}
 		catch (Exception e)

@@ -462,7 +462,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	}
 
 	@Override
-	public EbMSBaseMessage getEbMSMessage(final long id) throws DAOException
+	public EbMSBaseMessage getMessage(final long id) throws DAOException
 	{
 		try
 		{
@@ -485,7 +485,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	}
 	
 	@Override
-	public EbMSMessageStatus getEbMSMessageStatus(String messageId, final Date timestamp) throws DAOException
+	public EbMSMessageStatus getMessageStatus(String messageId, final Date timestamp) throws DAOException
 	{
 		try
 		{
@@ -1046,7 +1046,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<String> getMessageIds() throws DAOException
+	public List<String> getReceivedMessageIds() throws DAOException
 	{
 		try
 		{
@@ -1064,16 +1064,16 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 		}
 	}
 
-	public abstract String getMessageIdsQuery(int maxNr);
+	public abstract String getReceivedMessageIdsQuery(int maxNr);
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<String> getMessageIds(int maxNr) throws DAOException
+	public List<String> getReceivedMessageIds(int maxNr) throws DAOException
 	{
 		try
 		{
 			return jdbcTemplate.queryForList(
-					getMessageIdsQuery(maxNr),
+					getReceivedMessageIdsQuery(maxNr),
 					String.class
 			);
 		}
@@ -1084,7 +1084,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	}
 
 	@Override
-	public EbMSBaseMessage getEbMSMessage(String messageId) throws DAOException
+	public EbMSBaseMessage getMessage(String messageId) throws DAOException
 	{
 		try
 		{
@@ -1107,7 +1107,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	}
 
 	@Override
-	public void processMessage(String messageId) throws DAOException
+	public void processReceivedMessage(String messageId) throws DAOException
 	{
 		try
 		{
@@ -1126,7 +1126,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	}
 
 	@Override
-	public void processMessages(final List<String> messageIds) throws DAOException
+	public void processReceivedMessages(final List<String> messageIds) throws DAOException
 	{
 		try
 		{

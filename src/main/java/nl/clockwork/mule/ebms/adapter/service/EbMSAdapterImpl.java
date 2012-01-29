@@ -62,9 +62,9 @@ public class EbMSAdapterImpl implements EbMSAdapter
 		{
 			//FIXME use messageContext
 			if (maxNr == null)
-				return ebMSDAO.getMessageIds();
+				return ebMSDAO.getReceivedMessageIds();
 			else
-				return ebMSDAO.getMessageIds(maxNr);
+				return ebMSDAO.getReceivedMessageIds(maxNr);
 		}
 		catch (DAOException e)
 		{
@@ -79,12 +79,12 @@ public class EbMSAdapterImpl implements EbMSAdapter
 	{
 		try
 		{
-			EbMSBaseMessage message = ebMSDAO.getEbMSMessage(messageId);
+			EbMSBaseMessage message = ebMSDAO.getMessage(messageId);
 			if (message instanceof EbMSMessage)
 			{
 				EbMSMessageContent result = EbMSMessageUtils.EbMSMessageToEbMSMessageContent((EbMSMessage)message);
 				if (process != null && process)
-					ebMSDAO.processMessage(messageId);
+					ebMSDAO.processReceivedMessage(messageId);
 				return result;
 			}
 			return null;
@@ -102,7 +102,7 @@ public class EbMSAdapterImpl implements EbMSAdapter
 	{
 		try
 		{
-			ebMSDAO.processMessage(messageId);
+			ebMSDAO.processReceivedMessage(messageId);
 			return true;
 		}
 		catch (DAOException e)
@@ -118,7 +118,7 @@ public class EbMSAdapterImpl implements EbMSAdapter
 	{
 		try
 		{
-			ebMSDAO.processMessages(messageIds);
+			ebMSDAO.processReceivedMessages(messageIds);
 			return true;
 		}
 		catch (DAOException e)

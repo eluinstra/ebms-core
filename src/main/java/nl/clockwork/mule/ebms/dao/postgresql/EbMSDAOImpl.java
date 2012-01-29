@@ -218,7 +218,7 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 	}
 
 	@Override
-	public String getMessageIdsQuery(int maxNr)
+	public String getReceivedMessageIdsQuery(int maxNr)
 	{
 		return "select message_id" +
 		" from ebms_message" +
