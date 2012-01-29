@@ -219,12 +219,6 @@ During startup the following errors/warnings may occur and can be ignored:
 WARN  nl.clockwork.mule.ebms.HSQLDatabaseProvider - java.sql.SQLException: object name already exists: CPA in statement [CREATE TABLE cpa
 ERROR org.mule.module.management.mbean.ServiceService - Error post-registering the MBean javax.management.MalformedObjectNameException: Invalid character ':' in value part of property
 
-=================================
-Important configuration changes =
-=================================
-ebms.message.send.in changed to ebms.content.receive.in
-
-
 ==============
 Restrictions =
 ==============
