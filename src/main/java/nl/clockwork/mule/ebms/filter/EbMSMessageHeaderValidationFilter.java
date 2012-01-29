@@ -31,6 +31,7 @@ import nl.clockwork.mule.ebms.model.cpp.cpa.PerMessageCharacteristicsType;
 import nl.clockwork.mule.ebms.model.cpp.cpa.PersistenceLevelType;
 import nl.clockwork.mule.ebms.model.cpp.cpa.SyncReplyModeType;
 import nl.clockwork.mule.ebms.model.ebxml.AckRequested;
+import nl.clockwork.mule.ebms.model.ebxml.Acknowledgment;
 import nl.clockwork.mule.ebms.model.ebxml.MessageHeader;
 import nl.clockwork.mule.ebms.model.ebxml.PartyId;
 import nl.clockwork.mule.ebms.model.ebxml.Service;
@@ -52,7 +53,6 @@ public class EbMSMessageHeaderValidationFilter implements Filter
 	private PersistenceLevelType isConfidential = PersistenceLevelType.NONE;
 	private SyncReplyModeType syncReplyMode = SyncReplyModeType.NONE;
 	private PerMessageCharacteristicsType ackRequested = PerMessageCharacteristicsType.ALWAYS;
-	private PerMessageCharacteristicsType ackSignatureRequested = PerMessageCharacteristicsType.NEVER;
 	private PerMessageCharacteristicsType duplicateElimination = PerMessageCharacteristicsType.ALWAYS;
 
 	@Override
@@ -167,15 +167,24 @@ public class EbMSMessageHeaderValidationFilter implements Filter
 						message.setProperty(Constants.EBMS_ERROR,EbMSMessageUtils.createError("//Header/AckRequested",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Wrong value."));
 						return false;
 					}
-					if (!checkAckSignatureRequested(deliveryChannel))
+					if (!checkAckSignatureRequested(deliveryChannel,ackRequested))
 					{
-						message.setProperty(Constants.EBMS_ERROR,EbMSMessageUtils.createError(Constants.EbMSErrorCode.UNKNOWN.errorCode(),Constants.EbMSErrorCode.NOT_SUPPORTED.errorCode(),"AckSignatureRequested mode not supported."));
+						message.setProperty(Constants.EBMS_ERROR,EbMSMessageUtils.createError("//Header/AckRequested@signed",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Wrong value."));
 						return false;
 					}
 				}
 				if (message.getPayload() instanceof EbMSAcknowledgment)
 				{
-					//TODO check for AckSignature???
+					if (!checkAckSignatureRequested(deliveryChannel,((EbMSAcknowledgment)message.getPayload()).getAcknowledgment()))
+					{
+						message.setProperty(Constants.EBMS_ERROR,EbMSMessageUtils.createError("//Acknowledgment/Reference",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Wrong value."));
+						return false;
+					}
+					if (!checkActor(deliveryChannel,((EbMSAcknowledgment)message.getPayload()).getAcknowledgment()))
+					{
+						message.setProperty(Constants.EBMS_ERROR,EbMSMessageUtils.createError("//Acknowledgment/Reference",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Wrong value."));
+						return false;
+					}
 				}
 				return true;
 			}
@@ -237,14 +246,28 @@ public class EbMSMessageHeaderValidationFilter implements Filter
 	private boolean checkAckRequested(DeliveryChannel deliveryChannel, AckRequested ackRequested)
 	{
 		return (this.ackRequested.equals(PerMessageCharacteristicsType.ALWAYS) && ackRequested != null)
-				|| (this.ackRequested.equals(PerMessageCharacteristicsType.PER_MESSAGE))
+				|| this.ackRequested.equals(PerMessageCharacteristicsType.PER_MESSAGE)
 				|| (this.ackRequested.equals(PerMessageCharacteristicsType.NEVER) && ackRequested == null)
 		;
 	}
 	
-	private boolean checkAckSignatureRequested(DeliveryChannel deliveryChannel)
+	private boolean checkAckSignatureRequested(DeliveryChannel deliveryChannel, AckRequested ackRequested)
 	{
-		return deliveryChannel.getMessagingCharacteristics().getAckSignatureRequested().equals(ackSignatureRequested);
+		return (deliveryChannel.getMessagingCharacteristics().getAckSignatureRequested().equals(PerMessageCharacteristicsType.ALWAYS) && ackRequested.isSigned())
+				|| deliveryChannel.getMessagingCharacteristics().getAckSignatureRequested().equals(PerMessageCharacteristicsType.PER_MESSAGE)
+				|| (deliveryChannel.getMessagingCharacteristics().getAckSignatureRequested().equals(PerMessageCharacteristicsType.NEVER) && !ackRequested.isSigned());
+	}
+
+	private boolean checkAckSignatureRequested(DeliveryChannel deliveryChannel, Acknowledgment acknowledgment)
+	{
+		return (deliveryChannel.getMessagingCharacteristics().getAckSignatureRequested().equals(PerMessageCharacteristicsType.ALWAYS) && (acknowledgment.getReference() != null))
+		|| deliveryChannel.getMessagingCharacteristics().getAckSignatureRequested().equals(PerMessageCharacteristicsType.PER_MESSAGE)
+		|| (deliveryChannel.getMessagingCharacteristics().getAckSignatureRequested().equals(PerMessageCharacteristicsType.NEVER)/* && (acknowledgment.getReference() == null)*/);
+	}
+
+	private boolean checkActor(DeliveryChannel deliveryChannel, Acknowledgment acknowledgment)
+	{
+		return deliveryChannel.getMessagingCharacteristics().getActor().value().equals(acknowledgment.getActor());
 	}
 
 	public void setEbMSDAO(EbMSDAO ebMSDAO)
@@ -275,11 +298,6 @@ public class EbMSMessageHeaderValidationFilter implements Filter
 	public void setAckRequested(PerMessageCharacteristicsType ackRequested)
 	{
 		this.ackRequested = ackRequested;
-	}
-	
-	public void setAckSignatureRequested(PerMessageCharacteristicsType ackSignatureRequested)
-	{
-		this.ackSignatureRequested = ackSignatureRequested;
 	}
 	
 	public void setDuplicateElimination(PerMessageCharacteristicsType duplicateElimination)
