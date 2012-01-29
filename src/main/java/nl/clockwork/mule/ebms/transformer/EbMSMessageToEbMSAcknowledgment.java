@@ -70,6 +70,7 @@ public class EbMSMessageToEbMSAcknowledgment extends AbstractMessageAwareTransfo
 			//acknowledgment.getFrom().setRole(messageHeader.getFrom().getRole());
 			acknowledgment.getFrom().setRole(null);
 			
+			//TODO resolve actor from CPA
 			acknowledgment.setActor(ActorType.URN_OASIS_NAMES_TC_EBXML_MSG_ACTOR_TO_PARTY_MSH.value());
 			
 			if (msg.getAckRequested().isSigned() && msg.getSignature() != null)
