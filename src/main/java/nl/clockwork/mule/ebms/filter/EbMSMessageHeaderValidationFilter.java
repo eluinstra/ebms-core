@@ -182,7 +182,7 @@ public class EbMSMessageHeaderValidationFilter implements Filter
 					}
 					if (!checkActor(deliveryChannel,((EbMSAcknowledgment)message.getPayload()).getAcknowledgment()))
 					{
-						message.setProperty(Constants.EBMS_ERROR,EbMSMessageUtils.createError("//Acknowledgment/Reference",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Wrong value."));
+						message.setProperty(Constants.EBMS_ERROR,EbMSMessageUtils.createError("//Acknowledgment@actor",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Wrong value."));
 						return false;
 					}
 				}
