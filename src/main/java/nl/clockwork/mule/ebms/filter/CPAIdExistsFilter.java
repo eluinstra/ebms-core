@@ -24,7 +24,7 @@ import org.apache.commons.logging.LogFactory;
 import org.mule.api.MuleMessage;
 import org.mule.api.routing.filter.Filter;
 
-public class CPAExistsFilter implements Filter
+public class CPAIdExistsFilter implements Filter
 {
 	protected transient Log logger = LogFactory.getLog(getClass());
 	private EbMSDAO ebMSDAO;
