@@ -18,6 +18,7 @@ package nl.clockwork.mule.ebms.transformer;
 import nl.clockwork.mule.ebms.dao.EbMSDAO;
 import nl.clockwork.mule.ebms.model.EbMSMessageContent;
 import nl.clockwork.mule.ebms.model.cpp.cpa.CollaborationProtocolAgreement;
+import nl.clockwork.mule.ebms.util.EbMSMessageContextValidator;
 import nl.clockwork.mule.ebms.util.EbMSMessageUtils;
 
 import org.apache.commons.logging.Log;
@@ -43,6 +44,7 @@ public class EbMSMessageContentToEbMSMessage extends AbstractMessageAwareTransfo
 		try
 		{
 			EbMSMessageContent content = (EbMSMessageContent)message.getPayload();
+			new EbMSMessageContextValidator(ebMSDAO).validate(content.getContext());
 			CollaborationProtocolAgreement cpa = ebMSDAO.getCPA(content.getContext().getCpaId());
 			message.setPayload(EbMSMessageUtils.ebMSMessageContentToEbMSMessage(cpa,content,hostname));
 

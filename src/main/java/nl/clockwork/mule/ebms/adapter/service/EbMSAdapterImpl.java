@@ -15,7 +15,6 @@
  ******************************************************************************/
 package nl.clockwork.mule.ebms.adapter.service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import nl.clockwork.common.dao.DAOException;
@@ -25,6 +24,7 @@ import nl.clockwork.mule.ebms.model.EbMSMessage;
 import nl.clockwork.mule.ebms.model.EbMSMessageContent;
 import nl.clockwork.mule.ebms.model.EbMSMessageContext;
 import nl.clockwork.mule.ebms.model.cpp.cpa.CollaborationProtocolAgreement;
+import nl.clockwork.mule.ebms.util.EbMSMessageContextValidator;
 import nl.clockwork.mule.ebms.util.EbMSMessageUtils;
 
 import org.apache.commons.logging.Log;
@@ -41,6 +41,7 @@ public class EbMSAdapterImpl implements EbMSAdapter
 	{
 		try
 		{
+			new EbMSMessageContextValidator(ebMSDAO).validate(messageContent.getContext());
 			CollaborationProtocolAgreement cpa = ebMSDAO.getCPA(messageContent.getContext().getCpaId());
 			EbMSMessage message = EbMSMessageUtils.ebMSMessageContentToEbMSMessage(cpa,messageContent,hostname);
 			ebMSDAO.insertMessage(message);
@@ -48,9 +49,9 @@ public class EbMSAdapterImpl implements EbMSAdapter
 		}
 		catch (Exception e)
 		{
-			//throw new EbMSAdapterException(e);
-			logger.warn("",e);
-			return null;
+			throw new EbMSAdapterException(e);
+			//logger.warn("",e);
+			//return null;
 		}
 	}
 
@@ -67,9 +68,9 @@ public class EbMSAdapterImpl implements EbMSAdapter
 		}
 		catch (DAOException e)
 		{
-			//throw new EbMSAdapterException(e);
-			logger.warn("",e);
-			return new ArrayList<String>();
+			throw new EbMSAdapterException(e);
+			//logger.warn("",e);
+			//return new ArrayList<String>();
 		}
 	}
 
@@ -90,9 +91,9 @@ public class EbMSAdapterImpl implements EbMSAdapter
 		}
 		catch (Exception e)
 		{
-			//throw new EbMSAdapterException(e);
-			logger.warn("",e);
-			return null;
+			throw new EbMSAdapterException(e);
+			//logger.warn("",e);
+			//return null;
 		}
 	}
 
@@ -106,9 +107,9 @@ public class EbMSAdapterImpl implements EbMSAdapter
 		}
 		catch (DAOException e)
 		{
-			//throw new EbMSAdapterException(e);
-			logger.warn("",e);
-			return false;
+			throw new EbMSAdapterException(e);
+			//logger.warn("",e);
+			//return false;
 		}
 	}
 
@@ -122,9 +123,9 @@ public class EbMSAdapterImpl implements EbMSAdapter
 		}
 		catch (DAOException e)
 		{
-			//throw new EbMSAdapterException(e);
-			logger.warn("",e);
-			return false;
+			throw new EbMSAdapterException(e);
+			//logger.warn("",e);
+			//return false;
 		}
 	}
 
