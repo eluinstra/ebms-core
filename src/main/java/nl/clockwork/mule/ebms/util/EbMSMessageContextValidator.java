@@ -52,7 +52,7 @@ public class EbMSMessageContextValidator
 			{
 				StringBuffer msg = new StringBuffer();
 
-				msg.append("No action found for:");
+				msg.append("No from action found for:");
 				msg.append(" context.cpaId=").append(context.getCpaId());
 				if (context.getFromRole() != null)
 					msg.append(", context.fromRole=").append(context.getFromRole());
@@ -68,7 +68,7 @@ public class EbMSMessageContextValidator
 			{
 				StringBuffer msg = new StringBuffer();
 
-				msg.append("No action found for:");
+				msg.append("No to action found for:");
 				msg.append(" context.cpaId=").append(context.getCpaId());
 				if (context.getFromRole() != null)
 					msg.append(", context.toRole=").append(context.getToRole());
