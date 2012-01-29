@@ -38,14 +38,14 @@ public class EbMSMessageContextValidator
 		{
 			if (StringUtils.isEmpty(context.getCpaId()))
 				throw new EbMSMessageContextValidationException("context.cpaId cannot be empty.");
-			CollaborationProtocolAgreement cpa = ebMSDAO.getCPA(context.getCpaId());
-			if (cpa == null)
-				throw new EbMSMessageContextValidationException("No CPA found for: context.cpaId=" + context.getCpaId());
-
 			if (StringUtils.isEmpty(context.getService()))
 				throw new EbMSMessageContextValidationException("context.service cannot be empty.");
 			if (StringUtils.isEmpty(context.getAction()))
 				throw new EbMSMessageContextValidationException("context.action cannot be empty.");
+
+			CollaborationProtocolAgreement cpa = ebMSDAO.getCPA(context.getCpaId());
+			if (cpa == null)
+				throw new EbMSMessageContextValidationException("No CPA found for: context.cpaId=" + context.getCpaId());
 
 			PartyInfo partyInfo = CPAUtils.getSendingPartyInfo(cpa,context.getFromRole(),context.getServiceType(),context.getService(),context.getAction());
 			if (partyInfo == null)
