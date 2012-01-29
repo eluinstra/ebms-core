@@ -183,7 +183,10 @@ public class CPAUtils
 	
 	public static Certificate getCertificate(DeliveryChannel deliveryChannel)
 	{
-		return (Certificate)getDocExchange(deliveryChannel).getEbXMLSenderBinding().getSenderNonRepudiation().getSigningCertificateRef().getCertId();
+		DocExchange docExchange = getDocExchange(deliveryChannel);
+		if (docExchange != null && docExchange.getEbXMLSenderBinding() != null && docExchange.getEbXMLSenderBinding().getSenderNonRepudiation() != null && docExchange.getEbXMLSenderBinding().getSenderNonRepudiation().getSigningCertificateRef() != null)
+			return (Certificate)docExchange.getEbXMLSenderBinding().getSenderNonRepudiation().getSigningCertificateRef().getCertId();
+		return null;
 	}
 	
 	public static boolean isSigned(DeliveryChannel deliveryChannel)

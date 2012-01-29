@@ -175,7 +175,10 @@ public class EbMSSecSignatureInInterceptor extends AbstractSoapInterceptor
 					if (channels.size() == 1)
 					{
 						nl.clockwork.mule.ebms.model.cpp.cpa.Certificate c = CPAUtils.getCertificate(channels.get(0));
-						return CPAUtils.getX509Certificate(c);
+						if (c == null)
+							return null;
+						else
+							return CPAUtils.getX509Certificate(c);
 					}
 				}
 			}
