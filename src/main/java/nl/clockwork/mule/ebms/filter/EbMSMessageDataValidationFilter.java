@@ -16,9 +16,11 @@
 package nl.clockwork.mule.ebms.filter;
 
 import nl.clockwork.common.dao.DAOException;
+import nl.clockwork.mule.ebms.Constants;
 import nl.clockwork.mule.ebms.dao.EbMSDAO;
 import nl.clockwork.mule.ebms.model.EbMSBaseMessage;
 import nl.clockwork.mule.ebms.model.ebxml.MessageHeader;
+import nl.clockwork.mule.ebms.util.EbMSMessageUtils;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
@@ -44,7 +46,11 @@ public class EbMSMessageDataValidationFilter implements Filter
 				String refToMessageId = messageHeader.getMessageData().getRefToMessageId();
 				if (!StringUtils.isEmpty(refToMessageId))
 					//FIXME refToMessageId does not have to refer to another message or to an Acknowledgment or ErrorMessage
-					return ebMSDAO.existsMessage(refToMessageId);
+					if (!ebMSDAO.existsMessage(refToMessageId))
+					{
+						message.setProperty(Constants.EBMS_ERROR,EbMSMessageUtils.createError("//Header/MessageHeader/MessageData/RefToMessageId",Constants.EbMSErrorCode.VALUE_NOT_RECOGNIZED.errorCode(),"Value not found."));
+						return false;
+					}
 				return true;
 			}
 			catch (DAOException e)
