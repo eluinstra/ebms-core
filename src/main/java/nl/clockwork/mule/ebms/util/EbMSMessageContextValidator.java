@@ -15,13 +15,13 @@
  ******************************************************************************/
 package nl.clockwork.mule.ebms.util;
 
+import org.apache.cxf.common.util.StringUtils;
+
 import nl.clockwork.common.dao.DAOException;
 import nl.clockwork.mule.ebms.dao.EbMSDAO;
 import nl.clockwork.mule.ebms.model.EbMSMessageContext;
 import nl.clockwork.mule.ebms.model.cpp.cpa.CollaborationProtocolAgreement;
 import nl.clockwork.mule.ebms.model.cpp.cpa.PartyInfo;
-
-import org.apache.axis.utils.StringUtils;
 
 public class EbMSMessageContextValidator
 {
