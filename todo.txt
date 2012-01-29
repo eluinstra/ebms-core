@@ -1,6 +1,7 @@
 2.1.x:
 - create documentation/manual
 - improve error handling and logging
+- improve validation of received Error and Acknowledgment messages
 - configure CPA caching (or load CPA once per message)?
 / improve duplicate message handling
 	- store messages with unknown cpaId???
