@@ -29,7 +29,7 @@ import org.apache.commons.logging.LogFactory;
 import org.mule.api.MuleMessage;
 import org.mule.api.routing.filter.Filter;
 
-public class EbMSMessageBodyValidationFilter implements Filter
+public class EbMSManifestValidationFilter implements Filter
 {
   protected transient Log logger = LogFactory.getLog(getClass());
 

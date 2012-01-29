@@ -154,6 +154,9 @@
 						<message-properties-transformer>
 							<add-message-property key="EBMS.EBMS_MESSAGE_STATUS" value="UN_AUTHORIZED"/>
 						</message-properties-transformer>
+						<custom-transformer class="nl.clockwork.mule.common.transformer.Logger">
+							<spring:property name="message" value="CPA invalid!"/>
+						</custom-transformer>
 					</vm:outbound-endpoint>
 					<not-filter>
 						<custom-filter class="nl.clockwork.mule.ebms.filter.CPAValidationFilter">
@@ -166,6 +169,9 @@
 						<message-properties-transformer>
 							<add-message-property key="EBMS.EBMS_MESSAGE_STATUS" value="UN_AUTHORIZED"/>
 						</message-properties-transformer>
+						<custom-transformer class="nl.clockwork.mule.common.transformer.Logger">
+							<spring:property name="message" value="MessageHeader invalid!"/>
+						</custom-transformer>
 					</vm:outbound-endpoint>
 					<not-filter>
 						<custom-filter class="nl.clockwork.mule.ebms.filter.EbMSMessageHeaderValidationFilter">
@@ -178,6 +184,9 @@
 						<message-properties-transformer>
 							<add-message-property key="EBMS.EBMS_MESSAGE_STATUS" value="UN_AUTHORIZED"/>
 						</message-properties-transformer>
+						<custom-transformer class="nl.clockwork.mule.common.transformer.Logger">
+							<spring:property name="message" value="Signature invalid!"/>
+						</custom-transformer>
 					</vm:outbound-endpoint>
 					<not-filter>
 						<custom-filter class="nl.clockwork.mule.ebms.filter.EbMSSignatureValidationFilter">
@@ -190,6 +199,9 @@
 						<message-properties-transformer>
 							<add-message-property key="EBMS.EBMS_MESSAGE_STATUS" value="NOT_RECOGNIZED"/>
 						</message-properties-transformer>
+						<custom-transformer class="nl.clockwork.mule.common.transformer.Logger">
+							<spring:property name="message" value="MessageData invalid!"/>
+						</custom-transformer>
 					</vm:outbound-endpoint>
 					<not-filter>
 						<custom-filter class="nl.clockwork.mule.ebms.filter.EbMSMessageDataValidationFilter">
@@ -202,9 +214,12 @@
 						<message-properties-transformer>
 							<add-message-property key="EBMS.EBMS_MESSAGE_STATUS" value="UN_AUTHORIZED"/>
 						</message-properties-transformer>
+						<custom-transformer class="nl.clockwork.mule.common.transformer.Logger">
+							<spring:property name="message" value="Manifest invalid!"/>
+						</custom-transformer>
 					</vm:outbound-endpoint>
 					<not-filter>
-						<custom-filter class="nl.clockwork.mule.ebms.filter.EbMSMessageBodyValidationFilter" />
+						<custom-filter class="nl.clockwork.mule.ebms.filter.EbMSManifestValidationFilter" />
 					</not-filter>
 				</filtering-router>
 				<forwarding-catch-all-strategy>
@@ -212,6 +227,9 @@
 						<message-properties-transformer>
 							<add-message-property key="EBMS.EBMS_MESSAGE_STATUS" value="RECEIVED"/>
 						</message-properties-transformer>
+						<custom-transformer class="nl.clockwork.mule.common.transformer.Logger">
+							<spring:property name="message" value="Message valid."/>
+						</custom-transformer>
 					</vm:outbound-endpoint>
 				</forwarding-catch-all-strategy>
 			</outbound>
