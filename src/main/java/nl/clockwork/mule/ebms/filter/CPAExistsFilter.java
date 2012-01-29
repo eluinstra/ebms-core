@@ -15,14 +15,11 @@
  ******************************************************************************/
 package nl.clockwork.mule.ebms.filter;
 
-import java.util.Date;
-
 import nl.clockwork.common.dao.DAOException;
 import nl.clockwork.mule.ebms.Constants;
 import nl.clockwork.mule.ebms.dao.EbMSDAO;
 import nl.clockwork.mule.ebms.model.EbMSBaseMessage;
 import nl.clockwork.mule.ebms.model.cpp.cpa.CollaborationProtocolAgreement;
-import nl.clockwork.mule.ebms.model.cpp.cpa.StatusValueType;
 import nl.clockwork.mule.ebms.util.EbMSMessageUtils;
 
 import org.apache.commons.logging.Log;
@@ -30,7 +27,7 @@ import org.apache.commons.logging.LogFactory;
 import org.mule.api.MuleMessage;
 import org.mule.api.routing.filter.Filter;
 
-public class CPAValidationFilter implements Filter
+public class CPAExistsFilter implements Filter
 {
 	protected transient Log logger = LogFactory.getLog(getClass());
 	private EbMSDAO ebMSDAO;
@@ -43,24 +40,13 @@ public class CPAValidationFilter implements Filter
 			try
 			{
 				EbMSBaseMessage msg = (EbMSBaseMessage)message.getPayload();
-				Date now = new Date();
 				CollaborationProtocolAgreement cpa = ebMSDAO.getCPA(msg.getMessageHeader().getCPAId());
-				if (!StatusValueType.AGREED.equals(cpa.getStatus().getValue()))
+				if (cpa == null)
 				{
-					message.setProperty(Constants.EBMS_ERROR,EbMSMessageUtils.createError("//Header/MessageHeader[@cpaid]",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"CPA not agreed."));
+					message.setProperty(Constants.EBMS_ERROR,EbMSMessageUtils.createError("//Header/MessageHeader[@cpaid]",Constants.EbMSErrorCode.VALUE_NOT_RECOGNIZED.errorCode(),"CPA not found."));
 					return false;
 				}
-				if (now.compareTo(cpa.getStart().toGregorianCalendar().getTime()) < 0 || now.compareTo(cpa.getEnd().toGregorianCalendar().getTime()) > 0)
-				{
-					message.setProperty(Constants.EBMS_ERROR,EbMSMessageUtils.createError("//Header/MessageHeader[@cpaid]",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"CPA invalid."));
-					return false;
-				}
-
-				return cpa != null
-					&& StatusValueType.AGREED.equals(cpa.getStatus().getValue())
-					&& now.compareTo(cpa.getStart().toGregorianCalendar().getTime()) >= 0
-					&& now.compareTo(cpa.getEnd().toGregorianCalendar().getTime()) <= 0
-				;
+				return true;
 			}
 			catch (DAOException e)
 			{

@@ -16,7 +16,6 @@
 package nl.clockwork.mule.ebms.filter;
 
 import java.net.URI;
-import java.util.Date;
 import java.util.List;
 
 import nl.clockwork.common.dao.DAOException;
@@ -30,7 +29,6 @@ import nl.clockwork.mule.ebms.model.cpp.cpa.DeliveryChannel;
 import nl.clockwork.mule.ebms.model.cpp.cpa.PartyInfo;
 import nl.clockwork.mule.ebms.model.cpp.cpa.PerMessageCharacteristicsType;
 import nl.clockwork.mule.ebms.model.cpp.cpa.PersistenceLevelType;
-import nl.clockwork.mule.ebms.model.cpp.cpa.StatusValueType;
 import nl.clockwork.mule.ebms.model.cpp.cpa.SyncReplyModeType;
 import nl.clockwork.mule.ebms.model.ebxml.AckRequested;
 import nl.clockwork.mule.ebms.model.ebxml.MessageHeader;
@@ -69,23 +67,6 @@ public class EbMSMessageHeaderValidationFilter implements Filter
 				CollaborationProtocolAgreement cpa = ebMSDAO.getCPA(messageHeader.getCPAId());
 				PartyInfo from = null;
 				PartyInfo to = null;
-
-				if (cpa == null)
-				{
-					message.setProperty(Constants.EBMS_ERROR,EbMSMessageUtils.createError("//Header/MessageHeader[@cpaid]",Constants.EbMSErrorCode.VALUE_NOT_RECOGNIZED.errorCode(),""));
-					return false;
-				}
-				if (!StatusValueType.AGREED.equals(cpa.getStatus().getValue()))
-				{
-					message.setProperty(Constants.EBMS_ERROR,EbMSMessageUtils.createError("//Header/MessageHeader[@cpaid]",Constants.EbMSErrorCode.VALUE_NOT_RECOGNIZED.errorCode(),"CPA not agreed."));
-					return false;
-				}
-				Date now = new Date();
-				if (now.compareTo(cpa.getStart().toGregorianCalendar().getTime()) < 0 || now.compareTo(cpa.getEnd().toGregorianCalendar().getTime()) > 0)
-				{
-					message.setProperty(Constants.EBMS_ERROR,EbMSMessageUtils.createError("//Header/MessageHeader[@cpaid]",Constants.EbMSErrorCode.VALUE_NOT_RECOGNIZED.errorCode(),"CPA expired."));
-					return false;
-				}
 
 				if (!Constants.EBMS_VERSION.equals(messageHeader.getVersion()))
 				{
