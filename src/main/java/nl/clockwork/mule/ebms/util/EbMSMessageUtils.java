@@ -70,9 +70,9 @@ public class EbMSMessageUtils
 	public static MessageHeader createMessageHeader(CollaborationProtocolAgreement cpa, EbMSMessageContext context, String hostname) throws DatatypeConfigurationException
 	{
 		String uuid = UUID.getUUID();
-		PartyInfo partyInfo = CPAUtils.getSendingPartyInfo(cpa,context.getFromRole(),context.getServiceType(),context.getService(),context.getAction());
-		PartyInfo otherPartyInfo = CPAUtils.getReceivingPartyInfo(cpa,context.getToRole(),context.getServiceType(),context.getService(),context.getAction());
-		//PartyInfo otherPartyInfo = CPAUtils.getOtherReceivingPartyInfo(cpa,context.getFromRole(),context.getServiceType(),context.getService(),context.getAction());
+		PartyInfo sendingPartyInfo = CPAUtils.getSendingPartyInfo(cpa,context.getFromRole(),context.getServiceType(),context.getService(),context.getAction());
+		PartyInfo receivingPartyInfo = CPAUtils.getReceivingPartyInfo(cpa,context.getToRole(),context.getServiceType(),context.getService(),context.getAction());
+		//PartyInfo receivingPartyInfo = CPAUtils.getOtherReceivingPartyInfo(cpa,context.getFromRole(),context.getServiceType(),context.getService(),context.getAction());
 
 		MessageHeader messageHeader = new MessageHeader();
 
@@ -84,22 +84,22 @@ public class EbMSMessageUtils
 		
 		messageHeader.setFrom(new From());
 		PartyId from = new PartyId();
-		from.setType(partyInfo.getPartyId().get(0).getType());
-		from.setValue(partyInfo.getPartyId().get(0).getValue());
+		from.setType(sendingPartyInfo.getPartyId().get(0).getType());
+		from.setValue(sendingPartyInfo.getPartyId().get(0).getValue());
 		messageHeader.getFrom().getPartyId().add(from);
-		messageHeader.getFrom().setRole(partyInfo.getCollaborationRole().get(0).getRole().getName());
+		messageHeader.getFrom().setRole(sendingPartyInfo.getCollaborationRole().get(0).getRole().getName());
 
 		messageHeader.setTo(new To());
 		PartyId to = new PartyId();
-		to.setType(otherPartyInfo.getPartyId().get(0).getType());
-		to.setValue(otherPartyInfo.getPartyId().get(0).getValue());
+		to.setType(receivingPartyInfo.getPartyId().get(0).getType());
+		to.setValue(receivingPartyInfo.getPartyId().get(0).getValue());
 		messageHeader.getTo().getPartyId().add(to);
-		messageHeader.getTo().setRole(otherPartyInfo.getCollaborationRole().get(0).getRole().getName());
+		messageHeader.getTo().setRole(receivingPartyInfo.getCollaborationRole().get(0).getRole().getName());
 		
 		messageHeader.setService(new Service());
-		messageHeader.getService().setType(partyInfo.getCollaborationRole().get(0).getServiceBinding().getService().getType());
-		messageHeader.getService().setValue(partyInfo.getCollaborationRole().get(0).getServiceBinding().getService().getValue());
-		messageHeader.setAction(partyInfo.getCollaborationRole().get(0).getServiceBinding().getCanSend().get(0).getThisPartyActionBinding().getAction());
+		messageHeader.getService().setType(sendingPartyInfo.getCollaborationRole().get(0).getServiceBinding().getService().getType());
+		messageHeader.getService().setValue(sendingPartyInfo.getCollaborationRole().get(0).getServiceBinding().getService().getValue());
+		messageHeader.setAction(sendingPartyInfo.getCollaborationRole().get(0).getServiceBinding().getCanSend().get(0).getThisPartyActionBinding().getAction());
 
 		messageHeader.setMessageData(new MessageData());
 		messageHeader.getMessageData().setMessageId(uuid + "@" + hostname);
@@ -116,7 +116,7 @@ public class EbMSMessageUtils
 			messageHeader.getMessageData().setTimeToLive(DatatypeFactory.newInstance().newXMLGregorianCalendar(timestamp));
 		}
 
-		DeliveryChannel channel = CPAUtils.getDeliveryChannel(partyInfo.getCollaborationRole().get(0).getServiceBinding().getCanSend().get(0).getThisPartyActionBinding());
+		DeliveryChannel channel = CPAUtils.getDeliveryChannel(sendingPartyInfo.getCollaborationRole().get(0).getServiceBinding().getCanSend().get(0).getThisPartyActionBinding());
 
 		messageHeader.setDuplicateElimination(PerMessageCharacteristicsType.ALWAYS.equals(channel.getMessagingCharacteristics().getDuplicateElimination()) ? "" : null);
 		
