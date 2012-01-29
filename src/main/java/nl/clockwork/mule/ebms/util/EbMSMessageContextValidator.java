@@ -40,7 +40,7 @@ public class EbMSMessageContextValidator
 				throw new EbMSMessageContextValidationException("context.cpaId cannot be empty.");
 			CollaborationProtocolAgreement cpa = ebMSDAO.getCPA(context.getCpaId());
 			if (cpa == null)
-				throw new EbMSMessageContextValidationException("No CPA found with cpaId: " + context.getCpaId());
+				throw new EbMSMessageContextValidationException("No CPA found for: context.cpaId=" + context.getCpaId());
 
 			if (StringUtils.isEmpty(context.getService()))
 				throw new EbMSMessageContextValidationException("context.service cannot be empty.");
@@ -53,13 +53,13 @@ public class EbMSMessageContextValidator
 				StringBuffer msg = new StringBuffer();
 
 				msg.append("No action found for:");
-				msg.append("\n\tcontext.cpaId: ").append(context.getCpaId());
+				msg.append(" context.cpaId=").append(context.getCpaId());
 				if (context.getFromRole() != null)
-					msg.append("\n\tcontext.fromRole: ").append(context.getFromRole());
+					msg.append(", context.fromRole=").append(context.getFromRole());
 				if (context.getServiceType() != null)
-					msg.append("\n\tcontext.serviceType: ").append(context.getServiceType());
-				msg.append("\n\tcontext.service: ").append(context.getService());
-				msg.append("\n\tcontext.action: ").append(context.getAction());
+					msg.append(", context.serviceType=").append(context.getServiceType());
+				msg.append(", context.service=").append(context.getService());
+				msg.append(", context.action=").append(context.getAction());
 
 				throw new EbMSMessageContextValidationException(msg.toString());
 			}
@@ -69,13 +69,13 @@ public class EbMSMessageContextValidator
 				StringBuffer msg = new StringBuffer();
 
 				msg.append("No action found for:");
-				msg.append("\n\tcontext.cpaId: ").append(context.getCpaId());
+				msg.append(" context.cpaId=").append(context.getCpaId());
 				if (context.getFromRole() != null)
-					msg.append("\n\tcontext.toRole: ").append(context.getToRole());
+					msg.append(", context.toRole=").append(context.getToRole());
 				if (context.getServiceType() != null)
-					msg.append("\n\tcontext.serviceType: ").append(context.getServiceType());
-				msg.append("\n\tcontext.service: ").append(context.getService());
-				msg.append("\n\tcontext.action: ").append(context.getAction());
+					msg.append(", context.serviceType=").append(context.getServiceType());
+				msg.append(", context.service=").append(context.getService());
+				msg.append(", context.action=").append(context.getAction());
 				
 				throw new EbMSMessageContextValidationException(msg.toString());
 			}
