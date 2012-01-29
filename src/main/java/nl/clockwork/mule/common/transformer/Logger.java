@@ -23,35 +23,78 @@ import org.mule.transformer.AbstractMessageAwareTransformer;
 
 public class Logger extends AbstractMessageAwareTransformer
 {
+	private interface LogInvoker
+	{
+		void log(String message);
+	}
+	private class TraceLogInvoker implements LogInvoker
+	{
+		@Override
+		public void log(String message)
+		{
+			logger.trace(message);
+		}
+	}
+	private class DebugLogInvoker implements LogInvoker
+	{
+		@Override
+		public void log(String message)
+		{
+			logger.debug(message);
+		}
+	}
+	private class InfoLogInvoker implements LogInvoker
+	{
+		@Override
+		public void log(String message)
+		{
+			logger.info(message);
+		}
+	}
+	private class WarnLogInvoker implements LogInvoker
+	{
+		@Override
+		public void log(String message)
+		{
+			logger.warn(message);
+		}
+	}
+	private class ErrorLogInvoker implements LogInvoker
+	{
+		@Override
+		public void log(String message)
+		{
+			logger.error(message);
+		}
+	}
+	private class FatalLogInvoker implements LogInvoker
+	{
+		@Override
+		public void log(String message)
+		{
+			logger.fatal(message);
+		}
+	}
 	public static enum LogLevel
 	{
 		TRACE,DEBUG,INFO,WARN,ERROR,FATAL;
 	}
   protected transient Log logger = LogFactory.getLog(getClass());
+  private LogInvoker logInvoker = new InfoLogInvoker();
   private LogLevel logLevel = LogLevel.INFO;
 	private String message;
 
 	@Override
 	public Object transform(MuleMessage message, String outputEncoding) throws TransformerException
 	{
-		if (logLevel.equals(LogLevel.TRACE))
-			logger.trace(this.message);
-		else if (logLevel.equals(LogLevel.DEBUG))
-			logger.debug(this.message);
-		else if (logLevel.equals(LogLevel.INFO))
-			logger.info(this.message);
-		else if (logLevel.equals(LogLevel.WARN))
-			logger.warn(this.message);
-		else if (logLevel.equals(LogLevel.ERROR))
-			logger.error(this.message);
-		else if (logLevel.equals(LogLevel.FATAL))
-			logger.fatal(this.message);
+		logInvoker.log(this.message);
 		return message;
 	}
 
 	public void setLogLevel(LogLevel logLevel)
 	{
 		this.logLevel = logLevel;
+		setLogInvoker();
 	}
 	
 	public void setMessage(String message)
@@ -59,4 +102,19 @@ public class Logger extends AbstractMessageAwareTransformer
 		this.message = message;
 	}
 
+	private void setLogInvoker()
+	{
+		if (logLevel.equals(LogLevel.TRACE))
+			logInvoker = new TraceLogInvoker();
+		else if (logLevel.equals(LogLevel.DEBUG))
+			logInvoker = new DebugLogInvoker();
+		else if (logLevel.equals(LogLevel.INFO))
+			logInvoker = new InfoLogInvoker();
+		else if (logLevel.equals(LogLevel.WARN))
+			logInvoker = new WarnLogInvoker();
+		else if (logLevel.equals(LogLevel.ERROR))
+			logInvoker = new ErrorLogInvoker();
+		else if (logLevel.equals(LogLevel.FATAL))
+			logInvoker = new FatalLogInvoker();
+	}
 }
