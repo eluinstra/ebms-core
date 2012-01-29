@@ -107,7 +107,7 @@ public class EbMSMessageHeaderValidationFilter implements Filter
 				}
 				if (!CPAUtils.canReceive(to,messageHeader.getTo().getRole(),messageHeader.getService(),messageHeader.getAction()))
 				{
-					message.setProperty(Constants.EBMS_ERROR,EbMSMessageUtils.createError("//Header/MessageHeader/Action",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Action not found."));
+					message.setProperty(Constants.EBMS_ERROR,EbMSMessageUtils.createError("//Header/MessageHeader/Action",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Value not found."));
 					return false;
 				}
 
@@ -177,12 +177,12 @@ public class EbMSMessageHeaderValidationFilter implements Filter
 				{
 					if (!checkAckSignatureRequested(deliveryChannel,((EbMSAcknowledgment)message.getPayload()).getAcknowledgment()))
 					{
-						message.setProperty(Constants.EBMS_ERROR,EbMSMessageUtils.createError("//Acknowledgment/Reference",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Wrong value."));
+						message.setProperty(Constants.EBMS_ERROR,EbMSMessageUtils.createError("//Header/Acknowledgment/Reference",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Wrong value."));
 						return false;
 					}
 					if (!checkActor(deliveryChannel,((EbMSAcknowledgment)message.getPayload()).getAcknowledgment()))
 					{
-						message.setProperty(Constants.EBMS_ERROR,EbMSMessageUtils.createError("//Acknowledgment@actor",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Wrong value."));
+						message.setProperty(Constants.EBMS_ERROR,EbMSMessageUtils.createError("//Header/Acknowledgment@actor",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Wrong value."));
 						return false;
 					}
 				}
