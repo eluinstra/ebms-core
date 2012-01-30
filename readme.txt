@@ -180,21 +180,39 @@ EbMS Adapter Database =
 =======================
 The EbMS adapter supports different databases:
 - HSQLDB
+- MySQL
+- PostgreSQL
 - MSSQL
+- Oracle
 
 You can configure them by including the right xml in your project:
-- nl/clockwork/mule/ebms/components/dao.hsqldb.xml
-- nl/clockwork/mule/ebms/components/dao.mssql.xml
+- nl/clockwork/mule/ebms/components/hsqldb.xml
+- nl/clockwork/mule/ebms/components/mysql.xml
+- nl/clockwork/mule/ebms/components/postgresql.xml
+- nl/clockwork/mule/ebms/components/mssql.xml
+- nl/clockwork/mule/ebms/components/oracle.xml
 
 And you have to configure the right driver and connection string:
 - ebms.jdbc.driverClassName=org.hsqldb.jdbcDriver
 	ebms.jdbc.url=jdbc:hsqldb:mem:<dbname>
 	or
 	ebms.jdbc.url=jdbc:hsqldb:file:<path>
+	or
+	ebms.jdbc.url=jdbc:hsqldb:hsql://<host>:<port>/<dbname>
+
+- ebms.jdbc.driverClassName=com.mysql.jdbc.Driver
+	ebms.jdbc.url=jdbc:mysql://<host>:<port>/<dbname>
+
+- ebms.jdbc.driverClassName=org.postgresql.Driver
+	ebms.jdbc.url=jdbc:postgresql://<host>:<port>/<dbname>
+
 - ezpoort.jdbc.driverClassName=com.microsoft.sqlserver.jdbc.SQLServerDriver
 	or
 	ezpoort.jdbc.driverClassName=net.sourceforge.jtds.jdbc.Driver
 	ezpoort.jdbc.url=jdbc:sqlserver://<host>:<port>;databaseName=<dbname>;
+
+- ebms.jdbc.driverClassName=oracle.jdbc.OracleDriver
+	ebms.jdbc.url=jdbc:oracle:thin:@<host>:<port>:<dbname>
 
 If you want to let the adapter use the application datasource exclude the following file:
 - nl/clockwork/mule/ebms/components/datasource.xml
