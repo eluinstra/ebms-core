@@ -203,13 +203,13 @@ public class CPAUtils
 	{
 		for (Object o : certificate.getKeyInfo().getContent())
 		{
-			if (o instanceof JAXBElement<?> && ((JAXBElement<Object>)o).getValue() instanceof X509DataType)
+			if (o instanceof JAXBElement<?> && ((JAXBElement<?>)o).getValue() instanceof X509DataType)
 			{
-				for (Object p : ((X509DataType)((JAXBElement<Object>)o).getValue()).getX509IssuerSerialOrX509SKIOrX509SubjectName())
+				for (Object p : ((X509DataType)((JAXBElement<?>)o).getValue()).getX509IssuerSerialOrX509SKIOrX509SubjectName())
 				{
-					if (p instanceof JAXBElement<?> && ((JAXBElement<Object>)p).getValue() instanceof byte[])
+					if (p instanceof JAXBElement<?> && "X509Certificate".equals(((JAXBElement<?>)p).getName().getLocalPart()))
 					{
-						return (X509Certificate)CertificateFactory.getInstance("X.509").generateCertificate(new ByteArrayInputStream((byte[])((JAXBElement<Object>)p).getValue())); 
+						return (X509Certificate)CertificateFactory.getInstance("X.509").generateCertificate(new ByteArrayInputStream((byte[])((JAXBElement<?>)p).getValue())); 
 					}
 				}
 			}
