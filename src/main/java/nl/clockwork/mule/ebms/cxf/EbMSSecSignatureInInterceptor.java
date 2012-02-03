@@ -186,12 +186,12 @@ public class EbMSSecSignatureInInterceptor extends AbstractSoapInterceptor
 		}
 		catch (Exception e)
 		{
-			logger.info("",e);
+			logger.warn("",e);
 			return null;
 		}
 	}
 /*
-	private X509Certificate getCertificateOld(Document document)
+	private X509Certificate getCertificate(Document document)
 	{
 		try
 		{
@@ -201,7 +201,7 @@ public class EbMSSecSignatureInInterceptor extends AbstractSoapInterceptor
 		}
 		catch (Exception e)
 		{
-			logger.info("",e);
+			logger.warn("",e);
 			return null;
 		}
 	}
