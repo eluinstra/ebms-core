@@ -298,16 +298,6 @@ public class CxfServiceComponent implements Callable, Lifecycle
             // invoke the actual web service up until right before we serialize the response
             d.getMessageObserver().onMessage(m);
 
-            //PATCH 2 START
-            if (m.getExchange().getOutMessage() != null)
-            {
-	            String s = (String)m.getExchange().getOutMessage().get(HttpConstants.HEADER_CONTENT_TYPE);
-	            muleResMsg.setProperty(HttpConstants.HEADER_CONTENT_TYPE,s);
-            }
-            else
-            	muleResMsg.setProperty(HttpConnector.HTTP_STATUS_PROPERTY,HttpConstants.SC_NO_CONTENT);
-            //PATH 2 END
-           
             // Handle a fault if there is one.
             Message faultMsg = m.getExchange().getOutFaultMessage();
             if (faultMsg != null)
@@ -319,7 +309,18 @@ public class CxfServiceComponent implements Callable, Lifecycle
                     ctx.getMessage().setExceptionPayload(exceptionPayload);
                 }
             }
-            
+            else
+              //PATCH 2 START
+            	//TODO: set status = SC_NO_CONTENT if message == soap fault && message == ebms message
+	            if (m.getExchange().getOutMessage() != null)
+	            {
+		            String s = (String)m.getExchange().getOutMessage().get(HttpConstants.HEADER_CONTENT_TYPE);
+		            muleResMsg.setProperty(HttpConstants.HEADER_CONTENT_TYPE,s);
+	            }
+	            else
+	            	muleResMsg.setProperty(HttpConnector.HTTP_STATUS_PROPERTY,HttpConstants.SC_NO_CONTENT);
+            	//PATH 2 END
+
             muleResMsg.setProperty(MuleProperties.MULE_REPLY_TO_STOP_PROPERTY, "true");
             return muleResMsg;
         }
