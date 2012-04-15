@@ -33,8 +33,8 @@ CREATE TABLE ebms_message
 CREATE TABLE ebms_attachment
 (
 	ebms_message_id		INTEGER					NOT NULL,
-	name							VARCHAR(128)		NOT NULL,
-	content_type			VARCHAR(64)			NOT NULL,
+	name							VARCHAR(256)		NOT NULL,
+	content_type			VARCHAR(255)		NOT NULL,
 	content						BLOB						NOT NULL,
 	FOREIGN KEY (ebms_message_id) REFERENCES ebms_message(id)
 );
