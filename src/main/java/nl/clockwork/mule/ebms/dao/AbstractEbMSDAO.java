@@ -1047,17 +1047,76 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 		}
 	}
 	
+	public String getMessageContextFilter(EbMSMessageContext messageContext, List<Object> parameters)
+	{
+		StringBuffer result = new StringBuffer();
+		if (messageContext.getCpaId() != null)
+		{
+			parameters.add(messageContext.getCpaId());
+			result.append(" and cpa_id = ?");
+		}
+		if (messageContext.getFromRole() != null)
+		{
+			parameters.add(messageContext.getFromRole());
+			result.append(" and from_role = ?");
+		}
+		if (messageContext.getToRole() != null)
+		{
+			parameters.add(messageContext.getToRole());
+			result.append(" and to_role = ?");
+		}
+		if (messageContext.getServiceType() != null)
+		{
+			parameters.add(messageContext.getServiceType());
+			result.append(" and service_type = ?");
+		}
+		if (messageContext.getService() != null)
+		{
+			parameters.add(messageContext.getService());
+			result.append(" and service = ?");
+		}
+		if (messageContext.getAction() != null)
+		{
+			parameters.add(messageContext.getAction());
+			result.append(" and action = ?");
+		}
+		if (messageContext.getConversationId() != null)
+		{
+			parameters.add(messageContext.getConversationId());
+			result.append(" and conversation_id = ?");
+		}
+		if (messageContext.getMessageId() != null)
+		{
+			parameters.add(messageContext.getMessageId());
+			result.append(" and message_id = ?");
+		}
+		if (messageContext.getRefToMessageId() != null)
+		{
+			parameters.add(messageContext.getRefToMessageId());
+			result.append(" and ref_to_message_id = ?");
+		}
+		if (messageContext.getSequenceNr() != null)
+		{
+			parameters.add(messageContext.getSequenceNr());
+			result.append(" and sequence_nr = ?");
+		}
+		return result.toString();
+	}
+	
 	@SuppressWarnings("unchecked")
 	@Override
 	public List<String> getReceivedMessageIds(EbMSMessageContext messageContext) throws DAOException
 	{
 		try
 		{
+			List<Object> parameters = new ArrayList<Object>();
 			return jdbcTemplate.queryForList(
 					"select message_id" +
 					" from ebms_message" +
 					" where status = " + EbMSMessageStatus.RECEIVED.id() +
+					getMessageContextFilter(messageContext,parameters) +
 					" order by time_stamp asc",
+					parameters.toArray(new Object[0]),
 					String.class
 			);
 		}
@@ -1067,16 +1126,20 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 		}
 	}
 
-	public abstract String getReceivedMessageIdsQuery(int maxNr);
+	public abstract String getReceivedMessageIdsQuery(String messageContextFilter, int maxNr);
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<String> getReceivedMessageIds(int maxNr) throws DAOException
+	public List<String> getReceivedMessageIds(EbMSMessageContext messageContext, int maxNr) throws DAOException
 	{
 		try
 		{
+			//TODO improve: add maxNr to parameters???
+			List<Object> parameters = new ArrayList<Object>();
+			String messageContextFilter = getMessageContextFilter(messageContext,parameters);
 			return jdbcTemplate.queryForList(
-					getReceivedMessageIdsQuery(maxNr),
+					getReceivedMessageIdsQuery(messageContextFilter,maxNr),
+					parameters.toArray(new Object[0]),
 					String.class
 			);
 		}

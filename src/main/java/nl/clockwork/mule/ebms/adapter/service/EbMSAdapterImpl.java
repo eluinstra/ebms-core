@@ -64,7 +64,7 @@ public class EbMSAdapterImpl implements EbMSAdapter
 			if (maxNr == null)
 				return ebMSDAO.getReceivedMessageIds(messageContext);
 			else
-				return ebMSDAO.getReceivedMessageIds(maxNr);
+				return ebMSDAO.getReceivedMessageIds(messageContext,maxNr);
 		}
 		catch (DAOException e)
 		{
