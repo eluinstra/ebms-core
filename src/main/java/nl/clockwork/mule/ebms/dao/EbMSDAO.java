@@ -23,6 +23,7 @@ import nl.clockwork.mule.ebms.Constants.EbMSMessageStatus;
 import nl.clockwork.mule.ebms.model.EbMSAcknowledgment;
 import nl.clockwork.mule.ebms.model.EbMSBaseMessage;
 import nl.clockwork.mule.ebms.model.EbMSMessage;
+import nl.clockwork.mule.ebms.model.EbMSMessageContext;
 import nl.clockwork.mule.ebms.model.EbMSMessageError;
 import nl.clockwork.mule.ebms.model.cpp.cpa.CollaborationProtocolAgreement;
 import nl.clockwork.mule.ebms.model.ebxml.MessageHeader;
@@ -48,7 +49,7 @@ public interface EbMSDAO
 	void insertMessage(EbMSMessageError messageError, EbMSMessageStatus status) throws DAOException;
 	void insertMessage(EbMSAcknowledgment acknowledgment, EbMSMessageStatus status) throws DAOException;
 
-	List<String> getReceivedMessageIds() throws DAOException;
+	List<String> getReceivedMessageIds(EbMSMessageContext messageContext) throws DAOException;
 	List<String> getReceivedMessageIds(int maxNr) throws DAOException;
 	EbMSBaseMessage getMessage(String messageId) throws DAOException;
 	void processReceivedMessage(String messageId) throws DAOException;

@@ -36,6 +36,7 @@ import nl.clockwork.mule.ebms.Constants.EbMSMessageType;
 import nl.clockwork.mule.ebms.model.EbMSAcknowledgment;
 import nl.clockwork.mule.ebms.model.EbMSBaseMessage;
 import nl.clockwork.mule.ebms.model.EbMSMessage;
+import nl.clockwork.mule.ebms.model.EbMSMessageContext;
 import nl.clockwork.mule.ebms.model.EbMSMessageError;
 import nl.clockwork.mule.ebms.model.cpp.cpa.CollaborationProtocolAgreement;
 import nl.clockwork.mule.ebms.model.cpp.cpa.ReliableMessaging;
@@ -307,8 +308,8 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 			simpleJdbcTemplate.update
 			(
 				"insert into cpa (" +
-				"cpa_id," +
-				"cpa" +
+					"cpa_id," +
+					"cpa" +
 				") values (?,?)",
 				cpa.getCpaid(),
 				XMLMessageBuilder.getInstance(CollaborationProtocolAgreement.class).handle(cpa)
@@ -333,8 +334,8 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 			simpleJdbcTemplate.update
 			(
 				"update cpa set" +
-				" cpa=?" +
-				" where cpa_id=?",
+				" cpa = ?" +
+				" where cpa_id = ?",
 				XMLMessageBuilder.getInstance(CollaborationProtocolAgreement.class).handle(cpa),
 				cpa.getCpaid()
 			);
@@ -359,7 +360,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 				simpleJdbcTemplate.update
 				(
 					"delete from cpa" +
-					" where cpa_id=?",
+					" where cpa_id = ?",
 					cpaId
 				) > 0
 			;
@@ -582,10 +583,10 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 								simpleJdbcTemplate.update
 								(
 									"insert into ebms_attachment (" +
-									"ebms_message_id," +
-									"name," +
-									"content_type," +
-									"content" +
+										"ebms_message_id," +
+										"name," +
+										"content_type," +
+										"content" +
 									") values (?,?,?,?)",
 									keyHolder.getKey().longValue(),
 									attachment.getName() == null ? Constants.DEFAULT_FILENAME : attachment.getName(),
@@ -609,8 +610,8 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 								simpleJdbcTemplate.batchUpdate
 								(
 									"insert into ebms_send_event (" +
-									"ebms_message_id," +
-									"time" +
+										"ebms_message_id," +
+										"time" +
 									") values (?,?)",
 									sendEvents
 								);
@@ -680,10 +681,10 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 								simpleJdbcTemplate.update
 								(
 									"insert into ebms_attachment (" +
-									"ebms_message_id," +
-									"name," +
-									"content_type," +
-									"content" +
+										"ebms_message_id," +
+										"name," +
+										"content_type," +
+										"content" +
 									") values (?,?,?,?)",
 									keyHolder.getKey().longValue(),
 									attachment.getName() == null ? Constants.DEFAULT_FILENAME : attachment.getName(),
@@ -756,10 +757,10 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 								simpleJdbcTemplate.update
 								(
 									"insert into ebms_attachment (" +
-									"ebms_message_id," +
-									"name," +
-									"content_type," +
-									"content" +
+										"ebms_message_id," +
+										"name," +
+										"content_type," +
+										"content" +
 									") values (?,?,?,?)",
 									keyHolder.getKey().longValue(),
 									attachment.getName() == null ? Constants.DEFAULT_FILENAME : attachment.getName(),
@@ -789,8 +790,8 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 							simpleJdbcTemplate.update
 							(
 								"insert into ebms_send_event (" +
-								"ebms_message_id," +
-								"time" +
+									"ebms_message_id," +
+									"time" +
 								") values (?,?)",
 								keyHolder.getKey().longValue(),
 								//String.format(getDateFormat(),timestamp)
@@ -861,10 +862,10 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 								simpleJdbcTemplate.update
 								(
 									"insert into ebms_attachment (" +
-									"ebms_message_id," +
-									"name," +
-									"content_type," +
-									"content" +
+										"ebms_message_id," +
+										"name," +
+										"content_type," +
+										"content" +
 									") values (?,?,?,?)",
 									keyHolder.getKey().longValue(),
 									attachment.getName() == null ? Constants.DEFAULT_FILENAME : attachment.getName(),
@@ -894,8 +895,8 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 							simpleJdbcTemplate.update
 							(
 								"insert into ebms_send_event (" +
-								"ebms_message_id," +
-								"time" +
+									"ebms_message_id," +
+									"time" +
 								") values (?,?)",
 								keyHolder.getKey().longValue(),
 								//String.format(getDateFormat(),timestamp)
@@ -960,7 +961,8 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 								simpleJdbcTemplate.update
 								(
 									"delete from ebms_send_event" +
-									" where ebms_message_id=? and status=0",
+									" where ebms_message_id = ?" +
+									" and status = 0",
 									id
 								);
 
@@ -1022,7 +1024,8 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 								simpleJdbcTemplate.update
 								(
 									"delete from ebms_send_event" +
-									" where ebms_message_id=? and status=0",
+									" where ebms_message_id = ?" +
+									" and status = 0",
 									id
 								);
 
@@ -1046,14 +1049,14 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<String> getReceivedMessageIds() throws DAOException
+	public List<String> getReceivedMessageIds(EbMSMessageContext messageContext) throws DAOException
 	{
 		try
 		{
 			return jdbcTemplate.queryForList(
 					"select message_id" +
 					" from ebms_message" +
-					" where status=" + EbMSMessageStatus.RECEIVED.id() +
+					" where status = " + EbMSMessageStatus.RECEIVED.id() +
 					" order by time_stamp asc",
 					String.class
 			);
@@ -1091,7 +1094,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 			return simpleJdbcTemplate.queryForObject(
 				"select id, service, action, message_header, ack_requested, content" + 
 				" from ebms_message" + 
-				" where message_id=?",// and status=" + EbMSMessageStatus.RECEIVED.id(),
+				" where message_id = ?",// and status=" + EbMSMessageStatus.RECEIVED.id(),
 				new EbMSBaseMessageParameterizedRowMapper(),
 				messageId
 			);
@@ -1114,8 +1117,10 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 			simpleJdbcTemplate.update
 			(
 				"update ebms_message" +
-				" set status=" + EbMSMessageStatus.PROCESSED.id() +", status_time=" + getTimestampFunction() +
-				" where message_id=? and status=" + EbMSMessageStatus.RECEIVED.id(),
+				" set status = " + EbMSMessageStatus.PROCESSED.id() + "," +
+				" status_time = " + getTimestampFunction() +
+				" where message_id = ?" +
+				" and status = " + EbMSMessageStatus.RECEIVED.id(),
 				messageId
 			);
 		}
@@ -1135,8 +1140,10 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 				ids.add(new Object[]{messageId});
 			simpleJdbcTemplate.batchUpdate(
 					"update ebms_message" +
-					" set status=" + EbMSMessageStatus.PROCESSED.id() +", status_time=" + getTimestampFunction() +
-					" where message_id=? and status=" + EbMSMessageStatus.RECEIVED.id(),
+					" set status = " + EbMSMessageStatus.PROCESSED.id() + "," +
+					" status_time = " + getTimestampFunction() +
+					" where message_id = ?" +
+					" and status = " + EbMSMessageStatus.RECEIVED.id(),
 					ids
 			);
 		}
