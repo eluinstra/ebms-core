@@ -1050,55 +1050,58 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	public String getMessageContextFilter(EbMSMessageContext messageContext, List<Object> parameters)
 	{
 		StringBuffer result = new StringBuffer();
-		if (messageContext.getCpaId() != null)
+		if (messageContext != null)
 		{
-			parameters.add(messageContext.getCpaId());
-			result.append(" and cpa_id = ?");
-		}
-		if (messageContext.getFromRole() != null)
-		{
-			parameters.add(messageContext.getFromRole());
-			result.append(" and from_role = ?");
-		}
-		if (messageContext.getToRole() != null)
-		{
-			parameters.add(messageContext.getToRole());
-			result.append(" and to_role = ?");
-		}
-		if (messageContext.getServiceType() != null)
-		{
-			parameters.add(messageContext.getServiceType());
-			result.append(" and service_type = ?");
-		}
-		if (messageContext.getService() != null)
-		{
-			parameters.add(messageContext.getService());
-			result.append(" and service = ?");
-		}
-		if (messageContext.getAction() != null)
-		{
-			parameters.add(messageContext.getAction());
-			result.append(" and action = ?");
-		}
-		if (messageContext.getConversationId() != null)
-		{
-			parameters.add(messageContext.getConversationId());
-			result.append(" and conversation_id = ?");
-		}
-		if (messageContext.getMessageId() != null)
-		{
-			parameters.add(messageContext.getMessageId());
-			result.append(" and message_id = ?");
-		}
-		if (messageContext.getRefToMessageId() != null)
-		{
-			parameters.add(messageContext.getRefToMessageId());
-			result.append(" and ref_to_message_id = ?");
-		}
-		if (messageContext.getSequenceNr() != null)
-		{
-			parameters.add(messageContext.getSequenceNr());
-			result.append(" and sequence_nr = ?");
+			if (messageContext.getCpaId() != null)
+			{
+				parameters.add(messageContext.getCpaId());
+				result.append(" and cpa_id = ?");
+			}
+			if (messageContext.getFromRole() != null)
+			{
+				parameters.add(messageContext.getFromRole());
+				result.append(" and from_role = ?");
+			}
+			if (messageContext.getToRole() != null)
+			{
+				parameters.add(messageContext.getToRole());
+				result.append(" and to_role = ?");
+			}
+			if (messageContext.getServiceType() != null)
+			{
+				parameters.add(messageContext.getServiceType());
+				result.append(" and service_type = ?");
+			}
+			if (messageContext.getService() != null)
+			{
+				parameters.add(messageContext.getService());
+				result.append(" and service = ?");
+			}
+			if (messageContext.getAction() != null)
+			{
+				parameters.add(messageContext.getAction());
+				result.append(" and action = ?");
+			}
+			if (messageContext.getConversationId() != null)
+			{
+				parameters.add(messageContext.getConversationId());
+				result.append(" and conversation_id = ?");
+			}
+			if (messageContext.getMessageId() != null)
+			{
+				parameters.add(messageContext.getMessageId());
+				result.append(" and message_id = ?");
+			}
+			if (messageContext.getRefToMessageId() != null)
+			{
+				parameters.add(messageContext.getRefToMessageId());
+				result.append(" and ref_to_message_id = ?");
+			}
+			if (messageContext.getSequenceNr() != null)
+			{
+				parameters.add(messageContext.getSequenceNr());
+				result.append(" and sequence_nr = ?");
+			}
 		}
 		return result.toString();
 	}
