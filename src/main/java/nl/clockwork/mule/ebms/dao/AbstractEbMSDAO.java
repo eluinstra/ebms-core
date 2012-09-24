@@ -62,7 +62,7 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
-import org.springframework.transaction.support.TransactionCallback;
+import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 import org.springframework.transaction.support.TransactionTemplate;
 
 public abstract class AbstractEbMSDAO implements EbMSDAO
@@ -546,11 +546,11 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 		try
 		{
 			transactionTemplate.execute(
-				new TransactionCallback()
+				new TransactionCallbackWithoutResult()
 				{
 	
 					@Override
-					public Object doInTransaction(TransactionStatus transactionStatus)
+					public void doInTransactionWithoutResult(TransactionStatus transactionStatus)
 					{
 						try
 						{
@@ -616,12 +616,9 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 									sendEvents
 								);
 							}
-
-							return keyHolder.getKey().longValue();
 						}
 						catch (Exception e)
 						{
-							transactionStatus.setRollbackOnly(); 
 							throw new RuntimeException(e);
 						}
 					}
@@ -641,11 +638,11 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 		try
 		{
 			transactionTemplate.execute(
-				new TransactionCallback()
+				new TransactionCallbackWithoutResult()
 				{
 	
 					@Override
-					public Object doInTransaction(TransactionStatus transactionStatus)
+					public void doInTransactionWithoutResult(TransactionStatus transactionStatus)
 					{
 						try
 						{
@@ -692,12 +689,9 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 									IOUtils.toByteArray(attachment.getInputStream())
 								);
 							}
-							
-							return keyHolder.getKey().longValue();
 						}
 						catch (Exception e)
 						{
-							transactionStatus.setRollbackOnly(); 
 							throw new RuntimeException(e);
 						}
 					}
@@ -717,11 +711,11 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 		try
 		{
 			transactionTemplate.execute(
-				new TransactionCallback()
+				new TransactionCallbackWithoutResult()
 				{
 	
 					@Override
-					public Object doInTransaction(TransactionStatus transactionStatus)
+					public void doInTransactionWithoutResult(TransactionStatus transactionStatus)
 					{
 						try
 						{
@@ -797,12 +791,9 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 								//String.format(getDateFormat(),timestamp)
 								timestamp
 							);
-
-							return null;
 						}
 						catch (Exception e)
 						{
-							transactionStatus.setRollbackOnly(); 
 							throw new RuntimeException(e);
 						}
 					}
@@ -822,11 +813,11 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 		try
 		{
 			transactionTemplate.execute(
-				new TransactionCallback()
+				new TransactionCallbackWithoutResult()
 				{
 	
 					@Override
-					public Object doInTransaction(TransactionStatus transactionStatus)
+					public void doInTransactionWithoutResult(TransactionStatus transactionStatus)
 					{
 						try
 						{
@@ -902,12 +893,9 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 								//String.format(getDateFormat(),timestamp)
 								timestamp
 							);
-
-							return null;
 						}
 						catch (Exception e)
 						{
-							transactionStatus.setRollbackOnly(); 
 							throw new RuntimeException(e);
 						}
 					}
@@ -927,11 +915,11 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 		try
 		{
 			transactionTemplate.execute(
-				new TransactionCallback()
+				new TransactionCallbackWithoutResult()
 				{
 	
 					@Override
-					public Object doInTransaction(TransactionStatus transactionStatus)
+					public void doInTransactionWithoutResult(TransactionStatus transactionStatus)
 					{
 						try
 						{
@@ -965,12 +953,9 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 									" and status = 0",
 									id
 								);
-
-							return keyHolder.getKey().longValue();
 						}
 						catch (Exception e)
 						{
-							transactionStatus.setRollbackOnly(); 
 							throw new RuntimeException(e);
 						}
 					}
@@ -990,11 +975,11 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 		try
 		{
 			transactionTemplate.execute(
-				new TransactionCallback()
+				new TransactionCallbackWithoutResult()
 				{
 	
 					@Override
-					public Object doInTransaction(TransactionStatus transactionStatus)
+					public void doInTransactionWithoutResult(TransactionStatus transactionStatus)
 					{
 						try
 						{
@@ -1028,12 +1013,9 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 									" and status = 0",
 									id
 								);
-
-							return keyHolder.getKey().longValue();
 						}
 						catch (Exception e)
 						{
-							transactionStatus.setRollbackOnly(); 
 							throw new RuntimeException(e);
 						}
 					}

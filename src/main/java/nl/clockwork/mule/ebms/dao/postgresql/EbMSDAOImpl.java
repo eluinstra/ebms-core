@@ -53,7 +53,7 @@ import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
-import org.springframework.transaction.support.TransactionCallback;
+import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 import org.springframework.transaction.support.TransactionTemplate;
 
 public class EbMSDAOImpl extends AbstractEbMSDAO
@@ -234,11 +234,11 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 		try
 		{
 			transactionTemplate.execute(
-				new TransactionCallback()
+				new TransactionCallbackWithoutResult()
 				{
 	
 					@Override
-					public Object doInTransaction(TransactionStatus transactionStatus)
+					public void doInTransactionWithoutResult(TransactionStatus transactionStatus)
 					{
 						try
 						{
@@ -303,12 +303,9 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 									sendEvents
 								);
 							}
-
-							return key;
 						}
 						catch (Exception e)
 						{
-							transactionStatus.setRollbackOnly(); 
 							throw new RuntimeException(e);
 						}
 					}
@@ -328,11 +325,11 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 		try
 		{
 			transactionTemplate.execute(
-				new TransactionCallback()
+				new TransactionCallbackWithoutResult()
 				{
 	
 					@Override
-					public Object doInTransaction(TransactionStatus transactionStatus)
+					public void doInTransactionWithoutResult(TransactionStatus transactionStatus)
 					{
 						try
 						{
@@ -378,12 +375,9 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 									IOUtils.toByteArray(attachment.getInputStream())
 								);
 							}
-							
-							return key;
 						}
 						catch (Exception e)
 						{
-							transactionStatus.setRollbackOnly(); 
 							throw new RuntimeException(e);
 						}
 					}
@@ -403,11 +397,11 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 		try
 		{
 			transactionTemplate.execute(
-				new TransactionCallback()
+				new TransactionCallbackWithoutResult()
 				{
 	
 					@Override
-					public Object doInTransaction(TransactionStatus transactionStatus)
+					public void doInTransactionWithoutResult(TransactionStatus transactionStatus)
 					{
 						try
 						{
@@ -482,12 +476,9 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 								//String.format(getDateFormat(),timestamp)
 								timestamp
 							);
-
-							return null;
 						}
 						catch (Exception e)
 						{
-							transactionStatus.setRollbackOnly(); 
 							throw new RuntimeException(e);
 						}
 					}
@@ -507,11 +498,11 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 		try
 		{
 			transactionTemplate.execute(
-				new TransactionCallback()
+				new TransactionCallbackWithoutResult()
 				{
 	
 					@Override
-					public Object doInTransaction(TransactionStatus transactionStatus)
+					public void doInTransactionWithoutResult(TransactionStatus transactionStatus)
 					{
 						try
 						{
@@ -586,12 +577,9 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 								//String.format(getDateFormat(),timestamp)
 								timestamp
 							);
-
-							return null;
 						}
 						catch (Exception e)
 						{
-							transactionStatus.setRollbackOnly(); 
 							throw new RuntimeException(e);
 						}
 					}
@@ -611,16 +599,16 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 		try
 		{
 			transactionTemplate.execute(
-				new TransactionCallback()
+				new TransactionCallbackWithoutResult()
 				{
 	
 					@Override
-					public Object doInTransaction(TransactionStatus transactionStatus)
+					public void doInTransactionWithoutResult(TransactionStatus transactionStatus)
 					{
 						try
 						{
 							Date timestamp = new Date();
-							Long key = (Long)jdbcTemplate.query(
+							jdbcTemplate.update(
 									new EbMSMessagePreparedStatement(
 											timestamp,
 											messageError.getMessageHeader().getCPAId(),
@@ -635,8 +623,7 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 											XMLMessageBuilder.getInstance(MessageHeader.class).handle(messageError.getMessageHeader()),
 											XMLMessageBuilder.getInstance(ErrorList.class).handle(messageError.getErrorList()),
 											status
-									),
-									new IdExtractor()
+									)
 							);
 
 							Long id = getEbMSMessageId(messageError.getMessageHeader().getMessageData().getRefToMessageId());
@@ -647,12 +634,9 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 									" where ebms_message_id=? and status=0",
 									id
 								);
-
-							return key;
 						}
 						catch (Exception e)
 						{
-							transactionStatus.setRollbackOnly(); 
 							throw new RuntimeException(e);
 						}
 					}
@@ -672,16 +656,16 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 		try
 		{
 			transactionTemplate.execute(
-				new TransactionCallback()
+				new TransactionCallbackWithoutResult()
 				{
 	
 					@Override
-					public Object doInTransaction(TransactionStatus transactionStatus)
+					public void doInTransactionWithoutResult(TransactionStatus transactionStatus)
 					{
 						try
 						{
 							Date timestamp = new Date();
-							Long key = (Long)jdbcTemplate.query(
+							jdbcTemplate.update(
 									new EbMSMessagePreparedStatement(
 											timestamp,
 											acknowledgment.getMessageHeader().getCPAId(),
@@ -696,8 +680,7 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 											XMLMessageBuilder.getInstance(MessageHeader.class).handle(acknowledgment.getMessageHeader()),
 											XMLMessageBuilder.getInstance(Acknowledgment.class).handle(acknowledgment.getAcknowledgment()),
 											status
-									),
-									new IdExtractor()
+									)
 							);
 
 							Long id = getEbMSMessageId(acknowledgment.getMessageHeader().getMessageData().getRefToMessageId());
@@ -708,12 +691,9 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 									" where ebms_message_id=? and status=0",
 									id
 								);
-
-							return key;
 						}
 						catch (Exception e)
 						{
-							transactionStatus.setRollbackOnly(); 
 							throw new RuntimeException(e);
 						}
 					}
