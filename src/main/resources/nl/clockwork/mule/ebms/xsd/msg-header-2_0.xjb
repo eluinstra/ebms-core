@@ -3,6 +3,6 @@
 		<jxb:javaType name="javax.xml.datatype.XMLGregorianCalendar" xmlType="xsd:dateTime" parseMethod="nl.clockwork.mule.ebms.cxf.EbMSDateTimeConverter.parseDateTime" printMethod="nl.clockwork.mule.ebms.cxf.EbMSDateTimeConverter.printDateTime" />
 	</jxb:globalBindings>
     <jxb:schemaBindings>
-         <jxb:package name="nl.avisi.ebms.model.ebxml" />
+         <jxb:package name="nl.clockwork.mule.ebms.model.ebxml" />
      </jxb:schemaBindings>
 </jxb:bindings>

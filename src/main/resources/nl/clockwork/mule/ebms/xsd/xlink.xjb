@@ -1,5 +1,5 @@
 <jxb:bindings xmlns:jxb="http://java.sun.com/xml/ns/jaxb" xmlns:xsd="http://www.w3.org/2001/XMLSchema" version="2.0" schemaLocation="xlink.xsd">
     <jxb:schemaBindings>
-         <jxb:package name="nl.avisi.ebms.model.xml.xlink" />
+         <jxb:package name="nl.clockwork.mule.ebms.model.xml.xlink" />
      </jxb:schemaBindings>
 </jxb:bindings>

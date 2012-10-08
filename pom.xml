@@ -312,7 +312,7 @@
                             <schemaFiles>cpp-cpa-2_0.xsd</schemaFiles>
                             <bindingDirectory>${project.basedir}/src/main/resources/nl/clockwork/mule/ebms/xsd</bindingDirectory>
                             <bindingFiles>cpp-cpa-2_0.xjb</bindingFiles>
-                            <packageName>nl.avisi.mule.ebms.model.cpp.cpa</packageName>
+                            <packageName>nl.clockwork.mule.ebms.model.cpp.cpa</packageName>
                             <outputDirectory></outputDirectory>
                             <staleFile>${project.build.directory}/jaxb2/.cpaStaleFlag</staleFile>
                             <clearOutputDir>false</clearOutputDir>
