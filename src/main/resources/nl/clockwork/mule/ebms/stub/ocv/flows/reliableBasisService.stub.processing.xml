@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Copyright 2011 Clockwork
+  
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+  
+    http://www.apache.org/licenses/LICENSE-2.0
+  
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+<mule
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns="http://www.mulesource.org/schema/mule/core/2.2"
+        xmlns:spring="http://www.springframework.org/schema/beans"
+        xmlns:vm="http://www.mulesource.org/schema/mule/vm/2.2"
+        xmlns:file="http://www.mulesource.org/schema/mule/file/2.2"
+        xsi:schemaLocation="http://www.mulesource.org/schema/mule/core/2.2 http://www.mulesource.org/schema/mule/core/2.2/mule.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+
+
+		http://www.mulesource.org/schema/mule/vm/2.2 http://www.mulesource.org/schema/mule/vm/2.2/mule-vm.xsd
+
+
+		http://www.mulesource.org/schema/mule/file/2.2 http://www.mulesource.org/schema/mule/file/2.2/mule-file.xsd"
+        >
+
+	<vm:endpoint name="reliablebasisbericht.processing.service.in" path="reliablebasisbericht.processing.service.in" />
+
+	<model>
+
+		<service name="reliablebasisbericht.processing.service">
+			<inbound>
+					<vm:inbound-endpoint path="reliablebasisbericht.processing.service.in" />
+			</inbound>
+			<outbound>
+				<pass-through-router>
+					<vm:outbound-endpoint path="reliablebasisbericht.validate.in" synchronous="false"/>
+				</pass-through-router>
+			</outbound>
+		</service>
+
+		<service name="reliablebasisbericht.validate">
+			<inbound>
+				<vm:inbound-endpoint path="reliablebasisbericht.validate.in" />
+				<wire-tap-router>
+					<vm:outbound-endpoint path="reliablebasisbericht.request.log.in"/>
+				</wire-tap-router>
+			</inbound>
+			<outbound>
+				<filtering-router>
+					<vm:outbound-endpoint path="reliablebasisbericht.reliablebasisbevestiging.in">
+						<message-properties-transformer>
+							<add-message-property key="AANLEVERBERICHT_ERROR" value-ref="AANLEVERBERICHT_DETERMINATION_ERROR"/>
+						</message-properties-transformer>
+					</vm:outbound-endpoint>
+					<not-filter>
+						<custom-filter class="nl.clockwork.mule.ebms.filter.EbMSMessageContentValidationFilter" />
+					</not-filter>
+				</filtering-router>
+				<filtering-router>
+					<vm:outbound-endpoint path="reliablebasisbericht.reliablebasisbevestiging.in">
+						<message-properties-transformer>
+							<add-message-property key="AANLEVERBERICHT_ERROR" value-ref="AANLEVERBERICHT_XSD_ERROR"/>
+						</message-properties-transformer>
+					</vm:outbound-endpoint>
+					<not-filter>
+						<custom-filter class="nl.clockwork.mule.ebms.filter.EbMSMessageContentXSDValidationFilter">
+							<spring:property name="xsdFile" value="/nl/clockwork/mule/ebms/stub/ocv/xsd/Aanleveren_ebMS_2.0_v1.1.xsd" />
+						</custom-filter>
+					</not-filter>
+				</filtering-router>
+				<!--filtering-router>
+					<vm:outbound-endpoint path="aanleverbericht.aanleverbevestiging.in">
+						<message-properties-transformer>
+							<add-message-property key="AANLEVERBERICHT_ERROR" value-ref="AANLEVERBERICHT_BERICHTSOORT_ERROR"/>
+						</message-properties-transformer>
+					</vm:outbound-endpoint>
+					<not-filter>
+						<custom-filter class="nl.clockwork.mule.ebms.stub.ebf.filter.AanleverBerichtBerichtSoortValidationFilter">
+							<spring:property name="berichtSoort" ref="AANLEVERBERICHT_BERICHTSOORT_ORDER" />
+						</custom-filter>
+					</not-filter>
+				</filtering-router-->
+				<forwarding-catch-all-strategy>
+					<vm:outbound-endpoint path="reliablebasisbericht.reliablebasisbevestiging.in" />
+				</forwarding-catch-all-strategy>
+			</outbound>
+		</service>
+
+		<service name="reliablebasisbericht.reliablebasisbevestiging">
+			<inbound>
+				<vm:inbound-endpoint path="reliablebasisbericht.reliablebasisbevestiging.in">
+					<custom-transformer class="nl.clockwork.mule.ebms.stub.cdr.transformer.ReliableBasisBerichtToReliableBasisBevestiging">
+						<spring:property name="cpaId" value="${reliableBasisService.cpaId}"/>
+						<spring:property name="service" value="${reliablebasisService.service}"/>
+						<spring:property name="action" value="${reliableBasisService.response.action}"/>
+					</custom-transformer>
+				</vm:inbound-endpoint>
+			</inbound>
+			<outbound>
+				<multicasting-router>
+					<vm:outbound-endpoint path="reliablebasisbericht.response.log.in"/>
+					<vm:outbound-endpoint path="ebms.content.receive.in"/>
+				</multicasting-router>
+			</outbound>
+		</service>
+
+		<service name="reliablebasisbericht.request.log">
+			<inbound>
+				<vm:inbound-endpoint path="reliablebasisbericht.request.log.in"/>
+			</inbound>
+			<outbound>
+				<pass-through-router>
+					<file:outbound-endpoint connector-ref="connector.file" path="${dir.base}/reliableBasisService/request" outputPattern="request_#[function:datestamp:yyyyMMddHHmmSSS].xml">
+						<custom-transformer class="nl.clockwork.mule.ebms.stub.ebf.transformer.EbMSMessageContentToMessageContent"/>
+					</file:outbound-endpoint>
+				</pass-through-router>
+			</outbound>
+		</service>
+
+		<service name="reliablebasisbericht.response.log">
+			<inbound>
+				<vm:inbound-endpoint path="reliablebasisbericht.response.log.in"/>
+			</inbound>
+			<outbound>
+				<pass-through-router>
+					<file:outbound-endpoint connector-ref="connector.file" path="${dir.base}/reliableBasisService/response" outputPattern="response_#[function:datestamp:yyyyMMddHHmmSSS].xml">
+						<custom-transformer class="nl.clockwork.mule.ebms.stub.ebf.transformer.EbMSMessageContentToMessageContent"/>
+					</file:outbound-endpoint>
+				</pass-through-router>
+			</outbound>
+		</service>
+
+	</model>
+
+</mule>
