@@ -82,7 +82,9 @@
 			<outbound>
 				<filtering-router>
 					<vm:outbound-endpoint path="ebms.response.find.in" />
-					<custom-filter class="nl.clockwork.mule.ebms.filter.EbMSMessageHeaderCompareFilter"/>
+                    <custom-filter class="nl.clockwork.mule.ebms.filter.EbMSMessageHeaderCompareFilter">\r
+                        <spring:property name="ebMSDAO" ref="ebMSDAO"/>\r
+                    </custom-filter>
 				</filtering-router>
 				<forwarding-catch-all-strategy>
 					<!--vm:outbound-endpoint path="ebms.message.duplicate.invalid" /-->
