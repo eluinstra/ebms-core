@@ -1,5 +1,5 @@
 <jxb:bindings xmlns:jxb="http://java.sun.com/xml/ns/jaxb" xmlns:xsd="http://www.w3.org/2001/XMLSchema" version="2.0">
 	<jxb:globalBindings>
-		<jxb:javaType name="javax.xml.datatype.XMLGregorianCalendar" xmlType="xsd:dateTime" parseMethod="nl.ez.ezpoort.common.cxf.EbMSDateTimeConverter.parseDateTime" printMethod="nl.ez.ezpoort.common.cxf.EbMSDateTimeConverter.printdateTime" />
+		<jxb:javaType name="javax.xml.datatype.XMLGregorianCalendar" xmlType="xsd:dateTime" parseMethod="nl.clockwork.mule.ebms.cxf.EbMSDateTimeAdapter.parseDateTime" printMethod="nl.clockwork.mule.ebms.cxf.EbMSDateTimeAdapter.printdateTime" />
 	</jxb:globalBindings>
 </jxb:bindings>
