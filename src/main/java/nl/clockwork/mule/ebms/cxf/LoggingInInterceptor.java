@@ -48,7 +48,7 @@ public class LoggingInInterceptor extends AbstractPhaseInterceptor<Message>
 
 	public void handleMessage(Message message) throws Fault
 	{
-		final LoggingMessage buffer = new LoggingMessage("Inbound Message\n----------------------------");
+		final LoggingMessage buffer = new LoggingMessage("Inbound Message\n----------------------------", LoggingMessage.nextId());
 		buffer.getHeader().append(Message.CONTENT_TYPE).append(":").append(message.get(Message.CONTENT_TYPE));
 		String encoding = (String)message.get(Message.ENCODING);
 		if (encoding != null)

@@ -28,7 +28,10 @@
 		<url>www.clockwork.nl</url>
 	</organization>
 	<properties>
-		<mule.version>2.2.1</mule.version>
+        <!-- a lot of mule 2.2.1 dependencies aren't available anymore in public maven repo's -->
+        <!-- the dependencies of mule-2.2.8 are available in maven repo's, but there's no release of mule-2.2.8. -->
+        <!-- so you need to build mule-2.2.8 from source and place it in your own (local) maven repo. -->
+		<mule.version>2.2.8</mule.version>
 		<saxon.version>8.7</saxon.version>
 	</properties>
 	<dependencies>
@@ -110,7 +113,7 @@
 		<dependency>
 			<groupId>org.hsqldb</groupId>
 			<artifactId>hsqldb</artifactId>
-			<version>2.1.0</version>
+			<version>2.2.8</version>
 		</dependency>
 		<!--dependency>
 			<groupId>mysql</groupId>
@@ -269,12 +272,12 @@
 							<ignore>nl.clockwork.mule.ebms.dao.*</ignore>
 						</ignores>
 					</instrumentation>
-					<systemProperties>
-						<property>
-							<name>net.sourceforge.cobertura.datafile</name>
-							<value>${basedir}/target/cobertura/cobertura.ser</value>
-						</property>
-					</systemProperties>
+					<!--<systemProperties>-->
+						<!--<property>-->
+							<!--<name>net.sourceforge.cobertura.datafile</name>-->
+							<!--<value>${basedir}/target/cobertura/cobertura.ser</value>-->
+						<!--</property>-->
+					<!--</systemProperties>-->
 					<formats>
 						<format>html</format>
 						<format>xml</format>
@@ -459,7 +462,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-pmd-plugin</artifactId>
-				<version>2.3.1</version>
+				<version>2.7.1</version>
 				<configuration>
 					<targetJdk>1.6</targetJdk>
 					<excludes>

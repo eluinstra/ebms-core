@@ -98,7 +98,7 @@ public class LoggingOutInterceptor extends AbstractSoapInterceptor
 		{
 			try
 			{
-				final LoggingMessage buffer = new LoggingMessage("Outbound Message\n---------------------------");
+				final LoggingMessage buffer = new LoggingMessage("Outbound Message\n---------------------------", LoggingMessage.nextId());
 				buffer.getHeader().append(Message.CONTENT_TYPE).append(":").append(message.get(Message.CONTENT_TYPE));
 				String encoding = (String)message.get(Message.ENCODING);
 				if (encoding != null)
