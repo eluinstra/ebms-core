@@ -1,0 +1,8 @@
+<jxb:bindings xmlns:jxb="http://java.sun.com/xml/ns/jaxb" xmlns:xsd="http://www.w3.org/2001/XMLSchema" version="2.0" schemaLocation="msg-header-2_0.xsd">
+	<jxb:globalBindings>
+		<jxb:javaType name="javax.xml.datatype.XMLGregorianCalendar" xmlType="xsd:dateTime" parseMethod="nl.clockwork.mule.ebms.cxf.EbMSDateTimeConverter.parseDateTime" printMethod="nl.clockwork.mule.ebms.cxf.EbMSDateTimeConverter.printDateTime" />
+	</jxb:globalBindings>
+    <jxb:schemaBindings>
+         <jxb:package name="nl.avisi.ebms.model.ebxml" />
+     </jxb:schemaBindings>
+</jxb:bindings>

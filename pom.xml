@@ -298,49 +298,47 @@
 					<findbugsXmlOutputDirectory>findbugs</findbugsXmlOutputDirectory>
 				</configuration>
 			</plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>jaxb2-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>cpa</id>
+                        <goals>
+                            <goal>xjc</goal>
+                        </goals>
+                        <configuration>
+                            <schemaDirectory>${project.basedir}/src/main/resources/nl/clockwork/mule/ebms/xsd</schemaDirectory>
+                            <schemaFiles>cpp-cpa-2_0.xsd</schemaFiles>
+                            <bindingDirectory>${project.basedir}/src/main/resources/nl/clockwork/mule/ebms/xsd</bindingDirectory>
+                            <bindingFiles>cpp-cpa-2_0.xjb</bindingFiles>
+                            <packageName>nl.avisi.mule.ebms.model.cpp.cpa</packageName>
+                            <outputDirectory></outputDirectory>
+                            <staleFile>${project.build.directory}/jaxb2/.cpaStaleFlag</staleFile>
+                            <clearOutputDir>false</clearOutputDir>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>msgheader</id>
+                        <goals>
+                            <goal>xjc</goal>
+                        </goals>
+                        <configuration>
+                            <schemaDirectory>${project.basedir}/src/main/resources/nl/clockwork/mule/ebms/xsd</schemaDirectory>
+                            <schemaFiles>msg-header-2_0.xsd</schemaFiles>
+                            <bindingDirectory>${project.basedir}/src/main/resources/nl/clockwork/mule/ebms/xsd</bindingDirectory>
+                            <bindingFiles>msg-header-2_0.xjb,xmldsig-core-schema.xjb,xlink.xjb,xml.xjb,envelope.xjb</bindingFiles>
+                            <outputDirectory></outputDirectory>
+                            <staleFile>${project.build.directory}/jaxb2/.msgheaderStaleFlag</staleFile>
+                            <clearOutputDir>false</clearOutputDir>
+                            <!-- there's no <package/> element here, packages are configured in the *.xjb files -->
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
 		</plugins>
 	</build>
 	<profiles>
-		<profile>
-			<id>generate-cpp-cpa-model</id>
-			<activation>
-	 			<property>
-	  				<name>generate-cpp-cpa-model</name>
-				</property>  				
-			</activation>
-	  		<build>
-	    		<plugins>
-					<plugin>
-						<groupId>com.sun.tools.xjc.maven2</groupId>
-						<artifactId>maven-jaxb-plugin</artifactId>
-						<version>1.1.1</version>
-						<executions>
-							<execution>
-									<id>generateCPPCPA20Model</id>
-									<goals>
-										<goal>generate</goal>
-									</goals>
-									<phase>
-										generate-sources
-									</phase>	
-									<configuration>
-										<generatePackage>nl.clockwork.mule.ebms.model.cpp.cpa</generatePackage>
-										<generateDirectory>src/main/java</generateDirectory>
-										<includeSchemas>
-											<includeSchema>nl/clockwork/mule/ebms/xsd/cpp-cpa-2_0.xsd</includeSchema>
-										</includeSchemas>
-										<includeBindings>
-											<includeBinding>nl/clockwork/mule/ebms/xsd/cpp-cpa-2_0.xjc</includeBinding>
-										</includeBindings>
-										<removeOldOutput>false</removeOldOutput>
-										<verbose>false</verbose>					
-									</configuration>
-							</execution>
-						</executions>		
-					</plugin>				
-				</plugins>
-			</build>
-		</profile>
 		<profile>
 			<id>generate-ebf-model</id>
 			<activation>
