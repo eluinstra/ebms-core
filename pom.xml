@@ -19,6 +19,16 @@
 			<name>Edwin Luinstra</name>
 			<email>e.luinstra@wisdom.nl</email>
 		</developer>
+        <developer>
+            <id>bjornlammers</id>
+            <name>Bjorn Lammers</name>
+            <email>b.h.lammers@avisi.nl</email>
+        </developer>
+        <developer>
+            <id>rkettelerij</id>
+            <name>Richard Kettelerij</name>
+            <email>r.kettelerij@avisi.nl</email>
+        </developer>
 	</developers>
 	<scm>
 		<connection>ssh://git.code.sf.net/p/muleebmsadapter/code</connection>
