@@ -30,6 +30,8 @@ public class EbMSAttachmentToEbMSMessageContent extends AbstractMessageAwareTran
 	private String cpaId;
 	private String service;
 	private String action;
+    private String from;
+    private String to;
 
 	public EbMSAttachmentToEbMSMessageContent()
 	{
@@ -41,7 +43,7 @@ public class EbMSAttachmentToEbMSMessageContent extends AbstractMessageAwareTran
 	{
 		try
 		{
-			return new EbMSMessageContent(new EbMSMessageContext(cpaId,service,action),(List<EbMSAttachment>)message.getPayload());
+			return new EbMSMessageContent(new EbMSMessageContext(cpaId,from,to,service,action,null),(List<EbMSAttachment>)message.getPayload());
 		}
 		catch (Exception e)
 		{
@@ -63,5 +65,13 @@ public class EbMSAttachmentToEbMSMessageContent extends AbstractMessageAwareTran
 	{
 		this.action = action;
 	}
+
+    public void setFrom(String from) {
+        this.from = from;
+    }
+
+    public void setTo(String to) {
+        this.to = to;
+    }
 
 }
