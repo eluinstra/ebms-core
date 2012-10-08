@@ -1,3 +1,4 @@
+
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Some parsers may require explicit declaration of 'xmlns:xml="http://www.w3.org/XML/1998/namespace"'. 
      In that case, a copy of this schema augmented with the above declaration should be cached and used
@@ -126,7 +127,8 @@
 				<element ref="tns:RefToMessageId"/>
 				<element ref="tns:From" minOccurs="0"/>
 				<element ref="ds:Reference" minOccurs="0" maxOccurs="unbounded"/>
-				<any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+                <!-- Avisi, removed line below because of https://lists.oasis-open.org/archives/ebxml-msg/200811/msg00005.html -->
+				<!--<any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>-->
 			</sequence>
 			<attributeGroup ref="tns:headerExtension.grp"/>
 			<attribute ref="soap:actor"/>
