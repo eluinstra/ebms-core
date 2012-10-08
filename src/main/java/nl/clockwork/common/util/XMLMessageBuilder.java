@@ -19,6 +19,7 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.StringWriter;
 import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
@@ -32,7 +33,7 @@ import org.w3c.dom.Node;
 
 public class XMLMessageBuilder<T>
 {
-	private static HashMap<Class<?>,XMLMessageBuilder<?>> xmlHandlers = new HashMap<Class<?>,XMLMessageBuilder<?>>();
+    private static ConcurrentHashMap<Class<?>, XMLMessageBuilder<?>> xmlHandlers = new ConcurrentHashMap<Class<?>, XMLMessageBuilder<?>>();
 	
 	private JAXBContext context;
 	
@@ -94,13 +95,13 @@ public class XMLMessageBuilder<T>
   }
 	
 	@SuppressWarnings("unchecked")
-	public static <L> XMLMessageBuilder<L> getInstance(Class<L> clazz) throws JAXBException
-	{
-		if (xmlHandlers.get(clazz) == null)
-		{
-      JAXBContext context = JAXBContext.newInstance(clazz.getPackage().getName());
-			xmlHandlers.put(clazz,new XMLMessageBuilder<L>(context));
-		}
-		return (XMLMessageBuilder<L>)xmlHandlers.get(clazz);
-	}
+    public static <L> XMLMessageBuilder<L> getInstance(Class<L> clazz) throws JAXBException
+    {
+        if (!xmlHandlers.containsKey(clazz))
+        {
+            JAXBContext context = JAXBContext.newInstance(clazz.getPackage().getName());
+            xmlHandlers.putIfAbsent(clazz, new XMLMessageBuilder<L>(context));
+        }
+        return (XMLMessageBuilder<L>) xmlHandlers.get(clazz);
+    }
 }
