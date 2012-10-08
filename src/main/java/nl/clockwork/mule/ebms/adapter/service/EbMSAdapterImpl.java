@@ -62,9 +62,9 @@ public class EbMSAdapterImpl implements EbMSAdapter
 		{
 			//FIXME use messageContext
 			if (maxNr == null)
-				return ebMSDAO.getReceivedMessageIds(messageContext);
+				return ebMSDAO.getReceivedMessageIds();
 			else
-				return ebMSDAO.getReceivedMessageIds(messageContext,maxNr);
+				return ebMSDAO.getReceivedMessageIds(maxNr);
 		}
 		catch (DAOException e)
 		{

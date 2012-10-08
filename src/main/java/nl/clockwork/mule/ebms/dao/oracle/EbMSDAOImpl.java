@@ -179,17 +179,16 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 		return "SYSDATE";
 	}
 
-	@Override
-	public String getReceivedMessageIdsQuery(String messageContextFilter, int maxNr)
-	{
-		return "select * from (" +
-		"select message_id" +
-		" from ebms_message" +
-		" where status = " + EbMSMessageStatus.RECEIVED.id() +
-		messageContextFilter +
-		" order by time_stamp asc)" +
-		" where ROWNUM <= " + maxNr;
-	}
+    @Override
+   	public String getReceivedMessageIdsQuery(int maxNr)
+   	{
+   		return "select * from (" +
+   		"select message_id" +
+   		" from ebms_message" +
+   		" where status=" + EbMSMessageStatus.RECEIVED.id() +
+   		" order by time_stamp asc)" +
+   		" where ROWNUM <= " + maxNr;
+   	}
 
 	protected PreparedStatementCreator getEbMSMessagePreparedStatement(Date timestamp, String cpaId, String conversationId, Long sequenceNr, String messageId, String refToMessageId, String fromRole, String toRole, String serviceType, String service, String action, String messageHeader, String syncReply, String messageOrder, String ackRequested, String Manifest)
 	{
