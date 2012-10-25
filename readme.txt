@@ -81,6 +81,25 @@ copy ebms-adapter-1.0.0.jar/keystore.jks to ${user.home}/.ebms-stub
 	
 	jmx.port=1099
 
+===================================
+Configure EbMS Adapter Standalone =
+===================================
+create directory ${user.home}/.ebms-adapter
+
+create file ${user.home}/.ebms-adapter/ebms.adapter.properties (this overrides properties from nl/clockwork/mule/ebms/default.properties)
+
+	edit and add the following lines to ${user.home}/.ebms-adapter/ebms.adapter.properties:
+	
+	service.port=80
+	service.remote.port=8080
+	
+	ebms.jdbc.driverClassName=org.hsqldb.jdbcDriver
+	ebms.jdbc.url=jdbc:hsqldb:file:<path>
+
+	dir.base=H:/tmp/ebms-adapter
+	
+	jmx.port=1099
+
 ===========================
 Set Environment Vairables =
 ===========================
