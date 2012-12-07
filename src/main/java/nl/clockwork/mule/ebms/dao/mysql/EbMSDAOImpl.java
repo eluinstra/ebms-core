@@ -46,12 +46,11 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 	}
 
 	@Override
-	public String getReceivedMessageIdsQuery(String messageContextFilter, int maxNr)
+	public String getReceivedMessageIdsQuery(int maxNr)
 	{
 		return "select message_id" +
 		" from ebms_message" +
-		" where status = " + EbMSMessageStatus.RECEIVED.id() +
-		messageContextFilter +
+		" where status=" + EbMSMessageStatus.RECEIVED.id() +
 		" order by time_stamp asc" +
 		" limit " + maxNr;
 	}

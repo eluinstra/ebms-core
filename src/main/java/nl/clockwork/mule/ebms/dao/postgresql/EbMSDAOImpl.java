@@ -53,7 +53,7 @@ import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
-import org.springframework.transaction.support.TransactionCallbackWithoutResult;
+import org.springframework.transaction.support.TransactionCallback;
 import org.springframework.transaction.support.TransactionTemplate;
 
 public class EbMSDAOImpl extends AbstractEbMSDAO
@@ -218,12 +218,11 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 	}
 
 	@Override
-	public String getReceivedMessageIdsQuery(String messageContextFilter, int maxNr)
+	public String getReceivedMessageIdsQuery(int maxNr)
 	{
 		return "select message_id" +
 		" from ebms_message" +
 		" where status=" + EbMSMessageStatus.RECEIVED.id() +
-		messageContextFilter +
 		" order by time_stamp asc" +
 		" limit " + maxNr;
 	}
@@ -234,11 +233,11 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 		try
 		{
 			transactionTemplate.execute(
-				new TransactionCallbackWithoutResult()
+				new TransactionCallback()
 				{
 	
 					@Override
-					public void doInTransactionWithoutResult(TransactionStatus transactionStatus)
+					public Object doInTransaction(TransactionStatus transactionStatus)
 					{
 						try
 						{
@@ -303,9 +302,12 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 									sendEvents
 								);
 							}
+
+							return key;
 						}
 						catch (Exception e)
 						{
+							transactionStatus.setRollbackOnly(); 
 							throw new RuntimeException(e);
 						}
 					}
@@ -325,11 +327,11 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 		try
 		{
 			transactionTemplate.execute(
-				new TransactionCallbackWithoutResult()
+				new TransactionCallback()
 				{
 	
 					@Override
-					public void doInTransactionWithoutResult(TransactionStatus transactionStatus)
+					public Object doInTransaction(TransactionStatus transactionStatus)
 					{
 						try
 						{
@@ -375,9 +377,12 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 									IOUtils.toByteArray(attachment.getInputStream())
 								);
 							}
+							
+							return key;
 						}
 						catch (Exception e)
 						{
+							transactionStatus.setRollbackOnly(); 
 							throw new RuntimeException(e);
 						}
 					}
@@ -397,11 +402,11 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 		try
 		{
 			transactionTemplate.execute(
-				new TransactionCallbackWithoutResult()
+				new TransactionCallback()
 				{
 	
 					@Override
-					public void doInTransactionWithoutResult(TransactionStatus transactionStatus)
+					public Object doInTransaction(TransactionStatus transactionStatus)
 					{
 						try
 						{
@@ -476,9 +481,12 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 								//String.format(getDateFormat(),timestamp)
 								timestamp
 							);
+
+							return null;
 						}
 						catch (Exception e)
 						{
+							transactionStatus.setRollbackOnly(); 
 							throw new RuntimeException(e);
 						}
 					}
@@ -498,11 +506,11 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 		try
 		{
 			transactionTemplate.execute(
-				new TransactionCallbackWithoutResult()
+				new TransactionCallback()
 				{
 	
 					@Override
-					public void doInTransactionWithoutResult(TransactionStatus transactionStatus)
+					public Object doInTransaction(TransactionStatus transactionStatus)
 					{
 						try
 						{
@@ -577,9 +585,12 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 								//String.format(getDateFormat(),timestamp)
 								timestamp
 							);
+
+							return null;
 						}
 						catch (Exception e)
 						{
+							transactionStatus.setRollbackOnly(); 
 							throw new RuntimeException(e);
 						}
 					}
@@ -599,16 +610,16 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 		try
 		{
 			transactionTemplate.execute(
-				new TransactionCallbackWithoutResult()
+				new TransactionCallback()
 				{
 	
 					@Override
-					public void doInTransactionWithoutResult(TransactionStatus transactionStatus)
+					public Object doInTransaction(TransactionStatus transactionStatus)
 					{
 						try
 						{
 							Date timestamp = new Date();
-							jdbcTemplate.update(
+							Long key = (Long)jdbcTemplate.query(
 									new EbMSMessagePreparedStatement(
 											timestamp,
 											messageError.getMessageHeader().getCPAId(),
@@ -623,20 +634,30 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 											XMLMessageBuilder.getInstance(MessageHeader.class).handle(messageError.getMessageHeader()),
 											XMLMessageBuilder.getInstance(ErrorList.class).handle(messageError.getErrorList()),
 											status
-									)
+									),
+									new IdExtractor()
 							);
 
 							Long id = getEbMSMessageId(messageError.getMessageHeader().getMessageData().getRefToMessageId());
-							if (id != null)
+							if (id != null) {
 								simpleJdbcTemplate.update
 								(
 									"delete from ebms_send_event" +
 									" where ebms_message_id=? and status=0",
 									id
 								);
+                                                                simpleJdbcTemplate.update
+                                                                (
+                                                                        "update ebms_message set status=10" +
+                                                                        " where id=?",
+                                                                        id
+                                                                );
+							}
+							return key;
 						}
 						catch (Exception e)
 						{
+							transactionStatus.setRollbackOnly(); 
 							throw new RuntimeException(e);
 						}
 					}
@@ -656,16 +677,16 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 		try
 		{
 			transactionTemplate.execute(
-				new TransactionCallbackWithoutResult()
+				new TransactionCallback()
 				{
 	
 					@Override
-					public void doInTransactionWithoutResult(TransactionStatus transactionStatus)
+					public Object doInTransaction(TransactionStatus transactionStatus)
 					{
 						try
 						{
 							Date timestamp = new Date();
-							jdbcTemplate.update(
+							Long key = (Long)jdbcTemplate.query(
 									new EbMSMessagePreparedStatement(
 											timestamp,
 											acknowledgment.getMessageHeader().getCPAId(),
@@ -680,20 +701,30 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 											XMLMessageBuilder.getInstance(MessageHeader.class).handle(acknowledgment.getMessageHeader()),
 											XMLMessageBuilder.getInstance(Acknowledgment.class).handle(acknowledgment.getAcknowledgment()),
 											status
-									)
+									),
+									new IdExtractor()
 							);
 
 							Long id = getEbMSMessageId(acknowledgment.getMessageHeader().getMessageData().getRefToMessageId());
-							if (id != null)
+							if (id != null) {
 								simpleJdbcTemplate.update
 								(
 									"delete from ebms_send_event" +
 									" where ebms_message_id=? and status=0",
 									id
 								);
+                                                                simpleJdbcTemplate.update
+                                                                (
+                                                                        "update ebms_message set status=10" +
+                                                                        " where id=?",
+                                                                        id
+                                                                );
+        						}
+							return key;
 						}
 						catch (Exception e)
 						{
+							transactionStatus.setRollbackOnly(); 
 							throw new RuntimeException(e);
 						}
 					}

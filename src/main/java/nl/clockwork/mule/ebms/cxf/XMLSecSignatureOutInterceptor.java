@@ -50,6 +50,7 @@ import org.apache.cxf.message.Attachment;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.Phase;
+import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.signature.XMLSignature;
 import org.apache.xml.security.transforms.Transforms;
@@ -103,19 +104,12 @@ public class XMLSecSignatureOutInterceptor extends AbstractSoapInterceptor
 	@Override
 	public void handleMessage(SoapMessage message) throws Fault
 	{
-    try
-		{
     		OutputStream originalOs = message.getContent(OutputStream.class);
 			message.put(OUTPUT_STREAM_HOLDER,originalOs);
 			CachedOutputStream cos = new CachedOutputStream();
 			message.setContent(OutputStream.class,cos);
-			message.setContent(XMLStreamWriter.class,StaxOutInterceptor.getXMLOutputFactory(message).createXMLStreamWriter(cos,getEncoding(message)));
-			message.getInterceptorChain().add(new XMLSecSignatureOutEndingInterceptor()); 
-		}
-		catch (XMLStreamException e)
-		{
-			throw new Fault(e);
-		}
+            message.setContent(XMLStreamWriter.class, StaxUtils.createXMLStreamWriter(cos, getEncoding(message)));
+			message.getInterceptorChain().add(new XMLSecSignatureOutEndingInterceptor());
 	}
 	
 	public void setKeyStorePath(String keyStorePath)

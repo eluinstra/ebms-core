@@ -1,0 +1,5 @@
+<jxb:bindings xmlns:jxb="http://java.sun.com/xml/ns/jaxb" xmlns:xsd="http://www.w3.org/2001/XMLSchema" version="2.0" schemaLocation="xmldsig-core-schema.xsd">
+    <jxb:schemaBindings>
+         <jxb:package name="nl.clockwork.mule.ebms.model.xml.xmldsig" />
+     </jxb:schemaBindings>
+</jxb:bindings>

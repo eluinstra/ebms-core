@@ -37,7 +37,7 @@
 
 		<service name="ebms.soap.receive">
 			<inbound>
-				<cxf:inbound-endpoint connector-ref="connector.cxf.ebms.in" protocolConnector="connector.http.ebms.in" address="${service.protocol}://${service.host}:${service.port}${service.url}" serviceName="EbMSPortType" namespace="http://www.clockwork.nl/ebms/1.0" enableMuleSoapHeaders="false" mtomEnabled="true" synchronous="true">
+				<cxf:inbound-endpoint connector-ref="connector.cxf.ebms.in" protocolConnector="connector.http.ebms.in" address="${service.protocol}://${service.host}:${service.port}${service.url}" serviceName="EbMSPortType" namespace="http://www.clockwork.nl/ebms/1.0" enableMuleSoapHeaders="false" mtomEnabled="false" synchronous="true">
 					<cxf:inInterceptors>
 						<spring:bean class="nl.clockwork.mule.ebms.cxf.OracleEbMSContentTypeFixingInInterceptor" />
 						<spring:bean class="nl.clockwork.mule.ebms.cxf.LoggingInInterceptor">
@@ -105,7 +105,7 @@
 <!--			</component>-->
 			<outbound>
 				<pass-through-router>
-					<cxf:outbound-endpoint connector-ref="connector.cxf.ebms.out" protocolConnector="connector.http.ebms.out" address="${service.protocol}://${service.remote.host}:${service.remote.port}${service.remote.url}" clientClass="nl.clockwork.mule.ebms.service.EbMS" wsdlPort="EbMSPort" wsdlLocation="classpath:/nl/clockwork/mule/ebms/wsdl/ebms.wsdl" operation="Message" enableMuleSoapHeaders="false" mtomEnabled="true" synchronous="true">
+					<cxf:outbound-endpoint connector-ref="connector.cxf.ebms.out" protocolConnector="connector.http.ebms.out" address="${service.remote.protocol}://${service.remote.host}:${service.remote.port}${service.remote.url}" clientClass="nl.clockwork.mule.ebms.service.EbMS" wsdlPort="EbMSPort" wsdlLocation="classpath:/nl/clockwork/mule/ebms/wsdl/ebms.wsdl" operation="Message" enableMuleSoapHeaders="false" mtomEnabled="false" synchronous="true">
 						<cxf:inInterceptors>
 							<spring:bean class="nl.clockwork.mule.ebms.cxf.LoggingInInterceptor" />
 						</cxf:inInterceptors>
@@ -134,7 +134,7 @@
 			</inbound>
 			<outbound>
 				<pass-through-router>
-					<cxf:outbound-endpoint connector-ref="connector.cxf.ebms.out" protocolConnector="connector.http.ebms.out" address="${service.protocol}://${service.remote.host}:${service.remote.port}${service.remote.url}" clientClass="nl.clockwork.mule.ebms.service.EbMS" wsdlPort="EbMSPort" wsdlLocation="classpath:/nl/clockwork/mule/ebms/wsdl/ebms.wsdl" operation="MessageError" enableMuleSoapHeaders="false" synchronous="true">
+					<cxf:outbound-endpoint connector-ref="connector.cxf.ebms.out" protocolConnector="connector.http.ebms.out" address="${service.remote.protocol}://${service.remote.host}:${service.remote.port}${service.remote.url}" clientClass="nl.clockwork.mule.ebms.service.EbMS" wsdlPort="EbMSPort" wsdlLocation="classpath:/nl/clockwork/mule/ebms/wsdl/ebms.wsdl" operation="MessageError" enableMuleSoapHeaders="false" synchronous="true">
 						<cxf:inInterceptors>
 							<spring:bean class="nl.clockwork.mule.ebms.cxf.LoggingInInterceptor" />
 						</cxf:inInterceptors>
@@ -155,7 +155,7 @@
 			</inbound>
 			<outbound>
 				<pass-through-router>
-					<cxf:outbound-endpoint connector-ref="connector.cxf.ebms.out" protocolConnector="connector.http.ebms.out" address="${service.protocol}://${service.remote.host}:${service.remote.port}${service.remote.url}" clientClass="nl.clockwork.mule.ebms.service.EbMS" wsdlPort="EbMSPort" wsdlLocation="classpath:/nl/clockwork/mule/ebms/wsdl/ebms.wsdl" operation="Acknowledgment" enableMuleSoapHeaders="false" synchronous="true">
+					<cxf:outbound-endpoint connector-ref="connector.cxf.ebms.out" protocolConnector="connector.http.ebms.out" address="${service.remote.protocol}://${service.remote.host}:${service.remote.port}${service.remote.url}" clientClass="nl.clockwork.mule.ebms.service.EbMS" wsdlPort="EbMSPort" wsdlLocation="classpath:/nl/clockwork/mule/ebms/wsdl/ebms.wsdl" operation="Acknowledgment" enableMuleSoapHeaders="false" synchronous="true">
 						<cxf:inInterceptors>
 							<spring:bean class="nl.clockwork.mule.ebms.cxf.LoggingInInterceptor" />
 						</cxf:inInterceptors>

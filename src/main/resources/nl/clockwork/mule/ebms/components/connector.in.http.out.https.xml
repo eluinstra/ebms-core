@@ -15,23 +15,20 @@
   limitations under the License.
 -->
 <mule
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
-	xmlns="http://www.mulesource.org/schema/mule/core/2.2" 
-	xmlns:spring="http://www.springframework.org/schema/beans"
-	xmlns:https="http://www.mulesource.org/schema/mule/https/2.2"
-	xsi:schemaLocation="
-		http://www.mulesource.org/schema/mule/core/2.2 http://www.mulesource.org/schema/mule/core/2.2/mule.xsd
-		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd
-		http://www.mulesource.org/schema/mule/https/2.2 http://www.mulesource.org/schema/mule/https/2.2/mule-https.xsd
-	"
->
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns="http://www.mulesource.org/schema/mule/core/2.2"
+        xmlns:http="http://www.mulesource.org/schema/mule/http/2.2"
+        xmlns:https="http://www.mulesource.org/schema/mule/https/2.2"
+        xsi:schemaLocation="http://www.mulesource.org/schema/mule/core/2.2 http://www.mulesource.org/schema/mule/core/2.2/mule.xsd
 
-	<https:connector name="connector.http.ebms.in" validateConnections="${connector.ebms.validateConnections}">  
+		http://www.mulesource.org/schema/mule/http/2.2 http://www.mulesource.org/schema/mule/http/2.2/mule-http.xsd
+		http://www.mulesource.org/schema/mule/https/2.2 http://www.mulesource.org/schema/mule/https/2.2/mule-https.xsd"
+        >
+
+	<http:connector name="connector.http.ebms.in" validateConnections="${connector.ebms.validateConnections}">
 		<receiver-threading-profile maxThreadsActive="${threading.profile.ebms.http.receiver.maxThreadsActive}" maxThreadsIdle="${threading.profile.ebms.http.receiver.maxThreadsIdle}" threadTTL="${threading.profile.ebms.http.receiver.threadTTL}" poolExhaustedAction="WAIT" maxBufferSize="${threading.profile.ebms.http.receiver.maxBufferSize}" />
-		<https:tls-key-store path="${server.keystore.path}" storePassword="${server.keystore.password}" keyPassword="${server.keystore.keyPassword}"/>  
-		<https:tls-server path="${truststore.path}" storePassword="${truststore.password}" requireClientAuthentication="${connector.https.requireClientAuthentication}"/>
-	</https:connector>  
-
+	</http:connector>
+	
     <https:connector name="connector.http.ebms.out" validateConnections="${connector.ebms.validateConnections}">
         <dispatcher-threading-profile maxThreadsActive="${threading.profile.ebms.http.receiver.maxThreadsActive}" maxThreadsIdle="${threading.profile.ebms.http.receiver.maxThreadsIdle}" threadTTL="${threading.profile.ebms.http.receiver.threadTTL}" poolExhaustedAction="WAIT" maxBufferSize="${threading.profile.ebms.http.receiver.maxBufferSize}" />
         <https:tls-client path="${client.keystore.path}" storePassword="${client.keystore.password}"/>
@@ -39,6 +36,5 @@
         <https:tls-key-store path="${client.keystore.path}" storePassword="${client.keystore.password}" keyPassword="${client.keystore.password}"/>
         <https:tls-server path="${truststore.path}" storePassword="${truststore.password}"/>
     </https:connector>
-
 
 </mule>

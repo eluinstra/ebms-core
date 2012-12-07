@@ -35,6 +35,7 @@ import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.Phase;
+import org.apache.cxf.staxutils.StaxUtils;
 
 public class OracleEbMSXMLPrefixFixingOutInterceptor extends AbstractSoapInterceptor
 {
@@ -68,19 +69,12 @@ public class OracleEbMSXMLPrefixFixingOutInterceptor extends AbstractSoapInterce
 	@Override
 	public void handleMessage(SoapMessage message) throws Fault
 	{
-    try
-		{
     	OutputStream originalOs = message.getContent(OutputStream.class);
 			message.put(OUTPUT_STREAM_HOLDER,originalOs);
       CachedOutputStream cos = new CachedOutputStream();
-      message.setContent(OutputStream.class,cos); 
-			message.setContent(XMLStreamWriter.class,StaxOutInterceptor.getXMLOutputFactory(message).createXMLStreamWriter(cos,getEncoding(message)));
-	    message.getInterceptorChain().add(new OracleEbMSXMLPrefixFixingOutEndingInterceptor()); 
-		}
-		catch (Exception e)
-		{
-			throw new Fault(e);
-		}
+      message.setContent(OutputStream.class,cos);
+            message.setContent(XMLStreamWriter.class, StaxUtils.createXMLStreamWriter(cos, getEncoding(message)));
+	    message.getInterceptorChain().add(new OracleEbMSXMLPrefixFixingOutEndingInterceptor());
 	}
 	
 	public class OracleEbMSXMLPrefixFixingOutEndingInterceptor extends AbstractSoapInterceptor

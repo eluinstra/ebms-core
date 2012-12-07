@@ -74,6 +74,7 @@ import org.apache.cxf.message.Attachment;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.Phase;
+import org.apache.cxf.staxutils.StaxUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -117,19 +118,12 @@ public class XMLDSignatureOutInterceptor extends AbstractSoapInterceptor
 	@Override
 	public void handleMessage(SoapMessage message) throws Fault
 	{
-    try
-		{
     	OutputStream originalOs = message.getContent(OutputStream.class);
 			message.put(OUTPUT_STREAM_HOLDER,originalOs);
       CachedOutputStream cos = new CachedOutputStream();
       message.setContent(OutputStream.class,cos); 
-			message.setContent(XMLStreamWriter.class,StaxOutInterceptor.getXMLOutputFactory(message).createXMLStreamWriter(cos,getEncoding(message)));
-	    message.getInterceptorChain().add(new XMLDSignatureOutEndingInterceptor()); 
-		}
-		catch (XMLStreamException e)
-		{
-			throw new Fault(e);
-		}
+            message.setContent(XMLStreamWriter.class, StaxUtils.createXMLStreamWriter(cos, getEncoding(message)));
+	    message.getInterceptorChain().add(new XMLDSignatureOutEndingInterceptor());
 	}
 
 	public void setKeyStorePath(String keyStorePath)

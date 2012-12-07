@@ -34,6 +34,7 @@ import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.Phase;
+import org.apache.cxf.staxutils.StaxUtils;
 
 public class LoggingOutInterceptor extends AbstractSoapInterceptor
 {
@@ -69,19 +70,12 @@ public class LoggingOutInterceptor extends AbstractSoapInterceptor
 	@Override
 	public void handleMessage(SoapMessage message) throws Fault
 	{
-    try
-		{
     	OutputStream originalOs = message.getContent(OutputStream.class);
 			message.put(OUTPUT_STREAM_HOLDER,originalOs);
       CachedOutputStream cos = new CachedOutputStream();
       message.setContent(OutputStream.class,cos); 
-			message.setContent(XMLStreamWriter.class,StaxOutInterceptor.getXMLOutputFactory(message).createXMLStreamWriter(cos,getEncoding(message)));
-	    message.getInterceptorChain().add(new LoggingOutEndingInterceptor()); 
-		}
-		catch (XMLStreamException e)
-		{
-			throw new Fault(e);
-		}
+            message.setContent(XMLStreamWriter.class, StaxUtils.createXMLStreamWriter(cos, getEncoding(message)));
+	    message.getInterceptorChain().add(new LoggingOutEndingInterceptor());
 	}
 
   public class LoggingOutEndingInterceptor extends AbstractSoapInterceptor
@@ -98,7 +92,7 @@ public class LoggingOutInterceptor extends AbstractSoapInterceptor
 		{
 			try
 			{
-				final LoggingMessage buffer = new LoggingMessage("Outbound Message\n---------------------------");
+				final LoggingMessage buffer = new LoggingMessage("Outbound Message\n---------------------------", LoggingMessage.nextId());
 				buffer.getHeader().append(Message.CONTENT_TYPE).append(":").append(message.get(Message.CONTENT_TYPE));
 				String encoding = (String)message.get(Message.ENCODING);
 				if (encoding != null)

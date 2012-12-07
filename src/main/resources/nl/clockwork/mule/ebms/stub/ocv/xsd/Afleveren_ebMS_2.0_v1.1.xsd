@@ -1,0 +1,270 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://logius.nl/digipoort/ebms/2.0/afleverservice/1.1/" targetNamespace="http://logius.nl/digipoort/ebms/2.0/afleverservice/1.1/" elementFormDefault="qualified">
+	<xsd:element name="afleverBericht">
+		<xsd:complexType>
+			<xsd:sequence>
+						<xsd:element name="kenmerk" type="tns:kenmerkType" nillable="false"/>
+						<xsd:element name="berichtsoort" type="tns:berichtsoortType" nillable="false"/>
+						<xsd:element name="berichtkenmerk" type="tns:berichtkenmerkType" nillable="false"/>
+						<xsd:element name="aanleverkenmerk" type="tns:aanleverkenmerkType" nillable="false" minOccurs="0"/>
+						<xsd:element name="tijdstempelAangeleverd" type="xsd:dateTime" nillable="false"/>
+						<xsd:element name="identiteitBelanghebbende" type="tns:identiteitType" nillable="false"/>
+						<xsd:element name="rolBelanghebbende" type="tns:rolType" nillable="false"/>
+						
+						<xsd:element name="identiteitOntvanger" type="tns:identiteitType" nillable="false" minOccurs="0" />
+						<xsd:element name="rolOntvanger" type="tns:rolType" nillable="false" minOccurs="0" />
+					
+						<xsd:element name="berichtInhoud" type="tns:berichtInhoudType" nillable="false"/>
+						<xsd:element name="berichtBijlagen" type="tns:berichtBijlagenType" nillable="false" minOccurs="0"/>
+						<xsd:element name="foutLijst" type="tns:foutLijstType" nillable="false" minOccurs="0"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<!-- lijst van ondersteunde types -->
+			<xsd:simpleType name="kenmerkType">
+				<xsd:annotation>
+					<xsd:documentation>
+						Element				: 	kenmerkType
+						Type						: 	Tekst
+						Maximale lengte	:	40
+						Beschrijving			:	Het unieke kenmerk van een instantie van het verwerkingsproces. Voor elk aanleververzoek waarvoor nog geen 
+														uniek kenmerk bestaat wordt een nieuw verwerkingsproces gestart. Het kenmerk kan worden gebruikt bij het 
+														opvragen van statussen.
+					</xsd:documentation>
+				</xsd:annotation>
+				<xsd:restriction base="xsd:normalizedString">
+					<xsd:whiteSpace value="collapse"/>
+					<xsd:maxLength value="40"/>
+				</xsd:restriction>
+			</xsd:simpleType>
+			<xsd:simpleType name="berichtsoortType">
+				<xsd:annotation>
+					<xsd:documentation>
+						Element				: 	berichtsoortType
+						Type						:	Tekst
+						Maximale lengte	:	80
+						Beschrijving			:	Het element berichtsoort beschrijft het soort verwerkingsproces dat met een aanleververzoek wordt geïnitieerd. 
+														Het meegegeven element berichtsoort moet van een type zijn wat binnen Digipoort bekend is.
+					</xsd:documentation>
+				</xsd:annotation>
+				<xsd:restriction base="xsd:normalizedString">
+					<xsd:whiteSpace value="collapse"/>
+					<xsd:maxLength value="80"/>
+				</xsd:restriction>
+			</xsd:simpleType>
+			<xsd:simpleType name="berichtkenmerkType">
+				<xsd:annotation>
+					<xsd:documentation>
+						Element				:	berichtkenmerkType
+						Type						:	Tekst
+						Maximale lengte	:	256
+						Beschrijving			:	Het unieke kenmerk (message ID) van het aanleververzoek dat geleid heeft tot het initiëren van het verwerkingsproces.
+					</xsd:documentation>
+				</xsd:annotation>
+				<xsd:restriction base="xsd:normalizedString">
+					<xsd:whiteSpace value="collapse"/>
+					<xsd:maxLength value="256"/>
+				</xsd:restriction>
+			</xsd:simpleType>
+			<xsd:simpleType name="aanleverkenmerkType">
+				<xsd:annotation>
+					<xsd:documentation>
+						Element				:	aanleverkenmerkType
+						Type						:	Tekst
+						Maximale lengte	:	40
+						Beschrijving			:	Het referentiekenmerk aanleveraar bevat een eigen kenmerk dat door de aanleveraar aan het aanleververzoek is 
+														meegegeven. Dit kenmerk blijft het verdere proces onveranderd en stelt de aanleveraar in staat retourberichten te 
+														koppelen aan het aanleververzoek.
+
+														Het referentiekenmerk oorspronkelijke aanlevering bevat het aanleverkenmerk zoals dat in het aanleververzoek is 
+														meegegeven door de aanleveraar. 
+					</xsd:documentation>
+				</xsd:annotation>
+				<xsd:restriction base="xsd:normalizedString">
+					<xsd:whiteSpace value="collapse"/>
+					<xsd:maxLength value="40"/>
+				</xsd:restriction>
+			</xsd:simpleType>
+			<xsd:complexType name="identiteitType">
+				<xsd:annotation>
+					<xsd:documentation>
+						Element				:	identiteitType
+						Type						:	Nummer in combinatie met het type
+						Maximale lengte	: 	20
+						Beschrijving			:	De identiteit van de belanghebbende is een nummer waarmee degene op wie de inhoud van het bedrijfsdocument 
+														betrekking heeft (of die verantwoordelijk is voor het kennisnemen daarvan) kan worden geïdentificeerd. Deze identiteit 
+														kan worden gebruikt om een match te maken met een eventueel in het bedrijfsdocument voorkomende identiteit. De 
+														belanghebbende kan ook een ander zijn dan de aanleveraar of opvrager van berichten.
+
+														De identiteit van de ontvanger is een nummer aan de hand waarvan kan worden vastgesteld bij welke partij het bericht 
+														moet worden afgeleverd.
+
+														De typen die ondersteunt worden zijn: BSN, KvK, BTW, Fi en OIN
+					</xsd:documentation>
+				</xsd:annotation>
+				<xsd:sequence>
+					<xsd:element name="nummer" nillable="false">
+						<xsd:simpleType>
+							<xsd:restriction base="xsd:normalizedString">
+								<xsd:whiteSpace value="collapse"/>
+								<xsd:maxLength value="20"/>
+							</xsd:restriction>
+						</xsd:simpleType>
+					</xsd:element>
+					<xsd:element name="type" nillable="false" minOccurs="0">
+						<xsd:simpleType>
+							<xsd:restriction base="xsd:string">
+								<xsd:enumeration value="BSN"/>
+								<xsd:enumeration value="KvK"/>
+								<xsd:enumeration value="BTW"/>
+								<xsd:enumeration value="Fi"/>
+								<xsd:enumeration value="OIN"/>
+								<xsd:maxLength value="6"/>
+							</xsd:restriction>
+						</xsd:simpleType>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:complexType>
+			<xsd:simpleType name="rolType">
+				<xsd:annotation>
+					<xsd:documentation>
+						Element				:	rolType
+						Type						:	Tekst
+						Maximale lengte	:	40
+						Beschrijving			:	Een aanduiding van de rol van de belanghebbende in het verwerkingsproces.
+						
+														Een aanduiding van de rol van de ontvanger in het verwerkingsproces. 
+					</xsd:documentation>
+				</xsd:annotation>
+				<xsd:restriction base="xsd:normalizedString">
+					<xsd:whiteSpace value="collapse"/>
+					<xsd:maxLength value="40"/>
+				</xsd:restriction>
+			</xsd:simpleType>
+			<xsd:complexType name="berichtInhoudType">
+				<xsd:annotation>
+					<xsd:documentation>
+						Beschrijving			:	De berichtinhoud is dat deel van het bericht dat de eigenlijke bedrijfsprocesinformatie bevat.
+					</xsd:documentation>
+				</xsd:annotation>
+				<xsd:sequence>
+					<xsd:element name="mimeType" nillable="false">
+						<xsd:simpleType>
+							<xsd:restriction base="xsd:normalizedString">
+								<xsd:whiteSpace value="collapse"/>
+								<xsd:maxLength value="40"/>
+							</xsd:restriction>
+						</xsd:simpleType>
+					</xsd:element>
+					<xsd:element name="bestandsnaam" nillable="false">
+						<xsd:simpleType>
+							<xsd:restriction base="xsd:normalizedString">
+								<xsd:whiteSpace value="collapse"/>
+								<xsd:maxLength value="80"/>
+							</xsd:restriction>
+						</xsd:simpleType>
+					</xsd:element>
+					<xsd:element name="inhoud" nillable="false">
+						<xsd:simpleType>
+							<xsd:restriction base="xsd:base64Binary">
+								<xsd:maxLength value="20971520"/>
+							</xsd:restriction>
+						</xsd:simpleType>
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:complexType>
+			<xsd:complexType name="berichtBijlagenType">
+				<xsd:annotation>
+					<xsd:documentation>
+						Beschrijving			:	Een of meer bijlagen bij het bedrijfsdocument. Of daadwerkelijk bijlagen kunnen worden toegevoegd hangt af van 
+														het verwerkingsproces.
+					</xsd:documentation>
+				</xsd:annotation>
+				<xsd:sequence>
+					<xsd:element name="bijlage" type="tns:berichtInhoudType" minOccurs="1" maxOccurs="unbounded"/>
+				</xsd:sequence>
+			</xsd:complexType>
+			<xsd:simpleType name="autorisatieAdresType">
+				<xsd:annotation>
+					<xsd:documentation>
+						Element				:	autorisatieAdresType
+						Type						:	Tekst
+						Maximale lengte	: 	255
+						Beschrijving			:	Het autorisatieadres bevat het endpoint van de webservice die gebruikt wordt voor het vaststellen van de relatie tussen 
+														aanleveraar of opvrager enerzijds, en de belanghebbende. Het endpoint dient bij Digipoort geregistreerd te staan. Dit 
+														element is optioneel voor de aanleverservice, maar kan door het verwerkingsproces verplicht worden gesteld. Voor de 
+														statusinformatieservice en de mededelingenservice is het element verplicht wanneer de identiteit van de belanghebbende 
+														niet gelijk is aan de identiteit van de opvrager.
+					</xsd:documentation>
+				</xsd:annotation>
+				<xsd:restriction base="xsd:anyURI">
+					<xsd:whiteSpace value="collapse"/>
+					<xsd:maxLength value="255"/>
+				</xsd:restriction>
+			</xsd:simpleType>
+			<xsd:simpleType name="statuscodeType">
+				<xsd:annotation>
+					<xsd:documentation>
+						Element				:	statuscodeType
+						Type						: 	Tekst
+						Maximale lengte	: 	20
+						Beschrijving			:	De code waarmee een status wordt geïdentificeerd.				
+					</xsd:documentation>
+				</xsd:annotation>
+				<xsd:restriction base="xsd:normalizedString">
+					<xsd:whiteSpace value="collapse"/>
+					<xsd:maxLength value="20"/>
+				</xsd:restriction>
+			</xsd:simpleType>
+			<xsd:simpleType name="foutcodeType">
+				<xsd:annotation>
+					<xsd:documentation>
+						Element				:	foutcodeType
+						Type						: 	Tekst
+						Maximale lengte	:	20
+						Beschrijving			:	Een unieke code waarmee een fout kan worden geïdentificeerd.				
+					</xsd:documentation>
+				</xsd:annotation>
+				<xsd:restriction base="xsd:normalizedString">
+					<xsd:whiteSpace value="collapse"/>
+					<xsd:maxLength value="20"/>
+				</xsd:restriction>
+			</xsd:simpleType>
+			<xsd:simpleType name="foutbeschrijvingType">
+				<xsd:annotation>
+					<xsd:documentation>
+						Element				:	foutbeschrijvingType
+						Type						:	Tekst
+						Maximale lengte	:	8192
+						Beschrijving			:	Een omschrijving van de fout. 				
+					</xsd:documentation>
+				</xsd:annotation>
+				<xsd:restriction base="xsd:normalizedString">
+					<xsd:whiteSpace value="collapse"/>
+					<xsd:maxLength value="8192"/>
+				</xsd:restriction>
+			</xsd:simpleType>
+			<xsd:complexType name="foutLijstType">
+				<xsd:annotation>
+					<xsd:documentation>
+						Element				:	foutLijstType
+						Type						:	Lijst van fouten.
+					</xsd:documentation>
+				</xsd:annotation>
+				<xsd:sequence>
+					<xsd:element name="fout" type="tns:foutType" minOccurs="1" maxOccurs="unbounded"/>
+				</xsd:sequence>
+			</xsd:complexType>
+			<xsd:complexType name="foutType">
+				<xsd:annotation>
+					<xsd:documentation>
+						Element				:	foutType
+						Type						:	Combinatie van foutcode en foutomschrijving.
+					</xsd:documentation>
+				</xsd:annotation>
+				<xsd:sequence>
+					<xsd:element name="foutcode" type="tns:foutcodeType" nillable="false"/>
+					<xsd:element name="foutbeschrijving" type="tns:foutbeschrijvingType" nillable="false"/>
+				</xsd:sequence>
+			</xsd:complexType>
+</xsd:schema>

@@ -36,7 +36,7 @@ public class MapPropertyEnricher extends AbstractMessageAwareTransformer
 	@Override
 	public Object transform(MuleMessage message, String outputEncoding) throws TransformerException
 	{
-		Map<String,Object> map = (HashMap<String,Object>)message.getPayload();
+        Map<String,Object> map = (Map<String,Object>)message.getPayload();
 		for (String key : keys.keySet())
 		{
 			message.setProperty(keys.get(key),map.get(key));

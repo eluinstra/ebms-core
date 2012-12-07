@@ -37,7 +37,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
  * 						Type						:	Nummer in combinatie met het type
  * 						Maximale lengte	: 	20
  * 						Beschrijving			:	De identiteit van de belanghebbende is een nummer waarmee degene op wie de inhoud van het bedrijfsdocument 
- * 														betrekking heeft (of die verantwoordelijk is voor het kennisnemen daarvan) kan worden geïdentificeerd. Deze identiteit 
+ * 														betrekking heeft (of die verantwoordelijk is voor het kennisnemen daarvan) kan worden geidentificeerd. Deze identiteit
  * 														kan worden gebruikt om een match te maken met een eventueel in het bedrijfsdocument voorkomende identiteit. De 
  * 														belanghebbende kan ook een ander zijn dan de aanleveraar of opvrager van berichten.
  * 

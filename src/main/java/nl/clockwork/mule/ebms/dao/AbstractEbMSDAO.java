@@ -36,7 +36,6 @@ import nl.clockwork.mule.ebms.Constants.EbMSMessageType;
 import nl.clockwork.mule.ebms.model.EbMSAcknowledgment;
 import nl.clockwork.mule.ebms.model.EbMSBaseMessage;
 import nl.clockwork.mule.ebms.model.EbMSMessage;
-import nl.clockwork.mule.ebms.model.EbMSMessageContext;
 import nl.clockwork.mule.ebms.model.EbMSMessageError;
 import nl.clockwork.mule.ebms.model.cpp.cpa.CollaborationProtocolAgreement;
 import nl.clockwork.mule.ebms.model.cpp.cpa.ReliableMessaging;
@@ -62,7 +61,7 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
-import org.springframework.transaction.support.TransactionCallbackWithoutResult;
+import org.springframework.transaction.support.TransactionCallback;
 import org.springframework.transaction.support.TransactionTemplate;
 
 public abstract class AbstractEbMSDAO implements EbMSDAO
@@ -308,8 +307,8 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 			simpleJdbcTemplate.update
 			(
 				"insert into cpa (" +
-					"cpa_id," +
-					"cpa" +
+				"cpa_id," +
+				"cpa" +
 				") values (?,?)",
 				cpa.getCpaid(),
 				XMLMessageBuilder.getInstance(CollaborationProtocolAgreement.class).handle(cpa)
@@ -334,8 +333,8 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 			simpleJdbcTemplate.update
 			(
 				"update cpa set" +
-				" cpa = ?" +
-				" where cpa_id = ?",
+				" cpa=?" +
+				" where cpa_id=?",
 				XMLMessageBuilder.getInstance(CollaborationProtocolAgreement.class).handle(cpa),
 				cpa.getCpaid()
 			);
@@ -360,7 +359,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 				simpleJdbcTemplate.update
 				(
 					"delete from cpa" +
-					" where cpa_id = ?",
+					" where cpa_id=?",
 					cpaId
 				) > 0
 			;
@@ -546,11 +545,11 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 		try
 		{
 			transactionTemplate.execute(
-				new TransactionCallbackWithoutResult()
+				new TransactionCallback()
 				{
 	
 					@Override
-					public void doInTransactionWithoutResult(TransactionStatus transactionStatus)
+					public Object doInTransaction(TransactionStatus transactionStatus)
 					{
 						try
 						{
@@ -583,10 +582,10 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 								simpleJdbcTemplate.update
 								(
 									"insert into ebms_attachment (" +
-										"ebms_message_id," +
-										"name," +
-										"content_type," +
-										"content" +
+									"ebms_message_id," +
+									"name," +
+									"content_type," +
+									"content" +
 									") values (?,?,?,?)",
 									keyHolder.getKey().longValue(),
 									attachment.getName() == null ? Constants.DEFAULT_FILENAME : attachment.getName(),
@@ -610,15 +609,18 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 								simpleJdbcTemplate.batchUpdate
 								(
 									"insert into ebms_send_event (" +
-										"ebms_message_id," +
-										"time" +
+									"ebms_message_id," +
+									"time" +
 									") values (?,?)",
 									sendEvents
 								);
 							}
+
+							return keyHolder.getKey().longValue();
 						}
 						catch (Exception e)
 						{
+							transactionStatus.setRollbackOnly(); 
 							throw new RuntimeException(e);
 						}
 					}
@@ -638,11 +640,11 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 		try
 		{
 			transactionTemplate.execute(
-				new TransactionCallbackWithoutResult()
+				new TransactionCallback()
 				{
 	
 					@Override
-					public void doInTransactionWithoutResult(TransactionStatus transactionStatus)
+					public Object doInTransaction(TransactionStatus transactionStatus)
 					{
 						try
 						{
@@ -678,10 +680,10 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 								simpleJdbcTemplate.update
 								(
 									"insert into ebms_attachment (" +
-										"ebms_message_id," +
-										"name," +
-										"content_type," +
-										"content" +
+									"ebms_message_id," +
+									"name," +
+									"content_type," +
+									"content" +
 									") values (?,?,?,?)",
 									keyHolder.getKey().longValue(),
 									attachment.getName() == null ? Constants.DEFAULT_FILENAME : attachment.getName(),
@@ -689,9 +691,12 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 									IOUtils.toByteArray(attachment.getInputStream())
 								);
 							}
+							
+							return keyHolder.getKey().longValue();
 						}
 						catch (Exception e)
 						{
+							transactionStatus.setRollbackOnly(); 
 							throw new RuntimeException(e);
 						}
 					}
@@ -711,11 +716,11 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 		try
 		{
 			transactionTemplate.execute(
-				new TransactionCallbackWithoutResult()
+				new TransactionCallback()
 				{
 	
 					@Override
-					public void doInTransactionWithoutResult(TransactionStatus transactionStatus)
+					public Object doInTransaction(TransactionStatus transactionStatus)
 					{
 						try
 						{
@@ -751,10 +756,10 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 								simpleJdbcTemplate.update
 								(
 									"insert into ebms_attachment (" +
-										"ebms_message_id," +
-										"name," +
-										"content_type," +
-										"content" +
+									"ebms_message_id," +
+									"name," +
+									"content_type," +
+									"content" +
 									") values (?,?,?,?)",
 									keyHolder.getKey().longValue(),
 									attachment.getName() == null ? Constants.DEFAULT_FILENAME : attachment.getName(),
@@ -784,16 +789,19 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 							simpleJdbcTemplate.update
 							(
 								"insert into ebms_send_event (" +
-									"ebms_message_id," +
-									"time" +
+								"ebms_message_id," +
+								"time" +
 								") values (?,?)",
 								keyHolder.getKey().longValue(),
 								//String.format(getDateFormat(),timestamp)
 								timestamp
 							);
+
+							return null;
 						}
 						catch (Exception e)
 						{
+							transactionStatus.setRollbackOnly(); 
 							throw new RuntimeException(e);
 						}
 					}
@@ -813,11 +821,11 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 		try
 		{
 			transactionTemplate.execute(
-				new TransactionCallbackWithoutResult()
+				new TransactionCallback()
 				{
 	
 					@Override
-					public void doInTransactionWithoutResult(TransactionStatus transactionStatus)
+					public Object doInTransaction(TransactionStatus transactionStatus)
 					{
 						try
 						{
@@ -853,10 +861,10 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 								simpleJdbcTemplate.update
 								(
 									"insert into ebms_attachment (" +
-										"ebms_message_id," +
-										"name," +
-										"content_type," +
-										"content" +
+									"ebms_message_id," +
+									"name," +
+									"content_type," +
+									"content" +
 									") values (?,?,?,?)",
 									keyHolder.getKey().longValue(),
 									attachment.getName() == null ? Constants.DEFAULT_FILENAME : attachment.getName(),
@@ -886,16 +894,19 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 							simpleJdbcTemplate.update
 							(
 								"insert into ebms_send_event (" +
-									"ebms_message_id," +
-									"time" +
+								"ebms_message_id," +
+								"time" +
 								") values (?,?)",
 								keyHolder.getKey().longValue(),
 								//String.format(getDateFormat(),timestamp)
 								timestamp
 							);
+
+							return null;
 						}
 						catch (Exception e)
 						{
+							transactionStatus.setRollbackOnly(); 
 							throw new RuntimeException(e);
 						}
 					}
@@ -915,11 +926,11 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 		try
 		{
 			transactionTemplate.execute(
-				new TransactionCallbackWithoutResult()
+				new TransactionCallback()
 				{
 	
 					@Override
-					public void doInTransactionWithoutResult(TransactionStatus transactionStatus)
+					public Object doInTransaction(TransactionStatus transactionStatus)
 					{
 						try
 						{
@@ -945,17 +956,26 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 							);
 
 							Long id = getEbMSMessageId(messageError.getMessageHeader().getMessageData().getRefToMessageId());
-							if (id != null)
+							if (id != null) {
 								simpleJdbcTemplate.update
 								(
 									"delete from ebms_send_event" +
-									" where ebms_message_id = ?" +
-									" and status = 0",
+									" where ebms_message_id=? and status=0",
 									id
 								);
+                                                                simpleJdbcTemplate.update
+                                                                (
+                                                                        "update ebms_message set status=10" +
+                                                                        " where id=?",
+                                                                        id
+                                                                );
+							}
+
+							return keyHolder.getKey().longValue();
 						}
 						catch (Exception e)
 						{
+							transactionStatus.setRollbackOnly(); 
 							throw new RuntimeException(e);
 						}
 					}
@@ -975,11 +995,11 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 		try
 		{
 			transactionTemplate.execute(
-				new TransactionCallbackWithoutResult()
+				new TransactionCallback()
 				{
 	
 					@Override
-					public void doInTransactionWithoutResult(TransactionStatus transactionStatus)
+					public Object doInTransaction(TransactionStatus transactionStatus)
 					{
 						try
 						{
@@ -1005,17 +1025,26 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 							);
 
 							Long id = getEbMSMessageId(acknowledgment.getMessageHeader().getMessageData().getRefToMessageId());
-							if (id != null)
-								simpleJdbcTemplate.update
-								(
-									"delete from ebms_send_event" +
-									" where ebms_message_id = ?" +
-									" and status = 0",
-									id
-								);
+							if (id != null) {
+                                                            simpleJdbcTemplate.update
+                                                            (
+                                                                    "delete from ebms_send_event" +
+                                                                    " where ebms_message_id=? and status=0",
+                                                                    id
+                                                            );
+                                                            simpleJdbcTemplate.update
+                                                            (
+                                                                    "update ebms_message set status=10" +
+                                                                    " where id=?",
+                                                                    id
+                                                            );
+							}
+
+							return keyHolder.getKey().longValue();
 						}
 						catch (Exception e)
 						{
+							transactionStatus.setRollbackOnly(); 
 							throw new RuntimeException(e);
 						}
 					}
@@ -1029,79 +1058,16 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 		}
 	}
 	
-	public String getMessageContextFilter(EbMSMessageContext messageContext, List<Object> parameters)
-	{
-		StringBuffer result = new StringBuffer();
-		if (messageContext != null)
-		{
-			if (messageContext.getCpaId() != null)
-			{
-				parameters.add(messageContext.getCpaId());
-				result.append(" and cpa_id = ?");
-			}
-			if (messageContext.getFromRole() != null)
-			{
-				parameters.add(messageContext.getFromRole());
-				result.append(" and from_role = ?");
-			}
-			if (messageContext.getToRole() != null)
-			{
-				parameters.add(messageContext.getToRole());
-				result.append(" and to_role = ?");
-			}
-			if (messageContext.getServiceType() != null)
-			{
-				parameters.add(messageContext.getServiceType());
-				result.append(" and service_type = ?");
-			}
-			if (messageContext.getService() != null)
-			{
-				parameters.add(messageContext.getService());
-				result.append(" and service = ?");
-			}
-			if (messageContext.getAction() != null)
-			{
-				parameters.add(messageContext.getAction());
-				result.append(" and action = ?");
-			}
-			if (messageContext.getConversationId() != null)
-			{
-				parameters.add(messageContext.getConversationId());
-				result.append(" and conversation_id = ?");
-			}
-			if (messageContext.getMessageId() != null)
-			{
-				parameters.add(messageContext.getMessageId());
-				result.append(" and message_id = ?");
-			}
-			if (messageContext.getRefToMessageId() != null)
-			{
-				parameters.add(messageContext.getRefToMessageId());
-				result.append(" and ref_to_message_id = ?");
-			}
-			if (messageContext.getSequenceNr() != null)
-			{
-				parameters.add(messageContext.getSequenceNr());
-				result.append(" and sequence_nr = ?");
-			}
-		}
-		return result.toString();
-	}
-	
 	@SuppressWarnings("unchecked")
-	@Override
-	public List<String> getReceivedMessageIds(EbMSMessageContext messageContext) throws DAOException
+	public List<String> getReceivedMessageIds() throws DAOException
 	{
 		try
 		{
-			List<Object> parameters = new ArrayList<Object>();
 			return jdbcTemplate.queryForList(
 					"select message_id" +
 					" from ebms_message" +
-					" where status = " + EbMSMessageStatus.RECEIVED.id() +
-					getMessageContextFilter(messageContext,parameters) +
+					" where status=" + EbMSMessageStatus.RECEIVED.id() +
 					" order by time_stamp asc",
-					parameters.toArray(new Object[0]),
 					String.class
 			);
 		}
@@ -1111,20 +1077,16 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 		}
 	}
 
-	public abstract String getReceivedMessageIdsQuery(String messageContextFilter, int maxNr);
+	public abstract String getReceivedMessageIdsQuery(int maxNr);
 
 	@SuppressWarnings("unchecked")
-	@Override
-	public List<String> getReceivedMessageIds(EbMSMessageContext messageContext, int maxNr) throws DAOException
+    @Override
+	public List<String> getReceivedMessageIds(int maxNr) throws DAOException
 	{
 		try
 		{
-			//TODO improve: add maxNr to parameters???
-			List<Object> parameters = new ArrayList<Object>();
-			String messageContextFilter = getMessageContextFilter(messageContext,parameters);
 			return jdbcTemplate.queryForList(
-					getReceivedMessageIdsQuery(messageContextFilter,maxNr),
-					parameters.toArray(new Object[0]),
+					getReceivedMessageIdsQuery(maxNr),
 					String.class
 			);
 		}
@@ -1142,7 +1104,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 			return simpleJdbcTemplate.queryForObject(
 				"select id, service, action, message_header, ack_requested, content" + 
 				" from ebms_message" + 
-				" where message_id = ?",// and status=" + EbMSMessageStatus.RECEIVED.id(),
+				" where message_id=?",// and status=" + EbMSMessageStatus.RECEIVED.id(),
 				new EbMSBaseMessageParameterizedRowMapper(),
 				messageId
 			);
@@ -1165,10 +1127,8 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 			simpleJdbcTemplate.update
 			(
 				"update ebms_message" +
-				" set status = " + EbMSMessageStatus.PROCESSED.id() + "," +
-				" status_time = " + getTimestampFunction() +
-				" where message_id = ?" +
-				" and status = " + EbMSMessageStatus.RECEIVED.id(),
+				" set status=" + EbMSMessageStatus.PROCESSED.id() +", status_time=" + getTimestampFunction() +
+				" where message_id=? and status=" + EbMSMessageStatus.RECEIVED.id(),
 				messageId
 			);
 		}
@@ -1188,10 +1148,8 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 				ids.add(new Object[]{messageId});
 			simpleJdbcTemplate.batchUpdate(
 					"update ebms_message" +
-					" set status = " + EbMSMessageStatus.PROCESSED.id() + "," +
-					" status_time = " + getTimestampFunction() +
-					" where message_id = ?" +
-					" and status = " + EbMSMessageStatus.RECEIVED.id(),
+					" set status=" + EbMSMessageStatus.PROCESSED.id() +", status_time=" + getTimestampFunction() +
+					" where message_id=? and status=" + EbMSMessageStatus.RECEIVED.id(),
 					ids
 			);
 		}

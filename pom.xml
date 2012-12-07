@@ -19,6 +19,16 @@
 			<name>Edwin Luinstra</name>
 			<email>e.luinstra@wisdom.nl</email>
 		</developer>
+        <developer>
+            <id>bjornlammers</id>
+            <name>Bjorn Lammers</name>
+            <email>b.h.lammers@avisi.nl</email>
+        </developer>
+        <developer>
+            <id>rkettelerij</id>
+            <name>Richard Kettelerij</name>
+            <email>r.kettelerij@avisi.nl</email>
+        </developer>
 	</developers>
 	<scm>
 		<connection>ssh://git.code.sf.net/p/muleebmsadapter/code</connection>
@@ -28,7 +38,10 @@
 		<url>www.clockwork.nl</url>
 	</organization>
 	<properties>
-		<mule.version>2.2.1</mule.version>
+        <!-- a lot of mule 2.2.1 dependencies aren't available anymore in public maven repo's -->
+        <!-- the dependencies of mule-2.2.8 are available in maven repo's, but there's no release of mule-2.2.8. -->
+        <!-- so you need to build mule-2.2.8 from source and place it in your own (local) maven repo. -->
+		<mule.version>2.2.8</mule.version>
 		<saxon.version>8.7</saxon.version>
 	</properties>
 	<dependencies>
@@ -110,8 +123,13 @@
 		<dependency>
 			<groupId>org.hsqldb</groupId>
 			<artifactId>hsqldb</artifactId>
-			<version>2.1.0</version>
+			<version>2.2.8</version>
 		</dependency>
+        <dependency>
+            <groupId>commons-logging</groupId>
+            <artifactId>commons-logging</artifactId>
+            <version>1.1.1</version>
+        </dependency>
 		<!--dependency>
 			<groupId>mysql</groupId>
 			<artifactId>mysql-connector-java</artifactId>
@@ -269,12 +287,12 @@
 							<ignore>nl.clockwork.mule.ebms.dao.*</ignore>
 						</ignores>
 					</instrumentation>
-					<systemProperties>
-						<property>
-							<name>net.sourceforge.cobertura.datafile</name>
-							<value>${basedir}/target/cobertura/cobertura.ser</value>
-						</property>
-					</systemProperties>
+					<!--<systemProperties>-->
+						<!--<property>-->
+							<!--<name>net.sourceforge.cobertura.datafile</name>-->
+							<!--<value>${basedir}/target/cobertura/cobertura.ser</value>-->
+						<!--</property>-->
+					<!--</systemProperties>-->
 					<formats>
 						<format>html</format>
 						<format>xml</format>
@@ -290,49 +308,47 @@
 					<findbugsXmlOutputDirectory>findbugs</findbugsXmlOutputDirectory>
 				</configuration>
 			</plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>jaxb2-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>cpa</id>
+                        <goals>
+                            <goal>xjc</goal>
+                        </goals>
+                        <configuration>
+                            <schemaDirectory>${project.basedir}/src/main/resources/nl/clockwork/mule/ebms/xsd</schemaDirectory>
+                            <schemaFiles>cpp-cpa-2_0.xsd</schemaFiles>
+                            <bindingDirectory>${project.basedir}/src/main/resources/nl/clockwork/mule/ebms/xsd</bindingDirectory>
+                            <bindingFiles>cpp-cpa-2_0.xjb</bindingFiles>
+                            <packageName>nl.clockwork.mule.ebms.model.cpp.cpa</packageName>
+                            <outputDirectory></outputDirectory>
+                            <staleFile>${project.build.directory}/jaxb2/.cpaStaleFlag</staleFile>
+                            <clearOutputDir>false</clearOutputDir>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>msgheader</id>
+                        <goals>
+                            <goal>xjc</goal>
+                        </goals>
+                        <configuration>
+                            <schemaDirectory>${project.basedir}/src/main/resources/nl/clockwork/mule/ebms/xsd</schemaDirectory>
+                            <schemaFiles>msg-header-2_0.xsd</schemaFiles>
+                            <bindingDirectory>${project.basedir}/src/main/resources/nl/clockwork/mule/ebms/xsd</bindingDirectory>
+                            <bindingFiles>msg-header-2_0.xjb,xmldsig-core-schema.xjb,xlink.xjb,xml.xjb,envelope.xjb</bindingFiles>
+                            <outputDirectory></outputDirectory>
+                            <staleFile>${project.build.directory}/jaxb2/.msgheaderStaleFlag</staleFile>
+                            <clearOutputDir>false</clearOutputDir>
+                            <!-- there's no <package/> element here, packages are configured in the *.xjb files -->
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
 		</plugins>
 	</build>
 	<profiles>
-		<profile>
-			<id>generate-cpp-cpa-model</id>
-			<activation>
-	 			<property>
-	  				<name>generate-cpp-cpa-model</name>
-				</property>  				
-			</activation>
-	  		<build>
-	    		<plugins>
-					<plugin>
-						<groupId>com.sun.tools.xjc.maven2</groupId>
-						<artifactId>maven-jaxb-plugin</artifactId>
-						<version>1.1.1</version>
-						<executions>
-							<execution>
-									<id>generateCPPCPA20Model</id>
-									<goals>
-										<goal>generate</goal>
-									</goals>
-									<phase>
-										generate-sources
-									</phase>	
-									<configuration>
-										<generatePackage>nl.clockwork.mule.ebms.model.cpp.cpa</generatePackage>
-										<generateDirectory>src/main/java</generateDirectory>
-										<includeSchemas>
-											<includeSchema>nl/clockwork/mule/ebms/xsd/cpp-cpa-2_0.xsd</includeSchema>
-										</includeSchemas>
-										<includeBindings>
-											<includeBinding>nl/clockwork/mule/ebms/xsd/cpp-cpa-2_0.xjc</includeBinding>
-										</includeBindings>
-										<removeOldOutput>false</removeOldOutput>
-										<verbose>false</verbose>					
-									</configuration>
-							</execution>
-						</executions>		
-					</plugin>				
-				</plugins>
-			</build>
-		</profile>
 		<profile>
 			<id>generate-ebf-model</id>
 			<activation>
@@ -459,7 +475,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-pmd-plugin</artifactId>
-				<version>2.3.1</version>
+				<version>2.7.1</version>
 				<configuration>
 					<targetJdk>1.6</targetJdk>
 					<excludes>
