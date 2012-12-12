@@ -36,6 +36,12 @@ supported databases:
 - mssql 2008 R2
 - oracle (11)(lob > 4k fix (needed for older oracle jdbc adapters) not implemented!)
 
+===================
+Build from source =
+===================
+to generate sources from xml:
+mvn generate-sources
+
 =================
 Configure Stubs =
 =================
@@ -261,6 +267,7 @@ Restrictions =
 ==============
 
 - Only HTTP(S) protocol is supported
+- Only asynchronous transport is supported
 - Only 1 Channel per Action is allowed
 - Actor NextMSH is not supported. Only actor ToPartyMSH is supported
 - Message Acknowledgments as part of another message are not supported. Only Aknowledgment messages with a MessageHeader containing service 'urn:oasis:names:tc:ebxml-msg:service' and action 'Acknowledgment' are supported
