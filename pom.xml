@@ -41,7 +41,7 @@
         <!-- a lot of mule 2.2.1 dependencies aren't available anymore in public maven repo's -->
         <!-- the dependencies of mule-2.2.8 are available in maven repo's, but there's no release of mule-2.2.8. -->
         <!-- so you need to build mule-2.2.8 from source and place it in your own (local) maven repo. -->
-		<mule.version>2.2.8</mule.version>
+		<mule.version>2.2.1</mule.version>
 		<saxon.version>8.7</saxon.version>
 	</properties>
 	<dependencies>
@@ -49,6 +49,12 @@
 			<groupId>org.mule</groupId>
 			<artifactId>mule-core</artifactId>
 			<version>${mule.version}</version>
+			<exclusions>
+				<exclusion>
+					<artifactId>jug</artifactId>
+					<groupId>org.safehaus.jug</groupId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>org.mule.modules</groupId>
@@ -69,6 +75,12 @@
 			<groupId>org.mule.modules</groupId>
 			<artifactId>mule-module-scripting</artifactId>
 			<version>${mule.version}</version>
+			<exclusions>
+				<exclusion>
+					<artifactId>groovy-engine</artifactId>
+					<groupId>javax.script</groupId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>org.mule.transports</groupId>
@@ -311,6 +323,7 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>jaxb2-maven-plugin</artifactId>
+                <version>1.5</version>
                 <executions>
                     <execution>
                         <id>cpa</id>
@@ -325,7 +338,6 @@
                             <packageName>nl.clockwork.mule.ebms.model.cpp.cpa</packageName>
                             <outputDirectory></outputDirectory>
                             <staleFile>${project.build.directory}/jaxb2/.cpaStaleFlag</staleFile>
-                            <clearOutputDir>false</clearOutputDir>
                         </configuration>
                     </execution>
                     <execution>
