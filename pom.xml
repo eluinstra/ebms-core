@@ -46,15 +46,15 @@
 	</properties>
 	<dependencies>
 		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.10</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
 			<groupId>org.mule</groupId>
 			<artifactId>mule-core</artifactId>
 			<version>${mule.version}</version>
-			<exclusions>
-				<exclusion>
-					<artifactId>jug</artifactId>
-					<groupId>org.safehaus.jug</groupId>
-				</exclusion>
-			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>org.mule.modules</groupId>
@@ -75,12 +75,6 @@
 			<groupId>org.mule.modules</groupId>
 			<artifactId>mule-module-scripting</artifactId>
 			<version>${mule.version}</version>
-			<exclusions>
-				<exclusion>
-					<artifactId>groovy-engine</artifactId>
-					<groupId>javax.script</groupId>
-				</exclusion>
-			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>org.mule.transports</groupId>
@@ -323,7 +317,6 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>jaxb2-maven-plugin</artifactId>
-                <version>1.5</version>
                 <executions>
                     <execution>
                         <id>cpa</id>
@@ -336,7 +329,6 @@
                             <bindingDirectory>${project.basedir}/src/main/resources/nl/clockwork/mule/ebms/xsd</bindingDirectory>
                             <bindingFiles>cpp-cpa-2_0.xjb</bindingFiles>
                             <packageName>nl.clockwork.mule.ebms.model.cpp.cpa</packageName>
-                            <outputDirectory></outputDirectory>
                             <staleFile>${project.build.directory}/jaxb2/.cpaStaleFlag</staleFile>
                         </configuration>
                     </execution>
@@ -350,7 +342,6 @@
                             <schemaFiles>msg-header-2_0.xsd</schemaFiles>
                             <bindingDirectory>${project.basedir}/src/main/resources/nl/clockwork/mule/ebms/xsd</bindingDirectory>
                             <bindingFiles>msg-header-2_0.xjb,xmldsig-core-schema.xjb,xlink.xjb,xml.xjb,envelope.xjb</bindingFiles>
-                            <outputDirectory></outputDirectory>
                             <staleFile>${project.build.directory}/jaxb2/.msgheaderStaleFlag</staleFile>
                             <clearOutputDir>false</clearOutputDir>
                             <!-- there's no <package/> element here, packages are configured in the *.xjb files -->
