@@ -22,33 +22,41 @@ import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 
-public class EbMSDateTimeConverter {
-    private static final String DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss'Z'";
+public class EbMSDateTimeConverter
+{
+	private static final String DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss'Z'";
 
-    public static XMLGregorianCalendar parseDateTime(String date) {
-        try {
-            date = date.replaceFirst("\\.\\d{0,3}", "");
-            if (!date.endsWith("Z"))
-                date += "Z";
-            GregorianCalendar calendar = new GregorianCalendar();
-            DateFormat parser = new SimpleDateFormat(DATE_FORMAT);
-            parser.setTimeZone(TimeZone.getTimeZone("GMT"));
-            // df.setLenient(true);
-            calendar.setTime(parser.parse(date));
-            return DatatypeFactory.newInstance().newXMLGregorianCalendar(calendar);
-        } catch (ParseException e) {
-            // throw new RuntimeException(e);
-            return null;
-        } catch (DatatypeConfigurationException e) {
-            // throw new RuntimeException(e);
-            return null;
-        }
-    }
+	public static XMLGregorianCalendar parseDateTime(String date)
+	{
+		try
+		{
+			date = date.replaceFirst("\\.\\d{0,3}","");
+			if (!date.endsWith("Z"))
+				date += "Z";
+			GregorianCalendar calendar = new GregorianCalendar();
+			DateFormat parser = new SimpleDateFormat(DATE_FORMAT);
+			parser.setTimeZone(TimeZone.getTimeZone("GMT"));
+			// df.setLenient(true);
+			calendar.setTime(parser.parse(date));
+			return DatatypeFactory.newInstance().newXMLGregorianCalendar(calendar);
+		}
+		catch (ParseException e)
+		{
+			// throw new RuntimeException(e);
+			return null;
+		}
+		catch (DatatypeConfigurationException e)
+		{
+			// throw new RuntimeException(e);
+			return null;
+		}
+	}
 
-    public static String printDateTime(XMLGregorianCalendar date) {
-        DateFormat printer = new SimpleDateFormat(DATE_FORMAT);
-        printer.setTimeZone(TimeZone.getTimeZone("GMT"));
-        // df.setLenient(true);
-        return printer.format(date.toGregorianCalendar().getTime());
-    }
+	public static String printDateTime(XMLGregorianCalendar date)
+	{
+		DateFormat printer = new SimpleDateFormat(DATE_FORMAT);
+		printer.setTimeZone(TimeZone.getTimeZone("GMT"));
+		// df.setLenient(true);
+		return printer.format(date.toGregorianCalendar().getTime());
+	}
 }
