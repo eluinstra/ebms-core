@@ -18,7 +18,6 @@ package nl.clockwork.mule.ebms.cxf;
 import java.io.IOException;
 import java.io.OutputStream;
 
-import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
 import org.apache.commons.logging.Log;
@@ -28,7 +27,6 @@ import org.apache.cxf.binding.soap.interceptor.AbstractSoapInterceptor;
 import org.apache.cxf.interceptor.AttachmentOutInterceptor;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.interceptor.LoggingMessage;
-import org.apache.cxf.interceptor.StaxOutInterceptor;
 import org.apache.cxf.interceptor.AttachmentOutInterceptor.AttachmentOutEndingInterceptor;
 import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.message.Exchange;
@@ -92,7 +90,7 @@ public class LoggingOutInterceptor extends AbstractSoapInterceptor
 		{
 			try
 			{
-				final LoggingMessage buffer = new LoggingMessage("Outbound Message\n---------------------------", LoggingMessage.nextId());
+				final LoggingMessage buffer = new LoggingMessage("Outbound Message\n---------------------------");
 				buffer.getHeader().append(Message.CONTENT_TYPE).append(":").append(message.get(Message.CONTENT_TYPE));
 				String encoding = (String)message.get(Message.ENCODING);
 				if (encoding != null)

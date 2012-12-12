@@ -1,24 +1,26 @@
 /**
-* Licensed to the Apache Software Foundation (ASF) under one
-* or more contributor license agreements. See the NOTICE file
-* distributed with this work for additional information
-* regarding copyright ownership. The ASF licenses this file
-* to you under the Apache License, Version 2.0 (the
-* "License"); you may not use this file except in compliance
-* with the License. You may obtain a copy of the License at
-*
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing,
-* software distributed under the License is distributed on an
-* "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-* KIND, either express or implied. See the License for the
-* specific language governing permissions and limitations
-* under the License.
-*/
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
 
 package org.apache.cxf.interceptor;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -40,6 +42,7 @@ import org.apache.cxf.message.MessageContentsList;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.service.model.BindingMessageInfo;
 import org.apache.cxf.service.model.BindingOperationInfo;
+import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.service.model.MessageInfo;
 import org.apache.cxf.service.model.MessagePartInfo;
 import org.apache.cxf.service.model.OperationInfo;
@@ -50,289 +53,284 @@ import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.ws.commons.schema.XmlSchemaElement;
 
 public class DocLiteralInInterceptor extends AbstractInDatabindingInterceptor {
-   public static final String KEEP_PARAMETERS_WRAPPER = DocLiteralInInterceptor.class.getName() 
-       + ".DocLiteralInInterceptor.keep-parameters-wrapper";
+    private static final Logger LOG = LogUtils.getL7dLogger(DocLiteralInInterceptor.class);
 
-   private static final Logger LOG = LogUtils.getL7dLogger(DocLiteralInInterceptor.class);
+    public DocLiteralInInterceptor() {
+        super(Phase.UNMARSHAL);
+        addAfter(URIMappingInterceptor.class.getName());
+        addBefore(WrappedInInterceptor.class.getName());
+    }
 
-   public DocLiteralInInterceptor() {
-       super(Phase.UNMARSHAL);
-       addAfter(URIMappingInterceptor.class.getName());
-       addBefore(WrappedInInterceptor.class.getName());
-   }
+    public void handleMessage(Message message) {
+        if (isGET(message) && message.getContent(List.class) != null) {
+            LOG.info("DocLiteralInInterceptor skipped in HTTP GET method");
+            return;
+        }
 
-   public void handleMessage(Message message) {
-       if (isGET(message) && message.getContent(List.class) != null) {
-           LOG.fine("DocLiteralInInterceptor skipped in HTTP GET method");
-           return;
-       }
+        DepthXMLStreamReader xmlReader = getXMLStreamReader(message);
+        DataReader<XMLStreamReader> dr = getDataReader(message);
+        MessageContentsList parameters = new MessageContentsList();
 
-       DepthXMLStreamReader xmlReader = getXMLStreamReader(message);
-       DataReader<XMLStreamReader> dr = getDataReader(message);
-       MessageContentsList parameters = new MessageContentsList();
+        Exchange exchange = message.getExchange();
+        BindingOperationInfo bop = exchange.get(BindingOperationInfo.class);
 
-       Exchange exchange = message.getExchange();
-       BindingOperationInfo bop = exchange.getBindingOperationInfo();
+        boolean client = isRequestor(message);
 
-       boolean client = isRequestor(message);
+        //if body is empty and we have BindingOperationInfo, we do not need to match 
+        //operation anymore, just return
+        if (!StaxUtils.toNextElement(xmlReader) && bop != null) {
+            // body may be empty for partial response to decoupled request
+            return;
+        }
 
-       //if body is empty and we have BindingOperationInfo, we do not need to match 
-       //operation anymore, just return
-       if (bop != null && !StaxUtils.toNextElement(xmlReader)) {
-           // body may be empty for partial response to decoupled request
-           return;
-       }
+        //bop might be a unwrapped, wrap it back so that we can get correct info 
+        if (bop != null && bop.isUnwrapped()) {
+            bop = bop.getWrappedOperation();
+        }
 
-       //bop might be a unwrapped, wrap it back so that we can get correct info 
-       if (bop != null && bop.isUnwrapped()) {
-           bop = bop.getWrappedOperation();
-       }
+        if (bop == null) {
+            QName startQName = xmlReader.getName();
+            bop = getBindingOperationInfo(exchange, startQName, client);
+        }
 
-       if (bop == null) {
-           QName startQName = xmlReader == null 
-               ? new QName("http://cxf.apache.org/jaxws/provider", "invoke")
-               : xmlReader.getName();
-           bop = getBindingOperationInfo(exchange, startQName, client);
-       }
+        try {
+            if (bop != null && bop.isUnwrappedCapable()) {
+                ServiceInfo si = bop.getBinding().getService();
+                // Wrapped case
+                MessageInfo msgInfo = setMessage(message, bop, client, si);
+    
+                // Determine if there is a wrapper class
+                if (msgInfo.getMessageParts().get(0).getTypeClass() != null) {
+                    Object wrappedObject = dr.read(msgInfo.getMessageParts().get(0), xmlReader);
+                    parameters.put(msgInfo.getMessageParts().get(0), wrappedObject);
+                } else {
+                    // Unwrap each part individually if we don't have a wrapper
+    
+                    bop = bop.getUnwrappedOperation();
+    
+                    msgInfo = setMessage(message, bop, client, si);
+                    List<MessagePartInfo> messageParts = msgInfo.getMessageParts();
+                    Iterator<MessagePartInfo> itr = messageParts.iterator();
+    
+                    // advance just past the wrapped element so we don't get
+                    // stuck
+                    if (xmlReader.getEventType() == XMLStreamConstants.START_ELEMENT) {
+                        StaxUtils.nextEvent(xmlReader);
+                    }
+    
+                    // loop through each child element
+                    getPara(xmlReader, dr, parameters, itr, message);
+                }
+    
+            } else {
+                //Bare style
+                BindingMessageInfo msgInfo = null;
+    
+                if (bop != null) { //for xml binding or client side
+                    getMessageInfo(message, bop);
+                    if (client) {
+                        msgInfo = bop.getOutput();
+                    } else {
+                        msgInfo = bop.getInput();
+                    }
+                }
+    
+                Collection<OperationInfo> operations = null;
+                operations = new ArrayList<OperationInfo>();
+                Endpoint ep = exchange.get(Endpoint.class);
+                ServiceInfo si = ep.getEndpointInfo().getService();
+                operations.addAll(si.getInterface().getOperations());
+    
+                if (!StaxUtils.toNextElement(xmlReader)) {
+                    // empty input
+    
+                    // TO DO : check duplicate operation with no input
+                		int maxNrMatches = 0;
+                		OperationInfo tmpOP = null;
+                		BindingOperationInfo tmpBOP = null;
+                    for (OperationInfo op : operations) {
+                        MessageInfo bmsg = op.getInput();
+                        if (bmsg.getMessageParts().size() == 0) {
+                            BindingOperationInfo boi = ep.getEndpointInfo().getBinding().getOperation(op);
+                            exchange.put(BindingOperationInfo.class, boi);
+                            exchange.put(OperationInfo.class, op);
+                            exchange.setOneWay(op.isOneWay());
+                        }
+                        //PATCH_START
+                        else {
+                      		int i = 0;
+                        	for (MessagePartInfo mpi : bmsg.getMessageParts()) {
+                        		if (findHeader((SoapMessage)message, mpi) != null)
+                        			i++;
+                        	}
+                        	if (bmsg.getMessageParts().size() == i && ((SoapMessage)message).getHeaders().size() == i)
+                        	{
+                        		tmpOP = op;
+                        		tmpBOP = ep.getEndpointInfo().getBinding().getOperation(op);
+                        		break;
+                        	}
+                        	if (i == maxNrMatches)
+                        	{
+                        		tmpOP = null;
+                        		tmpBOP = null;
+                        	}
+                        	else if (i > maxNrMatches)
+                        	{
+                        		maxNrMatches = i;
+                        		tmpOP = op;
+                        		tmpBOP = ep.getEndpointInfo().getBinding().getOperation(op);
+                        	}
+                        }
+                        //PATCH_END
+                    }
+                    if (tmpBOP != null)
+                    {
+                      exchange.put(BindingOperationInfo.class, tmpBOP);
+                      exchange.put(OperationInfo.class, tmpOP);
+                      exchange.setOneWay(tmpOP.isOneWay());
+                    }
+                    return;
+                }
+    
+                int paramNum = 0;
+    
+                do {
+                    QName elName = xmlReader.getName();
+                    Object o = null;
+    
+                    MessagePartInfo p;
+                    if (!client && msgInfo != null && msgInfo.getMessageParts() != null 
+                        && msgInfo.getMessageParts().size() == 0) {
+                        //no input messagePartInfo
+                        return;
+                    }
+                    if (msgInfo != null && msgInfo.getMessageParts() != null 
+                        && msgInfo.getMessageParts().size() > 0) {
+                        assert msgInfo.getMessageParts().size() > paramNum;
+                        p = msgInfo.getMessageParts().get(paramNum);
+                    } else {
+                        p = findMessagePart(exchange, operations, elName, client, paramNum);
+                    }
+    
+                    if (p == null) {
+                        throw new Fault(new org.apache.cxf.common.i18n.Message("NO_PART_FOUND", LOG, elName),
+                                        Fault.FAULT_CODE_CLIENT);
+                    }
+    
+                    o = dr.read(p, xmlReader);
+                    parameters.put(p, o);
+                    
+                    paramNum++;
+                } while (StaxUtils.toNextElement(xmlReader));
+    
+            }
+    
+            if (parameters.size() > 0) {
+                message.setContent(List.class, parameters);
+            }
+        } catch (Fault f) {
+            if (!isRequestor(message)) {
+                f.setFaultCode(Fault.FAULT_CODE_CLIENT);
+            }
+            throw f;
+        }
+    }
+    
+    private void getPara(DepthXMLStreamReader xmlReader,
+                         DataReader<XMLStreamReader> dr,
+                         MessageContentsList parameters,
+                         Iterator<MessagePartInfo> itr,
+                         Message message) {
+        
+        boolean hasNext = true;
+        while (itr.hasNext()) {
+            MessagePartInfo part = itr.next();
+            if (hasNext) {
+                hasNext = StaxUtils.toNextElement(xmlReader);
+            }
+            Object obj = null;
+            if (hasNext) {
+                QName rname = xmlReader.getName();
+                while (part != null 
+                    && !rname.equals(part.getConcreteName())) {
+                    if (part.getXmlSchema() instanceof XmlSchemaElement) {
+                        //TODO - should check minOccurs=0 and throw validation exception
+                        //thing if the part needs to be here
+                        parameters.put(part, null);
+                    } 
 
-       try {
-           if (bop != null && bop.isUnwrappedCapable()) {
-               ServiceInfo si = bop.getBinding().getService();
-               // Wrapped case
-               MessageInfo msgInfo = setMessage(message, bop, client, si);
-   
-               // Determine if we should keep the parameters wrapper
-               if (shouldWrapParameters(msgInfo, message)) {
-                   QName startQName = xmlReader.getName();
-                   if (!msgInfo.getMessageParts().get(0).getConcreteName().equals(startQName)) {
-                       throw new Fault("UNEXPECTED_WRAPPER_ELEMENT", LOG, null, startQName,
-                                       msgInfo.getMessageParts().get(0).getConcreteName());
-                   }
-                   Object wrappedObject = dr.read(msgInfo.getMessageParts().get(0), xmlReader);
-                   parameters.put(msgInfo.getMessageParts().get(0), wrappedObject);
-               } else {
-                   // Unwrap each part individually if we don't have a wrapper
-   
-                   bop = bop.getUnwrappedOperation();
-   
-                   msgInfo = setMessage(message, bop, client, si);
-                   List<MessagePartInfo> messageParts = msgInfo.getMessageParts();
-                   Iterator<MessagePartInfo> itr = messageParts.iterator();
-   
-                   // advance just past the wrapped element so we don't get
-                   // stuck
-                   if (xmlReader.getEventType() == XMLStreamConstants.START_ELEMENT) {
-                       StaxUtils.nextEvent(xmlReader);
-                   }
-   
-                   // loop through each child element
-                   getPara(xmlReader, dr, parameters, itr, message);
-               }
-   
-           } else {
-               //Bare style
-               BindingMessageInfo msgInfo = null;
-
-   
-               Endpoint ep = exchange.get(Endpoint.class);
-               ServiceInfo si = ep.getEndpointInfo().getService();
-               if (bop != null) { //for xml binding or client side
-                   if (client) {
-                       msgInfo = bop.getOutput();
-                   } else {
-                       msgInfo = bop.getInput();
-                       if (bop.getOutput() == null) {
-                           exchange.setOneWay(true);
-                       }
-                   }
-                   if (msgInfo == null) {
-                       return;
-                   }
-                   setMessage(message, bop, client, si, msgInfo.getMessageInfo());
-               }
-   
-               Collection<OperationInfo> operations = null;
-               operations = new ArrayList<OperationInfo>();
-               operations.addAll(si.getInterface().getOperations());
-   
-               if (xmlReader == null || !StaxUtils.toNextElement(xmlReader)) {
-                   // empty input
-   
-                   // TO DO : check duplicate operation with no input
-                   int maxNrMatches = 0;
-                   OperationInfo tmpOP = null;
-                     BindingOperationInfo tmpBOP = null;
-                   for (OperationInfo op : operations) {
-                       MessageInfo bmsg = op.getInput();
-                       if (bmsg.getMessageParts().size() == 0) {
-                           BindingOperationInfo boi = ep.getEndpointInfo().getBinding().getOperation(op);
-                           exchange.put(BindingOperationInfo.class, boi);
-                           exchange.put(OperationInfo.class, op);
-                           exchange.setOneWay(op.isOneWay());
-                       }
-                                              //PATCH_START
-                       else {
-                             int i = 0;
-                           for (MessagePartInfo mpi : bmsg.getMessageParts()) {
-                               if (findHeader((SoapMessage)message, mpi) != null)
-                                   i++;
-                           }
-                           if (bmsg.getMessageParts().size() == i && ((SoapMessage)message).getHeaders().size() == i)
-                           {
-                               tmpOP = op;
-                               tmpBOP = ep.getEndpointInfo().getBinding().getOperation(op);
-                               break;
-                           }
-                           if (i == maxNrMatches)
-                           {
-                               tmpOP = null;
-                               tmpBOP = null;
-                           }
-                           else if (i > maxNrMatches)
-                           {
-                               maxNrMatches = i;
-                               tmpOP = op;
-                               tmpBOP = ep.getEndpointInfo().getBinding().getOperation(op);
-                           }
-                       }
-                       //PATCH_END
-                   }
-                   if (tmpBOP != null)
-                   {
-                     exchange.put(BindingOperationInfo.class, tmpBOP);
-                     exchange.put(OperationInfo.class, tmpOP);
-                     exchange.setOneWay(tmpOP.isOneWay());
-                   }
-                   return;
-               }
-   
-               int paramNum = 0;
-   
-               do {
-                   QName elName = xmlReader.getName();
-                   Object o = null;
-   
-                   MessagePartInfo p;
-                   if (!client && msgInfo != null && msgInfo.getMessageParts() != null 
-                       && msgInfo.getMessageParts().size() == 0) {
-                       //no input messagePartInfo
-                       return;
-                   }
-                   
-                   if (msgInfo != null && msgInfo.getMessageParts() != null 
-                       && msgInfo.getMessageParts().size() > 0) {
-                       if (msgInfo.getMessageParts().size() > paramNum) {
-                           p = msgInfo.getMessageParts().get(paramNum);
-                       } else {
-                           p = null;
-                       }
-                   } else {
-                       p = findMessagePart(exchange, operations, elName, client, paramNum, message);
-                   }
-   
-                   if (p == null) {
-                       throw new Fault(new org.apache.cxf.common.i18n.Message("NO_PART_FOUND", LOG, elName),
-                                       Fault.FAULT_CODE_CLIENT);
-                   }
-   
-                   o = dr.read(p, xmlReader);
-                   if (Boolean.TRUE.equals(si.getProperty("soap.force.doclit.bare")) 
-                       && parameters.isEmpty()) {
-                       // webservice provider does not need to ensure size
-                       parameters.add(o);
-                   } else {
-                       parameters.put(p, o);
-                   }
-                   
-                   paramNum++;
-                   if (message.getContent(XMLStreamReader.class) == null || o == xmlReader) {
-                       xmlReader = null;
-                   }
-               } while (xmlReader != null && StaxUtils.toNextElement(xmlReader));
-   
-           }
-   
-           message.setContent(List.class, parameters);
-       } catch (Fault f) {
-           if (!isRequestor(message)) {
-               f.setFaultCode(Fault.FAULT_CODE_CLIENT);
-           }
-           throw f;
-       }
-   }
-   
-   private void getPara(DepthXMLStreamReader xmlReader,
-                        DataReader<XMLStreamReader> dr,
-                        MessageContentsList parameters,
-                        Iterator<MessagePartInfo> itr,
-                        Message message) {
-       
-       boolean hasNext = true;
-       while (itr.hasNext()) {
-           MessagePartInfo part = itr.next();
-           if (hasNext) {
-               hasNext = StaxUtils.toNextElement(xmlReader);
-           }
-           Object obj = null;
-           if (hasNext) {
-               QName rname = xmlReader.getName();
-               while (part != null 
-                   && !rname.equals(part.getConcreteName())) {
-                   if (part.getXmlSchema() instanceof XmlSchemaElement) {
-                       //TODO - should check minOccurs=0 and throw validation exception
-                       //thing if the part needs to be here
-                       parameters.put(part, null);
-                   } 
-
-                   if (itr.hasNext()) {
-                       part = itr.next();
-                   } else {
-                       part = null;
-                   }                
-               }
-               if (part == null) {
-                   return;
-               }
-               if (rname.equals(part.getConcreteName())) {
-                   obj = dr.read(part, xmlReader);
-               }
-           }
-           parameters.put(part, obj);
-       }
-   }
+                    if (itr.hasNext()) {
+                        part = itr.next();
+                    } else {
+                        part = null;
+                    }                
+                }
+                if (part == null) {
+                    return;
+                }
+                if (rname.equals(part.getConcreteName())) {
+                    obj = dr.read(part, xmlReader);
+                }
+            }
+            parameters.put(part, obj);
+        }
+    }
 
 
-   private MessageInfo setMessage(Message message, BindingOperationInfo operation,
-                                  boolean requestor, ServiceInfo si) {
-       MessageInfo msgInfo = getMessageInfo(message, operation, requestor);
-       return setMessage(message, operation, requestor, si, msgInfo);
-   }
+    private MessageInfo setMessage(Message message, BindingOperationInfo operation,
+                                   boolean requestor, ServiceInfo si) {
+        MessageInfo msgInfo = getMessageInfo(message, operation, requestor);
+        message.put(MessageInfo.class, msgInfo);
 
-   
-   protected BindingOperationInfo getBindingOperationInfo(Exchange exchange, QName name,
-                                                          boolean client) {
-       BindingOperationInfo bop = ServiceModelUtil.getOperationForWrapperElement(exchange, name, client);
-       if (bop == null) {
-           bop = super.getBindingOperationInfo(exchange, name, client);
-       }
-           
-       if (bop != null) {
-           exchange.put(BindingOperationInfo.class, bop);
-           exchange.put(OperationInfo.class, bop.getOperationInfo());
-       }
-       return bop;
-   }
-   
-   protected boolean shouldWrapParameters(MessageInfo msgInfo, Message message) {
-       Object keepParametersWrapperFlag = message.get(KEEP_PARAMETERS_WRAPPER);
-       if (keepParametersWrapperFlag == null) {
-           return msgInfo.getMessageParts().get(0).getTypeClass() != null;
-       } else {
-           return Boolean.parseBoolean(keepParametersWrapperFlag.toString());
-       }
-   }
-   
-   private Header findHeader(SoapMessage message, MessagePartInfo mpi) {
-       return message.getHeader(mpi.getConcreteName());
-   }
+        Exchange ex = message.getExchange();
+        ex.put(BindingOperationInfo.class, operation);
+        ex.put(OperationInfo.class, operation.getOperationInfo());
+        ex.setOneWay(operation.getOperationInfo().isOneWay());
+
+        //Set standard MessageContext properties required by JAX_WS, but not specific to JAX_WS.
+        message.put(Message.WSDL_OPERATION, operation.getName());
+
+        QName serviceQName = si.getName();
+        message.put(Message.WSDL_SERVICE, serviceQName);
+
+        QName interfaceQName = si.getInterface().getName();
+        message.put(Message.WSDL_INTERFACE, interfaceQName);
+
+        EndpointInfo endpointInfo = ex.get(Endpoint.class).getEndpointInfo();
+        QName portQName = endpointInfo.getName();
+        message.put(Message.WSDL_PORT, portQName);
+
+        
+        URI wsdlDescription = endpointInfo.getProperty("URI", URI.class);
+        if (wsdlDescription == null) {
+            String address = endpointInfo.getAddress();
+            try {
+                wsdlDescription = new URI(address + "?wsdl");
+            } catch (URISyntaxException e) {
+                //do nothing
+            }
+            endpointInfo.setProperty("URI", wsdlDescription);
+        }
+        message.put(Message.WSDL_DESCRIPTION, wsdlDescription);
+
+        return msgInfo;
+    }
+    
+    protected BindingOperationInfo getBindingOperationInfo(Exchange exchange, QName name,
+                                                           boolean client) {
+        BindingOperationInfo bop = ServiceModelUtil.getOperationForWrapperElement(exchange, name, client);
+        if (bop == null) {
+            bop = super.getBindingOperationInfo(exchange, name, client);
+        }
+            
+        if (bop != null) {
+            exchange.put(BindingOperationInfo.class, bop);
+            exchange.put(OperationInfo.class, bop.getOperationInfo());
+        }
+        return bop;
+    }
+
+    private Header findHeader(SoapMessage message, MessagePartInfo mpi) {
+      return message.getHeader(mpi.getConcreteName());
+  }
 }
