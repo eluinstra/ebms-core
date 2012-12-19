@@ -261,6 +261,7 @@ Restrictions =
 ==============
 
 - Only HTTP(S) protocol is supported
+- Only asynchronous transport is supported
 - Only 1 Channel per Action is allowed
 - Actor NextMSH is not supported. Only actor ToPartyMSH is supported
 - Message Acknowledgments as part of another message are not supported. Only Aknowledgment messages with a MessageHeader containing service 'urn:oasis:names:tc:ebxml-msg:service' and action 'Acknowledgment' are supported
