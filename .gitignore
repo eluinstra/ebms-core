@@ -12,4 +12,5 @@ hooks
 /.classpath
 /.project
 /target
+/findbugs
 
