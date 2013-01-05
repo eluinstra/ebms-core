@@ -27,14 +27,7 @@ import javax.xml.datatype.XMLGregorianCalendar;
 
 public class EbMSDateTimeConverter
 {
-	private static DateFormat df;
-	
-	static
-	{
-		df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
-		df.setTimeZone(TimeZone.getTimeZone("GMT"));
-		//df.setLenient(true);
-	}
+	private static final String DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss'Z'";
 
 	public static XMLGregorianCalendar parseDateTime(String date)
 	{
@@ -44,6 +37,9 @@ public class EbMSDateTimeConverter
 			if (!date.endsWith("Z"))
 				date += "Z";
 			GregorianCalendar calendar = new GregorianCalendar();
+			DateFormat df = new SimpleDateFormat(DATE_FORMAT);
+			df.setTimeZone(TimeZone.getTimeZone("GMT"));
+			//df.setLenient(true);
 			calendar.setTime(df.parse(date));
 			return DatatypeFactory.newInstance().newXMLGregorianCalendar(calendar);
 		}
@@ -61,6 +57,9 @@ public class EbMSDateTimeConverter
 
 	public static String printDateTime(XMLGregorianCalendar date)
 	{
+		DateFormat df = new SimpleDateFormat(DATE_FORMAT);
+		df.setTimeZone(TimeZone.getTimeZone("GMT"));
+		//df.setLenient(true);
 		return df.format(date.toGregorianCalendar().getTime());
 	}
 }
