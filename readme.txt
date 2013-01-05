@@ -247,6 +247,25 @@ the reources directory resides in ebms-adapter-x.x.x.zip/resources and contains 
 	scripts/database/hsqldb - contains hsqldb scripts
 	scripts/database/mssql - contains mssql scripts
 
+==========
+Building =
+==========
+> mvn package
+
+====================
+Generating reports =
+====================
+> mvn site
+
+Or to generate individual reports:
+> mvn jxr:jxr
+> mvn jxr:test-jxr
+> mvn checkstyle:checkstyle
+> mvn findbugs:findbugs
+> mvn pmd:pmd
+> mvn jdepend:generate
+> mvn cobertura:cobertura
+
 ==============
 Known Issues =
 ==============
