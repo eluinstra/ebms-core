@@ -52,11 +52,11 @@ public class XMLMessageBuilder<T>
 	{
   	if (is == null) return null;
 		Unmarshaller unmarshaller = context.createUnmarshaller();
-     Object o = unmarshaller.unmarshal(is);
-	if (o instanceof JAXBElement<?>)
-		return (T)((JAXBElement<T>)o).getValue();
-	else
-		return (T)o;
+		Object o = unmarshaller.unmarshal(is);
+		if (o instanceof JAXBElement<?>)
+			return (T)((JAXBElement<T>)o).getValue();
+		else
+			return (T)o;
 	}
   
 	@SuppressWarnings("unchecked")
