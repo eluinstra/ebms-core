@@ -85,7 +85,8 @@
 	</element>
 	<element name="MessageId" type="tns:non-empty-string"/>
 	<element name="TimeToLive" type="dateTime"/>
-	<element name="DuplicateElimination"/>
+	<!--element name="DuplicateElimination"/-->
+	<element name="DuplicateElimination" type="string"/>
 	<!-- SYNC REPLY, for use in soap:Header element -->
 	<element name="SyncReply">
 		<complexType>
