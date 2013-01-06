@@ -39,6 +39,7 @@ public interface EbMSDAO
 	
 	boolean existsMessage(String messageId) throws DAOException;
 	Long getEbMSMessageId(String messageId) throws DAOException;
+	Long getEbMSResponseId(String messageId) throws DAOException;
 	MessageHeader getMessageHeader(String messageId) throws DAOException;
 	EbMSBaseMessage getMessage(long id) throws DAOException;
 	EbMSMessageStatus getMessageStatus(String messageId, Date timestamp) throws DAOException;

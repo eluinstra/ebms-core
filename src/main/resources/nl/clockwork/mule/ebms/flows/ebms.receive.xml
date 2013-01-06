@@ -98,7 +98,7 @@
 		<service name="ebms.response.find">
 			<inbound>
 				<vm:inbound-endpoint path="ebms.response.find.in">
-					<custom-transformer class="nl.clockwork.mule.ebms.transformer.EbMSRefToMessageToEbMSMessageId">
+					<custom-transformer class="nl.clockwork.mule.ebms.transformer.EbMSMessageToEbMSResponseId">
 						<spring:property name="ebMSDAO" ref="ebMSDAO"/>
 					</custom-transformer>
 				</vm:inbound-endpoint>

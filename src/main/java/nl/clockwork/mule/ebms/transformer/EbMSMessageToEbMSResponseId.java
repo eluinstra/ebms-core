@@ -25,12 +25,12 @@ import org.mule.api.MuleMessage;
 import org.mule.api.transformer.TransformerException;
 import org.mule.transformer.AbstractMessageAwareTransformer;
 
-public class EbMSRefToMessageToEbMSMessageId extends AbstractMessageAwareTransformer
+public class EbMSMessageToEbMSResponseId extends AbstractMessageAwareTransformer
 {
   protected transient Log logger = LogFactory.getLog(getClass());
   private EbMSDAO ebMSDAO;
 
-	public EbMSRefToMessageToEbMSMessageId()
+	public EbMSMessageToEbMSResponseId()
 	{
 		registerSourceType(EbMSMessage.class);
 		//FIXME
@@ -43,7 +43,7 @@ public class EbMSRefToMessageToEbMSMessageId extends AbstractMessageAwareTransfo
 		try
 		{
 			EbMSMessage msg = (EbMSMessage)message.getPayload();
-			Long id = ebMSDAO.getEbMSMessageId(msg.getMessageHeader().getMessageData().getRefToMessageId());
+			Long id = ebMSDAO.getEbMSResponseId(msg.getMessageHeader().getMessageData().getMessageId());
 			message.setPayload(id);
 			return message;
 		}
