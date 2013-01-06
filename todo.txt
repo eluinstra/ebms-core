@@ -1,5 +1,6 @@
 - check if catching MissingResourceFailureException in EbMSSecSignatureInInterceptor behaves according to specs
 - switch message validation and duplicate elimination checks
+- set http status to 204 on empty response???
 
 2.1.x:
 - create documentation/manual
