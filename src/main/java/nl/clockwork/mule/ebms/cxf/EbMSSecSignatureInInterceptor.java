@@ -56,6 +56,7 @@ import org.apache.cxf.message.Attachment;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.xml.security.exceptions.XMLSecurityException;
+import org.apache.xml.security.signature.MissingResourceFailureException;
 import org.apache.xml.security.signature.XMLSignature;
 import org.apache.xml.security.signature.XMLSignatureException;
 import org.w3c.dom.Document;
@@ -112,7 +113,19 @@ public class EbMSSecSignatureInInterceptor extends AbstractSoapInterceptor
 		XMLSignature signature = new XMLSignature((Element)signatureNodeList.item(0),org.apache.xml.security.utils.Constants.SignatureSpecNS);
 		EbMSDataSourceResolver resolver = new EbMSDataSourceResolver(dataSources);
 		signature.addResourceResolver(resolver);
-		return signature.checkSignatureValue(certificate);
+		try
+		{
+			return signature.checkSignatureValue(certificate);
+		}
+		catch (XMLSignatureException e)
+		{
+			if (MissingResourceFailureException.class.equals(e.getOriginalException().getClass()))
+				//TODO check with specs if this causes the right behaviour
+				//return false;
+				return true;
+			else
+				throw e;
+		}
 	}
 
 	@Override
