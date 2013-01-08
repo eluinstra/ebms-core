@@ -96,8 +96,15 @@ public class EbMSPortTypeImpl implements EbMSPortType
 	public MessageHeader ping(MessageHeader messageHeader)
 	{
 		//FIXME check for NullPayload and return null??, response has to be the same as without fix (so empty)
-		EbMSPong result = pingProcessor.process(new EbMSPing(messageHeader));
-		return result.getMessageHeader();
+		try
+		{
+			EbMSPong result = pingProcessor.process(new EbMSPing(messageHeader));
+			return result.getMessageHeader();
+		}
+		catch (ClassCastException e)
+		{
+			return null;
+		}
 	}
 
 	public void setMessageProcessor(EbMSMessageProcessor messageProcessor)
