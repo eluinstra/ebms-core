@@ -56,8 +56,7 @@ public class CPAValidationFilter implements Filter
 					return false;
 				}
 
-				return cpa != null
-					&& StatusValueType.AGREED.equals(cpa.getStatus().getValue())
+				return StatusValueType.AGREED.equals(cpa.getStatus().getValue())
 					&& now.compareTo(cpa.getStart().toGregorianCalendar().getTime()) >= 0
 					&& now.compareTo(cpa.getEnd().toGregorianCalendar().getTime()) <= 0
 				;
