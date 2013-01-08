@@ -279,6 +279,7 @@ ERROR org.mule.module.management.mbean.ServiceService - Error post-registering t
 Restrictions =
 ==============
 
+- Always eliminates duplicate messages (according to EbMS specs)
 - Only HTTP(S) protocol is supported
 - Only asynchronous transport is supported
 - Only 1 Channel per Action is allowed
