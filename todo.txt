@@ -1,6 +1,8 @@
 - implement MSH Ping and MessageStatus Services in EbMSAdapter Interface
 	- make EbMS Ping and MessageStatus Services async
 	- store Ping/Pong and MessageStatus Request and Response messages in the database???
+- validate received error and acknowledgment messages and add duplicate elimination?
+- remove EbMSMessageHeaderCompareFilter (not according to EbMS specs) or make it configurable???
 - check if catching MissingResourceFailureException in EbMSSecSignatureInInterceptor behaves according to specs
 - check if duplicateElimination behaves according to specs (when a different message with a duplicate messageId is sent or signature is invalid)
 - set http status to 204 on empty response???
@@ -10,9 +12,6 @@
 - improve error handling and logging
 - improve validation of received Error and Acknowledgment messages
 - configure CPA caching (or load CPA once per message)?
-/ improve duplicate message handling
-	- store messages with unknown cpaId???
-	- store duplicate messages???
 - get hostname (needed for messageId) from CPA
 
 2.2.x:
