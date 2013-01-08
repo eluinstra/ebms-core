@@ -16,7 +16,7 @@
 package nl.clockwork.mule.ebms.filter;
 
 import nl.clockwork.mule.ebms.Constants.EbMSMessageType;
-import nl.clockwork.mule.ebms.model.EbMSPing;
+import nl.clockwork.mule.ebms.model.EbMSBaseMessage;
 import nl.clockwork.mule.ebms.model.ebxml.Service;
 
 import org.apache.commons.logging.Log;
@@ -33,12 +33,8 @@ public class EbMSMessageActionFilter implements Filter
 	@Override
 	public boolean accept(MuleMessage message)
 	{
-		if (message.getPayload() instanceof EbMSPing)
-		{
-			EbMSPing msg = (EbMSPing)message.getPayload();
-			return service.equals(msg.getMessageHeader().getService().getValue()) && action.equals(msg.getMessageHeader().getAction());
-		}
-		return true;
+		EbMSBaseMessage msg = (EbMSBaseMessage)message.getPayload();
+		return service.getValue().equals(msg.getMessageHeader().getService().getValue()) && action.equals(msg.getMessageHeader().getAction());
 	}
 	
 	public void setService(Service service)
