@@ -1,5 +1,8 @@
+- implement MSH Ping and MessageStatus Services in EbMSAdapter Interface
+	- make EbMS Ping and MessageStatus Services async
+	- store Ping/Pong and MessageStatus Request and Response messages in the database???
 - check if catching MissingResourceFailureException in EbMSSecSignatureInInterceptor behaves according to specs
-- check if duplicateElimination behaves according to specs (when a different message with a duplicate messageId is sent)
+- check if duplicateElimination behaves according to specs (when a different message with a duplicate messageId is sent or signature is invalid)
 - set http status to 204 on empty response???
 
 2.1.x:
