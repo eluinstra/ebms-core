@@ -1,11 +1,28 @@
+- implement EbMSSyncReplyValidationFilter in EbMSMessageHeaderValidationFilter???
+- If CPAId is not recognized, a response is generated:
+	- Error - NotRecognized (use CPAExistsFilter!!!)
+	- normally get errorURI from CPA
+	- now get get errorURI from From element???
+- make message_id unique?
+	- make message_id primary key?
+- generate DeliveryFailure if nextMSH???
+- store url in ebms_send_event
+- Message Responses:
+	- validate received error and acknowledgment messages
+	- add duplicate elimination?
 - implement MSH Ping and MessageStatus Services in EbMSAdapter Interface
 	- make EbMS Ping and MessageStatus Services async
 	- store Ping/Pong and MessageStatus Request and Response messages in the database???
-- validate received error and acknowledgment messages and add duplicate elimination?
-- remove EbMSMessageHeaderCompareFilter (not according to EbMS specs) or make it configurable???
-- check if catching MissingResourceFailureException in EbMSSecSignatureInInterceptor behaves according to specs
-- check if duplicateElimination behaves according to specs (when a different message with a duplicate messageId is sent or signature is invalid)
-- set http status to 204 on empty response???
+	- add duplicate elimination?
+- handle SOAP Faults???
+	- store
+	- end retry
+- check if duplicateElimination behaves according to specs (when duplicate message (=messageId) is sent with different content or signature)
+	- remove EbMSMessageHeaderCompareFilter (not according to EbMS specs) or make it configurable???
+
+- validate Reference element if present in Aknowledgement against original message???
+- collect list of errors in message validators (instead of exit on the first error)???
+- check CPA for invalid use of urn:oasis:names:tc:ebxml-msg:service namespace for defined services???
 
 2.1.x:
 - create documentation/manual
