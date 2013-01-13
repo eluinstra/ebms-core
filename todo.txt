@@ -1,4 +1,5 @@
 - check EbMSMessageContentValidationFilter and EbMSMessageDataValidationFilter and EbMSMessageContentXSDValidationFilter
+- mark message as delivered (or failed) when Acknowledgment is received and message is not marked yet
 - improve EbMSMessageHeaderValidationFilter (see FIXMEs)
 - If CPAId is not recognized, a response is generated:
 	- Error - NotRecognized (use CPAExistsFilter!!!)
@@ -13,7 +14,12 @@
 - implement MSH Ping and MessageStatus Services in EbMSAdapter Interface
 	- make EbMS Ping and MessageStatus Services async
 	- store Ping/Pong and MessageStatus Request and Response messages in the database???
+	- validate MessageHeader against CPA
+		- Services can respond with an ErrorMessage???
+	- if request unauthorized response may be ignored
 	- add duplicate elimination???
+	- add to MessageStatus Service to check if message has same cpaId then messageStatus message if not set messageStatus to Unauthorized
+- messageStatus always received when message is received
 - handle SOAP Faults???
 	- store
 	- end retry
@@ -21,6 +27,7 @@
 	- remove EbMSMessageHeaderCompareFilter (not according to EbMS specs) or make it configurable???
 	- check order: security check, duplicate elimination, header check?
 - store TimeToLive in ebms_message???
+- improve TimeToLive and PersistDuration checks
 
 - validate Reference element if present in Acknowledgment against original message???
 - collect list of errors in message validators (instead of exit on the first error)???
@@ -31,6 +38,7 @@
 - use ebms-message.parent_id to link a request and its response message
 - notify From Party somehow on delivery failure (after all retries have failed) (this is a MUST)???
 	- notify From Party somehow on succesful delivery ignoring messages with duplicate refToMessageIds (this is OPTIONAL)
+
 2.1.x:
 - create documentation/manual
 - improve error handling and logging
