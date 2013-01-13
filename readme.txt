@@ -275,14 +275,32 @@ During startup the following errors/warnings may occur and can be ignored:
 WARN  nl.clockwork.mule.ebms.HSQLDatabaseProvider - java.sql.SQLException: object name already exists: CPA in statement [CREATE TABLE cpa
 ERROR org.mule.module.management.mbean.ServiceService - Error post-registering the MBean javax.management.MalformedObjectNameException: Invalid character ':' in value part of property
 
-==============
-Restrictions =
-==============
+===============
+Functionality =
+===============
 
-- Always eliminates duplicate messages (according to EbMS specs)
 - Only HTTP(S) protocol is supported
-- Only asynchronous transport is supported
-- Only 1 Channel per Action is allowed
-- Actor NextMSH is not supported. Only actor ToPartyMSH is supported
-- Message Acknowledgments as part of another message are not supported. Only Aknowledgment messages with a MessageHeader containing service 'urn:oasis:names:tc:ebxml-msg:service' and action 'Acknowledgment' are supported
-- Only supports one Transport at the moment
+- Security
+	- Signing is supported
+	- Encoding is not supported
+- SyncReply
+	- Only asynchronous communication is supported
+- Reliable Messaging is supported
+- Message Services
+	- Ping and Message Status Service supported
+		- Only synchronous communication is supported
+- Message Order is not supported
+- Multi-Hop is not supported
+	- Cannot act as intermediary MSH
+		- Only actor ToPartyMSH is supported
+		- Actor NextMSH is not supported
+
+- Manifest can only refer to payload data included as part of the message as payload document(s) contained in a Payload Container, not to remote resources accessible via a URL
+- Always eliminates duplicate messages (according to EbMS specs)
+- SOAP Fault messages can be generated
+- Only 1 Channel per Action is supported
+- ErrorList and Acknowledgment elements as part of another message are not supported.
+  Only error messages with a MessageHeader containing service 'urn:oasis:names:tc:ebxml-msg:service' and action 'MessageError' are supported
+  Only aknowledgment messages with a MessageHeader containing service 'urn:oasis:names:tc:ebxml-msg:service' and action 'Acknowledgment' are supported
+
+- Only one transport is supported
