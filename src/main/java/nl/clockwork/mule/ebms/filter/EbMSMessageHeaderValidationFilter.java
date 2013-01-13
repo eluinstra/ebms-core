@@ -16,7 +16,9 @@
 package nl.clockwork.mule.ebms.filter;
 
 import java.net.URI;
+import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.TimeZone;
 
 import nl.clockwork.common.dao.DAOException;
 import nl.clockwork.mule.ebms.Constants;
@@ -53,7 +55,6 @@ public class EbMSMessageHeaderValidationFilter implements Filter
 	private PersistenceLevelType isConfidential = PersistenceLevelType.NONE;
 	private SyncReplyModeType syncReplyMode = SyncReplyModeType.NONE;
 	private PerMessageCharacteristicsType ackRequested = PerMessageCharacteristicsType.ALWAYS;
-	private PerMessageCharacteristicsType duplicateElimination = PerMessageCharacteristicsType.ALWAYS;
 
 	@Override
 	public boolean accept(MuleMessage message)
@@ -73,31 +74,26 @@ public class EbMSMessageHeaderValidationFilter implements Filter
 					message.setProperty(Constants.EBMS_ERROR,EbMSMessageUtils.createError("//Header/MessageHeader[@version]",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Value invalid."));
 					return false;
 				}
-				if (true != messageHeader.isMustUnderstand())
-				{
-					message.setProperty(Constants.EBMS_ERROR,EbMSMessageUtils.createError("//Header/MessageHeader[@mustUnderstand]",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Value invalid."));
-					return false;
-				}
 
 				if (!isValid(messageHeader.getFrom().getPartyId()))
 				{
 					message.setProperty(Constants.EBMS_ERROR,EbMSMessageUtils.createError("//Header/MessageHeader/From/PartyId",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Value invalid."));
 					return false;
 				}
-				if ((from = CPAUtils.getPartyInfo(cpa, messageHeader.getFrom().getPartyId())) == null)
-				{
-					message.setProperty(Constants.EBMS_ERROR,EbMSMessageUtils.createError("//Header/MessageHeader/From/PartyId",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Value not found."));
-					return false;
-				}
-				if (!CPAUtils.canSend(from,messageHeader.getFrom().getRole(),messageHeader.getService(),messageHeader.getAction()))
-				{
-					message.setProperty(Constants.EBMS_ERROR,EbMSMessageUtils.createError("//Header/MessageHeader/Action",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Value not found."));
-					return false;
-				}
-
 				if (!isValid(messageHeader.getTo().getPartyId()))
 				{
 					message.setProperty(Constants.EBMS_ERROR,EbMSMessageUtils.createError("//Header/MessageHeader/To/PartyId",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Value invalid."));
+					return false;
+				}
+				if (!isValid(messageHeader.getService()))
+				{
+					message.setProperty(Constants.EBMS_ERROR,EbMSMessageUtils.createError("//Header/MessageHeader/Service",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Value invalid."));
+					return false;
+				}
+				
+				if ((from = CPAUtils.getPartyInfo(cpa, messageHeader.getFrom().getPartyId())) == null)
+				{
+					message.setProperty(Constants.EBMS_ERROR,EbMSMessageUtils.createError("//Header/MessageHeader/From/PartyId",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Value not found."));
 					return false;
 				}
 				if ((to = CPAUtils.getPartyInfo(cpa, messageHeader.getTo().getPartyId())) == null)
@@ -105,22 +101,22 @@ public class EbMSMessageHeaderValidationFilter implements Filter
 					message.setProperty(Constants.EBMS_ERROR,EbMSMessageUtils.createError("//Header/MessageHeader/To/PartyId",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Value not found."));
 					return false;
 				}
+
+				if (!CPAUtils.canSend(from,messageHeader.getFrom().getRole(),messageHeader.getService(),messageHeader.getAction()))
+				{
+					message.setProperty(Constants.EBMS_ERROR,EbMSMessageUtils.createError("//Header/MessageHeader/Action",Constants.EbMSErrorCode.VALUE_NOT_RECOGNIZED.errorCode(),"Value not found."));
+					return false;
+				}
 				if (!CPAUtils.canReceive(to,messageHeader.getTo().getRole(),messageHeader.getService(),messageHeader.getAction()))
 				{
-					message.setProperty(Constants.EBMS_ERROR,EbMSMessageUtils.createError("//Header/MessageHeader/Action",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Value not found."));
+					message.setProperty(Constants.EBMS_ERROR,EbMSMessageUtils.createError("//Header/MessageHeader/Action",Constants.EbMSErrorCode.VALUE_NOT_RECOGNIZED.errorCode(),"Value not found."));
 					return false;
 				}
 
-				if (!isValid(messageHeader.getService()))
-				{
-					message.setProperty(Constants.EBMS_ERROR,EbMSMessageUtils.createError("//Header/MessageHeader/Service",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Value invalid."));
-					return false;
-				}
-				
 				List<DeliveryChannel> deliveryChannels = CPAUtils.getDeliveryChannels(from,messageHeader.getFrom().getRole(),messageHeader.getService(),messageHeader.getAction());
 				if (deliveryChannels.size() == 0)
 				{
-					message.setProperty(Constants.EBMS_ERROR,EbMSMessageUtils.createError(Constants.EbMSErrorCode.UNKNOWN.errorCode(),Constants.EbMSErrorCode.UNKNOWN.errorCode(),"No DeviveryChannel found."));
+					message.setProperty(Constants.EBMS_ERROR,EbMSMessageUtils.createError(Constants.EbMSErrorCode.UNKNOWN.errorCode(),Constants.EbMSErrorCode.UNKNOWN.errorCode(),"No DeliveryChannel found."));
 					return false;
 				}
 				if (deliveryChannels.size() > 1)
@@ -129,9 +125,9 @@ public class EbMSMessageHeaderValidationFilter implements Filter
 					return false;
 				}
 				DeliveryChannel deliveryChannel = deliveryChannels.get(0);
-				if (!checkDuplicateElimination(deliveryChannel))
+				if (!checkTimeToLive(messageHeader))
 				{
-					message.setProperty(Constants.EBMS_ERROR,EbMSMessageUtils.createError("//Header/MessageHeader/DuplicateElimination",Constants.EbMSErrorCode.NOT_SUPPORTED.errorCode(),"DuplicateElimination value not supported."));
+					message.setProperty(Constants.EBMS_ERROR,EbMSMessageUtils.createError("//Header/MessageHeader/MessageData/TimeToLive",Constants.EbMSErrorCode.TIME_TO_LIVE_EXPIRED.errorCode(),null));
 					return false;
 				}
 				if (!checkDuplicateElimination(deliveryChannel,messageHeader))
@@ -155,11 +151,6 @@ public class EbMSMessageHeaderValidationFilter implements Filter
 					if (!Constants.EBMS_VERSION.equals(ackRequested.getVersion()))
 					{
 						message.setProperty(Constants.EBMS_ERROR,EbMSMessageUtils.createError("//Header/AckRequested[@version]",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Wrong value."));
-						return false;
-					}
-					if (true != ackRequested.isMustUnderstand())
-					{
-						message.setProperty(Constants.EBMS_ERROR,EbMSMessageUtils.createError("//Header/AckRequested[@mustUnderstand]",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Wrong value."));
 						return false;
 					}
 					if (!checkAckRequested(deliveryChannel,ackRequested))
@@ -222,15 +213,16 @@ public class EbMSMessageHeaderValidationFilter implements Filter
 		return !StringUtils.isEmpty(service.getType()) || isValidURI(service.getValue())/*FIXME replace by: org.apache.commons.validator.UrlValidator.isValid(service.getValue())*/; 
 	}
 	
-	private boolean checkDuplicateElimination(DeliveryChannel deliveryChannel)
+	private boolean checkTimeToLive(MessageHeader messageHeader)
 	{
-		return deliveryChannel.getMessagingCharacteristics().getDuplicateElimination().equals(duplicateElimination);
+		return messageHeader.getMessageData().getTimestamp() == null
+				|| new GregorianCalendar(TimeZone.getTimeZone("GMT")).before(messageHeader.getMessageData().getTimestamp());
 	}
 	
 	private boolean checkDuplicateElimination(DeliveryChannel deliveryChannel, MessageHeader messageHeader)
 	{
-		return deliveryChannel.getMessagingCharacteristics().getDuplicateElimination().equals(PerMessageCharacteristicsType.ALWAYS)
-				&& messageHeader.getDuplicateElimination() != null;
+		return !(deliveryChannel.getMessagingCharacteristics().getDuplicateElimination().equals(PerMessageCharacteristicsType.NEVER)
+				&& messageHeader.getDuplicateElimination() != null);
 	}
 	
 	private boolean checkSyncReplyMode(DeliveryChannel deliveryChannel)
@@ -300,8 +292,4 @@ public class EbMSMessageHeaderValidationFilter implements Filter
 		this.ackRequested = ackRequested;
 	}
 	
-	public void setDuplicateElimination(PerMessageCharacteristicsType duplicateElimination)
-	{
-		this.duplicateElimination = duplicateElimination;
-	}
 }

@@ -45,20 +45,24 @@ public class EbMSManifestValidationFilter implements Filter
 				message.setProperty(Constants.EBMS_ERROR,EbMSMessageUtils.createError("//Body/Manifest[@version]",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Wrong value."));
 				return false;
 			}
-			if (manifest.getReference().size() != msg.getAttachments().size())
-			{
-				message.setProperty(Constants.EBMS_ERROR,EbMSMessageUtils.createError("//Body/Manifest",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Wrong number of attachments."));
-				return false;
-			}
 			for (Reference reference : manifest.getReference())
 			{
-				boolean found = false;
-				for (DataSource dataSource : msg.getAttachments())
-					if (reference.getHref().startsWith("cid:") && reference.getHref().substring("cid:".length()).equals(((EbMSDataSource)dataSource).getContentId()))
-						found = true;
-				if (!found)
+				if (reference.getHref().startsWith("cid:"))
 				{
-					message.setProperty(Constants.EBMS_ERROR,EbMSMessageUtils.createError("//Body/Manifest/Reference[@href='" + reference.getHref() + "']",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Attachment not found."));
+					boolean found = false;
+					for (DataSource dataSource : msg.getAttachments())
+						if (reference.getHref().substring("cid:".length()).equals(((EbMSDataSource)dataSource).getContentId()))
+							found = true;
+					if (!found)
+					{
+						message.setProperty(Constants.EBMS_ERROR,EbMSMessageUtils.createError(reference.getHref(),Constants.EbMSErrorCode.MIME_PROBLEM.errorCode(),"MIME part not found."));
+						return false;
+					}
+				}
+				else
+				{
+					message.setProperty(Constants.EBMS_ERROR,EbMSMessageUtils.createError("//Body/Manifest/Reference[@href='" + reference.getHref() + "']",Constants.EbMSErrorCode.NOT_SUPPORTED.errorCode(),"URI not supported."));
+					//message.setProperty(Constants.EBMS_ERROR,EbMSMessageUtils.createError("//Body/Manifest/Reference[@href='" + reference.getHref() + "']",Constants.EbMSErrorCode.MIME_PROBLEM.errorCode(),"URI cannot be resolved."));
 					return false;
 				}
 			}
