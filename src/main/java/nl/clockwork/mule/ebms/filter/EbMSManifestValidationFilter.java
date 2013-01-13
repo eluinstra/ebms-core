@@ -61,8 +61,7 @@ public class EbMSManifestValidationFilter implements Filter
 				}
 				else
 				{
-					message.setProperty(Constants.EBMS_ERROR,EbMSMessageUtils.createError("//Body/Manifest/Reference[@href='" + reference.getHref() + "']",Constants.EbMSErrorCode.NOT_SUPPORTED.errorCode(),"URI not supported."));
-					//message.setProperty(Constants.EBMS_ERROR,EbMSMessageUtils.createError("//Body/Manifest/Reference[@href='" + reference.getHref() + "']",Constants.EbMSErrorCode.MIME_PROBLEM.errorCode(),"URI cannot be resolved."));
+					message.setProperty(Constants.EBMS_ERROR,EbMSMessageUtils.createError("//Body/Manifest/Reference[@href='" + reference.getHref() + "']",Constants.EbMSErrorCode.MIME_PROBLEM.errorCode(),"URI cannot be resolved."));
 					return false;
 				}
 			}
