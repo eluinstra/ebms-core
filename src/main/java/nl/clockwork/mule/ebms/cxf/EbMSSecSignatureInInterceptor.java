@@ -113,19 +113,7 @@ public class EbMSSecSignatureInInterceptor extends AbstractSoapInterceptor
 		XMLSignature signature = new XMLSignature((Element)signatureNodeList.item(0),org.apache.xml.security.utils.Constants.SignatureSpecNS);
 		EbMSDataSourceResolver resolver = new EbMSDataSourceResolver(dataSources);
 		signature.addResourceResolver(resolver);
-		try
-		{
-			return signature.checkSignatureValue(certificate);
-		}
-		catch (XMLSignatureException e)
-		{
-			if (MissingResourceFailureException.class.equals(e.getOriginalException().getClass()))
-				//TODO check with specs if this causes the right behaviour
-				//return false;
-				return true;
-			else
-				throw e;
-		}
+		return signature.checkSignatureValue(certificate);
 	}
 
 	@Override
