@@ -273,6 +273,7 @@ Known Issues =
 During startup the following errors/warnings may occur and can be ignored:
 
 WARN  nl.clockwork.mule.ebms.HSQLDatabaseProvider - java.sql.SQLException: object name already exists: CPA in statement [CREATE TABLE cpa
+
 ERROR org.mule.module.management.mbean.ServiceService - Error post-registering the MBean javax.management.MalformedObjectNameException: Invalid character ':' in value part of property
 
 ===============
@@ -282,17 +283,19 @@ Functionality =
 - Only HTTP(S) protocol is supported
 - Security
 	- Signing is supported
+		- not supported on default channel
 	- Encoding is not supported
 - SyncReply
 	- Only asynchronous communication is supported
+		- only synchronous communication is supported for EbMS Message Services
 - Reliable Messaging is supported
-- Message Services
+- EbMS Message Services
 	- Ping and Message Status Service supported
 		- Only synchronous communication is supported
 - Message Order is not supported
 - Multi-Hop is not supported
 	- Cannot act as intermediary MSH
-		- Only actor ToPartyMSH is supported
+		- Actor ToPartyMSH is supported
 		- Actor NextMSH is not supported
 
 - Manifest can only refer to payload data included as part of the message as payload document(s) contained in a Payload Container, not to remote resources accessible via a URL
