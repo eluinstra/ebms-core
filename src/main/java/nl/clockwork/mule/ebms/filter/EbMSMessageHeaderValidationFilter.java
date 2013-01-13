@@ -215,8 +215,8 @@ public class EbMSMessageHeaderValidationFilter implements Filter
 	
 	private boolean checkTimeToLive(MessageHeader messageHeader)
 	{
-		return messageHeader.getMessageData().getTimestamp() == null
-				|| new GregorianCalendar(TimeZone.getTimeZone("GMT")).before(messageHeader.getMessageData().getTimestamp());
+		return messageHeader.getMessageData().getTimeToLive() == null
+				|| new GregorianCalendar(TimeZone.getTimeZone("GMT")).before(messageHeader.getMessageData().getTimeToLive().toGregorianCalendar());
 	}
 	
 	private boolean checkDuplicateElimination(DeliveryChannel deliveryChannel, MessageHeader messageHeader)
