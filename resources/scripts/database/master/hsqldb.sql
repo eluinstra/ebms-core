@@ -30,6 +30,8 @@ CREATE TABLE ebms_message
 	status_time				TIMESTAMP				NULL
 );
 
+ALTER TABLE ebms_message ADD CONSTRAINT uc_ebms_message_id UNIQUE (message_id);
+
 CREATE TABLE ebms_attachment
 (
 	ebms_message_id		INTEGER					NOT NULL,
@@ -49,7 +51,3 @@ CREATE TABLE ebms_send_event
 	FOREIGN KEY (ebms_message_id) REFERENCES ebms_message(id),
 	UNIQUE (ebms_message_id,time)
 );
-
-COMMIT;
-
-CREATE INDEX i_message_id ON ebms_message(message_id);

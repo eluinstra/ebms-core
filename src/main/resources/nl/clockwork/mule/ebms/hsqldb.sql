@@ -12,7 +12,7 @@ CREATE TABLE ebms_message
 	cpa_id						VARCHAR(256)		NOT NULL,
 	conversation_id		VARCHAR(256)		NOT NULL,
 	sequence_nr				INTEGER					NULL,
-	message_id				VARCHAR(256)		NOT NULL,
+	message_id				VARCHAR(256)		NOT NULL UNIQUE,
 	ref_to_message_id	VARCHAR(256)		NULL,
 	from_role					VARCHAR(256)		NULL,
 	to_role						VARCHAR(256)		NULL,
@@ -29,6 +29,8 @@ CREATE TABLE ebms_message
 	status						INTEGER					NULL,
 	status_time				TIMESTAMP				NULL
 );
+
+--ALTER TABLE ebms_message ADD CONSTRAINT uc_ebms_message_id UNIQUE (message_id);
 
 CREATE TABLE ebms_attachment
 (
@@ -49,7 +51,3 @@ CREATE TABLE ebms_send_event
 	FOREIGN KEY (ebms_message_id) REFERENCES ebms_message(id),
 	UNIQUE (ebms_message_id,time)
 );
-
-COMMIT;
-
---CREATE INDEX i_message_id ON ebms_message(message_id);

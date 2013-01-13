@@ -27,9 +27,10 @@ CREATE TABLE ebms_message
 	ack_requested			TEXT						NULL,
 	content						TEXT						NULL,
 	status						INTEGER					NULL,
-	status_time				TIMESTAMP				NULL,
-	INDEX (message_id)
+	status_time				TIMESTAMP				NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+ALTER TABLE ebms_message ADD CONSTRAINT uc_ebms_message_id UNIQUE (message_id);
 
 CREATE TABLE ebms_attachment
 (
