@@ -1,28 +1,29 @@
+- check EbMSMessageContentValidationFilter and EbMSMessageDataValidationFilter and EbMSMessageContentXSDValidationFilter
 - implement EbMSSyncReplyValidationFilter in EbMSMessageHeaderValidationFilter???
 - If CPAId is not recognized, a response is generated:
 	- Error - NotRecognized (use CPAExistsFilter!!!)
 	- normally get errorURI from CPA
-	- now get get errorURI from From element???
-- make message_id unique?
-	- make message_id primary key?
+	- now get errorURI from From element???
 - generate DeliveryFailure if actor=nextMSH???
-- store url in ebms_send_event
+- store url (and signMessage???) in ebms_send_event
 - Message Responses:
 	- validate received error and acknowledgment messages
-	- add duplicate elimination?
+	- add duplicate elimination???
 - implement MSH Ping and MessageStatus Services in EbMSAdapter Interface
 	- make EbMS Ping and MessageStatus Services async
 	- store Ping/Pong and MessageStatus Request and Response messages in the database???
-	- add duplicate elimination?
+	- add duplicate elimination???
 - handle SOAP Faults???
 	- store
 	- end retry
 - check if duplicateElimination behaves according to specs (when duplicate message (=messageId) is sent with different content or signature)
 	- remove EbMSMessageHeaderCompareFilter (not according to EbMS specs) or make it configurable???
+	- check order: security check, duplicate elimination, header check?
 
 - validate Reference element if present in Aknowledgement against original message???
 - collect list of errors in message validators (instead of exit on the first error)???
 - check CPA for invalid use of urn:oasis:names:tc:ebxml-msg:service namespace for defined services???
+- notify From Party somehow on delivery failure (after all retries have failed)???
 
 2.1.x:
 - create documentation/manual
