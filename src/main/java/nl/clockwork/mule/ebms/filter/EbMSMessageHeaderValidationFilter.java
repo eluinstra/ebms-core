@@ -36,6 +36,7 @@ import nl.clockwork.mule.ebms.model.cpp.cpa.SyncReplyModeType;
 import nl.clockwork.mule.ebms.model.ebxml.AckRequested;
 import nl.clockwork.mule.ebms.model.ebxml.Acknowledgment;
 import nl.clockwork.mule.ebms.model.ebxml.MessageHeader;
+import nl.clockwork.mule.ebms.model.ebxml.MessageOrder;
 import nl.clockwork.mule.ebms.model.ebxml.PartyId;
 import nl.clockwork.mule.ebms.model.ebxml.Service;
 import nl.clockwork.mule.ebms.model.ebxml.SyncReply;
@@ -193,6 +194,12 @@ public class EbMSMessageHeaderValidationFilter implements Filter
 						message.setProperty(Constants.EBMS_ERROR,EbMSMessageUtils.createError("//Header/SyncReply",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Wrong value."));
 						return false;
 					}
+					MessageOrder messageOrder = ((EbMSMessage)message.getPayload()).getMessageOrder();
+					if (messageOrder != null)
+					{
+						message.setProperty(Constants.EBMS_ERROR,EbMSMessageUtils.createError("//Header/MessageOrder",Constants.EbMSErrorCode.NOT_SUPPORTED.errorCode(),"MessageOrder not supported."));
+						return false;
+					}
 				}
 				if (message.getPayload() instanceof EbMSAcknowledgment)
 				{
@@ -209,7 +216,7 @@ public class EbMSMessageHeaderValidationFilter implements Filter
 					}
 					if (((EbMSAcknowledgment)message.getPayload()).getAcknowledgment().getActor() != null && !((EbMSAcknowledgment)message.getPayload()).getAcknowledgment().getActor().equals(ActorType.URN_OASIS_NAMES_TC_EBXML_MSG_ACTOR_NEXT_MSH))
 					{
-						message.setProperty(Constants.EBMS_ERROR,EbMSMessageUtils.createError("//Header/AckRequested[@actor]",Constants.EbMSErrorCode.NOT_SUPPORTED.errorCode(),"NextMSH not supported."));
+						message.setProperty(Constants.EBMS_ERROR,EbMSMessageUtils.createError("//Header/Acknowledgment[@actor]",Constants.EbMSErrorCode.NOT_SUPPORTED.errorCode(),"NextMSH not supported."));
 						return false;
 					}
 				}
