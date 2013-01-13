@@ -5,7 +5,7 @@
 	- now get get errorURI from From element???
 - make message_id unique?
 	- make message_id primary key?
-- generate DeliveryFailure if nextMSH???
+- generate DeliveryFailure if actor=nextMSH???
 - store url in ebms_send_event
 - Message Responses:
 	- validate received error and acknowledgment messages
