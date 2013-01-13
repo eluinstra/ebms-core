@@ -41,7 +41,7 @@ public class CPAExistsFilter implements Filter
 			{
 				EbMSBaseMessage msg = (EbMSBaseMessage)message.getPayload();
 				CollaborationProtocolAgreement cpa = ebMSDAO.getCPA(msg.getMessageHeader().getCPAId());
-				if (cpa == null)
+				if (cpa == null || !cpa.getCpaid().equals(msg.getMessageHeader().getCPAId()))
 				{
 					message.setProperty(Constants.EBMS_ERROR,EbMSMessageUtils.createError("//Header/MessageHeader[@cpaid]",Constants.EbMSErrorCode.VALUE_NOT_RECOGNIZED.errorCode(),"CPA not found."));
 					return false;
