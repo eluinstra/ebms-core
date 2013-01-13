@@ -420,6 +420,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 				"select id" +
 				" from ebms_message" +
 				" where ref_to_message_id = ?" +
+//			" and service = '" + Constants.EBMS_SERVICE_URI + "'",
 				" and (service = '" + EbMSMessageType.MESSAGE_ERROR.action().getService().getValue() + "' and action = '" + EbMSMessageType.MESSAGE_ERROR.action().getAction() + "'"  +
 				" or service = '" + EbMSMessageType.ACKNOWLEDGMENT.action().getService().getValue() + "' and action = '" + EbMSMessageType.ACKNOWLEDGMENT.action().getAction() + "')",
 				messageId
