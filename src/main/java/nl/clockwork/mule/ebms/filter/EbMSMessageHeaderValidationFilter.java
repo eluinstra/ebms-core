@@ -270,14 +270,15 @@ public class EbMSMessageHeaderValidationFilter implements Filter
 	
 	private boolean checkAckRequested(DeliveryChannel deliveryChannel)
 	{
-		return deliveryChannel.getMessagingCharacteristics().getAckRequested().equals(ackRequested);
+		return (deliveryChannel.getMessagingCharacteristics().getAckRequested() == null && ackRequested.equals(PerMessageCharacteristicsType.PER_MESSAGE))
+				|| (deliveryChannel.getMessagingCharacteristics().getAckRequested() != null && deliveryChannel.getMessagingCharacteristics().getAckRequested().equals(ackRequested));
 	}
 
 	private boolean checkAckRequested(DeliveryChannel deliveryChannel, AckRequested ackRequested)
 	{
-		return (this.ackRequested.equals(PerMessageCharacteristicsType.ALWAYS) && ackRequested != null)
-				|| this.ackRequested.equals(PerMessageCharacteristicsType.PER_MESSAGE)
-				|| (this.ackRequested.equals(PerMessageCharacteristicsType.NEVER) && ackRequested == null)
+		return deliveryChannel.getMessagingCharacteristics().getAckRequested() == null || deliveryChannel.getMessagingCharacteristics().getAckRequested().equals(PerMessageCharacteristicsType.PER_MESSAGE)
+				|| (deliveryChannel.getMessagingCharacteristics().getAckRequested().equals(PerMessageCharacteristicsType.ALWAYS) && ackRequested != null)
+				|| (deliveryChannel.getMessagingCharacteristics().getAckRequested().equals(PerMessageCharacteristicsType.NEVER) && ackRequested == null)
 		;
 	}
 	
