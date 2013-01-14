@@ -18,7 +18,6 @@ package nl.clockwork.mule.ebms.filter;
 import java.net.URI;
 import java.util.GregorianCalendar;
 import java.util.List;
-import java.util.TimeZone;
 
 import nl.clockwork.common.dao.DAOException;
 import nl.clockwork.mule.ebms.Constants;
@@ -31,7 +30,6 @@ import nl.clockwork.mule.ebms.model.cpp.cpa.CollaborationProtocolAgreement;
 import nl.clockwork.mule.ebms.model.cpp.cpa.DeliveryChannel;
 import nl.clockwork.mule.ebms.model.cpp.cpa.PartyInfo;
 import nl.clockwork.mule.ebms.model.cpp.cpa.PerMessageCharacteristicsType;
-import nl.clockwork.mule.ebms.model.cpp.cpa.PersistenceLevelType;
 import nl.clockwork.mule.ebms.model.cpp.cpa.SyncReplyModeType;
 import nl.clockwork.mule.ebms.model.ebxml.AckRequested;
 import nl.clockwork.mule.ebms.model.ebxml.Acknowledgment;
@@ -257,7 +255,7 @@ public class EbMSMessageHeaderValidationFilter implements Filter
 	private boolean checkTimeToLive(MessageHeader messageHeader)
 	{
 		return messageHeader.getMessageData().getTimeToLive() == null
-				|| new GregorianCalendar(TimeZone.getTimeZone("GMT")).before(messageHeader.getMessageData().getTimeToLive().toGregorianCalendar());
+				|| new GregorianCalendar().before(messageHeader.getMessageData().getTimeToLive().toGregorianCalendar());
 	}
 	
 	private boolean checkDuplicateElimination(DeliveryChannel deliveryChannel, MessageHeader messageHeader)
