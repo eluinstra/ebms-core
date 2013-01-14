@@ -1,7 +1,4 @@
-- use timestamp from MessageData instead of generated on receipt; store messageData.timestamp instead or next to receipt timestamp?
 - improve EbMSMessageHeaderValidationFilter (see FIXMEs)
-- If CPAId is not recognized, a response is generated:
-	- Error - NotRecognized (use CPAExistsFilter!!!)
 - Message Responses:
 	- validate received error and acknowledgment messages
 	- add duplicate elimination???
@@ -13,11 +10,12 @@
 	- validate MessageHeader against CPA
 	- add duplicate elimination???
 	- add to MessageStatus Service to check if message has same cpaId then messageStatus message if not set messageStatus to Unauthorized
-- ignore ackRequested(, ackSignatureRequested) and duplicateElimination on the DefaultMSHChannel?
 
 
 2.1.x:
 - create documentation/manual
+- use timestamp from MessageData instead of generated on receipt; store messageData.timestamp instead or next to receipt timestamp?
+- ignore response messages with duplicate refToMessageIds?
 - improve error handling and logging
 	- collect list of errors in message validators (instead of exit on the first error)?
 		- implement internal error list to add the errors
@@ -48,12 +46,10 @@
 	- return NotSupported ErrorCode?
 / implement MessageStatus Service
 	- return NotSupported ErrorCode?
-	- UnAuthorized if request not authorized?
 	- NotRecognized if message identified by refToMessageId does not exist in the data store?
-	- Received if message identified by refToMessageId is received, but not generate ErrorMessage?
-	- Processed if message identified by refToMessageId is processed by the application?
-	- What is the status if message identified by refToMessageId is received, but generated ErrorMessage?
-	- Is messageStatus always received when message is received?
+	- Received only if message identified by refToMessageId is successfully received and did not generate ErrorMessage?
+		- What is the status if message identified by refToMessageId is received, but generated ErrorMessage?
+		- Is messageStatus always received when message is received?
 - implement MessageOrder
 - implement syncReplyMode?
 - implement ackRequested (mode=never|perMessage)
@@ -70,3 +66,4 @@
 considerations:
 - change wsdl definition to one operation (containing all ebxml elements) and 'parse' message in Mule?
 - replace cxf interface?
+- store datetime objects as UTC datetime in database (do not use sysdate anymore!)?
