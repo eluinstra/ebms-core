@@ -1,3 +1,5 @@
+2.1.x:
+- create documentation/manual
 - Message Responses:
 	- validate received error and acknowledgment messages
 	- add duplicate elimination???
@@ -9,11 +11,6 @@
 	- validate MessageHeader against CPA
 	- add duplicate elimination???
 	- add to MessageStatus Service to check if message has same cpaId then messageStatus message if not set messageStatus to Unauthorized
-
-
-2.1.x:
-- create documentation/manual
-- use timestamp from MessageData instead of generated on receipt; store messageData.timestamp instead or next to receipt timestamp?
 - ignore response messages with duplicate refToMessageIds?
 - improve error handling and logging
 	- collect list of errors in message validators (instead of exit on the first error)?
