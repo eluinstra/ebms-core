@@ -154,7 +154,7 @@
 				<filtering-router>
 					<vm:outbound-endpoint path="ebms.messageError.create.in">
 						<message-properties-transformer>
-							<add-message-property key="EBMS.EBMS_MESSAGE_STATUS" value="UN_AUTHORIZED"/>
+							<add-message-property key="EBMS.EBMS_MESSAGE_STATUS" value="FAILED"/>
 						</message-properties-transformer>
 						<custom-transformer class="nl.clockwork.mule.common.transformer.Logger">
 							<spring:property name="message" value="CPA invalid!"/>
@@ -169,7 +169,7 @@
 				<filtering-router>
 					<vm:outbound-endpoint path="ebms.messageError.create.in">
 						<message-properties-transformer>
-							<add-message-property key="EBMS.EBMS_MESSAGE_STATUS" value="UN_AUTHORIZED"/>
+							<add-message-property key="EBMS.EBMS_MESSAGE_STATUS" value="FAILED"/>
 						</message-properties-transformer>
 						<custom-transformer class="nl.clockwork.mule.common.transformer.Logger">
 							<spring:property name="message" value="MessageHeader invalid!"/>
@@ -184,7 +184,7 @@
 				<filtering-router>
 					<vm:outbound-endpoint path="ebms.messageError.create.in">
 						<message-properties-transformer>
-							<add-message-property key="EBMS.EBMS_MESSAGE_STATUS" value="UN_AUTHORIZED"/>
+							<add-message-property key="EBMS.EBMS_MESSAGE_STATUS" value="FAILED"/>
 						</message-properties-transformer>
 						<custom-transformer class="nl.clockwork.mule.common.transformer.Logger">
 							<spring:property name="message" value="Signature invalid!"/>
@@ -199,7 +199,7 @@
 				<filtering-router>
 					<vm:outbound-endpoint path="ebms.messageError.create.in">
 						<message-properties-transformer>
-							<add-message-property key="EBMS.EBMS_MESSAGE_STATUS" value="NOT_RECOGNIZED"/>
+							<add-message-property key="EBMS.EBMS_MESSAGE_STATUS" value="FAILED"/>
 						</message-properties-transformer>
 						<custom-transformer class="nl.clockwork.mule.common.transformer.Logger">
 							<spring:property name="message" value="MessageData invalid!"/>
@@ -214,7 +214,7 @@
 				<filtering-router>
 					<vm:outbound-endpoint path="ebms.messageError.create.in">
 						<message-properties-transformer>
-							<add-message-property key="EBMS.EBMS_MESSAGE_STATUS" value="UN_AUTHORIZED"/>
+							<add-message-property key="EBMS.EBMS_MESSAGE_STATUS" value="FAILED"/>
 						</message-properties-transformer>
 						<custom-transformer class="nl.clockwork.mule.common.transformer.Logger">
 							<spring:property name="message" value="Manifest invalid!"/>
