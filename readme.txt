@@ -318,5 +318,5 @@ Functionality =
 - Acknowledgments
 	- only custom messages can receive an Acknowledgment if messaging is reliable
 	- ErrorMessage, Acknowledgment, StatusRequest, StatusResponse, Ping, Pong messages can never receive an Acknowledgment
-- if duplicate message is received, the response (ErrorMessage, Aknowledgment(, StatusResponse, Pong)) will be resend
+- if duplicate message is received, the response, if any, (ErrorMessage, Aknowledgment(, StatusResponse, Pong)) will be resend
 - ackRequested(, ackSignatureRequested) and duplicateElimination are ignored on the DefaultMSHChannel
