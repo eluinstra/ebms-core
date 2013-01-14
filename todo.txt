@@ -4,7 +4,7 @@
 	- Error - NotRecognized (use CPAExistsFilter!!!)
 - store url (and signMessage???) in ebms_send_event
 - Message Responses:
-	- validate received error and acknowledgment messages
+	- validate received error and acknowledgment messages, if invalid then just store if not duplicate
 	- add duplicate elimination???
 - mark message as delivered (or failed) when Acknowledgment is received and message is not marked yet
 - implement MSH Ping and MessageStatus Services in EbMSAdapter Interface
@@ -13,19 +13,8 @@
 	- validate MessageHeader against CPA
 	- add duplicate elimination???
 	- add to MessageStatus Service to check if message has same cpaId then messageStatus message if not set messageStatus to Unauthorized
-- messageStatus is always received when message is received
-- check if duplicateElimination behaves according to specs (when duplicate message (=messageId) is sent with different content or signature)
-	- remove EbMSMessageHeaderCompareFilter (not according to EbMS specs) or make it configurable???
-	- check order: security check, duplicate elimination, header check?
-- improve TimeToLive and PersistDuration checks
-	- store TimeToLive in ebms_message???
 - ignore ackRequested(, ackSignatureRequested) and duplicateElimination on the DefaultMSHChannel?
 
-- collect list of errors in message validators (instead of exit on the first error)???
-	- implement internal error list to add the errors
-- check CPA for invalid use of urn:oasis:names:tc:ebxml-msg:service namespace for defined services???
-- Allow Aknowledgment and ErrorList (if severity is warning) elements as part of other messages???
-	- first allow ErrorList (if severity is warning) to be a part of Acknowledgment message
 - use ebms-message.parent_id to link a request and its response message
 - notify From Party somehow on delivery failure (after all retries have failed) (this is a MUST)???
 	- notify From Party somehow on succesful delivery ignoring messages with duplicate refToMessageIds (this is OPTIONAL)
@@ -33,8 +22,18 @@
 2.1.x:
 - create documentation/manual
 - improve error handling and logging
+	- collect list of errors in message validators (instead of exit on the first error)?
+		- implement internal error list to add the errors
+	- allow ErrorList (if severity is warning) to be a part of Acknowledgment message?
 - improve validation of received Error and Acknowledgment messages
+- improve DuplicateElimination
+	- check if duplicateElimination behaves according to specs (when duplicate message (=messageId) is sent with different content or signature)
+		- remove EbMSMessageHeaderCompareFilter (not according to EbMS specs) or make it configurable?
+		- check order: security check, duplicate elimination, header check?
+- improve TimeToLive and PersistDuration checks
+	- store TimeToLive in ebms_message???
 - configure CPA caching (or load CPA once per message)?
+- check CPA for invalid use of urn:oasis:names:tc:ebxml-msg:service namespace for defined services?
 - get hostname (needed for messageId) from CPA
 
 2.2.x:
@@ -47,6 +46,7 @@
 	- Received if message identified by refToMessageId is received, but not generate ErrorMessage?
 	- Processed if message identified by refToMessageId is processed by the application?
 	- What is the status if message identified by refToMessageId is received, but generated ErrorMessage?
+	- Is messageStatus always received when message is received?
 - implement MessageOrder
 - implement syncReplyMode?
 - implement ackRequested (mode=never|perMessage)
