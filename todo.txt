@@ -39,7 +39,14 @@
 
 2.2.x:
 / implement Ping Service
+	- return NotSupported ErrorCode?
 / implement MessageStatus Service
+	- return NotSupported ErrorCode?
+	- UnAuthorized if request not authorized?
+	- NotRecognized if message identified by refToMessageId does not exist in the data store?
+	- Received if message identified by refToMessageId is received, but not generate ErrorMessage?
+	- Processed if message identified by refToMessageId is processed by the application?
+	- What is the status if message identified by refToMessageId is received, but generated ErrorMessage?
 - implement MessageOrder
 - implement syncReplyMode?
 - implement ackRequested (mode=never|perMessage)
