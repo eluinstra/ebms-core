@@ -80,7 +80,7 @@
 						</message-properties-transformer>
 					</vm:outbound-endpoint>
 					<not-filter>
-						<custom-filter class="nl.clockwork.mule.ebms.filter.EbMSMessageContentXSDValidationFilter">
+						<custom-filter class="nl.clockwork.mule.ebms.stub.ebf.filter.EbMSMessageContentXSDValidationFilter">
 							<spring:property name="xsdFile" value="/nl/clockwork/mule/ebms/stub/ebf/xsd/Aanleveren_ebMS_2.0_v1.1.xsd" />
 						</custom-filter>
 					</not-filter>
