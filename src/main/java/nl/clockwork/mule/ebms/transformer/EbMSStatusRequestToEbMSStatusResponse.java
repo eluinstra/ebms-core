@@ -15,13 +15,14 @@
  ******************************************************************************/
 package nl.clockwork.mule.ebms.transformer;
 
-import java.util.Date;
 import java.util.GregorianCalendar;
 
 import nl.clockwork.mule.ebms.Constants;
 import nl.clockwork.mule.ebms.Constants.EbMSMessageStatus;
 import nl.clockwork.mule.ebms.dao.EbMSDAO;
 import nl.clockwork.mule.ebms.model.EbMSStatusRequest;
+import nl.clockwork.mule.ebms.model.ebxml.MessageHeader;
+import nl.clockwork.mule.ebms.model.ebxml.MessageStatusType;
 import nl.clockwork.mule.ebms.util.EbMSMessageUtils;
 
 import org.apache.commons.logging.Log;
@@ -46,13 +47,23 @@ public class EbMSStatusRequestToEbMSStatusResponse extends AbstractMessageAwareT
 	{
 		try
 		{
+			GregorianCalendar timestamp = null;
 			EbMSStatusRequest request = (EbMSStatusRequest)message.getPayload();
-			Date date = new Date();
 			EbMSMessageStatus status = EbMSMessageStatus.get((String)message.getProperty(Constants.EBMS_MESSAGE_STATUS));
 			if (status == null)
-				status = ebMSDAO.getMessageStatus(request.getStatusRequest().getRefToMessageId(),date);
-			GregorianCalendar timestamp = new GregorianCalendar();
-			timestamp.setTime(date);
+			{
+				MessageHeader messageHeader = ebMSDAO.getMessageHeader(request.getStatusRequest().getRefToMessageId());
+				if (messageHeader == null || messageHeader.getService().getValue().equals(Constants.EBMS_SERVICE_URI))
+					status = EbMSMessageStatus.NOT_RECOGNIZED;
+				else if (messageHeader.getCPAId().equals(request.getMessageHeader().getCPAId()))
+					status = EbMSMessageStatus.UNAUTHORIZED;
+				else
+				{
+					status = ebMSDAO.getMessageStatus(request.getStatusRequest().getRefToMessageId());
+					if (MessageStatusType.RECEIVED.equals(status.statusCode()) || MessageStatusType.PROCESSED.equals(status.statusCode()) || MessageStatusType.FORWARDED.equals(status.statusCode()))
+						timestamp = messageHeader.getMessageData().getTimestamp().toGregorianCalendar();
+				}
+			}
 			message.setPayload(EbMSMessageUtils.ebMSStatusRequestToEbMSStatusResponse(request,hostname,status,timestamp));
 			return message;
 		}

@@ -519,13 +519,13 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	}
 	
 	@Override
-	public EbMSMessageStatus getMessageStatus(String messageId, final Date timestamp) throws DAOException
+	public EbMSMessageStatus getMessageStatus(String messageId) throws DAOException
 	{
 		try
 		{
 			return EbMSMessageStatus.get(
 				simpleJdbcTemplate.queryForObject(
-					"select time_stamp, status" +
+					"select status" +
 					" from ebms_message" +
 					" where message_id = ?",
 					new ParameterizedRowMapper<Integer>()
@@ -533,10 +533,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 						@Override
 						public Integer mapRow(ResultSet rs, int rowNum) throws SQLException
 						{
-							//timestamp.setTime(rs.getTimestamp("time_stamp").getTime());
-							timestamp.setTime(((Date)rs.getObject("time_stamp")).getTime());
-							//return rs.getObject("status") == null ? EbMSMessageStatus.UN_AUTHORIZED.id() : rs.getInt("status");
-							return rs.getObject("status") == null ? -1 : rs.getInt("status");
+							return rs.getObject("status") == null ? null : rs.getInt("status");
 						}
 					},
 					messageId
@@ -628,7 +625,8 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 								);
 							}
 
-							Date sendTime = (Date)timestamp.clone();
+							//Date sendTime = (Date)timestamp.clone();
+							Date sendTime = message.getMessageHeader().getMessageData().getTimestamp().toGregorianCalendar().getTime();
 							CollaborationProtocolAgreement cpa = getCPA(message.getMessageHeader().getCPAId());
 							ReliableMessaging rm = CPAUtils.getReliableMessaging(cpa,message.getMessageHeader());
 							List<Object[]> sendEvents = new ArrayList<Object[]>();
@@ -814,6 +812,8 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 									keyHolder
 							);
 					
+							//Date sendTime = (Date)timestamp.clone();
+							Date sendTime = message.getMessageHeader().getMessageData().getTimestamp().toGregorianCalendar().getTime();
 							simpleJdbcTemplate.update
 							(
 								"insert into ebms_send_event (" +
@@ -821,8 +821,8 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 									"time" +
 								") values (?,?)",
 								keyHolder.getKey().longValue(),
-								//String.format(getDateFormat(),timestamp)
-								timestamp
+								//String.format(getDateFormat(),sendTime)
+								sendTime
 							);
 						}
 						catch (Exception e)
@@ -916,6 +916,8 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 									keyHolder
 							);
 					
+							//Date sendTime = (Date)timestamp.clone();
+							Date sendTime = message.getMessageHeader().getMessageData().getTimestamp().toGregorianCalendar().getTime();
 							simpleJdbcTemplate.update
 							(
 								"insert into ebms_send_event (" +
@@ -923,8 +925,8 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 									"time" +
 								") values (?,?)",
 								keyHolder.getKey().longValue(),
-								//String.format(getDateFormat(),timestamp)
-								timestamp
+								//String.format(getDateFormat(),sendTime)
+								sendTime
 							);
 						}
 						catch (Exception e)

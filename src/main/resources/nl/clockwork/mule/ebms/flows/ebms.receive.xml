@@ -158,6 +158,7 @@
 						</message-properties-transformer>
 						<custom-transformer class="nl.clockwork.mule.common.transformer.Logger">
 							<spring:property name="message" value="CPA invalid!"/>
+							<spring:property name="logLevel" value="WARN"/>
 						</custom-transformer>
 					</vm:outbound-endpoint>
 					<not-filter>
@@ -436,8 +437,10 @@
 			</inbound>
 			<outbound>
 				<filtering-router>
-					<vm:outbound-endpoint path="ebms.statusRequest.receive.async.reply">
-						<custom-transformer class="nl.clockwork.mule.common.transformer.NullPayloadTransformer" />
+					<vm:outbound-endpoint path="ebms.statusResponse.create">
+						<message-properties-transformer>
+							<add-message-property key="EBMS.EBMS_MESSAGE_STATUS" value="UNAUTHORIZED"/>
+						</message-properties-transformer>
 						<custom-transformer class="nl.clockwork.mule.common.transformer.Logger">
 							<spring:property name="message" value="CPA not found!"/>
 							<spring:property name="logLevel" value="WARN"/>
@@ -450,22 +453,18 @@
 					</not-filter>
 				</filtering-router>
 				<filtering-router>
-					<vm:outbound-endpoint path="ebms.statusRequest.receive.async.reply">
-						<custom-transformer class="nl.clockwork.mule.common.transformer.NullPayloadTransformer" />
+					<vm:outbound-endpoint path="ebms.statusResponse.create">
+						<message-properties-transformer>
+							<add-message-property key="EBMS.EBMS_MESSAGE_STATUS" value="UNAUTHORIZED"/>
+						</message-properties-transformer>
+						<custom-transformer class="nl.clockwork.mule.common.transformer.Logger">
+							<spring:property name="message" value="CPA invalid!"/>
+							<spring:property name="logLevel" value="WARN"/>
+						</custom-transformer>
 					</vm:outbound-endpoint>
 					<not-filter>
 						<custom-filter class="nl.clockwork.mule.ebms.filter.CPAValidationFilter">
 							<spring:property name="ebMSDAO" ref="ebMSDAO" />
-						</custom-filter>
-					</not-filter>
-				</filtering-router>
-				<filtering-router>
-					<vm:outbound-endpoint path="ebms.statusRequest.receive.async.reply">
-						<custom-transformer class="nl.clockwork.mule.common.transformer.NullPayloadTransformer" />
-					</vm:outbound-endpoint>
-					<not-filter>
-						<custom-filter class="nl.clockwork.mule.ebms.filter.EbMSMessageActionFilter">
-							<spring:property name="action" value="StatusRequest"/>
 						</custom-filter>
 					</not-filter>
 				</filtering-router>
@@ -538,20 +537,14 @@
 				<filtering-router>
 					<vm:outbound-endpoint path="ebms.ping.receive.async.reply">
 						<custom-transformer class="nl.clockwork.mule.common.transformer.NullPayloadTransformer" />
+						<custom-transformer class="nl.clockwork.mule.common.transformer.Logger">
+							<spring:property name="message" value="CPA invalid!"/>
+							<spring:property name="logLevel" value="WARN"/>
+						</custom-transformer>
 					</vm:outbound-endpoint>
 					<not-filter>
 						<custom-filter class="nl.clockwork.mule.ebms.filter.CPAValidationFilter">
 							<spring:property name="ebMSDAO" ref="ebMSDAO" />
-						</custom-filter>
-					</not-filter>
-				</filtering-router>
-				<filtering-router>
-					<vm:outbound-endpoint path="ebms.ping.receive.async.reply">
-						<custom-transformer class="nl.clockwork.mule.common.transformer.NullPayloadTransformer" />
-					</vm:outbound-endpoint>
-					<not-filter>
-						<custom-filter class="nl.clockwork.mule.ebms.filter.EbMSMessageActionFilter">
-							<spring:property name="action" value="Ping"/>
 						</custom-filter>
 					</not-filter>
 				</filtering-router>

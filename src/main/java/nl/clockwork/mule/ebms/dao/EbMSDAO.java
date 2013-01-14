@@ -15,7 +15,6 @@
  ******************************************************************************/
 package nl.clockwork.mule.ebms.dao;
 
-import java.util.Date;
 import java.util.List;
 
 import nl.clockwork.common.dao.DAOException;
@@ -42,7 +41,7 @@ public interface EbMSDAO
 	Long getEbMSMessageResponseId(String messageId) throws DAOException;
 	MessageHeader getMessageHeader(String messageId) throws DAOException;
 	EbMSBaseMessage getMessage(long id) throws DAOException;
-	EbMSMessageStatus getMessageStatus(String messageId, Date timestamp) throws DAOException;
+	EbMSMessageStatus getMessageStatus(String messageId) throws DAOException;
 	void insertMessage(EbMSMessage message) throws DAOException;
 	void insertMessage(EbMSMessage message, EbMSMessageStatus status) throws DAOException;
 	void insertMessage(EbMSMessage message, EbMSMessageStatus status, EbMSMessageError messageError) throws DAOException;
