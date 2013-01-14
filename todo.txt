@@ -1,12 +1,12 @@
-- check EbMSMessageContentValidationFilter and EbMSMessageDataValidationFilter and EbMSMessageContentXSDValidationFilter
+- use timestamp from MessageData instead of generated on receipt; store messageData.timestamp instead or next to receipt timestamp?
 - improve EbMSMessageHeaderValidationFilter (see FIXMEs)
 - If CPAId is not recognized, a response is generated:
 	- Error - NotRecognized (use CPAExistsFilter!!!)
-- store url (and signMessage???) in ebms_send_event
 - Message Responses:
-	- validate received error and acknowledgment messages, if invalid then just store if not duplicate
+	- validate received error and acknowledgment messages
 	- add duplicate elimination???
-- mark message as delivered (or failed) when Acknowledgment is received and message is not marked yet
+	- if invalid then just store (if not duplicate), or ignore?
+	- if duplicate refToMessageIds, store (if not duplicate messageId), or ignore?
 - implement MSH Ping and MessageStatus Services in EbMSAdapter Interface
 	- make EbMS Ping and MessageStatus Services async
 	- store Ping/Pong and MessageStatus Request and Response messages in the database???
@@ -15,9 +15,6 @@
 	- add to MessageStatus Service to check if message has same cpaId then messageStatus message if not set messageStatus to Unauthorized
 - ignore ackRequested(, ackSignatureRequested) and duplicateElimination on the DefaultMSHChannel?
 
-- use ebms-message.parent_id to link a request and its response message
-- notify From Party somehow on delivery failure (after all retries have failed) (this is a MUST)???
-	- notify From Party somehow on succesful delivery ignoring messages with duplicate refToMessageIds (this is OPTIONAL)
 
 2.1.x:
 - create documentation/manual
@@ -32,9 +29,19 @@
 		- check order: security check, duplicate elimination, header check?
 - improve TimeToLive and PersistDuration checks
 	- store TimeToLive in ebms_message???
+- remove EbMSMessageDataValidationFilter (not according to EbMS specs)
+- use ebms-message.parent_id to link a request and its response message
+- store url (and signMessage???) in ebms_send_event
+- handle SOAP Faults?
+	- store
+	- end retry
+- validate Reference element if present in Acknowledgment against original message?
 - configure CPA caching (or load CPA once per message)?
 - check CPA for invalid use of urn:oasis:names:tc:ebxml-msg:service namespace for defined services?
 - get hostname (needed for messageId) from CPA
+- mark message as delivered (or failed) when Acknowledgment is received and message is not marked yet
+- notify From Party somehow on delivery failure (after all retries have failed) (this is a MUST)???
+	- notify From Party somehow on succesful delivery ignoring messages with duplicate refToMessageIds (this is OPTIONAL)
 
 2.2.x:
 / implement Ping Service
@@ -54,10 +61,6 @@
 - implement Encoding?
 - implement JMS Client interface?
 - implement dynamic cxf outbound endpoints (request url has to be resolved from CPA)?
-- handle SOAP Faults?
-	- store
-	- end retry
-- validate Reference element if present in Acknowledgment against original message?
 
 3.x.x:
 - update adapter to Mule 3
