@@ -428,7 +428,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 				" and service = '" + Constants.EBMS_SERVICE_URI + "'" +
 				" and (action = '" + EbMSMessageType.MESSAGE_ERROR.action().getAction() + "'"  +
 				" or action = '" + EbMSMessageType.ACKNOWLEDGMENT.action().getAction() + "')" +
-				" order by timestamp asc",
+				" order by time_stamp asc",
 				new Object[]{messageId},
 				Long.class
 			);
