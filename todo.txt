@@ -1,4 +1,3 @@
-- improve EbMSMessageHeaderValidationFilter (see FIXMEs)
 - Message Responses:
 	- validate received error and acknowledgment messages
 	- add duplicate elimination???
@@ -40,6 +39,7 @@
 - mark message as delivered (or failed) when Acknowledgment is received and message is not marked yet
 - notify From Party somehow on delivery failure (after all retries have failed) (this is a MUST)???
 	- notify From Party somehow on succesful delivery ignoring messages with duplicate refToMessageIds (this is OPTIONAL)
+- if Acknowledgment is signed, check references in Acknowledgment, otherwise message was not delivered successfully
 
 2.2.x:
 / implement Ping Service
