@@ -425,9 +425,9 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 				"select id" +
 				" from ebms_message" +
 				" where ref_to_message_id = ?" +
-//			" and service = '" + Constants.EBMS_SERVICE_URI + "'",
-				" and (service = '" + EbMSMessageType.MESSAGE_ERROR.action().getService().getValue() + "' and action = '" + EbMSMessageType.MESSAGE_ERROR.action().getAction() + "'"  +
-				" or service = '" + EbMSMessageType.ACKNOWLEDGMENT.action().getService().getValue() + "' and action = '" + EbMSMessageType.ACKNOWLEDGMENT.action().getAction() + "')" +
+				" and service = '" + Constants.EBMS_SERVICE_URI + "'" +
+				" and (action = '" + EbMSMessageType.MESSAGE_ERROR.action().getAction() + "'"  +
+				" or action = '" + EbMSMessageType.ACKNOWLEDGMENT.action().getAction() + "')" +
 				" order by timestamp asc",
 				new Object[]{messageId},
 				Long.class
@@ -436,10 +436,6 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 				return null;
 			else
 				return result.get(0);
-		}
-		catch(EmptyResultDataAccessException e)
-		{
-			return null;
 		}
 		catch (DataAccessException e)
 		{
