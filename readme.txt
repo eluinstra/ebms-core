@@ -287,8 +287,9 @@ Functionality =
 	- Encoding is not supported
 - SyncReply
 	- Only asynchronous communication is supported
-		- only synchronous communication is supported for EbMS Message Services
+		- only synchronous communication is supported on default channel (for EbMS Message Services)
 - Reliable Messaging is supported
+	- only reliable messaging is supported
 - EbMS Message Services
 	- Ping and Message Status Service supported
 		- Only synchronous communication is supported
@@ -298,8 +299,11 @@ Functionality =
 		- Actor ToPartyMSH is supported
 		- Actor NextMSH is not supported
 
-- Manifest can only refer to payload data included as part of the message as payload document(s) contained in a Payload Container, not to remote resources accessible via a URL
 - Always eliminates duplicate messages (according to EbMS specs)
+	- messageId is globally unique
+	- all messages (Message, ErrorMessage, Acknowledgment, StatusRequest, StatusResponse, Ping, Pong) are stored
+	- also applied to Service Messages
+- Manifest can only refer to payload data included as part of the message as payload document(s) contained in a Payload Container, not to remote resources accessible via a URL
 - SOAP Fault messages can be generated
 - Only 1 Channel per Action is supported
 - ErrorList and Acknowledgment elements as part of another message are not supported.
@@ -307,3 +311,12 @@ Functionality =
   Only aknowledgment messages with a MessageHeader containing service 'urn:oasis:names:tc:ebxml-msg:service' and action 'Acknowledgment' are supported
 
 - Only one transport is supported
+
+- ErrorMessages
+	- only custom, StatusRequest and Ping messages can receive an ErrorMessage
+	- ErrorMessage, Acknowledgment, StatusRequest, StatusResponse, Ping and Pong messages can never receive an ErrorMessage
+- Acknowledgments
+	- only custom messages can receive an Acknowledgment if messaging is reliable
+	- ErrorMessage, Acknowledgment, StatusRequest, StatusResponse, Ping, Pong messages can never receive an Acknowledgment
+- if duplicate message is received, the response (ErrorMessage, Aknowledgment(, StatusResponse, Pong)) will be resend
+- ackRequested(, ackSignatureRequested) and duplicateElimination are ignored on the DefaultMSHChannel
