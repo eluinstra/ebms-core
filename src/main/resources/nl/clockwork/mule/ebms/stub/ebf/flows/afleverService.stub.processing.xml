@@ -67,7 +67,7 @@
 						</message-properties-transformer>
 					</vm:outbound-endpoint>
 					<not-filter>
-						<custom-filter class="nl.clockwork.mule.ebms.filter.EbMSMessageContentValidationFilter" />
+						<custom-filter class="nl.clockwork.mule.ebms.stub.ebf.filter.EbMSMessageContentValidationFilter" />
 					</not-filter>
 				</filtering-router>
 				<filtering-router>
