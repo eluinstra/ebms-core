@@ -43,7 +43,7 @@ public class EbMSMessageToEbMSResponseId extends AbstractMessageAwareTransformer
 		try
 		{
 			EbMSMessage msg = (EbMSMessage)message.getPayload();
-			Long id = ebMSDAO.getEbMSResponseId(msg.getMessageHeader().getMessageData().getMessageId());
+			Long id = ebMSDAO.getEbMSMessageResponseId(msg.getMessageHeader().getMessageData().getMessageId());
 			message.setPayload(id);
 			return message;
 		}

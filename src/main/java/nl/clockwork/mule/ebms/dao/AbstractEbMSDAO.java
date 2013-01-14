@@ -415,27 +415,24 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 		}
 	}
 	
-	@SuppressWarnings("unchecked")
 	@Override
-	public Long getEbMSResponseId(String messageId) throws DAOException
+	public Long getEbMSMessageResponseId(String messageId) throws DAOException
 	{
 		try
 		{
-			List<Long> result = jdbcTemplate.queryForList(
+			return simpleJdbcTemplate.queryForLong(
 				"select id" +
 				" from ebms_message" +
 				" where ref_to_message_id = ?" +
 				" and service = '" + Constants.EBMS_SERVICE_URI + "'" +
 				" and (action = '" + EbMSMessageType.MESSAGE_ERROR.action().getAction() + "'"  +
-				" or action = '" + EbMSMessageType.ACKNOWLEDGMENT.action().getAction() + "')" +
-				" order by time_stamp asc",
-				new Object[]{messageId},
-				Long.class
+				" or action = '" + EbMSMessageType.ACKNOWLEDGMENT.action().getAction() + "')",
+				messageId
 			);
-			if (result.size() == 0)
-				return null;
-			else
-				return result.get(0);
+		}
+		catch(EmptyResultDataAccessException e)
+		{
+			return null;
 		}
 		catch (DataAccessException e)
 		{
