@@ -24,7 +24,7 @@ public class Constants
 {
   public static enum EbMSMessageStatus
   {
-		UN_AUTHORIZED(0,MessageStatusType.UN_AUTHORIZED), NOT_RECOGNIZED(1,MessageStatusType.NOT_RECOGNIZED), RECEIVED(2,MessageStatusType.RECEIVED), PROCESSED(3,MessageStatusType.PROCESSED), FORWARDED(4,MessageStatusType.FORWARDED), FAILED(5,MessageStatusType.RECEIVED)/*, DELIVERED(10), DELIVERY_FAILED(11)*/;
+		UNAUTHORIZED(0,MessageStatusType.UN_AUTHORIZED), NOT_RECOGNIZED(1,MessageStatusType.NOT_RECOGNIZED), RECEIVED(2,MessageStatusType.RECEIVED), PROCESSED(3,MessageStatusType.PROCESSED), FORWARDED(4,MessageStatusType.FORWARDED), FAILED(5,MessageStatusType.RECEIVED)/*, DELIVERED(10), DELIVERY_FAILED(11)*/;
 
 		private final int id;
 		private final MessageStatusType statusCode;
@@ -38,35 +38,17 @@ public class Constants
 
 		public final static EbMSMessageStatus get(int id)
 		{
-			switch (id)
-			{
-				case 0:
-					return EbMSMessageStatus.UN_AUTHORIZED;
-				case 1:
-					return EbMSMessageStatus.NOT_RECOGNIZED;
-				case 2:
-					return EbMSMessageStatus.RECEIVED;
-				case 3:
-					return EbMSMessageStatus.PROCESSED;
-				case 4:
-					return EbMSMessageStatus.FORWARDED;
-				default:
-					return null;
-			}
+			for (EbMSMessageStatus status : EbMSMessageStatus.values())
+				if (status.id() == id)
+					return status;
+			return null;
 		}
 
 		public final static EbMSMessageStatus get(String id)
 		{
-			if (EbMSMessageStatus.UN_AUTHORIZED.name().equals(id))
-				return EbMSMessageStatus.UN_AUTHORIZED;
-			if (EbMSMessageStatus.NOT_RECOGNIZED.name().equals(id))
-				return EbMSMessageStatus.NOT_RECOGNIZED;
-			if (EbMSMessageStatus.RECEIVED.name().equals(id))
-				return EbMSMessageStatus.RECEIVED;
-			if (EbMSMessageStatus.PROCESSED.name().equals(id))
-				return EbMSMessageStatus.PROCESSED;
-			if (EbMSMessageStatus.FORWARDED.name().equals(id))
-				return EbMSMessageStatus.FORWARDED;
+			for (EbMSMessageStatus status : EbMSMessageStatus.values())
+				if (status.name().equals(id))
+					return status;
 			return null;
 		}
   };
@@ -111,27 +93,10 @@ public class Constants
 
 		public final static EbMSMessageType get(int id)
 		{
-			switch (id)
-			{
-				case 0:
-					return EbMSMessageType.MESSAGE;
-				case 1:
-					return EbMSMessageType.MESSAGE_ERROR;
-				case 2:
-					return EbMSMessageType.ACKNOWLEDGMENT;
-				case 3:
-					return EbMSMessageType.STATUS_REQUEST;
-				case 4:
-					return EbMSMessageType.STATUS_RESPONSE;
-				case 5:
-					return EbMSMessageType.PING;
-				case 6:
-					return EbMSMessageType.PONG;
-				case 7:
-					return EbMSMessageType.SERVICE_MESSAGE;
-				default:
-					return null;
-			}
+			for (EbMSMessageType type : EbMSMessageType.values())
+				if (type.id() == id)
+					return type;
+			return null;
 		}
   };
 
