@@ -146,6 +146,16 @@ public class EbMSMessageHeaderValidationFilter implements Filter
 						message.setProperty(Constants.EBMS_ERROR,EbMSMessageUtils.createError("//Header/AckRequested",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Wrong value."));
 						return false;
 					}
+					if (ackRequested != null && ackRequested.getActor() != null && ackRequested.getActor().equals(ActorType.URN_OASIS_NAMES_TC_EBXML_MSG_ACTOR_NEXT_MSH))
+					{
+						message.setProperty(Constants.EBMS_ERROR,EbMSMessageUtils.createError("//Header/AckRequested[@actor]",Constants.EbMSErrorCode.NOT_SUPPORTED.errorCode(),"NextMSH not supported."));
+						return false;
+					}
+					if (ackRequested != null && ackRequested.isSigned())
+					{
+						message.setProperty(Constants.EBMS_ERROR,EbMSMessageUtils.createError("//Header/AckRequested[@signed]",Constants.EbMSErrorCode.NOT_SUPPORTED.errorCode(),"Signed Acknowledgment not supported."));
+						return false;
+					}
 					if (!checkAckSignatureRequested(deliveryChannel,ackRequested))
 					{
 						message.setProperty(Constants.EBMS_ERROR,EbMSMessageUtils.createError("//Header/AckRequested@signed",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Wrong value."));
@@ -154,18 +164,6 @@ public class EbMSMessageHeaderValidationFilter implements Filter
 					if (ackRequested != null && !Constants.EBMS_VERSION.equals(ackRequested.getVersion()))
 					{
 						message.setProperty(Constants.EBMS_ERROR,EbMSMessageUtils.createError("//Header/AckRequested[@version]",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Wrong value."));
-						return false;
-					}
-					if (ackRequested != null && ackRequested.getActor() != null && ackRequested.getActor().equals(ActorType.URN_OASIS_NAMES_TC_EBXML_MSG_ACTOR_NEXT_MSH))
-					{
-						//FIXME: message has to be a warning
-						message.setProperty(Constants.EBMS_ERROR,EbMSMessageUtils.createError("//Header/AckRequested[@actor]",Constants.EbMSErrorCode.NOT_SUPPORTED.errorCode(),"NextMSH not supported."));
-						return false;
-					}
-					if (ackRequested != null && ackRequested.isSigned())
-					{
-						//FIXME: message has to be a warning
-						message.setProperty(Constants.EBMS_ERROR,EbMSMessageUtils.createError("//Header/AckRequested[@signed]",Constants.EbMSErrorCode.NOT_SUPPORTED.errorCode(),"Signed Acknowledgment not supported."));
 						return false;
 					}
 					SyncReply syncReply = ((EbMSMessage)message.getPayload()).getSyncReply();
@@ -199,7 +197,6 @@ public class EbMSMessageHeaderValidationFilter implements Filter
 				if (message.getPayload() instanceof EbMSAcknowledgment)
 				{
 					Acknowledgment acknowledgment = ((EbMSAcknowledgment)message.getPayload()).getAcknowledgment();
-					//FIXME get original message by acknowledgment.refToMessageId and check signed, from (if not null) and reference(s) attributes
 					if (!checkAckSignatureRequested(deliveryChannel,acknowledgment))
 					{
 						message.setProperty(Constants.EBMS_ERROR,EbMSMessageUtils.createError("//Header/Acknowledgment/Reference",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Wrong value."));
