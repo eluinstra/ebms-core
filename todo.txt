@@ -14,16 +14,13 @@
 	- add duplicate elimination???
 	- add to MessageStatus Service to check if message has same cpaId then messageStatus message if not set messageStatus to Unauthorized
 - messageStatus is always received when message is received
-- handle SOAP Faults???
-	- store
-	- end retry
 - check if duplicateElimination behaves according to specs (when duplicate message (=messageId) is sent with different content or signature)
 	- remove EbMSMessageHeaderCompareFilter (not according to EbMS specs) or make it configurable???
 	- check order: security check, duplicate elimination, header check?
 - improve TimeToLive and PersistDuration checks
 	- store TimeToLive in ebms_message???
+- ignore ackRequested(, ackSignatureRequested) and duplicateElimination on the DefaultMSHChannel?
 
-- validate Reference element if present in Acknowledgment against original message???
 - collect list of errors in message validators (instead of exit on the first error)???
 	- implement internal error list to add the errors
 - check CPA for invalid use of urn:oasis:names:tc:ebxml-msg:service namespace for defined services???
@@ -50,6 +47,10 @@
 - implement Encoding?
 - implement JMS Client interface?
 - implement dynamic cxf outbound endpoints (request url has to be resolved from CPA)?
+- handle SOAP Faults?
+	- store
+	- end retry
+- validate Reference element if present in Acknowledgment against original message?
 
 3.x.x:
 - update adapter to Mule 3
