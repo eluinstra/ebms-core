@@ -251,7 +251,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 				cpaId
 			) > 0;
 		}
-		catch (Exception e)
+		catch (DataAccessException e)
 		{
 			throw new DAOException(e);
 		}
@@ -275,7 +275,11 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 		{
 			return null;
 		}
-		catch (Exception e)
+		catch (DataAccessException e)
+		{
+			throw new DAOException(e);
+		}
+		catch (JAXBException e)
 		{
 			throw new DAOException(e);
 		}
@@ -294,7 +298,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 					String.class
 			);
 		}
-		catch (Exception e)
+		catch (DataAccessException e)
 		{
 			throw new DAOException(e);
 		}
@@ -383,7 +387,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 				messageId
 			) > 0;
 		}
-		catch (Exception e)
+		catch (DataAccessException e)
 		{
 			throw new DAOException(e);
 		}
@@ -405,32 +409,39 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 		{
 			return null;
 		}
-		catch (Exception e)
+		catch (DataAccessException e)
 		{
 			throw new DAOException(e);
 		}
 	}
 	
+	@SuppressWarnings("unchecked")
 	@Override
 	public Long getEbMSResponseId(String messageId) throws DAOException
 	{
 		try
 		{
-			return simpleJdbcTemplate.queryForLong(
+			List<Long> result = jdbcTemplate.queryForList(
 				"select id" +
 				" from ebms_message" +
 				" where ref_to_message_id = ?" +
 //			" and service = '" + Constants.EBMS_SERVICE_URI + "'",
 				" and (service = '" + EbMSMessageType.MESSAGE_ERROR.action().getService().getValue() + "' and action = '" + EbMSMessageType.MESSAGE_ERROR.action().getAction() + "'"  +
-				" or service = '" + EbMSMessageType.ACKNOWLEDGMENT.action().getService().getValue() + "' and action = '" + EbMSMessageType.ACKNOWLEDGMENT.action().getAction() + "')",
-				messageId
+				" or service = '" + EbMSMessageType.ACKNOWLEDGMENT.action().getService().getValue() + "' and action = '" + EbMSMessageType.ACKNOWLEDGMENT.action().getAction() + "')" +
+				" order by timestamp asc",
+				new Object[]{messageId},
+				Long.class
 			);
+			if (result.size() == 0)
+				return null;
+			else
+				return result.get(0);
 		}
 		catch(EmptyResultDataAccessException e)
 		{
 			return null;
 		}
-		catch (Exception e)
+		catch (DataAccessException e)
 		{
 			throw new DAOException(e);
 		}
@@ -454,7 +465,11 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 		{
 			return null;
 		}
-		catch (Exception e)
+		catch (DataAccessException e)
+		{
+			throw new DAOException(e);
+		}
+		catch (JAXBException e)
 		{
 			throw new DAOException(e);
 		}
@@ -481,7 +496,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 				messageId
 			);
 		}
-		catch (Exception e)
+		catch (DataAccessException e)
 		{
 			throw new DAOException(e);
 		}
@@ -504,7 +519,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 		{
 			return null;
 		}
-		catch (Exception e)
+		catch (DataAccessException e)
 		{
 			throw new DAOException(e);
 		}
@@ -539,7 +554,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 		{
 			return EbMSMessageStatus.NOT_RECOGNIZED;
 		}
-		catch (Exception e)
+		catch (DataAccessException e)
 		{
 			throw new DAOException(e);
 		}
@@ -651,7 +666,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 				}
 			);
 		}
-		catch (Exception e)
+		catch (RuntimeException e)
 		{
 			throw new DAOException(e);
 		}
@@ -724,7 +739,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 				}
 			);
 		}
-		catch (Exception e)
+		catch (RuntimeException e)
 		{
 			throw new DAOException(e);
 		}
@@ -826,7 +841,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 				}
 			);
 		}
-		catch (Exception e)
+		catch (RuntimeException e)
 		{
 			throw new DAOException(e);
 		}
@@ -928,7 +943,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 				}
 			);
 		}
-		catch (Exception e)
+		catch (RuntimeException e)
 		{
 			throw new DAOException(e);
 		}
@@ -988,7 +1003,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 				}
 			);
 		}
-		catch (Exception e)
+		catch (RuntimeException e)
 		{
 			throw new DAOException(e);
 		}
@@ -1048,7 +1063,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 				}
 			);
 		}
-		catch (Exception e)
+		catch (RuntimeException e)
 		{
 			throw new DAOException(e);
 		}
@@ -1130,7 +1145,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 					String.class
 			);
 		}
-		catch (Exception e)
+		catch (DataAccessException e)
 		{
 			throw new DAOException(e);
 		}
@@ -1153,7 +1168,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 					String.class
 			);
 		}
-		catch (Exception e)
+		catch (DataAccessException e)
 		{
 			throw new DAOException(e);
 		}
@@ -1176,7 +1191,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 		{
 			return null;
 		}
-		catch (Exception e)
+		catch (DataAccessException e)
 		{
 			throw new DAOException(e);
 		}
@@ -1220,7 +1235,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 					ids
 			);
 		}
-		catch (Exception e)
+		catch (DataAccessException e)
 		{
 			throw new DAOException(e);
 		}
