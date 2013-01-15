@@ -51,8 +51,10 @@ public class EbMSMessageHeaderValidationFilter implements Filter
 {
   protected transient Log logger = LogFactory.getLog(getClass());
 	private EbMSDAO ebMSDAO;
-	private SyncReplyModeType syncReplyMode = SyncReplyModeType.NONE;
+	private PerMessageCharacteristicsType duplicateElimination = PerMessageCharacteristicsType.ALWAYS;
 	private PerMessageCharacteristicsType ackRequested = PerMessageCharacteristicsType.ALWAYS;
+	private PerMessageCharacteristicsType ackSignatureRequested = PerMessageCharacteristicsType.NEVER;
+	private SyncReplyModeType syncReplyMode = SyncReplyModeType.NONE;
 
 	@Override
 	public boolean accept(MuleMessage message)
@@ -130,6 +132,11 @@ public class EbMSMessageHeaderValidationFilter implements Filter
 				}
 				if (message.getPayload() instanceof EbMSMessage)
 				{
+					if (!checkDuplicateElimination(deliveryChannel))
+					{
+						message.setProperty(Constants.EBMS_ERROR,EbMSMessageUtils.createError("//Header/MessageHeader/DuplicateElimination",Constants.EbMSErrorCode.NOT_SUPPORTED.errorCode(),"DuplicateElimination mode not supported."));
+						return false;
+					}
 					if (!checkDuplicateElimination(deliveryChannel,messageHeader))
 					{
 						message.setProperty(Constants.EBMS_ERROR,EbMSMessageUtils.createError("//Header/MessageHeader/DuplicateElimination",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Wrong value."));
@@ -146,33 +153,33 @@ public class EbMSMessageHeaderValidationFilter implements Filter
 						message.setProperty(Constants.EBMS_ERROR,EbMSMessageUtils.createError("//Header/AckRequested",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Wrong value."));
 						return false;
 					}
-					if (ackRequested != null && ackRequested.getActor() != null && ackRequested.getActor().equals(ActorType.URN_OASIS_NAMES_TC_EBXML_MSG_ACTOR_NEXT_MSH))
-					{
-						message.setProperty(Constants.EBMS_ERROR,EbMSMessageUtils.createError("//Header/AckRequested[@actor]",Constants.EbMSErrorCode.NOT_SUPPORTED.errorCode(),"NextMSH not supported."));
-						return false;
-					}
-					if (ackRequested != null && ackRequested.isSigned())
-					{
-						message.setProperty(Constants.EBMS_ERROR,EbMSMessageUtils.createError("//Header/AckRequested[@signed]",Constants.EbMSErrorCode.NOT_SUPPORTED.errorCode(),"Signed Acknowledgment not supported."));
-						return false;
-					}
-					if (!checkAckSignatureRequested(deliveryChannel,ackRequested))
-					{
-						message.setProperty(Constants.EBMS_ERROR,EbMSMessageUtils.createError("//Header/AckRequested@signed",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Wrong value."));
-						return false;
-					}
 					if (ackRequested != null && !Constants.EBMS_VERSION.equals(ackRequested.getVersion()))
 					{
 						message.setProperty(Constants.EBMS_ERROR,EbMSMessageUtils.createError("//Header/AckRequested[@version]",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Wrong value."));
 						return false;
 					}
-					SyncReply syncReply = ((EbMSMessage)message.getPayload()).getSyncReply();
-					if (!checkSyncReplyMode(deliveryChannel))
+					if (ackRequested != null && ackRequested.getActor() != null && ackRequested.getActor().equals(ActorType.URN_OASIS_NAMES_TC_EBXML_MSG_ACTOR_NEXT_MSH.value()))
 					{
-						message.setProperty(Constants.EBMS_ERROR,EbMSMessageUtils.createError("//Header/SyncReply",Constants.EbMSErrorCode.NOT_SUPPORTED.errorCode(),"SyncReplyMode not supported."));
+						message.setProperty(Constants.EBMS_ERROR,EbMSMessageUtils.createError("//Header/AckRequested[@actor]",Constants.EbMSErrorCode.NOT_SUPPORTED.errorCode(),"NextMSH not supported."));
 						return false;
 					}
-					if (!checkSyncReplyMode(deliveryChannel,syncReply))
+					if (!checkAckSignatureRequested(deliveryChannel))
+					{
+						message.setProperty(Constants.EBMS_ERROR,EbMSMessageUtils.createError("//Header/AckRequested[@signed]",Constants.EbMSErrorCode.NOT_SUPPORTED.errorCode(),"Signed Acknowledgment mode not supported."));
+						return false;
+					}
+					if (!checkAckSignatureRequested(deliveryChannel,ackRequested))
+					{
+						message.setProperty(Constants.EBMS_ERROR,EbMSMessageUtils.createError("//Header/AckRequested[@signed]",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Wrong value."));
+						return false;
+					}
+					SyncReply syncReply = ((EbMSMessage)message.getPayload()).getSyncReply();
+					if (!checkSyncReply(deliveryChannel))
+					{
+						message.setProperty(Constants.EBMS_ERROR,EbMSMessageUtils.createError("//Header/SyncReply",Constants.EbMSErrorCode.NOT_SUPPORTED.errorCode(),"SyncReply mode not supported."));
+						return false;
+					}
+					if (!checkSyncReply(deliveryChannel,syncReply))
 					{
 						message.setProperty(Constants.EBMS_ERROR,EbMSMessageUtils.createError("//Header/SyncReply",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Wrong value."));
 						return false;
@@ -197,19 +204,19 @@ public class EbMSMessageHeaderValidationFilter implements Filter
 				if (message.getPayload() instanceof EbMSAcknowledgment)
 				{
 					Acknowledgment acknowledgment = ((EbMSAcknowledgment)message.getPayload()).getAcknowledgment();
-					if (!checkAckSignatureRequested(deliveryChannel,acknowledgment))
-					{
-						message.setProperty(Constants.EBMS_ERROR,EbMSMessageUtils.createError("//Header/Acknowledgment/Reference",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Wrong value."));
-						return false;
-					}
 					if (!checkActor(deliveryChannel,acknowledgment))
 					{
 						message.setProperty(Constants.EBMS_ERROR,EbMSMessageUtils.createError("//Header/Acknowledgment[@actor]",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Wrong value."));
 						return false;
 					}
-					if (acknowledgment.getActor() != null && acknowledgment.getActor().equals(ActorType.URN_OASIS_NAMES_TC_EBXML_MSG_ACTOR_NEXT_MSH))
+					if (acknowledgment.getActor() != null && acknowledgment.getActor().equals(ActorType.URN_OASIS_NAMES_TC_EBXML_MSG_ACTOR_NEXT_MSH.value()))
 					{
 						message.setProperty(Constants.EBMS_ERROR,EbMSMessageUtils.createError("//Header/Acknowledgment[@actor]",Constants.EbMSErrorCode.NOT_SUPPORTED.errorCode(),"NextMSH not supported."));
+						return false;
+					}
+					if (!checkAckSignatureRequested(deliveryChannel,acknowledgment))
+					{
+						message.setProperty(Constants.EBMS_ERROR,EbMSMessageUtils.createError("//Header/Acknowledgment/Reference",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Wrong value."));
 						return false;
 					}
 				}
@@ -257,14 +264,19 @@ public class EbMSMessageHeaderValidationFilter implements Filter
 	
 	private boolean checkDuplicateElimination(DeliveryChannel deliveryChannel, MessageHeader messageHeader)
 	{
-		return !(deliveryChannel.getMessagingCharacteristics().getDuplicateElimination().equals(PerMessageCharacteristicsType.NEVER)
-				&& messageHeader.getDuplicateElimination() != null);
+		return deliveryChannel.getMessagingCharacteristics().getDuplicateElimination() == null || deliveryChannel.getMessagingCharacteristics().getDuplicateElimination().equals(PerMessageCharacteristicsType.PER_MESSAGE)
+				|| (deliveryChannel.getMessagingCharacteristics().getDuplicateElimination().equals(PerMessageCharacteristicsType.NEVER) && messageHeader.getDuplicateElimination() == null)
+				|| (deliveryChannel.getMessagingCharacteristics().getDuplicateElimination().equals(PerMessageCharacteristicsType.ALWAYS) && messageHeader.getDuplicateElimination() != null);
+	}
+	
+	private boolean checkDuplicateElimination(DeliveryChannel deliveryChannel)
+	{
+		return deliveryChannel.getMessagingCharacteristics().getDuplicateElimination().equals(duplicateElimination);
 	}
 	
 	private boolean checkAckRequested(DeliveryChannel deliveryChannel)
 	{
-		return (deliveryChannel.getMessagingCharacteristics().getAckRequested() == null && ackRequested.equals(PerMessageCharacteristicsType.PER_MESSAGE))
-				|| (deliveryChannel.getMessagingCharacteristics().getAckRequested() != null && deliveryChannel.getMessagingCharacteristics().getAckRequested().equals(ackRequested));
+		return deliveryChannel.getMessagingCharacteristics().getAckRequested().equals(ackRequested);
 	}
 
 	private boolean checkAckRequested(DeliveryChannel deliveryChannel, AckRequested ackRequested)
@@ -274,7 +286,12 @@ public class EbMSMessageHeaderValidationFilter implements Filter
 				|| (deliveryChannel.getMessagingCharacteristics().getAckRequested().equals(PerMessageCharacteristicsType.NEVER) && ackRequested == null)
 		;
 	}
-	
+
+	private boolean checkAckSignatureRequested(DeliveryChannel deliveryChannel)
+	{
+		return deliveryChannel.getMessagingCharacteristics().getAckSignatureRequested().equals(ackSignatureRequested);
+	}
+
 	private boolean checkAckSignatureRequested(DeliveryChannel deliveryChannel, AckRequested ackRequested)
 	{
 		return (deliveryChannel.getMessagingCharacteristics().getAckSignatureRequested().equals(PerMessageCharacteristicsType.ALWAYS) && ackRequested.isSigned())
@@ -289,12 +306,12 @@ public class EbMSMessageHeaderValidationFilter implements Filter
 		|| (deliveryChannel.getMessagingCharacteristics().getAckSignatureRequested().equals(PerMessageCharacteristicsType.NEVER));
 	}
 
-	private boolean checkSyncReplyMode(DeliveryChannel deliveryChannel)
+	private boolean checkSyncReply(DeliveryChannel deliveryChannel)
 	{
 		return deliveryChannel.getMessagingCharacteristics().getSyncReplyMode().equals(syncReplyMode);
 	}
 	
-	private boolean checkSyncReplyMode(DeliveryChannel deliveryChannel, SyncReply syncReply)
+	private boolean checkSyncReply(DeliveryChannel deliveryChannel, SyncReply syncReply)
 	{
 		return !((deliveryChannel.getMessagingCharacteristics().getSyncReplyMode() == null || deliveryChannel.getMessagingCharacteristics().getSyncReplyMode().equals(SyncReplyModeType.NONE))
 				&& syncReply != null);
@@ -311,14 +328,4 @@ public class EbMSMessageHeaderValidationFilter implements Filter
 		this.ebMSDAO = ebMSDAO;
 	}
 
-	public void setSyncReplyMode(SyncReplyModeType syncReplyMode)
-	{
-		this.syncReplyMode = syncReplyMode;
-	}
-	
-	public void setAckRequested(PerMessageCharacteristicsType ackRequested)
-	{
-		this.ackRequested = ackRequested;
-	}
-	
 }
