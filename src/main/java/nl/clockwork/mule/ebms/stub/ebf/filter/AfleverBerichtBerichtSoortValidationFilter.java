@@ -16,8 +16,8 @@
 package nl.clockwork.mule.ebms.stub.ebf.filter;
 
 import nl.clockwork.common.util.XMLMessageBuilder;
-import nl.clockwork.mule.ebms.model.EbMSAttachment;
-import nl.clockwork.mule.ebms.model.EbMSMessageContent;
+import nl.clockwork.ebms.model.EbMSAttachment;
+import nl.clockwork.ebms.model.EbMSMessageContent;
 import nl.clockwork.mule.ebms.stub.ebf.model.afleveren.bericht.AfleverBericht;
 
 import org.apache.commons.logging.Log;

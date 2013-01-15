@@ -15,9 +15,9 @@
  ******************************************************************************/
 package nl.clockwork.mule.ebms.filter;
 
-import nl.clockwork.mule.ebms.Constants.EbMSMessageType;
-import nl.clockwork.mule.ebms.model.EbMSBaseMessage;
-import nl.clockwork.mule.ebms.model.ebxml.Service;
+import nl.clockwork.ebms.Constants.EbMSMessageType;
+import nl.clockwork.ebms.model.EbMSBaseMessage;
+import nl.clockwork.ebms.model.ebxml.Service;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

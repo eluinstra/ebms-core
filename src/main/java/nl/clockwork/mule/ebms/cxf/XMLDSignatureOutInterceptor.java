@@ -57,7 +57,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
-import nl.clockwork.mule.ebms.model.EbMSDataSource;
+import nl.clockwork.ebms.model.EbMSDataSource;
 import nl.clockwork.mule.ebms.util.SecurityUtils;
 
 import org.apache.commons.codec.digest.DigestUtils;

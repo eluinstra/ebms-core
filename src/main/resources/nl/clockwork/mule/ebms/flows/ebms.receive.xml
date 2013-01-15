@@ -331,7 +331,7 @@
 			<inbound>
 				<vm:inbound-endpoint path="ebms.messageError.receive.in">
 					<message-properties-transformer>
-						<add-message-property key="EBMS.EBMS_MESSAGE_STATUS" value="nl.clockwork.mule.ebms.Constants.EbMSMessageStatus.RECEIVED"/>
+						<add-message-property key="EBMS.EBMS_MESSAGE_STATUS" value="nl.clockwork.ebms.Constants.EbMSMessageStatus.RECEIVED"/>
 					</message-properties-transformer>
 				</vm:inbound-endpoint>
 			</inbound>
@@ -379,7 +379,7 @@
 			<inbound>
 				<vm:inbound-endpoint path="ebms.acknowledgment.receive.in">
 					<message-properties-transformer>
-						<add-message-property key="EBMS.EBMS_MESSAGE_STATUS" value="nl.clockwork.mule.ebms.Constants.EbMSMessageStatus.RECEIVED"/>
+						<add-message-property key="EBMS.EBMS_MESSAGE_STATUS" value="nl.clockwork.ebms.Constants.EbMSMessageStatus.RECEIVED"/>
 					</message-properties-transformer>
 				</vm:inbound-endpoint>
 			</inbound>

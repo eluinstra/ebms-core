@@ -19,7 +19,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import nl.clockwork.common.cxf.AttachmentManager;
-import nl.clockwork.mule.ebms.model.EbMSMessage;
+import nl.clockwork.ebms.model.EbMSMessage;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

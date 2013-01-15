@@ -29,7 +29,7 @@ import java.util.List;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamReader;
 
-import nl.clockwork.mule.ebms.model.EbMSDataSource;
+import nl.clockwork.ebms.model.EbMSDataSource;
 import nl.clockwork.mule.ebms.util.SecurityUtils;
 import nl.clockwork.mule.ebms.xmldsig.EbMSDataSourceResolver;
 

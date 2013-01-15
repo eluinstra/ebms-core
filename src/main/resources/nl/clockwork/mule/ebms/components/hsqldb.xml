@@ -18,12 +18,12 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
 
-	<bean id="ebMSDAO" class="nl.clockwork.mule.ebms.dao.hsqldb.EbMSDAOImpl">
+	<bean id="ebMSDAO" class="nl.clockwork.ebms.dao.hsqldb.EbMSDAOImpl">
 		<constructor-arg index="0" ref="ebMSTransactionTemplate"/>
 		<constructor-arg index="1" ref="ebMSDataSource"/>
 	</bean>
 
-	<bean id="databaseProvider" class="nl.clockwork.mule.ebms.HSQLDatabaseProvider" init-method="init" destroy-method="close">
+	<bean id="databaseProvider" class="nl.clockwork.ebms.HSQLDatabaseProvider" init-method="init" destroy-method="close">
 		<constructor-arg ref="ebMSDataSource"/>
 		<constructor-arg value="/nl/clockwork/mule/ebms/hsqldb.sql"/>
 	</bean>

@@ -15,8 +15,8 @@
  ******************************************************************************/
 package nl.clockwork.mule.ebms.service;
 
-import nl.clockwork.mule.ebms.model.EbMSPing;
-import nl.clockwork.mule.ebms.model.EbMSPong;
+import nl.clockwork.ebms.model.EbMSPing;
+import nl.clockwork.ebms.model.EbMSPong;
 
 
 public interface EbMSPingProcessor

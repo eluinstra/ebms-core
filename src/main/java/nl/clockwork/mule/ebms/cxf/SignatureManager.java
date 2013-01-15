@@ -15,7 +15,7 @@
  ******************************************************************************/
 package nl.clockwork.mule.ebms.cxf;
 
-import nl.clockwork.mule.ebms.model.Signature;
+import nl.clockwork.ebms.model.Signature;
 
 public class SignatureManager
 {

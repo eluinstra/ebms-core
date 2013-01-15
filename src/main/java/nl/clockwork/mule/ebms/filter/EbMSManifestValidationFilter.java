@@ -17,12 +17,12 @@ package nl.clockwork.mule.ebms.filter;
 
 import javax.activation.DataSource;
 
-import nl.clockwork.mule.ebms.Constants;
-import nl.clockwork.mule.ebms.model.EbMSDataSource;
-import nl.clockwork.mule.ebms.model.EbMSMessage;
-import nl.clockwork.mule.ebms.model.ebxml.Manifest;
-import nl.clockwork.mule.ebms.model.ebxml.Reference;
-import nl.clockwork.mule.ebms.util.EbMSMessageUtils;
+import nl.clockwork.ebms.Constants;
+import nl.clockwork.ebms.model.EbMSDataSource;
+import nl.clockwork.ebms.model.EbMSMessage;
+import nl.clockwork.ebms.model.ebxml.Manifest;
+import nl.clockwork.ebms.model.ebxml.Reference;
+import nl.clockwork.ebms.util.EbMSMessageUtils;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

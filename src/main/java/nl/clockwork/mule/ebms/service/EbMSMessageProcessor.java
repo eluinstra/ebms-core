@@ -15,8 +15,8 @@
  ******************************************************************************/
 package nl.clockwork.mule.ebms.service;
 
-import nl.clockwork.mule.ebms.model.EbMSMessage;
-import nl.clockwork.mule.ebms.model.Signature;
+import nl.clockwork.ebms.model.EbMSMessage;
+import nl.clockwork.ebms.model.Signature;
 
 
 public interface EbMSMessageProcessor

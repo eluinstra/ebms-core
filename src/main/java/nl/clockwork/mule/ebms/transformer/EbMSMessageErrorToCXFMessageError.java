@@ -15,7 +15,7 @@
  ******************************************************************************/
 package nl.clockwork.mule.ebms.transformer;
 
-import nl.clockwork.mule.ebms.model.EbMSMessageError;
+import nl.clockwork.ebms.model.EbMSMessageError;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

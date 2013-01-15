@@ -17,9 +17,9 @@ package nl.clockwork.mule.ebms.transformer;
 
 import javax.xml.datatype.DatatypeConfigurationException;
 
-import nl.clockwork.mule.ebms.model.EbMSPing;
-import nl.clockwork.mule.ebms.model.EbMSPong;
-import nl.clockwork.mule.ebms.util.EbMSMessageUtils;
+import nl.clockwork.ebms.model.EbMSPing;
+import nl.clockwork.ebms.model.EbMSPong;
+import nl.clockwork.ebms.util.EbMSMessageUtils;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

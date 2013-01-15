@@ -39,7 +39,7 @@ import javax.xml.crypto.dsig.keyinfo.X509Data;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamReader;
 
-import nl.clockwork.mule.ebms.model.EbMSDataSource;
+import nl.clockwork.ebms.model.EbMSDataSource;
 import nl.clockwork.mule.ebms.xmldsig.EbMSDataSourceURIDereferencer;
 
 import org.apache.commons.logging.Log;

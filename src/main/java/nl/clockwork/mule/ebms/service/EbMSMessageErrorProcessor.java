@@ -15,7 +15,7 @@
  ******************************************************************************/
 package nl.clockwork.mule.ebms.service;
 
-import nl.clockwork.mule.ebms.model.EbMSMessageError;
+import nl.clockwork.ebms.model.EbMSMessageError;
 
 
 public interface EbMSMessageErrorProcessor

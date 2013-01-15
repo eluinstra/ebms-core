@@ -34,15 +34,15 @@ import javax.xml.xpath.XPathConstants;
 
 import nl.clockwork.common.util.XMLMessageBuilder;
 import nl.clockwork.common.util.XMLUtils;
-import nl.clockwork.mule.ebms.dao.EbMSDAO;
-import nl.clockwork.mule.ebms.model.EbMSDataSource;
-import nl.clockwork.mule.ebms.model.Signature;
-import nl.clockwork.mule.ebms.model.cpp.cpa.CollaborationProtocolAgreement;
-import nl.clockwork.mule.ebms.model.cpp.cpa.DeliveryChannel;
-import nl.clockwork.mule.ebms.model.cpp.cpa.PartyInfo;
-import nl.clockwork.mule.ebms.model.ebxml.MessageHeader;
-import nl.clockwork.mule.ebms.model.xml.xmldsig.SignatureType;
-import nl.clockwork.mule.ebms.util.CPAUtils;
+import nl.clockwork.ebms.dao.EbMSDAO;
+import nl.clockwork.ebms.model.EbMSDataSource;
+import nl.clockwork.ebms.model.Signature;
+import nl.clockwork.ebms.model.cpp.cpa.CollaborationProtocolAgreement;
+import nl.clockwork.ebms.model.cpp.cpa.DeliveryChannel;
+import nl.clockwork.ebms.model.cpp.cpa.PartyInfo;
+import nl.clockwork.ebms.model.ebxml.MessageHeader;
+import nl.clockwork.ebms.model.xml.xmldsig.SignatureType;
+import nl.clockwork.ebms.util.CPAUtils;
 import nl.clockwork.mule.ebms.util.SecurityUtils;
 import nl.clockwork.mule.ebms.xmldsig.EbMSDataSourceResolver;
 
@@ -175,7 +175,7 @@ public class EbMSSecSignatureInInterceptor extends AbstractSoapInterceptor
 					List<DeliveryChannel> channels = CPAUtils.getDeliveryChannels(partyInfo,messageHeader.getFrom().getRole(),messageHeader.getService(),messageHeader.getAction());
 					if (channels.size() == 1)
 					{
-						nl.clockwork.mule.ebms.model.cpp.cpa.Certificate c = CPAUtils.getCertificate(channels.get(0));
+						nl.clockwork.ebms.model.cpp.cpa.Certificate c = CPAUtils.getCertificate(channels.get(0));
 						if (c == null)
 							return null;
 						else

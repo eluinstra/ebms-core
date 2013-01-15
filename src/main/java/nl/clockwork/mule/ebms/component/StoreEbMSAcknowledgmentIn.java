@@ -15,11 +15,11 @@
  ******************************************************************************/
 package nl.clockwork.mule.ebms.component;
 
+import nl.clockwork.ebms.Constants;
+import nl.clockwork.ebms.Constants.EbMSMessageStatus;
+import nl.clockwork.ebms.dao.EbMSDAO;
+import nl.clockwork.ebms.model.EbMSAcknowledgment;
 import nl.clockwork.mule.common.component.Callable;
-import nl.clockwork.mule.ebms.Constants;
-import nl.clockwork.mule.ebms.Constants.EbMSMessageStatus;
-import nl.clockwork.mule.ebms.dao.EbMSDAO;
-import nl.clockwork.mule.ebms.model.EbMSAcknowledgment;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

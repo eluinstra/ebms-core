@@ -20,16 +20,16 @@ import java.util.GregorianCalendar;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 
-import nl.clockwork.mule.ebms.Constants;
-import nl.clockwork.mule.ebms.Constants.EbMSMessageType;
-import nl.clockwork.mule.ebms.model.EbMSAcknowledgment;
-import nl.clockwork.mule.ebms.model.EbMSMessage;
-import nl.clockwork.mule.ebms.model.cpp.cpa.ActorType;
-import nl.clockwork.mule.ebms.model.ebxml.Acknowledgment;
-import nl.clockwork.mule.ebms.model.ebxml.From;
-import nl.clockwork.mule.ebms.model.ebxml.MessageHeader;
-import nl.clockwork.mule.ebms.model.xml.xmldsig.ReferenceType;
-import nl.clockwork.mule.ebms.util.EbMSMessageUtils;
+import nl.clockwork.ebms.Constants;
+import nl.clockwork.ebms.Constants.EbMSMessageType;
+import nl.clockwork.ebms.model.EbMSAcknowledgment;
+import nl.clockwork.ebms.model.EbMSMessage;
+import nl.clockwork.ebms.model.cpp.cpa.ActorType;
+import nl.clockwork.ebms.model.ebxml.Acknowledgment;
+import nl.clockwork.ebms.model.ebxml.From;
+import nl.clockwork.ebms.model.ebxml.MessageHeader;
+import nl.clockwork.ebms.model.xml.xmldsig.ReferenceType;
+import nl.clockwork.ebms.util.EbMSMessageUtils;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

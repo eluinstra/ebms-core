@@ -18,16 +18,16 @@ package nl.clockwork.mule.ebms.filter;
 import java.util.List;
 
 import nl.clockwork.common.dao.DAOException;
-import nl.clockwork.mule.ebms.Constants;
-import nl.clockwork.mule.ebms.dao.EbMSDAO;
-import nl.clockwork.mule.ebms.model.EbMSMessage;
-import nl.clockwork.mule.ebms.model.Signature;
-import nl.clockwork.mule.ebms.model.cpp.cpa.CollaborationProtocolAgreement;
-import nl.clockwork.mule.ebms.model.cpp.cpa.DeliveryChannel;
-import nl.clockwork.mule.ebms.model.cpp.cpa.PartyInfo;
-import nl.clockwork.mule.ebms.model.ebxml.MessageHeader;
-import nl.clockwork.mule.ebms.util.CPAUtils;
-import nl.clockwork.mule.ebms.util.EbMSMessageUtils;
+import nl.clockwork.ebms.Constants;
+import nl.clockwork.ebms.dao.EbMSDAO;
+import nl.clockwork.ebms.model.EbMSMessage;
+import nl.clockwork.ebms.model.Signature;
+import nl.clockwork.ebms.model.cpp.cpa.CollaborationProtocolAgreement;
+import nl.clockwork.ebms.model.cpp.cpa.DeliveryChannel;
+import nl.clockwork.ebms.model.cpp.cpa.PartyInfo;
+import nl.clockwork.ebms.model.ebxml.MessageHeader;
+import nl.clockwork.ebms.util.CPAUtils;
+import nl.clockwork.ebms.util.EbMSMessageUtils;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

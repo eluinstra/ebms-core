@@ -17,13 +17,13 @@ package nl.clockwork.mule.ebms.transformer;
 
 import java.util.GregorianCalendar;
 
-import nl.clockwork.mule.ebms.Constants;
-import nl.clockwork.mule.ebms.Constants.EbMSMessageStatus;
-import nl.clockwork.mule.ebms.dao.EbMSDAO;
-import nl.clockwork.mule.ebms.model.EbMSStatusRequest;
-import nl.clockwork.mule.ebms.model.ebxml.MessageHeader;
-import nl.clockwork.mule.ebms.model.ebxml.MessageStatusType;
-import nl.clockwork.mule.ebms.util.EbMSMessageUtils;
+import nl.clockwork.ebms.Constants;
+import nl.clockwork.ebms.Constants.EbMSMessageStatus;
+import nl.clockwork.ebms.dao.EbMSDAO;
+import nl.clockwork.ebms.model.EbMSStatusRequest;
+import nl.clockwork.ebms.model.ebxml.MessageHeader;
+import nl.clockwork.ebms.model.ebxml.MessageStatusType;
+import nl.clockwork.ebms.util.EbMSMessageUtils;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

@@ -15,8 +15,8 @@
  ******************************************************************************/
 package nl.clockwork.mule.ebms.service;
 
-import nl.clockwork.mule.ebms.model.EbMSStatusRequest;
-import nl.clockwork.mule.ebms.model.EbMSStatusResponse;
+import nl.clockwork.ebms.model.EbMSStatusRequest;
+import nl.clockwork.ebms.model.EbMSStatusResponse;
 
 
 public interface EbMSMessageStatusProcessor

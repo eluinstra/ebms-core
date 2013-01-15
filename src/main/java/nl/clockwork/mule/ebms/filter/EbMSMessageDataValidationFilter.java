@@ -16,11 +16,11 @@
 package nl.clockwork.mule.ebms.filter;
 
 import nl.clockwork.common.dao.DAOException;
-import nl.clockwork.mule.ebms.Constants;
-import nl.clockwork.mule.ebms.dao.EbMSDAO;
-import nl.clockwork.mule.ebms.model.EbMSBaseMessage;
-import nl.clockwork.mule.ebms.model.ebxml.MessageHeader;
-import nl.clockwork.mule.ebms.util.EbMSMessageUtils;
+import nl.clockwork.ebms.Constants;
+import nl.clockwork.ebms.dao.EbMSDAO;
+import nl.clockwork.ebms.model.EbMSBaseMessage;
+import nl.clockwork.ebms.model.ebxml.MessageHeader;
+import nl.clockwork.ebms.util.EbMSMessageUtils;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;

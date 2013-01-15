@@ -31,7 +31,7 @@ import javax.xml.bind.annotation.XmlSeeAlso;
  */
  
 @WebService(targetNamespace = "http://www.clockwork.nl/ebms/1.0", name = "EbMSPortType")
-@XmlSeeAlso({nl.clockwork.mule.ebms.model.soap.envelope.ObjectFactory.class,nl.clockwork.mule.ebms.model.ebxml.ObjectFactory.class,nl.clockwork.mule.ebms.model.xml.xlink.ObjectFactory.class,nl.clockwork.mule.ebms.model.xml.xmldsig.ObjectFactory.class})
+@XmlSeeAlso({nl.clockwork.ebms.model.soap.envelope.ObjectFactory.class,nl.clockwork.ebms.model.ebxml.ObjectFactory.class,nl.clockwork.ebms.model.xml.xlink.ObjectFactory.class,nl.clockwork.ebms.model.xml.xmldsig.ObjectFactory.class})
 @SOAPBinding(parameterStyle = SOAPBinding.ParameterStyle.BARE)
 public interface EbMSPortType {
 
@@ -39,52 +39,52 @@ public interface EbMSPortType {
   @WebMethod(operationName = "Message", action = "ebXML")
   public void message(
       @WebParam(partName = "MessageHeader", name = "MessageHeader", targetNamespace = "http://www.oasis-open.org/committees/ebxml-msg/schema/msg-header-2_0.xsd", header = true)
-      nl.clockwork.mule.ebms.model.ebxml.MessageHeader messageHeader,
+      nl.clockwork.ebms.model.ebxml.MessageHeader messageHeader,
       @WebParam(partName = "SyncReply", name = "SyncReply", targetNamespace = "http://www.oasis-open.org/committees/ebxml-msg/schema/msg-header-2_0.xsd", header = true)
-      nl.clockwork.mule.ebms.model.ebxml.SyncReply syncReply,
+      nl.clockwork.ebms.model.ebxml.SyncReply syncReply,
       @WebParam(partName = "MessageOrder", name = "MessageOrder", targetNamespace = "http://www.oasis-open.org/committees/ebxml-msg/schema/msg-header-2_0.xsd", header = true)
-      nl.clockwork.mule.ebms.model.ebxml.MessageOrder messageOrder,
+      nl.clockwork.ebms.model.ebxml.MessageOrder messageOrder,
       @WebParam(partName = "AckRequested", name = "AckRequested", targetNamespace = "http://www.oasis-open.org/committees/ebxml-msg/schema/msg-header-2_0.xsd", header = true)
-      nl.clockwork.mule.ebms.model.ebxml.AckRequested ackRequested,
+      nl.clockwork.ebms.model.ebxml.AckRequested ackRequested,
       @WebParam(partName = "Manifest", name = "Manifest", targetNamespace = "http://www.oasis-open.org/committees/ebxml-msg/schema/msg-header-2_0.xsd")
-      nl.clockwork.mule.ebms.model.ebxml.Manifest manifest
+      nl.clockwork.ebms.model.ebxml.Manifest manifest
   );
 
     @Oneway
     @WebMethod(operationName = "MessageError", action = "ebXML")
     public void messageError(
         @WebParam(partName = "MessageHeader", name = "MessageHeader", targetNamespace = "http://www.oasis-open.org/committees/ebxml-msg/schema/msg-header-2_0.xsd", header = true)
-        nl.clockwork.mule.ebms.model.ebxml.MessageHeader messageHeader,
+        nl.clockwork.ebms.model.ebxml.MessageHeader messageHeader,
         @WebParam(partName = "ErrorList", name = "ErrorList", targetNamespace = "http://www.oasis-open.org/committees/ebxml-msg/schema/msg-header-2_0.xsd", header = true)
-        nl.clockwork.mule.ebms.model.ebxml.ErrorList errorList
+        nl.clockwork.ebms.model.ebxml.ErrorList errorList
     );
 
     @Oneway
     @WebMethod(operationName = "Acknowledgment", action = "ebXML")
     public void acknowledgment(
         @WebParam(partName = "MessageHeader", name = "MessageHeader", targetNamespace = "http://www.oasis-open.org/committees/ebxml-msg/schema/msg-header-2_0.xsd", header = true)
-        nl.clockwork.mule.ebms.model.ebxml.MessageHeader messageHeader,
+        nl.clockwork.ebms.model.ebxml.MessageHeader messageHeader,
         @WebParam(partName = "Acknowledgment", name = "Acknowledgment", targetNamespace = "http://www.oasis-open.org/committees/ebxml-msg/schema/msg-header-2_0.xsd", header = true)
-        nl.clockwork.mule.ebms.model.ebxml.Acknowledgment acknowledgment
+        nl.clockwork.ebms.model.ebxml.Acknowledgment acknowledgment
     );
 
     @WebMethod(operationName = "MessageStatus", action = "ebXML")
     public void messageStatus(
         @WebParam(partName = "RequestMessageHeader", name = "MessageHeader", targetNamespace = "http://www.oasis-open.org/committees/ebxml-msg/schema/msg-header-2_0.xsd", header = true)
-        nl.clockwork.mule.ebms.model.ebxml.MessageHeader requestMessageHeader,
+        nl.clockwork.ebms.model.ebxml.MessageHeader requestMessageHeader,
         @WebParam(partName = "StatusRequest", name = "StatusRequest", targetNamespace = "http://www.oasis-open.org/committees/ebxml-msg/schema/msg-header-2_0.xsd")
-        nl.clockwork.mule.ebms.model.ebxml.StatusRequest statusRequest,
+        nl.clockwork.ebms.model.ebxml.StatusRequest statusRequest,
         @WebParam(partName = "ResponseMessageHeader", mode = WebParam.Mode.OUT, name = "MessageHeader", targetNamespace = "http://www.oasis-open.org/committees/ebxml-msg/schema/msg-header-2_0.xsd", header = true)
-        javax.xml.ws.Holder<nl.clockwork.mule.ebms.model.ebxml.MessageHeader> responseMessageHeader,
+        javax.xml.ws.Holder<nl.clockwork.ebms.model.ebxml.MessageHeader> responseMessageHeader,
         @WebParam(partName = "StatusResponse", mode = WebParam.Mode.OUT, name = "StatusResponse", targetNamespace = "http://www.oasis-open.org/committees/ebxml-msg/schema/msg-header-2_0.xsd")
-        javax.xml.ws.Holder<nl.clockwork.mule.ebms.model.ebxml.StatusResponse> statusResponse
+        javax.xml.ws.Holder<nl.clockwork.ebms.model.ebxml.StatusResponse> statusResponse
     );
 
     @WebResult(name = "MessageHeader", targetNamespace = "http://www.oasis-open.org/committees/ebxml-msg/schema/msg-header-2_0.xsd", partName = "ResponseMessageHeader", header = true)
     @WebMethod(operationName = "Ping", action = "ebXML")
-    public nl.clockwork.mule.ebms.model.ebxml.MessageHeader ping(
+    public nl.clockwork.ebms.model.ebxml.MessageHeader ping(
         @WebParam(partName = "RequestMessageHeader", name = "MessageHeader", targetNamespace = "http://www.oasis-open.org/committees/ebxml-msg/schema/msg-header-2_0.xsd", header = true)
-        nl.clockwork.mule.ebms.model.ebxml.MessageHeader requestMessageHeader
+        nl.clockwork.ebms.model.ebxml.MessageHeader requestMessageHeader
     );
 
 }

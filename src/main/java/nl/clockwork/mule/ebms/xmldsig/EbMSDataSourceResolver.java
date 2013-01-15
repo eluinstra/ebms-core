@@ -22,7 +22,7 @@ import java.util.List;
 
 import javax.activation.DataSource;
 
-import nl.clockwork.mule.ebms.model.EbMSDataSource;
+import nl.clockwork.ebms.model.EbMSDataSource;
 
 import org.apache.xml.security.signature.XMLSignatureInput;
 import org.apache.xml.security.utils.resolver.ResourceResolverException;

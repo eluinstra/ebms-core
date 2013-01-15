@@ -72,14 +72,14 @@
 			<outbound>
 				<filtering-router>
 					<vm:outbound-endpoint path="ebms.messageError.send.in" />
-					<payload-type-filter expectedType="nl.clockwork.mule.ebms.model.EbMSMessageError"/>
+					<payload-type-filter expectedType="nl.clockwork.ebms.model.EbMSMessageError"/>
 				</filtering-router>
 				<filtering-router>
 					<vm:outbound-endpoint path="ebms.acknowledgment.send.in" />
-					<payload-type-filter expectedType="nl.clockwork.mule.ebms.model.EbMSAcknowledgment"/>
+					<payload-type-filter expectedType="nl.clockwork.ebms.model.EbMSAcknowledgment"/>
 				</filtering-router>
 				<forwarding-catch-all-strategy>
-					<!--payload-type-filter expectedType="nl.clockwork.mule.ebms.model.EbMSMessage"/-->
+					<!--payload-type-filter expectedType="nl.clockwork.ebms.model.EbMSMessage"/-->
 					<vm:outbound-endpoint path="ebms.message.send.in" />
 				</forwarding-catch-all-strategy>
 			</outbound>

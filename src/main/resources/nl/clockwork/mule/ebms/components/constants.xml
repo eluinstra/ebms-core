@@ -23,7 +23,7 @@
 	"
 >
 
-	<util:constant id="EBMS_MESSAGE_ID" static-field="nl.clockwork.mule.ebms.Constants.EBMS_MESSAGE_ID" />
-	<util:constant id="EBMS_MESSAGE_STATUS" static-field="nl.clockwork.mule.ebms.Constants.EBMS_MESSAGE_STATUS" />
+	<util:constant id="EBMS_MESSAGE_ID" static-field="nl.clockwork.ebms.Constants.EBMS_MESSAGE_ID" />
+	<util:constant id="EBMS_MESSAGE_STATUS" static-field="nl.clockwork.ebms.Constants.EBMS_MESSAGE_STATUS" />
 
 </beans>

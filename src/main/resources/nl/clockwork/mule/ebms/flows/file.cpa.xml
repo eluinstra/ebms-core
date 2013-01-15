@@ -43,13 +43,13 @@
 >
 
 	<spring:beans>
-		<util:constant id="CPA_ID" static-field="nl.clockwork.mule.ebms.Constants.CPA_ID"/>
+		<util:constant id="CPA_ID" static-field="nl.clockwork.ebms.Constants.CPA_ID"/>
 	</spring:beans>
 	
 	<script:transformer name="toCPAMap">
 		<script:script engine="groovy">
 			import java.util.HashMap;
-			import nl.clockwork.mule.ebms.Constants;
+			import nl.clockwork.ebms.Constants;
 
 			HashMap map = new HashMap();
 			map.put("cpa_id",message.getStringProperty(Constants.CPA_ID,null));

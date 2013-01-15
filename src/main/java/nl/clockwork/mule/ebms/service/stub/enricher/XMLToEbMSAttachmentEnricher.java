@@ -19,7 +19,7 @@ import java.io.IOException;
 import java.util.Arrays;
 
 import nl.clockwork.common.util.Utils;
-import nl.clockwork.mule.ebms.model.EbMSAttachment;
+import nl.clockwork.ebms.model.EbMSAttachment;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;

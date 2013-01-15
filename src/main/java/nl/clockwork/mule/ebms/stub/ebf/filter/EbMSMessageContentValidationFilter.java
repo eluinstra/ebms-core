@@ -17,8 +17,8 @@ package nl.clockwork.mule.ebms.stub.ebf.filter;
 
 import java.util.List;
 
-import nl.clockwork.mule.ebms.model.EbMSAttachment;
-import nl.clockwork.mule.ebms.model.EbMSMessageContent;
+import nl.clockwork.ebms.model.EbMSAttachment;
+import nl.clockwork.ebms.model.EbMSMessageContent;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

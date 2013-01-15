@@ -17,7 +17,7 @@ package nl.clockwork.mule.ebms.transformer;
 
 import java.util.HashMap;
 
-import nl.clockwork.mule.ebms.Constants;
+import nl.clockwork.ebms.Constants;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

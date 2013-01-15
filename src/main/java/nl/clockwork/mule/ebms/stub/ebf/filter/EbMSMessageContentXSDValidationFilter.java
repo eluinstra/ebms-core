@@ -17,9 +17,9 @@ package nl.clockwork.mule.ebms.stub.ebf.filter;
 
 import java.util.List;
 
+import nl.clockwork.ebms.model.EbMSAttachment;
+import nl.clockwork.ebms.model.EbMSMessageContent;
 import nl.clockwork.mule.common.filter.AbstractXSDValidationFilter;
-import nl.clockwork.mule.ebms.model.EbMSAttachment;
-import nl.clockwork.mule.ebms.model.EbMSMessageContent;
 
 import org.mule.api.MuleMessage;
 

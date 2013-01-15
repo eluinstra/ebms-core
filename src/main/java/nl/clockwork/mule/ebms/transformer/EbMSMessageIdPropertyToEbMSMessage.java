@@ -15,8 +15,8 @@
  ******************************************************************************/
 package nl.clockwork.mule.ebms.transformer;
 
-import nl.clockwork.mule.ebms.Constants;
-import nl.clockwork.mule.ebms.dao.EbMSDAO;
+import nl.clockwork.ebms.Constants;
+import nl.clockwork.ebms.dao.EbMSDAO;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

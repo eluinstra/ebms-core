@@ -15,7 +15,7 @@
  ******************************************************************************/
 package nl.clockwork.mule.ebms.stub.ebf.transformer;
 
-import nl.clockwork.mule.ebms.model.EbMSMessageContent;
+import nl.clockwork.ebms.model.EbMSMessageContent;
 
 import org.mule.api.MuleMessage;
 import org.mule.api.transformer.TransformerException;

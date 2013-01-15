@@ -22,9 +22,9 @@ import java.util.List;
 import javax.xml.datatype.DatatypeFactory;
 
 import nl.clockwork.common.util.XMLMessageBuilder;
-import nl.clockwork.mule.ebms.model.EbMSAttachment;
-import nl.clockwork.mule.ebms.model.EbMSMessageContent;
-import nl.clockwork.mule.ebms.model.EbMSMessageContext;
+import nl.clockwork.ebms.model.EbMSAttachment;
+import nl.clockwork.ebms.model.EbMSMessageContent;
+import nl.clockwork.ebms.model.EbMSMessageContext;
 import nl.clockwork.mule.ebms.stub.ebf.model.afleveren.bericht.AfleverBericht;
 import nl.clockwork.mule.ebms.stub.ebf.model.afleveren.bevestiging.BevestigAfleverBericht;
 import nl.clockwork.mule.ebms.stub.ebf.model.afleveren.bevestiging.FoutType;

@@ -51,7 +51,7 @@
 				</cxf:inbound-endpoint> 
 			</inbound>
 			<component>
-				<singleton-object class="nl.clockwork.mule.ebms.adapter.service.EbMSAdapterImpl">
+				<singleton-object class="nl.clockwork.ebms.adapter.service.EbMSAdapterImpl">
 					<property key="ebMSDAO" value-ref="ebMSDAO"/>
 					<property key="hostname" value="${service.host}"/>
 				</singleton-object>
@@ -74,7 +74,7 @@
 				</cxf:inbound-endpoint> 
 			</inbound>
 			<component>
-				<singleton-object class="nl.clockwork.mule.ebms.adapter.service.CPAAdapterImpl">
+				<singleton-object class="nl.clockwork.ebms.adapter.service.CPAAdapterImpl">
 					<property key="ebMSDAO" value-ref="ebMSDAO"/>
 				</singleton-object>
 			</component>

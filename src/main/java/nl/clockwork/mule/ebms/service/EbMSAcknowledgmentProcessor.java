@@ -15,7 +15,7 @@
  ******************************************************************************/
 package nl.clockwork.mule.ebms.service;
 
-import nl.clockwork.mule.ebms.model.EbMSAcknowledgment;
+import nl.clockwork.ebms.model.EbMSAcknowledgment;
 
 
 public interface EbMSAcknowledgmentProcessor

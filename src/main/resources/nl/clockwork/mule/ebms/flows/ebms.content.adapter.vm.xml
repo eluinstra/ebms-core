@@ -97,8 +97,8 @@
 <!--					<vm:outbound-endpoint path="end">-->
 <!--						<script:transformer>-->
 <!--							<script:script engine="groovy">-->
-<!--								import nl.clockwork.mule.ebms.model.EbMSMessage;-->
-<!--								import nl.clockwork.mule.ebms.model.EbMSMessageContentResponse;-->
+<!--								import nl.clockwork.ebms.model.EbMSMessage;-->
+<!--								import nl.clockwork.ebms.model.EbMSMessageContentResponse;-->
 <!--	-->
 <!--								EbMSMessage m = message.getPayload();-->
 <!--								EbMSMessageContentResponse r = new EbMSMessageContentResponse(m.getMessageHeader().getMessageData().getMessageId());-->
@@ -113,8 +113,8 @@
 <!--				<vm:outbound-endpoint path="end">-->
 <!--					<script:transformer>-->
 <!--						<script:script engine="groovy">-->
-<!--							import nl.clockwork.mule.ebms.model.EbMSMessage;-->
-<!--							import nl.clockwork.mule.ebms.model.EbMSMessageContentResponse;-->
+<!--							import nl.clockwork.ebms.model.EbMSMessage;-->
+<!--							import nl.clockwork.ebms.model.EbMSMessageContentResponse;-->
 <!---->
 <!--							EbMSMessage m = message.getPayload();-->
 <!--							EbMSMessageContentResponse r = new EbMSMessageContentResponse();-->

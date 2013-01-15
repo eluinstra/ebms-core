@@ -24,7 +24,7 @@ import javax.xml.crypto.URIReference;
 import javax.xml.crypto.URIReferenceException;
 import javax.xml.crypto.XMLCryptoContext;
 
-import nl.clockwork.mule.ebms.model.EbMSDataSource;
+import nl.clockwork.ebms.model.EbMSDataSource;
 
 import org.apache.xml.security.signature.XMLSignatureInput;
 
