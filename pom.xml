@@ -71,6 +71,12 @@
 			<groupId>org.mule.transports</groupId>
 			<artifactId>mule-transport-cxf</artifactId>
 			<version>${mule.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>opensaml</groupId>
+					<artifactId>opensaml</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>org.mule.transports</groupId>
@@ -108,14 +114,14 @@
 			<version>0.9.1.2</version>
 		</dependency>
 		<dependency>
-			<groupId>org.hsqldb</groupId>
-			<artifactId>hsqldb</artifactId>
-			<version>2.1.0</version>
-		</dependency>
-		<dependency>
 			<groupId>commons-logging</groupId>
 			<artifactId>commons-logging</artifactId>
 			<version>1.1.1</version>
+		</dependency>
+		<dependency>
+			<groupId>org.hsqldb</groupId>
+			<artifactId>hsqldb</artifactId>
+			<version>2.2.9</version>
 		</dependency>
 		<!--dependency>
 			<groupId>mysql</groupId>
