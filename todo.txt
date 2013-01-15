@@ -11,7 +11,14 @@
 	- validate MessageHeader against CPA
 	- add duplicate elimination???
 	- add to MessageStatus Service to check if message has same cpaId then messageStatus message if not set messageStatus to Unauthorized
+X ignore duplicate messageIds for all messages?
+	X make message_id unique in ebms_message???
+	- make message_id primary key in ebms_message???
+	- fix quickfixes in StoreEbMSMessageErrorIn and StoreEbMSAcknowledgmentIn
 - ignore response messages with duplicate refToMessageIds?
+- improve MessageHeader validation?
+	- validate role and service separately?
+	- validate required fields (ids, timestamps, etc.)?
 - improve error handling and logging
 	- collect list of errors in message validators (instead of exit on the first error)?
 		- implement internal error list to add the errors
@@ -30,9 +37,11 @@
 	- store
 	- end retry
 - validate Reference element if present in Acknowledgment against original message?
+
 - configure CPA caching (or load CPA once per message)?
 - check CPA for invalid use of urn:oasis:names:tc:ebxml-msg:service namespace for defined services?
 - get hostname (needed for messageId) from CPA
+
 - mark message as delivered (or failed) when Acknowledgment is received and message is not marked yet
 - notify From Party somehow on delivery failure (after all retries have failed) (this is a MUST)???
 	- notify From Party somehow on succesful delivery ignoring messages with duplicate refToMessageIds (this is OPTIONAL)
