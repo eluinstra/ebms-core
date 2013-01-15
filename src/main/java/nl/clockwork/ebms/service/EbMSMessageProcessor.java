@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  ******************************************************************************/
-package nl.clockwork.mule.ebms.service;
+package nl.clockwork.ebms.service;
 
 import nl.clockwork.ebms.model.EbMSMessage;
 import nl.clockwork.ebms.model.Signature;

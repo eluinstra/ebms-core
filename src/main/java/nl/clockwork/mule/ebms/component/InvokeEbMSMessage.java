@@ -20,10 +20,10 @@ import javax.xml.ws.BindingProvider;
 import nl.clockwork.ebms.dao.EbMSDAO;
 import nl.clockwork.ebms.model.EbMSMessage;
 import nl.clockwork.ebms.model.cpp.cpa.CollaborationProtocolAgreement;
+import nl.clockwork.ebms.service.EbMS;
+import nl.clockwork.ebms.service.EbMSPortType;
 import nl.clockwork.ebms.util.CPAUtils;
 import nl.clockwork.mule.common.component.Callable;
-import nl.clockwork.mule.ebms.service.EbMS;
-import nl.clockwork.mule.ebms.service.EbMSPortType;
 
 import org.mule.api.MuleMessage;
 

@@ -17,7 +17,7 @@
  * 
  */
 
-package nl.clockwork.mule.ebms.service;
+package nl.clockwork.ebms.service;
 
 import java.net.MalformedURLException;
 import java.net.URL;
