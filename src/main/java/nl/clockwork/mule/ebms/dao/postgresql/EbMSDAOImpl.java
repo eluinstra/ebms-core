@@ -34,8 +34,7 @@ import nl.clockwork.mule.ebms.dao.AbstractEbMSDAO;
 import nl.clockwork.mule.ebms.model.EbMSAcknowledgment;
 import nl.clockwork.mule.ebms.model.EbMSMessage;
 import nl.clockwork.mule.ebms.model.EbMSMessageError;
-import nl.clockwork.mule.ebms.model.cpp.cpa.CollaborationProtocolAgreement;
-import nl.clockwork.mule.ebms.model.cpp.cpa.ReliableMessaging;
+import nl.clockwork.mule.ebms.model.EbMSSendEvent;
 import nl.clockwork.mule.ebms.model.ebxml.AckRequested;
 import nl.clockwork.mule.ebms.model.ebxml.Acknowledgment;
 import nl.clockwork.mule.ebms.model.ebxml.ErrorList;
@@ -45,7 +44,6 @@ import nl.clockwork.mule.ebms.model.ebxml.MessageOrder;
 import nl.clockwork.mule.ebms.model.ebxml.SyncReply;
 import nl.clockwork.mule.ebms.model.xml.xmldsig.ObjectFactory;
 import nl.clockwork.mule.ebms.model.xml.xmldsig.SignatureType;
-import nl.clockwork.mule.ebms.util.CPAUtils;
 
 import org.apache.commons.io.IOUtils;
 import org.springframework.dao.DataAccessException;
@@ -229,7 +227,7 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 	}
 
 	@Override
-	public void insertMessage(final EbMSMessage message) throws DAOException
+	public void insertMessage(final EbMSMessage message, final List<EbMSSendEvent> sendEvents) throws DAOException
 	{
 		try
 		{
@@ -282,27 +280,20 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 								);
 							}
 
-							Date sendTime = (Date)timestamp.clone();
-							CollaborationProtocolAgreement cpa = getCPA(message.getMessageHeader().getCPAId());
-							ReliableMessaging rm = CPAUtils.getReliableMessaging(cpa,message.getMessageHeader());
-							List<Object[]> sendEvents = new ArrayList<Object[]>();
-							if (rm != null)
+							List<Object[]> events = new ArrayList<Object[]>();
+							for (EbMSSendEvent sendEvent : sendEvents)
 							{
-								for (int i = 0; i < rm.getRetries().intValue(); i++)
-								{
-									sendEvents.add(new Object[]{key,sendTime.clone()});
-									//retries.add(new Object[]{key,String.format(getDateFormat(),sendTime)});
-									rm.getRetryInterval().addTo(sendTime);
-								}
-								simpleJdbcTemplate.batchUpdate
-								(
-									"insert into ebms_send_event (" +
-									"ebms_message_id," +
-									"time" +
-									") values (?,?)",
-									sendEvents
-								);
+								//events.add(new Object[]{key,String.format(getDateFormat(),sendEvent.getTime())});
+								events.add(new Object[]{key,sendEvent.getTime()});
 							}
+							simpleJdbcTemplate.batchUpdate
+							(
+								"insert into ebms_send_event (" +
+								"ebms_message_id," +
+								"time" +
+								") values (?,?)",
+								events
+							);
 						}
 						catch (Exception e)
 						{
@@ -392,7 +383,7 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 	}
 
 	@Override
-	public void insertMessage(final EbMSMessage message, final EbMSMessageStatus status, final EbMSMessageError messageError) throws DAOException
+	public void insertMessage(final EbMSMessage message, final EbMSMessageStatus status, final EbMSMessageError messageError, final EbMSSendEvent sendEvent) throws DAOException
 	{
 		try
 		{
@@ -473,8 +464,8 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 								"time" +
 								") values (?,?)",
 								key,
-								//String.format(getDateFormat(),timestamp)
-								timestamp
+								//String.format(getDateFormat(),sendEvent.getTime())
+								sendEvent.getTime()
 							);
 						}
 						catch (Exception e)
@@ -493,7 +484,7 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 	}
 
 	@Override
-	public void insertMessage(final EbMSMessage message, final EbMSMessageStatus status, final EbMSAcknowledgment acknowledgment) throws DAOException
+	public void insertMessage(final EbMSMessage message, final EbMSMessageStatus status, final EbMSAcknowledgment acknowledgment, final EbMSSendEvent sendEvent) throws DAOException
 	{
 		try
 		{
@@ -574,8 +565,8 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 								"time" +
 								") values (?,?)",
 								key,
-								//String.format(getDateFormat(),timestamp)
-								timestamp
+								//String.format(getDateFormat(),sendEvent.getTime())
+								sendEvent.getTime()
 							);
 						}
 						catch (Exception e)

@@ -38,8 +38,8 @@ import nl.clockwork.mule.ebms.model.EbMSBaseMessage;
 import nl.clockwork.mule.ebms.model.EbMSMessage;
 import nl.clockwork.mule.ebms.model.EbMSMessageContext;
 import nl.clockwork.mule.ebms.model.EbMSMessageError;
+import nl.clockwork.mule.ebms.model.EbMSSendEvent;
 import nl.clockwork.mule.ebms.model.cpp.cpa.CollaborationProtocolAgreement;
-import nl.clockwork.mule.ebms.model.cpp.cpa.ReliableMessaging;
 import nl.clockwork.mule.ebms.model.ebxml.AckRequested;
 import nl.clockwork.mule.ebms.model.ebxml.Acknowledgment;
 import nl.clockwork.mule.ebms.model.ebxml.ErrorList;
@@ -49,7 +49,6 @@ import nl.clockwork.mule.ebms.model.ebxml.MessageOrder;
 import nl.clockwork.mule.ebms.model.ebxml.SyncReply;
 import nl.clockwork.mule.ebms.model.xml.xmldsig.ObjectFactory;
 import nl.clockwork.mule.ebms.model.xml.xmldsig.SignatureType;
-import nl.clockwork.mule.ebms.util.CPAUtils;
 
 import org.apache.commons.io.IOUtils;
 import org.springframework.dao.DataAccessException;
@@ -571,7 +570,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	}
 
 	@Override
-	public void insertMessage(final EbMSMessage message) throws DAOException
+	public void insertMessage(final EbMSMessage message, final List<EbMSSendEvent> sendEvents) throws DAOException
 	{
 		try
 		{
@@ -625,28 +624,20 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 								);
 							}
 
-							//Date sendTime = (Date)timestamp.clone();
-							Date sendTime = message.getMessageHeader().getMessageData().getTimestamp().toGregorianCalendar().getTime();
-							CollaborationProtocolAgreement cpa = getCPA(message.getMessageHeader().getCPAId());
-							ReliableMessaging rm = CPAUtils.getReliableMessaging(cpa,message.getMessageHeader());
-							List<Object[]> sendEvents = new ArrayList<Object[]>();
-							if (rm != null)
+							List<Object[]> events = new ArrayList<Object[]>();
+							for (EbMSSendEvent sendEvent : sendEvents)
 							{
-								for (int i = 0; i < rm.getRetries().intValue(); i++)
-								{
-									sendEvents.add(new Object[]{keyHolder.getKey().longValue(),sendTime.clone()});
-									//retries.add(new Object[]{keyHolder.getKey().longValue(),String.format(getDateFormat(),sendTime)});
-									rm.getRetryInterval().addTo(sendTime);
-								}
-								simpleJdbcTemplate.batchUpdate
-								(
-									"insert into ebms_send_event (" +
-										"ebms_message_id," +
-										"time" +
-									") values (?,?)",
-									sendEvents
-								);
+								//events.add(new Object[]{keyHolder.getKey().longValue(),String.format(getDateFormat(),sendEvent.getTime())});
+								events.add(new Object[]{keyHolder.getKey().longValue(),sendEvent.getTime()});
 							}
+							simpleJdbcTemplate.batchUpdate
+							(
+								"insert into ebms_send_event (" +
+									"ebms_message_id," +
+									"time" +
+								") values (?,?)",
+								events
+							);
 						}
 						catch (Exception e)
 						{
@@ -737,7 +728,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	}
 
 	@Override
-	public void insertMessage(final EbMSMessage message, final EbMSMessageStatus status, final EbMSMessageError messageError) throws DAOException
+	public void insertMessage(final EbMSMessage message, final EbMSMessageStatus status, final EbMSMessageError messageError, final EbMSSendEvent sendEvent) throws DAOException
 	{
 		try
 		{
@@ -812,8 +803,6 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 									keyHolder
 							);
 					
-							//Date sendTime = (Date)timestamp.clone();
-							Date sendTime = message.getMessageHeader().getMessageData().getTimestamp().toGregorianCalendar().getTime();
 							simpleJdbcTemplate.update
 							(
 								"insert into ebms_send_event (" +
@@ -821,8 +810,8 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 									"time" +
 								") values (?,?)",
 								keyHolder.getKey().longValue(),
-								//String.format(getDateFormat(),sendTime)
-								sendTime
+								//String.format(getDateFormat(),sendEvent.getTime())
+								sendEvent.getTime()
 							);
 						}
 						catch (Exception e)
@@ -841,7 +830,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	}
 
 	@Override
-	public void insertMessage(final EbMSMessage message, final EbMSMessageStatus status, final EbMSAcknowledgment acknowledgment) throws DAOException
+	public void insertMessage(final EbMSMessage message, final EbMSMessageStatus status, final EbMSAcknowledgment acknowledgment, final EbMSSendEvent sendEvent) throws DAOException
 	{
 		try
 		{
@@ -916,8 +905,6 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 									keyHolder
 							);
 					
-							//Date sendTime = (Date)timestamp.clone();
-							Date sendTime = message.getMessageHeader().getMessageData().getTimestamp().toGregorianCalendar().getTime();
 							simpleJdbcTemplate.update
 							(
 								"insert into ebms_send_event (" +
@@ -926,7 +913,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 								") values (?,?)",
 								keyHolder.getKey().longValue(),
 								//String.format(getDateFormat(),sendTime)
-								sendTime
+								sendEvent.getTime()
 							);
 						}
 						catch (Exception e)

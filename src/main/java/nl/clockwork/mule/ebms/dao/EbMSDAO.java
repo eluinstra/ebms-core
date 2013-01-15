@@ -24,6 +24,7 @@ import nl.clockwork.mule.ebms.model.EbMSBaseMessage;
 import nl.clockwork.mule.ebms.model.EbMSMessage;
 import nl.clockwork.mule.ebms.model.EbMSMessageContext;
 import nl.clockwork.mule.ebms.model.EbMSMessageError;
+import nl.clockwork.mule.ebms.model.EbMSSendEvent;
 import nl.clockwork.mule.ebms.model.cpp.cpa.CollaborationProtocolAgreement;
 import nl.clockwork.mule.ebms.model.ebxml.MessageHeader;
 
@@ -42,10 +43,10 @@ public interface EbMSDAO
 	MessageHeader getMessageHeader(String messageId) throws DAOException;
 	EbMSBaseMessage getMessage(long id) throws DAOException;
 	EbMSMessageStatus getMessageStatus(String messageId) throws DAOException;
-	void insertMessage(EbMSMessage message) throws DAOException;
+	void insertMessage(EbMSMessage message, List<EbMSSendEvent> sendEvents) throws DAOException;
 	void insertMessage(EbMSMessage message, EbMSMessageStatus status) throws DAOException;
-	void insertMessage(EbMSMessage message, EbMSMessageStatus status, EbMSMessageError messageError) throws DAOException;
-	void insertMessage(EbMSMessage message, EbMSMessageStatus status, EbMSAcknowledgment acknowledgment) throws DAOException;
+	void insertMessage(EbMSMessage message, EbMSMessageStatus status, EbMSMessageError messageError, EbMSSendEvent sendEvent) throws DAOException;
+	void insertMessage(EbMSMessage message, EbMSMessageStatus status, EbMSAcknowledgment acknowledgment, EbMSSendEvent sendEvent) throws DAOException;
 	void insertMessage(EbMSMessageError messageError, EbMSMessageStatus status) throws DAOException;
 	void insertMessage(EbMSAcknowledgment acknowledgment, EbMSMessageStatus status) throws DAOException;
 

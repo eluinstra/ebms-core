@@ -15,9 +15,13 @@
  ******************************************************************************/
 package nl.clockwork.mule.ebms.component;
 
+import java.util.List;
+
 import nl.clockwork.mule.common.component.Callable;
 import nl.clockwork.mule.ebms.dao.EbMSDAO;
 import nl.clockwork.mule.ebms.model.EbMSMessage;
+import nl.clockwork.mule.ebms.model.EbMSSendEvent;
+import nl.clockwork.mule.ebms.util.EbMSMessageUtils;
 
 import org.mule.api.MuleMessage;
 
@@ -31,7 +35,8 @@ public class StoreEbMSMessageOut extends Callable
 		if (message.getPayload() instanceof EbMSMessage)
 		{
 			EbMSMessage msg = (EbMSMessage)message.getPayload();
-			ebMSDAO.insertMessage(msg);
+			List<EbMSSendEvent> sendEvents = EbMSMessageUtils.getEbMSSendEvents(ebMSDAO.getCPA(msg.getMessageHeader().getCPAId()),msg.getMessageHeader());
+			ebMSDAO.insertMessage(msg,sendEvents);
 		}
 		return message;
 	}

@@ -21,6 +21,8 @@ import nl.clockwork.mule.ebms.Constants.EbMSMessageStatus;
 import nl.clockwork.mule.ebms.dao.EbMSDAO;
 import nl.clockwork.mule.ebms.model.EbMSAcknowledgment;
 import nl.clockwork.mule.ebms.model.EbMSMessage;
+import nl.clockwork.mule.ebms.model.EbMSSendEvent;
+import nl.clockwork.mule.ebms.util.EbMSMessageUtils;
 
 import org.mule.api.MuleMessage;
 
@@ -36,7 +38,8 @@ public class StoreEbMSMessageInEbMSAcknowledgmentOut extends Callable
 			EbMSMessage msg = (EbMSMessage)message.getProperty(Constants.EBMS_MESSAGE);
 			EbMSMessageStatus status = EbMSMessageStatus.get((String)message.getProperty(Constants.EBMS_MESSAGE_STATUS));
 			EbMSAcknowledgment ack = (EbMSAcknowledgment)message.getPayload();
-			ebMSDAO.insertMessage(msg,status,ack);
+			EbMSSendEvent sendEvent = EbMSMessageUtils.getEbMSSendEvent(ebMSDAO.getCPA(msg.getMessageHeader().getCPAId()),msg.getMessageHeader());
+			ebMSDAO.insertMessage(msg,status,ack,sendEvent);
 		}
 		return message;
 	}

@@ -23,6 +23,7 @@ import nl.clockwork.mule.ebms.model.EbMSBaseMessage;
 import nl.clockwork.mule.ebms.model.EbMSMessage;
 import nl.clockwork.mule.ebms.model.EbMSMessageContent;
 import nl.clockwork.mule.ebms.model.EbMSMessageContext;
+import nl.clockwork.mule.ebms.model.EbMSSendEvent;
 import nl.clockwork.mule.ebms.model.cpp.cpa.CollaborationProtocolAgreement;
 import nl.clockwork.mule.ebms.util.EbMSMessageContextValidator;
 import nl.clockwork.mule.ebms.util.EbMSMessageUtils;
@@ -44,7 +45,8 @@ public class EbMSAdapterImpl implements EbMSAdapter
 			new EbMSMessageContextValidator(ebMSDAO).validate(messageContent.getContext());
 			CollaborationProtocolAgreement cpa = ebMSDAO.getCPA(messageContent.getContext().getCpaId());
 			EbMSMessage message = EbMSMessageUtils.ebMSMessageContentToEbMSMessage(cpa,messageContent,hostname);
-			ebMSDAO.insertMessage(message);
+			List<EbMSSendEvent> sendEvents = EbMSMessageUtils.getEbMSSendEvents(ebMSDAO.getCPA(message.getMessageHeader().getCPAId()),message.getMessageHeader());
+			ebMSDAO.insertMessage(message,sendEvents);
 			return message.getMessageHeader().getMessageData().getMessageId();
 		}
 		catch (Exception e)

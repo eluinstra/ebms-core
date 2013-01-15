@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 
@@ -39,6 +40,7 @@ import nl.clockwork.mule.ebms.model.EbMSMessageContent;
 import nl.clockwork.mule.ebms.model.EbMSMessageContext;
 import nl.clockwork.mule.ebms.model.EbMSPing;
 import nl.clockwork.mule.ebms.model.EbMSPong;
+import nl.clockwork.mule.ebms.model.EbMSSendEvent;
 import nl.clockwork.mule.ebms.model.EbMSStatusRequest;
 import nl.clockwork.mule.ebms.model.EbMSStatusResponse;
 import nl.clockwork.mule.ebms.model.cpp.cpa.CollaborationProtocolAgreement;
@@ -263,4 +265,24 @@ public class EbMSMessageUtils
 		return new EbMSMessageContent(new EbMSMessageContext(message.getMessageHeader()),attachments);
 	}
 
+	public static EbMSSendEvent getEbMSSendEvent(CollaborationProtocolAgreement cpa, MessageHeader messageHeader)
+	{
+		return new EbMSSendEvent(messageHeader.getMessageData().getMessageId(),messageHeader.getMessageData().getTimestamp().toGregorianCalendar().getTime());
+	}
+
+	public static List<EbMSSendEvent> getEbMSSendEvents(CollaborationProtocolAgreement cpa, MessageHeader messageHeader)
+	{
+		List<EbMSSendEvent> result = new ArrayList<EbMSSendEvent>();
+		Date sendTime = messageHeader.getMessageData().getTimestamp().toGregorianCalendar().getTime();
+		ReliableMessaging rm = CPAUtils.getReliableMessaging(cpa,messageHeader);
+		if (rm != null)
+		{
+			for (int i = 0; i < rm.getRetries().intValue() + 1; i++)
+			{
+				result.add(new EbMSSendEvent(messageHeader.getMessageData().getMessageId(),(Date)sendTime.clone()));
+				rm.getRetryInterval().addTo(sendTime);
+			}
+		}
+		return result;
+	}
 }
