@@ -58,7 +58,12 @@
 
 		<service name="ebms.message.eliminateDuplicate">
 			<inbound>
-				<vm:inbound-endpoint path="ebms.message.eliminateDuplicate.in" />
+				<vm:inbound-endpoint path="ebms.message.eliminateDuplicate.in">
+					<custom-transformer class="nl.clockwork.mule.common.transformer.Logger">
+						<spring:property name="message" value="Duplicate message found!"/>
+						<spring:property name="logLevel" value="WARN"/>
+					</custom-transformer>
+				</vm:inbound-endpoint>
 				<selective-consumer-router>
 					<custom-filter class="nl.clockwork.mule.ebms.filter.EbMSDuplicateMessageFilter">
 						<spring:property name="ebMSDAO" ref="ebMSDAO" />

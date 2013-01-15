@@ -21,10 +21,13 @@ import nl.clockwork.mule.ebms.Constants.EbMSMessageStatus;
 import nl.clockwork.mule.ebms.dao.EbMSDAO;
 import nl.clockwork.mule.ebms.model.EbMSMessageError;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.mule.api.MuleMessage;
 
 public class StoreEbMSMessageErrorIn extends Callable
 {
+  protected transient Log logger = LogFactory.getLog(getClass());
 	private EbMSDAO ebMSDAO;
 
 	@Override
@@ -37,6 +40,8 @@ public class StoreEbMSMessageErrorIn extends Callable
 			//FIXME quickfix to prevent inserting duplicate messages
 			if (!ebMSDAO.existsMessage(msgError.getMessageHeader().getMessageData().getMessageId()))
 				ebMSDAO.insertMessage(msgError,status);
+			else
+				logger.warn("Duplicate messageError found.");
 		}
 		return message;
 	}
