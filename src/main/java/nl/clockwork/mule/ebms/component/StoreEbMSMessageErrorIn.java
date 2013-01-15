@@ -34,7 +34,9 @@ public class StoreEbMSMessageErrorIn extends Callable
 		{
 			EbMSMessageError msgError = (EbMSMessageError)message.getPayload();
 			EbMSMessageStatus status = EbMSMessageStatus.get((String)message.getProperty(Constants.EBMS_MESSAGE_STATUS));
-			ebMSDAO.insertMessage(msgError,status);
+			//FIXME quickfix to prevent inserting duplicate messages
+			if (!ebMSDAO.existsMessage(msgError.getMessageHeader().getMessageData().getMessageId()))
+				ebMSDAO.insertMessage(msgError,status);
 		}
 		return message;
 	}

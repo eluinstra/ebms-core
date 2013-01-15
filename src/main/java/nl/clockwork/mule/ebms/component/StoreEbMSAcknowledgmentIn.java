@@ -34,7 +34,9 @@ public class StoreEbMSAcknowledgmentIn extends Callable
 		{
 			EbMSAcknowledgment ack = (EbMSAcknowledgment)message.getPayload();
 			EbMSMessageStatus status = EbMSMessageStatus.get((String)message.getProperty(Constants.EBMS_MESSAGE_STATUS));
-			ebMSDAO.insertMessage(ack,status);
+			//FIXME quickfix to prevent inserting duplicate messages
+			if (!ebMSDAO.existsMessage(ack.getMessageHeader().getMessageData().getMessageId()))
+				ebMSDAO.insertMessage(ack,status);
 		}
 		return message;
 	}
