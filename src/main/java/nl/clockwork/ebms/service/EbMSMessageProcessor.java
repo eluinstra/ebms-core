@@ -16,10 +16,9 @@
 package nl.clockwork.ebms.service;
 
 import nl.clockwork.ebms.model.EbMSMessage;
-import nl.clockwork.ebms.model.Signature;
 
 
 public interface EbMSMessageProcessor
 {
-	void process(EbMSMessage message, Signature signature);
+	void process(EbMSMessage message);
 }

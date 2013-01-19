@@ -58,20 +58,7 @@
 			<component>
 				<singleton-object class="nl.clockwork.ebms.service.EbMSPortTypeImpl" />
 				<binding interface="nl.clockwork.ebms.service.EbMSMessageProcessor" method="process">
-					<vm:outbound-endpoint path="ebms.message.receive.in" synchronous="true">
-						<script:transformer>
-							<script:script engine="groovy">
-								import nl.clockwork.ebms.Constants;
-								import nl.clockwork.ebms.model.EbMSMessage;
-
-								Object[] objects = message.getPayload();
-								if (objects[1] != null)
-									message.setProperty(Constants.EBMS_SIGNATURE,objects[1]);
-								message.setPayload(objects[0]);
-								return message;
-							</script:script>
-						</script:transformer>
-					</vm:outbound-endpoint>
+					<vm:outbound-endpoint path="ebms.message.receive.in" synchronous="true"/>
 				</binding>
 				<binding interface="nl.clockwork.ebms.service.EbMSMessageErrorProcessor" method="process">
 					<vm:outbound-endpoint path="ebms.messageError.receive.in" synchronous="true"/>

@@ -66,7 +66,7 @@ public class EbMSPortTypeImpl implements EbMSPortType
 		List<DataSource> dataSources = new ArrayList<DataSource>();
 		for (Attachment attachment : attachments)
 			dataSources.add(new EbMSDataSource(attachment.getDataHandler().getDataSource(),attachment.getId(),attachment.getDataHandler().getName()));
-		messageProcessor.process(new EbMSMessage(MessageManager.get(),SignatureManager.get() == null ? null : SignatureManager.get().getSignature(),messageHeader,syncReply,messageOrder,ackRequested,manifest,dataSources),SignatureManager.get());
+		messageProcessor.process(new EbMSMessage(MessageManager.get(),SignatureManager.get() == null ? null : SignatureManager.get(),messageHeader,syncReply,messageOrder,ackRequested,manifest,dataSources));
 	}
 
 	@Override

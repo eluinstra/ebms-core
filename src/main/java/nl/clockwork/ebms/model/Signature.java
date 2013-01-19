@@ -16,10 +16,15 @@
 package nl.clockwork.ebms.model;
 
 import java.security.cert.X509Certificate;
+import java.util.List;
 
+import nl.clockwork.ebms.model.xml.xmldsig.KeyInfoType;
+import nl.clockwork.ebms.model.xml.xmldsig.ObjectType;
 import nl.clockwork.ebms.model.xml.xmldsig.SignatureType;
+import nl.clockwork.ebms.model.xml.xmldsig.SignatureValueType;
+import nl.clockwork.ebms.model.xml.xmldsig.SignedInfoType;
 
-public class Signature
+public class Signature extends SignatureType
 {
 	private X509Certificate certificate;
 	private SignatureType signature;
@@ -46,4 +51,36 @@ public class Signature
 	{
 		return isValid;
 	}
+	
+	@Override
+	public String getId()
+	{
+		return signature.getId();
+	}
+	
+	@Override
+	public KeyInfoType getKeyInfo()
+	{
+		return signature.getKeyInfo();
+	}
+	
+	@Override
+	public List<ObjectType> getObject()
+	{
+		return signature.getObject();
+	}
+	
+	@Override
+	public SignatureValueType getSignatureValue()
+	{
+		return signature.getSignatureValue();
+	}
+	
+	@Override
+	public SignedInfoType getSignedInfo()
+	{
+		return signature.getSignedInfo();
+	}
+	
+	
 }

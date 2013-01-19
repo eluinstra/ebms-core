@@ -49,7 +49,7 @@ public class EbMSSignatureValidationFilter implements Filter
 				EbMSMessage msg = (EbMSMessage)message.getPayload();
 				MessageHeader messageHeader = msg.getMessageHeader();
 				CollaborationProtocolAgreement cpa = ebMSDAO.getCPA(messageHeader.getCPAId());
-				Signature signature = (Signature)message.getProperty(Constants.EBMS_SIGNATURE);
+				Signature signature = (Signature)msg.getSignature();
 				PartyInfo partyInfo = CPAUtils.getPartyInfo(cpa,messageHeader.getFrom().getPartyId());
 				List<DeliveryChannel> deliveryChannels = CPAUtils.getDeliveryChannels(partyInfo,messageHeader.getFrom().getRole(),messageHeader.getService(),messageHeader.getAction());
 				if (CPAUtils.isSigned(deliveryChannels.get(0)))

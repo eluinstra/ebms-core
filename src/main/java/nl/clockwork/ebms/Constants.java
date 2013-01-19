@@ -113,7 +113,6 @@ public class Constants
 	public static final String EBMS_DEFAULT_LANGUAGE = "en-US";
 
 	public static final String EBMS_ERROR = "EBMS.EBMS_ERROR";
-	public static final String EBMS_SIGNATURE = "EBMS.SIGNATURE";
 
 	public static final String EBMS_MESSAGE = "EBMS.EBMS_MESSAGE";
 	public static final String EBMS_MESSAGE_ID = "EBMS.EBMS_MESSAGE_ID";
