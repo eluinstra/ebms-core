@@ -1,3 +1,7 @@
+- change wsdl definition to one operation (containing all ebxml elements) and 'parse' message in Mule?
+	- 1 generic message processor will call the specific message processor(s) depending on the content of the message (action and available elements)
+	- also possible to process messages with ErrorList and Acknowledgment elements
+
 2.1.x:
 - create documentation/manual
 - Message Responses:
