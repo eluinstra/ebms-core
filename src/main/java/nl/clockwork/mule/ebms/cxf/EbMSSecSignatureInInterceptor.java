@@ -56,7 +56,6 @@ import org.apache.cxf.message.Attachment;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.xml.security.exceptions.XMLSecurityException;
-import org.apache.xml.security.signature.MissingResourceFailureException;
 import org.apache.xml.security.signature.XMLSignature;
 import org.apache.xml.security.signature.XMLSignatureException;
 import org.w3c.dom.Document;
