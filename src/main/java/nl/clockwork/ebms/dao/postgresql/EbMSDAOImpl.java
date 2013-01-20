@@ -540,34 +540,38 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 								);
 							}
 							
-							key = (Long)jdbcTemplate.query(
-									new EbMSMessagePreparedStatement(
-											timestamp,
-											acknowledgment.getMessageHeader().getCPAId(),
-											acknowledgment.getMessageHeader().getConversationId(),
-											acknowledgment.getMessageHeader().getMessageData().getMessageId(),
-											acknowledgment.getMessageHeader().getMessageData().getRefToMessageId(),
-											acknowledgment.getMessageHeader().getFrom().getRole(),
-											acknowledgment.getMessageHeader().getTo().getRole(),
-											acknowledgment.getMessageHeader().getService().getType(),
-											acknowledgment.getMessageHeader().getService().getValue(),
-											acknowledgment.getMessageHeader().getAction(),
-											XMLMessageBuilder.getInstance(MessageHeader.class).handle(acknowledgment.getMessageHeader()),
-											XMLMessageBuilder.getInstance(Acknowledgment.class).handle(acknowledgment.getAcknowledgment())
-									),
-									new IdExtractor()
-							);
+							if (acknowledgment != null)
+							{
+								key = (Long)jdbcTemplate.query(
+										new EbMSMessagePreparedStatement(
+												timestamp,
+												acknowledgment.getMessageHeader().getCPAId(),
+												acknowledgment.getMessageHeader().getConversationId(),
+												acknowledgment.getMessageHeader().getMessageData().getMessageId(),
+												acknowledgment.getMessageHeader().getMessageData().getRefToMessageId(),
+												acknowledgment.getMessageHeader().getFrom().getRole(),
+												acknowledgment.getMessageHeader().getTo().getRole(),
+												acknowledgment.getMessageHeader().getService().getType(),
+												acknowledgment.getMessageHeader().getService().getValue(),
+												acknowledgment.getMessageHeader().getAction(),
+												XMLMessageBuilder.getInstance(MessageHeader.class).handle(acknowledgment.getMessageHeader()),
+												XMLMessageBuilder.getInstance(Acknowledgment.class).handle(acknowledgment.getAcknowledgment())
+										),
+										new IdExtractor()
+								);
 					
-							simpleJdbcTemplate.update
-							(
-								"insert into ebms_send_event (" +
-								"ebms_message_id," +
-								"time" +
-								") values (?,?)",
-								key,
-								//String.format(getDateFormat(),sendEvent.getTime())
-								sendEvent.getTime()
-							);
+								if (sendEvent != null)
+									simpleJdbcTemplate.update
+									(
+										"insert into ebms_send_event (" +
+										"ebms_message_id," +
+										"time" +
+										") values (?,?)",
+										key,
+										//String.format(getDateFormat(),sendEvent.getTime())
+										sendEvent.getTime()
+									);
+							}
 						}
 						catch (Exception e)
 						{

@@ -49,6 +49,7 @@ public interface EbMSDAO
 	void insertMessage(EbMSMessage message, EbMSMessageStatus status, EbMSAcknowledgment acknowledgment, EbMSSendEvent sendEvent) throws DAOException;
 	void insertMessage(EbMSMessageError messageError, EbMSMessageStatus status) throws DAOException;
 	void insertMessage(EbMSAcknowledgment acknowledgment, EbMSMessageStatus status) throws DAOException;
+	void insertSendEvent(long id) throws DAOException;
 
 	List<String> getReceivedMessageIds(EbMSMessageContext messageContext) throws DAOException;
 	List<String> getReceivedMessageIds(EbMSMessageContext messageContext, int maxNr) throws DAOException;
