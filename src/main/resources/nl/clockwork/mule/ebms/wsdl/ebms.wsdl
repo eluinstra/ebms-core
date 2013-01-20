@@ -118,6 +118,7 @@
 			<soap:operation soapAction="ebXML" />
 			<wsdl:input>
  				<soap:header message="tns:StatusRequest" part="RequestMessageHeader" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />          
+ 				<soap:header message="tns:StatusRequest" part="SyncReply" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" wsdl:required="false" />          
 		 		<soap:body parts="StatusRequest" part="StatusRequest" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />          
 			</wsdl:input>
 			<wsdl:output>
@@ -129,6 +130,7 @@
 			<soap:operation soapAction="ebXML" />
 			<wsdl:input>
  				<soap:header message="tns:Ping" part="RequestMessageHeader" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />          
+ 				<soap:header message="tns:Ping" part="SyncReply" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" wsdl:required="false" />          
 			</wsdl:input>
 			<wsdl:output>
  				<soap:header message="tns:Pong" part="ResponseMessageHeader" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />          
