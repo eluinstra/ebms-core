@@ -20,11 +20,10 @@ import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
+import java.util.GregorianCalendar;
 import java.util.List;
 
 import javax.xml.bind.JAXBElement;
-
-import org.apache.xml.security.signature.XMLSignature;
 
 import nl.clockwork.ebms.model.cpp.cpa.ActionBindingType;
 import nl.clockwork.ebms.model.cpp.cpa.CanReceive;
@@ -40,13 +39,24 @@ import nl.clockwork.ebms.model.cpp.cpa.ReliableMessaging;
 import nl.clockwork.ebms.model.cpp.cpa.ServiceBinding;
 import nl.clockwork.ebms.model.cpp.cpa.ServiceType;
 import nl.clockwork.ebms.model.cpp.cpa.SignatureAlgorithm;
+import nl.clockwork.ebms.model.cpp.cpa.StatusValueType;
 import nl.clockwork.ebms.model.cpp.cpa.X509DataType;
 import nl.clockwork.ebms.model.ebxml.MessageHeader;
 import nl.clockwork.ebms.model.ebxml.Service;
 
+import org.apache.xml.security.signature.XMLSignature;
+
 //FIXME use JXPath
 public class CPAUtils
 {
+	public static boolean isValid(CollaborationProtocolAgreement cpa, GregorianCalendar timestamp)
+	{
+		return StatusValueType.AGREED.equals(cpa.getStatus().getValue())
+			&& timestamp.compareTo(cpa.getStart().toGregorianCalendar()) >= 0
+			&& timestamp.compareTo(cpa.getEnd().toGregorianCalendar()) <= 0
+		;
+	}
+
 	public static PartyInfo getPartyInfo(CollaborationProtocolAgreement cpa, List<nl.clockwork.ebms.model.ebxml.PartyId> partyIds)
 	{
 		for (PartyInfo partyInfo : cpa.getPartyInfo())
