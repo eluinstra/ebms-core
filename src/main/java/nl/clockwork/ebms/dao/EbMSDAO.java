@@ -18,7 +18,6 @@ package nl.clockwork.ebms.dao;
 import java.util.GregorianCalendar;
 import java.util.List;
 
-import nl.clockwork.common.dao.DAOException;
 import nl.clockwork.ebms.Constants.EbMSMessageStatus;
 import nl.clockwork.ebms.model.EbMSAcknowledgment;
 import nl.clockwork.ebms.model.EbMSBaseMessage;

@@ -15,7 +15,7 @@
  ******************************************************************************/
 package nl.clockwork.mule.ebms.transformer;
 
-import nl.clockwork.common.dao.DAOException;
+import nl.clockwork.ebms.dao.DAOException;
 import nl.clockwork.ebms.dao.EbMSDAO;
 import nl.clockwork.ebms.model.EbMSMessage;
 

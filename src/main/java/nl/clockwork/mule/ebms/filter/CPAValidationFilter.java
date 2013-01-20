@@ -17,8 +17,8 @@ package nl.clockwork.mule.ebms.filter;
 
 import java.util.Date;
 
-import nl.clockwork.common.dao.DAOException;
 import nl.clockwork.ebms.Constants;
+import nl.clockwork.ebms.dao.DAOException;
 import nl.clockwork.ebms.dao.EbMSDAO;
 import nl.clockwork.ebms.model.EbMSBaseMessage;
 import nl.clockwork.ebms.model.cpp.cpa.CollaborationProtocolAgreement;

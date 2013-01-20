@@ -17,8 +17,8 @@ package nl.clockwork.mule.ebms.filter;
 
 import java.util.List;
 
-import nl.clockwork.common.dao.DAOException;
 import nl.clockwork.ebms.Constants;
+import nl.clockwork.ebms.dao.DAOException;
 import nl.clockwork.ebms.dao.EbMSDAO;
 import nl.clockwork.ebms.model.EbMSMessage;
 import nl.clockwork.ebms.model.Signature;

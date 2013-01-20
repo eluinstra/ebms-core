@@ -15,8 +15,8 @@
  ******************************************************************************/
 package nl.clockwork.mule.ebms.filter;
 
-import nl.clockwork.common.dao.DAOException;
 import nl.clockwork.ebms.Constants;
+import nl.clockwork.ebms.dao.DAOException;
 import nl.clockwork.ebms.dao.EbMSDAO;
 
 import org.apache.commons.logging.Log;

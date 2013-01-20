@@ -17,7 +17,7 @@ package nl.clockwork.ebms.adapter.service;
 
 import java.util.List;
 
-import nl.clockwork.common.dao.DAOException;
+import nl.clockwork.ebms.dao.DAOException;
 import nl.clockwork.ebms.dao.EbMSDAO;
 import nl.clockwork.ebms.model.EbMSBaseMessage;
 import nl.clockwork.ebms.model.EbMSMessage;

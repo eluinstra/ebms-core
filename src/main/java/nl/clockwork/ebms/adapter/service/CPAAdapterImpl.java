@@ -4,8 +4,8 @@ import java.util.List;
 
 import javax.xml.bind.JAXBException;
 
-import nl.clockwork.common.dao.DAOException;
 import nl.clockwork.common.util.XMLMessageBuilder;
+import nl.clockwork.ebms.dao.DAOException;
 import nl.clockwork.ebms.dao.EbMSDAO;
 import nl.clockwork.ebms.model.cpp.cpa.CollaborationProtocolAgreement;
 
