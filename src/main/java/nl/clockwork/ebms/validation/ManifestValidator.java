@@ -17,8 +17,6 @@ package nl.clockwork.ebms.validation;
 
 import java.util.List;
 
-import javax.activation.DataSource;
-
 import nl.clockwork.ebms.Constants;
 import nl.clockwork.ebms.model.EbMSDataSource;
 import nl.clockwork.ebms.model.ebxml.Error;
@@ -33,7 +31,7 @@ public class ManifestValidator
 {
   protected transient Log logger = LogFactory.getLog(getClass());
 
-	public Error validate(Manifest manifest, List<DataSource> dataSources)
+	public Error validate(Manifest manifest, List<EbMSDataSource> dataSources)
 	{
 		if (!Constants.EBMS_VERSION.equals(manifest.getVersion()))
 			return EbMSMessageUtils.createError("//Body/Manifest[@version]",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Wrong value.");
@@ -42,8 +40,8 @@ public class ManifestValidator
 			if (reference.getHref().startsWith("cid:"))
 			{
 				boolean found = false;
-				for (DataSource dataSource : dataSources)
-					if (reference.getHref().substring("cid:".length()).equals(((EbMSDataSource)dataSource).getContentId()))
+				for (EbMSDataSource dataSource : dataSources)
+					if (reference.getHref().substring("cid:".length()).equals(dataSource.getContentId()))
 						found = true;
 				if (!found)
 					return EbMSMessageUtils.createError(reference.getHref(),Constants.EbMSErrorCode.MIME_PROBLEM.errorCode(),"MIME part not found.");

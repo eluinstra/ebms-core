@@ -27,9 +27,9 @@ public class EbMSDataSource implements DataSource
 	private String contentId;
 	private String name;
 	
-	public EbMSDataSource(DataSource dataSource, String componentId)
+	public EbMSDataSource(DataSource dataSource, String contentId)
 	{
-		this(dataSource,componentId,null);
+		this(dataSource,contentId,null);
 	}
 	
 	public EbMSDataSource(DataSource dataSource, String contentId, String name)

@@ -17,8 +17,6 @@ package nl.clockwork.ebms.model;
 
 import java.util.List;
 
-import javax.activation.DataSource;
-
 import nl.clockwork.ebms.model.ebxml.AckRequested;
 import nl.clockwork.ebms.model.ebxml.Manifest;
 import nl.clockwork.ebms.model.ebxml.MessageHeader;
@@ -35,24 +33,24 @@ public class EbMSMessage implements EbMSBaseMessage
 	private MessageOrder messageOrder;
 	private AckRequested ackRequested;
 	private Manifest manifest;
-	private List<DataSource> attachments;
+	private List<EbMSDataSource> attachments;
 
-	public EbMSMessage(MessageHeader messageHeader, AckRequested ackRequested, Manifest manifest, List<DataSource> attachments)
+	public EbMSMessage(MessageHeader messageHeader, AckRequested ackRequested, Manifest manifest, List<EbMSDataSource> attachments)
 	{
 		this(null,null,messageHeader,ackRequested,manifest,attachments);
 	}
 	
-	public EbMSMessage(byte[] message, SignatureType signature, MessageHeader messageHeader, AckRequested ackRequested, Manifest manifest, List<DataSource> attachments)
+	public EbMSMessage(byte[] message, SignatureType signature, MessageHeader messageHeader, AckRequested ackRequested, Manifest manifest, List<EbMSDataSource> attachments)
 	{
 		this(message,signature,messageHeader,null,null,ackRequested,manifest,attachments);
 	}
 	
-	public EbMSMessage(MessageHeader messageHeader, SyncReply syncReply, MessageOrder messageOrder, AckRequested ackRequested, Manifest manifest, List<DataSource> attachments)
+	public EbMSMessage(MessageHeader messageHeader, SyncReply syncReply, MessageOrder messageOrder, AckRequested ackRequested, Manifest manifest, List<EbMSDataSource> attachments)
 	{
 		this(null,null,messageHeader,syncReply,messageOrder,ackRequested,manifest,attachments);
 	}
 	
-	public EbMSMessage(byte[] original, SignatureType signature, MessageHeader messageHeader, SyncReply syncReply, MessageOrder messageOrder, AckRequested ackRequested, Manifest manifest, List<DataSource> attachments)
+	public EbMSMessage(byte[] original, SignatureType signature, MessageHeader messageHeader, SyncReply syncReply, MessageOrder messageOrder, AckRequested ackRequested, Manifest manifest, List<EbMSDataSource> attachments)
 	{
 		this.original = original;
 		this.signature = signature;
@@ -100,7 +98,7 @@ public class EbMSMessage implements EbMSBaseMessage
 		return manifest;
 	}
 	
-	public List<DataSource> getAttachments()
+	public List<EbMSDataSource> getAttachments()
 	{
 		return attachments;
 	}

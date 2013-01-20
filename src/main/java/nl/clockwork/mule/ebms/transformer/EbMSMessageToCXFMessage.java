@@ -15,15 +15,11 @@
  ******************************************************************************/
 package nl.clockwork.mule.ebms.transformer;
 
-import java.util.ArrayList;
-import java.util.Collection;
-
 import nl.clockwork.common.cxf.AttachmentManager;
 import nl.clockwork.ebms.model.EbMSMessage;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.cxf.message.Attachment;
 import org.mule.api.MuleMessage;
 import org.mule.api.transformer.TransformerException;
 import org.mule.transformer.AbstractMessageAwareTransformer;
@@ -42,12 +38,7 @@ public class EbMSMessageToCXFMessage extends AbstractMessageAwareTransformer
 	{
 		EbMSMessage msg = (EbMSMessage)message.getPayload();
 		message.setPayload(new Object[]{msg.getMessageHeader(),null,null,msg.getAckRequested(),msg.getManifest()});
-
-		Collection<Attachment> attachments = new ArrayList<Attachment>();
-		for (int i = 0; i < msg.getAttachments().size(); i++)
-			attachments.add(new nl.clockwork.common.cxf.Attachment("" + (i + 1),msg.getAttachments().get(i)));
-		AttachmentManager.set(attachments);
-
+		AttachmentManager.set(msg.getAttachments());
 		return message;
 	}
 

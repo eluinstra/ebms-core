@@ -35,6 +35,7 @@ import nl.clockwork.ebms.Constants.EbMSMessageStatus;
 import nl.clockwork.ebms.Constants.EbMSMessageType;
 import nl.clockwork.ebms.model.EbMSAction;
 import nl.clockwork.ebms.model.EbMSAttachment;
+import nl.clockwork.ebms.model.EbMSDataSource;
 import nl.clockwork.ebms.model.EbMSMessage;
 import nl.clockwork.ebms.model.EbMSMessageContent;
 import nl.clockwork.ebms.model.EbMSMessageContext;
@@ -233,15 +234,15 @@ public class EbMSMessageUtils
 		AckRequested ackRequested = createAckRequested(cpa,content.getContext());
 		
 		Manifest manifest = createManifest();
-		for (int i = 0; i < content.getAttachments().size(); i++)
-			manifest.getReference().add(createReference(i + 1));
-		
-		List<DataSource> attachments = new ArrayList<DataSource>();
+		List<EbMSDataSource> attachments = new ArrayList<EbMSDataSource>();
+		int i = 1;
 		for (EbMSAttachment attachment : content.getAttachments())
 		{
+			manifest.getReference().add(createReference(i));
 			ByteArrayDataSource ds = new ByteArrayDataSource(attachment.getContent(),attachment.getContentType());
 			ds.setName(attachment.getName());
-			attachments.add(ds);
+			attachments.add(new EbMSDataSource(ds,"" + i));
+			i++;
 		}
 
 		return new EbMSMessage(messageHeader,ackRequested,manifest,attachments);

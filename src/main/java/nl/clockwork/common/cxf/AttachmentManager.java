@@ -15,27 +15,27 @@
  ******************************************************************************/
 package nl.clockwork.common.cxf;
 
-import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 
-import org.apache.cxf.message.Attachment;
+import nl.clockwork.ebms.model.EbMSDataSource;
 
 public class AttachmentManager
 {
-	private static ThreadLocal<Collection<Attachment>> attachments = new ThreadLocal<Collection<Attachment>>()
+	private static ThreadLocal<List<EbMSDataSource>> attachments = new ThreadLocal<List<EbMSDataSource>>()
 	{
-		protected synchronized Collection<Attachment> initialValue()
+		protected synchronized List<EbMSDataSource> initialValue()
 		{
 			return Collections.emptyList();
 		}
 	};
 
-	public static void set(Collection<Attachment> attachments)
+	public static void set(List<EbMSDataSource> attachments)
 	{
 		AttachmentManager.attachments.set(attachments);
 	}
 
-	public static Collection<Attachment> get()
+	public static List<EbMSDataSource> get()
 	{
 		return attachments.get();
 	}

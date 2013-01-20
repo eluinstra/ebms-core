@@ -15,16 +15,10 @@
  ******************************************************************************/
 package nl.clockwork.ebms.service;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-
-import javax.activation.DataSource;
 import javax.xml.ws.Holder;
 
 import nl.clockwork.common.cxf.AttachmentManager;
 import nl.clockwork.ebms.model.EbMSAcknowledgment;
-import nl.clockwork.ebms.model.EbMSDataSource;
 import nl.clockwork.ebms.model.EbMSMessage;
 import nl.clockwork.ebms.model.EbMSMessageError;
 import nl.clockwork.ebms.model.EbMSPing;
@@ -45,7 +39,6 @@ import nl.clockwork.mule.ebms.cxf.SignatureManager;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.cxf.message.Attachment;
 
 public class EbMSPortTypeImpl implements EbMSPortType
 {
@@ -62,11 +55,7 @@ public class EbMSPortTypeImpl implements EbMSPortType
 	@Override
 	public void message(MessageHeader messageHeader, SyncReply syncReply, MessageOrder messageOrder, AckRequested ackRequested, Manifest manifest)
 	{
-		Collection<Attachment> attachments = AttachmentManager.get();
-		List<DataSource> dataSources = new ArrayList<DataSource>();
-		for (Attachment attachment : attachments)
-			dataSources.add(new EbMSDataSource(attachment.getDataHandler().getDataSource(),attachment.getId(),attachment.getDataHandler().getName()));
-		messageProcessor.process(new EbMSMessage(MessageManager.get(),SignatureManager.get() == null ? null : SignatureManager.get(),messageHeader,syncReply,messageOrder,ackRequested,manifest,dataSources));
+		messageProcessor.process(new EbMSMessage(MessageManager.get(),SignatureManager.get() == null ? null : SignatureManager.get(),messageHeader,syncReply,messageOrder,ackRequested,manifest,AttachmentManager.get()));
 	}
 
 	@Override

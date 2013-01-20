@@ -1,0 +1,1 @@
+ALTER TABLE ebms_attachment ADD content_id VARCHAR(256) NOT NULL;
