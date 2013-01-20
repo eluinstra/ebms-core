@@ -35,11 +35,11 @@
 	</wsdl:types>
 
 	<wsdl:message name="Message">
-		<wsdl:part name="MessageHeader" element="eb:MessageHeader" />
-		<wsdl:part name="SyncReply" element="eb:SyncReply" />
-		<wsdl:part name="MessageOrder" element="eb:MessageOrder" />
-		<wsdl:part name="AckRequested" element="eb:AckRequested" />
-		<wsdl:part name="Manifest" element="eb:Manifest" />
+		<wsdl:part element="eb:MessageHeader" name="MessageHeader" />
+		<wsdl:part element="eb:SyncReply" name="SyncReply" />
+		<wsdl:part element="eb:MessageOrder" name="MessageOrder" />
+		<wsdl:part element="eb:AckRequested" name="AckRequested" />
+		<wsdl:part element="eb:Manifest" name="Manifest" />
 	</wsdl:message>
 	<wsdl:message name="MessageError">
 		<wsdl:part element="eb:MessageHeader" name="MessageHeader" />
@@ -51,6 +51,7 @@
 	</wsdl:message>
 	<wsdl:message name="StatusRequest">
 		<wsdl:part element="eb:MessageHeader" name="RequestMessageHeader" />
+		<wsdl:part element="eb:SyncReply" name="SyncReply" />
 		<wsdl:part element="eb:StatusRequest" name="StatusRequest" />
 	</wsdl:message>
 	<wsdl:message name="StatusResponse">
@@ -59,6 +60,7 @@
 	</wsdl:message>
 	<wsdl:message name="Ping">
 		<wsdl:part element="eb:MessageHeader" name="RequestMessageHeader" />
+		<wsdl:part element="eb:SyncReply" name="SyncReply" />
 	</wsdl:message>
 	<wsdl:message name="Pong">
 		<wsdl:part element="eb:MessageHeader" name="ResponseMessageHeader" />

@@ -82,9 +82,9 @@ public class EbMSPortTypeImpl implements EbMSPortType
 	}
 
 	@Override
-	public void messageStatus(MessageHeader requestMessageHeader, StatusRequest statusRequest, Holder<MessageHeader> responseMessageHeader, Holder<StatusResponse> statusResponse)
+	public void messageStatus(MessageHeader requestMessageHeader, SyncReply syncReply, StatusRequest statusRequest, Holder<MessageHeader> responseMessageHeader, Holder<StatusResponse> statusResponse)
 	{
-		EbMSStatusResponse response = messageStatusProcessor.process(new EbMSStatusRequest(requestMessageHeader,statusRequest));
+		EbMSStatusResponse response = messageStatusProcessor.process(new EbMSStatusRequest(requestMessageHeader,syncReply,statusRequest));
 		if (response != null)
 		{
 			responseMessageHeader.value = response.getMessageHeader();
@@ -93,12 +93,12 @@ public class EbMSPortTypeImpl implements EbMSPortType
 	}
 
 	@Override
-	public MessageHeader ping(MessageHeader messageHeader)
+	public MessageHeader ping(MessageHeader messageHeader, SyncReply syncReply)
 	{
 		//FIXME check for NullPayload and return null??, response has to be the same as without fix (so empty)
 		try
 		{
-			EbMSPong result = pingProcessor.process(new EbMSPing(messageHeader));
+			EbMSPong result = pingProcessor.process(new EbMSPing(messageHeader,syncReply));
 			return result.getMessageHeader();
 		}
 		catch (ClassCastException e)

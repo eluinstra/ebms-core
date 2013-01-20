@@ -16,19 +16,27 @@
 package nl.clockwork.ebms.model;
 
 import nl.clockwork.ebms.model.ebxml.MessageHeader;
+import nl.clockwork.ebms.model.ebxml.SyncReply;
 
 public class EbMSPing implements EbMSBaseMessage
 {
 	private MessageHeader messageHeader;
+	private SyncReply syncReply;
 
-	public EbMSPing(MessageHeader messageHeader)
+	public EbMSPing(MessageHeader messageHeader, SyncReply syncReply)
 	{
 		this.messageHeader = messageHeader;
+		this.syncReply = syncReply;
 	}
 
 	@Override
 	public MessageHeader getMessageHeader()
 	{
 		return messageHeader;
+	}
+	
+	public SyncReply getSyncReply()
+	{
+		return syncReply;
 	}
 }

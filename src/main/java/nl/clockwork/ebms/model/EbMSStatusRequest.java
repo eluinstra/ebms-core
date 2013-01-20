@@ -17,15 +17,18 @@ package nl.clockwork.ebms.model;
 
 import nl.clockwork.ebms.model.ebxml.MessageHeader;
 import nl.clockwork.ebms.model.ebxml.StatusRequest;
+import nl.clockwork.ebms.model.ebxml.SyncReply;
 
 public class EbMSStatusRequest implements EbMSBaseMessage
 {
 	private MessageHeader messageHeader;
+	private SyncReply syncReply;
 	private StatusRequest statusRequest;
 
-	public EbMSStatusRequest(MessageHeader messageHeader, StatusRequest statusRequest)
+	public EbMSStatusRequest(MessageHeader messageHeader, SyncReply syncReply, StatusRequest statusRequest)
 	{
 		this.messageHeader = messageHeader;
+		this.syncReply = syncReply;
 		this.statusRequest = statusRequest;
 	}
 
@@ -33,6 +36,11 @@ public class EbMSStatusRequest implements EbMSBaseMessage
 	public MessageHeader getMessageHeader()
 	{
 		return messageHeader;
+	}
+
+	public SyncReply getSyncReply()
+	{
+		return syncReply;
 	}
 
 	public StatusRequest getStatusRequest()

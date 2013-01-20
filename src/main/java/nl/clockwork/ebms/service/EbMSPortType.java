@@ -72,6 +72,8 @@ public interface EbMSPortType {
     public void messageStatus(
         @WebParam(partName = "RequestMessageHeader", name = "MessageHeader", targetNamespace = "http://www.oasis-open.org/committees/ebxml-msg/schema/msg-header-2_0.xsd", header = true)
         nl.clockwork.ebms.model.ebxml.MessageHeader requestMessageHeader,
+        @WebParam(partName = "SyncReply", name = "SyncReply", targetNamespace = "http://www.oasis-open.org/committees/ebxml-msg/schema/msg-header-2_0.xsd", header = true)
+        nl.clockwork.ebms.model.ebxml.SyncReply syncReply,
         @WebParam(partName = "StatusRequest", name = "StatusRequest", targetNamespace = "http://www.oasis-open.org/committees/ebxml-msg/schema/msg-header-2_0.xsd")
         nl.clockwork.ebms.model.ebxml.StatusRequest statusRequest,
         @WebParam(partName = "ResponseMessageHeader", mode = WebParam.Mode.OUT, name = "MessageHeader", targetNamespace = "http://www.oasis-open.org/committees/ebxml-msg/schema/msg-header-2_0.xsd", header = true)
@@ -84,7 +86,9 @@ public interface EbMSPortType {
     @WebMethod(operationName = "Ping", action = "ebXML")
     public nl.clockwork.ebms.model.ebxml.MessageHeader ping(
         @WebParam(partName = "RequestMessageHeader", name = "MessageHeader", targetNamespace = "http://www.oasis-open.org/committees/ebxml-msg/schema/msg-header-2_0.xsd", header = true)
-        nl.clockwork.ebms.model.ebxml.MessageHeader requestMessageHeader
+        nl.clockwork.ebms.model.ebxml.MessageHeader requestMessageHeader,
+        @WebParam(partName = "SyncReply", name = "SyncReply", targetNamespace = "http://www.oasis-open.org/committees/ebxml-msg/schema/msg-header-2_0.xsd", header = true)
+        nl.clockwork.ebms.model.ebxml.SyncReply syncReply
     );
 
 }
