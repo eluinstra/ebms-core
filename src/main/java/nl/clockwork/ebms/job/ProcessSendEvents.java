@@ -25,7 +25,7 @@ public class ProcessSendEvents
 {
   protected transient Log logger = LogFactory.getLog(getClass());
   private EbMSDAO ebMSDAO;
-  private EbMSPortType ebmsInterface;
+  private EbMSPortType ebMSPortType;
 
   public void process()
   {
@@ -37,20 +37,20 @@ public class ProcessSendEvents
   		if (message instanceof EbMSMessage)
   		{
   			AttachmentManager.set(((EbMSMessage)message).getAttachments());
-  			ebmsInterface.message(message.getMessageHeader(),((EbMSMessage)message).getSyncReply(),((EbMSMessage)message).getMessageOrder(),((EbMSMessage)message).getAckRequested(),((EbMSMessage)message).getManifest());
+  			ebMSPortType.message(message.getMessageHeader(),((EbMSMessage)message).getSyncReply(),((EbMSMessage)message).getMessageOrder(),((EbMSMessage)message).getAckRequested(),((EbMSMessage)message).getManifest());
   		}
   		else if (message instanceof EbMSMessageError)
-  			ebmsInterface.messageError(message.getMessageHeader(),((EbMSMessageError)message).getErrorList());
+  			ebMSPortType.messageError(message.getMessageHeader(),((EbMSMessageError)message).getErrorList());
   		else if (message instanceof EbMSAcknowledgment)
-  			ebmsInterface.acknowledgment(message.getMessageHeader(),((EbMSAcknowledgment)message).getAcknowledgment());
+  			ebMSPortType.acknowledgment(message.getMessageHeader(),((EbMSAcknowledgment)message).getAcknowledgment());
   		else if (message instanceof EbMSStatusRequest)
-  			ebmsInterface.messageStatus(message.getMessageHeader(),((EbMSStatusRequest)message).getSyncReply(),((EbMSStatusRequest)message).getStatusRequest(),new Holder<MessageHeader>(), new Holder<StatusResponse>());
+  			ebMSPortType.messageStatus(message.getMessageHeader(),((EbMSStatusRequest)message).getSyncReply(),((EbMSStatusRequest)message).getStatusRequest(),new Holder<MessageHeader>(), new Holder<StatusResponse>());
   		//else if (message instanceof EbMSStatusResponse)
-  			//ebmsInterface.messageStatusResponse(message.getMessageHeader(),((EbMSStatusResponse)message).getStatusResponse());
+  			//ebMSPortType.messageStatusResponse(message.getMessageHeader(),((EbMSStatusResponse)message).getStatusResponse());
   		else if (message instanceof EbMSPing)
-  			ebmsInterface.ping(message.getMessageHeader(),((EbMSPing)message).getSyncReply());
+  			ebMSPortType.ping(message.getMessageHeader(),((EbMSPing)message).getSyncReply());
   		//else if (message instanceof EbMSPong)
-  			//ebmsInterface.pong(message.getMessageHeader());
+  			//ebMSPortType.pong(message.getMessageHeader());
   	}
   }
 }
