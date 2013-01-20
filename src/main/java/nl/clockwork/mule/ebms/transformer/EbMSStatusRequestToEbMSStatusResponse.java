@@ -55,7 +55,7 @@ public class EbMSStatusRequestToEbMSStatusResponse extends AbstractMessageAwareT
 				MessageHeader messageHeader = ebMSDAO.getMessageHeader(request.getStatusRequest().getRefToMessageId());
 				if (messageHeader == null || messageHeader.getService().getValue().equals(Constants.EBMS_SERVICE_URI))
 					status = EbMSMessageStatus.NOT_RECOGNIZED;
-				else if (messageHeader.getCPAId().equals(request.getMessageHeader().getCPAId()))
+				else if (!messageHeader.getCPAId().equals(request.getMessageHeader().getCPAId()))
 					status = EbMSMessageStatus.UNAUTHORIZED;
 				else
 				{
