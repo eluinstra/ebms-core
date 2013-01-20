@@ -44,10 +44,10 @@ import org.apache.commons.logging.LogFactory;
 public class MessageHeaderValidator
 {
   protected transient Log logger = LogFactory.getLog(getClass());
-	private PerMessageCharacteristicsType duplicateElimination = PerMessageCharacteristicsType.ALWAYS;
-	private PerMessageCharacteristicsType ackRequested = PerMessageCharacteristicsType.ALWAYS;
-	private PerMessageCharacteristicsType ackSignatureRequested = PerMessageCharacteristicsType.NEVER;
-	private SyncReplyModeType syncReplyMode = SyncReplyModeType.NONE;
+	private PerMessageCharacteristicsType ackRequested;// = PerMessageCharacteristicsType.ALWAYS;
+	private PerMessageCharacteristicsType ackSignatureRequested;// = PerMessageCharacteristicsType.NEVER;
+	private PerMessageCharacteristicsType duplicateElimination;// = PerMessageCharacteristicsType.ALWAYS;
+	private SyncReplyModeType syncReplyMode;// = SyncReplyModeType.NONE;
 	private EbMSDAO ebMSDAO;
 
 	public Error validate(CollaborationProtocolAgreement cpa, MessageHeader messageHeader, AckRequested ackRequested, SyncReply syncReply, MessageOrder messageOrder, GregorianCalendar timestamp)
@@ -174,12 +174,12 @@ public class MessageHeaderValidator
 	
 	private boolean checkDuplicateElimination(DeliveryChannel deliveryChannel)
 	{
-		return deliveryChannel.getMessagingCharacteristics().getDuplicateElimination().equals(duplicateElimination);
+		return duplicateElimination == null || deliveryChannel.getMessagingCharacteristics().getDuplicateElimination().equals(duplicateElimination);
 	}
 	
 	private boolean checkAckRequested(DeliveryChannel deliveryChannel)
 	{
-		return deliveryChannel.getMessagingCharacteristics().getAckRequested().equals(ackRequested);
+		return ackRequested == null || deliveryChannel.getMessagingCharacteristics().getAckRequested().equals(ackRequested);
 	}
 
 	private boolean checkAckRequested(DeliveryChannel deliveryChannel, AckRequested ackRequested)
@@ -192,7 +192,7 @@ public class MessageHeaderValidator
 
 	private boolean checkAckSignatureRequested(DeliveryChannel deliveryChannel)
 	{
-		return deliveryChannel.getMessagingCharacteristics().getAckSignatureRequested().equals(ackSignatureRequested);
+		return ackSignatureRequested == null || deliveryChannel.getMessagingCharacteristics().getAckSignatureRequested().equals(ackSignatureRequested);
 	}
 
 	private boolean checkAckSignatureRequested(DeliveryChannel deliveryChannel, AckRequested ackRequested)
@@ -211,7 +211,7 @@ public class MessageHeaderValidator
 
 	private boolean checkSyncReply(DeliveryChannel deliveryChannel)
 	{
-		return deliveryChannel.getMessagingCharacteristics().getSyncReplyMode().equals(syncReplyMode);
+		return syncReplyMode == null || deliveryChannel.getMessagingCharacteristics().getSyncReplyMode().equals(syncReplyMode);
 	}
 	
 	private boolean checkSyncReply(DeliveryChannel deliveryChannel, SyncReply syncReply)
@@ -226,4 +226,23 @@ public class MessageHeaderValidator
 //				|| deliveryChannel.getMessagingCharacteristics().getActor().value().equals(acknowledgment.getActor());
 //	}
 
+	public void setAckRequested(PerMessageCharacteristicsType ackRequested)
+	{
+		this.ackRequested = ackRequested;
+	}
+	
+	public void setAckSignatureRequested(PerMessageCharacteristicsType ackSignatureRequested)
+	{
+		this.ackSignatureRequested = ackSignatureRequested;
+	}
+	
+	public void setDuplicateElimination(PerMessageCharacteristicsType duplicateElimination)
+	{
+		this.duplicateElimination = duplicateElimination;
+	}
+	
+	public void setSyncReplyMode(SyncReplyModeType syncReplyMode)
+	{
+		this.syncReplyMode = syncReplyMode;
+	}
 }
