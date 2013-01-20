@@ -45,6 +45,7 @@ X ignore duplicate messageIds for all messages?
 	- store
 	- end retry
 - validate Reference element if present in Acknowledgment against original message?
+- use PersistantDuration (+ configurable time) to delete messages automatically.
 
 - configure CPA caching (or load CPA once per message)?
 - check CPA for invalid use of urn:oasis:names:tc:ebxml-msg:service namespace for defined services?
