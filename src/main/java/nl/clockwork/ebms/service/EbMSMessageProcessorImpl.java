@@ -68,10 +68,7 @@ public class EbMSMessageProcessorImpl implements EbMSMessageProcessor
 						return null;
 					}
 					else
-					{
-						EbMSBaseMessage response = null;
-						return response;
-					}
+						return getResponseMessage(messageHeader);
 				}
 				else
 				{
@@ -90,7 +87,7 @@ public class EbMSMessageProcessorImpl implements EbMSMessageProcessor
 					logger.info("Message valid.");
 					if (message.getAckRequested() != null)
 					{
-						EbMSAcknowledgment acknowledgment = createEbMSAcknowledgment(message,timestamp,hostname);
+						EbMSAcknowledgment acknowledgment = createEbMSAcknowledgment(message,timestamp);
 						if (message.getSyncReply() == null)
 						{
 							EbMSSendEvent sendEvent = EbMSMessageUtils.getEbMSSendEvent(ebMSDAO.getCPA(acknowledgment.getMessageHeader().getCPAId()),acknowledgment.getMessageHeader());
@@ -113,7 +110,7 @@ public class EbMSMessageProcessorImpl implements EbMSMessageProcessor
 				else
 				{
 					logger.warn("Message not valid.");
-					EbMSMessageError messageError = createEbMSMessageError(message,error,timestamp,hostname);
+					EbMSMessageError messageError = createEbMSMessageError(message,error,timestamp);
 					EbMSSendEvent sendEvent = EbMSMessageUtils.getEbMSSendEvent(ebMSDAO.getCPA(messageError.getMessageHeader().getCPAId()),messageError.getMessageHeader());
 					if (message.getSyncReply() == null)
 					{
@@ -165,17 +162,22 @@ public class EbMSMessageProcessorImpl implements EbMSMessageProcessor
 	}
 	
 	@Override
-	public EbMSStatusResponse process(EbMSStatusRequest statusRequest)
+	public EbMSBaseMessage process(EbMSStatusRequest statusRequest)
 	{
 		try
 		{
 			GregorianCalendar timestamp = new GregorianCalendar();
 			MessageHeader messageHeader = statusRequest.getMessageHeader();
 			CollaborationProtocolAgreement cpa = ebMSDAO.getCPA(messageHeader.getCPAId());
-			if (cpaValidator.validate(cpa,messageHeader,timestamp) != null)
-				return createEbMSStatusResponse(statusRequest,EbMSMessageStatus.UNAUTHORIZED);
+			EbMSStatusResponse statusResponse = createEbMSStatusResponse(statusRequest,cpaValidator.validate(cpa,messageHeader,timestamp) == null ? null : EbMSMessageStatus.UNAUTHORIZED);
+			if (statusRequest.getSyncReply() == null)
+			{
+				//TODO store statusResponse and sendEvent and add duplicate detection
+				//return null;
+				return createEbMSMessageError(statusRequest,EbMSMessageUtils.createError("//Header/SyncReply",Constants.EbMSErrorCode.NOT_SUPPORTED.errorCode(),"SyncReply mode not supported."),timestamp);
+			}
 			else
-				return createEbMSStatusResponse(statusRequest,null);
+				return statusResponse;
 		}
 		catch (Exception e)
 		{
@@ -184,10 +186,27 @@ public class EbMSMessageProcessorImpl implements EbMSMessageProcessor
 	}
 	
 	@Override
-	public EbMSPong process(EbMSPing message)
+	public EbMSBaseMessage process(EbMSPing ping)
 	{
-		// TODO Auto-generated method stub
-		return null;
+		try
+		{
+			GregorianCalendar timestamp = new GregorianCalendar();
+			MessageHeader messageHeader = ping.getMessageHeader();
+			CollaborationProtocolAgreement cpa = ebMSDAO.getCPA(messageHeader.getCPAId());
+			EbMSPong pong = cpaValidator.validate(cpa,messageHeader,timestamp) == null ? null : createEbMSPong(ping);
+			if (ping.getSyncReply() == null)
+			{
+				//TODO store pong and sendEvent and add duplicate detection
+				//return null;
+				return createEbMSMessageError(ping,EbMSMessageUtils.createError("//Header/SyncReply",Constants.EbMSErrorCode.NOT_SUPPORTED.errorCode(),"SyncReply mode not supported."),timestamp);
+			}
+			else
+				return pong;
+		}
+		catch (Exception e)
+		{
+			throw new RuntimeException(e);
+		}
 	}
 	
 	private boolean isDuplicate(MessageHeader messageHeader)
@@ -209,7 +228,12 @@ public class EbMSMessageProcessorImpl implements EbMSMessageProcessor
 		return ebMSDAO.getEbMSMessageResponseId(messageHeader.getMessageData().getMessageId());
 	}
 
-	private EbMSMessageError createEbMSMessageError(EbMSMessage message, Error error, GregorianCalendar timestamp, String hostname) throws DatatypeConfigurationException
+	private EbMSBaseMessage getResponseMessage(MessageHeader messageHeader)
+	{
+		return ebMSDAO.getEbMSMessageResponse(messageHeader.getMessageData().getMessageId());
+	}
+
+	private EbMSMessageError createEbMSMessageError(EbMSBaseMessage message, Error error, GregorianCalendar timestamp) throws DatatypeConfigurationException
 	{
 		MessageHeader messageHeader = EbMSMessageUtils.createMessageHeader(message.getMessageHeader(),hostname,timestamp,EbMSMessageType.MESSAGE_ERROR.action());
 		
@@ -226,7 +250,7 @@ public class EbMSMessageProcessorImpl implements EbMSMessageProcessor
 		return new EbMSMessageError(messageHeader,errorList);
 	}
 
-	private EbMSAcknowledgment createEbMSAcknowledgment(EbMSMessage message, GregorianCalendar timestamp, String hostname) throws DatatypeConfigurationException
+	private EbMSAcknowledgment createEbMSAcknowledgment(EbMSMessage message, GregorianCalendar timestamp) throws DatatypeConfigurationException
 	{
 		MessageHeader messageHeader = EbMSMessageUtils.createMessageHeader(message.getMessageHeader(),hostname,timestamp,EbMSMessageType.ACKNOWLEDGMENT.action());
 		
@@ -261,7 +285,7 @@ public class EbMSMessageProcessorImpl implements EbMSMessageProcessor
 			MessageHeader messageHeader = ebMSDAO.getMessageHeader(statusRequest.getStatusRequest().getRefToMessageId());
 			if (messageHeader == null || messageHeader.getService().getValue().equals(Constants.EBMS_SERVICE_URI))
 				status = EbMSMessageStatus.NOT_RECOGNIZED;
-			else if (messageHeader.getCPAId().equals(statusRequest.getMessageHeader().getCPAId()))
+			else if (!messageHeader.getCPAId().equals(statusRequest.getMessageHeader().getCPAId()))
 				status = EbMSMessageStatus.UNAUTHORIZED;
 			else
 			{
@@ -271,6 +295,11 @@ public class EbMSMessageProcessorImpl implements EbMSMessageProcessor
 			}
 		}
 		return EbMSMessageUtils.ebMSStatusRequestToEbMSStatusResponse(statusRequest,hostname,status,timestamp);
+	}
+
+	public EbMSPong createEbMSPong(EbMSPing ping) throws DatatypeConfigurationException
+	{
+		return EbMSMessageUtils.ebMSPingToEbMSPong(ping,hostname);
 	}
 
 	public void setEbMSDAO(EbMSDAO ebMSDAO)

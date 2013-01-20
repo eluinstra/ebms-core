@@ -20,9 +20,7 @@ import nl.clockwork.ebms.model.EbMSBaseMessage;
 import nl.clockwork.ebms.model.EbMSMessage;
 import nl.clockwork.ebms.model.EbMSMessageError;
 import nl.clockwork.ebms.model.EbMSPing;
-import nl.clockwork.ebms.model.EbMSPong;
 import nl.clockwork.ebms.model.EbMSStatusRequest;
-import nl.clockwork.ebms.model.EbMSStatusResponse;
 
 
 public interface EbMSMessageProcessor
@@ -30,6 +28,6 @@ public interface EbMSMessageProcessor
 	EbMSBaseMessage process(EbMSMessage message);
 	void process(EbMSMessageError messageError);
 	void process(EbMSAcknowledgment acknowledgment);
-	EbMSStatusResponse process(EbMSStatusRequest request);
-	EbMSPong process(EbMSPing message);
+	EbMSBaseMessage process(EbMSStatusRequest request);
+	EbMSBaseMessage process(EbMSPing message);
 }
