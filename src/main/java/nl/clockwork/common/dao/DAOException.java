@@ -15,7 +15,7 @@
  ******************************************************************************/
 package nl.clockwork.common.dao;
 
-public class DAOException extends Exception
+public class DAOException extends RuntimeException
 {
 
 	private static final long serialVersionUID = 1L;
