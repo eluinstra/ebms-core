@@ -440,6 +440,32 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	}
 	
 	@Override
+	public EbMSBaseMessage getEbMSMessageResponse(String messageId) throws DAOException
+	{
+		try
+		{
+			return simpleJdbcTemplate.queryForObject(
+				"select id, service, action, message_header, ack_requested, content" +
+				" from ebms_message" +
+				" where ref_to_message_id = ?" +
+				" and service = '" + Constants.EBMS_SERVICE_URI + "'" +
+				" and (action = '" + EbMSMessageType.MESSAGE_ERROR.action().getAction() + "'"  +
+				" or action = '" + EbMSMessageType.ACKNOWLEDGMENT.action().getAction() + "')",
+				new EbMSBaseMessageParameterizedRowMapper(),
+				messageId
+			);
+		}
+		catch(EmptyResultDataAccessException e)
+		{
+			return null;
+		}
+		catch (DataAccessException e)
+		{
+			throw new DAOException(e);
+		}
+	}
+	
+	@Override
 	public MessageHeader getMessageHeader(String messageId) throws DAOException
 	{
 		try
