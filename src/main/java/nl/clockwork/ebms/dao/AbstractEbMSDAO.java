@@ -61,6 +61,7 @@ import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionException;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 import org.springframework.transaction.support.TransactionTemplate;
@@ -758,14 +759,14 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 						}
 						catch (Exception e)
 						{
-							throw new RuntimeException(e);
+							throw new DAOException(e);
 						}
 					}
 	
 				}
 			);
 		}
-		catch (RuntimeException e)
+		catch (TransactionException e)
 		{
 			throw new DAOException(e);
 		}
@@ -833,14 +834,14 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 						}
 						catch (Exception e)
 						{
-							throw new RuntimeException(e);
+							throw new DAOException(e);
 						}
 					}
 	
 				}
 			);
 		}
-		catch (RuntimeException e)
+		catch (TransactionException e)
 		{
 			throw new DAOException(e);
 		}
@@ -938,14 +939,14 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 						}
 						catch (Exception e)
 						{
-							throw new RuntimeException(e);
+							throw new DAOException(e);
 						}
 					}
 	
 				}
 			);
 		}
-		catch (RuntimeException e)
+		catch (TransactionException e)
 		{
 			throw new DAOException(e);
 		}
@@ -1046,14 +1047,14 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 						}
 						catch (Exception e)
 						{
-							throw new RuntimeException(e);
+							throw new DAOException(e);
 						}
 					}
 	
 				}
 			);
 		}
-		catch (RuntimeException e)
+		catch (TransactionException e)
 		{
 			throw new DAOException(e);
 		}
@@ -1106,14 +1107,14 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 						}
 						catch (Exception e)
 						{
-							throw new RuntimeException(e);
+							throw new DAOException(e);
 						}
 					}
 	
 				}
 			);
 		}
-		catch (RuntimeException e)
+		catch (TransactionException e)
 		{
 			throw new DAOException(e);
 		}
@@ -1166,14 +1167,14 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 						}
 						catch (Exception e)
 						{
-							throw new RuntimeException(e);
+							throw new DAOException(e);
 						}
 					}
 	
 				}
 			);
 		}
-		catch (RuntimeException e)
+		catch (TransactionException e)
 		{
 			throw new DAOException(e);
 		}
