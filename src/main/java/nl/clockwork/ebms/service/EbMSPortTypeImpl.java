@@ -17,7 +17,7 @@ package nl.clockwork.ebms.service;
 
 import javax.xml.ws.Holder;
 
-import nl.clockwork.common.cxf.AttachmentManager;
+import nl.clockwork.ebms.AttachmentManager;
 import nl.clockwork.ebms.model.EbMSAcknowledgment;
 import nl.clockwork.ebms.model.EbMSMessage;
 import nl.clockwork.ebms.model.EbMSMessageError;

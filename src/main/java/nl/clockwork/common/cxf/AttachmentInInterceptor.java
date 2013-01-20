@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import nl.clockwork.ebms.AttachmentManager;
 import nl.clockwork.ebms.model.EbMSAttachment;
 
 import org.apache.cxf.binding.soap.SoapMessage;

@@ -5,7 +5,7 @@ import java.util.List;
 
 import javax.xml.ws.Holder;
 
-import nl.clockwork.common.cxf.AttachmentManager;
+import nl.clockwork.ebms.AttachmentManager;
 import nl.clockwork.ebms.dao.EbMSDAO;
 import nl.clockwork.ebms.model.EbMSAcknowledgment;
 import nl.clockwork.ebms.model.EbMSBaseMessage;

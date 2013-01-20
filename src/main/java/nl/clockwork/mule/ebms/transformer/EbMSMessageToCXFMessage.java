@@ -15,7 +15,7 @@
  ******************************************************************************/
 package nl.clockwork.mule.ebms.transformer;
 
-import nl.clockwork.common.cxf.AttachmentManager;
+import nl.clockwork.ebms.AttachmentManager;
 import nl.clockwork.ebms.model.EbMSMessage;
 
 import org.apache.commons.logging.Log;
