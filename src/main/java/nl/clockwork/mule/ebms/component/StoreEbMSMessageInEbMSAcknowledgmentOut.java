@@ -38,7 +38,7 @@ public class StoreEbMSMessageInEbMSAcknowledgmentOut extends Callable
 			EbMSMessage msg = (EbMSMessage)message.getProperty(Constants.EBMS_MESSAGE);
 			EbMSMessageStatus status = EbMSMessageStatus.get((String)message.getProperty(Constants.EBMS_MESSAGE_STATUS));
 			EbMSAcknowledgment ack = (EbMSAcknowledgment)message.getPayload();
-			EbMSSendEvent sendEvent = EbMSMessageUtils.getEbMSSendEvent(ebMSDAO.getCPA(msg.getMessageHeader().getCPAId()),msg.getMessageHeader());
+			EbMSSendEvent sendEvent = EbMSMessageUtils.getEbMSSendEvent(ebMSDAO.getCPA(ack.getMessageHeader().getCPAId()),ack.getMessageHeader());
 			ebMSDAO.insertMessage(msg,status,ack,sendEvent);
 		}
 		return message;

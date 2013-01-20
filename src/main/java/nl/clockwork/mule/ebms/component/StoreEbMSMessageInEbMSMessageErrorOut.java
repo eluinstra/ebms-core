@@ -38,7 +38,7 @@ public class StoreEbMSMessageInEbMSMessageErrorOut extends Callable
 			EbMSMessage msg = (EbMSMessage)message.getProperty(Constants.EBMS_MESSAGE);
 			EbMSMessageStatus status = EbMSMessageStatus.get((String)message.getProperty(Constants.EBMS_MESSAGE_STATUS));
 			EbMSMessageError msgError = (EbMSMessageError)message.getPayload();
-			EbMSSendEvent sendEvent = EbMSMessageUtils.getEbMSSendEvent(ebMSDAO.getCPA(msg.getMessageHeader().getCPAId()),msg.getMessageHeader());
+			EbMSSendEvent sendEvent = EbMSMessageUtils.getEbMSSendEvent(ebMSDAO.getCPA(msgError.getMessageHeader().getCPAId()),msgError.getMessageHeader());
 			ebMSDAO.insertMessage(msg,status,msgError,sendEvent);
 		}
 		return message;
