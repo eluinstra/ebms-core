@@ -15,52 +15,62 @@
  ******************************************************************************/
 package nl.clockwork.ebms.model;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 
-public class EbMSAttachment
+import javax.activation.DataSource;
+
+public class EbMSAttachment implements DataSource
 {
+	private DataSource dataSource;
+	private String contentId;
 	private String name;
-	private String contentType;
-	private byte[] content;
-
-	public EbMSAttachment()
+	
+	public EbMSAttachment(DataSource dataSource, String contentId)
 	{
+		this(dataSource,contentId,null);
 	}
 	
-	public EbMSAttachment(String name, String contentType, byte[] content)
+	public EbMSAttachment(DataSource dataSource, String contentId, String name)
 	{
-		this.name = name;
-		this.contentType = contentType;
-		this.content = content;
-	}
-	
-	public String getName()
-	{
-		return name;
-	}
-	
-	public void setName(String name)
-	{
+		this.dataSource = dataSource;
+		this.contentId = contentId;
 		this.name = name;
 	}
 	
+	@Override
 	public String getContentType()
 	{
-		return contentType;
+		return dataSource.getContentType();
 	}
 
-	public void setContentType(String contentType)
+	@Override
+	public InputStream getInputStream() throws IOException
 	{
-		this.contentType = contentType;
+		return dataSource.getInputStream();
+	}
+
+	@Override
+	public String getName()
+	{
+		return name == null ? dataSource.getName() : name;
+	}
+
+	@Override
+	public OutputStream getOutputStream() throws IOException
+	{
+		return dataSource.getOutputStream();
+	}
+
+	public DataSource getDataSource()
+	{
+		return dataSource;
 	}
 	
-	public byte[] getContent()
+	public String getContentId()
 	{
-		return content;
+		return contentId;
 	}
-	
-	public void setContent(byte[] content)
-	{
-		this.content = content;
-	}
-	
+
 }

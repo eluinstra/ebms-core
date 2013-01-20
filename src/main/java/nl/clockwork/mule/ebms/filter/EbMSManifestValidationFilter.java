@@ -15,10 +15,8 @@
  ******************************************************************************/
 package nl.clockwork.mule.ebms.filter;
 
-import javax.activation.DataSource;
-
 import nl.clockwork.ebms.Constants;
-import nl.clockwork.ebms.model.EbMSDataSource;
+import nl.clockwork.ebms.model.EbMSAttachment;
 import nl.clockwork.ebms.model.EbMSMessage;
 import nl.clockwork.ebms.model.ebxml.Manifest;
 import nl.clockwork.ebms.model.ebxml.Reference;
@@ -50,8 +48,8 @@ public class EbMSManifestValidationFilter implements Filter
 				if (reference.getHref().startsWith("cid:"))
 				{
 					boolean found = false;
-					for (DataSource dataSource : msg.getAttachments())
-						if (reference.getHref().substring("cid:".length()).equals(((EbMSDataSource)dataSource).getContentId()))
+					for (EbMSAttachment attachment: msg.getAttachments())
+						if (reference.getHref().substring("cid:".length()).equals(attachment.getContentId()))
 							found = true;
 					if (!found)
 					{

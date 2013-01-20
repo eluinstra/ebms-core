@@ -34,9 +34,9 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
-import nl.clockwork.ebms.model.EbMSDataSource;
+import nl.clockwork.ebms.model.EbMSAttachment;
 import nl.clockwork.mule.ebms.util.SecurityUtils;
-import nl.clockwork.mule.ebms.xmldsig.EbMSDataSourceResolver;
+import nl.clockwork.mule.ebms.xmldsig.EbMSAttachmentResolver;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -161,14 +161,14 @@ public class XMLSecSignatureOutInterceptor extends AbstractSoapInterceptor
 			super(clazz,phase);
 		}
 		
-		private void sign(KeyStore keyStore, KeyPair keyPair, String alias, Document document, List<EbMSDataSource> dataSources) throws XMLSecurityException, KeyStoreException
+		private void sign(KeyStore keyStore, KeyPair keyPair, String alias, Document document, List<EbMSAttachment> attachments) throws XMLSecurityException, KeyStoreException
 		{
 			XMLSignature signature = new XMLSignature(document,org.apache.xml.security.utils.Constants.SignatureSpecNS,XMLSignature.ALGO_ID_SIGNATURE_RSA_SHA1);
 	
 			Element soapHeader = getFirstChildElement(document.getDocumentElement());
 			soapHeader.appendChild(signature.getElement());
 			
-			EbMSDataSourceResolver resolver = new EbMSDataSourceResolver(dataSources);
+			EbMSAttachmentResolver resolver = new EbMSAttachmentResolver(attachments);
 			signature.getSignedInfo().addResourceResolver(resolver);
 				
 			Transforms transforms = new Transforms(document);
@@ -182,8 +182,8 @@ public class XMLSecSignatureOutInterceptor extends AbstractSoapInterceptor
 			
 			signature.addDocument("",transforms,org.apache.xml.security.utils.Constants.ALGO_ID_DIGEST_SHA1);
 			
-			for (EbMSDataSource dataSource : dataSources)
-				signature.addDocument("cid:" + dataSource.getContentId());
+			for (EbMSAttachment attachment : attachments)
+				signature.addDocument("cid:" + attachment.getContentId());
 			
 			signature.addKeyInfo(keyPair.getPublic());
 			
@@ -219,15 +219,15 @@ public class XMLSecSignatureOutInterceptor extends AbstractSoapInterceptor
 				dbf.setNamespaceAware(true);
 				Document document = dbf.newDocumentBuilder().parse(new ByteArrayInputStream(sb.toString().getBytes()));
 				
-				List<EbMSDataSource> dataSources = new ArrayList<EbMSDataSource>();
+				List<EbMSAttachment> attachments = new ArrayList<EbMSAttachment>();
 				if (message.getAttachments() != null)
 					for (Attachment attachment : message.getAttachments())
 					{
 						DataSource ds = attachment.getDataHandler().getDataSource();
-						dataSources.add(new EbMSDataSource(ds,attachment.getId(),attachment.getDataHandler().getName()));
+						attachments.add(new EbMSAttachment(ds,attachment.getId(),attachment.getDataHandler().getName()));
 					}
 	
-				sign(keyStore,keyPair,keyAlias,document,dataSources);
+				sign(keyStore,keyPair,keyAlias,document,attachments);
 	
 				OutputStream originalOs = (OutputStream)message.get(OUTPUT_STREAM_HOLDER);
 				Transformer transformer = TransformerFactory.newInstance().newTransformer();

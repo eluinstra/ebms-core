@@ -17,7 +17,7 @@ package nl.clockwork.mule.ebms.service.stub.transformer;
 
 import java.util.List;
 
-import nl.clockwork.ebms.model.EbMSAttachment;
+import nl.clockwork.ebms.model.EbMSDataSource;
 import nl.clockwork.ebms.model.EbMSMessageContent;
 import nl.clockwork.ebms.model.EbMSMessageContext;
 
@@ -25,13 +25,13 @@ import org.mule.api.MuleMessage;
 import org.mule.api.transformer.TransformerException;
 import org.mule.transformer.AbstractMessageAwareTransformer;
 
-public class EbMSAttachmentToEbMSMessageContent extends AbstractMessageAwareTransformer
+public class EbMSDataSourceToEbMSMessageContent extends AbstractMessageAwareTransformer
 {
 	private String cpaId;
 	private String service;
 	private String action;
 
-	public EbMSAttachmentToEbMSMessageContent()
+	public EbMSDataSourceToEbMSMessageContent()
 	{
 		registerSourceType(List.class);
 	}
@@ -41,7 +41,7 @@ public class EbMSAttachmentToEbMSMessageContent extends AbstractMessageAwareTran
 	{
 		try
 		{
-			return new EbMSMessageContent(new EbMSMessageContext(cpaId,service,action),(List<EbMSAttachment>)message.getPayload());
+			return new EbMSMessageContent(new EbMSMessageContext(cpaId,service,action),(List<EbMSDataSource>)message.getPayload());
 		}
 		catch (Exception e)
 		{

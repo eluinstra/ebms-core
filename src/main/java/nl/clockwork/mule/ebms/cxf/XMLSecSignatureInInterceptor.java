@@ -29,9 +29,9 @@ import java.util.List;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamReader;
 
-import nl.clockwork.ebms.model.EbMSDataSource;
+import nl.clockwork.ebms.model.EbMSAttachment;
 import nl.clockwork.mule.ebms.util.SecurityUtils;
-import nl.clockwork.mule.ebms.xmldsig.EbMSDataSourceResolver;
+import nl.clockwork.mule.ebms.xmldsig.EbMSAttachmentResolver;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -65,14 +65,14 @@ public class XMLSecSignatureInInterceptor extends AbstractSoapInterceptor
 		org.apache.xml.security.Init.init();
 	}
 
-	private boolean verify(KeyStore keyStore, Document document, List<EbMSDataSource> dataSources) throws XMLSignatureException, XMLSecurityException, CertificateExpiredException, CertificateNotYetValidException, KeyStoreException
+	private boolean verify(KeyStore keyStore, Document document, List<EbMSAttachment> attachments) throws XMLSignatureException, XMLSecurityException, CertificateExpiredException, CertificateNotYetValidException, KeyStoreException
 	{
 		NodeList nodeList = document.getElementsByTagNameNS(org.apache.xml.security.utils.Constants.SignatureSpecNS,org.apache.xml.security.utils.Constants._TAG_SIGNATURE);
 		if (nodeList.getLength() > 0)
 		{
 			XMLSignature signature = new XMLSignature((Element)nodeList.item(0),org.apache.xml.security.utils.Constants.SignatureSpecNS);
 	
-			EbMSDataSourceResolver resolver = new EbMSDataSourceResolver(dataSources);
+			EbMSAttachmentResolver resolver = new EbMSAttachmentResolver(attachments);
 			signature.addResourceResolver(resolver);
 	
 			X509Certificate certificate = signature.getKeyInfo().getX509Certificate();
@@ -120,12 +120,12 @@ public class XMLSecSignatureInInterceptor extends AbstractSoapInterceptor
 			XMLStreamReader copy = StaxUtils.createXMLStreamReader(document);
 			message.setContent(XMLStreamReader.class,copy);
 
-			List<EbMSDataSource> dataSources = new ArrayList<EbMSDataSource>();
+			List<EbMSAttachment> attachments = new ArrayList<EbMSAttachment>();
 			if (message.getAttachments() != null)
 				for (Attachment attachment : message.getAttachments())
-					dataSources.add(new EbMSDataSource(attachment.getDataHandler().getDataSource(),attachment.getId(),attachment.getDataHandler().getName()));
+					attachments.add(new EbMSAttachment(attachment.getDataHandler().getDataSource(),attachment.getId(),attachment.getDataHandler().getName()));
 
-			if (!verify(keyStore,document,dataSources))
+			if (!verify(keyStore,document,attachments))
 				throw new SoapFault("",new QName("InvalidSignature"));
 		}
 		catch (SoapFault e)

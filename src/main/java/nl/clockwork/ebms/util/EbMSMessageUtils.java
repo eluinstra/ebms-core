@@ -34,8 +34,8 @@ import nl.clockwork.ebms.Constants;
 import nl.clockwork.ebms.Constants.EbMSMessageStatus;
 import nl.clockwork.ebms.Constants.EbMSMessageType;
 import nl.clockwork.ebms.model.EbMSAction;
-import nl.clockwork.ebms.model.EbMSAttachment;
 import nl.clockwork.ebms.model.EbMSDataSource;
+import nl.clockwork.ebms.model.EbMSAttachment;
 import nl.clockwork.ebms.model.EbMSMessage;
 import nl.clockwork.ebms.model.EbMSMessageContent;
 import nl.clockwork.ebms.model.EbMSMessageContext;
@@ -234,14 +234,14 @@ public class EbMSMessageUtils
 		AckRequested ackRequested = createAckRequested(cpa,content.getContext());
 		
 		Manifest manifest = createManifest();
-		List<EbMSDataSource> attachments = new ArrayList<EbMSDataSource>();
+		List<EbMSAttachment> attachments = new ArrayList<EbMSAttachment>();
 		int i = 1;
-		for (EbMSAttachment attachment : content.getAttachments())
+		for (EbMSDataSource dataSource : content.getDataSources())
 		{
 			manifest.getReference().add(createReference(i));
-			ByteArrayDataSource ds = new ByteArrayDataSource(attachment.getContent(),attachment.getContentType());
-			ds.setName(attachment.getName());
-			attachments.add(new EbMSDataSource(ds,"" + i));
+			ByteArrayDataSource ds = new ByteArrayDataSource(dataSource.getContent(),dataSource.getContentType());
+			ds.setName(dataSource.getName());
+			attachments.add(new EbMSAttachment(ds,"" + i));
 			i++;
 		}
 
@@ -259,11 +259,10 @@ public class EbMSMessageUtils
 
 	public static EbMSMessageContent EbMSMessageToEbMSMessageContent(EbMSMessage message) throws IOException
 	{
-		List<EbMSAttachment> attachments = new ArrayList<EbMSAttachment>();
-		for (DataSource attachment : message.getAttachments())
-			attachments.add(new EbMSAttachment(attachment.getName(),attachment.getContentType(),IOUtils.toByteArray(attachment.getInputStream())));
-
-		return new EbMSMessageContent(new EbMSMessageContext(message.getMessageHeader()),attachments);
+		List<EbMSDataSource> dataSources = new ArrayList<EbMSDataSource>();
+		for (DataSource dataSource : message.getAttachments())
+			dataSources.add(new EbMSDataSource(dataSource.getName(),dataSource.getContentType(),IOUtils.toByteArray(dataSource.getInputStream())));
+		return new EbMSMessageContent(new EbMSMessageContext(message.getMessageHeader()),dataSources);
 	}
 
 	public static EbMSSendEvent getEbMSSendEvent(CollaborationProtocolAgreement cpa, MessageHeader messageHeader)

@@ -57,7 +57,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
-import nl.clockwork.ebms.model.EbMSDataSource;
+import nl.clockwork.ebms.model.EbMSAttachment;
 import nl.clockwork.mule.ebms.util.SecurityUtils;
 
 import org.apache.commons.codec.digest.DigestUtils;
@@ -162,7 +162,7 @@ public class XMLDSignatureOutInterceptor extends AbstractSoapInterceptor
 			//addBefore(StaxOutInterceptor.StaxOutEndingInterceptor.class.getName());
 		}
 		
-		private void sign(KeyStore keyStore, KeyPair keyPair, String alias, Document document, List<EbMSDataSource> dataSources) throws NoSuchAlgorithmException, InvalidAlgorithmParameterException, IOException, KeyException, MarshalException, XMLSignatureException, KeyStoreException
+		private void sign(KeyStore keyStore, KeyPair keyPair, String alias, Document document, List<EbMSAttachment> attachments) throws NoSuchAlgorithmException, InvalidAlgorithmParameterException, IOException, KeyException, MarshalException, XMLSignatureException, KeyStoreException
 		{
 			//XMLSignatureFactory signFactory = XMLSignatureFactory.getInstance("DOM");
 			XMLSignatureFactory signFactory = XMLSignatureFactory.getInstance();
@@ -178,8 +178,8 @@ public class XMLDSignatureOutInterceptor extends AbstractSoapInterceptor
 			List<Reference> references = new ArrayList<Reference>();
 			references.add(signFactory.newReference("",sha1DigestMethod,transforms,null,null));
 	
-			for (EbMSDataSource dataSource : dataSources)
-				references.add(signFactory.newReference("cid:" + dataSource.getContentId(),sha1DigestMethod,Collections.emptyList(),null,null,DigestUtils.sha(IOUtils.toByteArray(dataSource.getInputStream()))));
+			for (EbMSAttachment attachment : attachments)
+				references.add(signFactory.newReference("cid:" + attachment.getContentId(),sha1DigestMethod,Collections.emptyList(),null,null,DigestUtils.sha(IOUtils.toByteArray(attachment.getInputStream()))));
 	
 			SignedInfo signedInfo = signFactory.newSignedInfo(signFactory.newCanonicalizationMethod(CanonicalizationMethod.INCLUSIVE,(C14NMethodParameterSpec)null),signFactory.newSignatureMethod(SignatureMethod.RSA_SHA1,null),references);
 	
@@ -225,15 +225,15 @@ public class XMLDSignatureOutInterceptor extends AbstractSoapInterceptor
 				dbf.setNamespaceAware(true);
 				Document document = dbf.newDocumentBuilder().parse(new ByteArrayInputStream(sb.toString().getBytes()));
 				
-				List<EbMSDataSource> dataSources = new ArrayList<EbMSDataSource>();
+				List<EbMSAttachment> attachments = new ArrayList<EbMSAttachment>();
 				if (message.getAttachments() != null)
 					for (Attachment attachment : message.getAttachments())
 					{
 						DataSource ds = attachment.getDataHandler().getDataSource();
-						dataSources.add(new EbMSDataSource(ds,attachment.getId(),attachment.getDataHandler().getName()));
+						attachments.add(new EbMSAttachment(ds,attachment.getId(),attachment.getDataHandler().getName()));
 					}
 	
-				sign(keyStore,keyPair,keyAlias,document,dataSources);
+				sign(keyStore,keyPair,keyAlias,document,attachments);
 	
 				OutputStream originalOs = (OutputStream)message.get(OUTPUT_STREAM_HOLDER);
 				Transformer transformer = TransformerFactory.newInstance().newTransformer();

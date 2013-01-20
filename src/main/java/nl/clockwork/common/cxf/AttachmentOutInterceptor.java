@@ -19,7 +19,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import nl.clockwork.ebms.model.EbMSDataSource;
+import nl.clockwork.ebms.model.EbMSAttachment;
 
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.binding.soap.interceptor.AbstractSoapInterceptor;
@@ -37,10 +37,10 @@ public class AttachmentOutInterceptor extends AbstractSoapInterceptor
 	@Override
 	public void handleMessage(SoapMessage message) throws Fault
 	{
-		List<EbMSDataSource> dataSources = AttachmentManager.get();
+		List<EbMSAttachment> ebMSAttachments = AttachmentManager.get();
 		Collection<Attachment> attachments = new ArrayList<Attachment>();
-		for (EbMSDataSource dataSource : dataSources)
-			attachments.add(new nl.clockwork.common.cxf.Attachment(dataSource.getContentId(),dataSource));
+		for (EbMSAttachment attachment : ebMSAttachments)
+			attachments.add(new nl.clockwork.common.cxf.Attachment(attachment.getContentId(),attachment));
 	}
 
 }

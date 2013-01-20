@@ -34,7 +34,7 @@ public class EbMSMessageContentToMessageContent extends AbstractMessageAwareTran
 		try
 		{
 			EbMSMessageContent content = (EbMSMessageContent)message.getPayload();
-			return new String(content.getAttachments().get(0).getContent());
+			return new String(content.getDataSources().get(0).getContent());
 		}
 		catch (Exception e)
 		{

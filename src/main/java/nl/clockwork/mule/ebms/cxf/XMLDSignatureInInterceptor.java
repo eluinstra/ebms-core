@@ -39,8 +39,8 @@ import javax.xml.crypto.dsig.keyinfo.X509Data;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamReader;
 
-import nl.clockwork.ebms.model.EbMSDataSource;
-import nl.clockwork.mule.ebms.xmldsig.EbMSDataSourceURIDereferencer;
+import nl.clockwork.ebms.model.EbMSAttachment;
+import nl.clockwork.mule.ebms.xmldsig.EbMSAttachmentURIDereferencer;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -112,14 +112,14 @@ public class XMLDSignatureInInterceptor extends AbstractSoapInterceptor
   	}
 	}
 
-	private boolean verify(Document document, List<EbMSDataSource> dataSources) throws MarshalException, XMLSignatureException
+	private boolean verify(Document document, List<EbMSAttachment> attachments) throws MarshalException, XMLSignatureException
 	{
 		NodeList nodeList = document.getElementsByTagNameNS(XMLSignature.XMLNS,"Signature");
 		if (nodeList.getLength() > 0)
 		{
 			XMLSignatureFactory signFactory = XMLSignatureFactory.getInstance();
 			DOMValidateContext validateContext = new DOMValidateContext(new XMLDSigKeySelector(),nodeList.item(0));
-			URIDereferencer dereferencer = new EbMSDataSourceURIDereferencer(dataSources);
+			URIDereferencer dereferencer = new EbMSAttachmentURIDereferencer(attachments);
 			validateContext.setURIDereferencer(dereferencer);
 			XMLSignature signature = signFactory.unmarshalXMLSignature(validateContext);
 			return signature.validate(validateContext);
@@ -137,12 +137,12 @@ public class XMLDSignatureInInterceptor extends AbstractSoapInterceptor
 			XMLStreamReader copy = StaxUtils.createXMLStreamReader(document);
 			message.setContent(XMLStreamReader.class, copy);
 
-			List<EbMSDataSource> dataSources = new ArrayList<EbMSDataSource>();
+			List<EbMSAttachment> attachments = new ArrayList<EbMSAttachment>();
 			if (message.getAttachments() != null)
 				for (Attachment attachment : message.getAttachments())
-					dataSources.add(new EbMSDataSource(attachment.getDataHandler().getDataSource(),attachment.getId(),attachment.getDataHandler().getName()));
+					attachments.add(new EbMSAttachment(attachment.getDataHandler().getDataSource(),attachment.getId(),attachment.getDataHandler().getName()));
 
-			if (!verify(document,dataSources))
+			if (!verify(document,attachments))
 				throw new SoapFault("",new QName("InvalidSignature"));
 		}
 		catch (SoapFault e)

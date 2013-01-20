@@ -18,24 +18,24 @@ package nl.clockwork.common.cxf;
 import java.util.Collections;
 import java.util.List;
 
-import nl.clockwork.ebms.model.EbMSDataSource;
+import nl.clockwork.ebms.model.EbMSAttachment;
 
 public class AttachmentManager
 {
-	private static ThreadLocal<List<EbMSDataSource>> attachments = new ThreadLocal<List<EbMSDataSource>>()
+	private static ThreadLocal<List<EbMSAttachment>> attachments = new ThreadLocal<List<EbMSAttachment>>()
 	{
-		protected synchronized List<EbMSDataSource> initialValue()
+		protected synchronized List<EbMSAttachment> initialValue()
 		{
 			return Collections.emptyList();
 		}
 	};
 
-	public static void set(List<EbMSDataSource> attachments)
+	public static void set(List<EbMSAttachment> attachments)
 	{
 		AttachmentManager.attachments.set(attachments);
 	}
 
-	public static List<EbMSDataSource> get()
+	public static List<EbMSAttachment> get()
 	{
 		return attachments.get();
 	}

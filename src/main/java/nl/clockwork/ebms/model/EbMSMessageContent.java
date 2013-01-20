@@ -21,16 +21,16 @@ public class EbMSMessageContent
 {
 	private static final long serialVersionUID = 1L;
 	private EbMSMessageContext context;
-	private List<EbMSAttachment> attachments;
+	private List<EbMSDataSource> dataSources;
 
 	public EbMSMessageContent()
 	{
 	}
 	
-	public EbMSMessageContent(EbMSMessageContext context, List<EbMSAttachment> attachments)
+	public EbMSMessageContent(EbMSMessageContext context, List<EbMSDataSource> attachments)
 	{
 		this.context = context;
-		this.attachments = attachments;
+		this.dataSources = attachments;
 	}
 
 	public EbMSMessageContext getContext()
@@ -43,14 +43,14 @@ public class EbMSMessageContent
 		this.context = context;
 	}
 	
-	public List<EbMSAttachment> getAttachments()
+	public List<EbMSDataSource> getDataSources()
 	{
-		return attachments;
+		return dataSources;
 	}
 	
-	public void setAttachments(List<EbMSAttachment> attachments)
+	public void setDataSources(List<EbMSDataSource> dataSources)
 	{
-		this.attachments = attachments;
+		this.dataSources = dataSources;
 	}
 	
 }

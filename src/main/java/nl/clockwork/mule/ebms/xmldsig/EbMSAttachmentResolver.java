@@ -22,24 +22,24 @@ import java.util.List;
 
 import javax.activation.DataSource;
 
-import nl.clockwork.ebms.model.EbMSDataSource;
+import nl.clockwork.ebms.model.EbMSAttachment;
 
 import org.apache.xml.security.signature.XMLSignatureInput;
 import org.apache.xml.security.utils.resolver.ResourceResolverException;
 import org.apache.xml.security.utils.resolver.ResourceResolverSpi;
 import org.w3c.dom.Attr;
 
-public class EbMSDataSourceResolver extends ResourceResolverSpi
+public class EbMSAttachmentResolver extends ResourceResolverSpi
 {
-	private List<EbMSDataSource> dataSources = new ArrayList<EbMSDataSource>();
+	private List<EbMSAttachment> attachments = new ArrayList<EbMSAttachment>();
 
-	public EbMSDataSourceResolver()
+	public EbMSAttachmentResolver()
 	{
 	}
 	
-	public EbMSDataSourceResolver(List<EbMSDataSource> dataSources)
+	public EbMSAttachmentResolver(List<EbMSAttachment> attachments)
 	{
-		this.dataSources = dataSources;
+		this.attachments = attachments;
 	}
 
 	@Override
@@ -47,8 +47,8 @@ public class EbMSDataSourceResolver extends ResourceResolverSpi
 	{
 		String href = uri.getNodeValue();
 		if (href.startsWith("cid:"))
-			for (EbMSDataSource dataSource: dataSources)
-				if (href.substring("cid:".length()).equals(dataSource.getContentId()))
+			for (EbMSAttachment attachment: attachments)
+				if (href.substring("cid:".length()).equals(attachment.getContentId()))
 					return true;
 		return false;
 	}
@@ -62,10 +62,10 @@ public class EbMSDataSourceResolver extends ResourceResolverSpi
 			throw new ResourceResolverException(href,new Object[]{"Reference URI does not start with 'cid:'"},uri,baseUri);
 
 		DataSource result = null;
-		for (EbMSDataSource dataSource : dataSources)
-			if (href.substring("cid:".length()).equals(dataSource.getContentId()))
+		for (EbMSAttachment attachment : attachments)
+			if (href.substring("cid:".length()).equals(attachment.getContentId()))
 			{
-				result = dataSource;
+				result = attachment;
 				break;
 			}
 
@@ -92,9 +92,9 @@ public class EbMSDataSourceResolver extends ResourceResolverSpi
 		return input;
 	}
 
-	public List<EbMSDataSource> getDataSources()
+	public List<EbMSAttachment> getAttachments()
 	{
-		return dataSources;
+		return attachments;
 	}
 	
 }

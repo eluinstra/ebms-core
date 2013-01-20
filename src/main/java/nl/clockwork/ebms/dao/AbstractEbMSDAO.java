@@ -35,7 +35,7 @@ import nl.clockwork.ebms.Constants.EbMSMessageStatus;
 import nl.clockwork.ebms.Constants.EbMSMessageType;
 import nl.clockwork.ebms.model.EbMSAcknowledgment;
 import nl.clockwork.ebms.model.EbMSBaseMessage;
-import nl.clockwork.ebms.model.EbMSDataSource;
+import nl.clockwork.ebms.model.EbMSAttachment;
 import nl.clockwork.ebms.model.EbMSMessage;
 import nl.clockwork.ebms.model.EbMSMessageContext;
 import nl.clockwork.ebms.model.EbMSMessageError;
@@ -495,7 +495,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 		}
 	}
 
-	private List<EbMSDataSource> getAttachments(long messageId) throws DAOException
+	private List<EbMSAttachment> getAttachments(long messageId) throws DAOException
 	{
 		try
 		{
@@ -503,14 +503,14 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 				"select name, content_id, content_type, content" + 
 				" from ebms_attachment" + 
 				" where ebms_message_id = ?",
-				new ParameterizedRowMapper<EbMSDataSource>()
+				new ParameterizedRowMapper<EbMSAttachment>()
 				{
 					@Override
-					public EbMSDataSource mapRow(ResultSet rs, int rowNum) throws SQLException
+					public EbMSAttachment mapRow(ResultSet rs, int rowNum) throws SQLException
 					{
 						ByteArrayDataSource dataSource = new ByteArrayDataSource(rs.getBytes("content"),rs.getString("content_type"));
 						dataSource.setName(rs.getString("name"));
-						return new EbMSDataSource(dataSource,rs.getString("content_id"));
+						return new EbMSAttachment(dataSource,rs.getString("content_id"));
 					}
 				},
 				messageId
@@ -723,7 +723,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 									keyHolder
 							);
 					
-							for (EbMSDataSource attachment : message.getAttachments())
+							for (EbMSAttachment attachment : message.getAttachments())
 							{
 								simpleJdbcTemplate.update
 								(
@@ -813,7 +813,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 									keyHolder
 							);
 					
-							for (EbMSDataSource attachment : message.getAttachments())
+							for (EbMSAttachment attachment : message.getAttachments())
 							{
 								simpleJdbcTemplate.update
 								(
@@ -888,7 +888,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 									keyHolder
 							);
 					
-							for (EbMSDataSource attachment : message.getAttachments())
+							for (EbMSAttachment attachment : message.getAttachments())
 							{
 								simpleJdbcTemplate.update
 								(
@@ -993,7 +993,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 									keyHolder
 							);
 					
-							for (EbMSDataSource attachment : message.getAttachments())
+							for (EbMSAttachment attachment : message.getAttachments())
 							{
 								simpleJdbcTemplate.update
 								(

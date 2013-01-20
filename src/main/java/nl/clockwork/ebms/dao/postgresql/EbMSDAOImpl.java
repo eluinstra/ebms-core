@@ -30,7 +30,7 @@ import nl.clockwork.ebms.Constants;
 import nl.clockwork.ebms.Constants.EbMSMessageStatus;
 import nl.clockwork.ebms.dao.AbstractEbMSDAO;
 import nl.clockwork.ebms.model.EbMSAcknowledgment;
-import nl.clockwork.ebms.model.EbMSDataSource;
+import nl.clockwork.ebms.model.EbMSAttachment;
 import nl.clockwork.ebms.model.EbMSMessage;
 import nl.clockwork.ebms.model.EbMSMessageError;
 import nl.clockwork.ebms.model.EbMSSendEvent;
@@ -262,7 +262,7 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 									new IdExtractor()
 							);
 					
-							for (EbMSDataSource attachment : message.getAttachments())
+							for (EbMSAttachment attachment : message.getAttachments())
 							{
 								simpleJdbcTemplate.update
 								(
@@ -351,7 +351,7 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 									new IdExtractor()
 							);
 					
-							for (EbMSDataSource attachment : message.getAttachments())
+							for (EbMSAttachment attachment : message.getAttachments())
 							{
 								simpleJdbcTemplate.update
 								(
@@ -425,7 +425,7 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 									new IdExtractor()
 							);
 					
-							for (EbMSDataSource attachment : message.getAttachments())
+							for (EbMSAttachment attachment : message.getAttachments())
 							{
 								simpleJdbcTemplate.update
 								(
@@ -528,7 +528,7 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 									new IdExtractor()
 							);
 					
-							for (EbMSDataSource attachment : message.getAttachments())
+							for (EbMSAttachment attachment : message.getAttachments())
 							{
 								simpleJdbcTemplate.update
 								(

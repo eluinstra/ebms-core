@@ -22,7 +22,7 @@ import java.util.List;
 import javax.xml.datatype.DatatypeFactory;
 
 import nl.clockwork.common.util.XMLMessageBuilder;
-import nl.clockwork.ebms.model.EbMSAttachment;
+import nl.clockwork.ebms.model.EbMSDataSource;
 import nl.clockwork.ebms.model.EbMSMessageContent;
 import nl.clockwork.ebms.model.EbMSMessageContext;
 import nl.clockwork.mule.ebms.stub.ebf.model.afleveren.bericht.AfleverBericht;
@@ -50,7 +50,7 @@ public class AfleverBerichtToAfleverBevestiging extends AbstractMessageAwareTran
 		try
 		{
 			EbMSMessageContent content = (EbMSMessageContent)message.getPayload();
-			AfleverBericht afleverBericht = XMLMessageBuilder.getInstance(AfleverBericht.class).handle(new String(content.getAttachments().iterator().next().getContent()));
+			AfleverBericht afleverBericht = XMLMessageBuilder.getInstance(AfleverBericht.class).handle(new String(content.getDataSources().iterator().next().getContent()));
 			BevestigAfleverBericht afleverBevestiging = new BevestigAfleverBericht();
 
 			afleverBevestiging.setKenmerk(afleverBericht.getKenmerk());
@@ -62,10 +62,10 @@ public class AfleverBerichtToAfleverBevestiging extends AbstractMessageAwareTran
 			else
 				afleverBevestiging.setFout(error);
 
-			List<EbMSAttachment> attachments = new ArrayList<EbMSAttachment>();
-			attachments.add(new EbMSAttachment(name,"application/xml",XMLMessageBuilder.getInstance(BevestigAfleverBericht.class).handle(afleverBevestiging).getBytes()));
+			List<EbMSDataSource> dataSources = new ArrayList<EbMSDataSource>();
+			dataSources.add(new EbMSDataSource(name,"application/xml",XMLMessageBuilder.getInstance(BevestigAfleverBericht.class).handle(afleverBevestiging).getBytes()));
 
-			return new EbMSMessageContent(new EbMSMessageContext(cpaId,service,action,content.getContext().getConversationId()),attachments);
+			return new EbMSMessageContent(new EbMSMessageContext(cpaId,service,action,content.getContext().getConversationId()),dataSources);
 		}
 		catch (Exception e)
 		{

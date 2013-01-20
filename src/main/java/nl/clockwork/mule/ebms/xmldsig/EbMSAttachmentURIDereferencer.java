@@ -24,17 +24,17 @@ import javax.xml.crypto.URIReference;
 import javax.xml.crypto.URIReferenceException;
 import javax.xml.crypto.XMLCryptoContext;
 
-import nl.clockwork.ebms.model.EbMSDataSource;
+import nl.clockwork.ebms.model.EbMSAttachment;
 
 import org.apache.xml.security.signature.XMLSignatureInput;
 
-public class EbMSDataSourceURIDereferencer implements URIDereferencer
+public class EbMSAttachmentURIDereferencer implements URIDereferencer
 {
-	private List<EbMSDataSource> dataSources;
+	private List<EbMSAttachment> attachments;
 
-	public EbMSDataSourceURIDereferencer(List<EbMSDataSource> dataSources)
+	public EbMSAttachmentURIDereferencer(List<EbMSAttachment> attachments)
 	{
-		this.dataSources = dataSources;
+		this.attachments = attachments;
 	}
 
 	@Override
@@ -45,10 +45,10 @@ public class EbMSDataSourceURIDereferencer implements URIDereferencer
 			if (uriReference.getURI().startsWith("cid:"))
 			{
 				DataSource ds = null;
-				for (EbMSDataSource dataSource : dataSources)
-					if (uriReference.getURI().substring("cid:".length()).equals(dataSource.getContentId()))
+				for (EbMSAttachment attachment : attachments)
+					if (uriReference.getURI().substring("cid:".length()).equals(attachment.getContentId()))
 					{
-						ds = dataSource;
+						ds = attachment;
 						break;
 					}
 				if (ds == null)

@@ -33,24 +33,24 @@ public class EbMSMessage implements EbMSBaseMessage
 	private MessageOrder messageOrder;
 	private AckRequested ackRequested;
 	private Manifest manifest;
-	private List<EbMSDataSource> attachments;
+	private List<EbMSAttachment> attachments;
 
-	public EbMSMessage(MessageHeader messageHeader, AckRequested ackRequested, Manifest manifest, List<EbMSDataSource> attachments)
+	public EbMSMessage(MessageHeader messageHeader, AckRequested ackRequested, Manifest manifest, List<EbMSAttachment> attachments)
 	{
 		this(null,null,messageHeader,ackRequested,manifest,attachments);
 	}
 	
-	public EbMSMessage(byte[] message, SignatureType signature, MessageHeader messageHeader, AckRequested ackRequested, Manifest manifest, List<EbMSDataSource> attachments)
+	public EbMSMessage(byte[] message, SignatureType signature, MessageHeader messageHeader, AckRequested ackRequested, Manifest manifest, List<EbMSAttachment> attachments)
 	{
 		this(message,signature,messageHeader,null,null,ackRequested,manifest,attachments);
 	}
 	
-	public EbMSMessage(MessageHeader messageHeader, SyncReply syncReply, MessageOrder messageOrder, AckRequested ackRequested, Manifest manifest, List<EbMSDataSource> attachments)
+	public EbMSMessage(MessageHeader messageHeader, SyncReply syncReply, MessageOrder messageOrder, AckRequested ackRequested, Manifest manifest, List<EbMSAttachment> attachments)
 	{
 		this(null,null,messageHeader,syncReply,messageOrder,ackRequested,manifest,attachments);
 	}
 	
-	public EbMSMessage(byte[] original, SignatureType signature, MessageHeader messageHeader, SyncReply syncReply, MessageOrder messageOrder, AckRequested ackRequested, Manifest manifest, List<EbMSDataSource> attachments)
+	public EbMSMessage(byte[] original, SignatureType signature, MessageHeader messageHeader, SyncReply syncReply, MessageOrder messageOrder, AckRequested ackRequested, Manifest manifest, List<EbMSAttachment> attachments)
 	{
 		this.original = original;
 		this.signature = signature;
@@ -98,7 +98,7 @@ public class EbMSMessage implements EbMSBaseMessage
 		return manifest;
 	}
 	
-	public List<EbMSDataSource> getAttachments()
+	public List<EbMSAttachment> getAttachments()
 	{
 		return attachments;
 	}
