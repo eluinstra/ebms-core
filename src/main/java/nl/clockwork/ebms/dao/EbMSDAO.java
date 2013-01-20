@@ -15,6 +15,7 @@
  ******************************************************************************/
 package nl.clockwork.ebms.dao;
 
+import java.util.GregorianCalendar;
 import java.util.List;
 
 import nl.clockwork.common.dao.DAOException;
@@ -44,6 +45,11 @@ public interface EbMSDAO
 	MessageHeader getMessageHeader(String messageId) throws DAOException;
 	EbMSBaseMessage getMessage(long id) throws DAOException;
 	EbMSMessageStatus getMessageStatus(String messageId) throws DAOException;
+
+	List<EbMSSendEvent> selectEventsForSending(GregorianCalendar timestamp) throws DAOException;
+	void deleteEventsForSending(GregorianCalendar timestamp, String messageId) throws DAOException;
+	void deleteExpiredEvents(GregorianCalendar timestamp, String messageId) throws DAOException;
+
 	void insertMessage(EbMSMessage message, List<EbMSSendEvent> sendEvents) throws DAOException;
 	void insertMessage(EbMSMessage message, EbMSMessageStatus status) throws DAOException;
 	void insertMessage(EbMSMessage message, EbMSMessageStatus status, EbMSMessageError messageError, EbMSSendEvent sendEvent) throws DAOException;

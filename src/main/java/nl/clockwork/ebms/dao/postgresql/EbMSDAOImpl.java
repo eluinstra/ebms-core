@@ -24,14 +24,13 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import javax.activation.DataSource;
-
 import nl.clockwork.common.dao.DAOException;
 import nl.clockwork.common.util.XMLMessageBuilder;
 import nl.clockwork.ebms.Constants;
 import nl.clockwork.ebms.Constants.EbMSMessageStatus;
 import nl.clockwork.ebms.dao.AbstractEbMSDAO;
 import nl.clockwork.ebms.model.EbMSAcknowledgment;
+import nl.clockwork.ebms.model.EbMSDataSource;
 import nl.clockwork.ebms.model.EbMSMessage;
 import nl.clockwork.ebms.model.EbMSMessageError;
 import nl.clockwork.ebms.model.EbMSSendEvent;
@@ -263,18 +262,20 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 									new IdExtractor()
 							);
 					
-							for (DataSource attachment : message.getAttachments())
+							for (EbMSDataSource attachment : message.getAttachments())
 							{
 								simpleJdbcTemplate.update
 								(
 									"insert into ebms_attachment (" +
 									"ebms_message_id," +
 									"name," +
+									"content_id," +
 									"content_type," +
 									"content" +
 									") values (?,?,?,?)",
 									key,
 									attachment.getName() == null ? Constants.DEFAULT_FILENAME : attachment.getName(),
+									attachment.getContentId(),
 									attachment.getContentType().split(";")[0].trim(),
 									IOUtils.toByteArray(attachment.getInputStream())
 								);
@@ -350,18 +351,20 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 									new IdExtractor()
 							);
 					
-							for (DataSource attachment : message.getAttachments())
+							for (EbMSDataSource attachment : message.getAttachments())
 							{
 								simpleJdbcTemplate.update
 								(
 									"insert into ebms_attachment (" +
 									"ebms_message_id," +
 									"name," +
+									"content_id," +
 									"content_type," +
 									"content" +
 									") values (?,?,?,?)",
 									key,
 									attachment.getName() == null ? Constants.DEFAULT_FILENAME : attachment.getName(),
+									attachment.getContentId(),
 									attachment.getContentType().split(";")[0].trim(),
 									IOUtils.toByteArray(attachment.getInputStream())
 								);
@@ -422,18 +425,20 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 									new IdExtractor()
 							);
 					
-							for (DataSource attachment : message.getAttachments())
+							for (EbMSDataSource attachment : message.getAttachments())
 							{
 								simpleJdbcTemplate.update
 								(
 									"insert into ebms_attachment (" +
 									"ebms_message_id," +
 									"name," +
+									"content_id," +
 									"content_type," +
 									"content" +
 									") values (?,?,?,?)",
 									key,
 									attachment.getName() == null ? Constants.DEFAULT_FILENAME : attachment.getName(),
+									attachment.getContentId(),
 									attachment.getContentType().split(";")[0].trim(),
 									IOUtils.toByteArray(attachment.getInputStream())
 								);
@@ -523,18 +528,20 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 									new IdExtractor()
 							);
 					
-							for (DataSource attachment : message.getAttachments())
+							for (EbMSDataSource attachment : message.getAttachments())
 							{
 								simpleJdbcTemplate.update
 								(
 									"insert into ebms_attachment (" +
 									"ebms_message_id," +
 									"name," +
+									"content_id," +
 									"content_type," +
 									"content" +
 									") values (?,?,?,?)",
 									key,
 									attachment.getName() == null ? Constants.DEFAULT_FILENAME : attachment.getName(),
+									attachment.getContentId(),
 									attachment.getContentType().split(";")[0].trim(),
 									IOUtils.toByteArray(attachment.getInputStream())
 								);

@@ -576,6 +576,94 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 		}
 	}
 
+	@Override
+	public List<EbMSSendEvent> selectEventsForSending(GregorianCalendar timestamp) throws DAOException
+	{
+		try
+		{
+			return simpleJdbcTemplate.query(
+				"select ebms_message_id, max(time) as time" +
+				" from ebms_send_event" +
+				" where status = 0 " +
+				//" and time <= " + getTimestampFunction() +
+				" and time <= ?" +
+				" group by ebms_message_id",
+				new ParameterizedRowMapper<EbMSSendEvent>()
+				{
+					@Override
+					public EbMSSendEvent mapRow(ResultSet rs, int rowNum) throws SQLException
+					{
+						return new EbMSSendEvent(rs.getString("ebms_message_id"),rs.getDate("time"));
+					}
+				},
+				timestamp.getTime()
+			);
+		}
+		catch (DataAccessException e)
+		{
+			throw new DAOException(e);
+		}
+	}
+	
+	@Override
+	public void deleteEventsForSending(final GregorianCalendar timestamp, final String messageId) throws DAOException
+	{
+		try
+		{
+			transactionTemplate.execute(
+				new TransactionCallbackWithoutResult()
+				{
+	
+					@Override
+					public void doInTransactionWithoutResult(TransactionStatus transactionStatus)
+					{
+						simpleJdbcTemplate.update(
+							"update ebms_send_event set" +
+							" status = 1," +
+							" status_time=NOW()" +
+							" where ebms_message_id = ?" +
+							" and time = ?",
+							messageId,
+							timestamp.getTime()
+						);
+						simpleJdbcTemplate.update(
+							"delete from ebms_send_event" +
+							" where ebms_message_id=?" +
+							" and time < ?" +
+							"and status=0",
+							messageId,
+							timestamp.getTime()
+						);
+					}
+				}
+			);
+		}
+		catch (DataAccessException e)
+		{
+			throw new DAOException(e);
+		}
+	}
+	
+	@Override
+	public void deleteExpiredEvents(GregorianCalendar timestamp, String messageId) throws DAOException
+	{
+		try
+		{
+			simpleJdbcTemplate.update(
+				"delete from ebms_send_event" +
+				" where ebms_message_id=?" +
+				" and time < ?" +
+				"and status=0",
+				messageId,
+				timestamp.getTime()
+			);
+		}
+		catch (DataAccessException e)
+		{
+			throw new DAOException(e);
+		}
+	}
+
 	protected PreparedStatementCreator getEbMSMessagePreparedStatement(Date timestamp, String cpaId, String conversationId, String messageId, String refToMessageId, String fromRole, String toRole, String serviceType, String service, String action, String messageHeader, String content)
 	{
 		return new EbMSMessagePreparedStatement(timestamp,cpaId,conversationId,messageId,refToMessageId,fromRole,toRole,serviceType,service,action,messageHeader,content);
