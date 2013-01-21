@@ -37,7 +37,7 @@ public class EbMSMessageToCXFMessage extends AbstractMessageAwareTransformer
 	public Object transform(MuleMessage message, String outputEncoding) throws TransformerException
 	{
 		EbMSMessage msg = (EbMSMessage)message.getPayload();
-		message.setPayload(new Object[]{msg.getMessageHeader(),null,null,msg.getAckRequested(),msg.getManifest()});
+		message.setPayload(new Object[]{msg.getMessageHeader(),null,msg.getAckRequested(),null,null,msg.getManifest(),null,null});
 		AttachmentManager.set(msg.getAttachments());
 		return message;
 	}

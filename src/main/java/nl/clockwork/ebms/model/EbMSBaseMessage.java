@@ -16,8 +16,10 @@
 package nl.clockwork.ebms.model;
 
 import nl.clockwork.ebms.model.ebxml.MessageHeader;
+import nl.clockwork.ebms.model.ebxml.SyncReply;
 
 public interface EbMSBaseMessage
 {
-	public MessageHeader getMessageHeader();
+	MessageHeader getMessageHeader();
+	SyncReply getSyncReply();
 }

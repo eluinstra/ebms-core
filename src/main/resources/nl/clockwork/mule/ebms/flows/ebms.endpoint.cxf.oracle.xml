@@ -121,7 +121,7 @@
 			</inbound>
 			<outbound>
 				<pass-through-router>
-					<cxf:outbound-endpoint connector-ref="connector.cxf.ebms.out" protocolConnector="connector.http.ebms.out" address="${service.protocol}://${service.remote.host}:${service.remote.port}${service.remote.url}" clientClass="nl.clockwork.ebms.service.EbMS" wsdlPort="EbMSPort" wsdlLocation="classpath:/nl/clockwork/mule/ebms/wsdl/ebms.wsdl" operation="MessageError" enableMuleSoapHeaders="false" synchronous="true">
+					<cxf:outbound-endpoint connector-ref="connector.cxf.ebms.out" protocolConnector="connector.http.ebms.out" address="${service.protocol}://${service.remote.host}:${service.remote.port}${service.remote.url}" clientClass="nl.clockwork.ebms.service.EbMS" wsdlPort="EbMSPort" wsdlLocation="classpath:/nl/clockwork/mule/ebms/wsdl/ebms.wsdl" operation="Message" enableMuleSoapHeaders="false" synchronous="true">
 						<cxf:inInterceptors>
 							<spring:bean class="nl.clockwork.mule.ebms.cxf.LoggingInInterceptor" />
 						</cxf:inInterceptors>
@@ -142,7 +142,7 @@
 			</inbound>
 			<outbound>
 				<pass-through-router>
-					<cxf:outbound-endpoint connector-ref="connector.cxf.ebms.out" protocolConnector="connector.http.ebms.out" address="${service.protocol}://${service.remote.host}:${service.remote.port}${service.remote.url}" clientClass="nl.clockwork.ebms.service.EbMS" wsdlPort="EbMSPort" wsdlLocation="classpath:/nl/clockwork/mule/ebms/wsdl/ebms.wsdl" operation="Acknowledgment" enableMuleSoapHeaders="false" synchronous="true">
+					<cxf:outbound-endpoint connector-ref="connector.cxf.ebms.out" protocolConnector="connector.http.ebms.out" address="${service.protocol}://${service.remote.host}:${service.remote.port}${service.remote.url}" clientClass="nl.clockwork.ebms.service.EbMS" wsdlPort="EbMSPort" wsdlLocation="classpath:/nl/clockwork/mule/ebms/wsdl/ebms.wsdl" operation="Message" enableMuleSoapHeaders="false" synchronous="true">
 						<cxf:inInterceptors>
 							<spring:bean class="nl.clockwork.mule.ebms.cxf.LoggingInInterceptor" />
 						</cxf:inInterceptors>

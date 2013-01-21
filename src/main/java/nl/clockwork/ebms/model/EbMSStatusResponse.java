@@ -17,6 +17,7 @@ package nl.clockwork.ebms.model;
 
 import nl.clockwork.ebms.model.ebxml.MessageHeader;
 import nl.clockwork.ebms.model.ebxml.StatusResponse;
+import nl.clockwork.ebms.model.ebxml.SyncReply;
 
 public class EbMSStatusResponse implements EbMSBaseMessage
 {
@@ -33,6 +34,12 @@ public class EbMSStatusResponse implements EbMSBaseMessage
 	public MessageHeader getMessageHeader()
 	{
 		return messageHeader;
+	}
+	
+	@Override
+	public SyncReply getSyncReply()
+	{
+		return null;
 	}
 
 	public StatusResponse getStatusResponse()

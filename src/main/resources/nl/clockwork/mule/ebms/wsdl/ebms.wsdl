@@ -36,52 +36,35 @@
 
 	<wsdl:message name="Message">
 		<wsdl:part element="eb:MessageHeader" name="MessageHeader" />
+		<wsdl:part element="eb:MessageOrder" name="MessageOrder" />
+		<wsdl:part element="eb:AckRequested" name="AckRequested" />
+		<wsdl:part element="eb:ErrorList" name="ErrorList" />
+		<wsdl:part element="eb:Acknowledgment" name="Acknowledgment" />
+		<wsdl:part element="eb:Manifest" name="Manifest" />
+		<wsdl:part element="eb:StatusRequest" name="StatusRequest" />
+		<wsdl:part element="eb:StatusResponse" name="StatusResponse" />
+	</wsdl:message>
+	<wsdl:message name="MessageRequest">
+		<wsdl:part element="eb:MessageHeader" name="RequestMessageHeader" />
 		<wsdl:part element="eb:SyncReply" name="SyncReply" />
 		<wsdl:part element="eb:MessageOrder" name="MessageOrder" />
 		<wsdl:part element="eb:AckRequested" name="AckRequested" />
 		<wsdl:part element="eb:Manifest" name="Manifest" />
-	</wsdl:message>
-	<wsdl:message name="MessageError">
-		<wsdl:part element="eb:MessageHeader" name="MessageHeader" />
-		<wsdl:part element="eb:ErrorList" name="ErrorList" />
-	</wsdl:message>
-	<wsdl:message name="Acknowledgment">
-		<wsdl:part element="eb:MessageHeader" name="MessageHeader" />
-		<wsdl:part element="eb:Acknowledgment" name="Acknowledgment" />
-	</wsdl:message>
-	<wsdl:message name="StatusRequest">
-		<wsdl:part element="eb:MessageHeader" name="RequestMessageHeader" />
-		<wsdl:part element="eb:SyncReply" name="SyncReply" />
 		<wsdl:part element="eb:StatusRequest" name="StatusRequest" />
 	</wsdl:message>
-	<wsdl:message name="StatusResponse">
+	<wsdl:message name="MessageResponse">
 		<wsdl:part element="eb:MessageHeader" name="ResponseMessageHeader" />
+		<wsdl:part element="eb:ErrorList" name="ErrorList" />
+		<wsdl:part element="eb:Acknowledgment" name="Acknowledgment" />
 		<wsdl:part element="eb:StatusResponse" name="StatusResponse" />
-	</wsdl:message>
-	<wsdl:message name="Ping">
-		<wsdl:part element="eb:MessageHeader" name="RequestMessageHeader" />
-		<wsdl:part element="eb:SyncReply" name="SyncReply" />
-	</wsdl:message>
-	<wsdl:message name="Pong">
-		<wsdl:part element="eb:MessageHeader" name="ResponseMessageHeader" />
 	</wsdl:message>
 	<wsdl:portType name="EbMSPortType">
 		<wsdl:operation name="Message">
 			<wsdl:input message="tns:Message" />
 		</wsdl:operation>
-		<wsdl:operation name="MessageError">
-			<wsdl:input message="tns:MessageError" />
-		</wsdl:operation>
-		<wsdl:operation name="Acknowledgment">
-			<wsdl:input message="tns:Acknowledgment" />
-		</wsdl:operation>
-		<wsdl:operation name="MessageStatus">
-			<wsdl:input message="tns:StatusRequest" />
-			<wsdl:output message="tns:StatusResponse" />
-		</wsdl:operation>
-		<wsdl:operation name="Ping">
-			<wsdl:input message="tns:Ping" />
-			<wsdl:output message="tns:Pong" />
+		<wsdl:operation name="SyncMessage">
+			<wsdl:input message="tns:MessageRequest" />
+			<wsdl:output message="tns:MessageResponse" />
 		</wsdl:operation>
 	</wsdl:portType>
 	<wsdl:binding name="EbMSSOAPBinding" type="tns:EbMSPortType">
@@ -92,48 +75,36 @@
 				<mime:multipartRelated>
 					<mime:part>
 		 				<soap:header message="tns:Message" part="MessageHeader" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />          
-		 				<soap:header message="tns:Message" part="SyncReply" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" wsdl:required="false" />          
 		 				<soap:header message="tns:Message" part="MessageOrder" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" wsdl:required="false" />          
 		 				<soap:header message="tns:Message" part="AckRequested" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" wsdl:required="false" />          
-						<soap:body parts="Message" part="Manifest" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+				 		<soap:header message="tns:Message" part="ErrorList" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" wsdl:required="false" />          
+				 		<soap:header message="tns:Message" part="Acknowledgment" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" wsdl:required="false" />          
+						<soap:body parts="Message" part="Manifest" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" wsdl:required="false" />
+				 		<soap:body parts="Message" part="StatusRequest" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" wsdl:required="false" />          
+				 		<soap:body parts="Message" part="StatusResponse" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" wsdl:required="false" />          
 					</mime:part>				
 				</mime:multipartRelated>
 			</wsdl:input>
 		</wsdl:operation>
-		<wsdl:operation name="MessageError">
+		<wsdl:operation name="SyncMessage">
 			<soap:operation soapAction="ebXML" />
 			<wsdl:input>
- 				<soap:header message="tns:MessageError" part="MessageHeader" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />          
-		 		<soap:header message="tns:MessageError" part="ErrorList" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />          
-			</wsdl:input>
-		</wsdl:operation>
-		<wsdl:operation name="Acknowledgment">
-			<soap:operation soapAction="ebXML" />
-			<wsdl:input>
- 				<soap:header message="tns:Acknowledgment" part="MessageHeader" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />          
-		 		<soap:header message="tns:Acknowledgment" part="Acknowledgment" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" wsdl:required="false" />          
-			</wsdl:input>
-		</wsdl:operation>
-		<wsdl:operation name="MessageStatus">
-			<soap:operation soapAction="ebXML" />
-			<wsdl:input>
- 				<soap:header message="tns:StatusRequest" part="RequestMessageHeader" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />          
- 				<soap:header message="tns:StatusRequest" part="SyncReply" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" wsdl:required="false" />          
-		 		<soap:body parts="StatusRequest" part="StatusRequest" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />          
+				<mime:multipartRelated>
+					<mime:part>
+		 				<soap:header message="tns:MessageRequest" part="RequestMessageHeader" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />          
+		 				<soap:header message="tns:MessageRequest" part="SyncReply" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />          
+		 				<soap:header message="tns:MessageRequest" part="MessageOrder" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" wsdl:required="false" />          
+		 				<soap:header message="tns:MessageRequest" part="AckRequested" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" wsdl:required="false" />          
+						<soap:body parts="MessageRequest" part="Manifest" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" wsdl:required="false" />
+				 		<soap:body parts="MessageRequest" part="StatusRequest" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" wsdl:required="false" />          
+					</mime:part>				
+				</mime:multipartRelated>
 			</wsdl:input>
 			<wsdl:output>
- 				<soap:header message="tns:StatusResponse" part="ResponseMessageHeader" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />          
-		 		<soap:body parts="StatusResponse" part="StatusResponse" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />          
-			</wsdl:output>
-		</wsdl:operation>
-		<wsdl:operation name="Ping">
-			<soap:operation soapAction="ebXML" />
-			<wsdl:input>
- 				<soap:header message="tns:Ping" part="RequestMessageHeader" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />          
- 				<soap:header message="tns:Ping" part="SyncReply" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" wsdl:required="false" />          
-			</wsdl:input>
-			<wsdl:output>
- 				<soap:header message="tns:Pong" part="ResponseMessageHeader" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />          
+ 				<soap:header message="tns:MessageResponse" part="ResponseMessageHeader" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />          
+		 		<soap:header message="tns:MessageResponse" part="ErrorList" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" wsdl:required="false" />          
+		 		<soap:header message="tns:MessageResponse" part="Acknowledgment" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" wsdl:required="false" />          
+		 		<soap:body parts="tns:MessageResponse" part="StatusResponse" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" wsdl:required="false" />          
 			</wsdl:output>
 		</wsdl:operation>
 	</wsdl:binding>

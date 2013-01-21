@@ -18,12 +18,13 @@ package nl.clockwork.ebms.service;
 import javax.xml.ws.Holder;
 
 import nl.clockwork.ebms.AttachmentManager;
+import nl.clockwork.ebms.Constants;
+import nl.clockwork.ebms.Constants.EbMSMessageType;
 import nl.clockwork.ebms.model.EbMSAcknowledgment;
 import nl.clockwork.ebms.model.EbMSBaseMessage;
 import nl.clockwork.ebms.model.EbMSMessage;
 import nl.clockwork.ebms.model.EbMSMessageError;
 import nl.clockwork.ebms.model.EbMSPing;
-import nl.clockwork.ebms.model.EbMSPong;
 import nl.clockwork.ebms.model.EbMSStatusRequest;
 import nl.clockwork.ebms.model.EbMSStatusResponse;
 import nl.clockwork.ebms.model.ebxml.AckRequested;
@@ -48,52 +49,67 @@ public class EbMSPortTypeImpl implements EbMSPortType
   private EbMSMessageProcessor messageProcessor;
 
 	@Override
-	public void message(MessageHeader messageHeader, SyncReply syncReply, MessageOrder messageOrder, AckRequested ackRequested, Manifest manifest)
+	public void message(MessageHeader messageHeader, MessageOrder messageOrder, AckRequested ackRequested, ErrorList errorList, Acknowledgment acknowledgment, Manifest manifest, StatusRequest statusRequest, StatusResponse statusResponse)
 	{
-		messageProcessor.process(new EbMSMessage(MessageManager.get(),SignatureManager.get() == null ? null : SignatureManager.get(),messageHeader,syncReply,messageOrder,ackRequested,manifest,AttachmentManager.get()));
-	}
-
-	@Override
-	public void messageError(MessageHeader messageHeader, ErrorList errorList)
-	{
-		messageProcessor.process(new EbMSMessageError(messageHeader,errorList));
-	}
-
-	@Override
-	public void acknowledgment(MessageHeader messageHeader, Acknowledgment acknowledgment)
-	{
-		messageProcessor.process(new EbMSAcknowledgment(messageHeader,acknowledgment));
-	}
-
-	@Override
-	public void messageStatus(MessageHeader requestMessageHeader, SyncReply syncReply, StatusRequest statusRequest, Holder<MessageHeader> responseMessageHeader, Holder<StatusResponse> statusResponse)
-	{
-		EbMSBaseMessage response = messageProcessor.process(new EbMSStatusRequest(requestMessageHeader,syncReply,statusRequest));
-		if (response != null)
+		if (!Constants.EBMS_SERVICE_URI.equals(messageHeader.getService().getValue()))
+			messageProcessor.process(new EbMSMessage(MessageManager.get(),SignatureManager.get() == null ? null : SignatureManager.get(),messageHeader,null,messageOrder,ackRequested,manifest,AttachmentManager.get()));
+		else if (EbMSMessageType.MESSAGE_ERROR.action().equals(messageHeader.getAction()))
+			messageProcessor.process(new EbMSMessageError(messageHeader,errorList));
+		else if (EbMSMessageType.ACKNOWLEDGMENT.action().equals(messageHeader.getAction()))
+			messageProcessor.process(new EbMSAcknowledgment(messageHeader,acknowledgment));
+		else if (EbMSMessageType.STATUS_REQUEST.action().equals(messageHeader.getAction()))
 		{
-			if (response instanceof EbMSStatusResponse)
+			EbMSBaseMessage response = messageProcessor.process(new EbMSStatusRequest(messageHeader,null,statusRequest));
+			if (response != null)
 			{
-				responseMessageHeader.value = response.getMessageHeader();
-				statusResponse.value = ((EbMSStatusResponse)response).getStatusResponse();
+				if (response instanceof EbMSStatusResponse)
+				{
+					//messageHeader.value = response.getMessageHeader();
+					//statusResponse.value = ((EbMSStatusResponse)response).getStatusResponse();
+				}
 			}
 		}
-	}
-
-	@Override
-	public MessageHeader ping(MessageHeader messageHeader, SyncReply syncReply)
-	{
-		//FIXME check for NullPayload and return null??, response has to be the same as without fix (so empty)
-		try
+		else if (EbMSMessageType.STATUS_RESPONSE.action().equals(messageHeader.getAction()))
 		{
-			EbMSBaseMessage result = messageProcessor.process(new EbMSPing(messageHeader,syncReply));
-			if (result instanceof EbMSPong)
-				return result.getMessageHeader();
-			else
-				return null;
+			
 		}
-		catch (ClassCastException e)
+		else if (EbMSMessageType.PING.action().equals(messageHeader.getAction()))
 		{
-			return null;
+			//EbMSBaseMessage result = messageProcessor.process(new EbMSPing(messageHeader,null));
+			//if (result instanceof EbMSPong)
+				//return result.getMessageHeader();
+			//else
+				//return null;
+		}
+		else if (EbMSMessageType.PONG.action().equals(messageHeader.getAction()))
+		{
+			
+		}
+	}
+	
+	@Override
+	public void syncMessage(MessageHeader requestMessageHeader, SyncReply syncReply, MessageOrder messageOrder, AckRequested ackRequested, Manifest manifest, StatusRequest statusRequest, Holder<MessageHeader> responseMessageHeader, Holder<ErrorList> errorList, Holder<Acknowledgment> acknowledgment, Holder<StatusResponse> statusResponse)
+	{
+		if (!Constants.EBMS_SERVICE_URI.equals(requestMessageHeader.getService().getValue()))
+			messageProcessor.process(new EbMSMessage(MessageManager.get(),SignatureManager.get() == null ? null : SignatureManager.get(),requestMessageHeader,syncReply,messageOrder,ackRequested,manifest,AttachmentManager.get()));
+		else if (EbMSMessageType.STATUS_REQUEST.action().equals(requestMessageHeader.getAction()))
+		{
+			EbMSBaseMessage response = messageProcessor.process(new EbMSStatusRequest(requestMessageHeader,syncReply,statusRequest));
+			if (response != null)
+			{
+				responseMessageHeader.value = response.getMessageHeader();
+				if (response instanceof EbMSStatusResponse)
+				{
+					statusResponse.value = ((EbMSStatusResponse)response).getStatusResponse();
+				}
+			}
+		}
+		else if (EbMSMessageType.PING.action().equals(requestMessageHeader.getAction()))
+		{
+			EbMSBaseMessage response = messageProcessor.process(new EbMSPing(requestMessageHeader,syncReply));
+			responseMessageHeader.value = response.getMessageHeader();
+			if (response instanceof EbMSMessageError)
+				errorList.value = ((EbMSMessageError)response).getErrorList();
 		}
 	}
 
@@ -101,5 +117,6 @@ public class EbMSPortTypeImpl implements EbMSPortType
 	{
 		this.messageProcessor = messageProcessor;
 	}
-	
+
+
 }

@@ -12,8 +12,12 @@ import nl.clockwork.ebms.model.EbMSBaseMessage;
 import nl.clockwork.ebms.model.EbMSMessage;
 import nl.clockwork.ebms.model.EbMSMessageError;
 import nl.clockwork.ebms.model.EbMSPing;
+import nl.clockwork.ebms.model.EbMSPong;
 import nl.clockwork.ebms.model.EbMSSendEvent;
 import nl.clockwork.ebms.model.EbMSStatusRequest;
+import nl.clockwork.ebms.model.EbMSStatusResponse;
+import nl.clockwork.ebms.model.ebxml.Acknowledgment;
+import nl.clockwork.ebms.model.ebxml.ErrorList;
 import nl.clockwork.ebms.model.ebxml.MessageHeader;
 import nl.clockwork.ebms.model.ebxml.StatusResponse;
 import nl.clockwork.ebms.service.EbMSPortType;
@@ -38,20 +42,29 @@ public class ProcessSendEvents
   		{
   			AttachmentManager.set(((EbMSMessage)message).getAttachments());
   			//URLManager.set(url);
-  			ebMSPortType.message(message.getMessageHeader(),((EbMSMessage)message).getSyncReply(),((EbMSMessage)message).getMessageOrder(),((EbMSMessage)message).getAckRequested(),((EbMSMessage)message).getManifest());
+  			if (message.getSyncReply() == null)
+  				ebMSPortType.message(message.getMessageHeader(),((EbMSMessage)message).getMessageOrder(),((EbMSMessage)message).getAckRequested(),null,null,((EbMSMessage)message).getManifest(),null,null);
+  			else
+  				ebMSPortType.syncMessage(message.getMessageHeader(),message.getSyncReply(),((EbMSMessage)message).getMessageOrder(),((EbMSMessage)message).getAckRequested(),((EbMSMessage)message).getManifest(),null,new Holder<MessageHeader>(),new Holder<ErrorList>(),new Holder<Acknowledgment>(),new Holder<StatusResponse>());
   		}
   		else if (message instanceof EbMSMessageError)
-  			ebMSPortType.messageError(message.getMessageHeader(),((EbMSMessageError)message).getErrorList());
+  			ebMSPortType.message(message.getMessageHeader(),null,null,((EbMSMessageError)message).getErrorList(),null,null,null,null);
   		else if (message instanceof EbMSAcknowledgment)
-  			ebMSPortType.acknowledgment(message.getMessageHeader(),((EbMSAcknowledgment)message).getAcknowledgment());
+  			ebMSPortType.message(message.getMessageHeader(),null,null,null,((EbMSAcknowledgment)message).getAcknowledgment(),null,null,null);
   		else if (message instanceof EbMSStatusRequest)
-  			ebMSPortType.messageStatus(message.getMessageHeader(),((EbMSStatusRequest)message).getSyncReply(),((EbMSStatusRequest)message).getStatusRequest(),new Holder<MessageHeader>(), new Holder<StatusResponse>());
-  		//else if (message instanceof EbMSStatusResponse)
-  			//ebMSPortType.messageStatusResponse(message.getMessageHeader(),((EbMSStatusResponse)message).getStatusResponse());
+  			if (message.getSyncReply() == null)
+  				ebMSPortType.message(message.getMessageHeader(),null,null,null,null,null,((EbMSStatusRequest)message).getStatusRequest(),null);
+  			else
+  				ebMSPortType.syncMessage(message.getMessageHeader(),message.getSyncReply(),null,null,null,((EbMSStatusRequest)message).getStatusRequest(),new Holder<MessageHeader>(),new Holder<ErrorList>(),new Holder<Acknowledgment>(),new Holder<StatusResponse>());
+  		else if (message instanceof EbMSStatusResponse)
+  			ebMSPortType.message(message.getMessageHeader(),null,null,null,null,null,null,((EbMSStatusResponse)message).getStatusResponse());
   		else if (message instanceof EbMSPing)
-  			ebMSPortType.ping(message.getMessageHeader(),((EbMSPing)message).getSyncReply());
-  		//else if (message instanceof EbMSPong)
-  			//ebMSPortType.pong(message.getMessageHeader());
+  			if (message.getSyncReply() == null)
+  				ebMSPortType.message(message.getMessageHeader(),null,null,null,null,null,null,null);
+  			else
+  				ebMSPortType.syncMessage(message.getMessageHeader(),message.getSyncReply(),null,null,null,null,new Holder<MessageHeader>(),new Holder<ErrorList>(),new Holder<Acknowledgment>(),new Holder<StatusResponse>());
+  		else if (message instanceof EbMSPong)
+				ebMSPortType.message(message.getMessageHeader(),null,null,null,null,null,null,null);
   		ebMSDAO.deleteEventsForSending(timestamp,sendEvent.getEbMSMessageId());
   	}
   }

@@ -17,6 +17,7 @@ package nl.clockwork.ebms.model;
 
 import nl.clockwork.ebms.model.ebxml.ErrorList;
 import nl.clockwork.ebms.model.ebxml.MessageHeader;
+import nl.clockwork.ebms.model.ebxml.SyncReply;
 
 public class EbMSMessageError implements EbMSBaseMessage
 {
@@ -36,6 +37,12 @@ public class EbMSMessageError implements EbMSBaseMessage
 		return messageHeader;
 	}
 
+	@Override
+	public SyncReply getSyncReply()
+	{
+		return null;
+	}
+	
 	public ErrorList getErrorList()
 	{
 		return errorList;

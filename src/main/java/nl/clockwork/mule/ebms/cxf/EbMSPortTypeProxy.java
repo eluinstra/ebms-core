@@ -31,24 +31,7 @@ public class EbMSPortTypeProxy implements EbMSPortType
 	}
 
 	@Override
-	public void message(MessageHeader messageHeader, SyncReply syncReply, MessageOrder messageOrder, AckRequested ackRequested, Manifest manifest)
-	{
-//		EbMS service = new EbMS();
-//		EbMSPortType ebMSPortType = service.getEbMSPort();
-//		((BindingProvider)ebMSPortType).getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY,url);
-  	
-		Service service = Service.create(EbMS.SERVICE);
-		service.addPort(EbMS.EbMSPort,SOAPBinding.SOAP11HTTP_BINDING,url);
-		EbMSPortType ebMSPortType = service.getPort(EbMSPortType.class);
-  	
-		Client cxfClient = ClientProxy.getClient(ebMSPortType);
-		cxfClient.getOutInterceptors().add(new AttachmentOutInterceptor());
-
-		ebMSPortType.message(messageHeader,syncReply,messageOrder,ackRequested,manifest);
-	}
-
-	@Override
-	public void messageError(MessageHeader messageHeader, ErrorList errorList)
+	public void message(MessageHeader messageHeader, MessageOrder messageOrder, AckRequested ackRequested, ErrorList errorList, Acknowledgment acknowledgment, Manifest manifest, StatusRequest statusRequest, StatusResponse statusResponse)
 	{
 //		EbMS service = new EbMS();
 //		EbMSPortType ebMSPortType = service.getEbMSPort();
@@ -58,53 +41,32 @@ public class EbMSPortTypeProxy implements EbMSPortType
 		service.addPort(EbMS.EbMSPort,SOAPBinding.SOAP11HTTP_BINDING,url);
 		EbMSPortType ebMSPortType = service.getPort(EbMSPortType.class);
 		
-		ebMSPortType.messageError(messageHeader,errorList);
-	}
-
-	@Override
-	public void acknowledgment(MessageHeader messageHeader, Acknowledgment acknowledgment)
-	{
-//		EbMS service = new EbMS();
-//		EbMSPortType ebMSPortType = service.getEbMSPort();
-//		((BindingProvider)ebMSPortType).getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY,url);
-
-		Service service = Service.create(EbMS.SERVICE);
-		service.addPort(EbMS.EbMSPort,SOAPBinding.SOAP11HTTP_BINDING,url);
-		EbMSPortType ebMSPortType = service.getPort(EbMSPortType.class);
-
-		ebMSPortType.acknowledgment(messageHeader,acknowledgment);
-	}
-
-	@Override
-	public void messageStatus(MessageHeader requestMessageHeader, SyncReply syncReply, StatusRequest statusRequest, Holder<MessageHeader> responseMessageHeader, Holder<StatusResponse> statusResponse)
-	{
-//		EbMS service = new EbMS();
-//		EbMSPortType ebMSPortType = service.getEbMSPort();
-//		((BindingProvider)ebMSPortType).getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY,url);
-
-		Service service = Service.create(EbMS.SERVICE);
-		service.addPort(EbMS.EbMSPort,SOAPBinding.SOAP11HTTP_BINDING,url);
-		EbMSPortType ebMSPortType = service.getPort(EbMSPortType.class);
-
-		ebMSPortType.messageStatus(requestMessageHeader,syncReply,statusRequest,responseMessageHeader,statusResponse);
-	}
-
-	@Override
-	public MessageHeader ping(MessageHeader requestMessageHeader, SyncReply syncReply)
-	{
-//		EbMS service = new EbMS();
-//		EbMSPortType ebMSPortType = service.getEbMSPort();
-//		((BindingProvider)ebMSPortType).getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY,url);
-
-		Service service = Service.create(EbMS.SERVICE);
-		service.addPort(EbMS.EbMSPort,SOAPBinding.SOAP11HTTP_BINDING,url);
-		EbMSPortType ebMSPortType = service.getPort(EbMSPortType.class);
-
-		return ebMSPortType.ping(requestMessageHeader,syncReply);
-	}
+		Client cxfClient = ClientProxy.getClient(ebMSPortType);
+		cxfClient.getOutInterceptors().add(new AttachmentOutInterceptor());
 	
+		ebMSPortType.message(messageHeader,messageOrder,ackRequested,errorList,acknowledgment,manifest,statusRequest,statusResponse);
+	}
+
+	@Override
+	public void syncMessage(MessageHeader requestMessageHeader, SyncReply syncReply, MessageOrder messageOrder, AckRequested ackRequested, Manifest manifest, StatusRequest statusRequest, Holder<MessageHeader> responseMessageHeader, Holder<ErrorList> errorList, Holder<Acknowledgment> acknowledgment, Holder<StatusResponse> statusResponse)
+	{
+//		EbMS service = new EbMS();
+//		EbMSPortType ebMSPortType = service.getEbMSPort();
+//		((BindingProvider)ebMSPortType).getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY,url);
+
+		Service service = Service.create(EbMS.SERVICE);
+		service.addPort(EbMS.EbMSPort,SOAPBinding.SOAP11HTTP_BINDING,url);
+		EbMSPortType ebMSPortType = service.getPort(EbMSPortType.class);
+		
+		Client cxfClient = ClientProxy.getClient(ebMSPortType);
+		cxfClient.getOutInterceptors().add(new AttachmentOutInterceptor());
+	
+		ebMSPortType.syncMessage(requestMessageHeader,syncReply,messageOrder,ackRequested,manifest,statusRequest,responseMessageHeader,errorList,acknowledgment,statusResponse);
+	}
+
 	public void setUrl(String url)
 	{
 		this.url = url;
 	}
+
 }

@@ -48,7 +48,7 @@ public class InvokeEbMSMessage extends Callable
 			String url = "http://localhost:63081/greeter";
 			((BindingProvider)ebMS).getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY,url);
 
-			ebMS.message(msg.getMessageHeader(),msg.getSyncReply(),msg.getMessageOrder(),msg.getAckRequested(),msg.getManifest());
+			ebMS.message(msg.getMessageHeader(),msg.getMessageOrder(),msg.getAckRequested(),null,null,msg.getManifest(),null,null);
 		}
 		return message;
 	}
