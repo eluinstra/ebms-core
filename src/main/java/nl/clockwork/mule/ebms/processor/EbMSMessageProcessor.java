@@ -13,14 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  ******************************************************************************/
-package nl.clockwork.ebms.service;
+package nl.clockwork.mule.ebms.processor;
 
-import nl.clockwork.ebms.model.EbMSStatusRequest;
-import nl.clockwork.ebms.model.EbMSStatusResponse;
+import nl.clockwork.ebms.model.EbMSMessage;
 
 
-public interface EbMSMessageStatusProcessor
+public interface EbMSMessageProcessor
 {
-	EbMSStatusResponse process(EbMSStatusRequest request);
-
+	void process(EbMSMessage message);
 }

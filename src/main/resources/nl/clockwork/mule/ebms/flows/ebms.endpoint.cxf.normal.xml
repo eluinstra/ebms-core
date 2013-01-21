@@ -55,20 +55,20 @@
 				</cxf:inbound-endpoint>
 			</inbound>
 			<component>
-				<singleton-object class="nl.clockwork.ebms.service.EbMSPortTypeImpl" />
-				<binding interface="nl.clockwork.ebms.service.EbMSMessageProcessor" method="process">
+				<singleton-object class="nl.clockwork.mule.ebms.service.EbMSPortTypeImpl" />
+				<binding interface="nl.clockwork.mule.ebms.processor.EbMSMessageProcessor" method="process">
 					<vm:outbound-endpoint path="ebms.message.receive.in" synchronous="true"/>
 				</binding>
-				<binding interface="nl.clockwork.ebms.service.EbMSMessageErrorProcessor" method="process">
+				<binding interface="nl.clockwork.mule.ebms.processor.EbMSMessageErrorProcessor" method="process">
 					<vm:outbound-endpoint path="ebms.messageError.receive.in" synchronous="true"/>
 				</binding>
-				<binding interface="nl.clockwork.ebms.service.EbMSAcknowledgmentProcessor" method="process">
+				<binding interface="nl.clockwork.mule.ebms.processor.EbMSAcknowledgmentProcessor" method="process">
 					<vm:outbound-endpoint path="ebms.acknowledgment.receive.in" synchronous="true"/>
 				</binding>
-				<binding interface="nl.clockwork.ebms.service.EbMSMessageStatusProcessor" method="process">
+				<binding interface="nl.clockwork.mule.ebms.processor.EbMSMessageStatusProcessor" method="process">
 					<vm:outbound-endpoint path="ebms.statusRequest.receive.in" synchronous="true"/>
 				</binding>
-				<binding interface="nl.clockwork.ebms.service.EbMSPingProcessor" method="process">
+				<binding interface="nl.clockwork.mule.ebms.processor.EbMSPingProcessor" method="process">
 					<vm:outbound-endpoint path="ebms.ping.receive.in" synchronous="true"/>
 				</binding>
 			</component>

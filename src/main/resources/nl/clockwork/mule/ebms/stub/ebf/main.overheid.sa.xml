@@ -47,8 +47,8 @@
 			<property name="locations"> 
 				<list>
 					<value>classpath:nl/clockwork/mule/ebms/default.properties</value>   
-					<value>classpath:nl/clockwork/mule/ebms/adapter/service/default.properties</value>   
-					<value>file:${user.home}/.ebms-adapter/ebms.service.properties</value>
+					<value>classpath:nl/clockwork/mule/ebms/stub/ebf/default.overheid.properties</value>   
+					<value>file:${user.home}/.ebms-stub/ebf.overheid.properties</value>
 				</list>
 			</property>
 		</bean>
@@ -66,11 +66,23 @@
 		<!--import resource="classpath:nl/clockwork/ebms/dao/mssql.xml" /-->
 		<!--import resource="classpath:nl/clockwork/ebms/dao/oracle.xml" /-->
 
-		<import resource="classpath:nl/clockwork/mule/ebms/flows/ebms.endpoint.cxf.normal.xml" />
+		<import resource="classpath:nl/clockwork/ebms/processor.xml" />
+
+		<import resource="classpath:nl/clockwork/mule/ebms/flows/file.cpa.xml" />
+		<!--import resource="classpath:nl/clockwork/mule/ebms/flows/file.sql.xml" /-->
+
+		<import resource="classpath:nl/clockwork/mule/ebms/flows/ebms.endpoint.cxf.normal.sa.xml" />
 		<!--import resource="classpath:nl/clockwork/mule/ebms/flows/ebms.endpoint.cxf.oracle.xml" /-->
 		<import resource="classpath:nl/clockwork/mule/ebms/flows/ebms.receive.xml" />
 		<import resource="classpath:nl/clockwork/mule/ebms/flows/ebms.send.xml" />
-		<import resource="classpath:nl/clockwork/mule/ebms/flows/ebms.content.adapter.cxf.xml" />
+		<import resource="classpath:nl/clockwork/mule/ebms/flows/ebms.content.adapter.vm.xml" />
+
+		<import resource="components/constants.xml" />
+		<import resource="components/connector.xml" />
+		<import resource="flows/overheid.stub.routing.xml" />
+		<import resource="flows/afleverService.stub.processing.xml" />
+		<import resource="flows/aanleverService.stub.request.xml" />
+		<import resource="flows/aanleverService.stub.response.xml" />
 
 	</spring:beans>
 

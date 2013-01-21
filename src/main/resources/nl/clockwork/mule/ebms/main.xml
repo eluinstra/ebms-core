@@ -57,8 +57,8 @@
 		<import resource="classpath:nl/clockwork/mule/ebms/components/connector.${ebms.protocol}.xml" />
 		<import resource="classpath:nl/clockwork/mule/ebms/components/connector.xml" />
 
-		<import resource="classpath:nl/clockwork/mule/ebms/components/datasource.xml" />
-		<import resource="classpath:nl/clockwork/mule/ebms/components/${ebms.database}.xml" />
+		<import resource="classpath:nl/clockwork/ebms/dao/datasource.xml" />
+		<import resource="classpath:nl/clockwork/ebms/dao/${ebms.database}.xml" />
 
 		<import resource="classpath:nl/clockwork/mule/ebms/flows/ebms.endpoint.cxf.${ebms.mode}.xml" />
 		<import resource="classpath:nl/clockwork/mule/ebms/flows/ebms.receive.xml" />

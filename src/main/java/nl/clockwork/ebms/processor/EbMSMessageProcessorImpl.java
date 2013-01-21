@@ -1,4 +1,4 @@
-package nl.clockwork.ebms.service;
+package nl.clockwork.ebms.processor;
 
 import java.util.GregorianCalendar;
 
@@ -47,6 +47,15 @@ public class EbMSMessageProcessorImpl implements EbMSMessageProcessor
   private MessageHeaderValidator messageHeaderValidator;
   private ManifestValidator manifestValidator;
   private SignatureValidator signatureValidator;
+  
+	public EbMSMessageProcessorImpl(EbMSDAO ebMSDAO)
+	{
+		this.ebMSDAO = ebMSDAO;
+		cpaValidator = new CPAValidator();
+		messageHeaderValidator = new MessageHeaderValidator(ebMSDAO);
+		manifestValidator = new ManifestValidator();
+		signatureValidator = new SignatureValidator();
+	}
 
 	@Override
 	public EbMSBaseMessage process(EbMSMessage message)
@@ -302,11 +311,6 @@ public class EbMSMessageProcessorImpl implements EbMSMessageProcessor
 	public EbMSPong createEbMSPong(EbMSPing ping) throws DatatypeConfigurationException
 	{
 		return EbMSMessageUtils.ebMSPingToEbMSPong(ping,hostname);
-	}
-
-	public void setEbMSDAO(EbMSDAO ebMSDAO)
-	{
-		this.ebMSDAO = ebMSDAO;
 	}
 
 }

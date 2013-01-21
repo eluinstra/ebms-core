@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  ******************************************************************************/
-package nl.clockwork.ebms.service;
+package nl.clockwork.mule.ebms.service;
 
 import javax.xml.ws.Holder;
 
@@ -34,8 +34,14 @@ import nl.clockwork.ebms.model.ebxml.MessageOrder;
 import nl.clockwork.ebms.model.ebxml.StatusRequest;
 import nl.clockwork.ebms.model.ebxml.StatusResponse;
 import nl.clockwork.ebms.model.ebxml.SyncReply;
+import nl.clockwork.ebms.service.EbMSPortType;
 import nl.clockwork.mule.ebms.cxf.MessageManager;
 import nl.clockwork.mule.ebms.cxf.SignatureManager;
+import nl.clockwork.mule.ebms.processor.EbMSAcknowledgmentProcessor;
+import nl.clockwork.mule.ebms.processor.EbMSMessageErrorProcessor;
+import nl.clockwork.mule.ebms.processor.EbMSMessageProcessor;
+import nl.clockwork.mule.ebms.processor.EbMSMessageStatusProcessor;
+import nl.clockwork.mule.ebms.processor.EbMSPingProcessor;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
