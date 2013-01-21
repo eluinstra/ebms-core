@@ -50,6 +50,11 @@ public class MessageHeaderValidator
 	private SyncReplyModeType syncReplyMode;// = SyncReplyModeType.NONE;
 	private EbMSDAO ebMSDAO;
 
+	public MessageHeaderValidator(EbMSDAO ebMSDAO)
+	{
+		this.ebMSDAO = ebMSDAO;
+	}
+
 	public Error validate(CollaborationProtocolAgreement cpa, MessageHeader messageHeader, AckRequested ackRequested, SyncReply syncReply, MessageOrder messageOrder, GregorianCalendar timestamp)
 	{
 		//ErrorList result = new ErrorList();
@@ -156,7 +161,7 @@ public class MessageHeaderValidator
 	
 	private boolean existsRefToMessageId(String refToMessageId)
 	{
-		return ebMSDAO.existsMessage(refToMessageId);
+		return refToMessageId == null || ebMSDAO.existsMessage(refToMessageId);
 	}
 	
 	private boolean checkTimeToLive(MessageHeader messageHeader, GregorianCalendar timestamp)

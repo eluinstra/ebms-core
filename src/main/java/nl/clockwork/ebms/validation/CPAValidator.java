@@ -44,7 +44,7 @@ public class CPAValidator
 
 	private boolean cpaExists(CollaborationProtocolAgreement cpa, MessageHeader messageHeader)
 	{
-		return cpa == null || !cpa.getCpaid().equals(messageHeader.getCPAId());
+		return cpa != null && cpa.getCpaid().equals(messageHeader.getCPAId());
 	}
 	
 }
