@@ -52,6 +52,7 @@ public class ProcessSendEvents
   			ebMSPortType.ping(message.getMessageHeader(),((EbMSPing)message).getSyncReply());
   		//else if (message instanceof EbMSPong)
   			//ebMSPortType.pong(message.getMessageHeader());
+  		ebMSDAO.deleteEventsForSending(timestamp,sendEvent.getMessageId());
   	}
   }
 }
