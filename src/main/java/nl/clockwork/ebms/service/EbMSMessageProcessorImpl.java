@@ -105,7 +105,8 @@ public class EbMSMessageProcessorImpl implements EbMSMessageProcessor
 						ebMSDAO.insertMessage(message,EbMSMessageStatus.RECEIVED,(EbMSAcknowledgment)null,(EbMSSendEvent)null);
 						return null;
 					}
-					//return /*message.getAckRequested() == null || */message.getSyncReply() == null ? null : acknowledgment;
+					//ebMSDAO.insertMessage(message,EbMSMessageStatus.RECEIVED,message.getAckRequested() == null ? (EbMSAcknowledgment)null : acknowledgment,message.getSyncReply() != null ? (EbMSSendEvent)null : sendEvent);
+					//return message.getAckRequested() == null || message.getSyncReply() == null ? null : acknowledgment;
 				}
 				else
 				{
@@ -122,6 +123,7 @@ public class EbMSMessageProcessorImpl implements EbMSMessageProcessor
 						ebMSDAO.insertMessage(message,EbMSMessageStatus.FAILED,messageError,null);
 						return messageError;
 					}
+					//ebMSDAO.insertMessage(message,EbMSMessageStatus.FAILED,messageError,message.getSyncReply() != null ? null : sendEvent);
 					//return message.getSyncReply() == null ? null : messageError;
 				}
 			}

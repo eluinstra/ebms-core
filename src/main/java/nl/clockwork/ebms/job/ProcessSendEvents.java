@@ -37,6 +37,7 @@ public class ProcessSendEvents
   		if (message instanceof EbMSMessage)
   		{
   			AttachmentManager.set(((EbMSMessage)message).getAttachments());
+  			//URLManager.set(url);
   			ebMSPortType.message(message.getMessageHeader(),((EbMSMessage)message).getSyncReply(),((EbMSMessage)message).getMessageOrder(),((EbMSMessage)message).getAckRequested(),((EbMSMessage)message).getManifest());
   		}
   		else if (message instanceof EbMSMessageError)
