@@ -41,8 +41,9 @@ public class AttachmentInInterceptor extends AbstractSoapInterceptor
 	{
 		Collection<Attachment> attachments = message.getAttachments();
 		List<EbMSAttachment> ebMSAttachments = new ArrayList<EbMSAttachment>();
-		for (Attachment attachment : attachments)
-			ebMSAttachments.add(new EbMSAttachment(attachment.getDataHandler().getDataSource(),attachment.getId(),attachment.getDataHandler().getName()));
+		if (attachments != null)
+			for (Attachment attachment : attachments)
+				ebMSAttachments.add(new EbMSAttachment(attachment.getDataHandler().getDataSource(),attachment.getId(),attachment.getDataHandler().getName()));
 		AttachmentManager.set(ebMSAttachments);
 	}
 
