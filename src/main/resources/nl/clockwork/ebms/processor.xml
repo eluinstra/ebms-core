@@ -23,9 +23,9 @@
 		<constructor-arg ref="ebMSDAO"/>
 	</bean>
 
-	<!--bean id="processSendEvents" class="nl.clockwork.ebms.job.ProcessSendEvents">
-		<property name="ebMSDAO" ref="ebMSDAO"/>
-		<property name="ebMSPortType" ref=""/>
-	</bean-->
+<!--	<bean id="processSendEvents" class="nl.clockwork.ebms.job.ProcessSendEvents">-->
+<!--		<property name="ebMSDAO" ref="ebMSDAO"/>-->
+<!--		<property name="ebMSPortType" ref="ebMSPortType"/>-->
+<!--	</bean>-->
 
 </beans>

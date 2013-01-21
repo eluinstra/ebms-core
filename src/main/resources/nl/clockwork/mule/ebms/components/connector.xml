@@ -22,6 +22,7 @@
 	xmlns:https="http://www.mulesource.org/schema/mule/https/2.2"
 	xmlns:cxf="http://www.mulesource.org/schema/mule/cxf/2.2"
 	xmlns:jdbc="http://www.mulesource.org/schema/mule/jdbc/2.2"
+	xmlns:quartz="http://www.mulesource.org/schema/mule/quartz/2.2"
 	xmlns:file="http://www.mulesource.org/schema/mule/file/2.2" 
 	xsi:schemaLocation="
 		http://www.mulesource.org/schema/mule/core/2.2 http://www.mulesource.org/schema/mule/core/2.2/mule.xsd
@@ -30,6 +31,7 @@
 		http://www.mulesource.org/schema/mule/https/2.2 http://www.mulesource.org/schema/mule/https/2.2/mule-https.xsd
 		http://www.mulesource.org/schema/mule/cxf/2.2 http://www.mulesource.org/schema/mule/cxf/2.2/mule-cxf.xsd
 		http://www.mulesource.org/schema/mule/jdbc/2.2 http://www.mulesource.org/schema/mule/jdbc/2.2/mule-jdbc.xsd
+		http://www.mulesource.org/schema/mule/quartz/2.2 http://www.mulesource.org/schema/mule/quartz/2.2/mule-quartz.xsd
 		http://www.mulesource.org/schema/mule/file/2.2 http://www.mulesource.org/schema/mule/file/2.2/mule-file.xsd
 	"
 >
@@ -51,6 +53,15 @@
 		<jdbc:query key="selectEbMSMessageForProcessing" value-ref="selectEbMSMessageForProcessing" /> 
 		<jdbc:query key="selectEbMSMessageForProcessing.ack" value-ref="selectEbMSMessageForProcessing.ack" /> 
 	</jdbc:connector>
+
+<!--	<quartz:connector name="connector.quartz.ebms" scheduler-ref="scheduler">-->
+<!--		<quartz:factory-property key="org.quartz.scheduler.instanceName" value="EbMSScheduler"/>-->
+<!--		<quartz:factory-property key="org.quartz.threadPool.class" value="org.quartz.simpl.SimpleThreadPool"/>-->
+<!--		<quartz:factory-property key="org.quartz.threadPool.threadCount" value="3"/>-->
+<!--		<quartz:factory-property key="org.quartz.scheduler.rmi.proxy" value="false"/>-->
+<!--		<quartz:factory-property key="org.quartz.scheduler.rmi.export" value="false"/>-->
+<!--		<quartz:factory-property key="org.quartz.jobStore.class" value="org.quartz.simpl.RAMJobStore"/>-->
+<!--	</quartz:connector>-->
 
 	<file:connector name="connector.file.ebms">
 		<file:expression-filename-parser/>
