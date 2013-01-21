@@ -42,6 +42,7 @@ public class AttachmentOutInterceptor extends AbstractSoapInterceptor
 		Collection<Attachment> attachments = new ArrayList<Attachment>();
 		for (EbMSAttachment attachment : ebMSAttachments)
 			attachments.add(new nl.clockwork.common.cxf.Attachment(attachment.getContentId(),attachment));
+		message.setAttachments(attachments);
 	}
 
 }
