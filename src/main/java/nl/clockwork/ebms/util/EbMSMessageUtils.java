@@ -267,7 +267,7 @@ public class EbMSMessageUtils
 
 	public static EbMSSendEvent getEbMSSendEvent(CollaborationProtocolAgreement cpa, MessageHeader messageHeader)
 	{
-		return new EbMSSendEvent(messageHeader.getMessageData().getMessageId(),messageHeader.getMessageData().getTimestamp().toGregorianCalendar().getTime());
+		return new EbMSSendEvent(messageHeader.getMessageData().getTimestamp().toGregorianCalendar().getTime());
 	}
 
 	public static List<EbMSSendEvent> getEbMSSendEvents(CollaborationProtocolAgreement cpa, MessageHeader messageHeader)
@@ -279,7 +279,7 @@ public class EbMSMessageUtils
 		{
 			for (int i = 0; i < rm.getRetries().intValue() + 1; i++)
 			{
-				result.add(new EbMSSendEvent(messageHeader.getMessageData().getMessageId(),(Date)sendTime.clone()));
+				result.add(new EbMSSendEvent((Date)sendTime.clone()));
 				rm.getRetryInterval().addTo(sendTime);
 			}
 		}

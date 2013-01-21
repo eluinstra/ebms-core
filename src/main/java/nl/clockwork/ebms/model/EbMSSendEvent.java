@@ -19,18 +19,24 @@ import java.util.Date;
 
 public class EbMSSendEvent
 {
-	private String messageId;
+	private Long ebMSMessageId;
 	private Date time;
-	
-	public EbMSSendEvent(String messageId, Date time)
+
+	public EbMSSendEvent(Date time)
 	{
-		this.messageId = messageId;
+		this(null,time);
+	}
+
+	
+	public EbMSSendEvent(Long ebMSMessageId, Date time)
+	{
+		this.ebMSMessageId = ebMSMessageId;
 		this.time = time;
 	}
 
-	public String getMessageId()
+	public Long getEbMSMessageId()
 	{
-		return messageId;
+		return ebMSMessageId;
 	}
 	
 	public Date getTime()

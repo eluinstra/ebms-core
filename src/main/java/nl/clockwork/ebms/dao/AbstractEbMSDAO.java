@@ -593,7 +593,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 					@Override
 					public EbMSSendEvent mapRow(ResultSet rs, int rowNum) throws SQLException
 					{
-						return new EbMSSendEvent(rs.getString("ebms_message_id"),rs.getDate("time"));
+						return new EbMSSendEvent(rs.getLong("ebms_message_id"),rs.getDate("time"));
 					}
 				},
 				timestamp.getTime()
@@ -606,7 +606,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	}
 	
 	@Override
-	public void deleteEventsForSending(final GregorianCalendar timestamp, final String messageId) throws DAOException
+	public void deleteEventsForSending(final GregorianCalendar timestamp, final Long id) throws DAOException
 	{
 		try
 		{
@@ -623,7 +623,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 							" status_time=NOW()" +
 							" where ebms_message_id = ?" +
 							" and time = ?",
-							messageId,
+							id,
 							timestamp.getTime()
 						);
 						simpleJdbcTemplate.update(
@@ -631,7 +631,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 							" where ebms_message_id=?" +
 							" and time < ?" +
 							"and status=0",
-							messageId,
+							id,
 							timestamp.getTime()
 						);
 					}
@@ -645,7 +645,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	}
 	
 	@Override
-	public void deleteExpiredEvents(GregorianCalendar timestamp, String messageId) throws DAOException
+	public void deleteExpiredEvents(GregorianCalendar timestamp, Long id) throws DAOException
 	{
 		try
 		{
@@ -654,7 +654,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 				" where ebms_message_id=?" +
 				" and time < ?" +
 				"and status=0",
-				messageId,
+				id,
 				timestamp.getTime()
 			);
 		}
