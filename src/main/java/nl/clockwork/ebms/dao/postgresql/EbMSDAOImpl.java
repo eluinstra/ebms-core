@@ -272,7 +272,7 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 									"content_id," +
 									"content_type," +
 									"content" +
-									") values (?,?,?,?)",
+									") values (?,?,?,?,?)",
 									key,
 									attachment.getName() == null ? Constants.DEFAULT_FILENAME : attachment.getName(),
 									attachment.getContentId(),
@@ -361,7 +361,7 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 									"content_id," +
 									"content_type," +
 									"content" +
-									") values (?,?,?,?)",
+									") values (?,?,?,?,?)",
 									key,
 									attachment.getName() == null ? Constants.DEFAULT_FILENAME : attachment.getName(),
 									attachment.getContentId(),
@@ -435,7 +435,7 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 									"content_id," +
 									"content_type," +
 									"content" +
-									") values (?,?,?,?)",
+									") values (?,?,?,?,?)",
 									key,
 									attachment.getName() == null ? Constants.DEFAULT_FILENAME : attachment.getName(),
 									attachment.getContentId(),
@@ -538,7 +538,7 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 									"content_id," +
 									"content_type," +
 									"content" +
-									") values (?,?,?,?)",
+									") values (?,?,?,?,?)",
 									key,
 									attachment.getName() == null ? Constants.DEFAULT_FILENAME : attachment.getName(),
 									attachment.getContentId(),

@@ -732,7 +732,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 										"content_id," +
 										"content_type," +
 										"content" +
-									") values (?,?,?,?)",
+									") values (?,?,?,?,?)",
 									keyHolder.getKey().longValue(),
 									attachment.getName() == null ? Constants.DEFAULT_FILENAME : attachment.getName(),
 									attachment.getContentId(),
@@ -822,7 +822,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 										"content_id," +
 										"content_type," +
 										"content" +
-									") values (?,?,?,?)",
+									") values (?,?,?,?,?)",
 									keyHolder.getKey().longValue(),
 									attachment.getName() == null ? Constants.DEFAULT_FILENAME : attachment.getName(),
 									attachment.getContentId(),
@@ -897,7 +897,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 										"content_id," +
 										"content_type," +
 										"content" +
-									") values (?,?,?,?)",
+									") values (?,?,?,?,?)",
 									keyHolder.getKey().longValue(),
 									attachment.getName() == null ? Constants.DEFAULT_FILENAME : attachment.getName(),
 									attachment.getContentId(),
@@ -1002,7 +1002,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 										"content_id," +
 										"content_type," +
 										"content" +
-									") values (?,?,?,?)",
+									") values (?,?,?,?,?)",
 									keyHolder.getKey().longValue(),
 									attachment.getName() == null ? Constants.DEFAULT_FILENAME : attachment.getName(),
 									attachment.getContentId(),
