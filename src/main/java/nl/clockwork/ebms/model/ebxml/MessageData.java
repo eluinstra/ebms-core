@@ -24,7 +24,7 @@ import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import javax.xml.datatype.XMLGregorianCalendar;
 
-import nl.clockwork.mule.ebms.cxf.EbMSDateTimeAdapter;
+import nl.clockwork.common.jaxb.EbMSDateTimeAdapter;
 
 
 /**
