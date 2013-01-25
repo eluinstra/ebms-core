@@ -16,12 +16,7 @@
 package nl.clockwork.ebms.service.b;
 
 import nl.clockwork.ebms.AttachmentManager;
-import nl.clockwork.ebms.model.EbMSAcknowledgment;
-import nl.clockwork.ebms.model.EbMSBaseMessage;
 import nl.clockwork.ebms.model.EbMSMessage;
-import nl.clockwork.ebms.model.EbMSMessageError;
-import nl.clockwork.ebms.model.EbMSPing;
-import nl.clockwork.ebms.model.EbMSStatusRequest;
 import nl.clockwork.ebms.model.ebxml.AckRequested;
 import nl.clockwork.ebms.model.ebxml.Acknowledgment;
 import nl.clockwork.ebms.model.ebxml.ErrorList;
@@ -46,28 +41,25 @@ public class EbMSPortTypeImpl implements EbMSPortType
 	@Override
 	public void messageRequest(MessageHeader messageHeader, SyncReply syncReply, MessageOrder messageOrder, AckRequested ackRequested, Manifest manifest)
 	{
-		messageProcessor.process(new EbMSMessage(MessageManager.get(),SignatureManager.get() == null ? null : SignatureManager.get(),messageHeader,syncReply,messageOrder,ackRequested,manifest,AttachmentManager.get()));
+		messageProcessor.process(new EbMSMessage(MessageManager.get(),SignatureManager.get(),messageHeader,syncReply,messageOrder,ackRequested,manifest,AttachmentManager.get()));
 	}
 
 	@Override
 	public void messageResponse(MessageHeader messageHeader, SyncReply syncReply, ErrorList errorList, Acknowledgment acknowledgment)
 	{
-		messageProcessor.process(new EbMSMessageError(messageHeader,errorList));
-		messageProcessor.process(new EbMSAcknowledgment(messageHeader,acknowledgment));
-		EbMSBaseMessage result = messageProcessor.process(new EbMSPing(messageHeader,syncReply));
-		//EbMSBaseMessage result = messageProcessor.process(new EbMSPong(messageHeader));
+		messageProcessor.process(new EbMSMessage(messageHeader,syncReply,errorList,acknowledgment));
 	}
 
 	@Override
 	public void statusRequest(MessageHeader messageHeader, SyncReply syncReply, StatusRequest statusRequest)
 	{
-		EbMSBaseMessage response = messageProcessor.process(new EbMSStatusRequest(messageHeader,syncReply,statusRequest));
+		messageProcessor.process(new EbMSMessage(messageHeader,syncReply,statusRequest));
 	}
 
 	@Override
 	public void statusResponse(MessageHeader messageHeader, StatusResponse statusResponse)
 	{
-		//EbMSBaseMessage response = messageProcessor.process(new EbMSStatusResponse(messageHeader,statusResponse));
+		messageProcessor.process(new EbMSMessage(messageHeader,statusResponse));
 	}
 
 	public void setMessageProcessor(EbMSMessageProcessor messageProcessor)
