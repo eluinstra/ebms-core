@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!--
+  Copyright 2011 Clockwork
+  
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+  
+    http://www.apache.org/licenses/LICENSE-2.0
+  
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+<wsdl:definitions 
+	name="EbMS"
+	targetNamespace="http://www.clockwork.nl/ebms/1.0"
+	xmlns:tns="http://www.clockwork.nl/ebms/1.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	xmlns:xmime="http://www.w3.org/2005/05/xmlmime"
+	xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+	xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" 
+	xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/"
+	xmlns:eb="http://www.oasis-open.org/committees/ebxml-msg/schema/msg-header-2_0.xsd"
+	xsi:schemaLocation="http://schemas.xmlsoap.org/soap/envelope/ http://www.oasis-open.org/committees/ebxml-msg/schema/envelope.xsd"
+>
+
+	<wsdl:types>
+		<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+			<xsd:import namespace="http://www.oasis-open.org/committees/ebxml-msg/schema/msg-header-2_0.xsd" schemaLocation="../../xsd/msg-header-2_0.xsd" />
+		</xsd:schema>    	
+	</wsdl:types>
+
+	<wsdl:message name="Message">
+		<wsdl:part element="eb:MessageHeader" name="MessageHeader" />
+		<wsdl:part element="eb:SyncReply" name="SyncReply" />
+		<wsdl:part element="eb:MessageOrder" name="MessageOrder" />
+		<wsdl:part element="eb:AckRequested" name="AckRequested" />
+		<wsdl:part element="eb:ErrorList" name="ErrorList" />
+		<wsdl:part element="eb:Acknowledgment" name="Acknowledgment" />
+		<wsdl:part element="eb:Manifest" name="Manifest" />
+	</wsdl:message>
+	<wsdl:message name="StatusRequest">
+		<wsdl:part element="eb:MessageHeader" name="MessageHeader" />
+		<wsdl:part element="eb:SyncReply" name="SyncReply" />
+		<wsdl:part element="eb:StatusRequest" name="StatusRequest" />
+	</wsdl:message>
+	<wsdl:message name="StatusResponse">
+		<wsdl:part element="eb:MessageHeader" name="MessageHeader" />
+		<wsdl:part element="eb:StatusResponse" name="StatusResponse" />
+	</wsdl:message>
+	<wsdl:portType name="EbMSPortType">
+		<wsdl:operation name="Message">
+			<wsdl:input message="tns:Message" />
+		</wsdl:operation>
+		<wsdl:operation name="MessageStatus">
+			<wsdl:input message="tns:StatusRequest" />
+			<wsdl:output message="tns:StatusResponse" />
+		</wsdl:operation>
+	</wsdl:portType>
+	<wsdl:binding name="EbMSSOAPBinding" type="tns:EbMSPortType">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http" />
+		<wsdl:operation name="Message">
+			<soap:operation soapAction="ebXML" />
+			<wsdl:input>
+				<mime:multipartRelated>
+					<mime:part>
+		 				<soap:header message="tns:Message" part="MessageHeader" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+		 				<soap:header message="tns:Message" part="SyncReply" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" wsdl:required="false" />
+		 				<soap:header message="tns:Message" part="MessageOrder" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" wsdl:required="false" />
+		 				<soap:header message="tns:Message" part="AckRequested" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" wsdl:required="false" />
+				 		<soap:header message="tns:Message" part="ErrorList" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />          
+				 		<soap:header message="tns:Message" part="Acknowledgment" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" wsdl:required="false" />
+						<soap:body parts="Manifest" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+					</mime:part>				
+				</mime:multipartRelated>
+			</wsdl:input>
+		</wsdl:operation>
+		<wsdl:operation name="StatusRequest">
+			<soap:operation soapAction="ebXML" />
+			<wsdl:input>
+ 				<soap:header message="tns:StatusRequest" part="MessageHeader" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+ 				<soap:header message="tns:StatusRequest" part="SyncReply" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" wsdl:required="false" />
+		 		<soap:body parts="StatusRequest" part="StatusRequest" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+			</wsdl:input>
+		</wsdl:operation>
+		<wsdl:operation name="StatusResponse">
+			<soap:operation soapAction="ebXML" />
+			<wsdl:input>
+ 				<soap:header message="tns:StatusResponse" part="MessageHeader" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+		 		<soap:body parts="StatusResponse" part="StatusResponse" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+			</wsdl:input>
+		</wsdl:operation>
+	</wsdl:binding>
+	<wsdl:service name="EbMS">
+		<wsdl:port binding="tns:EbMSSOAPBinding" name="EbMSPort">
+			<soap:address location="http://www.clockwork.nl/ebms" />
+		</wsdl:port>
+	</wsdl:service>
+</wsdl:definitions>

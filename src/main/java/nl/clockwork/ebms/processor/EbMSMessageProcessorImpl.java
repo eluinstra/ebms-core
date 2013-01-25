@@ -60,88 +60,124 @@ public class EbMSMessageProcessorImpl implements EbMSMessageProcessor
 	@Override
 	public EbMSBaseMessage process(EbMSMessage message)
 	{
-		try
+		if (!Constants.EBMS_SERVICE_URI.equals(message.getMessageHeader().getService().getValue()))
 		{
-			GregorianCalendar timestamp = new GregorianCalendar();
-			Error error = null;
-			MessageHeader messageHeader = message.getMessageHeader();
-			if (isDuplicate(messageHeader))
+			try
 			{
-				logger.warn("Duplicate message found!");
-				if (equalsDuplicateMessageHeader(messageHeader))
+				GregorianCalendar timestamp = new GregorianCalendar();
+				Error error = null;
+				MessageHeader messageHeader = message.getMessageHeader();
+				if (isDuplicate(messageHeader))
 				{
-					if (message.getSyncReply() == null)
+					logger.warn("Duplicate message found!");
+					if (equalsDuplicateMessageHeader(messageHeader))
 					{
-						long responseId = getResponseMessageId(messageHeader);
-						ebMSDAO.insertSendEvent(responseId);
-						return null;
+						if (message.getSyncReply() == null)
+						{
+							long responseId = getResponseMessageId(messageHeader);
+							ebMSDAO.insertSendEvent(responseId);
+							return null;
+						}
+						else
+							return getResponseMessage(messageHeader);
 					}
 					else
-						return getResponseMessage(messageHeader);
+					{
+						logger.warn("Duplicate messages are not identical! Message discarded.");
+						return null;
+					}
 				}
 				else
 				{
-					logger.warn("Duplicate messages are not identical! Message discarded.");
-					return null;
-				}
-			}
-			else
-			{
-				CollaborationProtocolAgreement cpa = ebMSDAO.getCPA(messageHeader.getCPAId());
-				if ((error = cpaValidator.validate(cpa,messageHeader,timestamp)) == null
-					&& (error = messageHeaderValidator.validate(cpa,messageHeader,message.getAckRequested(),message.getSyncReply(),message.getMessageOrder(),timestamp)) == null
-					&& (error = signatureValidator.validate(cpa,messageHeader,(Signature)message.getSignature())) == null
-					&& (error = manifestValidator.validate(message.getManifest(),message.getAttachments())) == null)
-				{
-					logger.info("Message valid.");
-					if (message.getAckRequested() != null)
+					CollaborationProtocolAgreement cpa = ebMSDAO.getCPA(messageHeader.getCPAId());
+					if ((error = cpaValidator.validate(cpa,messageHeader,timestamp)) == null
+						&& (error = messageHeaderValidator.validate(cpa,messageHeader,message.getAckRequested(),message.getSyncReply(),message.getMessageOrder(),timestamp)) == null
+						&& (error = signatureValidator.validate(cpa,messageHeader,(Signature)message.getSignature())) == null
+						&& (error = manifestValidator.validate(message.getManifest(),message.getAttachments())) == null)
 					{
-						EbMSAcknowledgment acknowledgment = createEbMSAcknowledgment(message,timestamp);
+						logger.info("Message valid.");
+						if (message.getAckRequested() != null)
+						{
+							EbMSAcknowledgment acknowledgment = createEbMSAcknowledgment(message,timestamp);
+							if (message.getSyncReply() == null)
+							{
+								EbMSSendEvent sendEvent = EbMSMessageUtils.getEbMSSendEvent(ebMSDAO.getCPA(acknowledgment.getMessageHeader().getCPAId()),acknowledgment.getMessageHeader());
+								ebMSDAO.insertMessage(message,EbMSMessageStatus.RECEIVED,acknowledgment,sendEvent);
+								return null;
+							}
+							else
+							{
+								ebMSDAO.insertMessage(message,EbMSMessageStatus.RECEIVED,acknowledgment,null);
+								return acknowledgment;
+							}
+						}
+						else
+						{
+							ebMSDAO.insertMessage(message,EbMSMessageStatus.RECEIVED,(EbMSAcknowledgment)null,(EbMSSendEvent)null);
+							return null;
+						}
+						//ebMSDAO.insertMessage(message,EbMSMessageStatus.RECEIVED,message.getAckRequested() == null ? (EbMSAcknowledgment)null : acknowledgment,message.getSyncReply() != null ? (EbMSSendEvent)null : sendEvent);
+						//return message.getAckRequested() == null || message.getSyncReply() == null ? null : acknowledgment;
+					}
+					else
+					{
+						logger.warn("Message not valid.");
+						EbMSMessageError messageError = createEbMSMessageError(message,error,timestamp);
+						EbMSSendEvent sendEvent = EbMSMessageUtils.getEbMSSendEvent(ebMSDAO.getCPA(messageError.getMessageHeader().getCPAId()),messageError.getMessageHeader());
 						if (message.getSyncReply() == null)
 						{
-							EbMSSendEvent sendEvent = EbMSMessageUtils.getEbMSSendEvent(ebMSDAO.getCPA(acknowledgment.getMessageHeader().getCPAId()),acknowledgment.getMessageHeader());
-							ebMSDAO.insertMessage(message,EbMSMessageStatus.RECEIVED,acknowledgment,sendEvent);
+							ebMSDAO.insertMessage(message,EbMSMessageStatus.FAILED,messageError,sendEvent);
 							return null;
 						}
 						else
 						{
-							ebMSDAO.insertMessage(message,EbMSMessageStatus.RECEIVED,acknowledgment,null);
-							return acknowledgment;
+							ebMSDAO.insertMessage(message,EbMSMessageStatus.FAILED,messageError,null);
+							return messageError;
 						}
+						//ebMSDAO.insertMessage(message,EbMSMessageStatus.FAILED,messageError,message.getSyncReply() != null ? null : sendEvent);
+						//return message.getSyncReply() == null ? null : messageError;
 					}
-					else
-					{
-						ebMSDAO.insertMessage(message,EbMSMessageStatus.RECEIVED,(EbMSAcknowledgment)null,(EbMSSendEvent)null);
-						return null;
-					}
-					//ebMSDAO.insertMessage(message,EbMSMessageStatus.RECEIVED,message.getAckRequested() == null ? (EbMSAcknowledgment)null : acknowledgment,message.getSyncReply() != null ? (EbMSSendEvent)null : sendEvent);
-					//return message.getAckRequested() == null || message.getSyncReply() == null ? null : acknowledgment;
 				}
-				else
-				{
-					logger.warn("Message not valid.");
-					EbMSMessageError messageError = createEbMSMessageError(message,error,timestamp);
-					EbMSSendEvent sendEvent = EbMSMessageUtils.getEbMSSendEvent(ebMSDAO.getCPA(messageError.getMessageHeader().getCPAId()),messageError.getMessageHeader());
-					if (message.getSyncReply() == null)
-					{
-						ebMSDAO.insertMessage(message,EbMSMessageStatus.FAILED,messageError,sendEvent);
-						return null;
-					}
-					else
-					{
-						ebMSDAO.insertMessage(message,EbMSMessageStatus.FAILED,messageError,null);
-						return messageError;
-					}
-					//ebMSDAO.insertMessage(message,EbMSMessageStatus.FAILED,messageError,message.getSyncReply() != null ? null : sendEvent);
-					//return message.getSyncReply() == null ? null : messageError;
-				}
+				//return null;
 			}
-			//return null;
+			catch (Exception e)
+			{
+				throw new RuntimeException(e);
+			}
 		}
-		catch (Exception e)
+		else if (EbMSMessageType.MESSAGE_ERROR.action().equals(message.getMessageHeader().getAction()))
 		{
-			throw new RuntimeException(e);
+			process(new EbMSMessageError(message.getMessageHeader(),message.getErrorList()));
+			return null;
 		}
+		else if (EbMSMessageType.ACKNOWLEDGMENT.action().equals(message.getMessageHeader().getAction()))
+		{
+			process(new EbMSAcknowledgment(message.getMessageHeader(),message.getAcknowledgment()));
+			return null;
+		}
+		else if (EbMSMessageType.STATUS_REQUEST.action().equals(message.getMessageHeader().getAction()))
+		{
+			EbMSBaseMessage response = process(new EbMSStatusRequest(message.getMessageHeader(),null,message.getStatusRequest()));
+			return message.getSyncReply() == null ? null : response;
+		}
+		else if (EbMSMessageType.STATUS_RESPONSE.action().equals(message.getMessageHeader().getAction()))
+		{
+			//process(new EbMSStatusResponse(message.getMessageHeader(),message.getStatusResponse()));
+			return null;
+		}
+		else if (EbMSMessageType.PING.action().equals(message.getMessageHeader().getAction()))
+		{
+			EbMSBaseMessage response = process(new EbMSPing(message.getMessageHeader(),null));
+			return message.getSyncReply() == null ? null : response;
+		}
+		else if (EbMSMessageType.PONG.action().equals(message.getMessageHeader().getAction()))
+		{
+			//process(new EbMSPong(message.getMessageHeader()));
+			return null;
+		}
+		else
+			// TODO create messageError???
+			return null;
 	}
 	
 	@Override
