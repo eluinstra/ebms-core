@@ -34,7 +34,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.namespace.QName;
 
-import nl.clockwork.common.jaxb.EbMSDateTimeAdapter;
+import nl.clockwork.ebms.jaxb.EbMSDateTimeAdapter;
 
 import org.w3c.dom.Element;
 
