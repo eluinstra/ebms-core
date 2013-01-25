@@ -15,7 +15,6 @@
  ******************************************************************************/
 package nl.clockwork.mule.ebms.component;
 
-import nl.clockwork.ebms.Constants;
 import nl.clockwork.ebms.Constants.EbMSMessageStatus;
 import nl.clockwork.ebms.dao.EbMSDAO;
 import nl.clockwork.ebms.model.EbMSMessageError;
@@ -36,10 +35,9 @@ public class StoreEbMSMessageErrorIn extends Callable
 		if (message.getPayload() instanceof EbMSMessageError)
 		{
 			EbMSMessageError msgError = (EbMSMessageError)message.getPayload();
-			EbMSMessageStatus status = EbMSMessageStatus.get((String)message.getProperty(Constants.EBMS_MESSAGE_STATUS));
 			//FIXME quickfix to prevent inserting duplicate messages
 			if (!ebMSDAO.existsMessage(msgError.getMessageHeader().getMessageData().getMessageId()))
-				ebMSDAO.insertMessage(msgError,status);
+				ebMSDAO.insertMessage(msgError,EbMSMessageStatus.DELIVERY_FAILED);
 			else
 				logger.warn("Duplicate messageError found.");
 		}

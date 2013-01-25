@@ -191,7 +191,7 @@ public class EbMSMessageProcessorImpl implements EbMSMessageProcessor
 				logger.warn("Duplicate messages are not identical! Message discarded.");
 		}
 		else
-			ebMSDAO.insertMessage(messageError,null);
+			ebMSDAO.insertMessage(messageError,EbMSMessageStatus.DELIVERY_FAILED);
 	}
 	
 	@Override
@@ -205,7 +205,7 @@ public class EbMSMessageProcessorImpl implements EbMSMessageProcessor
 				logger.warn("Duplicate messages are not identical! Message discarded.");
 		}
 		else
-			ebMSDAO.insertMessage(acknowledgment,null);
+			ebMSDAO.insertMessage(acknowledgment,EbMSMessageStatus.DELIVERED);
 	}
 	
 	@Override

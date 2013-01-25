@@ -15,7 +15,6 @@
  ******************************************************************************/
 package nl.clockwork.mule.ebms.component;
 
-import nl.clockwork.ebms.Constants;
 import nl.clockwork.ebms.Constants.EbMSMessageStatus;
 import nl.clockwork.ebms.dao.EbMSDAO;
 import nl.clockwork.ebms.model.EbMSAcknowledgment;
@@ -36,10 +35,9 @@ public class StoreEbMSAcknowledgmentIn extends Callable
 		if (message.getPayload() instanceof EbMSAcknowledgment)
 		{
 			EbMSAcknowledgment ack = (EbMSAcknowledgment)message.getPayload();
-			EbMSMessageStatus status = EbMSMessageStatus.get((String)message.getProperty(Constants.EBMS_MESSAGE_STATUS));
 			//FIXME quickfix to prevent inserting duplicate messages
 			if (!ebMSDAO.existsMessage(ack.getMessageHeader().getMessageData().getMessageId()))
-				ebMSDAO.insertMessage(ack,status);
+				ebMSDAO.insertMessage(ack,EbMSMessageStatus.DELIVERED);
 			else
 				logger.warn("Duplicate acknowlegment found.");
 		}
