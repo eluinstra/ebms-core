@@ -78,10 +78,8 @@
 		 				<soap:header message="tns:Message" part="MessageOrder" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" wsdl:required="false" />          
 		 				<soap:header message="tns:Message" part="AckRequested" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" wsdl:required="false" />          
 				 		<soap:header message="tns:Message" part="ErrorList" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" wsdl:required="false" />          
-				 		<soap:header message="tns:Message" part="Acknowledgment" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" wsdl:required="false" />          
-						<soap:body parts="Message" part="Manifest" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" wsdl:required="false" />
-				 		<soap:body parts="Message" part="StatusRequest" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" wsdl:required="false" />          
-				 		<soap:body parts="Message" part="StatusResponse" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" wsdl:required="false" />          
+				 		<soap:header message="tns:Message" part="Acknowledgment" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" wsdl:required="false" />
+						<soap:body parts="Manifest StatusRequest StatusResponse" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" wsdl:required="false" />
 					</mime:part>				
 				</mime:multipartRelated>
 			</wsdl:input>
@@ -95,8 +93,7 @@
 		 				<soap:header message="tns:MessageRequest" part="SyncReply" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />          
 		 				<soap:header message="tns:MessageRequest" part="MessageOrder" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" wsdl:required="false" />          
 		 				<soap:header message="tns:MessageRequest" part="AckRequested" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" wsdl:required="false" />          
-						<soap:body parts="MessageRequest" part="Manifest" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" wsdl:required="false" />
-				 		<soap:body parts="MessageRequest" part="StatusRequest" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" wsdl:required="false" />          
+						<soap:body parts="Manifest MessageRequest" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" wsdl:required="false" />
 					</mime:part>				
 				</mime:multipartRelated>
 			</wsdl:input>
@@ -104,7 +101,7 @@
  				<soap:header message="tns:MessageResponse" part="ResponseMessageHeader" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />          
 		 		<soap:header message="tns:MessageResponse" part="ErrorList" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" wsdl:required="false" />          
 		 		<soap:header message="tns:MessageResponse" part="Acknowledgment" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" wsdl:required="false" />          
-		 		<soap:body parts="tns:MessageResponse" part="StatusResponse" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" wsdl:required="false" />          
+		 		<soap:body parts="StatusResponse" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" wsdl:required="false" />
 			</wsdl:output>
 		</wsdl:operation>
 	</wsdl:binding>
