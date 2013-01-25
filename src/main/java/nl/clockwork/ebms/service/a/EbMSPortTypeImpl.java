@@ -52,7 +52,7 @@ public class EbMSPortTypeImpl implements EbMSPortType
 	public void message(MessageHeader messageHeader, MessageOrder messageOrder, AckRequested ackRequested, ErrorList errorList, Acknowledgment acknowledgment, Manifest manifest, StatusRequest statusRequest, StatusResponse statusResponse)
 	{
 		if (!Constants.EBMS_SERVICE_URI.equals(messageHeader.getService().getValue()))
-			messageProcessor.process(new EbMSMessage(MessageManager.get(),SignatureManager.get() == null ? null : SignatureManager.get(),messageHeader,null,messageOrder,ackRequested,manifest,AttachmentManager.get()));
+			messageProcessor.process(new EbMSMessage(MessageManager.get(),SignatureManager.get(),messageHeader,null,messageOrder,ackRequested,manifest,AttachmentManager.get()));
 		else if (EbMSMessageType.MESSAGE_ERROR.action().equals(messageHeader.getAction()))
 			messageProcessor.process(new EbMSMessageError(messageHeader,errorList));
 		else if (EbMSMessageType.ACKNOWLEDGMENT.action().equals(messageHeader.getAction()))

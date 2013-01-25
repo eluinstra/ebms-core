@@ -50,7 +50,7 @@ public class EbMSPortTypeImpl implements EbMSPortType
 	@Override
 	public void message(MessageHeader messageHeader, SyncReply syncReply, MessageOrder messageOrder, AckRequested ackRequested, Manifest manifest)
 	{
-		messageProcessor.process(new EbMSMessage(MessageManager.get(),SignatureManager.get() == null ? null : SignatureManager.get(),messageHeader,syncReply,messageOrder,ackRequested,manifest,AttachmentManager.get()));
+		messageProcessor.process(new EbMSMessage(MessageManager.get(),SignatureManager.get(),messageHeader,syncReply,messageOrder,ackRequested,manifest,AttachmentManager.get()));
 	}
 
 	@Override
