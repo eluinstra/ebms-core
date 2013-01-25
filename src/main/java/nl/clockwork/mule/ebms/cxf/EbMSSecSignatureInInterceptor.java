@@ -34,6 +34,7 @@ import javax.xml.xpath.XPathConstants;
 
 import nl.clockwork.common.util.XMLMessageBuilder;
 import nl.clockwork.common.util.XMLUtils;
+import nl.clockwork.ebms.SignatureManager;
 import nl.clockwork.ebms.dao.EbMSDAO;
 import nl.clockwork.ebms.model.EbMSAttachment;
 import nl.clockwork.ebms.model.Signature;

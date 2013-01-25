@@ -19,6 +19,8 @@ import javax.xml.ws.Holder;
 
 import nl.clockwork.ebms.AttachmentManager;
 import nl.clockwork.ebms.Constants;
+import nl.clockwork.ebms.MessageManager;
+import nl.clockwork.ebms.SignatureManager;
 import nl.clockwork.ebms.Constants.EbMSMessageType;
 import nl.clockwork.ebms.model.EbMSAcknowledgment;
 import nl.clockwork.ebms.model.EbMSBaseMessage;
@@ -37,8 +39,6 @@ import nl.clockwork.ebms.model.ebxml.StatusRequest;
 import nl.clockwork.ebms.model.ebxml.StatusResponse;
 import nl.clockwork.ebms.model.ebxml.SyncReply;
 import nl.clockwork.ebms.processor.EbMSMessageProcessor;
-import nl.clockwork.mule.ebms.cxf.MessageManager;
-import nl.clockwork.mule.ebms.cxf.SignatureManager;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

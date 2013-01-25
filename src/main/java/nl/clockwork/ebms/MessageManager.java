@@ -13,28 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  ******************************************************************************/
-package nl.clockwork.mule.ebms.cxf;
+package nl.clockwork.ebms;
 
-import nl.clockwork.ebms.model.Signature;
-
-public class SignatureManager
+public class MessageManager
 {
-	private static ThreadLocal<Signature> signature = new ThreadLocal<Signature>()
+	private static ThreadLocal<byte[]> message = new ThreadLocal<byte[]>()
 	{
-		protected synchronized Signature initialValue()
+		protected synchronized byte[] initialValue()
 		{
-			return null;
+			return new byte[]{};
 		}
 	};
 
-	public static void set(Signature signature)
+	public static void set(byte[] message)
 	{
-		SignatureManager.signature.set(signature);
+		MessageManager.message.set(message);
 	}
 
-	public static Signature get()
+	public static byte[] get()
 	{
-		return signature.get();
+		return message.get();
 	}
 
 }

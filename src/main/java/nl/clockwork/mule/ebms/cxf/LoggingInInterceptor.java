@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import nl.clockwork.common.util.Utils;
+import nl.clockwork.ebms.MessageManager;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

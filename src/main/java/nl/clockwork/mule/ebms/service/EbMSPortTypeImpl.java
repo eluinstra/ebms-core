@@ -18,6 +18,8 @@ package nl.clockwork.mule.ebms.service;
 import javax.xml.ws.Holder;
 
 import nl.clockwork.ebms.AttachmentManager;
+import nl.clockwork.ebms.MessageManager;
+import nl.clockwork.ebms.SignatureManager;
 import nl.clockwork.ebms.model.EbMSAcknowledgment;
 import nl.clockwork.ebms.model.EbMSMessage;
 import nl.clockwork.ebms.model.EbMSMessageError;
@@ -35,8 +37,6 @@ import nl.clockwork.ebms.model.ebxml.StatusRequest;
 import nl.clockwork.ebms.model.ebxml.StatusResponse;
 import nl.clockwork.ebms.model.ebxml.SyncReply;
 import nl.clockwork.ebms.service.EbMSPortType;
-import nl.clockwork.mule.ebms.cxf.MessageManager;
-import nl.clockwork.mule.ebms.cxf.SignatureManager;
 import nl.clockwork.mule.ebms.processor.EbMSAcknowledgmentProcessor;
 import nl.clockwork.mule.ebms.processor.EbMSMessageErrorProcessor;
 import nl.clockwork.mule.ebms.processor.EbMSMessageProcessor;
