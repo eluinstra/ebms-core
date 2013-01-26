@@ -883,13 +883,15 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 								simpleJdbcTemplate.update
 								(
 									"delete from ebms_send_event" +
-									" where ebms_message_id=? and status=0",
+									" where ebms_message_id=?" +
+									" and status=0",
 									id
 								);
 								simpleJdbcTemplate.update
 								(
 									"update ebms_message set status=?" +
-									" where id=?",
+									" where id=?" +
+									" and status is null",
 									id,
 									refToMessageStatus
 								);
@@ -948,13 +950,15 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 								simpleJdbcTemplate.update
 								(
 									"delete from ebms_send_event" +
-									" where ebms_message_id=? and status=0",
+									" where ebms_message_id=?" +
+									" and status=0",
 									id
 								);
 								simpleJdbcTemplate.update
 								(
 									"update ebms_message set status=?" +
-									" where id=?",
+									" where id=?" +
+									" and status is null",
 									id,
 									refToMessageStatus
 								);

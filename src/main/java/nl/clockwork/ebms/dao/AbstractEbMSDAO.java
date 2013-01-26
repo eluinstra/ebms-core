@@ -1347,7 +1347,8 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 								simpleJdbcTemplate.update
 								(
 									"update ebms_message set status=?" +
-									" where id=?",
+									" where id=?" +
+									" and status is null",
 									id,
 									refToMessageStatus
 								);
@@ -1415,7 +1416,8 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 								simpleJdbcTemplate.update
 								(
 									"update ebms_message set status=?" +
-									" where id=?",
+									" where id=?" +
+									" and status is null",
 									id,
 									refToMessageStatus
 								);
