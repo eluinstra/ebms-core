@@ -38,9 +38,9 @@ public class EbMSMessage implements EbMSBaseMessage
 	private AckRequested ackRequested;
 	private ErrorList errorList;
 	private Acknowledgment acknowledgment;
+	private Manifest manifest;
 	private StatusRequest statusRequest;
 	private StatusResponse statusResponse;
-	private Manifest manifest;
 	private List<EbMSAttachment> attachments;
 
 	public EbMSMessage(MessageHeader messageHeader, AckRequested ackRequested, Manifest manifest, List<EbMSAttachment> attachments)
@@ -60,7 +60,7 @@ public class EbMSMessage implements EbMSBaseMessage
 	
 	public EbMSMessage(byte[] original, SignatureType signature, MessageHeader messageHeader, SyncReply syncReply, MessageOrder messageOrder, AckRequested ackRequested, Manifest manifest, List<EbMSAttachment> attachments)
 	{
-		this(original,signature,messageHeader,syncReply,messageOrder,ackRequested,null,null,null,null,manifest,attachments);
+		this(original,signature,messageHeader,syncReply,messageOrder,ackRequested,null,null,manifest,null,null,attachments);
 	}
 	
 	public EbMSMessage(MessageHeader messageHeader, ErrorList errorList)
@@ -80,15 +80,15 @@ public class EbMSMessage implements EbMSBaseMessage
 	
 	public EbMSMessage(MessageHeader messageHeader, SyncReply syncReply, StatusRequest statusRequest)
 	{
-		this(null,null,messageHeader,syncReply,null,null,null,null,statusRequest,null,null,null);
+		this(null,null,messageHeader,syncReply,null,null,null,null,null,statusRequest,null,null);
 	}
 	
 	public EbMSMessage(MessageHeader messageHeader, StatusResponse statusResponse)
 	{
-		this(null,null,messageHeader,null,null,null,null,null,null,statusResponse,null,null);
+		this(null,null,messageHeader,null,null,null,null,null,null,null,statusResponse,null);
 	}
 	
-	public EbMSMessage(byte[] original, SignatureType signature, MessageHeader messageHeader, SyncReply syncReply, MessageOrder messageOrder, AckRequested ackRequested, ErrorList errorList, Acknowledgment acknowledgment, StatusRequest statusRequest, StatusResponse statusResponse, Manifest manifest, List<EbMSAttachment> attachments)
+	public EbMSMessage(byte[] original, SignatureType signature, MessageHeader messageHeader, SyncReply syncReply, MessageOrder messageOrder, AckRequested ackRequested, ErrorList errorList, Acknowledgment acknowledgment, Manifest manifest, StatusRequest statusRequest, StatusResponse statusResponse, List<EbMSAttachment> attachments)
 	{
 		this.original = original;
 		this.signature = signature;
@@ -145,6 +145,11 @@ public class EbMSMessage implements EbMSBaseMessage
 		return acknowledgment;
 	}
 	
+	public Manifest getManifest()
+	{
+		return manifest;
+	}
+	
 	public StatusRequest getStatusRequest()
 	{
 		return statusRequest;
@@ -155,11 +160,6 @@ public class EbMSMessage implements EbMSBaseMessage
 		return statusResponse;
 	}
 
-	public Manifest getManifest()
-	{
-		return manifest;
-	}
-	
 	public List<EbMSAttachment> getAttachments()
 	{
 		return attachments;
