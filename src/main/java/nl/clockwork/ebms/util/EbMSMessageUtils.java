@@ -22,20 +22,22 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.UUID;
 
 import javax.activation.DataSource;
 import javax.mail.util.ByteArrayDataSource;
+import javax.xml.bind.JAXBException;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.Duration;
 
-import nl.clockwork.common.util.XMLUtils;
+import nl.clockwork.common.util.XMLMessageBuilder;
 import nl.clockwork.ebms.Constants;
 import nl.clockwork.ebms.Constants.EbMSMessageStatus;
 import nl.clockwork.ebms.Constants.EbMSMessageType;
 import nl.clockwork.ebms.model.EbMSAction;
-import nl.clockwork.ebms.model.EbMSDataSource;
 import nl.clockwork.ebms.model.EbMSAttachment;
+import nl.clockwork.ebms.model.EbMSDataSource;
 import nl.clockwork.ebms.model.EbMSMessage;
 import nl.clockwork.ebms.model.EbMSMessageContent;
 import nl.clockwork.ebms.model.EbMSMessageContext;
@@ -66,13 +68,12 @@ import nl.clockwork.ebms.model.ebxml.StatusResponse;
 import nl.clockwork.ebms.model.ebxml.To;
 
 import org.apache.commons.io.IOUtils;
-import org.mule.util.UUID;
 
 public class EbMSMessageUtils
 {
 	public static MessageHeader createMessageHeader(CollaborationProtocolAgreement cpa, EbMSMessageContext context, String hostname) throws DatatypeConfigurationException
 	{
-		String uuid = UUID.getUUID();
+		String uuid = UUID.randomUUID().toString();
 		PartyInfo sendingPartyInfo = CPAUtils.getSendingPartyInfo(cpa,context.getFromRole(),context.getServiceType(),context.getService(),context.getAction());
 		PartyInfo receivingPartyInfo = CPAUtils.getReceivingPartyInfo(cpa,context.getToRole(),context.getServiceType(),context.getService(),context.getAction());
 		//PartyInfo receivingPartyInfo = CPAUtils.getOtherReceivingPartyInfo(cpa,context.getFromRole(),context.getServiceType(),context.getService(),context.getAction());
@@ -126,9 +127,10 @@ public class EbMSMessageUtils
 		return messageHeader;
 	}
 
-	public static MessageHeader createMessageHeader(MessageHeader messageHeader, String hostname, GregorianCalendar timestamp, EbMSAction action) throws DatatypeConfigurationException
+	public static MessageHeader createMessageHeader(MessageHeader messageHeader, String hostname, GregorianCalendar timestamp, EbMSAction action) throws DatatypeConfigurationException, JAXBException
 	{
-		messageHeader = (MessageHeader)XMLUtils.xmlToObject(XMLUtils.objectToXML(messageHeader)); //FIXME: replace by more efficient copy
+		XMLMessageBuilder<MessageHeader> builder = XMLMessageBuilder.getInstance(MessageHeader.class);
+		messageHeader = builder.handle(builder.handle(messageHeader));
 		List<PartyId> partyIds = new ArrayList<PartyId>(messageHeader.getFrom().getPartyId());
 		messageHeader.getFrom().getPartyId().clear();
 		messageHeader.getFrom().getPartyId().addAll(messageHeader.getTo().getPartyId());
@@ -139,7 +141,7 @@ public class EbMSMessageUtils
 		messageHeader.getTo().setRole(null);
 
 		messageHeader.getMessageData().setRefToMessageId(messageHeader.getMessageData().getMessageId());
-		messageHeader.getMessageData().setMessageId(UUID.getUUID() + "@" + hostname);
+		messageHeader.getMessageData().setMessageId(UUID.randomUUID().toString() + "@" + hostname);
 		messageHeader.getMessageData().setTimestamp(DatatypeFactory.newInstance().newXMLGregorianCalendar(timestamp));
 		messageHeader.getMessageData().setTimeToLive(null);
 
@@ -213,13 +215,13 @@ public class EbMSMessageUtils
 		return response;
 	}
 
-	public static EbMSPong ebMSPingToEbMSPong(EbMSPing ping, String hostname) throws DatatypeConfigurationException
+	public static EbMSPong ebMSPingToEbMSPong(EbMSPing ping, String hostname) throws DatatypeConfigurationException, JAXBException
 	{
 		EbMSPong pong = new EbMSPong(createMessageHeader(ping.getMessageHeader(),hostname,new GregorianCalendar(),EbMSMessageType.PONG.action()));
 		return pong;
 	}
 
-	public static EbMSStatusResponse ebMSStatusRequestToEbMSStatusResponse(EbMSStatusRequest request, String hostname, EbMSMessageStatus status, GregorianCalendar timestamp) throws DatatypeConfigurationException
+	public static EbMSStatusResponse ebMSStatusRequestToEbMSStatusResponse(EbMSStatusRequest request, String hostname, EbMSMessageStatus status, GregorianCalendar timestamp) throws DatatypeConfigurationException, JAXBException
 	{
 		MessageHeader messageHeader = createMessageHeader(request.getMessageHeader(),hostname,new GregorianCalendar(),EbMSMessageType.STATUS_RESPONSE.action());
 		StatusResponse statusResponse = createStatusResponse(request.getStatusRequest(),status,timestamp);
