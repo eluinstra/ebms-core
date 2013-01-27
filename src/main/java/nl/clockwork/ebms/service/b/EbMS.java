@@ -36,7 +36,7 @@ import javax.xml.ws.WebServiceFeature;
 
 
 @WebServiceClient(name = "EbMS", 
-                  wsdlLocation = "classpath:nl/clockwork/mule/ebms/wsdl/ebms.wsdl",
+                  wsdlLocation = "classpath:nl/clockwork/ebms/wsdl/ebms.wsdl",
                   targetNamespace = "http://www.clockwork.nl/ebms/1.0") 
 public class EbMS extends Service {
 
@@ -46,9 +46,9 @@ public class EbMS extends Service {
     static {
         URL url = null;
         try {
-            url = new URL("classpath:nl/clockwork/mule/ebms/wsdl/ebms.wsdl");
+            url = new URL("classpath:nl/clockwork/ebms/wsdl/ebms.wsdl");
         } catch (MalformedURLException e) {
-            System.err.println("Can not initialize the default wsdl from classpath:nl/clockwork/mule/ebms/wsdl/ebms.wsdl");
+            System.err.println("Can not initialize the default wsdl from classpath:nl/clockwork/ebms/wsdl/ebms.wsdl");
             // e.printStackTrace();
         }
         WSDL_LOCATION = url;

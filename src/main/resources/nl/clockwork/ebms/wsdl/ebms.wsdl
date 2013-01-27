@@ -95,7 +95,7 @@
 		 				<soap:header message="tns:Message" part="SyncReply" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" wsdl:required="false" />          
 		 				<soap:header message="tns:Message" part="MessageOrder" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" wsdl:required="false" />          
 		 				<soap:header message="tns:Message" part="AckRequested" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" wsdl:required="false" />          
-						<soap:body parts="Message" part="Manifest" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
+						<soap:body parts="Manifest" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />
 					</mime:part>				
 				</mime:multipartRelated>
 			</wsdl:input>
@@ -119,11 +119,11 @@
 			<wsdl:input>
  				<soap:header message="tns:StatusRequest" part="RequestMessageHeader" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />          
  				<soap:header message="tns:StatusRequest" part="SyncReply" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" wsdl:required="false" />          
-		 		<soap:body parts="StatusRequest" part="StatusRequest" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />          
+		 		<soap:body parts="StatusRequest" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />          
 			</wsdl:input>
 			<wsdl:output>
  				<soap:header message="tns:StatusResponse" part="ResponseMessageHeader" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />          
-		 		<soap:body parts="StatusResponse" part="StatusResponse" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />          
+		 		<soap:body parts="StatusResponse" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/" use="literal" />          
 			</wsdl:output>
 		</wsdl:operation>
 		<wsdl:operation name="Ping">

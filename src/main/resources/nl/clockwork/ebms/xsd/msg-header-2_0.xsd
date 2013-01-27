@@ -127,7 +127,7 @@
 				<element ref="tns:RefToMessageId"/>
 				<element ref="tns:From" minOccurs="0"/>
 				<element ref="ds:Reference" minOccurs="0" maxOccurs="unbounded"/>
-				<any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/>
+				<!--any namespace="##other" processContents="lax" minOccurs="0" maxOccurs="unbounded"/-->
 			</sequence>
 			<attributeGroup ref="tns:headerExtension.grp"/>
 			<attribute ref="soap:actor"/>
