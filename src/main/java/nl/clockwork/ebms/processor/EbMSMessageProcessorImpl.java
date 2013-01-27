@@ -2,6 +2,7 @@ package nl.clockwork.ebms.processor;
 
 import java.util.GregorianCalendar;
 
+import javax.xml.bind.JAXBException;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 
@@ -280,7 +281,7 @@ public class EbMSMessageProcessorImpl implements EbMSMessageProcessor
 		return ebMSDAO.getEbMSMessageResponse(messageHeader.getMessageData().getMessageId());
 	}
 
-	private EbMSMessageError createEbMSMessageError(EbMSBaseMessage message, Error error, GregorianCalendar timestamp) throws DatatypeConfigurationException
+	private EbMSMessageError createEbMSMessageError(EbMSBaseMessage message, Error error, GregorianCalendar timestamp) throws DatatypeConfigurationException, JAXBException
 	{
 		MessageHeader messageHeader = EbMSMessageUtils.createMessageHeader(message.getMessageHeader(),hostname,timestamp,EbMSMessageType.MESSAGE_ERROR.action());
 		
@@ -297,7 +298,7 @@ public class EbMSMessageProcessorImpl implements EbMSMessageProcessor
 		return new EbMSMessageError(messageHeader,errorList);
 	}
 
-	private EbMSAcknowledgment createEbMSAcknowledgment(EbMSMessage message, GregorianCalendar timestamp) throws DatatypeConfigurationException
+	private EbMSAcknowledgment createEbMSAcknowledgment(EbMSMessage message, GregorianCalendar timestamp) throws DatatypeConfigurationException, JAXBException
 	{
 		MessageHeader messageHeader = EbMSMessageUtils.createMessageHeader(message.getMessageHeader(),hostname,timestamp,EbMSMessageType.ACKNOWLEDGMENT.action());
 		
@@ -324,7 +325,7 @@ public class EbMSMessageProcessorImpl implements EbMSMessageProcessor
 		return new EbMSAcknowledgment(messageHeader,acknowledgment);
 	}
 	
-	private EbMSStatusResponse createEbMSStatusResponse(EbMSStatusRequest statusRequest, EbMSMessageStatus status) throws DatatypeConfigurationException
+	private EbMSStatusResponse createEbMSStatusResponse(EbMSStatusRequest statusRequest, EbMSMessageStatus status) throws DatatypeConfigurationException, JAXBException
 	{
 		GregorianCalendar timestamp = null;
 		if (status == null)
@@ -344,7 +345,7 @@ public class EbMSMessageProcessorImpl implements EbMSMessageProcessor
 		return EbMSMessageUtils.ebMSStatusRequestToEbMSStatusResponse(statusRequest,hostname,status,timestamp);
 	}
 
-	public EbMSPong createEbMSPong(EbMSPing ping) throws DatatypeConfigurationException
+	public EbMSPong createEbMSPong(EbMSPing ping) throws DatatypeConfigurationException, JAXBException
 	{
 		return EbMSMessageUtils.ebMSPingToEbMSPong(ping,hostname);
 	}

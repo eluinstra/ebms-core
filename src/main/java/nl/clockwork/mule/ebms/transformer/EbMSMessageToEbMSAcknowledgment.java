@@ -17,6 +17,7 @@ package nl.clockwork.mule.ebms.transformer;
 
 import java.util.GregorianCalendar;
 
+import javax.xml.bind.JAXBException;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 
@@ -81,6 +82,10 @@ public class EbMSMessageToEbMSAcknowledgment extends AbstractMessageAwareTransfo
 			return message;
 		}
 		catch (DatatypeConfigurationException e)
+		{
+			throw new TransformerException(this,e);
+		}
+		catch (JAXBException e)
 		{
 			throw new TransformerException(this,e);
 		}
