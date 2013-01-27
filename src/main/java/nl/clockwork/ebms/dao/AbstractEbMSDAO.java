@@ -1350,7 +1350,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 									" where id=?" +
 									" and status is null",
 									id,
-									refToMessageStatus
+									refToMessageStatus.id()
 								);
 							}
 						}
@@ -1419,7 +1419,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 									" where id=?" +
 									" and status is null",
 									id,
-									refToMessageStatus
+									refToMessageStatus.id()
 								);
 							}
 						}

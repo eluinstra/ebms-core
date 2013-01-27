@@ -893,7 +893,7 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 									" where id=?" +
 									" and status is null",
 									id,
-									refToMessageStatus
+									refToMessageStatus.id()
 								);
 							}
 						}
@@ -960,7 +960,7 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 									" where id=?" +
 									" and status is null",
 									id,
-									refToMessageStatus
+									refToMessageStatus.id()
 								);
 							}
 						}
