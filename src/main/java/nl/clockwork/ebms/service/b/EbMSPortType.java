@@ -76,9 +76,9 @@ public interface EbMSPortType {
 	@Oneway
 	@WebMethod(operationName = "StatusResponse", action = "ebXML")
 	public void statusResponse(
-		@WebParam(partName = "MessageHeader", mode = WebParam.Mode.OUT, name = "MessageHeader", targetNamespace = "http://www.oasis-open.org/committees/ebxml-msg/schema/msg-header-2_0.xsd", header = true)
+		@WebParam(partName = "MessageHeader", name = "MessageHeader", targetNamespace = "http://www.oasis-open.org/committees/ebxml-msg/schema/msg-header-2_0.xsd", header = true)
 		nl.clockwork.ebms.model.ebxml.MessageHeader messageHeader,
-		@WebParam(partName = "StatusResponse", mode = WebParam.Mode.OUT, name = "StatusResponse", targetNamespace = "http://www.oasis-open.org/committees/ebxml-msg/schema/msg-header-2_0.xsd")
+		@WebParam(partName = "StatusResponse", name = "StatusResponse", targetNamespace = "http://www.oasis-open.org/committees/ebxml-msg/schema/msg-header-2_0.xsd")
 		nl.clockwork.ebms.model.ebxml.StatusResponse statusResponse
 	);
 
