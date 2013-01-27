@@ -1,5 +1,6 @@
 - split EbMSDAO into CPADAO and EbMSDAO?
 - replace column content in table ebms_message by columns error_list, acknowledgment, manifest, status_request and status_response?
+- add column in/out to table ebms_message?
 - determine syncReply through cpa instead of message?
 - create error messages in validators (MessageHeaderValidator)
 	or
