@@ -42,36 +42,26 @@ public class EbMSContentHandler implements ContentHandler
 	@Override
 	public void startMessage() throws MimeException
 	{
-		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
 	public void endMessage() throws MimeException
 	{
-		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
 	public void startBodyPart() throws MimeException
 	{
-		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
 	public void endBodyPart() throws MimeException
 	{
-		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
 	public void startHeader() throws MimeException
 	{
-		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
@@ -83,36 +73,26 @@ public class EbMSContentHandler implements ContentHandler
 	@Override
 	public void endHeader() throws MimeException
 	{
-		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
 	public void preamble(InputStream is) throws MimeException, IOException
 	{
-		logger.info("---preamble");
-		logger.info(is);
 	}
 
 	@Override
 	public void epilogue(InputStream is) throws MimeException, IOException
 	{
-		logger.info("---epilogue");
-		logger.info(is);
 	}
 
 	@Override
 	public void startMultipart(BodyDescriptor bd) throws MimeException
 	{
-		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
 	public void endMultipart() throws MimeException
 	{
-		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
@@ -124,14 +104,12 @@ public class EbMSContentHandler implements ContentHandler
 		//ds.setName("");
 		String contentId = headers.get("Content-ID");
 		attachments.add(new EbMSAttachment(ds,contentId));
-		//logger.info(is);
+		headers.clear();
 	}
 
 	@Override
 	public void raw(InputStream is) throws MimeException, IOException
 	{
-		logger.info("---raw");
-		//logger.info(arg0);
 	}
 
 	public List<EbMSAttachment> getAttachments()

@@ -48,6 +48,8 @@ import nl.clockwork.ebms.processor.EbMSMessageProcessor;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.james.mime4j.dom.MessageWriter;
+import org.apache.james.mime4j.message.DefaultMessageWriter;
 import org.apache.james.mime4j.parser.MimeStreamParser;
 import org.apache.james.mime4j.stream.MimeConfig;
 import org.springframework.web.context.WebApplicationContext;
@@ -102,6 +104,12 @@ public class EbMSMimeServlet extends GenericServlet
 			if (out == null)
 			{
 				((HttpServletResponse)response).setStatus(204);
+			}
+			else
+			{
+				((HttpServletResponse)response).setStatus(200);
+				MessageWriter messageWriter = new DefaultMessageWriter();
+				//messageWriter.writeMultipart(arg0,response.getOutputStream());
 			}
 		}
 		catch (Exception e)
