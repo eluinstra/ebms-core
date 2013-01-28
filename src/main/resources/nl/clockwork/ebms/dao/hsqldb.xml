@@ -25,7 +25,7 @@
 
 	<bean id="databaseProvider" class="nl.clockwork.ebms.HSQLDatabaseProvider" init-method="init" destroy-method="close">
 		<constructor-arg ref="ebMSDataSource"/>
-		<constructor-arg value="/nl/clockwork/mule/ebms/hsqldb.sql"/>
+		<constructor-arg value="/nl/clockwork/ebms/hsqldb.sql"/>
 	</bean>
 	
 	<bean id="insertCPA" class="java.lang.String">
