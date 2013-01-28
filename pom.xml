@@ -119,6 +119,16 @@
 			<version>1.2.14</version>
 		</dependency>
 		<dependency>
+			<groupId>org.apache.james</groupId>
+			<artifactId>apache-mime4j-core</artifactId>
+			<version>0.7.2</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.james</groupId>
+			<artifactId>apache-mime4j-dom</artifactId>
+			<version>0.7.2</version>
+		</dependency>
+		<dependency>
 			<groupId>c3p0</groupId>
 			<artifactId>c3p0</artifactId>
 			<version>0.9.1.2</version>
