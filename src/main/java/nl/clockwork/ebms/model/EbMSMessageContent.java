@@ -19,7 +19,6 @@ import java.util.List;
 
 public class EbMSMessageContent
 {
-	private static final long serialVersionUID = 1L;
 	private EbMSMessageContext context;
 	private List<EbMSDataSource> dataSources;
 
