@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  ******************************************************************************/
-package nl.clockwork.ebms.adapter.service;
+package nl.clockwork.ebms.iface;
 
 import java.util.List;
 
@@ -22,8 +22,8 @@ import javax.jws.WebParam;
 import javax.jws.WebResult;
 import javax.jws.WebService;
 
-@WebService(targetNamespace="http://www.clockwork.nl/cpa/adapter/1.0")
-public interface CPAAdapter
+@WebService(targetNamespace="http://www.clockwork.nl/cpa/1.0")
+public interface CPAService
 {
 	@WebResult(name="Result")
 	@WebMethod(operationName="InsertCPA")

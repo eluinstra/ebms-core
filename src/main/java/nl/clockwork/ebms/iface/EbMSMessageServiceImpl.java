@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  ******************************************************************************/
-package nl.clockwork.ebms.adapter.service;
+package nl.clockwork.ebms.iface;
 
 import java.util.List;
 
@@ -31,7 +31,7 @@ import nl.clockwork.ebms.util.EbMSMessageUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-public class EbMSAdapterImpl implements EbMSAdapter
+public class EbMSMessageServiceImpl implements EbMSMessageService
 {
   protected transient Log logger = LogFactory.getLog(getClass());
 	private EbMSDAO ebMSDAO;
@@ -51,7 +51,7 @@ public class EbMSAdapterImpl implements EbMSAdapter
 		}
 		catch (Exception e)
 		{
-			throw new EbMSAdapterException(e);
+			throw new EbMSMessageServiceException(e);
 			//logger.warn("",e);
 			//return null;
 		}
@@ -70,7 +70,7 @@ public class EbMSAdapterImpl implements EbMSAdapter
 		}
 		catch (DAOException e)
 		{
-			throw new EbMSAdapterException(e);
+			throw new EbMSMessageServiceException(e);
 			//logger.warn("",e);
 			//return new ArrayList<String>();
 		}
@@ -93,7 +93,7 @@ public class EbMSAdapterImpl implements EbMSAdapter
 		}
 		catch (Exception e)
 		{
-			throw new EbMSAdapterException(e);
+			throw new EbMSMessageServiceException(e);
 			//logger.warn("",e);
 			//return null;
 		}
@@ -109,7 +109,7 @@ public class EbMSAdapterImpl implements EbMSAdapter
 		}
 		catch (DAOException e)
 		{
-			throw new EbMSAdapterException(e);
+			throw new EbMSMessageServiceException(e);
 			//logger.warn("",e);
 			//return false;
 		}
@@ -125,7 +125,7 @@ public class EbMSAdapterImpl implements EbMSAdapter
 		}
 		catch (DAOException e)
 		{
-			throw new EbMSAdapterException(e);
+			throw new EbMSMessageServiceException(e);
 			//logger.warn("",e);
 			//return false;
 		}

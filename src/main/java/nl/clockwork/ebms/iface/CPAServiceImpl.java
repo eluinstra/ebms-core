@@ -1,4 +1,4 @@
-package nl.clockwork.ebms.adapter.service;
+package nl.clockwork.ebms.iface;
 
 import java.util.List;
 
@@ -12,7 +12,7 @@ import nl.clockwork.ebms.model.cpp.cpa.CollaborationProtocolAgreement;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-public class CPAAdapterImpl implements CPAAdapter
+public class CPAServiceImpl implements CPAService
 {
   protected transient Log logger = LogFactory.getLog(getClass());
 	private EbMSDAO ebMSDAO;
@@ -30,13 +30,13 @@ public class CPAAdapterImpl implements CPAAdapter
 		}
 		catch (DAOException e)
 		{
-			throw new CPAAdapterException(e);
+			throw new CPAServiceException(e);
 			//logger.warn("",e);
 			//return false;
 		}
 		catch (JAXBException e)
 		{
-			throw new CPAAdapterException(e);
+			throw new CPAServiceException(e);
 			//logger.warn("",e);
 			//return false;
 		}
@@ -51,7 +51,7 @@ public class CPAAdapterImpl implements CPAAdapter
 		}
 		catch (DAOException e)
 		{
-			throw new CPAAdapterException(e);
+			throw new CPAServiceException(e);
 			//logger.warn("",e);
 			//return false;
 		}
@@ -66,7 +66,7 @@ public class CPAAdapterImpl implements CPAAdapter
 		}
 		catch (DAOException e)
 		{
-			throw new CPAAdapterException(e);
+			throw new CPAServiceException(e);
 			//logger.warn("",e);
 			//return new ArrayList<String>();
 		}
@@ -81,13 +81,13 @@ public class CPAAdapterImpl implements CPAAdapter
 		}
 		catch (DAOException e)
 		{
-			throw new CPAAdapterException(e);
+			throw new CPAServiceException(e);
 			//logger.warn("",e);
 			//return null;
 		}
 		catch (JAXBException e)
 		{
-			throw new CPAAdapterException(e);
+			throw new CPAServiceException(e);
 			//logger.warn("",e);
 			//return null;
 		}

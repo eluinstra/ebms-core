@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  ******************************************************************************/
-package nl.clockwork.ebms.adapter.service;
+package nl.clockwork.ebms.iface;
 
 import java.util.List;
 
@@ -25,8 +25,8 @@ import javax.jws.WebService;
 import nl.clockwork.ebms.model.EbMSMessageContent;
 import nl.clockwork.ebms.model.EbMSMessageContext;
 
-@WebService(targetNamespace="http://www.clockwork.nl/ebms/adapter/1.0")
-public interface EbMSAdapter
+@WebService(targetNamespace="http://www.clockwork.nl/ebms/1.0")
+public interface EbMSMessageService
 {
 	@WebResult(name="MessageId")
 	@WebMethod(operationName="SendMessage")

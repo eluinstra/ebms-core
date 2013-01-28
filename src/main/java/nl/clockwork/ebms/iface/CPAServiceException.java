@@ -13,32 +13,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  ******************************************************************************/
-package nl.clockwork.ebms.adapter.service;
+package nl.clockwork.ebms.iface;
 
 import javax.xml.ws.WebFault;
 
 
-@WebFault(name="EbMSAdapterException", targetNamespace="http://www.clockwork.nl/ebms/adapter/1.0")
-public class EbMSAdapterException extends RuntimeException
+@WebFault(name="CPAServiceException", targetNamespace="http://www.clockwork.nl/cpa/1.0")
+public class CPAServiceException extends RuntimeException
 {
 	private static final long serialVersionUID = 1L;
 
-	public EbMSAdapterException()
+	public CPAServiceException()
 	{
 		super();
 	}
 
-	public EbMSAdapterException(String message, Throwable cause)
+	public CPAServiceException(String message, Throwable cause)
 	{
 		super(message,cause);
 	}
 
-	public EbMSAdapterException(String message)
+	public CPAServiceException(String message)
 	{
 		super(message);
 	}
 
-	public EbMSAdapterException(Throwable cause)
+	public CPAServiceException(Throwable cause)
 	{
 		super(cause);
 	}

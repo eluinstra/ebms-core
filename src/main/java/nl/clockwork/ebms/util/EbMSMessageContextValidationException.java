@@ -18,7 +18,7 @@ package nl.clockwork.ebms.util;
 import javax.xml.ws.WebFault;
 
 
-@WebFault(name="EbMSAdapterException", targetNamespace="http://www.clockwork.nl/ebms/adapter/1.0")
+@WebFault(name="EbMSMessageServiceException", targetNamespace="http://www.clockwork.nl/ebms/1.0")
 public class EbMSMessageContextValidationException extends RuntimeException
 {
 	private static final long serialVersionUID = 1L;
