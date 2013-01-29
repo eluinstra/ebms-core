@@ -24,11 +24,8 @@ import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Enumeration;
-import java.util.Iterator;
 import java.util.List;
 
-import javax.xml.XMLConstants;
-import javax.xml.namespace.NamespaceContext;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.xpath.XPathConstants;
 
@@ -45,6 +42,7 @@ import nl.clockwork.ebms.model.cpp.cpa.PartyInfo;
 import nl.clockwork.ebms.model.ebxml.MessageHeader;
 import nl.clockwork.ebms.model.xml.dsig.SignatureType;
 import nl.clockwork.ebms.util.CPAUtils;
+import nl.clockwork.ebms.xml.EbXMLNamespaceContext;
 import nl.clockwork.ebms.xml.dsig.EbMSAttachmentResolver;
 
 import org.apache.commons.logging.Log;
@@ -66,36 +64,7 @@ import org.w3c.dom.NodeList;
 
 public class EbMSSecSignatureInInterceptor extends AbstractSoapInterceptor
 {
-	public class EbXMLNamespaceContext implements NamespaceContext
-	{
-
-		public String getNamespaceURI(String prefix)
-		{
-			if (prefix == null)
-				throw new NullPointerException("prefix is null");
-			else if ("soap".equals(prefix))
-				return "http://schemas.xmlsoap.org/soap/envelope/";
-			else if ("ebxml".equals(prefix))
-				return "http://www.oasis-open.org/committees/ebxml-msg/schema/msg-header-2_0.xsd";
-			else if ("ds".equals(prefix))
-				return "http://www.w3.org/2000/09/xmldsig#";
-			return XMLConstants.NULL_NS_URI;
-		}
-
-		public String getPrefix(String uri)
-		{
-			throw new UnsupportedOperationException();
-		}
-
-		public Iterator<Object> getPrefixes(String uri)
-		{
-			throw new UnsupportedOperationException();
-		}
-
-	}
-
 	protected transient Log logger = LogFactory.getLog(getClass());
-
 	private EbMSDAO ebMSDAO;
 	private String keyStorePath;
 	private String keyStorePassword;
