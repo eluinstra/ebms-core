@@ -29,7 +29,7 @@ import nl.clockwork.ebms.model.ebxml.From;
 import nl.clockwork.ebms.model.ebxml.MessageHeader;
 import nl.clockwork.ebms.model.ebxml.MessageStatusType;
 import nl.clockwork.ebms.model.ebxml.SeverityType;
-import nl.clockwork.ebms.model.xml.xmldsig.ReferenceType;
+import nl.clockwork.ebms.model.xml.dsig.ReferenceType;
 import nl.clockwork.ebms.util.EbMSMessageUtils;
 import nl.clockwork.ebms.validation.CPAValidator;
 import nl.clockwork.ebms.validation.ManifestValidator;

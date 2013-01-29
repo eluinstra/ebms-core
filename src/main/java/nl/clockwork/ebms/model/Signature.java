@@ -18,11 +18,11 @@ package nl.clockwork.ebms.model;
 import java.security.cert.X509Certificate;
 import java.util.List;
 
-import nl.clockwork.ebms.model.xml.xmldsig.KeyInfoType;
-import nl.clockwork.ebms.model.xml.xmldsig.ObjectType;
-import nl.clockwork.ebms.model.xml.xmldsig.SignatureType;
-import nl.clockwork.ebms.model.xml.xmldsig.SignatureValueType;
-import nl.clockwork.ebms.model.xml.xmldsig.SignedInfoType;
+import nl.clockwork.ebms.model.xml.dsig.KeyInfoType;
+import nl.clockwork.ebms.model.xml.dsig.ObjectType;
+import nl.clockwork.ebms.model.xml.dsig.SignatureType;
+import nl.clockwork.ebms.model.xml.dsig.SignatureValueType;
+import nl.clockwork.ebms.model.xml.dsig.SignedInfoType;
 
 public class Signature extends SignatureType
 {

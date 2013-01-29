@@ -34,9 +34,9 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import nl.clockwork.common.util.SecurityUtils;
 import nl.clockwork.ebms.model.EbMSAttachment;
-import nl.clockwork.mule.ebms.util.SecurityUtils;
-import nl.clockwork.mule.ebms.xmldsig.EbMSAttachmentResolver;
+import nl.clockwork.ebms.xml.dsig.EbMSAttachmentResolver;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

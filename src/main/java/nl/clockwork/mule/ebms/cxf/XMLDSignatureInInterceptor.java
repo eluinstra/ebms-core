@@ -40,7 +40,6 @@ import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamReader;
 
 import nl.clockwork.ebms.model.EbMSAttachment;
-import nl.clockwork.mule.ebms.xmldsig.EbMSAttachmentURIDereferencer;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -52,6 +51,7 @@ import org.apache.cxf.interceptor.StaxInInterceptor;
 import org.apache.cxf.message.Attachment;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.staxutils.StaxUtils;
+import org.jcp.xml.dsig.internal.dom.EbMSAttachmentURIDereferencer;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 

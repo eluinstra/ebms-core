@@ -42,6 +42,7 @@ import javax.xml.transform.stream.StreamResult;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 
+import nl.clockwork.common.util.SecurityUtils;
 import nl.clockwork.common.util.XMLMessageBuilder;
 import nl.clockwork.common.util.XMLUtils;
 import nl.clockwork.ebms.dao.DAOException;
@@ -52,8 +53,7 @@ import nl.clockwork.ebms.model.cpp.cpa.DeliveryChannel;
 import nl.clockwork.ebms.model.cpp.cpa.PartyInfo;
 import nl.clockwork.ebms.model.ebxml.MessageHeader;
 import nl.clockwork.ebms.util.CPAUtils;
-import nl.clockwork.mule.ebms.util.SecurityUtils;
-import nl.clockwork.mule.ebms.xmldsig.EbMSAttachmentResolver;
+import nl.clockwork.ebms.xml.dsig.EbMSAttachmentResolver;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

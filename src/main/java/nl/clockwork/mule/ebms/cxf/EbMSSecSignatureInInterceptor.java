@@ -32,6 +32,7 @@ import javax.xml.namespace.NamespaceContext;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.xpath.XPathConstants;
 
+import nl.clockwork.common.util.SecurityUtils;
 import nl.clockwork.common.util.XMLMessageBuilder;
 import nl.clockwork.common.util.XMLUtils;
 import nl.clockwork.ebms.SignatureManager;
@@ -42,10 +43,9 @@ import nl.clockwork.ebms.model.cpp.cpa.CollaborationProtocolAgreement;
 import nl.clockwork.ebms.model.cpp.cpa.DeliveryChannel;
 import nl.clockwork.ebms.model.cpp.cpa.PartyInfo;
 import nl.clockwork.ebms.model.ebxml.MessageHeader;
-import nl.clockwork.ebms.model.xml.xmldsig.SignatureType;
+import nl.clockwork.ebms.model.xml.dsig.SignatureType;
 import nl.clockwork.ebms.util.CPAUtils;
-import nl.clockwork.mule.ebms.util.SecurityUtils;
-import nl.clockwork.mule.ebms.xmldsig.EbMSAttachmentResolver;
+import nl.clockwork.ebms.xml.dsig.EbMSAttachmentResolver;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

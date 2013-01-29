@@ -43,7 +43,7 @@ import nl.clockwork.ebms.model.ebxml.MessageOrder;
 import nl.clockwork.ebms.model.ebxml.StatusRequest;
 import nl.clockwork.ebms.model.ebxml.StatusResponse;
 import nl.clockwork.ebms.model.ebxml.SyncReply;
-import nl.clockwork.ebms.model.xml.xmldsig.SignatureType;
+import nl.clockwork.ebms.model.xml.dsig.SignatureType;
 import nl.clockwork.ebms.processor.EbMSMessageProcessor;
 
 import org.apache.commons.logging.Log;

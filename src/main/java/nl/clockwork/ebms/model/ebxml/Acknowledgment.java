@@ -36,7 +36,7 @@ import javax.xml.namespace.QName;
 
 import nl.clockwork.ebms.jaxb.EbMSDateTimeAdapter;
 import nl.clockwork.ebms.model.ebxml.runtime.ZeroOneBooleanAdapter;
-import nl.clockwork.ebms.model.xml.xmldsig.ReferenceType;
+import nl.clockwork.ebms.model.xml.dsig.ReferenceType;
 
 import org.w3c.dom.Element;
 
