@@ -19,13 +19,7 @@ CREATE TABLE ebms_message
 	service_type			VARCHAR(256)		NULL,
 	service						VARCHAR(256)		NOT NULL,
 	action						VARCHAR(256)		NOT NULL,
-	original					BLOB						NULL,
-	signature					CLOB						NULL,
-	message_header		CLOB						NOT NULL,
-	sync_reply				CLOB						NULL,
-	message_order			CLOB						NULL,
-	ack_requested			CLOB						NULL,
-	content						CLOB						NULL,
+	message						CLOB						NOT NULL,
 	status						INTEGER					NULL,
 	status_time				TIMESTAMP				NULL
 );
@@ -48,7 +42,8 @@ CREATE TABLE ebms_send_event
 	time							TIMESTAMP				DEFAULT NOW() NOT NULL,
 	status						INTEGER					DEFAULT 0 NOT NULL,
 	status_time				TIMESTAMP				DEFAULT NOW() NOT NULL,
---	http_status_code	INTEGER					NULL,
+--	http_url					INTEGER					NULL,
+--	http_status_code	VARCHAR(2048)		NULL,
 	FOREIGN KEY (ebms_message_id) REFERENCES ebms_message(id),
 	UNIQUE (ebms_message_id,time)
 );
