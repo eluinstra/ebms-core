@@ -33,7 +33,7 @@ public class SSLFactoryManager
 	private String keyStorePassword;
 	private String trustStorePath;
 	private String trustStorePassword;
-  public String[] allowedCipherSuites = new String[]{};
+	public String[] allowedCipherSuites = new String[]{};
 	private boolean requireClientAuthentication;
 	private boolean verifyHostnames;
 	private SSLSocketFactory sslFactory;
