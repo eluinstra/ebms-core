@@ -34,7 +34,7 @@
 		<property name="ebMSDAO" ref="ebMSDAO"/>
 	</bean>
 
-	<bean id="JobScheduler" class="nl.clockwork.ebms.job.JobScheduler" init-method="init" destroy-method="destroy">
+	<bean id="jobScheduler" class="nl.clockwork.ebms.job.JobScheduler" init-method="init" destroy-method="destroy">
 		<property name="delay" value="${jobScheduler.delay}"/>
 		<property name="period" value="${jobScheduler.period}"/>
 		<property name="jobs">
