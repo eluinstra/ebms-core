@@ -49,15 +49,14 @@ public class EbMSMessageProcessorImpl implements EbMSMessageProcessor
   private ManifestValidator manifestValidator;
   private SignatureValidator signatureValidator;
   
-	public EbMSMessageProcessorImpl(EbMSDAO ebMSDAO)
+	public void init()
 	{
-		this.ebMSDAO = ebMSDAO;
 		cpaValidator = new CPAValidator();
 		messageHeaderValidator = new MessageHeaderValidator(ebMSDAO);
 		manifestValidator = new ManifestValidator();
 		signatureValidator = new SignatureValidator();
 	}
-
+	
 	@Override
 	public EbMSBaseMessage process(EbMSMessage message)
 	{
@@ -181,8 +180,7 @@ public class EbMSMessageProcessorImpl implements EbMSMessageProcessor
 			return null;
 	}
 	
-	@Override
-	public void process(EbMSMessageError messageError)
+	private void process(EbMSMessageError messageError)
 	{
 		MessageHeader messageHeader = messageError.getMessageHeader();
 		if (isDuplicate(messageHeader))
@@ -195,8 +193,7 @@ public class EbMSMessageProcessorImpl implements EbMSMessageProcessor
 			ebMSDAO.insertMessage(messageError,EbMSMessageStatus.DELIVERY_FAILED);
 	}
 	
-	@Override
-	public void process(EbMSAcknowledgment acknowledgment)
+	private void process(EbMSAcknowledgment acknowledgment)
 	{
 		MessageHeader messageHeader = acknowledgment.getMessageHeader();
 		if (isDuplicate(messageHeader))
@@ -209,8 +206,7 @@ public class EbMSMessageProcessorImpl implements EbMSMessageProcessor
 			ebMSDAO.insertMessage(acknowledgment,EbMSMessageStatus.DELIVERED);
 	}
 	
-	@Override
-	public EbMSBaseMessage process(EbMSStatusRequest statusRequest)
+	private EbMSBaseMessage process(EbMSStatusRequest statusRequest)
 	{
 		try
 		{
@@ -233,8 +229,7 @@ public class EbMSMessageProcessorImpl implements EbMSMessageProcessor
 		}
 	}
 	
-	@Override
-	public EbMSBaseMessage process(EbMSPing ping)
+	private EbMSBaseMessage process(EbMSPing ping)
 	{
 		try
 		{
@@ -264,6 +259,7 @@ public class EbMSMessageProcessorImpl implements EbMSMessageProcessor
 
 	private boolean equalsDuplicateMessageHeader(MessageHeader messageHeader)
 	{
+		//TODO extend comparison (signature)
 		MessageHeader duplicateMessageHeader = ebMSDAO.getMessageHeader(messageHeader.getMessageData().getMessageId());
 		return messageHeader.getCPAId().equals(duplicateMessageHeader.getCPAId())
 		&& messageHeader.getService().getType().equals(duplicateMessageHeader.getService().getType())
@@ -348,6 +344,11 @@ public class EbMSMessageProcessorImpl implements EbMSMessageProcessor
 	public EbMSPong createEbMSPong(EbMSPing ping) throws DatatypeConfigurationException, JAXBException
 	{
 		return EbMSMessageUtils.ebMSPingToEbMSPong(ping,hostname);
+	}
+	
+	public void setEbMSDAO(EbMSDAO ebMSDAO)
+	{
+		this.ebMSDAO = ebMSDAO;
 	}
 
 }

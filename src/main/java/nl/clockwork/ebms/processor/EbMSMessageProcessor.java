@@ -15,19 +15,11 @@
  ******************************************************************************/
 package nl.clockwork.ebms.processor;
 
-import nl.clockwork.ebms.model.EbMSAcknowledgment;
 import nl.clockwork.ebms.model.EbMSBaseMessage;
 import nl.clockwork.ebms.model.EbMSMessage;
-import nl.clockwork.ebms.model.EbMSMessageError;
-import nl.clockwork.ebms.model.EbMSPing;
-import nl.clockwork.ebms.model.EbMSStatusRequest;
 
 
 public interface EbMSMessageProcessor
 {
 	EbMSBaseMessage process(EbMSMessage message);
-	void process(EbMSMessageError messageError);
-	void process(EbMSAcknowledgment acknowledgment);
-	EbMSBaseMessage process(EbMSStatusRequest request);
-	EbMSBaseMessage process(EbMSPing message);
 }

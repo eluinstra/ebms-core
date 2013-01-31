@@ -100,11 +100,7 @@ public class Constants
 		}
   };
 
-  public static final String[] allowedCipherSuites = new String[]{"TLS_DHE_RSA_WITH_AES_128_CBC_SHA","TLS_RSA_WITH_AES_128_CBC_SHA"};
-  
-	public static final String DEFAULT_FILENAME = "filename";
-
-	public static final String CPA_ID = "EBMS.CPA_ID";
+	public static final String DEFAULT_FILENAME = "file";
 
 	public static final String EBMS_VERSION = "2.0";
 	public static final String EBMS_SERVICE_URI = "urn:oasis:names:tc:ebxml-msg:service";
@@ -112,11 +108,13 @@ public class Constants
 	public static final String EBMS_ERROR_CODE_CONTEXT = EBMS_SERVICE_URI + ":errors";
 	public static final String EBMS_DEFAULT_LANGUAGE = "en-US";
 
-	public static final String EBMS_ERROR = "EBMS.EBMS_ERROR";
-
-	public static final String EBMS_MESSAGE = "EBMS.EBMS_MESSAGE";
-	public static final String EBMS_MESSAGE_ID = "EBMS.EBMS_MESSAGE_ID";
-	public static final String EBMS_MESSAGE_STATUS = "EBMS.EBMS_MESSAGE_STATUS";
-	public static final String EBMS_DELEGATE_PATH = "EBMS.EBMS_DELEGATE_PATH";
+	public static final String NAMESPACE_URI_XML_NS = "http://www.w3.org/2000/xmlns/";
+	public static final String NAMESPACE_URI_SOAP_ENVELOPE = "http://schemas.xmlsoap.org/soap/envelope/";
+	public static final String TRANSFORM_ALGORITHM_XPATH = "http://www.w3.org/TR/1999/REC-xpath-19991116";
+	public static final String NAMESPACE_PREFIX_SOAP_ENVELOPE = "soap";
+	//public static final String TRANSFORM_XPATH = "not(ancestor-or-self::node()[@" + NAMESPACE_PREFIX_SOAP_ENVELOPE + ":actor=\"" + ACTOR_NEXT_MSH_URN + "\"] | ancestor-or-self::node()[@" + NAMESPACE_PREFIX_SOAP_ENVELOPE + ":actor=\"" + ACTOR_NEXT_MSH_SCHEMAS + "\"])";
+	public static final String TRANSFORM_XPATH = "not(ancestor-or-self::node()[@" + NAMESPACE_PREFIX_SOAP_ENVELOPE + ":actor=\"urn:oasis:names:tc:ebxml-msg:service:nextMSH\"]|ancestor-or-self::node()[@" + NAMESPACE_PREFIX_SOAP_ENVELOPE + ":actor=\"http://schemas.xmlsoap.org/soap/actor/next\"])";
+	public static final String NAMESPACE_PREFIX_DS = "ds";
+	public static final String CID = "cid:";
 
 }

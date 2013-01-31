@@ -37,7 +37,7 @@ public class SignatureValidator
 	public Error validate(CollaborationProtocolAgreement cpa, MessageHeader messageHeader, Signature signature)
 	{
 		PartyInfo partyInfo = CPAUtils.getPartyInfo(cpa,messageHeader.getFrom().getPartyId());
-		List<DeliveryChannel> deliveryChannels = CPAUtils.getDeliveryChannels(partyInfo,messageHeader.getFrom().getRole(),messageHeader.getService(),messageHeader.getAction());
+		List<DeliveryChannel> deliveryChannels = CPAUtils.getSendingDeliveryChannels(partyInfo,messageHeader.getFrom().getRole(),messageHeader.getService(),messageHeader.getAction());
 		if (CPAUtils.isSigned(deliveryChannels.get(0)))
 		{
 			if (signature == null)

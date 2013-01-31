@@ -43,21 +43,11 @@
 		<!--appender-ref ref="FILE"/-->
 	</appender>
 
-	<logger name="nl.clockwork" additivity="false">
-		<level value="info"/>
-		<appender-ref ref="ASYNC"/>
-	</logger>
-	
-	<logger name="nl.clockwork.mule.ebms" additivity="false">
+	<logger name="nl.clockwork.ebms" additivity="false">
 		<level value="debug"/>
 		<appender-ref ref="ASYNC"/>
 	</logger>
 	
-	<logger name="org.apache" additivity="false">
-		<level value="warn"/>
-		<appender-ref ref="ASYNC"/>
-	</logger>
-
 	<logger name="com.sun.org" additivity="false">
 		<level value="warn"/>
 		<appender-ref ref="ASYNC"/>
@@ -73,16 +63,6 @@
 		<appender-ref ref="ASYNC"/>
 	</logger>	
 
-	<logger name="net.sf.saxon" additivity="false">
-		<level value="debug"/>
-		<appender-ref ref="ASYNC"/>
-	</logger>
-
-	<logger name="org.hibernate.engine.StatefulPersistenceContext.ProxyWarnLog" additivity="false">
-		<level value="error"/>
-		<appender-ref ref="ASYNC"/>
-	</logger>
-
 	<logger name="org.springframework.beans.factory" additivity="false">
 		<level value="warn"/>
 		<appender-ref ref="ASYNC"/>
@@ -95,51 +75,6 @@
 
 	<logger name="com.mchange.v2" additivity="false">
 		<level value="warn"/>
-		<appender-ref ref="ASYNC"/>
-	</logger>
-
-	<logger name="com.mulesource" additivity="false">
-		<level value="info"/>
-		<appender-ref ref="ASYNC"/>
-	</logger>
-
-	<logger name="org.mule" additivity="false">
-		<level value="info"/>
-		<appender-ref ref="ASYNC"/>
-	</logger>
-
-	<logger name="org.mule.expression" additivity="false">
-		<level value="debug"/>
-		<appender-ref ref="ASYNC"/>
-	</logger>
-	
-	<logger name="org.mule.module.xml.expression" additivity="false">
-		<level value="debug"/>
-		<appender-ref ref="ASYNC"/>
-	</logger>
-
-	<logger name="org.mule.routing" additivity="false">
-		<level value="debug"/>
-		<appender-ref ref="ASYNC"/>
-	</logger>
-	
-	<logger name="org.mule.routing.filters.ExpressionFilter" additivity="false">
-		<level value="debug" />
-		<appender-ref ref="ASYNC"/>
-	</logger>
-	
-	<logger name="org.mule.routing.filters" additivity="false">
-		<level value="debug"/>
-		<appender-ref ref="ASYNC"/>
-	</logger>
-	
-	<logger name="org.mule.module.xml.transformer.AbstractXmlTransformer" additivity="false">
-		<level value="debug"/>
-		<appender-ref ref="ASYNC"/>
-	</logger>	
-
-	<logger name="org.mule.routing.outbound" additivity="false">
-		<level value="debug"/>
 		<appender-ref ref="ASYNC"/>
 	</logger>
 

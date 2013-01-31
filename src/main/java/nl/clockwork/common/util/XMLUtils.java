@@ -33,23 +33,8 @@ import org.w3c.dom.Node;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
-import com.thoughtworks.xstream.XStream;
-
 public class XMLUtils
 {
-	public static String objectToXML(Object o)
-	{
-		XStream xstream = new XStream();
-		//xstream.alias("object",o.getClass());
-		return xstream.toXML(o);
-	}
-
-	public static Object xmlToObject(String xml)
-	{
-		XStream xstream = new XStream();
-		return xstream.fromXML(xml);
-	}
-
 	public static String executeXPathQuery(String content, String query) throws ParserConfigurationException, SAXException, IOException, XPathExpressionException
 	{
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();

@@ -25,6 +25,7 @@ import java.util.List;
 
 import javax.xml.bind.JAXBElement;
 
+import nl.clockwork.ebms.Constants;
 import nl.clockwork.ebms.model.cpp.cpa.ActionBindingType;
 import nl.clockwork.ebms.model.cpp.cpa.CanReceive;
 import nl.clockwork.ebms.model.cpp.cpa.CanSend;
@@ -174,15 +175,41 @@ public class CPAUtils
 		return (DeliveryChannel)((JAXBElement<Object>)bindingType.getChannelId().get(0)).getValue();
 	}
 	
-	public static List<DeliveryChannel> getDeliveryChannels(PartyInfo partyInfo, String role, Service service, String action)
+	public static List<DeliveryChannel> getSendingDeliveryChannels(PartyInfo partyInfo, String role, Service service, String action)
 	{
 		List<DeliveryChannel> result = new ArrayList<DeliveryChannel>();
-		ServiceBinding serviceBinding = getServiceBinding(partyInfo, role, service);
-		if (serviceBinding != null)
-			for (CanSend canSend : serviceBinding.getCanSend())
-				if (action.equals(canSend.getThisPartyActionBinding().getAction()))
-					for (JAXBElement<Object> o : canSend.getThisPartyActionBinding().getChannelId())
-						result.add((DeliveryChannel)o.getValue());
+		if (Constants.EBMS_SERVICE_URI.equals(service.getValue()))
+		{
+					result.add((DeliveryChannel)partyInfo.getDefaultMshChannelId());
+		}
+		else
+		{
+			ServiceBinding serviceBinding = getServiceBinding(partyInfo, role, service);
+			if (serviceBinding != null)
+				for (CanSend canSend : serviceBinding.getCanSend())
+					if (action.equals(canSend.getThisPartyActionBinding().getAction()))
+						for (JAXBElement<Object> o : canSend.getThisPartyActionBinding().getChannelId())
+							result.add((DeliveryChannel)o.getValue());
+		}
+		return result;
+	}
+	
+	public static List<DeliveryChannel> getReceivingDeliveryChannels(PartyInfo partyInfo, String role, Service service, String action)
+	{
+		List<DeliveryChannel> result = new ArrayList<DeliveryChannel>();
+		if (Constants.EBMS_SERVICE_URI.equals(service.getValue()))
+		{
+					result.add((DeliveryChannel)partyInfo.getDefaultMshChannelId());
+		}
+		else
+		{
+			ServiceBinding serviceBinding = getServiceBinding(partyInfo, role, service);
+			if (serviceBinding != null)
+				for (CanReceive canReceive : serviceBinding.getCanReceive())
+					if (action.equals(canReceive.getThisPartyActionBinding().getAction()))
+						for (JAXBElement<Object> o : canReceive.getThisPartyActionBinding().getChannelId())
+							result.add((DeliveryChannel)o.getValue());
+		}
 		return result;
 	}
 	
@@ -232,7 +259,7 @@ public class CPAUtils
 		try
 		{
 			PartyInfo partyInfo = getPartyInfo(cpa,messageHeader.getFrom().getPartyId());
-			List<DeliveryChannel> deliveryChannels = getDeliveryChannels(partyInfo,messageHeader.getFrom().getRole(),messageHeader.getService(),messageHeader.getAction());
+			List<DeliveryChannel> deliveryChannels = getSendingDeliveryChannels(partyInfo,messageHeader.getFrom().getRole(),messageHeader.getService(),messageHeader.getAction());
 			return ((DocExchange)deliveryChannels.get(0).getDocExchangeId()).getEbXMLSenderBinding().getReliableMessaging();
 		}
 		catch (Exception e)
@@ -240,4 +267,5 @@ public class CPAUtils
 			return null;
 		}
 	}
+	
 }

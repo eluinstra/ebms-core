@@ -23,36 +23,4 @@
 		<constructor-arg index="1" ref="ebMSDataSource"/>
 	</bean>
 
-	<bean id="insertCPA" class="java.lang.String">
-		<constructor-arg value="insert into cpa (cpa_id, cpa) values (#[map-payload:cpa_id], #[map-payload:cpa])" />
-	</bean>
-	<bean id="updateCPA" class="java.lang.String">
-		<constructor-arg value="update cpa set cpa=#[map-payload:cpa] where cpa_id=#[map-payload:cpa_id]" />
-	</bean>
-
-	<bean id="updateEbMSMessageStatus" class="java.lang.String">
-		<constructor-arg value="update ebms_message set status=#[map-payload:status], status_time=GETDATE() where id=#[map-payload:id]" /> 
-	</bean>
-
-	<bean id="addEbMSMessageSendEvent" class="java.lang.String">
-		<constructor-arg value="insert into ebms_send_event (ebms_message_id) values (#[map-payload:id])" /> 
-	</bean>
-
-	<bean id="selectEventsForSending" class="java.lang.String">
-		<constructor-arg value="select ebms_message_id, max(time) as time from ebms_send_event where status=0 and time&lt;=GETDATE() group by ebms_message_id" />
-	</bean>
-	<bean id="selectEventsForSending.ack" class="java.lang.String">
-		<constructor-arg value="update ebms_send_event set status=1, status_time=GETDATE() where ebms_message_id=#[map-payload:ebms_message_id] and time=#[map-payload:time];" /> 
-	</bean>
-	<bean id="deleteExpiredEvents" class="java.lang.String">
-		<constructor-arg value="delete from ebms_send_event where ebms_message_id=#[map-payload:ebms_message_id] and time&lt;#[map-payload:time] and status=0" />
-	</bean>
-
-	<bean id="selectEbMSMessageForProcessing" class="java.lang.String">
-		<constructor-arg value="select id from ebms_message where service!='urn:oasis:names:tc:ebxml-msg:service' and status=2" />
-	</bean>
-	<bean id="selectEbMSMessageForProcessing.ack" class="java.lang.String">
-		<constructor-arg value="update ebms_message set status=3, status_time=GETDATE() where id=#[map-payload:id]" /> 
-	</bean>
-
 </beans>

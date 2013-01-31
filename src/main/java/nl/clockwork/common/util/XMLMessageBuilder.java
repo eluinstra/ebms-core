@@ -98,7 +98,18 @@ public class XMLMessageBuilder<T>
 	{
 		if (xmlHandlers.get(clazz) == null)
 		{
-      JAXBContext context = JAXBContext.newInstance(clazz.getPackage().getName());
+      JAXBContext context = JAXBContext.newInstance(clazz);
+			xmlHandlers.put(clazz,new XMLMessageBuilder<L>(context));
+		}
+		return (XMLMessageBuilder<L>)xmlHandlers.get(clazz);
+	}
+
+	@SuppressWarnings("unchecked")
+	public static <L> XMLMessageBuilder<L> getInstance(Class<L> clazz, Class<?>...clazzes) throws JAXBException
+	{
+		if (xmlHandlers.get(clazz) == null)
+		{
+      JAXBContext context = JAXBContext.newInstance(clazzes);
 			xmlHandlers.put(clazz,new XMLMessageBuilder<L>(context));
 		}
 		return (XMLMessageBuilder<L>)xmlHandlers.get(clazz);

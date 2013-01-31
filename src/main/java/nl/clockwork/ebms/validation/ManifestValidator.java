@@ -37,11 +37,11 @@ public class ManifestValidator
 			return EbMSMessageUtils.createError("//Body/Manifest[@version]",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Wrong value.");
 		for (Reference reference : manifest.getReference())
 		{
-			if (reference.getHref().startsWith("cid:"))
+			if (reference.getHref().startsWith(Constants.CID))
 			{
 				boolean found = false;
 				for (EbMSAttachment attachment : attachments)
-					if (reference.getHref().substring("cid:".length()).equals(attachment.getContentId()))
+					if (reference.getHref().substring(Constants.CID.length()).equals(attachment.getContentId()))
 						found = true;
 				if (!found)
 					return EbMSMessageUtils.createError(reference.getHref(),Constants.EbMSErrorCode.MIME_PROBLEM.errorCode(),"MIME part not found.");

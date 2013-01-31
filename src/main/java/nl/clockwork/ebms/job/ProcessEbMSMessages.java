@@ -1,8 +1,9 @@
 package nl.clockwork.ebms.job;
 
-public class ProcessEbMSMessages
+public class ProcessEbMSMessages implements Job
 {
-	public void process()
+	@Override
+	public void execute()
 	{
 		
 	}

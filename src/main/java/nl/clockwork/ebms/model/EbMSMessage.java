@@ -15,6 +15,7 @@
  ******************************************************************************/
 package nl.clockwork.ebms.model;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import nl.clockwork.ebms.model.ebxml.AckRequested;
@@ -41,7 +42,7 @@ public class EbMSMessage implements EbMSBaseMessage
 	private Manifest manifest;
 	private StatusRequest statusRequest;
 	private StatusResponse statusResponse;
-	private List<EbMSAttachment> attachments;
+	private List<EbMSAttachment> attachments = new ArrayList<EbMSAttachment>();
 
 	public EbMSMessage(MessageHeader messageHeader, AckRequested ackRequested, Manifest manifest, List<EbMSAttachment> attachments)
 	{
@@ -101,7 +102,7 @@ public class EbMSMessage implements EbMSBaseMessage
 		this.statusRequest = statusRequest;
 		this.statusResponse = statusResponse;
 		this.manifest = manifest;
-		this.attachments = attachments;
+		this.attachments = attachments == null ? new ArrayList<EbMSAttachment>() : attachments;
 	}
 
 	public byte[] getOriginal()

@@ -15,7 +15,7 @@
  ******************************************************************************/
 package nl.clockwork.ebms.util;
 
-import org.apache.cxf.common.util.StringUtils;
+import org.apache.commons.lang.StringUtils;
 
 import nl.clockwork.ebms.dao.DAOException;
 import nl.clockwork.ebms.dao.EbMSDAO;

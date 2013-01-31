@@ -18,9 +18,19 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-	<bean id="ebMSDAO" class="nl.clockwork.ebms.dao.oracle.EbMSDAOImpl">
-		<constructor-arg index="0" ref="ebMSTransactionTemplate"/>
-		<constructor-arg index="1" ref="ebMSDataSource"/>
+	<import resource="dao/datasource.xml"/>
+	<import resource="dao/hsqldb.xml"/>
+	<import resource="dao/hsqldb.provider.xml"/>
+	<import resource="processor.xml"/>
+	<import resource="interface.xml"/>
+
+	<bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="ignoreResourceNotFound" value="true" />
+		<property name="locations"> 
+			<list>
+				<value>classpath:nl/clockwork/ebms/default.properties</value>   
+			</list>
+		</property>
 	</bean>
 
 </beans>

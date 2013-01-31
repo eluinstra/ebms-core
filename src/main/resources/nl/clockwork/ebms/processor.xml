@@ -19,13 +19,56 @@
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd"
 >
 
-	<bean id="messageProcessor" class="nl.clockwork.ebms.processor.EbMSMessageProcessorImpl">
-		<constructor-arg ref="ebMSDAO"/>
+	<bean id="httpProcessor" class="nl.clockwork.ebms.processor.EbMSHttpMime4jProcessor">
+		<property name="signatureValidator" ref="signatureValidator"/>
+		<property name="messageProcessor" ref="messageProcessor"/>
 	</bean>
 
-<!--	<bean id="processSendEvents" class="nl.clockwork.ebms.job.ProcessSendEvents">-->
-<!--		<property name="ebMSDAO" ref="ebMSDAO"/>-->
-<!--		<property name="ebMSPortType" ref="ebMSPortType"/>-->
-<!--	</bean>-->
+	<bean id="signatureValidator" class="nl.clockwork.ebms.signing.EbMSSecSignatureValidator">
+		<property name="ebMSDAO" ref="ebMSDAO"/>
+		<property name="keyStorePath" value="${truststore.path}"/>
+		<property name="keyStorePassword" value="${truststore.password}"/>
+	</bean>
+
+	<bean id="messageProcessor" class="nl.clockwork.ebms.processor.EbMSMessageProcessorImpl" init-method="init">
+		<property name="ebMSDAO" ref="ebMSDAO"/>
+	</bean>
+
+	<bean id="JobScheduler" class="nl.clockwork.ebms.job.JobScheduler" init-method="init" destroy-method="destroy">
+		<property name="delay" value="${jobScheduler.delay}"/>
+		<property name="period" value="${jobScheduler.period}"/>
+		<property name="jobs">
+			<list>
+				<bean id="processSendEvents" class="nl.clockwork.ebms.job.ProcessSendEvents">
+					<property name="ebMSDAO" ref="ebMSDAO"/>
+					<property name="ebMSClient" ref="ebMSClient"/>
+				</bean>
+			</list>
+		</property>
+	</bean>
+
+	<bean id="ebMSClient" class="nl.clockwork.ebms.client.EbMSHttpClient">
+		<property name="ebMSDAO" ref="ebMSDAO"/>
+		<property name="signatureGenerator" ref="signatureGenerator"/>
+		<property name="sslFactoryManager" ref="sslFactoryManager"/>
+	</bean>
+
+	<bean id="signatureGenerator" class="nl.clockwork.ebms.signing.EbMSSecSignatureGenerator" init-method="init">
+		<property name="ebMSDAO" ref="ebMSDAO"/>
+		<property name="keyStorePath" value="${signature.keystore.path}" />
+		<property name="keyStorePassword" value="${signature.keystore.password}" />
+		<property name="keyAlias" value="${signature.key.alias}" />
+		<property name="keyPassword" value="${signature.key.password}" />
+	</bean>  
+
+	<bean id="sslFactoryManager" class="nl.clockwork.ebms.client.SSLFactoryManager" init-method="init">
+		<property name="keyStorePath" value="${keystore.path}"/>
+		<property name="keyStorePassword" value="${keystore.password}"/>
+		<property name="trustStorePath" value="${truststore.path}"/>
+		<property name="trustStorePassword" value="${truststore.password}"/>
+		<property name="allowedCipherSuites" value="${https.allowedCipherSuites}"/>
+		<property name="requireClientAuthentication" value="${https.requireClientAuthentication}"/>
+		<property name="verifyHostnames" value="${https.verifyHostnames}"></property>
+	</bean>
 
 </beans>

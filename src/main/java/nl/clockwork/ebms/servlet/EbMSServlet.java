@@ -15,68 +15,49 @@
  ******************************************************************************/
 package nl.clockwork.ebms.servlet;
 
-import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.SequenceInputStream;
-import java.util.Enumeration;
-import java.util.Properties;
 
-import javax.mail.MessagingException;
-import javax.mail.Session;
-import javax.mail.internet.MimeMessage;
 import javax.servlet.GenericServlet;
+import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import nl.clockwork.ebms.processor.EbMSHttpProcessor;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 
 public class EbMSServlet extends GenericServlet
 {
 	private static final long serialVersionUID = 1L;
   protected transient Log logger = LogFactory.getLog(getClass());
+  private EbMSHttpProcessor httpProcessor;
 
+  @Override
+  public void init(ServletConfig config) throws ServletException
+  {
+  	super.init(config);
+		WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(getServletContext());
+		String p = config.getInitParameter("httpProcessor");
+		if (p == null)
+			p = "httpProcessor";
+		httpProcessor = wac.getBean(p,EbMSHttpProcessor.class);
+  }
+  
 	@Override
 	public void service(final ServletRequest request, ServletResponse response) throws ServletException, IOException
 	{
-		//log(request);
-		try
-		{
-			Session s = Session.getDefaultInstance(new Properties());
-			InputStream inputStream = new SequenceInputStream(new ByteArrayInputStream(("MIME-Version: 1.0\nContent-Type: " + request.getContentType() + "\n").getBytes()),request.getInputStream());
-			MimeMessage message = new MimeMessage(s,inputStream);
-
-			//MimeMultipart m = new MimeMultipart(new ServletMultipartDataSource(request));
-
-			logger.info("---");
-		}
-		catch (MessagingException e)
-		{
-			e.printStackTrace();
-		}
+		httpProcessor.process((HttpServletRequest)request,(HttpServletResponse)response);
 	}
 
-	private void log(HttpServletRequest request) throws IOException
+	public void setHttpProcessor(EbMSHttpProcessor httpProcessor)
 	{
-		Enumeration<String> headerNames = request.getHeaderNames();
-		while (headerNames.hasMoreElements())
-		{
-			String headerName = headerNames.nextElement();
-			logger.info(headerName + ": " + request.getHeader(headerName));
-//			Enumeration<String> headerValues = request.getHeaders(headerName);
-//			while (headerValues.hasMoreElements())
-//				logger.info(headerName + ": " + headerValues.nextElement());
-		}
-		BufferedReader reader = request.getReader();
-		StringBuffer s = new StringBuffer();
-		String in = null;
-		while ((in = reader.readLine()) != null)
-			s.append(in);
-		logger.info(s);
+		this.httpProcessor = httpProcessor;
 	}
 
 }

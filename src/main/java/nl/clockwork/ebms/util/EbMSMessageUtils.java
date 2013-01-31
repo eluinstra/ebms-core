@@ -15,6 +15,7 @@
  ******************************************************************************/
 package nl.clockwork.ebms.util;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -26,10 +27,16 @@ import java.util.UUID;
 
 import javax.activation.DataSource;
 import javax.mail.util.ByteArrayDataSource;
+import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.Duration;
+import javax.xml.namespace.QName;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.soap.SOAPException;
 
 import nl.clockwork.common.util.XMLMessageBuilder;
 import nl.clockwork.ebms.Constants;
@@ -52,12 +59,15 @@ import nl.clockwork.ebms.model.cpp.cpa.PartyInfo;
 import nl.clockwork.ebms.model.cpp.cpa.PerMessageCharacteristicsType;
 import nl.clockwork.ebms.model.cpp.cpa.ReliableMessaging;
 import nl.clockwork.ebms.model.ebxml.AckRequested;
+import nl.clockwork.ebms.model.ebxml.Acknowledgment;
 import nl.clockwork.ebms.model.ebxml.Description;
 import nl.clockwork.ebms.model.ebxml.Error;
+import nl.clockwork.ebms.model.ebxml.ErrorList;
 import nl.clockwork.ebms.model.ebxml.From;
 import nl.clockwork.ebms.model.ebxml.Manifest;
 import nl.clockwork.ebms.model.ebxml.MessageData;
 import nl.clockwork.ebms.model.ebxml.MessageHeader;
+import nl.clockwork.ebms.model.ebxml.MessageOrder;
 import nl.clockwork.ebms.model.ebxml.MessageStatusType;
 import nl.clockwork.ebms.model.ebxml.PartyId;
 import nl.clockwork.ebms.model.ebxml.Reference;
@@ -65,9 +75,16 @@ import nl.clockwork.ebms.model.ebxml.Service;
 import nl.clockwork.ebms.model.ebxml.SeverityType;
 import nl.clockwork.ebms.model.ebxml.StatusRequest;
 import nl.clockwork.ebms.model.ebxml.StatusResponse;
+import nl.clockwork.ebms.model.ebxml.SyncReply;
 import nl.clockwork.ebms.model.ebxml.To;
+import nl.clockwork.ebms.model.soap.envelope.Body;
+import nl.clockwork.ebms.model.soap.envelope.Envelope;
+import nl.clockwork.ebms.model.soap.envelope.Header;
+import nl.clockwork.ebms.model.xml.dsig.SignatureType;
 
 import org.apache.commons.io.IOUtils;
+import org.w3c.dom.Document;
+import org.xml.sax.SAXException;
 
 public class EbMSMessageUtils
 {
@@ -129,6 +146,7 @@ public class EbMSMessageUtils
 
 	public static MessageHeader createMessageHeader(MessageHeader messageHeader, String hostname, GregorianCalendar timestamp, EbMSAction action) throws DatatypeConfigurationException, JAXBException
 	{
+		//TODO: optimize
 		XMLMessageBuilder<MessageHeader> builder = XMLMessageBuilder.getInstance(MessageHeader.class);
 		messageHeader = builder.handle(builder.handle(messageHeader));
 		List<PartyId> partyIds = new ArrayList<PartyId>(messageHeader.getFrom().getPartyId());
@@ -253,7 +271,7 @@ public class EbMSMessageUtils
 	private static Reference createReference(int cid)
 	{
 		Reference reference = new Reference();
-		reference.setHref("cid:" + cid);
+		reference.setHref(Constants.CID + cid);
 		reference.setType("simple");
 		//reference.setRole("XLinkRole");
 		return reference;
@@ -278,13 +296,37 @@ public class EbMSMessageUtils
 		Date sendTime = messageHeader.getMessageData().getTimestamp().toGregorianCalendar().getTime();
 		ReliableMessaging rm = CPAUtils.getReliableMessaging(cpa,messageHeader);
 		if (rm != null)
-		{
 			for (int i = 0; i < rm.getRetries().intValue() + 1; i++)
 			{
 				result.add(new EbMSSendEvent((Date)sendTime.clone()));
 				rm.getRetryInterval().addTo(sendTime);
 			}
-		}
 		return result;
 	}
+
+	public static Document createSOAPMessage(EbMSMessage ebMSMessage) throws SOAPException, JAXBException, ParserConfigurationException, SAXException, IOException
+	{
+		Envelope envelope = new Envelope();
+		envelope.setHeader(new Header());
+		envelope.setBody(new Body());
+		
+		envelope.getHeader().getAny().add(ebMSMessage.getMessageHeader());
+		envelope.getHeader().getAny().add(ebMSMessage.getSyncReply());
+		envelope.getHeader().getAny().add(ebMSMessage.getMessageOrder());
+		envelope.getHeader().getAny().add(ebMSMessage.getAckRequested());
+		envelope.getHeader().getAny().add(ebMSMessage.getSignature());
+		envelope.getHeader().getAny().add(ebMSMessage.getErrorList());
+		envelope.getHeader().getAny().add(ebMSMessage.getAcknowledgment());
+		envelope.getBody().getAny().add(ebMSMessage.getManifest());
+		envelope.getBody().getAny().add(ebMSMessage.getStatusRequest());
+		envelope.getBody().getAny().add(ebMSMessage.getStatusResponse());
+		
+		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+		dbf.setNamespaceAware(true);
+		DocumentBuilder db = dbf.newDocumentBuilder();
+		Document d = db.parse(new ByteArrayInputStream(XMLMessageBuilder.getInstance(Envelope.class,Envelope.class,MessageHeader.class,SyncReply.class,MessageOrder.class,AckRequested.class,SignatureType.class,ErrorList.class,Acknowledgment.class,Manifest.class,StatusRequest.class,StatusResponse.class)
+				.handle(new JAXBElement<Envelope>(new QName("http://schemas.xmlsoap.org/soap/envelope/","Envelope"), Envelope.class, envelope)).getBytes()));
+		return d;
+	}
+
 }

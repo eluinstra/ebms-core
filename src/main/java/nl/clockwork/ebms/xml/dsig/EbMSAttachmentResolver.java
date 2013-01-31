@@ -22,6 +22,7 @@ import java.util.List;
 
 import javax.activation.DataSource;
 
+import nl.clockwork.ebms.Constants;
 import nl.clockwork.ebms.model.EbMSAttachment;
 
 import org.apache.xml.security.signature.XMLSignatureInput;
@@ -46,9 +47,9 @@ public class EbMSAttachmentResolver extends ResourceResolverSpi
 	public boolean engineCanResolve(Attr uri, String baseUri)
 	{
 		String href = uri.getNodeValue();
-		if (href.startsWith("cid:"))
+		if (href.startsWith(Constants.CID))
 			for (EbMSAttachment attachment: attachments)
-				if (href.substring("cid:".length()).equals(attachment.getContentId()))
+				if (href.substring(Constants.CID.length()).equals(attachment.getContentId()))
 					return true;
 		return false;
 	}
@@ -58,12 +59,12 @@ public class EbMSAttachmentResolver extends ResourceResolverSpi
 	{
 		String href = uri.getNodeValue();
 
-		if (!href.startsWith("cid:"))
-			throw new ResourceResolverException(href,new Object[]{"Reference URI does not start with 'cid:'"},uri,baseUri);
+		if (!href.startsWith(Constants.CID))
+			throw new ResourceResolverException(href,new Object[]{"Reference URI does not start with '" + Constants.CID + "'"},uri,baseUri);
 
 		DataSource result = null;
 		for (EbMSAttachment attachment : attachments)
-			if (href.substring("cid:".length()).equals(attachment.getContentId()))
+			if (href.substring(Constants.CID.length()).equals(attachment.getContentId()))
 			{
 				result = attachment;
 				break;

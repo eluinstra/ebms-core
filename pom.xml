@@ -2,10 +2,10 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>nl.clockwork.mule.ebms</groupId>
-	<artifactId>ebms-adapter</artifactId>
+	<groupId>nl.clockwork.ebms</groupId>
+	<artifactId>ebms-core</artifactId>
 	<packaging>jar</packaging>
-	<name>Mule EbMS Adapter</name>
+	<name>EbMS Core</name>
 	<version>2.1.0-SNAPSHOT</version>
 	<description></description>
 	<url>https://sourceforge.net/projects/muleebmsadapter/</url>
@@ -28,110 +28,96 @@
 		<url>www.clockwork.nl</url>
 	</organization>
 	<properties>
-		<mule.version>2.2.1</mule.version>
-		<saxon.version>8.7</saxon.version>
+		<spring.version>3.1.3.RELEASE</spring.version>
 	</properties>
 	<dependencies>
 		<dependency>
-			<groupId>org.mule</groupId>
-			<artifactId>mule-core</artifactId>
-			<version>${mule.version}</version>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.4</version>
+			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.mule.modules</groupId>
-			<artifactId>mule-module-spring-config</artifactId>
-			<version>${mule.version}</version>
+			<groupId>dbunit</groupId>
+			<artifactId>dbunit</artifactId>
+			<version>2.2</version>
+			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.mule.modules</groupId>
-			<artifactId>mule-module-management</artifactId>
-			<version>${mule.version}</version>
+			<groupId>javax.servlet</groupId>
+			<artifactId>servlet-api</artifactId>
+			<version>2.5</version>
 		</dependency>
 		<dependency>
-			<groupId>org.mule.modules</groupId>
-			<artifactId>mule-module-xml</artifactId>
-			<version>${mule.version}</version>
+			<groupId>javax.mail</groupId>
+			<artifactId>mail</artifactId>
+			<version>1.4</version>
 		</dependency>
-		<dependency>
-			<groupId>org.mule.modules</groupId>
-			<artifactId>mule-module-scripting</artifactId>
-			<version>${mule.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.mule.transports</groupId>
-			<artifactId>mule-transport-vm</artifactId>
-			<version>${mule.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.mule.transports</groupId>
-			<artifactId>mule-transport-http</artifactId>
-			<version>${mule.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.mule.transports</groupId>
-			<artifactId>mule-transport-cxf</artifactId>
-			<version>${mule.version}</version>
-			<exclusions>
-				<exclusion>
-					<groupId>opensaml</groupId>
-					<artifactId>opensaml</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-		<dependency>
-			<groupId>org.mule.transports</groupId>
-			<artifactId>mule-transport-jdbc</artifactId>
-			<version>${mule.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.mule.transports</groupId>
-			<artifactId>mule-transport-quartz</artifactId>
-			<version>${mule.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.mule.transports</groupId>
-			<artifactId>mule-transport-file</artifactId>
-			<version>${mule.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>xalan</groupId>
-			<artifactId>xalan</artifactId>
-			<version>2.7.1</version>
-		</dependency>
-		<dependency>
-			<groupId>net.sf.saxon</groupId>
-			<artifactId>saxon</artifactId>
-			<version>${saxon.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>net.sf.saxon</groupId>
-			<artifactId>saxon-dom</artifactId>
-			<version>${saxon.version}</version>
-		</dependency>
+	    <!--dependency>
+	      <groupId>org.springframework</groupId>
+	      <artifactId>spring-context</artifactId>
+	      <version>${spring.version}</version>
+	    </dependency--> 
+	    <dependency>
+	      <groupId>org.springframework</groupId>
+	      <artifactId>spring-web</artifactId>
+	      <version>${spring.version}</version>
+	    </dependency>
+	    <dependency>
+	      <groupId>org.springframework</groupId>
+	      <artifactId>spring-jdbc</artifactId>
+	      <version>${spring.version}</version>
+	    </dependency>
 		<dependency>
 			<groupId>commons-logging</groupId>
 			<artifactId>commons-logging</artifactId>
 			<version>1.1.1</version>
 		</dependency>
 		<dependency>
-			<groupId>log4j</groupId>
-			<artifactId>log4j</artifactId>
-			<version>1.2.14</version>
+			<groupId>commons-lang</groupId>
+			<artifactId>commons-lang</artifactId>
+			<version>2.6</version>
+		</dependency>
+		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+			<version>2.4</version>
+		</dependency>
+		<dependency>
+			<groupId>commons-codec</groupId>
+			<artifactId>commons-codec</artifactId>
+			<version>1.7</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.santuario</groupId>
+			<artifactId>xmlsec</artifactId>
+			<version>1.5.3</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.james</groupId>
 			<artifactId>apache-mime4j-core</artifactId>
 			<version>0.7.2</version>
 		</dependency>
-		<dependency>
+		<!--dependency>
 			<groupId>org.apache.james</groupId>
 			<artifactId>apache-mime4j-dom</artifactId>
 			<version>0.7.2</version>
 		</dependency>
 		<dependency>
+			<groupId>org.apache.james</groupId>
+			<artifactId>apache-mime4j-storage</artifactId>
+			<version>0.7.2</version>
+		</dependency-->
+		<!--dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpclient</artifactId>
+			<version>4.2.2</version>
+		</dependency-->
+		<dependency>
 			<groupId>c3p0</groupId>
 			<artifactId>c3p0</artifactId>
 			<version>0.9.1.2</version>
+			<scope>runtime</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.hsqldb</groupId>
@@ -143,118 +129,47 @@
 			<groupId>mysql</groupId>
 			<artifactId>mysql-connector-java</artifactId>
 			<version>5.1.18</version>
+			<scope>runtime</scope>
 		</dependency-->
 		<!--dependency>
 			<groupId>postgresql</groupId>
 			<artifactId>postgresql</artifactId>
 			<version>9.1-901.jdbc3</version>
+			<scope>runtime</scope>
 		</dependency-->
 		<!--dependency>
 			<groupId>net.sourceforge.jtds</groupId>
 			<artifactId>jtds</artifactId>
 			<version>1.2.4</version>
+			<scope>runtime</scope>
 		</dependency-->
 		<!--dependency>
 			<groupId>ms</groupId>
 			<artifactId>sqljdbc4</artifactId>
 			<version>201004</version>
+			<scope>runtime</scope>
 		</dependency-->
 		<!--dependency>
 			<groupId>oracle</groupId>
 			<artifactId>ojdbc6</artifactId>
 			<version>11.2.0.1.0</version>
+			<scope>runtime</scope>
 		</dependency>
 		<dependency>
 			<groupId>oracle</groupId>
 			<artifactId>orai18n</artifactId>
 			<version>11.2.0.1.0</version>
+			<scope>runtime</scope>
 		</dependency-->
 	</dependencies>
 	<repositories>
-		<repository>
-			<id>central</id>
-			<url>http://repo1.maven.org/maven2</url>
-		</repository>
-		<repository>
-			<id>codehaus</id>
-			<name>Codehaus Maven 2.x Release Repository</name>
-			<url>http://repository.codehaus.org</url>
-			<snapshots>
-				<enabled>false</enabled>
-			</snapshots>
-		</repository>
-		<repository>
-			<id>codehaus-snapshots</id>
-			<name>Codehaus Maven 2.x Snapshots Repository</name>
-			<url>http://snapshots.repository.codehaus.org</url>
-			<snapshots>
-				<enabled>true</enabled>
-			</snapshots>
-			<releases>
-				<enabled>false</enabled>
-			</releases>
-		</repository>
-		<repository>
-			<id>muleforge</id>
-			<url>http://repository.muleforge.org</url>
-			<snapshots>
-				<enabled>false</enabled>
-			</snapshots>
-		</repository>
-		<repository>
-			<id>sonatype-central</id>
-			<name>Sonatype Central</name>
-			<url>https://repository.sonatype.org/content/repositories/central/</url>
-		</repository>
+    <repository>
+      <id>springsource-repo</id>
+      <name>SpringSource Repository</name>
+      <url>http://repo.springsource.org/release</url>
+    </repository>
 	</repositories>
-	<pluginRepositories>
-		<pluginRepository>
-			<id>central</id>
-			<url>http://repo1.maven.org/maven2</url>
-		</pluginRepository>
-		<pluginRepository>
-			<id>apache-plugin-snapshots</id>
-			<name>Apache Maven Plugins Snapshot Repository</name>
-			<url>http://people.apache.org/repo/m2-snapshot-repository</url>
-			<snapshots>
-				<enabled>true</enabled>
-			</snapshots>
-			<releases>
-				<enabled>false</enabled>
-			</releases>
-		</pluginRepository>
-		<pluginRepository>
-			<id>muleforge</id>
-			<name>MuleForge Repository</name>
-			<url>http://repository.muleforge.org</url>
-		</pluginRepository>
-		<pluginRepository>
-			<snapshots>
-				<enabled>true</enabled>
-			</snapshots>
-			<id>atanion</id>
-			<url>http://www.atanion.com/maven2</url>
-		</pluginRepository>
-		<pluginRepository>
-			<id>maven2-repository.dev.java.net</id>
-			<name>Java.net Maven 2 Repository</name>
-			<url>http://download.java.net/maven/2</url>
-		</pluginRepository>
-		<pluginRepository>
-			<id>sonatype-central</id>
-			<name>Sonatype Central</name>
-			<url>https://repository.sonatype.org/content/repositories/central/</url>
-		</pluginRepository>
-	</pluginRepositories>
 	<build>
-		<resources>
-			<resource>
-				<directory>conf</directory>
-			</resource>
-			<resource>
-				<directory>src/main/resources</directory>
-			</resource>
-		</resources>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -346,10 +261,10 @@
 										<generatePackage>nl.clockwork.ebms.model.cpp.cpa</generatePackage>
 										<generateDirectory>src/main/java</generateDirectory>
 										<includeSchemas>
-											<includeSchema>nl/clockwork/mule/ebms/xsd/cpp-cpa-2_0.xsd</includeSchema>
+											<includeSchema>nl/clockwork/ebms/xsd/cpp-cpa-2_0.xsd</includeSchema>
 										</includeSchemas>
 										<includeBindings>
-											<includeBinding>nl/clockwork/mule/ebms/xsd/cpp-cpa-2_0.xjc</includeBinding>
+											<includeBinding>nl/clockwork/ebms/xsd/cpp-cpa-2_0.xjc</includeBinding>
 										</includeBindings>
 										<removeOldOutput>false</removeOldOutput>
 										<verbose>false</verbose>					
@@ -361,10 +276,10 @@
 			</build>
 		</profile>
 		<profile>
-			<id>generate-ebf-model</id>
+			<id>generate-ebxml-model</id>
 			<activation>
 	 			<property>
-	  				<name>generate-ebf-model</name>
+	  				<name>generate-ebxml-model</name>
 				</property>  				
 			</activation>
 	  		<build>
@@ -375,7 +290,7 @@
 						<version>1.1.1</version>
 						<executions>
 							<execution>
-									<id>generateEBFAfleverenModel</id>
+									<id>generateEbXMLModel</id>
 									<goals>
 										<goal>generate</goal>
 									</goals>
@@ -383,65 +298,14 @@
 										generate-sources
 									</phase>	
 									<configuration>
-										<generatePackage>nl.clockwork.mule.ebms.stub.ebf.model.afleveren.bericht</generatePackage>
+										<generatePackage>nl.clockwork.ebms.model.ebxml</generatePackage>
 										<generateDirectory>src/main/java</generateDirectory>
 										<includeSchemas>
-											<includeSchema>nl/clockwork/mule/ebms/stub/ebf/xsd/Afleveren_ebMS_2.0_v1.1.xsd</includeSchema>
+											<includeSchema>nl/clockwork/ebms/xsd/msg-header-2_0.xsd</includeSchema>
 										</includeSchemas>
-										<removeOldOutput>false</removeOldOutput>
-										<verbose>false</verbose>					
-									</configuration>
-							</execution>
-							<execution>
-									<id>generateEBFAfleverenBevestigingModel</id>
-									<goals>
-										<goal>generate</goal>
-									</goals>
-									<phase>
-										generate-sources
-									</phase>	
-									<configuration>
-										<generatePackage>nl.clockwork.mule.ebms.stub.ebf.model.afleveren.bevestiging</generatePackage>
-										<generateDirectory>src/main/java</generateDirectory>
-										<includeSchemas>
-											<includeSchema>nl/clockwork/mule/ebms/stub/ebf/xsd/Afleveren_bevestiging_ebMS_2.0_v1.1.xsd</includeSchema>
-										</includeSchemas>
-										<removeOldOutput>false</removeOldOutput>
-										<verbose>false</verbose>					
-									</configuration>
-							</execution>
-							<execution>
-									<id>generateEBFAanleverenModel</id>
-									<goals>
-										<goal>generate</goal>
-									</goals>
-									<phase>
-										generate-sources
-									</phase>	
-									<configuration>
-										<generatePackage>nl.clockwork.mule.ebms.stub.ebf.model.aanleveren.bericht</generatePackage>
-										<generateDirectory>src/main/java</generateDirectory>
-										<includeSchemas>
-											<includeSchema>nl/clockwork/mule/ebms/stub/ebf/xsd/Aanleveren_ebMS_2.0_v1.1.xsd</includeSchema>
-										</includeSchemas>
-										<removeOldOutput>false</removeOldOutput>
-										<verbose>false</verbose>					
-									</configuration>
-							</execution>
-							<execution>
-									<id>generateEBFAanleverenBevestigingModel</id>
-									<goals>
-										<goal>generate</goal>
-									</goals>
-									<phase>
-										generate-sources
-									</phase>	
-									<configuration>
-										<generatePackage>nl.clockwork.mule.ebms.stub.ebf.model.aanleveren.bevestiging</generatePackage>
-										<generateDirectory>src/main/java</generateDirectory>
-										<includeSchemas>
-											<includeSchema>nl/clockwork/mule/ebms/stub/ebf/xsd/Aanleveren_bevestiging_ebMS_2.0_v1.1.xsd</includeSchema>
-										</includeSchemas>
+										<includeBindings>
+											<includeBinding>nl/clockwork/ebms/xsd/msg-header-2_0.xjc</includeBinding>
+										</includeBindings>
 										<removeOldOutput>false</removeOldOutput>
 										<verbose>false</verbose>					
 									</configuration>
