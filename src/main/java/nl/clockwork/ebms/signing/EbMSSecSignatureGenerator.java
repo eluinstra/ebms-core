@@ -29,11 +29,11 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 
-import nl.clockwork.common.util.DOMUtils;
-import nl.clockwork.common.util.SecurityUtils;
-import nl.clockwork.common.util.XMLMessageBuilder;
-import nl.clockwork.common.util.XMLUtils;
 import nl.clockwork.ebms.Constants;
+import nl.clockwork.ebms.common.util.DOMUtils;
+import nl.clockwork.ebms.common.util.SecurityUtils;
+import nl.clockwork.ebms.common.util.XMLMessageBuilder;
+import nl.clockwork.ebms.common.util.XMLUtils;
 import nl.clockwork.ebms.dao.DAOException;
 import nl.clockwork.ebms.dao.EbMSDAO;
 import nl.clockwork.ebms.model.EbMSAttachment;

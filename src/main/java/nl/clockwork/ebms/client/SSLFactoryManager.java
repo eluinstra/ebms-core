@@ -25,7 +25,7 @@ import javax.net.ssl.SSLEngine;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManagerFactory;
 
-import nl.clockwork.common.util.SecurityUtils;
+import nl.clockwork.ebms.common.util.SecurityUtils;
 
 public class SSLFactoryManager
 {

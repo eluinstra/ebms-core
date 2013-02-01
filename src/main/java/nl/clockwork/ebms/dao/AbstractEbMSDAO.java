@@ -29,10 +29,10 @@ import java.util.List;
 import javax.mail.util.ByteArrayDataSource;
 import javax.xml.bind.JAXBException;
 
-import nl.clockwork.common.util.XMLMessageBuilder;
 import nl.clockwork.ebms.Constants;
 import nl.clockwork.ebms.Constants.EbMSMessageStatus;
 import nl.clockwork.ebms.Constants.EbMSMessageType;
+import nl.clockwork.ebms.common.util.XMLMessageBuilder;
 import nl.clockwork.ebms.model.EbMSAcknowledgment;
 import nl.clockwork.ebms.model.EbMSBaseMessage;
 import nl.clockwork.ebms.model.EbMSAttachment;

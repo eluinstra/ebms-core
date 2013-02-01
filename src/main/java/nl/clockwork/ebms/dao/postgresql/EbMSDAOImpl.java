@@ -28,10 +28,10 @@ import java.util.List;
 
 import javax.xml.bind.JAXBException;
 
-import nl.clockwork.common.util.XMLMessageBuilder;
 import nl.clockwork.ebms.Constants;
 import nl.clockwork.ebms.Constants.EbMSMessageStatus;
 import nl.clockwork.ebms.Constants.EbMSMessageType;
+import nl.clockwork.ebms.common.util.XMLMessageBuilder;
 import nl.clockwork.ebms.dao.AbstractEbMSDAO;
 import nl.clockwork.ebms.dao.DAOException;
 import nl.clockwork.ebms.model.EbMSAcknowledgment;

@@ -25,7 +25,7 @@ import java.security.cert.X509Certificate;
 import java.util.Enumeration;
 import java.util.List;
 
-import nl.clockwork.common.util.SecurityUtils;
+import nl.clockwork.ebms.common.util.SecurityUtils;
 import nl.clockwork.ebms.model.EbMSAttachment;
 import nl.clockwork.ebms.xml.dsig.EbMSAttachmentResolver;
 

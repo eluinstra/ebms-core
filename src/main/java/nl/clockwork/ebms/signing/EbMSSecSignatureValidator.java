@@ -27,9 +27,9 @@ import java.util.List;
 
 import javax.xml.xpath.XPathConstants;
 
-import nl.clockwork.common.util.SecurityUtils;
-import nl.clockwork.common.util.XMLMessageBuilder;
-import nl.clockwork.common.util.XMLUtils;
+import nl.clockwork.ebms.common.util.SecurityUtils;
+import nl.clockwork.ebms.common.util.XMLMessageBuilder;
+import nl.clockwork.ebms.common.util.XMLUtils;
 import nl.clockwork.ebms.dao.EbMSDAO;
 import nl.clockwork.ebms.model.EbMSAttachment;
 import nl.clockwork.ebms.model.Signature;

@@ -26,7 +26,7 @@ import java.util.UUID;
 
 import javax.net.ssl.HttpsURLConnection;
 
-import nl.clockwork.common.util.DOMUtils;
+import nl.clockwork.ebms.common.util.DOMUtils;
 import nl.clockwork.ebms.dao.EbMSDAO;
 import nl.clockwork.ebms.model.EbMSAttachment;
 import nl.clockwork.ebms.model.EbMSMessage;

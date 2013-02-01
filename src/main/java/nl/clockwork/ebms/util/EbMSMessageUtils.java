@@ -38,10 +38,10 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.soap.SOAPException;
 
-import nl.clockwork.common.util.XMLMessageBuilder;
 import nl.clockwork.ebms.Constants;
 import nl.clockwork.ebms.Constants.EbMSMessageStatus;
 import nl.clockwork.ebms.Constants.EbMSMessageType;
+import nl.clockwork.ebms.common.util.XMLMessageBuilder;
 import nl.clockwork.ebms.model.EbMSAction;
 import nl.clockwork.ebms.model.EbMSAttachment;
 import nl.clockwork.ebms.model.EbMSDataSource;

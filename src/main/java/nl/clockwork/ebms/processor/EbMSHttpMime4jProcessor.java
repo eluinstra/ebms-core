@@ -28,8 +28,8 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.soap.SOAPException;
 import javax.xml.transform.TransformerException;
 
-import nl.clockwork.common.util.DOMUtils;
-import nl.clockwork.common.util.XMLMessageBuilder;
+import nl.clockwork.ebms.common.util.DOMUtils;
+import nl.clockwork.ebms.common.util.XMLMessageBuilder;
 import nl.clockwork.ebms.model.EbMSAcknowledgment;
 import nl.clockwork.ebms.model.EbMSAttachment;
 import nl.clockwork.ebms.model.EbMSBaseMessage;

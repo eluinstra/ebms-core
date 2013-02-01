@@ -48,9 +48,9 @@ import javax.xml.crypto.dsig.spec.C14NMethodParameterSpec;
 import javax.xml.crypto.dsig.spec.TransformParameterSpec;
 import javax.xml.crypto.dsig.spec.XPathFilterParameterSpec;
 
-import nl.clockwork.common.util.DOMUtils;
-import nl.clockwork.common.util.SecurityUtils;
 import nl.clockwork.ebms.Constants;
+import nl.clockwork.ebms.common.util.DOMUtils;
+import nl.clockwork.ebms.common.util.SecurityUtils;
 import nl.clockwork.ebms.model.EbMSAttachment;
 
 import org.apache.commons.codec.digest.DigestUtils;
