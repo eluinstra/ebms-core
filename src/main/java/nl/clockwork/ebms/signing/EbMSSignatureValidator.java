@@ -15,14 +15,11 @@
  ******************************************************************************/
 package nl.clockwork.ebms.signing;
 
-import java.util.List;
-
-import nl.clockwork.ebms.model.EbMSAttachment;
+import nl.clockwork.ebms.model.RawEbMSMessage;
 import nl.clockwork.ebms.model.Signature;
-
-import org.w3c.dom.Document;
+import nl.clockwork.ebms.validation.ValidatorException;
 
 public interface EbMSSignatureValidator
 {
-	Signature validateSignature(Document document, List<EbMSAttachment> attachments) throws Exception;
+	Signature validate(RawEbMSMessage message) throws ValidatorException;
 }

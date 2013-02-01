@@ -32,6 +32,7 @@ import nl.clockwork.ebms.common.util.XMLMessageBuilder;
 import nl.clockwork.ebms.common.util.XMLUtils;
 import nl.clockwork.ebms.dao.EbMSDAO;
 import nl.clockwork.ebms.model.EbMSAttachment;
+import nl.clockwork.ebms.model.RawEbMSMessage;
 import nl.clockwork.ebms.model.Signature;
 import nl.clockwork.ebms.model.cpp.cpa.CollaborationProtocolAgreement;
 import nl.clockwork.ebms.model.cpp.cpa.DeliveryChannel;
@@ -39,6 +40,7 @@ import nl.clockwork.ebms.model.cpp.cpa.PartyInfo;
 import nl.clockwork.ebms.model.ebxml.MessageHeader;
 import nl.clockwork.ebms.model.xml.dsig.SignatureType;
 import nl.clockwork.ebms.util.CPAUtils;
+import nl.clockwork.ebms.validation.ValidatorException;
 import nl.clockwork.ebms.xml.EbXMLNamespaceContext;
 import nl.clockwork.ebms.xml.dsig.EbMSAttachmentResolver;
 
@@ -65,30 +67,37 @@ public class EbMSSecSignatureValidator implements EbMSSignatureValidator
 	}
 	
 	@Override
-	public Signature validateSignature(Document document, List<EbMSAttachment> attachments) throws Exception
+	public Signature validate(RawEbMSMessage message) throws ValidatorException
 	{
-		KeyStore keyStore = SecurityUtils.loadKeyStore(keyStorePath,keyStorePassword);
-		NodeList signatureNodeList = document.getElementsByTagNameNS(org.apache.xml.security.utils.Constants.SignatureSpecNS,org.apache.xml.security.utils.Constants._TAG_SIGNATURE);
-		if (signatureNodeList.getLength() > 0)
+		try
 		{
-			boolean isValid = false;
-			X509Certificate certificate = getCertificate(document);
-			if (certificate != null)
+			KeyStore keyStore = SecurityUtils.loadKeyStore(keyStorePath,keyStorePassword);
+			NodeList signatureNodeList = message.getMessage().getElementsByTagNameNS(org.apache.xml.security.utils.Constants.SignatureSpecNS,org.apache.xml.security.utils.Constants._TAG_SIGNATURE);
+			if (signatureNodeList.getLength() > 0)
 			{
-				isValid = validateCertificate(keyStore,certificate,new Date()/*TODO get date from message???*/);
-				if (isValid)
+				boolean isValid = false;
+				X509Certificate certificate = getCertificate(message.getMessage());
+				if (certificate != null)
 				{
-					isValid = verify(certificate,signatureNodeList,attachments);
-					logger.info("Signature" + (isValid ? " " : " in") + "valid.");
+					isValid = validateCertificate(keyStore,certificate,new Date()/*TODO get date from message???*/);
+					if (isValid)
+					{
+						isValid = verify(certificate,signatureNodeList,message.getAttachments());
+						logger.info("Signature" + (isValid ? " " : " in") + "valid.");
+					}
+					else
+						logger.info("Certificate invalid.");
 				}
 				else
-					logger.info("Certificate invalid.");
+					logger.info("Certificate not found.");
+				return new Signature(certificate,XMLMessageBuilder.getInstance(SignatureType.class).handle(signatureNodeList.item(0)),isValid);
 			}
-			else
-				logger.info("Certificate not found.");
-			return new Signature(certificate,XMLMessageBuilder.getInstance(SignatureType.class).handle(signatureNodeList.item(0)),isValid);
+			return null;
 		}
-		return null;
+		catch (Exception e)
+		{
+			throw new ValidatorException(e);
+		}
 	}
 
 	private boolean verify(X509Certificate certificate, NodeList signatureNodeList, List<EbMSAttachment> attachments) throws XMLSignatureException, XMLSecurityException, CertificateExpiredException, CertificateNotYetValidException, KeyStoreException

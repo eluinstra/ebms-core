@@ -20,5 +20,5 @@ import javax.servlet.http.HttpServletResponse;
 
 public interface EbMSHttpHandler
 {
-	void handle(HttpServletRequest request, HttpServletResponse response);
+	void handle(HttpServletRequest request, HttpServletResponse response) throws EbMSProcessorException;
 }

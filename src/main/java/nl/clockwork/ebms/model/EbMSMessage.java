@@ -31,7 +31,6 @@ import nl.clockwork.ebms.model.xml.dsig.SignatureType;
 
 public class EbMSMessage implements EbMSBaseMessage
 {
-	private byte[] original;
 	private SignatureType signature;
 	private MessageHeader messageHeader;
 	private SyncReply syncReply;
@@ -46,53 +45,41 @@ public class EbMSMessage implements EbMSBaseMessage
 
 	public EbMSMessage(MessageHeader messageHeader, AckRequested ackRequested, Manifest manifest, List<EbMSAttachment> attachments)
 	{
-		this(null,null,messageHeader,ackRequested,manifest,attachments);
-	}
-	
-	public EbMSMessage(byte[] message, SignatureType signature, MessageHeader messageHeader, AckRequested ackRequested, Manifest manifest, List<EbMSAttachment> attachments)
-	{
-		this(message,signature,messageHeader,null,null,ackRequested,manifest,attachments);
+		this(messageHeader,null,null,ackRequested,manifest,attachments);
 	}
 	
 	public EbMSMessage(MessageHeader messageHeader, SyncReply syncReply, MessageOrder messageOrder, AckRequested ackRequested, Manifest manifest, List<EbMSAttachment> attachments)
 	{
-		this(null,null,messageHeader,syncReply,messageOrder,ackRequested,manifest,attachments);
-	}
-	
-	public EbMSMessage(byte[] original, SignatureType signature, MessageHeader messageHeader, SyncReply syncReply, MessageOrder messageOrder, AckRequested ackRequested, Manifest manifest, List<EbMSAttachment> attachments)
-	{
-		this(original,signature,messageHeader,syncReply,messageOrder,ackRequested,null,null,manifest,null,null,attachments);
+		this(messageHeader,syncReply,messageOrder,ackRequested,null,null,manifest,null,null,attachments);
 	}
 	
 	public EbMSMessage(MessageHeader messageHeader, ErrorList errorList)
 	{
-		this(null,null,messageHeader,null,null,null,errorList,null,null,null,null,null);
+		this(messageHeader,null,null,null,errorList,null,null,null,null,null);
 	}
 	
 	public EbMSMessage(MessageHeader messageHeader, Acknowledgment acknowledgment)
 	{
-		this(null,null,messageHeader,null,null,null,null,acknowledgment,null,null,null,null);
+		this(messageHeader,null,null,null,null,acknowledgment,null,null,null,null);
 	}
 	
 	public EbMSMessage(MessageHeader messageHeader, SyncReply syncReply, ErrorList errorList, Acknowledgment acknowledgment)
 	{
-		this(null,null,messageHeader,syncReply,null,null,errorList,acknowledgment,null,null,null,null);
+		this(messageHeader,syncReply,null,null,errorList,acknowledgment,null,null,null,null);
 	}
 	
 	public EbMSMessage(MessageHeader messageHeader, SyncReply syncReply, StatusRequest statusRequest)
 	{
-		this(null,null,messageHeader,syncReply,null,null,null,null,null,statusRequest,null,null);
+		this(messageHeader,syncReply,null,null,null,null,null,statusRequest,null,null);
 	}
 	
 	public EbMSMessage(MessageHeader messageHeader, StatusResponse statusResponse)
 	{
-		this(null,null,messageHeader,null,null,null,null,null,null,null,statusResponse,null);
+		this(messageHeader,null,null,null,null,null,null,null,statusResponse,null);
 	}
 	
-	public EbMSMessage(byte[] original, SignatureType signature, MessageHeader messageHeader, SyncReply syncReply, MessageOrder messageOrder, AckRequested ackRequested, ErrorList errorList, Acknowledgment acknowledgment, Manifest manifest, StatusRequest statusRequest, StatusResponse statusResponse, List<EbMSAttachment> attachments)
+	public EbMSMessage(MessageHeader messageHeader, SyncReply syncReply, MessageOrder messageOrder, AckRequested ackRequested, ErrorList errorList, Acknowledgment acknowledgment, Manifest manifest, StatusRequest statusRequest, StatusResponse statusResponse, List<EbMSAttachment> attachments)
 	{
-		this.original = original;
-		this.signature = signature;
 		this.messageHeader = messageHeader;
 		this.syncReply = syncReply;
 		this.messageOrder = messageOrder;
@@ -107,12 +94,17 @@ public class EbMSMessage implements EbMSBaseMessage
 
 	public byte[] getOriginal()
 	{
-		return original;
+		return new byte[]{};
 	}
 	
 	public SignatureType getSignature()
 	{
 		return signature;
+	}
+	
+	public void setSignature(SignatureType signature)
+	{
+		this.signature = signature;
 	}
 	
 	@Override

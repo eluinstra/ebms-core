@@ -19,6 +19,9 @@ import java.io.OutputStream;
 import java.io.StringWriter;
 import java.io.Writer;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
@@ -28,9 +31,17 @@ import javax.xml.transform.stream.StreamResult;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 public class DOMUtils
 {
+	public static DocumentBuilder getDocumentBuilder() throws ParserConfigurationException
+	{
+		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+		dbf.setNamespaceAware(true);
+		return dbf.newDocumentBuilder();
+	}
+
 	public static Element getFirstChildElement(Node node)
 	{
 		Node child = node.getFirstChild();
@@ -39,6 +50,12 @@ public class DOMUtils
 		return (Element)child;
 	}
 	
+	public static Node getNode(Document document, String namespace, String tagName)
+	{
+		NodeList nl = document.getElementsByTagNameNS(namespace,tagName);
+		return nl.getLength() == 0 ? null : nl.item(0);
+	}
+
 	public static String toString(Document document) throws TransformerException
 	{
 		// return document.getDocumentElement().toString();

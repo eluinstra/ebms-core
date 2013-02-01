@@ -26,6 +26,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import nl.clockwork.ebms.processor.EbMSHttpHandler;
+import nl.clockwork.ebms.processor.EbMSProcessorException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -35,29 +36,31 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 public class EbMSServlet extends GenericServlet
 {
 	private static final long serialVersionUID = 1L;
-  protected transient Log logger = LogFactory.getLog(getClass());
-  private EbMSHttpHandler httpProcessor;
+	protected transient Log logger = LogFactory.getLog(getClass());
+	private EbMSHttpHandler httpHandler;
 
-  @Override
-  public void init(ServletConfig config) throws ServletException
-  {
-  	super.init(config);
+	@Override
+	public void init(ServletConfig config) throws ServletException
+	{
+		super.init(config);
 		WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(getServletContext());
-		String p = config.getInitParameter("httpProcessor");
-		if (p == null)
-			p = "httpProcessor";
-		httpProcessor = wac.getBean(p,EbMSHttpHandler.class);
-  }
-  
+		String id = config.getInitParameter("httpHandler");
+		if (id == null)
+			id = "httpHandler";
+		httpHandler = wac.getBean(id,EbMSHttpHandler.class);
+	}
+
 	@Override
 	public void service(final ServletRequest request, ServletResponse response) throws ServletException, IOException
 	{
-		httpProcessor.handle((HttpServletRequest)request,(HttpServletResponse)response);
-	}
-
-	public void setHttpProcessor(EbMSHttpHandler httpProcessor)
-	{
-		this.httpProcessor = httpProcessor;
+		try
+		{
+			httpHandler.handle((HttpServletRequest)request,(HttpServletResponse)response);
+		}
+		catch (EbMSProcessorException e)
+		{
+			throw new ServletException(e);
+		}
 	}
 
 }
