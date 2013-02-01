@@ -23,8 +23,8 @@ import java.util.Properties;
 
 import javax.xml.datatype.DatatypeFactory;
 
-import nl.clockwork.common.util.Utils;
-import nl.clockwork.common.util.XMLMessageBuilder;
+import nl.clockwork.ebms.common.util.Utils;
+import nl.clockwork.ebms.common.util.XMLMessageBuilder;
 import nl.clockwork.mule.common.component.Callable;
 import nl.clockwork.mule.ebms.stub.ebf.model.afleveren.bericht.AfleverBericht;
 import nl.clockwork.mule.ebms.stub.ebf.model.afleveren.bericht.BerichtBijlagenType;

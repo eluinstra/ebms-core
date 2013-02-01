@@ -18,8 +18,8 @@ package nl.clockwork.mule.ebms.cxf;
 import java.io.IOException;
 import java.io.InputStream;
 
-import nl.clockwork.common.util.Utils;
 import nl.clockwork.ebms.MessageManager;
+import nl.clockwork.ebms.common.util.Utils;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

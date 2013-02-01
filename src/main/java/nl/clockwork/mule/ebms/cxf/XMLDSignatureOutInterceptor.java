@@ -57,7 +57,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
-import nl.clockwork.common.util.SecurityUtils;
+import nl.clockwork.ebms.common.util.SecurityUtils;
 import nl.clockwork.ebms.model.EbMSAttachment;
 
 import org.apache.commons.codec.digest.DigestUtils;

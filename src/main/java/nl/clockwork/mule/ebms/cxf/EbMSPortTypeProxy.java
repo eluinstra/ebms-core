@@ -9,7 +9,7 @@ import javax.xml.ws.soap.SOAPBinding;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.frontend.ClientProxy;
 
-import nl.clockwork.common.cxf.AttachmentOutInterceptor;
+import nl.clockwork.ebms.common.cxf.AttachmentOutInterceptor;
 import nl.clockwork.ebms.model.ebxml.AckRequested;
 import nl.clockwork.ebms.model.ebxml.Acknowledgment;
 import nl.clockwork.ebms.model.ebxml.ErrorList;

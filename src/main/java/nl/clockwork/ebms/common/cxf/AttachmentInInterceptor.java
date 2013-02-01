@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  ******************************************************************************/
-package nl.clockwork.common.cxf;
+package nl.clockwork.ebms.common.cxf;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -28,21 +28,23 @@ import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Attachment;
 import org.apache.cxf.phase.Phase;
 
-public class AttachmentOutInterceptor extends AbstractSoapInterceptor
+public class AttachmentInInterceptor extends AbstractSoapInterceptor
 {
-	public AttachmentOutInterceptor()
+	public AttachmentInInterceptor()
 	{
-		super(Phase.USER_LOGICAL);
+		super(Phase.USER_PROTOCOL);
+		//super(Phase.USER_LOGICAL);
 	}
 
 	@Override
 	public void handleMessage(SoapMessage message) throws Fault
 	{
-		List<EbMSAttachment> ebMSAttachments = AttachmentManager.get();
-		Collection<Attachment> attachments = new ArrayList<Attachment>();
-		for (EbMSAttachment attachment : ebMSAttachments)
-			attachments.add(new nl.clockwork.common.cxf.Attachment(attachment.getContentId(),attachment));
-		message.setAttachments(attachments);
+		Collection<Attachment> attachments = message.getAttachments();
+		List<EbMSAttachment> ebMSAttachments = new ArrayList<EbMSAttachment>();
+		if (attachments != null)
+			for (Attachment attachment : attachments)
+				ebMSAttachments.add(new EbMSAttachment(attachment.getDataHandler().getDataSource(),attachment.getId(),attachment.getDataHandler().getName()));
+		AttachmentManager.set(ebMSAttachments);
 	}
 
 }

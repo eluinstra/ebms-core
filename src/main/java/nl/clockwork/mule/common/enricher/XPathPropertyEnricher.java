@@ -17,7 +17,7 @@ package nl.clockwork.mule.common.enricher;
 
 import java.util.Map;
 
-import nl.clockwork.common.util.XMLUtils;
+import nl.clockwork.ebms.common.util.XMLUtils;
 
 import org.mule.api.MuleMessage;
 import org.mule.api.transformer.TransformerException;

@@ -29,7 +29,7 @@ import java.util.List;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamReader;
 
-import nl.clockwork.common.util.SecurityUtils;
+import nl.clockwork.ebms.common.util.SecurityUtils;
 import nl.clockwork.ebms.model.EbMSAttachment;
 import nl.clockwork.ebms.xml.dsig.EbMSAttachmentResolver;
 

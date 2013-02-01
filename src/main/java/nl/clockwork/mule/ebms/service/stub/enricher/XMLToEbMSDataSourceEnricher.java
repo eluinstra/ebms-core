@@ -18,7 +18,7 @@ package nl.clockwork.mule.ebms.service.stub.enricher;
 import java.io.IOException;
 import java.util.Arrays;
 
-import nl.clockwork.common.util.Utils;
+import nl.clockwork.ebms.common.util.Utils;
 import nl.clockwork.ebms.model.EbMSDataSource;
 
 import org.apache.commons.lang.StringUtils;

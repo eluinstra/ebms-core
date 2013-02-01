@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  ******************************************************************************/
-package nl.clockwork.common;
+package nl.clockwork.ebms.common;
 
 import org.apache.log4j.LogManager;
 import org.springframework.beans.factory.InitializingBean;
