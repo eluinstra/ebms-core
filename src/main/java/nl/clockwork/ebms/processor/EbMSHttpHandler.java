@@ -18,7 +18,7 @@ package nl.clockwork.ebms.processor;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-public interface EbMSHttpProcessor
+public interface EbMSHttpHandler
 {
-	void process(HttpServletRequest request, HttpServletResponse response);
+	void handle(HttpServletRequest request, HttpServletResponse response);
 }

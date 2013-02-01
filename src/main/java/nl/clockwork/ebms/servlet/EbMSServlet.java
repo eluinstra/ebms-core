@@ -25,7 +25,7 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import nl.clockwork.ebms.processor.EbMSHttpProcessor;
+import nl.clockwork.ebms.processor.EbMSHttpHandler;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -36,7 +36,7 @@ public class EbMSServlet extends GenericServlet
 {
 	private static final long serialVersionUID = 1L;
   protected transient Log logger = LogFactory.getLog(getClass());
-  private EbMSHttpProcessor httpProcessor;
+  private EbMSHttpHandler httpProcessor;
 
   @Override
   public void init(ServletConfig config) throws ServletException
@@ -46,16 +46,16 @@ public class EbMSServlet extends GenericServlet
 		String p = config.getInitParameter("httpProcessor");
 		if (p == null)
 			p = "httpProcessor";
-		httpProcessor = wac.getBean(p,EbMSHttpProcessor.class);
+		httpProcessor = wac.getBean(p,EbMSHttpHandler.class);
   }
   
 	@Override
 	public void service(final ServletRequest request, ServletResponse response) throws ServletException, IOException
 	{
-		httpProcessor.process((HttpServletRequest)request,(HttpServletResponse)response);
+		httpProcessor.handle((HttpServletRequest)request,(HttpServletResponse)response);
 	}
 
-	public void setHttpProcessor(EbMSHttpProcessor httpProcessor)
+	public void setHttpProcessor(EbMSHttpHandler httpProcessor)
 	{
 		this.httpProcessor = httpProcessor;
 	}

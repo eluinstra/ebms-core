@@ -59,14 +59,14 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-public class EbMSHttpMime4jProcessor implements EbMSHttpProcessor
+public class EbMSHttpMime4jHandler implements EbMSHttpHandler
 {
   protected transient Log logger = LogFactory.getLog(getClass());
   private EbMSSignatureValidator signatureValidator;
 	private EbMSMessageProcessor messageProcessor;
 
 	@Override
-	public void process(HttpServletRequest request, HttpServletResponse response)
+	public void handle(HttpServletRequest request, HttpServletResponse response)
 	{
 	  try
 		{

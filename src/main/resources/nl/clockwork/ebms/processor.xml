@@ -19,7 +19,7 @@
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd"
 >
 
-	<bean id="httpProcessor" class="nl.clockwork.ebms.processor.EbMSHttpMime4jProcessor">
+	<bean id="httpProcessor" class="nl.clockwork.ebms.processor.EbMSHttpMime4jHandler">
 		<property name="signatureValidator" ref="signatureValidator"/>
 		<property name="messageProcessor" ref="messageProcessor"/>
 	</bean>
