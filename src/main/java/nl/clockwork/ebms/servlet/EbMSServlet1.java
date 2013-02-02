@@ -72,18 +72,20 @@ public class EbMSServlet1 extends GenericServlet
 				new EbMSInputStreamHandlerImpl(messageProcessor,headers)
 				{
 					@Override
-					public void writeMessage(int statusCode)
+					public void writeStatusCode(int statusCode)
 					{
 						((HttpServletResponse)response).setStatus(statusCode);
 					}
-	
+
 					@Override
-					public OutputStream writeMessage(Map<String,String> headers, int statusCode) throws IOException
+					public void writeHeader(String name, String value)
 					{
-						((HttpServletResponse)response).setStatus(statusCode);
-						//((HttpServletResponse)response).setContentType(headers.get("Content-Type"));
-						for (String key : headers.keySet())
-							((HttpServletResponse)response).setHeader(key,headers.get(key));
+						((HttpServletResponse)response).setHeader(name,value);
+					}
+				
+					@Override
+					public OutputStream getOutputStream() throws IOException
+					{
 						return response.getOutputStream();
 					}
 				}
