@@ -30,8 +30,8 @@
 		<property name="locations"> 
 			<list>
 				<value>classpath:nl/clockwork/ebms/default.properties</value>   
-				<value>classpath:nl/clockwork/ebms/service/default.properties</value>   
-				<value>file:${user.home}/.ebms-service/ebms-service.properties</value>
+				<value>classpath:nl/clockwork/ebms/web/default.properties</value>   
+				<value>file:${user.home}/.ebms-web/ebms-web.properties</value>
 			</list>
 		</property>
 	</bean>
