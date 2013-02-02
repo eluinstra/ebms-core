@@ -24,6 +24,7 @@
 
 	<bean id="ebMSMessageService" class="nl.clockwork.ebms.iface.EbMSMessageServiceImpl">
 		<property name="ebMSDAO" ref="ebMSDAO"/>
+		<property name="hostname" value="${hostname}"/>
 	</bean>
 
 </beans>
