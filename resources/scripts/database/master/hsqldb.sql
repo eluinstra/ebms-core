@@ -19,7 +19,13 @@ CREATE TABLE ebms_message
 	service_type			VARCHAR(256)		NULL,
 	service						VARCHAR(256)		NOT NULL,
 	action						VARCHAR(256)		NOT NULL,
-	message						CLOB						NOT NULL,
+	original					BLOB						NULL,
+	signature					CLOB						NULL,
+	message_header		CLOB						NOT NULL,
+	sync_reply				CLOB						NULL,
+	message_order			CLOB						NULL,
+	ack_requested			CLOB						NULL,
+	content						CLOB						NULL,
 	status						INTEGER					NULL,
 	status_time				TIMESTAMP				NULL
 );
