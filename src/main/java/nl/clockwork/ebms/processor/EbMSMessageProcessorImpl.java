@@ -31,6 +31,7 @@ import nl.clockwork.ebms.Constants.EbMSMessageStatus;
 import nl.clockwork.ebms.Constants.EbMSMessageType;
 import nl.clockwork.ebms.common.util.DOMUtils;
 import nl.clockwork.ebms.common.util.XMLMessageBuilder;
+import nl.clockwork.ebms.dao.DAOTransactionCallback;
 import nl.clockwork.ebms.dao.EbMSDAO;
 import nl.clockwork.ebms.model.EbMSAttachment;
 import nl.clockwork.ebms.model.EbMSDocument;
@@ -90,8 +91,8 @@ public class EbMSMessageProcessorImpl implements EbMSMessageProcessor
 	{
 		try
 		{
-			GregorianCalendar timestamp = new GregorianCalendar();
-			EbMSMessage message = getEbMSMessage(document.getMessage(),document.getAttachments());
+			final GregorianCalendar timestamp = new GregorianCalendar();
+			final EbMSMessage message = getEbMSMessage(document.getMessage(),document.getAttachments());
 			if (!Constants.EBMS_SERVICE_URI.equals(message.getMessageHeader().getService().getValue()))
 			{
 				Error error = null;
@@ -127,44 +128,82 @@ public class EbMSMessageProcessorImpl implements EbMSMessageProcessor
 						logger.info("Message valid.");
 						if (message.getAckRequested() != null)
 						{
-							EbMSMessage acknowledgment = createEbMSAcknowledgment(timestamp,message);
+							final EbMSMessage acknowledgment = createEbMSAcknowledgment(timestamp,message);
 							if (message.getSyncReply() == null)
 							{
-								EbMSSendEvent sendEvent = EbMSMessageUtils.getEbMSSendEvent(ebMSDAO.getCPA(acknowledgment.getMessageHeader().getCPAId()),acknowledgment.getMessageHeader());
-								ebMSDAO.insertMessage(timestamp.getTime(),message,EbMSMessageStatus.RECEIVED,acknowledgment,sendEvent);
+								final EbMSSendEvent sendEvent = EbMSMessageUtils.getEbMSSendEvent(ebMSDAO.getCPA(acknowledgment.getMessageHeader().getCPAId()),acknowledgment.getMessageHeader());
+								ebMSDAO.executeTransaction(
+									new DAOTransactionCallback()
+									{
+										@Override
+										public void doInTransaction()
+										{
+											ebMSDAO.insertMessage(timestamp.getTime(),message,EbMSMessageStatus.RECEIVED);
+											long id = ebMSDAO.insertMessage(timestamp.getTime(),acknowledgment,null);
+											ebMSDAO.insertSendEvent(id,sendEvent);
+										}
+									}
+								);
 								return null;
 							}
 							else
 							{
-								ebMSDAO.insertMessage(timestamp.getTime(),message,EbMSMessageStatus.RECEIVED,acknowledgment,null);
+								ebMSDAO.executeTransaction(
+									new DAOTransactionCallback()
+									{
+										@Override
+										public void doInTransaction()
+										{
+											ebMSDAO.insertMessage(timestamp.getTime(),message,EbMSMessageStatus.RECEIVED);
+											ebMSDAO.insertMessage(timestamp.getTime(),acknowledgment,null);
+										}
+									}
+								);
 								return getEbMSDocument(acknowledgment);
 							}
 						}
 						else
 						{
-							ebMSDAO.insertMessage(timestamp.getTime(),message,EbMSMessageStatus.RECEIVED,null,null);
+							ebMSDAO.insertMessage(timestamp.getTime(),message,EbMSMessageStatus.RECEIVED);
 							return null;
 						}
-						//ebMSDAO.insertMessage(timestamp.getTime(),message,EbMSMessageStatus.RECEIVED,message.getAckRequested() == null ? null : acknowledgment,message.getSyncReply() != null ? null : sendEvent);
-						//return message.getAckRequested() == null || message.getSyncReply() == null ? null : getEbMSDocument(acknowledgment);
 					}
 					else
 					{
 						logger.warn("Message not valid.");
-						EbMSMessage messageError = createEbMSMessageError(timestamp,message,error);
-						EbMSSendEvent sendEvent = EbMSMessageUtils.getEbMSSendEvent(ebMSDAO.getCPA(messageError.getMessageHeader().getCPAId()),messageError.getMessageHeader());
+						final EbMSMessage messageError = createEbMSMessageError(timestamp,message,error);
+						final EbMSSendEvent sendEvent = EbMSMessageUtils.getEbMSSendEvent(ebMSDAO.getCPA(messageError.getMessageHeader().getCPAId()),messageError.getMessageHeader());
 						if (message.getSyncReply() == null)
 						{
-							ebMSDAO.insertMessage(timestamp.getTime(),message,EbMSMessageStatus.FAILED,messageError,sendEvent);
+							ebMSDAO.executeTransaction(
+								new DAOTransactionCallback()
+								{
+									@Override
+									public void doInTransaction()
+									{
+										ebMSDAO.insertMessage(timestamp.getTime(),message,EbMSMessageStatus.FAILED);
+										long id = ebMSDAO.insertMessage(timestamp.getTime(),messageError,null);
+										ebMSDAO.insertSendEvent(id,sendEvent);
+									}
+								}
+							);
 							return null;
 						}
 						else
 						{
-							ebMSDAO.insertMessage(timestamp.getTime(),message,EbMSMessageStatus.FAILED,messageError,null);
+							ebMSDAO.executeTransaction(
+								new DAOTransactionCallback()
+								{
+									@Override
+									public void doInTransaction()
+									{
+										ebMSDAO.insertMessage(timestamp.getTime(),message,EbMSMessageStatus.FAILED);
+										ebMSDAO.insertMessage(timestamp.getTime(),messageError,null);
+									}
+								}
+							);
 							return getEbMSDocument(messageError);
 						}
-						//ebMSDAO.insertMessage(message,EbMSMessageStatus.FAILED,messageError,message.getSyncReply() != null ? null : sendEvent);
-						//return message.getSyncReply() == null ? null : messageError;
 					}
 				}
 				//return null;
@@ -236,7 +275,7 @@ public class EbMSMessageProcessorImpl implements EbMSMessageProcessor
 		return DOMUtils.getNode(document,"http://www.oasis-open.org/committees/ebxml-msg/schema/msg-header-2_0.xsd",tagName);
 	}
 
-	private void process(Calendar timestamp, EbMSMessage message,EbMSMessageStatus status)
+	private void process(final Calendar timestamp, final EbMSMessage message, final EbMSMessageStatus status)
 	{
 		MessageHeader messageHeader = message.getMessageHeader();
 		if (isDuplicate(messageHeader))
@@ -246,7 +285,22 @@ public class EbMSMessageProcessorImpl implements EbMSMessageProcessor
 				logger.warn("Duplicate messages are not identical! Message discarded.");
 		}
 		else
-			ebMSDAO.insertMessage(timestamp.getTime(),message,status);
+			ebMSDAO.executeTransaction(
+				new DAOTransactionCallback()
+				{
+					@Override
+					public void doInTransaction()
+					{
+						ebMSDAO.insertMessage(timestamp.getTime(),message,null);
+						Long id = ebMSDAO.getEbMSMessageId(message.getMessageHeader().getMessageData().getRefToMessageId());
+						if (id != null)
+						{
+							ebMSDAO.deleteSendEvents(id);
+							ebMSDAO.updateMessageStatus(id,status);
+						}
+					}
+				}
+			);
 	}
 	
 	private EbMSMessage processStatusRequest(GregorianCalendar timestamp, EbMSMessage message)

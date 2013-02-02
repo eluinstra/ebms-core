@@ -47,14 +47,18 @@ public interface EbMSDAO
 	void deleteEventsForSending(GregorianCalendar timestamp, Long id) throws DAOException;
 	void deleteExpiredEvents(GregorianCalendar timestamp, Long id) throws DAOException;
 
-	void insertMessage(Date timestamp, EbMSMessage message, List<EbMSSendEvent> sendEvents) throws DAOException;
-	void insertMessage(Date timestamp, EbMSMessage message, EbMSMessageStatus refToMessageStatus) throws DAOException;
-	void insertMessage(Date timestamp, EbMSMessage request, EbMSMessageStatus messageStatus, EbMSMessage response, EbMSSendEvent sendEvent) throws DAOException;
+	void executeTransaction(DAOTransactionCallback transaction);
+	long insertMessage(Date timestamp, EbMSMessage message, EbMSMessageStatus status) throws DAOException;
+	void updateMessageStatus(Long id, EbMSMessageStatus status) throws DAOException;
 	void insertSendEvent(long id) throws DAOException;
+	void insertSendEvent(long id, EbMSSendEvent sendEvent) throws DAOException;
+	void insertSendEvents(long id, List<EbMSSendEvent> sendEvents) throws DAOException;
+	void deleteSendEvents(Long id) throws DAOException;
 
 	List<String> getReceivedMessageIds(EbMSMessageContext messageContext) throws DAOException;
 	List<String> getReceivedMessageIds(EbMSMessageContext messageContext, int maxNr) throws DAOException;
 	EbMSMessage getMessage(String messageId) throws DAOException;
 	void processReceivedMessage(String messageId) throws DAOException;
 	void processReceivedMessages(List<String> messageIds) throws DAOException;
+
 }

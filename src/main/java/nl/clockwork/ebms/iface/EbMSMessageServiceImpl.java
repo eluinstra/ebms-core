@@ -19,6 +19,7 @@ import java.util.Date;
 import java.util.List;
 
 import nl.clockwork.ebms.dao.DAOException;
+import nl.clockwork.ebms.dao.DAOTransactionCallback;
 import nl.clockwork.ebms.dao.EbMSDAO;
 import nl.clockwork.ebms.model.EbMSMessage;
 import nl.clockwork.ebms.model.EbMSMessageContent;
@@ -44,9 +45,19 @@ public class EbMSMessageServiceImpl implements EbMSMessageService
 		{
 			new EbMSMessageContextValidator(ebMSDAO).validate(messageContent.getContext());
 			CollaborationProtocolAgreement cpa = ebMSDAO.getCPA(messageContent.getContext().getCpaId());
-			EbMSMessage message = EbMSMessageUtils.ebMSMessageContentToEbMSMessage(cpa,messageContent,hostname);
-			List<EbMSSendEvent> sendEvents = EbMSMessageUtils.getEbMSSendEvents(ebMSDAO.getCPA(message.getMessageHeader().getCPAId()),message.getMessageHeader());
-			ebMSDAO.insertMessage(new Date(),message,sendEvents);
+			final EbMSMessage message = EbMSMessageUtils.ebMSMessageContentToEbMSMessage(cpa,messageContent,hostname);
+			final List<EbMSSendEvent> sendEvents = EbMSMessageUtils.getEbMSSendEvents(ebMSDAO.getCPA(message.getMessageHeader().getCPAId()),message.getMessageHeader());
+			ebMSDAO.executeTransaction(
+				new DAOTransactionCallback()
+				{
+					@Override
+					public void doInTransaction()
+					{
+						long id = ebMSDAO.insertMessage(new Date(),message,null);
+						ebMSDAO.insertSendEvents(id,sendEvents);
+					}
+				}
+			);
 			return message.getMessageHeader().getMessageData().getMessageId();
 		}
 		catch (Exception e)
