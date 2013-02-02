@@ -17,7 +17,12 @@ package nl.clockwork.mule.ebms.stub;
 
 public class Constants
 {
-  public enum AfleverberichtError
+	public static final String[] allowedCipherSuites = new String[]{"TLS_DHE_RSA_WITH_AES_128_CBC_SHA","TLS_RSA_WITH_AES_128_CBC_SHA"};
+	public static final String CPA_ID = "EBMS.CPA_ID";
+	public static final String EBMS_MESSAGE_ID = "EBMS.EBMS_MESSAGE_ID";
+	public static final String EBMS_MESSAGE_STATUS = "EBMS.EBMS_MESSAGE_STATUS";
+
+	public enum AfleverberichtError
   {
 		NO_ERROR(0), PROCESSING_ERROR(1), XSD_ERROR(2), BERICHTSOORT_ERROR(3);
 		

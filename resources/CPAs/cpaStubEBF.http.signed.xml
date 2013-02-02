@@ -116,7 +116,7 @@ OcDNBvpKX2SpoHffgXmdrExQshpIDzzofex0y/Kg4mulDQUPwVuIZtbnlQ==
          </tns:TransportSender>
          <tns:TransportReceiver>
             <tns:TransportProtocol tns:version="1.1">HTTP</tns:TransportProtocol>
-            <tns:Endpoint tns:uri="http://localhost:8888/digipoortStub" tns:type="allPurpose"/>
+            <tns:Endpoint tns:uri="http://localhost:8090/digipoortStub" tns:type="allPurpose"/>
             <tns:TransportServerSecurity>
                <tns:TransportSecurityProtocol tns:version="3.0">SSL</tns:TransportSecurityProtocol>
                <tns:ServerCertificateRef tns:certId="DIGIPOORT_ServerCert"/>
@@ -287,7 +287,7 @@ OcDNBvpKX2SpoHffgXmdrExQshpIDzzofex0y/Kg4mulDQUPwVuIZtbnlQ==
          </tns:TransportSender>
          <tns:TransportReceiver>
             <tns:TransportProtocol tns:version="1.1">HTTP</tns:TransportProtocol>
-            <tns:Endpoint tns:uri="http://localhost:8088/overheidStub" tns:type="allPurpose"/>
+            <tns:Endpoint tns:uri="http://localhost:8080/overheidStub" tns:type="allPurpose"/>
             <tns:TransportServerSecurity>
                <tns:TransportSecurityProtocol tns:version="3.0">SSL</tns:TransportSecurityProtocol>
                <tns:ServerCertificateRef tns:certId="OVERHEID_ServerCert"/>

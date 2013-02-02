@@ -10,7 +10,7 @@
 
 package org.mule.transport.ssl;
 
-import nl.clockwork.ebms.Constants;
+import nl.clockwork.mule.ebms.stub.Constants;
 
 import org.mule.api.security.tls.TlsConfiguration;
 import org.mule.transport.tcp.TcpServerSocketFactory;

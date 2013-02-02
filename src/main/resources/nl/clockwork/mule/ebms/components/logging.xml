@@ -4,7 +4,7 @@
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd"
 >
 
-	<bean id="log4jInitialization" class="nl.clockwork.ebms.common.Log4jConfigurer">
+	<bean id="log4jInitialization" class="nl.clockwork.mule.common.Log4jConfigurer">
 		<constructor-arg index="0" value="${log4j.config.file}"/>
 		<constructor-arg index="1" value="${log4j.config.refreshInterval}"/>
 	</bean>

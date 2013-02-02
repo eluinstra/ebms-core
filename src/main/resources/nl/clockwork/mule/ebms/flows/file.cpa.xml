@@ -43,7 +43,7 @@
 >
 
 	<spring:beans>
-		<util:constant id="CPA_ID" static-field="nl.clockwork.ebms.Constants.CPA_ID"/>
+		<util:constant id="CPA_ID" static-field="nl.clockwork.mule.ebms.stub.Constants.CPA_ID"/>
 	</spring:beans>
 	
 	<script:transformer name="toCPAMap">
@@ -64,7 +64,7 @@
 		<default-service-exception-strategy>
 			<vm:outbound-endpoint path="file.cpa.report.in" synchronous="false">
 				<script:transformer>
-          	<script:script engine="groovy">
+          <script:script engine="groovy">
 						import java.io.PrintWriter;
 						import java.io.StringWriter;
 						import java.io.Writer;
@@ -134,8 +134,8 @@
 			<outbound>
 				<filtering-router>
 					<vm:outbound-endpoint path="file.cpa.update.in" synchronous="false"/>
-					<custom-filter class="nl.clockwork.mule.ebms.filter.CPAIdExistsFilter">
-						<spring:property name="ebMSDAO" ref="ebMSDAO" />
+					<custom-filter class="nl.clockwork.mule.ebms.stub.filter.CPAIdExistsFilter">
+						<spring:property name="cpaService" ref="cpaService" />
 					</custom-filter>
 				</filtering-router>
 				<forwarding-catch-all-strategy>
@@ -150,10 +150,11 @@
 			</inbound>
 			<outbound>
 				<chaining-router>
-					<jdbc:outbound-endpoint connector-ref="connector.jdbc.ebms" queryKey="query">
+					<!-- FIXME: use cpaService -->
+					<!--jdbc:outbound-endpoint queryKey="query">
 						<transformer ref="toCPAMap"/>
 						<jdbc:query key="query" value-ref="insertCPA" />
-					</jdbc:outbound-endpoint>
+					</jdbc:outbound-endpoint-->
 					<vm:outbound-endpoint path="file.cpa.report.in" synchronous="false">
 						<script:transformer>
             	<script:script engine="groovy">
@@ -172,10 +173,11 @@
 			</inbound>
 			<outbound>
 				<chaining-router>
-					<jdbc:outbound-endpoint connector-ref="connector.jdbc.ebms" queryKey="query">
+					<!-- FIXME: use cpaService -->
+					<!--jdbc:outbound-endpoint queryKey="query">
 						<transformer ref="toCPAMap"/>
 						<jdbc:query key="query" value-ref="updateCPA" />
-					</jdbc:outbound-endpoint>
+					</jdbc:outbound-endpoint-->
 					<vm:outbound-endpoint path="file.cpa.report.in" synchronous="false">
 						<script:transformer>
             	<script:script engine="groovy">

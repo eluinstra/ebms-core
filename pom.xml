@@ -2,11 +2,11 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>nl.clockwork.mule.ebms</groupId>
-	<artifactId>ebms-adapter</artifactId>
+	<groupId>nl.clockwork.ebms.mule</groupId>
+	<artifactId>ebms-adapter-mule2</artifactId>
 	<packaging>jar</packaging>
-	<name>Mule EbMS Adapter</name>
-	<version>2.1.0-SNAPSHOT</version>
+	<name>Mule2 EbMS Adapter</name>
+	<version>1.0.0-SNAPSHOT</version>
 	<description></description>
 	<url>https://sourceforge.net/projects/muleebmsadapter/</url>
 	<issueManagement>
@@ -69,17 +69,6 @@
 		</dependency>
 		<dependency>
 			<groupId>org.mule.transports</groupId>
-			<artifactId>mule-transport-cxf</artifactId>
-			<version>${mule.version}</version>
-			<exclusions>
-				<exclusion>
-					<groupId>opensaml</groupId>
-					<artifactId>opensaml</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-		<dependency>
-			<groupId>org.mule.transports</groupId>
 			<artifactId>mule-transport-jdbc</artifactId>
 			<version>${mule.version}</version>
 		</dependency>
@@ -119,56 +108,10 @@
 			<version>1.2.14</version>
 		</dependency>
 		<dependency>
-			<groupId>org.apache.james</groupId>
-			<artifactId>apache-mime4j-core</artifactId>
-			<version>0.7.2</version>
+			<groupId>nl.clockwork.ebms</groupId>
+			<artifactId>ebms-core</artifactId>
+			<version>1.0.0-SNAPSHOT</version>
 		</dependency>
-		<dependency>
-			<groupId>org.apache.james</groupId>
-			<artifactId>apache-mime4j-dom</artifactId>
-			<version>0.7.2</version>
-		</dependency>
-		<dependency>
-			<groupId>c3p0</groupId>
-			<artifactId>c3p0</artifactId>
-			<version>0.9.1.2</version>
-		</dependency>
-		<dependency>
-			<groupId>org.hsqldb</groupId>
-			<artifactId>hsqldb</artifactId>
-			<version>2.2.9</version>
-			<scope>runtime</scope>
-		</dependency>
-		<!--dependency>
-			<groupId>mysql</groupId>
-			<artifactId>mysql-connector-java</artifactId>
-			<version>5.1.18</version>
-		</dependency-->
-		<!--dependency>
-			<groupId>postgresql</groupId>
-			<artifactId>postgresql</artifactId>
-			<version>9.1-901.jdbc3</version>
-		</dependency-->
-		<!--dependency>
-			<groupId>net.sourceforge.jtds</groupId>
-			<artifactId>jtds</artifactId>
-			<version>1.2.4</version>
-		</dependency-->
-		<!--dependency>
-			<groupId>ms</groupId>
-			<artifactId>sqljdbc4</artifactId>
-			<version>201004</version>
-		</dependency-->
-		<!--dependency>
-			<groupId>oracle</groupId>
-			<artifactId>ojdbc6</artifactId>
-			<version>11.2.0.1.0</version>
-		</dependency>
-		<dependency>
-			<groupId>oracle</groupId>
-			<artifactId>orai18n</artifactId>
-			<version>11.2.0.1.0</version>
-		</dependency-->
 	</dependencies>
 	<repositories>
 		<repository>
@@ -321,46 +264,6 @@
 	</build>
 	<profiles>
 		<profile>
-			<id>generate-cpp-cpa-model</id>
-			<activation>
-	 			<property>
-	  				<name>generate-cpp-cpa-model</name>
-				</property>  				
-			</activation>
-	  		<build>
-	    		<plugins>
-					<plugin>
-						<groupId>com.sun.tools.xjc.maven2</groupId>
-						<artifactId>maven-jaxb-plugin</artifactId>
-						<version>1.1.1</version>
-						<executions>
-							<execution>
-									<id>generateCPPCPA20Model</id>
-									<goals>
-										<goal>generate</goal>
-									</goals>
-									<phase>
-										generate-sources
-									</phase>	
-									<configuration>
-										<generatePackage>nl.clockwork.ebms.model.cpp.cpa</generatePackage>
-										<generateDirectory>src/main/java</generateDirectory>
-										<includeSchemas>
-											<includeSchema>nl/clockwork/mule/ebms/xsd/cpp-cpa-2_0.xsd</includeSchema>
-										</includeSchemas>
-										<includeBindings>
-											<includeBinding>nl/clockwork/mule/ebms/xsd/cpp-cpa-2_0.xjc</includeBinding>
-										</includeBindings>
-										<removeOldOutput>false</removeOldOutput>
-										<verbose>false</verbose>					
-									</configuration>
-							</execution>
-						</executions>		
-					</plugin>				
-				</plugins>
-			</build>
-		</profile>
-		<profile>
 			<id>generate-ebf-model</id>
 			<activation>
 	 			<property>
@@ -506,7 +409,7 @@
 					<linkXref>true</linkXref>
 					<targetJdk>1.6</targetJdk>
 					<!--excludes>
-						<exclude>nl/clockwork/mule/ebms/model/**/*.java</exclude>
+						<exclude>nl/clockwork/ebms/model/**/*.java</exclude>
 					</excludes-->
 				</configuration>
 			</plugin>

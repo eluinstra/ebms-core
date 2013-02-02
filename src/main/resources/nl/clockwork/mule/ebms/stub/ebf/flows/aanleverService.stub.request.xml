@@ -61,8 +61,8 @@
 		<service name="aanleverbericht.stub.message.transform">
 			<inbound>
 				<vm:inbound-endpoint path="aanleverbericht.stub.message.transform.in" synchronous="false">
-					<custom-transformer class="nl.clockwork.mule.ebms.service.stub.enricher.XMLToEbMSDataSourceEnricher" />
-					<custom-transformer class="nl.clockwork.mule.ebms.service.stub.transformer.EbMSDataSourceToEbMSMessageContent">
+					<custom-transformer class="nl.clockwork.mule.ebms.stub.enricher.XMLToEbMSDataSourceEnricher" />
+					<custom-transformer class="nl.clockwork.mule.ebms.stub.transformer.EbMSDataSourceToEbMSMessageContent">
 						<spring:property name="cpaId" value="${aanleverService.cpaId}"/>
 						<spring:property name="service" value="${aanleverService.service}"/>
 						<spring:property name="action" value="${aanleverService.request.action}"/>
