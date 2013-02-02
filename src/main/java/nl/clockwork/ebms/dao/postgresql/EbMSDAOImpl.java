@@ -184,11 +184,11 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 		}
 	}
 
-	public class IdExtractor implements ResultSetExtractor
+	public class IdExtractor implements ResultSetExtractor<Long>
 	{
 
 		@Override
-		public Object extractData(ResultSet rs) throws SQLException, DataAccessException
+		public Long extractData(ResultSet rs) throws SQLException, DataAccessException
 		{
 			if (rs.next())
 				return rs.getLong("id");
@@ -249,7 +249,7 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 					
 							for (EbMSAttachment attachment : message.getAttachments())
 							{
-								simpleJdbcTemplate.update
+								jdbcTemplate.update
 								(
 									"insert into ebms_attachment (" +
 										"ebms_message_id," +
@@ -272,7 +272,7 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 								//events.add(new Object[]{keyHolder.getKey().longValue(),String.format(getDateFormat(),sendEvent.getTime())});
 								events.add(new Object[]{id,sendEvent.getTime()});
 							}
-							simpleJdbcTemplate.batchUpdate
+							jdbcTemplate.batchUpdate
 							(
 								"insert into ebms_send_event (" +
 									"ebms_message_id," +
@@ -330,14 +330,14 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 							Long id = getEbMSMessageId(messageError.getMessageHeader().getMessageData().getRefToMessageId());
 							if (id != null)
 							{
-								simpleJdbcTemplate.update
+								jdbcTemplate.update
 								(
 									"delete from ebms_send_event" +
 									" where ebms_message_id=?" +
 									" and status=0",
 									id
 								);
-								simpleJdbcTemplate.update
+								jdbcTemplate.update
 								(
 									"update ebms_message set status=?" +
 									" where id=?" +
@@ -380,7 +380,7 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 							long id = insertMessage1(timestamp,response,(EbMSMessageStatus)null);
 
 							if (sendEvent != null)
-								simpleJdbcTemplate.update
+								jdbcTemplate.update
 								(
 									"insert into ebms_send_event (" +
 										"ebms_message_id," +
@@ -517,7 +517,7 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 
 		for (EbMSAttachment attachment : message.getAttachments())
 		{
-			simpleJdbcTemplate.update
+			jdbcTemplate.update
 			(
 				"insert into ebms_attachment (" +
 					"ebms_message_id," +

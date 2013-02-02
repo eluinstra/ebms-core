@@ -56,7 +56,6 @@ import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
-import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -220,7 +219,6 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 
 	protected TransactionTemplate transactionTemplate;
 	protected JdbcTemplate jdbcTemplate;
-	protected SimpleJdbcTemplate simpleJdbcTemplate;
 
 	//public abstract String getDateFormat();
 	public abstract String getTimestampFunction();
@@ -229,14 +227,12 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	{
 		transactionTemplate = new TransactionTemplate(transactionManager);
 		jdbcTemplate = new JdbcTemplate(dataSource);
-		simpleJdbcTemplate = new SimpleJdbcTemplate(dataSource);
 	}
 
 	public AbstractEbMSDAO(TransactionTemplate transactionTemplate, javax.sql.DataSource dataSource)
 	{
 		this.transactionTemplate = transactionTemplate;
 		jdbcTemplate = new JdbcTemplate(dataSource);
-		simpleJdbcTemplate = new SimpleJdbcTemplate(dataSource);
 	}
 
 	@Override
@@ -244,7 +240,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	{
 		try
 		{
-			return simpleJdbcTemplate.queryForInt(
+			return jdbcTemplate.queryForInt(
 				"select count(cpa_id)" +
 				" from cpa" +
 				" where cpa_id = ?",
@@ -262,7 +258,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	{
 		try
 		{
-			String result = simpleJdbcTemplate.queryForObject(
+			String result = jdbcTemplate.queryForObject(
 				"select cpa" +
 				" from cpa" +
 				" where cpa_id = ?",
@@ -285,7 +281,6 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 		}
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public List<String> getCPAIds() throws DAOException
 	{
@@ -309,7 +304,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	{
 		try
 		{
-			simpleJdbcTemplate.update
+			jdbcTemplate.update
 			(
 				"insert into cpa (" +
 					"cpa_id," +
@@ -335,7 +330,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	{
 		try
 		{
-			simpleJdbcTemplate.update
+			jdbcTemplate.update
 			(
 				"update cpa set" +
 				" cpa = ?" +
@@ -361,7 +356,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 		try
 		{
 			return
-				simpleJdbcTemplate.update
+				jdbcTemplate.update
 				(
 					"delete from cpa" +
 					" where cpa_id = ?",
@@ -380,7 +375,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	{
 		try
 		{
-			return simpleJdbcTemplate.queryForInt(
+			return jdbcTemplate.queryForInt(
 				"select count(message_id)" +
 				" from ebms_message" +
 				" where message_id = ?",
@@ -398,7 +393,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	{
 		try
 		{
-			return simpleJdbcTemplate.queryForLong(
+			return jdbcTemplate.queryForLong(
 				"select id" +
 				" from ebms_message" +
 				" where message_id = ?",
@@ -420,7 +415,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	{
 		try
 		{
-			return simpleJdbcTemplate.queryForLong(
+			return jdbcTemplate.queryForLong(
 				"select id" +
 				" from ebms_message" +
 				" where ref_to_message_id = ?" +
@@ -445,7 +440,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	{
 		try
 		{
-			return simpleJdbcTemplate.queryForObject(
+			return jdbcTemplate.queryForObject(
 				"select id, service, action, message_header, ack_requested, content" +
 				" from ebms_message" +
 				" where ref_to_message_id = ?" +
@@ -471,7 +466,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	{
 		try
 		{
-			String result = simpleJdbcTemplate.queryForObject(
+			String result = jdbcTemplate.queryForObject(
 				"select message_header" + 
 				" from ebms_message" + 
 				" where message_id = ?",
@@ -498,7 +493,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	{
 		try
 		{
-			return simpleJdbcTemplate.query(
+			return jdbcTemplate.query(
 				"select name, content_id, content_type, content" + 
 				" from ebms_attachment" + 
 				" where ebms_message_id = ?",
@@ -526,7 +521,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	{
 		try
 		{
-			return simpleJdbcTemplate.queryForObject(
+			return jdbcTemplate.queryForObject(
 				"select id, service, action, message_header, ack_requested, content" + 
 				" from ebms_message" + 
 				" where id = ?",
@@ -550,7 +545,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 		try
 		{
 			return EbMSMessageStatus.get(
-				simpleJdbcTemplate.queryForObject(
+				jdbcTemplate.queryForObject(
 					"select status" +
 					" from ebms_message" +
 					" where message_id = ?",
@@ -581,7 +576,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	{
 		try
 		{
-			return simpleJdbcTemplate.query(
+			return jdbcTemplate.query(
 				"select ebms_message_id, max(time) as time" +
 				" from ebms_send_event" +
 				" where status = 0 " +
@@ -617,7 +612,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 					@Override
 					public void doInTransactionWithoutResult(TransactionStatus transactionStatus)
 					{
-						simpleJdbcTemplate.update(
+						jdbcTemplate.update(
 							"update ebms_send_event set" +
 							" status = 1," +
 							" status_time=NOW()" +
@@ -626,7 +621,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 							id,
 							timestamp.getTime()
 						);
-						simpleJdbcTemplate.update(
+						jdbcTemplate.update(
 							"delete from ebms_send_event" +
 							" where ebms_message_id=?" +
 							" and time < ?" +
@@ -649,7 +644,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	{
 		try
 		{
-			simpleJdbcTemplate.update(
+			jdbcTemplate.update(
 				"delete from ebms_send_event" +
 				" where ebms_message_id=?" +
 				" and time < ?" +
@@ -682,7 +677,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 					
 							for (EbMSAttachment attachment : message.getAttachments())
 							{
-								simpleJdbcTemplate.update
+								jdbcTemplate.update
 								(
 									"insert into ebms_attachment (" +
 										"ebms_message_id," +
@@ -705,7 +700,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 								//events.add(new Object[]{keyHolder.getKey().longValue(),String.format(getDateFormat(),sendEvent.getTime())});
 								events.add(new Object[]{id,sendEvent.getTime()});
 							}
-							simpleJdbcTemplate.batchUpdate
+							jdbcTemplate.batchUpdate
 							(
 								"insert into ebms_send_event (" +
 									"ebms_message_id," +
@@ -765,14 +760,14 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 							Long id = getEbMSMessageId(message.getMessageHeader().getMessageData().getRefToMessageId());
 							if (id != null)
 							{
-								simpleJdbcTemplate.update
+								jdbcTemplate.update
 								(
 									"delete from ebms_send_event" +
 									" where ebms_message_id = ?" +
 									" and status = 0",
 									id
 								);
-								simpleJdbcTemplate.update
+								jdbcTemplate.update
 								(
 									"update ebms_message set status=?" +
 									" where id=?" +
@@ -815,7 +810,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 							long id = insertMessage1(timestamp,response,(EbMSMessageStatus)null);
 
 							if (sendEvent != null)
-								simpleJdbcTemplate.update
+								jdbcTemplate.update
 								(
 									"insert into ebms_send_event (" +
 										"ebms_message_id," +
@@ -935,7 +930,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 
 		for (EbMSAttachment attachment : message.getAttachments())
 		{
-			simpleJdbcTemplate.update
+			jdbcTemplate.update
 			(
 				"insert into ebms_attachment (" +
 					"ebms_message_id," +
@@ -958,7 +953,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	@Override
 	public void insertSendEvent(long id) throws DAOException
 	{
-		simpleJdbcTemplate.update
+		jdbcTemplate.update
 		(
 			"insert into ebms_send_event (" +
 				"ebms_message_id" +
@@ -1046,7 +1041,6 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 		return result.toString();
 	}
 	
-	@SuppressWarnings("unchecked")
 	@Override
 	public List<String> getReceivedMessageIds(EbMSMessageContext messageContext) throws DAOException
 	{
@@ -1071,7 +1065,6 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 
 	public abstract String getReceivedMessageIdsQuery(String messageContextFilter, int maxNr);
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public List<String> getReceivedMessageIds(EbMSMessageContext messageContext, int maxNr) throws DAOException
 	{
@@ -1097,7 +1090,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	{
 		try
 		{
-			return simpleJdbcTemplate.queryForObject(
+			return jdbcTemplate.queryForObject(
 				"select id, service, action, message_header, ack_requested, content" + 
 				" from ebms_message" + 
 				" where message_id = ?",// and status=" + EbMSMessageStatus.RECEIVED.id(),
@@ -1120,7 +1113,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	{
 		try
 		{
-			simpleJdbcTemplate.update
+			jdbcTemplate.update
 			(
 				"update ebms_message" +
 				" set status = " + EbMSMessageStatus.PROCESSED.id() + "," +
@@ -1144,7 +1137,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 			List<Object[]> ids = new ArrayList<Object[]>();
 			for (String messageId : messageIds)
 				ids.add(new Object[]{messageId});
-			simpleJdbcTemplate.batchUpdate(
+			jdbcTemplate.batchUpdate(
 					"update ebms_message" +
 					" set status = " + EbMSMessageStatus.PROCESSED.id() + "," +
 					" status_time = " + getTimestampFunction() +
