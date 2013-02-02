@@ -19,6 +19,7 @@ import java.util.GregorianCalendar;
 import java.util.List;
 
 import nl.clockwork.ebms.client.EbMSClient;
+import nl.clockwork.ebms.dao.DAOTransactionCallback;
 import nl.clockwork.ebms.dao.EbMSDAO;
 import nl.clockwork.ebms.model.EbMSDocument;
 import nl.clockwork.ebms.model.EbMSMessage;
@@ -48,14 +49,26 @@ public class ProcessSendEvents implements Job
   	{
 	  	GregorianCalendar timestamp = new GregorianCalendar();
 	  	List<EbMSSendEvent> sendEvents = ebMSDAO.selectEventsForSending(timestamp);
-	  	for (EbMSSendEvent sendEvent : sendEvents)
+	  	for (final EbMSSendEvent sendEvent : sendEvents)
 	  	{
 	  		EbMSMessage message = ebMSDAO.getMessage(sendEvent.getEbMSMessageId());
 	  		EbMSDocument document = new EbMSDocument(EbMSMessageUtils.createSOAPMessage(message),message.getAttachments());
 	  		signatureGenerator.generateSignature(document.getMessage(),document.getAttachments());
 	  		String uri = getUrl(message);
 	  		ebMSClient.sendMessage(uri,document);
-	  		ebMSDAO.deleteEventsForSending(timestamp,sendEvent.getEbMSMessageId());
+	  		ebMSDAO.executeTransaction(
+	  			new DAOTransactionCallback()
+					{
+						@Override
+						public void doInTransaction()
+						{
+					  	GregorianCalendar timestamp = new GregorianCalendar();
+					  	timestamp.setTime(sendEvent.getTime());
+				  		ebMSDAO.updateSentEvent(timestamp,sendEvent.getEbMSMessageId());
+				  		ebMSDAO.deleteUnprocessedEvents(timestamp,sendEvent.getEbMSMessageId());
+						}
+					}
+	  		);
 	  	}
   	}
   	catch (Exception e)

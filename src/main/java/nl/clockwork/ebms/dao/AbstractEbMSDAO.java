@@ -474,36 +474,18 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	}
 	
 	@Override
-	public void deleteEventsForSending(final GregorianCalendar timestamp, final Long id) throws DAOException
+	public void updateSentEvent(final GregorianCalendar timestamp, final Long id) throws DAOException
 	{
 		try
 		{
-			transactionTemplate.execute(
-				new TransactionCallbackWithoutResult()
-				{
-	
-					@Override
-					public void doInTransactionWithoutResult(TransactionStatus transactionStatus)
-					{
-						jdbcTemplate.update(
-							"update ebms_send_event set" +
-							" status = 1," +
-							" status_time=NOW()" +
-							" where ebms_message_id = ?" +
-							" and time = ?",
-							id,
-							timestamp.getTime()
-						);
-						jdbcTemplate.update(
-							"delete from ebms_send_event" +
-							" where ebms_message_id=?" +
-							" and time < ?" +
-							"and status=0",
-							id,
-							timestamp.getTime()
-						);
-					}
-				}
+			jdbcTemplate.update(
+				"update ebms_send_event set" +
+				" status = 1," +
+				" status_time = NOW()" +
+				" where ebms_message_id = ?" +
+				" and time = ?",
+				id,
+				timestamp.getTime()
 			);
 		}
 		catch (DataAccessException e)
@@ -513,7 +495,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	}
 	
 	@Override
-	public void deleteExpiredEvents(GregorianCalendar timestamp, Long id) throws DAOException
+	public void deleteUnprocessedEvents(GregorianCalendar timestamp, Long id) throws DAOException
 	{
 		try
 		{
@@ -521,7 +503,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 				"delete from ebms_send_event" +
 				" where ebms_message_id=?" +
 				" and time < ?" +
-				"and status=0",
+				"and status = 0",
 				id,
 				timestamp.getTime()
 			);
