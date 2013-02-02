@@ -1,4 +1,4 @@
-package nl.clockwork.ebms.processor;
+package nl.clockwork.ebms.client;
 
 import java.io.IOException;
 import java.io.OutputStreamWriter;
@@ -13,6 +13,7 @@ import nl.clockwork.ebms.Constants;
 import nl.clockwork.ebms.common.util.DOMUtils;
 import nl.clockwork.ebms.model.EbMSAttachment;
 import nl.clockwork.ebms.model.EbMSDocument;
+import nl.clockwork.ebms.processor.EbMSProcessorException;
 
 public class EbMSMessageWriterImpl implements EbMSMessageWriter
 {

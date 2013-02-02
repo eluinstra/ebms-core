@@ -25,8 +25,6 @@ import java.net.URLConnection;
 import javax.net.ssl.HttpsURLConnection;
 
 import nl.clockwork.ebms.model.EbMSDocument;
-import nl.clockwork.ebms.processor.EbMSMessageWriter;
-import nl.clockwork.ebms.processor.EbMSMessageWriterImpl;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

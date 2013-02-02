@@ -1,6 +1,7 @@
-package nl.clockwork.ebms.processor;
+package nl.clockwork.ebms.client;
 
 import nl.clockwork.ebms.model.EbMSDocument;
+import nl.clockwork.ebms.processor.EbMSProcessorException;
 
 public interface EbMSMessageWriter
 {

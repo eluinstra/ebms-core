@@ -19,7 +19,7 @@
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd"
 >
 
-	<bean id="httpHandler" class="nl.clockwork.ebms.processor.EbMSHttpHandlerImpl">
+	<bean id="httpHandler" class="nl.clockwork.ebms.server.EbMSHttpHandlerImpl">
 		<property name="messageProcessor" ref="messageProcessor"/>
 	</bean>
 

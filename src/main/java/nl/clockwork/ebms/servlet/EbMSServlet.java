@@ -25,8 +25,8 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import nl.clockwork.ebms.processor.EbMSHttpHandler;
 import nl.clockwork.ebms.processor.EbMSProcessorException;
+import nl.clockwork.ebms.server.EbMSHttpHandler;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
