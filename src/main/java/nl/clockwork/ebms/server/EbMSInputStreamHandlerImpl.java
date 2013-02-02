@@ -15,6 +15,7 @@
  ******************************************************************************/
 package nl.clockwork.ebms.server;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.HashMap;
@@ -33,13 +34,12 @@ public abstract class EbMSInputStreamHandlerImpl implements EbMSInputStreamHandl
 {
   protected transient Log logger = LogFactory.getLog(getClass());
 	private EbMSMessageProcessor messageProcessor;
-	private String soapAction;
-	private String contentType;
+	private Map<String,String> headers = new HashMap<String,String>();
 
-	public EbMSInputStreamHandlerImpl(String soapAction, String contentType)
+	public EbMSInputStreamHandlerImpl(EbMSMessageProcessor messageProcessor, Map<String,String> headers)
 	{
-		this.soapAction = soapAction;
-		this.contentType = contentType;
+		this.messageProcessor = messageProcessor;
+		this.headers  = headers;
 	}
 
 	@Override
@@ -47,9 +47,9 @@ public abstract class EbMSInputStreamHandlerImpl implements EbMSInputStreamHandl
 	{
 	  try
 		{
-	  	if (Constants.EBMS_SOAP_ACTION.equals(soapAction))
+	  	if (Constants.EBMS_SOAP_ACTION.equals(getHeader("SOAPAction")))
 	  	{
-	  		EbMSMessageReader messageReader = new EbMSMessageReaderImpl(contentType);
+	  		EbMSMessageReader messageReader = new EbMSMessageReaderImpl(getHeader("Content-Type"));
 				EbMSDocument in = messageReader.read(request);
 				EbMSDocument out = messageProcessor.process(in);
 				if (out == null)
@@ -71,13 +71,16 @@ public abstract class EbMSInputStreamHandlerImpl implements EbMSInputStreamHandl
 	  
 	}
 	
+	private String getHeader(String headerName)
+	{
+		for (String key : headers.keySet())
+			if (headerName.toLowerCase().equals(headerName.toLowerCase()))
+				return headers.get(key);
+		return null;
+	}
+
 	public abstract void writeMessage(int statusCode);
 
-	public abstract OutputStream writeMessage(Map<String,String> headers, int statusCode);
-
-	public void setMessageProcessor(EbMSMessageProcessor messageProcessor)
-	{
-		this.messageProcessor = messageProcessor;
-	}
+	public abstract OutputStream writeMessage(Map<String,String> headers, int statusCode) throws IOException;
 
 }
