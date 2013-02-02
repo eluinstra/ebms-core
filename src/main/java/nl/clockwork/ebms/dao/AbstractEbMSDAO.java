@@ -91,132 +91,6 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 		}
 	}
 	
-	public class EbMSMessagePreparedStatement implements PreparedStatementCreator
-	{
-		private Date timestamp;
-		private String cpaId;
-		private String conversationId;
-		private Long sequenceNr;
-		private String messageId;
-		private String refToMessageId;
-		private String fromRole;
-		private String toRole;
-		private String serviceType;
-		private String service;
-		private String action;
-		private byte[] original;
-		private String signature;
-		private String messageHeader;
-		private String syncReply;
-		private String messageOrder;
-		private String ackRequested;
-		private String content;
-		private EbMSMessageStatus status;
-
-		public EbMSMessagePreparedStatement(Date timestamp, String cpaId, String conversationId, String messageId, String refToMessageId, String fromRole, String toRole, String serviceType, String service, String action, String messageHeader, String content)
-		{
-			this(timestamp,cpaId,conversationId,null,messageId,refToMessageId,fromRole,toRole,serviceType,service,action,null,null,messageHeader,null,null,null,content,null);
-		}
-
-		public EbMSMessagePreparedStatement(Date timestamp, String cpaId, String conversationId, String messageId, String refToMessageId, String fromRole, String toRole, String serviceType, String service, String action, String messageHeader, String content, EbMSMessageStatus status)
-		{
-			this(timestamp,cpaId,conversationId,null,messageId,refToMessageId,fromRole,toRole,serviceType,service,action,null,null,messageHeader,null,null,null,content,status);
-		}
-
-		public EbMSMessagePreparedStatement(Date timestamp, String cpaId, String conversationId, Long sequenceNr, String messageId, String refToMessageId, String fromRole, String toRole, String serviceType, String service, String action, String messageHeader, String syncReply, String messageOrder, String ackRequested, String content)
-		{
-			this(timestamp,cpaId,conversationId,sequenceNr,messageId,refToMessageId,fromRole,toRole,serviceType,service,action,null,null,messageHeader,syncReply,messageOrder,ackRequested,content,null);
-		}
-		
-		public EbMSMessagePreparedStatement(Date timestamp, String cpaId, String conversationId, Long sequenceNr, String messageId, String refToMessageId, String fromRole, String toRole, String serviceType, String service, String action, byte[] original, String signature, String messageHeader, String syncReply, String messageOrder, String ackRequested, String content, EbMSMessageStatus status)
-		{
-			this.timestamp = timestamp;
-			this.cpaId = cpaId;
-			this.conversationId = conversationId;
-			this.sequenceNr = sequenceNr;
-			this.messageId = messageId;
-			this.refToMessageId = refToMessageId;
-			this.fromRole = fromRole;
-			this.toRole = toRole;
-			this.serviceType = serviceType;
-			this.service = service;
-			this.action = action;
-			this.original = original;
-			this.signature = signature;
-			this.messageHeader = messageHeader;
-			this.syncReply = syncReply;
-			this.messageOrder = messageOrder;
-			this.ackRequested = ackRequested;
-			this.content = content;
-			this.status = status;
-		}
-
-		public PreparedStatement createPreparedStatement(Connection connection) throws SQLException
-		{
-			PreparedStatement ps = connection.prepareStatement
-			(
-				"insert into ebms_message (" +
-					"time_stamp," +
-					"cpa_id," +
-					"conversation_id," +
-					"sequence_nr," +
-					"message_id," +
-					"ref_to_message_id," +
-					"from_role," +
-					"to_role," +
-					"service_type," +
-					"service," +
-					"action," +
-					"original," +
-					"signature," +
-					"message_header," +
-					"sync_reply," +
-					"message_order," +
-					"ack_requested," +
-					"content," +
-					"status," +
-					"status_time" +
-				") values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?," + (status == null ? "null" : getTimestampFunction()) + ")",
-				//new String[]{"id"}
-				new int[]{1}
-			);
-			//ps.setDate(1,new java.sql.Date(timestamp.getTime()));
-			//ps.setString(1,String.format(getDateFormat(),timestamp));
-			ps.setTimestamp(1,new Timestamp(timestamp.getTime()));
-			//ps.setObject(1,timestamp,Types.TIMESTAMP);
-			//ps.setObject(1,timestamp);
-			ps.setString(2,cpaId);
-			ps.setString(3,conversationId);
-			if (sequenceNr == null)
-				ps.setNull(4,java.sql.Types.BIGINT);
-			else
-				ps.setLong(4,sequenceNr);
-			ps.setString(5,messageId);
-			ps.setString(6,refToMessageId);
-			ps.setString(7,fromRole);
-			ps.setString(8,toRole);
-			ps.setString(9,serviceType);
-			ps.setString(10,service);
-			ps.setString(11,action);
-			ps.setBytes(12,original);
-			ps.setString(13,signature);
-			ps.setString(14,messageHeader);
-			ps.setString(15,syncReply);
-			ps.setString(16,messageOrder);
-			ps.setString(17,ackRequested);
-			ps.setString(18,content);
-			if (status == null)
-				ps.setNull(19,java.sql.Types.INTEGER);
-			else
-				ps.setInt(19,status.id());
-			//ps.setString(20,status == null ? null : String.format(getDateFormat(),timestamp));
-			//ps.setTimestamp(20,status == null ? null : new Timestamp(timestamp.getTime()));
-			//ps.setObject(20,status == null ? null : timestamp,Types.TIMESTAMP);
-			//ps.setObject(20,status == null ? null : timestamp);
-			return ps;
-		}
-	}
-
 	protected TransactionTemplate transactionTemplate;
 	protected JdbcTemplate jdbcTemplate;
 
@@ -673,41 +547,8 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 					{
 						try
 						{
-							long id = insertMessage1(timestamp,message,(EbMSMessageStatus)null);
-					
-							for (EbMSAttachment attachment : message.getAttachments())
-							{
-								jdbcTemplate.update
-								(
-									"insert into ebms_attachment (" +
-										"ebms_message_id," +
-										"name," +
-										"content_id," +
-										"content_type," +
-										"content" +
-									") values (?,?,?,?,?)",
-									id,
-									attachment.getName() == null ? Constants.DEFAULT_FILENAME : attachment.getName(),
-									attachment.getContentId(),
-									attachment.getContentType().split(";")[0].trim(),
-									IOUtils.toByteArray(attachment.getInputStream())
-								);
-							}
-
-							List<Object[]> events = new ArrayList<Object[]>();
-							for (EbMSSendEvent sendEvent : sendEvents)
-							{
-								//events.add(new Object[]{keyHolder.getKey().longValue(),String.format(getDateFormat(),sendEvent.getTime())});
-								events.add(new Object[]{id,sendEvent.getTime()});
-							}
-							jdbcTemplate.batchUpdate
-							(
-								"insert into ebms_send_event (" +
-									"ebms_message_id," +
-									"time" +
-								") values (?,?)",
-								events
-							);
+							long id = insertMessage1(timestamp,message,null);
+							insertSendEvents(id,sendEvents);
 						}
 						catch (Exception e)
 						{
@@ -738,43 +579,12 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 					{
 						try
 						{
-							KeyHolder keyHolder = new GeneratedKeyHolder();
-							jdbcTemplate.update(
-									getEbMSMessagePreparedStatement(
-											timestamp,
-											message.getMessageHeader().getCPAId(),
-											message.getMessageHeader().getConversationId(),
-											message.getMessageHeader().getMessageData().getMessageId(),
-											message.getMessageHeader().getMessageData().getRefToMessageId(),
-											message.getMessageHeader().getFrom().getRole(),
-											message.getMessageHeader().getTo().getRole(),
-											message.getMessageHeader().getService().getType(),
-											message.getMessageHeader().getService().getValue(),
-											message.getMessageHeader().getAction(),
-											XMLMessageBuilder.getInstance(MessageHeader.class).handle(message.getMessageHeader()),
-											XMLMessageBuilder.getInstance(ErrorList.class).handle(message.getErrorList())
-									),
-									keyHolder
-							);
-
+							insertMessage1(timestamp,message,null);
 							Long id = getEbMSMessageId(message.getMessageHeader().getMessageData().getRefToMessageId());
 							if (id != null)
 							{
-								jdbcTemplate.update
-								(
-									"delete from ebms_send_event" +
-									" where ebms_message_id = ?" +
-									" and status = 0",
-									id
-								);
-								jdbcTemplate.update
-								(
-									"update ebms_message set status=?" +
-									" where id=?" +
-									" and status is null",
-									id,
-									refToMessageStatus.id()
-								);
+								deleteSendEvents(id);
+								updateMessageStatus(id,refToMessageStatus);
 							}
 						}
 						catch (Exception e)
@@ -807,19 +617,8 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 						try
 						{
 							insertMessage(timestamp,request,status);
-							long id = insertMessage1(timestamp,response,(EbMSMessageStatus)null);
-
-							if (sendEvent != null)
-								jdbcTemplate.update
-								(
-									"insert into ebms_send_event (" +
-										"ebms_message_id," +
-										"time" +
-									") values (?,?)",
-									id,
-									//String.format(getDateFormat(),sendEvent.getTime())
-									sendEvent.getTime()
-								);
+							long id = insertMessage1(timestamp,response,null);
+							insertSendEvent(id,sendEvent);
 						}
 						catch (Exception e)
 						{
@@ -950,6 +749,62 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 		return keyHolder.getKey().longValue();
 	}
 
+	protected void updateMessageStatus(Long id, EbMSMessageStatus status)
+	{
+		jdbcTemplate.update
+		(
+			"update ebms_message set status=?" +
+			" where id=?" +
+			" and status is null",
+			id,
+			status.id()
+		);
+	}
+
+	protected void insertSendEvent(long id, EbMSSendEvent sendEvent)
+	{
+		if (sendEvent != null)
+			jdbcTemplate.update
+			(
+				"insert into ebms_send_event (" +
+					"ebms_message_id," +
+					"time" +
+				") values (?,?)",
+				id,
+				//String.format(getDateFormat(),sendEvent.getTime())
+				sendEvent.getTime()
+			);
+	}
+
+	protected void insertSendEvents(long id, List<EbMSSendEvent> sendEvents)
+	{
+		List<Object[]> events = new ArrayList<Object[]>();
+		for (EbMSSendEvent sendEvent : sendEvents)
+		{
+			//events.add(new Object[]{keyHolder.getKey().longValue(),String.format(getDateFormat(),sendEvent.getTime())});
+			events.add(new Object[]{id,sendEvent.getTime()});
+		}
+		jdbcTemplate.batchUpdate
+		(
+			"insert into ebms_send_event (" +
+				"ebms_message_id," +
+				"time" +
+			") values (?,?)",
+			events
+		);
+	}
+
+	protected void deleteSendEvents(Long id)
+	{
+		jdbcTemplate.update
+		(
+			"delete from ebms_send_event" +
+			" where ebms_message_id = ?" +
+			" and status = 0",
+			id
+		);
+	}
+
 	@Override
 	public void insertSendEvent(long id) throws DAOException
 	{
@@ -962,26 +817,6 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 		);
 	}
 	
-	protected PreparedStatementCreator getEbMSMessagePreparedStatement(Date timestamp, String cpaId, String conversationId, String messageId, String refToMessageId, String fromRole, String toRole, String serviceType, String service, String action, String messageHeader, String content)
-	{
-		return new EbMSMessagePreparedStatement(timestamp,cpaId,conversationId,messageId,refToMessageId,fromRole,toRole,serviceType,service,action,messageHeader,content);
-	}
-
-	protected PreparedStatementCreator getEbMSMessagePreparedStatement(Date timestamp, String cpaId, String conversationId, String messageId, String refToMessageId, String fromRole, String toRole, String serviceType, String service, String action, String messageHeader, String content, EbMSMessageStatus status)
-	{
-		return new EbMSMessagePreparedStatement(timestamp,cpaId,conversationId,messageId,refToMessageId,fromRole,toRole,serviceType,service,action,messageHeader,content,status);
-	}
-
-	protected PreparedStatementCreator getEbMSMessagePreparedStatement(Date timestamp, String cpaId, String conversationId, Long sequenceNr, String messageId, String refToMessageId, String fromRole, String toRole, String serviceType, String service, String action, String messageHeader, String syncReply, String messageOrder, String ackRequested, String Manifest)
-	{
-		return new EbMSMessagePreparedStatement(timestamp,cpaId,conversationId,sequenceNr,messageId,refToMessageId,fromRole,toRole,serviceType,service,action,messageHeader,syncReply,messageOrder,ackRequested,Manifest);
-	}
-
-	protected PreparedStatementCreator getEbMSMessagePreparedStatement(Date timestamp, String cpaId, String conversationId, Long sequenceNr, String messageId, String refToMessageId, String fromRole, String toRole, String serviceType, String service, String action, byte[] original, String signature, String messageHeader, String syncReply, String messageOrder, String ackRequested, String Manifest, EbMSMessageStatus status)
-	{
-		return new EbMSMessagePreparedStatement(timestamp,cpaId,conversationId,sequenceNr,messageId,refToMessageId,fromRole,toRole,serviceType,service,action,original,signature,messageHeader,syncReply,messageOrder,ackRequested,Manifest,status);
-	}
-
 	public String getMessageContextFilter(EbMSMessageContext messageContext, List<Object> parameters)
 	{
 		StringBuffer result = new StringBuffer();
