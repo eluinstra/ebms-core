@@ -43,11 +43,12 @@ public interface EbMSDAO
 	EbMSMessage getMessage(long id) throws DAOException;
 	EbMSMessageStatus getMessageStatus(String messageId) throws DAOException;
 
+	void executeTransaction(DAOTransactionCallback callback);
+
 	List<EbMSSendEvent> selectEventsForSending(GregorianCalendar timestamp) throws DAOException;
 	void updateSentEvent(GregorianCalendar timestamp, Long id) throws DAOException;
 	void deleteUnprocessedEvents(GregorianCalendar timestamp, Long id) throws DAOException;
 
-	void executeTransaction(DAOTransactionCallback transaction);
 	long insertMessage(Date timestamp, EbMSMessage message, EbMSMessageStatus status) throws DAOException;
 	void updateMessageStatus(Long id, EbMSMessageStatus status) throws DAOException;
 	void insertSendEvent(long id) throws DAOException;

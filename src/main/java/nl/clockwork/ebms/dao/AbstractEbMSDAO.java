@@ -445,6 +445,29 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	}
 
 	@Override
+	public void executeTransaction(final DAOTransactionCallback callback)
+	{
+		try
+		{
+			transactionTemplate.execute(
+				new TransactionCallbackWithoutResult()
+				{
+
+					@Override
+					protected void doInTransactionWithoutResult(TransactionStatus transactionStatus)
+					{
+						callback.doInTransaction();
+					}
+				}
+			);
+		}
+		catch (TransactionException e)
+		{
+			throw new DAOException(e);
+		}
+	}
+
+	@Override
 	public List<EbMSSendEvent> selectEventsForSending(GregorianCalendar timestamp) throws DAOException
 	{
 		try
@@ -509,29 +532,6 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 			);
 		}
 		catch (DataAccessException e)
-		{
-			throw new DAOException(e);
-		}
-	}
-
-	@Override
-	public void executeTransaction(final DAOTransactionCallback transaction)
-	{
-		try
-		{
-			transactionTemplate.execute(
-				new TransactionCallbackWithoutResult()
-				{
-
-					@Override
-					protected void doInTransactionWithoutResult(TransactionStatus transactionStatus)
-					{
-						transaction.doInTransaction();
-					}
-				}
-			);
-		}
-		catch (TransactionException e)
 		{
 			throw new DAOException(e);
 		}
@@ -676,78 +676,113 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	}
 
 	@Override
-	public void updateMessageStatus(Long id, EbMSMessageStatus status)
+	public void updateMessageStatus(Long id, EbMSMessageStatus status) throws DAOException
 	{
-		jdbcTemplate.update
-		(
-			"update ebms_message set status=?" +
-			" where id=?" +
-			" and status is null",
-			id,
-			status.id()
-		);
+		try
+		{
+			jdbcTemplate.update
+			(
+				"update ebms_message set status=?" +
+				" where id=?" +
+				" and status is null",
+				id,
+				status.id()
+			);
+		}
+		catch (DataAccessException e)
+		{
+			throw new DAOException(e);
+		}
 	}
 
 	@Override
 	public void insertSendEvent(long id) throws DAOException
 	{
-		jdbcTemplate.update
-		(
-			"insert into ebms_send_event (" +
-				"ebms_message_id" +
-			") values (?)",
-			id
-		);
+		try
+		{
+			jdbcTemplate.update
+			(
+				"insert into ebms_send_event (" +
+					"ebms_message_id" +
+				") values (?)",
+				id
+			);
+		}
+		catch (DataAccessException e)
+		{
+			throw new DAOException(e);
+		}
 	}
 	
 	@Override
-	public void insertSendEvent(long id, EbMSSendEvent sendEvent)
+	public void insertSendEvent(long id, EbMSSendEvent sendEvent) throws DAOException
 	{
-		if (sendEvent != null)
-			jdbcTemplate.update
+		try
+		{
+			if (sendEvent != null)
+				jdbcTemplate.update
+				(
+					"insert into ebms_send_event (" +
+						"ebms_message_id," +
+						"time" +
+					") values (?,?)",
+					id,
+					//String.format(getDateFormat(),sendEvent.getTime())
+					sendEvent.getTime()
+				);
+		}
+		catch (DataAccessException e)
+		{
+			throw new DAOException(e);
+		}
+	}
+
+	@Override
+	public void insertSendEvents(long id, List<EbMSSendEvent> sendEvents) throws DAOException
+	{
+		try
+		{
+			List<Object[]> events = new ArrayList<Object[]>();
+			for (EbMSSendEvent sendEvent : sendEvents)
+			{
+				//events.add(new Object[]{keyHolder.getKey().longValue(),String.format(getDateFormat(),sendEvent.getTime())});
+				events.add(new Object[]{id,sendEvent.getTime()});
+			}
+			jdbcTemplate.batchUpdate
 			(
 				"insert into ebms_send_event (" +
 					"ebms_message_id," +
 					"time" +
 				") values (?,?)",
-				id,
-				//String.format(getDateFormat(),sendEvent.getTime())
-				sendEvent.getTime()
+				events
 			);
-	}
-
-	@Override
-	public void insertSendEvents(long id, List<EbMSSendEvent> sendEvents)
-	{
-		List<Object[]> events = new ArrayList<Object[]>();
-		for (EbMSSendEvent sendEvent : sendEvents)
-		{
-			//events.add(new Object[]{keyHolder.getKey().longValue(),String.format(getDateFormat(),sendEvent.getTime())});
-			events.add(new Object[]{id,sendEvent.getTime()});
 		}
-		jdbcTemplate.batchUpdate
-		(
-			"insert into ebms_send_event (" +
-				"ebms_message_id," +
-				"time" +
-			") values (?,?)",
-			events
-		);
+		catch (DataAccessException e)
+		{
+			throw new DAOException(e);
+		}
 	}
 
 	@Override
-	public void deleteSendEvents(Long id)
+	public void deleteSendEvents(Long id) throws DAOException
 	{
-		jdbcTemplate.update
-		(
-			"delete from ebms_send_event" +
-			" where ebms_message_id = ?" +
-			" and status = 0",
-			id
-		);
+		try
+		{
+			jdbcTemplate.update
+			(
+				"delete from ebms_send_event" +
+				" where ebms_message_id = ?" +
+				" and status = 0",
+				id
+			);
+		}
+		catch (DataAccessException e)
+		{
+			throw new DAOException(e);
+		}
 	}
 
-	public String getMessageContextFilter(EbMSMessageContext messageContext, List<Object> parameters)
+	protected String getMessageContextFilter(EbMSMessageContext messageContext, List<Object> parameters)
 	{
 		StringBuffer result = new StringBuffer();
 		if (messageContext != null)
