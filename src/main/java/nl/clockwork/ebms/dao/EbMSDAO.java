@@ -20,11 +20,8 @@ import java.util.GregorianCalendar;
 import java.util.List;
 
 import nl.clockwork.ebms.Constants.EbMSMessageStatus;
-import nl.clockwork.ebms.model.EbMSAcknowledgment;
-import nl.clockwork.ebms.model.EbMSBaseMessage;
 import nl.clockwork.ebms.model.EbMSMessage;
 import nl.clockwork.ebms.model.EbMSMessageContext;
-import nl.clockwork.ebms.model.EbMSMessageError;
 import nl.clockwork.ebms.model.EbMSSendEvent;
 import nl.clockwork.ebms.model.cpp.cpa.CollaborationProtocolAgreement;
 import nl.clockwork.ebms.model.ebxml.MessageHeader;
@@ -41,9 +38,9 @@ public interface EbMSDAO
 	boolean existsMessage(String messageId) throws DAOException;
 	Long getEbMSMessageId(String messageId) throws DAOException;
 	Long getEbMSMessageResponseId(String messageId) throws DAOException;
-	EbMSBaseMessage getEbMSMessageResponse(String messageId) throws DAOException;
+	EbMSMessage getEbMSMessageResponse(String messageId) throws DAOException;
 	MessageHeader getMessageHeader(String messageId) throws DAOException;
-	EbMSBaseMessage getMessage(long id) throws DAOException;
+	EbMSMessage getMessage(long id) throws DAOException;
 	EbMSMessageStatus getMessageStatus(String messageId) throws DAOException;
 
 	List<EbMSSendEvent> selectEventsForSending(GregorianCalendar timestamp) throws DAOException;
@@ -51,19 +48,13 @@ public interface EbMSDAO
 	void deleteExpiredEvents(GregorianCalendar timestamp, Long id) throws DAOException;
 
 	void insertMessage(Date timestamp, EbMSMessage message, List<EbMSSendEvent> sendEvents) throws DAOException;
+	void insertMessage(Date timestamp, EbMSMessage message, EbMSMessageStatus refToMessageStatus) throws DAOException;
 	void insertMessage(Date timestamp, EbMSMessage request, EbMSMessageStatus messageStatus, EbMSMessage response, EbMSSendEvent sendEvent) throws DAOException;
 	void insertSendEvent(long id) throws DAOException;
 
-	void insertMessage(EbMSMessage message, List<EbMSSendEvent> sendEvents) throws DAOException;
-	void insertMessage(EbMSMessage message, EbMSMessageStatus messageStatus) throws DAOException;
-	void insertMessage(EbMSMessage message, EbMSMessageStatus messageStatus, EbMSMessageError messageError, EbMSSendEvent sendEvent) throws DAOException;
-	void insertMessage(EbMSMessage message, EbMSMessageStatus messageStatus, EbMSAcknowledgment acknowledgment, EbMSSendEvent sendEvent) throws DAOException;
-	void insertMessage(EbMSMessageError messageError, EbMSMessageStatus refToMessageStatus) throws DAOException;
-	void insertMessage(EbMSAcknowledgment acknowledgment, EbMSMessageStatus refToMessageStatus) throws DAOException;
-
 	List<String> getReceivedMessageIds(EbMSMessageContext messageContext) throws DAOException;
 	List<String> getReceivedMessageIds(EbMSMessageContext messageContext, int maxNr) throws DAOException;
-	EbMSBaseMessage getMessage(String messageId) throws DAOException;
+	EbMSMessage getMessage(String messageId) throws DAOException;
 	void processReceivedMessage(String messageId) throws DAOException;
 	void processReceivedMessages(List<String> messageIds) throws DAOException;
 }

@@ -34,10 +34,8 @@ import nl.clockwork.ebms.Constants.EbMSMessageType;
 import nl.clockwork.ebms.common.util.XMLMessageBuilder;
 import nl.clockwork.ebms.dao.AbstractEbMSDAO;
 import nl.clockwork.ebms.dao.DAOException;
-import nl.clockwork.ebms.model.EbMSAcknowledgment;
 import nl.clockwork.ebms.model.EbMSAttachment;
 import nl.clockwork.ebms.model.EbMSMessage;
-import nl.clockwork.ebms.model.EbMSMessageError;
 import nl.clockwork.ebms.model.EbMSSendEvent;
 import nl.clockwork.ebms.model.ebxml.AckRequested;
 import nl.clockwork.ebms.model.ebxml.Acknowledgment;
@@ -48,7 +46,6 @@ import nl.clockwork.ebms.model.ebxml.MessageOrder;
 import nl.clockwork.ebms.model.ebxml.StatusRequest;
 import nl.clockwork.ebms.model.ebxml.StatusResponse;
 import nl.clockwork.ebms.model.ebxml.SyncReply;
-import nl.clockwork.ebms.model.xml.dsig.ObjectFactory;
 import nl.clockwork.ebms.model.xml.dsig.SignatureType;
 
 import org.apache.commons.io.IOUtils;
@@ -235,7 +232,7 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 	}
 
 	@Override
-	public void insertMessage(final EbMSMessage message, final List<EbMSSendEvent> sendEvents) throws DAOException
+	public void insertMessage(final Date timestamp, final EbMSMessage message, final List<EbMSSendEvent> sendEvents) throws DAOException
 	{
 		try
 		{
@@ -248,271 +245,7 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 					{
 						try
 						{
-							Date timestamp = new Date();
-							Long key = (Long)jdbcTemplate.query(
-									new EbMSMessagePreparedStatement(
-											timestamp,
-											message.getMessageHeader().getCPAId(),
-											message.getMessageHeader().getConversationId(),
-											message.getMessageOrder() == null ? null : message.getMessageOrder().getSequenceNumber().getValue().longValue(),
-											message.getMessageHeader().getMessageData().getMessageId(),
-											message.getMessageHeader().getMessageData().getRefToMessageId(),
-											message.getMessageHeader().getFrom().getRole(),
-											message.getMessageHeader().getTo().getRole(),
-											message.getMessageHeader().getService().getType(),
-											message.getMessageHeader().getService().getValue(),
-											message.getMessageHeader().getAction(),
-											XMLMessageBuilder.getInstance(MessageHeader.class).handle(message.getMessageHeader()),
-											XMLMessageBuilder.getInstance(SyncReply.class).handle(message.getSyncReply()),
-											XMLMessageBuilder.getInstance(MessageOrder.class).handle(message.getMessageOrder()),
-											XMLMessageBuilder.getInstance(AckRequested.class).handle(message.getAckRequested()),
-											XMLMessageBuilder.getInstance(Manifest.class).handle(message.getManifest())
-									),
-									new IdExtractor()
-							);
-					
-							for (EbMSAttachment attachment : message.getAttachments())
-							{
-								simpleJdbcTemplate.update
-								(
-									"insert into ebms_attachment (" +
-									"ebms_message_id," +
-									"name," +
-									"content_id," +
-									"content_type," +
-									"content" +
-									") values (?,?,?,?,?)",
-									key,
-									attachment.getName() == null ? Constants.DEFAULT_FILENAME : attachment.getName(),
-									attachment.getContentId(),
-									attachment.getContentType().split(";")[0].trim(),
-									IOUtils.toByteArray(attachment.getInputStream())
-								);
-							}
-
-							List<Object[]> events = new ArrayList<Object[]>();
-							for (EbMSSendEvent sendEvent : sendEvents)
-							{
-								//events.add(new Object[]{key,String.format(getDateFormat(),sendEvent.getTime())});
-								events.add(new Object[]{key,sendEvent.getTime()});
-							}
-							simpleJdbcTemplate.batchUpdate
-							(
-								"insert into ebms_send_event (" +
-								"ebms_message_id," +
-								"time" +
-								") values (?,?)",
-								events
-							);
-						}
-						catch (Exception e)
-						{
-							throw new RuntimeException(e);
-						}
-					}
-	
-				}
-			);
-		}
-		catch (Exception e)
-		{
-			throw new DAOException(e);
-		}
-	}
-
-	@Override
-	public void insertMessage(final EbMSMessage message, final EbMSMessageStatus status) throws DAOException
-	{
-		try
-		{
-			transactionTemplate.execute(
-				new TransactionCallbackWithoutResult()
-				{
-	
-					@Override
-					public void doInTransactionWithoutResult(TransactionStatus transactionStatus)
-					{
-						try
-						{
-							Date timestamp = new Date();
-							Long key = (Long)jdbcTemplate.query(
-									new EbMSMessagePreparedStatement(
-											timestamp,
-											message.getMessageHeader().getCPAId(),
-											message.getMessageHeader().getConversationId(),
-											message.getMessageOrder() == null ? null : message.getMessageOrder().getSequenceNumber().getValue().longValue(),
-											message.getMessageHeader().getMessageData().getMessageId(),
-											message.getMessageHeader().getMessageData().getRefToMessageId(),
-											message.getMessageHeader().getFrom().getRole(),
-											message.getMessageHeader().getTo().getRole(),
-											message.getMessageHeader().getService().getType(),
-											message.getMessageHeader().getService().getValue(),
-											message.getMessageHeader().getAction(),
-											message.getOriginal(),
-											XMLMessageBuilder.getInstance(SignatureType.class).handle(new ObjectFactory().createSignature(message.getSignature())),
-											XMLMessageBuilder.getInstance(MessageHeader.class).handle(message.getMessageHeader()),
-											XMLMessageBuilder.getInstance(SyncReply.class).handle(message.getSyncReply()),
-											XMLMessageBuilder.getInstance(MessageOrder.class).handle(message.getMessageOrder()),
-											XMLMessageBuilder.getInstance(AckRequested.class).handle(message.getAckRequested()),
-											XMLMessageBuilder.getInstance(Manifest.class).handle(message.getManifest()),
-											status
-									),
-									new IdExtractor()
-							);
-					
-							for (EbMSAttachment attachment : message.getAttachments())
-							{
-								simpleJdbcTemplate.update
-								(
-									"insert into ebms_attachment (" +
-									"ebms_message_id," +
-									"name," +
-									"content_id," +
-									"content_type," +
-									"content" +
-									") values (?,?,?,?,?)",
-									key,
-									attachment.getName() == null ? Constants.DEFAULT_FILENAME : attachment.getName(),
-									attachment.getContentId(),
-									attachment.getContentType().split(";")[0].trim(),
-									IOUtils.toByteArray(attachment.getInputStream())
-								);
-							}
-						}
-						catch (Exception e)
-						{
-							throw new RuntimeException(e);
-						}
-					}
-	
-				}
-			);
-		}
-		catch (Exception e)
-		{
-			throw new DAOException(e);
-		}
-	}
-
-	@Override
-	public void insertMessage(final EbMSMessage message, final EbMSMessageStatus status, final EbMSMessageError messageError, final EbMSSendEvent sendEvent) throws DAOException
-	{
-		try
-		{
-			transactionTemplate.execute(
-				new TransactionCallbackWithoutResult()
-				{
-	
-					@Override
-					public void doInTransactionWithoutResult(TransactionStatus transactionStatus)
-					{
-						try
-						{
-							Date timestamp = new Date();
-							Long key = (Long)jdbcTemplate.query(
-									new EbMSMessagePreparedStatement(
-											timestamp,
-											message.getMessageHeader().getCPAId(),
-											message.getMessageHeader().getConversationId(),
-											message.getMessageOrder() == null ? null : message.getMessageOrder().getSequenceNumber().getValue().longValue(),
-											message.getMessageHeader().getMessageData().getMessageId(),
-											message.getMessageHeader().getMessageData().getRefToMessageId(),
-											message.getMessageHeader().getFrom().getRole(),
-											message.getMessageHeader().getTo().getRole(),
-											message.getMessageHeader().getService().getType(),
-											message.getMessageHeader().getService().getValue(),
-											message.getMessageHeader().getAction(),
-											message.getOriginal(),
-											XMLMessageBuilder.getInstance(SignatureType.class).handle(new ObjectFactory().createSignature(message.getSignature())),
-											XMLMessageBuilder.getInstance(MessageHeader.class).handle(message.getMessageHeader()),
-											XMLMessageBuilder.getInstance(SyncReply.class).handle(message.getSyncReply()),
-											XMLMessageBuilder.getInstance(MessageOrder.class).handle(message.getMessageOrder()),
-											XMLMessageBuilder.getInstance(AckRequested.class).handle(message.getAckRequested()),
-											XMLMessageBuilder.getInstance(Manifest.class).handle(message.getManifest()),
-											status
-									),
-									new IdExtractor()
-							);
-					
-							for (EbMSAttachment attachment : message.getAttachments())
-							{
-								simpleJdbcTemplate.update
-								(
-									"insert into ebms_attachment (" +
-									"ebms_message_id," +
-									"name," +
-									"content_id," +
-									"content_type," +
-									"content" +
-									") values (?,?,?,?,?)",
-									key,
-									attachment.getName() == null ? Constants.DEFAULT_FILENAME : attachment.getName(),
-									attachment.getContentId(),
-									attachment.getContentType().split(";")[0].trim(),
-									IOUtils.toByteArray(attachment.getInputStream())
-								);
-							}
-							
-							key = (Long)jdbcTemplate.query(
-									new EbMSMessagePreparedStatement(
-											timestamp,
-											messageError.getMessageHeader().getCPAId(),
-											messageError.getMessageHeader().getConversationId(),
-											messageError.getMessageHeader().getMessageData().getMessageId(),
-											messageError.getMessageHeader().getMessageData().getRefToMessageId(),
-											messageError.getMessageHeader().getFrom().getRole(),
-											messageError.getMessageHeader().getTo().getRole(),
-											messageError.getMessageHeader().getService().getType(),
-											messageError.getMessageHeader().getService().getValue(),
-											messageError.getMessageHeader().getAction(),
-											XMLMessageBuilder.getInstance(MessageHeader.class).handle(messageError.getMessageHeader()),
-											XMLMessageBuilder.getInstance(ErrorList.class).handle(messageError.getErrorList())
-									),
-									new IdExtractor()
-							);
-					
-							simpleJdbcTemplate.update
-							(
-								"insert into ebms_send_event (" +
-								"ebms_message_id," +
-								"time" +
-								") values (?,?)",
-								key,
-								//String.format(getDateFormat(),sendEvent.getTime())
-								sendEvent.getTime()
-							);
-						}
-						catch (Exception e)
-						{
-							throw new RuntimeException(e);
-						}
-					}
-	
-				}
-			);
-		}
-		catch (Exception e)
-		{
-			throw new DAOException(e);
-		}
-	}
-
-	@Override
-	public void insertMessage(Date timestamp, final EbMSMessage message, final List<EbMSSendEvent> sendEvents) throws DAOException
-	{
-		try
-		{
-			transactionTemplate.execute(
-				new TransactionCallbackWithoutResult()
-				{
-	
-					@Override
-					public void doInTransactionWithoutResult(TransactionStatus transactionStatus)
-					{
-						try
-						{
-							Date timestamp = new Date();
-							long id = insertMessage(timestamp,message,(EbMSMessageStatus)null);
+							long id = insertMessage1(timestamp,message,(EbMSMessageStatus)null);
 					
 							for (EbMSAttachment attachment : message.getAttachments())
 							{
@@ -564,7 +297,7 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 	}
 	
 	@Override
-	public void insertMessage(Date timestamp, final EbMSMessage request, final EbMSMessageStatus status, final EbMSMessage response, final EbMSSendEvent sendEvent) throws DAOException
+	public void insertMessage(final Date timestamp, final EbMSMessage messageError, final EbMSMessageStatus refToMessageStatus) throws DAOException
 	{
 		try
 		{
@@ -577,9 +310,74 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 					{
 						try
 						{
-							Date timestamp = new Date();
+							jdbcTemplate.update(
+									new EbMSMessagePreparedStatement(
+											timestamp,
+											messageError.getMessageHeader().getCPAId(),
+											messageError.getMessageHeader().getConversationId(),
+											messageError.getMessageHeader().getMessageData().getMessageId(),
+											messageError.getMessageHeader().getMessageData().getRefToMessageId(),
+											messageError.getMessageHeader().getFrom().getRole(),
+											messageError.getMessageHeader().getTo().getRole(),
+											messageError.getMessageHeader().getService().getType(),
+											messageError.getMessageHeader().getService().getValue(),
+											messageError.getMessageHeader().getAction(),
+											XMLMessageBuilder.getInstance(MessageHeader.class).handle(messageError.getMessageHeader()),
+											XMLMessageBuilder.getInstance(ErrorList.class).handle(messageError.getErrorList())
+									)
+							);
+
+							Long id = getEbMSMessageId(messageError.getMessageHeader().getMessageData().getRefToMessageId());
+							if (id != null)
+							{
+								simpleJdbcTemplate.update
+								(
+									"delete from ebms_send_event" +
+									" where ebms_message_id=?" +
+									" and status=0",
+									id
+								);
+								simpleJdbcTemplate.update
+								(
+									"update ebms_message set status=?" +
+									" where id=?" +
+									" and status is null",
+									id,
+									refToMessageStatus.id()
+								);
+							}
+						}
+						catch (Exception e)
+						{
+							throw new RuntimeException(e);
+						}
+					}
+	
+				}
+			);
+		}
+		catch (Exception e)
+		{
+			throw new DAOException(e);
+		}
+	}
+
+	@Override
+	public void insertMessage(final Date timestamp, final EbMSMessage request, final EbMSMessageStatus status, final EbMSMessage response, final EbMSSendEvent sendEvent) throws DAOException
+	{
+		try
+		{
+			transactionTemplate.execute(
+				new TransactionCallbackWithoutResult()
+				{
+	
+					@Override
+					public void doInTransactionWithoutResult(TransactionStatus transactionStatus)
+					{
+						try
+						{
 							insertMessage(timestamp,request,status);
-							long id = insertMessage(timestamp,response,(EbMSMessageStatus)null);
+							long id = insertMessage1(timestamp,response,(EbMSMessageStatus)null);
 
 							if (sendEvent != null)
 								simpleJdbcTemplate.update
@@ -608,7 +406,7 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 		}
 	}
 	
-	protected long insertMessage(final Date timestamp, final EbMSMessage message, final EbMSMessageStatus status) throws InvalidDataAccessApiUsageException, DataAccessException, IOException
+	protected long insertMessage1(final Date timestamp, final EbMSMessage message, final EbMSMessageStatus status) throws InvalidDataAccessApiUsageException, DataAccessException, IOException
 	{
 		Long key = (Long)jdbcTemplate.query(
 			new PreparedStatementCreator()
@@ -737,246 +535,6 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 		}
 		
 		return key;
-	}
-	@Override
-	public void insertMessage(final EbMSMessage message, final EbMSMessageStatus status, final EbMSAcknowledgment acknowledgment, final EbMSSendEvent sendEvent) throws DAOException
-	{
-		try
-		{
-			transactionTemplate.execute(
-				new TransactionCallbackWithoutResult()
-				{
-	
-					@Override
-					public void doInTransactionWithoutResult(TransactionStatus transactionStatus)
-					{
-						try
-						{
-							Date timestamp = new Date();
-							Long key = (Long)jdbcTemplate.query(
-									new EbMSMessagePreparedStatement(
-											timestamp,
-											message.getMessageHeader().getCPAId(),
-											message.getMessageHeader().getConversationId(),
-											message.getMessageOrder() == null ? null : message.getMessageOrder().getSequenceNumber().getValue().longValue(),
-											message.getMessageHeader().getMessageData().getMessageId(),
-											message.getMessageHeader().getMessageData().getRefToMessageId(),
-											message.getMessageHeader().getFrom().getRole(),
-											message.getMessageHeader().getTo().getRole(),
-											message.getMessageHeader().getService().getType(),
-											message.getMessageHeader().getService().getValue(),
-											message.getMessageHeader().getAction(),
-											message.getOriginal(),
-											XMLMessageBuilder.getInstance(SignatureType.class).handle(new ObjectFactory().createSignature(message.getSignature())),
-											XMLMessageBuilder.getInstance(MessageHeader.class).handle(message.getMessageHeader()),
-											XMLMessageBuilder.getInstance(SyncReply.class).handle(message.getSyncReply()),
-											XMLMessageBuilder.getInstance(MessageOrder.class).handle(message.getMessageOrder()),
-											XMLMessageBuilder.getInstance(AckRequested.class).handle(message.getAckRequested()),
-											XMLMessageBuilder.getInstance(Manifest.class).handle(message.getManifest()),
-											status
-									),
-									new IdExtractor()
-							);
-					
-							for (EbMSAttachment attachment : message.getAttachments())
-							{
-								simpleJdbcTemplate.update
-								(
-									"insert into ebms_attachment (" +
-									"ebms_message_id," +
-									"name," +
-									"content_id," +
-									"content_type," +
-									"content" +
-									") values (?,?,?,?,?)",
-									key,
-									attachment.getName() == null ? Constants.DEFAULT_FILENAME : attachment.getName(),
-									attachment.getContentId(),
-									attachment.getContentType().split(";")[0].trim(),
-									IOUtils.toByteArray(attachment.getInputStream())
-								);
-							}
-							
-							if (acknowledgment != null)
-							{
-								key = (Long)jdbcTemplate.query(
-										new EbMSMessagePreparedStatement(
-												timestamp,
-												acknowledgment.getMessageHeader().getCPAId(),
-												acknowledgment.getMessageHeader().getConversationId(),
-												acknowledgment.getMessageHeader().getMessageData().getMessageId(),
-												acknowledgment.getMessageHeader().getMessageData().getRefToMessageId(),
-												acknowledgment.getMessageHeader().getFrom().getRole(),
-												acknowledgment.getMessageHeader().getTo().getRole(),
-												acknowledgment.getMessageHeader().getService().getType(),
-												acknowledgment.getMessageHeader().getService().getValue(),
-												acknowledgment.getMessageHeader().getAction(),
-												XMLMessageBuilder.getInstance(MessageHeader.class).handle(acknowledgment.getMessageHeader()),
-												XMLMessageBuilder.getInstance(Acknowledgment.class).handle(acknowledgment.getAcknowledgment())
-										),
-										new IdExtractor()
-								);
-					
-								if (sendEvent != null)
-									simpleJdbcTemplate.update
-									(
-										"insert into ebms_send_event (" +
-										"ebms_message_id," +
-										"time" +
-										") values (?,?)",
-										key,
-										//String.format(getDateFormat(),sendEvent.getTime())
-										sendEvent.getTime()
-									);
-							}
-						}
-						catch (Exception e)
-						{
-							throw new RuntimeException(e);
-						}
-					}
-	
-				}
-			);
-		}
-		catch (Exception e)
-		{
-			throw new DAOException(e);
-		}
-	}
-
-	@Override
-	public void insertMessage(final EbMSMessageError messageError, final EbMSMessageStatus refToMessageStatus) throws DAOException
-	{
-		try
-		{
-			transactionTemplate.execute(
-				new TransactionCallbackWithoutResult()
-				{
-	
-					@Override
-					public void doInTransactionWithoutResult(TransactionStatus transactionStatus)
-					{
-						try
-						{
-							Date timestamp = new Date();
-							jdbcTemplate.update(
-									new EbMSMessagePreparedStatement(
-											timestamp,
-											messageError.getMessageHeader().getCPAId(),
-											messageError.getMessageHeader().getConversationId(),
-											messageError.getMessageHeader().getMessageData().getMessageId(),
-											messageError.getMessageHeader().getMessageData().getRefToMessageId(),
-											messageError.getMessageHeader().getFrom().getRole(),
-											messageError.getMessageHeader().getTo().getRole(),
-											messageError.getMessageHeader().getService().getType(),
-											messageError.getMessageHeader().getService().getValue(),
-											messageError.getMessageHeader().getAction(),
-											XMLMessageBuilder.getInstance(MessageHeader.class).handle(messageError.getMessageHeader()),
-											XMLMessageBuilder.getInstance(ErrorList.class).handle(messageError.getErrorList())
-									)
-							);
-
-							Long id = getEbMSMessageId(messageError.getMessageHeader().getMessageData().getRefToMessageId());
-							if (id != null)
-							{
-								simpleJdbcTemplate.update
-								(
-									"delete from ebms_send_event" +
-									" where ebms_message_id=?" +
-									" and status=0",
-									id
-								);
-								simpleJdbcTemplate.update
-								(
-									"update ebms_message set status=?" +
-									" where id=?" +
-									" and status is null",
-									id,
-									refToMessageStatus.id()
-								);
-							}
-						}
-						catch (Exception e)
-						{
-							throw new RuntimeException(e);
-						}
-					}
-	
-				}
-			);
-		}
-		catch (Exception e)
-		{
-			throw new DAOException(e);
-		}
-	}
-
-	@Override
-	public void insertMessage(final EbMSAcknowledgment acknowledgment, final EbMSMessageStatus refToMessageStatus) throws DAOException
-	{
-		try
-		{
-			transactionTemplate.execute(
-				new TransactionCallbackWithoutResult()
-				{
-	
-					@Override
-					public void doInTransactionWithoutResult(TransactionStatus transactionStatus)
-					{
-						try
-						{
-							Date timestamp = new Date();
-							jdbcTemplate.update(
-									new EbMSMessagePreparedStatement(
-											timestamp,
-											acknowledgment.getMessageHeader().getCPAId(),
-											acknowledgment.getMessageHeader().getConversationId(),
-											acknowledgment.getMessageHeader().getMessageData().getMessageId(),
-											acknowledgment.getMessageHeader().getMessageData().getRefToMessageId(),
-											acknowledgment.getMessageHeader().getFrom().getRole(),
-											acknowledgment.getMessageHeader().getTo().getRole(),
-											acknowledgment.getMessageHeader().getService().getType(),
-											acknowledgment.getMessageHeader().getService().getValue(),
-											acknowledgment.getMessageHeader().getAction(),
-											XMLMessageBuilder.getInstance(MessageHeader.class).handle(acknowledgment.getMessageHeader()),
-											XMLMessageBuilder.getInstance(Acknowledgment.class).handle(acknowledgment.getAcknowledgment())
-									)
-							);
-
-							Long id = getEbMSMessageId(acknowledgment.getMessageHeader().getMessageData().getRefToMessageId());
-							if (id != null)
-							{
-								simpleJdbcTemplate.update
-								(
-									"delete from ebms_send_event" +
-									" where ebms_message_id=?" +
-									" and status=0",
-									id
-								);
-								simpleJdbcTemplate.update
-								(
-									"update ebms_message set status=?" +
-									" where id=?" +
-									" and status is null",
-									id,
-									refToMessageStatus.id()
-								);
-							}
-						}
-						catch (Exception e)
-						{
-							throw new RuntimeException(e);
-						}
-					}
-	
-				}
-			);
-		}
-		catch (Exception e)
-		{
-			throw new DAOException(e);
-		}
 	}
 	
 }

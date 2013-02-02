@@ -15,9 +15,9 @@
  ******************************************************************************/
 package nl.clockwork.ebms.client;
 
-import nl.clockwork.ebms.model.EbMSMessage;
+import nl.clockwork.ebms.model.EbMSDocument;
 
 public interface EbMSClient
 {
-	public void sendMessage(EbMSMessage message) throws Exception;
+	public void sendMessage(String uri, EbMSDocument message) throws Exception;
 }

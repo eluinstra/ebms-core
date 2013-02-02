@@ -18,12 +18,14 @@ package nl.clockwork.ebms.validation;
 import java.util.List;
 
 import nl.clockwork.ebms.Constants;
-import nl.clockwork.ebms.model.Signature;
+import nl.clockwork.ebms.model.EbMSDocument;
 import nl.clockwork.ebms.model.cpp.cpa.CollaborationProtocolAgreement;
 import nl.clockwork.ebms.model.cpp.cpa.DeliveryChannel;
 import nl.clockwork.ebms.model.cpp.cpa.PartyInfo;
 import nl.clockwork.ebms.model.ebxml.Error;
 import nl.clockwork.ebms.model.ebxml.MessageHeader;
+import nl.clockwork.ebms.model.xml.dsig.SignatureType;
+import nl.clockwork.ebms.signing.EbMSSignatureValidator;
 import nl.clockwork.ebms.util.CPAUtils;
 import nl.clockwork.ebms.util.EbMSMessageUtils;
 
@@ -33,8 +35,14 @@ import org.apache.commons.logging.LogFactory;
 public class SignatureValidator
 {
   protected transient Log logger = LogFactory.getLog(getClass());
+  private EbMSSignatureValidator ebMSSignatureValidator;
 
-	public Error validate(CollaborationProtocolAgreement cpa, MessageHeader messageHeader, Signature signature)
+	public SignatureValidator(EbMSSignatureValidator ebMSSignatureValidator)
+	{
+		this.ebMSSignatureValidator = ebMSSignatureValidator;
+	}
+
+	public Error validate(CollaborationProtocolAgreement cpa, EbMSDocument document, MessageHeader messageHeader, SignatureType signature) throws ValidatorException
 	{
 		PartyInfo partyInfo = CPAUtils.getPartyInfo(cpa,messageHeader.getFrom().getPartyId());
 		List<DeliveryChannel> deliveryChannels = CPAUtils.getSendingDeliveryChannels(partyInfo,messageHeader.getFrom().getRole(),messageHeader.getService(),messageHeader.getAction());
@@ -42,10 +50,15 @@ public class SignatureValidator
 		{
 			if (signature == null)
 				return EbMSMessageUtils.createError("//Header/Signature",Constants.EbMSErrorCode.SECURITY_FAILURE.errorCode(),"No signature found.");
-			if (!signature.isValid())
+			if (ebMSSignatureValidator.validate(document))
 				return EbMSMessageUtils.createError("//Header/Signature",Constants.EbMSErrorCode.SECURITY_FAILURE.errorCode(),"Signature invalid.");
 		}
 		return null;
+	}
+	
+	public void setEbMSSignatureValidator(EbMSSignatureValidator ebMSSignatureValidator)
+	{
+		this.ebMSSignatureValidator = ebMSSignatureValidator;
 	}
 
 }

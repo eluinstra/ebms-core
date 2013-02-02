@@ -15,11 +15,11 @@
  ******************************************************************************/
 package nl.clockwork.ebms.iface;
 
+import java.util.Date;
 import java.util.List;
 
 import nl.clockwork.ebms.dao.DAOException;
 import nl.clockwork.ebms.dao.EbMSDAO;
-import nl.clockwork.ebms.model.EbMSBaseMessage;
 import nl.clockwork.ebms.model.EbMSMessage;
 import nl.clockwork.ebms.model.EbMSMessageContent;
 import nl.clockwork.ebms.model.EbMSMessageContext;
@@ -46,7 +46,7 @@ public class EbMSMessageServiceImpl implements EbMSMessageService
 			CollaborationProtocolAgreement cpa = ebMSDAO.getCPA(messageContent.getContext().getCpaId());
 			EbMSMessage message = EbMSMessageUtils.ebMSMessageContentToEbMSMessage(cpa,messageContent,hostname);
 			List<EbMSSendEvent> sendEvents = EbMSMessageUtils.getEbMSSendEvents(ebMSDAO.getCPA(message.getMessageHeader().getCPAId()),message.getMessageHeader());
-			ebMSDAO.insertMessage(message,sendEvents);
+			ebMSDAO.insertMessage(new Date(),message,sendEvents);
 			return message.getMessageHeader().getMessageData().getMessageId();
 		}
 		catch (Exception e)
@@ -81,7 +81,7 @@ public class EbMSMessageServiceImpl implements EbMSMessageService
 	{
 		try
 		{
-			EbMSBaseMessage message = ebMSDAO.getMessage(messageId);
+			EbMSMessage message = ebMSDAO.getMessage(messageId);
 			if (message instanceof EbMSMessage)
 			{
 				EbMSMessageContent result = EbMSMessageUtils.EbMSMessageToEbMSMessageContent((EbMSMessage)message);

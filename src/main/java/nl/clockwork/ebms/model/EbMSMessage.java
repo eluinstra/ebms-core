@@ -29,7 +29,7 @@ import nl.clockwork.ebms.model.ebxml.StatusResponse;
 import nl.clockwork.ebms.model.ebxml.SyncReply;
 import nl.clockwork.ebms.model.xml.dsig.SignatureType;
 
-public class EbMSMessage implements EbMSBaseMessage
+public class EbMSMessage
 {
 	private SignatureType signature;
 	private MessageHeader messageHeader;
@@ -51,6 +51,11 @@ public class EbMSMessage implements EbMSBaseMessage
 	public EbMSMessage(MessageHeader messageHeader, SyncReply syncReply, MessageOrder messageOrder, AckRequested ackRequested, Manifest manifest, List<EbMSAttachment> attachments)
 	{
 		this(messageHeader,syncReply,messageOrder,ackRequested,null,null,manifest,null,null,attachments);
+	}
+	
+	public EbMSMessage(MessageHeader messageHeader)
+	{
+		this(messageHeader,null,null,null,null,null,null,null,null,null);
 	}
 	
 	public EbMSMessage(MessageHeader messageHeader, ErrorList errorList)
@@ -80,6 +85,12 @@ public class EbMSMessage implements EbMSBaseMessage
 	
 	public EbMSMessage(MessageHeader messageHeader, SyncReply syncReply, MessageOrder messageOrder, AckRequested ackRequested, ErrorList errorList, Acknowledgment acknowledgment, Manifest manifest, StatusRequest statusRequest, StatusResponse statusResponse, List<EbMSAttachment> attachments)
 	{
+		this(null,messageHeader,syncReply,messageOrder,ackRequested,errorList,acknowledgment,manifest,statusRequest,statusResponse,attachments);
+	}
+	
+	public EbMSMessage(SignatureType signature,MessageHeader messageHeader, SyncReply syncReply, MessageOrder messageOrder, AckRequested ackRequested, ErrorList errorList, Acknowledgment acknowledgment, Manifest manifest, StatusRequest statusRequest, StatusResponse statusResponse, List<EbMSAttachment> attachments)
+	{
+		this.signature = signature;
 		this.messageHeader = messageHeader;
 		this.syncReply = syncReply;
 		this.messageOrder = messageOrder;
@@ -107,7 +118,6 @@ public class EbMSMessage implements EbMSBaseMessage
 		this.signature = signature;
 	}
 	
-	@Override
 	public MessageHeader getMessageHeader()
 	{
 		return messageHeader;

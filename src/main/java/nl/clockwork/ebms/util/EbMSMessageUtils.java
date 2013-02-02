@@ -48,11 +48,7 @@ import nl.clockwork.ebms.model.EbMSDataSource;
 import nl.clockwork.ebms.model.EbMSMessage;
 import nl.clockwork.ebms.model.EbMSMessageContent;
 import nl.clockwork.ebms.model.EbMSMessageContext;
-import nl.clockwork.ebms.model.EbMSPing;
-import nl.clockwork.ebms.model.EbMSPong;
 import nl.clockwork.ebms.model.EbMSSendEvent;
-import nl.clockwork.ebms.model.EbMSStatusRequest;
-import nl.clockwork.ebms.model.EbMSStatusResponse;
 import nl.clockwork.ebms.model.cpp.cpa.CollaborationProtocolAgreement;
 import nl.clockwork.ebms.model.cpp.cpa.DeliveryChannel;
 import nl.clockwork.ebms.model.cpp.cpa.PartyInfo;
@@ -233,17 +229,17 @@ public class EbMSMessageUtils
 		return response;
 	}
 
-	public static EbMSPong ebMSPingToEbMSPong(EbMSPing ping, String hostname) throws DatatypeConfigurationException, JAXBException
+	public static EbMSMessage ebMSPingToEbMSPong(EbMSMessage ping, String hostname) throws DatatypeConfigurationException, JAXBException
 	{
-		EbMSPong pong = new EbMSPong(createMessageHeader(ping.getMessageHeader(),hostname,new GregorianCalendar(),EbMSMessageType.PONG.action()));
+		EbMSMessage pong = new EbMSMessage(createMessageHeader(ping.getMessageHeader(),hostname,new GregorianCalendar(),EbMSMessageType.PONG.action()));
 		return pong;
 	}
 
-	public static EbMSStatusResponse ebMSStatusRequestToEbMSStatusResponse(EbMSStatusRequest request, String hostname, EbMSMessageStatus status, GregorianCalendar timestamp) throws DatatypeConfigurationException, JAXBException
+	public static EbMSMessage ebMSStatusRequestToEbMSStatusResponse(EbMSMessage request, String hostname, EbMSMessageStatus status, GregorianCalendar timestamp) throws DatatypeConfigurationException, JAXBException
 	{
 		MessageHeader messageHeader = createMessageHeader(request.getMessageHeader(),hostname,new GregorianCalendar(),EbMSMessageType.STATUS_RESPONSE.action());
 		StatusResponse statusResponse = createStatusResponse(request.getStatusRequest(),status,timestamp);
-		EbMSStatusResponse response = new EbMSStatusResponse(messageHeader,statusResponse);
+		EbMSMessage response = new EbMSMessage(messageHeader,statusResponse);
 		return response;
 	}
 

@@ -15,11 +15,11 @@
  ******************************************************************************/
 package nl.clockwork.ebms.processor;
 
-import nl.clockwork.ebms.model.EbMSBaseMessage;
-import nl.clockwork.ebms.model.EbMSMessage;
+import nl.clockwork.ebms.model.EbMSDocument;
 
 
 public interface EbMSMessageProcessor
 {
-	EbMSBaseMessage process(EbMSMessage message);
+	EbMSDocument process(EbMSDocument document) throws EbMSProcessorException;
+	//void process(InputStream in, OutputStream out) throws EbMSProcessorException;
 }

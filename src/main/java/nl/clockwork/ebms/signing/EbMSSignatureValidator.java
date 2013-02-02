@@ -15,11 +15,10 @@
  ******************************************************************************/
 package nl.clockwork.ebms.signing;
 
-import nl.clockwork.ebms.model.RawEbMSMessage;
-import nl.clockwork.ebms.model.Signature;
+import nl.clockwork.ebms.model.EbMSDocument;
 import nl.clockwork.ebms.validation.ValidatorException;
 
 public interface EbMSSignatureValidator
 {
-	Signature validate(RawEbMSMessage message) throws ValidatorException;
+	boolean validate(EbMSDocument document) throws ValidatorException;
 }

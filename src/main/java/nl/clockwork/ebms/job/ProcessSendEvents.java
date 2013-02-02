@@ -20,12 +20,16 @@ import java.util.List;
 
 import nl.clockwork.ebms.client.EbMSClient;
 import nl.clockwork.ebms.dao.EbMSDAO;
-import nl.clockwork.ebms.model.EbMSAcknowledgment;
-import nl.clockwork.ebms.model.EbMSBaseMessage;
+import nl.clockwork.ebms.model.EbMSDocument;
 import nl.clockwork.ebms.model.EbMSMessage;
-import nl.clockwork.ebms.model.EbMSMessageError;
 import nl.clockwork.ebms.model.EbMSSendEvent;
-import nl.clockwork.ebms.model.EbMSStatusRequest;
+import nl.clockwork.ebms.model.cpp.cpa.CollaborationProtocolAgreement;
+import nl.clockwork.ebms.model.cpp.cpa.DeliveryChannel;
+import nl.clockwork.ebms.model.cpp.cpa.PartyInfo;
+import nl.clockwork.ebms.model.cpp.cpa.Transport;
+import nl.clockwork.ebms.signing.EbMSSignatureGenerator;
+import nl.clockwork.ebms.util.CPAUtils;
+import nl.clockwork.ebms.util.EbMSMessageUtils;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -34,6 +38,7 @@ public class ProcessSendEvents implements Job
 {
   protected transient Log logger = LogFactory.getLog(getClass());
   private EbMSDAO ebMSDAO;
+	private EbMSSignatureGenerator signatureGenerator;
   private EbMSClient ebMSClient;
 
   @Override
@@ -45,18 +50,11 @@ public class ProcessSendEvents implements Job
 	  	List<EbMSSendEvent> sendEvents = ebMSDAO.selectEventsForSending(timestamp);
 	  	for (EbMSSendEvent sendEvent : sendEvents)
 	  	{
-	  		EbMSBaseMessage message = ebMSDAO.getMessage(sendEvent.getEbMSMessageId());
-
-	  		if (message instanceof EbMSMessageError)
-	  			message = new EbMSMessage(message.getMessageHeader(),((EbMSMessageError)message).getErrorList());
-	  		else if (message instanceof EbMSAcknowledgment)
-	  			message = new EbMSMessage(message.getMessageHeader(),((EbMSAcknowledgment)message).getAcknowledgment());
-	  		else if (message instanceof EbMSStatusRequest)
-	  			message = new EbMSMessage(message.getMessageHeader(),null,((EbMSStatusRequest)message).getStatusRequest());
-	  		else if (message instanceof EbMSMessageError)
-	  			message = new EbMSMessage(message.getMessageHeader(),((EbMSMessageError)message).getErrorList());
-
-	  		ebMSClient.sendMessage((EbMSMessage)message);
+	  		EbMSMessage message = ebMSDAO.getMessage(sendEvent.getEbMSMessageId());
+	  		EbMSDocument document = new EbMSDocument(EbMSMessageUtils.createSOAPMessage(message),message.getAttachments());
+	  		signatureGenerator.generateSignature(document.getMessage(),document.getAttachments());
+	  		String uri = getUrl(message);
+	  		ebMSClient.sendMessage(uri,document);
 	  		ebMSDAO.deleteEventsForSending(timestamp,sendEvent.getEbMSMessageId());
 	  	}
   	}
@@ -66,9 +64,23 @@ public class ProcessSendEvents implements Job
   	}
   }
   
+	private String getUrl(EbMSMessage message)
+	{
+		CollaborationProtocolAgreement cpa = ebMSDAO.getCPA(message.getMessageHeader().getCPAId());
+		PartyInfo partyInfo = CPAUtils.getPartyInfo(cpa,message.getMessageHeader().getTo().getPartyId());
+		DeliveryChannel deliveryChannel = CPAUtils.getReceivingDeliveryChannels(partyInfo,message.getMessageHeader().getTo().getRole(),message.getMessageHeader().getService(),message.getMessageHeader().getAction()).get(0);
+		Transport transport = (Transport)deliveryChannel.getTransportId();
+		return transport.getTransportReceiver().getEndpoint().get(0).getUri();
+	}
+
   public void setEbMSDAO(EbMSDAO ebMSDAO)
 	{
 		this.ebMSDAO = ebMSDAO;
+	}
+
+	public void setSignatureGenerator(EbMSSignatureGenerator signatureGenerator)
+	{
+		this.signatureGenerator = signatureGenerator;
 	}
 
   public void setEbMSClient(EbMSClient ebMSClient)

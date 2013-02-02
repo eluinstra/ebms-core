@@ -20,8 +20,12 @@
 >
 
 	<bean id="httpHandler" class="nl.clockwork.ebms.processor.EbMSHttpHandlerImpl">
-		<property name="signatureValidator" ref="signatureValidator"/>
 		<property name="messageProcessor" ref="messageProcessor"/>
+	</bean>
+
+	<bean id="messageProcessor" class="nl.clockwork.ebms.processor.EbMSMessageProcessorImpl" init-method="init">
+		<property name="ebMSDAO" ref="ebMSDAO"/>
+		<property name="ebMSSignatureValidator" ref="signatureValidator"/>
 	</bean>
 
 	<bean id="signatureValidator" class="nl.clockwork.ebms.signing.EbMSSecSignatureValidator">
@@ -30,27 +34,20 @@
 		<property name="keyStorePassword" value="${truststore.password}"/>
 	</bean>
 
-	<bean id="messageProcessor" class="nl.clockwork.ebms.processor.EbMSMessageProcessorImpl" init-method="init">
-		<property name="ebMSDAO" ref="ebMSDAO"/>
-	</bean>
-
 	<bean id="jobScheduler" class="nl.clockwork.ebms.job.JobScheduler" init-method="init" destroy-method="destroy">
 		<property name="delay" value="${jobScheduler.delay}"/>
 		<property name="period" value="${jobScheduler.period}"/>
 		<property name="jobs">
 			<list>
-				<bean id="processSendEvents" class="nl.clockwork.ebms.job.ProcessSendEvents">
-					<property name="ebMSDAO" ref="ebMSDAO"/>
-					<property name="ebMSClient" ref="ebMSClient"/>
-				</bean>
+				<idref bean="processSendEvents"/>
 			</list>
 		</property>
 	</bean>
 
-	<bean id="ebMSClient" class="nl.clockwork.ebms.client.EbMSHttpClient">
+	<bean id="processSendEvents" class="nl.clockwork.ebms.job.ProcessSendEvents">
 		<property name="ebMSDAO" ref="ebMSDAO"/>
 		<property name="signatureGenerator" ref="signatureGenerator"/>
-		<property name="sslFactoryManager" ref="sslFactoryManager"/>
+		<property name="ebMSClient" ref="ebMSClient"/>
 	</bean>
 
 	<bean id="signatureGenerator" class="nl.clockwork.ebms.signing.EbMSSecSignatureGenerator" init-method="init">
@@ -60,6 +57,10 @@
 		<property name="keyAlias" value="${signature.key.alias}" />
 		<property name="keyPassword" value="${signature.key.password}" />
 	</bean>  
+
+	<bean id="ebMSClient" class="nl.clockwork.ebms.client.EbMSHttpClient">
+		<property name="sslFactoryManager" ref="sslFactoryManager"/>
+	</bean>
 
 	<bean id="sslFactoryManager" class="nl.clockwork.ebms.client.SSLFactoryManager" init-method="init">
 		<property name="keyStorePath" value="${keystore.path}"/>

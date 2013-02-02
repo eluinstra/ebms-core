@@ -15,28 +15,46 @@
  ******************************************************************************/
 package nl.clockwork.ebms.model;
 
-import nl.clockwork.ebms.model.ebxml.Acknowledgment;
-import nl.clockwork.ebms.model.ebxml.MessageHeader;
+import java.util.ArrayList;
+import java.util.List;
 
-public class EbMSAcknowledgment implements EbMSBaseMessage
+import org.w3c.dom.Document;
+
+public class EbMSDocument
 {
-	private MessageHeader messageHeader;
-	private Acknowledgment acknowledgment;
-
-	public EbMSAcknowledgment(MessageHeader messageHeader, Acknowledgment acknowledgment)
-	{
-		this.messageHeader = messageHeader;
-		this.acknowledgment = acknowledgment;
-	}
-
-	@Override
-	public MessageHeader getMessageHeader()
-	{
-		return messageHeader;
-	}
+	//private String soapAction;
+	private Document message;
+	private List<EbMSAttachment> attachments = new ArrayList<EbMSAttachment>();
 	
-	public Acknowledgment getAcknowledgment()
+	public EbMSDocument(Document message)
 	{
-		return acknowledgment;
+		this(message,new ArrayList<EbMSAttachment>());
 	}
+
+	public EbMSDocument(Document message, List<EbMSAttachment> attachments)
+	{
+		this.message = message;
+		this.attachments = attachments;
+	}
+
+	public Document getMessage()
+	{
+		return message;
+	}
+
+	public void setMessage(Document message)
+	{
+		this.message = message;
+	}
+
+	public List<EbMSAttachment> getAttachments()
+	{
+		return attachments;
+	}
+
+	public void setAttachments(List<EbMSAttachment> attachments)
+	{
+		this.attachments = attachments;
+	}
+
 }

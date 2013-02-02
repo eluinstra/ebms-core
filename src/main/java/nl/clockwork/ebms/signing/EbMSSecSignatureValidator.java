@@ -32,13 +32,11 @@ import nl.clockwork.ebms.common.util.XMLMessageBuilder;
 import nl.clockwork.ebms.common.util.XMLUtils;
 import nl.clockwork.ebms.dao.EbMSDAO;
 import nl.clockwork.ebms.model.EbMSAttachment;
-import nl.clockwork.ebms.model.RawEbMSMessage;
-import nl.clockwork.ebms.model.Signature;
+import nl.clockwork.ebms.model.EbMSDocument;
 import nl.clockwork.ebms.model.cpp.cpa.CollaborationProtocolAgreement;
 import nl.clockwork.ebms.model.cpp.cpa.DeliveryChannel;
 import nl.clockwork.ebms.model.cpp.cpa.PartyInfo;
 import nl.clockwork.ebms.model.ebxml.MessageHeader;
-import nl.clockwork.ebms.model.xml.dsig.SignatureType;
 import nl.clockwork.ebms.util.CPAUtils;
 import nl.clockwork.ebms.validation.ValidatorException;
 import nl.clockwork.ebms.xml.EbXMLNamespaceContext;
@@ -67,32 +65,31 @@ public class EbMSSecSignatureValidator implements EbMSSignatureValidator
 	}
 	
 	@Override
-	public Signature validate(RawEbMSMessage message) throws ValidatorException
+	public boolean validate(EbMSDocument document) throws ValidatorException
 	{
 		try
 		{
+			boolean result = false;
 			KeyStore keyStore = SecurityUtils.loadKeyStore(keyStorePath,keyStorePassword);
-			NodeList signatureNodeList = message.getMessage().getElementsByTagNameNS(org.apache.xml.security.utils.Constants.SignatureSpecNS,org.apache.xml.security.utils.Constants._TAG_SIGNATURE);
+			NodeList signatureNodeList = document.getMessage().getElementsByTagNameNS(org.apache.xml.security.utils.Constants.SignatureSpecNS,org.apache.xml.security.utils.Constants._TAG_SIGNATURE);
 			if (signatureNodeList.getLength() > 0)
 			{
-				boolean isValid = false;
-				X509Certificate certificate = getCertificate(message.getMessage());
+				X509Certificate certificate = getCertificate(document.getMessage());
 				if (certificate != null)
 				{
-					isValid = validateCertificate(keyStore,certificate,new Date()/*TODO get date from message???*/);
-					if (isValid)
+					result = validateCertificate(keyStore,certificate,new Date()/*TODO get date from message???*/);
+					if (result)
 					{
-						isValid = verify(certificate,signatureNodeList,message.getAttachments());
-						logger.info("Signature" + (isValid ? " " : " in") + "valid.");
+						result = verify(certificate,signatureNodeList,document.getAttachments());
+						logger.info("Signature" + (result ? " " : " in") + "valid.");
 					}
 					else
 						logger.info("Certificate invalid.");
 				}
 				else
 					logger.info("Certificate not found.");
-				return new Signature(certificate,XMLMessageBuilder.getInstance(SignatureType.class).handle(signatureNodeList.item(0)),isValid);
 			}
-			return null;
+			return result;
 		}
 		catch (Exception e)
 		{
