@@ -210,32 +210,32 @@ public class EbMSMessageProcessorImpl implements EbMSMessageProcessor
 			}
 			else if (EbMSMessageType.MESSAGE_ERROR.action().getAction().equals(message.getMessageHeader().getAction()))
 			{
-				process(timestamp,new EbMSMessage(message.getMessageHeader(),message.getErrorList()),EbMSMessageStatus.DELIVERY_FAILED);
+				process(timestamp,message,EbMSMessageStatus.DELIVERY_FAILED);
 				return null;
 			}
 			else if (EbMSMessageType.ACKNOWLEDGMENT.action().getAction().equals(message.getMessageHeader().getAction()))
 			{
-				process(timestamp,new EbMSMessage(message.getMessageHeader(),message.getAcknowledgment()),EbMSMessageStatus.DELIVERED);
+				process(timestamp,message,EbMSMessageStatus.DELIVERED);
 				return null;
 			}
 			else if (EbMSMessageType.STATUS_REQUEST.action().getAction().equals(message.getMessageHeader().getAction()))
 			{
-				EbMSMessage response = processStatusRequest(timestamp,new EbMSMessage(message.getMessageHeader(),null,message.getStatusRequest()));
+				EbMSMessage response = processStatusRequest(timestamp,message);
 				return message.getSyncReply() == null ? null : getEbMSDocument(response);
 			}
 			else if (EbMSMessageType.STATUS_RESPONSE.action().getAction().equals(message.getMessageHeader().getAction()))
 			{
-				//process(timestamp,new EbMSStatusResponse(message.getMessageHeader(),message.getStatusResponse()));
+				//process(timestamp,message);
 				return null;
 			}
 			else if (EbMSMessageType.PING.action().getAction().equals(message.getMessageHeader().getAction()))
 			{
-				EbMSMessage response = processPing(timestamp,new EbMSMessage(message.getMessageHeader()));
+				EbMSMessage response = processPing(timestamp,message);
 				return message.getSyncReply() == null ? null : getEbMSDocument(response);
 			}
 			else if (EbMSMessageType.PONG.action().getAction().equals(message.getMessageHeader().getAction()))
 			{
-				//process(new EbMSPong(message.getMessageHeader()));
+				//process(message);
 				return null;
 			}
 			else
