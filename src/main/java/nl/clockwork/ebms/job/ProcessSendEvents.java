@@ -18,7 +18,6 @@ package nl.clockwork.ebms.job;
 import java.util.GregorianCalendar;
 import java.util.List;
 
-import nl.clockwork.ebms.Constants;
 import nl.clockwork.ebms.client.EbMSClient;
 import nl.clockwork.ebms.dao.DAOTransactionCallback;
 import nl.clockwork.ebms.dao.EbMSDAO;
