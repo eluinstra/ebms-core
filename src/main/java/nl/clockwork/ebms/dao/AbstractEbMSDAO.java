@@ -71,12 +71,22 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 		{
 			try
 			{
-					if (EbMSMessageType.MESSAGE_ERROR.action().getService().getValue().equals(rs.getString("service")) && EbMSMessageType.MESSAGE_ERROR.action().getAction().equals(rs.getString("action")))
-						return new EbMSMessage(XMLMessageBuilder.getInstance(MessageHeader.class).handle(rs.getString("message_header")),XMLMessageBuilder.getInstance(ErrorList.class).handle(rs.getString("content")));
-					else if (EbMSMessageType.ACKNOWLEDGMENT.action().getService().getValue().equals(rs.getString("service")) && EbMSMessageType.ACKNOWLEDGMENT.action().getAction().equals(rs.getString("action")))
-						return new EbMSMessage(XMLMessageBuilder.getInstance(MessageHeader.class).handle(rs.getString("message_header")),XMLMessageBuilder.getInstance(Acknowledgment.class).handle(rs.getString("content")));
-					else
-						return new EbMSMessage(XMLMessageBuilder.getInstance(MessageHeader.class).handle(rs.getString("message_header")),XMLMessageBuilder.getInstance(AckRequested.class).handle(rs.getString("ack_requested")),XMLMessageBuilder.getInstance(Manifest.class).handle(rs.getString("content")),getAttachments(rs.getLong("id")));
+				if (!Constants.EBMS_SERVICE_URI.equals(rs.getString("service")))
+					return new EbMSMessage(XMLMessageBuilder.getInstance(MessageHeader.class).handle(rs.getString("message_header")),XMLMessageBuilder.getInstance(AckRequested.class).handle(rs.getString("ack_requested")),XMLMessageBuilder.getInstance(Manifest.class).handle(rs.getString("content")),getAttachments(rs.getLong("id")));
+				else if (EbMSMessageType.MESSAGE_ERROR.action().getAction().equals(rs.getString("action")))
+					return new EbMSMessage(XMLMessageBuilder.getInstance(MessageHeader.class).handle(rs.getString("message_header")),XMLMessageBuilder.getInstance(ErrorList.class).handle(rs.getString("content")));
+				else if (EbMSMessageType.ACKNOWLEDGMENT.action().getAction().equals(rs.getString("action")))
+					return new EbMSMessage(XMLMessageBuilder.getInstance(MessageHeader.class).handle(rs.getString("message_header")),XMLMessageBuilder.getInstance(Acknowledgment.class).handle(rs.getString("content")));
+				else if (EbMSMessageType.STATUS_REQUEST.action().getAction().equals(rs.getString("action")))
+					return new EbMSMessage(XMLMessageBuilder.getInstance(MessageHeader.class).handle(rs.getString("message_header")),null,XMLMessageBuilder.getInstance(StatusRequest.class).handle(rs.getString("content")));
+				else if (EbMSMessageType.STATUS_RESPONSE.action().getAction().equals(rs.getString("action")))
+					return new EbMSMessage(XMLMessageBuilder.getInstance(MessageHeader.class).handle(rs.getString("message_header")),XMLMessageBuilder.getInstance(StatusResponse.class).handle(rs.getString("content")));
+				else if (EbMSMessageType.PING.action().getAction().equals(rs.getString("action")))
+					return new EbMSMessage(XMLMessageBuilder.getInstance(MessageHeader.class).handle(rs.getString("message_header")));
+				else if (EbMSMessageType.PONG.action().getAction().equals(rs.getString("action")))
+					return new EbMSMessage(XMLMessageBuilder.getInstance(MessageHeader.class).handle(rs.getString("message_header")));
+				else
+					return null;
 			}
 			catch (JAXBException e)
 			{
@@ -523,7 +533,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 		{
 			jdbcTemplate.update(
 				"delete from ebms_send_event" +
-				" where ebms_message_id=?" +
+				" where ebms_message_id = ?" +
 				" and time < ?" +
 				"and status = 0",
 				id,
@@ -688,8 +698,8 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 		{
 			jdbcTemplate.update
 			(
-				"update ebms_message set status=?" +
-				" where id=?" +
+				"update ebms_message set status = ?" +
+				" where id = ?" +
 				" and status is null",
 				id,
 				status.id()
