@@ -48,7 +48,7 @@ public class ProcessSendEvents implements Job
   	try
   	{
 	  	GregorianCalendar timestamp = new GregorianCalendar();
-	  	List<EbMSSendEvent> sendEvents = ebMSDAO.selectEventsForSending(timestamp);
+	  	List<EbMSSendEvent> sendEvents = ebMSDAO.selectEventsForSending(timestamp.getTime());
 	  	for (final EbMSSendEvent sendEvent : sendEvents)
 	  	{
 	  		EbMSMessage message = ebMSDAO.getMessage(sendEvent.getEbMSMessageId());
@@ -62,11 +62,8 @@ public class ProcessSendEvents implements Job
 						@Override
 						public void doInTransaction()
 						{
-					  	GregorianCalendar timestamp = new GregorianCalendar();
-					  	//FIXME use sendEvent time
-					  	//timestamp.setTime(sendEvent.getTime());
-				  		ebMSDAO.updateSentEvent(timestamp,sendEvent.getEbMSMessageId());
-				  		ebMSDAO.deleteUnprocessedEvents(timestamp,sendEvent.getEbMSMessageId());
+				  		ebMSDAO.updateSentEvent(sendEvent.getTime(),sendEvent.getEbMSMessageId());
+				  		ebMSDAO.deleteUnprocessedEvents(sendEvent.getTime(),sendEvent.getEbMSMessageId());
 						}
 					}
 	  		);

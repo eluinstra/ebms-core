@@ -16,7 +16,6 @@
 package nl.clockwork.ebms.dao;
 
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.List;
 
 import nl.clockwork.ebms.Constants.EbMSMessageStatus;
@@ -45,9 +44,9 @@ public interface EbMSDAO
 
 	void executeTransaction(DAOTransactionCallback callback);
 
-	List<EbMSSendEvent> selectEventsForSending(GregorianCalendar timestamp) throws DAOException;
-	void updateSentEvent(GregorianCalendar timestamp, Long id) throws DAOException;
-	void deleteUnprocessedEvents(GregorianCalendar timestamp, Long id) throws DAOException;
+	List<EbMSSendEvent> selectEventsForSending(Date timestamp) throws DAOException;
+	void updateSentEvent(Date timestamp, Long id) throws DAOException;
+	void deleteUnprocessedEvents(Date timestamp, Long id) throws DAOException;
 
 	long insertMessage(Date timestamp, EbMSMessage message, EbMSMessageStatus status) throws DAOException;
 	void updateMessageStatus(Long id, EbMSMessageStatus status) throws DAOException;

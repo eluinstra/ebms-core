@@ -22,7 +22,6 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.List;
 
 import javax.mail.util.ByteArrayDataSource;
@@ -468,7 +467,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	}
 
 	@Override
-	public List<EbMSSendEvent> selectEventsForSending(GregorianCalendar timestamp) throws DAOException
+	public List<EbMSSendEvent> selectEventsForSending(Date timestamp) throws DAOException
 	{
 		try
 		{
@@ -484,10 +483,10 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 					@Override
 					public EbMSSendEvent mapRow(ResultSet rs, int rowNum) throws SQLException
 					{
-						return new EbMSSendEvent(rs.getLong("ebms_message_id"),rs.getDate("time"));
+						return new EbMSSendEvent(rs.getLong("ebms_message_id"),rs.getTimestamp("time"));
 					}
 				},
-				timestamp.getTime()
+				timestamp
 			);
 		}
 		catch (DataAccessException e)
@@ -497,7 +496,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	}
 	
 	@Override
-	public void updateSentEvent(final GregorianCalendar timestamp, final Long id) throws DAOException
+	public void updateSentEvent(Date timestamp, Long id) throws DAOException
 	{
 		try
 		{
@@ -508,7 +507,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 				" where ebms_message_id = ?" +
 				" and time = ?",
 				id,
-				timestamp.getTime()
+				timestamp
 			);
 		}
 		catch (DataAccessException e)
@@ -518,7 +517,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	}
 	
 	@Override
-	public void deleteUnprocessedEvents(GregorianCalendar timestamp, Long id) throws DAOException
+	public void deleteUnprocessedEvents(Date timestamp, Long id) throws DAOException
 	{
 		try
 		{
@@ -528,7 +527,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 				" and time < ?" +
 				"and status = 0",
 				id,
-				timestamp.getTime()
+				timestamp
 			);
 		}
 		catch (DataAccessException e)
