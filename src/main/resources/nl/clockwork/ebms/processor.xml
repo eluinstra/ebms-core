@@ -26,6 +26,7 @@
 	<bean id="messageProcessor" class="nl.clockwork.ebms.processor.EbMSMessageProcessorImpl" init-method="init">
 		<property name="ebMSDAO" ref="ebMSDAO"/>
 		<property name="ebMSSignatureValidator" ref="signatureValidator"/>
+		<property name="hostname" value="${hostname}"/>
 	</bean>
 
 	<bean id="signatureValidator" class="nl.clockwork.ebms.signing.EbMSSecSignatureValidator">
@@ -40,6 +41,7 @@
 		<property name="jobs">
 			<list>
 				<ref bean="processSendEvents"/>
+				<ref bean="processEbMSMessages"/>
 			</list>
 		</property>
 	</bean>
@@ -71,6 +73,14 @@
 		<property name="allowedCipherSuites" value="${https.allowedCipherSuites}"/>
 		<property name="requireClientAuthentication" value="${https.requireClientAuthentication}"/>
 		<property name="verifyHostnames" value="${https.verifyHostnames}"></property>
+	</bean>
+
+	<bean id="processEbMSMessages" class="nl.clockwork.ebms.job.ProcessEbMSMessages" init-method="init">
+		<property name="maxThreads" value="${job.maxTreads}"/>
+		<property name="ebMSMessageService" ref="ebMSMessageService"/>
+		<property name="ebMSProcessMessageCallback">
+			<bean class="nl.clockwork.ebms.processor.EbMSProcessMessageCallbackImpl"/>
+		</property>
 	</bean>
 
 </beans>

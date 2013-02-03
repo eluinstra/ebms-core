@@ -15,11 +15,64 @@
  ******************************************************************************/
 package nl.clockwork.ebms.job;
 
+import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
+import nl.clockwork.ebms.iface.EbMSMessageService;
+import nl.clockwork.ebms.model.EbMSMessageContent;
+import nl.clockwork.ebms.processor.EbMSProcessMessageCallback;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 public class ProcessEbMSMessages implements Job
 {
+  protected transient Log logger = LogFactory.getLog(getClass());
+  private ExecutorService executorService;
+	private int maxThreads = 4;
+  private EbMSMessageService ebMSMessageService;
+  private EbMSProcessMessageCallback ebMSProcessMessageCallback;
+  
+	public void init()
+	{
+		executorService = Executors.newFixedThreadPool(maxThreads);
+	}
+	
 	@Override
 	public void run()
 	{
-		
+		List<String> messageIds = ebMSMessageService.getMessageIds(null,null);
+		for (final String messageId : messageIds)
+		{
+			executorService.execute(
+				new Runnable()
+				{
+					
+					@Override
+					public void run()
+					{
+						EbMSMessageContent messageContent = ebMSMessageService.getMessage(messageId,false);
+						ebMSProcessMessageCallback.process(messageContent);
+						ebMSMessageService.processMessage(messageId);
+					}
+				}
+			);
+		}
+	}
+
+	public void setMaxThreads(int maxThreads)
+	{
+		this.maxThreads = maxThreads;
+	}
+	
+	public void setEbMSMessageService(EbMSMessageService ebMSMessageService)
+	{
+		this.ebMSMessageService = ebMSMessageService;
+	}
+
+	public void setEbMSProcessMessageCallback(EbMSProcessMessageCallback ebMSProcessMessageCallback)
+	{
+		this.ebMSProcessMessageCallback = ebMSProcessMessageCallback;
 	}
 }
