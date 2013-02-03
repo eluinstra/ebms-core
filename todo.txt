@@ -11,6 +11,7 @@
 
 - implement AdminService
 
+- use either ebms_message.id or ebms_message.message_id to identify message
 - CPAService: define cpa as CollaborationProtocolAgreement instead of String
 - MessageHeader: define duplicateElimination as Object instead of String
 
