@@ -1,15 +1,16 @@
 - remove unnecessary defined Interfaces and custom Exceptions
 - check http headers
-- replace EbMSBaseMessage and all its extended classes by EbMSMessage
+- improve EbMSMessageProcessor
 - improve EbMSHttpClient
-  - let sendMessage return an ebMSMessage/responseObject?
   - move cpa functionality to caller; add extra properties for url and signing (sendEvent)?
-- refactor EbMSAbstractDAO
 - validate EbMS messages?
 - remove servlet from core?
 - replace commons-logging by slf4j?
 - remove EbMS prefix on classes
 - TODO: optimize
+
+- implement AdminService
+
 - read mime message
 	- replace mime4j by:
 		- java soap
@@ -20,6 +21,3 @@
 		- java soap
 		- mime4j
 		- http client
-
-- implement AdminService
-		
