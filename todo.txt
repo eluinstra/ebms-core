@@ -11,6 +11,9 @@
 
 - implement AdminService
 
+- CPAService: define cpa as CollaborationProtocolAgreement instead of String
+- MessageHeader: define duplicateElimination as Object instead of String
+
 - read mime message
 	- replace mime4j by:
 		- java soap
