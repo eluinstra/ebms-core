@@ -43,7 +43,7 @@
 		<!--appender-ref ref="FILE"/-->
 	</appender>
 
-	<logger name="nl.clockwork.ebms.web" additivity="false">
+	<logger name="nl.clockwork.ebms" additivity="false">
 		<level value="debug"/>
 		<appender-ref ref="ASYNC"/>
 	</logger>
