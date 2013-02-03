@@ -27,6 +27,7 @@ import java.util.List;
 
 import nl.clockwork.ebms.common.util.SecurityUtils;
 import nl.clockwork.ebms.model.EbMSAttachment;
+import nl.clockwork.ebms.validation.ValidatorException;
 import nl.clockwork.ebms.xml.dsig.EbMSAttachmentResolver;
 
 import org.apache.commons.logging.Log;
@@ -56,10 +57,17 @@ public class XMLSecSignatureValidator implements SignatureValidator
 	}
 
 	@Override
-	public boolean validateMessage(Document document, List<EbMSAttachment> attachments) throws Exception
+	public boolean validate(Document document, List<EbMSAttachment> attachments) throws ValidatorException
 	{
-		KeyStore keyStore = SecurityUtils.loadKeyStore(keyStorePath,keyStorePassword);
-		return verify(keyStore,document,attachments);
+		try
+		{
+			KeyStore keyStore = SecurityUtils.loadKeyStore(keyStorePath,keyStorePassword);
+			return verify(keyStore,document,attachments);
+		}
+		catch (Exception e)
+		{
+			throw new ValidatorException(e);
+		}
 	}
 
 	private boolean verify(KeyStore keyStore, Document document, List<EbMSAttachment> attachments) throws XMLSignatureException, XMLSecurityException, CertificateExpiredException, CertificateNotYetValidException, KeyStoreException

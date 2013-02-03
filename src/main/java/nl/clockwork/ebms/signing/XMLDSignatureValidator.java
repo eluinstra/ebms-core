@@ -37,6 +37,7 @@ import javax.xml.crypto.dsig.keyinfo.KeyValue;
 import javax.xml.crypto.dsig.keyinfo.X509Data;
 
 import nl.clockwork.ebms.model.EbMSAttachment;
+import nl.clockwork.ebms.validation.ValidatorException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -49,9 +50,16 @@ public class XMLDSignatureValidator implements SignatureValidator
   protected transient Log logger = LogFactory.getLog(getClass());
 
   //@Override
-	public boolean validateMessage(Document document, List<EbMSAttachment> attachments) throws Exception
+	public boolean validate(Document document, List<EbMSAttachment> attachments) throws ValidatorException
 	{
-		return verify(document,attachments);
+		try
+		{
+			return verify(document,attachments);
+		}
+		catch (Exception e)
+		{
+			throw new ValidatorException(e);
+		}
 	}
 
 	private boolean verify(Document document, List<EbMSAttachment> attachments) throws MarshalException, XMLSignatureException
