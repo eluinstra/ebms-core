@@ -484,7 +484,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 			return jdbcTemplate.query(
 				"select ebms_message_id, max(time) as time" +
 				" from ebms_send_event" +
-				" where status = 0 " +
+				" where status = 0" +
 				//" and time <= " + getTimestampFunction() +
 				" and time <= ?" +
 				" group by ebms_message_id",
@@ -698,11 +698,13 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 		{
 			jdbcTemplate.update
 			(
-				"update ebms_message set status = ?" +
+				"update ebms_message" +
+				" set status = ?," + 
+				" status_time = " + getTimestampFunction() +
 				" where id = ?" +
 				" and status is null",
-				id,
-				status.id()
+				status.id(),
+				id
 			);
 		}
 		catch (DataAccessException e)
@@ -710,6 +712,27 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 			throw new DAOException(e);
 		}
 	}
+
+//	public void updateMessageStatus(Long id, EbMSMessageStatus oldStatus, EbMSMessageStatus newStatus) throws DAOException
+//	{
+//		try
+//		{
+//			jdbcTemplate.update
+//			(
+//				"update ebms_message" +
+//				" set status = ?," + 
+//				" status_time = " + getTimestampFunction() +
+//				" where id = ?" +
+//				oldStatus == null ? " and status is null" : " and status = " + oldStatus.id(),
+//				newStatus.id(),
+//				id
+//			);
+//		}
+//		catch (DataAccessException e)
+//		{
+//			throw new DAOException(e);
+//		}
+//	}
 
 	@Override
 	public void insertSendEvent(long id) throws DAOException
@@ -886,7 +909,6 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	{
 		try
 		{
-			//TODO improve: add maxNr to parameters???
 			List<Object> parameters = new ArrayList<Object>();
 			String messageContextFilter = getMessageContextFilter(messageContext,parameters);
 			return jdbcTemplate.queryForList(
@@ -909,7 +931,8 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 			return jdbcTemplate.queryForObject(
 				"select id, service, action, message_header, ack_requested, content" + 
 				" from ebms_message" + 
-				" where message_id = ?",// and status=" + EbMSMessageStatus.RECEIVED.id(),
+				" where message_id = ?",
+				//" and status = " + EbMSMessageStatus.RECEIVED.id(),
 				new EbMSMessageParameterizedRowMapper(),
 				messageId
 			);
