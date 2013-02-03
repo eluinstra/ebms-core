@@ -41,7 +41,7 @@ public class JobScheduler
 				public void run()
 				{
 					logger.info("Executing job: " + job.getClass());
-					job.execute();
+					job.run();
 				}
 			},
 			delay*1000,
