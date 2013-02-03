@@ -26,6 +26,10 @@ public class EbMSDocument
 	private Document message;
 	private List<EbMSAttachment> attachments = new ArrayList<EbMSAttachment>();
 	
+	protected EbMSDocument()
+	{
+	}
+
 	public EbMSDocument(Document message)
 	{
 		this(message,new ArrayList<EbMSAttachment>());
@@ -42,19 +46,9 @@ public class EbMSDocument
 		return message;
 	}
 
-	public void setMessage(Document message)
-	{
-		this.message = message;
-	}
-
 	public List<EbMSAttachment> getAttachments()
 	{
 		return attachments;
-	}
-
-	public void setAttachments(List<EbMSAttachment> attachments)
-	{
-		this.attachments = attachments;
 	}
 
 }
