@@ -24,7 +24,7 @@ import nl.clockwork.ebms.processor.EbMSProcessorException;
 public interface EbMSInputStreamHandler
 {
 	void handle(InputStream request) throws EbMSProcessorException;
-	void writeStatusCode(int statusCode);
-	void writeHeader(String name, String value);
+	void writeResponseStatus(int statusCode);
+	void writeResponseHeader(String name, String value);
 	OutputStream getOutputStream() throws IOException;
 }

@@ -53,21 +53,21 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  ******************************************************************************/
-public class EbMSServlet1 extends GenericServlet
+public class EbMSMessageServlet extends GenericServlet
 {
 	private static final long serialVersionUID = 1L;
 	protected transient Log logger = LogFactory.getLog(getClass());
-	private EbMSMessageProcessor messageProcessor;
+	private EbMSMessageProcessor ebMSMessageProcessor;
 
 	@Override
 	public void init(ServletConfig config) throws ServletException
 	{
 		super.init(config);
 		WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(getServletContext());
-		String id = config.getInitParameter("messageProcessor");
+		String id = config.getInitParameter("ebMSMessageProcessor");
 		if (id == null)
-			id = "messageProcessor";
-		messageProcessor = wac.getBean(id,EbMSMessageProcessor.class);
+			id = "ebMSMessageProcessor";
+		ebMSMessageProcessor = wac.getBean(id,EbMSMessageProcessor.class);
 	}
 
 	@Override
@@ -75,27 +75,20 @@ public class EbMSServlet1 extends GenericServlet
 	{
 		try
 		{
-			@SuppressWarnings("unchecked")
-			Enumeration<String> headerNames = ((HttpServletRequest)request).getHeaderNames();
-			Map<String,String> headers = new HashMap<String,String>();
-			while (headerNames.hasMoreElements())
-			{
-				String headerName = headerNames.nextElement();
-				headers.put(headerName,((HttpServletRequest)request).getHeader(headerName));
-			}
+			Map<String,String> headers = getHeaders((HttpServletRequest)request);
 			EbMSInputStreamHandlerImpl handler = 
-				new EbMSInputStreamHandlerImpl(messageProcessor,headers)
+				new EbMSInputStreamHandlerImpl(ebMSMessageProcessor,headers)
 				{
 					@Override
-					public void writeStatusCode(int statusCode)
+					public void writeResponseStatus(int statusCode)
 					{
 						((HttpServletResponse)response).setStatus(statusCode);
 					}
 
 					@Override
-					public void writeHeader(String name, String value)
+					public void writeResponseHeader(String name, String value)
 					{
-						((HttpServletResponse)response).setHeader(name,value);
+						((HttpServletResponse)response).addHeader(name,value);
 					}
 				
 					@Override
@@ -111,6 +104,24 @@ public class EbMSServlet1 extends GenericServlet
 		{
 			throw new ServletException(e);
 		}
+	}
+
+	private Map<String,String> getHeaders(HttpServletRequest request)
+	{
+		Map<String,String> result = new HashMap<String,String>();
+		@SuppressWarnings("unchecked")
+		Enumeration<String> headerNames = request.getHeaderNames();
+		while (headerNames.hasMoreElements())
+		{
+			String headerName = headerNames.nextElement();
+			result.put(headerName,request.getHeader(headerName));
+		}
+		return result;
+	}
+	
+	public void setEbMSMessageProcessor(EbMSMessageProcessor ebMSMessageProcessor)
+	{
+		this.ebMSMessageProcessor = ebMSMessageProcessor;
 	}
 
 }

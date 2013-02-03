@@ -53,12 +53,12 @@ public abstract class EbMSInputStreamHandlerImpl implements EbMSInputStreamHandl
 				EbMSDocument in = messageReader.read(request);
 				EbMSDocument out = messageProcessor.process(in);
 				if (out == null)
-					writeStatusCode(204);
+					writeResponseStatus(204);
 				else
 				{
-					writeStatusCode(200);
-					writeHeader("Content-Type","text/xml");
-					writeHeader("SOAPAction",Constants.EBMS_SOAP_ACTION);
+					writeResponseStatus(200);
+					writeResponseHeader("Content-Type","text/xml");
+					writeResponseHeader("SOAPAction",Constants.EBMS_SOAP_ACTION);
 					OutputStream response = getOutputStream();
 					DOMUtils.write(out.getMessage(),response);
 				}
@@ -79,9 +79,9 @@ public abstract class EbMSInputStreamHandlerImpl implements EbMSInputStreamHandl
 		return null;
 	}
 
-	public abstract void writeStatusCode(int statusCode);
+	public abstract void writeResponseStatus(int statusCode);
 	
-	public abstract void writeHeader(String name, String value);
+	public abstract void writeResponseHeader(String name, String value);
 
 	public abstract OutputStream getOutputStream() throws IOException;
 
