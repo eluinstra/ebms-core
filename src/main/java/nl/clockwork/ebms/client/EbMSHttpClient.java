@@ -15,32 +15,49 @@
  ******************************************************************************/
 package nl.clockwork.ebms.client;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.ArrayList;
 
 import javax.net.ssl.HttpsURLConnection;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
 
+import nl.clockwork.ebms.common.util.DOMUtils;
+import nl.clockwork.ebms.model.EbMSAttachment;
 import nl.clockwork.ebms.model.EbMSDocument;
+import nl.clockwork.ebms.model.EbMSResponseDocument;
+import nl.clockwork.ebms.processor.EbMSProcessorException;
 
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.w3c.dom.Document;
+import org.xml.sax.SAXException;
 
 public class EbMSHttpClient implements EbMSClient
 {
   protected transient Log logger = LogFactory.getLog(getClass());
 	private SSLFactoryManager sslFactoryManager;
 
-	public void sendMessage(String uri, EbMSDocument document) throws Exception
+	public EbMSDocument sendMessage(String uri, EbMSDocument document) throws EbMSProcessorException
 	{
-		URLConnection connection = openConnection(uri);
-		EbMSMessageWriter writer = new EbMSMessageWriterImpl((HttpURLConnection)connection);
-		writer.write(document);
-		writer.flush();
-		handleResponse(connection);
+		try
+		{
+			URLConnection connection = openConnection(uri);
+			EbMSMessageWriter writer = new EbMSMessageWriterImpl((HttpURLConnection)connection);
+			writer.write(document);
+			writer.flush();
+			return handleResponse((HttpURLConnection)connection);
+		}
+		catch (Exception e)
+		{
+			throw new EbMSProcessorException(e);
+		}
 	}
 	
 	private URLConnection openConnection(String uri) throws IOException
@@ -54,16 +71,25 @@ public class EbMSHttpClient implements EbMSClient
 		return connection;
 	}
 
-	private void handleResponse(URLConnection connection) throws IOException
+	private EbMSDocument handleResponse(HttpURLConnection connection) throws IOException, EbMSProcessorException, TransformerException, ParserConfigurationException, SAXException
 	{
-		//TODO: handle response
-		if (connection instanceof HttpURLConnection)
-			logger.info("StatusCode: " + ((HttpURLConnection)connection).getResponseCode());
-		BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-		String s;
-		while ((s = in.readLine()) != null)
-			logger.info(s);
-		in.close();
+		logger.info("StatusCode: " + connection.getResponseCode());
+		EbMSDocument document = getEbMSMessage(IOUtils.toString(connection.getInputStream()));
+		EbMSResponseDocument result = new EbMSResponseDocument(document,connection.getResponseCode());
+		logger.info(result.getMessage() == null ? null : DOMUtils.toString(result.getMessage()));
+		return result;
+	}
+
+	private EbMSDocument getEbMSMessage(String message) throws ParserConfigurationException, SAXException, IOException
+	{
+		EbMSDocument result = null;
+		if (StringUtils.isNotBlank(message))
+		{
+			DocumentBuilder db = DOMUtils.getDocumentBuilder();
+			Document d = db.parse(message);
+			result = new EbMSDocument(d,new ArrayList<EbMSAttachment>());
+		}
+		return result;
 	}
 
 	public void setSslFactoryManager(SSLFactoryManager sslFactoryManager)

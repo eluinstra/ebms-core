@@ -16,8 +16,9 @@
 package nl.clockwork.ebms.client;
 
 import nl.clockwork.ebms.model.EbMSDocument;
+import nl.clockwork.ebms.processor.EbMSProcessorException;
 
 public interface EbMSClient
 {
-	public void sendMessage(String uri, EbMSDocument message) throws Exception;
+	public EbMSDocument sendMessage(String uri, EbMSDocument message) throws EbMSProcessorException;
 }
