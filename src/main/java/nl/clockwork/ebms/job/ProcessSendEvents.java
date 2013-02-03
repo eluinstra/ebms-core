@@ -17,6 +17,8 @@ package nl.clockwork.ebms.job;
 
 import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import nl.clockwork.ebms.client.EbMSClient;
 import nl.clockwork.ebms.dao.DAOTransactionCallback;
@@ -40,43 +42,59 @@ import org.apache.commons.logging.LogFactory;
 public class ProcessSendEvents implements Job
 {
   protected transient Log logger = LogFactory.getLog(getClass());
+  private ExecutorService exec;
+	private int maxThreads = 4;
   private EbMSDAO ebMSDAO;
 	private EbMSSignatureGenerator signatureGenerator;
   private EbMSClient ebMSClient;
 	private EbMSMessageProcessor ebMSMessageProcessor;
 
+	public void init()
+	{
+		exec = Executors.newFixedThreadPool(maxThreads);
+	}
+	
   @Override
   public void execute()
   {
-  	try
+  	GregorianCalendar timestamp = new GregorianCalendar();
+  	List<EbMSSendEvent> sendEvents = ebMSDAO.selectEventsForSending(timestamp.getTime());
+  	for (final EbMSSendEvent sendEvent : sendEvents)
   	{
-	  	GregorianCalendar timestamp = new GregorianCalendar();
-	  	List<EbMSSendEvent> sendEvents = ebMSDAO.selectEventsForSending(timestamp.getTime());
-	  	for (final EbMSSendEvent sendEvent : sendEvents)
-	  	{
-	  		EbMSMessage message = ebMSDAO.getMessage(sendEvent.getEbMSMessageId());
-	  		EbMSDocument document = new EbMSDocument(EbMSMessageUtils.createSOAPMessage(message),message.getAttachments());
-	  		signatureGenerator.generate(document.getMessage(),document.getAttachments());
-	  		String uri = getUrl(message);
-	  		EbMSDocument responseDocument = ebMSClient.sendMessage(uri,document);
-	  		if (!(responseDocument == null || (responseDocument instanceof EbMSResponseDocument && ((EbMSResponseDocument)responseDocument).getMessage() == null)))
-	  			ebMSMessageProcessor.process(responseDocument);
-	  		ebMSDAO.executeTransaction(
-	  			new DAOTransactionCallback()
+  		exec.execute(
+  			new Runnable()
+				{
+					@Override
+					public void run()
 					{
-						@Override
-						public void doInTransaction()
+						try
 						{
-				  		ebMSDAO.updateSentEvent(sendEvent.getTime(),sendEvent.getEbMSMessageId());
-				  		ebMSDAO.deleteUnprocessedEvents(sendEvent.getTime(),sendEvent.getEbMSMessageId());
+				  		EbMSMessage message = ebMSDAO.getMessage(sendEvent.getEbMSMessageId());
+				  		EbMSDocument document = new EbMSDocument(EbMSMessageUtils.createSOAPMessage(message),message.getAttachments());
+				  		signatureGenerator.generate(document.getMessage(),document.getAttachments());
+				  		String uri = getUrl(message);
+				  		EbMSDocument responseDocument = ebMSClient.sendMessage(uri,document);
+				  		if (!(responseDocument == null || (responseDocument instanceof EbMSResponseDocument && ((EbMSResponseDocument)responseDocument).getMessage() == null)))
+				  			ebMSMessageProcessor.process(responseDocument);
+				  		ebMSDAO.executeTransaction(
+				  			new DAOTransactionCallback()
+								{
+									@Override
+									public void doInTransaction()
+									{
+							  		ebMSDAO.updateSentEvent(sendEvent.getTime(),sendEvent.getEbMSMessageId());
+							  		ebMSDAO.deleteUnprocessedEvents(sendEvent.getTime(),sendEvent.getEbMSMessageId());
+									}
+								}
+				  		);
+						}
+						catch (Exception e)
+						{
+				  		logger.error("",e);
 						}
 					}
-	  		);
-	  	}
-  	}
-  	catch (Exception e)
-  	{
-  		logger.error("",e);
+				}
+  		);
   	}
   }
   
@@ -87,6 +105,11 @@ public class ProcessSendEvents implements Job
 		DeliveryChannel deliveryChannel = CPAUtils.getReceivingDeliveryChannels(partyInfo,message.getMessageHeader().getTo().getRole(),message.getMessageHeader().getService(),message.getMessageHeader().getAction()).get(0);
 		Transport transport = (Transport)deliveryChannel.getTransportId();
 		return transport.getTransportReceiver().getEndpoint().get(0).getUri();
+	}
+
+	public void setMaxThreads(int maxThreads)
+	{
+		this.maxThreads = maxThreads;
 	}
 
   public void setEbMSDAO(EbMSDAO ebMSDAO)

@@ -44,7 +44,8 @@
 		</property>
 	</bean>
 
-	<bean id="processSendEvents" class="nl.clockwork.ebms.job.ProcessSendEvents">
+	<bean id="processSendEvents" class="nl.clockwork.ebms.job.ProcessSendEvents" init-method="init">
+		<property name="maxThreads" value="${job.maxTreads}"/>
 		<property name="ebMSDAO" ref="ebMSDAO"/>
 		<property name="signatureGenerator" ref="signatureGenerator"/>
 		<property name="ebMSClient" ref="ebMSClient"/>
