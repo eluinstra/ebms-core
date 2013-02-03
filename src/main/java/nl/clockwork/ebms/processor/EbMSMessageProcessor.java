@@ -21,5 +21,4 @@ import nl.clockwork.ebms.model.EbMSDocument;
 public interface EbMSMessageProcessor
 {
 	EbMSDocument process(EbMSDocument document) throws EbMSProcessorException;
-	//void process(InputStream in, OutputStream out) throws EbMSProcessorException;
 }
