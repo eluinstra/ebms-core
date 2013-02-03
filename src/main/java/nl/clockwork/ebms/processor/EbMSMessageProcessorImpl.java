@@ -70,9 +70,9 @@ import org.xml.sax.SAXException;
 public class EbMSMessageProcessorImpl implements EbMSMessageProcessor
 {
   protected transient Log logger = LogFactory.getLog(getClass());
-  private String hostname;
   private EbMSDAO ebMSDAO;
   private EbMSSignatureValidator ebMSSignatureValidator;
+  private String hostname;
   private CPAValidator cpaValidator;
   private MessageHeaderValidator messageHeaderValidator;
   private ManifestValidator manifestValidator;
@@ -449,6 +449,11 @@ public class EbMSMessageProcessorImpl implements EbMSMessageProcessor
 	public void setEbMSSignatureValidator(EbMSSignatureValidator ebMSSignatureValidator)
 	{
 		this.ebMSSignatureValidator = ebMSSignatureValidator;
+	}
+	
+	public void setHostname(String hostname)
+	{
+		this.hostname = hostname;
 	}
 
 }
