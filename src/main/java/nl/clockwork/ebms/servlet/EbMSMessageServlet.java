@@ -88,7 +88,10 @@ public class EbMSMessageServlet extends GenericServlet
 					@Override
 					public void writeResponseHeader(String name, String value)
 					{
-						((HttpServletResponse)response).addHeader(name,value);
+						if ("Content-Type".equalsIgnoreCase(name))
+							response.setContentType(value);
+						else
+							((HttpServletResponse)response).addHeader(name,value);
 					}
 				
 					@Override

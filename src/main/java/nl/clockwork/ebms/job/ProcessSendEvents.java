@@ -18,6 +18,7 @@ package nl.clockwork.ebms.job;
 import java.util.GregorianCalendar;
 import java.util.List;
 
+import nl.clockwork.ebms.Constants;
 import nl.clockwork.ebms.client.EbMSClient;
 import nl.clockwork.ebms.dao.DAOTransactionCallback;
 import nl.clockwork.ebms.dao.EbMSDAO;
@@ -63,7 +64,8 @@ public class ProcessSendEvents implements Job
 						public void doInTransaction()
 						{
 					  	GregorianCalendar timestamp = new GregorianCalendar();
-					  	timestamp.setTime(sendEvent.getTime());
+					  	//FIXME use sendEvent time
+					  	//timestamp.setTime(sendEvent.getTime());
 				  		ebMSDAO.updateSentEvent(timestamp,sendEvent.getEbMSMessageId());
 				  		ebMSDAO.deleteUnprocessedEvents(timestamp,sendEvent.getEbMSMessageId());
 						}

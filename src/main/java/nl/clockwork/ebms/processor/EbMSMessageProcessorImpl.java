@@ -208,32 +208,32 @@ public class EbMSMessageProcessorImpl implements EbMSMessageProcessor
 				}
 				//return null;
 			}
-			else if (EbMSMessageType.MESSAGE_ERROR.action().equals(message.getMessageHeader().getAction()))
+			else if (EbMSMessageType.MESSAGE_ERROR.action().getAction().equals(message.getMessageHeader().getAction()))
 			{
 				process(timestamp,new EbMSMessage(message.getMessageHeader(),message.getErrorList()),EbMSMessageStatus.DELIVERY_FAILED);
 				return null;
 			}
-			else if (EbMSMessageType.ACKNOWLEDGMENT.action().equals(message.getMessageHeader().getAction()))
+			else if (EbMSMessageType.ACKNOWLEDGMENT.action().getAction().equals(message.getMessageHeader().getAction()))
 			{
 				process(timestamp,new EbMSMessage(message.getMessageHeader(),message.getAcknowledgment()),EbMSMessageStatus.DELIVERED);
 				return null;
 			}
-			else if (EbMSMessageType.STATUS_REQUEST.action().equals(message.getMessageHeader().getAction()))
+			else if (EbMSMessageType.STATUS_REQUEST.action().getAction().equals(message.getMessageHeader().getAction()))
 			{
 				EbMSMessage response = processStatusRequest(timestamp,new EbMSMessage(message.getMessageHeader(),null,message.getStatusRequest()));
 				return message.getSyncReply() == null ? null : getEbMSDocument(response);
 			}
-			else if (EbMSMessageType.STATUS_RESPONSE.action().equals(message.getMessageHeader().getAction()))
+			else if (EbMSMessageType.STATUS_RESPONSE.action().getAction().equals(message.getMessageHeader().getAction()))
 			{
 				//process(timestamp,new EbMSStatusResponse(message.getMessageHeader(),message.getStatusResponse()));
 				return null;
 			}
-			else if (EbMSMessageType.PING.action().equals(message.getMessageHeader().getAction()))
+			else if (EbMSMessageType.PING.action().getAction().equals(message.getMessageHeader().getAction()))
 			{
 				EbMSMessage response = processPing(timestamp,new EbMSMessage(message.getMessageHeader()));
 				return message.getSyncReply() == null ? null : getEbMSDocument(response);
 			}
-			else if (EbMSMessageType.PONG.action().equals(message.getMessageHeader().getAction()))
+			else if (EbMSMessageType.PONG.action().getAction().equals(message.getMessageHeader().getAction()))
 			{
 				//process(new EbMSPong(message.getMessageHeader()));
 				return null;

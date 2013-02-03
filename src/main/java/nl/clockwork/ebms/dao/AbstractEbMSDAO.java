@@ -580,14 +580,10 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 													"sync_reply," +
 													"message_order," +
 													"ack_requested," +
-													"error_list," +
-													"acknowledgment," +
-													"manifest," +
-													"status_request," +
-													"status_response," +
+													"content," +
 													"status," +
 													"status_time" +
-												") values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?," + (status == null ? "null" : getTimestampFunction()) + ")",
+												") values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?," + (status == null ? "null" : getTimestampFunction()) + ")",
 												//new String[]{"id"}
 												new int[]{1}
 											);
@@ -616,19 +612,15 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 											ps.setString(15,XMLMessageBuilder.getInstance(SyncReply.class).handle(message.getSyncReply()));
 											ps.setString(16,XMLMessageBuilder.getInstance(MessageOrder.class).handle(message.getMessageOrder()));
 											ps.setString(17,XMLMessageBuilder.getInstance(AckRequested.class).handle(message.getAckRequested()));
-											ps.setString(18,XMLMessageBuilder.getInstance(ErrorList.class).handle(message.getErrorList()));
-											ps.setString(19,XMLMessageBuilder.getInstance(Acknowledgment.class).handle(message.getAcknowledgment()));
-											ps.setString(20,XMLMessageBuilder.getInstance(Manifest.class).handle(message.getManifest()));
-											ps.setString(21,XMLMessageBuilder.getInstance(StatusRequest.class).handle(message.getStatusRequest()));
-											ps.setString(22,XMLMessageBuilder.getInstance(StatusResponse.class).handle(message.getStatusResponse()));
+											ps.setString(18,getContent(message));
 											if (status == null)
-												ps.setNull(23,java.sql.Types.INTEGER);
+												ps.setNull(19,java.sql.Types.INTEGER);
 											else
-												ps.setInt(23,status.id());
-											//ps.setString(24,status == null ? null : String.format(getDateFormat(),timestamp));
-											//ps.setTimestamp(24,status == null ? null : new Timestamp(timestamp.getTime()));
-											//ps.setObject(24,status == null ? null : timestamp,Types.TIMESTAMP);
-											//ps.setObject(24,status == null ? null : timestamp);
+												ps.setInt(19,status.id());
+											//ps.setString(20,status == null ? null : String.format(getDateFormat(),timestamp));
+											//ps.setTimestamp(20,status == null ? null : new Timestamp(timestamp.getTime()));
+											//ps.setObject(20,status == null ? null : timestamp,Types.TIMESTAMP);
+											//ps.setObject(20,status == null ? null : timestamp);
 											return ps;
 										}
 										catch (JAXBException e)
@@ -673,6 +665,21 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 		{
 			throw new DAOException(e);
 		}
+	}
+
+	protected String getContent(EbMSMessage message) throws JAXBException
+	{
+		if (!Constants.EBMS_SERVICE_URI.equals(message.getMessageHeader().getService().getValue()))
+			return XMLMessageBuilder.getInstance(Manifest.class).handle(message.getManifest());
+		else if (EbMSMessageType.MESSAGE_ERROR.action().getAction().equals(message.getMessageHeader().getAction()))
+			return XMLMessageBuilder.getInstance(ErrorList.class).handle(message.getErrorList());
+		else if (EbMSMessageType.ACKNOWLEDGMENT.action().getAction().equals(message.getMessageHeader().getAction()))
+			return XMLMessageBuilder.getInstance(Acknowledgment.class).handle(message.getAcknowledgment());
+		else if (EbMSMessageType.STATUS_REQUEST.action().getAction().equals(message.getMessageHeader().getAction()))
+			return XMLMessageBuilder.getInstance(StatusRequest.class).handle(message.getStatusRequest());
+		else if (EbMSMessageType.STATUS_RESPONSE.action().getAction().equals(message.getMessageHeader().getAction()))
+			return XMLMessageBuilder.getInstance(StatusResponse.class).handle(message.getStatusResponse());
+		return null;
 	}
 
 	@Override
