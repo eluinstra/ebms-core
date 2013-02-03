@@ -18,10 +18,11 @@ package nl.clockwork.ebms.signing;
 import java.util.List;
 
 import nl.clockwork.ebms.model.EbMSAttachment;
+import nl.clockwork.ebms.processor.EbMSProcessorException;
 
 import org.w3c.dom.Document;
 
 public interface SignatureGenerator
 {
-	boolean generateSignature(Document d, List<EbMSAttachment> attachments) throws Exception;
+	boolean generate(Document d, List<EbMSAttachment> attachments) throws EbMSProcessorException;
 }

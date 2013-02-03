@@ -41,6 +41,7 @@ import nl.clockwork.ebms.model.cpp.cpa.CollaborationProtocolAgreement;
 import nl.clockwork.ebms.model.cpp.cpa.DeliveryChannel;
 import nl.clockwork.ebms.model.cpp.cpa.PartyInfo;
 import nl.clockwork.ebms.model.ebxml.MessageHeader;
+import nl.clockwork.ebms.processor.EbMSProcessorException;
 import nl.clockwork.ebms.util.CPAUtils;
 import nl.clockwork.ebms.xml.EbXMLNamespaceContext;
 import nl.clockwork.ebms.xml.dsig.EbMSAttachmentResolver;
@@ -73,12 +74,19 @@ public class EbMSSecSignatureGenerator implements EbMSSignatureGenerator
 	}
 
 	@Override
-	public Document generateSignature(Document document, List<EbMSAttachment> attachments) throws Exception
+	public Document generate(Document document, List<EbMSAttachment> attachments) throws EbMSProcessorException
 	{
-		if (isSigned(document))
-			//TODO: read keyAlias from cpa (by convention (cpaId or endpoint))
-			sign(keyStore,keyPair,keyAlias,document,attachments);
-		return document;
+		try
+		{
+			if (isSigned(document))
+				//TODO: read keyAlias from cpa (by convention (cpaId or endpoint))
+				sign(keyStore,keyPair,keyAlias,document,attachments);
+			return document;
+		}
+		catch (Exception e)
+		{
+			throw new EbMSProcessorException(e);
+		}
 	}
 
 	private boolean isSigned(Document document) throws XPathExpressionException, ParserConfigurationException, SAXException, IOException, JAXBException, DAOException

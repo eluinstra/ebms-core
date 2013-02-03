@@ -23,11 +23,13 @@ import nl.clockwork.ebms.dao.DAOTransactionCallback;
 import nl.clockwork.ebms.dao.EbMSDAO;
 import nl.clockwork.ebms.model.EbMSDocument;
 import nl.clockwork.ebms.model.EbMSMessage;
+import nl.clockwork.ebms.model.EbMSResponseDocument;
 import nl.clockwork.ebms.model.EbMSSendEvent;
 import nl.clockwork.ebms.model.cpp.cpa.CollaborationProtocolAgreement;
 import nl.clockwork.ebms.model.cpp.cpa.DeliveryChannel;
 import nl.clockwork.ebms.model.cpp.cpa.PartyInfo;
 import nl.clockwork.ebms.model.cpp.cpa.Transport;
+import nl.clockwork.ebms.processor.EbMSMessageProcessor;
 import nl.clockwork.ebms.signing.EbMSSignatureGenerator;
 import nl.clockwork.ebms.util.CPAUtils;
 import nl.clockwork.ebms.util.EbMSMessageUtils;
@@ -41,6 +43,7 @@ public class ProcessSendEvents implements Job
   private EbMSDAO ebMSDAO;
 	private EbMSSignatureGenerator signatureGenerator;
   private EbMSClient ebMSClient;
+	private EbMSMessageProcessor ebMSMessageProcessor;
 
   @Override
   public void execute()
@@ -53,9 +56,11 @@ public class ProcessSendEvents implements Job
 	  	{
 	  		EbMSMessage message = ebMSDAO.getMessage(sendEvent.getEbMSMessageId());
 	  		EbMSDocument document = new EbMSDocument(EbMSMessageUtils.createSOAPMessage(message),message.getAttachments());
-	  		signatureGenerator.generateSignature(document.getMessage(),document.getAttachments());
+	  		signatureGenerator.generate(document.getMessage(),document.getAttachments());
 	  		String uri = getUrl(message);
-	  		ebMSClient.sendMessage(uri,document);
+	  		EbMSDocument responseDocument = ebMSClient.sendMessage(uri,document);
+	  		if (!(responseDocument == null || (responseDocument instanceof EbMSResponseDocument && ((EbMSResponseDocument)responseDocument).getMessage() == null)))
+	  			ebMSMessageProcessor.process(responseDocument);
 	  		ebMSDAO.executeTransaction(
 	  			new DAOTransactionCallback()
 					{

@@ -52,6 +52,7 @@ import nl.clockwork.ebms.Constants;
 import nl.clockwork.ebms.common.util.DOMUtils;
 import nl.clockwork.ebms.common.util.SecurityUtils;
 import nl.clockwork.ebms.model.EbMSAttachment;
+import nl.clockwork.ebms.processor.EbMSProcessorException;
 
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.logging.Log;
@@ -76,7 +77,7 @@ public class XMLDSignatureGenerator implements SignatureGenerator
 	}
 	
 	@Override
-	public boolean generateSignature(Document document, List<EbMSAttachment> attachments) throws Exception
+	public boolean generate(Document document, List<EbMSAttachment> attachments) throws EbMSProcessorException
 	{
 		try
 		{
@@ -86,6 +87,10 @@ public class XMLDSignatureGenerator implements SignatureGenerator
 		catch (XMLSignatureException e)
 		{
 			return false;
+		}
+		catch (Exception e)
+		{
+			throw new EbMSProcessorException(e);
 		}
 	}
 	
