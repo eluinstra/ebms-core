@@ -42,7 +42,7 @@ import org.apache.commons.logging.LogFactory;
 public class ProcessSendEvents implements Job
 {
   protected transient Log logger = LogFactory.getLog(getClass());
-  private ExecutorService exec;
+  private ExecutorService executorService;
 	private int maxThreads = 4;
   private EbMSDAO ebMSDAO;
 	private EbMSSignatureGenerator signatureGenerator;
@@ -51,7 +51,7 @@ public class ProcessSendEvents implements Job
 
 	public void init()
 	{
-		exec = Executors.newFixedThreadPool(maxThreads);
+		executorService = Executors.newFixedThreadPool(maxThreads);
 	}
 	
   @Override
@@ -61,7 +61,7 @@ public class ProcessSendEvents implements Job
   	List<EbMSSendEvent> sendEvents = ebMSDAO.selectEventsForSending(timestamp.getTime());
   	for (final EbMSSendEvent sendEvent : sendEvents)
   	{
-  		exec.execute(
+  		executorService.execute(
   			new Runnable()
 				{
 					@Override
