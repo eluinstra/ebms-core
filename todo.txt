@@ -1,3 +1,4 @@
+- remove unnecessary defined Interfaces and custom Exceptions
 - check http headers
 - replace EbMSBaseMessage and all its extended classes by EbMSMessage
 - improve EbMSHttpClient
