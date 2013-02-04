@@ -25,12 +25,7 @@ import java.util.Date;
 import java.util.Enumeration;
 import java.util.List;
 
-import javax.xml.xpath.XPathConstants;
-
 import nl.clockwork.ebms.common.util.SecurityUtils;
-import nl.clockwork.ebms.common.util.XMLMessageBuilder;
-import nl.clockwork.ebms.common.util.XMLUtils;
-import nl.clockwork.ebms.dao.EbMSDAO;
 import nl.clockwork.ebms.model.EbMSAttachment;
 import nl.clockwork.ebms.model.EbMSDocument;
 import nl.clockwork.ebms.model.cpp.cpa.CollaborationProtocolAgreement;
@@ -39,7 +34,6 @@ import nl.clockwork.ebms.model.cpp.cpa.PartyInfo;
 import nl.clockwork.ebms.model.ebxml.MessageHeader;
 import nl.clockwork.ebms.util.CPAUtils;
 import nl.clockwork.ebms.validation.ValidatorException;
-import nl.clockwork.ebms.xml.EbXMLNamespaceContext;
 import nl.clockwork.ebms.xml.dsig.EbMSAttachmentResolver;
 
 import org.apache.commons.logging.Log;
@@ -49,13 +43,11 @@ import org.apache.xml.security.signature.XMLSignature;
 import org.apache.xml.security.signature.XMLSignatureException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 public class EbMSSecSignatureValidator implements EbMSSignatureValidator
 {
   protected transient Log logger = LogFactory.getLog(getClass());
-	private EbMSDAO ebMSDAO;
   private String keyStorePath;
 	private String keyStorePassword;
 
@@ -65,7 +57,7 @@ public class EbMSSecSignatureValidator implements EbMSSignatureValidator
 	}
 	
 	@Override
-	public boolean validate(EbMSDocument document) throws ValidatorException
+	public boolean isValid(CollaborationProtocolAgreement cpa, EbMSDocument document, MessageHeader messageHeader) throws ValidatorException
 	{
 		try
 		{
@@ -74,7 +66,7 @@ public class EbMSSecSignatureValidator implements EbMSSignatureValidator
 			NodeList signatureNodeList = document.getMessage().getElementsByTagNameNS(org.apache.xml.security.utils.Constants.SignatureSpecNS,org.apache.xml.security.utils.Constants._TAG_SIGNATURE);
 			if (signatureNodeList.getLength() > 0)
 			{
-				X509Certificate certificate = getCertificate(document.getMessage());
+				X509Certificate certificate = getCertificate(cpa,document.getMessage(),messageHeader);
 				if (certificate != null)
 				{
 					result = validateCertificate(keyStore,certificate,new Date()/*TODO get date from message???*/);
@@ -105,13 +97,10 @@ public class EbMSSecSignatureValidator implements EbMSSignatureValidator
 		return signature.checkSignatureValue(certificate);
 	}
 
-	private X509Certificate getCertificate(Document document)
+	private X509Certificate getCertificate(CollaborationProtocolAgreement cpa, Document document, MessageHeader messageHeader)
 	{
 		try
 		{
-			Node n = (Node)XMLUtils.executeXPathQuery(new EbXMLNamespaceContext(),document,"/soap:Envelope/soap:Header/ebxml:MessageHeader",XPathConstants.NODE);
-			MessageHeader messageHeader = XMLMessageBuilder.getInstance(MessageHeader.class).handle(n);
-			CollaborationProtocolAgreement cpa = ebMSDAO.getCPA(messageHeader.getCPAId());
 			if (cpa != null)
 			{
 				PartyInfo partyInfo = CPAUtils.getPartyInfo(cpa,messageHeader.getFrom().getPartyId());
@@ -209,10 +198,6 @@ public class EbMSSecSignatureValidator implements EbMSSignatureValidator
 		return result;
 	}
 */
-	public void setEbMSDAO(EbMSDAO ebMSDAO)
-	{
-		this.ebMSDAO = ebMSDAO;
-	}
 	
 	public void setKeyStorePath(String keyStorePath)
 	{

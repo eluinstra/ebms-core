@@ -16,9 +16,11 @@
 package nl.clockwork.ebms.signing;
 
 import nl.clockwork.ebms.model.EbMSDocument;
+import nl.clockwork.ebms.model.cpp.cpa.CollaborationProtocolAgreement;
+import nl.clockwork.ebms.model.ebxml.MessageHeader;
 import nl.clockwork.ebms.validation.ValidatorException;
 
 public interface EbMSSignatureValidator
 {
-	boolean validate(EbMSDocument document) throws ValidatorException;
+	boolean isValid(CollaborationProtocolAgreement cpa, EbMSDocument document, MessageHeader messageHeader) throws ValidatorException;
 }

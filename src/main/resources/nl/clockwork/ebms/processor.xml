@@ -30,7 +30,6 @@
 	</bean>
 
 	<bean id="signatureValidator" class="nl.clockwork.ebms.signing.EbMSSecSignatureValidator">
-		<property name="ebMSDAO" ref="ebMSDAO"/>
 		<property name="keyStorePath" value="${truststore.path}"/>
 		<property name="keyStorePassword" value="${truststore.password}"/>
 	</bean>
@@ -54,7 +53,6 @@
 	</bean>
 
 	<bean id="signatureGenerator" class="nl.clockwork.ebms.signing.EbMSSecSignatureGenerator" init-method="init">
-		<property name="ebMSDAO" ref="ebMSDAO"/>
 		<property name="keyStorePath" value="${signature.keystore.path}" />
 		<property name="keyStorePassword" value="${signature.keystore.password}" />
 		<property name="keyAlias" value="${signature.key.alias}" />

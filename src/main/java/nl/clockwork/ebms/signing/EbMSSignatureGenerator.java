@@ -15,14 +15,12 @@
  ******************************************************************************/
 package nl.clockwork.ebms.signing;
 
-import java.util.List;
-
-import nl.clockwork.ebms.model.EbMSAttachment;
+import nl.clockwork.ebms.model.EbMSDocument;
+import nl.clockwork.ebms.model.cpp.cpa.CollaborationProtocolAgreement;
+import nl.clockwork.ebms.model.ebxml.MessageHeader;
 import nl.clockwork.ebms.processor.EbMSProcessorException;
-
-import org.w3c.dom.Document;
 
 public interface EbMSSignatureGenerator
 {
-	Document generate(Document d, List<EbMSAttachment> attachments) throws EbMSProcessorException;
+	void generate(CollaborationProtocolAgreement cpa, EbMSDocument document, MessageHeader messageHeader) throws EbMSProcessorException;
 }

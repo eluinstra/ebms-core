@@ -26,24 +26,20 @@ import java.util.List;
 
 import javax.xml.bind.JAXBException;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 
 import nl.clockwork.ebms.Constants;
 import nl.clockwork.ebms.common.util.DOMUtils;
 import nl.clockwork.ebms.common.util.SecurityUtils;
-import nl.clockwork.ebms.common.util.XMLMessageBuilder;
-import nl.clockwork.ebms.common.util.XMLUtils;
 import nl.clockwork.ebms.dao.DAOException;
-import nl.clockwork.ebms.dao.EbMSDAO;
 import nl.clockwork.ebms.model.EbMSAttachment;
+import nl.clockwork.ebms.model.EbMSDocument;
 import nl.clockwork.ebms.model.cpp.cpa.CollaborationProtocolAgreement;
 import nl.clockwork.ebms.model.cpp.cpa.DeliveryChannel;
 import nl.clockwork.ebms.model.cpp.cpa.PartyInfo;
 import nl.clockwork.ebms.model.ebxml.MessageHeader;
 import nl.clockwork.ebms.processor.EbMSProcessorException;
 import nl.clockwork.ebms.util.CPAUtils;
-import nl.clockwork.ebms.xml.EbXMLNamespaceContext;
 import nl.clockwork.ebms.xml.dsig.EbMSAttachmentResolver;
 
 import org.apache.commons.logging.Log;
@@ -53,13 +49,11 @@ import org.apache.xml.security.signature.XMLSignature;
 import org.apache.xml.security.transforms.Transforms;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
 public class EbMSSecSignatureGenerator implements EbMSSignatureGenerator
 {
 	protected transient Log logger = LogFactory.getLog(getClass());
-	private EbMSDAO ebMSDAO;
 	private String keyStorePath;
 	private String keyStorePassword;
 	private String keyAlias;
@@ -74,14 +68,13 @@ public class EbMSSecSignatureGenerator implements EbMSSignatureGenerator
 	}
 
 	@Override
-	public Document generate(Document document, List<EbMSAttachment> attachments) throws EbMSProcessorException
+	public void generate(CollaborationProtocolAgreement cpa, EbMSDocument document, MessageHeader messageHeader) throws EbMSProcessorException
 	{
 		try
 		{
-			if (isSigned(document))
+			if (isSigned(cpa,document.getMessage(),messageHeader))
 				//TODO: read keyAlias from cpa (by convention (cpaId or endpoint))
-				sign(keyStore,keyPair,keyAlias,document,attachments);
-			return document;
+				sign(keyStore,keyPair,keyAlias,document.getMessage(),document.getAttachments());
 		}
 		catch (Exception e)
 		{
@@ -89,14 +82,11 @@ public class EbMSSecSignatureGenerator implements EbMSSignatureGenerator
 		}
 	}
 
-	private boolean isSigned(Document document) throws XPathExpressionException, ParserConfigurationException, SAXException, IOException, JAXBException, DAOException
+	private boolean isSigned(CollaborationProtocolAgreement cpa, Document document, MessageHeader messageHeader) throws XPathExpressionException, ParserConfigurationException, SAXException, IOException, JAXBException, DAOException
 	{
-		Node n = (Node)XMLUtils.executeXPathQuery(new EbXMLNamespaceContext(),document,"/soap:Envelope/soap:Header/ebxml:MessageHeader",XPathConstants.NODE);
-		MessageHeader messageHeader = XMLMessageBuilder.getInstance(MessageHeader.class).handle(n);
 		//TODO: get isSigned info from CPA for all messages
 		if (!Constants.EBMS_SERVICE_URI.equals(messageHeader.getService().getValue()))
 		{
-			CollaborationProtocolAgreement cpa = ebMSDAO.getCPA(messageHeader.getCPAId());
 			PartyInfo partyInfo = CPAUtils.getPartyInfo(cpa,messageHeader.getFrom().getPartyId());
 			List<DeliveryChannel> channels = CPAUtils.getSendingDeliveryChannels(partyInfo,messageHeader.getFrom().getRole(),messageHeader.getService(),messageHeader.getAction());
 			return CPAUtils.isSigned(channels.get(0));
@@ -137,11 +127,6 @@ public class EbMSSecSignatureGenerator implements EbMSSignatureGenerator
 		signature.addKeyInfo((X509Certificate)certificates[0]);
 
 		signature.sign(keyPair.getPrivate());
-	}
-	
-	public void setEbMSDAO(EbMSDAO ebMSDAO)
-	{
-		this.ebMSDAO = ebMSDAO;
 	}
 	
 	public void setKeyStorePath(String keyStorePath)

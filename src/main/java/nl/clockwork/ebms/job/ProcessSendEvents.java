@@ -70,8 +70,9 @@ public class ProcessSendEvents implements Job
 						try
 						{
 				  		EbMSMessage message = ebMSDAO.getMessage(sendEvent.getEbMSMessageId());
+				  		CollaborationProtocolAgreement cpa = ebMSDAO.getCPA(message.getMessageHeader().getCPAId());
 				  		EbMSDocument document = new EbMSDocument(EbMSMessageUtils.createSOAPMessage(message),message.getAttachments());
-				  		signatureGenerator.generate(document.getMessage(),document.getAttachments());
+				  		signatureGenerator.generate(cpa,document,message.getMessageHeader());
 				  		String uri = getUrl(message);
 				  		EbMSDocument responseDocument = ebMSClient.sendMessage(uri,document);
 				  		if (!(responseDocument == null || (responseDocument instanceof EbMSResponseDocument && ((EbMSResponseDocument)responseDocument).getMessage() == null)))
