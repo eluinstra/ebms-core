@@ -25,7 +25,9 @@ import java.util.Date;
 import java.util.List;
 
 import javax.mail.util.ByteArrayDataSource;
+import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
+import javax.xml.namespace.QName;
 
 import nl.clockwork.ebms.Constants;
 import nl.clockwork.ebms.Constants.EbMSMessageStatus;
@@ -616,7 +618,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 											ps.setString(10,messageHeader.getService().getValue());
 											ps.setString(11,messageHeader.getAction());
 											ps.setBytes(12,message.getOriginal());
-											ps.setString(13,XMLMessageBuilder.getInstance(SignatureType.class).handle(message.getSignature()));
+											ps.setString(13,XMLMessageBuilder.getInstance(SignatureType.class).handle(new JAXBElement<SignatureType>(new QName("http://www.w3.org/2000/09/xmldsig#","Signature"),SignatureType.class,message.getSignature())));
 											ps.setString(14,XMLMessageBuilder.getInstance(MessageHeader.class).handle(messageHeader));
 											ps.setString(15,XMLMessageBuilder.getInstance(SyncReply.class).handle(message.getSyncReply()));
 											ps.setString(16,XMLMessageBuilder.getInstance(MessageOrder.class).handle(message.getMessageOrder()));

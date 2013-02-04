@@ -48,7 +48,7 @@ public class SignatureValidator
 		PartyInfo partyInfo = CPAUtils.getPartyInfo(cpa,messageHeader.getFrom().getPartyId());
 		List<DeliveryChannel> deliveryChannels = CPAUtils.getSendingDeliveryChannels(partyInfo,messageHeader.getFrom().getRole(),messageHeader.getService(),messageHeader.getAction());
 		if (CPAUtils.isSigned(deliveryChannels.get(0)))
-			if (ebMSSignatureValidator.validate(document))
+			if (!ebMSSignatureValidator.validate(document))
 			{
 				errorList.getError().add(EbMSMessageUtils.createError("//Header/Signature",Constants.EbMSErrorCode.SECURITY_FAILURE.errorCode(),"Signature invalid."));
 				errorList.setHighestSeverity(SeverityType.ERROR);
