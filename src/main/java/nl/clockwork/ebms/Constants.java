@@ -62,18 +62,6 @@ public class Constants
 		
   };
 
-  public enum EbMSErrorLocation
-  {
-  	UNKNOWN("Unknown");
-
-		private final String location;
-		
-		EbMSErrorLocation(String location) { this.location = location; }
-		
-		public final String location() { return location; }
-		
-  }
-
   public static enum EbMSAction
   {
 		MESSAGE_ERROR("MessageError"), ACKNOWLEDGMENT("Acknowledgment"), STATUS_REQUEST("StatusRequest"), STATUS_RESPONSE("StatusResponse"), PING("Ping"), PONG("Pong");
