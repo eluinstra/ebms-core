@@ -93,10 +93,15 @@ public class EbMSSecSignatureGenerator implements EbMSSignatureGenerator
 	{
 		Node n = (Node)XMLUtils.executeXPathQuery(new EbXMLNamespaceContext(),document,"/soap:Envelope/soap:Header/ebxml:MessageHeader",XPathConstants.NODE);
 		MessageHeader messageHeader = XMLMessageBuilder.getInstance(MessageHeader.class).handle(n);
-		CollaborationProtocolAgreement cpa = ebMSDAO.getCPA(messageHeader.getCPAId());
-		PartyInfo partyInfo = CPAUtils.getPartyInfo(cpa,messageHeader.getFrom().getPartyId());
-		List<DeliveryChannel> channels = CPAUtils.getSendingDeliveryChannels(partyInfo,messageHeader.getFrom().getRole(),messageHeader.getService(),messageHeader.getAction());
-		return CPAUtils.isSigned(channels.get(0));
+		if (!Constants.EBMS_SERVICE_URI.equals(messageHeader.getService().getValue()))
+		{
+			CollaborationProtocolAgreement cpa = ebMSDAO.getCPA(messageHeader.getCPAId());
+			PartyInfo partyInfo = CPAUtils.getPartyInfo(cpa,messageHeader.getFrom().getPartyId());
+			List<DeliveryChannel> channels = CPAUtils.getSendingDeliveryChannels(partyInfo,messageHeader.getFrom().getRole(),messageHeader.getService(),messageHeader.getAction());
+			return CPAUtils.isSigned(channels.get(0));
+		}
+		else
+			return false;
 	}
 	
 	private void sign(KeyStore keyStore, KeyPair keyPair, String alias, Document document, List<EbMSAttachment> attachments) throws XMLSecurityException, KeyStoreException
