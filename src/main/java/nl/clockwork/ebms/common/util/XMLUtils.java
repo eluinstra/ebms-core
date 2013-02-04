@@ -74,12 +74,6 @@ public class XMLUtils
 	    XPath xpath = XPathFactory.newInstance().newXPath();
 	    xpath.setNamespaceContext(namespaceContext);
 	    XPathExpression expr = xpath.compile(query);
-	
-//		Object result = expr.evaluate(document,XPathConstants.NODESET);
-//		NodeList nodes = (NodeList) result;
-//		for (int i = 0; i < nodes.getLength(); i++)
-//			System.out.println(nodes.item(i).getNodeValue()); 
-	
 	    return expr.evaluate(node,returnType);
 	}
 

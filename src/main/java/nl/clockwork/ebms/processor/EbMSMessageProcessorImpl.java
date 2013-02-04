@@ -102,12 +102,12 @@ public class EbMSMessageProcessorImpl implements EbMSMessageProcessor
 					{
 						if (message.getSyncReply() == null)
 						{
-							long responseId = getResponseMessageId(messageHeader);
+							long responseId = ebMSDAO.getResponseMessageId(messageHeader.getMessageData().getMessageId());
 							ebMSDAO.insertSendEvent(responseId);
 							return null;
 						}
 						else
-							return getEbMSDocument(getResponseMessage(messageHeader));
+							return getEbMSDocument(ebMSDAO.getResponseMessage(messageHeader.getMessageData().getMessageId()));
 					}
 					else
 					{
@@ -206,7 +206,6 @@ public class EbMSMessageProcessorImpl implements EbMSMessageProcessor
 						}
 					}
 				}
-				//return null;
 			}
 			else if (EbMSAction.MESSAGE_ERROR.action().equals(message.getMessageHeader().getAction()))
 			{
@@ -270,7 +269,6 @@ public class EbMSMessageProcessorImpl implements EbMSMessageProcessor
 	private EbMSDocument getEbMSDocument(EbMSMessage message) throws SOAPException, JAXBException, ParserConfigurationException, SAXException, IOException
 	{
 		return new EbMSDocument(EbMSMessageUtils.createSOAPMessage(message),message.getAttachments());
-		
 	}
 	
 	private void process(final Calendar timestamp, final EbMSMessage message, final EbMSMessageStatus status)
@@ -354,8 +352,6 @@ public class EbMSMessageProcessorImpl implements EbMSMessageProcessor
 	{
 		return /*message.getMessageHeader().getDuplicateElimination()!= null && */ebMSDAO.existsMessage(message.getMessageHeader().getMessageData().getMessageId());
 	}
-
-	
 	
 	private boolean equalsDuplicateMessage(EbMSMessage message)
 	{
@@ -370,16 +366,6 @@ public class EbMSMessageProcessorImpl implements EbMSMessageProcessor
 	private boolean isDuplicateRefToMessage(EbMSMessage message)
 	{
 		return ebMSDAO.existsResponseMessage(message.getMessageHeader().getMessageData().getRefToMessageId());
-	}
-
-	private long getResponseMessageId(MessageHeader messageHeader)
-	{
-		return ebMSDAO.getResponseMessageId(messageHeader.getMessageData().getMessageId());
-	}
-
-	private EbMSMessage getResponseMessage(MessageHeader messageHeader)
-	{
-		return ebMSDAO.getResponseMessage(messageHeader.getMessageData().getMessageId());
 	}
 
 	private ErrorList createErrorList()
