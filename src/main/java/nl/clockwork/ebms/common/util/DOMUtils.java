@@ -15,10 +15,13 @@
  ******************************************************************************/
 package nl.clockwork.ebms.common.util;
 
+import java.io.IOException;
 import java.io.OutputStream;
 import java.io.StringWriter;
 import java.io.Writer;
 
+import javax.xml.namespace.NamespaceContext;
+import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -29,11 +32,16 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpression;
+import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactory;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 
 public class DOMUtils
 {
@@ -62,12 +70,6 @@ public class DOMUtils
 		return (Element)child;
 	}
 	
-	public static Node getNode(Document document, String namespace, String tagName)
-	{
-		NodeList nl = document.getElementsByTagNameNS(namespace,tagName);
-		return nl.getLength() == 0 ? null : nl.item(0);
-	}
-
 	public static String toString(Document document) throws TransformerException
 	{
 		//return document.getDocumentElement().toString();
@@ -87,6 +89,19 @@ public class DOMUtils
 	{
 		Transformer transformer = getTransformer();
 		transformer.transform(new DOMSource(document),new StreamResult(writer));
+	}
+	
+	public static Node executeXPathQuery(NamespaceContext namespaceContext, Document document, String query) throws ParserConfigurationException, SAXException, IOException, XPathExpressionException
+	{
+		return (Node)executeXPathQuery(namespaceContext,document,query,XPathConstants.NODE);
+	}
+
+	public static Object executeXPathQuery(NamespaceContext namespaceContext, Document document, String query, QName returnType) throws ParserConfigurationException, SAXException, IOException, XPathExpressionException
+	{
+	    XPath xpath = XPathFactory.newInstance().newXPath();
+	    xpath.setNamespaceContext(namespaceContext);
+	    XPathExpression expr = xpath.compile(query);
+	    return (Node)expr.evaluate(document,returnType);
 	}
 
 }

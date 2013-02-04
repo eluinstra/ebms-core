@@ -25,11 +25,11 @@ import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.soap.SOAPException;
+import javax.xml.xpath.XPathExpressionException;
 
 import nl.clockwork.ebms.Constants;
 import nl.clockwork.ebms.Constants.EbMSAction;
 import nl.clockwork.ebms.Constants.EbMSMessageStatus;
-import nl.clockwork.ebms.common.util.DOMUtils;
 import nl.clockwork.ebms.common.util.XMLMessageBuilder;
 import nl.clockwork.ebms.dao.DAOTransactionCallback;
 import nl.clockwork.ebms.dao.EbMSDAO;
@@ -51,6 +51,7 @@ import nl.clockwork.ebms.model.ebxml.SeverityType;
 import nl.clockwork.ebms.model.ebxml.StatusRequest;
 import nl.clockwork.ebms.model.ebxml.StatusResponse;
 import nl.clockwork.ebms.model.ebxml.SyncReply;
+import nl.clockwork.ebms.model.soap.envelope.Envelope;
 import nl.clockwork.ebms.model.xml.dsig.ReferenceType;
 import nl.clockwork.ebms.model.xml.dsig.SignatureType;
 import nl.clockwork.ebms.signing.EbMSSignatureValidator;
@@ -63,7 +64,6 @@ import nl.clockwork.ebms.validation.SignatureValidator;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.w3c.dom.Document;
-import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
 public class EbMSMessageProcessorImpl implements EbMSMessageProcessor
@@ -248,20 +248,23 @@ public class EbMSMessageProcessorImpl implements EbMSMessageProcessor
 		}
 	}
 	
-	private EbMSMessage getEbMSMessage(Document document, List<EbMSAttachment> attachments) throws JAXBException
+	private EbMSMessage getEbMSMessage(Document document, List<EbMSAttachment> attachments) throws JAXBException, XPathExpressionException, ParserConfigurationException, SAXException, IOException
 	{
-		//TODO: optimize
-		SignatureType signature = XMLMessageBuilder.getInstance(SignatureType.class).handle(DOMUtils.getNode(document,"http://www.w3.org/2000/09/xmldsig#","Signature"));
-		MessageHeader messageHeader = XMLMessageBuilder.getInstance(MessageHeader.class).handle(getNode(document,"MessageHeader"));
-		SyncReply syncReply = XMLMessageBuilder.getInstance(SyncReply.class).handle(getNode(document,"SyncReply"));
-		MessageOrder messageOrder = XMLMessageBuilder.getInstance(MessageOrder.class).handle(getNode(document,"MessageOrder"));
-		AckRequested ackRequested = XMLMessageBuilder.getInstance(AckRequested.class).handle(getNode(document,"AckRequested"));
-		ErrorList errorList = XMLMessageBuilder.getInstance(ErrorList.class).handle(getNode(document,"ErrorList"));
-		Acknowledgment acknowledgment = XMLMessageBuilder.getInstance(Acknowledgment.class).handle(getNode(document,"Acknowledgment"));
-		Manifest manifest = XMLMessageBuilder.getInstance(Manifest.class).handle(getNode(document,"Manifest"));
-		StatusRequest statusRequest = XMLMessageBuilder.getInstance(StatusRequest.class).handle(getNode(document,"StatusRequest"));
-		StatusResponse statusResponse = XMLMessageBuilder.getInstance(StatusResponse.class).handle(getNode(document,"StatusResponse"));
-		return new EbMSMessage(signature,messageHeader,syncReply,messageOrder,ackRequested,errorList,acknowledgment,manifest,statusRequest,statusResponse,attachments);
+		XMLMessageBuilder<Envelope> messageBuilder = XMLMessageBuilder.getInstance(Envelope.class,Envelope.class,MessageHeader.class,SyncReply.class,MessageOrder.class,AckRequested.class,SignatureType.class,ErrorList.class,Acknowledgment.class,Manifest.class,StatusRequest.class,StatusResponse.class);
+		Envelope envelope = messageBuilder.handle(document);
+		return new EbMSMessage(envelope,attachments);
+		
+//		SignatureType signature = XMLMessageBuilder.getInstance(SignatureType.class).handle(DOMUtils.executeXPathQuery(new EbXMLNamespaceContext(),document,"/soap:Envelope/soap:Header/ds:Signature"));
+//		MessageHeader messageHeader = XMLMessageBuilder.getInstance(MessageHeader.class).handle(DOMUtils.executeXPathQuery(new EbXMLNamespaceContext(),document,"/soap:Envelope/soap:Header/ebxml:MessageHeader"));
+//		SyncReply syncReply = XMLMessageBuilder.getInstance(SyncReply.class).handle(DOMUtils.executeXPathQuery(new EbXMLNamespaceContext(),document,"/soap:Envelope/soap:Header/ebxml:SyncReply"));
+//		MessageOrder messageOrder = XMLMessageBuilder.getInstance(MessageOrder.class).handle(DOMUtils.executeXPathQuery(new EbXMLNamespaceContext(),document,"/soap:Envelope/soap:Header/ebxml:MessageOrder"));
+//		AckRequested ackRequested = XMLMessageBuilder.getInstance(AckRequested.class).handle(DOMUtils.executeXPathQuery(new EbXMLNamespaceContext(),document,"/soap:Envelope/soap:Header/ebxml:AckRequested"));
+//		ErrorList errorList = XMLMessageBuilder.getInstance(ErrorList.class).handle(DOMUtils.executeXPathQuery(new EbXMLNamespaceContext(),document,"/soap:Envelope/soap:Header/ebxml:ErrorList"));
+//		Acknowledgment acknowledgment = XMLMessageBuilder.getInstance(Acknowledgment.class).handle(DOMUtils.executeXPathQuery(new EbXMLNamespaceContext(),document,"/soap:Envelope/soap:Header/ebxml:Acknowledgment"));
+//		Manifest manifest = XMLMessageBuilder.getInstance(Manifest.class).handle(DOMUtils.executeXPathQuery(new EbXMLNamespaceContext(),document,"/soap:Envelope/soap:Body/ebxml:Manifest"));
+//		StatusRequest statusRequest = XMLMessageBuilder.getInstance(StatusRequest.class).handle(DOMUtils.executeXPathQuery(new EbXMLNamespaceContext(),document,"/soap:Envelope/soap:Body/ebxml:StatusRequest"));
+//		StatusResponse statusResponse = XMLMessageBuilder.getInstance(StatusResponse.class).handle(DOMUtils.executeXPathQuery(new EbXMLNamespaceContext(),document,"/soap:Envelope/soap:Body/ebxml:StatusResponse"));
+//		return new EbMSMessage(signature,messageHeader,syncReply,messageOrder,ackRequested,errorList,acknowledgment,manifest,statusRequest,statusResponse,attachments);
 	}
 
 	private EbMSDocument getEbMSDocument(EbMSMessage message) throws SOAPException, JAXBException, ParserConfigurationException, SAXException, IOException
@@ -270,11 +273,6 @@ public class EbMSMessageProcessorImpl implements EbMSMessageProcessor
 		
 	}
 	
-	private Node getNode(Document document, String tagName)
-	{
-		return DOMUtils.getNode(document,"http://www.oasis-open.org/committees/ebxml-msg/schema/msg-header-2_0.xsd",tagName);
-	}
-
 	private void process(final Calendar timestamp, final EbMSMessage message, final EbMSMessageStatus status)
 	{
 		if (isDuplicateMessage(message))

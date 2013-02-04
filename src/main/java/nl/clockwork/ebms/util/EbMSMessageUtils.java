@@ -141,30 +141,28 @@ public class EbMSMessageUtils
 
 	public static MessageHeader createMessageHeader(MessageHeader messageHeader, String hostname, GregorianCalendar timestamp, EbMSAction action) throws DatatypeConfigurationException, JAXBException
 	{
-		//TODO: optimize
-		XMLMessageBuilder<MessageHeader> builder = XMLMessageBuilder.getInstance(MessageHeader.class);
-		messageHeader = builder.handle(builder.handle(messageHeader));
-		List<PartyId> partyIds = new ArrayList<PartyId>(messageHeader.getFrom().getPartyId());
-		messageHeader.getFrom().getPartyId().clear();
-		messageHeader.getFrom().getPartyId().addAll(messageHeader.getTo().getPartyId());
-		messageHeader.getTo().getPartyId().clear();
-		messageHeader.getTo().getPartyId().addAll(partyIds);
+		MessageHeader result = XMLMessageBuilder.deepCopy(messageHeader);
 
-		messageHeader.getFrom().setRole(null);
-		messageHeader.getTo().setRole(null);
+		result.getFrom().getPartyId().clear();
+		result.getFrom().getPartyId().addAll(messageHeader.getTo().getPartyId());
+		result.getTo().getPartyId().clear();
+		result.getTo().getPartyId().addAll(messageHeader.getFrom().getPartyId());
 
-		messageHeader.getMessageData().setRefToMessageId(messageHeader.getMessageData().getMessageId());
-		messageHeader.getMessageData().setMessageId(UUID.randomUUID().toString() + "@" + hostname);
-		messageHeader.getMessageData().setTimestamp(DatatypeFactory.newInstance().newXMLGregorianCalendar(timestamp));
-		messageHeader.getMessageData().setTimeToLive(null);
+		result.getFrom().setRole(null);
+		result.getTo().setRole(null);
 
-		messageHeader.setService(new Service());
-		messageHeader.getService().setValue(Constants.EBMS_SERVICE_URI);
-		messageHeader.setAction(action.action());
+		result.getMessageData().setRefToMessageId(messageHeader.getMessageData().getMessageId());
+		result.getMessageData().setMessageId(UUID.randomUUID().toString() + "@" + hostname);
+		result.getMessageData().setTimestamp(DatatypeFactory.newInstance().newXMLGregorianCalendar(timestamp));
+		result.getMessageData().setTimeToLive(null);
 
-		messageHeader.setDuplicateElimination(null);
+		result.setService(new Service());
+		result.getService().setValue(Constants.EBMS_SERVICE_URI);
+		result.setAction(action.action());
 
-		return messageHeader;
+		result.setDuplicateElimination(null);
+
+		return result;
 	}
 
 	public static AckRequested createAckRequested(CollaborationProtocolAgreement cpa, EbMSMessageContext context)

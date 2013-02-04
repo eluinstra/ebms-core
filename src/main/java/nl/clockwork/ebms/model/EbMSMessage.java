@@ -18,6 +18,8 @@ package nl.clockwork.ebms.model;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.xml.bind.JAXBElement;
+
 import nl.clockwork.ebms.model.ebxml.AckRequested;
 import nl.clockwork.ebms.model.ebxml.Acknowledgment;
 import nl.clockwork.ebms.model.ebxml.ErrorList;
@@ -27,6 +29,7 @@ import nl.clockwork.ebms.model.ebxml.MessageOrder;
 import nl.clockwork.ebms.model.ebxml.StatusRequest;
 import nl.clockwork.ebms.model.ebxml.StatusResponse;
 import nl.clockwork.ebms.model.ebxml.SyncReply;
+import nl.clockwork.ebms.model.soap.envelope.Envelope;
 import nl.clockwork.ebms.model.xml.dsig.SignatureType;
 
 public class EbMSMessage
@@ -103,6 +106,34 @@ public class EbMSMessage
 		this.attachments = attachments == null ? new ArrayList<EbMSAttachment>() : attachments;
 	}
 
+	@SuppressWarnings("unchecked")
+	public EbMSMessage(Envelope envelope, List<EbMSAttachment> attachments)
+	{
+		for (Object element : envelope.getHeader().getAny())
+			if (element instanceof JAXBElement && ((JAXBElement<?>)element).getValue() instanceof SignatureType)
+				signature = ((JAXBElement<SignatureType>)element).getValue();
+			else if (element instanceof MessageHeader)
+				messageHeader = (MessageHeader)element;
+			else if (element instanceof SyncReply)
+				syncReply = (SyncReply)element;
+			else if (element instanceof MessageOrder)
+				messageOrder = (MessageOrder)element;
+			else if (element instanceof AckRequested)
+				ackRequested = (AckRequested)element;
+			else if (element instanceof ErrorList)
+				errorList = (ErrorList)element;
+			else if (element instanceof Acknowledgment)
+				acknowledgment = (Acknowledgment)element;
+		for (Object element : envelope.getBody().getAny())
+			if (element instanceof Manifest)
+				manifest = (Manifest)element;
+			else if (element instanceof StatusRequest)
+				statusRequest = (StatusRequest)element;
+			else if (element instanceof StatusResponse)
+				statusResponse = (StatusResponse)element;
+		this.attachments = attachments == null ? new ArrayList<EbMSAttachment>() : attachments;
+	}
+	
 	public byte[] getOriginal()
 	{
 		return new byte[]{};

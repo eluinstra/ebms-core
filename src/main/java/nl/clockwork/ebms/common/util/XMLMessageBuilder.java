@@ -25,6 +25,8 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
+import javax.xml.bind.util.JAXBSource;
+import javax.xml.namespace.QName;
 
 import org.apache.commons.lang.StringUtils;
 import org.w3c.dom.Node;
@@ -114,4 +116,15 @@ public class XMLMessageBuilder<T>
 		}
 		return (XMLMessageBuilder<L>)xmlHandlers.get(clazz);
 	}
+	
+	@SuppressWarnings("unchecked")
+	public static <T> T deepCopy(T object) throws JAXBException
+	{
+		if (object == null) return null;
+		JAXBContext jaxbContext = JAXBContext.newInstance(object.getClass());
+		JAXBElement<T> contentObject = new JAXBElement<T>(new QName(object.getClass().getSimpleName()),(Class<T>)object.getClass(),object);
+		JAXBSource source = new JAXBSource(jaxbContext,contentObject);
+		return jaxbContext.createUnmarshaller().unmarshal(source,(Class<T>)object.getClass()).getValue();
+	}
+
 }
