@@ -15,10 +15,7 @@
  ******************************************************************************/
 package nl.clockwork.ebms;
 
-import nl.clockwork.ebms.model.EbMSAction;
-import nl.clockwork.ebms.model.EbMSService;
 import nl.clockwork.ebms.model.ebxml.MessageStatusType;
-import nl.clockwork.ebms.model.ebxml.Service;
 
 public class Constants
 {
@@ -77,27 +74,16 @@ public class Constants
 		
   }
 
-  public static enum EbMSMessageType
+  public static enum EbMSAction
   {
-		MESSAGE(0), MESSAGE_ERROR(1,new EbMSAction(EBMS_SERVICE_MESSAGE,"MessageError")), ACKNOWLEDGMENT(2,new EbMSAction(EBMS_SERVICE_MESSAGE,"Acknowledgment")), STATUS_REQUEST(3,new EbMSAction(EBMS_SERVICE_MESSAGE,"StatusRequest")), STATUS_RESPONSE(4,new EbMSAction(EBMS_SERVICE_MESSAGE,"StatusResponse")), PING(5,new EbMSAction(EBMS_SERVICE_MESSAGE,"Ping")), PONG(6,new EbMSAction(EBMS_SERVICE_MESSAGE,"Pong")), SERVICE_MESSAGE(7,new EbMSAction(EBMS_SERVICE_MESSAGE,null));
+		MESSAGE_ERROR("MessageError"), ACKNOWLEDGMENT("Acknowledgment"), STATUS_REQUEST("StatusRequest"), STATUS_RESPONSE("StatusResponse"), PING("Ping"), PONG("Pong");
 
-		private final int id;
-		private final EbMSAction action;
+		private final String action;
 
-		EbMSMessageType(int id) { this.id = id; this.action = null; }
-		EbMSMessageType(int id, EbMSAction action) { this.id = id; this.action = action; }
+		EbMSAction(String action) { this.action = action; }
 
-		public final int id() { return id; }
+		public final String action() { return action; }
 
-		public final EbMSAction action() { return action; }
-
-		public final static EbMSMessageType get(int id)
-		{
-			for (EbMSMessageType type : EbMSMessageType.values())
-				if (type.id() == id)
-					return type;
-			return null;
-		}
   };
 
 	public static final String DEFAULT_FILENAME = "file";
@@ -105,7 +91,6 @@ public class Constants
 	public static final String EBMS_SOAP_ACTION = "\"ebXML\"";
 	public static final String EBMS_VERSION = "2.0";
 	public static final String EBMS_SERVICE_URI = "urn:oasis:names:tc:ebxml-msg:service";
-	public static final Service EBMS_SERVICE_MESSAGE = new EbMSService(EBMS_SERVICE_URI);
 	public static final String EBMS_ERROR_CODE_CONTEXT = EBMS_SERVICE_URI + ":errors";
 	public static final String EBMS_DEFAULT_LANGUAGE = "en-US";
 

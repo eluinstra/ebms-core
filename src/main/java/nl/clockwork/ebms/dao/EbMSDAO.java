@@ -35,9 +35,10 @@ public interface EbMSDAO
 	boolean deleteCPA(String cpaId) throws DAOException;
 	
 	boolean existsMessage(String messageId) throws DAOException;
-	Long getEbMSMessageId(String messageId) throws DAOException;
-	Long getEbMSMessageResponseId(String messageId) throws DAOException;
-	EbMSMessage getEbMSMessageResponse(String messageId) throws DAOException;
+	boolean existsResponseMessage(String messageId) throws DAOException;
+	Long getMessageId(String messageId) throws DAOException;
+	Long getResponseMessageId(String messageId) throws DAOException;
+	EbMSMessage getResponseMessage(String messageId) throws DAOException;
 	MessageHeader getMessageHeader(String messageId) throws DAOException;
 	EbMSMessage getMessage(long id) throws DAOException;
 	EbMSMessageStatus getMessageStatus(String messageId) throws DAOException;

@@ -27,8 +27,8 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.soap.SOAPException;
 
 import nl.clockwork.ebms.Constants;
+import nl.clockwork.ebms.Constants.EbMSAction;
 import nl.clockwork.ebms.Constants.EbMSMessageStatus;
-import nl.clockwork.ebms.Constants.EbMSMessageType;
 import nl.clockwork.ebms.common.util.DOMUtils;
 import nl.clockwork.ebms.common.util.XMLMessageBuilder;
 import nl.clockwork.ebms.dao.DAOTransactionCallback;
@@ -95,10 +95,10 @@ public class EbMSMessageProcessorImpl implements EbMSMessageProcessor
 			if (!Constants.EBMS_SERVICE_URI.equals(message.getMessageHeader().getService().getValue()))
 			{
 				MessageHeader messageHeader = message.getMessageHeader();
-				if (isDuplicate(messageHeader))
+				if (isDuplicateMessage(message))
 				{
 					logger.warn("Duplicate message found!");
-					if (equalsDuplicateMessageHeader(messageHeader))
+					if (equalsDuplicateMessage(message))
 					{
 						if (message.getSyncReply() == null)
 						{
@@ -208,32 +208,32 @@ public class EbMSMessageProcessorImpl implements EbMSMessageProcessor
 				}
 				//return null;
 			}
-			else if (EbMSMessageType.MESSAGE_ERROR.action().getAction().equals(message.getMessageHeader().getAction()))
+			else if (EbMSAction.MESSAGE_ERROR.action().equals(message.getMessageHeader().getAction()))
 			{
 				process(timestamp,message,EbMSMessageStatus.DELIVERY_FAILED);
 				return null;
 			}
-			else if (EbMSMessageType.ACKNOWLEDGMENT.action().getAction().equals(message.getMessageHeader().getAction()))
+			else if (EbMSAction.ACKNOWLEDGMENT.action().equals(message.getMessageHeader().getAction()))
 			{
 				process(timestamp,message,EbMSMessageStatus.DELIVERED);
 				return null;
 			}
-			else if (EbMSMessageType.STATUS_REQUEST.action().getAction().equals(message.getMessageHeader().getAction()))
+			else if (EbMSAction.STATUS_REQUEST.action().equals(message.getMessageHeader().getAction()))
 			{
 				EbMSMessage response = processStatusRequest(timestamp,message);
 				return message.getSyncReply() == null ? null : getEbMSDocument(response);
 			}
-			else if (EbMSMessageType.STATUS_RESPONSE.action().getAction().equals(message.getMessageHeader().getAction()))
+			else if (EbMSAction.STATUS_RESPONSE.action().equals(message.getMessageHeader().getAction()))
 			{
 				//process(timestamp,message);
 				return null;
 			}
-			else if (EbMSMessageType.PING.action().getAction().equals(message.getMessageHeader().getAction()))
+			else if (EbMSAction.PING.action().equals(message.getMessageHeader().getAction()))
 			{
 				EbMSMessage response = processPing(timestamp,message);
 				return message.getSyncReply() == null ? null : getEbMSDocument(response);
 			}
-			else if (EbMSMessageType.PONG.action().getAction().equals(message.getMessageHeader().getAction()))
+			else if (EbMSAction.PONG.action().equals(message.getMessageHeader().getAction()))
 			{
 				//process(message);
 				return null;
@@ -277,13 +277,14 @@ public class EbMSMessageProcessorImpl implements EbMSMessageProcessor
 
 	private void process(final Calendar timestamp, final EbMSMessage message, final EbMSMessageStatus status)
 	{
-		MessageHeader messageHeader = message.getMessageHeader();
-		if (isDuplicate(messageHeader))
+		if (isDuplicateMessage(message))
 		{
 			logger.warn("Duplicate message found!");
-			if (!equalsDuplicateMessageHeader(messageHeader))
+			if (!equalsDuplicateMessage(message))
 				logger.warn("Duplicate messages are not identical! Message discarded.");
 		}
+		else if (isDuplicateRefToMessage(message))
+			logger.warn("Duplicate response message found! Message discarded.");
 		else
 			ebMSDAO.executeTransaction(
 				new DAOTransactionCallback()
@@ -292,7 +293,7 @@ public class EbMSMessageProcessorImpl implements EbMSMessageProcessor
 					public void doInTransaction()
 					{
 						ebMSDAO.insertMessage(timestamp.getTime(),message,null);
-						Long id = ebMSDAO.getEbMSMessageId(message.getMessageHeader().getMessageData().getRefToMessageId());
+						Long id = ebMSDAO.getMessageId(message.getMessageHeader().getMessageData().getRefToMessageId());
 						if (id != null)
 						{
 							ebMSDAO.deleteSendEvents(id);
@@ -351,29 +352,36 @@ public class EbMSMessageProcessorImpl implements EbMSMessageProcessor
 		}
 	}
 	
-	private boolean isDuplicate(MessageHeader messageHeader)
+	private boolean isDuplicateMessage(EbMSMessage message)
 	{
-		return /*messageHeader.getDuplicateElimination()!= null && */ebMSDAO.existsMessage(messageHeader.getMessageData().getMessageId());
+		return /*message.getMessageHeader().getDuplicateElimination()!= null && */ebMSDAO.existsMessage(message.getMessageHeader().getMessageData().getMessageId());
 	}
 
-	private boolean equalsDuplicateMessageHeader(MessageHeader messageHeader)
+	
+	
+	private boolean equalsDuplicateMessage(EbMSMessage message)
 	{
 		//TODO extend comparison (signature)
-		MessageHeader duplicateMessageHeader = ebMSDAO.getMessageHeader(messageHeader.getMessageData().getMessageId());
-		return messageHeader.getCPAId().equals(duplicateMessageHeader.getCPAId())
-		&& messageHeader.getService().getType().equals(duplicateMessageHeader.getService().getType())
-		&& messageHeader.getService().getValue().equals(duplicateMessageHeader.getService().getValue())
-		&& messageHeader.getAction().equals(duplicateMessageHeader.getAction());
+		MessageHeader duplicateMessageHeader = ebMSDAO.getMessageHeader(message.getMessageHeader().getMessageData().getMessageId());
+		return message.getMessageHeader().getCPAId().equals(duplicateMessageHeader.getCPAId())
+		&& message.getMessageHeader().getService().getType().equals(duplicateMessageHeader.getService().getType())
+		&& message.getMessageHeader().getService().getValue().equals(duplicateMessageHeader.getService().getValue())
+		&& message.getMessageHeader().getAction().equals(duplicateMessageHeader.getAction());
+	}
+
+	private boolean isDuplicateRefToMessage(EbMSMessage message)
+	{
+		return ebMSDAO.existsResponseMessage(message.getMessageHeader().getMessageData().getRefToMessageId());
 	}
 
 	private long getResponseMessageId(MessageHeader messageHeader)
 	{
-		return ebMSDAO.getEbMSMessageResponseId(messageHeader.getMessageData().getMessageId());
+		return ebMSDAO.getResponseMessageId(messageHeader.getMessageData().getMessageId());
 	}
 
 	private EbMSMessage getResponseMessage(MessageHeader messageHeader)
 	{
-		return ebMSDAO.getEbMSMessageResponse(messageHeader.getMessageData().getMessageId());
+		return ebMSDAO.getResponseMessage(messageHeader.getMessageData().getMessageId());
 	}
 
 	private ErrorList createErrorList()
@@ -387,7 +395,7 @@ public class EbMSMessageProcessorImpl implements EbMSMessageProcessor
 	
 	private EbMSMessage createEbMSMessageError(GregorianCalendar timestamp, EbMSMessage message, ErrorList errorList) throws DatatypeConfigurationException, JAXBException
 	{
-		MessageHeader messageHeader = EbMSMessageUtils.createMessageHeader(message.getMessageHeader(),hostname,timestamp,EbMSMessageType.MESSAGE_ERROR.action());
+		MessageHeader messageHeader = EbMSMessageUtils.createMessageHeader(message.getMessageHeader(),hostname,timestamp,EbMSAction.MESSAGE_ERROR);
 		if (errorList.getError().size() == 0)
 			errorList.getError().add(EbMSMessageUtils.createError(Constants.EbMSErrorLocation.UNKNOWN.location(),Constants.EbMSErrorCode.UNKNOWN.errorCode(),"An unknown error occurred!"));
 		return new EbMSMessage(messageHeader,errorList);
@@ -395,7 +403,7 @@ public class EbMSMessageProcessorImpl implements EbMSMessageProcessor
 
 	private EbMSMessage createEbMSAcknowledgment(GregorianCalendar timestamp, EbMSMessage message) throws DatatypeConfigurationException, JAXBException
 	{
-		MessageHeader messageHeader = EbMSMessageUtils.createMessageHeader(message.getMessageHeader(),hostname,timestamp,EbMSMessageType.ACKNOWLEDGMENT.action());
+		MessageHeader messageHeader = EbMSMessageUtils.createMessageHeader(message.getMessageHeader(),hostname,timestamp,EbMSAction.ACKNOWLEDGMENT);
 		
 		Acknowledgment acknowledgment = new Acknowledgment();
 

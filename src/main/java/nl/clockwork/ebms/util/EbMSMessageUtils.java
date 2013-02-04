@@ -39,10 +39,9 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.soap.SOAPException;
 
 import nl.clockwork.ebms.Constants;
+import nl.clockwork.ebms.Constants.EbMSAction;
 import nl.clockwork.ebms.Constants.EbMSMessageStatus;
-import nl.clockwork.ebms.Constants.EbMSMessageType;
 import nl.clockwork.ebms.common.util.XMLMessageBuilder;
-import nl.clockwork.ebms.model.EbMSAction;
 import nl.clockwork.ebms.model.EbMSAttachment;
 import nl.clockwork.ebms.model.EbMSDataSource;
 import nl.clockwork.ebms.model.EbMSMessage;
@@ -159,8 +158,9 @@ public class EbMSMessageUtils
 		messageHeader.getMessageData().setTimestamp(DatatypeFactory.newInstance().newXMLGregorianCalendar(timestamp));
 		messageHeader.getMessageData().setTimeToLive(null);
 
-		messageHeader.setService(action.getService());
-		messageHeader.setAction(action.getAction());
+		messageHeader.setService(new Service());
+		messageHeader.getService().setValue(Constants.EBMS_SERVICE_URI);
+		messageHeader.setAction(action.action());
 
 		messageHeader.setDuplicateElimination(null);
 
@@ -231,13 +231,13 @@ public class EbMSMessageUtils
 
 	public static EbMSMessage ebMSPingToEbMSPong(EbMSMessage ping, String hostname) throws DatatypeConfigurationException, JAXBException
 	{
-		EbMSMessage pong = new EbMSMessage(createMessageHeader(ping.getMessageHeader(),hostname,new GregorianCalendar(),EbMSMessageType.PONG.action()));
+		EbMSMessage pong = new EbMSMessage(createMessageHeader(ping.getMessageHeader(),hostname,new GregorianCalendar(),EbMSAction.PONG));
 		return pong;
 	}
 
 	public static EbMSMessage ebMSStatusRequestToEbMSStatusResponse(EbMSMessage request, String hostname, EbMSMessageStatus status, GregorianCalendar timestamp) throws DatatypeConfigurationException, JAXBException
 	{
-		MessageHeader messageHeader = createMessageHeader(request.getMessageHeader(),hostname,new GregorianCalendar(),EbMSMessageType.STATUS_RESPONSE.action());
+		MessageHeader messageHeader = createMessageHeader(request.getMessageHeader(),hostname,new GregorianCalendar(),EbMSAction.STATUS_RESPONSE);
 		StatusResponse statusResponse = createStatusResponse(request.getStatusRequest(),status,timestamp);
 		EbMSMessage response = new EbMSMessage(messageHeader,statusResponse);
 		return response;

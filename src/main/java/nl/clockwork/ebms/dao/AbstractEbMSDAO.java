@@ -30,8 +30,8 @@ import javax.xml.bind.JAXBException;
 import javax.xml.namespace.QName;
 
 import nl.clockwork.ebms.Constants;
+import nl.clockwork.ebms.Constants.EbMSAction;
 import nl.clockwork.ebms.Constants.EbMSMessageStatus;
-import nl.clockwork.ebms.Constants.EbMSMessageType;
 import nl.clockwork.ebms.common.util.XMLMessageBuilder;
 import nl.clockwork.ebms.model.EbMSAttachment;
 import nl.clockwork.ebms.model.EbMSMessage;
@@ -75,17 +75,17 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 			{
 				if (!Constants.EBMS_SERVICE_URI.equals(rs.getString("service")))
 					return new EbMSMessage(XMLMessageBuilder.getInstance(MessageHeader.class).handle(rs.getString("message_header")),XMLMessageBuilder.getInstance(AckRequested.class).handle(rs.getString("ack_requested")),XMLMessageBuilder.getInstance(Manifest.class).handle(rs.getString("content")),getAttachments(rs.getLong("id")));
-				else if (EbMSMessageType.MESSAGE_ERROR.action().getAction().equals(rs.getString("action")))
+				else if (EbMSAction.MESSAGE_ERROR.action().equals(rs.getString("action")))
 					return new EbMSMessage(XMLMessageBuilder.getInstance(MessageHeader.class).handle(rs.getString("message_header")),XMLMessageBuilder.getInstance(ErrorList.class).handle(rs.getString("content")));
-				else if (EbMSMessageType.ACKNOWLEDGMENT.action().getAction().equals(rs.getString("action")))
+				else if (EbMSAction.ACKNOWLEDGMENT.action().equals(rs.getString("action")))
 					return new EbMSMessage(XMLMessageBuilder.getInstance(MessageHeader.class).handle(rs.getString("message_header")),XMLMessageBuilder.getInstance(Acknowledgment.class).handle(rs.getString("content")));
-				else if (EbMSMessageType.STATUS_REQUEST.action().getAction().equals(rs.getString("action")))
+				else if (EbMSAction.STATUS_REQUEST.action().equals(rs.getString("action")))
 					return new EbMSMessage(XMLMessageBuilder.getInstance(MessageHeader.class).handle(rs.getString("message_header")),null,XMLMessageBuilder.getInstance(StatusRequest.class).handle(rs.getString("content")));
-				else if (EbMSMessageType.STATUS_RESPONSE.action().getAction().equals(rs.getString("action")))
+				else if (EbMSAction.STATUS_RESPONSE.action().equals(rs.getString("action")))
 					return new EbMSMessage(XMLMessageBuilder.getInstance(MessageHeader.class).handle(rs.getString("message_header")),XMLMessageBuilder.getInstance(StatusResponse.class).handle(rs.getString("content")));
-				else if (EbMSMessageType.PING.action().getAction().equals(rs.getString("action")))
+				else if (EbMSAction.PING.action().equals(rs.getString("action")))
 					return new EbMSMessage(XMLMessageBuilder.getInstance(MessageHeader.class).handle(rs.getString("message_header")));
-				else if (EbMSMessageType.PONG.action().getAction().equals(rs.getString("action")))
+				else if (EbMSAction.PONG.action().equals(rs.getString("action")))
 					return new EbMSMessage(XMLMessageBuilder.getInstance(MessageHeader.class).handle(rs.getString("message_header")));
 				else
 					return null;
@@ -273,7 +273,27 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	}
 	
 	@Override
-	public Long getEbMSMessageId(String messageId) throws DAOException
+	public boolean existsResponseMessage(String messageId) throws DAOException
+	{
+		try
+		{
+			return jdbcTemplate.queryForInt(
+				"select count(message_id)" +
+				" from ebms_message" +
+				" where ref_to_message_id = ?" +
+				" and service = '" + Constants.EBMS_SERVICE_URI + "'" +
+				" and action in ('" + EbMSAction.MESSAGE_ERROR.action() + "','" + EbMSAction.ACKNOWLEDGMENT.action() + "')",
+				messageId
+			) > 0;
+		}
+		catch (DataAccessException e)
+		{
+			throw new DAOException(e);
+		}
+	}
+	
+	@Override
+	public Long getMessageId(String messageId) throws DAOException
 	{
 		try
 		{
@@ -295,7 +315,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	}
 	
 	@Override
-	public Long getEbMSMessageResponseId(String messageId) throws DAOException
+	public Long getResponseMessageId(String messageId) throws DAOException
 	{
 		try
 		{
@@ -304,8 +324,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 				" from ebms_message" +
 				" where ref_to_message_id = ?" +
 				" and service = '" + Constants.EBMS_SERVICE_URI + "'" +
-				" and (action = '" + EbMSMessageType.MESSAGE_ERROR.action().getAction() + "'"  +
-				" or action = '" + EbMSMessageType.ACKNOWLEDGMENT.action().getAction() + "')",
+				" and action in ('" + EbMSAction.MESSAGE_ERROR.action() + "','" + EbMSAction.ACKNOWLEDGMENT.action() + "')",
 				messageId
 			);
 		}
@@ -320,7 +339,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	}
 	
 	@Override
-	public EbMSMessage getEbMSMessageResponse(String messageId) throws DAOException
+	public EbMSMessage getResponseMessage(String messageId) throws DAOException
 	{
 		try
 		{
@@ -329,8 +348,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 				" from ebms_message" +
 				" where ref_to_message_id = ?" +
 				" and service = '" + Constants.EBMS_SERVICE_URI + "'" +
-				" and (action = '" + EbMSMessageType.MESSAGE_ERROR.action().getAction() + "'"  +
-				" or action = '" + EbMSMessageType.ACKNOWLEDGMENT.action().getAction() + "')",
+				" and action in ('" + EbMSAction.MESSAGE_ERROR.action() + "','" + EbMSAction.ACKNOWLEDGMENT.action() + "')",
 				new EbMSMessageParameterizedRowMapper(),
 				messageId
 			);
@@ -682,13 +700,13 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	{
 		if (!Constants.EBMS_SERVICE_URI.equals(message.getMessageHeader().getService().getValue()))
 			return XMLMessageBuilder.getInstance(Manifest.class).handle(message.getManifest());
-		else if (EbMSMessageType.MESSAGE_ERROR.action().getAction().equals(message.getMessageHeader().getAction()))
+		else if (EbMSAction.MESSAGE_ERROR.action().equals(message.getMessageHeader().getAction()))
 			return XMLMessageBuilder.getInstance(ErrorList.class).handle(message.getErrorList());
-		else if (EbMSMessageType.ACKNOWLEDGMENT.action().getAction().equals(message.getMessageHeader().getAction()))
+		else if (EbMSAction.ACKNOWLEDGMENT.action().equals(message.getMessageHeader().getAction()))
 			return XMLMessageBuilder.getInstance(Acknowledgment.class).handle(message.getAcknowledgment());
-		else if (EbMSMessageType.STATUS_REQUEST.action().getAction().equals(message.getMessageHeader().getAction()))
+		else if (EbMSAction.STATUS_REQUEST.action().equals(message.getMessageHeader().getAction()))
 			return XMLMessageBuilder.getInstance(StatusRequest.class).handle(message.getStatusRequest());
-		else if (EbMSMessageType.STATUS_RESPONSE.action().getAction().equals(message.getMessageHeader().getAction()))
+		else if (EbMSAction.STATUS_RESPONSE.action().equals(message.getMessageHeader().getAction()))
 			return XMLMessageBuilder.getInstance(StatusResponse.class).handle(message.getStatusResponse());
 		return null;
 	}

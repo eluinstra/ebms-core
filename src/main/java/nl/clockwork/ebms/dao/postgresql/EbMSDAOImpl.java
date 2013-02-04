@@ -25,8 +25,8 @@ import java.util.Date;
 import javax.xml.bind.JAXBException;
 
 import nl.clockwork.ebms.Constants;
+import nl.clockwork.ebms.Constants.EbMSAction;
 import nl.clockwork.ebms.Constants.EbMSMessageStatus;
-import nl.clockwork.ebms.Constants.EbMSMessageType;
 import nl.clockwork.ebms.common.util.XMLMessageBuilder;
 import nl.clockwork.ebms.dao.AbstractEbMSDAO;
 import nl.clockwork.ebms.dao.DAOException;
@@ -182,13 +182,13 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 											ps.setString(17,XMLMessageBuilder.getInstance(AckRequested.class).handle(message.getAckRequested()));
 											if (!Constants.EBMS_SERVICE_URI.equals(messageHeader.getService().getValue()))
 												ps.setString(18,XMLMessageBuilder.getInstance(Manifest.class).handle(message.getManifest()));
-											else if (EbMSMessageType.MESSAGE_ERROR.action().equals(messageHeader.getAction()))
+											else if (EbMSAction.MESSAGE_ERROR.action().equals(messageHeader.getAction()))
 												ps.setString(18,XMLMessageBuilder.getInstance(ErrorList.class).handle(message.getErrorList()));
-											else if (EbMSMessageType.ACKNOWLEDGMENT.action().equals(messageHeader.getAction()))
+											else if (EbMSAction.ACKNOWLEDGMENT.action().equals(messageHeader.getAction()))
 												ps.setString(18,XMLMessageBuilder.getInstance(Acknowledgment.class).handle(message.getAcknowledgment()));
-											else if (EbMSMessageType.STATUS_REQUEST.action().equals(messageHeader.getAction()))
+											else if (EbMSAction.STATUS_REQUEST.action().equals(messageHeader.getAction()))
 												ps.setString(18,XMLMessageBuilder.getInstance(StatusRequest.class).handle(message.getStatusRequest()));
-											else if (EbMSMessageType.STATUS_RESPONSE.action().equals(messageHeader.getAction()))
+											else if (EbMSAction.STATUS_RESPONSE.action().equals(messageHeader.getAction()))
 												ps.setString(18,XMLMessageBuilder.getInstance(StatusResponse.class).handle(message.getStatusResponse()));
 											else
 												ps.setString(18,null);
