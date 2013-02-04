@@ -122,8 +122,8 @@ public class EbMSMessageProcessorImpl implements EbMSMessageProcessor
 					if (signatureValidator.validate(errorList,cpa,document,messageHeader)
 						&& cpaValidator.validate(errorList,cpa,messageHeader,timestamp)
 						&& messageHeaderValidator.validate(errorList,cpa,messageHeader,message.getAckRequested(),message.getSyncReply(),message.getMessageOrder(),timestamp)
-						&& (signatureValidator.validate(errorList,cpa,messageHeader,message.getSignature())
-						&& manifestValidator.validate(errorList,message.getManifest(),message.getAttachments())))
+						&& signatureValidator.validate(errorList,cpa,messageHeader,message.getSignature())
+						&& manifestValidator.validate(errorList,message.getManifest(),message.getAttachments()))
 					{
 						logger.info("Message valid.");
 						if (message.getAckRequested() != null)
