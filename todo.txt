@@ -1,3 +1,8 @@
+- improve logging
+- improve header validation
+	- add seperate service and action validation
+- add signature certificate validation 
+
 - remove unnecessary defined Interfaces and custom Exceptions
 - check http headers
 - improve EbMSMessageProcessor
@@ -9,7 +14,13 @@
 - remove EbMS prefix on classes
 - TODO: optimize
 
+- add url to table sendEvent
+- support multiple deliveryChannels
+
 - implement AdminService
+
+- add response and statusCode to table sendEvent
+- implement table receiveEvent???
 
 - use either ebms_message.id or ebms_message.message_id to identify message
 - CPAService: define cpa as CollaborationProtocolAgreement instead of String
