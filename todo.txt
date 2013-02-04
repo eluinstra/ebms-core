@@ -1,3 +1,4 @@
+- validate message format (available elements versus action)
 - improve logging
 - improve header validation
 	- add separate service and action validation
@@ -15,7 +16,7 @@
 
 - implement AdminService
 
-- add response and statusCode to table sendEvent
+- add response and statusCode to table sendEvent???
 - implement table receivedEvent???
 
 - use either ebms_message.id or ebms_message.message_id to identify message
@@ -26,7 +27,7 @@
 - remove servlet from core?
 - remove EbMS prefix on classes
 
-- replace commons-logging by slf4j?
+- replace commons-logging by slf4j???
 - read mime message
 	- replace mime4j by:
 		- java soap
