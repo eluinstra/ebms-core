@@ -1,7 +1,6 @@
 - improve logging
 - improve header validation
-	- add seperate service and action validation
-- add signature certificate validation 
+	- add separate service and action validation
 - improve CPAUtils.isSigned
 
 - remove unnecessary defined Interfaces and custom Exceptions
@@ -11,11 +10,10 @@
   - move cpa functionality to caller; add extra properties for url and signing (sendEvent)?
 - validate EbMS messages?
 - remove servlet from core?
-- replace commons-logging by slf4j?
 - remove EbMS prefix on classes
 - TODO: optimize
 
-- add url to table sendEvent
+- add url (or deliveryChannel) to table sendEvent
 - support multiple deliveryChannels
 
 - implement AdminService
@@ -24,9 +22,11 @@
 - implement table receiveEvent???
 
 - use either ebms_message.id or ebms_message.message_id to identify message
+
 - CPAService: define cpa as CollaborationProtocolAgreement instead of String
 - MessageHeader: define duplicateElimination as Object instead of String
 
+- replace commons-logging by slf4j?
 - read mime message
 	- replace mime4j by:
 		- java soap
