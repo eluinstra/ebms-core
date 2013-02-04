@@ -19,9 +19,10 @@ import java.util.List;
 
 import nl.clockwork.ebms.Constants;
 import nl.clockwork.ebms.model.EbMSAttachment;
-import nl.clockwork.ebms.model.ebxml.Error;
+import nl.clockwork.ebms.model.ebxml.ErrorList;
 import nl.clockwork.ebms.model.ebxml.Manifest;
 import nl.clockwork.ebms.model.ebxml.Reference;
+import nl.clockwork.ebms.model.ebxml.SeverityType;
 import nl.clockwork.ebms.util.EbMSMessageUtils;
 
 import org.apache.commons.logging.Log;
@@ -31,10 +32,14 @@ public class ManifestValidator
 {
   protected transient Log logger = LogFactory.getLog(getClass());
 
-	public Error validate(Manifest manifest, List<EbMSAttachment> attachments)
+	public boolean validate(ErrorList errorList, Manifest manifest, List<EbMSAttachment> attachments)
 	{
 		if (!Constants.EBMS_VERSION.equals(manifest.getVersion()))
-			return EbMSMessageUtils.createError("//Body/Manifest[@version]",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Wrong value.");
+		{
+			errorList.getError().add(EbMSMessageUtils.createError("//Body/Manifest[@version]",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Wrong value."));
+			errorList.setHighestSeverity(SeverityType.ERROR);
+			return false;
+		}
 		for (Reference reference : manifest.getReference())
 		{
 			if (reference.getHref().startsWith(Constants.CID))
@@ -44,11 +49,19 @@ public class ManifestValidator
 					if (reference.getHref().substring(Constants.CID.length()).equals(attachment.getContentId()))
 						found = true;
 				if (!found)
-					return EbMSMessageUtils.createError(reference.getHref(),Constants.EbMSErrorCode.MIME_PROBLEM.errorCode(),"MIME part not found.");
+				{
+					errorList.getError().add(EbMSMessageUtils.createError(reference.getHref(),Constants.EbMSErrorCode.MIME_PROBLEM.errorCode(),"MIME part not found."));
+					errorList.setHighestSeverity(SeverityType.ERROR);
+					return false;
+				}
 			}
 			else
-				return EbMSMessageUtils.createError("//Body/Manifest/Reference[@href='" + reference.getHref() + "']",Constants.EbMSErrorCode.MIME_PROBLEM.errorCode(),"URI cannot be resolved.");
+			{
+				errorList.getError().add(EbMSMessageUtils.createError("//Body/Manifest/Reference[@href='" + reference.getHref() + "']",Constants.EbMSErrorCode.MIME_PROBLEM.errorCode(),"URI cannot be resolved."));
+				errorList.setHighestSeverity(SeverityType.ERROR);
+				return false;
+			}
 		}
-		return null;
+		return true;
 	}
 }

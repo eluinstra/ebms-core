@@ -41,7 +41,6 @@ import nl.clockwork.ebms.model.cpp.cpa.ActorType;
 import nl.clockwork.ebms.model.cpp.cpa.CollaborationProtocolAgreement;
 import nl.clockwork.ebms.model.ebxml.AckRequested;
 import nl.clockwork.ebms.model.ebxml.Acknowledgment;
-import nl.clockwork.ebms.model.ebxml.Error;
 import nl.clockwork.ebms.model.ebxml.ErrorList;
 import nl.clockwork.ebms.model.ebxml.From;
 import nl.clockwork.ebms.model.ebxml.Manifest;
@@ -95,7 +94,6 @@ public class EbMSMessageProcessorImpl implements EbMSMessageProcessor
 			final EbMSMessage message = getEbMSMessage(document.getMessage(),document.getAttachments());
 			if (!Constants.EBMS_SERVICE_URI.equals(message.getMessageHeader().getService().getValue()))
 			{
-				Error error = null;
 				MessageHeader messageHeader = message.getMessageHeader();
 				if (isDuplicate(messageHeader))
 				{
@@ -119,11 +117,13 @@ public class EbMSMessageProcessorImpl implements EbMSMessageProcessor
 				}
 				else
 				{
+					ErrorList errorList = createErrorList();
 					CollaborationProtocolAgreement cpa = ebMSDAO.getCPA(messageHeader.getCPAId());
-					if ((error = cpaValidator.validate(cpa,messageHeader,timestamp)) == null
-						&& (error = messageHeaderValidator.validate(cpa,messageHeader,message.getAckRequested(),message.getSyncReply(),message.getMessageOrder(),timestamp)) == null
-						&& (error = signatureValidator.validate(cpa,document,messageHeader,message.getSignature())) == null
-						&& (error = manifestValidator.validate(message.getManifest(),message.getAttachments())) == null)
+					if (signatureValidator.validate(errorList,cpa,document,messageHeader)
+						&& cpaValidator.validate(errorList,cpa,messageHeader,timestamp)
+						&& messageHeaderValidator.validate(errorList,cpa,messageHeader,message.getAckRequested(),message.getSyncReply(),message.getMessageOrder(),timestamp)
+						&& (signatureValidator.validate(errorList,cpa,messageHeader,message.getSignature())
+						&& manifestValidator.validate(errorList,message.getManifest(),message.getAttachments())))
 					{
 						logger.info("Message valid.");
 						if (message.getAckRequested() != null)
@@ -171,7 +171,7 @@ public class EbMSMessageProcessorImpl implements EbMSMessageProcessor
 					else
 					{
 						logger.warn("Message not valid.");
-						final EbMSMessage messageError = createEbMSMessageError(timestamp,message,error);
+						final EbMSMessage messageError = createEbMSMessageError(timestamp,message,errorList);
 						final EbMSSendEvent sendEvent = EbMSMessageUtils.getEbMSSendEvent(ebMSDAO.getCPA(messageError.getMessageHeader().getCPAId()),messageError.getMessageHeader());
 						if (message.getSyncReply() == null)
 						{
@@ -307,14 +307,16 @@ public class EbMSMessageProcessorImpl implements EbMSMessageProcessor
 	{
 		try
 		{
+			//TODO store statusResponse and sendEvent and add duplicate detection
 			MessageHeader messageHeader = message.getMessageHeader();
 			CollaborationProtocolAgreement cpa = ebMSDAO.getCPA(messageHeader.getCPAId());
-			EbMSMessage statusResponse = createEbMSStatusResponse(message,cpaValidator.validate(cpa,messageHeader,timestamp) == null ? null : EbMSMessageStatus.UNAUTHORIZED);
+			ErrorList errorList = createErrorList();
+			EbMSMessage statusResponse = createEbMSStatusResponse(message,cpaValidator.validate(errorList,cpa,messageHeader,timestamp) ? null : EbMSMessageStatus.UNAUTHORIZED);
 			if (message.getSyncReply() == null)
 			{
-				//TODO store statusResponse and sendEvent and add duplicate detection
-				//return null;
-				return createEbMSMessageError(timestamp,message,EbMSMessageUtils.createError("//Header/SyncReply",Constants.EbMSErrorCode.NOT_SUPPORTED.errorCode(),"SyncReply mode not supported."));
+				errorList = createErrorList();
+				errorList.getError().add(EbMSMessageUtils.createError("//Header/SyncReply",Constants.EbMSErrorCode.NOT_SUPPORTED.errorCode(),"SyncReply mode not supported."));
+				return createEbMSMessageError(timestamp,message,errorList );
 			}
 			else
 				return statusResponse;
@@ -329,14 +331,16 @@ public class EbMSMessageProcessorImpl implements EbMSMessageProcessor
 	{
 		try
 		{
+			//TODO store pong and sendEvent and add duplicate detection
 			MessageHeader messageHeader = message.getMessageHeader();
 			CollaborationProtocolAgreement cpa = ebMSDAO.getCPA(messageHeader.getCPAId());
-			EbMSMessage pong = cpaValidator.validate(cpa,messageHeader,timestamp) == null ? null : createEbMSPong(message);
+			ErrorList errorList = createErrorList();
+			EbMSMessage pong = cpaValidator.validate(errorList,cpa,messageHeader,timestamp) ? null : createEbMSPong(message);
 			if (message.getSyncReply() == null)
 			{
-				//TODO store pong and sendEvent and add duplicate detection
-				//return null;
-				return createEbMSMessageError(timestamp,message,EbMSMessageUtils.createError("//Header/SyncReply",Constants.EbMSErrorCode.NOT_SUPPORTED.errorCode(),"SyncReply mode not supported."));
+				errorList = createErrorList();
+				errorList.getError().add(EbMSMessageUtils.createError("//Header/SyncReply",Constants.EbMSErrorCode.NOT_SUPPORTED.errorCode(),"SyncReply mode not supported."));
+				return createEbMSMessageError(timestamp,message,errorList);
 			}
 			else
 				return pong;
@@ -372,20 +376,20 @@ public class EbMSMessageProcessorImpl implements EbMSMessageProcessor
 		return ebMSDAO.getEbMSMessageResponse(messageHeader.getMessageData().getMessageId());
 	}
 
-	private EbMSMessage createEbMSMessageError(GregorianCalendar timestamp, EbMSMessage message, Error error) throws DatatypeConfigurationException, JAXBException
+	private ErrorList createErrorList()
+	{
+		ErrorList result = new ErrorList();
+		result.setVersion(Constants.EBMS_VERSION);
+		result.setMustUnderstand(true);
+		result.setHighestSeverity(SeverityType.WARNING);
+		return result;
+	}
+	
+	private EbMSMessage createEbMSMessageError(GregorianCalendar timestamp, EbMSMessage message, ErrorList errorList) throws DatatypeConfigurationException, JAXBException
 	{
 		MessageHeader messageHeader = EbMSMessageUtils.createMessageHeader(message.getMessageHeader(),hostname,timestamp,EbMSMessageType.MESSAGE_ERROR.action());
-		
-		ErrorList errorList = new ErrorList();
-
-		errorList.setVersion(Constants.EBMS_VERSION);
-		errorList.setMustUnderstand(true);
-		errorList.setHighestSeverity(SeverityType.ERROR);
-
-		if (error == null)
-			error = EbMSMessageUtils.createError(Constants.EbMSErrorLocation.UNKNOWN.location(),Constants.EbMSErrorCode.UNKNOWN.errorCode(),"An unknown error occurred!");
-		errorList.getError().add(error);
-		
+		if (errorList.getError().size() == 0)
+			errorList.getError().add(EbMSMessageUtils.createError(Constants.EbMSErrorLocation.UNKNOWN.location(),Constants.EbMSErrorCode.UNKNOWN.errorCode(),"An unknown error occurred!"));
 		return new EbMSMessage(messageHeader,errorList);
 	}
 

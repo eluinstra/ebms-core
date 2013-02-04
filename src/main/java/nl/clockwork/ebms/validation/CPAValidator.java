@@ -19,8 +19,9 @@ import java.util.GregorianCalendar;
 
 import nl.clockwork.ebms.Constants;
 import nl.clockwork.ebms.model.cpp.cpa.CollaborationProtocolAgreement;
-import nl.clockwork.ebms.model.ebxml.Error;
+import nl.clockwork.ebms.model.ebxml.ErrorList;
 import nl.clockwork.ebms.model.ebxml.MessageHeader;
+import nl.clockwork.ebms.model.ebxml.SeverityType;
 import nl.clockwork.ebms.util.CPAUtils;
 import nl.clockwork.ebms.util.EbMSMessageUtils;
 
@@ -31,15 +32,27 @@ public class CPAValidator
 {
   protected transient Log logger = LogFactory.getLog(getClass());
 
-	public Error validate(CollaborationProtocolAgreement cpa, MessageHeader messageHeader, GregorianCalendar timestamp)
+	public boolean validate(ErrorList errorList, CollaborationProtocolAgreement cpa, MessageHeader messageHeader, GregorianCalendar timestamp)
 	{
 		if (!cpaExists(cpa,messageHeader))
-			return EbMSMessageUtils.createError("//Header/MessageHeader[@cpaid]",Constants.EbMSErrorCode.VALUE_NOT_RECOGNIZED.errorCode(),"CPA not found.");
+		{
+			errorList.getError().add(EbMSMessageUtils.createError("//Header/MessageHeader[@cpaid]",Constants.EbMSErrorCode.VALUE_NOT_RECOGNIZED.errorCode(),"CPA not found."));
+			errorList.setHighestSeverity(SeverityType.ERROR);
+			return false;
+		}
 		if (!CPAUtils.isValid(cpa,timestamp))
-			return EbMSMessageUtils.createError("//Header/MessageHeader[@cpaid]",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"CPA not valid.");
+		{
+			errorList.getError().add(EbMSMessageUtils.createError("//Header/MessageHeader[@cpaid]",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"CPA not valid."));
+			errorList.setHighestSeverity(SeverityType.ERROR);
+			return false;
+		}
 		if (!Constants.EBMS_VERSION.equals(messageHeader.getVersion()))
-			return EbMSMessageUtils.createError("//Header/MessageHeader[@version]",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Value invalid.");
-		return null;
+		{
+			errorList.getError().add(EbMSMessageUtils.createError("//Header/MessageHeader[@version]",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Value invalid."));
+			errorList.setHighestSeverity(SeverityType.ERROR);
+			return false;
+		}
+		return true;
 	}
 
 	private boolean cpaExists(CollaborationProtocolAgreement cpa, MessageHeader messageHeader)

@@ -22,8 +22,9 @@ import nl.clockwork.ebms.model.EbMSDocument;
 import nl.clockwork.ebms.model.cpp.cpa.CollaborationProtocolAgreement;
 import nl.clockwork.ebms.model.cpp.cpa.DeliveryChannel;
 import nl.clockwork.ebms.model.cpp.cpa.PartyInfo;
-import nl.clockwork.ebms.model.ebxml.Error;
+import nl.clockwork.ebms.model.ebxml.ErrorList;
 import nl.clockwork.ebms.model.ebxml.MessageHeader;
+import nl.clockwork.ebms.model.ebxml.SeverityType;
 import nl.clockwork.ebms.model.xml.dsig.SignatureType;
 import nl.clockwork.ebms.signing.EbMSSignatureValidator;
 import nl.clockwork.ebms.util.CPAUtils;
@@ -42,18 +43,32 @@ public class SignatureValidator
 		this.ebMSSignatureValidator = ebMSSignatureValidator;
 	}
 
-	public Error validate(CollaborationProtocolAgreement cpa, EbMSDocument document, MessageHeader messageHeader, SignatureType signature) throws ValidatorException
+	public boolean validate(ErrorList errorList, CollaborationProtocolAgreement cpa, EbMSDocument document, MessageHeader messageHeader) throws ValidatorException
 	{
 		PartyInfo partyInfo = CPAUtils.getPartyInfo(cpa,messageHeader.getFrom().getPartyId());
 		List<DeliveryChannel> deliveryChannels = CPAUtils.getSendingDeliveryChannels(partyInfo,messageHeader.getFrom().getRole(),messageHeader.getService(),messageHeader.getAction());
 		if (CPAUtils.isSigned(deliveryChannels.get(0)))
-		{
-			if (signature == null)
-				return EbMSMessageUtils.createError("//Header/Signature",Constants.EbMSErrorCode.SECURITY_FAILURE.errorCode(),"No signature found.");
 			if (ebMSSignatureValidator.validate(document))
-				return EbMSMessageUtils.createError("//Header/Signature",Constants.EbMSErrorCode.SECURITY_FAILURE.errorCode(),"Signature invalid.");
-		}
-		return null;
+			{
+				errorList.getError().add(EbMSMessageUtils.createError("//Header/Signature",Constants.EbMSErrorCode.SECURITY_FAILURE.errorCode(),"Signature invalid."));
+				errorList.setHighestSeverity(SeverityType.ERROR);
+				return false;
+			}
+		return true;
+	}
+	
+	public boolean validate(ErrorList errorList, CollaborationProtocolAgreement cpa, MessageHeader messageHeader, SignatureType signature) throws ValidatorException
+	{
+		PartyInfo partyInfo = CPAUtils.getPartyInfo(cpa,messageHeader.getFrom().getPartyId());
+		List<DeliveryChannel> deliveryChannels = CPAUtils.getSendingDeliveryChannels(partyInfo,messageHeader.getFrom().getRole(),messageHeader.getService(),messageHeader.getAction());
+		if (CPAUtils.isSigned(deliveryChannels.get(0)))
+			if (signature == null)
+			{
+				errorList.getError().add(EbMSMessageUtils.createError("//Header/Signature",Constants.EbMSErrorCode.SECURITY_FAILURE.errorCode(),"No signature found."));
+				errorList.setHighestSeverity(SeverityType.ERROR);
+				return false; 
+			}
+		return true;
 	}
 	
 	public void setEbMSSignatureValidator(EbMSSignatureValidator ebMSSignatureValidator)

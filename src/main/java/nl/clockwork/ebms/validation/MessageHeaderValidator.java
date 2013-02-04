@@ -28,11 +28,12 @@ import nl.clockwork.ebms.model.cpp.cpa.PartyInfo;
 import nl.clockwork.ebms.model.cpp.cpa.PerMessageCharacteristicsType;
 import nl.clockwork.ebms.model.cpp.cpa.SyncReplyModeType;
 import nl.clockwork.ebms.model.ebxml.AckRequested;
-import nl.clockwork.ebms.model.ebxml.Error;
+import nl.clockwork.ebms.model.ebxml.ErrorList;
 import nl.clockwork.ebms.model.ebxml.MessageHeader;
 import nl.clockwork.ebms.model.ebxml.MessageOrder;
 import nl.clockwork.ebms.model.ebxml.PartyId;
 import nl.clockwork.ebms.model.ebxml.Service;
+import nl.clockwork.ebms.model.ebxml.SeverityType;
 import nl.clockwork.ebms.model.ebxml.SyncReply;
 import nl.clockwork.ebms.util.CPAUtils;
 import nl.clockwork.ebms.util.EbMSMessageUtils;
@@ -55,82 +56,189 @@ public class MessageHeaderValidator
 		this.ebMSDAO = ebMSDAO;
 	}
 
-	public Error validate(CollaborationProtocolAgreement cpa, MessageHeader messageHeader, AckRequested ackRequested, SyncReply syncReply, MessageOrder messageOrder, GregorianCalendar timestamp)
+	public boolean validate(ErrorList errorList, CollaborationProtocolAgreement cpa, MessageHeader messageHeader, AckRequested ackRequested, SyncReply syncReply, MessageOrder messageOrder, GregorianCalendar timestamp)
 	{
-		//ErrorList result = new ErrorList();
 		PartyInfo from = null;
 		PartyInfo to = null;
 
 		if (!isValid(messageHeader.getFrom().getPartyId()))
-			return EbMSMessageUtils.createError("//Header/MessageHeader/From/PartyId",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Value invalid.");
+		{
+			errorList.getError().add(EbMSMessageUtils.createError("//Header/MessageHeader/From/PartyId",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Value invalid."));
+			errorList.setHighestSeverity(SeverityType.ERROR);
+			return false;
+		}
 		if (!isValid(messageHeader.getTo().getPartyId()))
-			return EbMSMessageUtils.createError("//Header/MessageHeader/To/PartyId",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Value invalid.");
+		{
+			errorList.getError().add(EbMSMessageUtils.createError("//Header/MessageHeader/To/PartyId",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Value invalid."));
+			errorList.setHighestSeverity(SeverityType.ERROR);
+			return false;
+		}
 		if (!isValid(messageHeader.getService()))
-			return EbMSMessageUtils.createError("//Header/MessageHeader/Service",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Value invalid.");
+		{
+			errorList.getError().add(EbMSMessageUtils.createError("//Header/MessageHeader/Service",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Value invalid."));
+			errorList.setHighestSeverity(SeverityType.ERROR);
+			return false;
+		}
 		
 		if ((from = CPAUtils.getPartyInfo(cpa, messageHeader.getFrom().getPartyId())) == null)
-			return EbMSMessageUtils.createError("//Header/MessageHeader/From/PartyId",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Value not found.");
+		{
+			errorList.getError().add(EbMSMessageUtils.createError("//Header/MessageHeader/From/PartyId",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Value not found."));
+			errorList.setHighestSeverity(SeverityType.ERROR);
+			return false;
+		}
 		if ((to = CPAUtils.getPartyInfo(cpa, messageHeader.getTo().getPartyId())) == null)
-			return EbMSMessageUtils.createError("//Header/MessageHeader/To/PartyId",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Value not found.");
+		{
+			errorList.getError().add(EbMSMessageUtils.createError("//Header/MessageHeader/To/PartyId",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Value not found."));
+			errorList.setHighestSeverity(SeverityType.ERROR);
+			return false;
+		}
 
 		if (!CPAUtils.canSend(from,messageHeader.getFrom().getRole(),messageHeader.getService(),messageHeader.getAction()))
-			return EbMSMessageUtils.createError("//Header/MessageHeader/Action",Constants.EbMSErrorCode.VALUE_NOT_RECOGNIZED.errorCode(),"Value not found.");
+		{
+			errorList.getError().add(EbMSMessageUtils.createError("//Header/MessageHeader/Action",Constants.EbMSErrorCode.VALUE_NOT_RECOGNIZED.errorCode(),"Value not found."));
+			errorList.setHighestSeverity(SeverityType.ERROR);
+			return false;
+		}
 		if (!CPAUtils.canReceive(to,messageHeader.getTo().getRole(),messageHeader.getService(),messageHeader.getAction()))
-			return EbMSMessageUtils.createError("//Header/MessageHeader/Action",Constants.EbMSErrorCode.VALUE_NOT_RECOGNIZED.errorCode(),"Value not found.");
+		{
+			errorList.getError().add(EbMSMessageUtils.createError("//Header/MessageHeader/Action",Constants.EbMSErrorCode.VALUE_NOT_RECOGNIZED.errorCode(),"Value not found."));
+			errorList.setHighestSeverity(SeverityType.ERROR);
+			return false;
+		}
 
 		List<DeliveryChannel> deliveryChannels = CPAUtils.getSendingDeliveryChannels(from,messageHeader.getFrom().getRole(),messageHeader.getService(),messageHeader.getAction());
 		if (deliveryChannels.size() == 0)
-			return EbMSMessageUtils.createError(Constants.EbMSErrorCode.UNKNOWN.errorCode(),Constants.EbMSErrorCode.UNKNOWN.errorCode(),"No DeliveryChannel found.");
+		{
+			errorList.getError().add(EbMSMessageUtils.createError(Constants.EbMSErrorCode.UNKNOWN.errorCode(),Constants.EbMSErrorCode.UNKNOWN.errorCode(),"No DeliveryChannel found."));
+			errorList.setHighestSeverity(SeverityType.ERROR);
+			return false;
+		}
 		if (deliveryChannels.size() > 1)
-			return EbMSMessageUtils.createError(Constants.EbMSErrorCode.UNKNOWN.errorCode(),Constants.EbMSErrorCode.NOT_SUPPORTED.errorCode(),"Multiple DeliveryChannels not supported.");
+		{
+			errorList.getError().add(EbMSMessageUtils.createError(Constants.EbMSErrorCode.UNKNOWN.errorCode(),Constants.EbMSErrorCode.NOT_SUPPORTED.errorCode(),"Multiple DeliveryChannels not supported."));
+			errorList.setHighestSeverity(SeverityType.ERROR);
+			return false;
+		}
 		DeliveryChannel deliveryChannel = deliveryChannels.get(0);
 		if (!existsRefToMessageId(messageHeader.getMessageData().getRefToMessageId()))
-			return EbMSMessageUtils.createError("//Header/MessageHeader/MessageData/RefToMessageId",Constants.EbMSErrorCode.VALUE_NOT_RECOGNIZED.errorCode(),"Value not found.");
+		{
+			errorList.getError().add(EbMSMessageUtils.createError("//Header/MessageHeader/MessageData/RefToMessageId",Constants.EbMSErrorCode.VALUE_NOT_RECOGNIZED.errorCode(),"Value not found."));
+			errorList.setHighestSeverity(SeverityType.ERROR);
+			return false;
+		}
 		if (!checkTimeToLive(messageHeader,timestamp))
-			return EbMSMessageUtils.createError("//Header/MessageHeader/MessageData/TimeToLive",Constants.EbMSErrorCode.TIME_TO_LIVE_EXPIRED.errorCode(),null);
+		{
+			errorList.getError().add(EbMSMessageUtils.createError("//Header/MessageHeader/MessageData/TimeToLive",Constants.EbMSErrorCode.TIME_TO_LIVE_EXPIRED.errorCode(),null));
+			errorList.setHighestSeverity(SeverityType.ERROR);
+			return false;
+		}
 		if (!Constants.EBMS_SERVICE_URI.equals(messageHeader.getService().getValue()))
 		{
 			if (!checkDuplicateElimination(deliveryChannel))
-				return EbMSMessageUtils.createError("//Header/MessageHeader/DuplicateElimination",Constants.EbMSErrorCode.NOT_SUPPORTED.errorCode(),"DuplicateElimination mode not supported.");
+			{
+				errorList.getError().add(EbMSMessageUtils.createError("//Header/MessageHeader/DuplicateElimination",Constants.EbMSErrorCode.NOT_SUPPORTED.errorCode(),"DuplicateElimination mode not supported."));
+				errorList.setHighestSeverity(SeverityType.ERROR);
+				return false;
+			}
 			if (!checkDuplicateElimination(deliveryChannel,messageHeader))
-				return EbMSMessageUtils.createError("//Header/MessageHeader/DuplicateElimination",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Wrong value.");
+			{
+				errorList.getError().add(EbMSMessageUtils.createError("//Header/MessageHeader/DuplicateElimination",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Wrong value."));
+				errorList.setHighestSeverity(SeverityType.ERROR);
+				return false;
+			}
 
 			if (!checkAckRequested(deliveryChannel))
-				return EbMSMessageUtils.createError("//Header/AckRequested",Constants.EbMSErrorCode.NOT_SUPPORTED.errorCode(),"AckRequested mode not supported.");
+			{
+				errorList.getError().add(EbMSMessageUtils.createError("//Header/AckRequested",Constants.EbMSErrorCode.NOT_SUPPORTED.errorCode(),"AckRequested mode not supported."));
+				errorList.setHighestSeverity(SeverityType.ERROR);
+				return false;
+			}
 			if (!checkAckRequested(deliveryChannel,ackRequested))
-				return EbMSMessageUtils.createError("//Header/AckRequested",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Wrong value.");
+			{
+				errorList.getError().add(EbMSMessageUtils.createError("//Header/AckRequested",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Wrong value."));
+				errorList.setHighestSeverity(SeverityType.ERROR);
+				return false;
+			}
 			if (ackRequested != null && !Constants.EBMS_VERSION.equals(ackRequested.getVersion()))
-				return EbMSMessageUtils.createError("//Header/AckRequested[@version]",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Wrong value.");
+			{
+				errorList.getError().add(EbMSMessageUtils.createError("//Header/AckRequested[@version]",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Wrong value."));
+				errorList.setHighestSeverity(SeverityType.ERROR);
+				return false;
+			}
 			if (ackRequested != null && ackRequested.getActor() != null && ackRequested.getActor().equals(ActorType.URN_OASIS_NAMES_TC_EBXML_MSG_ACTOR_NEXT_MSH.value()))
-				return EbMSMessageUtils.createError("//Header/AckRequested[@actor]",Constants.EbMSErrorCode.NOT_SUPPORTED.errorCode(),"NextMSH not supported.");
+			{
+				errorList.getError().add(EbMSMessageUtils.createError("//Header/AckRequested[@actor]",Constants.EbMSErrorCode.NOT_SUPPORTED.errorCode(),"NextMSH not supported."));
+				errorList.setHighestSeverity(SeverityType.ERROR);
+				return false;
+			}
 			if (!checkAckSignatureRequested(deliveryChannel))
-				return EbMSMessageUtils.createError("//Header/AckRequested[@signed]",Constants.EbMSErrorCode.NOT_SUPPORTED.errorCode(),"Signed Acknowledgment mode not supported.");
+			{
+				errorList.getError().add(EbMSMessageUtils.createError("//Header/AckRequested[@signed]",Constants.EbMSErrorCode.NOT_SUPPORTED.errorCode(),"Signed Acknowledgment mode not supported."));
+				errorList.setHighestSeverity(SeverityType.ERROR);
+				return false;
+			}
 			if (!checkAckSignatureRequested(deliveryChannel,ackRequested))
-				return EbMSMessageUtils.createError("//Header/AckRequested[@signed]",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Wrong value.");
+			{
+				errorList.getError().add(EbMSMessageUtils.createError("//Header/AckRequested[@signed]",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Wrong value."));
+				errorList.setHighestSeverity(SeverityType.ERROR);
+				return false;
+			}
 
 			if (!checkSyncReply(deliveryChannel))
-				return EbMSMessageUtils.createError("//Header/SyncReply",Constants.EbMSErrorCode.NOT_SUPPORTED.errorCode(),"SyncReply mode not supported.");
+			{
+				errorList.getError().add(EbMSMessageUtils.createError("//Header/SyncReply",Constants.EbMSErrorCode.NOT_SUPPORTED.errorCode(),"SyncReply mode not supported."));
+				errorList.setHighestSeverity(SeverityType.ERROR);
+				return false;
+			}
 			if (!checkSyncReply(deliveryChannel,syncReply))
-				return EbMSMessageUtils.createError("//Header/SyncReply",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Wrong value.");
+			{
+				errorList.getError().add(EbMSMessageUtils.createError("//Header/SyncReply",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Wrong value."));
+				errorList.setHighestSeverity(SeverityType.ERROR);
+				return false;
+			}
 			if (syncReply != null && !Constants.EBMS_VERSION.equals(syncReply.getVersion()))
-				return EbMSMessageUtils.createError("//Header/SyncReply[@version]",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Wrong value.");
+			{
+				errorList.getError().add(EbMSMessageUtils.createError("//Header/SyncReply[@version]",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Wrong value."));
+				errorList.setHighestSeverity(SeverityType.ERROR);
+				return false;
+			}
 			if (syncReply != null && syncReply.getActor() != null && !syncReply.getActor().equals("http://schemas.xmlsoap.org/soap/actor/next"))
-				return EbMSMessageUtils.createError("//Header/SyncReply[@actor]",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Wrong value.");
+			{
+				errorList.getError().add(EbMSMessageUtils.createError("//Header/SyncReply[@actor]",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Wrong value."));
+				errorList.setHighestSeverity(SeverityType.ERROR);
+				return false;
+			}
 
 			if (messageOrder != null)
-				return EbMSMessageUtils.createError("//Header/MessageOrder",Constants.EbMSErrorCode.NOT_SUPPORTED.errorCode(),"MessageOrder not supported.");
+			{
+				errorList.getError().add(EbMSMessageUtils.createError("//Header/MessageOrder",Constants.EbMSErrorCode.NOT_SUPPORTED.errorCode(),"MessageOrder not supported."));
+				errorList.setHighestSeverity(SeverityType.ERROR);
+				return false;
+			}
 		}
 //		if (EbMSMessageType.ACKNOWLEDGMENT.action().getService().getValue().equals(messageHeader.getService().getValue()) && EbMSMessageType.ACKNOWLEDGMENT.action().getAction().equals(messageHeader.getAction()))
 //		{
 //			Acknowledgment acknowledgment = ((EbMSAcknowledgment)message.getPayload()).getAcknowledgment();
 //			if (!checkActor(deliveryChannel,acknowledgment))
-//				return EbMSMessageUtils.createError("//Header/Acknowledgment[@actor]",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Wrong value."));
+//			{
+//				errorList.getError().add(EbMSMessageUtils.createError("//Header/Acknowledgment[@actor]",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Wrong value."));
+//				errorList.setHighestSeverity(SeverityType.ERROR);
+//				return false;
+//			}
 //			if (acknowledgment.getActor() != null && acknowledgment.getActor().equals(ActorType.URN_OASIS_NAMES_TC_EBXML_MSG_ACTOR_NEXT_MSH.value()))
-//				return EbMSMessageUtils.createError("//Header/Acknowledgment[@actor]",Constants.EbMSErrorCode.NOT_SUPPORTED.errorCode(),"NextMSH not supported."));
+//			{
+//				errorList.getError().add(EbMSMessageUtils.createError("//Header/Acknowledgment[@actor]",Constants.EbMSErrorCode.NOT_SUPPORTED.errorCode(),"NextMSH not supported."));
+//				errorList.setHighestSeverity(SeverityType.ERROR);
+//				return false;
+//			}
 //			if (!checkAckSignatureRequested(deliveryChannel,acknowledgment))
-//				return EbMSMessageUtils.createError("//Header/Acknowledgment/Reference",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Wrong value."));
+//			{
+//				errorList.getError().add(EbMSMessageUtils.createError("//Header/Acknowledgment/Reference",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Wrong value."));
+//				errorList.setHighestSeverity(SeverityType.ERROR);
+//				return false;
+//			}
 //		}
-		return null;
+		return true;
 	}
 
 	private boolean isValid(List<PartyId> partyIds)
