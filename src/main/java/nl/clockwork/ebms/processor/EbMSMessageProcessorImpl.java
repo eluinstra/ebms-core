@@ -119,11 +119,11 @@ public class EbMSMessageProcessorImpl implements EbMSMessageProcessor
 				{
 					ErrorList errorList = createErrorList();
 					CollaborationProtocolAgreement cpa = ebMSDAO.getCPA(messageHeader.getCPAId());
-					if (signatureValidator.validate(errorList,cpa,document,messageHeader)
-						&& cpaValidator.validate(errorList,cpa,messageHeader,timestamp)
-						&& messageHeaderValidator.validate(errorList,cpa,messageHeader,message.getAckRequested(),message.getSyncReply(),message.getMessageOrder(),timestamp)
-						&& signatureValidator.validate(errorList,cpa,messageHeader,message.getSignature())
-						&& manifestValidator.validate(errorList,message.getManifest(),message.getAttachments()))
+					if (signatureValidator.isValid(errorList,cpa,document,messageHeader)
+						&& cpaValidator.isValid(errorList,cpa,messageHeader,timestamp)
+						&& messageHeaderValidator.isValid(errorList,cpa,messageHeader,message.getAckRequested(),message.getSyncReply(),message.getMessageOrder(),timestamp)
+						&& signatureValidator.isValid(errorList,cpa,messageHeader,message.getSignature())
+						&& manifestValidator.isValid(errorList,message.getManifest(),message.getAttachments()))
 					{
 						logger.info("Message valid.");
 						if (message.getAckRequested() != null)
@@ -311,7 +311,7 @@ public class EbMSMessageProcessorImpl implements EbMSMessageProcessor
 			MessageHeader messageHeader = message.getMessageHeader();
 			CollaborationProtocolAgreement cpa = ebMSDAO.getCPA(messageHeader.getCPAId());
 			ErrorList errorList = createErrorList();
-			EbMSMessage statusResponse = createEbMSStatusResponse(message,cpaValidator.validate(errorList,cpa,messageHeader,timestamp) ? null : EbMSMessageStatus.UNAUTHORIZED);
+			EbMSMessage statusResponse = createEbMSStatusResponse(message,cpaValidator.isValid(errorList,cpa,messageHeader,timestamp) ? null : EbMSMessageStatus.UNAUTHORIZED);
 			if (message.getSyncReply() == null)
 			{
 				errorList = createErrorList();
@@ -335,7 +335,7 @@ public class EbMSMessageProcessorImpl implements EbMSMessageProcessor
 			MessageHeader messageHeader = message.getMessageHeader();
 			CollaborationProtocolAgreement cpa = ebMSDAO.getCPA(messageHeader.getCPAId());
 			ErrorList errorList = createErrorList();
-			EbMSMessage pong = cpaValidator.validate(errorList,cpa,messageHeader,timestamp) ? null : createEbMSPong(message);
+			EbMSMessage pong = cpaValidator.isValid(errorList,cpa,messageHeader,timestamp) ? null : createEbMSPong(message);
 			if (message.getSyncReply() == null)
 			{
 				errorList = createErrorList();

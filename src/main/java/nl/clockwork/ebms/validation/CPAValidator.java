@@ -32,7 +32,7 @@ public class CPAValidator
 {
   protected transient Log logger = LogFactory.getLog(getClass());
 
-	public boolean validate(ErrorList errorList, CollaborationProtocolAgreement cpa, MessageHeader messageHeader, GregorianCalendar timestamp)
+	public boolean isValid(ErrorList errorList, CollaborationProtocolAgreement cpa, MessageHeader messageHeader, GregorianCalendar timestamp)
 	{
 		if (!cpaExists(cpa,messageHeader))
 		{

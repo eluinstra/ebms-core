@@ -24,5 +24,5 @@ import org.w3c.dom.Document;
 
 public interface SignatureValidator
 {
-	boolean validate(Document document, List<EbMSAttachment> attachments) throws ValidatorException;
+	boolean isValid(Document document, List<EbMSAttachment> attachments) throws ValidatorException;
 }

@@ -32,7 +32,7 @@ public class ManifestValidator
 {
   protected transient Log logger = LogFactory.getLog(getClass());
 
-	public boolean validate(ErrorList errorList, Manifest manifest, List<EbMSAttachment> attachments)
+	public boolean isValid(ErrorList errorList, Manifest manifest, List<EbMSAttachment> attachments)
 	{
 		if (!Constants.EBMS_VERSION.equals(manifest.getVersion()))
 		{

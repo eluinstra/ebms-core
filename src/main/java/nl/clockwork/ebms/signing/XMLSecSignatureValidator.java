@@ -57,7 +57,7 @@ public class XMLSecSignatureValidator implements SignatureValidator
 	}
 
 	@Override
-	public boolean validate(Document document, List<EbMSAttachment> attachments) throws ValidatorException
+	public boolean isValid(Document document, List<EbMSAttachment> attachments) throws ValidatorException
 	{
 		try
 		{

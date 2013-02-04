@@ -50,7 +50,7 @@ public class XMLDSignatureValidator implements SignatureValidator
   protected transient Log logger = LogFactory.getLog(getClass());
 
   //@Override
-	public boolean validate(Document document, List<EbMSAttachment> attachments) throws ValidatorException
+	public boolean isValid(Document document, List<EbMSAttachment> attachments) throws ValidatorException
 	{
 		try
 		{
