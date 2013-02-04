@@ -397,7 +397,10 @@ public class EbMSMessageProcessorImpl implements EbMSMessageProcessor
 	{
 		MessageHeader messageHeader = EbMSMessageUtils.createMessageHeader(message.getMessageHeader(),hostname,timestamp,EbMSAction.MESSAGE_ERROR);
 		if (errorList.getError().size() == 0)
+		{
 			errorList.getError().add(EbMSMessageUtils.createError(Constants.EbMSErrorCode.UNKNOWN.errorCode(),Constants.EbMSErrorCode.UNKNOWN.errorCode(),"An unknown error occurred!"));
+			errorList.setHighestSeverity(SeverityType.ERROR);
+		}
 		return new EbMSMessage(messageHeader,errorList);
 	}
 
