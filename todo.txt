@@ -2,6 +2,7 @@
 - improve header validation
 	- add seperate service and action validation
 - add signature certificate validation 
+- improve CPAUtils.isSigned
 
 - remove unnecessary defined Interfaces and custom Exceptions
 - check http headers

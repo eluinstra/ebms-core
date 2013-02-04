@@ -93,6 +93,7 @@ public class EbMSSecSignatureGenerator implements EbMSSignatureGenerator
 	{
 		Node n = (Node)XMLUtils.executeXPathQuery(new EbXMLNamespaceContext(),document,"/soap:Envelope/soap:Header/ebxml:MessageHeader",XPathConstants.NODE);
 		MessageHeader messageHeader = XMLMessageBuilder.getInstance(MessageHeader.class).handle(n);
+		//TODO: get isSigned info from CPA for all messages
 		if (!Constants.EBMS_SERVICE_URI.equals(messageHeader.getService().getValue()))
 		{
 			CollaborationProtocolAgreement cpa = ebMSDAO.getCPA(messageHeader.getCPAId());
