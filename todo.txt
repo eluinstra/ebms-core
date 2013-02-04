@@ -9,9 +9,6 @@
 - improve EbMSHttpClient
   - move cpa functionality to caller; add extra properties for url and signing (sendEvent)?
 - validate EbMS messages?
-- remove servlet from core?
-- remove EbMS prefix on classes
-- TODO: optimize
 
 - add url (or deliveryChannel) to table sendEvent
 - support multiple deliveryChannels
@@ -19,12 +16,15 @@
 - implement AdminService
 
 - add response and statusCode to table sendEvent
-- implement table receiveEvent???
+- implement table receivedEvent???
 
 - use either ebms_message.id or ebms_message.message_id to identify message
 
 - CPAService: define cpa as CollaborationProtocolAgreement instead of String
 - MessageHeader: define duplicateElimination as Object instead of String
+
+- remove servlet from core?
+- remove EbMS prefix on classes
 
 - replace commons-logging by slf4j?
 - read mime message
