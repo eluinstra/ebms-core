@@ -100,6 +100,7 @@ public class ProcessSendEvents implements Job
 			}
 			catch (Exception e)
 			{
+	  		logger.error("",e);
 			}
   }
   
