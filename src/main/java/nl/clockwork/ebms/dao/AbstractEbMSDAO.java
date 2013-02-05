@@ -52,7 +52,6 @@ import nl.clockwork.ebms.model.ebxml.SyncReply;
 import nl.clockwork.ebms.model.xml.dsig.SignatureType;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -280,7 +279,6 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	{
 		try
 		{
-			StringUtils.join(actions,",");
 			return jdbcTemplate.queryForInt(
 				"select count(message_id)" +
 				" from ebms_message" +
