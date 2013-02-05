@@ -74,6 +74,11 @@ public class Constants
 
   };
 
+  public static enum EbMSEventStatus
+  {
+		UNPROCESSED, PROCESSED;
+  }
+
 	public static final String DEFAULT_FILENAME = "file";
 
 	public static final String EBMS_SOAP_ACTION = "\"ebXML\"";
