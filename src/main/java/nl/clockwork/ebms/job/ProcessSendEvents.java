@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import nl.clockwork.ebms.Constants.EbMSEventStatus;
 import nl.clockwork.ebms.client.EbMSClient;
 import nl.clockwork.ebms.dao.DAOTransactionCallback;
 import nl.clockwork.ebms.dao.EbMSDAO;
@@ -84,7 +85,7 @@ public class ProcessSendEvents implements Job
 									public void doInTransaction()
 									{
 							  		ebMSDAO.updateSentEvent(sendEvent.getTime(),sendEvent.getEbMSMessageId());
-							  		ebMSDAO.deleteUnprocessedEvents(sendEvent.getTime(),sendEvent.getEbMSMessageId());
+							  		ebMSDAO.deleteEventsBefore(sendEvent.getTime(),sendEvent.getEbMSMessageId(),EbMSEventStatus.UNPROCESSED);
 									}
 								}
 				  		);

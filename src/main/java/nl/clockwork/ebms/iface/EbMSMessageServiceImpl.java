@@ -18,6 +18,7 @@ package nl.clockwork.ebms.iface;
 import java.util.Date;
 import java.util.List;
 
+import nl.clockwork.ebms.Constants.EbMSMessageStatus;
 import nl.clockwork.ebms.dao.DAOException;
 import nl.clockwork.ebms.dao.DAOTransactionCallback;
 import nl.clockwork.ebms.dao.EbMSDAO;
@@ -75,9 +76,9 @@ public class EbMSMessageServiceImpl implements EbMSMessageService
 		{
 			//FIXME use messageContext
 			if (maxNr == null)
-				return ebMSDAO.getReceivedMessageIds(messageContext);
+				return ebMSDAO.getMessageIds(messageContext,EbMSMessageStatus.RECEIVED);
 			else
-				return ebMSDAO.getReceivedMessageIds(messageContext,maxNr);
+				return ebMSDAO.getMessageIds(messageContext,EbMSMessageStatus.RECEIVED,maxNr);
 		}
 		catch (DAOException e)
 		{
@@ -97,7 +98,7 @@ public class EbMSMessageServiceImpl implements EbMSMessageService
 			{
 				EbMSMessageContent result = EbMSMessageUtils.EbMSMessageToEbMSMessageContent((EbMSMessage)message);
 				if (process != null && process)
-					ebMSDAO.processReceivedMessage(messageId);
+					ebMSDAO.updateMessage(messageId,EbMSMessageStatus.RECEIVED,EbMSMessageStatus.PROCESSED);
 				return result;
 			}
 			return null;
@@ -115,7 +116,7 @@ public class EbMSMessageServiceImpl implements EbMSMessageService
 	{
 		try
 		{
-			ebMSDAO.processReceivedMessage(messageId);
+			ebMSDAO.updateMessage(messageId,EbMSMessageStatus.RECEIVED,EbMSMessageStatus.PROCESSED);
 			return true;
 		}
 		catch (DAOException e)
@@ -131,7 +132,7 @@ public class EbMSMessageServiceImpl implements EbMSMessageService
 	{
 		try
 		{
-			ebMSDAO.processReceivedMessages(messageIds);
+			ebMSDAO.updateMessages(messageIds,EbMSMessageStatus.RECEIVED,EbMSMessageStatus.PROCESSED);
 			return true;
 		}
 		catch (DAOException e)

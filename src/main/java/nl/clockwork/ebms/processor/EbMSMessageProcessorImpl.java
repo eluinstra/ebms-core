@@ -47,6 +47,7 @@ import nl.clockwork.ebms.model.ebxml.Manifest;
 import nl.clockwork.ebms.model.ebxml.MessageHeader;
 import nl.clockwork.ebms.model.ebxml.MessageOrder;
 import nl.clockwork.ebms.model.ebxml.MessageStatusType;
+import nl.clockwork.ebms.model.ebxml.Service;
 import nl.clockwork.ebms.model.ebxml.SeverityType;
 import nl.clockwork.ebms.model.ebxml.StatusRequest;
 import nl.clockwork.ebms.model.ebxml.StatusResponse;
@@ -76,6 +77,7 @@ public class EbMSMessageProcessorImpl implements EbMSMessageProcessor
   private MessageHeaderValidator messageHeaderValidator;
   private ManifestValidator manifestValidator;
   private SignatureValidator signatureValidator;
+  private Service service;
   
 	public void init()
 	{
@@ -83,6 +85,8 @@ public class EbMSMessageProcessorImpl implements EbMSMessageProcessor
 		messageHeaderValidator = new MessageHeaderValidator(ebMSDAO);
 		manifestValidator = new ManifestValidator();
 		signatureValidator = new SignatureValidator(ebMSSignatureValidator);
+		service = new Service();
+		service.setValue(Constants.EBMS_SERVICE_URI);
 	}
 	
 	@Override
@@ -102,12 +106,12 @@ public class EbMSMessageProcessorImpl implements EbMSMessageProcessor
 					{
 						if (message.getSyncReply() == null)
 						{
-							long responseId = ebMSDAO.getResponseMessageId(messageHeader.getMessageData().getMessageId());
+							long responseId = ebMSDAO.getMessageId(messageHeader.getMessageData().getMessageId(),service,new String[]{EbMSAction.MESSAGE_ERROR.action(),EbMSAction.ACKNOWLEDGMENT.action()});
 							ebMSDAO.insertSendEvent(responseId);
 							return null;
 						}
 						else
-							return getEbMSDocument(ebMSDAO.getResponseMessage(messageHeader.getMessageData().getMessageId()));
+							return getEbMSDocument(ebMSDAO.getMessage(messageHeader.getMessageData().getMessageId(),service,new String[]{EbMSAction.MESSAGE_ERROR.action(),EbMSAction.ACKNOWLEDGMENT.action()}));
 					}
 					else
 					{
@@ -119,11 +123,12 @@ public class EbMSMessageProcessorImpl implements EbMSMessageProcessor
 				{
 					ErrorList errorList = createErrorList();
 					CollaborationProtocolAgreement cpa = ebMSDAO.getCPA(messageHeader.getCPAId());
-					if (signatureValidator.isValid(errorList,cpa,document,messageHeader)
-						&& cpaValidator.isValid(errorList,cpa,messageHeader,timestamp)
+					if (cpaValidator.isValid(errorList,cpa,messageHeader,timestamp)
 						&& messageHeaderValidator.isValid(errorList,cpa,messageHeader,message.getAckRequested(),message.getSyncReply(),message.getMessageOrder(),timestamp)
 						&& signatureValidator.isValid(errorList,cpa,messageHeader,message.getSignature())
-						&& manifestValidator.isValid(errorList,message.getManifest(),message.getAttachments()))
+						&& manifestValidator.isValid(errorList,message.getManifest(),message.getAttachments())
+						&& signatureValidator.isValid(errorList,cpa,document,messageHeader)
+					)
 					{
 						logger.info("Message valid.");
 						if (message.getAckRequested() != null)
@@ -293,7 +298,7 @@ public class EbMSMessageProcessorImpl implements EbMSMessageProcessor
 						if (id != null)
 						{
 							ebMSDAO.deleteSendEvents(id);
-							ebMSDAO.updateMessageStatus(id,status);
+							ebMSDAO.updateMessageStatus(id,null,status);
 						}
 					}
 				}
@@ -365,7 +370,7 @@ public class EbMSMessageProcessorImpl implements EbMSMessageProcessor
 
 	private boolean isDuplicateRefToMessage(EbMSMessage message)
 	{
-		return ebMSDAO.existsResponseMessage(message.getMessageHeader().getMessageData().getRefToMessageId());
+		return ebMSDAO.existsMessage(message.getMessageHeader().getMessageData().getRefToMessageId(),service,new String[]{EbMSAction.MESSAGE_ERROR.action(),EbMSAction.ACKNOWLEDGMENT.action()});
 	}
 
 	private ErrorList createErrorList()

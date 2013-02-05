@@ -18,12 +18,14 @@ package nl.clockwork.ebms.dao;
 import java.util.Date;
 import java.util.List;
 
+import nl.clockwork.ebms.Constants.EbMSEventStatus;
 import nl.clockwork.ebms.Constants.EbMSMessageStatus;
 import nl.clockwork.ebms.model.EbMSMessage;
 import nl.clockwork.ebms.model.EbMSMessageContext;
 import nl.clockwork.ebms.model.EbMSSendEvent;
 import nl.clockwork.ebms.model.cpp.cpa.CollaborationProtocolAgreement;
 import nl.clockwork.ebms.model.ebxml.MessageHeader;
+import nl.clockwork.ebms.model.ebxml.Service;
 
 public interface EbMSDAO
 {
@@ -35,10 +37,10 @@ public interface EbMSDAO
 	boolean deleteCPA(String cpaId) throws DAOException;
 	
 	boolean existsMessage(String messageId) throws DAOException;
-	boolean existsResponseMessage(String messageId) throws DAOException;
+	boolean existsMessage(String messageId, Service service, String[] actions) throws DAOException;
 	Long getMessageId(String messageId) throws DAOException;
-	Long getResponseMessageId(String messageId) throws DAOException;
-	EbMSMessage getResponseMessage(String messageId) throws DAOException;
+	Long getMessageId(String messageId, Service service, String[] actions) throws DAOException;
+	EbMSMessage getMessage(String messageId, Service service, String[] actions) throws DAOException;
 	MessageHeader getMessageHeader(String messageId) throws DAOException;
 	EbMSMessage getMessage(long id) throws DAOException;
 	EbMSMessageStatus getMessageStatus(String messageId) throws DAOException;
@@ -47,19 +49,19 @@ public interface EbMSDAO
 
 	List<EbMSSendEvent> selectEventsForSending(Date timestamp) throws DAOException;
 	void updateSentEvent(Date timestamp, Long id) throws DAOException;
-	void deleteUnprocessedEvents(Date timestamp, Long id) throws DAOException;
+	void deleteEventsBefore(Date timestamp, Long id, EbMSEventStatus status) throws DAOException;
 
 	long insertMessage(Date timestamp, EbMSMessage message, EbMSMessageStatus status) throws DAOException;
-	void updateMessageStatus(Long id, EbMSMessageStatus status) throws DAOException;
+	void updateMessageStatus(Long id, EbMSMessageStatus oldStatus, EbMSMessageStatus newStatus) throws DAOException;
 	void insertSendEvent(long id) throws DAOException;
 	void insertSendEvent(long id, EbMSSendEvent sendEvent) throws DAOException;
 	void insertSendEvents(long id, List<EbMSSendEvent> sendEvents) throws DAOException;
 	void deleteSendEvents(Long id) throws DAOException;
 
-	List<String> getReceivedMessageIds(EbMSMessageContext messageContext) throws DAOException;
-	List<String> getReceivedMessageIds(EbMSMessageContext messageContext, int maxNr) throws DAOException;
+	List<String> getMessageIds(EbMSMessageContext messageContext, EbMSMessageStatus status) throws DAOException;
+	List<String> getMessageIds(EbMSMessageContext messageContext, EbMSMessageStatus status, int maxNr) throws DAOException;
 	EbMSMessage getMessage(String messageId) throws DAOException;
-	void processReceivedMessage(String messageId) throws DAOException;
-	void processReceivedMessages(List<String> messageIds) throws DAOException;
+	void updateMessage(String messageId, EbMSMessageStatus oldStatus, EbMSMessageStatus newStatus) throws DAOException;
+	void updateMessages(List<String> messageIds, EbMSMessageStatus oldStatus, EbMSMessageStatus newStatus) throws DAOException;
 
 }
