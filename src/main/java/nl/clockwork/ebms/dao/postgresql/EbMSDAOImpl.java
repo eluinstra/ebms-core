@@ -136,7 +136,6 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 													"service_type," +
 													"service," +
 													"action," +
-													"original," +
 													"signature," +
 													"message_header," +
 													"sync_reply," +
@@ -150,7 +149,7 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 													//"status_response," +
 													"status," +
 													"status_time" +
-												") values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?," + (status == null ? "null" : getTimestampFunction()) + ")",
+												") values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?," + (status == null ? "null" : getTimestampFunction()) + ")",
 												//") values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?," + (status == null ? "null" : getTimestampFunction()) + ")",
 												//new String[]{"id"}
 												new int[]{1}
@@ -174,41 +173,31 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 											ps.setString(9,messageHeader.getService().getType());
 											ps.setString(10,messageHeader.getService().getValue());
 											ps.setString(11,messageHeader.getAction());
-											ps.setBytes(12,message.getOriginal());
-											ps.setString(13,XMLMessageBuilder.getInstance(SignatureType.class).handle(message.getSignature()));
-											ps.setString(14,XMLMessageBuilder.getInstance(MessageHeader.class).handle(messageHeader));
-											ps.setString(15,XMLMessageBuilder.getInstance(SyncReply.class).handle(message.getSyncReply()));
-											ps.setString(16,XMLMessageBuilder.getInstance(MessageOrder.class).handle(message.getMessageOrder()));
-											ps.setString(17,XMLMessageBuilder.getInstance(AckRequested.class).handle(message.getAckRequested()));
+											ps.setString(12,XMLMessageBuilder.getInstance(SignatureType.class).handle(message.getSignature()));
+											ps.setString(13,XMLMessageBuilder.getInstance(MessageHeader.class).handle(messageHeader));
+											ps.setString(14,XMLMessageBuilder.getInstance(SyncReply.class).handle(message.getSyncReply()));
+											ps.setString(15,XMLMessageBuilder.getInstance(MessageOrder.class).handle(message.getMessageOrder()));
+											ps.setString(16,XMLMessageBuilder.getInstance(AckRequested.class).handle(message.getAckRequested()));
 											if (!Constants.EBMS_SERVICE_URI.equals(messageHeader.getService().getValue()))
-												ps.setString(18,XMLMessageBuilder.getInstance(Manifest.class).handle(message.getManifest()));
+												ps.setString(17,XMLMessageBuilder.getInstance(Manifest.class).handle(message.getManifest()));
 											else if (EbMSAction.MESSAGE_ERROR.action().equals(messageHeader.getAction()))
-												ps.setString(18,XMLMessageBuilder.getInstance(ErrorList.class).handle(message.getErrorList()));
+												ps.setString(17,XMLMessageBuilder.getInstance(ErrorList.class).handle(message.getErrorList()));
 											else if (EbMSAction.ACKNOWLEDGMENT.action().equals(messageHeader.getAction()))
-												ps.setString(18,XMLMessageBuilder.getInstance(Acknowledgment.class).handle(message.getAcknowledgment()));
+												ps.setString(17,XMLMessageBuilder.getInstance(Acknowledgment.class).handle(message.getAcknowledgment()));
 											else if (EbMSAction.STATUS_REQUEST.action().equals(messageHeader.getAction()))
-												ps.setString(18,XMLMessageBuilder.getInstance(StatusRequest.class).handle(message.getStatusRequest()));
+												ps.setString(17,XMLMessageBuilder.getInstance(StatusRequest.class).handle(message.getStatusRequest()));
 											else if (EbMSAction.STATUS_RESPONSE.action().equals(messageHeader.getAction()))
-												ps.setString(18,XMLMessageBuilder.getInstance(StatusResponse.class).handle(message.getStatusResponse()));
+												ps.setString(17,XMLMessageBuilder.getInstance(StatusResponse.class).handle(message.getStatusResponse()));
 											else
-												ps.setString(18,null);
+												ps.setString(17,null);
 											if (status == null)
-												ps.setNull(19,java.sql.Types.INTEGER);
+												ps.setNull(18,java.sql.Types.INTEGER);
 											else
-												ps.setInt(19,status.id());
-											//ps.setString(18,XMLMessageBuilder.getInstance(ErrorList.class).handle(message.getErrorList()));
-											//ps.setString(19,XMLMessageBuilder.getInstance(Acknowledgment.class).handle(message.getAcknowledgment()));
-											//ps.setString(20,XMLMessageBuilder.getInstance(Manifest.class).handle(message.getManifest()));
-											//ps.setString(21,XMLMessageBuilder.getInstance(StatusRequest.class).handle(message.getStatusRequest()));
-											//ps.setString(22,XMLMessageBuilder.getInstance(StatusResponse.class).handle(message.getStatusResponse()));
-											//if (status == null)
-												//ps.setNull(23,java.sql.Types.INTEGER);
-											//else
-												//ps.setInt(23,status.id());
-											//ps.setString(24,status == null ? null : String.format(getDateFormat(),timestamp));
-											//ps.setTimestamp(24,status == null ? null : new Timestamp(timestamp.getTime()));
-											//ps.setObject(24,status == null ? null : timestamp,Types.TIMESTAMP);
-											//ps.setObject(24,status == null ? null : timestamp);
+												ps.setInt(18,status.id());
+											//ps.setString(19,status == null ? null : String.format(getDateFormat(),timestamp));
+											//ps.setTimestamp(19,status == null ? null : new Timestamp(timestamp.getTime()));
+											//ps.setObject(19,status == null ? null : timestamp,Types.TIMESTAMP);
+											//ps.setObject(19,status == null ? null : timestamp);
 											return ps;
 										}
 										catch (JAXBException e)

@@ -19,7 +19,6 @@ CREATE TABLE ebms_message
 	service_type			VARCHAR(256)		NULL,
 	service						VARCHAR(256)		NOT NULL,
 	action						VARCHAR(256)		NOT NULL,
-	original					BYTEA						NULL,
 	signature					TEXT						NULL,
 	message_header		TEXT						NOT NULL,
 	sync_reply				TEXT						NULL,
