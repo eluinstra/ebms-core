@@ -20,6 +20,7 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.List;
 
+import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
@@ -256,7 +257,7 @@ public class EbMSMessageProcessorImpl implements EbMSMessageProcessor
 	{
 		XMLMessageBuilder<Envelope> messageBuilder = XMLMessageBuilder.getInstance(Envelope.class,Envelope.class,MessageHeader.class,SyncReply.class,MessageOrder.class,AckRequested.class,SignatureType.class,ErrorList.class,Acknowledgment.class,Manifest.class,StatusRequest.class,StatusResponse.class);
 		Envelope envelope = messageBuilder.handle(document);
-		return new EbMSMessage(envelope,attachments);
+		return getEbMSMessage(envelope,attachments);
 		
 //		SignatureType signature = XMLMessageBuilder.getInstance(SignatureType.class).handle(DOMUtils.executeXPathQuery(new EbXMLNamespaceContext(),document,"/soap:Envelope/soap:Header/ds:Signature"));
 //		MessageHeader messageHeader = XMLMessageBuilder.getInstance(MessageHeader.class).handle(DOMUtils.executeXPathQuery(new EbXMLNamespaceContext(),document,"/soap:Envelope/soap:Header/ebxml:MessageHeader"));
@@ -271,6 +272,47 @@ public class EbMSMessageProcessorImpl implements EbMSMessageProcessor
 //		return new EbMSMessage(signature,messageHeader,syncReply,messageOrder,ackRequested,errorList,acknowledgment,manifest,statusRequest,statusResponse,attachments);
 	}
 
+	@SuppressWarnings("unchecked")
+	public EbMSMessage getEbMSMessage(Envelope envelope, List<EbMSAttachment> attachments)
+	{
+		
+		SignatureType signature = null;
+		MessageHeader messageHeader = null;
+		SyncReply syncReply = null;
+		MessageOrder messageOrder = null;
+		AckRequested ackRequested = null;
+		ErrorList errorList = null;
+		Acknowledgment acknowledgment = null;
+		for (Object element : envelope.getHeader().getAny())
+			if (element instanceof JAXBElement && ((JAXBElement<?>)element).getValue() instanceof SignatureType)
+				signature = ((JAXBElement<SignatureType>)element).getValue();
+			else if (element instanceof MessageHeader)
+				messageHeader = (MessageHeader)element;
+			else if (element instanceof SyncReply)
+				syncReply = (SyncReply)element;
+			else if (element instanceof MessageOrder)
+				messageOrder = (MessageOrder)element;
+			else if (element instanceof AckRequested)
+				ackRequested = (AckRequested)element;
+			else if (element instanceof ErrorList)
+				errorList = (ErrorList)element;
+			else if (element instanceof Acknowledgment)
+				acknowledgment = (Acknowledgment)element;
+
+		Manifest manifest = null;
+		StatusRequest statusRequest = null;
+		StatusResponse statusResponse = null;
+		for (Object element : envelope.getBody().getAny())
+			if (element instanceof Manifest)
+				manifest = (Manifest)element;
+			else if (element instanceof StatusRequest)
+				statusRequest = (StatusRequest)element;
+			else if (element instanceof StatusResponse)
+				statusResponse = (StatusResponse)element;
+
+		return new EbMSMessage(signature,messageHeader,syncReply,messageOrder,ackRequested,errorList,acknowledgment,manifest,statusRequest,statusResponse,attachments);
+	}
+	
 	private EbMSDocument getEbMSDocument(EbMSMessage message) throws SOAPException, JAXBException, ParserConfigurationException, SAXException, IOException
 	{
 		return new EbMSDocument(EbMSMessageUtils.createSOAPMessage(message),message.getAttachments());
