@@ -40,7 +40,7 @@
 		<property name="jobs">
 			<list>
 				<ref bean="processSendEvents"/>
-				<ref bean="processEbMSMessages"/>
+				<!--ref bean="processEbMSMessages"/-->
 			</list>
 		</property>
 	</bean>
