@@ -48,11 +48,11 @@
 
 		<service name="ebms.https.receive">
 			<inbound>
-				<https:inbound-endpoint connector-ref="connector.http.ebms.in" host="${service.host}" port="${service.port}" path="${service.url}" synchronous="true"/>
+				<https:inbound-endpoint connector-ref="connector.http.ebms.in" address="https://${service.host}:${service.port}${service.url}" synchronous="true"/>
 			</inbound>
 			<component>
 				<singleton-object class="nl.clockwork.mule.ebms.processor.EbMSHttpHandler">
-					<property key="messageProcessor" value-ref="messageProcessor"/>
+					<property key="ebMSMessageProcessor" value-ref="messageProcessor"/>
 				</singleton-object>
 			</component>
 		</service>

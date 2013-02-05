@@ -12,6 +12,7 @@ import nl.clockwork.ebms.processor.EbMSMessageProcessor;
 import nl.clockwork.ebms.server.EbMSMessageReader;
 import nl.clockwork.ebms.server.EbMSMessageReaderImpl;
 
+import org.apache.commons.httpclient.ContentLengthInputStream;
 import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpVersion;
 import org.mule.api.MuleEvent;
@@ -20,24 +21,24 @@ import org.mule.api.MuleMessage;
 import org.mule.api.lifecycle.Callable;
 import org.mule.api.transport.OutputHandler;
 import org.mule.transport.http.HttpConstants;
-import org.mule.transport.http.HttpRequest;
 import org.mule.transport.http.HttpResponse;
 
 public class EbMSHttpHandler implements Callable
 {
-	private EbMSMessageProcessor messageProcessor;
+	private EbMSMessageProcessor ebMSMessageProcessor;
 
 	@Override
 	public Object onCall(MuleEventContext eventContext) throws Exception
 	{
+		
 		MuleMessage message = eventContext.getMessage();
-  	HttpRequest request = (HttpRequest)message.getPayload();
+  	ContentLengthInputStream request = (ContentLengthInputStream)message.getPayload();
   	HttpResponse response = new HttpResponse();
-		if (Constants.EBMS_SOAP_ACTION.equals(getHeader(request,"SOAPAction")))
+		if (Constants.EBMS_SOAP_ACTION.equals(getHeader(message,"SOAPAction")))
   	{
-  		EbMSMessageReader messageReader = new EbMSMessageReaderImpl(request.getContentType());
-			EbMSDocument in = messageReader.read(request.getBody());
-			final EbMSDocument out = messageProcessor.process(in);
+  		EbMSMessageReader messageReader = new EbMSMessageReaderImpl(getHeader(message,"Content-Type"));
+			EbMSDocument in = messageReader.read(request);
+			final EbMSDocument out = ebMSMessageProcessor.process(in);
 			if (out == null)
 				response.setStatusLine(HttpVersion.parse(HttpConstants.HTTP11),204);
 			else
@@ -68,12 +69,16 @@ public class EbMSHttpHandler implements Callable
 		return message;
 	}
 
-	private String getHeader(HttpRequest request, String headerName)
+	private String getHeader(MuleMessage message, String headerName)
 	{
-		for (Header header : request.getHeaders())
-			if (headerName.equals(header.getName()))
-				return header.getValue();
+		for (Object name : message.getPropertyNames())
+			if (headerName.equalsIgnoreCase((String)name))
+				return (String)message.getProperty((String)name);
 		return null;
 	}
 
+	public void setEbMSMessageProcessor(EbMSMessageProcessor ebMSMessageProcessor)
+	{
+		this.ebMSMessageProcessor = ebMSMessageProcessor;
+	}
 }
