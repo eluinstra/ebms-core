@@ -48,7 +48,7 @@ public interface EbMSDAO
 	void executeTransaction(DAOTransactionCallback callback);
 
 	List<EbMSSendEvent> selectEventsForSending(Date timestamp) throws DAOException;
-	void updateSentEvent(Date timestamp, Long id) throws DAOException;
+	void updateSendEvent(Date timestamp, Long id, EbMSEventStatus status) throws DAOException;
 	void deleteEventsBefore(Date timestamp, Long id, EbMSEventStatus status) throws DAOException;
 
 	long insertMessage(Date timestamp, EbMSMessage message, EbMSMessageStatus status) throws DAOException;

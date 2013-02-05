@@ -543,16 +543,17 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	}
 	
 	@Override
-	public void updateSentEvent(Date timestamp, Long id) throws DAOException
+	public void updateSendEvent(Date timestamp, Long id, EbMSEventStatus status) throws DAOException
 	{
 		try
 		{
 			jdbcTemplate.update(
 				"update ebms_send_event set" +
-				" status = 1," +
+				" status = ?," +
 				" status_time = NOW()" +
 				" where ebms_message_id = ?" +
 				" and time = ?",
+				status.ordinal(),
 				id,
 				timestamp
 			);

@@ -15,10 +15,12 @@
  ******************************************************************************/
 package nl.clockwork.ebms.job;
 
+import java.util.ArrayList;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import nl.clockwork.ebms.Constants.EbMSEventStatus;
 import nl.clockwork.ebms.client.EbMSClient;
@@ -60,9 +62,10 @@ public class ProcessSendEvents implements Job
   {
   	GregorianCalendar timestamp = new GregorianCalendar();
   	List<EbMSSendEvent> sendEvents = ebMSDAO.selectEventsForSending(timestamp.getTime());
+  	List<Future<?>> futures = new ArrayList<Future<?>>();
   	for (final EbMSSendEvent sendEvent : sendEvents)
   	{
-  		executorService.execute(
+  		Future<?> future = executorService.submit(
   			new Runnable()
 				{
 					@Override
@@ -78,26 +81,26 @@ public class ProcessSendEvents implements Job
 				  		EbMSDocument responseDocument = ebMSClient.sendMessage(uri,document);
 				  		if (!(responseDocument == null || (responseDocument instanceof EbMSResponseDocument && ((EbMSResponseDocument)responseDocument).getMessage() == null)))
 				  			ebMSMessageProcessor.process(responseDocument);
-				  		ebMSDAO.executeTransaction(
-				  			new DAOTransactionCallback()
-								{
-									@Override
-									public void doInTransaction()
-									{
-							  		ebMSDAO.updateSentEvent(sendEvent.getTime(),sendEvent.getEbMSMessageId());
-							  		ebMSDAO.deleteEventsBefore(sendEvent.getTime(),sendEvent.getEbMSMessageId(),EbMSEventStatus.UNPROCESSED);
-									}
-								}
-				  		);
+				  		updateEvent(sendEvent,EbMSEventStatus.PROCESSED);
 						}
 						catch (Exception e)
 						{
+			  			updateEvent(sendEvent,EbMSEventStatus.FAILED);
 				  		logger.error("",e);
 						}
 					}
 				}
   		);
+  		futures.add(future);
   	}
+  	for (Future<?> future : futures)
+			try
+			{
+				future.get();
+			}
+			catch (Exception e)
+			{
+			}
   }
   
 	private String getUrl(EbMSMessage message)
@@ -107,6 +110,21 @@ public class ProcessSendEvents implements Job
 		DeliveryChannel deliveryChannel = CPAUtils.getReceivingDeliveryChannels(partyInfo,message.getMessageHeader().getTo().getRole(),message.getMessageHeader().getService(),message.getMessageHeader().getAction()).get(0);
 		Transport transport = (Transport)deliveryChannel.getTransportId();
 		return transport.getTransportReceiver().getEndpoint().get(0).getUri();
+	}
+
+	private void updateEvent(final EbMSSendEvent sendEvent, final EbMSEventStatus status)
+	{
+		ebMSDAO.executeTransaction(
+  			new DAOTransactionCallback()
+				{
+					@Override
+					public void doInTransaction()
+					{
+			  		ebMSDAO.updateSendEvent(sendEvent.getTime(),sendEvent.getEbMSMessageId(),status);
+			  		ebMSDAO.deleteEventsBefore(sendEvent.getTime(),sendEvent.getEbMSMessageId(),EbMSEventStatus.UNPROCESSED);
+					}
+				}
+  		);
 	}
 
 	public void setMaxThreads(int maxThreads)

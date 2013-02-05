@@ -76,8 +76,14 @@ public class Constants
 
   public static enum EbMSEventStatus
   {
-		UNPROCESSED, PROCESSED;
-  }
+		UNPROCESSED(0), PROCESSED(1), FAILED(2);
+
+		private final int id;
+
+		EbMSEventStatus(int id) { this.id = id; }
+
+		public final int id() { return id; }
+ }
 
 	public static final String DEFAULT_FILENAME = "file";
 
