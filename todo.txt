@@ -9,7 +9,6 @@
 - improve EbMSMessageProcessor
 - improve EbMSHttpClient
   - move cpa functionality to caller; add extra properties for url and signing (sendEvent)?
-- validate EbMS messages?
 
 - add url (or deliveryChannel) to table sendEvent
 - support multiple deliveryChannels
