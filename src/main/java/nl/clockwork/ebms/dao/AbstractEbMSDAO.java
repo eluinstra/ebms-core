@@ -740,7 +740,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 				" set status = ?," + 
 				" status_time = " + getTimestampFunction() +
 				" where id = ?" +
-				oldStatus == null ? " and status is null" : " and status = " + oldStatus.id(),
+				(oldStatus == null ? " and status is null" : " and status = " + oldStatus.id()),
 				newStatus.id(),
 				id
 			);
@@ -974,7 +974,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 				" set status = ?," +
 				" status_time = " + getTimestampFunction() +
 				" where message_id = ?" +
-				oldStatus == null ? " and status is null" : " and status = " + oldStatus.id(),
+				(oldStatus == null ? " and status is null" : " and status = " + oldStatus.id()),
 				newStatus.id(),
 				messageId
 			);
@@ -998,7 +998,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 					" set status = " + newStatus.id() + "," +
 					" status_time = " + getTimestampFunction() +
 					" where message_id = ?" +
-					oldStatus == null ? " and status is null" : " and status = " + oldStatus.id(),
+					(oldStatus == null ? " and status is null" : " and status = " + oldStatus.id()),
 					ids
 			);
 		}
