@@ -46,19 +46,6 @@
 		<util:constant id="CPA_ID" static-field="nl.clockwork.mule.ebms.stub.Constants.CPA_ID"/>
 	</spring:beans>
 	
-	<script:transformer name="toCPAMap">
-		<script:script engine="groovy">
-			import java.util.HashMap;
-			import nl.clockwork.ebms.Constants;
-
-			HashMap map = new HashMap();
-			map.put("cpa_id",message.getStringProperty(Constants.CPA_ID,null));
-			map.put("cpa",message.getPayload());
-			message.setPayload(map);
-			return message;
-		</script:script>
-	</script:transformer>
-
 	<model>
 
 		<default-service-exception-strategy>
@@ -93,100 +80,15 @@
 					<object-to-string-transformer/>
 				</file:inbound-endpoint>				
 			</inbound>
+			<component>
+				<singleton-object class="nl.clockwork.mule.ebms.stub.ebf.processor.CPAInserter">
+					<property key="cpaService" value-ref="cpaService"/>
+				</singleton-object>
+			</component>
 			<outbound>
-				<filtering-router>
-					<vm:outbound-endpoint path="file.cpa.metadata.in" synchronous="false"/>
-					<custom-filter class="nl.clockwork.mule.common.filter.XSDValidationFilter">
-						<spring:property name="xsdFile" value="/nl/clockwork/ebms/xsd/cpp-cpa-2_0.xsd" />
-					</custom-filter>
-				</filtering-router>
-				<forwarding-catch-all-strategy>
-					<vm:outbound-endpoint path="file.cpa.report.in" synchronous="false">
-						<!--message-properties-transformer>
-							<add-message-property key="EBMS.REPORT" value="#[header:originalFilename] contains no CPA." />
-						</message-properties-transformer-->
-						<script:transformer>
-            	<script:script engine="groovy">
-								message.setProperty("EBMS.REPORT",message.getProperty("originalFilename") + " contains no CPA.");
-								return message;
-							</script:script>
-						</script:transformer>
-					</vm:outbound-endpoint>
-				</forwarding-catch-all-strategy>
-			</outbound>
-		</service>
-
-		<service name="file.cpa.metadata">
-			<inbound>
-				<vm:inbound-endpoint path="file.cpa.metadata.in" synchronous="false">
-					<!--message-properties-transformer>
-						<add-message-property key="EBMS.CPA_ID" value="#[xpath:/CollaborationProtocolAgreement/@cpaid]" />
-					</message-properties-transformer-->
-					<custom-transformer class="nl.clockwork.mule.common.enricher.XPathPropertyEnricher">
-						<spring:property name="xpathQueries">
-							<spring:map>
-								<spring:entry key-ref="CPA_ID" value="/CollaborationProtocolAgreement/@cpaid" />
-							</spring:map>
-						</spring:property>
-					</custom-transformer>
-				</vm:inbound-endpoint>
-			</inbound>
-			<outbound>
-				<filtering-router>
-					<vm:outbound-endpoint path="file.cpa.update.in" synchronous="false"/>
-					<custom-filter class="nl.clockwork.mule.ebms.stub.filter.CPAIdExistsFilter">
-						<spring:property name="cpaService" ref="cpaService" />
-					</custom-filter>
-				</filtering-router>
-				<forwarding-catch-all-strategy>
-					<vm:outbound-endpoint path="file.cpa.insert.in" synchronous="false" />
-				</forwarding-catch-all-strategy>
-			</outbound>
-		</service>
-
-		<service name="file.cpa.insert">
-			<inbound>
-				<vm:inbound-endpoint path="file.cpa.insert.in" synchronous="false" />
-			</inbound>
-			<outbound>
-				<chaining-router>
-					<!-- FIXME: use cpaService -->
-					<!--jdbc:outbound-endpoint queryKey="query">
-						<transformer ref="toCPAMap"/>
-						<jdbc:query key="query" value-ref="insertCPA" />
-					</jdbc:outbound-endpoint-->
-					<vm:outbound-endpoint path="file.cpa.report.in" synchronous="false">
-						<script:transformer>
-            	<script:script engine="groovy">
-								message.setProperty("EBMS.REPORT",message.getProperty("originalFilename") + " inserted successfully.");
-								return message;
-							</script:script>
-						</script:transformer>
-					</vm:outbound-endpoint>
-				</chaining-router>
-			</outbound>
-		</service>
-
-		<service name="file.cpa.update">
-			<inbound>
-				<vm:inbound-endpoint path="file.cpa.update.in" synchronous="false" />
-			</inbound>
-			<outbound>
-				<chaining-router>
-					<!-- FIXME: use cpaService -->
-					<!--jdbc:outbound-endpoint queryKey="query">
-						<transformer ref="toCPAMap"/>
-						<jdbc:query key="query" value-ref="updateCPA" />
-					</jdbc:outbound-endpoint-->
-					<vm:outbound-endpoint path="file.cpa.report.in" synchronous="false">
-						<script:transformer>
-            	<script:script engine="groovy">
-								message.setProperty("EBMS.REPORT",message.getProperty("originalFilename") + " updated successfully.");
-								return message;
-							</script:script>
-						</script:transformer>
-					</vm:outbound-endpoint>
-				</chaining-router>
+				<pass-through-router>
+					<vm:outbound-endpoint path="file.cpa.report.in" synchronous="false"/>
+				</pass-through-router>
 			</outbound>
 		</service>
 
