@@ -4,6 +4,8 @@ import java.util.List;
 
 import nl.clockwork.ebms.iface.EbMSMessageService;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.mule.api.MuleContext;
 import org.mule.api.MuleException;
 import org.mule.api.context.MuleContextAware;
@@ -14,6 +16,7 @@ import org.quartz.StatefulJob;
 
 public class EbMSMessageProcessingJob implements StatefulJob, MuleContextAware
 {
+  protected transient Log logger = LogFactory.getLog(getClass());
 	private MuleContext muleContext;
 	private EbMSMessageService ebMSMessageService;
 	private String delegatePath;
@@ -21,6 +24,7 @@ public class EbMSMessageProcessingJob implements StatefulJob, MuleContextAware
 	@Override
 	public void execute(JobExecutionContext arg0) throws JobExecutionException
 	{
+		logger.info("Executing job: " + this.getClass());
 		try
 		{
 			MuleClient client = new MuleClient(muleContext);
