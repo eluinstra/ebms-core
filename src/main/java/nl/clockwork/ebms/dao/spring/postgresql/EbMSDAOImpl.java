@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  ******************************************************************************/
-package nl.clockwork.ebms.dao.postgresql;
+package nl.clockwork.ebms.dao.spring.postgresql;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -28,8 +28,8 @@ import nl.clockwork.ebms.Constants;
 import nl.clockwork.ebms.Constants.EbMSAction;
 import nl.clockwork.ebms.Constants.EbMSMessageStatus;
 import nl.clockwork.ebms.common.util.XMLMessageBuilder;
-import nl.clockwork.ebms.dao.AbstractEbMSDAO;
 import nl.clockwork.ebms.dao.DAOException;
+import nl.clockwork.ebms.dao.spring.AbstractEbMSDAO;
 import nl.clockwork.ebms.model.EbMSAttachment;
 import nl.clockwork.ebms.model.EbMSMessage;
 import nl.clockwork.ebms.model.ebxml.AckRequested;
@@ -142,15 +142,9 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 													"message_order," +
 													"ack_requested," +
 													"content," +
-													//"error_list," +
-													//"acknowledgment," +
-													//"manifest," +
-													//"status_request," +
-													//"status_response," +
 													"status," +
 													"status_time" +
 												") values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?," + (status == null ? "null" : getTimestampFunction()) + ")",
-												//") values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?," + (status == null ? "null" : getTimestampFunction()) + ")",
 												//new String[]{"id"}
 												new int[]{1}
 											);

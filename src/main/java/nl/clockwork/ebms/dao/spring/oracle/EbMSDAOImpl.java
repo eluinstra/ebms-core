@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  ******************************************************************************/
-package nl.clockwork.ebms.dao.oracle;
+package nl.clockwork.ebms.dao.spring.oracle;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -22,7 +22,7 @@ import java.sql.Timestamp;
 import java.util.Date;
 
 import nl.clockwork.ebms.Constants.EbMSMessageStatus;
-import nl.clockwork.ebms.dao.AbstractEbMSDAO;
+import nl.clockwork.ebms.dao.spring.AbstractEbMSDAO;
 
 import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -43,7 +43,6 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 		private String serviceType;
 		private String service;
 		private String action;
-		private byte[] original;
 		private String signature;
 		private String messageHeader;
 		private String syncReply;
@@ -80,7 +79,6 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 			this.serviceType = serviceType;
 			this.service = service;
 			this.action = action;
-			this.original = original;
 			this.signature = signature;
 			this.messageHeader = messageHeader;
 			this.syncReply = syncReply;
@@ -107,7 +105,6 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 					"service_type," +
 					"service," +
 					"action," +
-					"original," +
 					"signature," +
 					"message_header," +
 					"sync_reply," +
@@ -116,7 +113,7 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 					"content," +
 					"status," +
 					"status_time" +
-				") values (seq_ebms_message_id.nextval,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?," + (status == null ? "null" : getTimestampFunction()) + ")",
+				") values (seq_ebms_message_id.nextval,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?," + (status == null ? "null" : getTimestampFunction()) + ")",
 				//new String[]{"id"}
 				new int[]{1}
 			);
@@ -138,21 +135,20 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 			ps.setString(9,serviceType);
 			ps.setString(10,service);
 			ps.setString(11,action);
-			ps.setBytes(12,original);
-			ps.setString(13,signature);
-			ps.setString(14,messageHeader);
-			ps.setString(15,syncReply);
-			ps.setString(16,messageOrder);
-			ps.setString(17,ackRequested);
-			ps.setString(18,content);
+			ps.setString(12,signature);
+			ps.setString(13,messageHeader);
+			ps.setString(14,syncReply);
+			ps.setString(15,messageOrder);
+			ps.setString(16,ackRequested);
+			ps.setString(17,content);
 			if (status == null)
-				ps.setNull(19,java.sql.Types.INTEGER);
+				ps.setNull(18,java.sql.Types.INTEGER);
 			else
-				ps.setInt(19,status.id());
-			//ps.setString(20,status == null ? null : String.format(getDateFormat(),timestamp));
-			//ps.setTimestamp(20,status == null ? null : new Timestamp(timestamp.getTime()));
-			//ps.setObject(20,status == null ? null : timestamp,Types.TIMESTAMP);
-			//ps.setObject(20,status == null ? null : timestamp);
+				ps.setInt(18,status.id());
+			//ps.setString(19,status == null ? null : String.format(getDateFormat(),timestamp));
+			//ps.setTimestamp(19,status == null ? null : new Timestamp(timestamp.getTime()));
+			//ps.setObject(19,status == null ? null : timestamp,Types.TIMESTAMP);
+			//ps.setObject(19,status == null ? null : timestamp);
 			return ps;
 		}
 	}

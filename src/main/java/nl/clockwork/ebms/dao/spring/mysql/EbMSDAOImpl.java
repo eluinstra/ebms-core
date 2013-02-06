@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  ******************************************************************************/
-package nl.clockwork.ebms.dao.mssql;
+package nl.clockwork.ebms.dao.spring.mysql;
 
 import nl.clockwork.ebms.Constants.EbMSMessageStatus;
-import nl.clockwork.ebms.dao.AbstractEbMSDAO;
+import nl.clockwork.ebms.dao.spring.AbstractEbMSDAO;
 
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.support.TransactionTemplate;
@@ -36,32 +36,23 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 //	@Override
 //	public String getDateFormat()
 //	{
-//		return "%1$tY-%1$tm-%1$td %1$tH:%1$tM:%1$tS:%1$tL";
+//		return "%1$tY-%1$tm-%1$td %1$tH:%1$tM:%1$tS";
 //	}
 
 	@Override
 	public String getTimestampFunction()
 	{
-		return "GETDATE()";
+		return "NOW()";
 	}
 
 	@Override
 	public String getMessageIdsQuery(String messageContextFilter, EbMSMessageStatus status, int maxNr)
 	{
-		return "select top " + maxNr + " message_id" +
+		return "select message_id" +
 		" from ebms_message" +
 		" where status = " + status.id() +
 		messageContextFilter +
-		" order by time_stamp asc";
-//		return "select message_id" +
-//		" from (" +
-//			" select message_id, ROW_NUMBER() OVER (order by time_stamp asc) as rownum" +
-//			" from ebms_message" +
-//			" where status = " + EbMSMessageStatus.RECEIVED.id() +
-//			messageContextFilter +
-//		" ) as tmpTable" +
-//		//" where tmpTable.rownum between 0 and " + maxNr;
-//		" where tmpTable.rownum < " + maxNr;
+		" order by time_stamp asc" +
+		" limit " + maxNr;
 	}
-
 }

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  ******************************************************************************/
-package nl.clockwork.ebms.dao;
+package nl.clockwork.ebms.dao.spring;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -34,6 +34,9 @@ import nl.clockwork.ebms.Constants.EbMSAction;
 import nl.clockwork.ebms.Constants.EbMSEventStatus;
 import nl.clockwork.ebms.Constants.EbMSMessageStatus;
 import nl.clockwork.ebms.common.util.XMLMessageBuilder;
+import nl.clockwork.ebms.dao.DAOException;
+import nl.clockwork.ebms.dao.DAOTransactionCallback;
+import nl.clockwork.ebms.dao.EbMSDAO;
 import nl.clockwork.ebms.model.EbMSAttachment;
 import nl.clockwork.ebms.model.EbMSMessage;
 import nl.clockwork.ebms.model.EbMSMessageContext;
@@ -105,7 +108,6 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	
 	protected TransactionTemplate transactionTemplate;
 	protected JdbcTemplate jdbcTemplate;
-
 	//public abstract String getDateFormat();
 	public abstract String getTimestampFunction();
 	
@@ -553,7 +555,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 				" status_time = NOW()" +
 				" where ebms_message_id = ?" +
 				" and time = ?",
-				status.ordinal(),
+				status.id(),
 				id,
 				timestamp
 			);
@@ -576,7 +578,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 				"and status = ?",
 				id,
 				timestamp,
-				status.ordinal()
+				status.id()
 			);
 		}
 		catch (DataAccessException e)
@@ -819,7 +821,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	}
 
 	@Override
-	public void deleteSendEvents(Long id) throws DAOException
+	public void deleteSendEvents(Long id, EbMSEventStatus status) throws DAOException
 	{
 		try
 		{
@@ -827,8 +829,9 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 			(
 				"delete from ebms_send_event" +
 				" where ebms_message_id = ?" +
-				" and status = 0",
-				id
+				" and status = ?",
+				id,
+				status.id()
 			);
 		}
 		catch (DataAccessException e)

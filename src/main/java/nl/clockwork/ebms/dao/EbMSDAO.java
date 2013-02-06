@@ -29,6 +29,8 @@ import nl.clockwork.ebms.model.ebxml.Service;
 
 public interface EbMSDAO
 {
+	void executeTransaction(DAOTransactionCallback callback);
+
 	boolean existsCPA(String cpaId) throws DAOException;
 	CollaborationProtocolAgreement getCPA(String cpaId) throws DAOException;
 	List<String> getCPAIds() throws DAOException;
@@ -45,8 +47,6 @@ public interface EbMSDAO
 	EbMSMessage getMessage(long id) throws DAOException;
 	EbMSMessageStatus getMessageStatus(String messageId) throws DAOException;
 
-	void executeTransaction(DAOTransactionCallback callback);
-
 	List<EbMSSendEvent> selectEventsForSending(Date timestamp) throws DAOException;
 	void updateSendEvent(Date timestamp, Long id, EbMSEventStatus status) throws DAOException;
 	void deleteEventsBefore(Date timestamp, Long id, EbMSEventStatus status) throws DAOException;
@@ -56,7 +56,7 @@ public interface EbMSDAO
 	void insertSendEvent(long id) throws DAOException;
 	void insertSendEvent(long id, EbMSSendEvent sendEvent) throws DAOException;
 	void insertSendEvents(long id, List<EbMSSendEvent> sendEvents) throws DAOException;
-	void deleteSendEvents(Long id) throws DAOException;
+	void deleteSendEvents(Long id, EbMSEventStatus status) throws DAOException;
 
 	List<String> getMessageIds(EbMSMessageContext messageContext, EbMSMessageStatus status) throws DAOException;
 	List<String> getMessageIds(EbMSMessageContext messageContext, EbMSMessageStatus status, int maxNr) throws DAOException;
