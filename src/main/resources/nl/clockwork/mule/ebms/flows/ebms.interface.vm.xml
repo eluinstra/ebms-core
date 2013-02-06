@@ -32,12 +32,12 @@
 >
 	<beans xmlns="http://www.springframework.org/schema/beans">
 	
-		<!--bean id="messageProcessingJob" class="nl.clockwork.mule.ebms.job.EbMSMessageProcessingJob">
+		<bean id="messageProcessingJob" class="nl.clockwork.mule.ebms.job.EbMSMessageProcessingJob">
 			<property name="ebMSMessageService" ref="ebMSMessageService"/>
 			<property name="delegatePath" value="${ebms.delegate.out}"/>
-		</bean-->
+		</bean>
 		
-		<bean id="muleJobScheduler" class="nl.clockwork.ebms.job.JobScheduler" init-method="init" destroy-method="destroy">
+		<!--bean id="muleJobScheduler" class="nl.clockwork.ebms.job.JobScheduler" init-method="init" destroy-method="destroy">
 			<property name="delay" value="${jobScheduler.delay}"/>
 			<property name="period" value="${jobScheduler.period}"/>
 			<property name="jobs">
@@ -50,29 +50,21 @@
 		<bean id="processEbMSMessages" class="nl.clockwork.mule.ebms.job.EbMSMessageProcessing">
 			<property name="ebMSMessageService" ref="ebMSMessageService"/>
 			<property name="delegatePath" value="${ebms.delegate.out}"/>
-		</bean>
+		</bean-->
 		
 	</beans>
 
-	<!--model name="content.send">
+	<model name="content.send">
 
 		<service name="ebms.content.send">
 			<inbound>
-				<quartz:inbound-endpoint jobName="messageProcessingJob1" startDelay="10000" repeatInterval="10000" repeatCount="-1">
-					<quartz:event-generator-job/>
+				<quartz:inbound-endpoint jobName="messageProcessingJob" startDelay="10000" repeatInterval="10000">
+					<quartz:custom-job job-ref="messageProcessingJob"/>
 				</quartz:inbound-endpoint>
 			</inbound>
-			<log-component/>
-			<outbound>
-				<pass-through-router>
-					<quartz:outbound-endpoint jobName="messageProcessingJob" startDelay="10000" repeatInterval="10000">
-						<quartz:custom-job job-ref="messageProcessingJob"/>
-					</quartz:outbound-endpoint>
-				</pass-through-router>
-			</outbound>
 		</service>
 
-	</model-->
+	</model>
 
 	<model name="content.receive">
 
