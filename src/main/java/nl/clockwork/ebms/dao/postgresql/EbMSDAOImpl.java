@@ -19,40 +19,14 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
-import java.sql.Timestamp;
-import java.util.Date;
 
 import javax.sql.DataSource;
-import javax.xml.bind.JAXBException;
 
-import nl.clockwork.ebms.Constants;
-import nl.clockwork.ebms.Constants.EbMSAction;
 import nl.clockwork.ebms.Constants.EbMSMessageStatus;
-import nl.clockwork.ebms.common.util.XMLMessageBuilder;
-import nl.clockwork.ebms.dao.DAOException;
 import nl.clockwork.ebms.dao.AbstractEbMSDAO;
-import nl.clockwork.ebms.model.EbMSAttachment;
-import nl.clockwork.ebms.model.EbMSMessage;
-import nl.clockwork.ebms.model.ebxml.AckRequested;
-import nl.clockwork.ebms.model.ebxml.Acknowledgment;
-import nl.clockwork.ebms.model.ebxml.ErrorList;
-import nl.clockwork.ebms.model.ebxml.Manifest;
-import nl.clockwork.ebms.model.ebxml.MessageHeader;
-import nl.clockwork.ebms.model.ebxml.MessageOrder;
-import nl.clockwork.ebms.model.ebxml.StatusRequest;
-import nl.clockwork.ebms.model.ebxml.StatusResponse;
-import nl.clockwork.ebms.model.ebxml.SyncReply;
-import nl.clockwork.ebms.model.xml.dsig.SignatureType;
 
-import org.apache.commons.io.IOUtils;
 import org.springframework.dao.DataAccessException;
-import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.ResultSetExtractor;
-import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.TransactionStatus;
-import org.springframework.transaction.support.TransactionCallback;
-import org.springframework.transaction.support.TransactionTemplate;
 
 public class EbMSDAOImpl extends AbstractEbMSDAO
 {
