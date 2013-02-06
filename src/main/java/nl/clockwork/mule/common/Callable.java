@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  ******************************************************************************/
-package nl.clockwork.mule.common.component;
+package nl.clockwork.mule.common;
 
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleMessage;

@@ -11,27 +11,24 @@ import nl.clockwork.ebms.model.EbMSDocument;
 import nl.clockwork.ebms.processor.EbMSMessageProcessor;
 import nl.clockwork.ebms.server.EbMSMessageReader;
 import nl.clockwork.ebms.server.EbMSMessageReaderImpl;
+import nl.clockwork.mule.common.Callable;
 
 import org.apache.commons.httpclient.ContentLengthInputStream;
 import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpVersion;
 import org.mule.api.MuleEvent;
-import org.mule.api.MuleEventContext;
 import org.mule.api.MuleMessage;
-import org.mule.api.lifecycle.Callable;
 import org.mule.api.transport.OutputHandler;
 import org.mule.transport.http.HttpConstants;
 import org.mule.transport.http.HttpResponse;
 
-public class EbMSHttpHandler implements Callable
+public class EbMSHttpHandler extends Callable
 {
 	private EbMSMessageProcessor ebMSMessageProcessor;
 
 	@Override
-	public Object onCall(MuleEventContext eventContext) throws Exception
+	public Object onCall(MuleMessage message) throws Exception
 	{
-		
-		MuleMessage message = eventContext.getMessage();
   	ContentLengthInputStream request = (ContentLengthInputStream)message.getPayload();
   	HttpResponse response = new HttpResponse();
 		if (Constants.EBMS_SOAP_ACTION.equals(getHeader(message,"SOAPAction")))

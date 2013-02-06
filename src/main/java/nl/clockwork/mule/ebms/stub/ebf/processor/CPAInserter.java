@@ -13,7 +13,7 @@ import javax.xml.validation.Validator;
 
 import nl.clockwork.ebms.iface.CPAService;
 import nl.clockwork.ebms.iface.CPAServiceException;
-import nl.clockwork.mule.common.component.Callable;
+import nl.clockwork.mule.common.Callable;
 
 import org.mule.api.MuleMessage;
 import org.xml.sax.SAXException;
