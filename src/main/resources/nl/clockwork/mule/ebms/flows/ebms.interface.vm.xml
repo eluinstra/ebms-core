@@ -58,18 +58,10 @@
 
 		<service name="ebms.content.send">
 			<inbound>
-				<quartz:inbound-endpoint jobName="messageProcessingJob1" startDelay="10000" repeatInterval="10000" repeatCount="-1">
-					<quartz:event-generator-job/>
-				</quartz:inbound-endpoint>
+				<quartz:outbound-endpoint jobName="messageProcessingJob" startDelay="10000" repeatInterval="10000">
+					<quartz:custom-job job-ref="messageProcessingJob"/>
+				</quartz:outbound-endpoint>
 			</inbound>
-			<log-component/>
-			<outbound>
-				<pass-through-router>
-					<quartz:outbound-endpoint jobName="messageProcessingJob" startDelay="10000" repeatInterval="10000">
-						<quartz:custom-job job-ref="messageProcessingJob"/>
-					</quartz:outbound-endpoint>
-				</pass-through-router>
-			</outbound>
 		</service>
 
 	</model-->

@@ -53,11 +53,13 @@
 			</property>
 		</bean>
 
-		<import resource="classpath:nl/clockwork/mule/ebms/components/constants.xml" />
+		<import resource="classpath:nl/clockwork/ebms/processor.xml" />
+		<import resource="classpath:nl/clockwork/ebms/interface.xml" />
 
-		<import resource="classpath:nl/clockwork/mule/ebms/components/connector.http.xml" />
-		<!--import resource="classpath:nl/clockwork/mule/ebms/components/connector.https.xml" /-->
 		<import resource="classpath:nl/clockwork/mule/ebms/components/connector.xml" />
+
+		<import resource="classpath:nl/clockwork/mule/ebms/flows/ebms.endpoint.http.xml" />
+		<!--import resource="classpath:nl/clockwork/mule/ebms/flows/ebms.endpoint.https.xml" /-->
 
 		<import resource="classpath:nl/clockwork/ebms/dao/datasource.xml" />
 		<import resource="classpath:nl/clockwork/ebms/dao/hsqldb.xml" />
@@ -67,11 +69,7 @@
 		<!--import resource="classpath:nl/clockwork/ebms/dao/mssql.xml" /-->
 		<!--import resource="classpath:nl/clockwork/ebms/dao/oracle.xml" /-->
 
-		<import resource="classpath:nl/clockwork/mule/ebms/flows/ebms.endpoint.cxf.normal.xml" />
-		<!--import resource="classpath:nl/clockwork/mule/ebms/flows/ebms.endpoint.cxf.oracle.xml" /-->
-		<import resource="classpath:nl/clockwork/mule/ebms/flows/ebms.receive.xml" />
-		<import resource="classpath:nl/clockwork/mule/ebms/flows/ebms.send.xml" />
-		<import resource="classpath:nl/clockwork/mule/ebms/flows/ebms.content.adapter.cxf.xml" />
+		<import resource="classpath:nl/clockwork/mule/ebms/flows/ebms.interface.cxf.xml" />
 
 	</spring:beans>
 

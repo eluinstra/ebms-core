@@ -84,7 +84,7 @@ public class EbMSHttpHandler extends Callable
 	{
 		Map<String,String> result = new HashMap<String,String>();
 		for (Object name : message.getPropertyNames(PropertyScope.INBOUND))
-			result.put((String)name,(String)message.getProperty((String)name));
+			result.put((String)name,(String)message.getProperty((String)name,PropertyScope.INBOUND));
 		return result;
 	}
 

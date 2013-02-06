@@ -52,18 +52,17 @@
 			</property>
 		</bean>
 
-		<import resource="classpath:nl/clockwork/mule/ebms/components/constants.xml" />
+		<import resource="classpath:nl/clockwork/ebms/processor.xml" />
+		<import resource="classpath:nl/clockwork/ebms/interface.xml" />
 
-		<import resource="classpath:nl/clockwork/mule/ebms/components/connector.${ebms.protocol}.xml" />
 		<import resource="classpath:nl/clockwork/mule/ebms/components/connector.xml" />
+
+		<import resource="classpath:nl/clockwork/mule/ebms/flows/ebms.endpoint.${ebms.protocol}.xml" />
 
 		<import resource="classpath:nl/clockwork/ebms/dao/datasource.xml" />
 		<import resource="classpath:nl/clockwork/ebms/dao/${ebms.database}.xml" />
 
-		<import resource="classpath:nl/clockwork/mule/ebms/flows/ebms.endpoint.cxf.${ebms.mode}.xml" />
-		<import resource="classpath:nl/clockwork/mule/ebms/flows/ebms.receive.xml" />
-		<import resource="classpath:nl/clockwork/mule/ebms/flows/ebms.send.xml" />
-		<import resource="classpath:nl/clockwork/mule/ebms/flows/ebms.content.adapter.cxf.xml" />
+		<import resource="classpath:nl/clockwork/mule/ebms/flows/ebms.interface.cxf.xml" />
 
 	</spring:beans>
 
