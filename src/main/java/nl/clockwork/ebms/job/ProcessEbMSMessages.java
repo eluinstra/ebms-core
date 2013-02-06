@@ -40,7 +40,7 @@ public class ProcessEbMSMessages implements Job
 	}
 	
 	@Override
-	public void run()
+	public void execute()
 	{
 		List<String> messageIds = ebMSMessageService.getMessageIds(null,null);
 		for (final String messageId : messageIds)

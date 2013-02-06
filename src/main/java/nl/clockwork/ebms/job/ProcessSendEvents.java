@@ -58,7 +58,7 @@ public class ProcessSendEvents implements Job
 	}
 	
   @Override
-  public void run()
+  public void execute()
   {
   	GregorianCalendar timestamp = new GregorianCalendar();
   	List<EbMSSendEvent> sendEvents = ebMSDAO.selectEventsForSending(timestamp.getTime());
