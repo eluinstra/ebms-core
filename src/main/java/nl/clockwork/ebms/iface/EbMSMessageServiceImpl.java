@@ -40,7 +40,7 @@ public class EbMSMessageServiceImpl implements EbMSMessageService
 	private String hostname;
 
 	@Override
-	public String sendMessage(EbMSMessageContent messageContent)
+	public String sendMessage(EbMSMessageContent messageContent) throws EbMSMessageServiceException
 	{
 		try
 		{
@@ -70,7 +70,7 @@ public class EbMSMessageServiceImpl implements EbMSMessageService
 	}
 
 	@Override
-	public List<String> getMessageIds(EbMSMessageContext messageContext, Integer maxNr)
+	public List<String> getMessageIds(EbMSMessageContext messageContext, Integer maxNr) throws EbMSMessageServiceException
 	{
 		try
 		{
@@ -89,7 +89,7 @@ public class EbMSMessageServiceImpl implements EbMSMessageService
 	}
 
 	@Override
-	public EbMSMessageContent getMessage(String messageId, Boolean process)
+	public EbMSMessageContent getMessage(String messageId, Boolean process) throws EbMSMessageServiceException
 	{
 		try
 		{
@@ -112,7 +112,7 @@ public class EbMSMessageServiceImpl implements EbMSMessageService
 	}
 
 	@Override
-	public boolean processMessage(String messageId)
+	public boolean processMessage(String messageId) throws EbMSMessageServiceException
 	{
 		try
 		{
@@ -128,7 +128,7 @@ public class EbMSMessageServiceImpl implements EbMSMessageService
 	}
 
 	@Override
-	public boolean processMessages(List<String> messageIds)
+	public boolean processMessages(List<String> messageIds) throws EbMSMessageServiceException
 	{
 		try
 		{

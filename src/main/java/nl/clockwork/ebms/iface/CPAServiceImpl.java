@@ -16,16 +16,23 @@ public class CPAServiceImpl implements CPAService
 {
   protected transient Log logger = LogFactory.getLog(getClass());
 	private EbMSDAO ebMSDAO;
+	private Object cpaMonitor = new Object();
 
 	@Override
-	public boolean insertCPA(/*CollaborationProtocolAgreement*/String cpa_, Boolean overwrite)
+	public boolean insertCPA(/*CollaborationProtocolAgreement*/String cpa_, Boolean overwrite) throws CPAServiceException
 	{
 		try
 		{
 			CollaborationProtocolAgreement cpa = XMLMessageBuilder.getInstance(CollaborationProtocolAgreement.class).handle(cpa_);
-			boolean result = ebMSDAO.insertCPA(cpa);
-			if (!result && (overwrite == null || overwrite == true))
-				result = ebMSDAO.updateCPA(cpa);
+			boolean result = false;
+			synchronized (cpaMonitor)
+			{
+				if (ebMSDAO.existsCPA(cpa.getCpaid()))
+					if (overwrite)
+						result = ebMSDAO.updateCPA(cpa);
+					else
+						result = ebMSDAO.insertCPA(cpa);
+			}
 			return result;
 		}
 		catch (DAOException e)
@@ -43,11 +50,14 @@ public class CPAServiceImpl implements CPAService
 	}
 
 	@Override
-	public boolean deleteCPA(String cpaId)
+	public boolean deleteCPA(String cpaId) throws CPAServiceException
 	{
 		try
 		{
-			return ebMSDAO.deleteCPA(cpaId);
+			synchronized(cpaMonitor)
+			{
+				return ebMSDAO.deleteCPA(cpaId);
+			}
 		}
 		catch (DAOException e)
 		{
@@ -58,7 +68,7 @@ public class CPAServiceImpl implements CPAService
 	}
 
 	@Override
-	public List<String> getCPAIds()
+	public List<String> getCPAIds() throws CPAServiceException
 	{
 		try
 		{
@@ -73,7 +83,7 @@ public class CPAServiceImpl implements CPAService
 	}
 
 	@Override
-	public /*CollaborationProtocolAgreement*/String getCPA(String cpaId)
+	public /*CollaborationProtocolAgreement*/String getCPA(String cpaId) throws CPAServiceException
 	{
 		try
 		{

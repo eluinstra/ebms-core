@@ -27,18 +27,18 @@ public interface CPAService
 {
 	@WebResult(name="Result")
 	@WebMethod(operationName="InsertCPA")
-	boolean insertCPA(@WebParam(name="CPA") /*CollaborationProtocolAgreement*/String cpa, @WebParam(name="Overwrite") Boolean overwrite);
+	boolean insertCPA(@WebParam(name="CPA") /*CollaborationProtocolAgreement*/String cpa, @WebParam(name="Overwrite") Boolean overwrite) throws CPAServiceException;
 
 	@WebResult(name="Result")
 	@WebMethod(operationName="DeleteCPA")
-	boolean deleteCPA(@WebParam(name="CPAId") String cpaId);
+	boolean deleteCPA(@WebParam(name="CPAId") String cpaId) throws CPAServiceException;
 
 	@WebResult(name="MessageIds")
 	@WebMethod(operationName="GetCPAIds")
-	List<String> getCPAIds();
+	List<String> getCPAIds() throws CPAServiceException;
 
 	@WebResult(name="CPA")
 	@WebMethod(operationName="GetCPA")
-	/*CollaborationProtocolAgreement*/String getCPA(@WebParam(name="CPAId") String cpaId);
+	/*CollaborationProtocolAgreement*/String getCPA(@WebParam(name="CPAId") String cpaId) throws CPAServiceException;
 
 }

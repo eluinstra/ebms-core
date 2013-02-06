@@ -30,26 +30,26 @@ public interface EbMSMessageService
 {
 	@WebResult(name="MessageId")
 	@WebMethod(operationName="SendMessage")
-	String sendMessage(@WebParam(name="Message") EbMSMessageContent messageContent);
+	String sendMessage(@WebParam(name="Message") EbMSMessageContent messageContent) throws EbMSMessageServiceException;
 
 	@WebResult(name="MessageId")
 	@WebMethod(operationName="GetMessageIds")
-	List<String> getMessageIds(@WebParam(name="MessageContext") EbMSMessageContext messageContext, @WebParam(name="MaxNr") Integer maxNr);
+	List<String> getMessageIds(@WebParam(name="MessageContext") EbMSMessageContext messageContext, @WebParam(name="MaxNr") Integer maxNr) throws EbMSMessageServiceException;
 
 	@WebResult(name="Message")
 	@WebMethod(operationName="GetMessage")
-	EbMSMessageContent getMessage(@WebParam(name="MessageId") String messageId, @WebParam(name="Process") Boolean process);
+	EbMSMessageContent getMessage(@WebParam(name="MessageId") String messageId, @WebParam(name="Process") Boolean process) throws EbMSMessageServiceException;
 
 	//@WebResult(name="Message")
 	//@WebMethod(operationName="GetRefToMessage")
-	//EbMSMessageContent getRefToMessage(@WebParam(name="MessageId") String messageId, @WebParam(name="Process") Boolean process);
+	//EbMSMessageContent getRefToMessage(@WebParam(name="MessageId") String messageId, @WebParam(name="Process") Boolean process) throws EbMSMessageServiceException;
 
 	@WebResult(name="Result")
 	@WebMethod(operationName="ProcessMessage")
-	boolean processMessage(@WebParam(name="MessageId") String messageId);
+	boolean processMessage(@WebParam(name="MessageId") String messageId) throws EbMSMessageServiceException;
 
 	@WebResult(name="Result")
 	@WebMethod(operationName="ProcessMessages")
-	boolean processMessages(@WebParam(name="MessageId") List<String> messageIds);
+	boolean processMessages(@WebParam(name="MessageId") List<String> messageIds) throws EbMSMessageServiceException;
 
 }
