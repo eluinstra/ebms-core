@@ -30,6 +30,7 @@ import javax.xml.xpath.XPathExpressionException;
 
 import nl.clockwork.ebms.Constants;
 import nl.clockwork.ebms.Constants.EbMSAction;
+import nl.clockwork.ebms.Constants.EbMSEventStatus;
 import nl.clockwork.ebms.Constants.EbMSMessageStatus;
 import nl.clockwork.ebms.common.util.XMLMessageBuilder;
 import nl.clockwork.ebms.dao.DAOTransactionCallback;
@@ -170,7 +171,16 @@ public class EbMSMessageProcessorImpl implements EbMSMessageProcessor
 						}
 						else
 						{
-							ebMSDAO.insertMessage(timestamp.getTime(),message,EbMSMessageStatus.RECEIVED);
+							ebMSDAO.executeTransaction(
+								new DAOTransactionCallback()
+								{
+									@Override
+									public void doInTransaction()
+									{
+										ebMSDAO.insertMessage(timestamp.getTime(),message,EbMSMessageStatus.RECEIVED);
+									}
+								}
+							);
 							return null;
 						}
 					}
@@ -339,7 +349,7 @@ public class EbMSMessageProcessorImpl implements EbMSMessageProcessor
 						Long id = ebMSDAO.getMessageId(message.getMessageHeader().getMessageData().getRefToMessageId());
 						if (id != null)
 						{
-							ebMSDAO.deleteSendEvents(id);
+							ebMSDAO.deleteSendEvents(id,EbMSEventStatus.UNPROCESSED);
 							ebMSDAO.updateMessageStatus(id,null,status);
 						}
 					}
