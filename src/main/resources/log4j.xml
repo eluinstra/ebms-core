@@ -43,7 +43,7 @@
 		<!--appender-ref ref="FILE"/-->
 	</appender>
 
-	<logger name="nl.clockwork" additivity="false">
+	<logger name="nl.clockwork.ebms" additivity="false">
 		<level value="info"/>
 		<appender-ref ref="ASYNC"/>
 	</logger>
@@ -144,7 +144,7 @@
 	</logger>
 
 	<root>
-		<priority value="error"/>
+		<priority value="info"/>
 		<appender-ref ref="ASYNC"/>
 	</root>
 

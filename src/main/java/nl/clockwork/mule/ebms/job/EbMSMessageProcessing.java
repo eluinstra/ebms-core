@@ -22,7 +22,6 @@ public class EbMSMessageProcessing implements Job, MuleContextAware
 	@Override
 	public void execute()
 	{
-		logger.info("Executing job: " + this.getClass());
 		try
 		{
 			MuleClient client = new MuleClient(muleContext);
