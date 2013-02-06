@@ -13,13 +13,12 @@ import javax.xml.validation.Validator;
 
 import nl.clockwork.ebms.iface.CPAService;
 import nl.clockwork.ebms.iface.CPAServiceException;
+import nl.clockwork.mule.common.component.Callable;
 
-import org.mule.api.MuleEventContext;
 import org.mule.api.MuleMessage;
-import org.mule.api.lifecycle.Callable;
 import org.xml.sax.SAXException;
 
-public class CPAInserter implements Callable
+public class CPAInserter extends Callable
 {
 	private Schema schema;
 	private CPAService cpaService;
@@ -34,14 +33,11 @@ public class CPAInserter implements Callable
 	}
 	
 	@Override
-	public Object onCall(MuleEventContext eventContext) throws Exception
+	public Object onCall(MuleMessage message) throws Exception
 	{
-		MuleMessage message = eventContext.getMessage();
 		try
 		{
-			//String cpa = (String)message.getPayload();
-			//String cpa = IOUtils.toString((InputStream)message.getPayload());
-			String cpa = message.getPayloadAsString();
+			String cpa = (String)message.getPayload();
 			//quick fix for synchronization problem with validate() method
 			synchronized (validatorMonitor)
 			{

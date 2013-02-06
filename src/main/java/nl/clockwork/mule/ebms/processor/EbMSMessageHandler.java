@@ -9,27 +9,25 @@ import nl.clockwork.ebms.processor.EbMSMessageProcessor;
 import nl.clockwork.ebms.processor.EbMSProcessorException;
 import nl.clockwork.ebms.server.EbMSInputStreamHandler;
 import nl.clockwork.ebms.server.EbMSInputStreamHandlerImpl;
+import nl.clockwork.mule.common.component.Callable;
 
 import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpVersion;
 import org.apache.commons.httpclient.ProtocolException;
 import org.mule.api.MuleEvent;
-import org.mule.api.MuleEventContext;
 import org.mule.api.MuleMessage;
-import org.mule.api.lifecycle.Callable;
 import org.mule.api.transport.OutputHandler;
 import org.mule.transport.http.HttpConstants;
 import org.mule.transport.http.HttpRequest;
 import org.mule.transport.http.HttpResponse;
 
-public class EbMSMessageHandler implements Callable
+public class EbMSMessageHandler extends Callable
 {
 	private EbMSMessageProcessor ebMSMessageProcessor;
 
 	@Override
-	public Object onCall(MuleEventContext eventContext) throws Exception
+	public Object onCall(MuleMessage message) throws Exception
 	{
-		MuleMessage message = eventContext.getMessage();
   	final HttpRequest request = (HttpRequest)message.getPayload();
   	final HttpResponse response = new HttpResponse();
 		response.setBody(new OutputHandler()
