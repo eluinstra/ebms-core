@@ -46,7 +46,7 @@
 				<http:inbound-endpoint connector-ref="connector.http.ebms.in" address="http://${service.host}:${service.port}${service.url}" synchronous="true"/>
 			</inbound>
 			<component>
-				<singleton-object class="nl.clockwork.mule.ebms.processor.EbMSHttpHandler">
+				<singleton-object class="nl.clockwork.mule.ebms.processor.EbMSInputStreamHandler">
 					<property key="ebMSMessageProcessor" value-ref="messageProcessor"/>
 				</singleton-object>
 			</component>
