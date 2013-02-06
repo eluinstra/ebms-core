@@ -62,7 +62,7 @@ import nl.clockwork.ebms.util.EbMSMessageUtils;
 import nl.clockwork.ebms.validation.CPAValidator;
 import nl.clockwork.ebms.validation.ManifestValidator;
 import nl.clockwork.ebms.validation.MessageHeaderValidator;
-import nl.clockwork.ebms.validation.SignatureValidator;
+import nl.clockwork.ebms.validation.SignatureTypeValidator;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -73,12 +73,12 @@ public class EbMSMessageProcessorImpl implements EbMSMessageProcessor
 {
   protected transient Log logger = LogFactory.getLog(getClass());
   private EbMSDAO ebMSDAO;
-  private EbMSSignatureValidator ebMSSignatureValidator;
+  private EbMSSignatureValidator signatureValidator;
   private String hostname;
   private CPAValidator cpaValidator;
   private MessageHeaderValidator messageHeaderValidator;
   private ManifestValidator manifestValidator;
-  private SignatureValidator signatureValidator;
+  private SignatureTypeValidator signatureTypeValidator;
   private Service service;
   
 	public void init()
@@ -86,7 +86,7 @@ public class EbMSMessageProcessorImpl implements EbMSMessageProcessor
 		cpaValidator = new CPAValidator();
 		messageHeaderValidator = new MessageHeaderValidator(ebMSDAO);
 		manifestValidator = new ManifestValidator();
-		signatureValidator = new SignatureValidator(ebMSSignatureValidator);
+		signatureTypeValidator = new SignatureTypeValidator(signatureValidator);
 		service = new Service();
 		service.setValue(Constants.EBMS_SERVICE_URI);
 	}
@@ -127,9 +127,9 @@ public class EbMSMessageProcessorImpl implements EbMSMessageProcessor
 					CollaborationProtocolAgreement cpa = ebMSDAO.getCPA(messageHeader.getCPAId());
 					if (cpaValidator.isValid(errorList,cpa,messageHeader,timestamp)
 						&& messageHeaderValidator.isValid(errorList,cpa,messageHeader,message.getAckRequested(),message.getSyncReply(),message.getMessageOrder(),timestamp)
-						&& signatureValidator.isValid(errorList,cpa,messageHeader,message.getSignature())
+						&& signatureTypeValidator.isValid(errorList,cpa,messageHeader,message.getSignature())
 						&& manifestValidator.isValid(errorList,message.getManifest(),message.getAttachments())
-						&& signatureValidator.isValid(errorList,cpa,document,messageHeader)
+						&& signatureTypeValidator.isValid(errorList,cpa,document,messageHeader)
 					)
 					{
 						logger.info("Message valid.");
@@ -502,9 +502,9 @@ public class EbMSMessageProcessorImpl implements EbMSMessageProcessor
 		this.ebMSDAO = ebMSDAO;
 	}
 	
-	public void setEbMSSignatureValidator(EbMSSignatureValidator ebMSSignatureValidator)
+	public void setSignatureValidator(EbMSSignatureValidator signatureValidator)
 	{
-		this.ebMSSignatureValidator = ebMSSignatureValidator;
+		this.signatureValidator = signatureValidator;
 	}
 	
 	public void setHostname(String hostname)

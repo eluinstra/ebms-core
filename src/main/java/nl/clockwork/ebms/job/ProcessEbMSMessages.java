@@ -21,7 +21,7 @@ import java.util.concurrent.Executors;
 
 import nl.clockwork.ebms.iface.EbMSMessageService;
 import nl.clockwork.ebms.model.EbMSMessageContent;
-import nl.clockwork.ebms.processor.EbMSProcessMessageCallback;
+import nl.clockwork.ebms.processor.ProcessEbMSMessageCallback;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -31,8 +31,8 @@ public class ProcessEbMSMessages implements Job
   protected transient Log logger = LogFactory.getLog(getClass());
   private ExecutorService executorService;
 	private int maxThreads = 4;
-  private EbMSMessageService ebMSMessageService;
-  private EbMSProcessMessageCallback ebMSProcessMessageCallback;
+  private EbMSMessageService messageService;
+  private ProcessEbMSMessageCallback processMessageCallback;
   
 	public void init()
 	{
@@ -42,7 +42,7 @@ public class ProcessEbMSMessages implements Job
 	@Override
 	public void execute()
 	{
-		List<String> messageIds = ebMSMessageService.getMessageIds(null,null);
+		List<String> messageIds = messageService.getMessageIds(null,null);
 		for (final String messageId : messageIds)
 		{
 			executorService.execute(
@@ -52,9 +52,9 @@ public class ProcessEbMSMessages implements Job
 					@Override
 					public void run()
 					{
-						EbMSMessageContent messageContent = ebMSMessageService.getMessage(messageId,false);
-						ebMSProcessMessageCallback.process(messageContent);
-						ebMSMessageService.processMessage(messageId);
+						EbMSMessageContent messageContent = messageService.getMessage(messageId,false);
+						processMessageCallback.process(messageContent);
+						messageService.processMessage(messageId);
 					}
 				}
 			);
@@ -66,13 +66,13 @@ public class ProcessEbMSMessages implements Job
 		this.maxThreads = maxThreads;
 	}
 	
-	public void setEbMSMessageService(EbMSMessageService ebMSMessageService)
+	public void setMessageService(EbMSMessageService messageService)
 	{
-		this.ebMSMessageService = ebMSMessageService;
+		this.messageService = messageService;
 	}
 
-	public void setEbMSProcessMessageCallback(EbMSProcessMessageCallback ebMSProcessMessageCallback)
+	public void setProcessMessageCallback(ProcessEbMSMessageCallback processMessageCallback)
 	{
-		this.ebMSProcessMessageCallback = ebMSProcessMessageCallback;
+		this.processMessageCallback = processMessageCallback;
 	}
 }

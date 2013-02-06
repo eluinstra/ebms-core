@@ -6,7 +6,7 @@ import org.apache.commons.logging.LogFactory;
 import nl.clockwork.ebms.model.EbMSDataSource;
 import nl.clockwork.ebms.model.EbMSMessageContent;
 
-public class EbMSProcessMessageCallbackImpl implements EbMSProcessMessageCallback
+public class ProcessEbMSMessageCallbackImpl implements ProcessEbMSMessageCallback
 {
   protected transient Log logger = LogFactory.getLog(getClass());
 

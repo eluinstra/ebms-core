@@ -33,12 +33,12 @@ import nl.clockwork.ebms.util.EbMSMessageUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-public class SignatureValidator
+public class SignatureTypeValidator
 {
   protected transient Log logger = LogFactory.getLog(getClass());
   private EbMSSignatureValidator ebMSSignatureValidator;
 
-	public SignatureValidator(EbMSSignatureValidator ebMSSignatureValidator)
+	public SignatureTypeValidator(EbMSSignatureValidator ebMSSignatureValidator)
 	{
 		this.ebMSSignatureValidator = ebMSSignatureValidator;
 	}
