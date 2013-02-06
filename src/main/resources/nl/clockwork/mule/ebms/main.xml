@@ -57,8 +57,12 @@
 
 		<import resource="classpath:nl/clockwork/mule/ebms/components/connector.xml" />
 
+		<import resource="classpath:nl/clockwork/mule/ebms/flows/ebms.endpoint.${ebms.protocol}.xml" />
+
 		<import resource="classpath:nl/clockwork/ebms/dao/spring/datasource.xml" />
 		<import resource="classpath:nl/clockwork/ebms/dao/spring/${ebms.database}.xml" />
+
+		<import resource="classpath:nl/clockwork/mule/ebms/flows/ebms.interface.cxf.xml" />
 
 	</spring:beans>
 
