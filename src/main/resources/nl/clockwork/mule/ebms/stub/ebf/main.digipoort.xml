@@ -27,9 +27,9 @@
 		http://www.mulesource.org/schema/mule/management/2.2 http://www.mulesource.org/schema/mule/management/2.2/mule-management.xsd
 	"
 >
-	<custom-transaction-manager class="org.mule.module.spring.transaction.SpringTransactionFactory">
+	<!--custom-transaction-manager class="org.mule.module.spring.transaction.SpringTransactionFactory">
 		<spring:property name="manager" ref="ebMSTXManager" />
-	</custom-transaction-manager>
+	</custom-transaction-manager-->
  	    
 	<management:jmx-default-config port="${jmx.port}"/>
 	<!--management:jmx-log4j /-->
