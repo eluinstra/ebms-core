@@ -24,7 +24,6 @@ import java.util.Properties;
 import javax.xml.datatype.DatatypeFactory;
 
 import nl.clockwork.ebms.common.util.XMLMessageBuilder;
-import nl.clockwork.mule.common.Callable;
 import nl.clockwork.mule.ebms.stub.ebf.model.afleveren.bericht.AfleverBericht;
 import nl.clockwork.mule.ebms.stub.ebf.model.afleveren.bericht.BerichtBijlagenType;
 import nl.clockwork.mule.ebms.stub.ebf.model.afleveren.bericht.BerichtInhoudType;
@@ -32,15 +31,19 @@ import nl.clockwork.mule.ebms.stub.ebf.model.afleveren.bericht.IdentiteitType;
 import nl.clockwork.mule.ebms.stub.util.Utils;
 
 import org.apache.commons.io.FileUtils;
+import org.mule.api.MuleEventContext;
 import org.mule.api.MuleMessage;
+import org.mule.api.lifecycle.Callable;
+import org.mule.api.transport.PropertyScope;
 
-public class AfleverBerichtGenerator extends Callable
+public class AfleverBerichtGenerator implements Callable
 {
 	private String baseDir;
 	
 	@Override
-	public Object onCall(MuleMessage message) throws Exception
+	public Object onCall(MuleEventContext eventContext) throws Exception
 	{
+		MuleMessage message = eventContext.getMessage();
 		if (message.getPayload() instanceof String)
 		{
 			Properties p = new Properties();
@@ -63,7 +66,7 @@ public class AfleverBerichtGenerator extends Callable
 			setBerichtInhoud(baseDir,afleverBericht,p.getProperty("berichtInhoud"));
 			setBerichtBijlagen(baseDir,afleverBericht,p.getProperty("berichtBijlagen").split(","));
 			String result = XMLMessageBuilder.getInstance(AfleverBericht.class).handle(afleverBericht);
-			message.setProperty("originalFilename",p.getProperty("berichtInhoud"));
+			message.setProperty("originalFilename",p.getProperty("berichtInhoud"),PropertyScope.SESSION);
 			message.setPayload(result);
 		}
 		return message;

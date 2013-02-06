@@ -15,30 +15,30 @@
   limitations under the License.
 -->
 <mule
+	xmlns="http://www.mulesoft.org/schema/mule/core" 
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
-	xmlns="http://www.mulesource.org/schema/mule/core/2.2" 
 	xmlns:spring="http://www.springframework.org/schema/beans"
 	xmlns:context="http://www.springframework.org/schema/context"
 	xmlns:util="http://www.springframework.org/schema/util"
-	xmlns:vm="http://www.mulesource.org/schema/mule/vm/2.2"
-	xmlns:jdbc="http://www.mulesource.org/schema/mule/jdbc/2.2"
-	xmlns:smtp="http://www.mulesource.org/schema/mule/smtp/2.2"
-	xmlns:file="http://www.mulesource.org/schema/mule/file/2.2" 
-	xmlns:ftp="http://www.mulesource.org/schema/mule/ftp/2.2" 
-	xmlns:mxml="http://www.mulesource.org/schema/mule/xml/2.2"
-	xmlns:script="http://www.mulesource.org/schema/mule/scripting/2.2"
+	xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
+	xmlns:jdbc="http://www.mulesoft.org/schema/mule/jdbc"
+	xmlns:smtp="http://www.mulesoft.org/schema/mule/smtp"
+	xmlns:file="http://www.mulesoft.org/schema/mule/file" 
+	xmlns:ftp="http://www.mulesoft.org/schema/mule/ftp" 
+	xmlns:mxml="http://www.mulesoft.org/schema/mule/xml"
+	xmlns:script="http://www.mulesoft.org/schema/mule/scripting"
 	xsi:schemaLocation="
-		http://www.mulesource.org/schema/mule/core/2.2 http://www.mulesource.org/schema/mule/core/2.2/mule.xsd
-		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
-		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd
+		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd
 		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.5.xsd
-		http://www.mulesource.org/schema/mule/vm/2.2 http://www.mulesource.org/schema/mule/vm/2.2/mule-vm.xsd
-		http://www.mulesource.org/schema/mule/jdbc/2.2 http://www.mulesource.org/schema/mule/jdbc/2.2/mule-jdbc.xsd
-		http://www.mulesource.org/schema/mule/smtp/2.2 http://www.mulesource.org/schema/mule/smtp/2.2/mule-smtp.xsd
-		http://www.mulesource.org/schema/mule/file/2.2 http://www.mulesource.org/schema/mule/file/2.2/mule-file.xsd
-		http://www.mulesource.org/schema/mule/ftp/2.2 http://www.mulesource.org/schema/mule/ftp/2.2/mule-ftp.xsd
-		http://www.mulesource.org/schema/mule/xml/2.2 http://www.mulesource.org/schema/mule/xml/2.2/mule-xml.xsd
-		http://www.mulesource.org/schema/mule/scripting/2.2 http://www.mulesource.org/schema/mule/scripting/2.2/mule-scripting.xsd  
+		http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.2/mule-vm.xsd
+		http://www.mulesoft.org/schema/mule/jdbc http://www.mulesoft.org/schema/mule/jdbc/3.2/mule-jdbc.xsd
+		http://www.mulesoft.org/schema/mule/smtp http://www.mulesoft.org/schema/mule/smtp/3.2/mule-smtp.xsd
+		http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/3.2/mule-file.xsd
+		http://www.mulesoft.org/schema/mule/ftp http://www.mulesoft.org/schema/mule/ftp/3.2/mule-ftp.xsd
+		http://www.mulesoft.org/schema/mule/xml http://www.mulesoft.org/schema/mule/xml/3.2/mule-xml.xsd
+		http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/3.2/mule-scripting.xsd  
 	"
 >
 
@@ -49,7 +49,7 @@
 	<model>
 
 		<default-service-exception-strategy>
-			<vm:outbound-endpoint path="file.cpa.report.in" synchronous="false">
+			<vm:outbound-endpoint path="file.cpa.report.in" exchange-pattern="one-way">
 				<script:transformer>
           <script:script engine="groovy">
 						import java.io.PrintWriter;
@@ -74,7 +74,7 @@
 
 		<service name="file.cpa.service">
 			<inbound>
-				<file:inbound-endpoint connector-ref="connector.file.ebms"	path="${dir.upload.cpa}" moveToDirectory="${dir.upload.cpa}/processed" pollingFrequency="${dir.upload.cpa.pollingFrequency}" synchronous="false">
+				<file:inbound-endpoint connector-ref="connector.file.ebms"	path="${dir.upload.cpa}" moveToDirectory="${dir.upload.cpa}/processed" pollingFrequency="${dir.upload.cpa.pollingFrequency}">
 					<file:filename-wildcard-filter pattern="*.xml" caseSensitive="false"/>
 					<!--file:file-to-string-transformer/-->
 					<object-to-string-transformer/>
@@ -87,14 +87,14 @@
 			</component>
 			<outbound>
 				<pass-through-router>
-					<vm:outbound-endpoint path="file.cpa.report.in" synchronous="false"/>
+					<vm:outbound-endpoint path="file.cpa.report.in" exchange-pattern="one-way"/>
 				</pass-through-router>
 			</outbound>
 		</service>
 
 		<service name="file.cpa.report">
 			<inbound>
-				<vm:inbound-endpoint path="file.cpa.report.in" synchronous="false" />
+				<vm:inbound-endpoint path="file.cpa.report.in" exchange-pattern="one-way"/>
 			</inbound>
 			<outbound>
 				<pass-through-router>

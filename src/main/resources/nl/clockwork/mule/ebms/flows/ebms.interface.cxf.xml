@@ -14,21 +14,19 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 -->
-<mule xmlns="http://www.mulesource.org/schema/mule/core/2.2"
+<mule xmlns="http://www.mulesoft.org/schema/mule/core"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xmlns:spring="http://www.springframework.org/schema/beans"
-	xmlns:http="http://www.mulesource.org/schema/mule/http/2.2" 
-	xmlns:mxml="http://www.mulesource.org/schema/mule/xml/2.2"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http" 
+	xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf" 
+	xmlns:mxml="http://www.mulesoft.org/schema/mule/xml"
 	xsi:schemaLocation="
-		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
-		http://www.mulesource.org/schema/mule/core/2.2 http://www.mulesource.org/schema/mule/core/2.2/mule.xsd
-		http://www.mulesource.org/schema/mule/http/2.2 http://www.mulesource.org/schema/mule/http/2.2/mule-http.xsd
-		http://www.mulesource.org/schema/mule/xml/2.2 http://www.mulesource.org/schema/mule/xml/2.2/mule-xml.xsd"
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd
+		http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/3.2/mule-http.xsd
+		http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/3.2/mule-cxf.xsd
+		http://www.mulesoft.org/schema/mule/xml http://www.mulesoft.org/schema/mule/xml/3.2/mule-xml.xsd"
 >
-	<cxf:connector name="ebms.adapter.connector.cxf">
-		<receiver-threading-profile maxThreadsActive="${threading.profile.ebms.receiver.maxThreadsActive}" maxThreadsIdle="${threading.profile.ebms.receiver.maxThreadsIdle}" threadTTL="${threading.profile.ebms.receiver.threadTTL}" poolExhaustedAction="WAIT" maxBufferSize="${threading.profile.ebms.receiver.maxBufferSize}" />
-	</cxf:connector>
-
 	<http:connector name="ebms.adapter.connector.http">
 		<receiver-threading-profile maxThreadsActive="${threading.profile.ebms.http.receiver.maxThreadsActive}" maxThreadsIdle="${threading.profile.ebms.http.receiver.maxThreadsIdle}" threadTTL="${threading.profile.ebms.http.receiver.threadTTL}" poolExhaustedAction="WAIT" maxBufferSize="${threading.profile.ebms.http.receiver.maxBufferSize}" />
 	</http:connector>
@@ -37,20 +35,12 @@
 
 		<service name="cpaAdapter">
 			<inbound>
-				<cxf:inbound-endpoint connector-ref="ebms.adapter.connector.cxf" protocolConnector="ebms.adapter.connector.http" address="http://${service.adapter.host}:${service.adapter.port}${service.adapter.url}/cpa" enableMuleSoapHeaders="false" synchronous="true">
-					<cxf:inInterceptors>
-						<spring:bean class="nl.clockwork.mule.ebms.cxf.LoggingInInterceptor" />
-					</cxf:inInterceptors>
-					<cxf:outInterceptors>
-						<spring:bean class="nl.clockwork.mule.ebms.cxf.LoggingOutInterceptor" />
-					</cxf:outInterceptors>
-				</cxf:inbound-endpoint> 
+				<http:inbound-endpoint connector-ref="ebms.adapter.connector.http" address="http://${service.adapter.host}:${service.adapter.port}${service.adapter.url}/cpa" exchange-pattern="request-response">
+					<cxf:jaxws-service serviceClass="nl.clockwork.ebms.iface.CPAService"/>
+				</http:inbound-endpoint> 
 			</inbound>
 			<component>
 				<spring-object bean="cpaService"/>
-				<!--singleton-object class="nl.clockwork.ebms.iface.CPAServiceImpl">
-					<property key="ebMSDAO" value-ref="ebMSDAO"/>
-				</singleton-object-->
 			</component>
 		</service>
 
@@ -60,21 +50,12 @@
 
 		<service name="ebMSAdapter">
 			<inbound>
-				<cxf:inbound-endpoint connector-ref="ebms.adapter.connector.cxf" protocolConnector="ebms.adapter.connector.http" address="http://${service.adapter.host}:${service.adapter.port}${service.adapter.url}/ebms" enableMuleSoapHeaders="false" synchronous="true">
-					<cxf:inInterceptors>
-						<spring:bean class="nl.clockwork.mule.ebms.cxf.LoggingInInterceptor" />
-					</cxf:inInterceptors>
-					<cxf:outInterceptors>
-						<spring:bean class="nl.clockwork.mule.ebms.cxf.LoggingOutInterceptor" />
-					</cxf:outInterceptors>
-				</cxf:inbound-endpoint> 
+				<http:inbound-endpoint connector-ref="ebms.adapter.connector.http" address="http://${service.adapter.host}:${service.adapter.port}${service.adapter.url}/ebms" exchange-pattern="request-response">
+					<cxf:jaxws-service serviceClass="nl.clockwork.ebms.iface.EbMSMessageService"/>
+				</http:inbound-endpoint> 
 			</inbound>
 			<component>
 				<spring-object bean="ebMSMessageService"/>
-				<!--singleton-object class="nl.clockwork.ebms.iface.EbMSMessageServiceImpl">
-					<property key="ebMSDAO" value-ref="ebMSDAO"/>
-					<property key="hostname" value="${service.host}"/>
-				</singleton-object-->
 			</component>
 		</service>
 

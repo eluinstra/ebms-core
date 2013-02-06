@@ -19,17 +19,18 @@ import nl.clockwork.ebms.model.EbMSMessageContent;
 
 import org.mule.api.MuleMessage;
 import org.mule.api.transformer.TransformerException;
-import org.mule.transformer.AbstractMessageAwareTransformer;
+import org.mule.transformer.AbstractMessageTransformer;
+import org.mule.transformer.types.DataTypeFactory;
 
-public class EbMSMessageContentToMessageContent extends AbstractMessageAwareTransformer
+public class EbMSMessageContentToMessageContent extends AbstractMessageTransformer
 {
 	public EbMSMessageContentToMessageContent()
 	{
-		registerSourceType(EbMSMessageContent.class);
+		registerSourceType(DataTypeFactory.create(EbMSMessageContent.class));
 	}
 	
 	@Override
-	public Object transform(MuleMessage message, String outputEncoding) throws TransformerException
+	public Object transformMessage(MuleMessage message, String outputEncoding) throws TransformerException
 	{
 		try
 		{

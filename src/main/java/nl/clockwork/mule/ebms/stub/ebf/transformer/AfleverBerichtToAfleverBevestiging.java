@@ -31,9 +31,11 @@ import nl.clockwork.mule.ebms.stub.ebf.model.afleveren.bevestiging.FoutType;
 
 import org.mule.api.MuleMessage;
 import org.mule.api.transformer.TransformerException;
-import org.mule.transformer.AbstractMessageAwareTransformer;
+import org.mule.api.transport.PropertyScope;
+import org.mule.transformer.AbstractMessageTransformer;
+import org.mule.transformer.types.DataTypeFactory;
 
-public class AfleverBerichtToAfleverBevestiging extends AbstractMessageAwareTransformer
+public class AfleverBerichtToAfleverBevestiging extends AbstractMessageTransformer
 {
 	private String cpaId;
 	private String service;
@@ -41,11 +43,11 @@ public class AfleverBerichtToAfleverBevestiging extends AbstractMessageAwareTran
 
 	public AfleverBerichtToAfleverBevestiging()
 	{
-		registerSourceType(EbMSMessageContent.class);
+		registerSourceType(DataTypeFactory.create(EbMSMessageContent.class));
 	}
 	
 	@Override
-	public Object transform(MuleMessage message, String outputEncoding) throws TransformerException
+	public Object transformMessage(MuleMessage message, String outputEncoding) throws TransformerException
 	{
 		try
 		{
@@ -56,7 +58,7 @@ public class AfleverBerichtToAfleverBevestiging extends AbstractMessageAwareTran
 			afleverBevestiging.setKenmerk(afleverBericht.getKenmerk());
 			afleverBevestiging.setBerichtsoort(afleverBericht.getBerichtsoort());
 
-			FoutType error = (FoutType)message.getProperty("AFLEVERBERICHT_ERROR");
+			FoutType error = (FoutType)message.getProperty("AFLEVERBERICHT_ERROR",PropertyScope.SESSION);
 			if (error == null)
 				afleverBevestiging.setTijdstempelAfgeleverd(DatatypeFactory.newInstance().newXMLGregorianCalendar(new GregorianCalendar()));
 			else

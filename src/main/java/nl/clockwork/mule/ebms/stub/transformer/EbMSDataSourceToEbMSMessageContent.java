@@ -23,9 +23,10 @@ import nl.clockwork.ebms.model.EbMSMessageContext;
 
 import org.mule.api.MuleMessage;
 import org.mule.api.transformer.TransformerException;
-import org.mule.transformer.AbstractMessageAwareTransformer;
+import org.mule.transformer.AbstractMessageTransformer;
+import org.mule.transformer.types.DataTypeFactory;
 
-public class EbMSDataSourceToEbMSMessageContent extends AbstractMessageAwareTransformer
+public class EbMSDataSourceToEbMSMessageContent extends AbstractMessageTransformer
 {
 	private String cpaId;
 	private String service;
@@ -33,11 +34,12 @@ public class EbMSDataSourceToEbMSMessageContent extends AbstractMessageAwareTran
 
 	public EbMSDataSourceToEbMSMessageContent()
 	{
-		registerSourceType(List.class);
+		registerSourceType(DataTypeFactory.create(List.class));
 	}
 	
+	@SuppressWarnings("unchecked")
 	@Override
-	public Object transform(MuleMessage message, String outputEncoding) throws TransformerException
+	public Object transformMessage(MuleMessage message, String outputEncoding) throws TransformerException
 	{
 		try
 		{

@@ -26,25 +26,27 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.api.MuleMessage;
 import org.mule.api.transformer.TransformerException;
-import org.mule.transformer.AbstractMessageAwareTransformer;
+import org.mule.api.transport.PropertyScope;
+import org.mule.transformer.AbstractMessageTransformer;
+import org.mule.transformer.types.DataTypeFactory;
 
-public class XMLToEbMSDataSourceEnricher extends AbstractMessageAwareTransformer
+public class XMLToEbMSDataSourceEnricher extends AbstractMessageTransformer
 {
   protected transient Log logger = LogFactory.getLog(getClass());
 
 	public XMLToEbMSDataSourceEnricher()
 	{
-		registerSourceType(String.class);
+		registerSourceType(DataTypeFactory.STRING);
 		//FIXME
-		//setReturnClass(String.class);
+		//setReturnDataType(DataTypeFactory.STRING);
 	}
 	
 	@Override
-	public Object transform(final MuleMessage message, String outputEncoding) throws TransformerException
+	public Object transformMessage(final MuleMessage message, String outputEncoding) throws TransformerException
 	{
 		try
 		{
-			String fileName = message.getStringProperty("originalFilename","message.xml");
+			String fileName = message.getProperty("originalFilename",PropertyScope.SESSION);
 			EbMSDataSource dataSource = new EbMSDataSource(fileName,StringUtils.defaultIfEmpty(Utils.getMimeType(fileName),"application/octet-stream"),((String)message.getPayload()).getBytes()); //application/xml
 			message.setPayload(Arrays.asList(dataSource));
 			return message;

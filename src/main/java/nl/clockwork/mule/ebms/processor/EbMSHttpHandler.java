@@ -9,26 +9,28 @@ import nl.clockwork.ebms.processor.EbMSMessageProcessor;
 import nl.clockwork.ebms.processor.EbMSProcessorException;
 import nl.clockwork.ebms.server.EbMSInputStreamHandler;
 import nl.clockwork.ebms.server.EbMSInputStreamHandlerImpl;
-import nl.clockwork.mule.common.Callable;
 
 import org.apache.commons.httpclient.ContentLengthInputStream;
 import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpVersion;
 import org.apache.commons.httpclient.ProtocolException;
 import org.mule.api.MuleEvent;
+import org.mule.api.MuleEventContext;
 import org.mule.api.MuleMessage;
+import org.mule.api.lifecycle.Callable;
 import org.mule.api.transport.OutputHandler;
 import org.mule.api.transport.PropertyScope;
 import org.mule.transport.http.HttpConstants;
 import org.mule.transport.http.HttpResponse;
 
-public class EbMSHttpHandler extends Callable
+public class EbMSHttpHandler implements Callable
 {
 	private EbMSMessageProcessor ebMSMessageProcessor;
 
 	@Override
-	public Object onCall(final MuleMessage message) throws Exception
+	public Object onCall(MuleEventContext eventContext) throws Exception
 	{
+		final MuleMessage message = eventContext.getMessage();
   	final ContentLengthInputStream request = (ContentLengthInputStream)message.getPayload();
   	final HttpResponse response = new HttpResponse();
 		response.setBody(
@@ -84,7 +86,7 @@ public class EbMSHttpHandler extends Callable
 	{
 		Map<String,String> result = new HashMap<String,String>();
 		for (Object name : message.getPropertyNames(PropertyScope.INBOUND))
-			result.put((String)name,(String)message.getProperty((String)name));
+			result.put((String)name,(String)message.getProperty((String)name,PropertyScope.INBOUND));
 		return result;
 	}
 

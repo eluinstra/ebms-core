@@ -13,12 +13,14 @@ import javax.xml.validation.Validator;
 
 import nl.clockwork.ebms.iface.CPAService;
 import nl.clockwork.ebms.iface.CPAServiceException;
-import nl.clockwork.mule.common.Callable;
 
+import org.mule.api.MuleEventContext;
 import org.mule.api.MuleMessage;
+import org.mule.api.lifecycle.Callable;
+import org.mule.api.transport.PropertyScope;
 import org.xml.sax.SAXException;
 
-public class CPAInserter extends Callable
+public class CPAInserter implements Callable
 {
 	private Schema schema;
 	private CPAService cpaService;
@@ -33,8 +35,9 @@ public class CPAInserter extends Callable
 	}
 	
 	@Override
-	public Object onCall(MuleMessage message) throws Exception
+	public Object onCall(MuleEventContext eventContext) throws Exception
 	{
+		MuleMessage message = eventContext.getMessage();
 		try
 		{
 			String cpa = (String)message.getPayload();
@@ -46,11 +49,11 @@ public class CPAInserter extends Callable
 				{
 					validator.validate(new StreamSource(new StringReader(cpa)));
 					cpaService.insertCPA(cpa,true);
-					message.setProperty("EBMS.REPORT",message.getProperty("originalFilename") + " inserted successfully.");
+					message.setProperty("EBMS.REPORT",message.getProperty("originalFilename",PropertyScope.SESSION) + " inserted successfully.",PropertyScope.SESSION);
 				}
 				catch (SAXException e)
 				{
-					message.setProperty("EBMS.REPORT",message.getProperty("originalFilename") + " contains not a valid CPA.");
+					message.setProperty("EBMS.REPORT",message.getProperty("originalFilename",PropertyScope.SESSION) + " contains not a valid CPA.",PropertyScope.SESSION);
 				}
 				return message;
 			}
@@ -63,7 +66,7 @@ public class CPAInserter extends Callable
 				PrintWriter pw = new PrintWriter(result);
 				e.printStackTrace(pw);
 			}
-			message.setProperty("EBMS.REPORT","Update " + message.getProperty("originalFilename") + " failed.\n\n" + result.toString());
+			message.setProperty("EBMS.REPORT","Update " + message.getProperty("originalFilename",PropertyScope.SESSION) + " failed.\n\n" + result.toString(),PropertyScope.SESSION);
 			throw e;
 		}
 	}

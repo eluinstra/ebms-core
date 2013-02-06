@@ -33,9 +33,11 @@ import nl.clockwork.mule.ebms.stub.ebf.model.aanleveren.bevestiging.IdentiteitTy
 import org.apache.commons.lang.StringUtils;
 import org.mule.api.MuleMessage;
 import org.mule.api.transformer.TransformerException;
-import org.mule.transformer.AbstractMessageAwareTransformer;
+import org.mule.api.transport.PropertyScope;
+import org.mule.transformer.AbstractMessageTransformer;
+import org.mule.transformer.types.DataTypeFactory;
 
-public class AanleverBerichtToAanleverBevestiging extends AbstractMessageAwareTransformer
+public class AanleverBerichtToAanleverBevestiging extends AbstractMessageTransformer
 {
 	private String cpaId;
 	private String service;
@@ -43,11 +45,11 @@ public class AanleverBerichtToAanleverBevestiging extends AbstractMessageAwareTr
 
 	public AanleverBerichtToAanleverBevestiging()
 	{
-		registerSourceType(EbMSMessageContent.class);
+		registerSourceType(DataTypeFactory.create(EbMSMessageContent.class));
 	}
 	
 	@Override
-	public Object transform(MuleMessage message, String outputEncoding) throws TransformerException
+	public Object transformMessage(MuleMessage message, String outputEncoding) throws TransformerException
 	{
 		try
 		{
@@ -80,7 +82,7 @@ public class AanleverBerichtToAanleverBevestiging extends AbstractMessageAwareTr
 			aanleverBevestiging.setStatuscode("0");
 			aanleverBevestiging.setTijdstempelStatus(DatatypeFactory.newInstance().newXMLGregorianCalendar(new GregorianCalendar()));
 			
-			FoutType error = (FoutType)message.getProperty("AANLEVERBERICHT_ERROR");
+			FoutType error = (FoutType)message.getProperty("AANLEVERBERICHT_ERROR",PropertyScope.SESSION);
 			if (error == null)
 				aanleverBevestiging.setTijdstempelAangeleverd(DatatypeFactory.newInstance().newXMLGregorianCalendar(new GregorianCalendar()));
 			else

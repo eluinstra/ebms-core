@@ -32,9 +32,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.api.MuleMessage;
 import org.mule.api.transformer.TransformerException;
-import org.mule.transformer.AbstractMessageAwareTransformer;
+import org.mule.transformer.AbstractMessageTransformer;
 
-public abstract class AbstractXSLTransformer extends AbstractMessageAwareTransformer
+public abstract class AbstractXSLTransformer extends AbstractMessageTransformer
 {
   protected transient Log logger = LogFactory.getLog(getClass());
 	private Templates templates;
@@ -45,7 +45,7 @@ public abstract class AbstractXSLTransformer extends AbstractMessageAwareTransfo
 	}
 	
 	@Override
-	public Object transform(MuleMessage message, String outputEncoding) throws TransformerException
+	public Object transformMessage(MuleMessage message, String outputEncoding) throws TransformerException
 	{
 		try
 		{
