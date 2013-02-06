@@ -74,7 +74,7 @@ public abstract class EbMSInputStreamHandlerImpl implements EbMSInputStreamHandl
 	private String getHeader(String headerName)
 	{
 		for (String key : headers.keySet())
-			if (headerName.toLowerCase().equals(headerName.toLowerCase()))
+			if (headerName.toLowerCase().equals(key.toLowerCase()))
 				return headers.get(key);
 		return null;
 	}
@@ -84,5 +84,10 @@ public abstract class EbMSInputStreamHandlerImpl implements EbMSInputStreamHandl
 	public abstract void writeResponseHeader(String name, String value);
 
 	public abstract OutputStream getOutputStream() throws IOException;
+	
+	public void setMessageProcessor(EbMSMessageProcessor messageProcessor)
+	{
+		this.messageProcessor = messageProcessor;
+	}
 
 }
