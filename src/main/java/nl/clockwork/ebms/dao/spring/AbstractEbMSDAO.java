@@ -192,7 +192,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	{
 		try
 		{
-			jdbcTemplate.update
+			return jdbcTemplate.update
 			(
 				"insert into cpa (" +
 					"cpa_id," +
@@ -200,12 +200,11 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 				") values (?,?)",
 				cpa.getCpaid(),
 				XMLMessageBuilder.getInstance(CollaborationProtocolAgreement.class).handle(cpa)
-			);
-			return true;
+			) > 0;
 		}
 		catch (DataAccessException e)
 		{
-			return false;
+			throw new DAOException(e);
 		}
 		catch (JAXBException e)
 		{
@@ -218,19 +217,18 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	{
 		try
 		{
-			jdbcTemplate.update
+			return jdbcTemplate.update
 			(
 				"update cpa set" +
 				" cpa = ?" +
 				" where cpa_id = ?",
 				XMLMessageBuilder.getInstance(CollaborationProtocolAgreement.class).handle(cpa),
 				cpa.getCpaid()
-			);
-			return true;
+			) > 0;
 		}
 		catch (DataAccessException e)
 		{
-			return false;
+			throw new DAOException(e);
 		}
 		catch (JAXBException e)
 		{
