@@ -42,7 +42,7 @@
 			<property name="period" value="${jobScheduler.period}"/>
 			<property name="jobs">
 				<list>
-<!--					<ref bean="processEbMSMessages"/>-->
+					<ref bean="processEbMSMessages"/>
 				</list>
 			</property>
 		</bean>
