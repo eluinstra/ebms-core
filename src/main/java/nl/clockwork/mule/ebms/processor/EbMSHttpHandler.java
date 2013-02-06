@@ -7,6 +7,7 @@ import java.util.Map;
 
 import nl.clockwork.ebms.processor.EbMSMessageProcessor;
 import nl.clockwork.ebms.processor.EbMSProcessorException;
+import nl.clockwork.ebms.server.EbMSInputStreamHandler;
 import nl.clockwork.ebms.server.EbMSInputStreamHandlerImpl;
 import nl.clockwork.mule.common.Callable;
 
@@ -21,7 +22,7 @@ import org.mule.api.transport.PropertyScope;
 import org.mule.transport.http.HttpConstants;
 import org.mule.transport.http.HttpResponse;
 
-public class EbMSInputStreamHandler extends Callable
+public class EbMSHttpHandler extends Callable
 {
 	private EbMSMessageProcessor ebMSMessageProcessor;
 
@@ -38,7 +39,7 @@ public class EbMSInputStreamHandler extends Callable
 				{
 					try
 					{
-						nl.clockwork.ebms.server.EbMSInputStreamHandler messageHandler = 
+						EbMSInputStreamHandler messageHandler = 
 				  		new EbMSInputStreamHandlerImpl(ebMSMessageProcessor,getHeaders(message))
 							{
 								@Override
