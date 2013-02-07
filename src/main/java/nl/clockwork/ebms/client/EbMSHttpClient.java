@@ -53,9 +53,9 @@ public class EbMSHttpClient implements EbMSClient
 			EbMSMessageWriter writer = new EbMSMessageWriterImpl((HttpURLConnection)connection);
 			writer.write(document);
 			writer.flush();
-			EbMSDocument in = handleResponse((HttpURLConnection)connection);
-			logger.info("StatusCode: " + ((HttpURLConnection)connection).getResponseCode());
-			logger.debug("IN:\n" + in.getMessage() == null ? "" : DOMUtils.toString(in.getMessage()));
+			EbMSResponseDocument in = handleResponse((HttpURLConnection)connection);
+			logger.debug("StatusCode: " + in.getStatusCode());
+			logger.debug("IN:\n" + (in.getMessage() == null ? "" : DOMUtils.toString(in.getMessage())));
 			return in;
 		}
 		catch (Exception e)
@@ -75,7 +75,7 @@ public class EbMSHttpClient implements EbMSClient
 		return connection;
 	}
 
-	private EbMSDocument handleResponse(HttpURLConnection connection) throws IOException, EbMSProcessorException, TransformerException, ParserConfigurationException, SAXException
+	private EbMSResponseDocument handleResponse(HttpURLConnection connection) throws IOException, EbMSProcessorException, TransformerException, ParserConfigurationException, SAXException
 	{
 		EbMSDocument document = getEbMSMessage(IOUtils.toString(connection.getInputStream()));
 		EbMSResponseDocument result = new EbMSResponseDocument(document,connection.getResponseCode());
