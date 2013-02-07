@@ -36,6 +36,7 @@ public class EbMSDataSourceToEbMSMessageContent extends AbstractMessageAwareTran
 		registerSourceType(List.class);
 	}
 	
+	@SuppressWarnings("unchecked")
 	@Override
 	public Object transform(MuleMessage message, String outputEncoding) throws TransformerException
 	{
