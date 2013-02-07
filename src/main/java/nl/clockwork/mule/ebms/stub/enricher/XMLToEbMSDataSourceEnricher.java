@@ -47,6 +47,8 @@ public class XMLToEbMSDataSourceEnricher extends AbstractMessageTransformer
 		try
 		{
 			String fileName = message.getProperty("originalFilename",PropertyScope.SESSION);
+			if (fileName == null)
+				fileName = "message.xml";
 			EbMSDataSource dataSource = new EbMSDataSource(fileName,StringUtils.defaultIfEmpty(Utils.getMimeType(fileName),"application/octet-stream"),((String)message.getPayload()).getBytes()); //application/xml
 			message.setPayload(Arrays.asList(dataSource));
 			return message;
