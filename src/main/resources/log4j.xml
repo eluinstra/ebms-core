@@ -44,7 +44,7 @@
 	</appender>
 
 	<logger name="nl.clockwork.ebms" additivity="false">
-		<level value="info"/>
+		<level value="debug"/>
 		<appender-ref ref="ASYNC"/>
 	</logger>
 	
