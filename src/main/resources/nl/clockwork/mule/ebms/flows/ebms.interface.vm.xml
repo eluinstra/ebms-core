@@ -70,7 +70,7 @@
 
 		<service name="ebms.content.receive">
 			<inbound>
-				<vm:inbound-endpoint path="ebms.content.receive.in" synchronous="true"/>
+				<vm:inbound-endpoint path="ebms.content.receive.in"/>
 			</inbound>
 			<component>
 				<spring-object bean="ebMSMessageService"/>
