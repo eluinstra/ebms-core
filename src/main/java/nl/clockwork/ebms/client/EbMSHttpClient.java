@@ -49,10 +49,14 @@ public class EbMSHttpClient implements EbMSClient
 		try
 		{
 			URLConnection connection = openConnection(uri);
+			logger.debug("OUT:\n" + DOMUtils.toString(document.getMessage()));
 			EbMSMessageWriter writer = new EbMSMessageWriterImpl((HttpURLConnection)connection);
 			writer.write(document);
 			writer.flush();
-			return handleResponse((HttpURLConnection)connection);
+			EbMSDocument in = handleResponse((HttpURLConnection)connection);
+			logger.info("StatusCode: " + ((HttpURLConnection)connection).getResponseCode());
+			logger.debug("IN:\n" + in.getMessage() == null ? "" : DOMUtils.toString(in.getMessage()));
+			return in;
 		}
 		catch (Exception e)
 		{
@@ -73,10 +77,8 @@ public class EbMSHttpClient implements EbMSClient
 
 	private EbMSDocument handleResponse(HttpURLConnection connection) throws IOException, EbMSProcessorException, TransformerException, ParserConfigurationException, SAXException
 	{
-		logger.info("StatusCode: " + connection.getResponseCode());
 		EbMSDocument document = getEbMSMessage(IOUtils.toString(connection.getInputStream()));
 		EbMSResponseDocument result = new EbMSResponseDocument(document,connection.getResponseCode());
-		logger.info(result.getMessage() == null ? null : DOMUtils.toString(result.getMessage()));
 		return result;
 	}
 
