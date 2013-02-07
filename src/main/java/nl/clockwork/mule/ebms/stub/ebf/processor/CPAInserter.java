@@ -45,12 +45,14 @@ public class CPAInserter extends Callable
 				try
 				{
 					validator.validate(new StreamSource(new StringReader(cpa)));
-					cpaService.insertCPA(cpa,true);
-					message.setProperty("EBMS.REPORT",message.getProperty("originalFilename") + " inserted successfully.");
+					if (cpaService.insertCPA(cpa,true))
+						message.setProperty("EBMS.REPORT",message.getProperty("originalFilename") + " inserted successfully.");
+					else
+						message.setProperty("EBMS.REPORT","Inserting " + message.getProperty("originalFilename") + " failed!");
 				}
 				catch (SAXException e)
 				{
-					message.setProperty("EBMS.REPORT",message.getProperty("originalFilename") + " contains not a valid CPA.");
+					message.setProperty("EBMS.REPORT",message.getProperty("originalFilename") + " does not contain a valid CPA.");
 				}
 				return message;
 			}
