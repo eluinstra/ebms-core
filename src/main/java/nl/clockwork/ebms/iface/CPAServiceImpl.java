@@ -28,10 +28,12 @@ public class CPAServiceImpl implements CPAService
 			synchronized (cpaMonitor)
 			{
 				if (ebMSDAO.existsCPA(cpa.getCpaid()))
+				{
 					if (overwrite)
 						result = ebMSDAO.updateCPA(cpa);
-					else
-						result = ebMSDAO.insertCPA(cpa);
+				}
+				else
+					result = ebMSDAO.insertCPA(cpa);
 			}
 			return result;
 		}
