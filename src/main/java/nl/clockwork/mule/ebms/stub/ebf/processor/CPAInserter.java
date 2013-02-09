@@ -1,9 +1,6 @@
 package nl.clockwork.mule.ebms.stub.ebf.processor;
 
-import java.io.PrintWriter;
 import java.io.StringReader;
-import java.io.StringWriter;
-import java.io.Writer;
 
 import javax.xml.XMLConstants;
 import javax.xml.transform.stream.StreamSource;
@@ -12,7 +9,6 @@ import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
 
 import nl.clockwork.ebms.iface.CPAService;
-import nl.clockwork.ebms.iface.CPAServiceException;
 
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleMessage;
@@ -38,33 +34,22 @@ public class CPAInserter implements Callable
 	public Object onCall(MuleEventContext eventContext) throws Exception
 	{
 		MuleMessage message = eventContext.getMessage();
-		try
+		String cpa = (String)message.getPayload();
+		//quick fix for synchronization problem with validate() method
+		synchronized (validatorMonitor)
 		{
-			String cpa = (String)message.getPayload();
-			//quick fix for synchronization problem with validate() method
-			synchronized (validatorMonitor)
+			Validator validator = schema.newValidator();
+			try
 			{
-				Validator validator = schema.newValidator();
-				try
-				{
-					validator.validate(new StreamSource(new StringReader(cpa)));
-					cpaService.insertCPA(cpa,true);
-					message.setProperty("EBMS.REPORT",message.getProperty("originalFilename",PropertyScope.OUTBOUND) + " inserted successfully.",PropertyScope.SESSION);
-				}
-				catch (SAXException e)
-				{
-					message.setProperty("EBMS.REPORT",message.getProperty("originalFilename",PropertyScope.OUTBOUND) + " contains not a valid CPA.",PropertyScope.SESSION);
-				}
-				return message;
+				validator.validate(new StreamSource(new StringReader(cpa)));
+				cpaService.insertCPA(cpa,true);
+				message.setProperty("EBMS.REPORT",message.getProperty("originalFilename",PropertyScope.OUTBOUND) + " inserted successfully.",PropertyScope.SESSION);
 			}
-		}
-		catch (CPAServiceException e)
-		{
-			Writer result = new StringWriter();
-			PrintWriter pw = new PrintWriter(result);
-			e.printStackTrace(pw);
-			message.setProperty("EBMS.REPORT","Update " + message.getProperty("originalFilename",PropertyScope.OUTBOUND) + " failed.\n\n" + result.toString(),PropertyScope.SESSION);
-			throw e;
+			catch (SAXException e)
+			{
+				message.setProperty("EBMS.REPORT",message.getProperty("originalFilename",PropertyScope.OUTBOUND) + " contains not a valid CPA.",PropertyScope.SESSION);
+			}
+			return message;
 		}
 	}
 
