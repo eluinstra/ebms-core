@@ -37,13 +37,6 @@
 		<https:tls-server path="${truststore.path}" storePassword="${truststore.password}" requireClientAuthentication="${connector.https.requireClientAuthentication}"/>
 	</https:connector>  
 
-	<https:connector name="connector.http.ebms.out" validateConnections="${connector.ebms.validateConnections}">
-		<dispatcher-threading-profile maxThreadsActive="${threading.profile.ebms.http.receiver.maxThreadsActive}" maxThreadsIdle="${threading.profile.ebms.http.receiver.maxThreadsIdle}" threadTTL="${threading.profile.ebms.http.receiver.threadTTL}" poolExhaustedAction="WAIT" maxBufferSize="${threading.profile.ebms.http.receiver.maxBufferSize}" />
-		<https:tls-client path="${client.keystore.path}" storePassword="${client.keystore.password}"/>
-		<https:tls-key-store path="${server.keystore.path}" storePassword="${server.keystore.password}" keyPassword="${server.keystore.keyPassword}"/>  
-		<https:tls-server path="${truststore.path}" storePassword="${truststore.password}"/>
-	</https:connector>
-
 	<model>
 
 		<service name="ebms.https.receive">
