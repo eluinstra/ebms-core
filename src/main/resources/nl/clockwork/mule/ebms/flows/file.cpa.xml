@@ -42,14 +42,10 @@
 	"
 >
 
-	<spring:beans>
-		<util:constant id="CPA_ID" static-field="nl.clockwork.mule.ebms.stub.Constants.CPA_ID"/>
-	</spring:beans>
-	
 	<model>
 
 		<default-service-exception-strategy>
-			<vm:outbound-endpoint path="file.cpa.report.in" synchronous="false">
+			<vm:outbound-endpoint path="file.cpa.upload.report.in" synchronous="false">
 				<script:transformer>
           <script:script engine="groovy">
 						import java.io.PrintWriter;
@@ -72,7 +68,7 @@
 			</vm:outbound-endpoint>
 		</default-service-exception-strategy>
 
-		<service name="file.cpa.service">
+		<service name="file.cpa.upload">
 			<inbound>
 				<file:inbound-endpoint connector-ref="connector.file.ebms"	path="${dir.upload.cpa}" moveToDirectory="${dir.upload.cpa}/processed" pollingFrequency="${dir.upload.cpa.pollingFrequency}" synchronous="false">
 					<file:filename-wildcard-filter pattern="*.xml" caseSensitive="false"/>
@@ -87,14 +83,14 @@
 			</component>
 			<outbound>
 				<pass-through-router>
-					<vm:outbound-endpoint path="file.cpa.report.in" synchronous="false"/>
+					<vm:outbound-endpoint path="file.cpa.upload.report.in" synchronous="false"/>
 				</pass-through-router>
 			</outbound>
 		</service>
 
-		<service name="file.cpa.report">
+		<service name="file.cpa.upload.report">
 			<inbound>
-				<vm:inbound-endpoint path="file.cpa.report.in" synchronous="false" />
+				<vm:inbound-endpoint path="file.cpa.upload.report.in" synchronous="false" />
 			</inbound>
 			<outbound>
 				<pass-through-router>
