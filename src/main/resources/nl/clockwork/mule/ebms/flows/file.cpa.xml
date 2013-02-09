@@ -51,19 +51,20 @@
 		<default-service-exception-strategy>
 			<vm:outbound-endpoint path="file.cpa.report.in" exchange-pattern="one-way">
 				<script:transformer>
-          <script:script engine="groovy">
+					<script:script engine="groovy">
 						import java.io.PrintWriter;
 						import java.io.StringWriter;
 						import java.io.Writer;
+						import org.mule.api.transport.PropertyScope;
 
 						Writer result = new StringWriter();
-						if (message.getExceptionPayload() != null)
+						if (message.getPayload() != null)
 						{
 							PrintWriter pw = new PrintWriter(result);
-							message.getExceptionPayload().getException().printStackTrace(pw);
+							message.getPayload().getException().printStackTrace(pw);
 						}
 
-						message.setProperty("EBMS.REPORT","Update " + message.getProperty("originalFilename") + " failed.\n\n" + result.toString());
+						message.setProperty("EBMS.REPORT","Update " + message.getProperty("originalFilename",PropertyScope.OUTBOUND) + " failed.\n\n" + result.toString(),PropertyScope.SESSION);
 						result.close();
 
 						return message;
@@ -100,7 +101,7 @@
 				<pass-through-router>
 					<file:outbound-endpoint connector-ref="connector.file.ebms" path="${dir.upload.cpa}/reports" outputPattern="report_#[function:datestamp:yyyyMMddHHmmSSS].txt">
 						<expression-transformer returnClass="java.lang.String">
-							<return-argument evaluator="header" expression="EBMS.REPORT"/>
+							<return-argument evaluator="header" expression="session:EBMS.REPORT" optional="true"/>
 						</expression-transformer>
 					</file:outbound-endpoint>
 				</pass-through-router>

@@ -49,11 +49,11 @@ public class CPAInserter implements Callable
 				{
 					validator.validate(new StreamSource(new StringReader(cpa)));
 					cpaService.insertCPA(cpa,true);
-					message.setProperty("EBMS.REPORT",message.getProperty("originalFilename",PropertyScope.SESSION) + " inserted successfully.",PropertyScope.SESSION);
+					message.setProperty("EBMS.REPORT",message.getProperty("originalFilename",PropertyScope.OUTBOUND) + " inserted successfully.",PropertyScope.SESSION);
 				}
 				catch (SAXException e)
 				{
-					message.setProperty("EBMS.REPORT",message.getProperty("originalFilename",PropertyScope.SESSION) + " contains not a valid CPA.",PropertyScope.SESSION);
+					message.setProperty("EBMS.REPORT",message.getProperty("originalFilename",PropertyScope.OUTBOUND) + " contains not a valid CPA.",PropertyScope.SESSION);
 				}
 				return message;
 			}
@@ -61,12 +61,9 @@ public class CPAInserter implements Callable
 		catch (CPAServiceException e)
 		{
 			Writer result = new StringWriter();
-			if (message.getExceptionPayload() != null)
-			{
-				PrintWriter pw = new PrintWriter(result);
-				e.printStackTrace(pw);
-			}
-			message.setProperty("EBMS.REPORT","Update " + message.getProperty("originalFilename",PropertyScope.SESSION) + " failed.\n\n" + result.toString(),PropertyScope.SESSION);
+			PrintWriter pw = new PrintWriter(result);
+			e.printStackTrace(pw);
+			message.setProperty("EBMS.REPORT","Update " + message.getProperty("originalFilename",PropertyScope.OUTBOUND) + " failed.\n\n" + result.toString(),PropertyScope.SESSION);
 			throw e;
 		}
 	}
