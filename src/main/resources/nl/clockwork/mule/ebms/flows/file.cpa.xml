@@ -39,17 +39,22 @@
 		http://www.mulesoft.org/schema/mule/ftp http://www.mulesoft.org/schema/mule/ftp/3.2/mule-ftp.xsd
 		http://www.mulesoft.org/schema/mule/xml http://www.mulesoft.org/schema/mule/xml/3.2/mule-xml.xsd
 		http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/3.2/mule-scripting.xsd  
-	"
->
+	">
 
-	<spring:beans>
-		<util:constant id="CPA_ID" static-field="nl.clockwork.mule.ebms.stub.Constants.CPA_ID"/>
-	</spring:beans>
-	
-	<model>
-
-		<default-service-exception-strategy>
-			<vm:outbound-endpoint path="file.cpa.report.in" exchange-pattern="one-way">
+	<flow name="file.cpa.upload">
+		<file:inbound-endpoint connector-ref="connector.file.ebms"	path="${dir.upload.cpa}" moveToDirectory="${dir.upload.cpa}/processed" pollingFrequency="${dir.upload.cpa.pollingFrequency}">
+			<file:filename-wildcard-filter pattern="*.xml" caseSensitive="false"/>
+			<!--file:file-to-string-transformer/-->
+			<object-to-string-transformer/>
+		</file:inbound-endpoint>
+		<component>
+			<singleton-object class="nl.clockwork.mule.ebms.stub.ebf.processor.CPAInserter">
+				<property key="cpaService" value-ref="cpaService"/>
+			</singleton-object>
+		</component>
+		<vm:outbound-endpoint path="file.cpa.upload.report.in" exchange-pattern="one-way"/>
+		<default-exception-strategy>
+			<vm:outbound-endpoint path="file.cpa.upload.report.in" exchange-pattern="one-way">
 				<script:transformer>
 					<script:script engine="groovy">
 						import java.io.PrintWriter;
@@ -71,43 +76,16 @@
 					</script:script>
 				</script:transformer>
 			</vm:outbound-endpoint>
-		</default-service-exception-strategy>
+		</default-exception-strategy>
+	</flow>
 
-		<service name="file.cpa.service">
-			<inbound>
-				<file:inbound-endpoint connector-ref="connector.file.ebms"	path="${dir.upload.cpa}" moveToDirectory="${dir.upload.cpa}/processed" pollingFrequency="${dir.upload.cpa.pollingFrequency}">
-					<file:filename-wildcard-filter pattern="*.xml" caseSensitive="false"/>
-					<!--file:file-to-string-transformer/-->
-					<object-to-string-transformer/>
-				</file:inbound-endpoint>				
-			</inbound>
-			<component>
-				<singleton-object class="nl.clockwork.mule.ebms.stub.ebf.processor.CPAInserter">
-					<property key="cpaService" value-ref="cpaService"/>
-				</singleton-object>
-			</component>
-			<outbound>
-				<pass-through-router>
-					<vm:outbound-endpoint path="file.cpa.report.in" exchange-pattern="one-way"/>
-				</pass-through-router>
-			</outbound>
-		</service>
-
-		<service name="file.cpa.report">
-			<inbound>
-				<vm:inbound-endpoint path="file.cpa.report.in" exchange-pattern="one-way"/>
-			</inbound>
-			<outbound>
-				<pass-through-router>
-					<file:outbound-endpoint connector-ref="connector.file.ebms" path="${dir.upload.cpa}/reports" outputPattern="report_#[function:datestamp:yyyyMMddHHmmSSS].txt">
-						<expression-transformer returnClass="java.lang.String">
-							<return-argument evaluator="header" expression="session:EBMS.REPORT" optional="true"/>
-						</expression-transformer>
-					</file:outbound-endpoint>
-				</pass-through-router>
-			</outbound>
-		</service>
-
-	</model>
-
+	<flow name="file.cpa.upload.report">
+		<vm:inbound-endpoint path="file.cpa.upload.report.in" exchange-pattern="one-way"/>
+		<file:outbound-endpoint connector-ref="connector.file.ebms" path="${dir.upload.cpa}/reports" outputPattern="report_#[function:datestamp:yyyyMMddHHmmSSS].txt">
+			<expression-transformer returnClass="java.lang.String">
+				<return-argument evaluator="header" expression="session:EBMS.REPORT" optional="true"/>
+			</expression-transformer>
+		</file:outbound-endpoint>
+	</flow>
+	
 </mule>
