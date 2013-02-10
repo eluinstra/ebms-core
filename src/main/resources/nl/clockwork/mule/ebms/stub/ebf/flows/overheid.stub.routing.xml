@@ -34,55 +34,18 @@
 		http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.2/mule-vm.xsd
 		http://www.mulesoft.org/schema/mule/jdbc http://www.mulesoft.org/schema/mule/jdbc/3.2/mule-jdbc.xsd
 		http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/3.2/mule-scripting.xsd  
-	"
->
+	">
 
-	<model>
-
-		<service name="overheid.stub">
-			<inbound>
-					<vm:inbound-endpoint path="overheid.stub.in"/>
-			</inbound>
-			<outbound>
-				<filtering-router>
-					<vm:outbound-endpoint path="aanleverbericht.stub.message.receive.in" />
-					<and-filter>
-						<custom-filter class="nl.clockwork.mule.common.filter.JXPathFilter">
-							<spring:property name="xPathQuery" value="context/cpaId" />
-							<spring:property name="regEx" value="${aanleverService.cpaId}" />
-						</custom-filter>
-<!--						<custom-filter class="nl.clockwork.mule.common.filter.JXPathFilter">-->
-<!--							<spring:property name="xPathQuery" value="context/service" />-->
-<!--							<spring:property name="regEx" value="${aanleverService.service}" />-->
-<!--						</custom-filter>-->
-						<custom-filter class="nl.clockwork.mule.common.filter.JXPathFilter">
-							<spring:property name="xPathQuery" value="context/action" />
-							<spring:property name="regEx" value="${aanleverService.response.action}" />
-						</custom-filter>
-					</and-filter>
-				</filtering-router>
-				<filtering-router>
-					<vm:outbound-endpoint path="afleverbericht.processing.service.in" />
-					<and-filter>
-						<custom-filter class="nl.clockwork.mule.common.filter.JXPathFilter">
-							<spring:property name="xPathQuery" value="context/cpaId" />
-							<spring:property name="regEx" value="${afleverService.cpaId}" />
-						</custom-filter>
-<!--						<custom-filter class="nl.clockwork.mule.common.filter.JXPathFilter">-->
-<!--							<spring:property name="xPathQuery" value="context/service" />-->
-<!--							<spring:property name="regEx" value="${afleverService.service}" />-->
-<!--						</custom-filter>-->
-						<custom-filter class="nl.clockwork.mule.common.filter.JXPathFilter">
-							<spring:property name="xPathQuery" value="context/action" />
-							<spring:property name="regEx" value="${afleverService.request.action}" />
-						</custom-filter>
-					</and-filter>
-				</filtering-router>
-				<forwarding-catch-all-strategy>
-				</forwarding-catch-all-strategy>
-			</outbound>
-		</service>
-		
-	</model>
+	<flow name="overheid.stub">
+		<vm:inbound-endpoint path="overheid.stub.in"/>
+		<choice>
+			<when expression="(context/cpaId)='${aanleverService.cpaId}' and (context/service)='${aanleverService.service}' and (context/action)='${aanleverService.response.action}'" evaluator="jxpath">
+				<vm:outbound-endpoint path="aanleverbericht.stub.message.receive.in"/>
+			</when>
+			<when expression="(context/cpaId)='${afleverService.cpaId}' and (context/service)='${afleverService.service}' and (context/action)='${afleverService.request.action}'" evaluator="jxpath">
+				<vm:outbound-endpoint path="afleverbericht.processing.service.in"/>
+			</when>
+		</choice>
+	</flow>
 
 </mule>

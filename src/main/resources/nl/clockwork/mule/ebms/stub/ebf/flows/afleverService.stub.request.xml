@@ -34,83 +34,47 @@
 		http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.2/mule-vm.xsd
 		http://www.mulesoft.org/schema/mule/jdbc http://www.mulesoft.org/schema/mule/jdbc/3.2/mule-jdbc.xsd
 		http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/3.2/mule-scripting.xsd  
-	"
->
+	">
 
-	<model>
+	<flow name="afleverbericht.stub.file.receive">
+		<file:inbound-endpoint connector-ref="connector.file"	path="${dir.base}/afleverService/request" moveToDirectory="${dir.base}/afleverService/request/processed" pollingFrequency="3000">
+			<file:filename-wildcard-filter pattern="*.xml" caseSensitive="false"/>
+			<object-to-string-transformer/>
+		</file:inbound-endpoint>				
+		<vm:outbound-endpoint path="afleverbericht.stub.validate.in"/>
+	</flow>
 
-		<service name="afleverbericht.stub.file.receive">
-			<inbound>
-				<file:inbound-endpoint connector-ref="connector.file"	path="${dir.base}/afleverService/request" moveToDirectory="${dir.base}/afleverService/request/processed" pollingFrequency="3000">
-					<file:filename-wildcard-filter pattern="*.xml" caseSensitive="false"/>
-					<object-to-string-transformer/>
-				</file:inbound-endpoint>				
-			</inbound>
-			<outbound>
-				<pass-through-router>
-					<vm:outbound-endpoint path="afleverbericht.stub.validate.in"/>
-				</pass-through-router>
-			</outbound>
-		</service>
+	<flow name="afleverbericht.stub.file.raw.receive">
+		<file:inbound-endpoint connector-ref="connector.file"	path="${dir.base}/afleverService/request" moveToDirectory="${dir.base}/afleverService/request/processed" pollingFrequency="10000">
+			<file:filename-wildcard-filter pattern="*.properties" caseSensitive="false"/>
+			<object-to-string-transformer/>
+		</file:inbound-endpoint>				
+		<component>
+			<singleton-object class="nl.clockwork.mule.ebms.stub.ebf.processor.AfleverBerichtGenerator">
+				<property key="baseDir" value="${dir.base}/afleverService/request"/>
+			</singleton-object>
+		</component>
+		<vm:outbound-endpoint path="afleverbericht.stub.validate.in"/>
+	</flow>
 
-		<service name="afleverbericht.stub.file.raw.receive">
-			<inbound>
-				<file:inbound-endpoint connector-ref="connector.file"	path="${dir.base}/afleverService/request" moveToDirectory="${dir.base}/afleverService/request/processed" pollingFrequency="10000">
-					<file:filename-wildcard-filter pattern="*.properties" caseSensitive="false"/>
-					<object-to-string-transformer/>
-				</file:inbound-endpoint>				
-			</inbound>
-			<component>
-				<singleton-object class="nl.clockwork.mule.ebms.stub.ebf.processor.AfleverBerichtGenerator">
-					<property key="baseDir" value="${dir.base}/afleverService/request"/>
-				</singleton-object>
-			</component>
-			<outbound>
-				<pass-through-router>
-					<vm:outbound-endpoint path="afleverbericht.stub.validate.in"/>
-				</pass-through-router>
-			</outbound>
-		</service>
-
-		<service name="afleverbericht.stub.validate">
-			<inbound>
-				<vm:inbound-endpoint path="afleverbericht.stub.validate.in"/>
-			</inbound>
-			<outbound>
-				<filtering-router>
-					<vm:outbound-endpoint path="afleverbericht.stub.message.transform.in" />
-					<expression-filter evaluator="groovy" expression="${afleverbericht.message.validate}==false" />
-				</filtering-router>
-				<filtering-router>
-					<vm:outbound-endpoint path="afleverbericht.stub.message.transform.in" />
-					<custom-filter class="nl.clockwork.mule.common.filter.XSDValidationFilter">
-						<spring:property name="xsdFile" value="/nl/clockwork/mule/ebms/stub/ebf/xsd/Afleveren_ebMS_2.0_v1.1.xsd" />
-					</custom-filter>
-				</filtering-router>
-				<forwarding-catch-all-strategy>
-					<vm:outbound-endpoint path="afleverbericht.stub.message.invalid"/>
-				</forwarding-catch-all-strategy>
-			</outbound>
-		</service>
-
-		<service name="afleverbericht.stub.message.transform">
-			<inbound>
-				<vm:inbound-endpoint path="afleverbericht.stub.message.transform.in" exchange-pattern="one-way">
-					<custom-transformer class="nl.clockwork.mule.ebms.stub.enricher.XMLToEbMSDataSourceEnricher" />
-					<custom-transformer class="nl.clockwork.mule.ebms.stub.transformer.EbMSDataSourceToEbMSMessageContent">
-						<spring:property name="cpaId" value="${afleverService.cpaId}"/>
-						<spring:property name="service" value="${afleverService.service}"/>
-						<spring:property name="action" value="${afleverService.request.action}"/>
-					</custom-transformer>
-				</vm:inbound-endpoint>
-			</inbound>
-			<outbound>
-				<pass-through-router>
-					<vm:outbound-endpoint path="ebms.content.receive.in" />
-				</pass-through-router>
-			</outbound>
-		</service>
-		
-	</model>
+	<flow name="afleverbericht.stub.validate">
+		<vm:inbound-endpoint path="afleverbericht.stub.validate.in"/>
+		<message-filter throwOnUnaccepted="false" onUnaccepted="afleverbericht.stub.message.transform">
+			<expression-filter evaluator="groovy" expression="${afleverbericht.message.validate}==true" />
+		</message-filter>
+		<message-filter throwOnUnaccepted="true">
+			<custom-filter class="nl.clockwork.mule.common.filter.XSDValidationFilter">
+				<spring:property name="xsdFile" value="/nl/clockwork/mule/ebms/stub/ebf/xsd/Afleveren_ebMS_2.0_v1.1.xsd" />
+			</custom-filter>
+		</message-filter>
+		<custom-transformer name="afleverbericht.stub.message.transform" class="nl.clockwork.mule.ebms.stub.enricher.XMLToEbMSDataSourceEnricher" />
+		<custom-transformer class="nl.clockwork.mule.ebms.stub.transformer.EbMSDataSourceToEbMSMessageContent">
+			<spring:property name="cpaId" value="${afleverService.cpaId}"/>
+			<spring:property name="service" value="${afleverService.service}"/>
+			<spring:property name="action" value="${afleverService.request.action}"/>
+		</custom-transformer>
+		<vm:outbound-endpoint path="ebms.content.receive.in" />
+		<default-exception-strategy/>
+	</flow>
 
 </mule>

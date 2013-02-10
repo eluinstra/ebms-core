@@ -37,86 +37,42 @@
 		http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/3.2/mule-file.xsd
 		http://www.mulesoft.org/schema/mule/ftp http://www.mulesoft.org/schema/mule/ftp/3.2/mule-ftp.xsd
 		http://www.mulesoft.org/schema/mule/xml http://www.mulesoft.org/schema/mule/xml/3.2/mule-xml.xsd
-	"
->
+	">
 
-	<vm:endpoint name="afleverbericht.processing.service.in" path="afleverbericht.processing.service.in" />
+	<flow name="afleverbericht.processing.service">
+		<vm:inbound-endpoint path="afleverbericht.processing.service.in" />
+		<message-properties-transformer>
+			<add-message-property key="AFLEVERBERICHT_ERROR" value-ref="AFLEVERBERICHT_DETERMINATION_ERROR"/>
+		</message-properties-transformer>
+		<message-filter throwOnUnaccepted="false" onUnaccepted="afleverBerichtToAfleverBevestiging">
+			<custom-filter class="nl.clockwork.mule.ebms.stub.ebf.filter.EbMSMessageContentValidationFilter" />
+		</message-filter>
+		<message-properties-transformer>
+			<add-message-property key="AFLEVERBERICHT_ERROR" value-ref="AFLEVERBERICHT_XSD_ERROR"/>
+		</message-properties-transformer>
+		<message-filter throwOnUnaccepted="false" onUnaccepted="afleverBerichtToAfleverBevestiging">
+			<custom-filter class="nl.clockwork.mule.ebms.stub.ebf.filter.EbMSMessageContentXSDValidationFilter">
+				<spring:property name="xsdFile" value="/nl/clockwork/mule/ebms/stub/ebf/xsd/Afleveren_ebMS_2.0_v1.1.xsd" />
+			</custom-filter>
+		</message-filter>
+		<!--message-properties-transformer>
+			<add-message-property key="AFLEVERBERICHT_ERROR" value-ref="AFLEVERBERICHT_BERICHTSOORT_ERROR"/>
+		</message-properties-transformer>
+		<message-filter throwOnUnaccepted="false" onUnaccepted="afleverBerichtToAfleverBevestiging">
+			<custom-filter class="nl.clockwork.mule.ebms.stub.ebf.filter.AfleverBerichtBerichtSoortValidationFilter">
+				<spring:property name="berichtSoort" ref="AFLEVERBERICHT_BERICHTSOORT_EFACTUUR" />
+			</custom-filter>
+		</message-filter-->
+		<message-properties-transformer>
+			<delete-message-property key="AFLEVERBERICHT_ERROR"/>
+		</message-properties-transformer>
 
-	<model>
-
-		<service name="afleverbericht.processing.service">
-			<inbound>
-					<vm:inbound-endpoint path="afleverbericht.processing.service.in" />
-			</inbound>
-			<outbound>
-				<pass-through-router>
-					<vm:outbound-endpoint path="afleverbericht.validate.in" exchange-pattern="one-way"/>
-				</pass-through-router>
-			</outbound>
-		</service>
-
-		<service name="afleverbericht.validate">
-			<inbound>
-				<vm:inbound-endpoint path="afleverbericht.validate.in" />
-			</inbound>
-			<outbound>
-				<filtering-router>
-					<vm:outbound-endpoint path="afleverbericht.afleverbevestiging.in">
-						<message-properties-transformer>
-							<add-message-property key="AFLEVERBERICHT_ERROR" value-ref="AFLEVERBERICHT_DETERMINATION_ERROR"/>
-						</message-properties-transformer>
-					</vm:outbound-endpoint>
-					<not-filter>
-						<custom-filter class="nl.clockwork.mule.ebms.stub.ebf.filter.EbMSMessageContentValidationFilter" />
-					</not-filter>
-				</filtering-router>
-				<filtering-router>
-					<vm:outbound-endpoint path="afleverbericht.afleverbevestiging.in">
-						<message-properties-transformer>
-							<add-message-property key="AFLEVERBERICHT_ERROR" value-ref="AFLEVERBERICHT_XSD_ERROR"/>
-						</message-properties-transformer>
-					</vm:outbound-endpoint>
-					<not-filter>
-						<custom-filter class="nl.clockwork.mule.ebms.stub.ebf.filter.EbMSMessageContentXSDValidationFilter">
-							<spring:property name="xsdFile" value="/nl/clockwork/mule/ebms/stub/ebf/xsd/Afleveren_ebMS_2.0_v1.1.xsd" />
-						</custom-filter>
-					</not-filter>
-				</filtering-router>
-				<!--filtering-router>
-					<vm:outbound-endpoint path="afleverbericht.afleverbevestiging.in">
-						<message-properties-transformer>
-							<add-message-property key="AFLEVERBERICHT_ERROR" value-ref="AFLEVERBERICHT_BERICHTSOORT_ERROR"/>
-						</message-properties-transformer>
-					</vm:outbound-endpoint>
-					<not-filter>
-						<custom-filter class="nl.clockwork.mule.ebms.stub.ebf.filter.AfleverBerichtBerichtSoortValidationFilter">
-							<spring:property name="berichtSoort" ref="AFLEVERBERICHT_BERICHTSOORT_EFACTUUR" />
-						</custom-filter>
-					</not-filter>
-				</filtering-router-->
-				<forwarding-catch-all-strategy>
-					<vm:outbound-endpoint path="afleverbericht.afleverbevestiging.in" />
-				</forwarding-catch-all-strategy>
-			</outbound>
-		</service>
-
-		<service name="afleverbericht.afleverbevestiging">
-			<inbound>
-				<vm:inbound-endpoint path="afleverbericht.afleverbevestiging.in">
-					<custom-transformer class="nl.clockwork.mule.ebms.stub.ebf.transformer.AfleverBerichtToAfleverBevestiging">
-						<spring:property name="cpaId" value="${afleverService.cpaId}"/>
-						<spring:property name="service" value="${afleverService.service}"/>
-						<spring:property name="action" value="${afleverService.response.action}"/>
-					</custom-transformer>
-				</vm:inbound-endpoint>
-			</inbound>
-			<outbound>
-				<pass-through-router>
-					<vm:outbound-endpoint path="ebms.content.receive.in" />
-				</pass-through-router>
-			</outbound>
-		</service>
-
-	</model>
+		<custom-transformer name="afleverBerichtToAfleverBevestiging" class="nl.clockwork.mule.ebms.stub.ebf.transformer.AfleverBerichtToAfleverBevestiging">
+			<spring:property name="cpaId" value="${afleverService.cpaId}"/>
+			<spring:property name="service" value="${afleverService.service}"/>
+			<spring:property name="action" value="${afleverService.response.action}"/>
+		</custom-transformer>
+		<vm:outbound-endpoint path="ebms.content.receive.in" />
+	</flow>
 
 </mule>

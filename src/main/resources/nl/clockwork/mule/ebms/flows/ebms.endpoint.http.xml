@@ -28,30 +28,19 @@
 		http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/3.2/mule-vm.xsd
 		http://www.mulesoft.org/schema/mule/jdbc http://www.mulesoft.org/schema/mule/jdbc/3.2/mule-jdbc.xsd
 		http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/3.2/mule-scripting.xsd  
-	"
->
+	">
 
 	<http:connector name="connector.http.ebms.in" validateConnections="${connector.ebms.validateConnections}">
 		<receiver-threading-profile maxThreadsActive="${threading.profile.ebms.http.receiver.maxThreadsActive}" maxThreadsIdle="${threading.profile.ebms.http.receiver.maxThreadsIdle}" threadTTL="${threading.profile.ebms.http.receiver.threadTTL}" poolExhaustedAction="WAIT" maxBufferSize="${threading.profile.ebms.http.receiver.maxBufferSize}" />
 	</http:connector>
 	
-	<http:connector name="connector.http.ebms.out" validateConnections="${connector.ebms.validateConnections}">
-		<dispatcher-threading-profile maxThreadsActive="${threading.profile.ebms.http.receiver.maxThreadsActive}" maxThreadsIdle="${threading.profile.ebms.http.receiver.maxThreadsIdle}" threadTTL="${threading.profile.ebms.http.receiver.threadTTL}" poolExhaustedAction="WAIT" maxBufferSize="${threading.profile.ebms.http.receiver.maxBufferSize}" />
-	</http:connector>
-
-	<model>
-
-		<service name="ebms.http.receive">
-			<inbound>
-				<http:inbound-endpoint connector-ref="connector.http.ebms.in" address="http://${service.host}:${service.port}${service.url}" exchange-pattern="request-response"/>
-			</inbound>
-			<component>
-				<singleton-object class="nl.clockwork.mule.ebms.processor.EbMSHttpHandler">
-					<property key="ebMSMessageProcessor" value-ref="messageProcessor"/>
-				</singleton-object>
-			</component>
-		</service>
-
-	</model>
+	<flow name="ebms.http.receive">
+		<http:inbound-endpoint connector-ref="connector.http.ebms.in" address="http://${service.host}:${service.port}${service.url}" exchange-pattern="request-response"/>
+		<component>
+			<singleton-object class="nl.clockwork.mule.ebms.processor.EbMSHttpHandler">
+				<property key="ebMSMessageProcessor" value-ref="messageProcessor"/>
+			</singleton-object>
+		</component>
+	</flow>
 
 </mule>

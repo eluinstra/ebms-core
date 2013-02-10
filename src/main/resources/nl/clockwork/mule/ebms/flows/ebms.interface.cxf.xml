@@ -25,40 +25,29 @@
 		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/3.2/mule.xsd
 		http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/3.2/mule-http.xsd
 		http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/3.2/mule-cxf.xsd
-		http://www.mulesoft.org/schema/mule/xml http://www.mulesoft.org/schema/mule/xml/3.2/mule-xml.xsd"
->
+		http://www.mulesoft.org/schema/mule/xml http://www.mulesoft.org/schema/mule/xml/3.2/mule-xml.xsd
+	">
+
 	<http:connector name="ebms.adapter.connector.http">
 		<receiver-threading-profile maxThreadsActive="${threading.profile.ebms.http.receiver.maxThreadsActive}" maxThreadsIdle="${threading.profile.ebms.http.receiver.maxThreadsIdle}" threadTTL="${threading.profile.ebms.http.receiver.threadTTL}" poolExhaustedAction="WAIT" maxBufferSize="${threading.profile.ebms.http.receiver.maxBufferSize}" />
 	</http:connector>
 	
-	<model>
+	<flow name="cpaService">
+		<http:inbound-endpoint connector-ref="ebms.adapter.connector.http" address="http://${service.adapter.host}:${service.adapter.port}${service.adapter.url}/cpa" exchange-pattern="request-response">
+			<cxf:jaxws-service serviceClass="nl.clockwork.ebms.iface.CPAService"/>
+		</http:inbound-endpoint> 
+		<component>
+			<spring-object bean="cpaService"/>
+		</component>
+	</flow>
 
-		<service name="cpaAdapter">
-			<inbound>
-				<http:inbound-endpoint connector-ref="ebms.adapter.connector.http" address="http://${service.adapter.host}:${service.adapter.port}${service.adapter.url}/cpa" exchange-pattern="request-response">
-					<cxf:jaxws-service serviceClass="nl.clockwork.ebms.iface.CPAService"/>
-				</http:inbound-endpoint> 
-			</inbound>
-			<component>
-				<spring-object bean="cpaService"/>
-			</component>
-		</service>
-
-	</model>
-
-	<model>
-
-		<service name="ebMSAdapter">
-			<inbound>
-				<http:inbound-endpoint connector-ref="ebms.adapter.connector.http" address="http://${service.adapter.host}:${service.adapter.port}${service.adapter.url}/ebms" exchange-pattern="request-response">
-					<cxf:jaxws-service serviceClass="nl.clockwork.ebms.iface.EbMSMessageService"/>
-				</http:inbound-endpoint> 
-			</inbound>
-			<component>
-				<spring-object bean="ebMSMessageService"/>
-			</component>
-		</service>
-
-	</model>
+	<flow name="ebMSMessageService">
+		<http:inbound-endpoint connector-ref="ebms.adapter.connector.http" address="http://${service.adapter.host}:${service.adapter.port}${service.adapter.url}/ebms" exchange-pattern="request-response">
+			<cxf:jaxws-service serviceClass="nl.clockwork.ebms.iface.EbMSMessageService"/>
+		</http:inbound-endpoint> 
+		<component>
+			<spring-object bean="ebMSMessageService"/>
+		</component>
+	</flow>
 
 </mule>

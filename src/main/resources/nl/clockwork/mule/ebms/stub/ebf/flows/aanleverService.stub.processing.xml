@@ -37,116 +37,55 @@
 		http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/3.2/mule-file.xsd
 		http://www.mulesoft.org/schema/mule/ftp http://www.mulesoft.org/schema/mule/ftp/3.2/mule-ftp.xsd
 		http://www.mulesoft.org/schema/mule/xml http://www.mulesoft.org/schema/mule/xml/3.2/mule-xml.xsd
-	"
->
+	">
 
 	<vm:endpoint name="aanleverbericht.processing.service.in" path="aanleverbericht.processing.service.in" />
 
-	<model>
+	<flow name="aanleverbericht.processing.service">
+		<vm:inbound-endpoint path="aanleverbericht.processing.service.in" />
+		<async>
+			<file:outbound-endpoint connector-ref="connector.file" path="${dir.base}/aanleverService/request" outputPattern="request_#[function:datestamp:yyyyMMddHHmmSSS].xml">
+				<custom-transformer class="nl.clockwork.mule.ebms.stub.ebf.transformer.EbMSMessageContentToMessageContent"/>
+			</file:outbound-endpoint>
+		</async>
+		<message-properties-transformer>
+			<add-message-property key="AANLEVERBERICHT_ERROR" value-ref="AANLEVERBERICHT_DETERMINATION_ERROR"/>
+		</message-properties-transformer>
+		<message-filter throwOnUnaccepted="false" onUnaccepted="aanleverBerichtToAanleverBevestiging">
+			<custom-filter class="nl.clockwork.mule.ebms.stub.ebf.filter.EbMSMessageContentValidationFilter" />
+		</message-filter>
+		<message-properties-transformer>
+			<add-message-property key="AANLEVERBERICHT_ERROR" value-ref="AANLEVERBERICHT_XSD_ERROR"/>
+		</message-properties-transformer>
+		<message-filter throwOnUnaccepted="false" onUnaccepted="aanleverBerichtToAanleverBevestiging">
+			<!--mxml:schema-validation-filter schemaLocations="/nl/clockwork/mule/ebms/stub/ebf/xsd/Aanleveren_ebMS_2.0_v1.1.xsd"/-->
+			<custom-filter class="nl.clockwork.mule.ebms.stub.ebf.filter.EbMSMessageContentXSDValidationFilter">
+				<spring:property name="xsdFile" value="/nl/clockwork/mule/ebms/stub/ebf/xsd/Aanleveren_ebMS_2.0_v1.1.xsd" />
+			</custom-filter>
+		</message-filter>
+		<!--message-properties-transformer>
+			<add-message-property key="AANLEVERBERICHT_ERROR" value-ref="AANLEVERBERICHT_BERICHTSOORT_ERROR"/>
+		</message-properties-transformer>
+		<message-filter throwOnUnaccepted="false" onUnaccepted="aanleverBerichtToAanleverBevestiging">
+			<custom-filter class="nl.clockwork.mule.ebms.stub.ebf.filter.AanleverBerichtBerichtSoortValidationFilter">
+				<spring:property name="berichtSoort" ref="AANLEVERBERICHT_BERICHTSOORT_ORDER" />
+			</custom-filter>
+		</message-filter-->
+		<message-properties-transformer>
+			<delete-message-property key="AANLEVERBERICHT_ERROR"/>
+		</message-properties-transformer>
 
-		<service name="aanleverbericht.processing.service">
-			<inbound>
-					<vm:inbound-endpoint path="aanleverbericht.processing.service.in" />
-			</inbound>
-			<outbound>
-				<pass-through-router>
-					<vm:outbound-endpoint path="aanleverbericht.validate.in" exchange-pattern="one-way"/>
-				</pass-through-router>
-			</outbound>
-		</service>
-
-		<service name="aanleverbericht.validate">
-			<inbound>
-				<vm:inbound-endpoint path="aanleverbericht.validate.in" />
-				<wire-tap-router>
-					<vm:outbound-endpoint path="aanleverbericht.request.log.in"/>
-				</wire-tap-router>
-			</inbound>
-			<outbound>
-				<filtering-router>
-					<vm:outbound-endpoint path="aanleverbericht.aanleverbevestiging.in">
-						<message-properties-transformer>
-							<add-message-property key="AANLEVERBERICHT_ERROR" value-ref="AANLEVERBERICHT_DETERMINATION_ERROR"/>
-						</message-properties-transformer>
-					</vm:outbound-endpoint>
-					<not-filter>
-						<custom-filter class="nl.clockwork.mule.ebms.stub.ebf.filter.EbMSMessageContentValidationFilter" />
-					</not-filter>
-				</filtering-router>
-				<filtering-router>
-					<vm:outbound-endpoint path="aanleverbericht.aanleverbevestiging.in">
-						<message-properties-transformer>
-							<add-message-property key="AANLEVERBERICHT_ERROR" value-ref="AANLEVERBERICHT_XSD_ERROR"/>
-						</message-properties-transformer>
-					</vm:outbound-endpoint>
-					<not-filter>
-						<custom-filter class="nl.clockwork.mule.ebms.stub.ebf.filter.EbMSMessageContentXSDValidationFilter">
-							<spring:property name="xsdFile" value="/nl/clockwork/mule/ebms/stub/ebf/xsd/Aanleveren_ebMS_2.0_v1.1.xsd" />
-						</custom-filter>
-					</not-filter>
-				</filtering-router>
-				<!--filtering-router>
-					<vm:outbound-endpoint path="aanleverbericht.aanleverbevestiging.in">
-						<message-properties-transformer>
-							<add-message-property key="AANLEVERBERICHT_ERROR" value-ref="AANLEVERBERICHT_BERICHTSOORT_ERROR"/>
-						</message-properties-transformer>
-					</vm:outbound-endpoint>
-					<not-filter>
-						<custom-filter class="nl.clockwork.mule.ebms.stub.ebf.filter.AanleverBerichtBerichtSoortValidationFilter">
-							<spring:property name="berichtSoort" ref="AANLEVERBERICHT_BERICHTSOORT_ORDER" />
-						</custom-filter>
-					</not-filter>
-				</filtering-router-->
-				<forwarding-catch-all-strategy>
-					<vm:outbound-endpoint path="aanleverbericht.aanleverbevestiging.in" />
-				</forwarding-catch-all-strategy>
-			</outbound>
-		</service>
-
-		<service name="aanleverbericht.aanleverbevestiging">
-			<inbound>
-				<vm:inbound-endpoint path="aanleverbericht.aanleverbevestiging.in">
-					<custom-transformer class="nl.clockwork.mule.ebms.stub.ebf.transformer.AanleverBerichtToAanleverBevestiging">
-						<spring:property name="cpaId" value="${aanleverService.cpaId}"/>
-						<spring:property name="service" value="${aanleverService.service}"/>
-						<spring:property name="action" value="${aanleverService.response.action}"/>
-					</custom-transformer>
-				</vm:inbound-endpoint>
-			</inbound>
-			<outbound>
-				<multicasting-router>
-					<vm:outbound-endpoint path="aanleverbericht.response.log.in"/>
-					<vm:outbound-endpoint path="ebms.content.receive.in"/>
-				</multicasting-router>
-			</outbound>
-		</service>
-
-		<service name="aanleverbericht.request.log">
-			<inbound>
-				<vm:inbound-endpoint path="aanleverbericht.request.log.in"/>
-			</inbound>
-			<outbound>
-				<pass-through-router>
-					<file:outbound-endpoint connector-ref="connector.file" path="${dir.base}/aanleverService/request" outputPattern="request_#[function:datestamp:yyyyMMddHHmmSSS].xml">
-						<custom-transformer class="nl.clockwork.mule.ebms.stub.ebf.transformer.EbMSMessageContentToMessageContent"/>
-					</file:outbound-endpoint>
-				</pass-through-router>
-			</outbound>
-		</service>
-
-		<service name="aanleverbericht.response.log">
-			<inbound>
-				<vm:inbound-endpoint path="aanleverbericht.response.log.in"/>
-			</inbound>
-			<outbound>
-				<pass-through-router>
-					<file:outbound-endpoint connector-ref="connector.file" path="${dir.base}/aanleverService/response" outputPattern="response_#[function:datestamp:yyyyMMddHHmmSSS].xml">
-						<custom-transformer class="nl.clockwork.mule.ebms.stub.ebf.transformer.EbMSMessageContentToMessageContent"/>
-					</file:outbound-endpoint>
-				</pass-through-router>
-			</outbound>
-		</service>
-
-	</model>
+		<custom-transformer name="aanleverBerichtToAanleverBevestiging" class="nl.clockwork.mule.ebms.stub.ebf.transformer.AanleverBerichtToAanleverBevestiging">
+			<spring:property name="cpaId" value="${aanleverService.cpaId}"/>
+			<spring:property name="service" value="${aanleverService.service}"/>
+			<spring:property name="action" value="${aanleverService.response.action}"/>
+		</custom-transformer>
+		<async>
+			<file:outbound-endpoint connector-ref="connector.file" path="${dir.base}/aanleverService/response" outputPattern="response_#[function:datestamp:yyyyMMddHHmmSSS].xml">
+				<custom-transformer class="nl.clockwork.mule.ebms.stub.ebf.transformer.EbMSMessageContentToMessageContent"/>
+			</file:outbound-endpoint>
+		</async>
+		<vm:outbound-endpoint path="ebms.content.receive.in"/>
+	</flow>
 
 </mule>

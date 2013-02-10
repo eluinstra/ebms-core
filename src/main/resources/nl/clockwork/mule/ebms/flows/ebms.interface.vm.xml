@@ -28,8 +28,8 @@
 		http://www.mulesoft.org/schema/mule/jdbc http://www.mulesoft.org/schema/mule/jdbc/3.2/mule-jdbc.xsd
 		http://www.mulesoft.org/schema/mule/quartz http://www.mulesoft.org/schema/mule/quartz/3.2/mule-quartz.xsd
 		http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/3.2/mule-scripting.xsd  
-	"
->
+	">
+
 	<beans xmlns="http://www.springframework.org/schema/beans">
 	
 		<bean id="messageProcessingJob" class="nl.clockwork.mule.ebms.job.EbMSMessageProcessingJob">
@@ -54,29 +54,18 @@
 		
 	</beans>
 
-	<model name="content.send">
+	<flow name="content.send">
+		<quartz:inbound-endpoint jobName="messageProcessingJob" startDelay="10000" repeatInterval="10000">
+			<quartz:custom-job job-ref="messageProcessingJob"/>
+		</quartz:inbound-endpoint>
+		<log-component/>
+	</flow>
 
-		<service name="ebms.content.send">
-			<inbound>
-				<quartz:inbound-endpoint jobName="messageProcessingJob" startDelay="10000" repeatInterval="10000">
-					<quartz:custom-job job-ref="messageProcessingJob"/>
-				</quartz:inbound-endpoint>
-			</inbound>
-		</service>
-
-	</model>
-
-	<model name="content.receive">
-
-		<service name="ebms.content.receive">
-			<inbound>
-				<vm:inbound-endpoint path="ebms.content.receive.in"/>
-			</inbound>
-			<component>
-				<spring-object bean="ebMSMessageService"/>
-			</component>
-		</service>
-
-	</model>
+	<flow name="content.receive">
+		<vm:inbound-endpoint path="ebms.content.receive.in"/>
+		<component>
+			<spring-object bean="ebMSMessageService"/>
+		</component>
+	</flow>
 
 </mule>
