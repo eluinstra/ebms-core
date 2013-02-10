@@ -49,15 +49,13 @@
 					<value>classpath:nl/clockwork/ebms/default.properties</value>   
 					<value>classpath:nl/clockwork/mule/ebms/default.properties</value>   
 					<value>classpath:nl/clockwork/mule/ebms/adapter/service/default.properties</value>   
-					<value>file:${user.home}/.ebms-adapter/ebms.service.properties</value>
+					<value>file:${mule.home}/conf/ebms.service.properties</value>
 				</list>
 			</property>
 		</bean>
 
 		<import resource="classpath:nl/clockwork/ebms/processor.xml" />
 		<import resource="classpath:nl/clockwork/ebms/interface.xml" />
-
-		<import resource="classpath:nl/clockwork/mule/ebms/components/connector.xml" />
 
 		<import resource="classpath:nl/clockwork/mule/ebms/flows/ebms.endpoint.http.xml" />
 		<!--import resource="classpath:nl/clockwork/mule/ebms/flows/ebms.endpoint.https.xml" /-->

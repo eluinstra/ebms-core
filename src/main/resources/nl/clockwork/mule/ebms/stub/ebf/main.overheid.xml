@@ -49,7 +49,7 @@
 					<value>classpath:nl/clockwork/ebms/default.properties</value>   
 					<value>classpath:nl/clockwork/mule/ebms/default.properties</value>   
 					<value>classpath:nl/clockwork/mule/ebms/stub/ebf/default.overheid.properties</value>   
-					<value>file:${user.home}/.ebms-stub/ebf.overheid.properties</value>
+					<value>file:${mule.home}/conf/ebf.overheid.properties</value>
 				</list>
 			</property>
 		</bean>

@@ -49,7 +49,7 @@
 					<value>classpath:nl/clockwork/ebms/default.properties</value>   
 					<value>classpath:nl/clockwork/mule/ebms/default.properties</value>   
 					<value>classpath:nl/clockwork/mule/ebms/stub/ebf/default.digipoort.properties</value>   
-					<value>file:${user.home}/.ebms-stub/ebf.digipoort.properties</value>
+					<value>file:${mule.home}/conf/ebf.digipoort.properties</value>
 				</list>
 			</property>
 		</bean>
