@@ -16,6 +16,7 @@
 package nl.clockwork.ebms.client;
 
 import java.io.IOException;
+import java.net.ConnectException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
@@ -48,15 +49,19 @@ public class EbMSHttpClient implements EbMSClient
 	{
 		try
 		{
-			URLConnection connection = openConnection(uri);
+			HttpURLConnection connection = (HttpURLConnection)openConnection(uri);
 			logger.debug("OUT:\n" + DOMUtils.toString(document.getMessage()));
-			EbMSMessageWriter writer = new EbMSMessageWriterImpl((HttpURLConnection)connection);
+			EbMSMessageWriter writer = new EbMSMessageWriterImpl(connection);
 			writer.write(document);
 			writer.flush();
-			EbMSResponseDocument in = handleResponse((HttpURLConnection)connection);
+			EbMSResponseDocument in = handleResponse(connection);
 			logger.debug("StatusCode: " + in.getStatusCode());
 			logger.debug("IN:\n" + (in.getMessage() == null ? "" : DOMUtils.toString(in.getMessage())));
 			return in;
+		}
+		catch (ConnectException e)
+		{
+			throw new EbMSProcessorException("Error connecting to: " + uri,e);
 		}
 		catch (Exception e)
 		{

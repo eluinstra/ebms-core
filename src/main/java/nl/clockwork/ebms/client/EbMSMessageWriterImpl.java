@@ -40,7 +40,7 @@ public class EbMSMessageWriterImpl implements EbMSMessageWriter
 	}
 
 	@Override
-	public void write(EbMSDocument document) throws EbMSProcessorException
+	public void write(EbMSDocument document) throws IOException, EbMSProcessorException
 	{
 		try
 		{
@@ -49,23 +49,16 @@ public class EbMSMessageWriterImpl implements EbMSMessageWriter
 			else
 				writeMessage(document);
 		}
-		catch (Exception e)
+		catch (TransformerException e)
 		{
 			throw new EbMSProcessorException(e);
 		}
 	}
 
 	@Override
-	public void flush() throws EbMSProcessorException
+	public void flush() throws IOException
 	{
-		try
-		{
-			connection.getOutputStream().flush();
-		}
-		catch (IOException e)
-		{
-			throw new EbMSProcessorException(e);
-		}
+		connection.getOutputStream().flush();
 	}
 	
 	private void writeMessage(EbMSDocument document) throws TransformerException, IOException
