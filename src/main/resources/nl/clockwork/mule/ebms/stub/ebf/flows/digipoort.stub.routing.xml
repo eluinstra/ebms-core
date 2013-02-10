@@ -39,10 +39,10 @@
 	<flow name="digipoort.stub">
 		<vm:inbound-endpoint path="digipoort.stub.in"/>
 		<choice>
-			<when expression="(context/cpaId)=='${afleverService.cpaId}' and (context/service)=='${afleverService.service}' and (context/action)=='${afleverService.response.action}'" evaluator="jxpath">
+			<when expression="(context/cpaId)='${afleverService.cpaId}' and (context/service)='${afleverService.service}' and (context/action)='${afleverService.response.action}'" evaluator="jxpath">
 				<vm:outbound-endpoint path="afleverbericht.stub.message.receive.in"/>
 			</when>
-			<when expression="(context/cpaId)=='${aanleverService.cpaId}' and (context/service)=='${aanleverService.service}' and (context/action)=='${aanleverService.request.action}'" evaluator="jxpath">
+			<when expression="(context/cpaId)='${aanleverService.cpaId}' and (context/service)='${aanleverService.service}' and (context/action)='${aanleverService.request.action}'" evaluator="jxpath">
 				<vm:outbound-endpoint path="aanleverbericht.processing.service.in"/>
 			</when>
 		</choice>
