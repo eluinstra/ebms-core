@@ -31,6 +31,8 @@ import javax.xml.namespace.QName;
 import org.apache.commons.lang.StringUtils;
 import org.w3c.dom.Node;
 
+import com.sun.xml.bind.marshaller.NamespacePrefixMapper;
+
 
 public class XMLMessageBuilder<T>
 {
@@ -78,7 +80,19 @@ public class XMLMessageBuilder<T>
   	if (e == null) return null;
    	StringWriter result = new StringWriter();
 		Marshaller marshaller = context.createMarshaller();
-		marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
+		marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT,Boolean.TRUE);
+    marshaller.marshal(e,result);
+    result.flush();
+    return result.toString();
+	}
+  
+	public String handle(JAXBElement<T> e, NamespacePrefixMapper namespacePrefixMapper) throws JAXBException
+	{
+  	if (e == null) return null;
+   	StringWriter result = new StringWriter();
+		Marshaller marshaller = context.createMarshaller();
+		marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT,Boolean.TRUE);
+		marshaller.setProperty("com.sun.xml.bind.namespacePrefixMapper",namespacePrefixMapper);
     marshaller.marshal(e,result);
     result.flush();
     return result.toString();
@@ -89,7 +103,19 @@ public class XMLMessageBuilder<T>
   	if (object == null) return null;
    	StringWriter result = new StringWriter();
 		Marshaller marshaller = context.createMarshaller();
-		marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
+		marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT,Boolean.TRUE);
+    marshaller.marshal(object,result);
+    result.flush();
+    return result.toString();
+  }
+	
+  public String handle(T object, NamespacePrefixMapper namespacePrefixMapper) throws JAXBException
+  {
+  	if (object == null) return null;
+   	StringWriter result = new StringWriter();
+		Marshaller marshaller = context.createMarshaller();
+		marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT,Boolean.TRUE);
+		marshaller.setProperty("com.sun.xml.bind.namespacePrefixMapper",namespacePrefixMapper);
     marshaller.marshal(object,result);
     result.flush();
     return result.toString();

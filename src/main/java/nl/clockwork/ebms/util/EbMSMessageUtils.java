@@ -34,13 +34,13 @@ import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.Duration;
 import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.soap.SOAPException;
 
 import nl.clockwork.ebms.Constants;
 import nl.clockwork.ebms.Constants.EbMSAction;
 import nl.clockwork.ebms.Constants.EbMSMessageStatus;
+import nl.clockwork.ebms.common.util.DOMUtils;
 import nl.clockwork.ebms.common.util.XMLMessageBuilder;
 import nl.clockwork.ebms.model.EbMSAttachment;
 import nl.clockwork.ebms.model.EbMSDataSource;
@@ -76,6 +76,7 @@ import nl.clockwork.ebms.model.soap.envelope.Body;
 import nl.clockwork.ebms.model.soap.envelope.Envelope;
 import nl.clockwork.ebms.model.soap.envelope.Header;
 import nl.clockwork.ebms.model.xml.dsig.SignatureType;
+import nl.clockwork.ebms.xml.EbMSNamespaceMapper;
 
 import org.apache.commons.io.IOUtils;
 import org.w3c.dom.Document;
@@ -315,11 +316,18 @@ public class EbMSMessageUtils
 		envelope.getBody().getAny().add(ebMSMessage.getStatusRequest());
 		envelope.getBody().getAny().add(ebMSMessage.getStatusResponse());
 		
-		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-		dbf.setNamespaceAware(true);
-		DocumentBuilder db = dbf.newDocumentBuilder();
+		DocumentBuilder db = DOMUtils.getDocumentBuilder();
 		XMLMessageBuilder<Envelope> messageBuilder = XMLMessageBuilder.getInstance(Envelope.class,Envelope.class,MessageHeader.class,SyncReply.class,MessageOrder.class,AckRequested.class,SignatureType.class,ErrorList.class,Acknowledgment.class,Manifest.class,StatusRequest.class,StatusResponse.class);
-		Document d = db.parse(new ByteArrayInputStream(messageBuilder.handle(new JAXBElement<Envelope>(new QName("http://schemas.xmlsoap.org/soap/envelope/","Envelope"),Envelope.class,envelope)).getBytes()));
+
+		//Document d = db.parse(new ByteArrayInputStream(messageBuilder.handle(new JAXBElement<Envelope>(new QName("http://schemas.xmlsoap.org/soap/envelope/","Envelope"),Envelope.class,envelope)).getBytes()));
+
+		//Transformer transformer = DOMUtils.getTransformer("/nl/clockwork/ebms/xsl/EbMSNullTransformation.xml");
+		//DOMResult result = new DOMResult();
+		//transformer.transform(new DOMSource(d),result);
+		//d = (Document)result.getNode();
+
+		Document d = db.parse(new ByteArrayInputStream(messageBuilder.handle(new JAXBElement<Envelope>(new QName("http://schemas.xmlsoap.org/soap/envelope/","Envelope"),Envelope.class,envelope),new EbMSNamespaceMapper()).getBytes()));
+
 		return d;
 	}
 

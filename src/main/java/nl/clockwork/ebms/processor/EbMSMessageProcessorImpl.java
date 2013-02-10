@@ -26,6 +26,8 @@ import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.soap.SOAPException;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.xpath.XPathExpressionException;
 
 import nl.clockwork.ebms.Constants;
@@ -323,7 +325,7 @@ public class EbMSMessageProcessorImpl implements EbMSMessageProcessor
 		return new EbMSMessage(signature,messageHeader,syncReply,messageOrder,ackRequested,errorList,acknowledgment,manifest,statusRequest,statusResponse,attachments);
 	}
 	
-	private EbMSDocument getEbMSDocument(EbMSMessage message) throws SOAPException, JAXBException, ParserConfigurationException, SAXException, IOException
+	private EbMSDocument getEbMSDocument(EbMSMessage message) throws SOAPException, JAXBException, ParserConfigurationException, SAXException, IOException, TransformerFactoryConfigurationError, TransformerException
 	{
 		return new EbMSDocument(EbMSMessageUtils.createSOAPMessage(message),message.getAttachments());
 	}

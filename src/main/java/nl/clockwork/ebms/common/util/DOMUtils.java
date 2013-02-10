@@ -32,6 +32,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.stream.StreamSource;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
@@ -59,6 +60,12 @@ public class DOMUtils
 		//result.setOutputProperty(OutputKeys.METHOD,"xml");
 		//result.setOutputProperty(OutputKeys.INDENT,"yes");
 		//result.setOutputProperty(OutputKeys.ENCODING,"UTF-8");
+		return result;
+	}
+
+	public static Transformer getTransformer(String xslFile) throws TransformerConfigurationException, TransformerFactoryConfigurationError
+	{
+		Transformer result = TransformerFactory.newInstance().newTransformer(new StreamSource(DOMUtils.class.getResourceAsStream(xslFile)));
 		return result;
 	}
 
