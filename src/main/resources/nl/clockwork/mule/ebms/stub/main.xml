@@ -48,8 +48,8 @@
 				<list>
 					<value>classpath:nl/clockwork/ebms/default.properties</value>   
 					<value>classpath:nl/clockwork/mule/ebms/default.properties</value>   
-					<value>classpath:nl/clockwork/mule/ebms/adapter/service/default.properties</value>   
-					<value>file:${mule.home}/conf/ebms.service.properties</value>
+					<value>classpath:nl/clockwork/mule/ebms/stub/default.properties</value>   
+					<value>file:${mule.home}/conf/ebms.stub.properties</value>
 				</list>
 			</property>
 		</bean>
