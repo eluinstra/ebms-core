@@ -39,8 +39,6 @@
 		http://www.mulesoft.org/schema/mule/xml http://www.mulesoft.org/schema/mule/xml/3.2/mule-xml.xsd
 	">
 
-	<vm:endpoint name="aanleverbericht.processing.service.in" path="aanleverbericht.processing.service.in" />
-
 	<flow name="aanleverbericht.processing.service">
 		<vm:inbound-endpoint path="aanleverbericht.processing.service.in" />
 		<async>
