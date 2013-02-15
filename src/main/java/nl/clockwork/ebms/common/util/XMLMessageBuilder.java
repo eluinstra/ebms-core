@@ -33,13 +33,11 @@ import org.w3c.dom.Node;
 
 import com.sun.xml.bind.marshaller.NamespacePrefixMapper;
 
-
 public class XMLMessageBuilder<T>
 {
 	private static HashMap<Class<?>,XMLMessageBuilder<?>> xmlHandlers = new HashMap<Class<?>,XMLMessageBuilder<?>>();
-	
 	private JAXBContext context;
-	
+
 	private XMLMessageBuilder(JAXBContext context)
 	{
 		this.context = context;
@@ -47,14 +45,16 @@ public class XMLMessageBuilder<T>
 
 	public T handle(String xml) throws JAXBException
 	{
-		if (StringUtils.isEmpty(xml)) return null;
-    return handle(new ByteArrayInputStream(xml.getBytes()));
+		if (StringUtils.isEmpty(xml))
+			return null;
+		return handle(new ByteArrayInputStream(xml.getBytes()));
 	}
 
-  @SuppressWarnings("unchecked")
+	@SuppressWarnings("unchecked")
 	public T handle(InputStream is) throws JAXBException
 	{
-  	if (is == null) return null;
+		if (is == null)
+			return null;
 		Unmarshaller unmarshaller = context.createUnmarshaller();
 		Object o = unmarshaller.unmarshal(is);
 		if (o instanceof JAXBElement<?>)
@@ -62,11 +62,12 @@ public class XMLMessageBuilder<T>
 		else
 			return (T)o;
 	}
-  
+
 	@SuppressWarnings("unchecked")
 	public T handle(Node n) throws JAXBException
 	{
-		if (n == null) return null;
+		if (n == null)
+			return null;
 		Unmarshaller unmarshaller = context.createUnmarshaller();
 		Object o = unmarshaller.unmarshal(n);
 		if (o instanceof JAXBElement<?>)
@@ -74,59 +75,89 @@ public class XMLMessageBuilder<T>
 		else
 			return (T)o;
 	}
-  
+
 	public String handle(JAXBElement<T> e) throws JAXBException
 	{
-  	if (e == null) return null;
-   	StringWriter result = new StringWriter();
+		if (e == null)
+			return null;
+		StringWriter result = new StringWriter();
 		Marshaller marshaller = context.createMarshaller();
 		marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT,Boolean.TRUE);
-    marshaller.marshal(e,result);
-    result.flush();
-    return result.toString();
+		marshaller.marshal(e,result);
+		result.flush();
+		return result.toString();
 	}
-  
+
 	public String handle(JAXBElement<T> e, NamespacePrefixMapper namespacePrefixMapper) throws JAXBException
 	{
-  	if (e == null) return null;
-   	StringWriter result = new StringWriter();
+		if (e == null)
+			return null;
+		StringWriter result = new StringWriter();
 		Marshaller marshaller = context.createMarshaller();
 		marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT,Boolean.TRUE);
 		marshaller.setProperty("com.sun.xml.bind.namespacePrefixMapper",namespacePrefixMapper);
-    marshaller.marshal(e,result);
-    result.flush();
-    return result.toString();
+		marshaller.marshal(e,result);
+		result.flush();
+		return result.toString();
 	}
-  
-  public String handle(T object) throws JAXBException
-  {
-  	if (object == null) return null;
-   	StringWriter result = new StringWriter();
+
+	public String handle(JAXBElement<T> e, @SuppressWarnings("restriction") com.sun.xml.internal.bind.marshaller.NamespacePrefixMapper namespacePrefixMapper) throws JAXBException
+	{
+		if (e == null)
+			return null;
+		StringWriter result = new StringWriter();
 		Marshaller marshaller = context.createMarshaller();
 		marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT,Boolean.TRUE);
-    marshaller.marshal(object,result);
-    result.flush();
-    return result.toString();
-  }
-	
-  public String handle(T object, NamespacePrefixMapper namespacePrefixMapper) throws JAXBException
-  {
-  	if (object == null) return null;
-   	StringWriter result = new StringWriter();
+		marshaller.setProperty("com.sun.xml.internal.bind.namespacePrefixMapper",namespacePrefixMapper);
+		marshaller.marshal(e,result);
+		result.flush();
+		return result.toString();
+	}
+
+	public String handle(T object) throws JAXBException
+	{
+		if (object == null)
+			return null;
+		StringWriter result = new StringWriter();
+		Marshaller marshaller = context.createMarshaller();
+		marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT,Boolean.TRUE);
+		marshaller.marshal(object,result);
+		result.flush();
+		return result.toString();
+	}
+
+	public String handle(T object, NamespacePrefixMapper namespacePrefixMapper) throws JAXBException
+	{
+		if (object == null)
+			return null;
+		StringWriter result = new StringWriter();
 		Marshaller marshaller = context.createMarshaller();
 		marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT,Boolean.TRUE);
 		marshaller.setProperty("com.sun.xml.bind.namespacePrefixMapper",namespacePrefixMapper);
-    marshaller.marshal(object,result);
-    result.flush();
-    return result.toString();
-  }
-	
+		marshaller.marshal(object,result);
+		result.flush();
+		return result.toString();
+	}
+
+	public String handle(T object, @SuppressWarnings("restriction") com.sun.xml.internal.bind.marshaller.NamespacePrefixMapper namespacePrefixMapper) throws JAXBException
+	{
+		if (object == null)
+			return null;
+		StringWriter result = new StringWriter();
+		Marshaller marshaller = context.createMarshaller();
+		marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT,Boolean.TRUE);
+		marshaller.setProperty("com.sun.xml.internal.bind.namespacePrefixMapper",namespacePrefixMapper);
+		marshaller.marshal(object,result);
+		result.flush();
+		return result.toString();
+	}
+
 	@SuppressWarnings("unchecked")
 	public static <L> XMLMessageBuilder<L> getInstance(Class<L> clazz) throws JAXBException
 	{
 		if (xmlHandlers.get(clazz) == null)
 		{
-      JAXBContext context = JAXBContext.newInstance(clazz);
+			JAXBContext context = JAXBContext.newInstance(clazz);
 			xmlHandlers.put(clazz,new XMLMessageBuilder<L>(context));
 		}
 		return (XMLMessageBuilder<L>)xmlHandlers.get(clazz);
@@ -137,16 +168,17 @@ public class XMLMessageBuilder<T>
 	{
 		if (xmlHandlers.get(clazz) == null)
 		{
-      JAXBContext context = JAXBContext.newInstance(clazzes);
+			JAXBContext context = JAXBContext.newInstance(clazzes);
 			xmlHandlers.put(clazz,new XMLMessageBuilder<L>(context));
 		}
 		return (XMLMessageBuilder<L>)xmlHandlers.get(clazz);
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	public static <T> T deepCopy(T object) throws JAXBException
 	{
-		if (object == null) return null;
+		if (object == null)
+			return null;
 		JAXBContext jaxbContext = JAXBContext.newInstance(object.getClass());
 		JAXBElement<T> contentObject = new JAXBElement<T>(new QName(object.getClass().getSimpleName()),(Class<T>)object.getClass(),object);
 		JAXBSource source = new JAXBSource(jaxbContext,contentObject);

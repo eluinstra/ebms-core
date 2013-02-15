@@ -27,6 +27,7 @@ import java.util.UUID;
 
 import javax.activation.DataSource;
 import javax.mail.util.ByteArrayDataSource;
+import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.datatype.DatatypeConfigurationException;
@@ -36,6 +37,8 @@ import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.soap.SOAPException;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactoryConfigurationError;
 
 import nl.clockwork.ebms.Constants;
 import nl.clockwork.ebms.Constants.EbMSAction;
@@ -76,6 +79,7 @@ import nl.clockwork.ebms.model.soap.envelope.Body;
 import nl.clockwork.ebms.model.soap.envelope.Envelope;
 import nl.clockwork.ebms.model.soap.envelope.Header;
 import nl.clockwork.ebms.model.xml.dsig.SignatureType;
+import nl.clockwork.ebms.xml.EbMSInternalNamespaceMapper;
 import nl.clockwork.ebms.xml.EbMSNamespaceMapper;
 
 import org.apache.commons.io.IOUtils;
@@ -84,6 +88,14 @@ import org.xml.sax.SAXException;
 
 public class EbMSMessageUtils
 {
+	private static boolean useInternalJAXB;
+	
+	static
+	{
+		//useInternalJAXB =  !JAXBContext.JAXB_CONTEXT_FACTORY.equals("com.sun.xml.internal.bind.v2.ContextFactory");
+		useInternalJAXB =  !JAXBContext.JAXB_CONTEXT_FACTORY.contains("internal");
+	}
+	
 	public static MessageHeader createMessageHeader(CollaborationProtocolAgreement cpa, EbMSMessageContext context, String hostname) throws DatatypeConfigurationException
 	{
 		String uuid = UUID.randomUUID().toString();
@@ -299,7 +311,7 @@ public class EbMSMessageUtils
 		return result;
 	}
 
-	public static Document createSOAPMessage(EbMSMessage ebMSMessage) throws SOAPException, JAXBException, ParserConfigurationException, SAXException, IOException
+	public static Document createSOAPMessage(EbMSMessage ebMSMessage) throws SOAPException, JAXBException, ParserConfigurationException, SAXException, IOException, TransformerFactoryConfigurationError, TransformerException
 	{
 		Envelope envelope = new Envelope();
 		envelope.setHeader(new Header());
@@ -321,12 +333,17 @@ public class EbMSMessageUtils
 
 		//Document d = db.parse(new ByteArrayInputStream(messageBuilder.handle(new JAXBElement<Envelope>(new QName("http://schemas.xmlsoap.org/soap/envelope/","Envelope"),Envelope.class,envelope)).getBytes()));
 
-		//Transformer transformer = DOMUtils.getTransformer("/nl/clockwork/ebms/xsl/EbMSNullTransformation.xml");
-		//DOMResult result = new DOMResult();
-		//transformer.transform(new DOMSource(d),result);
-		//d = (Document)result.getNode();
-
-		Document d = db.parse(new ByteArrayInputStream(messageBuilder.handle(new JAXBElement<Envelope>(new QName("http://schemas.xmlsoap.org/soap/envelope/","Envelope"),Envelope.class,envelope),new EbMSNamespaceMapper()).getBytes()));
+		Document d = null;
+		if (useInternalJAXB)
+		{
+			//Transformer transformer = DOMUtils.getTransformer("/nl/clockwork/ebms/xsl/EbMSNullTransformation.xml");
+			//DOMResult result = new DOMResult();
+			//transformer.transform(new DOMSource(d),result);
+			//d = (Document)result.getNode();
+			d = db.parse(new ByteArrayInputStream(messageBuilder.handle(new JAXBElement<Envelope>(new QName("http://schemas.xmlsoap.org/soap/envelope/","Envelope"),Envelope.class,envelope),new EbMSInternalNamespaceMapper()).getBytes()));
+		}
+		else
+			d = db.parse(new ByteArrayInputStream(messageBuilder.handle(new JAXBElement<Envelope>(new QName("http://schemas.xmlsoap.org/soap/envelope/","Envelope"),Envelope.class,envelope),new EbMSNamespaceMapper()).getBytes()));
 
 		return d;
 	}
