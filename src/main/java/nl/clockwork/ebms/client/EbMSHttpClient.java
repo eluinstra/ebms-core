@@ -50,13 +50,17 @@ public class EbMSHttpClient implements EbMSClient
 		try
 		{
 			HttpURLConnection connection = (HttpURLConnection)openConnection(uri);
-			logger.debug("OUT:\n" + DOMUtils.toString(document.getMessage()));
+			if (logger.isDebugEnabled())
+				logger.debug("OUT:\n" + DOMUtils.toString(document.getMessage()));
 			EbMSMessageWriter writer = new EbMSMessageWriterImpl(connection);
 			writer.write(document);
 			writer.flush();
 			EbMSResponseDocument in = handleResponse(connection);
-			logger.debug("StatusCode: " + in.getStatusCode());
-			logger.debug("IN:\n" + (in.getMessage() == null ? "" : DOMUtils.toString(in.getMessage())));
+			if (logger.isDebugEnabled())
+			{
+				logger.debug("StatusCode: " + in.getStatusCode());
+				logger.debug("IN:\n" + (in.getMessage() == null ? "" : DOMUtils.toString(in.getMessage())));
+			}
 			return in;
 		}
 		catch (ConnectException e)

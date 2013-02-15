@@ -41,18 +41,23 @@ public class EbMSHttpHandlerImpl implements EbMSHttpHandler
 	  	{
 	  		EbMSMessageReader messageReader = new EbMSMessageReaderImpl(request.getContentType());
 				EbMSDocument in = messageReader.read(request.getInputStream());
-				logger.debug("IN:\n" + DOMUtils.toString(in.getMessage()));
+				if (logger.isDebugEnabled())
+					logger.debug("IN:\n" + DOMUtils.toString(in.getMessage()));
 				EbMSDocument out = messageProcessor.process(in);
 				if (out == null)
 				{
-					logger.debug("StatusCode: 204");
+					if (logger.isDebugEnabled())
+						logger.debug("StatusCode: 204");
 					response.setStatus(204);
 				}
 				else
 				{
-					logger.debug("StatusCode: 200");
-					logger.debug("Content-Type: text/xml");
-					logger.debug("OUT:\n" + DOMUtils.toString(out.getMessage()));
+					if (logger.isDebugEnabled())
+					{
+						logger.debug("StatusCode: 200");
+						logger.debug("Content-Type: text/xml");
+						logger.debug("OUT:\n" + DOMUtils.toString(out.getMessage()));
+					}
 					response.setStatus(200);
 					response.setHeader("Content-Type","text/xml");
 					response.setHeader("SOAPAction",Constants.EBMS_SOAP_ACTION);

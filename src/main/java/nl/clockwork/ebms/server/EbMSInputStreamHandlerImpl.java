@@ -51,18 +51,23 @@ public abstract class EbMSInputStreamHandlerImpl implements EbMSInputStreamHandl
 	  	{
 	  		EbMSMessageReader messageReader = new EbMSMessageReaderImpl(getHeader("Content-Type"));
 				EbMSDocument in = messageReader.read(request);
-				logger.debug("IN:\n" + DOMUtils.toString(in.getMessage()));
+				if (logger.isDebugEnabled())
+					logger.debug("IN:\n" + DOMUtils.toString(in.getMessage()));
 				EbMSDocument out = messageProcessor.process(in);
 				if (out == null)
 				{
-					logger.debug("StatusCode: 204");
+					if (logger.isDebugEnabled())
+						logger.debug("StatusCode: 204");
 					writeResponseStatus(204);
 				}
 				else
 				{
-					logger.debug("StatusCode: 200");
-					logger.debug("Content-Type: text/xml");
-					logger.debug("OUT:\n" + DOMUtils.toString(out.getMessage()));
+					if (logger.isDebugEnabled())
+					{
+						logger.debug("StatusCode: 200");
+						logger.debug("Content-Type: text/xml");
+						logger.debug("OUT:\n" + DOMUtils.toString(out.getMessage()));
+					}
 					writeResponseStatus(200);
 					writeResponseHeader("Content-Type","text/xml");
 					writeResponseHeader("SOAPAction",Constants.EBMS_SOAP_ACTION);
