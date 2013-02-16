@@ -359,52 +359,38 @@ public class EbMSMessageProcessorImpl implements EbMSMessageProcessor
 			);
 	}
 	
-	private EbMSMessage processStatusRequest(GregorianCalendar timestamp, EbMSMessage message)
+	private EbMSMessage processStatusRequest(GregorianCalendar timestamp, EbMSMessage message) throws DatatypeConfigurationException, JAXBException
 	{
-		try
+		//TODO store statusResponse and sendEvent and add duplicate detection
+		MessageHeader messageHeader = message.getMessageHeader();
+		CollaborationProtocolAgreement cpa = ebMSDAO.getCPA(messageHeader.getCPAId());
+		ErrorList errorList = createErrorList();
+		EbMSMessage statusResponse = createEbMSStatusResponse(message,cpaValidator.isValid(errorList,cpa,messageHeader,timestamp) ? null : EbMSMessageStatus.UNAUTHORIZED);
+		if (message.getSyncReply() == null)
 		{
-			//TODO store statusResponse and sendEvent and add duplicate detection
-			MessageHeader messageHeader = message.getMessageHeader();
-			CollaborationProtocolAgreement cpa = ebMSDAO.getCPA(messageHeader.getCPAId());
-			ErrorList errorList = createErrorList();
-			EbMSMessage statusResponse = createEbMSStatusResponse(message,cpaValidator.isValid(errorList,cpa,messageHeader,timestamp) ? null : EbMSMessageStatus.UNAUTHORIZED);
-			if (message.getSyncReply() == null)
-			{
-				errorList = createErrorList();
-				errorList.getError().add(EbMSMessageUtils.createError("//Header/SyncReply",Constants.EbMSErrorCode.NOT_SUPPORTED.errorCode(),"SyncReply mode not supported."));
-				return createEbMSMessageError(timestamp,message,errorList );
-			}
-			else
-				return statusResponse;
+			errorList = createErrorList();
+			errorList.getError().add(EbMSMessageUtils.createError("//Header/SyncReply",Constants.EbMSErrorCode.NOT_SUPPORTED.errorCode(),"SyncReply mode not supported."));
+			return createEbMSMessageError(timestamp,message,errorList );
 		}
-		catch (Exception e)
-		{
-			throw new RuntimeException(e);
-		}
+		else
+			return statusResponse;
 	}
 	
-	private EbMSMessage processPing(GregorianCalendar timestamp, EbMSMessage message)
+	private EbMSMessage processPing(GregorianCalendar timestamp, EbMSMessage message) throws DatatypeConfigurationException, JAXBException
 	{
-		try
+		//TODO store pong and sendEvent and add duplicate detection
+		MessageHeader messageHeader = message.getMessageHeader();
+		CollaborationProtocolAgreement cpa = ebMSDAO.getCPA(messageHeader.getCPAId());
+		ErrorList errorList = createErrorList();
+		EbMSMessage pong = cpaValidator.isValid(errorList,cpa,messageHeader,timestamp) ? null : createEbMSPong(message);
+		if (message.getSyncReply() == null)
 		{
-			//TODO store pong and sendEvent and add duplicate detection
-			MessageHeader messageHeader = message.getMessageHeader();
-			CollaborationProtocolAgreement cpa = ebMSDAO.getCPA(messageHeader.getCPAId());
-			ErrorList errorList = createErrorList();
-			EbMSMessage pong = cpaValidator.isValid(errorList,cpa,messageHeader,timestamp) ? null : createEbMSPong(message);
-			if (message.getSyncReply() == null)
-			{
-				errorList = createErrorList();
-				errorList.getError().add(EbMSMessageUtils.createError("//Header/SyncReply",Constants.EbMSErrorCode.NOT_SUPPORTED.errorCode(),"SyncReply mode not supported."));
-				return createEbMSMessageError(timestamp,message,errorList);
-			}
-			else
-				return pong;
+			errorList = createErrorList();
+			errorList.getError().add(EbMSMessageUtils.createError("//Header/SyncReply",Constants.EbMSErrorCode.NOT_SUPPORTED.errorCode(),"SyncReply mode not supported."));
+			return createEbMSMessageError(timestamp,message,errorList);
 		}
-		catch (Exception e)
-		{
-			throw new RuntimeException(e);
-		}
+		else
+			return pong;
 	}
 	
 	private boolean isDuplicateMessage(EbMSMessage message)
