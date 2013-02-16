@@ -1,12 +1,11 @@
 - validate message format (available elements versus action)
-- improve logging
 - improve header validation
 	- add separate service and action validation
 - improve CPAUtils.isSigned
 
 - remove unnecessary defined Interfaces and custom Exceptions
 - check http headers
-- improve EbMSMessageProcessor
+/ improve EbMSMessageProcessor
 - improve EbMSHttpClient
   - move cpa functionality to caller; add extra properties for url and signing (sendEvent)?
 
