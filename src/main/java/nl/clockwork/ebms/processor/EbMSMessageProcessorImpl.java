@@ -417,7 +417,7 @@ public class EbMSMessageProcessorImpl implements EbMSMessageProcessor
 		//TODO extend comparison (signature)
 		MessageHeader duplicateMessageHeader = ebMSDAO.getMessageHeader(message.getMessageHeader().getMessageData().getMessageId());
 		return message.getMessageHeader().getCPAId().equals(duplicateMessageHeader.getCPAId())
-		&& message.getMessageHeader().getService().getType().equals(duplicateMessageHeader.getService().getType())
+		&& (message.getMessageHeader().getService().getType() == null ? duplicateMessageHeader.getService().getType() == null : message.getMessageHeader().getService().getType().equals(duplicateMessageHeader.getService().getType()))
 		&& message.getMessageHeader().getService().getValue().equals(duplicateMessageHeader.getService().getValue())
 		&& message.getMessageHeader().getAction().equals(duplicateMessageHeader.getAction());
 	}
