@@ -175,8 +175,8 @@ public class EbMSMessageProcessorImpl implements EbMSMessageProcessor
 								long id = ebMSDAO.insertMessage(timestamp.getTime(),acknowledgment,null);
 								if (message.getSyncReply() == null)
 								{
-									final EbMSSendEvent sendEvent = EbMSMessageUtils.getEbMSSendEvent(cpa,acknowledgment.getMessageHeader());
-									ebMSDAO.insertSendEvent(id,sendEvent);
+									EbMSSendEvent sendEvent = EbMSMessageUtils.getEbMSSendEvent(id,acknowledgment.getMessageHeader());
+									ebMSDAO.insertSendEvent(sendEvent);
 								}
 							}
 						}
@@ -212,8 +212,8 @@ public class EbMSMessageProcessorImpl implements EbMSMessageProcessor
 							long id = ebMSDAO.insertMessage(timestamp.getTime(),messageError,null);
 							if (message.getSyncReply() == null)
 							{
-								final EbMSSendEvent sendEvent = EbMSMessageUtils.getEbMSSendEvent(cpa,messageError.getMessageHeader());
-								ebMSDAO.insertSendEvent(id,sendEvent);
+								EbMSSendEvent sendEvent = EbMSMessageUtils.getEbMSSendEvent(id,messageError.getMessageHeader());
+								ebMSDAO.insertSendEvent(sendEvent);
 							}
 						}
 					}
@@ -308,8 +308,8 @@ public class EbMSMessageProcessorImpl implements EbMSMessageProcessor
 						long id = ebMSDAO.insertMessage(timestamp.getTime(),statusResponse,null);
 						if (message.getSyncReply() == null)
 						{
-							final EbMSSendEvent sendEvent = EbMSMessageUtils.getEbMSSendEvent(cpa,statusResponse.getMessageHeader());
-							ebMSDAO.insertSendEvent(id,sendEvent);
+							EbMSSendEvent sendEvent = EbMSMessageUtils.getEbMSSendEvent(id,statusResponse.getMessageHeader());
+							ebMSDAO.insertSendEvent(sendEvent);
 						}
 					}
 				}
@@ -356,8 +356,8 @@ public class EbMSMessageProcessorImpl implements EbMSMessageProcessor
 						long id = ebMSDAO.insertMessage(timestamp.getTime(),pong,null);
 						if (message.getSyncReply() == null)
 						{
-							final EbMSSendEvent sendEvent = EbMSMessageUtils.getEbMSSendEvent(cpa,pong.getMessageHeader());
-							ebMSDAO.insertSendEvent(id,sendEvent);
+							EbMSSendEvent sendEvent = EbMSMessageUtils.getEbMSSendEvent(id,pong.getMessageHeader());
+							ebMSDAO.insertSendEvent(sendEvent);
 						}
 					}
 				}

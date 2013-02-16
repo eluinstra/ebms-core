@@ -48,15 +48,15 @@ public interface EbMSDAO
 	EbMSMessageStatus getMessageStatus(String messageId) throws DAOException;
 
 	List<EbMSSendEvent> selectEventsForSending(Date timestamp) throws DAOException;
-	void updateSendEvent(Date timestamp, Long id, EbMSEventStatus status) throws DAOException;
-	void deleteEventsBefore(Date timestamp, Long id, EbMSEventStatus status) throws DAOException;
+	void updateSendEvent(Date timestamp, Long ebMSMessageId, EbMSEventStatus status) throws DAOException;
+	void deleteEventsBefore(Date timestamp, Long ebMSMessageId, EbMSEventStatus status) throws DAOException;
 
 	long insertMessage(Date timestamp, EbMSMessage message, EbMSMessageStatus status) throws DAOException;
-	void updateMessageStatus(Long id, EbMSMessageStatus oldStatus, EbMSMessageStatus newStatus) throws DAOException;
-	void insertSendEvent(long id) throws DAOException;
-	void insertSendEvent(long id, EbMSSendEvent sendEvent) throws DAOException;
-	void insertSendEvents(long id, List<EbMSSendEvent> sendEvents) throws DAOException;
-	void deleteSendEvents(Long id, EbMSEventStatus status) throws DAOException;
+	void updateMessageStatus(Long ebMSMessageId, EbMSMessageStatus oldStatus, EbMSMessageStatus newStatus) throws DAOException;
+	void insertSendEvent(long ebMSMessageId) throws DAOException;
+	void insertSendEvent(EbMSSendEvent sendEvent) throws DAOException;
+	void insertSendEvents(List<EbMSSendEvent> sendEvents) throws DAOException;
+	void deleteSendEvents(Long ebMSMessageId, EbMSEventStatus status) throws DAOException;
 
 	List<String> getMessageIds(EbMSMessageContext messageContext, EbMSMessageStatus status) throws DAOException;
 	List<String> getMessageIds(EbMSMessageContext messageContext, EbMSMessageStatus status, int maxNr) throws DAOException;

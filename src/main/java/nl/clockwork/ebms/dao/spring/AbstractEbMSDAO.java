@@ -543,7 +543,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	}
 	
 	@Override
-	public void updateSendEvent(Date timestamp, Long id, EbMSEventStatus status) throws DAOException
+	public void updateSendEvent(Date timestamp, Long ebMSMessageId, EbMSEventStatus status) throws DAOException
 	{
 		try
 		{
@@ -554,7 +554,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 				" where ebms_message_id = ?" +
 				" and time = ?",
 				status.id(),
-				id,
+				ebMSMessageId,
 				timestamp
 			);
 		}
@@ -565,7 +565,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	}
 	
 	@Override
-	public void deleteEventsBefore(Date timestamp, Long id, EbMSEventStatus status) throws DAOException
+	public void deleteEventsBefore(Date timestamp, Long ebMSMessageId, EbMSEventStatus status) throws DAOException
 	{
 		try
 		{
@@ -574,7 +574,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 				" where ebms_message_id = ?" +
 				" and time < ?" +
 				"and status = ?",
-				id,
+				ebMSMessageId,
 				timestamp,
 				status.id()
 			);
@@ -729,7 +729,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	}
 
 	@Override
-	public void updateMessageStatus(Long id, EbMSMessageStatus oldStatus, EbMSMessageStatus newStatus) throws DAOException
+	public void updateMessageStatus(Long ebMSMessageId, EbMSMessageStatus oldStatus, EbMSMessageStatus newStatus) throws DAOException
 	{
 		try
 		{
@@ -741,7 +741,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 				" where id = ?" +
 				(oldStatus == null ? " and status is null" : " and status = " + oldStatus.id()),
 				newStatus.id(),
-				id
+				ebMSMessageId
 			);
 		}
 		catch (DataAccessException e)
@@ -770,7 +770,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	}
 	
 	@Override
-	public void insertSendEvent(long id, EbMSSendEvent sendEvent) throws DAOException
+	public void insertSendEvent(EbMSSendEvent sendEvent) throws DAOException
 	{
 		try
 		{
@@ -781,7 +781,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 						"ebms_message_id," +
 						"time" +
 					") values (?,?)",
-					id,
+					sendEvent.getEbMSMessageId(),
 					//String.format(getDateFormat(),sendEvent.getTime())
 					sendEvent.getTime()
 				);
@@ -793,15 +793,15 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	}
 
 	@Override
-	public void insertSendEvents(long id, List<EbMSSendEvent> sendEvents) throws DAOException
+	public void insertSendEvents(List<EbMSSendEvent> sendEvents) throws DAOException
 	{
 		try
 		{
 			List<Object[]> events = new ArrayList<Object[]>();
 			for (EbMSSendEvent sendEvent : sendEvents)
 			{
-				//events.add(new Object[]{keyHolder.getKey().longValue(),String.format(getDateFormat(),sendEvent.getTime())});
-				events.add(new Object[]{id,sendEvent.getTime()});
+				//events.add(new Object[]{sendEvent.getEbMSMessageId(),String.format(getDateFormat(),sendEvent.getTime())});
+				events.add(new Object[]{sendEvent.getEbMSMessageId(),sendEvent.getTime()});
 			}
 			jdbcTemplate.batchUpdate
 			(
@@ -819,7 +819,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	}
 
 	@Override
-	public void deleteSendEvents(Long id, EbMSEventStatus status) throws DAOException
+	public void deleteSendEvents(Long ebMSMessageId, EbMSEventStatus status) throws DAOException
 	{
 		try
 		{
@@ -828,7 +828,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 				"delete from ebms_send_event" +
 				" where ebms_message_id = ?" +
 				" and status = ?",
-				id,
+				ebMSMessageId,
 				status.id()
 			);
 		}

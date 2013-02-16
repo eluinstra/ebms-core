@@ -22,12 +22,6 @@ public class EbMSSendEvent
 	private Long ebMSMessageId;
 	private Date time;
 
-	public EbMSSendEvent(Date time)
-	{
-		this(null,time);
-	}
-
-	
 	public EbMSSendEvent(Long ebMSMessageId, Date time)
 	{
 		this.ebMSMessageId = ebMSMessageId;

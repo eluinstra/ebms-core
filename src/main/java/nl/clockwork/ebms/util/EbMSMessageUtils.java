@@ -407,12 +407,12 @@ public class EbMSMessageUtils
 		return new EbMSMessageContent(new EbMSMessageContext(message.getMessageHeader()),dataSources);
 	}
 
-	public static EbMSSendEvent getEbMSSendEvent(CollaborationProtocolAgreement cpa, MessageHeader messageHeader)
+	public static EbMSSendEvent getEbMSSendEvent(long id, MessageHeader messageHeader)
 	{
-		return new EbMSSendEvent(messageHeader.getMessageData().getTimestamp().toGregorianCalendar().getTime());
+		return new EbMSSendEvent(id,messageHeader.getMessageData().getTimestamp().toGregorianCalendar().getTime());
 	}
 
-	public static List<EbMSSendEvent> getEbMSSendEvents(CollaborationProtocolAgreement cpa, MessageHeader messageHeader)
+	public static List<EbMSSendEvent> getEbMSSendEvents(CollaborationProtocolAgreement cpa, long id, MessageHeader messageHeader)
 	{
 		List<EbMSSendEvent> result = new ArrayList<EbMSSendEvent>();
 		Date sendTime = messageHeader.getMessageData().getTimestamp().toGregorianCalendar().getTime();
@@ -420,7 +420,7 @@ public class EbMSMessageUtils
 		if (rm != null)
 			for (int i = 0; i < rm.getRetries().intValue() + 1; i++)
 			{
-				result.add(new EbMSSendEvent((Date)sendTime.clone()));
+				result.add(new EbMSSendEvent(id,(Date)sendTime.clone()));
 				rm.getRetryInterval().addTo(sendTime);
 			}
 		return result;

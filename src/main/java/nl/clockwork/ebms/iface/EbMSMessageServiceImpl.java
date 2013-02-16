@@ -47,7 +47,6 @@ public class EbMSMessageServiceImpl implements EbMSMessageService
 			new EbMSMessageContextValidator(ebMSDAO).validate(messageContent.getContext());
 			CollaborationProtocolAgreement cpa = ebMSDAO.getCPA(messageContent.getContext().getCpaId());
 			final EbMSMessage message = EbMSMessageUtils.ebMSMessageContentToEbMSMessage(cpa,messageContent,hostname);
-			final List<EbMSSendEvent> sendEvents = EbMSMessageUtils.getEbMSSendEvents(ebMSDAO.getCPA(message.getMessageHeader().getCPAId()),message.getMessageHeader());
 			ebMSDAO.executeTransaction(
 				new DAOTransactionCallback()
 				{
@@ -55,7 +54,8 @@ public class EbMSMessageServiceImpl implements EbMSMessageService
 					public void doInTransaction()
 					{
 						long id = ebMSDAO.insertMessage(new Date(),message,null);
-						ebMSDAO.insertSendEvents(id,sendEvents);
+						List<EbMSSendEvent> sendEvents = EbMSMessageUtils.getEbMSSendEvents(ebMSDAO.getCPA(message.getMessageHeader().getCPAId()),id,message.getMessageHeader());
+						ebMSDAO.insertSendEvents(sendEvents);
 					}
 				}
 			);
