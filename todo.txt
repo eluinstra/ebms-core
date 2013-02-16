@@ -25,6 +25,8 @@
 - remove servlet from core?
 - remove EbMS prefix on classes
 
+- implement EbMSFileAttachment (file proxy) and EbMSDBAttachment (db proxy) for large message processing?
+
 - replace commons-logging by slf4j???
 - read mime message
 	- replace mime4j by:
