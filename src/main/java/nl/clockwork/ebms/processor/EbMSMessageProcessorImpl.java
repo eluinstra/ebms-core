@@ -291,7 +291,7 @@ public class EbMSMessageProcessorImpl implements EbMSMessageProcessor
 				else
 				{
 					status = ebMSDAO.getMessageStatus(message.getStatusRequest().getRefToMessageId());
-					if (MessageStatusType.RECEIVED.equals(status.statusCode()) || MessageStatusType.PROCESSED.equals(status.statusCode()) || MessageStatusType.FORWARDED.equals(status.statusCode()))
+					if (status != null && (MessageStatusType.RECEIVED.equals(status.statusCode()) || MessageStatusType.PROCESSED.equals(status.statusCode()) || MessageStatusType.FORWARDED.equals(status.statusCode())))
 						c = header.getMessageData().getTimestamp().toGregorianCalendar();
 				}
 			}

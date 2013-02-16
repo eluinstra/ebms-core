@@ -567,8 +567,6 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 				ResultSet rs = ps.getResultSet();
 				if (rs.next())
 					result = EbMSMessageStatus.get(rs.getObject("status") == null ? null : rs.getInt("status"));
-				else
-					result = EbMSMessageStatus.NOT_RECOGNIZED;
 			}
 			return result;
 		}

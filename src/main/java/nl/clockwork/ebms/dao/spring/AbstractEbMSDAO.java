@@ -482,7 +482,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 		}
 		catch(EmptyResultDataAccessException e)
 		{
-			return EbMSMessageStatus.NOT_RECOGNIZED;
+			return null;
 		}
 		catch (DataAccessException e)
 		{
