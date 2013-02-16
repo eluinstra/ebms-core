@@ -584,7 +584,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	}
 
 	@Override
-	public List<EbMSSendEvent> selectEventsForSending(Date timestamp) throws DAOException
+	public List<EbMSSendEvent> getLatestEventsByEbMSMessageIdBefore(Date timestamp, EbMSEventStatus status) throws DAOException
 	{
 		Connection c = null;
 		PreparedStatement ps = null;
@@ -595,12 +595,12 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 			ps = c.prepareStatement(
 				"select ebms_message_id, max(time) as time" +
 				" from ebms_send_event" +
-				" where status = 0" +
-				//" and time <= " + getTimestampFunction() +
+				" where status = ?" +
 				" and time <= ?" +
 				" group by ebms_message_id"
 			);
-			ps.setTimestamp(1,new Timestamp(timestamp.getTime()));
+			ps.setInt(1,status.ordinal());
+			ps.setTimestamp(2,new Timestamp(timestamp.getTime()));
 			if (ps.execute())
 			{
 				ResultSet rs = ps.getResultSet();
@@ -631,7 +631,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 			ps  = c.prepareStatement(
 				"update ebms_send_event set" +
 				" status = ?," +
-				" status_time = NOW()" +
+				" status_time = " + getTimestampFunction() +
 				" where ebms_message_id = ?" +
 				" and time = ?"
 			);

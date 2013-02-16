@@ -47,7 +47,7 @@ public interface EbMSDAO
 	EbMSMessage getMessage(long id) throws DAOException;
 	EbMSMessageStatus getMessageStatus(String messageId) throws DAOException;
 
-	List<EbMSSendEvent> selectEventsForSending(Date timestamp) throws DAOException;
+	List<EbMSSendEvent> getLatestEventsByEbMSMessageIdBefore(Date timestamp, EbMSEventStatus status) throws DAOException;
 	void updateSendEvent(Date timestamp, Long ebMSMessageId, EbMSEventStatus status) throws DAOException;
 	void deleteEventsBefore(Date timestamp, Long ebMSMessageId, EbMSEventStatus status) throws DAOException;
 
@@ -63,5 +63,6 @@ public interface EbMSDAO
 	EbMSMessage getMessage(String messageId) throws DAOException;
 	void updateMessage(String messageId, EbMSMessageStatus oldStatus, EbMSMessageStatus newStatus) throws DAOException;
 	void updateMessages(List<String> messageIds, EbMSMessageStatus oldStatus, EbMSMessageStatus newStatus) throws DAOException;
+
 
 }

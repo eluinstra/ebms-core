@@ -514,15 +514,14 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	}
 
 	@Override
-	public List<EbMSSendEvent> selectEventsForSending(Date timestamp) throws DAOException
+	public List<EbMSSendEvent> getLatestEventsByEbMSMessageIdBefore(Date timestamp, EbMSEventStatus status) throws DAOException
 	{
 		try
 		{
 			return jdbcTemplate.query(
 				"select ebms_message_id, max(time) as time" +
 				" from ebms_send_event" +
-				" where status = 0" +
-				//" and time <= " + getTimestampFunction() +
+				" where status = ?" +
 				" and time <= ?" +
 				" group by ebms_message_id",
 				new ParameterizedRowMapper<EbMSSendEvent>()
@@ -533,6 +532,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 						return new EbMSSendEvent(rs.getLong("ebms_message_id"),rs.getTimestamp("time"));
 					}
 				},
+				status.ordinal(),
 				timestamp
 			);
 		}
@@ -550,7 +550,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 			jdbcTemplate.update(
 				"update ebms_send_event set" +
 				" status = ?," +
-				" status_time = NOW()" +
+				" status_time = " + getTimestampFunction() +
 				" where ebms_message_id = ?" +
 				" and time = ?",
 				status.id(),

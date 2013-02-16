@@ -61,7 +61,7 @@ public class ProcessSendEvents implements Job
   public void execute()
   {
   	GregorianCalendar timestamp = new GregorianCalendar();
-  	List<EbMSSendEvent> sendEvents = ebMSDAO.selectEventsForSending(timestamp.getTime());
+  	List<EbMSSendEvent> sendEvents = ebMSDAO.getLatestEventsByEbMSMessageIdBefore(timestamp.getTime(),EbMSEventStatus.UNPROCESSED);
   	List<Future<?>> futures = new ArrayList<Future<?>>();
   	for (final EbMSSendEvent sendEvent : sendEvents)
   	{
