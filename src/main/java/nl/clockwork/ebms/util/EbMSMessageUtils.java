@@ -39,6 +39,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.soap.SOAPException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactoryConfigurationError;
+import javax.xml.xpath.XPathExpressionException;
 
 import nl.clockwork.ebms.Constants;
 import nl.clockwork.ebms.Constants.EbMSAction;
@@ -47,6 +48,7 @@ import nl.clockwork.ebms.common.util.DOMUtils;
 import nl.clockwork.ebms.common.util.XMLMessageBuilder;
 import nl.clockwork.ebms.model.EbMSAttachment;
 import nl.clockwork.ebms.model.EbMSDataSource;
+import nl.clockwork.ebms.model.EbMSDocument;
 import nl.clockwork.ebms.model.EbMSMessage;
 import nl.clockwork.ebms.model.EbMSMessageContent;
 import nl.clockwork.ebms.model.EbMSMessageContext;
@@ -96,6 +98,71 @@ public class EbMSMessageUtils
 	{
 		//useInternalJAXB =  !JAXBContext.JAXB_CONTEXT_FACTORY.equals("com.sun.xml.internal.bind.v2.ContextFactory");
 		useInternalJAXB =  !JAXBContext.JAXB_CONTEXT_FACTORY.contains("internal");
+	}
+	
+	public static EbMSMessage getEbMSMessage(Document document, List<EbMSAttachment> attachments) throws JAXBException, XPathExpressionException, ParserConfigurationException, SAXException, IOException
+	{
+		XMLMessageBuilder<Envelope> messageBuilder = XMLMessageBuilder.getInstance(Envelope.class,Envelope.class,MessageHeader.class,SyncReply.class,MessageOrder.class,AckRequested.class,SignatureType.class,ErrorList.class,Acknowledgment.class,Manifest.class,StatusRequest.class,StatusResponse.class);
+		Envelope envelope = messageBuilder.handle(document);
+		return getEbMSMessage(envelope,attachments);
+		
+//		SignatureType signature = XMLMessageBuilder.getInstance(SignatureType.class).handle(DOMUtils.executeXPathQuery(new EbXMLNamespaceContext(),document,"/soap:Envelope/soap:Header/ds:Signature"));
+//		MessageHeader messageHeader = XMLMessageBuilder.getInstance(MessageHeader.class).handle(DOMUtils.executeXPathQuery(new EbXMLNamespaceContext(),document,"/soap:Envelope/soap:Header/ebxml:MessageHeader"));
+//		SyncReply syncReply = XMLMessageBuilder.getInstance(SyncReply.class).handle(DOMUtils.executeXPathQuery(new EbXMLNamespaceContext(),document,"/soap:Envelope/soap:Header/ebxml:SyncReply"));
+//		MessageOrder messageOrder = XMLMessageBuilder.getInstance(MessageOrder.class).handle(DOMUtils.executeXPathQuery(new EbXMLNamespaceContext(),document,"/soap:Envelope/soap:Header/ebxml:MessageOrder"));
+//		AckRequested ackRequested = XMLMessageBuilder.getInstance(AckRequested.class).handle(DOMUtils.executeXPathQuery(new EbXMLNamespaceContext(),document,"/soap:Envelope/soap:Header/ebxml:AckRequested"));
+//		ErrorList errorList = XMLMessageBuilder.getInstance(ErrorList.class).handle(DOMUtils.executeXPathQuery(new EbXMLNamespaceContext(),document,"/soap:Envelope/soap:Header/ebxml:ErrorList"));
+//		Acknowledgment acknowledgment = XMLMessageBuilder.getInstance(Acknowledgment.class).handle(DOMUtils.executeXPathQuery(new EbXMLNamespaceContext(),document,"/soap:Envelope/soap:Header/ebxml:Acknowledgment"));
+//		Manifest manifest = XMLMessageBuilder.getInstance(Manifest.class).handle(DOMUtils.executeXPathQuery(new EbXMLNamespaceContext(),document,"/soap:Envelope/soap:Body/ebxml:Manifest"));
+//		StatusRequest statusRequest = XMLMessageBuilder.getInstance(StatusRequest.class).handle(DOMUtils.executeXPathQuery(new EbXMLNamespaceContext(),document,"/soap:Envelope/soap:Body/ebxml:StatusRequest"));
+//		StatusResponse statusResponse = XMLMessageBuilder.getInstance(StatusResponse.class).handle(DOMUtils.executeXPathQuery(new EbXMLNamespaceContext(),document,"/soap:Envelope/soap:Body/ebxml:StatusResponse"));
+//		return new EbMSMessage(signature,messageHeader,syncReply,messageOrder,ackRequested,errorList,acknowledgment,manifest,statusRequest,statusResponse,attachments);
+	}
+
+	@SuppressWarnings("unchecked")
+	public static EbMSMessage getEbMSMessage(Envelope envelope, List<EbMSAttachment> attachments)
+	{
+		
+		SignatureType signature = null;
+		MessageHeader messageHeader = null;
+		SyncReply syncReply = null;
+		MessageOrder messageOrder = null;
+		AckRequested ackRequested = null;
+		ErrorList errorList = null;
+		Acknowledgment acknowledgment = null;
+		for (Object element : envelope.getHeader().getAny())
+			if (element instanceof JAXBElement && ((JAXBElement<?>)element).getValue() instanceof SignatureType)
+				signature = ((JAXBElement<SignatureType>)element).getValue();
+			else if (element instanceof MessageHeader)
+				messageHeader = (MessageHeader)element;
+			else if (element instanceof SyncReply)
+				syncReply = (SyncReply)element;
+			else if (element instanceof MessageOrder)
+				messageOrder = (MessageOrder)element;
+			else if (element instanceof AckRequested)
+				ackRequested = (AckRequested)element;
+			else if (element instanceof ErrorList)
+				errorList = (ErrorList)element;
+			else if (element instanceof Acknowledgment)
+				acknowledgment = (Acknowledgment)element;
+
+		Manifest manifest = null;
+		StatusRequest statusRequest = null;
+		StatusResponse statusResponse = null;
+		for (Object element : envelope.getBody().getAny())
+			if (element instanceof Manifest)
+				manifest = (Manifest)element;
+			else if (element instanceof StatusRequest)
+				statusRequest = (StatusRequest)element;
+			else if (element instanceof StatusResponse)
+				statusResponse = (StatusResponse)element;
+
+		return new EbMSMessage(signature,messageHeader,syncReply,messageOrder,ackRequested,errorList,acknowledgment,manifest,statusRequest,statusResponse,attachments);
+	}
+	
+	public static EbMSDocument getEbMSDocument(EbMSMessage message) throws SOAPException, JAXBException, ParserConfigurationException, SAXException, IOException, TransformerFactoryConfigurationError, TransformerException
+	{
+		return new EbMSDocument(EbMSMessageUtils.createSOAPMessage(message),message.getAttachments());
 	}
 	
 	public static MessageHeader createMessageHeader(CollaborationProtocolAgreement cpa, EbMSMessageContext context, String hostname) throws DatatypeConfigurationException
@@ -203,6 +270,15 @@ public class EbMSMessageUtils
 		Manifest manifest = new Manifest();
 		manifest.setVersion(Constants.EBMS_VERSION);
 		return manifest;
+	}
+	
+	public static ErrorList createErrorList()
+	{
+		ErrorList result = new ErrorList();
+		result.setVersion(Constants.EBMS_VERSION);
+		result.setMustUnderstand(true);
+		result.setHighestSeverity(SeverityType.WARNING);
+		return result;
 	}
 	
 	public static Error createError(String location, String errorCode, String description)

@@ -18,44 +18,29 @@ package nl.clockwork.ebms.processor;
 import java.io.IOException;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
-import java.util.List;
 
-import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.soap.SOAPException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactoryConfigurationError;
-import javax.xml.xpath.XPathExpressionException;
 
 import nl.clockwork.ebms.Constants;
 import nl.clockwork.ebms.Constants.EbMSAction;
 import nl.clockwork.ebms.Constants.EbMSEventStatus;
 import nl.clockwork.ebms.Constants.EbMSMessageStatus;
-import nl.clockwork.ebms.common.util.XMLMessageBuilder;
 import nl.clockwork.ebms.dao.DAOException;
 import nl.clockwork.ebms.dao.DAOTransactionCallback;
 import nl.clockwork.ebms.dao.EbMSDAO;
-import nl.clockwork.ebms.model.EbMSAttachment;
 import nl.clockwork.ebms.model.EbMSDocument;
 import nl.clockwork.ebms.model.EbMSMessage;
 import nl.clockwork.ebms.model.EbMSSendEvent;
 import nl.clockwork.ebms.model.cpp.cpa.CollaborationProtocolAgreement;
-import nl.clockwork.ebms.model.ebxml.AckRequested;
-import nl.clockwork.ebms.model.ebxml.Acknowledgment;
 import nl.clockwork.ebms.model.ebxml.ErrorList;
-import nl.clockwork.ebms.model.ebxml.Manifest;
 import nl.clockwork.ebms.model.ebxml.MessageHeader;
-import nl.clockwork.ebms.model.ebxml.MessageOrder;
 import nl.clockwork.ebms.model.ebxml.MessageStatusType;
 import nl.clockwork.ebms.model.ebxml.Service;
-import nl.clockwork.ebms.model.ebxml.SeverityType;
-import nl.clockwork.ebms.model.ebxml.StatusRequest;
-import nl.clockwork.ebms.model.ebxml.StatusResponse;
-import nl.clockwork.ebms.model.ebxml.SyncReply;
-import nl.clockwork.ebms.model.soap.envelope.Envelope;
-import nl.clockwork.ebms.model.xml.dsig.SignatureType;
 import nl.clockwork.ebms.signing.EbMSSignatureValidator;
 import nl.clockwork.ebms.util.EbMSMessageUtils;
 import nl.clockwork.ebms.validation.CPAValidator;
@@ -66,7 +51,6 @@ import nl.clockwork.ebms.validation.ValidatorException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
 public class EbMSMessageProcessorImpl implements EbMSMessageProcessor
@@ -97,11 +81,11 @@ public class EbMSMessageProcessorImpl implements EbMSMessageProcessor
 		try
 		{
 			GregorianCalendar timestamp = new GregorianCalendar();
-			EbMSMessage message = getEbMSMessage(document.getMessage(),document.getAttachments());
+			EbMSMessage message = EbMSMessageUtils.getEbMSMessage(document.getMessage(),document.getAttachments());
 			if (!Constants.EBMS_SERVICE_URI.equals(message.getMessageHeader().getService().getValue()))
 			{
 				EbMSMessage response = process(timestamp,document,message);
-				return response == null ? null : getEbMSDocument(response);
+				return response == null ? null : EbMSMessageUtils.getEbMSDocument(response);
 			}
 			else if (EbMSAction.MESSAGE_ERROR.action().equals(message.getMessageHeader().getAction()))
 			{
@@ -116,7 +100,7 @@ public class EbMSMessageProcessorImpl implements EbMSMessageProcessor
 			else if (EbMSAction.STATUS_REQUEST.action().equals(message.getMessageHeader().getAction()))
 			{
 				EbMSMessage response = processStatusRequest(timestamp,message);
-				return response == null ? null : getEbMSDocument(response);
+				return response == null ? null : EbMSMessageUtils.getEbMSDocument(response);
 			}
 			else if (EbMSAction.STATUS_RESPONSE.action().equals(message.getMessageHeader().getAction()))
 			{
@@ -126,7 +110,7 @@ public class EbMSMessageProcessorImpl implements EbMSMessageProcessor
 			else if (EbMSAction.PING.action().equals(message.getMessageHeader().getAction()))
 			{
 				EbMSMessage response = processPing(timestamp,message);
-				return response == null ? null : getEbMSDocument(response);
+				return response == null ? null : EbMSMessageUtils.getEbMSDocument(response);
 			}
 			else if (EbMSAction.PONG.action().equals(message.getMessageHeader().getAction()))
 			{
@@ -168,7 +152,7 @@ public class EbMSMessageProcessorImpl implements EbMSMessageProcessor
 		}
 		else
 		{
-			ErrorList errorList = createErrorList();
+			ErrorList errorList = EbMSMessageUtils.createErrorList();
 			final CollaborationProtocolAgreement cpa = ebMSDAO.getCPA(messageHeader.getCPAId());
 			if (cpaValidator.isValid(errorList,cpa,messageHeader,timestamp)
 				&& messageHeaderValidator.isValid(errorList,cpa,messageHeader,message.getAckRequested(),message.getSyncReply(),message.getMessageOrder(),timestamp)
@@ -295,7 +279,7 @@ public class EbMSMessageProcessorImpl implements EbMSMessageProcessor
 		{
 			MessageHeader messageHeader = message.getMessageHeader();
 			final CollaborationProtocolAgreement cpa = ebMSDAO.getCPA(messageHeader.getCPAId());
-			ErrorList errorList = createErrorList();
+			ErrorList errorList = EbMSMessageUtils.createErrorList();
 			EbMSMessageStatus status = null; //EbMSMessageStatus.UNAUTHORIZED;
 			if (cpaValidator.isValid(errorList,cpa,messageHeader,timestamp))
 			{
@@ -360,7 +344,7 @@ public class EbMSMessageProcessorImpl implements EbMSMessageProcessor
 		{
 			MessageHeader messageHeader = message.getMessageHeader();
 			final CollaborationProtocolAgreement cpa = ebMSDAO.getCPA(messageHeader.getCPAId());
-			ErrorList errorList = createErrorList();
+			ErrorList errorList = EbMSMessageUtils.createErrorList();
 			final EbMSMessage pong = cpaValidator.isValid(errorList,cpa,messageHeader,timestamp) ? null : EbMSMessageUtils.createEbMSPong(message,hostname);
 			ebMSDAO.executeTransaction(
 				new DAOTransactionCallback()
@@ -423,80 +407,6 @@ public class EbMSMessageProcessorImpl implements EbMSMessageProcessor
 		return ebMSDAO.existsMessage(message.getMessageHeader().getMessageData().getRefToMessageId(),service,new String[]{EbMSAction.MESSAGE_ERROR.action(),EbMSAction.ACKNOWLEDGMENT.action()});
 	}
 
-	private EbMSMessage getEbMSMessage(Document document, List<EbMSAttachment> attachments) throws JAXBException, XPathExpressionException, ParserConfigurationException, SAXException, IOException
-	{
-		XMLMessageBuilder<Envelope> messageBuilder = XMLMessageBuilder.getInstance(Envelope.class,Envelope.class,MessageHeader.class,SyncReply.class,MessageOrder.class,AckRequested.class,SignatureType.class,ErrorList.class,Acknowledgment.class,Manifest.class,StatusRequest.class,StatusResponse.class);
-		Envelope envelope = messageBuilder.handle(document);
-		return getEbMSMessage(envelope,attachments);
-		
-//		SignatureType signature = XMLMessageBuilder.getInstance(SignatureType.class).handle(DOMUtils.executeXPathQuery(new EbXMLNamespaceContext(),document,"/soap:Envelope/soap:Header/ds:Signature"));
-//		MessageHeader messageHeader = XMLMessageBuilder.getInstance(MessageHeader.class).handle(DOMUtils.executeXPathQuery(new EbXMLNamespaceContext(),document,"/soap:Envelope/soap:Header/ebxml:MessageHeader"));
-//		SyncReply syncReply = XMLMessageBuilder.getInstance(SyncReply.class).handle(DOMUtils.executeXPathQuery(new EbXMLNamespaceContext(),document,"/soap:Envelope/soap:Header/ebxml:SyncReply"));
-//		MessageOrder messageOrder = XMLMessageBuilder.getInstance(MessageOrder.class).handle(DOMUtils.executeXPathQuery(new EbXMLNamespaceContext(),document,"/soap:Envelope/soap:Header/ebxml:MessageOrder"));
-//		AckRequested ackRequested = XMLMessageBuilder.getInstance(AckRequested.class).handle(DOMUtils.executeXPathQuery(new EbXMLNamespaceContext(),document,"/soap:Envelope/soap:Header/ebxml:AckRequested"));
-//		ErrorList errorList = XMLMessageBuilder.getInstance(ErrorList.class).handle(DOMUtils.executeXPathQuery(new EbXMLNamespaceContext(),document,"/soap:Envelope/soap:Header/ebxml:ErrorList"));
-//		Acknowledgment acknowledgment = XMLMessageBuilder.getInstance(Acknowledgment.class).handle(DOMUtils.executeXPathQuery(new EbXMLNamespaceContext(),document,"/soap:Envelope/soap:Header/ebxml:Acknowledgment"));
-//		Manifest manifest = XMLMessageBuilder.getInstance(Manifest.class).handle(DOMUtils.executeXPathQuery(new EbXMLNamespaceContext(),document,"/soap:Envelope/soap:Body/ebxml:Manifest"));
-//		StatusRequest statusRequest = XMLMessageBuilder.getInstance(StatusRequest.class).handle(DOMUtils.executeXPathQuery(new EbXMLNamespaceContext(),document,"/soap:Envelope/soap:Body/ebxml:StatusRequest"));
-//		StatusResponse statusResponse = XMLMessageBuilder.getInstance(StatusResponse.class).handle(DOMUtils.executeXPathQuery(new EbXMLNamespaceContext(),document,"/soap:Envelope/soap:Body/ebxml:StatusResponse"));
-//		return new EbMSMessage(signature,messageHeader,syncReply,messageOrder,ackRequested,errorList,acknowledgment,manifest,statusRequest,statusResponse,attachments);
-	}
-
-	@SuppressWarnings("unchecked")
-	private EbMSMessage getEbMSMessage(Envelope envelope, List<EbMSAttachment> attachments)
-	{
-		
-		SignatureType signature = null;
-		MessageHeader messageHeader = null;
-		SyncReply syncReply = null;
-		MessageOrder messageOrder = null;
-		AckRequested ackRequested = null;
-		ErrorList errorList = null;
-		Acknowledgment acknowledgment = null;
-		for (Object element : envelope.getHeader().getAny())
-			if (element instanceof JAXBElement && ((JAXBElement<?>)element).getValue() instanceof SignatureType)
-				signature = ((JAXBElement<SignatureType>)element).getValue();
-			else if (element instanceof MessageHeader)
-				messageHeader = (MessageHeader)element;
-			else if (element instanceof SyncReply)
-				syncReply = (SyncReply)element;
-			else if (element instanceof MessageOrder)
-				messageOrder = (MessageOrder)element;
-			else if (element instanceof AckRequested)
-				ackRequested = (AckRequested)element;
-			else if (element instanceof ErrorList)
-				errorList = (ErrorList)element;
-			else if (element instanceof Acknowledgment)
-				acknowledgment = (Acknowledgment)element;
-
-		Manifest manifest = null;
-		StatusRequest statusRequest = null;
-		StatusResponse statusResponse = null;
-		for (Object element : envelope.getBody().getAny())
-			if (element instanceof Manifest)
-				manifest = (Manifest)element;
-			else if (element instanceof StatusRequest)
-				statusRequest = (StatusRequest)element;
-			else if (element instanceof StatusResponse)
-				statusResponse = (StatusResponse)element;
-
-		return new EbMSMessage(signature,messageHeader,syncReply,messageOrder,ackRequested,errorList,acknowledgment,manifest,statusRequest,statusResponse,attachments);
-	}
-	
-	private EbMSDocument getEbMSDocument(EbMSMessage message) throws SOAPException, JAXBException, ParserConfigurationException, SAXException, IOException, TransformerFactoryConfigurationError, TransformerException
-	{
-		return new EbMSDocument(EbMSMessageUtils.createSOAPMessage(message),message.getAttachments());
-	}
-	
-	private ErrorList createErrorList()
-	{
-		ErrorList result = new ErrorList();
-		result.setVersion(Constants.EBMS_VERSION);
-		result.setMustUnderstand(true);
-		result.setHighestSeverity(SeverityType.WARNING);
-		return result;
-	}
-	
 	public void setEbMSDAO(EbMSDAO ebMSDAO)
 	{
 		this.ebMSDAO = ebMSDAO;
