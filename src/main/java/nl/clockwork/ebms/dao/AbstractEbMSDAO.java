@@ -597,7 +597,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 				" and time <= ?" +
 				" group by ebms_message_id"
 			);
-			ps.setInt(1,status.ordinal());
+			ps.setInt(1,status.id());
 			ps.setTimestamp(2,new Timestamp(timestamp.getTime()));
 			if (ps.execute())
 			{
@@ -970,11 +970,11 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 			ps  = c.prepareStatement(
 				"select message_id" +
 				" from ebms_message" +
-				" where status = ?" +
-				getMessageContextFilter(messageContext,ps,2) +
+				" where status = " + status.id() +
+				addMessageContextFilter(messageContext) +
 				" order by time_stamp asc"
 			);
-			ps.setLong(1,status.id());
+			addMessageContextFilter(messageContext,ps);
 			if (ps.execute())
 			{
 				ResultSet rs = ps.getResultSet();
@@ -999,21 +999,17 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	@Override
 	public List<String> getMessageIds(EbMSMessageContext messageContext, EbMSMessageStatus status, int maxNr) throws DAOException
 	{
-		//TODO: use maxNr
 		Connection c = null;
 		PreparedStatement ps = null;
 		try
 		{
 			List<String> result = new ArrayList<String>();
 			c = getConnection();
-			ps  = c.prepareStatement(
-				"select message_id" +
-				" from ebms_message" +
-				" where status = ?" +
-				getMessageContextFilter(messageContext,ps,2) +
-				" order by time_stamp asc"
+			String messageContextFilter = addMessageContextFilter(messageContext);
+			ps = c.prepareStatement(
+				getMessageIdsQuery(messageContextFilter,status,maxNr)
 			);
-			ps.setLong(1,status.id());
+			addMessageContextFilter(messageContext,ps);
 			if (ps.execute())
 			{
 				ResultSet rs = ps.getResultSet();
@@ -1172,63 +1168,61 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 		}
 	}
 
-	protected String getMessageContextFilter(EbMSMessageContext messageContext, PreparedStatement ps, int parameterIndex) throws SQLException
+	protected String addMessageContextFilter(EbMSMessageContext messageContext) throws SQLException
 	{
 		StringBuffer result = new StringBuffer();
 		if (messageContext != null)
 		{
 			if (messageContext.getCpaId() != null)
-			{
 				result.append(" and cpa_id = ?");
-				ps.setString(parameterIndex++,messageContext.getCpaId());
-			}
 			if (messageContext.getFromRole() != null)
-			{
 				result.append(" and from_role = ?");
-				ps.setString(parameterIndex++,messageContext.getFromRole());
-			}
 			if (messageContext.getToRole() != null)
-			{
 				result.append(" and to_role = ?");
-				ps.setString(parameterIndex++,messageContext.getToRole());
-			}
 			if (messageContext.getServiceType() != null)
-			{
 				result.append(" and service_type = ?");
-				ps.setString(parameterIndex++,messageContext.getServiceType());
-			}
 			if (messageContext.getService() != null)
-			{
 				result.append(" and service = ?");
-				ps.setString(parameterIndex++,messageContext.getService());
-			}
 			if (messageContext.getAction() != null)
-			{
 				result.append(" and action = ?");
-				ps.setString(parameterIndex++,messageContext.getAction());
-			}
 			if (messageContext.getConversationId() != null)
-			{
 				result.append(" and conversation_id = ?");
-				ps.setString(parameterIndex++,messageContext.getConversationId());
-			}
 			if (messageContext.getMessageId() != null)
-			{
 				result.append(" and message_id = ?");
-				ps.setString(parameterIndex++,messageContext.getMessageId());
-			}
 			if (messageContext.getRefToMessageId() != null)
-			{
 				result.append(" and ref_to_message_id = ?");
-				ps.setString(parameterIndex++,messageContext.getRefToMessageId());
-			}
 			if (messageContext.getSequenceNr() != null)
-			{
 				result.append(" and sequence_nr = ?");
-				ps.setObject(parameterIndex++,messageContext.getSequenceNr());
-			}
 		}
 		return result.toString();
+	}
+	
+	protected void addMessageContextFilter(EbMSMessageContext messageContext, PreparedStatement ps) throws SQLException
+	{
+		if (messageContext != null)
+		{
+			int parameterIndex = 0;
+			if (messageContext.getCpaId() != null)
+				ps.setString(parameterIndex++,messageContext.getCpaId());
+			if (messageContext.getFromRole() != null)
+				ps.setString(parameterIndex++,messageContext.getFromRole());
+			if (messageContext.getToRole() != null)
+				ps.setString(parameterIndex++,messageContext.getToRole());
+			if (messageContext.getServiceType() != null)
+				ps.setString(parameterIndex++,messageContext.getServiceType());
+			if (messageContext.getService() != null)
+				ps.setString(parameterIndex++,messageContext.getService());
+			if (messageContext.getAction() != null)
+				ps.setString(parameterIndex++,messageContext.getAction());
+			if (messageContext.getConversationId() != null)
+				ps.setString(parameterIndex++,messageContext.getConversationId());
+			if (messageContext.getMessageId() != null)
+				ps.setString(parameterIndex++,messageContext.getMessageId());
+			if (messageContext.getRefToMessageId() != null)
+				ps.setString(parameterIndex++,messageContext.getRefToMessageId());
+			if (messageContext.getSequenceNr() != null)
+				ps.setObject(parameterIndex++,messageContext.getSequenceNr());
+		}
 	}
 	
 	protected EbMSMessage getEbMSMessage(ResultSet rs) throws DAOException, SQLException, JAXBException

@@ -532,7 +532,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 						return new EbMSSendEvent(rs.getLong("ebms_message_id"),rs.getTimestamp("time"));
 					}
 				},
-				status.ordinal(),
+				status.id(),
 				timestamp
 			);
 		}
