@@ -51,6 +51,7 @@ import nl.clockwork.ebms.model.EbMSMessage;
 import nl.clockwork.ebms.model.EbMSMessageContent;
 import nl.clockwork.ebms.model.EbMSMessageContext;
 import nl.clockwork.ebms.model.EbMSSendEvent;
+import nl.clockwork.ebms.model.cpp.cpa.ActorType;
 import nl.clockwork.ebms.model.cpp.cpa.CollaborationProtocolAgreement;
 import nl.clockwork.ebms.model.cpp.cpa.DeliveryChannel;
 import nl.clockwork.ebms.model.cpp.cpa.PartyInfo;
@@ -78,6 +79,7 @@ import nl.clockwork.ebms.model.ebxml.To;
 import nl.clockwork.ebms.model.soap.envelope.Body;
 import nl.clockwork.ebms.model.soap.envelope.Envelope;
 import nl.clockwork.ebms.model.soap.envelope.Header;
+import nl.clockwork.ebms.model.xml.dsig.ReferenceType;
 import nl.clockwork.ebms.model.xml.dsig.SignatureType;
 import nl.clockwork.ebms.xml.EbMSInternalNamespaceMapper;
 import nl.clockwork.ebms.xml.EbMSNamespaceMapper;
@@ -240,13 +242,50 @@ public class EbMSMessageUtils
 		return response;
 	}
 
-	public static EbMSMessage ebMSPingToEbMSPong(EbMSMessage ping, String hostname) throws DatatypeConfigurationException, JAXBException
+	public static EbMSMessage createEbMSMessageError(EbMSMessage message, ErrorList errorList, String hostname, GregorianCalendar timestamp) throws DatatypeConfigurationException, JAXBException
 	{
-		EbMSMessage pong = new EbMSMessage(createMessageHeader(ping.getMessageHeader(),hostname,new GregorianCalendar(),EbMSAction.PONG));
-		return pong;
+		MessageHeader messageHeader = EbMSMessageUtils.createMessageHeader(message.getMessageHeader(),hostname,timestamp,EbMSAction.MESSAGE_ERROR);
+		if (errorList.getError().size() == 0)
+		{
+			errorList.getError().add(EbMSMessageUtils.createError(Constants.EbMSErrorCode.UNKNOWN.errorCode(),Constants.EbMSErrorCode.UNKNOWN.errorCode(),"An unknown error occurred!"));
+			errorList.setHighestSeverity(SeverityType.ERROR);
+		}
+		return new EbMSMessage(messageHeader,errorList);
 	}
 
-	public static EbMSMessage ebMSStatusRequestToEbMSStatusResponse(EbMSMessage request, String hostname, EbMSMessageStatus status, GregorianCalendar timestamp) throws DatatypeConfigurationException, JAXBException
+	public static EbMSMessage createEbMSAcknowledgment(EbMSMessage message, String hostname, GregorianCalendar timestamp) throws DatatypeConfigurationException, JAXBException
+	{
+		MessageHeader messageHeader = EbMSMessageUtils.createMessageHeader(message.getMessageHeader(),hostname,timestamp,EbMSAction.ACKNOWLEDGMENT);
+		
+		Acknowledgment acknowledgment = new Acknowledgment();
+
+		acknowledgment.setVersion(Constants.EBMS_VERSION);
+		acknowledgment.setMustUnderstand(true);
+
+		acknowledgment.setTimestamp(DatatypeFactory.newInstance().newXMLGregorianCalendar(timestamp));
+		acknowledgment.setRefToMessageId(messageHeader.getMessageData().getRefToMessageId());
+		acknowledgment.setFrom(new From()); //optioneel
+		acknowledgment.getFrom().getPartyId().addAll(messageHeader.getFrom().getPartyId());
+		// ebMS specs 1701
+		//acknowledgment.getFrom().setRole(messageHeader.getFrom().getRole());
+		acknowledgment.getFrom().setRole(null);
+		
+		//TODO resolve actor from CPA
+		acknowledgment.setActor(ActorType.URN_OASIS_NAMES_TC_EBXML_MSG_ACTOR_TO_PARTY_MSH.value());
+		
+		if (message.getAckRequested().isSigned() && message.getSignature() != null)
+			for (ReferenceType reference : message.getSignature().getSignedInfo().getReference())
+				acknowledgment.getReference().add(reference);
+
+		return new EbMSMessage(messageHeader,acknowledgment);
+	}
+	
+	public static EbMSMessage createEbMSPong(EbMSMessage ping, String hostname) throws DatatypeConfigurationException, JAXBException
+	{
+		return new EbMSMessage(createMessageHeader(ping.getMessageHeader(),hostname,new GregorianCalendar(),EbMSAction.PONG));
+	}
+	
+	public static EbMSMessage createEbMSStatusResponse(EbMSMessage request, String hostname, EbMSMessageStatus status, GregorianCalendar timestamp) throws DatatypeConfigurationException, JAXBException
 	{
 		MessageHeader messageHeader = createMessageHeader(request.getMessageHeader(),hostname,new GregorianCalendar(),EbMSAction.STATUS_RESPONSE);
 		StatusResponse statusResponse = createStatusResponse(request.getStatusRequest(),status,timestamp);

@@ -275,7 +275,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	}
 	
 	@Override
-	public boolean existsMessage(String messageId, Service service, String[] actions) throws DAOException
+	public boolean existsMessage(String messageId, Service service, String...actions) throws DAOException
 	{
 		try
 		{
@@ -330,7 +330,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	}
 	
 	@Override
-	public Long getMessageId(String messageId, Service service, String[] actions) throws DAOException
+	public Long getMessageId(String messageId, Service service, String...actions) throws DAOException
 	{
 		try
 		{
@@ -355,7 +355,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	}
 	
 	@Override
-	public EbMSMessage getMessage(String messageId, Service service, String[] actions) throws DAOException
+	public EbMSMessage getMessage(String messageId, Service service, String...actions) throws DAOException
 	{
 		try
 		{
