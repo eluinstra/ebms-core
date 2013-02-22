@@ -4,7 +4,6 @@
 - improve CPAUtils.isSigned
 
 - remove unnecessary defined Interfaces and custom Exceptions
-- check http headers
 / improve EbMSMessageProcessor
 - improve EbMSHttpClient
   - move cpa functionality to caller; add extra properties for url and signing (sendEvent)?
