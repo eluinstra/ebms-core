@@ -15,9 +15,11 @@
  ******************************************************************************/
 package nl.clockwork.ebms.job;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import nl.clockwork.ebms.iface.EbMSMessageService;
 import nl.clockwork.ebms.model.EbMSMessageContent;
@@ -43,22 +45,34 @@ public class ProcessEbMSMessages implements Job
 	public void execute()
 	{
 		List<String> messageIds = messageService.getMessageIds(null,null);
+  	List<Future<?>> futures = new ArrayList<Future<?>>();
 		for (final String messageId : messageIds)
 		{
-			executorService.execute(
-				new Runnable()
-				{
-					
-					@Override
-					public void run()
+			futures.add(
+				executorService.submit(
+					new Runnable()
 					{
-						EbMSMessageContent messageContent = messageService.getMessage(messageId,false);
-						processMessageCallback.process(messageContent);
-						messageService.processMessage(messageId);
+						
+						@Override
+						public void run()
+						{
+							EbMSMessageContent messageContent = messageService.getMessage(messageId,false);
+							processMessageCallback.process(messageContent);
+							messageService.processMessage(messageId);
+						}
 					}
-				}
+				)
 			);
 		}
+  	for (Future<?> future : futures)
+			try
+			{
+				future.get();
+			}
+			catch (Exception e)
+			{
+	  		logger.error("",e);
+			}
 	}
 
 	public void setMaxThreads(int maxThreads)

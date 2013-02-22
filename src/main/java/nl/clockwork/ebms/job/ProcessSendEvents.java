@@ -65,33 +65,34 @@ public class ProcessSendEvents implements Job
   	List<Future<?>> futures = new ArrayList<Future<?>>();
   	for (final EbMSSendEvent sendEvent : sendEvents)
   	{
-  		Future<?> future = executorService.submit(
-  			new Runnable()
-				{
-					@Override
-					public void run()
+  		futures.add(
+  			executorService.submit(
+	  			new Runnable()
 					{
-						try
+						@Override
+						public void run()
 						{
-				  		EbMSMessage message = ebMSDAO.getMessage(sendEvent.getEbMSMessageId());
-				  		CollaborationProtocolAgreement cpa = ebMSDAO.getCPA(message.getMessageHeader().getCPAId());
-				  		EbMSDocument document = new EbMSDocument(EbMSMessageUtils.createSOAPMessage(message),message.getAttachments());
-				  		signatureGenerator.generate(cpa,document,message.getMessageHeader());
-				  		String uri = getUrl(message);
-				  		EbMSDocument responseDocument = ebMSClient.sendMessage(uri,document);
-				  		if (!(responseDocument == null || (responseDocument instanceof EbMSResponseDocument && ((EbMSResponseDocument)responseDocument).getMessage() == null)))
-				  			ebMSMessageProcessor.process(responseDocument);
-				  		updateEvent(sendEvent,EbMSEventStatus.PROCESSED);
-						}
-						catch (Exception e)
-						{
-			  			updateEvent(sendEvent,EbMSEventStatus.FAILED);
-				  		logger.error("",e);
+							try
+							{
+					  		EbMSMessage message = ebMSDAO.getMessage(sendEvent.getEbMSMessageId());
+					  		CollaborationProtocolAgreement cpa = ebMSDAO.getCPA(message.getMessageHeader().getCPAId());
+					  		EbMSDocument document = new EbMSDocument(EbMSMessageUtils.createSOAPMessage(message),message.getAttachments());
+					  		signatureGenerator.generate(cpa,document,message.getMessageHeader());
+					  		String uri = getUrl(message);
+					  		EbMSDocument responseDocument = ebMSClient.sendMessage(uri,document);
+					  		if (!(responseDocument == null || (responseDocument instanceof EbMSResponseDocument && ((EbMSResponseDocument)responseDocument).getMessage() == null)))
+					  			ebMSMessageProcessor.process(responseDocument);
+					  		updateEvent(sendEvent,EbMSEventStatus.PROCESSED);
+							}
+							catch (Exception e)
+							{
+				  			updateEvent(sendEvent,EbMSEventStatus.FAILED);
+					  		logger.error("",e);
+							}
 						}
 					}
-				}
+  			)
   		);
-  		futures.add(future);
   	}
   	for (Future<?> future : futures)
 			try
