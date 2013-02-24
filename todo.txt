@@ -10,6 +10,7 @@
 
 - add url (or deliveryChannel) to table sendEvent
 - support multiple deliveryChannels
+	- support mail channel?
 
 - implement AdminService
 
@@ -23,6 +24,8 @@
 
 - remove servlet from core?
 - remove EbMS prefix on classes
+
+- store attachment order?
 
 - implement EbMSFileAttachment (file proxy) and EbMSDBAttachment (db proxy) for large message processing?
 
