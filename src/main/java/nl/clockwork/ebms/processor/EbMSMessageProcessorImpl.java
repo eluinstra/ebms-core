@@ -16,6 +16,7 @@
 package nl.clockwork.ebms.processor;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
@@ -41,6 +42,8 @@ import nl.clockwork.ebms.model.ebxml.ErrorList;
 import nl.clockwork.ebms.model.ebxml.MessageHeader;
 import nl.clockwork.ebms.model.ebxml.MessageStatusType;
 import nl.clockwork.ebms.model.ebxml.Service;
+import nl.clockwork.ebms.model.xml.dsig.ReferenceType;
+import nl.clockwork.ebms.model.xml.dsig.SignatureType;
 import nl.clockwork.ebms.signing.EbMSSignatureValidator;
 import nl.clockwork.ebms.util.EbMSMessageUtils;
 import nl.clockwork.ebms.validation.CPAValidator;
@@ -200,7 +203,7 @@ public class EbMSMessageProcessorImpl implements EbMSMessageProcessor
 			}
 			else
 			{
-				logger.warn("Message not valid.");
+				logger.warn("Message invalid.");
 				final EbMSMessage messageError = EbMSMessageUtils.createEbMSMessageError(message,errorList,hostname,timestamp);
 				ebMSDAO.executeTransaction(
 					new DAOTransactionCallback()
@@ -394,12 +397,38 @@ public class EbMSMessageProcessorImpl implements EbMSMessageProcessor
 	
 	private boolean equalsDuplicateMessage(EbMSMessage message)
 	{
-		//TODO extend comparison (signature)
-		MessageHeader duplicateMessageHeader = ebMSDAO.getMessageHeader(message.getMessageHeader().getMessageData().getMessageId());
-		return message.getMessageHeader().getCPAId().equals(duplicateMessageHeader.getCPAId())
-		&& (message.getMessageHeader().getService().getType() == null ? duplicateMessageHeader.getService().getType() == null : message.getMessageHeader().getService().getType().equals(duplicateMessageHeader.getService().getType()))
-		&& message.getMessageHeader().getService().getValue().equals(duplicateMessageHeader.getService().getValue())
-		&& message.getMessageHeader().getAction().equals(duplicateMessageHeader.getAction());
+		EbMSMessage duplicateMessage = ebMSDAO.getMessage(message.getMessageHeader().getMessageData().getMessageId());
+		return equals(message.getMessageHeader(),duplicateMessage.getMessageHeader())
+				&& equals(message.getSignature(),duplicateMessage.getSignature());
+	}
+
+	private boolean equals(MessageHeader messageHeader, MessageHeader duplicateMessageHeader)
+	{
+		return messageHeader.getCPAId().equals(duplicateMessageHeader.getCPAId())
+				&& (messageHeader.getService().getType() == null ? duplicateMessageHeader.getService().getType() == null : messageHeader.getService().getType().equals(duplicateMessageHeader.getService().getType()))
+				&& messageHeader.getService().getValue().equals(duplicateMessageHeader.getService().getValue())
+				&& messageHeader.getAction().equals(duplicateMessageHeader.getAction());
+	}
+
+	private boolean equals(SignatureType signature, SignatureType duplicateSignature)
+	{
+		if (signature == null && duplicateSignature == null)
+			return true;
+		else if (signature == null || duplicateSignature == null)
+			return false;
+		else
+		{
+			boolean result = Arrays.equals(signature.getSignatureValue().getValue(),duplicateSignature.getSignatureValue().getValue()) && signature.getSignedInfo().getReference().size() == duplicateSignature.getSignedInfo().getReference().size();
+			for (int i = 0; result && i < signature.getSignedInfo().getReference().size() ; i++)
+				result &= equals(signature.getSignedInfo().getReference().get(i),duplicateSignature.getSignedInfo().getReference().get(i));
+			return result;
+		}
+	}
+
+	private boolean equals(ReferenceType referenceType, ReferenceType duplicateRreferenceType)
+	{
+		return (referenceType.getId() == null ? duplicateRreferenceType.getId() == null : referenceType.getId().equals(duplicateRreferenceType.getId()))
+				&& Arrays.equals(referenceType.getDigestValue(),duplicateRreferenceType.getDigestValue());
 	}
 
 	private boolean isDuplicateRefToMessage(EbMSMessage message)

@@ -440,7 +440,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 			EbMSMessage result = null;
 			c = getConnection();
 			ps  = c.prepareStatement(
-				"select id, service, action, message_header, ack_requested, content" +
+				"select id, service, action, signature, message_header, ack_requested, content" +
 				" from ebms_message" +
 				" where ref_to_message_id = ?" +
 				(service.getType() == null ? "" : " and serviceType = '" + service.getType() + "'") +
@@ -519,7 +519,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 			EbMSMessage result = null;
 			c = getConnection();
 			ps = c.prepareStatement(
-				"select id, service, action, message_header, ack_requested, content" + 
+				"select id, service, action, signature, message_header, ack_requested, content" + 
 				" from ebms_message" + 
 				" where id = ?"
 			);
@@ -1040,7 +1040,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 			EbMSMessage result = null;
 			c = getConnection();
 			ps = c.prepareStatement(
-				"select id, service, action, message_header, ack_requested, content" + 
+				"select id, service, action, signature, message_header, ack_requested, content" + 
 				" from ebms_message" + 
 				" where message_id = ?"
 			);
@@ -1229,19 +1229,19 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	protected EbMSMessage getEbMSMessage(ResultSet rs) throws DAOException, SQLException, JAXBException
 	{
 		if (!Constants.EBMS_SERVICE_URI.equals(rs.getString("service")))
-			return new EbMSMessage(XMLMessageBuilder.getInstance(MessageHeader.class).handle(rs.getString("message_header")),XMLMessageBuilder.getInstance(AckRequested.class).handle(rs.getString("ack_requested")),XMLMessageBuilder.getInstance(Manifest.class).handle(rs.getString("content")),getAttachments(rs.getLong("id")));
+			return new EbMSMessage(XMLMessageBuilder.getInstance(SignatureType.class).handle(rs.getString("signature")),XMLMessageBuilder.getInstance(MessageHeader.class).handle(rs.getString("message_header")),XMLMessageBuilder.getInstance(AckRequested.class).handle(rs.getString("ack_requested")),XMLMessageBuilder.getInstance(Manifest.class).handle(rs.getString("content")),getAttachments(rs.getLong("id")));
 		else if (EbMSAction.MESSAGE_ERROR.action().equals(rs.getString("action")))
-			return new EbMSMessage(XMLMessageBuilder.getInstance(MessageHeader.class).handle(rs.getString("message_header")),XMLMessageBuilder.getInstance(ErrorList.class).handle(rs.getString("content")));
+			return new EbMSMessage(XMLMessageBuilder.getInstance(SignatureType.class).handle(rs.getString("signature")),XMLMessageBuilder.getInstance(MessageHeader.class).handle(rs.getString("message_header")),XMLMessageBuilder.getInstance(ErrorList.class).handle(rs.getString("content")));
 		else if (EbMSAction.ACKNOWLEDGMENT.action().equals(rs.getString("action")))
-			return new EbMSMessage(XMLMessageBuilder.getInstance(MessageHeader.class).handle(rs.getString("message_header")),XMLMessageBuilder.getInstance(Acknowledgment.class).handle(rs.getString("content")));
+			return new EbMSMessage(XMLMessageBuilder.getInstance(SignatureType.class).handle(rs.getString("signature")),XMLMessageBuilder.getInstance(MessageHeader.class).handle(rs.getString("message_header")),XMLMessageBuilder.getInstance(Acknowledgment.class).handle(rs.getString("content")));
 		else if (EbMSAction.STATUS_REQUEST.action().equals(rs.getString("action")))
-			return new EbMSMessage(XMLMessageBuilder.getInstance(MessageHeader.class).handle(rs.getString("message_header")),null,XMLMessageBuilder.getInstance(StatusRequest.class).handle(rs.getString("content")));
+			return new EbMSMessage(XMLMessageBuilder.getInstance(SignatureType.class).handle(rs.getString("signature")),XMLMessageBuilder.getInstance(MessageHeader.class).handle(rs.getString("message_header")),null,XMLMessageBuilder.getInstance(StatusRequest.class).handle(rs.getString("content")));
 		else if (EbMSAction.STATUS_RESPONSE.action().equals(rs.getString("action")))
-			return new EbMSMessage(XMLMessageBuilder.getInstance(MessageHeader.class).handle(rs.getString("message_header")),XMLMessageBuilder.getInstance(StatusResponse.class).handle(rs.getString("content")));
+			return new EbMSMessage(XMLMessageBuilder.getInstance(SignatureType.class).handle(rs.getString("signature")),XMLMessageBuilder.getInstance(MessageHeader.class).handle(rs.getString("message_header")),XMLMessageBuilder.getInstance(StatusResponse.class).handle(rs.getString("content")));
 		else if (EbMSAction.PING.action().equals(rs.getString("action")))
-			return new EbMSMessage(XMLMessageBuilder.getInstance(MessageHeader.class).handle(rs.getString("message_header")));
+			return new EbMSMessage(XMLMessageBuilder.getInstance(SignatureType.class).handle(rs.getString("signature")),XMLMessageBuilder.getInstance(MessageHeader.class).handle(rs.getString("message_header")));
 		else if (EbMSAction.PONG.action().equals(rs.getString("action")))
-			return new EbMSMessage(XMLMessageBuilder.getInstance(MessageHeader.class).handle(rs.getString("message_header")));
+			return new EbMSMessage(XMLMessageBuilder.getInstance(SignatureType.class).handle(rs.getString("signature")),XMLMessageBuilder.getInstance(MessageHeader.class).handle(rs.getString("message_header")));
 		else
 			return null;
 	}

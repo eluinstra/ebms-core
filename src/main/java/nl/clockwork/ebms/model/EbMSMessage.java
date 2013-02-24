@@ -45,27 +45,47 @@ public class EbMSMessage
 
 	public EbMSMessage(MessageHeader messageHeader, AckRequested ackRequested, Manifest manifest, List<EbMSAttachment> attachments)
 	{
-		this(messageHeader,null,null,ackRequested,manifest,attachments);
+		this(null,messageHeader,null,null,ackRequested,manifest,attachments);
 	}
 	
-	public EbMSMessage(MessageHeader messageHeader, SyncReply syncReply, MessageOrder messageOrder, AckRequested ackRequested, Manifest manifest, List<EbMSAttachment> attachments)
+	public EbMSMessage(SignatureType signature, MessageHeader messageHeader, AckRequested ackRequested, Manifest manifest, List<EbMSAttachment> attachments)
 	{
-		this(messageHeader,syncReply,messageOrder,ackRequested,null,null,manifest,null,null,attachments);
+		this(signature,messageHeader,null,null,ackRequested,manifest,attachments);
+	}
+	
+	public EbMSMessage(SignatureType signature, MessageHeader messageHeader, SyncReply syncReply, MessageOrder messageOrder, AckRequested ackRequested, Manifest manifest, List<EbMSAttachment> attachments)
+	{
+		this(signature,messageHeader,syncReply,messageOrder,ackRequested,null,null,manifest,null,null,attachments);
 	}
 	
 	public EbMSMessage(MessageHeader messageHeader)
 	{
-		this(messageHeader,null,null,null,null,null,null,null,null,null);
+		this(null,messageHeader,null,null,null,null,null,null,null,null,null);
+	}
+	
+	public EbMSMessage(SignatureType signature, MessageHeader messageHeader)
+	{
+		this(signature,messageHeader,null,null,null,null,null,null,null,null,null);
 	}
 	
 	public EbMSMessage(MessageHeader messageHeader, ErrorList errorList)
 	{
-		this(messageHeader,null,null,null,errorList,null,null,null,null,null);
+		this(null,messageHeader,null,null,null,errorList,null,null,null,null,null);
+	}
+	
+	public EbMSMessage(SignatureType signature, MessageHeader messageHeader, ErrorList errorList)
+	{
+		this(signature,messageHeader,null,null,null,errorList,null,null,null,null,null);
 	}
 	
 	public EbMSMessage(MessageHeader messageHeader, Acknowledgment acknowledgment)
 	{
-		this(messageHeader,null,null,null,null,acknowledgment,null,null,null,null);
+		this(null,messageHeader,null,null,null,null,acknowledgment,null,null,null,null);
+	}
+	
+	public EbMSMessage(SignatureType signature, MessageHeader messageHeader, Acknowledgment acknowledgment)
+	{
+		this(signature,messageHeader,null,null,null,null,acknowledgment,null,null,null,null);
 	}
 	
 	public EbMSMessage(MessageHeader messageHeader, SyncReply syncReply, ErrorList errorList, Acknowledgment acknowledgment)
@@ -73,14 +93,19 @@ public class EbMSMessage
 		this(messageHeader,syncReply,null,null,errorList,acknowledgment,null,null,null,null);
 	}
 	
-	public EbMSMessage(MessageHeader messageHeader, SyncReply syncReply, StatusRequest statusRequest)
+	public EbMSMessage(SignatureType signature, MessageHeader messageHeader, SyncReply syncReply, StatusRequest statusRequest)
 	{
-		this(messageHeader,syncReply,null,null,null,null,null,statusRequest,null,null);
+		this(signature,messageHeader,syncReply,null,null,null,null,null,statusRequest,null,null);
 	}
 	
 	public EbMSMessage(MessageHeader messageHeader, StatusResponse statusResponse)
 	{
-		this(messageHeader,null,null,null,null,null,null,null,statusResponse,null);
+		this(null,messageHeader,null,null,null,null,null,null,null,statusResponse,null);
+	}
+	
+	public EbMSMessage(SignatureType signature, MessageHeader messageHeader, StatusResponse statusResponse)
+	{
+		this(signature,messageHeader,null,null,null,null,null,null,null,statusResponse,null);
 	}
 	
 	public EbMSMessage(MessageHeader messageHeader, SyncReply syncReply, MessageOrder messageOrder, AckRequested ackRequested, ErrorList errorList, Acknowledgment acknowledgment, Manifest manifest, StatusRequest statusRequest, StatusResponse statusResponse, List<EbMSAttachment> attachments)
