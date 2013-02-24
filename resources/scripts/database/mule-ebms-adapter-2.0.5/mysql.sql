@@ -21,7 +21,7 @@ WHERE id NOT IN (
 
 DROP INDEX i_message_id ON ebms_message;
 
-ALTER TABLE ebms_message ADD CONSTRAINT uc_ebms_message_id UNIQUE (message_id);
+ALTER TABLE ebms_message ADD CONSTRAINT uc_ebms_message_id UNIQUE (message_id(255));
 
 UPDATE ebms_message
 SET status=5

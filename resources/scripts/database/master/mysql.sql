@@ -30,7 +30,7 @@ CREATE TABLE ebms_message
 	status_time				TIMESTAMP				NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-ALTER TABLE ebms_message ADD CONSTRAINT uc_ebms_message_id UNIQUE (message_id);
+ALTER TABLE ebms_message ADD CONSTRAINT uc_ebms_message_id UNIQUE (message_id(255));
 
 CREATE TABLE ebms_attachment
 (
