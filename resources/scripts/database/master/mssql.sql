@@ -14,6 +14,7 @@ CREATE TABLE ebms_message
 	sequence_nr				INT							NULL,
 	message_id				VARCHAR(256)		NOT NULL,
 	ref_to_message_id	VARCHAR(256)		NULL,
+	time_to_live			DATETIME				NULL,
 	from_role					VARCHAR(256)		NULL,
 	to_role						VARCHAR(256)		NULL,
 	service_type			VARCHAR(256)		NULL,
