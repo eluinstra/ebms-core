@@ -41,6 +41,7 @@ CREATE TABLE ebms_attachment
 (
 	ebms_message_id		NUMBER					NOT NULL REFERENCES ebms_message(id),
 	name							VARCHAR(256)		NOT NULL,
+	content_id 				VARCHAR(256) 		NOT NULL,
 	content_type			VARCHAR(255)		NOT NULL,
 	content						BLOB						NOT NULL
 );

@@ -36,6 +36,7 @@ CREATE TABLE ebms_attachment
 (
 	ebms_message_id		INT							NOT NULL FOREIGN KEY REFERENCES ebms_message(id),
 	name							VARCHAR(256)		NOT NULL,
+	content_id 				VARCHAR(256) 		NOT NULL,
 	content_type			VARCHAR(255)		NOT NULL,
 	content						IMAGE						NOT NULL
 );
