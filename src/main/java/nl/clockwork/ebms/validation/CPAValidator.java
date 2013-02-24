@@ -42,7 +42,7 @@ public class CPAValidator
 		}
 		if (!CPAUtils.isValid(cpa,timestamp))
 		{
-			errorList.getError().add(EbMSMessageUtils.createError("//Header/MessageHeader[@cpaid]",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"CPA not valid."));
+			errorList.getError().add(EbMSMessageUtils.createError("//Header/MessageHeader[@cpaid]",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"CPA invalid."));
 			errorList.setHighestSeverity(SeverityType.ERROR);
 			return false;
 		}

@@ -25,6 +25,7 @@ import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
@@ -56,7 +57,7 @@ public class DOMUtils
 	public static Transformer getTransformer() throws TransformerConfigurationException, TransformerFactoryConfigurationError
 	{
 		Transformer result = TransformerFactory.newInstance().newTransformer();
-		//result.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION,"no");
+		result.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION,"yes");
 		//result.setOutputProperty(OutputKeys.METHOD,"xml");
 		//result.setOutputProperty(OutputKeys.INDENT,"yes");
 		//result.setOutputProperty(OutputKeys.ENCODING,"UTF-8");
@@ -66,6 +67,10 @@ public class DOMUtils
 	public static Transformer getTransformer(String xslFile) throws TransformerConfigurationException, TransformerFactoryConfigurationError
 	{
 		Transformer result = TransformerFactory.newInstance().newTransformer(new StreamSource(DOMUtils.class.getResourceAsStream(xslFile)));
+		result.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION,"yes");
+		//result.setOutputProperty(OutputKeys.METHOD,"xml");
+		//result.setOutputProperty(OutputKeys.INDENT,"yes");
+		//result.setOutputProperty(OutputKeys.ENCODING,"UTF-8");
 		return result;
 	}
 
