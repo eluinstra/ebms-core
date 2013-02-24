@@ -27,9 +27,9 @@
 		http://www.mulesoft.org/schema/mule/management http://www.mulesoft.org/schema/mule/management/3.2/mule-management.xsd
 	">
 
-	<custom-transaction-manager class="org.mule.module.spring.transaction.SpringTransactionFactory">
+	<!--custom-transaction-manager class="org.mule.module.spring.transaction.SpringTransactionFactory">
 		<spring:property name="manager" ref="ebMSTXManager" />
-	</custom-transaction-manager>
+	</custom-transaction-manager-->
  	    
 	<management:jmx-default-config port="${jmx.port}"/>
 	<!--management:jmx-log4j /-->
@@ -57,9 +57,17 @@
 		<import resource="classpath:nl/clockwork/ebms/processor.xml" />
 		<import resource="classpath:nl/clockwork/ebms/interface.xml" />
 
-		<import resource="classpath:nl/clockwork/ebms/dao/spring/datasource.xml" />
-		<import resource="classpath:nl/clockwork/ebms/dao/spring/hsqldb.xml" />
+		<import resource="classpath:nl/clockwork/ebms/dao/datasource.xml" />
+		<import resource="classpath:nl/clockwork/ebms/dao/hsqldb.xml" />
 		<import resource="classpath:nl/clockwork/ebms/dao/hsqldb.provider.xml"/>
+		<!--import resource="classpath:nl/clockwork/ebms/dao/mysql.xml" /-->
+		<!--import resource="classpath:nl/clockwork/ebms/dao/postgresql.xml" /-->
+		<!--import resource="classpath:nl/clockwork/ebms/dao/mssql.xml" /-->
+		<!--import resource="classpath:nl/clockwork/ebms/dao/oracle.xml" /-->
+		
+		<!--import resource="classpath:nl/clockwork/ebms/dao/spring/datasource.xml" /-->
+		<!--import resource="classpath:nl/clockwork/ebms/dao/spring/hsqldb.xml" /-->
+		<!--import resource="classpath:nl/clockwork/ebms/dao/hsqldb.provider.xml"/-->
 		<!--import resource="classpath:nl/clockwork/ebms/dao/spring/mysql.xml" /-->
 		<!--import resource="classpath:nl/clockwork/ebms/dao/spring/postgresql.xml" /-->
 		<!--import resource="classpath:nl/clockwork/ebms/dao/spring/mssql.xml" /-->
