@@ -19,6 +19,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 
 import javax.sql.DataSource;
 
@@ -98,9 +99,8 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 				"content," +
 				"status," +
 				"status_time" +
-			") values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?," + (status == null ? "null" : getTimestampFunction()) + ")" +
-			" returning id"
-			//Statement.RETURN_GENERATED_KEYS
+			") values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?," + (status == null ? "null" : getTimestampFunction()) + ")",
+			Statement.RETURN_GENERATED_KEYS
 		);
 	}
 

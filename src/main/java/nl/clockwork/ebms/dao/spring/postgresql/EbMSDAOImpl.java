@@ -22,7 +22,9 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.Date;
 
+import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
+import javax.xml.namespace.QName;
 
 import nl.clockwork.ebms.Constants;
 import nl.clockwork.ebms.Constants.EbMSMessageStatus;
@@ -139,9 +141,8 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 													"content," +
 													"status," +
 													"status_time" +
-												") values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?," + (status == null ? "null" : getTimestampFunction()) + ")",
-												//new String[]{"id"}
-												new int[]{1}
+												") values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?," + (status == null ? "null" : getTimestampFunction()) + ")" +
+												" returning id"
 											);
 											//ps.setDate(1,new java.sql.Date(timestamp.getTime()));
 											//ps.setString(1,String.format(getDateFormat(),timestamp));
@@ -163,7 +164,7 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 											ps.setString(10,messageHeader.getService().getType());
 											ps.setString(11,messageHeader.getService().getValue());
 											ps.setString(12,messageHeader.getAction());
-											ps.setString(13,XMLMessageBuilder.getInstance(SignatureType.class).handle(message.getSignature()));
+											ps.setString(13,XMLMessageBuilder.getInstance(SignatureType.class).handle(new JAXBElement<SignatureType>(new QName("http://www.w3.org/2000/09/xmldsig#","Signature"),SignatureType.class,message.getSignature())));
 											ps.setString(14,XMLMessageBuilder.getInstance(MessageHeader.class).handle(messageHeader));
 											ps.setString(15,XMLMessageBuilder.getInstance(SyncReply.class).handle(message.getSyncReply()));
 											ps.setString(16,XMLMessageBuilder.getInstance(MessageOrder.class).handle(message.getMessageOrder()));
@@ -219,7 +220,7 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 		}
 		catch (Exception e)
 		{
-			throw new DAOException();
+			throw new DAOException(e);
 		}
 	}
 	
