@@ -176,7 +176,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 			ps  = c.prepareStatement(
 				"select cpa_id" +
 				" from cpa" +
-				" order by cpa_id desc"
+				" order by cpa_id asc"
 			);
 			if (ps.execute())
 			{
@@ -595,7 +595,8 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 				" from ebms_send_event" +
 				" where status = ?" +
 				" and time <= ?" +
-				" group by ebms_message_id"
+				" group by ebms_message_id" +
+				" order by time asc"
 			);
 			ps.setInt(1,status.id());
 			ps.setTimestamp(2,new Timestamp(timestamp.getTime()));

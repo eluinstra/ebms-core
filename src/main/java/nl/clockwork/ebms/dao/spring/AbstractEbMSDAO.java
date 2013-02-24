@@ -177,7 +177,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 			return jdbcTemplate.queryForList(
 					"select cpa_id" +
 					" from cpa" +
-					" order by cpa_id desc",
+					" order by cpa_id asc",
 					String.class
 			);
 		}
@@ -523,7 +523,8 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 				" from ebms_send_event" +
 				" where status = ?" +
 				" and time <= ?" +
-				" group by ebms_message_id",
+				" group by ebms_message_id" +
+				" order by time asc",
 				new ParameterizedRowMapper<EbMSSendEvent>()
 				{
 					@Override
