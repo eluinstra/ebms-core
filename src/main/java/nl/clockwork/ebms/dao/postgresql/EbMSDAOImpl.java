@@ -84,6 +84,7 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 				"sequence_nr," +
 				"message_id," +
 				"ref_to_message_id," +
+				"time_to_live," +
 				"from_role," +
 				"to_role," +
 				"service_type," +
@@ -97,7 +98,7 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 				"content," +
 				"status," +
 				"status_time" +
-			") values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?," + (status == null ? "null" : getTimestampFunction()) + ")" +
+			") values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?," + (status == null ? "null" : getTimestampFunction()) + ")" +
 			" returning id"
 			//Statement.RETURN_GENERATED_KEYS
 		);

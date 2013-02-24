@@ -618,6 +618,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 													"sequence_nr," +
 													"message_id," +
 													"ref_to_message_id," +
+													"time_to_live," +
 													"from_role," +
 													"to_role," +
 													"service_type," +
@@ -631,7 +632,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 													"content," +
 													"status," +
 													"status_time" +
-												") values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?," + (status == null ? "null" : getTimestampFunction()) + ")",
+												") values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?," + (status == null ? "null" : getTimestampFunction()) + ")",
 												//new String[]{"id"}
 												new int[]{1}
 											);
@@ -649,25 +650,26 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 												ps.setLong(4,message.getMessageOrder().getSequenceNumber().getValue().longValue());
 											ps.setString(5,messageHeader.getMessageData().getMessageId());
 											ps.setString(6,messageHeader.getMessageData().getRefToMessageId());
-											ps.setString(7,messageHeader.getFrom().getRole());
-											ps.setString(8,messageHeader.getTo().getRole());
-											ps.setString(9,messageHeader.getService().getType());
-											ps.setString(10,messageHeader.getService().getValue());
-											ps.setString(11,messageHeader.getAction());
-											ps.setString(12,XMLMessageBuilder.getInstance(SignatureType.class).handle(new JAXBElement<SignatureType>(new QName("http://www.w3.org/2000/09/xmldsig#","Signature"),SignatureType.class,message.getSignature())));
-											ps.setString(13,XMLMessageBuilder.getInstance(MessageHeader.class).handle(messageHeader));
-											ps.setString(14,XMLMessageBuilder.getInstance(SyncReply.class).handle(message.getSyncReply()));
-											ps.setString(15,XMLMessageBuilder.getInstance(MessageOrder.class).handle(message.getMessageOrder()));
-											ps.setString(16,XMLMessageBuilder.getInstance(AckRequested.class).handle(message.getAckRequested()));
-											ps.setString(17,getContent(message));
+											ps.setTimestamp(7,messageHeader.getMessageData().getTimeToLive() == null ? null : new Timestamp(messageHeader.getMessageData().getTimeToLive().toGregorianCalendar().getTimeInMillis()));
+											ps.setString(8,messageHeader.getFrom().getRole());
+											ps.setString(9,messageHeader.getTo().getRole());
+											ps.setString(10,messageHeader.getService().getType());
+											ps.setString(11,messageHeader.getService().getValue());
+											ps.setString(12,messageHeader.getAction());
+											ps.setString(13,XMLMessageBuilder.getInstance(SignatureType.class).handle(new JAXBElement<SignatureType>(new QName("http://www.w3.org/2000/09/xmldsig#","Signature"),SignatureType.class,message.getSignature())));
+											ps.setString(14,XMLMessageBuilder.getInstance(MessageHeader.class).handle(messageHeader));
+											ps.setString(15,XMLMessageBuilder.getInstance(SyncReply.class).handle(message.getSyncReply()));
+											ps.setString(16,XMLMessageBuilder.getInstance(MessageOrder.class).handle(message.getMessageOrder()));
+											ps.setString(17,XMLMessageBuilder.getInstance(AckRequested.class).handle(message.getAckRequested()));
+											ps.setString(18,getContent(message));
 											if (status == null)
-												ps.setNull(18,java.sql.Types.INTEGER);
+												ps.setNull(19,java.sql.Types.INTEGER);
 											else
-												ps.setInt(18,status.id());
-											//ps.setString(19,status == null ? null : String.format(getDateFormat(),timestamp));
-											//ps.setTimestamp(19,status == null ? null : new Timestamp(timestamp.getTime()));
-											//ps.setObject(19,status == null ? null : timestamp,Types.TIMESTAMP);
-											//ps.setObject(19,status == null ? null : timestamp);
+												ps.setInt(19,status.id());
+											//ps.setString(20,status == null ? null : String.format(getDateFormat(),timestamp));
+											//ps.setTimestamp(20,status == null ? null : new Timestamp(timestamp.getTime()));
+											//ps.setObject(20,status == null ? null : timestamp,Types.TIMESTAMP);
+											//ps.setObject(20,status == null ? null : timestamp);
 											return ps;
 										}
 										catch (JAXBException e)

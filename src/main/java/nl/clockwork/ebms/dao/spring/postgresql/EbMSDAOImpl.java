@@ -25,7 +25,6 @@ import java.util.Date;
 import javax.xml.bind.JAXBException;
 
 import nl.clockwork.ebms.Constants;
-import nl.clockwork.ebms.Constants.EbMSAction;
 import nl.clockwork.ebms.Constants.EbMSMessageStatus;
 import nl.clockwork.ebms.common.util.XMLMessageBuilder;
 import nl.clockwork.ebms.dao.DAOException;
@@ -33,13 +32,8 @@ import nl.clockwork.ebms.dao.spring.AbstractEbMSDAO;
 import nl.clockwork.ebms.model.EbMSAttachment;
 import nl.clockwork.ebms.model.EbMSMessage;
 import nl.clockwork.ebms.model.ebxml.AckRequested;
-import nl.clockwork.ebms.model.ebxml.Acknowledgment;
-import nl.clockwork.ebms.model.ebxml.ErrorList;
-import nl.clockwork.ebms.model.ebxml.Manifest;
 import nl.clockwork.ebms.model.ebxml.MessageHeader;
 import nl.clockwork.ebms.model.ebxml.MessageOrder;
-import nl.clockwork.ebms.model.ebxml.StatusRequest;
-import nl.clockwork.ebms.model.ebxml.StatusResponse;
 import nl.clockwork.ebms.model.ebxml.SyncReply;
 import nl.clockwork.ebms.model.xml.dsig.SignatureType;
 
@@ -131,6 +125,7 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 													"sequence_nr," +
 													"message_id," +
 													"ref_to_message_id," +
+													"time_to_live," +
 													"from_role," +
 													"to_role," +
 													"service_type," +
@@ -144,7 +139,7 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 													"content," +
 													"status," +
 													"status_time" +
-												") values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?," + (status == null ? "null" : getTimestampFunction()) + ")",
+												") values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?," + (status == null ? "null" : getTimestampFunction()) + ")",
 												//new String[]{"id"}
 												new int[]{1}
 											);
@@ -162,36 +157,26 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 												ps.setLong(4,message.getMessageOrder().getSequenceNumber().getValue().longValue());
 											ps.setString(5,messageHeader.getMessageData().getMessageId());
 											ps.setString(6,messageHeader.getMessageData().getRefToMessageId());
-											ps.setString(7,messageHeader.getFrom().getRole());
-											ps.setString(8,messageHeader.getTo().getRole());
-											ps.setString(9,messageHeader.getService().getType());
-											ps.setString(10,messageHeader.getService().getValue());
-											ps.setString(11,messageHeader.getAction());
-											ps.setString(12,XMLMessageBuilder.getInstance(SignatureType.class).handle(message.getSignature()));
-											ps.setString(13,XMLMessageBuilder.getInstance(MessageHeader.class).handle(messageHeader));
-											ps.setString(14,XMLMessageBuilder.getInstance(SyncReply.class).handle(message.getSyncReply()));
-											ps.setString(15,XMLMessageBuilder.getInstance(MessageOrder.class).handle(message.getMessageOrder()));
-											ps.setString(16,XMLMessageBuilder.getInstance(AckRequested.class).handle(message.getAckRequested()));
-											if (!Constants.EBMS_SERVICE_URI.equals(messageHeader.getService().getValue()))
-												ps.setString(17,XMLMessageBuilder.getInstance(Manifest.class).handle(message.getManifest()));
-											else if (EbMSAction.MESSAGE_ERROR.action().equals(messageHeader.getAction()))
-												ps.setString(17,XMLMessageBuilder.getInstance(ErrorList.class).handle(message.getErrorList()));
-											else if (EbMSAction.ACKNOWLEDGMENT.action().equals(messageHeader.getAction()))
-												ps.setString(17,XMLMessageBuilder.getInstance(Acknowledgment.class).handle(message.getAcknowledgment()));
-											else if (EbMSAction.STATUS_REQUEST.action().equals(messageHeader.getAction()))
-												ps.setString(17,XMLMessageBuilder.getInstance(StatusRequest.class).handle(message.getStatusRequest()));
-											else if (EbMSAction.STATUS_RESPONSE.action().equals(messageHeader.getAction()))
-												ps.setString(17,XMLMessageBuilder.getInstance(StatusResponse.class).handle(message.getStatusResponse()));
-											else
-												ps.setString(17,null);
+											ps.setTimestamp(7,messageHeader.getMessageData().getTimeToLive() == null ? null : new Timestamp(messageHeader.getMessageData().getTimeToLive().toGregorianCalendar().getTimeInMillis()));
+											ps.setString(8,messageHeader.getFrom().getRole());
+											ps.setString(9,messageHeader.getTo().getRole());
+											ps.setString(10,messageHeader.getService().getType());
+											ps.setString(11,messageHeader.getService().getValue());
+											ps.setString(12,messageHeader.getAction());
+											ps.setString(13,XMLMessageBuilder.getInstance(SignatureType.class).handle(message.getSignature()));
+											ps.setString(14,XMLMessageBuilder.getInstance(MessageHeader.class).handle(messageHeader));
+											ps.setString(15,XMLMessageBuilder.getInstance(SyncReply.class).handle(message.getSyncReply()));
+											ps.setString(16,XMLMessageBuilder.getInstance(MessageOrder.class).handle(message.getMessageOrder()));
+											ps.setString(17,XMLMessageBuilder.getInstance(AckRequested.class).handle(message.getAckRequested()));
+											ps.setString(18,getContent(message));
 											if (status == null)
-												ps.setNull(18,java.sql.Types.INTEGER);
+												ps.setNull(19,java.sql.Types.INTEGER);
 											else
-												ps.setInt(18,status.id());
-											//ps.setString(19,status == null ? null : String.format(getDateFormat(),timestamp));
-											//ps.setTimestamp(19,status == null ? null : new Timestamp(timestamp.getTime()));
-											//ps.setObject(19,status == null ? null : timestamp,Types.TIMESTAMP);
-											//ps.setObject(19,status == null ? null : timestamp);
+												ps.setInt(19,status.id());
+											//ps.setString(20,status == null ? null : String.format(getDateFormat(),timestamp));
+											//ps.setTimestamp(20,status == null ? null : new Timestamp(timestamp.getTime()));
+											//ps.setObject(20,status == null ? null : timestamp,Types.TIMESTAMP);
+											//ps.setObject(20,status == null ? null : timestamp);
 											return ps;
 										}
 										catch (JAXBException e)

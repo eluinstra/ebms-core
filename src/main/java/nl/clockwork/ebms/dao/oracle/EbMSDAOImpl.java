@@ -56,6 +56,7 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 				"sequence_nr," +
 				"message_id," +
 				"ref_to_message_id," +
+				"time_to_live," +
 				"from_role," +
 				"to_role," +
 				"service_type," +
@@ -69,7 +70,7 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 				"content," +
 				"status," +
 				"status_time" +
-			") values (seq_ebms_message_id.nextval,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?," + (status == null ? "null" : getTimestampFunction()) + ")",
+			") values (seq_ebms_message_id.nextval,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?," + (status == null ? "null" : getTimestampFunction()) + ")",
 			//new String[]{"id"}
 			new int[]{1}
 		);
