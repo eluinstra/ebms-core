@@ -66,8 +66,8 @@
 		<!--import resource="classpath:nl/clockwork/ebms/dao/oracle.xml" /-->
 		
 		<!--import resource="classpath:nl/clockwork/ebms/dao/spring/datasource.xml" /-->
-		<!--import resource="classpath:nl/clockwork/ebms/dao/spring/hsqldb.xml" /-->
-		<!--import resource="classpath:nl/clockwork/ebms/dao/hsqldb.provider.xml"/-->
+		<!--import resource="classpath:nl/clockwork/ebms/dao/spring/hsqldb.xml" />
+		<import resource="classpath:nl/clockwork/ebms/dao/hsqldb.provider.xml"/-->
 		<!--import resource="classpath:nl/clockwork/ebms/dao/spring/mysql.xml" /-->
 		<!--import resource="classpath:nl/clockwork/ebms/dao/spring/postgresql.xml" /-->
 		<!--import resource="classpath:nl/clockwork/ebms/dao/spring/mssql.xml" /-->
