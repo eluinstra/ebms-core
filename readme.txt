@@ -238,9 +238,9 @@ the reources directory resides in ebms-adapter-mule3-x.x.x-src.zip/resources and
 the database resources directory resides in ebms-core-x.x.x-src.zip/resources and contains the following data:
 	scripts/database/master/hsqldb - contains hsqldb scripts
 	scripts/database/master/mssql - contains mssql scripts
-	scripts/database/master/mysql - contains mssql scripts
-	scripts/database/master/oracle - contains mssql scripts
-	scripts/database/master/postgresql - contains mssql scripts
+	scripts/database/master/mysql - contains mysql scripts
+	scripts/database/master/oracle - contains oracle scripts
+	scripts/database/master/postgresql - contains postgresql scripts
 
 ==========
 Building =
