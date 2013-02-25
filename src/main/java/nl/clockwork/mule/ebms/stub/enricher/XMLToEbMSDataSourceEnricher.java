@@ -15,13 +15,10 @@
  ******************************************************************************/
 package nl.clockwork.mule.ebms.stub.enricher;
 
-import java.io.IOException;
 import java.util.Arrays;
 
 import nl.clockwork.ebms.model.EbMSDataSource;
-import nl.clockwork.mule.ebms.stub.util.Utils;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mule.api.MuleMessage;
@@ -37,24 +34,16 @@ public class XMLToEbMSDataSourceEnricher extends AbstractMessageTransformer
 	public XMLToEbMSDataSourceEnricher()
 	{
 		registerSourceType(DataTypeFactory.STRING);
-		//FIXME
-		//setReturnDataType(DataTypeFactory.STRING);
+		//setReturnDataType(DataTypeFactory.create(List.class));
 	}
 	
 	@Override
 	public Object transformMessage(final MuleMessage message, String outputEncoding) throws TransformerException
 	{
-		try
-		{
-			String fileName = message.getProperty("originalFilename",PropertyScope.SESSION,"message.xml");
-			EbMSDataSource dataSource = new EbMSDataSource(fileName,StringUtils.defaultIfEmpty(Utils.getMimeType(fileName),"application/octet-stream"),((String)message.getPayload()).getBytes()); //application/xml
-			message.setPayload(Arrays.asList(dataSource));
-			return message;
-		}
-		catch (IOException e)
-		{
-			throw new TransformerException(this,e);
-		}
+		String fileName = message.getProperty("originalFilename",PropertyScope.SESSION);
+		EbMSDataSource dataSource = new EbMSDataSource(fileName,"application/xml",((String)message.getPayload()).getBytes());
+		message.setPayload(Arrays.asList(dataSource));
+		return message;
 	}
 	
 }
