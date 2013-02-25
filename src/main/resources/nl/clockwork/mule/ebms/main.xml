@@ -34,10 +34,7 @@
 	<management:jmx-default-config port="${jmx.port}"/>
 	<!--management:jmx-log4j /-->
 
-	<configuration defaultResponseTimeout="${mule.config.defaultResponseTimeout}" shutdownTimeout="${mule.config.shutdownTimeout}">
-		<!--default-dispatcher-threading-profile maxThreadsActive="${threading.profile.maxThreadsActive}" maxThreadsIdle="${threading.profile.maxThreadsIdle}" threadTTL="${threading.profile.threadTTL}" poolExhaustedAction="WAIT" maxBufferSize="${threading.profile.maxBufferSize}" /-->
-		<!--default-receiver-threading-profile maxThreadsActive="${threading.profile.receiver.maxThreadsActive}" maxThreadsIdle="${threading.profile.receiver.maxThreadsIdle}" threadTTL="${threading.profile.receiver.threadTTL}" poolExhaustedAction="WAIT" maxBufferSize="${threading.profile.receiver.maxBufferSize}" /-->
-	</configuration>
+	<configuration defaultResponseTimeout="${mule.config.defaultResponseTimeout}" shutdownTimeout="${mule.config.shutdownTimeout}"/>
 
 	<spring:beans xmlns="http://www.springframework.org/schema/beans">
 
