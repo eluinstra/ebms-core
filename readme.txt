@@ -234,12 +234,17 @@ and add the name ebMSDataSource to the application datasource
 ===========
 Resources =
 ===========
-the reources directory resides in ebms-adapter-x.x.x.zip/resources and contains the following data:
+the resources directory resides in ebms-adapter-mule2-x.x.x-src.zip/resources and contains the following data:
 	CPAs - contains test CPAs
 	data/aanleveren - contains aanleverbericht test messages
 	data/afleveren - contains afleverbericht test messages
-	scripts/database/hsqldb - contains hsqldb scripts
-	scripts/database/mssql - contains mssql scripts
+
+the database resources directory resides in ebms-core-x.x.x-src.zip/resources and contains the following data:
+	scripts/database/master/hsqldb - contains hsqldb scripts
+	scripts/database/master/mssql - contains mssql scripts
+	scripts/database/master/mysql - contains mssql scripts
+	scripts/database/master/oracle - contains mssql scripts
+	scripts/database/master/postgresql - contains mssql scripts
 
 ==========
 Building =
