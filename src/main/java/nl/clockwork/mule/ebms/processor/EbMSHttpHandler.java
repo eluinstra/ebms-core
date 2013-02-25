@@ -1,6 +1,7 @@
 package nl.clockwork.mule.ebms.processor;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Map;
@@ -11,7 +12,6 @@ import nl.clockwork.ebms.server.EbMSInputStreamHandler;
 import nl.clockwork.ebms.server.EbMSInputStreamHandlerImpl;
 import nl.clockwork.mule.common.Callable;
 
-import org.apache.commons.httpclient.ContentLengthInputStream;
 import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpVersion;
 import org.apache.commons.httpclient.ProtocolException;
@@ -29,7 +29,7 @@ public class EbMSHttpHandler extends Callable
 	@Override
 	public Object onCall(final MuleMessage message) throws Exception
 	{
-  	final ContentLengthInputStream request = (ContentLengthInputStream)message.getPayload();
+  	final InputStream request = (InputStream)message.getPayload();
   	final HttpResponse response = new HttpResponse();
 		response.setBody(
 			new OutputHandler()
