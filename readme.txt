@@ -51,7 +51,6 @@ copy ebms-adapter-mule2-1.0.0.jar/keystore.jks to ${user.home}/.ebms-stub
 	edit and add the following lines to ${user.home}/.ebms-stub/ebf.digipoort.properties:
 	
 	service.port=4443
-	service.remote.port=443
 	
 	server.keystore.path=${user.home}/.ebms-stub/keystore.jks
 	client.keystore.path=${user.home}/.ebms-stub/keystore.jks
@@ -70,7 +69,6 @@ copy ebms-adapter-mule2-1.0.0.jar/keystore.jks to ${user.home}/.ebms-stub
 	edit and add the following lines to ${user.home}/.ebms-stub/ebf.overheid.properties:
 	
 	service.port=443
-	service.remote.port=4443
 	
 	server.keystore.path=${user.home}/.ebms-stub/keystore.jks
 	client.keystore.path=${user.home}/.ebms-stub/keystore.jks
@@ -91,7 +89,6 @@ create file ${user.home}/.ebms-adapter/ebms.adapter.properties (this overrides p
 	edit and add the following lines to ${user.home}/.ebms-adapter/ebms.adapter.properties:
 	
 	service.port=80
-	service.remote.port=8080
 	
 	ebms.jdbc.driverClassName=org.hsqldb.jdbcDriver
 	ebms.jdbc.url=jdbc:hsqldb:file:<path>
