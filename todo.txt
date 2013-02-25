@@ -29,6 +29,8 @@
 
 - implement EbMSFileAttachment (file proxy) and EbMSDBAttachment (db proxy) for large message processing?
 
+- change DuplicateElimination back to type Object
+
 - replace commons-logging by slf4j???
 - read mime message
 	- replace mime4j by:
