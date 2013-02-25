@@ -31,9 +31,6 @@
 		<spring:property name="manager" ref="ebMSTXManager" />
 	</custom-transaction-manager-->
  	    
-	<management:jmx-default-config port="${jmx.port}"/>
-	<!--management:jmx-log4j /-->
-
 	<configuration defaultResponseTimeout="${mule.config.defaultResponseTimeout}" shutdownTimeout="${mule.config.shutdownTimeout}"/>
 
 	<spring:beans xmlns="http://www.springframework.org/schema/beans">
