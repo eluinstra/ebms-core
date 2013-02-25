@@ -17,10 +17,10 @@ You can use the overheid (standalone) stub as a starting point for your project.
 Prerequisites =
 ===============
 install mule-standalone-3.2.1
-build or download ebms-adapter-mule3-1.0.0.jar
-move the ebms-adapter-mule3-1.0.0.jar to <mule-standalone-3.2.1>/lib/user
+build or download ebms-adapter-mule3-1.0.0.zip
+move the ebms-adapter-mule3-1.0.0.zip to <mule-standalone-3.2.1>/apps
 
-download and copy the following libraries to <mule-standalone-3.2.1>/lib/opt:
+download and copy the following libraries to <mule-standalone-3.2.1>/lib/opt (if not included in ebms-adapter-mule3-1.0.0.zip):
 - c3p0-0.9.1.2.jar
 - depending on the database used:
 	- hsqldb-2.1.0.jar
@@ -39,7 +39,7 @@ supported databases:
 =================
 Configure Stubs =
 =================
-copy ebms-adapter-mule3-1.0.0.jar/keystore.jks to ${mule.home}/conf
+copy ebms-adapter-mule3-1.0.0.zip/classes/keystore.jks to ${mule.home}/conf
 
 	============================
 	Configure digipoort EbMS stub =
@@ -230,12 +230,10 @@ and add the name ebMSDataSource to the application datasource
 ===========
 Resources =
 ===========
-the reources directory resides in ebms-adapter-x.x.x.zip/resources and contains the following data:
+the reources directory resides in ebms-adapter-mule3-x.x.x-src.zip/resources and contains the following data:
 	CPAs - contains test CPAs
 	data/aanleveren - contains aanleverbericht test messages
 	data/afleveren - contains afleverbericht test messages
-	scripts/database/hsqldb - contains hsqldb scripts
-	scripts/database/mssql - contains mssql scripts
 
 ==========
 Building =
