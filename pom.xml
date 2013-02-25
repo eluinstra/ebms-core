@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>nl.clockwork.ebms.mule</groupId>
 	<artifactId>ebms-adapter-mule3</artifactId>
-	<packaging>jar</packaging>
+	<packaging>mule</packaging>
 	<name>Mule3 EbMS Adapter</name>
 	<version>1.0.0-SNAPSHOT</version>
 	<description></description>
@@ -235,6 +235,27 @@
 										<ignore></ignore>
 									</action>
 								</pluginExecution>
+                <pluginExecution>
+                    <pluginExecutionFilter>
+                        <groupId>
+                            org.mule.tools
+                        </groupId>
+                        <artifactId>
+                            maven-mule-plugin
+                        </artifactId>
+                        <versionRange>
+                            [1.5,)
+                        </versionRange>
+                        <goals>
+                            <goal>
+                                attach-test-resources
+                            </goal>
+                        </goals>
+                    </pluginExecutionFilter>
+                    <action>
+                        <ignore></ignore>
+                    </action>
+                </pluginExecution>
 							</pluginExecutions>
 						</lifecycleMappingMetadata>
 					</configuration>
