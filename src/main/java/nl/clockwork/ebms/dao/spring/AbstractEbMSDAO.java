@@ -693,7 +693,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 										"content" +
 									") values (?,?,?,?,?)",
 									keyHolder.getKey().longValue(),
-									attachment.getName() == null ? Constants.DEFAULT_FILENAME : attachment.getName(),
+									attachment.getName(),
 									attachment.getContentId(),
 									attachment.getContentType().split(";")[0].trim(),
 									IOUtils.toByteArray(attachment.getInputStream())

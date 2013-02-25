@@ -772,7 +772,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 				for (EbMSAttachment attachment : message.getAttachments())
 				{
 					ps.setLong(1,key);
-					ps.setString(2,attachment.getName() == null ? Constants.DEFAULT_FILENAME : attachment.getName());
+					ps.setString(2,attachment.getName());
 					ps.setString(3,attachment.getContentId());
 					ps.setString(4,attachment.getContentType().split(";")[0].trim());
 					ps.setBytes(5,IOUtils.toByteArray(attachment.getInputStream()));

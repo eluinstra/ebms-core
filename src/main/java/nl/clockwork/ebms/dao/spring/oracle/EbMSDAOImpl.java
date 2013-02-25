@@ -25,7 +25,6 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.namespace.QName;
 
-import nl.clockwork.ebms.Constants;
 import nl.clockwork.ebms.Constants.EbMSMessageStatus;
 import nl.clockwork.ebms.common.util.XMLMessageBuilder;
 import nl.clockwork.ebms.dao.DAOException;
@@ -192,7 +191,7 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 										"content" +
 									") values (?,?,?,?,?)",
 									keyHolder.getKey().longValue(),
-									attachment.getName() == null ? Constants.DEFAULT_FILENAME : attachment.getName(),
+									attachment.getName(),
 									attachment.getContentId(),
 									attachment.getContentType().split(";")[0].trim(),
 									IOUtils.toByteArray(attachment.getInputStream())
