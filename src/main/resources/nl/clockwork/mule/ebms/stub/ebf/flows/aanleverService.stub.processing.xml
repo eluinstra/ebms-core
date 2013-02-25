@@ -40,8 +40,6 @@
 	"
 >
 
-	<vm:endpoint name="aanleverbericht.processing.service.in" path="aanleverbericht.processing.service.in" />
-
 	<model>
 
 		<service name="aanleverbericht.processing.service">
