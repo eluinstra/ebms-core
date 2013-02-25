@@ -4,8 +4,8 @@ Introduction =
 
 This version will support the full Digikoppeling EbMS Deployment Profile (see Koppelvlakstandaard ebMS Voor Digikoppeling 2.0 Versie 2.2) which is a subset of the ebXML Message Service 2.0 specification by OASIS.
 
-This ebms-adapter runs on mule-standalone-2.2.1. You can use the ebms-adapter in two ways:
-- include it in your application/project (only possible if your project also runs on mule-standalone-2.2.1)
+This ebms-adapter runs on mule-standalone-3.2.1. You can use the ebms-adapter in two ways:
+- include it in your application/project (only possible if your project also runs on mule-standalone-3.2.1)
 - run it standalone and use the tcp bridge to connect to your application
 
 This project includes 2 stubs (digipoort en overheid) that implement the AfleverService and the AanleverService. These stubs can communicate with each other.
@@ -16,11 +16,11 @@ You can use the overheid (standalone) stub as a starting point for your project.
 ===============
 Prerequisites =
 ===============
-install mule-standalone-2.2.1
-build or download ebms-adapter-1.0.0.jar
-move the ebms-adapter-1.0.0.jar to <mule-standalone-2.2.1>/lib/user
+install mule-standalone-3.2.1
+build or download ebms-adapter-mule3-1.0.0.jar
+move the ebms-adapter-mule3-1.0.0.jar to <mule-standalone-3.2.1>/lib/user
 
-download and copy the following libraries to <mule-standalone-2.2.1>/lib/opt:
+download and copy the following libraries to <mule-standalone-3.2.1>/lib/opt:
 - c3p0-0.9.1.2.jar
 - depending on the database used:
 	- hsqldb-2.1.0.jar
@@ -39,24 +39,21 @@ supported databases:
 =================
 Configure Stubs =
 =================
-create directory ${user.home}/.ebms-stub
-
-copy ebms-adapter-1.0.0.jar/keystore.jks to ${user.home}/.ebms-stub
+copy ebms-adapter-mule3-1.0.0.jar/keystore.jks to ${mule.home}/conf
 
 	============================
 	Configure digipoort EbMS stub =
 	============================
-	create file ${user.home}/.ebms-stub/ebf.digipoort.properties (this overrides properties from nl/clockwork/mule/ebms/default.properties and nl/clockwork/mule/ebms/stub/ebf/default.digipoort.properties)
+	create file ${mule.home}/conf/ebf.digipoort.properties (this overrides properties from nl/clockwork/ebms/default.properties and nl/clockwork/mule/ebms/stub/ebf/default.digipoort.properties)
 	
-	edit and add the following lines to ${user.home}/.ebms-stub/ebf.digipoort.properties:
+	edit and add the following lines to ${mule.home}/conf/ebf.digipoort.properties:
 	
 	service.port=4443
-	service.remote.port=443
 	
-	server.keystore.path=${user.home}/.ebms-stub/keystore.jks
-	client.keystore.path=${user.home}/.ebms-stub/keystore.jks
-	truststore.path=${user.home}/.ebms-stub/keystore.jks
-	signature.keystore.path=${user.home}/.ebms-stub/keystore.jks
+	server.keystore.path=${mule.home}/conf/keystore.jks
+	client.keystore.path=${mule.home}/conf/keystore.jks
+	truststore.path=${mule.home}/conf/keystore.jks
+	signature.keystore.path=${mule.home}/conf/keystore.jks
 	
 	dir.base=H:/tmp/ebms-stub/digipoort
 	
@@ -65,17 +62,16 @@ copy ebms-adapter-1.0.0.jar/keystore.jks to ${user.home}/.ebms-stub
 	===========================
 	Configure overheid EbMS stub =
 	===========================
-	create file ${user.home}/.ebms-stub/ebf.overheid.properties (this overrides properties from nl/clockwork/mule/ebms/default.properties and nl/clockwork/mule/ebms/stub/ebf/default.overheid.properties)
+	create file ${mule.home}/conf/ebf.overheid.properties (this overrides properties from nl/clockwork/mule/ebms/default.properties and nl/clockwork/mule/ebms/stub/ebf/default.overheid.properties)
 	
-	edit and add the following lines to ${user.home}/.ebms-stub/ebf.overheid.properties:
+	edit and add the following lines to ${mule.home}/conf/ebf.overheid.properties:
 	
 	service.port=443
-	service.remote.port=4443
 	
-	server.keystore.path=${user.home}/.ebms-stub/keystore.jks
-	client.keystore.path=${user.home}/.ebms-stub/keystore.jks
-	truststore.path=${user.home}/.ebms-stub/keystore.jks
-	signature.keystore.path=${user.home}/.ebms-stub/keystore.jks
+	server.keystore.path=${mule.home}/conf/keystore.jks
+	client.keystore.path=${mule.home}/conf/keystore.jks
+	truststore.path=${mule.home}/conf/keystore.jks
+	signature.keystore.path=${mule.home}/conf/keystore.jks
 	
 	dir.base=H:/tmp/ebms-stub/overheid
 	
@@ -84,14 +80,11 @@ copy ebms-adapter-1.0.0.jar/keystore.jks to ${user.home}/.ebms-stub
 ===================================
 Configure EbMS Adapter Standalone =
 ===================================
-create directory ${user.home}/.ebms-adapter
+create file ${mule.home}/conf/ebms.adapter.properties (this overrides properties from nl/clockwork/mule/ebms/default.properties)
 
-create file ${user.home}/.ebms-adapter/ebms.adapter.properties (this overrides properties from nl/clockwork/mule/ebms/default.properties)
-
-	edit and add the following lines to ${user.home}/.ebms-adapter/ebms.adapter.properties:
+	edit and add the following lines to ${mule.home}/conf/ebms.adapter.properties:
 	
 	service.port=80
-	service.remote.port=8080
 	
 	ebms.jdbc.driverClassName=org.hsqldb.jdbcDriver
 	ebms.jdbc.url=jdbc:hsqldb:file:<path>
@@ -104,7 +97,7 @@ create file ${user.home}/.ebms-adapter/ebms.adapter.properties (this overrides p
 Set Environment Vairables =
 ===========================
 > set JAVA_HOME=<jdk6>
-> set MULE_HOME=<mule-standalone-2.2.1>
+> set MULE_HOME=<mule-standalone-3.2.1>
 > set PATH=%JAVA_HOME%\bin;%MULE_HOME%\bin;%PATH%
 
 > cd %MULE_HOME%\bin
@@ -122,8 +115,7 @@ Start overheid EbMS stub =
 ===============================
 Start EbMS Adapter Standalone =
 ===============================
-add the following lines to <mule-standalone-2.2.1>/conf/wrapper.conf
-wrapper.java.additional.3=-Debms.mode=normal
+add the following lines to <mule-standalone-3.2.1>/conf/wrapper.conf
 wrapper.java.additional.4=-Debms.protocol=http
 wrapper.java.additional.5=-Debms.database=hsqldb
 
@@ -139,23 +131,23 @@ http://localhost:8089/adapter/ebms
 Testing Stubs =
 ===============
 Load CPA in overheid EbMS stub:
-	copy ebms-adapter-x.x.x.zip/resources/CPAs/cpaStubEBF.xml to <overheid EbMS stub dir.base>/cpa
+	copy ebms-adapter-mule3-x.x.x.zip/resources/CPAs/cpaStubEBF.xml to <overheid EbMS stub dir.base>/cpa
 		the file will be moved to <overheid EbMS stub dir.base>/cpa/processed when it's processed
 		an import report will be written to <overheid EbMS stub dir.base>/cpa/reports
 Now the CPA is loaded the overheid EbMS stub is ready to send and receive messages.
 
 Load CPA in digipoort EbMS stub:
-	copy ebms-adapter-x.x.x.zip/resources/CPAs/cpaStubEBF.xml to <digipoort EbMS stub dir.base>/cpa
+	copy ebms-adapter-mule3-x.x.x.zip/resources/CPAs/cpaStubEBF.xml to <digipoort EbMS stub dir.base>/cpa
 		the file will be moved to <digipoort EbMS stub dir.base>/cpa/processed when it's processed
 		an import report will be written to <digipoort EbMS stub dir.base>/cpa/reports
 Now the CPA is loaded the digipoort EbMS stub is ready to send and receive messages.
 
 Send afleverbericht message from digipoort EbMS stub to overheid EbMS stub:
-	copy ebms-adapter-x.x.x.zip/resources/data/afleveren/Afleverbericht_Afleveren_ebMS_2.0_v1.1.xml to <digipoort EbMS stub dir.base>/afleveren/request
+	copy ebms-adapter-mule3-x.x.x.zip/resources/data/afleveren/Afleverbericht_Afleveren_ebMS_2.0_v1.1.xml to <digipoort EbMS stub dir.base>/afleveren/request
 		check <digipoort EbMS stub dir.base>/afleveren/response for the response message
 
 Send aanleverbericht message from overheid EbMS stub to digipoort EbMS stub:
-	copy ebms-adapter-x.x.x.zip/resources/data/aanleveren/Aanleverbericht_Aanleveren_ebMS_2.0_v1.1.xml to <overheid EbMS stub dir.base>/aanleveren/request
+	copy ebms-adapter-mule3-x.x.x.zip/resources/data/aanleveren/Aanleverbericht_Aanleveren_ebMS_2.0_v1.1.xml to <overheid EbMS stub dir.base>/aanleveren/request
 		check <overheid EbMS stub dir.base>/aanleveren/request for the response message
 
 =======
@@ -187,12 +179,8 @@ The EbMS adapter supports to different protocols:
 - HTTPS
 
 You can configure them by including the right xml in your project:
-- nl/clockwork/mule/ebms/components/connector.http.xml
-- nl/clockwork/mule/ebms/components/connector.https.xml
-
-And you have to configure the right server protocol:
-- service.protocol=http
-- service.protocol=https
+- nl/clockwork/mule/ebms/flows/ebms.endpoint.http.xml
+- nl/clockwork/mule/ebms/flows/ebms.endpoint.https.xml
 
 =======================
 EbMS Adapter Database =
@@ -204,12 +192,14 @@ The EbMS adapter supports different databases:
 - MSSQL
 - Oracle
 
-You can configure them by including the right xml in your project:
-- nl/clockwork/mule/ebms/components/hsqldb.xml
-- nl/clockwork/mule/ebms/components/mysql.xml
-- nl/clockwork/mule/ebms/components/postgresql.xml
-- nl/clockwork/mule/ebms/components/mssql.xml
-- nl/clockwork/mule/ebms/components/oracle.xml
+You can configure them by including the right xml from ebms-core-1.0.0.jar in your project:
+- nl/clockwork/ebms/dao/spring/datasource.xml
+
+- nl/clockwork/ebms/dao/spring/hsqldb.xml
+- nl/clockwork/ebms/dao/spring/mysql.xml
+- nl/clockwork/ebms/dao/spring/postgresql.xml
+- nl/clockwork/ebms/dao/spring/mssql.xml
+- nl/clockwork/ebms/dao/spring/oracle.xml
 
 And you have to configure the right driver and connection string:
 - ebms.jdbc.driverClassName=org.hsqldb.jdbcDriver
@@ -225,16 +215,16 @@ And you have to configure the right driver and connection string:
 - ebms.jdbc.driverClassName=org.postgresql.Driver
 	ebms.jdbc.url=jdbc:postgresql://<host>:<port>/<dbname>
 
-- ezpoort.jdbc.driverClassName=com.microsoft.sqlserver.jdbc.SQLServerDriver
+- ebms.jdbc.driverClassName=com.microsoft.sqlserver.jdbc.SQLServerDriver
 	or
-	ezpoort.jdbc.driverClassName=net.sourceforge.jtds.jdbc.Driver
-	ezpoort.jdbc.url=jdbc:sqlserver://<host>:<port>;databaseName=<dbname>;
+	ebms.jdbc.driverClassName=net.sourceforge.jtds.jdbc.Driver
+	ebms.jdbc.url=jdbc:sqlserver://<host>:<port>;databaseName=<dbname>;
 
 - ebms.jdbc.driverClassName=oracle.jdbc.OracleDriver
 	ebms.jdbc.url=jdbc:oracle:thin:@<host>:<port>:<dbname>
 
 If you want to let the adapter use the application datasource exclude the following file:
-- nl/clockwork/mule/ebms/components/datasource.xml
+- nl/clockwork/ebms/dao/spring/datasource.xml
 and add the name ebMSDataSource to the application datasource 
 
 ===========
@@ -273,6 +263,4 @@ Known Issues =
 During startup the following errors/warnings may occur and can be ignored:
 
 WARN  nl.clockwork.mule.ebms.HSQLDatabaseProvider - java.sql.SQLException: object name already exists: CPA in statement [CREATE TABLE cpa
-
-ERROR org.mule.module.management.mbean.ServiceService - Error post-registering the MBean javax.management.MalformedObjectNameException: Invalid character ':' in value part of property
 
