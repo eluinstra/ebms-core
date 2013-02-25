@@ -6,7 +6,7 @@
 	<artifactId>ebms-adapter-mule2</artifactId>
 	<packaging>jar</packaging>
 	<name>Mule2 EbMS Adapter</name>
-	<version>1.0.0-SNAPSHOT</version>
+	<version>1.0.0</version>
 	<description></description>
 	<url>https://sourceforge.net/projects/muleebmsadapter/</url>
 	<issueManagement>
