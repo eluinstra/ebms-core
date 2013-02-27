@@ -53,6 +53,9 @@
 	</bean>
 
 	<bean id="signatureGenerator" class="nl.clockwork.ebms.signing.EbMSSecSignatureGenerator" init-method="init">
+		<property name="canonicalizationMethodAlgorithm" value="${xmldsig.canonicalizationMethodAlgorithm}"/>
+		<property name="signatureMethodAlgorithm" value="${xmldsig.signatureMethodAlgorithm}"/>
+		<property name="transformAlgorithm" value="${xmldsig.transformAlgorithm}"/>
 		<property name="keyStorePath" value="${signature.keystore.path}" />
 		<property name="keyStorePassword" value="${signature.keystore.password}" />
 		<property name="keyAlias" value="${signature.key.alias}" />
@@ -61,6 +64,7 @@
 
 	<bean id="ebMSClient" class="nl.clockwork.ebms.client.EbMSHttpClient">
 		<property name="sslFactoryManager" ref="sslFactoryManager"/>
+		<property name="chunkedStreamingMode" value="${http.chunkedStreamingMode}"/>
 	</bean>
 
 	<bean id="sslFactoryManager" class="nl.clockwork.ebms.client.SSLFactoryManager" init-method="init">

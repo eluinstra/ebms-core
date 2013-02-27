@@ -43,6 +43,9 @@ import org.w3c.dom.Element;
 public class XMLSecSignatureGenerator implements SignatureGenerator
 {
 	protected transient Log logger = LogFactory.getLog(getClass());
+  private String canonicalizationMethodAlgorithm = Transforms.TRANSFORM_C14N_OMIT_COMMENTS;
+  private String signatureMethodAlgorithm = XMLSignature.ALGO_ID_SIGNATURE_DSA;
+  private String transformAlgorithm = Transforms.TRANSFORM_C14N_OMIT_COMMENTS;
 	private String keyStorePath;
 	private String keyStorePassword;
 	private String keyAlias;
@@ -76,7 +79,7 @@ public class XMLSecSignatureGenerator implements SignatureGenerator
 
 	private void sign(KeyStore keyStore, KeyPair keyPair, String alias, Document document, List<EbMSAttachment> attachments) throws XMLSecurityException, KeyStoreException
 	{
-		XMLSignature signature = new XMLSignature(document,org.apache.xml.security.utils.Constants.SignatureSpecNS,XMLSignature.ALGO_ID_SIGNATURE_RSA_SHA1);
+		XMLSignature signature = new XMLSignature(document,org.apache.xml.security.utils.Constants.SignatureSpecNS,signatureMethodAlgorithm,canonicalizationMethodAlgorithm);
 
 		Element soapHeader = DOMUtils.getFirstChildElement(document.getDocumentElement());
 		soapHeader.appendChild(signature.getElement());
@@ -90,8 +93,8 @@ public class XMLSecSignatureGenerator implements SignatureGenerator
 		xpath.setAttributeNS(Constants.NAMESPACE_URI_XML_NS, "xmlns:" + Constants.NAMESPACE_PREFIX_SOAP_ENVELOPE,Constants.NAMESPACE_URI_SOAP_ENVELOPE);
 		xpath.appendChild(document.createTextNode(Constants.TRANSFORM_XPATH));
 		xpath.setPrefix(Constants.NAMESPACE_PREFIX_DS);
-		transforms.addTransform(Constants.TRANSFORM_ALGORITHM_XPATH,xpath);
-		transforms.addTransform(Transforms.TRANSFORM_C14N_OMIT_COMMENTS);
+		transforms.addTransform(Transforms.TRANSFORM_XPATH,xpath);
+		transforms.addTransform(transformAlgorithm);
 		
 		signature.addDocument("",transforms,org.apache.xml.security.utils.Constants.ALGO_ID_DIGEST_SHA1);
 		
@@ -108,6 +111,21 @@ public class XMLSecSignatureGenerator implements SignatureGenerator
 		signature.sign(keyPair.getPrivate());
 	}
 	
+	public void setCanonicalizationMethodAlgorithm(String canonicalizationMethodAlgorithm)
+	{
+		this.canonicalizationMethodAlgorithm = canonicalizationMethodAlgorithm;
+	}
+	
+	public void setSignatureMethodAlgorithm(String signatureMethodAlgorithm)
+	{
+		this.signatureMethodAlgorithm = signatureMethodAlgorithm;
+	}
+	
+	public void setTransformAlgorithm(String transformAlgorithm)
+	{
+		this.transformAlgorithm = transformAlgorithm;
+	}
+
 	public void setKeyStorePath(String keyStorePath)
 	{
 		this.keyStorePath = keyStorePath;

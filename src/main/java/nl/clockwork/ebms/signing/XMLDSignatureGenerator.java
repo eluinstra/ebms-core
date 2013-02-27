@@ -63,6 +63,9 @@ import org.w3c.dom.Element;
 public class XMLDSignatureGenerator implements SignatureGenerator
 {
   protected transient Log logger = LogFactory.getLog(getClass());
+  private String canonicalizationMethodAlgorithm = CanonicalizationMethod.INCLUSIVE;
+  private String signatureMethodAlgorithm = SignatureMethod.DSA_SHA1;
+  private String transformAlgorithm = CanonicalizationMethod.INCLUSIVE;
   private String keyStorePath;
   private String keyStorePassword;
   private String keyAlias;
@@ -105,7 +108,7 @@ public class XMLDSignatureGenerator implements SignatureGenerator
 		Map<String,String> m = new HashMap<String,String>();
 		m.put(Constants.NAMESPACE_PREFIX_SOAP_ENVELOPE,Constants.NAMESPACE_URI_SOAP_ENVELOPE);
 		transforms.add(signFactory.newTransform(Transform.XPATH,new XPathFilterParameterSpec(Constants.TRANSFORM_XPATH,m)));
-		transforms.add(signFactory.newTransform(CanonicalizationMethod.INCLUSIVE,(TransformParameterSpec)null));
+		transforms.add(signFactory.newTransform(transformAlgorithm,(TransformParameterSpec)null));
 
 		List<Reference> references = new ArrayList<Reference>();
 		references.add(signFactory.newReference("",sha1DigestMethod,transforms,null,null));
@@ -113,7 +116,7 @@ public class XMLDSignatureGenerator implements SignatureGenerator
 		for (EbMSAttachment attachment : attachments)
 			references.add(signFactory.newReference(Constants.CID + attachment.getContentId(),sha1DigestMethod,Collections.emptyList(),null,null,DigestUtils.sha1(attachment.getInputStream())));
 
-		SignedInfo signedInfo = signFactory.newSignedInfo(signFactory.newCanonicalizationMethod(CanonicalizationMethod.INCLUSIVE,(C14NMethodParameterSpec)null),signFactory.newSignatureMethod(SignatureMethod.RSA_SHA1,null),references);
+		SignedInfo signedInfo = signFactory.newSignedInfo(signFactory.newCanonicalizationMethod(canonicalizationMethodAlgorithm,(C14NMethodParameterSpec)null),signFactory.newSignatureMethod(signatureMethodAlgorithm,null),references);
 
 		List<XMLStructure> keyInfoElements = new ArrayList<XMLStructure>();
 		KeyInfoFactory keyInfoFactory = signFactory.getKeyInfoFactory();
@@ -131,6 +134,21 @@ public class XMLDSignatureGenerator implements SignatureGenerator
 		DOMSignContext signContext = new DOMSignContext(keyPair.getPrivate(),soapHeader);
 		signContext.putNamespacePrefix(XMLSignature.XMLNS,Constants.NAMESPACE_PREFIX_DS);
 		signature.sign(signContext);
+	}
+	
+	public void setCanonicalizationMethodAlgorithm(String canonicalizationMethodAlgorithm)
+	{
+		this.canonicalizationMethodAlgorithm = canonicalizationMethodAlgorithm;
+	}
+	
+	public void setSignatureMethodAlgorithm(String signatureMethodAlgorithm)
+	{
+		this.signatureMethodAlgorithm = signatureMethodAlgorithm;
+	}
+	
+	public void setTransformAlgorithm(String transformAlgorithm)
+	{
+		this.transformAlgorithm = transformAlgorithm;
 	}
 
 	public void setKeyStorePath(String keyStorePath)
