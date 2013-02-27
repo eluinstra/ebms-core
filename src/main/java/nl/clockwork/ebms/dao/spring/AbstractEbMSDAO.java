@@ -818,6 +818,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 					public void setValues(PreparedStatement ps, int i) throws SQLException
 					{
 						ps.setLong(1,sendEvents.get(i).getEbMSMessageId());
+						//ps.setTimestamp(2,String.format(getDateFormat(),sendEvents.get(i).getTime()));
 						ps.setTimestamp(2,new Timestamp(sendEvents.get(i).getTime().getTime()));
 					}
 					
