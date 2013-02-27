@@ -57,6 +57,7 @@ import nl.clockwork.ebms.model.xml.dsig.SignatureType;
 import org.apache.commons.io.IOUtils;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
@@ -796,23 +797,36 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	}
 
 	@Override
-	public void insertSendEvents(List<EbMSSendEvent> sendEvents) throws DAOException
+	public void insertSendEvents(final List<EbMSSendEvent> sendEvents) throws DAOException
 	{
 		try
 		{
-			List<Object[]> events = new ArrayList<Object[]>();
-			for (EbMSSendEvent sendEvent : sendEvents)
-			{
-				//events.add(new Object[]{sendEvent.getEbMSMessageId(),String.format(getDateFormat(),sendEvent.getTime())});
-				events.add(new Object[]{sendEvent.getEbMSMessageId(),sendEvent.getTime()});
-			}
+			//List<Object[]> events = new ArrayList<Object[]>();
+			//for (EbMSSendEvent sendEvent : sendEvents)
+				////events.add(new Object[]{sendEvent.getEbMSMessageId(),String.format(getDateFormat(),sendEvent.getTime())});
+				//events.add(new Object[]{sendEvent.getEbMSMessageId(),sendEvent.getTime()});
 			jdbcTemplate.batchUpdate
 			(
 				"insert into ebms_send_event (" +
 					"ebms_message_id," +
 					"time" +
 				") values (?,?)",
-				events
+				//events
+				new BatchPreparedStatementSetter()
+				{
+					@Override
+					public void setValues(PreparedStatement ps, int i) throws SQLException
+					{
+						ps.setLong(1,sendEvents.get(i).getEbMSMessageId());
+						ps.setTimestamp(2,new Timestamp(sendEvents.get(i).getTime().getTime()));
+					}
+					
+					@Override
+					public int getBatchSize()
+					{
+						return sendEvents.size();
+					}
+				}
 			);
 		}
 		catch (DataAccessException e)
