@@ -44,6 +44,7 @@ public class EbMSHttpClient implements EbMSClient
 {
   protected transient Log logger = LogFactory.getLog(getClass());
 	private SSLFactoryManager sslFactoryManager;
+	private boolean chunkedStreamingMode = true;
 
 	public EbMSDocument sendMessage(String uri, EbMSDocument document) throws EbMSProcessorException
 	{
@@ -52,6 +53,8 @@ public class EbMSHttpClient implements EbMSClient
 			HttpURLConnection connection = (HttpURLConnection)openConnection(uri);
 			if (logger.isDebugEnabled())
 				logger.debug("OUT:\n" + DOMUtils.toString(document.getMessage()));
+			if (chunkedStreamingMode)
+				connection.setChunkedStreamingMode(0);
 			EbMSMessageWriter writer = new EbMSMessageWriterImpl(connection);
 			writer.write(document);
 			writer.flush();
@@ -106,5 +109,10 @@ public class EbMSHttpClient implements EbMSClient
 	public void setSslFactoryManager(SSLFactoryManager sslFactoryManager)
 	{
 		this.sslFactoryManager = sslFactoryManager;
+	}
+	
+	public void setChunkedStreamingMode(boolean chunkedStreamingMode)
+	{
+		this.chunkedStreamingMode = chunkedStreamingMode;
 	}
 }
