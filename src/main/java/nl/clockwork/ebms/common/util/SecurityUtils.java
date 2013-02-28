@@ -21,43 +21,24 @@ import java.io.InputStream;
 import java.security.GeneralSecurityException;
 import java.security.Key;
 import java.security.KeyPair;
-import java.security.KeyPairGenerator;
 import java.security.KeyStore;
-import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
-import java.security.SecureRandom;
 import java.security.cert.Certificate;
-import java.util.HashMap;
-import java.util.Map;
 
 public class SecurityUtils
 {
-	private static Map<String,KeyStore> keyStores = new HashMap<String,KeyStore>();
-
-	public static KeyPair generateRSAKeyPair() throws NoSuchAlgorithmException
+	public static KeyStore loadKeyStore(String location, String password) throws GeneralSecurityException, IOException
 	{
-		KeyPairGenerator generator = KeyPairGenerator.getInstance("RSA");
-		generator.initialize(1024,new SecureRandom());
-		return generator.generateKeyPair();
-	}
-
-	public static synchronized KeyStore loadKeyStore(String location, String password) throws GeneralSecurityException, IOException
-	{
-		String key = location + "::" + password;
-		if (!keyStores.containsKey(key))
-		{
-			//location = ResourceUtils.getURL(SystemPropertyUtils.resolvePlaceholders(location)).getFile();
-			InputStream in = SecurityUtils.class.getResourceAsStream(location);
-			if (in == null)
-				in = SecurityUtils.class.getResourceAsStream("/" + location);
-			if (in == null)
-				in = new FileInputStream(location);
-			KeyStore keyStore = KeyStore.getInstance("JKS");
-			keyStore.load(in,password.toCharArray());
-			keyStores.put(key,keyStore);
-		}
-		return keyStores.get(key);
+		//location = ResourceUtils.getURL(SystemPropertyUtils.resolvePlaceholders(location)).getFile();
+		InputStream in = SecurityUtils.class.getResourceAsStream(location);
+		if (in == null)
+			in = SecurityUtils.class.getResourceAsStream("/" + location);
+		if (in == null)
+			in = new FileInputStream(location);
+		KeyStore keyStore = KeyStore.getInstance("JKS");
+		keyStore.load(in,password.toCharArray());
+		return keyStore;
 	}
 
 	public static KeyPair getKeyPair(KeyStore keyStore, String alias, String password) throws GeneralSecurityException
