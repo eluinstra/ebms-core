@@ -101,19 +101,6 @@ public class XMLMessageBuilder<T>
 		return result.toString();
 	}
 
-	public String handle(JAXBElement<T> e, @SuppressWarnings("restriction") com.sun.xml.internal.bind.marshaller.NamespacePrefixMapper namespacePrefixMapper) throws JAXBException
-	{
-		if (e == null)
-			return null;
-		StringWriter result = new StringWriter();
-		Marshaller marshaller = context.createMarshaller();
-		marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT,Boolean.TRUE);
-		marshaller.setProperty("com.sun.xml.internal.bind.namespacePrefixMapper",namespacePrefixMapper);
-		marshaller.marshal(e,result);
-		result.flush();
-		return result.toString();
-	}
-
 	public String handle(T object) throws JAXBException
 	{
 		if (object == null)
@@ -134,19 +121,6 @@ public class XMLMessageBuilder<T>
 		Marshaller marshaller = context.createMarshaller();
 		marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT,Boolean.TRUE);
 		marshaller.setProperty("com.sun.xml.bind.namespacePrefixMapper",namespacePrefixMapper);
-		marshaller.marshal(object,result);
-		result.flush();
-		return result.toString();
-	}
-
-	public String handle(T object, @SuppressWarnings("restriction") com.sun.xml.internal.bind.marshaller.NamespacePrefixMapper namespacePrefixMapper) throws JAXBException
-	{
-		if (object == null)
-			return null;
-		StringWriter result = new StringWriter();
-		Marshaller marshaller = context.createMarshaller();
-		marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT,Boolean.TRUE);
-		marshaller.setProperty("com.sun.xml.internal.bind.namespacePrefixMapper",namespacePrefixMapper);
 		marshaller.marshal(object,result);
 		result.flush();
 		return result.toString();

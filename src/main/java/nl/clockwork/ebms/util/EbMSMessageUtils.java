@@ -27,7 +27,6 @@ import java.util.UUID;
 
 import javax.activation.DataSource;
 import javax.mail.util.ByteArrayDataSource;
-import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.datatype.DatatypeConfigurationException;
@@ -83,7 +82,6 @@ import nl.clockwork.ebms.model.soap.envelope.Envelope;
 import nl.clockwork.ebms.model.soap.envelope.Header;
 import nl.clockwork.ebms.model.xml.dsig.ReferenceType;
 import nl.clockwork.ebms.model.xml.dsig.SignatureType;
-import nl.clockwork.ebms.xml.EbMSInternalNamespaceMapper;
 import nl.clockwork.ebms.xml.EbMSNamespaceMapper;
 
 import org.apache.commons.io.IOUtils;
@@ -92,14 +90,6 @@ import org.xml.sax.SAXException;
 
 public class EbMSMessageUtils
 {
-	private static boolean useInternalJAXB;
-	
-	static
-	{
-		//useInternalJAXB =  !JAXBContext.JAXB_CONTEXT_FACTORY.equals("com.sun.xml.internal.bind.v2.ContextFactory");
-		useInternalJAXB =  !JAXBContext.JAXB_CONTEXT_FACTORY.contains("internal");
-	}
-	
 	public static EbMSMessage getEbMSMessage(Document document, List<EbMSAttachment> attachments) throws JAXBException, XPathExpressionException, ParserConfigurationException, SAXException, IOException
 	{
 		XMLMessageBuilder<Envelope> messageBuilder = XMLMessageBuilder.getInstance(Envelope.class,Envelope.class,MessageHeader.class,SyncReply.class,MessageOrder.class,AckRequested.class,SignatureType.class,ErrorList.class,Acknowledgment.class,Manifest.class,StatusRequest.class,StatusResponse.class);
@@ -448,17 +438,12 @@ public class EbMSMessageUtils
 
 		//Document d = db.parse(new ByteArrayInputStream(messageBuilder.handle(new JAXBElement<Envelope>(new QName("http://schemas.xmlsoap.org/soap/envelope/","Envelope"),Envelope.class,envelope)).getBytes()));
 
-		Document d = null;
-		if (useInternalJAXB)
-		{
-			//Transformer transformer = DOMUtils.getTransformer("/nl/clockwork/ebms/xsl/EbMSNullTransformation.xml");
-			//DOMResult result = new DOMResult();
-			//transformer.transform(new DOMSource(d),result);
-			//d = (Document)result.getNode();
-			d = db.parse(new ByteArrayInputStream(messageBuilder.handle(new JAXBElement<Envelope>(new QName("http://schemas.xmlsoap.org/soap/envelope/","Envelope"),Envelope.class,envelope),new EbMSInternalNamespaceMapper()).getBytes()));
-		}
-		else
-			d = db.parse(new ByteArrayInputStream(messageBuilder.handle(new JAXBElement<Envelope>(new QName("http://schemas.xmlsoap.org/soap/envelope/","Envelope"),Envelope.class,envelope),new EbMSNamespaceMapper()).getBytes()));
+		//Transformer transformer = DOMUtils.getTransformer("/nl/clockwork/ebms/xsl/EbMSNullTransformation.xml");
+		//DOMResult result = new DOMResult();
+		//transformer.transform(new DOMSource(d),result);
+		//Document d = (Document)result.getNode();
+
+		Document d = db.parse(new ByteArrayInputStream(messageBuilder.handle(new JAXBElement<Envelope>(new QName("http://schemas.xmlsoap.org/soap/envelope/","Envelope"),Envelope.class,envelope),new EbMSNamespaceMapper()).getBytes()));
 
 		return d;
 	}
