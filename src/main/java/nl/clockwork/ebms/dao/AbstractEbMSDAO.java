@@ -84,6 +84,12 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 		{
 			if (connection != null)
 				rollback(connection);
+			throw e;
+		}
+		catch (RuntimeException e)
+		{
+			if (connection != null)
+				rollback(connection);
 			throw new DAOException(e);
 		}
 		finally
