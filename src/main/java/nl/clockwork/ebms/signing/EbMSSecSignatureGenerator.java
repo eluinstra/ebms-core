@@ -64,10 +64,12 @@ public class EbMSSecSignatureGenerator implements EbMSSignatureGenerator
 	private KeyStore keyStore;
 	private KeyPair keyPair;
 
-	public void init() throws GeneralSecurityException, IOException
+	public void init() throws GeneralSecurityException, IOException, EbMSProcessorException
 	{
 		keyStore = SecurityUtils.loadKeyStore(keyStorePath,keyStorePassword);
 		keyPair = SecurityUtils.getKeyPair(keyStore,keyAlias,keyPassword);
+		if (keyPair == null)
+			throw new EbMSProcessorException("Cannot find key with alias: " + keyAlias);
 	}
 
 	@Override
