@@ -164,7 +164,7 @@ public class EbMSMessageProcessorImpl implements EbMSMessageProcessor
 				&& signatureTypeValidator.isValid(errorList,cpa,document,messageHeader)
 			)
 			{
-				logger.info("Message valid.");
+				logger.info("Message valid. MessageId: " + message.getMessageHeader().getMessageData().getMessageId());
 				if (message.getAckRequested() != null)
 				{
 					final EbMSMessage acknowledgment = EbMSMessageUtils.createEbMSAcknowledgment(message,hostname,timestamp);
@@ -203,7 +203,7 @@ public class EbMSMessageProcessorImpl implements EbMSMessageProcessor
 			}
 			else
 			{
-				logger.warn("Message invalid.");
+				logger.warn("Message invalid. MessageId: " + message.getMessageHeader().getMessageData().getMessageId());
 				final EbMSMessage messageError = EbMSMessageUtils.createEbMSMessageError(message,errorList,hostname,timestamp);
 				ebMSDAO.executeTransaction(
 					new DAOTransactionCallback()
