@@ -4,8 +4,8 @@ Introduction =
 
 This version will support the full Digikoppeling EbMS Deployment Profile (see Koppelvlakstandaard ebMS Voor Digikoppeling 2.0 Versie 2.2) which is a subset of the ebXML Message Service 2.0 specification by OASIS.
 
-This ebms-adapter runs on mule-standalone-3.2.1. You can use the ebms-adapter in two ways:
-- include it in your application/project (only possible if your project also runs on mule-standalone-3.2.1)
+This ebms-adapter runs on mule-standalone-3.x.x. You can use the ebms-adapter in two ways:
+- include it in your application/project (only possible if your project also runs on mule-standalone-3.x.x)
 - run it standalone and use the tcp bridge to connect to your application
 
 This project includes 2 stubs (digipoort en overheid) that implement the AfleverService and the AanleverService. These stubs can communicate with each other.
@@ -16,11 +16,11 @@ You can use the overheid (standalone) stub as a starting point for your project.
 ===============
 Prerequisites =
 ===============
-install mule-standalone-3.2.1
+install mule-standalone-3.x.x
 build or download ebms-adapter-mule3-1.0.0.zip
-move the ebms-adapter-mule3-1.0.0.zip to <mule-standalone-3.2.1>/apps
+move the ebms-adapter-mule3-1.0.0.zip to <mule-standalone-3.x.x>/apps
 
-download and copy the following libraries to <mule-standalone-3.2.1>/lib/opt (if not included in ebms-adapter-mule3-1.0.0.zip):
+download and copy the following libraries to <mule-standalone-3.x.x>/lib/opt (if not included in ebms-adapter-mule3-1.0.0.zip):
 - c3p0-0.9.1.2.jar
 - depending on the database used:
 	- hsqldb-2.1.0.jar
@@ -97,7 +97,7 @@ create file ${mule.home}/conf/ebms.adapter.properties (this overrides properties
 Set Environment Vairables =
 ===========================
 > set JAVA_HOME=<jdk6>
-> set MULE_HOME=<mule-standalone-3.2.1>
+> set MULE_HOME=<mule-standalone-3.x.x>
 > set PATH=%JAVA_HOME%\bin;%MULE_HOME%\bin;%PATH%
 
 > cd %MULE_HOME%\bin
@@ -115,7 +115,7 @@ Start overheid EbMS stub =
 ===============================
 Start EbMS Adapter Standalone =
 ===============================
-add the following lines to <mule-standalone-3.2.1>/conf/wrapper.conf
+add the following lines to <mule-standalone-3.x.x>/conf/wrapper.conf
 wrapper.java.additional.4=-Debms.protocol=http
 wrapper.java.additional.5=-Debms.database=hsqldb
 
