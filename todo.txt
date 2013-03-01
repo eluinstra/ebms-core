@@ -2,6 +2,9 @@
 - improve header validation
 	- add separate service and action validation
 - improve CPAUtils.isSigned
+- EbMSMessageUtils.createSOAPMessage 
+	- make predefined namespace prefix configurable
+	- make way to generate predefined namespace prefix (namespacemapper of xslt) configurable
 
 - remove unnecessary defined Interfaces and custom Exceptions
 / improve EbMSMessageProcessor
