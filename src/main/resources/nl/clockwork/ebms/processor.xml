@@ -19,6 +19,15 @@
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd"
 >
 
+	<bean id="cpaService" class="nl.clockwork.ebms.iface.CPAServiceImpl">
+		<property name="ebMSDAO" ref="ebMSDAO"/>
+	</bean>
+
+	<bean id="ebMSMessageService" class="nl.clockwork.ebms.iface.EbMSMessageServiceImpl">
+		<property name="ebMSDAO" ref="ebMSDAO"/>
+		<property name="hostname" value="${hostname}"/>
+	</bean>
+
 	<bean id="httpHandler" class="nl.clockwork.ebms.server.EbMSHttpHandlerImpl">
 		<property name="messageProcessor" ref="messageProcessor"/>
 	</bean>
