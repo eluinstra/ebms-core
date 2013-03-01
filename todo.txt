@@ -15,6 +15,8 @@
 - support multiple deliveryChannels
 	- support mail channel?
 
+- store attachment order? (Keep order defined in Manifest?)
+
 - implement AdminService
 
 - add response and statusCode to table sendEvent???
@@ -26,9 +28,7 @@
 - MessageHeader: define duplicateElimination as Object instead of String
 
 - remove servlet from core?
-- remove EbMS prefix on classes
-
-- store attachment order?
+- remove EbMS prefix on classes; add EbMS prefix on bean ids? 
 
 - implement EbMSFileAttachment (file proxy) and EbMSDBAttachment (db proxy) for large message processing?
 
