@@ -6,7 +6,7 @@
 	<artifactId>ebms-adapter-mule2</artifactId>
 	<packaging>jar</packaging>
 	<name>Mule2 EbMS Adapter</name>
-	<version>1.0.0</version>
+	<version>1.1.0-SNAPSHOT</version>
 	<description></description>
 	<url>https://sourceforge.net/projects/muleebmsadapter/</url>
 	<issueManagement>
@@ -110,7 +110,7 @@
 		<dependency>
 			<groupId>nl.clockwork.ebms</groupId>
 			<artifactId>ebms-core</artifactId>
-			<version>1.0.0</version>
+			<version>1.1.0-SNAPSHOT</version>
 			<exclusions>
 				<exclusion>
 					<groupId>org.springframework</groupId>
