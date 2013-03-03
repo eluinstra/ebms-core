@@ -63,7 +63,6 @@
 
 	<bean id="signatureGenerator" class="nl.clockwork.ebms.signing.EbMSSecSignatureGenerator" init-method="init">
 		<property name="canonicalizationMethodAlgorithm" value="${xmldsig.canonicalizationMethodAlgorithm}"/>
-		<property name="signatureMethodAlgorithm" value="${xmldsig.signatureMethodAlgorithm}"/>
 		<property name="transformAlgorithm" value="${xmldsig.transformAlgorithm}"/>
 		<property name="keyStorePath" value="${signature.keystore.path}" />
 		<property name="keyStorePassword" value="${signature.keystore.password}" />

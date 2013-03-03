@@ -47,7 +47,7 @@ public class SignatureTypeValidator
 	{
 		PartyInfo partyInfo = CPAUtils.getPartyInfo(cpa,messageHeader.getFrom().getPartyId());
 		List<DeliveryChannel> deliveryChannels = CPAUtils.getSendingDeliveryChannels(partyInfo,messageHeader.getFrom().getRole(),messageHeader.getService(),messageHeader.getAction());
-		if (CPAUtils.isSigned(deliveryChannels.get(0)))
+		if (CPAUtils.getReceiverNonRepudiation(deliveryChannels.get(0)) != null)
 			if (!ebMSSignatureValidator.isValid(cpa,document,messageHeader))
 			{
 				errorList.getError().add(EbMSMessageUtils.createError("//Header/Signature",Constants.EbMSErrorCode.SECURITY_FAILURE.errorCode(),"Signature invalid."));
@@ -61,7 +61,7 @@ public class SignatureTypeValidator
 	{
 		PartyInfo partyInfo = CPAUtils.getPartyInfo(cpa,messageHeader.getFrom().getPartyId());
 		List<DeliveryChannel> deliveryChannels = CPAUtils.getSendingDeliveryChannels(partyInfo,messageHeader.getFrom().getRole(),messageHeader.getService(),messageHeader.getAction());
-		if (CPAUtils.isSigned(deliveryChannels.get(0)))
+		if (CPAUtils.getReceiverNonRepudiation(deliveryChannels.get(0)) != null)
 			if (signature == null)
 			{
 				errorList.getError().add(EbMSMessageUtils.createError("//Header/Signature",Constants.EbMSErrorCode.SECURITY_FAILURE.errorCode(),"No signature found."));

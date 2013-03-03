@@ -36,16 +36,15 @@ import nl.clockwork.ebms.model.cpp.cpa.DeliveryChannel;
 import nl.clockwork.ebms.model.cpp.cpa.DocExchange;
 import nl.clockwork.ebms.model.cpp.cpa.PartyId;
 import nl.clockwork.ebms.model.cpp.cpa.PartyInfo;
+import nl.clockwork.ebms.model.cpp.cpa.ReceiverNonRepudiation;
 import nl.clockwork.ebms.model.cpp.cpa.ReliableMessaging;
+import nl.clockwork.ebms.model.cpp.cpa.SenderNonRepudiation;
 import nl.clockwork.ebms.model.cpp.cpa.ServiceBinding;
 import nl.clockwork.ebms.model.cpp.cpa.ServiceType;
-import nl.clockwork.ebms.model.cpp.cpa.SignatureAlgorithm;
 import nl.clockwork.ebms.model.cpp.cpa.StatusValueType;
 import nl.clockwork.ebms.model.cpp.cpa.X509DataType;
 import nl.clockwork.ebms.model.ebxml.MessageHeader;
 import nl.clockwork.ebms.model.ebxml.Service;
-
-import org.apache.xml.security.signature.XMLSignature;
 
 //FIXME use JXPath
 public class CPAUtils
@@ -226,16 +225,37 @@ public class CPAUtils
 		return null;
 	}
 	
-	public static boolean isSigned(DeliveryChannel deliveryChannel)
+	public static SenderNonRepudiation getSenderNonRepudiation(DeliveryChannel deliveryChannel)
 	{
 		DocExchange docExchange = getDocExchange(deliveryChannel);
-		if (docExchange != null && docExchange.getEbXMLReceiverBinding() != null && docExchange.getEbXMLReceiverBinding().getReceiverNonRepudiation() != null && docExchange.getEbXMLReceiverBinding().getReceiverNonRepudiation().getSignatureAlgorithm() != null)
-			for (SignatureAlgorithm algorithm : docExchange.getEbXMLReceiverBinding().getReceiverNonRepudiation().getSignatureAlgorithm())
-				if (XMLSignature.ALGO_ID_SIGNATURE_RSA_SHA1.equals(algorithm.getValue()))
-					return true;
-		return false;
+		if (docExchange != null && docExchange.getEbXMLReceiverBinding() != null)
+			return docExchange.getEbXMLSenderBinding().getSenderNonRepudiation();
+		return null;
 	}
 	
+	public static ReceiverNonRepudiation getReceiverNonRepudiation(DeliveryChannel deliveryChannel)
+	{
+		DocExchange docExchange = getDocExchange(deliveryChannel);
+		if (docExchange != null && docExchange.getEbXMLReceiverBinding() != null)
+			return docExchange.getEbXMLReceiverBinding().getReceiverNonRepudiation();
+		return null;
+	}
+	
+	public static String getNonRepudiationProtocol(ReceiverNonRepudiation receiverNonRepudiation)
+	{
+		return receiverNonRepudiation.getNonRepudiationProtocol().getValue();
+	}
+
+	public static String getSignatureAlgorithm(ReceiverNonRepudiation receiverNonRepudiation)
+	{
+		return receiverNonRepudiation.getSignatureAlgorithm().get(0).getW3C() != null ? receiverNonRepudiation.getSignatureAlgorithm().get(0).getW3C() : receiverNonRepudiation.getSignatureAlgorithm().get(0).getValue();
+	}
+
+	public static String getHashFunction(ReceiverNonRepudiation receiverNonRepudiation)
+	{
+		return receiverNonRepudiation.getHashFunction();
+	}
+
 	public static X509Certificate getX509Certificate(Certificate certificate) throws CertificateException
 	{
 		for (Object o : certificate.getKeyInfo().getContent())

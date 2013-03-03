@@ -90,7 +90,7 @@ public class XMLSecSignatureGenerator implements SignatureGenerator
 		Transforms transforms = new Transforms(document);
 		transforms.addTransform(Transforms.TRANSFORM_ENVELOPED_SIGNATURE);
 		Element xpath = document.createElementNS(org.apache.xml.security.utils.Constants.SignatureSpecNS,org.apache.xml.security.utils.Constants._TAG_XPATH);
-		xpath.setAttributeNS(Constants.NAMESPACE_URI_XML_NS, "xmlns:" + Constants.NAMESPACE_PREFIX_SOAP_ENVELOPE,Constants.NAMESPACE_URI_SOAP_ENVELOPE);
+		xpath.setAttributeNS(org.apache.xml.security.utils.Constants.NamespaceSpecNS,"xmlns:" + Constants.NAMESPACE_PREFIX_SOAP_ENVELOPE,Constants.NAMESPACE_URI_SOAP_ENVELOPE);
 		xpath.appendChild(document.createTextNode(Constants.TRANSFORM_XPATH));
 		xpath.setPrefix(Constants.NAMESPACE_PREFIX_DS);
 		transforms.addTransform(Transforms.TRANSFORM_XPATH,xpath);

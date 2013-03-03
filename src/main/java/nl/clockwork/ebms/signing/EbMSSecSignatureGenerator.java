@@ -24,19 +24,15 @@ import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import java.util.List;
 
-import javax.xml.bind.JAXBException;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.xpath.XPathExpressionException;
-
 import nl.clockwork.ebms.Constants;
 import nl.clockwork.ebms.common.util.DOMUtils;
 import nl.clockwork.ebms.common.util.SecurityUtils;
-import nl.clockwork.ebms.dao.DAOException;
 import nl.clockwork.ebms.model.EbMSAttachment;
 import nl.clockwork.ebms.model.EbMSDocument;
 import nl.clockwork.ebms.model.cpp.cpa.CollaborationProtocolAgreement;
 import nl.clockwork.ebms.model.cpp.cpa.DeliveryChannel;
 import nl.clockwork.ebms.model.cpp.cpa.PartyInfo;
+import nl.clockwork.ebms.model.cpp.cpa.ReceiverNonRepudiation;
 import nl.clockwork.ebms.model.ebxml.MessageHeader;
 import nl.clockwork.ebms.processor.EbMSProcessorException;
 import nl.clockwork.ebms.util.CPAUtils;
@@ -49,14 +45,15 @@ import org.apache.xml.security.signature.XMLSignature;
 import org.apache.xml.security.transforms.Transforms;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.xml.sax.SAXException;
 
 public class EbMSSecSignatureGenerator implements EbMSSignatureGenerator
 {
 	protected transient Log logger = LogFactory.getLog(getClass());
-  private String canonicalizationMethodAlgorithm = Transforms.TRANSFORM_C14N_OMIT_COMMENTS;
-  private String signatureMethodAlgorithm = XMLSignature.ALGO_ID_SIGNATURE_DSA;
-  private String transformAlgorithm = Transforms.TRANSFORM_C14N_OMIT_COMMENTS;
+	//private String baseURI = org.apache.xml.security.utils.Constants.SignatureSpecNS;
+	private String canonicalizationMethodAlgorithm = Transforms.TRANSFORM_C14N_OMIT_COMMENTS;
+	//private String signatureMethodAlgorithm = XMLSignature.ALGO_ID_SIGNATURE_DSA;
+	private String transformAlgorithm = Transforms.TRANSFORM_C14N_OMIT_COMMENTS;
+	//private String digestAlgorithm = org.apache.xml.security.utils.Constants.ALGO_ID_DIGEST_SHA1;
 	private String keyStorePath;
 	private String keyStorePassword;
 	private String keyAlias;
@@ -77,9 +74,18 @@ public class EbMSSecSignatureGenerator implements EbMSSignatureGenerator
 	{
 		try
 		{
-			if (isSigned(cpa,document.getMessage(),messageHeader))
-				//TODO: read keyAlias from cpa (by convention (cpaId or endpoint))
-				sign(keyStore,keyPair,keyAlias,document.getMessage(),document.getAttachments());
+			//TODO: get isSigned info from CPA for all messages
+			if (!Constants.EBMS_SERVICE_URI.equals(messageHeader.getService().getValue()))
+			{
+				PartyInfo partyInfo = CPAUtils.getPartyInfo(cpa,messageHeader.getFrom().getPartyId());
+				List<DeliveryChannel> channels = CPAUtils.getSendingDeliveryChannels(partyInfo,messageHeader.getFrom().getRole(),messageHeader.getService(),messageHeader.getAction());
+				ReceiverNonRepudiation receiverNonRepudiation = CPAUtils.getReceiverNonRepudiation(channels.get(0));
+				if (receiverNonRepudiation != null)
+				{
+					//TODO: read keyAlias from cpa (by convention (cpaId or endpoint))
+					sign(keyStore,keyPair,keyAlias,document.getMessage(),document.getAttachments(),CPAUtils.getNonRepudiationProtocol(receiverNonRepudiation),CPAUtils.getSignatureAlgorithm(receiverNonRepudiation),CPAUtils.getHashFunction(receiverNonRepudiation));
+				}
+			}
 		}
 		catch (Exception e)
 		{
@@ -87,22 +93,15 @@ public class EbMSSecSignatureGenerator implements EbMSSignatureGenerator
 		}
 	}
 
-	private boolean isSigned(CollaborationProtocolAgreement cpa, Document document, MessageHeader messageHeader) throws XPathExpressionException, ParserConfigurationException, SAXException, IOException, JAXBException, DAOException
+	private void sign(KeyStore keyStore, KeyPair keyPair, String alias, Document document, List<EbMSAttachment> attachments, String baseURI, String signatureMethodAlgorithm, String digestAlgorithm) throws XMLSecurityException, KeyStoreException
 	{
-		//TODO: get isSigned info from CPA for all messages
-		if (!Constants.EBMS_SERVICE_URI.equals(messageHeader.getService().getValue()))
-		{
-			PartyInfo partyInfo = CPAUtils.getPartyInfo(cpa,messageHeader.getFrom().getPartyId());
-			List<DeliveryChannel> channels = CPAUtils.getSendingDeliveryChannels(partyInfo,messageHeader.getFrom().getRole(),messageHeader.getService(),messageHeader.getAction());
-			return CPAUtils.isSigned(channels.get(0));
-		}
-		else
-			return false;
-	}
-	
-	private void sign(KeyStore keyStore, KeyPair keyPair, String alias, Document document, List<EbMSAttachment> attachments) throws XMLSecurityException, KeyStoreException
-	{
-		XMLSignature signature = new XMLSignature(document,org.apache.xml.security.utils.Constants.SignatureSpecNS,signatureMethodAlgorithm,canonicalizationMethodAlgorithm);
+		// quickfix for error: "Cannot find ds:XPath in Transform"
+		if (baseURI.equals(org.apache.xml.security.utils.Constants.SignatureSpecNS))
+			baseURI = org.apache.xml.security.utils.Constants.SignatureSpecNS;
+		else if (baseURI.equals(org.apache.xml.security.utils.Constants.SignatureSpec11NS))
+			baseURI = org.apache.xml.security.utils.Constants.SignatureSpec11NS;
+
+		XMLSignature signature = new XMLSignature(document,baseURI,signatureMethodAlgorithm,canonicalizationMethodAlgorithm);
 
 		Element soapHeader = DOMUtils.getFirstChildElement(document.getDocumentElement());
 		soapHeader.appendChild(signature.getElement());
@@ -112,14 +111,21 @@ public class EbMSSecSignatureGenerator implements EbMSSignatureGenerator
 			
 		Transforms transforms = new Transforms(document);
 		transforms.addTransform(Transforms.TRANSFORM_ENVELOPED_SIGNATURE);
-		Element xpath = document.createElementNS(org.apache.xml.security.utils.Constants.SignatureSpecNS,org.apache.xml.security.utils.Constants._TAG_XPATH);
-		xpath.setAttributeNS(Constants.NAMESPACE_URI_XML_NS, "xmlns:" + Constants.NAMESPACE_PREFIX_SOAP_ENVELOPE,Constants.NAMESPACE_URI_SOAP_ENVELOPE);
+
+		Element xpath = document.createElementNS(baseURI,org.apache.xml.security.utils.Constants._TAG_XPATH);
+		xpath.setAttributeNS(org.apache.xml.security.utils.Constants.NamespaceSpecNS,"xmlns:" + Constants.NAMESPACE_PREFIX_SOAP_ENVELOPE,Constants.NAMESPACE_URI_SOAP_ENVELOPE);
 		xpath.appendChild(document.createTextNode(Constants.TRANSFORM_XPATH));
 		xpath.setPrefix(Constants.NAMESPACE_PREFIX_DS);
+
+		//XPath2FilterContainer xpathC = XPath2FilterContainer.newInstanceIntersect(document,Constants.TRANSFORM_XPATH);
+		//xpathC.setXPathNamespaceContext("ds",Transforms.TRANSFORM_XPATH);
+		//Element xpath = xpathC.getElement();
+		
 		transforms.addTransform(Transforms.TRANSFORM_XPATH,xpath);
+		
 		transforms.addTransform(transformAlgorithm);
 		
-		signature.addDocument("",transforms,org.apache.xml.security.utils.Constants.ALGO_ID_DIGEST_SHA1);
+		signature.addDocument("",transforms,digestAlgorithm);
 		
 		for (EbMSAttachment attachment : attachments)
 			signature.addDocument(Constants.CID + attachment.getContentId());
@@ -127,8 +133,8 @@ public class EbMSSecSignatureGenerator implements EbMSSignatureGenerator
 		signature.addKeyInfo(keyPair.getPublic());
 		
 		Certificate[] certificates = keyStore.getCertificateChain(alias);
-	   //for (Certificate certificate : certificates)
-	   //	signature.addKeyInfo((X509Certificate)certificate);
+	  //for (Certificate certificate : certificates)
+	  //	signature.addKeyInfo((X509Certificate)certificate);
 		signature.addKeyInfo((X509Certificate)certificates[0]);
 
 		signature.sign(keyPair.getPrivate());
@@ -137,11 +143,6 @@ public class EbMSSecSignatureGenerator implements EbMSSignatureGenerator
 	public void setCanonicalizationMethodAlgorithm(String canonicalizationMethodAlgorithm)
 	{
 		this.canonicalizationMethodAlgorithm = canonicalizationMethodAlgorithm;
-	}
-	
-	public void setSignatureMethodAlgorithm(String signatureMethodAlgorithm)
-	{
-		this.signatureMethodAlgorithm = signatureMethodAlgorithm;
 	}
 	
 	public void setTransformAlgorithm(String transformAlgorithm)
