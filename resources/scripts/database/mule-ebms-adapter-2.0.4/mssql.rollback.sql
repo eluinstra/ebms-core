@@ -1,0 +1,2 @@
+ALTER TABLE ebms_attachment ALTER COLUMN content_type VARCHAR(64) NOT NULL;
+ALTER TABLE ebms_attachment ALTER COLUMN name VARCHAR(128)NOT NULL;
