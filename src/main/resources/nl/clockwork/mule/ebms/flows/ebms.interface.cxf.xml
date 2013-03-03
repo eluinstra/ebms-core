@@ -48,9 +48,6 @@
 			</inbound>
 			<component>
 				<spring-object bean="cpaService"/>
-				<!--singleton-object class="nl.clockwork.ebms.iface.CPAServiceImpl">
-					<property key="ebMSDAO" value-ref="ebMSDAO"/>
-				</singleton-object-->
 			</component>
 		</service>
 
@@ -71,10 +68,6 @@
 			</inbound>
 			<component>
 				<spring-object bean="ebMSMessageService"/>
-				<!--singleton-object class="nl.clockwork.ebms.iface.EbMSMessageServiceImpl">
-					<property key="ebMSDAO" value-ref="ebMSDAO"/>
-					<property key="hostname" value="${service.host}"/>
-				</singleton-object-->
 			</component>
 		</service>
 
