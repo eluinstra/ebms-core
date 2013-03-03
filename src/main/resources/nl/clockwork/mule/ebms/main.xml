@@ -45,7 +45,6 @@
 		</bean>
 
 		<import resource="classpath:nl/clockwork/ebms/processor.xml" />
-		<import resource="classpath:nl/clockwork/ebms/interface.xml" />
 
 		<import resource="classpath:nl/clockwork/mule/ebms/flows/ebms.endpoint.${ebms.protocol}.xml" />
 
