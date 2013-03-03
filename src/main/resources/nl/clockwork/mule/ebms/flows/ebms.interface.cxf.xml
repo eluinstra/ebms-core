@@ -29,7 +29,7 @@
 	">
 
 	<http:connector name="ebms.adapter.connector.http">
-		<receiver-threading-profile maxThreadsActive="${threading.profile.ebms.http.receiver.maxThreadsActive}" maxThreadsIdle="${threading.profile.ebms.http.receiver.maxThreadsIdle}" threadTTL="${threading.profile.ebms.http.receiver.threadTTL}" poolExhaustedAction="WAIT" maxBufferSize="${threading.profile.ebms.http.receiver.maxBufferSize}" />
+		<receiver-threading-profile maxThreadsActive="${threading.profile.http.receiver.maxThreadsActive}" maxThreadsIdle="${threading.profile.http.receiver.maxThreadsIdle}" threadTTL="${threading.profile.http.receiver.threadTTL}" poolExhaustedAction="WAIT" maxBufferSize="${threading.profile.http.receiver.maxBufferSize}" />
 	</http:connector>
 	
 	<flow name="cpaService">
