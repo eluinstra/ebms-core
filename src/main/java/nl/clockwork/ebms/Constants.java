@@ -91,10 +91,8 @@ public class Constants
 	public static final String EBMS_ERROR_CODE_CONTEXT = EBMS_SERVICE_URI + ":errors";
 	public static final String EBMS_DEFAULT_LANGUAGE = "en-US";
 
-	public static final String NAMESPACE_URI_XML_NS = "http://www.w3.org/2000/xmlns/";
 	public static final String NAMESPACE_URI_SOAP_ENVELOPE = "http://schemas.xmlsoap.org/soap/envelope/";
 	public static final String NAMESPACE_PREFIX_SOAP_ENVELOPE = "soap";
-	//public static final String TRANSFORM_XPATH = "not(ancestor-or-self::node()[@" + NAMESPACE_PREFIX_SOAP_ENVELOPE + ":actor=\"" + ACTOR_NEXT_MSH_URN + "\"] | ancestor-or-self::node()[@" + NAMESPACE_PREFIX_SOAP_ENVELOPE + ":actor=\"" + ACTOR_NEXT_MSH_SCHEMAS + "\"])";
 	public static final String TRANSFORM_XPATH = "not(ancestor-or-self::node()[@" + NAMESPACE_PREFIX_SOAP_ENVELOPE + ":actor=\"" + EBMS_SERVICE_URI + ":nextMSH\"]|ancestor-or-self::node()[@" + NAMESPACE_PREFIX_SOAP_ENVELOPE + ":actor=\"http://schemas.xmlsoap.org/soap/actor/next\"])";
 	public static final String NAMESPACE_PREFIX_DS = "ds";
 	public static final String CID = "cid:";
