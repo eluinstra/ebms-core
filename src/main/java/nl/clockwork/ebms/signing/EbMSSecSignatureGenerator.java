@@ -117,10 +117,6 @@ public class EbMSSecSignatureGenerator implements EbMSSignatureGenerator
 		xpath.appendChild(document.createTextNode(Constants.TRANSFORM_XPATH));
 		xpath.setPrefix(Constants.NAMESPACE_PREFIX_DS);
 
-		//XPath2FilterContainer xpathC = XPath2FilterContainer.newInstanceIntersect(document,Constants.TRANSFORM_XPATH);
-		//xpathC.setXPathNamespaceContext("ds",Transforms.TRANSFORM_XPATH);
-		//Element xpath = xpathC.getElement();
-		
 		transforms.addTransform(Transforms.TRANSFORM_XPATH,xpath);
 		
 		transforms.addTransform(transformAlgorithm);
