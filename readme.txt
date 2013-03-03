@@ -36,6 +36,8 @@ supported databases:
 - mssql 2008 R2
 - oracle (11)(lob > 4k fix (needed for older oracle jdbc adapters) not implemented!)
 
+to generate cleaner/smaller messages/signatures copy xmlsec-1.5.3.jar to <mule-standalone-3.x.x>/lib/boot (optional)
+
 =================
 Configure Stubs =
 =================
