@@ -18,7 +18,7 @@ Prerequisites =
 ===============
 install mule-standalone-2.2.1
 build or download ebms-adapter-mule2-1.0.0.jar
-move the ebms-adapter-mule2-1.0.0.jar to <mule-standalone-2.2.1>/lib/user
+move ebms-adapter-mule2-1.0.0.jar to <mule-standalone-2.2.1>/lib/user
 
 download and copy the following libraries to <mule-standalone-2.2.1>/lib/opt:
 - c3p0-0.9.1.2.jar
