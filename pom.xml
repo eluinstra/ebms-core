@@ -6,7 +6,7 @@
 	<artifactId>ebms-adapter-web</artifactId>
 	<packaging>war</packaging>
 	<name>EbMS Web Application</name>
-	<version>1.0.0-SNAPSHOT</version>
+	<version>1.0.0</version>
 	<description></description>
 	<url>https://sourceforge.net/projects/muleebmsadapter/</url>
 	<issueManagement>
