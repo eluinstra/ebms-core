@@ -135,9 +135,9 @@ public class EbMSMessageProcessorImpl implements EbMSMessageProcessor
 		MessageHeader messageHeader = message.getMessageHeader();
 		if (isDuplicateMessage(message))
 		{
-			logger.warn("Duplicate message found! MessageId: " + message.getMessageHeader().getMessageData().getMessageId());
 			if (equalsDuplicateMessage(message))
 			{
+				logger.warn("Duplicate message found! MessageId: " + message.getMessageHeader().getMessageData().getMessageId());
 				if (message.getSyncReply() == null)
 				{
 					long responseId = ebMSDAO.getMessageId(messageHeader.getMessageData().getMessageId(),service,EbMSAction.MESSAGE_ERROR.action(),EbMSAction.ACKNOWLEDGMENT.action());
@@ -149,7 +149,7 @@ public class EbMSMessageProcessorImpl implements EbMSMessageProcessor
 			}
 			else
 			{
-				logger.warn("Duplicate messages are not identical! Message discarded.");
+				logger.warn("Duplicate but unidentical message found! MessageId: " + message.getMessageHeader().getMessageData().getMessageId());
 				return null;
 			}
 		}
@@ -230,12 +230,13 @@ public class EbMSMessageProcessorImpl implements EbMSMessageProcessor
 	{
 		if (isDuplicateMessage(message))
 		{
-			logger.warn("Duplicate message found! MessageId: " + message.getMessageHeader().getMessageData().getMessageId());
-			if (!equalsDuplicateMessage(message))
-				logger.warn("Duplicate messages are not identical! Message discarded.");
+			if (equalsDuplicateMessage(message))
+				logger.warn("Duplicate message found! MessageId: " + message.getMessageHeader().getMessageData().getMessageId());
+			else
+				logger.warn("Duplicate but unidentical message found! MessageId: " + message.getMessageHeader().getMessageData().getMessageId());
 		}
 		else if (isDuplicateRefToMessage(message))
-			logger.warn("Duplicate response message found! Message discarded. RefToMessageId: " + message.getMessageHeader().getMessageData().getRefToMessageId());
+			logger.warn("Duplicate response message found! RefToMessageId: " + message.getMessageHeader().getMessageData().getRefToMessageId());
 		else
 			ebMSDAO.executeTransaction(
 				new DAOTransactionCallback()
@@ -260,9 +261,9 @@ public class EbMSMessageProcessorImpl implements EbMSMessageProcessor
 		GregorianCalendar c = timestamp;
 		if (isDuplicateMessage(message))
 		{
-			logger.warn("Duplicate message found! MessageId: " + message.getMessageHeader().getMessageData().getMessageId());
 			if (equalsDuplicateMessage(message))
 			{
+				logger.warn("Duplicate message found! MessageId: " + message.getMessageHeader().getMessageData().getMessageId());
 				if (message.getSyncReply() == null)
 				{
 					long responseId = ebMSDAO.getMessageId(message.getMessageHeader().getMessageData().getMessageId(),service,EbMSAction.STATUS_RESPONSE.action());
@@ -274,7 +275,7 @@ public class EbMSMessageProcessorImpl implements EbMSMessageProcessor
 			}
 			else
 			{
-				logger.warn("Duplicate messages are not identical! Message discarded.");
+				logger.warn("Duplicate but unidentical message found! MessageId: " + message.getMessageHeader().getMessageData().getMessageId());
 				return null;
 			}
 		}
@@ -325,9 +326,9 @@ public class EbMSMessageProcessorImpl implements EbMSMessageProcessor
 	{
 		if (isDuplicateMessage(message))
 		{
-			logger.warn("Duplicate message found! MessageId: " + message.getMessageHeader().getMessageData().getMessageId());
 			if (equalsDuplicateMessage(message))
 			{
+				logger.warn("Duplicate message found! MessageId: " + message.getMessageHeader().getMessageData().getMessageId());
 				if (message.getSyncReply() == null)
 				{
 					long responseId = ebMSDAO.getMessageId(message.getMessageHeader().getMessageData().getMessageId(),service,EbMSAction.PONG.action());
@@ -339,7 +340,7 @@ public class EbMSMessageProcessorImpl implements EbMSMessageProcessor
 			}
 			else
 			{
-				logger.warn("Duplicate messages are not identical! Message discarded.");
+				logger.warn("Duplicate but unidentical message found! MessageId: " + message.getMessageHeader().getMessageData().getMessageId());
 				return null;
 			}
 		}
@@ -373,9 +374,10 @@ public class EbMSMessageProcessorImpl implements EbMSMessageProcessor
 	{
 		if (isDuplicateMessage(message))
 		{
-			logger.warn("Duplicate message found! MessageId: " + message.getMessageHeader().getMessageData().getMessageId());
-			if (!equalsDuplicateMessage(message))
-				logger.warn("Duplicate messages are not identical! Message discarded.");
+			if (equalsDuplicateMessage(message))
+				logger.warn("Duplicate message found! MessageId: " + message.getMessageHeader().getMessageData().getMessageId());
+			else
+				logger.warn("Duplicate but unidentical message found! MessageId: " + message.getMessageHeader().getMessageData().getMessageId());
 		}
 		else
 			ebMSDAO.executeTransaction(
