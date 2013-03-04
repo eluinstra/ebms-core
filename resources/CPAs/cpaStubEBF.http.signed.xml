@@ -81,22 +81,9 @@ OcDNBvpKX2SpoHffgXmdrExQshpIDzzofex0y/Kg4mulDQUPwVuIZtbnlQ==
     </X509Data>
   </KeyInfo>
       </tns:Certificate>
-      <tns:Certificate tns:certId="DIGIPOORT_EncryptionCert">
-      </tns:Certificate>
-      <tns:Certificate tns:certId="DIGIPOORT_ServerCert">
-      </tns:Certificate>
-      <tns:Certificate tns:certId="DIGIPOORT_ClientCert">
-      </tns:Certificate>
       <tns:SecurityDetails tns:securityId="DIGIPOORT_Security">
          <tns:TrustAnchors>
             <tns:AnchorCertificateRef tns:certId="DIGIPOORT_SigningCert"/>
-            <tns:AnchorCertificateRef tns:certId="DIGIPOORT_EncryptionCert"/>
-         </tns:TrustAnchors>
-      </tns:SecurityDetails>
-      <tns:SecurityDetails tns:securityId="DIGIPOORT_TransportSecurity">
-         <tns:TrustAnchors>
-            <tns:AnchorCertificateRef tns:certId="DIGIPOORT_ServerCert"/>
-            <tns:AnchorCertificateRef tns:certId="DIGIPOORT_ClientCert"/>
          </tns:TrustAnchors>
       </tns:SecurityDetails>
       <tns:DeliveryChannel tns:channelId="DIGIPOORT_defaultDeliveryChannel_ProfileBestEffortSigned" tns:docExchangeId="DIGIPOORT_SIGNED_BestEffort" tns:transportId="DIGIPOORT_transport_HTTPS">
@@ -108,20 +95,10 @@ OcDNBvpKX2SpoHffgXmdrExQshpIDzzofex0y/Kg4mulDQUPwVuIZtbnlQ==
       <tns:Transport tns:transportId="DIGIPOORT_transport_HTTPS">
          <tns:TransportSender>
             <tns:TransportProtocol tns:version="1.1">HTTP</tns:TransportProtocol>
-            <tns:TransportClientSecurity>
-               <tns:TransportSecurityProtocol tns:version="3.0">SSL</tns:TransportSecurityProtocol>
-               <tns:ClientCertificateRef tns:certId="DIGIPOORT_ClientCert"/>
-               <tns:ServerSecurityDetailsRef tns:securityId="DIGIPOORT_TransportSecurity"/>
-            </tns:TransportClientSecurity>
          </tns:TransportSender>
          <tns:TransportReceiver>
             <tns:TransportProtocol tns:version="1.1">HTTP</tns:TransportProtocol>
-            <tns:Endpoint tns:uri="http://localhost:8090/digipoortStub" tns:type="allPurpose"/>
-            <tns:TransportServerSecurity>
-               <tns:TransportSecurityProtocol tns:version="3.0">SSL</tns:TransportSecurityProtocol>
-               <tns:ServerCertificateRef tns:certId="DIGIPOORT_ServerCert"/>
-               <tns:ClientSecurityDetailsRef tns:securityId="DIGIPOORT_TransportSecurity"/>
-            </tns:TransportServerSecurity>
+            <tns:Endpoint tns:uri="http://localhost:8888/digipoortStub" tns:type="allPurpose"/>
          </tns:TransportReceiver>
       </tns:Transport>
       <tns:DocExchange tns:docExchangeId="DIGIPOORT_SIGNED_BestEffort">
@@ -252,22 +229,10 @@ OcDNBvpKX2SpoHffgXmdrExQshpIDzzofex0y/Kg4mulDQUPwVuIZtbnlQ==
     </X509Data>
   </KeyInfo>
       </tns:Certificate>
-      <tns:Certificate tns:certId="OVERHEID_EncryptionCert">
-      </tns:Certificate>
-      <tns:Certificate tns:certId="OVERHEID_ServerCert">
-      </tns:Certificate>
-      <tns:Certificate tns:certId="OVERHEID_ClientCert">
-      </tns:Certificate>
       <tns:SecurityDetails tns:securityId="OVERHEID_Security">
          <tns:TrustAnchors>
             <tns:AnchorCertificateRef tns:certId="OVERHEID_SigningCert"/>
-            <tns:AnchorCertificateRef tns:certId="OVERHEID_EncryptionCert"/>
-         </tns:TrustAnchors>
-      </tns:SecurityDetails>
-      <tns:SecurityDetails tns:securityId="OVERHEID_TransportSecurity">
-         <tns:TrustAnchors>
-            <tns:AnchorCertificateRef tns:certId="OVERHEID_ServerCert"/>
-            <tns:AnchorCertificateRef tns:certId="OVERHEID_ClientCert"/>
+
          </tns:TrustAnchors>
       </tns:SecurityDetails>
       <tns:DeliveryChannel tns:channelId="OVERHEID_defaultDeliveryChannel_ProfileBestEffortSigned" tns:docExchangeId="OVERHEID_SIGNED_BestEffort" tns:transportId="OVERHEID_transport_HTTPS">
@@ -279,20 +244,10 @@ OcDNBvpKX2SpoHffgXmdrExQshpIDzzofex0y/Kg4mulDQUPwVuIZtbnlQ==
       <tns:Transport tns:transportId="OVERHEID_transport_HTTPS">
          <tns:TransportSender>
             <tns:TransportProtocol tns:version="1.1">HTTP</tns:TransportProtocol>
-            <tns:TransportClientSecurity>
-               <tns:TransportSecurityProtocol tns:version="3.0">SSL</tns:TransportSecurityProtocol>
-               <tns:ClientCertificateRef tns:certId="OVERHEID_ClientCert"/>
-               <tns:ServerSecurityDetailsRef tns:securityId="OVERHEID_TransportSecurity"/>
-            </tns:TransportClientSecurity>
          </tns:TransportSender>
          <tns:TransportReceiver>
             <tns:TransportProtocol tns:version="1.1">HTTP</tns:TransportProtocol>
-            <tns:Endpoint tns:uri="http://localhost:8080/overheidStub" tns:type="allPurpose"/>
-            <tns:TransportServerSecurity>
-               <tns:TransportSecurityProtocol tns:version="3.0">SSL</tns:TransportSecurityProtocol>
-               <tns:ServerCertificateRef tns:certId="OVERHEID_ServerCert"/>
-               <tns:ClientSecurityDetailsRef tns:securityId="OVERHEID_TransportSecurity"/>
-            </tns:TransportServerSecurity>
+            <tns:Endpoint tns:uri="http://localhost:8088/overheidStub" tns:type="allPurpose"/>
          </tns:TransportReceiver>
       </tns:Transport>
       <tns:DocExchange tns:docExchangeId="OVERHEID_SIGNED_BestEffort">
