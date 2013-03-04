@@ -39,12 +39,12 @@
 	</appender>
 
 	<appender name="ASYNC" class="org.apache.log4j.AsyncAppender">
-		<appender-ref ref="CONSOLE"/>
-		<!--appender-ref ref="FILE"/-->
+		<!--appender-ref ref="CONSOLE"/-->
+		<appender-ref ref="FILE"/>
 	</appender>
 
 	<logger name="nl.clockwork.ebms" additivity="false">
-		<level value="debug"/>
+		<level value="info"/>
 		<appender-ref ref="ASYNC"/>
 	</logger>
 	
