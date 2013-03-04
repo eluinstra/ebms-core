@@ -248,7 +248,13 @@ public class CPAUtils
 
 	public static String getSignatureAlgorithm(ReceiverNonRepudiation receiverNonRepudiation)
 	{
-		return receiverNonRepudiation.getSignatureAlgorithm().get(0).getW3C() != null ? receiverNonRepudiation.getSignatureAlgorithm().get(0).getW3C() : receiverNonRepudiation.getSignatureAlgorithm().get(0).getValue();
+		return receiverNonRepudiation.getSignatureAlgorithm().get(0).getW3C() != null ? receiverNonRepudiation.getSignatureAlgorithm().get(0).getW3C() : getSignatureAlgorithm(receiverNonRepudiation.getSignatureAlgorithm().get(0).getValue());
+	}
+
+	private static String getSignatureAlgorithm(String value)
+	{
+		// TODO: Expected values include: RSA-MD5, RSA-SHA1, DSA-MD5, DSA-SHA1, SHA1withRSA, MD5withRSA, and so on.
+		return value;
 	}
 
 	public static String getHashFunction(ReceiverNonRepudiation receiverNonRepudiation)
