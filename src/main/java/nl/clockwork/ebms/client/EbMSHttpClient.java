@@ -51,18 +51,18 @@ public class EbMSHttpClient implements EbMSClient
 		try
 		{
 			HttpURLConnection connection = (HttpURLConnection)openConnection(uri);
-			if (logger.isDebugEnabled())
-				logger.debug("OUT:\n" + DOMUtils.toString(document.getMessage()));
+			if (logger.isInfoEnabled())
+				logger.info("OUT:\n" + DOMUtils.toString(document.getMessage()));
 			if (chunkedStreamingMode)
 				connection.setChunkedStreamingMode(0);
 			EbMSMessageWriter writer = new EbMSMessageWriterImpl(connection);
 			writer.write(document);
 			writer.flush();
 			EbMSResponseDocument in = handleResponse(connection);
-			if (logger.isDebugEnabled())
+			if (logger.isInfoEnabled())
 			{
-				logger.debug("StatusCode: " + in.getStatusCode());
-				logger.debug("IN:\n" + (in.getMessage() == null ? "" : DOMUtils.toString(in.getMessage())));
+				logger.info("StatusCode: " + in.getStatusCode());
+				logger.info("IN:\n" + (in.getMessage() == null ? "" : DOMUtils.toString(in.getMessage())));
 			}
 			return in;
 		}
