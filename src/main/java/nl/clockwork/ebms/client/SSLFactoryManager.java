@@ -67,12 +67,24 @@ public class SSLFactoryManager
 		sslFactory = sslContext.getSocketFactory();
 	}
 
+	@SuppressWarnings({"restriction","deprecation"})
 	private void setDefaultHostnameVerifier()
 	{
+		//if ("javax.net.ssl".equals(System.getProperty("java.protocol.handler.pkgs")))
 		javax.net.ssl.HttpsURLConnection.setDefaultHostnameVerifier(
 			new javax.net.ssl.HostnameVerifier()
 			{
 				public boolean verify(String hostname, javax.net.ssl.SSLSession sslSession)
+				{
+					return true;
+				}
+			}
+		);
+		//if ("com.sun.net.ssl.internal.www.protocol".equals(System.getProperty("java.protocol.handler.pkgs")))
+		com.sun.net.ssl.HttpsURLConnection.setDefaultHostnameVerifier(
+			new com.sun.net.ssl.HostnameVerifier()
+			{
+				public boolean verify(String urlHostname, String certHostname)
 				{
 					return true;
 				}

@@ -76,6 +76,7 @@ public class EbMSHttpClient implements EbMSClient
 		}
 	}
 	
+	@SuppressWarnings({"restriction","deprecation"})
 	private URLConnection openConnection(String uri) throws IOException
 	{
 		URL url = new URL(uri);
@@ -84,6 +85,8 @@ public class EbMSHttpClient implements EbMSClient
 		//connection.setMethod("POST");
 		if (connection instanceof HttpsURLConnection)
 			((HttpsURLConnection)connection).setSSLSocketFactory(sslFactoryManager.getSslFactory());
+		else if (connection instanceof com.sun.net.ssl.HttpsURLConnection)
+			((com.sun.net.ssl.HttpsURLConnection)connection).setSSLSocketFactory(sslFactoryManager.getSslFactory());
 		return connection;
 	}
 
