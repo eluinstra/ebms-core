@@ -24,7 +24,7 @@ public class EbMSMessageProcessingJob implements StatefulJob, MuleContextAware
 	@Override
 	public void execute(JobExecutionContext arg0) throws JobExecutionException
 	{
-		logger.info("Executing job: " + this.getClass());
+		logger.debug("Executing job: " + this.getClass());
 		try
 		{
 			MuleClient client = new MuleClient(muleContext);
