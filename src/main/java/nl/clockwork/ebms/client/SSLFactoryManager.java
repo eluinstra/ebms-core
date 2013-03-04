@@ -19,9 +19,12 @@ import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
 
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLEngine;
+import javax.net.ssl.SSLSession;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManagerFactory;
 
@@ -71,10 +74,11 @@ public class SSLFactoryManager
 	private void setDefaultHostnameVerifier()
 	{
 		//if ("javax.net.ssl".equals(System.getProperty("java.protocol.handler.pkgs")))
-		javax.net.ssl.HttpsURLConnection.setDefaultHostnameVerifier(
-			new javax.net.ssl.HostnameVerifier()
+		HttpsURLConnection.setDefaultHostnameVerifier(
+			new HostnameVerifier()
 			{
-				public boolean verify(String hostname, javax.net.ssl.SSLSession sslSession)
+				@Override
+				public boolean verify(String hostname, SSLSession sslSession)
 				{
 					return true;
 				}
@@ -84,6 +88,7 @@ public class SSLFactoryManager
 		com.sun.net.ssl.HttpsURLConnection.setDefaultHostnameVerifier(
 			new com.sun.net.ssl.HostnameVerifier()
 			{
+				@Override
 				public boolean verify(String urlHostname, String certHostname)
 				{
 					return true;
