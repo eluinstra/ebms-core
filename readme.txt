@@ -13,22 +13,6 @@ The project also includes a standalone ebms-adapter configuration that has a tcp
 The project includes a standalone version of the overheid stub that uses the standalone ebms-adapter (through tcp), that can also communicate with the digipoort stub.
 You can use the overheid (standalone) stub as a starting point for your project.
 
-===============
-Prerequisites =
-===============
-install mule-standalone-3.x.x
-build or download ebms-adapter-mule3-1.0.0.zip
-move the ebms-adapter-mule3-1.0.0.zip to <mule-standalone-3.x.x>/apps
-
-download and copy the following libraries to <mule-standalone-3.x.x>/lib/opt (if not included in ebms-adapter-mule3-1.0.0.zip):
-- c3p0-0.9.1.2.jar
-- depending on the database used:
-	- hsqldb-2.1.0.jar
-	- mysql-connector-java-5.1.18.jar
-	- postgresql-9.1-901.jdbc3.jar or postgresql-9.1-901.jdbc4.jar
-	- jtds-1.2.4.jar or sqljdbc4-201004.jar
-	- ojdbc6-11.2.0.1.0.jar (and orai18n-11.2.0.1.0.jar)
-
 supported databases:
 - hsqldb 2.1.0
 - mysql (5.5) (innodb)
@@ -36,7 +20,21 @@ supported databases:
 - mssql 2008 R2
 - oracle (11)(lob > 4k fix (needed for older oracle jdbc adapters) not implemented!)
 
-to generate cleaner/smaller messages/signatures copy xmlsec-1.5.3.jar to <mule-standalone-3.x.x>/lib/boot (optional)
+===============
+Prerequisites =
+===============
+install mule-standalone-3.x.x
+build or download ebms-adapter-mule3-1.0.0.zip
+move ebms-adapter-mule3-1.0.0.zip to <mule-standalone-3.x.x>/apps
+
+download and copy one of the following libraries to <mule-standalone-3.x.x>/lib/opt depending on the database used:
+- hsqldb-2.1.0.jar
+- mysql-connector-java-5.1.18.jar
+- postgresql-9.1-901.jdbc3.jar or postgresql-9.1-901.jdbc4.jar
+- jtds-1.2.4.jar or sqljdbc4-201004.jar
+- ojdbc6-11.2.0.1.0.jar (and orai18n-11.2.0.1.0.jar)
+
+to generate cleaner/smaller messages/signatures download and copy xmlsec-1.5.3.jar to <mule-standalone-3.x.x>/lib/boot (optional)
 
 =================
 Configure Stubs =
