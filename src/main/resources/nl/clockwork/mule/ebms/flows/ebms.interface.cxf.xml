@@ -32,7 +32,7 @@
 		<receiver-threading-profile maxThreadsActive="${threading.profile.http.receiver.maxThreadsActive}" maxThreadsIdle="${threading.profile.http.receiver.maxThreadsIdle}" threadTTL="${threading.profile.http.receiver.threadTTL}" poolExhaustedAction="WAIT" maxBufferSize="${threading.profile.http.receiver.maxBufferSize}" />
 	</http:connector>
 	
-	<flow name="cpaService">
+	<flow name="cpaService.cxf">
 		<http:inbound-endpoint connector-ref="ebms.adapter.connector.http" address="http://${service.adapter.host}:${service.adapter.port}${service.adapter.url}/cpa" exchange-pattern="request-response">
 			<cxf:jaxws-service serviceClass="nl.clockwork.ebms.iface.CPAService"/>
 		</http:inbound-endpoint> 
@@ -41,7 +41,7 @@
 		</component>
 	</flow>
 
-	<flow name="ebMSMessageService">
+	<flow name="ebMSMessageService.cxf">
 		<http:inbound-endpoint connector-ref="ebms.adapter.connector.http" address="http://${service.adapter.host}:${service.adapter.port}${service.adapter.url}/ebms" exchange-pattern="request-response">
 			<cxf:jaxws-service serviceClass="nl.clockwork.ebms.iface.EbMSMessageService"/>
 		</http:inbound-endpoint> 
