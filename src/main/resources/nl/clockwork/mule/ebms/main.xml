@@ -38,6 +38,7 @@
 			<property name="ignoreResourceNotFound" value="true" />
 			<property name="locations"> 
 				<list>
+					<value>classpath:nl/clockwork/ebms/default.properties</value>   
 					<value>classpath:nl/clockwork/mule/ebms/default.properties</value>   
 					<value>file:${user.home}/.ebms-adapter/ebms.adapter.properties</value>
 				</list>
