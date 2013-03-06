@@ -26,10 +26,10 @@ public class EbMSMessageContent
 	{
 	}
 	
-	public EbMSMessageContent(EbMSMessageContext context, List<EbMSDataSource> attachments)
+	public EbMSMessageContent(EbMSMessageContext context, List<EbMSDataSource> dataSources)
 	{
 		this.context = context;
-		this.dataSources = attachments;
+		this.dataSources = dataSources;
 	}
 
 	public EbMSMessageContext getContext()
