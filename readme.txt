@@ -50,8 +50,7 @@ copy ebms-adapter-mule3-1.0.0.zip/classes/keystore.jks to ${mule.home}/conf
 	
 	service.port=4443
 	
-	server.keystore.path=${mule.home}/conf/keystore.jks
-	client.keystore.path=${mule.home}/conf/keystore.jks
+	keystore.path=${mule.home}/conf/keystore.jks
 	truststore.path=${mule.home}/conf/keystore.jks
 	signature.keystore.path=${mule.home}/conf/keystore.jks
 	
@@ -68,8 +67,7 @@ copy ebms-adapter-mule3-1.0.0.zip/classes/keystore.jks to ${mule.home}/conf
 	
 	service.port=443
 	
-	server.keystore.path=${mule.home}/conf/keystore.jks
-	client.keystore.path=${mule.home}/conf/keystore.jks
+	keystore.path=${mule.home}/conf/keystore.jks
 	truststore.path=${mule.home}/conf/keystore.jks
 	signature.keystore.path=${mule.home}/conf/keystore.jks
 	
