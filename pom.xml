@@ -6,7 +6,7 @@
 	<artifactId>ebms-adapter-mule3</artifactId>
 	<packaging>mule</packaging>
 	<name>Mule3 EbMS Adapter</name>
-	<version>1.0.0</version>
+	<version>1.1.0</version>
 	<description></description>
 	<url>https://sourceforge.net/projects/muleebmsadapter/</url>
 	<issueManagement>
@@ -28,7 +28,7 @@
 		<url>www.clockwork.nl</url>
 	</organization>
 	<properties>
-		<mule.version>3.2.1</mule.version>
+		<mule.version>3.3.1</mule.version>
 		<saxon.version>8.7</saxon.version>
 	</properties>
 	<dependencies>
