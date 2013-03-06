@@ -28,13 +28,13 @@ build or download ebms-adapter-mule3-1.0.0.zip
 move ebms-adapter-mule3-1.0.0.zip to <mule-standalone-3.x.x>/apps
 
 download and copy one of the following libraries to <mule-standalone-3.x.x>/lib/opt depending on the database used:
-- hsqldb-2.1.0.jar
+- hsqldb-2.2.9.jar
 - mysql-connector-java-5.1.18.jar
 - postgresql-9.1-901.jdbc3.jar or postgresql-9.1-901.jdbc4.jar
 - jtds-1.2.4.jar or sqljdbc4-201004.jar
 - ojdbc6-11.2.0.1.0.jar (and orai18n-11.2.0.1.0.jar)
 
-to generate cleaner/smaller messages/signatures download and copy xmlsec-1.5.3.jar to <mule-standalone-3.x.x>/lib/boot (optional)
+to generate cleaner/smaller messages/signatures download and copy xmlsec-1.5.3.jar to <mule-standalone-3.x.x>/lib/user (optional)
 
 =================
 Configure Stubs =
