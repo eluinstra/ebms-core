@@ -33,7 +33,7 @@
 
 	<https:connector name="connector.http.ebms.in">
 		<receiver-threading-profile maxThreadsActive="${threading.profile.http.receiver.maxThreadsActive}" maxThreadsIdle="${threading.profile.http.receiver.maxThreadsIdle}" threadTTL="${threading.profile.http.receiver.threadTTL}" poolExhaustedAction="WAIT" maxBufferSize="${threading.profile.http.receiver.maxBufferSize}" />
-		<https:tls-key-store path="${server.keystore.path}" storePassword="${server.keystore.password}" keyPassword="${server.keystore.keyPassword}"/>  
+		<https:tls-key-store path="${keystore.path}" storePassword="${keystore.password}" keyPassword="${keystore.keyPassword}"/>  
 		<https:tls-server path="${truststore.path}" storePassword="${truststore.password}" requireClientAuthentication="${connector.https.requireClientAuthentication}"/>
 	</https:connector>  
 
