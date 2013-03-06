@@ -39,7 +39,6 @@ to generate cleaner/smaller messages/signatures download and copy xmlsec-1.5.3.j
 =================
 Configure Stubs =
 =================
-copy ebms-adapter-mule3-1.0.0.zip/classes/keystore.jks to ${mule.home}/conf
 
 	============================
 	Configure digipoort EbMS stub =
