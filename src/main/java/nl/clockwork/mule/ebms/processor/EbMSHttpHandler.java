@@ -86,7 +86,8 @@ public class EbMSHttpHandler implements Callable
 	{
 		Map<String,String> result = new HashMap<String,String>();
 		for (Object name : message.getPropertyNames(PropertyScope.INBOUND))
-			result.put((String)name,(String)message.getProperty((String)name,PropertyScope.INBOUND));
+			if (message.getProperty((String)name,PropertyScope.INBOUND) instanceof String)
+				result.put((String)name,(String)message.getProperty((String)name,PropertyScope.INBOUND));
 		return result;
 	}
 
