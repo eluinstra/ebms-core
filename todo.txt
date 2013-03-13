@@ -1,3 +1,9 @@
+- validate signature algorithms with cpa
+- implement syncReply
+- implement ackRequested
+- improve Service models:
+	- add jaxb annotations
+
 - validate message format (available elements versus action)
 - improve header validation
 	- add separate service and action validation
