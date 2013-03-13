@@ -575,7 +575,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 				"delete from ebms_send_event" +
 				" where ebms_message_id = ?" +
 				" and time < ?" +
-				"and status = ?",
+				" and status = ?",
 				ebMSMessageId,
 				timestamp,
 				status.id()

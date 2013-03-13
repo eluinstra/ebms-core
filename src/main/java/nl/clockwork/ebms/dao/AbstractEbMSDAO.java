@@ -668,7 +668,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 				"delete from ebms_send_event" +
 				" where ebms_message_id = ?" +
 				" and time < ?" +
-				"and status = ?"
+				" and status = ?"
 			);
 			ps.setLong(1,ebMSMessageId);
 			ps.setTimestamp(2,new Timestamp(timestamp.getTime()));
