@@ -113,12 +113,6 @@ public class MessageHeaderValidator
 			errorList.setHighestSeverity(SeverityType.ERROR);
 			return false;
 		}
-		if (deliveryChannels.size() > 1)
-		{
-			errorList.getError().add(EbMSMessageUtils.createError(Constants.EbMSErrorCode.UNKNOWN.errorCode(),Constants.EbMSErrorCode.NOT_SUPPORTED.errorCode(),"Multiple DeliveryChannels not supported."));
-			errorList.setHighestSeverity(SeverityType.ERROR);
-			return false;
-		}
 		DeliveryChannel deliveryChannel = deliveryChannels.get(0);
 		if (!existsRefToMessageId(messageHeader.getMessageData().getRefToMessageId()))
 		{
