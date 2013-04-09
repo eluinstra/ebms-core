@@ -72,7 +72,7 @@ public class EbMSSecSignatureValidator implements EbMSSignatureValidator
 					result = validateCertificate(keyStore,certificate,new Date()/*TODO get date from message???*/);
 					if (result)
 					{
-						result = verify(certificate,signatureNodeList,document.getAttachments());
+						result = verify(certificate,(Element)signatureNodeList.item(0),document.getAttachments());
 						logger.info("Signature" + (result ? " " : " in") + "valid.");
 					}
 					else
@@ -89,9 +89,9 @@ public class EbMSSecSignatureValidator implements EbMSSignatureValidator
 		}
 	}
 
-	private boolean verify(X509Certificate certificate, NodeList signatureNodeList, List<EbMSAttachment> attachments) throws XMLSignatureException, XMLSecurityException, CertificateExpiredException, CertificateNotYetValidException, KeyStoreException
+	private boolean verify(X509Certificate certificate, Element signatureElement, List<EbMSAttachment> attachments) throws XMLSignatureException, XMLSecurityException, CertificateExpiredException, CertificateNotYetValidException, KeyStoreException
 	{
-		XMLSignature signature = new XMLSignature((Element)signatureNodeList.item(0),org.apache.xml.security.utils.Constants.SignatureSpecNS);
+		XMLSignature signature = new XMLSignature(signatureElement,org.apache.xml.security.utils.Constants.SignatureSpecNS);
 		EbMSAttachmentResolver resolver = new EbMSAttachmentResolver(attachments);
 		signature.addResourceResolver(resolver);
 		return signature.checkSignatureValue(certificate);
@@ -107,7 +107,7 @@ public class EbMSSecSignatureValidator implements EbMSSignatureValidator
 				if (partyInfo != null)
 				{
 					List<DeliveryChannel> channels = CPAUtils.getSendingDeliveryChannels(partyInfo,messageHeader.getFrom().getRole(),messageHeader.getService(),messageHeader.getAction());
-					if (channels.size() == 1)
+					if (channels.size() > 0)
 					{
 						nl.clockwork.ebms.model.cpp.cpa.Certificate c = CPAUtils.getCertificate(channels.get(0));
 						if (c == null)
