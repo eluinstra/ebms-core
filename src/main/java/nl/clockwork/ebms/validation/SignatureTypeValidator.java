@@ -22,14 +22,17 @@ import nl.clockwork.ebms.model.EbMSDocument;
 import nl.clockwork.ebms.model.cpp.cpa.CollaborationProtocolAgreement;
 import nl.clockwork.ebms.model.cpp.cpa.DeliveryChannel;
 import nl.clockwork.ebms.model.cpp.cpa.PartyInfo;
+import nl.clockwork.ebms.model.cpp.cpa.ReceiverNonRepudiation;
 import nl.clockwork.ebms.model.ebxml.ErrorList;
 import nl.clockwork.ebms.model.ebxml.MessageHeader;
 import nl.clockwork.ebms.model.ebxml.SeverityType;
+import nl.clockwork.ebms.model.xml.dsig.ReferenceType;
 import nl.clockwork.ebms.model.xml.dsig.SignatureType;
 import nl.clockwork.ebms.signing.EbMSSignatureValidator;
 import nl.clockwork.ebms.util.CPAUtils;
 import nl.clockwork.ebms.util.EbMSMessageUtils;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -47,13 +50,16 @@ public class SignatureTypeValidator
 	{
 		PartyInfo partyInfo = CPAUtils.getPartyInfo(cpa,messageHeader.getFrom().getPartyId());
 		List<DeliveryChannel> deliveryChannels = CPAUtils.getSendingDeliveryChannels(partyInfo,messageHeader.getFrom().getRole(),messageHeader.getService(),messageHeader.getAction());
-		if (CPAUtils.getReceiverNonRepudiation(deliveryChannels.get(0)) != null)
+		ReceiverNonRepudiation receiverNonRepudiation = CPAUtils.getReceiverNonRepudiation(deliveryChannels.get(0));
+		if (receiverNonRepudiation != null && !StringUtils.isEmpty(CPAUtils.getNonRepudiationProtocol(receiverNonRepudiation)))
+		{
 			if (!ebMSSignatureValidator.isValid(cpa,document,messageHeader))
 			{
-				errorList.getError().add(EbMSMessageUtils.createError("//Header/Signature",Constants.EbMSErrorCode.SECURITY_FAILURE.errorCode(),"Signature invalid."));
+				errorList.getError().add(EbMSMessageUtils.createError("//Header/Signature",Constants.EbMSErrorCode.SECURITY_FAILURE.errorCode(),"Invalid Signature."));
 				errorList.setHighestSeverity(SeverityType.ERROR);
 				return false;
 			}
+		}
 		return true;
 	}
 	
@@ -61,13 +67,30 @@ public class SignatureTypeValidator
 	{
 		PartyInfo partyInfo = CPAUtils.getPartyInfo(cpa,messageHeader.getFrom().getPartyId());
 		List<DeliveryChannel> deliveryChannels = CPAUtils.getSendingDeliveryChannels(partyInfo,messageHeader.getFrom().getRole(),messageHeader.getService(),messageHeader.getAction());
-		if (CPAUtils.getReceiverNonRepudiation(deliveryChannels.get(0)) != null)
+		ReceiverNonRepudiation receiverNonRepudiation = CPAUtils.getReceiverNonRepudiation(deliveryChannels.get(0));
+		if (receiverNonRepudiation != null && !StringUtils.isEmpty(CPAUtils.getNonRepudiationProtocol(receiverNonRepudiation)))
+		{
 			if (signature == null)
 			{
-				errorList.getError().add(EbMSMessageUtils.createError("//Header/Signature",Constants.EbMSErrorCode.SECURITY_FAILURE.errorCode(),"No signature found."));
+				errorList.getError().add(EbMSMessageUtils.createError("//Header/Signature",Constants.EbMSErrorCode.SECURITY_FAILURE.errorCode(),"Signature not found."));
 				errorList.setHighestSeverity(SeverityType.ERROR);
 				return false; 
 			}
+			List<ReferenceType> references = signature.getSignedInfo().getReference();
+			for (ReferenceType reference : references)
+				if (!CPAUtils.getHashFunction(receiverNonRepudiation).equals(reference.getDigestMethod().getAlgorithm()))
+				{
+					errorList.getError().add(EbMSMessageUtils.createError("//Header/Signature/SignedInfo/Reference[@URI='" + reference.getURI() + "']/DigestMethod[@Algorithm]",Constants.EbMSErrorCode.SECURITY_FAILURE.errorCode(),"Invalid DigestMethod."));
+					errorList.setHighestSeverity(SeverityType.ERROR);
+					return false; 
+				}
+			if (!CPAUtils.getSignatureAlgorithm(receiverNonRepudiation).equals(signature.getSignedInfo().getSignatureMethod().getAlgorithm()))
+			{
+				errorList.getError().add(EbMSMessageUtils.createError("//Header/Signature/SignedInfo/SignatureMethod[@Algorithm]",Constants.EbMSErrorCode.SECURITY_FAILURE.errorCode(),"Invalid SignatureMethod."));
+				errorList.setHighestSeverity(SeverityType.ERROR);
+				return false; 
+			}
+		}
 		return true;
 	}
 	
