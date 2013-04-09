@@ -42,13 +42,13 @@ public class CPAValidator
 		}
 		if (!CPAUtils.isValid(cpa,timestamp))
 		{
-			errorList.getError().add(EbMSMessageUtils.createError("//Header/MessageHeader[@cpaid]",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"CPA invalid."));
+			errorList.getError().add(EbMSMessageUtils.createError("//Header/MessageHeader[@cpaid]",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Invalid CPA."));
 			errorList.setHighestSeverity(SeverityType.ERROR);
 			return false;
 		}
 		if (!Constants.EBMS_VERSION.equals(messageHeader.getVersion()))
 		{
-			errorList.getError().add(EbMSMessageUtils.createError("//Header/MessageHeader[@version]",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Value invalid."));
+			errorList.getError().add(EbMSMessageUtils.createError("//Header/MessageHeader[@version]",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Invalid value."));
 			errorList.setHighestSeverity(SeverityType.ERROR);
 			return false;
 		}

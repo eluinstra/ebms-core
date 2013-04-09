@@ -61,21 +61,27 @@ public class MessageHeaderValidator
 		PartyInfo from = null;
 		PartyInfo to = null;
 
+		if (messageHeader != null && !Constants.EBMS_VERSION.equals(messageHeader.getVersion()))
+		{
+			errorList.getError().add(EbMSMessageUtils.createError("//Header/MessageHeader[@version]",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Invalid value."));
+			errorList.setHighestSeverity(SeverityType.ERROR);
+			return false;
+		}
 		if (!isValid(messageHeader.getFrom().getPartyId()))
 		{
-			errorList.getError().add(EbMSMessageUtils.createError("//Header/MessageHeader/From/PartyId",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Value invalid."));
+			errorList.getError().add(EbMSMessageUtils.createError("//Header/MessageHeader/From/PartyId",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Invalid value."));
 			errorList.setHighestSeverity(SeverityType.ERROR);
 			return false;
 		}
 		if (!isValid(messageHeader.getTo().getPartyId()))
 		{
-			errorList.getError().add(EbMSMessageUtils.createError("//Header/MessageHeader/To/PartyId",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Value invalid."));
+			errorList.getError().add(EbMSMessageUtils.createError("//Header/MessageHeader/To/PartyId",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Invalid value."));
 			errorList.setHighestSeverity(SeverityType.ERROR);
 			return false;
 		}
 		if (!isValid(messageHeader.getService()))
 		{
-			errorList.getError().add(EbMSMessageUtils.createError("//Header/MessageHeader/Service",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Value invalid."));
+			errorList.getError().add(EbMSMessageUtils.createError("//Header/MessageHeader/Service",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Invalid value."));
 			errorList.setHighestSeverity(SeverityType.ERROR);
 			return false;
 		}
@@ -155,7 +161,7 @@ public class MessageHeaderValidator
 			}
 			if (ackRequested != null && !Constants.EBMS_VERSION.equals(ackRequested.getVersion()))
 			{
-				errorList.getError().add(EbMSMessageUtils.createError("//Header/AckRequested[@version]",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Wrong value."));
+				errorList.getError().add(EbMSMessageUtils.createError("//Header/AckRequested[@version]",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Invalid value."));
 				errorList.setHighestSeverity(SeverityType.ERROR);
 				return false;
 			}
@@ -192,7 +198,7 @@ public class MessageHeaderValidator
 			}
 			if (syncReply != null && !Constants.EBMS_VERSION.equals(syncReply.getVersion()))
 			{
-				errorList.getError().add(EbMSMessageUtils.createError("//Header/SyncReply[@version]",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Wrong value."));
+				errorList.getError().add(EbMSMessageUtils.createError("//Header/SyncReply[@version]",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Invalid value."));
 				errorList.setHighestSeverity(SeverityType.ERROR);
 				return false;
 			}
@@ -209,10 +215,22 @@ public class MessageHeaderValidator
 				errorList.setHighestSeverity(SeverityType.ERROR);
 				return false;
 			}
+//			if (messageOrder != null && !Constants.EBMS_VERSION.equals(messageOrder.getVersion()))
+//			{
+//				errorList.getError().add(EbMSMessageUtils.createError("//Header/MessageOrder[@version]",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Invalid value."));
+//				errorList.setHighestSeverity(SeverityType.ERROR);
+//				return false;
+//			}
 		}
 //		if (EbMSMessageType.ACKNOWLEDGMENT.action().getService().getValue().equals(messageHeader.getService().getValue()) && EbMSMessageType.ACKNOWLEDGMENT.action().getAction().equals(messageHeader.getAction()))
 //		{
 //			Acknowledgment acknowledgment = ((EbMSAcknowledgment)message.getPayload()).getAcknowledgment();
+//			if (acknowledgment != null && !Constants.EBMS_VERSION.equals(acknowledgment.getVersion()))
+//			{
+//				errorList.getError().add(EbMSMessageUtils.createError("//Header/Acknowledgment[@version]",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Invalid value."));
+//				errorList.setHighestSeverity(SeverityType.ERROR);
+//				return false;
+//			}
 //			if (!checkActor(deliveryChannel,acknowledgment))
 //			{
 //				errorList.getError().add(EbMSMessageUtils.createError("//Header/Acknowledgment[@actor]",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Wrong value."));

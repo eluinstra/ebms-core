@@ -36,7 +36,7 @@ public class ManifestValidator
 	{
 		if (!Constants.EBMS_VERSION.equals(manifest.getVersion()))
 		{
-			errorList.getError().add(EbMSMessageUtils.createError("//Body/Manifest[@version]",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Wrong value."));
+			errorList.getError().add(EbMSMessageUtils.createError("//Body/Manifest[@version]",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Invalid value."));
 			errorList.setHighestSeverity(SeverityType.ERROR);
 			return false;
 		}
