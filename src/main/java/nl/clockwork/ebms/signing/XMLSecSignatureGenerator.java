@@ -37,8 +37,10 @@ import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.signature.XMLSignature;
 import org.apache.xml.security.signature.XMLSignatureException;
 import org.apache.xml.security.transforms.Transforms;
+import org.apache.xml.security.transforms.params.XPathContainer;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
 
 public class XMLSecSignatureGenerator implements SignatureGenerator
 {
@@ -79,7 +81,7 @@ public class XMLSecSignatureGenerator implements SignatureGenerator
 
 	private void sign(KeyStore keyStore, KeyPair keyPair, String alias, Document document, List<EbMSAttachment> attachments) throws XMLSecurityException, KeyStoreException
 	{
-		XMLSignature signature = new XMLSignature(document,org.apache.xml.security.utils.Constants.SignatureSpecNS,signatureMethodAlgorithm,canonicalizationMethodAlgorithm);
+		XMLSignature signature = new XMLSignature(document,null,signatureMethodAlgorithm,canonicalizationMethodAlgorithm);
 
 		Element soapHeader = DOMUtils.getFirstChildElement(document.getDocumentElement());
 		soapHeader.appendChild(signature.getElement());
@@ -89,11 +91,7 @@ public class XMLSecSignatureGenerator implements SignatureGenerator
 			
 		Transforms transforms = new Transforms(document);
 		transforms.addTransform(Transforms.TRANSFORM_ENVELOPED_SIGNATURE);
-		Element xpath = document.createElementNS(org.apache.xml.security.utils.Constants.SignatureSpecNS,org.apache.xml.security.utils.Constants._TAG_XPATH);
-		xpath.setAttributeNS(org.apache.xml.security.utils.Constants.NamespaceSpecNS,"xmlns:" + Constants.NAMESPACE_PREFIX_SOAP_ENVELOPE,Constants.NAMESPACE_URI_SOAP_ENVELOPE);
-		xpath.appendChild(document.createTextNode(Constants.TRANSFORM_XPATH));
-		xpath.setPrefix(Constants.NAMESPACE_PREFIX_DS);
-		transforms.addTransform(Transforms.TRANSFORM_XPATH,xpath);
+		transforms.addTransform(Transforms.TRANSFORM_XPATH,getXPathTransform(document));
 		transforms.addTransform(transformAlgorithm);
 		
 		signature.addDocument("",transforms,org.apache.xml.security.utils.Constants.ALGO_ID_DIGEST_SHA1);
@@ -109,6 +107,16 @@ public class XMLSecSignatureGenerator implements SignatureGenerator
 		signature.addKeyInfo((X509Certificate)certificates[0]);
 
 		signature.sign(keyPair.getPrivate());
+	}
+	
+	private NodeList getXPathTransform(Document document) throws XMLSecurityException
+	{
+		String prefix = document.lookupPrefix(Constants.NSURI_SOAP_ENVELOPE);
+		prefix = prefix == null ? "" : prefix + ":";
+		XPathContainer container = new XPathContainer(document);
+		//container.setXPathNamespaceContext(prefix,Constants.NSURI_SOAP_ENVELOPE);
+		container.setXPath("not(ancestor-or-self::node()[@" + prefix + "actor=\"urn:oasis:names:tc:ebxml-msg:actor:nextMSH\"]|ancestor-or-self::node()[@" + prefix + "actor=\"" + Constants.NSURI_SOAP_NEXT_ACTOR + "\"])");
+		return container.getElementPlusReturns();
 	}
 	
 	public void setCanonicalizationMethodAlgorithm(String canonicalizationMethodAlgorithm)

@@ -43,13 +43,14 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.signature.XMLSignature;
 import org.apache.xml.security.transforms.Transforms;
+import org.apache.xml.security.transforms.params.XPathContainer;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
 
 public class EbMSSecSignatureGenerator implements EbMSSignatureGenerator
 {
 	protected transient Log logger = LogFactory.getLog(getClass());
-	//private String baseURI = org.apache.xml.security.utils.Constants.SignatureSpecNS;
 	private String canonicalizationMethodAlgorithm = Transforms.TRANSFORM_C14N_OMIT_COMMENTS;
 	//private String signatureMethodAlgorithm = XMLSignature.ALGO_ID_SIGNATURE_DSA;
 	private String transformAlgorithm = Transforms.TRANSFORM_C14N_OMIT_COMMENTS;
@@ -83,7 +84,7 @@ public class EbMSSecSignatureGenerator implements EbMSSignatureGenerator
 				if (receiverNonRepudiation != null)
 				{
 					//TODO: read keyAlias from cpa (by convention (cpaId or endpoint))
-					sign(keyStore,keyPair,keyAlias,document.getMessage(),document.getAttachments(),CPAUtils.getNonRepudiationProtocol(receiverNonRepudiation),CPAUtils.getSignatureAlgorithm(receiverNonRepudiation),CPAUtils.getHashFunction(receiverNonRepudiation));
+					sign(keyStore,keyPair,keyAlias,document.getMessage(),document.getAttachments(),CPAUtils.getSignatureAlgorithm(receiverNonRepudiation),CPAUtils.getHashFunction(receiverNonRepudiation));
 				}
 			}
 		}
@@ -93,15 +94,9 @@ public class EbMSSecSignatureGenerator implements EbMSSignatureGenerator
 		}
 	}
 
-	private void sign(KeyStore keyStore, KeyPair keyPair, String alias, Document document, List<EbMSAttachment> attachments, String baseURI, String signatureMethodAlgorithm, String digestAlgorithm) throws XMLSecurityException, KeyStoreException
+	private void sign(KeyStore keyStore, KeyPair keyPair, String alias, Document document, List<EbMSAttachment> attachments, String signatureMethodAlgorithm, String digestAlgorithm) throws XMLSecurityException, KeyStoreException
 	{
-		// quickfix for error: "Cannot find ds:XPath in Transform"
-		if (baseURI.equals(org.apache.xml.security.utils.Constants.SignatureSpecNS))
-			baseURI = org.apache.xml.security.utils.Constants.SignatureSpecNS;
-		else if (baseURI.equals(org.apache.xml.security.utils.Constants.SignatureSpec11NS))
-			baseURI = org.apache.xml.security.utils.Constants.SignatureSpec11NS;
-
-		XMLSignature signature = new XMLSignature(document,baseURI,signatureMethodAlgorithm,canonicalizationMethodAlgorithm);
+		XMLSignature signature = new XMLSignature(document,null,signatureMethodAlgorithm,canonicalizationMethodAlgorithm);
 
 		Element soapHeader = DOMUtils.getFirstChildElement(document.getDocumentElement());
 		soapHeader.appendChild(signature.getElement());
@@ -111,14 +106,7 @@ public class EbMSSecSignatureGenerator implements EbMSSignatureGenerator
 			
 		Transforms transforms = new Transforms(document);
 		transforms.addTransform(Transforms.TRANSFORM_ENVELOPED_SIGNATURE);
-
-		Element xpath = document.createElementNS(baseURI,org.apache.xml.security.utils.Constants._TAG_XPATH);
-		xpath.setAttributeNS(org.apache.xml.security.utils.Constants.NamespaceSpecNS,"xmlns:" + Constants.NAMESPACE_PREFIX_SOAP_ENVELOPE,Constants.NAMESPACE_URI_SOAP_ENVELOPE);
-		xpath.appendChild(document.createTextNode(Constants.TRANSFORM_XPATH));
-		xpath.setPrefix(Constants.NAMESPACE_PREFIX_DS);
-
-		transforms.addTransform(Transforms.TRANSFORM_XPATH,xpath);
-		
+		transforms.addTransform(Transforms.TRANSFORM_XPATH,getXPathTransform(document));
 		transforms.addTransform(transformAlgorithm);
 		
 		signature.addDocument("",transforms,digestAlgorithm);
@@ -134,6 +122,16 @@ public class EbMSSecSignatureGenerator implements EbMSSignatureGenerator
 		signature.addKeyInfo((X509Certificate)certificates[0]);
 
 		signature.sign(keyPair.getPrivate());
+	}
+	
+	private NodeList getXPathTransform(Document document) throws XMLSecurityException
+	{
+		String prefix = document.lookupPrefix(Constants.NSURI_SOAP_ENVELOPE);
+		prefix = prefix == null ? "" : prefix + ":";
+		XPathContainer container = new XPathContainer(document);
+		//container.setXPathNamespaceContext(prefix,Constants.NSURI_SOAP_ENVELOPE);
+		container.setXPath("not(ancestor-or-self::node()[@" + prefix + "actor=\"urn:oasis:names:tc:ebxml-msg:actor:nextMSH\"]|ancestor-or-self::node()[@" + prefix + "actor=\"" + Constants.NSURI_SOAP_NEXT_ACTOR + "\"])");
+		return container.getElementPlusReturns();
 	}
 	
 	public void setCanonicalizationMethodAlgorithm(String canonicalizationMethodAlgorithm)

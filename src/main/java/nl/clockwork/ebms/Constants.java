@@ -88,13 +88,10 @@ public class Constants
 	public static final String EBMS_SOAP_ACTION = "\"ebXML\"";
 	public static final String EBMS_VERSION = "2.0";
 	public static final String EBMS_SERVICE_URI = "urn:oasis:names:tc:ebxml-msg:service";
-	public static final String EBMS_ERROR_CODE_CONTEXT = EBMS_SERVICE_URI + ":errors";
 	public static final String EBMS_DEFAULT_LANGUAGE = "en-US";
 
-	public static final String NAMESPACE_URI_SOAP_ENVELOPE = "http://schemas.xmlsoap.org/soap/envelope/";
-	public static final String NAMESPACE_PREFIX_SOAP_ENVELOPE = "soap";
-	public static final String TRANSFORM_XPATH = "not(ancestor-or-self::node()[@" + NAMESPACE_PREFIX_SOAP_ENVELOPE + ":actor=\"" + EBMS_SERVICE_URI + ":nextMSH\"]|ancestor-or-self::node()[@" + NAMESPACE_PREFIX_SOAP_ENVELOPE + ":actor=\"http://schemas.xmlsoap.org/soap/actor/next\"])";
-	public static final String NAMESPACE_PREFIX_DS = "ds";
+	public static final String NSURI_SOAP_ENVELOPE = "http://schemas.xmlsoap.org/soap/envelope/";
+	public static final String NSURI_SOAP_NEXT_ACTOR = "http://schemas.xmlsoap.org/soap/actor/next";
 	public static final String CID = "cid:";
 
 }

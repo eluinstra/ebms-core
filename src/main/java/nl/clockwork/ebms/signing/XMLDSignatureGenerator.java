@@ -26,9 +26,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.cert.Certificate;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.xml.crypto.MarshalException;
 import javax.xml.crypto.XMLStructure;
@@ -105,9 +103,7 @@ public class XMLDSignatureGenerator implements SignatureGenerator
 
 		List<Transform> transforms = new ArrayList<Transform>();
 		transforms.add(signFactory.newTransform(Transform.ENVELOPED,(TransformParameterSpec)null));
-		Map<String,String> m = new HashMap<String,String>();
-		m.put(Constants.NAMESPACE_PREFIX_SOAP_ENVELOPE,Constants.NAMESPACE_URI_SOAP_ENVELOPE);
-		transforms.add(signFactory.newTransform(Transform.XPATH,new XPathFilterParameterSpec(Constants.TRANSFORM_XPATH,m)));
+		transforms.add(signFactory.newTransform(Transform.XPATH,getXPathTransform(document)));
 		transforms.add(signFactory.newTransform(transformAlgorithm,(TransformParameterSpec)null));
 
 		List<Reference> references = new ArrayList<Reference>();
@@ -132,8 +128,17 @@ public class XMLDSignatureGenerator implements SignatureGenerator
 
 		Element soapHeader = DOMUtils.getFirstChildElement(document.getDocumentElement());
 		DOMSignContext signContext = new DOMSignContext(keyPair.getPrivate(),soapHeader);
-		signContext.putNamespacePrefix(XMLSignature.XMLNS,Constants.NAMESPACE_PREFIX_DS);
+		//signContext.putNamespacePrefix(XMLSignature.XMLNS,"ds");
 		signature.sign(signContext);
+	}
+	
+	private XPathFilterParameterSpec getXPathTransform(Document document)
+	{
+		String prefix = document.lookupPrefix(Constants.NSURI_SOAP_ENVELOPE);
+		prefix = prefix == null ? "" : prefix + ":";
+		//Map<String,String> m = new HashMap<String,String>();
+		//m.put(prefix,Constants.NSURI_SOAP_ENVELOPE);
+		return new XPathFilterParameterSpec("not(ancestor-or-self::node()[@" + prefix + "actor=\"urn:oasis:names:tc:ebxml-msg:actor:nextMSH\"]|ancestor-or-self::node()[@" + prefix + "actor=\"" + Constants.NSURI_SOAP_NEXT_ACTOR + "\"])"/*,m*/);
 	}
 	
 	public void setCanonicalizationMethodAlgorithm(String canonicalizationMethodAlgorithm)
