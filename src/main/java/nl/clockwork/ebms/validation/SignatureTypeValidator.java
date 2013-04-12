@@ -32,7 +32,6 @@ import nl.clockwork.ebms.signing.EbMSSignatureValidator;
 import nl.clockwork.ebms.util.CPAUtils;
 import nl.clockwork.ebms.util.EbMSMessageUtils;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -51,7 +50,7 @@ public class SignatureTypeValidator
 		PartyInfo partyInfo = CPAUtils.getPartyInfo(cpa,messageHeader.getFrom().getPartyId());
 		List<DeliveryChannel> deliveryChannels = CPAUtils.getSendingDeliveryChannels(partyInfo,messageHeader.getFrom().getRole(),messageHeader.getService(),messageHeader.getAction());
 		ReceiverNonRepudiation receiverNonRepudiation = CPAUtils.getReceiverNonRepudiation(deliveryChannels.get(0));
-		if (receiverNonRepudiation != null && !StringUtils.isEmpty(CPAUtils.getNonRepudiationProtocol(receiverNonRepudiation)))
+		if (CPAUtils.isSigned(receiverNonRepudiation))
 		{
 			if (!ebMSSignatureValidator.isValid(cpa,document,messageHeader))
 			{
@@ -68,7 +67,7 @@ public class SignatureTypeValidator
 		PartyInfo partyInfo = CPAUtils.getPartyInfo(cpa,messageHeader.getFrom().getPartyId());
 		List<DeliveryChannel> deliveryChannels = CPAUtils.getSendingDeliveryChannels(partyInfo,messageHeader.getFrom().getRole(),messageHeader.getService(),messageHeader.getAction());
 		ReceiverNonRepudiation receiverNonRepudiation = CPAUtils.getReceiverNonRepudiation(deliveryChannels.get(0));
-		if (receiverNonRepudiation != null && !StringUtils.isEmpty(CPAUtils.getNonRepudiationProtocol(receiverNonRepudiation)))
+		if (CPAUtils.isSigned(receiverNonRepudiation))
 		{
 			if (signature == null)
 			{

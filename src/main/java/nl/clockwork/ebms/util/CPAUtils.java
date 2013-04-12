@@ -25,6 +25,8 @@ import java.util.List;
 
 import javax.xml.bind.JAXBElement;
 
+import org.apache.commons.lang.StringUtils;
+
 import nl.clockwork.ebms.Constants;
 import nl.clockwork.ebms.model.cpp.cpa.ActionBindingType;
 import nl.clockwork.ebms.model.cpp.cpa.CanReceive;
@@ -217,7 +219,7 @@ public class CPAUtils
 		return (DocExchange)deliveryChannel.getDocExchangeId();
 	}
 	
-	public static Certificate getCertificate(DeliveryChannel deliveryChannel)
+	public static Certificate getSigningCertificate(DeliveryChannel deliveryChannel)
 	{
 		DocExchange docExchange = getDocExchange(deliveryChannel);
 		if (docExchange != null && docExchange.getEbXMLSenderBinding() != null && docExchange.getEbXMLSenderBinding().getSenderNonRepudiation() != null && docExchange.getEbXMLSenderBinding().getSenderNonRepudiation().getSigningCertificateRef() != null)
@@ -239,6 +241,11 @@ public class CPAUtils
 		if (docExchange != null && docExchange.getEbXMLReceiverBinding() != null)
 			return docExchange.getEbXMLReceiverBinding().getReceiverNonRepudiation();
 		return null;
+	}
+	
+	public static boolean isSigned(ReceiverNonRepudiation receiverNonRepudiation)
+	{
+		return receiverNonRepudiation != null && !StringUtils.isEmpty(getNonRepudiationProtocol(receiverNonRepudiation));
 	}
 	
 	public static String getNonRepudiationProtocol(ReceiverNonRepudiation receiverNonRepudiation)

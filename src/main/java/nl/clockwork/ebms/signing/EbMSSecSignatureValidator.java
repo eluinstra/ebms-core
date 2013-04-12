@@ -109,7 +109,7 @@ public class EbMSSecSignatureValidator implements EbMSSignatureValidator
 					List<DeliveryChannel> channels = CPAUtils.getSendingDeliveryChannels(partyInfo,messageHeader.getFrom().getRole(),messageHeader.getService(),messageHeader.getAction());
 					if (channels.size() > 0)
 					{
-						nl.clockwork.ebms.model.cpp.cpa.Certificate c = CPAUtils.getCertificate(channels.get(0));
+						nl.clockwork.ebms.model.cpp.cpa.Certificate c = CPAUtils.getSigningCertificate(channels.get(0));
 						if (c == null)
 							return null;
 						else
