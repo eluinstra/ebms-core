@@ -57,17 +57,11 @@ public class EbMSSecSignatureGenerator implements EbMSSignatureGenerator
 	//private String digestAlgorithm = org.apache.xml.security.utils.Constants.ALGO_ID_DIGEST_SHA1;
 	private String keyStorePath;
 	private String keyStorePassword;
-	private String keyAlias;
-	private String keyPassword;
 	private KeyStore keyStore;
-	private KeyPair keyPair;
 
 	public void init() throws GeneralSecurityException, IOException, EbMSProcessorException
 	{
 		keyStore = SecurityUtils.loadKeyStore(keyStorePath,keyStorePassword);
-		keyPair = SecurityUtils.getKeyPair(keyStore,keyAlias,keyPassword);
-		if (keyPair == null)
-			throw new EbMSProcessorException("Cannot find key with alias: " + keyAlias);
 	}
 
 	@Override
@@ -81,10 +75,12 @@ public class EbMSSecSignatureGenerator implements EbMSSignatureGenerator
 				PartyInfo partyInfo = CPAUtils.getPartyInfo(cpa,messageHeader.getFrom().getPartyId());
 				List<DeliveryChannel> channels = CPAUtils.getSendingDeliveryChannels(partyInfo,messageHeader.getFrom().getRole(),messageHeader.getService(),messageHeader.getAction());
 				ReceiverNonRepudiation receiverNonRepudiation = CPAUtils.getReceiverNonRepudiation(channels.get(0));
-				if (receiverNonRepudiation != null)
+				if (CPAUtils.isSigned(receiverNonRepudiation))
 				{
-					//TODO: read keyAlias from cpa (by convention (cpaId or endpoint))
-					sign(keyStore,keyPair,keyAlias,document.getMessage(),document.getAttachments(),CPAUtils.getSignatureAlgorithm(receiverNonRepudiation),CPAUtils.getHashFunction(receiverNonRepudiation));
+					X509Certificate certificate = CPAUtils.getX509Certificate(CPAUtils.getSigningCertificate(channels.get(0)));
+					String alias = keyStore.getCertificateAlias(certificate);
+					KeyPair keyPair = SecurityUtils.getKeyPair(keyStore,alias,keyStorePassword);
+					sign(keyStore,keyPair,alias,document.getMessage(),document.getAttachments(),CPAUtils.getSignatureAlgorithm(receiverNonRepudiation),CPAUtils.getHashFunction(receiverNonRepudiation));
 				}
 			}
 		}
@@ -154,13 +150,4 @@ public class EbMSSecSignatureGenerator implements EbMSSignatureGenerator
 		this.keyStorePassword = keyStorePassword;
 	}
 	
-	public void setKeyAlias(String keyAlias)
-	{
-		this.keyAlias = keyAlias;
-	}
-	
-	public void setKeyPassword(String keyPassword)
-	{
-		this.keyPassword = keyPassword;
-	}
 }

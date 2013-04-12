@@ -66,8 +66,6 @@
 		<property name="transformAlgorithm" value="${xmldsig.transformAlgorithm}"/>
 		<property name="keyStorePath" value="${signature.keystore.path}" />
 		<property name="keyStorePassword" value="${signature.keystore.password}" />
-		<property name="keyAlias" value="${signature.key.alias}" />
-		<property name="keyPassword" value="${signature.key.password}" />
 	</bean>  
 
 	<bean id="ebMSClient" class="nl.clockwork.ebms.client.EbMSHttpClient">
