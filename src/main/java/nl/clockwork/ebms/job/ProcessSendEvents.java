@@ -31,9 +31,6 @@ import nl.clockwork.ebms.model.EbMSMessage;
 import nl.clockwork.ebms.model.EbMSResponseDocument;
 import nl.clockwork.ebms.model.EbMSSendEvent;
 import nl.clockwork.ebms.model.cpp.cpa.CollaborationProtocolAgreement;
-import nl.clockwork.ebms.model.cpp.cpa.DeliveryChannel;
-import nl.clockwork.ebms.model.cpp.cpa.PartyInfo;
-import nl.clockwork.ebms.model.cpp.cpa.Transport;
 import nl.clockwork.ebms.processor.EbMSMessageProcessor;
 import nl.clockwork.ebms.signing.EbMSSignatureGenerator;
 import nl.clockwork.ebms.util.CPAUtils;
@@ -78,7 +75,7 @@ public class ProcessSendEvents implements Job
 					  		CollaborationProtocolAgreement cpa = ebMSDAO.getCPA(message.getMessageHeader().getCPAId());
 					  		EbMSDocument document = new EbMSDocument(EbMSMessageUtils.createSOAPMessage(message),message.getAttachments());
 					  		signatureGenerator.generate(cpa,document,message.getMessageHeader());
-					  		String uri = getUrl(message);
+					  		String uri = CPAUtils.getUri(cpa,message);
 					  		EbMSDocument responseDocument = ebMSClient.sendMessage(uri,document);
 					  		if (!(responseDocument == null || (responseDocument instanceof EbMSResponseDocument && ((EbMSResponseDocument)responseDocument).getMessage() == null)))
 					  			ebMSMessageProcessor.process(responseDocument);
@@ -105,15 +102,6 @@ public class ProcessSendEvents implements Job
 			}
   }
   
-	private String getUrl(EbMSMessage message)
-	{
-		CollaborationProtocolAgreement cpa = ebMSDAO.getCPA(message.getMessageHeader().getCPAId());
-		PartyInfo partyInfo = CPAUtils.getPartyInfo(cpa,message.getMessageHeader().getTo().getPartyId());
-		DeliveryChannel deliveryChannel = CPAUtils.getReceivingDeliveryChannels(partyInfo,message.getMessageHeader().getTo().getRole(),message.getMessageHeader().getService(),message.getMessageHeader().getAction()).get(0);
-		Transport transport = (Transport)deliveryChannel.getTransportId();
-		return transport.getTransportReceiver().getEndpoint().get(0).getUri();
-	}
-
 	private void updateEvent(final EbMSSendEvent sendEvent, final EbMSEventStatus status)
 	{
 		ebMSDAO.executeTransaction(

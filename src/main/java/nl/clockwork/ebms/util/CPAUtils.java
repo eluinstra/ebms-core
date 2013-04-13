@@ -16,6 +16,8 @@
 package nl.clockwork.ebms.util;
 
 import java.io.ByteArrayInputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
@@ -25,9 +27,8 @@ import java.util.List;
 
 import javax.xml.bind.JAXBElement;
 
-import org.apache.commons.lang.StringUtils;
-
 import nl.clockwork.ebms.Constants;
+import nl.clockwork.ebms.model.EbMSMessage;
 import nl.clockwork.ebms.model.cpp.cpa.ActionBindingType;
 import nl.clockwork.ebms.model.cpp.cpa.CanReceive;
 import nl.clockwork.ebms.model.cpp.cpa.CanSend;
@@ -44,9 +45,12 @@ import nl.clockwork.ebms.model.cpp.cpa.SenderNonRepudiation;
 import nl.clockwork.ebms.model.cpp.cpa.ServiceBinding;
 import nl.clockwork.ebms.model.cpp.cpa.ServiceType;
 import nl.clockwork.ebms.model.cpp.cpa.StatusValueType;
+import nl.clockwork.ebms.model.cpp.cpa.Transport;
 import nl.clockwork.ebms.model.cpp.cpa.X509DataType;
 import nl.clockwork.ebms.model.ebxml.MessageHeader;
 import nl.clockwork.ebms.model.ebxml.Service;
+
+import org.apache.commons.lang.StringUtils;
 
 //FIXME use JXPath
 public class CPAUtils
@@ -62,14 +66,10 @@ public class CPAUtils
 	public static PartyInfo getPartyInfo(CollaborationProtocolAgreement cpa, List<nl.clockwork.ebms.model.ebxml.PartyId> partyIds)
 	{
 		for (PartyInfo partyInfo : cpa.getPartyInfo())
-		{
-			boolean found = true;
 			for (nl.clockwork.ebms.model.ebxml.PartyId partyId : partyIds)
 				for (PartyId cpaPartyId : partyInfo.getPartyId())
-					found &= equals(partyId,cpaPartyId);
-			if (found)
-				return partyInfo;
-		}
+					if (equals(partyId,cpaPartyId))
+						return partyInfo;
 		return null;
 	}
 	
@@ -171,6 +171,11 @@ public class CPAUtils
 		return getCanReceive(partyInfo,role,service,action) != null;
 	}
 
+	public static DeliveryChannel getDefaultDeliveryChannel(PartyInfo partyInfo)
+	{
+		return (DeliveryChannel)partyInfo.getDefaultMshChannelId();
+	}
+
 	public static DeliveryChannel getDeliveryChannel(ActionBindingType bindingType)
 	{
 		return (DeliveryChannel)((JAXBElement<Object>)bindingType.getChannelId().get(0)).getValue();
@@ -180,9 +185,7 @@ public class CPAUtils
 	{
 		List<DeliveryChannel> result = new ArrayList<DeliveryChannel>();
 		if (Constants.EBMS_SERVICE_URI.equals(service.getValue()))
-		{
-					result.add((DeliveryChannel)partyInfo.getDefaultMshChannelId());
-		}
+			result.add((DeliveryChannel)partyInfo.getDefaultMshChannelId());
 		else
 		{
 			ServiceBinding serviceBinding = getServiceBinding(partyInfo, role, service);
@@ -199,9 +202,7 @@ public class CPAUtils
 	{
 		List<DeliveryChannel> result = new ArrayList<DeliveryChannel>();
 		if (Constants.EBMS_SERVICE_URI.equals(service.getValue()))
-		{
-					result.add((DeliveryChannel)partyInfo.getDefaultMshChannelId());
-		}
+			result.add((DeliveryChannel)partyInfo.getDefaultMshChannelId());
 		else
 		{
 			ServiceBinding serviceBinding = getServiceBinding(partyInfo, role, service);
@@ -245,7 +246,7 @@ public class CPAUtils
 	
 	public static boolean isSigned(ReceiverNonRepudiation receiverNonRepudiation)
 	{
-		return receiverNonRepudiation != null && !StringUtils.isEmpty(getNonRepudiationProtocol(receiverNonRepudiation));
+		return receiverNonRepudiation != null && !StringUtils.isEmpty(getNonRepudiationProtocol(receiverNonRepudiation)) /*&& XMLSignature.XMLNS.equals(getNonRepudiationProtocol(receiverNonRepudiation))*/;
 	}
 	
 	public static String getNonRepudiationProtocol(ReceiverNonRepudiation receiverNonRepudiation)
@@ -301,4 +302,30 @@ public class CPAUtils
 		}
 	}
 	
+	public static String getUri(CollaborationProtocolAgreement cpa, EbMSMessage message)
+	{
+		PartyInfo partyInfo = CPAUtils.getPartyInfo(cpa,message.getMessageHeader().getTo().getPartyId());
+		DeliveryChannel deliveryChannel = CPAUtils.getReceivingDeliveryChannels(partyInfo,message.getMessageHeader().getTo().getRole(),message.getMessageHeader().getService(),message.getMessageHeader().getAction()).get(0);
+		return getUri(deliveryChannel);
+	}
+
+	public static String getUri(DeliveryChannel deliveryChannel)
+	{
+		Transport transport = (Transport)deliveryChannel.getTransportId();
+		return transport.getTransportReceiver().getEndpoint().get(0).getUri();
+	}
+	
+	public static String getHostname(DeliveryChannel deliveryChannel)
+	{
+		try
+		{
+			String uri = CPAUtils.getUri(deliveryChannel);
+			URL url = new URL(uri);
+			return url.getHost();
+		}
+		catch (MalformedURLException e)
+		{
+			return "hostname";
+		}
+	}
 }

@@ -61,7 +61,6 @@ public class EbMSMessageProcessorImpl implements EbMSMessageProcessor
   protected transient Log logger = LogFactory.getLog(getClass());
   private EbMSDAO ebMSDAO;
   private EbMSSignatureValidator signatureValidator;
-  private String hostname;
   private CPAValidator cpaValidator;
   private MessageHeaderValidator messageHeaderValidator;
   private ManifestValidator manifestValidator;
@@ -167,7 +166,7 @@ public class EbMSMessageProcessorImpl implements EbMSMessageProcessor
 				logger.info("Message valid. MessageId: " + message.getMessageHeader().getMessageData().getMessageId());
 				if (message.getAckRequested() != null)
 				{
-					final EbMSMessage acknowledgment = EbMSMessageUtils.createEbMSAcknowledgment(message,hostname,timestamp);
+					final EbMSMessage acknowledgment = EbMSMessageUtils.createEbMSAcknowledgment(cpa,message,timestamp);
 					ebMSDAO.executeTransaction(
 						new DAOTransactionCallback()
 						{
@@ -204,7 +203,7 @@ public class EbMSMessageProcessorImpl implements EbMSMessageProcessor
 			else
 			{
 				logger.warn("Message invalid. MessageId: " + message.getMessageHeader().getMessageData().getMessageId());
-				final EbMSMessage messageError = EbMSMessageUtils.createEbMSMessageError(message,errorList,hostname,timestamp);
+				final EbMSMessage messageError = EbMSMessageUtils.createEbMSMessageError(cpa,message,errorList,timestamp);
 				ebMSDAO.executeTransaction(
 					new DAOTransactionCallback()
 					{
@@ -301,7 +300,7 @@ public class EbMSMessageProcessorImpl implements EbMSMessageProcessor
 			}
 			else
 				status = EbMSMessageStatus.UNAUTHORIZED;
-			final EbMSMessage statusResponse = EbMSMessageUtils.createEbMSStatusResponse(message,hostname,status,c); 
+			final EbMSMessage statusResponse = EbMSMessageUtils.createEbMSStatusResponse(cpa,message,status,c); 
 			ebMSDAO.executeTransaction(
 				new DAOTransactionCallback()
 				{
@@ -349,7 +348,7 @@ public class EbMSMessageProcessorImpl implements EbMSMessageProcessor
 			MessageHeader messageHeader = message.getMessageHeader();
 			final CollaborationProtocolAgreement cpa = ebMSDAO.getCPA(messageHeader.getCPAId());
 			ErrorList errorList = EbMSMessageUtils.createErrorList();
-			final EbMSMessage pong = cpaValidator.isValid(errorList,cpa,messageHeader,timestamp) ? null : EbMSMessageUtils.createEbMSPong(message,hostname);
+			final EbMSMessage pong = cpaValidator.isValid(errorList,cpa,messageHeader,timestamp) ? null : EbMSMessageUtils.createEbMSPong(cpa,message);
 			ebMSDAO.executeTransaction(
 				new DAOTransactionCallback()
 				{
@@ -448,9 +447,4 @@ public class EbMSMessageProcessorImpl implements EbMSMessageProcessor
 		this.signatureValidator = signatureValidator;
 	}
 	
-	public void setHostname(String hostname)
-	{
-		this.hostname = hostname;
-	}
-
 }

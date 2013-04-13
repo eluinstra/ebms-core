@@ -37,7 +37,6 @@ public class EbMSMessageServiceImpl implements EbMSMessageService
 {
   protected transient Log logger = LogFactory.getLog(getClass());
 	private EbMSDAO ebMSDAO;
-	private String hostname;
 
 	@Override
 	public String sendMessage(EbMSMessageContent messageContent) throws EbMSMessageServiceException
@@ -46,7 +45,7 @@ public class EbMSMessageServiceImpl implements EbMSMessageService
 		{
 			new EbMSMessageContextValidator(ebMSDAO).validate(messageContent.getContext());
 			CollaborationProtocolAgreement cpa = ebMSDAO.getCPA(messageContent.getContext().getCpaId());
-			final EbMSMessage message = EbMSMessageUtils.ebMSMessageContentToEbMSMessage(cpa,messageContent,hostname);
+			final EbMSMessage message = EbMSMessageUtils.ebMSMessageContentToEbMSMessage(cpa,messageContent);
 			ebMSDAO.executeTransaction(
 				new DAOTransactionCallback()
 				{
@@ -148,8 +147,4 @@ public class EbMSMessageServiceImpl implements EbMSMessageService
 		this.ebMSDAO = ebMSDAO;
 	}
 	
-	public void setHostname(String hostname)
-	{
-		this.hostname = hostname;
-	}
 }

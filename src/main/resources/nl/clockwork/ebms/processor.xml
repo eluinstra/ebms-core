@@ -25,7 +25,6 @@
 
 	<bean id="ebMSMessageService" class="nl.clockwork.ebms.iface.EbMSMessageServiceImpl">
 		<property name="ebMSDAO" ref="ebMSDAO"/>
-		<property name="hostname" value="${hostname}"/>
 	</bean>
 
 	<bean id="httpHandler" class="nl.clockwork.ebms.server.EbMSHttpHandlerImpl">
@@ -35,7 +34,6 @@
 	<bean id="messageProcessor" class="nl.clockwork.ebms.processor.EbMSMessageProcessorImpl" init-method="init">
 		<property name="ebMSDAO" ref="ebMSDAO"/>
 		<property name="signatureValidator" ref="signatureValidator"/>
-		<property name="hostname" value="${hostname}"/>
 	</bean>
 
 	<bean id="signatureValidator" class="nl.clockwork.ebms.signing.EbMSSecSignatureValidator">

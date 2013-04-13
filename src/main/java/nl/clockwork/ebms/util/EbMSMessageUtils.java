@@ -143,12 +143,14 @@ public class EbMSMessageUtils
 		return new EbMSDocument(EbMSMessageUtils.createSOAPMessage(message),message.getAttachments());
 	}
 	
-	public static MessageHeader createMessageHeader(CollaborationProtocolAgreement cpa, EbMSMessageContext context, String hostname) throws DatatypeConfigurationException
+	public static MessageHeader createMessageHeader(CollaborationProtocolAgreement cpa, EbMSMessageContext context) throws DatatypeConfigurationException
 	{
 		String uuid = UUID.randomUUID().toString();
 		PartyInfo sendingPartyInfo = CPAUtils.getSendingPartyInfo(cpa,context.getFromRole(),context.getServiceType(),context.getService(),context.getAction());
 		PartyInfo receivingPartyInfo = CPAUtils.getReceivingPartyInfo(cpa,context.getToRole(),context.getServiceType(),context.getService(),context.getAction());
 		//PartyInfo receivingPartyInfo = CPAUtils.getOtherReceivingPartyInfo(cpa,context.getFromRole(),context.getServiceType(),context.getService(),context.getAction());
+		DeliveryChannel deliveryChannel = CPAUtils.getDeliveryChannel(sendingPartyInfo.getCollaborationRole().get(0).getServiceBinding().getCanSend().get(0).getThisPartyActionBinding());
+		String hostname = CPAUtils.getHostname(deliveryChannel);
 
 		MessageHeader messageHeader = new MessageHeader();
 
@@ -192,15 +194,17 @@ public class EbMSMessageUtils
 			messageHeader.getMessageData().setTimeToLive(DatatypeFactory.newInstance().newXMLGregorianCalendar(timestamp));
 		}
 
-		DeliveryChannel channel = CPAUtils.getDeliveryChannel(sendingPartyInfo.getCollaborationRole().get(0).getServiceBinding().getCanSend().get(0).getThisPartyActionBinding());
-
-		messageHeader.setDuplicateElimination(PerMessageCharacteristicsType.ALWAYS.equals(channel.getMessagingCharacteristics().getDuplicateElimination()) ? "" : null);
+		messageHeader.setDuplicateElimination(PerMessageCharacteristicsType.ALWAYS.equals(deliveryChannel.getMessagingCharacteristics().getDuplicateElimination()) ? "" : null);
 		
 		return messageHeader;
 	}
 
-	public static MessageHeader createMessageHeader(MessageHeader messageHeader, String hostname, GregorianCalendar timestamp, EbMSAction action) throws DatatypeConfigurationException, JAXBException
+	public static MessageHeader createMessageHeader(CollaborationProtocolAgreement cpa, MessageHeader messageHeader, GregorianCalendar timestamp, EbMSAction action) throws DatatypeConfigurationException, JAXBException
 	{
+		PartyInfo partyInfo = CPAUtils.getPartyInfo(cpa,messageHeader.getTo().getPartyId());
+		DeliveryChannel deliveryChannel = CPAUtils.getDefaultDeliveryChannel(partyInfo);
+		String hostname = CPAUtils.getHostname(deliveryChannel);
+
 		MessageHeader result = XMLMessageBuilder.deepCopy(messageHeader);
 
 		result.getFrom().getPartyId().clear();
@@ -296,9 +300,9 @@ public class EbMSMessageUtils
 		return response;
 	}
 
-	public static EbMSMessage createEbMSMessageError(EbMSMessage message, ErrorList errorList, String hostname, GregorianCalendar timestamp) throws DatatypeConfigurationException, JAXBException
+	public static EbMSMessage createEbMSMessageError(CollaborationProtocolAgreement cpa, EbMSMessage message, ErrorList errorList, GregorianCalendar timestamp) throws DatatypeConfigurationException, JAXBException
 	{
-		MessageHeader messageHeader = EbMSMessageUtils.createMessageHeader(message.getMessageHeader(),hostname,timestamp,EbMSAction.MESSAGE_ERROR);
+		MessageHeader messageHeader = EbMSMessageUtils.createMessageHeader(cpa,message.getMessageHeader(),timestamp,EbMSAction.MESSAGE_ERROR);
 		if (errorList.getError().size() == 0)
 		{
 			errorList.getError().add(EbMSMessageUtils.createError(Constants.EbMSErrorCode.UNKNOWN.errorCode(),Constants.EbMSErrorCode.UNKNOWN.errorCode(),"An unknown error occurred!"));
@@ -307,9 +311,9 @@ public class EbMSMessageUtils
 		return new EbMSMessage(messageHeader,errorList);
 	}
 
-	public static EbMSMessage createEbMSAcknowledgment(EbMSMessage message, String hostname, GregorianCalendar timestamp) throws DatatypeConfigurationException, JAXBException
+	public static EbMSMessage createEbMSAcknowledgment(CollaborationProtocolAgreement cpa, EbMSMessage message, GregorianCalendar timestamp) throws DatatypeConfigurationException, JAXBException
 	{
-		MessageHeader messageHeader = EbMSMessageUtils.createMessageHeader(message.getMessageHeader(),hostname,timestamp,EbMSAction.ACKNOWLEDGMENT);
+		MessageHeader messageHeader = EbMSMessageUtils.createMessageHeader(cpa,message.getMessageHeader(),timestamp,EbMSAction.ACKNOWLEDGMENT);
 		
 		Acknowledgment acknowledgment = new Acknowledgment();
 
@@ -334,22 +338,22 @@ public class EbMSMessageUtils
 		return new EbMSMessage(messageHeader,acknowledgment);
 	}
 	
-	public static EbMSMessage createEbMSPong(EbMSMessage ping, String hostname) throws DatatypeConfigurationException, JAXBException
+	public static EbMSMessage createEbMSPong(CollaborationProtocolAgreement cpa, EbMSMessage ping) throws DatatypeConfigurationException, JAXBException
 	{
-		return new EbMSMessage(createMessageHeader(ping.getMessageHeader(),hostname,new GregorianCalendar(),EbMSAction.PONG));
+		return new EbMSMessage(createMessageHeader(cpa,ping.getMessageHeader(),new GregorianCalendar(),EbMSAction.PONG));
 	}
 	
-	public static EbMSMessage createEbMSStatusResponse(EbMSMessage request, String hostname, EbMSMessageStatus status, GregorianCalendar timestamp) throws DatatypeConfigurationException, JAXBException
+	public static EbMSMessage createEbMSStatusResponse(CollaborationProtocolAgreement cpa, EbMSMessage request, EbMSMessageStatus status, GregorianCalendar timestamp) throws DatatypeConfigurationException, JAXBException
 	{
-		MessageHeader messageHeader = createMessageHeader(request.getMessageHeader(),hostname,new GregorianCalendar(),EbMSAction.STATUS_RESPONSE);
+		MessageHeader messageHeader = createMessageHeader(cpa,request.getMessageHeader(),new GregorianCalendar(),EbMSAction.STATUS_RESPONSE);
 		StatusResponse statusResponse = createStatusResponse(request.getStatusRequest(),status,timestamp);
 		EbMSMessage response = new EbMSMessage(messageHeader,statusResponse);
 		return response;
 	}
 
-	public static EbMSMessage ebMSMessageContentToEbMSMessage(CollaborationProtocolAgreement cpa, EbMSMessageContent content, String hostname) throws DatatypeConfigurationException
+	public static EbMSMessage ebMSMessageContentToEbMSMessage(CollaborationProtocolAgreement cpa, EbMSMessageContent content) throws DatatypeConfigurationException
 	{
-		MessageHeader messageHeader = createMessageHeader(cpa,content.getContext(),hostname);
+		MessageHeader messageHeader = createMessageHeader(cpa,content.getContext());
 
 		AckRequested ackRequested = createAckRequested(cpa,content.getContext());
 		
