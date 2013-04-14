@@ -3,6 +3,13 @@
 - improve Service models:
 	- add jaxb annotations
 
+- make EbMSMessageProcessor event driven
+	- implement eventManager
+	- replace dao.insertSendEvent(messageId) to eventManager.generateSendEvent(EbMSDocument)
+	- implement eventManager.generateReceiveEvent(MimeMessage/EbMSDocument)
+
+- implement configurable (wire tapped) in and out message logger that logs each received and sent message (and logs message's corresponding/available messageId (and cpaId))
+
 - validate message format (available elements versus action)
 - improve header validation
 	- add separate service and action validation
@@ -21,6 +28,7 @@
 - store attachment order? (Keep order defined in Manifest?)
 
 - implement AdminService
+- implement wicket/jdo? admin interface with direct database access
 
 - add response and statusCode to table sendEvent???
 - implement table receivedEvent???
