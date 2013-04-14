@@ -69,7 +69,7 @@ public class EbMSSecSignatureValidator implements EbMSSignatureValidator
 				X509Certificate certificate = getCertificate(cpa,document.getMessage(),messageHeader);
 				if (certificate != null)
 				{
-					result = validateCertificate(keyStore,certificate,new Date()/*TODO get date from message???*/);
+					result = validateCertificate(keyStore,certificate,messageHeader.getMessageData().getTimestamp() == null ? new Date() : messageHeader.getMessageData().getTimestamp().toGregorianCalendar().getTime());
 					if (result)
 					{
 						result = verify(certificate,(Element)signatureNodeList.item(0),document.getAttachments());
