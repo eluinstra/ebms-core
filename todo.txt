@@ -5,10 +5,13 @@
 
 - make EbMSMessageProcessor event driven
 	- implement eventManager
-	- replace dao.insertSendEvent(messageId) to eventManager.generateSendEvent(EbMSDocument)
+	- replace dao.insertSendEvent(messageId) (and/or EbMSMessageUtils.getEbMSSendEvents(cpa,message)) to eventManager.generateSendEvent(EbMSDocument)
 	- implement eventManager.generateReceiveEvent(MimeMessage/EbMSDocument)
 
 - implement configurable (wire tapped) in and out message logger that logs each received and sent message (and logs message's corresponding/available messageId (and cpaId))
+
+- validate CPA content during upload CPA
+- remove CPA content validation during message processing
 
 - validate message format (available elements versus action)
 - improve header validation
