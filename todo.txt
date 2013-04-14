@@ -6,7 +6,6 @@
 - validate message format (available elements versus action)
 - improve header validation
 	- add separate service and action validation
-- improve EbMSSecSignatureGenerator.generate()
 - EbMSMessageUtils.createSOAPMessage 
 	- make predefined namespace prefix configurable
 	- make way to generate predefined namespace prefix (namespacemapper of xslt) configurable

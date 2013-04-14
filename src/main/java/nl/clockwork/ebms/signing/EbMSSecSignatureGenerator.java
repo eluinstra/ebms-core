@@ -69,7 +69,6 @@ public class EbMSSecSignatureGenerator implements EbMSSignatureGenerator
 	{
 		try
 		{
-			//TODO: get isSigned info from CPA for all messages
 			if (!Constants.EBMS_SERVICE_URI.equals(messageHeader.getService().getValue()))
 			{
 				PartyInfo partyInfo = CPAUtils.getPartyInfo(cpa,messageHeader.getFrom().getPartyId());
