@@ -63,9 +63,9 @@ import org.xml.sax.SAXException;
 public class EbMSMessageProcessorImpl implements EbMSMessageProcessor
 {
   protected transient Log logger = LogFactory.getLog(getClass());
-  private EbMSDAO ebMSDAO;
   private ExecutorService executorService;
-  private int threadPoolSize = 10;
+  private int maxThreads = 4;
+  private EbMSDAO ebMSDAO;
   private EbMSClient ebMSClient;
   private EbMSSignatureValidator signatureValidator;
   private CPAValidator cpaValidator;
@@ -82,7 +82,7 @@ public class EbMSMessageProcessorImpl implements EbMSMessageProcessor
 		signatureTypeValidator = new SignatureTypeValidator(signatureValidator);
 		service = new Service();
 		service.setValue(Constants.EBMS_SERVICE_URI);
-		executorService = Executors.newFixedThreadPool(threadPoolSize);
+		executorService = Executors.newFixedThreadPool(maxThreads);
 	}
 	
 	@Override
@@ -390,6 +390,11 @@ public class EbMSMessageProcessorImpl implements EbMSMessageProcessor
 		return ebMSDAO.existsMessage(message.getMessageHeader().getMessageData().getRefToMessageId(),service,new String[]{EbMSAction.MESSAGE_ERROR.action(),EbMSAction.ACKNOWLEDGMENT.action()});
 	}
 
+	public void setMaxThreads(int maxThreads)
+	{
+		this.maxThreads = maxThreads;
+	}
+
 	public void setEbMSDAO(EbMSDAO ebMSDAO)
 	{
 		this.ebMSDAO = ebMSDAO;
@@ -399,10 +404,4 @@ public class EbMSMessageProcessorImpl implements EbMSMessageProcessor
 	{
 		this.signatureValidator = signatureValidator;
 	}
-	
-	public void setThreadPoolSize(int threadPoolSize)
-	{
-		this.threadPoolSize = threadPoolSize;
-	} 
-	
 }
