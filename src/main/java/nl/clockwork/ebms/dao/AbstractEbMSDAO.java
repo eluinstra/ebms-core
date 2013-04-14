@@ -691,12 +691,11 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 		return connection.prepareStatement
 		(
 			"insert into ebms_message (" +
-				//"creation_time," +
+				"time_stamp," +
 				"cpa_id," +
 				"conversation_id," +
 				"sequence_nr," +
 				"message_id," +
-				"time_stamp," +
 				"ref_to_message_id," +
 				"time_to_live," +
 				"from_role," +
@@ -729,18 +728,17 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 			ps = getInsertMessagePreparedStatement(c,status);
 			//ps.setDate(1,new java.sql.Date(timestamp.getTime()));
 			//ps.setString(1,String.format(getDateFormat(),timestamp));
-			//ps.setTimestamp(1,new Timestamp(timestamp.getTime()));
+			ps.setTimestamp(1,new Timestamp(timestamp.getTime()));
 			//ps.setObject(1,timestamp,Types.TIMESTAMP);
 			//ps.setObject(1,timestamp);
 			MessageHeader messageHeader = message.getMessageHeader();
-			ps.setString(1,messageHeader.getCPAId());
-			ps.setString(2,messageHeader.getConversationId());
+			ps.setString(2,messageHeader.getCPAId());
+			ps.setString(3,messageHeader.getConversationId());
 			if (message.getMessageOrder() == null || message.getMessageOrder().getSequenceNumber() == null)
-				ps.setNull(3,java.sql.Types.BIGINT);
+				ps.setNull(4,java.sql.Types.BIGINT);
 			else
-				ps.setLong(3,message.getMessageOrder().getSequenceNumber().getValue().longValue());
-			ps.setString(4,messageHeader.getMessageData().getMessageId());
-			ps.setTimestamp(5,new Timestamp(messageHeader.getMessageData().getTimestamp().toGregorianCalendar().getTimeInMillis()));
+				ps.setLong(4,message.getMessageOrder().getSequenceNumber().getValue().longValue());
+			ps.setString(5,messageHeader.getMessageData().getMessageId());
 			ps.setString(6,messageHeader.getMessageData().getRefToMessageId());
 			ps.setTimestamp(7,messageHeader.getMessageData().getTimeToLive() == null ? null : new Timestamp(messageHeader.getMessageData().getTimeToLive().toGregorianCalendar().getTimeInMillis()));
 			ps.setString(8,messageHeader.getFrom().getRole());

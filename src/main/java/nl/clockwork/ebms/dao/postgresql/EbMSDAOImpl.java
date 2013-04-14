@@ -79,12 +79,11 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 		return connection.prepareStatement
 		(
 			"insert into ebms_message (" +
-				//"creation_time," +
+				"time_stamp," +
 				"cpa_id," +
 				"conversation_id," +
 				"sequence_nr," +
 				"message_id," +
-				"time_stamp," +
 				"ref_to_message_id," +
 				"time_to_live," +
 				"from_role," +
