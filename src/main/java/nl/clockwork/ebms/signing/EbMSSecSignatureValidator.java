@@ -31,8 +31,10 @@ import nl.clockwork.ebms.model.EbMSDocument;
 import nl.clockwork.ebms.model.cpp.cpa.CollaborationProtocolAgreement;
 import nl.clockwork.ebms.model.cpp.cpa.DeliveryChannel;
 import nl.clockwork.ebms.model.cpp.cpa.PartyInfo;
+import nl.clockwork.ebms.model.cpp.cpa.ReceiverNonRepudiation;
 import nl.clockwork.ebms.model.ebxml.MessageHeader;
 import nl.clockwork.ebms.util.CPAUtils;
+import nl.clockwork.ebms.validation.ValidationException;
 import nl.clockwork.ebms.validation.ValidatorException;
 import nl.clockwork.ebms.xml.dsig.EbMSAttachmentResolver;
 
@@ -57,31 +59,39 @@ public class EbMSSecSignatureValidator implements EbMSSignatureValidator
 	}
 	
 	@Override
-	public boolean isValid(CollaborationProtocolAgreement cpa, EbMSDocument document, MessageHeader messageHeader) throws ValidatorException
+	public void validate(CollaborationProtocolAgreement cpa, EbMSDocument document, MessageHeader messageHeader) throws ValidatorException, ValidationException
 	{
 		try
 		{
-			boolean result = false;
-			KeyStore keyStore = SecurityUtils.loadKeyStore(keyStorePath,keyStorePassword);
-			NodeList signatureNodeList = document.getMessage().getElementsByTagNameNS(org.apache.xml.security.utils.Constants.SignatureSpecNS,org.apache.xml.security.utils.Constants._TAG_SIGNATURE);
-			if (signatureNodeList.getLength() > 0)
+			PartyInfo partyInfo = CPAUtils.getPartyInfo(cpa,messageHeader.getFrom().getPartyId());
+			List<DeliveryChannel> deliveryChannels = CPAUtils.getSendingDeliveryChannels(partyInfo,messageHeader.getFrom().getRole(),messageHeader.getService(),messageHeader.getAction());
+			ReceiverNonRepudiation receiverNonRepudiation = CPAUtils.getReceiverNonRepudiation(deliveryChannels.get(0));
+			if (CPAUtils.isSigned(receiverNonRepudiation))
 			{
-				X509Certificate certificate = getCertificate(cpa,document.getMessage(),messageHeader);
-				if (certificate != null)
+				KeyStore keyStore = SecurityUtils.loadKeyStore(keyStorePath,keyStorePassword);
+				NodeList signatureNodeList = document.getMessage().getElementsByTagNameNS(org.apache.xml.security.utils.Constants.SignatureSpecNS,org.apache.xml.security.utils.Constants._TAG_SIGNATURE);
+				if (signatureNodeList.getLength() > 0)
 				{
-					result = validateCertificate(keyStore,certificate,messageHeader.getMessageData().getTimestamp() == null ? new Date() : messageHeader.getMessageData().getTimestamp().toGregorianCalendar().getTime());
-					if (result)
+					X509Certificate certificate = getCertificate(cpa,document.getMessage(),messageHeader);
+					if (certificate != null)
 					{
-						result = verify(certificate,(Element)signatureNodeList.item(0),document.getAttachments());
-						logger.info("Signature" + (result ? " " : " in") + "valid.");
+						if (validateCertificate(keyStore,certificate,messageHeader.getMessageData().getTimestamp() == null ? new Date() : messageHeader.getMessageData().getTimestamp().toGregorianCalendar().getTime()))
+							if (verify(certificate,(Element)signatureNodeList.item(0),document.getAttachments()))
+								logger.info("Signature valid.");
+							else
+							{
+								logger.info("Signature invalid.");
+								throw new ValidationException("Invalid Signature.");
+							}
+						else
+							throw new ValidationException("Invalid Certificate.");
 					}
 					else
-						logger.info("Certificate invalid.");
+						throw new ValidationException("Certificate not found.");
 				}
 				else
-					logger.info("Certificate not found.");
+					throw new ValidationException("Signature not found.");
 			}
-			return result;
 		}
 		catch (Exception e)
 		{

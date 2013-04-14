@@ -47,17 +47,15 @@ public class SignatureTypeValidator
 
 	public boolean isValid(ErrorList errorList, CollaborationProtocolAgreement cpa, EbMSDocument document, MessageHeader messageHeader) throws ValidatorException
 	{
-		PartyInfo partyInfo = CPAUtils.getPartyInfo(cpa,messageHeader.getFrom().getPartyId());
-		List<DeliveryChannel> deliveryChannels = CPAUtils.getSendingDeliveryChannels(partyInfo,messageHeader.getFrom().getRole(),messageHeader.getService(),messageHeader.getAction());
-		ReceiverNonRepudiation receiverNonRepudiation = CPAUtils.getReceiverNonRepudiation(deliveryChannels.get(0));
-		if (CPAUtils.isSigned(receiverNonRepudiation))
+		try
 		{
-			if (!ebMSSignatureValidator.isValid(cpa,document,messageHeader))
-			{
-				errorList.getError().add(EbMSMessageUtils.createError("//Header/Signature",Constants.EbMSErrorCode.SECURITY_FAILURE.errorCode(),"Invalid Signature."));
-				errorList.setHighestSeverity(SeverityType.ERROR);
-				return false;
-			}
+			ebMSSignatureValidator.validate(cpa,document,messageHeader);
+		}
+		catch (ValidationException e)
+		{
+			errorList.getError().add(EbMSMessageUtils.createError("//Header/Signature",Constants.EbMSErrorCode.SECURITY_FAILURE.errorCode(),e.getMessage()));
+			errorList.setHighestSeverity(SeverityType.ERROR);
+			return false;
 		}
 		return true;
 	}
