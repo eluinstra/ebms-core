@@ -1,4 +1,3 @@
-- validate signature algorithms with cpa
 - implement syncReply
 - implement ackRequested
 - improve Service models:
