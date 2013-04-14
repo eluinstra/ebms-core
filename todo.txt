@@ -6,9 +6,8 @@
 - validate message format (available elements versus action)
 - improve header validation
 	- add separate service and action validation
-- EbMSMessageUtils.createSOAPMessage 
-	- make predefined namespace prefix configurable
-	- make way to generate predefined namespace prefix (namespacemapper of xslt) configurable
+- EbMSMessageUtils.createSOAPMessage
+	- make predefined namespace prefix configurable?
 
 - remove unnecessary defined Interfaces and custom Exceptions
 / improve EbMSMessageProcessor
@@ -26,7 +25,7 @@
 - add response and statusCode to table sendEvent???
 - implement table receivedEvent???
 
-- use either ebms_message.id or ebms_message.message_id to identify message
+- use ebms_message.message_id to identify message
 
 - CPAService: define cpa as CollaborationProtocolAgreement instead of String
 - MessageHeader: define duplicateElimination as Object instead of String
@@ -35,8 +34,6 @@
 - remove EbMS prefix on classes; add EbMS prefix on bean ids? 
 
 - implement EbMSFileAttachment (file proxy) and EbMSDBAttachment (db proxy) for large message processing?
-
-- change DuplicateElimination back to type Object
 
 - replace commons-logging by slf4j???
 - read mime message
