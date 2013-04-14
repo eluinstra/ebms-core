@@ -8,11 +8,12 @@ CREATE TABLE ebms_message
 (
 	id								INTEGER					AUTO_INCREMENT PRIMARY KEY,
 --	parent_id					INTEGER					NULL REFERENCES ebms_message(id),
-	time_stamp				TIMESTAMP				NOT NULL DEFAULT '0000-00-00 00:00:00',
+--	creation_time			TIMESTAMP				NOT NULL DEFAULT '0000-00-00 00:00:00',
 	cpa_id						VARCHAR(256)		NOT NULL,
 	conversation_id		VARCHAR(256)		NOT NULL,
 	sequence_nr				INTEGER					NULL,
 	message_id				VARCHAR(256)		NOT NULL,
+	time_stamp				TIMESTAMP				NOT NULL DEFAULT '0000-00-00 00:00:00',
 	ref_to_message_id	VARCHAR(256)		NULL,
 	time_to_live			TIMESTAMP				NULL,
 	from_role					VARCHAR(256)		NULL,

@@ -50,11 +50,12 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 		(
 			"insert into ebms_message (" +
 				"id," +
-				"time_stamp," +
+				//"creation_time," +
 				"cpa_id," +
 				"conversation_id," +
 				"sequence_nr," +
 				"message_id," +
+				"time_stamp," +
 				"ref_to_message_id," +
 				"time_to_live," +
 				"from_role," +
