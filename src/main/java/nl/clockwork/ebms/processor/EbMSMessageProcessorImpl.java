@@ -138,9 +138,9 @@ public class EbMSMessageProcessorImpl implements EbMSMessageProcessor
 	
 	private EbMSDocument handleResponseMessage(final CollaborationProtocolAgreement cpa, final EbMSMessage message, final EbMSMessage response) throws SOAPException, JAXBException, ParserConfigurationException, SAXException, IOException, TransformerFactoryConfigurationError, TransformerException
 	{
-		if (message.getSyncReply() == null)
+		if (response != null)
 		{
-			if (response != null)
+			if (message.getSyncReply() == null)
 			{
 				Runnable command = new Runnable()
 				{
@@ -160,12 +160,10 @@ public class EbMSMessageProcessorImpl implements EbMSMessageProcessor
 				};
 				executorService.execute(command);
 			}
-			return null;
+			else
+				return EbMSMessageUtils.getEbMSDocument(response);
 		}
-		else
-		{
-			return response == null ? null : EbMSMessageUtils.getEbMSDocument(response);
-		}
+		return null;
 	}
 
 	private EbMSMessage process(CollaborationProtocolAgreement cpa, final GregorianCalendar timestamp, EbMSDocument document, final EbMSMessage message) throws DAOException, ValidatorException, DatatypeConfigurationException, JAXBException, SOAPException, ParserConfigurationException, SAXException, IOException, TransformerFactoryConfigurationError, TransformerException
