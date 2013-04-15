@@ -50,7 +50,7 @@ public class MessageQueue
 
 	public EbMSMessage getMessage(EbMSMessage message)
 	{
-		return getMessage(message,timeout );
+		return getMessage(message,timeout);
 	}
 
 	public EbMSMessage getMessage(EbMSMessage message, int timeout)
