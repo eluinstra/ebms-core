@@ -24,7 +24,17 @@
 	</bean>
 
 	<bean id="ebMSMessageService" class="nl.clockwork.ebms.iface.EbMSMessageServiceImpl">
+		<property name="deliveryManager" ref="deliveryManager"></property>
 		<property name="ebMSDAO" ref="ebMSDAO"/>
+	</bean>
+
+	<bean id="deliveryManager" class="nl.clockwork.ebms.client.DeliveryManager">
+		<property name="maxThreads" value="${deliveryManager.maxTreads}"/>
+		<property name="messageQueue" ref="messageQueue"/>
+	</bean>
+
+	<bean id="messageQueue" class="nl.clockwork.ebms.client.MessageQueue">
+		<property name="maxEntries" value="${messageQueue.maxEntries}"/>
 	</bean>
 
 	<bean id="httpHandler" class="nl.clockwork.ebms.server.EbMSHttpHandlerImpl">
@@ -32,6 +42,8 @@
 	</bean>
 
 	<bean id="messageProcessor" class="nl.clockwork.ebms.processor.EbMSMessageProcessorImpl" init-method="init">
+		<property name="deliveryManager" ref="deliveryManager"/>
+		<property name="messageQueue" ref="messageQueue"/>
 		<property name="ebMSDAO" ref="ebMSDAO"/>
 		<property name="signatureValidator" ref="signatureValidator"/>
 	</bean>

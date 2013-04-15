@@ -18,14 +18,18 @@ package nl.clockwork.ebms.iface;
 import java.util.Date;
 import java.util.List;
 
+import nl.clockwork.ebms.Constants.EbMSAction;
 import nl.clockwork.ebms.Constants.EbMSMessageStatus;
+import nl.clockwork.ebms.client.DeliveryManager;
 import nl.clockwork.ebms.dao.DAOException;
 import nl.clockwork.ebms.dao.DAOTransactionCallback;
 import nl.clockwork.ebms.dao.EbMSDAO;
+import nl.clockwork.ebms.model.EbMSDocument;
 import nl.clockwork.ebms.model.EbMSMessage;
 import nl.clockwork.ebms.model.EbMSMessageContent;
 import nl.clockwork.ebms.model.EbMSMessageContext;
 import nl.clockwork.ebms.model.EbMSSendEvent;
+import nl.clockwork.ebms.model.MessageStatus;
 import nl.clockwork.ebms.model.cpp.cpa.CollaborationProtocolAgreement;
 import nl.clockwork.ebms.util.EbMSMessageContextValidator;
 import nl.clockwork.ebms.util.EbMSMessageUtils;
@@ -36,8 +40,32 @@ import org.apache.commons.logging.LogFactory;
 public class EbMSMessageServiceImpl implements EbMSMessageService
 {
   protected transient Log logger = LogFactory.getLog(getClass());
+	private DeliveryManager deliveryManager;
 	private EbMSDAO ebMSDAO;
 
+	@Override
+	public void ping(String cpaId, String fromRole, String toRole) throws EbMSMessageServiceException
+	{
+		try
+		{
+			CollaborationProtocolAgreement cpa = ebMSDAO.getCPA(cpaId);
+			EbMSMessage ping = EbMSMessageUtils.createEbMSPing(cpa,fromRole,toRole);
+			EbMSDocument document = deliveryManager.sendMessage(cpa,ping);
+			if (document != null)
+			{
+				EbMSMessage message = EbMSMessageUtils.getEbMSMessage(document.getMessage(),document.getAttachments());
+				if (!EbMSAction.PONG.action().equals(message.getMessageHeader().getAction()))
+					throw new EbMSMessageServiceException("No valid response received!");
+			}
+			else
+				throw new EbMSMessageServiceException("No response received!");
+		}
+		catch (Exception e)
+		{
+			throw new EbMSMessageServiceException(e);
+		}
+	}
+	
 	@Override
 	public String sendMessage(EbMSMessageContent messageContent) throws EbMSMessageServiceException
 	{
@@ -140,6 +168,36 @@ public class EbMSMessageServiceImpl implements EbMSMessageService
 			//logger.warn("",e);
 			//return false;
 		}
+	}
+	
+	@Override
+	public MessageStatus getMessageStatus(String cpaId, String fromRole, String toRole, String messageId) throws EbMSMessageServiceException
+	{
+		try
+		{
+			CollaborationProtocolAgreement cpa = ebMSDAO.getCPA(cpaId);
+			EbMSMessage statusRequest = EbMSMessageUtils.createEbMSStatusRequest(cpa,fromRole,toRole,messageId);
+			EbMSDocument document = deliveryManager.sendMessage(cpa,statusRequest);
+			if (document != null)
+			{
+				EbMSMessage message = EbMSMessageUtils.getEbMSMessage(document.getMessage(),document.getAttachments());
+				if (EbMSAction.STATUS_RESPONSE.action().equals(message.getMessageHeader().getAction()) && message.getStatusResponse() != null)
+					return new MessageStatus(message.getStatusResponse().getTimestamp().toGregorianCalendar().getTime(),EbMSMessageStatus.get(message.getStatusResponse().getMessageStatus()));
+				else
+					throw new EbMSMessageServiceException("No valid response received!");
+			}
+			else
+				throw new EbMSMessageServiceException("No response received!");
+		}
+		catch (Exception e)
+		{
+			throw new EbMSMessageServiceException(e);
+		}
+	}
+
+	public void setDeliveryManager(DeliveryManager deliveryManager)
+	{
+		this.deliveryManager = deliveryManager;
 	}
 
 	public void setEbMSDAO(EbMSDAO ebMSDAO)

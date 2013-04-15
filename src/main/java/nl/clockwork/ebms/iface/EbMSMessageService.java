@@ -24,10 +24,14 @@ import javax.jws.WebService;
 
 import nl.clockwork.ebms.model.EbMSMessageContent;
 import nl.clockwork.ebms.model.EbMSMessageContext;
+import nl.clockwork.ebms.model.MessageStatus;
 
 @WebService(targetNamespace="http://www.clockwork.nl/ebms/1.0")
 public interface EbMSMessageService
 {
+	@WebMethod(operationName="Ping")
+	void ping(String cpaId, String fromRole, String toRole) throws EbMSMessageServiceException;
+	
 	@WebResult(name="MessageId")
 	@WebMethod(operationName="SendMessage")
 	String sendMessage(@WebParam(name="Message") EbMSMessageContent messageContent) throws EbMSMessageServiceException;
@@ -52,4 +56,8 @@ public interface EbMSMessageService
 	@WebMethod(operationName="ProcessMessages")
 	boolean processMessages(@WebParam(name="MessageId") List<String> messageIds) throws EbMSMessageServiceException;
 
+	@WebResult(name="MessageId")
+	@WebMethod(operationName="Ping")
+	MessageStatus getMessageStatus(String cpaId, String fromRole, String toRole, String messageId) throws EbMSMessageServiceException;
+	
 }
