@@ -286,7 +286,15 @@ public class EbMSMessageUtils
 		return error;
 	}
 	
-	private static StatusResponse createStatusResponse(StatusRequest statusRequest, EbMSMessageStatus status, GregorianCalendar timestamp) throws DatatypeConfigurationException
+	public static StatusRequest createStatusRequest(String refToMessageId) throws DatatypeConfigurationException
+	{
+		StatusRequest request = new StatusRequest();
+		request.setVersion(Constants.EBMS_VERSION);
+		request.setRefToMessageId(refToMessageId);
+		return request;
+	}
+
+	public static StatusResponse createStatusResponse(StatusRequest statusRequest, EbMSMessageStatus status, GregorianCalendar timestamp) throws DatatypeConfigurationException
 	{
 		StatusResponse response = new StatusResponse();
 		response.setVersion(Constants.EBMS_VERSION);
@@ -338,11 +346,26 @@ public class EbMSMessageUtils
 		return new EbMSMessage(messageHeader,acknowledgment);
 	}
 	
+	public static EbMSMessage createEbMSPing(CollaborationProtocolAgreement cpa, String fromRole, String toRole) throws DatatypeConfigurationException, JAXBException
+	{
+		EbMSMessageContext context = new EbMSMessageContext(cpa.getCpaid(),fromRole,toRole,Constants.EBMS_SERVICE_URI,EbMSAction.PING.action());
+		return new EbMSMessage(createMessageHeader(cpa,context));
+	}
+	
 	public static EbMSMessage createEbMSPong(CollaborationProtocolAgreement cpa, EbMSMessage ping) throws DatatypeConfigurationException, JAXBException
 	{
 		return new EbMSMessage(createMessageHeader(cpa,ping.getMessageHeader(),new GregorianCalendar(),EbMSAction.PONG));
 	}
 	
+	public static EbMSMessage createEbMSStatusRequest(CollaborationProtocolAgreement cpa, String fromRole, String toRole, String messageId) throws DatatypeConfigurationException, JAXBException
+	{
+		EbMSMessageContext context = new EbMSMessageContext(cpa.getCpaid(),fromRole,toRole,Constants.EBMS_SERVICE_URI,EbMSAction.STATUS_REQUEST.action());
+		MessageHeader messageHeader = createMessageHeader(cpa,context);
+		StatusRequest statusRequest = createStatusRequest(messageId);
+		EbMSMessage request = new EbMSMessage(messageHeader,statusRequest);
+		return request;
+	}
+
 	public static EbMSMessage createEbMSStatusResponse(CollaborationProtocolAgreement cpa, EbMSMessage request, EbMSMessageStatus status, GregorianCalendar timestamp) throws DatatypeConfigurationException, JAXBException
 	{
 		MessageHeader messageHeader = createMessageHeader(cpa,request.getMessageHeader(),new GregorianCalendar(),EbMSAction.STATUS_RESPONSE);
@@ -372,7 +395,7 @@ public class EbMSMessageUtils
 		return new EbMSMessage(messageHeader,ackRequested,manifest,attachments);
 	}
 
-	private static Reference createReference(int cid)
+	public static Reference createReference(int cid)
 	{
 		Reference reference = new Reference();
 		reference.setHref(Constants.CID + cid);
