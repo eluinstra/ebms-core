@@ -98,6 +98,11 @@ public class EbMSMessage
 		this(signature,messageHeader,syncReply,null,null,null,null,null,statusRequest,null,null);
 	}
 	
+	public EbMSMessage(MessageHeader messageHeader, StatusRequest statusRequest)
+	{
+		this(null,messageHeader,null,null,null,null,null,null,statusRequest,null,null);
+	}
+	
 	public EbMSMessage(MessageHeader messageHeader, StatusResponse statusResponse)
 	{
 		this(null,messageHeader,null,null,null,null,null,null,null,statusResponse,null);

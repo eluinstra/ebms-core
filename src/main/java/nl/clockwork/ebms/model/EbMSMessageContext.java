@@ -50,6 +50,11 @@ public class EbMSMessageContext
 		this(cpaId,null,null,service,action,conversationId);
 	}
 
+	public EbMSMessageContext(String cpaId, String from, String to, String service, String action)
+	{
+		this(cpaId,from,to,null,service,action,null,null,null,null);
+	}
+	
 	public EbMSMessageContext(String cpaId, String from, String to, String service, String action, String conversationId)
 	{
 		this(cpaId,from,to,null,service,action,conversationId,null,null,null);

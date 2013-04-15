@@ -15,6 +15,7 @@
  ******************************************************************************/
 package nl.clockwork.ebms.model;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class EbMSMessageContent
@@ -26,6 +27,11 @@ public class EbMSMessageContent
 	{
 	}
 	
+	public EbMSMessageContent(EbMSMessageContext context)
+	{
+		this(context,new ArrayList<EbMSDataSource>());
+	}
+
 	public EbMSMessageContent(EbMSMessageContext context, List<EbMSDataSource> dataSources)
 	{
 		this.context = context;
