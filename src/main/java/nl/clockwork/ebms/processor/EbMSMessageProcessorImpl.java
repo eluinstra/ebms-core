@@ -111,7 +111,7 @@ public class EbMSMessageProcessorImpl implements EbMSMessageProcessor
 			}
 			else if (EbMSAction.STATUS_RESPONSE.action().equals(message.getMessageHeader().getAction()))
 			{
-				messageQueue.putMessage(message);
+				messageQueue.putMessage(message.getMessageHeader().getMessageData().getRefToMessageId(),message);
 				return null;
 			}
 			else if (EbMSAction.PING.action().equals(message.getMessageHeader().getAction()))
@@ -121,7 +121,7 @@ public class EbMSMessageProcessorImpl implements EbMSMessageProcessor
 			}
 			else if (EbMSAction.PONG.action().equals(message.getMessageHeader().getAction()))
 			{
-				messageQueue.putMessage(message);
+				messageQueue.putMessage(message.getMessageHeader().getMessageData().getRefToMessageId(),message);
 				return null;
 			}
 			else

@@ -37,23 +37,22 @@ public class MessageQueue
 		;
 	}
 	
-	public void register(EbMSMessage message)
+	public void register(String correlationId)
 	{
-		String messageId = message.getMessageHeader().getMessageData().getMessageId();
 		synchronized (queue)
 		{
-			if (queue.containsKey(messageId))
-				throw new RuntimeException("key " + messageId + " already exists!");
-			queue.put(messageId,new QueueEntry(Thread.currentThread()));
+			if (queue.containsKey(correlationId))
+				throw new RuntimeException("key " + correlationId + " already exists!");
+			queue.put(correlationId,new QueueEntry(Thread.currentThread()));
 		}
 	}
 
-	public EbMSMessage getMessage(EbMSMessage message)
+	public EbMSMessage getMessage(String correlationId)
 	{
-		return getMessage(message,timeout);
+		return getMessage(correlationId,timeout);
 	}
 
-	public EbMSMessage getMessage(EbMSMessage message, int timeout)
+	public EbMSMessage getMessage(String correlationId, int timeout)
 	{
 		try
 		{
@@ -64,39 +63,36 @@ public class MessageQueue
 		{
 		}
 		EbMSMessage result = null;
-		String messageId = message.getMessageHeader().getMessageData().getMessageId();
 		synchronized (queue)
 		{
-			if (queue.containsKey(messageId))
-				result = queue.remove(messageId).message;
+			if (queue.containsKey(correlationId))
+				result = queue.remove(correlationId).message;
 		}
 		return result;
 	}
 
-	public void putMessage(EbMSMessage message)
+	public void putMessage(String correlationId, EbMSMessage message)
 	{
-		String messageId = message.getMessageHeader().getMessageData().getRefToMessageId();
 		synchronized (queue)
 		{
-			if (queue.containsKey(messageId))
+			if (queue.containsKey(correlationId))
 			{
-				queue.get(messageId).message = message;
-				queue.get(messageId).thread.interrupt();
-				//queue.get(messageId).thread.notify();
+				queue.get(correlationId).message = message;
+				queue.get(correlationId).thread.interrupt();
+				//queue.get(correlationId).thread.notify();
 			}
 		}
 	}
 	
-	public void putEmptyMessage(EbMSMessage message)
+	public void putEmptyMessage(String correlationId)
 	{
-		String messageId = message.getMessageHeader().getMessageData().getMessageId();
 		synchronized (queue)
 		{
-			if (queue.containsKey(messageId))
+			if (queue.containsKey(correlationId))
 			{
-				queue.get(messageId).message = null;
-				queue.get(messageId).thread.interrupt();
-				//queue.get(messageId).thread.notify();
+				queue.get(correlationId).message = null;
+				queue.get(correlationId).thread.interrupt();
+				//queue.get(correlationId).thread.notify();
 			}
 		}
 	}

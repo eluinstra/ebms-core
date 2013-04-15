@@ -53,14 +53,14 @@ public class DeliveryManager //DeliveryService
 						}
 						catch (Exception e)
 						{
-							messageQueue.putEmptyMessage(message);
+							messageQueue.putEmptyMessage(message.getMessageHeader().getMessageData().getMessageId());
 							logger.error("",e);
 						}
 					}
 				};
-				messageQueue.register(message);
+				messageQueue.register(message.getMessageHeader().getMessageData().getMessageId());
 				executorService.execute(command);
-				EbMSMessage response = messageQueue.getMessage(message);
+				EbMSMessage response = messageQueue.getMessage(message.getMessageHeader().getMessageData().getMessageId());
 				if (response != null)
 					return EbMSMessageUtils.getEbMSDocument(response);
 			}
