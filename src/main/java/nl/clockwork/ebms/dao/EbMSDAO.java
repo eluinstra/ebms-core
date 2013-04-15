@@ -39,7 +39,6 @@ public interface EbMSDAO
 	boolean deleteCPA(String cpaId) throws DAOException;
 	
 	boolean existsMessage(String messageId) throws DAOException;
-	boolean existsMessage(String messageId, Service service, String...actions) throws DAOException;
 	Long getMessageId(String messageId) throws DAOException;
 	Long getMessageId(String messageId, Service service, String...actions) throws DAOException;
 	EbMSMessage getMessage(String messageId, Service service, String...actions) throws DAOException;

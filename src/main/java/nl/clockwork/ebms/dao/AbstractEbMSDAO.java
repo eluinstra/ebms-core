@@ -329,43 +329,6 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	}
 	
 	@Override
-	public boolean existsMessage(String messageId, Service service, String...actions) throws DAOException
-	{
-		Connection c = null;
-		PreparedStatement ps = null;
-		try
-		{
-			boolean result = false;
-			c = getConnection();
-			ps  = c.prepareStatement(
-				"select count(message_id)" +
-				" from ebms_message" +
-				" where ref_to_message_id = ?" +
-				(service.getType() == null ? "" : " and serviceType = '" + service.getType() + "'") +
-				(service.getValue() == null ? "" : " and service = '" + service.getValue() + "'") +
-				(actions.length == 0 ? "" : " and action in (" + join(actions,",") + ")")
-			);
-			ps.setString(1,messageId);
-			if (ps.execute())
-			{
-				ResultSet rs = ps.getResultSet();
-				if (rs.next())
-					result = rs.getInt(1) > 0;
-			}
-			return result;
-		}
-		catch (SQLException e)
-		{
-			throw new DAOException(e);
-		}
-		finally
-		{
-			close(ps);
-			close(c);
-		}
-	}
-	
-	@Override
 	public Long getMessageId(String messageId) throws DAOException
 	{
 		Connection c = null;

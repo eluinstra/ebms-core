@@ -275,27 +275,6 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 		}
 	}
 	
-	@Override
-	public boolean existsMessage(String messageId, Service service, String...actions) throws DAOException
-	{
-		try
-		{
-			return jdbcTemplate.queryForInt(
-				"select count(message_id)" +
-				" from ebms_message" +
-				" where ref_to_message_id = ?" +
-				(service.getType() == null ? "" : " and serviceType = '" + service.getType() + "'") +
-				(service.getValue() == null ? "" : " and service = '" + service.getValue() + "'") +
-				(actions.length == 0 ? "" : " and action in (" + join(actions,",") + ")"),
-				messageId
-			) > 0;
-		}
-		catch (DataAccessException e)
-		{
-			throw new DAOException(e);
-		}
-	}
-	
 	private String join(String[] array, String delimiter)
 	{
 		StringBuffer result = new StringBuffer();

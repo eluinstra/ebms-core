@@ -231,16 +231,7 @@ public class EbMSMessageProcessorImpl implements EbMSMessageProcessor
 
 	private void process(final Calendar timestamp, final EbMSMessage message, final EbMSMessageStatus status)
 	{
-		if (isDuplicateMessage(message))
-		{
-			if (equalsDuplicateMessage(message))
-				logger.warn("Duplicate message found! MessageId: " + message.getMessageHeader().getMessageData().getMessageId());
-			else
-				logger.warn("Duplicate but unidentical message found! MessageId: " + message.getMessageHeader().getMessageData().getMessageId());
-		}
-		else if (isDuplicateRefToMessage(message))
-			logger.warn("Duplicate response message found! RefToMessageId: " + message.getMessageHeader().getMessageData().getRefToMessageId());
-		else
+		if (!isDuplicateMessage(message))
 			ebMSDAO.executeTransaction(
 				new DAOTransactionCallback()
 				{
@@ -331,11 +322,6 @@ public class EbMSMessageProcessorImpl implements EbMSMessageProcessor
 	{
 		return (referenceType.getId() == null ? duplicateRreferenceType.getId() == null : referenceType.getId().equals(duplicateRreferenceType.getId()))
 				&& Arrays.equals(referenceType.getDigestValue(),duplicateRreferenceType.getDigestValue());
-	}
-
-	private boolean isDuplicateRefToMessage(EbMSMessage message)
-	{
-		return ebMSDAO.existsMessage(message.getMessageHeader().getMessageData().getRefToMessageId(),service,new String[]{EbMSAction.MESSAGE_ERROR.action(),EbMSAction.ACKNOWLEDGMENT.action()});
 	}
 
 	public void setDeliveryManager(DeliveryManager deliveryManager)
