@@ -91,8 +91,6 @@ public class EbMSMessageServiceImpl implements EbMSMessageService
 		catch (Exception e)
 		{
 			throw new EbMSMessageServiceException(e);
-			//logger.warn("",e);
-			//return null;
 		}
 	}
 
@@ -110,8 +108,6 @@ public class EbMSMessageServiceImpl implements EbMSMessageService
 		catch (DAOException e)
 		{
 			throw new EbMSMessageServiceException(e);
-			//logger.warn("",e);
-			//return new ArrayList<String>();
 		}
 	}
 
@@ -139,61 +135,55 @@ public class EbMSMessageServiceImpl implements EbMSMessageService
 	}
 
 	@Override
-	public boolean processMessage(String messageId) throws EbMSMessageServiceException
+	public void processMessage(String messageId) throws EbMSMessageServiceException
 	{
 		try
 		{
 			ebMSDAO.updateMessage(messageId,EbMSMessageStatus.RECEIVED,EbMSMessageStatus.PROCESSED);
-			return true;
 		}
 		catch (DAOException e)
 		{
 			throw new EbMSMessageServiceException(e);
-			//logger.warn("",e);
-			//return false;
 		}
 	}
 
 	@Override
-	public boolean processMessages(List<String> messageIds) throws EbMSMessageServiceException
+	public void processMessages(List<String> messageIds) throws EbMSMessageServiceException
 	{
 		try
 		{
 			ebMSDAO.updateMessages(messageIds,EbMSMessageStatus.RECEIVED,EbMSMessageStatus.PROCESSED);
-			return true;
 		}
 		catch (DAOException e)
 		{
 			throw new EbMSMessageServiceException(e);
-			//logger.warn("",e);
-			//return false;
 		}
 	}
 	
-//	@Override
-//	public MessageStatus getMessageStatus(String cpaId, String fromParty, String toParty, String messageId) throws EbMSMessageServiceException
-//	{
-//		try
-//		{
-//			CollaborationProtocolAgreement cpa = ebMSDAO.getCPA(cpaId);
-//			EbMSMessage statusRequest = EbMSMessageUtils.createEbMSStatusRequest(cpa,fromParty,toParty,messageId);
-//			EbMSDocument document = deliveryManager.sendMessage(cpa,statusRequest);
-//			if (document != null)
-//			{
-//				EbMSMessage message = EbMSMessageUtils.getEbMSMessage(document.getMessage(),document.getAttachments());
-//				if (EbMSAction.STATUS_RESPONSE.action().equals(message.getMessageHeader().getAction()) && message.getStatusResponse() != null)
-//					return new MessageStatus(message.getStatusResponse().getTimestamp().toGregorianCalendar().getTime(),EbMSMessageStatus.get(message.getStatusResponse().getMessageStatus()));
-//				else
-//					throw new EbMSMessageServiceException("No valid response received!");
-//			}
-//			else
-//				throw new EbMSMessageServiceException("No response received!");
-//		}
-//		catch (Exception e)
-//		{
-//			throw new EbMSMessageServiceException(e);
-//		}
-//	}
+	@Override
+	public MessageStatus getMessageStatus(String cpaId, String fromParty, String toParty, String messageId) throws EbMSMessageServiceException
+	{
+		try
+		{
+			CollaborationProtocolAgreement cpa = ebMSDAO.getCPA(cpaId);
+			EbMSMessage statusRequest = EbMSMessageUtils.createEbMSStatusRequest(cpa,fromParty,toParty,messageId);
+			EbMSDocument document = deliveryManager.sendMessage(cpa,statusRequest);
+			if (document != null)
+			{
+				EbMSMessage message = EbMSMessageUtils.getEbMSMessage(document.getMessage(),document.getAttachments());
+				if (EbMSAction.STATUS_RESPONSE.action().equals(message.getMessageHeader().getAction()) && message.getStatusResponse() != null)
+					return new MessageStatus(message.getStatusResponse().getTimestamp().toGregorianCalendar().getTime(),EbMSMessageStatus.get(message.getStatusResponse().getMessageStatus()));
+				else
+					throw new EbMSMessageServiceException("No valid response received!");
+			}
+			else
+				throw new EbMSMessageServiceException("No response received!");
+		}
+		catch (Exception e)
+		{
+			throw new EbMSMessageServiceException(e);
+		}
+	}
 
 	public void setDeliveryManager(DeliveryManager deliveryManager)
 	{

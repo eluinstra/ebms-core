@@ -44,16 +44,13 @@ public interface EbMSMessageService
 	@WebMethod(operationName="GetMessage")
 	EbMSMessageContent getMessage(@WebParam(name="MessageId") String messageId, @WebParam(name="Process") Boolean process) throws EbMSMessageServiceException;
 
-	@WebResult(name="Result")
 	@WebMethod(operationName="ProcessMessage")
-	boolean processMessage(@WebParam(name="MessageId") String messageId) throws EbMSMessageServiceException;
+	void processMessage(@WebParam(name="MessageId") String messageId) throws EbMSMessageServiceException;
 
-	@WebResult(name="Result")
 	@WebMethod(operationName="ProcessMessages")
-	boolean processMessages(@WebParam(name="MessageId") List<String> messageIds) throws EbMSMessageServiceException;
+	void processMessages(@WebParam(name="MessageId") List<String> messageIds) throws EbMSMessageServiceException;
 
-//	@WebResult(name="MessageStatus")
-//	@WebMethod(operationName="GetMessageStatus")
-//	MessageStatus getMessageStatus(@WebParam(name="CPAId") String cpaId, @WebParam(name="FromParty") String fromParty, @WebParam(name="ToParty") String toParty, @WebParam(name="MessageId") String messageId) throws EbMSMessageServiceException;
-	
+	@WebResult(name="MessageStatus")
+	@WebMethod(operationName="GetMessageStatus")
+	MessageStatus getMessageStatus(@WebParam(name="CPAId") String cpaId, @WebParam(name="FromParty") String fromParty, @WebParam(name="ToParty") String toParty, @WebParam(name="MessageId") String messageId) throws EbMSMessageServiceException;
 }

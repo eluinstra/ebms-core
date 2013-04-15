@@ -9,6 +9,10 @@ public class MessageStatus
 	private Date timestamp;
 	private EbMSMessageStatus status;
 	
+	public MessageStatus()
+	{
+	}
+	
 	public MessageStatus(Date timestamp, EbMSMessageStatus status)
 	{
 		this.timestamp = timestamp;
@@ -19,7 +23,7 @@ public class MessageStatus
 	{
 		return timestamp;
 	}
-	
+
 	public EbMSMessageStatus getStatus()
 	{
 		return status;
