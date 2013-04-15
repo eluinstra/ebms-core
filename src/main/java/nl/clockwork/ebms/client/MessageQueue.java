@@ -87,6 +87,20 @@ public class MessageQueue
 		}
 	}
 	
+	public void putEmptyMessage(EbMSMessage message)
+	{
+		String messageId = message.getMessageHeader().getMessageData().getMessageId();
+		synchronized (queue)
+		{
+			if (queue.containsKey(messageId))
+			{
+				queue.get(messageId).message = null;
+				queue.get(messageId).thread.interrupt();
+				//queue.get(messageId).thread.notify();
+			}
+		}
+	}
+
 	public void setMaxEntries(int maxEntries)
 	{
 		this.maxEntries = maxEntries;
@@ -96,4 +110,5 @@ public class MessageQueue
 	{
 		this.timeout = timeout;
 	}
+
 }

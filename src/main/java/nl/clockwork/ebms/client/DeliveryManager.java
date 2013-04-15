@@ -53,6 +53,7 @@ public class DeliveryManager //DeliveryService
 						}
 						catch (Exception e)
 						{
+							messageQueue.putEmptyMessage(message);
 							logger.error("",e);
 						}
 					}
