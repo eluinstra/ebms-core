@@ -15,7 +15,7 @@
  ******************************************************************************/
 package nl.clockwork.ebms.processor;
 
-public class EbMSProcessingException extends Exception
+public class EbMSProcessingException extends EbMSProcessorException
 {
 	private static final long serialVersionUID = 1L;
 
