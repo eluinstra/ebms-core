@@ -262,12 +262,12 @@ public class EbMSMessageProcessorImpl implements EbMSMessageProcessor
 	private EbMSMessage processStatusRequest(final GregorianCalendar timestamp, final EbMSMessage message) throws DatatypeConfigurationException, JAXBException
 	{
 		GregorianCalendar c = null;
-		EbMSMessageStatus status = EbMSMessageStatus.UNAUTHORIZED;
 		MessageHeader messageHeader = message.getMessageHeader();
 		final CollaborationProtocolAgreement cpa = ebMSDAO.getCPA(messageHeader.getCPAId());
 		ErrorList errorList = EbMSMessageUtils.createErrorList();
 		if (cpaValidator.isValid(errorList,cpa,messageHeader,timestamp))
 		{
+			EbMSMessageStatus status = EbMSMessageStatus.UNAUTHORIZED;
 			MessageHeader header = ebMSDAO.getMessageHeader(message.getStatusRequest().getRefToMessageId());
 			if (header == null || header.getService().getValue().equals(Constants.EBMS_SERVICE_URI))
 				status = EbMSMessageStatus.NOT_RECOGNIZED;
@@ -279,8 +279,9 @@ public class EbMSMessageProcessorImpl implements EbMSMessageProcessor
 				if (status != null && (MessageStatusType.RECEIVED.equals(status.statusCode()) || MessageStatusType.PROCESSED.equals(status.statusCode()) || MessageStatusType.FORWARDED.equals(status.statusCode())))
 					c = header.getMessageData().getTimestamp().toGregorianCalendar();
 			}
+			return EbMSMessageUtils.createEbMSStatusResponse(cpa,message,status,c); 
 		}
-		return EbMSMessageUtils.createEbMSStatusResponse(cpa,message,status,c); 
+		return null;
 	}
 	
 	private EbMSMessage processPing(final GregorianCalendar timestamp, final EbMSMessage message) throws DatatypeConfigurationException, JAXBException
@@ -288,7 +289,7 @@ public class EbMSMessageProcessorImpl implements EbMSMessageProcessor
 		MessageHeader messageHeader = message.getMessageHeader();
 		final CollaborationProtocolAgreement cpa = ebMSDAO.getCPA(messageHeader.getCPAId());
 		ErrorList errorList = EbMSMessageUtils.createErrorList();
-		return cpaValidator.isValid(errorList,cpa,messageHeader,timestamp) ? null : EbMSMessageUtils.createEbMSPong(cpa,message);
+		return cpaValidator.isValid(errorList,cpa,messageHeader,timestamp) ? EbMSMessageUtils.createEbMSPong(cpa,message) : null;
 	}
 	
 	private boolean isDuplicateMessage(EbMSMessage message)

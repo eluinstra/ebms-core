@@ -57,10 +57,11 @@ public class DeliveryManager //DeliveryService
 						}
 					}
 				};
+				messageQueue.register(message);
 				executorService.execute(command);
 				EbMSMessage response = messageQueue.getMessage(message);
 				if (response != null)
-					return EbMSMessageUtils.getEbMSDocument(message);
+					return EbMSMessageUtils.getEbMSDocument(response);
 			}
 			else
 				return ebMSClient.sendMessage(uri,EbMSMessageUtils.getEbMSDocument(message));

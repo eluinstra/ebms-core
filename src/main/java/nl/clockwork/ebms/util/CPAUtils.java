@@ -63,6 +63,15 @@ public class CPAUtils
 		;
 	}
 
+	public static PartyInfo getPartyInfo(CollaborationProtocolAgreement cpa, String partyId)
+	{
+		for (PartyInfo partyInfo : cpa.getPartyInfo())
+			for (PartyId cpaPartyId : partyInfo.getPartyId())
+				if (partyId.equals((cpaPartyId.getType() == null ? "" : cpaPartyId.getType() + ":") + cpaPartyId.getValue()))
+					return partyInfo;
+		return null;
+	}
+
 	public static PartyInfo getPartyInfo(CollaborationProtocolAgreement cpa, List<nl.clockwork.ebms.model.ebxml.PartyId> partyIds)
 	{
 		for (PartyInfo partyInfo : cpa.getPartyInfo())
@@ -328,4 +337,5 @@ public class CPAUtils
 			return "hostname";
 		}
 	}
+
 }

@@ -44,12 +44,12 @@ public class EbMSMessageServiceImpl implements EbMSMessageService
 	private EbMSDAO ebMSDAO;
 
 	@Override
-	public void ping(String cpaId, String fromRole, String toRole) throws EbMSMessageServiceException
+	public void ping(String cpaId, String fromParty, String toParty) throws EbMSMessageServiceException
 	{
 		try
 		{
 			CollaborationProtocolAgreement cpa = ebMSDAO.getCPA(cpaId);
-			EbMSMessage ping = EbMSMessageUtils.createEbMSPing(cpa,fromRole,toRole);
+			EbMSMessage ping = EbMSMessageUtils.createEbMSPing(cpa,fromParty,toParty);
 			EbMSDocument document = deliveryManager.sendMessage(cpa,ping);
 			if (document != null)
 			{
@@ -170,30 +170,30 @@ public class EbMSMessageServiceImpl implements EbMSMessageService
 		}
 	}
 	
-	@Override
-	public MessageStatus getMessageStatus(String cpaId, String fromRole, String toRole, String messageId) throws EbMSMessageServiceException
-	{
-		try
-		{
-			CollaborationProtocolAgreement cpa = ebMSDAO.getCPA(cpaId);
-			EbMSMessage statusRequest = EbMSMessageUtils.createEbMSStatusRequest(cpa,fromRole,toRole,messageId);
-			EbMSDocument document = deliveryManager.sendMessage(cpa,statusRequest);
-			if (document != null)
-			{
-				EbMSMessage message = EbMSMessageUtils.getEbMSMessage(document.getMessage(),document.getAttachments());
-				if (EbMSAction.STATUS_RESPONSE.action().equals(message.getMessageHeader().getAction()) && message.getStatusResponse() != null)
-					return new MessageStatus(message.getStatusResponse().getTimestamp().toGregorianCalendar().getTime(),EbMSMessageStatus.get(message.getStatusResponse().getMessageStatus()));
-				else
-					throw new EbMSMessageServiceException("No valid response received!");
-			}
-			else
-				throw new EbMSMessageServiceException("No response received!");
-		}
-		catch (Exception e)
-		{
-			throw new EbMSMessageServiceException(e);
-		}
-	}
+//	@Override
+//	public MessageStatus getMessageStatus(String cpaId, String fromParty, String toParty, String messageId) throws EbMSMessageServiceException
+//	{
+//		try
+//		{
+//			CollaborationProtocolAgreement cpa = ebMSDAO.getCPA(cpaId);
+//			EbMSMessage statusRequest = EbMSMessageUtils.createEbMSStatusRequest(cpa,fromParty,toParty,messageId);
+//			EbMSDocument document = deliveryManager.sendMessage(cpa,statusRequest);
+//			if (document != null)
+//			{
+//				EbMSMessage message = EbMSMessageUtils.getEbMSMessage(document.getMessage(),document.getAttachments());
+//				if (EbMSAction.STATUS_RESPONSE.action().equals(message.getMessageHeader().getAction()) && message.getStatusResponse() != null)
+//					return new MessageStatus(message.getStatusResponse().getTimestamp().toGregorianCalendar().getTime(),EbMSMessageStatus.get(message.getStatusResponse().getMessageStatus()));
+//				else
+//					throw new EbMSMessageServiceException("No valid response received!");
+//			}
+//			else
+//				throw new EbMSMessageServiceException("No response received!");
+//		}
+//		catch (Exception e)
+//		{
+//			throw new EbMSMessageServiceException(e);
+//		}
+//	}
 
 	public void setDeliveryManager(DeliveryManager deliveryManager)
 	{

@@ -19,6 +19,7 @@ public class MessageQueue
 	
 	private LinkedHashMap<String,QueueEntry> queue;
 	private int maxEntries = 128;
+	private int timeout = 60000;
 	
 	public void init()
 	{
@@ -36,14 +37,8 @@ public class MessageQueue
 		;
 	}
 	
-	public EbMSMessage getMessage(EbMSMessage message)
+	public void register(EbMSMessage message)
 	{
-		return getMessage(message,1000);
-	}
-
-	public EbMSMessage getMessage(EbMSMessage message, int sleepTime)
-	{
-		EbMSMessage result = null;
 		String messageId = message.getMessageHeader().getMessageData().getMessageId();
 		synchronized (queue)
 		{
@@ -51,33 +46,43 @@ public class MessageQueue
 				throw new RuntimeException("key " + messageId + " already exists!");
 			queue.put(messageId,new QueueEntry(Thread.currentThread()));
 		}
+	}
+
+	public EbMSMessage getMessage(EbMSMessage message)
+	{
+		return getMessage(message,timeout );
+	}
+
+	public EbMSMessage getMessage(EbMSMessage message, int timeout)
+	{
 		try
 		{
-			Thread.sleep(sleepTime);
+			Thread.sleep(timeout);
+			//Thread.currentThread().wait(timeout);
 		}
 		catch (InterruptedException e)
 		{
 		}
+		EbMSMessage result = null;
+		String messageId = message.getMessageHeader().getMessageData().getMessageId();
 		synchronized (queue)
 		{
 			if (queue.containsKey(messageId))
-			{
-				result = queue.get(messageId).message;
-				queue.remove(messageId);
-			}
+				result = queue.remove(messageId).message;
 		}
 		return result;
 	}
 
 	public void putMessage(EbMSMessage message)
 	{
-		String messageId = message.getMessageHeader().getMessageData().getMessageId();
+		String messageId = message.getMessageHeader().getMessageData().getRefToMessageId();
 		synchronized (queue)
 		{
 			if (queue.containsKey(messageId))
 			{
 				queue.get(messageId).message = message;
 				queue.get(messageId).thread.interrupt();
+				//queue.get(messageId).thread.notify();
 			}
 		}
 	}
@@ -85,5 +90,10 @@ public class MessageQueue
 	public void setMaxEntries(int maxEntries)
 	{
 		this.maxEntries = maxEntries;
+	}
+	
+	public void setTimeout(int timeout)
+	{
+		this.timeout = timeout;
 	}
 }

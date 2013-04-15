@@ -143,6 +143,62 @@ public class EbMSMessageUtils
 		return new EbMSDocument(EbMSMessageUtils.createSOAPMessage(message),message.getAttachments());
 	}
 	
+	public static MessageHeader createMessageHeader(CollaborationProtocolAgreement cpa, String fromParty, String toParty,String action) throws DatatypeConfigurationException
+	{
+		String uuid = UUID.randomUUID().toString();
+		PartyInfo sendingPartyInfo = CPAUtils.getPartyInfo(cpa,fromParty);
+		PartyInfo receivingPartyInfo = CPAUtils.getPartyInfo(cpa,toParty);
+		//PartyInfo receivingPartyInfo = CPAUtils.getOtherReceivingPartyInfo(cpa,context.getFromRole(),context.getServiceType(),context.getService(),context.getAction());
+		DeliveryChannel deliveryChannel = CPAUtils.getDeliveryChannel(sendingPartyInfo.getCollaborationRole().get(0).getServiceBinding().getCanSend().get(0).getThisPartyActionBinding());
+		String hostname = CPAUtils.getHostname(deliveryChannel);
+
+		MessageHeader messageHeader = new MessageHeader();
+
+		messageHeader.setVersion(Constants.EBMS_VERSION);
+		messageHeader.setMustUnderstand(true);
+
+		messageHeader.setCPAId(cpa.getCpaid());
+		messageHeader.setConversationId(uuid);
+		
+		messageHeader.setFrom(new From());
+		PartyId from = new PartyId();
+		from.setType(sendingPartyInfo.getPartyId().get(0).getType());
+		from.setValue(sendingPartyInfo.getPartyId().get(0).getValue());
+		messageHeader.getFrom().getPartyId().add(from);
+		messageHeader.getFrom().setRole(sendingPartyInfo.getCollaborationRole().get(0).getRole().getName());
+
+		messageHeader.setTo(new To());
+		PartyId to = new PartyId();
+		to.setType(receivingPartyInfo.getPartyId().get(0).getType());
+		to.setValue(receivingPartyInfo.getPartyId().get(0).getValue());
+		messageHeader.getTo().getPartyId().add(to);
+		messageHeader.getTo().setRole(receivingPartyInfo.getCollaborationRole().get(0).getRole().getName());
+		
+		messageHeader.setService(new Service());
+		messageHeader.getService().setType(null);
+		messageHeader.getService().setValue(Constants.EBMS_SERVICE_URI);
+		messageHeader.setAction(action);
+
+		messageHeader.setMessageData(new MessageData());
+		messageHeader.getMessageData().setMessageId(uuid + "@" + hostname);
+		//messageHeader.getMessageData().setRefToMessageId(null);
+		messageHeader.getMessageData().setTimestamp(DatatypeFactory.newInstance().newXMLGregorianCalendar(new GregorianCalendar()));
+
+		ReliableMessaging rm = CPAUtils.getReliableMessaging(cpa,messageHeader);
+		if (rm != null)
+		{
+			GregorianCalendar timestamp = messageHeader.getMessageData().getTimestamp().toGregorianCalendar();
+			Duration d = rm.getRetryInterval().multiply(rm.getRetries().add(new BigInteger("1")).intValue());
+			d.addTo(timestamp);
+			timestamp.add(Calendar.SECOND,1);
+			messageHeader.getMessageData().setTimeToLive(DatatypeFactory.newInstance().newXMLGregorianCalendar(timestamp));
+		}
+
+		//messageHeader.setDuplicateElimination(PerMessageCharacteristicsType.ALWAYS.equals(deliveryChannel.getMessagingCharacteristics().getDuplicateElimination()) ? "" : null);
+		
+		return messageHeader;
+	}
+
 	public static MessageHeader createMessageHeader(CollaborationProtocolAgreement cpa, EbMSMessageContext context) throws DatatypeConfigurationException
 	{
 		String uuid = UUID.randomUUID().toString();
@@ -346,10 +402,9 @@ public class EbMSMessageUtils
 		return new EbMSMessage(messageHeader,acknowledgment);
 	}
 	
-	public static EbMSMessage createEbMSPing(CollaborationProtocolAgreement cpa, String fromRole, String toRole) throws DatatypeConfigurationException, JAXBException
+	public static EbMSMessage createEbMSPing(CollaborationProtocolAgreement cpa, String fromParty, String toParty) throws DatatypeConfigurationException, JAXBException
 	{
-		EbMSMessageContext context = new EbMSMessageContext(cpa.getCpaid(),fromRole,toRole,Constants.EBMS_SERVICE_URI,EbMSAction.PING.action());
-		return new EbMSMessage(createMessageHeader(cpa,context));
+		return new EbMSMessage(createMessageHeader(cpa,fromParty,toParty,EbMSAction.PING.action()));
 	}
 	
 	public static EbMSMessage createEbMSPong(CollaborationProtocolAgreement cpa, EbMSMessage ping) throws DatatypeConfigurationException, JAXBException
@@ -357,10 +412,9 @@ public class EbMSMessageUtils
 		return new EbMSMessage(createMessageHeader(cpa,ping.getMessageHeader(),new GregorianCalendar(),EbMSAction.PONG));
 	}
 	
-	public static EbMSMessage createEbMSStatusRequest(CollaborationProtocolAgreement cpa, String fromRole, String toRole, String messageId) throws DatatypeConfigurationException, JAXBException
+	public static EbMSMessage createEbMSStatusRequest(CollaborationProtocolAgreement cpa, String fromParty, String toParty, String messageId) throws DatatypeConfigurationException, JAXBException
 	{
-		EbMSMessageContext context = new EbMSMessageContext(cpa.getCpaid(),fromRole,toRole,Constants.EBMS_SERVICE_URI,EbMSAction.STATUS_REQUEST.action());
-		MessageHeader messageHeader = createMessageHeader(cpa,context);
+		MessageHeader messageHeader = createMessageHeader(cpa,fromParty,toParty,EbMSAction.STATUS_REQUEST.action());
 		StatusRequest statusRequest = createStatusRequest(messageId);
 		EbMSMessage request = new EbMSMessage(messageHeader,statusRequest);
 		return request;

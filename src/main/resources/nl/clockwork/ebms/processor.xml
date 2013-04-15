@@ -28,13 +28,15 @@
 		<property name="ebMSDAO" ref="ebMSDAO"/>
 	</bean>
 
-	<bean id="deliveryManager" class="nl.clockwork.ebms.client.DeliveryManager">
+	<bean id="deliveryManager" class="nl.clockwork.ebms.client.DeliveryManager" init-method="init">
 		<property name="maxThreads" value="${deliveryManager.maxTreads}"/>
 		<property name="messageQueue" ref="messageQueue"/>
+		<property name="ebMSClient" ref="ebMSClient"/>
 	</bean>
 
-	<bean id="messageQueue" class="nl.clockwork.ebms.client.MessageQueue">
+	<bean id="messageQueue" class="nl.clockwork.ebms.client.MessageQueue" init-method="init">
 		<property name="maxEntries" value="${messageQueue.maxEntries}"/>
+		<property name="timeout" value="${messageQueue.timeout}"/>
 	</bean>
 
 	<bean id="httpHandler" class="nl.clockwork.ebms.server.EbMSHttpHandlerImpl">
