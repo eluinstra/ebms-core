@@ -41,10 +41,18 @@ public class Constants
 			return null;
 		}
 
-		public final static EbMSMessageStatus get(String id)
+		public final static EbMSMessageStatus get(String name)
 		{
 			for (EbMSMessageStatus status : EbMSMessageStatus.values())
-				if (status.name().equals(id))
+				if (status.name().equals(name))
+					return status;
+			return null;
+		}
+
+		public final static EbMSMessageStatus get(MessageStatusType statusCode)
+		{
+			for (EbMSMessageStatus status : EbMSMessageStatus.values())
+				if (status.statusCode().equals(statusCode))
 					return status;
 			return null;
 		}
