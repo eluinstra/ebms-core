@@ -78,10 +78,16 @@ public class EbMSSecSignatureGenerator implements EbMSSignatureGenerator
 				{
 					X509Certificate certificate = CPAUtils.getX509Certificate(CPAUtils.getSigningCertificate(channels.get(0)));
 					String alias = keyStore.getCertificateAlias(certificate);
+					if (alias == null)
+						throw new EbMSProcessorException("No certificate found with subject \"" + certificate.getSubjectDN().getName() + "\" in keystore \"" + keyStorePath + "\"");
 					KeyPair keyPair = SecurityUtils.getKeyPair(keyStore,alias,keyStorePassword);
 					sign(keyStore,keyPair,alias,document.getMessage(),document.getAttachments(),CPAUtils.getSignatureAlgorithm(receiverNonRepudiation),CPAUtils.getHashFunction(receiverNonRepudiation));
 				}
 			}
+		}
+		catch (EbMSProcessorException e)
+		{
+			throw e;
 		}
 		catch (Exception e)
 		{
