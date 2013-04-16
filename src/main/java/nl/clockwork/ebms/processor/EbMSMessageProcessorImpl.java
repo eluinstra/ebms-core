@@ -62,7 +62,7 @@ public class EbMSMessageProcessorImpl implements EbMSMessageProcessor
 {
   protected transient Log logger = LogFactory.getLog(getClass());
 	private DeliveryManager deliveryManager;
-  private MessageQueue messageQueue;
+  private MessageQueue<EbMSMessage> messageQueue;
   private EbMSDAO ebMSDAO;
   private EbMSSignatureValidator signatureValidator;
   private CPAValidator cpaValidator;
@@ -329,7 +329,7 @@ public class EbMSMessageProcessorImpl implements EbMSMessageProcessor
 		this.deliveryManager = deliveryManager;
 	}
 	
-	public void setMessageQueue(MessageQueue messageQueue)
+	public void setMessageQueue(MessageQueue<EbMSMessage> messageQueue)
 	{
 		this.messageQueue = messageQueue;
 	}
