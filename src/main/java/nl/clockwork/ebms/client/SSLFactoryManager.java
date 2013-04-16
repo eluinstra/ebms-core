@@ -112,9 +112,12 @@ public class SSLFactoryManager
 		kmf.init(keyStore,keyStorePassword.toCharArray());
 
 		if (clientAlias != null)
-			for (KeyManager keyManager : kmf.getKeyManagers())
-				if (keyManager instanceof X509KeyManager)
-					keyManager = new EbMSX509KeyManager((X509KeyManager)keyManager,clientAlias);
+		{
+			KeyManager[] keyManagers = kmf.getKeyManagers();
+			for (int i = 0; i < keyManagers.length; i++)
+				if (keyManagers[i] instanceof X509KeyManager)
+					keyManagers[i] = new EbMSX509KeyManager((X509KeyManager)keyManagers[i],clientAlias);
+		}
 
 		//TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
 		TrustManagerFactory tmf = TrustManagerFactory.getInstance("SunX509");
