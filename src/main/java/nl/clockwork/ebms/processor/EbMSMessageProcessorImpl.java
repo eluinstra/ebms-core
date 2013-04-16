@@ -85,7 +85,7 @@ public class EbMSMessageProcessorImpl implements EbMSMessageProcessor
 	}
 	
 	@Override
-	public EbMSDocument process(EbMSDocument document) throws EbMSProcessorException
+	public EbMSDocument processRequest(EbMSDocument document) throws EbMSProcessorException
 	{
 		try
 		{
@@ -131,6 +131,41 @@ public class EbMSMessageProcessorImpl implements EbMSMessageProcessor
 			else
 				// TODO create messageError???
 				return null;
+		}
+		catch (Exception e)
+		{
+			throw new EbMSProcessorException(e);
+		}
+	}
+	
+	@Override
+	public void processResponse(EbMSDocument document) throws EbMSProcessorException
+	{
+		try
+		{
+			xsdValidator.validate(document.getMessage());
+			GregorianCalendar timestamp = new GregorianCalendar();
+			final EbMSMessage message = EbMSMessageUtils.getEbMSMessage(document.getMessage(),document.getAttachments());
+			//final CollaborationProtocolAgreement cpa = ebMSDAO.getCPA(message.getMessageHeader().getCPAId());
+			if (Constants.EBMS_SERVICE_URI.equals(message.getMessageHeader().getService().getValue()))
+			{
+				if (EbMSAction.MESSAGE_ERROR.action().equals(message.getMessageHeader().getAction()))
+				{
+					process(timestamp,message,EbMSMessageStatus.DELIVERY_FAILED);
+				}
+				else if (EbMSAction.ACKNOWLEDGMENT.action().equals(message.getMessageHeader().getAction()))
+				{
+					process(timestamp,message,EbMSMessageStatus.DELIVERED);
+				}
+				else if (EbMSAction.STATUS_RESPONSE.action().equals(message.getMessageHeader().getAction()))
+				{
+					messageQueue.put(message.getMessageHeader().getMessageData().getRefToMessageId(),message);
+				}
+				else if (EbMSAction.PONG.action().equals(message.getMessageHeader().getAction()))
+				{
+					messageQueue.put(message.getMessageHeader().getMessageData().getRefToMessageId(),message);
+				}
+			}
 		}
 		catch (Exception e)
 		{

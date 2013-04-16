@@ -53,7 +53,7 @@ public abstract class EbMSInputStreamHandlerImpl implements EbMSInputStreamHandl
 				EbMSDocument in = messageReader.read(request);
 				if (logger.isInfoEnabled())
 					logger.info("IN:\n" + DOMUtils.toString(in.getMessage()));
-				EbMSDocument out = messageProcessor.process(in);
+				EbMSDocument out = messageProcessor.processRequest(in);
 				if (out == null)
 				{
 					if (logger.isInfoEnabled())

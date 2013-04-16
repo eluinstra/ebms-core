@@ -43,7 +43,7 @@ public class EbMSHttpHandlerImpl implements EbMSHttpHandler
 				EbMSDocument in = messageReader.read(request.getInputStream());
 				if (logger.isInfoEnabled())
 					logger.info("IN:\n" + DOMUtils.toString(in.getMessage()));
-				EbMSDocument out = messageProcessor.process(in);
+				EbMSDocument out = messageProcessor.processRequest(in);
 				if (out == null)
 				{
 					if (logger.isInfoEnabled())

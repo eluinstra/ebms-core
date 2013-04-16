@@ -78,7 +78,7 @@ public class ProcessSendEvents implements Job
 					  		String uri = CPAUtils.getUri(cpa,message);
 					  		EbMSDocument responseDocument = ebMSClient.sendMessage(uri,document);
 					  		if (!(responseDocument == null || (responseDocument instanceof EbMSResponseDocument && ((EbMSResponseDocument)responseDocument).getMessage() == null)))
-					  			ebMSMessageProcessor.process(responseDocument);
+					  			ebMSMessageProcessor.processResponse(responseDocument);
 					  		updateEvent(sendEvent,EbMSEventStatus.PROCESSED);
 							}
 							catch (Exception e)

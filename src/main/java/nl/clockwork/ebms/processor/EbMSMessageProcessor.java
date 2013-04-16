@@ -17,8 +17,8 @@ package nl.clockwork.ebms.processor;
 
 import nl.clockwork.ebms.model.EbMSDocument;
 
-
 public interface EbMSMessageProcessor
 {
-	EbMSDocument process(EbMSDocument document) throws EbMSProcessorException;
+	EbMSDocument processRequest(EbMSDocument document) throws EbMSProcessorException;
+	void processResponse(EbMSDocument document) throws EbMSProcessorException;
 }
