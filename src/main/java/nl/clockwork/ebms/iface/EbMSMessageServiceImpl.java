@@ -172,7 +172,7 @@ public class EbMSMessageServiceImpl implements EbMSMessageService
 			{
 				EbMSMessage message = EbMSMessageUtils.getEbMSMessage(document.getMessage(),document.getAttachments());
 				if (EbMSAction.STATUS_RESPONSE.action().equals(message.getMessageHeader().getAction()) && message.getStatusResponse() != null)
-					return new MessageStatus(message.getStatusResponse().getTimestamp().toGregorianCalendar().getTime(),EbMSMessageStatus.get(message.getStatusResponse().getMessageStatus()));
+					return new MessageStatus(message.getStatusResponse().getTimestamp() == null ? null : message.getStatusResponse().getTimestamp().toGregorianCalendar().getTime(),EbMSMessageStatus.get(message.getStatusResponse().getMessageStatus()));
 				else
 					throw new EbMSMessageServiceException("No valid response received!");
 			}

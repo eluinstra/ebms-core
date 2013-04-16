@@ -165,14 +165,14 @@ public class EbMSMessageUtils
 		from.setType(sendingPartyInfo.getPartyId().get(0).getType());
 		from.setValue(sendingPartyInfo.getPartyId().get(0).getValue());
 		messageHeader.getFrom().getPartyId().add(from);
-		messageHeader.getFrom().setRole(sendingPartyInfo.getCollaborationRole().get(0).getRole().getName());
+		//messageHeader.getFrom().setRole(sendingPartyInfo.getCollaborationRole().get(0).getRole().getName());
 
 		messageHeader.setTo(new To());
 		PartyId to = new PartyId();
 		to.setType(receivingPartyInfo.getPartyId().get(0).getType());
 		to.setValue(receivingPartyInfo.getPartyId().get(0).getValue());
 		messageHeader.getTo().getPartyId().add(to);
-		messageHeader.getTo().setRole(receivingPartyInfo.getCollaborationRole().get(0).getRole().getName());
+		//messageHeader.getTo().setRole(receivingPartyInfo.getCollaborationRole().get(0).getRole().getName());
 		
 		messageHeader.setService(new Service());
 		messageHeader.getService().setType(null);

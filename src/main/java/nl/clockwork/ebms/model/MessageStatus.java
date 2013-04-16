@@ -23,9 +23,19 @@ public class MessageStatus
 	{
 		return timestamp;
 	}
+	
+	public void setTimestamp(Date timestamp)
+	{
+		this.timestamp = timestamp;
+	}
 
 	public EbMSMessageStatus getStatus()
 	{
 		return status;
+	}
+	
+	public void setStatus(EbMSMessageStatus status)
+	{
+		this.status = status;
 	}
 }
