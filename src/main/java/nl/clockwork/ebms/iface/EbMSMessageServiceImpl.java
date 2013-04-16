@@ -128,8 +128,6 @@ public class EbMSMessageServiceImpl implements EbMSMessageService
 		catch (Exception e)
 		{
 			throw new EbMSMessageServiceException(e);
-			//logger.warn("",e);
-			//return null;
 		}
 	}
 
