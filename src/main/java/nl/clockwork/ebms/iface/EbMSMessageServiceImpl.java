@@ -99,7 +99,6 @@ public class EbMSMessageServiceImpl implements EbMSMessageService
 	{
 		try
 		{
-			//FIXME use messageContext
 			if (maxNr == null)
 				return ebMSDAO.getMessageIds(messageContext,EbMSMessageStatus.RECEIVED);
 			else
