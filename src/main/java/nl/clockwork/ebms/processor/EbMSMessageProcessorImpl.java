@@ -148,24 +148,10 @@ public class EbMSMessageProcessorImpl implements EbMSMessageProcessor
 			final EbMSMessage message = EbMSMessageUtils.getEbMSMessage(document.getMessage(),document.getAttachments());
 			//final CollaborationProtocolAgreement cpa = ebMSDAO.getCPA(message.getMessageHeader().getCPAId());
 			if (Constants.EBMS_SERVICE_URI.equals(message.getMessageHeader().getService().getValue()))
-			{
 				if (EbMSAction.MESSAGE_ERROR.action().equals(message.getMessageHeader().getAction()))
-				{
 					process(timestamp,message,EbMSMessageStatus.DELIVERY_FAILED);
-				}
 				else if (EbMSAction.ACKNOWLEDGMENT.action().equals(message.getMessageHeader().getAction()))
-				{
 					process(timestamp,message,EbMSMessageStatus.DELIVERED);
-				}
-				else if (EbMSAction.STATUS_RESPONSE.action().equals(message.getMessageHeader().getAction()))
-				{
-					messageQueue.put(message.getMessageHeader().getMessageData().getRefToMessageId(),message);
-				}
-				else if (EbMSAction.PONG.action().equals(message.getMessageHeader().getAction()))
-				{
-					messageQueue.put(message.getMessageHeader().getMessageData().getRefToMessageId(),message);
-				}
-			}
 		}
 		catch (Exception e)
 		{
