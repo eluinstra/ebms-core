@@ -26,7 +26,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.namespace.QName;
 
 import nl.clockwork.ebms.Constants.EbMSMessageStatus;
-import nl.clockwork.ebms.common.util.XMLMessageBuilder;
+import nl.clockwork.ebms.common.XMLMessageBuilder;
 import nl.clockwork.ebms.dao.DAOException;
 import nl.clockwork.ebms.dao.spring.AbstractEbMSDAO;
 import nl.clockwork.ebms.model.EbMSAttachment;
