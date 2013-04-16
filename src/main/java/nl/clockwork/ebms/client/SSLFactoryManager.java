@@ -34,6 +34,8 @@ import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManagerFactory;
 import javax.net.ssl.X509KeyManager;
 
+import org.apache.commons.lang.StringUtils;
+
 import nl.clockwork.ebms.common.util.SecurityUtils;
 
 public class SSLFactoryManager
@@ -58,10 +60,7 @@ public class SSLFactoryManager
 		@Override
 		public String chooseClientAlias(String[] keyType, Principal[] issuers, Socket socket)
 		{
-			if (clientAlias != null)
-				return clientAlias;
-			else
-				return standardKeyManager.chooseClientAlias(keyType,issuers,socket);
+			return clientAlias;
 		}
 
 		@Override
@@ -111,7 +110,7 @@ public class SSLFactoryManager
 		KeyManagerFactory kmf = KeyManagerFactory.getInstance("SunX509");
 		kmf.init(keyStore,keyStorePassword.toCharArray());
 
-		if (clientAlias != null)
+		if (!StringUtils.isEmpty(clientAlias))
 		{
 			KeyManager[] keyManagers = kmf.getKeyManagers();
 			for (int i = 0; i < keyManagers.length; i++)
