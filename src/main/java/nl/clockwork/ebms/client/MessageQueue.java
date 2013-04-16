@@ -84,19 +84,6 @@ public class MessageQueue
 		}
 	}
 	
-	public void putEmptyMessage(String correlationId)
-	{
-		synchronized (queue)
-		{
-			if (queue.containsKey(correlationId))
-			{
-				queue.get(correlationId).message = null;
-				queue.get(correlationId).thread.interrupt();
-				//queue.get(correlationId).thread.notify();
-			}
-		}
-	}
-
 	public void setMaxEntries(int maxEntries)
 	{
 		this.maxEntries = maxEntries;

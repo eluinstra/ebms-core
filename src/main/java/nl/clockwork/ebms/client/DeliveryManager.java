@@ -53,7 +53,7 @@ public class DeliveryManager //DeliveryService
 						}
 						catch (Exception e)
 						{
-							messageQueue.putEmptyMessage(message.getMessageHeader().getMessageData().getMessageId());
+							messageQueue.putMessage(message.getMessageHeader().getMessageData().getMessageId(),null);
 							logger.error("",e);
 						}
 					}
