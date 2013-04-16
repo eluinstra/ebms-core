@@ -53,6 +53,7 @@ import nl.clockwork.ebms.validation.ManifestValidator;
 import nl.clockwork.ebms.validation.MessageHeaderValidator;
 import nl.clockwork.ebms.validation.SignatureTypeValidator;
 import nl.clockwork.ebms.validation.ValidatorException;
+import nl.clockwork.ebms.validation.XSDValidator;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -65,6 +66,7 @@ public class EbMSMessageProcessorImpl implements EbMSMessageProcessor
   private MessageQueue<EbMSMessage> messageQueue;
   private EbMSDAO ebMSDAO;
   private EbMSSignatureValidator signatureValidator;
+	private XSDValidator xsdValidator;
   private CPAValidator cpaValidator;
   private MessageHeaderValidator messageHeaderValidator;
   private ManifestValidator manifestValidator;
@@ -73,6 +75,7 @@ public class EbMSMessageProcessorImpl implements EbMSMessageProcessor
   
 	public void init()
 	{
+		xsdValidator = new XSDValidator("/nl/clockwork/ebms/xsd/msg-header-2_0.xsd");
 		cpaValidator = new CPAValidator();
 		messageHeaderValidator = new MessageHeaderValidator(ebMSDAO);
 		manifestValidator = new ManifestValidator();
@@ -86,6 +89,7 @@ public class EbMSMessageProcessorImpl implements EbMSMessageProcessor
 	{
 		try
 		{
+			xsdValidator.validate(document.getMessage());
 			GregorianCalendar timestamp = new GregorianCalendar();
 			final EbMSMessage message = EbMSMessageUtils.getEbMSMessage(document.getMessage(),document.getAttachments());
 			final CollaborationProtocolAgreement cpa = ebMSDAO.getCPA(message.getMessageHeader().getCPAId());
