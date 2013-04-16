@@ -1,14 +1,7 @@
 package nl.clockwork.ebms.client;
 
-import java.io.IOException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-
-import javax.xml.bind.JAXBException;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.soap.SOAPException;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactoryConfigurationError;
 
 import nl.clockwork.ebms.common.MessageQueue;
 import nl.clockwork.ebms.model.EbMSDocument;
@@ -21,7 +14,6 @@ import nl.clockwork.ebms.util.EbMSMessageUtils;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.xml.sax.SAXException;
 
 public class DeliveryManager //DeliveryService
 {
@@ -79,34 +71,41 @@ public class DeliveryManager //DeliveryService
 		}
 	}
 
-	public EbMSDocument handleResponseMessage(final CollaborationProtocolAgreement cpa, final EbMSMessage message, final EbMSMessage response) throws SOAPException, JAXBException, ParserConfigurationException, SAXException, IOException, TransformerFactoryConfigurationError, TransformerException
+	public EbMSDocument handleResponseMessage(final CollaborationProtocolAgreement cpa, final EbMSMessage message, final EbMSMessage response) throws EbMSProcessorException
 	{
-		if (response != null)
+		try
 		{
-			if (message.getSyncReply() == null)
+			if (response != null)
 			{
-				Runnable command = new Runnable()
+				if (message.getSyncReply() == null)
 				{
-					@Override
-					public void run()
+					Runnable command = new Runnable()
 					{
-						try
+						@Override
+						public void run()
 						{
-							String uri = CPAUtils.getUri(cpa,response);
-							ebMSClient.sendMessage(uri,EbMSMessageUtils.getEbMSDocument(response));
+							try
+							{
+								String uri = CPAUtils.getUri(cpa,response);
+								ebMSClient.sendMessage(uri,EbMSMessageUtils.getEbMSDocument(response));
+							}
+							catch (Exception e)
+							{
+								logger.error("",e);
+							}
 						}
-						catch (Exception e)
-						{
-							logger.error("",e);
-						}
-					}
-				};
-				executorService.execute(command);
+					};
+					executorService.execute(command);
+				}
+				else
+					return EbMSMessageUtils.getEbMSDocument(response);
 			}
-			else
-				return EbMSMessageUtils.getEbMSDocument(response);
+			return null;
 		}
-		return null;
+		catch (Exception e)
+		{
+			throw new EbMSProcessorException(e);
+		}
 	}
 
 	public void setMaxThreads(int maxThreads)

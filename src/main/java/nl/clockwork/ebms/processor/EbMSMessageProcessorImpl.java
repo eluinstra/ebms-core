@@ -132,6 +132,10 @@ public class EbMSMessageProcessorImpl implements EbMSMessageProcessor
 				// TODO create messageError???
 				return null;
 		}
+		catch (EbMSProcessorException e)
+		{
+			throw e;
+		}
 		catch (Exception e)
 		{
 			throw new EbMSProcessorException(e);
