@@ -4,6 +4,7 @@
 
 - implement syncReply
 - implement ackRequested
+- implement encryption
 - improve Service models:
 	- add jaxb annotations?
 
