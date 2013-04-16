@@ -1,15 +1,13 @@
-package nl.clockwork.ebms.client;
+package nl.clockwork.ebms.common;
 
 import java.util.LinkedHashMap;
 
-import nl.clockwork.ebms.model.EbMSMessage;
-
-public class MessageQueue
+public class MessageQueue<T>
 {
-	private class QueueEntry
+	private class QueueEntry<U>
 	{
 		public Thread thread;
-		public EbMSMessage message;
+		public U object;
 		
 		public QueueEntry(Thread thread)
 		{
@@ -17,19 +15,19 @@ public class MessageQueue
 		}
 	}
 	
-	private LinkedHashMap<String,QueueEntry> queue;
+	private LinkedHashMap<String,QueueEntry<T>> queue;
 	private int maxEntries = 128;
 	private int timeout = 60000;
 	
 	public void init()
 	{
 		queue = 
-			new LinkedHashMap<String,QueueEntry>(maxEntries + 1,.75F,true)
+			new LinkedHashMap<String,QueueEntry<T>>(maxEntries + 1,.75F,true)
 			{
 				private static final long serialVersionUID = 1L;
 
 				@Override
-				protected boolean removeEldestEntry(java.util.Map.Entry<String,QueueEntry> eldest)
+				protected boolean removeEldestEntry(java.util.Map.Entry<String,QueueEntry<T>> eldest)
 				{
 					return size() > maxEntries;
 				}
@@ -43,16 +41,16 @@ public class MessageQueue
 		{
 			if (queue.containsKey(correlationId))
 				throw new RuntimeException("key " + correlationId + " already exists!");
-			queue.put(correlationId,new QueueEntry(Thread.currentThread()));
+			queue.put(correlationId,new QueueEntry<T>(Thread.currentThread()));
 		}
 	}
 
-	public EbMSMessage getMessage(String correlationId)
+	public T get(String correlationId)
 	{
-		return getMessage(correlationId,timeout);
+		return get(correlationId,timeout);
 	}
 
-	public EbMSMessage getMessage(String correlationId, int timeout)
+	public T get(String correlationId, int timeout)
 	{
 		try
 		{
@@ -62,22 +60,22 @@ public class MessageQueue
 		catch (InterruptedException e)
 		{
 		}
-		EbMSMessage result = null;
+		T result = null;
 		synchronized (queue)
 		{
 			if (queue.containsKey(correlationId))
-				result = queue.remove(correlationId).message;
+				result = queue.remove(correlationId).object;
 		}
 		return result;
 	}
 
-	public void putMessage(String correlationId, EbMSMessage message)
+	public void put(String correlationId, T object)
 	{
 		synchronized (queue)
 		{
 			if (queue.containsKey(correlationId))
 			{
-				queue.get(correlationId).message = message;
+				queue.get(correlationId).object = object;
 				queue.get(correlationId).thread.interrupt();
 				//queue.get(correlationId).thread.notify();
 			}

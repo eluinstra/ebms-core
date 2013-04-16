@@ -34,7 +34,7 @@
 		<property name="ebMSClient" ref="ebMSClient"/>
 	</bean>
 
-	<bean id="messageQueue" class="nl.clockwork.ebms.client.MessageQueue" init-method="init">
+	<bean id="messageQueue" class="nl.clockwork.ebms.client.EbMSMessageQueue" init-method="init">
 		<property name="maxEntries" value="${messageQueue.maxEntries}"/>
 		<property name="timeout" value="${messageQueue.timeout}"/>
 	</bean>

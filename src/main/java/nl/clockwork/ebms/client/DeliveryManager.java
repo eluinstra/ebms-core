@@ -10,6 +10,7 @@ import javax.xml.soap.SOAPException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactoryConfigurationError;
 
+import nl.clockwork.ebms.common.MessageQueue;
 import nl.clockwork.ebms.model.EbMSDocument;
 import nl.clockwork.ebms.model.EbMSMessage;
 import nl.clockwork.ebms.model.cpp.cpa.CollaborationProtocolAgreement;
@@ -27,7 +28,7 @@ public class DeliveryManager //DeliveryService
 	protected transient Log logger = LogFactory.getLog(getClass());
   private ExecutorService executorService;
   private int maxThreads = 4;
-  private MessageQueue messageQueue;
+  private MessageQueue<EbMSMessage> messageQueue;
 	private EbMSClient ebMSClient;
 
 	public void init()
@@ -53,14 +54,14 @@ public class DeliveryManager //DeliveryService
 						}
 						catch (Exception e)
 						{
-							messageQueue.putMessage(message.getMessageHeader().getMessageData().getMessageId(),null);
+							messageQueue.put(message.getMessageHeader().getMessageData().getMessageId(),null);
 							logger.error("",e);
 						}
 					}
 				};
 				messageQueue.register(message.getMessageHeader().getMessageData().getMessageId());
 				executorService.execute(command);
-				EbMSMessage response = messageQueue.getMessage(message.getMessageHeader().getMessageData().getMessageId());
+				EbMSMessage response = messageQueue.get(message.getMessageHeader().getMessageData().getMessageId());
 				if (response != null)
 					return EbMSMessageUtils.getEbMSDocument(response);
 			}
@@ -113,7 +114,7 @@ public class DeliveryManager //DeliveryService
 		this.maxThreads = maxThreads;
 	}
 
-	public void setMessageQueue(MessageQueue messageQueue)
+	public void setMessageQueue(MessageQueue<EbMSMessage> messageQueue)
 	{
 		this.messageQueue = messageQueue;
 	}
