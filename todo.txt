@@ -1,12 +1,11 @@
-- validate xml message
-- test MessageStatus service
 - test multiple certificates in keystore
+- generate soap fault on error
 - change sendEvent generation: store one event per message (and calculate the following after current is handled if necessary)
 
 - implement syncReply
 - implement ackRequested
 - improve Service models:
-	- add jaxb annotations
+	- add jaxb annotations?
 
 - make EbMSMessageProcessor event driven
 	- implement eventManager
