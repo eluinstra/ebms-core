@@ -110,20 +110,18 @@ public class SSLFactoryManager
 		KeyManagerFactory kmf = KeyManagerFactory.getInstance("SunX509");
 		kmf.init(keyStore,keyStorePassword.toCharArray());
 
+		KeyManager[] keyManagers = kmf.getKeyManagers();
 		if (!StringUtils.isEmpty(clientAlias))
-		{
-			KeyManager[] keyManagers = kmf.getKeyManagers();
 			for (int i = 0; i < keyManagers.length; i++)
 				if (keyManagers[i] instanceof X509KeyManager)
 					keyManagers[i] = new EbMSX509KeyManager((X509KeyManager)keyManagers[i],clientAlias);
-		}
 
 		//TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
 		TrustManagerFactory tmf = TrustManagerFactory.getInstance("SunX509");
 		tmf.init(trustStore);
 
 		SSLContext sslContext = SSLContext.getInstance("TLS");
-		sslContext.init(kmf.getKeyManagers(),tmf.getTrustManagers(),null);
+		sslContext.init(keyManagers,tmf.getTrustManagers(),null);
 
 		//SSLEngine engine = sslContext.createSSLEngine(hostname, port);
 		SSLEngine engine = sslContext.createSSLEngine();
