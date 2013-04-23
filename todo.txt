@@ -2,6 +2,10 @@
 - generate soap fault on error
 - change sendEvent generation: store one event per message (and calculate the following after current is handled if necessary)
 
+- let DeliveryManager work with EbMSDocument instead of EbMSMessage?
+	- change messageQueue from EbMSMessage to EbMSDocument
+	- get messageId from EbMSDocument
+
 - implement syncReply
 - implement ackRequested
 - implement encryption
