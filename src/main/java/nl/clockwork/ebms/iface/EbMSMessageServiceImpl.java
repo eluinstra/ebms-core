@@ -60,6 +60,10 @@ public class EbMSMessageServiceImpl implements EbMSMessageService
 			else
 				throw new EbMSMessageServiceException("No response received!");
 		}
+		catch (EbMSMessageServiceException e)
+		{
+			throw e;
+		}
 		catch (Exception e)
 		{
 			throw new EbMSMessageServiceException(e);
