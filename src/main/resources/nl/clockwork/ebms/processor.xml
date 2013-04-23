@@ -45,7 +45,6 @@
 
 	<bean id="messageProcessor" class="nl.clockwork.ebms.processor.EbMSMessageProcessorImpl" init-method="init">
 		<property name="deliveryManager" ref="deliveryManager"/>
-		<property name="messageQueue" ref="messageQueue"/>
 		<property name="ebMSDAO" ref="ebMSDAO"/>
 		<property name="signatureValidator" ref="signatureValidator"/>
 	</bean>

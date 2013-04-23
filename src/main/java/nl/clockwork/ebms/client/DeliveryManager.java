@@ -71,6 +71,11 @@ public class DeliveryManager //DeliveryService
 		}
 	}
 
+	public void handleResponseMessage(final EbMSMessage message) throws EbMSProcessorException
+	{
+		messageQueue.put(message.getMessageHeader().getMessageData().getRefToMessageId(),message);
+	}
+	
 	public EbMSDocument handleResponseMessage(final CollaborationProtocolAgreement cpa, final EbMSMessage message, final EbMSMessage response) throws EbMSProcessorException
 	{
 		try

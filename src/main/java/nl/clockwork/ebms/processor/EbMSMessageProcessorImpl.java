@@ -32,7 +32,6 @@ import nl.clockwork.ebms.Constants.EbMSAction;
 import nl.clockwork.ebms.Constants.EbMSEventStatus;
 import nl.clockwork.ebms.Constants.EbMSMessageStatus;
 import nl.clockwork.ebms.client.DeliveryManager;
-import nl.clockwork.ebms.common.MessageQueue;
 import nl.clockwork.ebms.dao.DAOException;
 import nl.clockwork.ebms.dao.DAOTransactionCallback;
 import nl.clockwork.ebms.dao.EbMSDAO;
@@ -63,7 +62,6 @@ public class EbMSMessageProcessorImpl implements EbMSMessageProcessor
 {
   protected transient Log logger = LogFactory.getLog(getClass());
 	private DeliveryManager deliveryManager;
-  private MessageQueue<EbMSMessage> messageQueue;
   private EbMSDAO ebMSDAO;
   private EbMSSignatureValidator signatureValidator;
 	private XSDValidator xsdValidator;
@@ -115,7 +113,7 @@ public class EbMSMessageProcessorImpl implements EbMSMessageProcessor
 			}
 			else if (EbMSAction.STATUS_RESPONSE.action().equals(message.getMessageHeader().getAction()))
 			{
-				messageQueue.put(message.getMessageHeader().getMessageData().getRefToMessageId(),message);
+				deliveryManager.handleResponseMessage(message);
 				return null;
 			}
 			else if (EbMSAction.PING.action().equals(message.getMessageHeader().getAction()))
@@ -125,7 +123,7 @@ public class EbMSMessageProcessorImpl implements EbMSMessageProcessor
 			}
 			else if (EbMSAction.PONG.action().equals(message.getMessageHeader().getAction()))
 			{
-				messageQueue.put(message.getMessageHeader().getMessageData().getRefToMessageId(),message);
+				deliveryManager.handleResponseMessage(message);
 				return null;
 			}
 			else
@@ -358,11 +356,6 @@ public class EbMSMessageProcessorImpl implements EbMSMessageProcessor
 		this.deliveryManager = deliveryManager;
 	}
 	
-	public void setMessageQueue(MessageQueue<EbMSMessage> messageQueue)
-	{
-		this.messageQueue = messageQueue;
-	}
-
 	public void setEbMSDAO(EbMSDAO ebMSDAO)
 	{
 		this.ebMSDAO = ebMSDAO;
