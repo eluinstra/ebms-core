@@ -16,6 +16,8 @@
 package nl.clockwork.ebms.client;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.StringReader;
 import java.net.ConnectException;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -38,6 +40,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.w3c.dom.Document;
+import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 public class EbMSHttpClient implements EbMSClient
@@ -92,18 +95,19 @@ public class EbMSHttpClient implements EbMSClient
 
 	private EbMSResponseDocument handleResponse(HttpURLConnection connection) throws IOException, EbMSProcessorException, TransformerException, ParserConfigurationException, SAXException
 	{
-		EbMSDocument document = getEbMSMessage(IOUtils.toString(connection.getInputStream()));
+		EbMSDocument document = getEbMSMessage(connection.getInputStream());
 		EbMSResponseDocument result = new EbMSResponseDocument(document,connection.getResponseCode());
 		return result;
 	}
 
-	private EbMSDocument getEbMSMessage(String message) throws ParserConfigurationException, SAXException, IOException
+	private EbMSDocument getEbMSMessage(InputStream in) throws ParserConfigurationException, SAXException, IOException
 	{
 		EbMSDocument result = null;
+		String message = IOUtils.toString(in);
 		if (StringUtils.isNotBlank(message))
 		{
 			DocumentBuilder db = DOMUtils.getDocumentBuilder();
-			Document d = db.parse(message);
+			Document d = db.parse(new InputSource(new StringReader(message)));
 			result = new EbMSDocument(d,new ArrayList<EbMSAttachment>());
 		}
 		return result;
