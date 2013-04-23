@@ -108,8 +108,8 @@ public class EbMSMessageProcessorImpl implements EbMSMessageProcessor
 			}
 			else if (EbMSAction.STATUS_REQUEST.action().equals(message.getMessageHeader().getAction()))
 			{
-				EbMSMessage response = processStatusRequest(timestamp,message);
-				return deliveryManager.handleResponseMessage(cpa,message,response);
+				EbMSMessage response = deliveryManager.handleResponseMessage(cpa,message,processStatusRequest(timestamp,message));
+				return response == null ? null : EbMSMessageUtils.getEbMSDocument(response);
 			}
 			else if (EbMSAction.STATUS_RESPONSE.action().equals(message.getMessageHeader().getAction()))
 			{
@@ -118,8 +118,8 @@ public class EbMSMessageProcessorImpl implements EbMSMessageProcessor
 			}
 			else if (EbMSAction.PING.action().equals(message.getMessageHeader().getAction()))
 			{
-				EbMSMessage response = processPing(timestamp,message);
-				return deliveryManager.handleResponseMessage(cpa,message,response);
+				EbMSMessage response = deliveryManager.handleResponseMessage(cpa,message,processPing(timestamp,message));
+				return response == null ? null : EbMSMessageUtils.getEbMSDocument(response);
 			}
 			else if (EbMSAction.PONG.action().equals(message.getMessageHeader().getAction()))
 			{

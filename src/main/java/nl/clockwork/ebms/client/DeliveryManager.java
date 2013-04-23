@@ -28,7 +28,7 @@ public class DeliveryManager //DeliveryService
 		executorService = Executors.newFixedThreadPool(maxThreads);
 	}
 
-	public EbMSDocument sendMessage(final CollaborationProtocolAgreement cpa, final EbMSMessage message) throws EbMSProcessorException
+	public EbMSMessage sendMessage(final CollaborationProtocolAgreement cpa, final EbMSMessage message) throws EbMSProcessorException
 	{
 		try
 		{
@@ -55,10 +55,14 @@ public class DeliveryManager //DeliveryService
 				executorService.execute(command);
 				EbMSMessage response = messageQueue.get(message.getMessageHeader().getMessageData().getMessageId());
 				if (response != null)
-					return EbMSMessageUtils.getEbMSDocument(response);
+					return response;
 			}
 			else
-				return ebMSClient.sendMessage(uri,EbMSMessageUtils.getEbMSDocument(message));
+			{
+				EbMSDocument response = ebMSClient.sendMessage(uri,EbMSMessageUtils.getEbMSDocument(message));
+				if (response != null)
+					return EbMSMessageUtils.getEbMSMessage(response.getMessage(),response.getAttachments());
+			}
 			return null;
 		}
 		catch (EbMSProcessorException e)
@@ -76,7 +80,7 @@ public class DeliveryManager //DeliveryService
 		messageQueue.put(message.getMessageHeader().getMessageData().getRefToMessageId(),message);
 	}
 	
-	public EbMSDocument handleResponseMessage(final CollaborationProtocolAgreement cpa, final EbMSMessage message, final EbMSMessage response) throws EbMSProcessorException
+	public EbMSMessage handleResponseMessage(final CollaborationProtocolAgreement cpa, final EbMSMessage message, final EbMSMessage response) throws EbMSProcessorException
 	{
 		try
 		{
@@ -103,7 +107,7 @@ public class DeliveryManager //DeliveryService
 					executorService.execute(command);
 				}
 				else
-					return EbMSMessageUtils.getEbMSDocument(response);
+					return response;
 			}
 			return null;
 		}

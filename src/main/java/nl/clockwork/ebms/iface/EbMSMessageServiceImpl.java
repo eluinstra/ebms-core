@@ -24,7 +24,6 @@ import nl.clockwork.ebms.client.DeliveryManager;
 import nl.clockwork.ebms.dao.DAOException;
 import nl.clockwork.ebms.dao.DAOTransactionCallback;
 import nl.clockwork.ebms.dao.EbMSDAO;
-import nl.clockwork.ebms.model.EbMSDocument;
 import nl.clockwork.ebms.model.EbMSMessage;
 import nl.clockwork.ebms.model.EbMSMessageContent;
 import nl.clockwork.ebms.model.EbMSMessageContext;
@@ -49,12 +48,11 @@ public class EbMSMessageServiceImpl implements EbMSMessageService
 		try
 		{
 			CollaborationProtocolAgreement cpa = ebMSDAO.getCPA(cpaId);
-			EbMSMessage ping = EbMSMessageUtils.createEbMSPing(cpa,fromParty,toParty);
-			EbMSDocument document = deliveryManager.sendMessage(cpa,ping);
-			if (document != null)
+			EbMSMessage request = EbMSMessageUtils.createEbMSPing(cpa,fromParty,toParty);
+			EbMSMessage response = deliveryManager.sendMessage(cpa,request);
+			if (response != null)
 			{
-				EbMSMessage message = EbMSMessageUtils.getEbMSMessage(document.getMessage(),document.getAttachments());
-				if (!EbMSAction.PONG.action().equals(message.getMessageHeader().getAction()))
+				if (!EbMSAction.PONG.action().equals(response.getMessageHeader().getAction()))
 					throw new EbMSMessageServiceException("No valid response received!");
 			}
 			else
@@ -167,13 +165,12 @@ public class EbMSMessageServiceImpl implements EbMSMessageService
 		try
 		{
 			CollaborationProtocolAgreement cpa = ebMSDAO.getCPA(cpaId);
-			EbMSMessage statusRequest = EbMSMessageUtils.createEbMSStatusRequest(cpa,fromParty,toParty,messageId);
-			EbMSDocument document = deliveryManager.sendMessage(cpa,statusRequest);
-			if (document != null)
+			EbMSMessage request = EbMSMessageUtils.createEbMSStatusRequest(cpa,fromParty,toParty,messageId);
+			EbMSMessage response = deliveryManager.sendMessage(cpa,request);
+			if (response != null)
 			{
-				EbMSMessage message = EbMSMessageUtils.getEbMSMessage(document.getMessage(),document.getAttachments());
-				if (EbMSAction.STATUS_RESPONSE.action().equals(message.getMessageHeader().getAction()) && message.getStatusResponse() != null)
-					return new MessageStatus(message.getStatusResponse().getTimestamp() == null ? null : message.getStatusResponse().getTimestamp().toGregorianCalendar().getTime(),EbMSMessageStatus.get(message.getStatusResponse().getMessageStatus()));
+				if (EbMSAction.STATUS_RESPONSE.action().equals(response.getMessageHeader().getAction()) && response.getStatusResponse() != null)
+					return new MessageStatus(response.getStatusResponse().getTimestamp() == null ? null : response.getStatusResponse().getTimestamp().toGregorianCalendar().getTime(),EbMSMessageStatus.get(response.getStatusResponse().getMessageStatus()));
 				else
 					throw new EbMSMessageServiceException("No valid response received!");
 			}
