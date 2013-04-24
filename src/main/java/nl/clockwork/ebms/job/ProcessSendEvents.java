@@ -47,7 +47,7 @@ public class ProcessSendEvents implements Job
   private EbMSDAO ebMSDAO;
 	private EbMSSignatureGenerator signatureGenerator;
   private EbMSClient ebMSClient;
-	private EbMSMessageProcessor ebMSMessageProcessor;
+	private EbMSMessageProcessor messageProcessor;
 
 	public void init()
 	{
@@ -78,7 +78,7 @@ public class ProcessSendEvents implements Job
 					  		String uri = CPAUtils.getUri(cpa,message);
 					  		EbMSDocument responseDocument = ebMSClient.sendMessage(uri,document);
 					  		if (!(responseDocument == null || (responseDocument instanceof EbMSResponseDocument && ((EbMSResponseDocument)responseDocument).getMessage() == null)))
-					  			ebMSMessageProcessor.processResponse(responseDocument);
+					  			messageProcessor.processResponse(responseDocument);
 					  		updateEvent(sendEvent,EbMSEventStatus.PROCESSED);
 							}
 							catch (Exception e)
@@ -135,5 +135,10 @@ public class ProcessSendEvents implements Job
   public void setEbMSClient(EbMSClient ebMSClient)
 	{
 		this.ebMSClient = ebMSClient;
+	}
+
+  public void setMessageProcessor(EbMSMessageProcessor messageProcessor)
+	{
+		this.messageProcessor = messageProcessor;
 	}
 }

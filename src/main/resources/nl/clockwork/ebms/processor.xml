@@ -70,6 +70,7 @@
 		<property name="ebMSDAO" ref="ebMSDAO"/>
 		<property name="signatureGenerator" ref="signatureGenerator"/>
 		<property name="ebMSClient" ref="ebMSClient"/>
+		<property name="messageProcessor" ref="messageProcessor"/>
 	</bean>
 
 	<bean id="signatureGenerator" class="nl.clockwork.ebms.signing.EbMSSecSignatureGenerator" init-method="init">
