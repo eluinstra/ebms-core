@@ -56,7 +56,7 @@ public class EbMSHttpClient implements EbMSClient
 			HttpURLConnection connection = (HttpURLConnection)openConnection(uri);
 			if (logger.isInfoEnabled())
 				logger.info("OUT:\n" + DOMUtils.toString(document.getMessage()));
-			if (chunkedStreamingMode)
+			if (chunkedStreaming(uri))
 				connection.setChunkedStreamingMode(0);
 			EbMSMessageWriter writer = new EbMSMessageWriterImpl(connection);
 			writer.write(document);
@@ -79,6 +79,11 @@ public class EbMSHttpClient implements EbMSClient
 		}
 	}
 	
+	public boolean chunkedStreaming(String uri)
+	{
+		return chunkedStreamingMode;
+	}
+
 	@SuppressWarnings({"restriction","deprecation"})
 	private URLConnection openConnection(String uri) throws IOException
 	{
