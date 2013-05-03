@@ -16,7 +16,6 @@
 package nl.clockwork.ebms.processor;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
@@ -43,8 +42,6 @@ import nl.clockwork.ebms.model.ebxml.ErrorList;
 import nl.clockwork.ebms.model.ebxml.MessageHeader;
 import nl.clockwork.ebms.model.ebxml.MessageStatusType;
 import nl.clockwork.ebms.model.ebxml.Service;
-import nl.clockwork.ebms.model.xml.dsig.ReferenceType;
-import nl.clockwork.ebms.model.xml.dsig.SignatureType;
 import nl.clockwork.ebms.signing.EbMSSignatureValidator;
 import nl.clockwork.ebms.util.EbMSMessageUtils;
 import nl.clockwork.ebms.validation.CPAValidator;
@@ -166,23 +163,15 @@ public class EbMSMessageProcessorImpl implements EbMSMessageProcessor
 		MessageHeader messageHeader = message.getMessageHeader();
 		if (isDuplicateMessage(message))
 		{
-			if (equalsDuplicateMessage(message))
+			logger.warn("Duplicate message found! MessageId: " + message.getMessageHeader().getMessageData().getMessageId());
+			if (message.getSyncReply() == null)
 			{
-				logger.warn("Duplicate message found! MessageId: " + message.getMessageHeader().getMessageData().getMessageId());
-				if (message.getSyncReply() == null)
-				{
-					long responseId = ebMSDAO.getMessageId(messageHeader.getMessageData().getMessageId(),service,EbMSAction.MESSAGE_ERROR.action(),EbMSAction.ACKNOWLEDGMENT.action());
-					ebMSDAO.insertSendEvent(responseId);
-					return null;
-				}
-				else
-					return ebMSDAO.getMessage(messageHeader.getMessageData().getMessageId(),service,EbMSAction.MESSAGE_ERROR.action(),EbMSAction.ACKNOWLEDGMENT.action());
-			}
-			else
-			{
-				logger.warn("Duplicate but unidentical message found! MessageId: " + message.getMessageHeader().getMessageData().getMessageId());
+				long responseId = ebMSDAO.getMessageId(messageHeader.getMessageData().getMessageId(),service,EbMSAction.MESSAGE_ERROR.action(),EbMSAction.ACKNOWLEDGMENT.action());
+				ebMSDAO.insertSendEvent(responseId);
 				return null;
 			}
+			else
+				return ebMSDAO.getMessage(messageHeader.getMessageData().getMessageId(),service,EbMSAction.MESSAGE_ERROR.action(),EbMSAction.ACKNOWLEDGMENT.action());
 		}
 		else
 		{
@@ -315,42 +304,6 @@ public class EbMSMessageProcessorImpl implements EbMSMessageProcessor
 		return /*message.getMessageHeader().getDuplicateElimination()!= null && */ebMSDAO.existsMessage(message.getMessageHeader().getMessageData().getMessageId());
 	}
 	
-	private boolean equalsDuplicateMessage(EbMSMessage message)
-	{
-		EbMSMessage duplicateMessage = ebMSDAO.getMessage(message.getMessageHeader().getMessageData().getMessageId());
-		return equals(message.getMessageHeader(),duplicateMessage.getMessageHeader())
-				&& equals(message.getSignature(),duplicateMessage.getSignature());
-	}
-
-	private boolean equals(MessageHeader messageHeader, MessageHeader duplicateMessageHeader)
-	{
-		return messageHeader.getCPAId().equals(duplicateMessageHeader.getCPAId())
-				&& (messageHeader.getService().getType() == null ? duplicateMessageHeader.getService().getType() == null : messageHeader.getService().getType().equals(duplicateMessageHeader.getService().getType()))
-				&& messageHeader.getService().getValue().equals(duplicateMessageHeader.getService().getValue())
-				&& messageHeader.getAction().equals(duplicateMessageHeader.getAction());
-	}
-
-	private boolean equals(SignatureType signature, SignatureType duplicateSignature)
-	{
-		if (signature == null && duplicateSignature == null)
-			return true;
-		else if (signature == null || duplicateSignature == null)
-			return false;
-		else
-		{
-			boolean result = Arrays.equals(signature.getSignatureValue().getValue(),duplicateSignature.getSignatureValue().getValue()) && signature.getSignedInfo().getReference().size() == duplicateSignature.getSignedInfo().getReference().size();
-			for (int i = 0; result && i < signature.getSignedInfo().getReference().size() ; i++)
-				result &= equals(signature.getSignedInfo().getReference().get(i),duplicateSignature.getSignedInfo().getReference().get(i));
-			return result;
-		}
-	}
-
-	private boolean equals(ReferenceType referenceType, ReferenceType duplicateRreferenceType)
-	{
-		return (referenceType.getId() == null ? duplicateRreferenceType.getId() == null : referenceType.getId().equals(duplicateRreferenceType.getId()))
-				&& Arrays.equals(referenceType.getDigestValue(),duplicateRreferenceType.getDigestValue());
-	}
-
 	public void setDeliveryManager(DeliveryManager deliveryManager)
 	{
 		this.deliveryManager = deliveryManager;
