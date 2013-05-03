@@ -42,12 +42,8 @@ public abstract class AbstractXSDValidationFilter implements Filter
 		{
 			String content = getContent(message);
 			Validator validator = schema.newValidator();
-			//quick fix for synchronization problem with validate() method
-			synchronized (this)
-			{
-				//validator.validate(new SAXSource(new InputSource(new StringReader(content))));
-				validator.validate(new StreamSource(new StringReader(content)));
-			}
+			//validator.validate(new SAXSource(new InputSource(new StringReader(content))));
+			validator.validate(new StreamSource(new StringReader(content)));
 			return true;
 		}
 		catch (SAXException e)
