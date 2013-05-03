@@ -6,7 +6,7 @@
 	<artifactId>ebms-adapter-mule3</artifactId>
 	<packaging>mule</packaging>
 	<name>Mule3 EbMS Adapter</name>
-	<version>1.1.1</version>
+	<version>1.1.2</version>
 	<description></description>
 	<url>https://sourceforge.net/projects/muleebmsadapter/</url>
 	<issueManagement>
