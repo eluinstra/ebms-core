@@ -28,7 +28,6 @@ import nl.clockwork.ebms.dao.DAOTransactionCallback;
 import nl.clockwork.ebms.dao.EbMSDAO;
 import nl.clockwork.ebms.model.EbMSDocument;
 import nl.clockwork.ebms.model.EbMSMessage;
-import nl.clockwork.ebms.model.EbMSResponseDocument;
 import nl.clockwork.ebms.model.EbMSSendEvent;
 import nl.clockwork.ebms.model.cpp.cpa.CollaborationProtocolAgreement;
 import nl.clockwork.ebms.processor.EbMSMessageProcessor;
@@ -77,7 +76,7 @@ public class ProcessSendEvents implements Job
 					  		signatureGenerator.generate(cpa,document,message.getMessageHeader());
 					  		String uri = CPAUtils.getUri(cpa,message);
 					  		EbMSDocument responseDocument = ebMSClient.sendMessage(uri,document);
-					  		if (!(responseDocument == null || (responseDocument instanceof EbMSResponseDocument && ((EbMSResponseDocument)responseDocument).getMessage() == null)))
+					  		if (responseDocument != null && responseDocument.getMessage() != null)
 					  			messageProcessor.processResponse(responseDocument);
 					  		updateEvent(sendEvent,EbMSEventStatus.PROCESSED);
 							}

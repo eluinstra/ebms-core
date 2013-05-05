@@ -27,12 +27,10 @@ import java.util.ArrayList;
 import javax.net.ssl.HttpsURLConnection;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerException;
 
 import nl.clockwork.ebms.common.util.DOMUtils;
 import nl.clockwork.ebms.model.EbMSAttachment;
 import nl.clockwork.ebms.model.EbMSDocument;
-import nl.clockwork.ebms.model.EbMSResponseDocument;
 import nl.clockwork.ebms.processor.EbMSProcessorException;
 
 import org.apache.commons.io.IOUtils;
@@ -61,11 +59,11 @@ public class EbMSHttpClient implements EbMSClient
 			EbMSMessageWriter writer = new EbMSMessageWriterImpl(connection);
 			writer.write(document);
 			writer.flush();
-			EbMSResponseDocument in = handleResponse(connection);
+			EbMSDocument in = getEbMSMessage(connection.getInputStream());
 			if (logger.isInfoEnabled())
 			{
-				logger.info("StatusCode: " + in.getStatusCode());
-				logger.info("IN:\n" + (in.getMessage() == null ? "" : DOMUtils.toString(in.getMessage())));
+				logger.info("StatusCode: " + connection.getResponseCode());
+				logger.info("IN:\n" + (in == null ? "" : DOMUtils.toString(in.getMessage())));
 			}
 			return in;
 		}
@@ -96,13 +94,6 @@ public class EbMSHttpClient implements EbMSClient
 		else if (connection instanceof com.sun.net.ssl.HttpsURLConnection)
 			((com.sun.net.ssl.HttpsURLConnection)connection).setSSLSocketFactory(sslFactoryManager.getSslFactory());
 		return connection;
-	}
-
-	private EbMSResponseDocument handleResponse(HttpURLConnection connection) throws IOException, EbMSProcessorException, TransformerException, ParserConfigurationException, SAXException
-	{
-		EbMSDocument document = getEbMSMessage(connection.getInputStream());
-		EbMSResponseDocument result = new EbMSResponseDocument(document,connection.getResponseCode());
-		return result;
 	}
 
 	private EbMSDocument getEbMSMessage(InputStream in) throws ParserConfigurationException, SAXException, IOException
