@@ -55,7 +55,7 @@
 	</beans>
 
 	<flow name="content.send">
-		<quartz:inbound-endpoint jobName="messageProcessingJob" startDelay="10000" repeatInterval="10000">
+		<quartz:inbound-endpoint jobName="messageProcessingJob" startDelay="${jobScheduler.delay}" repeatInterval="${jobScheduler.period}">
 			<quartz:custom-job job-ref="messageProcessingJob"/>
 		</quartz:inbound-endpoint>
 		<log-component/>
