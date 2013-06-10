@@ -41,6 +41,7 @@ public class EbMSHttpHandlerImpl implements EbMSHttpHandler
 	  	{
 	  		EbMSMessageReader messageReader = new EbMSMessageReaderImpl(request.getContentType());
 				EbMSDocument in = messageReader.read(request.getInputStream());
+				//request.getInputStream().close();
 				if (logger.isInfoEnabled())
 					logger.info("IN:\n" + DOMUtils.toString(in.getMessage()));
 				EbMSDocument out = messageProcessor.processRequest(in);
@@ -62,6 +63,7 @@ public class EbMSHttpHandlerImpl implements EbMSHttpHandler
 					response.setHeader("Content-Type","text/xml");
 					response.setHeader("SOAPAction",Constants.EBMS_SOAP_ACTION);
 					DOMUtils.write(out.getMessage(),response.getOutputStream());
+					//response.getOutputStream().close();
 				}
 	  	}
 		}
