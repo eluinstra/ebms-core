@@ -79,6 +79,7 @@ import nl.clockwork.ebms.model.ebxml.SyncReply;
 import nl.clockwork.ebms.model.ebxml.To;
 import nl.clockwork.ebms.model.soap.envelope.Body;
 import nl.clockwork.ebms.model.soap.envelope.Envelope;
+import nl.clockwork.ebms.model.soap.envelope.Fault;
 import nl.clockwork.ebms.model.soap.envelope.Header;
 import nl.clockwork.ebms.model.xml.dsig.ReferenceType;
 import nl.clockwork.ebms.model.xml.dsig.SignatureType;
@@ -100,7 +101,6 @@ public class EbMSMessageUtils
 	@SuppressWarnings("unchecked")
 	public static EbMSMessage getEbMSMessage(Envelope envelope, List<EbMSAttachment> attachments)
 	{
-		
 		SignatureType signature = null;
 		MessageHeader messageHeader = null;
 		SyncReply syncReply = null;
@@ -138,6 +138,15 @@ public class EbMSMessageUtils
 		return new EbMSMessage(signature,messageHeader,syncReply,messageOrder,ackRequested,errorList,acknowledgment,manifest,statusRequest,statusResponse,attachments);
 	}
 	
+	private static boolean isSOAPFault(Envelope envelope)
+	{
+		if (envelope.getBody() != null /*&& envelope.getBody().getAny() != null*/)
+			for (Object element : envelope.getBody().getAny())
+				if (((JAXBElement<?>)element).getDeclaredType().equals(Fault.class))
+					return true;
+		return false;
+	}
+
 	public static EbMSDocument getEbMSDocument(EbMSMessage message) throws SOAPException, JAXBException, ParserConfigurationException, SAXException, IOException, TransformerFactoryConfigurationError, TransformerException
 	{
 		return new EbMSDocument(EbMSMessageUtils.createSOAPMessage(message),message.getAttachments());
@@ -386,10 +395,8 @@ public class EbMSMessageUtils
 
 		acknowledgment.setTimestamp(DatatypeFactory.newInstance().newXMLGregorianCalendar(timestamp));
 		acknowledgment.setRefToMessageId(messageHeader.getMessageData().getRefToMessageId());
-		acknowledgment.setFrom(new From()); //optioneel
+		acknowledgment.setFrom(new From());
 		acknowledgment.getFrom().getPartyId().addAll(messageHeader.getFrom().getPartyId());
-		// ebMS specs 1701
-		//acknowledgment.getFrom().setRole(messageHeader.getFrom().getRole());
 		acknowledgment.getFrom().setRole(null);
 		
 		//TODO resolve actor from CPA
