@@ -1,13 +1,15 @@
 - test multiple certificates in keystore
 - generate soap fault on error
 - change sendEvent generation: store one event per message (and calculate the following after current is handled if necessary)
+	- replace table ebms_send_event by a queue
 
 - let DeliveryManager work with EbMSDocument instead of EbMSMessage?
 	- change messageQueue from EbMSMessage to EbMSDocument
 	- get messageId from EbMSDocument
+- implement ackRequested/best-effort
+- fix java EbMSDAO
 
 - implement syncReply
-- implement ackRequested
 - implement encryption
 - improve Service models:
 	- add jaxb annotations?
@@ -35,8 +37,13 @@
 - support multiple deliveryChannels
 	- support mail channel?
 
-- implement AdminService
-- implement wicket/jdo? admin interface with direct database access
+- implement AdminService?
+- implement wicket/jdo? admin interface:
+	- view on message tables
+	- view on logging tables
+	- CPAService interface
+	- EbMSMessageService interface
+	- AdminService interface?
 
 - add response and statusCode to table sendEvent???
 - implement table receivedEvent???
