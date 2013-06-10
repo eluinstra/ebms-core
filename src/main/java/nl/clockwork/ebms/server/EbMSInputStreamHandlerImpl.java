@@ -51,6 +51,7 @@ public abstract class EbMSInputStreamHandlerImpl implements EbMSInputStreamHandl
 	  	{
 	  		EbMSMessageReader messageReader = new EbMSMessageReaderImpl(getHeader("Content-Type"));
 				EbMSDocument in = messageReader.read(request);
+				//request.close();
 				if (logger.isInfoEnabled())
 					logger.info("IN:\n" + DOMUtils.toString(in.getMessage()));
 				EbMSDocument out = messageProcessor.processRequest(in);
@@ -73,6 +74,7 @@ public abstract class EbMSInputStreamHandlerImpl implements EbMSInputStreamHandl
 					writeResponseHeader("SOAPAction",Constants.EBMS_SOAP_ACTION);
 					OutputStream response = getOutputStream();
 					DOMUtils.write(out.getMessage(),response);
+					//response.close();
 				}
 	  	}
 		}
@@ -83,14 +85,6 @@ public abstract class EbMSInputStreamHandlerImpl implements EbMSInputStreamHandl
 	  
 	}
 	
-	private String getHeader(String headerName)
-	{
-		for (String key : headers.keySet())
-			if (headerName.toLowerCase().equals(key.toLowerCase()))
-				return headers.get(key);
-		return null;
-	}
-
 	public abstract void writeResponseStatus(int statusCode);
 	
 	public abstract void writeResponseHeader(String name, String value);
@@ -100,6 +94,19 @@ public abstract class EbMSInputStreamHandlerImpl implements EbMSInputStreamHandl
 	public void setMessageProcessor(EbMSMessageProcessor messageProcessor)
 	{
 		this.messageProcessor = messageProcessor;
+	}
+
+	private String getHeader(String headerName)
+	{
+		String result = headers.get(headerName);
+		if (result == null)
+			for (String key : headers.keySet())
+				if (headerName.equalsIgnoreCase(key))
+				{
+					result = headers.get(key);
+					break;
+				}
+		return result;
 	}
 
 }

@@ -98,12 +98,12 @@ public class EbMSContentHandler implements ContentHandler
 	@Override
 	public void body(BodyDescriptor bd, InputStream is) throws MimeException, IOException
 	{
-		String contentType = headers.get("Content-Type");
+		String contentType = getHeader("Content-Type");
 		ByteArrayDataSource ds = new ByteArrayDataSource(is,contentType);
 		//ds.setName("");
-		String contentId = headers.get("Content-ID");
+		String contentId = getHeader("Content-ID");
 		//TODO parse properly
-		contentId = contentId.substring(1,contentId.length()-1);
+		contentId = contentId.substring(1,contentId.length() - 1);
 		attachments.add(new EbMSAttachment(ds,contentId));
 		headers.clear();
 	}
@@ -117,4 +117,18 @@ public class EbMSContentHandler implements ContentHandler
 	{
 		return attachments;
 	}
+
+	private String getHeader(String headerName)
+	{
+		String result = headers.get(headerName);
+		if (result == null)
+			for (String key : headers.keySet())
+				if (headerName.equalsIgnoreCase(key))
+				{
+					result = headers.get(key);
+					break;
+				}
+		return result;
+	}
+
 }
