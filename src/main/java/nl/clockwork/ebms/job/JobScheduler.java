@@ -44,8 +44,8 @@ public class JobScheduler
 					job.execute();
 				}
 			},
-			delay*1000,
-			period*1000);
+			delay,
+			period);
 	}
 	
 	public void destroy()
