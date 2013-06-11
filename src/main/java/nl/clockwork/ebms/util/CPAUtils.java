@@ -39,6 +39,7 @@ import nl.clockwork.ebms.model.cpp.cpa.DeliveryChannel;
 import nl.clockwork.ebms.model.cpp.cpa.DocExchange;
 import nl.clockwork.ebms.model.cpp.cpa.PartyId;
 import nl.clockwork.ebms.model.cpp.cpa.PartyInfo;
+import nl.clockwork.ebms.model.cpp.cpa.PerMessageCharacteristicsType;
 import nl.clockwork.ebms.model.cpp.cpa.ReceiverNonRepudiation;
 import nl.clockwork.ebms.model.cpp.cpa.ReliableMessaging;
 import nl.clockwork.ebms.model.cpp.cpa.SenderNonRepudiation;
@@ -303,8 +304,10 @@ public class CPAUtils
 		{
 			PartyInfo partyInfo = getPartyInfo(cpa,messageHeader.getFrom().getPartyId());
 			List<DeliveryChannel> deliveryChannels = getSendingDeliveryChannels(partyInfo,messageHeader.getFrom().getRole(),messageHeader.getService(),messageHeader.getAction());
-			//FIXME if (PerMessageCharacteristicsType.NEVER.equals((deliveryChannels.get(0).getMessagingCharacteristics().getAckRequested())))
-			return ((DocExchange)deliveryChannels.get(0).getDocExchangeId()).getEbXMLSenderBinding().getReliableMessaging();
+			if (!PerMessageCharacteristicsType.NEVER.equals((deliveryChannels.get(0).getMessagingCharacteristics().getAckRequested())))
+				return ((DocExchange)deliveryChannels.get(0).getDocExchangeId()).getEbXMLSenderBinding().getReliableMessaging();
+			else
+				return null;
 		}
 		catch (Exception e)
 		{
