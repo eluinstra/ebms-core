@@ -493,6 +493,8 @@ public class EbMSMessageUtils
 				result.add(new EbMSSendEvent(id,(Date)sendTime.clone()));
 				rm.getRetryInterval().addTo(sendTime);
 			}
+		else
+			result.add(new EbMSSendEvent(id,(Date)sendTime.clone()));
 		return result;
 	}
 
