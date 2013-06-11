@@ -86,6 +86,7 @@ import nl.clockwork.ebms.model.xml.dsig.SignatureType;
 import nl.clockwork.ebms.xml.EbMSNamespaceMapper;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
@@ -344,9 +345,12 @@ public class EbMSMessageUtils
 		error.setCodeContext(Constants.EBMS_SERVICE_URI + ":errors");
 		error.setLocation(location);
 		error.setErrorCode(errorCode);
-		error.setDescription(new Description());
-		error.getDescription().setLang(language);
-		error.getDescription().setValue(description);
+		if (!StringUtils.isEmpty(description))
+		{
+			error.setDescription(new Description());
+			error.getDescription().setLang(language);
+			error.getDescription().setValue(description);
+		}
 		error.setSeverity(severity);
 		return error;
 	}
