@@ -270,7 +270,7 @@ public class CPAUtils
 
 	private static String getSignatureAlgorithm(String value)
 	{
-		// TODO: Expected values include: RSA-MD5, RSA-SHA1, DSA-MD5, DSA-SHA1, SHA1withRSA, MD5withRSA, and so on.
+		//TODO: Expected values include: RSA-MD5, RSA-SHA1, DSA-MD5, DSA-SHA1, SHA1withRSA, MD5withRSA, and so on.
 		return value;
 	}
 
@@ -303,6 +303,7 @@ public class CPAUtils
 		{
 			PartyInfo partyInfo = getPartyInfo(cpa,messageHeader.getFrom().getPartyId());
 			List<DeliveryChannel> deliveryChannels = getSendingDeliveryChannels(partyInfo,messageHeader.getFrom().getRole(),messageHeader.getService(),messageHeader.getAction());
+			//FIXME if (PerMessageCharacteristicsType.NEVER.equals((deliveryChannels.get(0).getMessagingCharacteristics().getAckRequested())))
 			return ((DocExchange)deliveryChannels.get(0).getDocExchangeId()).getEbXMLSenderBinding().getReliableMessaging();
 		}
 		catch (Exception e)
