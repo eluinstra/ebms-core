@@ -191,7 +191,7 @@ public class CPAUtils
 		return (DeliveryChannel)((JAXBElement<Object>)bindingType.getChannelId().get(0)).getValue();
 	}
 	
-	public static List<DeliveryChannel> getSendingDeliveryChannels(PartyInfo partyInfo, String role, Service service, String action)
+	public static DeliveryChannel getSendingDeliveryChannel(PartyInfo partyInfo, String role, Service service, String action)
 	{
 		List<DeliveryChannel> result = new ArrayList<DeliveryChannel>();
 		if (Constants.EBMS_SERVICE_URI.equals(service.getValue()))
@@ -203,12 +203,12 @@ public class CPAUtils
 				for (CanSend canSend : serviceBinding.getCanSend())
 					if (action.equals(canSend.getThisPartyActionBinding().getAction()))
 						for (JAXBElement<Object> o : canSend.getThisPartyActionBinding().getChannelId())
-							result.add((DeliveryChannel)o.getValue());
+							return (DeliveryChannel)o.getValue();
 		}
-		return result;
+		return null;
 	}
 	
-	public static List<DeliveryChannel> getReceivingDeliveryChannels(PartyInfo partyInfo, String role, Service service, String action)
+	public static DeliveryChannel getReceivingDeliveryChannel(PartyInfo partyInfo, String role, Service service, String action)
 	{
 		List<DeliveryChannel> result = new ArrayList<DeliveryChannel>();
 		if (Constants.EBMS_SERVICE_URI.equals(service.getValue()))
@@ -220,9 +220,9 @@ public class CPAUtils
 				for (CanReceive canReceive : serviceBinding.getCanReceive())
 					if (action.equals(canReceive.getThisPartyActionBinding().getAction()))
 						for (JAXBElement<Object> o : canReceive.getThisPartyActionBinding().getChannelId())
-							result.add((DeliveryChannel)o.getValue());
+							return (DeliveryChannel)o.getValue();
 		}
-		return result;
+		return null;
 	}
 	
 	public static DocExchange getDocExchange(DeliveryChannel deliveryChannel)
@@ -303,9 +303,9 @@ public class CPAUtils
 		try
 		{
 			PartyInfo partyInfo = getPartyInfo(cpa,messageHeader.getFrom().getPartyId());
-			List<DeliveryChannel> deliveryChannels = getSendingDeliveryChannels(partyInfo,messageHeader.getFrom().getRole(),messageHeader.getService(),messageHeader.getAction());
-			if (!PerMessageCharacteristicsType.NEVER.equals((deliveryChannels.get(0).getMessagingCharacteristics().getAckRequested())))
-				return ((DocExchange)deliveryChannels.get(0).getDocExchangeId()).getEbXMLSenderBinding().getReliableMessaging();
+			DeliveryChannel deliveryChannel = getSendingDeliveryChannel(partyInfo,messageHeader.getFrom().getRole(),messageHeader.getService(),messageHeader.getAction());
+			if (!PerMessageCharacteristicsType.NEVER.equals((deliveryChannel.getMessagingCharacteristics().getAckRequested())))
+				return ((DocExchange)deliveryChannel.getDocExchangeId()).getEbXMLSenderBinding().getReliableMessaging();
 			else
 				return null;
 		}
@@ -318,7 +318,7 @@ public class CPAUtils
 	public static String getUri(CollaborationProtocolAgreement cpa, EbMSMessage message)
 	{
 		PartyInfo partyInfo = CPAUtils.getPartyInfo(cpa,message.getMessageHeader().getTo().getPartyId());
-		DeliveryChannel deliveryChannel = CPAUtils.getReceivingDeliveryChannels(partyInfo,message.getMessageHeader().getTo().getRole(),message.getMessageHeader().getService(),message.getMessageHeader().getAction()).get(0);
+		DeliveryChannel deliveryChannel = CPAUtils.getReceivingDeliveryChannel(partyInfo,message.getMessageHeader().getTo().getRole(),message.getMessageHeader().getService(),message.getMessageHeader().getAction());
 		return getUri(deliveryChannel);
 	}
 

@@ -63,8 +63,8 @@ public class SignatureTypeValidator
 	public boolean isValid(ErrorList errorList, CollaborationProtocolAgreement cpa, MessageHeader messageHeader, SignatureType signature) throws ValidatorException
 	{
 		PartyInfo partyInfo = CPAUtils.getPartyInfo(cpa,messageHeader.getFrom().getPartyId());
-		List<DeliveryChannel> deliveryChannels = CPAUtils.getSendingDeliveryChannels(partyInfo,messageHeader.getFrom().getRole(),messageHeader.getService(),messageHeader.getAction());
-		ReceiverNonRepudiation receiverNonRepudiation = CPAUtils.getReceiverNonRepudiation(deliveryChannels.get(0));
+		DeliveryChannel deliveryChannel = CPAUtils.getSendingDeliveryChannel(partyInfo,messageHeader.getFrom().getRole(),messageHeader.getService(),messageHeader.getAction());
+		ReceiverNonRepudiation receiverNonRepudiation = CPAUtils.getReceiverNonRepudiation(deliveryChannel);
 		if (CPAUtils.isSigned(receiverNonRepudiation))
 		{
 			if (signature == null)

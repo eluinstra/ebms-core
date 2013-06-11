@@ -112,14 +112,13 @@ public class MessageHeaderValidator
 			return false;
 		}
 
-		List<DeliveryChannel> deliveryChannels = CPAUtils.getSendingDeliveryChannels(from,messageHeader.getFrom().getRole(),messageHeader.getService(),messageHeader.getAction());
-		if (deliveryChannels.size() == 0)
+		DeliveryChannel deliveryChannel = CPAUtils.getSendingDeliveryChannel(from,messageHeader.getFrom().getRole(),messageHeader.getService(),messageHeader.getAction());
+		if (deliveryChannel == null)
 		{
 			errorList.getError().add(EbMSMessageUtils.createError(Constants.EbMSErrorCode.UNKNOWN.errorCode(),Constants.EbMSErrorCode.UNKNOWN.errorCode(),"No DeliveryChannel found."));
 			errorList.setHighestSeverity(SeverityType.ERROR);
 			return false;
 		}
-		DeliveryChannel deliveryChannel = deliveryChannels.get(0);
 		if (!existsRefToMessageId(messageHeader.getMessageData().getRefToMessageId()))
 		{
 			errorList.getError().add(EbMSMessageUtils.createError("//Header/MessageHeader/MessageData/RefToMessageId",Constants.EbMSErrorCode.VALUE_NOT_RECOGNIZED.errorCode(),"Value not found."));

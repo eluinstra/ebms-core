@@ -64,8 +64,8 @@ public class EbMSSecSignatureValidator implements EbMSSignatureValidator
 		try
 		{
 			PartyInfo partyInfo = CPAUtils.getPartyInfo(cpa,messageHeader.getFrom().getPartyId());
-			List<DeliveryChannel> deliveryChannels = CPAUtils.getSendingDeliveryChannels(partyInfo,messageHeader.getFrom().getRole(),messageHeader.getService(),messageHeader.getAction());
-			ReceiverNonRepudiation receiverNonRepudiation = CPAUtils.getReceiverNonRepudiation(deliveryChannels.get(0));
+			DeliveryChannel deliveryChannel = CPAUtils.getSendingDeliveryChannel(partyInfo,messageHeader.getFrom().getRole(),messageHeader.getService(),messageHeader.getAction());
+			ReceiverNonRepudiation receiverNonRepudiation = CPAUtils.getReceiverNonRepudiation(deliveryChannel);
 			if (CPAUtils.isSigned(receiverNonRepudiation))
 			{
 				KeyStore keyStore = SecurityUtils.loadKeyStore(keyStorePath,keyStorePassword);
@@ -116,10 +116,10 @@ public class EbMSSecSignatureValidator implements EbMSSignatureValidator
 				PartyInfo partyInfo = CPAUtils.getPartyInfo(cpa,messageHeader.getFrom().getPartyId());
 				if (partyInfo != null)
 				{
-					List<DeliveryChannel> channels = CPAUtils.getSendingDeliveryChannels(partyInfo,messageHeader.getFrom().getRole(),messageHeader.getService(),messageHeader.getAction());
-					if (channels.size() > 0)
+					DeliveryChannel deliveryChannel = CPAUtils.getSendingDeliveryChannel(partyInfo,messageHeader.getFrom().getRole(),messageHeader.getService(),messageHeader.getAction());
+					if (deliveryChannel != null)
 					{
-						nl.clockwork.ebms.model.cpp.cpa.Certificate c = CPAUtils.getSigningCertificate(channels.get(0));
+						nl.clockwork.ebms.model.cpp.cpa.Certificate c = CPAUtils.getSigningCertificate(deliveryChannel);
 						if (c == null)
 							return null;
 						else

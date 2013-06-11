@@ -72,11 +72,11 @@ public class EbMSSecSignatureGenerator implements EbMSSignatureGenerator
 			if (!Constants.EBMS_SERVICE_URI.equals(messageHeader.getService().getValue()))
 			{
 				PartyInfo partyInfo = CPAUtils.getPartyInfo(cpa,messageHeader.getFrom().getPartyId());
-				List<DeliveryChannel> channels = CPAUtils.getSendingDeliveryChannels(partyInfo,messageHeader.getFrom().getRole(),messageHeader.getService(),messageHeader.getAction());
-				ReceiverNonRepudiation receiverNonRepudiation = CPAUtils.getReceiverNonRepudiation(channels.get(0));
+				DeliveryChannel deliveryChannel = CPAUtils.getSendingDeliveryChannel(partyInfo,messageHeader.getFrom().getRole(),messageHeader.getService(),messageHeader.getAction());
+				ReceiverNonRepudiation receiverNonRepudiation = CPAUtils.getReceiverNonRepudiation(deliveryChannel);
 				if (CPAUtils.isSigned(receiverNonRepudiation))
 				{
-					X509Certificate certificate = CPAUtils.getX509Certificate(CPAUtils.getSigningCertificate(channels.get(0)));
+					X509Certificate certificate = CPAUtils.getX509Certificate(CPAUtils.getSigningCertificate(deliveryChannel));
 					String alias = keyStore.getCertificateAlias(certificate);
 					if (alias == null)
 						throw new EbMSProcessorException("No certificate found with subject \"" + certificate.getSubjectDN().getName() + "\" in keystore \"" + keyStorePath + "\"");
