@@ -1,7 +1,7 @@
 - improve implementation of BusinessTransactionCharacteristics
 - improve implementation of MessagingCharacteristics:
 	- ackRequested per message
-	- ackSignatureRequested per message
+	- ackSignatureRequested (per message)
 
 - test multiple certificates in keystore
 - generate soap fault on error
