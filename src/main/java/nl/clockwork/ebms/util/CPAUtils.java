@@ -40,7 +40,6 @@ import nl.clockwork.ebms.model.cpp.cpa.DocExchange;
 import nl.clockwork.ebms.model.cpp.cpa.PartyId;
 import nl.clockwork.ebms.model.cpp.cpa.PartyInfo;
 import nl.clockwork.ebms.model.cpp.cpa.PerMessageCharacteristicsType;
-import nl.clockwork.ebms.model.cpp.cpa.ReceiverNonRepudiation;
 import nl.clockwork.ebms.model.cpp.cpa.ReliableMessaging;
 import nl.clockwork.ebms.model.cpp.cpa.SenderNonRepudiation;
 import nl.clockwork.ebms.model.cpp.cpa.ServiceBinding;
@@ -48,10 +47,7 @@ import nl.clockwork.ebms.model.cpp.cpa.ServiceType;
 import nl.clockwork.ebms.model.cpp.cpa.StatusValueType;
 import nl.clockwork.ebms.model.cpp.cpa.Transport;
 import nl.clockwork.ebms.model.cpp.cpa.X509DataType;
-import nl.clockwork.ebms.model.ebxml.MessageHeader;
 import nl.clockwork.ebms.model.ebxml.Service;
-
-import org.apache.commons.lang.StringUtils;
 
 //FIXME use JXPath
 public class CPAUtils
@@ -62,6 +58,13 @@ public class CPAUtils
 			&& timestamp.compareTo(cpa.getStart().toGregorianCalendar()) >= 0
 			&& timestamp.compareTo(cpa.getEnd().toGregorianCalendar()) <= 0
 		;
+	}
+
+	public static String getUri(CollaborationProtocolAgreement cpa, EbMSMessage message)
+	{
+		PartyInfo partyInfo = CPAUtils.getPartyInfo(cpa,message.getMessageHeader().getTo().getPartyId());
+		DeliveryChannel deliveryChannel = CPAUtils.getReceivingDeliveryChannel(partyInfo,message.getMessageHeader().getTo().getRole(),message.getMessageHeader().getService(),message.getMessageHeader().getAction());
+		return getUri(deliveryChannel);
 	}
 
 	public static PartyInfo getPartyInfo(CollaborationProtocolAgreement cpa, String partyId)
@@ -181,16 +184,6 @@ public class CPAUtils
 		return getCanReceive(partyInfo,role,service,action) != null;
 	}
 
-	public static DeliveryChannel getDefaultDeliveryChannel(PartyInfo partyInfo)
-	{
-		return (DeliveryChannel)partyInfo.getDefaultMshChannelId();
-	}
-
-	public static DeliveryChannel getDeliveryChannel(ActionBindingType bindingType)
-	{
-		return (DeliveryChannel)((JAXBElement<Object>)bindingType.getChannelId().get(0)).getValue();
-	}
-	
 	public static DeliveryChannel getSendingDeliveryChannel(PartyInfo partyInfo, String role, Service service, String action)
 	{
 		List<DeliveryChannel> result = new ArrayList<DeliveryChannel>();
@@ -225,9 +218,35 @@ public class CPAUtils
 		return null;
 	}
 	
+	public static boolean isSigned(PartyInfo partyInfo, String role, Service service, String action)
+	{
+		CanSend canSend = getCanSend(partyInfo,role,service,action);
+		return canSend.getThisPartyActionBinding().getBusinessTransactionCharacteristics().isIsNonRepudiationRequired();
+	}
+
+	public static DeliveryChannel getDefaultDeliveryChannel(PartyInfo partyInfo)
+	{
+		return (DeliveryChannel)partyInfo.getDefaultMshChannelId();
+	}
+
+	public static DeliveryChannel getDeliveryChannel(ActionBindingType bindingType)
+	{
+		return (DeliveryChannel)((JAXBElement<Object>)bindingType.getChannelId().get(0)).getValue();
+	}
+	
 	public static DocExchange getDocExchange(DeliveryChannel deliveryChannel)
 	{
 		return (DocExchange)deliveryChannel.getDocExchangeId();
+	}
+	
+	public static boolean isReliableMessaging(CollaborationProtocolAgreement cpa, DeliveryChannel deliveryChannel)
+	{
+		return !PerMessageCharacteristicsType.NEVER.equals((deliveryChannel.getMessagingCharacteristics().getAckRequested())) && ((DocExchange)deliveryChannel.getDocExchangeId()).getEbXMLSenderBinding().getReliableMessaging() != null;
+	}
+	
+	public static ReliableMessaging getReliableMessaging(CollaborationProtocolAgreement cpa, DeliveryChannel deliveryChannel)
+	{
+		return ((DocExchange)deliveryChannel.getDocExchangeId()).getEbXMLSenderBinding().getReliableMessaging();
 	}
 	
 	public static Certificate getSigningCertificate(DeliveryChannel deliveryChannel)
@@ -238,88 +257,18 @@ public class CPAUtils
 		return null;
 	}
 	
-	public static SenderNonRepudiation getSenderNonRepudiation(DeliveryChannel deliveryChannel)
+	public static String getSignatureAlgorithm(DeliveryChannel deliveryChannel)
 	{
 		DocExchange docExchange = getDocExchange(deliveryChannel);
-		if (docExchange != null && docExchange.getEbXMLReceiverBinding() != null)
-			return docExchange.getEbXMLSenderBinding().getSenderNonRepudiation();
-		return null;
+		SenderNonRepudiation senderNonRepudiation = docExchange.getEbXMLSenderBinding().getSenderNonRepudiation();
+		return senderNonRepudiation.getSignatureAlgorithm().get(0).getW3C() != null ? senderNonRepudiation.getSignatureAlgorithm().get(0).getW3C() : getSignatureAlgorithm(senderNonRepudiation.getSignatureAlgorithm().get(0).getValue());
 	}
-	
-	public static ReceiverNonRepudiation getReceiverNonRepudiation(DeliveryChannel deliveryChannel)
+
+	public static String getHashFunction(DeliveryChannel deliveryChannel)
 	{
 		DocExchange docExchange = getDocExchange(deliveryChannel);
-		if (docExchange != null && docExchange.getEbXMLReceiverBinding() != null)
-			return docExchange.getEbXMLReceiverBinding().getReceiverNonRepudiation();
-		return null;
-	}
-	
-	public static boolean isSigned(ReceiverNonRepudiation receiverNonRepudiation)
-	{
-		return receiverNonRepudiation != null && !StringUtils.isEmpty(getNonRepudiationProtocol(receiverNonRepudiation)) /*&& XMLSignature.XMLNS.equals(getNonRepudiationProtocol(receiverNonRepudiation))*/;
-	}
-	
-	public static String getNonRepudiationProtocol(ReceiverNonRepudiation receiverNonRepudiation)
-	{
-		return receiverNonRepudiation.getNonRepudiationProtocol().getValue();
-	}
-
-	public static String getSignatureAlgorithm(ReceiverNonRepudiation receiverNonRepudiation)
-	{
-		return receiverNonRepudiation.getSignatureAlgorithm().get(0).getW3C() != null ? receiverNonRepudiation.getSignatureAlgorithm().get(0).getW3C() : getSignatureAlgorithm(receiverNonRepudiation.getSignatureAlgorithm().get(0).getValue());
-	}
-
-	private static String getSignatureAlgorithm(String value)
-	{
-		//TODO: Expected values include: RSA-MD5, RSA-SHA1, DSA-MD5, DSA-SHA1, SHA1withRSA, MD5withRSA, and so on.
-		return value;
-	}
-
-	public static String getHashFunction(ReceiverNonRepudiation receiverNonRepudiation)
-	{
-		return receiverNonRepudiation.getHashFunction();
-	}
-
-	public static X509Certificate getX509Certificate(Certificate certificate) throws CertificateException
-	{
-		for (Object o : certificate.getKeyInfo().getContent())
-		{
-			if (o instanceof JAXBElement<?> && ((JAXBElement<?>)o).getValue() instanceof X509DataType)
-			{
-				for (Object p : ((X509DataType)((JAXBElement<?>)o).getValue()).getX509IssuerSerialOrX509SKIOrX509SubjectName())
-				{
-					if (p instanceof JAXBElement<?> && "X509Certificate".equals(((JAXBElement<?>)p).getName().getLocalPart()))
-					{
-						return (X509Certificate)CertificateFactory.getInstance("X.509").generateCertificate(new ByteArrayInputStream((byte[])((JAXBElement<?>)p).getValue())); 
-					}
-				}
-			}
-		}
-		return null;
-	}
-
-	public static ReliableMessaging getReliableMessaging(CollaborationProtocolAgreement cpa, MessageHeader messageHeader)
-	{
-		try
-		{
-			PartyInfo partyInfo = getPartyInfo(cpa,messageHeader.getFrom().getPartyId());
-			DeliveryChannel deliveryChannel = getSendingDeliveryChannel(partyInfo,messageHeader.getFrom().getRole(),messageHeader.getService(),messageHeader.getAction());
-			if (!PerMessageCharacteristicsType.NEVER.equals((deliveryChannel.getMessagingCharacteristics().getAckRequested())))
-				return ((DocExchange)deliveryChannel.getDocExchangeId()).getEbXMLSenderBinding().getReliableMessaging();
-			else
-				return null;
-		}
-		catch (Exception e)
-		{
-			return null;
-		}
-	}
-	
-	public static String getUri(CollaborationProtocolAgreement cpa, EbMSMessage message)
-	{
-		PartyInfo partyInfo = CPAUtils.getPartyInfo(cpa,message.getMessageHeader().getTo().getPartyId());
-		DeliveryChannel deliveryChannel = CPAUtils.getReceivingDeliveryChannel(partyInfo,message.getMessageHeader().getTo().getRole(),message.getMessageHeader().getService(),message.getMessageHeader().getAction());
-		return getUri(deliveryChannel);
+		SenderNonRepudiation senderNonRepudiation = docExchange.getEbXMLSenderBinding().getSenderNonRepudiation();
+		return senderNonRepudiation.getHashFunction();
 	}
 
 	public static String getUri(DeliveryChannel deliveryChannel)
@@ -340,6 +289,30 @@ public class CPAUtils
 		{
 			return "hostname";
 		}
+	}
+
+	public static X509Certificate getX509Certificate(Certificate certificate) throws CertificateException
+	{
+		for (Object o : certificate.getKeyInfo().getContent())
+		{
+			if (o instanceof JAXBElement<?> && ((JAXBElement<?>)o).getValue() instanceof X509DataType)
+			{
+				for (Object p : ((X509DataType)((JAXBElement<?>)o).getValue()).getX509IssuerSerialOrX509SKIOrX509SubjectName())
+				{
+					if (p instanceof JAXBElement<?> && "X509Certificate".equals(((JAXBElement<?>)p).getName().getLocalPart()))
+					{
+						return (X509Certificate)CertificateFactory.getInstance("X.509").generateCertificate(new ByteArrayInputStream((byte[])((JAXBElement<?>)p).getValue())); 
+					}
+				}
+			}
+		}
+		return null;
+	}
+
+	private static String getSignatureAlgorithm(String value)
+	{
+		//TODO: Expected values include: RSA-MD5, RSA-SHA1, DSA-MD5, DSA-SHA1, SHA1withRSA, MD5withRSA, and so on.
+		return value;
 	}
 
 }

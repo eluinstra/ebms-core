@@ -194,15 +194,7 @@ public class EbMSMessageUtils
 		//messageHeader.getMessageData().setRefToMessageId(null);
 		messageHeader.getMessageData().setTimestamp(DatatypeFactory.newInstance().newXMLGregorianCalendar(new GregorianCalendar()));
 
-		ReliableMessaging rm = CPAUtils.getReliableMessaging(cpa,messageHeader);
-		if (rm != null)
-		{
-			GregorianCalendar timestamp = messageHeader.getMessageData().getTimestamp().toGregorianCalendar();
-			Duration d = rm.getRetryInterval().multiply(rm.getRetries().add(new BigInteger("1")).intValue());
-			d.addTo(timestamp);
-			timestamp.add(Calendar.SECOND,1);
-			messageHeader.getMessageData().setTimeToLive(DatatypeFactory.newInstance().newXMLGregorianCalendar(timestamp));
-		}
+		//setTimeToLive(cpa,deliveryChannel,messageHeader);
 
 		//messageHeader.setDuplicateElimination(PerMessageCharacteristicsType.ALWAYS.equals(deliveryChannel.getMessagingCharacteristics().getDuplicateElimination()) ? "" : null);
 		
@@ -250,19 +242,24 @@ public class EbMSMessageUtils
 		messageHeader.getMessageData().setRefToMessageId(context.getRefToMessageId());
 		messageHeader.getMessageData().setTimestamp(DatatypeFactory.newInstance().newXMLGregorianCalendar(new GregorianCalendar()));
 
-		ReliableMessaging rm = CPAUtils.getReliableMessaging(cpa,messageHeader);
-		if (rm != null)
+		setTimeToLive(cpa,deliveryChannel,messageHeader);
+
+		messageHeader.setDuplicateElimination(PerMessageCharacteristicsType.ALWAYS.equals(deliveryChannel.getMessagingCharacteristics().getDuplicateElimination()) ? "" : null);
+		
+		return messageHeader;
+	}
+
+	private static void setTimeToLive(CollaborationProtocolAgreement cpa, DeliveryChannel deliveryChannel, MessageHeader messageHeader) throws DatatypeConfigurationException
+	{
+		if (CPAUtils.isReliableMessaging(cpa,deliveryChannel))
 		{
+			ReliableMessaging rm = CPAUtils.getReliableMessaging(cpa,deliveryChannel);
 			GregorianCalendar timestamp = messageHeader.getMessageData().getTimestamp().toGregorianCalendar();
 			Duration d = rm.getRetryInterval().multiply(rm.getRetries().add(new BigInteger("1")).intValue());
 			d.addTo(timestamp);
 			timestamp.add(Calendar.SECOND,1);
 			messageHeader.getMessageData().setTimeToLive(DatatypeFactory.newInstance().newXMLGregorianCalendar(timestamp));
 		}
-
-		messageHeader.setDuplicateElimination(PerMessageCharacteristicsType.ALWAYS.equals(deliveryChannel.getMessagingCharacteristics().getDuplicateElimination()) ? "" : null);
-		
-		return messageHeader;
 	}
 
 	public static MessageHeader createMessageHeader(CollaborationProtocolAgreement cpa, MessageHeader messageHeader, GregorianCalendar timestamp, EbMSAction action) throws DatatypeConfigurationException, JAXBException
@@ -290,7 +287,7 @@ public class EbMSMessageUtils
 		result.getService().setValue(Constants.EBMS_SERVICE_URI);
 		result.setAction(action.action());
 
-		result.setDuplicateElimination(null);
+		//result.setDuplicateElimination(null);
 
 		return result;
 	}
@@ -486,13 +483,17 @@ public class EbMSMessageUtils
 	{
 		List<EbMSSendEvent> result = new ArrayList<EbMSSendEvent>();
 		Date sendTime = messageHeader.getMessageData().getTimestamp().toGregorianCalendar().getTime();
-		ReliableMessaging rm = CPAUtils.getReliableMessaging(cpa,messageHeader);
-		if (rm != null)
+		PartyInfo partyInfo = CPAUtils.getPartyInfo(cpa,messageHeader.getFrom().getPartyId());
+		DeliveryChannel deliveryChannel = CPAUtils.getSendingDeliveryChannel(partyInfo,messageHeader.getFrom().getRole(),messageHeader.getService(),messageHeader.getAction());
+		if (CPAUtils.isReliableMessaging(cpa,deliveryChannel))
+		{
+			ReliableMessaging rm = CPAUtils.getReliableMessaging(cpa,deliveryChannel);
 			for (int i = 0; i < rm.getRetries().intValue() + 1; i++)
 			{
 				result.add(new EbMSSendEvent(id,(Date)sendTime.clone()));
 				rm.getRetryInterval().addTo(sendTime);
 			}
+		}
 		else
 			result.add(new EbMSSendEvent(id,(Date)sendTime.clone()));
 		return result;

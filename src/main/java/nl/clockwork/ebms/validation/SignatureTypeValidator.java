@@ -22,7 +22,6 @@ import nl.clockwork.ebms.model.EbMSDocument;
 import nl.clockwork.ebms.model.cpp.cpa.CollaborationProtocolAgreement;
 import nl.clockwork.ebms.model.cpp.cpa.DeliveryChannel;
 import nl.clockwork.ebms.model.cpp.cpa.PartyInfo;
-import nl.clockwork.ebms.model.cpp.cpa.ReceiverNonRepudiation;
 import nl.clockwork.ebms.model.ebxml.ErrorList;
 import nl.clockwork.ebms.model.ebxml.MessageHeader;
 import nl.clockwork.ebms.model.ebxml.SeverityType;
@@ -64,8 +63,7 @@ public class SignatureTypeValidator
 	{
 		PartyInfo partyInfo = CPAUtils.getPartyInfo(cpa,messageHeader.getFrom().getPartyId());
 		DeliveryChannel deliveryChannel = CPAUtils.getSendingDeliveryChannel(partyInfo,messageHeader.getFrom().getRole(),messageHeader.getService(),messageHeader.getAction());
-		ReceiverNonRepudiation receiverNonRepudiation = CPAUtils.getReceiverNonRepudiation(deliveryChannel);
-		if (CPAUtils.isSigned(receiverNonRepudiation))
+		if (CPAUtils.isSigned(partyInfo,messageHeader.getFrom().getRole(),messageHeader.getService(),messageHeader.getAction()))
 		{
 			if (signature == null)
 			{
@@ -75,13 +73,13 @@ public class SignatureTypeValidator
 			}
 			List<ReferenceType> references = signature.getSignedInfo().getReference();
 			for (ReferenceType reference : references)
-				if (!CPAUtils.getHashFunction(receiverNonRepudiation).equals(reference.getDigestMethod().getAlgorithm()))
+				if (!CPAUtils.getHashFunction(deliveryChannel).equals(reference.getDigestMethod().getAlgorithm()))
 				{
 					errorList.getError().add(EbMSMessageUtils.createError("//Header/Signature/SignedInfo/Reference[@URI='" + reference.getURI() + "']/DigestMethod[@Algorithm]",Constants.EbMSErrorCode.SECURITY_FAILURE.errorCode(),"Invalid DigestMethod."));
 					errorList.setHighestSeverity(SeverityType.ERROR);
 					return false; 
 				}
-			if (!CPAUtils.getSignatureAlgorithm(receiverNonRepudiation).equals(signature.getSignedInfo().getSignatureMethod().getAlgorithm()))
+			if (!CPAUtils.getSignatureAlgorithm(deliveryChannel).equals(signature.getSignedInfo().getSignatureMethod().getAlgorithm()))
 			{
 				errorList.getError().add(EbMSMessageUtils.createError("//Header/Signature/SignedInfo/SignatureMethod[@Algorithm]",Constants.EbMSErrorCode.SECURITY_FAILURE.errorCode(),"Invalid SignatureMethod."));
 				errorList.setHighestSeverity(SeverityType.ERROR);

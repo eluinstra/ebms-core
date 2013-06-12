@@ -32,7 +32,6 @@ import nl.clockwork.ebms.model.EbMSDocument;
 import nl.clockwork.ebms.model.cpp.cpa.CollaborationProtocolAgreement;
 import nl.clockwork.ebms.model.cpp.cpa.DeliveryChannel;
 import nl.clockwork.ebms.model.cpp.cpa.PartyInfo;
-import nl.clockwork.ebms.model.cpp.cpa.ReceiverNonRepudiation;
 import nl.clockwork.ebms.model.ebxml.MessageHeader;
 import nl.clockwork.ebms.processor.EbMSProcessorException;
 import nl.clockwork.ebms.util.CPAUtils;
@@ -73,15 +72,14 @@ public class EbMSSecSignatureGenerator implements EbMSSignatureGenerator
 			{
 				PartyInfo partyInfo = CPAUtils.getPartyInfo(cpa,messageHeader.getFrom().getPartyId());
 				DeliveryChannel deliveryChannel = CPAUtils.getSendingDeliveryChannel(partyInfo,messageHeader.getFrom().getRole(),messageHeader.getService(),messageHeader.getAction());
-				ReceiverNonRepudiation receiverNonRepudiation = CPAUtils.getReceiverNonRepudiation(deliveryChannel);
-				if (CPAUtils.isSigned(receiverNonRepudiation))
+				if (CPAUtils.isSigned(partyInfo,messageHeader.getFrom().getRole(),messageHeader.getService(),messageHeader.getAction()))
 				{
 					X509Certificate certificate = CPAUtils.getX509Certificate(CPAUtils.getSigningCertificate(deliveryChannel));
 					String alias = keyStore.getCertificateAlias(certificate);
 					if (alias == null)
 						throw new EbMSProcessorException("No certificate found with subject \"" + certificate.getSubjectDN().getName() + "\" in keystore \"" + keyStorePath + "\"");
 					KeyPair keyPair = SecurityUtils.getKeyPair(keyStore,alias,keyStorePassword);
-					sign(keyStore,keyPair,alias,document.getMessage(),document.getAttachments(),CPAUtils.getSignatureAlgorithm(receiverNonRepudiation),CPAUtils.getHashFunction(receiverNonRepudiation));
+					sign(keyStore,keyPair,alias,document.getMessage(),document.getAttachments(),CPAUtils.getSignatureAlgorithm(deliveryChannel),CPAUtils.getHashFunction(deliveryChannel));
 				}
 			}
 		}
