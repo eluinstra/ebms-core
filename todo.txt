@@ -1,3 +1,8 @@
+- improve implementation of BusinessTransactionCharacteristics
+- improve implementation of MessagingCharacteristics:
+	- ackRequested per message
+	- ackSignatureRequested per message
+
 - test multiple certificates in keystore
 - generate soap fault on error
 - change sendEvent generation: store one event per message (and calculate the following after current is handled if necessary)
@@ -22,6 +27,8 @@
 - implement configurable (wire tapped) in and out message logger that logs each received and sent message (and logs message's corresponding/available messageId (and cpaId))
 
 - validate CPA content during upload CPA
+	- only 1 channel per action is supported
+	- canReceive element is optional?
 - remove CPA content validation during message processing
 
 - validate message format (available elements versus action)
@@ -33,9 +40,14 @@
 - improve EbMSHttpClient
   - move cpa functionality to caller; add extra properties for url and signing (sendEvent)?
 
-- add url (or deliveryChannel) to table sendEvent
 - support multiple deliveryChannels
+	- add url (or deliveryChannel) to table sendEvent
 	- support mail channel?
+	- move the following functionality from message generation to message sending (per channel):
+		- ackRequested 
+		- ackSignatureRequested
+		- duplicateElimination
+		- (signature generation)
 
 - implement AdminService?
 - implement wicket/jdo? admin interface:
