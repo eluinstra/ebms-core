@@ -115,13 +115,8 @@ public class EbMSSecSignatureValidator implements EbMSSignatureValidator
 				{
 					DeliveryChannel deliveryChannel = CPAUtils.getSendingDeliveryChannel(partyInfo,messageHeader.getFrom().getRole(),messageHeader.getService(),messageHeader.getAction());
 					if (deliveryChannel != null)
-					{
-						nl.clockwork.ebms.model.cpp.cpa.Certificate c = CPAUtils.getSigningCertificate(deliveryChannel);
-						if (c == null)
-							return null;
-						else
-							return CPAUtils.getX509Certificate(c);
-					}
+						if (CPAUtils.isSigned(partyInfo,messageHeader.getFrom().getRole(),messageHeader.getService(),messageHeader.getAction()))
+							return CPAUtils.getX509Certificate(CPAUtils.getSigningCertificate(deliveryChannel));
 				}
 			}
 			return null;
