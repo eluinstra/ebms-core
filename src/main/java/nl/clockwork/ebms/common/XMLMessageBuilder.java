@@ -17,6 +17,7 @@ package nl.clockwork.ebms.common;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.io.Reader;
 import java.io.StringWriter;
 import java.util.HashMap;
 
@@ -27,6 +28,8 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.util.JAXBSource;
 import javax.xml.namespace.QName;
+import javax.xml.stream.XMLStreamReader;
+import javax.xml.validation.Schema;
 
 import org.apache.commons.lang.StringUtils;
 import org.w3c.dom.Node;
@@ -50,28 +53,92 @@ public class XMLMessageBuilder<T>
 		return handle(new ByteArrayInputStream(xml.getBytes()));
 	}
 
-	@SuppressWarnings("unchecked")
 	public T handle(InputStream is) throws JAXBException
+	{
+		return handle(null,is);
+	}
+
+	@SuppressWarnings("unchecked")
+	public T handle(Schema schema, InputStream is) throws JAXBException
 	{
 		if (is == null)
 			return null;
 		Unmarshaller unmarshaller = context.createUnmarshaller();
+		if (schema != null)
+			unmarshaller.setSchema(schema);
 		Object o = unmarshaller.unmarshal(is);
 		if (o instanceof JAXBElement<?>)
-			return (T)((JAXBElement<T>)o).getValue();
+			return ((JAXBElement<T>)o).getValue();
 		else
 			return (T)o;
 	}
 
+	public T handle(Reader r) throws JAXBException
+	{
+		return handle(null,r);
+	}
+
 	@SuppressWarnings("unchecked")
+	public T handle(Schema schema, Reader r) throws JAXBException
+	{
+		if (r == null)
+			return null;
+		Unmarshaller unmarshaller = context.createUnmarshaller();
+		if (schema != null)
+			unmarshaller.setSchema(schema);
+		Object o = unmarshaller.unmarshal(r);
+		if (o instanceof JAXBElement<?>)
+			return ((JAXBElement<T>)o).getValue();
+		else
+			return (T)o;
+	}
+
+	public T handle(XMLStreamReader r) throws JAXBException
+	{
+		return handle(null,r,null);
+	}
+
+	public T handle(Schema schema, XMLStreamReader r) throws JAXBException
+	{
+		return handle(schema,r,null);
+	}
+
+	public <U> U handle(XMLStreamReader r, Class<U> clazz) throws JAXBException
+	{
+		return handle(null,r,clazz);
+	}
+
+	@SuppressWarnings("unchecked")
+	public <U> U handle(Schema schema, XMLStreamReader r, Class<U> clazz) throws JAXBException
+	{
+		if (r == null)
+			return null;
+		Unmarshaller unmarshaller = context.createUnmarshaller();
+		if (schema != null)
+			unmarshaller.setSchema(schema);
+		Object o = clazz == null ? unmarshaller.unmarshal(r) : unmarshaller.unmarshal(r,clazz);
+		if (o instanceof JAXBElement<?>)
+			return ((JAXBElement<U>)o).getValue();
+		else
+			return (U)o;
+	}
+
 	public T handle(Node n) throws JAXBException
+	{
+		return handle(null,n);
+	}
+
+	@SuppressWarnings("unchecked")
+	public T handle(Schema schema, Node n) throws JAXBException
 	{
 		if (n == null)
 			return null;
 		Unmarshaller unmarshaller = context.createUnmarshaller();
+		if (schema != null)
+			unmarshaller.setSchema(schema);
 		Object o = unmarshaller.unmarshal(n);
 		if (o instanceof JAXBElement<?>)
-			return (T)((JAXBElement<T>)o).getValue();
+			return ((JAXBElement<T>)o).getValue();
 		else
 			return (T)o;
 	}
