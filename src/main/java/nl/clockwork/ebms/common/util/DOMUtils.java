@@ -97,9 +97,23 @@ public class DOMUtils
 		transformer.transform(new DOMSource(document),new StreamResult(outputStream));
 	}
 
+	public static void write(Document document, OutputStream outputStream, String encoding) throws TransformerException
+	{
+		Transformer transformer = getTransformer();
+		transformer.setOutputProperty(OutputKeys.ENCODING,encoding);
+		transformer.transform(new DOMSource(document),new StreamResult(outputStream));
+	}
+
 	public static void write(Document document, Writer writer) throws TransformerException
 	{
 		Transformer transformer = getTransformer();
+		transformer.transform(new DOMSource(document),new StreamResult(writer));
+	}
+	
+	public static void write(Document document, Writer writer, String encoding) throws TransformerException
+	{
+		Transformer transformer = getTransformer();
+		transformer.setOutputProperty(OutputKeys.ENCODING,encoding);
 		transformer.transform(new DOMSource(document),new StreamResult(writer));
 	}
 	

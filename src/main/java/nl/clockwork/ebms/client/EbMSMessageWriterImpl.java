@@ -16,6 +16,7 @@
 package nl.clockwork.ebms.client;
 
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.util.UUID;
@@ -66,7 +67,7 @@ public class EbMSMessageWriterImpl implements EbMSMessageWriter
 		connection.setRequestProperty("Content-Type","text/xml");
 		connection.setRequestProperty("SOAPAction",Constants.EBMS_SOAP_ACTION);
 		//signatureGenerator.generateSignature(message,ebMSMessage.getAttachments());
-		DOMUtils.write(document.getMessage(),connection.getOutputStream());
+		DOMUtils.write(document.getMessage(),connection.getOutputStream(),"UTF-8");
 	}
 	
 	private void writeMimeMessage(EbMSDocument document) throws IOException, TransformerException
@@ -77,8 +78,10 @@ public class EbMSMessageWriterImpl implements EbMSMessageWriter
 		connection.setRequestProperty("MIME-Version","1.0");
 		connection.setRequestProperty("Content-Type",contentType);
 		connection.setRequestProperty("SOAPAction",Constants.EBMS_SOAP_ACTION);
-	
-		OutputStreamWriter writer = new OutputStreamWriter(connection.getOutputStream());
+
+		OutputStream outputStream = connection.getOutputStream();
+
+		OutputStreamWriter writer = new OutputStreamWriter(outputStream,"UTF-8");
 		writer.write("--");
 		writer.write(boundary);
 		writer.write("\r\n");
@@ -90,7 +93,7 @@ public class EbMSMessageWriterImpl implements EbMSMessageWriter
 		writer.write("Content-ID: <0>");
 		writer.write("\r\n");
 		writer.write("\r\n");
-		DOMUtils.write(document.getMessage(),writer);
+		DOMUtils.write(document.getMessage(),writer,"UTF-8");
 		writer.write("\r\n");
 		writer.write("--");
 		writer.write(boundary);
@@ -105,7 +108,8 @@ public class EbMSMessageWriterImpl implements EbMSMessageWriter
 			writer.write("Content-ID: <" + attachment.getContentId() + ">");
 			writer.write("\r\n");
 			writer.write("\r\n");
-			IOUtils.copy(attachment.getDataSource().getInputStream(),writer);
+			writer.flush();
+			IOUtils.copy(attachment.getDataSource().getInputStream(),outputStream);
 			writer.write("\r\n");
 			writer.write("--");
 			writer.write(boundary);
