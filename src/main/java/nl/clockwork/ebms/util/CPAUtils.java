@@ -21,7 +21,6 @@ import java.net.URL;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
-import java.util.ArrayList;
 import java.util.GregorianCalendar;
 import java.util.List;
 
@@ -186,9 +185,8 @@ public class CPAUtils
 
 	public static DeliveryChannel getSendingDeliveryChannel(PartyInfo partyInfo, String role, Service service, String action)
 	{
-		List<DeliveryChannel> result = new ArrayList<DeliveryChannel>();
 		if (Constants.EBMS_SERVICE_URI.equals(service.getValue()))
-			result.add((DeliveryChannel)partyInfo.getDefaultMshChannelId());
+			return (DeliveryChannel)partyInfo.getDefaultMshChannelId();
 		else
 		{
 			ServiceBinding serviceBinding = getServiceBinding(partyInfo, role, service);
@@ -203,9 +201,8 @@ public class CPAUtils
 	
 	public static DeliveryChannel getReceivingDeliveryChannel(PartyInfo partyInfo, String role, Service service, String action)
 	{
-		List<DeliveryChannel> result = new ArrayList<DeliveryChannel>();
 		if (Constants.EBMS_SERVICE_URI.equals(service.getValue()))
-			result.add((DeliveryChannel)partyInfo.getDefaultMshChannelId());
+			return (DeliveryChannel)partyInfo.getDefaultMshChannelId();
 		else
 		{
 			ServiceBinding serviceBinding = getServiceBinding(partyInfo, role, service);
