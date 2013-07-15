@@ -102,8 +102,7 @@ public class EbMSContentHandler implements ContentHandler
 		ByteArrayDataSource ds = new ByteArrayDataSource(is,contentType);
 		//ds.setName("");
 		String contentId = getHeader("Content-ID");
-		//TODO parse properly
-		contentId = contentId.substring(1,contentId.length() - 1);
+		contentId = contentId.replaceAll("^<(.*)>$|^(.*)$","$1$2");
 		attachments.add(new EbMSAttachment(ds,contentId));
 		headers.clear();
 	}
