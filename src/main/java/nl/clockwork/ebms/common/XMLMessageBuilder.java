@@ -29,6 +29,7 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.util.JAXBSource;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamReader;
+import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
 
 import org.apache.commons.lang.StringUtils;
@@ -58,15 +59,20 @@ public class XMLMessageBuilder<T>
 		return handle(null,is);
 	}
 
-	@SuppressWarnings("unchecked")
 	public T handle(Schema schema, InputStream is) throws JAXBException
+	{
+		return handle(schema,is);
+	}
+
+	@SuppressWarnings("unchecked")
+	public T handle(Schema schema, InputStream is, Class<?> clazz) throws JAXBException
 	{
 		if (is == null)
 			return null;
 		Unmarshaller unmarshaller = context.createUnmarshaller();
 		if (schema != null)
 			unmarshaller.setSchema(schema);
-		Object o = unmarshaller.unmarshal(is);
+		Object o = clazz == null ? unmarshaller.unmarshal(is) : unmarshaller.unmarshal(new StreamSource(is),clazz);
 		if (o instanceof JAXBElement<?>)
 			return ((JAXBElement<T>)o).getValue();
 		else
