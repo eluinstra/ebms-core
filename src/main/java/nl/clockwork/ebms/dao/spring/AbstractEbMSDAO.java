@@ -696,6 +696,12 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 		}
 	}
 
+	@Override
+	public long insertDuplicateMessage(Date timestamp, EbMSMessage message) throws DAOException
+	{
+		return 0;
+	}
+
 	protected String getContent(EbMSMessage message) throws JAXBException
 	{
 		if (!Constants.EBMS_SERVICE_URI.equals(message.getMessageHeader().getService().getValue()))

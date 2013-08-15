@@ -781,6 +781,12 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	}
 
 	@Override
+	public long insertDuplicateMessage(Date timestamp, EbMSMessage message) throws DAOException
+	{
+		return 0;
+	}
+	
+	@Override
 	public void updateMessageStatus(Long ebMSMessageId, EbMSMessageStatus oldStatus, EbMSMessageStatus newStatus) throws DAOException
 	{
 		Connection c = null;
