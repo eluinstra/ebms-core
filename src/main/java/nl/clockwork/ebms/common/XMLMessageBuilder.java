@@ -49,9 +49,14 @@ public class XMLMessageBuilder<T>
 
 	public T handle(String xml) throws JAXBException
 	{
+		return (handle(xml,null));
+	}
+
+	public T handle(String xml, Class<T> clazz) throws JAXBException
+	{
 		if (StringUtils.isEmpty(xml))
 			return null;
-		return handle(new ByteArrayInputStream(xml.getBytes()));
+		return handle(new ByteArrayInputStream(xml.getBytes()),clazz);
 	}
 
 	public T handle(InputStream is) throws JAXBException
@@ -61,11 +66,16 @@ public class XMLMessageBuilder<T>
 
 	public T handle(Schema schema, InputStream is) throws JAXBException
 	{
-		return handle(schema,is);
+		return handle(schema,is,null);
+	}
+
+	public T handle(InputStream is, Class<T> clazz) throws JAXBException
+	{
+		return handle(null,is,clazz);
 	}
 
 	@SuppressWarnings("unchecked")
-	public T handle(Schema schema, InputStream is, Class<?> clazz) throws JAXBException
+	public T handle(Schema schema, InputStream is, Class<T> clazz) throws JAXBException
 	{
 		if (is == null)
 			return null;
@@ -109,13 +119,13 @@ public class XMLMessageBuilder<T>
 		return handle(schema,r,null);
 	}
 
-	public <U> U handle(XMLStreamReader r, Class<U> clazz) throws JAXBException
+	public T handle(XMLStreamReader r, Class<T> clazz) throws JAXBException
 	{
 		return handle(null,r,clazz);
 	}
 
 	@SuppressWarnings("unchecked")
-	public <U> U handle(Schema schema, XMLStreamReader r, Class<U> clazz) throws JAXBException
+	public T handle(Schema schema, XMLStreamReader r, Class<T> clazz) throws JAXBException
 	{
 		if (r == null)
 			return null;
@@ -124,9 +134,9 @@ public class XMLMessageBuilder<T>
 			unmarshaller.setSchema(schema);
 		Object o = clazz == null ? unmarshaller.unmarshal(r) : unmarshaller.unmarshal(r,clazz);
 		if (o instanceof JAXBElement<?>)
-			return ((JAXBElement<U>)o).getValue();
+			return ((JAXBElement<T>)o).getValue();
 		else
-			return (U)o;
+			return (T)o;
 	}
 
 	public T handle(Node n) throws JAXBException
