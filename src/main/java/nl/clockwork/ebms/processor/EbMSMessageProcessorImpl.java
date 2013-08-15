@@ -30,6 +30,8 @@ import nl.clockwork.ebms.Constants;
 import nl.clockwork.ebms.Constants.EbMSAction;
 import nl.clockwork.ebms.Constants.EbMSEventStatus;
 import nl.clockwork.ebms.Constants.EbMSMessageStatus;
+import nl.clockwork.ebms.DefaultEventHandler;
+import nl.clockwork.ebms.EventHandler;
 import nl.clockwork.ebms.client.DeliveryManager;
 import nl.clockwork.ebms.dao.DAOException;
 import nl.clockwork.ebms.dao.DAOTransactionCallback;
@@ -59,6 +61,7 @@ public class EbMSMessageProcessorImpl implements EbMSMessageProcessor
 {
   protected transient Log logger = LogFactory.getLog(getClass());
 	private DeliveryManager deliveryManager;
+	private EventHandler eventHandler = new DefaultEventHandler();
   private EbMSDAO ebMSDAO;
   private EbMSSignatureValidator signatureValidator;
 	private XSDValidator xsdValidator;
@@ -100,7 +103,8 @@ public class EbMSMessageProcessorImpl implements EbMSMessageProcessor
 			}
 			else if (EbMSAction.ACKNOWLEDGMENT.action().equals(message.getMessageHeader().getAction()))
 			{
-				process(timestamp,message,EbMSMessageStatus.DELIVERED);
+				process(timestamp,message,EbMSMessageStatus.DELIVERY_ACKNOWLEDGED);
+				eventHandler.onMessageDelivered(message.getMessageHeader().getMessageData().getRefToMessageId());
 				return null;
 			}
 			else if (EbMSAction.STATUS_REQUEST.action().equals(message.getMessageHeader().getAction()))
@@ -140,38 +144,64 @@ public class EbMSMessageProcessorImpl implements EbMSMessageProcessor
 	@Override
 	public void processResponse(EbMSDocument document) throws EbMSProcessorException
 	{
-		try
-		{
-			xsdValidator.validate(document.getMessage());
-			GregorianCalendar timestamp = new GregorianCalendar();
-			final EbMSMessage message = EbMSMessageUtils.getEbMSMessage(document.getMessage(),document.getAttachments());
-			//final CollaborationProtocolAgreement cpa = ebMSDAO.getCPA(message.getMessageHeader().getCPAId());
-			if (Constants.EBMS_SERVICE_URI.equals(message.getMessageHeader().getService().getValue()))
-				if (EbMSAction.MESSAGE_ERROR.action().equals(message.getMessageHeader().getAction()))
-					process(timestamp,message,EbMSMessageStatus.DELIVERY_FAILED);
-				else if (EbMSAction.ACKNOWLEDGMENT.action().equals(message.getMessageHeader().getAction()))
-					process(timestamp,message,EbMSMessageStatus.DELIVERED);
-		}
-		catch (Exception e)
-		{
-			throw new EbMSProcessorException(e);
-		}
+		if (document != null && document.getMessage() != null)
+			try
+			{
+				xsdValidator.validate(document.getMessage());
+				GregorianCalendar timestamp = new GregorianCalendar();
+				final EbMSMessage message = EbMSMessageUtils.getEbMSMessage(document.getMessage(),document.getAttachments());
+				//final CollaborationProtocolAgreement cpa = ebMSDAO.getCPA(message.getMessageHeader().getCPAId());
+				if (Constants.EBMS_SERVICE_URI.equals(message.getMessageHeader().getService().getValue()))
+					if (EbMSAction.MESSAGE_ERROR.action().equals(message.getMessageHeader().getAction()))
+						process(timestamp,message,EbMSMessageStatus.DELIVERY_FAILED);
+					else if (EbMSAction.ACKNOWLEDGMENT.action().equals(message.getMessageHeader().getAction()))
+					{
+						process(timestamp,message,EbMSMessageStatus.DELIVERY_ACKNOWLEDGED);
+						eventHandler.onMessageDelivered(message.getMessageHeader().getMessageData().getRefToMessageId());
+					}
+			}
+			catch (Exception e)
+			{
+				throw new EbMSProcessorException(e);
+			}
 	}
 	
 	private EbMSMessage process(CollaborationProtocolAgreement cpa, final GregorianCalendar timestamp, EbMSDocument document, final EbMSMessage message) throws DAOException, ValidatorException, DatatypeConfigurationException, JAXBException, SOAPException, ParserConfigurationException, SAXException, IOException, TransformerFactoryConfigurationError, TransformerException
 	{
-		MessageHeader messageHeader = message.getMessageHeader();
+		final MessageHeader messageHeader = message.getMessageHeader();
 		if (isDuplicateMessage(message))
 		{
 			logger.warn("Duplicate message found! MessageId: " + message.getMessageHeader().getMessageData().getMessageId());
 			if (message.getSyncReply() == null)
 			{
-				long responseId = ebMSDAO.getMessageId(messageHeader.getMessageData().getMessageId(),service,EbMSAction.MESSAGE_ERROR.action(),EbMSAction.ACKNOWLEDGMENT.action());
-				ebMSDAO.insertSendEvent(responseId);
+				ebMSDAO.executeTransaction(
+					new DAOTransactionCallback()
+					{
+						@Override
+						public void doInTransaction()
+						{
+							ebMSDAO.insertDuplicateMessage(timestamp.getTime(),message);
+							long responseId = ebMSDAO.getMessageId(messageHeader.getMessageData().getMessageId(),service,EbMSAction.MESSAGE_ERROR.action(),EbMSAction.ACKNOWLEDGMENT.action());
+							ebMSDAO.insertSendEvent(responseId);
+						}
+					}
+				);
 				return null;
 			}
 			else
+			{
+				ebMSDAO.executeTransaction(
+					new DAOTransactionCallback()
+					{
+						@Override
+						public void doInTransaction()
+						{
+							ebMSDAO.insertDuplicateMessage(timestamp.getTime(),message);
+						}
+					}
+				);
 				return ebMSDAO.getMessage(messageHeader.getMessageData().getMessageId(),service,EbMSAction.MESSAGE_ERROR.action(),EbMSAction.ACKNOWLEDGMENT.action());
+			}
 		}
 		else
 		{
@@ -184,7 +214,22 @@ public class EbMSMessageProcessorImpl implements EbMSMessageProcessor
 			)
 			{
 				logger.info("Message valid. MessageId: " + message.getMessageHeader().getMessageData().getMessageId());
-				if (message.getAckRequested() != null)
+				if (message.getAckRequested() == null)
+				{
+					ebMSDAO.executeTransaction(
+						new DAOTransactionCallback()
+						{
+							@Override
+							public void doInTransaction()
+							{
+								ebMSDAO.insertMessage(timestamp.getTime(),message,EbMSMessageStatus.RECEIVED);
+								eventHandler.onMessageReceived(message.getMessageHeader().getMessageData().getMessageId());
+							}
+						}
+					);
+					return null;
+				}
+				else
 				{
 					final EbMSMessage acknowledgment = EbMSMessageUtils.createEbMSAcknowledgment(cpa,message,timestamp);
 					ebMSDAO.executeTransaction(
@@ -200,24 +245,11 @@ public class EbMSMessageProcessorImpl implements EbMSMessageProcessor
 									EbMSSendEvent sendEvent = EbMSMessageUtils.getEbMSSendEvent(id,acknowledgment.getMessageHeader());
 									ebMSDAO.insertSendEvent(sendEvent);
 								}
+								eventHandler.onMessageReceived(message.getMessageHeader().getMessageData().getMessageId());
 							}
 						}
 					);
 					return message.getSyncReply() == null ? null : acknowledgment;
-				}
-				else
-				{
-					ebMSDAO.executeTransaction(
-						new DAOTransactionCallback()
-						{
-							@Override
-							public void doInTransaction()
-							{
-								ebMSDAO.insertMessage(timestamp.getTime(),message,EbMSMessageStatus.RECEIVED);
-							}
-						}
-					);
-					return null;
 				}
 			}
 			else
@@ -247,7 +279,18 @@ public class EbMSMessageProcessorImpl implements EbMSMessageProcessor
 
 	private void process(final Calendar timestamp, final EbMSMessage message, final EbMSMessageStatus status)
 	{
-		if (!isDuplicateMessage(message))
+		if (isDuplicateMessage(message))
+			ebMSDAO.executeTransaction(
+				new DAOTransactionCallback()
+				{
+					@Override
+					public void doInTransaction()
+					{
+						ebMSDAO.insertDuplicateMessage(timestamp.getTime(),message);
+					}
+				}
+			);
+		else
 			ebMSDAO.executeTransaction(
 				new DAOTransactionCallback()
 				{
@@ -307,6 +350,11 @@ public class EbMSMessageProcessorImpl implements EbMSMessageProcessor
 	public void setDeliveryManager(DeliveryManager deliveryManager)
 	{
 		this.deliveryManager = deliveryManager;
+	}
+	
+	public void setEventHandler(EventHandler eventHandler)
+	{
+		this.eventHandler = eventHandler;
 	}
 	
 	public void setEbMSDAO(EbMSDAO ebMSDAO)

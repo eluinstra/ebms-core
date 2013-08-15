@@ -76,8 +76,7 @@ public class ProcessSendEvents implements Job
 					  		signatureGenerator.generate(cpa,document,message.getMessageHeader());
 					  		String uri = CPAUtils.getUri(cpa,message);
 					  		EbMSDocument responseDocument = ebMSClient.sendMessage(uri,document);
-					  		if (responseDocument != null && responseDocument.getMessage() != null)
-					  			messageProcessor.processResponse(responseDocument);
+				  			messageProcessor.processResponse(responseDocument);
 					  		updateEvent(sendEvent,EbMSEventStatus.PROCESSED);
 							}
 							catch (Exception e)
