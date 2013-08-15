@@ -48,5 +48,5 @@ CREATE TABLE ebms_send_event
 	status						INTEGER					NOT NULL DEFAULT 0,
 	status_time				TIMESTAMP				NOT NULL DEFAULT NOW(),
 --	http_status_code	INTEGER					NULL,
-	UNIQUE (ebms_message_id,time)
+	CONSTRAINT uc_ebms_send_event UNIQUE (ebms_message_id,time)
 );
