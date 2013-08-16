@@ -53,7 +53,10 @@ public class EbMSHttpClient implements EbMSClient
 		{
 			HttpURLConnection connection = (HttpURLConnection)openConnection(uri);
 			if (logger.isInfoEnabled())
+			{
+				logger.info("Connection to: " + uri);
 				logger.info("OUT:\n" + DOMUtils.toString(document.getMessage()));
+			}
 			if (chunkedStreaming(uri))
 				connection.setChunkedStreamingMode(0);
 			EbMSMessageWriter writer = new EbMSMessageWriter(connection);
