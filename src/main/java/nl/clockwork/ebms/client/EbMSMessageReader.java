@@ -43,20 +43,15 @@ public class EbMSMessageReader
 				EbMSDocument result = getEbMSMessage(input);
 				return result;
 			}
+			else if (statusCode.startsWith("4") || statusCode.startsWith("5"))
+				throw new EbMSProcessingException("StatusCode: " + statusCode + "\n" + IOUtils.toString(connection.getErrorStream()));
 			else
-			{
-				if (statusCode.startsWith("4") || statusCode.startsWith("5"))
-					throw new EbMSProcessingException("StatusCode: " + connection.getResponseCode() + "\n" + IOUtils.toString(connection.getErrorStream()));
-				else
-					throw new EbMSProcessingException("StatusCode: " + connection.getResponseCode());
-			}
+				throw new EbMSProcessingException("StatusCode: " + statusCode);
 		}
 		catch (IOException e)
 		{
 			try
 			{
-				input = null;
-				//int responseCode = connection.getResponseCode();
 				InputStream error = new BufferedInputStream(connection.getErrorStream());
 				error.close();
 			}
