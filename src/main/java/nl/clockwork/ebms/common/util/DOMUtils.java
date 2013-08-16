@@ -91,6 +91,16 @@ public class DOMUtils
 		return writer.toString();
 	}
 
+	public static String toString(Document document, String encoding) throws TransformerException
+	{
+		//return document.getDocumentElement().toString();
+		StringWriter writer = new StringWriter();
+		Transformer transformer = getTransformer();
+		transformer.setOutputProperty(OutputKeys.ENCODING,encoding);
+		transformer.transform(new DOMSource(document),new StreamResult(writer));
+		return writer.toString();
+	}
+
 	public static void write(Document document, OutputStream outputStream) throws TransformerException
 	{
 		Transformer transformer = getTransformer();
