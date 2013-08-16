@@ -52,24 +52,17 @@ public class EbMSHttpClientN implements EbMSClient
 				logger.info("OUT:\n" + DOMUtils.toString(document.getMessage()));
 			if (chunkedStreaming(uri))
 				connection.setChunkedStreamingMode(0);
-			EbMSMessageWriter writer = new EbMSMessageWriterImpl(connection);
+			EbMSMessageWriter writer = new EbMSMessageWriter(connection);
 			writer.write(document);
 			connection.connect();
-			EbMSMessageReader reader = new EbMSMessageReaderImpl(connection);
-			try
+			EbMSMessageReader reader = new EbMSMessageReader(connection);
+			EbMSDocument in = reader.read();
+			if (logger.isInfoEnabled())
 			{
-				EbMSDocument in = reader.read();
-				if (logger.isInfoEnabled())
-				{
-					logger.info("StatusCode: " + connection.getResponseCode());
-					logger.info("IN:\n" + (in == null || in.getMessage() == null ? "" : DOMUtils.toString(in.getMessage())));
-				}
-				return in;
+				logger.info("StatusCode: " + connection.getResponseCode());
+				logger.info("IN:\n" + (in == null || in.getMessage() == null ? "" : DOMUtils.toString(in.getMessage())));
 			}
-			finally
-			{
-				reader.close();
-			}
+			return in;
 		}
 		catch (ConnectException e)
 		{
