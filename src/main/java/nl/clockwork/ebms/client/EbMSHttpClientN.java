@@ -34,13 +34,8 @@ public class EbMSHttpClientN implements EbMSClient
 {
   protected transient Log logger = LogFactory.getLog(getClass());
 	private SSLFactoryManager sslFactoryManager;
-	protected boolean chunkedStreamingMode = true;
+	private boolean chunkedStreamingMode = true;
 	
-	public EbMSHttpClientN()
-	{
-		//System.setProperty("http.keepAlive","false");
-	}
-
 	public EbMSDocument sendMessage(String uri, EbMSDocument document) throws EbMSProcessorException
 	{
 		HttpURLConnection connection = null;
