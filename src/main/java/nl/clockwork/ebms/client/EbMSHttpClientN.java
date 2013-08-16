@@ -34,7 +34,7 @@ public class EbMSHttpClientN implements EbMSClient
 {
   protected transient Log logger = LogFactory.getLog(getClass());
 	private SSLFactoryManager sslFactoryManager;
-	protected boolean chunkedStreamingMode;
+	protected boolean chunkedStreamingMode = true;
 	
 	public EbMSHttpClientN()
 	{
