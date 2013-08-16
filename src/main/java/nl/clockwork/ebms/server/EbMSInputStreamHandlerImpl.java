@@ -27,6 +27,8 @@ import nl.clockwork.ebms.model.EbMSDocument;
 import nl.clockwork.ebms.processor.EbMSMessageProcessor;
 import nl.clockwork.ebms.processor.EbMSProcessorException;
 
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -76,6 +78,11 @@ public abstract class EbMSInputStreamHandlerImpl implements EbMSInputStreamHandl
 					DOMUtils.write(out.getMessage(),response);
 					//response.close();
 				}
+	  	}
+	  	else
+	  	{
+	  		logger.warn("Request ignored! SOAPAction: " + (StringUtils.isEmpty(getHeader("SOAPAction"))? "<empty>" : getHeader("SOAPAction")));
+	  		logger.warn("IN:\n" + IOUtils.toString(request));
 	  	}
 		}
 		catch (Exception e)

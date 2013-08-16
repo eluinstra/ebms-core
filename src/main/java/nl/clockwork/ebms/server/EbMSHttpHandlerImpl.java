@@ -24,6 +24,8 @@ import nl.clockwork.ebms.model.EbMSDocument;
 import nl.clockwork.ebms.processor.EbMSMessageProcessor;
 import nl.clockwork.ebms.processor.EbMSProcessorException;
 
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -37,7 +39,7 @@ public class EbMSHttpHandlerImpl implements EbMSHttpHandler
 	{
 	  try
 		{
-	  	if (Constants.EBMS_SOAP_ACTION.equals(request.getHeader("SOAPAction")))
+	  	if (Constants.EBMS_SOAP_ACTION.equals(getHeader(request,"SOAPAction")))
 	  	{
 	  		EbMSMessageReader messageReader = new EbMSMessageReaderImpl(request.getContentType());
 				EbMSDocument in = messageReader.read(request.getInputStream());
@@ -66,6 +68,11 @@ public class EbMSHttpHandlerImpl implements EbMSHttpHandler
 					//response.getOutputStream().close();
 				}
 	  	}
+	  	else
+	  	{
+	  		logger.warn("Request ignored! SOAPAction: " + (StringUtils.isEmpty(getHeader(request,"SOAPAction"))? "<empty>" : getHeader(request,"SOAPAction")));
+	  		logger.warn("IN:\n" + IOUtils.toString(request.getInputStream()));
+	  	}
 		}
 		catch (Exception e)
 		{
@@ -77,6 +84,22 @@ public class EbMSHttpHandlerImpl implements EbMSHttpHandler
 	public void setMessageProcessor(EbMSMessageProcessor messageProcessor)
 	{
 		this.messageProcessor = messageProcessor;
+	}
+
+	private String getHeader(HttpServletRequest request, String headerName)
+	{
+		String result = request.getHeader(headerName);
+		if (result == null)
+			while (request.getHeaderNames().hasMoreElements())
+			{
+				String key = (String)request.getHeaderNames().nextElement();
+				if (headerName.equalsIgnoreCase(key))
+				{
+					result = request.getHeader(key);
+					break;
+				}
+			}
+		return result;
 	}
 
 }

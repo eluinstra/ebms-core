@@ -26,6 +26,7 @@ import javax.mail.util.ByteArrayDataSource;
 
 import nl.clockwork.ebms.model.EbMSAttachment;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.james.mime4j.MimeException;
@@ -102,6 +103,8 @@ public class EbMSContentHandler implements ContentHandler
 		ByteArrayDataSource ds = new ByteArrayDataSource(is,contentType);
 		//ds.setName("");
 		String contentId = getHeader("Content-ID");
+		if (StringUtils.isEmpty(contentId))
+			throw new NullPointerException("Header Content-ID not found!");
 		contentId = contentId.replaceAll("^<(.*)>$|^(.*)$","$1$2");
 		attachments.add(new EbMSAttachment(ds,contentId));
 		headers.clear();
