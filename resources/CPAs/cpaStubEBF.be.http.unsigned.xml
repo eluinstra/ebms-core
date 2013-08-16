@@ -12,14 +12,14 @@
             <tns:Service tns:type="urn:osb:services">osb:afleveren:1.1$1.0</tns:Service>
             <tns:CanSend>
                <tns:ThisPartyActionBinding tns:id="DIGIPOORT_S_Afleveren" tns:action="afleveren" tns:packageId="defaultPackage">
-                  <tns:BusinessTransactionCharacteristics tns:isAuthenticated="transient-and-persistent" tns:timeToPerform="P2D" tns:isAuthorizationRequired="true" tns:isConfidential="transient" tns:isIntelligibleCheckRequired="false" tns:isNonRepudiationReceiptRequired="true" tns:isNonRepudiationRequired="true" tns:isTamperProof="transient-and-persistent"/>
+                  <tns:BusinessTransactionCharacteristics tns:isAuthenticated="transient-and-persistent" tns:timeToPerform="P2D" tns:isAuthorizationRequired="true" tns:isConfidential="transient" tns:isIntelligibleCheckRequired="false" tns:isNonRepudiationReceiptRequired="false" tns:isNonRepudiationRequired="false" tns:isTamperProof="transient-and-persistent"/>
                   <tns:ChannelId>DIGIPOORT_defaultDeliveryChannel_ProfileBestEffortSigned</tns:ChannelId>
                </tns:ThisPartyActionBinding>
                <tns:OtherPartyActionBinding>OVERHEID_R_Afleveren</tns:OtherPartyActionBinding>
             </tns:CanSend>
             <tns:CanReceive>
                <tns:ThisPartyActionBinding tns:id="DIGIPOORT_R_BevestigAfleveren" tns:action="bevestigAfleveren" tns:packageId="defaultPackage">
-                  <tns:BusinessTransactionCharacteristics tns:isAuthenticated="transient-and-persistent" tns:timeToPerform="P2D" tns:isAuthorizationRequired="true" tns:isConfidential="transient" tns:isIntelligibleCheckRequired="false" tns:isNonRepudiationReceiptRequired="true" tns:isNonRepudiationRequired="true" tns:isTamperProof="transient-and-persistent"/>
+                  <tns:BusinessTransactionCharacteristics tns:isAuthenticated="transient-and-persistent" tns:timeToPerform="P2D" tns:isAuthorizationRequired="true" tns:isConfidential="transient" tns:isIntelligibleCheckRequired="false" tns:isNonRepudiationReceiptRequired="false" tns:isNonRepudiationRequired="false" tns:isTamperProof="transient-and-persistent"/>
                   <tns:ChannelId>DIGIPOORT_defaultDeliveryChannel_ProfileBestEffortSigned</tns:ChannelId>
                </tns:ThisPartyActionBinding>
                <tns:OtherPartyActionBinding>OVERHEID_S_BevestigAfleveren</tns:OtherPartyActionBinding>
@@ -33,14 +33,14 @@
             <tns:Service tns:type="urn:osb:services">osb:aanleveren:1.1$1.0</tns:Service>
             <tns:CanSend>
                <tns:ThisPartyActionBinding tns:id="DIGIPOORT_S_BevestigAanleveren" tns:action="bevestigAanleveren" tns:packageId="defaultPackage">
-                  <tns:BusinessTransactionCharacteristics tns:isAuthenticated="transient-and-persistent" tns:timeToPerform="P2D" tns:isAuthorizationRequired="true" tns:isConfidential="transient" tns:isIntelligibleCheckRequired="false" tns:isNonRepudiationReceiptRequired="true" tns:isNonRepudiationRequired="true" tns:isTamperProof="transient-and-persistent"/>
+                  <tns:BusinessTransactionCharacteristics tns:isAuthenticated="transient-and-persistent" tns:timeToPerform="P2D" tns:isAuthorizationRequired="true" tns:isConfidential="transient" tns:isIntelligibleCheckRequired="false" tns:isNonRepudiationReceiptRequired="false" tns:isNonRepudiationRequired="false" tns:isTamperProof="transient-and-persistent"/>
                   <tns:ChannelId>DIGIPOORT_defaultDeliveryChannel_ProfileBestEffortSigned</tns:ChannelId>
                </tns:ThisPartyActionBinding>
                <tns:OtherPartyActionBinding>OVERHEID_R_BevestigAanleveren</tns:OtherPartyActionBinding>
             </tns:CanSend>
             <tns:CanReceive>
                <tns:ThisPartyActionBinding tns:id="DIGIPOORT_R_Aanleveren" tns:action="aanleveren" tns:packageId="defaultPackage">
-                  <tns:BusinessTransactionCharacteristics tns:isAuthenticated="transient-and-persistent" tns:timeToPerform="P2D" tns:isAuthorizationRequired="true" tns:isConfidential="transient" tns:isIntelligibleCheckRequired="false" tns:isNonRepudiationReceiptRequired="true" tns:isNonRepudiationRequired="true" tns:isTamperProof="transient-and-persistent"/>
+                  <tns:BusinessTransactionCharacteristics tns:isAuthenticated="transient-and-persistent" tns:timeToPerform="P2D" tns:isAuthorizationRequired="true" tns:isConfidential="transient" tns:isIntelligibleCheckRequired="false" tns:isNonRepudiationReceiptRequired="false" tns:isNonRepudiationRequired="false" tns:isTamperProof="transient-and-persistent"/>
                   <tns:ChannelId>DIGIPOORT_defaultDeliveryChannel_ProfileBestEffortSigned</tns:ChannelId>
                </tns:ThisPartyActionBinding>
                <tns:OtherPartyActionBinding>OVERHEID_S_Aanleveren</tns:OtherPartyActionBinding>
@@ -74,14 +74,14 @@
             <tns:Service tns:type="urn:osb:services">osb:afleveren:1.1$1.0</tns:Service>
             <tns:CanSend>
                <tns:ThisPartyActionBinding tns:id="OVERHEID_S_BevestigAfleveren" tns:action="bevestigAfleveren" tns:packageId="defaultPackage">
-                  <tns:BusinessTransactionCharacteristics tns:isAuthenticated="transient-and-persistent" tns:timeToPerform="P2D" tns:isAuthorizationRequired="true" tns:isConfidential="transient" tns:isIntelligibleCheckRequired="false" tns:isNonRepudiationReceiptRequired="true" tns:isNonRepudiationRequired="true" tns:isTamperProof="transient-and-persistent"/>
+                  <tns:BusinessTransactionCharacteristics tns:isAuthenticated="transient-and-persistent" tns:timeToPerform="P2D" tns:isAuthorizationRequired="true" tns:isConfidential="transient" tns:isIntelligibleCheckRequired="false" tns:isNonRepudiationReceiptRequired="false" tns:isNonRepudiationRequired="false" tns:isTamperProof="transient-and-persistent"/>
                   <tns:ChannelId>OVERHEID_defaultDeliveryChannel_ProfileBestEffortSigned</tns:ChannelId>
                </tns:ThisPartyActionBinding>
                <tns:OtherPartyActionBinding>DIGIPOORT_R_BevestigAfleveren</tns:OtherPartyActionBinding>
             </tns:CanSend>
             <tns:CanReceive>
                <tns:ThisPartyActionBinding tns:id="OVERHEID_R_Afleveren" tns:action="afleveren" tns:packageId="defaultPackage">
-                  <tns:BusinessTransactionCharacteristics tns:isAuthenticated="transient-and-persistent" tns:timeToPerform="P2D" tns:isAuthorizationRequired="true" tns:isConfidential="transient" tns:isIntelligibleCheckRequired="false" tns:isNonRepudiationReceiptRequired="true" tns:isNonRepudiationRequired="true" tns:isTamperProof="transient-and-persistent"/>
+                  <tns:BusinessTransactionCharacteristics tns:isAuthenticated="transient-and-persistent" tns:timeToPerform="P2D" tns:isAuthorizationRequired="true" tns:isConfidential="transient" tns:isIntelligibleCheckRequired="false" tns:isNonRepudiationReceiptRequired="false" tns:isNonRepudiationRequired="false" tns:isTamperProof="transient-and-persistent"/>
                   <tns:ChannelId>OVERHEID_defaultDeliveryChannel_ProfileBestEffortSigned</tns:ChannelId>
                </tns:ThisPartyActionBinding>
                <tns:OtherPartyActionBinding>DIGIPOORT_S_Afleveren</tns:OtherPartyActionBinding>
@@ -95,14 +95,14 @@
             <tns:Service tns:type="urn:osb:services">osb:aanleveren:1.1$1.0</tns:Service>
             <tns:CanSend>
                <tns:ThisPartyActionBinding tns:id="OVERHEID_S_Aanleveren" tns:action="aanleveren" tns:packageId="defaultPackage">
-                  <tns:BusinessTransactionCharacteristics tns:isAuthenticated="transient-and-persistent" tns:timeToPerform="P2D" tns:isAuthorizationRequired="true" tns:isConfidential="transient" tns:isIntelligibleCheckRequired="false" tns:isNonRepudiationReceiptRequired="true" tns:isNonRepudiationRequired="true" tns:isTamperProof="transient-and-persistent"/>
+                  <tns:BusinessTransactionCharacteristics tns:isAuthenticated="transient-and-persistent" tns:timeToPerform="P2D" tns:isAuthorizationRequired="true" tns:isConfidential="transient" tns:isIntelligibleCheckRequired="false" tns:isNonRepudiationReceiptRequired="false" tns:isNonRepudiationRequired="false" tns:isTamperProof="transient-and-persistent"/>
                   <tns:ChannelId>OVERHEID_defaultDeliveryChannel_ProfileBestEffortSigned</tns:ChannelId>
                </tns:ThisPartyActionBinding>
                <tns:OtherPartyActionBinding>DIGIPOORT_R_Aanleveren</tns:OtherPartyActionBinding>
             </tns:CanSend>
             <tns:CanReceive>
                <tns:ThisPartyActionBinding tns:id="OVERHEID_R_BevestigAanleveren" tns:action="bevestigAanleveren" tns:packageId="defaultPackage">
-                  <tns:BusinessTransactionCharacteristics tns:isAuthenticated="transient-and-persistent" tns:timeToPerform="P2D" tns:isAuthorizationRequired="true" tns:isConfidential="transient" tns:isIntelligibleCheckRequired="false" tns:isNonRepudiationReceiptRequired="true" tns:isNonRepudiationRequired="true" tns:isTamperProof="transient-and-persistent"/>
+                  <tns:BusinessTransactionCharacteristics tns:isAuthenticated="transient-and-persistent" tns:timeToPerform="P2D" tns:isAuthorizationRequired="true" tns:isConfidential="transient" tns:isIntelligibleCheckRequired="false" tns:isNonRepudiationReceiptRequired="false" tns:isNonRepudiationRequired="false" tns:isTamperProof="transient-and-persistent"/>
                   <tns:ChannelId>OVERHEID_defaultDeliveryChannel_ProfileBestEffortSigned</tns:ChannelId>
                </tns:ThisPartyActionBinding>
                <tns:OtherPartyActionBinding>DIGIPOORT_S_BevestigAanleveren</tns:OtherPartyActionBinding>
