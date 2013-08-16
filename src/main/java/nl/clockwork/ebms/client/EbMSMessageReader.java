@@ -25,7 +25,6 @@ import org.xml.sax.SAXException;
 public class EbMSMessageReader
 {
 	private HttpURLConnection connection;
-	private InputStream input;
 	
 	public EbMSMessageReader(HttpURLConnection connection)
 	{
@@ -34,26 +33,33 @@ public class EbMSMessageReader
 
 	public EbMSDocument read() throws IOException, EbMSProcessorException
 	{
+		InputStream input = null;
 		try
 		{
 			input = connection.getInputStream();
-			String statusCode = new Integer(connection.getResponseCode()).toString();
-			if (statusCode.startsWith("2"))
+			if (connection.getResponseCode() / 100 == 2)
 			{
 				EbMSDocument result = getEbMSMessage(input);
 				return result;
 			}
-			else if (statusCode.startsWith("4") || statusCode.startsWith("5"))
-				throw new EbMSProcessingException("StatusCode: " + statusCode + "\n" + IOUtils.toString(connection.getErrorStream()));
+			else if (connection.getResponseCode() >= 400)
+			{
+				InputStream errorStream = connection.getErrorStream();
+				String error = IOUtils.toString(errorStream);
+				errorStream.close();
+				throw new EbMSProcessingException("StatusCode: " + connection.getResponseCode() + "\n" + error);
+			}
 			else
-				throw new EbMSProcessingException("StatusCode: " + statusCode);
+				throw new EbMSProcessingException("StatusCode: " + connection.getResponseCode());
 		}
 		catch (IOException e)
 		{
 			try
 			{
-				InputStream error = new BufferedInputStream(connection.getErrorStream());
-				error.close();
+				connection.getResponseCode();
+				InputStream errorStream = new BufferedInputStream(connection.getErrorStream());
+				IOUtils.toString(errorStream);
+				errorStream.close();
 			}
 			catch (IOException ex)
 			{
