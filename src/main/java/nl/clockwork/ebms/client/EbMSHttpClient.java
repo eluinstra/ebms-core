@@ -58,7 +58,6 @@ public class EbMSHttpClient implements EbMSClient
 				connection.setChunkedStreamingMode(0);
 			EbMSMessageWriter writer = new EbMSMessageWriterImpl(connection);
 			writer.write(document);
-			writer.flush();
 			EbMSDocument in = getEbMSMessage(connection.getInputStream());
 			if (logger.isInfoEnabled())
 			{

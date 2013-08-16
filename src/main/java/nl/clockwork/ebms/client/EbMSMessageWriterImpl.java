@@ -56,12 +56,6 @@ public class EbMSMessageWriterImpl implements EbMSMessageWriter
 		}
 	}
 
-	@Override
-	public void flush() throws IOException
-	{
-		connection.getOutputStream().flush();
-	}
-	
 	private void writeMessage(EbMSDocument document) throws TransformerException, IOException
 	{
 		connection.setRequestProperty("Content-Type","text/xml");
@@ -82,13 +76,12 @@ public class EbMSMessageWriterImpl implements EbMSMessageWriter
 		OutputStream outputStream = connection.getOutputStream();
 
 		OutputStreamWriter writer = new OutputStreamWriter(outputStream,"UTF-8");
+
 		writer.write("--");
 		writer.write(boundary);
 		writer.write("\r\n");
 
-		writer.write("Content-Type: application/xop+xml; charset=UTF-8; type=\"text/xml\";");
-		writer.write("\r\n");
-		writer.write("Content-Transfer-Encoding: binary");
+		writer.write("Content-Type: text/xml; charset=UTF-8");
 		writer.write("\r\n");
 		writer.write("Content-ID: <0>");
 		writer.write("\r\n");

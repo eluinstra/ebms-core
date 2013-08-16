@@ -23,5 +23,4 @@ import nl.clockwork.ebms.processor.EbMSProcessorException;
 public interface EbMSMessageWriter
 {
 	void write(EbMSDocument document) throws IOException, EbMSProcessorException;
-	void flush() throws IOException;
 }
