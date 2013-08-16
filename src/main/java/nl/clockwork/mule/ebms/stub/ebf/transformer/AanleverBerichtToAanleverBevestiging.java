@@ -21,7 +21,7 @@ import java.util.List;
 
 import javax.xml.datatype.DatatypeFactory;
 
-import nl.clockwork.ebms.common.util.XMLMessageBuilder;
+import nl.clockwork.ebms.common.XMLMessageBuilder;
 import nl.clockwork.ebms.model.EbMSDataSource;
 import nl.clockwork.ebms.model.EbMSMessageContent;
 import nl.clockwork.ebms.model.EbMSMessageContext;
