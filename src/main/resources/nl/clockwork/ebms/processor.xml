@@ -80,7 +80,7 @@
 		<property name="keyStorePassword" value="${signature.keystore.password}" />
 	</bean>  
 
-	<bean id="ebMSClient" class="nl.clockwork.ebms.client.EbMSHttpClient">
+	<bean id="ebMSClient" class="nl.clockwork.ebms.client.EbMSHttpClientN">
 		<property name="sslFactoryManager" ref="sslFactoryManager"/>
 		<property name="chunkedStreamingMode" value="${http.chunkedStreamingMode}"/>
 	</bean>
