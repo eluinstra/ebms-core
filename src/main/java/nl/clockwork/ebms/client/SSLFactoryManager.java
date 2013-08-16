@@ -60,6 +60,7 @@ public class SSLFactoryManager
 		@Override
 		public String chooseClientAlias(String[] keyType, Principal[] issuers, Socket socket)
 		{
+			//socket.getInetAddress().getHostName(); socket.getPort();
 			return clientAlias;
 		}
 
@@ -123,7 +124,7 @@ public class SSLFactoryManager
 		SSLContext sslContext = SSLContext.getInstance("TLS");
 		sslContext.init(keyManagers,tmf.getTrustManagers(),null);
 
-		//SSLEngine engine = sslContext.createSSLEngine(hostname, port);
+		//SSLEngine engine = sslContext.createSSLEngine(hostname,port);
 		SSLEngine engine = sslContext.createSSLEngine();
 		if (allowedCipherSuites.length > 0)
 			engine.setEnabledCipherSuites(allowedCipherSuites);
