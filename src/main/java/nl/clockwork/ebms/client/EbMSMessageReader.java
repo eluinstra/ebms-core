@@ -13,8 +13,6 @@ import javax.xml.parsers.ParserConfigurationException;
 import nl.clockwork.ebms.common.util.DOMUtils;
 import nl.clockwork.ebms.model.EbMSAttachment;
 import nl.clockwork.ebms.model.EbMSDocument;
-import nl.clockwork.ebms.processor.EbMSProcessorException;
-import nl.clockwork.ebms.processor.EbMSProcessingException;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
@@ -31,7 +29,7 @@ public class EbMSMessageReader
 		this.connection = connection;
 	}
 
-	public EbMSDocument read() throws IOException, EbMSProcessorException
+	public EbMSDocument read() throws IOException, ParserConfigurationException, SAXException, ReaderException
 	{
 		InputStream input = null;
 		try
@@ -39,18 +37,17 @@ public class EbMSMessageReader
 			input = connection.getInputStream();
 			if (connection.getResponseCode() / 100 == 2)
 			{
-				EbMSDocument result = getEbMSMessage(input);
-				return result;
+				return getEbMSMessage(input);
 			}
 			else if (connection.getResponseCode() >= 400)
 			{
 				InputStream errorStream = connection.getErrorStream();
 				String error = IOUtils.toString(errorStream);
 				errorStream.close();
-				throw new EbMSProcessingException("StatusCode: " + connection.getResponseCode() + "\n" + error);
+				throw new ReaderException(connection.getResponseCode(),error);
 			}
 			else
-				throw new EbMSProcessingException("StatusCode: " + connection.getResponseCode());
+				throw new ReaderException(connection.getResponseCode());
 		}
 		catch (IOException e)
 		{
@@ -66,14 +63,6 @@ public class EbMSMessageReader
 			}
 			throw e;
 		}
-		catch (ParserConfigurationException e)
-		{
-			throw new EbMSProcessorException(e);
-		}
-		catch (SAXException e)
-		{
-			throw new EbMSProcessorException(e);
-		}
 		finally
 		{
 			if (input != null)
@@ -81,7 +70,7 @@ public class EbMSMessageReader
 		}
 	}
 
-	private EbMSDocument getEbMSMessage(InputStream in) throws ParserConfigurationException, SAXException, IOException
+	private EbMSDocument getEbMSMessage(InputStream in) throws IOException, ParserConfigurationException, SAXException
 	{
 		EbMSDocument result = null;
 		String message = IOUtils.toString(in,getCharSet());
