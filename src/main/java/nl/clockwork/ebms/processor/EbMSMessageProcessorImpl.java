@@ -30,8 +30,8 @@ import nl.clockwork.ebms.Constants;
 import nl.clockwork.ebms.Constants.EbMSAction;
 import nl.clockwork.ebms.Constants.EbMSEventStatus;
 import nl.clockwork.ebms.Constants.EbMSMessageStatus;
-import nl.clockwork.ebms.DefaultEventHandler;
-import nl.clockwork.ebms.EventHandler;
+import nl.clockwork.ebms.DefaultEventListener;
+import nl.clockwork.ebms.EventListener;
 import nl.clockwork.ebms.client.DeliveryManager;
 import nl.clockwork.ebms.dao.DAOException;
 import nl.clockwork.ebms.dao.DAOTransactionCallback;
@@ -61,7 +61,7 @@ public class EbMSMessageProcessorImpl implements EbMSMessageProcessor
 {
   protected transient Log logger = LogFactory.getLog(getClass());
 	private DeliveryManager deliveryManager;
-	private EventHandler eventHandler = new DefaultEventHandler();
+	private EventListener eventListener = new DefaultEventListener();
   private EbMSDAO ebMSDAO;
   private EbMSSignatureValidator signatureValidator;
 	private XSDValidator xsdValidator;
@@ -99,12 +99,13 @@ public class EbMSMessageProcessorImpl implements EbMSMessageProcessor
 			else if (EbMSAction.MESSAGE_ERROR.action().equals(message.getMessageHeader().getAction()))
 			{
 				process(timestamp,message,EbMSMessageStatus.DELIVERY_FAILED);
+				eventListener.onMessageDeliveryFailed(message.getMessageHeader().getMessageData().getRefToMessageId());
 				return null;
 			}
 			else if (EbMSAction.ACKNOWLEDGMENT.action().equals(message.getMessageHeader().getAction()))
 			{
 				process(timestamp,message,EbMSMessageStatus.DELIVERY_ACKNOWLEDGED);
-				eventHandler.onMessageDelivered(message.getMessageHeader().getMessageData().getRefToMessageId());
+				eventListener.onMessageDelivered(message.getMessageHeader().getMessageData().getRefToMessageId());
 				return null;
 			}
 			else if (EbMSAction.STATUS_REQUEST.action().equals(message.getMessageHeader().getAction()))
@@ -153,11 +154,14 @@ public class EbMSMessageProcessorImpl implements EbMSMessageProcessor
 				//final CollaborationProtocolAgreement cpa = ebMSDAO.getCPA(message.getMessageHeader().getCPAId());
 				if (Constants.EBMS_SERVICE_URI.equals(message.getMessageHeader().getService().getValue()))
 					if (EbMSAction.MESSAGE_ERROR.action().equals(message.getMessageHeader().getAction()))
+					{
 						process(timestamp,message,EbMSMessageStatus.DELIVERY_FAILED);
+						eventListener.onMessageDeliveryFailed(message.getMessageHeader().getMessageData().getRefToMessageId());
+					}
 					else if (EbMSAction.ACKNOWLEDGMENT.action().equals(message.getMessageHeader().getAction()))
 					{
 						process(timestamp,message,EbMSMessageStatus.DELIVERY_ACKNOWLEDGED);
-						eventHandler.onMessageDelivered(message.getMessageHeader().getMessageData().getRefToMessageId());
+						eventListener.onMessageDelivered(message.getMessageHeader().getMessageData().getRefToMessageId());
 					}
 			}
 			catch (Exception e)
@@ -223,7 +227,7 @@ public class EbMSMessageProcessorImpl implements EbMSMessageProcessor
 							public void doInTransaction()
 							{
 								ebMSDAO.insertMessage(timestamp.getTime(),message,EbMSMessageStatus.RECEIVED);
-								eventHandler.onMessageReceived(message.getMessageHeader().getMessageData().getMessageId());
+								eventListener.onMessageReceived(message.getMessageHeader().getMessageData().getMessageId());
 							}
 						}
 					);
@@ -245,7 +249,7 @@ public class EbMSMessageProcessorImpl implements EbMSMessageProcessor
 									EbMSSendEvent sendEvent = EbMSMessageUtils.getEbMSSendEvent(id,acknowledgment.getMessageHeader());
 									ebMSDAO.insertSendEvent(sendEvent);
 								}
-								eventHandler.onMessageReceived(message.getMessageHeader().getMessageData().getMessageId());
+								eventListener.onMessageReceived(message.getMessageHeader().getMessageData().getMessageId());
 							}
 						}
 					);
@@ -352,9 +356,9 @@ public class EbMSMessageProcessorImpl implements EbMSMessageProcessor
 		this.deliveryManager = deliveryManager;
 	}
 	
-	public void setEventHandler(EventHandler eventHandler)
+	public void setEventListener(EventListener eventListener)
 	{
-		this.eventHandler = eventHandler;
+		this.eventListener = eventListener;
 	}
 	
 	public void setEbMSDAO(EbMSDAO ebMSDAO)
