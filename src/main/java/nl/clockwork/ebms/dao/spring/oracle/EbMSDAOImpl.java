@@ -15,6 +15,7 @@
  ******************************************************************************/
 package nl.clockwork.ebms.dao.spring.oracle;
 
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -200,7 +201,7 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 							
 							return keyHolder.getKey().longValue();
 						}
-						catch (Exception e)
+						catch (IOException e)
 						{
 							throw new DAOException(e);
 						}

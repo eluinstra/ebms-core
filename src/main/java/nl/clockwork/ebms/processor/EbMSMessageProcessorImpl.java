@@ -25,6 +25,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.soap.SOAPException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactoryConfigurationError;
+import javax.xml.xpath.XPathExpressionException;
 
 import nl.clockwork.ebms.Constants;
 import nl.clockwork.ebms.Constants.EbMSAction;
@@ -138,7 +139,10 @@ public class EbMSMessageProcessorImpl implements EbMSMessageProcessor
 		}
 		catch (Exception e)
 		{
-			throw new EbMSProcessorException(e);
+			if (e instanceof RuntimeException)
+				throw (RuntimeException)e;
+			else
+				throw new EbMSProcessorException(e);
 		}
 	}
 	
@@ -164,10 +168,13 @@ public class EbMSMessageProcessorImpl implements EbMSMessageProcessor
 						eventListener.onMessageDelivered(message.getMessageHeader().getMessageData().getRefToMessageId());
 					}
 			}
-			catch (Exception e)
-			{
+		catch (Exception e)
+		{
+			if (e instanceof RuntimeException)
+				throw (RuntimeException)e;
+			else
 				throw new EbMSProcessorException(e);
-			}
+		}
 	}
 	
 	private EbMSMessage process(CollaborationProtocolAgreement cpa, final GregorianCalendar timestamp, EbMSDocument document, final EbMSMessage message) throws DAOException, ValidatorException, DatatypeConfigurationException, JAXBException, SOAPException, ParserConfigurationException, SAXException, IOException, TransformerFactoryConfigurationError, TransformerException

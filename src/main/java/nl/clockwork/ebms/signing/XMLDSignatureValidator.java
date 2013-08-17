@@ -37,6 +37,7 @@ import javax.xml.crypto.dsig.keyinfo.KeyValue;
 import javax.xml.crypto.dsig.keyinfo.X509Data;
 
 import nl.clockwork.ebms.model.EbMSAttachment;
+import nl.clockwork.ebms.validation.ValidationException;
 import nl.clockwork.ebms.validation.ValidatorException;
 
 import org.apache.commons.logging.Log;
@@ -56,9 +57,13 @@ public class XMLDSignatureValidator implements SignatureValidator
 		{
 			return verify(document,attachments);
 		}
-		catch (Exception e)
+		catch (MarshalException e)
 		{
 			throw new ValidatorException(e);
+		}
+		catch (XMLSignatureException e)
+		{
+			throw new ValidationException(e);
 		}
 	}
 

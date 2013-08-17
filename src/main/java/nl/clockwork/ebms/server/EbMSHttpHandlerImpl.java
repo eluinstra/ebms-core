@@ -15,8 +15,11 @@
  ******************************************************************************/
 package nl.clockwork.ebms.server;
 
+import java.io.IOException;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.xml.transform.TransformerException;
 
 import nl.clockwork.ebms.Constants;
 import nl.clockwork.ebms.common.util.DOMUtils;
@@ -74,7 +77,11 @@ public class EbMSHttpHandlerImpl implements EbMSHttpHandler
 	  		logger.warn("IN:\n" + IOUtils.toString(request.getInputStream()));
 	  	}
 		}
-		catch (Exception e)
+		catch (IOException e)
+		{
+			throw new EbMSProcessorException(e);
+		}
+		catch (TransformerException e)
 		{
 			throw new EbMSProcessorException(e);
 		}

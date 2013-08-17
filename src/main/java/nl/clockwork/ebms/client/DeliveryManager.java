@@ -71,7 +71,10 @@ public class DeliveryManager //DeliveryService
 		}
 		catch (Exception e)
 		{
-			throw new EbMSProcessingException(e);
+			if (e instanceof RuntimeException)
+				throw (RuntimeException)e;
+			else
+				throw new EbMSProcessingException(e);
 		}
 	}
 
@@ -82,39 +85,32 @@ public class DeliveryManager //DeliveryService
 	
 	public EbMSMessage handleResponseMessage(final CollaborationProtocolAgreement cpa, final EbMSMessage message, final EbMSMessage response) throws EbMSProcessorException
 	{
-		try
+		if (response != null)
 		{
-			if (response != null)
+			if (message.getSyncReply() == null)
 			{
-				if (message.getSyncReply() == null)
+				Runnable command = new Runnable()
 				{
-					Runnable command = new Runnable()
+					@Override
+					public void run()
 					{
-						@Override
-						public void run()
+						try
 						{
-							try
-							{
-								String uri = CPAUtils.getUri(cpa,response);
-								ebMSClient.sendMessage(uri,EbMSMessageUtils.getEbMSDocument(response));
-							}
-							catch (Exception e)
-							{
-								logger.error("",e);
-							}
+							String uri = CPAUtils.getUri(cpa,response);
+							ebMSClient.sendMessage(uri,EbMSMessageUtils.getEbMSDocument(response));
 						}
-					};
-					executorService.execute(command);
-				}
-				else
-					return response;
+						catch (Exception e)
+						{
+							logger.error("",e);
+						}
+					}
+				};
+				executorService.execute(command);
 			}
-			return null;
+			else
+				return response;
 		}
-		catch (Exception e)
-		{
-			throw new EbMSProcessorException(e);
-		}
+		return null;
 	}
 
 	public void setMaxThreads(int maxThreads)

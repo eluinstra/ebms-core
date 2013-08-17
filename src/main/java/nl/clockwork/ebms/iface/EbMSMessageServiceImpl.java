@@ -18,6 +18,9 @@ package nl.clockwork.ebms.iface;
 import java.util.Date;
 import java.util.List;
 
+import javax.xml.bind.JAXBException;
+import javax.xml.datatype.DatatypeConfigurationException;
+
 import nl.clockwork.ebms.Constants.EbMSAction;
 import nl.clockwork.ebms.Constants.EbMSMessageStatus;
 import nl.clockwork.ebms.client.DeliveryManager;
@@ -30,6 +33,7 @@ import nl.clockwork.ebms.model.EbMSMessageContext;
 import nl.clockwork.ebms.model.EbMSSendEvent;
 import nl.clockwork.ebms.model.MessageStatus;
 import nl.clockwork.ebms.model.cpp.cpa.CollaborationProtocolAgreement;
+import nl.clockwork.ebms.processor.EbMSProcessorException;
 import nl.clockwork.ebms.util.EbMSMessageContextValidator;
 import nl.clockwork.ebms.util.EbMSMessageUtils;
 
@@ -58,11 +62,15 @@ public class EbMSMessageServiceImpl implements EbMSMessageService
 			else
 				throw new EbMSMessageServiceException("No response received!");
 		}
-		catch (EbMSMessageServiceException e)
+		catch (DatatypeConfigurationException e)
 		{
-			throw e;
+			throw new EbMSMessageServiceException(e);
 		}
-		catch (Exception e)
+		catch (JAXBException e)
+		{
+			throw new EbMSMessageServiceException(e);
+		}
+		catch (EbMSProcessorException e)
 		{
 			throw new EbMSMessageServiceException(e);
 		}

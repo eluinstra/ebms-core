@@ -33,6 +33,7 @@ import nl.clockwork.ebms.model.cpp.cpa.CollaborationProtocolAgreement;
 import nl.clockwork.ebms.model.cpp.cpa.DeliveryChannel;
 import nl.clockwork.ebms.model.cpp.cpa.PartyInfo;
 import nl.clockwork.ebms.model.ebxml.MessageHeader;
+import nl.clockwork.ebms.processor.EbMSProcessingException;
 import nl.clockwork.ebms.processor.EbMSProcessorException;
 import nl.clockwork.ebms.util.CPAUtils;
 import nl.clockwork.ebms.xml.dsig.EbMSAttachmentResolver;
@@ -83,13 +84,13 @@ public class EbMSSecSignatureGenerator implements EbMSSignatureGenerator
 				}
 			}
 		}
-		catch (EbMSProcessorException e)
-		{
-			throw e;
-		}
-		catch (Exception e)
+		catch (GeneralSecurityException e)
 		{
 			throw new EbMSProcessorException(e);
+		}
+		catch (XMLSecurityException e)
+		{
+			throw new EbMSProcessingException(e);
 		}
 	}
 

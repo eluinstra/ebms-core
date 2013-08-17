@@ -15,10 +15,17 @@
  ******************************************************************************/
 package nl.clockwork.ebms.signing;
 
+import java.io.IOException;
+import java.security.GeneralSecurityException;
+import java.security.InvalidKeyException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
 import java.security.PublicKey;
+import java.security.SignatureException;
 import java.security.cert.Certificate;
+import java.security.cert.CertificateException;
 import java.security.cert.CertificateExpiredException;
 import java.security.cert.CertificateNotYetValidException;
 import java.security.cert.X509Certificate;
@@ -27,6 +34,7 @@ import java.util.List;
 
 import nl.clockwork.ebms.common.util.SecurityUtils;
 import nl.clockwork.ebms.model.EbMSAttachment;
+import nl.clockwork.ebms.validation.ValidationException;
 import nl.clockwork.ebms.validation.ValidatorException;
 import nl.clockwork.ebms.xml.dsig.EbMSAttachmentResolver;
 
@@ -64,9 +72,21 @@ public class XMLSecSignatureValidator implements SignatureValidator
 			KeyStore keyStore = SecurityUtils.loadKeyStore(keyStorePath,keyStorePassword);
 			return verify(keyStore,document,attachments);
 		}
-		catch (Exception e)
+		catch (GeneralSecurityException e)
 		{
 			throw new ValidatorException(e);
+		}
+		catch (IOException e)
+		{
+			throw new ValidatorException(e);
+		}
+		catch (XMLSignatureException e)
+		{
+			throw new ValidatorException(e);
+		}
+		catch (XMLSecurityException e)
+		{
+			throw new ValidationException(e);
 		}
 	}
 
@@ -93,12 +113,9 @@ public class XMLSecSignatureValidator implements SignatureValidator
 						certificate.verify(c.getPublicKey());
 						return signature.checkSignatureValue(certificate);
 					}
-					catch (KeyStoreException e)
+					catch (GeneralSecurityException e)
 					{
-						throw e;
-					}
-					catch (Exception e)
-					{
+						logger.debug("",e);
 					}
 				}
 			}

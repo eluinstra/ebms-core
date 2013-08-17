@@ -16,6 +16,7 @@
 package nl.clockwork.ebms.xml.dsig;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
@@ -83,7 +84,7 @@ public class EbMSAttachmentResolver extends ResourceResolverSpi
 				out.write(buffer,0,c);
 			input = new XMLSignatureInput(out.toByteArray());
 		}
-		catch (Exception e)
+		catch (IOException e)
 		{
 			throw new ResourceResolverException(href,e,uri,baseUri);
 		}

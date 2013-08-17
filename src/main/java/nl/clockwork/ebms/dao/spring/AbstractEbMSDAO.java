@@ -15,6 +15,7 @@
  ******************************************************************************/
 package nl.clockwork.ebms.dao.spring;
 
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -682,7 +683,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 							
 							return keyHolder.getKey().longValue();
 						}
-						catch (Exception e)
+						catch (IOException e)
 						{
 							throw new DAOException(e);
 						}

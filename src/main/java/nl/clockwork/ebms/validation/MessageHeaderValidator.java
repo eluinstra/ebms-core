@@ -16,6 +16,7 @@
 package nl.clockwork.ebms.validation;
 
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.GregorianCalendar;
 import java.util.List;
 
@@ -261,7 +262,7 @@ public class MessageHeaderValidator
 			new URI(s);
 			return true;
 		}
-		catch (Exception e)
+		catch (URISyntaxException e)
 		{
 			return false;
 		}

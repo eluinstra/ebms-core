@@ -21,6 +21,8 @@ import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.xml.transform.TransformerException;
+
 import nl.clockwork.ebms.Constants;
 import nl.clockwork.ebms.common.util.DOMUtils;
 import nl.clockwork.ebms.model.EbMSDocument;
@@ -85,7 +87,11 @@ public abstract class EbMSInputStreamHandlerImpl implements EbMSInputStreamHandl
 	  		logger.warn("IN:\n" + IOUtils.toString(request));
 	  	}
 		}
-		catch (Exception e)
+		catch (TransformerException e)
+		{
+			throw new EbMSProcessorException(e);
+		}
+		catch (IOException e)
 		{
 			throw new EbMSProcessorException(e);
 		}

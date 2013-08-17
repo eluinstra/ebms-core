@@ -15,9 +15,12 @@
  ******************************************************************************/
 package nl.clockwork.ebms.signing;
 
+import java.io.IOException;
+import java.security.GeneralSecurityException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.cert.Certificate;
+import java.security.cert.CertificateException;
 import java.security.cert.CertificateExpiredException;
 import java.security.cert.CertificateNotYetValidException;
 import java.security.cert.X509Certificate;
@@ -90,9 +93,21 @@ public class EbMSSecSignatureValidator implements EbMSSignatureValidator
 					throw new ValidationException("Signature not found.");
 			}
 		}
-		catch (Exception e)
+		catch (GeneralSecurityException e)
 		{
 			throw new ValidatorException(e);
+		}
+		catch (IOException e)
+		{
+			throw new ValidatorException(e);
+		}
+		catch (XMLSignatureException e)
+		{
+			throw new ValidationException(e);
+		}
+		catch (XMLSecurityException e)
+		{
+			throw new ValidationException(e);
 		}
 	}
 
@@ -120,7 +135,7 @@ public class EbMSSecSignatureValidator implements EbMSSignatureValidator
 			}
 			return null;
 		}
-		catch (Exception e)
+		catch (CertificateException e)
 		{
 			logger.warn("",e);
 			return null;
@@ -135,7 +150,12 @@ public class EbMSSecSignatureValidator implements EbMSSignatureValidator
 			XMLSignature signature = new XMLSignature((Element)signatureNodeList.item(0),org.apache.xml.security.utils.Constants.SignatureSpecNS);
 			return signature.getKeyInfo().getX509Certificate();
 		}
-		catch (Exception e)
+		catch (XMLSignatureException e)
+		{
+			logger.warn("",e);
+			return null;
+		}
+		catch (XMLSecurityException e)
 		{
 			logger.warn("",e);
 			return null;
@@ -148,7 +168,11 @@ public class EbMSSecSignatureValidator implements EbMSSignatureValidator
 		{
 			certificate.checkValidity(date);
 		}
-		catch (Exception e)
+		catch (CertificateExpiredException e)
+		{
+			return false;
+		}
+		catch (CertificateNotYetValidException e)
 		{
 			return false;
 		}
@@ -161,11 +185,7 @@ public class EbMSSecSignatureValidator implements EbMSSignatureValidator
 				certificate.verify(c.getPublicKey());
 				return true;
 			}
-			catch (KeyStoreException e)
-			{
-				throw e;
-			}
-			catch (Exception e)
+			catch (GeneralSecurityException e)
 			{
 				logger.debug("",e);
 			}

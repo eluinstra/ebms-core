@@ -28,6 +28,7 @@ import nl.clockwork.ebms.Constants;
 import nl.clockwork.ebms.common.util.DOMUtils;
 import nl.clockwork.ebms.common.util.SecurityUtils;
 import nl.clockwork.ebms.model.EbMSAttachment;
+import nl.clockwork.ebms.processor.EbMSProcessingException;
 import nl.clockwork.ebms.processor.EbMSProcessorException;
 import nl.clockwork.ebms.xml.dsig.EbMSAttachmentResolver;
 
@@ -73,9 +74,13 @@ public class XMLSecSignatureGenerator implements SignatureGenerator
 		{
 			return false;
 		}
-		catch (Exception e)
+		catch (KeyStoreException e)
 		{
 			throw new EbMSProcessorException(e);
+		}
+		catch (XMLSecurityException e)
+		{
+			throw new EbMSProcessingException(e);
 		}
 	}
 

@@ -59,7 +59,19 @@ public class EbMSMessageReaderImpl implements EbMSMessageReader
 			else
 				return getEbMSMessage(in);
 		}
-		catch (Exception e)
+		catch (MimeException e)
+		{
+			throw new EbMSProcessorException(e);
+		}
+		catch (IOException e)
+		{
+			throw new EbMSProcessorException(e);
+		}
+		catch (ParserConfigurationException e)
+		{
+			throw new EbMSProcessorException(e);
+		}
+		catch (SAXException e)
 		{
 			throw new EbMSProcessorException(e);
 		}
