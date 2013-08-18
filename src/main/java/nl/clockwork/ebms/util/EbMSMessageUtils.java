@@ -79,7 +79,6 @@ import nl.clockwork.ebms.model.ebxml.SyncReply;
 import nl.clockwork.ebms.model.ebxml.To;
 import nl.clockwork.ebms.model.soap.envelope.Body;
 import nl.clockwork.ebms.model.soap.envelope.Envelope;
-import nl.clockwork.ebms.model.soap.envelope.Fault;
 import nl.clockwork.ebms.model.soap.envelope.Header;
 import nl.clockwork.ebms.model.xml.dsig.ReferenceType;
 import nl.clockwork.ebms.model.xml.dsig.SignatureType;
