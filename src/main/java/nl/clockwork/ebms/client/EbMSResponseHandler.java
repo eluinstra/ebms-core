@@ -20,16 +20,16 @@ import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
-public class EbMSMessageReader
+public class EbMSResponseHandler
 {
 	private HttpURLConnection connection;
 	
-	public EbMSMessageReader(HttpURLConnection connection)
+	public EbMSResponseHandler(HttpURLConnection connection)
 	{
 		this.connection = connection;
 	}
 
-	public EbMSDocument read() throws IOException, ParserConfigurationException, SAXException, ReaderException
+	public EbMSDocument read() throws IOException, ParserConfigurationException, SAXException, EbMSResponseException
 	{
 		InputStream input = null;
 		try
@@ -44,10 +44,10 @@ public class EbMSMessageReader
 				InputStream errorStream = connection.getErrorStream();
 				String error = IOUtils.toString(errorStream);
 				errorStream.close();
-				throw new ReaderException(connection.getResponseCode(),error);
+				throw new EbMSResponseException(connection.getResponseCode(),error);
 			}
 			else
-				throw new ReaderException(connection.getResponseCode());
+				throw new EbMSResponseException(connection.getResponseCode());
 		}
 		catch (IOException e)
 		{

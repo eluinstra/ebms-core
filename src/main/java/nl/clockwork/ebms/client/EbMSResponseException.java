@@ -2,17 +2,17 @@ package nl.clockwork.ebms.client;
 
 import nl.clockwork.ebms.processor.EbMSProcessingException;
 
-public class ReaderException extends EbMSProcessingException
+public class EbMSResponseException extends EbMSProcessingException
 {
 	private static final long serialVersionUID = 1L;
 	private int statusCode;
 
-	public ReaderException(int statusCode)
+	public EbMSResponseException(int statusCode)
 	{
 		this.statusCode = statusCode;
 	}
 	
-	public ReaderException(int statusCode, String message)
+	public EbMSResponseException(int statusCode, String message)
 	{
 		super(message);
 		this.statusCode = statusCode;

@@ -56,7 +56,7 @@ public class EbMSHttpClient implements EbMSClient
 			EbMSMessageWriter writer = new EbMSMessageWriter(connection);
 			writer.write(document);
 			connection.connect();
-			EbMSMessageReader reader = new EbMSMessageReader(connection);
+			EbMSResponseHandler reader = new EbMSResponseHandler(connection);
 			EbMSDocument in = reader.read();
 			if (logger.isInfoEnabled())
 				logger.info("IN:\n" + (in == null || in.getMessage() == null ? "" : DOMUtils.toString(in.getMessage())));
