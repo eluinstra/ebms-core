@@ -67,6 +67,8 @@
 - MessageHeader: define duplicateElimination as Object instead of String
 
 - remove servlet from core?
+- remove sql dao from core?
+- remove http client from core?
 - remove EbMS(Message) prefix on classes; add EbMS(Message) prefix on bean ids? 
 
 - implement EbMSFileAttachment (file proxy) and EbMSDBAttachment (db proxy) for large message processing?
