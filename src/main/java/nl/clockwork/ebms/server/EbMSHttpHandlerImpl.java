@@ -52,18 +52,13 @@ public class EbMSHttpHandlerImpl implements EbMSHttpHandler
 				EbMSDocument out = messageProcessor.processRequest(in);
 				if (out == null)
 				{
-					if (logger.isDebugEnabled())
-						logger.debug("StatusCode: 204");
+					logger.debug("OUT:\n");
 					response.setStatus(204);
 				}
 				else
 				{
 					if (logger.isDebugEnabled())
-					{
-						logger.debug("StatusCode: 200");
-						logger.debug("Content-Type: text/xml");
 						logger.debug("OUT:\n" + DOMUtils.toString(out.getMessage()));
-					}
 					response.setStatus(200);
 					response.setHeader("Content-Type","text/xml");
 					response.setHeader("SOAPAction",Constants.EBMS_SOAP_ACTION);
