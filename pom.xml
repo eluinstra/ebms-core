@@ -17,7 +17,13 @@
 		<developer>
 			<id>e.luinstra</id>
 			<name>Edwin Luinstra</name>
-			<email>e.luinstra@wisdom.nl</email>
+			<email>edwin.luinstra@clockwork.nl</email>
+			<organizationUrl>http://www.clockwork.nl</organizationUrl>
+			<roles>
+				<role>Architect</role>
+				<role>Developer</role>
+			</roles>
+			<timezone>1</timezone>
 		</developer>
 	</developers>
 	<scm>
@@ -31,18 +37,18 @@
     <cxf.version>2.6.2</cxf.version>
 	</properties>
 	<dependencies>
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>4.4</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>dbunit</groupId>
-      <artifactId>dbunit</artifactId>
-      <version>2.2</version>
-      <scope>test</scope>
-    </dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.4</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>dbunit</groupId>
+			<artifactId>dbunit</artifactId>
+			<version>2.2</version>
+			<scope>test</scope>
+		</dependency>
 		<dependency>
 			<groupId>javax.servlet</groupId>
 			<artifactId>servlet-api</artifactId>
@@ -61,18 +67,18 @@
 	    <dependency>
 	      <groupId>nl.clockwork.ebms</groupId>
 	      <artifactId>ebms-core</artifactId>
-	      <version>1.1.0</version>
+	      <version>1.2.0-SNAPSHOT</version>
 	    </dependency>
 	    <dependency>
 	      <groupId>org.apache.cxf</groupId>
 	      <artifactId>cxf-rt-frontend-jaxws</artifactId>
 	      <version>${cxf.version}</version>
 		</dependency>
-    <dependency>
-      <groupId>org.apache.cxf</groupId>
-      <artifactId>cxf-rt-transports-http</artifactId>
-      <version>${cxf.version}</version>
-    </dependency>
+		<dependency>
+			<groupId>org.apache.cxf</groupId>
+			<artifactId>cxf-rt-transports-http</artifactId>
+			<version>${cxf.version}</version>
+		</dependency>
 		<dependency>
 			<groupId>org.hsqldb</groupId>
 			<artifactId>hsqldb</artifactId>
@@ -195,9 +201,6 @@
 	<build>
 		<resources>
 			<resource>
-				<directory>conf</directory>
-			</resource>
-			<resource>
 				<directory>src/main/resources</directory>
 			</resource>
 		</resources>
@@ -214,21 +217,17 @@
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-jar-plugin</artifactId>
-				<version>2.2</version>
+				<artifactId>maven-war-plugin</artifactId>
+				<version>2.3</version>
 				<configuration>
 					<archive>
 						<manifest>
 							<addDefaultImplementationEntries>true</addDefaultImplementationEntries>
-							<packageName>nl.clockwork.mule.ebms</packageName>
+							<packageName>${project.groupId}</packageName>
 							<addClasspath>true</addClasspath>
-							<addExtensions />
-							<classpathPrefix />
+							<addExtensions/>
+							<classpathPrefix/>
 						</manifest>
-						<manifestEntries>
-							<mode>development</mode>
-							<url>${project.url}</url>
-						</manifestEntries>
 					</archive>
 				</configuration>
 			</plugin>
@@ -285,9 +284,7 @@
 									<goals>
 										<goal>generate</goal>
 									</goals>
-									<phase>
-										generate-sources
-									</phase>	
+									<phase>generate-sources</phase>	
 									<configuration>
 										<generatePackage>nl.clockwork.ebms.model.cpp.cpa</generatePackage>
 										<generateDirectory>src/main/java</generateDirectory>
@@ -321,76 +318,74 @@
 						<version>1.1.1</version>
 						<executions>
 							<execution>
-									<id>generateEBFAfleverenModel</id>
-									<goals>
-										<goal>generate</goal>
-									</goals>
-									<phase>
-										generate-sources
-									</phase>	
-									<configuration>
-										<generatePackage>nl.clockwork.mule.ebms.stub.ebf.model.afleveren.bericht</generatePackage>
-										<generateDirectory>src/main/java</generateDirectory>
-										<includeSchemas>
-											<includeSchema>nl/clockwork/mule/ebms/stub/ebf/xsd/Afleveren_ebMS_2.0_v1.1.xsd</includeSchema>
-										</includeSchemas>
-										<removeOldOutput>false</removeOldOutput>
-										<verbose>false</verbose>					
-									</configuration>
+								<id>generateEBFAfleverenModel</id>
+								<goals>
+									<goal>generate</goal>
+								</goals>
+								<phase>generate-sources</phase>	
+								<configuration>
+									<generatePackage>nl.clockwork.mule.ebms.stub.ebf.model.afleveren.bericht</generatePackage>
+									<generateDirectory>src/main/java</generateDirectory>
+									<includeSchemas>
+										<includeSchema>nl/clockwork/mule/ebms/stub/ebf/xsd/Afleveren_ebMS_2.0_v1.1.xsd</includeSchema>
+									</includeSchemas>
+									<removeOldOutput>false</removeOldOutput>
+									<verbose>false</verbose>					
+								</configuration>
 							</execution>
 							<execution>
-									<id>generateEBFAfleverenBevestigingModel</id>
-									<goals>
-										<goal>generate</goal>
-									</goals>
-									<phase>
-										generate-sources
-									</phase>	
-									<configuration>
-										<generatePackage>nl.clockwork.mule.ebms.stub.ebf.model.afleveren.bevestiging</generatePackage>
-										<generateDirectory>src/main/java</generateDirectory>
-										<includeSchemas>
-											<includeSchema>nl/clockwork/mule/ebms/stub/ebf/xsd/Afleveren_bevestiging_ebMS_2.0_v1.1.xsd</includeSchema>
-										</includeSchemas>
-										<removeOldOutput>false</removeOldOutput>
-										<verbose>false</verbose>					
-									</configuration>
+								<id>generateEBFAfleverenBevestigingModel</id>
+								<goals>
+									<goal>generate</goal>
+								</goals>
+								<phase>
+									generate-sources
+								</phase>	
+								<configuration>
+									<generatePackage>nl.clockwork.mule.ebms.stub.ebf.model.afleveren.bevestiging</generatePackage>
+									<generateDirectory>src/main/java</generateDirectory>
+									<includeSchemas>
+										<includeSchema>nl/clockwork/mule/ebms/stub/ebf/xsd/Afleveren_bevestiging_ebMS_2.0_v1.1.xsd</includeSchema>
+									</includeSchemas>
+									<removeOldOutput>false</removeOldOutput>
+									<verbose>false</verbose>					
+								</configuration>
 							</execution>
 							<execution>
-									<id>generateEBFAanleverenModel</id>
-									<goals>
-										<goal>generate</goal>
-									</goals>
-									<phase>
-										generate-sources
-									</phase>	
-									<configuration>
-										<generatePackage>nl.clockwork.mule.ebms.stub.ebf.model.aanleveren.bericht</generatePackage>
-										<generateDirectory>src/main/java</generateDirectory>
-										<includeSchemas>
-											<includeSchema>nl/clockwork/mule/ebms/stub/ebf/xsd/Aanleveren_ebMS_2.0_v1.1.xsd</includeSchema>
-										</includeSchemas>
-										<removeOldOutput>false</removeOldOutput>
-										<verbose>false</verbose>					
-									</configuration>
+								<id>generateEBFAanleverenModel</id>
+								<goals>
+									<goal>generate</goal>
+								</goals>
+								<phase>
+									generate-sources
+								</phase>	
+								<configuration>
+									<generatePackage>nl.clockwork.mule.ebms.stub.ebf.model.aanleveren.bericht</generatePackage>
+									<generateDirectory>src/main/java</generateDirectory>
+									<includeSchemas>
+										<includeSchema>nl/clockwork/mule/ebms/stub/ebf/xsd/Aanleveren_ebMS_2.0_v1.1.xsd</includeSchema>
+									</includeSchemas>
+									<removeOldOutput>false</removeOldOutput>
+									<verbose>false</verbose>					
+								</configuration>
 							</execution>
 							<execution>
-									<id>generateEBFAanleverenBevestigingModel</id>
-									<goals>
-										<goal>generate</goal>
-									</goals>
-									<phase>
-										generate-sources
-									</phase>	
-									<configuration>
-										<generatePackage>nl.clockwork.mule.ebms.stub.ebf.model.aanleveren.bevestiging</generatePackage>
-										<generateDirectory>src/main/java</generateDirectory>
-										<includeSchemas>
-											<includeSchema>nl/clockwork/mule/ebms/stub/ebf/xsd/Aanleveren_bevestiging_ebMS_2.0_v1.1.xsd</includeSchema>
-										</includeSchemas>
-										<removeOldOutput>false</removeOldOutput>
-										<verbose>false</verbose>					
-									</configuration>
+								<id>generateEBFAanleverenBevestigingModel</id>
+								<goals>
+									<goal>generate</goal>
+								</goals>
+								<phase>
+									generate-sources
+								</phase>	
+								<configuration>
+									<generatePackage>nl.clockwork.mule.ebms.stub.ebf.model.aanleveren.bevestiging</generatePackage>
+									<generateDirectory>src/main/java</generateDirectory>
+									<includeSchemas>
+										<includeSchema>nl/clockwork/mule/ebms/stub/ebf/xsd/Aanleveren_bevestiging_ebMS_2.0_v1.1.xsd</includeSchema>
+									</includeSchemas>
+									<removeOldOutput>false</removeOldOutput>
+									<verbose>false</verbose>					
+								</configuration>
 							</execution>
 						</executions>		
 					</plugin>				
@@ -405,39 +400,39 @@
 				<artifactId>maven-javadoc-plugin</artifactId>
 				<version>2.9</version>
 			</plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-site-plugin</artifactId>
-        <version>3.2</version>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-jxr-plugin</artifactId>
-        <version>2.3</version>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-checkstyle-plugin</artifactId>
-        <version>2.9.1</version>
-        <configuration>
-          <detail>true</detail>
-          <enableFilesSummary>true</enableFilesSummary>
-          <enableRulesSummary>true</enableRulesSummary>
-          <enableSeveritySummary>true</enableSeveritySummary>
-          <headerLocation>${basedir}/resources/reporting/license.txt</headerLocation>
-          <linkXRef>true</linkXRef>
-          <configLocation>${basedir}/resources/reporting/checkstyle.xml</configLocation>
-        </configuration>
-      </plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-site-plugin</artifactId>
+				<version>3.2</version>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jxr-plugin</artifactId>
+				<version>2.3</version>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-checkstyle-plugin</artifactId>
+				<version>2.9.1</version>
+				<configuration>
+					<detail>true</detail>
+					<enableFilesSummary>true</enableFilesSummary>
+					<enableRulesSummary>true</enableRulesSummary>
+					<enableSeveritySummary>true</enableSeveritySummary>
+					<headerLocation>${basedir}/resources/reporting/license.txt</headerLocation>
+					<linkXRef>true</linkXRef>
+					<configLocation>${basedir}/resources/reporting/checkstyle.xml</configLocation>
+				</configuration>
+			</plugin>
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>findbugs-maven-plugin</artifactId>
 				<version>2.5.2</version>
-        <configuration>
-        	<findbugsXmlOutputDirectory>${basedir}/target</findbugsXmlOutputDirectory>
-          <xmlOutput>true</xmlOutput>
-          <xmlOutputDirectory>target/site</xmlOutputDirectory>
-        </configuration>
+				<configuration>
+					<findbugsXmlOutputDirectory>${basedir}/target</findbugsXmlOutputDirectory>
+					<xmlOutput>true</xmlOutput>
+					<xmlOutputDirectory>target/site</xmlOutputDirectory>
+				</configuration>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
