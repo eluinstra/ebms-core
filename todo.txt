@@ -38,6 +38,9 @@
 - improve EbMSHttpClient
   - move cpa functionality to caller; add extra properties for url and signing (sendEvent)?
 
+- implement CPA/hostname related SSLFactoryManager to handle different key/certificate pairs
+	- load right SSLFactoryManager on each URLConnection request
+
 - support multiple deliveryChannels???
 	- add url (or deliveryChannel) to table sendEvent
 	- support mail channel?
