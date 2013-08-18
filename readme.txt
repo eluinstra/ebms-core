@@ -1,3 +1,5 @@
+mvn archetype:generate -DgroupId=nl.clockwork.ebms -DartifactId=ebms-adapter-web -DarchetypeArtifactId=maven-archetype-webapp
+
 Tomcat SSL Connector Configuration:
 
     <Connector port="8443" protocol="HTTP/1.1" SSLEnabled="true"
