@@ -51,6 +51,7 @@ import nl.clockwork.ebms.validation.CPAValidator;
 import nl.clockwork.ebms.validation.ManifestValidator;
 import nl.clockwork.ebms.validation.MessageHeaderValidator;
 import nl.clockwork.ebms.validation.SignatureTypeValidator;
+import nl.clockwork.ebms.validation.ValidationException;
 import nl.clockwork.ebms.validation.ValidatorException;
 import nl.clockwork.ebms.validation.XSDValidator;
 
@@ -133,16 +134,49 @@ public class EbMSMessageProcessorImpl implements EbMSMessageProcessor
 				// TODO create messageError???
 				return null;
 		}
-		catch (EbMSProcessorException e)
+		catch (ValidationException e)
 		{
-			throw e;
+			throw new EbMSProcessingException(e);
 		}
-		catch (Exception e)
+		catch (ValidatorException e)
 		{
-			if (e instanceof RuntimeException)
-				throw (RuntimeException)e;
-			else
-				throw new EbMSProcessorException(e);
+			throw new EbMSProcessorException(e);
+		}
+		catch (XPathExpressionException e)
+		{
+			throw new EbMSProcessorException(e);
+		}
+		catch (JAXBException e)
+		{
+			throw new EbMSProcessingException(e);
+		}
+		catch (ParserConfigurationException e)
+		{
+			throw new EbMSProcessorException(e);
+		}
+		catch (SAXException e)
+		{
+			throw new EbMSProcessingException(e);
+		}
+		catch (IOException e)
+		{
+			throw new EbMSProcessingException(e);
+		}
+		catch (DatatypeConfigurationException e)
+		{
+			throw new EbMSProcessorException(e);
+		}
+		catch (SOAPException e)
+		{
+			throw new EbMSProcessingException(e);
+		}
+		catch (TransformerFactoryConfigurationError e)
+		{
+			throw new EbMSProcessorException(e);
+		}
+		catch (TransformerException e)
+		{
+			throw new EbMSProcessingException(e);
 		}
 	}
 	
@@ -168,13 +202,34 @@ public class EbMSMessageProcessorImpl implements EbMSMessageProcessor
 						eventListener.onMessageDelivered(message.getMessageHeader().getMessageData().getRefToMessageId());
 					}
 			}
-		catch (Exception e)
-		{
-			if (e instanceof RuntimeException)
-				throw (RuntimeException)e;
-			else
+			catch (ValidationException e)
+			{
+				throw new EbMSProcessingException(e);
+			}
+			catch (ValidatorException e)
+			{
 				throw new EbMSProcessorException(e);
-		}
+			}
+			catch (XPathExpressionException e)
+			{
+				throw new EbMSProcessorException(e);
+			}
+			catch (JAXBException e)
+			{
+				throw new EbMSProcessingException(e);
+			}
+			catch (ParserConfigurationException e)
+			{
+				throw new EbMSProcessorException(e);
+			}
+			catch (SAXException e)
+			{
+				throw new EbMSProcessingException(e);
+			}
+			catch (IOException e)
+			{
+				throw new EbMSProcessingException(e);
+			}
 	}
 	
 	private EbMSMessage process(CollaborationProtocolAgreement cpa, final GregorianCalendar timestamp, EbMSDocument document, final EbMSMessage message) throws DAOException, ValidatorException, DatatypeConfigurationException, JAXBException, SOAPException, ParserConfigurationException, SAXException, IOException, TransformerFactoryConfigurationError, TransformerException

@@ -1,7 +1,15 @@
 package nl.clockwork.ebms.client;
 
+import java.io.IOException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+
+import javax.xml.bind.JAXBException;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.soap.SOAPException;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactoryConfigurationError;
+import javax.xml.xpath.XPathExpressionException;
 
 import nl.clockwork.ebms.common.MessageQueue;
 import nl.clockwork.ebms.model.EbMSDocument;
@@ -14,6 +22,7 @@ import nl.clockwork.ebms.util.EbMSMessageUtils;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.xml.sax.SAXException;
 
 public class DeliveryManager //DeliveryService
 {
@@ -65,16 +74,37 @@ public class DeliveryManager //DeliveryService
 			}
 			return null;
 		}
-		catch (EbMSProcessorException e)
+		catch (SOAPException e)
 		{
-			throw e;
+			throw new EbMSProcessingException(e);
 		}
-		catch (Exception e)
+		catch (JAXBException e)
 		{
-			if (e instanceof RuntimeException)
-				throw (RuntimeException)e;
-			else
-				throw new EbMSProcessingException(e);
+			throw new EbMSProcessingException(e);
+		}
+		catch (ParserConfigurationException e)
+		{
+			throw new EbMSProcessorException(e);
+		}
+		catch (SAXException e)
+		{
+			throw new EbMSProcessingException(e);
+		}
+		catch (IOException e)
+		{
+			throw new EbMSProcessingException(e);
+		}
+		catch (TransformerFactoryConfigurationError e)
+		{
+			throw new EbMSProcessorException(e);
+		}
+		catch (TransformerException e)
+		{
+			throw new EbMSProcessingException(e);
+		}
+		catch (XPathExpressionException e)
+		{
+			throw new EbMSProcessorException(e);
 		}
 	}
 
