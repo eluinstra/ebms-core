@@ -85,6 +85,16 @@
 		<property name="chunkedStreamingMode" value="${http.chunkedStreamingMode}"/>
 	</bean>
 
+	<!--bean id="ebMSClient" class="nl.clockwork.ebms.client.apache.EbMSHttpClient">
+		<property name="sslSocketFactory" ref="sslSocketFactory"/>
+		<property name="chunkedStreamingMode" value="${http.chunkedStreamingMode}"/>
+	</bean>
+	
+	<bean id="sslSocketFactory" class="nl.clockwork.ebms.client.apache.SSLSocketFactoryFactory">
+		<property name="sslFactoryManager" ref="sslFactoryManager"/>
+		<property name="verifyHostnames" value="${https.verifyHostnames}"></property>
+	</bean-->
+
 	<bean id="sslFactoryManager" class="nl.clockwork.ebms.client.SSLFactoryManager" init-method="init">
 		<property name="keyStorePath" value="${keystore.path}"/>
 		<property name="keyStorePassword" value="${keystore.password}"/>
