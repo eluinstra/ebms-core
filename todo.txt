@@ -38,7 +38,7 @@
 - improve EbMSHttpClient
   - move cpa functionality to caller; add extra properties for url and signing (sendEvent)?
 
-- implement CPA/hostname related SSLFactoryManager to handle different key/certificate pairs
+- implement SSLFactoryManager that returns a CPA/hostname related SSLSocketFactory to handle different key/certificate pairs
 	- load right SSLFactoryManager on each URLConnection request
 
 - support multiple deliveryChannels???
