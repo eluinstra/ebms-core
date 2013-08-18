@@ -37,8 +37,9 @@ public class EbMSHttpClient implements EbMSClient
 {
   protected transient Log logger = LogFactory.getLog(getClass());
 	private SSLFactoryManager sslFactoryManager;
-	private boolean chunkedStreamingMode = true;
-	
+	private boolean chunkedStreamingMode;
+	//private boolean verifyHostnames;
+
 	public EbMSDocument sendMessage(String uri, EbMSDocument document) throws EbMSProcessorException
 	{
 		HttpURLConnection connection = null;
@@ -98,9 +99,35 @@ public class EbMSHttpClient implements EbMSClient
 		connection.setDoOutput(true);
 		//connection.setMethod("POST");
 		if (connection instanceof HttpsURLConnection)
+		{
+			//if (!verifyHostnames)
+			//	((HttpsURLConnection)connection).setHostnameVerifier(
+			//		new HostnameVerifier()
+			//		{
+			//			@Override
+			//			public boolean verify(String hostname, SSLSession sslSession)
+			//			{
+			//				return true;
+			//			}
+			//		}
+			//	);
 			((HttpsURLConnection)connection).setSSLSocketFactory(sslFactoryManager.getSslFactory());
+		}
 		else if (connection instanceof com.sun.net.ssl.HttpsURLConnection)
+		{
+			//if (!verifyHostnames)
+			//	((com.sun.net.ssl.HttpsURLConnection)connection).setHostnameVerifier(
+			//		new com.sun.net.ssl.HostnameVerifier()
+			//		{
+			//			@Override
+			//			public boolean verify(String urlHostname, String certHostname)
+			//			{
+			//				return true;
+			//			}
+			//		}
+			//	);
 			((com.sun.net.ssl.HttpsURLConnection)connection).setSSLSocketFactory(sslFactoryManager.getSslFactory());
+		}
 		return connection;
 	}
 
