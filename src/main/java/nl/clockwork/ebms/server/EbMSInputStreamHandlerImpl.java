@@ -56,8 +56,8 @@ public abstract class EbMSInputStreamHandlerImpl implements EbMSInputStreamHandl
 	  		EbMSMessageReader messageReader = new EbMSMessageReaderImpl(getHeader("Content-Type"));
 				EbMSDocument in = messageReader.read(request);
 				//request.close();
-				if (logger.isInfoEnabled())
-					logger.info("IN:\n" + DOMUtils.toString(in.getMessage()));
+				if (logger.isDebugEnabled())
+					logger.debug("IN:\n" + DOMUtils.toString(in.getMessage()));
 				EbMSDocument out = messageProcessor.processRequest(in);
 				if (out == null)
 				{
@@ -67,11 +67,11 @@ public abstract class EbMSInputStreamHandlerImpl implements EbMSInputStreamHandl
 				}
 				else
 				{
-					if (logger.isInfoEnabled())
+					if (logger.isDebugEnabled())
 					{
-						logger.info("StatusCode: 200");
-						logger.info("Content-Type: text/xml");
-						logger.info("OUT:\n" + DOMUtils.toString(out.getMessage()));
+						logger.debug("StatusCode: 200");
+						logger.debug("Content-Type: text/xml");
+						logger.debug("OUT:\n" + DOMUtils.toString(out.getMessage()));
 					}
 					writeResponseStatus(200);
 					writeResponseHeader("Content-Type","text/xml");
@@ -83,8 +83,11 @@ public abstract class EbMSInputStreamHandlerImpl implements EbMSInputStreamHandl
 	  	}
 	  	else
 	  	{
-	  		logger.warn("Request ignored! SOAPAction: " + (StringUtils.isEmpty(getHeader("SOAPAction"))? "<empty>" : getHeader("SOAPAction")));
-	  		logger.warn("IN:\n" + IOUtils.toString(request));
+	  		if (logger.isDebugEnabled())
+	  		{
+	  			logger.debug("Request ignored! SOAPAction: " + (StringUtils.isEmpty(getHeader("SOAPAction"))? "<empty>" : getHeader("SOAPAction")));
+	  			logger.debug("IN:\n" + IOUtils.toString(request));
+	  		}
 	  	}
 		}
 		catch (TransformerException e)

@@ -49,18 +49,18 @@ public class EbMSHttpClient implements EbMSClient
 			//connection.setConnectTimeout(connectTimeout);
 			if (chunkedStreaming(uri))
 				connection.setChunkedStreamingMode(0);
-			if (logger.isInfoEnabled())
+			if (logger.isDebugEnabled())
 			{
-				logger.info("Connection to: " + uri);
-				logger.info("OUT:\n" + DOMUtils.toString(document.getMessage()));
+				logger.debug("Connection to: " + uri);
+				logger.debug("OUT:\n" + DOMUtils.toString(document.getMessage()));
 			}
 			EbMSMessageWriter writer = new EbMSMessageWriter(connection);
 			writer.write(document);
 			connection.connect();
 			EbMSResponseHandler reader = new EbMSResponseHandler(connection);
 			EbMSDocument in = reader.read();
-			if (logger.isInfoEnabled())
-				logger.info("IN:\n" + (in == null || in.getMessage() == null ? "" : DOMUtils.toString(in.getMessage())));
+			if (logger.isDebugEnabled())
+				logger.debug("IN:\n" + (in == null || in.getMessage() == null ? "" : DOMUtils.toString(in.getMessage())));
 			return in;
 		}
 		catch (IOException e)

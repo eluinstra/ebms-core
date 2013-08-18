@@ -47,22 +47,22 @@ public class EbMSHttpHandlerImpl implements EbMSHttpHandler
 	  		EbMSMessageReader messageReader = new EbMSMessageReaderImpl(request.getContentType());
 				EbMSDocument in = messageReader.read(request.getInputStream());
 				//request.getInputStream().close();
-				if (logger.isInfoEnabled())
-					logger.info("IN:\n" + DOMUtils.toString(in.getMessage()));
+				if (logger.isDebugEnabled())
+					logger.debug("IN:\n" + DOMUtils.toString(in.getMessage()));
 				EbMSDocument out = messageProcessor.processRequest(in);
 				if (out == null)
 				{
-					if (logger.isInfoEnabled())
-						logger.info("StatusCode: 204");
+					if (logger.isDebugEnabled())
+						logger.debug("StatusCode: 204");
 					response.setStatus(204);
 				}
 				else
 				{
-					if (logger.isInfoEnabled())
+					if (logger.isDebugEnabled())
 					{
-						logger.info("StatusCode: 200");
-						logger.info("Content-Type: text/xml");
-						logger.info("OUT:\n" + DOMUtils.toString(out.getMessage()));
+						logger.debug("StatusCode: 200");
+						logger.debug("Content-Type: text/xml");
+						logger.debug("OUT:\n" + DOMUtils.toString(out.getMessage()));
 					}
 					response.setStatus(200);
 					response.setHeader("Content-Type","text/xml");
@@ -73,8 +73,11 @@ public class EbMSHttpHandlerImpl implements EbMSHttpHandler
 	  	}
 	  	else
 	  	{
-	  		logger.warn("Request ignored! SOAPAction: " + (StringUtils.isEmpty(getHeader(request,"SOAPAction"))? "<empty>" : getHeader(request,"SOAPAction")));
-	  		logger.warn("IN:\n" + IOUtils.toString(request.getInputStream()));
+	  		if (logger.isDebugEnabled())
+	  		{
+	  			logger.debug("Request ignored! SOAPAction: " + (StringUtils.isEmpty(getHeader(request,"SOAPAction"))? "<empty>" : getHeader(request,"SOAPAction")));
+	  			logger.debug("IN:\n" + IOUtils.toString(request.getInputStream()));
+	  		}
 	  	}
 		}
 		catch (IOException e)
