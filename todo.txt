@@ -24,8 +24,6 @@
 	- replace dao.insertSendEvent(messageId) (and/or EbMSMessageUtils.getEbMSSendEvents(cpa,message)) to eventManager.generateSendEvent(EbMSDocument)
 	- implement eventManager.generateReceiveEvent(MimeMessage/EbMSDocument)
 
-- implement configurable (wire tapped) in and out message logger that logs each received and sent message (and logs message's corresponding/available messageId (and cpaId))
-
 - validate CPA content during upload CPA
 	- only 1 channel per action is supported
 	- canReceive element is optional?
@@ -40,7 +38,7 @@
 - improve EbMSHttpClient
   - move cpa functionality to caller; add extra properties for url and signing (sendEvent)?
 
-- support multiple deliveryChannels
+- support multiple deliveryChannels???
 	- add url (or deliveryChannel) to table sendEvent
 	- support mail channel?
 	- move the following functionality from message generation to message sending (per channel):
@@ -70,7 +68,6 @@
 
 - implement EbMSFileAttachment (file proxy) and EbMSDBAttachment (db proxy) for large message processing?
 
-- replace commons-logging by slf4j???
 - read mime message
 	- replace mime4j by:
 		- java soap
@@ -80,4 +77,4 @@
 	- replace custom writer by:
 		- java soap
 		- mime4j
-		- http client
+		X http client
