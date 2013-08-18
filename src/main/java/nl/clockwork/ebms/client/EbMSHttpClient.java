@@ -111,7 +111,7 @@ public class EbMSHttpClient implements EbMSClient
 			//			}
 			//		}
 			//	);
-			((HttpsURLConnection)connection).setSSLSocketFactory(sslFactoryManager.getSslFactory());
+			((HttpsURLConnection)connection).setSSLSocketFactory(sslFactoryManager.getSslSocketFactory());
 		}
 		else if (connection instanceof com.sun.net.ssl.HttpsURLConnection)
 		{
@@ -126,7 +126,7 @@ public class EbMSHttpClient implements EbMSClient
 			//			}
 			//		}
 			//	);
-			((com.sun.net.ssl.HttpsURLConnection)connection).setSSLSocketFactory(sslFactoryManager.getSslFactory());
+			((com.sun.net.ssl.HttpsURLConnection)connection).setSSLSocketFactory(sslFactoryManager.getSslSocketFactory());
 		}
 		return connection;
 	}

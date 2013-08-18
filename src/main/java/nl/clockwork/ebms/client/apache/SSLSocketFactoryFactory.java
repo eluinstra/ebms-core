@@ -28,7 +28,7 @@ public class SSLSocketFactoryFactory implements FactoryBean<SSLSocketFactory>
 	@Override
 	public SSLSocketFactory getObject() throws Exception
 	{
-		return new SSLSocketFactory(sslFactoryManager.getSslFactory(),verifyHostnames ? SSLSocketFactory.STRICT_HOSTNAME_VERIFIER : SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
+		return new SSLSocketFactory(sslFactoryManager.getSslSocketFactory(),verifyHostnames ? SSLSocketFactory.STRICT_HOSTNAME_VERIFIER : SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
 	}
 
 	@Override

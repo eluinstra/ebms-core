@@ -97,7 +97,7 @@ public class SSLFactoryManager
 	public String[] allowedCipherSuites = new String[]{};
 	private boolean requireClientAuthentication;
 	private String clientAlias;
-	private SSLSocketFactory sslFactory;
+	private SSLSocketFactory sslSocketFactory;
 
 	public void init() throws GeneralSecurityException, IOException
 	{
@@ -131,7 +131,7 @@ public class SSLFactoryManager
 
 		engine.setUseClientMode(requireClientAuthentication);
 
-		sslFactory = sslContext.getSocketFactory();
+		sslSocketFactory = sslContext.getSocketFactory();
 	}
 
 	@SuppressWarnings({"restriction","deprecation"})
@@ -161,9 +161,9 @@ public class SSLFactoryManager
 		);
 	}
 
-	public SSLSocketFactory getSslFactory()
+	public SSLSocketFactory getSslSocketFactory()
 	{
-		return sslFactory;
+		return sslSocketFactory;
 	}
 
 	public void setKeyStorePath(String keyStorePath)
