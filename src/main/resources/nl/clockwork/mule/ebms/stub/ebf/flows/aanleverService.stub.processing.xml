@@ -35,7 +35,7 @@
 		http://www.mulesoft.org/schema/mule/xml http://www.mulesoft.org/schema/mule/xml/current/mule-xml.xsd
 	">
 
-	<flow name="aanleverbericht.processing.service">
+	<flow name="aanleverbericht.processing.service" processingStrategy="synchronous">
 		<vm:inbound-endpoint path="aanleverbericht.processing.service.in" />
 		<async>
 			<file:outbound-endpoint connector-ref="connector.file" path="${dir.base}/aanleverService/request" outputPattern="request_#[function:datestamp:yyyyMMddHHmmSSS].xml">

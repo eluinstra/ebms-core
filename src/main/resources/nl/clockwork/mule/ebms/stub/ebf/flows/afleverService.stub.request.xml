@@ -36,7 +36,7 @@
 		http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/current/mule-scripting.xsd  
 	">
 
-	<flow name="afleverbericht.stub.file.receive">
+	<flow name="afleverbericht.stub.file.receive" processingStrategy="synchronous">
 		<file:inbound-endpoint connector-ref="connector.file"	path="${dir.base}/afleverService/request" moveToDirectory="${dir.base}/afleverService/request/processed" pollingFrequency="3000">
 			<file:filename-wildcard-filter pattern="*.xml" caseSensitive="false"/>
 			<object-to-string-transformer/>
@@ -44,7 +44,7 @@
 		<flow-ref name="afleverbericht.stub.validate"/>
 	</flow>
 
-	<flow name="afleverbericht.stub.file.raw.receive">
+	<flow name="afleverbericht.stub.file.raw.receive" processingStrategy="synchronous">
 		<file:inbound-endpoint connector-ref="connector.file"	path="${dir.base}/afleverService/request" moveToDirectory="${dir.base}/afleverService/request/processed" pollingFrequency="10000">
 			<file:filename-wildcard-filter pattern="*.properties" caseSensitive="false"/>
 			<object-to-string-transformer/>
@@ -57,7 +57,7 @@
 		<flow-ref name="afleverbericht.stub.validate"/>
 	</flow>
 
-	<flow name="afleverbericht.stub.validate">
+	<flow name="afleverbericht.stub.validate" processingStrategy="synchronous">
 		<message-filter throwOnUnaccepted="false" onUnaccepted="afleverbericht.stub.message.transform">
 			<expression-filter evaluator="groovy" expression="${afleverbericht.message.validate}" />
 		</message-filter>

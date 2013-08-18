@@ -22,7 +22,7 @@ public class EbMSMessageProcessingJob implements StatefulJob, MuleContextAware
 	private String delegatePath;
 
 	@Override
-	public void execute(JobExecutionContext arg0) throws JobExecutionException
+	public void execute(JobExecutionContext context) throws JobExecutionException
 	{
 		logger.debug("Executing job: " + this.getClass());
 		try
@@ -31,7 +31,7 @@ public class EbMSMessageProcessingJob implements StatefulJob, MuleContextAware
 			List<String> messageIds = ebMSMessageService.getMessageIds(null,null);
 			for (String messageId : messageIds)
 			{
-				client.send(delegatePath,ebMSMessageService.getMessage(messageId,false),null);
+				client.sendNoReceive(delegatePath,ebMSMessageService.getMessage(messageId,false),null);
 				ebMSMessageService.processMessage(messageId);
 			}
 		}

@@ -36,7 +36,7 @@
 		http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/current/mule-scripting.xsd  
 	">
 
-	<flow name="digipoort.stub">
+	<flow name="digipoort.stub" processingStrategy="synchronous">
 		<vm:inbound-endpoint path="digipoort.stub.in"/>
 		<choice>
 			<when expression="(context/cpaId)='${afleverService.cpaId}' and (context/service)='${afleverService.service}' and (context/action)='${afleverService.response.action}'" evaluator="jxpath">

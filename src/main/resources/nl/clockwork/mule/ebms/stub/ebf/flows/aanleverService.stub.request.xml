@@ -36,7 +36,7 @@
 		http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/current/mule-scripting.xsd  
 	">
 
-	<flow name="aanleverbericht.stub.file.receive">
+	<flow name="aanleverbericht.stub.file.receive" processingStrategy="synchronous">
 		<file:inbound-endpoint connector-ref="connector.file"	path="${dir.base}/aanleverService/request" moveToDirectory="${dir.base}/aanleverService/request/processed" pollingFrequency="3000">
 			<file:filename-wildcard-filter pattern="*.xml" caseSensitive="false"/>
 			<object-to-string-transformer/>

@@ -35,7 +35,7 @@
 		http://www.mulesoft.org/schema/mule/xml http://www.mulesoft.org/schema/mule/xml/current/mule-xml.xsd
 	">
 
-	<flow name="afleverbericht.processing.service">
+	<flow name="afleverbericht.processing.service" processingStrategy="synchronous">
 		<vm:inbound-endpoint path="afleverbericht.processing.service.in" />
 		<message-properties-transformer>
 			<add-message-property key="AFLEVERBERICHT_ERROR" value-ref="AFLEVERBERICHT_DETERMINATION_ERROR"/>

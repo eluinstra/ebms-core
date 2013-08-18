@@ -61,7 +61,7 @@
 		<log-component/>
 	</flow>
 
-	<flow name="content.receive">
+	<flow name="content.receive" processingStrategy="synchronous">
 		<vm:inbound-endpoint path="ebms.content.receive.in"/>
 		<component>
 			<spring-object bean="ebMSMessageService"/>
