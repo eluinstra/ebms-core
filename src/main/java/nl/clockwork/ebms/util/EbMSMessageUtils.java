@@ -139,14 +139,14 @@ public class EbMSMessageUtils
 		return new EbMSMessage(signature,messageHeader,syncReply,messageOrder,ackRequested,errorList,acknowledgment,manifest,statusRequest,statusResponse,attachments);
 	}
 	
-	private static boolean isSOAPFault(Envelope envelope)
-	{
-		if (envelope.getBody() != null /*&& envelope.getBody().getAny() != null*/)
-			for (Object element : envelope.getBody().getAny())
-				if (((JAXBElement<?>)element).getDeclaredType().equals(Fault.class))
-					return true;
-		return false;
-	}
+	//private static boolean isSOAPFault(Envelope envelope)
+	//{
+	//	if (envelope.getBody() != null /*&& envelope.getBody().getAny() != null*/)
+	//		for (Object element : envelope.getBody().getAny())
+	//			if (((JAXBElement<?>)element).getDeclaredType().equals(Fault.class))
+	//				return true;
+	//	return false;
+	//}
 
 	public static EbMSDocument getEbMSDocument(EbMSMessage message) throws SOAPException, JAXBException, ParserConfigurationException, SAXException, IOException, TransformerFactoryConfigurationError, TransformerException
 	{
