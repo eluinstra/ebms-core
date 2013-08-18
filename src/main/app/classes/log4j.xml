@@ -58,6 +58,11 @@
 		<appender-ref ref="ASYNC"/>
 	</logger>
 
+	<logger name="httpclient.wire" additivity="false">
+		<level value="warn"/>
+		<appender-ref ref="ASYNC"/>
+	</logger>
+
 	<logger name="com.sun.org" additivity="false">
 		<level value="warn"/>
 		<appender-ref ref="ASYNC"/>
@@ -75,11 +80,6 @@
 
 	<logger name="net.sf.saxon" additivity="false">
 		<level value="debug"/>
-		<appender-ref ref="ASYNC"/>
-	</logger>
-
-	<logger name="org.hibernate.engine.StatefulPersistenceContext.ProxyWarnLog" additivity="false">
-		<level value="error"/>
 		<appender-ref ref="ASYNC"/>
 	</logger>
 
@@ -105,46 +105,6 @@
 
 	<logger name="org.mule" additivity="false">
 		<level value="info"/>
-		<appender-ref ref="ASYNC"/>
-	</logger>
-
-	<logger name="org.mule.module.client" additivity="false">
-		<level value="warn"/>
-		<appender-ref ref="ASYNC"/>
-	</logger>
-
-	<logger name="org.mule.expression" additivity="false">
-		<level value="debug"/>
-		<appender-ref ref="ASYNC"/>
-	</logger>
-	
-	<logger name="org.mule.module.xml.expression" additivity="false">
-		<level value="debug"/>
-		<appender-ref ref="ASYNC"/>
-	</logger>
-
-	<logger name="org.mule.routing" additivity="false">
-		<level value="debug"/>
-		<appender-ref ref="ASYNC"/>
-	</logger>
-	
-	<logger name="org.mule.routing.filters.ExpressionFilter" additivity="false">
-		<level value="debug" />
-		<appender-ref ref="ASYNC"/>
-	</logger>
-	
-	<logger name="org.mule.routing.filters" additivity="false">
-		<level value="debug"/>
-		<appender-ref ref="ASYNC"/>
-	</logger>
-	
-	<logger name="org.mule.module.xml.transformer.AbstractXmlTransformer" additivity="false">
-		<level value="debug"/>
-		<appender-ref ref="ASYNC"/>
-	</logger>	
-
-	<logger name="org.mule.routing.outbound" additivity="false">
-		<level value="debug"/>
 		<appender-ref ref="ASYNC"/>
 	</logger>
 
