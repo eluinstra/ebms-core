@@ -38,7 +38,7 @@
 	<flow name="aanleverbericht.processing.service" processingStrategy="synchronous">
 		<vm:inbound-endpoint path="aanleverbericht.processing.service.in" />
 		<async>
-			<file:outbound-endpoint connector-ref="connector.file" path="${dir.base}/aanleverService/request" outputPattern="request_#[function:datestamp:yyyyMMddHHmmSSS].xml">
+			<file:outbound-endpoint connector-ref="connector.file" path="${dir.base}/aanleverService/request" outputPattern="request_#[function:datestamp:yyyyMMddHHmmSSS]_#[message.id].xml">
 				<custom-transformer class="nl.clockwork.mule.ebms.stub.ebf.transformer.EbMSMessageContentToMessageContent"/>
 			</file:outbound-endpoint>
 		</async>
@@ -75,7 +75,7 @@
 			<spring:property name="action" value="${aanleverService.response.action}"/>
 		</custom-transformer>
 		<async>
-			<file:outbound-endpoint connector-ref="connector.file" path="${dir.base}/aanleverService/response" outputPattern="response_#[function:datestamp:yyyyMMddHHmmSSS].xml">
+			<file:outbound-endpoint connector-ref="connector.file" path="${dir.base}/aanleverService/response" outputPattern="response_#[function:datestamp:yyyyMMddHHmmSSS]_#[message.id].xml">
 				<custom-transformer class="nl.clockwork.mule.ebms.stub.ebf.transformer.EbMSMessageContentToMessageContent"/>
 			</file:outbound-endpoint>
 		</async>
