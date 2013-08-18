@@ -61,8 +61,8 @@ public abstract class EbMSInputStreamHandlerImpl implements EbMSInputStreamHandl
 				EbMSDocument out = messageProcessor.processRequest(in);
 				if (out == null)
 				{
-					if (logger.isInfoEnabled())
-						logger.info("StatusCode: 204");
+					if (logger.isDebugEnabled())
+						logger.debug("StatusCode: 204");
 					writeResponseStatus(204);
 				}
 				else
