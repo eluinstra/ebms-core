@@ -108,6 +108,11 @@
 		<appender-ref ref="ASYNC"/>
 	</logger>
 
+	<logger name="org.mule.module.client" additivity="false">
+		<level value="warn"/>
+		<appender-ref ref="ASYNC"/>
+	</logger>
+
 	<root>
 		<priority value="info"/>
 		<appender-ref ref="ASYNC"/>
