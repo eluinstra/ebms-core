@@ -24,6 +24,7 @@ import java.util.concurrent.Future;
 
 import nl.clockwork.ebms.Constants.EbMSEventStatus;
 import nl.clockwork.ebms.client.EbMSClient;
+import nl.clockwork.ebms.client.EbMSResponseException;
 import nl.clockwork.ebms.dao.DAOTransactionCallback;
 import nl.clockwork.ebms.dao.EbMSDAO;
 import nl.clockwork.ebms.model.EbMSDocument;
@@ -79,9 +80,14 @@ public class ProcessSendEvents implements Job
 				  			messageProcessor.processResponse(responseDocument);
 					  		updateEvent(sendEvent,EbMSEventStatus.PROCESSED);
 							}
+							catch (EbMSResponseException e)
+							{
+				  			updateEvent(sendEvent,EbMSEventStatus.FAILED); //e.getMessage()
+					  		logger.error("",e);
+							}
 							catch (Exception e)
 							{
-				  			updateEvent(sendEvent,EbMSEventStatus.FAILED);
+				  			updateEvent(sendEvent,EbMSEventStatus.FAILED); //e.printStackTrace()
 					  		logger.error("",e);
 							}
 						}
