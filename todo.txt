@@ -1,3 +1,5 @@
+- EbMSResponseHandlers examine and use content-type while parsing response
+
 - improve implementation of BusinessTransactionCharacteristics
 - improve implementation of MessagingCharacteristics:
 	- ackRequested per message
