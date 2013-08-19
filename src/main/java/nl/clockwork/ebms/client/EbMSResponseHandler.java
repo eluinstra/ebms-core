@@ -49,17 +49,20 @@ public class EbMSResponseHandler
 		InputStream input = null;
 		try
 		{
-			input = connection.getInputStream();
 			if (connection.getResponseCode() / 100 == 2)
 			{
-				return getEbMSMessage(input);
+				if (connection.getContentLength() == 0)
+					return null;
+				else
+				{
+					input = connection.getInputStream();
+					return getEbMSMessage(input);
+				}
 			}
 			else if (connection.getResponseCode() >= 400)
 			{
-				InputStream errorStream = connection.getErrorStream();
-				String error = IOUtils.toString(errorStream);
-				errorStream.close();
-				throw new EbMSResponseException(connection.getResponseCode(),error);
+				input = connection.getErrorStream();
+				throw new EbMSResponseException(connection.getResponseCode(),IOUtils.toString(input));
 			}
 			else
 				throw new EbMSResponseException(connection.getResponseCode());
@@ -68,12 +71,12 @@ public class EbMSResponseHandler
 		{
 			try
 			{
-				connection.getResponseCode();
 				InputStream errorStream = new BufferedInputStream(connection.getErrorStream());
-				IOUtils.toString(errorStream);
+				String error = IOUtils.toString(errorStream);
 				errorStream.close();
+				throw new EbMSResponseException(connection.getResponseCode(),error);
 			}
-			catch (IOException ex)
+			catch (IOException ignore)
 			{
 			}
 			throw e;

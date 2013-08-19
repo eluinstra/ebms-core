@@ -47,7 +47,7 @@ public class EbMSResponseHandler implements ResponseHandler<EbMSDocument>
 		if (response.getStatusLine().getStatusCode() / 100 == 2)
 		{
 	    HttpEntity entity = response.getEntity();
-	    if (entity != null)
+	    if (entity != null && entity.getContentLength() != 0)
 	    {
 				InputStream content = entity.getContent();
 				try
@@ -68,15 +68,37 @@ public class EbMSResponseHandler implements ResponseHandler<EbMSDocument>
 					{
 						content.close();
 					}
-					catch (Exception ignore)
+					catch (IOException ignore)
 					{
 					}
 	    	}
 	    }
-	    return in;
+		}
+		else if (response.getStatusLine().getStatusCode() >= 400)
+		{
+	    HttpEntity entity = response.getEntity();
+	    if (entity != null)
+	    {
+				InputStream content = entity.getContent();
+				try
+				{
+					throw new IOException("StatusCode: " + response.getStatusLine().getStatusCode() + "\n" + IOUtils.toString(content));
+				}
+	    	finally
+	    	{
+	    		try
+					{
+						content.close();
+					}
+					catch (IOException ignore)
+					{
+					}
+	    	}
+	    }
 		}
 		else
 			throw new IOException("StatusCode: " + response.getStatusLine().getStatusCode());
+    return in;
 	}
 
 	private EbMSDocument getEbMSMessage(String message) throws ParserConfigurationException, SAXException, IOException
