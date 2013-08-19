@@ -24,6 +24,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.ParserConfigurationException;
 
 import nl.clockwork.ebms.common.util.DOMUtils;
+import nl.clockwork.ebms.common.util.HTTPUtils;
 import nl.clockwork.ebms.model.EbMSAttachment;
 import nl.clockwork.ebms.model.EbMSDocument;
 
@@ -52,7 +53,7 @@ public class EbMSResponseHandler implements ResponseHandler<EbMSDocument>
 				InputStream content = entity.getContent();
 				try
 				{
-					in = getEbMSMessage(IOUtils.toString(content));
+					in = getEbMSMessage(IOUtils.toString(content,getCharSet(entity)));
 				}
 				catch (ParserConfigurationException e)
 				{
@@ -101,6 +102,11 @@ public class EbMSResponseHandler implements ResponseHandler<EbMSDocument>
     return in;
 	}
 
+	private String getCharSet(HttpEntity entity)
+	{
+		return HTTPUtils.getCharSet(entity.getContentType().getValue());
+	}
+	
 	private EbMSDocument getEbMSMessage(String message) throws ParserConfigurationException, SAXException, IOException
 	{
 		EbMSDocument result = null;

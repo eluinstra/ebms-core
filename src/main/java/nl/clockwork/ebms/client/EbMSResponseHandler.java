@@ -26,6 +26,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.ParserConfigurationException;
 
 import nl.clockwork.ebms.common.util.DOMUtils;
+import nl.clockwork.ebms.common.util.HTTPUtils;
 import nl.clockwork.ebms.model.EbMSAttachment;
 import nl.clockwork.ebms.model.EbMSDocument;
 
@@ -104,16 +105,7 @@ public class EbMSResponseHandler
 	private String getCharSet()
 	{
 		String contentType = getHeaderField(connection,"Content-Type");
-		String charset = null;
-		for (String param: contentType.replace(" ","").split(";"))
-		{
-			if (param.startsWith("charset="))
-			{
-				charset = param.split("=",2)[1];
-				break;
-			}
-		}
-		return charset;
+		return HTTPUtils.getCharSet(contentType);
 	}
 	
 	private String getHeaderField(HttpURLConnection connection, String name)
