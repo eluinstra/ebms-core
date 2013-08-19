@@ -35,7 +35,7 @@ public class LoggingEventListener implements EventListener
 	}
 	
 	@Override
-	public void onMessageDeliveryFailed(String messageId) throws EventException
+	public void onMessageNotDelivered(String messageId) throws EventException
 	{
 		logger.info("Message delivery failed. MessageId: " + messageId);
 	}

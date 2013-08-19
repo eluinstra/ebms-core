@@ -101,7 +101,7 @@ public class EbMSMessageProcessorImpl implements EbMSMessageProcessor
 			else if (EbMSAction.MESSAGE_ERROR.action().equals(message.getMessageHeader().getAction()))
 			{
 				process(timestamp,message,EbMSMessageStatus.DELIVERY_FAILED);
-				eventListener.onMessageDeliveryFailed(message.getMessageHeader().getMessageData().getRefToMessageId());
+				eventListener.onMessageNotDelivered(message.getMessageHeader().getMessageData().getRefToMessageId());
 				return null;
 			}
 			else if (EbMSAction.ACKNOWLEDGMENT.action().equals(message.getMessageHeader().getAction()))
@@ -194,7 +194,7 @@ public class EbMSMessageProcessorImpl implements EbMSMessageProcessor
 					if (EbMSAction.MESSAGE_ERROR.action().equals(message.getMessageHeader().getAction()))
 					{
 						process(timestamp,message,EbMSMessageStatus.DELIVERY_FAILED);
-						eventListener.onMessageDeliveryFailed(message.getMessageHeader().getMessageData().getRefToMessageId());
+						eventListener.onMessageNotDelivered(message.getMessageHeader().getMessageData().getRefToMessageId());
 					}
 					else if (EbMSAction.ACKNOWLEDGMENT.action().equals(message.getMessageHeader().getAction()))
 					{
