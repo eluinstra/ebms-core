@@ -72,24 +72,25 @@ public class ProcessSendEvents implements Job
 						{
 							try
 							{
-					  		EbMSMessage message = ebMSDAO.getMessage(sendEvent.getEbMSMessageId());
-					  		CollaborationProtocolAgreement cpa = ebMSDAO.getCPA(message.getMessageHeader().getCPAId());
-					  		EbMSDocument document = new EbMSDocument(EbMSMessageUtils.createSOAPMessage(message),message.getAttachments());
-					  		signatureGenerator.generate(cpa,document,message.getMessageHeader());
-					  		String uri = CPAUtils.getUri(cpa,message);
-					  		EbMSDocument responseDocument = ebMSClient.sendMessage(uri,document);
-				  			messageProcessor.processResponse(responseDocument);
-					  		updateEvent(sendEvent,EbMSEventStatus.PROCESSED,null);
+								EbMSMessage message = ebMSDAO.getMessage(sendEvent.getEbMSMessageId());
+								CollaborationProtocolAgreement cpa = ebMSDAO.getCPA(message.getMessageHeader().getCPAId());
+								EbMSDocument document = new EbMSDocument(EbMSMessageUtils.createSOAPMessage(message),message.getAttachments());
+								signatureGenerator.generate(cpa,document,message.getMessageHeader());
+								String uri = CPAUtils.getUri(cpa,message);
+								logger.info("Sending message. MessageId: " +  message.getMessageHeader().getMessageData().getMessageId());
+								EbMSDocument responseDocument = ebMSClient.sendMessage(uri,document);
+								messageProcessor.processResponse(responseDocument);
+								updateEvent(sendEvent,EbMSEventStatus.PROCESSED,null);
 							}
 							catch (EbMSResponseException e)
 							{
-				  			updateEvent(sendEvent,EbMSEventStatus.FAILED,e.getMessage());
-					  		logger.error("",e);
+								updateEvent(sendEvent,EbMSEventStatus.FAILED,e.getMessage());
+								logger.error("",e);
 							}
 							catch (Exception e)
 							{
-				  			updateEvent(sendEvent,EbMSEventStatus.FAILED,ExceptionUtils.getStackTrace(e));
-					  		logger.error("",e);
+								updateEvent(sendEvent,EbMSEventStatus.FAILED,ExceptionUtils.getStackTrace(e));
+								logger.error("",e);
 							}
 						}
 					}
@@ -115,8 +116,8 @@ public class ProcessSendEvents implements Job
 					@Override
 					public void doInTransaction()
 					{
-			  		ebMSDAO.updateSendEvent(sendEvent.getTime(),sendEvent.getEbMSMessageId(),status,errorMessage);
-			  		ebMSDAO.deleteEventsBefore(sendEvent.getTime(),sendEvent.getEbMSMessageId(),EbMSEventStatus.UNPROCESSED);
+						ebMSDAO.updateSendEvent(sendEvent.getTime(),sendEvent.getEbMSMessageId(),status,errorMessage);
+						ebMSDAO.deleteEventsBefore(sendEvent.getTime(),sendEvent.getEbMSMessageId(),EbMSEventStatus.UNPROCESSED);
 					}
 				}
   		);
