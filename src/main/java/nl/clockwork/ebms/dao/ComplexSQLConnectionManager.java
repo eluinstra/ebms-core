@@ -119,15 +119,7 @@ public class ComplexSQLConnectionManager
 		finally
 		{
 			if (endTransaction)
-				try
-				{
-					Savepoint savepoint = threadLocal.get().transactionStack.pop();
-					threadLocal.get().connection.releaseSavepoint(savepoint);
-				}
-				catch (SQLException e)
-				{
-					logger.warn("",e);
-				}
+				threadLocal.get().transactionStack.pop();
 			if (threadLocal.get().transactionStack.size() == 0)
 				threadLocal.get().connection = null;
 				//threadLocal.remove();
