@@ -19,52 +19,50 @@ import java.sql.Connection;
 
 public class ConnectionManager
 {
-	private static class MyConnection
-	{
-		public Connection connection;
-		public int nr;
-	}
-	private static final ThreadLocal<MyConnection> connectionHolder =
-		new ThreadLocal<MyConnection>()
+	private static final ThreadLocal<ConnectionManager> threadLocal =
+		new ThreadLocal<ConnectionManager>()
 		{
-			protected MyConnection initialValue()
+			protected ConnectionManager initialValue()
 			{
-				return new MyConnection();
+				return new ConnectionManager();
 			};
 		};
 	
+	public Connection connection;
+	public int transactionCount = 0;
+
 	public static void set(Connection connection)
 	{
-		if (connectionHolder.get().nr == 0)
-			connectionHolder.get().connection = connection;
-		connectionHolder.get().nr++;
+		if (threadLocal.get().transactionCount == 0)
+			threadLocal.get().connection = connection;
+		threadLocal.get().transactionCount++;
 	}
 	
 	public static void unset()
 	{
-		connectionHolder.get().nr--;
-		if (connectionHolder.get().nr == 0)
-			connectionHolder.remove();
+		threadLocal.get().transactionCount--;
+		if (threadLocal.get().transactionCount == 0)
+			threadLocal.remove();
 	}
 	
 	public static Connection get()
 	{
-		return connectionHolder.get().connection;
+		return threadLocal.get().connection;
 	}
 
 	public static boolean isSet()
 	{
-		return connectionHolder.get().connection != null;
+		return threadLocal.get().connection != null;
 	}
 
 	public static boolean commit()
 	{
-		return connectionHolder.get().nr == 1;
+		return threadLocal.get().transactionCount == 1;
 	}
 
 	public static boolean close()
 	{
-		return connectionHolder.get().nr == 1;
+		return threadLocal.get().transactionCount == 1;
 	}
 
 }
