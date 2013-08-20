@@ -35,15 +35,15 @@ public class ConnectionManager
 	
 	public static void set(Connection connection)
 	{
-		if (ConnectionManager.connectionHolder.get().nr == 0)
-			ConnectionManager.connectionHolder.get().connection = connection;
-		ConnectionManager.connectionHolder.get().nr++;
+		if (connectionHolder.get().nr == 0)
+			connectionHolder.get().connection = connection;
+		connectionHolder.get().nr++;
 	}
 	
 	public static void unset()
 	{
-		ConnectionManager.connectionHolder.get().nr--;
-		if (ConnectionManager.connectionHolder.get().nr == 0)
+		connectionHolder.get().nr--;
+		if (connectionHolder.get().nr == 0)
 			connectionHolder.remove();
 	}
 	
