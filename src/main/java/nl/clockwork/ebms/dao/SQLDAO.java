@@ -83,7 +83,7 @@ public class SQLDAO
 		try
 		{
 			if (connection != null)
-				if ((!endTransaction && ConnectionManager.isSet())|| (endTransaction && ConnectionManager.close()))
+				if ((!endTransaction && !ConnectionManager.isSet()) || (endTransaction && ConnectionManager.close()))
 					connection.close();
 		}
 		catch (SQLException e)
