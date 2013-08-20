@@ -106,7 +106,8 @@ public class SimpleSQLConnectionManager
 		{
 			threadLocal.get().transactionCount--;
 			if (threadLocal.get().transactionCount == 0)
-				threadLocal.remove();
+				threadLocal.get().connection = null;
+				//threadLocal.remove();
 		}
 	}
 
