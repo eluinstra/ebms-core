@@ -19,21 +19,40 @@ import java.sql.Connection;
 
 public class ConnectionManager
 {
-	private static final ThreadLocal<Connection> connection =  new ThreadLocal<Connection>();
+	private static class MyConnection
+	{
+		public Connection connection;
+		public int nr;
+	}
+	private static final ThreadLocal<MyConnection> connectionHolder =
+		new ThreadLocal<MyConnection>()
+		{
+			protected MyConnection initialValue()
+			{
+				return new MyConnection();
+			};
+		};
 	
 	public static void set(Connection connection)
 	{
-		ConnectionManager.connection.set(connection);
+		if (ConnectionManager.connectionHolder.get().nr == 0)
+			ConnectionManager.connectionHolder.get().connection = connection;
+		ConnectionManager.connectionHolder.get().nr++;
 	}
 	
 	public static void unset()
 	{
-		connection.remove();
+		ConnectionManager.connectionHolder.get().nr--;
+		if (ConnectionManager.connectionHolder.get().nr == 0)
+		{
+			ConnectionManager.connectionHolder.get().connection = null;
+			connectionHolder.remove();
+		}
 	}
 	
 	public static Connection get()
 	{
-		return connection.get();
+		return connectionHolder.get().connection;
 	}
 
 }

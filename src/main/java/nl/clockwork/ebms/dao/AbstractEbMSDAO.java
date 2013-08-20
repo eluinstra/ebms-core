@@ -94,7 +94,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 		}
 		finally
 		{
-			close(connection);
+			close(connection,true);
 		}
 	}
 
