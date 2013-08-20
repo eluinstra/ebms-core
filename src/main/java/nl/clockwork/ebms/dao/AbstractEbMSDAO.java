@@ -58,16 +58,15 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-public abstract class AbstractEbMSDAO implements EbMSDAO
+public abstract class AbstractEbMSDAO extends SQLDAO implements EbMSDAO
 {
   protected transient Log logger = LogFactory.getLog(getClass());
-	protected DataSource dataSource;
 	//public abstract String getDateFormat();
 	public abstract String getTimestampFunction();
 	
 	public AbstractEbMSDAO(DataSource dataSource)
 	{
-		this.dataSource = dataSource;
+		super(dataSource);
 	}
 
 	@Override
@@ -1363,95 +1362,6 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 		else if (EbMSAction.STATUS_RESPONSE.action().equals(message.getMessageHeader().getAction()))
 			return XMLMessageBuilder.getInstance(StatusResponse.class).handle(message.getStatusResponse());
 		return null;
-	}
-
-	protected Connection getConnection() throws DAOException
-	{
-		return getConnection(false);
-	}
-
-	protected Connection getConnection(boolean startTransaction) throws DAOException
-	{
-		try
-		{
-			Connection connection = ConnectionManager.get();
-			if (connection == null)
-				connection = dataSource.getConnection();
-			if (startTransaction)
-			{
-				connection.setAutoCommit(false);
-				ConnectionManager.set(connection);
-			}
-			return connection;
-		}
-		catch (SQLException e)
-		{
-			throw new DAOException(e);
-		}
-	}
-
-	protected void commit(Connection connection) throws DAOException
-	{
-		if (ConnectionManager.commit())
-			try
-			{
-				connection.commit();
-				connection.setAutoCommit(true);
-			}
-			catch (SQLException e)
-			{
-				throw new DAOException(e);
-			}
-	}
-
-	protected void rollback(Connection connection) throws DAOException
-	{
-		try
-		{
-			connection.rollback();
-		}
-		catch (SQLException e)
-		{
-			//throw new DAOException(e);
-			logger.warn("",e);
-		}
-	}
-
-	protected void close(Connection connection) throws DAOException
-	{
-		close(connection,false);
-	}
-	
-	protected void close(Connection connection, boolean endTransaction)
-	{
-		try
-		{
-			if (connection != null)
-				if ((!endTransaction && ConnectionManager.get() == null)|| (endTransaction && ConnectionManager.close()))
-					connection.close();
-		}
-		catch (SQLException e)
-		{
-			logger.warn("",e);
-		}
-		finally
-		{
-			if (endTransaction)
-				ConnectionManager.unset();
-		}
-	}
-
-	protected void close(Statement ps)
-	{
-		try
-		{
-			if (ps != null)
-				ps.close();
-		}
-		catch (SQLException e)
-		{
-			logger.warn("",e);
-		}
 	}
 
 	protected String join(String[] array, String delimiter)
