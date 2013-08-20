@@ -67,7 +67,8 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 	{
 		return "select message_id" +
 		" from ebms_message" +
-		" where status=" + status.id() +
+		" where message_nr = 0" +
+		" and status=" + status.id() +
 		messageContextFilter +
 		" order by time_stamp asc" +
 		" limit " + maxNr;
@@ -100,6 +101,36 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 				"status," +
 				"status_time" +
 			") values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?," + (status == null ? "null" : getTimestampFunction()) + ")",
+			Statement.RETURN_GENERATED_KEYS
+		);
+	}
+
+	@Override
+	protected PreparedStatement getInsertDuplicateMessagePreparedStatement(Connection connection) throws SQLException
+	{
+		return connection.prepareStatement
+		(
+			"insert into ebms_message (" +
+				"time_stamp," +
+				"cpa_id," +
+				"conversation_id," +
+				"sequence_nr," +
+				"message_id," +
+				"message_nr," +
+				"ref_to_message_id," +
+				"time_to_live," +
+				"from_role," +
+				"to_role," +
+				"service_type," +
+				"service," +
+				"action," +
+				"signature," +
+				"message_header," +
+				"sync_reply," +
+				"message_order," +
+				"ack_requested," +
+				"content" +
+			") values (?,?,?,?,?,(select max(message_nr) + 1 from ebms_message where message_id = ?),?,?,?,?,?,?,?,?,?,?,?,?,?)",
 			Statement.RETURN_GENERATED_KEYS
 		);
 	}

@@ -266,7 +266,8 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 			return jdbcTemplate.queryForInt(
 				"select count(message_id)" +
 				" from ebms_message" +
-				" where message_id = ?",
+				" where message_id = ?" +
+				" and message_nr = 0",
 				messageId
 			) > 0;
 		}
@@ -296,7 +297,8 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 			return jdbcTemplate.queryForLong(
 				"select id" +
 				" from ebms_message" +
-				" where message_id = ?",
+				" where message_id = ?" +
+				" and message_nr = 0",
 				messageId
 			);
 		}
@@ -311,7 +313,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	}
 	
 	@Override
-	public Long getMessageId(String messageId, Service service, String...actions) throws DAOException
+	public Long getMessageId(String refToMessageId, Service service, String...actions) throws DAOException
 	{
 		try
 		{
@@ -319,10 +321,11 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 				"select id" +
 				" from ebms_message" +
 				" where ref_to_message_id = ?" +
+				" and message_nr = 0" +
 				(service.getType() == null ? "" : " and serviceType = '" + service.getType() + "'") +
 				(service.getValue() == null ? "" : " and service = '" + service.getValue() + "'") +
 				(actions.length == 0 ? "" : " and action in (" + join(actions,",") + ")"),
-				messageId
+				refToMessageId
 			);
 		}
 		catch(EmptyResultDataAccessException e)
@@ -336,7 +339,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	}
 	
 	@Override
-	public EbMSMessage getMessage(String messageId, Service service, String...actions) throws DAOException
+	public EbMSMessage getMessage(String refToMessageId, Service service, String...actions) throws DAOException
 	{
 		try
 		{
@@ -344,11 +347,12 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 				"select id, service, action, signature, message_header, ack_requested, content" +
 				" from ebms_message" +
 				" where ref_to_message_id = ?" +
+				" and message_nr = 0" +
 				(service.getType() == null ? "" : " and serviceType = '" + service.getType() + "'") +
 				(service.getValue() == null ? "" : " and service = '" + service.getValue() + "'") +
 				(actions.length == 0 ? "" : " and action in (" + join(actions,",") + ")"),
 				new EbMSMessageParameterizedRowMapper(),
-				messageId
+				refToMessageId
 			);
 		}
 		catch(EmptyResultDataAccessException e)
@@ -369,7 +373,8 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 			String result = jdbcTemplate.queryForObject(
 				"select message_header" + 
 				" from ebms_message" + 
-				" where message_id = ?",
+				" where message_id = ?" +
+				" and message_nr = 0",
 				String.class,
 				messageId
 			);
@@ -448,7 +453,8 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 				jdbcTemplate.queryForObject(
 					"select status" +
 					" from ebms_message" +
-					" where message_id = ?",
+					" where message_id = ?" +
+					" and message_nr = 0",
 					new ParameterizedRowMapper<Integer>()
 					{
 						@Override
@@ -525,17 +531,19 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	}
 	
 	@Override
-	public void updateSendEvent(Date timestamp, Long ebMSMessageId, EbMSEventStatus status) throws DAOException
+	public void updateSendEvent(Date timestamp, Long ebMSMessageId, EbMSEventStatus status, String errorMessage) throws DAOException
 	{
 		try
 		{
 			jdbcTemplate.update(
 				"update ebms_send_event set" +
 				" status = ?," +
-				" status_time = " + getTimestampFunction() +
+				" status_time = " + getTimestampFunction() + "," +
+				" error_message = ?" +
 				" where ebms_message_id = ?" +
 				" and time = ?",
 				status.id(),
+				errorMessage,
 				ebMSMessageId,
 				timestamp
 			);
@@ -698,9 +706,125 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	}
 
 	@Override
-	public long insertDuplicateMessage(Date timestamp, EbMSMessage message) throws DAOException
+	public long insertDuplicateMessage(final Date timestamp, final EbMSMessage message) throws DAOException
 	{
-		return 0;
+		try
+		{
+			return transactionTemplate.execute(
+				new TransactionCallback<Long>()
+				{
+					@Override
+					public Long doInTransaction(TransactionStatus arg0)
+					{
+						try
+						{
+							KeyHolder keyHolder = new GeneratedKeyHolder();
+							jdbcTemplate.update(
+								new PreparedStatementCreator()
+								{
+									
+									@Override
+									public PreparedStatement createPreparedStatement(Connection connection) throws SQLException
+									{
+										try
+										{
+											PreparedStatement ps = connection.prepareStatement
+											(
+												"insert into ebms_message (" +
+													"time_stamp," +
+													"cpa_id," +
+													"conversation_id," +
+													"sequence_nr," +
+													"message_id," +
+													"message_nr," +
+													"ref_to_message_id," +
+													"time_to_live," +
+													"from_role," +
+													"to_role," +
+													"service_type," +
+													"service," +
+													"action," +
+													"signature," +
+													"message_header," +
+													"sync_reply," +
+													"message_order," +
+													"ack_requested," +
+													"content" +
+												") values (?,?,?,?,?,(select max(message_nr) + 1 from ebms_message where message_id = ?),?,?,?,?,?,?,?,?,?,?,?,?,?)",
+												//new String[]{"id"}
+												new int[]{1}
+											);
+											//ps.setDate(1,new java.sql.Date(timestamp.getTime()));
+											//ps.setString(1,String.format(getDateFormat(),timestamp));
+											ps.setTimestamp(1,new Timestamp(timestamp.getTime()));
+											//ps.setObject(1,timestamp,Types.TIMESTAMP);
+											//ps.setObject(1,timestamp);
+											MessageHeader messageHeader = message.getMessageHeader();
+											ps.setString(2,messageHeader.getCPAId());
+											ps.setString(3,messageHeader.getConversationId());
+											if (message.getMessageOrder() == null || message.getMessageOrder().getSequenceNumber() == null)
+												ps.setNull(4,java.sql.Types.BIGINT);
+											else
+												ps.setLong(4,message.getMessageOrder().getSequenceNumber().getValue().longValue());
+											ps.setString(5,messageHeader.getMessageData().getMessageId());
+											ps.setString(6,messageHeader.getMessageData().getMessageId());
+											ps.setString(7,messageHeader.getMessageData().getRefToMessageId());
+											ps.setTimestamp(8,messageHeader.getMessageData().getTimeToLive() == null ? null : new Timestamp(messageHeader.getMessageData().getTimeToLive().toGregorianCalendar().getTimeInMillis()));
+											ps.setString(9,messageHeader.getFrom().getRole());
+											ps.setString(10,messageHeader.getTo().getRole());
+											ps.setString(11,messageHeader.getService().getType());
+											ps.setString(12,messageHeader.getService().getValue());
+											ps.setString(13,messageHeader.getAction());
+											ps.setString(14,XMLMessageBuilder.getInstance(SignatureType.class).handle(new JAXBElement<SignatureType>(new QName("http://www.w3.org/2000/09/xmldsig#","Signature"),SignatureType.class,message.getSignature())));
+											ps.setString(15,XMLMessageBuilder.getInstance(MessageHeader.class).handle(messageHeader));
+											ps.setString(16,XMLMessageBuilder.getInstance(SyncReply.class).handle(message.getSyncReply()));
+											ps.setString(17,XMLMessageBuilder.getInstance(MessageOrder.class).handle(message.getMessageOrder()));
+											ps.setString(18,XMLMessageBuilder.getInstance(AckRequested.class).handle(message.getAckRequested()));
+											ps.setString(19,getContent(message));
+											return ps;
+										}
+										catch (JAXBException e)
+										{
+											throw new SQLException(e);
+										}
+									}
+								},
+								keyHolder
+							);
+					
+							for (EbMSAttachment attachment : message.getAttachments())
+							{
+								jdbcTemplate.update
+								(
+									"insert into ebms_attachment (" +
+										"ebms_message_id," +
+										"name," +
+										"content_id," +
+										"content_type," +
+										"content" +
+									") values (?,?,?,?,?)",
+									keyHolder.getKey().longValue(),
+									attachment.getName(),
+									attachment.getContentId(),
+									attachment.getContentType().split(";")[0].trim(),
+									IOUtils.toByteArray(attachment.getInputStream())
+								);
+							}
+							
+							return keyHolder.getKey().longValue();
+						}
+						catch (IOException e)
+						{
+							throw new DAOException(e);
+						}
+					}
+				}
+			);
+		}
+		catch (TransactionException e)
+		{
+			throw new DAOException(e);
+		}
 	}
 
 	protected String getContent(EbMSMessage message) throws JAXBException
@@ -910,7 +1034,8 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 			return jdbcTemplate.queryForList(
 					"select message_id" +
 					" from ebms_message" +
-					" where status = " + status.id() +
+					" where message_nr = 0" +
+					" and status = " + status.id() +
 					getMessageContextFilter(messageContext,parameters) +
 					" order by time_stamp asc",
 					parameters.toArray(new Object[0]),
@@ -952,7 +1077,8 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 			return jdbcTemplate.queryForObject(
 				"select id, service, action, signature, message_header, ack_requested, content" + 
 				" from ebms_message" + 
-				" where message_id = ?",
+				" where message_id = ?" +
+				" and message_nr = 0",
 				new EbMSMessageParameterizedRowMapper(),
 				messageId
 			);
@@ -978,6 +1104,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 				" set status = ?," +
 				" status_time = " + getTimestampFunction() +
 				" where message_id = ?" +
+				" and message_nr = 0" +
 				(oldStatus == null ? " and status is null" : " and status = " + oldStatus.id()),
 				newStatus.id(),
 				messageId
@@ -1002,6 +1129,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 					" set status = " + newStatus.id() + "," +
 					" status_time = " + getTimestampFunction() +
 					" where message_id = ?" +
+					" and message_nr = 0" +
 					(oldStatus == null ? " and status is null" : " and status = " + oldStatus.id()),
 					ids
 			);

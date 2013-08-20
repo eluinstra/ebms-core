@@ -12,7 +12,8 @@ CREATE TABLE ebms_message
 	cpa_id						VARCHAR(256)		NOT NULL,
 	conversation_id		VARCHAR(256)		NOT NULL,
 	sequence_nr				INTEGER					NULL,
-	message_id				VARCHAR(256)		NOT NULL UNIQUE,
+	message_id				VARCHAR(256)		NOT NULL,
+	message_nr				INTEGER					DEFAULT 0 NOT NULL,
 	ref_to_message_id	VARCHAR(256)		NULL,
 	time_to_live			TIMESTAMP				NULL,
 	from_role					VARCHAR(256)		NULL,
@@ -27,7 +28,8 @@ CREATE TABLE ebms_message
 	ack_requested			CLOB						NULL,
 	content						CLOB						NULL,
 	status						INTEGER					NULL,
-	status_time				TIMESTAMP				NULL
+	status_time				TIMESTAMP				NULL,
+	UNIQUE (message_id,message_nr)
 );
 
 --ALTER TABLE ebms_message ADD CONSTRAINT uc_ebms_message_id UNIQUE (message_id);
@@ -48,7 +50,7 @@ CREATE TABLE ebms_send_event
 	time							TIMESTAMP				DEFAULT NOW() NOT NULL,
 	status						INTEGER					DEFAULT 0 NOT NULL,
 	status_time				TIMESTAMP				DEFAULT NOW() NOT NULL,
---	http_status_code	INTEGER					NULL,
+	error_message			CLOB						NULL,
 	FOREIGN KEY (ebms_message_id) REFERENCES ebms_message(id),
 	UNIQUE (ebms_message_id,time)
 );

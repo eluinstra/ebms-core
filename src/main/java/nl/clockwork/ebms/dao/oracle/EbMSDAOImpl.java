@@ -44,6 +44,19 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 	}
 
 	@Override
+	public String getMessageIdsQuery(String messageContextFilter, EbMSMessageStatus status, int maxNr)
+	{
+		return "select * from (" +
+		"select message_id" +
+		" from ebms_message" +
+		" where message_nr = 0" +
+		" and status = " + status.id() +
+		messageContextFilter +
+		" order by time_stamp asc)" +
+		" where ROWNUM <= " + maxNr;
+	}
+
+	@Override
 	protected PreparedStatement getInsertMessagePreparedStatement(Connection connection, EbMSMessageStatus status) throws SQLException
 	{
 		return connection.prepareStatement
@@ -77,15 +90,35 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 	}
 
 	@Override
-	public String getMessageIdsQuery(String messageContextFilter, EbMSMessageStatus status, int maxNr)
+	protected PreparedStatement getInsertDuplicateMessagePreparedStatement(Connection connection) throws SQLException
 	{
-		return "select * from (" +
-		"select message_id" +
-		" from ebms_message" +
-		" where status = " + status.id() +
-		messageContextFilter +
-		" order by time_stamp asc)" +
-		" where ROWNUM <= " + maxNr;
+		return connection.prepareStatement
+		(
+			"insert into ebms_message (" +
+				"id," +
+				"time_stamp," +
+				"cpa_id," +
+				"conversation_id," +
+				"sequence_nr," +
+				"message_id," +
+				"message_nr," +
+				"ref_to_message_id," +
+				"time_to_live," +
+				"from_role," +
+				"to_role," +
+				"service_type," +
+				"service," +
+				"action," +
+				"signature," +
+				"message_header," +
+				"sync_reply," +
+				"message_order," +
+				"ack_requested," +
+				"content," +
+			") values (seq_ebms_message_id.nextval,?,?,?,?,?,(select max(message_nr) + 1 from ebms_message where message_id = ?),?,?,?,?,?,?,?,?,?,?,?,?,?)",
+			//new String[]{"id"}
+			new int[]{1}
+		);
 	}
 
 }

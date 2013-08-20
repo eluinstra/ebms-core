@@ -36,6 +36,7 @@ import nl.clockwork.ebms.signing.EbMSSignatureGenerator;
 import nl.clockwork.ebms.util.CPAUtils;
 import nl.clockwork.ebms.util.EbMSMessageUtils;
 
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -78,16 +79,16 @@ public class ProcessSendEvents implements Job
 					  		String uri = CPAUtils.getUri(cpa,message);
 					  		EbMSDocument responseDocument = ebMSClient.sendMessage(uri,document);
 				  			messageProcessor.processResponse(responseDocument);
-					  		updateEvent(sendEvent,EbMSEventStatus.PROCESSED);
+					  		updateEvent(sendEvent,EbMSEventStatus.PROCESSED,null);
 							}
 							catch (EbMSResponseException e)
 							{
-				  			updateEvent(sendEvent,EbMSEventStatus.FAILED); //e.getMessage()
+				  			updateEvent(sendEvent,EbMSEventStatus.FAILED,e.getMessage());
 					  		logger.error("",e);
 							}
 							catch (Exception e)
 							{
-				  			updateEvent(sendEvent,EbMSEventStatus.FAILED); //e.printStackTrace()
+				  			updateEvent(sendEvent,EbMSEventStatus.FAILED,ExceptionUtils.getStackTrace(e));
 					  		logger.error("",e);
 							}
 						}
@@ -106,7 +107,7 @@ public class ProcessSendEvents implements Job
 			}
   }
   
-	private void updateEvent(final EbMSSendEvent sendEvent, final EbMSEventStatus status)
+	private void updateEvent(final EbMSSendEvent sendEvent, final EbMSEventStatus status, final String errorMessage)
 	{
 		ebMSDAO.executeTransaction(
   			new DAOTransactionCallback()
@@ -114,7 +115,7 @@ public class ProcessSendEvents implements Job
 					@Override
 					public void doInTransaction()
 					{
-			  		ebMSDAO.updateSendEvent(sendEvent.getTime(),sendEvent.getEbMSMessageId(),status);
+			  		ebMSDAO.updateSendEvent(sendEvent.getTime(),sendEvent.getEbMSMessageId(),status,errorMessage);
 			  		ebMSDAO.deleteEventsBefore(sendEvent.getTime(),sendEvent.getEbMSMessageId(),EbMSEventStatus.UNPROCESSED);
 					}
 				}

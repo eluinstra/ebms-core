@@ -40,14 +40,14 @@ public interface EbMSDAO
 	
 	boolean existsMessage(String messageId) throws DAOException;
 	Long getMessageId(String messageId) throws DAOException;
-	Long getMessageId(String messageId, Service service, String...actions) throws DAOException;
-	EbMSMessage getMessage(String messageId, Service service, String...actions) throws DAOException;
+	Long getMessageId(String refToMessageId, Service service, String...actions) throws DAOException;
+	EbMSMessage getMessage(String refToMessageId, Service service, String...actions) throws DAOException;
 	MessageHeader getMessageHeader(String messageId) throws DAOException;
 	EbMSMessage getMessage(long id) throws DAOException;
 	EbMSMessageStatus getMessageStatus(String messageId) throws DAOException;
 
 	List<EbMSSendEvent> getLatestEventsByEbMSMessageIdBefore(Date timestamp, EbMSEventStatus status) throws DAOException;
-	void updateSendEvent(Date timestamp, Long ebMSMessageId, EbMSEventStatus status) throws DAOException;
+	void updateSendEvent(Date timestamp, Long ebMSMessageId, EbMSEventStatus status, String errorMessage) throws DAOException;
 	void deleteEventsBefore(Date timestamp, Long ebMSMessageId, EbMSEventStatus status) throws DAOException;
 
 	long insertMessage(Date timestamp, EbMSMessage message, EbMSMessageStatus status) throws DAOException;

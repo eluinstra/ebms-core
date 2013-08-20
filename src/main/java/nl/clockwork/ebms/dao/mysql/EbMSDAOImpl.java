@@ -45,7 +45,8 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 	{
 		return "select message_id" +
 		" from ebms_message" +
-		" where status = " + status.id() +
+		" where message_nr = 0" +
+		" and status = " + status.id() +
 		messageContextFilter +
 		" order by time_stamp asc" +
 		" limit " + maxNr;
