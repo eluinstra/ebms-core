@@ -44,10 +44,7 @@ public class ConnectionManager
 	{
 		ConnectionManager.connectionHolder.get().nr--;
 		if (ConnectionManager.connectionHolder.get().nr == 0)
-		{
-			ConnectionManager.connectionHolder.get().connection = null;
 			connectionHolder.remove();
-		}
 	}
 	
 	public static Connection get()
