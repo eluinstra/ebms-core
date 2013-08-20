@@ -55,4 +55,19 @@ public class ConnectionManager
 		return connectionHolder.get().connection;
 	}
 
+	public static boolean isSet()
+	{
+		return connectionHolder.get().connection != null;
+	}
+
+	public static boolean commit()
+	{
+		return connectionHolder.get().nr == 1;
+	}
+
+	public static boolean close()
+	{
+		return connectionHolder.get().nr == 1;
+	}
+
 }

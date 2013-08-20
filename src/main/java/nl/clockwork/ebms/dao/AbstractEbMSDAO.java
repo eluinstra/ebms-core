@@ -723,8 +723,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 		PreparedStatement ps = null;
 		try
 		{
-			//c = getConnection(true);
-			c = getConnection();
+			c = getConnection(true);
 			ps = getInsertMessagePreparedStatement(c,status);
 			//ps.setDate(1,new java.sql.Date(timestamp.getTime()));
 			//ps.setString(1,String.format(getDateFormat(),timestamp));
@@ -786,34 +785,34 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 				}
 				if (message.getAttachments().size() > 0)
 					ps.executeBatch();
-				//commit(c);
+				commit(c);
 				return key;
 			}
 			else
 			{
-				//rollback(c);
+				rollback(c);
 				throw new DAOException("No key found!");
 			}
 		}
 		catch (SQLException e)
 		{
-			//rollback(c);
+			rollback(c);
 			throw new DAOException(e);
 		}
 		catch (JAXBException e)
 		{
-			//rollback(c);
+			rollback(c);
 			throw new DAOException(e);
 		}
 		catch (IOException e)
 		{
-			//rollback(c);
+			rollback(c);
 			throw new DAOException(e);
 		}
 		finally
 		{
 			close(ps);
-			close(c);
+			close(c,true);
 		}
 	}
 
@@ -824,8 +823,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 		PreparedStatement ps = null;
 		try
 		{
-			//c = getConnection(true);
-			c = getConnection();
+			c = getConnection(true);
 			ps = getInsertDuplicateMessagePreparedStatement(c);
 			//ps.setDate(1,new java.sql.Date(timestamp.getTime()));
 			//ps.setString(1,String.format(getDateFormat(),timestamp));
@@ -880,34 +878,34 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 				}
 				if (message.getAttachments().size() > 0)
 					ps.executeBatch();
-				//commit(c);
+				commit(c);
 				return key;
 			}
 			else
 			{
-				//rollback(c);
+				rollback(c);
 				throw new DAOException("No key found!");
 			}
 		}
 		catch (SQLException e)
 		{
-			//rollback(c);
+			rollback(c);
 			throw new DAOException(e);
 		}
 		catch (JAXBException e)
 		{
-			//rollback(c);
+			rollback(c);
 			throw new DAOException(e);
 		}
 		catch (IOException e)
 		{
-			//rollback(c);
+			rollback(c);
 			throw new DAOException(e);
 		}
 		finally
 		{
 			close(ps);
-			close(c);
+			close(c,true);
 		}
 	}
 	
@@ -1394,15 +1392,16 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 
 	protected void commit(Connection connection) throws DAOException
 	{
-		try
-		{
-			connection.commit();
-			connection.setAutoCommit(true);
-		}
-		catch (SQLException e)
-		{
-			throw new DAOException(e);
-		}
+		if (ConnectionManager.commit())
+			try
+			{
+				connection.commit();
+				connection.setAutoCommit(true);
+			}
+			catch (SQLException e)
+			{
+				throw new DAOException(e);
+			}
 	}
 
 	protected void rollback(Connection connection) throws DAOException
@@ -1413,7 +1412,8 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 		}
 		catch (SQLException e)
 		{
-			throw new DAOException(e);
+			//throw new DAOException(e);
+			logger.warn("",e);
 		}
 	}
 
@@ -1427,12 +1427,11 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 		try
 		{
 			if (connection != null)
-				if ((!endTransaction && ConnectionManager.get() == null) || (endTransaction && ConnectionManager.get() != null))
+				if ((!endTransaction && ConnectionManager.get() == null)|| (endTransaction && ConnectionManager.close()))
 					connection.close();
 		}
 		catch (SQLException e)
 		{
-			//throw new DAOException(e);
 			logger.warn("",e);
 		}
 		finally
@@ -1442,7 +1441,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 		}
 	}
 
-	protected void close(Statement ps) throws DAOException
+	protected void close(Statement ps)
 	{
 		try
 		{
@@ -1451,7 +1450,6 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 		}
 		catch (SQLException e)
 		{
-			//throw new DAOException(e);
 			logger.warn("",e);
 		}
 	}
