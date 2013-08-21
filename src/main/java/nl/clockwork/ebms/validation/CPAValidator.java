@@ -46,15 +46,14 @@ public class CPAValidator
 			errorList.setHighestSeverity(SeverityType.ERROR);
 			return false;
 		}
-		if (!Constants.EBMS_VERSION.equals(messageHeader.getVersion()))
-		{
-			errorList.getError().add(EbMSMessageUtils.createError("//Header/MessageHeader[@version]",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Invalid value."));
-			errorList.setHighestSeverity(SeverityType.ERROR);
-			return false;
-		}
 		return true;
 	}
 
+	public void validate(CollaborationProtocolAgreement cpa) throws ValidatorException
+	{
+		
+	}
+	
 	private boolean cpaExists(CollaborationProtocolAgreement cpa, MessageHeader messageHeader)
 	{
 		return cpa != null && cpa.getCpaid().equals(messageHeader.getCPAId());
