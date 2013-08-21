@@ -13,6 +13,7 @@ CREATE TABLE ebms_message
 	conversation_id		VARCHAR(256)		NOT NULL,
 	sequence_nr				INTEGER					NULL,
 	message_id				VARCHAR(256)		NOT NULL,
+	message_nr				INTEGER					NOT NULL DEFAULT 0,
 	ref_to_message_id	VARCHAR(256)		NULL,
 	time_to_live			TIMESTAMP				NULL,
 	from_role					VARCHAR(256)		NULL,
@@ -30,7 +31,7 @@ CREATE TABLE ebms_message
 	status_time				TIMESTAMP				NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-ALTER TABLE ebms_message ADD CONSTRAINT uc_ebms_message_id UNIQUE (message_id(255));
+ALTER TABLE ebms_message ADD CONSTRAINT uc_ebms_message_id UNIQUE (message_id(255),message_nr);
 
 CREATE TABLE ebms_attachment
 (
@@ -48,7 +49,7 @@ CREATE TABLE ebms_send_event
 	time							TIMESTAMP				NOT NULL DEFAULT '0000-00-00 00:00:00',
 	status						INTEGER					NOT NULL DEFAULT 0,
 	status_time				TIMESTAMP				NOT NULL DEFAULT NOW(),
---	http_status_code	INTEGER					NULL,
+	error_message			TEXT						NULL,
 	FOREIGN KEY (ebms_message_id) REFERENCES ebms_message(id),
 	UNIQUE (ebms_message_id,time)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;

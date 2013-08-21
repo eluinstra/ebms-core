@@ -13,6 +13,7 @@ CREATE TABLE ebms_message
 	conversation_id		VARCHAR(256)		NOT NULL,
 	sequence_nr				INT							NULL,
 	message_id				VARCHAR(256)		NOT NULL,
+	message_nr				INT							NOT NULL DEFAULT 0,
 	ref_to_message_id	VARCHAR(256)		NULL,
 	time_to_live			DATETIME				NULL,
 	from_role					VARCHAR(256)		NULL,
@@ -30,7 +31,7 @@ CREATE TABLE ebms_message
 	status_time				DATETIME				NULL
 );
 
-ALTER TABLE ebms_message ADD CONSTRAINT uc_ebms_message_id UNIQUE (message_id);
+ALTER TABLE ebms_message ADD CONSTRAINT uc_ebms_message_id UNIQUE (message_id,message_nr);
 
 CREATE TABLE ebms_attachment
 (
@@ -47,6 +48,6 @@ CREATE TABLE ebms_send_event
 	time							DATETIME				NOT NULL DEFAULT GETDATE(),
 	status						INT							NOT NULL DEFAULT 0,
 	status_time				DATETIME				NOT NULL DEFAULT GETDATE(),
---	http_status_code	INT							NULL,
+	error_message			TEXT						NULL,
 	UNIQUE (ebms_message_id,time)
 );
