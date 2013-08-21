@@ -18,15 +18,15 @@ package nl.clockwork.ebms.validation;
 import java.util.GregorianCalendar;
 
 import nl.clockwork.ebms.Constants;
-import nl.clockwork.ebms.model.cpp.cpa.CollaborationProtocolAgreement;
-import nl.clockwork.ebms.model.ebxml.ErrorList;
-import nl.clockwork.ebms.model.ebxml.MessageHeader;
-import nl.clockwork.ebms.model.ebxml.SeverityType;
 import nl.clockwork.ebms.util.CPAUtils;
 import nl.clockwork.ebms.util.EbMSMessageUtils;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CollaborationProtocolAgreement;
+import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.ErrorList;
+import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageHeader;
+import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.SeverityType;
 
 public class CPAValidator
 {

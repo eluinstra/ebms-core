@@ -32,13 +32,12 @@ import nl.clockwork.ebms.dao.DAOException;
 import nl.clockwork.ebms.dao.spring.AbstractEbMSDAO;
 import nl.clockwork.ebms.model.EbMSAttachment;
 import nl.clockwork.ebms.model.EbMSMessage;
-import nl.clockwork.ebms.model.ebxml.AckRequested;
-import nl.clockwork.ebms.model.ebxml.MessageHeader;
-import nl.clockwork.ebms.model.ebxml.MessageOrder;
-import nl.clockwork.ebms.model.ebxml.SyncReply;
-import nl.clockwork.ebms.model.xml.dsig.SignatureType;
 
 import org.apache.commons.io.IOUtils;
+import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.AckRequested;
+import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageHeader;
+import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageOrder;
+import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.SyncReply;
 import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
@@ -47,6 +46,7 @@ import org.springframework.transaction.TransactionException;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallback;
 import org.springframework.transaction.support.TransactionTemplate;
+import org.w3._2000._09.xmldsig_.SignatureType;
 
 public class EbMSDAOImpl extends AbstractEbMSDAO
 {

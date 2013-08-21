@@ -18,10 +18,10 @@ package nl.clockwork.ebms.util;
 import nl.clockwork.ebms.dao.DAOException;
 import nl.clockwork.ebms.dao.EbMSDAO;
 import nl.clockwork.ebms.model.EbMSMessageContext;
-import nl.clockwork.ebms.model.cpp.cpa.CollaborationProtocolAgreement;
-import nl.clockwork.ebms.model.cpp.cpa.PartyInfo;
 
 import org.apache.commons.lang.StringUtils;
+import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CollaborationProtocolAgreement;
+import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.PartyInfo;
 
 public class EbMSMessageContextValidator
 {

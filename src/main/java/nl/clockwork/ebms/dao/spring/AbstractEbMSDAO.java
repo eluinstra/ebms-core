@@ -42,20 +42,19 @@ import nl.clockwork.ebms.model.EbMSAttachment;
 import nl.clockwork.ebms.model.EbMSMessage;
 import nl.clockwork.ebms.model.EbMSMessageContext;
 import nl.clockwork.ebms.model.EbMSSendEvent;
-import nl.clockwork.ebms.model.cpp.cpa.CollaborationProtocolAgreement;
-import nl.clockwork.ebms.model.ebxml.AckRequested;
-import nl.clockwork.ebms.model.ebxml.Acknowledgment;
-import nl.clockwork.ebms.model.ebxml.ErrorList;
-import nl.clockwork.ebms.model.ebxml.Manifest;
-import nl.clockwork.ebms.model.ebxml.MessageHeader;
-import nl.clockwork.ebms.model.ebxml.MessageOrder;
-import nl.clockwork.ebms.model.ebxml.Service;
-import nl.clockwork.ebms.model.ebxml.StatusRequest;
-import nl.clockwork.ebms.model.ebxml.StatusResponse;
-import nl.clockwork.ebms.model.ebxml.SyncReply;
-import nl.clockwork.ebms.model.xml.dsig.SignatureType;
 
 import org.apache.commons.io.IOUtils;
+import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CollaborationProtocolAgreement;
+import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.AckRequested;
+import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.Acknowledgment;
+import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.ErrorList;
+import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.Manifest;
+import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageHeader;
+import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageOrder;
+import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.Service;
+import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.StatusRequest;
+import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.StatusResponse;
+import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.SyncReply;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
@@ -70,6 +69,7 @@ import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallback;
 import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 import org.springframework.transaction.support.TransactionTemplate;
+import org.w3._2000._09.xmldsig_.SignatureType;
 
 public abstract class AbstractEbMSDAO implements EbMSDAO
 {

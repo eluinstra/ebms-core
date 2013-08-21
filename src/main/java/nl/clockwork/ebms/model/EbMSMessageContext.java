@@ -15,7 +15,7 @@
  ******************************************************************************/
 package nl.clockwork.ebms.model;
 
-import nl.clockwork.ebms.model.ebxml.MessageHeader;
+import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageHeader;
 
 public class EbMSMessageContext
 {

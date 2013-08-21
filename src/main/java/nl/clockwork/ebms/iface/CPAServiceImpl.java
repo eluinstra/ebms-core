@@ -7,10 +7,10 @@ import javax.xml.bind.JAXBException;
 import nl.clockwork.ebms.common.XMLMessageBuilder;
 import nl.clockwork.ebms.dao.DAOException;
 import nl.clockwork.ebms.dao.EbMSDAO;
-import nl.clockwork.ebms.model.cpp.cpa.CollaborationProtocolAgreement;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CollaborationProtocolAgreement;
 
 public class CPAServiceImpl implements CPAService
 {

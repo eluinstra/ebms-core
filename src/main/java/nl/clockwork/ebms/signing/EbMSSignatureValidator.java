@@ -16,10 +16,11 @@
 package nl.clockwork.ebms.signing;
 
 import nl.clockwork.ebms.model.EbMSDocument;
-import nl.clockwork.ebms.model.cpp.cpa.CollaborationProtocolAgreement;
-import nl.clockwork.ebms.model.ebxml.MessageHeader;
 import nl.clockwork.ebms.validation.ValidationException;
 import nl.clockwork.ebms.validation.ValidatorException;
+
+import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CollaborationProtocolAgreement;
+import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageHeader;
 
 public interface EbMSSignatureValidator
 {

@@ -22,26 +22,26 @@ import java.util.List;
 
 import nl.clockwork.ebms.Constants;
 import nl.clockwork.ebms.dao.EbMSDAO;
-import nl.clockwork.ebms.model.cpp.cpa.ActorType;
-import nl.clockwork.ebms.model.cpp.cpa.CollaborationProtocolAgreement;
-import nl.clockwork.ebms.model.cpp.cpa.DeliveryChannel;
-import nl.clockwork.ebms.model.cpp.cpa.PartyInfo;
-import nl.clockwork.ebms.model.cpp.cpa.PerMessageCharacteristicsType;
-import nl.clockwork.ebms.model.cpp.cpa.SyncReplyModeType;
-import nl.clockwork.ebms.model.ebxml.AckRequested;
-import nl.clockwork.ebms.model.ebxml.ErrorList;
-import nl.clockwork.ebms.model.ebxml.MessageHeader;
-import nl.clockwork.ebms.model.ebxml.MessageOrder;
-import nl.clockwork.ebms.model.ebxml.PartyId;
-import nl.clockwork.ebms.model.ebxml.Service;
-import nl.clockwork.ebms.model.ebxml.SeverityType;
-import nl.clockwork.ebms.model.ebxml.SyncReply;
 import nl.clockwork.ebms.util.CPAUtils;
 import nl.clockwork.ebms.util.EbMSMessageUtils;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.ActorType;
+import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CollaborationProtocolAgreement;
+import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DeliveryChannel;
+import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.PartyInfo;
+import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.PerMessageCharacteristicsType;
+import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.SyncReplyModeType;
+import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.AckRequested;
+import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.ErrorList;
+import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageHeader;
+import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageOrder;
+import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.PartyId;
+import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.Service;
+import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.SeverityType;
+import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.SyncReply;
 
 public class MessageHeaderValidator
 {

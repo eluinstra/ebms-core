@@ -19,20 +19,20 @@ import java.util.List;
 
 import nl.clockwork.ebms.Constants;
 import nl.clockwork.ebms.model.EbMSDocument;
-import nl.clockwork.ebms.model.cpp.cpa.CollaborationProtocolAgreement;
-import nl.clockwork.ebms.model.cpp.cpa.DeliveryChannel;
-import nl.clockwork.ebms.model.cpp.cpa.PartyInfo;
-import nl.clockwork.ebms.model.ebxml.ErrorList;
-import nl.clockwork.ebms.model.ebxml.MessageHeader;
-import nl.clockwork.ebms.model.ebxml.SeverityType;
-import nl.clockwork.ebms.model.xml.dsig.ReferenceType;
-import nl.clockwork.ebms.model.xml.dsig.SignatureType;
 import nl.clockwork.ebms.signing.EbMSSignatureValidator;
 import nl.clockwork.ebms.util.CPAUtils;
 import nl.clockwork.ebms.util.EbMSMessageUtils;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CollaborationProtocolAgreement;
+import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DeliveryChannel;
+import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.PartyInfo;
+import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.ErrorList;
+import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageHeader;
+import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.SeverityType;
+import org.w3._2000._09.xmldsig_.ReferenceType;
+import org.w3._2000._09.xmldsig_.SignatureType;
 
 public class SignatureTypeValidator
 {

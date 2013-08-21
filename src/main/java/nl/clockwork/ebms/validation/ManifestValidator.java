@@ -19,14 +19,14 @@ import java.util.List;
 
 import nl.clockwork.ebms.Constants;
 import nl.clockwork.ebms.model.EbMSAttachment;
-import nl.clockwork.ebms.model.ebxml.ErrorList;
-import nl.clockwork.ebms.model.ebxml.Manifest;
-import nl.clockwork.ebms.model.ebxml.Reference;
-import nl.clockwork.ebms.model.ebxml.SeverityType;
 import nl.clockwork.ebms.util.EbMSMessageUtils;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.ErrorList;
+import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.Manifest;
+import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.Reference;
+import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.SeverityType;
 
 public class ManifestValidator
 {

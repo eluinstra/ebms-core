@@ -198,9 +198,39 @@
 	<build>
 		<resources>
 			<resource>
-				<directory>src/main/resources</directory>
+				<directory>target/generated-sources/xjc</directory>
 			</resource>
 		</resources>
+		<pluginManagement>
+			<plugins>
+				<plugin>
+				 <groupId>org.eclipse.m2e</groupId>
+				 <artifactId>lifecycle-mapping</artifactId>
+				 <version>1.0.0</version>
+				 <configuration>
+				   <lifecycleMappingMetadata>
+				     <pluginExecutions>
+				       <pluginExecution>
+				         <pluginExecutionFilter>
+				           <groupId>com.sun.tools.xjc.maven2</groupId>
+				           <artifactId>maven-jaxb-plugin</artifactId>
+				           <versionRange>1.1.1</versionRange>
+				           <goals>
+				             <goal>generate</goal>
+				           </goals>
+				         </pluginExecutionFilter>
+				         <action>
+				           <execute >
+				             <runOnIncremental>false</runOnIncremental>
+				           </execute >
+				         </action>
+				       </pluginExecution>
+				     </pluginExecutions>
+				   </lifecycleMappingMetadata>
+				 </configuration>
+				</plugin>
+			</plugins>
+		</pluginManagement>
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -212,6 +242,57 @@
 					<encoding>ISO-8859-1</encoding>
 				</configuration>
 			</plugin>
+			<plugin>
+				<groupId>com.sun.tools.xjc.maven2</groupId>
+				<artifactId>maven-jaxb-plugin</artifactId>
+				<version>1.1.1</version>
+				<executions>
+					<execution>
+						<id>generate-sources</id>
+						<configuration>
+							<includeSchemas>
+								<includeSchema>nl/clockwork/ebms/xsd/cpp-cpa-2_0.xsd</includeSchema>
+								<includeSchema>nl/clockwork/ebms/xsd/msg-header-2_0.xsd</includeSchema>
+							</includeSchemas>
+							<includeBindings>
+								<includeBinding>nl/clockwork/ebms/xsd/cpp-cpa-2_0.xjc</includeBinding>
+							  <includeBinding>nl/clockwork/ebms/xsd/msg-header-2_0.xjc</includeBinding>
+							</includeBindings>
+							<removeOldOutput>false</removeOldOutput>
+							<verbose>false</verbose>					
+						</configuration>
+						<goals>
+							<goal>generate</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<!--plugin>
+			   <groupId>org.jvnet.jaxb2.maven2</groupId>
+			   <artifactId>maven-jaxb2-plugin</artifactId>
+			   <version>0.8.3</version>
+			   <executions>
+					  <execution>
+							<id>generate-sources</id>
+							<configuration>
+								   <schemaIncludes>
+										  <schemaInclude>nl/clockwork/ebms/xsd/cpp-cpa-2_0.xsd</schemaInclude>
+										  <schemaInclude>nl/clockwork/ebms/xsd/msg-header-2_0.xsd</schemaInclude>
+								   </schemaIncludes>
+								   <bindingIncludes>
+										  <bindingInclude>nl/clockwork/ebms/xsd/cpp-cpa-2_0.xjc</bindingInclude>
+										  <includeBinding>nl/clockwork/ebms/xsd/msg-header-2_0.xjc</includeBinding>
+								   </bindingIncludes>
+								   <forceRegenerate>true</forceRegenerate>
+								   <removeOldOutput>true</removeOldOutput>
+								   <verbose>true</verbose>
+							</configuration>
+							<goals>
+								   <goal>generate</goal>
+							</goals>
+					  </execution>
+			   </executions>
+			</plugin-->                         
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jar-plugin</artifactId>
@@ -265,84 +346,6 @@
 			</plugin>
 		</plugins>
 	</build>
-	<profiles>
-		<profile>
-			<id>generate-cpp-cpa-model</id>
-			<activation>
-	 			<property>
-	  				<name>generate-cpp-cpa-model</name>
-				</property>  				
-			</activation>
-	  		<build>
-	    		<plugins>
-					<plugin>
-						<groupId>com.sun.tools.xjc.maven2</groupId>
-						<artifactId>maven-jaxb-plugin</artifactId>
-						<version>1.1.1</version>
-						<executions>
-							<execution>
-								<id>generateCPPCPA20Model</id>
-								<goals>
-									<goal>generate</goal>
-								</goals>
-								<phase>generate-sources</phase>	
-								<configuration>
-									<generatePackage>nl.clockwork.ebms.model.cpp.cpa</generatePackage>
-									<generateDirectory>src/main/java</generateDirectory>
-									<includeSchemas>
-										<includeSchema>nl/clockwork/ebms/xsd/cpp-cpa-2_0.xsd</includeSchema>
-									</includeSchemas>
-									<includeBindings>
-										<includeBinding>nl/clockwork/ebms/xsd/cpp-cpa-2_0.xjc</includeBinding>
-									</includeBindings>
-									<removeOldOutput>false</removeOldOutput>
-									<verbose>false</verbose>					
-								</configuration>
-							</execution>
-						</executions>		
-					</plugin>				
-				</plugins>
-			</build>
-		</profile>
-		<profile>
-			<id>generate-ebxml-model</id>
-			<activation>
-	 			<property>
-	  				<name>generate-ebxml-model</name>
-				</property>  				
-			</activation>
-	  		<build>
-	    		<plugins>
-					<plugin>
-						<groupId>com.sun.tools.xjc.maven2</groupId>
-						<artifactId>maven-jaxb-plugin</artifactId>
-						<version>1.1.1</version>
-						<executions>
-							<execution>
-								<id>generateEbXMLModel</id>
-								<goals>
-									<goal>generate</goal>
-								</goals>
-								<phase>generate-sources</phase>	
-								<configuration>
-									<generatePackage>nl.clockwork.ebms.model.ebxml</generatePackage>
-									<generateDirectory>src/main/java</generateDirectory>
-									<includeSchemas>
-										<includeSchema>nl/clockwork/ebms/xsd/msg-header-2_0.xsd</includeSchema>
-									</includeSchemas>
-									<includeBindings>
-										<includeBinding>nl/clockwork/ebms/xsd/msg-header-2_0.xjc</includeBinding>
-									</includeBindings>
-									<removeOldOutput>false</removeOldOutput>
-									<verbose>false</verbose>					
-								</configuration>
-							</execution>
-						</executions>		
-					</plugin>				
-				</plugins>
-			</build>
-		</profile>
-	</profiles>
 	<reporting>
 		<plugins>
 			<plugin>

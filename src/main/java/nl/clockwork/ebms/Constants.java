@@ -15,7 +15,7 @@
  ******************************************************************************/
 package nl.clockwork.ebms;
 
-import nl.clockwork.ebms.model.ebxml.MessageStatusType;
+import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageStatusType;
 
 public class Constants
 {

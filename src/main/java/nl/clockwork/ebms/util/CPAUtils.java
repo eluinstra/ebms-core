@@ -26,27 +26,28 @@ import java.util.List;
 
 import javax.xml.bind.JAXBElement;
 
+import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.ActionBindingType;
+import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CanReceive;
+import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CanSend;
+import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.Certificate;
+import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CollaborationProtocolAgreement;
+import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CollaborationRole;
+import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DeliveryChannel;
+import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DocExchange;
+import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.PartyId;
+import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.PartyInfo;
+import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.PerMessageCharacteristicsType;
+import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.ReliableMessaging;
+import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.SenderNonRepudiation;
+import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.ServiceBinding;
+import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.ServiceType;
+import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.StatusValueType;
+import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.Transport;
+import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.Service;
+import org.w3._2000._09.xmldsig_.X509DataType;
+
 import nl.clockwork.ebms.Constants;
 import nl.clockwork.ebms.model.EbMSMessage;
-import nl.clockwork.ebms.model.cpp.cpa.ActionBindingType;
-import nl.clockwork.ebms.model.cpp.cpa.CanReceive;
-import nl.clockwork.ebms.model.cpp.cpa.CanSend;
-import nl.clockwork.ebms.model.cpp.cpa.Certificate;
-import nl.clockwork.ebms.model.cpp.cpa.CollaborationProtocolAgreement;
-import nl.clockwork.ebms.model.cpp.cpa.CollaborationRole;
-import nl.clockwork.ebms.model.cpp.cpa.DeliveryChannel;
-import nl.clockwork.ebms.model.cpp.cpa.DocExchange;
-import nl.clockwork.ebms.model.cpp.cpa.PartyId;
-import nl.clockwork.ebms.model.cpp.cpa.PartyInfo;
-import nl.clockwork.ebms.model.cpp.cpa.PerMessageCharacteristicsType;
-import nl.clockwork.ebms.model.cpp.cpa.ReliableMessaging;
-import nl.clockwork.ebms.model.cpp.cpa.SenderNonRepudiation;
-import nl.clockwork.ebms.model.cpp.cpa.ServiceBinding;
-import nl.clockwork.ebms.model.cpp.cpa.ServiceType;
-import nl.clockwork.ebms.model.cpp.cpa.StatusValueType;
-import nl.clockwork.ebms.model.cpp.cpa.Transport;
-import nl.clockwork.ebms.model.cpp.cpa.X509DataType;
-import nl.clockwork.ebms.model.ebxml.Service;
 
 //FIXME use JXPath
 public class CPAUtils
@@ -75,17 +76,17 @@ public class CPAUtils
 		return null;
 	}
 
-	public static PartyInfo getPartyInfo(CollaborationProtocolAgreement cpa, List<nl.clockwork.ebms.model.ebxml.PartyId> partyIds)
+	public static PartyInfo getPartyInfo(CollaborationProtocolAgreement cpa, List<org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.PartyId> partyIds)
 	{
 		for (PartyInfo partyInfo : cpa.getPartyInfo())
-			for (nl.clockwork.ebms.model.ebxml.PartyId partyId : partyIds)
+			for (org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.PartyId partyId : partyIds)
 				for (PartyId cpaPartyId : partyInfo.getPartyId())
 					if (equals(partyId,cpaPartyId))
 						return partyInfo;
 		return null;
 	}
 	
-	private static boolean equals(nl.clockwork.ebms.model.ebxml.PartyId partyId, PartyId cpaPartyId)
+	private static boolean equals(org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.PartyId partyId, PartyId cpaPartyId)
 	{
 		return partyId.getType().equals(cpaPartyId.getType())
 			&& partyId.getValue().equals(cpaPartyId.getValue());
