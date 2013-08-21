@@ -62,7 +62,7 @@ public class MessageHeaderValidator
 		PartyInfo from = null;
 		PartyInfo to = null;
 
-		if (messageHeader != null && !Constants.EBMS_VERSION.equals(messageHeader.getVersion()))
+		if (!Constants.EBMS_VERSION.equals(messageHeader.getVersion()))
 		{
 			errorList.getError().add(EbMSMessageUtils.createError("//Header/MessageHeader[@version]",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Invalid value."));
 			errorList.setHighestSeverity(SeverityType.ERROR);
