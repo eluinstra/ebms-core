@@ -74,12 +74,12 @@ public class ProcessSendEvents implements Job
 							{
 								EbMSMessage message = ebMSDAO.getMessage(sendEvent.getEbMSMessageId());
 								CollaborationProtocolAgreement cpa = ebMSDAO.getCPA(message.getMessageHeader().getCPAId());
-								EbMSDocument document = new EbMSDocument(EbMSMessageUtils.createSOAPMessage(message),message.getAttachments());
-								signatureGenerator.generate(cpa,document,message.getMessageHeader());
+								EbMSDocument requestDocument = new EbMSDocument(EbMSMessageUtils.createSOAPMessage(message),message.getAttachments());
+								signatureGenerator.generate(cpa,requestDocument,message.getMessageHeader());
 								String uri = CPAUtils.getUri(cpa,message);
 								logger.info("Sending message. MessageId: " +  message.getMessageHeader().getMessageData().getMessageId());
-								EbMSDocument responseDocument = ebMSClient.sendMessage(uri,document);
-								messageProcessor.processResponse(responseDocument);
+								EbMSDocument responseDocument = ebMSClient.sendMessage(uri,requestDocument);
+								messageProcessor.processResponse(requestDocument,responseDocument);
 								updateEvent(sendEvent,EbMSEventStatus.PROCESSED,null);
 							}
 							catch (EbMSResponseException e)

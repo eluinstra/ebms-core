@@ -182,55 +182,63 @@ public class EbMSMessageProcessorImpl implements EbMSMessageProcessor
 	}
 	
 	@Override
-	public void processResponse(EbMSDocument document) throws EbMSProcessorException
+	public void processResponse(EbMSDocument request, EbMSDocument response) throws EbMSProcessorException
 	{
-		if (document != null && document.getMessage() != null)
-			try
+		try
+		{
+			EbMSMessage requestMessage = EbMSMessageUtils.getEbMSMessage(request.getMessage(),request.getAttachments());
+			if (requestMessage.getAckRequested() != null && requestMessage.getSyncReply() != null && response == null)
+				throw new EbMSProcessingException("No response received for message. MessageId: " + requestMessage.getMessageHeader().getMessageData().getMessageId());
+			else if ((requestMessage.getAckRequested() == null || requestMessage.getSyncReply() == null) && response != null)
+				throw new EbMSProcessingException("No response expected for message. MessageId: " + requestMessage.getMessageHeader().getMessageData().getMessageId());
+
+			if (response != null)
 			{
-				xsdValidator.validate(document.getMessage());
+				xsdValidator.validate(response.getMessage());
 				GregorianCalendar timestamp = new GregorianCalendar();
-				final EbMSMessage message = EbMSMessageUtils.getEbMSMessage(document.getMessage(),document.getAttachments());
+				final EbMSMessage responseMessage = EbMSMessageUtils.getEbMSMessage(response.getMessage(),response.getAttachments());
 				//final CollaborationProtocolAgreement cpa = ebMSDAO.getCPA(message.getMessageHeader().getCPAId());
-				if (Constants.EBMS_SERVICE_URI.equals(message.getMessageHeader().getService().getValue()))
-					if (EbMSAction.MESSAGE_ERROR.action().equals(message.getMessageHeader().getAction()))
+				if (Constants.EBMS_SERVICE_URI.equals(responseMessage.getMessageHeader().getService().getValue()))
+					if (EbMSAction.MESSAGE_ERROR.action().equals(responseMessage.getMessageHeader().getAction()))
 					{
-						process(timestamp,message,EbMSMessageStatus.DELIVERY_FAILED);
-						eventListener.onMessageNotDelivered(message.getMessageHeader().getMessageData().getRefToMessageId());
+						process(timestamp,responseMessage,EbMSMessageStatus.DELIVERY_FAILED);
+						eventListener.onMessageNotDelivered(responseMessage.getMessageHeader().getMessageData().getRefToMessageId());
 					}
-					else if (EbMSAction.ACKNOWLEDGMENT.action().equals(message.getMessageHeader().getAction()))
+					else if (EbMSAction.ACKNOWLEDGMENT.action().equals(responseMessage.getMessageHeader().getAction()))
 					{
-						process(timestamp,message,EbMSMessageStatus.DELIVERY_ACKNOWLEDGED);
-						eventListener.onMessageDelivered(message.getMessageHeader().getMessageData().getRefToMessageId());
+						process(timestamp,responseMessage,EbMSMessageStatus.DELIVERY_ACKNOWLEDGED);
+						eventListener.onMessageDelivered(responseMessage.getMessageHeader().getMessageData().getRefToMessageId());
 					}
 			}
-			catch (ValidationException e)
-			{
-				throw new EbMSProcessingException(e);
-			}
-			catch (ValidatorException e)
-			{
-				throw new EbMSProcessorException(e);
-			}
-			catch (XPathExpressionException e)
-			{
-				throw new EbMSProcessorException(e);
-			}
-			catch (JAXBException e)
-			{
-				throw new EbMSProcessingException(e);
-			}
-			catch (ParserConfigurationException e)
-			{
-				throw new EbMSProcessorException(e);
-			}
-			catch (SAXException e)
-			{
-				throw new EbMSProcessingException(e);
-			}
-			catch (IOException e)
-			{
-				throw new EbMSProcessingException(e);
-			}
+		}
+		catch (ValidationException e)
+		{
+			throw new EbMSProcessingException(e);
+		}
+		catch (ValidatorException e)
+		{
+			throw new EbMSProcessorException(e);
+		}
+		catch (XPathExpressionException e)
+		{
+			throw new EbMSProcessorException(e);
+		}
+		catch (JAXBException e)
+		{
+			throw new EbMSProcessingException(e);
+		}
+		catch (ParserConfigurationException e)
+		{
+			throw new EbMSProcessorException(e);
+		}
+		catch (SAXException e)
+		{
+			throw new EbMSProcessingException(e);
+		}
+		catch (IOException e)
+		{
+			throw new EbMSProcessingException(e);
+		}
 	}
 	
 	private EbMSMessage process(CollaborationProtocolAgreement cpa, final GregorianCalendar timestamp, EbMSDocument document, final EbMSMessage message) throws DAOException, ValidatorException, DatatypeConfigurationException, JAXBException, SOAPException, ParserConfigurationException, SAXException, IOException, TransformerFactoryConfigurationError, TransformerException
