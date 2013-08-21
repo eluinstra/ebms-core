@@ -27,7 +27,7 @@ import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageOrder;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.StatusRequest;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.StatusResponse;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.SyncReply;
-import org.w3._2000._09.xmldsig_.SignatureType;
+import org.w3._2000._09.xmldsig.SignatureType;
 
 public class EbMSMessage
 {

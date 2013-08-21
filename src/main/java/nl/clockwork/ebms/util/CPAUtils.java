@@ -44,7 +44,7 @@ import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.ServiceType;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.StatusValueType;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.Transport;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.Service;
-import org.w3._2000._09.xmldsig_.X509DataType;
+import org.w3._2000._09.xmldsig.X509DataType;
 
 import nl.clockwork.ebms.Constants;
 import nl.clockwork.ebms.model.EbMSMessage;

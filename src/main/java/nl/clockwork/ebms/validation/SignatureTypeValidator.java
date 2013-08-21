@@ -31,8 +31,8 @@ import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.PartyInfo;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.ErrorList;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageHeader;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.SeverityType;
-import org.w3._2000._09.xmldsig_.ReferenceType;
-import org.w3._2000._09.xmldsig_.SignatureType;
+import org.w3._2000._09.xmldsig.ReferenceType;
+import org.w3._2000._09.xmldsig.SignatureType;
 
 public class SignatureTypeValidator
 {
