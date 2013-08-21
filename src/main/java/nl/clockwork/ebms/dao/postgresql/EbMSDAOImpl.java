@@ -21,8 +21,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-import javax.sql.DataSource;
-
 import nl.clockwork.ebms.Constants.EbMSMessageStatus;
 import nl.clockwork.ebms.dao.AbstractEbMSDAO;
 
@@ -31,14 +29,8 @@ import org.springframework.jdbc.core.ResultSetExtractor;
 
 public class EbMSDAOImpl extends AbstractEbMSDAO
 {
-	public EbMSDAOImpl(DataSource dataSource)
-	{
-		super(dataSource);
-	}
-
 	public class IdExtractor implements ResultSetExtractor<Long>
 	{
-
 		@Override
 		public Long extractData(ResultSet rs) throws SQLException, DataAccessException
 		{
@@ -47,7 +39,6 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 			else
 				return null;
 		}
-		
 	}
 
 //	@Override

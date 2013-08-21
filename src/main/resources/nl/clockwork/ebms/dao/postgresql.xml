@@ -19,7 +19,7 @@
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
 	<bean id="ebMSDAO" class="nl.clockwork.ebms.dao.postgresql.EbMSDAOImpl">
-		<constructor-arg index="0" ref="ebMSDataSource"/>
+		<property name="connectionManager" ref="connectionManager"/>
 	</bean>
 
 </beans>

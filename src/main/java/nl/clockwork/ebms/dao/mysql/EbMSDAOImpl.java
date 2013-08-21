@@ -15,19 +15,11 @@
  ******************************************************************************/
 package nl.clockwork.ebms.dao.mysql;
 
-import javax.sql.DataSource;
-
 import nl.clockwork.ebms.Constants.EbMSMessageStatus;
 import nl.clockwork.ebms.dao.AbstractEbMSDAO;
 
 public class EbMSDAOImpl extends AbstractEbMSDAO
 {
-
-	public EbMSDAOImpl(DataSource dataSource)
-	{
-		super(dataSource);
-	}
-
 //@Override
 //public String getDateFormat()
 //{

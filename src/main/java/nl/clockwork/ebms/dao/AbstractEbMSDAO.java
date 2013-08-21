@@ -27,7 +27,6 @@ import java.util.Date;
 import java.util.List;
 
 import javax.mail.util.ByteArrayDataSource;
-import javax.sql.DataSource;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.namespace.QName;
@@ -58,42 +57,39 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-public abstract class AbstractEbMSDAO extends SQLDAO implements EbMSDAO
+public abstract class AbstractEbMSDAO implements EbMSDAO
 {
   protected transient Log logger = LogFactory.getLog(getClass());
-	//public abstract String getDateFormat();
+	protected ConnectionManager connectionManager;
+
+  //public abstract String getDateFormat();
 	public abstract String getTimestampFunction();
 	
-	public AbstractEbMSDAO(DataSource dataSource)
-	{
-		super(dataSource);
-	}
-
 	@Override
 	public void executeTransaction(DAOTransactionCallback callback) throws DAOException
 	{
 		Connection connection = null;
 		try
 		{
-			connection = getConnection(true);
+			connection = connectionManager.getConnection(true);
 			callback.doInTransaction();
-			commit(connection);
+			connectionManager.commit();
 		}
 		catch (DAOException e)
 		{
 			if (connection != null)
-				rollback(connection);
+				connectionManager.rollback();
 			throw e;
 		}
 		catch (RuntimeException e)
 		{
 			if (connection != null)
-				rollback(connection);
+				connectionManager.rollback();
 			throw new DAOException(e);
 		}
 		finally
 		{
-			close(connection,true);
+			connectionManager.close(true);
 		}
 	}
 
@@ -105,7 +101,7 @@ public abstract class AbstractEbMSDAO extends SQLDAO implements EbMSDAO
 		try
 		{
 			boolean result = false;
-			c = getConnection();
+			c = connectionManager.getConnection();
 			ps  = c.prepareStatement(
 				"select count(cpa_id)" +
 				" from cpa" +
@@ -126,8 +122,8 @@ public abstract class AbstractEbMSDAO extends SQLDAO implements EbMSDAO
 		}
 		finally
 		{
-			close(ps);
-			close(c);
+			connectionManager.close(ps);
+			connectionManager.close();
 		}
 	}
 	
@@ -139,7 +135,7 @@ public abstract class AbstractEbMSDAO extends SQLDAO implements EbMSDAO
 		try
 		{
 			CollaborationProtocolAgreement result = null;
-			c = getConnection();
+			c = connectionManager.getConnection();
 			ps  = c.prepareStatement(
 				"select cpa" +
 				" from cpa" +
@@ -164,8 +160,8 @@ public abstract class AbstractEbMSDAO extends SQLDAO implements EbMSDAO
 		}
 		finally
 		{
-			close(ps);
-			close(c);
+			connectionManager.close(ps);
+			connectionManager.close();
 		}
 	}
 
@@ -177,7 +173,7 @@ public abstract class AbstractEbMSDAO extends SQLDAO implements EbMSDAO
 		try
 		{
 			List<String> result = new ArrayList<String>();
-			c = getConnection();
+			c = connectionManager.getConnection();
 			ps  = c.prepareStatement(
 				"select cpa_id" +
 				" from cpa" +
@@ -197,8 +193,8 @@ public abstract class AbstractEbMSDAO extends SQLDAO implements EbMSDAO
 		}
 		finally
 		{
-			close(ps);
-			close(c);
+			connectionManager.close(ps);
+			connectionManager.close();
 		}
 	}
 
@@ -209,7 +205,7 @@ public abstract class AbstractEbMSDAO extends SQLDAO implements EbMSDAO
 		PreparedStatement ps = null;
 		try
 		{
-			c = getConnection();
+			c = connectionManager.getConnection();
 			ps  = c.prepareStatement(
 				"insert into cpa (" +
 					"cpa_id," +
@@ -230,8 +226,8 @@ public abstract class AbstractEbMSDAO extends SQLDAO implements EbMSDAO
 		}
 		finally
 		{
-			close(ps);
-			close(c);
+			connectionManager.close(ps);
+			connectionManager.close();
 		}
 	}
 
@@ -242,7 +238,7 @@ public abstract class AbstractEbMSDAO extends SQLDAO implements EbMSDAO
 		PreparedStatement ps = null;
 		try
 		{
-			c = getConnection();
+			c = connectionManager.getConnection();
 			ps  = c.prepareStatement(
 				"update cpa set" +
 				" cpa = ?" +
@@ -262,8 +258,8 @@ public abstract class AbstractEbMSDAO extends SQLDAO implements EbMSDAO
 		}
 		finally
 		{
-			close(ps);
-			close(c);
+			connectionManager.close(ps);
+			connectionManager.close();
 		}
 	}
 
@@ -274,7 +270,7 @@ public abstract class AbstractEbMSDAO extends SQLDAO implements EbMSDAO
 		PreparedStatement ps = null;
 		try
 		{
-			c = getConnection();
+			c = connectionManager.getConnection();
 			ps  = c.prepareStatement(
 				"delete from cpa" +
 				" where cpa_id = ?"
@@ -288,8 +284,8 @@ public abstract class AbstractEbMSDAO extends SQLDAO implements EbMSDAO
 		}
 		finally
 		{
-			close(ps);
-			close(c);
+			connectionManager.close(ps);
+			connectionManager.close();
 		}
 	}
 
@@ -301,7 +297,7 @@ public abstract class AbstractEbMSDAO extends SQLDAO implements EbMSDAO
 		try
 		{
 			boolean result = false;
-			c = getConnection();
+			c = connectionManager.getConnection();
 			ps  = c.prepareStatement(
 				"select count(message_id)" +
 				" from ebms_message" +
@@ -323,8 +319,8 @@ public abstract class AbstractEbMSDAO extends SQLDAO implements EbMSDAO
 		}
 		finally
 		{
-			close(ps);
-			close(c);
+			connectionManager.close(ps);
+			connectionManager.close();
 		}
 	}
 	
@@ -336,7 +332,7 @@ public abstract class AbstractEbMSDAO extends SQLDAO implements EbMSDAO
 		try
 		{
 			Long result = null;
-			c = getConnection();
+			c = connectionManager.getConnection();
 			ps  = c.prepareStatement(
 				"select id" +
 				" from ebms_message" +
@@ -358,8 +354,8 @@ public abstract class AbstractEbMSDAO extends SQLDAO implements EbMSDAO
 		}
 		finally
 		{
-			close(ps);
-			close(c);
+			connectionManager.close(ps);
+			connectionManager.close();
 		}
 	}
 	
@@ -371,7 +367,7 @@ public abstract class AbstractEbMSDAO extends SQLDAO implements EbMSDAO
 		try
 		{
 			Long result = null;
-			c = getConnection();
+			c = connectionManager.getConnection();
 			ps  = c.prepareStatement(
 				"select id" +
 				" from ebms_message" +
@@ -396,8 +392,8 @@ public abstract class AbstractEbMSDAO extends SQLDAO implements EbMSDAO
 		}
 		finally
 		{
-			close(ps);
-			close(c);
+			connectionManager.close(ps);
+			connectionManager.close();
 		}
 	}
 	
@@ -409,7 +405,7 @@ public abstract class AbstractEbMSDAO extends SQLDAO implements EbMSDAO
 		try
 		{
 			EbMSMessage result = null;
-			c = getConnection();
+			c = connectionManager.getConnection();
 			ps  = c.prepareStatement(
 				"select id, service, action, signature, message_header, ack_requested, content" +
 				" from ebms_message" +
@@ -438,8 +434,8 @@ public abstract class AbstractEbMSDAO extends SQLDAO implements EbMSDAO
 		}
 		finally
 		{
-			close(ps);
-			close(c);
+			connectionManager.close(ps);
+			connectionManager.close();
 		}
 	}
 	
@@ -451,7 +447,7 @@ public abstract class AbstractEbMSDAO extends SQLDAO implements EbMSDAO
 		try
 		{
 			MessageHeader result = null;
-			c = getConnection();
+			c = connectionManager.getConnection();
 			ps = c.prepareStatement(
 				"select message_header" + 
 				" from ebms_message" + 
@@ -477,8 +473,8 @@ public abstract class AbstractEbMSDAO extends SQLDAO implements EbMSDAO
 		}
 		finally
 		{
-			close(ps);
-			close(c);
+			connectionManager.close(ps);
+			connectionManager.close();
 		}
 	}
 
@@ -490,7 +486,7 @@ public abstract class AbstractEbMSDAO extends SQLDAO implements EbMSDAO
 		try
 		{
 			EbMSMessage result = null;
-			c = getConnection();
+			c = connectionManager.getConnection();
 			ps = c.prepareStatement(
 				"select id, service, action, signature, message_header, ack_requested, content" + 
 				" from ebms_message" + 
@@ -515,8 +511,8 @@ public abstract class AbstractEbMSDAO extends SQLDAO implements EbMSDAO
 		}
 		finally
 		{
-			close(ps);
-			close(c);
+			connectionManager.close(ps);
+			connectionManager.close();
 		}
 	}
 	
@@ -528,7 +524,7 @@ public abstract class AbstractEbMSDAO extends SQLDAO implements EbMSDAO
 		try
 		{
 			EbMSMessageStatus result = null;
-			c = getConnection();
+			c = connectionManager.getConnection();
 			ps = c.prepareStatement(
 				"select status" +
 				" from ebms_message" +
@@ -550,8 +546,8 @@ public abstract class AbstractEbMSDAO extends SQLDAO implements EbMSDAO
 		}
 		finally
 		{
-			close(ps);
-			close(c);
+			connectionManager.close(ps);
+			connectionManager.close();
 		}
 	}
 
@@ -563,7 +559,7 @@ public abstract class AbstractEbMSDAO extends SQLDAO implements EbMSDAO
 		try
 		{
 			List<EbMSSendEvent> result = new ArrayList<EbMSSendEvent>();
-			c = getConnection();
+			c = connectionManager.getConnection();
 			ps = c.prepareStatement(
 				"select ebms_message_id, max(time) as time" +
 				" from ebms_send_event" +
@@ -588,8 +584,8 @@ public abstract class AbstractEbMSDAO extends SQLDAO implements EbMSDAO
 		}
 		finally
 		{
-			close(ps);
-			close(c);
+			connectionManager.close(ps);
+			connectionManager.close();
 		}
 	}
 	
@@ -600,7 +596,7 @@ public abstract class AbstractEbMSDAO extends SQLDAO implements EbMSDAO
 		PreparedStatement ps = null;
 		try
 		{
-			c = getConnection();
+			c = connectionManager.getConnection();
 			ps  = c.prepareStatement(
 				"update ebms_send_event set" +
 				" status = ?," +
@@ -621,8 +617,8 @@ public abstract class AbstractEbMSDAO extends SQLDAO implements EbMSDAO
 		}
 		finally
 		{
-			close(ps);
-			close(c);
+			connectionManager.close(ps);
+			connectionManager.close();
 		}
 	}
 	
@@ -633,7 +629,7 @@ public abstract class AbstractEbMSDAO extends SQLDAO implements EbMSDAO
 		PreparedStatement ps = null;
 		try
 		{
-			c = getConnection();
+			c = connectionManager.getConnection();
 			ps  = c.prepareStatement(
 				"delete from ebms_send_event" +
 				" where ebms_message_id = ?" +
@@ -651,8 +647,8 @@ public abstract class AbstractEbMSDAO extends SQLDAO implements EbMSDAO
 		}
 		finally
 		{
-			close(ps);
-			close(c);
+			connectionManager.close(ps);
+			connectionManager.close();
 		}
 	}
 	
@@ -722,7 +718,7 @@ public abstract class AbstractEbMSDAO extends SQLDAO implements EbMSDAO
 		PreparedStatement ps = null;
 		try
 		{
-			c = getConnection(true);
+			c = connectionManager.getConnection(true);
 			ps = getInsertMessagePreparedStatement(c,status);
 			//ps.setDate(1,new java.sql.Date(timestamp.getTime()));
 			//ps.setString(1,String.format(getDateFormat(),timestamp));
@@ -763,7 +759,7 @@ public abstract class AbstractEbMSDAO extends SQLDAO implements EbMSDAO
 			if (rs.next())
 			{
 				long key = rs.getLong(1);
-				ps.close();
+				connectionManager.close(ps);
 				ps  = c.prepareStatement(
 					"insert into ebms_attachment (" +
 					"ebms_message_id," +
@@ -784,34 +780,34 @@ public abstract class AbstractEbMSDAO extends SQLDAO implements EbMSDAO
 				}
 				if (message.getAttachments().size() > 0)
 					ps.executeBatch();
-				commit(c);
+				connectionManager.commit();
 				return key;
 			}
 			else
 			{
-				rollback(c);
+				connectionManager.rollback();
 				throw new DAOException("No key found!");
 			}
 		}
 		catch (SQLException e)
 		{
-			rollback(c);
+			connectionManager.rollback();
 			throw new DAOException(e);
 		}
 		catch (JAXBException e)
 		{
-			rollback(c);
+			connectionManager.rollback();
 			throw new DAOException(e);
 		}
 		catch (IOException e)
 		{
-			rollback(c);
+			connectionManager.rollback();
 			throw new DAOException(e);
 		}
 		finally
 		{
-			close(ps);
-			close(c,true);
+			connectionManager.close(ps);
+			connectionManager.close(true);
 		}
 	}
 
@@ -822,7 +818,7 @@ public abstract class AbstractEbMSDAO extends SQLDAO implements EbMSDAO
 		PreparedStatement ps = null;
 		try
 		{
-			c = getConnection(true);
+			c = connectionManager.getConnection(true);
 			ps = getInsertDuplicateMessagePreparedStatement(c);
 			//ps.setDate(1,new java.sql.Date(timestamp.getTime()));
 			//ps.setString(1,String.format(getDateFormat(),timestamp));
@@ -856,7 +852,7 @@ public abstract class AbstractEbMSDAO extends SQLDAO implements EbMSDAO
 			if (rs.next())
 			{
 				long key = rs.getLong(1);
-				ps.close();
+				connectionManager.close(ps);
 				ps  = c.prepareStatement(
 					"insert into ebms_attachment (" +
 					"ebms_message_id," +
@@ -877,34 +873,34 @@ public abstract class AbstractEbMSDAO extends SQLDAO implements EbMSDAO
 				}
 				if (message.getAttachments().size() > 0)
 					ps.executeBatch();
-				commit(c);
+				connectionManager.commit();
 				return key;
 			}
 			else
 			{
-				rollback(c);
-				throw new DAOException("No key found!");
+				connectionManager.rollback();
+				throw new DAOException("No 2key found!");
 			}
 		}
 		catch (SQLException e)
 		{
-			rollback(c);
+			connectionManager.rollback();
 			throw new DAOException(e);
 		}
 		catch (JAXBException e)
 		{
-			rollback(c);
+			connectionManager.rollback();
 			throw new DAOException(e);
 		}
 		catch (IOException e)
 		{
-			rollback(c);
+			connectionManager.rollback();
 			throw new DAOException(e);
 		}
 		finally
 		{
-			close(ps);
-			close(c,true);
+			connectionManager.close(ps);
+			connectionManager.close(true);
 		}
 	}
 	
@@ -915,7 +911,7 @@ public abstract class AbstractEbMSDAO extends SQLDAO implements EbMSDAO
 		PreparedStatement ps = null;
 		try
 		{
-			c = getConnection();
+			c = connectionManager.getConnection();
 			ps  = c.prepareStatement(
 				"update ebms_message" +
 				" set status = ?," + 
@@ -933,8 +929,8 @@ public abstract class AbstractEbMSDAO extends SQLDAO implements EbMSDAO
 		}
 		finally
 		{
-			close(ps);
-			close(c);
+			connectionManager.close(ps);
+			connectionManager.close();
 		}
 	}
 
@@ -945,7 +941,7 @@ public abstract class AbstractEbMSDAO extends SQLDAO implements EbMSDAO
 		PreparedStatement ps = null;
 		try
 		{
-			c = getConnection();
+			c = connectionManager.getConnection();
 			ps  = c.prepareStatement(
 				"insert into ebms_send_event (" +
 					"ebms_message_id" +
@@ -960,8 +956,8 @@ public abstract class AbstractEbMSDAO extends SQLDAO implements EbMSDAO
 		}
 		finally
 		{
-			close(ps);
-			close(c);
+			connectionManager.close(ps);
+			connectionManager.close();
 		}
 	}
 	
@@ -973,7 +969,7 @@ public abstract class AbstractEbMSDAO extends SQLDAO implements EbMSDAO
 		PreparedStatement ps = null;
 		try
 		{
-			c = getConnection();
+			c = connectionManager.getConnection();
 			ps  = c.prepareStatement(
 				"insert into ebms_send_event (" +
 					"ebms_message_id," +
@@ -991,8 +987,8 @@ public abstract class AbstractEbMSDAO extends SQLDAO implements EbMSDAO
 		}
 		finally
 		{
-			close(ps);
-			close(c);
+			connectionManager.close(ps);
+			connectionManager.close();
 		}
 	}
 
@@ -1003,7 +999,7 @@ public abstract class AbstractEbMSDAO extends SQLDAO implements EbMSDAO
 		PreparedStatement ps = null;
 		try
 		{
-			c = getConnection();
+			c = connectionManager.getConnection();
 			ps  = c.prepareStatement(
 				"insert into ebms_send_event (" +
 					"ebms_message_id," +
@@ -1025,8 +1021,8 @@ public abstract class AbstractEbMSDAO extends SQLDAO implements EbMSDAO
 		}
 		finally
 		{
-			close(ps);
-			close(c);
+			connectionManager.close(ps);
+			connectionManager.close();
 		}
 	}
 
@@ -1037,7 +1033,7 @@ public abstract class AbstractEbMSDAO extends SQLDAO implements EbMSDAO
 		PreparedStatement ps = null;
 		try
 		{
-			c = getConnection();
+			c = connectionManager.getConnection();
 			ps  = c.prepareStatement(
 				"delete from ebms_send_event" +
 				" where ebms_message_id = ?" +
@@ -1053,8 +1049,8 @@ public abstract class AbstractEbMSDAO extends SQLDAO implements EbMSDAO
 		}
 		finally
 		{
-			close(ps);
-			close(c);
+			connectionManager.close(ps);
+			connectionManager.close();
 		}
 	}
 
@@ -1066,7 +1062,7 @@ public abstract class AbstractEbMSDAO extends SQLDAO implements EbMSDAO
 		try
 		{
 			List<String> result = new ArrayList<String>();
-			c = getConnection();
+			c = connectionManager.getConnection();
 			ps  = c.prepareStatement(
 				"select message_id" +
 				" from ebms_message" +
@@ -1090,8 +1086,8 @@ public abstract class AbstractEbMSDAO extends SQLDAO implements EbMSDAO
 		}
 		finally
 		{
-			close(ps);
-			close(c);
+			connectionManager.close(ps);
+			connectionManager.close();
 		}
 	}
 
@@ -1105,7 +1101,7 @@ public abstract class AbstractEbMSDAO extends SQLDAO implements EbMSDAO
 		try
 		{
 			List<String> result = new ArrayList<String>();
-			c = getConnection();
+			c = connectionManager.getConnection();
 			String messageContextFilter = addMessageContextFilter(messageContext);
 			ps = c.prepareStatement(
 				getMessageIdsQuery(messageContextFilter,status,maxNr)
@@ -1125,8 +1121,8 @@ public abstract class AbstractEbMSDAO extends SQLDAO implements EbMSDAO
 		}
 		finally
 		{
-			close(ps);
-			close(c);
+			connectionManager.close(ps);
+			connectionManager.close();
 		}
 	}
 
@@ -1138,7 +1134,7 @@ public abstract class AbstractEbMSDAO extends SQLDAO implements EbMSDAO
 		try
 		{
 			EbMSMessage result = null;
-			c = getConnection();
+			c = connectionManager.getConnection();
 			ps = c.prepareStatement(
 				"select id, service, action, signature, message_header, ack_requested, content" + 
 				" from ebms_message" + 
@@ -1164,8 +1160,8 @@ public abstract class AbstractEbMSDAO extends SQLDAO implements EbMSDAO
 		}
 		finally
 		{
-			close(ps);
-			close(c);
+			connectionManager.close(ps);
+			connectionManager.close();
 		}
 	}
 
@@ -1176,7 +1172,7 @@ public abstract class AbstractEbMSDAO extends SQLDAO implements EbMSDAO
 		PreparedStatement ps = null;
 		try
 		{
-			c = getConnection();
+			c = connectionManager.getConnection();
 			ps  = c.prepareStatement(
 				"update ebms_message" +
 				" set status = ?," +
@@ -1195,8 +1191,8 @@ public abstract class AbstractEbMSDAO extends SQLDAO implements EbMSDAO
 		}
 		finally
 		{
-			close(ps);
-			close(c);
+			connectionManager.close(ps);
+			connectionManager.close();
 		}
 	}
 
@@ -1207,7 +1203,7 @@ public abstract class AbstractEbMSDAO extends SQLDAO implements EbMSDAO
 		PreparedStatement ps = null;
 		try
 		{
-			c = getConnection();
+			c = connectionManager.getConnection();
 			ps  = c.prepareStatement(
 				"update ebms_message" +
 				" set status = " + newStatus.id() + "," +
@@ -1230,8 +1226,8 @@ public abstract class AbstractEbMSDAO extends SQLDAO implements EbMSDAO
 		}
 		finally
 		{
-			close(ps);
-			close(c);
+			connectionManager.close(ps);
+			connectionManager.close();
 		}
 	}
 
@@ -1242,7 +1238,7 @@ public abstract class AbstractEbMSDAO extends SQLDAO implements EbMSDAO
 		try
 		{
 			List<EbMSAttachment> result = new ArrayList<EbMSAttachment>();
-			c = getConnection();
+			c = connectionManager.getConnection();
 			ps = c.prepareStatement(
 				"select name, content_id, content_type, content" + 
 				" from ebms_attachment" + 
@@ -1267,8 +1263,8 @@ public abstract class AbstractEbMSDAO extends SQLDAO implements EbMSDAO
 		}
 		finally
 		{
-			close(ps);
-			close(c);
+			connectionManager.close(ps);
+			connectionManager.close();
 		}
 	}
 
@@ -1374,6 +1370,11 @@ public abstract class AbstractEbMSDAO extends SQLDAO implements EbMSDAO
 			result.deleteCharAt(result.length() - 1);
 		}
 		return result.toString();
+	}
+	
+	public void setConnectionManager(ConnectionManager connectionManager)
+	{
+		this.connectionManager = connectionManager;
 	}
 	
 }
