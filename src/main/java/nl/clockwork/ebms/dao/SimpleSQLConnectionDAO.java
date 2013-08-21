@@ -21,32 +21,32 @@ public class SimpleSQLConnectionDAO
 
 	protected Connection getConnection() throws DAOException
 	{
-		return SimpleSQLConnectionManager.getConnection(dataSource);
+		return SimpleSQLConnectionHolder.getConnection(dataSource);
 	}
 
 	protected Connection getConnection(boolean startTransaction) throws DAOException
 	{
-		return SimpleSQLConnectionManager.getConnection(dataSource);
+		return SimpleSQLConnectionHolder.getConnection(dataSource);
 	}
 
 	protected void commit(Connection connection) throws DAOException
 	{
-		SimpleSQLConnectionManager.commit();
+		SimpleSQLConnectionHolder.commit();
 	}
 
 	protected void rollback(Connection connection)
 	{
-		SimpleSQLConnectionManager.rollback();
+		SimpleSQLConnectionHolder.rollback();
 	}
 
 	protected void close(Connection connection) throws DAOException
 	{
-		SimpleSQLConnectionManager.close();
+		SimpleSQLConnectionHolder.close();
 	}
 	
 	protected void close(Connection connection, boolean endTransaction)
 	{
-		SimpleSQLConnectionManager.close();
+		SimpleSQLConnectionHolder.close();
 	}
 
 	protected void close(Statement ps)

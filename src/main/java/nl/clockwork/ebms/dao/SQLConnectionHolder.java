@@ -17,29 +17,27 @@ package nl.clockwork.ebms.dao;
 
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.sql.Savepoint;
 import java.sql.Statement;
-import java.util.Stack;
 
 import javax.sql.DataSource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-public class ComplexSQLConnectionManager
+public class SQLConnectionHolder
 {
-	private static final Log logger = LogFactory.getLog(ComplexSQLConnectionManager.class);
-	private static final ThreadLocal<ComplexSQLConnectionManager> threadLocal =
-		new ThreadLocal<ComplexSQLConnectionManager>()
+	private static final Log logger = LogFactory.getLog(SQLConnectionHolder.class);
+	private static final ThreadLocal<SQLConnectionHolder> threadLocal =
+		new ThreadLocal<SQLConnectionHolder>()
 		{
-			protected ComplexSQLConnectionManager initialValue()
+			protected SQLConnectionHolder initialValue()
 			{
-				return new ComplexSQLConnectionManager();
+				return new SQLConnectionHolder();
 			};
 		};
 	
 	public Connection connection;
-	public Stack<Savepoint> transactionStack = new Stack<Savepoint>();
+	public int transactionCount = 0;
 
 	public static Connection getConnection(DataSource dataSource) throws DAOException
 	{
@@ -58,8 +56,7 @@ public class ComplexSQLConnectionManager
 			if (startTransaction)
 			{
 				threadLocal.get().connection.setAutoCommit(false);
-				Savepoint savepoint = threadLocal.get().connection.setSavepoint();
-				threadLocal.get().transactionStack.push(savepoint);
+				threadLocal.get().transactionCount++;
 			}
 			return threadLocal.get().connection;
 		}
@@ -78,7 +75,7 @@ public class ComplexSQLConnectionManager
 	{
 		try
 		{
-			if (force || threadLocal.get().transactionStack.size() == 1)
+			if (force || threadLocal.get().transactionCount == 1)
 				threadLocal.get().connection.commit();
 		}
 		catch (SQLException e)
@@ -91,7 +88,7 @@ public class ComplexSQLConnectionManager
 	{
 		try
 		{
-			threadLocal.get().connection.rollback(threadLocal.get().transactionStack.peek());
+			threadLocal.get().connection.rollback();
 		}
 		catch (SQLException e)
 		{
@@ -109,7 +106,7 @@ public class ComplexSQLConnectionManager
 		try
 		{
 			if (threadLocal.get().connection != null)
-				if ((!endTransaction && threadLocal.get().transactionStack.size() == 0) || (endTransaction && threadLocal.get().transactionStack.size() == 1))
+				if ((!endTransaction && threadLocal.get().transactionCount == 0) || (endTransaction && threadLocal.get().transactionCount == 1))
 					threadLocal.get().connection.close();
 		}
 		catch (SQLException e)
@@ -119,8 +116,8 @@ public class ComplexSQLConnectionManager
 		finally
 		{
 			if (endTransaction)
-				threadLocal.get().transactionStack.pop();
-			if (threadLocal.get().transactionStack.size() == 0)
+				threadLocal.get().transactionCount--;
+			if (threadLocal.get().transactionCount == 0)
 				threadLocal.get().connection = null;
 				//threadLocal.remove();
 		}

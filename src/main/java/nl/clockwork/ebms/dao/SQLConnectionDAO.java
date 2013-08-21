@@ -21,32 +21,32 @@ public class SQLConnectionDAO
 
 	protected Connection getConnection() throws DAOException
 	{
-		return SQLConnectionManager.getConnection(dataSource);
+		return SQLConnectionHolder.getConnection(dataSource);
 	}
 
 	protected Connection getConnection(boolean startTransaction) throws DAOException
 	{
-		return SQLConnectionManager.getConnection(dataSource,startTransaction);
+		return SQLConnectionHolder.getConnection(dataSource,startTransaction);
 	}
 
 	protected void commit(Connection connection) throws DAOException
 	{
-		SQLConnectionManager.commit();
+		SQLConnectionHolder.commit();
 	}
 
 	protected void rollback(Connection connection)
 	{
-		SQLConnectionManager.rollback();
+		SQLConnectionHolder.rollback();
 	}
 
 	protected void close(Connection connection) throws DAOException
 	{
-		SQLConnectionManager.close();
+		SQLConnectionHolder.close();
 	}
 	
 	protected void close(Connection connection, boolean endTransaction)
 	{
-		SQLConnectionManager.close(endTransaction);
+		SQLConnectionHolder.close(endTransaction);
 	}
 
 	protected void close(Statement ps)

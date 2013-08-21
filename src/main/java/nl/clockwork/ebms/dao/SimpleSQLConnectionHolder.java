@@ -24,15 +24,15 @@ import javax.sql.DataSource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-public class SimpleSQLConnectionManager
+public class SimpleSQLConnectionHolder
 {
-	private static final Log logger = LogFactory.getLog(SimpleSQLConnectionManager.class);
-	private static final ThreadLocal<SimpleSQLConnectionManager> threadLocal =
-		new ThreadLocal<SimpleSQLConnectionManager>()
+	private static final Log logger = LogFactory.getLog(SimpleSQLConnectionHolder.class);
+	private static final ThreadLocal<SimpleSQLConnectionHolder> threadLocal =
+		new ThreadLocal<SimpleSQLConnectionHolder>()
 		{
-			protected SimpleSQLConnectionManager initialValue()
+			protected SimpleSQLConnectionHolder initialValue()
 			{
-				return new SimpleSQLConnectionManager();
+				return new SimpleSQLConnectionHolder();
 			};
 		};
 	
