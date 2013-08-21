@@ -20,7 +20,7 @@
 >
 
 	<bean id="connectionManager" class="nl.clockwork.ebms.dao.SQLConnectionManager">
-		<property name="dataSource" ref="ebMSDataSource"/>
+		<constructor-arg index="0" ref="ebMSDataSource"/>
 	</bean>
 
 	<bean id="ebMSDataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource" destroy-method="close">
