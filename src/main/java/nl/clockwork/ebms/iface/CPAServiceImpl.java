@@ -7,6 +7,8 @@ import javax.xml.bind.JAXBException;
 import nl.clockwork.ebms.common.XMLMessageBuilder;
 import nl.clockwork.ebms.dao.DAOException;
 import nl.clockwork.ebms.dao.EbMSDAO;
+import nl.clockwork.ebms.validation.CPAValidator;
+import nl.clockwork.ebms.validation.ValidatorException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -19,46 +21,51 @@ public class CPAServiceImpl implements CPAService
 	private Object cpaMonitor = new Object();
 
 	@Override
-	public boolean insertCPA(/*CollaborationProtocolAgreement*/String cpa_, Boolean overwrite) throws CPAServiceException
+	public void insertCPA(/*CollaborationProtocolAgreement*/String cpa_, Boolean overwrite) throws CPAServiceException
 	{
 		try
 		{
 			CollaborationProtocolAgreement cpa = XMLMessageBuilder.getInstance(CollaborationProtocolAgreement.class).handle(cpa_);
-			boolean result = false;
+			new CPAValidator().validate(cpa);
 			synchronized (cpaMonitor)
 			{
 				if (ebMSDAO.existsCPA(cpa.getCpaid()))
 				{
 					if (overwrite)
-						result = ebMSDAO.updateCPA(cpa);
+						if (!ebMSDAO.updateCPA(cpa))
+							throw new CPAServiceException("Could not update CPA! CPAId: " + cpa.getCpaid());
 				}
 				else
-					result = ebMSDAO.insertCPA(cpa);
+					if (!ebMSDAO.insertCPA(cpa))
+						throw new CPAServiceException("Could not insert CPA! CPAId: " + cpa.getCpaid());
 			}
-			return result;
-		}
-		catch (DAOException e)
-		{
-			throw new CPAServiceException(e);
-			//logger.warn("",e);
-			//return false;
 		}
 		catch (JAXBException e)
 		{
+			logger.warn("",e);
 			throw new CPAServiceException(e);
-			//logger.warn("",e);
-			//return false;
+		}
+		catch (ValidatorException e)
+		{
+			logger.warn("",e);
+			throw new CPAServiceException(e);
+		}
+		catch (DAOException e)
+		{
+			logger.warn("",e);
+			throw new CPAServiceException(e);
 		}
 	}
 
 	@Override
-	public boolean deleteCPA(String cpaId) throws CPAServiceException
+	public void deleteCPA(String cpaId) throws CPAServiceException
 	{
 		try
 		{
 			synchronized(cpaMonitor)
 			{
-				return ebMSDAO.deleteCPA(cpaId);
+				if (!ebMSDAO.deleteCPA(cpaId))
+					throw new CPAServiceException("Could not delete CPA! CPAId: " + cpaId);
 			}
 		}
 		catch (DAOException e)

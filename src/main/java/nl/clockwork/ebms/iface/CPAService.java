@@ -25,13 +25,11 @@ import javax.jws.WebService;
 @WebService(targetNamespace="http://www.clockwork.nl/cpa/1.0")
 public interface CPAService
 {
-	@WebResult(name="Result")
 	@WebMethod(operationName="InsertCPA")
-	boolean insertCPA(@WebParam(name="CPA") /*CollaborationProtocolAgreement*/String cpa, @WebParam(name="Overwrite") Boolean overwrite) throws CPAServiceException;
+	void insertCPA(@WebParam(name="CPA") /*CollaborationProtocolAgreement*/String cpa, @WebParam(name="Overwrite") Boolean overwrite) throws CPAServiceException;
 
-	@WebResult(name="Result")
 	@WebMethod(operationName="DeleteCPA")
-	boolean deleteCPA(@WebParam(name="CPAId") String cpaId) throws CPAServiceException;
+	void deleteCPA(@WebParam(name="CPAId") String cpaId) throws CPAServiceException;
 
 	@WebResult(name="MessageIds")
 	@WebMethod(operationName="GetCPAIds")
