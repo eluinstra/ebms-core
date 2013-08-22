@@ -15,6 +15,7 @@
  ******************************************************************************/
 package nl.clockwork.ebms.validation;
 
+import java.util.Calendar;
 import java.util.GregorianCalendar;
 
 import nl.clockwork.ebms.Constants;
@@ -51,7 +52,24 @@ public class CPAValidator
 
 	public void validate(CollaborationProtocolAgreement cpa) throws ValidatorException
 	{
-		
+		//if (!"2.0a".equals(cpa.getVersion()))
+		//	throw new ValidationException("CPA version " + cpa.getVersion() + " detected. CPA version 2.0a expected.");
+		if ("proposed".equals(cpa.getStatus()))
+			throw new ValidationException("CPA not agreed to by both Parties.");
+		if (cpa.getStart().compare(cpa.getEnd()) > 0)
+			throw new ValidationException("CPA End Date bofre CPA Start Date!");
+		if (Calendar.getInstance().compareTo(cpa.getEnd().toGregorianCalendar()) > 0)
+			throw new ValidationException("CPA already expired!");
+		if (cpa.getConversationConstraints() != null)
+			throw new ValidationException("CPA Conversation Constraints not supported!");
+		//CanSend/Receive
+		//nr of channels
+		//signatures
+		//encryption
+		//MessageOrder
+		//Packaging.ComponentList.Encapsulation
+		if (cpa.getSignature() != null)
+			throw new ValidationException("CPA Signature not supported!");
 	}
 	
 	private boolean cpaExists(CollaborationProtocolAgreement cpa, MessageHeader messageHeader)

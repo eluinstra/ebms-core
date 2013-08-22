@@ -22,7 +22,7 @@ import javax.jws.WebParam;
 import javax.jws.WebResult;
 import javax.jws.WebService;
 
-@WebService(targetNamespace="http://www.clockwork.nl/cpa/1.0")
+@WebService(targetNamespace="http://www.clockwork.nl/cpa/1.1")
 public interface CPAService
 {
 	@WebMethod(operationName="InsertCPA")

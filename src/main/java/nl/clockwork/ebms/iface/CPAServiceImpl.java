@@ -32,8 +32,12 @@ public class CPAServiceImpl implements CPAService
 				if (ebMSDAO.existsCPA(cpa.getCpaid()))
 				{
 					if (overwrite)
+					{
 						if (!ebMSDAO.updateCPA(cpa))
-							throw new CPAServiceException("Could not update CPA! CPAId: " + cpa.getCpaid());
+							throw new CPAServiceException("Could not update CPA! CPA does not exists! CPAId: " + cpa.getCpaid());
+					}
+					else
+						throw new CPAServiceException("Did not insert CPA! CPA already exists! CPAId: " + cpa.getCpaid());
 				}
 				else
 					if (!ebMSDAO.insertCPA(cpa))
@@ -65,14 +69,12 @@ public class CPAServiceImpl implements CPAService
 			synchronized(cpaMonitor)
 			{
 				if (!ebMSDAO.deleteCPA(cpaId))
-					throw new CPAServiceException("Could not delete CPA! CPAId: " + cpaId);
+					throw new CPAServiceException("Could not delete CPA! CPA does not exists!");
 			}
 		}
 		catch (DAOException e)
 		{
 			throw new CPAServiceException(e);
-			//logger.warn("",e);
-			//return false;
 		}
 	}
 
@@ -86,8 +88,6 @@ public class CPAServiceImpl implements CPAService
 		catch (DAOException e)
 		{
 			throw new CPAServiceException(e);
-			//logger.warn("",e);
-			//return new ArrayList<String>();
 		}
 	}
 
@@ -101,14 +101,10 @@ public class CPAServiceImpl implements CPAService
 		catch (DAOException e)
 		{
 			throw new CPAServiceException(e);
-			//logger.warn("",e);
-			//return null;
 		}
 		catch (JAXBException e)
 		{
 			throw new CPAServiceException(e);
-			//logger.warn("",e);
-			//return null;
 		}
 	}
 	
