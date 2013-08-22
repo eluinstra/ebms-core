@@ -1,4 +1,7 @@
 - EbMSResponseHandlers examine and use content-type while parsing response
+- check Content-Type=text/xml; charset=UTF-8 at receipt
+
+- validate message composition using SimplePart and Packaging definition from CPA 
 
 - improve implementation of BusinessTransactionCharacteristics
 - improve implementation of MessagingCharacteristics:
