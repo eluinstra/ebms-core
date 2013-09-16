@@ -93,8 +93,6 @@ public class EbMSMessageProcessorImpl implements EbMSMessageProcessor
 			GregorianCalendar timestamp = new GregorianCalendar();
 			final EbMSMessage message = EbMSMessageUtils.getEbMSMessage(document.getMessage(),document.getAttachments());
 			final CollaborationProtocolAgreement cpa = ebMSDAO.getCPA(message.getMessageHeader().getCPAId());
-			if (cpa == null)
-				throw new EbMSProcessingException("CPA " + message.getMessageHeader().getCPAId() + " not found!");
 			logger.info("Message received. MessageId: " + message.getMessageHeader().getMessageData().getMessageId());
 			if (!Constants.EBMS_SERVICE_URI.equals(message.getMessageHeader().getService().getValue()))
 			{
