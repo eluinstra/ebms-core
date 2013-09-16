@@ -57,7 +57,7 @@ public class CPAValidator
 		if ("proposed".equals(cpa.getStatus()))
 			throw new ValidationException("CPA not agreed to by both Parties.");
 		if (cpa.getStart().compare(cpa.getEnd()) > 0)
-			throw new ValidationException("CPA End Date bofre CPA Start Date!");
+			throw new ValidationException("CPA End Date before CPA Start Date!");
 		if (Calendar.getInstance().compareTo(cpa.getEnd().toGregorianCalendar()) > 0)
 			throw new ValidationException("CPA already expired!");
 		if (cpa.getConversationConstraints() != null)
