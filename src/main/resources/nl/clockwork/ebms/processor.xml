@@ -50,8 +50,8 @@
 	</bean>
 
 	<bean id="signatureValidator" class="nl.clockwork.ebms.signing.EbMSSecSignatureValidator">
-		<property name="keyStorePath" value="${truststore.path}"/>
-		<property name="keyStorePassword" value="${truststore.password}"/>
+		<property name="trustStorePath" value="${truststore.path}"/>
+		<property name="trustStorePassword" value="${truststore.password}"/>
 	</bean>
 
 	<bean id="jobScheduler" class="nl.clockwork.ebms.job.JobScheduler" init-method="init" destroy-method="destroy">

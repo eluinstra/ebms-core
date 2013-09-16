@@ -51,9 +51,9 @@ import org.w3c.dom.NodeList;
 
 public class EbMSSecSignatureValidator implements EbMSSignatureValidator
 {
-  protected transient Log logger = LogFactory.getLog(getClass());
-  private String keyStorePath;
-	private String keyStorePassword;
+	protected transient Log logger = LogFactory.getLog(getClass());
+	private String trustStorePath;
+	private String trustStorePassword;
 
 	public EbMSSecSignatureValidator()
 	{
@@ -68,14 +68,14 @@ public class EbMSSecSignatureValidator implements EbMSSignatureValidator
 			PartyInfo partyInfo = CPAUtils.getPartyInfo(cpa,messageHeader.getFrom().getPartyId());
 			if (CPAUtils.isSigned(partyInfo,messageHeader.getFrom().getRole(),messageHeader.getService(),messageHeader.getAction()))
 			{
-				KeyStore keyStore = SecurityUtils.loadKeyStore(keyStorePath,keyStorePassword);
+				KeyStore trustStore = SecurityUtils.loadKeyStore(trustStorePath,trustStorePassword);
 				NodeList signatureNodeList = document.getMessage().getElementsByTagNameNS(org.apache.xml.security.utils.Constants.SignatureSpecNS,org.apache.xml.security.utils.Constants._TAG_SIGNATURE);
 				if (signatureNodeList.getLength() > 0)
 				{
 					X509Certificate certificate = getCertificate(cpa,document.getMessage(),messageHeader);
 					if (certificate != null)
 					{
-						if (validateCertificate(keyStore,certificate,messageHeader.getMessageData().getTimestamp() == null ? new Date() : messageHeader.getMessageData().getTimestamp().toGregorianCalendar().getTime()))
+						if (validateCertificate(trustStore,certificate,messageHeader.getMessageData().getTimestamp() == null ? new Date() : messageHeader.getMessageData().getTimestamp().toGregorianCalendar().getTime()))
 							if (verify(certificate,(Element)signatureNodeList.item(0),document.getAttachments()))
 								logger.info("Signature valid.");
 							else
@@ -162,7 +162,7 @@ public class EbMSSecSignatureValidator implements EbMSSignatureValidator
 //		}
 //	}
 
-	private boolean validateCertificate(KeyStore keyStore, X509Certificate certificate, Date date) throws KeyStoreException
+	private boolean validateCertificate(KeyStore trustStore, X509Certificate certificate, Date date) throws KeyStoreException
 	{
 		try
 		{
@@ -176,12 +176,12 @@ public class EbMSSecSignatureValidator implements EbMSSignatureValidator
 		{
 			return false;
 		}
-		Enumeration<String> aliases = keyStore.aliases();
+		Enumeration<String> aliases = trustStore.aliases();
 		while (aliases.hasMoreElements())
 		{
 			try
 			{
-				Certificate c = keyStore.getCertificate(aliases.nextElement());
+				Certificate c = trustStore.getCertificate(aliases.nextElement());
 				if (c instanceof X509Certificate)
 					if (certificate.getIssuerDN().getName().equals(((X509Certificate)c).getSubjectDN().getName()))
 					{
@@ -197,13 +197,13 @@ public class EbMSSecSignatureValidator implements EbMSSignatureValidator
 		return false;
 	}
 	
-	public void setKeyStorePath(String keyStorePath)
+	public void setTrustStorePath(String trustStorePath)
 	{
-		this.keyStorePath = keyStorePath;
+		this.trustStorePath = trustStorePath;
 	}
 	
-	public void setKeyStorePassword(String keyStorePassword)
+	public void setTrustStorePassword(String trustStorePassword)
 	{
-		this.keyStorePassword = keyStorePassword;
+		this.trustStorePassword = trustStorePassword;
 	}
 }
