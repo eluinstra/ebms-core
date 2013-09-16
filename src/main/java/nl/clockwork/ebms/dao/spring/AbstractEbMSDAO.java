@@ -498,6 +498,10 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 		{
 			throw new DAOException(e);
 		}
+		catch (DataAccessException e)
+		{
+			throw new DAOException(e);
+		}
 	}
 
 	@Override
@@ -703,6 +707,10 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 		{
 			throw new DAOException(e);
 		}
+		catch (DataAccessException e)
+		{
+			throw new DAOException(e);
+		}
 	}
 
 	@Override
@@ -822,6 +830,10 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 			);
 		}
 		catch (TransactionException e)
+		{
+			throw new DAOException(e);
+		}
+		catch (DataAccessException e)
 		{
 			throw new DAOException(e);
 		}
