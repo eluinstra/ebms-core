@@ -31,6 +31,7 @@ import nl.clockwork.ebms.model.EbMSDocument;
 import nl.clockwork.ebms.model.EbMSMessage;
 import nl.clockwork.ebms.model.EbMSSendEvent;
 import nl.clockwork.ebms.processor.EbMSMessageProcessor;
+import nl.clockwork.ebms.processor.EbMSProcessingException;
 import nl.clockwork.ebms.signing.EbMSSignatureGenerator;
 import nl.clockwork.ebms.util.CPAUtils;
 import nl.clockwork.ebms.util.EbMSMessageUtils;
@@ -74,6 +75,8 @@ public class ProcessSendEvents implements Job
 							{
 								EbMSMessage message = ebMSDAO.getMessage(sendEvent.getEbMSMessageId());
 								CollaborationProtocolAgreement cpa = ebMSDAO.getCPA(message.getMessageHeader().getCPAId());
+								if (cpa == null)
+									throw new EbMSProcessingException("CPA " + message.getMessageHeader().getCPAId() + " not found!");
 								EbMSDocument requestDocument = new EbMSDocument(EbMSMessageUtils.createSOAPMessage(message),message.getAttachments());
 								signatureGenerator.generate(cpa,requestDocument,message.getMessageHeader());
 								String uri = CPAUtils.getUri(cpa,message);

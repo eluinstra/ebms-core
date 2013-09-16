@@ -93,6 +93,8 @@ public class EbMSMessageProcessorImpl implements EbMSMessageProcessor
 			GregorianCalendar timestamp = new GregorianCalendar();
 			final EbMSMessage message = EbMSMessageUtils.getEbMSMessage(document.getMessage(),document.getAttachments());
 			final CollaborationProtocolAgreement cpa = ebMSDAO.getCPA(message.getMessageHeader().getCPAId());
+			if (cpa == null)
+				throw new EbMSProcessingException("CPA " + message.getMessageHeader().getCPAId() + " not found!");
 			logger.info("Message received. MessageId: " + message.getMessageHeader().getMessageData().getMessageId());
 			if (!Constants.EBMS_SERVICE_URI.equals(message.getMessageHeader().getService().getValue()))
 			{
@@ -113,7 +115,7 @@ public class EbMSMessageProcessorImpl implements EbMSMessageProcessor
 			}
 			else if (EbMSAction.STATUS_REQUEST.action().equals(message.getMessageHeader().getAction()))
 			{
-				EbMSMessage response = deliveryManager.handleResponseMessage(cpa,message,processStatusRequest(timestamp,message));
+				EbMSMessage response = deliveryManager.handleResponseMessage(cpa,message,processStatusRequest(cpa,timestamp,message));
 				return response == null ? null : EbMSMessageUtils.getEbMSDocument(response);
 			}
 			else if (EbMSAction.STATUS_RESPONSE.action().equals(message.getMessageHeader().getAction()))
@@ -123,7 +125,7 @@ public class EbMSMessageProcessorImpl implements EbMSMessageProcessor
 			}
 			else if (EbMSAction.PING.action().equals(message.getMessageHeader().getAction()))
 			{
-				EbMSMessage response = deliveryManager.handleResponseMessage(cpa,message,processPing(timestamp,message));
+				EbMSMessage response = deliveryManager.handleResponseMessage(cpa,message,processPing(cpa,timestamp,message));
 				return response == null ? null : EbMSMessageUtils.getEbMSDocument(response);
 			}
 			else if (EbMSAction.PONG.action().equals(message.getMessageHeader().getAction()))
@@ -384,11 +386,10 @@ public class EbMSMessageProcessorImpl implements EbMSMessageProcessor
 			);
 	}
 	
-	private EbMSMessage processStatusRequest(final GregorianCalendar timestamp, final EbMSMessage message) throws DatatypeConfigurationException, JAXBException
+	private EbMSMessage processStatusRequest(CollaborationProtocolAgreement cpa, final GregorianCalendar timestamp, final EbMSMessage message) throws DatatypeConfigurationException, JAXBException
 	{
 		GregorianCalendar c = null;
 		MessageHeader messageHeader = message.getMessageHeader();
-		final CollaborationProtocolAgreement cpa = ebMSDAO.getCPA(messageHeader.getCPAId());
 		ErrorList errorList = EbMSMessageUtils.createErrorList();
 		if (cpaValidator.isValid(errorList,cpa,messageHeader,timestamp))
 		{
@@ -409,10 +410,9 @@ public class EbMSMessageProcessorImpl implements EbMSMessageProcessor
 		return null;
 	}
 	
-	private EbMSMessage processPing(final GregorianCalendar timestamp, final EbMSMessage message) throws DatatypeConfigurationException, JAXBException
+	private EbMSMessage processPing(CollaborationProtocolAgreement cpa, final GregorianCalendar timestamp, final EbMSMessage message) throws DatatypeConfigurationException, JAXBException
 	{
 		MessageHeader messageHeader = message.getMessageHeader();
-		final CollaborationProtocolAgreement cpa = ebMSDAO.getCPA(messageHeader.getCPAId());
 		ErrorList errorList = EbMSMessageUtils.createErrorList();
 		return cpaValidator.isValid(errorList,cpa,messageHeader,timestamp) ? EbMSMessageUtils.createEbMSPong(cpa,message) : null;
 	}
