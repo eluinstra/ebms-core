@@ -141,27 +141,27 @@ public class EbMSSecSignatureValidator implements EbMSSignatureValidator
 			return null;
 		}
 	}
-/*
-	private X509Certificate getCertificate(Document document)
-	{
-		try
-		{
-			NodeList signatureNodeList = document.getElementsByTagNameNS(org.apache.xml.security.utils.Constants.SignatureSpecNS,org.apache.xml.security.utils.Constants._TAG_SIGNATURE);
-			XMLSignature signature = new XMLSignature((Element)signatureNodeList.item(0),org.apache.xml.security.utils.Constants.SignatureSpecNS);
-			return signature.getKeyInfo().getX509Certificate();
-		}
-		catch (XMLSignatureException e)
-		{
-			logger.warn("",e);
-			return null;
-		}
-		catch (XMLSecurityException e)
-		{
-			logger.warn("",e);
-			return null;
-		}
-	}
-*/
+
+//	private X509Certificate getCertificate(Document document)
+//	{
+//		try
+//		{
+//			NodeList signatureNodeList = document.getElementsByTagNameNS(org.apache.xml.security.utils.Constants.SignatureSpecNS,org.apache.xml.security.utils.Constants._TAG_SIGNATURE);
+//			XMLSignature signature = new XMLSignature((Element)signatureNodeList.item(0),org.apache.xml.security.utils.Constants.SignatureSpecNS);
+//			return signature.getKeyInfo().getX509Certificate();
+//		}
+//		catch (XMLSignatureException e)
+//		{
+//			logger.warn("",e);
+//			return null;
+//		}
+//		catch (XMLSecurityException e)
+//		{
+//			logger.warn("",e);
+//			return null;
+//		}
+//	}
+
 	private boolean validateCertificate(KeyStore keyStore, X509Certificate certificate, Date date) throws KeyStoreException
 	{
 		try
@@ -182,43 +182,20 @@ public class EbMSSecSignatureValidator implements EbMSSignatureValidator
 			try
 			{
 				Certificate c = keyStore.getCertificate(aliases.nextElement());
-				certificate.verify(c.getPublicKey());
-				return true;
+				if (c instanceof X509Certificate)
+					if (certificate.getIssuerDN().getName().equals(((X509Certificate)c).getSubjectDN().getName()))
+					{
+						certificate.verify(c.getPublicKey());
+						return true;
+					}
 			}
 			catch (GeneralSecurityException e)
 			{
-				logger.debug("",e);
+				logger.trace("",e);
 			}
 		}
 		return false;
 	}
-/*
-	private boolean verifyCertificate(XMLSignature signature, X509Certificate certificate)
-	{
-		boolean result = false;
-		try
-		{
-			X509Certificate c = signature.getKeyInfo().getX509Certificate();
-			result |= certificate.equals(c);
-		}
-		catch (KeyResolverException e)
-		{
-			logger.info("",e);
-		}
-		try
-		{
-			PublicKey publicKey = signature.getKeyInfo().getPublicKey();
-			result |= certificate.getPublicKey().getAlgorithm().equals(publicKey.getAlgorithm())
-				&& certificate.getPublicKey().getFormat().equals(publicKey.getFormat())
-				&& certificate.getPublicKey().getEncoded().equals(publicKey.getEncoded());
-		}
-		catch (KeyResolverException e)
-		{
-			logger.info("",e);
-		}
-		return result;
-	}
-*/
 	
 	public void setKeyStorePath(String keyStorePath)
 	{
