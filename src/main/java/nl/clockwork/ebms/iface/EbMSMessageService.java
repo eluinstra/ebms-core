@@ -36,7 +36,7 @@ public interface EbMSMessageService
 	@WebMethod(operationName="SendMessage")
 	String sendMessage(@WebParam(name="Message") EbMSMessageContent messageContent) throws EbMSMessageServiceException;
 
-	@WebResult(name="MessageId")
+	@WebResult(name="MessageIds")
 	@WebMethod(operationName="GetMessageIds")
 	List<String> getMessageIds(@WebParam(name="MessageContext") EbMSMessageContext messageContext, @WebParam(name="MaxNr") Integer maxNr) throws EbMSMessageServiceException;
 
