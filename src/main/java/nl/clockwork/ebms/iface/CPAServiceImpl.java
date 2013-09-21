@@ -21,7 +21,7 @@ public class CPAServiceImpl implements CPAService
 	private Object cpaMonitor = new Object();
 
 	@Override
-	public void insertCPA(/*CollaborationProtocolAgreement*/String cpa_, Boolean overwrite) throws CPAServiceException
+	public String insertCPA(/*CollaborationProtocolAgreement*/String cpa_, Boolean overwrite) throws CPAServiceException
 	{
 		try
 		{
@@ -43,6 +43,7 @@ public class CPAServiceImpl implements CPAService
 					if (!ebMSDAO.insertCPA(cpa))
 						throw new CPAServiceException("Could not insert CPA! CPAId: " + cpa.getCpaid());
 			}
+			return cpa.getCpaid();
 		}
 		catch (JAXBException e)
 		{
