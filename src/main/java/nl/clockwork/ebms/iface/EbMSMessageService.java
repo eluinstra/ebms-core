@@ -26,7 +26,7 @@ import nl.clockwork.ebms.model.EbMSMessageContent;
 import nl.clockwork.ebms.model.EbMSMessageContext;
 import nl.clockwork.ebms.model.MessageStatus;
 
-@WebService(targetNamespace="http://www.clockwork.nl/ebms/1.1")
+@WebService(targetNamespace="http://www.clockwork.nl/ebms/1.2")
 public interface EbMSMessageService
 {
 	@WebMethod(operationName="Ping")
