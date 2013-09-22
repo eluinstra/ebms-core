@@ -1,4 +1,4 @@
-package nl.clockwork.ebms.iface;
+package nl.clockwork.ebms.service;
 
 import java.util.List;
 

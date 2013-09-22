@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  ******************************************************************************/
-package nl.clockwork.ebms.iface;
+package nl.clockwork.ebms.service;
 
 import javax.xml.ws.WebFault;
 

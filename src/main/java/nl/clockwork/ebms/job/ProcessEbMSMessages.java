@@ -21,9 +21,9 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
-import nl.clockwork.ebms.iface.EbMSMessageService;
 import nl.clockwork.ebms.model.EbMSMessageContent;
 import nl.clockwork.ebms.processor.ProcessEbMSMessageCallback;
+import nl.clockwork.ebms.service.EbMSMessageService;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

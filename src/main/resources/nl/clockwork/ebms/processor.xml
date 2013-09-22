@@ -19,11 +19,11 @@
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd"
 >
 
-	<bean id="cpaService" class="nl.clockwork.ebms.iface.CPAServiceImpl">
+	<bean id="cpaService" class="nl.clockwork.ebms.service.CPAServiceImpl">
 		<property name="ebMSDAO" ref="ebMSDAO"/>
 	</bean>
 
-	<bean id="ebMSMessageService" class="nl.clockwork.ebms.iface.EbMSMessageServiceImpl">
+	<bean id="ebMSMessageService" class="nl.clockwork.ebms.service.EbMSMessageServiceImpl">
 		<property name="deliveryManager" ref="deliveryManager"></property>
 		<property name="ebMSDAO" ref="ebMSDAO"/>
 	</bean>
