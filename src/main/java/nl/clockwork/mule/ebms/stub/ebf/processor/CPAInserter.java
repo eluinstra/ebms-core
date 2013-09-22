@@ -8,7 +8,7 @@ import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
 
-import nl.clockwork.ebms.iface.CPAService;
+import nl.clockwork.ebms.service.CPAService;
 
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleMessage;

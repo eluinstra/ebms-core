@@ -34,7 +34,7 @@
 	
 	<flow name="cpaService.cxf">
 		<http:inbound-endpoint connector-ref="ebms.adapter.connector.http" address="http://${service.adapter.host}:${service.adapter.port}${service.adapter.url}/cpa" exchange-pattern="request-response">
-			<cxf:jaxws-service serviceClass="nl.clockwork.ebms.iface.CPAService" enableMuleSoapHeaders="false"/>
+			<cxf:jaxws-service serviceClass="nl.clockwork.ebms.service.CPAService" enableMuleSoapHeaders="false"/>
 		</http:inbound-endpoint> 
 		<component>
 			<spring-object bean="cpaService"/>
@@ -43,7 +43,7 @@
 
 	<flow name="ebMSMessageService.cxf">
 		<http:inbound-endpoint connector-ref="ebms.adapter.connector.http" address="http://${service.adapter.host}:${service.adapter.port}${service.adapter.url}/ebms" exchange-pattern="request-response">
-			<cxf:jaxws-service serviceClass="nl.clockwork.ebms.iface.EbMSMessageService" enableMuleSoapHeaders="false"/>
+			<cxf:jaxws-service serviceClass="nl.clockwork.ebms.service.EbMSMessageService" enableMuleSoapHeaders="false"/>
 		</http:inbound-endpoint> 
 		<component>
 			<spring-object bean="ebMSMessageService"/>

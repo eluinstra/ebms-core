@@ -2,8 +2,8 @@ package nl.clockwork.mule.ebms.job;
 
 import java.util.List;
 
-import nl.clockwork.ebms.iface.EbMSMessageService;
 import nl.clockwork.ebms.job.Job;
+import nl.clockwork.ebms.service.EbMSMessageService;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
