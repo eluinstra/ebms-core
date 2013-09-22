@@ -48,6 +48,11 @@
 		<appender-ref ref="ASYNC"/>
 	</logger>
 	
+	<logger name="nl.clockwork.ebms.job.JobScheduler" additivity="false">
+		<level value="info"/>
+		<appender-ref ref="ASYNC"/>
+	</logger>
+	
 	<logger name="nl.clockwork.mule.ebms" additivity="false">
 		<level value="info"/>
 		<appender-ref ref="ASYNC"/>
