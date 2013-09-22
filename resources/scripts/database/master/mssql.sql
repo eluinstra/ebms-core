@@ -7,7 +7,6 @@ CREATE TABLE cpa
 CREATE TABLE ebms_message
 (
 	id								INT							IDENTITY(1,1)	PRIMARY KEY,
---	parent_id					INT							NULL FOREIGN KEY REFERENCES ebms_message(id),
 	time_stamp				DATETIME				NOT NULL,
 	cpa_id						VARCHAR(256)		NOT NULL,
 	conversation_id		VARCHAR(256)		NOT NULL,
