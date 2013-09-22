@@ -25,6 +25,9 @@ import javax.jws.WebService;
 @WebService(targetNamespace="http://www.clockwork.nl/cpa/1.2")
 public interface CPAService
 {
+	@WebMethod(operationName="ValidateCPA")
+	void validateCPA(@WebParam(name="CPA") /*CollaborationProtocolAgreement*/String cpa) throws CPAServiceException;
+
 	@WebResult(name="CPAId")
 	@WebMethod(operationName="InsertCPA")
 	String insertCPA(@WebParam(name="CPA") /*CollaborationProtocolAgreement*/String cpa, @WebParam(name="Overwrite") Boolean overwrite) throws CPAServiceException;

@@ -21,6 +21,27 @@ public class CPAServiceImpl implements CPAService
 	private Object cpaMonitor = new Object();
 
 	@Override
+	public
+	void validateCPA(/*CollaborationProtocolAgreement*/String cpa_) throws CPAServiceException
+	{
+		try
+		{
+			CollaborationProtocolAgreement cpa = XMLMessageBuilder.getInstance(CollaborationProtocolAgreement.class).handle(cpa_);
+			new CPAValidator().validate(cpa);
+		}
+		catch (JAXBException e)
+		{
+			logger.warn("",e);
+			throw new CPAServiceException(e);
+		}
+		catch (ValidatorException e)
+		{
+			logger.warn("",e);
+			throw new CPAServiceException(e);
+		}
+	}
+	
+	@Override
 	public String insertCPA(/*CollaborationProtocolAgreement*/String cpa_, Boolean overwrite) throws CPAServiceException
 	{
 		try
