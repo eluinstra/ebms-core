@@ -17,7 +17,6 @@ package nl.clockwork.mule.ebms.stub;
 
 public class Constants
 {
-	public static final String[] allowedCipherSuites = new String[]{"TLS_DHE_RSA_WITH_AES_128_CBC_SHA","TLS_RSA_WITH_AES_128_CBC_SHA"};
 	public static final String CPA_ID = "EBMS.CPA_ID";
 	public static final String EBMS_MESSAGE_ID = "EBMS.EBMS_MESSAGE_ID";
 	public static final String EBMS_MESSAGE_STATUS = "EBMS.EBMS_MESSAGE_STATUS";

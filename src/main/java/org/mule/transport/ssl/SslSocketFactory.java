@@ -10,18 +10,16 @@
 
 package org.mule.transport.ssl;
 
-import nl.clockwork.mule.ebms.stub.Constants;
-
-import org.mule.api.security.tls.TlsConfiguration;
-import org.mule.transport.tcp.AbstractTcpSocketFactory;
-import org.mule.transport.tcp.TcpSocketKey;
-
 import java.io.IOException;
 import java.net.Socket;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 
 import javax.net.ssl.SSLSocket;
+
+import org.mule.api.security.tls.TlsConfiguration;
+import org.mule.transport.tcp.AbstractTcpSocketFactory;
+import org.mule.transport.tcp.TcpSocketKey;
 
 public class SslSocketFactory extends AbstractTcpSocketFactory
 {
@@ -39,7 +37,7 @@ public class SslSocketFactory extends AbstractTcpSocketFactory
         {
             SSLSocket socket = (SSLSocket)tls.getSocketFactory().createSocket(key.getInetAddress(), key.getPort());
             //PATCH
-        		socket.setEnabledCipherSuites(Constants.allowedCipherSuites);
+        		socket.setEnabledCipherSuites(new String[]{"TLS_DHE_RSA_WITH_AES_128_CBC_SHA","TLS_RSA_WITH_AES_128_CBC_SHA"});
         		return socket;
         }
         catch (NoSuchAlgorithmException e)

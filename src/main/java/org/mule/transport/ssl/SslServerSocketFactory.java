@@ -10,18 +10,16 @@
 
 package org.mule.transport.ssl;
 
-import nl.clockwork.mule.ebms.stub.Constants;
-
-import org.mule.api.security.tls.TlsConfiguration;
-import org.mule.transport.tcp.TcpServerSocketFactory;
-
 import java.io.IOException;
 import java.net.InetAddress;
-import java.net.ServerSocket;
 import java.net.InetSocketAddress;
+import java.net.ServerSocket;
 
 import javax.net.ServerSocketFactory;
 import javax.net.ssl.SSLServerSocket;
+
+import org.mule.api.security.tls.TlsConfiguration;
+import org.mule.transport.tcp.TcpServerSocketFactory;
 
 public class SslServerSocketFactory extends TcpServerSocketFactory
 {
@@ -41,7 +39,7 @@ public class SslServerSocketFactory extends TcpServerSocketFactory
             ServerSocketFactory ssf = tls.getServerSocketFactory();
             SSLServerSocket serverSocket = (SSLServerSocket)ssf.createServerSocket();
             //PATCH
-            serverSocket.setEnabledCipherSuites(Constants.allowedCipherSuites);
+            serverSocket.setEnabledCipherSuites(new String[]{"TLS_DHE_RSA_WITH_AES_128_CBC_SHA","TLS_RSA_WITH_AES_128_CBC_SHA"});
             return configure(serverSocket, reuse, new InetSocketAddress(address, port), backlog);
         }
         catch (IOException e)
@@ -62,7 +60,7 @@ public class SslServerSocketFactory extends TcpServerSocketFactory
             ServerSocketFactory ssf = tls.getServerSocketFactory();
             SSLServerSocket serverSocket = (SSLServerSocket)ssf.createServerSocket();
             //PATCH
-            serverSocket.setEnabledCipherSuites(Constants.allowedCipherSuites);
+            serverSocket.setEnabledCipherSuites(new String[]{"TLS_DHE_RSA_WITH_AES_128_CBC_SHA","TLS_RSA_WITH_AES_128_CBC_SHA"});
             return configure(serverSocket, reuse, new InetSocketAddress(port), backlog);
         }
         catch (IOException e)
