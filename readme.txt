@@ -49,10 +49,6 @@ Configure Stubs =
 	
 	service.port=4443
 	
-	keystore.path=${mule.home}/conf/keystore.jks
-	truststore.path=${mule.home}/conf/keystore.jks
-	signature.keystore.path=${mule.home}/conf/keystore.jks
-	
 	dir.base=H:/tmp/ebms-stub/digipoort
 	
 	jmx.port=1099
@@ -65,10 +61,6 @@ Configure Stubs =
 	edit and add the following lines to ${mule.home}/conf/ebf.overheid.properties:
 	
 	service.port=443
-	
-	keystore.path=${mule.home}/conf/keystore.jks
-	truststore.path=${mule.home}/conf/keystore.jks
-	signature.keystore.path=${mule.home}/conf/keystore.jks
 	
 	dir.base=H:/tmp/ebms-stub/overheid
 	
@@ -114,7 +106,6 @@ Start EbMS Adapter Standalone =
 ===============================
 add the following lines to <mule-standalone-3.x.x>/conf/wrapper.conf
 wrapper.java.additional.4=-Debms.protocol=http
-wrapper.java.additional.5=-Debms.database=hsqldb
 
 > mule -config nl/clockwork/mule/ebms/main.xml
 
@@ -190,13 +181,8 @@ The EbMS adapter supports different databases:
 - Oracle
 
 You can configure them by including the right xml from ebms-core-1.0.0.jar in your project:
-- nl/clockwork/ebms/dao/spring/datasource.xml
-
-- nl/clockwork/ebms/dao/spring/hsqldb.xml
-- nl/clockwork/ebms/dao/spring/mysql.xml
-- nl/clockwork/ebms/dao/spring/postgresql.xml
-- nl/clockwork/ebms/dao/spring/mssql.xml
-- nl/clockwork/ebms/dao/spring/oracle.xml
+- nl/clockwork/ebms/datasource.xml
+- nl/clockwork/ebms/dao.spring.xml
 
 And you have to configure the right driver and connection string:
 - ebms.jdbc.driverClassName=org.hsqldb.jdbcDriver
@@ -261,8 +247,4 @@ Or to generate individual reports:
 ==============
 Known Issues =
 ==============
-
-During startup the following errors/warnings may occur and can be ignored:
-
-WARN  nl.clockwork.mule.ebms.HSQLDatabaseProvider - java.sql.SQLException: object name already exists: CPA in statement [CREATE TABLE cpa
 
