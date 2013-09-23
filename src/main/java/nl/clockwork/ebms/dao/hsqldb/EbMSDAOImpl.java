@@ -17,6 +17,7 @@ package nl.clockwork.ebms.dao.hsqldb;
 
 import nl.clockwork.ebms.Constants.EbMSMessageStatus;
 import nl.clockwork.ebms.dao.AbstractEbMSDAO;
+import nl.clockwork.ebms.dao.ConnectionManager;
 
 public class EbMSDAOImpl extends AbstractEbMSDAO
 {
@@ -25,6 +26,11 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 //	{
 //		return "%1$tY-%1$tm-%1$td %1$tH:%1$tM:%1$tS.%1$tL";
 //	}
+
+	public EbMSDAOImpl(ConnectionManager connectionManager)
+	{
+		super(connectionManager);
+	}
 
 	@Override
 	public String getTimestampFunction()

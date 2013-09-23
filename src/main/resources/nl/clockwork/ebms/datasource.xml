@@ -19,10 +19,6 @@
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd"
 >
 
-	<bean id="connectionManager" class="nl.clockwork.ebms.dao.SQLConnectionManager">
-		<constructor-arg index="0" ref="ebMSDataSource"/>
-	</bean>
-
 	<bean id="ebMSDataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource" destroy-method="close">
 		<property name="driverClass" value="${ebms.jdbc.driverClassName}"/>
 		<property name="jdbcUrl" value="${ebms.jdbc.url}"/>

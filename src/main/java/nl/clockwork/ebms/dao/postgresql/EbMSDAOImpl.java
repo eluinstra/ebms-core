@@ -23,6 +23,7 @@ import java.sql.Statement;
 
 import nl.clockwork.ebms.Constants.EbMSMessageStatus;
 import nl.clockwork.ebms.dao.AbstractEbMSDAO;
+import nl.clockwork.ebms.dao.ConnectionManager;
 
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.ResultSetExtractor;
@@ -39,6 +40,11 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 			else
 				return null;
 		}
+	}
+
+	public EbMSDAOImpl(ConnectionManager connectionManager)
+	{
+		super(connectionManager);
 	}
 
 //	@Override

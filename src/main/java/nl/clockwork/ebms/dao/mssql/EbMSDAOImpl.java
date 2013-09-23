@@ -17,9 +17,15 @@ package nl.clockwork.ebms.dao.mssql;
 
 import nl.clockwork.ebms.Constants.EbMSMessageStatus;
 import nl.clockwork.ebms.dao.AbstractEbMSDAO;
+import nl.clockwork.ebms.dao.ConnectionManager;
 
 public class EbMSDAOImpl extends AbstractEbMSDAO
 {
+	public EbMSDAOImpl(ConnectionManager connectionManager)
+	{
+		super(connectionManager);
+	}
+
 //@Override
 //public String getDateFormat()
 //{

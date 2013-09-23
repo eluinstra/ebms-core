@@ -38,10 +38,10 @@ import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.AckRequested;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageHeader;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageOrder;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.SyncReply;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
-import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionException;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallback;
@@ -50,14 +50,9 @@ import org.w3._2000._09.xmldsig.SignatureType;
 
 public class EbMSDAOImpl extends AbstractEbMSDAO
 {
-	public EbMSDAOImpl(PlatformTransactionManager transactionManager, javax.sql.DataSource dataSource)
+	public EbMSDAOImpl(TransactionTemplate transactionTemplate, JdbcTemplate jdbcTemplate)
 	{
-		super(transactionManager,dataSource);
-	}
-
-	public EbMSDAOImpl(TransactionTemplate transactionTemplate, javax.sql.DataSource dataSource)
-	{
-		super(transactionTemplate,dataSource);
+		super(transactionTemplate,jdbcTemplate);
 	}
 
 //	@Override

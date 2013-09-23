@@ -62,7 +62,12 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
   protected transient Log logger = LogFactory.getLog(getClass());
 	protected ConnectionManager connectionManager;
 
-  //public abstract String getDateFormat();
+  public AbstractEbMSDAO(ConnectionManager connectionManager)
+	{
+		this.connectionManager = connectionManager;
+	}
+
+	//public abstract String getDateFormat();
 	public abstract String getTimestampFunction();
 	
 	@Override
@@ -1370,11 +1375,6 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 			result.deleteCharAt(result.length() - 1);
 		}
 		return result.toString();
-	}
-	
-	public void setConnectionManager(ConnectionManager connectionManager)
-	{
-		this.connectionManager = connectionManager;
 	}
 	
 }

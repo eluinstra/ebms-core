@@ -18,19 +18,14 @@ package nl.clockwork.ebms.dao.spring.mssql;
 import nl.clockwork.ebms.Constants.EbMSMessageStatus;
 import nl.clockwork.ebms.dao.spring.AbstractEbMSDAO;
 
-import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.transaction.support.TransactionTemplate;
 
 public class EbMSDAOImpl extends AbstractEbMSDAO
 {
-	public EbMSDAOImpl(PlatformTransactionManager transactionManager, javax.sql.DataSource dataSource)
+	public EbMSDAOImpl(TransactionTemplate transactionTemplate, JdbcTemplate jdbcTemplate)
 	{
-		super(transactionManager,dataSource);
-	}
-
-	public EbMSDAOImpl(TransactionTemplate transactionTemplate, javax.sql.DataSource dataSource)
-	{
-		super(transactionTemplate,dataSource);
+		super(transactionTemplate,jdbcTemplate);
 	}
 
 //	@Override

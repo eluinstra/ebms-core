@@ -63,7 +63,6 @@ import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
-import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionException;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallback;
@@ -113,16 +112,10 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	//public abstract String getDateFormat();
 	public abstract String getTimestampFunction();
 	
-	public AbstractEbMSDAO(PlatformTransactionManager transactionManager, javax.sql.DataSource dataSource)
-	{
-		transactionTemplate = new TransactionTemplate(transactionManager);
-		jdbcTemplate = new JdbcTemplate(dataSource);
-	}
-
-	public AbstractEbMSDAO(TransactionTemplate transactionTemplate, javax.sql.DataSource dataSource)
+	public AbstractEbMSDAO(TransactionTemplate transactionTemplate, JdbcTemplate jdbcTemplate)
 	{
 		this.transactionTemplate = transactionTemplate;
-		jdbcTemplate = new JdbcTemplate(dataSource);
+		this.jdbcTemplate = jdbcTemplate;
 	}
 
 	@Override

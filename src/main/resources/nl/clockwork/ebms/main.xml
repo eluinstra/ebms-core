@@ -27,9 +27,8 @@
 		</property>
 	</bean>
 
-	<import resource="dao/datasource.xml"/>
-	<import resource="dao/hsqldb.xml"/>
-	<import resource="dao/hsqldb.provider.xml"/>
+	<import resource="datasource.xml"/>
+	<import resource="dao.spring.xml"/>
 
 	<import resource="processor.xml"/>
 
