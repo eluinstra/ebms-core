@@ -75,22 +75,15 @@ public class EbMSSecSignatureValidator implements EbMSSignatureValidator
 					X509Certificate certificate = getCertificate(cpa,document.getMessage(),messageHeader);
 					if (certificate != null)
 					{
-						if (validateCertificate(trustStore,certificate,messageHeader.getMessageData().getTimestamp() == null ? new Date() : messageHeader.getMessageData().getTimestamp().toGregorianCalendar().getTime()))
-							if (verify(certificate,(Element)signatureNodeList.item(0),document.getAttachments()))
-								logger.info("Signature valid.");
-							else
-							{
-								logger.info("Signature invalid.");
-								throw new ValidationException("Invalid Signature.");
-							}
-						else
-							throw new ValidationException("Invalid Certificate.");
+						validateCertificate(trustStore,certificate,messageHeader.getMessageData().getTimestamp() == null ? new Date() : messageHeader.getMessageData().getTimestamp().toGregorianCalendar().getTime());
+						if (!verify(certificate,(Element)signatureNodeList.item(0),document.getAttachments()))
+							throw new ValidationException("Invalid Signature!");
 					}
 					else
-						throw new ValidationException("Certificate not found.");
+						throw new ValidationException("Certificate not found!");
 				}
 				else
-					throw new ValidationException("Signature not found.");
+					throw new ValidationException("Signature not found!");
 			}
 		}
 		catch (GeneralSecurityException e)
@@ -162,7 +155,7 @@ public class EbMSSecSignatureValidator implements EbMSSignatureValidator
 //		}
 //	}
 
-	private boolean validateCertificate(KeyStore trustStore, X509Certificate certificate, Date date) throws KeyStoreException
+	private void validateCertificate(KeyStore trustStore, X509Certificate certificate, Date date) throws KeyStoreException, ValidationException
 	{
 		try
 		{
@@ -170,11 +163,11 @@ public class EbMSSecSignatureValidator implements EbMSSignatureValidator
 		}
 		catch (CertificateExpiredException e)
 		{
-			return false;
+			throw new ValidationException(e);
 		}
 		catch (CertificateNotYetValidException e)
 		{
-			return false;
+			throw new ValidationException(e);
 		}
 		Enumeration<String> aliases = trustStore.aliases();
 		while (aliases.hasMoreElements())
@@ -186,7 +179,7 @@ public class EbMSSecSignatureValidator implements EbMSSignatureValidator
 					if (certificate.getIssuerDN().getName().equals(((X509Certificate)c).getSubjectDN().getName()))
 					{
 						certificate.verify(c.getPublicKey());
-						return true;
+						return;
 					}
 			}
 			catch (GeneralSecurityException e)
@@ -194,7 +187,7 @@ public class EbMSSecSignatureValidator implements EbMSSignatureValidator
 				logger.trace("",e);
 			}
 		}
-		return false;
+		throw new ValidationException("Certificate " + certificate.getIssuerDN() + " not found!");
 	}
 	
 	public void setTrustStorePath(String trustStorePath)
