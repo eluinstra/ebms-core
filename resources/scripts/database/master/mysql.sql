@@ -49,6 +49,7 @@ CREATE TABLE ebms_send_event
 	status						INTEGER					NOT NULL DEFAULT 0,
 	status_time				TIMESTAMP				NOT NULL DEFAULT NOW(),
 	error_message			TEXT						NULL,
-	FOREIGN KEY (ebms_message_id) REFERENCES ebms_message(id),
-	UNIQUE (ebms_message_id,time)
+	FOREIGN KEY (ebms_message_id) REFERENCES ebms_message(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+ALTER TABLE ebms_send_event ADD CONSTRAINT uc_ebms_send_event UNIQUE (ebms_message_id,time);

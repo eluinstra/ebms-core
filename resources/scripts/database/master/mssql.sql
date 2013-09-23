@@ -47,6 +47,7 @@ CREATE TABLE ebms_send_event
 	time							DATETIME				NOT NULL DEFAULT GETDATE(),
 	status						INT							NOT NULL DEFAULT 0,
 	status_time				DATETIME				NOT NULL DEFAULT GETDATE(),
-	error_message			TEXT						NULL,
-	UNIQUE (ebms_message_id,time)
+	error_message			TEXT						NULL
 );
+
+ALTER TABLE ebms_send_event ADD CONSTRAINT uc_ebms_send_event UNIQUE (ebms_message_id,time);
