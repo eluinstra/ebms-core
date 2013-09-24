@@ -38,16 +38,16 @@ CREATE TABLE ebms_attachment
 	name							VARCHAR(256)		NULL,
 	content_id 				VARCHAR(256) 		NOT NULL,
 	content_type			VARCHAR(255)		NOT NULL,
-	content						BLOB						NOT NULL,
+	content						LONGBLOB 				NOT NULL,
 	FOREIGN KEY (ebms_message_id) REFERENCES ebms_message(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 CREATE TABLE ebms_send_event
 (
 	ebms_message_id		INTEGER					NOT NULL REFERENCES ebms_message(id),
-	time							TIMESTAMP				NOT NULL DEFAULT '0000-00-00 00:00:00',
+	time							TIMESTAMP				NOT NULL DEFAULT NOW(),
 	status						INTEGER					NOT NULL DEFAULT 0,
-	status_time				TIMESTAMP				NOT NULL DEFAULT NOW(),
+	status_time				TIMESTAMP				NOT NULL DEFAULT '0000-00-00 00:00:00',
 	error_message			TEXT						NULL,
 	FOREIGN KEY (ebms_message_id) REFERENCES ebms_message(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
