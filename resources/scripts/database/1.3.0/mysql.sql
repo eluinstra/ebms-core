@@ -6,4 +6,8 @@ ALTER TABLE ebms_message ADD CONSTRAINT uc_ebms_message_id UNIQUE (message_id(25
 
 ALTER TABLE ebms_send_event ADD error_message TEXT NULL;
 
+ALTER TABLE ebms_send_event MODIFY status_time TIMESTAMP NOT NULL DEFAULT '0000-00-00 00:00:00';
+
+ALTER TABLE ebms_send_event MODIFY time TIMESTAMP NOT NULL DEFAULT NOW();
+
 ALTER TABLE ebms_send_event ADD CONSTRAINT uc_ebms_send_event UNIQUE (ebms_message_id,time);

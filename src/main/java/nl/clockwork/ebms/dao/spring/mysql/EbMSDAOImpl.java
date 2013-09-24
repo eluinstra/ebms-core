@@ -15,11 +15,39 @@
  ******************************************************************************/
 package nl.clockwork.ebms.dao.spring.mysql;
 
-import nl.clockwork.ebms.Constants.EbMSMessageStatus;
-import nl.clockwork.ebms.dao.spring.AbstractEbMSDAO;
+import java.io.IOException;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.util.Date;
 
+import javax.xml.bind.JAXBElement;
+import javax.xml.bind.JAXBException;
+import javax.xml.namespace.QName;
+
+import nl.clockwork.ebms.Constants.EbMSMessageStatus;
+import nl.clockwork.ebms.common.XMLMessageBuilder;
+import nl.clockwork.ebms.dao.DAOException;
+import nl.clockwork.ebms.dao.spring.AbstractEbMSDAO;
+import nl.clockwork.ebms.model.EbMSAttachment;
+import nl.clockwork.ebms.model.EbMSMessage;
+
+import org.apache.commons.io.IOUtils;
+import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.AckRequested;
+import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageHeader;
+import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageOrder;
+import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.SyncReply;
+import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.PreparedStatementCreator;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
+import org.springframework.transaction.TransactionException;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.support.TransactionCallback;
 import org.springframework.transaction.support.TransactionTemplate;
+import org.w3._2000._09.xmldsig.SignatureType;
 
 public class EbMSDAOImpl extends AbstractEbMSDAO
 {
@@ -51,4 +79,131 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 		" order by time_stamp asc" +
 		" limit " + maxNr;
 	}
+
+	@Override
+	public long insertDuplicateMessage(final Date timestamp, final EbMSMessage message) throws DAOException
+	{
+		try
+		{
+			return transactionTemplate.execute(
+				new TransactionCallback<Long>()
+				{
+					@Override
+					public Long doInTransaction(TransactionStatus arg0)
+					{
+						try
+						{
+							KeyHolder keyHolder = new GeneratedKeyHolder();
+							jdbcTemplate.update(
+								new PreparedStatementCreator()
+								{
+									
+									@Override
+									public PreparedStatement createPreparedStatement(Connection connection) throws SQLException
+									{
+										try
+										{
+											PreparedStatement ps = connection.prepareStatement
+											(
+												"insert into ebms_message (" +
+													"time_stamp," +
+													"cpa_id," +
+													"conversation_id," +
+													"sequence_nr," +
+													"message_id," +
+													"message_nr," +
+													"ref_to_message_id," +
+													"time_to_live," +
+													"from_role," +
+													"to_role," +
+													"service_type," +
+													"service," +
+													"action," +
+													"signature," +
+													"message_header," +
+													"sync_reply," +
+													"message_order," +
+													"ack_requested," +
+													"content" +
+												") values (?,?,?,?,?,(select nr from (select max(message_nr) + 1 as nr from ebms_message where message_id = ?) as c),?,?,?,?,?,?,?,?,?,?,?,?,?)",
+												//new String[]{"id"}
+												new int[]{1}
+											);
+											//ps.setDate(1,new java.sql.Date(timestamp.getTime()));
+											//ps.setString(1,String.format(getDateFormat(),timestamp));
+											ps.setTimestamp(1,new Timestamp(timestamp.getTime()));
+											//ps.setObject(1,timestamp,Types.TIMESTAMP);
+											//ps.setObject(1,timestamp);
+											MessageHeader messageHeader = message.getMessageHeader();
+											ps.setString(2,messageHeader.getCPAId());
+											ps.setString(3,messageHeader.getConversationId());
+											if (message.getMessageOrder() == null || message.getMessageOrder().getSequenceNumber() == null)
+												ps.setNull(4,java.sql.Types.BIGINT);
+											else
+												ps.setLong(4,message.getMessageOrder().getSequenceNumber().getValue().longValue());
+											ps.setString(5,messageHeader.getMessageData().getMessageId());
+											ps.setString(6,messageHeader.getMessageData().getMessageId());
+											ps.setString(7,messageHeader.getMessageData().getRefToMessageId());
+											ps.setTimestamp(8,messageHeader.getMessageData().getTimeToLive() == null ? null : new Timestamp(messageHeader.getMessageData().getTimeToLive().toGregorianCalendar().getTimeInMillis()));
+											ps.setString(9,messageHeader.getFrom().getRole());
+											ps.setString(10,messageHeader.getTo().getRole());
+											ps.setString(11,messageHeader.getService().getType());
+											ps.setString(12,messageHeader.getService().getValue());
+											ps.setString(13,messageHeader.getAction());
+											ps.setString(14,XMLMessageBuilder.getInstance(SignatureType.class).handle(new JAXBElement<SignatureType>(new QName("http://www.w3.org/2000/09/xmldsig#","Signature"),SignatureType.class,message.getSignature())));
+											ps.setString(15,XMLMessageBuilder.getInstance(MessageHeader.class).handle(messageHeader));
+											ps.setString(16,XMLMessageBuilder.getInstance(SyncReply.class).handle(message.getSyncReply()));
+											ps.setString(17,XMLMessageBuilder.getInstance(MessageOrder.class).handle(message.getMessageOrder()));
+											ps.setString(18,XMLMessageBuilder.getInstance(AckRequested.class).handle(message.getAckRequested()));
+											ps.setString(19,getContent(message));
+											return ps;
+										}
+										catch (JAXBException e)
+										{
+											throw new SQLException(e);
+										}
+									}
+								},
+								keyHolder
+							);
+					
+							for (EbMSAttachment attachment : message.getAttachments())
+							{
+								jdbcTemplate.update
+								(
+									"insert into ebms_attachment (" +
+										"ebms_message_id," +
+										"name," +
+										"content_id," +
+										"content_type," +
+										"content" +
+									") values (?,?,?,?,?)",
+									keyHolder.getKey().longValue(),
+									attachment.getName(),
+									attachment.getContentId(),
+									attachment.getContentType().split(";")[0].trim(),
+									IOUtils.toByteArray(attachment.getInputStream())
+								);
+							}
+							
+							return keyHolder.getKey().longValue();
+						}
+						catch (IOException e)
+						{
+							throw new DAOException(e);
+						}
+					}
+				}
+			);
+		}
+		catch (TransactionException e)
+		{
+			throw new DAOException(e);
+		}
+		catch (DataAccessException e)
+		{
+			throw new DAOException(e);
+		}
+	}
+
 }
