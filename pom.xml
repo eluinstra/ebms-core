@@ -169,12 +169,12 @@
 			<version>1.2.4</version>
 			<scope>test</scope>
 		</dependency>
-		<dependency>
+		<!--dependency>
 			<groupId>ms</groupId>
 			<artifactId>sqljdbc4</artifactId>
 			<version>201004</version>
 			<scope>test</scope>
-		</dependency>
+		</dependency-->
 		<dependency>
 			<groupId>com.oracle</groupId>
 			<artifactId>ojdbc6</artifactId>
