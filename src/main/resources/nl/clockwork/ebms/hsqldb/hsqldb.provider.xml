@@ -18,9 +18,11 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-	<bean id="databaseProvider" class="nl.clockwork.ebms.HSQLDatabaseProvider" init-method="init" destroy-method="close">
-		<constructor-arg ref="ebMSDataSource"/>
-		<constructor-arg value="/nl/clockwork/ebms/hsqldb.sql"/>
+	<bean id="databaseProvider" class="nl.clockwork.ebms.DatabaseProvider" init-method="init" destroy-method="close">
+		<property name="dataSource" ref="ebMSDataSource"/>
+		<property name="driverClassName" value="org.hsqldb.jdbcDriver"/>
+		<property name="execute" value="${ebms.hsqldb.init}"/>
+		<property name="sqlFiles" value="/nl/clockwork/ebms/hsqldb/hsqldb.sql"/>
 	</bean>
 	
 </beans>

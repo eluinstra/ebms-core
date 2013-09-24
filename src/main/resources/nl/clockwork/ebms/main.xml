@@ -29,6 +29,7 @@
 
 	<import resource="datasource.xml"/>
 	<import resource="dao.spring.xml"/>
+	<import resource="hsqldb/hsqldb.provider.xml"/>
 
 	<import resource="processor.xml"/>
 

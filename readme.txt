@@ -115,7 +115,9 @@ Known Issues =
 
 During startup the following errors/warnings may occur and can be ignored:
 
-WARN  nl.clockwork.ebms.HSQLDatabaseProvider - java.sql.SQLException: object name already exists: CPA in statement [CREATE TABLE cpa
+WARN  nl.clockwork.ebms.DatabaseProvider - java.sql.SQLException: object name already exists: CPA in statement [CREATE TABLE cpa
+
+To prevent this error set ebms.hsqldb.init=false
 
 ===============
 Functionality =

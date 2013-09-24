@@ -26,36 +26,30 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-public class HSQLDatabaseProvider
+import com.mchange.v2.c3p0.ComboPooledDataSource;
+
+public class DatabaseProvider
 {
 	protected transient Log logger = LogFactory.getLog(getClass());
 	private DataSource dataSource;
-	private String sqlFile;
+	private String driverClassName;
 	private boolean execute;
-
-	public HSQLDatabaseProvider(DataSource dataSource, String sqlFile)
-	{
-		this(dataSource,sqlFile,true);
-	}
-	
-	public HSQLDatabaseProvider(DataSource dataSource, String sqlFile, boolean execute)
-	{
-		this.dataSource = dataSource;
-		this.sqlFile = sqlFile;
-		this.execute = execute;
-	}
+	private String[] sqlFiles;
 
 	public void init() throws SQLException, IOException
 	{
-		if (execute)
+		if (execute && driverClassName.equals(((ComboPooledDataSource)dataSource).getDriverClass()))
 		{
 			Connection c = dataSource.getConnection();
 			try
 			{
-				Statement s = c.createStatement();
-				String sql = IOUtils.toString(HSQLDatabaseProvider.class.getResourceAsStream(sqlFile));
-				s.executeUpdate(sql);
-				s.close();
+				for (String sqlFile : sqlFiles)
+				{
+					Statement s = c.createStatement();
+					logger.info("Executing file " + sqlFile);
+					s.executeUpdate(IOUtils.toString(DatabaseProvider.class.getResourceAsStream(sqlFile.trim())));
+					s.close();
+				}
 			}
 			catch (SQLException e)
 			{
@@ -84,5 +78,25 @@ public class HSQLDatabaseProvider
 				c.close();
 			}
 		}
+	}
+	
+	public void setDataSource(DataSource dataSource)
+	{
+		this.dataSource = dataSource;
+	}
+	
+	public void setDriverClassName(String driverClassName)
+	{
+		this.driverClassName = driverClassName;
+	}
+	
+	public void setExecute(boolean execute)
+	{
+		this.execute = execute;
+	}
+	
+	public void setSqlFiles(String sqlFiles)
+	{
+		this.sqlFiles = sqlFiles.split(",");
 	}
 }
