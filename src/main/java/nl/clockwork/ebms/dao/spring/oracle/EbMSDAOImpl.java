@@ -25,9 +25,11 @@ import java.util.Date;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.namespace.QName;
+import javax.xml.transform.TransformerException;
 
 import nl.clockwork.ebms.Constants.EbMSMessageStatus;
 import nl.clockwork.ebms.common.XMLMessageBuilder;
+import nl.clockwork.ebms.common.util.DOMUtils;
 import nl.clockwork.ebms.dao.DAOException;
 import nl.clockwork.ebms.dao.spring.AbstractEbMSDAO;
 import nl.clockwork.ebms.model.EbMSAttachment;
@@ -119,6 +121,7 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 													"service_type," +
 													"service," +
 													"action," +
+													"original," +
 													"signature," +
 													"message_header," +
 													"sync_reply," +
@@ -127,7 +130,7 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 													"content," +
 													"status," +
 													"status_time" +
-												") values (seq_ebms_message_id.nextval,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?," + (status == null ? "null" : getTimestampFunction()) + ")",
+												") values (seq_ebms_message_id.nextval,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?," + (status == null ? "null" : getTimestampFunction()) + ")",
 												//new String[]{"id"}
 												new int[]{1}
 											);
@@ -151,23 +154,28 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 											ps.setString(10,messageHeader.getService().getType());
 											ps.setString(11,messageHeader.getService().getValue());
 											ps.setString(12,messageHeader.getAction());
-											ps.setString(13,XMLMessageBuilder.getInstance(SignatureType.class).handle(new JAXBElement<SignatureType>(new QName("http://www.w3.org/2000/09/xmldsig#","Signature"),SignatureType.class,message.getSignature())));
-											ps.setString(14,XMLMessageBuilder.getInstance(MessageHeader.class).handle(messageHeader));
-											ps.setString(15,XMLMessageBuilder.getInstance(SyncReply.class).handle(message.getSyncReply()));
-											ps.setString(16,XMLMessageBuilder.getInstance(MessageOrder.class).handle(message.getMessageOrder()));
-											ps.setString(17,XMLMessageBuilder.getInstance(AckRequested.class).handle(message.getAckRequested()));
-											ps.setString(18,getContent(message));
+											ps.setString(13,DOMUtils.toString(message.getDocument(),"UTF-8"));
+											ps.setString(14,XMLMessageBuilder.getInstance(SignatureType.class).handle(new JAXBElement<SignatureType>(new QName("http://www.w3.org/2000/09/xmldsig#","Signature"),SignatureType.class,message.getSignature())));
+											ps.setString(15,XMLMessageBuilder.getInstance(MessageHeader.class).handle(messageHeader));
+											ps.setString(16,XMLMessageBuilder.getInstance(SyncReply.class).handle(message.getSyncReply()));
+											ps.setString(17,XMLMessageBuilder.getInstance(MessageOrder.class).handle(message.getMessageOrder()));
+											ps.setString(18,XMLMessageBuilder.getInstance(AckRequested.class).handle(message.getAckRequested()));
+											ps.setString(19,getContent(message));
 											if (status == null)
-												ps.setNull(19,java.sql.Types.INTEGER);
+												ps.setNull(20,java.sql.Types.INTEGER);
 											else
-												ps.setInt(19,status.id());
-											//ps.setString(20,status == null ? null : String.format(getDateFormat(),timestamp));
-											//ps.setTimestamp(20,status == null ? null : new Timestamp(timestamp.getTime()));
-											//ps.setObject(20,status == null ? null : timestamp,Types.TIMESTAMP);
-											//ps.setObject(20,status == null ? null : timestamp);
+												ps.setInt(20,status.id());
+											//ps.setString(21,status == null ? null : String.format(getDateFormat(),timestamp));
+											//ps.setTimestamp(21,status == null ? null : new Timestamp(timestamp.getTime()));
+											//ps.setObject(21,status == null ? null : timestamp,Types.TIMESTAMP);
+											//ps.setObject(21,status == null ? null : timestamp);
 											return ps;
 										}
 										catch (JAXBException e)
+										{
+											throw new SQLException(e);
+										}
+										catch (TransformerException e)
 										{
 											throw new SQLException(e);
 										}
@@ -251,13 +259,14 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 													"service_type," +
 													"service," +
 													"action," +
+													"original," +
 													"signature," +
 													"message_header," +
 													"sync_reply," +
 													"message_order," +
 													"ack_requested," +
 													"content" +
-												") values (seq_ebms_message_id.nextval,?,?,?,?,?,(select max(message_nr) + 1 from ebms_message where message_id = ?),?,?,?,?,?,?,?,?,?,?,?,?,?)",
+												") values (seq_ebms_message_id.nextval,?,?,?,?,?,(select max(message_nr) + 1 from ebms_message where message_id = ?),?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
 												//new String[]{"id"}
 												new int[]{1}
 											);
@@ -282,15 +291,20 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 											ps.setString(11,messageHeader.getService().getType());
 											ps.setString(12,messageHeader.getService().getValue());
 											ps.setString(13,messageHeader.getAction());
-											ps.setString(14,XMLMessageBuilder.getInstance(SignatureType.class).handle(new JAXBElement<SignatureType>(new QName("http://www.w3.org/2000/09/xmldsig#","Signature"),SignatureType.class,message.getSignature())));
-											ps.setString(15,XMLMessageBuilder.getInstance(MessageHeader.class).handle(messageHeader));
-											ps.setString(16,XMLMessageBuilder.getInstance(SyncReply.class).handle(message.getSyncReply()));
-											ps.setString(17,XMLMessageBuilder.getInstance(MessageOrder.class).handle(message.getMessageOrder()));
-											ps.setString(18,XMLMessageBuilder.getInstance(AckRequested.class).handle(message.getAckRequested()));
-											ps.setString(19,getContent(message));
+											ps.setString(14,DOMUtils.toString(message.getDocument(),"UTF-8"));
+											ps.setString(15,XMLMessageBuilder.getInstance(SignatureType.class).handle(new JAXBElement<SignatureType>(new QName("http://www.w3.org/2000/09/xmldsig#","Signature"),SignatureType.class,message.getSignature())));
+											ps.setString(16,XMLMessageBuilder.getInstance(MessageHeader.class).handle(messageHeader));
+											ps.setString(17,XMLMessageBuilder.getInstance(SyncReply.class).handle(message.getSyncReply()));
+											ps.setString(18,XMLMessageBuilder.getInstance(MessageOrder.class).handle(message.getMessageOrder()));
+											ps.setString(19,XMLMessageBuilder.getInstance(AckRequested.class).handle(message.getAckRequested()));
+											ps.setString(20,getContent(message));
 											return ps;
 										}
 										catch (JAXBException e)
+										{
+											throw new SQLException(e);
+										}
+										catch (TransformerException e)
 										{
 											throw new SQLException(e);
 										}

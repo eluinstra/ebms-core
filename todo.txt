@@ -11,7 +11,7 @@
 - test multiple certificates in keystore
 - generate soap fault on error
 - change sendEvent generation: store one event per message (and calculate the following after current is handled if necessary)
-	- replace table ebms_send_event by a queue
+	- replace table ebms_event by a queue
 
 - let DeliveryManager work with EbMSDocument instead of EbMSMessage?
 	- change messageQueue from EbMSMessage to EbMSDocument

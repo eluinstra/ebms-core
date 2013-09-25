@@ -20,6 +20,7 @@ CREATE TABLE ebms_message
 	service_type			VARCHAR(256)		NULL,
 	service						VARCHAR(256)		NOT NULL,
 	action						VARCHAR(256)		NOT NULL,
+	original					CLOB						NULL,
 	signature					CLOB						NULL,
 	message_header		CLOB						NOT NULL,
 	sync_reply				CLOB						NULL,
@@ -43,10 +44,11 @@ CREATE TABLE ebms_attachment
 	FOREIGN KEY (ebms_message_id) REFERENCES ebms_message(id)
 );
 
-CREATE TABLE ebms_send_event
+CREATE TABLE ebms_event
 (
 	ebms_message_id		INTEGER					NOT NULL,
 	time							TIMESTAMP				DEFAULT NOW() NOT NULL,
+	type							INTEGER					NOT NULL,
 	status						INTEGER					DEFAULT 0 NOT NULL,
 	status_time				TIMESTAMP				DEFAULT NOW() NOT NULL,
 	error_message			CLOB						NULL,

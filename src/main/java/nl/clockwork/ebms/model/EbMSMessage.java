@@ -28,9 +28,11 @@ import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.StatusRequest;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.StatusResponse;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.SyncReply;
 import org.w3._2000._09.xmldsig.SignatureType;
+import org.w3c.dom.Document;
 
 public class EbMSMessage
 {
+	private Document document;
 	private SignatureType signature;
 	private MessageHeader messageHeader;
 	private SyncReply syncReply;
@@ -120,6 +122,12 @@ public class EbMSMessage
 	
 	public EbMSMessage(SignatureType signature,MessageHeader messageHeader, SyncReply syncReply, MessageOrder messageOrder, AckRequested ackRequested, ErrorList errorList, Acknowledgment acknowledgment, Manifest manifest, StatusRequest statusRequest, StatusResponse statusResponse, List<EbMSAttachment> attachments)
 	{
+		this(null,signature,messageHeader,syncReply,messageOrder,ackRequested,errorList,acknowledgment,manifest,statusRequest,statusResponse,attachments);
+	}
+
+	public EbMSMessage(Document document, SignatureType signature,MessageHeader messageHeader, SyncReply syncReply, MessageOrder messageOrder, AckRequested ackRequested, ErrorList errorList, Acknowledgment acknowledgment, Manifest manifest, StatusRequest statusRequest, StatusResponse statusResponse, List<EbMSAttachment> attachments)
+	{
+		this.document = document;
 		this.signature = signature;
 		this.messageHeader = messageHeader;
 		this.syncReply = syncReply;
@@ -131,6 +139,16 @@ public class EbMSMessage
 		this.statusResponse = statusResponse;
 		this.manifest = manifest;
 		this.attachments = attachments == null ? new ArrayList<EbMSAttachment>() : attachments;
+	}
+	
+	public Document getDocument()
+	{
+		return document;
+	}
+	
+	public void setDocument(Document document)
+	{
+		this.document = document;
 	}
 
 	public SignatureType getSignature()

@@ -18,7 +18,7 @@ package nl.clockwork.ebms.validation;
 import java.util.List;
 
 import nl.clockwork.ebms.Constants;
-import nl.clockwork.ebms.model.EbMSDocument;
+import nl.clockwork.ebms.model.EbMSAttachment;
 import nl.clockwork.ebms.signing.EbMSSignatureValidator;
 import nl.clockwork.ebms.util.CPAUtils;
 import nl.clockwork.ebms.util.EbMSMessageUtils;
@@ -31,6 +31,7 @@ import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.PartyInfo;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageHeader;
 import org.w3._2000._09.xmldsig.ReferenceType;
 import org.w3._2000._09.xmldsig.SignatureType;
+import org.w3c.dom.Document;
 
 public class SignatureTypeValidator
 {
@@ -42,11 +43,11 @@ public class SignatureTypeValidator
 		this.ebMSSignatureValidator = ebMSSignatureValidator;
 	}
 
-	public void validate(CollaborationProtocolAgreement cpa, EbMSDocument document, MessageHeader messageHeader) throws ValidatorException
+	public void validate(CollaborationProtocolAgreement cpa, MessageHeader messageHeader, Document document, List<EbMSAttachment> attachments) throws ValidatorException
 	{
 		try
 		{
-			ebMSSignatureValidator.validate(cpa,document,messageHeader);
+			ebMSSignatureValidator.validate(cpa,messageHeader,document,attachments);
 		}
 		catch (ValidationException e)
 		{

@@ -92,16 +92,11 @@ import org.xmlsoap.schemas.soap.envelope.Header;
 
 public class EbMSMessageUtils
 {
+	@SuppressWarnings("unchecked")
 	public static EbMSMessage getEbMSMessage(Document document, List<EbMSAttachment> attachments) throws JAXBException, XPathExpressionException, ParserConfigurationException, SAXException, IOException
 	{
 		XMLMessageBuilder<Envelope> messageBuilder = XMLMessageBuilder.getInstance(Envelope.class,Envelope.class,MessageHeader.class,SyncReply.class,MessageOrder.class,AckRequested.class,SignatureType.class,ErrorList.class,Acknowledgment.class,Manifest.class,StatusRequest.class,StatusResponse.class);
 		Envelope envelope = messageBuilder.handle(document);
-		return getEbMSMessage(envelope,attachments);
-	}
-
-	@SuppressWarnings("unchecked")
-	public static EbMSMessage getEbMSMessage(Envelope envelope, List<EbMSAttachment> attachments)
-	{
 		SignatureType signature = null;
 		MessageHeader messageHeader = null;
 		SyncReply syncReply = null;
@@ -136,9 +131,9 @@ public class EbMSMessageUtils
 			else if (element instanceof StatusResponse)
 				statusResponse = (StatusResponse)element;
 
-		return new EbMSMessage(signature,messageHeader,syncReply,messageOrder,ackRequested,errorList,acknowledgment,manifest,statusRequest,statusResponse,attachments);
+		return new EbMSMessage(document,signature,messageHeader,syncReply,messageOrder,ackRequested,errorList,acknowledgment,manifest,statusRequest,statusResponse,attachments);
 	}
-	
+
 	//private static boolean isSOAPFault(Envelope envelope)
 	//{
 	//	if (envelope.getBody() != null /*&& envelope.getBody().getAny() != null*/)
@@ -509,7 +504,6 @@ public class EbMSMessageUtils
 		envelope.getHeader().getAny().add(ebMSMessage.getSyncReply());
 		envelope.getHeader().getAny().add(ebMSMessage.getMessageOrder());
 		envelope.getHeader().getAny().add(ebMSMessage.getAckRequested());
-		envelope.getHeader().getAny().add(ebMSMessage.getSignature());
 		envelope.getHeader().getAny().add(ebMSMessage.getErrorList());
 		envelope.getHeader().getAny().add(ebMSMessage.getAcknowledgment());
 		envelope.getBody().getAny().add(ebMSMessage.getManifest());
@@ -517,7 +511,7 @@ public class EbMSMessageUtils
 		envelope.getBody().getAny().add(ebMSMessage.getStatusResponse());
 		
 		DocumentBuilder db = DOMUtils.getDocumentBuilder();
-		XMLMessageBuilder<Envelope> messageBuilder = XMLMessageBuilder.getInstance(Envelope.class,Envelope.class,MessageHeader.class,SyncReply.class,MessageOrder.class,AckRequested.class,SignatureType.class,ErrorList.class,Acknowledgment.class,Manifest.class,StatusRequest.class,StatusResponse.class);
+		XMLMessageBuilder<Envelope> messageBuilder = XMLMessageBuilder.getInstance(Envelope.class,Envelope.class,MessageHeader.class,SyncReply.class,MessageOrder.class,AckRequested.class,ErrorList.class,Acknowledgment.class,Manifest.class,StatusRequest.class,StatusResponse.class);
 
 		//Document d = db.parse(new ByteArrayInputStream(messageBuilder.handle(new JAXBElement<Envelope>(new QName("http://schemas.xmlsoap.org/soap/envelope/","Envelope"),Envelope.class,envelope)).getBytes()));
 

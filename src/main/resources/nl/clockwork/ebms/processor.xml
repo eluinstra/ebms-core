@@ -26,6 +26,7 @@
 	<bean id="ebMSMessageService" class="nl.clockwork.ebms.service.EbMSMessageServiceImpl">
 		<property name="deliveryManager" ref="deliveryManager"></property>
 		<property name="ebMSDAO" ref="ebMSDAO"/>
+		<property name="signatureGenerator" ref="signatureGenerator"/>
 	</bean>
 
 	<bean id="deliveryManager" class="nl.clockwork.ebms.client.DeliveryManager" init-method="init">
@@ -49,6 +50,7 @@
 		<property name="deliveryManager" ref="deliveryManager"/>
 		<property name="eventListener" ref="eventListener"/>
 		<property name="ebMSDAO" ref="ebMSDAO"/>
+		<property name="signatureGenerator" ref="signatureGenerator"/>
 		<property name="signatureValidator" ref="signatureValidator"/>
 	</bean>
 

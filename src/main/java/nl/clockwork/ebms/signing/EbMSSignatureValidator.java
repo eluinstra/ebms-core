@@ -15,14 +15,17 @@
  ******************************************************************************/
 package nl.clockwork.ebms.signing;
 
-import nl.clockwork.ebms.model.EbMSDocument;
+import java.util.List;
+
+import nl.clockwork.ebms.model.EbMSAttachment;
 import nl.clockwork.ebms.validation.ValidationException;
 import nl.clockwork.ebms.validation.ValidatorException;
 
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CollaborationProtocolAgreement;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageHeader;
+import org.w3c.dom.Document;
 
 public interface EbMSSignatureValidator
 {
-	void validate(CollaborationProtocolAgreement cpa, EbMSDocument document, MessageHeader messageHeader) throws ValidatorException, ValidationException;
+	void validate(CollaborationProtocolAgreement cpa, MessageHeader messageHeader, Document document, List<EbMSAttachment> attachments) throws ValidatorException, ValidationException;
 }

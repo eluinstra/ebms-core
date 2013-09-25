@@ -20,6 +20,7 @@ CREATE TABLE ebms_message
 	service_type			VARCHAR(256)		NULL,
 	service						VARCHAR(256)		NOT NULL,
 	action						VARCHAR(256)		NOT NULL,
+	original					CLOB						NULL,
 	signature					CLOB						NULL,
 	message_header		CLOB						NOT NULL,
 	sync_reply				CLOB						NULL,
@@ -55,4 +56,4 @@ CREATE TABLE ebms_event
 	FOREIGN KEY (ebms_message_id) REFERENCES ebms_message(id)
 );
 
-ALTER TABLE ebms_send_event ADD CONSTRAINT uc_ebms_send_event UNIQUE (ebms_message_id,time);
+ALTER TABLE ebms_event ADD CONSTRAINT uc_ebms_event UNIQUE (ebms_message_id,time);

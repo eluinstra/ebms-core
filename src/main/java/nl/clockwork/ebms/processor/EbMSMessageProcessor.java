@@ -40,6 +40,7 @@ import nl.clockwork.ebms.dao.EbMSDAO;
 import nl.clockwork.ebms.model.EbMSDocument;
 import nl.clockwork.ebms.model.EbMSEvent;
 import nl.clockwork.ebms.model.EbMSMessage;
+import nl.clockwork.ebms.signing.EbMSSignatureGenerator;
 import nl.clockwork.ebms.signing.EbMSSignatureValidator;
 import nl.clockwork.ebms.util.EbMSMessageUtils;
 import nl.clockwork.ebms.validation.CPAValidator;
@@ -58,6 +59,7 @@ import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.ErrorList;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageHeader;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageStatusType;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.Service;
+import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
 public class EbMSMessageProcessor
@@ -66,6 +68,7 @@ public class EbMSMessageProcessor
 	private DeliveryManager deliveryManager;
 	private EventListener eventListener;
   private EbMSDAO ebMSDAO;
+	private EbMSSignatureGenerator signatureGenerator;
   private EbMSSignatureValidator signatureValidator;
 	private XSDValidator xsdValidator;
   private CPAValidator cpaValidator;
@@ -96,7 +99,7 @@ public class EbMSMessageProcessor
 			logger.info("Message received. MessageId " + message.getMessageHeader().getMessageData().getMessageId());
 			if (!Constants.EBMS_SERVICE_URI.equals(message.getMessageHeader().getService().getValue()))
 			{
-				EbMSMessage response = process(cpa,timestamp,document,message);
+				EbMSMessage response = process(cpa,timestamp,message);
 				return response == null ? null : EbMSMessageUtils.getEbMSDocument(response);
 			}
 			else if (EbMSAction.MESSAGE_ERROR.action().equals(message.getMessageHeader().getAction()))
@@ -232,7 +235,7 @@ public class EbMSMessageProcessor
 		}
 	}
 	
-	private EbMSMessage process(CollaborationProtocolAgreement cpa, final GregorianCalendar timestamp, EbMSDocument document, final EbMSMessage message) throws DAOException, ValidatorException, DatatypeConfigurationException, JAXBException, SOAPException, ParserConfigurationException, SAXException, IOException, TransformerFactoryConfigurationError, TransformerException
+	private EbMSMessage process(CollaborationProtocolAgreement cpa, final GregorianCalendar timestamp, final EbMSMessage message) throws DAOException, ValidatorException, DatatypeConfigurationException, JAXBException, SOAPException, ParserConfigurationException, SAXException, IOException, TransformerFactoryConfigurationError, TransformerException, EbMSProcessorException
 	{
 		final MessageHeader messageHeader = message.getMessageHeader();
 		if (isDuplicateMessage(message))
@@ -277,7 +280,7 @@ public class EbMSMessageProcessor
 				messageHeaderValidator.validate(cpa,messageHeader,message.getAckRequested(),message.getSyncReply(),message.getMessageOrder(),timestamp);
 				signatureTypeValidator.validate(cpa,messageHeader,message.getSignature());
 				manifestValidator.validate(message.getManifest(),message.getAttachments());
-				signatureTypeValidator.validate(cpa,document,messageHeader);
+				signatureTypeValidator.validate(cpa,messageHeader,message.getDocument(),message.getAttachments());
 				logger.info("Message valid. MessageId " + message.getMessageHeader().getMessageData().getMessageId());
 				if (message.getAckRequested() == null)
 				{
@@ -297,6 +300,9 @@ public class EbMSMessageProcessor
 				else
 				{
 					final EbMSMessage acknowledgment = EbMSMessageUtils.createEbMSAcknowledgment(cpa,message,timestamp);
+					Document document = EbMSMessageUtils.createSOAPMessage(acknowledgment);
+					signatureGenerator.generate(cpa,acknowledgment.getMessageHeader(),document,acknowledgment.getAttachments());
+					acknowledgment.setDocument(document);
 					ebMSDAO.executeTransaction(
 						new DAOTransactionCallback()
 						{
@@ -323,6 +329,9 @@ public class EbMSMessageProcessor
 				ErrorList errorList = EbMSMessageUtils.createErrorList();
 				errorList.getError().add(e.getError());
 				final EbMSMessage messageError = EbMSMessageUtils.createEbMSMessageError(cpa,message,errorList,timestamp);
+				Document document = EbMSMessageUtils.createSOAPMessage(messageError);
+				signatureGenerator.generate(cpa,messageError.getMessageHeader(),document,messageError.getAttachments());
+				messageError.setDocument(document);
 				ebMSDAO.executeTransaction(
 					new DAOTransactionCallback()
 					{
@@ -441,6 +450,11 @@ public class EbMSMessageProcessor
 	public void setEbMSDAO(EbMSDAO ebMSDAO)
 	{
 		this.ebMSDAO = ebMSDAO;
+	}
+	
+	public void setSignatureGenerator(EbMSSignatureGenerator signatureGenerator)
+	{
+		this.signatureGenerator = signatureGenerator;
 	}
 	
 	public void setSignatureValidator(EbMSSignatureValidator signatureValidator)

@@ -28,24 +28,27 @@ import nl.clockwork.ebms.client.DeliveryManager;
 import nl.clockwork.ebms.dao.DAOException;
 import nl.clockwork.ebms.dao.DAOTransactionCallback;
 import nl.clockwork.ebms.dao.EbMSDAO;
+import nl.clockwork.ebms.model.EbMSEvent;
 import nl.clockwork.ebms.model.EbMSMessage;
 import nl.clockwork.ebms.model.EbMSMessageContent;
 import nl.clockwork.ebms.model.EbMSMessageContext;
-import nl.clockwork.ebms.model.EbMSEvent;
 import nl.clockwork.ebms.model.MessageStatus;
 import nl.clockwork.ebms.processor.EbMSProcessorException;
+import nl.clockwork.ebms.signing.EbMSSignatureGenerator;
 import nl.clockwork.ebms.util.EbMSMessageContextValidator;
 import nl.clockwork.ebms.util.EbMSMessageUtils;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CollaborationProtocolAgreement;
+import org.w3c.dom.Document;
 
 public class EbMSMessageServiceImpl implements EbMSMessageService
 {
   protected transient Log logger = LogFactory.getLog(getClass());
 	private DeliveryManager deliveryManager;
 	private EbMSDAO ebMSDAO;
+	private EbMSSignatureGenerator signatureGenerator;
 
 	@Override
 	public void ping(String cpaId, String fromParty, String toParty) throws EbMSMessageServiceException
@@ -85,6 +88,9 @@ public class EbMSMessageServiceImpl implements EbMSMessageService
 			new EbMSMessageContextValidator(ebMSDAO).validate(messageContent.getContext());
 			CollaborationProtocolAgreement cpa = ebMSDAO.getCPA(messageContent.getContext().getCpaId());
 			final EbMSMessage message = EbMSMessageUtils.ebMSMessageContentToEbMSMessage(cpa,messageContent);
+			Document document = EbMSMessageUtils.createSOAPMessage(message);
+			signatureGenerator.generate(cpa,message.getMessageHeader(),document,message.getAttachments());
+			message.setDocument(document);
 			ebMSDAO.executeTransaction(
 				new DAOTransactionCallback()
 				{
@@ -93,7 +99,7 @@ public class EbMSMessageServiceImpl implements EbMSMessageService
 					{
 						long id = ebMSDAO.insertMessage(new Date(),message,null);
 						List<EbMSEvent> events = EbMSMessageUtils.getEbMSSendEvents(ebMSDAO.getCPA(message.getMessageHeader().getCPAId()),id,message.getMessageHeader());
-						events.add(new EbMSEvent(id,message.getMessageHeader().getMessageData().getTimestamp().toGregorianCalendar().getTime(),EbMSEventType.EXPIRE));
+						events.add(new EbMSEvent(id,message.getMessageHeader().getMessageData().getTimeToLive().toGregorianCalendar().getTime(),EbMSEventType.EXPIRE));
 						ebMSDAO.insertEvents(events);
 					}
 				}
@@ -201,6 +207,11 @@ public class EbMSMessageServiceImpl implements EbMSMessageService
 	public void setEbMSDAO(EbMSDAO ebMSDAO)
 	{
 		this.ebMSDAO = ebMSDAO;
+	}
+	
+	public void setSignatureGenerator(EbMSSignatureGenerator signatureGenerator)
+	{
+		this.signatureGenerator = signatureGenerator;
 	}
 	
 }

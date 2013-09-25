@@ -30,7 +30,6 @@ import java.util.List;
 
 import nl.clockwork.ebms.common.util.SecurityUtils;
 import nl.clockwork.ebms.model.EbMSAttachment;
-import nl.clockwork.ebms.model.EbMSDocument;
 import nl.clockwork.ebms.util.CPAUtils;
 import nl.clockwork.ebms.validation.ValidationException;
 import nl.clockwork.ebms.validation.ValidatorException;
@@ -61,7 +60,7 @@ public class EbMSSecSignatureValidator implements EbMSSignatureValidator
 	}
 	
 	@Override
-	public void validate(CollaborationProtocolAgreement cpa, EbMSDocument document, MessageHeader messageHeader) throws ValidatorException, ValidationException
+	public void validate(CollaborationProtocolAgreement cpa, MessageHeader messageHeader, Document document, List<EbMSAttachment> attachments) throws ValidatorException, ValidationException
 	{
 		try
 		{
@@ -69,14 +68,14 @@ public class EbMSSecSignatureValidator implements EbMSSignatureValidator
 			if (CPAUtils.isSigned(partyInfo,messageHeader.getFrom().getRole(),messageHeader.getService(),messageHeader.getAction()))
 			{
 				KeyStore trustStore = SecurityUtils.loadKeyStore(trustStorePath,trustStorePassword);
-				NodeList signatureNodeList = document.getMessage().getElementsByTagNameNS(org.apache.xml.security.utils.Constants.SignatureSpecNS,org.apache.xml.security.utils.Constants._TAG_SIGNATURE);
+				NodeList signatureNodeList = document.getElementsByTagNameNS(org.apache.xml.security.utils.Constants.SignatureSpecNS,org.apache.xml.security.utils.Constants._TAG_SIGNATURE);
 				if (signatureNodeList.getLength() > 0)
 				{
-					X509Certificate certificate = getCertificate(cpa,document.getMessage(),messageHeader);
+					X509Certificate certificate = getCertificate(cpa,document,messageHeader);
 					if (certificate != null)
 					{
 						validateCertificate(trustStore,certificate,messageHeader.getMessageData().getTimestamp() == null ? new Date() : messageHeader.getMessageData().getTimestamp().toGregorianCalendar().getTime());
-						if (!verify(certificate,(Element)signatureNodeList.item(0),document.getAttachments()))
+						if (!verify(certificate,(Element)signatureNodeList.item(0),attachments))
 							throw new ValidationException("Invalid Signature!");
 					}
 					else

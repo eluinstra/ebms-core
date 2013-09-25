@@ -28,7 +28,6 @@ import nl.clockwork.ebms.Constants;
 import nl.clockwork.ebms.common.util.DOMUtils;
 import nl.clockwork.ebms.common.util.SecurityUtils;
 import nl.clockwork.ebms.model.EbMSAttachment;
-import nl.clockwork.ebms.model.EbMSDocument;
 import nl.clockwork.ebms.processor.EbMSProcessingException;
 import nl.clockwork.ebms.processor.EbMSProcessorException;
 import nl.clockwork.ebms.util.CPAUtils;
@@ -65,7 +64,7 @@ public class EbMSSecSignatureGenerator implements EbMSSignatureGenerator
 	}
 
 	@Override
-	public void generate(CollaborationProtocolAgreement cpa, EbMSDocument document, MessageHeader messageHeader) throws EbMSProcessorException
+	public void generate(CollaborationProtocolAgreement cpa, MessageHeader messageHeader, Document document, List<EbMSAttachment> attachments) throws EbMSProcessorException
 	{
 		try
 		{
@@ -80,7 +79,7 @@ public class EbMSSecSignatureGenerator implements EbMSSignatureGenerator
 					if (alias == null)
 						throw new EbMSProcessorException("No certificate found with subject \"" + certificate.getSubjectDN().getName() + "\" in keystore \"" + keyStorePath + "\"");
 					KeyPair keyPair = SecurityUtils.getKeyPair(keyStore,alias,keyStorePassword);
-					sign(keyStore,keyPair,alias,document.getMessage(),document.getAttachments(),CPAUtils.getSignatureAlgorithm(deliveryChannel),CPAUtils.getHashFunction(deliveryChannel));
+					sign(keyStore,keyPair,alias,document,attachments,CPAUtils.getSignatureAlgorithm(deliveryChannel),CPAUtils.getHashFunction(deliveryChannel));
 				}
 			}
 		}

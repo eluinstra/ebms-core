@@ -256,13 +256,13 @@ public class CPAUtils
 		//return null;
 	}
 	
-	public static String getSignatureAlgorithm(DeliveryChannel deliveryChannel)
+	public static String getNonRepudiationProtocol(DeliveryChannel deliveryChannel)
 	{
 		DocExchange docExchange = getDocExchange(deliveryChannel);
-		//if (docExchange.getEbXMLSenderBinding() != null && docExchange.getEbXMLSenderBinding().getSenderNonRepudiation() != null && docExchange.getEbXMLSenderBinding().getSenderNonRepudiation().getSignatureAlgorithm() != null && !docExchange.getEbXMLSenderBinding().getSenderNonRepudiation().getSignatureAlgorithm().isEmpty())
+		//if (docExchange.getEbXMLSenderBinding() != null && docExchange.getEbXMLSenderBinding().getSenderNonRepudiation() != null && docExchange.getEbXMLSenderBinding().getSenderNonRepudiation().getHashFunction() != null)
 		{
 			SenderNonRepudiation senderNonRepudiation = docExchange.getEbXMLSenderBinding().getSenderNonRepudiation();
-			return senderNonRepudiation.getSignatureAlgorithm().get(0).getW3C() != null ? senderNonRepudiation.getSignatureAlgorithm().get(0).getW3C() : getSignatureAlgorithm(senderNonRepudiation.getSignatureAlgorithm().get(0).getValue());
+			return senderNonRepudiation.getNonRepudiationProtocol().getValue();
 		}
 		//return null;
 	}
@@ -274,6 +274,17 @@ public class CPAUtils
 		{
 			SenderNonRepudiation senderNonRepudiation = docExchange.getEbXMLSenderBinding().getSenderNonRepudiation();
 			return senderNonRepudiation.getHashFunction();
+		}
+		//return null;
+	}
+
+	public static String getSignatureAlgorithm(DeliveryChannel deliveryChannel)
+	{
+		DocExchange docExchange = getDocExchange(deliveryChannel);
+		//if (docExchange.getEbXMLSenderBinding() != null && docExchange.getEbXMLSenderBinding().getSenderNonRepudiation() != null && docExchange.getEbXMLSenderBinding().getSenderNonRepudiation().getSignatureAlgorithm() != null && !docExchange.getEbXMLSenderBinding().getSenderNonRepudiation().getSignatureAlgorithm().isEmpty())
+		{
+			SenderNonRepudiation senderNonRepudiation = docExchange.getEbXMLSenderBinding().getSenderNonRepudiation();
+			return senderNonRepudiation.getSignatureAlgorithm().get(0).getW3C() != null ? senderNonRepudiation.getSignatureAlgorithm().get(0).getW3C() : getSignatureAlgorithm(senderNonRepudiation.getSignatureAlgorithm().get(0).getValue());
 		}
 		//return null;
 	}

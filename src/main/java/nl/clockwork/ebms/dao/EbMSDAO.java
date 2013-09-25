@@ -56,8 +56,8 @@ public interface EbMSDAO
 	long insertDuplicateMessage(Date timestamp, EbMSMessage message) throws DAOException;
 	void updateMessageStatus(Long ebMSMessageId, EbMSMessageStatus oldStatus, EbMSMessageStatus newStatus) throws DAOException;
 	void insertEvent(long ebMSMessageId, EbMSEventType type) throws DAOException;
-	void insertEvent(EbMSEvent sendEvent) throws DAOException;
-	void insertEvents(List<EbMSEvent> sendEvents) throws DAOException;
+	void insertEvent(EbMSEvent event) throws DAOException;
+	void insertEvents(List<EbMSEvent> events) throws DAOException;
 	void deleteEvents(Long ebMSMessageId, EbMSEventStatus status) throws DAOException;
 
 	List<String> getMessageIds(EbMSMessageContext messageContext, EbMSMessageStatus status) throws DAOException;
