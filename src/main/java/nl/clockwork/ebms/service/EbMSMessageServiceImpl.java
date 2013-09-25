@@ -34,7 +34,7 @@ import nl.clockwork.ebms.model.EbMSMessageContent;
 import nl.clockwork.ebms.model.EbMSMessageContext;
 import nl.clockwork.ebms.model.MessageStatus;
 import nl.clockwork.ebms.processor.EbMSProcessorException;
-import nl.clockwork.ebms.signing.EbMSSignatureGenerator;
+import nl.clockwork.ebms.signature.EbMSSignatureGenerator;
 import nl.clockwork.ebms.util.EbMSMessageContextValidator;
 import nl.clockwork.ebms.util.EbMSMessageUtils;
 
