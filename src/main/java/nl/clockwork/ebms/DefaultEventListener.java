@@ -28,9 +28,12 @@ public class DefaultEventListener implements EventListener
 	}
 	
 	@Override
+	public void onMessageDeliveryFailed(String messageId) throws EventException
+	{
+	}
+
+	@Override
 	public void onMessageNotDelivered(String messageId) throws EventException
 	{
-		// TODO Auto-generated method stub
-		
 	}
 }
