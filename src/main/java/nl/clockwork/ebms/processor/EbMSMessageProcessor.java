@@ -60,7 +60,7 @@ import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageStatusTy
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.Service;
 import org.xml.sax.SAXException;
 
-public class EbMSMessageProcessorImpl
+public class EbMSMessageProcessor
 {
   protected transient Log logger = LogFactory.getLog(getClass());
 	private DeliveryManager deliveryManager;

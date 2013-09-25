@@ -33,7 +33,7 @@ import nl.clockwork.ebms.dao.EbMSDAO;
 import nl.clockwork.ebms.model.EbMSDocument;
 import nl.clockwork.ebms.model.EbMSEvent;
 import nl.clockwork.ebms.model.EbMSMessage;
-import nl.clockwork.ebms.processor.EbMSMessageProcessorImpl;
+import nl.clockwork.ebms.processor.EbMSMessageProcessor;
 import nl.clockwork.ebms.processor.EbMSProcessingException;
 import nl.clockwork.ebms.signing.EbMSSignatureGenerator;
 import nl.clockwork.ebms.util.CPAUtils;
@@ -130,7 +130,7 @@ public class ProcessEbMSEvents implements Job
   private EbMSDAO ebMSDAO;
 	private EbMSSignatureGenerator signatureGenerator;
   private EbMSClient ebMSClient;
-	private EbMSMessageProcessorImpl messageProcessor;
+	private EbMSMessageProcessor messageProcessor;
 
 	public void init()
 	{
@@ -199,7 +199,7 @@ public class ProcessEbMSEvents implements Job
 		this.ebMSClient = ebMSClient;
 	}
 
-  public void setMessageProcessor(EbMSMessageProcessorImpl messageProcessor)
+  public void setMessageProcessor(EbMSMessageProcessor messageProcessor)
 	{
 		this.messageProcessor = messageProcessor;
 	}
