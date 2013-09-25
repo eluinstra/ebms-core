@@ -42,6 +42,7 @@ import javax.xml.xpath.XPathExpressionException;
 
 import nl.clockwork.ebms.Constants;
 import nl.clockwork.ebms.Constants.EbMSAction;
+import nl.clockwork.ebms.Constants.EbMSEventType;
 import nl.clockwork.ebms.Constants.EbMSMessageStatus;
 import nl.clockwork.ebms.common.XMLMessageBuilder;
 import nl.clockwork.ebms.common.util.DOMUtils;
@@ -51,7 +52,7 @@ import nl.clockwork.ebms.model.EbMSDocument;
 import nl.clockwork.ebms.model.EbMSMessage;
 import nl.clockwork.ebms.model.EbMSMessageContent;
 import nl.clockwork.ebms.model.EbMSMessageContext;
-import nl.clockwork.ebms.model.EbMSSendEvent;
+import nl.clockwork.ebms.model.EbMSEvent;
 import nl.clockwork.ebms.xml.EbMSNamespaceMapper;
 
 import org.apache.commons.io.IOUtils;
@@ -321,7 +322,7 @@ public class EbMSMessageUtils
 		ErrorList result = new ErrorList();
 		result.setVersion(Constants.EBMS_VERSION);
 		result.setMustUnderstand(true);
-		result.setHighestSeverity(SeverityType.WARNING);
+		result.setHighestSeverity(SeverityType.ERROR);
 		return result;
 	}
 	
@@ -473,14 +474,14 @@ public class EbMSMessageUtils
 		return new EbMSMessageContent(new EbMSMessageContext(message.getMessageHeader()),dataSources);
 	}
 
-	public static EbMSSendEvent getEbMSSendEvent(long id, MessageHeader messageHeader)
+	public static EbMSEvent getEbMSSendEvent(long id, MessageHeader messageHeader)
 	{
-		return new EbMSSendEvent(id,messageHeader.getMessageData().getTimestamp().toGregorianCalendar().getTime());
+		return new EbMSEvent(id,messageHeader.getMessageData().getTimestamp().toGregorianCalendar().getTime(),EbMSEventType.SEND);
 	}
 
-	public static List<EbMSSendEvent> getEbMSSendEvents(CollaborationProtocolAgreement cpa, long id, MessageHeader messageHeader)
+	public static List<EbMSEvent> getEbMSSendEvents(CollaborationProtocolAgreement cpa, long id, MessageHeader messageHeader)
 	{
-		List<EbMSSendEvent> result = new ArrayList<EbMSSendEvent>();
+		List<EbMSEvent> result = new ArrayList<EbMSEvent>();
 		Date sendTime = messageHeader.getMessageData().getTimestamp().toGregorianCalendar().getTime();
 		PartyInfo partyInfo = CPAUtils.getPartyInfo(cpa,messageHeader.getFrom().getPartyId());
 		DeliveryChannel deliveryChannel = CPAUtils.getSendingDeliveryChannel(partyInfo,messageHeader.getFrom().getRole(),messageHeader.getService(),messageHeader.getAction());
@@ -489,12 +490,12 @@ public class EbMSMessageUtils
 			ReliableMessaging rm = CPAUtils.getReliableMessaging(cpa,deliveryChannel);
 			for (int i = 0; i < rm.getRetries().intValue() + 1; i++)
 			{
-				result.add(new EbMSSendEvent(id,(Date)sendTime.clone()));
+				result.add(new EbMSEvent(id,(Date)sendTime.clone(),EbMSEventType.SEND));
 				rm.getRetryInterval().addTo(sendTime);
 			}
 		}
 		else
-			result.add(new EbMSSendEvent(id,(Date)sendTime.clone()));
+			result.add(new EbMSEvent(id,(Date)sendTime.clone(),EbMSEventType.SEND));
 		return result;
 	}
 

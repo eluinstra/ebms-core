@@ -44,10 +44,11 @@ CREATE TABLE ebms_attachment
 
 --ALTER TABLE ebms_attachment ADD CONSTRAINT uc_ebms_attachment UNIQUE (ebms_message_id,content_id);
 
-CREATE TABLE ebms_send_event
+CREATE TABLE ebms_event
 (
 	ebms_message_id		INTEGER					NOT NULL,
 	time							TIMESTAMP				DEFAULT NOW() NOT NULL,
+	type							INTEGER					NOT NULL,
 	status						INTEGER					DEFAULT 0 NOT NULL,
 	status_time				TIMESTAMP				DEFAULT NOW() NOT NULL,
 	error_message			CLOB						NULL,

@@ -17,25 +17,34 @@ package nl.clockwork.ebms.model;
 
 import java.util.Date;
 
-public class EbMSSendEvent
+import nl.clockwork.ebms.Constants.EbMSEventType;
+
+public class EbMSEvent
 {
 	private Long ebMSMessageId;
 	private Date time;
+	private EbMSEventType type;
 
-	public EbMSSendEvent(Long ebMSMessageId, Date time)
+	public EbMSEvent(Long ebMSMessageId, Date time, EbMSEventType type)
 	{
 		this.ebMSMessageId = ebMSMessageId;
 		this.time = time;
+		this.type = type;
 	}
 
 	public Long getEbMSMessageId()
 	{
 		return ebMSMessageId;
 	}
-	
+
 	public Date getTime()
 	{
 		return time;
+	}
+
+	public EbMSEventType getType()
+	{
+		return type;
 	}
 
 }

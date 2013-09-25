@@ -33,6 +33,7 @@ import javax.xml.namespace.QName;
 import nl.clockwork.ebms.Constants;
 import nl.clockwork.ebms.Constants.EbMSAction;
 import nl.clockwork.ebms.Constants.EbMSEventStatus;
+import nl.clockwork.ebms.Constants.EbMSEventType;
 import nl.clockwork.ebms.Constants.EbMSMessageStatus;
 import nl.clockwork.ebms.common.XMLMessageBuilder;
 import nl.clockwork.ebms.dao.DAOException;
@@ -41,7 +42,7 @@ import nl.clockwork.ebms.dao.EbMSDAO;
 import nl.clockwork.ebms.model.EbMSAttachment;
 import nl.clockwork.ebms.model.EbMSMessage;
 import nl.clockwork.ebms.model.EbMSMessageContext;
-import nl.clockwork.ebms.model.EbMSSendEvent;
+import nl.clockwork.ebms.model.EbMSEvent;
 
 import org.apache.commons.io.IOUtils;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CollaborationProtocolAgreement;
@@ -498,23 +499,23 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	}
 
 	@Override
-	public List<EbMSSendEvent> getLatestEventsByEbMSMessageIdBefore(Date timestamp, EbMSEventStatus status) throws DAOException
+	public List<EbMSEvent> getLatestEventsByEbMSMessageIdBefore(Date timestamp, EbMSEventStatus status) throws DAOException
 	{
 		try
 		{
 			return jdbcTemplate.query(
-				"select ebms_message_id, max(time) as time" +
+				"select ebms_message_id, max(time) as time, type" +
 				" from ebms_send_event" +
 				" where status = ?" +
 				" and time <= ?" +
 				" group by ebms_message_id" +
 				" order by time asc",
-				new ParameterizedRowMapper<EbMSSendEvent>()
+				new ParameterizedRowMapper<EbMSEvent>()
 				{
 					@Override
-					public EbMSSendEvent mapRow(ResultSet rs, int rowNum) throws SQLException
+					public EbMSEvent mapRow(ResultSet rs, int rowNum) throws SQLException
 					{
-						return new EbMSSendEvent(rs.getLong("ebms_message_id"),rs.getTimestamp("time"));
+						return new EbMSEvent(rs.getLong("ebms_message_id"),rs.getTimestamp("time"),EbMSEventType.values()[rs.getInt("type")]);
 					}
 				},
 				status.id(),
@@ -528,7 +529,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	}
 	
 	@Override
-	public void updateSendEvent(Date timestamp, Long ebMSMessageId, EbMSEventStatus status, String errorMessage) throws DAOException
+	public void updateEvent(Date timestamp, Long ebMSMessageId, EbMSEventStatus status, String errorMessage) throws DAOException
 	{
 		try
 		{
@@ -870,16 +871,18 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	}
 
 	@Override
-	public void insertSendEvent(long id) throws DAOException
+	public void insertEvent(long id, EbMSEventType type) throws DAOException
 	{
 		try
 		{
 			jdbcTemplate.update
 			(
-				"insert into ebms_send_event (" +
-					"ebms_message_id" +
-				") values (?)",
-				id
+				"insert into ebms_event (" +
+					"ebms_message_id," +
+					"type" +
+				") values (?,?)",
+				id,
+				type.id()
 			);
 		}
 		catch (DataAccessException e)
@@ -889,7 +892,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	}
 	
 	@Override
-	public void insertSendEvent(EbMSSendEvent sendEvent) throws DAOException
+	public void insertEvent(EbMSEvent sendEvent) throws DAOException
 	{
 		try
 		{
@@ -898,11 +901,13 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 				(
 					"insert into ebms_send_event (" +
 						"ebms_message_id," +
-						"time" +
-					") values (?,?)",
+						"time," +
+						"type" +
+					") values (?,?,?)",
 					sendEvent.getEbMSMessageId(),
-					//String.format(getDateFormat(),sendEvent.getTime())
-					sendEvent.getTime()
+					//String.format(getDateFormat(),sendEvent.getTime()),
+					sendEvent.getTime(),
+					sendEvent.getType().id()
 				);
 		}
 		catch (DataAccessException e)
@@ -912,20 +917,21 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	}
 
 	@Override
-	public void insertSendEvents(final List<EbMSSendEvent> sendEvents) throws DAOException
+	public void insertEvents(final List<EbMSEvent> sendEvents) throws DAOException
 	{
 		try
 		{
 			//List<Object[]> events = new ArrayList<Object[]>();
-			//for (EbMSSendEvent sendEvent : sendEvents)
+			//for (EbMSEvent sendEvent : sendEvents)
 				////events.add(new Object[]{sendEvent.getEbMSMessageId(),String.format(getDateFormat(),sendEvent.getTime())});
 				//events.add(new Object[]{sendEvent.getEbMSMessageId(),sendEvent.getTime()});
 			jdbcTemplate.batchUpdate
 			(
 				"insert into ebms_send_event (" +
 					"ebms_message_id," +
-					"time" +
-				") values (?,?)",
+					"time," +
+					"type" +
+				") values (?,?,?)",
 				//events
 				new BatchPreparedStatementSetter()
 				{
@@ -935,6 +941,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 						ps.setLong(1,sendEvents.get(i).getEbMSMessageId());
 						//ps.setTimestamp(2,String.format(getDateFormat(),sendEvents.get(i).getTime()));
 						ps.setTimestamp(2,new Timestamp(sendEvents.get(i).getTime().getTime()));
+						ps.setInt(3,sendEvents.get(i).getType().id());
 					}
 					
 					@Override
@@ -952,7 +959,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	}
 
 	@Override
-	public void deleteSendEvents(Long ebMSMessageId, EbMSEventStatus status) throws DAOException
+	public void deleteEvents(Long ebMSMessageId, EbMSEventStatus status) throws DAOException
 	{
 		try
 		{

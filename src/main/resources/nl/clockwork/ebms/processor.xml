@@ -34,6 +34,8 @@
 		<property name="ebMSClient" ref="ebMSClient"/>
 	</bean>
 
+	<bean id="eventListener" class="nl.clockwork.ebms.LoggingEventListener"/>
+
 	<bean id="messageQueue" class="nl.clockwork.ebms.client.EbMSMessageQueue" init-method="init">
 		<property name="maxEntries" value="${messageQueue.maxEntries}"/>
 		<property name="timeout" value="${messageQueue.timeout}"/>
@@ -43,8 +45,9 @@
 		<property name="messageProcessor" ref="messageProcessor"/>
 	</bean>
 
-	<bean id="messageProcessor" class="nl.clockwork.ebms.processor.EbMSMessageProcessorImpl" init-method="init">
+	<bean id="messageProcessor" class="nl.clockwork.ebms.processor.EbMSMessageProcessor" init-method="init">
 		<property name="deliveryManager" ref="deliveryManager"/>
+		<property name="eventListener" ref="eventListener"/>
 		<property name="ebMSDAO" ref="ebMSDAO"/>
 		<property name="signatureValidator" ref="signatureValidator"/>
 	</bean>
@@ -60,13 +63,13 @@
 		<property name="jobs">
 			<list>
 				<ref bean="processSendEventsJob"/>
-				<!--ref bean="processEbMSMessagesJob"/-->
 			</list>
 		</property>
 	</bean>
 
-	<bean id="processSendEventsJob" class="nl.clockwork.ebms.job.ProcessSendEvents" init-method="init">
+	<bean id="processSendEventsJob" class="nl.clockwork.ebms.job.ProcessEbMSEvents" init-method="init">
 		<property name="maxThreads" value="${job.maxTreads}"/>
+		<property name="eventListener" ref="eventListener"/>
 		<property name="ebMSDAO" ref="ebMSDAO"/>
 		<property name="signatureGenerator" ref="signatureGenerator"/>
 		<property name="ebMSClient" ref="ebMSClient"/>
@@ -103,14 +106,6 @@
 		<property name="allowedCipherSuites" value="${https.allowedCipherSuites}"/>
 		<property name="requireClientAuthentication" value="${https.requireClientAuthentication}"/>
 		<property name="verifyHostnames" value="${https.verifyHostnames}"></property>
-	</bean>
-
-	<bean id="processEbMSMessagesJob" class="nl.clockwork.ebms.job.ProcessEbMSMessages" init-method="init">
-		<property name="maxThreads" value="${job.maxTreads}"/>
-		<property name="messageService" ref="ebMSMessageService"/>
-		<property name="processMessageCallback">
-			<bean class="nl.clockwork.ebms.processor.ProcessEbMSMessageCallbackImpl"/>
-		</property>
 	</bean>
 
 </beans>

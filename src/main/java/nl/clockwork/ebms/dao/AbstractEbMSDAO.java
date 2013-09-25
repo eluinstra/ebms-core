@@ -34,12 +34,13 @@ import javax.xml.namespace.QName;
 import nl.clockwork.ebms.Constants;
 import nl.clockwork.ebms.Constants.EbMSAction;
 import nl.clockwork.ebms.Constants.EbMSEventStatus;
+import nl.clockwork.ebms.Constants.EbMSEventType;
 import nl.clockwork.ebms.Constants.EbMSMessageStatus;
 import nl.clockwork.ebms.common.XMLMessageBuilder;
 import nl.clockwork.ebms.model.EbMSAttachment;
 import nl.clockwork.ebms.model.EbMSMessage;
 import nl.clockwork.ebms.model.EbMSMessageContext;
-import nl.clockwork.ebms.model.EbMSSendEvent;
+import nl.clockwork.ebms.model.EbMSEvent;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
@@ -557,16 +558,16 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	}
 
 	@Override
-	public List<EbMSSendEvent> getLatestEventsByEbMSMessageIdBefore(Date timestamp, EbMSEventStatus status) throws DAOException
+	public List<EbMSEvent> getLatestEventsByEbMSMessageIdBefore(Date timestamp, EbMSEventStatus status) throws DAOException
 	{
 		Connection c = null;
 		PreparedStatement ps = null;
 		try
 		{
-			List<EbMSSendEvent> result = new ArrayList<EbMSSendEvent>();
+			List<EbMSEvent> result = new ArrayList<EbMSEvent>();
 			c = connectionManager.getConnection();
 			ps = c.prepareStatement(
-				"select ebms_message_id, max(time) as time" +
+				"select ebms_message_id, max(time) as time, type" +
 				" from ebms_send_event" +
 				" where status = ?" +
 				" and time <= ?" +
@@ -579,7 +580,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 			{
 				ResultSet rs = ps.getResultSet();
 				if (rs.next())
-					result.add(new EbMSSendEvent(rs.getLong("ebms_message_id"),rs.getTimestamp("time")));
+					result.add(new EbMSEvent(rs.getLong("ebms_message_id"),rs.getTimestamp("time"),EbMSEventType.values()[rs.getInt("type")]));
 			}
 			return result;
 		}
@@ -595,7 +596,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	}
 	
 	@Override
-	public void updateSendEvent(Date timestamp, Long ebMSMessageId, EbMSEventStatus status, String errorMessage) throws DAOException
+	public void updateEvent(Date timestamp, Long ebMSMessageId, EbMSEventStatus status, String errorMessage) throws DAOException
 	{
 		Connection c = null;
 		PreparedStatement ps = null;
@@ -940,7 +941,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	}
 
 	@Override
-	public void insertSendEvent(long ebMSMessageId) throws DAOException
+	public void insertEvent(long ebMSMessageId, EbMSEventType type) throws DAOException
 	{
 		Connection c = null;
 		PreparedStatement ps = null;
@@ -949,10 +950,12 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 			c = connectionManager.getConnection();
 			ps  = c.prepareStatement(
 				"insert into ebms_send_event (" +
-					"ebms_message_id" +
-				") values (?)"
+					"ebms_message_id," +
+					"type" +
+				") values (?,?)"
 			);
 			ps.setLong(1,ebMSMessageId);
+			ps.setInt(2,type.id());
 			ps.executeUpdate();
 		}
 		catch (SQLException e)
@@ -967,7 +970,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	}
 	
 	@Override
-	public void insertSendEvent(EbMSSendEvent sendEvent) throws DAOException
+	public void insertEvent(EbMSEvent sendEvent) throws DAOException
 	{
 		//if (sendEvent != null)
 		Connection c = null;
@@ -978,12 +981,14 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 			ps  = c.prepareStatement(
 				"insert into ebms_send_event (" +
 					"ebms_message_id," +
-					"time" +
-				") values (?,?)"
+					"time," +
+					"type" +
+				") values (?,?,?)"
 			);
 			ps.setLong(1,sendEvent.getEbMSMessageId());
 			//ps.setTimestamp(2,String.format(getDateFormat(),sendEvent.getTime()));
 			ps.setTimestamp(2,new Timestamp(sendEvent.getTime().getTime()));
+			ps.setInt(3,sendEvent.getType().id());
 			ps.executeUpdate();
 		}
 		catch (SQLException e)
@@ -998,7 +1003,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	}
 
 	@Override
-	public void insertSendEvents(List<EbMSSendEvent> sendEvents) throws DAOException
+	public void insertEvents(List<EbMSEvent> sendEvents) throws DAOException
 	{
 		Connection c = null;
 		PreparedStatement ps = null;
@@ -1008,13 +1013,15 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 			ps  = c.prepareStatement(
 				"insert into ebms_send_event (" +
 					"ebms_message_id," +
-					"time" +
-				") values (?,?)"
+					"time," +
+					"type" +
+				") values (?,?,?)"
 			);
-			for (EbMSSendEvent sendEvent : sendEvents)
+			for (EbMSEvent sendEvent : sendEvents)
 			{
 				ps.setLong(1,sendEvent.getEbMSMessageId());
 				ps.setTimestamp(2,new Timestamp(sendEvent.getTime().getTime()));
+				ps.setInt(3,sendEvent.getType().id());
 				ps.addBatch();
 			}
 			if (sendEvents.size() > 0)
@@ -1032,7 +1039,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	}
 
 	@Override
-	public void deleteSendEvents(Long ebMSMessageId, EbMSEventStatus status) throws DAOException
+	public void deleteEvents(Long ebMSMessageId, EbMSEventStatus status) throws DAOException
 	{
 		Connection c = null;
 		PreparedStatement ps = null;
