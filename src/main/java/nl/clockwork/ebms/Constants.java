@@ -21,7 +21,7 @@ public class Constants
 {
   public static enum EbMSMessageStatus
   {
-		UNAUTHORIZED(0,MessageStatusType.UN_AUTHORIZED), NOT_RECOGNIZED(1,MessageStatusType.NOT_RECOGNIZED), RECEIVED(2,MessageStatusType.RECEIVED), PROCESSED(3,MessageStatusType.PROCESSED), FORWARDED(4,MessageStatusType.FORWARDED), FAILED(5,MessageStatusType.RECEIVED), DELIVERY_ACKNOWLEDGED(10), DELIVERY_FAILED(11);
+		UNAUTHORIZED(0,MessageStatusType.UN_AUTHORIZED), NOT_RECOGNIZED(1,MessageStatusType.NOT_RECOGNIZED), RECEIVED(2,MessageStatusType.RECEIVED), PROCESSED(3,MessageStatusType.PROCESSED), FORWARDED(4,MessageStatusType.FORWARDED), FAILED(5,MessageStatusType.RECEIVED), /*WAITING(6,MessageStatusType.RECEIVED), */ACKNOWLEDGED(10), DELIVERY_FAILED(11), NOT_ACKNOWLEDGED(12);
 
 		private final int id;
 		private final MessageStatusType statusCode;
@@ -81,6 +81,17 @@ public class Constants
 		public final String action() { return action; }
 
   };
+
+  public static enum EbMSEventType
+  {
+		SEND(0), EXPIRE(1);
+
+		private final int id;
+
+		EbMSEventType(int id) { this.id = id; }
+
+		public final int id() { return id; }
+ }
 
   public static enum EbMSEventStatus
   {
