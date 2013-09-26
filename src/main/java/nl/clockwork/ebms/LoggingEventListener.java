@@ -29,7 +29,7 @@ public class LoggingEventListener implements EventListener
 	}
 
 	@Override
-	public void onMessageDelivered(String messageId) throws EventException
+	public void onMessageAcknowledged(String messageId) throws EventException
 	{
 		logger.info("Message acknowledged. MessageId " + messageId);
 	}
@@ -41,7 +41,7 @@ public class LoggingEventListener implements EventListener
 	}
 
 	@Override
-	public void onMessageNotDelivered(String messageId) throws EventException
+	public void onMessageNotAcknowledged(String messageId) throws EventException
 	{
 		logger.info("Message not acknowledged. MessageId " + messageId);
 	}

@@ -107,7 +107,7 @@ public class ProcessEbMSEvents implements Job
 							updateEvent(event,EbMSEventStatus.PROCESSED,null);
 							ebMSDAO.deleteEvents(event.getEbMSMessageId(),EbMSEventStatus.UNPROCESSED);
 							ebMSDAO.updateMessageStatus(event.getEbMSMessageId(),null,EbMSMessageStatus.NOT_ACKNOWLEDGED);
-							eventListener.onMessageNotDelivered(message.getMessageHeader().getMessageData().getMessageId());
+							eventListener.onMessageNotAcknowledged(message.getMessageHeader().getMessageData().getMessageId());
 						}
 					}
 				);

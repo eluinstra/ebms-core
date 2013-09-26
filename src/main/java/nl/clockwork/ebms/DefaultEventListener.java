@@ -23,7 +23,7 @@ public class DefaultEventListener implements EventListener
 	}
 
 	@Override
-	public void onMessageDelivered(String messageId) throws EventException
+	public void onMessageAcknowledged(String messageId) throws EventException
 	{
 	}
 	
@@ -33,7 +33,7 @@ public class DefaultEventListener implements EventListener
 	}
 
 	@Override
-	public void onMessageNotDelivered(String messageId) throws EventException
+	public void onMessageNotAcknowledged(String messageId) throws EventException
 	{
 	}
 }

@@ -18,7 +18,7 @@ package nl.clockwork.ebms;
 public interface EventListener
 {
 	void onMessageReceived(String messageId) throws EventException;
-	void onMessageDelivered(String messageId) throws EventException;
+	void onMessageAcknowledged(String messageId) throws EventException;
 	void onMessageDeliveryFailed(String messageId) throws EventException;
-	void onMessageNotDelivered(String messageId) throws EventException;
+	void onMessageNotAcknowledged(String messageId) throws EventException;
 }

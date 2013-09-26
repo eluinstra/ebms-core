@@ -380,7 +380,7 @@ public class EbMSMessageProcessor
 							ebMSDAO.deleteEvents(id,EbMSEventStatus.UNPROCESSED);
 							ebMSDAO.updateMessageStatus(id,null,status);
 							if (status.equals(EbMSMessageStatus.ACKNOWLEDGED))
-								eventListener.onMessageDelivered(message.getMessageHeader().getMessageData().getRefToMessageId());
+								eventListener.onMessageAcknowledged(message.getMessageHeader().getMessageData().getRefToMessageId());
 							else if (status.equals(EbMSMessageStatus.DELIVERY_FAILED))
 								eventListener.onMessageDeliveryFailed(message.getMessageHeader().getMessageData().getRefToMessageId());
 						}
