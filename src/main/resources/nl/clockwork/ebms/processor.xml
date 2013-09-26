@@ -60,7 +60,6 @@
 		<property name="jobs">
 			<list>
 				<ref bean="processSendEventsJob"/>
-				<!--ref bean="processEbMSMessagesJob"/-->
 			</list>
 		</property>
 	</bean>
