@@ -32,7 +32,6 @@ import nl.clockwork.ebms.Constants.EbMSAction;
 import nl.clockwork.ebms.Constants.EbMSEventStatus;
 import nl.clockwork.ebms.Constants.EbMSEventType;
 import nl.clockwork.ebms.Constants.EbMSMessageStatus;
-import nl.clockwork.ebms.DefaultEventListener;
 import nl.clockwork.ebms.EventListener;
 import nl.clockwork.ebms.client.DeliveryManager;
 import nl.clockwork.ebms.dao.DAOException;
@@ -63,7 +62,7 @@ public class EbMSMessageProcessor
 {
   protected transient Log logger = LogFactory.getLog(getClass());
 	private DeliveryManager deliveryManager;
-	private EventListener eventListener = new DefaultEventListener();
+	private EventListener eventListener;
   private EbMSDAO ebMSDAO;
   private EbMSSignatureValidator signatureValidator;
 	private XSDValidator xsdValidator;
@@ -101,13 +100,11 @@ public class EbMSMessageProcessor
 			else if (EbMSAction.MESSAGE_ERROR.action().equals(message.getMessageHeader().getAction()))
 			{
 				process(timestamp,message,EbMSMessageStatus.DELIVERY_FAILED);
-				eventListener.onMessageNotDelivered(message.getMessageHeader().getMessageData().getRefToMessageId());
 				return null;
 			}
 			else if (EbMSAction.ACKNOWLEDGMENT.action().equals(message.getMessageHeader().getAction()))
 			{
-				process(timestamp,message,EbMSMessageStatus.DELIVERY_ACKNOWLEDGED);
-				eventListener.onMessageDelivered(message.getMessageHeader().getMessageData().getRefToMessageId());
+				process(timestamp,message,EbMSMessageStatus.ACKNOWLEDGED);
 				return null;
 			}
 			else if (EbMSAction.STATUS_REQUEST.action().equals(message.getMessageHeader().getAction()))
@@ -198,15 +195,9 @@ public class EbMSMessageProcessor
 				//final CollaborationProtocolAgreement cpa = ebMSDAO.getCPA(message.getMessageHeader().getCPAId());
 				if (Constants.EBMS_SERVICE_URI.equals(responseMessage.getMessageHeader().getService().getValue()))
 					if (EbMSAction.MESSAGE_ERROR.action().equals(responseMessage.getMessageHeader().getAction()))
-					{
 						process(timestamp,responseMessage,EbMSMessageStatus.DELIVERY_FAILED);
-						eventListener.onMessageNotDelivered(responseMessage.getMessageHeader().getMessageData().getRefToMessageId());
-					}
 					else if (EbMSAction.ACKNOWLEDGMENT.action().equals(responseMessage.getMessageHeader().getAction()))
-					{
-						process(timestamp,responseMessage,EbMSMessageStatus.DELIVERY_ACKNOWLEDGED);
-						eventListener.onMessageDelivered(responseMessage.getMessageHeader().getMessageData().getRefToMessageId());
-					}
+						process(timestamp,responseMessage,EbMSMessageStatus.ACKNOWLEDGED);
 			}
 		}
 		catch (ValidationException e)
@@ -370,6 +361,10 @@ public class EbMSMessageProcessor
 						{
 							ebMSDAO.deleteEvents(id,EbMSEventStatus.UNPROCESSED);
 							ebMSDAO.updateMessageStatus(id,null,status);
+							if (status.equals(EbMSMessageStatus.ACKNOWLEDGED))
+								eventListener.onMessageAcknowledged(message.getMessageHeader().getMessageData().getRefToMessageId());
+							else if (status.equals(EbMSMessageStatus.DELIVERY_FAILED))
+								eventListener.onMessageDeliveryFailed(message.getMessageHeader().getMessageData().getRefToMessageId());
 						}
 					}
 				}

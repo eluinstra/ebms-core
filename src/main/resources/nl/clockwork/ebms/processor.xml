@@ -34,6 +34,8 @@
 		<property name="ebMSClient" ref="ebMSClient"/>
 	</bean>
 
+	<bean id="eventListener" class="nl.clockwork.ebms.LoggingEventListener"/>
+
 	<bean id="messageQueue" class="nl.clockwork.ebms.client.EbMSMessageQueue" init-method="init">
 		<property name="maxEntries" value="${messageQueue.maxEntries}"/>
 		<property name="timeout" value="${messageQueue.timeout}"/>
@@ -43,8 +45,9 @@
 		<property name="messageProcessor" ref="messageProcessor"/>
 	</bean>
 
-	<bean id="messageProcessor" class="nl.clockwork.ebms.processor.EbMSMessageProcessorImpl" init-method="init">
+	<bean id="messageProcessor" class="nl.clockwork.ebms.processor.EbMSMessageProcessor" init-method="init">
 		<property name="deliveryManager" ref="deliveryManager"/>
+		<property name="eventListener" ref="eventListener"/>
 		<property name="ebMSDAO" ref="ebMSDAO"/>
 		<property name="signatureValidator" ref="signatureValidator"/>
 	</bean>
@@ -66,6 +69,7 @@
 
 	<bean id="processEventsJob" class="nl.clockwork.ebms.job.ProcessEvents" init-method="init">
 		<property name="maxThreads" value="${job.maxTreads}"/>
+		<property name="eventListener" ref="eventListener"/>
 		<property name="ebMSDAO" ref="ebMSDAO"/>
 		<property name="signatureGenerator" ref="signatureGenerator"/>
 		<property name="ebMSClient" ref="ebMSClient"/>
