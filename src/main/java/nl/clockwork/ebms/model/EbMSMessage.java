@@ -90,11 +90,6 @@ public class EbMSMessage
 		this(document,signature,messageHeader,null,null,null,null,acknowledgment,null,null,null,null);
 	}
 	
-	public EbMSMessage(MessageHeader messageHeader, SyncReply syncReply, ErrorList errorList, Acknowledgment acknowledgment)
-	{
-		this(messageHeader,syncReply,null,null,errorList,acknowledgment,null,null,null,null);
-	}
-	
 	public EbMSMessage(SignatureType signature, MessageHeader messageHeader, SyncReply syncReply, StatusRequest statusRequest)
 	{
 		this(signature,messageHeader,syncReply,null,null,null,null,null,statusRequest,null,null);

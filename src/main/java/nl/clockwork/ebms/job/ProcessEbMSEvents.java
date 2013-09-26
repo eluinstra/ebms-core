@@ -35,9 +35,7 @@ import nl.clockwork.ebms.model.EbMSEvent;
 import nl.clockwork.ebms.model.EbMSMessage;
 import nl.clockwork.ebms.processor.EbMSMessageProcessor;
 import nl.clockwork.ebms.processor.EbMSProcessingException;
-import nl.clockwork.ebms.signature.EbMSSignatureGenerator;
 import nl.clockwork.ebms.util.CPAUtils;
-import nl.clockwork.ebms.util.EbMSMessageUtils;
 
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.commons.logging.Log;
@@ -127,7 +125,6 @@ public class ProcessEbMSEvents implements Job
 	private int maxThreads = 4;
 	private EventListener eventListener;
   private EbMSDAO ebMSDAO;
-	private EbMSSignatureGenerator signatureGenerator;
   private EbMSClient ebMSClient;
 	private EbMSMessageProcessor messageProcessor;
 
@@ -186,11 +183,6 @@ public class ProcessEbMSEvents implements Job
   public void setEbMSDAO(EbMSDAO ebMSDAO)
 	{
 		this.ebMSDAO = ebMSDAO;
-	}
-
-	public void setSignatureGenerator(EbMSSignatureGenerator signatureGenerator)
-	{
-		this.signatureGenerator = signatureGenerator;
 	}
 
   public void setEbMSClient(EbMSClient ebMSClient)
