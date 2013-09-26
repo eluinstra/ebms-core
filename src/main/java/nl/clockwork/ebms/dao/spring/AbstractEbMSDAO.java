@@ -29,6 +29,7 @@ import javax.mail.util.ByteArrayDataSource;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.namespace.QName;
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
 import nl.clockwork.ebms.Constants;
@@ -72,6 +73,7 @@ import org.springframework.transaction.support.TransactionCallback;
 import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 import org.springframework.transaction.support.TransactionTemplate;
 import org.w3._2000._09.xmldsig.SignatureType;
+import org.xml.sax.SAXException;
 
 public abstract class AbstractEbMSDAO implements EbMSDAO
 {
@@ -83,11 +85,11 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 			try
 			{
 				if (!Constants.EBMS_SERVICE_URI.equals(rs.getString("service")))
-					return new EbMSMessage(XMLMessageBuilder.getInstance(SignatureType.class).handle(rs.getString("signature")),XMLMessageBuilder.getInstance(MessageHeader.class).handle(rs.getString("message_header")),XMLMessageBuilder.getInstance(AckRequested.class).handle(rs.getString("ack_requested")),XMLMessageBuilder.getInstance(Manifest.class).handle(rs.getString("content")),getAttachments(rs.getLong("id")));
+					return new EbMSMessage(DOMUtils.read(rs.getString("original")),XMLMessageBuilder.getInstance(SignatureType.class).handle(rs.getString("signature")),XMLMessageBuilder.getInstance(MessageHeader.class).handle(rs.getString("message_header")),XMLMessageBuilder.getInstance(AckRequested.class).handle(rs.getString("ack_requested")),XMLMessageBuilder.getInstance(Manifest.class).handle(rs.getString("content")),getAttachments(rs.getLong("id")));
 				else if (EbMSAction.MESSAGE_ERROR.action().equals(rs.getString("action")))
-					return new EbMSMessage(XMLMessageBuilder.getInstance(SignatureType.class).handle(rs.getString("signature")),XMLMessageBuilder.getInstance(MessageHeader.class).handle(rs.getString("message_header")),XMLMessageBuilder.getInstance(ErrorList.class).handle(rs.getString("content")));
+					return new EbMSMessage(DOMUtils.read(rs.getString("original")),XMLMessageBuilder.getInstance(SignatureType.class).handle(rs.getString("signature")),XMLMessageBuilder.getInstance(MessageHeader.class).handle(rs.getString("message_header")),XMLMessageBuilder.getInstance(ErrorList.class).handle(rs.getString("content")));
 				else if (EbMSAction.ACKNOWLEDGMENT.action().equals(rs.getString("action")))
-					return new EbMSMessage(XMLMessageBuilder.getInstance(SignatureType.class).handle(rs.getString("signature")),XMLMessageBuilder.getInstance(MessageHeader.class).handle(rs.getString("message_header")),XMLMessageBuilder.getInstance(Acknowledgment.class).handle(rs.getString("content")));
+					return new EbMSMessage(DOMUtils.read(rs.getString("original")),XMLMessageBuilder.getInstance(SignatureType.class).handle(rs.getString("signature")),XMLMessageBuilder.getInstance(MessageHeader.class).handle(rs.getString("message_header")),XMLMessageBuilder.getInstance(Acknowledgment.class).handle(rs.getString("content")));
 				else if (EbMSAction.STATUS_REQUEST.action().equals(rs.getString("action")))
 					return new EbMSMessage(XMLMessageBuilder.getInstance(SignatureType.class).handle(rs.getString("signature")),XMLMessageBuilder.getInstance(MessageHeader.class).handle(rs.getString("message_header")),null,XMLMessageBuilder.getInstance(StatusRequest.class).handle(rs.getString("content")));
 				else if (EbMSAction.STATUS_RESPONSE.action().equals(rs.getString("action")))
@@ -99,11 +101,19 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 				else
 					return null;
 			}
-			catch (JAXBException e)
+			catch (ParserConfigurationException e)
 			{
 				throw new SQLException(e);
 			}
-			catch (DAOException e)
+			catch (SAXException e)
+			{
+				throw new SQLException(e);
+			}
+			catch (IOException e)
+			{
+				throw new SQLException(e);
+			}
+			catch (JAXBException e)
 			{
 				throw new SQLException(e);
 			}
@@ -340,7 +350,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 		try
 		{
 			return jdbcTemplate.queryForObject(
-				"select id, service, action, signature, message_header, ack_requested, content" +
+				"select id, service, action, original, signature, message_header, ack_requested, content" +
 				" from ebms_message" +
 				" where ref_to_message_id = ?" +
 				" and message_nr = 0" +
@@ -423,7 +433,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 		try
 		{
 			return jdbcTemplate.queryForObject(
-				"select id, service, action, signature, message_header, ack_requested, content" + 
+				"select id, service, action, original, signature, message_header, ack_requested, content" + 
 				" from ebms_message" + 
 				" where id = ?",
 				new EbMSMessageParameterizedRowMapper(),
@@ -1107,7 +1117,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 		try
 		{
 			return jdbcTemplate.queryForObject(
-				"select id, service, action, signature, message_header, ack_requested, content" + 
+				"select id, service, action, original, signature, message_header, ack_requested, content" + 
 				" from ebms_message" + 
 				" where message_id = ?" +
 				" and message_nr = 0",

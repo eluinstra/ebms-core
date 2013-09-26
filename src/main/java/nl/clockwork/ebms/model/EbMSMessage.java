@@ -47,17 +47,17 @@ public class EbMSMessage
 
 	public EbMSMessage(MessageHeader messageHeader, AckRequested ackRequested, Manifest manifest, List<EbMSAttachment> attachments)
 	{
-		this(null,messageHeader,null,null,ackRequested,manifest,attachments);
+		this(null,null,messageHeader,null,null,ackRequested,manifest,attachments);
 	}
 	
-	public EbMSMessage(SignatureType signature, MessageHeader messageHeader, AckRequested ackRequested, Manifest manifest, List<EbMSAttachment> attachments)
+	public EbMSMessage(Document document, SignatureType signature, MessageHeader messageHeader, AckRequested ackRequested, Manifest manifest, List<EbMSAttachment> attachments)
 	{
-		this(signature,messageHeader,null,null,ackRequested,manifest,attachments);
+		this(document,signature,messageHeader,null,null,ackRequested,manifest,attachments);
 	}
 	
-	public EbMSMessage(SignatureType signature, MessageHeader messageHeader, SyncReply syncReply, MessageOrder messageOrder, AckRequested ackRequested, Manifest manifest, List<EbMSAttachment> attachments)
+	public EbMSMessage(Document document, SignatureType signature, MessageHeader messageHeader, SyncReply syncReply, MessageOrder messageOrder, AckRequested ackRequested, Manifest manifest, List<EbMSAttachment> attachments)
 	{
-		this(signature,messageHeader,syncReply,messageOrder,ackRequested,null,null,manifest,null,null,attachments);
+		this(document,signature,messageHeader,syncReply,messageOrder,ackRequested,null,null,manifest,null,null,attachments);
 	}
 	
 	public EbMSMessage(MessageHeader messageHeader)
@@ -75,9 +75,9 @@ public class EbMSMessage
 		this(null,messageHeader,null,null,null,errorList,null,null,null,null,null);
 	}
 	
-	public EbMSMessage(SignatureType signature, MessageHeader messageHeader, ErrorList errorList)
+	public EbMSMessage(Document document, SignatureType signature, MessageHeader messageHeader, ErrorList errorList)
 	{
-		this(signature,messageHeader,null,null,null,errorList,null,null,null,null,null);
+		this(document,signature,messageHeader,null,null,null,errorList,null,null,null,null,null);
 	}
 	
 	public EbMSMessage(MessageHeader messageHeader, Acknowledgment acknowledgment)
@@ -85,9 +85,9 @@ public class EbMSMessage
 		this(null,messageHeader,null,null,null,null,acknowledgment,null,null,null,null);
 	}
 	
-	public EbMSMessage(SignatureType signature, MessageHeader messageHeader, Acknowledgment acknowledgment)
+	public EbMSMessage(Document document, SignatureType signature, MessageHeader messageHeader, Acknowledgment acknowledgment)
 	{
-		this(signature,messageHeader,null,null,null,null,acknowledgment,null,null,null,null);
+		this(document,signature,messageHeader,null,null,null,null,acknowledgment,null,null,null,null);
 	}
 	
 	public EbMSMessage(MessageHeader messageHeader, SyncReply syncReply, ErrorList errorList, Acknowledgment acknowledgment)

@@ -30,6 +30,7 @@ import javax.mail.util.ByteArrayDataSource;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.namespace.QName;
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
 import nl.clockwork.ebms.Constants;
@@ -59,6 +60,7 @@ import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.StatusRequest;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.StatusResponse;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.SyncReply;
 import org.w3._2000._09.xmldsig.SignatureType;
+import org.xml.sax.SAXException;
 
 public abstract class AbstractEbMSDAO implements EbMSDAO
 {
@@ -415,7 +417,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 			EbMSMessage result = null;
 			c = connectionManager.getConnection();
 			ps  = c.prepareStatement(
-				"select id, service, action, signature, message_header, ack_requested, content" +
+				"select id, service, action, original, signature, message_header, ack_requested, content" +
 				" from ebms_message" +
 				" where ref_to_message_id = ?" +
 				" and message_nr = 0" +
@@ -433,6 +435,18 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 			return result;
 		}
 		catch (SQLException e)
+		{
+			throw new DAOException(e);
+		}
+		catch (ParserConfigurationException e)
+		{
+			throw new DAOException(e);
+		}
+		catch (SAXException e)
+		{
+			throw new DAOException(e);
+		}
+		catch (IOException e)
 		{
 			throw new DAOException(e);
 		}
@@ -496,7 +510,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 			EbMSMessage result = null;
 			c = connectionManager.getConnection();
 			ps = c.prepareStatement(
-				"select id, service, action, signature, message_header, ack_requested, content" + 
+				"select id, service, action, original, signature, message_header, ack_requested, content" + 
 				" from ebms_message" + 
 				" where id = ?"
 			);
@@ -510,6 +524,18 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 			return result;
 		}
 		catch (SQLException e)
+		{
+			throw new DAOException(e);
+		}
+		catch (ParserConfigurationException e)
+		{
+			throw new DAOException(e);
+		}
+		catch (SAXException e)
+		{
+			throw new DAOException(e);
+		}
+		catch (IOException e)
 		{
 			throw new DAOException(e);
 		}
@@ -1170,7 +1196,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 			EbMSMessage result = null;
 			c = connectionManager.getConnection();
 			ps = c.prepareStatement(
-				"select id, service, action, signature, message_header, ack_requested, content" + 
+				"select id, service, action, original, signature, message_header, ack_requested, content" + 
 				" from ebms_message" + 
 				" where message_id = ?" +
 				" and message_nr = 0"
@@ -1185,6 +1211,18 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 			return result;
 		}
 		catch (SQLException e)
+		{
+			throw new DAOException(e);
+		}
+		catch (ParserConfigurationException e)
+		{
+			throw new DAOException(e);
+		}
+		catch (SAXException e)
+		{
+			throw new DAOException(e);
+		}
+		catch (IOException e)
 		{
 			throw new DAOException(e);
 		}
@@ -1359,14 +1397,14 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 		}
 	}
 	
-	protected EbMSMessage getEbMSMessage(ResultSet rs) throws DAOException, SQLException, JAXBException
+	protected EbMSMessage getEbMSMessage(ResultSet rs) throws SQLException, ParserConfigurationException, SAXException, IOException, JAXBException
 	{
 		if (!Constants.EBMS_SERVICE_URI.equals(rs.getString("service")))
-			return new EbMSMessage(XMLMessageBuilder.getInstance(SignatureType.class).handle(rs.getString("signature")),XMLMessageBuilder.getInstance(MessageHeader.class).handle(rs.getString("message_header")),XMLMessageBuilder.getInstance(AckRequested.class).handle(rs.getString("ack_requested")),XMLMessageBuilder.getInstance(Manifest.class).handle(rs.getString("content")),getAttachments(rs.getLong("id")));
+			return new EbMSMessage(DOMUtils.read(rs.getString("original")),XMLMessageBuilder.getInstance(SignatureType.class).handle(rs.getString("signature")),XMLMessageBuilder.getInstance(MessageHeader.class).handle(rs.getString("message_header")),XMLMessageBuilder.getInstance(AckRequested.class).handle(rs.getString("ack_requested")),XMLMessageBuilder.getInstance(Manifest.class).handle(rs.getString("content")),getAttachments(rs.getLong("id")));
 		else if (EbMSAction.MESSAGE_ERROR.action().equals(rs.getString("action")))
-			return new EbMSMessage(XMLMessageBuilder.getInstance(SignatureType.class).handle(rs.getString("signature")),XMLMessageBuilder.getInstance(MessageHeader.class).handle(rs.getString("message_header")),XMLMessageBuilder.getInstance(ErrorList.class).handle(rs.getString("content")));
+			return new EbMSMessage(DOMUtils.read(rs.getString("original")),XMLMessageBuilder.getInstance(SignatureType.class).handle(rs.getString("signature")),XMLMessageBuilder.getInstance(MessageHeader.class).handle(rs.getString("message_header")),XMLMessageBuilder.getInstance(ErrorList.class).handle(rs.getString("content")));
 		else if (EbMSAction.ACKNOWLEDGMENT.action().equals(rs.getString("action")))
-			return new EbMSMessage(XMLMessageBuilder.getInstance(SignatureType.class).handle(rs.getString("signature")),XMLMessageBuilder.getInstance(MessageHeader.class).handle(rs.getString("message_header")),XMLMessageBuilder.getInstance(Acknowledgment.class).handle(rs.getString("content")));
+			return new EbMSMessage(DOMUtils.read(rs.getString("original")),XMLMessageBuilder.getInstance(SignatureType.class).handle(rs.getString("signature")),XMLMessageBuilder.getInstance(MessageHeader.class).handle(rs.getString("message_header")),XMLMessageBuilder.getInstance(Acknowledgment.class).handle(rs.getString("content")));
 		else if (EbMSAction.STATUS_REQUEST.action().equals(rs.getString("action")))
 			return new EbMSMessage(XMLMessageBuilder.getInstance(SignatureType.class).handle(rs.getString("signature")),XMLMessageBuilder.getInstance(MessageHeader.class).handle(rs.getString("message_header")),null,XMLMessageBuilder.getInstance(StatusRequest.class).handle(rs.getString("content")));
 		else if (EbMSAction.STATUS_RESPONSE.action().equals(rs.getString("action")))

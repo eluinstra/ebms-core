@@ -64,15 +64,7 @@ public class ProcessEbMSEvents implements Job
 				CollaborationProtocolAgreement cpa = ebMSDAO.getCPA(message.getMessageHeader().getCPAId());
 				if (cpa == null)
 					throw new EbMSProcessingException("CPA " + message.getMessageHeader().getCPAId() + " not found!");
-				EbMSDocument requestDocument;
-				//TODO remove fallback
-				if (message.getDocument() == null)
-				{
-					requestDocument = new EbMSDocument(EbMSMessageUtils.createSOAPMessage(message),message.getAttachments());
-					signatureGenerator.generate(cpa,message.getMessageHeader(),requestDocument.getMessage(),requestDocument.getAttachments());
-				}
-				else
-					requestDocument = new EbMSDocument(message.getDocument(),message.getAttachments());
+				EbMSDocument requestDocument = new EbMSDocument(message.getDocument(),message.getAttachments());
 				String uri = CPAUtils.getUri(cpa,message);
 				logger.info("Sending message. MessageId " +  message.getMessageHeader().getMessageData().getMessageId());
 				EbMSDocument responseDocument = ebMSClient.sendMessage(uri,requestDocument);

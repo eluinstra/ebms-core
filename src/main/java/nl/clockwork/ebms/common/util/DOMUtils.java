@@ -16,7 +16,9 @@
 package nl.clockwork.ebms.common.util;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
 
@@ -43,6 +45,7 @@ import javax.xml.xpath.XPathFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 public class DOMUtils
@@ -82,6 +85,18 @@ public class DOMUtils
 		return (Element)child;
 	}
 	
+	public static Document read(String s) throws ParserConfigurationException, SAXException, IOException
+	{
+		DocumentBuilder db = getDocumentBuilder();
+		return db.parse(new InputSource(new StringReader(s)));
+	}
+
+	public static Document read(InputStream stream) throws ParserConfigurationException, SAXException, IOException
+	{
+		DocumentBuilder db = getDocumentBuilder();
+		return db.parse(stream);
+	}
+
 	public static String toString(Document document) throws TransformerException
 	{
 		//return document.getDocumentElement().toString();

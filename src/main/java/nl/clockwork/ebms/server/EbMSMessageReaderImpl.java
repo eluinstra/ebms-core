@@ -20,7 +20,6 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.ParserConfigurationException;
 
 import nl.clockwork.ebms.common.util.DOMUtils;
@@ -88,8 +87,7 @@ public class EbMSMessageReaderImpl implements EbMSMessageReader
 
 	private EbMSDocument getEbMSMessage(InputStream in) throws ParserConfigurationException, SAXException, IOException
 	{
-		DocumentBuilder db = DOMUtils.getDocumentBuilder();
-		Document d = db.parse(in);
+		Document d = DOMUtils.read(in);
 		return new EbMSDocument(d,new ArrayList<EbMSAttachment>());
 	}
 
@@ -98,8 +96,7 @@ public class EbMSMessageReaderImpl implements EbMSMessageReader
 		EbMSDocument result = null;
 		if (attachments.size() > 0)
 		{
-			DocumentBuilder db = DOMUtils.getDocumentBuilder();
-			Document d = db.parse((attachments.get(0).getDataSource().getInputStream()));
+			Document d = DOMUtils.read((attachments.get(0).getDataSource().getInputStream()));
 			attachments.remove(0);
 			result = new EbMSDocument(d,attachments);
 		}
