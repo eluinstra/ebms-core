@@ -22,6 +22,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.datatype.DatatypeConfigurationException;
 
 import nl.clockwork.ebms.Constants.EbMSAction;
+import nl.clockwork.ebms.Constants.EbMSEventType;
 import nl.clockwork.ebms.Constants.EbMSMessageStatus;
 import nl.clockwork.ebms.client.DeliveryManager;
 import nl.clockwork.ebms.dao.DAOException;
@@ -30,7 +31,7 @@ import nl.clockwork.ebms.dao.EbMSDAO;
 import nl.clockwork.ebms.model.EbMSMessage;
 import nl.clockwork.ebms.model.EbMSMessageContent;
 import nl.clockwork.ebms.model.EbMSMessageContext;
-import nl.clockwork.ebms.model.EbMSSendEvent;
+import nl.clockwork.ebms.model.EbMSEvent;
 import nl.clockwork.ebms.model.MessageStatus;
 import nl.clockwork.ebms.processor.EbMSProcessorException;
 import nl.clockwork.ebms.util.EbMSMessageContextValidator;
@@ -91,8 +92,9 @@ public class EbMSMessageServiceImpl implements EbMSMessageService
 					public void doInTransaction()
 					{
 						long id = ebMSDAO.insertMessage(new Date(),message,null);
-						List<EbMSSendEvent> sendEvents = EbMSMessageUtils.getEbMSSendEvents(ebMSDAO.getCPA(message.getMessageHeader().getCPAId()),id,message.getMessageHeader());
-						ebMSDAO.insertSendEvents(sendEvents);
+						List<EbMSEvent> events = EbMSMessageUtils.getEbMSSendEvents(ebMSDAO.getCPA(message.getMessageHeader().getCPAId()),id,message.getMessageHeader());
+						events.add(new EbMSEvent(id,message.getMessageHeader().getMessageData().getTimeToLive().toGregorianCalendar().getTime(),EbMSEventType.EXPIRE));
+						ebMSDAO.insertEvents(events);
 					}
 				}
 			);

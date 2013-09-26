@@ -29,7 +29,7 @@ import nl.clockwork.ebms.dao.DAOTransactionCallback;
 import nl.clockwork.ebms.dao.EbMSDAO;
 import nl.clockwork.ebms.model.EbMSDocument;
 import nl.clockwork.ebms.model.EbMSMessage;
-import nl.clockwork.ebms.model.EbMSSendEvent;
+import nl.clockwork.ebms.model.EbMSEvent;
 import nl.clockwork.ebms.processor.EbMSMessageProcessor;
 import nl.clockwork.ebms.processor.EbMSProcessingException;
 import nl.clockwork.ebms.signing.EbMSSignatureGenerator;
@@ -41,7 +41,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CollaborationProtocolAgreement;
 
-public class ProcessSendEvents implements Job
+public class ProcessEvents implements Job
 {
   protected transient Log logger = LogFactory.getLog(getClass());
   private ExecutorService executorService;
@@ -60,9 +60,9 @@ public class ProcessSendEvents implements Job
   public void execute()
   {
   	GregorianCalendar timestamp = new GregorianCalendar();
-  	List<EbMSSendEvent> sendEvents = ebMSDAO.getLatestEventsByEbMSMessageIdBefore(timestamp.getTime(),EbMSEventStatus.UNPROCESSED);
+  	List<EbMSEvent> events = ebMSDAO.getLatestEventsByEbMSMessageIdBefore(timestamp.getTime(),EbMSEventStatus.UNPROCESSED);
   	List<Future<?>> futures = new ArrayList<Future<?>>();
-  	for (final EbMSSendEvent sendEvent : sendEvents)
+  	for (final EbMSEvent event : events)
   	{
   		futures.add(
   			executorService.submit(
@@ -73,7 +73,7 @@ public class ProcessSendEvents implements Job
 						{
 							try
 							{
-								EbMSMessage message = ebMSDAO.getMessage(sendEvent.getEbMSMessageId());
+								EbMSMessage message = ebMSDAO.getMessage(event.getEbMSMessageId());
 								CollaborationProtocolAgreement cpa = ebMSDAO.getCPA(message.getMessageHeader().getCPAId());
 								if (cpa == null)
 									throw new EbMSProcessingException("CPA " + message.getMessageHeader().getCPAId() + " not found!");
@@ -83,16 +83,16 @@ public class ProcessSendEvents implements Job
 								logger.info("Sending message. MessageId: " +  message.getMessageHeader().getMessageData().getMessageId());
 								EbMSDocument responseDocument = ebMSClient.sendMessage(uri,requestDocument);
 								messageProcessor.processResponse(requestDocument,responseDocument);
-								updateEvent(sendEvent,EbMSEventStatus.PROCESSED,null);
+								updateEvent(event,EbMSEventStatus.PROCESSED,null);
 							}
 							catch (EbMSResponseException e)
 							{
-								updateEvent(sendEvent,EbMSEventStatus.FAILED,e.getMessage());
+								updateEvent(event,EbMSEventStatus.FAILED,e.getMessage());
 								logger.error("",e);
 							}
 							catch (Exception e)
 							{
-								updateEvent(sendEvent,EbMSEventStatus.FAILED,ExceptionUtils.getStackTrace(e));
+								updateEvent(event,EbMSEventStatus.FAILED,ExceptionUtils.getStackTrace(e));
 								logger.error("",e);
 							}
 						}
@@ -111,7 +111,7 @@ public class ProcessSendEvents implements Job
 			}
   }
   
-	private void updateEvent(final EbMSSendEvent sendEvent, final EbMSEventStatus status, final String errorMessage)
+	private void updateEvent(final EbMSEvent event, final EbMSEventStatus status, final String errorMessage)
 	{
 		ebMSDAO.executeTransaction(
   			new DAOTransactionCallback()
@@ -119,8 +119,8 @@ public class ProcessSendEvents implements Job
 					@Override
 					public void doInTransaction()
 					{
-						ebMSDAO.updateSendEvent(sendEvent.getTime(),sendEvent.getEbMSMessageId(),status,errorMessage);
-						ebMSDAO.deleteEventsBefore(sendEvent.getTime(),sendEvent.getEbMSMessageId(),EbMSEventStatus.UNPROCESSED);
+						ebMSDAO.updateEvent(event.getTime(),event.getEbMSMessageId(),status,errorMessage);
+						ebMSDAO.deleteEventsBefore(event.getTime(),event.getEbMSMessageId(),EbMSEventStatus.UNPROCESSED);
 					}
 				}
   		);

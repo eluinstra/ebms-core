@@ -17,7 +17,7 @@ CREATE TABLE ebms_message
 	conversation_id		VARCHAR(256)		NOT NULL,
 	sequence_nr				NUMBER					NULL,
 	message_id				VARCHAR(256)		NOT NULL,
-	message_nr				INTEGER					DEFAULT 0 NOT NULL,
+	message_nr				NUMBER					DEFAULT 0 NOT NULL,
 	ref_to_message_id	VARCHAR(256)		NULL,
 	time_to_live			TIMESTAMP				NULL,
 	from_role					VARCHAR(256)		NULL,
@@ -46,12 +46,13 @@ CREATE TABLE ebms_attachment
 	content						BLOB						NOT NULL
 );
 
-CREATE TABLE ebms_send_event
+CREATE TABLE ebms_event
 (
 	ebms_message_id		NUMBER					NOT NULL REFERENCES ebms_message(id),
 	time							TIMESTAMP				DEFAULT SYSDATE NOT NULL,
+	type							NUMBER					NOT NULL,
 	status						NUMBER					DEFAULT 0 NOT NULL,
 	status_time				TIMESTAMP				DEFAULT SYSDATE NOT NULL,
 	error_message			CLOB						NULL,
-	CONSTRAINT uc_ebms_send_event UNIQUE (ebms_message_id,time)
+	CONSTRAINT uc_ebms_event UNIQUE (ebms_message_id,time)
 );

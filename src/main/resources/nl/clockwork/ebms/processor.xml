@@ -59,12 +59,12 @@
 		<property name="period" value="${jobScheduler.period}"/>
 		<property name="jobs">
 			<list>
-				<ref bean="processSendEventsJob"/>
+				<ref bean="processEventsJob"/>
 			</list>
 		</property>
 	</bean>
 
-	<bean id="processSendEventsJob" class="nl.clockwork.ebms.job.ProcessSendEvents" init-method="init">
+	<bean id="processEventsJob" class="nl.clockwork.ebms.job.ProcessEvents" init-method="init">
 		<property name="maxThreads" value="${job.maxTreads}"/>
 		<property name="ebMSDAO" ref="ebMSDAO"/>
 		<property name="signatureGenerator" ref="signatureGenerator"/>

@@ -41,12 +41,13 @@ CREATE TABLE ebms_attachment
 	content						BYTEA						NOT NULL
 );
 
-CREATE TABLE ebms_send_event
+CREATE TABLE ebms_event
 (
 	ebms_message_id		INTEGER					NOT NULL REFERENCES ebms_message(id),
 	time							TIMESTAMP				NOT NULL DEFAULT NOW(),
+	type							INTEGER					NOT NULL,
 	status						INTEGER					NOT NULL DEFAULT 0,
 	status_time				TIMESTAMP				NOT NULL DEFAULT NOW(),
 	error_message			TEXT						NULL,
-	CONSTRAINT uc_ebms_send_event UNIQUE (ebms_message_id,time)
+	CONSTRAINT uc_ebms_event UNIQUE (ebms_message_id,time)
 );

@@ -34,12 +34,13 @@ import javax.xml.namespace.QName;
 import nl.clockwork.ebms.Constants;
 import nl.clockwork.ebms.Constants.EbMSAction;
 import nl.clockwork.ebms.Constants.EbMSEventStatus;
+import nl.clockwork.ebms.Constants.EbMSEventType;
 import nl.clockwork.ebms.Constants.EbMSMessageStatus;
 import nl.clockwork.ebms.common.XMLMessageBuilder;
 import nl.clockwork.ebms.model.EbMSAttachment;
+import nl.clockwork.ebms.model.EbMSEvent;
 import nl.clockwork.ebms.model.EbMSMessage;
 import nl.clockwork.ebms.model.EbMSMessageContext;
-import nl.clockwork.ebms.model.EbMSSendEvent;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
@@ -52,8 +53,6 @@ import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.Manifest;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageHeader;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageOrder;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.Service;
-import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.StatusRequest;
-import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.StatusResponse;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.SyncReply;
 import org.w3._2000._09.xmldsig.SignatureType;
 
@@ -557,21 +556,27 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	}
 
 	@Override
-	public List<EbMSSendEvent> getLatestEventsByEbMSMessageIdBefore(Date timestamp, EbMSEventStatus status) throws DAOException
+	public List<EbMSEvent> getLatestEventsByEbMSMessageIdBefore(Date timestamp, EbMSEventStatus status) throws DAOException
 	{
 		Connection c = null;
 		PreparedStatement ps = null;
 		try
 		{
-			List<EbMSSendEvent> result = new ArrayList<EbMSSendEvent>();
+			List<EbMSEvent> result = new ArrayList<EbMSEvent>();
 			c = connectionManager.getConnection();
 			ps = c.prepareStatement(
-				"select ebms_message_id, max(time) as time" +
-				" from ebms_send_event" +
-				" where status = ?" +
-				" and time <= ?" +
-				" group by ebms_message_id" +
-				" order by time asc"
+				"select ebms_message_id, time, type" +
+				" from ebms_event e" + 
+				" inner join (" +
+					"	select ebms_message_id, max(time) as time" +
+					" from ebms_event" +
+					" where status = ?" +
+					" and time <= ?" +
+					" group by ebms_message_id" +
+					" order by time asc" +
+				") l" +
+				" on e.ebms_message_id = l.ebms_message_id" +
+				" and e.time = l.time"
 			);
 			ps.setInt(1,status.id());
 			ps.setTimestamp(2,new Timestamp(timestamp.getTime()));
@@ -579,7 +584,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 			{
 				ResultSet rs = ps.getResultSet();
 				if (rs.next())
-					result.add(new EbMSSendEvent(rs.getLong("ebms_message_id"),rs.getTimestamp("time")));
+					result.add(new EbMSEvent(rs.getLong("ebms_message_id"),rs.getTimestamp("time"),EbMSEventType.values()[rs.getInt("type")]));
 			}
 			return result;
 		}
@@ -595,7 +600,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	}
 	
 	@Override
-	public void updateSendEvent(Date timestamp, Long ebMSMessageId, EbMSEventStatus status, String errorMessage) throws DAOException
+	public void updateEvent(Date timestamp, Long ebMSMessageId, EbMSEventStatus status, String errorMessage) throws DAOException
 	{
 		Connection c = null;
 		PreparedStatement ps = null;
@@ -603,7 +608,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 		{
 			c = connectionManager.getConnection();
 			ps  = c.prepareStatement(
-				"update ebms_send_event set" +
+				"update ebms_event set" +
 				" status = ?," +
 				" status_time = " + getTimestampFunction() + "," +
 				" error_message = ?" +
@@ -636,7 +641,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 		{
 			c = connectionManager.getConnection();
 			ps  = c.prepareStatement(
-				"delete from ebms_send_event" +
+				"delete from ebms_event" +
 				" where ebms_message_id = ?" +
 				" and time < ?" +
 				" and status = ?"
@@ -940,7 +945,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	}
 
 	@Override
-	public void insertSendEvent(long ebMSMessageId) throws DAOException
+	public void insertEvent(long ebMSMessageId, EbMSEventType type) throws DAOException
 	{
 		Connection c = null;
 		PreparedStatement ps = null;
@@ -948,11 +953,13 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 		{
 			c = connectionManager.getConnection();
 			ps  = c.prepareStatement(
-				"insert into ebms_send_event (" +
-					"ebms_message_id" +
-				") values (?)"
+				"insert into ebms_event (" +
+					"ebms_message_id," +
+					"type" +
+				") values (?,?)"
 			);
 			ps.setLong(1,ebMSMessageId);
+			ps.setInt(2,type.id());
 			ps.executeUpdate();
 		}
 		catch (SQLException e)
@@ -967,23 +974,24 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	}
 	
 	@Override
-	public void insertSendEvent(EbMSSendEvent sendEvent) throws DAOException
+	public void insertEvent(EbMSEvent event) throws DAOException
 	{
-		//if (sendEvent != null)
 		Connection c = null;
 		PreparedStatement ps = null;
 		try
 		{
 			c = connectionManager.getConnection();
 			ps  = c.prepareStatement(
-				"insert into ebms_send_event (" +
+				"insert into ebms_event (" +
 					"ebms_message_id," +
-					"time" +
-				") values (?,?)"
+					"time," +
+					"type" +
+				") values (?,?,?)"
 			);
-			ps.setLong(1,sendEvent.getEbMSMessageId());
-			//ps.setTimestamp(2,String.format(getDateFormat(),sendEvent.getTime()));
-			ps.setTimestamp(2,new Timestamp(sendEvent.getTime().getTime()));
+			ps.setLong(1,event.getEbMSMessageId());
+			//ps.setTimestamp(2,String.format(getDateFormat(),event.getTime()));
+			ps.setTimestamp(2,new Timestamp(event.getTime().getTime()));
+			ps.setInt(3,event.getType().id());
 			ps.executeUpdate();
 		}
 		catch (SQLException e)
@@ -998,7 +1006,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	}
 
 	@Override
-	public void insertSendEvents(List<EbMSSendEvent> sendEvents) throws DAOException
+	public void insertEvents(List<EbMSEvent> events) throws DAOException
 	{
 		Connection c = null;
 		PreparedStatement ps = null;
@@ -1006,18 +1014,20 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 		{
 			c = connectionManager.getConnection();
 			ps  = c.prepareStatement(
-				"insert into ebms_send_event (" +
+				"insert into ebms_event (" +
 					"ebms_message_id," +
-					"time" +
-				") values (?,?)"
+					"time," +
+					"type" +
+				") values (?,?,?)"
 			);
-			for (EbMSSendEvent sendEvent : sendEvents)
+			for (EbMSEvent event : events)
 			{
-				ps.setLong(1,sendEvent.getEbMSMessageId());
-				ps.setTimestamp(2,new Timestamp(sendEvent.getTime().getTime()));
+				ps.setLong(1,event.getEbMSMessageId());
+				ps.setTimestamp(2,new Timestamp(event.getTime().getTime()));
+				ps.setInt(3,event.getType().id());
 				ps.addBatch();
 			}
-			if (sendEvents.size() > 0)
+			if (events.size() > 0)
 				ps.executeBatch();
 		}
 		catch (SQLException e)
@@ -1032,7 +1042,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	}
 
 	@Override
-	public void deleteSendEvents(Long ebMSMessageId, EbMSEventStatus status) throws DAOException
+	public void deleteEvents(Long ebMSMessageId, EbMSEventStatus status) throws DAOException
 	{
 		Connection c = null;
 		PreparedStatement ps = null;
@@ -1040,7 +1050,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 		{
 			c = connectionManager.getConnection();
 			ps  = c.prepareStatement(
-				"delete from ebms_send_event" +
+				"delete from ebms_event" +
 				" where ebms_message_id = ?" +
 				" and status = ?"
 			);
@@ -1338,14 +1348,6 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 			return new EbMSMessage(XMLMessageBuilder.getInstance(SignatureType.class).handle(rs.getString("signature")),XMLMessageBuilder.getInstance(MessageHeader.class).handle(rs.getString("message_header")),XMLMessageBuilder.getInstance(ErrorList.class).handle(rs.getString("content")));
 		else if (EbMSAction.ACKNOWLEDGMENT.action().equals(rs.getString("action")))
 			return new EbMSMessage(XMLMessageBuilder.getInstance(SignatureType.class).handle(rs.getString("signature")),XMLMessageBuilder.getInstance(MessageHeader.class).handle(rs.getString("message_header")),XMLMessageBuilder.getInstance(Acknowledgment.class).handle(rs.getString("content")));
-		else if (EbMSAction.STATUS_REQUEST.action().equals(rs.getString("action")))
-			return new EbMSMessage(XMLMessageBuilder.getInstance(SignatureType.class).handle(rs.getString("signature")),XMLMessageBuilder.getInstance(MessageHeader.class).handle(rs.getString("message_header")),null,XMLMessageBuilder.getInstance(StatusRequest.class).handle(rs.getString("content")));
-		else if (EbMSAction.STATUS_RESPONSE.action().equals(rs.getString("action")))
-			return new EbMSMessage(XMLMessageBuilder.getInstance(SignatureType.class).handle(rs.getString("signature")),XMLMessageBuilder.getInstance(MessageHeader.class).handle(rs.getString("message_header")),XMLMessageBuilder.getInstance(StatusResponse.class).handle(rs.getString("content")));
-		else if (EbMSAction.PING.action().equals(rs.getString("action")))
-			return new EbMSMessage(XMLMessageBuilder.getInstance(SignatureType.class).handle(rs.getString("signature")),XMLMessageBuilder.getInstance(MessageHeader.class).handle(rs.getString("message_header")));
-		else if (EbMSAction.PONG.action().equals(rs.getString("action")))
-			return new EbMSMessage(XMLMessageBuilder.getInstance(SignatureType.class).handle(rs.getString("signature")),XMLMessageBuilder.getInstance(MessageHeader.class).handle(rs.getString("message_header")));
 		else
 			return null;
 	}
@@ -1358,10 +1360,6 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 			return XMLMessageBuilder.getInstance(ErrorList.class).handle(message.getErrorList());
 		else if (EbMSAction.ACKNOWLEDGMENT.action().equals(message.getMessageHeader().getAction()))
 			return XMLMessageBuilder.getInstance(Acknowledgment.class).handle(message.getAcknowledgment());
-		else if (EbMSAction.STATUS_REQUEST.action().equals(message.getMessageHeader().getAction()))
-			return XMLMessageBuilder.getInstance(StatusRequest.class).handle(message.getStatusRequest());
-		else if (EbMSAction.STATUS_RESPONSE.action().equals(message.getMessageHeader().getAction()))
-			return XMLMessageBuilder.getInstance(StatusResponse.class).handle(message.getStatusResponse());
 		return null;
 	}
 

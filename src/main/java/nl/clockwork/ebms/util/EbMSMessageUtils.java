@@ -42,6 +42,7 @@ import javax.xml.xpath.XPathExpressionException;
 
 import nl.clockwork.ebms.Constants;
 import nl.clockwork.ebms.Constants.EbMSAction;
+import nl.clockwork.ebms.Constants.EbMSEventType;
 import nl.clockwork.ebms.Constants.EbMSMessageStatus;
 import nl.clockwork.ebms.common.XMLMessageBuilder;
 import nl.clockwork.ebms.common.util.DOMUtils;
@@ -51,7 +52,7 @@ import nl.clockwork.ebms.model.EbMSDocument;
 import nl.clockwork.ebms.model.EbMSMessage;
 import nl.clockwork.ebms.model.EbMSMessageContent;
 import nl.clockwork.ebms.model.EbMSMessageContext;
-import nl.clockwork.ebms.model.EbMSSendEvent;
+import nl.clockwork.ebms.model.EbMSEvent;
 import nl.clockwork.ebms.xml.EbMSNamespaceMapper;
 
 import org.apache.commons.io.IOUtils;
@@ -473,14 +474,14 @@ public class EbMSMessageUtils
 		return new EbMSMessageContent(new EbMSMessageContext(message.getMessageHeader()),dataSources);
 	}
 
-	public static EbMSSendEvent getEbMSSendEvent(long id, MessageHeader messageHeader)
+	public static EbMSEvent getEbMSSendEvent(long id, MessageHeader messageHeader)
 	{
-		return new EbMSSendEvent(id,messageHeader.getMessageData().getTimestamp().toGregorianCalendar().getTime());
+		return new EbMSEvent(id,messageHeader.getMessageData().getTimestamp().toGregorianCalendar().getTime(),EbMSEventType.SEND);
 	}
 
-	public static List<EbMSSendEvent> getEbMSSendEvents(CollaborationProtocolAgreement cpa, long id, MessageHeader messageHeader)
+	public static List<EbMSEvent> getEbMSSendEvents(CollaborationProtocolAgreement cpa, long id, MessageHeader messageHeader)
 	{
-		List<EbMSSendEvent> result = new ArrayList<EbMSSendEvent>();
+		List<EbMSEvent> result = new ArrayList<EbMSEvent>();
 		Date sendTime = messageHeader.getMessageData().getTimestamp().toGregorianCalendar().getTime();
 		PartyInfo partyInfo = CPAUtils.getPartyInfo(cpa,messageHeader.getFrom().getPartyId());
 		DeliveryChannel deliveryChannel = CPAUtils.getSendingDeliveryChannel(partyInfo,messageHeader.getFrom().getRole(),messageHeader.getService(),messageHeader.getAction());
@@ -489,12 +490,12 @@ public class EbMSMessageUtils
 			ReliableMessaging rm = CPAUtils.getReliableMessaging(cpa,deliveryChannel);
 			for (int i = 0; i < rm.getRetries().intValue() + 1; i++)
 			{
-				result.add(new EbMSSendEvent(id,(Date)sendTime.clone()));
+				result.add(new EbMSEvent(id,(Date)sendTime.clone(),EbMSEventType.SEND));
 				rm.getRetryInterval().addTo(sendTime);
 			}
 		}
 		else
-			result.add(new EbMSSendEvent(id,(Date)sendTime.clone()));
+			result.add(new EbMSEvent(id,(Date)sendTime.clone(),EbMSEventType.SEND));
 		return result;
 	}
 
@@ -508,7 +509,6 @@ public class EbMSMessageUtils
 		envelope.getHeader().getAny().add(ebMSMessage.getSyncReply());
 		envelope.getHeader().getAny().add(ebMSMessage.getMessageOrder());
 		envelope.getHeader().getAny().add(ebMSMessage.getAckRequested());
-		envelope.getHeader().getAny().add(ebMSMessage.getSignature());
 		envelope.getHeader().getAny().add(ebMSMessage.getErrorList());
 		envelope.getHeader().getAny().add(ebMSMessage.getAcknowledgment());
 		envelope.getBody().getAny().add(ebMSMessage.getManifest());
@@ -516,7 +516,7 @@ public class EbMSMessageUtils
 		envelope.getBody().getAny().add(ebMSMessage.getStatusResponse());
 		
 		DocumentBuilder db = DOMUtils.getDocumentBuilder();
-		XMLMessageBuilder<Envelope> messageBuilder = XMLMessageBuilder.getInstance(Envelope.class,Envelope.class,MessageHeader.class,SyncReply.class,MessageOrder.class,AckRequested.class,SignatureType.class,ErrorList.class,Acknowledgment.class,Manifest.class,StatusRequest.class,StatusResponse.class);
+		XMLMessageBuilder<Envelope> messageBuilder = XMLMessageBuilder.getInstance(Envelope.class,Envelope.class,MessageHeader.class,SyncReply.class,MessageOrder.class,AckRequested.class,ErrorList.class,Acknowledgment.class,Manifest.class,StatusRequest.class,StatusResponse.class);
 
 		//Document d = db.parse(new ByteArrayInputStream(messageBuilder.handle(new JAXBElement<Envelope>(new QName("http://schemas.xmlsoap.org/soap/envelope/","Envelope"),Envelope.class,envelope)).getBytes()));
 

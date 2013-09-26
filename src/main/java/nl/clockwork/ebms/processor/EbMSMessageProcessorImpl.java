@@ -30,6 +30,7 @@ import javax.xml.xpath.XPathExpressionException;
 import nl.clockwork.ebms.Constants;
 import nl.clockwork.ebms.Constants.EbMSAction;
 import nl.clockwork.ebms.Constants.EbMSEventStatus;
+import nl.clockwork.ebms.Constants.EbMSEventType;
 import nl.clockwork.ebms.Constants.EbMSMessageStatus;
 import nl.clockwork.ebms.DefaultEventListener;
 import nl.clockwork.ebms.EventListener;
@@ -39,7 +40,7 @@ import nl.clockwork.ebms.dao.DAOTransactionCallback;
 import nl.clockwork.ebms.dao.EbMSDAO;
 import nl.clockwork.ebms.model.EbMSDocument;
 import nl.clockwork.ebms.model.EbMSMessage;
-import nl.clockwork.ebms.model.EbMSSendEvent;
+import nl.clockwork.ebms.model.EbMSEvent;
 import nl.clockwork.ebms.signing.EbMSSignatureValidator;
 import nl.clockwork.ebms.util.EbMSMessageUtils;
 import nl.clockwork.ebms.validation.CPAValidator;
@@ -257,7 +258,7 @@ public class EbMSMessageProcessorImpl implements EbMSMessageProcessor
 						{
 							ebMSDAO.insertDuplicateMessage(timestamp.getTime(),message);
 							long responseId = ebMSDAO.getMessageId(messageHeader.getMessageData().getMessageId(),service,EbMSAction.MESSAGE_ERROR.action(),EbMSAction.ACKNOWLEDGMENT.action());
-							ebMSDAO.insertSendEvent(responseId);
+							ebMSDAO.insertEvent(responseId,EbMSEventType.SEND);
 						}
 					}
 				);
@@ -316,10 +317,7 @@ public class EbMSMessageProcessorImpl implements EbMSMessageProcessor
 								ebMSDAO.insertMessage(timestamp.getTime(),message,EbMSMessageStatus.RECEIVED);
 								long id = ebMSDAO.insertMessage(timestamp.getTime(),acknowledgment,null);
 								if (message.getSyncReply() == null)
-								{
-									EbMSSendEvent sendEvent = EbMSMessageUtils.getEbMSSendEvent(id,acknowledgment.getMessageHeader());
-									ebMSDAO.insertSendEvent(sendEvent);
-								}
+									ebMSDAO.insertEvent(EbMSMessageUtils.getEbMSSendEvent(id,acknowledgment.getMessageHeader()));
 								eventListener.onMessageReceived(message.getMessageHeader().getMessageData().getMessageId());
 							}
 						}
@@ -340,10 +338,7 @@ public class EbMSMessageProcessorImpl implements EbMSMessageProcessor
 							ebMSDAO.insertMessage(timestamp.getTime(),message,EbMSMessageStatus.FAILED);
 							long id = ebMSDAO.insertMessage(timestamp.getTime(),messageError,null);
 							if (message.getSyncReply() == null)
-							{
-								EbMSSendEvent sendEvent = EbMSMessageUtils.getEbMSSendEvent(id,messageError.getMessageHeader());
-								ebMSDAO.insertSendEvent(sendEvent);
-							}
+								ebMSDAO.insertEvent(EbMSMessageUtils.getEbMSSendEvent(id,messageError.getMessageHeader()));
 						}
 					}
 				);
@@ -376,7 +371,7 @@ public class EbMSMessageProcessorImpl implements EbMSMessageProcessor
 						Long id = ebMSDAO.getMessageId(message.getMessageHeader().getMessageData().getRefToMessageId());
 						if (id != null)
 						{
-							ebMSDAO.deleteSendEvents(id,EbMSEventStatus.UNPROCESSED);
+							ebMSDAO.deleteEvents(id,EbMSEventStatus.UNPROCESSED);
 							ebMSDAO.updateMessageStatus(id,null,status);
 						}
 					}

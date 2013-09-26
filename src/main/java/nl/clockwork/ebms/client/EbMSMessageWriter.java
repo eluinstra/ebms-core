@@ -51,7 +51,6 @@ public class EbMSMessageWriter
 	{
 		connection.setRequestProperty("Content-Type","text/xml");
 		connection.setRequestProperty("SOAPAction",Constants.EBMS_SOAP_ACTION);
-		//signatureGenerator.generateSignature(message,ebMSMessage.getAttachments());
 		DOMUtils.write(document.getMessage(),connection.getOutputStream(),"UTF-8");
 	}
 	
