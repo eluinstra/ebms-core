@@ -17,7 +17,6 @@
 - implement ackRequested/best-effort
 
 - implement syncReply
-- implement encryption
 - improve Service models:
 	- add jaxb annotations?
 
@@ -29,45 +28,18 @@
 - validate CPA content during upload CPA
 	- only 1 channel per action is supported
 	- canReceive element is optional?
-- remove CPA content validation during message processing
 
 - validate message format (available elements versus action)
 - improve header validation
 	- add separate service and action validation
 
 - remove unnecessary defined Interfaces and custom Exceptions
-/ improve EbMSMessageProcessor
-- improve EbMSHttpClient
-  - move cpa functionality to caller; add extra properties for url and signing (sendEvent)?
+- remove EbMS(Message) prefix on classes; add EbMS(Message) prefix on bean ids? 
 
 - implement SSLFactoryManager that returns a CPA/hostname related SSLSocketFactory to handle different key/certificate pairs
 	- load right SSLFactoryManager on each URLConnection request
 
-- support multiple deliveryChannels???
-	- add url (or deliveryChannel) to table sendEvent
-	- support mail channel?
-	- move the following functionality from message generation to message sending (per channel):
-		- ackRequested 
-		- ackSignatureRequested
-		- duplicateElimination
-		- (signature generation)
-
 - use ebms_message.message_id to identify message
-
-- remove servlet from core?
-- remove sql dao from core?
-- remove http client from core?
-- remove EbMS(Message) prefix on classes; add EbMS(Message) prefix on bean ids? 
 
 - implement EbMSFileAttachment (file proxy) and EbMSDBAttachment (db proxy) for large message processing?
 
-- read mime message
-	- replace mime4j by:
-		- java soap
-		- Just Another Multipart Parser (http://sourceforge.net/projects/jampp/)
-		- MIME pull (glassfish)
-- write mime message
-	- replace custom writer by:
-		- java soap
-		- mime4j
-		X http client
