@@ -40,7 +40,6 @@ import nl.clockwork.ebms.dao.DAOTransactionCallback;
 import nl.clockwork.ebms.dao.EbMSDAO;
 import nl.clockwork.ebms.model.EbMSDocument;
 import nl.clockwork.ebms.model.EbMSMessage;
-import nl.clockwork.ebms.model.EbMSEvent;
 import nl.clockwork.ebms.signing.EbMSSignatureValidator;
 import nl.clockwork.ebms.util.EbMSMessageUtils;
 import nl.clockwork.ebms.validation.CPAValidator;
@@ -60,7 +59,7 @@ import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageStatusTy
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.Service;
 import org.xml.sax.SAXException;
 
-public class EbMSMessageProcessorImpl implements EbMSMessageProcessor
+public class EbMSMessageProcessor
 {
   protected transient Log logger = LogFactory.getLog(getClass());
 	private DeliveryManager deliveryManager;
@@ -85,7 +84,6 @@ public class EbMSMessageProcessorImpl implements EbMSMessageProcessor
 		service.setValue(Constants.EBMS_SERVICE_URI);
 	}
 	
-	@Override
 	public EbMSDocument processRequest(EbMSDocument document) throws EbMSProcessorException
 	{
 		try
@@ -182,7 +180,6 @@ public class EbMSMessageProcessorImpl implements EbMSMessageProcessor
 		}
 	}
 	
-	@Override
 	public void processResponse(EbMSDocument request, EbMSDocument response) throws EbMSProcessorException
 	{
 		try
