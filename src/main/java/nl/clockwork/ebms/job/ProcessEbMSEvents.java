@@ -44,7 +44,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CollaborationProtocolAgreement;
 
-public class ProcessEvents implements Job
+public class ProcessEbMSEvents implements Job
 {
 	private class SendEventJob implements Runnable
 	{

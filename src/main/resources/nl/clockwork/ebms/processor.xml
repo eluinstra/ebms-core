@@ -67,7 +67,7 @@
 		</property>
 	</bean>
 
-	<bean id="processEventsJob" class="nl.clockwork.ebms.job.ProcessEvents" init-method="init">
+	<bean id="processEventsJob" class="nl.clockwork.ebms.job.ProcessEbMSEvents" init-method="init">
 		<property name="maxThreads" value="${job.maxTreads}"/>
 		<property name="eventListener" ref="eventListener"/>
 		<property name="ebMSDAO" ref="ebMSDAO"/>
