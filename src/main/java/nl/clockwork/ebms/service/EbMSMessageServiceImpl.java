@@ -128,14 +128,10 @@ public class EbMSMessageServiceImpl implements EbMSMessageService
 		try
 		{
 			EbMSMessage message = ebMSDAO.getMessage(messageId);
-			if (message instanceof EbMSMessage)
-			{
-				EbMSMessageContent result = EbMSMessageUtils.EbMSMessageToEbMSMessageContent((EbMSMessage)message);
-				if (process != null && process)
-					ebMSDAO.updateMessage(messageId,EbMSMessageStatus.RECEIVED,EbMSMessageStatus.PROCESSED);
-				return result;
-			}
-			return null;
+			EbMSMessageContent result = EbMSMessageUtils.EbMSMessageToEbMSMessageContent((EbMSMessage)message);
+			if (process != null && process)
+				ebMSDAO.updateMessage(messageId,EbMSMessageStatus.RECEIVED,EbMSMessageStatus.PROCESSED);
+			return result;
 		}
 		catch (Exception e)
 		{
