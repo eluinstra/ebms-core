@@ -10,14 +10,11 @@
 
 - test multiple certificates in keystore
 - generate soap fault on error
-- change sendEvent generation: store one event per message (and calculate the following after current is handled if necessary)
-	- replace table ebms_event by a queue
 
 - let DeliveryManager work with EbMSDocument instead of EbMSMessage?
 	- change messageQueue from EbMSMessage to EbMSDocument
 	- get messageId from EbMSDocument
 - implement ackRequested/best-effort
-- fix java EbMSDAO
 
 - implement syncReply
 - implement encryption
@@ -55,21 +52,7 @@
 		- duplicateElimination
 		- (signature generation)
 
-- implement AdminService?
-- implement wicket/jdo? admin interface:
-	- view on message tables
-	- view on logging tables
-	- CPAService interface
-	- EbMSMessageService interface
-	- AdminService interface?
-
-- add response and statusCode to table sendEvent???
-- implement table receivedEvent???
-
 - use ebms_message.message_id to identify message
-
-- CPAService: define cpa as CollaborationProtocolAgreement instead of String
-- MessageHeader: define duplicateElimination as Object instead of String
 
 - remove servlet from core?
 - remove sql dao from core?
