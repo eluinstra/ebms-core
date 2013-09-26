@@ -13,16 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  ******************************************************************************/
-package nl.clockwork.ebms.signing;
+package nl.clockwork.ebms.signature;
 
-import java.util.List;
-
-import nl.clockwork.ebms.model.EbMSAttachment;
+import nl.clockwork.ebms.model.EbMSDocument;
 import nl.clockwork.ebms.processor.EbMSProcessorException;
 
-import org.w3c.dom.Document;
+import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CollaborationProtocolAgreement;
+import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageHeader;
 
-public interface SignatureGenerator
+public interface EbMSSignatureGenerator
 {
-	boolean generate(Document d, List<EbMSAttachment> attachments) throws EbMSProcessorException;
+	void generate(CollaborationProtocolAgreement cpa, EbMSDocument document, MessageHeader messageHeader) throws EbMSProcessorException;
 }

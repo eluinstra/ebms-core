@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  ******************************************************************************/
-package nl.clockwork.ebms.signing;
+package nl.clockwork.ebms.signature;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
@@ -28,53 +28,63 @@ import nl.clockwork.ebms.Constants;
 import nl.clockwork.ebms.common.util.DOMUtils;
 import nl.clockwork.ebms.common.util.SecurityUtils;
 import nl.clockwork.ebms.model.EbMSAttachment;
+import nl.clockwork.ebms.model.EbMSDocument;
 import nl.clockwork.ebms.processor.EbMSProcessingException;
 import nl.clockwork.ebms.processor.EbMSProcessorException;
+import nl.clockwork.ebms.util.CPAUtils;
 import nl.clockwork.ebms.xml.dsig.EbMSAttachmentResolver;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.signature.XMLSignature;
-import org.apache.xml.security.signature.XMLSignatureException;
 import org.apache.xml.security.transforms.Transforms;
 import org.apache.xml.security.transforms.params.XPathContainer;
+import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CollaborationProtocolAgreement;
+import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DeliveryChannel;
+import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.PartyInfo;
+import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageHeader;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
-public class XMLSecSignatureGenerator implements SignatureGenerator
+public class EbMSSecSignatureGenerator implements EbMSSignatureGenerator
 {
 	protected transient Log logger = LogFactory.getLog(getClass());
-  private String canonicalizationMethodAlgorithm = Transforms.TRANSFORM_C14N_OMIT_COMMENTS;
-  private String signatureMethodAlgorithm = XMLSignature.ALGO_ID_SIGNATURE_DSA;
-  private String transformAlgorithm = Transforms.TRANSFORM_C14N_OMIT_COMMENTS;
+	private String canonicalizationMethodAlgorithm = Transforms.TRANSFORM_C14N_OMIT_COMMENTS;
+	//private String signatureMethodAlgorithm = XMLSignature.ALGO_ID_SIGNATURE_DSA;
+	private String transformAlgorithm = Transforms.TRANSFORM_C14N_OMIT_COMMENTS;
+	//private String digestAlgorithm = org.apache.xml.security.utils.Constants.ALGO_ID_DIGEST_SHA1;
 	private String keyStorePath;
 	private String keyStorePassword;
-	private String keyAlias;
-	private String keyPassword;
 	private KeyStore keyStore;
-	private KeyPair keyPair;
 
-	public void init() throws GeneralSecurityException, IOException
+	public void init() throws GeneralSecurityException, IOException, EbMSProcessorException
 	{
 		keyStore = SecurityUtils.loadKeyStore(keyStorePath,keyStorePassword);
-		keyPair = SecurityUtils.getKeyPair(keyStore,keyAlias,keyPassword);
 	}
-	
+
 	@Override
-	public boolean generate(Document document, List<EbMSAttachment> attachments) throws EbMSProcessorException
+	public void generate(CollaborationProtocolAgreement cpa, EbMSDocument document, MessageHeader messageHeader) throws EbMSProcessorException
 	{
 		try
 		{
-			sign(keyStore,keyPair,keyAlias,document,attachments);
-			return true;
+			if (!Constants.EBMS_SERVICE_URI.equals(messageHeader.getService().getValue()))
+			{
+				PartyInfo partyInfo = CPAUtils.getPartyInfo(cpa,messageHeader.getFrom().getPartyId());
+				DeliveryChannel deliveryChannel = CPAUtils.getSendingDeliveryChannel(partyInfo,messageHeader.getFrom().getRole(),messageHeader.getService(),messageHeader.getAction());
+				if (CPAUtils.isSigned(partyInfo,messageHeader.getFrom().getRole(),messageHeader.getService(),messageHeader.getAction()))
+				{
+					X509Certificate certificate = CPAUtils.getX509Certificate(CPAUtils.getSigningCertificate(deliveryChannel));
+					String alias = keyStore.getCertificateAlias(certificate);
+					if (alias == null)
+						throw new EbMSProcessorException("No certificate found with subject \"" + certificate.getSubjectDN().getName() + "\" in keystore \"" + keyStorePath + "\"");
+					KeyPair keyPair = SecurityUtils.getKeyPair(keyStore,alias,keyStorePassword);
+					sign(keyStore,keyPair,alias,document.getMessage(),document.getAttachments(),CPAUtils.getSignatureAlgorithm(deliveryChannel),CPAUtils.getHashFunction(deliveryChannel));
+				}
+			}
 		}
-		catch (XMLSignatureException e)
-		{
-			return false;
-		}
-		catch (KeyStoreException e)
+		catch (GeneralSecurityException e)
 		{
 			throw new EbMSProcessorException(e);
 		}
@@ -84,7 +94,7 @@ public class XMLSecSignatureGenerator implements SignatureGenerator
 		}
 	}
 
-	private void sign(KeyStore keyStore, KeyPair keyPair, String alias, Document document, List<EbMSAttachment> attachments) throws XMLSecurityException, KeyStoreException
+	private void sign(KeyStore keyStore, KeyPair keyPair, String alias, Document document, List<EbMSAttachment> attachments, String signatureMethodAlgorithm, String digestAlgorithm) throws XMLSecurityException, KeyStoreException
 	{
 		XMLSignature signature = new XMLSignature(document,null,signatureMethodAlgorithm,canonicalizationMethodAlgorithm);
 
@@ -99,7 +109,7 @@ public class XMLSecSignatureGenerator implements SignatureGenerator
 		transforms.addTransform(Transforms.TRANSFORM_XPATH,getXPathTransform(document));
 		transforms.addTransform(transformAlgorithm);
 		
-		signature.addDocument("",transforms,org.apache.xml.security.utils.Constants.ALGO_ID_DIGEST_SHA1);
+		signature.addDocument("",transforms,digestAlgorithm);
 		
 		for (EbMSAttachment attachment : attachments)
 			signature.addDocument(Constants.CID + attachment.getContentId());
@@ -107,8 +117,8 @@ public class XMLSecSignatureGenerator implements SignatureGenerator
 		signature.addKeyInfo(keyPair.getPublic());
 		
 		Certificate[] certificates = keyStore.getCertificateChain(alias);
-    //for (Certificate certificate : certificates)
-    //	signature.addKeyInfo((X509Certificate)certificate);
+	  //for (Certificate certificate : certificates)
+	  //	signature.addKeyInfo((X509Certificate)certificate);
 		signature.addKeyInfo((X509Certificate)certificates[0]);
 
 		signature.sign(keyPair.getPrivate());
@@ -129,11 +139,6 @@ public class XMLSecSignatureGenerator implements SignatureGenerator
 		this.canonicalizationMethodAlgorithm = canonicalizationMethodAlgorithm;
 	}
 	
-	public void setSignatureMethodAlgorithm(String signatureMethodAlgorithm)
-	{
-		this.signatureMethodAlgorithm = signatureMethodAlgorithm;
-	}
-	
 	public void setTransformAlgorithm(String transformAlgorithm)
 	{
 		this.transformAlgorithm = transformAlgorithm;
@@ -149,13 +154,4 @@ public class XMLSecSignatureGenerator implements SignatureGenerator
 		this.keyStorePassword = keyStorePassword;
 	}
 	
-	public void setKeyAlias(String keyAlias)
-	{
-		this.keyAlias = keyAlias;
-	}
-	
-	public void setKeyPassword(String keyPassword)
-	{
-		this.keyPassword = keyPassword;
-	}
 }

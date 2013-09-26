@@ -13,16 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  ******************************************************************************/
-package nl.clockwork.ebms.signing;
+package nl.clockwork.ebms.signature;
 
 import java.util.List;
 
 import nl.clockwork.ebms.model.EbMSAttachment;
-import nl.clockwork.ebms.validation.ValidatorException;
+import nl.clockwork.ebms.processor.EbMSProcessorException;
 
 import org.w3c.dom.Document;
 
-public interface SignatureValidator
+public interface SignatureGenerator
 {
-	boolean isValid(Document document, List<EbMSAttachment> attachments) throws ValidatorException;
+	boolean generate(Document d, List<EbMSAttachment> attachments) throws EbMSProcessorException;
 }

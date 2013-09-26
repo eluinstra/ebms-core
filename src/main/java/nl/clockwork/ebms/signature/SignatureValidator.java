@@ -13,16 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  ******************************************************************************/
-package nl.clockwork.ebms.signing;
+package nl.clockwork.ebms.signature;
 
-import nl.clockwork.ebms.model.EbMSDocument;
-import nl.clockwork.ebms.validation.ValidationException;
+import java.util.List;
+
+import nl.clockwork.ebms.model.EbMSAttachment;
 import nl.clockwork.ebms.validation.ValidatorException;
 
-import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CollaborationProtocolAgreement;
-import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageHeader;
+import org.w3c.dom.Document;
 
-public interface EbMSSignatureValidator
+public interface SignatureValidator
 {
-	void validate(CollaborationProtocolAgreement cpa, EbMSDocument document, MessageHeader messageHeader) throws ValidatorException, ValidationException;
+	boolean isValid(Document document, List<EbMSAttachment> attachments) throws ValidatorException;
 }
