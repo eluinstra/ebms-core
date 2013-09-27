@@ -18,7 +18,6 @@ package nl.clockwork.ebms.validation;
 import java.util.List;
 
 import nl.clockwork.ebms.Constants;
-import nl.clockwork.ebms.model.EbMSAttachment;
 import nl.clockwork.ebms.model.EbMSDocument;
 import nl.clockwork.ebms.signature.EbMSSignatureValidator;
 import nl.clockwork.ebms.util.CPAUtils;
