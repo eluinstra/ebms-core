@@ -4,4 +4,4 @@ ALTER TABLE ebms_event ADD type INTEGER NULL;
 
 UPDATE ebms_event SET type = 0;
 
-ALTER TABLE ebms_event ADD type DROP NOT NULL;
+ALTER TABLE ebms_event ALTER type DROP NOT NULL;
