@@ -67,7 +67,7 @@ public class ProcessEbMSEvents implements Job
 				EbMSDocument requestDocument = new EbMSDocument(EbMSMessageUtils.createSOAPMessage(message),message.getAttachments());
 				signatureGenerator.generate(cpa,requestDocument,message.getMessageHeader());
 				String uri = CPAUtils.getUri(cpa,message);
-				logger.info("Sending message " +  message.getMessageHeader().getMessageData().getMessageId());
+				logger.info("Sending message " + message.getMessageHeader().getMessageData().getMessageId() + " to " + uri);
 				EbMSDocument responseDocument = ebMSClient.sendMessage(uri,requestDocument);
 				messageProcessor.processResponse(requestDocument,responseDocument);
 				updateEvent(event,EbMSEventStatus.PROCESSED,null);

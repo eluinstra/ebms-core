@@ -44,7 +44,6 @@ public class EbMSHttpClient implements EbMSClient
     HttpClient httpClient = new DefaultHttpClient();
 		try
 		{
-			logger.info("Sending message to " + uri);
 			setSSLSocketFactory(httpClient,uri);
 			HttpPost httpPost = new HttpPost(uri);
 			if (logger.isDebugEnabled())
