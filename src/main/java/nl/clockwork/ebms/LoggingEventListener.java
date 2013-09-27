@@ -25,24 +25,24 @@ public class LoggingEventListener implements EventListener
 	@Override
 	public void onMessageReceived(String messageId) throws EventException
 	{
-		logger.info("Message " + messageId + " received.");
+		logger.info("Message " + messageId + " received");
 	}
 
 	@Override
 	public void onMessageAcknowledged(String messageId) throws EventException
 	{
-		logger.info("Message " + messageId + " acknowledged.");
+		logger.info("Message " + messageId + " acknowledged");
 	}
 	
 	@Override
 	public void onMessageDeliveryFailed(String messageId) throws EventException
 	{
-		logger.info("Message " + messageId + " delivery failed.");
+		logger.info("Message " + messageId + " delivery failed");
 	}
 
 	@Override
 	public void onMessageNotAcknowledged(String messageId) throws EventException
 	{
-		logger.info("Message " + messageId + " not acknowledged.");
+		logger.info("Message " + messageId + " not acknowledged");
 	}
 }
