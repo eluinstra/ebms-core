@@ -28,9 +28,7 @@ public class Start
 	
 	public static void main(String[] args) throws MuleException
 	{
-		setProperty("ebms.mode",new String[]{"normal","oracle"},"normal");
 		setProperty("ebms.protocol",new String[]{"http","https"},"http");
-		setProperty("ebms.database",new String[]{"hsqldb","mysql","postgresql","mssql","oracle"},"hsqldb");
 		DefaultMuleContextFactory muleContextFactory = new DefaultMuleContextFactory();
 		SpringXmlConfigurationBuilder configBuilder = new SpringXmlConfigurationBuilder(args.length == 0 ? "main.xml" : args[0]);
 		MuleContext muleContext = muleContextFactory.createMuleContext(configBuilder);
