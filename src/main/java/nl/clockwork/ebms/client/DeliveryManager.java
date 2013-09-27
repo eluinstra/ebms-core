@@ -141,8 +141,7 @@ public class DeliveryManager //DeliveryService
 					{
 						try
 						{
-							String uri = CPAUtils.getUri(cpa,response);
-							ebMSClient.sendMessage(uri,EbMSMessageUtils.getEbMSDocument(response));
+							ebMSClient.sendMessage(CPAUtils.getUri(cpa,response),EbMSMessageUtils.getEbMSDocument(response));
 						}
 						catch (Exception e)
 						{
