@@ -1,4 +1,4 @@
-RENAME TABLE ebms_send_event TO ebms_event;
+ALTER TABLE ebms_send_event RENAME TO ebms_event;
 
 ALTER TABLE ebms_event ADD type INTEGER NULL;
 
