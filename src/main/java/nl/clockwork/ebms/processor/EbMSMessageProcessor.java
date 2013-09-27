@@ -92,7 +92,6 @@ public class EbMSMessageProcessor
 			GregorianCalendar timestamp = new GregorianCalendar();
 			final EbMSMessage message = EbMSMessageUtils.getEbMSMessage(document.getMessage(),document.getAttachments());
 			final CollaborationProtocolAgreement cpa = ebMSDAO.getCPA(message.getMessageHeader().getCPAId());
-			logger.info("Message " + message.getMessageHeader().getMessageData().getMessageId() + " received.");
 			if (!Constants.EBMS_SERVICE_URI.equals(message.getMessageHeader().getService().getValue()))
 			{
 				EbMSMessage response = process(cpa,timestamp,document,message);
