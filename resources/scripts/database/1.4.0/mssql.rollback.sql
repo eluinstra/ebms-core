@@ -1,3 +1,3 @@
 ALTER TABLE ebms_event DROP COLUMN type;
 
-ALTER TABLE ebms_event RENAME TO ebms_send_event;
+sp_rename ebms_event, ebms_send_event;
