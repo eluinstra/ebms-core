@@ -573,10 +573,10 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 					" where status = ?" +
 					" and time <= ?" +
 					" group by ebms_message_id" +
-					" order by time asc" +
 				") l" +
 				" on e.ebms_message_id = l.ebms_message_id" +
-				" and e.time = l.time"
+				" and e.time = l.time" +
+				" order by e.time asc"
 			);
 			ps.setInt(1,status.id());
 			ps.setTimestamp(2,new Timestamp(timestamp.getTime()));
