@@ -122,11 +122,11 @@ OcDNBvpKX2SpoHffgXmdrExQshpIDzzofex0y/Kg4mulDQUPwVuIZtbnlQ==
       <tns:DocExchange tns:docExchangeId="DIGIPOORT_SIGNED_ReliableMessaging">
          <tns:ebXMLSenderBinding tns:version="2.0">
             <tns:ReliableMessaging>
-               <tns:Retries>8</tns:Retries>
-               <tns:RetryInterval>PT3H</tns:RetryInterval>
+               <tns:Retries>5</tns:Retries>
+               <tns:RetryInterval>PT5M</tns:RetryInterval>
                <tns:MessageOrderSemantics>NotGuaranteed</tns:MessageOrderSemantics>
             </tns:ReliableMessaging>
-            <tns:PersistDuration>P1D</tns:PersistDuration>
+            <tns:PersistDuration>PT25M</tns:PersistDuration>
             <tns:SenderNonRepudiation>
                <tns:NonRepudiationProtocol>http://www.w3.org/2000/09/xmldsig#</tns:NonRepudiationProtocol>
                <tns:HashFunction>http://www.w3.org/2000/09/xmldsig#sha1</tns:HashFunction>
@@ -136,11 +136,11 @@ OcDNBvpKX2SpoHffgXmdrExQshpIDzzofex0y/Kg4mulDQUPwVuIZtbnlQ==
          </tns:ebXMLSenderBinding>
          <tns:ebXMLReceiverBinding tns:version="2.0">
             <tns:ReliableMessaging>
-               <tns:Retries>8</tns:Retries>
-               <tns:RetryInterval>PT3H</tns:RetryInterval>
+               <tns:Retries>5</tns:Retries>
+               <tns:RetryInterval>PT5M</tns:RetryInterval>
                <tns:MessageOrderSemantics>NotGuaranteed</tns:MessageOrderSemantics>
             </tns:ReliableMessaging>
-            <tns:PersistDuration>P1D</tns:PersistDuration>
+            <tns:PersistDuration>PT25M</tns:PersistDuration>
             <tns:ReceiverNonRepudiation>
                <tns:NonRepudiationProtocol>http://www.w3.org/2000/09/xmldsig#</tns:NonRepudiationProtocol>
                <tns:HashFunction>http://www.w3.org/2000/09/xmldsig#sha1</tns:HashFunction>
@@ -270,11 +270,11 @@ OcDNBvpKX2SpoHffgXmdrExQshpIDzzofex0y/Kg4mulDQUPwVuIZtbnlQ==
       <tns:DocExchange tns:docExchangeId="OVERHEID_SIGNED_ReliableMessaging">
          <tns:ebXMLSenderBinding tns:version="2.0">
             <tns:ReliableMessaging>
-               <tns:Retries>8</tns:Retries>
-               <tns:RetryInterval>PT3H</tns:RetryInterval>
+               <tns:Retries>5</tns:Retries>
+               <tns:RetryInterval>PT5M</tns:RetryInterval>
                <tns:MessageOrderSemantics>NotGuaranteed</tns:MessageOrderSemantics>
             </tns:ReliableMessaging>
-            <tns:PersistDuration>P1D</tns:PersistDuration>
+            <tns:PersistDuration>PT25M</tns:PersistDuration>
             <tns:SenderNonRepudiation>
                <tns:NonRepudiationProtocol>http://www.w3.org/2000/09/xmldsig#</tns:NonRepudiationProtocol>
                <tns:HashFunction>http://www.w3.org/2000/09/xmldsig#sha1</tns:HashFunction>
@@ -284,11 +284,11 @@ OcDNBvpKX2SpoHffgXmdrExQshpIDzzofex0y/Kg4mulDQUPwVuIZtbnlQ==
          </tns:ebXMLSenderBinding>
          <tns:ebXMLReceiverBinding tns:version="2.0">
             <tns:ReliableMessaging>
-               <tns:Retries>8</tns:Retries>
-               <tns:RetryInterval>PT3H</tns:RetryInterval>
+               <tns:Retries>5</tns:Retries>
+               <tns:RetryInterval>PT5M</tns:RetryInterval>
                <tns:MessageOrderSemantics>NotGuaranteed</tns:MessageOrderSemantics>
             </tns:ReliableMessaging>
-            <tns:PersistDuration>P1D</tns:PersistDuration>
+            <tns:PersistDuration>PT25M</tns:PersistDuration>
             <tns:ReceiverNonRepudiation>
                <tns:NonRepudiationProtocol>http://www.w3.org/2000/09/xmldsig#</tns:NonRepudiationProtocol>
                <tns:HashFunction>http://www.w3.org/2000/09/xmldsig#sha1</tns:HashFunction>
