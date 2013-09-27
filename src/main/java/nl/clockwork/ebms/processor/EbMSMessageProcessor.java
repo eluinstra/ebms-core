@@ -42,6 +42,7 @@ import nl.clockwork.ebms.model.EbMSMessage;
 import nl.clockwork.ebms.signature.EbMSSignatureValidator;
 import nl.clockwork.ebms.util.EbMSMessageUtils;
 import nl.clockwork.ebms.validation.CPAValidator;
+import nl.clockwork.ebms.validation.EbMSValidationException;
 import nl.clockwork.ebms.validation.ManifestValidator;
 import nl.clockwork.ebms.validation.MessageHeaderValidator;
 import nl.clockwork.ebms.validation.SignatureTypeValidator;
@@ -91,7 +92,7 @@ public class EbMSMessageProcessor
 			GregorianCalendar timestamp = new GregorianCalendar();
 			final EbMSMessage message = EbMSMessageUtils.getEbMSMessage(document.getMessage(),document.getAttachments());
 			final CollaborationProtocolAgreement cpa = ebMSDAO.getCPA(message.getMessageHeader().getCPAId());
-			logger.info("Message received. MessageId: " + message.getMessageHeader().getMessageData().getMessageId());
+			logger.info("Message " + message.getMessageHeader().getMessageData().getMessageId() + " received.");
 			if (!Constants.EBMS_SERVICE_URI.equals(message.getMessageHeader().getService().getValue()))
 			{
 				EbMSMessage response = process(cpa,timestamp,document,message);
@@ -183,9 +184,9 @@ public class EbMSMessageProcessor
 		{
 			EbMSMessage requestMessage = EbMSMessageUtils.getEbMSMessage(request.getMessage(),request.getAttachments());
 			if (requestMessage.getAckRequested() != null && requestMessage.getSyncReply() != null && response == null)
-				throw new EbMSProcessingException("No response received for message. MessageId: " + requestMessage.getMessageHeader().getMessageData().getMessageId());
+				throw new EbMSProcessingException("No response received for message " + requestMessage.getMessageHeader().getMessageData().getMessageId());
 			else if ((requestMessage.getAckRequested() == null || requestMessage.getSyncReply() == null) && response != null)
-				throw new EbMSProcessingException("No response expected for message. MessageId: " + requestMessage.getMessageHeader().getMessageData().getMessageId());
+				throw new EbMSProcessingException("No response expected for message " + requestMessage.getMessageHeader().getMessageData().getMessageId());
 
 			if (response != null)
 			{
@@ -269,15 +270,13 @@ public class EbMSMessageProcessor
 		}
 		else
 		{
-			ErrorList errorList = EbMSMessageUtils.createErrorList();
-			if (cpaValidator.isValid(errorList,cpa,messageHeader,timestamp)
-				&& messageHeaderValidator.isValid(errorList,cpa,messageHeader,message.getAckRequested(),message.getSyncReply(),message.getMessageOrder(),timestamp)
-				&& signatureTypeValidator.isValid(errorList,cpa,messageHeader,message.getSignature())
-				&& manifestValidator.isValid(errorList,message.getManifest(),message.getAttachments())
-				&& signatureTypeValidator.isValid(errorList,cpa,document,messageHeader)
-			)
+			try
 			{
-				logger.info("Message valid. MessageId: " + message.getMessageHeader().getMessageData().getMessageId());
+				cpaValidator.validate(cpa,messageHeader,timestamp);
+				messageHeaderValidator.validate(cpa,messageHeader,message.getAckRequested(),message.getSyncReply(),message.getMessageOrder(),timestamp);
+				signatureTypeValidator.validate(cpa,messageHeader,message.getSignature());
+				manifestValidator.validate(message.getManifest(),message.getAttachments());
+				signatureTypeValidator.validate(cpa,document,messageHeader);
 				if (message.getAckRequested() == null)
 				{
 					ebMSDAO.executeTransaction(
@@ -313,9 +312,11 @@ public class EbMSMessageProcessor
 					return message.getSyncReply() == null ? null : acknowledgment;
 				}
 			}
-			else
+			catch (EbMSValidationException e)
 			{
-				logger.warn("Message invalid. MessageId: " + message.getMessageHeader().getMessageData().getMessageId());
+				logger.warn("Message " + message.getMessageHeader().getMessageData().getMessageId() + " invalid.\n" + e.getMessage());
+				ErrorList errorList = EbMSMessageUtils.createErrorList();
+				errorList.getError().add(e.getError());
 				final EbMSMessage messageError = EbMSMessageUtils.createEbMSMessageError(cpa,message,errorList,timestamp);
 				ebMSDAO.executeTransaction(
 					new DAOTransactionCallback()
@@ -373,11 +374,11 @@ public class EbMSMessageProcessor
 	
 	private EbMSMessage processStatusRequest(CollaborationProtocolAgreement cpa, final GregorianCalendar timestamp, final EbMSMessage message) throws DatatypeConfigurationException, JAXBException
 	{
-		GregorianCalendar c = null;
-		MessageHeader messageHeader = message.getMessageHeader();
-		ErrorList errorList = EbMSMessageUtils.createErrorList();
-		if (cpaValidator.isValid(errorList,cpa,messageHeader,timestamp))
+		try
 		{
+			GregorianCalendar c = null;
+			MessageHeader messageHeader = message.getMessageHeader();
+			cpaValidator.validate(cpa,messageHeader,timestamp);
 			EbMSMessageStatus status = EbMSMessageStatus.UNAUTHORIZED;
 			MessageHeader header = ebMSDAO.getMessageHeader(message.getStatusRequest().getRefToMessageId());
 			if (header == null || header.getService().getValue().equals(Constants.EBMS_SERVICE_URI))
@@ -392,14 +393,26 @@ public class EbMSMessageProcessor
 			}
 			return EbMSMessageUtils.createEbMSStatusResponse(cpa,message,status,c); 
 		}
-		return null;
+		catch (EbMSValidationException e)
+		{
+			logger.warn("",e);
+			return null;
+		}
 	}
 	
 	private EbMSMessage processPing(CollaborationProtocolAgreement cpa, final GregorianCalendar timestamp, final EbMSMessage message) throws DatatypeConfigurationException, JAXBException
 	{
-		MessageHeader messageHeader = message.getMessageHeader();
-		ErrorList errorList = EbMSMessageUtils.createErrorList();
-		return cpaValidator.isValid(errorList,cpa,messageHeader,timestamp) ? EbMSMessageUtils.createEbMSPong(cpa,message) : null;
+		try
+		{
+			MessageHeader messageHeader = message.getMessageHeader();
+			cpaValidator.validate(cpa,messageHeader,timestamp);
+			return EbMSMessageUtils.createEbMSPong(cpa,message);
+		}
+		catch(EbMSValidationException e)
+		{
+			logger.warn("",e);
+			return null;
+		}
 	}
 	
 	private boolean isDuplicateMessage(EbMSMessage message)

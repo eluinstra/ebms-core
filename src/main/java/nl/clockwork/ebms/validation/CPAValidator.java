@@ -25,29 +25,18 @@ import nl.clockwork.ebms.util.EbMSMessageUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CollaborationProtocolAgreement;
-import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.ErrorList;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageHeader;
-import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.SeverityType;
 
 public class CPAValidator
 {
   protected transient Log logger = LogFactory.getLog(getClass());
 
-	public boolean isValid(ErrorList errorList, CollaborationProtocolAgreement cpa, MessageHeader messageHeader, GregorianCalendar timestamp)
+	public void validate(CollaborationProtocolAgreement cpa, MessageHeader messageHeader, GregorianCalendar timestamp) throws EbMSValidationException
 	{
 		if (!cpaExists(cpa,messageHeader))
-		{
-			errorList.getError().add(EbMSMessageUtils.createError("//Header/MessageHeader[@cpaid]",Constants.EbMSErrorCode.VALUE_NOT_RECOGNIZED.errorCode(),"CPA not found."));
-			errorList.setHighestSeverity(SeverityType.ERROR);
-			return false;
-		}
+			throw new EbMSValidationException(EbMSMessageUtils.createError("//Header/MessageHeader[@cpaid]",Constants.EbMSErrorCode.VALUE_NOT_RECOGNIZED.errorCode(),"CPA not found."));
 		if (!CPAUtils.isValid(cpa,timestamp))
-		{
-			errorList.getError().add(EbMSMessageUtils.createError("//Header/MessageHeader[@cpaid]",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Invalid CPA."));
-			errorList.setHighestSeverity(SeverityType.ERROR);
-			return false;
-		}
-		return true;
+			throw new EbMSValidationException(EbMSMessageUtils.createError("//Header/MessageHeader[@cpaid]",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Invalid CPA."));
 	}
 
 	public void validate(CollaborationProtocolAgreement cpa) throws ValidatorException

@@ -67,7 +67,7 @@ public class ProcessEbMSEvents implements Job
 				EbMSDocument requestDocument = new EbMSDocument(EbMSMessageUtils.createSOAPMessage(message),message.getAttachments());
 				signatureGenerator.generate(cpa,requestDocument,message.getMessageHeader());
 				String uri = CPAUtils.getUri(cpa,message);
-				logger.info("Sending message. MessageId: " +  message.getMessageHeader().getMessageData().getMessageId());
+				logger.info("Sending message " +  message.getMessageHeader().getMessageData().getMessageId());
 				EbMSDocument responseDocument = ebMSClient.sendMessage(uri,requestDocument);
 				messageProcessor.processResponse(requestDocument,responseDocument);
 				updateEvent(event,EbMSEventStatus.PROCESSED,null);
@@ -106,7 +106,7 @@ public class ProcessEbMSEvents implements Job
 						public void doInTransaction()
 						{
 							EbMSMessage message = ebMSDAO.getMessage(event.getEbMSMessageId());
-							logger.info("Expiring message. MessageId " +  message.getMessageHeader().getMessageData().getMessageId());
+							logger.info("Expiring message " +  message.getMessageHeader().getMessageData().getMessageId());
 							updateEvent(event,EbMSEventStatus.PROCESSED,null);
 							ebMSDAO.deleteEvents(event.getEbMSMessageId(),EbMSEventStatus.UNPROCESSED);
 							ebMSDAO.updateMessageStatus(event.getEbMSMessageId(),null,EbMSMessageStatus.NOT_ACKNOWLEDGED);
