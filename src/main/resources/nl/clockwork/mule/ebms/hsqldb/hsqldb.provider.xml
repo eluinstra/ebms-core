@@ -22,7 +22,7 @@
 		<property name="dataSource" ref="ebMSDataSource"/>
 		<property name="driverClassName" value="org.hsqldb.jdbcDriver"/>
 		<property name="execute" value="${ebms.hsqldb.init}"/>
-		<property name="sqlFiles" value="/nl/clockwork/ebms/hsqldb/hsqldb.sql"/>
+		<property name="sqlFiles" value="/nl/clockwork/mule/ebms/hsqldb/hsqldb.sql"/>
 	</bean>
 	
 </beans>
