@@ -23,13 +23,9 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.Date;
 
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.JAXBException;
-import javax.xml.namespace.QName;
 import javax.xml.transform.TransformerException;
 
 import nl.clockwork.ebms.Constants.EbMSMessageStatus;
-import nl.clockwork.ebms.common.XMLMessageBuilder;
 import nl.clockwork.ebms.common.util.DOMUtils;
 import nl.clockwork.ebms.dao.DAOException;
 import nl.clockwork.ebms.dao.spring.AbstractEbMSDAO;
@@ -37,10 +33,7 @@ import nl.clockwork.ebms.model.EbMSAttachment;
 import nl.clockwork.ebms.model.EbMSMessage;
 
 import org.apache.commons.io.IOUtils;
-import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.AckRequested;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageHeader;
-import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageOrder;
-import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.SyncReply;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
@@ -48,7 +41,6 @@ import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallback;
 import org.springframework.transaction.support.TransactionTemplate;
-import org.w3._2000._09.xmldsig.SignatureType;
 
 public class EbMSDAOImpl extends AbstractEbMSDAO
 {
@@ -129,23 +121,13 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 												"service_type," +
 												"service," +
 												"action," +
-												"original," +
-												"signature," +
-												"message_header," +
-												"sync_reply," +
-												"message_order," +
-												"ack_requested," +
 												"content," +
 												"status," +
 												"status_time" +
-											") values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?," + (status == null ? "null" : getTimestampFunction()) + ")" +
+											") values (?,?,?,?,?,?,?,?,?,?,?,?,?,?," + (status == null ? "null" : getTimestampFunction()) + ")" +
 											" returning id"
 										);
-										//ps.setDate(1,new java.sql.Date(timestamp.getTime()));
-										//ps.setString(1,String.format(getDateFormat(),timestamp));
 										ps.setTimestamp(1,new Timestamp(timestamp.getTime()));
-										//ps.setObject(1,timestamp,Types.TIMESTAMP);
-										//ps.setObject(1,timestamp);
 										MessageHeader messageHeader = message.getMessageHeader();
 										ps.setString(2,messageHeader.getCPAId());
 										ps.setString(3,messageHeader.getConversationId());
@@ -162,25 +144,15 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 										ps.setString(11,messageHeader.getService().getValue());
 										ps.setString(12,messageHeader.getAction());
 										ps.setString(13,DOMUtils.toString(message.getDocument(),"UTF-8"));
-										ps.setString(14,XMLMessageBuilder.getInstance(SignatureType.class).handle(new JAXBElement<SignatureType>(new QName("http://www.w3.org/2000/09/xmldsig#","Signature"),SignatureType.class,message.getSignature())));
-										ps.setString(15,XMLMessageBuilder.getInstance(MessageHeader.class).handle(messageHeader));
-										ps.setString(16,XMLMessageBuilder.getInstance(SyncReply.class).handle(message.getSyncReply()));
-										ps.setString(17,XMLMessageBuilder.getInstance(MessageOrder.class).handle(message.getMessageOrder()));
-										ps.setString(18,XMLMessageBuilder.getInstance(AckRequested.class).handle(message.getAckRequested()));
-										ps.setString(19,getContent(message));
 										if (status == null)
-											ps.setNull(20,java.sql.Types.INTEGER);
+											ps.setNull(14,java.sql.Types.INTEGER);
 										else
-											ps.setInt(20,status.id());
-										//ps.setString(21,status == null ? null : String.format(getDateFormat(),timestamp));
-										//ps.setTimestamp(21,status == null ? null : new Timestamp(timestamp.getTime()));
-										//ps.setObject(21,status == null ? null : timestamp,Types.TIMESTAMP);
-										//ps.setObject(21,status == null ? null : timestamp);
+											ps.setInt(14,status.id());
+										//ps.setString(15,status == null ? null : String.format(getDateFormat(),timestamp));
+										//ps.setTimestamp(15,status == null ? null : new Timestamp(timestamp.getTime()));
+										//ps.setObject(15,status == null ? null : timestamp,Types.TIMESTAMP);
+										//ps.setObject(15,status == null ? null : timestamp);
 										return ps;
-									}
-									catch (JAXBException e)
-									{
-										throw new SQLException(e);
 									}
 									catch (TransformerException e)
 									{
@@ -256,14 +228,8 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 												"service_type," +
 												"service," +
 												"action," +
-												"original," +
-												"signature," +
-												"message_header," +
-												"sync_reply," +
-												"message_order," +
-												"ack_requested," +
 												"content" +
-											") values (?,?,?,?,?,(select max(message_nr) + 1 from ebms_message where message_id = ?),?,?,?,?,?,?,?,?,?,?,?,?,?,?)" +
+											") values (?,?,?,?,?,(select max(message_nr) + 1 from ebms_message where message_id = ?),?,?,?,?,?,?,?,?)" +
 											" returning id"
 										);
 										//ps.setDate(1,new java.sql.Date(timestamp.getTime()));
@@ -288,17 +254,7 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 										ps.setString(12,messageHeader.getService().getValue());
 										ps.setString(13,messageHeader.getAction());
 										ps.setString(14,DOMUtils.toString(message.getDocument(),"UTF-8"));
-										ps.setString(15,XMLMessageBuilder.getInstance(SignatureType.class).handle(new JAXBElement<SignatureType>(new QName("http://www.w3.org/2000/09/xmldsig#","Signature"),SignatureType.class,message.getSignature())));
-										ps.setString(16,XMLMessageBuilder.getInstance(MessageHeader.class).handle(messageHeader));
-										ps.setString(17,XMLMessageBuilder.getInstance(SyncReply.class).handle(message.getSyncReply()));
-										ps.setString(18,XMLMessageBuilder.getInstance(MessageOrder.class).handle(message.getMessageOrder()));
-										ps.setString(19,XMLMessageBuilder.getInstance(AckRequested.class).handle(message.getAckRequested()));
-										ps.setString(20,getContent(message));
 										return ps;
-									}
-									catch (JAXBException e)
-									{
-										throw new SQLException(e);
 									}
 									catch (TransformerException e)
 									{

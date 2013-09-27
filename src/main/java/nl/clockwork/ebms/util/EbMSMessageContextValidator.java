@@ -37,11 +37,11 @@ public class EbMSMessageContextValidator
 		try
 		{
 			if (StringUtils.isEmpty(context.getCpaId()))
-				throw new EbMSMessageContextValidationException("context.cpaId cannot be empty.");
+				throw new EbMSMessageContextValidationException("context.cpaId cannot be empty!");
 			if (StringUtils.isEmpty(context.getService()))
-				throw new EbMSMessageContextValidationException("context.service cannot be empty.");
+				throw new EbMSMessageContextValidationException("context.service cannot be empty!");
 			if (StringUtils.isEmpty(context.getAction()))
-				throw new EbMSMessageContextValidationException("context.action cannot be empty.");
+				throw new EbMSMessageContextValidationException("context.action cannot be empty!");
 
 			CollaborationProtocolAgreement cpa = ebMSDAO.getCPA(context.getCpaId());
 			if (cpa == null)

@@ -21,20 +21,27 @@ import nl.clockwork.ebms.Constants.EbMSEventType;
 
 public class EbMSEvent
 {
-	private Long ebMSMessageId;
+	private String messageId;
 	private Date time;
 	private EbMSEventType type;
+	private String uri;
 
-	public EbMSEvent(Long ebMSMessageId, Date time, EbMSEventType type)
+	public EbMSEvent(String messageId, Date time, EbMSEventType type)
 	{
-		this.ebMSMessageId = ebMSMessageId;
-		this.time = time;
-		this.type = type;
+		this(messageId,time,type,null);
 	}
 
-	public Long getEbMSMessageId()
+	public EbMSEvent(String messageId, Date time, EbMSEventType type, String uri)
 	{
-		return ebMSMessageId;
+		this.messageId = messageId;
+		this.time = time;
+		this.type = type;
+		this.uri = uri;
+	}
+
+	public String getMessageId()
+	{
+		return messageId;
 	}
 
 	public Date getTime()
@@ -47,4 +54,8 @@ public class EbMSEvent
 		return type;
 	}
 
+	public String getUri()
+	{
+		return uri;
+	}
 }

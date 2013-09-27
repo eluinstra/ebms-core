@@ -45,97 +45,6 @@ public class EbMSMessage
 	private StatusResponse statusResponse;
 	private List<EbMSAttachment> attachments = new ArrayList<EbMSAttachment>();
 
-	public EbMSMessage(MessageHeader messageHeader, AckRequested ackRequested, Manifest manifest, List<EbMSAttachment> attachments)
-	{
-		this(null,null,messageHeader,null,null,ackRequested,manifest,attachments);
-	}
-	
-	public EbMSMessage(Document document, SignatureType signature, MessageHeader messageHeader, AckRequested ackRequested, Manifest manifest, List<EbMSAttachment> attachments)
-	{
-		this(document,signature,messageHeader,null,null,ackRequested,manifest,attachments);
-	}
-	
-	public EbMSMessage(Document document, SignatureType signature, MessageHeader messageHeader, SyncReply syncReply, MessageOrder messageOrder, AckRequested ackRequested, Manifest manifest, List<EbMSAttachment> attachments)
-	{
-		this(document,signature,messageHeader,syncReply,messageOrder,ackRequested,null,null,manifest,null,null,attachments);
-	}
-	
-	public EbMSMessage(MessageHeader messageHeader)
-	{
-		this(null,messageHeader,null,null,null,null,null,null,null,null,null);
-	}
-	
-	public EbMSMessage(SignatureType signature, MessageHeader messageHeader)
-	{
-		this(signature,messageHeader,null,null,null,null,null,null,null,null,null);
-	}
-	
-	public EbMSMessage(MessageHeader messageHeader, ErrorList errorList)
-	{
-		this(null,messageHeader,null,null,null,errorList,null,null,null,null,null);
-	}
-	
-	public EbMSMessage(Document document, SignatureType signature, MessageHeader messageHeader, ErrorList errorList)
-	{
-		this(document,signature,messageHeader,null,null,null,errorList,null,null,null,null,null);
-	}
-	
-	public EbMSMessage(MessageHeader messageHeader, Acknowledgment acknowledgment)
-	{
-		this(null,messageHeader,null,null,null,null,acknowledgment,null,null,null,null);
-	}
-	
-	public EbMSMessage(Document document, SignatureType signature, MessageHeader messageHeader, Acknowledgment acknowledgment)
-	{
-		this(document,signature,messageHeader,null,null,null,null,acknowledgment,null,null,null,null);
-	}
-	
-	public EbMSMessage(SignatureType signature, MessageHeader messageHeader, SyncReply syncReply, StatusRequest statusRequest)
-	{
-		this(signature,messageHeader,syncReply,null,null,null,null,null,statusRequest,null,null);
-	}
-	
-	public EbMSMessage(MessageHeader messageHeader, StatusRequest statusRequest)
-	{
-		this(null,messageHeader,null,null,null,null,null,null,statusRequest,null,null);
-	}
-	
-	public EbMSMessage(MessageHeader messageHeader, StatusResponse statusResponse)
-	{
-		this(null,messageHeader,null,null,null,null,null,null,null,statusResponse,null);
-	}
-	
-	public EbMSMessage(SignatureType signature, MessageHeader messageHeader, StatusResponse statusResponse)
-	{
-		this(signature,messageHeader,null,null,null,null,null,null,null,statusResponse,null);
-	}
-	
-	public EbMSMessage(MessageHeader messageHeader, SyncReply syncReply, MessageOrder messageOrder, AckRequested ackRequested, ErrorList errorList, Acknowledgment acknowledgment, Manifest manifest, StatusRequest statusRequest, StatusResponse statusResponse, List<EbMSAttachment> attachments)
-	{
-		this(null,messageHeader,syncReply,messageOrder,ackRequested,errorList,acknowledgment,manifest,statusRequest,statusResponse,attachments);
-	}
-	
-	public EbMSMessage(SignatureType signature,MessageHeader messageHeader, SyncReply syncReply, MessageOrder messageOrder, AckRequested ackRequested, ErrorList errorList, Acknowledgment acknowledgment, Manifest manifest, StatusRequest statusRequest, StatusResponse statusResponse, List<EbMSAttachment> attachments)
-	{
-		this(null,signature,messageHeader,syncReply,messageOrder,ackRequested,errorList,acknowledgment,manifest,statusRequest,statusResponse,attachments);
-	}
-
-	public EbMSMessage(Document document, SignatureType signature,MessageHeader messageHeader, SyncReply syncReply, MessageOrder messageOrder, AckRequested ackRequested, ErrorList errorList, Acknowledgment acknowledgment, Manifest manifest, StatusRequest statusRequest, StatusResponse statusResponse, List<EbMSAttachment> attachments)
-	{
-		this.document = document;
-		this.signature = signature;
-		this.messageHeader = messageHeader;
-		this.syncReply = syncReply;
-		this.messageOrder = messageOrder;
-		this.ackRequested = ackRequested;
-		this.errorList = errorList;
-		this.acknowledgment = acknowledgment;
-		this.statusRequest = statusRequest;
-		this.statusResponse = statusResponse;
-		this.manifest = manifest;
-		this.attachments = attachments == null ? new ArrayList<EbMSAttachment>() : attachments;
-	}
-	
 	public Document getDocument()
 	{
 		return document;
@@ -161,9 +70,19 @@ public class EbMSMessage
 		return messageHeader;
 	}
 	
+	public void setMessageHeader(MessageHeader messageHeader)
+	{
+		this.messageHeader = messageHeader;
+	}
+	
 	public SyncReply getSyncReply()
 	{
 		return syncReply;
+	}
+	
+	public void setSyncReply(SyncReply syncReply)
+	{
+		this.syncReply = syncReply;
 	}
 	
 	public MessageOrder getMessageOrder()
@@ -171,9 +90,19 @@ public class EbMSMessage
 		return messageOrder;
 	}
 	
+	public void setMessageOrder(MessageOrder messageOrder)
+	{
+		this.messageOrder = messageOrder;
+	}
+	
 	public AckRequested getAckRequested()
 	{
 		return ackRequested;
+	}
+	
+	public void setAckRequested(AckRequested ackRequested)
+	{
+		this.ackRequested = ackRequested;
 	}
 	
 	public ErrorList getErrorList()
@@ -181,9 +110,19 @@ public class EbMSMessage
 		return errorList;
 	}
 	
+	public void setErrorList(ErrorList errorList)
+	{
+		this.errorList = errorList;
+	}
+	
 	public Acknowledgment getAcknowledgment()
 	{
 		return acknowledgment;
+	}
+	
+	public void setAcknowledgment(Acknowledgment acknowledgment)
+	{
+		this.acknowledgment = acknowledgment;
 	}
 	
 	public Manifest getManifest()
@@ -191,18 +130,38 @@ public class EbMSMessage
 		return manifest;
 	}
 	
+	public void setManifest(Manifest manifest)
+	{
+		this.manifest = manifest;
+	}
+	
 	public StatusRequest getStatusRequest()
 	{
 		return statusRequest;
+	}
+	
+	public void setStatusRequest(StatusRequest statusRequest)
+	{
+		this.statusRequest = statusRequest;
 	}
 	
 	public StatusResponse getStatusResponse()
 	{
 		return statusResponse;
 	}
+	
+	public void setStatusResponse(StatusResponse statusResponse)
+	{
+		this.statusResponse = statusResponse;
+	}
 
 	public List<EbMSAttachment> getAttachments()
 	{
 		return attachments;
+	}
+	
+	public void setAttachments(List<EbMSAttachment> attachments)
+	{
+		this.attachments = attachments;
 	}
 }

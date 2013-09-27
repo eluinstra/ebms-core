@@ -42,14 +42,16 @@ CREATE TABLE ebms_attachment
 	FOREIGN KEY (ebms_message_id) REFERENCES ebms_message(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-CREATE TABLE ebms_send_event
+CREATE TABLE ebms_event
 (
 	ebms_message_id		INTEGER					NOT NULL REFERENCES ebms_message(id),
 	time							TIMESTAMP				NOT NULL DEFAULT NOW(),
+	type							INTEGER					NOT NULL,
 	status						INTEGER					NOT NULL DEFAULT 0,
 	status_time				TIMESTAMP				NOT NULL DEFAULT '0000-00-00 00:00:00',
+	uri								VARCHAR(256)		NULL,
 	error_message			TEXT						NULL,
 	FOREIGN KEY (ebms_message_id) REFERENCES ebms_message(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-ALTER TABLE ebms_send_event ADD CONSTRAINT uc_ebms_send_event UNIQUE (ebms_message_id,time);
+ALTER TABLE ebms_event ADD CONSTRAINT uc_ebms_event UNIQUE (ebms_message_id,time);

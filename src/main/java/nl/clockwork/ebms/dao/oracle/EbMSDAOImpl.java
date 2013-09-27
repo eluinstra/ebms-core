@@ -74,16 +74,10 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 				"service_type," +
 				"service," +
 				"action," +
-				"original," +
-				"signature," +
-				"message_header," +
-				"sync_reply," +
-				"message_order," +
-				"ack_requested," +
 				"content," +
 				"status," +
 				"status_time" +
-			") values (seq_ebms_message_id.nextval,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?," + (status == null ? "null" : getTimestampFunction()) + ")",
+			") values (seq_ebms_message_id.nextval,?,?,?,?,?,?,?,?,?,?,?,?,?,?," + (status == null ? "null" : getTimestampFunction()) + ")",
 			//new String[]{"id"}
 			new int[]{1}
 		);
@@ -109,14 +103,8 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 				"service_type," +
 				"service," +
 				"action," +
-				"original," +
-				"signature," +
-				"message_header," +
-				"sync_reply," +
-				"message_order," +
-				"ack_requested," +
 				"content," +
-			") values (seq_ebms_message_id.nextval,?,?,?,?,?,(select max(message_nr) + 1 from ebms_message where message_id = ?),?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+			") values (seq_ebms_message_id.nextval,?,?,?,?,?,(select max(message_nr) + 1 from ebms_message where message_id = ?),?,?,?,?,?,?,?,?)",
 			//new String[]{"id"}
 			new int[]{1}
 		);

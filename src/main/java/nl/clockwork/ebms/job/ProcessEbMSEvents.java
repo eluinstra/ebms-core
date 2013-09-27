@@ -32,15 +32,11 @@ import nl.clockwork.ebms.dao.DAOTransactionCallback;
 import nl.clockwork.ebms.dao.EbMSDAO;
 import nl.clockwork.ebms.model.EbMSDocument;
 import nl.clockwork.ebms.model.EbMSEvent;
-import nl.clockwork.ebms.model.EbMSMessage;
 import nl.clockwork.ebms.processor.EbMSMessageProcessor;
-import nl.clockwork.ebms.processor.EbMSProcessingException;
-import nl.clockwork.ebms.util.CPAUtils;
 
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CollaborationProtocolAgreement;
 
 public class ProcessEbMSEvents implements Job
 {
@@ -58,14 +54,9 @@ public class ProcessEbMSEvents implements Job
 		{
 			try
 			{
-				EbMSMessage message = ebMSDAO.getMessage(event.getEbMSMessageId());
-				CollaborationProtocolAgreement cpa = ebMSDAO.getCPA(message.getMessageHeader().getCPAId());
-				if (cpa == null)
-					throw new EbMSProcessingException("CPA " + message.getMessageHeader().getCPAId() + " not found!");
-				EbMSDocument requestDocument = new EbMSDocument(message.getDocument(),message.getAttachments());
-				String uri = CPAUtils.getUri(cpa,message);
-				logger.info("Sending message. MessageId " +  message.getMessageHeader().getMessageData().getMessageId());
-				EbMSDocument responseDocument = ebMSClient.sendMessage(uri,requestDocument);
+				EbMSDocument requestDocument = ebMSDAO.getDocument(event.getMessageId());
+				logger.info("Sending message " +  event.getMessageId());
+				EbMSDocument responseDocument = ebMSClient.sendMessage(event.getUri(),requestDocument);
 				messageProcessor.processResponse(requestDocument,responseDocument);
 				updateEvent(event,EbMSEventStatus.PROCESSED,null);
 			}
@@ -102,12 +93,11 @@ public class ProcessEbMSEvents implements Job
 						@Override
 						public void doInTransaction()
 						{
-							EbMSMessage message = ebMSDAO.getMessage(event.getEbMSMessageId());
-							logger.info("Expiring message. MessageId " +  message.getMessageHeader().getMessageData().getMessageId());
+							logger.info("Expiring message " +  event.getMessageId());
 							updateEvent(event,EbMSEventStatus.PROCESSED,null);
-							ebMSDAO.deleteEvents(event.getEbMSMessageId(),EbMSEventStatus.UNPROCESSED);
-							ebMSDAO.updateMessageStatus(event.getEbMSMessageId(),null,EbMSMessageStatus.NOT_ACKNOWLEDGED);
-							eventListener.onMessageNotAcknowledged(message.getMessageHeader().getMessageData().getMessageId());
+							ebMSDAO.deleteEvents(event.getMessageId(),EbMSEventStatus.UNPROCESSED);
+							ebMSDAO.updateMessageStatus(event.getMessageId(),null,EbMSMessageStatus.NOT_ACKNOWLEDGED);
+							eventListener.onMessageNotAcknowledged(event.getMessageId());
 						}
 					}
 				);
@@ -158,16 +148,16 @@ public class ProcessEbMSEvents implements Job
 	private void updateEvent(final EbMSEvent event, final EbMSEventStatus status, final String errorMessage)
 	{
 		ebMSDAO.executeTransaction(
-  			new DAOTransactionCallback()
+			new DAOTransactionCallback()
+			{
+				@Override
+				public void doInTransaction()
 				{
-					@Override
-					public void doInTransaction()
-					{
-						ebMSDAO.updateEvent(event.getTime(),event.getEbMSMessageId(),status,errorMessage);
-						ebMSDAO.deleteEventsBefore(event.getTime(),event.getEbMSMessageId(),EbMSEventStatus.UNPROCESSED);
-					}
+					ebMSDAO.updateEvent(event.getTime(),event.getMessageId(),status,errorMessage);
+					ebMSDAO.deleteEventsBefore(event.getTime(),event.getMessageId(),EbMSEventStatus.UNPROCESSED);
 				}
-  		);
+			}
+		);
 	}
 
 	public void setMaxThreads(int maxThreads)

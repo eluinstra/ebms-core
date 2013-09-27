@@ -41,13 +41,15 @@ CREATE TABLE ebms_attachment
 	content						IMAGE						NOT NULL
 );
 
-CREATE TABLE ebms_send_event
+CREATE TABLE ebms_event
 (
 	ebms_message_id		INT							NOT NULL FOREIGN KEY REFERENCES ebms_message(id),
 	time							DATETIME				NOT NULL DEFAULT GETDATE(),
+	type							INT					NOT NULL,
 	status						INT							NOT NULL DEFAULT 0,
 	status_time				DATETIME				NOT NULL DEFAULT GETDATE(),
+	uri								VARCHAR(256)		NULL,
 	error_message			TEXT						NULL
 );
 
-ALTER TABLE ebms_send_event ADD CONSTRAINT uc_ebms_send_event UNIQUE (ebms_message_id,time);
+ALTER TABLE ebms_event ADD CONSTRAINT uc_ebms_event UNIQUE (ebms_message_id,time);

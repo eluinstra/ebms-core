@@ -38,10 +38,11 @@ import nl.clockwork.ebms.dao.DAOException;
 import nl.clockwork.ebms.dao.DAOTransactionCallback;
 import nl.clockwork.ebms.dao.EbMSDAO;
 import nl.clockwork.ebms.model.EbMSDocument;
-import nl.clockwork.ebms.model.EbMSEvent;
 import nl.clockwork.ebms.model.EbMSMessage;
+import nl.clockwork.ebms.model.EbMSMessageContext;
 import nl.clockwork.ebms.signature.EbMSSignatureGenerator;
 import nl.clockwork.ebms.signature.EbMSSignatureValidator;
+import nl.clockwork.ebms.util.CPAUtils;
 import nl.clockwork.ebms.util.EbMSMessageUtils;
 import nl.clockwork.ebms.validation.CPAValidator;
 import nl.clockwork.ebms.validation.EbMSValidationException;
@@ -96,11 +97,9 @@ public class EbMSMessageProcessor
 			GregorianCalendar timestamp = new GregorianCalendar();
 			final EbMSMessage message = EbMSMessageUtils.getEbMSMessage(document.getMessage(),document.getAttachments());
 			final CollaborationProtocolAgreement cpa = ebMSDAO.getCPA(message.getMessageHeader().getCPAId());
-			logger.info("Message received. MessageId " + message.getMessageHeader().getMessageData().getMessageId());
 			if (!Constants.EBMS_SERVICE_URI.equals(message.getMessageHeader().getService().getValue()))
 			{
-				EbMSMessage response = process(cpa,timestamp,message);
-				return response == null ? null : EbMSMessageUtils.getEbMSDocument(response);
+				return process(cpa,timestamp,message);
 			}
 			else if (EbMSAction.MESSAGE_ERROR.action().equals(message.getMessageHeader().getAction()))
 			{
@@ -188,9 +187,9 @@ public class EbMSMessageProcessor
 		{
 			EbMSMessage requestMessage = EbMSMessageUtils.getEbMSMessage(request.getMessage(),request.getAttachments());
 			if (requestMessage.getAckRequested() != null && requestMessage.getSyncReply() != null && response == null)
-				throw new EbMSProcessingException("No response received for message. MessageId " + requestMessage.getMessageHeader().getMessageData().getMessageId());
+				throw new EbMSProcessingException("No response received for message " + requestMessage.getMessageHeader().getMessageData().getMessageId());
 			else if ((requestMessage.getAckRequested() == null || requestMessage.getSyncReply() == null) && response != null)
-				throw new EbMSProcessingException("No response expected for message. MessageId " + requestMessage.getMessageHeader().getMessageData().getMessageId());
+				throw new EbMSProcessingException("No response expected for message " + requestMessage.getMessageHeader().getMessageData().getMessageId());
 
 			if (response != null)
 			{
@@ -235,12 +234,12 @@ public class EbMSMessageProcessor
 		}
 	}
 	
-	private EbMSMessage process(CollaborationProtocolAgreement cpa, final GregorianCalendar timestamp, final EbMSMessage message) throws DAOException, ValidatorException, DatatypeConfigurationException, JAXBException, SOAPException, ParserConfigurationException, SAXException, IOException, TransformerFactoryConfigurationError, TransformerException, EbMSProcessorException
+	private EbMSDocument process(final CollaborationProtocolAgreement cpa, final GregorianCalendar timestamp, final EbMSMessage message) throws DAOException, ValidatorException, DatatypeConfigurationException, JAXBException, SOAPException, ParserConfigurationException, SAXException, IOException, TransformerFactoryConfigurationError, TransformerException, EbMSProcessorException
 	{
 		final MessageHeader messageHeader = message.getMessageHeader();
 		if (isDuplicateMessage(message))
 		{
-			logger.warn("Duplicate message found! MessageId " + message.getMessageHeader().getMessageData().getMessageId());
+			logger.warn("Message " + message.getMessageHeader().getMessageData().getMessageId() + " is duplicate!");
 			if (message.getSyncReply() == null)
 			{
 				ebMSDAO.executeTransaction(
@@ -250,8 +249,8 @@ public class EbMSMessageProcessor
 						public void doInTransaction()
 						{
 							ebMSDAO.insertDuplicateMessage(timestamp.getTime(),message);
-							long responseId = ebMSDAO.getMessageId(messageHeader.getMessageData().getMessageId(),service,EbMSAction.MESSAGE_ERROR.action(),EbMSAction.ACKNOWLEDGMENT.action());
-							ebMSDAO.insertEvent(responseId,EbMSEventType.SEND);
+							EbMSMessageContext messageContext = ebMSDAO.getMessageContextByRefToMessageId(messageHeader.getMessageData().getMessageId(),service,EbMSAction.MESSAGE_ERROR.action(),EbMSAction.ACKNOWLEDGMENT.action());
+							ebMSDAO.insertEvent(messageContext.getMessageId(),EbMSEventType.SEND,CPAUtils.getResponseUri(cpa,message));
 						}
 					}
 				);
@@ -269,7 +268,7 @@ public class EbMSMessageProcessor
 						}
 					}
 				);
-				return ebMSDAO.getMessage(messageHeader.getMessageData().getMessageId(),service,EbMSAction.MESSAGE_ERROR.action(),EbMSAction.ACKNOWLEDGMENT.action());
+				return ebMSDAO.getDocument(messageHeader.getMessageData().getMessageId(),service,EbMSAction.MESSAGE_ERROR.action(),EbMSAction.ACKNOWLEDGMENT.action());
 			}
 		}
 		else
@@ -281,7 +280,6 @@ public class EbMSMessageProcessor
 				signatureTypeValidator.validate(cpa,messageHeader,message.getSignature());
 				manifestValidator.validate(message.getManifest(),message.getAttachments());
 				signatureTypeValidator.validate(cpa,messageHeader,message.getDocument(),message.getAttachments());
-				logger.info("Message valid. MessageId " + message.getMessageHeader().getMessageData().getMessageId());
 				if (message.getAckRequested() == null)
 				{
 					ebMSDAO.executeTransaction(
@@ -310,22 +308,19 @@ public class EbMSMessageProcessor
 							public void doInTransaction()
 							{
 								ebMSDAO.insertMessage(timestamp.getTime(),message,EbMSMessageStatus.RECEIVED);
-								long id = ebMSDAO.insertMessage(timestamp.getTime(),acknowledgment,null);
+								ebMSDAO.insertMessage(timestamp.getTime(),acknowledgment,null);
 								if (message.getSyncReply() == null)
-								{
-									EbMSEvent sendEvent = EbMSMessageUtils.getEbMSSendEvent(id,acknowledgment.getMessageHeader());
-									ebMSDAO.insertEvent(sendEvent);
-								}
+									ebMSDAO.insertEvent(EbMSMessageUtils.getEbMSSendEvent(acknowledgment.getMessageHeader(),CPAUtils.getUri(cpa,acknowledgment)));
 								eventListener.onMessageReceived(message.getMessageHeader().getMessageData().getMessageId());
 							}
 						}
 					);
-					return message.getSyncReply() == null ? null : acknowledgment;
+					return message.getSyncReply() == null ? null : new EbMSDocument(acknowledgment.getDocument());
 				}
 			}
 			catch (EbMSValidationException e)
 			{
-				logger.warn("Message invalid. MessageId " + message.getMessageHeader().getMessageData().getMessageId() + "\n" + e.getMessage());
+				logger.warn("Message " + message.getMessageHeader().getMessageData().getMessageId() + " invalid.\n" + e.getMessage());
 				ErrorList errorList = EbMSMessageUtils.createErrorList();
 				errorList.getError().add(e.getError());
 				final EbMSMessage messageError = EbMSMessageUtils.createEbMSMessageError(cpa,message,errorList,timestamp);
@@ -339,16 +334,13 @@ public class EbMSMessageProcessor
 						public void doInTransaction()
 						{
 							ebMSDAO.insertMessage(timestamp.getTime(),message,EbMSMessageStatus.FAILED);
-							long id = ebMSDAO.insertMessage(timestamp.getTime(),messageError,null);
+							ebMSDAO.insertMessage(timestamp.getTime(),messageError,null);
 							if (message.getSyncReply() == null)
-							{
-								EbMSEvent sendEvent = EbMSMessageUtils.getEbMSSendEvent(id,messageError.getMessageHeader());
-								ebMSDAO.insertEvent(sendEvent);
-							}
+								ebMSDAO.insertEvent(EbMSMessageUtils.getEbMSSendEvent(messageError.getMessageHeader(),CPAUtils.getUri(cpa,messageError)));
 						}
 					}
 				);
-				return message.getSyncReply() == null ? null : messageError;
+				return message.getSyncReply() == null ? null : new EbMSDocument(messageError.getDocument());
 			}
 		}
 	}
@@ -374,16 +366,12 @@ public class EbMSMessageProcessor
 					public void doInTransaction()
 					{
 						ebMSDAO.insertMessage(timestamp.getTime(),message,null);
-						Long id = ebMSDAO.getMessageId(message.getMessageHeader().getMessageData().getRefToMessageId());
-						if (id != null)
-						{
-							ebMSDAO.deleteEvents(id,EbMSEventStatus.UNPROCESSED);
-							ebMSDAO.updateMessageStatus(id,null,status);
-							if (status.equals(EbMSMessageStatus.ACKNOWLEDGED))
-								eventListener.onMessageAcknowledged(message.getMessageHeader().getMessageData().getRefToMessageId());
-							else if (status.equals(EbMSMessageStatus.DELIVERY_FAILED))
-								eventListener.onMessageDeliveryFailed(message.getMessageHeader().getMessageData().getRefToMessageId());
-						}
+						ebMSDAO.deleteEvents(message.getMessageHeader().getMessageData().getRefToMessageId(),EbMSEventStatus.UNPROCESSED);
+						ebMSDAO.updateMessageStatus(message.getMessageHeader().getMessageData().getRefToMessageId(),null,status);
+						if (status.equals(EbMSMessageStatus.ACKNOWLEDGED))
+							eventListener.onMessageAcknowledged(message.getMessageHeader().getMessageData().getRefToMessageId());
+						else if (status.equals(EbMSMessageStatus.DELIVERY_FAILED))
+							eventListener.onMessageDeliveryFailed(message.getMessageHeader().getMessageData().getRefToMessageId());
 					}
 				}
 			);

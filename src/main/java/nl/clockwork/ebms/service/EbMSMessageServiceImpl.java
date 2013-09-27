@@ -35,6 +35,7 @@ import nl.clockwork.ebms.model.EbMSMessageContext;
 import nl.clockwork.ebms.model.MessageStatus;
 import nl.clockwork.ebms.processor.EbMSProcessorException;
 import nl.clockwork.ebms.signature.EbMSSignatureGenerator;
+import nl.clockwork.ebms.util.CPAUtils;
 import nl.clockwork.ebms.util.EbMSMessageContextValidator;
 import nl.clockwork.ebms.util.EbMSMessageUtils;
 
@@ -86,7 +87,8 @@ public class EbMSMessageServiceImpl implements EbMSMessageService
 		try
 		{
 			new EbMSMessageContextValidator(ebMSDAO).validate(messageContent.getContext());
-			CollaborationProtocolAgreement cpa = ebMSDAO.getCPA(messageContent.getContext().getCpaId());
+			final CollaborationProtocolAgreement cpa = ebMSDAO.getCPA(messageContent.getContext().getCpaId());
+			//TODO ebMSMessageContentToEbMSDocument
 			final EbMSMessage message = EbMSMessageUtils.ebMSMessageContentToEbMSMessage(cpa,messageContent);
 			Document document = EbMSMessageUtils.createSOAPMessage(message);
 			signatureGenerator.generate(cpa,message.getMessageHeader(),document,message.getAttachments());
@@ -97,9 +99,9 @@ public class EbMSMessageServiceImpl implements EbMSMessageService
 					@Override
 					public void doInTransaction()
 					{
-						long id = ebMSDAO.insertMessage(new Date(),message,null);
-						List<EbMSEvent> events = EbMSMessageUtils.getEbMSSendEvents(ebMSDAO.getCPA(message.getMessageHeader().getCPAId()),id,message.getMessageHeader());
-						events.add(new EbMSEvent(id,message.getMessageHeader().getMessageData().getTimeToLive().toGregorianCalendar().getTime(),EbMSEventType.EXPIRE));
+						ebMSDAO.insertMessage(new Date(),message,null);
+						List<EbMSEvent> events = EbMSMessageUtils.getEbMSSendEvents(ebMSDAO.getCPA(message.getMessageHeader().getCPAId()),message.getMessageHeader(),CPAUtils.getUri(cpa,message));
+						events.add(new EbMSEvent(message.getMessageHeader().getMessageData().getMessageId(),message.getMessageHeader().getMessageData().getTimeToLive().toGregorianCalendar().getTime(),EbMSEventType.EXPIRE));
 						ebMSDAO.insertEvents(events);
 					}
 				}
@@ -133,15 +135,10 @@ public class EbMSMessageServiceImpl implements EbMSMessageService
 	{
 		try
 		{
-			EbMSMessage message = ebMSDAO.getMessage(messageId);
-			if (message instanceof EbMSMessage)
-			{
-				EbMSMessageContent result = EbMSMessageUtils.EbMSMessageToEbMSMessageContent((EbMSMessage)message);
-				if (process != null && process)
-					ebMSDAO.updateMessage(messageId,EbMSMessageStatus.RECEIVED,EbMSMessageStatus.PROCESSED);
-				return result;
-			}
-			return null;
+			EbMSMessageContent result = ebMSDAO.getMessageContent(messageId);
+			if (process != null && process)
+				ebMSDAO.updateMessage(messageId,EbMSMessageStatus.RECEIVED,EbMSMessageStatus.PROCESSED);
+			return result;
 		}
 		catch (Exception e)
 		{

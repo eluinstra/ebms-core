@@ -89,16 +89,10 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 				"service_type," +
 				"service," +
 				"action," +
-				"original," +
-				"signature," +
-				"message_header," +
-				"sync_reply," +
-				"message_order," +
-				"ack_requested," +
 				"content," +
 				"status," +
 				"status_time" +
-			") values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?," + (status == null ? "null" : getTimestampFunction()) + ")",
+			") values (?,?,?,?,?,?,?,?,?,?,?,?,?,?," + (status == null ? "null" : getTimestampFunction()) + ")",
 			Statement.RETURN_GENERATED_KEYS
 		);
 	}
@@ -122,14 +116,8 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 				"service_type," +
 				"service," +
 				"action," +
-				"original," +
-				"signature," +
-				"message_header," +
-				"sync_reply," +
-				"message_order," +
-				"ack_requested," +
 				"content" +
-			") values (?,?,?,?,?,(select max(message_nr) + 1 from ebms_message where message_id = ?),?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+			") values (?,?,?,?,?,(select max(message_nr) + 1 from ebms_message where message_id = ?),?,?,?,?,?,?,?,?)",
 			Statement.RETURN_GENERATED_KEYS
 		);
 	}

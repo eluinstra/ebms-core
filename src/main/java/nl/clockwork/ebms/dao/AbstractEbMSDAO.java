@@ -26,40 +26,31 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import javax.activation.DataSource;
 import javax.mail.util.ByteArrayDataSource;
-import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
-import javax.xml.namespace.QName;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
-import nl.clockwork.ebms.Constants;
-import nl.clockwork.ebms.Constants.EbMSAction;
 import nl.clockwork.ebms.Constants.EbMSEventStatus;
 import nl.clockwork.ebms.Constants.EbMSEventType;
 import nl.clockwork.ebms.Constants.EbMSMessageStatus;
 import nl.clockwork.ebms.common.XMLMessageBuilder;
 import nl.clockwork.ebms.common.util.DOMUtils;
 import nl.clockwork.ebms.model.EbMSAttachment;
-import nl.clockwork.ebms.model.EbMSMessage;
-import nl.clockwork.ebms.model.EbMSMessageContext;
+import nl.clockwork.ebms.model.EbMSDataSource;
+import nl.clockwork.ebms.model.EbMSDocument;
 import nl.clockwork.ebms.model.EbMSEvent;
+import nl.clockwork.ebms.model.EbMSMessage;
+import nl.clockwork.ebms.model.EbMSMessageContent;
+import nl.clockwork.ebms.model.EbMSMessageContext;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CollaborationProtocolAgreement;
-import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.AckRequested;
-import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.Acknowledgment;
-import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.ErrorList;
-import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.Manifest;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageHeader;
-import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageOrder;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.Service;
-import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.StatusRequest;
-import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.StatusResponse;
-import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.SyncReply;
-import org.w3._2000._09.xmldsig.SignatureType;
 import org.xml.sax.SAXException;
 
 public abstract class AbstractEbMSDAO implements EbMSDAO
@@ -370,16 +361,16 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	}
 	
 	@Override
-	public Long getMessageId(String refToMessageId, Service service, String...actions) throws DAOException
+	public String getMessageIdByRefToMessageId(String refToMessageId, Service service, String...actions) throws DAOException
 	{
 		Connection c = null;
 		PreparedStatement ps = null;
 		try
 		{
-			Long result = null;
+			String result = null;
 			c = connectionManager.getConnection();
 			ps  = c.prepareStatement(
-				"select id" +
+				"select message_id" +
 				" from ebms_message" +
 				" where ref_to_message_id = ?" +
 				" and message_nr = 0" +
@@ -392,7 +383,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 			{
 				ResultSet rs = ps.getResultSet();
 				if (rs.next())
-					result = rs.getLong("id");
+					result = rs.getString("message_id");
 			}
 			return result;
 		}
@@ -408,29 +399,90 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	}
 	
 	@Override
-	public EbMSMessage getMessage(String refToMessageId, Service service, String...actions) throws DAOException
+	public EbMSMessageContext getMessageContextByRefToMessageId(String refToMessageId, Service service, String...actions) throws DAOException
 	{
 		Connection c = null;
 		PreparedStatement ps = null;
 		try
 		{
-			EbMSMessage result = null;
+			EbMSMessageContext result = null;
+			c = connectionManager.getConnection();
+			ps = c.prepareStatement(
+				"select cpa_id," +
+				" from_role," +
+				" to_role," +
+				" service_type," +
+				" service," +
+				" action," +
+				" time_stamp," +
+				" conversation_id," +
+				" message_id," +
+				" ref_to_message_id," +
+				" sequence_nr" +
+				" from ebms_message" + 
+				" where message_id = ?" +
+				" and message_nr = 0" +
+				(service.getType() == null ? "" : " and serviceType = '" + service.getType() + "'") +
+				(service.getValue() == null ? "" : " and service = '" + service.getValue() + "'") +
+				(actions.length == 0 ? "" : " and action in (" + join(actions,",") + ")")
+			);
+			ps.setString(1,refToMessageId);
+			if (ps.execute())
+			{
+				ResultSet rs = ps.getResultSet();
+				if (rs.next())
+				{
+					result = new EbMSMessageContext();
+					result.setCpaId(rs.getString("cpa_id"));
+					result.setFromRole(rs.getString("from_role"));
+					result.setToRole(rs.getString("to_role"));
+					result.setServiceType(rs.getString("service_type"));
+					result.setService(rs.getString("service"));
+					result.setAction(rs.getString("action"));
+					result.setTimestamp(rs.getTimestamp("time_stamp"));
+					result.setConversationId(rs.getString("conversation_id"));
+					result.setMessageId(rs.getString("message_id"));
+					result.setRefToMessageId(rs.getString("ref_to_message_id"));
+					result.setSequenceNr(rs.getInt("sequence_nr"));
+				}
+			}
+			return result;
+		}
+		catch (SQLException e)
+		{
+			throw new DAOException(e);
+		}
+		finally
+		{
+			connectionManager.close(ps);
+			connectionManager.close();
+		}
+	}
+	
+	@Override
+	public EbMSDocument getDocument(String refToMessageId, Service service, String...actions) throws DAOException
+	{
+		Connection c = null;
+		PreparedStatement ps = null;
+		try
+		{
+			EbMSDocument result = null;
 			c = connectionManager.getConnection();
 			ps  = c.prepareStatement(
-				"select id, service, action, original, signature, message_header, ack_requested, content" +
+				"select content" +
 				" from ebms_message" +
 				" where ref_to_message_id = ?" +
 				" and message_nr = 0" +
 				(service.getType() == null ? "" : " and serviceType = '" + service.getType() + "'") +
 				(service.getValue() == null ? "" : " and service = '" + service.getValue() + "'") +
 				(actions.length == 0 ? "" : " and action in (" + join(actions,",") + ")")
-		);
+			);
 			ps.setString(1,refToMessageId);
 			if (ps.execute())
 			{
 				ResultSet rs = ps.getResultSet();
 				if (rs.next())
-					result = getEbMSMessage(rs);
+					result = new EbMSDocument(DOMUtils.read(rs.getString("content")),getAttachments(refToMessageId));
 			}
 			return result;
 		}
@@ -447,10 +499,6 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 			throw new DAOException(e);
 		}
 		catch (IOException e)
-		{
-			throw new DAOException(e);
-		}
-		catch (JAXBException e)
 		{
 			throw new DAOException(e);
 		}
@@ -501,25 +549,26 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	}
 
 	@Override
-	public EbMSMessage getMessage(long id) throws DAOException
+	public EbMSDocument getDocument(String messageId) throws DAOException
 	{
 		Connection c = null;
 		PreparedStatement ps = null;
 		try
 		{
-			EbMSMessage result = null;
+			EbMSDocument result = null;
 			c = connectionManager.getConnection();
-			ps = c.prepareStatement(
-				"select id, service, action, original, signature, message_header, ack_requested, content" + 
-				" from ebms_message" + 
-				" where id = ?"
+			ps  = c.prepareStatement(
+				"select content" +
+				" from ebms_message" +
+				" where message_id = ?" +
+				" and message_nr = 0"
 			);
-			ps.setLong(1,id);
+			ps.setString(1,messageId);
 			if (ps.execute())
 			{
 				ResultSet rs = ps.getResultSet();
 				if (rs.next())
-					result = getEbMSMessage(rs);
+					result = new EbMSDocument(DOMUtils.read(rs.getString("content")),getAttachments(messageId));
 			}
 			return result;
 		}
@@ -536,10 +585,6 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 			throw new DAOException(e);
 		}
 		catch (IOException e)
-		{
-			throw new DAOException(e);
-		}
-		catch (JAXBException e)
 		{
 			throw new DAOException(e);
 		}
@@ -595,18 +640,18 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 			List<EbMSEvent> result = new ArrayList<EbMSEvent>();
 			c = connectionManager.getConnection();
 			ps = c.prepareStatement(
-				"select ebms_message_id, time, type" +
+				"select e.message_id, e.time, e.type, e.uri" +
 				" from ebms_event e" + 
 				" inner join (" +
-					"	select ebms_message_id, max(time) as time" +
+					"	select message_id, max(time) as time" +
 					" from ebms_event" +
 					" where status = ?" +
 					" and time <= ?" +
-					" group by ebms_message_id" +
-					" order by time asc" +
+					" group by message_id" +
 				") l" +
-				" on e.ebms_message_id = l.ebms_message_id" +
-				" and e.time = l.time"
+				" on e.message_id = l.message_id" +
+				" and e.time = l.time" +
+				" order by e.time asc"
 			);
 			ps.setInt(1,status.id());
 			ps.setTimestamp(2,new Timestamp(timestamp.getTime()));
@@ -614,7 +659,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 			{
 				ResultSet rs = ps.getResultSet();
 				if (rs.next())
-					result.add(new EbMSEvent(rs.getLong("ebms_message_id"),rs.getTimestamp("time"),EbMSEventType.values()[rs.getInt("type")]));
+					result.add(new EbMSEvent(rs.getString("message_id"),rs.getTimestamp("time"),EbMSEventType.values()[rs.getInt("type")],rs.getString("uri")));
 			}
 			return result;
 		}
@@ -630,7 +675,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	}
 	
 	@Override
-	public void updateEvent(Date timestamp, Long ebMSMessageId, EbMSEventStatus status, String errorMessage) throws DAOException
+	public void updateEvent(Date timestamp, String messageId, EbMSEventStatus status, String errorMessage) throws DAOException
 	{
 		Connection c = null;
 		PreparedStatement ps = null;
@@ -642,12 +687,12 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 				" status = ?," +
 				" status_time = " + getTimestampFunction() + "," +
 				" error_message = ?" +
-				" where ebms_message_id = ?" +
+				" where message_id = ?" +
 				" and time = ?"
 			);
 			ps.setInt(1,status.id());
 			ps.setString(2,errorMessage);
-			ps.setLong(3,ebMSMessageId);
+			ps.setString(3,messageId);
 			ps.setTimestamp(4,new Timestamp(timestamp.getTime()));
 			ps.executeUpdate();
 		}
@@ -663,7 +708,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	}
 	
 	@Override
-	public void deleteEventsBefore(Date timestamp, Long ebMSMessageId, EbMSEventStatus status) throws DAOException
+	public void deleteEventsBefore(Date timestamp, String messageId, EbMSEventStatus status) throws DAOException
 	{
 		Connection c = null;
 		PreparedStatement ps = null;
@@ -672,11 +717,11 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 			c = connectionManager.getConnection();
 			ps  = c.prepareStatement(
 				"delete from ebms_event" +
-				" where ebms_message_id = ?" +
+				" where message_id = ?" +
 				" and time < ?" +
 				" and status = ?"
 			);
-			ps.setLong(1,ebMSMessageId);
+			ps.setString(1,messageId);
 			ps.setTimestamp(2,new Timestamp(timestamp.getTime()));
 			ps.setInt(3,status.id());
 			ps.executeUpdate();
@@ -709,16 +754,10 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 				"service_type," +
 				"service," +
 				"action," +
-				"original," +
-				"signature," +
-				"message_header," +
-				"sync_reply," +
-				"message_order," +
-				"ack_requested," +
 				"content," +
 				"status," +
 				"status_time" +
-			") values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?," + (status == null ? "null" : getTimestampFunction()) + ")",
+			") values (?,?,?,?,?,?,?,?,?,?,?,?,?,?," + (status == null ? "null" : getTimestampFunction()) + ")",
 			Statement.RETURN_GENERATED_KEYS
 		);
 	}
@@ -741,14 +780,8 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 				"service_type," +
 				"service," +
 				"action," +
-				"original," +
-				"signature," +
-				"message_header," +
-				"sync_reply," +
-				"message_order," +
-				"ack_requested," +
 				"content" +
-			") values (?,?,?,?,?,(select max(message_nr) + 1 from ebms_message where message_id = ?),?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+			") values (?,?,?,?,?,(select max(message_nr) + 1 from ebms_message where message_id = ?),?,?,?,?,?,?,?,?)",
 			Statement.RETURN_GENERATED_KEYS
 		);
 	}
@@ -762,11 +795,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 		{
 			c = connectionManager.getConnection(true);
 			ps = getInsertMessagePreparedStatement(c,status);
-			//ps.setDate(1,new java.sql.Date(timestamp.getTime()));
-			//ps.setString(1,String.format(getDateFormat(),timestamp));
 			ps.setTimestamp(1,new Timestamp(timestamp.getTime()));
-			//ps.setObject(1,timestamp,Types.TIMESTAMP);
-			//ps.setObject(1,timestamp);
 			MessageHeader messageHeader = message.getMessageHeader();
 			ps.setString(2,messageHeader.getCPAId());
 			ps.setString(3,messageHeader.getConversationId());
@@ -783,20 +812,14 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 			ps.setString(11,messageHeader.getService().getValue());
 			ps.setString(12,messageHeader.getAction());
 			ps.setString(13,DOMUtils.toString(message.getDocument(),"UTF-8"));
-			ps.setString(14,XMLMessageBuilder.getInstance(SignatureType.class).handle(new JAXBElement<SignatureType>(new QName("http://www.w3.org/2000/09/xmldsig#","Signature"),SignatureType.class,message.getSignature())));
-			ps.setString(15,XMLMessageBuilder.getInstance(MessageHeader.class).handle(messageHeader));
-			ps.setString(16,XMLMessageBuilder.getInstance(SyncReply.class).handle(message.getSyncReply()));
-			ps.setString(17,XMLMessageBuilder.getInstance(MessageOrder.class).handle(message.getMessageOrder()));
-			ps.setString(18,XMLMessageBuilder.getInstance(AckRequested.class).handle(message.getAckRequested()));
-			ps.setString(19,getContent(message));
 			if (status == null)
-				ps.setNull(20,java.sql.Types.INTEGER);
+				ps.setNull(14,java.sql.Types.INTEGER);
 			else
-				ps.setInt(20,status.id());
-			//ps.setString(21,status == null ? null : String.format(getDateFormat(),timestamp));
-			//ps.setTimestamp(21,status == null ? null : new Timestamp(timestamp.getTime()));
-			//ps.setObject(21,status == null ? null : timestamp,Types.TIMESTAMP);
-			//ps.setObject(21,status == null ? null : timestamp);
+				ps.setInt(14,status.id());
+			//ps.setString(15,status == null ? null : String.format(getDateFormat(),timestamp));
+			//ps.setTimestamp(15,status == null ? null : new Timestamp(timestamp.getTime()));
+			//ps.setObject(15,status == null ? null : timestamp,Types.TIMESTAMP);
+			//ps.setObject(15,status == null ? null : timestamp);
 			ps.executeUpdate();
 			ResultSet rs = ps.getGeneratedKeys();
 			if (rs.next())
@@ -833,11 +856,6 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 			}
 		}
 		catch (SQLException e)
-		{
-			connectionManager.rollback();
-			throw new DAOException(e);
-		}
-		catch (JAXBException e)
 		{
 			connectionManager.rollback();
 			throw new DAOException(e);
@@ -890,12 +908,6 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 			ps.setString(12,messageHeader.getService().getValue());
 			ps.setString(13,messageHeader.getAction());
 			ps.setString(14,DOMUtils.toString(message.getDocument(),"UTF-8"));
-			ps.setString(15,XMLMessageBuilder.getInstance(SignatureType.class).handle(new JAXBElement<SignatureType>(new QName("http://www.w3.org/2000/09/xmldsig#","Signature"),SignatureType.class,message.getSignature())));
-			ps.setString(16,XMLMessageBuilder.getInstance(MessageHeader.class).handle(messageHeader));
-			ps.setString(17,XMLMessageBuilder.getInstance(SyncReply.class).handle(message.getSyncReply()));
-			ps.setString(18,XMLMessageBuilder.getInstance(MessageOrder.class).handle(message.getMessageOrder()));
-			ps.setString(19,XMLMessageBuilder.getInstance(AckRequested.class).handle(message.getAckRequested()));
-			ps.setString(20,getContent(message));
 			ps.executeUpdate();
 			ResultSet rs = ps.getGeneratedKeys();
 			if (rs.next())
@@ -936,11 +948,6 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 			connectionManager.rollback();
 			throw new DAOException(e);
 		}
-		catch (JAXBException e)
-		{
-			connectionManager.rollback();
-			throw new DAOException(e);
-		}
 		catch (IOException e)
 		{
 			connectionManager.rollback();
@@ -959,7 +966,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	}
 	
 	@Override
-	public void updateMessageStatus(Long ebMSMessageId, EbMSMessageStatus oldStatus, EbMSMessageStatus newStatus) throws DAOException
+	public void updateMessageStatus(String messageId, EbMSMessageStatus oldStatus, EbMSMessageStatus newStatus) throws DAOException
 	{
 		Connection c = null;
 		PreparedStatement ps = null;
@@ -970,11 +977,12 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 				"update ebms_message" +
 				" set status = ?," + 
 				" status_time = " + getTimestampFunction() +
-				" where id = ?" +
+				" where message_id = ?" +
+				" and message_nr = 0" +
 				(oldStatus == null ? " and status is null" : " and status = " + oldStatus.id())
 			);
 			ps.setInt(1,newStatus.id());
-			ps.setLong(2,ebMSMessageId);
+			ps.setString(2,messageId);
 			ps.executeUpdate();
 		}
 		catch (SQLException e)
@@ -989,7 +997,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	}
 
 	@Override
-	public void insertEvent(long ebMSMessageId, EbMSEventType type) throws DAOException
+	public void insertEvent(String messageId, EbMSEventType type, String uri) throws DAOException
 	{
 		Connection c = null;
 		PreparedStatement ps = null;
@@ -998,12 +1006,14 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 			c = connectionManager.getConnection();
 			ps  = c.prepareStatement(
 				"insert into ebms_event (" +
-					"ebms_message_id," +
-					"type" +
-				") values (?,?)"
+					"message_id," +
+					"type," +
+					"uri" +
+				") values (?,?,?)"
 			);
-			ps.setLong(1,ebMSMessageId);
+			ps.setString(1,messageId);
 			ps.setInt(2,type.id());
+			ps.setString(3,uri);
 			ps.executeUpdate();
 		}
 		catch (SQLException e)
@@ -1020,7 +1030,6 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	@Override
 	public void insertEvent(EbMSEvent event) throws DAOException
 	{
-		//if (event != null)
 		Connection c = null;
 		PreparedStatement ps = null;
 		try
@@ -1028,15 +1037,17 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 			c = connectionManager.getConnection();
 			ps  = c.prepareStatement(
 				"insert into ebms_event (" +
-					"ebms_message_id," +
+					"message_id," +
 					"time," +
-					"type" +
-				") values (?,?,?)"
+					"type," +
+					"uri" +
+				") values (?,?,?,?)"
 			);
-			ps.setLong(1,event.getEbMSMessageId());
+			ps.setString(1,event.getMessageId());
 			//ps.setTimestamp(2,String.format(getDateFormat(),event.getTime()));
 			ps.setTimestamp(2,new Timestamp(event.getTime().getTime()));
 			ps.setInt(3,event.getType().id());
+			ps.setString(4,event.getUri());
 			ps.executeUpdate();
 		}
 		catch (SQLException e)
@@ -1060,16 +1071,18 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 			c = connectionManager.getConnection();
 			ps  = c.prepareStatement(
 				"insert into ebms_event (" +
-					"ebms_message_id," +
+					"message_id," +
 					"time," +
-					"type" +
-				") values (?,?,?)"
+					"type," +
+					"uri" +
+				") values (?,?,?,?)"
 			);
 			for (EbMSEvent event : events)
 			{
-				ps.setLong(1,event.getEbMSMessageId());
+				ps.setString(1,event.getMessageId());
 				ps.setTimestamp(2,new Timestamp(event.getTime().getTime()));
 				ps.setInt(3,event.getType().id());
+				ps.setString(4,event.getUri());
 				ps.addBatch();
 			}
 			if (events.size() > 0)
@@ -1087,7 +1100,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	}
 
 	@Override
-	public void deleteEvents(Long ebMSMessageId, EbMSEventStatus status) throws DAOException
+	public void deleteEvents(String messageId, EbMSEventStatus status) throws DAOException
 	{
 		Connection c = null;
 		PreparedStatement ps = null;
@@ -1096,10 +1109,10 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 			c = connectionManager.getConnection();
 			ps  = c.prepareStatement(
 				"delete from ebms_event" +
-				" where ebms_message_id = ?" +
+				" where message_id = ?" +
 				" and status = ?"
 			);
-			ps.setLong(1,ebMSMessageId);
+			ps.setString(1,messageId);
 			ps.setInt(2,status.id());
 			ps.executeUpdate();
 		}
@@ -1186,17 +1199,26 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 		}
 	}
 
-	@Override
-	public EbMSMessage getMessage(String messageId) throws DAOException
+	private EbMSMessageContext getMessageContext(String messageId) throws SQLException
 	{
 		Connection c = null;
 		PreparedStatement ps = null;
 		try
 		{
-			EbMSMessage result = null;
+			EbMSMessageContext result = null;
 			c = connectionManager.getConnection();
 			ps = c.prepareStatement(
-				"select id, service, action, original, signature, message_header, ack_requested, content" + 
+				"select cpa_id," +
+				" from_role," +
+				" to_role," +
+				" service_type," +
+				" service," +
+				" action," +
+				" time_stamp," +
+				" conversation_id," +
+				" message_id," +
+				" ref_to_message_id," +
+				" sequence_nr" +
 				" from ebms_message" + 
 				" where message_id = ?" +
 				" and message_nr = 0"
@@ -1206,34 +1228,51 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 			{
 				ResultSet rs = ps.getResultSet();
 				if (rs.next())
-					result = getEbMSMessage(rs);
+				{
+					result = new EbMSMessageContext();
+					result.setCpaId(rs.getString("cpa_id"));
+					result.setFromRole(rs.getString("from_role"));
+					result.setToRole(rs.getString("to_role"));
+					result.setServiceType(rs.getString("service_type"));
+					result.setService(rs.getString("service"));
+					result.setAction(rs.getString("action"));
+					result.setTimestamp(rs.getTimestamp("time_stamp"));
+					result.setConversationId(rs.getString("conversation_id"));
+					result.setMessageId(rs.getString("message_id"));
+					result.setRefToMessageId(rs.getString("ref_to_message_id"));
+					result.setSequenceNr(rs.getInt("sequence_nr"));
+				}
 			}
 			return result;
 		}
+		finally
+		{
+			connectionManager.close(ps);
+			connectionManager.close();
+		}
+	}
+
+	@Override
+	public EbMSMessageContent getMessageContent(String messageId) throws DAOException
+	{
+		try
+		{
+			EbMSMessageContext messageContext = getMessageContext(messageId);
+			if (messageContext == null)
+				return null;
+			List<EbMSAttachment> attachments = getAttachments(messageId);
+			List<EbMSDataSource> dataSources = new ArrayList<EbMSDataSource>();
+			for (DataSource dataSource : attachments)
+				dataSources.add(new EbMSDataSource(dataSource.getName(),dataSource.getContentType(),IOUtils.toByteArray(dataSource.getInputStream())));
+			return new EbMSMessageContent(messageContext,dataSources);
+		}
 		catch (SQLException e)
-		{
-			throw new DAOException(e);
-		}
-		catch (ParserConfigurationException e)
-		{
-			throw new DAOException(e);
-		}
-		catch (SAXException e)
 		{
 			throw new DAOException(e);
 		}
 		catch (IOException e)
 		{
 			throw new DAOException(e);
-		}
-		catch (JAXBException e)
-		{
-			throw new DAOException(e);
-		}
-		finally
-		{
-			connectionManager.close(ps);
-			connectionManager.close();
 		}
 	}
 
@@ -1303,7 +1342,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 		}
 	}
 
-	private List<EbMSAttachment> getAttachments(long messageId) throws DAOException
+	private List<EbMSAttachment> getAttachments(String messageId) throws SQLException
 	{
 		Connection c = null;
 		PreparedStatement ps = null;
@@ -1312,11 +1351,13 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 			List<EbMSAttachment> result = new ArrayList<EbMSAttachment>();
 			c = connectionManager.getConnection();
 			ps = c.prepareStatement(
-				"select name, content_id, content_type, content" + 
-				" from ebms_attachment" + 
-				" where ebms_message_id = ?"
+				"select a.name, a.content_id, a.content_type, a.content" + 
+				" from ebms_message m, ebms_attachment a" + 
+				" where m.message_id = ?" +
+				" and m.message_nr = 0" +
+				" and m.id = a.ebms_message_id"
 			);
-			ps.setLong(1,messageId);
+			ps.setString(1,messageId);
 			if (ps.execute())
 			{
 				ResultSet rs = ps.getResultSet();
@@ -1328,10 +1369,6 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 				}
 			}
 			return result;
-		}
-		catch (SQLException e)
-		{
-			throw new DAOException(e);
 		}
 		finally
 		{
@@ -1397,41 +1434,6 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 		}
 	}
 	
-	protected EbMSMessage getEbMSMessage(ResultSet rs) throws SQLException, ParserConfigurationException, SAXException, IOException, JAXBException
-	{
-		if (!Constants.EBMS_SERVICE_URI.equals(rs.getString("service")))
-			return new EbMSMessage(DOMUtils.read(rs.getString("original")),XMLMessageBuilder.getInstance(SignatureType.class).handle(rs.getString("signature")),XMLMessageBuilder.getInstance(MessageHeader.class).handle(rs.getString("message_header")),XMLMessageBuilder.getInstance(AckRequested.class).handle(rs.getString("ack_requested")),XMLMessageBuilder.getInstance(Manifest.class).handle(rs.getString("content")),getAttachments(rs.getLong("id")));
-		else if (EbMSAction.MESSAGE_ERROR.action().equals(rs.getString("action")))
-			return new EbMSMessage(DOMUtils.read(rs.getString("original")),XMLMessageBuilder.getInstance(SignatureType.class).handle(rs.getString("signature")),XMLMessageBuilder.getInstance(MessageHeader.class).handle(rs.getString("message_header")),XMLMessageBuilder.getInstance(ErrorList.class).handle(rs.getString("content")));
-		else if (EbMSAction.ACKNOWLEDGMENT.action().equals(rs.getString("action")))
-			return new EbMSMessage(DOMUtils.read(rs.getString("original")),XMLMessageBuilder.getInstance(SignatureType.class).handle(rs.getString("signature")),XMLMessageBuilder.getInstance(MessageHeader.class).handle(rs.getString("message_header")),XMLMessageBuilder.getInstance(Acknowledgment.class).handle(rs.getString("content")));
-		else if (EbMSAction.STATUS_REQUEST.action().equals(rs.getString("action")))
-			return new EbMSMessage(XMLMessageBuilder.getInstance(SignatureType.class).handle(rs.getString("signature")),XMLMessageBuilder.getInstance(MessageHeader.class).handle(rs.getString("message_header")),null,XMLMessageBuilder.getInstance(StatusRequest.class).handle(rs.getString("content")));
-		else if (EbMSAction.STATUS_RESPONSE.action().equals(rs.getString("action")))
-			return new EbMSMessage(XMLMessageBuilder.getInstance(SignatureType.class).handle(rs.getString("signature")),XMLMessageBuilder.getInstance(MessageHeader.class).handle(rs.getString("message_header")),XMLMessageBuilder.getInstance(StatusResponse.class).handle(rs.getString("content")));
-		else if (EbMSAction.PING.action().equals(rs.getString("action")))
-			return new EbMSMessage(XMLMessageBuilder.getInstance(SignatureType.class).handle(rs.getString("signature")),XMLMessageBuilder.getInstance(MessageHeader.class).handle(rs.getString("message_header")));
-		else if (EbMSAction.PONG.action().equals(rs.getString("action")))
-			return new EbMSMessage(XMLMessageBuilder.getInstance(SignatureType.class).handle(rs.getString("signature")),XMLMessageBuilder.getInstance(MessageHeader.class).handle(rs.getString("message_header")));
-		else
-			return null;
-	}
-
-	protected String getContent(EbMSMessage message) throws JAXBException
-	{
-		if (!Constants.EBMS_SERVICE_URI.equals(message.getMessageHeader().getService().getValue()))
-			return XMLMessageBuilder.getInstance(Manifest.class).handle(message.getManifest());
-		else if (EbMSAction.MESSAGE_ERROR.action().equals(message.getMessageHeader().getAction()))
-			return XMLMessageBuilder.getInstance(ErrorList.class).handle(message.getErrorList());
-		else if (EbMSAction.ACKNOWLEDGMENT.action().equals(message.getMessageHeader().getAction()))
-			return XMLMessageBuilder.getInstance(Acknowledgment.class).handle(message.getAcknowledgment());
-		else if (EbMSAction.STATUS_REQUEST.action().equals(message.getMessageHeader().getAction()))
-			return XMLMessageBuilder.getInstance(StatusRequest.class).handle(message.getStatusRequest());
-		else if (EbMSAction.STATUS_RESPONSE.action().equals(message.getMessageHeader().getAction()))
-			return XMLMessageBuilder.getInstance(StatusResponse.class).handle(message.getStatusResponse());
-		return null;
-	}
-
 	protected String join(String[] array, String delimiter)
 	{
 		StringBuffer result = new StringBuffer();

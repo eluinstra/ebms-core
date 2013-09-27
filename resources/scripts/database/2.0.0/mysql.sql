@@ -1,0 +1,1 @@
+ALTER TABLE ebms_event ADD uri VARCHAR(256) NULL;

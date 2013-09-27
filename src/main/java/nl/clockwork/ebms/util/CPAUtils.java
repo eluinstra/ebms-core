@@ -26,6 +26,9 @@ import java.util.List;
 
 import javax.xml.bind.JAXBElement;
 
+import nl.clockwork.ebms.Constants;
+import nl.clockwork.ebms.model.EbMSMessage;
+
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.ActionBindingType;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CanReceive;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CanSend;
@@ -46,10 +49,7 @@ import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.Transport;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.Service;
 import org.w3._2000._09.xmldsig.X509DataType;
 
-import nl.clockwork.ebms.Constants;
-import nl.clockwork.ebms.model.EbMSMessage;
-
-//FIXME use JXPath
+//TODO use JXPath
 public class CPAUtils
 {
 	public static boolean isValid(CollaborationProtocolAgreement cpa, GregorianCalendar timestamp)
@@ -64,6 +64,15 @@ public class CPAUtils
 	{
 		PartyInfo partyInfo = CPAUtils.getPartyInfo(cpa,message.getMessageHeader().getTo().getPartyId());
 		DeliveryChannel deliveryChannel = CPAUtils.getReceivingDeliveryChannel(partyInfo,message.getMessageHeader().getTo().getRole(),message.getMessageHeader().getService(),message.getMessageHeader().getAction());
+		return getUri(deliveryChannel);
+	}
+
+	public static String getResponseUri(CollaborationProtocolAgreement cpa, EbMSMessage message)
+	{
+		PartyInfo partyInfo = CPAUtils.getPartyInfo(cpa,message.getMessageHeader().getFrom().getPartyId());
+		Service service = new Service();
+		service.setValue(Constants.EBMS_SERVICE_URI);
+		DeliveryChannel deliveryChannel = CPAUtils.getReceivingDeliveryChannel(partyInfo,message.getMessageHeader().getFrom().getRole(),service,null);
 		return getUri(deliveryChannel);
 	}
 
@@ -206,7 +215,7 @@ public class CPAUtils
 			return (DeliveryChannel)partyInfo.getDefaultMshChannelId();
 		else
 		{
-			ServiceBinding serviceBinding = getServiceBinding(partyInfo, role, service);
+			ServiceBinding serviceBinding = getServiceBinding(partyInfo,role,service);
 			if (serviceBinding != null)
 				for (CanReceive canReceive : serviceBinding.getCanReceive())
 					if (action.equals(canReceive.getThisPartyActionBinding().getAction()))

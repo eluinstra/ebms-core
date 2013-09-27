@@ -15,7 +15,7 @@
  ******************************************************************************/
 package nl.clockwork.ebms.model;
 
-import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageHeader;
+import java.util.Date;
 
 public class EbMSMessageContext
 {
@@ -25,7 +25,7 @@ public class EbMSMessageContext
 	private String serviceType;
 	private String service;
 	private String action;
-	//private Date timestamp;
+	private Date timestamp;
 	private String conversationId;
 	private String messageId;
 	private String refToMessageId;
@@ -35,45 +35,6 @@ public class EbMSMessageContext
 	{
 	}
 	
-	public EbMSMessageContext(MessageHeader messageHeader)
-	{
-		this(messageHeader.getCPAId(),messageHeader.getFrom().getRole(),messageHeader.getTo().getRole(),messageHeader.getService().getType(),messageHeader.getService().getValue(),messageHeader.getAction(),messageHeader.getConversationId(),messageHeader.getMessageData().getMessageId(),messageHeader.getMessageData().getRefToMessageId(),null);		
-	}
-	
-	public EbMSMessageContext(String cpaId, String service, String action)
-	{
-		this(cpaId,null,null,service,action,null);
-	}
-
-	public EbMSMessageContext(String cpaId, String service, String action, String conversationId)
-	{
-		this(cpaId,null,null,service,action,conversationId);
-	}
-
-	public EbMSMessageContext(String cpaId, String from, String to, String service, String action)
-	{
-		this(cpaId,from,to,null,service,action,null,null,null,null);
-	}
-	
-	public EbMSMessageContext(String cpaId, String from, String to, String service, String action, String conversationId)
-	{
-		this(cpaId,from,to,null,service,action,conversationId,null,null,null);
-	}
-	
-	public EbMSMessageContext(String cpaId, String fromRole, String toRole, String serviceType, String service, String action, String conversationId, String messageId, String refToMessageId, Integer sequenceNr)
-	{
-		this.cpaId = cpaId;
-		this.fromRole = fromRole;
-		this.toRole = toRole;
-		this.serviceType = serviceType;
-		this.service = service;
-		this.action = action;
-		this.conversationId = conversationId;
-		this.messageId = messageId;
-		this.refToMessageId = refToMessageId;
-		this.sequenceNr = sequenceNr;
-	}
-
 	public String getCpaId()
 	{
 		return cpaId;
@@ -132,6 +93,16 @@ public class EbMSMessageContext
 	public void setAction(String action)
 	{
 		this.action = action;
+	}
+	
+	public Date getTimestamp()
+	{
+		return timestamp;
+	}
+	
+	public void setTimestamp(Date timestamp)
+	{
+		this.timestamp = timestamp;
 	}
 	
 	public String getConversationId()
