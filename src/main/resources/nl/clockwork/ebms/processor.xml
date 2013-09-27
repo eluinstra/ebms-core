@@ -108,12 +108,4 @@
 		<property name="verifyHostnames" value="${https.verifyHostnames}"></property>
 	</bean>
 
-	<bean id="processEbMSMessagesJob" class="nl.clockwork.ebms.job.ProcessEbMSMessages" init-method="init">
-		<property name="maxThreads" value="${job.maxTreads}"/>
-		<property name="messageService" ref="ebMSMessageService"/>
-		<property name="processMessageCallback">
-			<bean class="nl.clockwork.ebms.processor.ProcessEbMSMessageCallbackImpl"/>
-		</property>
-	</bean>
-
 </beans>
