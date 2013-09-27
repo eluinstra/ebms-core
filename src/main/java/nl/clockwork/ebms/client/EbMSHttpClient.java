@@ -45,7 +45,6 @@ public class EbMSHttpClient implements EbMSClient
 		HttpURLConnection connection = null;
 		try
 		{
-			logger.info("Sending message to " + uri);
 			connection = (HttpURLConnection)openConnection(uri);
 			//connection.setConnectTimeout(connectTimeout);
 			if (chunkedStreaming(uri))

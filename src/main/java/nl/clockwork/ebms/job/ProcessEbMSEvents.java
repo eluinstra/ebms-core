@@ -55,8 +55,9 @@ public class ProcessEbMSEvents implements Job
 			try
 			{
 				EbMSDocument requestDocument = ebMSDAO.getDocument(event.getMessageId());
-				logger.info("Sending message " +  event.getMessageId());
-				EbMSDocument responseDocument = ebMSClient.sendMessage(event.getUri(),requestDocument);
+				String uri = event.getUri();
+				logger.info("Sending message " +  event.getMessageId() + " to "  + uri);
+				EbMSDocument responseDocument = ebMSClient.sendMessage(uri,requestDocument);
 				messageProcessor.processResponse(requestDocument,responseDocument);
 				updateEvent(event,EbMSEventStatus.PROCESSED,null);
 			}
