@@ -43,7 +43,11 @@ public class EbMSDataSourceToEbMSMessageContent extends AbstractMessageTransform
 	{
 		try
 		{
-			return new EbMSMessageContent(new EbMSMessageContext(cpaId,service,action),(List<EbMSDataSource>)message.getPayload());
+			EbMSMessageContext messageContext = new EbMSMessageContext();
+			messageContext.setCpaId(cpaId);
+			messageContext.setService(service);
+			messageContext.setAction(action);
+			return new EbMSMessageContent(messageContext,(List<EbMSDataSource>)message.getPayload());
 		}
 		catch (Exception e)
 		{

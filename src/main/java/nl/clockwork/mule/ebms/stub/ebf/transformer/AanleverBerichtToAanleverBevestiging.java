@@ -91,7 +91,12 @@ public class AanleverBerichtToAanleverBevestiging extends AbstractMessageTransfo
 			List<EbMSDataSource> dataSources = new ArrayList<EbMSDataSource>();
 			dataSources.add(new EbMSDataSource(name,"application/xml",XMLMessageBuilder.getInstance(BevestigAanleverBericht.class).handle(aanleverBevestiging).getBytes()));
 
-			return new EbMSMessageContent(new EbMSMessageContext(cpaId,service,action,content.getContext().getConversationId()),dataSources);
+			EbMSMessageContext messageContext = new EbMSMessageContext();
+			messageContext.setCpaId(cpaId);
+			messageContext.setService(service);
+			messageContext.setAction(action);
+			messageContext.setConversationId(content.getContext().getConversationId());
+			return new EbMSMessageContent(messageContext,dataSources);
 		}
 		catch (Exception e)
 		{
