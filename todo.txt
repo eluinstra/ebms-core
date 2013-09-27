@@ -1,3 +1,7 @@
+- improve timetolive???
+	- timetolive = now + expirationperiod + 1s
+	- timetolive validation rule: now < timetolive + retryinterval
+
 - EbMSResponseHandlers examine and use content-type while parsing response
 - check Content-Type=text/xml; charset=UTF-8 at receipt
 
