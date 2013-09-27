@@ -494,7 +494,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 		try
 		{
 			return jdbcTemplate.query(
-				"select ebms_message_id, time, type" +
+				"select e.ebms_message_id, e.time, e.type" +
 				" from ebms_event e" + 
 				" inner join (" +
 					"	select ebms_message_id, max(time) as time" +

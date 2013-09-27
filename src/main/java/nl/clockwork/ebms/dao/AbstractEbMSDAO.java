@@ -565,7 +565,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 			List<EbMSEvent> result = new ArrayList<EbMSEvent>();
 			c = connectionManager.getConnection();
 			ps = c.prepareStatement(
-				"select ebms_message_id, time, type" +
+				"select e.ebms_message_id, e.time, e.type" +
 				" from ebms_event e" + 
 				" inner join (" +
 					"	select ebms_message_id, max(time) as time" +
