@@ -77,7 +77,7 @@ public abstract class AbstractXSLTransformer extends AbstractMessageTransformer
 		}
 		catch (TransformerConfigurationException e)
 		{
-			logger.fatal("Error creating transformer using file: " + xslFile,e);
+			logger.fatal("Error creating transformer using file " + xslFile,e);
 			throw new RuntimeException(e);
 		}
 	}
