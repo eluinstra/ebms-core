@@ -40,7 +40,7 @@ public class JobScheduler
 				@Override
 				public void run()
 				{
-					logger.debug("Executing job: " + job.getClass());
+					logger.debug("Executing job " + job.getClass());
 					job.execute();
 				}
 			},

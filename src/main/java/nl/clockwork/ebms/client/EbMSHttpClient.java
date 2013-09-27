@@ -49,7 +49,7 @@ public class EbMSHttpClient implements EbMSClient
 			//connection.setConnectTimeout(connectTimeout);
 			if (chunkedStreaming(uri))
 				connection.setChunkedStreamingMode(0);
-			logger.info("Sending message to: " + uri);
+			logger.info("Sending message to " + uri);
 			if (logger.isDebugEnabled())
 				logger.debug("OUT:\n" + DOMUtils.toString(document.getMessage()));
 			EbMSMessageWriter writer = new EbMSMessageWriter(connection);

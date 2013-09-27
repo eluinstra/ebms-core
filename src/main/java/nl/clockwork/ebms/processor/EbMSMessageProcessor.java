@@ -236,7 +236,7 @@ public class EbMSMessageProcessor
 		final MessageHeader messageHeader = message.getMessageHeader();
 		if (isDuplicateMessage(message))
 		{
-			logger.warn("Duplicate message found! MessageId: " + message.getMessageHeader().getMessageData().getMessageId());
+			logger.warn("Duplicate message found! MessageId " + message.getMessageHeader().getMessageData().getMessageId());
 			if (message.getSyncReply() == null)
 			{
 				ebMSDAO.executeTransaction(

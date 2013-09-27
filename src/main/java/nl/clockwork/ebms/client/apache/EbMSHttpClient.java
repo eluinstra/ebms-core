@@ -46,7 +46,7 @@ public class EbMSHttpClient implements EbMSClient
 		try
 		{
 			HttpPost httpPost = new HttpPost(uri);
-			logger.info("Sending message to: " + uri);
+			logger.info("Sending message to " + uri);
 			if (logger.isDebugEnabled())
 				logger.debug("OUT:\n" + DOMUtils.toString(document.getMessage()));
 			EbMSMessageWriter ebMSMessageWriter = new EbMSMessageWriter(httpPost,chunkedStreaming(uri));
