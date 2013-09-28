@@ -14,17 +14,17 @@ public abstract class AbstractDAOFactory<T> implements FactoryBean<T>
 	public T getObject() throws Exception
 	{
 		if ("org.hsqldb.jdbcDriver".equals(((ComboPooledDataSource)dataSource).getDriverClass()))
-			return createHsqldbDAO();
+			return createHSqlDbDAO();
 		else if ("com.mysql.jdbc.Driver".equals(((ComboPooledDataSource)dataSource).getDriverClass()))
-			return createMysqlDAO();
+			return createMySqlDAO();
 		else if ("org.postgresql.Driver".equals(((ComboPooledDataSource)dataSource).getDriverClass()))
 			return createPostgresDAO();
 		else if ("oracle.jdbc.OracleDriver".equals(((ComboPooledDataSource)dataSource).getDriverClass()))
 			return createOracleDAO();
 		else if ("net.sourceforge.jtds.jdbc.Driver".equals(((ComboPooledDataSource)dataSource).getDriverClass()))
-			return createMssqlDAO();
+			return createMsSqlDAO();
 		else if ("com.microsoft.sqlserver.jdbc.SQLServerDriver".equals(((ComboPooledDataSource)dataSource).getDriverClass()))
-			return createMssqlDAO();
+			return createMsSqlDAO();
 		return null;
 	}
 
@@ -37,15 +37,15 @@ public abstract class AbstractDAOFactory<T> implements FactoryBean<T>
 		return true;
 	}
 
-	public abstract T createHsqldbDAO();
+	public abstract T createHSqlDbDAO();
 
-	public abstract T createMysqlDAO();
+	public abstract T createMySqlDAO();
 
 	public abstract T createPostgresDAO();
 
 	public abstract T createOracleDAO();
 
-	public abstract T createMssqlDAO();
+	public abstract T createMsSqlDAO();
 
 	public void setDataSource(DataSource dataSource)
 	{
@@ -55,13 +55,13 @@ public abstract class AbstractDAOFactory<T> implements FactoryBean<T>
 	public static abstract class DefaultDAOFactory<U> extends AbstractDAOFactory<U>
 	{
 		@Override
-		public U createHsqldbDAO()
+		public U createHSqlDbDAO()
 		{
 			throw new RuntimeException("HSQLDB not supported!");
 		}
 
 		@Override
-		public U createMysqlDAO()
+		public U createMySqlDAO()
 		{
 			throw new RuntimeException("MySQL not supported!");
 		}
@@ -79,7 +79,7 @@ public abstract class AbstractDAOFactory<T> implements FactoryBean<T>
 		}
 
 		@Override
-		public U createMssqlDAO()
+		public U createMsSqlDAO()
 		{
 			throw new RuntimeException("MSSQL not supported!");
 		}

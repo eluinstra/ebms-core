@@ -11,13 +11,13 @@ public class EbMSDAOFactory extends AbstractDAOFactory<EbMSDAO>
 	}
 
 	@Override
-	public EbMSDAO createHsqldbDAO()
+	public EbMSDAO createHSqlDbDAO()
 	{
 		return new nl.clockwork.ebms.dao.hsqldb.EbMSDAOImpl(connectionManager);
 	}
 
 	@Override
-	public EbMSDAO createMysqlDAO()
+	public EbMSDAO createMySqlDAO()
 	{
 		return new nl.clockwork.ebms.dao.mysql.EbMSDAOImpl(connectionManager);
 	}
@@ -35,7 +35,7 @@ public class EbMSDAOFactory extends AbstractDAOFactory<EbMSDAO>
 	}
 
 	@Override
-	public EbMSDAO createMssqlDAO()
+	public EbMSDAO createMsSqlDAO()
 	{
 		return new nl.clockwork.ebms.dao.mssql.EbMSDAOImpl(connectionManager);
 	}

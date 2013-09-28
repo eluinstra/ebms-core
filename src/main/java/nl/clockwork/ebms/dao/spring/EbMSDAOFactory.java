@@ -18,13 +18,13 @@ public class EbMSDAOFactory extends AbstractDAOFactory<EbMSDAO>
 	}
 
 	@Override
-	public EbMSDAO createHsqldbDAO()
+	public EbMSDAO createHSqlDbDAO()
 	{
 		return new nl.clockwork.ebms.dao.spring.hsqldb.EbMSDAOImpl(transactionTemplate,jdbcTemplate);
 	}
 
 	@Override
-	public EbMSDAO createMysqlDAO()
+	public EbMSDAO createMySqlDAO()
 	{
 		return new nl.clockwork.ebms.dao.spring.mysql.EbMSDAOImpl(transactionTemplate,jdbcTemplate);
 	}
@@ -42,7 +42,7 @@ public class EbMSDAOFactory extends AbstractDAOFactory<EbMSDAO>
 	}
 
 	@Override
-	public EbMSDAO createMssqlDAO()
+	public EbMSDAO createMsSqlDAO()
 	{
 		return new nl.clockwork.ebms.dao.spring.mssql.EbMSDAOImpl(transactionTemplate,jdbcTemplate);
 	}
