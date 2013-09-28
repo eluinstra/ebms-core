@@ -17,7 +17,6 @@ package nl.clockwork.ebms.dao.postgresql;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
@@ -25,23 +24,8 @@ import nl.clockwork.ebms.Constants.EbMSMessageStatus;
 import nl.clockwork.ebms.dao.AbstractEbMSDAO;
 import nl.clockwork.ebms.dao.ConnectionManager;
 
-import org.springframework.dao.DataAccessException;
-import org.springframework.jdbc.core.ResultSetExtractor;
-
 public class EbMSDAOImpl extends AbstractEbMSDAO
 {
-	public class IdExtractor implements ResultSetExtractor<Long>
-	{
-		@Override
-		public Long extractData(ResultSet rs) throws SQLException, DataAccessException
-		{
-			if (rs.next())
-				return rs.getLong("id");
-			else
-				return null;
-		}
-	}
-
 	public EbMSDAOImpl(ConnectionManager connectionManager)
 	{
 		super(connectionManager);
