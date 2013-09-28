@@ -19,6 +19,7 @@
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
 	<bean id="ebMSDAO" class="nl.clockwork.ebms.dao.EbMSDAOFactory">
+		<property name="dataSource" ref="ebMSDataSource"/>
 		<property name="connectionManager" ref="connectionManager"/>
 	</bean>
 
