@@ -268,7 +268,7 @@ public class EbMSMessageProcessor
 						}
 					}
 				);
-				return ebMSDAO.getDocument(messageHeader.getMessageData().getMessageId(),service,EbMSAction.MESSAGE_ERROR.action(),EbMSAction.ACKNOWLEDGMENT.action());
+				return ebMSDAO.getDocumentByRefToMessageId(messageHeader.getMessageData().getMessageId(),service,EbMSAction.MESSAGE_ERROR.action(),EbMSAction.ACKNOWLEDGMENT.action());
 			}
 		}
 		else

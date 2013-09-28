@@ -15,10 +15,6 @@
  ******************************************************************************/
 package nl.clockwork.ebms.dao.oracle;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-
 import nl.clockwork.ebms.Constants.EbMSMessageStatus;
 import nl.clockwork.ebms.dao.AbstractEbMSDAO;
 import nl.clockwork.ebms.dao.ConnectionManager;
@@ -53,61 +49,6 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 		messageContextFilter +
 		" order by time_stamp asc)" +
 		" where ROWNUM <= " + maxNr;
-	}
-
-	@Override
-	protected PreparedStatement getInsertMessagePreparedStatement(Connection connection, EbMSMessageStatus status) throws SQLException
-	{
-		return connection.prepareStatement
-		(
-			"insert into ebms_message (" +
-				"id," +
-				"time_stamp," +
-				"cpa_id," +
-				"conversation_id," +
-				"sequence_nr," +
-				"message_id," +
-				"ref_to_message_id," +
-				"time_to_live," +
-				"from_role," +
-				"to_role," +
-				"service_type," +
-				"service," +
-				"action," +
-				"content," +
-				"status," +
-				"status_time" +
-			") values (seq_ebms_message_id.nextval,?,?,?,?,?,?,?,?,?,?,?,?,?,?," + (status == null ? "null" : getTimestampFunction()) + ")",
-			//new String[]{"id"}
-			new int[]{1}
-		);
-	}
-
-	@Override
-	protected PreparedStatement getInsertDuplicateMessagePreparedStatement(Connection connection) throws SQLException
-	{
-		return connection.prepareStatement
-		(
-			"insert into ebms_message (" +
-				"id," +
-				"time_stamp," +
-				"cpa_id," +
-				"conversation_id," +
-				"sequence_nr," +
-				"message_id," +
-				"message_nr," +
-				"ref_to_message_id," +
-				"time_to_live," +
-				"from_role," +
-				"to_role," +
-				"service_type," +
-				"service," +
-				"action," +
-				"content," +
-			") values (seq_ebms_message_id.nextval,?,?,?,?,?,(select max(message_nr) + 1 from ebms_message where message_id = ?),?,?,?,?,?,?,?,?)",
-			//new String[]{"id"}
-			new int[]{1}
-		);
 	}
 
 }

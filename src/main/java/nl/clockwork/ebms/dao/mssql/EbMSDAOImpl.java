@@ -15,11 +15,14 @@
  ******************************************************************************/
 package nl.clockwork.ebms.dao.mssql;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+
 import nl.clockwork.ebms.Constants.EbMSMessageStatus;
-import nl.clockwork.ebms.dao.AbstractEbMSDAO;
 import nl.clockwork.ebms.dao.ConnectionManager;
 
-public class EbMSDAOImpl extends AbstractEbMSDAO
+public class EbMSDAOImpl extends nl.clockwork.ebms.dao.mysql.EbMSDAOImpl
 {
 	public EbMSDAOImpl(ConnectionManager connectionManager)
 	{
@@ -57,6 +60,31 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 //		" ) as tmpTable" +
 //		//" where tmpTable.rownum between 0 and " + maxNr;
 //		" where tmpTable.rownum < " + maxNr;
+	}
+
+	protected PreparedStatement getInsertDuplicateMessagePreparedStatement(Connection connection) throws SQLException
+	{
+		return connection.prepareStatement
+		(
+			"insert into ebms_message (" +
+				"time_stamp," +
+				"cpa_id," +
+				"conversation_id," +
+				"sequence_nr," +
+				"message_id," +
+				"message_nr," +
+				"ref_to_message_id," +
+				"time_to_live," +
+				"from_role," +
+				"to_role," +
+				"service_type," +
+				"service," +
+				"action," +
+				"content" +
+			") values (?,?,?,?,?,(select max(message_nr) + 1 as nr from ebms_message where message_id = ?),?,?,?,?,?,?,?,?)",
+			//new String[]{"id"}
+			new int[]{1}
+		);
 	}
 
 }

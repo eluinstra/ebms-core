@@ -20,11 +20,6 @@ CREATE TABLE ebms_message
 	service_type			VARCHAR(256)		NULL,
 	service						VARCHAR(256)		NOT NULL,
 	action						VARCHAR(256)		NOT NULL,
-	signature					TEXT						NULL,
-	message_header		TEXT						NOT NULL,
-	sync_reply				TEXT						NULL,
-	message_order			TEXT						NULL,
-	ack_requested			TEXT						NULL,
 	content						TEXT						NULL,
 	status						INTEGER					NULL,
 	status_time				TIMESTAMP				NULL
@@ -44,14 +39,13 @@ CREATE TABLE ebms_attachment
 
 CREATE TABLE ebms_event
 (
-	ebms_message_id		INTEGER					NOT NULL REFERENCES ebms_message(id),
+	message_id				VARCHAR(256)		NOT NULL,
 	time							TIMESTAMP				NOT NULL DEFAULT NOW(),
 	type							INTEGER					NOT NULL,
 	status						INTEGER					NOT NULL DEFAULT 0,
 	status_time				TIMESTAMP				NOT NULL DEFAULT '0000-00-00 00:00:00',
 	uri								VARCHAR(256)		NULL,
-	error_message			TEXT						NULL,
-	FOREIGN KEY (ebms_message_id) REFERENCES ebms_message(id)
+	error_message			TEXT						NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-ALTER TABLE ebms_event ADD CONSTRAINT uc_ebms_event UNIQUE (ebms_message_id,time);
+ALTER TABLE ebms_event ADD CONSTRAINT uc_ebms_event UNIQUE (message_id(255),time);

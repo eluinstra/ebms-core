@@ -54,15 +54,14 @@ public class CPAServiceImpl implements CPAService
 				{
 					if (overwrite)
 					{
-						if (!ebMSDAO.updateCPA(cpa))
+						if (ebMSDAO.updateCPA(cpa) == 0)
 							throw new CPAServiceException("Could not update CPA " + cpa.getCpaid() + "! CPA does not exists.");
 					}
 					else
 						throw new CPAServiceException("Did not insert CPA " + cpa.getCpaid() + "! CPA already exists.");
 				}
 				else
-					if (!ebMSDAO.insertCPA(cpa))
-						throw new CPAServiceException("Could not insert CPA " + cpa.getCpaid() + "!");
+					ebMSDAO.insertCPA(cpa);
 			}
 			return cpa.getCpaid();
 		}
@@ -90,7 +89,7 @@ public class CPAServiceImpl implements CPAService
 		{
 			synchronized(cpaMonitor)
 			{
-				if (!ebMSDAO.deleteCPA(cpaId))
+				if (ebMSDAO.deleteCPA(cpaId) == 0)
 					throw new CPAServiceException("Could not delete CPA " + cpaId + "! CPA does not exists.");
 			}
 		}

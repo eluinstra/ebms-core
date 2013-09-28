@@ -20,7 +20,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
@@ -200,7 +199,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	}
 
 	@Override
-	public boolean insertCPA(CollaborationProtocolAgreement cpa) throws DAOException
+	public void insertCPA(CollaborationProtocolAgreement cpa) throws DAOException
 	{
 		Connection c = null;
 		PreparedStatement ps = null;
@@ -215,7 +214,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 			);
 			ps.setString(1,cpa.getCpaid());
 			ps.setString(2,XMLMessageBuilder.getInstance(CollaborationProtocolAgreement.class).handle(cpa));
-			return ps.executeUpdate() > 0;
+			ps.executeUpdate();
 		}
 		catch (SQLException e)
 		{
@@ -233,7 +232,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	}
 
 	@Override
-	public boolean updateCPA(CollaborationProtocolAgreement cpa) throws DAOException
+	public int updateCPA(CollaborationProtocolAgreement cpa) throws DAOException
 	{
 		Connection c = null;
 		PreparedStatement ps = null;
@@ -247,7 +246,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 			);
 			ps.setString(1,XMLMessageBuilder.getInstance(CollaborationProtocolAgreement.class).handle(cpa));
 			ps.setString(2,cpa.getCpaid());
-			return ps.executeUpdate() > 0;
+			return ps.executeUpdate();
 		}
 		catch (SQLException e)
 		{
@@ -265,7 +264,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	}
 
 	@Override
-	public boolean deleteCPA(String cpaId) throws DAOException
+	public int deleteCPA(String cpaId) throws DAOException
 	{
 		Connection c = null;
 		PreparedStatement ps = null;
@@ -277,7 +276,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 				" where cpa_id = ?"
 			);
 			ps.setString(1,cpaId);
-			return ps.executeUpdate() > 0;
+			return ps.executeUpdate();
 		}
 		catch (SQLException e)
 		{
@@ -311,41 +310,6 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 				ResultSet rs = ps.getResultSet();
 				if (rs.next())
 					result = rs.getInt(1) > 0;
-			}
-			return result;
-		}
-		catch (SQLException e)
-		{
-			throw new DAOException(e);
-		}
-		finally
-		{
-			connectionManager.close(ps);
-			connectionManager.close();
-		}
-	}
-	
-	@Override
-	public Long getMessageId(String messageId) throws DAOException
-	{
-		Connection c = null;
-		PreparedStatement ps = null;
-		try
-		{
-			Long result = null;
-			c = connectionManager.getConnection();
-			ps  = c.prepareStatement(
-				"select id" +
-				" from ebms_message" +
-				" where message_id = ?" +
-				" and message_nr = 0"
-			);
-			ps.setString(1,messageId);
-			if (ps.execute())
-			{
-				ResultSet rs = ps.getResultSet();
-				if (rs.next())
-					result = rs.getLong("id");
 			}
 			return result;
 		}
@@ -420,7 +384,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 				" ref_to_message_id," +
 				" sequence_nr" +
 				" from ebms_message" + 
-				" where message_id = ?" +
+				" where ref_to_message_id = ?" +
 				" and message_nr = 0" +
 				(service.getType() == null ? "" : " and serviceType = '" + service.getType() + "'") +
 				(service.getValue() == null ? "" : " and service = '" + service.getValue() + "'") +
@@ -460,7 +424,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	}
 	
 	@Override
-	public EbMSDocument getDocument(String refToMessageId, Service service, String...actions) throws DAOException
+	public EbMSDocument getDocumentByRefToMessageId(String refToMessageId, Service service, String...actions) throws DAOException
 	{
 		Connection c = null;
 		PreparedStatement ps = null;
@@ -758,7 +722,8 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 				"status," +
 				"status_time" +
 			") values (?,?,?,?,?,?,?,?,?,?,?,?,?,?," + (status == null ? "null" : getTimestampFunction()) + ")",
-			Statement.RETURN_GENERATED_KEYS
+			//new String[]{"message_id","message_nr"}
+			new int[]{5,6}
 		);
 	}
 
@@ -782,12 +747,13 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 				"action," +
 				"content" +
 			") values (?,?,?,?,?,(select max(message_nr) + 1 from ebms_message where message_id = ?),?,?,?,?,?,?,?,?)",
-			Statement.RETURN_GENERATED_KEYS
+			//new String[]{"message_id","message_nr"}
+			new int[]{5,6}
 		);
 	}
 
 	@Override
-	public long insertMessage(Date timestamp, EbMSMessage message, EbMSMessageStatus status) throws DAOException
+	public void insertMessage(Date timestamp, EbMSMessage message, EbMSMessageStatus status) throws DAOException
 	{
 		Connection c = null;
 		PreparedStatement ps = null;
@@ -824,30 +790,32 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 			ResultSet rs = ps.getGeneratedKeys();
 			if (rs.next())
 			{
-				long key = rs.getLong(1);
+				String messageId = rs.getString(1);
+				int messageNr = rs.getInt(2);
 				connectionManager.close(ps);
 				ps  = c.prepareStatement(
 					"insert into ebms_attachment (" +
-					"ebms_message_id," +
-					"name," +
-					"content_id," +
-					"content_type," +
-					"content" +
-					") values (?,?,?,?,?)"
+						"message_id," +
+						"message_nr," +
+						"name," +
+						"content_id," +
+						"content_type," +
+						"content" +
+					") values (?,?,?,?,?,?)"
 				);
 				for (EbMSAttachment attachment : message.getAttachments())
 				{
-					ps.setLong(1,key);
-					ps.setString(2,attachment.getName());
-					ps.setString(3,attachment.getContentId());
-					ps.setString(4,attachment.getContentType().split(";")[0].trim());
-					ps.setBytes(5,IOUtils.toByteArray(attachment.getInputStream()));
+					ps.setString(1,messageId);
+					ps.setInt(2,messageNr);
+					ps.setString(3,attachment.getName());
+					ps.setString(4,attachment.getContentId());
+					ps.setString(5,attachment.getContentType().split(";")[0].trim());
+					ps.setBytes(6,IOUtils.toByteArray(attachment.getInputStream()));
 					ps.addBatch();
 				}
 				if (message.getAttachments().size() > 0)
 					ps.executeBatch();
 				connectionManager.commit();
-				return key;
 			}
 			else
 			{
@@ -878,7 +846,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	}
 
 	@Override
-	public long insertDuplicateMessage(Date timestamp, EbMSMessage message) throws DAOException
+	public void insertDuplicateMessage(Date timestamp, EbMSMessage message) throws DAOException
 	{
 		Connection c = null;
 		PreparedStatement ps = null;
@@ -886,11 +854,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 		{
 			c = connectionManager.getConnection(true);
 			ps = getInsertDuplicateMessagePreparedStatement(c);
-			//ps.setDate(1,new java.sql.Date(timestamp.getTime()));
-			//ps.setString(1,String.format(getDateFormat(),timestamp));
 			ps.setTimestamp(1,new Timestamp(timestamp.getTime()));
-			//ps.setObject(1,timestamp,Types.TIMESTAMP);
-			//ps.setObject(1,timestamp);
 			MessageHeader messageHeader = message.getMessageHeader();
 			ps.setString(2,messageHeader.getCPAId());
 			ps.setString(3,messageHeader.getConversationId());
@@ -912,35 +876,37 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 			ResultSet rs = ps.getGeneratedKeys();
 			if (rs.next())
 			{
-				long key = rs.getLong(1);
+				String messageId = rs.getString(1);
+				int messageNr = rs.getInt(2);
 				connectionManager.close(ps);
 				ps  = c.prepareStatement(
 					"insert into ebms_attachment (" +
-					"ebms_message_id," +
-					"name," +
-					"content_id," +
-					"content_type," +
-					"content" +
-					") values (?,?,?,?,?)"
+						"message_id," +
+						"message_nr," +
+						"name," +
+						"content_id," +
+						"content_type," +
+						"content" +
+					") values (?,?,?,?,?,?)"
 				);
 				for (EbMSAttachment attachment : message.getAttachments())
 				{
-					ps.setLong(1,key);
-					ps.setString(2,attachment.getName());
-					ps.setString(3,attachment.getContentId());
-					ps.setString(4,attachment.getContentType().split(";")[0].trim());
-					ps.setBytes(5,IOUtils.toByteArray(attachment.getInputStream()));
+					ps.setString(1,messageId);
+					ps.setInt(2,messageNr);
+					ps.setString(3,attachment.getName());
+					ps.setString(4,attachment.getContentId());
+					ps.setString(5,attachment.getContentType().split(";")[0].trim());
+					ps.setBytes(6,IOUtils.toByteArray(attachment.getInputStream()));
 					ps.addBatch();
 				}
 				if (message.getAttachments().size() > 0)
 					ps.executeBatch();
 				connectionManager.commit();
-				return key;
 			}
 			else
 			{
 				connectionManager.rollback();
-				throw new DAOException("No 2key found!");
+				throw new DAOException("No key found!");
 			}
 		}
 		catch (SQLException e)
@@ -1342,7 +1308,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 		}
 	}
 
-	private List<EbMSAttachment> getAttachments(String messageId) throws SQLException
+	protected List<EbMSAttachment> getAttachments(String messageId) throws SQLException
 	{
 		Connection c = null;
 		PreparedStatement ps = null;
@@ -1351,11 +1317,10 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 			List<EbMSAttachment> result = new ArrayList<EbMSAttachment>();
 			c = connectionManager.getConnection();
 			ps = c.prepareStatement(
-				"select a.name, a.content_id, a.content_type, a.content" + 
-				" from ebms_message m, ebms_attachment a" + 
-				" where m.message_id = ?" +
-				" and m.message_nr = 0" +
-				" and m.id = a.ebms_message_id"
+				"select name, content_id, content_type, content" + 
+				" from ebms_attachment" + 
+				" where message_id = ?" +
+				" and message_nr = 0"
 			);
 			ps.setString(1,messageId);
 			if (ps.execute())

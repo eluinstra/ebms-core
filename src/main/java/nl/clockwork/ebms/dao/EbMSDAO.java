@@ -38,15 +38,14 @@ public interface EbMSDAO
 	boolean existsCPA(String cpaId) throws DAOException;
 	CollaborationProtocolAgreement getCPA(String cpaId) throws DAOException;
 	List<String> getCPAIds() throws DAOException;
-	boolean insertCPA(CollaborationProtocolAgreement cpa) throws DAOException;
-	boolean updateCPA(CollaborationProtocolAgreement cpa) throws DAOException;
-	boolean deleteCPA(String cpaId) throws DAOException;
+	void insertCPA(CollaborationProtocolAgreement cpa) throws DAOException;
+	int updateCPA(CollaborationProtocolAgreement cpa) throws DAOException;
+	int deleteCPA(String cpaId) throws DAOException;
 	
 	boolean existsMessage(String messageId) throws DAOException;
-	Long getMessageId(String messageId) throws DAOException;
 	String getMessageIdByRefToMessageId(String refToMessageId, Service service, String...actions) throws DAOException;
 	EbMSMessageContext getMessageContextByRefToMessageId(String refToMessageId, Service service, String...actions) throws DAOException;
-	EbMSDocument getDocument(String refToMessageId, Service service, String...actions) throws DAOException;
+	EbMSDocument getDocumentByRefToMessageId(String refToMessageId, Service service, String...actions) throws DAOException;
 	MessageHeader getMessageHeader(String messageId) throws DAOException;
 	EbMSDocument getDocument(String messageId) throws DAOException;
 	EbMSMessageStatus getMessageStatus(String messageId) throws DAOException;
@@ -55,8 +54,8 @@ public interface EbMSDAO
 	void updateEvent(Date timestamp, String messageId, EbMSEventStatus status, String errorMessage) throws DAOException;
 	void deleteEventsBefore(Date timestamp, String messageId, EbMSEventStatus status) throws DAOException;
 
-	long insertMessage(Date timestamp, EbMSMessage message, EbMSMessageStatus status) throws DAOException;
-	long insertDuplicateMessage(Date timestamp, EbMSMessage message) throws DAOException;
+	void insertMessage(Date timestamp, EbMSMessage message, EbMSMessageStatus status) throws DAOException;
+	void insertDuplicateMessage(Date timestamp, EbMSMessage message) throws DAOException;
 	void updateMessageStatus(String messageId, EbMSMessageStatus oldStatus, EbMSMessageStatus newStatus) throws DAOException;
 	void insertEvent(String messageId, EbMSEventType type, String uri) throws DAOException;
 	void insertEvent(EbMSEvent event) throws DAOException;

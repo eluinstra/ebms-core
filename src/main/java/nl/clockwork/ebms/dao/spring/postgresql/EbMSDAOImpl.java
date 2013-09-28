@@ -38,20 +38,31 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.ResultSetExtractor;
+import org.springframework.transaction.TransactionException;
 import org.springframework.transaction.TransactionStatus;
-import org.springframework.transaction.support.TransactionCallback;
+import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 import org.springframework.transaction.support.TransactionTemplate;
 
 public class EbMSDAOImpl extends AbstractEbMSDAO
 {
-	public class IdExtractor implements ResultSetExtractor<Long>
+	public class Key
+	{
+		public String messageId;
+		public int messageNr;
+		public Key(String messageId, int messageNr)
+		{
+			this.messageId = messageId;
+			this.messageNr = messageNr;
+		}
+	}
+	public class KeyExtractor implements ResultSetExtractor<Key>
 	{
 
 		@Override
-		public Long extractData(ResultSet rs) throws SQLException, DataAccessException
+		public Key extractData(ResultSet rs) throws SQLException, DataAccessException
 		{
 			if (rs.next())
-				return rs.getLong("id");
+				return new Key(rs.getString("message_id"),rs.getInt("message_nr"));
 			else
 				return null;
 		}
@@ -88,211 +99,229 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 	}
 	
 	@Override
-	public long insertMessage(final Date timestamp, final EbMSMessage message, final EbMSMessageStatus status) throws DAOException
+	public void insertMessage(final Date timestamp, final EbMSMessage message, final EbMSMessageStatus status) throws DAOException
 	{
-		return transactionTemplate.execute(
-			new TransactionCallback<Long>()
-			{
-				@Override
-				public Long doInTransaction(TransactionStatus arg0)
+		try
+		{
+			transactionTemplate.execute(
+				new TransactionCallbackWithoutResult()
 				{
-					try
+					@Override
+					public void doInTransactionWithoutResult(TransactionStatus arg0)
 					{
-						Long key = (Long)jdbcTemplate.query(
-							new PreparedStatementCreator()
-							{
-								@Override
-								public PreparedStatement createPreparedStatement(Connection connection) throws SQLException
-								{
-									try
-									{
-										PreparedStatement ps = connection.prepareStatement
-										(
-											"insert into ebms_message (" +
-												"time_stamp," +
-												"cpa_id," +
-												"conversation_id," +
-												"sequence_nr," +
-												"message_id," +
-												"ref_to_message_id," +
-												"time_to_live," +
-												"from_role," +
-												"to_role," +
-												"service_type," +
-												"service," +
-												"action," +
-												"content," +
-												"status," +
-												"status_time" +
-											") values (?,?,?,?,?,?,?,?,?,?,?,?,?,?," + (status == null ? "null" : getTimestampFunction()) + ")" +
-											" returning id"
-										);
-										ps.setTimestamp(1,new Timestamp(timestamp.getTime()));
-										MessageHeader messageHeader = message.getMessageHeader();
-										ps.setString(2,messageHeader.getCPAId());
-										ps.setString(3,messageHeader.getConversationId());
-										if (message.getMessageOrder() == null || message.getMessageOrder().getSequenceNumber() == null)
-											ps.setNull(4,java.sql.Types.BIGINT);
-										else
-											ps.setLong(4,message.getMessageOrder().getSequenceNumber().getValue().longValue());
-										ps.setString(5,messageHeader.getMessageData().getMessageId());
-										ps.setString(6,messageHeader.getMessageData().getRefToMessageId());
-										ps.setTimestamp(7,messageHeader.getMessageData().getTimeToLive() == null ? null : new Timestamp(messageHeader.getMessageData().getTimeToLive().toGregorianCalendar().getTimeInMillis()));
-										ps.setString(8,messageHeader.getFrom().getRole());
-										ps.setString(9,messageHeader.getTo().getRole());
-										ps.setString(10,messageHeader.getService().getType());
-										ps.setString(11,messageHeader.getService().getValue());
-										ps.setString(12,messageHeader.getAction());
-										ps.setString(13,DOMUtils.toString(message.getDocument(),"UTF-8"));
-										if (status == null)
-											ps.setNull(14,java.sql.Types.INTEGER);
-										else
-											ps.setInt(14,status.id());
-										//ps.setString(15,status == null ? null : String.format(getDateFormat(),timestamp));
-										//ps.setTimestamp(15,status == null ? null : new Timestamp(timestamp.getTime()));
-										//ps.setObject(15,status == null ? null : timestamp,Types.TIMESTAMP);
-										//ps.setObject(15,status == null ? null : timestamp);
-										return ps;
-									}
-									catch (TransformerException e)
-									{
-										throw new SQLException(e);
-									}
-								}
-							},
-							new IdExtractor()
-						);
-				
-						for (EbMSAttachment attachment : message.getAttachments())
+						try
 						{
-							jdbcTemplate.update
-							(
-								"insert into ebms_attachment (" +
-									"ebms_message_id," +
-									"name," +
-									"content_id," +
-									"content_type," +
-									"content" +
-								") values (?,?,?,?,?)",
-								key,
-								attachment.getName(),
-								attachment.getContentId(),
-								attachment.getContentType().split(";")[0].trim(),
-								IOUtils.toByteArray(attachment.getInputStream())
+							Key key = (Key)jdbcTemplate.query(
+								new PreparedStatementCreator()
+								{
+									@Override
+									public PreparedStatement createPreparedStatement(Connection connection) throws SQLException
+									{
+										try
+										{
+											PreparedStatement ps = connection.prepareStatement
+											(
+												"insert into ebms_message (" +
+													"time_stamp," +
+													"cpa_id," +
+													"conversation_id," +
+													"sequence_nr," +
+													"message_id," +
+													"ref_to_message_id," +
+													"time_to_live," +
+													"from_role," +
+													"to_role," +
+													"service_type," +
+													"service," +
+													"action," +
+													"content," +
+													"status," +
+													"status_time" +
+												") values (?,?,?,?,?,?,?,?,?,?,?,?,?,?," + (status == null ? "null" : getTimestampFunction()) + ")" +
+												" returning message_id, message_nr"
+											);
+											ps.setTimestamp(1,new Timestamp(timestamp.getTime()));
+											MessageHeader messageHeader = message.getMessageHeader();
+											ps.setString(2,messageHeader.getCPAId());
+											ps.setString(3,messageHeader.getConversationId());
+											if (message.getMessageOrder() == null || message.getMessageOrder().getSequenceNumber() == null)
+												ps.setNull(4,java.sql.Types.BIGINT);
+											else
+												ps.setLong(4,message.getMessageOrder().getSequenceNumber().getValue().longValue());
+											ps.setString(5,messageHeader.getMessageData().getMessageId());
+											ps.setString(6,messageHeader.getMessageData().getRefToMessageId());
+											ps.setTimestamp(7,messageHeader.getMessageData().getTimeToLive() == null ? null : new Timestamp(messageHeader.getMessageData().getTimeToLive().toGregorianCalendar().getTimeInMillis()));
+											ps.setString(8,messageHeader.getFrom().getRole());
+											ps.setString(9,messageHeader.getTo().getRole());
+											ps.setString(10,messageHeader.getService().getType());
+											ps.setString(11,messageHeader.getService().getValue());
+											ps.setString(12,messageHeader.getAction());
+											ps.setString(13,DOMUtils.toString(message.getDocument(),"UTF-8"));
+											if (status == null)
+												ps.setNull(14,java.sql.Types.INTEGER);
+											else
+												ps.setInt(14,status.id());
+											//ps.setString(15,status == null ? null : String.format(getDateFormat(),timestamp));
+											//ps.setTimestamp(15,status == null ? null : new Timestamp(timestamp.getTime()));
+											//ps.setObject(15,status == null ? null : timestamp,Types.TIMESTAMP);
+											//ps.setObject(15,status == null ? null : timestamp);
+											return ps;
+										}
+										catch (TransformerException e)
+										{
+											throw new SQLException(e);
+										}
+									}
+								},
+								new KeyExtractor()
 							);
+					
+							for (EbMSAttachment attachment : message.getAttachments())
+							{
+								jdbcTemplate.update
+								(
+									"insert into ebms_attachment (" +
+										"message_id," +
+										"message_nr," +
+										"name," +
+										"content_id," +
+										"content_type," +
+										"content" +
+									") values (?,?,?,?,?,?)",
+									key.messageId,
+									key.messageNr,
+									attachment.getName(),
+									attachment.getContentId(),
+									attachment.getContentType().split(";")[0].trim(),
+									IOUtils.toByteArray(attachment.getInputStream())
+								);
+							}
 						}
-						
-						return key;
-					}
-					catch (IOException e)
-					{
-						throw new DAOException(e);
+						catch (IOException e)
+						{
+							throw new DAOException(e);
+						}
 					}
 				}
-			}
-		);
+			);
+		}
+		catch (DataAccessException e)
+		{
+			throw new DAOException(e);
+		}
+		catch (TransactionException e)
+		{
+			throw new DAOException(e);
+		}
 	}
 	
 	@Override
-	public long insertDuplicateMessage(final Date timestamp, final EbMSMessage message) throws DAOException
+	public void insertDuplicateMessage(final Date timestamp, final EbMSMessage message) throws DAOException
 	{
-		return transactionTemplate.execute(
-			new TransactionCallback<Long>()
-			{
-				@Override
-				public Long doInTransaction(TransactionStatus arg0)
+		try
+		{
+			transactionTemplate.execute(
+				new TransactionCallbackWithoutResult()
 				{
-					try
+					@Override
+					public void doInTransactionWithoutResult(TransactionStatus arg0)
 					{
-						Long key = (Long)jdbcTemplate.query(
-							new PreparedStatementCreator()
-							{
-								@Override
-								public PreparedStatement createPreparedStatement(Connection connection) throws SQLException
-								{
-									try
-									{
-										PreparedStatement ps = connection.prepareStatement
-										(
-											"insert into ebms_message (" +
-												"time_stamp," +
-												"cpa_id," +
-												"conversation_id," +
-												"sequence_nr," +
-												"message_id," +
-												"message_nr," +
-												"ref_to_message_id," +
-												"time_to_live," +
-												"from_role," +
-												"to_role," +
-												"service_type," +
-												"service," +
-												"action," +
-												"content" +
-											") values (?,?,?,?,?,(select max(message_nr) + 1 from ebms_message where message_id = ?),?,?,?,?,?,?,?,?)" +
-											" returning id"
-										);
-										//ps.setDate(1,new java.sql.Date(timestamp.getTime()));
-										//ps.setString(1,String.format(getDateFormat(),timestamp));
-										ps.setTimestamp(1,new Timestamp(timestamp.getTime()));
-										//ps.setObject(1,timestamp,Types.TIMESTAMP);
-										//ps.setObject(1,timestamp);
-										MessageHeader messageHeader = message.getMessageHeader();
-										ps.setString(2,messageHeader.getCPAId());
-										ps.setString(3,messageHeader.getConversationId());
-										if (message.getMessageOrder() == null || message.getMessageOrder().getSequenceNumber() == null)
-											ps.setNull(4,java.sql.Types.BIGINT);
-										else
-											ps.setLong(4,message.getMessageOrder().getSequenceNumber().getValue().longValue());
-										ps.setString(5,messageHeader.getMessageData().getMessageId());
-										ps.setString(6,messageHeader.getMessageData().getMessageId());
-										ps.setString(7,messageHeader.getMessageData().getRefToMessageId());
-										ps.setTimestamp(8,messageHeader.getMessageData().getTimeToLive() == null ? null : new Timestamp(messageHeader.getMessageData().getTimeToLive().toGregorianCalendar().getTimeInMillis()));
-										ps.setString(9,messageHeader.getFrom().getRole());
-										ps.setString(10,messageHeader.getTo().getRole());
-										ps.setString(11,messageHeader.getService().getType());
-										ps.setString(12,messageHeader.getService().getValue());
-										ps.setString(13,messageHeader.getAction());
-										ps.setString(14,DOMUtils.toString(message.getDocument(),"UTF-8"));
-										return ps;
-									}
-									catch (TransformerException e)
-									{
-										throw new SQLException(e);
-									}
-								}
-							},
-							new IdExtractor()
-						);
-				
-						for (EbMSAttachment attachment : message.getAttachments())
+						try
 						{
-							jdbcTemplate.update
-							(
-								"insert into ebms_attachment (" +
-									"ebms_message_id," +
-									"name," +
-									"content_id," +
-									"content_type," +
-									"content" +
-								") values (?,?,?,?,?)",
-								key,
-								attachment.getName(),
-								attachment.getContentId(),
-								attachment.getContentType().split(";")[0].trim(),
-								IOUtils.toByteArray(attachment.getInputStream())
+							Key key = (Key)jdbcTemplate.query(
+								new PreparedStatementCreator()
+								{
+									@Override
+									public PreparedStatement createPreparedStatement(Connection connection) throws SQLException
+									{
+										try
+										{
+											PreparedStatement ps = connection.prepareStatement
+											(
+												"insert into ebms_message (" +
+													"time_stamp," +
+													"cpa_id," +
+													"conversation_id," +
+													"sequence_nr," +
+													"message_id," +
+													"message_nr," +
+													"ref_to_message_id," +
+													"time_to_live," +
+													"from_role," +
+													"to_role," +
+													"service_type," +
+													"service," +
+													"action," +
+													"content" +
+												") values (?,?,?,?,?,(select max(message_nr) + 1 from ebms_message where message_id = ?),?,?,?,?,?,?,?,?)" +
+												" returning message_id, message_nr"
+											);
+											ps.setTimestamp(1,new Timestamp(timestamp.getTime()));
+											MessageHeader messageHeader = message.getMessageHeader();
+											ps.setString(2,messageHeader.getCPAId());
+											ps.setString(3,messageHeader.getConversationId());
+											if (message.getMessageOrder() == null || message.getMessageOrder().getSequenceNumber() == null)
+												ps.setNull(4,java.sql.Types.BIGINT);
+											else
+												ps.setLong(4,message.getMessageOrder().getSequenceNumber().getValue().longValue());
+											ps.setString(5,messageHeader.getMessageData().getMessageId());
+											ps.setString(6,messageHeader.getMessageData().getMessageId());
+											ps.setString(7,messageHeader.getMessageData().getRefToMessageId());
+											ps.setTimestamp(8,messageHeader.getMessageData().getTimeToLive() == null ? null : new Timestamp(messageHeader.getMessageData().getTimeToLive().toGregorianCalendar().getTimeInMillis()));
+											ps.setString(9,messageHeader.getFrom().getRole());
+											ps.setString(10,messageHeader.getTo().getRole());
+											ps.setString(11,messageHeader.getService().getType());
+											ps.setString(12,messageHeader.getService().getValue());
+											ps.setString(13,messageHeader.getAction());
+											ps.setString(14,DOMUtils.toString(message.getDocument(),"UTF-8"));
+											return ps;
+										}
+										catch (TransformerException e)
+										{
+											throw new SQLException(e);
+										}
+									}
+								},
+								new KeyExtractor()
 							);
+					
+							for (EbMSAttachment attachment : message.getAttachments())
+							{
+								jdbcTemplate.update
+								(
+									"insert into ebms_attachment (" +
+										"message_id," +
+										"message_nr," +
+										"name," +
+										"content_id," +
+										"content_type," +
+										"content" +
+									") values (?,?,?,?,?,?)",
+									key.messageId,
+									key.messageNr,
+									attachment.getName(),
+									attachment.getContentId(),
+									attachment.getContentType().split(";")[0].trim(),
+									IOUtils.toByteArray(attachment.getInputStream())
+								);
+							}
 						}
-						
-						return key;
-					}
-					catch (IOException e)
-					{
-						throw new DAOException(e);
+						catch (IOException e)
+						{
+							throw new DAOException(e);
+						}
 					}
 				}
-			}
-		);
+			);
+		}
+		catch (DataAccessException e)
+		{
+			throw new DAOException(e);
+		}
+		catch (TransactionException e)
+		{
+			throw new DAOException(e);
+		}
 	}
 	
 }

@@ -18,10 +18,13 @@ package nl.clockwork.ebms.dao.spring.mysql;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.Date;
+import java.util.List;
 
+import javax.mail.util.ByteArrayDataSource;
 import javax.xml.transform.TransformerException;
 
 import nl.clockwork.ebms.Constants.EbMSMessageStatus;
@@ -36,11 +39,12 @@ import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageHeader;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
+import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.transaction.TransactionException;
 import org.springframework.transaction.TransactionStatus;
-import org.springframework.transaction.support.TransactionCallback;
+import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 import org.springframework.transaction.support.TransactionTemplate;
 
 public class EbMSDAOImpl extends AbstractEbMSDAO
@@ -75,15 +79,157 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 	}
 
 	@Override
-	public long insertDuplicateMessage(final Date timestamp, final EbMSMessage message) throws DAOException
+	protected List<EbMSAttachment> getAttachments(String messageId)
+	{
+		return jdbcTemplate.query(
+			"select a.name, a.content_id, a.content_type, a.content" + 
+			" from ebms_message m, ebms_attachment a" +
+			" where m.message_id = ?" +
+			" and m.message_nr = 0" +
+			" and m.id = a.ebms_message_id",
+			new ParameterizedRowMapper<EbMSAttachment>()
+			{
+				@Override
+				public EbMSAttachment mapRow(ResultSet rs, int rowNum) throws SQLException
+				{
+					ByteArrayDataSource dataSource = new ByteArrayDataSource(rs.getBytes("content"),rs.getString("content_type"));
+					dataSource.setName(rs.getString("name"));
+					return new EbMSAttachment(dataSource,rs.getString("content_id"));
+				}
+			},
+			messageId
+		);
+	}
+
+	@Override
+	public void insertMessage(final Date timestamp, final EbMSMessage message, final EbMSMessageStatus status) throws DAOException
 	{
 		try
 		{
-			return transactionTemplate.execute(
-				new TransactionCallback<Long>()
+			transactionTemplate.execute(
+				new TransactionCallbackWithoutResult()
 				{
 					@Override
-					public Long doInTransaction(TransactionStatus arg0)
+					public void doInTransactionWithoutResult(TransactionStatus arg0)
+					{
+						try
+						{
+							KeyHolder keyHolder = new GeneratedKeyHolder();
+							jdbcTemplate.update(
+								new PreparedStatementCreator()
+								{
+									
+									@Override
+									public PreparedStatement createPreparedStatement(Connection connection) throws SQLException
+									{
+										try
+										{
+											PreparedStatement ps = connection.prepareStatement
+											(
+												"insert into ebms_message (" +
+													"time_stamp," +
+													"cpa_id," +
+													"conversation_id," +
+													"sequence_nr," +
+													"message_id," +
+													"ref_to_message_id," +
+													"time_to_live," +
+													"from_role," +
+													"to_role," +
+													"service_type," +
+													"service," +
+													"action," +
+													"content," +
+													"status," +
+													"status_time" +
+												") values (?,?,?,?,?,?,?,?,?,?,?,?,?,?," + (status == null ? "null" : getTimestampFunction()) + ")",
+											//new String[]{"id"}
+												new int[]{1}
+											);
+											ps.setTimestamp(1,new Timestamp(timestamp.getTime()));
+											MessageHeader messageHeader = message.getMessageHeader();
+											ps.setString(2,messageHeader.getCPAId());
+											ps.setString(3,messageHeader.getConversationId());
+											if (message.getMessageOrder() == null || message.getMessageOrder().getSequenceNumber() == null)
+												ps.setNull(4,java.sql.Types.BIGINT);
+											else
+												ps.setLong(4,message.getMessageOrder().getSequenceNumber().getValue().longValue());
+											ps.setString(5,messageHeader.getMessageData().getMessageId());
+											ps.setString(6,messageHeader.getMessageData().getRefToMessageId());
+											ps.setTimestamp(7,messageHeader.getMessageData().getTimeToLive() == null ? null : new Timestamp(messageHeader.getMessageData().getTimeToLive().toGregorianCalendar().getTimeInMillis()));
+											ps.setString(8,messageHeader.getFrom().getRole());
+											ps.setString(9,messageHeader.getTo().getRole());
+											ps.setString(10,messageHeader.getService().getType());
+											ps.setString(11,messageHeader.getService().getValue());
+											ps.setString(12,messageHeader.getAction());
+											ps.setString(13,DOMUtils.toString(message.getDocument(),"UTF-8"));
+											if (status == null)
+												ps.setNull(14,java.sql.Types.INTEGER);
+											else
+												ps.setInt(14,status.id());
+											//ps.setString(15,status == null ? null : String.format(getDateFormat(),timestamp));
+											//ps.setTimestamp(15,status == null ? null : new Timestamp(timestamp.getTime()));
+											//ps.setObject(15,status == null ? null : timestamp,Types.TIMESTAMP);
+											//ps.setObject(15,status == null ? null : timestamp);
+											return ps;
+										}
+										catch (TransformerException e)
+										{
+											throw new SQLException(e);
+										}
+									}
+								},
+								keyHolder
+							);
+					
+							for (EbMSAttachment attachment : message.getAttachments())
+							{
+								jdbcTemplate.update
+								(
+									"insert into ebms_attachment (" +
+										"ebms_message_id," +
+										"name," +
+										"content_id," +
+										"content_type," +
+										"content" +
+									") values (?,?,?,?,?)",
+									keyHolder.getKey().longValue(),
+									attachment.getName(),
+									attachment.getContentId(),
+									attachment.getContentType().split(";")[0].trim(),
+									IOUtils.toByteArray(attachment.getInputStream())
+								);
+							}
+							
+						}
+						catch (IOException e)
+						{
+							throw new DAOException(e);
+						}
+					}
+				}
+			);
+		}
+		catch (DataAccessException e)
+		{
+			throw new DAOException(e);
+		}
+		catch (TransactionException e)
+		{
+			throw new DAOException(e);
+		}
+	}
+
+	@Override
+	public void insertDuplicateMessage(final Date timestamp, final EbMSMessage message) throws DAOException
+	{
+		try
+		{
+			transactionTemplate.execute(
+				new TransactionCallbackWithoutResult()
+				{
+					@Override
+					public void doInTransactionWithoutResult(TransactionStatus arg0)
 					{
 						try
 						{
@@ -165,8 +311,6 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 									IOUtils.toByteArray(attachment.getInputStream())
 								);
 							}
-							
-							return keyHolder.getKey().longValue();
 						}
 						catch (IOException e)
 						{
