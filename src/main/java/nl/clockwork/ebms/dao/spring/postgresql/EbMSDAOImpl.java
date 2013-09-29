@@ -138,11 +138,7 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 											") values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?," + (status == null ? "null" : getTimestampFunction()) + ")" +
 											" returning id"
 										);
-										//ps.setDate(1,new java.sql.Date(timestamp.getTime()));
-										//ps.setString(1,String.format(getDateFormat(),timestamp));
 										ps.setTimestamp(1,new Timestamp(timestamp.getTime()));
-										//ps.setObject(1,timestamp,Types.TIMESTAMP);
-										//ps.setObject(1,timestamp);
 										MessageHeader messageHeader = message.getMessageHeader();
 										ps.setString(2,messageHeader.getCPAId());
 										ps.setString(3,messageHeader.getConversationId());
@@ -257,11 +253,7 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 											") values (?,?,?,?,?,(select max(message_nr) + 1 from ebms_message where message_id = ?),?,?,?,?,?,?,?,?,?,?,?,?,?)" +
 											" returning id"
 										);
-										//ps.setDate(1,new java.sql.Date(timestamp.getTime()));
-										//ps.setString(1,String.format(getDateFormat(),timestamp));
 										ps.setTimestamp(1,new Timestamp(timestamp.getTime()));
-										//ps.setObject(1,timestamp,Types.TIMESTAMP);
-										//ps.setObject(1,timestamp);
 										MessageHeader messageHeader = message.getMessageHeader();
 										ps.setString(2,messageHeader.getCPAId());
 										ps.setString(3,messageHeader.getConversationId());

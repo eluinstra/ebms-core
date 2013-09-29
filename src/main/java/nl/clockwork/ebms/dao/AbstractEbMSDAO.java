@@ -730,11 +730,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 		{
 			c = connectionManager.getConnection(true);
 			ps = getInsertMessagePreparedStatement(c,status);
-			//ps.setDate(1,new java.sql.Date(timestamp.getTime()));
-			//ps.setString(1,String.format(getDateFormat(),timestamp));
 			ps.setTimestamp(1,new Timestamp(timestamp.getTime()));
-			//ps.setObject(1,timestamp,Types.TIMESTAMP);
-			//ps.setObject(1,timestamp);
 			MessageHeader messageHeader = message.getMessageHeader();
 			ps.setString(2,messageHeader.getCPAId());
 			ps.setString(3,messageHeader.getConversationId());
@@ -830,11 +826,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 		{
 			c = connectionManager.getConnection(true);
 			ps = getInsertDuplicateMessagePreparedStatement(c);
-			//ps.setDate(1,new java.sql.Date(timestamp.getTime()));
-			//ps.setString(1,String.format(getDateFormat(),timestamp));
 			ps.setTimestamp(1,new Timestamp(timestamp.getTime()));
-			//ps.setObject(1,timestamp,Types.TIMESTAMP);
-			//ps.setObject(1,timestamp);
 			MessageHeader messageHeader = message.getMessageHeader();
 			ps.setString(2,messageHeader.getCPAId());
 			ps.setString(3,messageHeader.getConversationId());
@@ -889,7 +881,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 			else
 			{
 				connectionManager.rollback();
-				throw new DAOException("No 2key found!");
+				throw new DAOException("No key found!");
 			}
 		}
 		catch (SQLException e)
