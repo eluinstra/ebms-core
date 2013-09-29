@@ -113,7 +113,7 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 				"sync_reply," +
 				"message_order," +
 				"ack_requested," +
-				"content," +
+				"content" +
 			") values (seq_ebms_message_id.nextval,?,?,?,?,?,(select max(message_nr) + 1 from ebms_message where message_id = ?),?,?,?,?,?,?,?,?,?,?,?,?,?)",
 			//new String[]{"id"}
 			new int[]{1}
