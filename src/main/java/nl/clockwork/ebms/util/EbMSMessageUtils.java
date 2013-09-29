@@ -337,11 +337,6 @@ public class EbMSMessageUtils
 		return createError(location,errorCode,description,Constants.EBMS_DEFAULT_LANGUAGE,SeverityType.ERROR);
 	}
 	
-	public static Error createError(String location, String errorCode, String description, SeverityType severity)
-	{
-		return createError(location,errorCode,description,Constants.EBMS_DEFAULT_LANGUAGE,severity);
-	}
-	
 	public static Error createError(String location, String errorCode, String description, String language, SeverityType severity)
 	{
 		Error error = new Error();

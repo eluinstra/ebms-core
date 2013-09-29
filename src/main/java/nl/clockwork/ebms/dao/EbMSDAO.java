@@ -43,7 +43,6 @@ public interface EbMSDAO
 	int deleteCPA(String cpaId) throws DAOException;
 	
 	boolean existsMessage(String messageId) throws DAOException;
-	String getMessageIdByRefToMessageId(String refToMessageId, Service service, String...actions) throws DAOException;
 	EbMSMessageContext getMessageContextByRefToMessageId(String refToMessageId, Service service, String...actions) throws DAOException;
 	EbMSDocument getDocumentByRefToMessageId(String refToMessageId, Service service, String...actions) throws DAOException;
 	MessageHeader getMessageHeader(String messageId) throws DAOException;

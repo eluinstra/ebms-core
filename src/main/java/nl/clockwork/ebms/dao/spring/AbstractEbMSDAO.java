@@ -241,33 +241,6 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	}
 	
 	@Override
-	public String getMessageIdByRefToMessageId(String refToMessageId, Service service, String...actions) throws DAOException
-	{
-		try
-		{
-			return jdbcTemplate.queryForObject(
-				"select message_id" +
-				" from ebms_message" +
-				" where ref_to_message_id = ?" +
-				" and message_nr = 0" +
-				(service.getType() == null ? "" : " and serviceType = '" + service.getType() + "'") +
-				(service.getValue() == null ? "" : " and service = '" + service.getValue() + "'") +
-				(actions.length == 0 ? "" : " and action in (" + join(actions,",") + ")"),
-				String.class,
-				refToMessageId
-			);
-		}
-		catch(EmptyResultDataAccessException e)
-		{
-			return null;
-		}
-		catch (DataAccessException e)
-		{
-			throw new DAOException(e);
-		}
-	}
-	
-	@Override
 	public EbMSMessageContext getMessageContextByRefToMessageId(String refToMessageId, Service service, String...actions) throws DAOException
 	{
 		try
