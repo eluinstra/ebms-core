@@ -874,7 +874,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 					"type" +
 				") values (?,?)",
 				id,
-				type
+				type.id()
 			);
 		}
 		catch (DataAccessException e)
