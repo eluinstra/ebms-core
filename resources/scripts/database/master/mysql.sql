@@ -1,8 +1,10 @@
 CREATE TABLE cpa
 (
-	cpa_id						VARCHAR(128)		NOT NULL UNIQUE,
+	cpa_id						VARCHAR(256)		NOT NULL,
 	cpa								TEXT						NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+ALTER TABLE cpa ADD CONSTRAINT uc_cpa_id UNIQUE (cpa_id(255));
 
 CREATE TABLE ebms_message
 (
@@ -10,9 +12,9 @@ CREATE TABLE ebms_message
 	time_stamp				TIMESTAMP				NOT NULL DEFAULT '0000-00-00 00:00:00',
 	cpa_id						VARCHAR(256)		NOT NULL,
 	conversation_id		VARCHAR(256)		NOT NULL,
-	sequence_nr				INTEGER					NULL,
+	sequence_nr				SMALLINT				NULL,
 	message_id				VARCHAR(256)		NOT NULL,
-	message_nr				INTEGER					NOT NULL DEFAULT 0,
+	message_nr				SMALLINT				NOT NULL DEFAULT 0,
 	ref_to_message_id	VARCHAR(256)		NULL,
 	time_to_live			TIMESTAMP				NULL,
 	from_role					VARCHAR(256)		NULL,
@@ -21,7 +23,7 @@ CREATE TABLE ebms_message
 	service						VARCHAR(256)		NOT NULL,
 	action						VARCHAR(256)		NOT NULL,
 	content						TEXT						NULL,
-	status						INTEGER					NULL,
+	status						SMALLINT				NULL,
 	status_time				TIMESTAMP				NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -41,8 +43,8 @@ CREATE TABLE ebms_event
 (
 	message_id				VARCHAR(256)		NOT NULL,
 	time							TIMESTAMP				NOT NULL DEFAULT NOW(),
-	type							INTEGER					NOT NULL,
-	status						INTEGER					NOT NULL DEFAULT 0,
+	type							SMALLINT				NOT NULL,
+	status						SMALLINT				NOT NULL DEFAULT 0,
 	status_time				TIMESTAMP				NOT NULL DEFAULT '0000-00-00 00:00:00',
 	uri								VARCHAR(256)		NULL,
 	error_message			TEXT						NULL

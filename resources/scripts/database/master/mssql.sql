@@ -1,6 +1,6 @@
 CREATE TABLE cpa
 (
-	cpa_id						VARCHAR(128)		NOT NULL UNIQUE,
+	cpa_id						VARCHAR(256)		NOT NULL UNIQUE,
 	cpa								TEXT						NOT NULL
 );
 
@@ -10,9 +10,9 @@ CREATE TABLE ebms_message
 	time_stamp				DATETIME				NOT NULL,
 	cpa_id						VARCHAR(256)		NOT NULL,
 	conversation_id		VARCHAR(256)		NOT NULL,
-	sequence_nr				INT							NULL,
+	sequence_nr				SMALLINT				NULL,
 	message_id				VARCHAR(256)		NOT NULL,
-	message_nr				INT							NOT NULL DEFAULT 0,
+	message_nr				SMALLINT				NOT NULL DEFAULT 0,
 	ref_to_message_id	VARCHAR(256)		NULL,
 	time_to_live			DATETIME				NULL,
 	from_role					VARCHAR(256)		NULL,
@@ -21,7 +21,7 @@ CREATE TABLE ebms_message
 	service						VARCHAR(256)		NOT NULL,
 	action						VARCHAR(256)		NOT NULL,
 	content						TEXT						NULL,
-	status						INT							NULL,
+	status						SMALLINT				NULL,
 	status_time				DATETIME				NULL
 );
 
@@ -40,8 +40,8 @@ CREATE TABLE ebms_event
 (
 	message_id				VARCHAR(256)		NOT NULL,
 	time							DATETIME				NOT NULL DEFAULT GETDATE(),
-	type							INT					NOT NULL,
-	status						INT							NOT NULL DEFAULT 0,
+	type							SMALLINT				NOT NULL,
+	status						SMALLINT				NOT NULL DEFAULT 0,
 	status_time				DATETIME				NOT NULL DEFAULT GETDATE(),
 	uri								VARCHAR(256)		NULL,
 	error_message			TEXT						NULL
