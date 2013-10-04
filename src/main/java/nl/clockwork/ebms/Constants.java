@@ -91,7 +91,15 @@ public class Constants
 		EbMSEventType(int id) { this.id = id; }
 
 		public final int id() { return id; }
- }
+
+		public final static EbMSEventType get(int id)
+		{
+			for (EbMSEventType event : EbMSEventType.values())
+				if (event.id() == id)
+					return event;
+			return null;
+		}
+  }
 
   public static enum EbMSEventStatus
   {
@@ -102,7 +110,15 @@ public class Constants
 		EbMSEventStatus(int id) { this.id = id; }
 
 		public final int id() { return id; }
- }
+
+		public final static EbMSEventStatus get(int id)
+		{
+			for (EbMSEventStatus status : EbMSEventStatus.values())
+				if (status.id() == id)
+					return status;
+			return null;
+		}
+  }
 
 	public static final String EBMS_SOAP_ACTION = "\"ebXML\"";
 	public static final String EBMS_VERSION = "2.0";
