@@ -18,7 +18,7 @@ package nl.clockwork.mule.ebms.stub.ebf.filter;
 import nl.clockwork.ebms.common.XMLMessageBuilder;
 import nl.clockwork.ebms.model.EbMSDataSource;
 import nl.clockwork.ebms.model.EbMSMessageContent;
-import nl.clockwork.mule.ebms.stub.ebf.model.aanleveren.bericht.AanleverBericht;
+import nl.logius.digipoort.ebms._2_0.aanleverservice._1.AanleverBericht;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

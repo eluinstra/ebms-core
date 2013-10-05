@@ -25,9 +25,9 @@ import nl.clockwork.ebms.common.XMLMessageBuilder;
 import nl.clockwork.ebms.model.EbMSDataSource;
 import nl.clockwork.ebms.model.EbMSMessageContent;
 import nl.clockwork.ebms.model.EbMSMessageContext;
-import nl.clockwork.mule.ebms.stub.ebf.model.afleveren.bericht.AfleverBericht;
-import nl.clockwork.mule.ebms.stub.ebf.model.afleveren.bevestiging.BevestigAfleverBericht;
-import nl.clockwork.mule.ebms.stub.ebf.model.afleveren.bevestiging.FoutType;
+import nl.logius.digipoort.ebms._2_0.afleverservice._1.AfleverBericht;
+import nl.logius.digipoort.ebms._2_0.afleverservice._1.BevestigAfleverBericht;
+import nl.logius.digipoort.ebms._2_0.afleverservice._1.FoutType;
 
 import org.mule.api.MuleMessage;
 import org.mule.api.transformer.TransformerException;
