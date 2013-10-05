@@ -62,7 +62,6 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 		this.connectionManager = connectionManager;
 	}
 
-	//public abstract String getDateFormat();
 	public abstract String getTimestampFunction();
 	
 	@Override
@@ -337,7 +336,6 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 				"select cpa_id," +
 				" from_role," +
 				" to_role," +
-				" service_type," +
 				" service," +
 				" action," +
 				" time_stamp," +
@@ -362,7 +360,6 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 					result.setCpaId(rs.getString("cpa_id"));
 					result.setFromRole(rs.getString("from_role"));
 					result.setToRole(rs.getString("to_role"));
-					result.setServiceType(rs.getString("service_type"));
 					result.setService(rs.getString("service"));
 					result.setAction(rs.getString("action"));
 					result.setTimestamp(rs.getTimestamp("time_stamp"));
@@ -677,14 +674,12 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 				"time_to_live," +
 				"from_role," +
 				"to_role," +
-				"service_type," +
 				"service," +
 				"action," +
 				"content," +
 				"status," +
 				"status_time" +
-			") values (?,?,?,?,?,?,?,?,?,?,?,?,?,?," + (status == null ? "null" : getTimestampFunction()) + ")",
-			//new String[]{"message_id","message_nr"}
+			") values (?,?,?,?,?,?,?,?,?,?,?,?,?," + (status == null ? "null" : getTimestampFunction()) + ")",
 			new int[]{5,6}
 		);
 	}
@@ -704,12 +699,10 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 				"time_to_live," +
 				"from_role," +
 				"to_role," +
-				"service_type," +
 				"service," +
 				"action," +
 				"content" +
-			") values (?,?,?,?,?,(select max(message_nr) + 1 from ebms_message where message_id = ?),?,?,?,?,?,?,?,?)",
-			//new String[]{"message_id","message_nr"}
+			") values (?,?,?,?,?,(select max(message_nr) + 1 from ebms_message where message_id = ?),?,?,?,?,?,?,?)",
 			new int[]{5,6}
 		);
 	}
@@ -744,10 +737,6 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 				ps.setNull(14,java.sql.Types.INTEGER);
 			else
 				ps.setInt(14,status.id());
-			//ps.setString(15,status == null ? null : String.format(getDateFormat(),timestamp));
-			//ps.setTimestamp(15,status == null ? null : new Timestamp(timestamp.getTime()));
-			//ps.setObject(15,status == null ? null : timestamp,Types.TIMESTAMP);
-			//ps.setObject(15,status == null ? null : timestamp);
 			ps.executeUpdate();
 			ResultSet rs = ps.getGeneratedKeys();
 			if (rs.next())
@@ -972,7 +961,6 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 				") values (?,?,?,?)"
 			);
 			ps.setString(1,event.getMessageId());
-			//ps.setTimestamp(2,String.format(getDateFormat(),event.getTime()));
 			ps.setTimestamp(2,new Timestamp(event.getTime().getTime()));
 			ps.setInt(3,event.getType().id());
 			ps.setString(4,event.getUri());
@@ -1139,7 +1127,6 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 				"select cpa_id," +
 				" from_role," +
 				" to_role," +
-				" service_type," +
 				" service," +
 				" action," +
 				" time_stamp," +
@@ -1161,7 +1148,6 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 					result.setCpaId(rs.getString("cpa_id"));
 					result.setFromRole(rs.getString("from_role"));
 					result.setToRole(rs.getString("to_role"));
-					result.setServiceType(rs.getString("service_type"));
 					result.setService(rs.getString("service"));
 					result.setAction(rs.getString("action"));
 					result.setTimestamp(rs.getTimestamp("time_stamp"));
@@ -1315,8 +1301,6 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 				result.append(" and from_role = ?");
 			if (messageContext.getToRole() != null)
 				result.append(" and to_role = ?");
-			if (messageContext.getServiceType() != null)
-				result.append(" and service_type = ?");
 			if (messageContext.getService() != null)
 				result.append(" and service = ?");
 			if (messageContext.getAction() != null)
@@ -1344,8 +1328,6 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 				ps.setString(parameterIndex++,messageContext.getFromRole());
 			if (messageContext.getToRole() != null)
 				ps.setString(parameterIndex++,messageContext.getToRole());
-			if (messageContext.getServiceType() != null)
-				ps.setString(parameterIndex++,messageContext.getServiceType());
 			if (messageContext.getService() != null)
 				ps.setString(parameterIndex++,messageContext.getService());
 			if (messageContext.getAction() != null)

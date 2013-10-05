@@ -22,7 +22,6 @@ public class EbMSMessageContext
 	private String cpaId;
 	private String fromRole;
 	private String toRole;
-	private String serviceType;
 	private String service;
 	private String action;
 	private Date timestamp;
@@ -65,15 +64,6 @@ public class EbMSMessageContext
 		this.toRole = toRole;
 	}
 	
-	public String getServiceType()
-	{
-		return serviceType;
-	}
-	
-	public void setServiceType(String serviceType)
-	{
-		this.serviceType = serviceType;
-	}
 	
 	public String getService()
 	{

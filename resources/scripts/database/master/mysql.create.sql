@@ -19,7 +19,6 @@ CREATE TABLE ebms_message
 	time_to_live			TIMESTAMP				NULL,
 	from_role					VARCHAR(256)		NULL,
 	to_role						VARCHAR(256)		NULL,
-	service_type			VARCHAR(256)		NULL,
 	service						VARCHAR(256)		NOT NULL,
 	action						VARCHAR(256)		NOT NULL,
 	content						TEXT						NULL,

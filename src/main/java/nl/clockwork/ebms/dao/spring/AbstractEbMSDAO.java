@@ -46,6 +46,7 @@ import nl.clockwork.ebms.model.EbMSEvent;
 import nl.clockwork.ebms.model.EbMSMessage;
 import nl.clockwork.ebms.model.EbMSMessageContent;
 import nl.clockwork.ebms.model.EbMSMessageContext;
+import nl.clockwork.ebms.util.EbMSMessageUtils;
 
 import org.apache.commons.io.IOUtils;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CollaborationProtocolAgreement;
@@ -69,7 +70,6 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 {
 	protected TransactionTemplate transactionTemplate;
 	protected JdbcTemplate jdbcTemplate;
-	//public abstract String getDateFormat();
 	public abstract String getTimestampFunction();
 	
 	public AbstractEbMSDAO(TransactionTemplate transactionTemplate, JdbcTemplate jdbcTemplate)
@@ -249,7 +249,6 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 				"select cpa_id," +
 				" from_role," +
 				" to_role," +
-				" service_type," +
 				" service," +
 				" action," +
 				" time_stamp," +
@@ -272,7 +271,6 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 						result.setCpaId(rs.getString("cpa_id"));
 						result.setFromRole(rs.getString("from_role"));
 						result.setToRole(rs.getString("to_role"));
-						result.setServiceType(rs.getString("service_type"));
 						result.setService(rs.getString("service"));
 						result.setAction(rs.getString("action"));
 						result.setTimestamp(rs.getTimestamp("time_stamp"));
@@ -600,14 +598,12 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 													"time_to_live," +
 													"from_role," +
 													"to_role," +
-													"service_type," +
 													"service," +
 													"action," +
 													"content," +
 													"status," +
 													"status_time" +
-												") values (?,?,?,?,?,?,?,?,?,?,?,?,?,?," + (status == null ? "null" : getTimestampFunction()) + ")",
-												//new String[]{"message_id","message_nr"}
+												") values (?,?,?,?,?,?,?,?,?,?,?,?,?," + (status == null ? "null" : getTimestampFunction()) + ")",
 												new int[]{5,6}
 											);
 											ps.setTimestamp(1,new Timestamp(timestamp.getTime()));
@@ -623,18 +619,13 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 											ps.setTimestamp(7,messageHeader.getMessageData().getTimeToLive() == null ? null : new Timestamp(messageHeader.getMessageData().getTimeToLive().toGregorianCalendar().getTimeInMillis()));
 											ps.setString(8,messageHeader.getFrom().getRole());
 											ps.setString(9,messageHeader.getTo().getRole());
-											ps.setString(10,messageHeader.getService().getType());
-											ps.setString(11,messageHeader.getService().getValue());
-											ps.setString(12,messageHeader.getAction());
-											ps.setString(13,DOMUtils.toString(message.getDocument(),"UTF-8"));
+											ps.setString(10,EbMSMessageUtils.toString(messageHeader.getService()));
+											ps.setString(11,messageHeader.getAction());
+											ps.setString(12,DOMUtils.toString(message.getDocument(),"UTF-8"));
 											if (status == null)
-												ps.setNull(14,java.sql.Types.INTEGER);
+												ps.setNull(13,java.sql.Types.INTEGER);
 											else
-												ps.setInt(14,status.id());
-											//ps.setString(15,status == null ? null : String.format(getDateFormat(),timestamp));
-											//ps.setTimestamp(15,status == null ? null : new Timestamp(timestamp.getTime()));
-											//ps.setObject(15,status == null ? null : timestamp,Types.TIMESTAMP);
-											//ps.setObject(15,status == null ? null : timestamp);
+												ps.setInt(13,status.id());
 											return ps;
 										}
 										catch (TransformerException e)
@@ -722,12 +713,10 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 													"time_to_live," +
 													"from_role," +
 													"to_role," +
-													"service_type," +
 													"service," +
 													"action," +
 													"content" +
-												") values (?,?,?,?,?,(select max(message_nr) + 1 from ebms_message where message_id = ?),?,?,?,?,?,?,?,?)",
-												//new String[]{"message_id","message_nr"}
+												") values (?,?,?,?,?,(select max(message_nr) + 1 from ebms_message where message_id = ?),?,?,?,?,?,?,?)",
 												new int[]{5,6}
 											);
 											ps.setTimestamp(1,new Timestamp(timestamp.getTime()));
@@ -744,10 +733,9 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 											ps.setTimestamp(8,messageHeader.getMessageData().getTimeToLive() == null ? null : new Timestamp(messageHeader.getMessageData().getTimeToLive().toGregorianCalendar().getTimeInMillis()));
 											ps.setString(9,messageHeader.getFrom().getRole());
 											ps.setString(10,messageHeader.getTo().getRole());
-											ps.setString(11,messageHeader.getService().getType());
-											ps.setString(12,messageHeader.getService().getValue());
-											ps.setString(13,messageHeader.getAction());
-											ps.setString(14,DOMUtils.toString(message.getDocument(),"UTF-8"));
+											ps.setString(11,EbMSMessageUtils.toString(messageHeader.getService()));
+											ps.setString(12,messageHeader.getAction());
+											ps.setString(13,DOMUtils.toString(message.getDocument(),"UTF-8"));
 											return ps;
 										}
 										catch (TransformerException e)
@@ -858,7 +846,6 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 					"uri" +
 				") values (?,?,?,?)",
 				event.getMessageId(),
-				//String.format(getDateFormat(),event.getTime()),
 				event.getTime(),
 				event.getType().id(),
 				event.getUri()
@@ -889,7 +876,6 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 					public void setValues(PreparedStatement ps, int i) throws SQLException
 					{
 						ps.setString(1,events.get(i).getMessageId());
-						//ps.setTimestamp(2,String.format(getDateFormat(),events.get(i).getTime()));
 						ps.setTimestamp(2,new Timestamp(events.get(i).getTime().getTime()));
 						ps.setInt(3,events.get(i).getType().id());
 						ps.setString(4,events.get(i).getUri());
@@ -948,11 +934,6 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 			{
 				parameters.add(messageContext.getToRole());
 				result.append(" and to_role = ?");
-			}
-			if (messageContext.getServiceType() != null)
-			{
-				parameters.add(messageContext.getServiceType());
-				result.append(" and service_type = ?");
 			}
 			if (messageContext.getService() != null)
 			{
@@ -1038,7 +1019,6 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 			"select cpa_id," +
 			" from_role," +
 			" to_role," +
-			" service_type," +
 			" service," +
 			" action," +
 			" time_stamp," +
@@ -1058,7 +1038,6 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 					result.setCpaId(rs.getString("cpa_id"));
 					result.setFromRole(rs.getString("from_role"));
 					result.setToRole(rs.getString("to_role"));
-					result.setServiceType(rs.getString("service_type"));
 					result.setService(rs.getString("service"));
 					result.setAction(rs.getString("action"));
 					result.setTimestamp(rs.getTimestamp("time_stamp"));

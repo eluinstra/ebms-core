@@ -47,7 +47,7 @@ public class EbMSMessageContextValidator
 			if (cpa == null)
 				throw new EbMSMessageContextValidationException("No CPA found for: context.cpaId=" + context.getCpaId());
 
-			PartyInfo sendingPartyInfo = CPAUtils.getSendingPartyInfo(cpa,context.getFromRole(),context.getServiceType(),context.getService(),context.getAction());
+			PartyInfo sendingPartyInfo = CPAUtils.getSendingPartyInfo(cpa,context.getFromRole(),context.getService(),context.getAction());
 			if (sendingPartyInfo == null)
 			{
 				StringBuffer msg = new StringBuffer();
@@ -56,14 +56,12 @@ public class EbMSMessageContextValidator
 				msg.append(" context.cpaId=").append(context.getCpaId());
 				if (context.getFromRole() != null)
 					msg.append(", context.fromRole=").append(context.getFromRole());
-				if (context.getServiceType() != null)
-					msg.append(", context.serviceType=").append(context.getServiceType());
 				msg.append(", context.service=").append(context.getService());
 				msg.append(", context.action=").append(context.getAction());
 
 				throw new EbMSMessageContextValidationException(msg.toString());
 			}
-			PartyInfo receivingPartyInfo = CPAUtils.getReceivingPartyInfo(cpa,context.getToRole(),context.getServiceType(),context.getService(),context.getAction());
+			PartyInfo receivingPartyInfo = CPAUtils.getReceivingPartyInfo(cpa,context.getToRole(),context.getService(),context.getAction());
 			if (receivingPartyInfo == null)
 			{
 				StringBuffer msg = new StringBuffer();
@@ -72,8 +70,6 @@ public class EbMSMessageContextValidator
 				msg.append(" context.cpaId=").append(context.getCpaId());
 				if (context.getFromRole() != null)
 					msg.append(", context.toRole=").append(context.getToRole());
-				if (context.getServiceType() != null)
-					msg.append(", context.serviceType=").append(context.getServiceType());
 				msg.append(", context.service=").append(context.getService());
 				msg.append(", context.action=").append(context.getAction());
 				

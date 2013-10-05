@@ -29,12 +29,6 @@ public class EbMSDAOImpl extends nl.clockwork.ebms.dao.mysql.EbMSDAOImpl
 		super(connectionManager);
 	}
 
-//@Override
-//public String getDateFormat()
-//{
-//	return "%1$tY-%1$tm-%1$td %1$tH:%1$tM:%1$tS:%1$tL";
-//}
-
 	@Override
 	public String getTimestampFunction()
 	{
@@ -50,16 +44,6 @@ public class EbMSDAOImpl extends nl.clockwork.ebms.dao.mysql.EbMSDAOImpl
 		" and status = " + status.id() +
 		messageContextFilter +
 		" order by time_stamp asc";
-//		return "select message_id" +
-//		" from (" +
-//			" select message_id, ROW_NUMBER() OVER (order by time_stamp asc) as rownum" +
-//			" from ebms_message" +
-//			" where message_nr = 0" +
-//			" and status = " + EbMSMessageStatus.RECEIVED.id() +
-//			messageContextFilter +
-//		" ) as tmpTable" +
-//		//" where tmpTable.rownum between 0 and " + maxNr;
-//		" where tmpTable.rownum < " + maxNr;
 	}
 
 	protected PreparedStatement getInsertDuplicateMessagePreparedStatement(Connection connection) throws SQLException
@@ -77,12 +61,10 @@ public class EbMSDAOImpl extends nl.clockwork.ebms.dao.mysql.EbMSDAOImpl
 				"time_to_live," +
 				"from_role," +
 				"to_role," +
-				"service_type," +
 				"service," +
 				"action," +
 				"content" +
-			") values (?,?,?,?,?,(select max(message_nr) + 1 as nr from ebms_message where message_id = ?),?,?,?,?,?,?,?,?)",
-			//new String[]{"id"}
+			") values (?,?,?,?,?,(select max(message_nr) + 1 as nr from ebms_message where message_id = ?),?,?,?,?,?,?,?)",
 			new int[]{1}
 		);
 	}

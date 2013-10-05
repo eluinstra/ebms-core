@@ -28,12 +28,6 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 		super(transactionTemplate,jdbcTemplate);
 	}
 
-//	@Override
-//	public String getDateFormat()
-//	{
-//		return "%1$tY-%1$tm-%1$td %1$tH:%1$tM:%1$tS.%1$tL";
-//	}
-
 	@Override
 	public String getTimestampFunction()
 	{

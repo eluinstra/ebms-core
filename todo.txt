@@ -1,5 +1,4 @@
 - move signature validation???
-- merge serviceType and service???
 - add partyId???
 - send message as string instead of document???
 

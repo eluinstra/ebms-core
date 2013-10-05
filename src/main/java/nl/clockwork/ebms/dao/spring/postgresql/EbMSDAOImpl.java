@@ -74,12 +74,6 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 		super(transactionTemplate,jdbcTemplate);
 	}
 
-//	@Override
-//	public String getDateFormat()
-//	{
-//		return "%1$tY-%1$tm-%1$td %1$tH:%1$tM:%1$tS.%1$tL";
-//	}
-
 	@Override
 	public String getTimestampFunction()
 	{
@@ -131,13 +125,12 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 													"time_to_live," +
 													"from_role," +
 													"to_role," +
-													"service_type," +
 													"service," +
 													"action," +
 													"content," +
 													"status," +
 													"status_time" +
-												") values (?,?,?,?,?,?,?,?,?,?,?,?,?,?," + (status == null ? "null" : getTimestampFunction()) + ")" +
+												") values (?,?,?,?,?,?,?,?,?,?,?,?,?," + (status == null ? "null" : getTimestampFunction()) + ")" +
 												" returning message_id, message_nr"
 											);
 											ps.setTimestamp(1,new Timestamp(timestamp.getTime()));
@@ -161,10 +154,6 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 												ps.setNull(14,java.sql.Types.INTEGER);
 											else
 												ps.setInt(14,status.id());
-											//ps.setString(15,status == null ? null : String.format(getDateFormat(),timestamp));
-											//ps.setTimestamp(15,status == null ? null : new Timestamp(timestamp.getTime()));
-											//ps.setObject(15,status == null ? null : timestamp,Types.TIMESTAMP);
-											//ps.setObject(15,status == null ? null : timestamp);
 											return ps;
 										}
 										catch (TransformerException e)
@@ -249,11 +238,10 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 													"time_to_live," +
 													"from_role," +
 													"to_role," +
-													"service_type," +
 													"service," +
 													"action," +
 													"content" +
-												") values (?,?,?,?,?,(select max(message_nr) + 1 from ebms_message where message_id = ?),?,?,?,?,?,?,?,?)" +
+												") values (?,?,?,?,?,(select max(message_nr) + 1 from ebms_message where message_id = ?),?,?,?,?,?,?,?)" +
 												" returning message_id, message_nr"
 											);
 											ps.setTimestamp(1,new Timestamp(timestamp.getTime()));
