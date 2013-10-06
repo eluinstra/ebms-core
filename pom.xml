@@ -239,6 +239,26 @@
 				</executions>
 			</plugin>
 			<plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>jaxb2-maven-plugin</artifactId>
+        <version>1.5</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>xjc</goal>
+						</goals>
+						<configuration>
+							<schemaDirectory>${project.basedir}/src/main/resources/nl/clockwork/ebms/xsd/</schemaDirectory>
+							<schemaFiles>cpp-cpa-2_0.xsd,msg-header-2_0.xsd</schemaFiles>
+							<bindingDirectory>${project.basedir}/src/main/resources/nl/clockwork/ebms/xsd/</bindingDirectory>
+							<bindingFiles>cpp-cpa-2_0.xjb,msg-header-2_0.xjb</bindingFiles>
+							<clearOutputDir>false</clearOutputDir>
+							<verbose>false</verbose>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>3.1</version>
@@ -247,27 +267,6 @@
 					<target>${jdk.version}</target>
 					<encoding>ISO-8859-1</encoding>
 				</configuration>
-			</plugin>
-			<plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>jaxb2-maven-plugin</artifactId>
-        <version>1.5</version>
-				<executions>
-					<execution>
-						<id>xjc</id>
-						<goals>
-							<goal>xjc</goal>
-						</goals>
-						<configuration>
-							<schemaDirectory>${project.basedir}/src/main/resources/</schemaDirectory>
-							<schemaFiles>nl/clockwork/ebms/xsd/cpp-cpa-2_0.xsd,nl/clockwork/ebms/xsd/msg-header-2_0.xsd</schemaFiles>
-							<bindingDirectory>${project.basedir}/src/main/resources/</bindingDirectory>
-							<bindingFiles>nl/clockwork/ebms/xsd/cpp-cpa-2_0.xjb,nl/clockwork/ebms/xsd/msg-header-2_0.xjb</bindingFiles>
-							<clearOutputDir>false</clearOutputDir>
-							<verbose>false</verbose>
-						</configuration>
-					</execution>
-				</executions>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
