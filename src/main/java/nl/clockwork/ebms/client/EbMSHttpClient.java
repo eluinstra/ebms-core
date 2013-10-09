@@ -97,32 +97,12 @@ public class EbMSHttpClient implements EbMSClient
 		//connection.setMethod("POST");
 		if (connection instanceof HttpsURLConnection)
 		{
-			//if (!verifyHostnames)
-			//	((HttpsURLConnection)connection).setHostnameVerifier(
-			//		new HostnameVerifier()
-			//		{
-			//			@Override
-			//			public boolean verify(String hostname, SSLSession sslSession)
-			//			{
-			//				return true;
-			//			}
-			//		}
-			//	);
+			((HttpsURLConnection)connection).setHostnameVerifier(sslFactoryManager.getHostnameVerifier((HttpsURLConnection)connection));
 			((HttpsURLConnection)connection).setSSLSocketFactory(sslFactoryManager.getSslSocketFactory());
 		}
 		else if (connection instanceof com.sun.net.ssl.HttpsURLConnection)
 		{
-			//if (!verifyHostnames)
-			//	((com.sun.net.ssl.HttpsURLConnection)connection).setHostnameVerifier(
-			//		new com.sun.net.ssl.HostnameVerifier()
-			//		{
-			//			@Override
-			//			public boolean verify(String urlHostname, String certHostname)
-			//			{
-			//				return true;
-			//			}
-			//		}
-			//	);
+			((com.sun.net.ssl.HttpsURLConnection)connection).setHostnameVerifier(sslFactoryManager.getHostnameVerifier((com.sun.net.ssl.HttpsURLConnection)connection));
 			((com.sun.net.ssl.HttpsURLConnection)connection).setSSLSocketFactory(sslFactoryManager.getSslSocketFactory());
 		}
 		return connection;
