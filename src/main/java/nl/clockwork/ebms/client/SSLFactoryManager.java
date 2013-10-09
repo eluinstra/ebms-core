@@ -101,9 +101,6 @@ public class SSLFactoryManager
 
 	public void init() throws GeneralSecurityException, IOException
 	{
-		if (!verifyHostnames)
-			setDefaultHostnameVerifier();
-
 		KeyStore keyStore = SecurityUtils.loadKeyStore(keyStorePath,keyStorePassword);
 		KeyStore trustStore = SecurityUtils.loadKeyStore(trustStorePath,trustStorePassword);
 
@@ -134,33 +131,31 @@ public class SSLFactoryManager
 		sslSocketFactory = sslContext.getSocketFactory();
 	}
 
-	@SuppressWarnings({"restriction","deprecation"})
-	private void setDefaultHostnameVerifier()
+	public HostnameVerifier getHostnameVerifier(HttpsURLConnection connection)
 	{
-		//if ("javax.net.ssl".equals(System.getProperty("java.protocol.handler.pkgs")))
-		HttpsURLConnection.setDefaultHostnameVerifier(
-			new HostnameVerifier()
+		return verifyHostnames ? HttpsURLConnection.getDefaultHostnameVerifier() : new HostnameVerifier()
+		{
+			@Override
+			public boolean verify(String hostname, SSLSession sslSession)
 			{
-				@Override
-				public boolean verify(String hostname, SSLSession sslSession)
-				{
-					return true;
-				}
+				return true;
 			}
-		);
-		//if ("com.sun.net.ssl.internal.www.protocol".equals(System.getProperty("java.protocol.handler.pkgs")))
-		com.sun.net.ssl.HttpsURLConnection.setDefaultHostnameVerifier(
-			new com.sun.net.ssl.HostnameVerifier()
-			{
-				@Override
-				public boolean verify(String urlHostname, String certHostname)
-				{
-					return true;
-				}
-			}
-		);
+		};
 	}
-
+	
+	@SuppressWarnings({"deprecation","restriction"})
+	public com.sun.net.ssl.HostnameVerifier getHostnameVerifier(com.sun.net.ssl.HttpsURLConnection connection)
+	{
+		return verifyHostnames ? com.sun.net.ssl.HttpsURLConnection.getDefaultHostnameVerifier() : new com.sun.net.ssl.HostnameVerifier()
+		{
+			@Override
+			public boolean verify(String urlHostname, String certHostname)
+			{
+				return true;
+			}
+		};
+	}
+	
 	public SSLSocketFactory getSslSocketFactory()
 	{
 		return sslSocketFactory;
