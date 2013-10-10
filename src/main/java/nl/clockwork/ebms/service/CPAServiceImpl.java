@@ -24,6 +24,7 @@ import nl.clockwork.ebms.dao.DAOException;
 import nl.clockwork.ebms.dao.EbMSDAO;
 import nl.clockwork.ebms.validation.CPAValidator;
 import nl.clockwork.ebms.validation.ValidatorException;
+import nl.clockwork.ebms.validation.XSDValidator;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -32,17 +33,24 @@ import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CollaborationProt
 public class CPAServiceImpl implements CPAService
 {
   protected transient Log logger = LogFactory.getLog(getClass());
+	private XSDValidator xsdValidator;
 	private EbMSDAO ebMSDAO;
 	private Object cpaMonitor = new Object();
 
+	public CPAServiceImpl()
+	{
+		xsdValidator = new XSDValidator("/nl/clockwork/ebms/xsd/cpp-cpa-2_0.xsd");
+	}
+	
 	@Override
 	public
-	void validateCPA(/*CollaborationProtocolAgreement*/String cpa_) throws CPAServiceException
+	void validateCPA(/*CollaborationProtocolAgreement*/String cpa) throws CPAServiceException
 	{
 		try
 		{
-			CollaborationProtocolAgreement cpa = XMLMessageBuilder.getInstance(CollaborationProtocolAgreement.class).handle(cpa_);
-			new CPAValidator().validate(cpa);
+			xsdValidator.validate(cpa);
+			CollaborationProtocolAgreement cpa_ = XMLMessageBuilder.getInstance(CollaborationProtocolAgreement.class).handle(cpa);
+			new CPAValidator().validate(cpa_);
 		}
 		catch (JAXBException e)
 		{
@@ -57,28 +65,29 @@ public class CPAServiceImpl implements CPAService
 	}
 	
 	@Override
-	public String insertCPA(/*CollaborationProtocolAgreement*/String cpa_, Boolean overwrite) throws CPAServiceException
+	public String insertCPA(/*CollaborationProtocolAgreement*/String cpa, Boolean overwrite) throws CPAServiceException
 	{
 		try
 		{
-			CollaborationProtocolAgreement cpa = XMLMessageBuilder.getInstance(CollaborationProtocolAgreement.class).handle(cpa_);
-			new CPAValidator().validate(cpa);
+			xsdValidator.validate(cpa);
+			CollaborationProtocolAgreement cpa_ = XMLMessageBuilder.getInstance(CollaborationProtocolAgreement.class).handle(cpa);
+			new CPAValidator().validate(cpa_);
 			synchronized (cpaMonitor)
 			{
-				if (ebMSDAO.existsCPA(cpa.getCpaid()))
+				if (ebMSDAO.existsCPA(cpa_.getCpaid()))
 				{
 					if (overwrite)
 					{
-						if (ebMSDAO.updateCPA(cpa) == 0)
-							throw new CPAServiceException("Could not update CPA " + cpa.getCpaid() + "! CPA does not exists.");
+						if (ebMSDAO.updateCPA(cpa_) == 0)
+							throw new CPAServiceException("Could not update CPA " + cpa_.getCpaid() + "! CPA does not exists.");
 					}
 					else
-						throw new CPAServiceException("Did not insert CPA " + cpa.getCpaid() + "! CPA already exists.");
+						throw new CPAServiceException("Did not insert CPA " + cpa_.getCpaid() + "! CPA already exists.");
 				}
 				else
-					ebMSDAO.insertCPA(cpa);
+					ebMSDAO.insertCPA(cpa_);
 			}
-			return cpa.getCpaid();
+			return cpa_.getCpaid();
 		}
 		catch (JAXBException e)
 		{
