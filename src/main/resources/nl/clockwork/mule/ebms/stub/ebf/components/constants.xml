@@ -26,22 +26,22 @@
 
 	<util:constant id="AFLEVERBERICHT_BERICHTSOORT_EFACTUUR" static-field="nl.clockwork.mule.ebms.stub.Constants.AFLEVERBERICHT_BERICHTSOORT_EFACTUUR" />
 
-	<bean id="AFLEVERBERICHT_PROCESSING_ERROR" class="nl.clockwork.mule.ebms.stub.ebf.model.afleveren.bevestiging.FoutType">
+	<bean id="AFLEVERBERICHT_PROCESSING_ERROR" class="nl.logius.digipoort.ebms._2_0.afleverservice._1.FoutType">
 		<property name="foutcode" value="AFS400" />
 		<property name="foutbeschrijving" value="Er is een technische fout in de afleverservice van de Procesinfrastructuur opgetreden. Probeer het later opnieuw of neem contact op met de beheerder van de Procesinfrastructuur." />
 	</bean>
 
-	<bean id="AFLEVERBERICHT_DETERMINATION_ERROR" class="nl.clockwork.mule.ebms.stub.ebf.model.afleveren.bevestiging.FoutType">
+	<bean id="AFLEVERBERICHT_DETERMINATION_ERROR" class="nl.logius.digipoort.ebms._2_0.afleverservice._1.FoutType">
 		<property name="foutcode" value="AFS100" />
 		<property name="foutbeschrijving" value="Het verzoek voldoet niet aan de koppelvlakspecificaties en kan hierdoor niet door de Procesinfrastructuur worden verwerkt.\n\nDe volgende fout is opgetreden:\nHet afleverbericht kan niet worden gevonden." />
 	</bean>
 
-	<bean id="AFLEVERBERICHT_XSD_ERROR" class="nl.clockwork.mule.ebms.stub.ebf.model.afleveren.bevestiging.FoutType">
+	<bean id="AFLEVERBERICHT_XSD_ERROR" class="nl.logius.digipoort.ebms._2_0.afleverservice._1.FoutType">
 		<property name="foutcode" value="AFS100" />
 		<property name="foutbeschrijving" value="Het verzoek voldoet niet aan de koppelvlakspecificaties en kan hierdoor niet door de Procesinfrastructuur worden verwerkt.\n\nDe volgende fout is opgetreden:\nHet afleverbericht voldoet niet aan de xsd." />
 	</bean>
 
-	<bean id="AFLEVERBERICHT_BERICHTSOORT_ERROR" class="nl.clockwork.mule.ebms.stub.ebf.model.afleveren.bevestiging.FoutType">
+	<bean id="AFLEVERBERICHT_BERICHTSOORT_ERROR" class="nl.logius.digipoort.ebms._2_0.afleverservice._1.FoutType">
 		<property name="foutcode" value="AFS100" />
 		<property name="foutbeschrijving" value="Het verzoek voldoet niet aan de koppelvlakspecificaties en kan hierdoor niet door de Procesinfrastructuur worden verwerkt.\n\nDe volgende fout is opgetreden:\nDe berichtsoort is onjuist." />
 	</bean>
@@ -49,22 +49,22 @@
 	<util:constant id="AANLEVERBERICHT_BERICHTSOORT_EFACTUUR" static-field="nl.clockwork.mule.ebms.stub.Constants.AANLEVERBERICHT_BERICHTSOORT_EFACTUUR" />
 	<util:constant id="AANLEVERBERICHT_BERICHTSOORT_ORDER" static-field="nl.clockwork.mule.ebms.stub.Constants.AANLEVERBERICHT_BERICHTSOORT_ORDER" />
 
-	<bean id="AANLEVERBERICHT_PROCESSING_ERROR" class="nl.clockwork.mule.ebms.stub.ebf.model.aanleveren.bevestiging.FoutType">
+	<bean id="AANLEVERBERICHT_PROCESSING_ERROR" class="nl.logius.digipoort.ebms._2_0.aanleverservice._1.FoutType">
 		<property name="foutcode" value="AFS400" />
 		<property name="foutbeschrijving" value="Er is een technische fout in de afleverservice van de Procesinfrastructuur opgetreden. Probeer het later opnieuw of neem contact op met de beheerder van de Procesinfrastructuur." />
 	</bean>
 
-	<bean id="AANLEVERBERICHT_DETERMINATION_ERROR" class="nl.clockwork.mule.ebms.stub.ebf.model.aanleveren.bevestiging.FoutType">
+	<bean id="AANLEVERBERICHT_DETERMINATION_ERROR" class="nl.logius.digipoort.ebms._2_0.aanleverservice._1.FoutType">
 		<property name="foutcode" value="AFS100" />
 		<property name="foutbeschrijving" value="Het verzoek voldoet niet aan de koppelvlakspecificaties en kan hierdoor niet door de Procesinfrastructuur worden verwerkt.\n\nDe volgende fout is opgetreden:\nHet afleverbericht kan niet worden gevonden." />
 	</bean>
 
-	<bean id="AANLEVERBERICHT_XSD_ERROR" class="nl.clockwork.mule.ebms.stub.ebf.model.aanleveren.bevestiging.FoutType">
+	<bean id="AANLEVERBERICHT_XSD_ERROR" class="nl.logius.digipoort.ebms._2_0.aanleverservice._1.FoutType">
 		<property name="foutcode" value="AFS100" />
 		<property name="foutbeschrijving" value="Het verzoek voldoet niet aan de koppelvlakspecificaties en kan hierdoor niet door de Procesinfrastructuur worden verwerkt.\n\nDe volgende fout is opgetreden:\nHet afleverbericht voldoet niet aan de xsd." />
 	</bean>
 
-	<bean id="AANLEVERBERICHT_BERICHTSOORT_ERROR" class="nl.clockwork.mule.ebms.stub.ebf.model.aanleveren.bevestiging.FoutType">
+	<bean id="AANLEVERBERICHT_BERICHTSOORT_ERROR" class="nl.logius.digipoort.ebms._2_0.aanleverservice._1.FoutType">
 		<property name="foutcode" value="AFS100" />
 		<property name="foutbeschrijving" value="Het verzoek voldoet niet aan de koppelvlakspecificaties en kan hierdoor niet door de Procesinfrastructuur worden verwerkt.\n\nDe volgende fout is opgetreden:\nDe berichtsoort is onjuist." />
 	</bean>
