@@ -62,7 +62,7 @@ public interface EbMSDAO
 	void deleteEvents(String messageId, EbMSEventStatus status) throws DAOException;
 
 	List<String> getMessageIds(EbMSMessageContext messageContext, EbMSMessageStatus status) throws DAOException;
-	List<String> getMessageIds(EbMSMessageContext messageContext, EbMSMessageStatus status, long maxNr) throws DAOException;
+	List<String> getMessageIds(EbMSMessageContext messageContext, EbMSMessageStatus status, int maxNr) throws DAOException;
 	EbMSMessageContent getMessageContent(String messageId) throws DAOException;
 	void updateMessage(String messageId, EbMSMessageStatus oldStatus, EbMSMessageStatus newStatus) throws DAOException;
 	void updateMessages(List<String> messageIds, EbMSMessageStatus oldStatus, EbMSMessageStatus newStatus) throws DAOException;

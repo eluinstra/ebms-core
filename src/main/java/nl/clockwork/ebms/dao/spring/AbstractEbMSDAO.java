@@ -992,10 +992,10 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 		}
 	}
 
-	public abstract String getMessageIdsQuery(String messageContextFilter, EbMSMessageStatus status, long maxNr);
+	public abstract String getMessageIdsQuery(String messageContextFilter, EbMSMessageStatus status, int maxNr);
 
 	@Override
-	public List<String> getMessageIds(EbMSMessageContext messageContext, EbMSMessageStatus status, long maxNr) throws DAOException
+	public List<String> getMessageIds(EbMSMessageContext messageContext, EbMSMessageStatus status, int maxNr) throws DAOException
 	{
 		try
 		{

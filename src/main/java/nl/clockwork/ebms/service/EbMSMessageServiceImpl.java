@@ -115,7 +115,7 @@ public class EbMSMessageServiceImpl implements EbMSMessageService
 	}
 
 	@Override
-	public List<String> getMessageIds(EbMSMessageContext messageContext, Long maxNr) throws EbMSMessageServiceException
+	public List<String> getMessageIds(EbMSMessageContext messageContext, Integer maxNr) throws EbMSMessageServiceException
 	{
 		try
 		{
