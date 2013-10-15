@@ -48,6 +48,7 @@ import nl.clockwork.ebms.model.EbMSMessageContext;
 import nl.clockwork.ebms.util.EbMSMessageUtils;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CollaborationProtocolAgreement;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageHeader;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.Service;
@@ -227,18 +228,6 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 		}
 	}
 	
-	private String join(String[] array, String delimiter)
-	{
-		StringBuffer result = new StringBuffer();
-		if (array.length > 0)
-		{
-			for (String s : array)
-				result.append("'").append(s).append("'").append(delimiter);
-			result.deleteCharAt(result.length() - 1);
-		}
-		return result.toString();
-	}
-	
 	@Override
 	public EbMSMessageContext getMessageContextByRefToMessageId(String refToMessageId, Service service, String...actions) throws DAOException
 	{
@@ -260,7 +249,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 				" and message_nr = 0" +
 				(service.getType() == null ? "" : " and serviceType = '" + service.getType() + "'") +
 				(service.getValue() == null ? "" : " and service = '" + service.getValue() + "'") +
-				(actions.length == 0 ? "" : " and action in (" + join(actions,",") + ")"),
+				(actions.length == 0 ? "" : " and action in (" + StringUtils.join(actions,",") + ")"),
 				new ParameterizedRowMapper<EbMSMessageContext>()
 				{
 					@Override
@@ -306,7 +295,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 				" and message_nr = 0" +
 				(service.getType() == null ? "" : " and serviceType = '" + service.getType() + "'") +
 				(service.getValue() == null ? "" : " and service = '" + service.getValue() + "'") +
-				(actions.length == 0 ? "" : " and action in (" + join(actions,",") + ")"),
+				(actions.length == 0 ? "" : " and action in (" + StringUtils.join(actions,",") + ")"),
 				String.class,
 				refToMessageId
 			);

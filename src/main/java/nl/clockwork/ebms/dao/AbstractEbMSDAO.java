@@ -44,6 +44,7 @@ import nl.clockwork.ebms.model.EbMSMessageContent;
 import nl.clockwork.ebms.model.EbMSMessageContext;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CollaborationProtocolAgreement;
@@ -347,7 +348,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 				" and message_nr = 0" +
 				(service.getType() == null ? "" : " and serviceType = '" + service.getType() + "'") +
 				(service.getValue() == null ? "" : " and service = '" + service.getValue() + "'") +
-				(actions.length == 0 ? "" : " and action in (" + join(actions,",") + ")")
+				(actions.length == 0 ? "" : " and action in (" + StringUtils.join(actions,",") + ")")
 			);
 			ps.setString(1,refToMessageId);
 			if (ps.execute())
@@ -397,7 +398,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 				" and message_nr = 0" +
 				(service.getType() == null ? "" : " and serviceType = '" + service.getType() + "'") +
 				(service.getValue() == null ? "" : " and service = '" + service.getValue() + "'") +
-				(actions.length == 0 ? "" : " and action in (" + join(actions,",") + ")")
+				(actions.length == 0 ? "" : " and action in (" + StringUtils.join(actions,",") + ")")
 			);
 			ps.setString(1,refToMessageId);
 			if (ps.execute())
@@ -1340,18 +1341,6 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 			if (messageContext.getSequenceNr() != null)
 				ps.setObject(parameterIndex++,messageContext.getSequenceNr());
 		}
-	}
-	
-	protected String join(String[] array, String delimiter)
-	{
-		StringBuffer result = new StringBuffer();
-		if (array.length > 0)
-		{
-			for (String s : array)
-				result.append("'").append(s).append("'").append(delimiter);
-			result.deleteCharAt(result.length() - 1);
-		}
-		return result.toString();
 	}
 	
 }
