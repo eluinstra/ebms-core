@@ -227,11 +227,13 @@
 						<include>src/main/resources/**/*</include>
 					</includes>
 					<excludes>
+						<include>src/main/resources/**/*.jks</include>
 						<exclude>src/main/resources/nl/clockwork/ebms/xsd/**/*</exclude>
 					</excludes>
 				</configuration>
 				<executions>
 					<execution>
+						<phase>package</phase>
 						<goals>
 							<goal>check</goal>
 						</goals>
