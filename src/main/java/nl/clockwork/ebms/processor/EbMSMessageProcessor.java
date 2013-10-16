@@ -367,7 +367,7 @@ public class EbMSMessageProcessor
 					{
 						ebMSDAO.insertMessage(timestamp.getTime(),message,null);
 						ebMSDAO.deleteEvents(message.getMessageHeader().getMessageData().getRefToMessageId(),EbMSEventStatus.UNPROCESSED);
-						ebMSDAO.updateMessageStatus(message.getMessageHeader().getMessageData().getRefToMessageId(),null,status);
+						ebMSDAO.updateMessageStatus(message.getMessageHeader().getMessageData().getRefToMessageId(),EbMSMessageStatus.SENT,status);
 						if (status.equals(EbMSMessageStatus.ACKNOWLEDGED))
 							eventListener.onMessageAcknowledged(message.getMessageHeader().getMessageData().getRefToMessageId());
 						else if (status.equals(EbMSMessageStatus.DELIVERY_FAILED))
