@@ -52,7 +52,7 @@ public class EbMSResponseHandler
 		{
 			if (connection.getResponseCode() / 100 == 2)
 			{
-				if (connection.getContentLength() == 0)
+				if (connection.getResponseCode() == 204 || connection.getContentLength() == 0)
 					return null;
 				else
 				{
