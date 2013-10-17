@@ -15,9 +15,12 @@
  */
 package nl.clockwork.ebms.model;
 
+import java.io.Serializable;
 
-public class EbMSDataSource
+
+public class EbMSDataSource implements Serializable
 {
+	private static final long serialVersionUID = 1L;
 	private String name;
 	private String contentType;
 	private byte[] content;
