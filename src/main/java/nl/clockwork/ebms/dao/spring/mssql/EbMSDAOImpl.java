@@ -29,6 +29,7 @@ import nl.clockwork.ebms.common.util.DOMUtils;
 import nl.clockwork.ebms.dao.DAOException;
 import nl.clockwork.ebms.model.EbMSAttachment;
 import nl.clockwork.ebms.model.EbMSMessage;
+import nl.clockwork.ebms.util.EbMSMessageUtils;
 
 import org.apache.commons.io.IOUtils;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageHeader;
@@ -122,10 +123,9 @@ public class EbMSDAOImpl extends nl.clockwork.ebms.dao.spring.mysql.EbMSDAOImpl
 											ps.setTimestamp(8,messageHeader.getMessageData().getTimeToLive() == null ? null : new Timestamp(messageHeader.getMessageData().getTimeToLive().toGregorianCalendar().getTimeInMillis()));
 											ps.setString(9,messageHeader.getFrom().getRole());
 											ps.setString(10,messageHeader.getTo().getRole());
-											ps.setString(11,messageHeader.getService().getType());
-											ps.setString(12,messageHeader.getService().getValue());
-											ps.setString(13,messageHeader.getAction());
-											ps.setString(14,DOMUtils.toString(message.getDocument(),"UTF-8"));
+											ps.setString(11,EbMSMessageUtils.toString(messageHeader.getService()));
+											ps.setString(12,messageHeader.getAction());
+											ps.setString(13,DOMUtils.toString(message.getDocument(),"UTF-8"));
 											return ps;
 										}
 										catch (TransformerException e)

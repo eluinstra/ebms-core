@@ -38,6 +38,7 @@ import nl.clockwork.ebms.dao.ConnectionManager;
 import nl.clockwork.ebms.dao.DAOException;
 import nl.clockwork.ebms.model.EbMSAttachment;
 import nl.clockwork.ebms.model.EbMSMessage;
+import nl.clockwork.ebms.util.EbMSMessageUtils;
 
 public class EbMSDAOImpl extends AbstractEbMSDAO
 {
@@ -168,14 +169,13 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 			ps.setTimestamp(7,messageHeader.getMessageData().getTimeToLive() == null ? null : new Timestamp(messageHeader.getMessageData().getTimeToLive().toGregorianCalendar().getTimeInMillis()));
 			ps.setString(8,messageHeader.getFrom().getRole());
 			ps.setString(9,messageHeader.getTo().getRole());
-			ps.setString(10,messageHeader.getService().getType());
-			ps.setString(11,messageHeader.getService().getValue());
-			ps.setString(12,messageHeader.getAction());
-			ps.setString(13,DOMUtils.toString(message.getDocument(),"UTF-8"));
+			ps.setString(10,EbMSMessageUtils.toString(messageHeader.getService()));
+			ps.setString(11,messageHeader.getAction());
+			ps.setString(12,DOMUtils.toString(message.getDocument(),"UTF-8"));
 			if (status == null)
-				ps.setNull(14,java.sql.Types.INTEGER);
+				ps.setNull(13,java.sql.Types.INTEGER);
 			else
-				ps.setInt(14,status.id());
+				ps.setInt(13,status.id());
 			ps.executeUpdate();
 			ResultSet rs = ps.getGeneratedKeys();
 			if (rs.next())
@@ -255,10 +255,9 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 			ps.setTimestamp(8,messageHeader.getMessageData().getTimeToLive() == null ? null : new Timestamp(messageHeader.getMessageData().getTimeToLive().toGregorianCalendar().getTimeInMillis()));
 			ps.setString(9,messageHeader.getFrom().getRole());
 			ps.setString(10,messageHeader.getTo().getRole());
-			ps.setString(11,messageHeader.getService().getType());
-			ps.setString(12,messageHeader.getService().getValue());
-			ps.setString(13,messageHeader.getAction());
-			ps.setString(14,DOMUtils.toString(message.getDocument(),"UTF-8"));
+			ps.setString(11,EbMSMessageUtils.toString(messageHeader.getService()));
+			ps.setString(12,messageHeader.getAction());
+			ps.setString(13,DOMUtils.toString(message.getDocument(),"UTF-8"));
 			ps.executeUpdate();
 			ResultSet rs = ps.getGeneratedKeys();
 			if (rs.next())

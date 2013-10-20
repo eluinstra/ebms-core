@@ -258,10 +258,9 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 											ps.setTimestamp(8,messageHeader.getMessageData().getTimeToLive() == null ? null : new Timestamp(messageHeader.getMessageData().getTimeToLive().toGregorianCalendar().getTimeInMillis()));
 											ps.setString(9,messageHeader.getFrom().getRole());
 											ps.setString(10,messageHeader.getTo().getRole());
-											ps.setString(11,messageHeader.getService().getType());
-											ps.setString(12,messageHeader.getService().getValue());
-											ps.setString(13,messageHeader.getAction());
-											ps.setString(14,DOMUtils.toString(message.getDocument(),"UTF-8"));
+											ps.setString(11,EbMSMessageUtils.toString(messageHeader.getService()));
+											ps.setString(12,messageHeader.getAction());
+											ps.setString(13,DOMUtils.toString(message.getDocument(),"UTF-8"));
 											return ps;
 										}
 										catch (TransformerException e)
