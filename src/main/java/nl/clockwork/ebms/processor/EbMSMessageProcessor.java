@@ -355,6 +355,7 @@ public class EbMSMessageProcessor
 					@Override
 					public void doInTransaction()
 					{
+						//TODO check if cpaIds match, otherwise log and discard
 						ebMSDAO.insertMessage(timestamp.getTime(),message,null);
 						Long id = ebMSDAO.getMessageId(message.getMessageHeader().getMessageData().getRefToMessageId());
 						if (id != null)
