@@ -17,9 +17,6 @@ package nl.clockwork.ebms.servlet;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Map;
 
 import javax.servlet.GenericServlet;
 import javax.servlet.ServletConfig;
@@ -60,10 +57,28 @@ public class EbMSMessageServlet extends GenericServlet
 	{
 		try
 		{
-			Map<String,String> headers = getHeaders((HttpServletRequest)request);
 			EbMSInputStreamHandler handler = 
-				new EbMSInputStreamHandler(ebMSMessageProcessor,headers)
+				new EbMSInputStreamHandler(ebMSMessageProcessor)
 				{
+					@Override
+					public String getRequestHeader(String headerName)
+					{
+						String result = ((HttpServletRequest)request).getHeader(headerName);
+						if ("Content-Type".equalsIgnoreCase(headerName))
+							result = request.getContentType();
+						if (result == null)
+							while (((HttpServletRequest)request).getHeaderNames().hasMoreElements())
+							{
+								String key = (String)((HttpServletRequest)request).getHeaderNames().nextElement();
+								if (key.equalsIgnoreCase(headerName))
+								{
+									result = ((HttpServletRequest)request).getHeader(key);
+									break;
+								}
+							}
+						return result;
+					}
+
 					@Override
 					public void writeResponseStatus(int statusCode)
 					{
@@ -76,7 +91,7 @@ public class EbMSMessageServlet extends GenericServlet
 						if ("Content-Type".equalsIgnoreCase(name))
 							response.setContentType(value);
 						else
-							((HttpServletResponse)response).addHeader(name,value);
+							((HttpServletResponse)response).setHeader(name,value);
 					}
 				
 					@Override
@@ -94,19 +109,6 @@ public class EbMSMessageServlet extends GenericServlet
 		}
 	}
 
-	private Map<String,String> getHeaders(HttpServletRequest request)
-	{
-		Map<String,String> result = new HashMap<String,String>();
-		@SuppressWarnings("unchecked")
-		Enumeration<String> headerNames = request.getHeaderNames();
-		while (headerNames.hasMoreElements())
-		{
-			String headerName = headerNames.nextElement();
-			result.put(headerName,request.getHeader(headerName));
-		}
-		return result;
-	}
-	
 	public void setEbMSMessageProcessor(EbMSMessageProcessor ebMSMessageProcessor)
 	{
 		this.ebMSMessageProcessor = ebMSMessageProcessor;

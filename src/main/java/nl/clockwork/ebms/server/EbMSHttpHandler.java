@@ -16,94 +16,80 @@
 package nl.clockwork.ebms.server;
 
 import java.io.IOException;
+import java.io.OutputStream;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.xml.transform.TransformerException;
 
-import nl.clockwork.ebms.Constants;
-import nl.clockwork.ebms.common.util.DOMUtils;
-import nl.clockwork.ebms.model.EbMSDocument;
 import nl.clockwork.ebms.processor.EbMSMessageProcessor;
 import nl.clockwork.ebms.processor.EbMSProcessorException;
 
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 public class EbMSHttpHandler
 {
-  protected transient Log logger = LogFactory.getLog(getClass());
+	protected transient Log logger = LogFactory.getLog(getClass());
 	private EbMSMessageProcessor messageProcessor;
 
-	public void handle(HttpServletRequest request, HttpServletResponse response) throws EbMSProcessorException
+  public EbMSHttpHandler(EbMSMessageProcessor messageProcessor)
 	{
-	  try
+		this.messageProcessor = messageProcessor;
+	}
+
+	public void handle(final HttpServletRequest request, final HttpServletResponse response) throws EbMSProcessorException
+	{
+		try
 		{
-	  	if (Constants.EBMS_SOAP_ACTION.equals(getHeader(request,"SOAPAction")))
-	  	{
-	  		EbMSMessageReader messageReader = new EbMSMessageReader(request.getContentType());
-				EbMSDocument in = messageReader.read(request.getInputStream());
-				//request.getInputStream().close();
-				if (logger.isDebugEnabled())
-					logger.debug("IN:\n" + DOMUtils.toString(in.getMessage()));
-				EbMSDocument out = messageProcessor.processRequest(in);
-				if (out == null)
+			EbMSInputStreamHandler inputStreamHandler = new EbMSInputStreamHandler(messageProcessor)
+			{
+				@Override
+				public String getRequestHeader(String headerName)
 				{
-					logger.debug("OUT:\n");
-					response.setStatus(204);
+					String result = request.getHeader(headerName);
+					if ("Content-Type".equalsIgnoreCase(headerName))
+						result = request.getContentType();
+					if (result == null)
+						while (request.getHeaderNames().hasMoreElements())
+						{
+							String key = (String)request.getHeaderNames().nextElement();
+							if (key.equalsIgnoreCase(headerName))
+							{
+								result = request.getHeader(key);
+								break;
+							}
+						}
+					return result;
 				}
-				else
+
+				@Override
+				public void writeResponseStatus(int statusCode)
 				{
-					if (logger.isDebugEnabled())
-						logger.debug("OUT:\n" + DOMUtils.toString(out.getMessage()));
-					response.setStatus(200);
-					response.setHeader("Content-Type","text/xml");
-					response.setHeader("SOAPAction",Constants.EBMS_SOAP_ACTION);
-					DOMUtils.write(out.getMessage(),response.getOutputStream());
-					//response.getOutputStream().close();
+					response.setStatus(statusCode);
 				}
-	  	}
-	  	else
-	  	{
-	  		if (logger.isDebugEnabled())
-	  		{
-	  			logger.debug("Request ignored! SOAPAction: " + (StringUtils.isEmpty(getHeader(request,"SOAPAction"))? "<empty>" : getHeader(request,"SOAPAction")));
-	  			logger.debug("IN:\n" + IOUtils.toString(request.getInputStream()));
-	  		}
-	  	}
+				
+				@Override
+				public void writeResponseHeader(String name, String value)
+				{
+					if ("Content-Type".equalsIgnoreCase(name))
+						response.setContentType(value);
+					else
+						response.setHeader(name,value);
+				}
+				
+				@Override
+				public OutputStream getOutputStream() throws IOException
+				{
+					return response.getOutputStream();
+				}
+				
+			};
+			inputStreamHandler.handle(request.getInputStream());
 		}
 		catch (IOException e)
 		{
 			throw new EbMSProcessorException(e);
 		}
-		catch (TransformerException e)
-		{
-			throw new EbMSProcessorException(e);
-		}
-	  
 	}
 	
-	public void setMessageProcessor(EbMSMessageProcessor messageProcessor)
-	{
-		this.messageProcessor = messageProcessor;
-	}
-
-	private String getHeader(HttpServletRequest request, String headerName)
-	{
-		String result = request.getHeader(headerName);
-		if (result == null)
-			while (request.getHeaderNames().hasMoreElements())
-			{
-				String key = (String)request.getHeaderNames().nextElement();
-				if (headerName.equalsIgnoreCase(key))
-				{
-					result = request.getHeader(key);
-					break;
-				}
-			}
-		return result;
-	}
-
 }

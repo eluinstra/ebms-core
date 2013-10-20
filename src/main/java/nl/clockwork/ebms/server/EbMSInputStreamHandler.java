@@ -18,8 +18,6 @@ package nl.clockwork.ebms.server;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.HashMap;
-import java.util.Map;
 
 import javax.xml.transform.TransformerException;
 
@@ -38,21 +36,19 @@ public abstract class EbMSInputStreamHandler
 {
   protected transient Log logger = LogFactory.getLog(getClass());
 	private EbMSMessageProcessor messageProcessor;
-	private Map<String,String> headers = new HashMap<String,String>();
 
-	public EbMSInputStreamHandler(EbMSMessageProcessor messageProcessor, Map<String,String> headers)
+	public EbMSInputStreamHandler(EbMSMessageProcessor messageProcessor)
 	{
 		this.messageProcessor = messageProcessor;
-		this.headers  = headers;
 	}
 
 	public void handle(InputStream request) throws EbMSProcessorException
 	{
 	  try
 		{
-	  	if (Constants.EBMS_SOAP_ACTION.equals(getHeader("SOAPAction")))
+	  	if (Constants.EBMS_SOAP_ACTION.equals(getRequestHeader("SOAPAction")))
 	  	{
-	  		EbMSMessageReader messageReader = new EbMSMessageReader(getHeader("Content-Type"));
+	  		EbMSMessageReader messageReader = new EbMSMessageReader(getRequestHeader("Content-Type"));
 				EbMSDocument in = messageReader.read(request);
 				//request.close();
 				if (logger.isDebugEnabled())
@@ -79,7 +75,7 @@ public abstract class EbMSInputStreamHandler
 	  	{
 	  		if (logger.isDebugEnabled())
 	  		{
-	  			logger.debug("Request ignored! SOAPAction: " + (StringUtils.isEmpty(getHeader("SOAPAction"))? "<empty>" : getHeader("SOAPAction")));
+	  			logger.debug("Request ignored! SOAPAction: " + (StringUtils.isEmpty(getRequestHeader("SOAPAction"))? "<empty>" : getRequestHeader("SOAPAction")));
 	  			logger.debug("IN:\n" + IOUtils.toString(request));
 	  		}
 	  	}
@@ -95,28 +91,12 @@ public abstract class EbMSInputStreamHandler
 	  
 	}
 	
+	public abstract String getRequestHeader(String headerName);
+	
 	public abstract void writeResponseStatus(int statusCode);
 	
 	public abstract void writeResponseHeader(String name, String value);
 
 	public abstract OutputStream getOutputStream() throws IOException;
 	
-	public void setMessageProcessor(EbMSMessageProcessor messageProcessor)
-	{
-		this.messageProcessor = messageProcessor;
-	}
-
-	private String getHeader(String headerName)
-	{
-		String result = headers.get(headerName);
-		if (result == null)
-			for (String key : headers.keySet())
-				if (headerName.equalsIgnoreCase(key))
-				{
-					result = headers.get(key);
-					break;
-				}
-		return result;
-	}
-
 }
