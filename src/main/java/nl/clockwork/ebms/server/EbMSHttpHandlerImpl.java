@@ -44,7 +44,7 @@ public class EbMSHttpHandlerImpl implements EbMSHttpHandler
 		{
 	  	if (Constants.EBMS_SOAP_ACTION.equals(getHeader(request,"SOAPAction")))
 	  	{
-	  		EbMSMessageReader messageReader = new EbMSMessageReaderImpl(request.getContentType());
+	  		EbMSMessageReader messageReader = new EbMSMessageReader(request.getContentType());
 				EbMSDocument in = messageReader.read(request.getInputStream());
 				//request.getInputStream().close();
 				if (logger.isDebugEnabled())

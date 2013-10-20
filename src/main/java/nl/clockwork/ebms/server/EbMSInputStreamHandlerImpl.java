@@ -53,7 +53,7 @@ public abstract class EbMSInputStreamHandlerImpl implements EbMSInputStreamHandl
 		{
 	  	if (Constants.EBMS_SOAP_ACTION.equals(getHeader("SOAPAction")))
 	  	{
-	  		EbMSMessageReader messageReader = new EbMSMessageReaderImpl(getHeader("Content-Type"));
+	  		EbMSMessageReader messageReader = new EbMSMessageReader(getHeader("Content-Type"));
 				EbMSDocument in = messageReader.read(request);
 				//request.close();
 				if (logger.isDebugEnabled())

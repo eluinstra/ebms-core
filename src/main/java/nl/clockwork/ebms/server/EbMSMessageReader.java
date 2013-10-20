@@ -33,11 +33,11 @@ import org.apache.james.mime4j.stream.MimeConfig;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
-public class EbMSMessageReaderImpl
+public class EbMSMessageReader
 {
 	private String contentType;
 	
-	public EbMSMessageReaderImpl(String contentType)
+	public EbMSMessageReader(String contentType)
 	{
 		this.contentType = contentType;
 	}
