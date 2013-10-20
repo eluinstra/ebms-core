@@ -34,7 +34,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-public abstract class EbMSInputStreamHandlerImpl implements EbMSInputStreamHandler
+public abstract class EbMSInputStreamHandlerImpl
 {
   protected transient Log logger = LogFactory.getLog(getClass());
 	private EbMSMessageProcessor messageProcessor;
@@ -46,7 +46,6 @@ public abstract class EbMSInputStreamHandlerImpl implements EbMSInputStreamHandl
 		this.headers  = headers;
 	}
 
-	@Override
 	public void handle(InputStream request) throws EbMSProcessorException
 	{
 	  try
