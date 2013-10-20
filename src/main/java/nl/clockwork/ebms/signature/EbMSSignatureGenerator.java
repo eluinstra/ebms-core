@@ -21,10 +21,12 @@ import nl.clockwork.ebms.model.EbMSAttachment;
 import nl.clockwork.ebms.processor.EbMSProcessorException;
 
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CollaborationProtocolAgreement;
+import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.AckRequested;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageHeader;
 import org.w3c.dom.Document;
 
 public interface EbMSSignatureGenerator
 {
 	void generate(CollaborationProtocolAgreement cpa, MessageHeader messageHeader, Document document, List<EbMSAttachment> attachments) throws EbMSProcessorException;
+	void generate(CollaborationProtocolAgreement cpa, AckRequested ackRequested, MessageHeader resposeMessageHeader, Document document, List<EbMSAttachment> attachments) throws EbMSProcessorException;
 }

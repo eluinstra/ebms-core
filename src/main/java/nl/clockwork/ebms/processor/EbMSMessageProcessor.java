@@ -299,7 +299,7 @@ public class EbMSMessageProcessor
 				{
 					final EbMSMessage acknowledgment = EbMSMessageUtils.createEbMSAcknowledgment(cpa,message,timestamp);
 					Document document = EbMSMessageUtils.createSOAPMessage(acknowledgment);
-					signatureGenerator.generate(cpa,acknowledgment.getMessageHeader(),document,acknowledgment.getAttachments());
+					signatureGenerator.generate(cpa,message.getAckRequested(),acknowledgment.getMessageHeader(),document,acknowledgment.getAttachments());
 					acknowledgment.setDocument(document);
 					ebMSDAO.executeTransaction(
 						new DAOTransactionCallback()
@@ -325,7 +325,6 @@ public class EbMSMessageProcessor
 				errorList.getError().add(e.getError());
 				final EbMSMessage messageError = EbMSMessageUtils.createEbMSMessageError(cpa,message,errorList,timestamp);
 				Document document = EbMSMessageUtils.createSOAPMessage(messageError);
-				signatureGenerator.generate(cpa,messageError.getMessageHeader(),document,messageError.getAttachments());
 				messageError.setDocument(document);
 				ebMSDAO.executeTransaction(
 					new DAOTransactionCallback()

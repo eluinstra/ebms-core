@@ -42,6 +42,7 @@ import org.apache.xml.security.transforms.params.XPathContainer;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CollaborationProtocolAgreement;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DeliveryChannel;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.PartyInfo;
+import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.AckRequested;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageHeader;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -68,19 +69,29 @@ public class EbMSSecSignatureGenerator implements EbMSSignatureGenerator
 	{
 		try
 		{
-			if (!Constants.EBMS_SERVICE_URI.equals(messageHeader.getService().getValue()))
+			PartyInfo partyInfo = CPAUtils.getPartyInfo(cpa,messageHeader.getFrom().getPartyId());
+			if (CPAUtils.isSigned(partyInfo,messageHeader.getFrom().getRole(),messageHeader.getService(),messageHeader.getAction()))
+				generate(partyInfo,messageHeader,document,attachments);
+		}
+		catch (GeneralSecurityException e)
+		{
+			throw new EbMSProcessorException(e);
+		}
+		catch (XMLSecurityException e)
+		{
+			throw new EbMSProcessingException(e);
+		}
+	}
+
+	@Override
+	public void generate(CollaborationProtocolAgreement cpa, AckRequested ackRequested, MessageHeader messageHeader, Document document, List<EbMSAttachment> attachments) throws EbMSProcessorException
+	{
+		try
+		{
+			if (ackRequested != null && ackRequested.isSigned())
 			{
 				PartyInfo partyInfo = CPAUtils.getPartyInfo(cpa,messageHeader.getFrom().getPartyId());
-				DeliveryChannel deliveryChannel = CPAUtils.getSendingDeliveryChannel(partyInfo,messageHeader.getFrom().getRole(),messageHeader.getService(),messageHeader.getAction());
-				if (CPAUtils.isSigned(partyInfo,messageHeader.getFrom().getRole(),messageHeader.getService(),messageHeader.getAction()))
-				{
-					X509Certificate certificate = CPAUtils.getX509Certificate(CPAUtils.getSigningCertificate(deliveryChannel));
-					String alias = keyStore.getCertificateAlias(certificate);
-					if (alias == null)
-						throw new EbMSProcessorException("No certificate found with subject \"" + certificate.getSubjectDN().getName() + "\" in keystore \"" + keyStorePath + "\"");
-					KeyPair keyPair = SecurityUtils.getKeyPair(keyStore,alias,keyStorePassword);
-					sign(keyStore,keyPair,alias,document,attachments,CPAUtils.getSignatureAlgorithm(deliveryChannel),CPAUtils.getHashFunction(deliveryChannel));
-				}
+				generate(partyInfo,messageHeader,document,attachments);
 			}
 		}
 		catch (GeneralSecurityException e)
@@ -93,6 +104,17 @@ public class EbMSSecSignatureGenerator implements EbMSSignatureGenerator
 		}
 	}
 
+	private void generate(PartyInfo partyInfo, MessageHeader messageHeader, Document document, List<EbMSAttachment> attachments) throws EbMSProcessorException, GeneralSecurityException, XMLSecurityException
+	{
+		DeliveryChannel deliveryChannel = CPAUtils.getSendingDeliveryChannel(partyInfo,messageHeader.getFrom().getRole(),messageHeader.getService(),messageHeader.getAction());
+		X509Certificate certificate = CPAUtils.getX509Certificate(CPAUtils.getSigningCertificate(deliveryChannel));
+		String alias = keyStore.getCertificateAlias(certificate);
+		if (alias == null)
+			throw new EbMSProcessorException("No certificate found with subject \"" + certificate.getSubjectDN().getName() + "\" in keystore \"" + keyStorePath + "\"");
+		KeyPair keyPair = SecurityUtils.getKeyPair(keyStore,alias,keyStorePassword);
+		sign(keyStore,keyPair,alias,document,attachments,CPAUtils.getSignatureAlgorithm(deliveryChannel),CPAUtils.getHashFunction(deliveryChannel));
+	}
+	
 	private void sign(KeyStore keyStore, KeyPair keyPair, String alias, Document document, List<EbMSAttachment> attachments, String signatureMethodAlgorithm, String digestAlgorithm) throws XMLSecurityException, KeyStoreException
 	{
 		XMLSignature signature = new XMLSignature(document,null,signatureMethodAlgorithm,canonicalizationMethodAlgorithm);
