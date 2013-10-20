@@ -54,6 +54,7 @@ import nl.clockwork.ebms.model.EbMSMessageContext;
 import nl.clockwork.ebms.xml.EbMSNamespaceMapper;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.ActorType;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CollaborationProtocolAgreement;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DeliveryChannel;
@@ -84,7 +85,9 @@ import org.w3._2000._09.xmldsig.SignatureType;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 import org.xmlsoap.schemas.soap.envelope.Body;
+import org.xmlsoap.schemas.soap.envelope.Detail;
 import org.xmlsoap.schemas.soap.envelope.Envelope;
+import org.xmlsoap.schemas.soap.envelope.Fault;
 import org.xmlsoap.schemas.soap.envelope.Header;
 
 public class EbMSMessageUtils
@@ -144,15 +147,6 @@ public class EbMSMessageUtils
 		return result;
 	}
 
-	//private static boolean isSOAPFault(Envelope envelope)
-	//{
-	//	if (envelope.getBody() != null /*&& envelope.getBody().getAny() != null*/)
-	//		for (Object element : envelope.getBody().getAny())
-	//			if (((JAXBElement<?>)element).getDeclaredType().equals(Fault.class))
-	//				return true;
-	//	return false;
-	//}
-	
 	public static String toString(Service service)
 	{
 		return CPAUtils.serviceToString(service.getType(),service.getValue());
@@ -531,13 +525,34 @@ public class EbMSMessageUtils
 		envelope.getBody().getAny().add(ebMSMessage.getStatusResponse());
 		
 		DocumentBuilder db = DOMUtils.getDocumentBuilder();
-		XMLMessageBuilder<Envelope> messageBuilder = XMLMessageBuilder.getInstance(Envelope.class,Envelope.class,MessageHeader.class,SyncReply.class,MessageOrder.class,AckRequested.class,ErrorList.class,Acknowledgment.class,Manifest.class,StatusRequest.class,StatusResponse.class);
-
-		//Document d = db.parse(new ByteArrayInputStream(messageBuilder.handle(new JAXBElement<Envelope>(new QName("http://schemas.xmlsoap.org/soap/envelope/","Envelope"),Envelope.class,envelope)).getBytes()));
-
-		Document d = db.parse(new ByteArrayInputStream(messageBuilder.handle(new JAXBElement<Envelope>(new QName("http://schemas.xmlsoap.org/soap/envelope/","Envelope"),Envelope.class,envelope),new EbMSNamespaceMapper()).getBytes()));
-
-		return d;
+		XMLMessageBuilder<Envelope> messageBuilder = XMLMessageBuilder.getInstance(Envelope.class,MessageHeader.class,SyncReply.class,MessageOrder.class,AckRequested.class,ErrorList.class,Acknowledgment.class,Manifest.class,StatusRequest.class,StatusResponse.class);
+		//return db.parse(new ByteArrayInputStream(messageBuilder.handle(new JAXBElement<Envelope>(new QName("http://schemas.xmlsoap.org/soap/envelope/","Envelope"),Envelope.class,envelope)).getBytes()));
+		return db.parse(new ByteArrayInputStream(messageBuilder.handle(new JAXBElement<Envelope>(new QName("http://schemas.xmlsoap.org/soap/envelope/","Envelope"),Envelope.class,envelope),new EbMSNamespaceMapper()).getBytes()));
 	}
 
+	public static boolean isSOAPFault(Envelope envelope)
+	{
+		if (envelope.getBody() != null /*&& envelope.getBody().getAny() != null*/)
+			for (Object element : envelope.getBody().getAny())
+				if (((JAXBElement<?>)element).getDeclaredType().equals(Fault.class))
+					return true;
+		return false;
+	}
+	
+	public static Document createSOAPFault(Exception e) throws ParserConfigurationException, JAXBException, SAXException, IOException
+	{
+		Envelope envelope = new Envelope();
+		envelope.setBody(new Body());
+		Fault fault = new Fault();
+		fault.setFaultcode(new QName("http://schemas.xmlsoap.org/soap/envelope/","Client")); //Server
+		fault.setFaultstring(e.getMessage());
+		fault.setDetail(new Detail());
+		fault.getDetail().getAny().add(ExceptionUtils.getStackTrace(e));
+		envelope.getBody().getAny().add(fault);
+
+		DocumentBuilder db = DOMUtils.getDocumentBuilder();
+		XMLMessageBuilder<Envelope> messageBuilder = XMLMessageBuilder.getInstance(Envelope.class);
+		return db.parse(new ByteArrayInputStream(messageBuilder.handle(new JAXBElement<Envelope>(new QName("http://schemas.xmlsoap.org/soap/envelope/","Envelope"),Envelope.class,envelope)).getBytes()));
+	}
+	
 }

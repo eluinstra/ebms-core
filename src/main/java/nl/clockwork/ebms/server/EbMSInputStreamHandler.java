@@ -19,18 +19,18 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import javax.xml.transform.TransformerException;
-
 import nl.clockwork.ebms.Constants;
 import nl.clockwork.ebms.common.util.DOMUtils;
 import nl.clockwork.ebms.model.EbMSDocument;
 import nl.clockwork.ebms.processor.EbMSMessageProcessor;
 import nl.clockwork.ebms.processor.EbMSProcessorException;
+import nl.clockwork.ebms.util.EbMSMessageUtils;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.w3c.dom.Document;
 
 public abstract class EbMSInputStreamHandler
 {
@@ -48,6 +48,7 @@ public abstract class EbMSInputStreamHandler
 		{
 	  	if (Constants.EBMS_SOAP_ACTION.equals(getRequestHeader("SOAPAction")))
 	  	{
+	  		//TODO validate Content-Type="text/xml; charset=UTF-8"
 	  		EbMSMessageReader messageReader = new EbMSMessageReader(getRequestHeader("Content-Type"));
 				EbMSDocument in = messageReader.read(request);
 				//request.close();
@@ -73,22 +74,27 @@ public abstract class EbMSInputStreamHandler
 	  	}
 	  	else
 	  	{
-	  		if (logger.isDebugEnabled())
-	  		{
-	  			logger.debug("Request ignored! SOAPAction: " + (StringUtils.isEmpty(getRequestHeader("SOAPAction"))? "<empty>" : getRequestHeader("SOAPAction")));
-	  			logger.debug("IN:\n" + IOUtils.toString(request));
-	  		}
+				throw new EbMSProcessorException("Request ignored! SOAPAction: " + (StringUtils.isEmpty(getRequestHeader("SOAPAction"))? "<empty>" : getRequestHeader("SOAPAction")) + "IN:\n" + IOUtils.toString(request));
 	  	}
 		}
-		catch (TransformerException e)
+		catch (Exception e)
 		{
-			throw new EbMSProcessorException(e);
+			try
+			{
+				Document soapFault = EbMSMessageUtils.createSOAPFault(e);
+				if (logger.isDebugEnabled())
+					logger.debug("OUT:\n" + DOMUtils.toString(soapFault));
+				writeResponseStatus(500);
+				writeResponseHeader("Content-Type","text/xml");
+				OutputStream response = getOutputStream();
+				DOMUtils.write(soapFault,response);
+				//response.close();
+			}
+			catch (Exception e1)
+			{
+				throw new EbMSProcessorException(e1);
+			}
 		}
-		catch (IOException e)
-		{
-			throw new EbMSProcessorException(e);
-		}
-	  
 	}
 	
 	public abstract String getRequestHeader(String headerName);

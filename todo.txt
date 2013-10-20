@@ -1,15 +1,13 @@
-- move signature validation???
-- add partyId???
-- send message as string instead of document???
-
-- improve timetolive???
-	- timetolive = now + expirationperiod + 1s
-	- timetolive validation rule: now < timetolive + retryinterval
+- improve CPA validation
 
 - EbMSResponseHandlers examine and use content-type while parsing response
-- check Content-Type=text/xml; charset=UTF-8 at receipt
+	- use EbMSMessageReader
+	- wrap exception on DOMUtils.read() empty stream
 
 - validate message composition using SimplePart and Packaging definition from CPA 
+- validate message format (available elements versus action)
+- improve header validation
+	- add separate service and action validation
 
 - improve implementation of BusinessTransactionCharacteristics
 - improve implementation of MessagingCharacteristics:
@@ -17,37 +15,35 @@
 	- ackSignatureRequested (per message)
 
 - test multiple certificates in keystore
-- generate soap fault on error
 
-- let DeliveryManager work with EbMSDocument instead of EbMSMessage?
-	- change messageQueue from EbMSMessage to EbMSDocument
-	- get messageId from EbMSDocument
 - implement ackRequested/best-effort
-
 - implement syncReply
-- improve Service models:
-	- add jaxb annotations?
+
+- implement SSLFactoryManager that returns a CPA/hostname related SSLSocketFactory to handle different key/certificate pairs
+	- load right SSLFactoryManager on each URLConnection request
 
 - make EbMSMessageProcessor event driven
 	- implement eventManager
 	- replace dao.insertSendEvent(messageId) (and/or EbMSMessageUtils.getEbMSSendEvents(cpa,message)) to eventManager.generateSendEvent(EbMSDocument)
 	- implement eventManager.generateReceiveEvent(MimeMessage/EbMSDocument)
 
-- validate CPA content during upload CPA
-	- only 1 channel per action is supported
-	- canReceive element is optional?
-
-- validate message format (available elements versus action)
-- improve header validation
-	- add separate service and action validation
+- let DeliveryManager work with EbMSDocument instead of EbMSMessage?
+	- change messageQueue from EbMSMessage to EbMSDocument
+	- get messageId from EbMSDocument
 
 - remove unnecessary defined Interfaces and custom Exceptions
 - remove EbMS(Message) prefix on classes; add EbMS(Message) prefix on bean ids? 
 
-- implement SSLFactoryManager that returns a CPA/hostname related SSLSocketFactory to handle different key/certificate pairs
-	- load right SSLFactoryManager on each URLConnection request
+3.0:
+- add fromParty and toParty (by PartyName) to EbMSMessageContext (and store them in ebms_message)
+- store PersistDuration (next to TimeToLive)
+- implement sync deliveryManager
+	- send message direct (send retries from queue)
+	- for sync communication keep channel open
+	- 1694 The Acknowledgment Message can be sent at the same time as the response to the received message. 
+- validate sender uri
+- make duplicate elimination configurable (depending on definition in CPA)???
 
-- use ebms_message.message_id to identify message
 
 - implement EbMSFileAttachment (file proxy) and EbMSDBAttachment (db proxy) for large message processing?
 
