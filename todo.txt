@@ -14,10 +14,10 @@
 	- ackRequested per message
 	- ackSignatureRequested (per message)
 
-- test multiple certificates in keystore
-
 - implement ackRequested/best-effort
 - implement syncReply
+
+- test multiple certificates in keystore
 
 - implement SSLFactoryManager that returns a CPA/hostname related SSLSocketFactory to handle different key/certificate pairs
 	- load right SSLFactoryManager on each URLConnection request
@@ -36,14 +36,11 @@
 
 3.0:
 - add fromParty and toParty (by PartyName) to EbMSMessageContext (and store them in ebms_message)
-- store PersistDuration (next to TimeToLive)
 - implement sync deliveryManager
 	- send message direct (send retries from queue)
 	- for sync communication keep channel open
 	- 1694 The Acknowledgment Message can be sent at the same time as the response to the received message. 
 - validate sender uri
-- make duplicate elimination configurable (depending on definition in CPA)???
-
 
 - implement EbMSFileAttachment (file proxy) and EbMSDBAttachment (db proxy) for large message processing?
 
