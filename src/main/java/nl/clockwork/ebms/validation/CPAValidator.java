@@ -44,21 +44,23 @@ public class CPAValidator
 		//if (!"2.0a".equals(cpa.getVersion()))
 		//	throw new ValidationException("CPA version " + cpa.getVersion() + " detected! CPA version 2.0a expected.");
 		if ("proposed".equals(cpa.getStatus()))
-			throw new ValidationException("CPA not agreed to by both Parties!");
+			throw new ValidationException("CPA Status is proposed!");
 		if (cpa.getStart().compare(cpa.getEnd()) > 0)
 			throw new ValidationException("CPA End Date before CPA Start Date!");
 		if (Calendar.getInstance().compareTo(cpa.getEnd().toGregorianCalendar()) > 0)
 			throw new ValidationException("CPA already expired!");
 		if (cpa.getConversationConstraints() != null)
 			throw new ValidationException("CPA Conversation Constraints not supported!");
+		//if (cpa.getSignature() != null)
+		//	throw new ValidationException("CPA Signature not supported!");
+		//unique partyName
 		//CanSend/Receive
-		//nr of channels
+		//TimeToLive == ((Retries + 1) * RetryInterval); PersistDuration >= TimeToLive
+		//1 channel per action
 		//signatures
 		//encryption
 		//MessageOrder
 		//Packaging.ComponentList.Encapsulation
-		if (cpa.getSignature() != null)
-			throw new ValidationException("CPA Signature not supported!");
 	}
 	
 	private boolean cpaExists(CollaborationProtocolAgreement cpa, MessageHeader messageHeader)
