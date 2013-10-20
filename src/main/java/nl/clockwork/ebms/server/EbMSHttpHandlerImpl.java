@@ -32,12 +32,11 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-public class EbMSHttpHandlerImpl implements EbMSHttpHandler
+public class EbMSHttpHandlerImpl
 {
   protected transient Log logger = LogFactory.getLog(getClass());
 	private EbMSMessageProcessor messageProcessor;
 
-	@Override
 	public void handle(HttpServletRequest request, HttpServletResponse response) throws EbMSProcessorException
 	{
 	  try
