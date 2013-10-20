@@ -44,7 +44,7 @@
 		<property name="timeout" value="${messageQueue.timeout}"/>
 	</bean>
 
-	<bean id="httpHandler" class="nl.clockwork.ebms.server.EbMSHttpHandlerImpl">
+	<bean id="httpHandler" class="nl.clockwork.ebms.server.EbMSHttpHandler">
 		<property name="messageProcessor" ref="messageProcessor"/>
 	</bean>
 
