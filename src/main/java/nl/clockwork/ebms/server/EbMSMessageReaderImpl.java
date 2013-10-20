@@ -33,7 +33,7 @@ import org.apache.james.mime4j.stream.MimeConfig;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
-public class EbMSMessageReaderImpl implements EbMSMessageReader
+public class EbMSMessageReaderImpl
 {
 	private String contentType;
 	
@@ -42,7 +42,6 @@ public class EbMSMessageReaderImpl implements EbMSMessageReader
 		this.contentType = contentType;
 	}
 
-	@Override
 	public EbMSDocument read(InputStream in) throws EbMSProcessorException
 	{
 		
