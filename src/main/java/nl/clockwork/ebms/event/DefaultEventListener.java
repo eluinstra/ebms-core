@@ -13,12 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.clockwork.ebms;
+package nl.clockwork.ebms.event;
 
-public interface EventListener
+public class DefaultEventListener implements EventListener
 {
-	void onMessageReceived(String messageId) throws EventException;
-	void onMessageAcknowledged(String messageId) throws EventException;
-	void onMessageDeliveryFailed(String messageId) throws EventException;
-	void onMessageNotAcknowledged(String messageId) throws EventException;
+	@Override
+	public void onMessageReceived(String messageId) throws EventException
+	{
+	}
+
+	@Override
+	public void onMessageAcknowledged(String messageId) throws EventException
+	{
+	}
+	
+	@Override
+	public void onMessageDeliveryFailed(String messageId) throws EventException
+	{
+	}
+
+	@Override
+	public void onMessageNotAcknowledged(String messageId) throws EventException
+	{
+	}
 }

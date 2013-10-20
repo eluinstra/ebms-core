@@ -13,27 +13,36 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.clockwork.ebms;
+package nl.clockwork.ebms.event;
 
-public class DefaultEventListener implements EventListener
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+public class LoggingEventListener implements EventListener
 {
+	protected transient Log logger = LogFactory.getLog(getClass());
+
 	@Override
 	public void onMessageReceived(String messageId) throws EventException
 	{
+		logger.info("Message " + messageId + " received");
 	}
 
 	@Override
 	public void onMessageAcknowledged(String messageId) throws EventException
 	{
+		logger.info("Message " + messageId + " acknowledged");
 	}
 	
 	@Override
 	public void onMessageDeliveryFailed(String messageId) throws EventException
 	{
+		logger.info("Message " + messageId + " delivery failed");
 	}
 
 	@Override
 	public void onMessageNotAcknowledged(String messageId) throws EventException
 	{
+		logger.info("Message " + messageId + " not acknowledged");
 	}
 }
