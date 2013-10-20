@@ -48,7 +48,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
-public class EbMSSecSignatureGenerator
+public class EbMSSignatureGenerator
 {
 	protected transient Log logger = LogFactory.getLog(getClass());
 	private String canonicalizationMethodAlgorithm = Transforms.TRANSFORM_C14N_OMIT_COMMENTS;

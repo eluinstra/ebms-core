@@ -48,13 +48,13 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
-public class EbMSSecSignatureValidator
+public class EbMSSignatureValidator
 {
 	protected transient Log logger = LogFactory.getLog(getClass());
 	private String trustStorePath;
 	private String trustStorePassword;
 
-	public EbMSSecSignatureValidator()
+	public EbMSSignatureValidator()
 	{
 		org.apache.xml.security.Init.init();
 	}
