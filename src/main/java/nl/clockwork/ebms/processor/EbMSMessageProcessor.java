@@ -365,6 +365,7 @@ public class EbMSMessageProcessor
 					@Override
 					public void doInTransaction()
 					{
+						//TODO check if cpaIds match, otherwise log and discard
 						ebMSDAO.insertMessage(timestamp.getTime(),message,null);
 						ebMSDAO.deleteEvents(message.getMessageHeader().getMessageData().getRefToMessageId(),EbMSEventStatus.UNPROCESSED);
 						ebMSDAO.updateMessageStatus(message.getMessageHeader().getMessageData().getRefToMessageId(),EbMSMessageStatus.SENT,status);
