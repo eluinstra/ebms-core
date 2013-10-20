@@ -19,7 +19,6 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
@@ -262,7 +261,6 @@ public class EbMSMessageUtils
 			GregorianCalendar timestamp = messageHeader.getMessageData().getTimestamp().toGregorianCalendar();
 			Duration d = rm.getRetryInterval().multiply(rm.getRetries().add(new BigInteger("1")).intValue());
 			d.addTo(timestamp);
-			timestamp.add(Calendar.SECOND,1);
 			messageHeader.getMessageData().setTimeToLive(DatatypeFactory.newInstance().newXMLGregorianCalendar(timestamp));
 		}
 	}
