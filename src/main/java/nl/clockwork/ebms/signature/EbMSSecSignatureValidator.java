@@ -48,7 +48,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
-public class EbMSSecSignatureValidator implements EbMSSignatureValidator
+public class EbMSSecSignatureValidator
 {
 	protected transient Log logger = LogFactory.getLog(getClass());
 	private String trustStorePath;
@@ -59,7 +59,6 @@ public class EbMSSecSignatureValidator implements EbMSSignatureValidator
 		org.apache.xml.security.Init.init();
 	}
 	
-	@Override
 	public void validate(CollaborationProtocolAgreement cpa, MessageHeader messageHeader, Document document, List<EbMSAttachment> attachments) throws ValidatorException, ValidationException
 	{
 		try

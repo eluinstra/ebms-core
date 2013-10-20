@@ -48,7 +48,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
-public class EbMSSecSignatureGenerator implements EbMSSignatureGenerator
+public class EbMSSecSignatureGenerator
 {
 	protected transient Log logger = LogFactory.getLog(getClass());
 	private String canonicalizationMethodAlgorithm = Transforms.TRANSFORM_C14N_OMIT_COMMENTS;
@@ -64,7 +64,6 @@ public class EbMSSecSignatureGenerator implements EbMSSignatureGenerator
 		keyStore = SecurityUtils.loadKeyStore(keyStorePath,keyStorePassword);
 	}
 
-	@Override
 	public void generate(CollaborationProtocolAgreement cpa, MessageHeader messageHeader, Document document, List<EbMSAttachment> attachments) throws EbMSProcessorException
 	{
 		try
@@ -83,7 +82,6 @@ public class EbMSSecSignatureGenerator implements EbMSSignatureGenerator
 		}
 	}
 
-	@Override
 	public void generate(CollaborationProtocolAgreement cpa, AckRequested ackRequested, MessageHeader messageHeader, Document document, List<EbMSAttachment> attachments) throws EbMSProcessorException
 	{
 		try
