@@ -31,7 +31,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import nl.clockwork.ebms.processor.EbMSMessageProcessor;
 import nl.clockwork.ebms.processor.EbMSProcessorException;
-import nl.clockwork.ebms.server.EbMSInputStreamHandlerImpl;
+import nl.clockwork.ebms.server.EbMSInputStreamHandler;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -61,8 +61,8 @@ public class EbMSMessageServlet extends GenericServlet
 		try
 		{
 			Map<String,String> headers = getHeaders((HttpServletRequest)request);
-			EbMSInputStreamHandlerImpl handler = 
-				new EbMSInputStreamHandlerImpl(ebMSMessageProcessor,headers)
+			EbMSInputStreamHandler handler = 
+				new EbMSInputStreamHandler(ebMSMessageProcessor,headers)
 				{
 					@Override
 					public void writeResponseStatus(int statusCode)

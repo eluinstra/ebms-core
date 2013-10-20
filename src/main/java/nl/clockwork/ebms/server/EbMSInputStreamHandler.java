@@ -34,13 +34,13 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-public abstract class EbMSInputStreamHandlerImpl
+public abstract class EbMSInputStreamHandler
 {
   protected transient Log logger = LogFactory.getLog(getClass());
 	private EbMSMessageProcessor messageProcessor;
 	private Map<String,String> headers = new HashMap<String,String>();
 
-	public EbMSInputStreamHandlerImpl(EbMSMessageProcessor messageProcessor, Map<String,String> headers)
+	public EbMSInputStreamHandler(EbMSMessageProcessor messageProcessor, Map<String,String> headers)
 	{
 		this.messageProcessor = messageProcessor;
 		this.headers  = headers;
