@@ -18,23 +18,17 @@ package nl.clockwork.ebms.client;
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.StringReader;
 import java.net.HttpURLConnection;
-import java.util.ArrayList;
 
-import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.ParserConfigurationException;
 
-import nl.clockwork.ebms.common.util.DOMUtils;
 import nl.clockwork.ebms.common.util.HTTPUtils;
-import nl.clockwork.ebms.model.EbMSAttachment;
 import nl.clockwork.ebms.model.EbMSDocument;
+import nl.clockwork.ebms.processor.EbMSProcessorException;
+import nl.clockwork.ebms.server.EbMSMessageReader;
 import nl.clockwork.ebms.util.EbMSMessageUtils;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
-import org.w3c.dom.Document;
-import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xmlsoap.schemas.soap.envelope.Fault;
 
@@ -47,7 +41,7 @@ public class EbMSResponseHandler
 		this.connection = connection;
 	}
 
-	public EbMSDocument read() throws IOException, ParserConfigurationException, SAXException, EbMSResponseException
+	public EbMSDocument read() throws IOException, ParserConfigurationException, SAXException, EbMSProcessorException
 	{
 		InputStream input = null;
 		try
@@ -59,7 +53,8 @@ public class EbMSResponseHandler
 				else
 				{
 					input = connection.getInputStream();
-					return getEbMSMessage(input);
+					EbMSMessageReader messageReader = new EbMSMessageReader(getHeaderField("Content-Type"));
+					return messageReader.read(input);
 				}
 			}
 			else if (connection.getResponseCode() >= 400)
@@ -98,19 +93,6 @@ public class EbMSResponseHandler
 		}
 	}
 
-	private EbMSDocument getEbMSMessage(InputStream in) throws IOException, ParserConfigurationException, SAXException
-	{
-		EbMSDocument result = null;
-		String message = IOUtils.toString(in,getCharSet());
-		if (StringUtils.isNotBlank(message))
-		{
-			DocumentBuilder db = DOMUtils.getDocumentBuilder();
-			Document d = db.parse(new InputSource(new StringReader(message)));
-			result = new EbMSDocument(d,new ArrayList<EbMSAttachment>());
-		}
-		return result;
-	}
-	
 	private String getCharSet()
 	{
 		String contentType = getHeaderField("Content-Type");
