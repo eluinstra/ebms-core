@@ -27,6 +27,8 @@ import nl.clockwork.ebms.model.EbMSAttachment;
 import nl.clockwork.ebms.model.EbMSDocument;
 import nl.clockwork.ebms.processor.EbMSProcessorException;
 
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.parser.MimeStreamParser;
 import org.apache.james.mime4j.stream.MimeConfig;
@@ -73,6 +75,18 @@ public class EbMSMessageReader
 		{
 			throw new EbMSProcessorException(e);
 		}
+	}
+
+	public EbMSDocument readResponse(InputStream in, String encoding) throws IOException, ParserConfigurationException, SAXException
+	{
+		EbMSDocument result = null;
+		String message = IOUtils.toString(in,encoding);
+		if (StringUtils.isNotBlank(message))
+		{
+			Document d = DOMUtils.read(message);
+			result = new EbMSDocument(d,new ArrayList<EbMSAttachment>());
+		}
+		return result;
 	}
 
 	private void parseEbMSMessage(EbMSContentHandler handler, String contentType, InputStream in) throws MimeException, IOException

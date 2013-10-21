@@ -54,7 +54,8 @@ public class EbMSResponseHandler
 				{
 					input = connection.getInputStream();
 					EbMSMessageReader messageReader = new EbMSMessageReader(getHeaderField("Content-Type"));
-					return messageReader.read(input);
+					//return messageReader.read(input);
+					return messageReader.readResponse(input,getEncoding());
 				}
 			}
 			else if (connection.getResponseCode() >= 400)
@@ -77,7 +78,7 @@ public class EbMSResponseHandler
 			try
 			{
 				InputStream errorStream = new BufferedInputStream(connection.getErrorStream());
-				String error = IOUtils.toString(errorStream,getCharSet());
+				String error = IOUtils.toString(errorStream,getEncoding());
 				errorStream.close();
 				throw new EbMSResponseException(connection.getResponseCode(),error);
 			}
@@ -93,7 +94,7 @@ public class EbMSResponseHandler
 		}
 	}
 
-	private String getCharSet()
+	private String getEncoding()
 	{
 		String contentType = getHeaderField("Content-Type");
 		return HTTPUtils.getCharSet(contentType);
