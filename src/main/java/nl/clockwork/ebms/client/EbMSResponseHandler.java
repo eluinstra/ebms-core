@@ -29,12 +29,14 @@ import nl.clockwork.ebms.common.util.DOMUtils;
 import nl.clockwork.ebms.common.util.HTTPUtils;
 import nl.clockwork.ebms.model.EbMSAttachment;
 import nl.clockwork.ebms.model.EbMSDocument;
+import nl.clockwork.ebms.util.EbMSMessageUtils;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
+import org.xmlsoap.schemas.soap.envelope.Fault;
 
 public class EbMSResponseHandler
 {
@@ -63,7 +65,14 @@ public class EbMSResponseHandler
 			else if (connection.getResponseCode() >= 400)
 			{
 				input = connection.getErrorStream();
-				throw new EbMSResponseException(connection.getResponseCode(),IOUtils.toString(input));
+				String response = IOUtils.toString(input);
+				if (connection.getResponseCode() == 500)
+				{
+					Fault soapFault = EbMSMessageUtils.getSOAPFault(response);
+					if (soapFault != null)
+						throw new EbMSResponseSOAPException(connection.getResponseCode(),soapFault.getFaultcode(),response);
+				}
+				throw new EbMSResponseException(connection.getResponseCode(),response);
 			}
 			else
 				throw new EbMSResponseException(connection.getResponseCode());
@@ -73,7 +82,7 @@ public class EbMSResponseHandler
 			try
 			{
 				InputStream errorStream = new BufferedInputStream(connection.getErrorStream());
-				String error = IOUtils.toString(errorStream);
+				String error = IOUtils.toString(errorStream,getCharSet());
 				errorStream.close();
 				throw new EbMSResponseException(connection.getResponseCode(),error);
 			}
@@ -104,11 +113,11 @@ public class EbMSResponseHandler
 	
 	private String getCharSet()
 	{
-		String contentType = getHeaderField(connection,"Content-Type");
+		String contentType = getHeaderField("Content-Type");
 		return HTTPUtils.getCharSet(contentType);
 	}
 	
-	private String getHeaderField(HttpURLConnection connection, String name)
+	private String getHeaderField(String name)
 	{
 		String result = connection.getHeaderField(name);
 		if (result == null)

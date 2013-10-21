@@ -27,6 +27,7 @@ import nl.clockwork.ebms.Constants.EbMSEventType;
 import nl.clockwork.ebms.Constants.EbMSMessageStatus;
 import nl.clockwork.ebms.client.EbMSClient;
 import nl.clockwork.ebms.client.EbMSResponseException;
+import nl.clockwork.ebms.client.EbMSResponseSOAPException;
 import nl.clockwork.ebms.dao.DAOTransactionCallback;
 import nl.clockwork.ebms.dao.EbMSDAO;
 import nl.clockwork.ebms.event.EventListener;
@@ -61,9 +62,24 @@ public class ProcessEbMSEvents implements Job
 				messageProcessor.processResponse(requestDocument,responseDocument);
 				updateEvent(event,EbMSEventStatus.PROCESSED,null);
 			}
-			catch (EbMSResponseException e)
+			catch (final EbMSResponseException e)
 			{
-				updateEvent(event,EbMSEventStatus.FAILED,e.getMessage());
+				ebMSDAO.executeTransaction(
+					new DAOTransactionCallback()
+					{
+						@Override
+						public void doInTransaction()
+						{
+							updateEvent(event,EbMSEventStatus.FAILED,e.getMessage());
+							if (e instanceof EbMSResponseSOAPException && EbMSResponseSOAPException.CLIENT.equals(((EbMSResponseSOAPException)e).getFaultCode()))
+							{
+								ebMSDAO.deleteEvents(event.getMessageId(),EbMSEventStatus.UNPROCESSED);
+								ebMSDAO.updateMessageStatus(event.getMessageId(),EbMSMessageStatus.SENT,EbMSMessageStatus.DELIVERY_FAILED);
+								eventListener.onMessageDeliveryFailed(event.getMessageId());
+							}
+						}
+					}
+				);
 				logger.error("",e);
 			}
 			catch (Exception e)
@@ -88,13 +104,13 @@ public class ProcessEbMSEvents implements Job
 		{
 			try
 			{
+				logger.warn("Expiring message " +  event.getMessageId());
 				ebMSDAO.executeTransaction(
 					new DAOTransactionCallback()
 					{
 						@Override
 						public void doInTransaction()
 						{
-							logger.info("Expiring message " +  event.getMessageId());
 							updateEvent(event,EbMSEventStatus.PROCESSED,null);
 							ebMSDAO.deleteEvents(event.getMessageId(),EbMSEventStatus.UNPROCESSED);
 							ebMSDAO.updateMessageStatus(event.getMessageId(),EbMSMessageStatus.SENT,EbMSMessageStatus.NOT_ACKNOWLEDGED);
