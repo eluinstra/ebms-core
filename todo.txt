@@ -1,9 +1,5 @@
 - improve CPA validation
 
-- EbMSResponseHandlers examine and use content-type while parsing response
-	- use EbMSMessageReader
-	- wrap exception on DOMUtils.read() empty stream
-
 - validate message composition using SimplePart and Packaging definition from CPA 
 - validate message format (available elements versus action)
 - improve header validation
@@ -39,8 +35,7 @@
 - implement sync deliveryManager
 	- send message direct (send retries from queue)
 	- for sync communication keep channel open
-	- 1694 The Acknowledgment Message can be sent at the same time as the response to the received message. 
-- validate sender uri
+- validate requested uri
 
 - implement EbMSFileAttachment (file proxy) and EbMSDBAttachment (db proxy) for large message processing?
 
