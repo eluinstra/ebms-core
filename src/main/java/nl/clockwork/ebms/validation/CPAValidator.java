@@ -46,14 +46,18 @@ public class CPAValidator
 		if ("proposed".equals(cpa.getStatus()))
 			throw new ValidationException("CPA Status is proposed!");
 		if (cpa.getStart().compare(cpa.getEnd()) > 0)
-			throw new ValidationException("CPA End Date before CPA Start Date!");
+			throw new ValidationException("CPA End date before Start date!");
 		if (Calendar.getInstance().compareTo(cpa.getEnd().toGregorianCalendar()) > 0)
-			throw new ValidationException("CPA already expired!");
+			throw new ValidationException("CPA expired on " + cpa.getEnd());
 		if (cpa.getConversationConstraints() != null)
 			throw new ValidationException("CPA Conversation Constraints not supported!");
 		//if (cpa.getSignature() != null)
 		//	throw new ValidationException("CPA Signature not supported!");
-		//unique partyName
+		if (cpa.getPartyInfo().size() != 2)
+			throw new ValidationException(cpa.getPartyInfo().size() + " part" + (cpa.getPartyInfo().size() == 1 ? "y" : "ies") + " defined!");
+		if (cpa.getPartyInfo().get(0).getPartyName().equals(cpa.getPartyInfo().get(1).getPartyName()))
+			throw new ValidationException("PartyName " + cpa.getPartyInfo().get(0).getPartyName() + " not unique!");
+		
 		//CanSend/Receive
 		//TimeToLive == ((Retries + 1) * RetryInterval); PersistDuration >= TimeToLive
 		//1 channel per action
