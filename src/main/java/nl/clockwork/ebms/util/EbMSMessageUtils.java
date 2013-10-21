@@ -54,7 +54,6 @@ import nl.clockwork.ebms.model.EbMSMessageContext;
 import nl.clockwork.ebms.xml.EbMSNamespaceMapper;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.exception.ExceptionUtils;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.ActorType;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CollaborationProtocolAgreement;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DeliveryChannel;
@@ -85,7 +84,6 @@ import org.w3._2000._09.xmldsig.SignatureType;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 import org.xmlsoap.schemas.soap.envelope.Body;
-import org.xmlsoap.schemas.soap.envelope.Detail;
 import org.xmlsoap.schemas.soap.envelope.Envelope;
 import org.xmlsoap.schemas.soap.envelope.Fault;
 import org.xmlsoap.schemas.soap.envelope.Header;
@@ -525,7 +523,7 @@ public class EbMSMessageUtils
 		envelope.getBody().getAny().add(ebMSMessage.getStatusResponse());
 		
 		DocumentBuilder db = DOMUtils.getDocumentBuilder();
-		XMLMessageBuilder<Envelope> messageBuilder = XMLMessageBuilder.getInstance(Envelope.class,MessageHeader.class,SyncReply.class,MessageOrder.class,AckRequested.class,ErrorList.class,Acknowledgment.class,Manifest.class,StatusRequest.class,StatusResponse.class);
+		XMLMessageBuilder<Envelope> messageBuilder = XMLMessageBuilder.getInstance(Envelope.class,Envelope.class,MessageHeader.class,SyncReply.class,MessageOrder.class,AckRequested.class,ErrorList.class,Acknowledgment.class,Manifest.class,StatusRequest.class,StatusResponse.class);
 		//return db.parse(new ByteArrayInputStream(messageBuilder.handle(new JAXBElement<Envelope>(new QName("http://schemas.xmlsoap.org/soap/envelope/","Envelope"),Envelope.class,envelope)).getBytes()));
 		return db.parse(new ByteArrayInputStream(messageBuilder.handle(new JAXBElement<Envelope>(new QName("http://schemas.xmlsoap.org/soap/envelope/","Envelope"),Envelope.class,envelope),new EbMSNamespaceMapper()).getBytes()));
 	}
@@ -546,9 +544,9 @@ public class EbMSMessageUtils
 		Fault fault = new Fault();
 		fault.setFaultcode(new QName("http://schemas.xmlsoap.org/soap/envelope/","Client")); //Server
 		fault.setFaultstring(e.getMessage());
-		fault.setDetail(new Detail());
-		fault.getDetail().getAny().add(ExceptionUtils.getStackTrace(e));
-		envelope.getBody().getAny().add(fault);
+		//fault.setDetail(new Detail());
+		//fault.getDetail().getAny().add(new JAXBElement<String>(new QName("","String"),String.class,ExceptionUtils.getStackTrace(e)));
+		envelope.getBody().getAny().add(new JAXBElement<Fault>(new QName("http://schemas.xmlsoap.org/soap/envelope/","Fault"),Fault.class,fault));
 
 		DocumentBuilder db = DOMUtils.getDocumentBuilder();
 		XMLMessageBuilder<Envelope> messageBuilder = XMLMessageBuilder.getInstance(Envelope.class);

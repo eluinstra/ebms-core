@@ -27,7 +27,6 @@ import nl.clockwork.ebms.processor.EbMSProcessorException;
 import nl.clockwork.ebms.util.EbMSMessageUtils;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.w3c.dom.Document;
@@ -46,36 +45,36 @@ public abstract class EbMSInputStreamHandler
 	{
 	  try
 		{
-	  	if (Constants.EBMS_SOAP_ACTION.equals(getRequestHeader("SOAPAction")))
+	  	String soapAction = getRequestHeader("SOAPAction");
+	  	if (!Constants.EBMS_SOAP_ACTION.equals(soapAction))
 	  	{
-	  		//TODO validate Content-Type="text/xml; charset=UTF-8"
-	  		EbMSMessageReader messageReader = new EbMSMessageReader(getRequestHeader("Content-Type"));
-				EbMSDocument in = messageReader.read(request);
-				//request.close();
 				if (logger.isDebugEnabled())
-					logger.debug("IN:\n" + DOMUtils.toString(in.getMessage()));
-				EbMSDocument out = messageProcessor.processRequest(in);
-				if (out == null)
-				{
-					logger.debug("OUT:\n");
-					writeResponseStatus(204);
-				}
-				else
-				{
-					if (logger.isDebugEnabled())
-						logger.debug("OUT:\n" + DOMUtils.toString(out.getMessage()));
-					writeResponseStatus(200);
-					writeResponseHeader("Content-Type","text/xml");
-					writeResponseHeader("SOAPAction",Constants.EBMS_SOAP_ACTION);
-					OutputStream response = getOutputStream();
-					DOMUtils.write(out.getMessage(),response);
-					//response.close();
-				}
+					logger.debug("IN:\n" + IOUtils.toString(request));
+				throw new EbMSProcessorException("Unable to process message! SOAPAction=" + soapAction);
 	  	}
-	  	else
-	  	{
-				throw new EbMSProcessorException("Request ignored! SOAPAction: " + (StringUtils.isEmpty(getRequestHeader("SOAPAction"))? "<empty>" : getRequestHeader("SOAPAction")) + "IN:\n" + IOUtils.toString(request));
-	  	}
+
+			EbMSMessageReader messageReader = new EbMSMessageReader(getRequestHeader("Content-Type"));
+			EbMSDocument in = messageReader.read(request);
+			//request.close();
+			if (logger.isDebugEnabled())
+				logger.debug("IN:\n" + DOMUtils.toString(in.getMessage()));
+			EbMSDocument out = messageProcessor.processRequest(in);
+			if (out == null)
+			{
+				logger.debug("OUT:\n");
+				writeResponseStatus(204);
+			}
+			else
+			{
+				if (logger.isDebugEnabled())
+					logger.debug("OUT:\n" + DOMUtils.toString(out.getMessage()));
+				writeResponseStatus(200);
+				writeResponseHeader("Content-Type","text/xml");
+				writeResponseHeader("SOAPAction",Constants.EBMS_SOAP_ACTION);
+				OutputStream response = getOutputStream();
+				DOMUtils.write(out.getMessage(),response);
+				//response.close();
+			}
 		}
 		catch (Exception e)
 		{
