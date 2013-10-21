@@ -15,6 +15,7 @@
  */
 package nl.clockwork.ebms.common.util;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -91,10 +92,26 @@ public class DOMUtils
 		return db.parse(new InputSource(new StringReader(s)));
 	}
 
+	public static Document read(String s, String encoding) throws ParserConfigurationException, SAXException, IOException
+	{
+		DocumentBuilder db = getDocumentBuilder();
+		InputSource is = new InputSource(new ByteArrayInputStream(s.getBytes(encoding)));
+		is.setEncoding(encoding);
+		return db.parse(is);
+	}
+
 	public static Document read(InputStream stream) throws ParserConfigurationException, SAXException, IOException
 	{
 		DocumentBuilder db = getDocumentBuilder();
 		return db.parse(stream);
+	}
+
+	public static Document read(InputStream stream, String encoding) throws ParserConfigurationException, SAXException, IOException
+	{
+		DocumentBuilder db = getDocumentBuilder();
+		InputSource is = new InputSource(stream);
+		is.setEncoding(encoding);
+		return db.parse(is);
 	}
 
 	public static String toString(Document document) throws TransformerException
