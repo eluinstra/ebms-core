@@ -17,25 +17,19 @@ package nl.clockwork.ebms.client.apache;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.StringReader;
-import java.util.ArrayList;
 
-import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.ParserConfigurationException;
 
-import nl.clockwork.ebms.common.util.DOMUtils;
 import nl.clockwork.ebms.common.util.HTTPUtils;
-import nl.clockwork.ebms.model.EbMSAttachment;
 import nl.clockwork.ebms.model.EbMSDocument;
+import nl.clockwork.ebms.server.EbMSMessageReader;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.ResponseHandler;
-import org.w3c.dom.Document;
-import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 public class EbMSResponseHandler implements ResponseHandler<EbMSDocument>
@@ -44,79 +38,66 @@ public class EbMSResponseHandler implements ResponseHandler<EbMSDocument>
 	@Override
 	public EbMSDocument handleResponse(HttpResponse response) throws ClientProtocolException, IOException
 	{
-		EbMSDocument in = null;
-		if (response.getStatusLine().getStatusCode() / 100 == 2)
+		InputStream input = null; 
+		try
 		{
-	    HttpEntity entity = response.getEntity();
-	    if (entity != null && entity.getContentLength() != 0)
-	    {
-				InputStream content = entity.getContent();
-				try
-				{
-					in = getEbMSMessage(IOUtils.toString(content,getCharSet(entity)));
-				}
-				catch (ParserConfigurationException e)
-				{
-					throw new IOException(e);
-				}
-				catch (SAXException e)
-				{
-					throw new IOException(e);
-				}
-	    	finally
-	    	{
-	    		try
-					{
-						content.close();
-					}
-					catch (IOException ignore)
-					{
-					}
-	    	}
-	    }
-		}
-		else if (response.getStatusLine().getStatusCode() >= 400)
-		{
-	    HttpEntity entity = response.getEntity();
-	    if (entity != null)
-	    {
-				InputStream content = entity.getContent();
-				try
-				{
-					throw new IOException("StatusCode: " + response.getStatusLine().getStatusCode() + "\n" + IOUtils.toString(content));
-				}
-	    	finally
-	    	{
-	    		try
-					{
-						content.close();
-					}
-					catch (IOException ignore)
-					{
-					}
-	    	}
-	    }
-		}
-		else
+			if (response.getStatusLine().getStatusCode() / 100 == 2)
+			{
+		    HttpEntity entity = response.getEntity();
+		    if (response.getStatusLine().getStatusCode() == 204 || entity == null || entity.getContentLength() == 0)
+		    	return null;
+		    else
+		    {
+					input = entity.getContent();
+					EbMSMessageReader messageReader = new EbMSMessageReader(getHeaderField(response,"Content-Type"));
+					//return messageReader.read(input);
+					return messageReader.readResponse(input,getEncoding(entity));
+		    }
+			}
+			else if (response.getStatusLine().getStatusCode() >= 400)
+			{
+		    HttpEntity entity = response.getEntity();
+		    if (entity != null)
+					throw new IOException("StatusCode: " + response.getStatusLine().getStatusCode() + "\n" + IOUtils.toString(entity.getContent()));
+			}
 			throw new IOException("StatusCode: " + response.getStatusLine().getStatusCode());
-    return in;
+		}
+		catch (ParserConfigurationException e)
+		{
+			throw new IOException(e);
+		}
+		catch (SAXException e)
+		{
+			throw new IOException(e);
+		}
+  	finally
+  	{
+  		try
+			{
+  			if (input != null)
+  				input.close();
+			}
+			catch (IOException ignore)
+			{
+			}
+  	}
 	}
 
-	private String getCharSet(HttpEntity entity)
+	private String getEncoding(HttpEntity entity)
 	{
 		return HTTPUtils.getCharSet(entity.getContentType().getValue());
 	}
 	
-	private EbMSDocument getEbMSMessage(String message) throws ParserConfigurationException, SAXException, IOException
+	private String getHeaderField(HttpResponse response, String name)
 	{
-		EbMSDocument result = null;
-		if (StringUtils.isNotBlank(message))
-		{
-			DocumentBuilder db = DOMUtils.getDocumentBuilder();
-			Document d = db.parse(new InputSource(new StringReader(message)));
-			result = new EbMSDocument(d,new ArrayList<EbMSAttachment>());
-		}
-		return result;
+		Header result = response.getFirstHeader(name);
+		if (result == null)
+			for (Header header : response.getAllHeaders())
+				if (header.getName().equalsIgnoreCase(name))
+				{
+					result = header;
+					break;
+				}
+		return result.getValue();
 	}
-
 }
