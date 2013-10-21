@@ -25,7 +25,6 @@ import javax.xml.parsers.ParserConfigurationException;
 import nl.clockwork.ebms.common.util.DOMUtils;
 import nl.clockwork.ebms.model.EbMSAttachment;
 import nl.clockwork.ebms.model.EbMSDocument;
-import nl.clockwork.ebms.processor.EbMSProcessorException;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
@@ -44,37 +43,18 @@ public class EbMSMessageReader
 		this.contentType = contentType;
 	}
 
-	public EbMSDocument read(InputStream in) throws EbMSProcessorException
+	public EbMSDocument read(InputStream in) throws MimeException, IOException, ParserConfigurationException, SAXException
 	{
 		
-		try
+		if (contentType.startsWith("multipart"))
 		{
-			if (contentType.startsWith("multipart"))
-			{
-				EbMSContentHandler handler = new EbMSContentHandler();
-				parseEbMSMessage(handler,contentType,in);
-				List<EbMSAttachment> attachments = handler.getAttachments();
-				return getEbMSMessage(attachments);
-			}
-			else
-				return getEbMSMessage(in);
+			EbMSContentHandler handler = new EbMSContentHandler();
+			parseEbMSMessage(handler,contentType,in);
+			List<EbMSAttachment> attachments = handler.getAttachments();
+			return getEbMSMessage(attachments);
 		}
-		catch (MimeException e)
-		{
-			throw new EbMSProcessorException(e);
-		}
-		catch (IOException e)
-		{
-			throw new EbMSProcessorException(e);
-		}
-		catch (ParserConfigurationException e)
-		{
-			throw new EbMSProcessorException(e);
-		}
-		catch (SAXException e)
-		{
-			throw new EbMSProcessorException(e);
-		}
+		else
+			return getEbMSMessage(in);
 	}
 
 	public EbMSDocument readResponse(InputStream in, String encoding) throws IOException, ParserConfigurationException, SAXException
