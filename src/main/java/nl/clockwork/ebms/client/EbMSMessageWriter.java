@@ -49,7 +49,7 @@ public class EbMSMessageWriter
 
 	private void writeMessage(EbMSDocument document) throws IOException, TransformerException
 	{
-		connection.setRequestProperty("Content-Type","text/xml");
+		connection.setRequestProperty("Content-Type","text/xml; charset=UTF-8");
 		connection.setRequestProperty("SOAPAction",Constants.EBMS_SOAP_ACTION);
 		DOMUtils.write(document.getMessage(),connection.getOutputStream(),"UTF-8");
 	}
