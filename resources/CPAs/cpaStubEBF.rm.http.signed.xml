@@ -126,7 +126,7 @@ OcDNBvpKX2SpoHffgXmdrExQshpIDzzofex0y/Kg4mulDQUPwVuIZtbnlQ==
                <tns:RetryInterval>PT5M</tns:RetryInterval>
                <tns:MessageOrderSemantics>NotGuaranteed</tns:MessageOrderSemantics>
             </tns:ReliableMessaging>
-            <tns:PersistDuration>PT25M</tns:PersistDuration>
+            <tns:PersistDuration>PT30M</tns:PersistDuration>
             <tns:SenderNonRepudiation>
                <tns:NonRepudiationProtocol>http://www.w3.org/2000/09/xmldsig#</tns:NonRepudiationProtocol>
                <tns:HashFunction>http://www.w3.org/2000/09/xmldsig#sha1</tns:HashFunction>
@@ -140,7 +140,7 @@ OcDNBvpKX2SpoHffgXmdrExQshpIDzzofex0y/Kg4mulDQUPwVuIZtbnlQ==
                <tns:RetryInterval>PT5M</tns:RetryInterval>
                <tns:MessageOrderSemantics>NotGuaranteed</tns:MessageOrderSemantics>
             </tns:ReliableMessaging>
-            <tns:PersistDuration>PT25M</tns:PersistDuration>
+            <tns:PersistDuration>PT30M</tns:PersistDuration>
             <tns:ReceiverNonRepudiation>
                <tns:NonRepudiationProtocol>http://www.w3.org/2000/09/xmldsig#</tns:NonRepudiationProtocol>
                <tns:HashFunction>http://www.w3.org/2000/09/xmldsig#sha1</tns:HashFunction>
@@ -274,7 +274,7 @@ OcDNBvpKX2SpoHffgXmdrExQshpIDzzofex0y/Kg4mulDQUPwVuIZtbnlQ==
                <tns:RetryInterval>PT5M</tns:RetryInterval>
                <tns:MessageOrderSemantics>NotGuaranteed</tns:MessageOrderSemantics>
             </tns:ReliableMessaging>
-            <tns:PersistDuration>PT25M</tns:PersistDuration>
+            <tns:PersistDuration>PT30M</tns:PersistDuration>
             <tns:SenderNonRepudiation>
                <tns:NonRepudiationProtocol>http://www.w3.org/2000/09/xmldsig#</tns:NonRepudiationProtocol>
                <tns:HashFunction>http://www.w3.org/2000/09/xmldsig#sha1</tns:HashFunction>
@@ -288,7 +288,7 @@ OcDNBvpKX2SpoHffgXmdrExQshpIDzzofex0y/Kg4mulDQUPwVuIZtbnlQ==
                <tns:RetryInterval>PT5M</tns:RetryInterval>
                <tns:MessageOrderSemantics>NotGuaranteed</tns:MessageOrderSemantics>
             </tns:ReliableMessaging>
-            <tns:PersistDuration>PT25M</tns:PersistDuration>
+            <tns:PersistDuration>PT30M</tns:PersistDuration>
             <tns:ReceiverNonRepudiation>
                <tns:NonRepudiationProtocol>http://www.w3.org/2000/09/xmldsig#</tns:NonRepudiationProtocol>
                <tns:HashFunction>http://www.w3.org/2000/09/xmldsig#sha1</tns:HashFunction>
