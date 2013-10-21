@@ -32,11 +32,6 @@ public class EbMSHttpHandler
 	protected transient Log logger = LogFactory.getLog(getClass());
 	private EbMSMessageProcessor messageProcessor;
 
-  public EbMSHttpHandler(EbMSMessageProcessor messageProcessor)
-	{
-		this.messageProcessor = messageProcessor;
-	}
-
 	public void handle(final HttpServletRequest request, final HttpServletResponse response) throws EbMSProcessorException
 	{
 		try
@@ -92,4 +87,8 @@ public class EbMSHttpHandler
 		}
 	}
 	
+	public void setMessageProcessor(EbMSMessageProcessor messageProcessor)
+	{
+		this.messageProcessor = messageProcessor;
+	}
 }
