@@ -22,6 +22,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.Date;
+import java.util.List;
 
 import javax.xml.transform.TransformerException;
 
@@ -29,14 +30,18 @@ import nl.clockwork.ebms.Constants.EbMSMessageStatus;
 import nl.clockwork.ebms.common.util.DOMUtils;
 import nl.clockwork.ebms.dao.DAOException;
 import nl.clockwork.ebms.dao.spring.AbstractEbMSDAO;
+import nl.clockwork.ebms.model.EbMSAttachment;
 import nl.clockwork.ebms.model.EbMSMessage;
 import nl.clockwork.ebms.util.EbMSMessageUtils;
 
+import org.apache.commons.io.IOUtils;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageHeader;
 import org.springframework.dao.DataAccessException;
+import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.ResultSetExtractor;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.transaction.TransactionException;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallbackWithoutResult;
@@ -162,7 +167,7 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 								},
 								new KeyExtractor()
 							);
-							insertAttachments(key.messageId,key.messageNr,message.getAttachments());
+							insertAttachments(key,message.getAttachments());
 						}
 						catch (IOException e)
 						{
@@ -249,7 +254,7 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 								},
 								new KeyExtractor()
 							);
-							insertAttachments(key.messageId,key.messageNr,message.getAttachments());
+							insertAttachments(key,message.getAttachments());
 						}
 						catch (IOException e)
 						{
@@ -268,5 +273,29 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 			throw new DAOException(e);
 		}
 	}
-	
+
+	protected void insertAttachments(Key key, List<EbMSAttachment> attachments) throws InvalidDataAccessApiUsageException, DataAccessException, IOException
+	{
+		for (EbMSAttachment attachment : attachments)
+		{
+			jdbcTemplate.update
+			(
+				"insert into ebms_attachment (" +
+					"message_id," +
+					"message_nr," +
+					"name," +
+					"content_id," +
+					"content_type," +
+					"content" +
+				") values (?,?,?,?,?,?)",
+				key.messageId,
+				key.messageNr,
+				attachment.getName(),
+				attachment.getContentId(),
+				attachment.getContentType().split(";")[0].trim(),
+				IOUtils.toByteArray(attachment.getInputStream())
+			);
+		}
+	}
+
 }

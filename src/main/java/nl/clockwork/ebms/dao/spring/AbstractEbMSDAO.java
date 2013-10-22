@@ -615,8 +615,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 								},
 								keyHolder
 							);
-
-							insertAttachments((String)keyHolder.getKeys().get("message_id"),(Integer)keyHolder.getKeys().get("message_nr"),message.getAttachments());
+							insertAttachments(keyHolder,message.getAttachments());
 						}
 						catch (IOException e)
 						{
@@ -705,8 +704,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 								},
 								keyHolder
 							);
-
-							insertAttachments((String)keyHolder.getKeys().get("message_id"),(Integer)keyHolder.getKeys().get("message_nr"),message.getAttachments());
+							insertAttachments(keyHolder,message.getAttachments());
 						}
 						catch (IOException e)
 						{
@@ -726,7 +724,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 		}
 	}
 
-	protected void insertAttachments(String messageId, int messageNr, List<EbMSAttachment> attachments) throws InvalidDataAccessApiUsageException, DataAccessException, IOException
+	protected void insertAttachments(KeyHolder keyHolder, List<EbMSAttachment> attachments) throws InvalidDataAccessApiUsageException, DataAccessException, IOException
 	{
 		for (EbMSAttachment attachment : attachments)
 		{
@@ -740,8 +738,8 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 					"content_type," +
 					"content" +
 				") values (?,?,?,?,?,?)",
-				messageId,
-				messageNr,
+				keyHolder.getKeys().get("message_id"),
+				keyHolder.getKeys().get("message_nr"),
 				attachment.getName(),
 				attachment.getContentId(),
 				attachment.getContentType().split(";")[0].trim(),
