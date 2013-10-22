@@ -185,6 +185,7 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 					"conversation_id," +
 					"sequence_nr," +
 					"message_id," +
+					"message_nr," +
 					"ref_to_message_id," +
 					"time_to_live," +
 					"from_role," +
@@ -192,7 +193,7 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 					"service," +
 					"action," +
 					"content" +
-				") values (?,?,?,?,?,?,?,?,?,?,?,?)",
+				") values (?,?,?,?,?,(select nr from (select max(message_nr) + 1 as nr from ebms_message where message_id = ?) as c),?,?,?,?,?,?,?)",
 				new int[]{1}
 			);
 			ps.setTimestamp(1,new Timestamp(timestamp.getTime()));
@@ -204,13 +205,14 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 			else
 				ps.setLong(4,message.getMessageOrder().getSequenceNumber().getValue().longValue());
 			ps.setString(5,messageHeader.getMessageData().getMessageId());
-			ps.setString(6,messageHeader.getMessageData().getRefToMessageId());
-			ps.setTimestamp(7,messageHeader.getMessageData().getTimeToLive() == null ? null : new Timestamp(messageHeader.getMessageData().getTimeToLive().toGregorianCalendar().getTimeInMillis()));
-			ps.setString(8,messageHeader.getFrom().getRole());
-			ps.setString(9,messageHeader.getTo().getRole());
-			ps.setString(10,EbMSMessageUtils.toString(messageHeader.getService()));
-			ps.setString(11,messageHeader.getAction());
-			ps.setString(12,DOMUtils.toString(message.getDocument(),"UTF-8"));
+			ps.setString(6,messageHeader.getMessageData().getMessageId());
+			ps.setString(7,messageHeader.getMessageData().getRefToMessageId());
+			ps.setTimestamp(8,messageHeader.getMessageData().getTimeToLive() == null ? null : new Timestamp(messageHeader.getMessageData().getTimeToLive().toGregorianCalendar().getTimeInMillis()));
+			ps.setString(9,messageHeader.getFrom().getRole());
+			ps.setString(10,messageHeader.getTo().getRole());
+			ps.setString(11,EbMSMessageUtils.toString(messageHeader.getService()));
+			ps.setString(12,messageHeader.getAction());
+			ps.setString(13,DOMUtils.toString(message.getDocument(),"UTF-8"));
 			ps.executeUpdate();
 			ResultSet rs = ps.getGeneratedKeys();
 			if (rs.next())

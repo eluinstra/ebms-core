@@ -15,8 +15,24 @@
  */
 package nl.clockwork.ebms.dao.mssql;
 
+import java.io.IOException;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.util.Date;
+
+import javax.xml.transform.TransformerException;
+
+import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageHeader;
+
 import nl.clockwork.ebms.Constants.EbMSMessageStatus;
+import nl.clockwork.ebms.common.util.DOMUtils;
 import nl.clockwork.ebms.dao.ConnectionManager;
+import nl.clockwork.ebms.dao.DAOException;
+import nl.clockwork.ebms.model.EbMSMessage;
+import nl.clockwork.ebms.util.EbMSMessageUtils;
 
 public class EbMSDAOImpl extends nl.clockwork.ebms.dao.mysql.EbMSDAOImpl
 {
@@ -42,4 +58,83 @@ public class EbMSDAOImpl extends nl.clockwork.ebms.dao.mysql.EbMSDAOImpl
 		" order by time_stamp asc";
 	}
 
+	@Override
+	public void insertDuplicateMessage(Date timestamp, EbMSMessage message) throws DAOException
+	{
+		Connection c = null;
+		PreparedStatement ps = null;
+		try
+		{
+			c = connectionManager.getConnection(true);
+			ps = c.prepareStatement
+			(
+				"insert into ebms_message (" +
+					"time_stamp," +
+					"cpa_id," +
+					"conversation_id," +
+					"sequence_nr," +
+					"message_id," +
+					"message_nr," +
+					"ref_to_message_id," +
+					"time_to_live," +
+					"from_role," +
+					"to_role," +
+					"service," +
+					"action," +
+					"content" +
+				") values (?,?,?,?,?,select max(message_nr) + 1 as nr from ebms_message where message_id = ?,?,?,?,?,?,?,?)",
+				new int[]{1}
+			);
+			ps.setTimestamp(1,new Timestamp(timestamp.getTime()));
+			MessageHeader messageHeader = message.getMessageHeader();
+			ps.setString(2,messageHeader.getCPAId());
+			ps.setString(3,messageHeader.getConversationId());
+			if (message.getMessageOrder() == null || message.getMessageOrder().getSequenceNumber() == null)
+				ps.setNull(4,java.sql.Types.BIGINT);
+			else
+				ps.setLong(4,message.getMessageOrder().getSequenceNumber().getValue().longValue());
+			ps.setString(5,messageHeader.getMessageData().getMessageId());
+			ps.setString(6,messageHeader.getMessageData().getMessageId());
+			ps.setString(7,messageHeader.getMessageData().getRefToMessageId());
+			ps.setTimestamp(8,messageHeader.getMessageData().getTimeToLive() == null ? null : new Timestamp(messageHeader.getMessageData().getTimeToLive().toGregorianCalendar().getTimeInMillis()));
+			ps.setString(9,messageHeader.getFrom().getRole());
+			ps.setString(10,messageHeader.getTo().getRole());
+			ps.setString(11,EbMSMessageUtils.toString(messageHeader.getService()));
+			ps.setString(12,messageHeader.getAction());
+			ps.setString(13,DOMUtils.toString(message.getDocument(),"UTF-8"));
+			ps.executeUpdate();
+			ResultSet rs = ps.getGeneratedKeys();
+			if (rs.next())
+			{
+				insertAttachments(rs.getLong(1),message.getAttachments());
+				connectionManager.commit();
+			}
+			else
+			{
+				connectionManager.rollback();
+				throw new DAOException("No key found!");
+			}
+		}
+		catch (SQLException e)
+		{
+			connectionManager.rollback();
+			throw new DAOException(e);
+		}
+		catch (IOException e)
+		{
+			connectionManager.rollback();
+			throw new DAOException(e);
+		}
+		catch (TransformerException e)
+		{
+			connectionManager.rollback();
+			throw new DAOException(e);
+		}
+		finally
+		{
+			connectionManager.close(ps);
+			connectionManager.close(true);
+		}
+	}
+	
 }
