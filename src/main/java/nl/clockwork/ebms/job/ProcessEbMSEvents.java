@@ -147,10 +147,10 @@ public class ProcessEbMSEvents implements Job
   	List<EbMSEvent> events = ebMSDAO.getLatestEventsByEbMSMessageIdBefore(timestamp.getTime(),EbMSEventStatus.UNPROCESSED);
   	List<Future<?>> futures = new ArrayList<Future<?>>();
   	for (final EbMSEvent event : events)
-			if (EbMSEventType.SEND.equals(event.getType()))
-	  		futures.add(executorService.submit(new SendEventJob(event)));
-			else if (EbMSEventType.EXPIRE.equals(event.getType()))
+			if (EbMSEventType.EXPIRE.equals(event.getType()))
 	  		futures.add(executorService.submit(new ExpireEventJob(event)));
+			else
+	  		futures.add(executorService.submit(new SendEventJob(event)));
   	for (Future<?> future : futures)
 			try
 			{

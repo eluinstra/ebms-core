@@ -310,7 +310,7 @@ public class EbMSMessageProcessor
 								ebMSDAO.insertMessage(timestamp.getTime(),message,EbMSMessageStatus.RECEIVED);
 								ebMSDAO.insertMessage(timestamp.getTime(),acknowledgment,null);
 								if (message.getSyncReply() == null)
-									ebMSDAO.insertEvent(EbMSMessageUtils.getEbMSSendEvent(acknowledgment.getMessageHeader(),CPAUtils.getUri(cpa,acknowledgment)));
+									ebMSDAO.insertEvent(EbMSMessageUtils.createEbMSSendEvent(acknowledgment,CPAUtils.getUri(cpa,acknowledgment)));
 								eventListener.onMessageReceived(message.getMessageHeader().getMessageData().getMessageId());
 							}
 						}
@@ -335,7 +335,7 @@ public class EbMSMessageProcessor
 							ebMSDAO.insertMessage(timestamp.getTime(),message,EbMSMessageStatus.FAILED);
 							ebMSDAO.insertMessage(timestamp.getTime(),messageError,null);
 							if (message.getSyncReply() == null)
-								ebMSDAO.insertEvent(EbMSMessageUtils.getEbMSSendEvent(messageError.getMessageHeader(),CPAUtils.getUri(cpa,messageError)));
+								ebMSDAO.insertEvent(EbMSMessageUtils.createEbMSSendEvent(messageError,CPAUtils.getUri(cpa,messageError)));
 						}
 					}
 				);

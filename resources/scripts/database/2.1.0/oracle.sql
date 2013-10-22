@@ -9,3 +9,7 @@ UPDATE ebms_message SET status = 12 WHERE status = 11;
 UPDATE ebms_message SET status = 11 WHERE status = 10;
 
 UPDATE ebms_message SET status = 10 WHERE service <> 'urn:oasis:names:tc:ebxml-msg:service' and status IS NULL;
+
+UPDATE ebms_event SET type = 4 where type = 0;
+
+UPDATE ebms_event SET type = 0 where type = 1;
