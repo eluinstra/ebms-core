@@ -55,6 +55,7 @@ import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageHeader;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.Service;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
@@ -77,6 +78,33 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	{
 		this.transactionTemplate = transactionTemplate;
 		this.jdbcTemplate = jdbcTemplate;
+	}
+
+	@Override
+	public void executeTransaction(final DAOTransactionCallback callback)
+	{
+		try
+		{
+			transactionTemplate.execute(
+				new TransactionCallbackWithoutResult()
+				{
+
+					@Override
+					protected void doInTransactionWithoutResult(TransactionStatus transactionStatus)
+					{
+						callback.doInTransaction();
+					}
+				}
+			);
+		}
+		catch (DataAccessException e)
+		{
+			throw new DAOException(e);
+		}
+		catch (TransactionException e)
+		{
+			throw new DAOException(e);
+		}
 	}
 
 	@Override
@@ -228,7 +256,83 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 			throw new DAOException(e);
 		}
 	}
-	
+
+	@Override
+	public EbMSMessageContent getMessageContent(String messageId) throws DAOException
+	{
+		try
+		{
+			EbMSMessageContext messageContext = getMessageContext(messageId);
+			if (messageContext == null)
+				return null;
+			List<EbMSAttachment> attachments = getAttachments(messageId);
+			List<EbMSDataSource> dataSources = new ArrayList<EbMSDataSource>();
+			for (DataSource dataSource : attachments)
+				dataSources.add(new EbMSDataSource(dataSource.getName(),dataSource.getContentType(),IOUtils.toByteArray(dataSource.getInputStream())));
+			return new EbMSMessageContent(messageContext,dataSources);
+		}
+		catch (DataAccessException e)
+		{
+			throw new DAOException(e);
+		}
+		catch (IOException e)
+		{
+			throw new DAOException(e);
+		}
+	}
+
+	@Override
+	public EbMSMessageContext getMessageContext(String messageId) throws DAOException
+	{
+		try
+		{
+			return jdbcTemplate.queryForObject(
+				"select cpa_id," +
+				" from_role," +
+				" to_role," +
+				" service," +
+				" action," +
+				" time_stamp," +
+				" conversation_id," +
+				" message_id," +
+				" ref_to_message_id," +
+				" sequence_nr" +
+				" from ebms_message" + 
+				" where message_id = ?" +
+				" and message_nr = 0",
+				new ParameterizedRowMapper<EbMSMessageContext>()
+				{
+					@Override
+					public EbMSMessageContext mapRow(ResultSet rs, int rowNum) throws SQLException
+					{
+						EbMSMessageContext result = new EbMSMessageContext();
+						result.setCpaId(rs.getString("cpa_id"));
+						result.setFromRole(rs.getString("from_role"));
+						result.setToRole(rs.getString("to_role"));
+						result.setService(rs.getString("service"));
+						result.setAction(rs.getString("action"));
+						result.setTimestamp(rs.getTimestamp("time_stamp"));
+						result.setConversationId(rs.getString("conversation_id"));
+						result.setMessageId(rs.getString("message_id"));
+						result.setRefToMessageId(rs.getString("ref_to_message_id"));
+						result.setSequenceNr(rs.getInt("sequence_nr"));
+						return result;
+					}
+					
+				},
+				messageId
+			);
+		}
+		catch(EmptyResultDataAccessException e)
+		{
+			return null;
+		}
+		catch (DataAccessException e)
+		{
+			throw new DAOException(e);
+		}
+	}
+
 	@Override
 	public EbMSMessageContext getMessageContextByRefToMessageId(String refToMessageId, Service service, String...actions) throws DAOException
 	{
@@ -285,22 +389,19 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	}
 	
 	@Override
-	public EbMSDocument getDocumentByRefToMessageId(String refToMessageId, Service service, String...actions) throws DAOException
+	public EbMSDocument getDocument(String messageId) throws DAOException
 	{
 		try
 		{
 			String document = jdbcTemplate.queryForObject(
 				"select content" +
 				" from ebms_message" +
-				" where ref_to_message_id = ?" +
-				" and message_nr = 0" +
-				(service.getType() == null ? "" : " and serviceType = '" + service.getType() + "'") +
-				(service.getValue() == null ? "" : " and service = '" + service.getValue() + "'") +
-				(actions.length == 0 ? "" : " and action in (" + StringUtils.join(actions,",") + ")"),
+				" where message_id = ?" +
+				" and message_nr = 0",
 				String.class,
-				refToMessageId
+				messageId
 			);
-			return new EbMSDocument(DOMUtils.read(document),getAttachments(refToMessageId));
+			return new EbMSDocument(DOMUtils.read(document),getAttachments(messageId));
 		}
 		catch(EmptyResultDataAccessException e)
 		{
@@ -325,69 +426,22 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	}
 	
 	@Override
-	public MessageHeader getMessageHeader(String messageId) throws DAOException
-	{
-		try
-		{
-			String result = jdbcTemplate.queryForObject(
-				"select message_header" + 
-				" from ebms_message" + 
-				" where message_id = ?" +
-				" and message_nr = 0",
-				String.class,
-				messageId
-			);
-			return XMLMessageBuilder.getInstance(MessageHeader.class).handle(result);
-		}
-		catch(EmptyResultDataAccessException e)
-		{
-			return null;
-		}
-		catch (DataAccessException e)
-		{
-			throw new DAOException(e);
-		}
-		catch (JAXBException e)
-		{
-			throw new DAOException(e);
-		}
-	}
-
-	protected List<EbMSAttachment> getAttachments(String messageId)
-	{
-		return jdbcTemplate.query(
-			"select name, content_id, content_type, content" + 
-			" from ebms_attachment" + 
-			" where message_id = ?" +
-			" and message_nr = 0",
-			new ParameterizedRowMapper<EbMSAttachment>()
-			{
-				@Override
-				public EbMSAttachment mapRow(ResultSet rs, int rowNum) throws SQLException
-				{
-					ByteArrayDataSource dataSource = new ByteArrayDataSource(rs.getBytes("content"),rs.getString("content_type"));
-					dataSource.setName(rs.getString("name"));
-					return new EbMSAttachment(dataSource,rs.getString("content_id"));
-				}
-			},
-			messageId
-		);
-	}
-
-	@Override
-	public EbMSDocument getDocument(String messageId) throws DAOException
+	public EbMSDocument getDocumentByRefToMessageId(String refToMessageId, Service service, String...actions) throws DAOException
 	{
 		try
 		{
 			String document = jdbcTemplate.queryForObject(
 				"select content" +
 				" from ebms_message" +
-				" where message_id = ?" +
-				" and message_nr = 0",
+				" where ref_to_message_id = ?" +
+				" and message_nr = 0" +
+				(service.getType() == null ? "" : " and serviceType = '" + service.getType() + "'") +
+				(service.getValue() == null ? "" : " and service = '" + service.getValue() + "'") +
+				(actions.length == 0 ? "" : " and action in (" + StringUtils.join(actions,",") + ")"),
 				String.class,
-				messageId
+				refToMessageId
 			);
-			return new EbMSDocument(DOMUtils.read(document),getAttachments(messageId));
+			return new EbMSDocument(DOMUtils.read(document),getAttachments(refToMessageId));
 		}
 		catch(EmptyResultDataAccessException e)
 		{
@@ -445,105 +499,41 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	}
 
 	@Override
-	public void executeTransaction(final DAOTransactionCallback callback)
+	public List<String> getMessageIds(EbMSMessageContext messageContext, EbMSMessageStatus status) throws DAOException
 	{
 		try
 		{
-			transactionTemplate.execute(
-				new TransactionCallbackWithoutResult()
-				{
-
-					@Override
-					protected void doInTransactionWithoutResult(TransactionStatus transactionStatus)
-					{
-						callback.doInTransaction();
-					}
-				}
+			List<Object> parameters = new ArrayList<Object>();
+			return jdbcTemplate.queryForList(
+					"select message_id" +
+					" from ebms_message" +
+					" where message_nr = 0" +
+					" and status = " + status.id() +
+					getMessageContextFilter(messageContext,parameters) +
+					" order by time_stamp asc",
+					parameters.toArray(new Object[0]),
+					String.class
 			);
 		}
 		catch (DataAccessException e)
-		{
-			throw new DAOException(e);
-		}
-		catch (TransactionException e)
 		{
 			throw new DAOException(e);
 		}
 	}
 
+	public abstract String getMessageIdsQuery(String messageContextFilter, EbMSMessageStatus status, int maxNr);
+
 	@Override
-	public List<EbMSEvent> getLatestEventsByEbMSMessageIdBefore(Date timestamp, EbMSEventStatus status) throws DAOException
+	public List<String> getMessageIds(EbMSMessageContext messageContext, EbMSMessageStatus status, int maxNr) throws DAOException
 	{
 		try
 		{
-			return jdbcTemplate.query(
-				"select e.message_id, e.time, e.type, e.uri" +
-				" from ebms_event e" + 
-				" inner join (" +
-					"	select message_id, max(time) as time" +
-					" from ebms_event" +
-					" where status = ?" +
-					" and time <= ?" +
-					" group by message_id" +
-				") l" +
-				" on e.message_id = l.message_id" +
-				" and e.time = l.time" +
-				" order by e.time asc",
-				new ParameterizedRowMapper<EbMSEvent>()
-				{
-					@Override
-					public EbMSEvent mapRow(ResultSet rs, int rowNum) throws SQLException
-					{
-						return new EbMSEvent(rs.getString("message_id"),rs.getTimestamp("time"),EbMSEventType.values()[rs.getInt("type")],rs.getString("uri"));
-					}
-				},
-				status.id(),
-				timestamp
-			);
-		}
-		catch (DataAccessException e)
-		{
-			throw new DAOException(e);
-		}
-	}
-	
-	@Override
-	public void updateEvent(Date timestamp, String messageId, EbMSEventStatus status, String errorMessage) throws DAOException
-	{
-		try
-		{
-			jdbcTemplate.update(
-				"update ebms_event set" +
-				" status = ?," +
-				" status_time = " + getTimestampFunction() + "," +
-				" error_message = ?" +
-				" where message_id = ?" +
-				" and time = ?",
-				status.id(),
-				errorMessage,
-				messageId,
-				timestamp
-			);
-		}
-		catch (DataAccessException e)
-		{
-			throw new DAOException(e);
-		}
-	}
-	
-	@Override
-	public void deleteEventsBefore(Date timestamp, String messageId, EbMSEventStatus status) throws DAOException
-	{
-		try
-		{
-			jdbcTemplate.update(
-				"delete from ebms_event" +
-				" where message_id = ?" +
-				" and time < ?" +
-				" and status = ?",
-				messageId,
-				timestamp,
-				status.id()
+			List<Object> parameters = new ArrayList<Object>();
+			String messageContextFilter = getMessageContextFilter(messageContext,parameters);
+			return jdbcTemplate.queryForList(
+					getMessageIdsQuery(messageContextFilter,status,maxNr),
+					parameters.toArray(new Object[0]),
+					String.class
 			);
 		}
 		catch (DataAccessException e)
@@ -625,28 +615,8 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 								},
 								keyHolder
 							);
-					
-							for (EbMSAttachment attachment : message.getAttachments())
-							{
-								jdbcTemplate.update
-								(
-									"insert into ebms_attachment (" +
-										"message_id," +
-										"message_nr," +
-										"name," +
-										"content_id," +
-										"content_type," +
-										"content" +
-									") values (?,?,?,?,?,?)",
-									keyHolder.getKeys().get("message_id"),
-									keyHolder.getKeys().get("message_nr"),
-									attachment.getName(),
-									attachment.getContentId(),
-									attachment.getContentType().split(";")[0].trim(),
-									IOUtils.toByteArray(attachment.getInputStream())
-								);
-							}
-							
+
+							insertAttachments((String)keyHolder.getKeys().get("message_id"),(Integer)keyHolder.getKeys().get("message_nr"),message.getAttachments());
 						}
 						catch (IOException e)
 						{
@@ -735,27 +705,8 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 								},
 								keyHolder
 							);
-					
-							for (EbMSAttachment attachment : message.getAttachments())
-							{
-								jdbcTemplate.update
-								(
-									"insert into ebms_attachment (" +
-										"message_id," +
-										"message_nr," +
-										"name," +
-										"content_id," +
-										"content_type," +
-										"content" +
-									") values (?,?,?,?,?,?)",
-									keyHolder.getKeys().get("message_id"),
-									keyHolder.getKeys().get("message_nr"),
-									attachment.getName(),
-									attachment.getContentId(),
-									attachment.getContentType().split(";")[0].trim(),
-									IOUtils.toByteArray(attachment.getInputStream())
-								);
-							}
+
+							insertAttachments((String)keyHolder.getKeys().get("message_id"),(Integer)keyHolder.getKeys().get("message_nr"),message.getAttachments());
 						}
 						catch (IOException e)
 						{
@@ -775,15 +726,39 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 		}
 	}
 
+	protected void insertAttachments(String messageId, int messageNr, List<EbMSAttachment> attachments) throws InvalidDataAccessApiUsageException, DataAccessException, IOException
+	{
+		for (EbMSAttachment attachment : attachments)
+		{
+			jdbcTemplate.update
+			(
+				"insert into ebms_attachment (" +
+					"message_id," +
+					"message_nr," +
+					"name," +
+					"content_id," +
+					"content_type," +
+					"content" +
+				") values (?,?,?,?,?,?)",
+				messageId,
+				messageNr,
+				attachment.getName(),
+				attachment.getContentId(),
+				attachment.getContentType().split(";")[0].trim(),
+				IOUtils.toByteArray(attachment.getInputStream())
+			);
+		}
+	}
+
 	@Override
-	public void updateMessageStatus(String messageId, EbMSMessageStatus oldStatus, EbMSMessageStatus newStatus) throws DAOException
+	public void updateMessage(String messageId, EbMSMessageStatus oldStatus, EbMSMessageStatus newStatus) throws DAOException
 	{
 		try
 		{
 			jdbcTemplate.update
 			(
 				"update ebms_message" +
-				" set status = ?," + 
+				" set status = ?," +
 				" status_time = " + getTimestampFunction() +
 				" where message_id = ?" +
 				" and message_nr = 0" +
@@ -798,6 +773,66 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 		}
 	}
 
+	@Override
+	public void updateMessages(final List<String> messageIds, EbMSMessageStatus oldStatus, EbMSMessageStatus newStatus) throws DAOException
+	{
+		try
+		{
+			List<Object[]> ids = new ArrayList<Object[]>();
+			for (String messageId : messageIds)
+				ids.add(new Object[]{messageId});
+			jdbcTemplate.batchUpdate(
+					"update ebms_message" +
+					" set status = " + newStatus.id() + "," +
+					" status_time = " + getTimestampFunction() +
+					" where message_id = ?" +
+					" and message_nr = 0" +
+					(oldStatus == null ? " and status is null" : " and status = " + oldStatus.id()),
+					ids
+			);
+		}
+		catch (DataAccessException e)
+		{
+			throw new DAOException(e);
+		}
+	}
+
+	@Override
+	public List<EbMSEvent> getLatestEventsByEbMSMessageIdBefore(Date timestamp, EbMSEventStatus status) throws DAOException
+	{
+		try
+		{
+			return jdbcTemplate.query(
+				"select e.message_id, e.time, e.type, e.uri" +
+				" from ebms_event e" + 
+				" inner join (" +
+					"	select message_id, max(time) as time" +
+					" from ebms_event" +
+					" where status = ?" +
+					" and time <= ?" +
+					" group by message_id" +
+				") l" +
+				" on e.message_id = l.message_id" +
+				" and e.time = l.time" +
+				" order by e.time asc",
+				new ParameterizedRowMapper<EbMSEvent>()
+				{
+					@Override
+					public EbMSEvent mapRow(ResultSet rs, int rowNum) throws SQLException
+					{
+						return new EbMSEvent(rs.getString("message_id"),rs.getTimestamp("time"),EbMSEventType.values()[rs.getInt("type")],rs.getString("uri"));
+					}
+				},
+				status.id(),
+				timestamp
+			);
+		}
+		catch (DataAccessException e)
+		{
+			throw new DAOException(e);
+		}
+	}
+	
 	@Override
 	public void insertEvent(String messageId, EbMSEventType type, String uri) throws DAOException
 	{
@@ -885,6 +920,30 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	}
 
 	@Override
+	public void updateEvent(Date timestamp, String messageId, EbMSEventStatus status, String errorMessage) throws DAOException
+	{
+		try
+		{
+			jdbcTemplate.update(
+				"update ebms_event set" +
+				" status = ?," +
+				" status_time = " + getTimestampFunction() + "," +
+				" error_message = ?" +
+				" where message_id = ?" +
+				" and time = ?",
+				status.id(),
+				errorMessage,
+				messageId,
+				timestamp
+			);
+		}
+		catch (DataAccessException e)
+		{
+			throw new DAOException(e);
+		}
+	}
+	
+	@Override
 	public void deleteEvents(String messageId, EbMSEventStatus status) throws DAOException
 	{
 		try
@@ -902,6 +961,48 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 		{
 			throw new DAOException(e);
 		}
+	}
+
+	@Override
+	public void deleteEventsBefore(Date timestamp, String messageId, EbMSEventStatus status) throws DAOException
+	{
+		try
+		{
+			jdbcTemplate.update(
+				"delete from ebms_event" +
+				" where message_id = ?" +
+				" and time < ?" +
+				" and status = ?",
+				messageId,
+				timestamp,
+				status.id()
+			);
+		}
+		catch (DataAccessException e)
+		{
+			throw new DAOException(e);
+		}
+	}
+
+	protected List<EbMSAttachment> getAttachments(String messageId)
+	{
+		return jdbcTemplate.query(
+			"select name, content_id, content_type, content" + 
+			" from ebms_attachment" + 
+			" where message_id = ?" +
+			" and message_nr = 0",
+			new ParameterizedRowMapper<EbMSAttachment>()
+			{
+				@Override
+				public EbMSAttachment mapRow(ResultSet rs, int rowNum) throws SQLException
+				{
+					ByteArrayDataSource dataSource = new ByteArrayDataSource(rs.getBytes("content"),rs.getString("content_type"));
+					dataSource.setName(rs.getString("name"));
+					return new EbMSAttachment(dataSource,rs.getString("content_id"));
+				}
+			},
+			messageId
+		);
 	}
 
 	protected String getMessageContextFilter(EbMSMessageContext messageContext, List<Object> parameters)
@@ -958,161 +1059,4 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 		return result.toString();
 	}
 	
-	@Override
-	public List<String> getMessageIds(EbMSMessageContext messageContext, EbMSMessageStatus status) throws DAOException
-	{
-		try
-		{
-			List<Object> parameters = new ArrayList<Object>();
-			return jdbcTemplate.queryForList(
-					"select message_id" +
-					" from ebms_message" +
-					" where message_nr = 0" +
-					" and status = " + status.id() +
-					getMessageContextFilter(messageContext,parameters) +
-					" order by time_stamp asc",
-					parameters.toArray(new Object[0]),
-					String.class
-			);
-		}
-		catch (DataAccessException e)
-		{
-			throw new DAOException(e);
-		}
-	}
-
-	public abstract String getMessageIdsQuery(String messageContextFilter, EbMSMessageStatus status, int maxNr);
-
-	@Override
-	public List<String> getMessageIds(EbMSMessageContext messageContext, EbMSMessageStatus status, int maxNr) throws DAOException
-	{
-		try
-		{
-			List<Object> parameters = new ArrayList<Object>();
-			String messageContextFilter = getMessageContextFilter(messageContext,parameters);
-			return jdbcTemplate.queryForList(
-					getMessageIdsQuery(messageContextFilter,status,maxNr),
-					parameters.toArray(new Object[0]),
-					String.class
-			);
-		}
-		catch (DataAccessException e)
-		{
-			throw new DAOException(e);
-		}
-	}
-
-	private EbMSMessageContext getMessageContext(String messageId)
-	{
-		return jdbcTemplate.queryForObject(
-			"select cpa_id," +
-			" from_role," +
-			" to_role," +
-			" service," +
-			" action," +
-			" time_stamp," +
-			" conversation_id," +
-			" message_id," +
-			" ref_to_message_id," +
-			" sequence_nr" +
-			" from ebms_message" + 
-			" where message_id = ?" +
-			" and message_nr = 0",
-			new ParameterizedRowMapper<EbMSMessageContext>()
-			{
-				@Override
-				public EbMSMessageContext mapRow(ResultSet rs, int rowNum) throws SQLException
-				{
-					EbMSMessageContext result = new EbMSMessageContext();
-					result.setCpaId(rs.getString("cpa_id"));
-					result.setFromRole(rs.getString("from_role"));
-					result.setToRole(rs.getString("to_role"));
-					result.setService(rs.getString("service"));
-					result.setAction(rs.getString("action"));
-					result.setTimestamp(rs.getTimestamp("time_stamp"));
-					result.setConversationId(rs.getString("conversation_id"));
-					result.setMessageId(rs.getString("message_id"));
-					result.setRefToMessageId(rs.getString("ref_to_message_id"));
-					result.setSequenceNr(rs.getInt("sequence_nr"));
-					return result;
-				}
-				
-			},
-			messageId
-		);
-	}
-
-	@Override
-	public EbMSMessageContent getMessageContent(String messageId) throws DAOException
-	{
-		try
-		{
-			EbMSMessageContext messageContext = getMessageContext(messageId);
-			List<EbMSAttachment> attachments = getAttachments(messageId);
-			List<EbMSDataSource> dataSources = new ArrayList<EbMSDataSource>();
-			for (DataSource dataSource : attachments)
-				dataSources.add(new EbMSDataSource(dataSource.getName(),dataSource.getContentType(),IOUtils.toByteArray(dataSource.getInputStream())));
-			return new EbMSMessageContent(messageContext,dataSources);
-		}
-		catch(EmptyResultDataAccessException e)
-		{
-			return null;
-		}
-		catch (DataAccessException e)
-		{
-			throw new DAOException(e);
-		}
-		catch (IOException e)
-		{
-			throw new DAOException(e);
-		}
-	}
-
-	@Override
-	public void updateMessage(String messageId, EbMSMessageStatus oldStatus, EbMSMessageStatus newStatus) throws DAOException
-	{
-		try
-		{
-			jdbcTemplate.update
-			(
-				"update ebms_message" +
-				" set status = ?," +
-				" status_time = " + getTimestampFunction() +
-				" where message_id = ?" +
-				" and message_nr = 0" +
-				(oldStatus == null ? " and status is null" : " and status = " + oldStatus.id()),
-				newStatus.id(),
-				messageId
-			);
-		}
-		catch (DataAccessException e)
-		{
-			throw new DAOException(e);
-		}
-	}
-
-	@Override
-	public void updateMessages(final List<String> messageIds, EbMSMessageStatus oldStatus, EbMSMessageStatus newStatus) throws DAOException
-	{
-		try
-		{
-			List<Object[]> ids = new ArrayList<Object[]>();
-			for (String messageId : messageIds)
-				ids.add(new Object[]{messageId});
-			jdbcTemplate.batchUpdate(
-					"update ebms_message" +
-					" set status = " + newStatus.id() + "," +
-					" status_time = " + getTimestampFunction() +
-					" where message_id = ?" +
-					" and message_nr = 0" +
-					(oldStatus == null ? " and status is null" : " and status = " + oldStatus.id()),
-					ids
-			);
-		}
-		catch (DataAccessException e)
-		{
-			throw new DAOException(e);
-		}
-	}
-
 }

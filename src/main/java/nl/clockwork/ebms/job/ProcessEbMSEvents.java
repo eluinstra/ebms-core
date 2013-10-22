@@ -74,7 +74,7 @@ public class ProcessEbMSEvents implements Job
 							if (e instanceof EbMSResponseSOAPException && EbMSResponseSOAPException.CLIENT.equals(((EbMSResponseSOAPException)e).getFaultCode()))
 							{
 								ebMSDAO.deleteEvents(event.getMessageId(),EbMSEventStatus.UNPROCESSED);
-								ebMSDAO.updateMessageStatus(event.getMessageId(),EbMSMessageStatus.SENT,EbMSMessageStatus.DELIVERY_ERROR);
+								ebMSDAO.updateMessage(event.getMessageId(),EbMSMessageStatus.SENT,EbMSMessageStatus.DELIVERY_ERROR);
 								eventListener.onMessageDeliveryFailed(event.getMessageId());
 							}
 						}
@@ -113,7 +113,7 @@ public class ProcessEbMSEvents implements Job
 						{
 							updateEvent(event,EbMSEventStatus.PROCESSED,null);
 							ebMSDAO.deleteEvents(event.getMessageId(),EbMSEventStatus.UNPROCESSED);
-							ebMSDAO.updateMessageStatus(event.getMessageId(),EbMSMessageStatus.SENT,EbMSMessageStatus.DELIVERY_FAILED);
+							ebMSDAO.updateMessage(event.getMessageId(),EbMSMessageStatus.SENT,EbMSMessageStatus.DELIVERY_FAILED);
 							eventListener.onMessageNotAcknowledged(event.getMessageId());
 						}
 					}

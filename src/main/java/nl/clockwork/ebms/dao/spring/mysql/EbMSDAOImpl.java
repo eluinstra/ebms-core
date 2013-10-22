@@ -74,29 +74,6 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 	}
 
 	@Override
-	protected List<EbMSAttachment> getAttachments(String messageId)
-	{
-		return jdbcTemplate.query(
-			"select a.name, a.content_id, a.content_type, a.content" + 
-			" from ebms_message m, ebms_attachment a" +
-			" where m.message_id = ?" +
-			" and m.message_nr = 0" +
-			" and m.id = a.ebms_message_id",
-			new ParameterizedRowMapper<EbMSAttachment>()
-			{
-				@Override
-				public EbMSAttachment mapRow(ResultSet rs, int rowNum) throws SQLException
-				{
-					ByteArrayDataSource dataSource = new ByteArrayDataSource(rs.getBytes("content"),rs.getString("content_type"));
-					dataSource.setName(rs.getString("name"));
-					return new EbMSAttachment(dataSource,rs.getString("content_id"));
-				}
-			},
-			messageId
-		);
-	}
-
-	@Override
 	public void insertMessage(final Date timestamp, final EbMSMessage message, final EbMSMessageStatus status) throws DAOException
 	{
 		try
@@ -169,26 +146,7 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 								},
 								keyHolder
 							);
-					
-							for (EbMSAttachment attachment : message.getAttachments())
-							{
-								jdbcTemplate.update
-								(
-									"insert into ebms_attachment (" +
-										"ebms_message_id," +
-										"name," +
-										"content_id," +
-										"content_type," +
-										"content" +
-									") values (?,?,?,?,?)",
-									keyHolder.getKey().longValue(),
-									attachment.getName(),
-									attachment.getContentId(),
-									attachment.getContentType().split(";")[0].trim(),
-									IOUtils.toByteArray(attachment.getInputStream())
-								);
-							}
-							
+							insertAttachments(keyHolder.getKey().longValue(),message.getAttachments());
 						}
 						catch (IOException e)
 						{
@@ -277,25 +235,7 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 								},
 								keyHolder
 							);
-					
-							for (EbMSAttachment attachment : message.getAttachments())
-							{
-								jdbcTemplate.update
-								(
-									"insert into ebms_attachment (" +
-										"ebms_message_id," +
-										"name," +
-										"content_id," +
-										"content_type," +
-										"content" +
-									") values (?,?,?,?,?)",
-									keyHolder.getKey().longValue(),
-									attachment.getName(),
-									attachment.getContentId(),
-									attachment.getContentType().split(";")[0].trim(),
-									IOUtils.toByteArray(attachment.getInputStream())
-								);
-							}
+							insertAttachments(keyHolder.getKey().longValue(),message.getAttachments());
 						}
 						catch (IOException e)
 						{
@@ -313,6 +253,51 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 		{
 			throw new DAOException(e);
 		}
+	}
+
+	protected void insertAttachments(long messageId, List<EbMSAttachment> attachments) throws DataAccessException, IOException
+	{
+		for (EbMSAttachment attachment : attachments)
+		{
+			jdbcTemplate.update
+			(
+				"insert into ebms_attachment (" +
+					"ebms_message_id," +
+					"name," +
+					"content_id," +
+					"content_type," +
+					"content" +
+				") values (?,?,?,?,?)",
+				messageId,
+				attachment.getName(),
+				attachment.getContentId(),
+				attachment.getContentType().split(";")[0].trim(),
+				IOUtils.toByteArray(attachment.getInputStream())
+			);
+		}
+	}
+
+	@Override
+	protected List<EbMSAttachment> getAttachments(String messageId)
+	{
+		return jdbcTemplate.query(
+			"select a.name, a.content_id, a.content_type, a.content" + 
+			" from ebms_message m, ebms_attachment a" +
+			" where m.message_id = ?" +
+			" and m.message_nr = 0" +
+			" and m.id = a.ebms_message_id",
+			new ParameterizedRowMapper<EbMSAttachment>()
+			{
+				@Override
+				public EbMSAttachment mapRow(ResultSet rs, int rowNum) throws SQLException
+				{
+					ByteArrayDataSource dataSource = new ByteArrayDataSource(rs.getBytes("content"),rs.getString("content_type"));
+					dataSource.setName(rs.getString("name"));
+					return new EbMSAttachment(dataSource,rs.getString("content_id"));
+				}
+			},
+			messageId
+		);
 	}
 
 }

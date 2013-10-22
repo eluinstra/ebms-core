@@ -30,11 +30,9 @@ import nl.clockwork.ebms.common.util.DOMUtils;
 import nl.clockwork.ebms.dao.AbstractEbMSDAO;
 import nl.clockwork.ebms.dao.ConnectionManager;
 import nl.clockwork.ebms.dao.DAOException;
-import nl.clockwork.ebms.model.EbMSAttachment;
 import nl.clockwork.ebms.model.EbMSMessage;
 import nl.clockwork.ebms.util.EbMSMessageUtils;
 
-import org.apache.commons.io.IOUtils;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageHeader;
 
 public class EbMSDAOImpl extends AbstractEbMSDAO
@@ -63,55 +61,6 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 	}
 
 	@Override
-	protected PreparedStatement getInsertMessagePreparedStatement(Connection connection, EbMSMessageStatus status) throws SQLException
-	{
-		return connection.prepareStatement
-		(
-			"insert into ebms_message (" +
-				"time_stamp," +
-				"cpa_id," +
-				"conversation_id," +
-				"sequence_nr," +
-				"message_id," +
-				"ref_to_message_id," +
-				"time_to_live," +
-				"from_role," +
-				"to_role," +
-				"service," +
-				"action," +
-				"content," +
-				"status," +
-				"status_time" +
-			") values (?,?,?,?,?,?,?,?,?,?,?,?,?," + (status == null ? "null" : getTimestampFunction()) + ")" +
-			" returning message_id, message_nr"
-		);
-	}
-
-	@Override
-	protected PreparedStatement getInsertDuplicateMessagePreparedStatement(Connection connection) throws SQLException
-	{
-		return connection.prepareStatement
-		(
-			"insert into ebms_message (" +
-				"time_stamp," +
-				"cpa_id," +
-				"conversation_id," +
-				"sequence_nr," +
-				"message_id," +
-				"message_nr," +
-				"ref_to_message_id," +
-				"time_to_live," +
-				"from_role," +
-				"to_role," +
-				"service," +
-				"action," +
-				"content" +
-			") values (?,?,?,?,?,(select max(message_nr) + 1 from ebms_message where message_id = ?),?,?,?,?,?,?,?)" +
-			" returning message_id, message_nr"
-		);
-	}
-
-	@Override
 	public void insertMessage(Date timestamp, EbMSMessage message, EbMSMessageStatus status) throws DAOException
 	{
 		Connection c = null;
@@ -119,7 +68,26 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 		try
 		{
 			c = connectionManager.getConnection(true);
-			ps = getInsertMessagePreparedStatement(c,status);
+			ps = c.prepareStatement
+			(
+				"insert into ebms_message (" +
+					"time_stamp," +
+					"cpa_id," +
+					"conversation_id," +
+					"sequence_nr," +
+					"message_id," +
+					"ref_to_message_id," +
+					"time_to_live," +
+					"from_role," +
+					"to_role," +
+					"service," +
+					"action," +
+					"content," +
+					"status," +
+					"status_time" +
+				") values (?,?,?,?,?,?,?,?,?,?,?,?,?," + (status == null ? "null" : getTimestampFunction()) + ")" +
+				" returning message_id, message_nr"
+			);
 			ps.setTimestamp(1,new Timestamp(timestamp.getTime()));
 			MessageHeader messageHeader = message.getMessageHeader();
 			ps.setString(2,messageHeader.getCPAId());
@@ -143,31 +111,7 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 			ResultSet rs = ps.executeQuery();
 			if (rs.next())
 			{
-				String messageId = rs.getString(1);
-				int messageNr = rs.getInt(2);
-				connectionManager.close(ps);
-				ps  = c.prepareStatement(
-					"insert into ebms_attachment (" +
-						"message_id," +
-						"message_nr," +
-						"name," +
-						"content_id," +
-						"content_type," +
-						"content" +
-					") values (?,?,?,?,?,?)"
-				);
-				for (EbMSAttachment attachment : message.getAttachments())
-				{
-					ps.setString(1,messageId);
-					ps.setInt(2,messageNr);
-					ps.setString(3,attachment.getName());
-					ps.setString(4,attachment.getContentId());
-					ps.setString(5,attachment.getContentType().split(";")[0].trim());
-					ps.setBytes(6,IOUtils.toByteArray(attachment.getInputStream()));
-					ps.addBatch();
-				}
-				if (message.getAttachments().size() > 0)
-					ps.executeBatch();
+				insertAttachments(rs.getString(1),rs.getInt(2),message.getAttachments());
 				connectionManager.commit();
 			}
 			else
@@ -206,7 +150,25 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 		try
 		{
 			c = connectionManager.getConnection(true);
-			ps = getInsertDuplicateMessagePreparedStatement(c);
+			ps = c.prepareStatement
+			(
+				"insert into ebms_message (" +
+					"time_stamp," +
+					"cpa_id," +
+					"conversation_id," +
+					"sequence_nr," +
+					"message_id," +
+					"message_nr," +
+					"ref_to_message_id," +
+					"time_to_live," +
+					"from_role," +
+					"to_role," +
+					"service," +
+					"action," +
+					"content" +
+				") values (?,?,?,?,?,(select max(message_nr) + 1 from ebms_message where message_id = ?),?,?,?,?,?,?,?)" +
+				" returning message_id, message_nr"
+			);
 			ps.setTimestamp(1,new Timestamp(timestamp.getTime()));
 			MessageHeader messageHeader = message.getMessageHeader();
 			ps.setString(2,messageHeader.getCPAId());
@@ -227,31 +189,7 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 			ResultSet rs = ps.executeQuery();
 			if (rs.next())
 			{
-				String messageId = rs.getString(1);
-				int messageNr = rs.getInt(2);
-				connectionManager.close(ps);
-				ps  = c.prepareStatement(
-					"insert into ebms_attachment (" +
-						"message_id," +
-						"message_nr," +
-						"name," +
-						"content_id," +
-						"content_type," +
-						"content" +
-					") values (?,?,?,?,?,?)"
-				);
-				for (EbMSAttachment attachment : message.getAttachments())
-				{
-					ps.setString(1,messageId);
-					ps.setInt(2,messageNr);
-					ps.setString(3,attachment.getName());
-					ps.setString(4,attachment.getContentId());
-					ps.setString(5,attachment.getContentType().split(";")[0].trim());
-					ps.setBytes(6,IOUtils.toByteArray(attachment.getInputStream()));
-					ps.addBatch();
-				}
-				if (message.getAttachments().size() > 0)
-					ps.executeBatch();
+				insertAttachments(rs.getString(1),rs.getInt(2),message.getAttachments());
 				connectionManager.commit();
 			}
 			else

@@ -132,8 +132,7 @@ public class EbMSMessageProcessor
 				return null;
 			}
 			else
-				// TODO create messageError???
-				return null;
+				throw new EbMSProcessingException("Unable to process message! Action=" + message.getMessageHeader().getAction());
 		}
 		catch (ValidationException e)
 		{
@@ -196,7 +195,6 @@ public class EbMSMessageProcessor
 				xsdValidator.validate(response.getMessage());
 				GregorianCalendar timestamp = new GregorianCalendar();
 				final EbMSMessage responseMessage = EbMSMessageUtils.getEbMSMessage(response.getMessage(),response.getAttachments());
-				//final CollaborationProtocolAgreement cpa = ebMSDAO.getCPA(message.getMessageHeader().getCPAId());
 				if (Constants.EBMS_SERVICE_URI.equals(responseMessage.getMessageHeader().getService().getValue()))
 					if (EbMSAction.MESSAGE_ERROR.action().equals(responseMessage.getMessageHeader().getAction()))
 						process(timestamp,responseMessage,EbMSMessageStatus.DELIVERY_ERROR);
@@ -364,10 +362,9 @@ public class EbMSMessageProcessor
 					@Override
 					public void doInTransaction()
 					{
-						//TODO check if cpaIds match, otherwise log and discard
 						ebMSDAO.insertMessage(timestamp.getTime(),message,null);
 						ebMSDAO.deleteEvents(message.getMessageHeader().getMessageData().getRefToMessageId(),EbMSEventStatus.UNPROCESSED);
-						ebMSDAO.updateMessageStatus(message.getMessageHeader().getMessageData().getRefToMessageId(),EbMSMessageStatus.SENT,status);
+						ebMSDAO.updateMessage(message.getMessageHeader().getMessageData().getRefToMessageId(),EbMSMessageStatus.SENT,status);
 						if (status.equals(EbMSMessageStatus.DELIVERED))
 							eventListener.onMessageAcknowledged(message.getMessageHeader().getMessageData().getRefToMessageId());
 						else if (status.equals(EbMSMessageStatus.DELIVERY_ERROR))
@@ -385,16 +382,19 @@ public class EbMSMessageProcessor
 			MessageHeader messageHeader = message.getMessageHeader();
 			cpaValidator.validate(cpa,messageHeader,timestamp);
 			EbMSMessageStatus status = EbMSMessageStatus.UNAUTHORIZED;
-			MessageHeader header = ebMSDAO.getMessageHeader(message.getStatusRequest().getRefToMessageId());
-			if (header == null || header.getService().getValue().equals(Constants.EBMS_SERVICE_URI))
+			EbMSMessageContext context = ebMSDAO.getMessageContext(message.getStatusRequest().getRefToMessageId());
+			if (context == null || Constants.EBMS_SERVICE_URI.equals(context.getService()))
 				status = EbMSMessageStatus.NOT_RECOGNIZED;
-			else if (!header.getCPAId().equals(message.getMessageHeader().getCPAId()))
+			else if (!context.getCpaId().equals(message.getMessageHeader().getCPAId()))
 				status = EbMSMessageStatus.UNAUTHORIZED;
 			else
 			{
 				status = ebMSDAO.getMessageStatus(message.getStatusRequest().getRefToMessageId());
 				if (status != null && (MessageStatusType.RECEIVED.equals(status.statusCode()) || MessageStatusType.PROCESSED.equals(status.statusCode()) || MessageStatusType.FORWARDED.equals(status.statusCode())))
-					c = header.getMessageData().getTimestamp().toGregorianCalendar();
+				{
+					c = new GregorianCalendar();
+					c.setTime(context.getTimestamp());
+				}
 			}
 			return EbMSMessageUtils.createEbMSStatusResponse(cpa,message,status,c); 
 		}

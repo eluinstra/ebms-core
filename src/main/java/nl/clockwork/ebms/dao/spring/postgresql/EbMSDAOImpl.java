@@ -29,11 +29,9 @@ import nl.clockwork.ebms.Constants.EbMSMessageStatus;
 import nl.clockwork.ebms.common.util.DOMUtils;
 import nl.clockwork.ebms.dao.DAOException;
 import nl.clockwork.ebms.dao.spring.AbstractEbMSDAO;
-import nl.clockwork.ebms.model.EbMSAttachment;
 import nl.clockwork.ebms.model.EbMSMessage;
 import nl.clockwork.ebms.util.EbMSMessageUtils;
 
-import org.apache.commons.io.IOUtils;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageHeader;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -164,27 +162,7 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 								},
 								new KeyExtractor()
 							);
-					
-							for (EbMSAttachment attachment : message.getAttachments())
-							{
-								jdbcTemplate.update
-								(
-									"insert into ebms_attachment (" +
-										"message_id," +
-										"message_nr," +
-										"name," +
-										"content_id," +
-										"content_type," +
-										"content" +
-									") values (?,?,?,?,?,?)",
-									key.messageId,
-									key.messageNr,
-									attachment.getName(),
-									attachment.getContentId(),
-									attachment.getContentType().split(";")[0].trim(),
-									IOUtils.toByteArray(attachment.getInputStream())
-								);
-							}
+							insertAttachments(key.messageId,key.messageNr,message.getAttachments());
 						}
 						catch (IOException e)
 						{
@@ -271,27 +249,7 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 								},
 								new KeyExtractor()
 							);
-					
-							for (EbMSAttachment attachment : message.getAttachments())
-							{
-								jdbcTemplate.update
-								(
-									"insert into ebms_attachment (" +
-										"message_id," +
-										"message_nr," +
-										"name," +
-										"content_id," +
-										"content_type," +
-										"content" +
-									") values (?,?,?,?,?,?)",
-									key.messageId,
-									key.messageNr,
-									attachment.getName(),
-									attachment.getContentId(),
-									attachment.getContentType().split(";")[0].trim(),
-									IOUtils.toByteArray(attachment.getInputStream())
-								);
-							}
+							insertAttachments(key.messageId,key.messageNr,message.getAttachments());
 						}
 						catch (IOException e)
 						{

@@ -324,7 +324,87 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 			connectionManager.close();
 		}
 	}
-	
+
+	@Override
+	public EbMSMessageContent getMessageContent(String messageId) throws DAOException
+	{
+		try
+		{
+			EbMSMessageContext messageContext = getMessageContext(messageId);
+			if (messageContext == null)
+				return null;
+			List<EbMSAttachment> attachments = getAttachments(messageId);
+			List<EbMSDataSource> dataSources = new ArrayList<EbMSDataSource>();
+			for (DataSource dataSource : attachments)
+				dataSources.add(new EbMSDataSource(dataSource.getName(),dataSource.getContentType(),IOUtils.toByteArray(dataSource.getInputStream())));
+			return new EbMSMessageContent(messageContext,dataSources);
+		}
+		catch (SQLException e)
+		{
+			throw new DAOException(e);
+		}
+		catch (IOException e)
+		{
+			throw new DAOException(e);
+		}
+	}
+
+	@Override
+	public EbMSMessageContext getMessageContext(String messageId) throws DAOException
+	{
+		Connection c = null;
+		PreparedStatement ps = null;
+		try
+		{
+			EbMSMessageContext result = null;
+			c = connectionManager.getConnection();
+			ps = c.prepareStatement(
+				"select cpa_id," +
+				" from_role," +
+				" to_role," +
+				" service," +
+				" action," +
+				" time_stamp," +
+				" conversation_id," +
+				" message_id," +
+				" ref_to_message_id," +
+				" sequence_nr" +
+				" from ebms_message" + 
+				" where message_id = ?" +
+				" and message_nr = 0"
+			);
+			ps.setString(1,messageId);
+			if (ps.execute())
+			{
+				ResultSet rs = ps.getResultSet();
+				if (rs.next())
+				{
+					result = new EbMSMessageContext();
+					result.setCpaId(rs.getString("cpa_id"));
+					result.setFromRole(rs.getString("from_role"));
+					result.setToRole(rs.getString("to_role"));
+					result.setService(rs.getString("service"));
+					result.setAction(rs.getString("action"));
+					result.setTimestamp(rs.getTimestamp("time_stamp"));
+					result.setConversationId(rs.getString("conversation_id"));
+					result.setMessageId(rs.getString("message_id"));
+					result.setRefToMessageId(rs.getString("ref_to_message_id"));
+					result.setSequenceNr(rs.getInt("sequence_nr"));
+				}
+			}
+			return result;
+		}
+		catch (SQLException e)
+		{
+			throw new DAOException(e);
+		}
+		finally
+		{
+			connectionManager.close(ps);
+			connectionManager.close();
+		}
+	}
+
 	@Override
 	public EbMSMessageContext getMessageContextByRefToMessageId(String refToMessageId, Service service, String...actions) throws DAOException
 	{
@@ -385,7 +465,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	}
 	
 	@Override
-	public EbMSDocument getDocumentByRefToMessageId(String refToMessageId, Service service, String...actions) throws DAOException
+	public EbMSDocument getDocument(String messageId) throws DAOException
 	{
 		Connection c = null;
 		PreparedStatement ps = null;
@@ -396,18 +476,15 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 			ps  = c.prepareStatement(
 				"select content" +
 				" from ebms_message" +
-				" where ref_to_message_id = ?" +
-				" and message_nr = 0" +
-				(service.getType() == null ? "" : " and serviceType = '" + service.getType() + "'") +
-				(service.getValue() == null ? "" : " and service = '" + service.getValue() + "'") +
-				(actions.length == 0 ? "" : " and action in (" + StringUtils.join(actions,",") + ")")
+				" where message_id = ?" +
+				" and message_nr = 0"
 			);
-			ps.setString(1,refToMessageId);
+			ps.setString(1,messageId);
 			if (ps.execute())
 			{
 				ResultSet rs = ps.getResultSet();
 				if (rs.next())
-					result = new EbMSDocument(DOMUtils.read(rs.getString("content")),getAttachments(refToMessageId));
+					result = new EbMSDocument(DOMUtils.read(rs.getString("content")),getAttachments(messageId));
 			}
 			return result;
 		}
@@ -435,46 +512,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	}
 	
 	@Override
-	public MessageHeader getMessageHeader(String messageId) throws DAOException
-	{
-		Connection c = null;
-		PreparedStatement ps = null;
-		try
-		{
-			MessageHeader result = null;
-			c = connectionManager.getConnection();
-			ps = c.prepareStatement(
-				"select message_header" + 
-				" from ebms_message" + 
-				" where message_id = ?" +
-				" and message_nr = 0"
-			);
-			ps.setString(1,messageId);
-			if (ps.execute())
-			{
-				ResultSet rs = ps.getResultSet();
-				if (rs.next())
-					result = XMLMessageBuilder.getInstance(MessageHeader.class).handle(rs.getString("message_header"));
-			}
-			return result;
-		}
-		catch (SQLException e)
-		{
-			throw new DAOException(e);
-		}
-		catch (JAXBException e)
-		{
-			throw new DAOException(e);
-		}
-		finally
-		{
-			connectionManager.close(ps);
-			connectionManager.close();
-		}
-	}
-
-	@Override
-	public EbMSDocument getDocument(String messageId) throws DAOException
+	public EbMSDocument getDocumentByRefToMessageId(String refToMessageId, Service service, String...actions) throws DAOException
 	{
 		Connection c = null;
 		PreparedStatement ps = null;
@@ -485,15 +523,18 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 			ps  = c.prepareStatement(
 				"select content" +
 				" from ebms_message" +
-				" where message_id = ?" +
-				" and message_nr = 0"
+				" where ref_to_message_id = ?" +
+				" and message_nr = 0" +
+				(service.getType() == null ? "" : " and serviceType = '" + service.getType() + "'") +
+				(service.getValue() == null ? "" : " and service = '" + service.getValue() + "'") +
+				(actions.length == 0 ? "" : " and action in (" + StringUtils.join(actions,",") + ")")
 			);
-			ps.setString(1,messageId);
+			ps.setString(1,refToMessageId);
 			if (ps.execute())
 			{
 				ResultSet rs = ps.getResultSet();
 				if (rs.next())
-					result = new EbMSDocument(DOMUtils.read(rs.getString("content")),getAttachments(messageId));
+					result = new EbMSDocument(DOMUtils.read(rs.getString("content")),getAttachments(refToMessageId));
 			}
 			return result;
 		}
@@ -556,6 +597,343 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	}
 
 	@Override
+	public List<String> getMessageIds(EbMSMessageContext messageContext, EbMSMessageStatus status) throws DAOException
+	{
+		Connection c = null;
+		PreparedStatement ps = null;
+		try
+		{
+			List<String> result = new ArrayList<String>();
+			c = connectionManager.getConnection();
+			ps  = c.prepareStatement(
+				"select message_id" +
+				" from ebms_message" +
+				" where message_nr = 0" +
+				" and status = " + status.id() +
+				addMessageContextFilter(messageContext) +
+				" order by time_stamp asc"
+			);
+			addMessageContextFilter(messageContext,ps);
+			if (ps.execute())
+			{
+				ResultSet rs = ps.getResultSet();
+				while (rs.next())
+					result.add(rs.getString("message_id"));
+			}
+			return result;
+		}
+		catch (SQLException e)
+		{
+			throw new DAOException(e);
+		}
+		finally
+		{
+			connectionManager.close(ps);
+			connectionManager.close();
+		}
+	}
+
+	public abstract String getMessageIdsQuery(String messageContextFilter, EbMSMessageStatus status, int maxNr);
+
+	@Override
+	public List<String> getMessageIds(EbMSMessageContext messageContext, EbMSMessageStatus status, int maxNr) throws DAOException
+	{
+		Connection c = null;
+		PreparedStatement ps = null;
+		try
+		{
+			List<String> result = new ArrayList<String>();
+			c = connectionManager.getConnection();
+			String messageContextFilter = addMessageContextFilter(messageContext);
+			ps = c.prepareStatement(
+				getMessageIdsQuery(messageContextFilter,status,maxNr)
+			);
+			addMessageContextFilter(messageContext,ps);
+			if (ps.execute())
+			{
+				ResultSet rs = ps.getResultSet();
+				while (rs.next())
+					result.add(rs.getString("message_id"));
+			}
+			return result;
+		}
+		catch (SQLException e)
+		{
+			throw new DAOException(e);
+		}
+		finally
+		{
+			connectionManager.close(ps);
+			connectionManager.close();
+		}
+	}
+
+	@Override
+	public void insertMessage(Date timestamp, EbMSMessage message, EbMSMessageStatus status) throws DAOException
+	{
+		Connection c = null;
+		PreparedStatement ps = null;
+		try
+		{
+			c = connectionManager.getConnection(true);
+			ps = c.prepareStatement
+			(
+				"insert into ebms_message (" +
+					"time_stamp," +
+					"cpa_id," +
+					"conversation_id," +
+					"sequence_nr," +
+					"message_id," +
+					"ref_to_message_id," +
+					"time_to_live," +
+					"from_role," +
+					"to_role," +
+					"service," +
+					"action," +
+					"content," +
+					"status," +
+					"status_time" +
+				") values (?,?,?,?,?,?,?,?,?,?,?,?,?," + (status == null ? "null" : getTimestampFunction()) + ")",
+				new int[]{5,6}
+			);
+			ps.setTimestamp(1,new Timestamp(timestamp.getTime()));
+			MessageHeader messageHeader = message.getMessageHeader();
+			ps.setString(2,messageHeader.getCPAId());
+			ps.setString(3,messageHeader.getConversationId());
+			if (message.getMessageOrder() == null || message.getMessageOrder().getSequenceNumber() == null)
+				ps.setNull(4,java.sql.Types.BIGINT);
+			else
+				ps.setLong(4,message.getMessageOrder().getSequenceNumber().getValue().longValue());
+			ps.setString(5,messageHeader.getMessageData().getMessageId());
+			ps.setString(6,messageHeader.getMessageData().getRefToMessageId());
+			ps.setTimestamp(7,messageHeader.getMessageData().getTimeToLive() == null ? null : new Timestamp(messageHeader.getMessageData().getTimeToLive().toGregorianCalendar().getTimeInMillis()));
+			ps.setString(8,messageHeader.getFrom().getRole());
+			ps.setString(9,messageHeader.getTo().getRole());
+			ps.setString(10,EbMSMessageUtils.toString(messageHeader.getService()));
+			ps.setString(11,messageHeader.getAction());
+			ps.setString(12,DOMUtils.toString(message.getDocument(),"UTF-8"));
+			if (status == null)
+				ps.setNull(13,java.sql.Types.INTEGER);
+			else
+				ps.setInt(13,status.id());
+			ps.executeUpdate();
+			ResultSet rs = ps.getGeneratedKeys();
+			if (rs.next())
+			{
+				insertAttachments(rs.getString(1),rs.getInt(2),message.getAttachments());
+				connectionManager.commit();
+			}
+			else
+			{
+				connectionManager.rollback();
+				throw new DAOException("No key found!");
+			}
+		}
+		catch (SQLException e)
+		{
+			connectionManager.rollback();
+			throw new DAOException(e);
+		}
+		catch (IOException e)
+		{
+			connectionManager.rollback();
+			throw new DAOException(e);
+		}
+		catch (TransformerException e)
+		{
+			connectionManager.rollback();
+			throw new DAOException(e);
+		}
+		finally
+		{
+			connectionManager.close(ps);
+			connectionManager.close(true);
+		}
+	}
+
+	@Override
+	public void insertDuplicateMessage(Date timestamp, EbMSMessage message) throws DAOException
+	{
+		Connection c = null;
+		PreparedStatement ps = null;
+		try
+		{
+			c = connectionManager.getConnection(true);
+			ps = c.prepareStatement
+			(
+				"insert into ebms_message (" +
+					"time_stamp," +
+					"cpa_id," +
+					"conversation_id," +
+					"sequence_nr," +
+					"message_id," +
+					"message_nr," +
+					"ref_to_message_id," +
+					"time_to_live," +
+					"from_role," +
+					"to_role," +
+					"service," +
+					"action," +
+					"content" +
+				") values (?,?,?,?,?,(select max(message_nr) + 1 from ebms_message where message_id = ?),?,?,?,?,?,?,?)",
+				new int[]{5,6}
+			);
+			ps.setTimestamp(1,new Timestamp(timestamp.getTime()));
+			MessageHeader messageHeader = message.getMessageHeader();
+			ps.setString(2,messageHeader.getCPAId());
+			ps.setString(3,messageHeader.getConversationId());
+			if (message.getMessageOrder() == null || message.getMessageOrder().getSequenceNumber() == null)
+				ps.setNull(4,java.sql.Types.BIGINT);
+			else
+				ps.setLong(4,message.getMessageOrder().getSequenceNumber().getValue().longValue());
+			ps.setString(5,messageHeader.getMessageData().getMessageId());
+			ps.setString(6,messageHeader.getMessageData().getMessageId());
+			ps.setString(7,messageHeader.getMessageData().getRefToMessageId());
+			ps.setTimestamp(8,messageHeader.getMessageData().getTimeToLive() == null ? null : new Timestamp(messageHeader.getMessageData().getTimeToLive().toGregorianCalendar().getTimeInMillis()));
+			ps.setString(9,messageHeader.getFrom().getRole());
+			ps.setString(10,messageHeader.getTo().getRole());
+			ps.setString(11,EbMSMessageUtils.toString(messageHeader.getService()));
+			ps.setString(12,messageHeader.getAction());
+			ps.setString(13,DOMUtils.toString(message.getDocument(),"UTF-8"));
+			ps.executeUpdate();
+			ResultSet rs = ps.getGeneratedKeys();
+			if (rs.next())
+			{
+				insertAttachments(rs.getString(1),rs.getInt(2),message.getAttachments());
+				connectionManager.commit();
+			}
+			else
+			{
+				connectionManager.rollback();
+				throw new DAOException("No key found!");
+			}
+		}
+		catch (SQLException e)
+		{
+			connectionManager.rollback();
+			throw new DAOException(e);
+		}
+		catch (IOException e)
+		{
+			connectionManager.rollback();
+			throw new DAOException(e);
+		}
+		catch (TransformerException e)
+		{
+			connectionManager.rollback();
+			throw new DAOException(e);
+		}
+		finally
+		{
+			connectionManager.close(ps);
+			connectionManager.close(true);
+		}
+	}
+	
+	protected void insertAttachments(String messageId, int messageNr, List<EbMSAttachment> attachments) throws SQLException, IOException
+	{
+		Connection c = null;
+		PreparedStatement ps = null;
+		try
+		{
+			c = connectionManager.getConnection(false);
+			ps = c.prepareStatement(
+				"insert into ebms_attachment (" +
+					"message_id," +
+					"message_nr," +
+					"name," +
+					"content_id," +
+					"content_type," +
+					"content" +
+				") values (?,?,?,?,?,?)"
+			);
+			for (EbMSAttachment attachment : attachments)
+			{
+				ps.setString(1,messageId);
+				ps.setInt(2,messageNr);
+				ps.setString(3,attachment.getName());
+				ps.setString(4,attachment.getContentId());
+				ps.setString(5,attachment.getContentType().split(";")[0].trim());
+				ps.setBytes(6,IOUtils.toByteArray(attachment.getInputStream()));
+				ps.addBatch();
+			}
+			if (attachments.size() > 0)
+				ps.executeBatch();
+		}
+		finally
+		{
+			connectionManager.close(ps);
+			connectionManager.close(false);
+		}
+	}
+
+	@Override
+	public void updateMessage(String messageId, EbMSMessageStatus oldStatus, EbMSMessageStatus newStatus) throws DAOException
+	{
+		Connection c = null;
+		PreparedStatement ps = null;
+		try
+		{
+			c = connectionManager.getConnection();
+			ps  = c.prepareStatement(
+				"update ebms_message" +
+				" set status = ?," +
+				" status_time = " + getTimestampFunction() +
+				" where message_id = ?" +
+				" and message_nr = 0" +
+				(oldStatus == null ? " and status is null" : " and status = " + oldStatus.id())
+			);
+			ps.setInt(1,newStatus.id());
+			ps.setString(2,messageId);
+			ps.executeUpdate();
+		}
+		catch (SQLException e)
+		{
+			throw new DAOException(e);
+		}
+		finally
+		{
+			connectionManager.close(ps);
+			connectionManager.close();
+		}
+	}
+
+	@Override
+	public void updateMessages(List<String> messageIds, EbMSMessageStatus oldStatus, EbMSMessageStatus newStatus) throws DAOException
+	{
+		Connection c = null;
+		PreparedStatement ps = null;
+		try
+		{
+			c = connectionManager.getConnection();
+			ps  = c.prepareStatement(
+				"update ebms_message" +
+				" set status = " + newStatus.id() + "," +
+				" status_time = " + getTimestampFunction() +
+				" where message_id = ?" +
+				" and message_nr = 0" +
+				(oldStatus == null ? " and status is null" : " and status = " + oldStatus.id())
+			);
+			for (String messageId : messageIds)
+			{
+				ps.setString(1,messageId);
+				ps.addBatch();
+			}
+			if (messageIds.size() > 0)
+				ps.executeBatch();
+		}
+		catch (SQLException e)
+		{
+			throw new DAOException(e);
+		}
+		finally
+		{
+			connectionManager.close(ps);
+			connectionManager.close();
+		}
+	}
+
+	@Override
 	public List<EbMSEvent> getLatestEventsByEbMSMessageIdBefore(Date timestamp, EbMSEventStatus status) throws DAOException
 	{
 		Connection c = null;
@@ -599,320 +977,6 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 		}
 	}
 	
-	@Override
-	public void updateEvent(Date timestamp, String messageId, EbMSEventStatus status, String errorMessage) throws DAOException
-	{
-		Connection c = null;
-		PreparedStatement ps = null;
-		try
-		{
-			c = connectionManager.getConnection();
-			ps  = c.prepareStatement(
-				"update ebms_event set" +
-				" status = ?," +
-				" status_time = " + getTimestampFunction() + "," +
-				" error_message = ?" +
-				" where message_id = ?" +
-				" and time = ?"
-			);
-			ps.setInt(1,status.id());
-			ps.setString(2,errorMessage);
-			ps.setString(3,messageId);
-			ps.setTimestamp(4,new Timestamp(timestamp.getTime()));
-			ps.executeUpdate();
-		}
-		catch (SQLException e)
-		{
-			throw new DAOException(e);
-		}
-		finally
-		{
-			connectionManager.close(ps);
-			connectionManager.close();
-		}
-	}
-	
-	@Override
-	public void deleteEventsBefore(Date timestamp, String messageId, EbMSEventStatus status) throws DAOException
-	{
-		Connection c = null;
-		PreparedStatement ps = null;
-		try
-		{
-			c = connectionManager.getConnection();
-			ps  = c.prepareStatement(
-				"delete from ebms_event" +
-				" where message_id = ?" +
-				" and time < ?" +
-				" and status = ?"
-			);
-			ps.setString(1,messageId);
-			ps.setTimestamp(2,new Timestamp(timestamp.getTime()));
-			ps.setInt(3,status.id());
-			ps.executeUpdate();
-		}
-		catch (SQLException e)
-		{
-			throw new DAOException(e);
-		}
-		finally
-		{
-			connectionManager.close(ps);
-			connectionManager.close();
-		}
-	}
-	
-	protected PreparedStatement getInsertMessagePreparedStatement(Connection connection, EbMSMessageStatus status) throws SQLException
-	{
-		return connection.prepareStatement
-		(
-			"insert into ebms_message (" +
-				"time_stamp," +
-				"cpa_id," +
-				"conversation_id," +
-				"sequence_nr," +
-				"message_id," +
-				"ref_to_message_id," +
-				"time_to_live," +
-				"from_role," +
-				"to_role," +
-				"service," +
-				"action," +
-				"content," +
-				"status," +
-				"status_time" +
-			") values (?,?,?,?,?,?,?,?,?,?,?,?,?," + (status == null ? "null" : getTimestampFunction()) + ")",
-			new int[]{5,6}
-		);
-	}
-
-	protected PreparedStatement getInsertDuplicateMessagePreparedStatement(Connection connection) throws SQLException
-	{
-		return connection.prepareStatement
-		(
-			"insert into ebms_message (" +
-				"time_stamp," +
-				"cpa_id," +
-				"conversation_id," +
-				"sequence_nr," +
-				"message_id," +
-				"message_nr," +
-				"ref_to_message_id," +
-				"time_to_live," +
-				"from_role," +
-				"to_role," +
-				"service," +
-				"action," +
-				"content" +
-			") values (?,?,?,?,?,(select max(message_nr) + 1 from ebms_message where message_id = ?),?,?,?,?,?,?,?)",
-			new int[]{5,6}
-		);
-	}
-
-	@Override
-	public void insertMessage(Date timestamp, EbMSMessage message, EbMSMessageStatus status) throws DAOException
-	{
-		Connection c = null;
-		PreparedStatement ps = null;
-		try
-		{
-			c = connectionManager.getConnection(true);
-			ps = getInsertMessagePreparedStatement(c,status);
-			ps.setTimestamp(1,new Timestamp(timestamp.getTime()));
-			MessageHeader messageHeader = message.getMessageHeader();
-			ps.setString(2,messageHeader.getCPAId());
-			ps.setString(3,messageHeader.getConversationId());
-			if (message.getMessageOrder() == null || message.getMessageOrder().getSequenceNumber() == null)
-				ps.setNull(4,java.sql.Types.BIGINT);
-			else
-				ps.setLong(4,message.getMessageOrder().getSequenceNumber().getValue().longValue());
-			ps.setString(5,messageHeader.getMessageData().getMessageId());
-			ps.setString(6,messageHeader.getMessageData().getRefToMessageId());
-			ps.setTimestamp(7,messageHeader.getMessageData().getTimeToLive() == null ? null : new Timestamp(messageHeader.getMessageData().getTimeToLive().toGregorianCalendar().getTimeInMillis()));
-			ps.setString(8,messageHeader.getFrom().getRole());
-			ps.setString(9,messageHeader.getTo().getRole());
-			ps.setString(10,EbMSMessageUtils.toString(messageHeader.getService()));
-			ps.setString(11,messageHeader.getAction());
-			ps.setString(12,DOMUtils.toString(message.getDocument(),"UTF-8"));
-			if (status == null)
-				ps.setNull(13,java.sql.Types.INTEGER);
-			else
-				ps.setInt(13,status.id());
-			ps.executeUpdate();
-			ResultSet rs = ps.getGeneratedKeys();
-			if (rs.next())
-			{
-				String messageId = rs.getString(1);
-				int messageNr = rs.getInt(2);
-				connectionManager.close(ps);
-				ps  = c.prepareStatement(
-					"insert into ebms_attachment (" +
-						"message_id," +
-						"message_nr," +
-						"name," +
-						"content_id," +
-						"content_type," +
-						"content" +
-					") values (?,?,?,?,?,?)"
-				);
-				for (EbMSAttachment attachment : message.getAttachments())
-				{
-					ps.setString(1,messageId);
-					ps.setInt(2,messageNr);
-					ps.setString(3,attachment.getName());
-					ps.setString(4,attachment.getContentId());
-					ps.setString(5,attachment.getContentType().split(";")[0].trim());
-					ps.setBytes(6,IOUtils.toByteArray(attachment.getInputStream()));
-					ps.addBatch();
-				}
-				if (message.getAttachments().size() > 0)
-					ps.executeBatch();
-				connectionManager.commit();
-			}
-			else
-			{
-				connectionManager.rollback();
-				throw new DAOException("No key found!");
-			}
-		}
-		catch (SQLException e)
-		{
-			connectionManager.rollback();
-			throw new DAOException(e);
-		}
-		catch (IOException e)
-		{
-			connectionManager.rollback();
-			throw new DAOException(e);
-		}
-		catch (TransformerException e)
-		{
-			connectionManager.rollback();
-			throw new DAOException(e);
-		}
-		finally
-		{
-			connectionManager.close(ps);
-			connectionManager.close(true);
-		}
-	}
-
-	@Override
-	public void insertDuplicateMessage(Date timestamp, EbMSMessage message) throws DAOException
-	{
-		Connection c = null;
-		PreparedStatement ps = null;
-		try
-		{
-			c = connectionManager.getConnection(true);
-			ps = getInsertDuplicateMessagePreparedStatement(c);
-			ps.setTimestamp(1,new Timestamp(timestamp.getTime()));
-			MessageHeader messageHeader = message.getMessageHeader();
-			ps.setString(2,messageHeader.getCPAId());
-			ps.setString(3,messageHeader.getConversationId());
-			if (message.getMessageOrder() == null || message.getMessageOrder().getSequenceNumber() == null)
-				ps.setNull(4,java.sql.Types.BIGINT);
-			else
-				ps.setLong(4,message.getMessageOrder().getSequenceNumber().getValue().longValue());
-			ps.setString(5,messageHeader.getMessageData().getMessageId());
-			ps.setString(6,messageHeader.getMessageData().getMessageId());
-			ps.setString(7,messageHeader.getMessageData().getRefToMessageId());
-			ps.setTimestamp(8,messageHeader.getMessageData().getTimeToLive() == null ? null : new Timestamp(messageHeader.getMessageData().getTimeToLive().toGregorianCalendar().getTimeInMillis()));
-			ps.setString(9,messageHeader.getFrom().getRole());
-			ps.setString(10,messageHeader.getTo().getRole());
-			ps.setString(11,EbMSMessageUtils.toString(messageHeader.getService()));
-			ps.setString(12,messageHeader.getAction());
-			ps.setString(13,DOMUtils.toString(message.getDocument(),"UTF-8"));
-			ps.executeUpdate();
-			ResultSet rs = ps.getGeneratedKeys();
-			if (rs.next())
-			{
-				String messageId = rs.getString(1);
-				int messageNr = rs.getInt(2);
-				connectionManager.close(ps);
-				ps  = c.prepareStatement(
-					"insert into ebms_attachment (" +
-						"message_id," +
-						"message_nr," +
-						"name," +
-						"content_id," +
-						"content_type," +
-						"content" +
-					") values (?,?,?,?,?,?)"
-				);
-				for (EbMSAttachment attachment : message.getAttachments())
-				{
-					ps.setString(1,messageId);
-					ps.setInt(2,messageNr);
-					ps.setString(3,attachment.getName());
-					ps.setString(4,attachment.getContentId());
-					ps.setString(5,attachment.getContentType().split(";")[0].trim());
-					ps.setBytes(6,IOUtils.toByteArray(attachment.getInputStream()));
-					ps.addBatch();
-				}
-				if (message.getAttachments().size() > 0)
-					ps.executeBatch();
-				connectionManager.commit();
-			}
-			else
-			{
-				connectionManager.rollback();
-				throw new DAOException("No key found!");
-			}
-		}
-		catch (SQLException e)
-		{
-			connectionManager.rollback();
-			throw new DAOException(e);
-		}
-		catch (IOException e)
-		{
-			connectionManager.rollback();
-			throw new DAOException(e);
-		}
-		catch (TransformerException e)
-		{
-			connectionManager.rollback();
-			throw new DAOException(e);
-		}
-		finally
-		{
-			connectionManager.close(ps);
-			connectionManager.close(true);
-		}
-	}
-	
-	@Override
-	public void updateMessageStatus(String messageId, EbMSMessageStatus oldStatus, EbMSMessageStatus newStatus) throws DAOException
-	{
-		Connection c = null;
-		PreparedStatement ps = null;
-		try
-		{
-			c = connectionManager.getConnection();
-			ps  = c.prepareStatement(
-				"update ebms_message" +
-				" set status = ?," + 
-				" status_time = " + getTimestampFunction() +
-				" where message_id = ?" +
-				" and message_nr = 0" +
-				(oldStatus == null ? " and status is null" : " and status = " + oldStatus.id())
-			);
-			ps.setInt(1,newStatus.id());
-			ps.setString(2,messageId);
-			ps.executeUpdate();
-		}
-		catch (SQLException e)
-		{
-			throw new DAOException(e);
-		}
-		finally
-		{
-			connectionManager.close(ps);
-			connectionManager.close();
-		}
-	}
-
 	@Override
 	public void insertEvent(String messageId, EbMSEventType type, String uri) throws DAOException
 	{
@@ -1016,6 +1080,39 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	}
 
 	@Override
+	public void updateEvent(Date timestamp, String messageId, EbMSEventStatus status, String errorMessage) throws DAOException
+	{
+		Connection c = null;
+		PreparedStatement ps = null;
+		try
+		{
+			c = connectionManager.getConnection();
+			ps  = c.prepareStatement(
+				"update ebms_event set" +
+				" status = ?," +
+				" status_time = " + getTimestampFunction() + "," +
+				" error_message = ?" +
+				" where message_id = ?" +
+				" and time = ?"
+			);
+			ps.setInt(1,status.id());
+			ps.setString(2,errorMessage);
+			ps.setString(3,messageId);
+			ps.setTimestamp(4,new Timestamp(timestamp.getTime()));
+			ps.executeUpdate();
+		}
+		catch (SQLException e)
+		{
+			throw new DAOException(e);
+		}
+		finally
+		{
+			connectionManager.close(ps);
+			connectionManager.close();
+		}
+	}
+	
+	@Override
 	public void deleteEvents(String messageId, EbMSEventStatus status) throws DAOException
 	{
 		Connection c = null;
@@ -1044,170 +1141,22 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	}
 
 	@Override
-	public List<String> getMessageIds(EbMSMessageContext messageContext, EbMSMessageStatus status) throws DAOException
+	public void deleteEventsBefore(Date timestamp, String messageId, EbMSEventStatus status) throws DAOException
 	{
 		Connection c = null;
 		PreparedStatement ps = null;
 		try
 		{
-			List<String> result = new ArrayList<String>();
 			c = connectionManager.getConnection();
 			ps  = c.prepareStatement(
-				"select message_id" +
-				" from ebms_message" +
-				" where message_nr = 0" +
-				" and status = " + status.id() +
-				addMessageContextFilter(messageContext) +
-				" order by time_stamp asc"
-			);
-			addMessageContextFilter(messageContext,ps);
-			if (ps.execute())
-			{
-				ResultSet rs = ps.getResultSet();
-				while (rs.next())
-					result.add(rs.getString("message_id"));
-			}
-			return result;
-		}
-		catch (SQLException e)
-		{
-			throw new DAOException(e);
-		}
-		finally
-		{
-			connectionManager.close(ps);
-			connectionManager.close();
-		}
-	}
-
-	public abstract String getMessageIdsQuery(String messageContextFilter, EbMSMessageStatus status, int maxNr);
-
-	@Override
-	public List<String> getMessageIds(EbMSMessageContext messageContext, EbMSMessageStatus status, int maxNr) throws DAOException
-	{
-		Connection c = null;
-		PreparedStatement ps = null;
-		try
-		{
-			List<String> result = new ArrayList<String>();
-			c = connectionManager.getConnection();
-			String messageContextFilter = addMessageContextFilter(messageContext);
-			ps = c.prepareStatement(
-				getMessageIdsQuery(messageContextFilter,status,maxNr)
-			);
-			addMessageContextFilter(messageContext,ps);
-			if (ps.execute())
-			{
-				ResultSet rs = ps.getResultSet();
-				while (rs.next())
-					result.add(rs.getString("message_id"));
-			}
-			return result;
-		}
-		catch (SQLException e)
-		{
-			throw new DAOException(e);
-		}
-		finally
-		{
-			connectionManager.close(ps);
-			connectionManager.close();
-		}
-	}
-
-	private EbMSMessageContext getMessageContext(String messageId) throws SQLException
-	{
-		Connection c = null;
-		PreparedStatement ps = null;
-		try
-		{
-			EbMSMessageContext result = null;
-			c = connectionManager.getConnection();
-			ps = c.prepareStatement(
-				"select cpa_id," +
-				" from_role," +
-				" to_role," +
-				" service," +
-				" action," +
-				" time_stamp," +
-				" conversation_id," +
-				" message_id," +
-				" ref_to_message_id," +
-				" sequence_nr" +
-				" from ebms_message" + 
+				"delete from ebms_event" +
 				" where message_id = ?" +
-				" and message_nr = 0"
+				" and time < ?" +
+				" and status = ?"
 			);
 			ps.setString(1,messageId);
-			if (ps.execute())
-			{
-				ResultSet rs = ps.getResultSet();
-				if (rs.next())
-				{
-					result = new EbMSMessageContext();
-					result.setCpaId(rs.getString("cpa_id"));
-					result.setFromRole(rs.getString("from_role"));
-					result.setToRole(rs.getString("to_role"));
-					result.setService(rs.getString("service"));
-					result.setAction(rs.getString("action"));
-					result.setTimestamp(rs.getTimestamp("time_stamp"));
-					result.setConversationId(rs.getString("conversation_id"));
-					result.setMessageId(rs.getString("message_id"));
-					result.setRefToMessageId(rs.getString("ref_to_message_id"));
-					result.setSequenceNr(rs.getInt("sequence_nr"));
-				}
-			}
-			return result;
-		}
-		finally
-		{
-			connectionManager.close(ps);
-			connectionManager.close();
-		}
-	}
-
-	@Override
-	public EbMSMessageContent getMessageContent(String messageId) throws DAOException
-	{
-		try
-		{
-			EbMSMessageContext messageContext = getMessageContext(messageId);
-			if (messageContext == null)
-				return null;
-			List<EbMSAttachment> attachments = getAttachments(messageId);
-			List<EbMSDataSource> dataSources = new ArrayList<EbMSDataSource>();
-			for (DataSource dataSource : attachments)
-				dataSources.add(new EbMSDataSource(dataSource.getName(),dataSource.getContentType(),IOUtils.toByteArray(dataSource.getInputStream())));
-			return new EbMSMessageContent(messageContext,dataSources);
-		}
-		catch (SQLException e)
-		{
-			throw new DAOException(e);
-		}
-		catch (IOException e)
-		{
-			throw new DAOException(e);
-		}
-	}
-
-	@Override
-	public void updateMessage(String messageId, EbMSMessageStatus oldStatus, EbMSMessageStatus newStatus) throws DAOException
-	{
-		Connection c = null;
-		PreparedStatement ps = null;
-		try
-		{
-			c = connectionManager.getConnection();
-			ps  = c.prepareStatement(
-				"update ebms_message" +
-				" set status = ?," +
-				" status_time = " + getTimestampFunction() +
-				" where message_id = ?" +
-				" and message_nr = 0" +
-				(oldStatus == null ? " and status is null" : " and status = " + oldStatus.id())
-			);
-			ps.setInt(1,newStatus.id());
-			ps.setString(2,messageId);
+			ps.setTimestamp(2,new Timestamp(timestamp.getTime()));
+			ps.setInt(3,status.id());
 			ps.executeUpdate();
 		}
 		catch (SQLException e)
@@ -1220,42 +1169,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 			connectionManager.close();
 		}
 	}
-
-	@Override
-	public void updateMessages(List<String> messageIds, EbMSMessageStatus oldStatus, EbMSMessageStatus newStatus) throws DAOException
-	{
-		Connection c = null;
-		PreparedStatement ps = null;
-		try
-		{
-			c = connectionManager.getConnection();
-			ps  = c.prepareStatement(
-				"update ebms_message" +
-				" set status = " + newStatus.id() + "," +
-				" status_time = " + getTimestampFunction() +
-				" where message_id = ?" +
-				" and message_nr = 0" +
-				(oldStatus == null ? " and status is null" : " and status = " + oldStatus.id())
-			);
-			for (String messageId : messageIds)
-			{
-				ps.setString(1,messageId);
-				ps.addBatch();
-			}
-			if (messageIds.size() > 0)
-				ps.executeBatch();
-		}
-		catch (SQLException e)
-		{
-			throw new DAOException(e);
-		}
-		finally
-		{
-			connectionManager.close(ps);
-			connectionManager.close();
-		}
-	}
-
+	
 	protected List<EbMSAttachment> getAttachments(String messageId) throws SQLException
 	{
 		Connection c = null;
