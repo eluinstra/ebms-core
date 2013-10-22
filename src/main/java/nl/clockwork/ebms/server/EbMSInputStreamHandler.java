@@ -55,7 +55,6 @@ public abstract class EbMSInputStreamHandler
 
 			EbMSMessageReader messageReader = new EbMSMessageReader(getRequestHeader("Content-Type"));
 			EbMSDocument in = messageReader.read(request);
-			//request.close();
 			if (logger.isDebugEnabled())
 				logger.debug("IN:\n" + DOMUtils.toString(in.getMessage()));
 			EbMSDocument out = messageProcessor.processRequest(in);
@@ -73,7 +72,6 @@ public abstract class EbMSInputStreamHandler
 				writeResponseHeader("SOAPAction",Constants.EBMS_SOAP_ACTION);
 				OutputStream response = getOutputStream();
 				DOMUtils.write(out.getMessage(),response);
-				//response.close();
 			}
 		}
 		catch (Exception e)
@@ -87,7 +85,6 @@ public abstract class EbMSInputStreamHandler
 				writeResponseHeader("Content-Type","text/xml");
 				OutputStream response = getOutputStream();
 				DOMUtils.write(soapFault,response);
-				//response.close();
 			}
 			catch (Exception e1)
 			{
