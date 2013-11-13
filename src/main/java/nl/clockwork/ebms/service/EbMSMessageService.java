@@ -51,6 +51,11 @@ public interface EbMSMessageService
 	void processMessages(@WebParam(name="MessageId") List<String> messageIds) throws EbMSMessageServiceException;
 
 	@WebResult(name="MessageStatus")
+	@WebMethod(operationName="GetMessageStatusByMessageId")
+	MessageStatus getMessageStatus(@WebParam(name="MessageId") String messageId) throws EbMSMessageServiceException;
+
+	@WebResult(name="MessageStatus")
 	@WebMethod(operationName="GetMessageStatus")
 	MessageStatus getMessageStatus(@WebParam(name="CPAId") String cpaId, @WebParam(name="FromParty") String fromParty, @WebParam(name="ToParty") String toParty, @WebParam(name="MessageId") String messageId) throws EbMSMessageServiceException;
+
 }

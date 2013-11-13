@@ -173,6 +173,31 @@ public class EbMSMessageServiceImpl implements EbMSMessageService
 	}
 	
 	@Override
+	public MessageStatus getMessageStatus(String messageId) throws EbMSMessageServiceException
+	{
+		try
+		{
+			EbMSMessageContext context = ebMSDAO.getMessageContext(messageId);
+			CollaborationProtocolAgreement cpa = ebMSDAO.getCPA(context.getCpaId());
+			EbMSMessage request = EbMSMessageUtils.createEbMSStatusRequest(cpa,CPAUtils.toString(CPAUtils.getSendingPartyInfo(cpa,context.getFromRole(),context.getService(),context.getAction()).getPartyId().get(0)),CPAUtils.toString(CPAUtils.getReceivingPartyInfo(cpa,context.getToRole(),context.getService(),context.getAction()).getPartyId().get(0)),messageId);
+			EbMSMessage response = deliveryManager.sendMessage(cpa,request);
+			if (response != null)
+			{
+				if (EbMSAction.STATUS_RESPONSE.action().equals(response.getMessageHeader().getAction()) && response.getStatusResponse() != null)
+					return new MessageStatus(response.getStatusResponse().getTimestamp() == null ? null : response.getStatusResponse().getTimestamp().toGregorianCalendar().getTime(),EbMSMessageStatus.get(response.getStatusResponse().getMessageStatus()));
+				else
+					throw new EbMSMessageServiceException("No valid response received!");
+			}
+			else
+				throw new EbMSMessageServiceException("No response received!");
+		}
+		catch (Exception e)
+		{
+			throw new EbMSMessageServiceException(e);
+		}
+	}
+
+	@Override
 	public MessageStatus getMessageStatus(String cpaId, String fromParty, String toParty, String messageId) throws EbMSMessageServiceException
 	{
 		try

@@ -60,7 +60,12 @@ public class CPAUtils
 		;
 	}
 
-	private static String toString(ServiceType service)
+	public static String toString(PartyId partyId)
+	{
+		return (partyId.getType() == null ? "" : partyId.getType() + ":") + partyId.getValue();
+	}
+
+	public static String toString(ServiceType service)
 	{
 		return serviceToString(service.getType(),service.getValue());
 	}
@@ -90,7 +95,7 @@ public class CPAUtils
 	{
 		for (PartyInfo partyInfo : cpa.getPartyInfo())
 			for (PartyId cpaPartyId : partyInfo.getPartyId())
-				if (partyId.equals((cpaPartyId.getType() == null ? "" : cpaPartyId.getType() + ":") + cpaPartyId.getValue()))
+				if (partyId.equals(toString(cpaPartyId)))
 					return partyInfo;
 		return null;
 	}
