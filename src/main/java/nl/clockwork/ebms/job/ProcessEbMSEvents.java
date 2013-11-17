@@ -109,7 +109,7 @@ public class ProcessEbMSEvents implements Job
 							logger.info("Expiring message " +  message.getMessageHeader().getMessageData().getMessageId());
 							updateEvent(event,EbMSEventStatus.PROCESSED,null);
 							ebMSDAO.deleteEvents(event.getEbMSMessageId(),EbMSEventStatus.UNPROCESSED);
-							ebMSDAO.updateMessageStatus(event.getEbMSMessageId(),null,EbMSMessageStatus.NOT_ACKNOWLEDGED);
+							ebMSDAO.updateMessageStatus(event.getEbMSMessageId(),EbMSMessageStatus.SENT,EbMSMessageStatus.NOT_ACKNOWLEDGED);
 							eventListener.onMessageNotAcknowledged(message.getMessageHeader().getMessageData().getMessageId());
 						}
 					}

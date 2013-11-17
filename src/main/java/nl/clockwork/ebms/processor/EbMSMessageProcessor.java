@@ -360,7 +360,7 @@ public class EbMSMessageProcessor
 						if (id != null)
 						{
 							ebMSDAO.deleteEvents(id,EbMSEventStatus.UNPROCESSED);
-							ebMSDAO.updateMessageStatus(id,null,status);
+							ebMSDAO.updateMessageStatus(id,EbMSMessageStatus.SENT,status);
 							if (status.equals(EbMSMessageStatus.ACKNOWLEDGED))
 								eventListener.onMessageAcknowledged(message.getMessageHeader().getMessageData().getRefToMessageId());
 							else if (status.equals(EbMSMessageStatus.DELIVERY_FAILED))
