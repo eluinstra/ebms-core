@@ -91,7 +91,7 @@ public class EbMSMessageServiceImpl implements EbMSMessageService
 					@Override
 					public void doInTransaction()
 					{
-						long id = ebMSDAO.insertMessage(new Date(),message,null);
+						long id = ebMSDAO.insertMessage(new Date(),message,EbMSMessageStatus.SENT);
 						List<EbMSEvent> events = EbMSMessageUtils.getEbMSSendEvents(ebMSDAO.getCPA(message.getMessageHeader().getCPAId()),id,message.getMessageHeader());
 						events.add(new EbMSEvent(id,message.getMessageHeader().getMessageData().getTimeToLive().toGregorianCalendar().getTime(),EbMSEventType.EXPIRE));
 						ebMSDAO.insertEvents(events);
