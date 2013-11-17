@@ -40,7 +40,7 @@ public abstract class AbstractDAOFactory<T> implements FactoryBean<T>
 			return createMssqlDAO();
 		else if ("com.microsoft.sqlserver.jdbc.SQLServerDriver".equals(((ComboPooledDataSource)dataSource).getDriverClass()))
 			return createMssqlDAO();
-		return null;
+		throw new RuntimeException("SQL Driver " + ((ComboPooledDataSource)dataSource).getDriverClass() + " not recognized!");
 	}
 
 	@Override
