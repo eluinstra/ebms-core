@@ -71,7 +71,6 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 				"time_to_live," +
 				"from_role," +
 				"to_role," +
-				"service_type," +
 				"service," +
 				"action," +
 				"signature," +
@@ -82,7 +81,7 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 				"content," +
 				"status," +
 				"status_time" +
-			") values (seq_ebms_message_id.nextval,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?," + (status == null ? "null" : getTimestampFunction()) + ")",
+			") values (seq_ebms_message_id.nextval,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?," + (status == null ? "null" : getTimestampFunction()) + ")",
 			//new String[]{"id"}
 			new int[]{1}
 		);
@@ -105,7 +104,6 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 				"time_to_live," +
 				"from_role," +
 				"to_role," +
-				"service_type," +
 				"service," +
 				"action," +
 				"signature," +
@@ -114,7 +112,7 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 				"message_order," +
 				"ack_requested," +
 				"content" +
-			") values (seq_ebms_message_id.nextval,?,?,?,?,?,(select max(message_nr) + 1 from ebms_message where message_id = ?),?,?,?,?,?,?,?,?,?,?,?,?,?)",
+			") values (seq_ebms_message_id.nextval,?,?,?,?,?,(select max(message_nr) + 1 from ebms_message where message_id = ?),?,?,?,?,?,?,?,?,?,?,?,?)",
 			//new String[]{"id"}
 			new int[]{1}
 		);

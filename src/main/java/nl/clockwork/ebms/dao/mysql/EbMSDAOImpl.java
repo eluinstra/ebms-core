@@ -70,7 +70,6 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 				"time_to_live," +
 				"from_role," +
 				"to_role," +
-				"service_type," +
 				"service," +
 				"action," +
 				"signature," +
@@ -79,7 +78,7 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 				"message_order," +
 				"ack_requested," +
 				"content" +
-			") values (?,?,?,?,?,(select nr from (select max(message_nr) + 1 as nr from ebms_message where message_id = ?) as c),?,?,?,?,?,?,?,?,?,?,?,?,?)",
+			") values (?,?,?,?,?,(select nr from (select max(message_nr) + 1 as nr from ebms_message where message_id = ?) as c),?,?,?,?,?,?,?,?,?,?,?,?)",
 			Statement.RETURN_GENERATED_KEYS
 		);
 	}
