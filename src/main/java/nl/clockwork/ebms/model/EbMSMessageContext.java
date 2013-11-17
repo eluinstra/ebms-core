@@ -15,12 +15,15 @@
  */
 package nl.clockwork.ebms.model;
 
+import java.io.Serializable;
+
 import nl.clockwork.ebms.util.EbMSMessageUtils;
 
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageHeader;
 
-public class EbMSMessageContext
+public class EbMSMessageContext implements Serializable
 {
+	private static final long serialVersionUID = 1L;
 	private String cpaId;
 	private String fromRole;
 	private String toRole;
