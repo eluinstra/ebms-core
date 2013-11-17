@@ -16,6 +16,7 @@
 package nl.clockwork.ebms.model;
 
 import java.io.Serializable;
+import java.util.Date;
 
 import nl.clockwork.ebms.util.EbMSMessageUtils;
 
@@ -29,7 +30,7 @@ public class EbMSMessageContext implements Serializable
 	private String toRole;
 	private String service;
 	private String action;
-	//private Date timestamp;
+	private Date timestamp;
 	private String conversationId;
 	private String messageId;
 	private String refToMessageId;
@@ -66,11 +67,16 @@ public class EbMSMessageContext implements Serializable
 	
 	public EbMSMessageContext(String cpaId, String fromRole, String toRole, String service, String action, String conversationId, String messageId, String refToMessageId, Integer sequenceNr)
 	{
+		this(cpaId,fromRole,toRole,service,action,null,conversationId,null,null,null);
+	}
+	public EbMSMessageContext(String cpaId, String fromRole, String toRole, String service, String action, Date timestamp, String conversationId, String messageId, String refToMessageId, Integer sequenceNr)
+	{
 		this.cpaId = cpaId;
 		this.fromRole = fromRole;
 		this.toRole = toRole;
 		this.service = service;
 		this.action = action;
+		this.timestamp = timestamp;
 		this.conversationId = conversationId;
 		this.messageId = messageId;
 		this.refToMessageId = refToMessageId;
@@ -125,6 +131,16 @@ public class EbMSMessageContext implements Serializable
 	public void setAction(String action)
 	{
 		this.action = action;
+	}
+	
+	public Date getTimestamp()
+	{
+		return timestamp;
+	}
+	
+	public void setTimestamp(Date timestamp)
+	{
+		this.timestamp = timestamp;
 	}
 	
 	public String getConversationId()
