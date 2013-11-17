@@ -46,6 +46,7 @@ import nl.clockwork.ebms.model.EbMSMessageContext;
 import nl.clockwork.ebms.util.EbMSMessageUtils;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CollaborationProtocolAgreement;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.AckRequested;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.Acknowledgment;
@@ -262,18 +263,6 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 		}
 	}
 	
-	private String join(String[] array, String delimiter)
-	{
-		StringBuffer result = new StringBuffer();
-		if (array.length > 0)
-		{
-			for (String s : array)
-				result.append("'").append(s).append("'").append(delimiter);
-			result.deleteCharAt(result.length() - 1);
-		}
-		return result.toString();
-	}
-	
 	@Override
 	public Long getMessageId(String messageId) throws DAOException
 	{
@@ -308,7 +297,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 				" where ref_to_message_id = ?" +
 				" and message_nr = 0" +
 				(service == null ? "" : " and service = '" + EbMSMessageUtils.toString(service) + "'") +
-				(actions.length == 0 ? "" : " and action in (" + join(actions,",") + ")"),
+				(actions.length == 0 ? "" : " and action in (" + StringUtils.join(actions,",") + ")"),
 				refToMessageId
 			);
 		}
@@ -333,7 +322,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 				" where ref_to_message_id = ?" +
 				" and message_nr = 0" +
 				(service == null ? "" : " and service = '" + EbMSMessageUtils.toString(service) + "'") +
-				(actions.length == 0 ? "" : " and action in (" + join(actions,",") + ")"),
+				(actions.length == 0 ? "" : " and action in (" + StringUtils.join(actions,",") + ")"),
 				new EbMSMessageParameterizedRowMapper(),
 				refToMessageId
 			);

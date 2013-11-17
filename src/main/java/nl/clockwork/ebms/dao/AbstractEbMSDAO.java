@@ -44,6 +44,7 @@ import nl.clockwork.ebms.model.EbMSMessageContext;
 import nl.clockwork.ebms.util.EbMSMessageUtils;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CollaborationProtocolAgreement;
@@ -379,7 +380,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 				" where ref_to_message_id = ?" +
 				" and message_nr = 0" +
 				(service == null ? "" : " and service = '" + EbMSMessageUtils.toString(service) + "'") +
-				(actions.length == 0 ? "" : " and action in (" + join(actions,",") + ")")
+				(actions.length == 0 ? "" : " and action in (" + StringUtils.join(actions,",") + ")")
 			);
 			ps.setString(1,refToMessageId);
 			if (ps.execute())
@@ -416,7 +417,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 				" where ref_to_message_id = ?" +
 				" and message_nr = 0" +
 				(service == null ? "" : " and service = '" + EbMSMessageUtils.toString(service) + "'") +
-				(actions.length == 0 ? "" : " and action in (" + join(actions,",") + ")")
+				(actions.length == 0 ? "" : " and action in (" + StringUtils.join(actions,",") + ")")
 		);
 			ps.setString(1,refToMessageId);
 			if (ps.execute())
@@ -1346,16 +1347,4 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 		return null;
 	}
 
-	protected String join(String[] array, String delimiter)
-	{
-		StringBuffer result = new StringBuffer();
-		if (array.length > 0)
-		{
-			for (String s : array)
-				result.append("'").append(s).append("'").append(delimiter);
-			result.deleteCharAt(result.length() - 1);
-		}
-		return result.toString();
-	}
-	
 }
