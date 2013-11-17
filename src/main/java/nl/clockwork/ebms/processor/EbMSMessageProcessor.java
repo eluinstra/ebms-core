@@ -99,12 +99,12 @@ public class EbMSMessageProcessor
 			}
 			else if (EbMSAction.MESSAGE_ERROR.action().equals(message.getMessageHeader().getAction()))
 			{
-				process(timestamp,message,EbMSMessageStatus.DELIVERY_FAILED);
+				process(timestamp,message,EbMSMessageStatus.DELIVERY_ERROR);
 				return null;
 			}
 			else if (EbMSAction.ACKNOWLEDGMENT.action().equals(message.getMessageHeader().getAction()))
 			{
-				process(timestamp,message,EbMSMessageStatus.ACKNOWLEDGED);
+				process(timestamp,message,EbMSMessageStatus.DELIVERED);
 				return null;
 			}
 			else if (EbMSAction.STATUS_REQUEST.action().equals(message.getMessageHeader().getAction()))
@@ -195,9 +195,9 @@ public class EbMSMessageProcessor
 				//final CollaborationProtocolAgreement cpa = ebMSDAO.getCPA(message.getMessageHeader().getCPAId());
 				if (Constants.EBMS_SERVICE_URI.equals(responseMessage.getMessageHeader().getService().getValue()))
 					if (EbMSAction.MESSAGE_ERROR.action().equals(responseMessage.getMessageHeader().getAction()))
-						process(timestamp,responseMessage,EbMSMessageStatus.DELIVERY_FAILED);
+						process(timestamp,responseMessage,EbMSMessageStatus.DELIVERY_ERROR);
 					else if (EbMSAction.ACKNOWLEDGMENT.action().equals(responseMessage.getMessageHeader().getAction()))
-						process(timestamp,responseMessage,EbMSMessageStatus.ACKNOWLEDGED);
+						process(timestamp,responseMessage,EbMSMessageStatus.DELIVERED);
 			}
 		}
 		catch (ValidationException e)
@@ -362,9 +362,9 @@ public class EbMSMessageProcessor
 						{
 							ebMSDAO.deleteEvents(id,EbMSEventStatus.UNPROCESSED);
 							ebMSDAO.updateMessageStatus(id,EbMSMessageStatus.SENT,status);
-							if (status.equals(EbMSMessageStatus.ACKNOWLEDGED))
+							if (status.equals(EbMSMessageStatus.DELIVERED))
 								eventListener.onMessageAcknowledged(message.getMessageHeader().getMessageData().getRefToMessageId());
-							else if (status.equals(EbMSMessageStatus.DELIVERY_FAILED))
+							else if (status.equals(EbMSMessageStatus.DELIVERY_ERROR))
 								eventListener.onMessageDeliveryFailed(message.getMessageHeader().getMessageData().getRefToMessageId());
 						}
 					}
