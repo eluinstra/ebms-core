@@ -1,4 +1,5 @@
-UPDATE ebms_message SET service = CONCAT_WS(':',service_type,service);
+--UPDATE ebms_message SET service = CONCAT_WS(':',service_type,service);
+UPDATE ebms_message SET service = CASE WHEN service_type is null THEN service ELSE CASE WHEN service is null THEN service_type ELSE service_type + ':' + service END END;
 
 ALTER TABLE ebms_message DROP COLUMN service_type;
 
