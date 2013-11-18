@@ -70,7 +70,6 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 				"time_to_live," +
 				"from_role," +
 				"to_role," +
-				"service_type," +
 				"service," +
 				"action," +
 				"signature," +
@@ -81,7 +80,7 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 				"content," +
 				"status," +
 				"status_time" +
-			") values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?," + (status == null ? "null" : getTimestampFunction()) + ")",
+			") values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?," + (status == null ? "null" : getTimestampFunction()) + ")",
 			Statement.RETURN_GENERATED_KEYS
 		);
 	}
@@ -102,7 +101,6 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 				"time_to_live," +
 				"from_role," +
 				"to_role," +
-				"service_type," +
 				"service," +
 				"action," +
 				"signature," +
@@ -111,7 +109,7 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 				"message_order," +
 				"ack_requested," +
 				"content" +
-			") values (?,?,?,?,?,(select max(message_nr) + 1 from ebms_message where message_id = ?),?,?,?,?,?,?,?,?,?,?,?,?,?)",
+			") values (?,?,?,?,?,(select max(message_nr) + 1 from ebms_message where message_id = ?),?,?,?,?,?,?,?,?,?,?,?,?)",
 			Statement.RETURN_GENERATED_KEYS
 		);
 	}
