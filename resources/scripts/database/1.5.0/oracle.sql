@@ -1,4 +1,4 @@
-UPDATE ebms_message SET service = decode(service_type,null,'',service_type || ':') || service;
+UPDATE ebms_message SET service = decode(service_type,null,service,decode(service,null,service_type,service_type || ':' || service));
 
 ALTER TABLE ebms_message DROP COLUMN service_type;
 
