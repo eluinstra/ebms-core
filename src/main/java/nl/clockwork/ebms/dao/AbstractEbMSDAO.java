@@ -428,8 +428,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 				" from ebms_message" + 
 				" where ref_to_message_id = ?" +
 				" and message_nr = 0" +
-				(service.getType() == null ? "" : " and serviceType = '" + service.getType() + "'") +
-				(service.getValue() == null ? "" : " and service = '" + service.getValue() + "'") +
+				(service == null ? "" : " and service = '" + EbMSMessageUtils.toString(service) + "'") +
 				(actions.length == 0 ? "" : " and action in (" + StringUtils.join(actions,",") + ")")
 			);
 			ps.setString(1,refToMessageId);
@@ -525,8 +524,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 				" from ebms_message" +
 				" where ref_to_message_id = ?" +
 				" and message_nr = 0" +
-				(service.getType() == null ? "" : " and serviceType = '" + service.getType() + "'") +
-				(service.getValue() == null ? "" : " and service = '" + service.getValue() + "'") +
+				(service == null ? "" : " and service = '" + EbMSMessageUtils.toString(service) + "'") +
 				(actions.length == 0 ? "" : " and action in (" + StringUtils.join(actions,",") + ")")
 			);
 			ps.setString(1,refToMessageId);
