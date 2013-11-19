@@ -315,8 +315,21 @@
 						</goals>
 						<configuration>
 							<schemaDirectory>${project.basedir}/src/main/resources/nl/clockwork/mule/ebms/stub/ebf/xsd/</schemaDirectory>
-							<schemaFiles>Afleveren_ebMS_2.0_v1.1.xsd,Afleveren_bevestiging_ebMS_2.0_v1.1.xsd</schemaFiles>
+							<schemaFiles>Afleveren_ebMS_2.0_v1.1.xsd</schemaFiles>
 							<staleFile>${project.build.directory}/jaxb2/.Afleveren_ebMS_2.0_v1.1.StaleFlag</staleFile>
+							<clearOutputDir>false</clearOutputDir>
+							<verbose>false</verbose>
+						</configuration>
+					</execution>
+					<execution>
+						<id>Afleveren_ebMS_2.0_v1.1_</id>
+						<goals>
+							<goal>xjc</goal>
+						</goals>
+						<configuration>
+							<schemaDirectory>${project.basedir}/src/main/resources/nl/clockwork/mule/ebms/stub/ebf/xsd/</schemaDirectory>
+							<schemaFiles>Afleveren_bevestiging_ebMS_2.0_v1.1.xsd</schemaFiles>
+							<staleFile>${project.build.directory}/jaxb2/.Afleveren_ebMS_2.0_v1.1_.StaleFlag</staleFile>
 							<clearOutputDir>false</clearOutputDir>
 							<verbose>false</verbose>
 						</configuration>
@@ -328,8 +341,21 @@
 						</goals>
 						<configuration>
 							<schemaDirectory>${project.basedir}/src/main/resources/nl/clockwork/mule/ebms/stub/ebf/xsd/</schemaDirectory>
-							<schemaFiles>Aanleveren_ebMS_2.0_v1.1.xsd,Aanleveren_bevestiging_ebMS_2.0_v1.1.xsd</schemaFiles>
+							<schemaFiles>Aanleveren_ebMS_2.0_v1.1.xsd</schemaFiles>
 							<staleFile>${project.build.directory}/jaxb2/.Aanleveren_ebMS_2.0_v1.1.StaleFlag</staleFile>
+							<clearOutputDir>false</clearOutputDir>
+							<verbose>false</verbose>
+						</configuration>
+					</execution>
+					<execution>
+						<id>Aanleveren_ebMS_2.0_v1.1_</id>
+						<goals>
+							<goal>xjc</goal>
+						</goals>
+						<configuration>
+							<schemaDirectory>${project.basedir}/src/main/resources/nl/clockwork/mule/ebms/stub/ebf/xsd/</schemaDirectory>
+							<schemaFiles>Aanleveren_bevestiging_ebMS_2.0_v1.1.xsd</schemaFiles>
+							<staleFile>${project.build.directory}/jaxb2/.Aanleveren_ebMS_2.0_v1.1_.StaleFlag</staleFile>
 							<clearOutputDir>false</clearOutputDir>
 							<verbose>false</verbose>
 						</configuration>
