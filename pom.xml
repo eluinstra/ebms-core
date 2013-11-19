@@ -1,4 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+    Copyright 2011 Clockwork
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
@@ -259,6 +276,34 @@
 		</pluginManagement>
 		<plugins>
 			<plugin>
+				<groupId>com.mycila</groupId>
+				<artifactId>license-maven-plugin</artifactId>
+				<version>2.5</version>
+				<configuration>
+					<strictCheck>true</strictCheck>
+					<header>${project.basedir}/resources/license/header.txt</header>
+					<failIfMissing>true</failIfMissing>
+					<aggregate>true</aggregate>
+					<includes>
+						<include>pom.xml</include>
+						<include>src/main/java/**/*.java</include>
+						<include>src/main/resources/**/*</include>
+					</includes>
+					<excludes>
+						<exclude>src/main/java/org/mule/**/*.java</exclude>
+						<exclude>src/main/resources/**/*.jks</exclude>
+						<exclude>src/main/resources/nl/clockwork/mule/ebms/stub/ebf/xsd/**/*</exclude>
+					</excludes>
+				</configuration>
+				<executions>
+					<execution>
+						<goals>
+							<goal>check</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
 				<groupId>org.mule.tools</groupId>
 				<artifactId>maven-mule-plugin</artifactId>
 				<version>${jdk.version}</version>
@@ -289,91 +334,6 @@
 			</plugin>
 		</plugins>
 	</build>
-	<profiles>
-		<profile>
-			<id>generate-ebf-model</id>
-			<activation>
-	 			<property>
-	  				<name>generate-ebf-model</name>
-				</property>  				
-			</activation>
-	  		<build>
-	    		<plugins>
-					<plugin>
-						<groupId>com.sun.tools.xjc.maven2</groupId>
-						<artifactId>maven-jaxb-plugin</artifactId>
-						<version>1.1.1</version>
-						<executions>
-							<execution>
-								<id>generateEBFAfleverenModel</id>
-								<goals>
-									<goal>generate</goal>
-								</goals>
-								<phase>generate-sources</phase>	
-								<configuration>
-									<generatePackage>nl.clockwork.mule.ebms.stub.ebf.model.afleveren.bericht</generatePackage>
-									<generateDirectory>src/main/java</generateDirectory>
-									<includeSchemas>
-										<includeSchema>nl/clockwork/mule/ebms/stub/ebf/xsd/Afleveren_ebMS_2.0_v1.1.xsd</includeSchema>
-									</includeSchemas>
-									<removeOldOutput>false</removeOldOutput>
-									<verbose>false</verbose>					
-								</configuration>
-							</execution>
-							<execution>
-								<id>generateEBFAfleverenBevestigingModel</id>
-								<goals>
-									<goal>generate</goal>
-								</goals>
-								<phase>generate-sources</phase>	
-								<configuration>
-									<generatePackage>nl.clockwork.mule.ebms.stub.ebf.model.afleveren.bevestiging</generatePackage>
-									<generateDirectory>src/main/java</generateDirectory>
-									<includeSchemas>
-										<includeSchema>nl/clockwork/mule/ebms/stub/ebf/xsd/Afleveren_bevestiging_ebMS_2.0_v1.1.xsd</includeSchema>
-									</includeSchemas>
-									<removeOldOutput>false</removeOldOutput>
-									<verbose>false</verbose>					
-								</configuration>
-							</execution>
-							<execution>
-								<id>generateEBFAanleverenModel</id>
-								<goals>
-									<goal>generate</goal>
-								</goals>
-								<phase>generate-sources</phase>	
-								<configuration>
-									<generatePackage>nl.clockwork.mule.ebms.stub.ebf.model.aanleveren.bericht</generatePackage>
-									<generateDirectory>src/main/java</generateDirectory>
-									<includeSchemas>
-										<includeSchema>nl/clockwork/mule/ebms/stub/ebf/xsd/Aanleveren_ebMS_2.0_v1.1.xsd</includeSchema>
-									</includeSchemas>
-									<removeOldOutput>false</removeOldOutput>
-									<verbose>false</verbose>					
-								</configuration>
-							</execution>
-							<execution>
-								<id>generateEBFAanleverenBevestigingModel</id>
-								<goals>
-									<goal>generate</goal>
-								</goals>
-								<phase>generate-sources</phase>	
-								<configuration>
-									<generatePackage>nl.clockwork.mule.ebms.stub.ebf.model.aanleveren.bevestiging</generatePackage>
-									<generateDirectory>src/main/java</generateDirectory>
-									<includeSchemas>
-										<includeSchema>nl/clockwork/mule/ebms/stub/ebf/xsd/Aanleveren_bevestiging_ebMS_2.0_v1.1.xsd</includeSchema>
-									</includeSchemas>
-									<removeOldOutput>false</removeOldOutput>
-									<verbose>false</verbose>					
-								</configuration>
-							</execution>
-						</executions>		
-					</plugin>				
-				</plugins>
-			</build>
-		</profile>
-	</profiles>
 	<reporting>
 		<plugins>
 			<plugin>
