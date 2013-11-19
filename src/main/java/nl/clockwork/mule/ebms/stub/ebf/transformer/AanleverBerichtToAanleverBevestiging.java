@@ -25,10 +25,10 @@ import nl.clockwork.ebms.common.XMLMessageBuilder;
 import nl.clockwork.ebms.model.EbMSDataSource;
 import nl.clockwork.ebms.model.EbMSMessageContent;
 import nl.clockwork.ebms.model.EbMSMessageContext;
-import nl.clockwork.mule.ebms.stub.ebf.model.aanleveren.bericht.AanleverBericht;
-import nl.clockwork.mule.ebms.stub.ebf.model.aanleveren.bevestiging.BevestigAanleverBericht;
-import nl.clockwork.mule.ebms.stub.ebf.model.aanleveren.bevestiging.FoutType;
-import nl.clockwork.mule.ebms.stub.ebf.model.aanleveren.bevestiging.IdentiteitType;
+import nl.logius.digipoort.ebms._2_0.aanleverservice._1.AanleverBericht;
+import nl.logius.digipoort.ebms._2_0.aanleverservice._1.BevestigAanleverBericht;
+import nl.logius.digipoort.ebms._2_0.aanleverservice._1.FoutType;
+import nl.logius.digipoort.ebms._2_0.aanleverservice._1.IdentiteitType;
 
 import org.apache.commons.lang.StringUtils;
 import org.mule.api.MuleMessage;

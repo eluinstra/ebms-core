@@ -24,11 +24,11 @@ import java.util.Properties;
 import javax.xml.datatype.DatatypeFactory;
 
 import nl.clockwork.ebms.common.XMLMessageBuilder;
-import nl.clockwork.mule.ebms.stub.ebf.model.afleveren.bericht.AfleverBericht;
-import nl.clockwork.mule.ebms.stub.ebf.model.afleveren.bericht.BerichtBijlagenType;
-import nl.clockwork.mule.ebms.stub.ebf.model.afleveren.bericht.BerichtInhoudType;
-import nl.clockwork.mule.ebms.stub.ebf.model.afleveren.bericht.IdentiteitType;
 import nl.clockwork.mule.ebms.stub.util.Utils;
+import nl.logius.digipoort.ebms._2_0.afleverservice._1.AfleverBericht;
+import nl.logius.digipoort.ebms._2_0.afleverservice._1.BerichtBijlagenType;
+import nl.logius.digipoort.ebms._2_0.afleverservice._1.BerichtInhoudType;
+import nl.logius.digipoort.ebms._2_0.afleverservice._1.IdentiteitType;
 
 import org.apache.commons.io.FileUtils;
 import org.mule.api.MuleEventContext;
