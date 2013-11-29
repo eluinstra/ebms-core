@@ -42,33 +42,9 @@ public class EbMSMessageContext implements Serializable
 	
 	public EbMSMessageContext(MessageHeader messageHeader)
 	{
-		this(messageHeader.getCPAId(),messageHeader.getFrom().getRole(),messageHeader.getTo().getRole(),EbMSMessageUtils.toString(messageHeader.getService()),messageHeader.getAction(),messageHeader.getConversationId(),messageHeader.getMessageData().getMessageId(),messageHeader.getMessageData().getRefToMessageId(),null);		
+		this(messageHeader.getCPAId(),messageHeader.getFrom().getRole(),messageHeader.getTo().getRole(),EbMSMessageUtils.toString(messageHeader.getService()),messageHeader.getAction(),messageHeader.getMessageData().getTimestamp().toGregorianCalendar().getTime(),messageHeader.getConversationId(),messageHeader.getMessageData().getMessageId(),messageHeader.getMessageData().getRefToMessageId(),null);		
 	}
 	
-	public EbMSMessageContext(String cpaId, String service, String action)
-	{
-		this(cpaId,null,null,service,action,null);
-	}
-
-	public EbMSMessageContext(String cpaId, String service, String action, String conversationId)
-	{
-		this(cpaId,null,null,service,action,conversationId);
-	}
-
-	public EbMSMessageContext(String cpaId, String from, String to, String service, String action)
-	{
-		this(cpaId,from,to,service,action,null,null,null,null);
-	}
-	
-	public EbMSMessageContext(String cpaId, String from, String to, String service, String action, String conversationId)
-	{
-		this(cpaId,from,to,service,action,conversationId,null,null,null);
-	}
-	
-	public EbMSMessageContext(String cpaId, String fromRole, String toRole, String service, String action, String conversationId, String messageId, String refToMessageId, Integer sequenceNr)
-	{
-		this(cpaId,fromRole,toRole,service,action,null,conversationId,null,null,null);
-	}
 	public EbMSMessageContext(String cpaId, String fromRole, String toRole, String service, String action, Date timestamp, String conversationId, String messageId, String refToMessageId, Integer sequenceNr)
 	{
 		this.cpaId = cpaId;
