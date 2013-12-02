@@ -36,10 +36,6 @@ public class EbMSMessageContext implements Serializable
 	private String refToMessageId;
 	private Integer sequenceNr;
 
-	public EbMSMessageContext()
-	{
-	}
-	
 	public EbMSMessageContext(MessageHeader messageHeader)
 	{
 		this(messageHeader.getCPAId(),messageHeader.getFrom().getRole(),messageHeader.getTo().getRole(),EbMSMessageUtils.toString(messageHeader.getService()),messageHeader.getAction(),messageHeader.getMessageData().getTimestamp().toGregorianCalendar().getTime(),messageHeader.getConversationId(),messageHeader.getMessageData().getMessageId(),messageHeader.getMessageData().getRefToMessageId(),null);		
