@@ -297,7 +297,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 				" where ref_to_message_id = ?" +
 				" and message_nr = 0" +
 				(service == null ? "" : " and service = '" + EbMSMessageUtils.toString(service) + "'") +
-				(actions.length == 0 ? "" : " and action in (" + StringUtils.join(actions,",") + ")"),
+				(actions.length == 0 ? "" : " and action in ('" + StringUtils.join(actions,"','") + "')"),
 				refToMessageId
 			);
 		}
@@ -322,7 +322,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 				" where ref_to_message_id = ?" +
 				" and message_nr = 0" +
 				(service == null ? "" : " and service = '" + EbMSMessageUtils.toString(service) + "'") +
-				(actions.length == 0 ? "" : " and action in (" + StringUtils.join(actions,",") + ")"),
+				(actions.length == 0 ? "" : " and action in ('" + StringUtils.join(actions,"','") + "')"),
 				new EbMSMessageParameterizedRowMapper(),
 				refToMessageId
 			);
