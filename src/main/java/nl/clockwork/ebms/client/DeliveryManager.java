@@ -16,8 +16,10 @@
 package nl.clockwork.ebms.client;
 
 import java.io.IOException;
+import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import javax.xml.bind.JAXBException;
 import javax.xml.parsers.ParserConfigurationException;
@@ -42,14 +44,32 @@ import org.xml.sax.SAXException;
 public class DeliveryManager //DeliveryService
 {
 	protected transient Log logger = LogFactory.getLog(getClass());
-  private ExecutorService executorService;
-  private int maxThreads = 4;
-  private MessageQueue<EbMSMessage> messageQueue;
+	private ExecutorService executorService;
+	private Integer maxThreads;
+	private Integer processorsScaleFactor;
+	private Integer queueScaleFactor;
+	private MessageQueue<EbMSMessage> messageQueue;
 	private EbMSClient ebMSClient;
 
 	public void init()
 	{
-		executorService = Executors.newFixedThreadPool(maxThreads);
+		//executorService = Executors.newFixedThreadPool(maxThreads);
+		if (maxThreads == null || maxThreads <= 0)
+		{
+			maxThreads = Runtime.getRuntime().availableProcessors() * processorsScaleFactor;
+			logger.info(this.getClass().getName() + " using " + maxThreads + " threads");
+		}
+		if (processorsScaleFactor == null || processorsScaleFactor <= 0)
+		{
+			processorsScaleFactor = 1;
+			logger.info(this.getClass().getName() + " using processors scale factor " + processorsScaleFactor);
+		}
+		if (queueScaleFactor == null || queueScaleFactor <= 0)
+		{
+			queueScaleFactor = 1;
+			logger.info(this.getClass().getName() + " using queue scale factor " + queueScaleFactor);
+		}
+		executorService = new ThreadPoolExecutor(maxThreads - 1,maxThreads - 1,1,TimeUnit.MINUTES,new ArrayBlockingQueue<Runnable>(maxThreads * queueScaleFactor,true),new ThreadPoolExecutor.CallerRunsPolicy());
 	}
 
 	public EbMSMessage sendMessage(final CollaborationProtocolAgreement cpa, final EbMSMessage message) throws EbMSProcessorException
@@ -157,9 +177,19 @@ public class DeliveryManager //DeliveryService
 		return null;
 	}
 
-	public void setMaxThreads(int maxThreads)
+	public void setMaxThreads(Integer maxThreads)
 	{
 		this.maxThreads = maxThreads;
+	}
+
+	public void setProcessorsScaleFactor(Integer processorsScaleFactor)
+	{
+		this.processorsScaleFactor = processorsScaleFactor;
+	}
+
+	public void setQueueScaleFactor(Integer queueScaleFactor)
+	{
+		this.queueScaleFactor = queueScaleFactor;
 	}
 
 	public void setMessageQueue(MessageQueue<EbMSMessage> messageQueue)

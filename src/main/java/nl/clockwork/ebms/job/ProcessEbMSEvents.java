@@ -18,9 +18,11 @@ package nl.clockwork.ebms.job;
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import nl.clockwork.ebms.Constants.EbMSEventStatus;
 import nl.clockwork.ebms.Constants.EbMSEventType;
@@ -127,17 +129,35 @@ public class ProcessEbMSEvents implements Job
 		
 	}
 
-  protected transient Log logger = LogFactory.getLog(getClass());
-  private ExecutorService executorService;
-	private int maxThreads = 4;
+	protected transient Log logger = LogFactory.getLog(getClass());
+	private ExecutorService executorService;
+	private Integer maxThreads;
+	private Integer processorsScaleFactor;
+	private Integer queueScaleFactor;
 	private EventListener eventListener;
-  private EbMSDAO ebMSDAO;
-  private EbMSClient ebMSClient;
+	private EbMSDAO ebMSDAO;
+	private EbMSClient ebMSClient;
 	private EbMSMessageProcessor messageProcessor;
 
 	public void init()
 	{
-		executorService = Executors.newFixedThreadPool(maxThreads);
+		//executorService = Executors.newFixedThreadPool(maxThreads);
+		if (maxThreads == null || maxThreads <= 0)
+		{
+			maxThreads = Runtime.getRuntime().availableProcessors() * processorsScaleFactor;
+			logger.info(this.getClass().getName() + " using " + maxThreads + " threads");
+		}
+		if (processorsScaleFactor == null || processorsScaleFactor <= 0)
+		{
+			processorsScaleFactor = 1;
+			logger.info(this.getClass().getName() + " using processors scale factor " + processorsScaleFactor);
+		}
+		if (queueScaleFactor == null || queueScaleFactor <= 0)
+		{
+			queueScaleFactor = 1;
+			logger.info(this.getClass().getName() + " using queue scale factor " + queueScaleFactor);
+		}
+		executorService = new ThreadPoolExecutor(maxThreads - 1,maxThreads - 1,1,TimeUnit.MINUTES,new ArrayBlockingQueue<Runnable>(maxThreads * queueScaleFactor,true),new ThreadPoolExecutor.CallerRunsPolicy());
 	}
 	
   @Override
@@ -177,9 +197,19 @@ public class ProcessEbMSEvents implements Job
 		);
 	}
 
-	public void setMaxThreads(int maxThreads)
+	public void setMaxThreads(Integer maxThreads)
 	{
 		this.maxThreads = maxThreads;
+	}
+
+	public void setProcessorsScaleFactor(Integer processorsScaleFactor)
+	{
+		this.processorsScaleFactor = processorsScaleFactor;
+	}
+
+	public void setQueueScaleFactor(Integer queueScaleFactor)
+	{
+		this.queueScaleFactor = queueScaleFactor;
 	}
 
 	public void setEventListener(EventListener eventListener)

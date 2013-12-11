@@ -33,6 +33,8 @@
 
 	<bean id="deliveryManager" class="nl.clockwork.ebms.client.DeliveryManager" init-method="init">
 		<property name="maxThreads" value="${deliveryManager.maxTreads}"/>
+		<property name="processorsScaleFactor" value="${deliveryManager.processorsScaleFactor}"/>
+		<property name="queueScaleFactor" value="${deliveryManager.queueScaleFactor}"/>
 		<property name="messageQueue" ref="messageQueue"/>
 		<property name="ebMSClient" ref="ebMSClient"/>
 	</bean>
@@ -73,6 +75,8 @@
 
 	<bean id="processEventsJob" class="nl.clockwork.ebms.job.ProcessEbMSEvents" init-method="init">
 		<property name="maxThreads" value="${job.maxTreads}"/>
+		<property name="processorsScaleFactor" value="${job.processorsScaleFactor}"/>
+		<property name="queueScaleFactor" value="${job.queueScaleFactor}"/>
 		<property name="eventListener" ref="eventListener"/>
 		<property name="ebMSDAO" ref="ebMSDAO"/>
 		<property name="ebMSClient" ref="ebMSClient"/>
