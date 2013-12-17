@@ -110,15 +110,6 @@ public class CPAUtils
 		return null;
 	}
 	
-	public static PartyInfo getPartyInfoByRole(CollaborationProtocolAgreement cpa, String roleName)
-	{
-		for (PartyInfo partyInfo : cpa.getPartyInfo())
-			for (CollaborationRole role : partyInfo.getCollaborationRole())
-				if (role.getRole().getName().equals(roleName))
-					return partyInfo;
-		return null;
-	}
-
 	private static boolean equals(org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.PartyId partyId, PartyId cpaPartyId)
 	{
 		return partyId.getType().equals(cpaPartyId.getType())
@@ -135,17 +126,25 @@ public class CPAUtils
 
 	private static boolean equals(ServiceType serviceType, Service service)
 	{
-		return serviceType.getType().equals(service.getType())
-			&& serviceType.getValue().equals(service.getValue());
+		return serviceType.getType().equals(service.getType()) && serviceType.getValue().equals(service.getValue());
 	}
 
+	public static PartyInfo getPartyInfo(CollaborationProtocolAgreement cpa, String from, String service, String action)
+	{
+		for (PartyInfo partyInfo : cpa.getPartyInfo())
+			for (CollaborationRole role : partyInfo.getCollaborationRole())
+				if ((from == null || from.equals(role.getRole().getName()))	&& service.equals(toString(role.getServiceBinding().getService())))
+					for (CanSend canSend : role.getServiceBinding().getCanSend())
+						if (action.equals(canSend.getThisPartyActionBinding().getAction()))
+							return partyInfo;
+		return null;
+	}
+	
 	public static PartyInfo getSendingPartyInfo(CollaborationProtocolAgreement cpa, String from, String service, String action)
 	{
 		for (PartyInfo partyInfo : cpa.getPartyInfo())
 			for (CollaborationRole role : partyInfo.getCollaborationRole())
-				if ((from == null || from.equals(role.getRole().getName()))
-						&& service.equals(toString(role.getServiceBinding().getService()))
-				)
+				if ((from == null || from.equals(role.getRole().getName())) && service.equals(toString(role.getServiceBinding().getService())))
 					for (CanSend canSend : role.getServiceBinding().getCanSend())
 						if (action.equals(canSend.getThisPartyActionBinding().getAction()))
 						{
@@ -166,9 +165,7 @@ public class CPAUtils
 	{
 		for (PartyInfo partyInfo : cpa.getPartyInfo())
 			for (CollaborationRole role : partyInfo.getCollaborationRole())
-				if ((to == null || to.equals(role.getRole().getName()))
-						&& service.equals(toString(role.getServiceBinding().getService()))
-				)
+				if ((to == null || to.equals(role.getRole().getName())) && service.equals(toString(role.getServiceBinding().getService())))
 					for (CanReceive canReceive : role.getServiceBinding().getCanReceive())
 						if (action.equals(canReceive.getThisPartyActionBinding().getAction()))
 						{

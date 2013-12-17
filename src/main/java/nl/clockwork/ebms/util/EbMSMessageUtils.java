@@ -318,7 +318,7 @@ public class EbMSMessageUtils
 	
 	public static SyncReply createSyncReply(CollaborationProtocolAgreement cpa, EbMSMessageContext context)
 	{
-		return createSyncReply(CPAUtils.getPartyInfoByRole(cpa,context.getFromRole()));
+		return createSyncReply(CPAUtils.getPartyInfo(cpa,context.getFromRole(),context.getService(),context.getAction()));
 	}
 
 	public static SyncReply createSyncReply(PartyInfo partyInfo)
@@ -476,10 +476,10 @@ public class EbMSMessageUtils
 	public static EbMSMessage ebMSMessageContentToEbMSMessage(CollaborationProtocolAgreement cpa, EbMSMessageContent content) throws DatatypeConfigurationException
 	{
 		MessageHeader messageHeader = createMessageHeader(cpa,content.getContext());
-
 		AckRequested ackRequested = createAckRequested(cpa,content.getContext());
-		
+		SyncReply syncReply = createSyncReply(cpa,content.getContext());
 		Manifest manifest = createManifest();
+
 		List<EbMSAttachment> attachments = new ArrayList<EbMSAttachment>();
 		int i = 1;
 		for (EbMSDataSource dataSource : content.getDataSources())
@@ -494,7 +494,7 @@ public class EbMSMessageUtils
 		EbMSMessage result = new EbMSMessage();
 		result.setMessageHeader(messageHeader);
 		result.setAckRequested(ackRequested);
-		result.setSyncReply(createSyncReply(cpa,content.getContext()));
+		result.setSyncReply(syncReply);
 		result.setManifest(manifest);
 		result.setAttachments(attachments);
 		return result;
