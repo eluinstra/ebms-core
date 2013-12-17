@@ -185,6 +185,7 @@ public class EbMSMessageProcessor
 		try
 		{
 			final EbMSMessage requestMessage = EbMSMessageUtils.getEbMSMessage(request.getMessage(),request.getAttachments());
+			//final CollaborationProtocolAgreement cpa = ebMSDAO.getCPA(requestMessage.getMessageHeader().getCPAId());
 			if (requestMessage.getAckRequested() != null && requestMessage.getSyncReply() != null && response == null)
 				throw new EbMSProcessingException("No response received for message " + requestMessage.getMessageHeader().getMessageData().getMessageId());
 			else if ((requestMessage.getAckRequested() == null || requestMessage.getSyncReply() == null) && response != null)
@@ -312,7 +313,7 @@ public class EbMSMessageProcessor
 				{
 					final EbMSMessage acknowledgment = EbMSMessageUtils.createEbMSAcknowledgment(cpa,message,timestamp);
 					Document document = EbMSMessageUtils.createSOAPMessage(acknowledgment);
-					signatureGenerator.generate(cpa,message.getAckRequested(),acknowledgment.getMessageHeader(),document,acknowledgment.getAttachments());
+					//signatureGenerator.generate(cpa,message.getAckRequested(),acknowledgment.getMessageHeader(),document,acknowledgment.getAttachments());
 					acknowledgment.setDocument(document);
 					ebMSDAO.executeTransaction(
 						new DAOTransactionCallback()
