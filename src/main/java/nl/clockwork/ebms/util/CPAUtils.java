@@ -110,6 +110,15 @@ public class CPAUtils
 		return null;
 	}
 	
+	public static PartyInfo getPartyInfoByRole(CollaborationProtocolAgreement cpa, String roleName)
+	{
+		for (PartyInfo partyInfo : cpa.getPartyInfo())
+			for (CollaborationRole role : partyInfo.getCollaborationRole())
+				if (role.getRole().getName().equals(roleName))
+					return partyInfo;
+		return null;
+	}
+
 	private static boolean equals(org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.PartyId partyId, PartyId cpaPartyId)
 	{
 		return partyId.getType().equals(cpaPartyId.getType())

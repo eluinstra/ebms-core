@@ -10,8 +10,8 @@
 	- ackRequested per message
 	- ackSignatureRequested (per message)
 
-- implement ackRequested/best-effort
-- implement syncReply
+- implement business signals handling (ReceiptAcknowledgment, AcceptanceAcknowledgment, and Exception)
+- implement business response messages handling
 
 - test multiple certificates in keystore
 

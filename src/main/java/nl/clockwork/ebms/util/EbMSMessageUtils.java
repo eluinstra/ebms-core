@@ -59,6 +59,7 @@ import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DeliveryChannel;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.PartyInfo;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.PerMessageCharacteristicsType;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.ReliableMessaging;
+import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.SyncReplyModeType;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.AckRequested;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.Acknowledgment;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.Description;
@@ -154,7 +155,7 @@ public class EbMSMessageUtils
 		return new EbMSDocument(EbMSMessageUtils.createSOAPMessage(message),message.getAttachments());
 	}
 	
-	public static MessageHeader createMessageHeader(CollaborationProtocolAgreement cpa, String fromParty, String toParty,String action) throws DatatypeConfigurationException
+	public static MessageHeader createMessageHeader(CollaborationProtocolAgreement cpa, String fromParty, String toParty, String action) throws DatatypeConfigurationException
 	{
 		String uuid = UUID.randomUUID().toString();
 		PartyInfo sendingPartyInfo = CPAUtils.getPartyInfo(cpa,fromParty);
@@ -310,6 +311,31 @@ public class EbMSMessageUtils
 			return null;
 	}
 	
+	public static SyncReply createSyncReply(CollaborationProtocolAgreement cpa, String fromParty)
+	{
+		return createSyncReply(CPAUtils.getPartyInfo(cpa,fromParty));
+	}
+	
+	public static SyncReply createSyncReply(CollaborationProtocolAgreement cpa, EbMSMessageContext context)
+	{
+		return createSyncReply(CPAUtils.getPartyInfoByRole(cpa,context.getFromRole()));
+	}
+
+	public static SyncReply createSyncReply(PartyInfo partyInfo)
+	{
+		DeliveryChannel channel = (DeliveryChannel)partyInfo.getDefaultMshChannelId();
+		if (SyncReplyModeType.MSH_SIGNALS_ONLY.equals(channel.getMessagingCharacteristics().getSyncReplyMode()) || SyncReplyModeType.SIGNALS_ONLY.equals(channel.getMessagingCharacteristics().getSyncReplyMode()) || SyncReplyModeType.SIGNALS_AND_RESPONSE.equals(channel.getMessagingCharacteristics().getSyncReplyMode()))
+		{
+			SyncReply syncReply = new SyncReply();
+			syncReply.setVersion(Constants.EBMS_VERSION);
+			syncReply.setMustUnderstand(true);
+			syncReply.setActor(Constants.NSURI_SOAP_NEXT_ACTOR);
+			return syncReply;
+		}
+		else
+			return null;
+	}
+
 	public static Manifest createManifest()
 	{
 		Manifest manifest = new Manifest();
@@ -415,6 +441,7 @@ public class EbMSMessageUtils
 	{
 		EbMSMessage result = new EbMSMessage();
 		result.setMessageHeader(createMessageHeader(cpa,fromParty,toParty,EbMSAction.PING.action()));
+		result.setSyncReply(createSyncReply(cpa,fromParty));
 		return result;
 	}
 	
@@ -431,6 +458,7 @@ public class EbMSMessageUtils
 		StatusRequest statusRequest = createStatusRequest(messageId);
 		EbMSMessage result = new EbMSMessage();
 		result.setMessageHeader(messageHeader);
+		result.setSyncReply(createSyncReply(cpa,fromParty));
 		result.setStatusRequest(statusRequest);
 		return result;
 	}
@@ -466,6 +494,7 @@ public class EbMSMessageUtils
 		EbMSMessage result = new EbMSMessage();
 		result.setMessageHeader(messageHeader);
 		result.setAckRequested(ackRequested);
+		result.setSyncReply(createSyncReply(cpa,content.getContext()));
 		result.setManifest(manifest);
 		result.setAttachments(attachments);
 		return result;

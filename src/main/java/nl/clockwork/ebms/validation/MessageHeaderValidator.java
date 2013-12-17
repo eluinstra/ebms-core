@@ -110,7 +110,7 @@ public class MessageHeaderValidator
 				throw new EbMSValidationException(EbMSMessageUtils.createError("//Header/SyncReply",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Wrong value."));
 			if (syncReply != null && !Constants.EBMS_VERSION.equals(syncReply.getVersion()))
 				throw new EbMSValidationException(EbMSMessageUtils.createError("//Header/SyncReply[@version]",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Invalid value."));
-			if (syncReply != null && syncReply.getActor() != null && !syncReply.getActor().equals("http://schemas.xmlsoap.org/soap/actor/next"))
+			if (syncReply != null && syncReply.getActor() != null && !syncReply.getActor().equals(Constants.NSURI_SOAP_NEXT_ACTOR))
 				throw new EbMSValidationException(EbMSMessageUtils.createError("//Header/SyncReply[@actor]",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Wrong value."));
 
 			if (messageOrder != null)
