@@ -61,10 +61,11 @@ public class CPAValidator
 		//syncReply mode signalsAndResponse not supported 
 		//syncReply mode responseOnly not supported
 		//ackSignatureRequested not supported
-		//CanSend/CanReceive match
+		//CanSend/CanReceive match (nested elements not allowed)
 		//TimeToLive == ((Retries + 1) * RetryInterval); PersistDuration >= TimeToLive
 		//1 channel per action allowed
-		//signatures
+		//if ackRequested then ReliableMessaging available
+		//if isNonRepudiationRequired then Sender/ReceiverNonRepudiation and certificates available
 		//encryption not supported
 		//MessageOrder not supported
 		//Packaging.ComponentList.Encapsulation
