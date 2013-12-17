@@ -184,12 +184,13 @@ public class EbMSMessageProcessor
 	{
 		try
 		{
-			EbMSMessage requestMessage = EbMSMessageUtils.getEbMSMessage(request.getMessage(),request.getAttachments());
+			final EbMSMessage requestMessage = EbMSMessageUtils.getEbMSMessage(request.getMessage(),request.getAttachments());
 			if (requestMessage.getAckRequested() != null && requestMessage.getSyncReply() != null && response == null)
 				throw new EbMSProcessingException("No response received for message " + requestMessage.getMessageHeader().getMessageData().getMessageId());
 			else if ((requestMessage.getAckRequested() == null || requestMessage.getSyncReply() == null) && response != null)
 				throw new EbMSProcessingException("No response expected for message " + requestMessage.getMessageHeader().getMessageData().getMessageId());
-
+			//check request.messageId == response.getRefToMessageId
+			
 			if (response != null)
 			{
 				xsdValidator.validate(response.getMessage());
@@ -200,6 +201,20 @@ public class EbMSMessageProcessor
 						process(timestamp,responseMessage,EbMSMessageStatus.DELIVERY_ERROR);
 					else if (EbMSAction.ACKNOWLEDGMENT.action().equals(responseMessage.getMessageHeader().getAction()))
 						process(timestamp,responseMessage,EbMSMessageStatus.DELIVERED);
+			}
+			else if (requestMessage.getAckRequested() == null)
+			{
+				ebMSDAO.executeTransaction(
+					new DAOTransactionCallback()
+					{
+						@Override
+						public void doInTransaction()
+						{
+							ebMSDAO.updateMessage(requestMessage.getMessageHeader().getMessageData().getMessageId(),EbMSMessageStatus.SENT,EbMSMessageStatus.DELIVERED);
+							eventListener.onMessageAcknowledged(requestMessage.getMessageHeader().getMessageData().getMessageId());
+						}
+					}
+				);
 			}
 		}
 		catch (ValidationException e)
@@ -342,16 +357,16 @@ public class EbMSMessageProcessor
 		}
 	}
 
-	private void process(final Calendar timestamp, final EbMSMessage message, final EbMSMessageStatus status)
+	private void process(final Calendar timestamp, final EbMSMessage responseMessage, final EbMSMessageStatus status)
 	{
-		if (isDuplicateMessage(message))
+		if (isDuplicateMessage(responseMessage))
 			ebMSDAO.executeTransaction(
 				new DAOTransactionCallback()
 				{
 					@Override
 					public void doInTransaction()
 					{
-						ebMSDAO.insertDuplicateMessage(timestamp.getTime(),message);
+						ebMSDAO.insertDuplicateMessage(timestamp.getTime(),responseMessage);
 					}
 				}
 			);
@@ -362,13 +377,13 @@ public class EbMSMessageProcessor
 					@Override
 					public void doInTransaction()
 					{
-						ebMSDAO.insertMessage(timestamp.getTime(),message,null);
-						ebMSDAO.deleteEvents(message.getMessageHeader().getMessageData().getRefToMessageId(),EbMSEventStatus.UNPROCESSED);
-						ebMSDAO.updateMessage(message.getMessageHeader().getMessageData().getRefToMessageId(),EbMSMessageStatus.SENT,status);
+						ebMSDAO.insertMessage(timestamp.getTime(),responseMessage,null);
+						ebMSDAO.deleteEvents(responseMessage.getMessageHeader().getMessageData().getRefToMessageId(),EbMSEventStatus.UNPROCESSED);
+						ebMSDAO.updateMessage(responseMessage.getMessageHeader().getMessageData().getRefToMessageId(),EbMSMessageStatus.SENT,status);
 						if (status.equals(EbMSMessageStatus.DELIVERED))
-							eventListener.onMessageAcknowledged(message.getMessageHeader().getMessageData().getRefToMessageId());
+							eventListener.onMessageAcknowledged(responseMessage.getMessageHeader().getMessageData().getRefToMessageId());
 						else if (status.equals(EbMSMessageStatus.DELIVERY_ERROR))
-							eventListener.onMessageDeliveryFailed(message.getMessageHeader().getMessageData().getRefToMessageId());
+							eventListener.onMessageDeliveryFailed(responseMessage.getMessageHeader().getMessageData().getRefToMessageId());
 					}
 				}
 			);
