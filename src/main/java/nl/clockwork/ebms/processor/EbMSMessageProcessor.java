@@ -202,7 +202,7 @@ public class EbMSMessageProcessor
 					else if (EbMSAction.ACKNOWLEDGMENT.action().equals(responseMessage.getMessageHeader().getAction()))
 						process(timestamp,responseMessage,EbMSMessageStatus.DELIVERED);
 			}
-			else if (requestMessage.getAckRequested() == null)
+			else if (requestMessage.getAckRequested() == null && requestMessage.getSyncReply() != null)
 			{
 				ebMSDAO.executeTransaction(
 					new DAOTransactionCallback()
