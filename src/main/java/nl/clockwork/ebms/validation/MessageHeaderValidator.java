@@ -44,10 +44,7 @@ import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.SyncReply;
 public class MessageHeaderValidator
 {
   protected transient Log logger = LogFactory.getLog(getClass());
-  //FIXME: use or remove following attributes
-	private PerMessageCharacteristicsType ackSignatureRequested;// = PerMessageCharacteristicsType.NEVER;
-	private PerMessageCharacteristicsType duplicateElimination;// = PerMessageCharacteristicsType.ALWAYS;
-	private SyncReplyModeType syncReplyMode;// = SyncReplyModeType.NONE;
+	private PerMessageCharacteristicsType ackSignatureRequested = PerMessageCharacteristicsType.NEVER;
 	private EbMSDAO ebMSDAO;
 
 	public MessageHeaderValidator(EbMSDAO ebMSDAO)
@@ -88,8 +85,6 @@ public class MessageHeaderValidator
 			throw new EbMSValidationException(EbMSMessageUtils.createError("//Header/MessageHeader/MessageData/TimeToLive",Constants.EbMSErrorCode.TIME_TO_LIVE_EXPIRED.errorCode(),null));
 		if (!Constants.EBMS_SERVICE_URI.equals(messageHeader.getService().getValue()))
 		{
-			if (!checkDuplicateElimination(deliveryChannel))
-				throw new EbMSValidationException(EbMSMessageUtils.createError("//Header/MessageHeader/DuplicateElimination",Constants.EbMSErrorCode.NOT_SUPPORTED.errorCode(),"DuplicateElimination mode not supported."));
 			if (!checkDuplicateElimination(deliveryChannel,messageHeader))
 				throw new EbMSValidationException(EbMSMessageUtils.createError("//Header/MessageHeader/DuplicateElimination",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Wrong value."));
 
@@ -104,8 +99,6 @@ public class MessageHeaderValidator
 			if (!checkAckSignatureRequested(deliveryChannel,ackRequested))
 				throw new EbMSValidationException(EbMSMessageUtils.createError("//Header/AckRequested[@signed]",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Wrong value."));
 
-			if (!checkSyncReply(deliveryChannel))
-				throw new EbMSValidationException(EbMSMessageUtils.createError("//Header/SyncReply",Constants.EbMSErrorCode.NOT_SUPPORTED.errorCode(),"SyncReply mode not supported."));
 			if (!checkSyncReply(deliveryChannel,syncReply))
 				throw new EbMSValidationException(EbMSMessageUtils.createError("//Header/SyncReply",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Wrong value."));
 			if (syncReply != null && !Constants.EBMS_VERSION.equals(syncReply.getVersion()))
@@ -176,11 +169,6 @@ public class MessageHeaderValidator
 				|| (deliveryChannel.getMessagingCharacteristics().getDuplicateElimination().equals(PerMessageCharacteristicsType.ALWAYS) && messageHeader.getDuplicateElimination() != null);
 	}
 	
-	private boolean checkDuplicateElimination(DeliveryChannel deliveryChannel)
-	{
-		return duplicateElimination == null || deliveryChannel.getMessagingCharacteristics().getDuplicateElimination().equals(duplicateElimination);
-	}
-	
 	private boolean checkAckRequested(DeliveryChannel deliveryChannel, AckRequested ackRequested)
 	{
 		return deliveryChannel.getMessagingCharacteristics().getAckRequested() == null || deliveryChannel.getMessagingCharacteristics().getAckRequested().equals(PerMessageCharacteristicsType.PER_MESSAGE)
@@ -191,7 +179,7 @@ public class MessageHeaderValidator
 
 	private boolean checkAckSignatureRequested(DeliveryChannel deliveryChannel)
 	{
-		return ackSignatureRequested == null || deliveryChannel.getMessagingCharacteristics().getAckSignatureRequested().equals(ackSignatureRequested);
+		return deliveryChannel.getMessagingCharacteristics().getAckSignatureRequested().equals(ackSignatureRequested);
 	}
 
 	private boolean checkAckSignatureRequested(DeliveryChannel deliveryChannel, AckRequested ackRequested)
@@ -208,11 +196,6 @@ public class MessageHeaderValidator
 //		|| (deliveryChannel.getMessagingCharacteristics().getAckSignatureRequested().equals(PerMessageCharacteristicsType.NEVER));
 //	}
 
-	private boolean checkSyncReply(DeliveryChannel deliveryChannel)
-	{
-		return syncReplyMode == null || deliveryChannel.getMessagingCharacteristics().getSyncReplyMode().equals(syncReplyMode);
-	}
-	
 	private boolean checkSyncReply(DeliveryChannel deliveryChannel, SyncReply syncReply)
 	{
 		return !((deliveryChannel.getMessagingCharacteristics().getSyncReplyMode() == null || deliveryChannel.getMessagingCharacteristics().getSyncReplyMode().equals(SyncReplyModeType.NONE))
