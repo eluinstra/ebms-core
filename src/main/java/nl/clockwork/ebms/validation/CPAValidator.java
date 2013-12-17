@@ -60,12 +60,13 @@ public class CPAValidator
 		
 		//syncReply mode signalsAndResponse not supported 
 		//syncReply mode responseOnly not supported
-		//CanSend/Receive
+		//ackSignatureRequested not supported
+		//CanSend/CanReceive match
 		//TimeToLive == ((Retries + 1) * RetryInterval); PersistDuration >= TimeToLive
-		//1 channel per action
+		//1 channel per action allowed
 		//signatures
-		//encryption
-		//MessageOrder
+		//encryption not supported
+		//MessageOrder not supported
 		//Packaging.ComponentList.Encapsulation
 	}
 	

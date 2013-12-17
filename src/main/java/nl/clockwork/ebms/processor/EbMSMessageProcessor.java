@@ -40,7 +40,6 @@ import nl.clockwork.ebms.event.EventListener;
 import nl.clockwork.ebms.model.EbMSDocument;
 import nl.clockwork.ebms.model.EbMSMessage;
 import nl.clockwork.ebms.model.EbMSMessageContext;
-import nl.clockwork.ebms.signature.EbMSSignatureGenerator;
 import nl.clockwork.ebms.signature.EbMSSignatureValidator;
 import nl.clockwork.ebms.util.CPAUtils;
 import nl.clockwork.ebms.util.EbMSMessageUtils;
@@ -69,7 +68,6 @@ public class EbMSMessageProcessor
 	private DeliveryManager deliveryManager;
 	private EventListener eventListener;
   private EbMSDAO ebMSDAO;
-	private EbMSSignatureGenerator signatureGenerator;
   private EbMSSignatureValidator signatureValidator;
 	private XSDValidator xsdValidator;
   private CPAValidator cpaValidator;
@@ -454,11 +452,6 @@ public class EbMSMessageProcessor
 	public void setEbMSDAO(EbMSDAO ebMSDAO)
 	{
 		this.ebMSDAO = ebMSDAO;
-	}
-	
-	public void setSignatureGenerator(EbMSSignatureGenerator signatureGenerator)
-	{
-		this.signatureGenerator = signatureGenerator;
 	}
 	
 	public void setSignatureValidator(EbMSSignatureValidator signatureValidator)
