@@ -8,7 +8,11 @@
 - improve implementation of BusinessTransactionCharacteristics
 - improve implementation of MessagingCharacteristics:
 	- ackRequested per message
-	- ackSignatureRequested (per message)
+	- ackSignatureRequested (perMessage)
+
+- implement ackSignatureRequested
+	- sign acknowledgment
+	- validate acknowledgment signature
 
 - implement business signals handling (ReceiptAcknowledgment, AcceptanceAcknowledgment, and Exception)
 - implement business response messages handling
