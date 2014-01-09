@@ -25,6 +25,7 @@ import java.security.cert.CertificateExpiredException;
 import java.security.cert.CertificateNotYetValidException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.List;
@@ -46,6 +47,7 @@ import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CollaborationProt
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DeliveryChannel;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.PartyInfo;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageHeader;
+import org.w3._2000._09.xmldsig.ReferenceType;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -120,6 +122,7 @@ public class EbMSSignatureValidator
 						validateCertificate(trustStore,certificate,responseMessage.getMessageHeader().getMessageData().getTimestamp() == null ? new Date() : responseMessage.getMessageHeader().getMessageData().getTimestamp().toGregorianCalendar().getTime());
 						if (!verify(certificate,(Element)signatureNodeList.item(0),new ArrayList<EbMSAttachment>()))
 							throw new ValidationException("Invalid Signature!");
+						validateSignatureReferences(requestMessage,responseMessage);
 					}
 					else
 						throw new ValidationException("Certificate not found!");
@@ -232,6 +235,34 @@ public class EbMSSignatureValidator
 		throw new ValidationException("Certificate " + certificate.getIssuerDN() + " not found!");
 	}
 	
+	private void validateSignatureReferences(EbMSMessage requestMessage, EbMSMessage responseMessage) throws ValidationException
+	{
+		if (requestMessage.getSignature().getSignedInfo().getReference() == null || requestMessage.getSignature().getSignedInfo().getReference().size() == 0)
+			throw new ValidationException("No signature references found in request message " + requestMessage.getMessageHeader().getMessageData().getMessageId());
+		if (responseMessage.getAcknowledgment().getReference() == null || responseMessage.getAcknowledgment().getReference().size() == 0)
+			throw new ValidationException("No signature references found in response message " + responseMessage.getMessageHeader().getMessageData().getMessageId());
+		if (requestMessage.getSignature().getSignedInfo().getReference().size() != responseMessage.getAcknowledgment().getReference().size())
+			throw new ValidationException("Nr of signature references found in request message " + requestMessage.getMessageHeader().getMessageData().getMessageId() + " and response message " + responseMessage.getMessageHeader().getMessageData().getMessageId() + " do not match");
+		for (ReferenceType requestReference : requestMessage.getSignature().getSignedInfo().getReference())
+		{
+			boolean found = false;
+			for (ReferenceType responseReference : responseMessage.getAcknowledgment().getReference())
+			{
+				found = equals(requestReference,responseReference);
+				if (found) break;
+			}
+			if (!found)
+				throw new ValidationException("Signature references found in request message " + requestMessage.getMessageHeader().getMessageData().getMessageId() + " and response message " + responseMessage.getMessageHeader().getMessageData().getMessageId() + " do not match");
+		}
+				
+	}
+
+	private boolean equals(ReferenceType requestReference, ReferenceType responseReference)
+	{
+		return requestReference.getURI().equals(responseReference.getURI())
+				&& Arrays.equals(requestReference.getDigestValue(),responseReference.getDigestValue());
+	}
+
 	public void setTrustStorePath(String trustStorePath)
 	{
 		this.trustStorePath = trustStorePath;
