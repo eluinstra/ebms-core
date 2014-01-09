@@ -1,21 +1,18 @@
 - improve CPA validation
 
-- validate message composition using SimplePart and Packaging definition from CPA 
-- validate message format (available elements versus action)
-- improve header validation
-	- add separate service and action validation
-
 - implement ackSignatureRequested
 	- sign acknowledgment
 	- validate acknowledgment signature (using cpa and original message)
-
-- implement business signals handling (ReceiptAcknowledgment, AcceptanceAcknowledgment, and Exception)
-- implement business response messages handling
 
 - test multiple certificates in keystore
 
 - implement SSLFactoryManager that returns a CPA/hostname related SSLSocketFactory to handle different key/certificate pairs
 	- load right SSLFactoryManager on each URLConnection request
+
+- validate message composition using SimplePart and Packaging definition from CPA 
+- validate message format (available elements versus action)
+- improve header validation
+	- add separate service and action validation
 
 - make EbMSMessageProcessor event driven
 	- implement eventManager
@@ -38,3 +35,5 @@
 
 - implement EbMSFileAttachment (file proxy) and EbMSDBAttachment (db proxy) for large message processing?
 
+- implement business signals handling (ReceiptAcknowledgment, AcceptanceAcknowledgment, and Exception)
+- implement business response messages handling
