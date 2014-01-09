@@ -80,7 +80,10 @@ public abstract class EbMSInputStreamHandler
 			{
 				Document soapFault = EbMSMessageUtils.createSOAPFault(e);
 				if (logger.isDebugEnabled())
+				{
 					logger.debug("OUT:\n" + DOMUtils.toString(soapFault));
+					logger.debug("",e);
+				}
 				writeResponseStatus(500);
 				writeResponseHeader("Content-Type","text/xml");
 				OutputStream response = getOutputStream();
