@@ -85,7 +85,7 @@ public class EbMSMessageProcessorX extends EbMSMessageProcessor
 				EbMSMessage requestMessage = EbMSMessageUtils.getEbMSMessage(request);
 				if (requestMessage.getSyncReply() != null)
 					throw new EbMSProcessingException("No async ErrorMessage expected for message " + requestMessage.getMessageHeader().getMessageData().getMessageId() + "\n" + DOMUtils.toString(document.getMessage()));
-				processMessageError(timestamp,requestMessage,message);
+				processMessageError(cpa,timestamp,requestMessage,message);
 				return null;
 			}
 			else if (EbMSAction.ACKNOWLEDGMENT.action().equals(message.getMessageHeader().getAction()))
@@ -185,7 +185,7 @@ public class EbMSMessageProcessorX extends EbMSMessageProcessor
 					{
 						if (requestMessage.getSyncReply() == null)
 							throw new EbMSProcessingException("No sync ErrorMessage expected for message " + requestMessage.getMessageHeader().getMessageData().getMessageId() + "\n" + DOMUtils.toString(response.getMessage()));
-						processMessageError(timestamp,requestMessage,responseMessage);
+						processMessageError(ebMSDAO.getCPA(requestMessage.getMessageHeader().getCPAId()),timestamp,requestMessage,responseMessage);
 					}
 					else if (EbMSAction.ACKNOWLEDGMENT.action().equals(responseMessage.getMessageHeader().getAction()))
 					{
@@ -248,7 +248,7 @@ public class EbMSMessageProcessorX extends EbMSMessageProcessor
 		}
 	}
 	
-	private void processMessageError(final Calendar timestamp, final EbMSMessage requestMessage, final EbMSMessage responseMessage)
+	private void processMessageError(CollaborationProtocolAgreement cpa, final Calendar timestamp, final EbMSMessage requestMessage, final EbMSMessage responseMessage)
 	{
 		if (isDuplicateMessage(responseMessage))
 			ebMSDAO.insertDuplicateMessage(timestamp.getTime(),responseMessage);
@@ -257,6 +257,7 @@ public class EbMSMessageProcessorX extends EbMSMessageProcessor
 			try
 			{
 				messageHeaderValidator.validate(requestMessage,responseMessage);
+				messageHeaderValidator.validate(cpa,responseMessage,timestamp);
 				ebMSDAO.executeTransaction(
 					new DAOTransactionCallback()
 					{
@@ -288,6 +289,7 @@ public class EbMSMessageProcessorX extends EbMSMessageProcessor
 			try
 			{
 				messageHeaderValidator.validate(requestMessage,responseMessage);
+				messageHeaderValidator.validate(cpa,responseMessage,timestamp);
 				signatureValidator.validate(cpa,requestMessage,responseMessage);
 				ebMSDAO.executeTransaction(
 					new DAOTransactionCallback()

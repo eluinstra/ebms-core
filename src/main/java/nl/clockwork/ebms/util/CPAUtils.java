@@ -21,7 +21,7 @@ import java.net.URL;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
-import java.util.GregorianCalendar;
+import java.util.Calendar;
 import java.util.List;
 
 import javax.xml.bind.JAXBElement;
@@ -52,7 +52,7 @@ import org.w3._2000._09.xmldsig.X509DataType;
 //TODO use JXPath
 public class CPAUtils
 {
-	public static boolean isValid(CollaborationProtocolAgreement cpa, GregorianCalendar timestamp)
+	public static boolean isValid(CollaborationProtocolAgreement cpa, Calendar timestamp)
 	{
 		return StatusValueType.AGREED.equals(cpa.getStatus().getValue())
 			&& timestamp.compareTo(cpa.getStart().toGregorianCalendar()) >= 0

@@ -17,10 +17,11 @@ package nl.clockwork.ebms.validation;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.GregorianCalendar;
+import java.util.Calendar;
 import java.util.List;
 
 import nl.clockwork.ebms.Constants;
+import nl.clockwork.ebms.Constants.EbMSAction;
 import nl.clockwork.ebms.dao.EbMSDAO;
 import nl.clockwork.ebms.model.EbMSMessage;
 import nl.clockwork.ebms.util.CPAUtils;
@@ -36,6 +37,7 @@ import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.PartyInfo;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.PerMessageCharacteristicsType;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.SyncReplyModeType;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.AckRequested;
+import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.Acknowledgment;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageHeader;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageOrder;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.PartyId;
@@ -53,7 +55,7 @@ public class MessageHeaderValidator
 		this.ebMSDAO = ebMSDAO;
 	}
 
-	public void validate(CollaborationProtocolAgreement cpa, EbMSMessage message, GregorianCalendar timestamp) throws EbMSValidationException
+	public void validate(CollaborationProtocolAgreement cpa, EbMSMessage message, Calendar timestamp) throws EbMSValidationException
 	{
 		MessageHeader messageHeader = message.getMessageHeader();
 		AckRequested ackRequested = message.getAckRequested();
@@ -77,10 +79,13 @@ public class MessageHeaderValidator
 		if ((to = CPAUtils.getPartyInfo(cpa, messageHeader.getTo().getPartyId())) == null)
 			throw new EbMSValidationException(EbMSMessageUtils.createError("//Header/MessageHeader/To/PartyId",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Value not found."));
 
-		if (!CPAUtils.canSend(from,messageHeader.getFrom().getRole(),messageHeader.getService(),messageHeader.getAction()))
-			throw new EbMSValidationException(EbMSMessageUtils.createError("//Header/MessageHeader/Action",Constants.EbMSErrorCode.VALUE_NOT_RECOGNIZED.errorCode(),"Value not found."));
-		if (!CPAUtils.canReceive(to,messageHeader.getTo().getRole(),messageHeader.getService(),messageHeader.getAction()))
-			throw new EbMSValidationException(EbMSMessageUtils.createError("//Header/MessageHeader/Action",Constants.EbMSErrorCode.VALUE_NOT_RECOGNIZED.errorCode(),"Value not found."));
+		if (!Constants.EBMS_SERVICE_URI.equals(messageHeader.getService().getValue()))
+		{
+			if (!CPAUtils.canSend(from,messageHeader.getFrom().getRole(),messageHeader.getService(),messageHeader.getAction()))
+				throw new EbMSValidationException(EbMSMessageUtils.createError("//Header/MessageHeader/Action",Constants.EbMSErrorCode.VALUE_NOT_RECOGNIZED.errorCode(),"Value not found."));
+			if (!CPAUtils.canReceive(to,messageHeader.getTo().getRole(),messageHeader.getService(),messageHeader.getAction()))
+				throw new EbMSValidationException(EbMSMessageUtils.createError("//Header/MessageHeader/Action",Constants.EbMSErrorCode.VALUE_NOT_RECOGNIZED.errorCode(),"Value not found."));
+		}
 
 		DeliveryChannel deliveryChannel = CPAUtils.getSendingDeliveryChannel(from,messageHeader.getFrom().getRole(),messageHeader.getService(),messageHeader.getAction());
 		if (deliveryChannel == null)
@@ -117,18 +122,18 @@ public class MessageHeaderValidator
 //			if (messageOrder != null && !Constants.EBMS_VERSION.equals(messageOrder.getVersion()))
 //				throw new EbMSValidationException(EbMSMessageUtils.createError("//Header/MessageOrder[@version]",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Invalid value."));
 		}
-//		if (EbMSMessageType.ACKNOWLEDGMENT.action().getService().getValue().equals(messageHeader.getService().getValue()) && EbMSMessageType.ACKNOWLEDGMENT.action().getAction().equals(messageHeader.getAction()))
-//		{
-//			Acknowledgment acknowledgment = ((EbMSAcknowledgment)message.getPayload()).getAcknowledgment();
-//			if (acknowledgment != null && !Constants.EBMS_VERSION.equals(acknowledgment.getVersion()))
-//				throw new EbMSValidationException(EbMSMessageUtils.createError("//Header/Acknowledgment[@version]",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Invalid value."));
-//			if (!checkActor(deliveryChannel,acknowledgment))
-//				throw new EbMSValidationException(EbMSMessageUtils.createError("//Header/Acknowledgment[@actor]",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Wrong value."));
-//			if (acknowledgment.getActor() != null && acknowledgment.getActor().equals(ActorType.URN_OASIS_NAMES_TC_EBXML_MSG_ACTOR_NEXT_MSH.value()))
-//				throw new EbMSValidationException(EbMSMessageUtils.createError("//Header/Acknowledgment[@actor]",Constants.EbMSErrorCode.NOT_SUPPORTED.errorCode(),"NextMSH not supported."));
-//			if (!checkAckSignatureRequested(deliveryChannel,acknowledgment))
-//				throw new EbMSValidationException(EbMSMessageUtils.createError("//Header/Acknowledgment/Reference",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Wrong value."));
-//		}
+		if (Constants.EBMS_SERVICE_URI.equals(messageHeader.getService().getValue()) && EbMSAction.ACKNOWLEDGMENT.action().equals(messageHeader.getAction()))
+		{
+			Acknowledgment acknowledgment = message.getAcknowledgment();
+			if (acknowledgment != null && !Constants.EBMS_VERSION.equals(acknowledgment.getVersion()))
+				throw new EbMSValidationException(EbMSMessageUtils.createError("//Header/Acknowledgment[@version]",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Invalid value."));
+			if (!checkActor(deliveryChannel,acknowledgment))
+				throw new EbMSValidationException(EbMSMessageUtils.createError("//Header/Acknowledgment[@actor]",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Wrong value."));
+			if (acknowledgment.getActor() != null && acknowledgment.getActor().equals(ActorType.URN_OASIS_NAMES_TC_EBXML_MSG_ACTOR_NEXT_MSH.value()))
+				throw new EbMSValidationException(EbMSMessageUtils.createError("//Header/Acknowledgment[@actor]",Constants.EbMSErrorCode.NOT_SUPPORTED.errorCode(),"NextMSH not supported."));
+			if (!checkAckSignatureRequested(deliveryChannel,acknowledgment))
+				throw new EbMSValidationException(EbMSMessageUtils.createError("//Header/Acknowledgment/Reference",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Wrong value."));
+		}
 	}
 
 	private boolean isValid(List<PartyId> partyIds)
@@ -162,7 +167,7 @@ public class MessageHeaderValidator
 		return refToMessageId == null || ebMSDAO.existsMessage(refToMessageId);
 	}
 	
-	private boolean checkTimeToLive(MessageHeader messageHeader, GregorianCalendar timestamp)
+	private boolean checkTimeToLive(MessageHeader messageHeader, Calendar timestamp)
 	{
 		return messageHeader.getMessageData().getTimeToLive() == null
 				|| timestamp.before(messageHeader.getMessageData().getTimeToLive().toGregorianCalendar());
@@ -195,12 +200,12 @@ public class MessageHeaderValidator
 				|| (deliveryChannel.getMessagingCharacteristics().getAckSignatureRequested().equals(PerMessageCharacteristicsType.NEVER) && (ackRequested == null || !ackRequested.isSigned()));
 	}
 
-//	private boolean checkAckSignatureRequested(DeliveryChannel deliveryChannel, Acknowledgment acknowledgment)
-//	{
-//		return (deliveryChannel.getMessagingCharacteristics().getAckSignatureRequested().equals(PerMessageCharacteristicsType.ALWAYS) && (acknowledgment.getReference() != null))
-//		|| deliveryChannel.getMessagingCharacteristics().getAckSignatureRequested().equals(PerMessageCharacteristicsType.PER_MESSAGE)
-//		|| (deliveryChannel.getMessagingCharacteristics().getAckSignatureRequested().equals(PerMessageCharacteristicsType.NEVER));
-//	}
+	private boolean checkAckSignatureRequested(DeliveryChannel deliveryChannel, Acknowledgment acknowledgment)
+	{
+		return (deliveryChannel.getMessagingCharacteristics().getAckSignatureRequested().equals(PerMessageCharacteristicsType.ALWAYS) && (acknowledgment.getReference() != null))
+		|| deliveryChannel.getMessagingCharacteristics().getAckSignatureRequested().equals(PerMessageCharacteristicsType.PER_MESSAGE)
+		|| (deliveryChannel.getMessagingCharacteristics().getAckSignatureRequested().equals(PerMessageCharacteristicsType.NEVER));
+	}
 
 	private boolean checkSyncReply(DeliveryChannel deliveryChannel, SyncReply syncReply)
 	{
@@ -208,11 +213,11 @@ public class MessageHeaderValidator
 				&& syncReply != null);
 	}
 	
-//	private boolean checkActor(DeliveryChannel deliveryChannel, Acknowledgment acknowledgment)
-//	{
-//		return (deliveryChannel.getMessagingCharacteristics().getActor() == null && acknowledgment.getActor() == null) 
-//				|| deliveryChannel.getMessagingCharacteristics().getActor().value().equals(acknowledgment.getActor());
-//	}
+	private boolean checkActor(DeliveryChannel deliveryChannel, Acknowledgment acknowledgment)
+	{
+		return (deliveryChannel.getMessagingCharacteristics().getActor() == null && acknowledgment.getActor() == null) 
+				|| deliveryChannel.getMessagingCharacteristics().getActor().value().equals(acknowledgment.getActor());
+	}
 
 	public void validate(EbMSMessage requestMessage, EbMSMessage responseMessage) throws ValidationException
 	{
