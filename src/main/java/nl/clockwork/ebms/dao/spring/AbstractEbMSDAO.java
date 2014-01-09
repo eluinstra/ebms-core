@@ -66,6 +66,7 @@ import org.springframework.transaction.TransactionException;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 import org.springframework.transaction.support.TransactionTemplate;
+import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
 public abstract class AbstractEbMSDAO implements EbMSDAO
@@ -388,7 +389,44 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	}
 	
 	@Override
-	public EbMSDocument getDocument(String messageId) throws DAOException
+	public Document getDocument(String messageId) throws DAOException
+	{
+		try
+		{
+			String document = jdbcTemplate.queryForObject(
+				"select content" +
+				" from ebms_message" +
+				" where message_id = ?" +
+				" and message_nr = 0",
+				String.class,
+				messageId
+			);
+			return DOMUtils.read(document);
+		}
+		catch(EmptyResultDataAccessException e)
+		{
+			return null;
+		}
+		catch (DataAccessException e)
+		{
+			throw new DAOException(e);
+		}
+		catch (ParserConfigurationException e)
+		{
+			throw new DAOException(e);
+		}
+		catch (SAXException e)
+		{
+			throw new DAOException(e);
+		}
+		catch (IOException e)
+		{
+			throw new DAOException(e);
+		}
+	}
+	
+	@Override
+	public EbMSDocument getEbMSDocument(String messageId) throws DAOException
 	{
 		try
 		{
@@ -425,7 +463,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	}
 	
 	@Override
-	public EbMSDocument getDocumentByRefToMessageId(String refToMessageId, Service service, String...actions) throws DAOException
+	public EbMSDocument getEbMSDocumentByRefToMessageId(String refToMessageId, Service service, String...actions) throws DAOException
 	{
 		try
 		{

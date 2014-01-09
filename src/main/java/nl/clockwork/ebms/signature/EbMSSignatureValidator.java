@@ -24,12 +24,14 @@ import java.security.cert.CertificateException;
 import java.security.cert.CertificateExpiredException;
 import java.security.cert.CertificateNotYetValidException;
 import java.security.cert.X509Certificate;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.List;
 
 import nl.clockwork.ebms.common.util.SecurityUtils;
 import nl.clockwork.ebms.model.EbMSAttachment;
+import nl.clockwork.ebms.model.EbMSMessage;
 import nl.clockwork.ebms.util.CPAUtils;
 import nl.clockwork.ebms.validation.ValidationException;
 import nl.clockwork.ebms.validation.ValidatorException;
@@ -75,6 +77,48 @@ public class EbMSSignatureValidator
 					{
 						validateCertificate(trustStore,certificate,messageHeader.getMessageData().getTimestamp() == null ? new Date() : messageHeader.getMessageData().getTimestamp().toGregorianCalendar().getTime());
 						if (!verify(certificate,(Element)signatureNodeList.item(0),attachments))
+							throw new ValidationException("Invalid Signature!");
+					}
+					else
+						throw new ValidationException("Certificate not found!");
+				}
+				else
+					throw new ValidationException("Signature not found!");
+			}
+		}
+		catch (GeneralSecurityException e)
+		{
+			throw new ValidatorException(e);
+		}
+		catch (IOException e)
+		{
+			throw new ValidatorException(e);
+		}
+		catch (XMLSignatureException e)
+		{
+			throw new ValidationException(e);
+		}
+		catch (XMLSecurityException e)
+		{
+			throw new ValidationException(e);
+		}
+	}
+
+	public void validate(CollaborationProtocolAgreement cpa, EbMSMessage requestMessage, EbMSMessage responseMessage) throws ValidatorException, ValidationException
+	{
+		try
+		{
+			if (requestMessage.getAckRequested().isSigned())
+			{
+				KeyStore trustStore = SecurityUtils.loadKeyStore(trustStorePath,trustStorePassword);
+				NodeList signatureNodeList = responseMessage.getDocument().getElementsByTagNameNS(org.apache.xml.security.utils.Constants.SignatureSpecNS,org.apache.xml.security.utils.Constants._TAG_SIGNATURE);
+				if (signatureNodeList.getLength() > 0)
+				{
+					X509Certificate certificate = getCertificate(cpa,responseMessage.getDocument(),responseMessage.getMessageHeader());
+					if (certificate != null)
+					{
+						validateCertificate(trustStore,certificate,responseMessage.getMessageHeader().getMessageData().getTimestamp() == null ? new Date() : responseMessage.getMessageHeader().getMessageData().getTimestamp().toGregorianCalendar().getTime());
+						if (!verify(certificate,(Element)signatureNodeList.item(0),new ArrayList<EbMSAttachment>()))
 							throw new ValidationException("Invalid Signature!");
 					}
 					else
@@ -197,4 +241,5 @@ public class EbMSSignatureValidator
 	{
 		this.trustStorePassword = trustStorePassword;
 	}
+
 }

@@ -22,6 +22,7 @@ import java.util.List;
 
 import nl.clockwork.ebms.Constants;
 import nl.clockwork.ebms.dao.EbMSDAO;
+import nl.clockwork.ebms.model.EbMSMessage;
 import nl.clockwork.ebms.util.CPAUtils;
 import nl.clockwork.ebms.util.EbMSMessageUtils;
 
@@ -44,7 +45,7 @@ import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.SyncReply;
 public class MessageHeaderValidator
 {
   protected transient Log logger = LogFactory.getLog(getClass());
-	private PerMessageCharacteristicsType ackSignatureRequested = PerMessageCharacteristicsType.NEVER;
+	private PerMessageCharacteristicsType ackSignatureRequested;// = PerMessageCharacteristicsType.NEVER;
 	private EbMSDAO ebMSDAO;
 
 	public MessageHeaderValidator(EbMSDAO ebMSDAO)
@@ -179,7 +180,7 @@ public class MessageHeaderValidator
 
 	private boolean checkAckSignatureRequested(DeliveryChannel deliveryChannel)
 	{
-		return deliveryChannel.getMessagingCharacteristics().getAckSignatureRequested().equals(ackSignatureRequested);
+		return ackSignatureRequested == null || deliveryChannel.getMessagingCharacteristics().getAckSignatureRequested().equals(ackSignatureRequested);
 	}
 
 	private boolean checkAckSignatureRequested(DeliveryChannel deliveryChannel, AckRequested ackRequested)
@@ -208,4 +209,28 @@ public class MessageHeaderValidator
 //				|| deliveryChannel.getMessagingCharacteristics().getActor().value().equals(acknowledgment.getActor());
 //	}
 
+	public void validate(EbMSMessage requestMessage, EbMSMessage responseMessage) throws ValidationException
+	{
+		if (!requestMessage.getMessageHeader().getCPAId().equals(responseMessage.getMessageHeader().getCPAId()))
+			throw new ValidationException("Request cpaId " + requestMessage.getMessageHeader().getCPAId() + " does not equal response cpaId " + responseMessage.getMessageHeader().getCPAId());
+		if (!requestMessage.getMessageHeader().getMessageData().getMessageId().equals(responseMessage.getMessageHeader().getMessageData().getRefToMessageId()))
+			throw new ValidationException("Request messageId " + requestMessage.getMessageHeader().getMessageData().getMessageId() + " does not equal response refToMessageId " + responseMessage.getMessageHeader().getMessageData().getRefToMessageId());
+		compare(requestMessage.getMessageHeader().getFrom().getPartyId(),responseMessage.getMessageHeader().getTo().getPartyId());
+		compare(requestMessage.getMessageHeader().getTo().getPartyId(),responseMessage.getMessageHeader().getFrom().getPartyId());
+	}
+	
+	private void compare(List<PartyId> requestPartyIds, List<PartyId> responsePartyIds) throws ValidationException
+	{
+		//TODO improvement: use CPA to validate partyIds?
+		for (PartyId requestPartyId : requestPartyIds)
+			for (PartyId responsePartyId : responsePartyIds)
+				if (EbMSMessageUtils.toString(requestPartyId).equals(EbMSMessageUtils.toString(responsePartyId)))
+					return;
+		throw new ValidationException("Request PartyIds do not match response PartyIds");
+	}
+
+	public void setAckSignatureRequested(PerMessageCharacteristicsType ackSignatureRequested)
+	{
+		this.ackSignatureRequested = ackSignatureRequested;
+	}
 }

@@ -90,6 +90,11 @@ import org.xmlsoap.schemas.soap.envelope.Header;
 
 public class EbMSMessageUtils
 {
+	public static EbMSMessage getEbMSMessage(Document document) throws JAXBException, XPathExpressionException, ParserConfigurationException, SAXException, IOException
+	{
+		return getEbMSMessage(document,null);
+	}
+
 	@SuppressWarnings("unchecked")
 	public static EbMSMessage getEbMSMessage(Document document, List<EbMSAttachment> attachments) throws JAXBException, XPathExpressionException, ParserConfigurationException, SAXException, IOException
 	{
@@ -143,6 +148,11 @@ public class EbMSMessageUtils
 		result.setStatusResponse(statusResponse);
 		result.setAttachments(attachments);
 		return result;
+	}
+
+	public static String toString(PartyId partyId)
+	{
+		return (partyId.getType() == null ? "" : partyId.getType() + ":") + partyId.getValue();
 	}
 
 	public static String toString(Service service)

@@ -29,6 +29,7 @@ import nl.clockwork.ebms.model.EbMSMessageContext;
 
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CollaborationProtocolAgreement;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.Service;
+import org.w3c.dom.Document;
 
 public interface EbMSDAO
 {
@@ -45,8 +46,9 @@ public interface EbMSDAO
 	EbMSMessageContent getMessageContent(String messageId) throws DAOException;
 	EbMSMessageContext getMessageContext(String messageId) throws DAOException;
 	EbMSMessageContext getMessageContextByRefToMessageId(String refToMessageId, Service service, String...actions) throws DAOException;
-	EbMSDocument getDocument(String messageId) throws DAOException;
-	EbMSDocument getDocumentByRefToMessageId(String refToMessageId, Service service, String...actions) throws DAOException;
+	Document getDocument(String messageId) throws DAOException;
+	EbMSDocument getEbMSDocument(String messageId) throws DAOException;
+	EbMSDocument getEbMSDocumentByRefToMessageId(String refToMessageId, Service service, String...actions) throws DAOException;
 	EbMSMessageStatus getMessageStatus(String messageId) throws DAOException;
 
 	List<String> getMessageIds(EbMSMessageContext messageContext, EbMSMessageStatus status) throws DAOException;
