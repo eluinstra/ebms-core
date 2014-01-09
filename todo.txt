@@ -1,8 +1,6 @@
 - improve CPA validation
 
-- implement ackSignatureRequested
-	- sign acknowledgment
-	- validate acknowledgment signature (using cpa and original message)
+- implement push soap interface
 
 - test multiple certificates in keystore
 
