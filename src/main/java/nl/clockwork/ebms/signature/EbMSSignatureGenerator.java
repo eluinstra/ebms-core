@@ -28,6 +28,7 @@ import nl.clockwork.ebms.Constants;
 import nl.clockwork.ebms.common.util.DOMUtils;
 import nl.clockwork.ebms.common.util.SecurityUtils;
 import nl.clockwork.ebms.model.EbMSAttachment;
+import nl.clockwork.ebms.model.EbMSMessage;
 import nl.clockwork.ebms.processor.EbMSProcessingException;
 import nl.clockwork.ebms.processor.EbMSProcessorException;
 import nl.clockwork.ebms.util.CPAUtils;
@@ -43,7 +44,6 @@ import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CollaborationProt
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DeliveryChannel;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.PartyInfo;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.AckRequested;
-import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageHeader;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -64,13 +64,13 @@ public class EbMSSignatureGenerator
 		keyStore = SecurityUtils.loadKeyStore(keyStorePath,keyStorePassword);
 	}
 
-	public void generate(CollaborationProtocolAgreement cpa, MessageHeader messageHeader, Document document, List<EbMSAttachment> attachments) throws EbMSProcessorException
+	public void generate(CollaborationProtocolAgreement cpa, EbMSMessage message) throws EbMSProcessorException
 	{
 		try
 		{
-			PartyInfo partyInfo = CPAUtils.getPartyInfo(cpa,messageHeader.getFrom().getPartyId());
-			if (CPAUtils.isSigned(partyInfo,messageHeader.getFrom().getRole(),messageHeader.getService(),messageHeader.getAction()))
-				generate(partyInfo,messageHeader,document,attachments);
+			PartyInfo partyInfo = CPAUtils.getPartyInfo(cpa,message.getMessageHeader().getFrom().getPartyId());
+			if (CPAUtils.isSigned(partyInfo,message.getMessageHeader().getFrom().getRole(),message.getMessageHeader().getService(),message.getMessageHeader().getAction()))
+				generate(partyInfo,message);
 		}
 		catch (GeneralSecurityException e)
 		{
@@ -82,14 +82,14 @@ public class EbMSSignatureGenerator
 		}
 	}
 
-	public void generate(CollaborationProtocolAgreement cpa, AckRequested ackRequested, MessageHeader messageHeader, Document document, List<EbMSAttachment> attachments) throws EbMSProcessorException
+	public void generate(CollaborationProtocolAgreement cpa, AckRequested ackRequested, EbMSMessage message) throws EbMSProcessorException
 	{
 		try
 		{
 			if (ackRequested != null && ackRequested.isSigned())
 			{
-				PartyInfo partyInfo = CPAUtils.getPartyInfo(cpa,messageHeader.getFrom().getPartyId());
-				generate(partyInfo,messageHeader,document,attachments);
+				PartyInfo partyInfo = CPAUtils.getPartyInfo(cpa,message.getMessageHeader().getFrom().getPartyId());
+				generate(partyInfo,message);
 			}
 		}
 		catch (GeneralSecurityException e)
@@ -102,15 +102,15 @@ public class EbMSSignatureGenerator
 		}
 	}
 
-	private void generate(PartyInfo partyInfo, MessageHeader messageHeader, Document document, List<EbMSAttachment> attachments) throws EbMSProcessorException, GeneralSecurityException, XMLSecurityException
+	private void generate(PartyInfo partyInfo, EbMSMessage message) throws EbMSProcessorException, GeneralSecurityException, XMLSecurityException
 	{
-		DeliveryChannel deliveryChannel = CPAUtils.getSendingDeliveryChannel(partyInfo,messageHeader.getFrom().getRole(),messageHeader.getService(),messageHeader.getAction());
+		DeliveryChannel deliveryChannel = CPAUtils.getSendingDeliveryChannel(partyInfo,message.getMessageHeader().getFrom().getRole(),message.getMessageHeader().getService(),message.getMessageHeader().getAction());
 		X509Certificate certificate = CPAUtils.getX509Certificate(CPAUtils.getSigningCertificate(deliveryChannel));
 		String alias = keyStore.getCertificateAlias(certificate);
 		if (alias == null)
 			throw new EbMSProcessorException("No certificate found with subject \"" + certificate.getSubjectDN().getName() + "\" in keystore \"" + keyStorePath + "\"");
 		KeyPair keyPair = SecurityUtils.getKeyPair(keyStore,alias,keyStorePassword);
-		sign(keyStore,keyPair,alias,document,attachments,CPAUtils.getSignatureAlgorithm(deliveryChannel),CPAUtils.getHashFunction(deliveryChannel));
+		sign(keyStore,keyPair,alias,message.getDocument(),message.getAttachments(),CPAUtils.getSignatureAlgorithm(deliveryChannel),CPAUtils.getHashFunction(deliveryChannel));
 	}
 	
 	private void sign(KeyStore keyStore, KeyPair keyPair, String alias, Document document, List<EbMSAttachment> attachments, String signatureMethodAlgorithm, String digestAlgorithm) throws XMLSecurityException, KeyStoreException

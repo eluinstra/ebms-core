@@ -53,8 +53,13 @@ public class MessageHeaderValidator
 		this.ebMSDAO = ebMSDAO;
 	}
 
-	public void validate(CollaborationProtocolAgreement cpa, MessageHeader messageHeader, AckRequested ackRequested, SyncReply syncReply, MessageOrder messageOrder, GregorianCalendar timestamp) throws EbMSValidationException
+	public void validate(CollaborationProtocolAgreement cpa, EbMSMessage message, GregorianCalendar timestamp) throws EbMSValidationException
 	{
+		MessageHeader messageHeader = message.getMessageHeader();
+		AckRequested ackRequested = message.getAckRequested();
+		SyncReply syncReply = message.getSyncReply();
+		MessageOrder messageOrder = message.getMessageOrder();
+		
 		PartyInfo from = null;
 		PartyInfo to = null;
 

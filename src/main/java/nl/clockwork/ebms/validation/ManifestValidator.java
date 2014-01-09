@@ -15,31 +15,29 @@
  */
 package nl.clockwork.ebms.validation;
 
-import java.util.List;
-
 import nl.clockwork.ebms.Constants;
 import nl.clockwork.ebms.model.EbMSAttachment;
+import nl.clockwork.ebms.model.EbMSMessage;
 import nl.clockwork.ebms.util.EbMSMessageUtils;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.Manifest;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.Reference;
 
 public class ManifestValidator
 {
   protected transient Log logger = LogFactory.getLog(getClass());
 
-	public void validate(Manifest manifest, List<EbMSAttachment> attachments) throws EbMSValidationException
+	public void validate(EbMSMessage message) throws EbMSValidationException
 	{
-		if (!Constants.EBMS_VERSION.equals(manifest.getVersion()))
+		if (!Constants.EBMS_VERSION.equals(message.getManifest().getVersion()))
 			throw new EbMSValidationException(EbMSMessageUtils.createError("//Body/Manifest[@version]",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Invalid value."));
-		for (Reference reference : manifest.getReference())
+		for (Reference reference : message.getManifest().getReference())
 		{
 			if (reference.getHref().startsWith(Constants.CID))
 			{
 				boolean found = false;
-				for (EbMSAttachment attachment : attachments)
+				for (EbMSAttachment attachment : message.getAttachments())
 					if (reference.getHref().substring(Constants.CID.length()).equals(attachment.getContentId()))
 						found = true;
 				if (!found)

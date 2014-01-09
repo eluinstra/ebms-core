@@ -19,6 +19,7 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 
 import nl.clockwork.ebms.Constants;
+import nl.clockwork.ebms.model.EbMSMessage;
 import nl.clockwork.ebms.util.CPAUtils;
 import nl.clockwork.ebms.util.EbMSMessageUtils;
 
@@ -31,9 +32,9 @@ public class CPAValidator
 {
   protected transient Log logger = LogFactory.getLog(getClass());
 
-	public void validate(CollaborationProtocolAgreement cpa, MessageHeader messageHeader, GregorianCalendar timestamp) throws EbMSValidationException
+	public void validate(CollaborationProtocolAgreement cpa, EbMSMessage message, GregorianCalendar timestamp) throws EbMSValidationException
 	{
-		if (!cpaExists(cpa,messageHeader))
+		if (!cpaExists(cpa,message.getMessageHeader()))
 			throw new EbMSValidationException(EbMSMessageUtils.createError("//Header/MessageHeader[@cpaid]",Constants.EbMSErrorCode.VALUE_NOT_RECOGNIZED.errorCode(),"CPA not found."));
 		if (!CPAUtils.isValid(cpa,timestamp))
 			throw new EbMSValidationException(EbMSMessageUtils.createError("//Header/MessageHeader[@cpaid]",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Invalid CPA."));

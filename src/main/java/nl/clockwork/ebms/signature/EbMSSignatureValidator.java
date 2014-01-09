@@ -61,22 +61,22 @@ public class EbMSSignatureValidator
 		org.apache.xml.security.Init.init();
 	}
 	
-	public void validate(CollaborationProtocolAgreement cpa, MessageHeader messageHeader, Document document, List<EbMSAttachment> attachments) throws ValidatorException, ValidationException
+	public void validate(CollaborationProtocolAgreement cpa, EbMSMessage message) throws ValidatorException, ValidationException
 	{
 		try
 		{
-			PartyInfo partyInfo = CPAUtils.getPartyInfo(cpa,messageHeader.getFrom().getPartyId());
-			if (CPAUtils.isSigned(partyInfo,messageHeader.getFrom().getRole(),messageHeader.getService(),messageHeader.getAction()))
+			PartyInfo partyInfo = CPAUtils.getPartyInfo(cpa,message.getMessageHeader().getFrom().getPartyId());
+			if (CPAUtils.isSigned(partyInfo,message.getMessageHeader().getFrom().getRole(),message.getMessageHeader().getService(),message.getMessageHeader().getAction()))
 			{
 				KeyStore trustStore = SecurityUtils.loadKeyStore(trustStorePath,trustStorePassword);
-				NodeList signatureNodeList = document.getElementsByTagNameNS(org.apache.xml.security.utils.Constants.SignatureSpecNS,org.apache.xml.security.utils.Constants._TAG_SIGNATURE);
+				NodeList signatureNodeList = message.getDocument().getElementsByTagNameNS(org.apache.xml.security.utils.Constants.SignatureSpecNS,org.apache.xml.security.utils.Constants._TAG_SIGNATURE);
 				if (signatureNodeList.getLength() > 0)
 				{
-					X509Certificate certificate = getCertificate(cpa,document,messageHeader);
+					X509Certificate certificate = getCertificate(cpa,message.getDocument(),message.getMessageHeader());
 					if (certificate != null)
 					{
-						validateCertificate(trustStore,certificate,messageHeader.getMessageData().getTimestamp() == null ? new Date() : messageHeader.getMessageData().getTimestamp().toGregorianCalendar().getTime());
-						if (!verify(certificate,(Element)signatureNodeList.item(0),attachments))
+						validateCertificate(trustStore,certificate,message.getMessageHeader().getMessageData().getTimestamp() == null ? new Date() : message.getMessageHeader().getMessageData().getTimestamp().toGregorianCalendar().getTime());
+						if (!verify(certificate,(Element)signatureNodeList.item(0),message.getAttachments()))
 							throw new ValidationException("Invalid Signature!");
 					}
 					else

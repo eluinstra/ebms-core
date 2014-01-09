@@ -42,7 +42,6 @@ import nl.clockwork.ebms.util.EbMSMessageUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CollaborationProtocolAgreement;
-import org.w3c.dom.Document;
 
 public class EbMSMessageServiceImpl implements EbMSMessageService
 {
@@ -90,9 +89,8 @@ public class EbMSMessageServiceImpl implements EbMSMessageService
 			final CollaborationProtocolAgreement cpa = ebMSDAO.getCPA(messageContent.getContext().getCpaId());
 			//TODO ebMSMessageContentToEbMSDocument
 			final EbMSMessage message = EbMSMessageUtils.ebMSMessageContentToEbMSMessage(cpa,messageContent);
-			Document document = EbMSMessageUtils.createSOAPMessage(message);
-			signatureGenerator.generate(cpa,message.getMessageHeader(),document,message.getAttachments());
-			message.setDocument(document);
+			message.setDocument(EbMSMessageUtils.createSOAPMessage(message));
+			signatureGenerator.generate(cpa,message);
 			ebMSDAO.executeTransaction(
 				new DAOTransactionCallback()
 				{

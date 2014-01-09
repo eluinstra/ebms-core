@@ -18,7 +18,7 @@ package nl.clockwork.ebms.validation;
 import java.util.List;
 
 import nl.clockwork.ebms.Constants;
-import nl.clockwork.ebms.model.EbMSAttachment;
+import nl.clockwork.ebms.model.EbMSMessage;
 import nl.clockwork.ebms.signature.EbMSSignatureValidator;
 import nl.clockwork.ebms.util.CPAUtils;
 import nl.clockwork.ebms.util.EbMSMessageUtils;
@@ -31,7 +31,6 @@ import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.PartyInfo;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageHeader;
 import org.w3._2000._09.xmldsig.ReferenceType;
 import org.w3._2000._09.xmldsig.SignatureType;
-import org.w3c.dom.Document;
 
 public class SignatureTypeValidator
 {
@@ -43,20 +42,11 @@ public class SignatureTypeValidator
 		this.ebMSSignatureValidator = ebMSSignatureValidator;
 	}
 
-	public void validate(CollaborationProtocolAgreement cpa, MessageHeader messageHeader, Document document, List<EbMSAttachment> attachments) throws ValidatorException
+	public void validate(CollaborationProtocolAgreement cpa, EbMSMessage message) throws ValidatorException
 	{
-		try
-		{
-			ebMSSignatureValidator.validate(cpa,messageHeader,document,attachments);
-		}
-		catch (ValidationException e)
-		{
-			throw new EbMSValidationException(EbMSMessageUtils.createError("//Header/Signature",Constants.EbMSErrorCode.SECURITY_FAILURE.errorCode(),e.getMessage()));
-		}
-	}
-	
-	public void validate(CollaborationProtocolAgreement cpa, MessageHeader messageHeader, SignatureType signature) throws ValidatorException
-	{
+		MessageHeader messageHeader = message.getMessageHeader();
+		SignatureType signature = message.getSignature();
+		
 		PartyInfo partyInfo = CPAUtils.getPartyInfo(cpa,messageHeader.getFrom().getPartyId());
 		DeliveryChannel deliveryChannel = CPAUtils.getSendingDeliveryChannel(partyInfo,messageHeader.getFrom().getRole(),messageHeader.getService(),messageHeader.getAction());
 		if (CPAUtils.isSigned(partyInfo,messageHeader.getFrom().getRole(),messageHeader.getService(),messageHeader.getAction()))
@@ -69,6 +59,18 @@ public class SignatureTypeValidator
 					throw new EbMSValidationException(EbMSMessageUtils.createError("//Header/Signature/SignedInfo/Reference[@URI='" + reference.getURI() + "']/DigestMethod[@Algorithm]",Constants.EbMSErrorCode.SECURITY_FAILURE.errorCode(),"Invalid DigestMethod."));
 			if (!CPAUtils.getSignatureAlgorithm(deliveryChannel).equals(signature.getSignedInfo().getSignatureMethod().getAlgorithm()))
 				throw new EbMSValidationException(EbMSMessageUtils.createError("//Header/Signature/SignedInfo/SignatureMethod[@Algorithm]",Constants.EbMSErrorCode.SECURITY_FAILURE.errorCode(),"Invalid SignatureMethod."));
+		}
+	}
+	
+	public void validateSignature(CollaborationProtocolAgreement cpa, EbMSMessage message) throws ValidatorException
+	{
+		try
+		{
+			ebMSSignatureValidator.validate(cpa,message);
+		}
+		catch (ValidationException e)
+		{
+			throw new EbMSValidationException(EbMSMessageUtils.createError("//Header/Signature",Constants.EbMSErrorCode.SECURITY_FAILURE.errorCode(),e.getMessage()));
 		}
 	}
 	
