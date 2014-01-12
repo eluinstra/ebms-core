@@ -1,6 +1,5 @@
 - improve CPA validation
 
-- CPA caching
 - implement security om soap interface
 - implement push soap interface
 - implement pull and push mq interfaces
