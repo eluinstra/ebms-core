@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+    Copyright 2011 Clockwork
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<bean id="ebMSDAO" class="org.springframework.aop.framework.ProxyFactoryBean">
+		<property name="target">
+			<ref bean="_ebMSDAO"/>
+		</property>
+		<property name="interceptorNames">
+			<list>
+				<value>ebMSDAOMethodCachePointCut</value>
+			</list>
+		</property>
+	</bean>
+
+	<bean id="ebMSDAOMethodCachePointCut" class="org.springframework.aop.support.RegexpMethodPointcutAdvisor">
+		<property name="advice">
+		  <ref bean="ebMSDAOMethodCacheInterceptor"/>
+		</property>
+		<property name="patterns">
+			<list>
+				<value>.*getCPA</value>
+			</list>
+		</property>
+	</bean>
+
+	<bean id="ebMSDAOMethodCacheInterceptor" class="nl.clockwork.ebms.dao.MethodCacheInterceptor">
+		<property name="cache">
+			<ref bean="ebMSDAOMethodCache" />
+		</property>
+	</bean>
+
+	<bean id="ebMSDAOMethodCache" class="org.springframework.cache.ehcache.EhCacheFactoryBean">
+		<property name="cacheManager">
+			<ref bean="cacheManager"/>
+		</property>
+		<property name="cacheName">
+			<value>nl.clockwork.ebms.dao.METHOD_CACHE</value>
+		</property>
+	</bean>
+
+	<bean id="cacheManager" class="org.springframework.cache.ehcache.EhCacheManagerFactoryBean">
+		<property name="configLocation">
+			<value>classpath:nl/clockwork/ebms/ehcache.xml</value>
+		</property>
+	</bean>
+
+</beans>

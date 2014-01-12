@@ -1,0 +1,14 @@
+<ehcache>
+
+    <diskStore path="java.io.tmpdir"/>
+
+    <cache name="nl.clockwork.ebms.dao.METHOD_CACHE"
+        maxElementsInMemory="10000"
+        eternal="false"
+        timeToIdleSeconds="300"
+        timeToLiveSeconds="300"
+        overflowToDisk="false"
+        memoryStoreEvictionPolicy="LRU"
+    />
+
+</ehcache>

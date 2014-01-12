@@ -20,18 +20,15 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-	<bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
-		<property name="ignoreResourceNotFound" value="true" />
-		<property name="locations"> 
-			<list>
-				<value>classpath:nl/clockwork/ebms/default.properties</value>   
-			</list>
-		</property>
+	<import resource="cache.xml"/>
+
+	<bean id="_ebMSDAO" class="nl.clockwork.ebms.dao.EbMSDAOFactory">
+		<property name="dataSource" ref="ebMSDataSource"/>
+		<property name="connectionManager" ref="connectionManager"/>
 	</bean>
 
-	<import resource="ds/datasource.xml"/>
-	<import resource="ds/dao.cached.spring.xml"/>
-
-	<import resource="processor.xml"/>
+	<bean id="connectionManager" class="nl.clockwork.ebms.dao.SQLConnectionManager">
+		<constructor-arg index="0" ref="ebMSDataSource"/>
+	</bean>
 
 </beans>
