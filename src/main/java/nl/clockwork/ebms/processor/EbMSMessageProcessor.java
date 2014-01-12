@@ -301,7 +301,7 @@ public class EbMSMessageProcessor
 		{
 			try
 			{
-				cpaValidator.validate(cpa,message,timestamp);
+				cpaValidator.validate(cpa,message);
 				messageHeaderValidator.validate(cpa,message,timestamp);
 				signatureTypeValidator.validate(cpa,message);
 				manifestValidator.validate(message);
@@ -397,7 +397,7 @@ public class EbMSMessageProcessor
 		try
 		{
 			GregorianCalendar c = null;
-			cpaValidator.validate(cpa,message,timestamp);
+			cpaValidator.cpaExists(cpa,message);
 			EbMSMessageStatus status = EbMSMessageStatus.UNAUTHORIZED;
 			EbMSMessageContext context = ebMSDAO.getMessageContext(message.getStatusRequest().getRefToMessageId());
 			if (context == null || Constants.EBMS_SERVICE_URI.equals(context.getService()))
@@ -426,7 +426,7 @@ public class EbMSMessageProcessor
 	{
 		try
 		{
-			cpaValidator.validate(cpa,message,timestamp);
+			cpaValidator.cpaExists(cpa,message);
 			return EbMSMessageUtils.createEbMSPong(cpa,message);
 		}
 		catch(EbMSValidationException e)

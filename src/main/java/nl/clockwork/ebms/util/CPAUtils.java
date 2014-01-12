@@ -52,8 +52,9 @@ import org.w3._2000._09.xmldsig.X509DataType;
 //TODO use JXPath
 public class CPAUtils
 {
-	public static boolean isValid(CollaborationProtocolAgreement cpa, Calendar timestamp)
+	public static boolean isValid(CollaborationProtocolAgreement cpa, EbMSMessage message)
 	{
+		Calendar timestamp = message.getMessageHeader().getMessageData().getTimestamp().toGregorianCalendar();
 		return StatusValueType.AGREED.equals(cpa.getStatus().getValue())
 			&& timestamp.compareTo(cpa.getStart().toGregorianCalendar()) >= 0
 			&& timestamp.compareTo(cpa.getEnd().toGregorianCalendar()) <= 0
