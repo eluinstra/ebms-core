@@ -21,9 +21,7 @@
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
 	<bean id="ebMSDAO" class="org.springframework.aop.framework.ProxyFactoryBean">
-		<property name="target">
-			<ref bean="_ebMSDAO"/>
-		</property>
+		<property name="target" ref="_ebMSDAO"/>
 		<property name="interceptorNames">
 			<list>
 				<value>ebMSDAOMethodCachePointCut</value>
@@ -32,9 +30,7 @@
 	</bean>
 
 	<bean id="ebMSDAOMethodCachePointCut" class="org.springframework.aop.support.RegexpMethodPointcutAdvisor">
-		<property name="advice">
-		  <ref bean="ebMSDAOMethodCacheInterceptor"/>
-		</property>
+		<property name="advice" ref="ebMSDAOMethodCacheInterceptor"/>
 		<property name="patterns">
 			<list>
 				<value>.*getCPA</value>
@@ -43,24 +39,18 @@
 	</bean>
 
 	<bean id="ebMSDAOMethodCacheInterceptor" class="nl.clockwork.ebms.dao.MethodCacheInterceptor">
-		<property name="cache">
-			<ref bean="ebMSDAOMethodCache" />
-		</property>
+		<property name="cache" ref="ebMSDAOMethodCache" />
 	</bean>
 
 	<bean id="ebMSDAOMethodCache" class="org.springframework.cache.ehcache.EhCacheFactoryBean">
-		<property name="cacheManager">
-			<ref bean="cacheManager"/>
-		</property>
-		<property name="cacheName">
-			<value>nl.clockwork.ebms.dao.METHOD_CACHE</value>
-		</property>
+		<property name="cacheManager" ref="cacheManager"/>
+		<property name="cacheName" value="nl.clockwork.ebms.dao.METHOD_CACHE"/>
+		<property name="overflowToDisk" value="false"/>
+		<property name="disabled" value="${cache.disabled}"/>
+		<property name="timeToIdle" value="${cache.timeToIdle}"/>
+		<property name="timeToLive" value="${cache.timeToLive}"/>
 	</bean>
 
-	<bean id="cacheManager" class="org.springframework.cache.ehcache.EhCacheManagerFactoryBean">
-		<property name="configLocation">
-			<value>classpath:nl/clockwork/ebms/ehcache.xml</value>
-		</property>
-	</bean>
+	<bean id="cacheManager" class="org.springframework.cache.ehcache.EhCacheManagerFactoryBean"/>
 
 </beans>
