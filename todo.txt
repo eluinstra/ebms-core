@@ -1,18 +1,22 @@
+2.1:
 - improve CPA validation
 
-- implement security om soap interface
+- implement security on soap interface
 - implement push soap interface
 - implement pull and push mq interfaces
 
 - test multiple certificates in keystore
 
-- implement SSLFactoryManager that returns a CPA/hostname related SSLSocketFactory to handle different key/certificate pairs
-	- load right SSLFactoryManager on each URLConnection request
-
+2.x:
 - validate message composition using SimplePart and Packaging definition from CPA 
 - validate message format (available elements versus action)
 - improve header validation
 	- add separate service and action validation
+
+- improve error handling and logging on exceptions on response messages (ErrorMessage and Acknowledgment)
+
+- implement SSLFactoryManager that returns a CPA/hostname related SSLSocketFactory to handle different key/certificate pairs
+	- load right SSLFactoryManager on each URLConnection request
 
 - make EbMSMessageProcessor event driven
 	- implement eventManager
