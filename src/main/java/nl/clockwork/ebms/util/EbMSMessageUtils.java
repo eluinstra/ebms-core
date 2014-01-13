@@ -298,7 +298,7 @@ public class EbMSMessageUtils
 		result.getService().setValue(Constants.EBMS_SERVICE_URI);
 		result.setAction(action.action());
 
-		//result.setDuplicateElimination(null);
+		result.setDuplicateElimination(null);
 
 		return result;
 	}
