@@ -29,8 +29,8 @@
 		</property>
 	</bean>
 
-	<import resource="ds/datasource.xml"/>
-	<import resource="ds/dao.cached.spring.xml"/>
+	<import resource="datasource.xml"/>
+	<import resource="dao.cached.spring.xml"/>
 
 	<import resource="processor.xml"/>
 
