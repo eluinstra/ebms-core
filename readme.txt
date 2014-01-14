@@ -11,6 +11,34 @@ This library contains the core functionality of the EbMS adapter including:
 	- oracle (11)(lob > 4k fix (needed for older oracle jdbc adapters) not implemented!)
 - CPA and EbMSMessage SOAP Services to control the EbMS adapter
 
+Supported:
+-	Core Functionality
+	o	Security Module
+			Signature
+	o	Error Handling Module
+	o	SyncReply Module
+-	Additional Features:
+	o	Reliable Messaging Module
+	o	Message Status Service
+	o	Message Service Handler Ping Service
+-	HTTP(S) Protocol
+-	Separate ErrorMessage and Acknowlegment messages
+
+Not supported:
+-	Core Functionality
+	o	Security Module
+			Encryption
+-	Additional Features:
+	o	Message Order Module
+	o	Multi-Hop Module
+-	Multiple delivery channels per action
+-	Manifest inspection
+
+Remarks:
+-	duplicate messages will always be eliminated
+-	partyName is required in the CPA and must be unique
+-	Extendable to support other communication protocols
+
 ===============
 Prerequisites =
 ===============
