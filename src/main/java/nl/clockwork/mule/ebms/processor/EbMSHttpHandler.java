@@ -100,7 +100,7 @@ public class EbMSHttpHandler implements Callable
 			throw new IOException(e);
 		}
 
-		response.setBody(
+		response.setBody(output.size() == 0 ? null :
 			new OutputHandler()
 			{
 				@Override
