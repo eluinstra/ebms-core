@@ -62,9 +62,8 @@ public class CPAValidator
 		if (cpa.getPartyInfo().get(0).getPartyName().equals(cpa.getPartyInfo().get(1).getPartyName()))
 			throw new ValidationException("PartyName " + cpa.getPartyInfo().get(0).getPartyName() + " not unique!");
 		
-		//syncReply mode signalsAndResponse not supported 
-		//syncReply mode responseOnly not supported
-		//ackSignatureRequested not supported
+		//syncReply mode signalsAndResponse not supported?
+		//syncReply mode responseOnly not supported?
 		//CanSend/CanReceive match (nested elements not allowed)
 		//TimeToLive == ((Retries + 1) * RetryInterval); PersistDuration >= TimeToLive
 		//1 channel per action allowed

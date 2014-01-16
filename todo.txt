@@ -1,5 +1,7 @@
 2.1:
 - improve CPA validation
+	- validate check used CPA fields in CPAUtils and them
+	- validate on unsupported features
 
 - implement security on soap interface
 - implement push soap interface
