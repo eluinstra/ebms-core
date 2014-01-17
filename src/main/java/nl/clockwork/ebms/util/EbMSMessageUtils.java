@@ -286,8 +286,11 @@ public class EbMSMessageUtils
 		result.getTo().getPartyId().clear();
 		result.getTo().getPartyId().addAll(messageHeader.getFrom().getPartyId());
 
-		result.getFrom().setRole(null);
-		result.getTo().setRole(null);
+		// Cleo patch
+		//result.getFrom().setRole(null);
+		//result.getTo().setRole(null);
+		result.getFrom().setRole(messageHeader.getTo().getRole());
+		result.getTo().setRole(messageHeader.getFrom().getRole());
 
 		result.getMessageData().setRefToMessageId(messageHeader.getMessageData().getMessageId());
 		result.getMessageData().setMessageId(UUID.randomUUID().toString() + "@" + hostname);
