@@ -27,7 +27,7 @@ import javax.xml.validation.Validator;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.w3c.dom.Document;
+import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
 public class XSDValidator
@@ -67,12 +67,12 @@ public class XSDValidator
 		}
 	}
 
-	public void validate(Document document) throws ValidatorException, ValidationException
+	public void validate(Node node) throws ValidatorException, ValidationException
 	{
 		try
 		{
 			Validator validator = schema.newValidator();
-			validator.validate(new DOMSource(document));
+			validator.validate(new DOMSource(node));
 		}
 		catch (SAXException e)
 		{
