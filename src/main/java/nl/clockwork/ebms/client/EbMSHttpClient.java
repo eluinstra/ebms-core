@@ -88,23 +88,14 @@ public class EbMSHttpClient implements EbMSClient
 		return chunkedStreamingMode;
 	}
 
-	@SuppressWarnings({"restriction","deprecation"})
 	private URLConnection openConnection(String uri) throws IOException
 	{
 		URL url = new URL(uri);
 		URLConnection connection = url.openConnection();
 		connection.setDoOutput(true);
 		//connection.setMethod("POST");
-		if (connection instanceof HttpsURLConnection)
-		{
-			((HttpsURLConnection)connection).setHostnameVerifier(sslFactoryManager.getHostnameVerifier((HttpsURLConnection)connection));
-			((HttpsURLConnection)connection).setSSLSocketFactory(sslFactoryManager.getSslSocketFactory());
-		}
-		else if (connection instanceof com.sun.net.ssl.HttpsURLConnection)
-		{
-			((com.sun.net.ssl.HttpsURLConnection)connection).setHostnameVerifier(sslFactoryManager.getHostnameVerifier((com.sun.net.ssl.HttpsURLConnection)connection));
-			((com.sun.net.ssl.HttpsURLConnection)connection).setSSLSocketFactory(sslFactoryManager.getSslSocketFactory());
-		}
+		((HttpsURLConnection)connection).setHostnameVerifier(sslFactoryManager.getHostnameVerifier((HttpsURLConnection)connection));
+		((HttpsURLConnection)connection).setSSLSocketFactory(sslFactoryManager.getSslSocketFactory());
 		return connection;
 	}
 
