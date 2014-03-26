@@ -53,8 +53,8 @@ public class CPAValidator
 			throw new ValidationException("CPA End date before Start date!");
 		if (Calendar.getInstance().compareTo(cpa.getEnd().toGregorianCalendar()) > 0)
 			throw new ValidationException("CPA expired on " + cpa.getEnd());
-		if (cpa.getConversationConstraints() != null)
-			throw new ValidationException("CPA Conversation Constraints not supported!");
+		//if (cpa.getConversationConstraints() != null)
+		//	throw new ValidationException("CPA Conversation Constraints not supported!");
 		//if (cpa.getSignature() != null)
 		//	throw new ValidationException("CPA Signature not supported!");
 		if (cpa.getPartyInfo().size() != 2)
