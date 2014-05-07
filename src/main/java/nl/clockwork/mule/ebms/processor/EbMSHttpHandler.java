@@ -29,6 +29,7 @@ import nl.clockwork.ebms.server.EbMSInputStreamHandlerImpl;
 import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpVersion;
 import org.apache.commons.httpclient.ProtocolException;
+import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.mule.api.MuleEvent;
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleMessage;
@@ -48,48 +49,52 @@ public class EbMSHttpHandler implements Callable
 		final MuleMessage message = eventContext.getMessage();
   	final InputStream request = (InputStream)message.getPayload();
   	final HttpResponse response = new HttpResponse();
-		response.setBody(
+		final ByteArrayOutputStream output = new ByteArrayOutputStream();
+
+		try
+		{
+			EbMSInputStreamHandler messageHandler = 
+	  		new EbMSInputStreamHandlerImpl(ebMSMessageProcessor,getHeaders(message))
+				{
+					@Override
+					public void writeResponseStatus(int statusCode)
+					{
+						try
+						{
+							response.setStatusLine(HttpVersion.parse(HttpConstants.HTTP11),statusCode);
+						}
+						catch (ProtocolException e)
+						{
+						}
+					}
+					
+					@Override
+					public void writeResponseHeader(String name, String value)
+					{
+						response.addHeader(new Header(name,value));
+					}
+					
+					@Override
+					public OutputStream getOutputStream() throws IOException
+					{
+						return output;
+					}
+				}
+	  	;
+			messageHandler.handle(request);
+		}
+		catch (EbMSProcessorException e)
+		{
+			throw new IOException(e);
+		}
+
+		response.setBody(output.size() == 0 ? null :
 			new OutputHandler()
 			{
 				@Override
 				public void write(MuleEvent event, final OutputStream out) throws IOException
 				{
-					try
-					{
-						EbMSInputStreamHandler messageHandler = 
-				  		new EbMSInputStreamHandlerImpl(ebMSMessageProcessor,getHeaders(message))
-							{
-								@Override
-								public void writeResponseStatus(int statusCode)
-								{
-									try
-									{
-										response.setStatusLine(HttpVersion.parse(HttpConstants.HTTP11),statusCode);
-									}
-									catch (ProtocolException e)
-									{
-									}
-								}
-								
-								@Override
-								public void writeResponseHeader(String name, String value)
-								{
-									response.addHeader(new Header(name,value));
-								}
-								
-								@Override
-								public OutputStream getOutputStream() throws IOException
-								{
-									return out;
-								}
-							}
-				  	;
-						messageHandler.handle(request);
-					}
-					catch (EbMSProcessorException e)
-					{
-						throw new IOException(e);
-					}
+					output.writeTo(out);
 				}
 			}
 		);
