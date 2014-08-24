@@ -123,6 +123,7 @@ public class SSLFactoryManager
 
 		//SSLEngine engine = sslContext.createSSLEngine(hostname,port);
 		SSLEngine engine = sslContext.createSSLEngine();
+		engine.setEnabledProtocols(new String[]{"SSLv2Hello","SSLv3","TLSv1"});
 		if (allowedCipherSuites.length > 0)
 			engine.setEnabledCipherSuites(allowedCipherSuites);
 
