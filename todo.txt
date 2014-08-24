@@ -4,8 +4,6 @@
 		  or
 		- add encoding to handle(String xml)
 
-- Check timing issue in DeliveryManager.sendMessage() and MessageQueue.put()
-
 - improve timetolive???
 	- timetolive = now + expirationperiod + 1s
 	- timetolive validation rule: now < timetolive + retryinterval
