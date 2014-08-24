@@ -19,6 +19,7 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.Reader;
 import java.io.StringWriter;
+import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 
 import javax.xml.bind.JAXBContext;
@@ -54,9 +55,16 @@ public class XMLMessageBuilder<T>
 
 	public T handle(String xml, Class<T> clazz) throws JAXBException
 	{
-		if (StringUtils.isEmpty(xml))
-			return null;
-		return handle(new ByteArrayInputStream(xml.getBytes()),clazz);
+		try
+		{
+			if (StringUtils.isEmpty(xml))
+				return null;
+			return handle(new ByteArrayInputStream(xml.getBytes("UTF-8")),clazz);
+		}
+		catch (UnsupportedEncodingException e)
+		{
+			throw new JAXBException(e);
+		}
 	}
 
 	public T handle(InputStream is) throws JAXBException
