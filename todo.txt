@@ -45,3 +45,5 @@
 - remove EbMS(Message) prefix on classes; add EbMS(Message) prefix on bean ids? 
 
 - implement EbMSFileAttachment (file proxy) and EbMSDBAttachment (db proxy) for large message processing?
+
+- replace custom message writer by mime4j???
