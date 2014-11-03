@@ -24,19 +24,19 @@ public class EbMSProcessingException extends EbMSProcessorException
 		super();
 	}
 
-	public EbMSProcessingException(String arg0, Throwable arg1)
+	public EbMSProcessingException(String message, Throwable cause)
 	{
-		super(arg0,arg1);
+		super(message,cause);
 	}
 
-	public EbMSProcessingException(String arg0)
+	public EbMSProcessingException(String message)
 	{
-		super(arg0);
+		super(message);
 	}
 
-	public EbMSProcessingException(Throwable arg0)
+	public EbMSProcessingException(Throwable cause)
 	{
-		super(arg0);
+		super(cause);
 	}
 
 }

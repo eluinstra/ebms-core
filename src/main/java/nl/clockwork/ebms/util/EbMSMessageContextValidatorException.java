@@ -17,7 +17,6 @@ package nl.clockwork.ebms.util;
 
 import javax.xml.ws.WebFault;
 
-
 @WebFault(name="EbMSMessageServiceException", targetNamespace="http://www.clockwork.nl/ebms/1.2")
 public class EbMSMessageContextValidatorException extends RuntimeException
 {

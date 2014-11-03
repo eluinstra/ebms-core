@@ -120,9 +120,7 @@ public class CPAUtils
 	{
 		for (PartyInfo partyInfo : cpa.getPartyInfo())
 			for (CollaborationRole role : partyInfo.getCollaborationRole())
-				if ((from == null || from.equals(role.getRole().getName()))
-						&& service.equals(toString(role.getServiceBinding().getService()))
-				)
+				if ((from == null || from.equals(role.getRole().getName())) && service.equals(toString(role.getServiceBinding().getService())))
 					for (CanSend canSend : role.getServiceBinding().getCanSend())
 						if (action.equals(canSend.getThisPartyActionBinding().getAction()))
 						{
@@ -143,9 +141,7 @@ public class CPAUtils
 	{
 		for (PartyInfo partyInfo : cpa.getPartyInfo())
 			for (CollaborationRole role : partyInfo.getCollaborationRole())
-				if ((to == null || to.equals(role.getRole().getName()))
-						&& service.equals(toString(role.getServiceBinding().getService()))
-				)
+				if ((to == null || to.equals(role.getRole().getName())) && service.equals(toString(role.getServiceBinding().getService())))
 					for (CanReceive canReceive : role.getServiceBinding().getCanReceive())
 						if (action.equals(canReceive.getThisPartyActionBinding().getAction()))
 						{

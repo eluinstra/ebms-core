@@ -65,6 +65,4 @@ public interface EbMSDAO
 	EbMSMessage getMessage(String messageId) throws DAOException;
 	void updateMessage(String messageId, EbMSMessageStatus oldStatus, EbMSMessageStatus newStatus) throws DAOException;
 	void updateMessages(List<String> messageIds, EbMSMessageStatus oldStatus, EbMSMessageStatus newStatus) throws DAOException;
-
-
 }

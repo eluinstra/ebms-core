@@ -134,10 +134,10 @@ public class DOMUtils
 
 	public static Object executeXPathQuery(NamespaceContext namespaceContext, Document document, String query, QName returnType) throws ParserConfigurationException, SAXException, IOException, XPathExpressionException
 	{
-	    XPath xpath = XPathFactory.newInstance().newXPath();
-	    xpath.setNamespaceContext(namespaceContext);
-	    XPathExpression expr = xpath.compile(query);
-	    return (Node)expr.evaluate(document,returnType);
+		XPath xpath = XPathFactory.newInstance().newXPath();
+		xpath.setNamespaceContext(namespaceContext);
+		XPathExpression expr = xpath.compile(query);
+		return (Node)expr.evaluate(document,returnType);
 	}
 
 }

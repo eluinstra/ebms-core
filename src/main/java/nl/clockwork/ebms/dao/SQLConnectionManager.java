@@ -29,14 +29,13 @@ public class SQLConnectionManager implements ConnectionManager
 	private static class SQLConnectionHolder
 	{
 		private static final Log logger = LogFactory.getLog(SQLConnectionHolder.class);
-		private static final ThreadLocal<SQLConnectionHolder> threadLocal =
-			new ThreadLocal<SQLConnectionHolder>()
+		private static final ThreadLocal<SQLConnectionHolder> threadLocal = new ThreadLocal<SQLConnectionHolder>()
+		{
+			protected SQLConnectionHolder initialValue()
 			{
-				protected SQLConnectionHolder initialValue()
-				{
-					return new SQLConnectionHolder();
-				};
+				return new SQLConnectionHolder();
 			};
+		};
 		
 		public Connection connection;
 		public int transactionCount = 0;
