@@ -43,12 +43,7 @@ public class EbMSDateTimeConverter
 			calendar.setTime(df.parse(date));
 			return DatatypeFactory.newInstance().newXMLGregorianCalendar(calendar);
 		}
-		catch (ParseException e)
-		{
-			//throw new RuntimeException(e);
-			return null;
-		}
-		catch (DatatypeConfigurationException e)
+		catch (ParseException | DatatypeConfigurationException e)
 		{
 			//throw new RuntimeException(e);
 			return null;

@@ -75,15 +75,10 @@ public class EbMSHttpHandlerImpl implements EbMSHttpHandler
 	  		}
 	  	}
 		}
-		catch (IOException e)
+		catch (IOException | TransformerException e)
 		{
 			throw new EbMSProcessorException(e);
 		}
-		catch (TransformerException e)
-		{
-			throw new EbMSProcessorException(e);
-		}
-	  
 	}
 	
 	public void setMessageProcessor(EbMSMessageProcessor messageProcessor)

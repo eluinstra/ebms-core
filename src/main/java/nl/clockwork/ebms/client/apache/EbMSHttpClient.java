@@ -63,11 +63,7 @@ public class EbMSHttpClient implements EbMSClient
 			//	throw e;
 			//}
 		}
-		catch (TransformerException e)
-		{
-			throw new EbMSProcessorException(e);
-		}
-		catch (IOException e)
+		catch (TransformerException | IOException e)
 		{
 			throw new EbMSProcessorException(e);
 		}

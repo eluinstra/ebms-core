@@ -89,11 +89,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 				else
 					return null;
 			}
-			catch (JAXBException e)
-			{
-				throw new SQLException(e);
-			}
-			catch (DAOException e)
+			catch (JAXBException | DAOException e)
 			{
 				throw new SQLException(e);
 			}
@@ -102,7 +98,6 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	
 	protected TransactionTemplate transactionTemplate;
 	protected JdbcTemplate jdbcTemplate;
-	//public abstract String getDateFormat();
 	public abstract String getTimestampFunction();
 	
 	public AbstractEbMSDAO(TransactionTemplate transactionTemplate, JdbcTemplate jdbcTemplate)
@@ -147,11 +142,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 		{
 			return null;
 		}
-		catch (DataAccessException e)
-		{
-			throw new DAOException(e);
-		}
-		catch (JAXBException e)
+		catch (DataAccessException | JAXBException e)
 		{
 			throw new DAOException(e);
 		}
@@ -190,11 +181,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 				XMLMessageBuilder.getInstance(CollaborationProtocolAgreement.class).handle(cpa)
 			) > 0;
 		}
-		catch (DataAccessException e)
-		{
-			throw new DAOException(e);
-		}
-		catch (JAXBException e)
+		catch (DataAccessException | JAXBException e)
 		{
 			throw new DAOException(e);
 		}
@@ -214,11 +201,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 				cpa.getCpaid()
 			) > 0;
 		}
-		catch (DataAccessException e)
-		{
-			throw new DAOException(e);
-		}
-		catch (JAXBException e)
+		catch (DataAccessException | JAXBException e)
 		{
 			throw new DAOException(e);
 		}
@@ -356,11 +339,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 		{
 			return null;
 		}
-		catch (DataAccessException e)
-		{
-			throw new DAOException(e);
-		}
-		catch (JAXBException e)
+		catch (DataAccessException | JAXBException e)
 		{
 			throw new DAOException(e);
 		}
@@ -466,11 +445,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 				}
 			);
 		}
-		catch (TransactionException e)
-		{
-			throw new DAOException(e);
-		}
-		catch (DataAccessException e)
+		catch (TransactionException | DataAccessException e)
 		{
 			throw new DAOException(e);
 		}
@@ -520,11 +495,13 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 			jdbcTemplate.update(
 				"update ebms_event set" +
 				" status = ?," +
-				" status_time = " + getTimestampFunction() + "," +
+				//" status_time = " + getTimestampFunction() + "," +
+				" status_time = ?," +
 				" error_message = ?" +
 				" where ebms_message_id = ?" +
 				" and time = ?",
 				status.id(),
+				new Date(),
 				errorMessage,
 				ebMSMessageId,
 				timestamp
@@ -675,11 +652,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 				}
 			);
 		}
-		catch (TransactionException e)
-		{
-			throw new DAOException(e);
-		}
-		catch (DataAccessException e)
+		catch (TransactionException | DataAccessException e)
 		{
 			throw new DAOException(e);
 		}
@@ -795,11 +768,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 				}
 			);
 		}
-		catch (TransactionException e)
-		{
-			throw new DAOException(e);
-		}
-		catch (DataAccessException e)
+		catch (TransactionException | DataAccessException e)
 		{
 			throw new DAOException(e);
 		}
@@ -1001,14 +970,14 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 		{
 			List<Object> parameters = new ArrayList<Object>();
 			return jdbcTemplate.queryForList(
-					"select message_id" +
-					" from ebms_message" +
-					" where message_nr = 0" +
-					" and status = " + status.id() +
-					getMessageContextFilter(messageContext,parameters) +
-					" order by time_stamp asc",
-					parameters.toArray(new Object[0]),
-					String.class
+				"select message_id" +
+				" from ebms_message" +
+				" where message_nr = 0" +
+				" and status = " + status.id() +
+				getMessageContextFilter(messageContext,parameters) +
+				" order by time_stamp asc",
+				parameters.toArray(new Object[0]),
+				String.class
 			);
 		}
 		catch (DataAccessException e)
@@ -1094,13 +1063,13 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 			for (String messageId : messageIds)
 				ids.add(new Object[]{messageId});
 			jdbcTemplate.batchUpdate(
-					"update ebms_message" +
-					" set status = " + newStatus.id() + "," +
-					" status_time = " + getTimestampFunction() +
-					" where message_id = ?" +
-					" and message_nr = 0" +
-					(oldStatus == null ? " and status is null" : " and status = " + oldStatus.id()),
-					ids
+				"update ebms_message" +
+				" set status = " + newStatus.id() + "," +
+				" status_time = " + getTimestampFunction() +
+				" where message_id = ?" +
+				" and message_nr = 0" +
+				(oldStatus == null ? " and status is null" : " and status = " + oldStatus.id()),
+				ids
 			);
 		}
 		catch (DataAccessException e)

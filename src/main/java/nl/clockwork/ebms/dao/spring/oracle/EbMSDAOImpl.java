@@ -39,6 +39,7 @@ import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.AckRequested;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageHeader;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageOrder;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.SyncReply;
+import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -55,12 +56,6 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 	{
 		super(transactionTemplate,jdbcTemplate);
 	}
-
-//	@Override
-//	public String getDateFormat()
-//	{
-//		return "%1$tY-%1$tm-%1$td %1$tH:%1$tM:%1$tS.%1$tL";
-//	}
 
 	@Override
 	public String getTimestampFunction()
@@ -200,7 +195,7 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 				}
 			);
 		}
-		catch (TransactionException e)
+		catch (TransactionException | DataAccessException e)
 		{
 			throw new DAOException(e);
 		}
@@ -317,7 +312,7 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 				}
 			);
 		}
-		catch (TransactionException e)
+		catch (TransactionException | DataAccessException e)
 		{
 			throw new DAOException(e);
 		}

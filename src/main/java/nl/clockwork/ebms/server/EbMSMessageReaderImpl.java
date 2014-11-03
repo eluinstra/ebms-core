@@ -26,6 +26,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import nl.clockwork.ebms.common.util.DOMUtils;
 import nl.clockwork.ebms.model.EbMSAttachment;
 import nl.clockwork.ebms.model.EbMSDocument;
+import nl.clockwork.ebms.processor.EbMSProcessingException;
 import nl.clockwork.ebms.processor.EbMSProcessorException;
 
 import org.apache.james.mime4j.MimeException;
@@ -59,19 +60,11 @@ public class EbMSMessageReaderImpl implements EbMSMessageReader
 			else
 				return getEbMSMessage(in);
 		}
-		catch (MimeException e)
+		catch (MimeException | IOException | SAXException e)
 		{
-			throw new EbMSProcessorException(e);
-		}
-		catch (IOException e)
-		{
-			throw new EbMSProcessorException(e);
+			throw new EbMSProcessingException(e);
 		}
 		catch (ParserConfigurationException e)
-		{
-			throw new EbMSProcessorException(e);
-		}
-		catch (SAXException e)
 		{
 			throw new EbMSProcessorException(e);
 		}

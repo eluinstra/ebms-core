@@ -63,15 +63,7 @@ public class EbMSMessageServiceImpl implements EbMSMessageService
 			else
 				throw new EbMSMessageServiceException("No response received!");
 		}
-		catch (DatatypeConfigurationException e)
-		{
-			throw new EbMSMessageServiceException(e);
-		}
-		catch (JAXBException e)
-		{
-			throw new EbMSMessageServiceException(e);
-		}
-		catch (EbMSProcessorException e)
+		catch (DatatypeConfigurationException | JAXBException | EbMSProcessorException e)
 		{
 			throw new EbMSMessageServiceException(e);
 		}
@@ -182,6 +174,10 @@ public class EbMSMessageServiceImpl implements EbMSMessageService
 			}
 			else
 				throw new EbMSMessageServiceException("No response received!");
+		}
+		catch (EbMSMessageServiceException e)
+		{
+			throw e;
 		}
 		catch (Exception e)
 		{

@@ -55,11 +55,7 @@ public class EbMSResponseHandler implements ResponseHandler<EbMSDocument>
 				{
 					in = getEbMSMessage(IOUtils.toString(content,getCharSet(entity)));
 				}
-				catch (ParserConfigurationException e)
-				{
-					throw new IOException(e);
-				}
-				catch (SAXException e)
+				catch (ParserConfigurationException | SAXException e)
 				{
 					throw new IOException(e);
 				}

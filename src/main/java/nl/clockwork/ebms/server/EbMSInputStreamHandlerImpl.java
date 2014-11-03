@@ -85,15 +85,10 @@ public abstract class EbMSInputStreamHandlerImpl implements EbMSInputStreamHandl
 	  		}
 	  	}
 		}
-		catch (TransformerException e)
+		catch (TransformerException | IOException e)
 		{
 			throw new EbMSProcessorException(e);
 		}
-		catch (IOException e)
-		{
-			throw new EbMSProcessorException(e);
-		}
-	  
 	}
 	
 	public abstract void writeResponseStatus(int statusCode);

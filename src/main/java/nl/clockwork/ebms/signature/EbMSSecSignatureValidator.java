@@ -86,17 +86,9 @@ public class EbMSSecSignatureValidator implements EbMSSignatureValidator
 					throw new ValidationException("Signature not found!");
 			}
 		}
-		catch (GeneralSecurityException e)
+		catch (GeneralSecurityException | IOException e)
 		{
 			throw new ValidatorException(e);
-		}
-		catch (IOException e)
-		{
-			throw new ValidatorException(e);
-		}
-		catch (XMLSignatureException e)
-		{
-			throw new ValidationException(e);
 		}
 		catch (XMLSecurityException e)
 		{
@@ -143,11 +135,6 @@ public class EbMSSecSignatureValidator implements EbMSSignatureValidator
 //			XMLSignature signature = new XMLSignature((Element)signatureNodeList.item(0),org.apache.xml.security.utils.Constants.SignatureSpecNS);
 //			return signature.getKeyInfo().getX509Certificate();
 //		}
-//		catch (XMLSignatureException e)
-//		{
-//			logger.warn("",e);
-//			return null;
-//		}
 //		catch (XMLSecurityException e)
 //		{
 //			logger.warn("",e);
@@ -161,11 +148,7 @@ public class EbMSSecSignatureValidator implements EbMSSignatureValidator
 		{
 			certificate.checkValidity(date);
 		}
-		catch (CertificateExpiredException e)
-		{
-			throw new ValidationException(e);
-		}
-		catch (CertificateNotYetValidException e)
+		catch (CertificateExpiredException | CertificateNotYetValidException e)
 		{
 			throw new ValidationException(e);
 		}

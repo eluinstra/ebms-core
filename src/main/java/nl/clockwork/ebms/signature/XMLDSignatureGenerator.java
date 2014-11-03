@@ -89,15 +89,7 @@ public class XMLDSignatureGenerator implements SignatureGenerator
 		{
 			return false;
 		}
-		catch (GeneralSecurityException e)
-		{
-			throw new EbMSProcessorException(e);
-		}
-		catch (IOException e)
-		{
-			throw new EbMSProcessorException(e);
-		}
-		catch (MarshalException e)
+		catch (GeneralSecurityException | IOException | MarshalException e)
 		{
 			throw new EbMSProcessorException(e);
 		}

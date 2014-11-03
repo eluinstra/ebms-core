@@ -52,12 +52,7 @@ public class CPAServiceImpl implements CPAService
 			CollaborationProtocolAgreement cpa_ = XMLMessageBuilder.getInstance(CollaborationProtocolAgreement.class).handle(cpa);
 			new CPAValidator().validate(cpa_);
 		}
-		catch (JAXBException e)
-		{
-			logger.warn("",e);
-			throw new CPAServiceException(e);
-		}
-		catch (ValidatorException e)
+		catch (JAXBException | ValidatorException e)
 		{
 			logger.warn("",e);
 			throw new CPAServiceException(e);
@@ -80,7 +75,7 @@ public class CPAServiceImpl implements CPAService
 					{
 						if (!ebMSDAO.updateCPA(cpa_))
 							throw new CPAServiceException("Could not update CPA " + cpa_.getCpaid() + "! CPA does not exists.");
-			}
+					}
 					else
 						throw new CPAServiceException("Did not insert CPA " + cpa_.getCpaid() + "! CPA already exists.");
 				}
@@ -90,17 +85,7 @@ public class CPAServiceImpl implements CPAService
 			}
 			return cpa_.getCpaid();
 		}
-		catch (JAXBException e)
-		{
-			logger.warn("",e);
-			throw new CPAServiceException(e);
-		}
-		catch (ValidatorException e)
-		{
-			logger.warn("",e);
-			throw new CPAServiceException(e);
-		}
-		catch (DAOException e)
+		catch (JAXBException | ValidatorException | DAOException e)
 		{
 			logger.warn("",e);
 			throw new CPAServiceException(e);
@@ -144,11 +129,7 @@ public class CPAServiceImpl implements CPAService
 		{
 			return XMLMessageBuilder.getInstance(CollaborationProtocolAgreement.class).handle(ebMSDAO.getCPA(cpaId));
 		}
-		catch (DAOException e)
-		{
-			throw new CPAServiceException(e);
-		}
-		catch (JAXBException e)
+		catch (DAOException | JAXBException e)
 		{
 			throw new CPAServiceException(e);
 		}

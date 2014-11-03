@@ -109,35 +109,11 @@ public class DeliveryManager //DeliveryService
 			}
 			return null;
 		}
-		catch (SOAPException e)
+		catch (SOAPException | JAXBException | SAXException | IOException | TransformerException e)
 		{
 			throw new EbMSProcessingException(e);
 		}
-		catch (JAXBException e)
-		{
-			throw new EbMSProcessingException(e);
-		}
-		catch (ParserConfigurationException e)
-		{
-			throw new EbMSProcessorException(e);
-		}
-		catch (SAXException e)
-		{
-			throw new EbMSProcessingException(e);
-		}
-		catch (IOException e)
-		{
-			throw new EbMSProcessingException(e);
-		}
-		catch (TransformerFactoryConfigurationError e)
-		{
-			throw new EbMSProcessorException(e);
-		}
-		catch (TransformerException e)
-		{
-			throw new EbMSProcessingException(e);
-		}
-		catch (XPathExpressionException e)
+		catch (ParserConfigurationException | TransformerFactoryConfigurationError | XPathExpressionException e)
 		{
 			throw new EbMSProcessorException(e);
 		}

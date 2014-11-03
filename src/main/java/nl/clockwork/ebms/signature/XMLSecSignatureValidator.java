@@ -67,15 +67,7 @@ public class XMLSecSignatureValidator implements SignatureValidator
 			KeyStore keyStore = SecurityUtils.loadKeyStore(keyStorePath,keyStorePassword);
 			return verify(keyStore,document,attachments);
 		}
-		catch (GeneralSecurityException e)
-		{
-			throw new ValidatorException(e);
-		}
-		catch (IOException e)
-		{
-			throw new ValidatorException(e);
-		}
-		catch (XMLSignatureException e)
+		catch (GeneralSecurityException | IOException | XMLSignatureException e)
 		{
 			throw new ValidatorException(e);
 		}
