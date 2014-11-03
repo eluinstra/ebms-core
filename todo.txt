@@ -1,3 +1,5 @@
+- change namespace to ordina
+
 - fix XMLMessageBuilder.handle(String xml, Class<T> clazz)
 	- get rid of hardcoded xml.getBytes("UTF-8")
 		- remove handle(String xml) completely and use handle(Reader xml) or handle(InputStream xml)
