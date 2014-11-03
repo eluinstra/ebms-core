@@ -41,8 +41,9 @@ public class CPAValidator
 
 	public void validate(CollaborationProtocolAgreement cpa) throws ValidatorException
 	{
-		//if (!"2.0a".equals(cpa.getVersion()))
-		//	throw new ValidationException("CPA version " + cpa.getVersion() + " detected! CPA version 2.0a expected.");
+		if (!"2_0b".equals(cpa.getVersion()))
+			//throw new ValidationException("CPA version " + cpa.getVersion() + " detected! CPA version 2_0b expected.");
+			logger.warn("CPA version " + cpa.getVersion() + " detected! CPA version 2_0b expected.");
 		if ("proposed".equals(cpa.getStatus()))
 			throw new ValidationException("CPA Status is proposed!");
 		if (cpa.getStart().compare(cpa.getEnd()) > 0)
@@ -50,9 +51,11 @@ public class CPAValidator
 		if (Calendar.getInstance().compareTo(cpa.getEnd().toGregorianCalendar()) > 0)
 			throw new ValidationException("CPA expired on " + cpa.getEnd());
 		if (cpa.getConversationConstraints() != null)
-			throw new ValidationException("CPA Conversation Constraints not supported!");
-		//if (cpa.getSignature() != null)
-		//	throw new ValidationException("CPA Signature not supported!");
+			//throw new ValidationException("CPA Conversation Constraints not supported!");
+			logger.warn("CPA Conversation Constraints not supported!");
+		if (cpa.getSignature() != null)
+			//throw new ValidationException("CPA Signature not supported!");
+			logger.warn("CPA Signature not supported!");
 		if (cpa.getPartyInfo().size() != 2)
 			throw new ValidationException(cpa.getPartyInfo().size() + " part" + (cpa.getPartyInfo().size() == 1 ? "y" : "ies") + " defined!");
 		if (cpa.getPartyInfo().get(0).getPartyName().equals(cpa.getPartyInfo().get(1).getPartyName()))
