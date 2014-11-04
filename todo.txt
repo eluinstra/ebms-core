@@ -49,3 +49,4 @@
 - implement EbMSFileAttachment (file proxy) and EbMSDBAttachment (db proxy) for large message processing?
 
 - replace custom message writer by mime4j???
+- replace xmlsec by bouncycastle???
