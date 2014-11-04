@@ -94,6 +94,7 @@ public class SSLFactoryManager
 	private String trustStorePath;
 	private String trustStorePassword;
 	private boolean verifyHostnames;
+	public String[] enabledProtocols = new String[]{};
 	public String[] allowedCipherSuites = new String[]{};
 	private boolean requireClientAuthentication;
 	private String clientAlias;
@@ -123,7 +124,8 @@ public class SSLFactoryManager
 
 		//SSLEngine engine = sslContext.createSSLEngine(hostname,port);
 		SSLEngine engine = sslContext.createSSLEngine();
-		engine.setEnabledProtocols(new String[]{"SSLv2Hello","SSLv3","TLSv1"});
+		if (enabledProtocols.length > 0)
+			engine.setEnabledProtocols(enabledProtocols);
 		if (allowedCipherSuites.length > 0)
 			engine.setEnabledCipherSuites(allowedCipherSuites);
 
@@ -144,6 +146,19 @@ public class SSLFactoryManager
 		};
 	}
 	
+	@SuppressWarnings({"deprecation","restriction"})
+	public com.sun.net.ssl.HostnameVerifier getHostnameVerifier(com.sun.net.ssl.HttpsURLConnection connection)
+	{
+		return verifyHostnames ? com.sun.net.ssl.HttpsURLConnection.getDefaultHostnameVerifier() : new com.sun.net.ssl.HostnameVerifier()
+		{
+			@Override
+			public boolean verify(String urlHostname, String certHostname)
+			{
+				return true;
+			}
+		};
+	}
+
 	public SSLSocketFactory getSslSocketFactory()
 	{
 		return sslSocketFactory;
@@ -174,6 +189,11 @@ public class SSLFactoryManager
 		this.verifyHostnames = verifyHostnames;
 	}
 
+	public void setEnabledProtocols(String[] enabledProtocols)
+	{
+		this.enabledProtocols = enabledProtocols;
+	}
+	
 	public void setAllowedCipherSuites(String[] allowedCipherSuites)
 	{
 		this.allowedCipherSuites = allowedCipherSuites;
