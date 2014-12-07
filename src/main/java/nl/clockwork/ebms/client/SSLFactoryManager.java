@@ -94,8 +94,8 @@ public class SSLFactoryManager
 	private String trustStorePath;
 	private String trustStorePassword;
 	private boolean verifyHostnames;
-	public String[] enabledProtocols = new String[]{};
-	public String[] allowedCipherSuites = new String[]{};
+	private String[] enabledProtocols = new String[]{};
+	private String[] allowedCipherSuites = new String[]{};
 	private boolean requireClientAuthentication;
 	private String clientAlias;
 	private SSLSocketFactory sslSocketFactory;
@@ -128,7 +128,6 @@ public class SSLFactoryManager
 			engine.setEnabledProtocols(enabledProtocols);
 		if (allowedCipherSuites.length > 0)
 			engine.setEnabledCipherSuites(allowedCipherSuites);
-
 		engine.setUseClientMode(requireClientAuthentication);
 
 		sslSocketFactory = sslContext.getSocketFactory();
@@ -193,7 +192,7 @@ public class SSLFactoryManager
 	{
 		this.enabledProtocols = enabledProtocols;
 	}
-	
+
 	public void setAllowedCipherSuites(String[] allowedCipherSuites)
 	{
 		this.allowedCipherSuites = allowedCipherSuites;
