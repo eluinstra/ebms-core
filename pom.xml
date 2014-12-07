@@ -23,7 +23,7 @@
 	<artifactId>ebms-core</artifactId>
 	<packaging>jar</packaging>
 	<name>EbMS Core</name>
-	<version>1.6.0</version>
+	<version>1.6.1-SNAPSHOT</version>
 	<description></description>
 	<url>https://sourceforge.net/projects/muleebmsadapter/</url>
 	<issueManagement>
