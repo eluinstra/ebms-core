@@ -417,6 +417,8 @@ public class EbMSMessageProcessor
 					c = new GregorianCalendar();
 					c.setTime(context.getTimestamp());
 				}
+				else
+					status = EbMSMessageStatus.NOT_RECOGNIZED;
 			}
 			return EbMSMessageUtils.createEbMSStatusResponse(cpa,message,status,c); 
 		}
