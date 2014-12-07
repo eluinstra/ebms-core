@@ -1,3 +1,4 @@
+- add try with resources statement on AutoClosable resources
 - remove hard coded UTF-8 encoding from DAO's?
 
 2.2:
