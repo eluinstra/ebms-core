@@ -1,3 +1,5 @@
+- remove hard coded UTF-8 encoding from DAO's?
+
 2.2:
 - improve CPA validation
 	- validate check used CPA fields in CPAUtils and them
@@ -43,3 +45,9 @@
 
 - implement business signals handling (ReceiptAcknowledgment, AcceptanceAcknowledgment, and Exception)
 - implement business response messages handling
+
+- replace events table by queue?
+- add push message interface with queue?
+
+- replace custom message writer by mime4j???
+- replace xmlsec by bouncycastle???
