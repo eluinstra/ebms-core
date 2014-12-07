@@ -15,11 +15,10 @@
  */
 package nl.clockwork.ebms.common;
 
-import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.Reader;
+import java.io.StringReader;
 import java.io.StringWriter;
-import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 
 import javax.xml.bind.JAXBContext;
@@ -55,16 +54,9 @@ public class XMLMessageBuilder<T>
 
 	public T handle(String xml, Class<T> clazz) throws JAXBException
 	{
-		try
-		{
-			if (StringUtils.isEmpty(xml))
-				return null;
-			return handle(new ByteArrayInputStream(xml.getBytes("UTF-8")),clazz);
-		}
-		catch (UnsupportedEncodingException e)
-		{
-			throw new JAXBException(e);
-		}
+		if (StringUtils.isEmpty(xml))
+			return null;
+		return handle(new StringReader(xml),clazz);
 	}
 
 	public T handle(InputStream is) throws JAXBException
@@ -102,15 +94,25 @@ public class XMLMessageBuilder<T>
 		return handle(null,r);
 	}
 
-	@SuppressWarnings("unchecked")
 	public T handle(Schema schema, Reader r) throws JAXBException
+	{
+		return handle(schema,r,null);
+	}
+
+	public T handle(Reader r, Class<T> clazz) throws JAXBException
+	{
+		return handle(null,r,clazz);
+	}
+
+	@SuppressWarnings("unchecked")
+	public T handle(Schema schema, Reader r, Class<T> clazz) throws JAXBException
 	{
 		if (r == null)
 			return null;
 		Unmarshaller unmarshaller = context.createUnmarshaller();
 		if (schema != null)
 			unmarshaller.setSchema(schema);
-		Object o = unmarshaller.unmarshal(r);
+		Object o = clazz == null ? unmarshaller.unmarshal(r) : unmarshaller.unmarshal(new StreamSource(r),clazz);
 		if (o instanceof JAXBElement<?>)
 			return ((JAXBElement<T>)o).getValue();
 		else
