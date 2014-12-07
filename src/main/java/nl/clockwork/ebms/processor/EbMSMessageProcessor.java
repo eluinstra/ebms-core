@@ -339,6 +339,8 @@ public class EbMSMessageProcessor
 				status = ebMSDAO.getMessageStatus(message.getStatusRequest().getRefToMessageId());
 				if (status != null && (MessageStatusType.RECEIVED.equals(status.statusCode()) || MessageStatusType.PROCESSED.equals(status.statusCode()) || MessageStatusType.FORWARDED.equals(status.statusCode())))
 					c = header.getMessageData().getTimestamp().toGregorianCalendar();
+				else
+					status = EbMSMessageStatus.NOT_RECOGNIZED;
 			}
 			return EbMSMessageUtils.createEbMSStatusResponse(cpa,message,status,c); 
 		}
