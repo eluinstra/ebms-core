@@ -1,3 +1,5 @@
+- add try with resources statement on AutoClosable resources
+
 - improve timetolive???
 	- timetolive = now + expirationperiod + 1s
 	- timetolive validation rule: now < timetolive + retryinterval
