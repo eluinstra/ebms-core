@@ -115,17 +115,7 @@ public class EbMSDAOImpl extends nl.clockwork.ebms.dao.mysql.EbMSDAOImpl
 				throw new DAOException("No key found!");
 			}
 		}
-		catch (SQLException e)
-		{
-			connectionManager.rollback();
-			throw new DAOException(e);
-		}
-		catch (IOException e)
-		{
-			connectionManager.rollback();
-			throw new DAOException(e);
-		}
-		catch (TransformerException e)
+		catch (SQLException | IOException | TransformerException e)
 		{
 			connectionManager.rollback();
 			throw new DAOException(e);

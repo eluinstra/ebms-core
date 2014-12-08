@@ -147,17 +147,7 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 				throw new DAOException("No key found!");
 			}
 		}
-		catch (SQLException e)
-		{
-			connectionManager.rollback();
-			throw new DAOException(e);
-		}
-		catch (IOException e)
-		{
-			connectionManager.rollback();
-			throw new DAOException(e);
-		}
-		catch (TransformerException e)
+		catch (SQLException | IOException | TransformerException e)
 		{
 			connectionManager.rollback();
 			throw new DAOException(e);
@@ -226,17 +216,7 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 				throw new DAOException("No key found!");
 			}
 		}
-		catch (SQLException e)
-		{
-			connectionManager.rollback();
-			throw new DAOException(e);
-		}
-		catch (IOException e)
-		{
-			connectionManager.rollback();
-			throw new DAOException(e);
-		}
-		catch (TransformerException e)
+		catch (SQLException | IOException | TransformerException e)
 		{
 			connectionManager.rollback();
 			throw new DAOException(e);

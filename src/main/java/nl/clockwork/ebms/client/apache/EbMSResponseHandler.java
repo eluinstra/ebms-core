@@ -62,11 +62,7 @@ public class EbMSResponseHandler implements ResponseHandler<EbMSDocument>
 			}
 			throw new IOException("StatusCode: " + response.getStatusLine().getStatusCode());
 		}
-		catch (ParserConfigurationException e)
-		{
-			throw new IOException(e);
-		}
-		catch (SAXException e)
+		catch (ParserConfigurationException | SAXException e)
 		{
 			throw new IOException(e);
 		}

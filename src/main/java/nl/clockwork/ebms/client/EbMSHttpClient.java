@@ -60,21 +60,13 @@ public class EbMSHttpClient implements EbMSClient
 				logger.debug("IN:\n" + (in == null || in.getMessage() == null ? "" : DOMUtils.toString(in.getMessage())));
 			return in;
 		}
-		catch (IOException e)
-		{
-			throw new EbMSProcessingException(e);
-		}
-		catch (TransformerException e)
+		catch (IOException | TransformerException | SAXException e)
 		{
 			throw new EbMSProcessingException(e);
 		}
 		catch (ParserConfigurationException e)
 		{
 			throw new EbMSProcessorException(e);
-		}
-		catch (SAXException e)
-		{
-			throw new EbMSProcessingException(e);
 		}
 		finally
 		{

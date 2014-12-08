@@ -150,49 +150,13 @@ public class EbMSMessageProcessor
 			else
 				throw new EbMSProcessingException("Unable to process message! Action=" + message.getMessageHeader().getAction());
 		}
-		catch (ValidationException e)
+		catch (ValidationException | JAXBException | SAXException | IOException | SOAPException | TransformerException e)
 		{
 			throw new EbMSProcessingException(e);
 		}
-		catch (ValidatorException e)
+		catch (ValidatorException | XPathExpressionException | ParserConfigurationException | DatatypeConfigurationException | TransformerFactoryConfigurationError e)
 		{
 			throw new EbMSProcessorException(e);
-		}
-		catch (XPathExpressionException e)
-		{
-			throw new EbMSProcessorException(e);
-		}
-		catch (JAXBException e)
-		{
-			throw new EbMSProcessingException(e);
-		}
-		catch (ParserConfigurationException e)
-		{
-			throw new EbMSProcessorException(e);
-		}
-		catch (SAXException e)
-		{
-			throw new EbMSProcessingException(e);
-		}
-		catch (IOException e)
-		{
-			throw new EbMSProcessingException(e);
-		}
-		catch (DatatypeConfigurationException e)
-		{
-			throw new EbMSProcessorException(e);
-		}
-		catch (SOAPException e)
-		{
-			throw new EbMSProcessingException(e);
-		}
-		catch (TransformerFactoryConfigurationError e)
-		{
-			throw new EbMSProcessorException(e);
-		}
-		catch (TransformerException e)
-		{
-			throw new EbMSProcessingException(e);
 		}
 	}
 	
@@ -240,37 +204,13 @@ public class EbMSMessageProcessor
 				);
 			}
 		}
-		catch (ValidationException e)
+		catch (ValidationException | JAXBException | SAXException | IOException | TransformerException e)
 		{
 			throw new EbMSProcessingException(e);
 		}
-		catch (ValidatorException e)
+		catch (ValidatorException | XPathExpressionException | ParserConfigurationException e)
 		{
 			throw new EbMSProcessorException(e);
-		}
-		catch (XPathExpressionException e)
-		{
-			throw new EbMSProcessorException(e);
-		}
-		catch (JAXBException e)
-		{
-			throw new EbMSProcessingException(e);
-		}
-		catch (ParserConfigurationException e)
-		{
-			throw new EbMSProcessorException(e);
-		}
-		catch (SAXException e)
-		{
-			throw new EbMSProcessingException(e);
-		}
-		catch (IOException e)
-		{
-			throw new EbMSProcessingException(e);
-		}
-		catch (TransformerException e)
-		{
-			throw new EbMSProcessingException(e);
 		}
 	}
 	

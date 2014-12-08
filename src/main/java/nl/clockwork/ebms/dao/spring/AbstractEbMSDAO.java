@@ -98,11 +98,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 				}
 			);
 		}
-		catch (DataAccessException e)
-		{
-			throw new DAOException(e);
-		}
-		catch (TransactionException e)
+		catch (DataAccessException | TransactionException e)
 		{
 			throw new DAOException(e);
 		}
@@ -144,11 +140,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 		{
 			return null;
 		}
-		catch (DataAccessException e)
-		{
-			throw new DAOException(e);
-		}
-		catch (JAXBException e)
+		catch (DataAccessException | JAXBException e)
 		{
 			throw new DAOException(e);
 		}
@@ -187,11 +179,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 				XMLMessageBuilder.getInstance(CollaborationProtocolAgreement.class).handle(cpa)
 			);
 		}
-		catch (DataAccessException e)
-		{
-			throw new DAOException(e);
-		}
-		catch (JAXBException e)
+		catch (DataAccessException | JAXBException e)
 		{
 			throw new DAOException(e);
 		}
@@ -211,11 +199,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 				cpa.getCpaid()
 			);
 		}
-		catch (DataAccessException e)
-		{
-			throw new DAOException(e);
-		}
-		catch (JAXBException e)
+		catch (DataAccessException | JAXBException e)
 		{
 			throw new DAOException(e);
 		}
@@ -272,11 +256,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 				dataSources.add(new EbMSDataSource(dataSource.getName(),dataSource.getContentType(),IOUtils.toByteArray(dataSource.getInputStream())));
 			return new EbMSMessageContent(messageContext,dataSources);
 		}
-		catch (DataAccessException e)
-		{
-			throw new DAOException(e);
-		}
-		catch (IOException e)
+		catch (DataAccessException | IOException e)
 		{
 			throw new DAOException(e);
 		}
@@ -407,19 +387,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 		{
 			return null;
 		}
-		catch (DataAccessException e)
-		{
-			throw new DAOException(e);
-		}
-		catch (ParserConfigurationException e)
-		{
-			throw new DAOException(e);
-		}
-		catch (SAXException e)
-		{
-			throw new DAOException(e);
-		}
-		catch (IOException e)
+		catch (DataAccessException | ParserConfigurationException | SAXException | IOException  e)
 		{
 			throw new DAOException(e);
 		}
@@ -444,19 +412,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 		{
 			return null;
 		}
-		catch (DataAccessException e)
-		{
-			throw new DAOException(e);
-		}
-		catch (ParserConfigurationException e)
-		{
-			throw new DAOException(e);
-		}
-		catch (SAXException e)
-		{
-			throw new DAOException(e);
-		}
-		catch (IOException e)
+		catch (DataAccessException | ParserConfigurationException | SAXException | IOException  e)
 		{
 			throw new DAOException(e);
 		}
@@ -483,19 +439,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 		{
 			return null;
 		}
-		catch (DataAccessException e)
-		{
-			throw new DAOException(e);
-		}
-		catch (ParserConfigurationException e)
-		{
-			throw new DAOException(e);
-		}
-		catch (SAXException e)
-		{
-			throw new DAOException(e);
-		}
-		catch (IOException e)
+		catch (DataAccessException | ParserConfigurationException | SAXException | IOException  e)
 		{
 			throw new DAOException(e);
 		}
@@ -661,11 +605,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 				}
 			);
 		}
-		catch (DataAccessException e)
-		{
-			throw new DAOException(e);
-		}
-		catch (TransactionException e)
+		catch (DataAccessException | TransactionException e)
 		{
 			throw new DAOException(e);
 		}
@@ -750,11 +690,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 				}
 			);
 		}
-		catch (DataAccessException e)
-		{
-			throw new DAOException(e);
-		}
-		catch (TransactionException e)
+		catch (DataAccessException | TransactionException e)
 		{
 			throw new DAOException(e);
 		}

@@ -176,11 +176,7 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 				}
 			);
 		}
-		catch (DataAccessException e)
-		{
-			throw new DAOException(e);
-		}
-		catch (TransactionException e)
+		catch (DataAccessException | TransactionException e)
 		{
 			throw new DAOException(e);
 		}

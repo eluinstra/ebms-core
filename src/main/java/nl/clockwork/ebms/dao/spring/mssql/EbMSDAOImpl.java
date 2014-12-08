@@ -144,11 +144,7 @@ public class EbMSDAOImpl extends nl.clockwork.ebms.dao.spring.mysql.EbMSDAOImpl
 				}
 			);
 		}
-		catch (TransactionException e)
-		{
-			throw new DAOException(e);
-		}
-		catch (DataAccessException e)
+		catch (DataAccessException | TransactionException e)
 		{
 			throw new DAOException(e);
 		}
