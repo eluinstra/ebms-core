@@ -15,6 +15,7 @@
  */
 package org.apache.jcp.xml.dsig.internal.dom;
 
+import java.io.IOException;
 import java.util.List;
 
 import javax.activation.DataSource;
@@ -30,6 +31,7 @@ import nl.clockwork.ebms.model.EbMSAttachment;
 import org.apache.jcp.xml.dsig.internal.dom.ApacheNodeSetData;
 import org.apache.jcp.xml.dsig.internal.dom.ApacheOctetStreamData;
 import org.apache.jcp.xml.dsig.internal.dom.DOMURIDereferencer;
+import org.apache.xml.security.c14n.CanonicalizationException;
 import org.apache.xml.security.signature.XMLSignatureInput;
 
 public class EbMSAttachmentURIDereferencer implements URIDereferencer
@@ -66,7 +68,7 @@ public class EbMSAttachmentURIDereferencer implements URIDereferencer
 			else
 				return DOMURIDereferencer.INSTANCE.dereference(uriReference,context);
 		}
-		catch (Exception e)
+		catch (IOException | CanonicalizationException e)
 		{
 			throw new URIReferenceException(e);
 		}

@@ -15,11 +15,16 @@
  */
 package nl.clockwork.ebms.service;
 
+import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 
 import javax.xml.bind.JAXBException;
 import javax.xml.datatype.DatatypeConfigurationException;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.soap.SOAPException;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactoryConfigurationError;
 
 import nl.clockwork.ebms.Constants.EbMSAction;
 import nl.clockwork.ebms.Constants.EbMSEventType;
@@ -42,6 +47,7 @@ import nl.clockwork.ebms.util.EbMSMessageUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CollaborationProtocolAgreement;
+import org.xml.sax.SAXException;
 
 public class EbMSMessageServiceImpl implements EbMSMessageService
 {
@@ -66,15 +72,7 @@ public class EbMSMessageServiceImpl implements EbMSMessageService
 			else
 				throw new EbMSMessageServiceException("No response received!");
 		}
-		catch (DatatypeConfigurationException e)
-		{
-			throw new EbMSMessageServiceException(e);
-		}
-		catch (JAXBException e)
-		{
-			throw new EbMSMessageServiceException(e);
-		}
-		catch (EbMSProcessorException e)
+		catch (DatatypeConfigurationException | JAXBException | EbMSProcessorException e)
 		{
 			throw new EbMSMessageServiceException(e);
 		}
@@ -107,7 +105,7 @@ public class EbMSMessageServiceImpl implements EbMSMessageService
 			);
 			return message.getMessageHeader().getMessageData().getMessageId();
 		}
-		catch (Exception e)
+		catch (DAOException | DatatypeConfigurationException | SOAPException | JAXBException | ParserConfigurationException | SAXException | IOException | TransformerFactoryConfigurationError | TransformerException | EbMSProcessorException e)
 		{
 			throw new EbMSMessageServiceException(e);
 		}
@@ -139,7 +137,7 @@ public class EbMSMessageServiceImpl implements EbMSMessageService
 				ebMSDAO.updateMessage(messageId,EbMSMessageStatus.RECEIVED,EbMSMessageStatus.PROCESSED);
 			return result;
 		}
-		catch (Exception e)
+		catch (DAOException e)
 		{
 			throw new EbMSMessageServiceException(e);
 		}
@@ -190,7 +188,7 @@ public class EbMSMessageServiceImpl implements EbMSMessageService
 			else
 				throw new EbMSMessageServiceException("No response received!");
 		}
-		catch (Exception e)
+		catch (DAOException | DatatypeConfigurationException | JAXBException | EbMSProcessorException e)
 		{
 			throw new EbMSMessageServiceException(e);
 		}
@@ -214,7 +212,7 @@ public class EbMSMessageServiceImpl implements EbMSMessageService
 			else
 				throw new EbMSMessageServiceException("No response received!");
 		}
-		catch (Exception e)
+		catch (DAOException | DatatypeConfigurationException | JAXBException | EbMSProcessorException e)
 		{
 			throw new EbMSMessageServiceException(e);
 		}

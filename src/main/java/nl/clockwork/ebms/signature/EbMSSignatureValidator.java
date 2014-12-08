@@ -88,17 +88,9 @@ public class EbMSSignatureValidator
 					throw new ValidationException("Signature not found!");
 			}
 		}
-		catch (GeneralSecurityException e)
+		catch (GeneralSecurityException | IOException e)
 		{
 			throw new ValidatorException(e);
-		}
-		catch (IOException e)
-		{
-			throw new ValidatorException(e);
-		}
-		catch (XMLSignatureException e)
-		{
-			throw new ValidationException(e);
 		}
 		catch (XMLSecurityException e)
 		{
@@ -131,17 +123,9 @@ public class EbMSSignatureValidator
 					throw new ValidationException("Signature not found!");
 			}
 		}
-		catch (GeneralSecurityException e)
+		catch (GeneralSecurityException | IOException e)
 		{
 			throw new ValidatorException(e);
-		}
-		catch (IOException e)
-		{
-			throw new ValidatorException(e);
-		}
-		catch (XMLSignatureException e)
-		{
-			throw new ValidationException(e);
 		}
 		catch (XMLSecurityException e)
 		{
@@ -188,12 +172,7 @@ public class EbMSSignatureValidator
 //			XMLSignature signature = new XMLSignature((Element)signatureNodeList.item(0),org.apache.xml.security.utils.Constants.SignatureSpecNS);
 //			return signature.getKeyInfo().getX509Certificate();
 //		}
-//		catch (XMLSignatureException e)
-//		{
-//			logger.warn("",e);
-//			return null;
-//		}
-//		catch (XMLSecurityException e)
+//		catch (XMLSignatureException | XMLSecurityException e)
 //		{
 //			logger.warn("",e);
 //			return null;
@@ -205,34 +184,30 @@ public class EbMSSignatureValidator
 		try
 		{
 			certificate.checkValidity(date);
+			Enumeration<String> aliases = trustStore.aliases();
+			while (aliases.hasMoreElements())
+			{
+				try
+				{
+					Certificate c = trustStore.getCertificate(aliases.nextElement());
+					if (c instanceof X509Certificate)
+						if (certificate.getIssuerDN().getName().equals(((X509Certificate)c).getSubjectDN().getName()))
+						{
+							certificate.verify(c.getPublicKey());
+							return;
+						}
+				}
+				catch (GeneralSecurityException e)
+				{
+					logger.trace("",e);
+				}
+			}
+			throw new ValidationException("Certificate " + certificate.getIssuerDN() + " not found!");
 		}
-		catch (CertificateExpiredException e)
+		catch (CertificateExpiredException | CertificateNotYetValidException e)
 		{
 			throw new ValidationException(e);
 		}
-		catch (CertificateNotYetValidException e)
-		{
-			throw new ValidationException(e);
-		}
-		Enumeration<String> aliases = trustStore.aliases();
-		while (aliases.hasMoreElements())
-		{
-			try
-			{
-				Certificate c = trustStore.getCertificate(aliases.nextElement());
-				if (c instanceof X509Certificate)
-					if (certificate.getIssuerDN().getName().equals(((X509Certificate)c).getSubjectDN().getName()))
-					{
-						certificate.verify(c.getPublicKey());
-						return;
-					}
-			}
-			catch (GeneralSecurityException e)
-			{
-				logger.trace("",e);
-			}
-		}
-		throw new ValidationException("Certificate " + certificate.getIssuerDN() + " not found!");
 	}
 	
 	private void validateSignatureReferences(EbMSMessage requestMessage, EbMSMessage responseMessage) throws ValidationException
