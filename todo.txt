@@ -1,6 +1,9 @@
 - add try with resources statement on AutoClosable resources
 - replace DAO.getTimestampFunction() by java Date
 - remove hard coded UTF-8 encoding from DAO's?
+- enable acknowledgment/errorMessage signature?
+- improve detection of signing etc. in CPA
+- improve CPA validation concerning signing etc.
 
 2.2:
 - improve CPA validation
