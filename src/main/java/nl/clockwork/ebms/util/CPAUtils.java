@@ -56,9 +56,8 @@ public class CPAUtils
 	{
 		Calendar timestamp = message.getMessageHeader().getMessageData().getTimestamp().toGregorianCalendar();
 		return StatusValueType.AGREED.equals(cpa.getStatus().getValue())
-			&& timestamp.compareTo(cpa.getStart().toGregorianCalendar()) >= 0
-			&& timestamp.compareTo(cpa.getEnd().toGregorianCalendar()) <= 0
-		;
+				&& timestamp.compareTo(cpa.getStart().toGregorianCalendar()) >= 0
+				&& timestamp.compareTo(cpa.getEnd().toGregorianCalendar()) <= 0;
 	}
 
 	public static String toString(PartyId partyId)
@@ -113,8 +112,7 @@ public class CPAUtils
 	
 	private static boolean equals(org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.PartyId partyId, PartyId cpaPartyId)
 	{
-		return partyId.getType().equals(cpaPartyId.getType())
-			&& partyId.getValue().equals(cpaPartyId.getValue());
+		return partyId.getType().equals(cpaPartyId.getType()) && partyId.getValue().equals(cpaPartyId.getValue());
 	}
 	
 	public static ServiceBinding getServiceBinding(PartyInfo partyInfo, String role, Service service)

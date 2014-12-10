@@ -17,7 +17,6 @@ package nl.clockwork.ebms.service;
 
 import javax.xml.ws.WebFault;
 
-
 @WebFault(name="CPAServiceException", targetNamespace="http://www.clockwork.nl/cpa/2.0")
 public class CPAServiceException extends RuntimeException
 {

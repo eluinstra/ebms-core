@@ -36,18 +36,16 @@ public class MessageQueue<T>
 	
 	public void init()
 	{
-		queue = 
-			new LinkedHashMap<String,QueueEntry<T>>(maxEntries + 1,.75F,true)
-			{
-				private static final long serialVersionUID = 1L;
+		queue = new LinkedHashMap<String,QueueEntry<T>>(maxEntries + 1,.75F,true)
+		{
+			private static final long serialVersionUID = 1L;
 
-				@Override
-				protected boolean removeEldestEntry(java.util.Map.Entry<String,QueueEntry<T>> eldest)
-				{
-					return size() > maxEntries;
-				}
+			@Override
+			protected boolean removeEldestEntry(java.util.Map.Entry<String,QueueEntry<T>> eldest)
+			{
+				return size() > maxEntries;
 			}
-		;
+		};
 	}
 	
 	public void register(String correlationId)
