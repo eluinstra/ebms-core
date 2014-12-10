@@ -1,4 +1,5 @@
 - add try with resources statement on AutoClosable resources
+- replace DAO.getTimestampFunction() by java Date
 - remove hard coded UTF-8 encoding from DAO's?
 
 2.2:
