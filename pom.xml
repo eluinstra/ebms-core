@@ -23,7 +23,7 @@
 	<artifactId>ebms-adapter-mule3</artifactId>
 	<packaging>mule</packaging>
 	<name>Mule3 EbMS Adapter</name>
-	<version>2.1.0</version>
+	<version>2.2.0-SNAPSHOT</version>
 	<description></description>
 	<url>https://sourceforge.net/projects/muleebmsadapter/</url>
 	<issueManagement>
@@ -51,8 +51,8 @@
 		<url>www.clockwork.nl</url>
 	</organization>
 	<properties>
-		<jdk.version>1.6</jdk.version>
-		<mule.version>3.3.1</mule.version>
+		<jdk.version>1.7</jdk.version>
+		<mule.version>3.4.0</mule.version>
 		<saxon.version>8.7</saxon.version>
 	</properties>
 	<dependencies>
@@ -164,7 +164,7 @@
 		<dependency>
 			<groupId>nl.clockwork.ebms</groupId>
 			<artifactId>ebms-core</artifactId>
-			<version>2.1.0</version>
+			<version>2.2.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>c3p0</groupId>
@@ -365,7 +365,7 @@
 			<plugin>
 				<groupId>org.mule.tools</groupId>
 				<artifactId>maven-mule-plugin</artifactId>
-				<version>${jdk.version}</version>
+				<version>1.6</version>
 				<extensions>true</extensions>
 				<configuration>
 					<copyToAppsDirectory>true</copyToAppsDirectory>
