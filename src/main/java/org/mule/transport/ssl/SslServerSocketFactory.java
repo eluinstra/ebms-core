@@ -1,7 +1,7 @@
 /*
- * $Id: SslServerSocketFactory.java 10489 2008-01-23 17:53:38Z dfeist $
+ * $Id$
  * --------------------------------------------------------------------------------------
- * Copyright (c) MuleSource, Inc.  All rights reserved.  http://www.mulesource.com
+ * Copyright (c) MuleSoft, Inc.  All rights reserved.  http://www.mulesoft.com
  *
  * The software in this package is published under the terms of the CPAL v1.0
  * license, a copy of which has been included with this distribution in the
@@ -10,16 +10,16 @@
 
 package org.mule.transport.ssl;
 
+import org.mule.api.security.tls.TlsConfiguration;
+import org.mule.transport.tcp.TcpServerSocketFactory;
+
 import java.io.IOException;
 import java.net.InetAddress;
-import java.net.InetSocketAddress;
 import java.net.ServerSocket;
+import java.net.InetSocketAddress;
 
 import javax.net.ServerSocketFactory;
 import javax.net.ssl.SSLServerSocket;
-
-import org.mule.api.security.tls.TlsConfiguration;
-import org.mule.transport.tcp.TcpServerSocketFactory;
 
 public class SslServerSocketFactory extends TcpServerSocketFactory
 {
@@ -31,7 +31,7 @@ public class SslServerSocketFactory extends TcpServerSocketFactory
         this.tls = tls;
     }
 
-    // @Override
+    @Override
     public ServerSocket createServerSocket(InetAddress address, int port, int backlog, Boolean reuse) throws IOException
     {
         try
@@ -52,7 +52,7 @@ public class SslServerSocketFactory extends TcpServerSocketFactory
         }
     }
 
-    // @Override
+    @Override
     public ServerSocket createServerSocket(int port, int backlog, Boolean reuse) throws IOException
     {
         try
