@@ -32,14 +32,14 @@
 		http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/current/mule-scripting.xsd  
 	">
 
-	<https:connector name="connector.http.ebms.in">  
+	<https:connector name="connector.https.ebms.in">
 		<receiver-threading-profile maxThreadsActive="${threading.profile.http.receiver.maxThreadsActive}" maxThreadsIdle="${threading.profile.http.receiver.maxThreadsIdle}" threadTTL="${threading.profile.http.receiver.threadTTL}" poolExhaustedAction="WAIT" maxBufferSize="${threading.profile.http.receiver.maxBufferSize}" />
-		<https:tls-key-store path="${keystore.path}" storePassword="${keystore.password}" keyPassword="${keystore.keyPassword}"/>  
-		<https:tls-server path="${truststore.path}" storePassword="${truststore.password}" requireClientAuthentication="${connector.https.requireClientAuthentication}"/>
+		<https:tls-key-store path="${keystore.path}" storePassword="${keystore.password}" keyPassword="${keystore.password}"/>  
+		<https:tls-server path="${truststore.path}" storePassword="${truststore.password}" requireClientAuthentication="${https.requireClientAuthentication}"/>
 	</https:connector>  
 
 	<flow name="ebms.https.receive">
-		<https:inbound-endpoint connector-ref="connector.http.ebms.in" address="https://${service.host}:${service.port}${service.url}" exchange-pattern="request-response"/>
+		<https:inbound-endpoint connector-ref="connector.https.ebms.in" address="https://${service.host}:${service.port}${service.url}" exchange-pattern="request-response"/>
 		<component>
 			<singleton-object class="nl.clockwork.mule.ebms.processor.EbMSHttpHandler">
 				<property key="ebMSMessageProcessor" value-ref="messageProcessor"/>
