@@ -34,9 +34,9 @@
 		<developer>
 			<id>e.luinstra</id>
 			<name>Edwin Luinstra</name>
-			<email>edwin.luinstra@clockwork.nl</email>
-			<organization>Clockwork</organization>
-			<organizationUrl>http://www.clockwork.nl</organizationUrl>
+			<email>edwin.luinstra@ordina.nl</email>
+			<organization>Ordina</organization>
+			<organizationUrl>http://www.ordina.nl</organizationUrl>
 			<roles>
 				<role>Architect</role>
 				<role>Developer</role>
@@ -48,8 +48,8 @@
 		<connection>scm:git:ssh://git.code.sf.net/p/muleebmsadapter/code</connection>
 	</scm>
 	<organization>
-		<name>Clockwork</name>
-		<url>www.clockwork.nl</url>
+		<name>Ordina</name>
+		<url>www.ordina.nl</url>
 	</organization>
 	<properties>
 		<jdk.version>1.7</jdk.version>
@@ -73,7 +73,7 @@
 		<dependency>
 			<groupId>com.sun.xml.bind</groupId>
 			<artifactId>jaxb-impl</artifactId>
-			<version>2.2.2</version>
+			<version>2.2.4</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
@@ -136,16 +136,6 @@
 			<artifactId>apache-mime4j-core</artifactId>
 			<version>${mime4j.version}</version>
 		</dependency>
-		<!--dependency>
-			<groupId>org.apache.james</groupId>
-			<artifactId>apache-mime4j-dom</artifactId>
-			<version>${mime4j.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.james</groupId>
-			<artifactId>apache-mime4j-storage</artifactId>
-			<version>${mime4j.version}</version>
-		</dependency-->
 		<dependency>
 			<groupId>org.apache.httpcomponents</groupId>
 			<artifactId>httpclient</artifactId>
