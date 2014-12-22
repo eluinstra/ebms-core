@@ -1,3 +1,6 @@
+- implement ebMSMessageContentValidator (make validation configurable)
+- optimize EbMSMessageutils and CPAUtils
+
 - add try with resources statement on AutoClosable resources
 - replace DAO.getTimestampFunction() by java Date
 - remove hard coded UTF-8 encoding from DAO's?
@@ -10,9 +13,10 @@
 	- validate check used CPA fields in CPAUtils and them
 	- validate on unsupported features
 
-- implement security on soap interface
+- implement push interface with jms
 - implement push soap interface
-- implement pull and push mq interfaces
+- implement events with quartz or jms
+- implement security on soap interface
 
 - test multiple certificates in keystore
 
