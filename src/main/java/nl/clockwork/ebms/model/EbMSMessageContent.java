@@ -19,6 +19,8 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.xml.bind.annotation.XmlElement;
+
 public class EbMSMessageContent implements Serializable
 {
 	private static final long serialVersionUID = 1L;
@@ -40,6 +42,7 @@ public class EbMSMessageContent implements Serializable
 		this.dataSources = dataSources;
 	}
 
+	@XmlElement(required=true)
 	public EbMSMessageContext getContext()
 	{
 		return context;
@@ -50,6 +53,7 @@ public class EbMSMessageContent implements Serializable
 		this.context = context;
 	}
 	
+	@XmlElement(name="dataSource",required=true)
 	public List<EbMSDataSource> getDataSources()
 	{
 		return dataSources;

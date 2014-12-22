@@ -38,6 +38,7 @@ import nl.clockwork.ebms.model.EbMSMessage;
 import nl.clockwork.ebms.model.EbMSMessageContent;
 import nl.clockwork.ebms.model.EbMSMessageContext;
 import nl.clockwork.ebms.model.MessageStatus;
+import nl.clockwork.ebms.model.Party;
 import nl.clockwork.ebms.processor.EbMSProcessorException;
 import nl.clockwork.ebms.signature.EbMSSignatureGenerator;
 import nl.clockwork.ebms.util.CPAUtils;
@@ -57,7 +58,7 @@ public class EbMSMessageServiceImpl implements EbMSMessageService
 	private EbMSSignatureGenerator signatureGenerator;
 
 	@Override
-	public void ping(String cpaId, String fromParty, String toParty) throws EbMSMessageServiceException
+	public void ping(String cpaId, Party fromParty, Party toParty) throws EbMSMessageServiceException
 	{
 		try
 		{
@@ -176,7 +177,7 @@ public class EbMSMessageServiceImpl implements EbMSMessageService
 		{
 			EbMSMessageContext context = ebMSDAO.getMessageContext(messageId);
 			CollaborationProtocolAgreement cpa = ebMSDAO.getCPA(context.getCpaId());
-			EbMSMessage request = EbMSMessageUtils.createEbMSStatusRequest(cpa,CPAUtils.toString(CPAUtils.getSendingPartyInfo(cpa,context.getFromRole(),context.getService(),context.getAction()).getPartyId().get(0)),CPAUtils.toString(CPAUtils.getReceivingPartyInfo(cpa,context.getToRole(),context.getService(),context.getAction()).getPartyId().get(0)),messageId);
+			EbMSMessage request = EbMSMessageUtils.createEbMSStatusRequest(cpa,CPAUtils.toParty(cpa,context.getFromRole(),context.getService(),context.getAction()),CPAUtils.toParty(cpa,context.getToRole(),context.getService(),context.getAction()),messageId);
 			EbMSMessage response = deliveryManager.sendMessage(cpa,request);
 			if (response != null)
 			{
@@ -195,7 +196,7 @@ public class EbMSMessageServiceImpl implements EbMSMessageService
 	}
 
 	@Override
-	public MessageStatus getMessageStatus(String cpaId, String fromParty, String toParty, String messageId) throws EbMSMessageServiceException
+	public MessageStatus getMessageStatus(String cpaId, Party fromParty, Party toParty, String messageId) throws EbMSMessageServiceException
 	{
 		try
 		{

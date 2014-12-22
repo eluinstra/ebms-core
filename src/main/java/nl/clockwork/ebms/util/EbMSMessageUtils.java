@@ -50,6 +50,7 @@ import nl.clockwork.ebms.model.EbMSEvent;
 import nl.clockwork.ebms.model.EbMSMessage;
 import nl.clockwork.ebms.model.EbMSMessageContent;
 import nl.clockwork.ebms.model.EbMSMessageContext;
+import nl.clockwork.ebms.model.Party;
 import nl.clockwork.ebms.xml.EbMSNamespaceMapper;
 
 import org.apache.commons.lang.StringUtils;
@@ -165,13 +166,12 @@ public class EbMSMessageUtils
 		return new EbMSDocument(EbMSMessageUtils.createSOAPMessage(message),message.getAttachments());
 	}
 	
-	public static MessageHeader createMessageHeader(CollaborationProtocolAgreement cpa, String fromParty, String toParty, String action) throws DatatypeConfigurationException
+	public static MessageHeader createMessageHeader(CollaborationProtocolAgreement cpa, Party fromParty, Party toParty, String action) throws DatatypeConfigurationException
 	{
 		String uuid = UUID.randomUUID().toString();
 		PartyInfo sendingPartyInfo = CPAUtils.getPartyInfo(cpa,fromParty);
 		PartyInfo receivingPartyInfo = CPAUtils.getPartyInfo(cpa,toParty);
-		//PartyInfo receivingPartyInfo = CPAUtils.getOtherReceivingPartyInfo(cpa,context.getFromRole(),context.getService(),context.getAction());
-		DeliveryChannel deliveryChannel = CPAUtils.getDeliveryChannel(sendingPartyInfo.getCollaborationRole().get(0).getServiceBinding().getCanSend().get(0).getThisPartyActionBinding());
+		DeliveryChannel deliveryChannel = (DeliveryChannel)sendingPartyInfo.getDefaultMshChannelId();
 		String hostname = CPAUtils.getHostname(deliveryChannel);
 
 		MessageHeader messageHeader = new MessageHeader();
@@ -183,18 +183,18 @@ public class EbMSMessageUtils
 		messageHeader.setConversationId(uuid);
 		
 		messageHeader.setFrom(new From());
-		PartyId from = new PartyId();
-		from.setType(sendingPartyInfo.getPartyId().get(0).getType());
-		from.setValue(sendingPartyInfo.getPartyId().get(0).getValue());
-		messageHeader.getFrom().getPartyId().add(from);
-		//messageHeader.getFrom().setRole(sendingPartyInfo.getCollaborationRole().get(0).getRole().getName());
+		PartyId fromPartyId = new PartyId();
+		fromPartyId.setType(sendingPartyInfo.getPartyId().get(0).getType());
+		fromPartyId.setValue(sendingPartyInfo.getPartyId().get(0).getValue());
+		messageHeader.getFrom().getPartyId().add(fromPartyId);
+		messageHeader.getFrom().setRole(fromParty.getRole());
 
 		messageHeader.setTo(new To());
-		PartyId to = new PartyId();
-		to.setType(receivingPartyInfo.getPartyId().get(0).getType());
-		to.setValue(receivingPartyInfo.getPartyId().get(0).getValue());
-		messageHeader.getTo().getPartyId().add(to);
-		//messageHeader.getTo().setRole(receivingPartyInfo.getCollaborationRole().get(0).getRole().getName());
+		PartyId toPartyId = new PartyId();
+		toPartyId.setType(receivingPartyInfo.getPartyId().get(0).getType());
+		toPartyId.setValue(receivingPartyInfo.getPartyId().get(0).getValue());
+		messageHeader.getTo().getPartyId().add(toPartyId);
+		messageHeader.getTo().setRole(toParty.getRole());
 		
 		messageHeader.setService(new Service());
 		messageHeader.getService().setType(null);
@@ -218,7 +218,6 @@ public class EbMSMessageUtils
 		String uuid = context.getMessageId() == null ? UUID.randomUUID().toString() : context.getMessageId();
 		PartyInfo sendingPartyInfo = CPAUtils.getSendingPartyInfo(cpa,context.getFromRole(),context.getService(),context.getAction());
 		PartyInfo receivingPartyInfo = CPAUtils.getReceivingPartyInfo(cpa,context.getToRole(),context.getService(),context.getAction());
-		//PartyInfo receivingPartyInfo = CPAUtils.getOtherReceivingPartyInfo(cpa,context.getFromRole(),context.getService(),context.getAction());
 		DeliveryChannel deliveryChannel = CPAUtils.getDeliveryChannel(sendingPartyInfo.getCollaborationRole().get(0).getServiceBinding().getCanSend().get(0).getThisPartyActionBinding());
 		String hostname = CPAUtils.getHostname(deliveryChannel);
 
@@ -283,11 +282,11 @@ public class EbMSMessageUtils
 
 		result.getFrom().getPartyId().clear();
 		result.getFrom().getPartyId().addAll(messageHeader.getTo().getPartyId());
+		result.getFrom().setRole(messageHeader.getTo().getRole());
+
 		result.getTo().getPartyId().clear();
 		result.getTo().getPartyId().addAll(messageHeader.getFrom().getPartyId());
-
-		result.getFrom().setRole(null);
-		result.getTo().setRole(null);
+		result.getTo().setRole(messageHeader.getFrom().getRole());
 
 		result.getMessageData().setRefToMessageId(messageHeader.getMessageData().getMessageId());
 		result.getMessageData().setMessageId(UUID.randomUUID().toString() + "@" + hostname);
@@ -321,7 +320,7 @@ public class EbMSMessageUtils
 			return null;
 	}
 	
-	public static SyncReply createSyncReply(CollaborationProtocolAgreement cpa, String fromParty)
+	public static SyncReply createSyncReply(CollaborationProtocolAgreement cpa, Party fromParty)
 	{
 		return createSyncReply(CPAUtils.getPartyInfo(cpa,fromParty));
 	}
@@ -447,7 +446,7 @@ public class EbMSMessageUtils
 		return result;
 	}
 	
-	public static EbMSMessage createEbMSPing(CollaborationProtocolAgreement cpa, String fromParty, String toParty) throws DatatypeConfigurationException, JAXBException
+	public static EbMSMessage createEbMSPing(CollaborationProtocolAgreement cpa, Party fromParty, Party toParty) throws DatatypeConfigurationException, JAXBException
 	{
 		EbMSMessage result = new EbMSMessage();
 		result.setMessageHeader(createMessageHeader(cpa,fromParty,toParty,EbMSAction.PING.action()));
@@ -462,7 +461,7 @@ public class EbMSMessageUtils
 		return result;
 	}
 	
-	public static EbMSMessage createEbMSStatusRequest(CollaborationProtocolAgreement cpa, String fromParty, String toParty, String messageId) throws DatatypeConfigurationException, JAXBException
+	public static EbMSMessage createEbMSStatusRequest(CollaborationProtocolAgreement cpa, Party fromParty, Party toParty, String messageId) throws DatatypeConfigurationException, JAXBException
 	{
 		MessageHeader messageHeader = createMessageHeader(cpa,fromParty,toParty,EbMSAction.STATUS_REQUEST.action());
 		StatusRequest statusRequest = createStatusRequest(messageId);

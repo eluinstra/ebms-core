@@ -21,41 +21,43 @@ import javax.jws.WebMethod;
 import javax.jws.WebParam;
 import javax.jws.WebResult;
 import javax.jws.WebService;
+import javax.xml.bind.annotation.XmlElement;
 
 import nl.clockwork.ebms.model.EbMSMessageContent;
 import nl.clockwork.ebms.model.EbMSMessageContext;
 import nl.clockwork.ebms.model.MessageStatus;
+import nl.clockwork.ebms.model.Party;
 
-@WebService(targetNamespace="http://www.clockwork.nl/ebms/2.0")
+@WebService(targetNamespace="http://www.ordina.nl/ebms/2.1")
 public interface EbMSMessageService
 {
 	@WebMethod(operationName="Ping")
-	void ping(@WebParam(name="CPAId") String cpaId, @WebParam(name="FromParty") String fromParty, @WebParam(name="ToParty") String toParty) throws EbMSMessageServiceException;
+	void ping(@WebParam(name="CPAId") @XmlElement(required=true) String cpaId, @WebParam(name="FromParty") @XmlElement(required=true) Party fromParty, @WebParam(name="ToParty") @XmlElement(required=true) Party toParty) throws EbMSMessageServiceException;
 	
 	@WebResult(name="MessageId")
 	@WebMethod(operationName="SendMessage")
-	String sendMessage(@WebParam(name="Message") EbMSMessageContent messageContent) throws EbMSMessageServiceException;
+	String sendMessage(@WebParam(name="Message") @XmlElement(required=true) EbMSMessageContent messageContent) throws EbMSMessageServiceException;
 
 	@WebResult(name="MessageIds")
 	@WebMethod(operationName="GetMessageIds")
-	List<String> getMessageIds(@WebParam(name="MessageContext") EbMSMessageContext messageContext, @WebParam(name="MaxNr") Integer maxNr) throws EbMSMessageServiceException;
+	List<String> getMessageIds(@WebParam(name="MessageContext") @XmlElement(required=true) EbMSMessageContext messageContext, @WebParam(name="MaxNr") Integer maxNr) throws EbMSMessageServiceException;
 
 	@WebResult(name="Message")
 	@WebMethod(operationName="GetMessage")
-	EbMSMessageContent getMessage(@WebParam(name="MessageId") String messageId, @WebParam(name="Process") Boolean process) throws EbMSMessageServiceException;
+	EbMSMessageContent getMessage(@WebParam(name="MessageId") @XmlElement(required=true) String messageId, @WebParam(name="Process") Boolean process) throws EbMSMessageServiceException;
 
 	@WebMethod(operationName="ProcessMessage")
-	void processMessage(@WebParam(name="MessageId") String messageId) throws EbMSMessageServiceException;
+	void processMessage(@WebParam(name="MessageId") @XmlElement(required=true) String messageId) throws EbMSMessageServiceException;
 
 	@WebMethod(operationName="ProcessMessages")
-	void processMessages(@WebParam(name="MessageId") List<String> messageIds) throws EbMSMessageServiceException;
+	void processMessages(@WebParam(name="MessageId") @XmlElement(required=true) List<String> messageIds) throws EbMSMessageServiceException;
 
 	@WebResult(name="MessageStatus")
 	@WebMethod(operationName="GetMessageStatusByMessageId")
-	MessageStatus getMessageStatus(@WebParam(name="MessageId") String messageId) throws EbMSMessageServiceException;
+	MessageStatus getMessageStatus(@WebParam(name="MessageId") @XmlElement(required=true) String messageId) throws EbMSMessageServiceException;
 
 	@WebResult(name="MessageStatus")
 	@WebMethod(operationName="GetMessageStatus")
-	MessageStatus getMessageStatus(@WebParam(name="CPAId") String cpaId, @WebParam(name="FromParty") String fromParty, @WebParam(name="ToParty") String toParty, @WebParam(name="MessageId") String messageId) throws EbMSMessageServiceException;
+	MessageStatus getMessageStatus(@WebParam(name="CPAId") @XmlElement(required=true) String cpaId, @WebParam(name="FromParty") @XmlElement(required=true) Party fromParty, @WebParam(name="ToParty") @XmlElement(required=true) Party toParty, @WebParam(name="MessageId") @XmlElement(required=true) String messageId) throws EbMSMessageServiceException;
 
 }

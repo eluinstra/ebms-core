@@ -17,7 +17,7 @@ package nl.clockwork.ebms.service;
 
 import javax.xml.ws.WebFault;
 
-@WebFault(name="CPAServiceException", targetNamespace="http://www.clockwork.nl/cpa/2.0")
+@WebFault(name="CPAServiceException", targetNamespace="http://www.ordina.nl/cpa/2.1")
 public class CPAServiceException extends RuntimeException
 {
 	private static final long serialVersionUID = 1L;

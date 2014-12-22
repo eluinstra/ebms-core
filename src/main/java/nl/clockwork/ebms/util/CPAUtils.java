@@ -28,6 +28,8 @@ import javax.xml.bind.JAXBElement;
 
 import nl.clockwork.ebms.Constants;
 import nl.clockwork.ebms.model.EbMSMessage;
+import nl.clockwork.ebms.model.Party;
+import nl.clockwork.ebms.model.Role;
 
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.ActionBindingType;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CanReceive;
@@ -70,6 +72,12 @@ public class CPAUtils
 		return serviceToString(service.getType(),service.getValue());
 	}
 	
+	public static Party toParty(CollaborationProtocolAgreement cpa, Role fromRole, String service, String action)
+	{
+		String partyId = fromRole.getPartyId() == null ? toString(getSendingPartyInfo(cpa,fromRole,service,action).getPartyId().get(0)) : fromRole.getPartyId();
+		return new Party(partyId,fromRole.getRole());
+	}
+	
 	public static String serviceToString(String type, String service)
 	{
 		return (type == null ? "" : type + ":") + service;
@@ -91,12 +99,21 @@ public class CPAUtils
 		return getUri(deliveryChannel);
 	}
 
-	public static PartyInfo getPartyInfo(CollaborationProtocolAgreement cpa, String partyId)
+	public static PartyInfo getPartyInfo(CollaborationProtocolAgreement cpa, Party party)
 	{
 		for (PartyInfo partyInfo : cpa.getPartyInfo())
 			for (PartyId cpaPartyId : partyInfo.getPartyId())
-				if (partyId.equals(toString(cpaPartyId)))
-					return partyInfo;
+				if (party.getPartyId().equals(toString(cpaPartyId)))
+					for (CollaborationRole role : partyInfo.getCollaborationRole())
+						if (party.getRole() == null || party.getRole().equals(role.getRole().getName()))
+						{
+							PartyInfo p = new PartyInfo();
+							p.getPartyId().addAll(partyInfo.getPartyId());
+							CollaborationRole cr = new CollaborationRole();
+							cr.setRole(role.getRole());
+							p.getCollaborationRole().add(cr);
+							return p;
+						}
 		return null;
 	}
 
@@ -128,56 +145,59 @@ public class CPAUtils
 		return serviceType.getType().equals(service.getType()) && serviceType.getValue().equals(service.getValue());
 	}
 
-	public static PartyInfo getPartyInfo(CollaborationProtocolAgreement cpa, String from, String service, String action)
+	public static PartyInfo getPartyInfo(CollaborationProtocolAgreement cpa, Role fromRole, String service, String action)
 	{
 		for (PartyInfo partyInfo : cpa.getPartyInfo())
-			for (CollaborationRole role : partyInfo.getCollaborationRole())
-				if ((from == null || from.equals(role.getRole().getName()))	&& service.equals(toString(role.getServiceBinding().getService())))
-					for (CanSend canSend : role.getServiceBinding().getCanSend())
-						if (action.equals(canSend.getThisPartyActionBinding().getAction()))
-							return partyInfo;
+			if (fromRole.getPartyId() == null || fromRole.getPartyId().equals(partyInfo.getPartyId()))
+				for (CollaborationRole role : partyInfo.getCollaborationRole())
+					if (fromRole.getRole().equals(role.getRole().getName())	&& service.equals(toString(role.getServiceBinding().getService())))
+						for (CanSend canSend : role.getServiceBinding().getCanSend())
+							if (action.equals(canSend.getThisPartyActionBinding().getAction()))
+								return partyInfo;
 		return null;
 	}
 	
-	public static PartyInfo getSendingPartyInfo(CollaborationProtocolAgreement cpa, String from, String service, String action)
+	public static PartyInfo getSendingPartyInfo(CollaborationProtocolAgreement cpa, Role fromRole, String service, String action)
 	{
 		for (PartyInfo partyInfo : cpa.getPartyInfo())
-			for (CollaborationRole role : partyInfo.getCollaborationRole())
-				if ((from == null || from.equals(role.getRole().getName())) && service.equals(toString(role.getServiceBinding().getService())))
-					for (CanSend canSend : role.getServiceBinding().getCanSend())
-						if (action.equals(canSend.getThisPartyActionBinding().getAction()))
-						{
-							PartyInfo p = new PartyInfo();
-							p.getPartyId().addAll(partyInfo.getPartyId());
-							CollaborationRole cr = new CollaborationRole();
-							cr.setRole(role.getRole());
-							cr.setServiceBinding(new ServiceBinding());
-							cr.getServiceBinding().setService(role.getServiceBinding().getService());
-							cr.getServiceBinding().getCanSend().add(canSend);
-							p.getCollaborationRole().add(cr);
-							return p;
-						}
+			if (fromRole.getPartyId() == null || fromRole.getPartyId().equals(partyInfo.getPartyId()))
+				for (CollaborationRole role : partyInfo.getCollaborationRole())
+					if (fromRole.getRole().equals(role.getRole().getName()) && service.equals(toString(role.getServiceBinding().getService())))
+						for (CanSend canSend : role.getServiceBinding().getCanSend())
+							if (action.equals(canSend.getThisPartyActionBinding().getAction()))
+							{
+								PartyInfo p = new PartyInfo();
+								p.getPartyId().addAll(partyInfo.getPartyId());
+								CollaborationRole cr = new CollaborationRole();
+								cr.setRole(role.getRole());
+								cr.setServiceBinding(new ServiceBinding());
+								cr.getServiceBinding().setService(role.getServiceBinding().getService());
+								cr.getServiceBinding().getCanSend().add(canSend);
+								p.getCollaborationRole().add(cr);
+								return p;
+							}
 		return null;
 	}
 	
-	public static PartyInfo getReceivingPartyInfo(CollaborationProtocolAgreement cpa, String to, String service, String action)
+	public static PartyInfo getReceivingPartyInfo(CollaborationProtocolAgreement cpa, Role toRole, String service, String action)
 	{
 		for (PartyInfo partyInfo : cpa.getPartyInfo())
-			for (CollaborationRole role : partyInfo.getCollaborationRole())
-				if ((to == null || to.equals(role.getRole().getName())) && service.equals(toString(role.getServiceBinding().getService())))
-					for (CanReceive canReceive : role.getServiceBinding().getCanReceive())
-						if (action.equals(canReceive.getThisPartyActionBinding().getAction()))
-						{
-							PartyInfo p = new PartyInfo();
-							p.getPartyId().addAll(partyInfo.getPartyId());
-							CollaborationRole r = new CollaborationRole();
-							r.setRole(role.getRole());
-							r.setServiceBinding(new ServiceBinding());
-							r.getServiceBinding().setService(role.getServiceBinding().getService());
-							r.getServiceBinding().getCanReceive().add(canReceive);
-							p.getCollaborationRole().add(r);
-							return p;
-						}
+			if (toRole.getPartyId() == null || toRole.getPartyId().equals(partyInfo.getPartyId()))
+				for (CollaborationRole role : partyInfo.getCollaborationRole())
+					if (toRole.getRole().equals(role.getRole().getName()) && service.equals(toString(role.getServiceBinding().getService())))
+						for (CanReceive canReceive : role.getServiceBinding().getCanReceive())
+							if (action.equals(canReceive.getThisPartyActionBinding().getAction()))
+							{
+								PartyInfo p = new PartyInfo();
+								p.getPartyId().addAll(partyInfo.getPartyId());
+								CollaborationRole r = new CollaborationRole();
+								r.setRole(role.getRole());
+								r.setServiceBinding(new ServiceBinding());
+								r.getServiceBinding().setService(role.getServiceBinding().getService());
+								r.getServiceBinding().getCanReceive().add(canReceive);
+								p.getCollaborationRole().add(r);
+								return p;
+							}
 		return null;
 	}
 	

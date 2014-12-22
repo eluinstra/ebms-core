@@ -46,6 +46,7 @@ import nl.clockwork.ebms.model.EbMSEvent;
 import nl.clockwork.ebms.model.EbMSMessage;
 import nl.clockwork.ebms.model.EbMSMessageContent;
 import nl.clockwork.ebms.model.EbMSMessageContext;
+import nl.clockwork.ebms.model.Role;
 import nl.clockwork.ebms.util.EbMSMessageUtils;
 
 import org.apache.commons.io.IOUtils;
@@ -288,8 +289,8 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 					{
 						EbMSMessageContext result = new EbMSMessageContext();
 						result.setCpaId(rs.getString("cpa_id"));
-						result.setFromRole(rs.getString("from_role"));
-						result.setToRole(rs.getString("to_role"));
+						result.setFromRole(new Role(rs.getString("from_role")));
+						result.setToRole(new Role(rs.getString("to_role")));
 						result.setService(rs.getString("service"));
 						result.setAction(rs.getString("action"));
 						result.setTimestamp(rs.getTimestamp("time_stamp"));
@@ -342,8 +343,8 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 					{
 						EbMSMessageContext result = new EbMSMessageContext();
 						result.setCpaId(rs.getString("cpa_id"));
-						result.setFromRole(rs.getString("from_role"));
-						result.setToRole(rs.getString("to_role"));
+						result.setFromRole(new Role(rs.getString("from_role")));
+						result.setToRole(new Role(rs.getString("to_role")));
 						result.setService(rs.getString("service"));
 						result.setAction(rs.getString("action"));
 						result.setTimestamp(rs.getTimestamp("time_stamp"));

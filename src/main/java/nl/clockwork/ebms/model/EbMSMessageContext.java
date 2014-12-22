@@ -18,12 +18,14 @@ package nl.clockwork.ebms.model;
 import java.io.Serializable;
 import java.util.Date;
 
+import javax.xml.bind.annotation.XmlElement;
+
 public class EbMSMessageContext implements Serializable
 {
 	private static final long serialVersionUID = 1L;
 	private String cpaId;
-	private String fromRole;
-	private String toRole;
+	private Role fromRole;
+	private Role toRole;
 	private String service;
 	private String action;
 	private Date timestamp;
@@ -36,6 +38,7 @@ public class EbMSMessageContext implements Serializable
 	{
 	}
 	
+	@XmlElement(required=true)
 	public String getCpaId()
 	{
 		return cpaId;
@@ -46,27 +49,30 @@ public class EbMSMessageContext implements Serializable
 		this.cpaId = cpaId;
 	}
 
-	public String getFromRole()
+	@XmlElement(required=true)
+	public Role getFromRole()
 	{
 		return fromRole;
 	}
 	
-	public void setFromRole(String fromRole)
+	public void setFromRole(Role fromRole)
 	{
 		this.fromRole = fromRole;
 	}
 	
-	public String getToRole()
+	@XmlElement(required=true)
+	public Role getToRole()
 	{
 		return toRole;
 	}
 	
-	public void setToRole(String toRole)
+	public void setToRole(Role toRole)
 	{
 		this.toRole = toRole;
 	}
 	
 	
+	@XmlElement(required=true)
 	public String getService()
 	{
 		return service;
@@ -77,6 +83,7 @@ public class EbMSMessageContext implements Serializable
 		this.service = service;
 	}
 	
+	@XmlElement(required=true)
 	public String getAction()
 	{
 		return action;
@@ -87,6 +94,7 @@ public class EbMSMessageContext implements Serializable
 		this.action = action;
 	}
 	
+	@XmlElement
 	public Date getTimestamp()
 	{
 		return timestamp;
@@ -97,6 +105,7 @@ public class EbMSMessageContext implements Serializable
 		this.timestamp = timestamp;
 	}
 	
+	@XmlElement
 	public String getConversationId()
 	{
 		return conversationId;
@@ -107,6 +116,7 @@ public class EbMSMessageContext implements Serializable
 		this.conversationId = conversationId;
 	}
 	
+	@XmlElement
 	public String getMessageId()
 	{
 		return messageId;
@@ -117,6 +127,7 @@ public class EbMSMessageContext implements Serializable
 		this.messageId = messageId;
 	}
 	
+	@XmlElement
 	public String getRefToMessageId()
 	{
 		return refToMessageId;
@@ -127,6 +138,7 @@ public class EbMSMessageContext implements Serializable
 		this.refToMessageId = refToMessageId;
 	}
 	
+	@XmlElement
 	public Integer getSequenceNr()
 	{
 		return sequenceNr;
