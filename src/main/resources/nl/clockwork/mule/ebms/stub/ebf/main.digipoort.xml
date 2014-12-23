@@ -55,7 +55,7 @@
 
 		<import resource="classpath:nl/clockwork/mule/ebms/components/connector.xml" />
 
-		<import resource="classpath:nl/clockwork/mule/ebms/flows/ebms.endpoint.http.xml" />
+		<import resource="classpath:nl/clockwork/mule/ebms/flows/ebms.endpoint.https.xml" />
 
 		<import resource="classpath:nl/clockwork/mule/ebms/flows/ebms.interface.vm.xml" />
 
