@@ -1,5 +1,6 @@
 package nl.clockwork.ebms.model;
 
+import java.io.Serializable;
 import java.util.List;
 
 import javax.xml.bind.annotation.XmlElement;
@@ -9,10 +10,11 @@ import nl.clockwork.ebms.util.CPAUtils;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.PartyId;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.Role;
 
-public class Party
+public class Party implements Serializable
 {
-	String partyId;
-	String role;
+	private static final long serialVersionUID = 1L;
+	private String partyId;
+	private String role;
 	
 	public Party()
 	{

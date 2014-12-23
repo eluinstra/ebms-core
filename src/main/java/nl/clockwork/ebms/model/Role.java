@@ -8,6 +8,8 @@ import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.PartyId;
 
 public class Role extends Party
 {
+	private static final long serialVersionUID = 1L;
+
 	public Role()
 	{
 	}
