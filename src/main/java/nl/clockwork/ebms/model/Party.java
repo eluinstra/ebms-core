@@ -1,6 +1,13 @@
 package nl.clockwork.ebms.model;
 
+import java.util.List;
+
 import javax.xml.bind.annotation.XmlElement;
+
+import nl.clockwork.ebms.util.CPAUtils;
+
+import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.PartyId;
+import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.Role;
 
 public class Party
 {
@@ -44,4 +51,20 @@ public class Party
 		this.role = role;
 	}
 	
+	public boolean matches(List<PartyId> partyIds)
+	{
+		if (getPartyId() == null && (partyIds == null || partyIds.size() == 0))
+			return true;
+		if (getPartyId() == null || partyIds == null)
+			return false;
+		for (PartyId partyId : partyIds)
+			if (getPartyId().equals(CPAUtils.toString(partyId)))
+				return true;
+		return false;
+	}
+	
+	public boolean matches(Role role)
+	{
+		return getRole() == null || getRole().equals(role.getName());
+	}
 }

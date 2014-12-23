@@ -4,8 +4,6 @@ import java.util.List;
 
 import javax.xml.bind.annotation.XmlElement;
 
-import nl.clockwork.ebms.util.CPAUtils;
-
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.PartyId;
 
 public class Role extends Party
@@ -38,16 +36,13 @@ public class Role extends Party
 		return super.getRole();
 	}
 	
-	public boolean equals(List<PartyId> partyIds)
+	public boolean matches(List<PartyId> partyIds)
 	{
-		if (getPartyId() == null && (partyIds == null || partyIds.size() == 0))
-			return true;
-		if (getPartyId() == null || partyIds == null)
-			return false;
-		for (PartyId partyId : partyIds)
-			if (getPartyId().equals(CPAUtils.toString(partyId)))
-				return true;
-		return false;
-		
+		return getPartyId() == null || super.matches(partyIds);
+	}
+
+	public boolean matches(org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.Role role)
+	{
+		return getRole().equals(role.getName());
 	}
 }
