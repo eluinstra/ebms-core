@@ -20,6 +20,7 @@ import nl.clockwork.ebms.dao.EbMSDAO;
 import nl.clockwork.ebms.model.EbMSMessageContext;
 
 import org.apache.commons.lang.StringUtils;
+import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.ActionBindingType;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CollaborationProtocolAgreement;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.PartyInfo;
 
@@ -51,30 +52,34 @@ public class EbMSMessageContextValidator
 			if (sendingPartyInfo == null)
 			{
 				StringBuffer msg = new StringBuffer();
-
 				msg.append("No CanSend action found for:");
 				msg.append(" context.cpaId=").append(context.getCpaId());
 				if (context.getFromRole() != null)
 					msg.append(", context.fromRole=").append(context.getFromRole());
 				msg.append(", context.service=").append(context.getService());
 				msg.append(", context.action=").append(context.getAction());
-
 				throw new EbMSMessageContextValidationException(msg.toString());
 			}
-			PartyInfo receivingPartyInfo = CPAUtils.getReceivingPartyInfo(cpa,context.getToRole(),context.getService(),context.getAction());
-			if (receivingPartyInfo == null)
+
+			//PartyInfo receivingPartyInfo = CPAUtils.getReceivingPartyInfo(cpa,(ActionBindingType)sendingPartyInfo.getCollaborationRole().get(0).getServiceBinding().getCanSend().get(0).getOtherPartyActionBinding());
+			PartyInfo receivingPartyInfo1 = CPAUtils.getReceivingPartyInfo(cpa,context.getToRole(),context.getService(),context.getAction());
+			//if (receivingPartyInfo == null && receivingPartyInfo1 == null)
+			if (sendingPartyInfo.getCollaborationRole().get(0).getServiceBinding().getCanSend().get(0).getOtherPartyActionBinding() == null && receivingPartyInfo1 == null)
 			{
 				StringBuffer msg = new StringBuffer();
-
 				msg.append("No CanReceive action found for:");
 				msg.append(" context.cpaId=").append(context.getCpaId());
-				if (context.getFromRole() != null)
+				if (sendingPartyInfo.getCollaborationRole().get(0).getServiceBinding().getCanSend().get(0).getOtherPartyActionBinding() != null && context.getFromRole() != null)
+					msg.append(", context.fromRole=").append(context.getFromRole());
+				if (context.getToRole() != null)
 					msg.append(", context.toRole=").append(context.getToRole());
 				msg.append(", context.service=").append(context.getService());
 				msg.append(", context.action=").append(context.getAction());
-				
 				throw new EbMSMessageContextValidationException(msg.toString());
 			}
+			//else if (receivingPartyInfo != null && receivingPartyInfo1 != null && receivingPartyInfo.getCollaborationRole().get(0).getServiceBinding().getCanReceive().get(0).getThisPartyActionBinding() != receivingPartyInfo1.getCollaborationRole().get(0).getServiceBinding().getCanReceive().get(0).getThisPartyActionBinding())
+			else if (sendingPartyInfo.getCollaborationRole().get(0).getServiceBinding().getCanSend().get(0).getOtherPartyActionBinding() != null && receivingPartyInfo1 != null && sendingPartyInfo.getCollaborationRole().get(0).getServiceBinding().getCanSend().get(0).getOtherPartyActionBinding() != receivingPartyInfo1.getCollaborationRole().get(0).getServiceBinding().getCanReceive().get(0).getThisPartyActionBinding())
+				throw new EbMSMessageContextValidationException("to party does not match from party for this action. Leave context.toRole empty!");
 		}
 		catch (DAOException e)
 		{

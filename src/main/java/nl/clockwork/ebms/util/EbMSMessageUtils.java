@@ -54,6 +54,7 @@ import nl.clockwork.ebms.model.Party;
 import nl.clockwork.ebms.xml.EbMSNamespaceMapper;
 
 import org.apache.commons.lang.StringUtils;
+import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.ActionBindingType;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.ActorType;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CollaborationProtocolAgreement;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DeliveryChannel;
@@ -217,7 +218,7 @@ public class EbMSMessageUtils
 	{
 		String uuid = context.getMessageId() == null ? UUID.randomUUID().toString() : context.getMessageId();
 		PartyInfo sendingPartyInfo = CPAUtils.getSendingPartyInfo(cpa,context.getFromRole(),context.getService(),context.getAction());
-		PartyInfo receivingPartyInfo = CPAUtils.getReceivingPartyInfo(cpa,context.getToRole(),context.getService(),context.getAction());
+		PartyInfo receivingPartyInfo = sendingPartyInfo.getCollaborationRole().get(0).getServiceBinding().getCanSend().get(0).getOtherPartyActionBinding() == null ? CPAUtils.getReceivingPartyInfo(cpa,context.getToRole(),context.getService(),context.getAction()) : CPAUtils.getReceivingPartyInfo(cpa,(ActionBindingType)sendingPartyInfo.getCollaborationRole().get(0).getServiceBinding().getCanSend().get(0).getOtherPartyActionBinding());
 		DeliveryChannel deliveryChannel = CPAUtils.getDeliveryChannel(sendingPartyInfo.getCollaborationRole().get(0).getServiceBinding().getCanSend().get(0).getThisPartyActionBinding());
 		String hostname = CPAUtils.getHostname(deliveryChannel);
 

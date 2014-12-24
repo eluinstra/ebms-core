@@ -60,7 +60,7 @@ public class EbMSMessageContext implements Serializable
 		this.fromRole = fromRole;
 	}
 	
-	@XmlElement(required=true)
+	@XmlElement
 	public Role getToRole()
 	{
 		return toRole;

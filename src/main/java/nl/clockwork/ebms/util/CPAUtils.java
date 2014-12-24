@@ -230,6 +230,26 @@ public class CPAUtils
 		return getCanReceive(partyInfo,role,service,action) != null;
 	}
 
+	public static PartyInfo getReceivingPartyInfo(CollaborationProtocolAgreement cpa, ActionBindingType actionBinding)
+	{
+		for (PartyInfo partyInfo : cpa.getPartyInfo())
+			for (CollaborationRole role : partyInfo.getCollaborationRole())
+				for (CanReceive canReceive : role.getServiceBinding().getCanReceive())
+					if (canReceive.getThisPartyActionBinding().equals(actionBinding))
+					{
+						PartyInfo p = new PartyInfo();
+						p.getPartyId().addAll(partyInfo.getPartyId());
+						CollaborationRole r = new CollaborationRole();
+						r.setRole(role.getRole());
+						r.setServiceBinding(new ServiceBinding());
+						r.getServiceBinding().setService(role.getServiceBinding().getService());
+						r.getServiceBinding().getCanReceive().add(canReceive);
+						p.getCollaborationRole().add(r);
+						return p;
+					}
+		return null;
+	}
+
 	public static DeliveryChannel getSendingDeliveryChannel(PartyInfo partyInfo, String role, Service service, String action)
 	{
 		if (Constants.EBMS_SERVICE_URI.equals(service.getValue()))
