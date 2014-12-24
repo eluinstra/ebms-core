@@ -1,5 +1,12 @@
-- implement ebMSMessageContentValidator (make validation configurable)
+- improve ebMSMessageContentValidator (make validation configurable?)
+- make ebms to optional if other binding info is available
 - optimize EbMSMessageutils and CPAUtils
+	- implement CPARegistry and CPA object
+		- make cpa endpoints configurable/replaceable
+- change events
+	- create only one event
+	- add expiration time and retry attempt nr to event
+- create message and event queues (and managers)
 
 - add try with resources statement on AutoClosable resources
 - replace DAO.getTimestampFunction() by java Date
@@ -8,9 +15,9 @@
 - improve detection of signing etc. in CPA
 - improve CPA validation concerning signing etc.
 
-2.2:
+2.3:
 - improve CPA validation
-	- validate check used CPA fields in CPAUtils and them
+	- check used CPA fields in CPAUtils and validate them
 	- validate on unsupported features
 
 - implement push interface with jms
