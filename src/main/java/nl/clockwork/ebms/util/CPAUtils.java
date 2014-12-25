@@ -119,14 +119,14 @@ public class CPAUtils
 	public static PartyInfo getPartyInfo(CollaborationProtocolAgreement cpa, List<org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.PartyId> partyIds)
 	{
 		for (PartyInfo partyInfo : cpa.getPartyInfo())
-			for (org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.PartyId partyId : partyIds)
-				for (PartyId cpaPartyId : partyInfo.getPartyId())
-					if (equals(partyId,cpaPartyId))
+			for (PartyId cpaPartyId : partyInfo.getPartyId())
+				for (org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.PartyId partyId : partyIds)
+					if (equals(cpaPartyId,partyId))
 						return partyInfo;
 		return null;
 	}
 	
-	private static boolean equals(org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.PartyId partyId, PartyId cpaPartyId)
+	private static boolean equals(PartyId cpaPartyId, org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.PartyId partyId)
 	{
 		return partyId.getType().equals(cpaPartyId.getType()) && partyId.getValue().equals(cpaPartyId.getValue());
 	}
