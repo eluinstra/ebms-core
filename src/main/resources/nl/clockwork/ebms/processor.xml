@@ -80,7 +80,7 @@
 		</property>
 	</bean>
 
-	<bean id="processEventsJob" class="nl.clockwork.ebms.job.ProcessEbMSEvents" init-method="init">
+	<bean id="processEventsJob" class="nl.clockwork.ebms.job.EbMSEventProcessor" init-method="init">
 		<property name="maxThreads" value="${job.maxTreads}"/>
 		<property name="processorsScaleFactor" value="${job.processorsScaleFactor}"/>
 		<property name="queueScaleFactor" value="${job.queueScaleFactor}"/>

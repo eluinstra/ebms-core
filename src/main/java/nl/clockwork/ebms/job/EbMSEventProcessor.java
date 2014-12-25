@@ -41,7 +41,7 @@ import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-public class ProcessEbMSEvents implements Job
+public class EbMSEventProcessor implements Job
 {
 	private class SendEventJob implements Runnable
 	{
