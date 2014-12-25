@@ -85,7 +85,8 @@ public class EbMSMessageServiceImpl implements EbMSMessageService
 					{
 						long id = ebMSDAO.insertMessage(new Date(),message,EbMSMessageStatus.SENT);
 						List<EbMSEvent> events = EbMSMessageUtils.getEbMSSendEvents(ebMSDAO.getCPA(message.getMessageHeader().getCPAId()),id,message.getMessageHeader());
-						events.add(new EbMSEvent(id,message.getMessageHeader().getMessageData().getTimeToLive().toGregorianCalendar().getTime(),EbMSEventType.EXPIRE));
+						if (message.getMessageHeader().getMessageData().getTimeToLive() != null)
+							events.add(new EbMSEvent(id,message.getMessageHeader().getMessageData().getTimeToLive().toGregorianCalendar().getTime(),EbMSEventType.EXPIRE));
 						ebMSDAO.insertEvents(events);
 					}
 				}
