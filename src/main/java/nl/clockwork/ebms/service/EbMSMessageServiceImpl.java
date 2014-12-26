@@ -177,7 +177,7 @@ public class EbMSMessageServiceImpl implements EbMSMessageService
 		{
 			EbMSMessageContext context = ebMSDAO.getMessageContext(messageId);
 			CollaborationProtocolAgreement cpa = ebMSDAO.getCPA(context.getCpaId());
-			EbMSMessage request = EbMSMessageUtils.createEbMSStatusRequest(cpa,CPAUtils.toParty(cpa,context.getFromRole(),context.getService(),context.getAction()),CPAUtils.toParty(cpa,context.getToRole(),context.getService(),context.getAction()),messageId);
+			EbMSMessage request = EbMSMessageUtils.createEbMSStatusRequest(cpa,CPAUtils.getFromParty(cpa,context.getFromRole(),context.getService(),context.getAction()),CPAUtils.getToParty(cpa,context.getToRole(),context.getService(),context.getAction()),messageId);
 			EbMSMessage response = deliveryManager.sendMessage(cpa,request);
 			if (response != null)
 			{
