@@ -54,22 +54,22 @@ public class DeliveryManager //DeliveryService
 	public void init()
 	{
 		//executorService = Executors.newFixedThreadPool(maxThreads);
-		if (maxThreads == null || maxThreads <= 0)
-		{
-			maxThreads = Runtime.getRuntime().availableProcessors() * processorsScaleFactor;
-			logger.info(this.getClass().getName() + " using " + maxThreads + " threads");
-		}
 		if (processorsScaleFactor == null || processorsScaleFactor <= 0)
 		{
 			processorsScaleFactor = 1;
 			logger.info(this.getClass().getName() + " using processors scale factor " + processorsScaleFactor);
+		}
+		if (maxThreads == null || maxThreads <= 0)
+		{
+			maxThreads = Runtime.getRuntime().availableProcessors() * processorsScaleFactor;
+			logger.info(this.getClass().getName() + " using " + maxThreads + " threads");
 		}
 		if (queueScaleFactor == null || queueScaleFactor <= 0)
 		{
 			queueScaleFactor = 1;
 			logger.info(this.getClass().getName() + " using queue scale factor " + queueScaleFactor);
 		}
-		executorService = new ThreadPoolExecutor(maxThreads - 1,maxThreads - 1,1,TimeUnit.MINUTES,new ArrayBlockingQueue<Runnable>(maxThreads * queueScaleFactor,true),new ThreadPoolExecutor.CallerRunsPolicy());
+		executorService = new ThreadPoolExecutor(maxThreads,maxThreads,1,TimeUnit.MINUTES,new ArrayBlockingQueue<Runnable>(maxThreads * queueScaleFactor,true),new ThreadPoolExecutor.CallerRunsPolicy());
 	}
 
 	public EbMSMessage sendMessage(final CollaborationProtocolAgreement cpa, final EbMSMessage message) throws EbMSProcessorException
