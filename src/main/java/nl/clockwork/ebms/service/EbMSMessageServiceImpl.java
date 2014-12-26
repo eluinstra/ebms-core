@@ -88,7 +88,7 @@ public class EbMSMessageServiceImpl implements EbMSMessageService
 			final CollaborationProtocolAgreement cpa = ebMSDAO.getCPA(messageContent.getContext().getCpaId());
 			//TODO ebMSMessageContentToEbMSDocument
 			final EbMSMessage message = EbMSMessageUtils.ebMSMessageContentToEbMSMessage(cpa,messageContent);
-			message.setDocument(EbMSMessageUtils.createSOAPMessage(message));
+			message.setMessage(EbMSMessageUtils.createSOAPMessage(message));
 			signatureGenerator.generate(cpa,message);
 			ebMSDAO.executeTransaction(
 				new DAOTransactionCallback()

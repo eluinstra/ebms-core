@@ -101,7 +101,7 @@ public class EbMSDAOImpl extends nl.clockwork.ebms.dao.mysql.EbMSDAOImpl
 			ps.setString(10,messageHeader.getTo().getRole());
 			ps.setString(11,EbMSMessageUtils.toString(messageHeader.getService()));
 			ps.setString(12,messageHeader.getAction());
-			ps.setString(13,DOMUtils.toString(message.getDocument(),"UTF-8"));
+			ps.setString(13,DOMUtils.toString(message.getMessage(),"UTF-8"));
 			ps.executeUpdate();
 			ResultSet rs = ps.getGeneratedKeys();
 			if (rs.next())

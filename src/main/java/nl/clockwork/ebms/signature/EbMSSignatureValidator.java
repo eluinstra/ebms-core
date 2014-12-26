@@ -71,10 +71,10 @@ public class EbMSSignatureValidator
 			if (CPAUtils.isSigned(partyInfo,message.getMessageHeader().getFrom().getRole(),message.getMessageHeader().getService(),message.getMessageHeader().getAction()))
 			{
 				KeyStore trustStore = SecurityUtils.loadKeyStore(trustStorePath,trustStorePassword);
-				NodeList signatureNodeList = message.getDocument().getElementsByTagNameNS(org.apache.xml.security.utils.Constants.SignatureSpecNS,org.apache.xml.security.utils.Constants._TAG_SIGNATURE);
+				NodeList signatureNodeList = message.getMessage().getElementsByTagNameNS(org.apache.xml.security.utils.Constants.SignatureSpecNS,org.apache.xml.security.utils.Constants._TAG_SIGNATURE);
 				if (signatureNodeList.getLength() > 0)
 				{
-					X509Certificate certificate = getCertificate(cpa,message.getDocument(),message.getMessageHeader());
+					X509Certificate certificate = getCertificate(cpa,message.getMessage(),message.getMessageHeader());
 					if (certificate != null)
 					{
 						validateCertificate(trustStore,certificate,message.getMessageHeader().getMessageData().getTimestamp() == null ? new Date() : message.getMessageHeader().getMessageData().getTimestamp().toGregorianCalendar().getTime());
@@ -105,10 +105,10 @@ public class EbMSSignatureValidator
 			if (requestMessage.getAckRequested().isSigned())
 			{
 				KeyStore trustStore = SecurityUtils.loadKeyStore(trustStorePath,trustStorePassword);
-				NodeList signatureNodeList = responseMessage.getDocument().getElementsByTagNameNS(org.apache.xml.security.utils.Constants.SignatureSpecNS,org.apache.xml.security.utils.Constants._TAG_SIGNATURE);
+				NodeList signatureNodeList = responseMessage.getMessage().getElementsByTagNameNS(org.apache.xml.security.utils.Constants.SignatureSpecNS,org.apache.xml.security.utils.Constants._TAG_SIGNATURE);
 				if (signatureNodeList.getLength() > 0)
 				{
-					X509Certificate certificate = getCertificate(cpa,responseMessage.getDocument(),responseMessage.getMessageHeader());
+					X509Certificate certificate = getCertificate(cpa,responseMessage.getMessage(),responseMessage.getMessageHeader());
 					if (certificate != null)
 					{
 						validateCertificate(trustStore,certificate,responseMessage.getMessageHeader().getMessageData().getTimestamp() == null ? new Date() : responseMessage.getMessageHeader().getMessageData().getTimestamp().toGregorianCalendar().getTime());

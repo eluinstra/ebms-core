@@ -106,7 +106,7 @@ public class EbMSMessageProcessor
 		{
 			xsdValidator.validate(document.getMessage());
 			GregorianCalendar timestamp = new GregorianCalendar();
-			final EbMSMessage message = EbMSMessageUtils.getEbMSMessage(document.getMessage(),document.getAttachments());
+			final EbMSMessage message = EbMSMessageUtils.getEbMSMessage(document);
 			final CollaborationProtocolAgreement cpa = ebMSDAO.getCPA(message.getMessageHeader().getCPAId());
 			if (cpa == null)
 			{
@@ -164,7 +164,7 @@ public class EbMSMessageProcessor
 	{
 		try
 		{
-			final EbMSMessage requestMessage = EbMSMessageUtils.getEbMSMessage(request.getMessage(),request.getAttachments());
+			final EbMSMessage requestMessage = EbMSMessageUtils.getEbMSMessage(request);
 			if (requestMessage.getAckRequested() != null && requestMessage.getSyncReply() != null && response == null)
 				throw new EbMSProcessingException("No response received for message " + requestMessage.getMessageHeader().getMessageData().getMessageId());
 			
@@ -172,7 +172,7 @@ public class EbMSMessageProcessor
 			{
 				xsdValidator.validate(response.getMessage());
 				GregorianCalendar timestamp = new GregorianCalendar();
-				final EbMSMessage responseMessage = EbMSMessageUtils.getEbMSMessage(response.getMessage(),response.getAttachments());
+				final EbMSMessage responseMessage = EbMSMessageUtils.getEbMSMessage(response);
 				if (Constants.EBMS_SERVICE_URI.equals(responseMessage.getMessageHeader().getService().getValue()))
 				{
 					if (EbMSAction.MESSAGE_ERROR.action().equals(responseMessage.getMessageHeader().getAction()))
@@ -269,7 +269,7 @@ public class EbMSMessageProcessor
 				else
 				{
 					final EbMSMessage acknowledgment = EbMSMessageUtils.createEbMSAcknowledgment(cpa,message,timestamp);
-					acknowledgment.setDocument(EbMSMessageUtils.createSOAPMessage(acknowledgment));
+					acknowledgment.setMessage(EbMSMessageUtils.createSOAPMessage(acknowledgment));
 					signatureGenerator.generate(cpa,message.getAckRequested(),acknowledgment);
 					ebMSDAO.executeTransaction(
 						new DAOTransactionCallback()
@@ -285,7 +285,7 @@ public class EbMSMessageProcessor
 							}
 						}
 					);
-					return message.getSyncReply() == null ? null : new EbMSDocument(acknowledgment.getDocument());
+					return message.getSyncReply() == null ? null : new EbMSDocument(acknowledgment.getMessage());
 				}
 			}
 			catch (EbMSValidationException e)
@@ -295,7 +295,7 @@ public class EbMSMessageProcessor
 				errorList.getError().add(e.getError());
 				final EbMSMessage messageError = EbMSMessageUtils.createEbMSMessageError(cpa,message,errorList,timestamp);
 				Document document = EbMSMessageUtils.createSOAPMessage(messageError);
-				messageError.setDocument(document);
+				messageError.setMessage(document);
 				ebMSDAO.executeTransaction(
 					new DAOTransactionCallback()
 					{
@@ -309,7 +309,7 @@ public class EbMSMessageProcessor
 						}
 					}
 				);
-				return message.getSyncReply() == null ? null : new EbMSDocument(messageError.getDocument());
+				return message.getSyncReply() == null ? null : new EbMSDocument(messageError.getMessage());
 			}
 		}
 	}

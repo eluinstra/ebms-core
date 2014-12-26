@@ -73,7 +73,7 @@ public class EbMSMessageProcessorX extends EbMSMessageProcessor
 		{
 			xsdValidator.validate(document.getMessage());
 			GregorianCalendar timestamp = new GregorianCalendar();
-			final EbMSMessage message = EbMSMessageUtils.getEbMSMessage(document.getMessage(),document.getAttachments());
+			final EbMSMessage message = EbMSMessageUtils.getEbMSMessage(document);
 			final CollaborationProtocolAgreement cpa = ebMSDAO.getCPA(message.getMessageHeader().getCPAId());
 			if (cpa == null)
 			{
@@ -183,7 +183,7 @@ public class EbMSMessageProcessorX extends EbMSMessageProcessor
 			{
 				xsdValidator.validate(response.getMessage());
 				GregorianCalendar timestamp = new GregorianCalendar();
-				final EbMSMessage responseMessage = EbMSMessageUtils.getEbMSMessage(response.getMessage(),response.getAttachments());
+				final EbMSMessage responseMessage = EbMSMessageUtils.getEbMSMessage(response);
 				if (Constants.EBMS_SERVICE_URI.equals(responseMessage.getMessageHeader().getService().getValue()))
 				{
 					if (EbMSAction.MESSAGE_ERROR.action().equals(responseMessage.getMessageHeader().getAction()))

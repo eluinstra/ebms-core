@@ -30,9 +30,9 @@ import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.SyncReply;
 import org.w3._2000._09.xmldsig.SignatureType;
 import org.w3c.dom.Document;
 
-public class EbMSMessage
+public class EbMSMessage extends EbMSDocument
 {
-	private Document document;
+	private Document message;
 	private SignatureType signature;
 	private MessageHeader messageHeader;
 	private SyncReply syncReply;
@@ -45,14 +45,15 @@ public class EbMSMessage
 	private StatusResponse statusResponse;
 	private List<EbMSAttachment> attachments = new ArrayList<EbMSAttachment>();
 
-	public Document getDocument()
+	@Override
+	public Document getMessage()
 	{
-		return document;
+		return message;
 	}
 	
-	public void setDocument(Document document)
+	public void setMessage(Document document)
 	{
-		this.document = document;
+		this.message = document;
 	}
 
 	public SignatureType getSignature()
@@ -155,6 +156,7 @@ public class EbMSMessage
 		this.statusResponse = statusResponse;
 	}
 
+	@Override
 	public List<EbMSAttachment> getAttachments()
 	{
 		return attachments;

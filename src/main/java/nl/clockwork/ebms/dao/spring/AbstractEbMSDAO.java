@@ -581,7 +581,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 											ps.setString(9,messageHeader.getTo().getRole());
 											ps.setString(10,EbMSMessageUtils.toString(messageHeader.getService()));
 											ps.setString(11,messageHeader.getAction());
-											ps.setString(12,DOMUtils.toString(message.getDocument(),"UTF-8"));
+											ps.setString(12,DOMUtils.toString(message.getMessage(),"UTF-8"));
 											if (status == null)
 												ps.setNull(13,java.sql.Types.INTEGER);
 											else
@@ -670,7 +670,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 											ps.setString(10,messageHeader.getTo().getRole());
 											ps.setString(11,EbMSMessageUtils.toString(messageHeader.getService()));
 											ps.setString(12,messageHeader.getAction());
-											ps.setString(13,DOMUtils.toString(message.getDocument(),"UTF-8"));
+											ps.setString(13,DOMUtils.toString(message.getMessage(),"UTF-8"));
 											return ps;
 										}
 										catch (TransformerException e)

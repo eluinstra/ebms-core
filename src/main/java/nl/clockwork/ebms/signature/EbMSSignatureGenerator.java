@@ -110,7 +110,7 @@ public class EbMSSignatureGenerator
 		if (alias == null)
 			throw new EbMSProcessorException("No certificate found with subject \"" + certificate.getSubjectDN().getName() + "\" in keystore \"" + keyStorePath + "\"");
 		KeyPair keyPair = SecurityUtils.getKeyPair(keyStore,alias,keyStorePassword);
-		sign(keyStore,keyPair,alias,message.getDocument(),message.getAttachments(),CPAUtils.getSignatureAlgorithm(deliveryChannel),CPAUtils.getHashFunction(deliveryChannel));
+		sign(keyStore,keyPair,alias,message.getMessage(),message.getAttachments(),CPAUtils.getSignatureAlgorithm(deliveryChannel),CPAUtils.getHashFunction(deliveryChannel));
 	}
 	
 	private void sign(KeyStore keyStore, KeyPair keyPair, String alias, Document document, List<EbMSAttachment> attachments, String signatureMethodAlgorithm, String digestAlgorithm) throws XMLSecurityException, KeyStoreException

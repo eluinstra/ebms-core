@@ -97,11 +97,16 @@ public class EbMSMessageUtils
 {
 	public static EbMSMessage getEbMSMessage(Document document) throws JAXBException, XPathExpressionException, ParserConfigurationException, SAXException, IOException
 	{
-		return getEbMSMessage(document,null);
+		return getEbMSMessage(document,new ArrayList<EbMSAttachment>());
+	}
+
+	public static EbMSMessage getEbMSMessage(EbMSDocument document) throws JAXBException, XPathExpressionException, ParserConfigurationException, SAXException, IOException
+	{
+		return getEbMSMessage(document.getMessage(),document.getAttachments());
 	}
 
 	@SuppressWarnings("unchecked")
-	public static EbMSMessage getEbMSMessage(Document document, List<EbMSAttachment> attachments) throws JAXBException, XPathExpressionException, ParserConfigurationException, SAXException, IOException
+	private static EbMSMessage getEbMSMessage(Document document, List<EbMSAttachment> attachments) throws JAXBException, XPathExpressionException, ParserConfigurationException, SAXException, IOException
 	{
 		XMLMessageBuilder<Envelope> messageBuilder = XMLMessageBuilder.getInstance(Envelope.class,Envelope.class,MessageHeader.class,SyncReply.class,MessageOrder.class,AckRequested.class,SignatureType.class,ErrorList.class,Acknowledgment.class,Manifest.class,StatusRequest.class,StatusResponse.class);
 		Envelope envelope = messageBuilder.handle(document);
@@ -140,7 +145,7 @@ public class EbMSMessageUtils
 				statusResponse = (StatusResponse)element;
 
 		EbMSMessage result = new EbMSMessage();
-		result.setDocument(document);
+		result.setMessage(document);
 		result.setSignature(signature);
 		result.setMessageHeader(messageHeader);
 		result.setSyncReply(syncReply);
