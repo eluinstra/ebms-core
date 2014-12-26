@@ -22,7 +22,7 @@ import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CanReceive;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DeliveryChannel;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.ServiceType;
 
-public class ToPartyInfo extends MyPartyInfo
+public class ToPartyInfo extends EbMSPartyInfo
 {
 	private static final long serialVersionUID = 1L;
 	private String role;

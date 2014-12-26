@@ -51,7 +51,7 @@ import nl.clockwork.ebms.model.EbMSMessage;
 import nl.clockwork.ebms.model.EbMSMessageContent;
 import nl.clockwork.ebms.model.EbMSMessageContext;
 import nl.clockwork.ebms.model.FromPartyInfo;
-import nl.clockwork.ebms.model.MyPartyInfo;
+import nl.clockwork.ebms.model.EbMSPartyInfo;
 import nl.clockwork.ebms.model.Party;
 import nl.clockwork.ebms.model.ToPartyInfo;
 import nl.clockwork.ebms.xml.EbMSNamespaceMapper;
@@ -178,8 +178,8 @@ public class EbMSMessageUtils
 	public static MessageHeader createMessageHeader(CollaborationProtocolAgreement cpa, Party fromParty, Party toParty, String action) throws DatatypeConfigurationException
 	{
 		String uuid = UUID.randomUUID().toString();
-		MyPartyInfo fromPartyInfo = CPAUtils.getMyPartyInfo(cpa,fromParty);
-		MyPartyInfo toPartyInfo = CPAUtils.getMyPartyInfo(cpa,toParty);
+		EbMSPartyInfo fromPartyInfo = CPAUtils.getMyPartyInfo(cpa,fromParty);
+		EbMSPartyInfo toPartyInfo = CPAUtils.getMyPartyInfo(cpa,toParty);
 		DeliveryChannel deliveryChannel = (DeliveryChannel)fromPartyInfo.getDefaultMshChannelId();
 		String hostname = CPAUtils.getHostname(deliveryChannel);
 

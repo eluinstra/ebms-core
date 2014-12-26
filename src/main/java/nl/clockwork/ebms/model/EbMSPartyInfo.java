@@ -20,14 +20,14 @@ import java.io.Serializable;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DeliveryChannel;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.PartyId;
 
-public class MyPartyInfo implements Serializable
+public class EbMSPartyInfo implements Serializable
 {
 	private static final long serialVersionUID = 1L;
 	DeliveryChannel defaultMshChannelId;
 	private PartyId partyId;
 	private String role;
 	
-	public MyPartyInfo()
+	public EbMSPartyInfo()
 	{
 	}
 

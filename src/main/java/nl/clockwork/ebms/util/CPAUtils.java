@@ -29,7 +29,7 @@ import javax.xml.bind.JAXBElement;
 import nl.clockwork.ebms.Constants;
 import nl.clockwork.ebms.model.EbMSMessage;
 import nl.clockwork.ebms.model.FromPartyInfo;
-import nl.clockwork.ebms.model.MyPartyInfo;
+import nl.clockwork.ebms.model.EbMSPartyInfo;
 import nl.clockwork.ebms.model.Party;
 import nl.clockwork.ebms.model.Role;
 import nl.clockwork.ebms.model.ToPartyInfo;
@@ -113,14 +113,14 @@ public class CPAUtils
 		return getUri(deliveryChannel);
 	}
 
-	public static MyPartyInfo getMyPartyInfo(CollaborationProtocolAgreement cpa, List<org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.PartyId> partyIds)
+	public static EbMSPartyInfo getMyPartyInfo(CollaborationProtocolAgreement cpa, List<org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.PartyId> partyIds)
 	{
 		for (PartyInfo partyInfo : cpa.getPartyInfo())
 			for (PartyId cpaPartyId : partyInfo.getPartyId())
 				for (org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.PartyId partyId : partyIds)
 					if (equals(cpaPartyId,partyId))
 					{
-						MyPartyInfo result = new MyPartyInfo();
+						EbMSPartyInfo result = new EbMSPartyInfo();
 						result.setDefaultMshChannelId((DeliveryChannel)partyInfo.getDefaultMshChannelId());
 						result.setPartyId(getPartyId(partyInfo.getPartyId(),toString(partyIds.get(0))));
 						return result;
@@ -128,14 +128,14 @@ public class CPAUtils
 		return null;
 	}
 	
-	public static MyPartyInfo getMyPartyInfo(CollaborationProtocolAgreement cpa, Party party)
+	public static EbMSPartyInfo getMyPartyInfo(CollaborationProtocolAgreement cpa, Party party)
 	{
 		for (PartyInfo partyInfo : cpa.getPartyInfo())
 			if (party.matches(partyInfo.getPartyId()))
 				for (CollaborationRole role : partyInfo.getCollaborationRole())
 					if (party.matches(role.getRole()))
 					{
-						MyPartyInfo result = new MyPartyInfo();
+						EbMSPartyInfo result = new EbMSPartyInfo();
 						result.setDefaultMshChannelId((DeliveryChannel)partyInfo.getDefaultMshChannelId());
 						result.setPartyId(getPartyId(partyInfo.getPartyId(),party.getPartyId()));
 						result.setRole(party.getRole());
