@@ -61,14 +61,19 @@ public class EbMSResponseHandler
 			else if (connection.getResponseCode() >= 400)
 			{
 				input = connection.getErrorStream();
-				String response = IOUtils.toString(input);
-				if (connection.getResponseCode() == 500)
+				if (input != null)
 				{
-					Fault soapFault = EbMSMessageUtils.getSOAPFault(response);
-					if (soapFault != null)
-						throw new EbMSResponseSOAPException(connection.getResponseCode(),soapFault.getFaultcode(),response);
+					String response = IOUtils.toString(input);
+					if (connection.getResponseCode() == 500)
+					{
+						Fault soapFault = EbMSMessageUtils.getSOAPFault(response);
+						if (soapFault != null)
+							throw new EbMSResponseSOAPException(connection.getResponseCode(),soapFault.getFaultcode(),response);
+					}
+					throw new EbMSResponseException(connection.getResponseCode(),response);
 				}
-				throw new EbMSResponseException(connection.getResponseCode(),response);
+				else
+					throw new EbMSResponseException(connection.getResponseCode());
 			}
 			else
 				throw new EbMSResponseException(connection.getResponseCode());
