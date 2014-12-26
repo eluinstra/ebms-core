@@ -70,6 +70,11 @@ public class CPAUtils
 		return (partyId.getType() == null ? "" : partyId.getType() + ":") + partyId.getValue();
 	}
 
+	private static String toString(org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.PartyId partyId)
+	{
+		return (partyId.getType() == null ? "" : partyId.getType() + ":") + partyId.getValue();
+	}
+
 	public static String toString(ServiceType service)
 	{
 		return toString(service.getType(),service.getValue());
@@ -108,7 +113,22 @@ public class CPAUtils
 		return getUri(deliveryChannel);
 	}
 
-	public static MyPartyInfo getPartyInfo(CollaborationProtocolAgreement cpa, Party party)
+	public static MyPartyInfo getMyPartyInfo(CollaborationProtocolAgreement cpa, List<org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.PartyId> partyIds)
+	{
+		for (PartyInfo partyInfo : cpa.getPartyInfo())
+			for (PartyId cpaPartyId : partyInfo.getPartyId())
+				for (org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.PartyId partyId : partyIds)
+					if (equals(cpaPartyId,partyId))
+					{
+						MyPartyInfo result = new MyPartyInfo();
+						result.setDefaultMshChannelId((DeliveryChannel)partyInfo.getDefaultMshChannelId());
+						result.setPartyId(getPartyId(partyInfo.getPartyId(),toString(partyIds.get(0))));
+						return result;
+					}
+		return null;
+	}
+	
+	public static MyPartyInfo getMyPartyInfo(CollaborationProtocolAgreement cpa, Party party)
 	{
 		for (PartyInfo partyInfo : cpa.getPartyInfo())
 			if (party.matches(partyInfo.getPartyId()))
@@ -160,6 +180,17 @@ public class CPAUtils
 		return serviceType.getType().equals(service.getType()) && serviceType.getValue().equals(service.getValue());
 	}
 
+	public static FromPartyInfo getFromPartyInfo(CollaborationProtocolAgreement cpa, List<org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.PartyId> partyIds, String fromRole, String service, String action)
+	{
+		PartyInfo partyInfo = getPartyInfo(cpa,partyIds);
+		for (CollaborationRole role : partyInfo.getCollaborationRole())
+			if (fromRole.equals(role.getRole().getName()) && service.equals(toString(role.getServiceBinding().getService())))
+				for (CanSend canSend : role.getServiceBinding().getCanSend())
+					if (action.equals(canSend.getThisPartyActionBinding().getAction()))
+						return getFromPartyInfo(partyInfo,role,canSend);
+		return null;
+	}
+	
 	public static FromPartyInfo getFromPartyInfo(CollaborationProtocolAgreement cpa, Role fromRole, String service, String action)
 	{
 		for (PartyInfo partyInfo : cpa.getPartyInfo())
@@ -169,6 +200,17 @@ public class CPAUtils
 						for (CanSend canSend : role.getServiceBinding().getCanSend())
 							if (action.equals(canSend.getThisPartyActionBinding().getAction()))
 								return getFromPartyInfo(partyInfo,role,canSend);
+		return null;
+	}
+	
+	public static ToPartyInfo getToPartyInfo(CollaborationProtocolAgreement cpa, List<org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.PartyId> partyIds, String toRole, String service, String action)
+	{
+		PartyInfo partyInfo = getPartyInfo(cpa,partyIds);
+		for (CollaborationRole role : partyInfo.getCollaborationRole())
+			if (toRole.equals(role.getRole().getName()) && service.equals(toString(role.getServiceBinding().getService())))
+				for (CanReceive canReceive : role.getServiceBinding().getCanReceive())
+					if (action.equals(canReceive.getThisPartyActionBinding().getAction()))
+						return getToPartyInfo(partyInfo,role,canReceive);
 		return null;
 	}
 	
@@ -183,7 +225,7 @@ public class CPAUtils
 								return getToPartyInfo(partyInfo,role,canReceive);
 		return null;
 	}
-	
+
 	public static CanSend getCanSend(PartyInfo partyInfo, String role, Service service, String action)
 	{
 		ServiceBinding serviceBinding = getServiceBinding(partyInfo, role, service);
