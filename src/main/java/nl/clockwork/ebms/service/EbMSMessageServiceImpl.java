@@ -26,6 +26,7 @@ import javax.xml.soap.SOAPException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactoryConfigurationError;
 
+import nl.clockwork.ebms.Constants;
 import nl.clockwork.ebms.Constants.EbMSAction;
 import nl.clockwork.ebms.Constants.EbMSEventType;
 import nl.clockwork.ebms.Constants.EbMSMessageStatus;
@@ -176,18 +177,25 @@ public class EbMSMessageServiceImpl implements EbMSMessageService
 		try
 		{
 			EbMSMessageContext context = ebMSDAO.getMessageContext(messageId);
-			CollaborationProtocolAgreement cpa = ebMSDAO.getCPA(context.getCpaId());
-			EbMSMessage request = EbMSMessageUtils.createEbMSStatusRequest(cpa,CPAUtils.getFromParty(cpa,context.getFromRole(),context.getService(),context.getAction()),CPAUtils.getToParty(cpa,context.getToRole(),context.getService(),context.getAction()),messageId);
-			EbMSMessage response = deliveryManager.sendMessage(cpa,request);
-			if (response != null)
-			{
-				if (EbMSAction.STATUS_RESPONSE.action().equals(response.getMessageHeader().getAction()) && response.getStatusResponse() != null)
-					return new MessageStatus(response.getStatusResponse().getTimestamp() == null ? null : response.getStatusResponse().getTimestamp().toGregorianCalendar().getTime(),EbMSMessageStatus.get(response.getStatusResponse().getMessageStatus()));
-				else
-					throw new EbMSMessageServiceException("No valid response received!");
-			}
+			if (context == null)
+				throw new EbMSMessageServiceException("No message found with messageId " + messageId + "!");
+			else if (Constants.EBMS_SERVICE_URI.equals(context.getService()))
+				throw new EbMSMessageServiceException("Message with messageId " + messageId + " is an EbMS service message!");
 			else
-				throw new EbMSMessageServiceException("No response received!");
+			{
+				CollaborationProtocolAgreement cpa = ebMSDAO.getCPA(context.getCpaId());
+				EbMSMessage request = EbMSMessageUtils.createEbMSStatusRequest(cpa,CPAUtils.getFromParty(cpa,context.getFromRole(),context.getService(),context.getAction()),CPAUtils.getToParty(cpa,context.getToRole(),context.getService(),context.getAction()),messageId);
+				EbMSMessage response = deliveryManager.sendMessage(cpa,request);
+				if (response != null)
+				{
+					if (EbMSAction.STATUS_RESPONSE.action().equals(response.getMessageHeader().getAction()) && response.getStatusResponse() != null)
+						return new MessageStatus(response.getStatusResponse().getTimestamp() == null ? null : response.getStatusResponse().getTimestamp().toGregorianCalendar().getTime(),EbMSMessageStatus.get(response.getStatusResponse().getMessageStatus()));
+					else
+						throw new EbMSMessageServiceException("No valid response received!");
+				}
+				else
+					throw new EbMSMessageServiceException("No response received!");
+			}
 		}
 		catch (DAOException | DatatypeConfigurationException | JAXBException | EbMSProcessorException e)
 		{
