@@ -150,7 +150,7 @@ public class EbMSSignatureValidator
 				PartyInfo partyInfo = CPAUtils.getPartyInfo(cpa,messageHeader.getFrom().getPartyId());
 				if (partyInfo != null)
 				{
-					DeliveryChannel deliveryChannel = CPAUtils.getSendingDeliveryChannel(partyInfo,messageHeader.getFrom().getRole(),messageHeader.getService(),messageHeader.getAction());
+					DeliveryChannel deliveryChannel = CPAUtils.getFromDeliveryChannel(partyInfo,messageHeader.getFrom().getRole(),messageHeader.getService(),messageHeader.getAction());
 					if (deliveryChannel != null)
 						return CPAUtils.getX509Certificate(CPAUtils.getSigningCertificate(deliveryChannel));
 				}
