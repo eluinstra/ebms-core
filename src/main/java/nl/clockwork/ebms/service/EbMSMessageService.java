@@ -22,6 +22,7 @@ import javax.jws.WebParam;
 import javax.jws.WebResult;
 import javax.jws.WebService;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.ws.ResponseWrapper;
 
 import nl.clockwork.ebms.model.EbMSMessageContent;
 import nl.clockwork.ebms.model.EbMSMessageContext;
@@ -40,6 +41,7 @@ public interface EbMSMessageService
 
 	@WebResult(name="MessageIds")
 	@WebMethod(operationName="GetMessageIds")
+	@ResponseWrapper(className="nl.clockwork.ebms.service.GetMessageIdsResponse")
 	List<String> getMessageIds(@WebParam(name="MessageContext") @XmlElement(required=true) EbMSMessageContext messageContext, @WebParam(name="MaxNr") Integer maxNr) throws EbMSMessageServiceException;
 
 	@WebResult(name="Message")
