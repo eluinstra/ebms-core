@@ -71,7 +71,7 @@ public class CPAServiceImpl implements CPAService
 			{
 				if (ebMSDAO.existsCPA(cpa_.getCpaid()))
 				{
-					if (overwrite)
+					if (overwrite != null && overwrite)
 					{
 						if (ebMSDAO.updateCPA(cpa_) == 0)
 							throw new CPAServiceException("Could not update CPA " + cpa_.getCpaid() + "! CPA does not exists.");

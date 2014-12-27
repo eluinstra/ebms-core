@@ -21,19 +21,20 @@ import javax.jws.WebMethod;
 import javax.jws.WebParam;
 import javax.jws.WebResult;
 import javax.jws.WebService;
+import javax.xml.bind.annotation.XmlElement;
 
 @WebService(targetNamespace="http://www.ordina.nl/cpa/2.1")
 public interface CPAService
 {
 	@WebMethod(operationName="ValidateCPA")
-	void validateCPA(@WebParam(name="CPA") /*CollaborationProtocolAgreement*/String cpa) throws CPAServiceException;
+	void validateCPA(@WebParam(name="CPA") @XmlElement(required=true) /*CollaborationProtocolAgreement*/String cpa) throws CPAServiceException;
 
 	@WebResult(name="CPAId")
 	@WebMethod(operationName="InsertCPA")
-	String insertCPA(@WebParam(name="CPA") /*CollaborationProtocolAgreement*/String cpa, @WebParam(name="Overwrite") Boolean overwrite) throws CPAServiceException;
+	String insertCPA(@WebParam(name="CPA") @XmlElement(required=true) /*CollaborationProtocolAgreement*/String cpa, @WebParam(name="Overwrite") Boolean overwrite) throws CPAServiceException;
 
 	@WebMethod(operationName="DeleteCPA")
-	void deleteCPA(@WebParam(name="CPAId") String cpaId) throws CPAServiceException;
+	void deleteCPA(@WebParam(name="CPAId") @XmlElement(required=true) String cpaId) throws CPAServiceException;
 
 	@WebResult(name="CPAIds")
 	@WebMethod(operationName="GetCPAIds")
@@ -42,6 +43,6 @@ public interface CPAService
 
 	@WebResult(name="CPA")
 	@WebMethod(operationName="GetCPA")
-	/*CollaborationProtocolAgreement*/String getCPA(@WebParam(name="CPAId") String cpaId) throws CPAServiceException;
+	/*CollaborationProtocolAgreement*/String getCPA(@WebParam(name="CPAId") @XmlElement(required=true) String cpaId) throws CPAServiceException;
 
 }
