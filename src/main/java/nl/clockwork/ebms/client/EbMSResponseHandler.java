@@ -63,7 +63,10 @@ public class EbMSResponseHandler
 			else if (connection.getResponseCode() >= 400)
 			{
 				input = connection.getErrorStream();
-				throw new EbMSResponseException(connection.getResponseCode(),IOUtils.toString(input));
+				if (input != null)
+					throw new EbMSResponseException(connection.getResponseCode(),IOUtils.toString(input));
+				else
+					throw new EbMSResponseException(connection.getResponseCode());
 			}
 			else
 				throw new EbMSResponseException(connection.getResponseCode());
