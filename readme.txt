@@ -99,10 +99,10 @@ And you have to configure the right driver and connection string:
 - ebms.jdbc.driverClassName=org.postgresql.Driver
 	ebms.jdbc.url=jdbc:postgresql://<host>:<port>/<dbname>
 
-- ezpoort.jdbc.driverClassName=com.microsoft.sqlserver.jdbc.SQLServerDriver
+- ebms.jdbc.driverClassName=com.microsoft.sqlserver.jdbc.SQLServerDriver
 	or
-	ezpoort.jdbc.driverClassName=net.sourceforge.jtds.jdbc.Driver
-	ezpoort.jdbc.url=jdbc:sqlserver://<host>:<port>;databaseName=<dbname>;
+	ebms.jdbc.driverClassName=net.sourceforge.jtds.jdbc.Driver
+	ebms.jdbc.url=jdbc:sqlserver://<host>:<port>;databaseName=<dbname>;
 
 - ebms.jdbc.driverClassName=oracle.jdbc.OracleDriver
 	ebms.jdbc.url=jdbc:oracle:thin:@<host>:<port>:<dbname>
