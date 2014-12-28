@@ -4,10 +4,10 @@ Introduction =
 This library contains the core functionality of the EbMS adapter including:
 - a servlet to use the adapter in a servlet container
 - database support for the following databases:
-	- hsqldb 2.2.9
+	- hsqldb (2.2.9)
 	- mysql (5.5) (innodb)
 	- postgresql (9)
-	- mssql 2008 R2
+	- mssql (2008 R2)
 	- oracle (11)(lob > 4k fix (needed for older oracle jdbc adapters) not implemented!)
 - CPA and EbMSMessage SOAP Services to control the EbMS adapter
 
@@ -35,8 +35,7 @@ Not supported:
 -	Manifest inspection
 
 Remarks:
--	duplicate messages will always be eliminated
--	partyName is required in the CPA and must be unique
+-	Duplicate messages will always be eliminated
 -	Extendable to support other communication protocols
 
 ===============
