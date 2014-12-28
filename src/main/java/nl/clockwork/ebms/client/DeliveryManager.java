@@ -79,27 +79,27 @@ public class DeliveryManager //DeliveryService
 			final String uri = CPAUtils.getUri(cpa,message);
 			if (message.getSyncReply() == null)
 			{
-				Runnable command = new Runnable()
+				try
 				{
-					@Override
-					public void run()
+					messageQueue.register(message.getMessageHeader().getMessageData().getMessageId());
+					EbMSDocument document = ebMSClient.sendMessage(uri,EbMSMessageUtils.getEbMSDocument(message));
+					if (document == null)
 					{
-						try
-						{
-							ebMSClient.sendMessage(uri,EbMSMessageUtils.getEbMSDocument(message));
-						}
-						catch (Exception e)
-						{
-							messageQueue.put(message.getMessageHeader().getMessageData().getMessageId(),null);
-							logger.error("",e);
-						}
+						EbMSMessage response = messageQueue.get(message.getMessageHeader().getMessageData().getMessageId());
+						if (response != null)
+							return response;
 					}
-				};
-				messageQueue.register(message.getMessageHeader().getMessageData().getMessageId());
-				executorService.execute(command);
-				EbMSMessage response = messageQueue.get(message.getMessageHeader().getMessageData().getMessageId());
-				if (response != null)
-					return response;
+					else
+					{
+						messageQueue.remove(message.getMessageHeader().getMessageData().getMessageId());
+						return EbMSMessageUtils.getEbMSMessage(document.getMessage(),null);
+					}
+				}
+				catch (Exception e)
+				{
+					messageQueue.remove(message.getMessageHeader().getMessageData().getMessageId());
+					throw e;
+				}
 			}
 			else
 			{

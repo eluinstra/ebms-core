@@ -95,6 +95,14 @@ public class MessageQueue<T>
 		}
 	}
 	
+	public void remove(String correlationId)
+	{
+		synchronized (queue)
+		{
+			queue.remove(correlationId);
+		}
+	}
+	
 	public void setMaxEntries(int maxEntries)
 	{
 		this.maxEntries = maxEntries;
