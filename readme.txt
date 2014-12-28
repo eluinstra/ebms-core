@@ -118,12 +118,14 @@ http://localhost:8089/adapter/ebms
 ===============
 Testing Stubs =
 ===============
+> mule -config nl/clockwork/mule/ebms/stub/ebf/main.overheid.xml
 Load CPA in overheid EbMS stub:
 	copy ebms-adapter-mule3-x.x.x.zip/resources/CPAs/cpaStubEBF.xml to <overheid EbMS stub dir.base>/cpa
 		the file will be moved to <overheid EbMS stub dir.base>/cpa/processed when it's processed
 		an import report will be written to <overheid EbMS stub dir.base>/cpa/reports
 Now the CPA is loaded the overheid EbMS stub is ready to send and receive messages.
 
+> mule -config nl/clockwork/mule/ebms/stub/ebf/main.digipoort.xml
 Load CPA in digipoort EbMS stub:
 	copy ebms-adapter-mule3-x.x.x.zip/resources/CPAs/cpaStubEBF.xml to <digipoort EbMS stub dir.base>/cpa
 		the file will be moved to <digipoort EbMS stub dir.base>/cpa/processed when it's processed
