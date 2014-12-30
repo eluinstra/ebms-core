@@ -1,5 +1,14 @@
+- manual
+- web adapter
+- message queue
+- simplify events
+- event queue
+- proxy
+- endpoint mapping
+- cpaManager
+- update libraries
+
 - improve ebMSMessageContentValidator (make validation configurable?)
-- make ebms to optional if other binding info is available
 - optimize EbMSMessageutils and CPAUtils
 	- implement CPARegistry and CPA object
 		- make cpa endpoints configurable/replaceable
