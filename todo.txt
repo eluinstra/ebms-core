@@ -5,7 +5,6 @@
 - event queue
 - endpoint mapping
 - cpaManager
-- update libraries
 
 - improve ebMSMessageContentValidator (make validation configurable?)
 - optimize EbMSMessageutils and CPAUtils
