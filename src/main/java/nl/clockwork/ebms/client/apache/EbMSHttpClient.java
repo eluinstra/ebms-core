@@ -36,6 +36,7 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
 
 public class EbMSHttpClient implements EbMSClient
@@ -81,13 +82,14 @@ public class EbMSHttpClient implements EbMSClient
 	
 	private CloseableHttpClient getHttpClient(String uri)
 	{
+		HttpClientBuilder custom = HttpClients.custom().setSSLSocketFactory(sslConnectionSocketFactory);
 		if (proxy != null && proxy.useProxy(uri) && proxy.useProxyAuthorization())
 		{
-      CredentialsProvider credsProvider = new BasicCredentialsProvider();
-      credsProvider.setCredentials(new AuthScope(proxy.getHost(),proxy.getPort()),new UsernamePasswordCredentials(proxy.getUsername(),proxy.getPassword()));
-      HttpClients.custom().setSSLSocketFactory(sslConnectionSocketFactory).setDefaultCredentialsProvider(credsProvider).build();
+			CredentialsProvider credsProvider = new BasicCredentialsProvider();
+			credsProvider.setCredentials(new AuthScope(proxy.getHost(),proxy.getPort()),new UsernamePasswordCredentials(proxy.getUsername(),proxy.getPassword()));
+			custom.setDefaultCredentialsProvider(credsProvider);
 		}
-		return HttpClients.custom().setSSLSocketFactory(sslConnectionSocketFactory).build();
+		return custom.build();
 	}
 
 	private HttpPost getHttpPost(String uri)
