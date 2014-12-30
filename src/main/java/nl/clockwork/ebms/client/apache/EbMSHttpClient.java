@@ -75,7 +75,7 @@ public class EbMSHttpClient implements EbMSClient
 			}
 			catch (IOException e)
 			{
-				//ignore
+				logger.debug("",e);
 			}
 		}
 	}
