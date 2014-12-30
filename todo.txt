@@ -3,7 +3,6 @@
 - message queue
 - simplify events
 - event queue
-- proxy
 - endpoint mapping
 - cpaManager
 - update libraries
