@@ -17,6 +17,8 @@ package nl.clockwork.ebms.client;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
+import java.net.InetSocketAddress;
+import java.net.Proxy;
 import java.net.URL;
 import java.net.URLConnection;
 
@@ -38,7 +40,7 @@ public class EbMSHttpClient implements EbMSClient
   protected transient Log logger = LogFactory.getLog(getClass());
 	private SSLFactoryManager sslFactoryManager;
 	private boolean chunkedStreamingMode;
-	//private boolean verifyHostnames;
+	private EbMSProxy proxy;
 
 	public EbMSDocument sendMessage(String uri, EbMSDocument document) throws EbMSProcessorException
 	{
@@ -84,7 +86,7 @@ public class EbMSHttpClient implements EbMSClient
 	private URLConnection openConnection(String uri) throws IOException
 	{
 		URL url = new URL(uri);
-		URLConnection connection = url.openConnection();
+		URLConnection connection = openConnection(url);
 		connection.setDoOutput(true);
 		//connection.setMethod("POST");
 		if (connection instanceof HttpsURLConnection)
@@ -100,6 +102,24 @@ public class EbMSHttpClient implements EbMSClient
 		return connection;
 	}
 
+	private URLConnection openConnection(URL url) throws IOException
+	{
+		if (this.proxy != null && this.proxy.useProxy(url.toString()))
+		{
+			Proxy proxy = new Proxy(Proxy.Type.HTTP,new InetSocketAddress(this.proxy.getHost(),this.proxy.getPort()));
+			if (this.proxy.useProxyAuthorization())
+			{
+				URLConnection connection = url.openConnection(proxy);
+				connection.setRequestProperty(this.proxy.getProxyAuthorizationKey(),this.proxy.getProxyAuthorizationValue());
+				return connection;
+			}
+			else
+				return url.openConnection(proxy);
+		}
+		else
+			return url.openConnection();
+	}
+
 	public void setSslFactoryManager(SSLFactoryManager sslFactoryManager)
 	{
 		this.sslFactoryManager = sslFactoryManager;
@@ -108,5 +128,10 @@ public class EbMSHttpClient implements EbMSClient
 	public void setChunkedStreamingMode(boolean chunkedStreamingMode)
 	{
 		this.chunkedStreamingMode = chunkedStreamingMode;
+	}
+	
+	public void setProxy(EbMSProxy proxy)
+	{
+		this.proxy = proxy;
 	}
 }

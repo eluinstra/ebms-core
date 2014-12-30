@@ -55,7 +55,7 @@
 		<jdk.version>1.7</jdk.version>
 		<spring.version>3.2.1.RELEASE</spring.version>
 		<mime4j.version>0.7.2</mime4j.version>
-		<httpclient.version>4.2.2</httpclient.version>
+		<httpclient.version>4.3.6</httpclient.version>
 	</properties>
 	<dependencies>
 		<!--dependency>

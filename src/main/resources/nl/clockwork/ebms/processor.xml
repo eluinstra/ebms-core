@@ -97,17 +97,27 @@
 		<property name="keyStorePassword" value="${signature.keystore.password}" />
 	</bean>  
 
+	<bean id="ebMSProxy" class="nl.clockwork.ebms.client.EbMSProxyFactory">
+		<property name="host" value="${http.proxy.host}"/>
+		<property name="port" value="${http.proxy.port}"/>
+		<property name="nonProxyHosts" value="${http.proxy.nonProxyHosts}"/>
+		<property name="username" value="${http.proxy.username}"/>
+		<property name="password" value="${http.proxy.password}"/>
+	</bean>
+
 	<bean id="ebMSClient" class="nl.clockwork.ebms.client.EbMSHttpClient">
 		<property name="sslFactoryManager" ref="sslFactoryManager"/>
 		<property name="chunkedStreamingMode" value="${http.chunkedStreamingMode}"/>
+		<property name="proxy" ref="ebMSProxy"/>
 	</bean>
 
 	<!--bean id="ebMSClient" class="nl.clockwork.ebms.client.apache.EbMSHttpClient">
-		<property name="sslSocketFactory" ref="sslSocketFactory"/>
+		<property name="sslConnectionSocketFactory" ref="sslConnectionSocketFactory"/>
 		<property name="chunkedStreamingMode" value="${http.chunkedStreamingMode}"/>
+		<property name="proxy" ref="ebMSProxy"/>
 	</bean>
 	
-	<bean id="sslSocketFactory" class="nl.clockwork.ebms.client.apache.SSLSocketFactoryFactory">
+	<bean id="sslConnectionSocketFactory" class="nl.clockwork.ebms.client.apache.SSLConnectionSocketFactoryFactory">
 		<property name="sslFactoryManager" ref="sslFactoryManager"/>
 		<property name="verifyHostnames" value="${https.verifyHostnames}"></property>
 	</bean-->

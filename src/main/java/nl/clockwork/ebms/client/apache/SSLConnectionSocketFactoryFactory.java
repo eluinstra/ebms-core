@@ -17,24 +17,24 @@ package nl.clockwork.ebms.client.apache;
 
 import nl.clockwork.ebms.client.SSLFactoryManager;
 
-import org.apache.http.conn.ssl.SSLSocketFactory;
+import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.springframework.beans.factory.FactoryBean;
 
-public class SSLSocketFactoryFactory implements FactoryBean<SSLSocketFactory>
+public class SSLConnectionSocketFactoryFactory implements FactoryBean<SSLConnectionSocketFactory>
 {
 	private SSLFactoryManager sslFactoryManager;
 	private boolean verifyHostnames;
 
 	@Override
-	public SSLSocketFactory getObject() throws Exception
+	public SSLConnectionSocketFactory getObject() throws Exception
 	{
-		return new SSLSocketFactory(sslFactoryManager.getSslSocketFactory(),verifyHostnames ? SSLSocketFactory.STRICT_HOSTNAME_VERIFIER : SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
+		return new SSLConnectionSocketFactory(sslFactoryManager.getSslSocketFactory(),verifyHostnames ? SSLConnectionSocketFactory.STRICT_HOSTNAME_VERIFIER : SSLConnectionSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
 	}
 
 	@Override
 	public Class<?> getObjectType()
 	{
-		return SSLSocketFactory.class;
+		return SSLConnectionSocketFactory.class;
 	}
 
 	@Override
