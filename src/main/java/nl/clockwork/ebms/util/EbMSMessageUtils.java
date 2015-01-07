@@ -178,8 +178,8 @@ public class EbMSMessageUtils
 	public static MessageHeader createMessageHeader(CollaborationProtocolAgreement cpa, Party fromParty, Party toParty, String action) throws DatatypeConfigurationException
 	{
 		String uuid = UUID.randomUUID().toString();
-		EbMSPartyInfo fromPartyInfo = CPAUtils.getMyPartyInfo(cpa,fromParty);
-		EbMSPartyInfo toPartyInfo = CPAUtils.getMyPartyInfo(cpa,toParty);
+		EbMSPartyInfo fromPartyInfo = CPAUtils.getEbMSPartyInfo(cpa,fromParty);
+		EbMSPartyInfo toPartyInfo = CPAUtils.getEbMSPartyInfo(cpa,toParty);
 		DeliveryChannel deliveryChannel = (DeliveryChannel)fromPartyInfo.getDefaultMshChannelId();
 		String hostname = CPAUtils.getHostname(deliveryChannel);
 
@@ -331,7 +331,7 @@ public class EbMSMessageUtils
 	
 	public static SyncReply createSyncReply(CollaborationProtocolAgreement cpa, Party fromParty)
 	{
-		return createSyncReply(CPAUtils.getMyPartyInfo(cpa,fromParty).getDefaultMshChannelId());
+		return createSyncReply(CPAUtils.getEbMSPartyInfo(cpa,fromParty).getDefaultMshChannelId());
 	}
 	
 	public static SyncReply createSyncReply(CollaborationProtocolAgreement cpa, EbMSMessageContext context)

@@ -113,7 +113,7 @@ public class CPAUtils
 		return getUri(deliveryChannel);
 	}
 
-	public static EbMSPartyInfo getMyPartyInfo(CollaborationProtocolAgreement cpa, List<org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.PartyId> partyIds)
+	public static EbMSPartyInfo getEbMSPartyInfo(CollaborationProtocolAgreement cpa, List<org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.PartyId> partyIds)
 	{
 		for (PartyInfo partyInfo : cpa.getPartyInfo())
 			if (containsAll(partyInfo.getPartyId(),partyIds))
@@ -126,7 +126,7 @@ public class CPAUtils
 		return null;
 	}
 	
-	public static EbMSPartyInfo getMyPartyInfo(CollaborationProtocolAgreement cpa, Party party)
+	public static EbMSPartyInfo getEbMSPartyInfo(CollaborationProtocolAgreement cpa, Party party)
 	{
 		for (PartyInfo partyInfo : cpa.getPartyInfo())
 			if (party.matches(partyInfo.getPartyId()))
