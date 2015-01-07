@@ -29,12 +29,6 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 	}
 
 	@Override
-	public String getTimestampFunction()
-	{
-		return "SYSDATE";
-	}
-
-	@Override
 	public String getMessageIdsQuery(String messageContextFilter, EbMSMessageStatus status, int maxNr)
 	{
 		return "select * from (" +

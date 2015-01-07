@@ -56,12 +56,6 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 	}
 
 	@Override
-	public String getTimestampFunction()
-	{
-		return "NOW()";
-	}
-
-	@Override
 	public String getMessageIdsQuery(String messageContextFilter, EbMSMessageStatus status, int maxNr)
 	{
 		return "select message_id" +
@@ -113,7 +107,7 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 													"content," +
 													"status," +
 													"status_time" +
-												") values (?,?,?,?,?,?,?,?,?,?,?,?,?," + (status == null ? "null" : getTimestampFunction()) + ")",
+												") values (?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
 												new int[]{1}
 											);
 											ps.setTimestamp(1,new Timestamp(timestamp.getTime()));
@@ -133,9 +127,15 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 											ps.setString(11,messageHeader.getAction());
 											ps.setString(12,DOMUtils.toString(message.getMessage(),"UTF-8"));
 											if (status == null)
+											{
 												ps.setNull(13,java.sql.Types.INTEGER);
+												ps.setNull(14,java.sql.Types.TIMESTAMP);
+											}
 											else
+											{
 												ps.setInt(13,status.id());
+												ps.setTimestamp(14,new Timestamp(timestamp.getTime()));
+											}
 											return ps;
 										}
 										catch (TransformerException e)

@@ -42,12 +42,6 @@ public class EbMSDAOImpl extends nl.clockwork.ebms.dao.mysql.EbMSDAOImpl
 	}
 
 	@Override
-	public String getTimestampFunction()
-	{
-		return "GETDATE()";
-	}
-
-	@Override
 	public String getMessageIdsQuery(String messageContextFilter, EbMSMessageStatus status, int maxNr)
 	{
 		return "select top " + maxNr + " message_id" +

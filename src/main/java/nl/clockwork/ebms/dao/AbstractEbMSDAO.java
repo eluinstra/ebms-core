@@ -66,8 +66,6 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 		this.connectionManager = connectionManager;
 	}
 
-	public abstract String getTimestampFunction();
-	
 	@Override
 	public void executeTransaction(DAOTransactionCallback callback) throws DAOException
 	{
@@ -805,7 +803,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 					"content," +
 					"status," +
 					"status_time" +
-				") values (?,?,?,?,?,?,?,?,?,?,?,?,?," + (status == null ? "null" : getTimestampFunction()) + ")",
+				") values (?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
 				new int[]{5,6}
 			);
 			ps.setTimestamp(1,new Timestamp(timestamp.getTime()));
@@ -825,9 +823,15 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 			ps.setString(11,messageHeader.getAction());
 			ps.setString(12,DOMUtils.toString(message.getMessage(),"UTF-8"));
 			if (status == null)
+			{
 				ps.setNull(13,java.sql.Types.INTEGER);
+				ps.setNull(14,java.sql.Types.TIMESTAMP);
+			}
 			else
+			{
 				ps.setInt(13,status.id());
+				ps.setTimestamp(14,new Timestamp(timestamp.getTime()));
+			}
 			ps.executeUpdate();
 			ResultSet rs = ps.getGeneratedKeys();
 			if (rs.next())
@@ -970,13 +974,18 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 			ps  = c.prepareStatement(
 				"update ebms_message" +
 				" set status = ?," +
-				" status_time = " + getTimestampFunction() +
+				" status_time = ?" +
 				" where message_id = ?" +
 				" and message_nr = 0" +
-				(oldStatus == null ? " and status is null" : " and status = " + oldStatus.id())
+				" and status = ?"
 			);
 			ps.setInt(1,newStatus.id());
-			ps.setString(2,messageId);
+			ps.setTimestamp(2,new Timestamp(new Date().getTime()));
+			ps.setString(3,messageId);
+			if (oldStatus == null)
+				ps.setNull(4,java.sql.Types.INTEGER);
+			else
+				ps.setInt(4,oldStatus.id());
 			ps.executeUpdate();
 		}
 		catch (SQLException e)
@@ -1000,15 +1009,22 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 			c = connectionManager.getConnection();
 			ps  = c.prepareStatement(
 				"update ebms_message" +
-				" set status = " + newStatus.id() + "," +
-				" status_time = " + getTimestampFunction() +
+				" set status = ?," +
+				" status_time = ?" +
 				" where message_id = ?" +
 				" and message_nr = 0" +
-				(oldStatus == null ? " and status is null" : " and status = " + oldStatus.id())
+				" and status = ?"
 			);
+			Timestamp timestamp = new Timestamp(new Date().getTime());
 			for (String messageId : messageIds)
 			{
-				ps.setString(1,messageId);
+				ps.setInt(1,newStatus.id());
+				ps.setTimestamp(2,timestamp);
+				ps.setString(3,messageId);
+				if (oldStatus == null)
+					ps.setNull(4,java.sql.Types.INTEGER);
+				else
+					ps.setInt(4,oldStatus.id());
 				ps.addBatch();
 			}
 			if (messageIds.size() > 0)
@@ -1080,13 +1096,20 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 			ps  = c.prepareStatement(
 				"insert into ebms_event (" +
 					"message_id," +
+					"time," +
 					"type," +
+					"status," +
+					"status_time," +
 					"uri" +
-				") values (?,?,?)"
+				") values (?,?,?,?,?,?)"
 			);
+			Timestamp timestamp = new Timestamp(new Date().getTime());
 			ps.setString(1,messageId);
-			ps.setInt(2,type.id());
-			ps.setString(3,uri);
+			ps.setTimestamp(2,timestamp);
+			ps.setInt(3,type.id());
+			ps.setInt(4,EbMSEventStatus.UNPROCESSED.id());
+			ps.setTimestamp(5,timestamp);
+			ps.setString(6,uri);
 			ps.executeUpdate();
 		}
 		catch (SQLException e)
@@ -1113,13 +1136,17 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 					"message_id," +
 					"time," +
 					"type," +
+					"status," +
+					"status_time," +
 					"uri" +
-				") values (?,?,?,?)"
+				") values (?,?,?,?,?,?)"
 			);
 			ps.setString(1,event.getMessageId());
 			ps.setTimestamp(2,new Timestamp(event.getTime().getTime()));
 			ps.setInt(3,event.getType().id());
-			ps.setString(4,event.getUri());
+			ps.setInt(4,EbMSEventStatus.UNPROCESSED.id());
+			ps.setTimestamp(5,new Timestamp(new Date().getTime()));
+			ps.setString(6,event.getUri());
 			ps.executeUpdate();
 		}
 		catch (SQLException e)
@@ -1146,15 +1173,19 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 					"message_id," +
 					"time," +
 					"type," +
+					"status," +
+					"status_time," +
 					"uri" +
-				") values (?,?,?,?)"
+				") values (?,?,?,?,?,?)"
 			);
 			for (EbMSEvent event : events)
 			{
 				ps.setString(1,event.getMessageId());
 				ps.setTimestamp(2,new Timestamp(event.getTime().getTime()));
 				ps.setInt(3,event.getType().id());
-				ps.setString(4,event.getUri());
+				ps.setInt(4,EbMSEventStatus.UNPROCESSED.id());
+				ps.setTimestamp(5,new Timestamp(new Date().getTime()));
+				ps.setString(6,event.getUri());
 				ps.addBatch();
 			}
 			if (events.size() > 0)
@@ -1183,16 +1214,17 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 				"update ebms_event set" +
 				" uri = ?," +
 				" status = ?," +
-				" status_time = " + getTimestampFunction() + "," +
+				" status_time = ?," +
 				" error_message = ?" +
 				" where message_id = ?" +
 				" and time = ?"
 			);
 			ps.setString(1,uri);
 			ps.setInt(2,status.id());
-			ps.setString(3,errorMessage);
-			ps.setString(4,messageId);
-			ps.setTimestamp(5,new Timestamp(timestamp.getTime()));
+			ps.setTimestamp(3,new Timestamp(new Date().getTime()));
+			ps.setString(4,errorMessage);
+			ps.setString(5,messageId);
+			ps.setTimestamp(6,new Timestamp(timestamp.getTime()));
 			ps.executeUpdate();
 		}
 		catch (SQLException e)
