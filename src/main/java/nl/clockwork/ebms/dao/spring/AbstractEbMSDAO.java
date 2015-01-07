@@ -225,6 +225,88 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	}
 
 	@Override
+	public String getUrl(String url)
+	{
+		try
+		{
+			return jdbcTemplate.queryForObject(
+				"select new_url" +
+				" from url" +
+				" where old_url = ?",
+				String.class,
+				url
+			);
+		}
+		catch(EmptyResultDataAccessException e)
+		{
+			return null;
+		}
+		catch (DataAccessException e)
+		{
+			throw new DAOException(e);
+		}
+	}
+
+	@Override
+	public void insertUrl(String oldUrl, String newUrl)
+	{
+		try
+		{
+			jdbcTemplate.update
+			(
+				"insert into url (" +
+					"old_url," +
+					"new_url" +
+				") values (?,?)",
+				oldUrl,
+				newUrl
+			);
+		}
+		catch (DataAccessException e)
+		{
+			throw new DAOException(e);
+		}
+	}
+
+	@Override
+	public int updateUrl(String oldUrl, String newUrl)
+	{
+		try
+		{
+			return jdbcTemplate.update
+			(
+				"update url set" +
+				" new_url = ?" +
+				" where old_url = ?",
+				newUrl,
+				oldUrl
+			);
+		}
+		catch (DataAccessException e)
+		{
+			throw new DAOException(e);
+		}
+	}
+
+	@Override
+	public int deleteUrl(String url)
+	{
+		try
+		{
+			return jdbcTemplate.update
+			(
+				"delete from url" +
+				" where old_url = ?",
+				url
+			);
+		}
+		catch (DataAccessException e)
+		{
+			throw new DAOException(e);
+		}
+	}
+
+	@Override
 	public boolean existsMessage(String messageId) throws DAOException
 	{
 		try
@@ -891,17 +973,19 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	}
 
 	@Override
-	public void updateEvent(Date timestamp, String messageId, EbMSEventStatus status, String errorMessage) throws DAOException
+	public void updateEvent(Date timestamp, String messageId, String uri, EbMSEventStatus status, String errorMessage) throws DAOException
 	{
 		try
 		{
 			jdbcTemplate.update(
 				"update ebms_event set" +
+				" uri = ?," +
 				" status = ?," +
 				" status_time = " + getTimestampFunction() + "," +
 				" error_message = ?" +
 				" where message_id = ?" +
 				" and time = ?",
+				uri,
 				status.id(),
 				errorMessage,
 				messageId,

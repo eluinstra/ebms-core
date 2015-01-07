@@ -4,4 +4,6 @@ DROP TABLE ebms_attachment;
 
 DROP TABLE ebms_message;
 
+DROP TABLE url;
+
 DROP TABLE cpa;

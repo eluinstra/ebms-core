@@ -4,6 +4,12 @@ CREATE TABLE cpa
 	cpa								CLOB						NOT NULL
 );
 
+CREATE TABLE url
+(
+	old_url 					VARCHAR(256)		NOT NULL UNIQUE,
+	new_url						VARCHAR(256)		NOT NULL
+);
+
 CREATE TABLE ebms_message
 (
 	time_stamp				TIMESTAMP				NOT NULL,
@@ -24,6 +30,8 @@ CREATE TABLE ebms_message
 	PRIMARY KEY (message_id,message_nr)
 );
 
+CREATE INDEX i_ebms_message_queue ON ebms_message_queue (cpa_id,from_role,to_role,service,action,conversation_id,message_id,ref_to_message_id,sequence_nr);
+
 CREATE TABLE ebms_attachment
 (
 	message_id				VARCHAR(256)		NOT NULL,
@@ -42,10 +50,19 @@ CREATE TABLE ebms_event
 	message_id				VARCHAR(256)		NOT NULL,
 	time							TIMESTAMP				DEFAULT NOW() NOT NULL,
 	type							SMALLINT				NOT NULL,
-	status						SMALLINT				DEFAULT 0 NOT NULL,
+	status						SMALLINT				DEFAULT 1 NOT NULL,
 	status_time				TIMESTAMP				DEFAULT NOW() NOT NULL,
 	uri								VARCHAR(256)		NULL,
 	error_message			CLOB						NULL
 );
 
 ALTER TABLE ebms_event ADD CONSTRAINT uc_ebms_event UNIQUE (message_id,time);
+
+CREATE TABLE ebms_event_queue
+(
+	message_id				VARCHAR(256)		NOT NULL UNIQUE,
+	time							TIMESTAMP				DEFAULT NOW() NOT NULL,
+	type							SMALLINT				NOT NULL,
+	expired						TIMESTAMP				NOT NULL,
+	uri								VARCHAR(256)		NULL,
+);

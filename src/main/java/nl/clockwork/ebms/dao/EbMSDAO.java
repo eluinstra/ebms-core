@@ -42,6 +42,11 @@ public interface EbMSDAO
 	int updateCPA(CollaborationProtocolAgreement cpa) throws DAOException;
 	int deleteCPA(String cpaId) throws DAOException;
 	
+	String getUrl(String url);
+	void insertUrl(String oldUrl, String newUrl);
+	int updateUrl(String oldUrl, String newUrl);
+	int deleteUrl(String url);
+
 	boolean existsMessage(String messageId) throws DAOException;
 	EbMSMessageContent getMessageContent(String messageId) throws DAOException;
 	EbMSMessageContext getMessageContext(String messageId) throws DAOException;
@@ -63,7 +68,7 @@ public interface EbMSDAO
 	void insertEvent(String messageId, EbMSEventType type, String uri) throws DAOException;
 	void insertEvent(EbMSEvent event) throws DAOException;
 	void insertEvents(List<EbMSEvent> events) throws DAOException;
-	void updateEvent(Date timestamp, String messageId, EbMSEventStatus status, String errorMessage) throws DAOException;
+	void updateEvent(Date timestamp, String messageId, String uri, EbMSEventStatus status, String errorMessage) throws DAOException;
 	void deleteEvents(String messageId, EbMSEventStatus status) throws DAOException;
 	void deleteEventsBefore(Date timestamp, String messageId, EbMSEventStatus status) throws DAOException;
 

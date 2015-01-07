@@ -119,12 +119,12 @@ public class DeliveryManager //DeliveryService
 		}
 	}
 
-	public void handleResponseMessage(final EbMSMessage message) throws EbMSProcessorException
+	public void sendResponseMessage(final EbMSMessage message) throws EbMSProcessorException
 	{
 		messageQueue.put(message.getMessageHeader().getMessageData().getRefToMessageId(),message);
 	}
 	
-	public EbMSMessage handleResponseMessage(final CollaborationProtocolAgreement cpa, final EbMSMessage message, final EbMSMessage response) throws EbMSProcessorException
+	public EbMSMessage sendResponseMessage(final String uri, final EbMSMessage message, final EbMSMessage response) throws EbMSProcessorException
 	{
 		if (response != null)
 		{
@@ -137,7 +137,7 @@ public class DeliveryManager //DeliveryService
 					{
 						try
 						{
-							ebMSClient.sendMessage(CPAUtils.getUri(cpa,response),EbMSMessageUtils.getEbMSDocument(response));
+							ebMSClient.sendMessage(uri,EbMSMessageUtils.getEbMSDocument(response));
 						}
 						catch (Exception e)
 						{

@@ -1,0 +1,7 @@
+CREATE TABLE url
+(
+	old_url 					VARCHAR(256)		NOT NULL UNIQUE,
+	new_url						VARCHAR(256)		NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+ALTER TABLE url ADD CONSTRAINT uc_old_url UNIQUE (old_url(255));

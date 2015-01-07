@@ -58,9 +58,9 @@ public class EbMSEventProcessor implements Job
 			try
 			{
 				EbMSDocument requestDocument = ebMSDAO.getEbMSDocument(event.getMessageId());
-				String uri = event.getUri();
-				logger.info("Sending message " + event.getMessageId() + " to " + uri);
-				EbMSDocument responseDocument = ebMSClient.sendMessage(uri,requestDocument);
+				event.setUri(ebMSDAO.getUrl(event.getUri()));
+				logger.info("Sending message " + event.getMessageId() + " to " + event.getUri());
+				EbMSDocument responseDocument = ebMSClient.sendMessage(event.getUri(),requestDocument);
 				messageProcessor.processResponse(requestDocument,responseDocument);
 				updateEvent(event,EbMSEventStatus.PROCESSED,null);
 			}
@@ -113,7 +113,7 @@ public class EbMSEventProcessor implements Job
 						@Override
 						public void doInTransaction()
 						{
-							updateEvent(event,EbMSEventStatus.PROCESSED,null);
+							updateEvent(event,EbMSEventStatus.SUCCEEDED,null);
 							ebMSDAO.deleteEvents(event.getMessageId(),EbMSEventStatus.UNPROCESSED);
 							ebMSDAO.updateMessage(event.getMessageId(),EbMSMessageStatus.SENT,EbMSMessageStatus.DELIVERY_FAILED);
 							eventListener.onMessageNotAcknowledged(event.getMessageId());
@@ -190,7 +190,7 @@ public class EbMSEventProcessor implements Job
 				@Override
 				public void doInTransaction()
 				{
-					ebMSDAO.updateEvent(event.getTime(),event.getMessageId(),status,errorMessage);
+					ebMSDAO.updateEvent(event.getTime(),event.getMessageId(),event.getUri(),status,errorMessage);
 					ebMSDAO.deleteEventsBefore(event.getTime(),event.getMessageId(),EbMSEventStatus.UNPROCESSED);
 				}
 			}

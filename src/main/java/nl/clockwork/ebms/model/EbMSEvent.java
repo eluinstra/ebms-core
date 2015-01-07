@@ -58,4 +58,9 @@ public class EbMSEvent
 	{
 		return uri;
 	}
+
+	public void setUri(String uri)
+	{
+		this.uri = uri;
+	}
 }

@@ -129,22 +129,24 @@ public class EbMSMessageProcessor
 			}
 			else if (EbMSAction.STATUS_REQUEST.action().equals(message.getMessageHeader().getAction()))
 			{
-				EbMSMessage response = deliveryManager.handleResponseMessage(cpa,message,processStatusRequest(cpa,timestamp,message));
+				EbMSMessage response = processStatusRequest(cpa,timestamp,message);
+				response = deliveryManager.sendResponseMessage(CPAUtils.getUri(cpa,response),message,response);
 				return response == null ? null : EbMSMessageUtils.getEbMSDocument(response);
 			}
 			else if (EbMSAction.STATUS_RESPONSE.action().equals(message.getMessageHeader().getAction()))
 			{
-				deliveryManager.handleResponseMessage(message);
+				deliveryManager.sendResponseMessage(message);
 				return null;
 			}
 			else if (EbMSAction.PING.action().equals(message.getMessageHeader().getAction()))
 			{
-				EbMSMessage response = deliveryManager.handleResponseMessage(cpa,message,processPing(cpa,timestamp,message));
+				EbMSMessage response = processPing(cpa,timestamp,message);
+				response = deliveryManager.sendResponseMessage(CPAUtils.getUri(cpa,response),message,response);
 				return response == null ? null : EbMSMessageUtils.getEbMSDocument(response);
 			}
 			else if (EbMSAction.PONG.action().equals(message.getMessageHeader().getAction()))
 			{
-				deliveryManager.handleResponseMessage(message);
+				deliveryManager.sendResponseMessage(message);
 				return null;
 			}
 			else

@@ -281,6 +281,123 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	}
 
 	@Override
+	public String getUrl(String url)
+	{
+		Connection c = null;
+		PreparedStatement ps = null;
+		try
+		{
+			String result = null;
+			c = connectionManager.getConnection();
+			ps  = c.prepareStatement(
+				"select new_url" +
+				" from url" +
+				" where old_url = ?"
+			);
+			ps.setString(1,url);
+			if (ps.execute())
+			{
+				ResultSet rs = ps.getResultSet();
+				if (rs.next())
+					result = rs.getString("new_url");
+			}
+			return result;
+		}
+		catch (SQLException e)
+		{
+			throw new DAOException(e);
+		}
+		finally
+		{
+			connectionManager.close(ps);
+			connectionManager.close();
+		}
+	}
+
+	@Override
+	public void insertUrl(String oldUrl, String newUrl)
+	{
+		Connection c = null;
+		PreparedStatement ps = null;
+		try
+		{
+			c = connectionManager.getConnection();
+			ps  = c.prepareStatement(
+				"insert into url (" +
+					"old_url," +
+					"new_url" +
+				") values (?,?)"
+			);
+			ps.setString(1,oldUrl);
+			ps.setString(2,newUrl);
+			ps.executeUpdate();
+		}
+		catch (SQLException e)
+		{
+			throw new DAOException(e);
+		}
+		finally
+		{
+			connectionManager.close(ps);
+			connectionManager.close();
+		}
+	}
+
+	@Override
+	public int updateUrl(String oldUrl, String newUrl)
+	{
+		Connection c = null;
+		PreparedStatement ps = null;
+		try
+		{
+			c = connectionManager.getConnection();
+			ps  = c.prepareStatement(
+				"update url set" +
+				" new_url = ?" +
+				" where old_url = ?"
+			);
+			ps.setString(1,newUrl);
+			ps.setString(2,oldUrl);
+			return ps.executeUpdate();
+		}
+		catch (SQLException e)
+		{
+			throw new DAOException(e);
+		}
+		finally
+		{
+			connectionManager.close(ps);
+			connectionManager.close();
+		}
+	}
+
+	@Override
+	public int deleteUrl(String url)
+	{
+		Connection c = null;
+		PreparedStatement ps = null;
+		try
+		{
+			c = connectionManager.getConnection();
+			ps  = c.prepareStatement(
+				"delete from url" +
+				" where old_url = ?"
+			);
+			ps.setString(1,url);
+			return ps.executeUpdate();
+		}
+		catch (SQLException e)
+		{
+			throw new DAOException(e);
+		}
+		finally
+		{
+			connectionManager.close(ps);
+			connectionManager.close();
+		}
+	}
+
+	@Override
 	public boolean existsMessage(String messageId) throws DAOException
 	{
 		Connection c = null;
@@ -1055,7 +1172,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	}
 
 	@Override
-	public void updateEvent(Date timestamp, String messageId, EbMSEventStatus status, String errorMessage) throws DAOException
+	public void updateEvent(Date timestamp, String messageId, String uri, EbMSEventStatus status, String errorMessage) throws DAOException
 	{
 		Connection c = null;
 		PreparedStatement ps = null;
@@ -1064,16 +1181,18 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 			c = connectionManager.getConnection();
 			ps  = c.prepareStatement(
 				"update ebms_event set" +
+				" uri = ?," +
 				" status = ?," +
 				" status_time = " + getTimestampFunction() + "," +
 				" error_message = ?" +
 				" where message_id = ?" +
 				" and time = ?"
 			);
-			ps.setInt(1,status.id());
-			ps.setString(2,errorMessage);
-			ps.setString(3,messageId);
-			ps.setTimestamp(4,new Timestamp(timestamp.getTime()));
+			ps.setString(1,uri);
+			ps.setInt(2,status.id());
+			ps.setString(3,errorMessage);
+			ps.setString(4,messageId);
+			ps.setTimestamp(5,new Timestamp(timestamp.getTime()));
 			ps.executeUpdate();
 		}
 		catch (SQLException e)

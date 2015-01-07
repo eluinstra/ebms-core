@@ -4,6 +4,12 @@ CREATE TABLE cpa
 	cpa								TEXT						NOT NULL
 );
 
+CREATE TABLE url
+(
+	old_url 					VARCHAR(256)		NOT NULL UNIQUE,
+	new_url						VARCHAR(256)		NOT NULL
+);
+
 CREATE TABLE ebms_message
 (
 	id								INT							IDENTITY(1,1)	PRIMARY KEY,
