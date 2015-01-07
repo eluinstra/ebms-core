@@ -15,8 +15,6 @@
  */
 package nl.clockwork.ebms;
 
-import nl.clockwork.ebms.model.EbMSMessage;
-
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageStatusType;
 
 public class Constants
@@ -86,7 +84,7 @@ public class Constants
 
   public static enum EbMSEventType
   {
-  	EXPIRE(0), SEND(1), SEND_ASYNC(2), SEND_SYNC(3), SEND_ASYNC_ACK(4), SEND_SYNC_ACK(5);
+  	EXPIRE(0), SEND(1);
 
 		private final int id;
 
@@ -100,23 +98,6 @@ public class Constants
 				if (event.id() == id)
 					return event;
 			return null;
-		}
-		
-		public static EbMSEventType getEbMSEventType(EbMSMessage message)
-		{
-			if (EBMS_SERVICE_URI.equals(message.getMessageHeader().getService().getValue()))
-				if (EbMSAction.MESSAGE_ERROR.equals(message.getMessageHeader().getAction()) || EbMSAction.ACKNOWLEDGMENT.equals(message.getMessageHeader().getAction()) || EbMSAction.STATUS_RESPONSE.equals(message.getMessageHeader().getAction()) || EbMSAction.PONG.equals(message.getMessageHeader().getAction()))
-					return SEND;
-			if (message.getSyncReply() == null)
-				if (message.getAckRequested() == null)
-					return SEND_ASYNC;
-				else
-					return SEND_ASYNC_ACK;
-			else
-				if (message.getAckRequested() == null)
-					return SEND_SYNC;
-				else
-					return SEND_SYNC_ACK;
 		}
   }
 

@@ -529,7 +529,7 @@ public class EbMSMessageUtils
 
 	public static EbMSEvent createEbMSSendEvent(EbMSMessage message, String uri)
 	{
-		return new EbMSEvent(message.getMessageHeader().getMessageData().getMessageId(),message.getMessageHeader().getMessageData().getTimestamp().toGregorianCalendar().getTime(),EbMSEventType.getEbMSEventType(message),uri);
+		return new EbMSEvent(message.getMessageHeader().getMessageData().getMessageId(),message.getMessageHeader().getMessageData().getTimestamp().toGregorianCalendar().getTime(),EbMSEventType.SEND,uri);
 	}
 
 	public static List<EbMSEvent> createEbMSSendEvents(CollaborationProtocolAgreement cpa, EbMSMessage message, String uri)
@@ -543,12 +543,12 @@ public class EbMSMessageUtils
 			ReliableMessaging rm = CPAUtils.getReliableMessaging(cpa,deliveryChannel);
 			for (int i = 0; i < rm.getRetries().intValue() + 1; i++)
 			{
-				result.add(new EbMSEvent(message.getMessageHeader().getMessageData().getMessageId(),(Date)sendTime.clone(),EbMSEventType.getEbMSEventType(message),uri));
+				result.add(new EbMSEvent(message.getMessageHeader().getMessageData().getMessageId(),(Date)sendTime.clone(),EbMSEventType.SEND,uri));
 				rm.getRetryInterval().addTo(sendTime);
 			}
 		}
 		else
-			result.add(new EbMSEvent(message.getMessageHeader().getMessageData().getMessageId(),(Date)sendTime.clone(),EbMSEventType.getEbMSEventType(message),uri));
+			result.add(new EbMSEvent(message.getMessageHeader().getMessageData().getMessageId(),(Date)sendTime.clone(),EbMSEventType.SEND,uri));
 		return result;
 	}
 

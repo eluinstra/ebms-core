@@ -5,3 +5,5 @@ CREATE TABLE url
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 ALTER TABLE url ADD CONSTRAINT uc_old_url UNIQUE (old_url(255));
+
+UPDATE ebms_event SET type = 1 where type > 1;
