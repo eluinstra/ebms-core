@@ -50,19 +50,10 @@ CREATE TABLE ebms_event
 	message_id				VARCHAR(256)		NOT NULL,
 	time							TIMESTAMP				DEFAULT NOW() NOT NULL,
 	type							SMALLINT				NOT NULL,
-	status						SMALLINT				DEFAULT 1 NOT NULL,
+	status						SMALLINT				DEFAULT 0 NOT NULL,
 	status_time				TIMESTAMP				DEFAULT NOW() NOT NULL,
 	uri								VARCHAR(256)		NULL,
 	error_message			CLOB						NULL
 );
 
 ALTER TABLE ebms_event ADD CONSTRAINT uc_ebms_event UNIQUE (message_id,time);
-
-CREATE TABLE ebms_event_queue
-(
-	message_id				VARCHAR(256)		NOT NULL UNIQUE,
-	time							TIMESTAMP				DEFAULT NOW() NOT NULL,
-	type							SMALLINT				NOT NULL,
-	expired						TIMESTAMP				NOT NULL,
-	uri								VARCHAR(256)		NULL,
-);
