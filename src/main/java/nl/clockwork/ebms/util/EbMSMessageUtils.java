@@ -192,17 +192,11 @@ public class EbMSMessageUtils
 		messageHeader.setConversationId(uuid);
 		
 		messageHeader.setFrom(new From());
-		PartyId fromPartyId = new PartyId();
-		fromPartyId.setType(fromPartyInfo.getPartyId().getType());
-		fromPartyId.setValue(fromPartyInfo.getPartyId().getValue());
-		messageHeader.getFrom().getPartyId().add(fromPartyId);
+		messageHeader.getFrom().getPartyId().addAll(fromPartyInfo.getPartyIds());
 		messageHeader.getFrom().setRole(fromParty.getRole());
 
 		messageHeader.setTo(new To());
-		PartyId toPartyId = new PartyId();
-		toPartyId.setType(toPartyInfo.getPartyId().getType());
-		toPartyId.setValue(toPartyInfo.getPartyId().getValue());
-		messageHeader.getTo().getPartyId().add(toPartyId);
+		messageHeader.getTo().getPartyId().addAll(toPartyInfo.getPartyIds());
 		messageHeader.getTo().setRole(toParty.getRole());
 		
 		messageHeader.setService(new Service());
@@ -239,17 +233,11 @@ public class EbMSMessageUtils
 		messageHeader.setConversationId(context.getConversationId() != null ? context.getConversationId() : uuid);
 		
 		messageHeader.setFrom(new From());
-		PartyId from = new PartyId();
-		from.setType(fromPartyInfo.getPartyId().getType());
-		from.setValue(fromPartyInfo.getPartyId().getValue());
-		messageHeader.getFrom().getPartyId().add(from);
+		messageHeader.getFrom().getPartyId().addAll(fromPartyInfo.getPartyIds());
 		messageHeader.getFrom().setRole(fromPartyInfo.getRole());
 
 		messageHeader.setTo(new To());
-		PartyId to = new PartyId();
-		to.setType(toPartyInfo.getPartyId().getType());
-		to.setValue(toPartyInfo.getPartyId().getValue());
-		messageHeader.getTo().getPartyId().add(to);
+		messageHeader.getTo().getPartyId().addAll(toPartyInfo.getPartyIds());
 		messageHeader.getTo().setRole(toPartyInfo.getRole());
 		
 		messageHeader.setService(new Service());

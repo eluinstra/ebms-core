@@ -16,17 +16,18 @@
 package nl.clockwork.ebms.model;
 
 import java.io.Serializable;
+import java.util.List;
 
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DeliveryChannel;
-import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.PartyId;
+import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.PartyId;
 
 public class EbMSPartyInfo implements Serializable
 {
 	private static final long serialVersionUID = 1L;
 	DeliveryChannel defaultMshChannelId;
-	private PartyId partyId;
+	private List<PartyId> partyIds;
 	private String role;
-	
+
 	public EbMSPartyInfo()
 	{
 	}
@@ -35,20 +36,20 @@ public class EbMSPartyInfo implements Serializable
 	{
 		return defaultMshChannelId;
 	}
-	
+
 	public void setDefaultMshChannelId(DeliveryChannel defaultMshChannelId)
 	{
 		this.defaultMshChannelId = defaultMshChannelId;
 	}
-	
-	public PartyId getPartyId()
+
+	public List<PartyId> getPartyIds()
 	{
-		return partyId;
+		return partyIds;
 	}
 
-	public void setPartyId(PartyId partyId)
+	public void setPartyIds(List<PartyId> partyIds)
 	{
-		this.partyId = partyId;
+		this.partyIds = partyIds;
 	}
 
 	public String getRole()
