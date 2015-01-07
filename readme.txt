@@ -11,7 +11,7 @@ This library contains the core functionality of the EbMS adapter including:
 	- oracle (11)(lob > 4k fix (needed for older oracle jdbc adapters) not implemented!)
 - CPA and EbMSMessage SOAP Services to control the EbMS adapter
 
-Supported:
+Implemented:
 -	Core Functionality
 	o	Security Module
 			Signature
@@ -24,7 +24,7 @@ Supported:
 -	HTTP(S) Protocol
 -	Separate ErrorMessage and Acknowlegment messages
 
-Not supported:
+Not implemented:
 -	Core Functionality
 	o	Security Module
 			Encryption
@@ -161,7 +161,7 @@ Functionality =
 
 - ErrorMessages
 	- only custom, StatusRequest and Ping messages can receive an ErrorMessage
-	- ErrorMessage, Acknowledgment, StatusRequest, StatusResponse, Ping and Pong messages can never receive an ErrorMessage
+	- ErrorMessage, Acknowledgment, StatusResponse, and Pong messages can never receive an ErrorMessage
 - Acknowledgments
 	- only custom messages can receive an Acknowledgment if messaging is reliable
 	- ErrorMessage, Acknowledgment, StatusRequest, StatusResponse, Ping, Pong messages can never receive an Acknowledgment
