@@ -546,6 +546,10 @@ public class EbMSMessageUtils
 				result.add(new EbMSEvent(message.getMessageHeader().getMessageData().getMessageId(),(Date)sendTime.clone(),EbMSEventType.SEND,uri));
 				rm.getRetryInterval().addTo(sendTime);
 			}
+			if (message.getMessageHeader().getMessageData().getTimeToLive() == null)
+				result.add(new EbMSEvent(message.getMessageHeader().getMessageData().getMessageId(),(Date)sendTime.clone(),EbMSEventType.EXPIRE));
+			else
+				result.add(new EbMSEvent(message.getMessageHeader().getMessageData().getMessageId(),message.getMessageHeader().getMessageData().getTimeToLive().toGregorianCalendar().getTime(),EbMSEventType.EXPIRE));
 		}
 		else
 			result.add(new EbMSEvent(message.getMessageHeader().getMessageData().getMessageId(),(Date)sendTime.clone(),EbMSEventType.SEND,uri));
