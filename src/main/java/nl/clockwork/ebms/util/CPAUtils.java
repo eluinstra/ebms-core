@@ -116,15 +116,13 @@ public class CPAUtils
 	public static EbMSPartyInfo getMyPartyInfo(CollaborationProtocolAgreement cpa, List<org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.PartyId> partyIds)
 	{
 		for (PartyInfo partyInfo : cpa.getPartyInfo())
-			for (PartyId cpaPartyId : partyInfo.getPartyId())
-				for (org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.PartyId partyId : partyIds)
-					if (equals(cpaPartyId,partyId))
-					{
-						EbMSPartyInfo result = new EbMSPartyInfo();
-						result.setDefaultMshChannelId((DeliveryChannel)partyInfo.getDefaultMshChannelId());
-						result.setPartyId(getPartyId(partyInfo.getPartyId(),toString(partyIds.get(0))));
-						return result;
-					}
+			if (containsAll(partyInfo.getPartyId(),partyIds))
+			{
+				EbMSPartyInfo result = new EbMSPartyInfo();
+				result.setDefaultMshChannelId((DeliveryChannel)partyInfo.getDefaultMshChannelId());
+				result.setPartyId(getPartyId(partyInfo.getPartyId(),toString(partyIds.get(0))));
+				return result;
+			}
 		return null;
 	}
 	
@@ -155,13 +153,27 @@ public class CPAUtils
 	public static PartyInfo getPartyInfo(CollaborationProtocolAgreement cpa, List<org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.PartyId> partyIds)
 	{
 		for (PartyInfo partyInfo : cpa.getPartyInfo())
-			for (PartyId cpaPartyId : partyInfo.getPartyId())
-				for (org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.PartyId partyId : partyIds)
-					if (equals(cpaPartyId,partyId))
-						return partyInfo;
+			if (containsAll(partyInfo.getPartyId(),partyIds))
+				return partyInfo;
 		return null;
 	}
 	
+	private static boolean containsAll(List<PartyId> cpaPartyIds, List<org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.PartyId> partyIds)
+	{
+		for (org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.PartyId partyId : partyIds)
+			if (!contains(cpaPartyIds,partyId))
+				return false;
+		return true;
+	}
+
+	private static boolean contains(List<PartyId> cpaPartyIds, org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.PartyId partyId)
+	{
+		for (PartyId cpaPartyId : cpaPartyIds)
+			if (equals(cpaPartyId,partyId))
+				return true;
+		return false;
+	}
+
 	private static boolean equals(PartyId cpaPartyId, org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.PartyId partyId)
 	{
 		return partyId.getType().equals(cpaPartyId.getType()) && partyId.getValue().equals(cpaPartyId.getValue());
@@ -420,18 +432,10 @@ public class CPAUtils
 	{
 		if (certificate != null)
 			for (Object o : certificate.getKeyInfo().getContent())
-			{
 				if (o instanceof JAXBElement<?> && ((JAXBElement<?>)o).getValue() instanceof X509DataType)
-				{
 					for (Object p : ((X509DataType)((JAXBElement<?>)o).getValue()).getX509IssuerSerialOrX509SKIOrX509SubjectName())
-					{
 						if (p instanceof JAXBElement<?> && "X509Certificate".equals(((JAXBElement<?>)p).getName().getLocalPart()))
-						{
 							return (X509Certificate)CertificateFactory.getInstance("X.509").generateCertificate(new ByteArrayInputStream((byte[])((JAXBElement<?>)p).getValue())); 
-						}
-					}
-				}
-			}
 		return null;
 	}
 
