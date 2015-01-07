@@ -1,10 +1,8 @@
+- implement OverrideMshActionBinding
 / manual
 / web adapter
-- message queue
-- simplify events
-- event queue
-- endpoint mapping
-- cpaManager
+- simplify events?
+- cpaManager?
 
 - improve ebMSMessageContentValidator (make validation configurable?)
 - optimize EbMSMessageutils and CPAUtils
