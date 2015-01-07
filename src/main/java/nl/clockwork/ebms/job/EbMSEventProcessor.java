@@ -62,7 +62,7 @@ public class EbMSEventProcessor implements Job
 				logger.info("Sending message " + event.getMessageId() + " to " + event.getUri());
 				EbMSDocument responseDocument = ebMSClient.sendMessage(event.getUri(),requestDocument);
 				messageProcessor.processResponse(requestDocument,responseDocument);
-				updateEvent(event,EbMSEventStatus.PROCESSED,null);
+				updateEvent(event,EbMSEventStatus.SUCCEEDED,null);
 			}
 			catch (final EbMSResponseException e)
 			{

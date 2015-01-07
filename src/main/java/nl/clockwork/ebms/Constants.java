@@ -122,7 +122,7 @@ public class Constants
 
   public static enum EbMSEventStatus
   {
-		UNPROCESSED(0), PROCESSED(1), FAILED(2);
+		UNPROCESSED(0), SUCCEEDED(1), FAILED(2)/*, EXPIRED(3)*/;
 
 		private final int id;
 
