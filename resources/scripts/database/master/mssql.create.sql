@@ -32,6 +32,8 @@ CREATE TABLE ebms_message
 
 ALTER TABLE ebms_message ADD CONSTRAINT uc_ebms_message_id UNIQUE (message_id,message_nr);
 
+CREATE INDEX i_ebms_message ON ebms_message_queue (cpa_id,status,message_nr);
+
 CREATE TABLE ebms_attachment
 (
 	ebms_message_id		INT							NOT NULL FOREIGN KEY REFERENCES ebms_message(id),

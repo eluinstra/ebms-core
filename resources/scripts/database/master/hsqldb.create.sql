@@ -30,7 +30,7 @@ CREATE TABLE ebms_message
 	PRIMARY KEY (message_id,message_nr)
 );
 
-CREATE INDEX i_ebms_message_queue ON ebms_message_queue (cpa_id,from_role,to_role,service,action,conversation_id,message_id,ref_to_message_id,sequence_nr);
+CREATE INDEX i_ebms_message ON ebms_message_queue (cpa_id,status,message_nr);
 
 CREATE TABLE ebms_attachment
 (

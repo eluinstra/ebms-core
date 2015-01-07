@@ -8,7 +8,7 @@ ALTER TABLE cpa ADD CONSTRAINT uc_cpa_id UNIQUE (cpa_id(255));
 
 CREATE TABLE url
 (
-	old_url 					VARCHAR(256)		NOT NULL UNIQUE,
+	old_url 					VARCHAR(256)		NOT NULL,
 	new_url						VARCHAR(256)		NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
@@ -35,6 +35,8 @@ CREATE TABLE ebms_message
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 ALTER TABLE ebms_message ADD CONSTRAINT uc_ebms_message_id UNIQUE (message_id(255),message_nr);
+
+CREATE INDEX i_ebms_message ON ebms_message (cpa_id(255),status,message_nr);
 
 CREATE TABLE ebms_attachment
 (
