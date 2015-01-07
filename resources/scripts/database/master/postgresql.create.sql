@@ -44,10 +44,10 @@ CREATE TABLE ebms_attachment
 CREATE TABLE ebms_event
 (
 	message_id				VARCHAR(256)		NOT NULL,
-	time							TIMESTAMP				NOT NULL DEFAULT NOW(),
+	time							TIMESTAMP				NOT NULL,
 	type							SMALLINT				NOT NULL,
-	status						SMALLINT				NOT NULL DEFAULT 0,
-	status_time				TIMESTAMP				NOT NULL DEFAULT NOW(),
+	status						SMALLINT				NOT NULL,
+	status_time				TIMESTAMP				NOT NULL,
 	uri								VARCHAR(256)		NULL,
 	error_message			TEXT						NULL,
 	CONSTRAINT uc_ebms_event UNIQUE (message_id,time)

@@ -44,10 +44,10 @@ CREATE TABLE ebms_attachment
 CREATE TABLE ebms_event
 (
 	message_id				VARCHAR(256)		NOT NULL,
-	time							DATETIME				NOT NULL DEFAULT GETDATE(),
+	time							DATETIME				NOT NULL,
 	type							SMALLINT				NOT NULL,
-	status						SMALLINT				NOT NULL DEFAULT 0,
-	status_time				DATETIME				NOT NULL DEFAULT GETDATE(),
+	status						SMALLINT				NOT NULL,
+	status_time				DATETIME				NOT NULL,
 	uri								VARCHAR(256)		NULL,
 	error_message			TEXT						NULL
 );
