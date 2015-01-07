@@ -1,5 +1,5 @@
-- manual
-- web adapter
+/ manual
+/ web adapter
 - message queue
 - simplify events
 - event queue
@@ -58,13 +58,9 @@
 - remove EbMS(Message) prefix on classes; add EbMS(Message) prefix on bean ids? 
 
 3.0:
-- add fromParty and toParty (by PartyName) to EbMSMessageContext (and store them in ebms_message)
-- implement sync deliveryManager
-	- send message direct (send retries from queue)
-	- for sync communication keep channel open
 - validate requested uri
 
-- implement EbMSFileAttachment (file proxy) and EbMSDBAttachment (db proxy) for large message processing?
+- implement EbMSFileAttachment (file proxy) and EbMSDBAttachment (db proxy) for large messages?
 
 - implement business signals handling (ReceiptAcknowledgment, AcceptanceAcknowledgment, and Exception)
 - implement business response messages handling
