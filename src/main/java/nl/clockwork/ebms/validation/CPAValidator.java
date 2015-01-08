@@ -60,10 +60,6 @@ public class CPAValidator
 		if (cpa.getSignature() != null)
 			//throw new ValidationException("CPA Signature not supported!");
 			logger.warn("CPA Signature not supported!");
-		if (cpa.getPartyInfo().size() != 2)
-			throw new ValidationException(cpa.getPartyInfo().size() + " part" + (cpa.getPartyInfo().size() == 1 ? "y" : "ies") + " defined!");
-		if (cpa.getPartyInfo().get(0).getPartyName().equals(cpa.getPartyInfo().get(1).getPartyName()))
-			throw new ValidationException("PartyName " + cpa.getPartyInfo().get(0).getPartyName() + " not unique!");
 		
 		//syncReply mode signalsAndResponse not supported?
 		//syncReply mode responseOnly not supported?
