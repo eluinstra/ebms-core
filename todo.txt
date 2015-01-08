@@ -1,24 +1,23 @@
-- implement OverrideMshActionBinding
+- validate packaging
+- enable acknowledgment/errorMessage signature?
 / manual
 / web adapter
 - simplify events?
 - cpaManager?
 
-- improve ebMSMessageContentValidator (make validation configurable?)
+- improve ebMSMessageContentValidator
+	- add packaging validator
 - optimize EbMSMessageutils and CPAUtils
 	- implement CPARegistry and CPA object
-		- make cpa endpoints configurable/replaceable
 - change events
 	- create only one event
 	- add expiration time and retry attempt nr to event
 - create message and event queues (and managers)
 
-- add try with resources statement on AutoClosable resources
-- replace DAO.getTimestampFunction() by java Date
 - remove hard coded UTF-8 encoding from DAO's?
-- enable acknowledgment/errorMessage signature?
 - improve detection of signing etc. in CPA
 - improve CPA validation concerning signing etc.
+- use try with resources statement on AutoClosable resources
 
 2.3:
 - improve CPA validation
