@@ -45,6 +45,7 @@ import nl.clockwork.ebms.signature.EbMSSignatureGenerator;
 import nl.clockwork.ebms.signature.EbMSSignatureValidator;
 import nl.clockwork.ebms.util.CPAUtils;
 import nl.clockwork.ebms.util.EbMSMessageUtils;
+import nl.clockwork.ebms.validation.AttachmentValidator;
 import nl.clockwork.ebms.validation.CPAValidator;
 import nl.clockwork.ebms.validation.EbMSValidationException;
 import nl.clockwork.ebms.validation.ManifestValidator;
@@ -78,8 +79,10 @@ public class EbMSMessageProcessor
   protected CPAValidator cpaValidator;
   protected MessageHeaderValidator messageHeaderValidator;
   protected ManifestValidator manifestValidator;
+  protected AttachmentValidator attachmentValidator;
   protected SignatureTypeValidator signatureTypeValidator;
-  protected Service service;
+  protected boolean validateAttachment;
+  protected Service mshMessageService;
   
 	public void init()
 	{
@@ -95,9 +98,16 @@ public class EbMSMessageProcessor
 		messageHeaderValidator = new MessageHeaderValidator(ebMSDAO);
 		messageHeaderValidator.setAckSignatureRequested(PerMessageCharacteristicsType.NEVER);
 		manifestValidator = new ManifestValidator();
+		attachmentValidator = validateAttachment ? new AttachmentValidator() : new AttachmentValidator()
+		{
+			@Override
+			public void validate(CollaborationProtocolAgreement cpa, EbMSMessage message) throws EbMSValidationException
+			{
+			}
+		};
 		signatureTypeValidator = new SignatureTypeValidator(signatureValidator);
-		service = new Service();
-		service.setValue(Constants.EBMS_SERVICE_URI);
+		mshMessageService = new Service();
+		mshMessageService.setValue(Constants.EBMS_SERVICE_URI);
 	}
 	
 	public EbMSDocument processRequest(EbMSDocument document) throws EbMSProcessorException
@@ -231,7 +241,7 @@ public class EbMSMessageProcessor
 						public void doInTransaction()
 						{
 							ebMSDAO.insertDuplicateMessage(timestamp.getTime(),message);
-							EbMSMessageContext messageContext = ebMSDAO.getMessageContextByRefToMessageId(messageHeader.getMessageData().getMessageId(),service,EbMSAction.MESSAGE_ERROR.action(),EbMSAction.ACKNOWLEDGMENT.action());
+							EbMSMessageContext messageContext = ebMSDAO.getMessageContextByRefToMessageId(messageHeader.getMessageData().getMessageId(),mshMessageService,EbMSAction.MESSAGE_ERROR.action(),EbMSAction.ACKNOWLEDGMENT.action());
 							ebMSDAO.insertEvent(messageContext.getMessageId(),EbMSEventType.SEND,CPAUtils.getResponseUri(cpa,message));
 						}
 					}
@@ -241,7 +251,7 @@ public class EbMSMessageProcessor
 			else
 			{
 				ebMSDAO.insertDuplicateMessage(timestamp.getTime(),message);
-				return ebMSDAO.getEbMSDocumentByRefToMessageId(messageHeader.getMessageData().getMessageId(),service,EbMSAction.MESSAGE_ERROR.action(),EbMSAction.ACKNOWLEDGMENT.action());
+				return ebMSDAO.getEbMSDocumentByRefToMessageId(messageHeader.getMessageData().getMessageId(),mshMessageService,EbMSAction.MESSAGE_ERROR.action(),EbMSAction.ACKNOWLEDGMENT.action());
 			}
 		}
 		else
@@ -252,6 +262,7 @@ public class EbMSMessageProcessor
 				messageHeaderValidator.validate(cpa,message,timestamp);
 				signatureTypeValidator.validate(cpa,message);
 				manifestValidator.validate(message);
+				attachmentValidator.validate(cpa,message);
 				signatureTypeValidator.validateSignature(cpa,message);
 				if (message.getAckRequested() == null)
 				{
@@ -408,5 +419,10 @@ public class EbMSMessageProcessor
 	public void setSignatureValidator(EbMSSignatureValidator signatureValidator)
 	{
 		this.signatureValidator = signatureValidator;
+	}
+
+	public void setValidateAttachment(boolean validateAttachment)
+	{
+		this.validateAttachment = validateAttachment;
 	}
 }

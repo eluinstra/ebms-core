@@ -38,7 +38,7 @@ import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageHeader;
 
 public class AttachmentValidator
 {
-  protected transient Log logger = LogFactory.getLog(getClass());
+	protected transient Log logger = LogFactory.getLog(getClass());
 
 	public void validate(CollaborationProtocolAgreement cpa, EbMSMessage message) throws EbMSValidationException
 	{
@@ -65,7 +65,7 @@ public class AttachmentValidator
 							if (attachment != null)
 								attachments.remove(attachment);
 							else
-								throw new EbMSValidationException(EbMSMessageUtils.createError("//Body/Manifest/Reference",Constants.EbMSErrorCode.MIME_PROBLEM.errorCode(),"Packaging Composite Part " + simplePart.getId() + " not found!"));
+								throw new EbMSValidationException(EbMSMessageUtils.createError("//Body/Manifest/Reference",Constants.EbMSErrorCode.MIME_PROBLEM.errorCode(),"SimplePart " + simplePart.getId() + " not found!"));
 						}
 						if (idref instanceof Encapsulation)
 						{
@@ -74,7 +74,7 @@ public class AttachmentValidator
 							if (attachment != null)
 								attachments.remove(attachment);
 							else
-								throw new EbMSValidationException(EbMSMessageUtils.createError("//Body/Manifest/Reference",Constants.EbMSErrorCode.MIME_PROBLEM.errorCode(),"Packaging Composite Part " + encapsulation.getId() + " not found!"));
+								throw new EbMSValidationException(EbMSMessageUtils.createError("//Body/Manifest/Reference",Constants.EbMSErrorCode.MIME_PROBLEM.errorCode(),"Packaging Encapsulation " + encapsulation.getId() + " not found!"));
 						}
 						if (idref instanceof Composite)
 						{
@@ -83,18 +83,18 @@ public class AttachmentValidator
 							if (attachment != null)
 								attachments.remove(attachment);
 							else
-								throw new EbMSValidationException(EbMSMessageUtils.createError("//Body/Manifest/Reference",Constants.EbMSErrorCode.MIME_PROBLEM.errorCode(),"Packaging Composite Part " + composite.getId() + " not found!"));
+								throw new EbMSValidationException(EbMSMessageUtils.createError("//Body/Manifest/Reference",Constants.EbMSErrorCode.MIME_PROBLEM.errorCode(),"Packaging Composite " + composite.getId() + " not found!"));
 						}
 					}
 					// if (attachments.size() > 0) ???
 				}
 				else if (root.getMimetype().endsWith("multipart/related") /*&& "type=&quot;text/xml&quot; version=&quot;1.0&quot".equals(composite.getMimeparameters())*/)
 				{
-					logger.warn("Packaging definition multipart/related not supported!");
+					logger.warn("Packaging validation not executed! multipart/related not supported!");
 				}
 			}
 			else
-				logger.warn("Packaging definition supported! Cannot find top-level definition.");
+				logger.warn("Packaging validation not executed! Cannot find top-level definition.");
 		}
 	}
 
