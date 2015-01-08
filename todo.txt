@@ -2,6 +2,10 @@
 / manual
 / web adapter
 
+- write mime message
+	- add encryption (s/mime)
+- define DeliveryChannel types (http, etc.)
+
 - improve ebMSMessageContentValidator
 - optimize EbMSMessageutils and CPAUtils
 	- implement CPARegistry and CPA object
