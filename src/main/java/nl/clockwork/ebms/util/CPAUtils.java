@@ -44,6 +44,7 @@ import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CollaborationRole
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DeliveryChannel;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DocExchange;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.OverrideMshActionBinding;
+import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.Packaging;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.PartyId;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.PartyInfo;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.PerMessageCharacteristicsType;
@@ -352,12 +353,9 @@ public class CPAUtils
 		return null;
 	}
 	
-	public static DeliveryChannel getDeliveryChannel(List<JAXBElement<Object>> channelIds)
+	public static Packaging getPackaging(CanSend canSend)
 	{
-		if (channelIds.size() > 0)
-			return (DeliveryChannel)channelIds.get(0).getValue();
-		else
-			return null;
+		return (Packaging)canSend.getThisPartyActionBinding().getPackageId();
 	}
 
 	public static boolean isSigned(PartyInfo partyInfo, String role, Service service, String action)
@@ -377,6 +375,14 @@ public class CPAUtils
 		return (DeliveryChannel)((JAXBElement<Object>)bindingType.getChannelId().get(0)).getValue();
 	}
 	
+	public static DeliveryChannel getDeliveryChannel(List<JAXBElement<Object>> channelIds)
+	{
+		if (channelIds.size() > 0)
+			return (DeliveryChannel)channelIds.get(0).getValue();
+		else
+			return null;
+	}
+
 	public static DocExchange getDocExchange(DeliveryChannel deliveryChannel)
 	{
 		return (DocExchange)deliveryChannel.getDocExchangeId();
