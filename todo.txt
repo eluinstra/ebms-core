@@ -1,12 +1,8 @@
-- validate packaging
-- enable acknowledgment/errorMessage signature?
+/ validate packaging
 / manual
 / web adapter
-- simplify events?
-- cpaManager?
 
 - improve ebMSMessageContentValidator
-	- add packaging validator
 - optimize EbMSMessageutils and CPAUtils
 	- implement CPARegistry and CPA object
 - change events
@@ -19,7 +15,7 @@
 - improve CPA validation concerning signing etc.
 - use try with resources statement on AutoClosable resources
 
-2.3:
+2.4:
 - improve CPA validation
 	- check used CPA fields in CPAUtils and validate them
 	- validate on unsupported features
