@@ -43,6 +43,7 @@ import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CollaborationProt
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CollaborationRole;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DeliveryChannel;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DocExchange;
+import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.OverrideMshActionBinding;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.PartyId;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.PartyInfo;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.PerMessageCharacteristicsType;
@@ -314,7 +315,12 @@ public class CPAUtils
 	public static DeliveryChannel getFromDeliveryChannel(PartyInfo partyInfo, String role, Service service, String action)
 	{
 		if (Constants.EBMS_SERVICE_URI.equals(service.getValue()))
+		{
+			for (OverrideMshActionBinding overrideMshActionBinding : partyInfo.getOverrideMshActionBinding())
+				if (overrideMshActionBinding.getAction().equals(action))
+					return (DeliveryChannel)overrideMshActionBinding.getChannelId();
 			return (DeliveryChannel)partyInfo.getDefaultMshChannelId();
+		}
 		else
 		{
 			ServiceBinding serviceBinding = getServiceBinding(partyInfo, role, service);
@@ -329,7 +335,12 @@ public class CPAUtils
 	public static DeliveryChannel getToDeliveryChannel(PartyInfo partyInfo, String role, Service service, String action)
 	{
 		if (Constants.EBMS_SERVICE_URI.equals(service.getValue()))
+		{
+			for (OverrideMshActionBinding overrideMshActionBinding : partyInfo.getOverrideMshActionBinding())
+				if (overrideMshActionBinding.getAction().equals(action))
+					return (DeliveryChannel)overrideMshActionBinding.getChannelId();
 			return (DeliveryChannel)partyInfo.getDefaultMshChannelId();
+		}
 		else
 		{
 			ServiceBinding serviceBinding = getServiceBinding(partyInfo,role,service);
