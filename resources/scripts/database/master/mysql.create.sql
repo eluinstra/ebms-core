@@ -17,7 +17,7 @@ ALTER TABLE url ADD CONSTRAINT uc_old_url UNIQUE (old_url(255));
 CREATE TABLE ebms_message
 (
 	id								INTEGER					AUTO_INCREMENT PRIMARY KEY,
-	time_stamp				TIMESTAMP				NOT NULL DEFAULT '0000-00-00 00:00:00',
+	time_stamp				TIMESTAMP				NOT NULL,
 	cpa_id						VARCHAR(256)		NOT NULL,
 	conversation_id		VARCHAR(256)		NOT NULL,
 	sequence_nr				SMALLINT				NULL,
