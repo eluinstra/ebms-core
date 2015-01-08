@@ -15,6 +15,9 @@
  */
 package nl.clockwork.ebms.validation;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import nl.clockwork.ebms.Constants;
 import nl.clockwork.ebms.model.EbMSAttachment;
 import nl.clockwork.ebms.model.EbMSMessage;
@@ -32,19 +35,28 @@ public class ManifestValidator
 	{
 		if (!Constants.EBMS_VERSION.equals(message.getManifest().getVersion()))
 			throw new EbMSValidationException(EbMSMessageUtils.createError("//Body/Manifest[@version]",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Invalid value."));
+		List<EbMSAttachment> attachments = new ArrayList<EbMSAttachment>();
 		for (Reference reference : message.getManifest().getReference())
 		{
 			if (reference.getHref().startsWith(Constants.CID))
 			{
-				boolean found = false;
-				for (EbMSAttachment attachment : message.getAttachments())
-					if (reference.getHref().substring(Constants.CID.length()).equals(attachment.getContentId()))
-						found = true;
-				if (!found)
+				EbMSAttachment attachment = findAttachment(message.getAttachments(),reference.getHref());
+				if (attachment != null)
+					attachments.add(attachment);
+				else
 					throw new EbMSValidationException(EbMSMessageUtils.createError(reference.getHref(),Constants.EbMSErrorCode.MIME_PROBLEM.errorCode(),"MIME part not found."));
 			}
 			else
 				throw new EbMSValidationException(EbMSMessageUtils.createError("//Body/Manifest/Reference[@href='" + reference.getHref() + "']",Constants.EbMSErrorCode.MIME_PROBLEM.errorCode(),"URI cannot be resolved."));
 		}
+		message.getAttachments().retainAll(attachments);
+	}
+
+	private EbMSAttachment findAttachment(List<EbMSAttachment> attachments, String href)
+	{
+		for (EbMSAttachment attachment : attachments)
+			if (href.substring(Constants.CID.length()).equals(attachment.getContentId()))
+				return attachment;
+		return null;
 	}
 }
