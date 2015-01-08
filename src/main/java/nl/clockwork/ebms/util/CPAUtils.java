@@ -361,8 +361,8 @@ public class CPAUtils
 	public static boolean isSigned(PartyInfo partyInfo, String role, Service service, String action)
 	{
 		CanSend canSend = getCanSend(partyInfo,role,service,action);
-		//DocExchange docExchange = getDocExchange(getFromDeliveryChannel(partyInfo,role,service,action));
-		return canSend.getThisPartyActionBinding().getBusinessTransactionCharacteristics().isIsNonRepudiationRequired() /*&& docExchange.getEbXMLSenderBinding() != null && docExchange.getEbXMLSenderBinding().getSenderNonRepudiation() != null*/;
+		DocExchange docExchange = getDocExchange(getFromDeliveryChannel(partyInfo,role,service,action));
+		return canSend.getThisPartyActionBinding().getBusinessTransactionCharacteristics().isIsNonRepudiationRequired() && docExchange.getEbXMLSenderBinding() != null && docExchange.getEbXMLSenderBinding().getSenderNonRepudiation() != null;
 	}
 
 	public static DeliveryChannel getDefaultDeliveryChannel(PartyInfo partyInfo)
@@ -419,8 +419,7 @@ public class CPAUtils
 		DocExchange docExchange = getDocExchange(deliveryChannel);
 		//if (docExchange.getEbXMLSenderBinding() != null && docExchange.getEbXMLSenderBinding().getSenderNonRepudiation() != null && docExchange.getEbXMLSenderBinding().getSenderNonRepudiation().getHashFunction() != null)
 		{
-			SenderNonRepudiation senderNonRepudiation = docExchange.getEbXMLSenderBinding().getSenderNonRepudiation();
-			return senderNonRepudiation.getHashFunction();
+			return docExchange.getEbXMLSenderBinding().getSenderNonRepudiation().getHashFunction();
 		}
 		//return null;
 	}
