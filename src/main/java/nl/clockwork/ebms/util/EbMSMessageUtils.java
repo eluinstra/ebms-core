@@ -272,7 +272,7 @@ public class EbMSMessageUtils
 	public static MessageHeader createMessageHeader(CollaborationProtocolAgreement cpa, MessageHeader messageHeader, GregorianCalendar timestamp, EbMSAction action) throws DatatypeConfigurationException, JAXBException
 	{
 		PartyInfo partyInfo = CPAUtils.getPartyInfo(cpa,messageHeader.getTo().getPartyId());
-		DeliveryChannel deliveryChannel = CPAUtils.getDefaultDeliveryChannel(partyInfo);
+		DeliveryChannel deliveryChannel = CPAUtils.getDefaultDeliveryChannel(partyInfo,action.action());
 		String hostname = CPAUtils.getHostname(deliveryChannel);
 
 		MessageHeader result = XMLMessageBuilder.deepCopy(messageHeader);

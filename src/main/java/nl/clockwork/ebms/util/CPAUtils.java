@@ -313,15 +313,18 @@ public class CPAUtils
 		return result;
 	}
 
+	public static DeliveryChannel getDefaultDeliveryChannel(PartyInfo partyInfo, String action)
+	{
+		for (OverrideMshActionBinding overrideMshActionBinding : partyInfo.getOverrideMshActionBinding())
+			if (overrideMshActionBinding.getAction().equals(action))
+				return (DeliveryChannel)overrideMshActionBinding.getChannelId();
+		return (DeliveryChannel)partyInfo.getDefaultMshChannelId();
+	}
+
 	public static DeliveryChannel getFromDeliveryChannel(PartyInfo partyInfo, String role, Service service, String action)
 	{
 		if (Constants.EBMS_SERVICE_URI.equals(service.getValue()))
-		{
-			for (OverrideMshActionBinding overrideMshActionBinding : partyInfo.getOverrideMshActionBinding())
-				if (overrideMshActionBinding.getAction().equals(action))
-					return (DeliveryChannel)overrideMshActionBinding.getChannelId();
-			return (DeliveryChannel)partyInfo.getDefaultMshChannelId();
-		}
+			return getDefaultDeliveryChannel(partyInfo,action);
 		else
 		{
 			ServiceBinding serviceBinding = getServiceBinding(partyInfo, role, service);
@@ -336,12 +339,7 @@ public class CPAUtils
 	public static DeliveryChannel getToDeliveryChannel(PartyInfo partyInfo, String role, Service service, String action)
 	{
 		if (Constants.EBMS_SERVICE_URI.equals(service.getValue()))
-		{
-			for (OverrideMshActionBinding overrideMshActionBinding : partyInfo.getOverrideMshActionBinding())
-				if (overrideMshActionBinding.getAction().equals(action))
-					return (DeliveryChannel)overrideMshActionBinding.getChannelId();
-			return (DeliveryChannel)partyInfo.getDefaultMshChannelId();
-		}
+			return getDefaultDeliveryChannel(partyInfo,action);
 		else
 		{
 			ServiceBinding serviceBinding = getServiceBinding(partyInfo,role,service);
@@ -353,23 +351,6 @@ public class CPAUtils
 		return null;
 	}
 	
-	public static Packaging getPackaging(CanSend canSend)
-	{
-		return (Packaging)canSend.getThisPartyActionBinding().getPackageId();
-	}
-
-	public static boolean isSigned(PartyInfo partyInfo, String role, Service service, String action)
-	{
-		CanSend canSend = getCanSend(partyInfo,role,service,action);
-		DocExchange docExchange = getDocExchange(getFromDeliveryChannel(partyInfo,role,service,action));
-		return canSend.getThisPartyActionBinding().getBusinessTransactionCharacteristics().isIsNonRepudiationRequired() && docExchange.getEbXMLSenderBinding() != null && docExchange.getEbXMLSenderBinding().getSenderNonRepudiation() != null;
-	}
-
-	public static DeliveryChannel getDefaultDeliveryChannel(PartyInfo partyInfo)
-	{
-		return (DeliveryChannel)partyInfo.getDefaultMshChannelId();
-	}
-
 	public static DeliveryChannel getDeliveryChannel(ActionBindingType bindingType)
 	{
 		return (DeliveryChannel)((JAXBElement<Object>)bindingType.getChannelId().get(0)).getValue();
@@ -388,6 +369,18 @@ public class CPAUtils
 		return (DocExchange)deliveryChannel.getDocExchangeId();
 	}
 	
+	public static Packaging getPackaging(CanSend canSend)
+	{
+		return (Packaging)canSend.getThisPartyActionBinding().getPackageId();
+	}
+
+	public static boolean isSigned(PartyInfo partyInfo, String role, Service service, String action)
+	{
+		CanSend canSend = getCanSend(partyInfo,role,service,action);
+		DocExchange docExchange = getDocExchange(getFromDeliveryChannel(partyInfo,role,service,action));
+		return canSend.getThisPartyActionBinding().getBusinessTransactionCharacteristics().isIsNonRepudiationRequired() && docExchange.getEbXMLSenderBinding() != null && docExchange.getEbXMLSenderBinding().getSenderNonRepudiation() != null;
+	}
+
 	public static boolean isReliableMessaging(CollaborationProtocolAgreement cpa, DeliveryChannel deliveryChannel)
 	{
 		return !PerMessageCharacteristicsType.NEVER.equals((deliveryChannel.getMessagingCharacteristics().getAckRequested())) /*&& ((DocExchange)deliveryChannel.getDocExchangeId()).getEbXMLSenderBinding() != null && ((DocExchange)deliveryChannel.getDocExchangeId()).getEbXMLSenderBinding().getReliableMessaging() != null*/;
@@ -445,9 +438,7 @@ public class CPAUtils
 	{
 		try
 		{
-			String uri = CPAUtils.getUri(deliveryChannel);
-			URL url = new URL(uri);
-			return url.getHost();
+			return new URL(CPAUtils.getUri(deliveryChannel)).getHost();
 		}
 		catch (MalformedURLException e)
 		{
