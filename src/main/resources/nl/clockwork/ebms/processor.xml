@@ -29,7 +29,6 @@
 		<property name="deliveryManager" ref="deliveryManager"></property>
 		<property name="ebMSDAO" ref="ebMSDAO"/>
 		<property name="signatureGenerator" ref="signatureGenerator"/>
-		<property name="validateDataSources" value="${ebms.validatePackaging}"/>
 	</bean>
 
 	<bean id="deliveryManager" class="nl.clockwork.ebms.client.DeliveryManager" init-method="init">
@@ -56,7 +55,6 @@
 		<property name="eventListener" ref="eventListener"/>
 		<property name="ebMSDAO" ref="ebMSDAO"/>
 		<property name="signatureValidator" ref="signatureValidator"/>
-		<property name="validateAttachment" value="${ebms.validatePackaging}"/>
 	</bean-->
 
 	<bean id="messageProcessor" class="nl.clockwork.ebms.processor.EbMSMessageProcessorX" init-method="init">
@@ -65,7 +63,6 @@
 		<property name="ebMSDAO" ref="ebMSDAO"/>
 		<property name="signatureGenerator" ref="signatureGenerator"/>
 		<property name="signatureValidator" ref="signatureValidator"/>
-		<property name="validateAttachment" value="${ebms.validatePackaging}"/>
 	</bean>
 
 	<bean id="signatureValidator" class="nl.clockwork.ebms.signature.EbMSSignatureValidator">

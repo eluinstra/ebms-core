@@ -57,11 +57,10 @@ public class EbMSMessageServiceImpl implements EbMSMessageService
 	private EbMSDAO ebMSDAO;
 	private EbMSMessageContentValidator ebMSMessageContentValidator;
 	private EbMSSignatureGenerator signatureGenerator;
-  private boolean validateDataSources;
 
   public void init()
   {
-		ebMSMessageContentValidator = new EbMSMessageContentValidator(ebMSDAO,validateDataSources);
+		ebMSMessageContentValidator = new EbMSMessageContentValidator(ebMSDAO);
   }
   
 	@Override
@@ -246,8 +245,4 @@ public class EbMSMessageServiceImpl implements EbMSMessageService
 		this.signatureGenerator = signatureGenerator;
 	}
 
-	public void setValidateDataSources(boolean validateDataSources)
-	{
-		this.validateDataSources = validateDataSources;
-	}
 }

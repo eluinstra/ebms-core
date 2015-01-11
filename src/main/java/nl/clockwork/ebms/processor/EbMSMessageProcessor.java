@@ -45,7 +45,6 @@ import nl.clockwork.ebms.signature.EbMSSignatureGenerator;
 import nl.clockwork.ebms.signature.EbMSSignatureValidator;
 import nl.clockwork.ebms.util.CPAUtils;
 import nl.clockwork.ebms.util.EbMSMessageUtils;
-import nl.clockwork.ebms.validation.AttachmentValidator;
 import nl.clockwork.ebms.validation.CPAValidator;
 import nl.clockwork.ebms.validation.EbMSValidationException;
 import nl.clockwork.ebms.validation.ManifestValidator;
@@ -79,9 +78,7 @@ public class EbMSMessageProcessor
   protected CPAValidator cpaValidator;
   protected MessageHeaderValidator messageHeaderValidator;
   protected ManifestValidator manifestValidator;
-  protected AttachmentValidator attachmentValidator;
   protected SignatureTypeValidator signatureTypeValidator;
-  protected boolean validateAttachment;
   protected Service mshMessageService;
   
 	public void init()
@@ -98,13 +95,6 @@ public class EbMSMessageProcessor
 		messageHeaderValidator = new MessageHeaderValidator(ebMSDAO);
 		messageHeaderValidator.setAckSignatureRequested(PerMessageCharacteristicsType.NEVER);
 		manifestValidator = new ManifestValidator();
-		attachmentValidator = validateAttachment ? new AttachmentValidator() : new AttachmentValidator()
-		{
-			@Override
-			public void validate(CollaborationProtocolAgreement cpa, EbMSMessage message) throws EbMSValidationException
-			{
-			}
-		};
 		signatureTypeValidator = new SignatureTypeValidator(signatureValidator);
 		mshMessageService = new Service();
 		mshMessageService.setValue(Constants.EBMS_SERVICE_URI);
@@ -262,7 +252,6 @@ public class EbMSMessageProcessor
 				messageHeaderValidator.validate(cpa,message,timestamp);
 				signatureTypeValidator.validate(cpa,message);
 				manifestValidator.validate(message);
-				attachmentValidator.validate(cpa,message);
 				signatureTypeValidator.validateSignature(cpa,message);
 				if (message.getAckRequested() == null)
 				{
@@ -421,8 +410,4 @@ public class EbMSMessageProcessor
 		this.signatureValidator = signatureValidator;
 	}
 
-	public void setValidateAttachment(boolean validateAttachment)
-	{
-		this.validateAttachment = validateAttachment;
-	}
 }

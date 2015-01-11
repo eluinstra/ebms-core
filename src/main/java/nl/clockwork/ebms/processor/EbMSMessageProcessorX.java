@@ -38,9 +38,7 @@ import nl.clockwork.ebms.model.EbMSMessage;
 import nl.clockwork.ebms.signature.EbMSSignatureGenerator;
 import nl.clockwork.ebms.util.CPAUtils;
 import nl.clockwork.ebms.util.EbMSMessageUtils;
-import nl.clockwork.ebms.validation.AttachmentValidator;
 import nl.clockwork.ebms.validation.CPAValidator;
-import nl.clockwork.ebms.validation.EbMSValidationException;
 import nl.clockwork.ebms.validation.ManifestValidator;
 import nl.clockwork.ebms.validation.MessageHeaderValidator;
 import nl.clockwork.ebms.validation.SignatureTypeValidator;
@@ -65,13 +63,6 @@ public class EbMSMessageProcessorX extends EbMSMessageProcessor
 		cpaValidator = new CPAValidator();
 		messageHeaderValidator = new MessageHeaderValidator(ebMSDAO);
 		manifestValidator = new ManifestValidator();
-		attachmentValidator = validateAttachment ? new AttachmentValidator() : new AttachmentValidator()
-		{
-			@Override
-			public void validate(CollaborationProtocolAgreement cpa, EbMSMessage message) throws EbMSValidationException
-			{
-			}
-		};
 		signatureTypeValidator = new SignatureTypeValidator(signatureValidator);
 		mshMessageService = new Service();
 		mshMessageService.setValue(Constants.EBMS_SERVICE_URI);

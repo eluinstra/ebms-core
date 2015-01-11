@@ -1,6 +1,8 @@
-/ validate packaging
+- store manifest orderNr or use Manifest order
+- add views for ebms_message and ebms_event
 / manual
 / web adapter
+- define default retry periods and times
 
 - write mime message
 	- add encryption (s/mime)
@@ -18,6 +20,19 @@
 - improve detection of signing etc. in CPA
 - improve CPA validation concerning signing etc.
 - use try with resources statement on AutoClosable resources
+
+nice to have features:
+- add endpoint type support (now only allPurpose endpoint type is supported):
+	- add messageType to MessageContext to determine endpoint type to use
+	- parse incoming url to determine endpoint type used
+- add ackRequested perMessage support (now if ackRequested is perMessage, then no ack is requested)
+	- add ackRequested to MessageContext to determine if request is needs ack
+- improve Manifest validation and Attachment storage:
+	- allow url as href?
+		- store url as attachment
+	- store optional manifest description and schema with attachment???
+- implement Packaging
+
 
 2.4:
 - improve CPA validation
