@@ -25,6 +25,8 @@ import nl.clockwork.ebms.util.EbMSMessageUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CollaborationProtocolAgreement;
+import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.PartyInfo;
+import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.Transport;
 
 public class CPAValidator
 {
@@ -55,11 +57,16 @@ public class CPAValidator
 		if (Calendar.getInstance().compareTo(cpa.getEnd().toGregorianCalendar()) > 0)
 			throw new ValidationException("CPA expired on " + cpa.getEnd());
 		if (cpa.getConversationConstraints() != null)
-			//throw new ValidationException("CPA Conversation Constraints not supported!");
-			logger.warn("CPA Conversation Constraints not supported!");
+			//throw new ValidationException("CPA Conversation Constraints not implemented!");
+			logger.warn("CPA Conversation Constraints not implemented!");
 		if (cpa.getSignature() != null)
-			//throw new ValidationException("CPA Signature not supported!");
-			logger.warn("CPA Signature not supported!");
+			//throw new ValidationException("CPA Signature not implemented!");
+			logger.warn("CPA Signature not implemented!");
+		if (cpa.getPackaging() != null && cpa.getPackaging().size() > 0)
+			//throw new ValidationException("Packaging not implemented!");
+			logger.warn("Packaging not implemented!");
+			
+		validateEndpoints(cpa);
 		
 		//syncReply mode signalsAndResponse not supported?
 		//syncReply mode responseOnly not supported?
@@ -71,6 +78,17 @@ public class CPAValidator
 		//encryption not supported
 		//MessageOrder not supported
 		//Packaging.ComponentList.Encapsulation
+	}
+
+	private void validateEndpoints(CollaborationProtocolAgreement cpa)
+	{
+		for (PartyInfo partyInfo : cpa.getPartyInfo())
+			for (Transport transport : partyInfo.getTransport())
+				if (transport.getTransportReceiver().getEndpoint().size() > 1)
+				{
+					logger.warn("Multiple endpoints not supported! Using first endpoint.");
+					return;
+				}
 	}
 	
 }
