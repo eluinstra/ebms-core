@@ -42,7 +42,7 @@ import nl.clockwork.ebms.model.Party;
 import nl.clockwork.ebms.processor.EbMSProcessorException;
 import nl.clockwork.ebms.signature.EbMSSignatureGenerator;
 import nl.clockwork.ebms.util.CPAUtils;
-import nl.clockwork.ebms.util.EbMSMessageContentValidator;
+import nl.clockwork.ebms.util.EbMSMessageContextValidator;
 import nl.clockwork.ebms.util.EbMSMessageUtils;
 
 import org.apache.commons.logging.Log;
@@ -55,12 +55,12 @@ public class EbMSMessageServiceImpl implements EbMSMessageService
   protected transient Log logger = LogFactory.getLog(getClass());
 	private DeliveryManager deliveryManager;
 	private EbMSDAO ebMSDAO;
-	private EbMSMessageContentValidator ebMSMessageContentValidator;
+	private EbMSMessageContextValidator ebMSMessageContextValidator;
 	private EbMSSignatureGenerator signatureGenerator;
 
   public void init()
   {
-		ebMSMessageContentValidator = new EbMSMessageContentValidator(ebMSDAO);
+		ebMSMessageContextValidator = new EbMSMessageContextValidator(ebMSDAO);
   }
   
 	@Override
@@ -90,7 +90,7 @@ public class EbMSMessageServiceImpl implements EbMSMessageService
 	{
 		try
 		{
-			ebMSMessageContentValidator.validate(messageContent);
+			ebMSMessageContextValidator.validate(messageContent.getContext());
 			final CollaborationProtocolAgreement cpa = ebMSDAO.getCPA(messageContent.getContext().getCpaId());
 			//TODO ebMSMessageContentToEbMSDocument
 			final EbMSMessage message = EbMSMessageUtils.ebMSMessageContentToEbMSMessage(cpa,messageContent);
