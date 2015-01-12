@@ -373,14 +373,15 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	}
 
 	@Override
-	public EbMSMessage getMessage(final long id) throws DAOException
+	public EbMSMessage getSentMessage(final long id) throws DAOException
 	{
 		try
 		{
 			return jdbcTemplate.queryForObject(
 				"select id, service, action, signature, message_header, ack_requested, content" + 
 				" from ebms_message" + 
-				" where id = ?",
+				" where id = ?" +
+				" and (status is null or status = " + EbMSMessageStatus.SENT.id() + ")",
 				new EbMSMessageParameterizedRowMapper(),
 				id
 			);

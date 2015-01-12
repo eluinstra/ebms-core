@@ -45,7 +45,7 @@ public interface EbMSDAO
 	Long getMessageId(String refToMessageId, Service service, String...actions) throws DAOException;
 	EbMSMessage getMessage(String refToMessageId, Service service, String...actions) throws DAOException;
 	MessageHeader getMessageHeader(String messageId) throws DAOException;
-	EbMSMessage getMessage(long id) throws DAOException;
+	EbMSMessage getSentMessage(long id) throws DAOException;
 	EbMSMessageStatus getMessageStatus(String messageId) throws DAOException;
 
 	List<EbMSEvent> getLatestEventsByEbMSMessageIdBefore(Date timestamp, EbMSEventStatus status) throws DAOException;

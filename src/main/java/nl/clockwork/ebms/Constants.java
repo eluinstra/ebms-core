@@ -84,7 +84,7 @@ public class Constants
 
   public static enum EbMSEventType
   {
-		SEND(0), EXPIRE(1), ACKNOWLEDGE(2), FAIL(3);
+		SEND(0), EXPIRE(1);
 
 		private final int id;
 

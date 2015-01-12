@@ -62,17 +62,22 @@ public class EbMSEventsProcessor implements Job
 		{
 			try
 			{
-				EbMSMessage message = ebMSDAO.getMessage(event.getEbMSMessageId());
-				CollaborationProtocolAgreement cpa = ebMSDAO.getCPA(message.getMessageHeader().getCPAId());
-				if (cpa == null)
-					throw new EbMSProcessingException("CPA " + message.getMessageHeader().getCPAId() + " not found!");
-				EbMSDocument requestDocument = new EbMSDocument(EbMSMessageUtils.createSOAPMessage(message),message.getAttachments());
-				signatureGenerator.generate(cpa,requestDocument,message.getMessageHeader());
-				String uri = CPAUtils.getUri(cpa,message);
-				logger.info("Sending message " + message.getMessageHeader().getMessageData().getMessageId() + " to " + uri);
-				EbMSDocument responseDocument = ebMSClient.sendMessage(uri,requestDocument);
-				messageProcessor.processResponse(requestDocument,responseDocument);
-				updateEvent(event,EbMSEventStatus.PROCESSED,null);
+				EbMSMessage message = ebMSDAO.getSentMessage(event.getEbMSMessageId());
+				if (message != null)
+				{
+					CollaborationProtocolAgreement cpa = ebMSDAO.getCPA(message.getMessageHeader().getCPAId());
+					if (cpa == null)
+						throw new EbMSProcessingException("CPA " + message.getMessageHeader().getCPAId() + " not found!");
+					EbMSDocument requestDocument = new EbMSDocument(EbMSMessageUtils.createSOAPMessage(message),message.getAttachments());
+					signatureGenerator.generate(cpa,requestDocument,message.getMessageHeader());
+					String uri = CPAUtils.getUri(cpa,message);
+					logger.info("Sending message " + message.getMessageHeader().getMessageData().getMessageId() + " to " + uri);
+					EbMSDocument responseDocument = ebMSClient.sendMessage(uri,requestDocument);
+					messageProcessor.processResponse(requestDocument,responseDocument);
+					updateEvent(event,EbMSEventStatus.PROCESSED,null);
+				}
+				else
+					ebMSDAO.deleteEvents(event.getEbMSMessageId(),EbMSEventStatus.UNPROCESSED);
 			}
 			catch (EbMSResponseException e)
 			{
@@ -107,86 +112,16 @@ public class EbMSEventsProcessor implements Job
 						@Override
 						public void doInTransaction()
 						{
-							EbMSMessage message = ebMSDAO.getMessage(event.getEbMSMessageId());
-							updateEvent(event,EbMSEventStatus.PROCESSED,null);
-							ebMSDAO.deleteEvents(event.getEbMSMessageId(),EbMSEventStatus.UNPROCESSED);
-							ebMSDAO.updateMessageStatus(event.getEbMSMessageId(),EbMSMessageStatus.SENT,EbMSMessageStatus.DELIVERY_FAILED);
-							eventListener.onMessageNotAcknowledged(message.getMessageHeader().getMessageData().getMessageId());
-						}
-					}
-				);
-			}
-			catch (Exception e)
-			{
-				logger.error("",e);
-			}
-		}
-	}
-
-	//QUICKFIX possible database locks
-	private class AcknowledgeEventJob implements Runnable
-	{
-		private EbMSEvent event;
-		
-		public AcknowledgeEventJob(EbMSEvent event)
-		{
-			this.event = event;
-		}
-
-		@Override
-		public void run()
-		{
-			try
-			{
-				ebMSDAO.executeTransaction(
-					new DAOTransactionCallback()
-					{
-						@Override
-						public void doInTransaction()
-						{
-							EbMSMessage message = ebMSDAO.getMessage(event.getEbMSMessageId());
-							updateEvent(event,EbMSEventStatus.PROCESSED,null);
-							ebMSDAO.deleteEvents(event.getEbMSMessageId(),EbMSEventStatus.UNPROCESSED);
-							ebMSDAO.updateMessageStatus(event.getEbMSMessageId(),EbMSMessageStatus.SENT,EbMSMessageStatus.DELIVERED);
-							eventListener.onMessageAcknowledged(message.getMessageHeader().getMessageData().getMessageId());
-						}
-					}
-				);
-			}
-			catch (Exception e)
-			{
-				logger.error("",e);
-			}
-		}
-	}
-
-	//QUICKFIX possible database locks
-	private class FailEventJob implements Runnable
-	{
-		private EbMSEvent event;
-		
-		public FailEventJob(EbMSEvent event)
-		{
-			this.event = event;
-		}
-
-		@Override
-		public void run()
-		{
-			try
-			{
-				ebMSDAO.executeTransaction(
-					new DAOTransactionCallback()
-					{
-						@Override
-						public void doInTransaction()
-						{
-							EbMSMessage message = ebMSDAO.getMessage(event.getEbMSMessageId());
-							logger.info("Fail message " +  message.getMessageHeader().getMessageData().getMessageId());
-							updateEvent(event,EbMSEventStatus.PROCESSED,null);
-							ebMSDAO.deleteEvents(event.getEbMSMessageId(),EbMSEventStatus.UNPROCESSED);
-							ebMSDAO.updateMessageStatus(event.getEbMSMessageId(),EbMSMessageStatus.SENT,EbMSMessageStatus.DELIVERY_ERROR);
-							eventListener.onMessageDeliveryFailed(message.getMessageHeader().getMessageData().getMessageId());
+							EbMSMessage message = ebMSDAO.getSentMessage(event.getEbMSMessageId());
+							if (message != null)
+							{
+								updateEvent(event,EbMSEventStatus.PROCESSED,null);
+								ebMSDAO.deleteEvents(event.getEbMSMessageId(),EbMSEventStatus.UNPROCESSED);
+								ebMSDAO.updateMessageStatus(event.getEbMSMessageId(),EbMSMessageStatus.SENT,EbMSMessageStatus.DELIVERY_FAILED);
+								eventListener.onMessageNotAcknowledged(message.getMessageHeader().getMessageData().getMessageId());
+							}
+							else
+								ebMSDAO.deleteEvents(event.getEbMSMessageId(),EbMSEventStatus.UNPROCESSED);
 						}
 					}
 				);
@@ -241,10 +176,6 @@ public class EbMSEventsProcessor implements Job
 	  		futures.add(executorService.submit(new SendEventJob(event)));
 			else if (EbMSEventType.EXPIRE.equals(event.getType()))
 	  		futures.add(executorService.submit(new ExpireEventJob(event)));
-			else if (EbMSEventType.ACKNOWLEDGE.equals(event.getType()))
-	  		futures.add(executorService.submit(new AcknowledgeEventJob(event)));
-			else if (EbMSEventType.FAIL.equals(event.getType()))
-	  		futures.add(executorService.submit(new FailEventJob(event)));
   	for (Future<?> future : futures)
 			try
 			{

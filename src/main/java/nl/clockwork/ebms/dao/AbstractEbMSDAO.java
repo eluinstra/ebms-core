@@ -462,7 +462,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	}
 
 	@Override
-	public EbMSMessage getMessage(long id) throws DAOException
+	public EbMSMessage getSentMessage(long id) throws DAOException
 	{
 		Connection c = null;
 		PreparedStatement ps = null;
@@ -473,7 +473,8 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 			ps = c.prepareStatement(
 				"select id, service, action, signature, message_header, ack_requested, content" + 
 				" from ebms_message" + 
-				" where id = ?"
+				" where id = ?" +
+				" and (status is null or status = " + EbMSMessageStatus.SENT.id() + ")"
 			);
 			ps.setLong(1,id);
 			if (ps.execute())

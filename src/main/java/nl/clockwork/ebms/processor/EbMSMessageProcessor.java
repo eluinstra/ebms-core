@@ -310,15 +310,11 @@ public class EbMSMessageProcessor
 						{
 							//QUICKFIX possible database locks
 							//ebMSDAO.deleteEvents(id,EbMSEventStatus.UNPROCESSED);
-							//ebMSDAO.updateMessageStatus(id,EbMSMessageStatus.SENT,status);
-							//if (status.equals(EbMSMessageStatus.DELIVERED))
-								//eventListener.onMessageAcknowledged(message.getMessageHeader().getMessageData().getRefToMessageId());
-							//else if (status.equals(EbMSMessageStatus.DELIVERY_ERROR))
-								//eventListener.onMessageDeliveryFailed(message.getMessageHeader().getMessageData().getRefToMessageId());
+							ebMSDAO.updateMessageStatus(id,EbMSMessageStatus.SENT,status);
 							if (status.equals(EbMSMessageStatus.DELIVERED))
-								ebMSDAO.insertEvent(id,EbMSEventType.ACKNOWLEDGE);
+								eventListener.onMessageAcknowledged(message.getMessageHeader().getMessageData().getRefToMessageId());
 							else if (status.equals(EbMSMessageStatus.DELIVERY_ERROR))
-								ebMSDAO.insertEvent(id,EbMSEventType.FAIL);
+								eventListener.onMessageDeliveryFailed(message.getMessageHeader().getMessageData().getRefToMessageId());
 						}
 					}
 				}
