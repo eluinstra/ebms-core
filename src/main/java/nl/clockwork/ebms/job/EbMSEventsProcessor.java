@@ -148,7 +148,7 @@ public class EbMSEventsProcessor implements Job
 							updateEvent(event,EbMSEventStatus.PROCESSED,null);
 							ebMSDAO.deleteEvents(event.getEbMSMessageId(),EbMSEventStatus.UNPROCESSED);
 							ebMSDAO.updateMessageStatus(event.getEbMSMessageId(),EbMSMessageStatus.SENT,EbMSMessageStatus.DELIVERED);
-							eventListener.onMessageAcknowledged(message.getMessageHeader().getMessageData().getRefToMessageId());
+							eventListener.onMessageAcknowledged(message.getMessageHeader().getMessageData().getMessageId());
 						}
 					}
 				);
@@ -186,7 +186,7 @@ public class EbMSEventsProcessor implements Job
 							updateEvent(event,EbMSEventStatus.PROCESSED,null);
 							ebMSDAO.deleteEvents(event.getEbMSMessageId(),EbMSEventStatus.UNPROCESSED);
 							ebMSDAO.updateMessageStatus(event.getEbMSMessageId(),EbMSMessageStatus.SENT,EbMSMessageStatus.DELIVERY_ERROR);
-							eventListener.onMessageDeliveryFailed(message.getMessageHeader().getMessageData().getRefToMessageId());
+							eventListener.onMessageDeliveryFailed(message.getMessageHeader().getMessageData().getMessageId());
 						}
 					}
 				);
