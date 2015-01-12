@@ -108,7 +108,6 @@ public class EbMSEventsProcessor implements Job
 						public void doInTransaction()
 						{
 							EbMSMessage message = ebMSDAO.getMessage(event.getEbMSMessageId());
-							logger.info("Expiring message " +  message.getMessageHeader().getMessageData().getMessageId());
 							updateEvent(event,EbMSEventStatus.PROCESSED,null);
 							ebMSDAO.deleteEvents(event.getEbMSMessageId(),EbMSEventStatus.UNPROCESSED);
 							ebMSDAO.updateMessageStatus(event.getEbMSMessageId(),EbMSMessageStatus.SENT,EbMSMessageStatus.DELIVERY_FAILED);
@@ -122,10 +121,84 @@ public class EbMSEventsProcessor implements Job
 				logger.error("",e);
 			}
 		}
-		
 	}
 
-  protected transient Log logger = LogFactory.getLog(getClass());
+	//QUICKFIX possible database locks
+	private class AcknowledgeEventJob implements Runnable
+	{
+		private EbMSEvent event;
+		
+		public AcknowledgeEventJob(EbMSEvent event)
+		{
+			this.event = event;
+		}
+
+		@Override
+		public void run()
+		{
+			try
+			{
+				ebMSDAO.executeTransaction(
+					new DAOTransactionCallback()
+					{
+						@Override
+						public void doInTransaction()
+						{
+							EbMSMessage message = ebMSDAO.getMessage(event.getEbMSMessageId());
+							updateEvent(event,EbMSEventStatus.PROCESSED,null);
+							ebMSDAO.deleteEvents(event.getEbMSMessageId(),EbMSEventStatus.UNPROCESSED);
+							ebMSDAO.updateMessageStatus(event.getEbMSMessageId(),EbMSMessageStatus.SENT,EbMSMessageStatus.DELIVERED);
+							eventListener.onMessageAcknowledged(message.getMessageHeader().getMessageData().getRefToMessageId());
+						}
+					}
+				);
+			}
+			catch (Exception e)
+			{
+				logger.error("",e);
+			}
+		}
+	}
+
+	//QUICKFIX possible database locks
+	private class FailEventJob implements Runnable
+	{
+		private EbMSEvent event;
+		
+		public FailEventJob(EbMSEvent event)
+		{
+			this.event = event;
+		}
+
+		@Override
+		public void run()
+		{
+			try
+			{
+				ebMSDAO.executeTransaction(
+					new DAOTransactionCallback()
+					{
+						@Override
+						public void doInTransaction()
+						{
+							EbMSMessage message = ebMSDAO.getMessage(event.getEbMSMessageId());
+							logger.info("Fail message " +  message.getMessageHeader().getMessageData().getMessageId());
+							updateEvent(event,EbMSEventStatus.PROCESSED,null);
+							ebMSDAO.deleteEvents(event.getEbMSMessageId(),EbMSEventStatus.UNPROCESSED);
+							ebMSDAO.updateMessageStatus(event.getEbMSMessageId(),EbMSMessageStatus.SENT,EbMSMessageStatus.DELIVERY_ERROR);
+							eventListener.onMessageDeliveryFailed(message.getMessageHeader().getMessageData().getRefToMessageId());
+						}
+					}
+				);
+			}
+			catch (Exception e)
+			{
+				logger.error("",e);
+			}
+		}
+	}
+
+	protected transient Log logger = LogFactory.getLog(getClass());
   private ExecutorService executorService;
   private Integer maxThreads;
 	private Integer processorsScaleFactor;
@@ -168,6 +241,10 @@ public class EbMSEventsProcessor implements Job
 	  		futures.add(executorService.submit(new SendEventJob(event)));
 			else if (EbMSEventType.EXPIRE.equals(event.getType()))
 	  		futures.add(executorService.submit(new ExpireEventJob(event)));
+			else if (EbMSEventType.ACKNOWLEDGE.equals(event.getType()))
+	  		futures.add(executorService.submit(new AcknowledgeEventJob(event)));
+			else if (EbMSEventType.FAIL.equals(event.getType()))
+	  		futures.add(executorService.submit(new FailEventJob(event)));
   	for (Future<?> future : futures)
 			try
 			{

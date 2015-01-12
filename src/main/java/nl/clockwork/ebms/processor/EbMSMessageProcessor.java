@@ -29,7 +29,6 @@ import javax.xml.xpath.XPathExpressionException;
 
 import nl.clockwork.ebms.Constants;
 import nl.clockwork.ebms.Constants.EbMSAction;
-import nl.clockwork.ebms.Constants.EbMSEventStatus;
 import nl.clockwork.ebms.Constants.EbMSEventType;
 import nl.clockwork.ebms.Constants.EbMSMessageStatus;
 import nl.clockwork.ebms.EventListener;
@@ -309,12 +308,17 @@ public class EbMSMessageProcessor
 						Long id = ebMSDAO.getMessageId(message.getMessageHeader().getMessageData().getRefToMessageId());
 						if (id != null)
 						{
-							ebMSDAO.deleteEvents(id,EbMSEventStatus.UNPROCESSED);
-							ebMSDAO.updateMessageStatus(id,EbMSMessageStatus.SENT,status);
+							//QUICKFIX possible database locks
+							//ebMSDAO.deleteEvents(id,EbMSEventStatus.UNPROCESSED);
+							//ebMSDAO.updateMessageStatus(id,EbMSMessageStatus.SENT,status);
+							//if (status.equals(EbMSMessageStatus.DELIVERED))
+								//eventListener.onMessageAcknowledged(message.getMessageHeader().getMessageData().getRefToMessageId());
+							//else if (status.equals(EbMSMessageStatus.DELIVERY_ERROR))
+								//eventListener.onMessageDeliveryFailed(message.getMessageHeader().getMessageData().getRefToMessageId());
 							if (status.equals(EbMSMessageStatus.DELIVERED))
-								eventListener.onMessageAcknowledged(message.getMessageHeader().getMessageData().getRefToMessageId());
+								ebMSDAO.insertEvent(id,EbMSEventType.ACKNOWLEDGE);
 							else if (status.equals(EbMSMessageStatus.DELIVERY_ERROR))
-								eventListener.onMessageDeliveryFailed(message.getMessageHeader().getMessageData().getRefToMessageId());
+								ebMSDAO.insertEvent(id,EbMSEventType.FAIL);
 						}
 					}
 				}
