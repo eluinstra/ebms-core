@@ -33,10 +33,8 @@ CREATE TABLE ebms_message
 	time_to_live			TIMESTAMP				NULL,
 	from_role					VARCHAR(256)		NULL,
 	to_role						VARCHAR(256)		NULL,
-	service_type			VARCHAR(256)		NULL,
 	service						VARCHAR(256)		NOT NULL,
 	action						VARCHAR(256)		NOT NULL,
-	original					CLOB						NULL,
 	signature					CLOB						NULL,
 	message_header		CLOB						NOT NULL,
 	sync_reply				CLOB						NULL,
@@ -44,11 +42,12 @@ CREATE TABLE ebms_message
 	ack_requested			CLOB						NULL,
 	content						CLOB						NULL,
 	status						INTEGER					NULL,
-	status_time				TIMESTAMP				NULL,
-	UNIQUE (message_id,message_nr)
+	status_time				TIMESTAMP				NULL
 );
 
---ALTER TABLE ebms_message ADD CONSTRAINT uc_ebms_message_id UNIQUE (message_id);
+--ALTER TABLE ebms_message ADD CONSTRAINT uc_ebms_message_id UNIQUE (message_id,message_nr);
+
+--CREATE INDEX i_ebms_message ON ebms_message (cpa_id,status,message_nr);
 
 CREATE TABLE ebms_attachment
 (
@@ -60,6 +59,8 @@ CREATE TABLE ebms_attachment
 	FOREIGN KEY (ebms_message_id) REFERENCES ebms_message(id)
 );
 
+--ALTER TABLE ebms_attachment ADD CONSTRAINT uc_ebms_attachment UNIQUE (ebms_message_id,content_id);
+
 CREATE TABLE ebms_event
 (
 	ebms_message_id		INTEGER					NOT NULL,
@@ -68,6 +69,9 @@ CREATE TABLE ebms_event
 	status						INTEGER					DEFAULT 0 NOT NULL,
 	status_time				TIMESTAMP				DEFAULT NOW() NOT NULL,
 	error_message			CLOB						NULL,
-	FOREIGN KEY (ebms_message_id) REFERENCES ebms_message(id),
-	UNIQUE (ebms_message_id,time)
+	FOREIGN KEY (ebms_message_id) REFERENCES ebms_message(id)
 );
+
+--ALTER TABLE ebms_event ADD CONSTRAINT uc_ebms_event UNIQUE (ebms_message_id,time);
+
+--CREATE INDEX i_ebms_event ON ebms_event (status);
