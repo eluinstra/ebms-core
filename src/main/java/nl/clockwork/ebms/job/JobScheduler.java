@@ -40,8 +40,15 @@ public class JobScheduler
 				@Override
 				public void run()
 				{
-					logger.debug("Executing job " + job.getClass());
-					job.execute();
+					try
+					{
+						logger.debug("Executing job " + job.getClass());
+						job.execute();
+					}
+					catch (Exception e)
+					{
+						logger.error("",e);
+					}
 				}
 			},
 			delay,
