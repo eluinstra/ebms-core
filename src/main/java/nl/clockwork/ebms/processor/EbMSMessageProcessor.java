@@ -29,7 +29,6 @@ import javax.xml.xpath.XPathExpressionException;
 
 import nl.clockwork.ebms.Constants;
 import nl.clockwork.ebms.Constants.EbMSAction;
-import nl.clockwork.ebms.Constants.EbMSEventStatus;
 import nl.clockwork.ebms.Constants.EbMSEventType;
 import nl.clockwork.ebms.Constants.EbMSMessageStatus;
 import nl.clockwork.ebms.client.DeliveryManager;
@@ -326,7 +325,7 @@ public class EbMSMessageProcessor
 					public void doInTransaction()
 					{
 						ebMSDAO.insertMessage(timestamp.getTime(),responseMessage,null);
-						ebMSDAO.deleteEvents(responseMessage.getMessageHeader().getMessageData().getRefToMessageId(),EbMSEventStatus.UNPROCESSED);
+						//ebMSDAO.deleteEvents(responseMessage.getMessageHeader().getMessageData().getRefToMessageId(),EbMSEventStatus.UNPROCESSED);
 						ebMSDAO.updateMessage(responseMessage.getMessageHeader().getMessageData().getRefToMessageId(),EbMSMessageStatus.SENT,status);
 						if (status.equals(EbMSMessageStatus.DELIVERED))
 							eventListener.onMessageAcknowledged(responseMessage.getMessageHeader().getMessageData().getRefToMessageId());
