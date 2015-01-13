@@ -31,6 +31,8 @@ CREATE TABLE ebms_message
 
 ALTER TABLE ebms_message ADD CONSTRAINT uc_ebms_message_id UNIQUE (message_id(255),message_nr);
 
+CREATE INDEX i_ebms_message ON ebms_message (cpa_id(255),status,message_nr);
+
 CREATE TABLE ebms_attachment
 (
 	ebms_message_id		INTEGER					NOT NULL,
@@ -53,3 +55,5 @@ CREATE TABLE ebms_event
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 ALTER TABLE ebms_event ADD CONSTRAINT uc_ebms_event UNIQUE (ebms_message_id,time);
+
+CREATE INDEX i_ebms_event ON ebms_event (status);
