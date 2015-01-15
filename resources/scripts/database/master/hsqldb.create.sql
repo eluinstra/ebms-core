@@ -24,6 +24,8 @@ CREATE TABLE ebms_message
 	PRIMARY KEY (message_id,message_nr)
 );
 
+CREATE INDEX i_ebms_message ON ebms_message (cpa_id,status,message_nr);
+
 CREATE TABLE ebms_attachment
 (
 	message_id				VARCHAR(256)		NOT NULL,
@@ -49,3 +51,5 @@ CREATE TABLE ebms_event
 );
 
 ALTER TABLE ebms_event ADD CONSTRAINT uc_ebms_event UNIQUE (message_id,time);
+
+CREATE INDEX i_ebms_event ON ebms_event (status);
