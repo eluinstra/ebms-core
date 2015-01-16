@@ -57,3 +57,5 @@ CREATE TABLE ebms_event
 );
 
 ALTER TABLE ebms_event ADD CONSTRAINT uc_ebms_event UNIQUE (message_id,time);
+
+CREATE INDEX i_ebms_event ON ebms_event (status);

@@ -54,3 +54,5 @@ CREATE TABLE ebms_event
 	error_message			TEXT						NULL,
 	CONSTRAINT uc_ebms_event UNIQUE (message_id,time)
 );
+
+CREATE INDEX i_ebms_event ON ebms_event (status);

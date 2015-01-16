@@ -60,3 +60,5 @@ CREATE TABLE ebms_event
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 ALTER TABLE ebms_event ADD CONSTRAINT uc_ebms_event UNIQUE (message_id(255),time);
+
+CREATE INDEX i_ebms_event ON ebms_event (status);
