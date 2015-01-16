@@ -937,20 +937,23 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 				"insert into ebms_attachment (" +
 					"message_id," +
 					"message_nr," +
+					"order_nr," +
 					"name," +
 					"content_id," +
 					"content_type," +
 					"content" +
 				") values (?,?,?,?,?,?)"
 			);
+			int orderNr = 0;
 			for (EbMSAttachment attachment : attachments)
 			{
 				ps.setString(1,messageId);
 				ps.setInt(2,messageNr);
-				ps.setString(3,attachment.getName());
-				ps.setString(4,attachment.getContentId());
-				ps.setString(5,attachment.getContentType().split(";")[0].trim());
-				ps.setBytes(6,IOUtils.toByteArray(attachment.getInputStream()));
+				ps.setInt(3,orderNr++);
+				ps.setString(4,attachment.getName());
+				ps.setString(5,attachment.getContentId());
+				ps.setString(6,attachment.getContentType().split(";")[0].trim());
+				ps.setBytes(7,IOUtils.toByteArray(attachment.getInputStream()));
 				ps.addBatch();
 			}
 			if (attachments.size() > 0)
@@ -1308,7 +1311,8 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 				"select name, content_id, content_type, content" + 
 				" from ebms_attachment" + 
 				" where message_id = ?" +
-				" and message_nr = 0"
+				" and message_nr = 0" +
+				" order by order_nr"
 			);
 			ps.setString(1,messageId);
 			if (ps.execute())

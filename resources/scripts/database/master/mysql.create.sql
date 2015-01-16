@@ -41,12 +41,15 @@ CREATE INDEX i_ebms_message ON ebms_message (cpa_id(255),status,message_nr);
 CREATE TABLE ebms_attachment
 (
 	ebms_message_id		INTEGER					NOT NULL,
+	order_nr					SMALLINT				NOT NULL,
 	name							VARCHAR(256)		NULL,
 	content_id 				VARCHAR(256) 		NOT NULL,
 	content_type			VARCHAR(255)		NOT NULL,
 	content						LONGBLOB 				NOT NULL,
 	FOREIGN KEY (ebms_message_id) REFERENCES ebms_message(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+ALTER TABLE ebms_attachment ADD CONSTRAINT uc_ebms_attachment UNIQUE (ebms_message_id,order_nr);
 
 CREATE TABLE ebms_event
 (

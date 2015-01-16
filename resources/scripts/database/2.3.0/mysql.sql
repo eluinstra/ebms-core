@@ -6,4 +6,10 @@ CREATE TABLE url
 
 ALTER TABLE url ADD CONSTRAINT uc_old_url UNIQUE (old_url(255));
 
-UPDATE ebms_event SET type = 1 where type > 1;
+ALTER TABLE ebms_attachment ADD COLUMN order_nr SMALLINT;
+
+UPDATE ebms_attachment SET order_nr = 0;
+
+ALTER TABLE ebms_attachment ADD COLUMN order_nr SMALLINT NOT NULL;
+
+UPDATE ebms_event SET type = 1 WHERE type > 1;

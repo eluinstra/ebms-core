@@ -122,19 +122,22 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 				ps  = c.prepareStatement(
 					"insert into ebms_attachment (" +
 						"ebms_message_id," +
+						"order_nr," +
 						"name," +
 						"content_id," +
 						"content_type," +
 						"content" +
 					") values (?,?,?,?,?)"
 				);
+				int orderNr = 0;
 				for (EbMSAttachment attachment : message.getAttachments())
 				{
 					ps.setLong(1,key);
-					ps.setString(2,attachment.getName());
-					ps.setString(3,attachment.getContentId());
-					ps.setString(4,attachment.getContentType().split(";")[0].trim());
-					ps.setBytes(5,IOUtils.toByteArray(attachment.getInputStream()));
+					ps.setInt(2,orderNr++);
+					ps.setString(3,attachment.getName());
+					ps.setString(4,attachment.getContentId());
+					ps.setString(5,attachment.getContentType().split(";")[0].trim());
+					ps.setBytes(6,IOUtils.toByteArray(attachment.getInputStream()));
 					ps.addBatch();
 				}
 				if (message.getAttachments().size() > 0)
@@ -238,19 +241,22 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 			ps  = c.prepareStatement(
 				"insert into ebms_attachment (" +
 					"ebms_message_id," +
+					"order_nr," +
 					"name," +
 					"content_id," +
 					"content_type," +
 					"content" +
 				") values (?,?,?,?,?)"
 			);
+			int orderNr = 0;
 			for (EbMSAttachment attachment : attachments)
 			{
 				ps.setLong(1,messageId);
-				ps.setString(2,attachment.getName());
-				ps.setString(3,attachment.getContentId());
-				ps.setString(4,attachment.getContentType().split(";")[0].trim());
-				ps.setBytes(5,IOUtils.toByteArray(attachment.getInputStream()));
+				ps.setInt(2,orderNr++);
+				ps.setString(3,attachment.getName());
+				ps.setString(4,attachment.getContentId());
+				ps.setString(5,attachment.getContentType().split(";")[0].trim());
+				ps.setBytes(6,IOUtils.toByteArray(attachment.getInputStream()));
 				ps.addBatch();
 			}
 			if (attachments.size() > 0)
@@ -276,7 +282,8 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 				" from ebms_message m, ebms_attachment a" +
 				" where m.message_id = ?" +
 				" and m.message_nr = 0" +
-				" and m.id = a.ebms_message_id"
+				" and m.id = a.ebms_message_id" +
+				" order by a.order_nr"
 			);
 			ps.setString(1,messageId);
 			if (ps.execute())

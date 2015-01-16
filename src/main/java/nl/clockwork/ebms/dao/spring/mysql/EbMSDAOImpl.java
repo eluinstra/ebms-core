@@ -249,18 +249,21 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 
 	protected void insertAttachments(long messageId, List<EbMSAttachment> attachments) throws DataAccessException, IOException
 	{
+		int orderNr = 0;
 		for (EbMSAttachment attachment : attachments)
 		{
 			jdbcTemplate.update
 			(
 				"insert into ebms_attachment (" +
 					"ebms_message_id," +
+					"order_nr," +
 					"name," +
 					"content_id," +
 					"content_type," +
 					"content" +
 				") values (?,?,?,?,?)",
 				messageId,
+				orderNr++,
 				attachment.getName(),
 				attachment.getContentId(),
 				attachment.getContentType().split(";")[0].trim(),
@@ -277,7 +280,8 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 			" from ebms_message m, ebms_attachment a" +
 			" where m.message_id = ?" +
 			" and m.message_nr = 0" +
-			" and m.id = a.ebms_message_id",
+			" and m.id = a.ebms_message_id" +
+			" order by a.order_nr",
 			new ParameterizedRowMapper<EbMSAttachment>()
 			{
 				@Override

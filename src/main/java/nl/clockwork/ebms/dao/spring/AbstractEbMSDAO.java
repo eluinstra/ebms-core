@@ -786,6 +786,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 
 	protected void insertAttachments(KeyHolder keyHolder, List<EbMSAttachment> attachments) throws InvalidDataAccessApiUsageException, DataAccessException, IOException
 	{
+		int orderNr = 0;
 		for (EbMSAttachment attachment : attachments)
 		{
 			jdbcTemplate.update
@@ -793,6 +794,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 				"insert into ebms_attachment (" +
 					"message_id," +
 					"message_nr," +
+					"order_nr," +
 					"name," +
 					"content_id," +
 					"content_type," +
@@ -800,6 +802,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 				") values (?,?,?,?,?,?)",
 				keyHolder.getKeys().get("message_id"),
 				keyHolder.getKeys().get("message_nr"),
+				orderNr++,
 				attachment.getName(),
 				attachment.getContentId(),
 				attachment.getContentType().split(";")[0].trim(),
@@ -1084,7 +1087,8 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 			"select name, content_id, content_type, content" + 
 			" from ebms_attachment" + 
 			" where message_id = ?" +
-			" and message_nr = 0",
+			" and message_nr = 0" +
+			" order by order_nr",
 			new ParameterizedRowMapper<EbMSAttachment>()
 			{
 				@Override

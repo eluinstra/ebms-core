@@ -36,12 +36,15 @@ CREATE TABLE ebms_attachment
 (
 	message_id				VARCHAR(256)		NOT NULL,
 	message_nr				NUMBER(5)				NOT NULL,
+	order_nr					NUMBER(5)				NOT NULL,
 	name							VARCHAR(256)		NULL,
 	content_id 				VARCHAR(256) 		NOT NULL,
 	content_type			VARCHAR(255)		NOT NULL,
 	content						BLOB						NOT NULL,
 	FOREIGN KEY (message_id,message_nr) REFERENCES ebms_message(message_id,message_nr)
 );
+
+ALTER TABLE ebms_attachment ADD CONSTRAINT uc_ebms_attachment UNIQUE (message_id,message_nr,order_nr);
 
 CREATE TABLE ebms_event
 (

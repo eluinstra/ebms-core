@@ -271,6 +271,7 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 
 	protected void insertAttachments(Key key, List<EbMSAttachment> attachments) throws InvalidDataAccessApiUsageException, DataAccessException, IOException
 	{
+		int orderNr = 0;
 		for (EbMSAttachment attachment : attachments)
 		{
 			jdbcTemplate.update
@@ -278,6 +279,7 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 				"insert into ebms_attachment (" +
 					"message_id," +
 					"message_nr," +
+					"order_nr," +
 					"name," +
 					"content_id," +
 					"content_type," +
@@ -285,6 +287,7 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 				") values (?,?,?,?,?,?)",
 				key.messageId,
 				key.messageNr,
+				orderNr++,
 				attachment.getName(),
 				attachment.getContentId(),
 				attachment.getContentType().split(";")[0].trim(),
