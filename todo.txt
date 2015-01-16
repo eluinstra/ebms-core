@@ -1,8 +1,12 @@
+- quickfix db lock
+	- add events
+- fix duplicate elimination
+	- add primary key to ebms_message table
+	- use key in other tables
 - store manifest orderNr or use Manifest order
-- add views for ebms_message and ebms_event
-/ manual
-/ web adapter
 - define default retry periods and times
+/ web adapter
+/ manual
 
 - write mime message
 	- add encryption (s/mime)
