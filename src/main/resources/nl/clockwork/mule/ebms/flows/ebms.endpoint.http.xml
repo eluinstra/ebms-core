@@ -34,6 +34,7 @@
 
 	<http:connector name="connector.http.ebms.in">
 		<receiver-threading-profile maxThreadsActive="${threading.profile.http.receiver.maxThreadsActive}" maxThreadsIdle="${threading.profile.http.receiver.maxThreadsIdle}" threadTTL="${threading.profile.http.receiver.threadTTL}" poolExhaustedAction="WAIT" maxBufferSize="${threading.profile.http.receiver.maxBufferSize}" />
+		<service-overrides messageFactory="org.mule.transport.http.HttpMuleMessageFactory" />
 	</http:connector>
 	
 	<flow name="ebms.http.receive">
