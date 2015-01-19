@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+    Copyright 2011 Clockwork
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:amq="http://activemq.apache.org/schema/core"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://activemq.apache.org/schema/core http://activemq.apache.org/schema/core/activemq-core.xsd">
+
+	<beans profile="loggingEventListener">
+		<bean id="eventListener" class="nl.clockwork.ebms.event.LoggingEventListener"/>
+	</beans>
+
+	<beans profile="jmsEventListener">
+
+		<bean id="receivedQueue" class="org.apache.activemq.command.ActiveMQQueue">
+			<constructor-arg value="EVENT.RECEIVED"/>
+		</bean>
+	
+		<bean id="acknowledgedQueue" class="org.apache.activemq.command.ActiveMQQueue">
+			<constructor-arg value="EVENT.ACKNOWLEDGED"/>
+		</bean>
+	
+		<bean id="failedQueue" class="org.apache.activemq.command.ActiveMQQueue">
+			<constructor-arg value="EVENT.FAILED"/>
+		</bean>
+	
+		<bean id="expiredQueue" class="org.apache.activemq.command.ActiveMQQueue">
+			<constructor-arg value="EVENT.EXPIRED"/>
+		</bean>
+	
+		<bean id="jmsTransactionTemplate" class="org.springframework.jms.core.JmsTemplate">
+		 <property name="connectionFactory" ref="jmsConnectionFactory"/>
+		</bean>
+	
+		<bean id="jmsConnectionFactory" class="org.apache.activemq.pool.PooledConnectionFactory" destroy-method="stop">
+			<property name="connectionFactory">
+				<bean class="org.apache.activemq.spring.ActiveMQConnectionFactory">
+					<property name="brokerURL" value="vm://embeddedBroker"/>
+					<property name="userName" value="${jms.broker.user.username}"/>
+					<property name="password" value="${jms.broker.user.password}"/>
+				</bean>
+			</property>
+			<property name="maximumActive" value="${jms.broker.maxConnections}"/>
+		</bean>
+	
+		<amq:broker brokerName="${jms.broker.name}" persistent="true" dataDirectory="${jms.data.dir}">
+			<amq:transportConnectors>
+				<amq:transportConnector name="vm" uri="vm://embeddedBroker" />
+				<amq:transportConnector name="openwire" uri="${jms.broker.uri}" />
+			</amq:transportConnectors>
+			<amq:plugins>
+				<amq:simpleAuthenticationPlugin>
+					<amq:users>
+						<amq:authenticationUser username="${jms.broker.user.username}" password="${jms.broker.user.password}" groups="${jms.broker.user.groups}"/>
+					</amq:users>
+				</amq:simpleAuthenticationPlugin>
+			</amq:plugins>
+		</amq:broker>
+	
+	</beans>
+	
+</beans>

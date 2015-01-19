@@ -33,5 +33,6 @@
 	<import resource="dao.cached.spring.xml"/>
 
 	<import resource="processor.xml"/>
+	<import resource="eventListener.xml"/>
 
 </beans>
