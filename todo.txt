@@ -41,11 +41,12 @@ nice to have features:
 2.4:
 - improve CPA validation
 	- check used CPA fields in CPAUtils and validate them
-	- validate on unsupported features
+	/ validate on unsupported features
 
 - implement push interface with jms
-- implement push soap interface
+- implement push soap interface?
 - implement events with quartz or jms
+- implement deliveryManager with jms
 - implement security on soap interface
 
 - test multiple certificates in keystore
