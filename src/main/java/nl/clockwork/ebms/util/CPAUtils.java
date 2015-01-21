@@ -168,7 +168,7 @@ public class CPAUtils
 	
 	private static boolean equals(List<PartyId> cpaPartyIds, List<org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.PartyId> headerPartyIds)
 	{
-		return cpaPartyIds.size() != headerPartyIds.size() && containsAll(cpaPartyIds,headerPartyIds);
+		return cpaPartyIds.size() == headerPartyIds.size() && containsAll(cpaPartyIds,headerPartyIds);
 	}
 
 	private static boolean containsAll(List<PartyId> cpaPartyIds, List<org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.PartyId> headerPartyIds)
