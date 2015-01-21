@@ -284,7 +284,7 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 					"content_id," +
 					"content_type," +
 					"content" +
-				") values (?,?,?,?,?,?)",
+				") values (?,?,?,?,?,?,?)",
 				key.messageId,
 				key.messageNr,
 				orderNr++,

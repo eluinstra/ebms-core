@@ -238,7 +238,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 		}
 		catch(EmptyResultDataAccessException e)
 		{
-			return null;
+			return url;
 		}
 		catch (DataAccessException e)
 		{
@@ -799,7 +799,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 					"content_id," +
 					"content_type," +
 					"content" +
-				") values (?,?,?,?,?,?)",
+				") values (?,?,?,?,?,?,?)",
 				keyHolder.getKeys().get("message_id"),
 				keyHolder.getKeys().get("message_nr"),
 				orderNr++,

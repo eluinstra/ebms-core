@@ -298,6 +298,8 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 				ResultSet rs = ps.getResultSet();
 				if (rs.next())
 					result = rs.getString("new_url");
+				else
+					result = url;
 			}
 			return result;
 		}
@@ -942,7 +944,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 					"content_id," +
 					"content_type," +
 					"content" +
-				") values (?,?,?,?,?,?)"
+				") values (?,?,?,?,?,?,?)"
 			);
 			int orderNr = 0;
 			for (EbMSAttachment attachment : attachments)

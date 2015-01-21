@@ -261,7 +261,7 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 					"content_id," +
 					"content_type," +
 					"content" +
-				") values (?,?,?,?,?)",
+				") values (?,?,?,?,?,?)",
 				messageId,
 				orderNr++,
 				attachment.getName(),

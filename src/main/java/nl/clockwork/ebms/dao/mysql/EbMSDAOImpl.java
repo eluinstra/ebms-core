@@ -127,7 +127,7 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 						"content_id," +
 						"content_type," +
 						"content" +
-					") values (?,?,?,?,?)"
+					") values (?,?,?,?,?,?)"
 				);
 				int orderNr = 0;
 				for (EbMSAttachment attachment : message.getAttachments())
@@ -246,7 +246,7 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 					"content_id," +
 					"content_type," +
 					"content" +
-				") values (?,?,?,?,?)"
+				") values (?,?,?,?,?,?)"
 			);
 			int orderNr = 0;
 			for (EbMSAttachment attachment : attachments)
