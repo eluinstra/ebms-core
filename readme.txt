@@ -36,7 +36,10 @@ Not implemented:
 
 Remarks:
 -	Duplicate messages will always be eliminated
--	Extendable to support other communication protocols
+-	Extendible to support other communication protocols
+- Manifest can only refer to payload data included as part of the message as payload document(s) contained in a Payload Container, not to remote resources accessible via a URL
+- Only 1 (allPurpose) Channel per Action is supported
+- ErrorList and Acknowledgment elements as part of another message are not supported. Only standalone Acknowledgment and MessageError messages are supported.
 
 ===============
 Prerequisites =
@@ -78,14 +81,7 @@ The EbMS adapter supports different databases:
 - MSSQL
 - Oracle
 
-You can configure them by including the right xml in your project:
-- nl/clockwork/ebms/components/hsqldb.xml
-- nl/clockwork/ebms/components/mysql.xml
-- nl/clockwork/ebms/components/postgresql.xml
-- nl/clockwork/ebms/components/mssql.xml
-- nl/clockwork/ebms/components/oracle.xml
-
-And you have to configure the right driver and connection string:
+You can configure them by configuring the right driver and connection string:
 - ebms.jdbc.driverClassName=org.hsqldb.jdbcDriver
 	ebms.jdbc.url=jdbc:hsqldb:mem:<dbname>
 	or
@@ -108,7 +104,7 @@ And you have to configure the right driver and connection string:
 	ebms.jdbc.url=jdbc:oracle:thin:@<host>:<port>:<dbname>
 
 If you want to let the adapter use the application datasource exclude the following file:
-- nl/clockwork/ebms/components/datasource.xml
+- nl/clockwork/ebms/datasource.xml
 and add the name ebMSDataSource to the application datasource 
 
 ===========
@@ -135,35 +131,3 @@ Or to generate individual reports:
 > mvn pmd:pmd
 > mvn jdepend:generate
 > mvn cobertura:cobertura
-
-===============
-Functionality =
-===============
-
-- Encoding is not supported
-- Message Order is not supported
-- Multi-Hop is not supported
-	- Cannot act as intermediary MSH
-		- Actor ToPartyMSH is supported
-		- Actor NextMSH is not supported
-
-- Always eliminates duplicate messages
-	- messageId is globally unique
-	- all messages are stored
-- Manifest can only refer to payload data included as part of the message as payload document(s) contained in a Payload Container, not to remote resources accessible via a URL
-- SOAP Fault messages can be generated
-- Only 1 Channel per Action is supported
-- ErrorList and Acknowledgment elements as part of another message are not supported.
-  Only error messages with a MessageHeader containing service 'urn:oasis:names:tc:ebxml-msg:service' and action 'MessageError' are supported
-  Only aknowledgment messages with a MessageHeader containing service 'urn:oasis:names:tc:ebxml-msg:service' and action 'Acknowledgment' are supported
-
-- Only one transport is supported
-
-- ErrorMessages
-	- only custom, StatusRequest and Ping messages can receive an ErrorMessage
-	- ErrorMessage, Acknowledgment, StatusResponse, and Pong messages can never receive an ErrorMessage
-- Acknowledgments
-	- only custom messages can receive an Acknowledgment if messaging is reliable
-	- ErrorMessage, Acknowledgment, StatusRequest, StatusResponse, Ping, Pong messages can never receive an Acknowledgment
-- if duplicate message is received, the response, if any, (ErrorMessage, Aknowledgment(, StatusResponse, Pong)) will be resend
-- ackRequested(, ackSignatureRequested) and duplicateElimination are ignored on the DefaultMSHChannel
