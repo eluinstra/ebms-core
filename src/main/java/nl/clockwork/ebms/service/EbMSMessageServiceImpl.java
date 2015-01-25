@@ -42,8 +42,9 @@ import nl.clockwork.ebms.model.Party;
 import nl.clockwork.ebms.processor.EbMSProcessorException;
 import nl.clockwork.ebms.signature.EbMSSignatureGenerator;
 import nl.clockwork.ebms.util.CPAUtils;
-import nl.clockwork.ebms.util.EbMSMessageContextValidator;
 import nl.clockwork.ebms.util.EbMSMessageUtils;
+import nl.clockwork.ebms.validation.EbMSMessageContextValidator;
+import nl.clockwork.ebms.validation.ValidatorException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -110,7 +111,7 @@ public class EbMSMessageServiceImpl implements EbMSMessageService
 			);
 			return message.getMessageHeader().getMessageData().getMessageId();
 		}
-		catch (DAOException | DatatypeConfigurationException | SOAPException | JAXBException | ParserConfigurationException | SAXException | IOException | TransformerFactoryConfigurationError | TransformerException | EbMSProcessorException e)
+		catch (ValidatorException | DAOException | DatatypeConfigurationException | SOAPException | JAXBException | ParserConfigurationException | SAXException | IOException | TransformerFactoryConfigurationError | TransformerException | EbMSProcessorException e)
 		{
 			throw new EbMSMessageServiceException(e);
 		}

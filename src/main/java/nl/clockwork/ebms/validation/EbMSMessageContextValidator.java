@@ -13,13 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.clockwork.ebms.util;
+package nl.clockwork.ebms.validation;
 
 import nl.clockwork.ebms.dao.DAOException;
 import nl.clockwork.ebms.dao.EbMSDAO;
 import nl.clockwork.ebms.model.EbMSMessageContext;
 import nl.clockwork.ebms.model.FromPartyInfo;
 import nl.clockwork.ebms.model.ToPartyInfo;
+import nl.clockwork.ebms.util.CPAUtils;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
@@ -36,20 +37,20 @@ public class EbMSMessageContextValidator
 		this.ebMSDAO = ebMSDAO;
 	}
 	
-	public void validate(EbMSMessageContext context)
+	public void validate(EbMSMessageContext context) throws ValidatorException
 	{
 		try
 		{
 			if (StringUtils.isEmpty(context.getCpaId()))
-				throw new EbMSMessageContextValidationException("context.cpaId cannot be empty!");
+				throw new ValidationException("context.cpaId cannot be empty!");
 			if (StringUtils.isEmpty(context.getService()))
-				throw new EbMSMessageContextValidationException("context.service cannot be empty!");
+				throw new ValidationException("context.service cannot be empty!");
 			if (StringUtils.isEmpty(context.getAction()))
-				throw new EbMSMessageContextValidationException("context.action cannot be empty!");
+				throw new ValidationException("context.action cannot be empty!");
 
 			CollaborationProtocolAgreement cpa = ebMSDAO.getCPA(context.getCpaId());
 			if (cpa == null)
-				throw new EbMSMessageContextValidationException("No CPA found for: context.cpaId=" + context.getCpaId());
+				throw new ValidationException("No CPA found for: context.cpaId=" + context.getCpaId());
 
 			FromPartyInfo fromPartyInfo = CPAUtils.getFromPartyInfo(cpa,context.getFromRole(),context.getService(),context.getAction());
 			if (fromPartyInfo == null)
@@ -61,7 +62,7 @@ public class EbMSMessageContextValidator
 					msg.append(", context.fromRole=").append(context.getFromRole());
 				msg.append(", context.service=").append(context.getService());
 				msg.append(", context.action=").append(context.getAction());
-				throw new EbMSMessageContextValidationException(msg.toString());
+				throw new ValidationException(msg.toString());
 			}
 
 			//ToPartyInfo toPartyInfo = CPAUtils.getToPartyInfo(cpa,(ActionBindingType)fromPartyInfo.getCanSend().getOtherPartyActionBinding());
@@ -78,15 +79,15 @@ public class EbMSMessageContextValidator
 					msg.append(", context.toRole=").append(context.getToRole());
 				msg.append(", context.service=").append(context.getService());
 				msg.append(", context.action=").append(context.getAction());
-				throw new EbMSMessageContextValidationException(msg.toString());
+				throw new ValidationException(msg.toString());
 			}
 			//else if (toPartyInfo != null && toPartyInfo1 != null && toPartyInfo.getCanReceive().getThisPartyActionBinding() != toPartyInfo1.getCanReceive().getThisPartyActionBinding())
 			else if (fromPartyInfo.getCanSend().getOtherPartyActionBinding() != null && toPartyInfo1 != null && fromPartyInfo.getCanSend().getOtherPartyActionBinding() != toPartyInfo1.getCanReceive().getThisPartyActionBinding())
-				throw new EbMSMessageContextValidationException("to party does not match from party for this action. Leave context.toRole empty!");
+				throw new ValidationException("to party does not match from party for this action. Leave context.toRole empty!");
 		}
 		catch (DAOException e)
 		{
-			throw new EbMSMessageContextValidatorException(e);
+			throw new ValidatorException(e);
 		}
 	}
 
