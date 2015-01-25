@@ -261,10 +261,9 @@ public class EbMSMessageUtils
 	{
 		if (CPAUtils.isReliableMessaging(cpa,deliveryChannel))
 		{
-			ReliableMessaging rm = CPAUtils.getReliableMessaging(cpa,deliveryChannel);
+			Duration duration = CPAUtils.getPersistantDuration(cpa,deliveryChannel);
 			GregorianCalendar timestamp = messageHeader.getMessageData().getTimestamp().toGregorianCalendar();
-			Duration d = rm.getRetryInterval().multiply(rm.getRetries().add(new BigInteger("1")).intValue());
-			d.addTo(timestamp);
+			duration.addTo(timestamp);
 			messageHeader.getMessageData().setTimeToLive(DatatypeFactory.newInstance().newXMLGregorianCalendar(timestamp));
 		}
 	}
