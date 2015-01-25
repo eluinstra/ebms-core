@@ -1,10 +1,13 @@
 - update sendEvent with new uri
+- improve EventListener
+	- change param messageId to messageContext
+	- improve event names
 - quickfix db lock
-	- add events
+	- add events Acknowledgment and MessageError
+	- add priority to events and event_queue
 - fix duplicate elimination
 	- add primary key to ebms_message table
 	- use key in other tables
-- store manifest orderNr or use Manifest order
 - define default retry periods and times
 / web adapter
 / manual
