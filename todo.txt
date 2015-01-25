@@ -5,12 +5,11 @@
 - quickfix db lock
 	- add events Acknowledgment and MessageError
 	- add priority to events and event_queue
+/ web adapter
+/ manual
 - fix duplicate elimination
 	- add primary key to ebms_message table
 	- use key in other tables
-- define default retry periods and times
-/ web adapter
-/ manual
 
 - write mime message
 	- add encryption (s/mime)
@@ -33,13 +32,16 @@ nice to have features:
 - add endpoint type support (now only allPurpose endpoint type is supported):
 	- add messageType to MessageContext to determine endpoint type to use
 	- parse incoming url to determine endpoint type used
-- add ackRequested perMessage support (now if ackRequested is perMessage, then no ack is requested)
-	- add ackRequested to MessageContext to determine if request is needs ack
+- add ackRequested (and ackSignatureRequested) perMessage support (now if ackRequested is perMessage, then no acknowledgment is requested)
+	- add ackRequested (and ackSignatureRequested) to MessageContext to determine if request is needs ack
+- add duplicateElimination perMessage support (now if duplicateElimination is perMessage, then no duplicateElimination is requested)
+	- add duplicateElimination to MessageContext to determine if request is needs duplicateElimination
 - improve Manifest validation and Attachment storage:
 	- allow url as href?
 		- store url as attachment
 	- store optional manifest description and schema with attachment???
 - implement Packaging
+- use PersistDuration to remove messages
 
 
 2.4:
@@ -47,22 +49,15 @@ nice to have features:
 	- check used CPA fields in CPAUtils and validate them
 	/ validate on unsupported features
 
-- implement push interface with jms
-- implement push soap interface?
+/ implement push interface with jms
+/ implement push soap interface?
 - implement events with quartz or jms
-- implement deliveryManager with jms
+/ implement deliveryManager with jms
 - implement security on soap interface
 
 - test multiple certificates in keystore
 
 2.x:
-- improve error handling and logging on exceptions on response messages (ErrorMessage and Acknowledgment)
-
-- validate message composition using SimplePart and Packaging definition from CPA 
-- validate message format (available elements versus action)
-- improve header validation
-	- add separate service and action validation
-
 - implement SSLFactoryManager that returns a CPA/hostname related SSLSocketFactory to handle different key/certificate pairs
 	- load right SSLFactoryManager on each URLConnection request
 
@@ -75,9 +70,6 @@ nice to have features:
 	- change messageQueue from EbMSMessage to EbMSDocument
 	- get messageId from EbMSDocument
 
-- remove unnecessary defined Interfaces and custom Exceptions
-- remove EbMS(Message) prefix on classes; add EbMS(Message) prefix on bean ids? 
-
 3.0:
 - validate requested uri
 
@@ -85,9 +77,6 @@ nice to have features:
 
 - implement business signals handling (ReceiptAcknowledgment, AcceptanceAcknowledgment, and Exception)
 - implement business response messages handling
-
-- replace events table by queue?
-- add push message interface with queue?
 
 - replace custom message writer by mime4j???
 - replace xmlsec by bouncycastle???
