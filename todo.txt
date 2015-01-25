@@ -1,3 +1,4 @@
+- update sendEvent with new uri
 - quickfix db lock
 	- add events
 - fix duplicate elimination
