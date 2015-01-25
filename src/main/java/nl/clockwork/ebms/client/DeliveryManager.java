@@ -33,23 +33,21 @@ import nl.clockwork.ebms.model.EbMSDocument;
 import nl.clockwork.ebms.model.EbMSMessage;
 import nl.clockwork.ebms.processor.EbMSProcessingException;
 import nl.clockwork.ebms.processor.EbMSProcessorException;
-import nl.clockwork.ebms.util.CPAUtils;
 import nl.clockwork.ebms.util.EbMSMessageUtils;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CollaborationProtocolAgreement;
 import org.xml.sax.SAXException;
 
 public class DeliveryManager //DeliveryService
 {
 	protected transient Log logger = LogFactory.getLog(getClass());
-	private ExecutorService executorService;
+	protected ExecutorService executorService;
 	private Integer maxThreads;
 	private Integer processorsScaleFactor;
 	private Integer queueScaleFactor;
 	private MessageQueue<EbMSMessage> messageQueue;
-	private EbMSClient ebMSClient;
+	protected EbMSClient ebMSClient;
 
 	public void init()
 	{
@@ -72,11 +70,10 @@ public class DeliveryManager //DeliveryService
 		executorService = new ThreadPoolExecutor(maxThreads,maxThreads,1,TimeUnit.MINUTES,new ArrayBlockingQueue<Runnable>(maxThreads * queueScaleFactor,true),new ThreadPoolExecutor.CallerRunsPolicy());
 	}
 
-	public EbMSMessage sendMessage(final CollaborationProtocolAgreement cpa, final EbMSMessage message) throws EbMSProcessorException
+	public EbMSMessage sendMessage(final String uri, final EbMSMessage message) throws EbMSProcessorException
 	{
 		try
 		{
-			final String uri = CPAUtils.getUri(cpa,message);
 			if (message.getSyncReply() == null)
 			{
 				try
@@ -84,11 +81,7 @@ public class DeliveryManager //DeliveryService
 					messageQueue.register(message.getMessageHeader().getMessageData().getMessageId());
 					EbMSDocument document = ebMSClient.sendMessage(uri,EbMSMessageUtils.getEbMSDocument(message));
 					if (document == null)
-					{
-						EbMSMessage response = messageQueue.get(message.getMessageHeader().getMessageData().getMessageId());
-						if (response != null)
-							return response;
-					}
+						return messageQueue.get(message.getMessageHeader().getMessageData().getMessageId());
 					else
 					{
 						messageQueue.remove(message.getMessageHeader().getMessageData().getMessageId());
@@ -119,38 +112,29 @@ public class DeliveryManager //DeliveryService
 		}
 	}
 
-	public void sendResponseMessage(final EbMSMessage message) throws EbMSProcessorException
+	public void handleResponseMessage(final EbMSMessage message) throws EbMSProcessorException
 	{
 		messageQueue.put(message.getMessageHeader().getMessageData().getRefToMessageId(),message);
 	}
 	
-	public EbMSMessage sendResponseMessage(final String uri, final EbMSMessage message, final EbMSMessage response) throws EbMSProcessorException
+	public void sendResponseMessage(final String uri, final EbMSMessage response) throws EbMSProcessorException
 	{
-		if (response != null)
+		Runnable command = new Runnable()
 		{
-			if (message.getSyncReply() == null)
+			@Override
+			public void run()
 			{
-				Runnable command = new Runnable()
+				try
 				{
-					@Override
-					public void run()
-					{
-						try
-						{
-							ebMSClient.sendMessage(uri,EbMSMessageUtils.getEbMSDocument(response));
-						}
-						catch (Exception e)
-						{
-							logger.error("",e);
-						}
-					}
-				};
-				executorService.execute(command);
+					ebMSClient.sendMessage(uri,EbMSMessageUtils.getEbMSDocument(response));
+				}
+				catch (Exception e)
+				{
+					logger.error("",e);
+				}
 			}
-			else
-				return response;
-		}
-		return null;
+		};
+		executorService.execute(command);
 	}
 
 	public void setMaxThreads(Integer maxThreads)

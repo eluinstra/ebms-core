@@ -130,23 +130,33 @@ public class EbMSMessageProcessor
 			else if (EbMSAction.STATUS_REQUEST.action().equals(message.getMessageHeader().getAction()))
 			{
 				EbMSMessage response = processStatusRequest(cpa,timestamp,message);
-				response = deliveryManager.sendResponseMessage(CPAUtils.getUri(cpa,response),message,response);
-				return response == null ? null : EbMSMessageUtils.getEbMSDocument(response);
+				if (message.getSyncReply() == null)
+				{
+					deliveryManager.sendResponseMessage(ebMSDAO.getUrl(CPAUtils.getUri(cpa,message)),response);
+					return null;
+				}
+				else
+					return EbMSMessageUtils.getEbMSDocument(response);
 			}
 			else if (EbMSAction.STATUS_RESPONSE.action().equals(message.getMessageHeader().getAction()))
 			{
-				deliveryManager.sendResponseMessage(message);
+				deliveryManager.handleResponseMessage(message);
 				return null;
 			}
 			else if (EbMSAction.PING.action().equals(message.getMessageHeader().getAction()))
 			{
 				EbMSMessage response = processPing(cpa,timestamp,message);
-				response = deliveryManager.sendResponseMessage(CPAUtils.getUri(cpa,response),message,response);
-				return response == null ? null : EbMSMessageUtils.getEbMSDocument(response);
+				if (message.getSyncReply() == null)
+				{
+					deliveryManager.sendResponseMessage(ebMSDAO.getUrl(CPAUtils.getUri(cpa,message)),response);
+					return null;
+				}
+				else
+					return EbMSMessageUtils.getEbMSDocument(response);
 			}
 			else if (EbMSAction.PONG.action().equals(message.getMessageHeader().getAction()))
 			{
-				deliveryManager.sendResponseMessage(message);
+				deliveryManager.handleResponseMessage(message);
 				return null;
 			}
 			else
@@ -339,50 +349,32 @@ public class EbMSMessageProcessor
 			);
 	}
 	
-	protected EbMSMessage processStatusRequest(CollaborationProtocolAgreement cpa, final GregorianCalendar timestamp, final EbMSMessage message) throws DatatypeConfigurationException, JAXBException
+	protected EbMSMessage processStatusRequest(CollaborationProtocolAgreement cpa, final GregorianCalendar timestamp, final EbMSMessage message) throws DatatypeConfigurationException, JAXBException, EbMSValidationException
 	{
-		try
+		GregorianCalendar c = null;
+		EbMSMessageStatus status = EbMSMessageStatus.UNAUTHORIZED;
+		EbMSMessageContext context = ebMSDAO.getMessageContext(message.getStatusRequest().getRefToMessageId());
+		if (context == null || Constants.EBMS_SERVICE_URI.equals(context.getService()))
+			status = EbMSMessageStatus.NOT_RECOGNIZED;
+		else if (!context.getCpaId().equals(message.getMessageHeader().getCPAId()))
+			status = EbMSMessageStatus.UNAUTHORIZED;
+		else
 		{
-			GregorianCalendar c = null;
-			cpaValidator.cpaExists(cpa,message);
-			EbMSMessageStatus status = EbMSMessageStatus.UNAUTHORIZED;
-			EbMSMessageContext context = ebMSDAO.getMessageContext(message.getStatusRequest().getRefToMessageId());
-			if (context == null || Constants.EBMS_SERVICE_URI.equals(context.getService()))
-				status = EbMSMessageStatus.NOT_RECOGNIZED;
-			else if (!context.getCpaId().equals(message.getMessageHeader().getCPAId()))
-				status = EbMSMessageStatus.UNAUTHORIZED;
-			else
+			status = ebMSDAO.getMessageStatus(message.getStatusRequest().getRefToMessageId());
+			if (status != null && (MessageStatusType.RECEIVED.equals(status.statusCode()) || MessageStatusType.PROCESSED.equals(status.statusCode()) || MessageStatusType.FORWARDED.equals(status.statusCode())))
 			{
-				status = ebMSDAO.getMessageStatus(message.getStatusRequest().getRefToMessageId());
-				if (status != null && (MessageStatusType.RECEIVED.equals(status.statusCode()) || MessageStatusType.PROCESSED.equals(status.statusCode()) || MessageStatusType.FORWARDED.equals(status.statusCode())))
-				{
-					c = new GregorianCalendar();
-					c.setTime(context.getTimestamp());
-				}
-				else
-					status = EbMSMessageStatus.NOT_RECOGNIZED;
+				c = new GregorianCalendar();
+				c.setTime(context.getTimestamp());
 			}
-			return EbMSMessageUtils.createEbMSStatusResponse(cpa,message,status,c); 
+			else
+				status = EbMSMessageStatus.NOT_RECOGNIZED;
 		}
-		catch (EbMSValidationException e)
-		{
-			logger.warn("",e);
-			return null;
-		}
+		return EbMSMessageUtils.createEbMSStatusResponse(cpa,message,status,c); 
 	}
 	
 	protected EbMSMessage processPing(CollaborationProtocolAgreement cpa, final GregorianCalendar timestamp, final EbMSMessage message) throws DatatypeConfigurationException, JAXBException
 	{
-		try
-		{
-			cpaValidator.cpaExists(cpa,message);
-			return EbMSMessageUtils.createEbMSPong(cpa,message);
-		}
-		catch(EbMSValidationException e)
-		{
-			logger.warn("",e);
-			return null;
-		}
+		return EbMSMessageUtils.createEbMSPong(cpa,message);
 	}
 	
 	protected boolean isDuplicateMessage(EbMSMessage message)

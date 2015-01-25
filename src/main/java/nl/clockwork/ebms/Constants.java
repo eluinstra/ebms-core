@@ -19,6 +19,7 @@ import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageStatusTy
 
 public class Constants
 {
+	public static String MESSAGE = "MESSAGE";
 	public static String EVENT_RECEIVED = "EVENT.RECEIVED";
 	public static String EVENT_ACKNOWLEDGED = "EVENT.ACKNOWLEDGED";
 	public static String EVENT_FAILED = "EVENT.FAILED";

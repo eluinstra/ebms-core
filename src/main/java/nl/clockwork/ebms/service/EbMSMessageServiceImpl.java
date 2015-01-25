@@ -70,7 +70,7 @@ public class EbMSMessageServiceImpl implements EbMSMessageService
 		{
 			CollaborationProtocolAgreement cpa = ebMSDAO.getCPA(cpaId);
 			EbMSMessage request = EbMSMessageUtils.createEbMSPing(cpa,fromParty,toParty);
-			EbMSMessage response = deliveryManager.sendMessage(cpa,request);
+			EbMSMessage response = deliveryManager.sendMessage(ebMSDAO.getUrl(CPAUtils.getUri(cpa,request)),request);
 			if (response != null)
 			{
 				if (!EbMSAction.PONG.action().equals(response.getMessageHeader().getAction()))
@@ -188,7 +188,7 @@ public class EbMSMessageServiceImpl implements EbMSMessageService
 			{
 				CollaborationProtocolAgreement cpa = ebMSDAO.getCPA(context.getCpaId());
 				EbMSMessage request = EbMSMessageUtils.createEbMSStatusRequest(cpa,CPAUtils.getFromParty(cpa,context.getFromRole(),context.getService(),context.getAction()),CPAUtils.getToParty(cpa,context.getToRole(),context.getService(),context.getAction()),messageId);
-				EbMSMessage response = deliveryManager.sendMessage(cpa,request);
+				EbMSMessage response = deliveryManager.sendMessage(ebMSDAO.getUrl(CPAUtils.getUri(cpa,request)),request);
 				if (response != null)
 				{
 					if (EbMSAction.STATUS_RESPONSE.action().equals(response.getMessageHeader().getAction()) && response.getStatusResponse() != null)
@@ -213,7 +213,7 @@ public class EbMSMessageServiceImpl implements EbMSMessageService
 		{
 			CollaborationProtocolAgreement cpa = ebMSDAO.getCPA(cpaId);
 			EbMSMessage request = EbMSMessageUtils.createEbMSStatusRequest(cpa,fromParty,toParty,messageId);
-			EbMSMessage response = deliveryManager.sendMessage(cpa,request);
+			EbMSMessage response = deliveryManager.sendMessage(ebMSDAO.getUrl(CPAUtils.getUri(cpa,request)),request);
 			if (response != null)
 			{
 				if (EbMSAction.STATUS_RESPONSE.action().equals(response.getMessageHeader().getAction()) && response.getStatusResponse() != null)

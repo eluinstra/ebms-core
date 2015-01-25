@@ -106,23 +106,33 @@ public class EbMSMessageProcessorX extends EbMSMessageProcessor
 			else if (EbMSAction.STATUS_REQUEST.action().equals(message.getMessageHeader().getAction()))
 			{
 				EbMSMessage response = processStatusRequest(cpa,timestamp,message);
-				response = deliveryManager.sendResponseMessage(CPAUtils.getUri(cpa,response),message,response);
-				return response == null ? null : EbMSMessageUtils.getEbMSDocument(response);
+				if (message.getSyncReply() == null)
+				{
+					deliveryManager.sendResponseMessage(ebMSDAO.getUrl(CPAUtils.getUri(cpa,message)),response);
+					return null;
+				}
+				else
+					return EbMSMessageUtils.getEbMSDocument(response);
 			}
 			else if (EbMSAction.STATUS_RESPONSE.action().equals(message.getMessageHeader().getAction()))
 			{
-				deliveryManager.sendResponseMessage(message);
+				deliveryManager.handleResponseMessage(message);
 				return null;
 			}
 			else if (EbMSAction.PING.action().equals(message.getMessageHeader().getAction()))
 			{
 				EbMSMessage response = processPing(cpa,timestamp,message);
-				response = deliveryManager.sendResponseMessage(CPAUtils.getUri(cpa,response),message,response);
-				return response == null ? null : EbMSMessageUtils.getEbMSDocument(response);
+				if (message.getSyncReply() == null)
+				{
+					deliveryManager.sendResponseMessage(ebMSDAO.getUrl(CPAUtils.getUri(cpa,message)),response);
+					return null;
+				}
+				else
+					return EbMSMessageUtils.getEbMSDocument(response);
 			}
 			else if (EbMSAction.PONG.action().equals(message.getMessageHeader().getAction()))
 			{
-				deliveryManager.sendResponseMessage(message);
+				deliveryManager.handleResponseMessage(message);
 				return null;
 			}
 			else

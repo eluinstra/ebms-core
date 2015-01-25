@@ -30,7 +30,7 @@
 
 	<beans profile="jmsEventListener">
 
-		<bean id="eventListener" class="nl.clockwork.ebms.event.JMSEventListener">
+		<bean id="eventListener" class="nl.clockwork.ebms.event.spring.JMSEventListener">
 			<property name="jmsTemplate" ref="jmsTransactionTemplate"/>
 			<property name="destinations">
 				<map>
@@ -92,7 +92,7 @@
 			</property>
 		</bean>
 	
-		<amq:broker id="broker" brokerName="${jms.broker.name}" persistent="true" dataDirectory="${jms.data.dir}">
+		<amq:broker id="broker" brokerName="${jms.broker.name}" persistent="true" dataDirectory="${jms.data.dir}" useJmx="${jms.jmx}">
 			<amq:transportConnectors>
 				<amq:transportConnector name="vm" uri="vm://embeddedBroker" />
 				<amq:transportConnector name="openwire" uri="${jms.broker.uri}" />

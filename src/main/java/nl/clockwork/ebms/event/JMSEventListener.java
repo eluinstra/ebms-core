@@ -15,55 +15,106 @@
  */
 package nl.clockwork.ebms.event;
 
-import java.util.Map;
+import javax.jms.Connection;
+import javax.jms.JMSException;
+import javax.jms.Message;
+import javax.jms.MessageProducer;
+import javax.jms.QueueConnectionFactory;
+import javax.jms.Session;
 
-import javax.jms.Destination;
+import nl.clockwork.ebms.Constants;
 
+import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.jms.core.JmsTemplate;
 
 public class JMSEventListener implements EventListener
 {
 	protected transient Log logger = LogFactory.getLog(getClass());
-	private JmsTemplate jmsTemplate;
-	private Map<String,Destination> destinations;
+	Connection connection;
+
+	public JMSEventListener() throws JMSException
+	{
+		this("vm:broker:(tcp://localhost:61616)?brokerName=localhost&persistent=true&dataDirectory=data&useJmx=true");
+	}
+	
+	public JMSEventListener(String brokerURL) throws JMSException
+	{
+		QueueConnectionFactory connectionFactory = new ActiveMQConnectionFactory(brokerURL);
+		connection = connectionFactory.createConnection();
+		connection.start();
+	}
 
 	@Override
 	public void onMessageReceived(String messageId) throws EventException
 	{
-		logger.info("Message " + messageId + " received");
-		jmsTemplate.send(destinations.get("EVENT.RECEIVED"),new EventMessageCreator(messageId));
+		try
+		{
+			logger.info("Message " + messageId + " received");
+			Session session = connection.createSession(false,Session.AUTO_ACKNOWLEDGE);
+			MessageProducer producer = session.createProducer(session.createQueue(Constants.EVENT_RECEIVED));
+			Message message = session.createMessage();
+			message.setStringProperty("messageId",messageId);
+			producer.send(message);
+		}
+		catch (JMSException e)
+		{
+			throw new EventException(e);
+		}
 	}
 
 	@Override
 	public void onMessageAcknowledged(String messageId) throws EventException
 	{
-		logger.info("Message " + messageId + " acknowledged");
-		jmsTemplate.send(destinations.get("EVENT.ACKNOWLEDGED"),new EventMessageCreator(messageId));
+		try
+		{
+			logger.info("Message " + messageId + " acknowledged");
+			Session session = connection.createSession(false,Session.AUTO_ACKNOWLEDGE);
+			MessageProducer producer = session.createProducer(session.createQueue(Constants.EVENT_ACKNOWLEDGED));
+			Message message = session.createMessage();
+			message.setStringProperty("messageId",messageId);
+			producer.send(message);
+		}
+		catch (JMSException e)
+		{
+			throw new EventException(e);
+		}
 	}
 	
 	@Override
 	public void onMessageDeliveryFailed(String messageId) throws EventException
 	{
-		logger.info("Message " + messageId + " delivery failed");
-		jmsTemplate.send(destinations.get("EVENT.FAILED"),new EventMessageCreator(messageId));
+		try
+		{
+			logger.info("Message " + messageId + " delivery failed");
+			Session session = connection.createSession(false,Session.AUTO_ACKNOWLEDGE);
+			MessageProducer producer = session.createProducer(session.createQueue(Constants.EVENT_FAILED));
+			Message message = session.createMessage();
+			message.setStringProperty("messageId",messageId);
+			producer.send(message);
+		}
+		catch (JMSException e)
+		{
+			throw new EventException(e);
+		}
 	}
 
 	@Override
 	public void onMessageNotAcknowledged(String messageId) throws EventException
 	{
-		logger.info("Message " + messageId + " not acknowledged");
-		jmsTemplate.send(destinations.get("EVENT.EXPIRED"),new EventMessageCreator(messageId));
+		try
+		{
+			logger.info("Message " + messageId + " not acknowledged");
+			Session session = connection.createSession(false,Session.AUTO_ACKNOWLEDGE);
+			MessageProducer producer = session.createProducer(session.createQueue(Constants.EVENT_EXPIRED));
+			Message message = session.createMessage();
+			message.setStringProperty("messageId",messageId);
+			producer.send(message);
+		}
+		catch (JMSException e)
+		{
+			throw new EventException(e);
+		}
 	}
 
-	public void setJmsTemplate(JmsTemplate jmsTemplate)
-	{
-		this.jmsTemplate = jmsTemplate;
-	}
-	
-	public void setDestinations(Map<String,Destination> destinations)
-	{
-		this.destinations = destinations;
-	}
 }
