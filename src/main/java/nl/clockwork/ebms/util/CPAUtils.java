@@ -394,7 +394,7 @@ public class CPAUtils
 	
 	public static ReliableMessaging getReliableMessaging(CollaborationProtocolAgreement cpa, DeliveryChannel deliveryChannel)
 	{
-		return ((DocExchange)deliveryChannel.getDocExchangeId()).getEbXMLReceiverBinding().getReliableMessaging();
+		return ((DocExchange)deliveryChannel.getDocExchangeId()).getEbXMLSenderBinding().getReliableMessaging();
 	}
 
 	public static Duration getPersistantDuration(CollaborationProtocolAgreement cpa, DeliveryChannel deliveryChannel)
