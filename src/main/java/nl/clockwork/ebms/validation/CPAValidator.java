@@ -48,7 +48,6 @@ public class CPAValidator
 	public void validate(CollaborationProtocolAgreement cpa) throws ValidatorException
 	{
 		if (!"2_0b".equals(cpa.getVersion()))
-			//throw new ValidationException("CPA version " + cpa.getVersion() + " detected! CPA version 2_0b expected.");
 			logger.warn("CPA version " + cpa.getVersion() + " detected! CPA version 2_0b expected.");
 		if ("proposed".equals(cpa.getStatus()))
 			throw new ValidationException("CPA Status is proposed!");
@@ -57,27 +56,21 @@ public class CPAValidator
 		if (Calendar.getInstance().compareTo(cpa.getEnd().toGregorianCalendar()) > 0)
 			throw new ValidationException("CPA expired on " + cpa.getEnd());
 		if (cpa.getConversationConstraints() != null)
-			//throw new ValidationException("CPA Conversation Constraints not implemented!");
 			logger.warn("CPA Conversation Constraints not implemented!");
 		if (cpa.getSignature() != null)
-			//throw new ValidationException("CPA Signature not implemented!");
 			logger.warn("CPA Signature not implemented!");
 		if (cpa.getPackaging() != null && cpa.getPackaging().size() > 0)
-			//throw new ValidationException("Packaging not implemented!");
 			logger.warn("Packaging not implemented!");
 			
 		validateEndpoints(cpa);
 		
 		//syncReply mode signalsAndResponse not supported?
 		//syncReply mode responseOnly not supported?
-		//CanSend/CanReceive match (nested elements not allowed)
-		//TimeToLive == ((Retries + 1) * RetryInterval); PersistDuration >= TimeToLive
 		//1 channel per action allowed
 		//if ackRequested then ReliableMessaging available
 		//if isNonRepudiationRequired then Sender/ReceiverNonRepudiation and certificates available
 		//encryption not supported
 		//MessageOrder not supported
-		//Packaging.ComponentList.Encapsulation
 	}
 
 	private void validateEndpoints(CollaborationProtocolAgreement cpa)
@@ -86,7 +79,7 @@ public class CPAValidator
 			for (Transport transport : partyInfo.getTransport())
 				if (transport.getTransportReceiver().getEndpoint().size() > 1)
 				{
-					logger.warn("Multiple endpoints not supported! Using first endpoint.");
+					logger.warn("Multiple endpoints not supported! Only allPurpose endpoint supported. Using first endpoint.");
 					return;
 				}
 	}
