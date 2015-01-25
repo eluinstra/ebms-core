@@ -26,6 +26,7 @@ import java.util.Calendar;
 import java.util.List;
 
 import javax.xml.bind.JAXBElement;
+import javax.xml.datatype.Duration;
 
 import nl.clockwork.ebms.Constants;
 import nl.clockwork.ebms.model.EbMSMessage;
@@ -393,7 +394,12 @@ public class CPAUtils
 	
 	public static ReliableMessaging getReliableMessaging(CollaborationProtocolAgreement cpa, DeliveryChannel deliveryChannel)
 	{
-		return ((DocExchange)deliveryChannel.getDocExchangeId()).getEbXMLSenderBinding().getReliableMessaging();
+		return ((DocExchange)deliveryChannel.getDocExchangeId()).getEbXMLReceiverBinding().getReliableMessaging();
+	}
+
+	public static Duration getPersistantDuration(CollaborationProtocolAgreement cpa, DeliveryChannel deliveryChannel)
+	{
+		return ((DocExchange)deliveryChannel.getDocExchangeId()).getEbXMLReceiverBinding().getPersistDuration();
 	}
 	
 	public static Certificate getSigningCertificate(DeliveryChannel deliveryChannel)
