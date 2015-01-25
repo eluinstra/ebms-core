@@ -73,12 +73,17 @@ public class CPAUtils
 		return (partyId.getType() == null ? "" : partyId.getType() + ":") + partyId.getValue();
 	}
 
-	private static String toString(org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.PartyId partyId)
+	public static String toString(org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.PartyId partyId)
 	{
 		return (partyId.getType() == null ? "" : partyId.getType() + ":") + partyId.getValue();
 	}
 
 	public static String toString(ServiceType service)
+	{
+		return toString(service.getType(),service.getValue());
+	}
+
+	public static String toString(Service service)
 	{
 		return toString(service.getType(),service.getValue());
 	}

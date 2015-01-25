@@ -20,6 +20,10 @@ import java.util.Date;
 
 import javax.xml.bind.annotation.XmlElement;
 
+import nl.clockwork.ebms.util.CPAUtils;
+
+import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageHeader;
+
 public class EbMSMessageContext implements Serializable
 {
 	private static final long serialVersionUID = 1L;
@@ -38,6 +42,19 @@ public class EbMSMessageContext implements Serializable
 	{
 	}
 	
+	public EbMSMessageContext(MessageHeader messageHeader)
+	{
+		cpaId = messageHeader.getCPAId();
+		fromRole = new Role(CPAUtils.toString(messageHeader.getFrom().getPartyId().get(0)),messageHeader.getFrom().getRole());
+		toRole = new Role(CPAUtils.toString(messageHeader.getTo().getPartyId().get(0)),messageHeader.getTo().getRole());
+		service = CPAUtils.toString(messageHeader.getService());
+		action = messageHeader.getAction();
+		timestamp = messageHeader.getMessageData().getTimestamp().toGregorianCalendar().getTime();
+		conversationId = messageHeader.getConversationId();
+		messageId = messageHeader.getMessageData().getMessageId();
+		refToMessageId = messageHeader.getMessageData().getRefToMessageId();
+	}
+
 	@XmlElement(required=true)
 	public String getCpaId()
 	{
