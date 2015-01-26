@@ -1,6 +1,3 @@
-- improve EventListener
-	- change param messageId to messageContext
-	- improve event names
 - quickfix db lock
 	- add events Acknowledgment and MessageError
 	- add priority to events and event_queue
