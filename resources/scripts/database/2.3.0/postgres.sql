@@ -10,4 +10,8 @@ UPDATE ebms_attachment SET order_nr = (SELECT ROW_NUMBER() OVER(PARTITION BY mes
 
 ALTER TABLE ebms_attachment ADD COLUMN order_nr SMALLINT NOT NULL;
 
-UPDATE ebms_event SET type = 1 WHERE type > 1;
+UPDATE ebms_event SET type = -1 WHERE type = 0;
+
+UPDATE ebms_event SET type = 0 WHERE type > 1;
+
+UPDATE ebms_event SET type = 1 WHERE type = -1;

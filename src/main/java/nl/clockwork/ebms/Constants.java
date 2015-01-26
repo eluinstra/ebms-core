@@ -90,13 +90,19 @@ public class Constants
 
   public static enum EbMSEventType
   {
-  	EXPIRE(0), SEND(1);
+  	SEND(0,0), EXPIRE(1,1), ACKNOWLEDGMENT(2,1), MESSAGE_ERROR(3,1);
 
 		private final int id;
+		private final int priority;
 
-		EbMSEventType(int id) { this.id = id; }
+		EbMSEventType(int id, int priority)
+		{
+			this.id = id;
+			this.priority = priority;
+		}
 
 		public final int id() { return id; }
+		public final int priority() { return priority; }
 
 		public final static EbMSEventType get(int id)
 		{
