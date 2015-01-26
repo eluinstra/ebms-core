@@ -284,8 +284,8 @@ public class EbMSMessageProcessorX extends EbMSMessageProcessor
 						{
 							ebMSDAO.insertMessage(timestamp.getTime(),responseMessage,null);
 							ebMSDAO.deleteEvents(responseMessage.getMessageHeader().getMessageData().getRefToMessageId(),EbMSEventStatus.UNPROCESSED);
-							ebMSDAO.updateMessage(responseMessage.getMessageHeader().getMessageData().getRefToMessageId(),EbMSMessageStatus.SENT,EbMSMessageStatus.DELIVERY_ERROR);
-							eventListener.onMessageDeliveryFailed(responseMessage.getMessageHeader().getMessageData().getRefToMessageId());
+							ebMSDAO.updateMessage(responseMessage.getMessageHeader().getMessageData().getRefToMessageId(),EbMSMessageStatus.SENT,EbMSMessageStatus.DELIVERY_FAILED);
+							eventListener.onMessageFailed(responseMessage.getMessageHeader().getMessageData().getRefToMessageId());
 						}
 					}
 				);

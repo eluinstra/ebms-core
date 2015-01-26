@@ -119,7 +119,7 @@ public class EbMSMessageProcessor
 			}
 			else if (EbMSAction.MESSAGE_ERROR.action().equals(message.getMessageHeader().getAction()))
 			{
-				process(timestamp,message,EbMSMessageStatus.DELIVERY_ERROR);
+				process(timestamp,message,EbMSMessageStatus.DELIVERY_FAILED);
 				return null;
 			}
 			else if (EbMSAction.ACKNOWLEDGMENT.action().equals(message.getMessageHeader().getAction()))
@@ -188,7 +188,7 @@ public class EbMSMessageProcessor
 				if (Constants.EBMS_SERVICE_URI.equals(responseMessage.getMessageHeader().getService().getValue()))
 				{
 					if (EbMSAction.MESSAGE_ERROR.action().equals(responseMessage.getMessageHeader().getAction()))
-						process(timestamp,responseMessage,EbMSMessageStatus.DELIVERY_ERROR);
+						process(timestamp,responseMessage,EbMSMessageStatus.DELIVERY_FAILED);
 					else if (EbMSAction.ACKNOWLEDGMENT.action().equals(responseMessage.getMessageHeader().getAction()))
 					{
 						if (requestMessage.getAckRequested() == null || requestMessage.getSyncReply() == null)
@@ -342,8 +342,8 @@ public class EbMSMessageProcessor
 						ebMSDAO.updateMessage(responseMessage.getMessageHeader().getMessageData().getRefToMessageId(),EbMSMessageStatus.SENT,status);
 						if (status.equals(EbMSMessageStatus.DELIVERED))
 							eventListener.onMessageAcknowledged(responseMessage.getMessageHeader().getMessageData().getRefToMessageId());
-						else if (status.equals(EbMSMessageStatus.DELIVERY_ERROR))
-							eventListener.onMessageDeliveryFailed(responseMessage.getMessageHeader().getMessageData().getRefToMessageId());
+						else if (status.equals(EbMSMessageStatus.DELIVERY_FAILED))
+							eventListener.onMessageFailed(responseMessage.getMessageHeader().getMessageData().getRefToMessageId());
 					}
 				}
 			);

@@ -19,6 +19,6 @@ public interface EventListener
 {
 	void onMessageReceived(String messageId) throws EventException;
 	void onMessageAcknowledged(String messageId) throws EventException;
-	void onMessageDeliveryFailed(String messageId) throws EventException;
-	void onMessageNotAcknowledged(String messageId) throws EventException;
+	void onMessageFailed(String messageId) throws EventException;
+	void onMessageExpired(String messageId) throws EventException;
 }

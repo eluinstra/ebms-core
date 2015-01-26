@@ -23,6 +23,8 @@ import javax.jms.QueueConnectionFactory;
 import javax.jms.Session;
 
 import nl.clockwork.ebms.Constants;
+import nl.clockwork.ebms.dao.EbMSDAO;
+import nl.clockwork.ebms.model.EbMSMessageContext;
 
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.commons.logging.Log;
@@ -31,7 +33,8 @@ import org.apache.commons.logging.LogFactory;
 public class JMSEventListener implements EventListener
 {
 	protected transient Log logger = LogFactory.getLog(getClass());
-	Connection connection;
+	private EbMSDAO ebMSDAO;
+	private Connection connection;
 
 	public JMSEventListener() throws JMSException
 	{
@@ -51,11 +54,10 @@ public class JMSEventListener implements EventListener
 		try
 		{
 			logger.info("Message " + messageId + " received");
+			EbMSMessageContext messageContext = ebMSDAO.getMessageContext(messageId);
 			Session session = connection.createSession(false,Session.AUTO_ACKNOWLEDGE);
 			MessageProducer producer = session.createProducer(session.createQueue(Constants.EVENT_RECEIVED));
-			Message message = session.createMessage();
-			message.setStringProperty("messageId",messageId);
-			producer.send(message);
+			producer.send(createMessage(session,messageContext));
 		}
 		catch (JMSException e)
 		{
@@ -69,11 +71,10 @@ public class JMSEventListener implements EventListener
 		try
 		{
 			logger.info("Message " + messageId + " acknowledged");
+			EbMSMessageContext messageContext = ebMSDAO.getMessageContext(messageId);
 			Session session = connection.createSession(false,Session.AUTO_ACKNOWLEDGE);
 			MessageProducer producer = session.createProducer(session.createQueue(Constants.EVENT_ACKNOWLEDGED));
-			Message message = session.createMessage();
-			message.setStringProperty("messageId",messageId);
-			producer.send(message);
+			producer.send(createMessage(session,messageContext));
 		}
 		catch (JMSException e)
 		{
@@ -82,16 +83,15 @@ public class JMSEventListener implements EventListener
 	}
 	
 	@Override
-	public void onMessageDeliveryFailed(String messageId) throws EventException
+	public void onMessageFailed(String messageId) throws EventException
 	{
 		try
 		{
-			logger.info("Message " + messageId + " delivery failed");
+			logger.info("Message " + messageId + " failed");
+			EbMSMessageContext messageContext = ebMSDAO.getMessageContext(messageId);
 			Session session = connection.createSession(false,Session.AUTO_ACKNOWLEDGE);
 			MessageProducer producer = session.createProducer(session.createQueue(Constants.EVENT_FAILED));
-			Message message = session.createMessage();
-			message.setStringProperty("messageId",messageId);
-			producer.send(message);
+			producer.send(createMessage(session,messageContext));
 		}
 		catch (JMSException e)
 		{
@@ -100,16 +100,15 @@ public class JMSEventListener implements EventListener
 	}
 
 	@Override
-	public void onMessageNotAcknowledged(String messageId) throws EventException
+	public void onMessageExpired(String messageId) throws EventException
 	{
 		try
 		{
-			logger.info("Message " + messageId + " not acknowledged");
+			logger.info("Message " + messageId + " expired");
+			EbMSMessageContext messageContext = ebMSDAO.getMessageContext(messageId);
 			Session session = connection.createSession(false,Session.AUTO_ACKNOWLEDGE);
 			MessageProducer producer = session.createProducer(session.createQueue(Constants.EVENT_EXPIRED));
-			Message message = session.createMessage();
-			message.setStringProperty("messageId",messageId);
-			producer.send(message);
+			producer.send(createMessage(session,messageContext));
 		}
 		catch (JMSException e)
 		{
@@ -117,4 +116,26 @@ public class JMSEventListener implements EventListener
 		}
 	}
 
+	private Message createMessage(Session session, EbMSMessageContext messageContext) throws JMSException
+	{
+		Message message = session.createMessage();
+		message.setStringProperty("cpaId",messageContext.getCpaId());
+		message.setStringProperty("fromPartyId",messageContext.getFromRole().getPartyId());
+		message.setStringProperty("fromRole",messageContext.getFromRole().getRole());
+		message.setStringProperty("toPartyId",messageContext.getToRole().getPartyId());
+		message.setStringProperty("toRole",messageContext.getToRole().getRole());
+		message.setStringProperty("service",messageContext.getService());
+		message.setStringProperty("action",messageContext.getAction());
+		message.setStringProperty("conversationId",messageContext.getConversationId());
+		message.setStringProperty("messageId",messageContext.getMessageId());
+		message.setStringProperty("refToMessageId",messageContext.getRefToMessageId());
+		if (messageContext.getSequenceNr() != null)
+			message.setIntProperty("sequenceNr",messageContext.getSequenceNr());
+		return message;
+	}
+
+	public void setEbMSDAO(EbMSDAO ebMSDAO)
+	{
+		this.ebMSDAO = ebMSDAO;
+	}
 }

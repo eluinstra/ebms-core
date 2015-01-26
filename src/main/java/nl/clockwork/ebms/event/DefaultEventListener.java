@@ -28,12 +28,12 @@ public class DefaultEventListener implements EventListener
 	}
 	
 	@Override
-	public void onMessageDeliveryFailed(String messageId) throws EventException
+	public void onMessageFailed(String messageId) throws EventException
 	{
 	}
 
 	@Override
-	public void onMessageNotAcknowledged(String messageId) throws EventException
+	public void onMessageExpired(String messageId) throws EventException
 	{
 	}
 }

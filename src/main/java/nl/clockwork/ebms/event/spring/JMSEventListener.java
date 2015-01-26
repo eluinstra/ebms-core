@@ -22,8 +22,10 @@ import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.Session;
 
+import nl.clockwork.ebms.dao.EbMSDAO;
 import nl.clockwork.ebms.event.EventException;
 import nl.clockwork.ebms.event.EventListener;
+import nl.clockwork.ebms.model.EbMSMessageContext;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -34,23 +36,35 @@ public class JMSEventListener implements EventListener
 {
 	public class EventMessageCreator implements MessageCreator
 	{
-		private String messageId;
+		private EbMSMessageContext messageContext;
 
-		public EventMessageCreator(String messageId)
+		public EventMessageCreator(EbMSMessageContext messageContext)
 		{
-			this.messageId = messageId;
+			this.messageContext = messageContext;
 		}
 
 		@Override
 		public Message createMessage(Session session) throws JMSException
 		{
 			Message result = session.createMessage();
-			result.setStringProperty("messageId",messageId);
+			result.setStringProperty("cpaId",messageContext.getCpaId());
+			result.setStringProperty("fromPartyId",messageContext.getFromRole().getPartyId());
+			result.setStringProperty("fromRole",messageContext.getFromRole().getRole());
+			result.setStringProperty("toPartyId",messageContext.getToRole().getPartyId());
+			result.setStringProperty("toRole",messageContext.getToRole().getRole());
+			result.setStringProperty("service",messageContext.getService());
+			result.setStringProperty("action",messageContext.getAction());
+			result.setStringProperty("conversationId",messageContext.getConversationId());
+			result.setStringProperty("messageId",messageContext.getMessageId());
+			result.setStringProperty("refToMessageId",messageContext.getRefToMessageId());
+			if (messageContext.getSequenceNr() != null)
+				result.setIntProperty("sequenceNr",messageContext.getSequenceNr());
 			return result;
 		}
 	}
 
 	protected transient Log logger = LogFactory.getLog(getClass());
+	private EbMSDAO ebMSDAO;
 	private JmsTemplate jmsTemplate;
 	private Map<String,Destination> destinations;
 
@@ -58,28 +72,28 @@ public class JMSEventListener implements EventListener
 	public void onMessageReceived(String messageId) throws EventException
 	{
 		logger.info("Message " + messageId + " received");
-		jmsTemplate.send(destinations.get("EVENT.RECEIVED"),new EventMessageCreator(messageId));
+		jmsTemplate.send(destinations.get("EVENT.RECEIVED"),new EventMessageCreator(ebMSDAO.getMessageContext(messageId)));
 	}
 
 	@Override
 	public void onMessageAcknowledged(String messageId) throws EventException
 	{
 		logger.info("Message " + messageId + " acknowledged");
-		jmsTemplate.send(destinations.get("EVENT.ACKNOWLEDGED"),new EventMessageCreator(messageId));
+		jmsTemplate.send(destinations.get("EVENT.ACKNOWLEDGED"),new EventMessageCreator(ebMSDAO.getMessageContext(messageId)));
 	}
 	
 	@Override
-	public void onMessageDeliveryFailed(String messageId) throws EventException
+	public void onMessageFailed(String messageId) throws EventException
 	{
-		logger.info("Message " + messageId + " delivery failed");
-		jmsTemplate.send(destinations.get("EVENT.FAILED"),new EventMessageCreator(messageId));
+		logger.info("Message " + messageId + " failed");
+		jmsTemplate.send(destinations.get("EVENT.FAILED"),new EventMessageCreator(ebMSDAO.getMessageContext(messageId)));
 	}
 
 	@Override
-	public void onMessageNotAcknowledged(String messageId) throws EventException
+	public void onMessageExpired(String messageId) throws EventException
 	{
-		logger.info("Message " + messageId + " not acknowledged");
-		jmsTemplate.send(destinations.get("EVENT.EXPIRED"),new EventMessageCreator(messageId));
+		logger.info("Message " + messageId + " expired");
+		jmsTemplate.send(destinations.get("EVENT.EXPIRED"),new EventMessageCreator(ebMSDAO.getMessageContext(messageId)));
 	}
 
 	public void setJmsTemplate(JmsTemplate jmsTemplate)
