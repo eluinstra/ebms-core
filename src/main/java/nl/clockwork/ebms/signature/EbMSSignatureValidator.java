@@ -68,7 +68,7 @@ public class EbMSSignatureValidator
 		try
 		{
 			PartyInfo partyInfo = CPAUtils.getPartyInfo(cpa,message.getMessageHeader().getFrom().getPartyId());
-			if (CPAUtils.isSigned(partyInfo,message.getMessageHeader().getFrom().getRole(),message.getMessageHeader().getService(),message.getMessageHeader().getAction()))
+			if (CPAUtils.isNonRepudiationRequired(partyInfo,message.getMessageHeader().getFrom().getRole(),message.getMessageHeader().getService(),message.getMessageHeader().getAction()))
 			{
 				KeyStore trustStore = SecurityUtils.loadKeyStore(trustStorePath,trustStorePassword);
 				NodeList signatureNodeList = message.getMessage().getElementsByTagNameNS(org.apache.xml.security.utils.Constants.SignatureSpecNS,org.apache.xml.security.utils.Constants._TAG_SIGNATURE);

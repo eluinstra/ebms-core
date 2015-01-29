@@ -380,7 +380,7 @@ public class CPAUtils
 		return (Packaging)canSend.getThisPartyActionBinding().getPackageId();
 	}
 
-	public static boolean isSigned(PartyInfo partyInfo, String role, Service service, String action)
+	public static boolean isNonRepudiationRequired(PartyInfo partyInfo, String role, Service service, String action)
 	{
 		CanSend canSend = getCanSend(partyInfo,role,service,action);
 		DocExchange docExchange = getDocExchange(getFromDeliveryChannel(partyInfo,role,service,action));

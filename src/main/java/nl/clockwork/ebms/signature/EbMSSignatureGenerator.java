@@ -69,7 +69,7 @@ public class EbMSSignatureGenerator
 		try
 		{
 			PartyInfo partyInfo = CPAUtils.getPartyInfo(cpa,message.getMessageHeader().getFrom().getPartyId());
-			if (CPAUtils.isSigned(partyInfo,message.getMessageHeader().getFrom().getRole(),message.getMessageHeader().getService(),message.getMessageHeader().getAction()))
+			if (CPAUtils.isNonRepudiationRequired(partyInfo,message.getMessageHeader().getFrom().getRole(),message.getMessageHeader().getService(),message.getMessageHeader().getAction()))
 				generate(partyInfo,message);
 		}
 		catch (GeneralSecurityException e)
