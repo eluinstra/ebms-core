@@ -1,14 +1,6 @@
-- improve ebMSMessageContentValidator
-- improve detection of signing etc. in CPA
-- improve CPA validation concerning signing etc.
-- remove hard coded UTF-8 encoding from DAO's?
-- use try with resources statement on AutoClosable resources
 - quickfix db lock
 	X add events Acknowledgment and MessageError
 	/ add priority to events and event_queue
-- improve CPA validation
-	- check used CPA fields in CPAUtils and validate them
-	/ validate on unsupported features
 / web adapter
 / manual
 
@@ -39,6 +31,8 @@ nice to have features:
 	- store optional manifest description and schema with attachment???
 - implement Packaging
 - use PersistDuration to remove messages
+
+- remove hard coded character encoding (UTF-8)?
 
 2.5:
 / implement push interface with jms
