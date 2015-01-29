@@ -65,10 +65,10 @@ public class EbMSMessageContextValidator
 				throw new ValidationException(msg.toString());
 			}
 
-			//ToPartyInfo toPartyInfo = CPAUtils.getToPartyInfo(cpa,(ActionBindingType)fromPartyInfo.getCanSend().getOtherPartyActionBinding());
-			ToPartyInfo toPartyInfo1 = CPAUtils.getToPartyInfo(cpa,context.getToRole(),context.getService(),context.getAction());
-			//if (toPartyInfo == null && toPartyInfo1 == null)
-			if (fromPartyInfo.getCanSend().getOtherPartyActionBinding() == null && toPartyInfo1 == null)
+			//ToPartyInfo otherPartyInfo = CPAUtils.getToPartyInfo(cpa,(ActionBindingType)fromPartyInfo.getCanSend().getOtherPartyActionBinding());
+			ToPartyInfo toPartyInfo = CPAUtils.getToPartyInfo(cpa,context.getToRole(),context.getService(),context.getAction());
+			//if (otherPartyInfo == null && toPartyInfo == null)
+			if (fromPartyInfo.getCanSend().getOtherPartyActionBinding() == null && toPartyInfo == null)
 			{
 				StringBuffer msg = new StringBuffer();
 				msg.append("No CanReceive action found for:");
@@ -82,7 +82,7 @@ public class EbMSMessageContextValidator
 				throw new ValidationException(msg.toString());
 			}
 			//else if (toPartyInfo != null && toPartyInfo1 != null && toPartyInfo.getCanReceive().getThisPartyActionBinding() != toPartyInfo1.getCanReceive().getThisPartyActionBinding())
-			else if (fromPartyInfo.getCanSend().getOtherPartyActionBinding() != null && toPartyInfo1 != null && fromPartyInfo.getCanSend().getOtherPartyActionBinding() != toPartyInfo1.getCanReceive().getThisPartyActionBinding())
+			else if (fromPartyInfo.getCanSend().getOtherPartyActionBinding() != null && toPartyInfo != null && fromPartyInfo.getCanSend().getOtherPartyActionBinding() != toPartyInfo.getCanReceive().getThisPartyActionBinding())
 				throw new ValidationException("to party does not match from party for this action. Leave context.toRole empty!");
 		}
 		catch (DAOException e)
