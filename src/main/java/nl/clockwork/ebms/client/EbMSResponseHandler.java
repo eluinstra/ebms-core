@@ -43,7 +43,6 @@ public class EbMSResponseHandler
 
 	public EbMSDocument read() throws IOException, ParserConfigurationException, SAXException, EbMSProcessorException
 	{
-		InputStream input = null;
 		try
 		{
 			if (connection.getResponseCode() / 100 == 2)
@@ -52,50 +51,47 @@ public class EbMSResponseHandler
 					return null;
 				else
 				{
-					input = connection.getInputStream();
-					EbMSMessageReader messageReader = new EbMSMessageReader(getHeaderField("Content-Type"));
-					//return messageReader.read(input);
-					return messageReader.readResponse(input,getEncoding());
+					try (InputStream input = connection.getInputStream())
+					{
+						EbMSMessageReader messageReader = new EbMSMessageReader(getHeaderField("Content-Type"));
+						//return messageReader.read(input);
+						return messageReader.readResponse(input,getEncoding());
+					}
 				}
 			}
 			else if (connection.getResponseCode() >= 400)
 			{
-				input = connection.getErrorStream();
-				if (input != null)
+				try (InputStream input = connection.getErrorStream())
 				{
-					String response = IOUtils.toString(input);
-					if (connection.getResponseCode() == 500)
+					if (input != null)
 					{
-						Fault soapFault = EbMSMessageUtils.getSOAPFault(response);
-						if (soapFault != null)
-							throw new EbMSResponseSOAPException(connection.getResponseCode(),soapFault.getFaultcode(),response);
+						String response = IOUtils.toString(input);
+						if (connection.getResponseCode() == 500)
+						{
+							Fault soapFault = EbMSMessageUtils.getSOAPFault(response);
+							if (soapFault != null)
+								throw new EbMSResponseSOAPException(connection.getResponseCode(),soapFault.getFaultcode(),response);
+						}
+						throw new EbMSResponseException(connection.getResponseCode(),response);
 					}
-					throw new EbMSResponseException(connection.getResponseCode(),response);
+					else
+						throw new EbMSResponseException(connection.getResponseCode());
 				}
-				else
-					throw new EbMSResponseException(connection.getResponseCode());
 			}
 			else
 				throw new EbMSResponseException(connection.getResponseCode());
 		}
 		catch (IOException e)
 		{
-			try
+			try (InputStream errorStream = new BufferedInputStream(connection.getErrorStream()))
 			{
-				InputStream errorStream = new BufferedInputStream(connection.getErrorStream());
 				String error = IOUtils.toString(errorStream,getEncoding());
-				errorStream.close();
 				throw new EbMSResponseException(connection.getResponseCode(),error);
 			}
 			catch (IOException ignore)
 			{
 			}
 			throw e;
-		}
-		finally
-		{
-			if (input != null)
-				input.close();
 		}
 	}
 

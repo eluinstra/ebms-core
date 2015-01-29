@@ -17,7 +17,6 @@ package nl.clockwork.ebms.dao;
 
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.sql.Statement;
 
 import javax.sql.DataSource;
 
@@ -157,20 +156,6 @@ public class SimpleSQLConnectionManager implements ConnectionManager
 	public void close(boolean endTransaction)
 	{
 		SQLConnectionHolder.close();
-	}
-
-	@Override
-	public void close(Statement ps)
-	{
-		try
-		{
-			if (ps != null)
-				ps.close();
-		}
-		catch (SQLException e)
-		{
-			logger.warn("",e);
-		}
 	}
 
 }

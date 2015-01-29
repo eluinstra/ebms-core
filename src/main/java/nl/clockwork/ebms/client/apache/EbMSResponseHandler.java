@@ -38,21 +38,22 @@ public class EbMSResponseHandler implements ResponseHandler<EbMSDocument>
 	@Override
 	public EbMSDocument handleResponse(HttpResponse response) throws ClientProtocolException, IOException
 	{
-		InputStream input = null; 
 		try
 		{
 			if (response.getStatusLine().getStatusCode() / 100 == 2)
 			{
-		    HttpEntity entity = response.getEntity();
-		    if (response.getStatusLine().getStatusCode() == 204 || entity == null || entity.getContentLength() == 0)
-		    	return null;
-		    else
-		    {
-					input = entity.getContent();
-					EbMSMessageReader messageReader = new EbMSMessageReader(getHeaderField(response,"Content-Type"));
-					//return messageReader.read(input);
-					return messageReader.readResponse(input,getEncoding(entity));
-		    }
+				HttpEntity entity = response.getEntity();
+				if (response.getStatusLine().getStatusCode() == 204 || entity == null || entity.getContentLength() == 0)
+					return null;
+				else
+				{
+					try (InputStream input = entity.getContent())
+					{
+						EbMSMessageReader messageReader = new EbMSMessageReader(getHeaderField(response,"Content-Type"));
+						//return messageReader.read(input);
+						return messageReader.readResponse(input,getEncoding(entity));
+					}
+				}
 			}
 			else if (response.getStatusLine().getStatusCode() >= 400)
 			{
@@ -66,17 +67,6 @@ public class EbMSResponseHandler implements ResponseHandler<EbMSDocument>
 		{
 			throw new IOException(e);
 		}
-  	finally
-  	{
-  		try
-			{
-  			if (input != null)
-  				input.close();
-			}
-			catch (IOException ignore)
-			{
-			}
-  	}
 	}
 
 	private String getEncoding(HttpEntity entity)

@@ -63,11 +63,10 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 	public void insertMessage(Date timestamp, EbMSMessage message, EbMSMessageStatus status) throws DAOException
 	{
 		Connection c = null;
-		PreparedStatement ps = null;
 		try
 		{
 			c = connectionManager.getConnection(true);
-			ps = c.prepareStatement
+			try (PreparedStatement ps = c.prepareStatement
 			(
 				"insert into ebms_message (" +
 					"time_stamp," +
@@ -86,68 +85,46 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 					"status_time" +
 				") values (?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
 				new int[]{1}
-			);
-			ps.setTimestamp(1,new Timestamp(timestamp.getTime()));
-			MessageHeader messageHeader = message.getMessageHeader();
-			ps.setString(2,messageHeader.getCPAId());
-			ps.setString(3,messageHeader.getConversationId());
-			if (message.getMessageOrder() == null || message.getMessageOrder().getSequenceNumber() == null)
-				ps.setNull(4,java.sql.Types.BIGINT);
-			else
-				ps.setLong(4,message.getMessageOrder().getSequenceNumber().getValue().longValue());
-			ps.setString(5,messageHeader.getMessageData().getMessageId());
-			ps.setString(6,messageHeader.getMessageData().getRefToMessageId());
-			ps.setTimestamp(7,messageHeader.getMessageData().getTimeToLive() == null ? null : new Timestamp(messageHeader.getMessageData().getTimeToLive().toGregorianCalendar().getTimeInMillis()));
-			ps.setString(8,messageHeader.getFrom().getRole());
-			ps.setString(9,messageHeader.getTo().getRole());
-			ps.setString(10,EbMSMessageUtils.toString(messageHeader.getService()));
-			ps.setString(11,messageHeader.getAction());
-			ps.setString(12,DOMUtils.toString(message.getMessage(),"UTF-8"));
-			if (status == null)
+			))
 			{
-				ps.setNull(13,java.sql.Types.INTEGER);
-				ps.setNull(14,java.sql.Types.TIMESTAMP);
-			}
-			else
-			{
-				ps.setInt(13,status.id());
-				ps.setTimestamp(14,new Timestamp(timestamp.getTime()));
-			}
-			ps.executeUpdate();
-			ResultSet rs = ps.getGeneratedKeys();
-			if (rs.next())
-			{
-				long key = rs.getLong(1);
-				connectionManager.close(ps);
-				ps  = c.prepareStatement(
-					"insert into ebms_attachment (" +
-						"ebms_message_id," +
-						"order_nr," +
-						"name," +
-						"content_id," +
-						"content_type," +
-						"content" +
-					") values (?,?,?,?,?,?)"
-				);
-				int orderNr = 0;
-				for (EbMSAttachment attachment : message.getAttachments())
+				ps.setTimestamp(1,new Timestamp(timestamp.getTime()));
+				MessageHeader messageHeader = message.getMessageHeader();
+				ps.setString(2,messageHeader.getCPAId());
+				ps.setString(3,messageHeader.getConversationId());
+				if (message.getMessageOrder() == null || message.getMessageOrder().getSequenceNumber() == null)
+					ps.setNull(4,java.sql.Types.BIGINT);
+				else
+					ps.setLong(4,message.getMessageOrder().getSequenceNumber().getValue().longValue());
+				ps.setString(5,messageHeader.getMessageData().getMessageId());
+				ps.setString(6,messageHeader.getMessageData().getRefToMessageId());
+				ps.setTimestamp(7,messageHeader.getMessageData().getTimeToLive() == null ? null : new Timestamp(messageHeader.getMessageData().getTimeToLive().toGregorianCalendar().getTimeInMillis()));
+				ps.setString(8,messageHeader.getFrom().getRole());
+				ps.setString(9,messageHeader.getTo().getRole());
+				ps.setString(10,EbMSMessageUtils.toString(messageHeader.getService()));
+				ps.setString(11,messageHeader.getAction());
+				ps.setString(12,DOMUtils.toString(message.getMessage(),"UTF-8"));
+				if (status == null)
 				{
-					ps.setLong(1,key);
-					ps.setInt(2,orderNr++);
-					ps.setString(3,attachment.getName());
-					ps.setString(4,attachment.getContentId());
-					ps.setString(5,attachment.getContentType().split(";")[0].trim());
-					ps.setBytes(6,IOUtils.toByteArray(attachment.getInputStream()));
-					ps.addBatch();
+					ps.setNull(13,java.sql.Types.INTEGER);
+					ps.setNull(14,java.sql.Types.TIMESTAMP);
 				}
-				if (message.getAttachments().size() > 0)
-					ps.executeBatch();
-				connectionManager.commit();
-			}
-			else
-			{
-				connectionManager.rollback();
-				throw new DAOException("No key found!");
+				else
+				{
+					ps.setInt(13,status.id());
+					ps.setTimestamp(14,new Timestamp(timestamp.getTime()));
+				}
+				ps.executeUpdate();
+				ResultSet rs = ps.getGeneratedKeys();
+				if (rs.next())
+				{
+					insertAttachments(rs.getLong(1),message.getAttachments());
+					connectionManager.commit();
+				}
+				else
+				{
+					connectionManager.rollback();
+					throw new DAOException("No key found!");
+				}
 			}
 		}
 		catch (SQLException | IOException | TransformerException e)
@@ -157,7 +134,6 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 		}
 		finally
 		{
-			connectionManager.close(ps);
 			connectionManager.close(true);
 		}
 	}
@@ -166,11 +142,10 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 	public void insertDuplicateMessage(Date timestamp, EbMSMessage message) throws DAOException
 	{
 		Connection c = null;
-		PreparedStatement ps = null;
 		try
 		{
 			c = connectionManager.getConnection(true);
-			ps = c.prepareStatement
+			try (PreparedStatement ps = c.prepareStatement
 			(
 				"insert into ebms_message (" +
 					"time_stamp," +
@@ -188,35 +163,37 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 					"content" +
 				") values (?,?,?,?,?,(select nr from (select max(message_nr) + 1 as nr from ebms_message where message_id = ?) as c),?,?,?,?,?,?,?)",
 				new int[]{1}
-			);
-			ps.setTimestamp(1,new Timestamp(timestamp.getTime()));
-			MessageHeader messageHeader = message.getMessageHeader();
-			ps.setString(2,messageHeader.getCPAId());
-			ps.setString(3,messageHeader.getConversationId());
-			if (message.getMessageOrder() == null || message.getMessageOrder().getSequenceNumber() == null)
-				ps.setNull(4,java.sql.Types.BIGINT);
-			else
-				ps.setLong(4,message.getMessageOrder().getSequenceNumber().getValue().longValue());
-			ps.setString(5,messageHeader.getMessageData().getMessageId());
-			ps.setString(6,messageHeader.getMessageData().getMessageId());
-			ps.setString(7,messageHeader.getMessageData().getRefToMessageId());
-			ps.setTimestamp(8,messageHeader.getMessageData().getTimeToLive() == null ? null : new Timestamp(messageHeader.getMessageData().getTimeToLive().toGregorianCalendar().getTimeInMillis()));
-			ps.setString(9,messageHeader.getFrom().getRole());
-			ps.setString(10,messageHeader.getTo().getRole());
-			ps.setString(11,EbMSMessageUtils.toString(messageHeader.getService()));
-			ps.setString(12,messageHeader.getAction());
-			ps.setString(13,DOMUtils.toString(message.getMessage(),"UTF-8"));
-			ps.executeUpdate();
-			ResultSet rs = ps.getGeneratedKeys();
-			if (rs.next())
+			))
 			{
-				insertAttachments(rs.getLong(1),message.getAttachments());
-				connectionManager.commit();
-			}
-			else
-			{
-				connectionManager.rollback();
-				throw new DAOException("No key found!");
+				ps.setTimestamp(1,new Timestamp(timestamp.getTime()));
+				MessageHeader messageHeader = message.getMessageHeader();
+				ps.setString(2,messageHeader.getCPAId());
+				ps.setString(3,messageHeader.getConversationId());
+				if (message.getMessageOrder() == null || message.getMessageOrder().getSequenceNumber() == null)
+					ps.setNull(4,java.sql.Types.BIGINT);
+				else
+					ps.setLong(4,message.getMessageOrder().getSequenceNumber().getValue().longValue());
+				ps.setString(5,messageHeader.getMessageData().getMessageId());
+				ps.setString(6,messageHeader.getMessageData().getMessageId());
+				ps.setString(7,messageHeader.getMessageData().getRefToMessageId());
+				ps.setTimestamp(8,messageHeader.getMessageData().getTimeToLive() == null ? null : new Timestamp(messageHeader.getMessageData().getTimeToLive().toGregorianCalendar().getTimeInMillis()));
+				ps.setString(9,messageHeader.getFrom().getRole());
+				ps.setString(10,messageHeader.getTo().getRole());
+				ps.setString(11,EbMSMessageUtils.toString(messageHeader.getService()));
+				ps.setString(12,messageHeader.getAction());
+				ps.setString(13,DOMUtils.toString(message.getMessage(),"UTF-8"));
+				ps.executeUpdate();
+				ResultSet rs = ps.getGeneratedKeys();
+				if (rs.next())
+				{
+					insertAttachments(rs.getLong(1),message.getAttachments());
+					connectionManager.commit();
+				}
+				else
+				{
+					connectionManager.rollback();
+					throw new DAOException("No key found!");
+				}
 			}
 		}
 		catch (SQLException | IOException | TransformerException e)
@@ -226,7 +203,6 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 		}
 		finally
 		{
-			connectionManager.close(ps);
 			connectionManager.close(true);
 		}
 	}
@@ -234,11 +210,10 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 	protected void insertAttachments(long messageId, List<EbMSAttachment> attachments) throws SQLException, IOException
 	{
 		Connection c = null;
-		PreparedStatement ps = null;
 		try
 		{
 			c = connectionManager.getConnection(false);
-			ps  = c.prepareStatement(
+			try (PreparedStatement ps  = c.prepareStatement(
 				"insert into ebms_attachment (" +
 					"ebms_message_id," +
 					"order_nr," +
@@ -247,24 +222,25 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 					"content_type," +
 					"content" +
 				") values (?,?,?,?,?,?)"
-			);
-			int orderNr = 0;
-			for (EbMSAttachment attachment : attachments)
+			))
 			{
-				ps.setLong(1,messageId);
-				ps.setInt(2,orderNr++);
-				ps.setString(3,attachment.getName());
-				ps.setString(4,attachment.getContentId());
-				ps.setString(5,attachment.getContentType().split(";")[0].trim());
-				ps.setBytes(6,IOUtils.toByteArray(attachment.getInputStream()));
-				ps.addBatch();
+				int orderNr = 0;
+				for (EbMSAttachment attachment : attachments)
+				{
+					ps.setLong(1,messageId);
+					ps.setInt(2,orderNr++);
+					ps.setString(3,attachment.getName());
+					ps.setString(4,attachment.getContentId());
+					ps.setString(5,attachment.getContentType().split(";")[0].trim());
+					ps.setBytes(6,IOUtils.toByteArray(attachment.getInputStream()));
+					ps.addBatch();
+				}
+				if (attachments.size() > 0)
+					ps.executeBatch();
 			}
-			if (attachments.size() > 0)
-				ps.executeBatch();
 		}
 		finally
 		{
-			connectionManager.close(ps);
 			connectionManager.close(false);
 		}
 	}
@@ -272,35 +248,35 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 	protected List<EbMSAttachment> getAttachments(String messageId) throws SQLException
 	{
 		Connection c = null;
-		PreparedStatement ps = null;
 		try
 		{
 			List<EbMSAttachment> result = new ArrayList<EbMSAttachment>();
 			c = connectionManager.getConnection();
-			ps = c.prepareStatement(
+			try (PreparedStatement ps = c.prepareStatement(
 				"select a.name, a.content_id, a.content_type, a.content" + 
 				" from ebms_message m, ebms_attachment a" +
 				" where m.message_id = ?" +
 				" and m.message_nr = 0" +
 				" and m.id = a.ebms_message_id" +
 				" order by a.order_nr"
-			);
-			ps.setString(1,messageId);
-			if (ps.execute())
+			))
 			{
-				ResultSet rs = ps.getResultSet();
-				while (rs.next())
+				ps.setString(1,messageId);
+				if (ps.execute())
 				{
-					ByteArrayDataSource dataSource = new ByteArrayDataSource(rs.getBytes("content"),rs.getString("content_type"));
-					dataSource.setName(rs.getString("name"));
-					result.add(new EbMSAttachment(dataSource,rs.getString("content_id")));
+					ResultSet rs = ps.getResultSet();
+					while (rs.next())
+					{
+						ByteArrayDataSource dataSource = new ByteArrayDataSource(rs.getBytes("content"),rs.getString("content_type"));
+						dataSource.setName(rs.getString("name"));
+						result.add(new EbMSAttachment(dataSource,rs.getString("content_id")));
+					}
 				}
+				return result;
 			}
-			return result;
 		}
 		finally
 		{
-			connectionManager.close(ps);
 			connectionManager.close();
 		}
 	}

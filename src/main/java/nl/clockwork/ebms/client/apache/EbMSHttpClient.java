@@ -48,8 +48,7 @@ public class EbMSHttpClient implements EbMSClient
 	
 	public EbMSDocument sendMessage(String uri, EbMSDocument document) throws EbMSProcessorException
 	{
-		CloseableHttpClient httpClient = getHttpClient(uri);
-		try
+		try (CloseableHttpClient httpClient = getHttpClient(uri))
 		{
 			HttpPost httpPost = getHttpPost(uri);
 			if (logger.isDebugEnabled())
@@ -66,17 +65,6 @@ public class EbMSHttpClient implements EbMSClient
 		catch (TransformerException | IOException e)
 		{
 			throw new EbMSProcessorException(e);
-		}
-		finally
-		{
-			try
-			{
-				httpClient.close();
-			}
-			catch (IOException e)
-			{
-				logger.debug("",e);
-			}
 		}
 	}
 	

@@ -65,41 +65,41 @@ public class EbMSMessageWriter
 
 		OutputStream outputStream = connection.getOutputStream();
 
-		OutputStreamWriter writer = new OutputStreamWriter(outputStream,"UTF-8");
-
-		writer.write("--");
-		writer.write(boundary);
-		writer.write("\r\n");
-
-		writer.write("Content-Type: text/xml; charset=UTF-8");
-		writer.write("\r\n");
-		writer.write("Content-ID: <0>");
-		writer.write("\r\n");
-		writer.write("\r\n");
-		DOMUtils.write(document.getMessage(),writer,"UTF-8");
-		writer.write("\r\n");
-		writer.write("--");
-		writer.write(boundary);
-
-		for (EbMSAttachment attachment : document.getAttachments())
+		try (OutputStreamWriter writer = new OutputStreamWriter(outputStream,"UTF-8"))
 		{
+			writer.write("--");
+			writer.write(boundary);
 			writer.write("\r\n");
-			writer.write("Content-Type: " + attachment.getContentType());
+
+			writer.write("Content-Type: text/xml; charset=UTF-8");
 			writer.write("\r\n");
-			writer.write("Content-Transfer-Encoding: binary");
-			writer.write("\r\n");
-			writer.write("Content-ID: <" + attachment.getContentId() + ">");
+			writer.write("Content-ID: <0>");
 			writer.write("\r\n");
 			writer.write("\r\n");
-			writer.flush();
-			IOUtils.copy(attachment.getDataSource().getInputStream(),outputStream);
+			DOMUtils.write(document.getMessage(),writer,"UTF-8");
 			writer.write("\r\n");
 			writer.write("--");
 			writer.write(boundary);
+
+			for (EbMSAttachment attachment : document.getAttachments())
+			{
+				writer.write("\r\n");
+				writer.write("Content-Type: " + attachment.getContentType());
+				writer.write("\r\n");
+				writer.write("Content-Transfer-Encoding: binary");
+				writer.write("\r\n");
+				writer.write("Content-ID: <" + attachment.getContentId() + ">");
+				writer.write("\r\n");
+				writer.write("\r\n");
+				writer.flush();
+				IOUtils.copy(attachment.getDataSource().getInputStream(),outputStream);
+				writer.write("\r\n");
+				writer.write("--");
+				writer.write(boundary);
+			}
+
+			writer.write("--");
 		}
-	
-		writer.write("--");
-		writer.close();
 	}
 
 	private String createBoundary()

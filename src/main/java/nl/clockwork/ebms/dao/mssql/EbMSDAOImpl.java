@@ -56,11 +56,10 @@ public class EbMSDAOImpl extends nl.clockwork.ebms.dao.mysql.EbMSDAOImpl
 	public void insertDuplicateMessage(Date timestamp, EbMSMessage message) throws DAOException
 	{
 		Connection c = null;
-		PreparedStatement ps = null;
 		try
 		{
 			c = connectionManager.getConnection(true);
-			ps = c.prepareStatement
+			try (PreparedStatement ps = c.prepareStatement
 			(
 				"insert into ebms_message (" +
 					"time_stamp," +
@@ -78,35 +77,37 @@ public class EbMSDAOImpl extends nl.clockwork.ebms.dao.mysql.EbMSDAOImpl
 					"content" +
 				") values (?,?,?,?,?,select max(message_nr) + 1 as nr from ebms_message where message_id = ?,?,?,?,?,?,?,?)",
 				new int[]{1}
-			);
-			ps.setTimestamp(1,new Timestamp(timestamp.getTime()));
-			MessageHeader messageHeader = message.getMessageHeader();
-			ps.setString(2,messageHeader.getCPAId());
-			ps.setString(3,messageHeader.getConversationId());
-			if (message.getMessageOrder() == null || message.getMessageOrder().getSequenceNumber() == null)
-				ps.setNull(4,java.sql.Types.BIGINT);
-			else
-				ps.setLong(4,message.getMessageOrder().getSequenceNumber().getValue().longValue());
-			ps.setString(5,messageHeader.getMessageData().getMessageId());
-			ps.setString(6,messageHeader.getMessageData().getMessageId());
-			ps.setString(7,messageHeader.getMessageData().getRefToMessageId());
-			ps.setTimestamp(8,messageHeader.getMessageData().getTimeToLive() == null ? null : new Timestamp(messageHeader.getMessageData().getTimeToLive().toGregorianCalendar().getTimeInMillis()));
-			ps.setString(9,messageHeader.getFrom().getRole());
-			ps.setString(10,messageHeader.getTo().getRole());
-			ps.setString(11,EbMSMessageUtils.toString(messageHeader.getService()));
-			ps.setString(12,messageHeader.getAction());
-			ps.setString(13,DOMUtils.toString(message.getMessage(),"UTF-8"));
-			ps.executeUpdate();
-			ResultSet rs = ps.getGeneratedKeys();
-			if (rs.next())
+			))
 			{
-				insertAttachments(rs.getLong(1),message.getAttachments());
-				connectionManager.commit();
-			}
-			else
-			{
-				connectionManager.rollback();
-				throw new DAOException("No key found!");
+				ps.setTimestamp(1,new Timestamp(timestamp.getTime()));
+				MessageHeader messageHeader = message.getMessageHeader();
+				ps.setString(2,messageHeader.getCPAId());
+				ps.setString(3,messageHeader.getConversationId());
+				if (message.getMessageOrder() == null || message.getMessageOrder().getSequenceNumber() == null)
+					ps.setNull(4,java.sql.Types.BIGINT);
+				else
+					ps.setLong(4,message.getMessageOrder().getSequenceNumber().getValue().longValue());
+				ps.setString(5,messageHeader.getMessageData().getMessageId());
+				ps.setString(6,messageHeader.getMessageData().getMessageId());
+				ps.setString(7,messageHeader.getMessageData().getRefToMessageId());
+				ps.setTimestamp(8,messageHeader.getMessageData().getTimeToLive() == null ? null : new Timestamp(messageHeader.getMessageData().getTimeToLive().toGregorianCalendar().getTimeInMillis()));
+				ps.setString(9,messageHeader.getFrom().getRole());
+				ps.setString(10,messageHeader.getTo().getRole());
+				ps.setString(11,EbMSMessageUtils.toString(messageHeader.getService()));
+				ps.setString(12,messageHeader.getAction());
+				ps.setString(13,DOMUtils.toString(message.getMessage(),"UTF-8"));
+				ps.executeUpdate();
+				ResultSet rs = ps.getGeneratedKeys();
+				if (rs.next())
+				{
+					insertAttachments(rs.getLong(1),message.getAttachments());
+					connectionManager.commit();
+				}
+				else
+				{
+					connectionManager.rollback();
+					throw new DAOException("No key found!");
+				}
 			}
 		}
 		catch (SQLException | IOException | TransformerException e)
@@ -116,7 +117,6 @@ public class EbMSDAOImpl extends nl.clockwork.ebms.dao.mysql.EbMSDAOImpl
 		}
 		finally
 		{
-			connectionManager.close(ps);
 			connectionManager.close(true);
 		}
 	}

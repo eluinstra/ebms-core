@@ -16,7 +16,6 @@
 package nl.clockwork.ebms.dao;
 
 import java.sql.Connection;
-import java.sql.Statement;
 
 public interface ConnectionManager
 {
@@ -26,5 +25,4 @@ public interface ConnectionManager
 	void rollback();
 	void close();
 	void close(boolean endTransaction);
-	void close(Statement ps);
 }
