@@ -1,6 +1,4 @@
 - quickfix db lock
-	X add events Acknowledgment and MessageError
-	/ add priority to events and event_queue
 / web adapter
 / manual
 - document service interfaces
@@ -17,6 +15,9 @@
 - change events
 	- create only one event
 	- add expiration time and retry attempt nr to event
+	- db locking issue
+		- add events Acknowledgment and MessageError
+		- add priority to events and event_queue
 
 nice to have features:
 - add endpoint type support (now only allPurpose endpoint type is supported):
