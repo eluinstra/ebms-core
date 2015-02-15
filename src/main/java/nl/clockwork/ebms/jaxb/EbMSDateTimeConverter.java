@@ -16,45 +16,26 @@
 package nl.clockwork.ebms.jaxb;
 
 import java.text.DateFormat;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.GregorianCalendar;
+import java.util.Date;
 import java.util.TimeZone;
 
-import javax.xml.datatype.DatatypeConfigurationException;
-import javax.xml.datatype.DatatypeFactory;
-import javax.xml.datatype.XMLGregorianCalendar;
+import javax.xml.bind.DatatypeConverter;
 
 public class EbMSDateTimeConverter
 {
-	private static final String DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss'Z'";
-
-	public static XMLGregorianCalendar parseDateTime(String date)
+	public static Date parseDateTime(String date)
 	{
-		try
-		{
-			date = date.replaceFirst("\\.\\d{0,3}","");
-			if (!date.endsWith("Z"))
-				date += "Z";
-			GregorianCalendar calendar = new GregorianCalendar();
-			DateFormat df = new SimpleDateFormat(DATE_FORMAT);
-			df.setTimeZone(TimeZone.getTimeZone("GMT"));
-			//df.setLenient(true);
-			calendar.setTime(df.parse(date));
-			return DatatypeFactory.newInstance().newXMLGregorianCalendar(calendar);
-		}
-		catch (ParseException | DatatypeConfigurationException e)
-		{
-			//throw new RuntimeException(e);
-			return null;
-		}
+		return DatatypeConverter.parseDateTime(date).getTime();
 	}
 
-	public static String printDateTime(XMLGregorianCalendar date)
+	public static String printDateTime(Date date)
 	{
-		DateFormat df = new SimpleDateFormat(DATE_FORMAT);
+//		final GregorianCalendar calendar = new GregorianCalendar();
+//		calendar.setTime(date);
+//		return DatatypeConverter.printDateTime(calendar);
+		DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssX");
 		df.setTimeZone(TimeZone.getTimeZone("GMT"));
-		//df.setLenient(true);
-		return df.format(date.toGregorianCalendar().getTime());
+		return df.format(date);
 	}
 }

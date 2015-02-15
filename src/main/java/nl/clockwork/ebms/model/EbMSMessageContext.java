@@ -49,7 +49,7 @@ public class EbMSMessageContext implements Serializable
 		toRole = new Role(CPAUtils.toString(messageHeader.getTo().getPartyId().get(0)),messageHeader.getTo().getRole());
 		service = CPAUtils.toString(messageHeader.getService());
 		action = messageHeader.getAction();
-		timestamp = messageHeader.getMessageData().getTimestamp().toGregorianCalendar().getTime();
+		timestamp = messageHeader.getMessageData().getTimestamp();
 		conversationId = messageHeader.getConversationId();
 		messageId = messageHeader.getMessageData().getMessageId();
 		refToMessageId = messageHeader.getMessageData().getRefToMessageId();

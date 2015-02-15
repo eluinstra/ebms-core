@@ -22,7 +22,7 @@ import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
-import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 import javax.xml.bind.JAXBElement;
@@ -30,8 +30,8 @@ import javax.xml.datatype.Duration;
 
 import nl.clockwork.ebms.Constants;
 import nl.clockwork.ebms.model.EbMSMessage;
-import nl.clockwork.ebms.model.FromPartyInfo;
 import nl.clockwork.ebms.model.EbMSPartyInfo;
+import nl.clockwork.ebms.model.FromPartyInfo;
 import nl.clockwork.ebms.model.Party;
 import nl.clockwork.ebms.model.Role;
 import nl.clockwork.ebms.model.ToPartyInfo;
@@ -63,10 +63,10 @@ public class CPAUtils
 {
 	public static boolean isValid(CollaborationProtocolAgreement cpa, EbMSMessage message)
 	{
-		Calendar timestamp = message.getMessageHeader().getMessageData().getTimestamp().toGregorianCalendar();
+		Date timestamp = message.getMessageHeader().getMessageData().getTimestamp();
 		return StatusValueType.AGREED.equals(cpa.getStatus().getValue())
-				&& timestamp.compareTo(cpa.getStart().toGregorianCalendar()) >= 0
-				&& timestamp.compareTo(cpa.getEnd().toGregorianCalendar()) <= 0;
+				&& timestamp.compareTo(cpa.getStart()) >= 0
+				&& timestamp.compareTo(cpa.getEnd()) <= 0;
 	}
 
 	public static String toString(PartyId partyId)

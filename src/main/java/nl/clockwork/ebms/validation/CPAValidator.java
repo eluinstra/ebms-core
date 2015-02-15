@@ -15,7 +15,7 @@
  */
 package nl.clockwork.ebms.validation;
 
-import java.util.Calendar;
+import java.util.Date;
 
 import nl.clockwork.ebms.Constants;
 import nl.clockwork.ebms.model.EbMSMessage;
@@ -61,9 +61,9 @@ public class CPAValidator
 			logger.warn("CPA version " + cpa.getVersion() + " detected! CPA version 2_0b expected.");
 		if ("proposed".equals(cpa.getStatus()))
 			throw new ValidationException("CPA Status is proposed!");
-		if (cpa.getStart().compare(cpa.getEnd()) > 0)
-			throw new ValidationException("CPA End date before Start date!");
-		if (Calendar.getInstance().compareTo(cpa.getEnd().toGregorianCalendar()) > 0)
+		if (cpa.getStart().before(cpa.getEnd()))
+			throw new ValidationException("CPA Start date not before End date!");
+		if (new Date().before(cpa.getEnd()))
 			throw new ValidationException("CPA expired on " + cpa.getEnd());
 		if (cpa.getConversationConstraints() != null)
 			logger.warn("CPA Conversation Constraints not implemented!");

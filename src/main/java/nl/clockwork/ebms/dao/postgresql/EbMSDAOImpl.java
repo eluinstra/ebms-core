@@ -92,7 +92,7 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 					ps.setLong(4,message.getMessageOrder().getSequenceNumber().getValue().longValue());
 				ps.setString(5,messageHeader.getMessageData().getMessageId());
 				ps.setString(6,messageHeader.getMessageData().getRefToMessageId());
-				ps.setTimestamp(7,messageHeader.getMessageData().getTimeToLive() == null ? null : new Timestamp(messageHeader.getMessageData().getTimeToLive().toGregorianCalendar().getTimeInMillis()));
+				ps.setTimestamp(7,messageHeader.getMessageData().getTimeToLive() == null ? null : new Timestamp(messageHeader.getMessageData().getTimeToLive().getTime()));
 				ps.setString(8,messageHeader.getFrom().getRole());
 				ps.setString(9,messageHeader.getTo().getRole());
 				ps.setString(10,EbMSMessageUtils.toString(messageHeader.getService()));
@@ -170,7 +170,7 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 				ps.setString(5,messageHeader.getMessageData().getMessageId());
 				ps.setString(6,messageHeader.getMessageData().getMessageId());
 				ps.setString(7,messageHeader.getMessageData().getRefToMessageId());
-				ps.setTimestamp(8,messageHeader.getMessageData().getTimeToLive() == null ? null : new Timestamp(messageHeader.getMessageData().getTimeToLive().toGregorianCalendar().getTimeInMillis()));
+				ps.setTimestamp(8,messageHeader.getMessageData().getTimeToLive() == null ? null : new Timestamp(messageHeader.getMessageData().getTimeToLive().getTime()));
 				ps.setString(9,messageHeader.getFrom().getRole());
 				ps.setString(10,messageHeader.getTo().getRole());
 				ps.setString(11,EbMSMessageUtils.toString(messageHeader.getService()));

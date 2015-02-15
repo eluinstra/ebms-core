@@ -16,8 +16,7 @@
 package nl.clockwork.ebms.processor;
 
 import java.io.IOException;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
+import java.util.Date;
 
 import javax.xml.bind.JAXBException;
 import javax.xml.datatype.DatatypeConfigurationException;
@@ -73,7 +72,7 @@ public class EbMSMessageProcessorX extends EbMSMessageProcessor
 		try
 		{
 			xsdValidator.validate(document.getMessage());
-			GregorianCalendar timestamp = new GregorianCalendar();
+			Date timestamp = new Date();
 			final EbMSMessage message = EbMSMessageUtils.getEbMSMessage(document);
 			final CollaborationProtocolAgreement cpa = ebMSDAO.getCPA(message.getMessageHeader().getCPAId());
 			if (cpa == null)
@@ -195,7 +194,7 @@ public class EbMSMessageProcessorX extends EbMSMessageProcessor
 			if (response != null)
 			{
 				xsdValidator.validate(response.getMessage());
-				GregorianCalendar timestamp = new GregorianCalendar();
+				Date timestamp = new Date();
 				final EbMSMessage responseMessage = EbMSMessageUtils.getEbMSMessage(response);
 				if (Constants.EBMS_SERVICE_URI.equals(responseMessage.getMessageHeader().getService().getValue()))
 				{
@@ -266,10 +265,10 @@ public class EbMSMessageProcessorX extends EbMSMessageProcessor
 		}
 	}
 	
-	private void processMessageError(CollaborationProtocolAgreement cpa, final Calendar timestamp, final EbMSMessage requestMessage, final EbMSMessage responseMessage)
+	private void processMessageError(CollaborationProtocolAgreement cpa, final Date timestamp, final EbMSMessage requestMessage, final EbMSMessage responseMessage)
 	{
 		if (isDuplicateMessage(responseMessage))
-			ebMSDAO.insertDuplicateMessage(timestamp.getTime(),responseMessage);
+			ebMSDAO.insertDuplicateMessage(timestamp,responseMessage);
 		else
 		{
 			try
@@ -282,7 +281,7 @@ public class EbMSMessageProcessorX extends EbMSMessageProcessor
 						@Override
 						public void doInTransaction()
 						{
-							ebMSDAO.insertMessage(timestamp.getTime(),responseMessage,null);
+							ebMSDAO.insertMessage(timestamp,responseMessage,null);
 							ebMSDAO.deleteEvents(responseMessage.getMessageHeader().getMessageData().getRefToMessageId(),EbMSEventStatus.UNPROCESSED);
 							ebMSDAO.updateMessage(responseMessage.getMessageHeader().getMessageData().getRefToMessageId(),EbMSMessageStatus.SENT,EbMSMessageStatus.DELIVERY_FAILED);
 							eventListener.onMessageFailed(responseMessage.getMessageHeader().getMessageData().getRefToMessageId());
@@ -292,16 +291,16 @@ public class EbMSMessageProcessorX extends EbMSMessageProcessor
 			}
 			catch (ValidationException e)
 			{
-				ebMSDAO.insertMessage(timestamp.getTime(),responseMessage,null);
+				ebMSDAO.insertMessage(timestamp,responseMessage,null);
 				logger.warn("Unable to process MessageError " + responseMessage.getMessageHeader().getMessageData().getMessageId(),e);
 			}
 		}
 	}
 	
-	private void processAcknowledgment(CollaborationProtocolAgreement cpa, final Calendar timestamp, final EbMSMessage requestMessage, final EbMSMessage responseMessage)
+	private void processAcknowledgment(CollaborationProtocolAgreement cpa, final Date timestamp, final EbMSMessage requestMessage, final EbMSMessage responseMessage)
 	{
 		if (isDuplicateMessage(responseMessage))
-			ebMSDAO.insertDuplicateMessage(timestamp.getTime(),responseMessage);
+			ebMSDAO.insertDuplicateMessage(timestamp,responseMessage);
 		else
 		{
 			try
@@ -315,7 +314,7 @@ public class EbMSMessageProcessorX extends EbMSMessageProcessor
 						@Override
 						public void doInTransaction()
 						{
-							ebMSDAO.insertMessage(timestamp.getTime(),responseMessage,null);
+							ebMSDAO.insertMessage(timestamp,responseMessage,null);
 							ebMSDAO.deleteEvents(responseMessage.getMessageHeader().getMessageData().getRefToMessageId(),EbMSEventStatus.UNPROCESSED);
 							ebMSDAO.updateMessage(responseMessage.getMessageHeader().getMessageData().getRefToMessageId(),EbMSMessageStatus.SENT,EbMSMessageStatus.DELIVERED);
 							eventListener.onMessageAcknowledged(responseMessage.getMessageHeader().getMessageData().getRefToMessageId());
@@ -325,7 +324,7 @@ public class EbMSMessageProcessorX extends EbMSMessageProcessor
 			}
 			catch (ValidatorException e)
 			{
-				ebMSDAO.insertMessage(timestamp.getTime(),responseMessage,null);
+				ebMSDAO.insertMessage(timestamp,responseMessage,null);
 				logger.warn("Unable to process Acknowledgment " + responseMessage.getMessageHeader().getMessageData().getMessageId(),e);
 			}
 		}

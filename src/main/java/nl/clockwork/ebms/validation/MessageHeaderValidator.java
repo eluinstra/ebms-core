@@ -17,7 +17,7 @@ package nl.clockwork.ebms.validation;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 import nl.clockwork.ebms.Constants;
@@ -55,7 +55,7 @@ public class MessageHeaderValidator
 		this.ebMSDAO = ebMSDAO;
 	}
 
-	public void validate(CollaborationProtocolAgreement cpa, EbMSMessage message, Calendar timestamp) throws EbMSValidationException
+	public void validate(CollaborationProtocolAgreement cpa, EbMSMessage message, Date timestamp) throws EbMSValidationException
 	{
 		MessageHeader messageHeader = message.getMessageHeader();
 		AckRequested ackRequested = message.getAckRequested();
@@ -167,10 +167,10 @@ public class MessageHeaderValidator
 		return refToMessageId == null || ebMSDAO.existsMessage(refToMessageId);
 	}
 	
-	private boolean checkTimeToLive(MessageHeader messageHeader, Calendar timestamp)
+	private boolean checkTimeToLive(MessageHeader messageHeader, Date timestamp)
 	{
 		return messageHeader.getMessageData().getTimeToLive() == null
-				|| timestamp.before(messageHeader.getMessageData().getTimeToLive().toGregorianCalendar());
+				|| timestamp.before(messageHeader.getMessageData().getTimeToLive());
 	}
 	
 	private boolean checkDuplicateElimination(DeliveryChannel deliveryChannel, MessageHeader messageHeader)

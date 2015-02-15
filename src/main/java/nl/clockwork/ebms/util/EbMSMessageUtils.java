@@ -19,7 +19,6 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.UUID;
 
@@ -27,7 +26,6 @@ import javax.mail.util.ByteArrayDataSource;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.datatype.DatatypeConfigurationException;
-import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.Duration;
 import javax.xml.namespace.QName;
 import javax.xml.parsers.ParserConfigurationException;
@@ -174,7 +172,7 @@ public class EbMSMessageUtils
 		return new EbMSDocument(EbMSMessageUtils.createSOAPMessage(message),message.getAttachments());
 	}
 	
-	public static MessageHeader createMessageHeader(CollaborationProtocolAgreement cpa, Party fromParty, Party toParty, String action) throws DatatypeConfigurationException
+	public static MessageHeader createMessageHeader(CollaborationProtocolAgreement cpa, Party fromParty, Party toParty, String action)
 	{
 		String uuid = UUID.randomUUID().toString();
 		EbMSPartyInfo fromPartyInfo = CPAUtils.getEbMSPartyInfo(cpa,fromParty);
@@ -206,7 +204,7 @@ public class EbMSMessageUtils
 		messageHeader.setMessageData(new MessageData());
 		messageHeader.getMessageData().setMessageId(uuid + "@" + hostname);
 		//messageHeader.getMessageData().setRefToMessageId(null);
-		messageHeader.getMessageData().setTimestamp(DatatypeFactory.newInstance().newXMLGregorianCalendar(new GregorianCalendar()));
+		messageHeader.getMessageData().setTimestamp(new Date());
 
 		//setTimeToLive(cpa,deliveryChannel,messageHeader);
 
@@ -247,7 +245,7 @@ public class EbMSMessageUtils
 		messageHeader.setMessageData(new MessageData());
 		messageHeader.getMessageData().setMessageId(uuid + "@" + hostname);
 		messageHeader.getMessageData().setRefToMessageId(context.getRefToMessageId());
-		messageHeader.getMessageData().setTimestamp(DatatypeFactory.newInstance().newXMLGregorianCalendar(new GregorianCalendar()));
+		messageHeader.getMessageData().setTimestamp(new Date());
 
 		setTimeToLive(cpa,deliveryChannel,messageHeader);
 
@@ -261,13 +259,13 @@ public class EbMSMessageUtils
 		if (CPAUtils.isReliableMessaging(cpa,deliveryChannel))
 		{
 			Duration duration = CPAUtils.getPersistantDuration(cpa,deliveryChannel);
-			GregorianCalendar timestamp = messageHeader.getMessageData().getTimestamp().toGregorianCalendar();
+			Date timestamp = messageHeader.getMessageData().getTimestamp();
 			duration.addTo(timestamp);
-			messageHeader.getMessageData().setTimeToLive(DatatypeFactory.newInstance().newXMLGregorianCalendar(timestamp));
+			messageHeader.getMessageData().setTimeToLive(timestamp);
 		}
 	}
 
-	public static MessageHeader createMessageHeader(CollaborationProtocolAgreement cpa, MessageHeader messageHeader, GregorianCalendar timestamp, EbMSAction action) throws DatatypeConfigurationException, JAXBException
+	public static MessageHeader createMessageHeader(CollaborationProtocolAgreement cpa, MessageHeader messageHeader, Date timestamp, EbMSAction action) throws DatatypeConfigurationException, JAXBException
 	{
 		PartyInfo partyInfo = CPAUtils.getPartyInfo(cpa,messageHeader.getTo().getPartyId());
 		DeliveryChannel deliveryChannel = CPAUtils.getDefaultDeliveryChannel(partyInfo,action.action());
@@ -285,7 +283,7 @@ public class EbMSMessageUtils
 
 		result.getMessageData().setRefToMessageId(messageHeader.getMessageData().getMessageId());
 		result.getMessageData().setMessageId(UUID.randomUUID().toString() + "@" + hostname);
-		result.getMessageData().setTimestamp(DatatypeFactory.newInstance().newXMLGregorianCalendar(timestamp));
+		result.getMessageData().setTimestamp(timestamp);
 		result.getMessageData().setTimeToLive(null);
 
 		result.setService(new Service());
@@ -385,7 +383,7 @@ public class EbMSMessageUtils
 		return request;
 	}
 
-	public static StatusResponse createStatusResponse(StatusRequest statusRequest, EbMSMessageStatus status, GregorianCalendar timestamp) throws DatatypeConfigurationException
+	public static StatusResponse createStatusResponse(StatusRequest statusRequest, EbMSMessageStatus status, Date timestamp) throws DatatypeConfigurationException
 	{
 		StatusResponse response = new StatusResponse();
 		response.setVersion(Constants.EBMS_VERSION);
@@ -394,12 +392,12 @@ public class EbMSMessageUtils
 		{
 			response.setMessageStatus(status.statusCode());
 			if (MessageStatusType.RECEIVED.equals(status.statusCode()) || MessageStatusType.PROCESSED.equals(status.statusCode()))
-				response.setTimestamp(DatatypeFactory.newInstance().newXMLGregorianCalendar(timestamp));
+				response.setTimestamp(timestamp);
 		}
 		return response;
 	}
 
-	public static EbMSMessage createEbMSMessageError(CollaborationProtocolAgreement cpa, EbMSMessage message, ErrorList errorList, GregorianCalendar timestamp) throws DatatypeConfigurationException, JAXBException
+	public static EbMSMessage createEbMSMessageError(CollaborationProtocolAgreement cpa, EbMSMessage message, ErrorList errorList, Date timestamp) throws DatatypeConfigurationException, JAXBException
 	{
 		MessageHeader messageHeader = EbMSMessageUtils.createMessageHeader(cpa,message.getMessageHeader(),timestamp,EbMSAction.MESSAGE_ERROR);
 		if (errorList.getError().size() == 0)
@@ -413,7 +411,7 @@ public class EbMSMessageUtils
 		return result;
 	}
 
-	public static EbMSMessage createEbMSAcknowledgment(CollaborationProtocolAgreement cpa, EbMSMessage message, GregorianCalendar timestamp) throws DatatypeConfigurationException, JAXBException
+	public static EbMSMessage createEbMSAcknowledgment(CollaborationProtocolAgreement cpa, EbMSMessage message, Date timestamp) throws DatatypeConfigurationException, JAXBException
 	{
 		MessageHeader messageHeader = EbMSMessageUtils.createMessageHeader(cpa,message.getMessageHeader(),timestamp,EbMSAction.ACKNOWLEDGMENT);
 		
@@ -422,7 +420,7 @@ public class EbMSMessageUtils
 		acknowledgment.setVersion(Constants.EBMS_VERSION);
 		acknowledgment.setMustUnderstand(true);
 
-		acknowledgment.setTimestamp(DatatypeFactory.newInstance().newXMLGregorianCalendar(timestamp));
+		acknowledgment.setTimestamp(timestamp);
 		acknowledgment.setRefToMessageId(messageHeader.getMessageData().getRefToMessageId());
 		acknowledgment.setFrom(new From());
 		acknowledgment.getFrom().getPartyId().addAll(messageHeader.getFrom().getPartyId());
@@ -452,7 +450,7 @@ public class EbMSMessageUtils
 	public static EbMSMessage createEbMSPong(CollaborationProtocolAgreement cpa, EbMSMessage ping) throws DatatypeConfigurationException, JAXBException
 	{
 		EbMSMessage result = new EbMSMessage();
-		result.setMessageHeader(createMessageHeader(cpa,ping.getMessageHeader(),new GregorianCalendar(),EbMSAction.PONG));
+		result.setMessageHeader(createMessageHeader(cpa,ping.getMessageHeader(),new Date(),EbMSAction.PONG));
 		return result;
 	}
 	
@@ -467,9 +465,9 @@ public class EbMSMessageUtils
 		return result;
 	}
 
-	public static EbMSMessage createEbMSStatusResponse(CollaborationProtocolAgreement cpa, EbMSMessage request, EbMSMessageStatus status, GregorianCalendar timestamp) throws DatatypeConfigurationException, JAXBException
+	public static EbMSMessage createEbMSStatusResponse(CollaborationProtocolAgreement cpa, EbMSMessage request, EbMSMessageStatus status, Date timestamp) throws DatatypeConfigurationException, JAXBException
 	{
-		MessageHeader messageHeader = createMessageHeader(cpa,request.getMessageHeader(),new GregorianCalendar(),EbMSAction.STATUS_RESPONSE);
+		MessageHeader messageHeader = createMessageHeader(cpa,request.getMessageHeader(),new Date(),EbMSAction.STATUS_RESPONSE);
 		StatusResponse statusResponse = createStatusResponse(request.getStatusRequest(),status,timestamp);
 		EbMSMessage result = new EbMSMessage();
 		result.setMessageHeader(messageHeader);
@@ -515,13 +513,13 @@ public class EbMSMessageUtils
 
 	public static EbMSEvent createEbMSSendEvent(EbMSMessage message, String uri)
 	{
-		return new EbMSEvent(message.getMessageHeader().getMessageData().getMessageId(),message.getMessageHeader().getMessageData().getTimestamp().toGregorianCalendar().getTime(),EbMSEventType.SEND,uri);
+		return new EbMSEvent(message.getMessageHeader().getMessageData().getMessageId(),message.getMessageHeader().getMessageData().getTimestamp(),EbMSEventType.SEND,uri);
 	}
 
 	public static List<EbMSEvent> createEbMSSendEvents(CollaborationProtocolAgreement cpa, EbMSMessage message, String uri)
 	{
 		List<EbMSEvent> result = new ArrayList<EbMSEvent>();
-		Date sendTime = message.getMessageHeader().getMessageData().getTimestamp().toGregorianCalendar().getTime();
+		Date sendTime = message.getMessageHeader().getMessageData().getTimestamp();
 		PartyInfo partyInfo = CPAUtils.getPartyInfo(cpa,message.getMessageHeader().getFrom().getPartyId());
 		DeliveryChannel deliveryChannel = CPAUtils.getFromDeliveryChannel(partyInfo,message.getMessageHeader().getFrom().getRole(),message.getMessageHeader().getService(),message.getMessageHeader().getAction());
 		if (CPAUtils.isReliableMessaging(cpa,deliveryChannel))
@@ -535,7 +533,7 @@ public class EbMSMessageUtils
 			if (message.getMessageHeader().getMessageData().getTimeToLive() == null)
 				result.add(new EbMSEvent(message.getMessageHeader().getMessageData().getMessageId(),(Date)sendTime.clone(),EbMSEventType.EXPIRE));
 			else
-				result.add(new EbMSEvent(message.getMessageHeader().getMessageData().getMessageId(),message.getMessageHeader().getMessageData().getTimeToLive().toGregorianCalendar().getTime(),EbMSEventType.EXPIRE));
+				result.add(new EbMSEvent(message.getMessageHeader().getMessageData().getMessageId(),message.getMessageHeader().getMessageData().getTimeToLive(),EbMSEventType.EXPIRE));
 		}
 		else
 			result.add(new EbMSEvent(message.getMessageHeader().getMessageData().getMessageId(),(Date)sendTime.clone(),EbMSEventType.SEND,uri));

@@ -112,7 +112,7 @@ public class EbMSDAOImpl extends nl.clockwork.ebms.dao.spring.mysql.EbMSDAOImpl
 											ps.setString(5,messageHeader.getMessageData().getMessageId());
 											ps.setString(6,messageHeader.getMessageData().getMessageId());
 											ps.setString(7,messageHeader.getMessageData().getRefToMessageId());
-											ps.setTimestamp(8,messageHeader.getMessageData().getTimeToLive() == null ? null : new Timestamp(messageHeader.getMessageData().getTimeToLive().toGregorianCalendar().getTimeInMillis()));
+											ps.setTimestamp(8,messageHeader.getMessageData().getTimeToLive() == null ? null : new Timestamp(messageHeader.getMessageData().getTimeToLive().getTime()));
 											ps.setString(9,messageHeader.getFrom().getRole());
 											ps.setString(10,messageHeader.getTo().getRole());
 											ps.setString(11,EbMSMessageUtils.toString(messageHeader.getService()));

@@ -77,7 +77,7 @@ public class EbMSSignatureValidator
 					X509Certificate certificate = getCertificate(cpa,message.getMessage(),message.getMessageHeader());
 					if (certificate != null)
 					{
-						validateCertificate(trustStore,certificate,message.getMessageHeader().getMessageData().getTimestamp() == null ? new Date() : message.getMessageHeader().getMessageData().getTimestamp().toGregorianCalendar().getTime());
+						validateCertificate(trustStore,certificate,message.getMessageHeader().getMessageData().getTimestamp() == null ? new Date() : message.getMessageHeader().getMessageData().getTimestamp());
 						if (!verify(certificate,(Element)signatureNodeList.item(0),message.getAttachments()))
 							throw new ValidationException("Invalid Signature!");
 					}
@@ -111,7 +111,7 @@ public class EbMSSignatureValidator
 					X509Certificate certificate = getCertificate(cpa,responseMessage.getMessage(),responseMessage.getMessageHeader());
 					if (certificate != null)
 					{
-						validateCertificate(trustStore,certificate,responseMessage.getMessageHeader().getMessageData().getTimestamp() == null ? new Date() : responseMessage.getMessageHeader().getMessageData().getTimestamp().toGregorianCalendar().getTime());
+						validateCertificate(trustStore,certificate,responseMessage.getMessageHeader().getMessageData().getTimestamp() == null ? new Date() : responseMessage.getMessageHeader().getMessageData().getTimestamp());
 						if (!verify(certificate,(Element)signatureNodeList.item(0),new ArrayList<EbMSAttachment>()))
 							throw new ValidationException("Invalid Signature!");
 						validateSignatureReferences(requestMessage,responseMessage);

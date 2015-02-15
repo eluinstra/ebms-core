@@ -193,7 +193,7 @@ public class EbMSMessageServiceImpl implements EbMSMessageService
 				if (response != null)
 				{
 					if (EbMSAction.STATUS_RESPONSE.action().equals(response.getMessageHeader().getAction()) && response.getStatusResponse() != null)
-						return new MessageStatus(response.getStatusResponse().getTimestamp() == null ? null : response.getStatusResponse().getTimestamp().toGregorianCalendar().getTime(),EbMSMessageStatus.get(response.getStatusResponse().getMessageStatus()));
+						return new MessageStatus(response.getStatusResponse().getTimestamp() == null ? null : response.getStatusResponse().getTimestamp(),EbMSMessageStatus.get(response.getStatusResponse().getMessageStatus()));
 					else
 						throw new EbMSMessageServiceException("No valid response received!");
 				}
@@ -218,7 +218,7 @@ public class EbMSMessageServiceImpl implements EbMSMessageService
 			if (response != null)
 			{
 				if (EbMSAction.STATUS_RESPONSE.action().equals(response.getMessageHeader().getAction()) && response.getStatusResponse() != null)
-					return new MessageStatus(response.getStatusResponse().getTimestamp() == null ? null : response.getStatusResponse().getTimestamp().toGregorianCalendar().getTime(),EbMSMessageStatus.get(response.getStatusResponse().getMessageStatus()));
+					return new MessageStatus(response.getStatusResponse().getTimestamp() == null ? null : response.getStatusResponse().getTimestamp(),EbMSMessageStatus.get(response.getStatusResponse().getMessageStatus()));
 				else
 					throw new EbMSMessageServiceException("No valid response received!");
 			}

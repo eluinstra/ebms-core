@@ -15,18 +15,19 @@
  */
 package nl.clockwork.ebms.jaxb;
 
-import javax.xml.bind.annotation.adapters.XmlAdapter;
-import javax.xml.datatype.XMLGregorianCalendar;
+import java.util.Date;
 
-public class EbMSDateTimeAdapter extends XmlAdapter<String,XMLGregorianCalendar>
+import javax.xml.bind.annotation.adapters.XmlAdapter;
+
+public class EbMSDateTimeAdapter extends XmlAdapter<String,Date>
 {
 
-	public XMLGregorianCalendar unmarshal(String value)
+	public Date unmarshal(String value)
 	{
 		return (EbMSDateTimeConverter.parseDateTime(value));
 	}
 
-	public String marshal(XMLGregorianCalendar value)
+	public String marshal(Date value)
 	{
 		return (EbMSDateTimeConverter.printDateTime(value));
 	}
