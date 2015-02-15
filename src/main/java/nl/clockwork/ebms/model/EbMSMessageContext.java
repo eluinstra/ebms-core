@@ -55,7 +55,7 @@ public class EbMSMessageContext implements Serializable
 		refToMessageId = messageHeader.getMessageData().getRefToMessageId();
 	}
 
-	@XmlElement(required=true)
+	@XmlElement//(required=true)
 	public String getCpaId()
 	{
 		return cpaId;
@@ -66,7 +66,7 @@ public class EbMSMessageContext implements Serializable
 		this.cpaId = cpaId;
 	}
 
-	@XmlElement(required=true)
+	@XmlElement//(required=true)
 	public Role getFromRole()
 	{
 		return fromRole;
@@ -89,7 +89,7 @@ public class EbMSMessageContext implements Serializable
 	}
 	
 	
-	@XmlElement(required=true)
+	@XmlElement//(required=true)
 	public String getService()
 	{
 		return service;
@@ -100,7 +100,7 @@ public class EbMSMessageContext implements Serializable
 		this.service = service;
 	}
 	
-	@XmlElement(required=true)
+	@XmlElement//(required=true)
 	public String getAction()
 	{
 		return action;
