@@ -8,7 +8,7 @@ ALTER TABLE ebms_attachment ADD COLUMN order_nr SMALLINT;
 
 UPDATE ebms_attachment SET order_nr = (SELECT ROW_NUMBER() OVER(PARTITION BY message_id, message_nr) AS order_nr FROM ebms_attachment);
 
-ALTER TABLE ebms_attachment ADD COLUMN order_nr SMALLINT NOT NULL;
+ALTER TABLE ebms_attachment MODIFY COLUMN order_nr SMALLINT NOT NULL;
 
 UPDATE ebms_event SET type = -1 WHERE type = 0;
 
