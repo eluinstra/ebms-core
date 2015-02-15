@@ -59,7 +59,10 @@ public class EbMSMessageContextValidator
 				msg.append("No CanSend action found for:");
 				msg.append(" context.cpaId=").append(context.getCpaId());
 				if (context.getFromRole() != null)
-					msg.append(", context.fromRole=").append(context.getFromRole());
+				{
+					msg.append(", context.fromRole.partyId=").append(context.getFromRole().getPartyId());
+					msg.append(", context.fromRole.role=").append(context.getFromRole().getRole());
+				}
 				msg.append(", context.service=").append(context.getService());
 				msg.append(", context.action=").append(context.getAction());
 				throw new ValidationException(msg.toString());
@@ -74,16 +77,40 @@ public class EbMSMessageContextValidator
 				msg.append("No CanReceive action found for:");
 				msg.append(" context.cpaId=").append(context.getCpaId());
 				if (fromPartyInfo.getCanSend().getOtherPartyActionBinding() != null && context.getFromRole() != null)
-					msg.append(", context.fromRole=").append(context.getFromRole());
+				{
+					msg.append(", context.fromRole.partyId=").append(context.getFromRole().getPartyId());
+					msg.append(", context.fromRole.role=").append(context.getFromRole().getRole());
+				}
 				if (context.getToRole() != null)
-					msg.append(", context.toRole=").append(context.getToRole());
+				{
+					msg.append(", context.toRole.partyId=").append(context.getToRole().getPartyId());
+					msg.append(", context.toRole.role=").append(context.getToRole().getRole());
+				}
 				msg.append(", context.service=").append(context.getService());
 				msg.append(", context.action=").append(context.getAction());
 				throw new ValidationException(msg.toString());
 			}
 			//else if (toPartyInfo != null && toPartyInfo1 != null && toPartyInfo.getCanReceive().getThisPartyActionBinding() != toPartyInfo1.getCanReceive().getThisPartyActionBinding())
 			else if (fromPartyInfo.getCanSend().getOtherPartyActionBinding() != null && toPartyInfo != null && fromPartyInfo.getCanSend().getOtherPartyActionBinding() != toPartyInfo.getCanReceive().getThisPartyActionBinding())
-				throw new ValidationException("to party does not match from party for this action. Leave context.toRole empty!");
+			{
+				StringBuffer msg = new StringBuffer();
+				msg.append("Action for to party does not match action for from party for:");
+				msg.append(" context.cpaId=").append(context.getCpaId());
+				if (fromPartyInfo.getCanSend().getOtherPartyActionBinding() != null && context.getFromRole() != null)
+				{
+					msg.append(", context.fromRole.partyId=").append(context.getFromRole().getPartyId());
+					msg.append(", context.fromRole.role=").append(context.getFromRole().getRole());
+				}
+				if (context.getToRole() != null)
+				{
+					msg.append(", context.toRole.partyId=").append(context.getToRole().getPartyId());
+					msg.append(", context.toRole.role=").append(context.getToRole().getRole());
+				}
+				msg.append(", context.service=").append(context.getService());
+				msg.append(", context.action=").append(context.getAction());
+				msg.append(". Leave context.toRole empty!");
+				throw new ValidationException(msg.toString());
+			}
 		}
 		catch (DAOException e)
 		{
