@@ -3,6 +3,7 @@
 	/ add priority to events and event_queue
 / web adapter
 / manual
+- document service interfaces
 
 - fix duplicate elimination
 	- add primary key to ebms_message table
