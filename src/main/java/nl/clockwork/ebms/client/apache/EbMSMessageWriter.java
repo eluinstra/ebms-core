@@ -71,7 +71,7 @@ public class EbMSMessageWriter
 		MultipartEntityBuilder entity = MultipartEntityBuilder.create();
     entity.addPart("0",new StringBody(DOMUtils.toString(document.getMessage(),"UTF-8"),ContentType.create("text/xml; charset=UTF-8")));
 		for (EbMSAttachment attachment : document.getAttachments())
-	    entity.addPart(attachment.getContentId().toString(),new InputStreamBody(attachment.getDataSource().getInputStream(),ContentType.create(attachment.getContentType()),attachment.getName()));
+	    entity.addPart(attachment.getContentId(),new InputStreamBody(attachment.getInputStream(),ContentType.create(attachment.getContentType()),attachment.getName()));
 		httpPost.setEntity(entity.build());
 	}
 

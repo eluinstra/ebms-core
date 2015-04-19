@@ -89,7 +89,7 @@ public class EbMSMessageReader
 		EbMSDocument result = null;
 		if (attachments.size() > 0)
 		{
-			Document d = DOMUtils.read((attachments.get(0).getDataSource().getInputStream()));
+			Document d = DOMUtils.read((attachments.get(0).getInputStream()));
 			attachments.remove(0);
 			result = new EbMSDocument(d,attachments);
 		}

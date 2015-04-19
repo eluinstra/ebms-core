@@ -86,13 +86,15 @@ public class EbMSMessageWriter
 				writer.write("\r\n");
 				writer.write("Content-Type: " + attachment.getContentType());
 				writer.write("\r\n");
+				writer.write("Content-Disposition: attachment; filename=" + attachment.getName() + ";");
+				writer.write("\r\n");
 				writer.write("Content-Transfer-Encoding: binary");
 				writer.write("\r\n");
 				writer.write("Content-ID: <" + attachment.getContentId() + ">");
 				writer.write("\r\n");
 				writer.write("\r\n");
 				writer.flush();
-				IOUtils.copy(attachment.getDataSource().getInputStream(),outputStream);
+				IOUtils.copy(attachment.getInputStream(),outputStream);
 				writer.write("\r\n");
 				writer.write("--");
 				writer.write(boundary);

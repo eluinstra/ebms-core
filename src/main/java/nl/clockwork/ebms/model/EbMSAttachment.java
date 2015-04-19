@@ -25,18 +25,11 @@ public class EbMSAttachment implements DataSource
 {
 	private DataSource dataSource;
 	private String contentId;
-	private String name;
 	
 	public EbMSAttachment(DataSource dataSource, String contentId)
 	{
-		this(dataSource,contentId,null);
-	}
-	
-	public EbMSAttachment(DataSource dataSource, String contentId, String name)
-	{
 		this.dataSource = dataSource;
 		this.contentId = contentId;
-		this.name = name;
 	}
 	
 	@Override
@@ -54,7 +47,7 @@ public class EbMSAttachment implements DataSource
 	@Override
 	public String getName()
 	{
-		return name == null ? dataSource.getName() : name;
+		return dataSource.getName();
 	}
 
 	@Override
@@ -63,11 +56,6 @@ public class EbMSAttachment implements DataSource
 		return dataSource.getOutputStream();
 	}
 
-	public DataSource getDataSource()
-	{
-		return dataSource;
-	}
-	
 	public String getContentId()
 	{
 		return contentId;
