@@ -253,8 +253,8 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 				return null;
 			List<EbMSAttachment> attachments = getAttachments(messageId);
 			List<EbMSDataSource> dataSources = new ArrayList<EbMSDataSource>();
-			for (DataSource dataSource : attachments)
-				dataSources.add(new EbMSDataSource(dataSource.getName(),dataSource.getContentType(),IOUtils.toByteArray(dataSource.getInputStream())));
+			for (EbMSAttachment attachment : attachments)
+				dataSources.add(new EbMSDataSource(attachment.getName(),attachment.getContentId(),attachment.getContentType(),IOUtils.toByteArray(attachment.getInputStream())));
 			return new EbMSMessageContent(messageContext,dataSources);
 		}
 		catch (DataAccessException | IOException e)

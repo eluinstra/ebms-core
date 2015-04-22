@@ -499,14 +499,12 @@ public class EbMSMessageUtils
 		Manifest manifest = createManifest();
 
 		List<EbMSAttachment> attachments = new ArrayList<EbMSAttachment>();
-		int i = 1;
 		for (EbMSDataSource dataSource : content.getDataSources())
 		{
-			manifest.getReference().add(createReference(i));
+			manifest.getReference().add(createReference(dataSource.getContentId()));
 			ByteArrayDataSource ds = new ByteArrayDataSource(dataSource.getContent(),dataSource.getContentType());
 			ds.setName(dataSource.getName());
-			attachments.add(new EbMSAttachment(ds,"" + i));
-			i++;
+			attachments.add(new EbMSAttachment(ds,dataSource.getContentId()));
 		}
 
 		EbMSMessage result = new EbMSMessage();
@@ -518,7 +516,7 @@ public class EbMSMessageUtils
 		return result;
 	}
 
-	public static Reference createReference(int cid)
+	public static Reference createReference(String cid)
 	{
 		Reference reference = new Reference();
 		reference.setHref(Constants.CID + cid);
