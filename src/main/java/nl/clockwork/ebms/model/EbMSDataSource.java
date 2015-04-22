@@ -24,14 +24,16 @@ public class EbMSDataSource implements Serializable
 	private String name;
 	private String contentType;
 	private byte[] content;
+	private String contentId;
 
 	public EbMSDataSource()
 	{
 	}
 	
-	public EbMSDataSource(String name, String contentType, byte[] content)
+	public EbMSDataSource(String name, String contentId, String contentType, byte[] content)
 	{
 		this.name = name;
+		this.contentId = contentId;
 		this.contentType = contentType;
 		this.content = content;
 	}
@@ -46,6 +48,16 @@ public class EbMSDataSource implements Serializable
 		this.name = name;
 	}
 	
+	public String getContentId()
+	{
+		return contentId;
+	}
+
+	public void setContentId(String contentId)
+	{
+		this.contentId = contentId;
+	}
+
 	public String getContentType()
 	{
 		return contentType;
