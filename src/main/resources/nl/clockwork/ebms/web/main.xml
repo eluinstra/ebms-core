@@ -26,16 +26,16 @@
 			<list>
 				<value>classpath:nl/clockwork/ebms/default.properties</value>   
 				<value>classpath:nl/clockwork/ebms/web/default.properties</value>   
-				<value>file:${user.home}/.ebms-web/ebms-web.properties</value>
+				<value>file:${catalina.base}/conf/ebms-web.properties</value>
 			</list>
 		</property>
 	</bean>
 
-	<import resource="../dao/datasource.xml"/>
-	<import resource="../dao/hsqldb.xml"/>
-	<import resource="../dao/hsqldb.provider.xml"/>
+	<import resource="classpath:nl/clockwork/ebms/datasource.xml"/>
+	<import resource="classpath:nl/clockwork/ebms/dao.spring.xml" />
+	<import resource="classpath:nl/clockwork/ebms/processor.xml" />
 
-	<import resource="../processor.xml"/>
+	<import resource="classpath:nl/clockwork/ebms/web/hsqldb/hsqldb.provider.xml"/>
 
 	<jaxws:endpoint implementor="#cpaService" address="/cpa" />
 
