@@ -23,7 +23,7 @@
 	<artifactId>ebms-adapter-mule3</artifactId>
 	<packaging>mule</packaging>
 	<name>Mule3 EbMS Adapter</name>
-	<version>2.2.0</version>
+	<version>2.3.0-SNAPSHOT</version>
 	<description></description>
 	<url>https://sourceforge.net/projects/muleebmsadapter/</url>
 	<issueManagement>
@@ -54,6 +54,7 @@
 		<jdk.version>1.7</jdk.version>
 		<mule.version>3.4.0</mule.version>
 		<saxon.version>8.7</saxon.version>
+		<activemq.version>5.10.0</activemq.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -67,6 +68,12 @@
 			<artifactId>mule-module-spring-config</artifactId>
 			<version>${mule.version}</version>
 			<scope>provided</scope>
+			<exclusions>
+				<exclusion>
+					<artifactId>spring-core</artifactId>
+					<groupId>org.springframework</groupId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>org.mule.transports</groupId>
@@ -97,6 +104,12 @@
 			<artifactId>mule-module-scripting</artifactId>
 			<version>${mule.version}</version>
 			<scope>provided</scope>
+			<exclusions>
+				<exclusion>
+					<artifactId>spring-core</artifactId>
+					<groupId>org.springframework</groupId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>org.mule.modules</groupId>
@@ -113,7 +126,7 @@
 		<dependency>
 			<groupId>xerces</groupId>
 			<artifactId>xercesImpl</artifactId>
-			<version>2.9.1</version>
+			<version>2.11.0</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
@@ -121,6 +134,12 @@
 			<artifactId>mule-tests-functional</artifactId>
 			<version>${mule.version}</version>
 			<scope>test</scope>
+			<exclusions>
+				<exclusion>
+					<artifactId>spring-core</artifactId>
+					<groupId>org.springframework</groupId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>mockobjects</groupId>
@@ -131,13 +150,13 @@
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
-			<version>4.8.1</version>
+			<version>4.12</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>xalan</groupId>
 			<artifactId>xalan</artifactId>
-			<version>2.7.1</version>
+			<version>2.7.2</version>
 		</dependency>
 		<dependency>
 			<groupId>net.sf.saxon</groupId>
@@ -152,47 +171,61 @@
 		<dependency>
 			<groupId>commons-logging</groupId>
 			<artifactId>commons-logging</artifactId>
-			<version>1.1.1</version>
+			<version>1.2</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>log4j</groupId>
 			<artifactId>log4j</artifactId>
-			<version>1.2.14</version>
+			<version>1.2.17</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>nl.clockwork.ebms</groupId>
 			<artifactId>ebms-core</artifactId>
-			<version>2.2.0</version>
+			<version>2.3.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
-			<groupId>c3p0</groupId>
+			<groupId>org.apache.activemq</groupId>
+			<artifactId>activemq-all</artifactId>
+			<version>${activemq.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.activemq</groupId>
+			<artifactId>activemq-jaas</artifactId>
+			<version>${activemq.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.xbean</groupId>
+			<artifactId>xbean-spring</artifactId>
+			<version>3.11.1</version>
+		</dependency>
+		<dependency>
+			<groupId>com.mchange</groupId>
 			<artifactId>c3p0</artifactId>
-			<version>0.9.1.2</version>
+			<version>0.9.2.1</version>
 		</dependency>
 		<dependency>
 			<groupId>org.hsqldb</groupId>
 			<artifactId>hsqldb</artifactId>
-			<version>2.2.9</version>
-			<scope>runtime</scope>
+			<version>2.3.2</version>
 		</dependency>
 		<dependency>
 			<groupId>mysql</groupId>
 			<artifactId>mysql-connector-java</artifactId>
-			<version>5.1.18</version>
+			<version>5.1.34</version>
 			<scope>runtime</scope>
 		</dependency>
 		<dependency>
-			<groupId>postgresql</groupId>
+			<groupId>org.postgresql</groupId>
 			<artifactId>postgresql</artifactId>
-			<version>9.1-901.jdbc3</version>
+			<version>9.3-1102-jdbc41</version>
 			<scope>runtime</scope>
 		</dependency>
 		<dependency>
 			<groupId>net.sourceforge.jtds</groupId>
 			<artifactId>jtds</artifactId>
-			<version>1.2.4</version>
+			<version>1.3.1</version>
 			<scope>runtime</scope>
 		</dependency>
 		<!--dependency>
@@ -202,26 +235,44 @@
 			<scope>runtime</scope>
 		</dependency-->
 		<dependency>
-			<groupId>oracle</groupId>
-			<artifactId>ojdbc6</artifactId>
-			<version>11.2.0.1.0</version>
+			<groupId>com.oracle</groupId>
+			<artifactId>ojdbc7</artifactId>
+			<version>12.1.0.2</version>
 			<scope>runtime</scope>
 		</dependency>
 	</dependencies>
 	<repositories>
 		<repository>
-			<id>muleforge-repo</id>
-			<name>MuleForge Repository</name>
-			<url>http://repository.muleforge.org</url>
-			<layout>default</layout>
+			<id>jboss</id>
+			<name>JBoss</name>
+			<url>http://repository.jboss.com/</url>
 		</repository>
 		<repository>
-			<id>codehaus-repo</id>
-			<name>Codehaus Repository</name>
-			<url>http://dist.codehaus.org/mule/dependencies/maven2</url>
-			<layout>default</layout>
-		</repository>		
+			<id>mulesoft-releases</id>
+			<name>MuleSoft Releases</name>
+			<url>http://repository.mulesoft.org/releases/</url>
+		</repository>
+		<repository>
+			<id>codehaus-releases</id>
+			<name>CodeHaus Releases</name>
+			<url>http://repository.codehaus.org/</url>
+		</repository>
+		<repository>
+			<id>codelds</id>
+			<url>https://code.lds.org/nexus/content/groups/main-repo</url>
+		</repository>
 	</repositories>
+	<pluginRepositories>
+		<pluginRepository>
+			<id>mulesoft-release</id>
+			<name>mulesoft release repository</name>
+			<layout>default</layout>
+			<url>http://repository.mulesoft.org/releases/</url>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</pluginRepository>
+	</pluginRepositories>
 	<build>
 		<resources>
 			<resource>
@@ -244,24 +295,12 @@
 							<pluginExecutions>
 								<pluginExecution>
 									<pluginExecutionFilter>
-										<groupId>org.apache.maven.plugins</groupId>
-										<artifactId>maven-enforcer-plugin</artifactId>
-										<versionRange>[1.0,)</versionRange>
-										<goals>
-											<goal>enforce</goal>
-										</goals>
-									</pluginExecutionFilter>
-									<action>
-										<ignore></ignore>
-									</action>
-								</pluginExecution>
-								<pluginExecution>
-									<pluginExecutionFilter>
 										<groupId>org.mule.tools</groupId>
 										<artifactId>maven-mule-plugin</artifactId>
 										<versionRange>[1.5,)</versionRange>
 										<goals>
 											<goal>attach-test-resources</goal>
+											<goal>filter-resources		</goal>
 										</goals>
 									</pluginExecutionFilter>
 									<action>
@@ -365,7 +404,7 @@
 			<plugin>
 				<groupId>org.mule.tools</groupId>
 				<artifactId>maven-mule-plugin</artifactId>
-				<version>1.6</version>
+				<version>1.9</version>
 				<extensions>true</extensions>
 				<configuration>
 					<copyToAppsDirectory>true</copyToAppsDirectory>
@@ -380,6 +419,11 @@
 					<target>${jdk.version}</target>
 					<encoding>ISO-8859-1</encoding>
 				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>2.18</version>
 			</plugin>
 			<plugin>
 				<artifactId>maven-assembly-plugin</artifactId>
