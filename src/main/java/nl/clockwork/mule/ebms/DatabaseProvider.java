@@ -40,24 +40,20 @@ public class DatabaseProvider
 	{
 		if (execute && driverClassName.equals(((ComboPooledDataSource)dataSource).getDriverClass()))
 		{
-			Connection c = dataSource.getConnection();
-			try
+			try (Connection c = dataSource.getConnection())
 			{
 				for (String sqlFile : sqlFiles)
 				{
-					Statement s = c.createStatement();
-					logger.info("Executing file " + sqlFile);
-					s.executeUpdate(IOUtils.toString(DatabaseProvider.class.getResourceAsStream(sqlFile.trim())));
-					s.close();
+					try (Statement s = c.createStatement())
+					{
+						logger.info("Executing file " + sqlFile);
+						s.executeUpdate(IOUtils.toString(DatabaseProvider.class.getResourceAsStream(sqlFile.trim())));
+					}
 				}
 			}
 			catch (SQLException e)
 			{
 				logger.warn("",e);
-			}
-			finally
-			{
-				c.close();
 			}
 		}
 	}
@@ -66,16 +62,12 @@ public class DatabaseProvider
 	{
 		if (execute)
 		{
-			Connection c = dataSource.getConnection();
-			try
+			try (Connection c = dataSource.getConnection())
 			{
-				Statement s = c.createStatement();
-				s.executeUpdate("shutdown");
-				s.close();
-			}
-			finally
-			{
-				c.close();
+				try (Statement s = c.createStatement())
+				{
+					s.executeUpdate("shutdown");
+				}
 			}
 		}
 	}
