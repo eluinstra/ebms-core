@@ -9,27 +9,8 @@
 		</layout>
 	</appender>
 
-	<!--appender name="FILE" class="org.apache.log4j.RollingFileAppender">
-		<param name="File" value="${user.home}/logs/ebms-webapp.log"/>
-		<param name="Threshold" value="INFO"/>
-		<param name="MaxFileSize" value="5MB"/>
-		<param name="MaxBackupIndex" value="20"/>
-		<layout class="org.apache.log4j.PatternLayout">
-			<param name="ConversionPattern" value="%d [%t] %-5p %c - %m%n"/>
-		</layout>
-	</appender-->
-
-	<!--appender  name="FILE"  class="org.apache.log4j.DailyFileAppender">
-		<param name="File" value="'${user.home}/logs/ebms-webapp-'yyyyMMdd'.log'"/>
-		<param name="Threshold" value="INFO"/>
-		<param name="Append" value="true"/>
-		<layout class="org.apache.log4j.PatternLayout">
-			<param name="ConversionPattern" value="%d [%t] %-5p %c - %m%n"/>
-		</layout>
-	</appender-->
-
 	<appender  name="FILE" class="org.apache.log4j.DailyRollingFileAppender">
-		<param name="File" value="${user.home}/logs/ebms-webapp.log"/>
+		<param name="File" value="${catalina.base}/logs/ebms-webapp.log"/>
 		<param name="DatePattern" value="yyyyMMdd'.log'"/>
 		<param name="Threshold" value="debug"/>
 		<param name="Append" value="true"/>
@@ -39,8 +20,7 @@
 	</appender>
 
 	<appender name="ASYNC" class="org.apache.log4j.AsyncAppender">
-		<!--appender-ref ref="CONSOLE"/-->
-		<appender-ref ref="FILE"/>
+		<appender-ref ref="CONSOLE"/>
 	</appender>
 
 	<logger name="nl.clockwork.ebms" additivity="false">
@@ -48,7 +28,37 @@
 		<appender-ref ref="ASYNC"/>
 	</logger>
 	
+	<logger name="nl.clockwork.ebms.client" additivity="false">
+		<level value="debug"/>
+		<appender-ref ref="ASYNC"/>
+	</logger>
+	
+	<logger name="nl.clockwork.ebms.server" additivity="false">
+		<level value="debug"/>
+		<appender-ref ref="ASYNC"/>
+	</logger>
+	
+	<logger name="nl.clockwork.ebms.job" additivity="false">
+		<level value="info"/>
+		<appender-ref ref="ASYNC"/>
+	</logger>
+	
+	<logger name="nl.clockwork.mule.ebms" additivity="false">
+		<level value="info"/>
+		<appender-ref ref="ASYNC"/>
+	</logger>
+	
+	<logger name="nl.clockwork.mule.ebms.processor" additivity="false">
+		<level value="debug"/>
+		<appender-ref ref="ASYNC"/>
+	</logger>
+	
 	<logger name="org.apache" additivity="false">
+		<level value="warn"/>
+		<appender-ref ref="ASYNC"/>
+	</logger>
+
+	<logger name="httpclient.wire" additivity="false">
 		<level value="warn"/>
 		<appender-ref ref="ASYNC"/>
 	</logger>
@@ -68,6 +78,11 @@
 		<appender-ref ref="ASYNC"/>
 	</logger>	
 
+	<logger name="net.sf.saxon" additivity="false">
+		<level value="debug"/>
+		<appender-ref ref="ASYNC"/>
+	</logger>
+
 	<logger name="org.springframework.beans.factory" additivity="false">
 		<level value="warn"/>
 		<appender-ref ref="ASYNC"/>
@@ -84,7 +99,7 @@
 	</logger>
 
 	<root>
-		<priority value="error"/>
+		<priority value="info"/>
 		<appender-ref ref="ASYNC"/>
 	</root>
 
