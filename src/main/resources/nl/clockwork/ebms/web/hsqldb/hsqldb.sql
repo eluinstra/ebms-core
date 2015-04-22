@@ -50,7 +50,6 @@ CREATE TABLE ebms_attachment
 (
 	message_id				VARCHAR(256)		NOT NULL,
 	message_nr				SMALLINT				NOT NULL,
-	order_nr					SMALLINT				NOT NULL,
 	name							VARCHAR(256)		NULL,
 	content_id 				VARCHAR(256) 		NOT NULL,
 	content_type			VARCHAR(255)		NOT NULL,
@@ -61,10 +60,10 @@ CREATE TABLE ebms_attachment
 CREATE TABLE ebms_event
 (
 	message_id				VARCHAR(256)		NOT NULL,
-	time							TIMESTAMP				NOT NULL,
+	time							TIMESTAMP				DEFAULT NOW() NOT NULL,
 	type							SMALLINT				NOT NULL,
-	status						SMALLINT				NOT NULL,
-	status_time				TIMESTAMP				NOT NULL,
+	status						SMALLINT				DEFAULT 0 NOT NULL,
+	status_time				TIMESTAMP				DEFAULT NOW() NOT NULL,
 	uri								VARCHAR(256)		NULL,
 	error_message			CLOB						NULL
 );
