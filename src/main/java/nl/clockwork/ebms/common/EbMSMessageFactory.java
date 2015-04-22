@@ -226,7 +226,7 @@ public class EbMSMessageFactory
 				int i = 1;
 				for (EbMSDataSource dataSource : content.getDataSources())
 				{
-					String contentId = createContentId(result.getMessageHeader().getMessageData().getMessageId(),i++);
+					String contentId = dataSource.getContentId() == null ? createContentId(result.getMessageHeader().getMessageData().getMessageId(),i++) : dataSource.getContentId();
 					manifest.getReference().add(EbMSMessageUtils.createReference(contentId));
 					ByteArrayDataSource ds = new ByteArrayDataSource(dataSource.getContent(),dataSource.getContentType());
 					ds.setName(dataSource.getName());
