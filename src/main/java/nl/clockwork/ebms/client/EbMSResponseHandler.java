@@ -24,11 +24,13 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import nl.clockwork.ebms.common.util.HTTPUtils;
 import nl.clockwork.ebms.model.EbMSDocument;
+import nl.clockwork.ebms.processor.EbMSProcessingException;
 import nl.clockwork.ebms.processor.EbMSProcessorException;
 import nl.clockwork.ebms.server.EbMSMessageReader;
 import nl.clockwork.ebms.util.EbMSMessageUtils;
 
 import org.apache.commons.io.IOUtils;
+import org.springframework.util.StringUtils;
 import org.xml.sax.SAXException;
 import org.xmlsoap.schemas.soap.envelope.Fault;
 
@@ -95,10 +97,13 @@ public class EbMSResponseHandler
 		}
 	}
 
-	private String getEncoding()
+	private String getEncoding() throws EbMSProcessingException
 	{
 		String contentType = getHeaderField("Content-Type");
-		return HTTPUtils.getCharSet(contentType);
+		if (!StringUtils.isEmpty(contentType))
+			return HTTPUtils.getCharSet(contentType);
+		else
+			throw new EbMSProcessingException("HTTP header Content-Type is not set!");
 	}
 	
 	private String getHeaderField(String name)
