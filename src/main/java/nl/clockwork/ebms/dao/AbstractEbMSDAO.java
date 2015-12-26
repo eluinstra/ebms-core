@@ -954,7 +954,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 					ps.setInt(3,orderNr++);
 					ps.setString(4,attachment.getName());
 					ps.setString(5,attachment.getContentId());
-					ps.setString(6,attachment.getContentType().split(";")[0].trim());
+					ps.setString(6,attachment.getContentType());
 					ps.setBytes(7,IOUtils.toByteArray(attachment.getInputStream()));
 					ps.addBatch();
 				}

@@ -21,6 +21,8 @@ import java.io.OutputStream;
 
 import javax.activation.DataSource;
 
+import org.springframework.util.StringUtils;
+
 public class EbMSAttachment implements DataSource
 {
 	private DataSource dataSource;
@@ -35,7 +37,7 @@ public class EbMSAttachment implements DataSource
 	@Override
 	public String getContentType()
 	{
-		return dataSource.getContentType();
+		return !StringUtils.isEmpty(dataSource.getContentType()) ? dataSource.getContentType().split(";")[0].trim() : null;
 	}
 
 	@Override

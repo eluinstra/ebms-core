@@ -290,7 +290,7 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 				orderNr++,
 				attachment.getName(),
 				attachment.getContentId(),
-				attachment.getContentType().split(";")[0].trim(),
+				attachment.getContentType(),
 				IOUtils.toByteArray(attachment.getInputStream())
 			);
 		}
