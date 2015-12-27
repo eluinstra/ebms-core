@@ -4,11 +4,11 @@ Introduction =
 This library contains the core functionality of the EbMS adapter including:
 - a servlet to use the adapter in a servlet container
 - database support for the following databases:
-	- hsqldb (2.2.9)
-	- mysql (5.5) (innodb)
-	- postgresql (9)
-	- mssql (2008 R2)
-	- oracle (11)(lob > 4k fix (needed for older oracle jdbc adapters) not implemented!)
+	- hsqldb (>=2.2.9)
+	- mysql/mariadb (>=5.5)
+	- postgresql (>=9)
+	- mssql (>=2008 R2)
+	- oracle (>=11)
 - CPA and EbMSMessage SOAP Services to control the EbMS adapter
 
 Implemented:
