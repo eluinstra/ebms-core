@@ -32,6 +32,8 @@ public abstract class AbstractDAOFactory<T> implements FactoryBean<T>
 			return createHSqlDbDAO();
 		else if ("com.mysql.jdbc.Driver".equals(((ComboPooledDataSource)dataSource).getDriverClass()))
 			return createMySqlDAO();
+		else if ("org.mariadb.jdbc.Driver".equals(((ComboPooledDataSource)dataSource).getDriverClass()))
+			return createMySqlDAO();
 		else if ("org.postgresql.Driver".equals(((ComboPooledDataSource)dataSource).getDriverClass()))
 			return createPostgresDAO();
 		else if ("oracle.jdbc.OracleDriver".equals(((ComboPooledDataSource)dataSource).getDriverClass()))
