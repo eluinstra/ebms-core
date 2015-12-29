@@ -20,7 +20,6 @@
 		- add priority to events and event_queue
 
 nice to have features:
-- add method getPartyIds(cpaId,role) to EbMSMessageService
 - add endpoint type support (now only allPurpose endpoint type is supported):
 	- add messageType to MessageContext to determine endpoint type to use
 	- parse incoming url to determine endpoint type used
@@ -36,6 +35,7 @@ nice to have features:
 - use PersistDuration to remove messages
 
 - remove hard coded character encoding (UTF-8)?
+- add method getPartyIds(cpaId,role) to EbMSMessageService?
 
 2.5:
 / implement push interface with jms
