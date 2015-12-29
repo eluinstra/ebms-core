@@ -122,7 +122,7 @@ public class EbMSMessageServiceImpl implements EbMSMessageService
 	{
 		try
 		{
-			if (maxNr == null)
+			if (maxNr == null || maxNr == 0)
 				return ebMSDAO.getMessageIds(messageContext,EbMSMessageStatus.RECEIVED);
 			else
 				return ebMSDAO.getMessageIds(messageContext,EbMSMessageStatus.RECEIVED,maxNr);
