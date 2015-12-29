@@ -20,6 +20,7 @@
 		- add priority to events and event_queue
 
 nice to have features:
+- add method getPartyIds(cpaId,role) to EbMSMessageService
 - add endpoint type support (now only allPurpose endpoint type is supported):
 	- add messageType to MessageContext to determine endpoint type to use
 	- parse incoming url to determine endpoint type used
