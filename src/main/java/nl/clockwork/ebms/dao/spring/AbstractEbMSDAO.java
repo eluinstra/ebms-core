@@ -1115,12 +1115,12 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 			}
 			if (messageContext.getFromRole() != null)
 			{
-				parameters.add(messageContext.getFromRole());
+				parameters.add(messageContext.getFromRole().getRole());
 				result.append(" and from_role = ?");
 			}
 			if (messageContext.getToRole() != null)
 			{
-				parameters.add(messageContext.getToRole());
+				parameters.add(messageContext.getToRole().getRole());
 				result.append(" and to_role = ?");
 			}
 			if (messageContext.getService() != null)
