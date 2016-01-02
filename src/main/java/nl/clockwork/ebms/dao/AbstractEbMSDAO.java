@@ -287,9 +287,9 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 			String result = null;
 			c = connectionManager.getConnection();
 			try (PreparedStatement ps  = c.prepareStatement(
-				"select new_url" +
+				"select destination_url" +
 				" from url" +
-				" where old_url = ?"
+				" where original_url = ?"
 			))
 			{
 				ps.setString(1,url);
@@ -297,7 +297,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 				{
 					ResultSet rs = ps.getResultSet();
 					if (rs.next())
-						result = rs.getString("new_url");
+						result = rs.getString("destination_url");
 					else
 						result = url;
 				}
@@ -315,7 +315,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	}
 
 	@Override
-	public void insertUrl(String oldUrl, String newUrl)
+	public void insertUrl(String originalUrl, String destinationUrl)
 	{
 		Connection c = null;
 		try
@@ -323,13 +323,13 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 			c = connectionManager.getConnection();
 			try (PreparedStatement ps  = c.prepareStatement(
 				"insert into url (" +
-					"old_url," +
-					"new_url" +
+					"original_url," +
+					"destination_url" +
 				") values (?,?)"
 			))
 			{
-				ps.setString(1,oldUrl);
-				ps.setString(2,newUrl);
+				ps.setString(1,originalUrl);
+				ps.setString(2,destinationUrl);
 				ps.executeUpdate();
 			}
 		}
@@ -344,7 +344,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	}
 
 	@Override
-	public int updateUrl(String oldUrl, String newUrl)
+	public int updateUrl(String originalUrl, String destinationUrl)
 	{
 		Connection c = null;
 		try
@@ -352,12 +352,12 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 			c = connectionManager.getConnection();
 			try (PreparedStatement ps  = c.prepareStatement(
 				"update url set" +
-				" new_url = ?" +
-				" where old_url = ?"
+				" destination_url = ?" +
+				" where original_url = ?"
 			))
 			{
-				ps.setString(1,newUrl);
-				ps.setString(2,oldUrl);
+				ps.setString(1,destinationUrl);
+				ps.setString(2,originalUrl);
 				return ps.executeUpdate();
 			}
 		}
@@ -380,7 +380,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 			c = connectionManager.getConnection();
 			try (PreparedStatement ps  = c.prepareStatement(
 				"delete from url" +
-				" where old_url = ?"
+				" where original_url = ?"
 			))
 			{
 				ps.setString(1,url);

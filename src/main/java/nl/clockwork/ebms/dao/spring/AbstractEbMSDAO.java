@@ -229,9 +229,9 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 		try
 		{
 			return jdbcTemplate.queryForObject(
-				"select new_url" +
+				"select destination_url" +
 				" from url" +
-				" where old_url = ?",
+				" where original_url = ?",
 				String.class,
 				url
 			);
@@ -247,18 +247,18 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	}
 
 	@Override
-	public void insertUrl(String oldUrl, String newUrl)
+	public void insertUrl(String originalUrl, String destinationUrl)
 	{
 		try
 		{
 			jdbcTemplate.update
 			(
 				"insert into url (" +
-					"old_url," +
-					"new_url" +
+					"original_url," +
+					"destination_url" +
 				") values (?,?)",
-				oldUrl,
-				newUrl
+				originalUrl,
+				destinationUrl
 			);
 		}
 		catch (DataAccessException e)
@@ -268,17 +268,17 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	}
 
 	@Override
-	public int updateUrl(String oldUrl, String newUrl)
+	public int updateUrl(String originalUrl, String destinationUrl)
 	{
 		try
 		{
 			return jdbcTemplate.update
 			(
 				"update url set" +
-				" new_url = ?" +
-				" where old_url = ?",
-				newUrl,
-				oldUrl
+				" destination_url = ?" +
+				" where original_url = ?",
+				destinationUrl,
+				originalUrl
 			);
 		}
 		catch (DataAccessException e)
@@ -295,7 +295,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 			return jdbcTemplate.update
 			(
 				"delete from url" +
-				" where old_url = ?",
+				" where original_url = ?",
 				url
 			);
 		}

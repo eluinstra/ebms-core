@@ -8,11 +8,11 @@ ALTER TABLE cpa ADD CONSTRAINT uc_cpa_id UNIQUE (cpa_id(255));
 
 CREATE TABLE url
 (
-	old_url 					VARCHAR(256)		NOT NULL,
-	new_url						VARCHAR(256)		NOT NULL
+	original_url 			VARCHAR(256)		NOT NULL,
+	destination_url		VARCHAR(256)		NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-ALTER TABLE url ADD CONSTRAINT uc_old_url UNIQUE (old_url(255));
+ALTER TABLE url ADD CONSTRAINT uc_original_url UNIQUE (original_url(255));
 
 CREATE TABLE ebms_message
 (

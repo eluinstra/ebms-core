@@ -6,8 +6,8 @@ CREATE TABLE cpa
 
 CREATE TABLE url
 (
-	old_url 					VARCHAR(256)		NOT NULL UNIQUE,
-	new_url						VARCHAR(256)		NOT NULL
+	original_url 			VARCHAR(256)		NOT NULL UNIQUE,
+	destination_url		VARCHAR(256)		NOT NULL
 );
 
 CREATE TABLE ebms_message

@@ -43,8 +43,8 @@ public interface EbMSDAO
 	int deleteCPA(String cpaId) throws DAOException;
 	
 	String getUrl(String url);
-	void insertUrl(String oldUrl, String newUrl);
-	int updateUrl(String oldUrl, String newUrl);
+	void insertUrl(String originalUrl, String destinationUrl);
+	int updateUrl(String originalUrl, String destinationUrl);
 	int deleteUrl(String url);
 
 	boolean existsMessage(String messageId) throws DAOException;
