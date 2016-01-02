@@ -1,4 +1,4 @@
-- quickfix db lock
+/ quickfix db lock
 / web adapter
 / manual
 - document service interfaces
@@ -34,6 +34,7 @@ nice to have features:
 - implement Packaging
 - use PersistDuration to remove messages
 
+- improve url mapping: allow wildcards in original_url
 - remove hard coded character encoding (UTF-8)?
 - add method getPartyIds(cpaId,role) to EbMSMessageService?
 
