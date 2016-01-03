@@ -61,7 +61,7 @@ public class CPAValidator
 			logger.warn("CPA version " + cpa.getVersion() + " detected! CPA version 2_0b expected.");
 		if ("proposed".equals(cpa.getStatus()))
 			throw new ValidationException("CPA Status is proposed!");
-		if (cpa.getStart().before(cpa.getEnd()))
+		if (cpa.getEnd().before(cpa.getStart()))
 			throw new ValidationException("CPA Start date not before End date!");
 		if (new Date().before(cpa.getEnd()))
 			throw new ValidationException("CPA expired on " + cpa.getEnd());
