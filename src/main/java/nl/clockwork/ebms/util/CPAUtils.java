@@ -401,6 +401,11 @@ public class CPAUtils
 	{
 		return ((DocExchange)deliveryChannel.getDocExchangeId()).getEbXMLReceiverBinding().getPersistDuration();
 	}
+
+	public static Duration getRetryInterval(CollaborationProtocolAgreement cpa, DeliveryChannel deliveryChannel)
+	{
+		return ((DocExchange)deliveryChannel.getDocExchangeId()).getEbXMLReceiverBinding().getReliableMessaging().getRetryInterval();
+	}
 	
 	public static Certificate getSigningCertificate(DeliveryChannel deliveryChannel)
 	{
