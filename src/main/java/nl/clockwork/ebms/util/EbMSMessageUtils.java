@@ -259,7 +259,7 @@ public class EbMSMessageUtils
 		if (CPAUtils.isReliableMessaging(cpa,deliveryChannel))
 		{
 			Duration duration = CPAUtils.getPersistantDuration(cpa,deliveryChannel);
-			Date timestamp = messageHeader.getMessageData().getTimestamp();
+			Date timestamp = (Date)messageHeader.getMessageData().getTimestamp().clone();
 			duration.addTo(timestamp);
 			messageHeader.getMessageData().setTimeToLive(timestamp);
 		}
