@@ -131,7 +131,7 @@ public class EbMSMessageProcessor
 				EbMSMessage response = processStatusRequest(cpa,timestamp,message);
 				if (message.getSyncReply() == null)
 				{
-					deliveryManager.sendResponseMessage(ebMSDAO.getUrl(CPAUtils.getUri(cpa,message)),response);
+					deliveryManager.sendResponseMessage(ebMSDAO.getUrl(CPAUtils.getUri(cpa,response)),response);
 					return null;
 				}
 				else
@@ -147,7 +147,7 @@ public class EbMSMessageProcessor
 				EbMSMessage response = processPing(cpa,timestamp,message);
 				if (message.getSyncReply() == null)
 				{
-					deliveryManager.sendResponseMessage(ebMSDAO.getUrl(CPAUtils.getUri(cpa,message)),response);
+					deliveryManager.sendResponseMessage(ebMSDAO.getUrl(CPAUtils.getUri(cpa,response)),response);
 					return null;
 				}
 				else
