@@ -63,7 +63,7 @@ public class CPAValidator
 			throw new ValidationException("CPA Status is proposed!");
 		if (!cpa.getStart().before(cpa.getEnd()))
 			throw new ValidationException("CPA Start date not before End date!");
-		if (new Date().before(cpa.getEnd()))
+		if (!new Date().before(cpa.getEnd()))
 			throw new ValidationException("CPA expired on " + cpa.getEnd());
 		if (cpa.getConversationConstraints() != null)
 			logger.warn("CPA Conversation Constraints not implemented!");
