@@ -18,94 +18,10 @@
 -->
 <beans xmlns="http://www.springframework.org/schema/beans"
 	xmlns:util="http://www.springframework.org/schema/util"
-	xmlns:amq="http://activemq.apache.org/schema/core"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
-		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd
-		http://activemq.apache.org/schema/core http://activemq.apache.org/schema/core/activemq-core.xsd">
+		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
 
-	<beans profile="loggingEventListener">
-		<bean id="eventListener" class="nl.clockwork.ebms.event.LoggingEventListener"/>
-	</beans>
+	<bean id="eventListener" class="nl.clockwork.ebms.event.LoggingEventListener"/>
 
-	<beans profile="jmsEventListener">
-
-		<bean id="eventListener" class="nl.clockwork.ebms.event.spring.JMSEventListener">
-			<property name="jmsTemplate" ref="jmsTransactionTemplate"/>
-			<property name="destinations">
-				<map>
-					<entry>
-						<key>
-							<util:constant static-field="nl.clockwork.ebms.Constants.EVENT_RECEIVED"/>
-						</key>
-						<bean class="org.apache.activemq.command.ActiveMQQueue">
-							<constructor-arg>
-								<util:constant static-field="nl.clockwork.ebms.Constants.EVENT_RECEIVED"/>
-							</constructor-arg>
-						</bean>
-					</entry>
-					<entry>
-						<key>
-							<util:constant static-field="nl.clockwork.ebms.Constants.EVENT_ACKNOWLEDGED"/>
-						</key>
-						<bean class="org.apache.activemq.command.ActiveMQQueue">
-							<constructor-arg>
-								<util:constant static-field="nl.clockwork.ebms.Constants.EVENT_ACKNOWLEDGED"/>
-							</constructor-arg>
-						</bean>
-					</entry>
-					<entry>
-						<key>
-							<util:constant static-field="nl.clockwork.ebms.Constants.EVENT_FAILED"/>
-						</key>
-						<bean class="org.apache.activemq.command.ActiveMQQueue">
-							<constructor-arg>
-								<util:constant static-field="nl.clockwork.ebms.Constants.EVENT_FAILED"/>
-							</constructor-arg>
-						</bean>
-					</entry>
-					<entry>
-						<key>
-							<util:constant static-field="nl.clockwork.ebms.Constants.EVENT_EXPIRED"/>
-						</key>
-						<bean class="org.apache.activemq.command.ActiveMQQueue">
-							<constructor-arg>
-								<util:constant static-field="nl.clockwork.ebms.Constants.EVENT_EXPIRED"/>
-							</constructor-arg>
-						</bean>
-					</entry>
-				</map>
-			</property>
-		</bean>
-
-		<bean id="jmsTransactionTemplate" class="org.springframework.jms.core.JmsTemplate">
-		 <property name="connectionFactory" ref="jmsConnectionFactory"/>
-		</bean>
-	
-		<bean id="jmsConnectionFactory" class="org.apache.activemq.pool.PooledConnectionFactory" destroy-method="stop">
-			<property name="connectionFactory">
-				<bean class="org.apache.activemq.spring.ActiveMQConnectionFactory">
-					<property name="brokerURL" value="vm://embeddedBroker"/>
-					<property name="userName" value="${jms.broker.user.username}"/>
-					<property name="password" value="${jms.broker.user.password}"/>
-				</bean>
-			</property>
-		</bean>
-	
-		<amq:broker id="broker" brokerName="${jms.broker.name}" persistent="true" dataDirectory="${jms.data.dir}" useJmx="${jms.jmx}">
-			<amq:transportConnectors>
-				<amq:transportConnector name="vm" uri="vm://embeddedBroker" />
-				<amq:transportConnector name="openwire" uri="${jms.broker.uri}" />
-			</amq:transportConnectors>
-			<amq:plugins>
-				<amq:simpleAuthenticationPlugin>
-					<amq:users>
-						<amq:authenticationUser username="${jms.broker.user.username}" password="${jms.broker.user.password}" groups="${jms.broker.user.groups}"/>
-					</amq:users>
-				</amq:simpleAuthenticationPlugin>
-			</amq:plugins>
-		</amq:broker>
-	
-	</beans>
-	
 </beans>
