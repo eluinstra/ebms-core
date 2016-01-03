@@ -70,7 +70,7 @@ public class CPAValidator
 		if (cpa.getSignature() != null)
 			logger.warn("CPA Signature not implemented!");
 		if (cpa.getPackaging() != null && cpa.getPackaging().size() > 0)
-			logger.warn("Packaging not implemented!");
+			logger.warn("Packaging partially implemented!");
 		validateActions(cpa);
 		validateChannels(cpa);
 		validateTransports(cpa);
@@ -85,7 +85,7 @@ public class CPAValidator
 				{
 					if (canSend.getCanReceive() != null && canSend.getCanReceive().size() > 0)
 						logger.warn("Nesting of actions under CanSend in Service " + CPAUtils.toString(role.getServiceBinding().getService()) +  " not supported!");
-					if (canSend.getThisPartyActionBinding().getChannelId().size() > 0)
+					if (canSend.getThisPartyActionBinding().getChannelId().size() > 1)
 						logger.warn("Multiple channels per action as defined in Action " + canSend.getThisPartyActionBinding().getAction() + " of Service " + CPAUtils.toString(role.getServiceBinding().getService()) + " not supported! Using first channel.");
 					if (PersistenceLevelType.PERSISTENT.equals(canSend.getThisPartyActionBinding().getBusinessTransactionCharacteristics().getIsConfidential()) || PersistenceLevelType.TRANSIENT_AND_PERSISTENT.equals(canSend.getThisPartyActionBinding().getBusinessTransactionCharacteristics().getIsConfidential()))
 						logger.warn("Encryption defined in Action " + canSend.getThisPartyActionBinding().getAction() + " of Service " + CPAUtils.toString(role.getServiceBinding().getService()) + " not implemented!");
@@ -98,7 +98,7 @@ public class CPAValidator
 				{
 					if (canReceive.getCanSend() != null && canReceive.getCanSend().size() > 0)
 						logger.warn("Nesting of actions under CanReceive in Service " + CPAUtils.toString(role.getServiceBinding().getService()) +  " not supported!");
-					if (canReceive.getThisPartyActionBinding().getChannelId().size() > 0)
+					if (canReceive.getThisPartyActionBinding().getChannelId().size() > 1)
 						logger.warn("Multiple channels per action as defined in Action " + canReceive.getThisPartyActionBinding().getAction() + " of Service " + CPAUtils.toString(role.getServiceBinding().getService()) + " not supported! Using first channel.");
 					if (PersistenceLevelType.PERSISTENT.equals(canReceive.getThisPartyActionBinding().getBusinessTransactionCharacteristics().getIsConfidential()) || PersistenceLevelType.TRANSIENT_AND_PERSISTENT.equals(canReceive.getThisPartyActionBinding().getBusinessTransactionCharacteristics().getIsConfidential()))
 						logger.warn("Encryption defined in Action " + canReceive.getThisPartyActionBinding().getAction() + " of Service " + CPAUtils.toString(role.getServiceBinding().getService()) + " not implemented!");
@@ -120,7 +120,7 @@ public class CPAValidator
 				if (SyncReplyModeType.SIGNALS_ONLY.equals(deliveryChannel.getMessagingCharacteristics().getSyncReplyMode()) || SyncReplyModeType.SIGNALS_AND_RESPONSE.equals(deliveryChannel.getMessagingCharacteristics().getSyncReplyMode()))
 					logger.warn("Business signals defined in Channel " + deliveryChannel.getChannelId() + " not supported!");
 				if (PerMessageCharacteristicsType.NEVER.equals(deliveryChannel.getMessagingCharacteristics().getDuplicateElimination()))
-					logger.warn("Duplicate Elimination always enabled!");
+					logger.warn("Duplicate Elimination defined in Channel " + deliveryChannel.getChannelId() + " always enabled!");
 				if (ActorType.URN_OASIS_NAMES_TC_EBXML_MSG_ACTOR_NEXT_MSH.equals(deliveryChannel.getMessagingCharacteristics().getActor()))
 					logger.warn("Actor NextMSH not supported!");
 			}
