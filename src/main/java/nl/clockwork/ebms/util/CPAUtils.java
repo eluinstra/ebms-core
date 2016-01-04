@@ -195,7 +195,7 @@ public class CPAUtils
 
 	private static boolean equals(PartyId cpaPartyId, org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.PartyId partyId)
 	{
-		return partyId.getType().equals(cpaPartyId.getType()) && partyId.getValue().equals(cpaPartyId.getValue());
+		return partyId.getValue().equals(cpaPartyId.getValue()) && (partyId.getType() == null || (cpaPartyId.getType() != null && partyId.getType().equals(cpaPartyId.getType())));
 	}
 	
 	public static ServiceBinding getServiceBinding(PartyInfo partyInfo, String role, Service service)
@@ -208,7 +208,7 @@ public class CPAUtils
 
 	private static boolean equals(ServiceType serviceType, Service service)
 	{
-		return serviceType.getType().equals(service.getType()) && serviceType.getValue().equals(service.getValue());
+		return serviceType.getValue().equals(service.getValue()) && (serviceType.getType() == null || (service.getType() != null && serviceType.getType().equals(service.getType())));
 	}
 
 	public static FromPartyInfo getFromPartyInfo(CollaborationProtocolAgreement cpa, List<org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.PartyId> partyIds, String fromRole, String service, String action)
