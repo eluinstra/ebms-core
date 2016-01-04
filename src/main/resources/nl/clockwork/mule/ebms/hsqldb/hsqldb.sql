@@ -16,7 +16,7 @@
 
 CREATE TABLE cpa
 (
-	cpa_id						VARCHAR(256)		NOT NULL UNIQUE,
+	cpa_id						VARCHAR(128)		NOT NULL UNIQUE,
 	cpa								CLOB						NOT NULL
 );
 
@@ -46,8 +46,6 @@ CREATE TABLE ebms_message
 	PRIMARY KEY (message_id,message_nr)
 );
 
-CREATE INDEX i_ebms_message ON ebms_message_queue (cpa_id,status,message_nr);
-
 CREATE TABLE ebms_attachment
 (
 	message_id				VARCHAR(256)		NOT NULL,
@@ -60,8 +58,6 @@ CREATE TABLE ebms_attachment
 	FOREIGN KEY (message_id,message_nr) REFERENCES ebms_message(message_id,message_nr)
 );
 
-ALTER TABLE ebms_attachment ADD CONSTRAINT uc_ebms_attachment UNIQUE (message_id,message_nr,order_nr);
-
 CREATE TABLE ebms_event
 (
 	message_id				VARCHAR(256)		NOT NULL,
@@ -72,7 +68,3 @@ CREATE TABLE ebms_event
 	uri								VARCHAR(256)		NULL,
 	error_message			CLOB						NULL
 );
-
-ALTER TABLE ebms_event ADD CONSTRAINT uc_ebms_event UNIQUE (message_id,time);
-
-CREATE INDEX i_ebms_event ON ebms_event (status);
