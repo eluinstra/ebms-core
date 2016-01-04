@@ -58,11 +58,16 @@ public class EbMSEventProcessor implements Job
 			try
 			{
 				EbMSDocument requestDocument = ebMSDAO.getEbMSDocument(event.getMessageId());
-				event.setUri(ebMSDAO.getUrl(event.getUri()));
-				logger.info("Sending message " + event.getMessageId() + " to " + event.getUri());
-				EbMSDocument responseDocument = ebMSClient.sendMessage(event.getUri(),requestDocument);
-				messageProcessor.processResponse(requestDocument,responseDocument);
-				updateEvent(event,EbMSEventStatus.SUCCEEDED,null);
+				if (requestDocument != null)
+				{
+					event.setUri(ebMSDAO.getUrl(event.getUri()));
+					logger.info("Sending message " + event.getMessageId() + " to " + event.getUri());
+					EbMSDocument responseDocument = ebMSClient.sendMessage(event.getUri(),requestDocument);
+					messageProcessor.processResponse(requestDocument,responseDocument);
+					updateEvent(event,EbMSEventStatus.SUCCEEDED,null);
+				}
+				else
+					ebMSDAO.deleteEvents(event.getMessageId(),EbMSEventStatus.UNPROCESSED);
 			}
 			catch (final EbMSResponseException e)
 			{
@@ -113,10 +118,16 @@ public class EbMSEventProcessor implements Job
 						@Override
 						public void doInTransaction()
 						{
-							updateEvent(event,EbMSEventStatus.SUCCEEDED,null);
-							ebMSDAO.deleteEvents(event.getMessageId(),EbMSEventStatus.UNPROCESSED);
-							ebMSDAO.updateMessage(event.getMessageId(),EbMSMessageStatus.SENT,EbMSMessageStatus.EXPIRED);
-							eventListener.onMessageExpired(event.getMessageId());
+							EbMSDocument requestDocument = ebMSDAO.getEbMSDocument(event.getMessageId());
+							if (requestDocument != null)
+							{
+								updateEvent(event,EbMSEventStatus.SUCCEEDED,null);
+								ebMSDAO.deleteEvents(event.getMessageId(),EbMSEventStatus.UNPROCESSED);
+								ebMSDAO.updateMessage(event.getMessageId(),EbMSMessageStatus.SENT,EbMSMessageStatus.EXPIRED);
+								eventListener.onMessageExpired(event.getMessageId());
+							}
+							else
+								ebMSDAO.deleteEvents(event.getMessageId(),EbMSEventStatus.UNPROCESSED);
 						}
 					}
 				);

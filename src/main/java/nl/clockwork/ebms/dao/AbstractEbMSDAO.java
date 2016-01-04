@@ -613,7 +613,8 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 				"select content" +
 				" from ebms_message" +
 				" where message_id = ?" +
-				" and message_nr = 0"
+				" and message_nr = 0" +
+				" and (status is null or status = " + EbMSMessageStatus.SENT.id() + ")"
 			))
 			{
 				ps.setString(1,messageId);
