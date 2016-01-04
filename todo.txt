@@ -30,7 +30,7 @@ nice to have features:
 	- allow url as href?
 		- store url as attachment
 	- store optional manifest description and schema with attachment???
-/ implement Packaging
+- implement Packaging
 - use PersistDuration to remove messages
 
 - improve url mapping: allow wildcards in original_url
