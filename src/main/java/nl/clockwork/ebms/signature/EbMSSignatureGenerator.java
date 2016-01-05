@@ -42,8 +42,8 @@ import org.apache.xml.security.signature.XMLSignature;
 import org.apache.xml.security.transforms.Transforms;
 import org.apache.xml.security.transforms.params.XPathContainer;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DeliveryChannel;
-import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.PartyInfo;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.AckRequested;
+import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.PartyId;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -69,9 +69,8 @@ public class EbMSSignatureGenerator
 	{
 		try
 		{
-			PartyInfo partyInfo = cpaManager.getPartyInfo(cpaId,message.getMessageHeader().getFrom().getPartyId());
-			if (CPAUtils.isNonRepudiationRequired(partyInfo,message.getMessageHeader().getFrom().getRole(),message.getMessageHeader().getService(),message.getMessageHeader().getAction()))
-				generate(partyInfo,message);
+			if (cpaManager.isNonRepudiationRequired(cpaId,message.getMessageHeader().getFrom().getPartyId(),message.getMessageHeader().getFrom().getRole(),message.getMessageHeader().getService(),message.getMessageHeader().getAction()))
+				generate(cpaId,message.getMessageHeader().getFrom().getPartyId(),message);
 		}
 		catch (GeneralSecurityException e)
 		{
@@ -89,8 +88,7 @@ public class EbMSSignatureGenerator
 		{
 			if (ackRequested != null && ackRequested.isSigned())
 			{
-				PartyInfo partyInfo = cpaManager.getPartyInfo(cpaId,message.getMessageHeader().getFrom().getPartyId());
-				generate(partyInfo,message);
+				generate(cpaId,message.getMessageHeader().getFrom().getPartyId(),message);
 			}
 		}
 		catch (GeneralSecurityException e)
@@ -103,9 +101,9 @@ public class EbMSSignatureGenerator
 		}
 	}
 
-	private void generate(PartyInfo partyInfo, EbMSMessage message) throws EbMSProcessorException, GeneralSecurityException, XMLSecurityException
+	private void generate(String cpaId, List<PartyId> partyId, EbMSMessage message) throws EbMSProcessorException, GeneralSecurityException, XMLSecurityException
 	{
-		DeliveryChannel deliveryChannel = CPAUtils.getFromDeliveryChannel(partyInfo,message.getMessageHeader().getFrom().getRole(),message.getMessageHeader().getService(),message.getMessageHeader().getAction());
+		DeliveryChannel deliveryChannel = cpaManager.getFromDeliveryChannel(cpaId,partyId,message.getMessageHeader().getFrom().getRole(),message.getMessageHeader().getService(),message.getMessageHeader().getAction());
 		X509Certificate certificate = CPAUtils.getX509Certificate(CPAUtils.getSigningCertificate(deliveryChannel));
 		String alias = keyStore.getCertificateAlias(certificate);
 		if (alias == null)

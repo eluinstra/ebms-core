@@ -27,7 +27,6 @@ import nl.clockwork.ebms.util.EbMSMessageUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DeliveryChannel;
-import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.PartyInfo;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageHeader;
 import org.w3._2000._09.xmldsig.ReferenceType;
 import org.w3._2000._09.xmldsig.SignatureType;
@@ -48,9 +47,8 @@ public class SignatureTypeValidator
 		MessageHeader messageHeader = message.getMessageHeader();
 		SignatureType signature = message.getSignature();
 		
-		PartyInfo partyInfo = cpaManager.getPartyInfo(cpaId,messageHeader.getFrom().getPartyId());
-		DeliveryChannel deliveryChannel = CPAUtils.getFromDeliveryChannel(partyInfo,messageHeader.getFrom().getRole(),messageHeader.getService(),messageHeader.getAction());
-		if (CPAUtils.isNonRepudiationRequired(partyInfo,messageHeader.getFrom().getRole(),messageHeader.getService(),messageHeader.getAction()))
+		DeliveryChannel deliveryChannel = cpaManager.getFromDeliveryChannel(cpaId,messageHeader.getFrom().getPartyId(),messageHeader.getFrom().getRole(),messageHeader.getService(),messageHeader.getAction());
+		if (cpaManager.isNonRepudiationRequired(cpaId,messageHeader.getFrom().getPartyId(),messageHeader.getFrom().getRole(),messageHeader.getService(),messageHeader.getAction()))
 		{
 			if (signature == null)
 				throw new EbMSValidationException(EbMSMessageUtils.createError("//Header/Signature",Constants.EbMSErrorCode.SECURITY_FAILURE.errorCode(),"Signature not found."));

@@ -28,7 +28,6 @@ import nl.clockwork.ebms.util.EbMSMessageUtils;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.ActionBindingType;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.ActorType;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DeliveryChannel;
-import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.PartyInfo;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.PerMessageCharacteristicsType;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.AckRequested;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.Acknowledgment;
@@ -279,8 +278,7 @@ public class EbMSMessageFactory
 
 	private MessageHeader createMessageHeader(String cpaId, MessageHeader messageHeader, Date timestamp, EbMSAction action) throws DatatypeConfigurationException, JAXBException
 	{
-		PartyInfo partyInfo = cpaManager.getPartyInfo(cpaId,messageHeader.getTo().getPartyId());
-		DeliveryChannel deliveryChannel = CPAUtils.getDefaultDeliveryChannel(partyInfo,action.action());
+		DeliveryChannel deliveryChannel = cpaManager.getDefaultDeliveryChannel(cpaId,messageHeader.getTo().getPartyId(),action.action());
 		String hostname = CPAUtils.getHostname(deliveryChannel);
 
 		MessageHeader result = XMLMessageBuilder.deepCopy(messageHeader);

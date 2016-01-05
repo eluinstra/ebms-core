@@ -38,14 +38,12 @@ import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.Certificate;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CollaborationRole;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DeliveryChannel;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DocExchange;
-import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.OverrideMshActionBinding;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.Packaging;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.PartyId;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.PartyInfo;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.PerMessageCharacteristicsType;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.ReliableMessaging;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.SenderNonRepudiation;
-import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.ServiceBinding;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.ServiceType;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.Transport;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.Service;
@@ -125,47 +123,9 @@ public class CPAUtils
 		return partyId.getValue().equals(cpaPartyId.getValue()) && (partyId.getType() == null || (cpaPartyId.getType() != null && partyId.getType().equals(cpaPartyId.getType())));
 	}
 	
-	public static ServiceBinding getServiceBinding(PartyInfo partyInfo, String role, Service service)
-	{
-		for (CollaborationRole collaborationRole : partyInfo.getCollaborationRole())
-			if (role.equals(collaborationRole.getRole().getName()) && equals(collaborationRole.getServiceBinding().getService(),service))
-				return collaborationRole.getServiceBinding();
-		return null;
-	}
-
-	private static boolean equals(ServiceType serviceType, Service service)
+	public static boolean equals(ServiceType serviceType, Service service)
 	{
 		return serviceType.getValue().equals(service.getValue()) && (serviceType.getType() == null || (service.getType() != null && serviceType.getType().equals(service.getType())));
-	}
-
-	public static CanSend getCanSend(PartyInfo partyInfo, String role, Service service, String action)
-	{
-		ServiceBinding serviceBinding = getServiceBinding(partyInfo, role, service);
-		if (serviceBinding != null)
-			for (CanSend canSend : serviceBinding.getCanSend())
-				if (action.equals(canSend.getThisPartyActionBinding().getAction()))
-					return canSend;
-		return null;
-	}
-
-	public static CanReceive getCanReceive(PartyInfo partyInfo, String role, Service service, String action)
-	{
-		ServiceBinding serviceBinding = getServiceBinding(partyInfo, role, service);
-		if (serviceBinding != null)
-			for (CanReceive canReceive : serviceBinding.getCanReceive())
-				if (action.equals(canReceive.getThisPartyActionBinding().getAction()))
-					return canReceive;
-		return null;
-	}
-
-	public static boolean canSend(PartyInfo partyInfo, String role, Service service, String action)
-	{
-		return getCanSend(partyInfo,role,service,action) != null;
-	}
-
-	public static boolean canReceive(PartyInfo partyInfo, String role, Service service, String action)
-	{
-		return getCanReceive(partyInfo,role,service,action) != null;
 	}
 
 	public static FromPartyInfo getFromPartyInfo(PartyInfo partyInfo, CollaborationRole role, CanSend canSend)
@@ -190,44 +150,6 @@ public class CPAUtils
 		return result;
 	}
 
-	public static DeliveryChannel getDefaultDeliveryChannel(PartyInfo partyInfo, String action)
-	{
-		for (OverrideMshActionBinding overrideMshActionBinding : partyInfo.getOverrideMshActionBinding())
-			if (overrideMshActionBinding.getAction().equals(action))
-				return (DeliveryChannel)overrideMshActionBinding.getChannelId();
-		return (DeliveryChannel)partyInfo.getDefaultMshChannelId();
-	}
-
-	public static DeliveryChannel getFromDeliveryChannel(PartyInfo partyInfo, String role, Service service, String action)
-	{
-		if (Constants.EBMS_SERVICE_URI.equals(service.getValue()))
-			return getDefaultDeliveryChannel(partyInfo,action);
-		else
-		{
-			ServiceBinding serviceBinding = getServiceBinding(partyInfo, role, service);
-			if (serviceBinding != null)
-				for (CanSend canSend : serviceBinding.getCanSend())
-					if (action.equals(canSend.getThisPartyActionBinding().getAction()))
-						return getDeliveryChannel(canSend.getThisPartyActionBinding().getChannelId());
-		}
-		return null;
-	}
-	
-	public static DeliveryChannel getToDeliveryChannel(PartyInfo partyInfo, String role, Service service, String action)
-	{
-		if (Constants.EBMS_SERVICE_URI.equals(service.getValue()))
-			return getDefaultDeliveryChannel(partyInfo,action);
-		else
-		{
-			ServiceBinding serviceBinding = getServiceBinding(partyInfo,role,service);
-			if (serviceBinding != null)
-				for (CanReceive canReceive : serviceBinding.getCanReceive())
-					if (action.equals(canReceive.getThisPartyActionBinding().getAction()))
-						return getDeliveryChannel(canReceive.getThisPartyActionBinding().getChannelId());
-		}
-		return null;
-	}
-	
 	public static DeliveryChannel getDeliveryChannel(ActionBindingType bindingType)
 	{
 		return (DeliveryChannel)((JAXBElement<Object>)bindingType.getChannelId().get(0)).getValue();
@@ -249,13 +171,6 @@ public class CPAUtils
 	public static Packaging getPackaging(CanSend canSend)
 	{
 		return (Packaging)canSend.getThisPartyActionBinding().getPackageId();
-	}
-
-	public static boolean isNonRepudiationRequired(PartyInfo partyInfo, String role, Service service, String action)
-	{
-		CanSend canSend = getCanSend(partyInfo,role,service,action);
-		DocExchange docExchange = getDocExchange(getFromDeliveryChannel(partyInfo,role,service,action));
-		return canSend.getThisPartyActionBinding().getBusinessTransactionCharacteristics().isIsNonRepudiationRequired() && docExchange.getEbXMLSenderBinding() != null && docExchange.getEbXMLSenderBinding().getSenderNonRepudiation() != null;
 	}
 
 	public static boolean isReliableMessaging(DeliveryChannel deliveryChannel)

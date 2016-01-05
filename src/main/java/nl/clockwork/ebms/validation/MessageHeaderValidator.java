@@ -25,7 +25,6 @@ import nl.clockwork.ebms.Constants.EbMSAction;
 import nl.clockwork.ebms.common.CPAManager;
 import nl.clockwork.ebms.dao.EbMSDAO;
 import nl.clockwork.ebms.model.EbMSMessage;
-import nl.clockwork.ebms.util.CPAUtils;
 import nl.clockwork.ebms.util.EbMSMessageUtils;
 
 import org.apache.commons.lang.StringUtils;
@@ -33,7 +32,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.ActorType;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DeliveryChannel;
-import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.PartyInfo;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.PerMessageCharacteristicsType;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.SyncReplyModeType;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.AckRequested;
@@ -64,9 +62,6 @@ public class MessageHeaderValidator
 		SyncReply syncReply = message.getSyncReply();
 		MessageOrder messageOrder = message.getMessageOrder();
 		
-		PartyInfo from = null;
-		PartyInfo to = null;
-
 		if (!Constants.EBMS_VERSION.equals(messageHeader.getVersion()))
 			throw new EbMSValidationException(EbMSMessageUtils.createError("//Header/MessageHeader[@version]",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Invalid value."));
 		if (!isValid(messageHeader.getFrom().getPartyId()))
@@ -76,20 +71,20 @@ public class MessageHeaderValidator
 		if (!isValid(messageHeader.getService()))
 			throw new EbMSValidationException(EbMSMessageUtils.createError("//Header/MessageHeader/Service",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Invalid value."));
 		
-		if ((from = cpaManager.getPartyInfo(cpaId,messageHeader.getFrom().getPartyId())) == null)
+		if (cpaManager.getPartyInfo(cpaId,messageHeader.getFrom().getPartyId()) == null)
 			throw new EbMSValidationException(EbMSMessageUtils.createError("//Header/MessageHeader/From/PartyId",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Value not found."));
-		if ((to = cpaManager.getPartyInfo(cpaId,messageHeader.getTo().getPartyId())) == null)
+		if (cpaManager.getPartyInfo(cpaId,messageHeader.getTo().getPartyId()) == null)
 			throw new EbMSValidationException(EbMSMessageUtils.createError("//Header/MessageHeader/To/PartyId",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Value not found."));
 
 		if (!Constants.EBMS_SERVICE_URI.equals(messageHeader.getService().getValue()))
 		{
-			if (!CPAUtils.canSend(from,messageHeader.getFrom().getRole(),messageHeader.getService(),messageHeader.getAction()))
+			if (!cpaManager.canSend(cpaId,messageHeader.getFrom().getPartyId(),messageHeader.getFrom().getRole(),messageHeader.getService(),messageHeader.getAction()))
 				throw new EbMSValidationException(EbMSMessageUtils.createError("//Header/MessageHeader/Action",Constants.EbMSErrorCode.VALUE_NOT_RECOGNIZED.errorCode(),"Value not found."));
-			if (!CPAUtils.canReceive(to,messageHeader.getTo().getRole(),messageHeader.getService(),messageHeader.getAction()))
+			if (!cpaManager.canReceive(cpaId,messageHeader.getTo().getPartyId(),messageHeader.getTo().getRole(),messageHeader.getService(),messageHeader.getAction()))
 				throw new EbMSValidationException(EbMSMessageUtils.createError("//Header/MessageHeader/Action",Constants.EbMSErrorCode.VALUE_NOT_RECOGNIZED.errorCode(),"Value not found."));
 		}
 
-		DeliveryChannel deliveryChannel = CPAUtils.getFromDeliveryChannel(from,messageHeader.getFrom().getRole(),messageHeader.getService(),messageHeader.getAction());
+		DeliveryChannel deliveryChannel = cpaManager.getFromDeliveryChannel(cpaId,messageHeader.getFrom().getPartyId(),messageHeader.getFrom().getRole(),messageHeader.getService(),messageHeader.getAction());
 		if (deliveryChannel == null)
 			throw new EbMSValidationException(EbMSMessageUtils.createError(Constants.EbMSErrorCode.UNKNOWN.errorCode(),Constants.EbMSErrorCode.UNKNOWN.errorCode(),"No DeliveryChannel found."));
 		if (!existsRefToMessageId(messageHeader.getMessageData().getRefToMessageId()))
