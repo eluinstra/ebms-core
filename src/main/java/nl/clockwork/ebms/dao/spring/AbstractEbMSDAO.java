@@ -224,21 +224,21 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	}
 
 	@Override
-	public String getUrl(String url)
+	public String getUrl(String cpaId)
 	{
 		try
 		{
 			return jdbcTemplate.queryForObject(
-				"select destination_url" +
-				" from url" +
-				" where original_url = ?",
+				"select url" +
+				" from cpa" +
+				" where cpa_id = ?",
 				String.class,
-				url
+				cpaId
 			);
 		}
 		catch(EmptyResultDataAccessException e)
 		{
-			return url;
+			return null;
 		}
 		catch (DataAccessException e)
 		{
@@ -247,56 +247,17 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	}
 
 	@Override
-	public void insertUrl(String originalUrl, String destinationUrl)
-	{
-		try
-		{
-			jdbcTemplate.update
-			(
-				"insert into url (" +
-					"original_url," +
-					"destination_url" +
-				") values (?,?)",
-				originalUrl,
-				destinationUrl
-			);
-		}
-		catch (DataAccessException e)
-		{
-			throw new DAOException(e);
-		}
-	}
-
-	@Override
-	public int updateUrl(String originalUrl, String destinationUrl)
+	public int updateUrl(String cpaId, String url)
 	{
 		try
 		{
 			return jdbcTemplate.update
 			(
-				"update url set" +
-				" destination_url = ?" +
-				" where original_url = ?",
-				destinationUrl,
-				originalUrl
-			);
-		}
-		catch (DataAccessException e)
-		{
-			throw new DAOException(e);
-		}
-	}
-
-	@Override
-	public int deleteUrl(String url)
-	{
-		try
-		{
-			return jdbcTemplate.update
-			(
-				"delete from url" +
-				" where original_url = ?",
-				url
+				"update cpa set" +
+				" url = ?" +
+				" where cpa_id = ?",
+				url,
+				cpaId
 			);
 		}
 		catch (DataAccessException e)

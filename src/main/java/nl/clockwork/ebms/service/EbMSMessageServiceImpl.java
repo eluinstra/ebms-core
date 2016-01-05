@@ -106,7 +106,7 @@ public class EbMSMessageServiceImpl implements EbMSMessageService
 					public void doInTransaction()
 					{
 						ebMSDAO.insertMessage(new Date(),message,EbMSMessageStatus.SENT);
-						List<EbMSEvent> events = eventManager.createEbMSSendEvents(message.getMessageHeader().getCPAId(),message,cpaManager.getOriginalUri(message.getMessageHeader().getCPAId(),message.getMessageHeader().getTo().getPartyId(),message.getMessageHeader().getTo().getRole(),message.getMessageHeader().getService(),message.getMessageHeader().getAction()));
+						List<EbMSEvent> events = eventManager.createEbMSSendEvents(message.getMessageHeader().getCPAId(),message,cpaManager.getUri(message.getMessageHeader().getCPAId(),message.getMessageHeader().getTo().getPartyId(),message.getMessageHeader().getTo().getRole(),message.getMessageHeader().getService(),message.getMessageHeader().getAction()));
 						ebMSDAO.insertEvents(events);
 					}
 				}

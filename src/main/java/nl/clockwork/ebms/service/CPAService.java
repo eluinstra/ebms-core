@@ -23,7 +23,7 @@ import javax.jws.WebResult;
 import javax.jws.WebService;
 import javax.xml.bind.annotation.XmlElement;
 
-@WebService(targetNamespace="http://www.ordina.nl/cpa/2.1")
+@WebService(targetNamespace="http://www.ordina.nl/cpa/2.2")
 public interface CPAService
 {
 	@WebMethod(operationName="ValidateCPA")
@@ -44,5 +44,12 @@ public interface CPAService
 	@WebResult(name="CPA")
 	@WebMethod(operationName="GetCPA")
 	/*CollaborationProtocolAgreement*/String getCPA(@WebParam(name="CPAId") @XmlElement(required=true) String cpaId) throws CPAServiceException;
+
+	@WebResult(name="URL")
+	@WebMethod(operationName="GetURL")
+	String getURL(@WebParam(name="CPAId") @XmlElement(required=true) String cpaId) throws CPAServiceException;
+
+	@WebMethod(operationName="SetURL")
+	void setURL(@WebParam(name="CPAId") @XmlElement(required=true) String cpaId, @WebParam(name="URL") @XmlElement(required=true) String url) throws CPAServiceException;
 
 }

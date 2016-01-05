@@ -138,4 +138,16 @@ public class CPAServiceImpl implements CPAService
 	{
 		this.cpaManager = cpaManager;
 	}
+
+	@Override
+	public String getURL(String cpaId) throws CPAServiceException
+	{
+		return cpaManager.getUrl(cpaId);
+	}
+
+	@Override
+	public void setURL(String cpaId, String url) throws CPAServiceException
+	{
+		cpaManager.setUrl(cpaId,url);
+	}
 }

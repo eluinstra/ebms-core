@@ -25,7 +25,6 @@ import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.Service;
 public class CPAManager
 {
 	private EbMSDAO ebMSDAO;
-	private URLManager urlManager;
 
 	public boolean existsCPA(String cpaId)
 	{
@@ -54,6 +53,16 @@ public class CPAManager
 	public int deleteCPA(String cpaId)
 	{
 		return ebMSDAO.deleteCPA(cpaId);
+	}
+
+	public String getUrl(String cpaId)
+	{
+		return ebMSDAO.getUrl(cpaId);
+	}
+
+	public void setUrl(String cpaId, String url)
+	{
+		ebMSDAO.updateUrl(cpaId,url);
 	}
 
 	public boolean isValid(String cpaId, Date timestamp)
@@ -175,16 +184,17 @@ public class CPAManager
 		return null;
 	}
 
-	public String getOriginalUri(String cpaId, List<PartyId> partyId, String role, Service service, String action)
+	private String getOriginalUri(String cpaId, List<PartyId> partyId, String role, Service service, String action)
 	{
 		PartyInfo partyInfo = getPartyInfo(cpaId,partyId);
 		DeliveryChannel deliveryChannel = CPAUtils.getToDeliveryChannel(partyInfo,role,service,action);
-		return urlManager.getUrl(CPAUtils.getUri(deliveryChannel));
+		return CPAUtils.getUri(deliveryChannel);
 	}
 
 	public String getUri(String cpaId, List<PartyId> partyId, String role, Service service, String action)
 	{
-		return ebMSDAO.getUrl(getOriginalUri(cpaId,partyId,role,service,action));
+		String replacementUrl = getUrl(cpaId);
+		return replacementUrl == null ? getOriginalUri(cpaId,partyId,role,service,action) : replacementUrl;
 	}
 
 	public void setEbMSDAO(EbMSDAO ebMSDAO)
@@ -192,8 +202,4 @@ public class CPAManager
 		this.ebMSDAO = ebMSDAO;
 	}
 
-	public void setUrlManager(URLManager urlManager)
-	{
-		this.urlManager = urlManager;
-	}
 }

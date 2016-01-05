@@ -42,10 +42,8 @@ public interface EbMSDAO
 	int updateCPA(CollaborationProtocolAgreement cpa) throws DAOException;
 	int deleteCPA(String cpaId) throws DAOException;
 	
-	String getUrl(String url);
-	void insertUrl(String originalUrl, String destinationUrl);
-	int updateUrl(String originalUrl, String destinationUrl);
-	int deleteUrl(String url);
+	String getUrl(String cpaId);
+	int updateUrl(String cpaId, String url);
 
 	boolean existsMessage(String messageId) throws DAOException;
 	EbMSMessageContent getMessageContent(String messageId) throws DAOException;

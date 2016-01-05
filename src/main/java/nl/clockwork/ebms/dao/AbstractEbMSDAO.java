@@ -279,7 +279,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	}
 
 	@Override
-	public String getUrl(String url)
+	public String getUrl(String cpaId)
 	{
 		Connection c = null;
 		try
@@ -287,19 +287,17 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 			String result = null;
 			c = connectionManager.getConnection();
 			try (PreparedStatement ps  = c.prepareStatement(
-				"select destination_url" +
-				" from url" +
-				" where original_url = ?"
+				"select url" +
+				" from cpa" +
+				" where cpa_id = ?"
 			))
 			{
-				ps.setString(1,url);
+				ps.setString(1,cpaId);
 				if (ps.execute())
 				{
 					ResultSet rs = ps.getResultSet();
 					if (rs.next())
-						result = rs.getString("destination_url");
-					else
-						result = url;
+						result = rs.getString("url");
 				}
 				return result;
 			}
@@ -315,75 +313,20 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	}
 
 	@Override
-	public void insertUrl(String originalUrl, String destinationUrl)
+	public int updateUrl(String cpaId, String url)
 	{
 		Connection c = null;
 		try
 		{
 			c = connectionManager.getConnection();
 			try (PreparedStatement ps  = c.prepareStatement(
-				"insert into url (" +
-					"original_url," +
-					"destination_url" +
-				") values (?,?)"
-			))
-			{
-				ps.setString(1,originalUrl);
-				ps.setString(2,destinationUrl);
-				ps.executeUpdate();
-			}
-		}
-		catch (SQLException e)
-		{
-			throw new DAOException(e);
-		}
-		finally
-		{
-			connectionManager.close();
-		}
-	}
-
-	@Override
-	public int updateUrl(String originalUrl, String destinationUrl)
-	{
-		Connection c = null;
-		try
-		{
-			c = connectionManager.getConnection();
-			try (PreparedStatement ps  = c.prepareStatement(
-				"update url set" +
-				" destination_url = ?" +
-				" where original_url = ?"
-			))
-			{
-				ps.setString(1,destinationUrl);
-				ps.setString(2,originalUrl);
-				return ps.executeUpdate();
-			}
-		}
-		catch (SQLException e)
-		{
-			throw new DAOException(e);
-		}
-		finally
-		{
-			connectionManager.close();
-		}
-	}
-
-	@Override
-	public int deleteUrl(String url)
-	{
-		Connection c = null;
-		try
-		{
-			c = connectionManager.getConnection();
-			try (PreparedStatement ps  = c.prepareStatement(
-				"delete from url" +
-				" where original_url = ?"
+				"update cpa set" +
+				" url = ?" +
+				" where cpa_id = ?"
 			))
 			{
 				ps.setString(1,url);
+				ps.setString(2,cpaId);
 				return ps.executeUpdate();
 			}
 		}

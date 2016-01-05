@@ -1,7 +1,8 @@
 CREATE TABLE cpa
 (
 	cpa_id						VARCHAR(256)		NOT NULL,
-	cpa								MEDIUMTEXT			NOT NULL
+	cpa								MEDIUMTEXT			NOT NULL,
+	url								VARCHAR(256)		NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 ALTER TABLE cpa ADD CONSTRAINT uc_cpa_id UNIQUE (cpa_id(255));
