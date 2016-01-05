@@ -17,7 +17,6 @@ package nl.clockwork.ebms.validation;
 
 import nl.clockwork.ebms.common.CPAManager;
 import nl.clockwork.ebms.dao.DAOException;
-import nl.clockwork.ebms.dao.EbMSDAO;
 import nl.clockwork.ebms.model.EbMSMessageContext;
 import nl.clockwork.ebms.model.FromPartyInfo;
 import nl.clockwork.ebms.model.ToPartyInfo;
@@ -30,12 +29,10 @@ import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CollaborationProt
 public class EbMSMessageContextValidator
 {
 	protected transient Log logger = LogFactory.getLog(getClass());
-	private EbMSDAO ebMSDAO;
 	private CPAManager cpaManager;
 
-	public EbMSMessageContextValidator(EbMSDAO ebMSDAO, CPAManager cpaManager)
+	public EbMSMessageContextValidator(CPAManager cpaManager)
 	{
-		this.ebMSDAO = ebMSDAO;
 		this.cpaManager = cpaManager;
 	}
 	
@@ -50,7 +47,7 @@ public class EbMSMessageContextValidator
 			if (StringUtils.isEmpty(context.getAction()))
 				throw new ValidationException("context.action cannot be empty!");
 
-			CollaborationProtocolAgreement cpa = ebMSDAO.getCPA(context.getCpaId());
+			CollaborationProtocolAgreement cpa = cpaManager.getCPA(context.getCpaId());
 			if (cpa == null)
 				throw new ValidationException("No CPA found for: context.cpaId=" + context.getCpaId());
 

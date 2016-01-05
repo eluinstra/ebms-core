@@ -65,7 +65,7 @@ public class EbMSMessageServiceImpl implements EbMSMessageService
 
   public void init()
   {
-		ebMSMessageContextValidator = new EbMSMessageContextValidator(ebMSDAO,cpaManager);
+		ebMSMessageContextValidator = new EbMSMessageContextValidator(cpaManager);
   }
   
 	@Override
