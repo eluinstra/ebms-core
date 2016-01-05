@@ -32,7 +32,7 @@ public class CPAManager
 
 	public boolean existsCPA(String cpaId)
 	{
-		return getCPA(cpaId) != null;
+		return ebMSDAO.existsCPA(cpaId);
 	}
 
 	public CollaborationProtocolAgreement getCPA(String cpaId)
