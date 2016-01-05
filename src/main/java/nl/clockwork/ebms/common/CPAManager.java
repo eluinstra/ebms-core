@@ -12,7 +12,6 @@ import nl.clockwork.ebms.model.Role;
 import nl.clockwork.ebms.model.ToPartyInfo;
 import nl.clockwork.ebms.util.CPAUtils;
 
-import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.ActionBindingType;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CanReceive;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CanSend;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CollaborationProtocolAgreement;
@@ -154,13 +153,14 @@ public class CPAManager
 		return null;
 	}
 
-	public ToPartyInfo getToPartyInfo(String cpaId, ActionBindingType actionBinding)
+	public ToPartyInfo getToPartyInfoByFromPartyActionBinding(String cpaId, Role fromRole, String service, String action)
 	{
+		FromPartyInfo fromPartyInfo = getFromPartyInfo(cpaId,fromRole,service,action);
 		CollaborationProtocolAgreement cpa = getCPA(cpaId);
 		for (PartyInfo partyInfo : cpa.getPartyInfo())
 			for (CollaborationRole role : partyInfo.getCollaborationRole())
 				for (CanReceive canReceive : role.getServiceBinding().getCanReceive())
-					if (canReceive.getThisPartyActionBinding().equals(actionBinding))
+					if (canReceive.getThisPartyActionBinding().equals(fromPartyInfo.getCanSend().getOtherPartyActionBinding()))
 						return CPAUtils.getToPartyInfo(partyInfo,role,canReceive);
 		return null;
 	}
@@ -189,7 +189,7 @@ public class CPAManager
 		return null;
 	}
 
-	public ServiceBinding getServiceBinding(PartyInfo partyInfo, String role, Service service)
+	private ServiceBinding getServiceBinding(PartyInfo partyInfo, String role, Service service)
 	{
 		for (CollaborationRole collaborationRole : partyInfo.getCollaborationRole())
 			if (role.equals(collaborationRole.getRole().getName()) && CPAUtils.equals(collaborationRole.getServiceBinding().getService(),service))
@@ -197,7 +197,7 @@ public class CPAManager
 		return null;
 	}
 
-	public CanSend getCanSend(PartyInfo partyInfo, String role, Service service, String action)
+	private CanSend getCanSend(PartyInfo partyInfo, String role, Service service, String action)
 	{
 		ServiceBinding serviceBinding = getServiceBinding(partyInfo, role, service);
 		if (serviceBinding != null)
@@ -207,7 +207,7 @@ public class CPAManager
 		return null;
 	}
 
-	public CanReceive getCanReceive(PartyInfo partyInfo, String role, Service service, String action)
+	private CanReceive getCanReceive(PartyInfo partyInfo, String role, Service service, String action)
 	{
 		ServiceBinding serviceBinding = getServiceBinding(partyInfo, role, service);
 		if (serviceBinding != null)

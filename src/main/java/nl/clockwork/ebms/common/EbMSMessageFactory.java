@@ -94,7 +94,9 @@ public class EbMSMessageFactory
 	{
 		String uuid = context.getMessageId() == null ? UUID.randomUUID().toString() : context.getMessageId();
 		FromPartyInfo fromPartyInfo = cpaManager.getFromPartyInfo(cpaId,context.getFromRole(),context.getService(),context.getAction());
-		ToPartyInfo toPartyInfo = fromPartyInfo.getCanSend().getOtherPartyActionBinding() == null ? cpaManager.getToPartyInfo(cpaId,context.getToRole(),context.getService(),context.getAction()) : cpaManager.getToPartyInfo(cpaId,(ActionBindingType)fromPartyInfo.getCanSend().getOtherPartyActionBinding());
+		ToPartyInfo toPartyInfo = cpaManager.getToPartyInfoByFromPartyActionBinding(cpaId,context.getFromRole(),context.getService(),context.getAction());
+		if (toPartyInfo == null)
+			toPartyInfo = cpaManager.getToPartyInfo(cpaId,context.getToRole(),context.getService(),context.getAction());
 		DeliveryChannel deliveryChannel = CPAUtils.getDeliveryChannel(fromPartyInfo.getCanSend().getThisPartyActionBinding());
 		String hostname = CPAUtils.getHostname(deliveryChannel);
 
