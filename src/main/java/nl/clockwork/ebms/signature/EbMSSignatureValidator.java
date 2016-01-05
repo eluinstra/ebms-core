@@ -30,6 +30,7 @@ import java.util.Date;
 import java.util.Enumeration;
 import java.util.List;
 
+import nl.clockwork.ebms.common.CPAManager;
 import nl.clockwork.ebms.common.util.SecurityUtils;
 import nl.clockwork.ebms.model.EbMSAttachment;
 import nl.clockwork.ebms.model.EbMSMessage;
@@ -43,7 +44,6 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.signature.XMLSignature;
 import org.apache.xml.security.signature.XMLSignatureException;
-import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CollaborationProtocolAgreement;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DeliveryChannel;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.PartyInfo;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageHeader;
@@ -55,6 +55,7 @@ import org.w3c.dom.NodeList;
 public class EbMSSignatureValidator
 {
 	protected transient Log logger = LogFactory.getLog(getClass());
+	private CPAManager cpaManager;
 	private String trustStorePath;
 	private String trustStorePassword;
 
@@ -63,18 +64,18 @@ public class EbMSSignatureValidator
 		org.apache.xml.security.Init.init();
 	}
 	
-	public void validate(CollaborationProtocolAgreement cpa, EbMSMessage message) throws ValidatorException, ValidationException
+	public void validate(String cpaId, EbMSMessage message) throws ValidatorException, ValidationException
 	{
 		try
 		{
-			PartyInfo partyInfo = CPAUtils.getPartyInfo(cpa,message.getMessageHeader().getFrom().getPartyId());
+			PartyInfo partyInfo = cpaManager.getPartyInfo(cpaId,message.getMessageHeader().getFrom().getPartyId());
 			if (CPAUtils.isNonRepudiationRequired(partyInfo,message.getMessageHeader().getFrom().getRole(),message.getMessageHeader().getService(),message.getMessageHeader().getAction()))
 			{
 				KeyStore trustStore = SecurityUtils.loadKeyStore(trustStorePath,trustStorePassword);
 				NodeList signatureNodeList = message.getMessage().getElementsByTagNameNS(org.apache.xml.security.utils.Constants.SignatureSpecNS,org.apache.xml.security.utils.Constants._TAG_SIGNATURE);
 				if (signatureNodeList.getLength() > 0)
 				{
-					X509Certificate certificate = getCertificate(cpa,message.getMessage(),message.getMessageHeader());
+					X509Certificate certificate = getCertificate(cpaId,message.getMessage(),message.getMessageHeader());
 					if (certificate != null)
 					{
 						validateCertificate(trustStore,certificate,message.getMessageHeader().getMessageData().getTimestamp() == null ? new Date() : message.getMessageHeader().getMessageData().getTimestamp());
@@ -98,7 +99,7 @@ public class EbMSSignatureValidator
 		}
 	}
 
-	public void validate(CollaborationProtocolAgreement cpa, EbMSMessage requestMessage, EbMSMessage responseMessage) throws ValidatorException, ValidationException
+	public void validate(String cpaId, EbMSMessage requestMessage, EbMSMessage responseMessage) throws ValidatorException, ValidationException
 	{
 		try
 		{
@@ -108,7 +109,7 @@ public class EbMSSignatureValidator
 				NodeList signatureNodeList = responseMessage.getMessage().getElementsByTagNameNS(org.apache.xml.security.utils.Constants.SignatureSpecNS,org.apache.xml.security.utils.Constants._TAG_SIGNATURE);
 				if (signatureNodeList.getLength() > 0)
 				{
-					X509Certificate certificate = getCertificate(cpa,responseMessage.getMessage(),responseMessage.getMessageHeader());
+					X509Certificate certificate = getCertificate(cpaId,responseMessage.getMessage(),responseMessage.getMessageHeader());
 					if (certificate != null)
 					{
 						validateCertificate(trustStore,certificate,responseMessage.getMessageHeader().getMessageData().getTimestamp() == null ? new Date() : responseMessage.getMessageHeader().getMessageData().getTimestamp());
@@ -141,19 +142,16 @@ public class EbMSSignatureValidator
 		return signature.checkSignatureValue(certificate);
 	}
 
-	private X509Certificate getCertificate(CollaborationProtocolAgreement cpa, Document document, MessageHeader messageHeader)
+	private X509Certificate getCertificate(String cpaId, Document document, MessageHeader messageHeader)
 	{
 		try
 		{
-			if (cpa != null)
+			PartyInfo partyInfo = cpaManager.getPartyInfo(cpaId,messageHeader.getFrom().getPartyId());
+			if (partyInfo != null)
 			{
-				PartyInfo partyInfo = CPAUtils.getPartyInfo(cpa,messageHeader.getFrom().getPartyId());
-				if (partyInfo != null)
-				{
-					DeliveryChannel deliveryChannel = CPAUtils.getFromDeliveryChannel(partyInfo,messageHeader.getFrom().getRole(),messageHeader.getService(),messageHeader.getAction());
-					if (deliveryChannel != null)
-						return CPAUtils.getX509Certificate(CPAUtils.getSigningCertificate(deliveryChannel));
-				}
+				DeliveryChannel deliveryChannel = CPAUtils.getFromDeliveryChannel(partyInfo,messageHeader.getFrom().getRole(),messageHeader.getService(),messageHeader.getAction());
+				if (deliveryChannel != null)
+					return CPAUtils.getX509Certificate(CPAUtils.getSigningCertificate(deliveryChannel));
 			}
 			return null;
 		}
@@ -236,6 +234,11 @@ public class EbMSSignatureValidator
 	{
 		return requestReference.getURI().equals(responseReference.getURI())
 				&& Arrays.equals(requestReference.getDigestValue(),responseReference.getDigestValue());
+	}
+
+	public void setCpaManager(CPAManager cpaManager)
+	{
+		this.cpaManager = cpaManager;
 	}
 
 	public void setTrustStorePath(String trustStorePath)

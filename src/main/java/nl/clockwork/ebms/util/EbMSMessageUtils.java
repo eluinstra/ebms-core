@@ -20,13 +20,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.UUID;
 
-import javax.mail.util.ByteArrayDataSource;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.datatype.DatatypeConfigurationException;
-import javax.xml.datatype.Duration;
 import javax.xml.namespace.QName;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.soap.SOAPException;
@@ -35,41 +32,25 @@ import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.xpath.XPathExpressionException;
 
 import nl.clockwork.ebms.Constants;
-import nl.clockwork.ebms.Constants.EbMSAction;
 import nl.clockwork.ebms.Constants.EbMSEventType;
 import nl.clockwork.ebms.Constants.EbMSMessageStatus;
 import nl.clockwork.ebms.common.XMLMessageBuilder;
 import nl.clockwork.ebms.common.util.DOMUtils;
 import nl.clockwork.ebms.model.EbMSAttachment;
-import nl.clockwork.ebms.model.EbMSDataSource;
 import nl.clockwork.ebms.model.EbMSDocument;
 import nl.clockwork.ebms.model.EbMSEvent;
 import nl.clockwork.ebms.model.EbMSMessage;
-import nl.clockwork.ebms.model.EbMSMessageContent;
-import nl.clockwork.ebms.model.EbMSMessageContext;
-import nl.clockwork.ebms.model.EbMSPartyInfo;
-import nl.clockwork.ebms.model.FromPartyInfo;
-import nl.clockwork.ebms.model.Party;
-import nl.clockwork.ebms.model.ToPartyInfo;
 import nl.clockwork.ebms.xml.EbMSNamespaceMapper;
 
 import org.apache.commons.lang.StringUtils;
-import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.ActionBindingType;
-import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.ActorType;
-import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CollaborationProtocolAgreement;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DeliveryChannel;
-import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.PartyInfo;
-import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.PerMessageCharacteristicsType;
-import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.ReliableMessaging;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.SyncReplyModeType;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.AckRequested;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.Acknowledgment;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.Description;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.Error;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.ErrorList;
-import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.From;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.Manifest;
-import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageData;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageHeader;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageOrder;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageStatusType;
@@ -80,8 +61,6 @@ import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.SeverityType;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.StatusRequest;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.StatusResponse;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.SyncReply;
-import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.To;
-import org.w3._2000._09.xmldsig.ReferenceType;
 import org.w3._2000._09.xmldsig.SignatureType;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
@@ -172,158 +151,6 @@ public class EbMSMessageUtils
 		return new EbMSDocument(EbMSMessageUtils.createSOAPMessage(message),message.getAttachments());
 	}
 	
-	public static MessageHeader createMessageHeader(CollaborationProtocolAgreement cpa, Party fromParty, Party toParty, String action)
-	{
-		String uuid = UUID.randomUUID().toString();
-		EbMSPartyInfo fromPartyInfo = CPAUtils.getEbMSPartyInfo(cpa,fromParty);
-		EbMSPartyInfo toPartyInfo = CPAUtils.getEbMSPartyInfo(cpa,toParty);
-		DeliveryChannel deliveryChannel = (DeliveryChannel)fromPartyInfo.getDefaultMshChannelId();
-		String hostname = CPAUtils.getHostname(deliveryChannel);
-
-		MessageHeader messageHeader = new MessageHeader();
-
-		messageHeader.setVersion(Constants.EBMS_VERSION);
-		messageHeader.setMustUnderstand(true);
-
-		messageHeader.setCPAId(cpa.getCpaid());
-		messageHeader.setConversationId(uuid);
-		
-		messageHeader.setFrom(new From());
-		messageHeader.getFrom().getPartyId().addAll(fromPartyInfo.getPartyIds());
-		messageHeader.getFrom().setRole(fromParty.getRole());
-
-		messageHeader.setTo(new To());
-		messageHeader.getTo().getPartyId().addAll(toPartyInfo.getPartyIds());
-		messageHeader.getTo().setRole(toParty.getRole());
-		
-		messageHeader.setService(new Service());
-		messageHeader.getService().setType(null);
-		messageHeader.getService().setValue(Constants.EBMS_SERVICE_URI);
-		messageHeader.setAction(action);
-
-		messageHeader.setMessageData(new MessageData());
-		messageHeader.getMessageData().setMessageId(uuid + "@" + hostname);
-		//messageHeader.getMessageData().setRefToMessageId(null);
-		messageHeader.getMessageData().setTimestamp(new Date());
-
-		//setTimeToLive(cpa,deliveryChannel,messageHeader);
-
-		//messageHeader.setDuplicateElimination(PerMessageCharacteristicsType.ALWAYS.equals(deliveryChannel.getMessagingCharacteristics().getDuplicateElimination()) ? "" : null);
-		
-		return messageHeader;
-	}
-
-	public static MessageHeader createMessageHeader(CollaborationProtocolAgreement cpa, EbMSMessageContext context) throws DatatypeConfigurationException
-	{
-		String uuid = context.getMessageId() == null ? UUID.randomUUID().toString() : context.getMessageId();
-		FromPartyInfo fromPartyInfo = CPAUtils.getFromPartyInfo(cpa,context.getFromRole(),context.getService(),context.getAction());
-		ToPartyInfo toPartyInfo = fromPartyInfo.getCanSend().getOtherPartyActionBinding() == null ? CPAUtils.getToPartyInfo(cpa,context.getToRole(),context.getService(),context.getAction()) : CPAUtils.getToPartyInfo(cpa,(ActionBindingType)fromPartyInfo.getCanSend().getOtherPartyActionBinding());
-		DeliveryChannel deliveryChannel = CPAUtils.getDeliveryChannel(fromPartyInfo.getCanSend().getThisPartyActionBinding());
-		String hostname = CPAUtils.getHostname(deliveryChannel);
-
-		MessageHeader messageHeader = new MessageHeader();
-
-		messageHeader.setVersion(Constants.EBMS_VERSION);
-		messageHeader.setMustUnderstand(true);
-
-		messageHeader.setCPAId(cpa.getCpaid());
-		messageHeader.setConversationId(context.getConversationId() != null ? context.getConversationId() : uuid);
-		
-		messageHeader.setFrom(new From());
-		messageHeader.getFrom().getPartyId().addAll(fromPartyInfo.getPartyIds());
-		messageHeader.getFrom().setRole(fromPartyInfo.getRole());
-
-		messageHeader.setTo(new To());
-		messageHeader.getTo().getPartyId().addAll(toPartyInfo.getPartyIds());
-		messageHeader.getTo().setRole(toPartyInfo.getRole());
-		
-		messageHeader.setService(new Service());
-		messageHeader.getService().setType(fromPartyInfo.getService().getType());
-		messageHeader.getService().setValue(fromPartyInfo.getService().getValue());
-		messageHeader.setAction(fromPartyInfo.getCanSend().getThisPartyActionBinding().getAction());
-
-		messageHeader.setMessageData(new MessageData());
-		messageHeader.getMessageData().setMessageId(uuid + "@" + hostname);
-		messageHeader.getMessageData().setRefToMessageId(context.getRefToMessageId());
-		messageHeader.getMessageData().setTimestamp(new Date());
-
-		setTimeToLive(cpa,deliveryChannel,messageHeader);
-
-		messageHeader.setDuplicateElimination(PerMessageCharacteristicsType.ALWAYS.equals(deliveryChannel.getMessagingCharacteristics().getDuplicateElimination()) ? "" : null);
-		
-		return messageHeader;
-	}
-
-	private static void setTimeToLive(CollaborationProtocolAgreement cpa, DeliveryChannel deliveryChannel, MessageHeader messageHeader) throws DatatypeConfigurationException
-	{
-		if (CPAUtils.isReliableMessaging(cpa,deliveryChannel))
-		{
-			Duration duration = CPAUtils.getPersistantDuration(cpa,deliveryChannel).add(CPAUtils.getRetryInterval(cpa,deliveryChannel));
-			Date timestamp = (Date)messageHeader.getMessageData().getTimestamp().clone();
-			duration.addTo(timestamp);
-			messageHeader.getMessageData().setTimeToLive(timestamp);
-		}
-	}
-
-	public static MessageHeader createMessageHeader(CollaborationProtocolAgreement cpa, MessageHeader messageHeader, Date timestamp, EbMSAction action) throws DatatypeConfigurationException, JAXBException
-	{
-		PartyInfo partyInfo = CPAUtils.getPartyInfo(cpa,messageHeader.getTo().getPartyId());
-		DeliveryChannel deliveryChannel = CPAUtils.getDefaultDeliveryChannel(partyInfo,action.action());
-		String hostname = CPAUtils.getHostname(deliveryChannel);
-
-		MessageHeader result = XMLMessageBuilder.deepCopy(messageHeader);
-
-		result.getFrom().getPartyId().clear();
-		result.getFrom().getPartyId().addAll(messageHeader.getTo().getPartyId());
-		result.getFrom().setRole(messageHeader.getTo().getRole());
-
-		result.getTo().getPartyId().clear();
-		result.getTo().getPartyId().addAll(messageHeader.getFrom().getPartyId());
-		result.getTo().setRole(messageHeader.getFrom().getRole());
-
-		result.getMessageData().setRefToMessageId(messageHeader.getMessageData().getMessageId());
-		result.getMessageData().setMessageId(UUID.randomUUID().toString() + "@" + hostname);
-		result.getMessageData().setTimestamp(timestamp);
-		result.getMessageData().setTimeToLive(null);
-
-		result.setService(new Service());
-		result.getService().setValue(Constants.EBMS_SERVICE_URI);
-		result.setAction(action.action());
-
-		result.setDuplicateElimination(null);
-
-		return result;
-	}
-
-	public static AckRequested createAckRequested(CollaborationProtocolAgreement cpa, EbMSMessageContext context)
-	{
-		FromPartyInfo partyInfo = CPAUtils.getFromPartyInfo(cpa,context.getFromRole(),context.getService(),context.getAction());
-		DeliveryChannel channel = CPAUtils.getDeliveryChannel(partyInfo.getCanSend().getThisPartyActionBinding());
-
-		if (PerMessageCharacteristicsType.ALWAYS.equals(channel.getMessagingCharacteristics().getAckRequested()))
-		{
-			AckRequested ackRequested = new AckRequested();
-			ackRequested.setVersion(Constants.EBMS_VERSION);
-			ackRequested.setMustUnderstand(true);
-			ackRequested.setSigned(PerMessageCharacteristicsType.ALWAYS.equals(channel.getMessagingCharacteristics().getAckSignatureRequested()));
-			ackRequested.setActor(channel.getMessagingCharacteristics().getActor().value());
-			return ackRequested;
-		}
-		else
-			return null;
-	}
-	
-	public static SyncReply createSyncReply(CollaborationProtocolAgreement cpa, Party fromParty)
-	{
-		return createSyncReply(CPAUtils.getEbMSPartyInfo(cpa,fromParty).getDefaultMshChannelId());
-	}
-	
-	public static SyncReply createSyncReply(CollaborationProtocolAgreement cpa, EbMSMessageContext context)
-	{
-		FromPartyInfo fromPartyInfo = CPAUtils.getFromPartyInfo(cpa,context.getFromRole(),context.getService(),context.getAction());
-		return createSyncReply(fromPartyInfo.getDeliveryChannel());
-	}
-
 	public static SyncReply createSyncReply(DeliveryChannel channel)
 	{
 		if (SyncReplyModeType.MSH_SIGNALS_ONLY.equals(channel.getMessagingCharacteristics().getSyncReplyMode()) || SyncReplyModeType.SIGNALS_ONLY.equals(channel.getMessagingCharacteristics().getSyncReplyMode()) || SyncReplyModeType.SIGNALS_AND_RESPONSE.equals(channel.getMessagingCharacteristics().getSyncReplyMode()))
@@ -397,111 +224,6 @@ public class EbMSMessageUtils
 		return response;
 	}
 
-	public static EbMSMessage createEbMSMessageError(CollaborationProtocolAgreement cpa, EbMSMessage message, ErrorList errorList, Date timestamp) throws DatatypeConfigurationException, JAXBException
-	{
-		MessageHeader messageHeader = EbMSMessageUtils.createMessageHeader(cpa,message.getMessageHeader(),timestamp,EbMSAction.MESSAGE_ERROR);
-		if (errorList.getError().size() == 0)
-		{
-			errorList.getError().add(EbMSMessageUtils.createError(Constants.EbMSErrorCode.UNKNOWN.errorCode(),Constants.EbMSErrorCode.UNKNOWN.errorCode(),"An unknown error occurred!"));
-			errorList.setHighestSeverity(SeverityType.ERROR);
-		}
-		EbMSMessage result = new EbMSMessage();
-		result.setMessageHeader(messageHeader);
-		result.setErrorList(errorList);
-		return result;
-	}
-
-	public static EbMSMessage createEbMSAcknowledgment(CollaborationProtocolAgreement cpa, EbMSMessage message, Date timestamp) throws DatatypeConfigurationException, JAXBException
-	{
-		MessageHeader messageHeader = EbMSMessageUtils.createMessageHeader(cpa,message.getMessageHeader(),timestamp,EbMSAction.ACKNOWLEDGMENT);
-		
-		Acknowledgment acknowledgment = new Acknowledgment();
-
-		acknowledgment.setVersion(Constants.EBMS_VERSION);
-		acknowledgment.setMustUnderstand(true);
-
-		acknowledgment.setTimestamp(timestamp);
-		acknowledgment.setRefToMessageId(messageHeader.getMessageData().getRefToMessageId());
-		acknowledgment.setFrom(new From());
-		acknowledgment.getFrom().getPartyId().addAll(messageHeader.getFrom().getPartyId());
-		acknowledgment.getFrom().setRole(null);
-		
-		//TODO resolve actor from CPA
-		acknowledgment.setActor(ActorType.URN_OASIS_NAMES_TC_EBXML_MSG_ACTOR_TO_PARTY_MSH.value());
-		
-		if (message.getAckRequested().isSigned() && message.getSignature() != null)
-			for (ReferenceType reference : message.getSignature().getSignedInfo().getReference())
-				acknowledgment.getReference().add(reference);
-
-		EbMSMessage result = new EbMSMessage();
-		result.setMessageHeader(messageHeader);
-		result.setAcknowledgment(acknowledgment);
-		return result;
-	}
-	
-	public static EbMSMessage createEbMSPing(CollaborationProtocolAgreement cpa, Party fromParty, Party toParty) throws DatatypeConfigurationException, JAXBException
-	{
-		EbMSMessage result = new EbMSMessage();
-		result.setMessageHeader(createMessageHeader(cpa,fromParty,toParty,EbMSAction.PING.action()));
-		result.setSyncReply(createSyncReply(cpa,fromParty));
-		return result;
-	}
-	
-	public static EbMSMessage createEbMSPong(CollaborationProtocolAgreement cpa, EbMSMessage ping) throws DatatypeConfigurationException, JAXBException
-	{
-		EbMSMessage result = new EbMSMessage();
-		result.setMessageHeader(createMessageHeader(cpa,ping.getMessageHeader(),new Date(),EbMSAction.PONG));
-		return result;
-	}
-	
-	public static EbMSMessage createEbMSStatusRequest(CollaborationProtocolAgreement cpa, Party fromParty, Party toParty, String messageId) throws DatatypeConfigurationException, JAXBException
-	{
-		MessageHeader messageHeader = createMessageHeader(cpa,fromParty,toParty,EbMSAction.STATUS_REQUEST.action());
-		StatusRequest statusRequest = createStatusRequest(messageId);
-		EbMSMessage result = new EbMSMessage();
-		result.setMessageHeader(messageHeader);
-		result.setSyncReply(createSyncReply(cpa,fromParty));
-		result.setStatusRequest(statusRequest);
-		return result;
-	}
-
-	public static EbMSMessage createEbMSStatusResponse(CollaborationProtocolAgreement cpa, EbMSMessage request, EbMSMessageStatus status, Date timestamp) throws DatatypeConfigurationException, JAXBException
-	{
-		MessageHeader messageHeader = createMessageHeader(cpa,request.getMessageHeader(),new Date(),EbMSAction.STATUS_RESPONSE);
-		StatusResponse statusResponse = createStatusResponse(request.getStatusRequest(),status,timestamp);
-		EbMSMessage result = new EbMSMessage();
-		result.setMessageHeader(messageHeader);
-		result.setStatusResponse(statusResponse);
-		return result;
-	}
-
-	public static EbMSMessage ebMSMessageContentToEbMSMessage(CollaborationProtocolAgreement cpa, EbMSMessageContent content) throws DatatypeConfigurationException
-	{
-		MessageHeader messageHeader = createMessageHeader(cpa,content.getContext());
-		AckRequested ackRequested = createAckRequested(cpa,content.getContext());
-		SyncReply syncReply = createSyncReply(cpa,content.getContext());
-		Manifest manifest = createManifest();
-
-		List<EbMSAttachment> attachments = new ArrayList<EbMSAttachment>();
-		int i = 1;
-		for (EbMSDataSource dataSource : content.getDataSources())
-		{
-			manifest.getReference().add(createReference(i));
-			ByteArrayDataSource ds = new ByteArrayDataSource(dataSource.getContent(),dataSource.getContentType());
-			ds.setName(dataSource.getName());
-			attachments.add(new EbMSAttachment(ds,"" + i));
-			i++;
-		}
-
-		EbMSMessage result = new EbMSMessage();
-		result.setMessageHeader(messageHeader);
-		result.setAckRequested(ackRequested);
-		result.setSyncReply(syncReply);
-		result.setManifest(manifest);
-		result.setAttachments(attachments);
-		return result;
-	}
-
 	public static Reference createReference(int cid)
 	{
 		Reference reference = new Reference();
@@ -514,30 +236,6 @@ public class EbMSMessageUtils
 	public static EbMSEvent createEbMSSendEvent(EbMSMessage message, String uri)
 	{
 		return new EbMSEvent(message.getMessageHeader().getMessageData().getMessageId(),message.getMessageHeader().getMessageData().getTimestamp(),EbMSEventType.SEND,uri);
-	}
-
-	public static List<EbMSEvent> createEbMSSendEvents(CollaborationProtocolAgreement cpa, EbMSMessage message, String uri)
-	{
-		List<EbMSEvent> result = new ArrayList<EbMSEvent>();
-		Date sendTime = message.getMessageHeader().getMessageData().getTimestamp();
-		PartyInfo partyInfo = CPAUtils.getPartyInfo(cpa,message.getMessageHeader().getFrom().getPartyId());
-		DeliveryChannel deliveryChannel = CPAUtils.getFromDeliveryChannel(partyInfo,message.getMessageHeader().getFrom().getRole(),message.getMessageHeader().getService(),message.getMessageHeader().getAction());
-		if (CPAUtils.isReliableMessaging(cpa,deliveryChannel))
-		{
-			ReliableMessaging rm = CPAUtils.getReliableMessaging(cpa,deliveryChannel);
-			for (int i = 0; i < rm.getRetries().intValue() + 1; i++)
-			{
-				result.add(new EbMSEvent(message.getMessageHeader().getMessageData().getMessageId(),(Date)sendTime.clone(),EbMSEventType.SEND,uri));
-				rm.getRetryInterval().addTo(sendTime);
-			}
-			if (message.getMessageHeader().getMessageData().getTimeToLive() == null)
-				result.add(new EbMSEvent(message.getMessageHeader().getMessageData().getMessageId(),(Date)sendTime.clone(),EbMSEventType.EXPIRE));
-			else
-				result.add(new EbMSEvent(message.getMessageHeader().getMessageData().getMessageId(),message.getMessageHeader().getMessageData().getTimeToLive(),EbMSEventType.EXPIRE));
-		}
-		else
-			result.add(new EbMSEvent(message.getMessageHeader().getMessageData().getMessageId(),(Date)sendTime.clone(),EbMSEventType.SEND,uri));
-		return result;
 	}
 
 	public static Document createSOAPMessage(EbMSMessage ebMSMessage) throws SOAPException, JAXBException, ParserConfigurationException, SAXException, IOException, TransformerFactoryConfigurationError, TransformerException

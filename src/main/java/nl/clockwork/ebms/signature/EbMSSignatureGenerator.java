@@ -25,6 +25,7 @@ import java.security.cert.X509Certificate;
 import java.util.List;
 
 import nl.clockwork.ebms.Constants;
+import nl.clockwork.ebms.common.CPAManager;
 import nl.clockwork.ebms.common.util.DOMUtils;
 import nl.clockwork.ebms.common.util.SecurityUtils;
 import nl.clockwork.ebms.model.EbMSAttachment;
@@ -40,7 +41,6 @@ import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.signature.XMLSignature;
 import org.apache.xml.security.transforms.Transforms;
 import org.apache.xml.security.transforms.params.XPathContainer;
-import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CollaborationProtocolAgreement;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DeliveryChannel;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.PartyInfo;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.AckRequested;
@@ -55,6 +55,7 @@ public class EbMSSignatureGenerator
 	//private String signatureMethodAlgorithm = XMLSignature.ALGO_ID_SIGNATURE_DSA;
 	private String transformAlgorithm = Transforms.TRANSFORM_C14N_OMIT_COMMENTS;
 	//private String digestAlgorithm = org.apache.xml.security.utils.Constants.ALGO_ID_DIGEST_SHA1;
+	private CPAManager cpaManager;
 	private String keyStorePath;
 	private String keyStorePassword;
 	private KeyStore keyStore;
@@ -64,11 +65,11 @@ public class EbMSSignatureGenerator
 		keyStore = SecurityUtils.loadKeyStore(keyStorePath,keyStorePassword);
 	}
 
-	public void generate(CollaborationProtocolAgreement cpa, EbMSMessage message) throws EbMSProcessorException
+	public void generate(String cpaId, EbMSMessage message) throws EbMSProcessorException
 	{
 		try
 		{
-			PartyInfo partyInfo = CPAUtils.getPartyInfo(cpa,message.getMessageHeader().getFrom().getPartyId());
+			PartyInfo partyInfo = cpaManager.getPartyInfo(cpaId,message.getMessageHeader().getFrom().getPartyId());
 			if (CPAUtils.isNonRepudiationRequired(partyInfo,message.getMessageHeader().getFrom().getRole(),message.getMessageHeader().getService(),message.getMessageHeader().getAction()))
 				generate(partyInfo,message);
 		}
@@ -82,13 +83,13 @@ public class EbMSSignatureGenerator
 		}
 	}
 
-	public void generate(CollaborationProtocolAgreement cpa, AckRequested ackRequested, EbMSMessage message) throws EbMSProcessorException
+	public void generate(String cpaId, AckRequested ackRequested, EbMSMessage message) throws EbMSProcessorException
 	{
 		try
 		{
 			if (ackRequested != null && ackRequested.isSigned())
 			{
-				PartyInfo partyInfo = CPAUtils.getPartyInfo(cpa,message.getMessageHeader().getFrom().getPartyId());
+				PartyInfo partyInfo = cpaManager.getPartyInfo(cpaId,message.getMessageHeader().getFrom().getPartyId());
 				generate(partyInfo,message);
 			}
 		}

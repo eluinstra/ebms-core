@@ -22,25 +22,19 @@ import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import javax.xml.bind.JAXBElement;
 import javax.xml.datatype.Duration;
 
 import nl.clockwork.ebms.Constants;
-import nl.clockwork.ebms.model.EbMSMessage;
-import nl.clockwork.ebms.model.EbMSPartyInfo;
 import nl.clockwork.ebms.model.FromPartyInfo;
-import nl.clockwork.ebms.model.Party;
-import nl.clockwork.ebms.model.Role;
 import nl.clockwork.ebms.model.ToPartyInfo;
 
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.ActionBindingType;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CanReceive;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CanSend;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.Certificate;
-import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CollaborationProtocolAgreement;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CollaborationRole;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DeliveryChannel;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DocExchange;
@@ -53,7 +47,6 @@ import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.ReliableMessaging
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.SenderNonRepudiation;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.ServiceBinding;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.ServiceType;
-import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.StatusValueType;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.Transport;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.Service;
 import org.w3._2000._09.xmldsig.X509DataType;
@@ -61,14 +54,6 @@ import org.w3._2000._09.xmldsig.X509DataType;
 //TODO use JXPath
 public class CPAUtils
 {
-	public static boolean isValid(CollaborationProtocolAgreement cpa, EbMSMessage message)
-	{
-		Date timestamp = message.getMessageHeader().getMessageData().getTimestamp();
-		return StatusValueType.AGREED.equals(cpa.getStatus().getValue())
-				&& timestamp.compareTo(cpa.getStart()) >= 0
-				&& timestamp.compareTo(cpa.getEnd()) <= 0;
-	}
-
 	public static String toString(PartyId partyId)
 	{
 		return (partyId.getType() == null ? "" : partyId.getType() + ":") + partyId.getValue();
@@ -94,63 +79,13 @@ public class CPAUtils
 		return (type == null ? "" : type + ":") + service;
 	}
 
-	public static Party getFromParty(CollaborationProtocolAgreement cpa, Role fromRole, String service, String action)
+	public static Service createEbMSMessageService()
 	{
-		String partyId = fromRole.getPartyId() == null ? toString(getFromPartyInfo(cpa,fromRole,service,action).getPartyIds().get(0)) : fromRole.getPartyId();
-		return new Party(partyId,fromRole.getRole());
+		Service result = new Service();
+		result.setValue(Constants.EBMS_SERVICE_URI);
+		return result;
 	}
 	
-	public static Party getToParty(CollaborationProtocolAgreement cpa, Role toRole, String service, String action)
-	{
-		String partyId = toRole.getPartyId() == null ? toString(getToPartyInfo(cpa,toRole,service,action).getPartyIds().get(0)) : toRole.getPartyId();
-		return new Party(partyId,toRole.getRole());
-	}
-	
-	public static String getUri(CollaborationProtocolAgreement cpa, EbMSMessage message)
-	{
-		PartyInfo partyInfo = CPAUtils.getPartyInfo(cpa,message.getMessageHeader().getTo().getPartyId());
-		DeliveryChannel deliveryChannel = CPAUtils.getToDeliveryChannel(partyInfo,message.getMessageHeader().getTo().getRole(),message.getMessageHeader().getService(),message.getMessageHeader().getAction());
-		return getUri(deliveryChannel);
-	}
-
-	public static String getResponseUri(CollaborationProtocolAgreement cpa, EbMSMessage message)
-	{
-		PartyInfo partyInfo = CPAUtils.getPartyInfo(cpa,message.getMessageHeader().getFrom().getPartyId());
-		Service service = new Service();
-		service.setValue(Constants.EBMS_SERVICE_URI);
-		DeliveryChannel deliveryChannel = CPAUtils.getToDeliveryChannel(partyInfo,message.getMessageHeader().getFrom().getRole(),service,null);
-		return getUri(deliveryChannel);
-	}
-
-	public static EbMSPartyInfo getEbMSPartyInfo(CollaborationProtocolAgreement cpa, List<org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.PartyId> partyIds)
-	{
-		for (PartyInfo partyInfo : cpa.getPartyInfo())
-			if (equals(partyInfo.getPartyId(),partyIds))
-			{
-				EbMSPartyInfo result = new EbMSPartyInfo();
-				result.setDefaultMshChannelId((DeliveryChannel)partyInfo.getDefaultMshChannelId());
-				result.setPartyIds(getPartyIds(partyInfo.getPartyId()));
-				return result;
-			}
-		return null;
-	}
-	
-	public static EbMSPartyInfo getEbMSPartyInfo(CollaborationProtocolAgreement cpa, Party party)
-	{
-		for (PartyInfo partyInfo : cpa.getPartyInfo())
-			if (party.matches(partyInfo.getPartyId()))
-				for (CollaborationRole role : partyInfo.getCollaborationRole())
-					if (party.matches(role.getRole()))
-					{
-						EbMSPartyInfo result = new EbMSPartyInfo();
-						result.setDefaultMshChannelId((DeliveryChannel)partyInfo.getDefaultMshChannelId());
-						result.setPartyIds(getPartyIds(partyInfo.getPartyId()));
-						result.setRole(party.getRole());
-						return result;
-					}
-		return null;
-	}
-
 	public static List<org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.PartyId> getPartyIds(List<PartyId> partyIds)
 	{
 		List<org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.PartyId> result = new ArrayList<org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.PartyId>();
@@ -164,15 +99,7 @@ public class CPAUtils
 		return result;
 	}
 	
-	public static PartyInfo getPartyInfo(CollaborationProtocolAgreement cpa, List<org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.PartyId> partyIds)
-	{
-		for (PartyInfo partyInfo : cpa.getPartyInfo())
-			if (equals(partyInfo.getPartyId(),partyIds))
-				return partyInfo;
-		return null;
-	}
-	
-	private static boolean equals(List<PartyId> cpaPartyIds, List<org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.PartyId> headerPartyIds)
+	public static boolean equals(List<PartyId> cpaPartyIds, List<org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.PartyId> headerPartyIds)
 	{
 		return cpaPartyIds.size() == headerPartyIds.size() && containsAll(cpaPartyIds,headerPartyIds);
 	}
@@ -211,52 +138,6 @@ public class CPAUtils
 		return serviceType.getValue().equals(service.getValue()) && (serviceType.getType() == null || (service.getType() != null && serviceType.getType().equals(service.getType())));
 	}
 
-	public static FromPartyInfo getFromPartyInfo(CollaborationProtocolAgreement cpa, List<org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.PartyId> partyIds, String fromRole, String service, String action)
-	{
-		PartyInfo partyInfo = getPartyInfo(cpa,partyIds);
-		for (CollaborationRole role : partyInfo.getCollaborationRole())
-			if (fromRole.equals(role.getRole().getName()) && service.equals(toString(role.getServiceBinding().getService())))
-				for (CanSend canSend : role.getServiceBinding().getCanSend())
-					if (action.equals(canSend.getThisPartyActionBinding().getAction()))
-						return getFromPartyInfo(partyInfo,role,canSend);
-		return null;
-	}
-	
-	public static FromPartyInfo getFromPartyInfo(CollaborationProtocolAgreement cpa, Role fromRole, String service, String action)
-	{
-		for (PartyInfo partyInfo : cpa.getPartyInfo())
-			if (fromRole == null || fromRole.matches(partyInfo.getPartyId()))
-				for (CollaborationRole role : partyInfo.getCollaborationRole())
-					if (fromRole == null || fromRole.matches(role.getRole()) && service.equals(toString(role.getServiceBinding().getService())))
-						for (CanSend canSend : role.getServiceBinding().getCanSend())
-							if (action.equals(canSend.getThisPartyActionBinding().getAction()))
-								return getFromPartyInfo(partyInfo,role,canSend);
-		return null;
-	}
-	
-	public static ToPartyInfo getToPartyInfo(CollaborationProtocolAgreement cpa, List<org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.PartyId> partyIds, String toRole, String service, String action)
-	{
-		PartyInfo partyInfo = getPartyInfo(cpa,partyIds);
-		for (CollaborationRole role : partyInfo.getCollaborationRole())
-			if (toRole.equals(role.getRole().getName()) && service.equals(toString(role.getServiceBinding().getService())))
-				for (CanReceive canReceive : role.getServiceBinding().getCanReceive())
-					if (action.equals(canReceive.getThisPartyActionBinding().getAction()))
-						return getToPartyInfo(partyInfo,role,canReceive);
-		return null;
-	}
-	
-	public static ToPartyInfo getToPartyInfo(CollaborationProtocolAgreement cpa, Role toRole, String service, String action)
-	{
-		for (PartyInfo partyInfo : cpa.getPartyInfo())
-			if (toRole == null || toRole.matches(partyInfo.getPartyId()))
-				for (CollaborationRole role : partyInfo.getCollaborationRole())
-					if (toRole == null || toRole.matches(role.getRole()) && service.equals(toString(role.getServiceBinding().getService())))
-						for (CanReceive canReceive : role.getServiceBinding().getCanReceive())
-							if (action.equals(canReceive.getThisPartyActionBinding().getAction()))
-								return getToPartyInfo(partyInfo,role,canReceive);
-		return null;
-	}
-
 	public static CanSend getCanSend(PartyInfo partyInfo, String role, Service service, String action)
 	{
 		ServiceBinding serviceBinding = getServiceBinding(partyInfo, role, service);
@@ -287,17 +168,7 @@ public class CPAUtils
 		return getCanReceive(partyInfo,role,service,action) != null;
 	}
 
-	public static ToPartyInfo getToPartyInfo(CollaborationProtocolAgreement cpa, ActionBindingType actionBinding)
-	{
-		for (PartyInfo partyInfo : cpa.getPartyInfo())
-			for (CollaborationRole role : partyInfo.getCollaborationRole())
-				for (CanReceive canReceive : role.getServiceBinding().getCanReceive())
-					if (canReceive.getThisPartyActionBinding().equals(actionBinding))
-						return getToPartyInfo(partyInfo,role,canReceive);
-		return null;
-	}
-
-	private static FromPartyInfo getFromPartyInfo(PartyInfo partyInfo, CollaborationRole role, CanSend canSend)
+	public static FromPartyInfo getFromPartyInfo(PartyInfo partyInfo, CollaborationRole role, CanSend canSend)
 	{
 		FromPartyInfo result = new FromPartyInfo();
 		result.setDefaultMshChannelId((DeliveryChannel)partyInfo.getDefaultMshChannelId());
@@ -308,7 +179,7 @@ public class CPAUtils
 		return result;
 	}
 
-	private static ToPartyInfo getToPartyInfo(PartyInfo partyInfo, CollaborationRole role, CanReceive canReceive)
+	public static ToPartyInfo getToPartyInfo(PartyInfo partyInfo, CollaborationRole role, CanReceive canReceive)
 	{
 		ToPartyInfo result = new ToPartyInfo();
 		result.setDefaultMshChannelId((DeliveryChannel)partyInfo.getDefaultMshChannelId());
@@ -387,22 +258,22 @@ public class CPAUtils
 		return canSend.getThisPartyActionBinding().getBusinessTransactionCharacteristics().isIsNonRepudiationRequired() && docExchange.getEbXMLSenderBinding() != null && docExchange.getEbXMLSenderBinding().getSenderNonRepudiation() != null;
 	}
 
-	public static boolean isReliableMessaging(CollaborationProtocolAgreement cpa, DeliveryChannel deliveryChannel)
+	public static boolean isReliableMessaging(DeliveryChannel deliveryChannel)
 	{
 		return !PerMessageCharacteristicsType.NEVER.equals((deliveryChannel.getMessagingCharacteristics().getAckRequested())) /*&& ((DocExchange)deliveryChannel.getDocExchangeId()).getEbXMLSenderBinding() != null && ((DocExchange)deliveryChannel.getDocExchangeId()).getEbXMLSenderBinding().getReliableMessaging() != null*/;
 	}
 	
-	public static ReliableMessaging getReliableMessaging(CollaborationProtocolAgreement cpa, DeliveryChannel deliveryChannel)
+	public static ReliableMessaging getReliableMessaging(DeliveryChannel deliveryChannel)
 	{
 		return ((DocExchange)deliveryChannel.getDocExchangeId()).getEbXMLSenderBinding().getReliableMessaging();
 	}
 
-	public static Duration getPersistantDuration(CollaborationProtocolAgreement cpa, DeliveryChannel deliveryChannel)
+	public static Duration getPersistantDuration(DeliveryChannel deliveryChannel)
 	{
 		return ((DocExchange)deliveryChannel.getDocExchangeId()).getEbXMLReceiverBinding().getPersistDuration();
 	}
 
-	public static Duration getRetryInterval(CollaborationProtocolAgreement cpa, DeliveryChannel deliveryChannel)
+	public static Duration getRetryInterval(DeliveryChannel deliveryChannel)
 	{
 		return ((DocExchange)deliveryChannel.getDocExchangeId()).getEbXMLReceiverBinding().getReliableMessaging().getRetryInterval();
 	}
@@ -410,38 +281,36 @@ public class CPAUtils
 	public static Certificate getSigningCertificate(DeliveryChannel deliveryChannel)
 	{
 		DocExchange docExchange = getDocExchange(deliveryChannel);
-		//if (docExchange.getEbXMLSenderBinding() != null && docExchange.getEbXMLSenderBinding().getSenderNonRepudiation() != null && docExchange.getEbXMLSenderBinding().getSenderNonRepudiation().getSigningCertificateRef() != null)
+		if (docExchange.getEbXMLSenderBinding() != null && docExchange.getEbXMLSenderBinding().getSenderNonRepudiation() != null && docExchange.getEbXMLSenderBinding().getSenderNonRepudiation().getSigningCertificateRef() != null)
 			return (Certificate)docExchange.getEbXMLSenderBinding().getSenderNonRepudiation().getSigningCertificateRef().getCertId();
-		//return null;
+		return null;
 	}
 	
 	public static String getNonRepudiationProtocol(DeliveryChannel deliveryChannel)
 	{
 		DocExchange docExchange = getDocExchange(deliveryChannel);
-		//if (docExchange.getEbXMLSenderBinding() != null && docExchange.getEbXMLSenderBinding().getSenderNonRepudiation() != null && docExchange.getEbXMLSenderBinding().getSenderNonRepudiation().getHashFunction() != null)
+		if (docExchange.getEbXMLSenderBinding() != null && docExchange.getEbXMLSenderBinding().getSenderNonRepudiation() != null && docExchange.getEbXMLSenderBinding().getSenderNonRepudiation().getHashFunction() != null)
 			return docExchange.getEbXMLSenderBinding().getSenderNonRepudiation().getNonRepudiationProtocol().getValue();
-		//return null;
+		return null;
 	}
 
 	public static String getHashFunction(DeliveryChannel deliveryChannel)
 	{
 		DocExchange docExchange = getDocExchange(deliveryChannel);
-		//if (docExchange.getEbXMLSenderBinding() != null && docExchange.getEbXMLSenderBinding().getSenderNonRepudiation() != null && docExchange.getEbXMLSenderBinding().getSenderNonRepudiation().getHashFunction() != null)
-		{
+		if (docExchange.getEbXMLSenderBinding() != null && docExchange.getEbXMLSenderBinding().getSenderNonRepudiation() != null && docExchange.getEbXMLSenderBinding().getSenderNonRepudiation().getHashFunction() != null)
 			return docExchange.getEbXMLSenderBinding().getSenderNonRepudiation().getHashFunction();
-		}
-		//return null;
+		return null;
 	}
 
 	public static String getSignatureAlgorithm(DeliveryChannel deliveryChannel)
 	{
 		DocExchange docExchange = getDocExchange(deliveryChannel);
-		//if (docExchange.getEbXMLSenderBinding() != null && docExchange.getEbXMLSenderBinding().getSenderNonRepudiation() != null && docExchange.getEbXMLSenderBinding().getSenderNonRepudiation().getSignatureAlgorithm() != null && !docExchange.getEbXMLSenderBinding().getSenderNonRepudiation().getSignatureAlgorithm().isEmpty())
+		if (docExchange.getEbXMLSenderBinding() != null && docExchange.getEbXMLSenderBinding().getSenderNonRepudiation() != null && docExchange.getEbXMLSenderBinding().getSenderNonRepudiation().getSignatureAlgorithm() != null && !docExchange.getEbXMLSenderBinding().getSenderNonRepudiation().getSignatureAlgorithm().isEmpty())
 		{
 			SenderNonRepudiation senderNonRepudiation = docExchange.getEbXMLSenderBinding().getSenderNonRepudiation();
 			return senderNonRepudiation.getSignatureAlgorithm().get(0).getW3C() != null ? senderNonRepudiation.getSignatureAlgorithm().get(0).getW3C() : getSignatureAlgorithm(senderNonRepudiation.getSignatureAlgorithm().get(0).getValue());
 		}
-		//return null;
+		return null;
 	}
 
 	public static String getUri(DeliveryChannel deliveryChannel)

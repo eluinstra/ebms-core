@@ -15,12 +15,12 @@
  */
 package nl.clockwork.ebms.validation;
 
+import nl.clockwork.ebms.common.CPAManager;
 import nl.clockwork.ebms.dao.DAOException;
 import nl.clockwork.ebms.dao.EbMSDAO;
 import nl.clockwork.ebms.model.EbMSMessageContext;
 import nl.clockwork.ebms.model.FromPartyInfo;
 import nl.clockwork.ebms.model.ToPartyInfo;
-import nl.clockwork.ebms.util.CPAUtils;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
@@ -31,10 +31,12 @@ public class EbMSMessageContextValidator
 {
 	protected transient Log logger = LogFactory.getLog(getClass());
 	private EbMSDAO ebMSDAO;
+	private CPAManager cpaManager;
 
-	public EbMSMessageContextValidator(EbMSDAO ebMSDAO)
+	public EbMSMessageContextValidator(EbMSDAO ebMSDAO, CPAManager cpaManager)
 	{
 		this.ebMSDAO = ebMSDAO;
+		this.cpaManager = cpaManager;
 	}
 	
 	public void validate(EbMSMessageContext context) throws ValidatorException
@@ -52,7 +54,7 @@ public class EbMSMessageContextValidator
 			if (cpa == null)
 				throw new ValidationException("No CPA found for: context.cpaId=" + context.getCpaId());
 
-			FromPartyInfo fromPartyInfo = CPAUtils.getFromPartyInfo(cpa,context.getFromRole(),context.getService(),context.getAction());
+			FromPartyInfo fromPartyInfo = cpaManager.getFromPartyInfo(context.getCpaId(),context.getFromRole(),context.getService(),context.getAction());
 			if (fromPartyInfo == null)
 			{
 				StringBuffer msg = new StringBuffer();
@@ -69,7 +71,7 @@ public class EbMSMessageContextValidator
 			}
 
 			//ToPartyInfo otherPartyInfo = CPAUtils.getToPartyInfo(cpa,(ActionBindingType)fromPartyInfo.getCanSend().getOtherPartyActionBinding());
-			ToPartyInfo toPartyInfo = CPAUtils.getToPartyInfo(cpa,context.getToRole(),context.getService(),context.getAction());
+			ToPartyInfo toPartyInfo = cpaManager.getToPartyInfo(context.getCpaId(),context.getToRole(),context.getService(),context.getAction());
 			//if (otherPartyInfo == null && toPartyInfo == null)
 			if (fromPartyInfo.getCanSend().getOtherPartyActionBinding() == null && toPartyInfo == null)
 			{

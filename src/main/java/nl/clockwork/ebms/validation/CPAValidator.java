@@ -18,6 +18,7 @@ package nl.clockwork.ebms.validation;
 import java.util.Date;
 
 import nl.clockwork.ebms.Constants;
+import nl.clockwork.ebms.common.CPAManager;
 import nl.clockwork.ebms.model.EbMSMessage;
 import nl.clockwork.ebms.util.CPAUtils;
 import nl.clockwork.ebms.util.EbMSMessageUtils;
@@ -41,18 +42,19 @@ import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.Transport;
 public class CPAValidator
 {
   protected transient Log logger = LogFactory.getLog(getClass());
+  private CPAManager cpaManager;
 
-	public void cpaExists(CollaborationProtocolAgreement cpa, EbMSMessage message) throws EbMSValidationException
+	public void validate(String cpaId, EbMSMessage message) throws EbMSValidationException
 	{
-		if (cpa == null || !cpa.getCpaid().equals(message.getMessageHeader().getCPAId()))
+		if (cpaId == null || !cpaId.equals(message.getMessageHeader().getCPAId()))
 			throw new EbMSValidationException(EbMSMessageUtils.createError("//Header/MessageHeader[@cpaid]",Constants.EbMSErrorCode.VALUE_NOT_RECOGNIZED.errorCode(),"CPA not found."));
-	}
-	
-	public void validate(CollaborationProtocolAgreement cpa, EbMSMessage message) throws EbMSValidationException
-	{
-		cpaExists(cpa,message);
-		if (!CPAUtils.isValid(cpa,message))
+		if (!cpaManager.isValid(cpaId,message.getMessageHeader().getMessageData().getTimestamp()))
 			throw new EbMSValidationException(EbMSMessageUtils.createError("//Header/MessageHeader[@cpaid]",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Invalid CPA."));
+	}
+
+	public void validate(String cpaId) throws ValidatorException
+	{
+		validate(cpaManager.getCPA(cpaId));
 	}
 
 	public void validate(CollaborationProtocolAgreement cpa) throws ValidatorException
@@ -140,5 +142,9 @@ public class CPAValidator
 					return;
 			}
 	}
-	
+
+	public void setCpaManager(CPAManager cpaManager)
+	{
+		this.cpaManager = cpaManager;
+	}
 }

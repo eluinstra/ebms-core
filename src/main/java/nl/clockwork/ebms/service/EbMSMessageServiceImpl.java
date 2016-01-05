@@ -30,9 +30,12 @@ import nl.clockwork.ebms.Constants;
 import nl.clockwork.ebms.Constants.EbMSAction;
 import nl.clockwork.ebms.Constants.EbMSMessageStatus;
 import nl.clockwork.ebms.client.DeliveryManager;
+import nl.clockwork.ebms.common.CPAManager;
+import nl.clockwork.ebms.common.EbMSMessageFactory;
 import nl.clockwork.ebms.dao.DAOException;
 import nl.clockwork.ebms.dao.DAOTransactionCallback;
 import nl.clockwork.ebms.dao.EbMSDAO;
+import nl.clockwork.ebms.job.EventManager;
 import nl.clockwork.ebms.model.EbMSEvent;
 import nl.clockwork.ebms.model.EbMSMessage;
 import nl.clockwork.ebms.model.EbMSMessageContent;
@@ -41,14 +44,12 @@ import nl.clockwork.ebms.model.MessageStatus;
 import nl.clockwork.ebms.model.Party;
 import nl.clockwork.ebms.processor.EbMSProcessorException;
 import nl.clockwork.ebms.signature.EbMSSignatureGenerator;
-import nl.clockwork.ebms.util.CPAUtils;
 import nl.clockwork.ebms.util.EbMSMessageUtils;
 import nl.clockwork.ebms.validation.EbMSMessageContextValidator;
 import nl.clockwork.ebms.validation.ValidatorException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CollaborationProtocolAgreement;
 import org.xml.sax.SAXException;
 
 public class EbMSMessageServiceImpl implements EbMSMessageService
@@ -56,12 +57,15 @@ public class EbMSMessageServiceImpl implements EbMSMessageService
   protected transient Log logger = LogFactory.getLog(getClass());
 	private DeliveryManager deliveryManager;
 	private EbMSDAO ebMSDAO;
+	private CPAManager cpaManager;
+	private EbMSMessageFactory ebMSMessageFactory;
+	private EventManager eventManager;
 	private EbMSMessageContextValidator ebMSMessageContextValidator;
 	private EbMSSignatureGenerator signatureGenerator;
 
   public void init()
   {
-		ebMSMessageContextValidator = new EbMSMessageContextValidator(ebMSDAO);
+		ebMSMessageContextValidator = new EbMSMessageContextValidator(ebMSDAO,cpaManager);
   }
   
 	@Override
@@ -69,9 +73,8 @@ public class EbMSMessageServiceImpl implements EbMSMessageService
 	{
 		try
 		{
-			CollaborationProtocolAgreement cpa = ebMSDAO.getCPA(cpaId);
-			EbMSMessage request = EbMSMessageUtils.createEbMSPing(cpa,fromParty,toParty);
-			EbMSMessage response = deliveryManager.sendMessage(ebMSDAO.getUrl(CPAUtils.getUri(cpa,request)),request);
+			EbMSMessage request = ebMSMessageFactory.createEbMSPing(cpaId,fromParty,toParty);
+			EbMSMessage response = deliveryManager.sendMessage(cpaManager.getUri(cpaId,request.getMessageHeader().getTo().getPartyId(),request.getMessageHeader().getTo().getRole(),request.getMessageHeader().getService(),request.getMessageHeader().getAction()),request);
 			if (response != null)
 			{
 				if (!EbMSAction.PONG.action().equals(response.getMessageHeader().getAction()))
@@ -92,11 +95,10 @@ public class EbMSMessageServiceImpl implements EbMSMessageService
 		try
 		{
 			ebMSMessageContextValidator.validate(messageContent.getContext());
-			final CollaborationProtocolAgreement cpa = ebMSDAO.getCPA(messageContent.getContext().getCpaId());
 			//TODO ebMSMessageContentToEbMSDocument
-			final EbMSMessage message = EbMSMessageUtils.ebMSMessageContentToEbMSMessage(cpa,messageContent);
+			final EbMSMessage message = ebMSMessageFactory.ebMSMessageContentToEbMSMessage(messageContent.getContext().getCpaId(),messageContent);
 			message.setMessage(EbMSMessageUtils.createSOAPMessage(message));
-			signatureGenerator.generate(cpa,message);
+			signatureGenerator.generate(messageContent.getContext().getCpaId(),message);
 			ebMSDAO.executeTransaction(
 				new DAOTransactionCallback()
 				{
@@ -104,7 +106,7 @@ public class EbMSMessageServiceImpl implements EbMSMessageService
 					public void doInTransaction()
 					{
 						ebMSDAO.insertMessage(new Date(),message,EbMSMessageStatus.SENT);
-						List<EbMSEvent> events = EbMSMessageUtils.createEbMSSendEvents(ebMSDAO.getCPA(message.getMessageHeader().getCPAId()),message,CPAUtils.getUri(cpa,message));
+						List<EbMSEvent> events = eventManager.createEbMSSendEvents(message.getMessageHeader().getCPAId(),message,cpaManager.getUri(message.getMessageHeader().getCPAId(),message.getMessageHeader().getTo().getPartyId(),message.getMessageHeader().getTo().getRole(),message.getMessageHeader().getService(),message.getMessageHeader().getAction()));
 						ebMSDAO.insertEvents(events);
 					}
 				}
@@ -187,9 +189,8 @@ public class EbMSMessageServiceImpl implements EbMSMessageService
 				throw new EbMSMessageServiceException("Message with messageId " + messageId + " is an EbMS service message!");
 			else
 			{
-				CollaborationProtocolAgreement cpa = ebMSDAO.getCPA(context.getCpaId());
-				EbMSMessage request = EbMSMessageUtils.createEbMSStatusRequest(cpa,CPAUtils.getFromParty(cpa,context.getFromRole(),context.getService(),context.getAction()),CPAUtils.getToParty(cpa,context.getToRole(),context.getService(),context.getAction()),messageId);
-				EbMSMessage response = deliveryManager.sendMessage(ebMSDAO.getUrl(CPAUtils.getUri(cpa,request)),request);
+				EbMSMessage request = ebMSMessageFactory.createEbMSStatusRequest(context.getCpaId(),cpaManager.getFromParty(context.getCpaId(),context.getFromRole(),context.getService(),context.getAction()),cpaManager.getToParty(context.getCpaId(),context.getToRole(),context.getService(),context.getAction()),messageId);
+				EbMSMessage response = deliveryManager.sendMessage(cpaManager.getUri(context.getCpaId(),request.getMessageHeader().getTo().getPartyId(),request.getMessageHeader().getTo().getRole(),request.getMessageHeader().getService(),request.getMessageHeader().getAction()),request);
 				if (response != null)
 				{
 					if (EbMSAction.STATUS_RESPONSE.action().equals(response.getMessageHeader().getAction()) && response.getStatusResponse() != null)
@@ -212,9 +213,8 @@ public class EbMSMessageServiceImpl implements EbMSMessageService
 	{
 		try
 		{
-			CollaborationProtocolAgreement cpa = ebMSDAO.getCPA(cpaId);
-			EbMSMessage request = EbMSMessageUtils.createEbMSStatusRequest(cpa,fromParty,toParty,messageId);
-			EbMSMessage response = deliveryManager.sendMessage(ebMSDAO.getUrl(CPAUtils.getUri(cpa,request)),request);
+			EbMSMessage request = ebMSMessageFactory.createEbMSStatusRequest(cpaId,fromParty,toParty,messageId);
+			EbMSMessage response = deliveryManager.sendMessage(cpaManager.getUri(cpaId,request.getMessageHeader().getTo().getPartyId(),request.getMessageHeader().getTo().getRole(),request.getMessageHeader().getService(),request.getMessageHeader().getAction()),request);
 			if (response != null)
 			{
 				if (EbMSAction.STATUS_RESPONSE.action().equals(response.getMessageHeader().getAction()) && response.getStatusResponse() != null)
@@ -240,7 +240,17 @@ public class EbMSMessageServiceImpl implements EbMSMessageService
 	{
 		this.ebMSDAO = ebMSDAO;
 	}
-	
+
+	public void setCpaManager(CPAManager cpaManager)
+	{
+		this.cpaManager = cpaManager;
+	}
+
+	public void setEventManager(EventManager eventManager)
+	{
+		this.eventManager = eventManager;
+	}
+
 	public void setSignatureGenerator(EbMSSignatureGenerator signatureGenerator)
 	{
 		this.signatureGenerator = signatureGenerator;

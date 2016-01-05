@@ -22,6 +22,7 @@ import java.util.List;
 
 import nl.clockwork.ebms.Constants;
 import nl.clockwork.ebms.Constants.EbMSAction;
+import nl.clockwork.ebms.common.CPAManager;
 import nl.clockwork.ebms.dao.EbMSDAO;
 import nl.clockwork.ebms.model.EbMSMessage;
 import nl.clockwork.ebms.util.CPAUtils;
@@ -31,7 +32,6 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.ActorType;
-import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CollaborationProtocolAgreement;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DeliveryChannel;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.PartyInfo;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.PerMessageCharacteristicsType;
@@ -49,13 +49,15 @@ public class MessageHeaderValidator
   protected transient Log logger = LogFactory.getLog(getClass());
 	private PerMessageCharacteristicsType ackSignatureRequested;// = PerMessageCharacteristicsType.NEVER;
 	private EbMSDAO ebMSDAO;
+	private CPAManager cpaManager;
 
-	public MessageHeaderValidator(EbMSDAO ebMSDAO)
+	public MessageHeaderValidator(EbMSDAO ebMSDAO, CPAManager cpaManager)
 	{
 		this.ebMSDAO = ebMSDAO;
+		this.cpaManager = cpaManager;
 	}
 
-	public void validate(CollaborationProtocolAgreement cpa, EbMSMessage message, Date timestamp) throws EbMSValidationException
+	public void validate(String cpaId, EbMSMessage message, Date timestamp) throws EbMSValidationException
 	{
 		MessageHeader messageHeader = message.getMessageHeader();
 		AckRequested ackRequested = message.getAckRequested();
@@ -74,9 +76,9 @@ public class MessageHeaderValidator
 		if (!isValid(messageHeader.getService()))
 			throw new EbMSValidationException(EbMSMessageUtils.createError("//Header/MessageHeader/Service",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Invalid value."));
 		
-		if ((from = CPAUtils.getPartyInfo(cpa, messageHeader.getFrom().getPartyId())) == null)
+		if ((from = cpaManager.getPartyInfo(cpaId,messageHeader.getFrom().getPartyId())) == null)
 			throw new EbMSValidationException(EbMSMessageUtils.createError("//Header/MessageHeader/From/PartyId",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Value not found."));
-		if ((to = CPAUtils.getPartyInfo(cpa, messageHeader.getTo().getPartyId())) == null)
+		if ((to = cpaManager.getPartyInfo(cpaId,messageHeader.getTo().getPartyId())) == null)
 			throw new EbMSValidationException(EbMSMessageUtils.createError("//Header/MessageHeader/To/PartyId",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Value not found."));
 
 		if (!Constants.EBMS_SERVICE_URI.equals(messageHeader.getService().getValue()))
@@ -136,6 +138,16 @@ public class MessageHeaderValidator
 		}
 	}
 
+	public void validate(EbMSMessage requestMessage, EbMSMessage responseMessage) throws ValidationException
+	{
+		if (!requestMessage.getMessageHeader().getCPAId().equals(responseMessage.getMessageHeader().getCPAId()))
+			throw new ValidationException("Request cpaId " + requestMessage.getMessageHeader().getCPAId() + " does not equal response cpaId " + responseMessage.getMessageHeader().getCPAId());
+		if (!requestMessage.getMessageHeader().getMessageData().getMessageId().equals(responseMessage.getMessageHeader().getMessageData().getRefToMessageId()))
+			throw new ValidationException("Request messageId " + requestMessage.getMessageHeader().getMessageData().getMessageId() + " does not equal response refToMessageId " + responseMessage.getMessageHeader().getMessageData().getRefToMessageId());
+		compare(requestMessage.getMessageHeader().getFrom().getPartyId(),responseMessage.getMessageHeader().getTo().getPartyId());
+		compare(requestMessage.getMessageHeader().getTo().getPartyId(),responseMessage.getMessageHeader().getFrom().getPartyId());
+	}
+	
 	private boolean isValid(List<PartyId> partyIds)
 	{
 		for (PartyId partyId : partyIds)
@@ -218,16 +230,6 @@ public class MessageHeaderValidator
 				|| deliveryChannel.getMessagingCharacteristics().getActor().value().equals(acknowledgment.getActor());
 	}
 
-	public void validate(EbMSMessage requestMessage, EbMSMessage responseMessage) throws ValidationException
-	{
-		if (!requestMessage.getMessageHeader().getCPAId().equals(responseMessage.getMessageHeader().getCPAId()))
-			throw new ValidationException("Request cpaId " + requestMessage.getMessageHeader().getCPAId() + " does not equal response cpaId " + responseMessage.getMessageHeader().getCPAId());
-		if (!requestMessage.getMessageHeader().getMessageData().getMessageId().equals(responseMessage.getMessageHeader().getMessageData().getRefToMessageId()))
-			throw new ValidationException("Request messageId " + requestMessage.getMessageHeader().getMessageData().getMessageId() + " does not equal response refToMessageId " + responseMessage.getMessageHeader().getMessageData().getRefToMessageId());
-		compare(requestMessage.getMessageHeader().getFrom().getPartyId(),responseMessage.getMessageHeader().getTo().getPartyId());
-		compare(requestMessage.getMessageHeader().getTo().getPartyId(),responseMessage.getMessageHeader().getFrom().getPartyId());
-	}
-	
 	private void compare(List<PartyId> requestPartyIds, List<PartyId> responsePartyIds) throws ValidationException
 	{
 		//TODO improvement: use CPA to validate partyIds?
