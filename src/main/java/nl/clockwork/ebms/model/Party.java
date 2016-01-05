@@ -67,6 +67,12 @@ public class Party implements Serializable
 	{
 		this.role = role;
 	}
+
+	@Override
+	public String toString()
+	{
+		return new StringBuffer().append(partyId).append(":").append(role).toString();
+	}
 	
 	public boolean matches(List<PartyId> partyIds)
 	{

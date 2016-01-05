@@ -26,7 +26,7 @@ public class EventManager
 	{
 		List<EbMSEvent> result = new ArrayList<EbMSEvent>();
 		Date sendTime = message.getMessageHeader().getMessageData().getTimestamp();
-		DeliveryChannel deliveryChannel = cpaManager.getFromDeliveryChannel(cpaId,message.getMessageHeader().getFrom().getPartyId(),message.getMessageHeader().getFrom().getRole(),message.getMessageHeader().getService(),message.getMessageHeader().getAction());
+		DeliveryChannel deliveryChannel = cpaManager.getFromDeliveryChannel(cpaId,message.getMessageHeader().getFrom().getPartyId(),message.getMessageHeader().getFrom().getRole(),CPAUtils.toString(message.getMessageHeader().getService()),message.getMessageHeader().getAction());
 		if (CPAUtils.isReliableMessaging(deliveryChannel))
 		{
 			ReliableMessaging rm = CPAUtils.getReliableMessaging(deliveryChannel);

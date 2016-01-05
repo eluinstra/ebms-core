@@ -123,11 +123,6 @@ public class CPAUtils
 		return partyId.getValue().equals(cpaPartyId.getValue()) && (partyId.getType() == null || (cpaPartyId.getType() != null && partyId.getType().equals(cpaPartyId.getType())));
 	}
 	
-	public static boolean equals(ServiceType serviceType, Service service)
-	{
-		return serviceType.getValue().equals(service.getValue()) && (serviceType.getType() == null || (service.getType() != null && serviceType.getType().equals(service.getType())));
-	}
-
 	public static FromPartyInfo getFromPartyInfo(PartyInfo partyInfo, CollaborationRole role, CanSend canSend)
 	{
 		FromPartyInfo result = new FromPartyInfo();

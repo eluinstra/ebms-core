@@ -69,7 +69,7 @@ public class EbMSSignatureGenerator
 	{
 		try
 		{
-			if (cpaManager.isNonRepudiationRequired(cpaId,message.getMessageHeader().getFrom().getPartyId(),message.getMessageHeader().getFrom().getRole(),message.getMessageHeader().getService(),message.getMessageHeader().getAction()))
+			if (cpaManager.isNonRepudiationRequired(cpaId,message.getMessageHeader().getFrom().getPartyId(),message.getMessageHeader().getFrom().getRole(),CPAUtils.toString(message.getMessageHeader().getService()),message.getMessageHeader().getAction()))
 				generate(cpaId,message.getMessageHeader().getFrom().getPartyId(),message);
 		}
 		catch (GeneralSecurityException e)
@@ -103,7 +103,7 @@ public class EbMSSignatureGenerator
 
 	private void generate(String cpaId, List<PartyId> partyId, EbMSMessage message) throws EbMSProcessorException, GeneralSecurityException, XMLSecurityException
 	{
-		DeliveryChannel deliveryChannel = cpaManager.getFromDeliveryChannel(cpaId,partyId,message.getMessageHeader().getFrom().getRole(),message.getMessageHeader().getService(),message.getMessageHeader().getAction());
+		DeliveryChannel deliveryChannel = cpaManager.getFromDeliveryChannel(cpaId,partyId,message.getMessageHeader().getFrom().getRole(),CPAUtils.toString(message.getMessageHeader().getService()),message.getMessageHeader().getAction());
 		X509Certificate certificate = CPAUtils.getX509Certificate(CPAUtils.getSigningCertificate(deliveryChannel));
 		String alias = keyStore.getCertificateAlias(certificate);
 		if (alias == null)

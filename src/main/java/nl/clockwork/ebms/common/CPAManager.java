@@ -23,7 +23,6 @@ import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.PartyInfo;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.ServiceBinding;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.StatusValueType;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.PartyId;
-import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.Service;
 
 public class CPAManager
 {
@@ -189,15 +188,15 @@ public class CPAManager
 		return null;
 	}
 
-	private ServiceBinding getServiceBinding(PartyInfo partyInfo, String role, Service service)
+	private ServiceBinding getServiceBinding(PartyInfo partyInfo, String role, String service)
 	{
 		for (CollaborationRole collaborationRole : partyInfo.getCollaborationRole())
-			if (role.equals(collaborationRole.getRole().getName()) && CPAUtils.equals(collaborationRole.getServiceBinding().getService(),service))
+			if (role.equals(collaborationRole.getRole().getName()) && CPAUtils.toString(collaborationRole.getServiceBinding().getService()).equals(service))
 				return collaborationRole.getServiceBinding();
 		return null;
 	}
 
-	private CanSend getCanSend(PartyInfo partyInfo, String role, Service service, String action)
+	private CanSend getCanSend(PartyInfo partyInfo, String role, String service, String action)
 	{
 		ServiceBinding serviceBinding = getServiceBinding(partyInfo, role, service);
 		if (serviceBinding != null)
@@ -207,7 +206,7 @@ public class CPAManager
 		return null;
 	}
 
-	private CanReceive getCanReceive(PartyInfo partyInfo, String role, Service service, String action)
+	private CanReceive getCanReceive(PartyInfo partyInfo, String role, String service, String action)
 	{
 		ServiceBinding serviceBinding = getServiceBinding(partyInfo, role, service);
 		if (serviceBinding != null)
@@ -217,12 +216,12 @@ public class CPAManager
 		return null;
 	}
 
-	public boolean canSend(String cpaId, List<PartyId> partyId, String role, Service service, String action)
+	public boolean canSend(String cpaId, List<PartyId> partyId, String role, String service, String action)
 	{
 		return getCanSend(getPartyInfo(cpaId,partyId),role,service,action) != null;
 	}
 
-	public boolean canReceive(String cpaId, List<PartyId> partyId, String role, Service service, String action)
+	public boolean canReceive(String cpaId, List<PartyId> partyId, String role, String service, String action)
 	{
 		return getCanReceive(getPartyInfo(cpaId,partyId),role,service,action) != null;
 	}
@@ -236,10 +235,10 @@ public class CPAManager
 		return (DeliveryChannel)partyInfo.getDefaultMshChannelId();
 	}
 
-	public DeliveryChannel getFromDeliveryChannel(String cpaId, List<PartyId> partyId, String role, Service service, String action)
+	public DeliveryChannel getFromDeliveryChannel(String cpaId, List<PartyId> partyId, String role, String service, String action)
 	{
 		PartyInfo partyInfo = getPartyInfo(cpaId,partyId);
-		if (Constants.EBMS_SERVICE_URI.equals(service.getValue()))
+		if (Constants.EBMS_SERVICE_URI.equals(service))
 			return getDefaultDeliveryChannel(cpaId,partyId,action);
 		else
 		{
@@ -252,10 +251,10 @@ public class CPAManager
 		return null;
 	}
 	
-	public DeliveryChannel getToDeliveryChannel(String cpaId, List<PartyId> partyId, String role, Service service, String action)
+	public DeliveryChannel getToDeliveryChannel(String cpaId, List<PartyId> partyId, String role, String service, String action)
 	{
 		PartyInfo partyInfo = getPartyInfo(cpaId,partyId);
-		if (Constants.EBMS_SERVICE_URI.equals(service.getValue()))
+		if (Constants.EBMS_SERVICE_URI.equals(service))
 			return getDefaultDeliveryChannel(cpaId,partyId,action);
 		else
 		{
@@ -268,7 +267,7 @@ public class CPAManager
 		return null;
 	}
 	
-	public boolean isNonRepudiationRequired(String cpaId, List<PartyId> partyId, String role, Service service, String action)
+	public boolean isNonRepudiationRequired(String cpaId, List<PartyId> partyId, String role, String service, String action)
 	{
 		PartyInfo partyInfo = getPartyInfo(cpaId,partyId);
 		CanSend canSend = getCanSend(partyInfo,role,service,action);
@@ -276,12 +275,12 @@ public class CPAManager
 		return canSend.getThisPartyActionBinding().getBusinessTransactionCharacteristics().isIsNonRepudiationRequired() && docExchange.getEbXMLSenderBinding() != null && docExchange.getEbXMLSenderBinding().getSenderNonRepudiation() != null;
 	}
 
-	private String getOriginalUri(String cpaId, List<PartyId> partyId, String role, Service service, String action)
+	private String getOriginalUri(String cpaId, List<PartyId> partyId, String role, String service, String action)
 	{
 		return CPAUtils.getUri(getToDeliveryChannel(cpaId,partyId,role,service,action));
 	}
 
-	public String getUri(String cpaId, List<PartyId> partyId, String role, Service service, String action)
+	public String getUri(String cpaId, List<PartyId> partyId, String role, String service, String action)
 	{
 		String replacementUrl = getUrl(cpaId);
 		return replacementUrl == null ? getOriginalUri(cpaId,partyId,role,service,action) : replacementUrl;

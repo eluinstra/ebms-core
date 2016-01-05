@@ -35,6 +35,7 @@ import nl.clockwork.ebms.dao.DAOTransactionCallback;
 import nl.clockwork.ebms.model.EbMSDocument;
 import nl.clockwork.ebms.model.EbMSMessage;
 import nl.clockwork.ebms.signature.EbMSSignatureGenerator;
+import nl.clockwork.ebms.util.CPAUtils;
 import nl.clockwork.ebms.util.EbMSMessageUtils;
 import nl.clockwork.ebms.validation.CPAValidator;
 import nl.clockwork.ebms.validation.ManifestValidator;
@@ -104,7 +105,7 @@ public class EbMSMessageProcessorX extends EbMSMessageProcessor
 				EbMSMessage response = processStatusRequest(message.getMessageHeader().getCPAId(),timestamp,message);
 				if (message.getSyncReply() == null)
 				{
-					deliveryManager.sendResponseMessage(cpaManager.getUri(response.getMessageHeader().getCPAId(),response.getMessageHeader().getTo().getPartyId(),response.getMessageHeader().getTo().getRole(),response.getMessageHeader().getService(),response.getMessageHeader().getAction()),response);
+					deliveryManager.sendResponseMessage(cpaManager.getUri(response.getMessageHeader().getCPAId(),response.getMessageHeader().getTo().getPartyId(),response.getMessageHeader().getTo().getRole(),CPAUtils.toString(response.getMessageHeader().getService()),response.getMessageHeader().getAction()),response);
 					return null;
 				}
 				else
@@ -120,7 +121,7 @@ public class EbMSMessageProcessorX extends EbMSMessageProcessor
 				EbMSMessage response = processPing(message.getMessageHeader().getCPAId(),timestamp,message);
 				if (message.getSyncReply() == null)
 				{
-					deliveryManager.sendResponseMessage(cpaManager.getUri(response.getMessageHeader().getCPAId(),response.getMessageHeader().getTo().getPartyId(),response.getMessageHeader().getTo().getRole(),response.getMessageHeader().getService(),response.getMessageHeader().getAction()),response);
+					deliveryManager.sendResponseMessage(cpaManager.getUri(response.getMessageHeader().getCPAId(),response.getMessageHeader().getTo().getPartyId(),response.getMessageHeader().getTo().getRole(),CPAUtils.toString(response.getMessageHeader().getService()),response.getMessageHeader().getAction()),response);
 					return null;
 				}
 				else

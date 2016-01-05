@@ -25,6 +25,7 @@ import nl.clockwork.ebms.Constants.EbMSAction;
 import nl.clockwork.ebms.common.CPAManager;
 import nl.clockwork.ebms.dao.EbMSDAO;
 import nl.clockwork.ebms.model.EbMSMessage;
+import nl.clockwork.ebms.util.CPAUtils;
 import nl.clockwork.ebms.util.EbMSMessageUtils;
 
 import org.apache.commons.lang.StringUtils;
@@ -78,13 +79,13 @@ public class MessageHeaderValidator
 
 		if (!Constants.EBMS_SERVICE_URI.equals(messageHeader.getService().getValue()))
 		{
-			if (!cpaManager.canSend(cpaId,messageHeader.getFrom().getPartyId(),messageHeader.getFrom().getRole(),messageHeader.getService(),messageHeader.getAction()))
+			if (!cpaManager.canSend(cpaId,messageHeader.getFrom().getPartyId(),messageHeader.getFrom().getRole(),CPAUtils.toString(messageHeader.getService()),messageHeader.getAction()))
 				throw new EbMSValidationException(EbMSMessageUtils.createError("//Header/MessageHeader/Action",Constants.EbMSErrorCode.VALUE_NOT_RECOGNIZED.errorCode(),"Value not found."));
-			if (!cpaManager.canReceive(cpaId,messageHeader.getTo().getPartyId(),messageHeader.getTo().getRole(),messageHeader.getService(),messageHeader.getAction()))
+			if (!cpaManager.canReceive(cpaId,messageHeader.getTo().getPartyId(),messageHeader.getTo().getRole(),CPAUtils.toString(messageHeader.getService()),messageHeader.getAction()))
 				throw new EbMSValidationException(EbMSMessageUtils.createError("//Header/MessageHeader/Action",Constants.EbMSErrorCode.VALUE_NOT_RECOGNIZED.errorCode(),"Value not found."));
 		}
 
-		DeliveryChannel deliveryChannel = cpaManager.getFromDeliveryChannel(cpaId,messageHeader.getFrom().getPartyId(),messageHeader.getFrom().getRole(),messageHeader.getService(),messageHeader.getAction());
+		DeliveryChannel deliveryChannel = cpaManager.getFromDeliveryChannel(cpaId,messageHeader.getFrom().getPartyId(),messageHeader.getFrom().getRole(),CPAUtils.toString(messageHeader.getService()),messageHeader.getAction());
 		if (deliveryChannel == null)
 			throw new EbMSValidationException(EbMSMessageUtils.createError(Constants.EbMSErrorCode.UNKNOWN.errorCode(),Constants.EbMSErrorCode.UNKNOWN.errorCode(),"No DeliveryChannel found."));
 		if (!existsRefToMessageId(messageHeader.getMessageData().getRefToMessageId()))

@@ -67,7 +67,7 @@ public class EbMSSignatureValidator
 	{
 		try
 		{
-			if (cpaManager.isNonRepudiationRequired(cpaId,message.getMessageHeader().getFrom().getPartyId(),message.getMessageHeader().getFrom().getRole(),message.getMessageHeader().getService(),message.getMessageHeader().getAction()))
+			if (cpaManager.isNonRepudiationRequired(cpaId,message.getMessageHeader().getFrom().getPartyId(),message.getMessageHeader().getFrom().getRole(),CPAUtils.toString(message.getMessageHeader().getService()),message.getMessageHeader().getAction()))
 			{
 				KeyStore trustStore = SecurityUtils.loadKeyStore(trustStorePath,trustStorePassword);
 				NodeList signatureNodeList = message.getMessage().getElementsByTagNameNS(org.apache.xml.security.utils.Constants.SignatureSpecNS,org.apache.xml.security.utils.Constants._TAG_SIGNATURE);
@@ -144,7 +144,7 @@ public class EbMSSignatureValidator
 	{
 		try
 		{
-			DeliveryChannel deliveryChannel = cpaManager.getFromDeliveryChannel(cpaId,messageHeader.getFrom().getPartyId(),messageHeader.getFrom().getRole(),messageHeader.getService(),messageHeader.getAction());
+			DeliveryChannel deliveryChannel = cpaManager.getFromDeliveryChannel(cpaId,messageHeader.getFrom().getPartyId(),messageHeader.getFrom().getRole(),CPAUtils.toString(messageHeader.getService()),messageHeader.getAction());
 			if (deliveryChannel != null)
 				return CPAUtils.getX509Certificate(CPAUtils.getSigningCertificate(deliveryChannel));
 			return null;

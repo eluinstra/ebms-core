@@ -47,8 +47,8 @@ public class SignatureTypeValidator
 		MessageHeader messageHeader = message.getMessageHeader();
 		SignatureType signature = message.getSignature();
 		
-		DeliveryChannel deliveryChannel = cpaManager.getFromDeliveryChannel(cpaId,messageHeader.getFrom().getPartyId(),messageHeader.getFrom().getRole(),messageHeader.getService(),messageHeader.getAction());
-		if (cpaManager.isNonRepudiationRequired(cpaId,messageHeader.getFrom().getPartyId(),messageHeader.getFrom().getRole(),messageHeader.getService(),messageHeader.getAction()))
+		DeliveryChannel deliveryChannel = cpaManager.getFromDeliveryChannel(cpaId,messageHeader.getFrom().getPartyId(),messageHeader.getFrom().getRole(),CPAUtils.toString(messageHeader.getService()),messageHeader.getAction());
+		if (cpaManager.isNonRepudiationRequired(cpaId,messageHeader.getFrom().getPartyId(),messageHeader.getFrom().getRole(),CPAUtils.toString(messageHeader.getService()),messageHeader.getAction()))
 		{
 			if (signature == null)
 				throw new EbMSValidationException(EbMSMessageUtils.createError("//Header/Signature",Constants.EbMSErrorCode.SECURITY_FAILURE.errorCode(),"Signature not found."));

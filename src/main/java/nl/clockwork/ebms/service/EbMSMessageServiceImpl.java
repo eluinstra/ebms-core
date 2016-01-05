@@ -44,6 +44,7 @@ import nl.clockwork.ebms.model.MessageStatus;
 import nl.clockwork.ebms.model.Party;
 import nl.clockwork.ebms.processor.EbMSProcessorException;
 import nl.clockwork.ebms.signature.EbMSSignatureGenerator;
+import nl.clockwork.ebms.util.CPAUtils;
 import nl.clockwork.ebms.util.EbMSMessageUtils;
 import nl.clockwork.ebms.validation.EbMSMessageContextValidator;
 import nl.clockwork.ebms.validation.ValidatorException;
@@ -74,7 +75,7 @@ public class EbMSMessageServiceImpl implements EbMSMessageService
 		try
 		{
 			EbMSMessage request = ebMSMessageFactory.createEbMSPing(cpaId,fromParty,toParty);
-			EbMSMessage response = deliveryManager.sendMessage(cpaManager.getUri(cpaId,request.getMessageHeader().getTo().getPartyId(),request.getMessageHeader().getTo().getRole(),request.getMessageHeader().getService(),request.getMessageHeader().getAction()),request);
+			EbMSMessage response = deliveryManager.sendMessage(cpaManager.getUri(cpaId,request.getMessageHeader().getTo().getPartyId(),request.getMessageHeader().getTo().getRole(),CPAUtils.toString(request.getMessageHeader().getService()),request.getMessageHeader().getAction()),request);
 			if (response != null)
 			{
 				if (!EbMSAction.PONG.action().equals(response.getMessageHeader().getAction()))
@@ -106,7 +107,7 @@ public class EbMSMessageServiceImpl implements EbMSMessageService
 					public void doInTransaction()
 					{
 						ebMSDAO.insertMessage(new Date(),message,EbMSMessageStatus.SENT);
-						List<EbMSEvent> events = eventManager.createEbMSSendEvents(message.getMessageHeader().getCPAId(),message,cpaManager.getUri(message.getMessageHeader().getCPAId(),message.getMessageHeader().getTo().getPartyId(),message.getMessageHeader().getTo().getRole(),message.getMessageHeader().getService(),message.getMessageHeader().getAction()));
+						List<EbMSEvent> events = eventManager.createEbMSSendEvents(message.getMessageHeader().getCPAId(),message,cpaManager.getUri(message.getMessageHeader().getCPAId(),message.getMessageHeader().getTo().getPartyId(),message.getMessageHeader().getTo().getRole(),CPAUtils.toString(message.getMessageHeader().getService()),message.getMessageHeader().getAction()));
 						ebMSDAO.insertEvents(events);
 					}
 				}
@@ -190,7 +191,7 @@ public class EbMSMessageServiceImpl implements EbMSMessageService
 			else
 			{
 				EbMSMessage request = ebMSMessageFactory.createEbMSStatusRequest(context.getCpaId(),cpaManager.getFromParty(context.getCpaId(),context.getFromRole(),context.getService(),context.getAction()),cpaManager.getToParty(context.getCpaId(),context.getToRole(),context.getService(),context.getAction()),messageId);
-				EbMSMessage response = deliveryManager.sendMessage(cpaManager.getUri(context.getCpaId(),request.getMessageHeader().getTo().getPartyId(),request.getMessageHeader().getTo().getRole(),request.getMessageHeader().getService(),request.getMessageHeader().getAction()),request);
+				EbMSMessage response = deliveryManager.sendMessage(cpaManager.getUri(context.getCpaId(),request.getMessageHeader().getTo().getPartyId(),request.getMessageHeader().getTo().getRole(),CPAUtils.toString(request.getMessageHeader().getService()),request.getMessageHeader().getAction()),request);
 				if (response != null)
 				{
 					if (EbMSAction.STATUS_RESPONSE.action().equals(response.getMessageHeader().getAction()) && response.getStatusResponse() != null)
@@ -214,7 +215,7 @@ public class EbMSMessageServiceImpl implements EbMSMessageService
 		try
 		{
 			EbMSMessage request = ebMSMessageFactory.createEbMSStatusRequest(cpaId,fromParty,toParty,messageId);
-			EbMSMessage response = deliveryManager.sendMessage(cpaManager.getUri(cpaId,request.getMessageHeader().getTo().getPartyId(),request.getMessageHeader().getTo().getRole(),request.getMessageHeader().getService(),request.getMessageHeader().getAction()),request);
+			EbMSMessage response = deliveryManager.sendMessage(cpaManager.getUri(cpaId,request.getMessageHeader().getTo().getPartyId(),request.getMessageHeader().getTo().getRole(),CPAUtils.toString(request.getMessageHeader().getService()),request.getMessageHeader().getAction()),request);
 			if (response != null)
 			{
 				if (EbMSAction.STATUS_RESPONSE.action().equals(response.getMessageHeader().getAction()) && response.getStatusResponse() != null)

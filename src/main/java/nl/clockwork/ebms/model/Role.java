@@ -67,6 +67,12 @@ public class Role implements Serializable// extends Party
 		this.role = role;
 	}
 
+	@Override
+	public String toString()
+	{
+		return new StringBuffer().append(partyId).append(":").append(role).toString();
+	}
+
 	public boolean matches(List<PartyId> partyIds)
 	{
 		if (getPartyId() == null && (partyIds == null || partyIds.size() == 0))
