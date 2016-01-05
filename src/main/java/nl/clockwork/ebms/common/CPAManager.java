@@ -44,6 +44,7 @@ public class CPAManager
 	{
 		return ebMSDAO.getCPAIds();
 	}
+
 	public void insertCPA(CollaborationProtocolAgreement cpa)
 	{
 		ebMSDAO.insertCPA(cpa);
