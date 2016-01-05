@@ -25,6 +25,7 @@ import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.Service;
 public class CPAManager
 {
 	private EbMSDAO ebMSDAO;
+	private URLManager urlManager;
 
 	public boolean existsCPA(String cpaId)
 	{
@@ -34,6 +35,25 @@ public class CPAManager
 	public CollaborationProtocolAgreement getCPA(String cpaId)
 	{
 		return ebMSDAO.getCPA(cpaId);
+	}
+
+	public List<String> getCPAIds()
+	{
+		return ebMSDAO.getCPAIds();
+	}
+	public void insertCPA(CollaborationProtocolAgreement cpa)
+	{
+		ebMSDAO.insertCPA(cpa);
+	}
+
+	public int updateCPA(CollaborationProtocolAgreement cpa)
+	{
+		return ebMSDAO.updateCPA(cpa);
+	}
+
+	public int deleteCPA(String cpaId)
+	{
+		return ebMSDAO.deleteCPA(cpaId);
 	}
 
 	public boolean isValid(String cpaId, Date timestamp)
@@ -159,7 +179,7 @@ public class CPAManager
 	{
 		PartyInfo partyInfo = getPartyInfo(cpaId,partyId);
 		DeliveryChannel deliveryChannel = CPAUtils.getToDeliveryChannel(partyInfo,role,service,action);
-		return ebMSDAO.getUrl(CPAUtils.getUri(deliveryChannel));
+		return urlManager.getUrl(CPAUtils.getUri(deliveryChannel));
 	}
 
 	public String getUri(String cpaId, List<PartyId> partyId, String role, Service service, String action)
@@ -170,5 +190,10 @@ public class CPAManager
 	public void setEbMSDAO(EbMSDAO ebMSDAO)
 	{
 		this.ebMSDAO = ebMSDAO;
+	}
+
+	public void setUrlManager(URLManager urlManager)
+	{
+		this.urlManager = urlManager;
 	}
 }

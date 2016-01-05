@@ -19,9 +19,9 @@ import java.util.List;
 
 import javax.xml.bind.JAXBException;
 
+import nl.clockwork.ebms.common.CPAManager;
 import nl.clockwork.ebms.common.XMLMessageBuilder;
 import nl.clockwork.ebms.dao.DAOException;
-import nl.clockwork.ebms.dao.EbMSDAO;
 import nl.clockwork.ebms.validation.CPAValidator;
 import nl.clockwork.ebms.validation.ValidatorException;
 import nl.clockwork.ebms.validation.XSDValidator;
@@ -34,7 +34,7 @@ public class CPAServiceImpl implements CPAService
 {
   protected transient Log logger = LogFactory.getLog(getClass());
 	private XSDValidator xsdValidator;
-	private EbMSDAO ebMSDAO;
+	private CPAManager cpaManager;
 	private Object cpaMonitor = new Object();
 
 	public CPAServiceImpl()
@@ -69,18 +69,18 @@ public class CPAServiceImpl implements CPAService
 			new CPAValidator().validate(cpa_);
 			synchronized (cpaMonitor)
 			{
-				if (ebMSDAO.existsCPA(cpa_.getCpaid()))
+				if (cpaManager.existsCPA(cpa_.getCpaid()))
 				{
 					if (overwrite != null && overwrite)
 					{
-						if (ebMSDAO.updateCPA(cpa_) == 0)
+						if (cpaManager.updateCPA(cpa_) == 0)
 							throw new CPAServiceException("Could not update CPA " + cpa_.getCpaid() + "! CPA does not exists.");
 					}
 					else
 						throw new CPAServiceException("Did not insert CPA " + cpa_.getCpaid() + "! CPA already exists.");
 				}
 				else
-					ebMSDAO.insertCPA(cpa_);
+					cpaManager.insertCPA(cpa_);
 			}
 			return cpa_.getCpaid();
 		}
@@ -98,7 +98,7 @@ public class CPAServiceImpl implements CPAService
 		{
 			synchronized(cpaMonitor)
 			{
-				if (ebMSDAO.deleteCPA(cpaId) == 0)
+				if (cpaManager.deleteCPA(cpaId) == 0)
 					throw new CPAServiceException("Could not delete CPA " + cpaId + "! CPA does not exists.");
 			}
 		}
@@ -113,7 +113,7 @@ public class CPAServiceImpl implements CPAService
 	{
 		try
 		{
-			return ebMSDAO.getCPAIds();
+			return cpaManager.getCPAIds();
 		}
 		catch (DAOException e)
 		{
@@ -126,17 +126,16 @@ public class CPAServiceImpl implements CPAService
 	{
 		try
 		{
-			return XMLMessageBuilder.getInstance(CollaborationProtocolAgreement.class).handle(ebMSDAO.getCPA(cpaId));
+			return XMLMessageBuilder.getInstance(CollaborationProtocolAgreement.class).handle(cpaManager.getCPA(cpaId));
 		}
 		catch (DAOException | JAXBException e)
 		{
 			throw new CPAServiceException(e);
 		}
 	}
-	
-	public void setEbMSDAO(EbMSDAO ebMSDAO)
-	{
-		this.ebMSDAO = ebMSDAO;
-	}
 
+	public void setCpaManager(CPAManager cpaManager)
+	{
+		this.cpaManager = cpaManager;
+	}
 }

@@ -30,6 +30,7 @@ import nl.clockwork.ebms.Constants.EbMSMessageStatus;
 import nl.clockwork.ebms.client.EbMSClient;
 import nl.clockwork.ebms.client.EbMSResponseException;
 import nl.clockwork.ebms.client.EbMSResponseSOAPException;
+import nl.clockwork.ebms.common.URLManager;
 import nl.clockwork.ebms.dao.DAOTransactionCallback;
 import nl.clockwork.ebms.dao.EbMSDAO;
 import nl.clockwork.ebms.event.EventListener;
@@ -60,7 +61,7 @@ public class EbMSEventProcessor implements Job
 				EbMSDocument requestDocument = ebMSDAO.getEbMSDocument(event.getMessageId());
 				if (requestDocument != null)
 				{
-					event.setUri(ebMSDAO.getUrl(event.getUri()));
+					event.setUri(urlManager.getUrl(event.getUri()));
 					logger.info("Sending message " + event.getMessageId() + " to " + event.getUri());
 					EbMSDocument responseDocument = ebMSClient.sendMessage(event.getUri(),requestDocument);
 					messageProcessor.processResponse(requestDocument,responseDocument);
@@ -147,6 +148,7 @@ public class EbMSEventProcessor implements Job
 	private Integer queueScaleFactor;
 	private EventListener eventListener;
 	private EbMSDAO ebMSDAO;
+	private URLManager urlManager;
 	private EbMSClient ebMSClient;
 	private EbMSMessageProcessor messageProcessor;
 
