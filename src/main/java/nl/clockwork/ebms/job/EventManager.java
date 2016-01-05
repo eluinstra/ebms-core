@@ -18,6 +18,11 @@ public class EventManager
 {
 	private CPAManager cpaManager;
 
+	public EbMSEvent createEbMSSendEvent(EbMSMessage message, String uri)
+	{
+		return new EbMSEvent(message.getMessageHeader().getMessageData().getMessageId(),message.getMessageHeader().getMessageData().getTimestamp(),EbMSEventType.SEND,uri);
+	}
+
 	public List<EbMSEvent> createEbMSSendEvents(String cpaId, EbMSMessage message, String uri)
 	{
 		List<EbMSEvent> result = new ArrayList<EbMSEvent>();

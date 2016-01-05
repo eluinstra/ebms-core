@@ -233,11 +233,6 @@ public class EbMSMessageUtils
 		return reference;
 	}
 
-	public static EbMSEvent createEbMSSendEvent(EbMSMessage message, String uri)
-	{
-		return new EbMSEvent(message.getMessageHeader().getMessageData().getMessageId(),message.getMessageHeader().getMessageData().getTimestamp(),EbMSEventType.SEND,uri);
-	}
-
 	public static Document createSOAPMessage(EbMSMessage ebMSMessage) throws SOAPException, JAXBException, ParserConfigurationException, SAXException, IOException, TransformerFactoryConfigurationError, TransformerException
 	{
 		Envelope envelope = new Envelope();

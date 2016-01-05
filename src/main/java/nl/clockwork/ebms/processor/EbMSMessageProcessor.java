@@ -38,6 +38,7 @@ import nl.clockwork.ebms.dao.DAOException;
 import nl.clockwork.ebms.dao.DAOTransactionCallback;
 import nl.clockwork.ebms.dao.EbMSDAO;
 import nl.clockwork.ebms.event.EventListener;
+import nl.clockwork.ebms.job.EventManager;
 import nl.clockwork.ebms.model.EbMSDocument;
 import nl.clockwork.ebms.model.EbMSMessage;
 import nl.clockwork.ebms.model.EbMSMessageContext;
@@ -73,6 +74,7 @@ public class EbMSMessageProcessor
 	protected EbMSDAO ebMSDAO;
 	protected CPAManager cpaManager;
 	protected EbMSMessageFactory ebMSMessageFactory;
+	protected EventManager eventManager;
   protected EbMSSignatureGenerator signatureGenerator;
 	protected EbMSSignatureValidator signatureValidator;
   protected XSDValidator xsdValidator;
@@ -292,7 +294,7 @@ public class EbMSMessageProcessor
 								ebMSDAO.insertMessage(timestamp,message,EbMSMessageStatus.RECEIVED);
 								ebMSDAO.insertMessage(timestamp,acknowledgment,null);
 								if (message.getSyncReply() == null)
-									ebMSDAO.insertEvent(EbMSMessageUtils.createEbMSSendEvent(acknowledgment,cpaManager.getUri(cpaId,acknowledgment.getMessageHeader().getTo().getPartyId(),acknowledgment.getMessageHeader().getTo().getRole(),acknowledgment.getMessageHeader().getService(),acknowledgment.getMessageHeader().getAction())));
+									ebMSDAO.insertEvent(eventManager.createEbMSSendEvent(acknowledgment,cpaManager.getOriginalUri(cpaId,acknowledgment.getMessageHeader().getTo().getPartyId(),acknowledgment.getMessageHeader().getTo().getRole(),acknowledgment.getMessageHeader().getService(),acknowledgment.getMessageHeader().getAction())));
 								eventListener.onMessageReceived(message.getMessageHeader().getMessageData().getMessageId());
 							}
 						}
@@ -317,7 +319,7 @@ public class EbMSMessageProcessor
 							ebMSDAO.insertMessage(timestamp,message,EbMSMessageStatus.FAILED);
 							ebMSDAO.insertMessage(timestamp,messageError,null);
 							if (message.getSyncReply() == null)
-								ebMSDAO.insertEvent(EbMSMessageUtils.createEbMSSendEvent(messageError,cpaManager.getUri(cpaId,messageError.getMessageHeader().getTo().getPartyId(),messageError.getMessageHeader().getTo().getRole(),messageError.getMessageHeader().getService(),messageError.getMessageHeader().getAction())));
+								ebMSDAO.insertEvent(eventManager.createEbMSSendEvent(messageError,cpaManager.getOriginalUri(cpaId,messageError.getMessageHeader().getTo().getPartyId(),messageError.getMessageHeader().getTo().getRole(),messageError.getMessageHeader().getService(),messageError.getMessageHeader().getAction())));
 						}
 					}
 				);

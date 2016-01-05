@@ -155,11 +155,16 @@ public class CPAManager
 		return null;
 	}
 
-	public String getUri(String cpaId, List<PartyId> partyId, String role, Service service, String action)
+	public String getOriginalUri(String cpaId, List<PartyId> partyId, String role, Service service, String action)
 	{
 		PartyInfo partyInfo = getPartyInfo(cpaId,partyId);
 		DeliveryChannel deliveryChannel = CPAUtils.getToDeliveryChannel(partyInfo,role,service,action);
 		return ebMSDAO.getUrl(CPAUtils.getUri(deliveryChannel));
+	}
+
+	public String getUri(String cpaId, List<PartyId> partyId, String role, Service service, String action)
+	{
+		return ebMSDAO.getUrl(getOriginalUri(cpaId,partyId,role,service,action));
 	}
 
 	public void setEbMSDAO(EbMSDAO ebMSDAO)

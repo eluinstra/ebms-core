@@ -2,6 +2,8 @@
 / manual
 - document service interfaces
 
+- hide all CPADAO functions behind CPAManager?
+
 - fix duplicate elimination
 	- add primary key to ebms_message table
 	- use key in other tables
