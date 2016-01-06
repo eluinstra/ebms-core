@@ -22,42 +22,38 @@ public class EventManager
 		ebMSDAO.insertEvent(new EbMSEvent(cpaId,deliveryChannelId,messageId,timeToLive,timestamp,0));
 	}
 
+	public void updateEvent(final EbMSEvent event, final String url, final EbMSEventStatus status)
+	{
+		ebMSDAO.executeTransaction(
+			new DAOTransactionCallback()
+			{
+				@Override
+				public void doInTransaction()
+				{
+					ebMSDAO.insertEventLog(event.getMessageId(),event.getTimestamp(),url,status,null);
+					ebMSDAO.deleteEvent(event.getMessageId());
+				}
+			}
+		);
+	}
+
 	public void updateEvent(final EbMSEvent event, final String url, final EbMSEventStatus status, final String errorMessage)
 	{
-		switch (status)
-		{
-			case FAILED:
-				final DeliveryChannel deliveryChannel = cpaManager.getDeliveryChannel(event.getCpaId(),event.getDeliveryChannelId());
-				ebMSDAO.executeTransaction(
-						new DAOTransactionCallback()
-						{
-							@Override
-							public void doInTransaction()
-							{
-								ebMSDAO.insertEventLog(event.getMessageId(),event.getTimestamp(),url,status,errorMessage);
-								if (CPAUtils.isReliableMessaging(deliveryChannel))
-									ebMSDAO.updateEvent(createNewEvent(event,deliveryChannel));
-								else
-									ebMSDAO.deleteEvent(event.getMessageId());
-							}
-						}
-					);
-				break;
-
-			default:
-				ebMSDAO.executeTransaction(
-						new DAOTransactionCallback()
-						{
-							@Override
-							public void doInTransaction()
-							{
-								ebMSDAO.insertEventLog(event.getMessageId(),event.getTimestamp(),url,status,errorMessage);
-								ebMSDAO.deleteEvent(event.getMessageId());
-							}
-						}
-					);
-				break;
-		}
+		final DeliveryChannel deliveryChannel = cpaManager.getDeliveryChannel(event.getCpaId(),event.getDeliveryChannelId());
+		ebMSDAO.executeTransaction(
+			new DAOTransactionCallback()
+			{
+				@Override
+				public void doInTransaction()
+				{
+					ebMSDAO.insertEventLog(event.getMessageId(),event.getTimestamp(),url,status,errorMessage);
+					if (CPAUtils.isReliableMessaging(deliveryChannel))
+						ebMSDAO.updateEvent(createNewEvent(event,deliveryChannel));
+					else
+						ebMSDAO.deleteEvent(event.getMessageId());
+				}
+			}
+		);
 	}
 
 	public void deleteEvent(String messageId)

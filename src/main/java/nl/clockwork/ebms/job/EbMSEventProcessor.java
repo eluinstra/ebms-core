@@ -60,8 +60,7 @@ public class EbMSEventProcessor implements Job
 		{
 			DeliveryChannel deliveryChannel = cpaManager.getDeliveryChannel(event.getCpaId(),event.getDeliveryChannelId());
 			if (event.getTimeToLive().after(new Date()))
-				//if (!CPAUtils.isReliableMessaging(deliveryChannel) || event.getRetries() < CPAUtils.getReliableMessaging(deliveryChannel).getRetries().intValue())
-					sendEvent(event,deliveryChannel);
+				sendEvent(event,deliveryChannel);
 			else
 				expireEvent(event);
 		}
@@ -78,7 +77,7 @@ public class EbMSEventProcessor implements Job
 					logger.info("Sending message " + event.getMessageId() + " to " + url);
 					EbMSDocument responseDocument = ebMSClient.sendMessage(url,requestDocument);
 					messageProcessor.processResponse(requestDocument,responseDocument);
-					eventManager.updateEvent(event,url,EbMSEventStatus.SUCCEEDED,null);
+					eventManager.updateEvent(event,url,EbMSEventStatus.SUCCEEDED);
 				}
 				else
 					eventManager.deleteEvent(event.getMessageId());
@@ -124,7 +123,7 @@ public class EbMSEventProcessor implements Job
 							EbMSDocument requestDocument = ebMSDAO.getEbMSDocumentIfUnsent(event.getMessageId());
 							if (requestDocument != null)
 							{
-								eventManager.updateEvent(event,null,EbMSEventStatus.SUCCEEDED,null);
+								eventManager.updateEvent(event,null,EbMSEventStatus.SUCCEEDED);
 								ebMSDAO.updateMessage(event.getMessageId(),EbMSMessageStatus.SENT,EbMSMessageStatus.EXPIRED);
 								eventListener.onMessageExpired(event.getMessageId());
 							}
