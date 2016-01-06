@@ -61,7 +61,7 @@ public class EbMSMessageProcessorX extends EbMSMessageProcessor
 		cpaValidator = new CPAValidator(cpaManager);
 		messageHeaderValidator = new MessageHeaderValidator(ebMSDAO,cpaManager);
 		manifestValidator = new ManifestValidator();
-		signatureTypeValidator = new SignatureTypeValidator(signatureValidator);
+		signatureTypeValidator = new SignatureTypeValidator(cpaManager,signatureValidator);
 	}
 	
 	public EbMSDocument processRequest(EbMSDocument document) throws EbMSProcessorException

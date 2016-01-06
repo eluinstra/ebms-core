@@ -38,8 +38,9 @@ public class SignatureTypeValidator
   private CPAManager cpaManager;
   private EbMSSignatureValidator ebMSSignatureValidator;
 
-	public SignatureTypeValidator(EbMSSignatureValidator ebMSSignatureValidator)
+	public SignatureTypeValidator(CPAManager cpaManager, EbMSSignatureValidator ebMSSignatureValidator)
 	{
+		this.cpaManager = cpaManager;
 		this.ebMSSignatureValidator = ebMSSignatureValidator;
 	}
 

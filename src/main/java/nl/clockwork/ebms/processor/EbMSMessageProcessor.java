@@ -105,7 +105,7 @@ public class EbMSMessageProcessor
 		messageHeaderValidator = new MessageHeaderValidator(ebMSDAO,cpaManager);
 		messageHeaderValidator.setAckSignatureRequested(PerMessageCharacteristicsType.NEVER);
 		manifestValidator = new ManifestValidator();
-		signatureTypeValidator = new SignatureTypeValidator(signatureValidator);
+		signatureTypeValidator = new SignatureTypeValidator(cpaManager,signatureValidator);
 	}
 	
 	public EbMSDocument processRequest(EbMSDocument document) throws EbMSProcessorException
