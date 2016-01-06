@@ -64,12 +64,12 @@ public class EventManager
 	private EbMSEvent createNewEvent(EbMSEvent event, DeliveryChannel deliveryChannel)
 	{
 		ReliableMessaging rm = CPAUtils.getReliableMessaging(deliveryChannel);
-		Date time = new Date();
+		Date timestamp = new Date();
 		if (event.getRetries() < rm.getRetries().intValue() - 1)
-			rm.getRetryInterval().addTo(time);
+			rm.getRetryInterval().addTo(timestamp);
 		else //if (event.getRetries() < rm.getRetries().intValue())
-			time = event.getTimeToLive();
-		return new EbMSEvent(event.getCpaId(),event.getDeliveryChannelId(),event.getMessageId(),event.getTimeToLive(),time,event.getRetries() + 1);
+			timestamp = event.getTimeToLive();
+		return new EbMSEvent(event.getCpaId(),event.getDeliveryChannelId(),event.getMessageId(),event.getTimeToLive(),timestamp,event.getRetries() + 1);
 	}
 
 	public void setEbMSDAO(EbMSDAO ebMSDAO)
