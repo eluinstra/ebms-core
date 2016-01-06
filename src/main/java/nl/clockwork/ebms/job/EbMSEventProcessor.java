@@ -59,7 +59,7 @@ public class EbMSEventProcessor implements Job
 		public void run()
 		{
 			DeliveryChannel deliveryChannel = cpaManager.getDeliveryChannel(event.getCpaId(),event.getDeliveryChannelId());
-			if (event.getTimeToLive().after(new Date()))
+			if (new Date().before(event.getTimeToLive()))
 				sendEvent(event,deliveryChannel);
 			else
 				expireEvent(event);
@@ -190,24 +190,6 @@ public class EbMSEventProcessor implements Job
 		{
 			logger.trace(e);
 		}
-  }
-  
-  public void executeOld()
-  {
-  	GregorianCalendar timestamp = new GregorianCalendar();
-  	List<EbMSEvent> events = ebMSDAO.getEventsBefore(timestamp.getTime());
-  	List<Future<?>> futures = new ArrayList<Future<?>>();
-  	for (final EbMSEvent event : events)
-  		futures.add(executorService.submit(new HandleEventJob(event)));
-  	for (Future<?> future : futures)
-			try
-			{
-				future.get();
-			}
-			catch (Exception e)
-			{
-	  		logger.error("",e);
-			}
   }
   
 	public void setMaxThreads(Integer maxThreads)
