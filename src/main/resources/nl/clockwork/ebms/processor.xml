@@ -22,12 +22,14 @@
 >
 
 	<bean id="cpaService" class="nl.clockwork.ebms.service.CPAServiceImpl">
-		<property name="ebMSDAO" ref="ebMSDAO"/>
+		<property name="cpaManager" ref="cpaManager"/>
 	</bean>
 
 	<bean id="ebMSMessageService" class="nl.clockwork.ebms.service.EbMSMessageServiceImpl" init-method="init">
 		<property name="deliveryManager" ref="deliveryManager"></property>
 		<property name="ebMSDAO" ref="ebMSDAO"/>
+		<property name="ebMSMessageFactory" ref="ebMSMessageFactory"/>
+		<property name="eventManager" ref="eventManager"/>
 		<property name="signatureGenerator" ref="signatureGenerator"/>
 	</bean>
 
@@ -59,11 +61,27 @@
 		<property name="deliveryManager" ref="deliveryManager"/>
 		<property name="eventListener" ref="eventListener"/>
 		<property name="ebMSDAO" ref="ebMSDAO"/>
+		<property name="cpaManager" ref="cpaManager"/>
+		<property name="ebMSMessageFactory" ref="ebMSMessageFactory"/>
+		<property name="eventManager" ref="eventManager"/>
 		<property name="signatureGenerator" ref="signatureGenerator"/>
 		<property name="signatureValidator" ref="signatureValidator"/>
 	</bean>
 
+	<bean id="cpaManager" class="nl.clockwork.ebms.common.CPAManager">
+		<property name="ebMSDAO" ref="ebMSDAO"/>
+	</bean>
+
+	<bean id="ebMSMessageFactory" class="nl.clockwork.ebms.common.EbMSMessageFactory">
+		<property name="cpaManager" ref="cpaManager"/>
+	</bean>
+
+	<bean id="eventManager" class="nl.clockwork.ebms.job.EventManager">
+		<property name="cpaManager" ref="cpaManager"/>
+	</bean>
+
 	<bean id="signatureValidator" class="nl.clockwork.ebms.signature.EbMSSignatureValidator">
+		<property name="cpaManager" ref="cpaManager"/>
 		<property name="trustStorePath" value="${truststore.path}"/>
 		<property name="trustStorePassword" value="${truststore.password}"/>
 	</bean>
@@ -89,6 +107,7 @@
 	</bean>
 
 	<bean id="signatureGenerator" class="nl.clockwork.ebms.signature.EbMSSignatureGenerator" init-method="init">
+		<property name="cpaManager" ref="cpaManager"/>
 		<property name="canonicalizationMethodAlgorithm" value="${xmldsig.canonicalizationMethodAlgorithm}"/>
 		<property name="transformAlgorithm" value="${xmldsig.transformAlgorithm}"/>
 		<property name="keyStorePath" value="${signature.keystore.path}" />

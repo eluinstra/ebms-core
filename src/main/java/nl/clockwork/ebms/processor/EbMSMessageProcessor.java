@@ -84,8 +84,8 @@ public class EbMSMessageProcessor
   protected ManifestValidator manifestValidator;
   protected SignatureTypeValidator signatureTypeValidator;
   protected Service mshMessageService;
-  
-	public void init()
+
+  public EbMSMessageProcessor()
 	{
 		signatureGenerator = new EbMSSignatureGenerator()
 		{
@@ -94,14 +94,18 @@ public class EbMSMessageProcessor
 			{
 			}
 		};
+		mshMessageService = new Service();
+		mshMessageService.setValue(Constants.EBMS_SERVICE_URI);
+	}
+
+	public void init()
+	{
 		xsdValidator = new XSDValidator("/nl/clockwork/ebms/xsd/msg-header-2_0.xsd");
 		cpaValidator = new CPAValidator();
 		messageHeaderValidator = new MessageHeaderValidator(ebMSDAO,cpaManager);
 		messageHeaderValidator.setAckSignatureRequested(PerMessageCharacteristicsType.NEVER);
 		manifestValidator = new ManifestValidator();
 		signatureTypeValidator = new SignatureTypeValidator(signatureValidator);
-		mshMessageService = new Service();
-		mshMessageService.setValue(Constants.EBMS_SERVICE_URI);
 	}
 	
 	public EbMSDocument processRequest(EbMSDocument document) throws EbMSProcessorException
@@ -405,6 +409,11 @@ public class EbMSMessageProcessor
 	public void setEbMSMessageFactory(EbMSMessageFactory ebMSMessageFactory)
 	{
 		this.ebMSMessageFactory = ebMSMessageFactory;
+	}
+
+	public void setEventManager(EventManager eventManager)
+	{
+		this.eventManager = eventManager;
 	}
 
 	public void setSignatureValidator(EbMSSignatureValidator signatureValidator)

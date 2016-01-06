@@ -32,9 +32,9 @@ import nl.clockwork.ebms.Constants.EbMSEventStatus;
 import nl.clockwork.ebms.Constants.EbMSMessageStatus;
 import nl.clockwork.ebms.common.util.DOMUtils;
 import nl.clockwork.ebms.dao.DAOTransactionCallback;
+import nl.clockwork.ebms.model.CacheablePartyId;
 import nl.clockwork.ebms.model.EbMSDocument;
 import nl.clockwork.ebms.model.EbMSMessage;
-import nl.clockwork.ebms.model.CacheablePartyId;
 import nl.clockwork.ebms.signature.EbMSSignatureGenerator;
 import nl.clockwork.ebms.util.CPAUtils;
 import nl.clockwork.ebms.util.EbMSMessageUtils;
@@ -48,7 +48,6 @@ import nl.clockwork.ebms.validation.XSDValidator;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.Service;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
@@ -63,8 +62,6 @@ public class EbMSMessageProcessorX extends EbMSMessageProcessor
 		messageHeaderValidator = new MessageHeaderValidator(ebMSDAO,cpaManager);
 		manifestValidator = new ManifestValidator();
 		signatureTypeValidator = new SignatureTypeValidator(signatureValidator);
-		mshMessageService = new Service();
-		mshMessageService.setValue(Constants.EBMS_SERVICE_URI);
 	}
 	
 	public EbMSDocument processRequest(EbMSDocument document) throws EbMSProcessorException

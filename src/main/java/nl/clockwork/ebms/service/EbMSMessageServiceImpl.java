@@ -248,6 +248,11 @@ public class EbMSMessageServiceImpl implements EbMSMessageService
 		this.cpaManager = cpaManager;
 	}
 
+	public void setEbMSMessageFactory(EbMSMessageFactory ebMSMessageFactory)
+	{
+		this.ebMSMessageFactory = ebMSMessageFactory;
+	}
+
 	public void setEventManager(EventManager eventManager)
 	{
 		this.eventManager = eventManager;

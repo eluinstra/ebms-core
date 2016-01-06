@@ -51,11 +51,11 @@ import org.w3c.dom.NodeList;
 public class EbMSSignatureGenerator
 {
 	protected transient Log logger = LogFactory.getLog(getClass());
+	private CPAManager cpaManager;
 	private String canonicalizationMethodAlgorithm = Transforms.TRANSFORM_C14N_OMIT_COMMENTS;
 	//private String signatureMethodAlgorithm = XMLSignature.ALGO_ID_SIGNATURE_DSA;
 	private String transformAlgorithm = Transforms.TRANSFORM_C14N_OMIT_COMMENTS;
 	//private String digestAlgorithm = org.apache.xml.security.utils.Constants.ALGO_ID_DIGEST_SHA1;
-	private CPAManager cpaManager;
 	private String keyStorePath;
 	private String keyStorePassword;
 	private KeyStore keyStore;
@@ -152,6 +152,11 @@ public class EbMSSignatureGenerator
 		return container.getElementPlusReturns();
 	}
 	
+	public void setCpaManager(CPAManager cpaManager)
+	{
+		this.cpaManager = cpaManager;
+	}
+
 	public void setCanonicalizationMethodAlgorithm(String canonicalizationMethodAlgorithm)
 	{
 		this.canonicalizationMethodAlgorithm = canonicalizationMethodAlgorithm;
