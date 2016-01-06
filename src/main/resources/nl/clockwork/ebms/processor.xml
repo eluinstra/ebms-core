@@ -28,6 +28,7 @@
 	<bean id="ebMSMessageService" class="nl.clockwork.ebms.service.EbMSMessageServiceImpl" init-method="init">
 		<property name="deliveryManager" ref="deliveryManager"></property>
 		<property name="ebMSDAO" ref="ebMSDAO"/>
+		<property name="cpaManager" ref="cpaManager"/>
 		<property name="ebMSMessageFactory" ref="ebMSMessageFactory"/>
 		<property name="eventManager" ref="eventManager"/>
 		<property name="signatureGenerator" ref="signatureGenerator"/>

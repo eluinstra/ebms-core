@@ -33,13 +33,15 @@ import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CollaborationProt
 public class CPAServiceImpl implements CPAService
 {
   protected transient Log logger = LogFactory.getLog(getClass());
-	private XSDValidator xsdValidator;
 	private CPAManager cpaManager;
+	private XSDValidator xsdValidator;
+	private CPAValidator cpaValidator;
 	private Object cpaMonitor = new Object();
 
 	public CPAServiceImpl()
 	{
 		xsdValidator = new XSDValidator("/nl/clockwork/ebms/xsd/cpp-cpa-2_0.xsd");
+		cpaValidator = new CPAValidator(cpaManager);
 	}
 	
 	@Override
@@ -50,7 +52,7 @@ public class CPAServiceImpl implements CPAService
 		{
 			xsdValidator.validate(cpa);
 			CollaborationProtocolAgreement cpa_ = XMLMessageBuilder.getInstance(CollaborationProtocolAgreement.class).handle(cpa);
-			new CPAValidator().validate(cpa_);
+			cpaValidator.validate(cpa_);
 		}
 		catch (JAXBException | ValidatorException e)
 		{
@@ -66,7 +68,8 @@ public class CPAServiceImpl implements CPAService
 		{
 			xsdValidator.validate(cpa);
 			CollaborationProtocolAgreement cpa_ = XMLMessageBuilder.getInstance(CollaborationProtocolAgreement.class).handle(cpa);
-			new CPAValidator().validate(cpa_);
+			CPAValidator cpaValidator = new CPAValidator(cpaManager);
+			cpaValidator.validate(cpa_);
 			synchronized (cpaMonitor)
 			{
 				if (cpaManager.existsCPA(cpa_.getCpaid()))

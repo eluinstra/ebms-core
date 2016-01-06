@@ -44,6 +44,11 @@ public class CPAValidator
   protected transient Log logger = LogFactory.getLog(getClass());
   private CPAManager cpaManager;
 
+	public CPAValidator(CPAManager cpaManager)
+	{
+		this.cpaManager = cpaManager;
+	}
+
 	public void validate(String cpaId, EbMSMessage message) throws EbMSValidationException
 	{
 		if (cpaId == null || !cpaId.equals(message.getMessageHeader().getCPAId()))
@@ -143,8 +148,4 @@ public class CPAValidator
 			}
 	}
 
-	public void setCpaManager(CPAManager cpaManager)
-	{
-		this.cpaManager = cpaManager;
-	}
 }

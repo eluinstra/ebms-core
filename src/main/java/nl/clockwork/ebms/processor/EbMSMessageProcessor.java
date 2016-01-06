@@ -101,7 +101,7 @@ public class EbMSMessageProcessor
 	public void init()
 	{
 		xsdValidator = new XSDValidator("/nl/clockwork/ebms/xsd/msg-header-2_0.xsd");
-		cpaValidator = new CPAValidator();
+		cpaValidator = new CPAValidator(cpaManager);
 		messageHeaderValidator = new MessageHeaderValidator(ebMSDAO,cpaManager);
 		messageHeaderValidator.setAckSignatureRequested(PerMessageCharacteristicsType.NEVER);
 		manifestValidator = new ManifestValidator();
@@ -115,7 +115,7 @@ public class EbMSMessageProcessor
 			xsdValidator.validate(document.getMessage());
 			Date timestamp = new Date();
 			final EbMSMessage message = EbMSMessageUtils.getEbMSMessage(document);
-			if (cpaManager.existsCPA(message.getMessageHeader().getCPAId()))
+			if (!cpaManager.existsCPA(message.getMessageHeader().getCPAId()))
 			{
 				logger.warn("CPA " + message.getMessageHeader().getCPAId() + " not found!");
 				return null;
