@@ -2,6 +2,8 @@
 / manual
 - document service interfaces
 
+- move more methods from CPAUtils to CPAManager and cache them?
+
 - fix duplicate elimination
 	- add primary key to ebms_message table
 	- use key in other tables
@@ -9,8 +11,6 @@
 	- add encryption (s/mime)
 - define DeliveryChannel types (http, etc.)
 
-- optimize EbMSMessageutils and CPAUtils
-	- implement CPARegistry and CPA object
 - change events
 	- create only one event
 	- add expiration time and retry attempt nr to event

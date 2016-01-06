@@ -29,8 +29,9 @@
 		</property>
 	</bean>
 
+	<import resource="cache.xml"/>
 	<import resource="datasource.xml"/>
-	<import resource="dao.cached.spring.xml"/>
+	<import resource="dao.spring.xml" />
 
 	<import resource="processor.xml"/>
 	<import resource="eventListener.xml"/>

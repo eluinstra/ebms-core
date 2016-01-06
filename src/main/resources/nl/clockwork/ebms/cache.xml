@@ -20,22 +20,19 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-	<bean id="ebMSDAO" class="org.springframework.aop.framework.ProxyFactoryBean">
-		<property name="target" ref="_ebMSDAO"/>
-		<property name="interceptorNames">
-			<list>
-				<value>ebMSDAOMethodCachePointCut</value>
-			</list>
-		</property>
+	<bean id="ebMSMethodCacheInterceptor" class="nl.clockwork.ebms.common.MethodCacheInterceptor">
+		<property name="cache" ref="ebMSMethodCache" />
 	</bean>
 
-	<bean id="ebMSDAOMethodCachePointCut" class="org.springframework.aop.support.RegexpMethodPointcutAdvisor">
-		<property name="advice" ref="ebMSMethodCacheInterceptor"/>
-		<property name="patterns">
-			<list>
-				<value>.*getCPA</value>
-			</list>
-		</property>
+	<bean id="ebMSMethodCache" class="org.springframework.cache.ehcache.EhCacheFactoryBean">
+		<property name="cacheManager" ref="cacheManager"/>
+		<property name="cacheName" value="nl.clockwork.ebms.METHOD_CACHE"/>
+		<property name="overflowToDisk" value="false"/>
+		<property name="disabled" value="${cache.disabled}"/>
+		<property name="timeToIdle" value="${cache.timeToIdle}"/>
+		<property name="timeToLive" value="${cache.timeToLive}"/>
 	</bean>
+
+	<bean id="cacheManager" class="org.springframework.cache.ehcache.EhCacheManagerFactoryBean"/>
 
 </beans>

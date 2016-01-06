@@ -68,8 +68,44 @@
 		<property name="signatureValidator" ref="signatureValidator"/>
 	</bean>
 
-	<bean id="cpaManager" class="nl.clockwork.ebms.common.CPAManager">
+	<bean id="_cpaManager" class="nl.clockwork.ebms.common.CPAManager">
 		<property name="ebMSDAO" ref="ebMSDAO"/>
+	</bean>
+
+	<bean id="cpaManager" class="org.springframework.aop.framework.ProxyFactoryBean">
+		<property name="target" ref="_cpaManager"/>
+		<property name="interceptorNames">
+			<list>
+				<value>ebMSCPAManagerMethodCachePointCut</value>
+			</list>
+		</property>
+	</bean>
+
+	<bean id="ebMSCPAManagerMethodCachePointCut" class="org.springframework.aop.support.RegexpMethodPointcutAdvisor">
+		<property name="advice" ref="ebMSMethodCacheInterceptor"/>
+		<property name="patterns">
+			<list>
+				<value>.*existsCPA</value>
+				<value>.*getCPA</value>
+				<value>.*getCPAIds</value>
+				<value>.*getUrl</value>
+				<value>.*getFromParty</value>
+				<value>.*getToParty</value>
+				<value>.*getEbMSPartyInfo</value>
+				<value>.*getPartyInfo</value>
+				<value>.*getFromPartyInfo</value>
+				<value>.*getToPartyInfoByFromPartyActionBinding</value>
+				<value>.*getToPartyInfo</value>
+				<value>.*getServiceBinding</value>
+				<value>.*canSend</value>
+				<value>.*canReceive</value>
+				<value>.*getDefaultDeliveryChannel</value>
+				<value>.*getFromDeliveryChannel</value>
+				<value>.*getToDeliveryChannel</value>
+				<value>.*isNonRepudiationRequired</value>
+				<value>.*getUri</value>
+			</list>
+		</property>
 	</bean>
 
 	<bean id="ebMSMessageFactory" class="nl.clockwork.ebms.common.EbMSMessageFactory">
