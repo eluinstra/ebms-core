@@ -46,9 +46,11 @@ CREATE TABLE ebms_event
 	cpa_id						VARCHAR(256)		NOT NULL,
 	channel_id				VARCHAR(256)		NOT NULL,
 	message_id				VARCHAR(256)		NOT NULL UNIQUE,
+	message_nr				SMALLINT				DEFAULT 0 NOT NULL,
 	time_to_live			TIMESTAMP				NULL,
 	time_stamp				TIMESTAMP				NOT NULL,
-	retries						SMALLINT				DEFAULT 0 NOT NULL
+	retries						SMALLINT				DEFAULT 0 NOT NULL,
+	FOREIGN KEY (message_id,message_nr) REFERENCES ebms_message(message_id,message_nr)
 );
 
 CREATE TABLE ebms_event_log
