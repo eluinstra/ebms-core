@@ -8,6 +8,8 @@ This ebms-adapter runs on mule-standalone-3.x.x. You can use the ebms-adapter in
 - include it in your application/project (only possible if your project also runs on mule-standalone-3.x.x)
 - run it standalone and use the tcp bridge to connect to your application
 
+See SourceForge for the EbMS Admin Console.
+
 This project includes 2 stubs (digipoort en overheid) that implement the AfleverService and the AanleverService. These stubs can communicate with each other.
 The project also includes a standalone ebms-adapter configuration that has a tcp bridge to communicate with an application.
 The project includes a standalone version of the overheid stub that uses the standalone ebms-adapter (through tcp), that can also communicate with the digipoort stub.
