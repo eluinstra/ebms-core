@@ -8,6 +8,7 @@ import nl.clockwork.ebms.Constants.EbMSEventType;
 import nl.clockwork.ebms.common.CPAManager;
 import nl.clockwork.ebms.model.EbMSEvent;
 import nl.clockwork.ebms.model.EbMSMessage;
+import nl.clockwork.ebms.model.CacheablePartyId;
 import nl.clockwork.ebms.util.CPAUtils;
 
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DeliveryChannel;
@@ -26,7 +27,7 @@ public class EventManager
 	{
 		List<EbMSEvent> result = new ArrayList<EbMSEvent>();
 		Date sendTime = message.getMessageHeader().getMessageData().getTimestamp();
-		DeliveryChannel deliveryChannel = cpaManager.getFromDeliveryChannel(cpaId,message.getMessageHeader().getFrom().getPartyId(),message.getMessageHeader().getFrom().getRole(),CPAUtils.toString(message.getMessageHeader().getService()),message.getMessageHeader().getAction());
+		DeliveryChannel deliveryChannel = cpaManager.getFromDeliveryChannel(cpaId,new CacheablePartyId(message.getMessageHeader().getFrom().getPartyId()),message.getMessageHeader().getFrom().getRole(),CPAUtils.toString(message.getMessageHeader().getService()),message.getMessageHeader().getAction());
 		if (CPAUtils.isReliableMessaging(deliveryChannel))
 		{
 			ReliableMessaging rm = CPAUtils.getReliableMessaging(deliveryChannel);

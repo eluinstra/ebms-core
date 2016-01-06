@@ -15,16 +15,11 @@
  */
 package nl.clockwork.ebms.common;
 
-import java.util.List;
-
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.Element;
-import nl.clockwork.ebms.util.CPAUtils;
 
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
-import org.apache.commons.lang.StringUtils;
-import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.PartyId;
 
 public class MethodCacheInterceptor implements MethodInterceptor
 {
@@ -53,23 +48,8 @@ public class MethodCacheInterceptor implements MethodInterceptor
 		sb.append(targetName).append(".").append(methodName);
 		if (arguments != null && arguments.length != 0)
 			for (Object argument : arguments)
-				if (argument instanceof List)
-					handle(sb,(List<?>)argument);
-				else
-					sb.append(".").append(argument);
+				sb.append(".").append(argument);
 		return sb.toString();
-	}
-
-	private void handle(StringBuffer sb, List<?> elements)
-	{
-		if (elements.get(0) instanceof PartyId)
-		{
-			for (Object partyId : elements)
-				sb.append(CPAUtils.toString((PartyId)partyId)).append(",");
-			sb.setLength(sb.length()-1);
-		}
-		else
-			sb.append(".").append(StringUtils.join((List<?>)elements,','));
 	}
 
 	public void setCache(Cache cache)

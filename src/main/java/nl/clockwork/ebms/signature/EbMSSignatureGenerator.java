@@ -30,6 +30,7 @@ import nl.clockwork.ebms.common.util.DOMUtils;
 import nl.clockwork.ebms.common.util.SecurityUtils;
 import nl.clockwork.ebms.model.EbMSAttachment;
 import nl.clockwork.ebms.model.EbMSMessage;
+import nl.clockwork.ebms.model.CacheablePartyId;
 import nl.clockwork.ebms.processor.EbMSProcessingException;
 import nl.clockwork.ebms.processor.EbMSProcessorException;
 import nl.clockwork.ebms.util.CPAUtils;
@@ -43,7 +44,6 @@ import org.apache.xml.security.transforms.Transforms;
 import org.apache.xml.security.transforms.params.XPathContainer;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DeliveryChannel;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.AckRequested;
-import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.PartyId;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -69,8 +69,8 @@ public class EbMSSignatureGenerator
 	{
 		try
 		{
-			if (cpaManager.isNonRepudiationRequired(cpaId,message.getMessageHeader().getFrom().getPartyId(),message.getMessageHeader().getFrom().getRole(),CPAUtils.toString(message.getMessageHeader().getService()),message.getMessageHeader().getAction()))
-				generate(cpaId,message.getMessageHeader().getFrom().getPartyId(),message);
+			if (cpaManager.isNonRepudiationRequired(cpaId,new CacheablePartyId(message.getMessageHeader().getFrom().getPartyId()),message.getMessageHeader().getFrom().getRole(),CPAUtils.toString(message.getMessageHeader().getService()),message.getMessageHeader().getAction()))
+				sign(cpaId,message);
 		}
 		catch (GeneralSecurityException e)
 		{
@@ -88,7 +88,7 @@ public class EbMSSignatureGenerator
 		{
 			if (ackRequested != null && ackRequested.isSigned())
 			{
-				generate(cpaId,message.getMessageHeader().getFrom().getPartyId(),message);
+				sign(cpaId,message);
 			}
 		}
 		catch (GeneralSecurityException e)
@@ -101,9 +101,9 @@ public class EbMSSignatureGenerator
 		}
 	}
 
-	private void generate(String cpaId, List<PartyId> partyId, EbMSMessage message) throws EbMSProcessorException, GeneralSecurityException, XMLSecurityException
+	private void sign(String cpaId, EbMSMessage message) throws EbMSProcessorException, GeneralSecurityException, XMLSecurityException
 	{
-		DeliveryChannel deliveryChannel = cpaManager.getFromDeliveryChannel(cpaId,partyId,message.getMessageHeader().getFrom().getRole(),CPAUtils.toString(message.getMessageHeader().getService()),message.getMessageHeader().getAction());
+		DeliveryChannel deliveryChannel = cpaManager.getFromDeliveryChannel(cpaId,new CacheablePartyId(message.getMessageHeader().getFrom().getPartyId()),message.getMessageHeader().getFrom().getRole(),CPAUtils.toString(message.getMessageHeader().getService()),message.getMessageHeader().getAction());
 		X509Certificate certificate = CPAUtils.getX509Certificate(CPAUtils.getSigningCertificate(deliveryChannel));
 		String alias = keyStore.getCertificateAlias(certificate);
 		if (alias == null)

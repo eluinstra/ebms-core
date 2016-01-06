@@ -21,6 +21,7 @@ import nl.clockwork.ebms.model.EbMSMessageContext;
 import nl.clockwork.ebms.model.EbMSPartyInfo;
 import nl.clockwork.ebms.model.FromPartyInfo;
 import nl.clockwork.ebms.model.Party;
+import nl.clockwork.ebms.model.CacheablePartyId;
 import nl.clockwork.ebms.model.ToPartyInfo;
 import nl.clockwork.ebms.util.CPAUtils;
 import nl.clockwork.ebms.util.EbMSMessageUtils;
@@ -279,7 +280,7 @@ public class EbMSMessageFactory
 
 	private MessageHeader createMessageHeader(String cpaId, MessageHeader messageHeader, Date timestamp, EbMSAction action) throws DatatypeConfigurationException, JAXBException
 	{
-		DeliveryChannel deliveryChannel = cpaManager.getDefaultDeliveryChannel(cpaId,messageHeader.getTo().getPartyId(),action.action());
+		DeliveryChannel deliveryChannel = cpaManager.getDefaultDeliveryChannel(cpaId,new CacheablePartyId(messageHeader.getTo().getPartyId()),action.action());
 		String hostname = CPAUtils.getHostname(deliveryChannel);
 
 		MessageHeader result = XMLMessageBuilder.deepCopy(messageHeader);

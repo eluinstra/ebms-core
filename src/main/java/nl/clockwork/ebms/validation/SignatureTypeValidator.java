@@ -20,6 +20,7 @@ import java.util.List;
 import nl.clockwork.ebms.Constants;
 import nl.clockwork.ebms.common.CPAManager;
 import nl.clockwork.ebms.model.EbMSMessage;
+import nl.clockwork.ebms.model.CacheablePartyId;
 import nl.clockwork.ebms.signature.EbMSSignatureValidator;
 import nl.clockwork.ebms.util.CPAUtils;
 import nl.clockwork.ebms.util.EbMSMessageUtils;
@@ -47,8 +48,8 @@ public class SignatureTypeValidator
 		MessageHeader messageHeader = message.getMessageHeader();
 		SignatureType signature = message.getSignature();
 		
-		DeliveryChannel deliveryChannel = cpaManager.getFromDeliveryChannel(cpaId,messageHeader.getFrom().getPartyId(),messageHeader.getFrom().getRole(),CPAUtils.toString(messageHeader.getService()),messageHeader.getAction());
-		if (cpaManager.isNonRepudiationRequired(cpaId,messageHeader.getFrom().getPartyId(),messageHeader.getFrom().getRole(),CPAUtils.toString(messageHeader.getService()),messageHeader.getAction()))
+		DeliveryChannel deliveryChannel = cpaManager.getFromDeliveryChannel(cpaId,new CacheablePartyId(messageHeader.getFrom().getPartyId()),messageHeader.getFrom().getRole(),CPAUtils.toString(messageHeader.getService()),messageHeader.getAction());
+		if (cpaManager.isNonRepudiationRequired(cpaId,new CacheablePartyId(messageHeader.getFrom().getPartyId()),messageHeader.getFrom().getRole(),CPAUtils.toString(messageHeader.getService()),messageHeader.getAction()))
 		{
 			if (signature == null)
 				throw new EbMSValidationException(EbMSMessageUtils.createError("//Header/Signature",Constants.EbMSErrorCode.SECURITY_FAILURE.errorCode(),"Signature not found."));
