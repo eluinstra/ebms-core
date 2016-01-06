@@ -88,31 +88,9 @@ public class Constants
 
   };
 
-  public static enum EbMSEventType
-  {
-  	SEND(0), EXPIRE(1);
-
-		private final int id;
-
-		EbMSEventType(int id)
-		{
-			this.id = id;
-		}
-
-		public final int id() { return id; }
-
-		public final static EbMSEventType get(int id)
-		{
-			for (EbMSEventType event : EbMSEventType.values())
-				if (event.id() == id)
-					return event;
-			return null;
-		}
-  }
-
   public static enum EbMSEventStatus
   {
-		UNPROCESSED(0), SUCCEEDED(1), FAILED(2)/*, EXPIRED(3)*/;
+		SUCCEEDED(1), FAILED(2), EXPIRED(3), NOT_FOUND(4);
 
 		private final int id;
 

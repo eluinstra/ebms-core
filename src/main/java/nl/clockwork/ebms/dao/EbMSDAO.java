@@ -19,7 +19,6 @@ import java.util.Date;
 import java.util.List;
 
 import nl.clockwork.ebms.Constants.EbMSEventStatus;
-import nl.clockwork.ebms.Constants.EbMSEventType;
 import nl.clockwork.ebms.Constants.EbMSMessageStatus;
 import nl.clockwork.ebms.model.EbMSDocument;
 import nl.clockwork.ebms.model.EbMSEvent;
@@ -62,12 +61,10 @@ public interface EbMSDAO
 	void updateMessage(String messageId, EbMSMessageStatus oldStatus, EbMSMessageStatus newStatus) throws DAOException;
 	void updateMessages(List<String> messageIds, EbMSMessageStatus oldStatus, EbMSMessageStatus newStatus) throws DAOException;
 
-	List<EbMSEvent> getLatestEventsByEbMSMessageIdBefore(Date timestamp, EbMSEventStatus status) throws DAOException;
-	void insertEvent(String messageId, EbMSEventType type, String uri) throws DAOException;
+	List<EbMSEvent> getEventsBefore(Date timestamp) throws DAOException;
 	void insertEvent(EbMSEvent event) throws DAOException;
-	void insertEvents(List<EbMSEvent> events) throws DAOException;
-	void updateEvent(Date timestamp, String messageId, String uri, EbMSEventStatus status, String errorMessage) throws DAOException;
-	void deleteEvents(String messageId, EbMSEventStatus status) throws DAOException;
-	void deleteEventsBefore(Date timestamp, String messageId, EbMSEventStatus status) throws DAOException;
+	void updateEvent(EbMSEvent event) throws DAOException;
+	void deleteEvent(String messageId) throws DAOException;
+	void insertEventLog(String messageId, Date timestamp, String uri, EbMSEventStatus status, String errorMessage) throws DAOException;
 
 }

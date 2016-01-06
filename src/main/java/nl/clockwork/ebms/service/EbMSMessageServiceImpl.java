@@ -36,13 +36,12 @@ import nl.clockwork.ebms.dao.DAOException;
 import nl.clockwork.ebms.dao.DAOTransactionCallback;
 import nl.clockwork.ebms.dao.EbMSDAO;
 import nl.clockwork.ebms.job.EventManager;
-import nl.clockwork.ebms.model.EbMSEvent;
+import nl.clockwork.ebms.model.CacheablePartyId;
 import nl.clockwork.ebms.model.EbMSMessage;
 import nl.clockwork.ebms.model.EbMSMessageContent;
 import nl.clockwork.ebms.model.EbMSMessageContext;
 import nl.clockwork.ebms.model.MessageStatus;
 import nl.clockwork.ebms.model.Party;
-import nl.clockwork.ebms.model.CacheablePartyId;
 import nl.clockwork.ebms.processor.EbMSProcessorException;
 import nl.clockwork.ebms.signature.EbMSSignatureGenerator;
 import nl.clockwork.ebms.util.CPAUtils;
@@ -108,8 +107,7 @@ public class EbMSMessageServiceImpl implements EbMSMessageService
 					public void doInTransaction()
 					{
 						ebMSDAO.insertMessage(new Date(),message,EbMSMessageStatus.SENT);
-						List<EbMSEvent> events = eventManager.createEbMSSendEvents(message.getMessageHeader().getCPAId(),message,cpaManager.getUri(message.getMessageHeader().getCPAId(),new CacheablePartyId(message.getMessageHeader().getTo().getPartyId()),message.getMessageHeader().getTo().getRole(),CPAUtils.toString(message.getMessageHeader().getService()),message.getMessageHeader().getAction()));
-						ebMSDAO.insertEvents(events);
+						eventManager.createEvent(message.getMessageHeader().getCPAId(),cpaManager.getToDeliveryChannel(message.getMessageHeader().getCPAId(),new CacheablePartyId(message.getMessageHeader().getTo().getPartyId()),message.getMessageHeader().getTo().getRole(),CPAUtils.toString(message.getMessageHeader().getService()),message.getMessageHeader().getAction()).getChannelId(),message.getMessageHeader().getMessageData().getMessageId(),message.getMessageHeader().getMessageData().getTimeToLive(),message.getMessageHeader().getMessageData().getTimestamp());
 					}
 				}
 			);

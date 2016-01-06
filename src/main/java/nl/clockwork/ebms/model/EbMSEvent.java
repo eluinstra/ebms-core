@@ -17,26 +17,33 @@ package nl.clockwork.ebms.model;
 
 import java.util.Date;
 
-import nl.clockwork.ebms.Constants.EbMSEventType;
-
 public class EbMSEvent
 {
+	private String cpaId;
+	private String deliveryChannelId;
 	private String messageId;
-	private Date time;
-	private EbMSEventType type;
-	private String uri;
+	private Date timeToLive;
+	private Date timestamp;
+	private int retries;
 
-	public EbMSEvent(String messageId, Date time, EbMSEventType type)
+	public EbMSEvent(String cpaId, String deliveryChannelId, String messageId, Date timeToLive, Date timestamp, int retries)
 	{
-		this(messageId,time,type,null);
+		this.cpaId = cpaId;
+		this.deliveryChannelId = deliveryChannelId;
+		this.messageId = messageId;
+		this.timeToLive = timeToLive;
+		this.timestamp = timestamp;
+		this.retries = retries;
 	}
 
-	public EbMSEvent(String messageId, Date time, EbMSEventType type, String uri)
+	public String getCpaId()
 	{
-		this.messageId = messageId;
-		this.time = time;
-		this.type = type;
-		this.uri = uri;
+		return cpaId;
+	}
+
+	public String getDeliveryChannelId()
+	{
+		return deliveryChannelId;
 	}
 
 	public String getMessageId()
@@ -44,23 +51,19 @@ public class EbMSEvent
 		return messageId;
 	}
 
-	public Date getTime()
+	public Date getTimeToLive()
 	{
-		return time;
+		return timeToLive;
 	}
 
-	public EbMSEventType getType()
+	public Date getTimestamp()
 	{
-		return type;
+		return timestamp;
 	}
 
-	public String getUri()
+	public int getRetries()
 	{
-		return uri;
+		return retries;
 	}
 
-	public void setUri(String uri)
-	{
-		this.uri = uri;
-	}
 }

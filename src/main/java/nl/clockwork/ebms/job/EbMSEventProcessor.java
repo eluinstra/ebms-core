@@ -16,6 +16,7 @@
 package nl.clockwork.ebms.job;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -25,29 +26,31 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import nl.clockwork.ebms.Constants.EbMSEventStatus;
-import nl.clockwork.ebms.Constants.EbMSEventType;
 import nl.clockwork.ebms.Constants.EbMSMessageStatus;
 import nl.clockwork.ebms.client.EbMSClient;
 import nl.clockwork.ebms.client.EbMSResponseException;
 import nl.clockwork.ebms.client.EbMSResponseSOAPException;
+import nl.clockwork.ebms.common.CPAManager;
 import nl.clockwork.ebms.dao.DAOTransactionCallback;
 import nl.clockwork.ebms.dao.EbMSDAO;
 import nl.clockwork.ebms.event.EventListener;
 import nl.clockwork.ebms.model.EbMSDocument;
 import nl.clockwork.ebms.model.EbMSEvent;
 import nl.clockwork.ebms.processor.EbMSMessageProcessor;
+import nl.clockwork.ebms.util.CPAUtils;
 
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DeliveryChannel;
 
 public class EbMSEventProcessor implements Job
 {
-	private class SendEventJob implements Runnable
+	private class HandleEventJob implements Runnable
 	{
 		private EbMSEvent event;
 		
-		public SendEventJob(EbMSEvent event)
+		public HandleEventJob(EbMSEvent event)
 		{
 			this.event = event;
 		}
@@ -55,31 +58,43 @@ public class EbMSEventProcessor implements Job
 		@Override
 		public void run()
 		{
+			DeliveryChannel deliveryChannel = cpaManager.getDeliveryChannel(event.getCpaId(),event.getDeliveryChannelId());
+			if (event.getTimeToLive().after(new Date()))
+				//if (!CPAUtils.isReliableMessaging(deliveryChannel) || event.getRetries() < CPAUtils.getReliableMessaging(deliveryChannel).getRetries().intValue())
+					sendEvent(event,deliveryChannel);
+			else
+				expireEvent(event);
+		}
+
+		private void sendEvent(final EbMSEvent event, DeliveryChannel deliveryChannel)
+		{
+			String url = null;
 			try
 			{
 				EbMSDocument requestDocument = ebMSDAO.getEbMSDocument(event.getMessageId());
 				if (requestDocument != null)
 				{
-					logger.info("Sending message " + event.getMessageId() + " to " + event.getUri());
-					EbMSDocument responseDocument = ebMSClient.sendMessage(event.getUri(),requestDocument);
+					url = CPAUtils.getUri(deliveryChannel);
+					logger.info("Sending message " + event.getMessageId() + " to " + url);
+					EbMSDocument responseDocument = ebMSClient.sendMessage(url,requestDocument);
 					messageProcessor.processResponse(requestDocument,responseDocument);
-					updateEvent(event,EbMSEventStatus.SUCCEEDED,null);
+					eventManager.updateEvent(event,url,EbMSEventStatus.SUCCEEDED,null);
 				}
 				else
-					ebMSDAO.deleteEvents(event.getMessageId(),EbMSEventStatus.UNPROCESSED);
+					eventManager.updateEvent(event,url,EbMSEventStatus.NOT_FOUND,null);
 			}
 			catch (final EbMSResponseException e)
 			{
+				final String url_ = url;
 				ebMSDAO.executeTransaction(
 					new DAOTransactionCallback()
 					{
 						@Override
 						public void doInTransaction()
 						{
-							updateEvent(event,EbMSEventStatus.FAILED,e.getMessage());
+							eventManager.updateEvent(event,url_,EbMSEventStatus.FAILED,e.getMessage());
 							if (e instanceof EbMSResponseSOAPException && EbMSResponseSOAPException.CLIENT.equals(((EbMSResponseSOAPException)e).getFaultCode()))
 							{
-								ebMSDAO.deleteEvents(event.getMessageId(),EbMSEventStatus.UNPROCESSED);
 								ebMSDAO.updateMessage(event.getMessageId(),EbMSMessageStatus.SENT,EbMSMessageStatus.DELIVERY_FAILED);
 								eventListener.onMessageFailed(event.getMessageId());
 							}
@@ -90,23 +105,12 @@ public class EbMSEventProcessor implements Job
 			}
 			catch (Exception e)
 			{
-				updateEvent(event,EbMSEventStatus.FAILED,ExceptionUtils.getStackTrace(e));
+				eventManager.updateEvent(event,url,EbMSEventStatus.FAILED,ExceptionUtils.getStackTrace(e));
 				logger.error("",e);
 			}
 		}
-	}
 
-	private class ExpireEventJob implements Runnable
-	{
-		private EbMSEvent event;
-		
-		public ExpireEventJob(EbMSEvent event)
-		{
-			this.event = event;
-		}
-
-		@Override
-		public void run()
+		private void expireEvent(final EbMSEvent event)
 		{
 			try
 			{
@@ -120,13 +124,12 @@ public class EbMSEventProcessor implements Job
 							EbMSDocument requestDocument = ebMSDAO.getEbMSDocument(event.getMessageId());
 							if (requestDocument != null)
 							{
-								updateEvent(event,EbMSEventStatus.SUCCEEDED,null);
-								ebMSDAO.deleteEvents(event.getMessageId(),EbMSEventStatus.UNPROCESSED);
+								eventManager.updateEvent(event,null,EbMSEventStatus.SUCCEEDED,null);
 								ebMSDAO.updateMessage(event.getMessageId(),EbMSMessageStatus.SENT,EbMSMessageStatus.EXPIRED);
 								eventListener.onMessageExpired(event.getMessageId());
 							}
 							else
-								ebMSDAO.deleteEvents(event.getMessageId(),EbMSEventStatus.UNPROCESSED);
+								eventManager.updateEvent(event,null,EbMSEventStatus.NOT_FOUND,null);
 						}
 					}
 				);
@@ -136,7 +139,7 @@ public class EbMSEventProcessor implements Job
 				logger.error("",e);
 			}
 		}
-		
+
 	}
 
 	protected transient Log logger = LogFactory.getLog(getClass());
@@ -146,12 +149,13 @@ public class EbMSEventProcessor implements Job
 	private Integer queueScaleFactor;
 	private EventListener eventListener;
 	private EbMSDAO ebMSDAO;
+	private CPAManager cpaManager;
+	private EventManager eventManager;
 	private EbMSClient ebMSClient;
 	private EbMSMessageProcessor messageProcessor;
 
 	public void init()
 	{
-		//executorService = Executors.newFixedThreadPool(maxThreads);
 		if (processorsScaleFactor == null || processorsScaleFactor <= 0)
 		{
 			processorsScaleFactor = 1;
@@ -167,20 +171,35 @@ public class EbMSEventProcessor implements Job
 			queueScaleFactor = 1;
 			logger.info(this.getClass().getName() + " using queue scale factor " + queueScaleFactor);
 		}
-		executorService = new ThreadPoolExecutor(maxThreads,maxThreads,1,TimeUnit.MINUTES,new ArrayBlockingQueue<Runnable>(maxThreads * queueScaleFactor,true),new ThreadPoolExecutor.CallerRunsPolicy());
 	}
 	
   @Override
   public void execute()
   {
+		//executorService = Executors.newFixedThreadPool(maxThreads);
+		executorService = new ThreadPoolExecutor(maxThreads,maxThreads,1,TimeUnit.MINUTES,new ArrayBlockingQueue<Runnable>(maxThreads * queueScaleFactor,true),new ThreadPoolExecutor.CallerRunsPolicy());
   	GregorianCalendar timestamp = new GregorianCalendar();
-  	List<EbMSEvent> events = ebMSDAO.getLatestEventsByEbMSMessageIdBefore(timestamp.getTime(),EbMSEventStatus.UNPROCESSED);
+  	List<EbMSEvent> events = ebMSDAO.getEventsBefore(timestamp.getTime());
+  	for (final EbMSEvent event : events)
+  		executorService.submit(new HandleEventJob(event));
+  	executorService.shutdown();
+  	try
+		{
+			while (!executorService.awaitTermination(1,TimeUnit.HOURS));
+		}
+		catch (InterruptedException e)
+		{
+			logger.trace(e);
+		}
+  }
+  
+  public void executeOld()
+  {
+  	GregorianCalendar timestamp = new GregorianCalendar();
+  	List<EbMSEvent> events = ebMSDAO.getEventsBefore(timestamp.getTime());
   	List<Future<?>> futures = new ArrayList<Future<?>>();
   	for (final EbMSEvent event : events)
-			if (EbMSEventType.EXPIRE.equals(event.getType()))
-	  		futures.add(executorService.submit(new ExpireEventJob(event)));
-			else
-	  		futures.add(executorService.submit(new SendEventJob(event)));
+  		futures.add(executorService.submit(new HandleEventJob(event)));
   	for (Future<?> future : futures)
 			try
 			{
@@ -192,21 +211,6 @@ public class EbMSEventProcessor implements Job
 			}
   }
   
-	private void updateEvent(final EbMSEvent event, final EbMSEventStatus status, final String errorMessage)
-	{
-		ebMSDAO.executeTransaction(
-			new DAOTransactionCallback()
-			{
-				@Override
-				public void doInTransaction()
-				{
-					ebMSDAO.updateEvent(event.getTime(),event.getMessageId(),event.getUri(),status,errorMessage);
-					ebMSDAO.deleteEventsBefore(event.getTime(),event.getMessageId(),EbMSEventStatus.UNPROCESSED);
-				}
-			}
-		);
-	}
-
 	public void setMaxThreads(Integer maxThreads)
 	{
 		this.maxThreads = maxThreads;
@@ -230,6 +234,16 @@ public class EbMSEventProcessor implements Job
   public void setEbMSDAO(EbMSDAO ebMSDAO)
 	{
 		this.ebMSDAO = ebMSDAO;
+	}
+
+  public void setCpaManager(CPAManager cpaManager)
+	{
+		this.cpaManager = cpaManager;
+	}
+
+  public void setEventManager(EventManager eventManager)
+	{
+		this.eventManager = eventManager;
 	}
 
   public void setEbMSClient(EbMSClient ebMSClient)

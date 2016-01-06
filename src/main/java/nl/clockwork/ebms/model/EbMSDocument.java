@@ -22,7 +22,6 @@ import org.w3c.dom.Document;
 
 public class EbMSDocument
 {
-	//private String soapAction;
 	private Document message;
 	private List<EbMSAttachment> attachments = new ArrayList<EbMSAttachment>();
 	

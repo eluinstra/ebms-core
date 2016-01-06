@@ -5,10 +5,10 @@ import java.util.List;
 
 import nl.clockwork.ebms.Constants;
 import nl.clockwork.ebms.dao.EbMSDAO;
+import nl.clockwork.ebms.model.CacheablePartyId;
 import nl.clockwork.ebms.model.EbMSPartyInfo;
 import nl.clockwork.ebms.model.FromPartyInfo;
 import nl.clockwork.ebms.model.Party;
-import nl.clockwork.ebms.model.CacheablePartyId;
 import nl.clockwork.ebms.model.Role;
 import nl.clockwork.ebms.model.ToPartyInfo;
 import nl.clockwork.ebms.util.CPAUtils;
@@ -226,6 +226,16 @@ public class CPAManager
 		return getCanReceive(getPartyInfo(cpaId,partyId),role,service,action) != null;
 	}
 
+	public DeliveryChannel getDeliveryChannel(String cpaId, String deliveryChannelId)
+	{
+		CollaborationProtocolAgreement cpa = getCPA(cpaId);
+		for (PartyInfo partyInfo : cpa.getPartyInfo())
+			for (DeliveryChannel deliveryChannel : partyInfo.getDeliveryChannel())
+				if (deliveryChannel.getChannelId().equals(deliveryChannelId))
+					return deliveryChannel;
+		return null;
+	}
+
 	public DeliveryChannel getDefaultDeliveryChannel(String cpaId, CacheablePartyId partyId, String action)
 	{
 		PartyInfo partyInfo = getPartyInfo(cpaId,partyId);
@@ -275,15 +285,12 @@ public class CPAManager
 		return canSend.getThisPartyActionBinding().getBusinessTransactionCharacteristics().isIsNonRepudiationRequired() && docExchange.getEbXMLSenderBinding() != null && docExchange.getEbXMLSenderBinding().getSenderNonRepudiation() != null;
 	}
 
-	private String getOriginalUri(String cpaId, CacheablePartyId partyId, String role, String service, String action)
-	{
-		return CPAUtils.getUri(getToDeliveryChannel(cpaId,partyId,role,service,action));
-	}
-
 	public String getUri(String cpaId, CacheablePartyId partyId, String role, String service, String action)
 	{
-		String replacementUrl = getUrl(cpaId);
-		return replacementUrl == null ? getOriginalUri(cpaId,partyId,role,service,action) : replacementUrl;
+		String result = getUrl(cpaId);
+		if (result == null)
+			result = CPAUtils.getUri(getToDeliveryChannel(cpaId,partyId,role,service,action));
+		return result;
 	}
 
 	public void setEbMSDAO(EbMSDAO ebMSDAO)

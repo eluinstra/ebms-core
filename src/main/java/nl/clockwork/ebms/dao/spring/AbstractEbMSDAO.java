@@ -32,7 +32,6 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
 import nl.clockwork.ebms.Constants.EbMSEventStatus;
-import nl.clockwork.ebms.Constants.EbMSEventType;
 import nl.clockwork.ebms.Constants.EbMSMessageStatus;
 import nl.clockwork.ebms.common.XMLMessageBuilder;
 import nl.clockwork.ebms.common.util.DOMUtils;
@@ -442,7 +441,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 		try
 		{
 			String document = jdbcTemplate.queryForObject(
-				"select content" +
+				"select cpa_id, content" +
 				" from ebms_message" +
 				" where message_id = ?" +
 				" and message_nr = 0" +
@@ -839,63 +838,24 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	}
 
 	@Override
-	public List<EbMSEvent> getLatestEventsByEbMSMessageIdBefore(Date timestamp, EbMSEventStatus status) throws DAOException
+	public List<EbMSEvent> getEventsBefore(Date timestamp) throws DAOException
 	{
 		try
 		{
 			return jdbcTemplate.query(
-				"select e.message_id, e.time, e.type, e.uri" +
-				" from ebms_event e" + 
-				" inner join (" +
-					"	select message_id, max(time) as time" +
-					" from ebms_event" +
-					" where status = ?" +
-					" and time <= ?" +
-					" group by message_id" +
-				") l" +
-				" on e.message_id = l.message_id" +
-				" and e.time = l.time" +
-				" order by e.time asc",
+				"select cpa_id, channel_id, message_id, time_to_live, time_stamp, retries" +
+				" from ebms_event" +
+				" where time_stamp <= ?" +
+				" order by time_stamp asc",
 				new ParameterizedRowMapper<EbMSEvent>()
 				{
 					@Override
 					public EbMSEvent mapRow(ResultSet rs, int rowNum) throws SQLException
 					{
-						return new EbMSEvent(rs.getString("message_id"),rs.getTimestamp("time"),EbMSEventType.values()[rs.getInt("type")],rs.getString("uri"));
+						return new EbMSEvent(rs.getString("cpa_id"),rs.getString("channel_id"),rs.getString("message_id"),rs.getTimestamp("time_to_live"),rs.getTimestamp("time_stamp"),rs.getInt("retries"));
 					}
 				},
-				status.id(),
 				timestamp
-			);
-		}
-		catch (DataAccessException e)
-		{
-			throw new DAOException(e);
-		}
-	}
-	
-	@Override
-	public void insertEvent(String messageId, EbMSEventType type, String uri) throws DAOException
-	{
-		try
-		{
-			Date date = new Date();
-			jdbcTemplate.update
-			(
-				"insert into ebms_event (" +
-					"message_id," +
-					"time," +
-					"type," +
-					"status," +
-					"status_time," +
-					"uri" +
-				") values (?,?,?,?,?,?)",
-				messageId,
-				date,
-				type.id(),
-				EbMSEventStatus.UNPROCESSED.id(),
-				date,
-				uri
 			);
 		}
 		catch (DataAccessException e)
@@ -909,22 +869,21 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	{
 		try
 		{
-			jdbcTemplate.update
-			(
+			jdbcTemplate.update(
 				"insert into ebms_event (" +
+					"cpa_id," +
+					"channel_id," +
 					"message_id," +
-					"time," +
-					"type," +
-					"status," +
-					"status_time," +
-					"uri" +
+					"time_to_live," +
+					"time_stamp," +
+					"retries" +
 				") values (?,?,?,?,?,?)",
+				event.getCpaId(),
+				event.getDeliveryChannelId(),
 				event.getMessageId(),
-				event.getTime(),
-				event.getType().id(),
-				EbMSEventStatus.UNPROCESSED.id(),
-				new Date(),
-				event.getUri()
+				event.getTimeToLive(),
+				event.getTimestamp(),
+				event.getRetries()
 			);
 		}
 		catch (DataAccessException e)
@@ -934,66 +893,18 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	}
 
 	@Override
-	public void insertEvents(final List<EbMSEvent> events) throws DAOException
-	{
-		try
-		{
-			jdbcTemplate.batchUpdate
-			(
-				"insert into ebms_event (" +
-					"message_id," +
-					"time," +
-					"type," +
-					"status," +
-					"status_time," +
-					"uri" +
-				") values (?,?,?,?,?,?)",
-				new BatchPreparedStatementSetter()
-				{
-					@Override
-					public void setValues(PreparedStatement ps, int i) throws SQLException
-					{
-						ps.setString(1,events.get(i).getMessageId());
-						ps.setTimestamp(2,new Timestamp(events.get(i).getTime().getTime()));
-						ps.setInt(3,events.get(i).getType().id());
-						ps.setInt(4,EbMSEventStatus.UNPROCESSED.id());
-						ps.setTimestamp(5,new Timestamp(new Date().getTime()));
-						ps.setString(6,events.get(i).getUri());
-					}
-					
-					@Override
-					public int getBatchSize()
-					{
-						return events.size();
-					}
-				}
-			);
-		}
-		catch (DataAccessException e)
-		{
-			throw new DAOException(e);
-		}
-	}
-
-	@Override
-	public void updateEvent(Date timestamp, String messageId, String uri, EbMSEventStatus status, String errorMessage) throws DAOException
+	public void updateEvent(EbMSEvent event) throws DAOException
 	{
 		try
 		{
 			jdbcTemplate.update(
 				"update ebms_event set" +
-				" uri = ?," +
-				" status = ?," +
-				" status_time = ?," +
-				" error_message = ?" +
-				" where message_id = ?" +
-				" and time = ?",
-				uri,
-				status.id(),
-				new Date(),
-				errorMessage,
-				messageId,
-				timestamp
+				" time_stamp = ?" +
+				" retries = ?" +
+				" where message_id = ?",
+				event.getTimestamp(),
+				event.getRetries(),
+				event.getMessageId()
 			);
 		}
 		catch (DataAccessException e)
@@ -1003,17 +914,14 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	}
 	
 	@Override
-	public void deleteEvents(String messageId, EbMSEventStatus status) throws DAOException
+	public void deleteEvent(String messageId) throws DAOException
 	{
 		try
 		{
-			jdbcTemplate.update
-			(
+			jdbcTemplate.update(
 				"delete from ebms_event" +
-				" where message_id = ?" +
-				" and status = ?",
-				messageId,
-				status.id()
+				" where message_id = ?",
+				messageId
 			);
 		}
 		catch (DataAccessException e)
@@ -1023,18 +931,23 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	}
 
 	@Override
-	public void deleteEventsBefore(Date timestamp, String messageId, EbMSEventStatus status) throws DAOException
+	public void insertEventLog(String messageId, Date timestamp, String uri, EbMSEventStatus status, String errorMessage) throws DAOException
 	{
 		try
 		{
 			jdbcTemplate.update(
-				"delete from ebms_event" +
-				" where message_id = ?" +
-				" and time < ?" +
-				" and status = ?",
+				"insert into ebms_event_log (" +
+					"message_id," +
+					"time_stamp," +
+					"uri" +
+					"status" +
+					"error_message" +
+				") values (?,?,?,?,?)",
 				messageId,
 				timestamp,
-				status.id()
+				uri,
+				status.id(),
+				errorMessage
 			);
 		}
 		catch (DataAccessException e)

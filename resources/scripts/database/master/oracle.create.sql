@@ -43,14 +43,19 @@ ALTER TABLE ebms_attachment ADD CONSTRAINT uc_ebms_attachment UNIQUE (message_id
 
 CREATE TABLE ebms_event
 (
-	message_id				VARCHAR(256)		NOT NULL,
-	time							TIMESTAMP				NOT NULL,
-	type							NUMBER(5)				NOT NULL,
-	status						NUMBER(5)				NOT NULL,
-	status_time				TIMESTAMP				NOT NULL,
-	uri								VARCHAR(256)		NULL,
-	error_message			CLOB						NULL,
-	CONSTRAINT uc_ebms_event UNIQUE (message_id,time)
+	cpa_id						VARCHAR(256)		NOT NULL,
+	channel_id				VARCHAR(256)		NOT NULL,
+	message_id				VARCHAR(256)		NOT NULL UNIQUE,
+	time_to_live			TIMESTAMP				NULL,
+	time_stamp				TIMESTAMP				NOT NULL,
+	retries						NUMBER(5)				DEFAULT 0 NOT NULL
 );
 
-CREATE INDEX i_ebms_event ON ebms_event (status);
+CREATE TABLE ebms_event_log
+(
+	message_id				VARCHAR(256)		NOT NULL,
+	time_stamp				TIMESTAMP				NOT NULL,
+	uri								VARCHAR(256)		NULL,
+	status						NUMBER(5)				NOT NULL,
+	error_message			CLOB						NULL
+);

@@ -32,7 +32,6 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
 import nl.clockwork.ebms.Constants.EbMSEventStatus;
-import nl.clockwork.ebms.Constants.EbMSEventType;
 import nl.clockwork.ebms.Constants.EbMSMessageStatus;
 import nl.clockwork.ebms.common.XMLMessageBuilder;
 import nl.clockwork.ebms.common.util.DOMUtils;
@@ -991,7 +990,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	}
 
 	@Override
-	public List<EbMSEvent> getLatestEventsByEbMSMessageIdBefore(Date timestamp, EbMSEventStatus status) throws DAOException
+	public List<EbMSEvent> getEventsBefore(Date timestamp) throws DAOException
 	{
 		Connection c = null;
 		try
@@ -999,67 +998,20 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 			List<EbMSEvent> result = new ArrayList<EbMSEvent>();
 			c = connectionManager.getConnection();
 			try (PreparedStatement ps = c.prepareStatement(
-				"select e.message_id, e.time, e.type, e.uri" +
-				" from ebms_event e" + 
-				" inner join (" +
-					"	select message_id, max(time) as time" +
-					" from ebms_event" +
-					" where status = ?" +
-					" and time <= ?" +
-					" group by message_id" +
-				") l" +
-				" on e.message_id = l.message_id" +
-				" and e.time = l.time" +
-				" order by e.time asc"
+				"select cpa_id, channel_id, message_id, time_to_live, time_stamp, retries" +
+				" from ebms_event" +
+				" where time_stamp <= ?" +
+				" order by time_stamp asc"
 			))
 			{
-				ps.setInt(1,status.id());
-				ps.setTimestamp(2,new Timestamp(timestamp.getTime()));
+				ps.setTimestamp(1,new Timestamp(timestamp.getTime()));
 				if (ps.execute())
 				{
 					ResultSet rs = ps.getResultSet();
 					if (rs.next())
-						result.add(new EbMSEvent(rs.getString("message_id"),rs.getTimestamp("time"),EbMSEventType.values()[rs.getInt("type")],rs.getString("uri")));
+						result.add(new EbMSEvent(rs.getString("cpa_id"),rs.getString("channel_id"),rs.getString("message_id"),rs.getTimestamp("time_to_live"),rs.getTimestamp("time_stamp"),rs.getInt("retries")));
 				}
 				return result;
-			}
-		}
-		catch (SQLException e)
-		{
-			throw new DAOException(e);
-		}
-		finally
-		{
-			connectionManager.close();
-		}
-	}
-	
-	@Override
-	public void insertEvent(String messageId, EbMSEventType type, String uri) throws DAOException
-	{
-		Connection c = null;
-		try
-		{
-			c = connectionManager.getConnection();
-			try (PreparedStatement ps  = c.prepareStatement(
-				"insert into ebms_event (" +
-					"message_id," +
-					"time," +
-					"type," +
-					"status," +
-					"status_time," +
-					"uri" +
-				") values (?,?,?,?,?,?)"
-			))
-			{
-				Timestamp timestamp = new Timestamp(new Date().getTime());
-				ps.setString(1,messageId);
-				ps.setTimestamp(2,timestamp);
-				ps.setInt(3,type.id());
-				ps.setInt(4,EbMSEventStatus.UNPROCESSED.id());
-				ps.setTimestamp(5,timestamp);
-				ps.setString(6,uri);
-				ps.executeUpdate();
 			}
 		}
 		catch (SQLException e)
@@ -1081,21 +1033,21 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 			c = connectionManager.getConnection();
 			try (PreparedStatement ps  = c.prepareStatement(
 				"insert into ebms_event (" +
+					"cpa_id," +
+					"channel_id," +
 					"message_id," +
-					"time," +
-					"type," +
-					"status," +
-					"status_time," +
-					"uri" +
+					"time_to_live," +
+					"time_stamp," +
+					"retries" +
 				") values (?,?,?,?,?,?)"
 			))
 			{
-				ps.setString(1,event.getMessageId());
-				ps.setTimestamp(2,new Timestamp(event.getTime().getTime()));
-				ps.setInt(3,event.getType().id());
-				ps.setInt(4,EbMSEventStatus.UNPROCESSED.id());
-				ps.setTimestamp(5,new Timestamp(new Date().getTime()));
-				ps.setString(6,event.getUri());
+				ps.setString(1,event.getCpaId());
+				ps.setString(2,event.getDeliveryChannelId());
+				ps.setString(3,event.getMessageId());
+				ps.setTimestamp(4,new Timestamp(event.getTimeToLive().getTime()));
+				ps.setTimestamp(5,new Timestamp(event.getTimestamp().getTime()));
+				ps.setInt(6,event.getRetries());
 				ps.executeUpdate();
 			}
 		}
@@ -1110,49 +1062,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	}
 
 	@Override
-	public void insertEvents(List<EbMSEvent> events) throws DAOException
-	{
-		Connection c = null;
-		try
-		{
-			c = connectionManager.getConnection();
-			try (PreparedStatement ps  = c.prepareStatement(
-				"insert into ebms_event (" +
-					"message_id," +
-					"time," +
-					"type," +
-					"status," +
-					"status_time," +
-					"uri" +
-				") values (?,?,?,?,?,?)"
-			))
-			{
-				for (EbMSEvent event : events)
-				{
-					ps.setString(1,event.getMessageId());
-					ps.setTimestamp(2,new Timestamp(event.getTime().getTime()));
-					ps.setInt(3,event.getType().id());
-					ps.setInt(4,EbMSEventStatus.UNPROCESSED.id());
-					ps.setTimestamp(5,new Timestamp(new Date().getTime()));
-					ps.setString(6,event.getUri());
-					ps.addBatch();
-				}
-				if (events.size() > 0)
-					ps.executeBatch();
-			}
-		}
-		catch (SQLException e)
-		{
-			throw new DAOException(e);
-		}
-		finally
-		{
-			connectionManager.close();
-		}
-	}
-
-	@Override
-	public void updateEvent(Date timestamp, String messageId, String uri, EbMSEventStatus status, String errorMessage) throws DAOException
+	public void updateEvent(EbMSEvent event) throws DAOException
 	{
 		Connection c = null;
 		try
@@ -1160,20 +1070,14 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 			c = connectionManager.getConnection();
 			try (PreparedStatement ps  = c.prepareStatement(
 				"update ebms_event set" +
-				" uri = ?," +
-				" status = ?," +
-				" status_time = ?," +
-				" error_message = ?" +
-				" where message_id = ?" +
-				" and time = ?"
+				" time_stamp = ?" +
+				" retries = ?" +
+				" where message_id = ?"
 			))
 			{
-				ps.setString(1,uri);
-				ps.setInt(2,status.id());
-				ps.setTimestamp(3,new Timestamp(new Date().getTime()));
-				ps.setString(4,errorMessage);
-				ps.setString(5,messageId);
-				ps.setTimestamp(6,new Timestamp(timestamp.getTime()));
+				ps.setTimestamp(1,new Timestamp(event.getTimestamp().getTime()));
+				ps.setInt(2,event.getRetries());
+				ps.setString(3,event.getMessageId());
 				ps.executeUpdate();
 			}
 		}
@@ -1188,7 +1092,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	}
 	
 	@Override
-	public void deleteEvents(String messageId, EbMSEventStatus status) throws DAOException
+	public void deleteEvent(String messageId) throws DAOException
 	{
 		Connection c = null;
 		try
@@ -1196,12 +1100,10 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 			c = connectionManager.getConnection();
 			try (PreparedStatement ps  = c.prepareStatement(
 				"delete from ebms_event" +
-				" where message_id = ?" +
-				" and status = ?"
+				" where message_id = ?"
 			))
 			{
 				ps.setString(1,messageId);
-				ps.setInt(2,status.id());
 				ps.executeUpdate();
 			}
 		}
@@ -1216,22 +1118,27 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	}
 
 	@Override
-	public void deleteEventsBefore(Date timestamp, String messageId, EbMSEventStatus status) throws DAOException
+	public void insertEventLog(String messageId, Date timestamp, String uri, EbMSEventStatus status, String errorMessage) throws DAOException
 	{
 		Connection c = null;
 		try
 		{
 			c = connectionManager.getConnection();
 			try (PreparedStatement ps  = c.prepareStatement(
-				"delete from ebms_event" +
-				" where message_id = ?" +
-				" and time < ?" +
-				" and status = ?"
+				"insert into ebms_event_log (" +
+					"message_id," +
+					"time_stamp," +
+					"uri" +
+					"status" +
+					"error_message" +
+				") values (?,?,?,?,?)"
 			))
 			{
 				ps.setString(1,messageId);
 				ps.setTimestamp(2,new Timestamp(timestamp.getTime()));
-				ps.setInt(3,status.id());
+				ps.setString(3,uri);
+				ps.setInt(4,status.id());
+				ps.setString(5,errorMessage);
 				ps.executeUpdate();
 			}
 		}
@@ -1244,7 +1151,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 			connectionManager.close();
 		}
 	}
-	
+
 	protected List<EbMSAttachment> getAttachments(String messageId) throws SQLException
 	{
 		Connection c = null;

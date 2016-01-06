@@ -54,15 +54,21 @@ ALTER TABLE ebms_attachment ADD CONSTRAINT uc_ebms_attachment UNIQUE (ebms_messa
 
 CREATE TABLE ebms_event
 (
+	cpa_id						VARCHAR(256)		NOT NULL,
+	channel_id				VARCHAR(256)		NOT NULL,
 	message_id				VARCHAR(256)		NOT NULL,
-	time							TIMESTAMP				NOT NULL,
-	type							SMALLINT				NOT NULL,
-	status						SMALLINT				NOT NULL,
-	status_time				TIMESTAMP				NOT NULL,
+	time_to_live			TIMESTAMP				NULL,
+	time_stamp				TIMESTAMP				NOT NULL,
+	retries						SMALLINT				DEFAULT 0 NOT NULL
+);
+
+ALTER TABLE ebms_event ADD CONSTRAINT uc_ebms_event UNIQUE (message_id(255));
+
+CREATE TABLE ebms_event_log
+(
+	message_id				VARCHAR(256)		NOT NULL,
+	time_stamp				TIMESTAMP				NOT NULL,
 	uri								VARCHAR(256)		NULL,
+	status						SMALLINT				NOT NULL,
 	error_message			TEXT						NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
-ALTER TABLE ebms_event ADD CONSTRAINT uc_ebms_event UNIQUE (message_id(255),time);
-
-CREATE INDEX i_ebms_event ON ebms_event (status);
+);

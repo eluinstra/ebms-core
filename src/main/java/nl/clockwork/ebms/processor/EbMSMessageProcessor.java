@@ -28,7 +28,6 @@ import javax.xml.xpath.XPathExpressionException;
 
 import nl.clockwork.ebms.Constants;
 import nl.clockwork.ebms.Constants.EbMSAction;
-import nl.clockwork.ebms.Constants.EbMSEventType;
 import nl.clockwork.ebms.Constants.EbMSMessageStatus;
 import nl.clockwork.ebms.client.DeliveryManager;
 import nl.clockwork.ebms.common.CPAManager;
@@ -39,10 +38,10 @@ import nl.clockwork.ebms.dao.DAOTransactionCallback;
 import nl.clockwork.ebms.dao.EbMSDAO;
 import nl.clockwork.ebms.event.EventListener;
 import nl.clockwork.ebms.job.EventManager;
+import nl.clockwork.ebms.model.CacheablePartyId;
 import nl.clockwork.ebms.model.EbMSDocument;
 import nl.clockwork.ebms.model.EbMSMessage;
 import nl.clockwork.ebms.model.EbMSMessageContext;
-import nl.clockwork.ebms.model.CacheablePartyId;
 import nl.clockwork.ebms.signature.EbMSSignatureGenerator;
 import nl.clockwork.ebms.signature.EbMSSignatureValidator;
 import nl.clockwork.ebms.util.CPAUtils;
@@ -249,7 +248,7 @@ public class EbMSMessageProcessor
 						{
 							ebMSDAO.insertDuplicateMessage(timestamp,message);
 							EbMSMessageContext messageContext = ebMSDAO.getMessageContextByRefToMessageId(messageHeader.getMessageData().getMessageId(),mshMessageService,EbMSAction.MESSAGE_ERROR.action(),EbMSAction.ACKNOWLEDGMENT.action());
-							ebMSDAO.insertEvent(messageContext.getMessageId(),EbMSEventType.SEND,cpaManager.getUri(cpaId,new CacheablePartyId(message.getMessageHeader().getFrom().getPartyId()),message.getMessageHeader().getFrom().getRole(),CPAUtils.toString(CPAUtils.createEbMSMessageService()),null));
+							eventManager.createEvent(cpaId,cpaManager.getToDeliveryChannel(cpaId,new CacheablePartyId(message.getMessageHeader().getFrom().getPartyId()),message.getMessageHeader().getFrom().getRole(),CPAUtils.toString(CPAUtils.createEbMSMessageService()),null).getChannelId(),messageContext.getMessageId(),message.getMessageHeader().getMessageData().getTimeToLive(),messageContext.getTimestamp());
 						}
 					}
 				);
@@ -299,7 +298,7 @@ public class EbMSMessageProcessor
 								ebMSDAO.insertMessage(timestamp,message,EbMSMessageStatus.RECEIVED);
 								ebMSDAO.insertMessage(timestamp,acknowledgment,null);
 								if (message.getSyncReply() == null)
-									ebMSDAO.insertEvent(eventManager.createEbMSSendEvent(acknowledgment,cpaManager.getUri(cpaId,new CacheablePartyId(acknowledgment.getMessageHeader().getTo().getPartyId()),acknowledgment.getMessageHeader().getTo().getRole(),CPAUtils.toString(acknowledgment.getMessageHeader().getService()),acknowledgment.getMessageHeader().getAction())));
+									eventManager.createEvent(cpaId,cpaManager.getToDeliveryChannel(cpaId,new CacheablePartyId(acknowledgment.getMessageHeader().getTo().getPartyId()),acknowledgment.getMessageHeader().getTo().getRole(),CPAUtils.toString(acknowledgment.getMessageHeader().getService()),acknowledgment.getMessageHeader().getAction()).getChannelId(),acknowledgment.getMessageHeader().getMessageData().getMessageId(),acknowledgment.getMessageHeader().getMessageData().getTimeToLive(),acknowledgment.getMessageHeader().getMessageData().getTimestamp());
 								eventListener.onMessageReceived(message.getMessageHeader().getMessageData().getMessageId());
 							}
 						}
@@ -324,7 +323,7 @@ public class EbMSMessageProcessor
 							ebMSDAO.insertMessage(timestamp,message,EbMSMessageStatus.FAILED);
 							ebMSDAO.insertMessage(timestamp,messageError,null);
 							if (message.getSyncReply() == null)
-								ebMSDAO.insertEvent(eventManager.createEbMSSendEvent(messageError,cpaManager.getUri(cpaId,new CacheablePartyId(messageError.getMessageHeader().getTo().getPartyId()),messageError.getMessageHeader().getTo().getRole(),CPAUtils.toString(messageError.getMessageHeader().getService()),messageError.getMessageHeader().getAction())));
+								eventManager.createEvent(cpaId,cpaManager.getToDeliveryChannel(cpaId,new CacheablePartyId(messageError.getMessageHeader().getTo().getPartyId()),messageError.getMessageHeader().getTo().getRole(),CPAUtils.toString(messageError.getMessageHeader().getService()),messageError.getMessageHeader().getAction()).getChannelId(),messageError.getMessageHeader().getMessageData().getMessageId(),messageError.getMessageHeader().getMessageData().getTimeToLive(),messageError.getMessageHeader().getMessageData().getTimestamp());
 						}
 					}
 				);
