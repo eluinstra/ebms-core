@@ -49,7 +49,7 @@ public interface EbMSDAO
 	EbMSMessageContext getMessageContext(String messageId) throws DAOException;
 	EbMSMessageContext getMessageContextByRefToMessageId(String refToMessageId, Service service, String...actions) throws DAOException;
 	Document getDocument(String messageId) throws DAOException;
-	EbMSDocument getEbMSDocument(String messageId) throws DAOException;
+	EbMSDocument getEbMSDocumentIfUnsent(String messageId) throws DAOException;
 	EbMSDocument getEbMSDocumentByRefToMessageId(String refToMessageId, Service service, String...actions) throws DAOException;
 	EbMSMessageStatus getMessageStatus(String messageId) throws DAOException;
 

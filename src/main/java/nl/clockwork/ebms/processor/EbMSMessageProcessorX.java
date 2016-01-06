@@ -277,7 +277,6 @@ public class EbMSMessageProcessorX extends EbMSMessageProcessor
 						public void doInTransaction()
 						{
 							ebMSDAO.insertMessage(timestamp,responseMessage,null);
-							eventManager.deleteEvent(responseMessage.getMessageHeader().getMessageData().getRefToMessageId());
 							ebMSDAO.updateMessage(responseMessage.getMessageHeader().getMessageData().getRefToMessageId(),EbMSMessageStatus.SENT,EbMSMessageStatus.DELIVERY_FAILED);
 							eventListener.onMessageFailed(responseMessage.getMessageHeader().getMessageData().getRefToMessageId());
 						}
@@ -310,7 +309,6 @@ public class EbMSMessageProcessorX extends EbMSMessageProcessor
 						public void doInTransaction()
 						{
 							ebMSDAO.insertMessage(timestamp,responseMessage,null);
-							eventManager.deleteEvent(responseMessage.getMessageHeader().getMessageData().getRefToMessageId());
 							ebMSDAO.updateMessage(responseMessage.getMessageHeader().getMessageData().getRefToMessageId(),EbMSMessageStatus.SENT,EbMSMessageStatus.DELIVERED);
 							eventListener.onMessageAcknowledged(responseMessage.getMessageHeader().getMessageData().getRefToMessageId());
 						}

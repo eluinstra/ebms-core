@@ -544,7 +544,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	}
 	
 	@Override
-	public EbMSDocument getEbMSDocument(String messageId) throws DAOException
+	public EbMSDocument getEbMSDocumentIfUnsent(String messageId) throws DAOException
 	{
 		Connection c = null;
 		try

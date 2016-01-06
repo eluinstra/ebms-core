@@ -71,7 +71,7 @@ public class EbMSEventProcessor implements Job
 			String url = null;
 			try
 			{
-				EbMSDocument requestDocument = ebMSDAO.getEbMSDocument(event.getMessageId());
+				EbMSDocument requestDocument = ebMSDAO.getEbMSDocumentIfUnsent(event.getMessageId());
 				if (requestDocument != null)
 				{
 					url = CPAUtils.getUri(deliveryChannel);
@@ -81,7 +81,7 @@ public class EbMSEventProcessor implements Job
 					eventManager.updateEvent(event,url,EbMSEventStatus.SUCCEEDED,null);
 				}
 				else
-					eventManager.updateEvent(event,url,EbMSEventStatus.NOT_FOUND,null);
+					eventManager.deleteEvent(event.getMessageId());
 			}
 			catch (final EbMSResponseException e)
 			{
@@ -121,7 +121,7 @@ public class EbMSEventProcessor implements Job
 						@Override
 						public void doInTransaction()
 						{
-							EbMSDocument requestDocument = ebMSDAO.getEbMSDocument(event.getMessageId());
+							EbMSDocument requestDocument = ebMSDAO.getEbMSDocumentIfUnsent(event.getMessageId());
 							if (requestDocument != null)
 							{
 								eventManager.updateEvent(event,null,EbMSEventStatus.SUCCEEDED,null);
@@ -129,7 +129,7 @@ public class EbMSEventProcessor implements Job
 								eventListener.onMessageExpired(event.getMessageId());
 							}
 							else
-								eventManager.updateEvent(event,null,EbMSEventStatus.NOT_FOUND,null);
+								eventManager.deleteEvent(event.getMessageId());
 						}
 					}
 				);

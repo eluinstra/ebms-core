@@ -90,7 +90,7 @@ public class Constants
 
   public static enum EbMSEventStatus
   {
-		SUCCEEDED(1), FAILED(2), EXPIRED(3), NOT_FOUND(4);
+		SUCCEEDED(1), FAILED(2), EXPIRED(3);
 
 		private final int id;
 
