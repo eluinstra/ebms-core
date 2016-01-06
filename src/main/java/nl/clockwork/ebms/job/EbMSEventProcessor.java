@@ -15,13 +15,11 @@
  */
 package nl.clockwork.ebms.job;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Future;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
@@ -175,7 +173,6 @@ public class EbMSEventProcessor implements Job
   @Override
   public void execute()
   {
-		//executorService = Executors.newFixedThreadPool(maxThreads);
 		executorService = new ThreadPoolExecutor(maxThreads,maxThreads,1,TimeUnit.MINUTES,new ArrayBlockingQueue<Runnable>(maxThreads * queueScaleFactor,true),new ThreadPoolExecutor.CallerRunsPolicy());
   	GregorianCalendar timestamp = new GregorianCalendar();
   	List<EbMSEvent> events = ebMSDAO.getEventsBefore(timestamp.getTime());
