@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.clockwork.ebms.dao;
+package nl.clockwork.ebms.common;
 
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.Element;

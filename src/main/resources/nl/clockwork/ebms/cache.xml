@@ -39,7 +39,7 @@
 		</property>
 	</bean>
 
-	<bean id="ebMSDAOMethodCacheInterceptor" class="nl.clockwork.ebms.dao.MethodCacheInterceptor">
+	<bean id="ebMSDAOMethodCacheInterceptor" class="nl.clockwork.ebms.common.MethodCacheInterceptor">
 		<property name="cache" ref="ebMSDAOMethodCache" />
 	</bean>
 
