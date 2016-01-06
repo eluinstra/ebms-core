@@ -34,7 +34,6 @@
 		<property name="patterns">
 			<list>
 				<value>.*getCPA</value>
-				<value>.*getUrl</value>
 			</list>
 		</property>
 	</bean>
