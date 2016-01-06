@@ -41,6 +41,8 @@ Remarks:
 - Only 1 (allPurpose) Channel per Action is supported
 - ErrorList and Acknowledgment elements as part of another message are not supported. Only standalone Acknowledgment and MessageError messages are supported.
 
+See SourceForge for the EbMS Admin Console.
+
 ===============
 Prerequisites =
 ===============
