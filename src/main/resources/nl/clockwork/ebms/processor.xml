@@ -110,6 +110,7 @@
 	</bean>
 
 	<bean id="ebMSMessageFactory" class="nl.clockwork.ebms.common.EbMSMessageFactory">
+		<property name="cleoPatch" value="${patch.cleo.enable}"/>
 		<property name="cpaManager" ref="cpaManager"/>
 	</bean>
 

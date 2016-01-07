@@ -47,6 +47,7 @@ import org.w3._2000._09.xmldsig.ReferenceType;
 
 public class EbMSMessageFactory
 {
+	private boolean cleoPatch;
 	private CPAManager cpaManager;
 
 	public MessageHeader createMessageHeader(String cpaId, Party fromParty, Party toParty, String action)
@@ -67,11 +68,13 @@ public class EbMSMessageFactory
 		
 		messageHeader.setFrom(new From());
 		messageHeader.getFrom().getPartyId().addAll(fromPartyInfo.getPartyIds());
-		messageHeader.getFrom().setRole(fromParty.getRole());
+		if (cleoPatch)
+			messageHeader.getFrom().setRole(fromParty.getRole());
 
 		messageHeader.setTo(new To());
 		messageHeader.getTo().getPartyId().addAll(toPartyInfo.getPartyIds());
-		messageHeader.getTo().setRole(toParty.getRole());
+		if (cleoPatch)
+			messageHeader.getTo().setRole(toParty.getRole());
 		
 		messageHeader.setService(new Service());
 		messageHeader.getService().setType(null);
@@ -287,11 +290,17 @@ public class EbMSMessageFactory
 
 		result.getFrom().getPartyId().clear();
 		result.getFrom().getPartyId().addAll(messageHeader.getTo().getPartyId());
-		result.getFrom().setRole(messageHeader.getTo().getRole());
+		if (cleoPatch)
+			result.getFrom().setRole(messageHeader.getTo().getRole());
+		else
+			result.getFrom().setRole(null);
 
 		result.getTo().getPartyId().clear();
 		result.getTo().getPartyId().addAll(messageHeader.getFrom().getPartyId());
-		result.getTo().setRole(messageHeader.getFrom().getRole());
+		if (cleoPatch)
+			result.getTo().setRole(messageHeader.getFrom().getRole());
+		else
+			result.getTo().setRole(null);
 
 		result.getMessageData().setRefToMessageId(messageHeader.getMessageData().getMessageId());
 		result.getMessageData().setMessageId(UUID.randomUUID().toString() + "@" + hostname);
@@ -319,6 +328,11 @@ public class EbMSMessageFactory
 				response.setTimestamp(timestamp);
 		}
 		return response;
+	}
+
+	public void setCleoPatch(boolean cleoPatch)
+	{
+		this.cleoPatch = cleoPatch;
 	}
 
 	public void setCpaManager(CPAManager cpaManager)
