@@ -24,8 +24,6 @@ nice to have features:
 - use PersistDuration to remove messages
 - define DeliveryChannel types (http, etc.)
 
-- remove hard coded character encoding (UTF-8)?
-
 2.5:
 / implement push interface with jms
 / implement push soap interface?
