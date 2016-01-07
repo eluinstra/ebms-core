@@ -1,7 +1,3 @@
-- document service interfaces
-
-- move more methods from CPAUtils to CPAManager and cache them?
-
 - fix duplicate elimination
 	- add primary key to ebms_message table
 	- use key in other tables
