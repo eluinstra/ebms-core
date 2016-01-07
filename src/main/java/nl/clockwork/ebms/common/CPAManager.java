@@ -190,34 +190,6 @@ public class CPAManager
 		return null;
 	}
 
-	private ServiceBinding getServiceBinding(PartyInfo partyInfo, String role, String service)
-	{
-		for (CollaborationRole collaborationRole : partyInfo.getCollaborationRole())
-			if (role.equals(collaborationRole.getRole().getName()) && CPAUtils.toString(collaborationRole.getServiceBinding().getService()).equals(service))
-				return collaborationRole.getServiceBinding();
-		return null;
-	}
-
-	private CanSend getCanSend(PartyInfo partyInfo, String role, String service, String action)
-	{
-		ServiceBinding serviceBinding = getServiceBinding(partyInfo, role, service);
-		if (serviceBinding != null)
-			for (CanSend canSend : serviceBinding.getCanSend())
-				if (action.equals(canSend.getThisPartyActionBinding().getAction()))
-					return canSend;
-		return null;
-	}
-
-	private CanReceive getCanReceive(PartyInfo partyInfo, String role, String service, String action)
-	{
-		ServiceBinding serviceBinding = getServiceBinding(partyInfo, role, service);
-		if (serviceBinding != null)
-			for (CanReceive canReceive : serviceBinding.getCanReceive())
-				if (action.equals(canReceive.getThisPartyActionBinding().getAction()))
-					return canReceive;
-		return null;
-	}
-
 	public boolean canSend(String cpaId, CacheablePartyId partyId, String role, String service, String action)
 	{
 		return getCanSend(getPartyInfo(cpaId,partyId),role,service,action) != null;
@@ -293,6 +265,34 @@ public class CPAManager
 		if (result == null)
 			result = CPAUtils.getUri(getToDeliveryChannel(cpaId,partyId,role,service,action));
 		return result;
+	}
+
+	private ServiceBinding getServiceBinding(PartyInfo partyInfo, String role, String service)
+	{
+		for (CollaborationRole collaborationRole : partyInfo.getCollaborationRole())
+			if (role.equals(collaborationRole.getRole().getName()) && CPAUtils.toString(collaborationRole.getServiceBinding().getService()).equals(service))
+				return collaborationRole.getServiceBinding();
+		return null;
+	}
+
+	private CanSend getCanSend(PartyInfo partyInfo, String role, String service, String action)
+	{
+		ServiceBinding serviceBinding = getServiceBinding(partyInfo, role, service);
+		if (serviceBinding != null)
+			for (CanSend canSend : serviceBinding.getCanSend())
+				if (action.equals(canSend.getThisPartyActionBinding().getAction()))
+					return canSend;
+		return null;
+	}
+
+	private CanReceive getCanReceive(PartyInfo partyInfo, String role, String service, String action)
+	{
+		ServiceBinding serviceBinding = getServiceBinding(partyInfo, role, service);
+		if (serviceBinding != null)
+			for (CanReceive canReceive : serviceBinding.getCanReceive())
+				if (action.equals(canReceive.getThisPartyActionBinding().getAction()))
+					return canReceive;
+		return null;
 	}
 
 	public void setEbMSDAO(EbMSDAO ebMSDAO)
