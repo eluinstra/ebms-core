@@ -441,7 +441,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 		try
 		{
 			String document = jdbcTemplate.queryForObject(
-				"select cpa_id, content" +
+				"select content" +
 				" from ebms_message" +
 				" where message_id = ?" +
 				" and message_nr = 0" +
@@ -899,7 +899,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 		{
 			jdbcTemplate.update(
 				"update ebms_event set" +
-				" time_stamp = ?" +
+				" time_stamp = ?," +
 				" retries = ?" +
 				" where message_id = ?",
 				event.getTimestamp(),
@@ -939,8 +939,8 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 				"insert into ebms_event_log (" +
 					"message_id," +
 					"time_stamp," +
-					"uri" +
-					"status" +
+					"uri," +
+					"status," +
 					"error_message" +
 				") values (?,?,?,?,?)",
 				messageId,

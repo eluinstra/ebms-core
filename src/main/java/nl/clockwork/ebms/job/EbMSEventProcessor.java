@@ -44,11 +44,11 @@ import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DeliveryChannel;
 
 public class EbMSEventProcessor implements Job
 {
-	private class HandleEventJob implements Runnable
+	private class HandleEventTask implements Runnable
 	{
 		private EbMSEvent event;
 		
-		public HandleEventJob(EbMSEvent event)
+		public HandleEventTask(EbMSEvent event)
 		{
 			this.event = event;
 		}
@@ -57,7 +57,7 @@ public class EbMSEventProcessor implements Job
 		public void run()
 		{
 			DeliveryChannel deliveryChannel = cpaManager.getDeliveryChannel(event.getCpaId(),event.getDeliveryChannelId());
-			if (new Date().before(event.getTimeToLive()))
+			if (event.getTimeToLive() == null || new Date().before(event.getTimeToLive()))
 				sendEvent(event,deliveryChannel);
 			else
 				expireEvent(event);
@@ -177,7 +177,7 @@ public class EbMSEventProcessor implements Job
   	GregorianCalendar timestamp = new GregorianCalendar();
   	List<EbMSEvent> events = ebMSDAO.getEventsBefore(timestamp.getTime());
   	for (final EbMSEvent event : events)
-  		executorService.submit(new HandleEventJob(event));
+  		executorService.submit(new HandleEventTask(event));
   	executorService.shutdown();
   	try
 		{

@@ -1,4 +1,4 @@
-DROP TABLE ebms_event_history;
+DROP TABLE ebms_event_log;
 
 DROP TABLE ebms_event;
 

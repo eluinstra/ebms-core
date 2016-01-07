@@ -1070,7 +1070,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 			c = connectionManager.getConnection();
 			try (PreparedStatement ps  = c.prepareStatement(
 				"update ebms_event set" +
-				" time_stamp = ?" +
+				" time_stamp = ?," +
 				" retries = ?" +
 				" where message_id = ?"
 			))
@@ -1128,8 +1128,8 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 				"insert into ebms_event_log (" +
 					"message_id," +
 					"time_stamp," +
-					"uri" +
-					"status" +
+					"uri," +
+					"status," +
 					"error_message" +
 				") values (?,?,?,?,?)"
 			))
