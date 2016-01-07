@@ -26,10 +26,7 @@ nice to have features:
 - implement Packaging
 - use PersistDuration to remove messages
 
-- improve url mapping: allow wildcards in original_url
 - remove hard coded character encoding (UTF-8)?
-- add method getPartyIds(cpaId,role) to EbMSMessageService?
-- fix for possible database lock when deleting or updating events (happens only in mssql)
 
 2.5:
 / implement push interface with jms
