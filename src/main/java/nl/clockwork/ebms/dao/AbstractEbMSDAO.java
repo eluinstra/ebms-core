@@ -404,7 +404,9 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 			c = connectionManager.getConnection();
 			try (PreparedStatement ps = c.prepareStatement(
 				"select cpa_id," +
+				" from_party_id," +
 				" from_role," +
+				" to_party_id," +
 				" to_role," +
 				" service," +
 				" action," +
@@ -426,8 +428,8 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 					{
 						result = new EbMSMessageContext();
 						result.setCpaId(rs.getString("cpa_id"));
-						result.setFromRole(new Role(rs.getString("from_role")));
-						result.setToRole(new Role(rs.getString("to_role")));
+						result.setFromRole(new Role(rs.getString("from_party_id"),rs.getString("from_role")));
+						result.setToRole(new Role(rs.getString("to_party_id"),rs.getString("to_role")));
 						result.setService(rs.getString("service"));
 						result.setAction(rs.getString("action"));
 						result.setTimestamp(rs.getTimestamp("time_stamp"));
@@ -460,7 +462,9 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 			c = connectionManager.getConnection();
 			try (PreparedStatement ps = c.prepareStatement(
 				"select cpa_id," +
+				" from_party_id," +
 				" from_role," +
+				" to_party_id," +
 				" to_role," +
 				" service," +
 				" action," +
@@ -484,8 +488,8 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 					{
 						result = new EbMSMessageContext();
 						result.setCpaId(rs.getString("cpa_id"));
-						result.setFromRole(new Role(rs.getString("from_role")));
-						result.setToRole(new Role(rs.getString("to_role")));
+						result.setFromRole(new Role(rs.getString("from_party_id"),rs.getString("from_role")));
+						result.setToRole(new Role(rs.getString("to_party_id"),rs.getString("to_role")));
 						result.setService(rs.getString("service"));
 						result.setAction(rs.getString("action"));
 						result.setTimestamp(rs.getTimestamp("time_stamp"));
@@ -740,14 +744,16 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 					"message_id," +
 					"ref_to_message_id," +
 					"time_to_live," +
+					"from_party_id," +
 					"from_role," +
+					"to_party_id," +
 					"to_role," +
 					"service," +
 					"action," +
 					"content," +
 					"status," +
 					"status_time" +
-				") values (?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+				") values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
 				new int[]{5,6}
 			))
 			{
@@ -762,20 +768,22 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 				ps.setString(5,messageHeader.getMessageData().getMessageId());
 				ps.setString(6,messageHeader.getMessageData().getRefToMessageId());
 				ps.setTimestamp(7,messageHeader.getMessageData().getTimeToLive() == null ? null : new Timestamp(messageHeader.getMessageData().getTimeToLive().getTime()));
-				ps.setString(8,messageHeader.getFrom().getRole());
-				ps.setString(9,messageHeader.getTo().getRole());
-				ps.setString(10,EbMSMessageUtils.toString(messageHeader.getService()));
-				ps.setString(11,messageHeader.getAction());
-				ps.setString(12,DOMUtils.toString(message.getMessage(),"UTF-8"));
+				ps.setString(8,EbMSMessageUtils.toString(messageHeader.getFrom().getPartyId().get(0)));
+				ps.setString(9,messageHeader.getFrom().getRole());
+				ps.setString(10,EbMSMessageUtils.toString(messageHeader.getTo().getPartyId().get(0)));
+				ps.setString(11,messageHeader.getTo().getRole());
+				ps.setString(12,EbMSMessageUtils.toString(messageHeader.getService()));
+				ps.setString(13,messageHeader.getAction());
+				ps.setString(14,DOMUtils.toString(message.getMessage(),"UTF-8"));
 				if (status == null)
 				{
-					ps.setNull(13,java.sql.Types.INTEGER);
-					ps.setNull(14,java.sql.Types.TIMESTAMP);
+					ps.setNull(15,java.sql.Types.INTEGER);
+					ps.setNull(16,java.sql.Types.TIMESTAMP);
 				}
 				else
 				{
-					ps.setInt(13,status.id());
-					ps.setTimestamp(14,new Timestamp(timestamp.getTime()));
+					ps.setInt(15,status.id());
+					ps.setTimestamp(16,new Timestamp(timestamp.getTime()));
 				}
 				ps.executeUpdate();
 				ResultSet rs = ps.getGeneratedKeys();
@@ -820,12 +828,14 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 					"message_nr," +
 					"ref_to_message_id," +
 					"time_to_live," +
+					"from_party_id," +
 					"from_role," +
+					"to_party_id," +
 					"to_role," +
 					"service," +
 					"action," +
 					"content" +
-				") values (?,?,?,?,?,(select max(message_nr) + 1 from ebms_message where message_id = ?),?,?,?,?,?,?,?)",
+				") values (?,?,?,?,?,(select max(message_nr) + 1 from ebms_message where message_id = ?),?,?,?,?,?,?,?,?,?)",
 				new int[]{5,6}
 			))
 			{
@@ -841,11 +851,13 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 				ps.setString(6,messageHeader.getMessageData().getMessageId());
 				ps.setString(7,messageHeader.getMessageData().getRefToMessageId());
 				ps.setTimestamp(8,messageHeader.getMessageData().getTimeToLive() == null ? null : new Timestamp(messageHeader.getMessageData().getTimeToLive().getTime()));
-				ps.setString(9,messageHeader.getFrom().getRole());
-				ps.setString(10,messageHeader.getTo().getRole());
-				ps.setString(11,EbMSMessageUtils.toString(messageHeader.getService()));
-				ps.setString(12,messageHeader.getAction());
-				ps.setString(13,DOMUtils.toString(message.getMessage(),"UTF-8"));
+				ps.setString(9,EbMSMessageUtils.toString(messageHeader.getFrom().getPartyId().get(0)));
+				ps.setString(10,messageHeader.getFrom().getRole());
+				ps.setString(11,EbMSMessageUtils.toString(messageHeader.getTo().getPartyId().get(0)));
+				ps.setString(12,messageHeader.getTo().getRole());
+				ps.setString(13,EbMSMessageUtils.toString(messageHeader.getService()));
+				ps.setString(14,messageHeader.getAction());
+				ps.setString(15,DOMUtils.toString(message.getMessage(),"UTF-8"));
 				ps.executeUpdate();
 				ResultSet rs = ps.getGeneratedKeys();
 				if (rs.next())

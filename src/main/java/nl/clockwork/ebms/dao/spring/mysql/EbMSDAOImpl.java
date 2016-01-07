@@ -100,14 +100,16 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 													"message_id," +
 													"ref_to_message_id," +
 													"time_to_live," +
+													"from_party_id," +
 													"from_role," +
+													"to_party_id," +
 													"to_role," +
 													"service," +
 													"action," +
 													"content," +
 													"status," +
 													"status_time" +
-												") values (?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+												") values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
 												new int[]{1}
 											);
 											ps.setTimestamp(1,new Timestamp(timestamp.getTime()));
@@ -121,20 +123,22 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 											ps.setString(5,messageHeader.getMessageData().getMessageId());
 											ps.setString(6,messageHeader.getMessageData().getRefToMessageId());
 											ps.setTimestamp(7,messageHeader.getMessageData().getTimeToLive() == null ? null : new Timestamp(messageHeader.getMessageData().getTimeToLive().getTime()));
-											ps.setString(8,messageHeader.getFrom().getRole());
-											ps.setString(9,messageHeader.getTo().getRole());
-											ps.setString(10,EbMSMessageUtils.toString(messageHeader.getService()));
-											ps.setString(11,messageHeader.getAction());
-											ps.setString(12,DOMUtils.toString(message.getMessage(),"UTF-8"));
+											ps.setString(8,EbMSMessageUtils.toString(messageHeader.getFrom().getPartyId().get(0)));
+											ps.setString(9,messageHeader.getFrom().getRole());
+											ps.setString(10,EbMSMessageUtils.toString(messageHeader.getTo().getPartyId().get(0)));
+											ps.setString(11,messageHeader.getTo().getRole());
+											ps.setString(12,EbMSMessageUtils.toString(messageHeader.getService()));
+											ps.setString(13,messageHeader.getAction());
+											ps.setString(14,DOMUtils.toString(message.getMessage(),"UTF-8"));
 											if (status == null)
 											{
-												ps.setNull(13,java.sql.Types.INTEGER);
-												ps.setNull(14,java.sql.Types.TIMESTAMP);
+												ps.setNull(15,java.sql.Types.INTEGER);
+												ps.setNull(16,java.sql.Types.TIMESTAMP);
 											}
 											else
 											{
-												ps.setInt(13,status.id());
-												ps.setTimestamp(14,new Timestamp(timestamp.getTime()));
+												ps.setInt(15,status.id());
+												ps.setTimestamp(16,new Timestamp(timestamp.getTime()));
 											}
 											return ps;
 										}
@@ -196,12 +200,14 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 													"message_nr," +
 													"ref_to_message_id," +
 													"time_to_live," +
+													"from_party_id," +
 													"from_role," +
+													"to_party_id," +
 													"to_role," +
 													"service," +
 													"action," +
 													"content" +
-												") values (?,?,?,?,?,(select nr from (select max(message_nr) + 1 as nr from ebms_message where message_id = ?) as c),?,?,?,?,?,?,?)",
+												") values (?,?,?,?,?,(select nr from (select max(message_nr) + 1 as nr from ebms_message where message_id = ?) as c),?,?,?,?,?,?,?,?,?)",
 												new int[]{1}
 											);
 											ps.setTimestamp(1,new Timestamp(timestamp.getTime()));
@@ -216,11 +222,13 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 											ps.setString(6,messageHeader.getMessageData().getMessageId());
 											ps.setString(7,messageHeader.getMessageData().getRefToMessageId());
 											ps.setTimestamp(8,messageHeader.getMessageData().getTimeToLive() == null ? null : new Timestamp(messageHeader.getMessageData().getTimeToLive().getTime()));
-											ps.setString(9,messageHeader.getFrom().getRole());
-											ps.setString(10,messageHeader.getTo().getRole());
-											ps.setString(11,EbMSMessageUtils.toString(messageHeader.getService()));
-											ps.setString(12,messageHeader.getAction());
-											ps.setString(13,DOMUtils.toString(message.getMessage(),"UTF-8"));
+											ps.setString(9,EbMSMessageUtils.toString(messageHeader.getFrom().getPartyId().get(0)));
+											ps.setString(10,messageHeader.getFrom().getRole());
+											ps.setString(11,EbMSMessageUtils.toString(messageHeader.getTo().getPartyId().get(0)));
+											ps.setString(12,messageHeader.getTo().getRole());
+											ps.setString(13,EbMSMessageUtils.toString(messageHeader.getService()));
+											ps.setString(14,messageHeader.getAction());
+											ps.setString(15,DOMUtils.toString(message.getMessage(),"UTF-8"));
 											return ps;
 										}
 										catch (TransformerException e)
