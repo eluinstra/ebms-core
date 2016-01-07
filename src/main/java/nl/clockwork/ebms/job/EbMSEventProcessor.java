@@ -174,14 +174,14 @@ public class EbMSEventProcessor implements Job
   public void execute()
   {
 		executorService = new ThreadPoolExecutor(maxThreads,maxThreads,1,TimeUnit.MINUTES,new ArrayBlockingQueue<Runnable>(maxThreads * queueScaleFactor,true),new ThreadPoolExecutor.CallerRunsPolicy());
-  	GregorianCalendar timestamp = new GregorianCalendar();
-  	List<EbMSEvent> events = ebMSDAO.getEventsBefore(timestamp.getTime());
-  	for (final EbMSEvent event : events)
-  		executorService.submit(new HandleEventTask(event));
-  	executorService.shutdown();
-  	try
+		GregorianCalendar timestamp = new GregorianCalendar();
+		List<EbMSEvent> events = ebMSDAO.getEventsBefore(timestamp.getTime());
+		for (final EbMSEvent event : events)
+			executorService.submit(new HandleEventTask(event));
+		executorService.shutdown();
+		try
 		{
-			while (!executorService.awaitTermination(1,TimeUnit.HOURS));
+			while (!executorService.awaitTermination(30,TimeUnit.MINUTES));
 		}
 		catch (InterruptedException e)
 		{
