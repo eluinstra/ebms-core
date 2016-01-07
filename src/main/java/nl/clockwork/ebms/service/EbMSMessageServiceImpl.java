@@ -15,15 +15,9 @@
  */
 package nl.clockwork.ebms.service;
 
-import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 
-import javax.xml.bind.JAXBException;
-import javax.xml.datatype.DatatypeConfigurationException;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.soap.SOAPException;
-import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactoryConfigurationError;
 
 import nl.clockwork.ebms.Constants;
@@ -45,13 +39,11 @@ import nl.clockwork.ebms.model.Party;
 import nl.clockwork.ebms.processor.EbMSProcessorException;
 import nl.clockwork.ebms.signature.EbMSSignatureGenerator;
 import nl.clockwork.ebms.util.CPAUtils;
-import nl.clockwork.ebms.util.EbMSMessageUtils;
 import nl.clockwork.ebms.validation.EbMSMessageContextValidator;
 import nl.clockwork.ebms.validation.ValidatorException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.xml.sax.SAXException;
 
 public class EbMSMessageServiceImpl implements EbMSMessageService
 {
@@ -84,7 +76,7 @@ public class EbMSMessageServiceImpl implements EbMSMessageService
 			else
 				throw new EbMSMessageServiceException("No response received!");
 		}
-		catch (DatatypeConfigurationException | JAXBException | EbMSProcessorException e)
+		catch (EbMSProcessorException e)
 		{
 			throw new EbMSMessageServiceException(e);
 		}
@@ -98,7 +90,6 @@ public class EbMSMessageServiceImpl implements EbMSMessageService
 			ebMSMessageContextValidator.validate(messageContent.getContext());
 			//TODO ebMSMessageContentToEbMSDocument
 			final EbMSMessage message = ebMSMessageFactory.ebMSMessageContentToEbMSMessage(messageContent.getContext().getCpaId(),messageContent);
-			message.setMessage(EbMSMessageUtils.createSOAPMessage(message));
 			signatureGenerator.generate(messageContent.getContext().getCpaId(),message);
 			ebMSDAO.executeTransaction(
 				new DAOTransactionCallback()
@@ -113,7 +104,7 @@ public class EbMSMessageServiceImpl implements EbMSMessageService
 			);
 			return message.getMessageHeader().getMessageData().getMessageId();
 		}
-		catch (ValidatorException | DAOException | DatatypeConfigurationException | SOAPException | JAXBException | ParserConfigurationException | SAXException | IOException | TransformerFactoryConfigurationError | TransformerException | EbMSProcessorException e)
+		catch (ValidatorException | DAOException | TransformerFactoryConfigurationError | EbMSProcessorException e)
 		{
 			throw new EbMSMessageServiceException(e);
 		}
@@ -202,7 +193,7 @@ public class EbMSMessageServiceImpl implements EbMSMessageService
 					throw new EbMSMessageServiceException("No response received!");
 			}
 		}
-		catch (DAOException | DatatypeConfigurationException | JAXBException | EbMSProcessorException e)
+		catch (DAOException | EbMSProcessorException e)
 		{
 			throw new EbMSMessageServiceException(e);
 		}
@@ -225,7 +216,7 @@ public class EbMSMessageServiceImpl implements EbMSMessageService
 			else
 				throw new EbMSMessageServiceException("No response received!");
 		}
-		catch (DAOException | DatatypeConfigurationException | JAXBException | EbMSProcessorException e)
+		catch (DAOException | EbMSProcessorException e)
 		{
 			throw new EbMSMessageServiceException(e);
 		}

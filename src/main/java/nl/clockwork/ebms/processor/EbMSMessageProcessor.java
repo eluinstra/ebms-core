@@ -287,7 +287,6 @@ public class EbMSMessageProcessor
 				else
 				{
 					final EbMSMessage acknowledgment = ebMSMessageFactory.createEbMSAcknowledgment(cpaId,message,timestamp);
-					acknowledgment.setMessage(EbMSMessageUtils.createSOAPMessage(acknowledgment));
 					signatureGenerator.generate(cpaId,message.getAckRequested(),acknowledgment);
 					ebMSDAO.executeTransaction(
 						new DAOTransactionCallback()
@@ -355,7 +354,7 @@ public class EbMSMessageProcessor
 			);
 	}
 	
-	protected EbMSMessage processStatusRequest(String cpaId, final Date timestamp, final EbMSMessage message) throws DatatypeConfigurationException, JAXBException, EbMSValidationException
+	protected EbMSMessage processStatusRequest(String cpaId, final Date timestamp, final EbMSMessage message) throws DatatypeConfigurationException, JAXBException, EbMSValidationException, EbMSProcessorException
 	{
 		Date date = null;
 		EbMSMessageStatus status = EbMSMessageStatus.UNAUTHORIZED;
@@ -375,7 +374,7 @@ public class EbMSMessageProcessor
 		return ebMSMessageFactory.createEbMSStatusResponse(cpaId,message,status,date); 
 	}
 	
-	protected EbMSMessage processPing(String cpaId, final Date timestamp, final EbMSMessage message) throws DatatypeConfigurationException, JAXBException
+	protected EbMSMessage processPing(String cpaId, final Date timestamp, final EbMSMessage message) throws EbMSProcessorException
 	{
 		return ebMSMessageFactory.createEbMSPong(cpaId,message);
 	}
