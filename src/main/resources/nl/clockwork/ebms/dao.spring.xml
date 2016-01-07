@@ -20,7 +20,23 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-	<import resource="dao.cache.xml"/>
+	<bean id="ebMSDAO" class="org.springframework.aop.framework.ProxyFactoryBean">
+		<property name="target" ref="_ebMSDAO"/>
+		<property name="interceptorNames">
+			<list>
+				<value>ebMSDAOMethodCachePointCut</value>
+			</list>
+		</property>
+	</bean>
+
+	<bean id="ebMSDAOMethodCachePointCut" class="org.springframework.aop.support.RegexpMethodPointcutAdvisor">
+		<property name="advice" ref="ebMSMethodCacheInterceptor"/>
+		<property name="patterns">
+			<list>
+				<value>.*getCPA</value>
+			</list>
+		</property>
+	</bean>
 
 	<bean id="_ebMSDAO" class="nl.clockwork.ebms.dao.spring.EbMSDAOFactory">
 		<property name="dataSource" ref="ebMSDataSource"/>
