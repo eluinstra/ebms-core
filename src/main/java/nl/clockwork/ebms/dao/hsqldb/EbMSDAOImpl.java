@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.clockwork.ebms.dao.spring.oracle;
+package nl.clockwork.ebms.dao.hsqldb;
 
 import nl.clockwork.ebms.Constants.EbMSMessageStatus;
-import nl.clockwork.ebms.dao.spring.AbstractEbMSDAO;
+import nl.clockwork.ebms.dao.AbstractEbMSDAO;
 
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.transaction.support.TransactionTemplate;
@@ -31,14 +31,13 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 	@Override
 	public String getMessageIdsQuery(String messageContextFilter, EbMSMessageStatus status, int maxNr)
 	{
-		return "select * from (" +
-		"select message_id" +
+		return "select message_id" +
 		" from ebms_message" +
-		" where message_nr = 0" +
+		" where message_nr = 0" + 
 		" and status = " + status.id() +
 		messageContextFilter +
-		" order by time_stamp asc)" +
-		" where ROWNUM <= " + maxNr;
+		" order by time_stamp asc" +
+		" limit " + maxNr;
 	}
 
 }

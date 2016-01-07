@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.clockwork.ebms.dao.spring;
+package nl.clockwork.ebms.dao;
 
 import java.io.IOException;
 import java.sql.Connection;
@@ -35,9 +35,6 @@ import nl.clockwork.ebms.Constants.EbMSEventStatus;
 import nl.clockwork.ebms.Constants.EbMSMessageStatus;
 import nl.clockwork.ebms.common.XMLMessageBuilder;
 import nl.clockwork.ebms.common.util.DOMUtils;
-import nl.clockwork.ebms.dao.DAOException;
-import nl.clockwork.ebms.dao.DAOTransactionCallback;
-import nl.clockwork.ebms.dao.EbMSDAO;
 import nl.clockwork.ebms.model.EbMSAttachment;
 import nl.clockwork.ebms.model.EbMSDataSource;
 import nl.clockwork.ebms.model.EbMSDocument;

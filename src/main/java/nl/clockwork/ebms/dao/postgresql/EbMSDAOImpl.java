@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.clockwork.ebms.dao.spring.mysql;
+package nl.clockwork.ebms.dao.postgresql;
 
 import java.io.IOException;
 import java.sql.Connection;
@@ -24,13 +24,12 @@ import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
 
-import javax.mail.util.ByteArrayDataSource;
 import javax.xml.transform.TransformerException;
 
 import nl.clockwork.ebms.Constants.EbMSMessageStatus;
 import nl.clockwork.ebms.common.util.DOMUtils;
+import nl.clockwork.ebms.dao.AbstractEbMSDAO;
 import nl.clockwork.ebms.dao.DAOException;
-import nl.clockwork.ebms.dao.spring.AbstractEbMSDAO;
 import nl.clockwork.ebms.model.EbMSAttachment;
 import nl.clockwork.ebms.model.EbMSMessage;
 import nl.clockwork.ebms.util.EbMSMessageUtils;
@@ -38,11 +37,10 @@ import nl.clockwork.ebms.util.EbMSMessageUtils;
 import org.apache.commons.io.IOUtils;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageHeader;
 import org.springframework.dao.DataAccessException;
+import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
-import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
-import org.springframework.jdbc.support.GeneratedKeyHolder;
-import org.springframework.jdbc.support.KeyHolder;
+import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.transaction.TransactionException;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallbackWithoutResult;
@@ -50,6 +48,30 @@ import org.springframework.transaction.support.TransactionTemplate;
 
 public class EbMSDAOImpl extends AbstractEbMSDAO
 {
+	public class Key
+	{
+		public String messageId;
+		public int messageNr;
+		public Key(String messageId, int messageNr)
+		{
+			this.messageId = messageId;
+			this.messageNr = messageNr;
+		}
+	}
+	public class KeyExtractor implements ResultSetExtractor<Key>
+	{
+
+		@Override
+		public Key extractData(ResultSet rs) throws SQLException, DataAccessException
+		{
+			if (rs.next())
+				return new Key(rs.getString("message_id"),rs.getInt("message_nr"));
+			else
+				return null;
+		}
+		
+	}
+
 	public EbMSDAOImpl(TransactionTemplate transactionTemplate, JdbcTemplate jdbcTemplate)
 	{
 		super(transactionTemplate,jdbcTemplate);
@@ -61,12 +83,12 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 		return "select message_id" +
 		" from ebms_message" +
 		" where message_nr = 0" +
-		" and status = " + status.id() +
+		" and status=" + status.id() +
 		messageContextFilter +
 		" order by time_stamp asc" +
 		" limit " + maxNr;
 	}
-
+	
 	@Override
 	public void insertMessage(final Date timestamp, final EbMSMessage message, final EbMSMessageStatus status) throws DAOException
 	{
@@ -80,11 +102,9 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 					{
 						try
 						{
-							KeyHolder keyHolder = new GeneratedKeyHolder();
-							jdbcTemplate.update(
+							Key key = (Key)jdbcTemplate.query(
 								new PreparedStatementCreator()
 								{
-									
 									@Override
 									public PreparedStatement createPreparedStatement(Connection connection) throws SQLException
 									{
@@ -109,8 +129,8 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 													"content," +
 													"status," +
 													"status_time" +
-												") values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
-												new int[]{1}
+												") values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)" +
+												" returning message_id, message_nr"
 											);
 											ps.setTimestamp(1,new Timestamp(timestamp.getTime()));
 											MessageHeader messageHeader = message.getMessageHeader();
@@ -148,9 +168,9 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 										}
 									}
 								},
-								keyHolder
+								new KeyExtractor()
 							);
-							insertAttachments(keyHolder.getKey().longValue(),message.getAttachments());
+							insertAttachments(key,message.getAttachments());
 						}
 						catch (IOException e)
 						{
@@ -165,7 +185,7 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 			throw new DAOException(e);
 		}
 	}
-
+	
 	@Override
 	public void insertDuplicateMessage(final Date timestamp, final EbMSMessage message) throws DAOException
 	{
@@ -179,11 +199,9 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 					{
 						try
 						{
-							KeyHolder keyHolder = new GeneratedKeyHolder();
-							jdbcTemplate.update(
+							Key key = (Key)jdbcTemplate.query(
 								new PreparedStatementCreator()
 								{
-									
 									@Override
 									public PreparedStatement createPreparedStatement(Connection connection) throws SQLException
 									{
@@ -207,8 +225,8 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 													"service," +
 													"action," +
 													"content" +
-												") values (?,?,?,?,?,(select nr from (select max(message_nr) + 1 as nr from ebms_message where message_id = ?) as c),?,?,?,?,?,?,?,?,?)",
-												new int[]{1}
+												") values (?,?,?,?,?,(select max(message_nr) + 1 from ebms_message where message_id = ?),?,?,?,?,?,?,?,?,?)" +
+												" returning message_id, message_nr"
 											);
 											ps.setTimestamp(1,new Timestamp(timestamp.getTime()));
 											MessageHeader messageHeader = message.getMessageHeader();
@@ -237,9 +255,9 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 										}
 									}
 								},
-								keyHolder
+								new KeyExtractor()
 							);
-							insertAttachments(keyHolder.getKey().longValue(),message.getAttachments());
+							insertAttachments(key,message.getAttachments());
 						}
 						catch (IOException e)
 						{
@@ -249,13 +267,17 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 				}
 			);
 		}
-		catch (DataAccessException | TransactionException e)
+		catch (DataAccessException e)
+		{
+			throw new DAOException(e);
+		}
+		catch (TransactionException e)
 		{
 			throw new DAOException(e);
 		}
 	}
 
-	protected void insertAttachments(long messageId, List<EbMSAttachment> attachments) throws DataAccessException, IOException
+	protected void insertAttachments(Key key, List<EbMSAttachment> attachments) throws InvalidDataAccessApiUsageException, DataAccessException, IOException
 	{
 		int orderNr = 0;
 		for (EbMSAttachment attachment : attachments)
@@ -263,14 +285,16 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 			jdbcTemplate.update
 			(
 				"insert into ebms_attachment (" +
-					"ebms_message_id," +
+					"message_id," +
+					"message_nr," +
 					"order_nr," +
 					"name," +
 					"content_id," +
 					"content_type," +
 					"content" +
-				") values (?,?,?,?,?,?)",
-				messageId,
+				") values (?,?,?,?,?,?,?)",
+				key.messageId,
+				key.messageNr,
 				orderNr++,
 				attachment.getName(),
 				attachment.getContentId(),
@@ -278,30 +302,6 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 				IOUtils.toByteArray(attachment.getInputStream())
 			);
 		}
-	}
-
-	@Override
-	protected List<EbMSAttachment> getAttachments(String messageId)
-	{
-		return jdbcTemplate.query(
-			"select a.name, a.content_id, a.content_type, a.content" + 
-			" from ebms_message m, ebms_attachment a" +
-			" where m.message_id = ?" +
-			" and m.message_nr = 0" +
-			" and m.id = a.ebms_message_id" +
-			" order by a.order_nr",
-			new ParameterizedRowMapper<EbMSAttachment>()
-			{
-				@Override
-				public EbMSAttachment mapRow(ResultSet rs, int rowNum) throws SQLException
-				{
-					ByteArrayDataSource dataSource = new ByteArrayDataSource(rs.getBytes("content"),rs.getString("content_type"));
-					dataSource.setName(rs.getString("name"));
-					return new EbMSAttachment(dataSource,rs.getString("content_id"));
-				}
-			},
-			messageId
-		);
 	}
 
 }

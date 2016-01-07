@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.clockwork.ebms.dao.spring.mssql;
+package nl.clockwork.ebms.dao.mssql;
 
 import java.io.IOException;
 import java.sql.Connection;
@@ -41,7 +41,7 @@ import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 import org.springframework.transaction.support.TransactionTemplate;
 
-public class EbMSDAOImpl extends nl.clockwork.ebms.dao.spring.mysql.EbMSDAOImpl
+public class EbMSDAOImpl extends nl.clockwork.ebms.dao.mysql.EbMSDAOImpl
 {
 	public EbMSDAOImpl(TransactionTemplate transactionTemplate, JdbcTemplate jdbcTemplate)
 	{

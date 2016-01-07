@@ -38,7 +38,7 @@
 		</property>
 	</bean>
 
-	<bean id="_ebMSDAO" class="nl.clockwork.ebms.dao.spring.EbMSDAOFactory">
+	<bean id="_ebMSDAO" class="nl.clockwork.ebms.dao.EbMSDAOFactory">
 		<property name="dataSource" ref="ebMSDataSource"/>
 		<property name="transactionTemplate" ref="ebMSTransactionTemplate"/>
 		<property name="jdbcTemplate" ref="ebMSJdbcTemplate"/>

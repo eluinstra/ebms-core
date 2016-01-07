@@ -13,13 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.clockwork.ebms.dao.spring;
+package nl.clockwork.ebms.dao;
 
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.transaction.support.TransactionTemplate;
-
-import nl.clockwork.ebms.dao.AbstractDAOFactory;
-import nl.clockwork.ebms.dao.EbMSDAO;
 
 public class EbMSDAOFactory extends AbstractDAOFactory<EbMSDAO>
 {
@@ -35,31 +32,31 @@ public class EbMSDAOFactory extends AbstractDAOFactory<EbMSDAO>
 	@Override
 	public EbMSDAO createHSqlDbDAO()
 	{
-		return new nl.clockwork.ebms.dao.spring.hsqldb.EbMSDAOImpl(transactionTemplate,jdbcTemplate);
+		return new nl.clockwork.ebms.dao.hsqldb.EbMSDAOImpl(transactionTemplate,jdbcTemplate);
 	}
 
 	@Override
 	public EbMSDAO createMySqlDAO()
 	{
-		return new nl.clockwork.ebms.dao.spring.mysql.EbMSDAOImpl(transactionTemplate,jdbcTemplate);
+		return new nl.clockwork.ebms.dao.mysql.EbMSDAOImpl(transactionTemplate,jdbcTemplate);
 	}
 
 	@Override
 	public EbMSDAO createPostgresDAO()
 	{
-		return new nl.clockwork.ebms.dao.spring.postgresql.EbMSDAOImpl(transactionTemplate,jdbcTemplate);
+		return new nl.clockwork.ebms.dao.postgresql.EbMSDAOImpl(transactionTemplate,jdbcTemplate);
 	}
 
 	@Override
 	public EbMSDAO createOracleDAO()
 	{
-		return new nl.clockwork.ebms.dao.spring.oracle.EbMSDAOImpl(transactionTemplate,jdbcTemplate);
+		return new nl.clockwork.ebms.dao.oracle.EbMSDAOImpl(transactionTemplate,jdbcTemplate);
 	}
 
 	@Override
 	public EbMSDAO createMsSqlDAO()
 	{
-		return new nl.clockwork.ebms.dao.spring.mssql.EbMSDAOImpl(transactionTemplate,jdbcTemplate);
+		return new nl.clockwork.ebms.dao.mssql.EbMSDAOImpl(transactionTemplate,jdbcTemplate);
 	}
 
 	public void setTransactionTemplate(TransactionTemplate transactionTemplate)
