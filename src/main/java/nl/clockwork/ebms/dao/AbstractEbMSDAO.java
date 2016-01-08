@@ -173,7 +173,8 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 					"url" +
 				") values (?,?,?)",
 				cpa.getCpaid(),
-				XMLMessageBuilder.getInstance(CollaborationProtocolAgreement.class).handle(cpa)
+				XMLMessageBuilder.getInstance(CollaborationProtocolAgreement.class).handle(cpa),
+				url
 			);
 		}
 		catch (DataAccessException | JAXBException e)
@@ -194,6 +195,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 				" url = ?" +
 				" where cpa_id = ?",
 				XMLMessageBuilder.getInstance(CollaborationProtocolAgreement.class).handle(cpa),
+				url,
 				cpa.getCpaid()
 			);
 		}
