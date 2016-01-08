@@ -90,7 +90,7 @@
 				<value>.*existsCPA</value>
 				<value>.*getCPA</value>
 				<value>.*getCPAIds</value>
-				<value>.*getUrl</value>
+				<!--value>.*getUrl</value-->
 				<value>.*getFromParty</value>
 				<value>.*getToParty</value>
 				<value>.*getEbMSPartyInfo</value>
