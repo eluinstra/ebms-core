@@ -65,7 +65,7 @@ public class EbMSMessageContext implements Serializable
 		this.cpaId = cpaId;
 	}
 
-	@XmlElement
+	@XmlElement(required=true)
 	public Role getFromRole()
 	{
 		return fromRole;

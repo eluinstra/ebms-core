@@ -19,12 +19,12 @@ import nl.clockwork.ebms.common.CPAManager;
 import nl.clockwork.ebms.dao.DAOException;
 import nl.clockwork.ebms.model.EbMSMessageContext;
 import nl.clockwork.ebms.model.FromPartyInfo;
+import nl.clockwork.ebms.model.Party;
 import nl.clockwork.ebms.model.ToPartyInfo;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CollaborationProtocolAgreement;
 
 public class EbMSMessageContextValidator
 {
@@ -35,7 +35,31 @@ public class EbMSMessageContextValidator
 	{
 		this.cpaManager = cpaManager;
 	}
-	
+
+	public void validate(String cpaId, Party fromParty, Party toParty) throws ValidationException
+	{
+		if (StringUtils.isEmpty(cpaId))
+			throw new ValidationException("cpaId cannot be empty!");
+		if (!cpaManager.existsCPA(cpaId))
+			throw new ValidationException("No CPA found for cpaId=" + cpaId);
+		if (!cpaManager.existsParty(cpaId,fromParty))
+		{
+			StringBuffer msg = new StringBuffer();
+			msg.append("No fromParty found for:");
+			msg.append(" context.cpaId=").append(cpaId);
+			msg.append(", context.fromParty.partyId=").append(fromParty.getPartyId());
+			msg.append(", context.fromParty.role=").append(fromParty.getRole());
+		}
+		if (!cpaManager.existsParty(cpaId,toParty))
+		{
+			StringBuffer msg = new StringBuffer();
+			msg.append("No toParty found for:");
+			msg.append(" context.cpaId=").append(cpaId);
+			msg.append(", context.toParty.partyId=").append(toParty.getPartyId());
+			msg.append(", context.toParty.role=").append(toParty.getRole());
+		}
+	}
+
 	public void validate(EbMSMessageContext context) throws ValidatorException
 	{
 		try
@@ -47,8 +71,7 @@ public class EbMSMessageContextValidator
 			if (StringUtils.isEmpty(context.getAction()))
 				throw new ValidationException("context.action cannot be empty!");
 
-			CollaborationProtocolAgreement cpa = cpaManager.getCPA(context.getCpaId());
-			if (cpa == null)
+			if (!cpaManager.existsCPA(context.getCpaId()))
 				throw new ValidationException("No CPA found for: context.cpaId=" + context.getCpaId());
 
 			FromPartyInfo fromPartyInfo = cpaManager.getFromPartyInfo(context.getCpaId(),context.getFromRole(),context.getService(),context.getAction());

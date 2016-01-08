@@ -40,6 +40,7 @@ import nl.clockwork.ebms.processor.EbMSProcessorException;
 import nl.clockwork.ebms.signature.EbMSSignatureGenerator;
 import nl.clockwork.ebms.util.CPAUtils;
 import nl.clockwork.ebms.validation.EbMSMessageContextValidator;
+import nl.clockwork.ebms.validation.ValidationException;
 import nl.clockwork.ebms.validation.ValidatorException;
 
 import org.apache.commons.logging.Log;
@@ -66,6 +67,7 @@ public class EbMSMessageServiceImpl implements EbMSMessageService
 	{
 		try
 		{
+			ebMSMessageContextValidator.validate(cpaId,fromParty,toParty);
 			EbMSMessage request = ebMSMessageFactory.createEbMSPing(cpaId,fromParty,toParty);
 			EbMSMessage response = deliveryManager.sendMessage(cpaManager.getUri(cpaId,new CacheablePartyId(request.getMessageHeader().getTo().getPartyId()),request.getMessageHeader().getTo().getRole(),CPAUtils.toString(request.getMessageHeader().getService()),request.getMessageHeader().getAction()),request);
 			if (response != null)
@@ -76,7 +78,7 @@ public class EbMSMessageServiceImpl implements EbMSMessageService
 			else
 				throw new EbMSMessageServiceException("No response received!");
 		}
-		catch (EbMSProcessorException e)
+		catch (ValidationException | EbMSProcessorException e)
 		{
 			throw new EbMSMessageServiceException(e);
 		}
@@ -204,6 +206,7 @@ public class EbMSMessageServiceImpl implements EbMSMessageService
 	{
 		try
 		{
+			ebMSMessageContextValidator.validate(cpaId,fromParty,toParty);
 			EbMSMessage request = ebMSMessageFactory.createEbMSStatusRequest(cpaId,fromParty,toParty,messageId);
 			EbMSMessage response = deliveryManager.sendMessage(cpaManager.getUri(cpaId,new CacheablePartyId(request.getMessageHeader().getTo().getPartyId()),request.getMessageHeader().getTo().getRole(),CPAUtils.toString(request.getMessageHeader().getService()),request.getMessageHeader().getAction()),request);
 			if (response != null)
@@ -216,7 +219,7 @@ public class EbMSMessageServiceImpl implements EbMSMessageService
 			else
 				throw new EbMSMessageServiceException("No response received!");
 		}
-		catch (DAOException | EbMSProcessorException e)
+		catch (ValidationException | DAOException | EbMSProcessorException e)
 		{
 			throw new EbMSMessageServiceException(e);
 		}

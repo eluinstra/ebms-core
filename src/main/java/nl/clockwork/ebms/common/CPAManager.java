@@ -76,18 +76,17 @@ public class CPAManager
 				&& timestamp.compareTo(cpa.getEnd()) <= 0;
 	}
 
-	public Party getFromParty(String cpaId, Role fromRole, String service, String action)
+	public boolean existsParty(String cpaId, Party party)
 	{
-		String partyId = fromRole.getPartyId() == null ? CPAUtils.toString(getFromPartyInfo(cpaId,fromRole,service,action).getPartyIds().get(0)) : fromRole.getPartyId();
-		return new Party(partyId,fromRole.getRole());
+		CollaborationProtocolAgreement cpa = getCPA(cpaId);
+		for (PartyInfo partyInfo : cpa.getPartyInfo())
+			if (party.matches(partyInfo.getPartyId()))
+				for (CollaborationRole role : partyInfo.getCollaborationRole())
+					if (party.matches(role.getRole()))
+						return true;
+		return false;
 	}
-	
-	public Party getToParty(String cpaId, Role toRole, String service, String action)
-	{
-		String partyId = toRole.getPartyId() == null ? CPAUtils.toString(getToPartyInfo(cpaId,toRole,service,action).getPartyIds().get(0)) : toRole.getPartyId();
-		return new Party(partyId,toRole.getRole());
-	}
-	
+
 	public EbMSPartyInfo getEbMSPartyInfo(String cpaId, Party party)
 	{
 		CollaborationProtocolAgreement cpa = getCPA(cpaId);
@@ -111,6 +110,18 @@ public class CPAManager
 			if (CPAUtils.equals(partyInfo.getPartyId(),partyId))
 				return partyInfo;
 		return null;
+	}
+	
+	public Party getFromParty(String cpaId, Role fromRole, String service, String action)
+	{
+		String partyId = fromRole.getPartyId() == null ? CPAUtils.toString(getFromPartyInfo(cpaId,fromRole,service,action).getPartyIds().get(0)) : fromRole.getPartyId();
+		return new Party(partyId,fromRole.getRole());
+	}
+	
+	public Party getToParty(String cpaId, Role toRole, String service, String action)
+	{
+		String partyId = toRole.getPartyId() == null ? CPAUtils.toString(getToPartyInfo(cpaId,toRole,service,action).getPartyIds().get(0)) : toRole.getPartyId();
+		return new Party(partyId,toRole.getRole());
 	}
 	
 	public FromPartyInfo getFromPartyInfo(String cpaId, Role fromRole, String service, String action)
