@@ -603,7 +603,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 													"content," +
 													"status," +
 													"status_time" +
-												") values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+												") values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
 												new int[]{5,6}
 											);
 											ps.setTimestamp(1,new Timestamp(timestamp.getTime()));
@@ -696,7 +696,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 													"service," +
 													"action," +
 													"content" +
-												") values (?,?,?,?,?,(select max(message_nr) + 1 from ebms_message where message_id = ?),?,?,?,?,?,?,?,?,?)",
+												") values (?,?,?,?,(select max(message_nr) + 1 from ebms_message where message_id = ?),?,?,?,?,?,?,?,?,?)",
 												new int[]{5,6}
 											);
 											ps.setTimestamp(1,new Timestamp(timestamp.getTime()));
