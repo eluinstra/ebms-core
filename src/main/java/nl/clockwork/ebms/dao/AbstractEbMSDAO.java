@@ -161,7 +161,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	}
 
 	@Override
-	public void insertCPA(CollaborationProtocolAgreement cpa) throws DAOException
+	public void insertCPA(CollaborationProtocolAgreement cpa, String url) throws DAOException
 	{
 		try
 		{
@@ -169,8 +169,9 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 			(
 				"insert into cpa (" +
 					"cpa_id," +
-					"cpa" +
-				") values (?,?)",
+					"cpa," +
+					"url" +
+				") values (?,?,?)",
 				cpa.getCpaid(),
 				XMLMessageBuilder.getInstance(CollaborationProtocolAgreement.class).handle(cpa)
 			);
@@ -182,14 +183,15 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	}
 
 	@Override
-	public int updateCPA(CollaborationProtocolAgreement cpa) throws DAOException
+	public int updateCPA(CollaborationProtocolAgreement cpa, String url) throws DAOException
 	{
 		try
 		{
 			return jdbcTemplate.update
 			(
 				"update cpa set" +
-				" cpa = ?" +
+				" cpa = ?," +
+				" url = ?" +
 				" where cpa_id = ?",
 				XMLMessageBuilder.getInstance(CollaborationProtocolAgreement.class).handle(cpa),
 				cpa.getCpaid()

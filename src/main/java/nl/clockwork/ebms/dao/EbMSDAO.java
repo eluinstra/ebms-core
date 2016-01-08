@@ -37,8 +37,8 @@ public interface EbMSDAO
 	boolean existsCPA(String cpaId) throws DAOException;
 	CollaborationProtocolAgreement getCPA(String cpaId) throws DAOException;
 	List<String> getCPAIds() throws DAOException;
-	void insertCPA(CollaborationProtocolAgreement cpa) throws DAOException;
-	int updateCPA(CollaborationProtocolAgreement cpa) throws DAOException;
+	void insertCPA(CollaborationProtocolAgreement cpa, String url) throws DAOException;
+	int updateCPA(CollaborationProtocolAgreement cpa, String url) throws DAOException;
 	int deleteCPA(String cpaId) throws DAOException;
 	
 	String getUrl(String cpaId);

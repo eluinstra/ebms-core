@@ -45,15 +45,16 @@ public class CPAManager
 		return ebMSDAO.getCPAIds();
 	}
 
-	public void insertCPA(CollaborationProtocolAgreement cpa)
+	public void insertCPA(CollaborationProtocolAgreement cpa, String url)
 	{
-		ebMSDAO.insertCPA(cpa);
+		ebMSDAO.insertCPA(cpa,url);
+		flushUrlMethodCache(cpa.getCpaid());
 		flushCPAMethodCache(cpa.getCpaid());
 	}
 
-	public int updateCPA(CollaborationProtocolAgreement cpa)
+	public int updateCPA(CollaborationProtocolAgreement cpa, String url)
 	{
-		int result = ebMSDAO.updateCPA(cpa);
+		int result = ebMSDAO.updateCPA(cpa,url);
 		methodCache.removeAll();
 		return result;
 	}

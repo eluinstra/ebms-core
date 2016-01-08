@@ -23,7 +23,7 @@ import javax.jws.WebResult;
 import javax.jws.WebService;
 import javax.xml.bind.annotation.XmlElement;
 
-@WebService(targetNamespace="http://www.ordina.nl/cpa/2.2")
+@WebService(targetNamespace="http://www.ordina.nl/cpa/2.10")
 public interface CPAService
 {
 	@WebMethod(operationName="ValidateCPA")
@@ -31,7 +31,7 @@ public interface CPAService
 
 	@WebResult(name="CPAId")
 	@WebMethod(operationName="InsertCPA")
-	String insertCPA(@WebParam(name="CPA") @XmlElement(required=true) /*CollaborationProtocolAgreement*/String cpa, @WebParam(name="Overwrite") Boolean overwrite) throws CPAServiceException;
+	String insertCPA(@WebParam(name="CPA") @XmlElement(required=true) /*CollaborationProtocolAgreement*/String cpa, @WebParam(name="URL") String url, @WebParam(name="Overwrite") Boolean overwrite) throws CPAServiceException;
 
 	@WebMethod(operationName="DeleteCPA")
 	void deleteCPA(@WebParam(name="CPAId") @XmlElement(required=true) String cpaId) throws CPAServiceException;

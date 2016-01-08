@@ -62,7 +62,7 @@ public class CPAServiceImpl implements CPAService
 	}
 	
 	@Override
-	public String insertCPA(/*CollaborationProtocolAgreement*/String cpa, Boolean overwrite) throws CPAServiceException
+	public String insertCPA(/*CollaborationProtocolAgreement*/String cpa, String url, Boolean overwrite) throws CPAServiceException
 	{
 		try
 		{
@@ -76,14 +76,14 @@ public class CPAServiceImpl implements CPAService
 				{
 					if (overwrite != null && overwrite)
 					{
-						if (cpaManager.updateCPA(cpa_) == 0)
+						if (cpaManager.updateCPA(cpa_,url) == 0)
 							throw new CPAServiceException("Could not update CPA " + cpa_.getCpaid() + "! CPA does not exists.");
 					}
 					else
 						throw new CPAServiceException("Did not insert CPA " + cpa_.getCpaid() + "! CPA already exists.");
 				}
 				else
-					cpaManager.insertCPA(cpa_);
+					cpaManager.insertCPA(cpa_,url);
 			}
 			return cpa_.getCpaid();
 		}
