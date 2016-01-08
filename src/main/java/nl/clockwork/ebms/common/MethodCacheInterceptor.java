@@ -42,7 +42,7 @@ public class MethodCacheInterceptor implements MethodInterceptor
 		return element.getObjectValue();
 	}
 
-	private String getCacheKey(String targetName, String methodName, Object[] arguments)
+	public static String getCacheKey(String targetName, String methodName, Object...arguments)
 	{
 		StringBuffer sb = new StringBuffer();
 		sb.append(targetName).append(".").append(methodName);

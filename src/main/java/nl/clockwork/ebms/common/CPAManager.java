@@ -3,6 +3,7 @@ package nl.clockwork.ebms.common;
 import java.util.Date;
 import java.util.List;
 
+import net.sf.ehcache.Ehcache;
 import nl.clockwork.ebms.Constants;
 import nl.clockwork.ebms.dao.EbMSDAO;
 import nl.clockwork.ebms.model.CacheablePartyId;
@@ -26,6 +27,7 @@ import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.StatusValueType;
 
 public class CPAManager
 {
+	private Ehcache methodCache;
 	private EbMSDAO ebMSDAO;
 
 	public boolean existsCPA(String cpaId)
@@ -46,16 +48,21 @@ public class CPAManager
 	public void insertCPA(CollaborationProtocolAgreement cpa)
 	{
 		ebMSDAO.insertCPA(cpa);
+		flushCPAMethodCache(cpa.getCpaid());
 	}
 
 	public int updateCPA(CollaborationProtocolAgreement cpa)
 	{
-		return ebMSDAO.updateCPA(cpa);
+		int result = ebMSDAO.updateCPA(cpa);
+		methodCache.removeAll();
+		return result;
 	}
 
 	public int deleteCPA(String cpaId)
 	{
-		return ebMSDAO.deleteCPA(cpaId);
+		int result = ebMSDAO.deleteCPA(cpaId);
+		methodCache.removeAll();
+		return result;
 	}
 
 	public String getUrl(String cpaId)
@@ -66,6 +73,7 @@ public class CPAManager
 	public void setUrl(String cpaId, String url)
 	{
 		ebMSDAO.updateUrl(cpaId,url);
+		methodCache.remove(MethodCacheInterceptor.getCacheKey("nl.clockwork.ebms.common.CPAManager","getUrl",cpaId));
 	}
 
 	public boolean isValid(String cpaId, Date timestamp)
@@ -239,6 +247,18 @@ public class CPAManager
 		return result;
 	}
 
+	private void flushCPAMethodCache(String cpaId)
+	{
+		methodCache.remove(MethodCacheInterceptor.getCacheKey("nl.clockwork.ebms.dao.hsqldb.EbMSDAOImpl","getCPA",cpaId));
+		methodCache.remove(MethodCacheInterceptor.getCacheKey("nl.clockwork.ebms.dao.mssql.EbMSDAOImpl","getCPA",cpaId));
+		methodCache.remove(MethodCacheInterceptor.getCacheKey("nl.clockwork.ebms.dao.mysql.EbMSDAOImpl","getCPA",cpaId));
+		methodCache.remove(MethodCacheInterceptor.getCacheKey("nl.clockwork.ebms.dao.oracle.EbMSDAOImpl","getCPA",cpaId));
+		methodCache.remove(MethodCacheInterceptor.getCacheKey("nl.clockwork.ebms.dao.postgresql.EbMSDAOImpl","getCPA",cpaId));
+		methodCache.remove(MethodCacheInterceptor.getCacheKey("nl.clockwork.ebms.common.CPAManager","existsCPA",cpaId));
+		methodCache.remove(MethodCacheInterceptor.getCacheKey("nl.clockwork.ebms.common.CPAManager","getCPA",cpaId));
+		methodCache.remove(MethodCacheInterceptor.getCacheKey("nl.clockwork.ebms.common.CPAManager","getCPAIds"));
+	}
+
 	private ServiceBinding getServiceBinding(PartyInfo partyInfo, String role, String service)
 	{
 		for (CollaborationRole collaborationRole : partyInfo.getCollaborationRole())
@@ -265,6 +285,11 @@ public class CPAManager
 				if (action.equals(canReceive.getThisPartyActionBinding().getAction()))
 					return canReceive;
 		return null;
+	}
+
+	public void setMethodCache(Ehcache methodCache)
+	{
+		this.methodCache = methodCache;
 	}
 
 	public void setEbMSDAO(EbMSDAO ebMSDAO)
