@@ -1,6 +1,6 @@
 CREATE TABLE cpa
 (
-	cpa_id						VARCHAR(256)		NOT NULL UNIQUE,
+	cpa_id						VARCHAR(256)		NOT NULL PRIMARY KEY,
 	cpa								CLOB						NOT NULL,
 	url								VARCHAR(256)		NULL
 );
@@ -23,7 +23,8 @@ CREATE TABLE ebms_message
 	content						CLOB						NULL,
 	status						SMALLINT				NULL,
 	status_time				TIMESTAMP				NULL,
-	PRIMARY KEY (message_id,message_nr)
+	PRIMARY KEY (message_id,message_nr),
+	FOREIGN KEY (cpa_id) REFERENCES cpa(cpa_id)
 );
 
 CREATE INDEX i_ebms_message ON ebms_message_queue (cpa_id,status,message_nr);
@@ -51,6 +52,7 @@ CREATE TABLE ebms_event
 	time_to_live			TIMESTAMP				NULL,
 	time_stamp				TIMESTAMP				NOT NULL,
 	retries						SMALLINT				DEFAULT 0 NOT NULL,
+	FOREIGN KEY (cpa_id) REFERENCES cpa(cpa_id),
 	FOREIGN KEY (message_id,message_nr) REFERENCES ebms_message(message_id,message_nr)
 );
 
