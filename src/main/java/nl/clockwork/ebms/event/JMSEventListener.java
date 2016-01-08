@@ -129,8 +129,6 @@ public class JMSEventListener implements EventListener
 		message.setStringProperty("conversationId",messageContext.getConversationId());
 		message.setStringProperty("messageId",messageContext.getMessageId());
 		message.setStringProperty("refToMessageId",messageContext.getRefToMessageId());
-		if (messageContext.getSequenceNr() != null)
-			message.setIntProperty("sequenceNr",messageContext.getSequenceNr());
 		return message;
 	}
 

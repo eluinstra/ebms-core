@@ -36,7 +36,6 @@ public class EbMSMessageContext implements Serializable
 	private String conversationId;
 	private String messageId;
 	private String refToMessageId;
-	private Integer sequenceNr;
 
 	public EbMSMessageContext()
 	{
@@ -155,14 +154,4 @@ public class EbMSMessageContext implements Serializable
 		this.refToMessageId = refToMessageId;
 	}
 	
-	@XmlElement
-	public Integer getSequenceNr()
-	{
-		return sequenceNr;
-	}
-	
-	public void setSequenceNr(Integer sequenceNr)
-	{
-		this.sequenceNr = sequenceNr;
-	}
 }
