@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.clockwork.ebms.event.spring;
+package nl.clockwork.ebms.event;
 
 import java.util.Map;
 
@@ -23,8 +23,6 @@ import javax.jms.Message;
 import javax.jms.Session;
 
 import nl.clockwork.ebms.dao.EbMSDAO;
-import nl.clockwork.ebms.event.EventException;
-import nl.clockwork.ebms.event.EventListener;
 import nl.clockwork.ebms.model.EbMSMessageContext;
 
 import org.apache.commons.logging.Log;
