@@ -45,7 +45,7 @@ public class CPAManager
 
 	public void insertCPA(CollaborationProtocolAgreement cpa, String url)
 	{
-		ebMSDAO.insertCPA(cpa);
+		ebMSDAO.insertCPA(cpa,url);
 	}
 
 	public int updateCPA(CollaborationProtocolAgreement cpa, String url)

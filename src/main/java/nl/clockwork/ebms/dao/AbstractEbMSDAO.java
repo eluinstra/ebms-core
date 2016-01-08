@@ -196,7 +196,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	}
 
 	@Override
-	public void insertCPA(CollaborationProtocolAgreement cpa) throws DAOException
+	public void insertCPA(CollaborationProtocolAgreement cpa, String url) throws DAOException
 	{
 		Connection c = null;
 		try
@@ -205,12 +205,14 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 			try (PreparedStatement ps  = c.prepareStatement(
 				"insert into cpa (" +
 					"cpa_id," +
-					"cpa" +
-				") values (?,?)"
+					"cpa," +
+					"url" +
+				") values (?,?,?)"
 			))
 			{
 				ps.setString(1,cpa.getCpaid());
 				ps.setString(2,XMLMessageBuilder.getInstance(CollaborationProtocolAgreement.class).handle(cpa));
+				ps.setString(3,url);
 				ps.executeUpdate();
 			}
 		}
@@ -225,7 +227,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	}
 
 	@Override
-	public int updateCPA(CollaborationProtocolAgreement cpa) throws DAOException
+	public int updateCPA(CollaborationProtocolAgreement cpa, String url) throws DAOException
 	{
 		Connection c = null;
 		try
@@ -234,11 +236,13 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 			try (PreparedStatement ps  = c.prepareStatement(
 				"update cpa set" +
 				" cpa = ?" +
+				" url= ?" +
 				" where cpa_id = ?"
 			))
 			{
 				ps.setString(1,XMLMessageBuilder.getInstance(CollaborationProtocolAgreement.class).handle(cpa));
-				ps.setString(2,cpa.getCpaid());
+				ps.setString(2,url);
+				ps.setString(3,cpa.getCpaid());
 				return ps.executeUpdate();
 			}	
 		}
