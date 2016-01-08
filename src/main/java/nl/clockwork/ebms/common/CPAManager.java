@@ -43,14 +43,14 @@ public class CPAManager
 		return ebMSDAO.getCPAIds();
 	}
 
-	public void insertCPA(CollaborationProtocolAgreement cpa)
+	public void insertCPA(CollaborationProtocolAgreement cpa, String url)
 	{
 		ebMSDAO.insertCPA(cpa);
 	}
 
-	public int updateCPA(CollaborationProtocolAgreement cpa)
+	public int updateCPA(CollaborationProtocolAgreement cpa, String url)
 	{
-		return ebMSDAO.updateCPA(cpa);
+		return ebMSDAO.updateCPA(cpa,url);
 	}
 
 	public int deleteCPA(String cpaId)
