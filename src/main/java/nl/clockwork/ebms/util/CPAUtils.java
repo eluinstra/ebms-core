@@ -52,6 +52,11 @@ import org.w3._2000._09.xmldsig.X509DataType;
 //TODO use JXPath
 public class CPAUtils
 {
+	public static boolean equals(List<PartyId> cpaPartyIds, List<org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.PartyId> headerPartyIds)
+	{
+		return headerPartyIds.size() <= cpaPartyIds.size() && containsAll(cpaPartyIds,headerPartyIds);
+	}
+
 	public static String toString(PartyId partyId)
 	{
 		return (partyId.getType() == null ? "" : partyId.getType() + ":") + partyId.getValue();
@@ -95,32 +100,6 @@ public class CPAUtils
 			result.add(p);
 		}
 		return result;
-	}
-	
-	public static boolean equals(List<PartyId> cpaPartyIds, List<org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.PartyId> headerPartyIds)
-	{
-		return cpaPartyIds.size() == headerPartyIds.size() && containsAll(cpaPartyIds,headerPartyIds);
-	}
-
-	private static boolean containsAll(List<PartyId> cpaPartyIds, List<org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.PartyId> headerPartyIds)
-	{
-		for (org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.PartyId headerPartyId : headerPartyIds)
-			if (!contains(cpaPartyIds,headerPartyId))
-				return false;
-		return true;
-	}
-
-	private static boolean contains(List<PartyId> cpaPartyIds, org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.PartyId partyId)
-	{
-		for (PartyId cpaPartyId : cpaPartyIds)
-			if (equals(cpaPartyId,partyId))
-				return true;
-		return false;
-	}
-
-	private static boolean equals(PartyId cpaPartyId, org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.PartyId partyId)
-	{
-		return partyId.getValue().equals(cpaPartyId.getValue()) && (partyId.getType() == null || (cpaPartyId.getType() != null && partyId.getType().equals(cpaPartyId.getType())));
 	}
 	
 	public static FromPartyInfo getFromPartyInfo(PartyInfo partyInfo, CollaborationRole role, CanSend canSend)
@@ -252,6 +231,27 @@ public class CPAUtils
 		return null;
 	}
 
+	private static boolean containsAll(List<PartyId> cpaPartyIds, List<org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.PartyId> headerPartyIds)
+	{
+		for (org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.PartyId headerPartyId : headerPartyIds)
+			if (!contains(cpaPartyIds,headerPartyId))
+				return false;
+		return true;
+	}
+
+	private static boolean contains(List<PartyId> cpaPartyIds, org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.PartyId partyId)
+	{
+		for (PartyId cpaPartyId : cpaPartyIds)
+			if (equals(cpaPartyId,partyId))
+				return true;
+		return false;
+	}
+
+	private static boolean equals(PartyId cpaPartyId, org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.PartyId partyId)
+	{
+		return partyId.getValue().equals(cpaPartyId.getValue()) && (partyId.getType() == null || (cpaPartyId.getType() != null && partyId.getType().equals(cpaPartyId.getType())));
+	}
+	
 	private static String getSignatureAlgorithm(String value)
 	{
 		//TODO: Expected values include: RSA-MD5, RSA-SHA1, DSA-MD5, DSA-SHA1, SHA1withRSA, MD5withRSA, and so on.
