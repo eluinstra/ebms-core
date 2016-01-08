@@ -38,7 +38,6 @@ public interface CPAService
 
 	@WebResult(name="CPAIds")
 	@WebMethod(operationName="GetCPAIds")
-	//@ResponseWrapper(className="nl.clockwork.ebms.service.GetCPAIdsResponse")
 	List<String> getCPAIds() throws CPAServiceException;
 
 	@WebResult(name="CPA")
