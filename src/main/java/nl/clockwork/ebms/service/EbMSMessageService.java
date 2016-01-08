@@ -40,7 +40,6 @@ public interface EbMSMessageService
 
 	@WebResult(name="MessageIds")
 	@WebMethod(operationName="GetMessageIds")
-	//@ResponseWrapper(className="nl.clockwork.ebms.service.GetMessageIdsResponse")
 	List<String> getMessageIds(@WebParam(name="MessageContext") @XmlElement(required=true) EbMSMessageContext messageContext, @WebParam(name="MaxNr") Integer maxNr) throws EbMSMessageServiceException;
 
 	@WebResult(name="Message")
