@@ -10,6 +10,7 @@ This library contains the core functionality of the EbMS adapter including:
 	- mssql (>=2008 R2)
 	- oracle (>=11)
 - CPA and EbMSMessage SOAP Services to control the EbMS adapter
+- See SourceForge for the EbMS Admin Console.
 
 Implemented:
 -	Core Functionality
@@ -36,12 +37,11 @@ Not implemented:
 
 Remarks:
 -	Duplicate messages will always be eliminated
+-	Only acts as ToPartyMSH, not as nextMSH
 -	Extendible to support other communication protocols
-- Manifest can only refer to payload data included as part of the message as payload document(s) contained in a Payload Container, not to remote resources accessible via a URL
-- Only 1 (allPurpose) Channel per Action is supported
-- ErrorList and Acknowledgment elements as part of another message are not supported. Only standalone Acknowledgment and MessageError messages are supported.
-
-See SourceForge for the EbMS Admin Console.
+-	Manifest can only refer to payload data included as part of the message as payload document(s) contained in a Payload Container, not to remote resources accessible via a URL
+-	Only 1 (allPurpose) Channel per Action is supported
+-	ErrorList and Acknowledgment elements as part of another message are not supported. Only standalone Acknowledgment and MessageError messages are supported.
 
 ===============
 Prerequisites =
@@ -79,6 +79,7 @@ EbMS Adapter Database =
 The EbMS adapter supports different databases:
 - HSQLDB
 - MySQL
+- MariaDB
 - PostgreSQL
 - MSSQL
 - Oracle
