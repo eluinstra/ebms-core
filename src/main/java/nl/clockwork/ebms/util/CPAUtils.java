@@ -40,7 +40,6 @@ import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DeliveryChannel;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DocExchange;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.Packaging;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.PartyId;
-import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.PartyInfo;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.PerMessageCharacteristicsType;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.ReliableMessaging;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.SenderNonRepudiation;
@@ -84,22 +83,19 @@ public class CPAUtils
 		return result;
 	}
 	
-	public static List<org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.PartyId> getPartyIds(List<PartyId> partyIds)
+	public static List<org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.PartyId> toPartyId(PartyId partyId)
 	{
 		List<org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.PartyId> result = new ArrayList<org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.PartyId>();
-		for (PartyId partyId : partyIds)
-		{
-			org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.PartyId p = new org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.PartyId();
-			p.setType(partyId.getType());
-			p.setValue(partyId.getValue());
-			result.add(p);
-		}
+		org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.PartyId p = new org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.PartyId();
+		p.setType(partyId.getType());
+		p.setValue(partyId.getValue());
+		result.add(p);
 		return result;
 	}
 	
 	public static boolean equals(List<PartyId> cpaPartyIds, List<org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.PartyId> headerPartyIds)
 	{
-		return cpaPartyIds.size() == headerPartyIds.size() && containsAll(cpaPartyIds,headerPartyIds);
+		return headerPartyIds.size() <= cpaPartyIds.size() && containsAll(cpaPartyIds,headerPartyIds);
 	}
 
 	private static boolean containsAll(List<PartyId> cpaPartyIds, List<org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.PartyId> headerPartyIds)
@@ -123,22 +119,20 @@ public class CPAUtils
 		return partyId.getValue().equals(cpaPartyId.getValue()) && (partyId.getType() == null || (cpaPartyId.getType() != null && partyId.getType().equals(cpaPartyId.getType())));
 	}
 	
-	public static FromPartyInfo getFromPartyInfo(PartyInfo partyInfo, CollaborationRole role, CanSend canSend)
+	public static FromPartyInfo getFromPartyInfo(PartyId partyId, CollaborationRole role, CanSend canSend)
 	{
 		FromPartyInfo result = new FromPartyInfo();
-		result.setDefaultMshChannelId((DeliveryChannel)partyInfo.getDefaultMshChannelId());
-		result.setPartyIds(getPartyIds(partyInfo.getPartyId()));
+		result.setPartyIds(toPartyId(partyId));
 		result.setRole(role.getRole().getName());
 		result.setService(role.getServiceBinding().getService());
 		result.setCanSend(canSend);
 		return result;
 	}
 
-	public static ToPartyInfo getToPartyInfo(PartyInfo partyInfo, CollaborationRole role, CanReceive canReceive)
+	public static ToPartyInfo getToPartyInfo(PartyId partyId, CollaborationRole role, CanReceive canReceive)
 	{
 		ToPartyInfo result = new ToPartyInfo();
-		result.setDefaultMshChannelId((DeliveryChannel)partyInfo.getDefaultMshChannelId());
-		result.setPartyIds(getPartyIds(partyInfo.getPartyId()));
+		result.setPartyIds(toPartyId(partyId));
 		result.setRole(role.getRole().getName());
 		result.setService(role.getServiceBinding().getService());
 		result.setCanReceive(canReceive);

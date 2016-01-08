@@ -15,11 +15,7 @@
  */
 package nl.clockwork.ebms.model;
 
-import nl.clockwork.ebms.Constants;
-import nl.clockwork.ebms.util.CPAUtils;
-
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CanReceive;
-import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DeliveryChannel;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.ServiceType;
 
 public class ToPartyInfo extends EbMSPartyInfo
@@ -63,8 +59,4 @@ public class ToPartyInfo extends EbMSPartyInfo
 		this.role = role;
 	}
 
-	public DeliveryChannel getDeliveryChannel()
-	{
-		return Constants.EBMS_SERVICE_URI.equals(service.getValue()) ? defaultMshChannelId : CPAUtils.getDeliveryChannel(canReceive.getThisPartyActionBinding().getChannelId());
-	}
 }

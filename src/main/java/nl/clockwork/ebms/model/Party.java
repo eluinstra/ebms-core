@@ -74,6 +74,16 @@ public class Party implements Serializable
 		return new StringBuffer().append(partyId).append(":").append(role).toString();
 	}
 	
+	public PartyId getPartyId(List<PartyId> partyIds)
+	{
+		if (getPartyId() == null || partyIds == null)
+			return null;
+		for (PartyId partyId : partyIds)
+			if (getPartyId().equals(CPAUtils.toString(partyId)))
+				return partyId;
+		return null;
+	}
+
 	public boolean matches(List<PartyId> partyIds)
 	{
 		if (getPartyId() == null && (partyIds == null || partyIds.size() == 0))
@@ -85,7 +95,7 @@ public class Party implements Serializable
 				return true;
 		return false;
 	}
-	
+
 	public boolean matches(Role role)
 	{
 		return getRole() == null || getRole().equals(role.getName());

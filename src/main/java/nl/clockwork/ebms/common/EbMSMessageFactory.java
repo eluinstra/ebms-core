@@ -118,7 +118,7 @@ public class EbMSMessageFactory
 		{
 			EbMSMessage result = new EbMSMessage();
 			result.setMessageHeader(createMessageHeader(cpaId,fromParty,toParty,EbMSAction.PING.action()));
-			result.setSyncReply(createSyncReply(cpaId,fromParty));
+			result.setSyncReply(createSyncReply(cpaId,fromParty,EbMSAction.PING.action()));
 			result.setMessage(EbMSMessageUtils.createSOAPMessage(result));
 			return result;
 		}
@@ -159,7 +159,7 @@ public class EbMSMessageFactory
 			StatusRequest statusRequest = EbMSMessageUtils.createStatusRequest(messageId);
 			EbMSMessage result = new EbMSMessage();
 			result.setMessageHeader(messageHeader);
-			result.setSyncReply(createSyncReply(cpaId,fromParty));
+			result.setSyncReply(createSyncReply(cpaId,fromParty,EbMSAction.STATUS_REQUEST.action()));
 			result.setStatusRequest(statusRequest);
 			result.setMessage(EbMSMessageUtils.createSOAPMessage(result));
 			return result;
@@ -240,7 +240,7 @@ public class EbMSMessageFactory
 		String uuid = UUID.randomUUID().toString();
 		EbMSPartyInfo fromPartyInfo = cpaManager.getEbMSPartyInfo(cpaId,fromParty);
 		EbMSPartyInfo toPartyInfo = cpaManager.getEbMSPartyInfo(cpaId,toParty);
-		DeliveryChannel deliveryChannel = (DeliveryChannel)fromPartyInfo.getDefaultMshChannelId();
+		DeliveryChannel deliveryChannel = cpaManager.getDefaultDeliveryChannel(cpaId,new CacheablePartyId(fromPartyInfo.getPartyIds()),action);
 		String hostname = CPAUtils.getHostname(deliveryChannel);
 
 		MessageHeader messageHeader = new MessageHeader();
@@ -386,15 +386,14 @@ public class EbMSMessageFactory
 			return null;
 	}
 	
-	private SyncReply createSyncReply(String cpaId, Party fromParty)
+	private SyncReply createSyncReply(String cpaId, Party fromParty, String action)
 	{
-		return EbMSMessageUtils.createSyncReply(cpaManager.getEbMSPartyInfo(cpaId,fromParty).getDefaultMshChannelId());
+		return EbMSMessageUtils.createSyncReply(cpaManager.getDefaultDeliveryChannel(cpaId,new CacheablePartyId(cpaManager.getEbMSPartyInfo(cpaId,fromParty).getPartyIds()),action));
 	}
 	
 	private SyncReply createSyncReply(String cpaId, EbMSMessageContext context)
 	{
-		FromPartyInfo fromPartyInfo = cpaManager.getFromPartyInfo(cpaId,context.getFromRole(),context.getService(),context.getAction());
-		return EbMSMessageUtils.createSyncReply(fromPartyInfo.getDeliveryChannel());
+		return EbMSMessageUtils.createSyncReply(cpaManager.getDefaultDeliveryChannel(cpaId,new CacheablePartyId(cpaManager.getFromPartyInfo(cpaId,context.getFromRole(),context.getService(),context.getAction()).getPartyIds()),context.getAction()));
 	}
 
 	private StatusResponse createStatusResponse(StatusRequest statusRequest, EbMSMessageStatus status, Date timestamp) throws DatatypeConfigurationException

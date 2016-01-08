@@ -90,20 +90,6 @@ public class CPAManager
 		return new Party(partyId,toRole.getRole());
 	}
 	
-	public EbMSPartyInfo getEbMSPartyInfo(String cpaId, CacheablePartyId partyId)
-	{
-		CollaborationProtocolAgreement cpa = getCPA(cpaId);
-		for (PartyInfo partyInfo : cpa.getPartyInfo())
-			if (CPAUtils.equals(partyInfo.getPartyId(),partyId))
-			{
-				EbMSPartyInfo result = new EbMSPartyInfo();
-				result.setDefaultMshChannelId((DeliveryChannel)partyInfo.getDefaultMshChannelId());
-				result.setPartyIds(CPAUtils.getPartyIds(partyInfo.getPartyId()));
-				return result;
-			}
-		return null;
-	}
-	
 	public EbMSPartyInfo getEbMSPartyInfo(String cpaId, Party party)
 	{
 		CollaborationProtocolAgreement cpa = getCPA(cpaId);
@@ -113,8 +99,7 @@ public class CPAManager
 					if (party.matches(role.getRole()))
 					{
 						EbMSPartyInfo result = new EbMSPartyInfo();
-						result.setDefaultMshChannelId((DeliveryChannel)partyInfo.getDefaultMshChannelId());
-						result.setPartyIds(CPAUtils.getPartyIds(partyInfo.getPartyId()));
+						result.setPartyIds(CPAUtils.toPartyId(party.getPartyId(partyInfo.getPartyId())));
 						result.setRole(party.getRole());
 						return result;
 					}
@@ -130,17 +115,6 @@ public class CPAManager
 		return null;
 	}
 	
-	public FromPartyInfo getFromPartyInfo(String cpaId, CacheablePartyId partyId, String fromRole, String service, String action)
-	{
-		PartyInfo partyInfo = getPartyInfo(cpaId,partyId);
-		for (CollaborationRole role : partyInfo.getCollaborationRole())
-			if (fromRole.equals(role.getRole().getName()) && service.equals(CPAUtils.toString(role.getServiceBinding().getService())))
-				for (CanSend canSend : role.getServiceBinding().getCanSend())
-					if (action.equals(canSend.getThisPartyActionBinding().getAction()))
-						return CPAUtils.getFromPartyInfo(partyInfo,role,canSend);
-		return null;
-	}
-	
 	public FromPartyInfo getFromPartyInfo(String cpaId, Role fromRole, String service, String action)
 	{
 		CollaborationProtocolAgreement cpa = getCPA(cpaId);
@@ -150,7 +124,7 @@ public class CPAManager
 					if (fromRole == null || fromRole.matches(role.getRole()) && service.equals(CPAUtils.toString(role.getServiceBinding().getService())))
 						for (CanSend canSend : role.getServiceBinding().getCanSend())
 							if (action.equals(canSend.getThisPartyActionBinding().getAction()))
-								return CPAUtils.getFromPartyInfo(partyInfo,role,canSend);
+								return CPAUtils.getFromPartyInfo(fromRole == null ? partyInfo.getPartyId().get(0) : fromRole.getPartyId(partyInfo.getPartyId()),role,canSend);
 		return null;
 	}
 
@@ -162,21 +136,10 @@ public class CPAManager
 			for (CollaborationRole role : partyInfo.getCollaborationRole())
 				for (CanReceive canReceive : role.getServiceBinding().getCanReceive())
 					if (canReceive.getThisPartyActionBinding().equals(fromPartyInfo.getCanSend().getOtherPartyActionBinding()))
-						return CPAUtils.getToPartyInfo(partyInfo,role,canReceive);
+						return CPAUtils.getToPartyInfo(fromRole == null ? partyInfo.getPartyId().get(0) : fromRole.getPartyId(partyInfo.getPartyId()),role,canReceive);
 		return null;
 	}
 
-	public ToPartyInfo getToPartyInfo(String cpaId, CacheablePartyId partyId, String toRole, String service, String action)
-	{
-		PartyInfo partyInfo = getPartyInfo(cpaId,partyId);
-		for (CollaborationRole role : partyInfo.getCollaborationRole())
-			if (toRole.equals(role.getRole().getName()) && service.equals(CPAUtils.toString(role.getServiceBinding().getService())))
-				for (CanReceive canReceive : role.getServiceBinding().getCanReceive())
-					if (action.equals(canReceive.getThisPartyActionBinding().getAction()))
-						return CPAUtils.getToPartyInfo(partyInfo,role,canReceive);
-		return null;
-	}
-	
 	public ToPartyInfo getToPartyInfo(String cpaId, Role toRole, String service, String action)
 	{
 		CollaborationProtocolAgreement cpa = getCPA(cpaId);
@@ -186,7 +149,7 @@ public class CPAManager
 					if (toRole == null || toRole.matches(role.getRole()) && service.equals(CPAUtils.toString(role.getServiceBinding().getService())))
 						for (CanReceive canReceive : role.getServiceBinding().getCanReceive())
 							if (action.equals(canReceive.getThisPartyActionBinding().getAction()))
-								return CPAUtils.getToPartyInfo(partyInfo,role,canReceive);
+								return CPAUtils.getToPartyInfo(toRole == null ? partyInfo.getPartyId().get(0) : toRole.getPartyId(partyInfo.getPartyId()),role,canReceive);
 		return null;
 	}
 
