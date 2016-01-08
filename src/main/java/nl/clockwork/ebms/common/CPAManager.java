@@ -30,9 +30,7 @@ public class CPAManager
 
 	public boolean existsCPA(String cpaId)
 	{
-		//FIXME existsCPA() is replaced by getCPA(), because it does not work on hsqldb
-		//return ebMSDAO.existsCPA(cpaId);
-		return ebMSDAO.getCPA(cpaId) != null;
+		return ebMSDAO.existsCPA(cpaId);
 	}
 
 	public CollaborationProtocolAgreement getCPA(String cpaId)

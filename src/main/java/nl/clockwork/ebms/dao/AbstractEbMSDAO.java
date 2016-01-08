@@ -106,7 +106,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 		try
 		{
 			return jdbcTemplate.queryForInt(
-				"select count(cpa_id)" +
+				"select count(*)" +
 				" from cpa" +
 				" where cpa_id = ?",
 				cpaId
