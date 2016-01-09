@@ -308,6 +308,11 @@ public class CPAManager
 		return replacementUrl == null ? CPAUtils.getUri(deliveryChannel) : replacementUrl;
 	}
 
+	public void setMethodCache(Ehcache methodCache)
+	{
+		this.methodCache = methodCache;
+	}
+
 	public void setEbMSDAO(EbMSDAO ebMSDAO)
 	{
 		this.ebMSDAO = ebMSDAO;

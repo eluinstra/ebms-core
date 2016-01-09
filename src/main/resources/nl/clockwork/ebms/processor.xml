@@ -70,6 +70,7 @@
 	</bean>
 
 	<bean id="_cpaManager" class="nl.clockwork.ebms.common.CPAManager">
+		<property name="methodCache" ref="ebMSMethodCache"/>
 		<property name="ebMSDAO" ref="ebMSDAO"/>
 	</bean>
 

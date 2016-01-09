@@ -235,7 +235,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 			c = connectionManager.getConnection();
 			try (PreparedStatement ps  = c.prepareStatement(
 				"update cpa set" +
-				" cpa = ?" +
+				" cpa = ?," +
 				" url= ?" +
 				" where cpa_id = ?"
 			))
