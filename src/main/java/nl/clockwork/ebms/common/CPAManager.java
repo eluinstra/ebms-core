@@ -15,6 +15,7 @@
  */
 package nl.clockwork.ebms.common;
 
+import java.lang.reflect.Proxy;
 import java.util.Date;
 import java.util.List;
 
@@ -94,7 +95,7 @@ public class CPAManager
 
 	private void flushCPAMethodCache(String cpaId)
 	{
-		methodCache.remove(MethodCacheInterceptor.getCacheKey(ebMSDAO.getClass().getName(),"getCPA",cpaId));
+		methodCache.remove(MethodCacheInterceptor.getCacheKey(Proxy.getInvocationHandler(ebMSDAO).getClass().getName(),"getCPA",cpaId));
 		methodCache.remove(MethodCacheInterceptor.getCacheKey("nl.clockwork.ebms.common.CPAManager","existsCPA",cpaId));
 		methodCache.remove(MethodCacheInterceptor.getCacheKey("nl.clockwork.ebms.common.CPAManager","getCPA",cpaId));
 		methodCache.remove(MethodCacheInterceptor.getCacheKey("nl.clockwork.ebms.common.CPAManager","getCPAIds"));
@@ -102,7 +103,7 @@ public class CPAManager
 
 	private void flushUrlMethodCache(String cpaId)
 	{
-		methodCache.remove(MethodCacheInterceptor.getCacheKey(ebMSDAO.getClass().getName(),"getUrl",cpaId));
+		methodCache.remove(MethodCacheInterceptor.getCacheKey(Proxy.getInvocationHandler(ebMSDAO).getClass().getName(),"getUrl",cpaId));
 	}
 
 	private void flushAllMethodCache()
