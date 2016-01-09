@@ -57,7 +57,7 @@ public class CPAInserter implements Callable
 			try
 			{
 				validator.validate(new StreamSource(new StringReader(cpa)));
-				cpaService.insertCPA(cpa,true);
+				cpaService.insertCPA(cpa,null,true);
 				message.setProperty("EBMS.REPORT",message.getProperty("originalFilename",PropertyScope.OUTBOUND) + " inserted successfully.",PropertyScope.SESSION);
 			}
 			catch (SAXException e)
