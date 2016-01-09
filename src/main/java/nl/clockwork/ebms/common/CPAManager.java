@@ -15,17 +15,16 @@
  */
 package nl.clockwork.ebms.common;
 
-import java.lang.reflect.Proxy;
 import java.util.Date;
 import java.util.List;
 
 import net.sf.ehcache.Ehcache;
 import nl.clockwork.ebms.Constants;
 import nl.clockwork.ebms.dao.EbMSDAO;
+import nl.clockwork.ebms.model.CacheablePartyId;
 import nl.clockwork.ebms.model.EbMSPartyInfo;
 import nl.clockwork.ebms.model.FromPartyInfo;
 import nl.clockwork.ebms.model.Party;
-import nl.clockwork.ebms.model.CacheablePartyId;
 import nl.clockwork.ebms.model.Role;
 import nl.clockwork.ebms.model.ToPartyInfo;
 import nl.clockwork.ebms.util.CPAUtils;
@@ -95,15 +94,15 @@ public class CPAManager
 
 	private void flushCPAMethodCache(String cpaId)
 	{
-		methodCache.remove(MethodCacheInterceptor.getCacheKey(Proxy.getInvocationHandler(ebMSDAO).getClass().getName(),"getCPA",cpaId));
-		methodCache.remove(MethodCacheInterceptor.getCacheKey("nl.clockwork.ebms.common.CPAManager","existsCPA",cpaId));
-		methodCache.remove(MethodCacheInterceptor.getCacheKey("nl.clockwork.ebms.common.CPAManager","getCPA",cpaId));
-		methodCache.remove(MethodCacheInterceptor.getCacheKey("nl.clockwork.ebms.common.CPAManager","getCPAIds"));
+		methodCache.remove(MethodCacheInterceptor.getCacheKey("EbMSDAOImpl","getCPA",cpaId));
+		methodCache.remove(MethodCacheInterceptor.getCacheKey("CPAManager","existsCPA",cpaId));
+		methodCache.remove(MethodCacheInterceptor.getCacheKey("CPAManager","getCPA",cpaId));
+		methodCache.remove(MethodCacheInterceptor.getCacheKey("CPAManager","getCPAIds"));
 	}
 
 	private void flushUrlMethodCache(String cpaId)
 	{
-		methodCache.remove(MethodCacheInterceptor.getCacheKey(Proxy.getInvocationHandler(ebMSDAO).getClass().getName(),"getUrl",cpaId));
+		methodCache.remove(MethodCacheInterceptor.getCacheKey("EbMSDAOImpl","getUrl",cpaId));
 	}
 
 	private void flushAllMethodCache()

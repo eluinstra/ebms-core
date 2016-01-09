@@ -27,7 +27,7 @@ public class MethodCacheInterceptor implements MethodInterceptor
 
 	public Object invoke(MethodInvocation invocation) throws Throwable
 	{
-		String targetName = invocation.getThis().getClass().getName();
+		String targetName = invocation.getThis().getClass().getSimpleName();
 		String methodName = invocation.getMethod().getName();
 		Object[] arguments = invocation.getArguments();
 
