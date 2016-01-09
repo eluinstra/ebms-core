@@ -300,7 +300,7 @@ public class EbMSMessageFactory
 		if (cleoPatch)
 			result.getTo().setRole(messageHeader.getFrom().getRole());
 		else
-			result.getFrom().setRole(null);
+			result.getTo().setRole(null);
 
 		result.getMessageData().setRefToMessageId(messageHeader.getMessageData().getMessageId());
 		result.getMessageData().setMessageId(UUID.randomUUID().toString() + "@" + hostname);
