@@ -55,14 +55,14 @@ public class CPAManager
 	public int updateCPA(CollaborationProtocolAgreement cpa, String url)
 	{
 		int result = ebMSDAO.updateCPA(cpa,url);
-		methodCache.removeAll();
+		flushAllMethodCache();
 		return result;
 	}
 
 	public int deleteCPA(String cpaId)
 	{
 		int result = ebMSDAO.deleteCPA(cpaId);
-		methodCache.removeAll();
+		flushAllMethodCache();
 		return result;
 	}
 
@@ -250,23 +250,19 @@ public class CPAManager
 
 	private void flushCPAMethodCache(String cpaId)
 	{
-		methodCache.remove(MethodCacheInterceptor.getCacheKey("nl.clockwork.ebms.dao.hsqldb.EbMSDAOImpl","getCPA",cpaId));
-		methodCache.remove(MethodCacheInterceptor.getCacheKey("nl.clockwork.ebms.dao.mssql.EbMSDAOImpl","getCPA",cpaId));
-		methodCache.remove(MethodCacheInterceptor.getCacheKey("nl.clockwork.ebms.dao.mysql.EbMSDAOImpl","getCPA",cpaId));
-		methodCache.remove(MethodCacheInterceptor.getCacheKey("nl.clockwork.ebms.dao.oracle.EbMSDAOImpl","getCPA",cpaId));
-		methodCache.remove(MethodCacheInterceptor.getCacheKey("nl.clockwork.ebms.dao.postgresql.EbMSDAOImpl","getCPA",cpaId));
-		methodCache.remove(MethodCacheInterceptor.getCacheKey("nl.clockwork.ebms.common.CPAManager","existsCPA",cpaId));
-		methodCache.remove(MethodCacheInterceptor.getCacheKey("nl.clockwork.ebms.common.CPAManager","getCPA",cpaId));
-		methodCache.remove(MethodCacheInterceptor.getCacheKey("nl.clockwork.ebms.common.CPAManager","getCPAIds"));
+		methodCache.remove(MethodCacheInterceptor.getCacheKey(ebMSDAO.getClass().getName(),"existsCPA",cpaId));
+		methodCache.remove(MethodCacheInterceptor.getCacheKey(ebMSDAO.getClass().getName(),"getCPA",cpaId));
+		methodCache.remove(MethodCacheInterceptor.getCacheKey(ebMSDAO.getClass().getName(),"getCPAIds"));
 	}
 
 	private void flushUrlMethodCache(String cpaId)
 	{
-		methodCache.remove(MethodCacheInterceptor.getCacheKey("nl.clockwork.ebms.dao.hsqldb.EbMSDAOImpl","getUrl",cpaId));
-		methodCache.remove(MethodCacheInterceptor.getCacheKey("nl.clockwork.ebms.dao.mssql.EbMSDAOImpl","getUrl",cpaId));
-		methodCache.remove(MethodCacheInterceptor.getCacheKey("nl.clockwork.ebms.dao.mysql.EbMSDAOImpl","getUrl",cpaId));
-		methodCache.remove(MethodCacheInterceptor.getCacheKey("nl.clockwork.ebms.dao.oracle.EbMSDAOImpl","getUrl",cpaId));
-		methodCache.remove(MethodCacheInterceptor.getCacheKey("nl.clockwork.ebms.dao.postgresql.EbMSDAOImpl","getUrl",cpaId));
+		methodCache.remove(MethodCacheInterceptor.getCacheKey(ebMSDAO.getClass().getName(),"getUrl",cpaId));
+	}
+
+	private void flushAllMethodCache()
+	{
+		methodCache.removeAll();
 	}
 
 	private ServiceBinding getServiceBinding(PartyInfo partyInfo, String role, String service)

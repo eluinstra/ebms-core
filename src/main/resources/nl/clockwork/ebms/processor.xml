@@ -87,10 +87,10 @@
 		<property name="advice" ref="ebMSMethodCacheInterceptor"/>
 		<property name="patterns">
 			<list>
-				<value>.*existsCPA</value>
+				<!--value>.*existsCPA</value>
 				<value>.*getCPA</value>
 				<value>.*getCPAIds</value>
-				<!--value>.*getUrl</value-->
+				<value>.*getUrl</value-->
 				<value>.*getFromParty</value>
 				<value>.*getToParty</value>
 				<value>.*getEbMSPartyInfo</value>
