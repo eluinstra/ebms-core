@@ -139,7 +139,7 @@ public class EbMSMessageProcessor
 				EbMSMessage response = processStatusRequest(message.getMessageHeader().getCPAId(),timestamp,message);
 				if (message.getSyncReply() == null)
 				{
-					deliveryManager.sendResponseMessage(cpaManager.getUri(response.getMessageHeader().getCPAId(),new CacheablePartyId(response.getMessageHeader().getTo().getPartyId()),response.getMessageHeader().getTo().getRole(),CPAUtils.toString(response.getMessageHeader().getService()),response.getMessageHeader().getAction()),response);
+					deliveryManager.sendResponseMessage(cpaManager.getUri(response.getMessageHeader().getCPAId(),cpaManager.getToDeliveryChannel(response.getMessageHeader().getCPAId(),new CacheablePartyId(response.getMessageHeader().getTo().getPartyId()),response.getMessageHeader().getTo().getRole(),CPAUtils.toString(response.getMessageHeader().getService()),response.getMessageHeader().getAction())),response);
 					return null;
 				}
 				else
@@ -155,7 +155,7 @@ public class EbMSMessageProcessor
 				EbMSMessage response = processPing(message.getMessageHeader().getCPAId(),timestamp,message);
 				if (message.getSyncReply() == null)
 				{
-					deliveryManager.sendResponseMessage(cpaManager.getUri(response.getMessageHeader().getCPAId(),new CacheablePartyId(response.getMessageHeader().getTo().getPartyId()),response.getMessageHeader().getTo().getRole(),CPAUtils.toString(response.getMessageHeader().getService()),response.getMessageHeader().getAction()),response);
+					deliveryManager.sendResponseMessage(cpaManager.getUri(response.getMessageHeader().getCPAId(),cpaManager.getToDeliveryChannel(response.getMessageHeader().getCPAId(),new CacheablePartyId(response.getMessageHeader().getTo().getPartyId()),response.getMessageHeader().getTo().getRole(),CPAUtils.toString(response.getMessageHeader().getService()),response.getMessageHeader().getAction())),response);
 					return null;
 				}
 				else
@@ -249,7 +249,7 @@ public class EbMSMessageProcessor
 						{
 							ebMSDAO.insertDuplicateMessage(timestamp,message);
 							EbMSMessageContext messageContext = ebMSDAO.getMessageContextByRefToMessageId(messageHeader.getMessageData().getMessageId(),mshMessageService,EbMSAction.MESSAGE_ERROR.action(),EbMSAction.ACKNOWLEDGMENT.action());
-							ebMSDAO.insertEvent(messageContext.getMessageId(),EbMSEventType.SEND,cpaManager.getUri(cpaId,new CacheablePartyId(message.getMessageHeader().getFrom().getPartyId()),message.getMessageHeader().getFrom().getRole(),CPAUtils.toString(CPAUtils.createEbMSMessageService()),null));
+							ebMSDAO.insertEvent(messageContext.getMessageId(),EbMSEventType.SEND,cpaManager.getUri(cpaId,cpaManager.getToDeliveryChannel(cpaId,new CacheablePartyId(message.getMessageHeader().getFrom().getPartyId()),message.getMessageHeader().getFrom().getRole(),CPAUtils.toString(CPAUtils.createEbMSMessageService()),null)));
 						}
 					}
 				);
@@ -299,7 +299,7 @@ public class EbMSMessageProcessor
 								ebMSDAO.insertMessage(timestamp,message,EbMSMessageStatus.RECEIVED);
 								ebMSDAO.insertMessage(timestamp,acknowledgment,null);
 								if (message.getSyncReply() == null)
-									ebMSDAO.insertEvent(eventManager.createEbMSSendEvent(acknowledgment,cpaManager.getUri(cpaId,new CacheablePartyId(acknowledgment.getMessageHeader().getTo().getPartyId()),acknowledgment.getMessageHeader().getTo().getRole(),CPAUtils.toString(acknowledgment.getMessageHeader().getService()),acknowledgment.getMessageHeader().getAction())));
+									ebMSDAO.insertEvent(eventManager.createEbMSSendEvent(acknowledgment,cpaManager.getUri(cpaId,cpaManager.getToDeliveryChannel(cpaId,new CacheablePartyId(acknowledgment.getMessageHeader().getTo().getPartyId()),acknowledgment.getMessageHeader().getTo().getRole(),CPAUtils.toString(acknowledgment.getMessageHeader().getService()),acknowledgment.getMessageHeader().getAction()))));
 								eventListener.onMessageReceived(message.getMessageHeader().getMessageData().getMessageId());
 							}
 						}
@@ -324,7 +324,7 @@ public class EbMSMessageProcessor
 							ebMSDAO.insertMessage(timestamp,message,EbMSMessageStatus.FAILED);
 							ebMSDAO.insertMessage(timestamp,messageError,null);
 							if (message.getSyncReply() == null)
-								ebMSDAO.insertEvent(eventManager.createEbMSSendEvent(messageError,cpaManager.getUri(cpaId,new CacheablePartyId(messageError.getMessageHeader().getTo().getPartyId()),messageError.getMessageHeader().getTo().getRole(),CPAUtils.toString(messageError.getMessageHeader().getService()),messageError.getMessageHeader().getAction())));
+								ebMSDAO.insertEvent(eventManager.createEbMSSendEvent(messageError,cpaManager.getUri(cpaId,cpaManager.getToDeliveryChannel(cpaId,new CacheablePartyId(messageError.getMessageHeader().getTo().getPartyId()),messageError.getMessageHeader().getTo().getRole(),CPAUtils.toString(messageError.getMessageHeader().getService()),messageError.getMessageHeader().getAction()))));
 						}
 					}
 				);

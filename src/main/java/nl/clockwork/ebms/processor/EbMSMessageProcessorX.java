@@ -103,7 +103,7 @@ public class EbMSMessageProcessorX extends EbMSMessageProcessor
 				EbMSMessage response = processStatusRequest(message.getMessageHeader().getCPAId(),timestamp,message);
 				if (message.getSyncReply() == null)
 				{
-					deliveryManager.sendResponseMessage(cpaManager.getUri(response.getMessageHeader().getCPAId(),new CacheablePartyId(response.getMessageHeader().getTo().getPartyId()),response.getMessageHeader().getTo().getRole(),CPAUtils.toString(response.getMessageHeader().getService()),response.getMessageHeader().getAction()),response);
+					deliveryManager.sendResponseMessage(cpaManager.getUri(response.getMessageHeader().getCPAId(),cpaManager.getToDeliveryChannel(response.getMessageHeader().getCPAId(),new CacheablePartyId(response.getMessageHeader().getTo().getPartyId()),response.getMessageHeader().getTo().getRole(),CPAUtils.toString(response.getMessageHeader().getService()),response.getMessageHeader().getAction())),response);
 					return null;
 				}
 				else
@@ -119,7 +119,7 @@ public class EbMSMessageProcessorX extends EbMSMessageProcessor
 				EbMSMessage response = processPing(message.getMessageHeader().getCPAId(),timestamp,message);
 				if (message.getSyncReply() == null)
 				{
-					deliveryManager.sendResponseMessage(cpaManager.getUri(response.getMessageHeader().getCPAId(),new CacheablePartyId(response.getMessageHeader().getTo().getPartyId()),response.getMessageHeader().getTo().getRole(),CPAUtils.toString(response.getMessageHeader().getService()),response.getMessageHeader().getAction()),response);
+					deliveryManager.sendResponseMessage(cpaManager.getUri(response.getMessageHeader().getCPAId(),cpaManager.getToDeliveryChannel(response.getMessageHeader().getCPAId(),new CacheablePartyId(response.getMessageHeader().getTo().getPartyId()),response.getMessageHeader().getTo().getRole(),CPAUtils.toString(response.getMessageHeader().getService()),response.getMessageHeader().getAction())),response);
 					return null;
 				}
 				else

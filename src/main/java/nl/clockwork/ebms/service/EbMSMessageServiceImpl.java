@@ -76,7 +76,7 @@ public class EbMSMessageServiceImpl implements EbMSMessageService
 		try
 		{
 			EbMSMessage request = ebMSMessageFactory.createEbMSPing(cpaId,fromParty,toParty);
-			EbMSMessage response = deliveryManager.sendMessage(cpaManager.getUri(cpaId,new CacheablePartyId(request.getMessageHeader().getTo().getPartyId()),request.getMessageHeader().getTo().getRole(),CPAUtils.toString(request.getMessageHeader().getService()),request.getMessageHeader().getAction()),request);
+			EbMSMessage response = deliveryManager.sendMessage(cpaManager.getUri(cpaId,cpaManager.getToDeliveryChannel(cpaId,new CacheablePartyId(request.getMessageHeader().getTo().getPartyId()),request.getMessageHeader().getTo().getRole(),CPAUtils.toString(request.getMessageHeader().getService()),request.getMessageHeader().getAction())),request);
 			if (response != null)
 			{
 				if (!EbMSAction.PONG.action().equals(response.getMessageHeader().getAction()))
@@ -108,7 +108,7 @@ public class EbMSMessageServiceImpl implements EbMSMessageService
 					public void doInTransaction()
 					{
 						ebMSDAO.insertMessage(new Date(),message,EbMSMessageStatus.SENT);
-						List<EbMSEvent> events = eventManager.createEbMSSendEvents(message.getMessageHeader().getCPAId(),message,cpaManager.getUri(message.getMessageHeader().getCPAId(),new CacheablePartyId(message.getMessageHeader().getTo().getPartyId()),message.getMessageHeader().getTo().getRole(),CPAUtils.toString(message.getMessageHeader().getService()),message.getMessageHeader().getAction()));
+						List<EbMSEvent> events = eventManager.createEbMSSendEvents(message.getMessageHeader().getCPAId(),message,cpaManager.getUri(message.getMessageHeader().getCPAId(),cpaManager.getToDeliveryChannel(message.getMessageHeader().getCPAId(),new CacheablePartyId(message.getMessageHeader().getTo().getPartyId()),message.getMessageHeader().getTo().getRole(),CPAUtils.toString(message.getMessageHeader().getService()),message.getMessageHeader().getAction())));
 						ebMSDAO.insertEvents(events);
 					}
 				}
@@ -192,7 +192,7 @@ public class EbMSMessageServiceImpl implements EbMSMessageService
 			else
 			{
 				EbMSMessage request = ebMSMessageFactory.createEbMSStatusRequest(context.getCpaId(),cpaManager.getFromParty(context.getCpaId(),context.getFromRole(),context.getService(),context.getAction()),cpaManager.getToParty(context.getCpaId(),context.getToRole(),context.getService(),context.getAction()),messageId);
-				EbMSMessage response = deliveryManager.sendMessage(cpaManager.getUri(context.getCpaId(),new CacheablePartyId(request.getMessageHeader().getTo().getPartyId()),request.getMessageHeader().getTo().getRole(),CPAUtils.toString(request.getMessageHeader().getService()),request.getMessageHeader().getAction()),request);
+				EbMSMessage response = deliveryManager.sendMessage(cpaManager.getUri(context.getCpaId(),cpaManager.getToDeliveryChannel(context.getCpaId(),new CacheablePartyId(request.getMessageHeader().getTo().getPartyId()),request.getMessageHeader().getTo().getRole(),CPAUtils.toString(request.getMessageHeader().getService()),request.getMessageHeader().getAction())),request);
 				if (response != null)
 				{
 					if (EbMSAction.STATUS_RESPONSE.action().equals(response.getMessageHeader().getAction()) && response.getStatusResponse() != null)
@@ -216,7 +216,7 @@ public class EbMSMessageServiceImpl implements EbMSMessageService
 		try
 		{
 			EbMSMessage request = ebMSMessageFactory.createEbMSStatusRequest(cpaId,fromParty,toParty,messageId);
-			EbMSMessage response = deliveryManager.sendMessage(cpaManager.getUri(cpaId,new CacheablePartyId(request.getMessageHeader().getTo().getPartyId()),request.getMessageHeader().getTo().getRole(),CPAUtils.toString(request.getMessageHeader().getService()),request.getMessageHeader().getAction()),request);
+			EbMSMessage response = deliveryManager.sendMessage(cpaManager.getUri(cpaId,cpaManager.getToDeliveryChannel(cpaId,new CacheablePartyId(request.getMessageHeader().getTo().getPartyId()),request.getMessageHeader().getTo().getRole(),CPAUtils.toString(request.getMessageHeader().getService()),request.getMessageHeader().getAction())),request);
 			if (response != null)
 			{
 				if (EbMSAction.STATUS_RESPONSE.action().equals(response.getMessageHeader().getAction()) && response.getStatusResponse() != null)

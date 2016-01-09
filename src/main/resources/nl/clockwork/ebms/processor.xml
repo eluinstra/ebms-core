@@ -89,7 +89,7 @@
 				<value>.*existsCPA</value>
 				<value>.*getCPA</value>
 				<value>.*getCPAIds</value>
-				<value>.*getUrl</value>
+				<!--value>.*getUrl</value-->
 				<value>.*getFromParty</value>
 				<value>.*getToParty</value>
 				<value>.*getEbMSPartyInfo</value>
@@ -104,7 +104,7 @@
 				<value>.*getFromDeliveryChannel</value>
 				<value>.*getToDeliveryChannel</value>
 				<value>.*isNonRepudiationRequired</value>
-				<value>.*getUri</value>
+				<!--value>.*getUri</value-->
 			</list>
 		</property>
 	</bean>
