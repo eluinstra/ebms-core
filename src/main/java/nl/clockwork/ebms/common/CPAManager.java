@@ -169,7 +169,7 @@ public class CPAManager
 			for (CollaborationRole role : partyInfo.getCollaborationRole())
 				for (CanReceive canReceive : role.getServiceBinding().getCanReceive())
 					if (canReceive.getThisPartyActionBinding().equals(fromPartyInfo.getCanSend().getOtherPartyActionBinding()))
-						return CPAUtils.getToPartyInfo(fromRole == null ? partyInfo.getPartyId().get(0) : fromRole.getPartyId(partyInfo.getPartyId()),role,canReceive);
+						return CPAUtils.getToPartyInfo(partyInfo.getPartyId().get(0),role,canReceive);
 		return null;
 	}
 
