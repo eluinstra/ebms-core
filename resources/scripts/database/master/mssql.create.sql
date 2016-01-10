@@ -40,8 +40,6 @@ CREATE TABLE ebms_attachment
 	content						IMAGE						NOT NULL
 );
 
-ALTER TABLE ebms_attachment ADD CONSTRAINT uc_ebms_attachment UNIQUE (ebms_message_id,order_nr);
-
 CREATE TABLE ebms_event
 (
 	cpa_id						VARCHAR(256)		NOT NULL,
@@ -52,6 +50,8 @@ CREATE TABLE ebms_event
 	retries						SMALLINT				DEFAULT 0 NOT NULL
 );
 
+CREATE INDEX i_ebms_event ON ebms_event (time_stamp);
+
 CREATE TABLE ebms_event_log
 (
 	message_id				VARCHAR(256)		NOT NULL,
@@ -60,3 +60,5 @@ CREATE TABLE ebms_event_log
 	status						SMALLINT				NOT NULL,
 	error_message			TEXT						NULL
 );
+
+CREATE INDEX i_ebms_event_log ON ebms_event_log (message_id);

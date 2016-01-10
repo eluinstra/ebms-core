@@ -1,6 +1,6 @@
 CREATE TABLE cpa
 (
-	cpa_id						VARCHAR(256)		NOT NULL PRIMARY KEY,
+	cpa_id						VARCHAR(256)		NOT NULL UNIQUE,
 	cpa								CLOB						NOT NULL,
 	url								VARCHAR(256)		NULL
 );
@@ -23,8 +23,7 @@ CREATE TABLE ebms_message
 	content						CLOB						NULL,
 	status						NUMBER(5)				NULL,
 	status_time				TIMESTAMP				NULL,
-	PRIMARY KEY (message_id,message_nr),
-	FOREIGN KEY (cpa_id) REFERENCES cpa(cpa_id)
+	PRIMARY KEY (message_id,message_nr)
 );
 
 CREATE INDEX i_ebms_message ON ebms_message (cpa_id,status,message_nr);
@@ -38,10 +37,8 @@ CREATE TABLE ebms_attachment
 	content_id 				VARCHAR(256) 		NOT NULL,
 	content_type			VARCHAR(255)		NOT NULL,
 	content						BLOB						NOT NULL,
-	FOREIGN KEY (message_id,message_nr) REFERENCES ebms_message(message_id,message_nr)
+	FOREIGN KEY (message_id,message_nr) REFERENCES ebms_message (message_id,message_nr)
 );
-
-ALTER TABLE ebms_attachment ADD CONSTRAINT uc_ebms_attachment UNIQUE (message_id,message_nr,order_nr);
 
 CREATE TABLE ebms_event
 (
@@ -50,10 +47,10 @@ CREATE TABLE ebms_event
 	message_id				VARCHAR(256)		NOT NULL UNIQUE,
 	time_to_live			TIMESTAMP				NULL,
 	time_stamp				TIMESTAMP				NOT NULL,
-	retries						NUMBER(5)				DEFAULT 0 NOT NULL,
-	FOREIGN KEY (cpa_id) REFERENCES cpa(cpa_id),
-	FOREIGN KEY (message_id,message_nr) REFERENCES ebms_message(message_id,message_nr)
+	retries						NUMBER(5)				DEFAULT 0 NOT NULL
 );
+
+CREATE INDEX i_ebms_event ON ebms_event (time_stamp);
 
 CREATE TABLE ebms_event_log
 (
@@ -63,3 +60,5 @@ CREATE TABLE ebms_event_log
 	status						NUMBER(5)				NOT NULL,
 	error_message			CLOB						NULL
 );
+
+CREATE INDEX i_ebms_event_log ON ebms_event_log (message_id);
