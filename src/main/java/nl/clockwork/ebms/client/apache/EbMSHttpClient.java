@@ -52,10 +52,7 @@ public class EbMSHttpClient implements EbMSClient
 		{
 			HttpPost httpPost = getHttpPost(uri);
 			if (logger.isDebugEnabled())
-			{
-				logger.debug("OUT: " + uri);
 				logger.debug("OUT:\n" + DOMUtils.toString(document.getMessage()));
-			}
 			EbMSMessageWriter ebMSMessageWriter = new EbMSMessageWriter(httpPost,chunkedStreaming(uri));
 			ebMSMessageWriter.write(document);
 			{
