@@ -29,6 +29,7 @@ import nl.clockwork.ebms.model.Role;
 import nl.clockwork.ebms.model.ToPartyInfo;
 import nl.clockwork.ebms.util.CPAUtils;
 
+import org.apache.commons.lang.StringUtils;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CanReceive;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CanSend;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CollaborationProtocolAgreement;
@@ -258,7 +259,7 @@ public class CPAManager
 	public String getUri(String cpaId, CacheablePartyId partyId, String role, String service, String action)
 	{
 		String result = getUrl(cpaId);
-		if (result == null)
+		if (StringUtils.isEmpty(result))
 			result = CPAUtils.getUri(getToDeliveryChannel(cpaId,partyId,role,service,action));
 		return result;
 	}
