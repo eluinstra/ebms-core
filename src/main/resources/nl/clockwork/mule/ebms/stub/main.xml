@@ -51,11 +51,11 @@
 		<import resource="classpath:nl/clockwork/ebms/datasource.xml" />
 		<import resource="classpath:nl/clockwork/ebms/dao.xml" />
 		<import resource="classpath:nl/clockwork/ebms/processor.xml" />
+		<import resource="classpath:nl/clockwork/ebms/eventListener.xml"/>
 
 		<import resource="classpath:nl/clockwork/mule/ebms/hsqldb/hsqldb.provider.xml"/>
 
-		<import resource="classpath:nl/clockwork/mule/ebms/flows/ebms.endpoint.http.xml" />
-		<!--import resource="classpath:nl/clockwork/mule/ebms/flows/ebms.endpoint.https.xml" /-->
+		<import resource="classpath:nl/clockwork/mule/ebms/flows/ebms.endpoint.https.xml" />
 
 		<import resource="classpath:nl/clockwork/mule/ebms/flows/ebms.interface.cxf.xml" />
 
