@@ -21,8 +21,6 @@ import java.io.OutputStream;
 
 import javax.activation.DataSource;
 
-import org.springframework.util.StringUtils;
-
 public class EbMSAttachment implements DataSource
 {
 	private DataSource dataSource;
