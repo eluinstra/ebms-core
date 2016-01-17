@@ -37,11 +37,11 @@ Not implemented:
 
 Remarks:
 -	Duplicate messages will always be eliminated
+-	Only standalone MSH level messages are supported.
 -	Only acts as ToPartyMSH, not as nextMSH
--	Extendible to support other communication protocols
--	Manifest can only refer to payload data included as part of the message as payload document(s) contained in a Payload Container, not to remote resources accessible via a URL
 -	Only 1 (allPurpose) Channel per Action is supported
--	ErrorList and Acknowledgment elements as part of another message are not supported. Only standalone Acknowledgment and MessageError messages are supported.
+-	Manifest can only refer to payload data included as part of the message as payload document(s) contained in a Payload Container
+-	Extendible to support other communication protocols
 
 ===============
 Prerequisites =
