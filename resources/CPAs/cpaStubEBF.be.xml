@@ -471,25 +471,25 @@
 			</tns:ebXMLReceiverBinding>
 		</tns:DocExchange>
 	</tns:PartyInfo>
-	<tp:SimplePart tp:id="MsgHdr" tp:mimetype="text/xml">
-		<tp:NamespaceSupported tp:location="http://www.oasis-open.org/committees/ebxml-msg/schema/msg-header-2_0.xsd" tp:version="2.0">http://www.oasis-open.org/committees/ebxml-msg/schema/msg-header-2_0.xsd</tp:NamespaceSupported>
-	</tp:SimplePart>
-	<tp:SimplePart tp:id="XMLMsg" tp:mimetype="application/xml" />
-	<tp:Packaging tp:id="MshSignalPackage">
-		<tp:ProcessingCapabilities tp:parse="true" tp:generate="true" />
-		<tp:CompositeList>
-			<tp:Composite tp:id="MshSignal" tp:mimetype="multipart/related" tp:mimeparameters="type=text/xml">
-				<tp:Constituent tp:idref="MsgHdr" />
-			</tp:Composite>
-		</tp:CompositeList>
-	</tp:Packaging>
-	<tp:Packaging tp:id="XMLMessagePackage">
-		<tp:ProcessingCapabilities tp:parse="true" tp:generate="true" />
-		<tp:CompositeList>
-			<tp:Composite tp:id="Message" tp:mimetype="multipart/related" tp:mimeparameters="type=text/xml">
-				<tp:Constituent tp:idref="MsgHdr" />
-				<tp:Constituent tp:idref="XMLMsg" />
-			</tp:Composite>
-		</tp:CompositeList>
-	</tp:Packaging>
+	<tns:SimplePart tns:id="MsgHdr" tns:mimetype="text/xml">
+		<tns:NamespaceSupported tns:location="http://www.oasis-open.org/committees/ebxml-msg/schema/msg-header-2_0.xsd" tns:version="2.0">http://www.oasis-open.org/committees/ebxml-msg/schema/msg-header-2_0.xsd</tns:NamespaceSupported>
+	</tns:SimplePart>
+	<tns:SimplePart tns:id="XMLMsg" tns:mimetype="application/xml" />
+	<tns:Packaging tns:id="MshSignalPackage">
+		<tns:ProcessingCapabilities tns:parse="true" tns:generate="true" />
+		<tns:CompositeList>
+			<tns:Composite tns:id="MshSignal" tns:mimetype="multipart/related" tns:mimeparameters="type=text/xml">
+				<tns:Constituent tns:idref="MsgHdr" />
+			</tns:Composite>
+		</tns:CompositeList>
+	</tns:Packaging>
+	<tns:Packaging tns:id="XMLMessagePackage">
+		<tns:ProcessingCapabilities tns:parse="true" tns:generate="true" />
+		<tns:CompositeList>
+			<tns:Composite tns:id="Message" tns:mimetype="multipart/related" tns:mimeparameters="type=text/xml">
+				<tns:Constituent tns:idref="MsgHdr" />
+				<tns:Constituent tns:idref="XMLMsg" />
+			</tns:Composite>
+		</tns:CompositeList>
+	</tns:Packaging>
 </tns:CollaborationProtocolAgreement>
