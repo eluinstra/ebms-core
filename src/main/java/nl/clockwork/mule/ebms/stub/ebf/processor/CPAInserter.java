@@ -25,6 +25,7 @@ import javax.xml.validation.Validator;
 
 import nl.clockwork.ebms.service.CPAService;
 
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.mule.api.MuleEventContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.lifecycle.Callable;
@@ -62,7 +63,7 @@ public class CPAInserter implements Callable
 			}
 			catch (SAXException e)
 			{
-				message.setProperty("EBMS.REPORT",message.getProperty("originalFilename",PropertyScope.OUTBOUND) + " contains not a valid CPA.",PropertyScope.SESSION);
+				message.setProperty("EBMS.REPORT",message.getProperty("originalFilename",PropertyScope.OUTBOUND) + " does not contain a valid CPA.\n\n" + ExceptionUtils.getFullStackTrace(e),PropertyScope.SESSION);
 			}
 			return message;
 		}
