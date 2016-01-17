@@ -62,7 +62,7 @@ public class EventManager
 				public void doInTransaction()
 				{
 					ebMSDAO.insertEventLog(event.getMessageId(),event.getTimestamp(),url,status,errorMessage);
-					if (CPAUtils.isReliableMessaging(deliveryChannel))
+					if (event.getTimeToLive() != null && CPAUtils.isReliableMessaging(deliveryChannel))
 						ebMSDAO.updateEvent(createNewEvent(event,deliveryChannel));
 					else
 						ebMSDAO.deleteEvent(event.getMessageId());
