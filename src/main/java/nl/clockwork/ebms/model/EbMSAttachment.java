@@ -37,7 +37,7 @@ public class EbMSAttachment implements DataSource
 	@Override
 	public String getContentType()
 	{
-		return !StringUtils.isEmpty(dataSource.getContentType()) ? dataSource.getContentType().split(";")[0].trim() : null;
+		return dataSource.getContentType();
 	}
 
 	@Override
