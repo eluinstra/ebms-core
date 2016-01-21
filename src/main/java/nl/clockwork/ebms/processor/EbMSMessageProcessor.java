@@ -36,14 +36,15 @@ import nl.clockwork.ebms.common.util.DOMUtils;
 import nl.clockwork.ebms.dao.DAOException;
 import nl.clockwork.ebms.dao.DAOTransactionCallback;
 import nl.clockwork.ebms.dao.EbMSDAO;
+import nl.clockwork.ebms.encryption.EbMSMessageDecrypter;
 import nl.clockwork.ebms.event.EventListener;
 import nl.clockwork.ebms.job.EventManager;
 import nl.clockwork.ebms.model.CacheablePartyId;
 import nl.clockwork.ebms.model.EbMSDocument;
 import nl.clockwork.ebms.model.EbMSMessage;
 import nl.clockwork.ebms.model.EbMSMessageContext;
-import nl.clockwork.ebms.signature.EbMSSignatureGenerator;
-import nl.clockwork.ebms.signature.EbMSSignatureValidator;
+import nl.clockwork.ebms.signing.EbMSSignatureGenerator;
+import nl.clockwork.ebms.signing.EbMSSignatureValidator;
 import nl.clockwork.ebms.util.CPAUtils;
 import nl.clockwork.ebms.util.EbMSMessageUtils;
 import nl.clockwork.ebms.validation.CPAValidator;
@@ -82,6 +83,7 @@ public class EbMSMessageProcessor
   protected MessageHeaderValidator messageHeaderValidator;
   protected ManifestValidator manifestValidator;
   protected SignatureTypeValidator signatureTypeValidator;
+  protected EbMSMessageDecrypter messageDecrypter;
   protected Service mshMessageService;
 
   public EbMSMessageProcessor()
@@ -105,6 +107,7 @@ public class EbMSMessageProcessor
 		messageHeaderValidator.setAckSignatureRequested(PerMessageCharacteristicsType.NEVER);
 		manifestValidator = new ManifestValidator();
 		signatureTypeValidator = new SignatureTypeValidator(cpaManager,signatureValidator);
+		messageDecrypter = new EbMSMessageDecrypter();
 	}
 	
 	public EbMSDocument processRequest(EbMSDocument document) throws EbMSProcessorException
@@ -268,6 +271,7 @@ public class EbMSMessageProcessor
 				messageHeaderValidator.validate(cpaId,message,timestamp);
 				signatureTypeValidator.validate(cpaId,message);
 				manifestValidator.validate(message);
+				messageDecrypter.decrypt(message);
 				signatureTypeValidator.validateSignature(cpaId,message);
 				if (message.getAckRequested() == null)
 				{

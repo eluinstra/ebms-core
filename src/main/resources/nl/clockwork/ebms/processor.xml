@@ -119,7 +119,7 @@
 		<property name="cpaManager" ref="cpaManager"/>
 	</bean>
 
-	<bean id="signatureValidator" class="nl.clockwork.ebms.signature.EbMSSignatureValidator">
+	<bean id="signatureValidator" class="nl.clockwork.ebms.signing.EbMSSignatureValidator">
 		<property name="cpaManager" ref="cpaManager"/>
 		<property name="trustStorePath" value="${truststore.path}"/>
 		<property name="trustStorePassword" value="${truststore.password}"/>
@@ -147,7 +147,7 @@
 		<property name="messageProcessor" ref="messageProcessor"/>
 	</bean>
 
-	<bean id="signatureGenerator" class="nl.clockwork.ebms.signature.EbMSSignatureGenerator" init-method="init">
+	<bean id="signatureGenerator" class="nl.clockwork.ebms.signing.EbMSSignatureGenerator" init-method="init">
 		<property name="cpaManager" ref="cpaManager"/>
 		<property name="canonicalizationMethodAlgorithm" value="${xmldsig.canonicalizationMethodAlgorithm}"/>
 		<property name="transformAlgorithm" value="${xmldsig.transformAlgorithm}"/>

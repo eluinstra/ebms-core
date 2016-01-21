@@ -31,10 +31,11 @@ import nl.clockwork.ebms.Constants.EbMSAction;
 import nl.clockwork.ebms.Constants.EbMSMessageStatus;
 import nl.clockwork.ebms.common.util.DOMUtils;
 import nl.clockwork.ebms.dao.DAOTransactionCallback;
+import nl.clockwork.ebms.encryption.EbMSMessageDecrypter;
 import nl.clockwork.ebms.model.CacheablePartyId;
 import nl.clockwork.ebms.model.EbMSDocument;
 import nl.clockwork.ebms.model.EbMSMessage;
-import nl.clockwork.ebms.signature.EbMSSignatureGenerator;
+import nl.clockwork.ebms.signing.EbMSSignatureGenerator;
 import nl.clockwork.ebms.util.CPAUtils;
 import nl.clockwork.ebms.util.EbMSMessageUtils;
 import nl.clockwork.ebms.validation.CPAValidator;
@@ -61,6 +62,7 @@ public class EbMSMessageProcessorX extends EbMSMessageProcessor
 		messageHeaderValidator = new MessageHeaderValidator(ebMSDAO,cpaManager);
 		manifestValidator = new ManifestValidator();
 		signatureTypeValidator = new SignatureTypeValidator(cpaManager,signatureValidator);
+		messageDecrypter = new EbMSMessageDecrypter();
 	}
 	
 	public EbMSDocument processRequest(EbMSDocument document) throws EbMSProcessorException
