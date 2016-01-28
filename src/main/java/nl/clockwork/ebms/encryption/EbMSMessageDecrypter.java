@@ -2,10 +2,13 @@ package nl.clockwork.ebms.encryption;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
+import java.security.GeneralSecurityException;
 import java.security.KeyPair;
 import java.security.KeyStore;
 import java.security.PrivateKey;
 
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
@@ -13,26 +16,55 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
 import org.apache.xml.security.encryption.XMLCipher;
+import org.apache.xml.security.encryption.XMLEncryptionException;
 import org.apache.xml.security.utils.EncryptionConstants;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.xml.sax.SAXException;
 
+import nl.clockwork.ebms.common.util.DOMUtils;
 import nl.clockwork.ebms.common.util.SecurityUtils;
 import nl.clockwork.ebms.model.EbMSAttachment;
 import nl.clockwork.ebms.model.EbMSMessage;
 
 public class EbMSMessageDecrypter
 {
+	public EbMSMessageDecrypter()
+	{
+		org.apache.xml.security.Init.init();
+	}
+
 	public void decrypt(EbMSMessage message)
 	{
-		for (EbMSAttachment attachment: message.getAttachments())
+		try
 		{
-			decrypt(attachment);
+			for (EbMSAttachment attachment: message.getAttachments())
+			{
+				decrypt(attachment);
+			}
+		}
+		catch (Exception e)
+		{
+			//FIXME
+			throw new RuntimeException(e);
 		}
 	}
 
-	private void decrypt(EbMSAttachment attachment)
+	private void decrypt(EbMSAttachment attachment) throws Exception
 	{
+		Document document = DOMUtils.read((attachment.getInputStream()));
+		Element encryptedDataElement = (Element)document.getElementsByTagNameNS(EncryptionConstants.EncryptionSpecNS,EncryptionConstants._TAG_ENCRYPTEDDATA).item(0);
+
+		KeyStore keyStore = SecurityUtils.loadKeyStore("/home/edwin/Downloads/keystore.logius.jks","password");
+		KeyPair keyPair = SecurityUtils.getKeyPair(keyStore,"1","password");
+		PrivateKey private1 = keyPair.getPrivate();
+
+		XMLCipher xmlCipher = XMLCipher.getInstance();
+		xmlCipher.init(XMLCipher.DECRYPT_MODE,null);
+		xmlCipher.setKEK(private1);
+
+		xmlCipher.doFinal(document,encryptedDataElement);
+		//DOMUtils.
 	}
 
 	private static Document loadEncryptionDocument() throws Exception
@@ -65,6 +97,8 @@ public class EbMSMessageDecrypter
 
 	public static void main(String[] args) throws Exception
 	{
+		org.apache.xml.security.Init.init();
+
 		Document document = loadEncryptionDocument();
 		Element encryptedDataElement = (Element)document.getElementsByTagNameNS(EncryptionConstants.EncryptionSpecNS,EncryptionConstants._TAG_ENCRYPTEDDATA).item(0);
 
@@ -72,7 +106,6 @@ public class EbMSMessageDecrypter
 		KeyPair keyPair = SecurityUtils.getKeyPair(keyStore,"1","password");
 		PrivateKey private1 = keyPair.getPrivate();
 
-		org.apache.xml.security.Init.init();
 		XMLCipher xmlCipher = XMLCipher.getInstance();
 		xmlCipher.init(XMLCipher.DECRYPT_MODE,null);
 		xmlCipher.setKEK(private1);
