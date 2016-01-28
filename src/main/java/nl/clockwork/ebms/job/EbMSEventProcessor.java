@@ -37,6 +37,7 @@ import nl.clockwork.ebms.model.EbMSEvent;
 import nl.clockwork.ebms.processor.EbMSMessageProcessor;
 import nl.clockwork.ebms.util.CPAUtils;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -65,13 +66,14 @@ public class EbMSEventProcessor implements Job
 
 		private void sendEvent(final EbMSEvent event, DeliveryChannel deliveryChannel)
 		{
-			String url = null;
+			String url = cpaManager.getUrl(event.getCpaId());
 			try
 			{
 				EbMSDocument requestDocument = ebMSDAO.getEbMSDocumentIfUnsent(event.getMessageId());
 				if (requestDocument != null)
 				{
-					url = CPAUtils.getUri(deliveryChannel);
+					if (StringUtils.isEmpty(url))
+						url = CPAUtils.getUri(deliveryChannel);
 					logger.info("Sending message " + event.getMessageId() + " to " + url);
 					EbMSDocument responseDocument = ebMSClient.sendMessage(url,requestDocument);
 					messageProcessor.processResponse(requestDocument,responseDocument);
