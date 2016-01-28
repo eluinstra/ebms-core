@@ -79,6 +79,7 @@ public class DeliveryManager //DeliveryService
 				try
 				{
 					messageQueue.register(message.getMessageHeader().getMessageData().getMessageId());
+					logger.info("Sending message " + message.getMessageHeader().getMessageData().getMessageId() + " to " + uri);
 					EbMSDocument document = ebMSClient.sendMessage(uri,EbMSMessageUtils.getEbMSDocument(message));
 					if (document == null)
 						return messageQueue.get(message.getMessageHeader().getMessageData().getMessageId());
@@ -126,6 +127,7 @@ public class DeliveryManager //DeliveryService
 			{
 				try
 				{
+					logger.info("Sending message " + response.getMessageHeader().getMessageData().getMessageId() + " to " + uri);
 					ebMSClient.sendMessage(uri,EbMSMessageUtils.getEbMSDocument(response));
 				}
 				catch (Exception e)

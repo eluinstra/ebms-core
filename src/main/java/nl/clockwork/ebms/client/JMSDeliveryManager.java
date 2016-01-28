@@ -51,6 +51,7 @@ public class JMSDeliveryManager extends DeliveryManager //DeliveryService
 		{
 			if (message.getSyncReply() == null)
 			{
+				logger.info("Sending message " + message.getMessageHeader().getMessageData().getMessageId() + " to " + uri);
 				EbMSDocument document = ebMSClient.sendMessage(uri,EbMSMessageUtils.getEbMSDocument(message));
 				if (document == null)
 				{
@@ -105,6 +106,7 @@ public class JMSDeliveryManager extends DeliveryManager //DeliveryService
 			{
 				try
 				{
+					logger.info("Sending message " + response.getMessageHeader().getMessageData().getMessageId() + " to " + uri);
 					ebMSClient.sendMessage(uri,EbMSMessageUtils.getEbMSDocument(response));
 				}
 				catch (Exception e)
