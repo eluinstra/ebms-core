@@ -129,7 +129,7 @@ public class EbMSMessageWriter
 
 	protected String createBoundary()
 	{
-		return "-=Part.0." + UUID.randomUUID() + "=-";
+		return "-=" + UUID.randomUUID() + "=-";
 	}
 
 	protected String createContentType(String boundary, String contentId)
