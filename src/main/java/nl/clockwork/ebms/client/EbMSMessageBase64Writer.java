@@ -66,7 +66,7 @@ public class EbMSMessageBase64Writer extends EbMSMessageWriter
 			writer.write(boundary);
 
 			for (EbMSAttachment attachment : document.getAttachments())
-				if (attachment.getContentType().matches("^(text/.*|/.*xml)$"))
+				if (attachment.getContentType().matches("^(text/.*|.*/xml)$"))
 					writeTextAttachment(boundary,outputStream,writer,attachment);
 				else
 					writeBinaryAttachment(boundary,outputStream,writer,attachment);
