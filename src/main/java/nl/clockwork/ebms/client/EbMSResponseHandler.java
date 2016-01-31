@@ -55,7 +55,7 @@ public class EbMSResponseHandler
 				{
 					try (InputStream input = connection.getInputStream())
 					{
-						EbMSMessageReader messageReader = new EbMSMessageReader(getHeaderField("Content-Type"));
+						EbMSMessageReader messageReader = new EbMSMessageReader(getHeaderField("Content-ID"),getHeaderField("Content-Type"));
 						//return messageReader.read(input);
 						return messageReader.readResponse(input,getEncoding());
 					}

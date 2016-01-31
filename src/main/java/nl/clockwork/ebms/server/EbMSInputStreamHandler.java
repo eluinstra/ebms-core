@@ -53,7 +53,7 @@ public abstract class EbMSInputStreamHandler
 				throw new EbMSProcessorException("Unable to process message! SOAPAction=" + soapAction);
 	  	}
 
-			EbMSMessageReader messageReader = new EbMSMessageReader(getRequestHeader("Content-Type"));
+			EbMSMessageReader messageReader = new EbMSMessageReader(getRequestHeader("Content-ID"),getRequestHeader("Content-Type"));
 			EbMSDocument in = messageReader.read(request);
 			if (logger.isDebugEnabled())
 				logger.debug("IN:\n" + DOMUtils.toString(in.getMessage()));

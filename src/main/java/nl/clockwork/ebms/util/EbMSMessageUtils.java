@@ -146,7 +146,7 @@ public class EbMSMessageUtils
 
 	public static EbMSDocument getEbMSDocument(EbMSMessage message) throws SOAPException, JAXBException, ParserConfigurationException, SAXException, IOException, TransformerFactoryConfigurationError, TransformerException
 	{
-		return new EbMSDocument(message.getMessage(),message.getAttachments());
+		return new EbMSDocument(message.getContentId(),message.getMessage(),message.getAttachments());
 	}
 	
 	public static SyncReply createSyncReply(DeliveryChannel channel)

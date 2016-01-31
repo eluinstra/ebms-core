@@ -36,10 +36,12 @@ import org.xml.sax.SAXException;
 
 public class EbMSMessageReader
 {
+	private String contentId;
 	private String contentType;
 	
-	public EbMSMessageReader(String contentType)
+	public EbMSMessageReader(String contentId, String contentType)
 	{
+		this.contentId = contentId;
 		this.contentType = contentType;
 	}
 
@@ -64,7 +66,7 @@ public class EbMSMessageReader
 		if (StringUtils.isNotBlank(message))
 		{
 			Document d = DOMUtils.read(message);
-			result = new EbMSDocument(d,new ArrayList<EbMSAttachment>());
+			result = new EbMSDocument(contentId,d,new ArrayList<EbMSAttachment>());
 		}
 		return result;
 	}
@@ -81,7 +83,7 @@ public class EbMSMessageReader
 	private EbMSDocument getEbMSMessage(InputStream in) throws ParserConfigurationException, SAXException, IOException
 	{
 		Document d = DOMUtils.read(in);
-		return new EbMSDocument(d,new ArrayList<EbMSAttachment>());
+		return new EbMSDocument(contentId,d,new ArrayList<EbMSAttachment>());
 	}
 
 	private EbMSDocument getEbMSMessage(List<EbMSAttachment> attachments) throws ParserConfigurationException, SAXException, IOException
@@ -91,7 +93,7 @@ public class EbMSMessageReader
 		{
 			Document d = DOMUtils.read((attachments.get(0).getInputStream()));
 			attachments.remove(0);
-			result = new EbMSDocument(d,attachments);
+			result = new EbMSDocument(contentId,d,attachments);
 		}
 		return result;
 	}

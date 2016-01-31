@@ -57,7 +57,7 @@ public class EbMSMessageWriter
 	private void writeMimeMessage(EbMSDocument document) throws IOException, TransformerException
 	{
 		String boundary = createBoundary();
-		String contentType = createContentType(boundary);
+		String contentType = createContentType(boundary,document.getContentId());
 
 		connection.setRequestProperty("MIME-Version","1.0");
 		connection.setRequestProperty("Content-Type",contentType);
@@ -73,7 +73,7 @@ public class EbMSMessageWriter
 
 			writer.write("Content-Type: text/xml; charset=UTF-8");
 			writer.write("\r\n");
-			writer.write("Content-ID: <0>");
+			writer.write("Content-ID: <" + document.getContentId() + ">");
 			writer.write("\r\n");
 			writer.write("\r\n");
 			DOMUtils.write(document.getMessage(),writer,"UTF-8");
@@ -109,9 +109,9 @@ public class EbMSMessageWriter
 		return "-=Part.0." + UUID.randomUUID() + "=-";
 	}
 
-	private String createContentType(String boundary)
+	private String createContentType(String boundary, String contentId)
 	{
-		return "multipart/related; boundary=\"" + boundary + "\"; type=\"text/xml\"; start=\"<0>\"; start-info=\"text/xml\"";
+		return "multipart/related; boundary=\"" + boundary + "\"; type=\"text/xml\"; start=\"<" + contentId + ">\"; start-info=\"text/xml\"";
 	}
 
 }

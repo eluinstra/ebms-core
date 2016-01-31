@@ -56,6 +56,7 @@ import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
@@ -450,7 +451,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 				String.class,
 				messageId
 			);
-			return new EbMSDocument(DOMUtils.read(document),getAttachments(messageId));
+			return new EbMSDocument(messageId,DOMUtils.read(document),getAttachments(messageId));
 		}
 		catch(EmptyResultDataAccessException e)
 		{
@@ -463,27 +464,43 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	}
 	
 	@Override
-	public EbMSDocument getEbMSDocumentByRefToMessageId(String refToMessageId, Service service, String...actions) throws DAOException
+	public EbMSDocument getEbMSDocumentByRefToMessageId(final String refToMessageId, Service service, String...actions) throws DAOException
 	{
 		try
 		{
-			String document = jdbcTemplate.queryForObject(
-				"select content" +
+			EbMSDocument document = jdbcTemplate.queryForObject(
+				"select message_id, content" +
 				" from ebms_message" +
 				" where ref_to_message_id = ?" +
 				" and message_nr = 0" +
 				(service == null ? "" : " and service = '" + EbMSMessageUtils.toString(service) + "'") +
 				(actions.length == 0 ? "" : " and action in ('" + StringUtils.join(actions,"','") + "')"),
-				String.class,
+				new RowMapper<EbMSDocument>()
+				{
+
+					@Override
+					public EbMSDocument mapRow(ResultSet rs, int rowNum) throws SQLException
+					{
+						try
+						{
+							return new EbMSDocument(rs.getString("messageId"),DOMUtils.read(rs.getString("content")));
+						}
+						catch (ParserConfigurationException | SAXException | IOException e)
+						{
+							throw new SQLException(e);
+						}
+					}
+					
+				},
 				refToMessageId
 			);
-			return new EbMSDocument(DOMUtils.read(document),getAttachments(refToMessageId));
+			return new EbMSDocument(document.getContentId(),document.getMessage(),getAttachments(refToMessageId));
 		}
 		catch(EmptyResultDataAccessException e)
 		{
 			return null;
 		}
-		catch (DataAccessException | ParserConfigurationException | SAXException | IOException  e)
+		catch (DataAccessException e)
 		{
 			throw new DAOException(e);
 		}

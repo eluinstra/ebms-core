@@ -306,7 +306,7 @@ public class EbMSMessageProcessor
 							}
 						}
 					);
-					return message.getSyncReply() == null ? null : new EbMSDocument(acknowledgment.getMessage());
+					return message.getSyncReply() == null ? null : new EbMSDocument(acknowledgment.getContentId(),acknowledgment.getMessage());
 				}
 			}
 			catch (EbMSValidationException e)
@@ -330,7 +330,7 @@ public class EbMSMessageProcessor
 						}
 					}
 				);
-				return message.getSyncReply() == null ? null : new EbMSDocument(messageError.getMessage());
+				return message.getSyncReply() == null ? null : new EbMSDocument(messageError.getContentId(),messageError.getMessage());
 			}
 		}
 	}

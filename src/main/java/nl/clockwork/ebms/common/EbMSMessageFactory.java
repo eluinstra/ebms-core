@@ -227,8 +227,7 @@ public class EbMSMessageFactory
 				manifest.getReference().add(EbMSMessageUtils.createReference(i));
 				ByteArrayDataSource ds = new ByteArrayDataSource(dataSource.getContent(),dataSource.getContentType());
 				ds.setName(dataSource.getName());
-				attachments.add(new EbMSAttachment(ds,"" + i));
-				i++;
+				attachments.add(new EbMSAttachment(ds,createContentId(messageHeader.getMessageData().getMessageId(),i++)));
 			}
 	
 			EbMSMessage result = new EbMSMessage();
@@ -250,13 +249,17 @@ public class EbMSMessageFactory
 		}
 	}
 
+	private String createContentId(String messageId, int i)
+	{
+		return messageId.replaceAll("^([^@]+)@(.+)$","$1-" + i + "@$2");
+	}
+
 	private MessageHeader createMessageHeader(String cpaId, Party fromParty, Party toParty, String action)
 	{
 		String uuid = UUID.randomUUID().toString();
 		EbMSPartyInfo fromPartyInfo = cpaManager.getEbMSPartyInfo(cpaId,fromParty);
 		EbMSPartyInfo toPartyInfo = cpaManager.getEbMSPartyInfo(cpaId,toParty);
-		DeliveryChannel deliveryChannel = cpaManager.getDefaultDeliveryChannel(cpaId,new CacheablePartyId(fromPartyInfo.getPartyIds()),action);
-		String hostname = CPAUtils.getHostname(deliveryChannel);
+		String hostname = CPAUtils.getHostname(cpaManager.getDefaultDeliveryChannel(cpaId,new CacheablePartyId(fromPartyInfo.getPartyIds()),action));
 
 		MessageHeader messageHeader = new MessageHeader();
 

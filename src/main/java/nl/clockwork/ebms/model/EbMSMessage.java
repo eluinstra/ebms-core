@@ -46,6 +46,12 @@ public class EbMSMessage extends EbMSDocument
 	private List<EbMSAttachment> attachments = new ArrayList<EbMSAttachment>();
 
 	@Override
+	public String getContentId()
+	{
+		return getMessageHeader() != null ? getMessageHeader().getMessageData().getMessageId() : super.getContentId();
+	}
+
+	@Override
 	public Document getMessage()
 	{
 		return message;

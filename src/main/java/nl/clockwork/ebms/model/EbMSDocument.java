@@ -22,6 +22,7 @@ import org.w3c.dom.Document;
 
 public class EbMSDocument
 {
+	private String contentId;
 	private Document message;
 	private List<EbMSAttachment> attachments = new ArrayList<EbMSAttachment>();
 	
@@ -29,15 +30,21 @@ public class EbMSDocument
 	{
 	}
 
-	public EbMSDocument(Document message)
+	public EbMSDocument(String contentId, Document message)
 	{
-		this(message,new ArrayList<EbMSAttachment>());
+		this(contentId,message,new ArrayList<EbMSAttachment>());
 	}
 
-	public EbMSDocument(Document message, List<EbMSAttachment> attachments)
+	public EbMSDocument(String contentId, Document message, List<EbMSAttachment> attachments)
 	{
+		this.contentId = contentId;
 		this.message = message;
 		this.attachments = attachments;
+	}
+
+	public String getContentId()
+	{
+		return contentId;
 	}
 
 	public Document getMessage()

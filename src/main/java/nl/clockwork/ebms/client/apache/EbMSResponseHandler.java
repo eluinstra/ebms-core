@@ -22,6 +22,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import nl.clockwork.ebms.common.util.HTTPUtils;
 import nl.clockwork.ebms.model.EbMSDocument;
+import nl.clockwork.ebms.processor.EbMSProcessingException;
 import nl.clockwork.ebms.server.EbMSMessageReader;
 
 import org.apache.commons.io.IOUtils;
@@ -30,6 +31,7 @@ import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.ResponseHandler;
+import org.springframework.util.StringUtils;
 import org.xml.sax.SAXException;
 
 public class EbMSResponseHandler implements ResponseHandler<EbMSDocument>
@@ -49,7 +51,7 @@ public class EbMSResponseHandler implements ResponseHandler<EbMSDocument>
 				{
 					try (InputStream input = entity.getContent())
 					{
-						EbMSMessageReader messageReader = new EbMSMessageReader(getHeaderField(response,"Content-Type"));
+						EbMSMessageReader messageReader = new EbMSMessageReader(getHeaderField(response,"Content-ID"),getHeaderField(response,"Content-Type"));
 						//return messageReader.read(input);
 						return messageReader.readResponse(input,getEncoding(entity));
 					}
@@ -63,15 +65,19 @@ public class EbMSResponseHandler implements ResponseHandler<EbMSDocument>
 			}
 			throw new IOException("StatusCode: " + response.getStatusLine().getStatusCode());
 		}
-		catch (ParserConfigurationException | SAXException e)
+		catch (ParserConfigurationException | SAXException | EbMSProcessingException e)
 		{
 			throw new IOException(e);
 		}
 	}
 
-	private String getEncoding(HttpEntity entity)
+	private String getEncoding(HttpEntity entity) throws EbMSProcessingException
 	{
-		return HTTPUtils.getCharSet(entity.getContentType().getValue());
+		String contentType = entity.getContentType().getValue();
+		if (!StringUtils.isEmpty(contentType))
+			return HTTPUtils.getCharSet(contentType);
+		else
+			throw new EbMSProcessingException("HTTP header Content-Type is not set!");
 	}
 	
 	private String getHeaderField(HttpResponse response, String name)
