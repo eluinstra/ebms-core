@@ -19,7 +19,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
-import java.util.UUID;
 
 import javax.xml.transform.TransformerException;
 
@@ -29,31 +28,16 @@ import nl.clockwork.ebms.model.EbMSAttachment;
 import nl.clockwork.ebms.model.EbMSDocument;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.james.mime4j.codec.Base64OutputStream;
 
-public class EbMSMessageWriter
+public class EbMSMessageBase64Writer extends EbMSMessageWriter
 {
-	protected HttpURLConnection connection;
-	
-	public EbMSMessageWriter(HttpURLConnection connection)
+	public EbMSMessageBase64Writer(HttpURLConnection connection)
 	{
-		this.connection = connection;
+		super(connection);
 	}
 
-	public void write(EbMSDocument document) throws IOException, TransformerException
-	{
-		if (document.getAttachments().size() > 0)
-			writeMimeMessage(document);
-		else
-			writeMessage(document);
-	}
-
-	protected void writeMessage(EbMSDocument document) throws IOException, TransformerException
-	{
-		connection.setRequestProperty("Content-Type","text/xml; charset=UTF-8");
-		connection.setRequestProperty("SOAPAction",Constants.EBMS_SOAP_ACTION);
-		DOMUtils.write(document.getMessage(),connection.getOutputStream(),"UTF-8");
-	}
-	
+	@Override
 	protected void writeMimeMessage(EbMSDocument document) throws IOException, TransformerException
 	{
 		String boundary = createBoundary();
@@ -82,7 +66,7 @@ public class EbMSMessageWriter
 			writer.write(boundary);
 
 			for (EbMSAttachment attachment : document.getAttachments())
-				if (attachment.getContentType().matches("^(text/.*|.*/xml)$"))
+				if (attachment.getContentType().matches("^(text/.*|/.*xml)$"))
 					writeTextAttachment(boundary,outputStream,writer,attachment);
 				else
 					writeBinaryAttachment(boundary,outputStream,writer,attachment);
@@ -115,26 +99,16 @@ public class EbMSMessageWriter
 		writer.write("\r\n");
 		writer.write("Content-Disposition: attachment; filename=" + attachment.getName() + ";");
 		writer.write("\r\n");
-		writer.write("Content-Transfer-Encoding: binary");
+		writer.write("Content-Transfer-Encoding: base64");
 		writer.write("\r\n");
 		writer.write("Content-ID: <" + attachment.getContentId() + ">");
 		writer.write("\r\n");
 		writer.write("\r\n");
 		writer.flush();
-		IOUtils.copy(attachment.getInputStream(),outputStream);
+		IOUtils.copy(attachment.getInputStream(),new Base64OutputStream(outputStream));
 		writer.write("\r\n");
 		writer.write("--");
 		writer.write(boundary);
-	}
-
-	protected String createBoundary()
-	{
-		return "-=Part.0." + UUID.randomUUID() + "=-";
-	}
-
-	protected String createContentType(String boundary, String contentId)
-	{
-		return "multipart/related; boundary=\"" + boundary + "\"; type=\"text/xml\"; start=\"<" + contentId + ">\"; start-info=\"text/xml\"";
 	}
 
 }
