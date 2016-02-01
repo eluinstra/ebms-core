@@ -2,30 +2,26 @@ package nl.clockwork.ebms.encryption;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.IOException;
-import java.security.GeneralSecurityException;
 import java.security.KeyPair;
 import java.security.KeyStore;
 import java.security.PrivateKey;
 
-import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
-import org.apache.xml.security.encryption.XMLCipher;
-import org.apache.xml.security.encryption.XMLEncryptionException;
-import org.apache.xml.security.utils.EncryptionConstants;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.xml.sax.SAXException;
-
 import nl.clockwork.ebms.common.util.DOMUtils;
 import nl.clockwork.ebms.common.util.SecurityUtils;
 import nl.clockwork.ebms.model.EbMSAttachment;
 import nl.clockwork.ebms.model.EbMSMessage;
+
+import org.apache.commons.io.IOUtils;
+import org.apache.xml.security.encryption.XMLCipher1;
+import org.apache.xml.security.utils.EncryptionConstants;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 public class EbMSMessageDecrypter
 {
@@ -59,8 +55,8 @@ public class EbMSMessageDecrypter
 		KeyPair keyPair = SecurityUtils.getKeyPair(keyStore,"1","password");
 		PrivateKey private1 = keyPair.getPrivate();
 
-		XMLCipher xmlCipher = XMLCipher.getInstance();
-		xmlCipher.init(XMLCipher.DECRYPT_MODE,null);
+		XMLCipher1 xmlCipher = XMLCipher1.getInstance();
+		xmlCipher.init(XMLCipher1.DECRYPT_MODE,null);
 		xmlCipher.setKEK(private1);
 
 		xmlCipher.doFinal(document,encryptedDataElement);
@@ -104,14 +100,17 @@ public class EbMSMessageDecrypter
 
 		KeyStore keyStore = SecurityUtils.loadKeyStore("/home/edwin/Downloads/keystore.logius.jks","password");
 		KeyPair keyPair = SecurityUtils.getKeyPair(keyStore,"1","password");
-		PrivateKey private1 = keyPair.getPrivate();
+		PrivateKey privateKey = keyPair.getPrivate();
 
-		XMLCipher xmlCipher = XMLCipher.getInstance();
-		xmlCipher.init(XMLCipher.DECRYPT_MODE,null);
-		xmlCipher.setKEK(private1);
+		XMLCipher1 xmlCipher = XMLCipher1.getInstance();
+		xmlCipher.init(XMLCipher1.DECRYPT_MODE,null);
+		xmlCipher.setKEK(privateKey);
 
-		xmlCipher.doFinal(document,encryptedDataElement);
+		byte[] result = xmlCipher.decryptToByteArray(encryptedDataElement);
+		
+		System.out.println(new String(result));
+		IOUtils.write(result,new FileOutputStream("/home/edwin/Downloads/A1453383414677.12095612@ebms.cv.prod.osb.overheid.nl_cn.decrypted.xml"));
 
-		outputDocToFile(document, "/home/edwin/Downloads/A1453383414677.12095612@ebms.cv.prod.osb.overheid.nl_cn.decrypted.xml");
+		//outputDocToFile(document, "/home/edwin/Downloads/A1453383414677.12095612@ebms.cv.prod.osb.overheid.nl_cn.decrypted.xml");
 	}
 }
