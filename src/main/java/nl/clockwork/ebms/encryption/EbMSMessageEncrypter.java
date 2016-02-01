@@ -57,7 +57,7 @@ public class EbMSMessageEncrypter
     encryptedKey.setKeyInfo(new KeyInfo(builder.parse(new InputSource(new StringReader("<KeyName>CN=52487C45.cm-4-1b.dynamic.ziggo.nl, serialNumber=00000001820029336000, O=Ordina, C=NL</KeyName>")))));
     encryptedData.setKeyInfo(keyInfo);
 
-    EncryptedData encryptData = xmlCipher.encryptData(document,null,new FileInputStream("/home/edwin/Downloads/A1453383414677.12095612@ebms.cv.prod.osb.overheid.nl_cn.decrypted.xml"));
+    EncryptedData encryptData = xmlCipher.encryptData(null,null,new FileInputStream("/home/edwin/Downloads/A1453383414677.12095612@ebms.cv.prod.osb.overheid.nl_cn.decrypted.xml"));
     
 //		IOUtils.write(XMLMessageBuilder.getInstance(EncryptedData.class).handle(encryptData),new FileOutputStream("/home/edwin/Downloads/A1453383414677.12095612@ebms.cv.prod.osb.overheid.nl_cn.encrypted.xml"));
 	}

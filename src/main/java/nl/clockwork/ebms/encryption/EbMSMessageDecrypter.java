@@ -18,7 +18,7 @@ import nl.clockwork.ebms.model.EbMSAttachment;
 import nl.clockwork.ebms.model.EbMSMessage;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.xml.security.encryption.XMLCipher1;
+import org.apache.xml.security.encryption.XMLCipher;
 import org.apache.xml.security.utils.EncryptionConstants;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -55,8 +55,8 @@ public class EbMSMessageDecrypter
 		KeyPair keyPair = SecurityUtils.getKeyPair(keyStore,"1","password");
 		PrivateKey private1 = keyPair.getPrivate();
 
-		XMLCipher1 xmlCipher = XMLCipher1.getInstance();
-		xmlCipher.init(XMLCipher1.DECRYPT_MODE,null);
+		XMLCipher xmlCipher = XMLCipher.getInstance();
+		xmlCipher.init(XMLCipher.DECRYPT_MODE,null);
 		xmlCipher.setKEK(private1);
 
 		xmlCipher.doFinal(document,encryptedDataElement);
@@ -102,8 +102,8 @@ public class EbMSMessageDecrypter
 		KeyPair keyPair = SecurityUtils.getKeyPair(keyStore,"1","password");
 		PrivateKey privateKey = keyPair.getPrivate();
 
-		XMLCipher1 xmlCipher = XMLCipher1.getInstance();
-		xmlCipher.init(XMLCipher1.DECRYPT_MODE,null);
+		XMLCipher xmlCipher = XMLCipher.getInstance();
+		xmlCipher.init(XMLCipher.DECRYPT_MODE,null);
 		xmlCipher.setKEK(privateKey);
 
 		byte[] result = xmlCipher.decryptToByteArray(encryptedDataElement);
