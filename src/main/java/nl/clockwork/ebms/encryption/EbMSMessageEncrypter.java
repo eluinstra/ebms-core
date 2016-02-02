@@ -1,8 +1,6 @@
 package nl.clockwork.ebms.encryption;
 
-import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.security.KeyPair;
@@ -39,22 +37,6 @@ public class EbMSMessageEncrypter
 		return keyGenerator.generateKey();
 	}
 
-	private static void outputDocToFile(Document doc, String fileName) throws Exception
-	{
-		File encryptionFile = new File(fileName);
-		FileOutputStream f = new FileOutputStream(encryptionFile);
-
-		TransformerFactory factory = TransformerFactory.newInstance();
-		Transformer transformer = factory.newTransformer();
-		transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION,"yes");
-		DOMSource source = new DOMSource(doc);
-		StreamResult result = new StreamResult(f);
-		transformer.transform(source,result);
-
-		f.close();
-		System.out.println("Wrote document containing decrypted data to " + encryptionFile.toURI().toURL().toString());
-	}
-
 	public static void main(String[] args) throws Exception
 	{
 		org.apache.xml.security.Init.init();
@@ -88,10 +70,6 @@ public class EbMSMessageEncrypter
 		encryptedData.setMimeType("application/xml");
 		encryptedData.setType("http://www.w3.org/2001/04/xmlenc#Element");
 
-		//xmlCipher.doFinal(document,document.getDocumentElement(),true);
-
-		//outputDocToFile(document,"/home/edwin/Downloads/A1453383414677.12095612@ebms.cv.prod.osb.overheid.nl_cn.encrypted.2.xml");
-
 		encryptedData = xmlCipher.encryptData(null,null,new FileInputStream("/home/edwin/Downloads/A1453383414677.12095612@ebms.cv.prod.osb.overheid.nl_cn.decrypted.xml"));
 		Element element = xmlCipher.martial(document,encryptedData);
 		//System.out.println(DOMUtils.toString((Document)element));
@@ -102,8 +80,5 @@ public class EbMSMessageEncrypter
 		transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
 		transformer.transform(new DOMSource(element),new StreamResult(buffer));
 		System.out.println(buffer.toString());
-		
-
-		// IOUtils.write(XMLMessageBuilder.getInstance(EncryptedData.class).handle(encryptData),new FileOutputStream("/home/edwin/Downloads/A1453383414677.12095612@ebms.cv.prod.osb.overheid.nl_cn.encrypted.xml"));
 	}
 }

@@ -2,8 +2,6 @@ package nl.clockwork.ebms.encryption;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.IOException;
-import java.security.GeneralSecurityException;
 import java.security.KeyPair;
 import java.security.KeyStore;
 import java.security.PrivateKey;
@@ -17,7 +15,6 @@ import nl.clockwork.ebms.common.util.SecurityUtils;
 import nl.clockwork.ebms.model.EbMSAttachment;
 import nl.clockwork.ebms.model.EbMSMessage;
 import nl.clockwork.ebms.processor.EbMSProcessingException;
-import nl.clockwork.ebms.processor.EbMSProcessorException;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.xml.security.encryption.EncryptedKey;
