@@ -84,6 +84,9 @@ public class EbMSMessageEncrypter
 		KeyInfo keyInfo = new KeyInfo(document);
 		keyInfo.add(encryptedKey);
 		encryptedData.setKeyInfo(keyInfo);
+		encryptedData.setId("1234567890");
+		encryptedData.setMimeType("application/xml");
+		encryptedData.setType("http://www.w3.org/2001/04/xmlenc#Element");
 
 		//xmlCipher.doFinal(document,document.getDocumentElement(),true);
 
