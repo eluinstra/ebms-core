@@ -48,14 +48,16 @@ import nl.clockwork.ebms.validation.XSDValidator;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.beans.factory.InitializingBean;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
-public class EbMSMessageProcessorX extends EbMSMessageProcessor
+public class EbMSMessageProcessorX extends EbMSMessageProcessor implements InitializingBean 
 {
   protected transient Log logger = LogFactory.getLog(getClass());
-  
-	public void init()
+
+	@Override
+	public void afterPropertiesSet() throws Exception
 	{
 		xsdValidator = new XSDValidator("/nl/clockwork/ebms/xsd/msg-header-2_0.xsd");
 		cpaValidator = new CPAValidator(cpaManager);
@@ -64,7 +66,7 @@ public class EbMSMessageProcessorX extends EbMSMessageProcessor
 		signatureTypeValidator = new SignatureTypeValidator(cpaManager,signatureValidator);
 		messageDecrypter = new EbMSMessageDecrypter();
 	}
-	
+
 	public EbMSDocument processRequest(EbMSDocument document) throws EbMSProcessorException
 	{
 		try

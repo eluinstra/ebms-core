@@ -15,9 +15,7 @@
  */
 package nl.clockwork.ebms.client;
 
-import java.io.IOException;
 import java.net.Socket;
-import java.security.GeneralSecurityException;
 import java.security.KeyStore;
 import java.security.Principal;
 import java.security.PrivateKey;
@@ -34,11 +32,12 @@ import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManagerFactory;
 import javax.net.ssl.X509KeyManager;
 
-import org.apache.commons.lang.StringUtils;
-
 import nl.clockwork.ebms.common.util.SecurityUtils;
 
-public class SSLFactoryManager
+import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.InitializingBean;
+
+public class SSLFactoryManager implements InitializingBean
 {
 	public class EbMSX509KeyManager implements X509KeyManager
 	{
@@ -100,7 +99,8 @@ public class SSLFactoryManager
 	private String clientAlias;
 	private SSLSocketFactory sslSocketFactory;
 
-	public void init() throws GeneralSecurityException, IOException
+	@Override
+	public void afterPropertiesSet() throws Exception
 	{
 		KeyStore keyStore = SecurityUtils.loadKeyStore(keyStorePath,keyStorePassword);
 		KeyStore trustStore = SecurityUtils.loadKeyStore(trustStorePath,trustStorePassword);

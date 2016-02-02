@@ -17,7 +17,9 @@ package nl.clockwork.ebms.common;
 
 import java.util.LinkedHashMap;
 
-public class MessageQueue<T>
+import org.springframework.beans.factory.InitializingBean;
+
+public class MessageQueue<T> implements InitializingBean
 {
 	private class QueueEntry<U>
 	{
@@ -33,8 +35,9 @@ public class MessageQueue<T>
 	private LinkedHashMap<String,QueueEntry<T>> queue;
 	private int maxEntries = 128;
 	private int timeout = 60000;
-	
-	public void init()
+
+	@Override
+	public void afterPropertiesSet() throws Exception
 	{
 		queue = new LinkedHashMap<String,QueueEntry<T>>(maxEntries + 1,.75F,true)
 		{

@@ -15,7 +15,6 @@
  */
 package nl.clockwork.ebms.signing;
 
-import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.security.KeyPair;
 import java.security.KeyStore;
@@ -28,9 +27,9 @@ import nl.clockwork.ebms.Constants;
 import nl.clockwork.ebms.common.CPAManager;
 import nl.clockwork.ebms.common.util.DOMUtils;
 import nl.clockwork.ebms.common.util.SecurityUtils;
+import nl.clockwork.ebms.model.CacheablePartyId;
 import nl.clockwork.ebms.model.EbMSAttachment;
 import nl.clockwork.ebms.model.EbMSMessage;
-import nl.clockwork.ebms.model.CacheablePartyId;
 import nl.clockwork.ebms.processor.EbMSProcessingException;
 import nl.clockwork.ebms.processor.EbMSProcessorException;
 import nl.clockwork.ebms.util.CPAUtils;
@@ -44,11 +43,12 @@ import org.apache.xml.security.transforms.Transforms;
 import org.apache.xml.security.transforms.params.XPathContainer;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DeliveryChannel;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.AckRequested;
+import org.springframework.beans.factory.InitializingBean;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
-public class EbMSSignatureGenerator
+public class EbMSSignatureGenerator implements InitializingBean
 {
 	protected transient Log logger = LogFactory.getLog(getClass());
 	private CPAManager cpaManager;
@@ -60,11 +60,12 @@ public class EbMSSignatureGenerator
 	private String keyStorePassword;
 	private KeyStore keyStore;
 
-	public void init() throws GeneralSecurityException, IOException, EbMSProcessorException
+	@Override
+	public void afterPropertiesSet() throws Exception
 	{
 		keyStore = SecurityUtils.loadKeyStore(keyStorePath,keyStorePassword);
 	}
-
+	
 	public void generate(String cpaId, EbMSMessage message) throws EbMSProcessorException
 	{
 		try
@@ -176,5 +177,5 @@ public class EbMSSignatureGenerator
 	{
 		this.keyStorePassword = keyStorePassword;
 	}
-	
+
 }

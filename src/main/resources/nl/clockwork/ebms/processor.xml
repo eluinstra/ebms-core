@@ -25,7 +25,7 @@
 		<property name="cpaManager" ref="cpaManager"/>
 	</bean>
 
-	<bean id="ebMSMessageService" class="nl.clockwork.ebms.service.EbMSMessageServiceImpl" init-method="init">
+	<bean id="ebMSMessageService" class="nl.clockwork.ebms.service.EbMSMessageServiceImpl">
 		<property name="deliveryManager" ref="deliveryManager"></property>
 		<property name="ebMSDAO" ref="ebMSDAO"/>
 		<property name="cpaManager" ref="cpaManager"/>
@@ -34,7 +34,7 @@
 		<property name="signatureGenerator" ref="signatureGenerator"/>
 	</bean>
 
-	<bean id="deliveryManager" class="nl.clockwork.ebms.client.DeliveryManager" init-method="init">
+	<bean id="deliveryManager" class="nl.clockwork.ebms.client.DeliveryManager">
 		<property name="maxThreads" value="${deliveryManager.maxTreads}"/>
 		<property name="processorsScaleFactor" value="${deliveryManager.processorsScaleFactor}"/>
 		<property name="queueScaleFactor" value="${deliveryManager.queueScaleFactor}"/>
@@ -42,7 +42,7 @@
 		<property name="ebMSClient" ref="ebMSClient"/>
 	</bean>
 
-	<bean id="messageQueue" class="nl.clockwork.ebms.client.EbMSMessageQueue" init-method="init">
+	<bean id="messageQueue" class="nl.clockwork.ebms.client.EbMSMessageQueue">
 		<property name="maxEntries" value="${messageQueue.maxEntries}"/>
 		<property name="timeout" value="${messageQueue.timeout}"/>
 	</bean>
@@ -51,14 +51,14 @@
 		<property name="messageProcessor" ref="messageProcessor"/>
 	</bean>
 
-	<!--bean id="messageProcessor" class="nl.clockwork.ebms.processor.EbMSMessageProcessor" init-method="init">
+	<!--bean id="messageProcessor" class="nl.clockwork.ebms.processor.EbMSMessageProcessor">
 		<property name="deliveryManager" ref="deliveryManager"/>
 		<property name="eventListener" ref="eventListener"/>
 		<property name="ebMSDAO" ref="ebMSDAO"/>
 		<property name="signatureValidator" ref="signatureValidator"/>
 	</bean-->
 
-	<bean id="messageProcessor" class="nl.clockwork.ebms.processor.EbMSMessageProcessorX" init-method="init">
+	<bean id="messageProcessor" class="nl.clockwork.ebms.processor.EbMSMessageProcessorX">
 		<property name="deliveryManager" ref="deliveryManager"/>
 		<property name="eventListener" ref="eventListener"/>
 		<property name="ebMSDAO" ref="ebMSDAO"/>
@@ -125,7 +125,7 @@
 		<property name="trustStorePassword" value="${truststore.password}"/>
 	</bean>
 
-	<bean id="jobScheduler" class="nl.clockwork.ebms.job.JobScheduler" init-method="init" destroy-method="destroy">
+	<bean id="jobScheduler" class="nl.clockwork.ebms.job.JobScheduler">
 		<property name="delay" value="${jobScheduler.delay}"/>
 		<property name="period" value="${jobScheduler.period}"/>
 		<property name="jobs">
@@ -135,7 +135,7 @@
 		</property>
 	</bean>
 
-	<bean id="processEventsJob" class="nl.clockwork.ebms.job.EbMSEventProcessor" init-method="init">
+	<bean id="processEventsJob" class="nl.clockwork.ebms.job.EbMSEventProcessor">
 		<property name="maxThreads" value="${job.maxTreads}"/>
 		<property name="processorsScaleFactor" value="${job.processorsScaleFactor}"/>
 		<property name="queueScaleFactor" value="${job.queueScaleFactor}"/>
@@ -147,7 +147,7 @@
 		<property name="messageProcessor" ref="messageProcessor"/>
 	</bean>
 
-	<bean id="signatureGenerator" class="nl.clockwork.ebms.signing.EbMSSignatureGenerator" init-method="init">
+	<bean id="signatureGenerator" class="nl.clockwork.ebms.signing.EbMSSignatureGenerator">
 		<property name="cpaManager" ref="cpaManager"/>
 		<property name="canonicalizationMethodAlgorithm" value="${xmldsig.canonicalizationMethodAlgorithm}"/>
 		<property name="transformAlgorithm" value="${xmldsig.transformAlgorithm}"/>
@@ -180,7 +180,7 @@
 		<property name="verifyHostnames" value="${https.verifyHostnames}"></property>
 	</bean-->
 
-	<bean id="sslFactoryManager" class="nl.clockwork.ebms.client.SSLFactoryManager" init-method="init">
+	<bean id="sslFactoryManager" class="nl.clockwork.ebms.client.SSLFactoryManager">
 		<property name="keyStorePath" value="${keystore.path}"/>
 		<property name="keyStorePassword" value="${keystore.password}"/>
 		<property name="trustStorePath" value="${truststore.path}"/>

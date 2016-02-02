@@ -64,10 +64,11 @@ import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.ErrorList;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageHeader;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageStatusType;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.Service;
+import org.springframework.beans.factory.InitializingBean;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
-public class EbMSMessageProcessor
+public class EbMSMessageProcessor implements InitializingBean
 {
   protected transient Log logger = LogFactory.getLog(getClass());
   protected DeliveryManager deliveryManager;
@@ -99,7 +100,8 @@ public class EbMSMessageProcessor
 		mshMessageService.setValue(Constants.EBMS_SERVICE_URI);
 	}
 
-	public void init()
+	@Override
+	public void afterPropertiesSet() throws Exception
 	{
 		xsdValidator = new XSDValidator("/nl/clockwork/ebms/xsd/msg-header-2_0.xsd");
 		cpaValidator = new CPAValidator(cpaManager);
@@ -109,7 +111,7 @@ public class EbMSMessageProcessor
 		signatureTypeValidator = new SignatureTypeValidator(cpaManager,signatureValidator);
 		messageDecrypter = new EbMSMessageDecrypter();
 	}
-	
+
 	public EbMSDocument processRequest(EbMSDocument document) throws EbMSProcessorException
 	{
 		try

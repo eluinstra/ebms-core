@@ -42,8 +42,9 @@ import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DeliveryChannel;
+import org.springframework.beans.factory.InitializingBean;
 
-public class EbMSEventProcessor implements Job
+public class EbMSEventProcessor implements InitializingBean, Job
 {
 	private class HandleEventTask implements Runnable
 	{
@@ -153,7 +154,8 @@ public class EbMSEventProcessor implements Job
 	private EbMSClient ebMSClient;
 	private EbMSMessageProcessor messageProcessor;
 
-	public void init()
+	@Override
+	public void afterPropertiesSet() throws Exception
 	{
 		if (processorsScaleFactor == null || processorsScaleFactor <= 0)
 		{
@@ -235,4 +237,5 @@ public class EbMSEventProcessor implements Job
 	{
 		this.messageProcessor = messageProcessor;
 	}
+
 }

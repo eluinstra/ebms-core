@@ -22,8 +22,10 @@ import java.util.TimerTask;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.beans.factory.DisposableBean;
+import org.springframework.beans.factory.InitializingBean;
 
-public class JobScheduler
+public class JobScheduler implements InitializingBean, DisposableBean
 {
   protected transient Log logger = LogFactory.getLog(getClass());
 	private Timer timer;
@@ -31,7 +33,8 @@ public class JobScheduler
 	private long period;
 	private List<Job> jobs = new ArrayList<Job>();
 
-	public void init()
+	@Override
+	public void afterPropertiesSet() throws Exception
 	{
 		Timer timer = new Timer();
 		for (final Job job : jobs)
@@ -55,6 +58,7 @@ public class JobScheduler
 			period);
 	}
 	
+	@Override
 	public void destroy()
 	{
 		if (timer != null)
@@ -75,4 +79,5 @@ public class JobScheduler
 	{
 		this.jobs = jobs;
 	}
+
 }

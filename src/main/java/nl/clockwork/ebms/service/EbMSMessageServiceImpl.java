@@ -45,8 +45,9 @@ import nl.clockwork.ebms.validation.ValidatorException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.beans.factory.InitializingBean;
 
-public class EbMSMessageServiceImpl implements EbMSMessageService
+public class EbMSMessageServiceImpl implements InitializingBean, EbMSMessageService
 {
   protected transient Log logger = LogFactory.getLog(getClass());
 	private DeliveryManager deliveryManager;
@@ -57,10 +58,11 @@ public class EbMSMessageServiceImpl implements EbMSMessageService
 	private EbMSMessageContextValidator ebMSMessageContextValidator;
 	private EbMSSignatureGenerator signatureGenerator;
 
-  public void init()
-  {
+	@Override
+	public void afterPropertiesSet() throws Exception
+	{
 		ebMSMessageContextValidator = new EbMSMessageContextValidator(cpaManager);
-  }
+	}
   
 	@Override
 	public void ping(String cpaId, Party fromParty, Party toParty) throws EbMSMessageServiceException

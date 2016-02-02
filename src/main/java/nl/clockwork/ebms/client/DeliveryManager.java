@@ -37,9 +37,10 @@ import nl.clockwork.ebms.util.EbMSMessageUtils;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.beans.factory.InitializingBean;
 import org.xml.sax.SAXException;
 
-public class DeliveryManager //DeliveryService
+public class DeliveryManager implements InitializingBean //DeliveryService
 {
 	protected transient Log logger = LogFactory.getLog(getClass());
 	protected ExecutorService executorService;
@@ -49,7 +50,8 @@ public class DeliveryManager //DeliveryService
 	private MessageQueue<EbMSMessage> messageQueue;
 	protected EbMSClient ebMSClient;
 
-	public void init()
+	@Override
+	public void afterPropertiesSet() throws Exception
 	{
 		//executorService = Executors.newFixedThreadPool(maxThreads);
 		if (processorsScaleFactor == null || processorsScaleFactor <= 0)
