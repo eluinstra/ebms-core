@@ -31,9 +31,11 @@
 		</property>
 	</bean>
 
+	<import resource="classpath:nl/clockwork/ebms/cache.xml" />
 	<import resource="classpath:nl/clockwork/ebms/datasource.xml"/>
-	<import resource="classpath:nl/clockwork/ebms/dao.spring.xml" />
+	<import resource="classpath:nl/clockwork/ebms/dao.xml" />
 	<import resource="classpath:nl/clockwork/ebms/processor.xml" />
+	<import resource="classpath:nl/clockwork/ebms/eventListener.xml" />
 
 	<import resource="classpath:nl/clockwork/ebms/web/hsqldb/hsqldb.provider.xml"/>
 
