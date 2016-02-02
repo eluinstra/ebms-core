@@ -25,6 +25,7 @@ import org.apache.xml.security.encryption.EncryptedData;
 import org.apache.xml.security.encryption.EncryptedKey;
 import org.apache.xml.security.encryption.XMLCipher;
 import org.apache.xml.security.keys.KeyInfo;
+import org.apache.xml.security.keys.content.KeyName;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.InputSource;
@@ -77,9 +78,11 @@ public class EbMSMessageEncrypter
 		xmlCipher.init(XMLCipher.ENCRYPT_MODE,secretKey);
 
 		EncryptedData encryptedData = xmlCipher.getEncryptedData();
+		KeyInfo encryptedKeyInfo = new KeyInfo(document);
+		encryptedKeyInfo.add(new KeyName(document,"CN=52487C45.cm-4-1b.dynamic.ziggo.nl, serialNumber=00000001820029336000, O=Ordina, C=NL"));
+		encryptedKey.setKeyInfo(encryptedKeyInfo);
 		KeyInfo keyInfo = new KeyInfo(document);
 		keyInfo.add(encryptedKey);
-		encryptedKey.setKeyInfo(new KeyInfo(builder.parse(new InputSource(new StringReader("<KeyName>CN=52487C45.cm-4-1b.dynamic.ziggo.nl, serialNumber=00000001820029336000, O=Ordina, C=NL</KeyName>")))));
 		encryptedData.setKeyInfo(keyInfo);
 
 		//xmlCipher.doFinal(document,document.getDocumentElement(),true);
