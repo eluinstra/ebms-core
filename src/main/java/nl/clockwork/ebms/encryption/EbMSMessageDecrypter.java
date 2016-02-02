@@ -2,42 +2,57 @@ package nl.clockwork.ebms.encryption;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
+import java.security.GeneralSecurityException;
 import java.security.KeyPair;
 import java.security.KeyStore;
 import java.security.PrivateKey;
+import java.util.ArrayList;
+import java.util.List;
 
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
+import javax.mail.util.ByteArrayDataSource;
 
 import nl.clockwork.ebms.common.util.DOMUtils;
 import nl.clockwork.ebms.common.util.SecurityUtils;
 import nl.clockwork.ebms.model.EbMSAttachment;
 import nl.clockwork.ebms.model.EbMSMessage;
+import nl.clockwork.ebms.processor.EbMSProcessingException;
+import nl.clockwork.ebms.processor.EbMSProcessorException;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.xml.security.encryption.EncryptedKey;
 import org.apache.xml.security.encryption.XMLCipher;
 import org.apache.xml.security.utils.EncryptionConstants;
+import org.fusesource.hawtbuf.ByteArrayInputStream;
+import org.springframework.beans.factory.InitializingBean;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-public class EbMSMessageDecrypter
+public class EbMSMessageDecrypter implements InitializingBean
 {
+	private String keyStorePath;
+	private String keyStorePassword;
+	private KeyStore keyStore;
+
 	public EbMSMessageDecrypter()
 	{
 		org.apache.xml.security.Init.init();
+	}
+
+	@Override
+	public void afterPropertiesSet() throws Exception
+	{
+		keyStore = SecurityUtils.loadKeyStore(keyStorePath,keyStorePassword);
 	}
 
 	public void decrypt(EbMSMessage message)
 	{
 		try
 		{
+			List<EbMSAttachment> attachments = new ArrayList<EbMSAttachment>();
 			for (EbMSAttachment attachment: message.getAttachments())
-			{
-				decrypt(attachment);
-			}
+				attachments.add(decrypt(attachment));
+			message.setAttachments(attachments);
 		}
 		catch (Exception e)
 		{
@@ -46,49 +61,43 @@ public class EbMSMessageDecrypter
 		}
 	}
 
-	private void decrypt(EbMSAttachment attachment) throws Exception
+	private EbMSAttachment decrypt(EbMSAttachment attachment) throws Exception
 	{
 		Document document = DOMUtils.read((attachment.getInputStream()));
-		Element encryptedDataElement = (Element)document.getElementsByTagNameNS(EncryptionConstants.EncryptionSpecNS,EncryptionConstants._TAG_ENCRYPTEDDATA).item(0);
+		if (document.getElementsByTagNameNS(EncryptionConstants.EncryptionSpecNS,EncryptionConstants._TAG_ENCRYPTEDDATA).getLength() > 0)
+		{
+			Element encryptedDataElement = (Element)document.getElementsByTagNameNS(EncryptionConstants.EncryptionSpecNS,EncryptionConstants._TAG_ENCRYPTEDDATA).item(0);
+			XMLCipher xmlCipher = XMLCipher.getInstance();
+			EncryptedKey encryptedKey = xmlCipher.loadEncryptedKey(encryptedDataElement);
+			if (encryptedKey.getKeyInfo().containsKeyName())
+			{
+				String keyName = encryptedKey.getKeyInfo().itemKeyName(0).getKeyName();
+	
+				KeyPair keyPair = SecurityUtils.getKeyPairByCertificateSubject(keyStore,keyName,"password");
+				PrivateKey privateKey = keyPair.getPrivate();
 
-		KeyStore keyStore = SecurityUtils.loadKeyStore("/home/edwin/Downloads/keystore.logius.jks","password");
-		KeyPair keyPair = SecurityUtils.getKeyPair(keyStore,"1","password");
-		PrivateKey private1 = keyPair.getPrivate();
-
-		XMLCipher xmlCipher = XMLCipher.getInstance();
-		xmlCipher.init(XMLCipher.DECRYPT_MODE,null);
-		xmlCipher.setKEK(private1);
-
-		xmlCipher.doFinal(document,encryptedDataElement);
-		//DOMUtils.
+				xmlCipher.init(XMLCipher.DECRYPT_MODE,null);
+				xmlCipher.setKEK(privateKey);
+		
+				byte[] buffer = xmlCipher.decryptToByteArray(encryptedDataElement);
+				ByteArrayDataSource ds = new ByteArrayDataSource(new ByteArrayInputStream(buffer),attachment.getContentType());
+				
+				return new EbMSAttachment(ds,attachment.getContentId());
+			}
+			else
+				throw new EbMSProcessingException("EncryptedData of attachment " + attachment.getContentId() + " does not contain the KeyName!");
+		}
+		else
+			throw new EbMSProcessingException("Attachment " + attachment.getContentId() + " not encrypted!");
 	}
 
 	private static Document loadEncryptionDocument() throws Exception
 	{
-		String fileName = "/home/edwin/Downloads/A1453383414677.12095612@ebms.cv.prod.osb.overheid.nl_cn.xml";
-		File encryptionFile = new File(fileName);
+		File encryptionFile = new File("/home/edwin/Downloads/A1453383414677.12095612@ebms.cv.prod.osb.overheid.nl_cn.xml");
 		javax.xml.parsers.DocumentBuilderFactory dbf = javax.xml.parsers.DocumentBuilderFactory.newInstance();
 		dbf.setNamespaceAware(true);
-		javax.xml.parsers.DocumentBuilder db = dbf.newDocumentBuilder();
-		Document document = db.parse(encryptionFile);
-		System.out.println("Encryption document loaded from " + encryptionFile.toURI().toURL().toString());
+		Document document = dbf.newDocumentBuilder().parse(encryptionFile);
 		return document;
-	}
-
-	private static void outputDocToFile(Document doc, String fileName) throws Exception
-	{
-		File encryptionFile = new File(fileName);
-		FileOutputStream f = new FileOutputStream(encryptionFile);
-
-		TransformerFactory factory = TransformerFactory.newInstance();
-		Transformer transformer = factory.newTransformer();
-		transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION,"yes");
-		DOMSource source = new DOMSource(doc);
-		StreamResult result = new StreamResult(f);
-		transformer.transform(source,result);
-
-		f.close();
-		System.out.println("Wrote document containing decrypted data to " + encryptionFile.toURI().toURL().toString());
 	}
 
 	public static void main(String[] args) throws Exception
@@ -110,7 +119,5 @@ public class EbMSMessageDecrypter
 		
 		System.out.println(new String(result));
 		IOUtils.write(result,new FileOutputStream("/home/edwin/Downloads/A1453383414677.12095612@ebms.cv.prod.osb.overheid.nl_cn.decrypted.xml"));
-
-		//outputDocToFile(document, "/home/edwin/Downloads/A1453383414677.12095612@ebms.cv.prod.osb.overheid.nl_cn.decrypted.xml");
 	}
 }
