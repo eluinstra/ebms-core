@@ -29,6 +29,7 @@ import nl.clockwork.ebms.model.EbMSAttachment;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.james.mime4j.MimeException;
+import org.apache.james.mime4j.codec.Base64InputStream;
 import org.apache.james.mime4j.parser.ContentHandler;
 import org.apache.james.mime4j.stream.BodyDescriptor;
 import org.apache.james.mime4j.stream.Field;
@@ -99,6 +100,8 @@ public class EbMSContentHandler implements ContentHandler
 	public void body(BodyDescriptor bd, InputStream is) throws MimeException, IOException
 	{
 		String contentType = getHeader("Content-Type");
+		if (getHeader("Content-Transfer-Encoding").equalsIgnoreCase("base64"))
+			is = new Base64InputStream(is);
 		ByteArrayDataSource ds = new ByteArrayDataSource(is,contentType);
 		//ds.setName("");
 		String contentId = getHeader("Content-ID");
