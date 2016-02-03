@@ -66,12 +66,12 @@ public class EbMSSignatureGenerator implements InitializingBean
 		keyStore = SecurityUtils.loadKeyStore(keyStorePath,keyStorePassword);
 	}
 	
-	public void generate(String cpaId, EbMSMessage message) throws EbMSProcessorException
+	public void generate(EbMSMessage message) throws EbMSProcessorException
 	{
 		try
 		{
-			if (cpaManager.isNonRepudiationRequired(cpaId,new CacheablePartyId(message.getMessageHeader().getFrom().getPartyId()),message.getMessageHeader().getFrom().getRole(),CPAUtils.toString(message.getMessageHeader().getService()),message.getMessageHeader().getAction()))
-				sign(cpaId,message);
+			if (cpaManager.isNonRepudiationRequired(message.getMessageHeader().getCPAId(),new CacheablePartyId(message.getMessageHeader().getFrom().getPartyId()),message.getMessageHeader().getFrom().getRole(),CPAUtils.toString(message.getMessageHeader().getService()),message.getMessageHeader().getAction()))
+				sign(message);
 		}
 		catch (GeneralSecurityException e)
 		{
@@ -83,13 +83,13 @@ public class EbMSSignatureGenerator implements InitializingBean
 		}
 	}
 
-	public void generate(String cpaId, AckRequested ackRequested, EbMSMessage message) throws EbMSProcessorException
+	public void generate(AckRequested ackRequested, EbMSMessage message) throws EbMSProcessorException
 	{
 		try
 		{
 			if (ackRequested != null && ackRequested.isSigned())
 			{
-				sign(cpaId,message);
+				sign(message);
 			}
 		}
 		catch (GeneralSecurityException e)
@@ -102,9 +102,9 @@ public class EbMSSignatureGenerator implements InitializingBean
 		}
 	}
 
-	private void sign(String cpaId, EbMSMessage message) throws EbMSProcessorException, GeneralSecurityException, XMLSecurityException
+	private void sign(EbMSMessage message) throws EbMSProcessorException, GeneralSecurityException, XMLSecurityException
 	{
-		DeliveryChannel deliveryChannel = cpaManager.getFromDeliveryChannel(cpaId,new CacheablePartyId(message.getMessageHeader().getFrom().getPartyId()),message.getMessageHeader().getFrom().getRole(),CPAUtils.toString(message.getMessageHeader().getService()),message.getMessageHeader().getAction());
+		DeliveryChannel deliveryChannel = cpaManager.getFromDeliveryChannel(message.getMessageHeader().getCPAId(),new CacheablePartyId(message.getMessageHeader().getFrom().getPartyId()),message.getMessageHeader().getFrom().getRole(),CPAUtils.toString(message.getMessageHeader().getService()),message.getMessageHeader().getAction());
 		X509Certificate certificate = CPAUtils.getX509Certificate(CPAUtils.getSigningCertificate(deliveryChannel));
 		String alias = keyStore.getCertificateAlias(certificate);
 		if (alias == null)

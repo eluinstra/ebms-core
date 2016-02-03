@@ -273,7 +273,7 @@ public class EbMSMessageProcessorX extends EbMSMessageProcessor implements Initi
 			try
 			{
 				messageHeaderValidator.validate(requestMessage,responseMessage);
-				messageHeaderValidator.validate(cpaId,responseMessage,timestamp);
+				messageHeaderValidator.validate(responseMessage,timestamp);
 				ebMSDAO.executeTransaction(
 					new DAOTransactionCallback()
 					{
@@ -304,8 +304,8 @@ public class EbMSMessageProcessorX extends EbMSMessageProcessor implements Initi
 			try
 			{
 				messageHeaderValidator.validate(requestMessage,responseMessage);
-				messageHeaderValidator.validate(cpaId,responseMessage,timestamp);
-				signatureValidator.validate(cpaId,requestMessage,responseMessage);
+				messageHeaderValidator.validate(responseMessage,timestamp);
+				signatureValidator.validate(requestMessage,responseMessage);
 				ebMSDAO.executeTransaction(
 					new DAOTransactionCallback()
 					{

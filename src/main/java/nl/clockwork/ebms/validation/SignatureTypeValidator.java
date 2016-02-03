@@ -44,13 +44,13 @@ public class SignatureTypeValidator
 		this.ebMSSignatureValidator = ebMSSignatureValidator;
 	}
 
-	public void validate(String cpaId, EbMSMessage message) throws ValidatorException
+	public void validate(EbMSMessage message) throws ValidatorException
 	{
 		MessageHeader messageHeader = message.getMessageHeader();
 		SignatureType signature = message.getSignature();
 		
-		DeliveryChannel deliveryChannel = cpaManager.getFromDeliveryChannel(cpaId,new CacheablePartyId(messageHeader.getFrom().getPartyId()),messageHeader.getFrom().getRole(),CPAUtils.toString(messageHeader.getService()),messageHeader.getAction());
-		if (cpaManager.isNonRepudiationRequired(cpaId,new CacheablePartyId(messageHeader.getFrom().getPartyId()),messageHeader.getFrom().getRole(),CPAUtils.toString(messageHeader.getService()),messageHeader.getAction()))
+		DeliveryChannel deliveryChannel = cpaManager.getFromDeliveryChannel(message.getMessageHeader().getCPAId(),new CacheablePartyId(messageHeader.getFrom().getPartyId()),messageHeader.getFrom().getRole(),CPAUtils.toString(messageHeader.getService()),messageHeader.getAction());
+		if (cpaManager.isNonRepudiationRequired(message.getMessageHeader().getCPAId(),new CacheablePartyId(messageHeader.getFrom().getPartyId()),messageHeader.getFrom().getRole(),CPAUtils.toString(messageHeader.getService()),messageHeader.getAction()))
 		{
 			if (signature == null)
 				throw new EbMSValidationException(EbMSMessageUtils.createError("//Header/Signature",Constants.EbMSErrorCode.SECURITY_FAILURE.errorCode(),"Signature not found."));
@@ -63,11 +63,11 @@ public class SignatureTypeValidator
 		}
 	}
 
-	public void validateSignature(String cpaId, EbMSMessage message) throws ValidatorException
+	public void validateSignature(EbMSMessage message) throws ValidatorException
 	{
 		try
 		{
-			ebMSSignatureValidator.validate(cpaId,message);
+			ebMSSignatureValidator.validate(message);
 		}
 		catch (ValidationException e)
 		{

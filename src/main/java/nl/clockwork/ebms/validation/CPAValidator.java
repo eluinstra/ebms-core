@@ -49,11 +49,9 @@ public class CPAValidator
 		this.cpaManager = cpaManager;
 	}
 
-	public void validate(String cpaId, EbMSMessage message) throws EbMSValidationException
+	public void validate(EbMSMessage message) throws EbMSValidationException
 	{
-		if (cpaId == null || !cpaId.equals(message.getMessageHeader().getCPAId()))
-			throw new EbMSValidationException(EbMSMessageUtils.createError("//Header/MessageHeader[@cpaid]",Constants.EbMSErrorCode.VALUE_NOT_RECOGNIZED.errorCode(),"CPA not found."));
-		if (!cpaManager.isValid(cpaId,message.getMessageHeader().getMessageData().getTimestamp()))
+		if (!cpaManager.isValid(message.getMessageHeader().getCPAId(),message.getMessageHeader().getMessageData().getTimestamp()))
 			throw new EbMSValidationException(EbMSMessageUtils.createError("//Header/MessageHeader[@cpaid]",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Invalid CPA."));
 	}
 

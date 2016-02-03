@@ -92,7 +92,7 @@ public class EbMSMessageProcessor implements InitializingBean
 		signatureGenerator = new EbMSSignatureGenerator()
 		{
 			@Override
-			public void generate(String cpaId, AckRequested ackRequested, EbMSMessage message) throws EbMSProcessorException
+			public void generate(AckRequested ackRequested, EbMSMessage message) throws EbMSProcessorException
 			{
 			}
 		};
@@ -269,12 +269,12 @@ public class EbMSMessageProcessor implements InitializingBean
 		{
 			try
 			{
-				cpaValidator.validate(cpaId,message);
-				messageHeaderValidator.validate(cpaId,message,timestamp);
-				signatureTypeValidator.validate(cpaId,message);
+				cpaValidator.validate(message);
+				messageHeaderValidator.validate(message,timestamp);
+				signatureTypeValidator.validate(message);
 				manifestValidator.validate(message);
 				messageDecrypter.decrypt(message);
-				signatureTypeValidator.validateSignature(cpaId,message);
+				signatureTypeValidator.validateSignature(message);
 				if (message.getAckRequested() == null)
 				{
 					ebMSDAO.executeTransaction(
@@ -293,7 +293,7 @@ public class EbMSMessageProcessor implements InitializingBean
 				else
 				{
 					final EbMSMessage acknowledgment = ebMSMessageFactory.createEbMSAcknowledgment(cpaId,message,timestamp);
-					signatureGenerator.generate(cpaId,message.getAckRequested(),acknowledgment);
+					signatureGenerator.generate(message.getAckRequested(),acknowledgment);
 					ebMSDAO.executeTransaction(
 						new DAOTransactionCallback()
 						{

@@ -58,23 +58,24 @@ public class EbMSSignatureValidator
 	private CPAManager cpaManager;
 	private String trustStorePath;
 	private String trustStorePassword;
+	private KeyStore trustStore;
 
-	public EbMSSignatureValidator()
+	public EbMSSignatureValidator() throws GeneralSecurityException, IOException
 	{
 		org.apache.xml.security.Init.init();
+		trustStore = SecurityUtils.loadKeyStore(trustStorePath,trustStorePassword);
 	}
 	
-	public void validate(String cpaId, EbMSMessage message) throws ValidatorException, ValidationException
+	public void validate(EbMSMessage message) throws ValidatorException, ValidationException
 	{
 		try
 		{
-			if (cpaManager.isNonRepudiationRequired(cpaId,new CacheablePartyId(message.getMessageHeader().getFrom().getPartyId()),message.getMessageHeader().getFrom().getRole(),CPAUtils.toString(message.getMessageHeader().getService()),message.getMessageHeader().getAction()))
+			if (cpaManager.isNonRepudiationRequired(message.getMessageHeader().getCPAId(),new CacheablePartyId(message.getMessageHeader().getFrom().getPartyId()),message.getMessageHeader().getFrom().getRole(),CPAUtils.toString(message.getMessageHeader().getService()),message.getMessageHeader().getAction()))
 			{
-				KeyStore trustStore = SecurityUtils.loadKeyStore(trustStorePath,trustStorePassword);
 				NodeList signatureNodeList = message.getMessage().getElementsByTagNameNS(org.apache.xml.security.utils.Constants.SignatureSpecNS,org.apache.xml.security.utils.Constants._TAG_SIGNATURE);
 				if (signatureNodeList.getLength() > 0)
 				{
-					X509Certificate certificate = getCertificate(cpaId,message.getMessage(),message.getMessageHeader());
+					X509Certificate certificate = getCertificate(message.getMessage(),message.getMessageHeader());
 					if (certificate != null)
 					{
 						validateCertificate(trustStore,certificate,message.getMessageHeader().getMessageData().getTimestamp() == null ? new Date() : message.getMessageHeader().getMessageData().getTimestamp());
@@ -88,7 +89,7 @@ public class EbMSSignatureValidator
 					throw new ValidationException("Signature not found!");
 			}
 		}
-		catch (GeneralSecurityException | IOException e)
+		catch (GeneralSecurityException e)
 		{
 			throw new ValidatorException(e);
 		}
@@ -98,7 +99,7 @@ public class EbMSSignatureValidator
 		}
 	}
 
-	public void validate(String cpaId, EbMSMessage requestMessage, EbMSMessage responseMessage) throws ValidatorException, ValidationException
+	public void validate(EbMSMessage requestMessage, EbMSMessage responseMessage) throws ValidatorException, ValidationException
 	{
 		try
 		{
@@ -108,7 +109,7 @@ public class EbMSSignatureValidator
 				NodeList signatureNodeList = responseMessage.getMessage().getElementsByTagNameNS(org.apache.xml.security.utils.Constants.SignatureSpecNS,org.apache.xml.security.utils.Constants._TAG_SIGNATURE);
 				if (signatureNodeList.getLength() > 0)
 				{
-					X509Certificate certificate = getCertificate(cpaId,responseMessage.getMessage(),responseMessage.getMessageHeader());
+					X509Certificate certificate = getCertificate(responseMessage.getMessage(),responseMessage.getMessageHeader());
 					if (certificate != null)
 					{
 						validateCertificate(trustStore,certificate,responseMessage.getMessageHeader().getMessageData().getTimestamp() == null ? new Date() : responseMessage.getMessageHeader().getMessageData().getTimestamp());
@@ -141,11 +142,11 @@ public class EbMSSignatureValidator
 		return signature.checkSignatureValue(certificate);
 	}
 
-	private X509Certificate getCertificate(String cpaId, Document document, MessageHeader messageHeader)
+	private X509Certificate getCertificate(Document document, MessageHeader messageHeader)
 	{
 		try
 		{
-			DeliveryChannel deliveryChannel = cpaManager.getFromDeliveryChannel(cpaId,new CacheablePartyId(messageHeader.getFrom().getPartyId()),messageHeader.getFrom().getRole(),CPAUtils.toString(messageHeader.getService()),messageHeader.getAction());
+			DeliveryChannel deliveryChannel = cpaManager.getFromDeliveryChannel(messageHeader.getCPAId(),new CacheablePartyId(messageHeader.getFrom().getPartyId()),messageHeader.getFrom().getRole(),CPAUtils.toString(messageHeader.getService()),messageHeader.getAction());
 			if (deliveryChannel != null)
 				return CPAUtils.getX509Certificate(CPAUtils.getSigningCertificate(deliveryChannel));
 			return null;
