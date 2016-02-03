@@ -94,7 +94,7 @@ public class EbMSMessageServiceImpl implements InitializingBean, EbMSMessageServ
 			ebMSMessageContextValidator.validate(messageContent.getContext());
 			//TODO ebMSMessageContentToEbMSDocument
 			final EbMSMessage message = ebMSMessageFactory.ebMSMessageContentToEbMSMessage(messageContent.getContext().getCpaId(),messageContent);
-			signatureGenerator.generate(messageContent.getContext().getCpaId(),message);
+			signatureGenerator.generate(message);
 			ebMSDAO.executeTransaction(
 				new DAOTransactionCallback()
 				{
