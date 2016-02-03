@@ -98,29 +98,23 @@ public class EbMSMessageDecrypter implements InitializingBean
 	private EbMSAttachment decrypt(X509Certificate certificate, XMLCipher xmlCipher, EbMSAttachment attachment) throws ParserConfigurationException, SAXException, IOException, XMLSecurityException, GeneralSecurityException, EbMSProcessingException
 	{
 		Document document = DOMUtils.read((attachment.getInputStream()));
-		if (document.getElementsByTagNameNS(EncryptionConstants.EncryptionSpecNS,EncryptionConstants._TAG_ENCRYPTEDDATA).getLength() > 0)
-		{
-			Element encryptedDataElement = (Element)document.getElementsByTagNameNS(EncryptionConstants.EncryptionSpecNS,EncryptionConstants._TAG_ENCRYPTEDDATA).item(0);
-			EncryptedKey encryptedKey = xmlCipher.loadEncryptedKey(encryptedDataElement);
-			if (encryptedKey.getKeyInfo().containsKeyName())
-			{
-				String keyName = encryptedKey.getKeyInfo().itemKeyName(0).getKeyName();
-				if (certificate.getSubjectDN().getName().equals(keyName))
-				{
-					byte[] buffer = xmlCipher.decryptToByteArray(encryptedDataElement);
-					String contentType = attachment.getContentType(); //FIXME get mimeType from EncryptedData
-					ByteArrayDataSource ds = new ByteArrayDataSource(new ByteArrayInputStream(buffer),contentType);
-					
-					return new EbMSAttachment(ds,attachment.getContentId());
-				}
-				else
-					throw new EbMSProcessingException("KeyName " + keyName + " does match expected certificate subject " + certificate.getSubjectDN().getName() + "!");
-			}
-			else
-				throw new EbMSProcessingException("EncryptedData of attachment " + attachment.getContentId() + " does not contain a KeyName!");
-		}
-		else
+		if (document.getElementsByTagNameNS(EncryptionConstants.EncryptionSpecNS,EncryptionConstants._TAG_ENCRYPTEDDATA).getLength() == 0)
 			throw new EbMSProcessingException("Attachment " + attachment.getContentId() + " not encrypted!");
+
+		Element encryptedDataElement = (Element)document.getElementsByTagNameNS(EncryptionConstants.EncryptionSpecNS,EncryptionConstants._TAG_ENCRYPTEDDATA).item(0);
+		EncryptedKey encryptedKey = xmlCipher.loadEncryptedKey(encryptedDataElement);
+		if (!encryptedKey.getKeyInfo().containsKeyName())
+			throw new EbMSProcessingException("EncryptedData of attachment " + attachment.getContentId() + " does not contain a KeyName!");
+
+		String keyName = encryptedKey.getKeyInfo().itemKeyName(0).getKeyName();
+		if (!certificate.getSubjectDN().getName().equals(keyName))
+			throw new EbMSProcessingException("KeyName " + keyName + " does match expected certificate subject " + certificate.getSubjectDN().getName() + "!");
+
+		byte[] buffer = xmlCipher.decryptToByteArray(encryptedDataElement);
+		String contentType = attachment.getContentType(); //FIXME get mimeType from EncryptedData
+		ByteArrayDataSource ds = new ByteArrayDataSource(new ByteArrayInputStream(buffer),contentType);
+
+		return new EbMSAttachment(ds,attachment.getContentId());
 	}
 
 	private static Document loadEncryptionDocument() throws Exception
