@@ -49,6 +49,7 @@ public class EbMSMessageContextValidator
 			msg.append(" context.cpaId=").append(cpaId);
 			msg.append(", context.fromParty.partyId=").append(fromParty.getPartyId());
 			msg.append(", context.fromParty.role=").append(fromParty.getRole());
+			throw new ValidationException(msg.toString());
 		}
 		if (!cpaManager.existsParty(cpaId,toParty))
 		{
@@ -57,6 +58,7 @@ public class EbMSMessageContextValidator
 			msg.append(" context.cpaId=").append(cpaId);
 			msg.append(", context.toParty.partyId=").append(toParty.getPartyId());
 			msg.append(", context.toParty.role=").append(toParty.getRole());
+			throw new ValidationException(msg.toString());
 		}
 	}
 
