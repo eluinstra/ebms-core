@@ -16,6 +16,7 @@ Implemented:
 -	Core Functionality
 	o	Security Module
 			Signature
+			Encryption
 	o	Error Handling Module
 	o	SyncReply Module
 -	Additional Features:
@@ -27,13 +28,11 @@ Implemented:
 
 Not implemented:
 -	Core Functionality
-	o	Security Module
-			Encryption
+	o	Packaging
 -	Additional Features:
 	o	Message Order Module
 	o	Multi-Hop Module
 -	Multiple delivery channels per action
--	Manifest inspection
 
 Remarks:
 -	Duplicate messages will always be eliminated

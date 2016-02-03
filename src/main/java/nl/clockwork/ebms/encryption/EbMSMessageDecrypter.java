@@ -30,6 +30,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.xml.security.encryption.EncryptedKey;
 import org.apache.xml.security.encryption.XMLCipher;
+import org.apache.xml.security.encryption.XMLEncryptionException;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.utils.EncryptionConstants;
 import org.fusesource.hawtbuf.ByteArrayInputStream;
@@ -66,9 +67,10 @@ public class EbMSMessageDecrypter implements InitializingBean
 			{
 				DeliveryChannel deliveryChannel = cpaManager.getToDeliveryChannel(message.getMessageHeader().getCPAId(),new CacheablePartyId(message.getMessageHeader().getTo().getPartyId()),message.getMessageHeader().getFrom().getRole(),CPAUtils.toString(message.getMessageHeader().getService()),message.getMessageHeader().getAction());
 				X509Certificate certificate = CPAUtils.getX509Certificate(CPAUtils.getEncryptionCertificate(deliveryChannel));
+				XMLCipher xmlCipher = createXmlCipher(certificate);
 				List<EbMSAttachment> attachments = new ArrayList<EbMSAttachment>();
 				for (EbMSAttachment attachment: message.getAttachments())
-					attachments.add(decrypt(certificate,attachment));
+					attachments.add(decrypt(certificate,xmlCipher,attachment));
 				message.setAttachments(attachments);
 			}
 		}
@@ -82,27 +84,29 @@ public class EbMSMessageDecrypter implements InitializingBean
 		}
 	}
 
-	private EbMSAttachment decrypt(X509Certificate certificate, EbMSAttachment attachment) throws ParserConfigurationException, SAXException, IOException, XMLSecurityException, GeneralSecurityException, EbMSProcessingException
+	private XMLCipher createXmlCipher(X509Certificate certificate) throws XMLEncryptionException, GeneralSecurityException
+	{
+		XMLCipher result = XMLCipher.getInstance();
+		result.init(XMLCipher.DECRYPT_MODE,null);
+		result.setKEK(SecurityUtils.getKeyPairByCertificateSubject(keyStore,certificate.getSubjectDN().getName(),keyStorePassword).getPrivate());
+		return result;
+	}
+
+	private EbMSAttachment decrypt(X509Certificate certificate, XMLCipher xmlCipher, EbMSAttachment attachment) throws ParserConfigurationException, SAXException, IOException, XMLSecurityException, GeneralSecurityException, EbMSProcessingException
 	{
 		Document document = DOMUtils.read((attachment.getInputStream()));
 		if (document.getElementsByTagNameNS(EncryptionConstants.EncryptionSpecNS,EncryptionConstants._TAG_ENCRYPTEDDATA).getLength() > 0)
 		{
 			Element encryptedDataElement = (Element)document.getElementsByTagNameNS(EncryptionConstants.EncryptionSpecNS,EncryptionConstants._TAG_ENCRYPTEDDATA).item(0);
-			XMLCipher xmlCipher = XMLCipher.getInstance();
 			EncryptedKey encryptedKey = xmlCipher.loadEncryptedKey(encryptedDataElement);
 			if (encryptedKey.getKeyInfo().containsKeyName())
 			{
 				String keyName = encryptedKey.getKeyInfo().itemKeyName(0).getKeyName();
 				if (certificate.getSubjectDN().getName().equals(keyName))
 				{
-					KeyPair keyPair = SecurityUtils.getKeyPairByCertificateSubject(keyStore,keyName,"password");
-					PrivateKey privateKey = keyPair.getPrivate();
-	
-					xmlCipher.init(XMLCipher.DECRYPT_MODE,null);
-					xmlCipher.setKEK(privateKey);
-			
 					byte[] buffer = xmlCipher.decryptToByteArray(encryptedDataElement);
-					ByteArrayDataSource ds = new ByteArrayDataSource(new ByteArrayInputStream(buffer),attachment.getContentType());
+					String contentType = attachment.getContentType(); //FIXME get mimeType from EncryptedData
+					ByteArrayDataSource ds = new ByteArrayDataSource(new ByteArrayInputStream(buffer),contentType);
 					
 					return new EbMSAttachment(ds,attachment.getContentId());
 				}
@@ -110,7 +114,7 @@ public class EbMSMessageDecrypter implements InitializingBean
 					throw new EbMSProcessingException("KeyName " + keyName + " does match expected certificate subject " + certificate.getSubjectDN().getName() + "!");
 			}
 			else
-				throw new EbMSProcessingException("EncryptedData of attachment " + attachment.getContentId() + " does not contain the KeyName!");
+				throw new EbMSProcessingException("EncryptedData of attachment " + attachment.getContentId() + " does not contain a KeyName!");
 		}
 		else
 			throw new EbMSProcessingException("Attachment " + attachment.getContentId() + " not encrypted!");
@@ -121,8 +125,7 @@ public class EbMSMessageDecrypter implements InitializingBean
 		File encryptionFile = new File("/home/edwin/Downloads/A1453383414677.12095612@ebms.cv.prod.osb.overheid.nl_cn.xml");
 		javax.xml.parsers.DocumentBuilderFactory dbf = javax.xml.parsers.DocumentBuilderFactory.newInstance();
 		dbf.setNamespaceAware(true);
-		Document document = dbf.newDocumentBuilder().parse(encryptionFile);
-		return document;
+		return dbf.newDocumentBuilder().parse(encryptionFile);
 	}
 
 	public static void main(String[] args) throws Exception

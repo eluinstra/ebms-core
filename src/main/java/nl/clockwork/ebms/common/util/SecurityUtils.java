@@ -22,11 +22,15 @@ import java.security.GeneralSecurityException;
 import java.security.Key;
 import java.security.KeyPair;
 import java.security.KeyStore;
+import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import java.util.Enumeration;
+
+import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
 
 public class SecurityUtils
 {
@@ -71,6 +75,13 @@ public class SecurityUtils
 			}
 		}
 		return null;
+	}
+
+	public static SecretKey GenerateAESKey() throws NoSuchAlgorithmException
+	{
+		KeyGenerator keyGenerator = KeyGenerator.getInstance("AES");
+		keyGenerator.init(128);
+		return keyGenerator.generateKey();
 	}
 
 }
