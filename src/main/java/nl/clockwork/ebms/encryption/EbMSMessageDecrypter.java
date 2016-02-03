@@ -67,6 +67,9 @@ public class EbMSMessageDecrypter implements InitializingBean
 			{
 				DeliveryChannel deliveryChannel = cpaManager.getToDeliveryChannel(message.getMessageHeader().getCPAId(),new CacheablePartyId(message.getMessageHeader().getTo().getPartyId()),message.getMessageHeader().getFrom().getRole(),CPAUtils.toString(message.getMessageHeader().getService()),message.getMessageHeader().getAction());
 				X509Certificate certificate = CPAUtils.getX509Certificate(CPAUtils.getEncryptionCertificate(deliveryChannel));
+				String alias = keyStore.getCertificateAlias(certificate);
+				if (alias == null)
+					throw new ValidationException("No certificate found with subject \"" + certificate.getSubjectDN().getName() + "\" in keystore \"" + keyStorePath + "\"");
 				XMLCipher xmlCipher = createXmlCipher(certificate);
 				List<EbMSAttachment> attachments = new ArrayList<EbMSAttachment>();
 				for (EbMSAttachment attachment: message.getAttachments())
