@@ -169,6 +169,14 @@ public class CPAUtils
 		return null;
 	}
 	
+	public static Certificate getEncryptionCertificate(DeliveryChannel deliveryChannel)
+	{
+		DocExchange docExchange = getDocExchange(deliveryChannel);
+		if (docExchange.getEbXMLSenderBinding() != null && docExchange.getEbXMLSenderBinding().getSenderNonRepudiation() != null && docExchange.getEbXMLSenderBinding().getSenderNonRepudiation().getSigningCertificateRef() != null)
+			return (Certificate)docExchange.getEbXMLReceiverBinding().getReceiverDigitalEnvelope().getEncryptionCertificateRef().getCertId();
+		return null;
+	}
+	
 	public static String getNonRepudiationProtocol(DeliveryChannel deliveryChannel)
 	{
 		DocExchange docExchange = getDocExchange(deliveryChannel);
