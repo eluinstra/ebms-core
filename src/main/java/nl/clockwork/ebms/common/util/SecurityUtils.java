@@ -84,17 +84,21 @@ public class SecurityUtils
 		KeyGenerator keyGenerator;
 		switch (encryptionAlgorithm)
 		{
-			case XMLCipher.AES_128 :
+			case XMLCipher.AES_128:
 				keyGenerator = KeyGenerator.getInstance("AES");
 				keyGenerator.init(128);
 				return keyGenerator.generateKey();
-			case XMLCipher.AES_192 :
+			case XMLCipher.AES_192:
 				keyGenerator = KeyGenerator.getInstance("AES");
 				keyGenerator.init(192);
 				return keyGenerator.generateKey();
-			case XMLCipher.AES_256 :
+			case XMLCipher.AES_256:
 				keyGenerator = KeyGenerator.getInstance("AES");
 				keyGenerator.init(256);
+				return keyGenerator.generateKey();
+			case XMLCipher.TRIPLEDES:
+				keyGenerator = KeyGenerator.getInstance("DESede");
+				keyGenerator.init(192);
 				return keyGenerator.generateKey();
 			default:
 				return null;

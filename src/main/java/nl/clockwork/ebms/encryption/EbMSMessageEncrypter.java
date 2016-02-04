@@ -83,8 +83,11 @@ public class EbMSMessageEncrypter
 				DeliveryChannel deliveryChannel = cpaManager.getToDeliveryChannel(message.getMessageHeader().getCPAId(),new CacheablePartyId(message.getMessageHeader().getTo().getPartyId()),message.getMessageHeader().getFrom().getRole(),CPAUtils.toString(message.getMessageHeader().getService()),message.getMessageHeader().getAction());
 				X509Certificate certificate = CPAUtils.getX509Certificate(CPAUtils.getEncryptionCertificate(deliveryChannel));
 				validateCertificate(trustStore,certificate);
-				SecretKey secretKey = SecurityUtils.GenerateKey(CPAUtils.getEncryptionAlgorithm(deliveryChannel));
-				XMLCipher xmlCipher = createXmlCipher(secretKey);
+				String encryptionAlgorithm = CPAUtils.getEncryptionAlgorithm(deliveryChannel);
+				SecretKey secretKey = SecurityUtils.GenerateKey(encryptionAlgorithm);
+				if (secretKey == null)
+					throw new EbMSProcessingException("Unable to generate secret key for encryption algorithm " + encryptionAlgorithm);
+				XMLCipher xmlCipher = createXmlCipher(encryptionAlgorithm,secretKey);
 				Transformer transformer = createTransformer();
 				List<EbMSAttachment> attachments = new ArrayList<EbMSAttachment>();
 				for (EbMSAttachment attachment: message.getAttachments())
@@ -108,8 +111,11 @@ public class EbMSMessageEncrypter
 		{
 			X509Certificate certificate = CPAUtils.getX509Certificate(CPAUtils.getEncryptionCertificate(deliveryChannel));
 			validateCertificate(trustStore,certificate);
-			SecretKey secretKey = SecurityUtils.GenerateKey(CPAUtils.getEncryptionAlgorithm(deliveryChannel));
-			XMLCipher xmlCipher = createXmlCipher(secretKey);
+			String encryptionAlgorithm = CPAUtils.getEncryptionAlgorithm(deliveryChannel);
+			SecretKey secretKey = SecurityUtils.GenerateKey(encryptionAlgorithm);
+			if (secretKey == null)
+				throw new EbMSProcessingException("Unable to generate secret key for encryption algorithm " + encryptionAlgorithm);
+			XMLCipher xmlCipher = createXmlCipher(encryptionAlgorithm,secretKey);
 			Transformer transformer = createTransformer();
 			List<EbMSAttachment> attachments = new ArrayList<EbMSAttachment>();
 			for (EbMSAttachment attachment: message.getAttachments())
@@ -131,13 +137,13 @@ public class EbMSMessageEncrypter
 	{
 		TransformerFactory transFactory = TransformerFactory.newInstance();
 		Transformer transformer = transFactory.newTransformer();
-		transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+		transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION,"yes");
 		return transformer;
 	}
 
-	private XMLCipher createXmlCipher(SecretKey secretKey) throws XMLEncryptionException
+	private XMLCipher createXmlCipher(String encryptionAlgorithm, SecretKey secretKey) throws XMLEncryptionException
 	{
-		XMLCipher result = XMLCipher.getInstance(XMLCipher.AES_256);
+		XMLCipher result = XMLCipher.getInstance(encryptionAlgorithm);
 		result.init(XMLCipher.ENCRYPT_MODE,secretKey);
 		return result;
 	}
