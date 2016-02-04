@@ -273,8 +273,8 @@ public class EbMSMessageProcessor implements InitializingBean
 				messageHeaderValidator.validate(message,timestamp);
 				signatureTypeValidator.validate(message);
 				manifestValidator.validate(message);
-				signatureTypeValidator.validateSignature(message);
 				messageDecrypter.decrypt(message);
+				signatureTypeValidator.validateSignature(message);
 				if (message.getAckRequested() == null)
 				{
 					ebMSDAO.executeTransaction(
