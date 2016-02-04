@@ -57,6 +57,8 @@
 		<mime4j.version>0.7.2</mime4j.version>
 		<httpclient.version>4.3.6</httpclient.version>
 		<activemq.version>5.10.0</activemq.version>
+		<release.repo.url>http://sourceforge.net</release.repo.url>
+		<snapshot.repo.url>http://sourceforge.net</snapshot.repo.url>
 	</properties>
 	<dependencies>
 		<!--dependency>
@@ -441,5 +443,17 @@
 				</configuration>
 			</plugin>
 		</plugins>
-	</reporting>	
+	</reporting>
+	<distributionManagement>
+		<repository>
+			<id>release.repo</id>
+			<name>Release repository</name>
+			<url>${release.repo.url}</url>
+		</repository>
+		<snapshotRepository>
+			<id>snapshot.repo</id>
+			<name>Snapshot repository</name>
+			<url>${snapshot.repo.url}</url>
+		</snapshotRepository>
+	</distributionManagement>
 </project>
