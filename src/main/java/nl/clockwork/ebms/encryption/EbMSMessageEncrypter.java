@@ -68,6 +68,7 @@ import org.apache.xml.security.encryption.XMLCipher;
 import org.apache.xml.security.encryption.XMLEncryptionException;
 import org.apache.xml.security.keys.KeyInfo;
 import org.apache.xml.security.keys.content.KeyName;
+import org.apache.xml.security.utils.EncryptionConstants;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DeliveryChannel;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -99,12 +100,9 @@ public class EbMSMessageEncrypter
 				X509Certificate certificate = CPAUtils.getX509Certificate(CPAUtils.getEncryptionCertificate(deliveryChannel));
 				validateCertificate(trustStore,certificate);
 				String encryptionAlgorithm = CPAUtils.getEncryptionAlgorithm(deliveryChannel);
-				SecretKey secretKey = SecurityUtils.GenerateKey(encryptionAlgorithm);
-				XMLCipher xmlCipher = createXmlCipher(encryptionAlgorithm,secretKey);
-				Transformer transformer = createTransformer();
 				List<EbMSAttachment> attachments = new ArrayList<EbMSAttachment>();
-				for (EbMSAttachment attachment: message.getAttachments())
-					attachments.add(encrypt(transformer,certificate,xmlCipher,attachment));
+				for (EbMSAttachment attachment : message.getAttachments())
+					attachments.add(encrypt(certificate,encryptionAlgorithm,attachment));
 				message.setAttachments(attachments);
 			}
 		}
@@ -125,12 +123,9 @@ public class EbMSMessageEncrypter
 			X509Certificate certificate = CPAUtils.getX509Certificate(CPAUtils.getEncryptionCertificate(deliveryChannel));
 			validateCertificate(trustStore,certificate);
 			String encryptionAlgorithm = CPAUtils.getEncryptionAlgorithm(deliveryChannel);
-			SecretKey secretKey = SecurityUtils.GenerateKey(encryptionAlgorithm);
-			XMLCipher xmlCipher = createXmlCipher(encryptionAlgorithm,secretKey);
-			Transformer transformer = createTransformer();
 			List<EbMSAttachment> attachments = new ArrayList<EbMSAttachment>();
-			for (EbMSAttachment attachment: message.getAttachments())
-				attachments.add(encrypt(transformer,certificate,xmlCipher,attachment));
+			for (EbMSAttachment attachment : message.getAttachments())
+				attachments.add(encrypt(certificate,encryptionAlgorithm,attachment));
 			message.getAttachments().clear();
 			message.getAttachments().addAll(attachments);
 		}
@@ -144,27 +139,11 @@ public class EbMSMessageEncrypter
 		}
 	}
 
-	private Transformer createTransformer() throws TransformerFactoryConfigurationError, TransformerConfigurationException
-	{
-		TransformerFactory transFactory = TransformerFactory.newInstance();
-		Transformer transformer = transFactory.newTransformer();
-		transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION,"yes");
-		return transformer;
-	}
-
 	private XMLCipher createXmlCipher(String encryptionAlgorithm, SecretKey secretKey) throws XMLEncryptionException
 	{
 		XMLCipher result = XMLCipher.getInstance(encryptionAlgorithm);
 		result.init(XMLCipher.ENCRYPT_MODE,secretKey);
 		return result;
-	}
-
-	private Document createDocument() throws ParserConfigurationException, SAXException, IOException
-	{
-		DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-		dbFactory.setNamespaceAware(true);
-		DocumentBuilder builder = dbFactory.newDocumentBuilder();
-		return builder.parse(new InputSource(new StringReader("<root></root>")));
 	}
 
 	private void validateCertificate(KeyStore trustStore, X509Certificate certificate) throws KeyStoreException, ValidationException
@@ -197,15 +176,16 @@ public class EbMSMessageEncrypter
 			throw new ValidationException(e);
 		}
 	}
-	
-	private EbMSAttachment encrypt(Transformer transformer, X509Certificate certificate, XMLCipher xmlCipher, EbMSAttachment attachment) throws NoSuchAlgorithmException, XMLEncryptionException, FileNotFoundException, Exception
+
+	private EbMSAttachment encrypt(X509Certificate certificate, String encryptionAlgorithm, EbMSAttachment attachment) throws NoSuchAlgorithmException, XMLEncryptionException, FileNotFoundException, Exception
 	{
-		SecretKey secretKey = SecurityUtils.GenerateKey("http://www.w3.org/2001/04/xmlenc#aes128-cbc");
+		SecretKey secretKey = SecurityUtils.GenerateKey(encryptionAlgorithm);
+		XMLCipher xmlCipher = createXmlCipher(encryptionAlgorithm,secretKey);
 		EncryptedKey encryptedKey = createEncryptedKey(certificate.getPublicKey(),secretKey);
 		setEncryptedData(xmlCipher,encryptedKey,certificate,attachment);
 		EncryptedData encryptedData = xmlCipher.encryptData(null,null,attachment.getInputStream());
 		StringWriter buffer = new StringWriter();
-		transformer.transform(new DOMSource(xmlCipher.martial(document,encryptedData)),new StreamResult(buffer));
+		createTransformer().transform(new DOMSource(xmlCipher.martial(document,encryptedData)),new StreamResult(buffer));
 		return new EbMSAttachment(new ByteArrayDataSource(buffer.toString().getBytes("UTF-8"),"application/xml"),attachment.getContentId());
 	}
 
@@ -227,7 +207,23 @@ public class EbMSMessageEncrypter
 		encryptedData.setKeyInfo(keyInfo);
 		encryptedData.setId(attachment.getContentId());
 		encryptedData.setMimeType(attachment.getContentType());
-		encryptedData.setType("http://www.w3.org/2001/04/xmlenc#Element");
+		encryptedData.setType(EncryptionConstants.TYPE_ELEMENT);
+	}
+
+	private Document createDocument() throws ParserConfigurationException, SAXException, IOException
+	{
+		DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+		dbFactory.setNamespaceAware(true);
+		DocumentBuilder builder = dbFactory.newDocumentBuilder();
+		return builder.parse(new InputSource(new StringReader("<root></root>")));
+	}
+
+	private Transformer createTransformer() throws TransformerFactoryConfigurationError, TransformerConfigurationException
+	{
+		TransformerFactory transormerFactory = TransformerFactory.newInstance();
+		Transformer transformer = transormerFactory.newTransformer();
+		transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION,"yes");
+		return transformer;
 	}
 
 	public static void main(String[] args) throws Exception
@@ -265,11 +261,11 @@ public class EbMSMessageEncrypter
 
 		encryptedData = xmlCipher.encryptData(null,null,new FileInputStream("/home/edwin/Downloads/A1453383414677.12095612@ebms.cv.prod.osb.overheid.nl_cn.decrypted.xml"));
 		Element element = xmlCipher.martial(document,encryptedData);
-		//System.out.println(DOMUtils.toString((Document)element));
+		// System.out.println(DOMUtils.toString((Document)element));
 
 		TransformerFactory transFactory = TransformerFactory.newInstance();
 		Transformer transformer = transFactory.newTransformer();
-		transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+		transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION,"yes");
 		StringWriter buffer = new StringWriter();
 		transformer.transform(new DOMSource(element),new StreamResult(buffer));
 		System.out.println(buffer.toString());

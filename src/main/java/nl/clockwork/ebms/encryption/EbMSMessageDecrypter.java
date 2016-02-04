@@ -87,7 +87,7 @@ public class EbMSMessageDecrypter implements InitializingBean
 					throw new ValidationException("No certificate found with subject \"" + certificate.getSubjectDN().getName() + "\" in keystore \"" + keyStorePath + "\"");
 				XMLCipher xmlCipher = createXmlCipher(certificate);
 				List<EbMSAttachment> attachments = new ArrayList<EbMSAttachment>();
-				for (EbMSAttachment attachment: message.getAttachments())
+				for (EbMSAttachment attachment : message.getAttachments())
 					attachments.add(decrypt(certificate,xmlCipher,attachment));
 				message.setAttachments(attachments);
 			}
@@ -156,7 +156,7 @@ public class EbMSMessageDecrypter implements InitializingBean
 		xmlCipher.setKEK(privateKey);
 
 		byte[] result = xmlCipher.decryptToByteArray(encryptedDataElement);
-		
+
 		System.out.println(new String(result));
 		IOUtils.write(result,new FileOutputStream("/home/edwin/Downloads/A1453383414677.12095612@ebms.cv.prod.osb.overheid.nl_cn.decrypted.xml"));
 	}
