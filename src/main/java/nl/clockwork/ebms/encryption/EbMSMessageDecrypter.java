@@ -126,7 +126,7 @@ public class EbMSMessageDecrypter implements InitializingBean
 			throw new EbMSProcessingException("KeyName " + keyName + " does match expected certificate subject " + certificate.getSubjectDN().getName() + "!");
 
 		byte[] buffer = xmlCipher.decryptToByteArray(encryptedDataElement);
-		String contentType = attachment.getContentType(); //FIXME get mimeType from EncryptedData
+		String contentType = encryptedDataElement.getAttribute("MimeType");
 		ByteArrayDataSource ds = new ByteArrayDataSource(new ByteArrayInputStream(buffer),contentType);
 
 		return new EbMSAttachment(ds,attachment.getContentId());
