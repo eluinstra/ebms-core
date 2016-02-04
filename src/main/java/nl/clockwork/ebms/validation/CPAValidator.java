@@ -15,10 +15,13 @@
  */
 package nl.clockwork.ebms.validation;
 
+import java.security.NoSuchAlgorithmException;
 import java.util.Date;
+import java.util.List;
 
 import nl.clockwork.ebms.Constants;
 import nl.clockwork.ebms.common.CPAManager;
+import nl.clockwork.ebms.common.util.SecurityUtils;
 import nl.clockwork.ebms.model.EbMSMessage;
 import nl.clockwork.ebms.util.CPAUtils;
 import nl.clockwork.ebms.util.EbMSMessageUtils;
@@ -32,6 +35,7 @@ import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CollaborationProt
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CollaborationRole;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DeliveryChannel;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DocExchange;
+import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.EncryptionAlgorithm;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.MessageOrderSemanticsType;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.PartyInfo;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.PerMessageCharacteristicsType;
@@ -123,7 +127,31 @@ public class CPAValidator
 					logger.warn("Duplicate Elimination defined in Channel " + deliveryChannel.getChannelId() + " always enabled!");
 				if (ActorType.URN_OASIS_NAMES_TC_EBXML_MSG_ACTOR_NEXT_MSH.equals(deliveryChannel.getMessagingCharacteristics().getActor()))
 					logger.warn("Actor NextMSH not supported!");
+				if (((DocExchange)deliveryChannel.getDocExchangeId()).getEbXMLReceiverBinding().getReceiverDigitalEnvelope() != null)
+				{
+					if (((DocExchange)deliveryChannel.getDocExchangeId()).getEbXMLReceiverBinding().getReceiverDigitalEnvelope().getDigitalEnvelopeProtocol() != null && !"XMLENC".equals(((DocExchange)deliveryChannel.getDocExchangeId()).getEbXMLReceiverBinding().getReceiverDigitalEnvelope().getDigitalEnvelopeProtocol().getValue()))
+						logger.warn("Digital Envelope Protocol" + ((DocExchange)deliveryChannel.getDocExchangeId()).getEbXMLReceiverBinding().getReceiverDigitalEnvelope().getDigitalEnvelopeProtocol().getValue() + " not supported!");
+					String encryptionAlgorithm = getEncryptionAlgorithm(((DocExchange)deliveryChannel.getDocExchangeId()).getEbXMLReceiverBinding().getReceiverDigitalEnvelope().getEncryptionAlgorithm());
+					if (encryptionAlgorithm != null)
+						try
+						{
+							if (SecurityUtils.GenerateKey(encryptionAlgorithm) == null)
+								logger.warn("Encryption Algorithm " + encryptionAlgorithm + " not supported!");
+						}
+						catch (NoSuchAlgorithmException e)
+						{
+							logger.warn("Encryption Algorithm " + encryptionAlgorithm + " not supported!",e);
+						}
+				}
 			}
+	}
+
+	private String getEncryptionAlgorithm(List<EncryptionAlgorithm> encryptionAlgorithm)
+	{
+		if (encryptionAlgorithm != null && encryptionAlgorithm.size() > 0)
+			return encryptionAlgorithm.get(0).getW3C() == null ? encryptionAlgorithm.get(0).getValue() : encryptionAlgorithm.get(0).getW3C();
+		else
+			return null;
 	}
 
 	private void validateTransports(CollaborationProtocolAgreement cpa)
