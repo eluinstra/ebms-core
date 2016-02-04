@@ -32,6 +32,8 @@ import java.util.Enumeration;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 
+import org.apache.xml.security.encryption.XMLCipher;
+
 public class SecurityUtils
 {
 	public static KeyStore loadKeyStore(String location, String password) throws GeneralSecurityException, IOException
@@ -77,11 +79,26 @@ public class SecurityUtils
 		return null;
 	}
 
-	public static SecretKey GenerateAESKey() throws NoSuchAlgorithmException
+	public static SecretKey GenerateKey(String encryptionAlgorithm) throws NoSuchAlgorithmException
 	{
-		KeyGenerator keyGenerator = KeyGenerator.getInstance("AES");
-		keyGenerator.init(128);
-		return keyGenerator.generateKey();
+		KeyGenerator keyGenerator;
+		switch (encryptionAlgorithm)
+		{
+			case XMLCipher.AES_128 :
+				keyGenerator = KeyGenerator.getInstance("AES");
+				keyGenerator.init(128);
+				return keyGenerator.generateKey();
+			case XMLCipher.AES_192 :
+				keyGenerator = KeyGenerator.getInstance("AES");
+				keyGenerator.init(192);
+				return keyGenerator.generateKey();
+			case XMLCipher.AES_256 :
+				keyGenerator = KeyGenerator.getInstance("AES");
+				keyGenerator.init(256);
+				return keyGenerator.generateKey();
+			default:
+				return null;
+		}
 	}
 
 }

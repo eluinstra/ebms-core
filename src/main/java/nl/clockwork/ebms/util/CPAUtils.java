@@ -41,6 +41,7 @@ import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DocExchange;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.Packaging;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.PartyId;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.PerMessageCharacteristicsType;
+import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.ReceiverDigitalEnvelope;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.ReliableMessaging;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.SenderNonRepudiation;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.ServiceType;
@@ -204,6 +205,17 @@ public class CPAUtils
 		return null;
 	}
 
+	public static String getEncryptionAlgorithm(DeliveryChannel deliveryChannel)
+	{
+		DocExchange docExchange = getDocExchange(deliveryChannel);
+		if (docExchange.getEbXMLReceiverBinding() != null && docExchange.getEbXMLReceiverBinding().getReceiverDigitalEnvelope() != null && docExchange.getEbXMLReceiverBinding().getReceiverDigitalEnvelope().getEncryptionAlgorithm() != null && !docExchange.getEbXMLReceiverBinding().getReceiverDigitalEnvelope().getEncryptionAlgorithm().isEmpty())
+		{
+			ReceiverDigitalEnvelope receiverDigitalEnvelope = docExchange.getEbXMLReceiverBinding().getReceiverDigitalEnvelope();
+			return receiverDigitalEnvelope.getEncryptionAlgorithm().get(0).getW3C() != null ? receiverDigitalEnvelope.getEncryptionAlgorithm().get(0).getW3C() : getEncryptionAlgorithm(receiverDigitalEnvelope.getEncryptionAlgorithm().get(0).getValue());
+		}
+		return null;
+	}
+
 	public static String getUri(DeliveryChannel deliveryChannel)
 	{
 		Transport transport = (Transport)deliveryChannel.getTransportId();
@@ -257,6 +269,12 @@ public class CPAUtils
 	private static String getSignatureAlgorithm(String value)
 	{
 		//TODO: Expected values include: RSA-MD5, RSA-SHA1, DSA-MD5, DSA-SHA1, SHA1withRSA, MD5withRSA, and so on.
+		return value;
+	}
+
+	private static String getEncryptionAlgorithm(String value)
+	{
+		//TODO: Expected values include:
 		return value;
 	}
 

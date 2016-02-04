@@ -83,7 +83,7 @@ public class EbMSMessageEncrypter
 				DeliveryChannel deliveryChannel = cpaManager.getToDeliveryChannel(message.getMessageHeader().getCPAId(),new CacheablePartyId(message.getMessageHeader().getTo().getPartyId()),message.getMessageHeader().getFrom().getRole(),CPAUtils.toString(message.getMessageHeader().getService()),message.getMessageHeader().getAction());
 				X509Certificate certificate = CPAUtils.getX509Certificate(CPAUtils.getEncryptionCertificate(deliveryChannel));
 				validateCertificate(trustStore,certificate);
-				SecretKey secretKey = SecurityUtils.GenerateAESKey();
+				SecretKey secretKey = SecurityUtils.GenerateKey(CPAUtils.getEncryptionAlgorithm(deliveryChannel));
 				XMLCipher xmlCipher = createXmlCipher(secretKey);
 				Transformer transformer = createTransformer();
 				List<EbMSAttachment> attachments = new ArrayList<EbMSAttachment>();
@@ -108,7 +108,7 @@ public class EbMSMessageEncrypter
 		{
 			X509Certificate certificate = CPAUtils.getX509Certificate(CPAUtils.getEncryptionCertificate(deliveryChannel));
 			validateCertificate(trustStore,certificate);
-			SecretKey secretKey = SecurityUtils.GenerateAESKey();
+			SecretKey secretKey = SecurityUtils.GenerateKey(CPAUtils.getEncryptionAlgorithm(deliveryChannel));
 			XMLCipher xmlCipher = createXmlCipher(secretKey);
 			Transformer transformer = createTransformer();
 			List<EbMSAttachment> attachments = new ArrayList<EbMSAttachment>();
@@ -183,7 +183,7 @@ public class EbMSMessageEncrypter
 	
 	private EbMSAttachment encrypt(Transformer transformer, X509Certificate certificate, XMLCipher xmlCipher, EbMSAttachment attachment) throws NoSuchAlgorithmException, XMLEncryptionException, FileNotFoundException, Exception
 	{
-		SecretKey secretKey = SecurityUtils.GenerateAESKey();
+		SecretKey secretKey = SecurityUtils.GenerateKey("http://www.w3.org/2001/04/xmlenc#aes128-cbc");
 		EncryptedKey encryptedKey = createEncryptedKey(certificate.getPublicKey(),secretKey);
 		setEncryptedData(xmlCipher,encryptedKey,certificate,attachment);
 		EncryptedData encryptedData = xmlCipher.encryptData(null,null,attachment.getInputStream());
@@ -217,7 +217,7 @@ public class EbMSMessageEncrypter
 	{
 		org.apache.xml.security.Init.init();
 
-		SecretKey secretKey = SecurityUtils.GenerateAESKey();
+		SecretKey secretKey = SecurityUtils.GenerateKey("http://www.w3.org/2001/04/xmlenc#aes128-cbc");
 
 		KeyStore keyStore = SecurityUtils.loadKeyStore("/home/edwin/Downloads/keystore.logius.jks","password");
 		KeyPair keyPair = SecurityUtils.getKeyPair(keyStore,"1","password");
