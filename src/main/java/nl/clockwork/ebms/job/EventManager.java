@@ -32,9 +32,9 @@ public class EventManager
 	private EbMSDAO ebMSDAO;
 	private CPAManager cpaManager;
 
-	public void createEvent(String cpaId, String deliveryChannelId, String messageId, Date timeToLive, Date timestamp)
+	public void createEvent(String cpaId, String deliveryChannelId, String messageId, Date timeToLive, Date timestamp, boolean isConfidential)
 	{
-		ebMSDAO.insertEvent(new EbMSEvent(cpaId,deliveryChannelId,messageId,timeToLive,timestamp,0));
+		ebMSDAO.insertEvent(new EbMSEvent(cpaId,deliveryChannelId,messageId,timeToLive,timestamp,isConfidential,0));
 	}
 
 	public void updateEvent(final EbMSEvent event, final String url, final EbMSEventStatus status)
@@ -84,7 +84,7 @@ public class EventManager
 			rm.getRetryInterval().addTo(timestamp);
 		else //if (event.getRetries() < rm.getRetries().intValue())
 			timestamp = event.getTimeToLive();
-		return new EbMSEvent(event.getCpaId(),event.getDeliveryChannelId(),event.getMessageId(),event.getTimeToLive(),timestamp,event.getRetries() + 1);
+		return new EbMSEvent(event.getCpaId(),event.getDeliveryChannelId(),event.getMessageId(),event.getTimeToLive(),timestamp,event.isConfidential(),event.getRetries() + 1);
 	}
 
 	public void setEbMSDAO(EbMSDAO ebMSDAO)

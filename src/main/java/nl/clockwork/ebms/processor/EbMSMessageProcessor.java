@@ -253,7 +253,7 @@ public class EbMSMessageProcessor implements InitializingBean
 						{
 							ebMSDAO.insertDuplicateMessage(timestamp,message);
 							EbMSMessageContext messageContext = ebMSDAO.getMessageContextByRefToMessageId(messageHeader.getMessageData().getMessageId(),mshMessageService,EbMSAction.MESSAGE_ERROR.action(),EbMSAction.ACKNOWLEDGMENT.action());
-							eventManager.createEvent(cpaId,cpaManager.getToDeliveryChannel(cpaId,new CacheablePartyId(message.getMessageHeader().getFrom().getPartyId()),message.getMessageHeader().getFrom().getRole(),CPAUtils.toString(CPAUtils.createEbMSMessageService()),null).getChannelId(),messageContext.getMessageId(),message.getMessageHeader().getMessageData().getTimeToLive(),messageContext.getTimestamp());
+							eventManager.createEvent(cpaId,cpaManager.getToDeliveryChannel(cpaId,new CacheablePartyId(message.getMessageHeader().getFrom().getPartyId()),message.getMessageHeader().getFrom().getRole(),CPAUtils.toString(CPAUtils.createEbMSMessageService()),null).getChannelId(),messageContext.getMessageId(),message.getMessageHeader().getMessageData().getTimeToLive(),messageContext.getTimestamp(),false);
 						}
 					}
 				);
@@ -273,8 +273,8 @@ public class EbMSMessageProcessor implements InitializingBean
 				messageHeaderValidator.validate(message,timestamp);
 				signatureTypeValidator.validate(message);
 				manifestValidator.validate(message);
-				messageDecrypter.decrypt(message);
 				signatureTypeValidator.validateSignature(message);
+				messageDecrypter.decrypt(message);
 				if (message.getAckRequested() == null)
 				{
 					ebMSDAO.executeTransaction(
@@ -303,7 +303,7 @@ public class EbMSMessageProcessor implements InitializingBean
 								ebMSDAO.insertMessage(timestamp,message,EbMSMessageStatus.RECEIVED);
 								ebMSDAO.insertMessage(timestamp,acknowledgment,null);
 								if (message.getSyncReply() == null)
-									eventManager.createEvent(cpaId,cpaManager.getToDeliveryChannel(cpaId,new CacheablePartyId(acknowledgment.getMessageHeader().getTo().getPartyId()),acknowledgment.getMessageHeader().getTo().getRole(),CPAUtils.toString(acknowledgment.getMessageHeader().getService()),acknowledgment.getMessageHeader().getAction()).getChannelId(),acknowledgment.getMessageHeader().getMessageData().getMessageId(),acknowledgment.getMessageHeader().getMessageData().getTimeToLive(),acknowledgment.getMessageHeader().getMessageData().getTimestamp());
+									eventManager.createEvent(cpaId,cpaManager.getToDeliveryChannel(cpaId,new CacheablePartyId(acknowledgment.getMessageHeader().getTo().getPartyId()),acknowledgment.getMessageHeader().getTo().getRole(),CPAUtils.toString(acknowledgment.getMessageHeader().getService()),acknowledgment.getMessageHeader().getAction()).getChannelId(),acknowledgment.getMessageHeader().getMessageData().getMessageId(),acknowledgment.getMessageHeader().getMessageData().getTimeToLive(),acknowledgment.getMessageHeader().getMessageData().getTimestamp(),false);
 								eventListener.onMessageReceived(message.getMessageHeader().getMessageData().getMessageId());
 							}
 						}
@@ -328,7 +328,7 @@ public class EbMSMessageProcessor implements InitializingBean
 							ebMSDAO.insertMessage(timestamp,message,EbMSMessageStatus.FAILED);
 							ebMSDAO.insertMessage(timestamp,messageError,null);
 							if (message.getSyncReply() == null)
-								eventManager.createEvent(cpaId,cpaManager.getToDeliveryChannel(cpaId,new CacheablePartyId(messageError.getMessageHeader().getTo().getPartyId()),messageError.getMessageHeader().getTo().getRole(),CPAUtils.toString(messageError.getMessageHeader().getService()),messageError.getMessageHeader().getAction()).getChannelId(),messageError.getMessageHeader().getMessageData().getMessageId(),messageError.getMessageHeader().getMessageData().getTimeToLive(),messageError.getMessageHeader().getMessageData().getTimestamp());
+								eventManager.createEvent(cpaId,cpaManager.getToDeliveryChannel(cpaId,new CacheablePartyId(messageError.getMessageHeader().getTo().getPartyId()),messageError.getMessageHeader().getTo().getRole(),CPAUtils.toString(messageError.getMessageHeader().getService()),messageError.getMessageHeader().getAction()).getChannelId(),messageError.getMessageHeader().getMessageData().getMessageId(),messageError.getMessageHeader().getMessageData().getTimeToLive(),messageError.getMessageHeader().getMessageData().getTimestamp(),false);
 						}
 					}
 				);

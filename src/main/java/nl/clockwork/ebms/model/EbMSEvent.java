@@ -24,15 +24,17 @@ public class EbMSEvent
 	private String messageId;
 	private Date timeToLive;
 	private Date timestamp;
+	private boolean isConfidential;
 	private int retries;
 
-	public EbMSEvent(String cpaId, String deliveryChannelId, String messageId, Date timeToLive, Date timestamp, int retries)
+	public EbMSEvent(String cpaId, String deliveryChannelId, String messageId, Date timeToLive, Date timestamp, boolean isConfidential, int retries)
 	{
 		this.cpaId = cpaId;
 		this.deliveryChannelId = deliveryChannelId;
 		this.messageId = messageId;
 		this.timeToLive = timeToLive;
 		this.timestamp = timestamp;
+		this.isConfidential = isConfidential;
 		this.retries = retries;
 	}
 
@@ -59,6 +61,11 @@ public class EbMSEvent
 	public Date getTimestamp()
 	{
 		return timestamp;
+	}
+
+	public boolean isConfidential()
+	{
+		return isConfidential;
 	}
 
 	public int getRetries()

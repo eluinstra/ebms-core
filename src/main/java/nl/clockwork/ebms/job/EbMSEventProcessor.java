@@ -31,6 +31,7 @@ import nl.clockwork.ebms.client.EbMSResponseSOAPException;
 import nl.clockwork.ebms.common.CPAManager;
 import nl.clockwork.ebms.dao.DAOTransactionCallback;
 import nl.clockwork.ebms.dao.EbMSDAO;
+import nl.clockwork.ebms.encryption.EbMSMessageEncrypter;
 import nl.clockwork.ebms.event.EventListener;
 import nl.clockwork.ebms.model.EbMSDocument;
 import nl.clockwork.ebms.model.EbMSEvent;
@@ -73,6 +74,7 @@ public class EbMSEventProcessor implements InitializingBean, Job
 				EbMSDocument requestDocument = ebMSDAO.getEbMSDocumentIfUnsent(event.getMessageId());
 				if (requestDocument != null)
 				{
+					messageEncrypter.encrypt(deliveryChannel,requestDocument);
 					if (StringUtils.isEmpty(url))
 						url = CPAUtils.getUri(deliveryChannel);
 					logger.info("Sending message " + event.getMessageId() + " to " + url);
@@ -152,6 +154,7 @@ public class EbMSEventProcessor implements InitializingBean, Job
 	private CPAManager cpaManager;
 	private EventManager eventManager;
 	private EbMSClient ebMSClient;
+	private EbMSMessageEncrypter messageEncrypter;
 	private EbMSMessageProcessor messageProcessor;
 
 	@Override
@@ -231,6 +234,11 @@ public class EbMSEventProcessor implements InitializingBean, Job
   public void setEbMSClient(EbMSClient ebMSClient)
 	{
 		this.ebMSClient = ebMSClient;
+	}
+
+  public void setMessageEncrypter(EbMSMessageEncrypter messageEncrypter)
+	{
+		this.messageEncrypter = messageEncrypter;
 	}
 
   public void setMessageProcessor(EbMSMessageProcessor messageProcessor)

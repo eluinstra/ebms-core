@@ -859,7 +859,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 		try
 		{
 			return jdbcTemplate.query(
-				"select cpa_id, channel_id, message_id, time_to_live, time_stamp, retries" +
+				"select cpa_id, channel_id, message_id, time_to_live, time_stamp, is_confidential, retries" +
 				" from ebms_event" +
 				" where time_stamp <= ?" +
 				" order by time_stamp asc",
@@ -868,7 +868,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 					@Override
 					public EbMSEvent mapRow(ResultSet rs, int rowNum) throws SQLException
 					{
-						return new EbMSEvent(rs.getString("cpa_id"),rs.getString("channel_id"),rs.getString("message_id"),rs.getTimestamp("time_to_live"),rs.getTimestamp("time_stamp"),rs.getInt("retries"));
+						return new EbMSEvent(rs.getString("cpa_id"),rs.getString("channel_id"),rs.getString("message_id"),rs.getTimestamp("time_to_live"),rs.getTimestamp("time_stamp"),rs.getBoolean("is_confidential"),rs.getInt("retries"));
 					}
 				},
 				timestamp
@@ -892,13 +892,15 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 					"message_id," +
 					"time_to_live," +
 					"time_stamp," +
+					"is_confidential," +
 					"retries" +
-				") values (?,?,?,?,?,?)",
+				") values (?,?,?,?,?,?,?)",
 				event.getCpaId(),
 				event.getDeliveryChannelId(),
 				event.getMessageId(),
 				event.getTimeToLive(),
 				event.getTimestamp(),
+				event.isConfidential(),
 				event.getRetries()
 			);
 		}

@@ -39,6 +39,7 @@ import nl.clockwork.ebms.common.CPAManager;
 import nl.clockwork.ebms.common.util.SecurityUtils;
 import nl.clockwork.ebms.model.CacheablePartyId;
 import nl.clockwork.ebms.model.EbMSAttachment;
+import nl.clockwork.ebms.model.EbMSDocument;
 import nl.clockwork.ebms.model.EbMSMessage;
 import nl.clockwork.ebms.processor.EbMSProcessingException;
 import nl.clockwork.ebms.util.CPAUtils;
@@ -92,6 +93,31 @@ public class EbMSMessageEncrypter
 			}
 		}
 		catch (CertificateException | NoSuchAlgorithmException | KeyStoreException | ValidationException | XMLEncryptionException | FileNotFoundException e)
+		{
+			throw new EbMSProcessingException(e);
+		}
+		catch (Exception e)
+		{
+			throw new EbMSProcessingException(e);
+		}
+	}
+
+	public void encrypt(DeliveryChannel deliveryChannel, EbMSDocument message) throws EbMSProcessingException
+	{
+		try
+		{
+			X509Certificate certificate = CPAUtils.getX509Certificate(CPAUtils.getEncryptionCertificate(deliveryChannel));
+			validateCertificate(trustStore,certificate);
+			SecretKey secretKey = SecurityUtils.GenerateAESKey();
+			XMLCipher xmlCipher = createXmlCipher(secretKey);
+			Transformer transformer = createTransformer();
+			List<EbMSAttachment> attachments = new ArrayList<EbMSAttachment>();
+			for (EbMSAttachment attachment: message.getAttachments())
+				attachments.add(encrypt(transformer,certificate,xmlCipher,attachment));
+			message.getAttachments().clear();
+			message.getAttachments().addAll(attachments);
+		}
+		catch (TransformerFactoryConfigurationError | CertificateException | KeyStoreException | ValidationException | NoSuchAlgorithmException | XMLEncryptionException | TransformerConfigurationException e)
 		{
 			throw new EbMSProcessingException(e);
 		}
