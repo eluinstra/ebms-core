@@ -63,11 +63,6 @@ public class EbMSMessageDecrypter implements InitializingBean
 	private String keyStorePassword;
 	private KeyStore keyStore;
 
-	public EbMSMessageDecrypter()
-	{
-		org.apache.xml.security.Init.init();
-	}
-
 	@Override
 	public void afterPropertiesSet() throws Exception
 	{

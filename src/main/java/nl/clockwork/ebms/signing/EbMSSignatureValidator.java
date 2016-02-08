@@ -61,11 +61,6 @@ public class EbMSSignatureValidator implements InitializingBean
 	private String trustStorePassword;
 	private KeyStore trustStore;
 
-	public EbMSSignatureValidator() throws GeneralSecurityException, IOException
-	{
-		org.apache.xml.security.Init.init();
-	}
-
 	@Override
 	public void afterPropertiesSet() throws Exception
 	{
