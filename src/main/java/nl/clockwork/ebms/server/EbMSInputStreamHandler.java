@@ -33,7 +33,7 @@ import org.w3c.dom.Document;
 
 public abstract class EbMSInputStreamHandler
 {
-  protected transient Log logger = LogFactory.getLog(getClass());
+  protected transient Log logger = LogFactory.getLog(nl.clockwork.ebms.server.EbMSInputStreamHandler.class);
 	private EbMSMessageProcessor messageProcessor;
 
 	public EbMSInputStreamHandler(EbMSMessageProcessor messageProcessor)
