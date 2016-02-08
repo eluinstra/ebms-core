@@ -1,9 +1,7 @@
-- implement packaging
-- improve Content-ID
-	- store Content-ID (and Content-Type) with message
+- add raw inputstream and outputstream logging
 
-- write mime message
-	- add encryption (s/mime)
+- implement packaging
+- implement message ordering
 
 - replace custom message writer by mime4j???
 - replace xmlsec by bouncycastle???

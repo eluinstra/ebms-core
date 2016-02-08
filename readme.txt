@@ -24,7 +24,7 @@ Implemented:
 	o	Message Status Service
 	o	Message Service Handler Ping Service
 -	HTTP(S) Protocol
--	Separate ErrorMessage and Acknowlegment messages
+-	Separate ErrorMessage and Acknowledgment messages
 
 Not implemented:
 -	Core Functionality
