@@ -224,10 +224,11 @@ public class EbMSMessageFactory
 			int i = 1;
 			for (EbMSDataSource dataSource : content.getDataSources())
 			{
-				manifest.getReference().add(EbMSMessageUtils.createReference(i));
+				String contentId = createContentId(messageHeader.getMessageData().getMessageId(),i++);
+				manifest.getReference().add(EbMSMessageUtils.createReference(contentId));
 				ByteArrayDataSource ds = new ByteArrayDataSource(dataSource.getContent(),dataSource.getContentType());
 				ds.setName(dataSource.getName());
-				attachments.add(new EbMSAttachment(ds,createContentId(messageHeader.getMessageData().getMessageId(),i++)));
+				attachments.add(new EbMSAttachment(ds,contentId));
 			}
 	
 			EbMSMessage result = new EbMSMessage();

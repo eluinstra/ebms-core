@@ -67,6 +67,7 @@
 		<property name="eventManager" ref="eventManager"/>
 		<property name="signatureGenerator" ref="signatureGenerator"/>
 		<property name="signatureValidator" ref="signatureValidator"/>
+		<property name="messageDecrypter" ref="messageDecrypter"/>
 	</bean>
 
 	<bean id="_cpaManager" class="nl.clockwork.ebms.common.CPAManager">
@@ -119,6 +120,12 @@
 		<property name="cpaManager" ref="cpaManager"/>
 	</bean>
 
+	<bean id="messageDecrypter" class="nl.clockwork.ebms.encryption.EbMSMessageDecrypter">
+		<property name="cpaManager" ref="cpaManager"/>
+		<property name="keyStorePath" value="${encryption.keystore.path}" />
+		<property name="keyStorePassword" value="${encryption.keystore.password}" />
+	</bean>
+
 	<bean id="signatureValidator" class="nl.clockwork.ebms.signing.EbMSSignatureValidator">
 		<property name="cpaManager" ref="cpaManager"/>
 		<property name="trustStorePath" value="${truststore.path}"/>
@@ -144,6 +151,7 @@
 		<property name="cpaManager" ref="cpaManager"/>
 		<property name="eventManager" ref="eventManager"/>
 		<property name="ebMSClient" ref="ebMSClient"/>
+		<property name="messageEncrypter" ref="messageEncrypter"/>
 		<property name="messageProcessor" ref="messageProcessor"/>
 	</bean>
 
@@ -154,6 +162,12 @@
 		<property name="keyStorePath" value="${signature.keystore.path}" />
 		<property name="keyStorePassword" value="${signature.keystore.password}" />
 	</bean>  
+
+	<bean id="messageEncrypter" class="nl.clockwork.ebms.encryption.EbMSMessageEncrypter">
+		<property name="cpaManager" ref="cpaManager"/>
+		<property name="trustStorePath" value="${truststore.path}"/>
+		<property name="trustStorePassword" value="${truststore.password}"/>
+	</bean>
 
 	<bean id="ebMSProxy" class="nl.clockwork.ebms.client.EbMSProxyFactory">
 		<property name="host" value="${http.proxy.host}"/>

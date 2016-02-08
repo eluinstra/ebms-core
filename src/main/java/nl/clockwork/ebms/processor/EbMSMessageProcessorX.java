@@ -31,7 +31,6 @@ import nl.clockwork.ebms.Constants.EbMSAction;
 import nl.clockwork.ebms.Constants.EbMSMessageStatus;
 import nl.clockwork.ebms.common.util.DOMUtils;
 import nl.clockwork.ebms.dao.DAOTransactionCallback;
-import nl.clockwork.ebms.encryption.EbMSMessageDecrypter;
 import nl.clockwork.ebms.model.CacheablePartyId;
 import nl.clockwork.ebms.model.EbMSDocument;
 import nl.clockwork.ebms.model.EbMSMessage;
@@ -64,7 +63,6 @@ public class EbMSMessageProcessorX extends EbMSMessageProcessor implements Initi
 		messageHeaderValidator = new MessageHeaderValidator(ebMSDAO,cpaManager);
 		manifestValidator = new ManifestValidator();
 		signatureTypeValidator = new SignatureTypeValidator(cpaManager,signatureValidator);
-		messageDecrypter = new EbMSMessageDecrypter();
 	}
 
 	public EbMSDocument processRequest(EbMSDocument document) throws EbMSProcessorException

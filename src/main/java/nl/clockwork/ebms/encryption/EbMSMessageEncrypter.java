@@ -55,6 +55,7 @@ import nl.clockwork.ebms.common.util.SecurityUtils;
 import nl.clockwork.ebms.model.CacheablePartyId;
 import nl.clockwork.ebms.model.EbMSAttachment;
 import nl.clockwork.ebms.model.EbMSDocument;
+import nl.clockwork.ebms.model.EbMSEvent;
 import nl.clockwork.ebms.model.EbMSMessage;
 import nl.clockwork.ebms.processor.EbMSProcessingException;
 import nl.clockwork.ebms.util.CPAUtils;
@@ -70,12 +71,13 @@ import org.apache.xml.security.keys.KeyInfo;
 import org.apache.xml.security.keys.content.KeyName;
 import org.apache.xml.security.utils.EncryptionConstants;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DeliveryChannel;
+import org.springframework.beans.factory.InitializingBean;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
-public class EbMSMessageEncrypter
+public class EbMSMessageEncrypter implements InitializingBean
 {
 	protected transient Log logger = LogFactory.getLog(getClass());
 	private CPAManager cpaManager;
@@ -86,8 +88,13 @@ public class EbMSMessageEncrypter
 
 	public EbMSMessageEncrypter() throws GeneralSecurityException, IOException, ParserConfigurationException, SAXException
 	{
-		trustStore = SecurityUtils.loadKeyStore(trustStorePath,trustStorePassword);
 		document = createDocument();
+	}
+
+	@Override
+	public void afterPropertiesSet() throws Exception
+	{
+		trustStore = SecurityUtils.loadKeyStore(trustStorePath,trustStorePassword);
 	}
 
 	public void encrypt(EbMSMessage message) throws EbMSProcessingException
@@ -116,18 +123,21 @@ public class EbMSMessageEncrypter
 		}
 	}
 
-	public void encrypt(DeliveryChannel deliveryChannel, EbMSDocument message) throws EbMSProcessingException
+	public void encrypt(EbMSEvent event, DeliveryChannel deliveryChannel, EbMSDocument message) throws EbMSProcessingException
 	{
 		try
 		{
-			X509Certificate certificate = CPAUtils.getX509Certificate(CPAUtils.getEncryptionCertificate(deliveryChannel));
-			validateCertificate(trustStore,certificate);
-			String encryptionAlgorithm = CPAUtils.getEncryptionAlgorithm(deliveryChannel);
-			List<EbMSAttachment> attachments = new ArrayList<EbMSAttachment>();
-			for (EbMSAttachment attachment : message.getAttachments())
-				attachments.add(encrypt(certificate,encryptionAlgorithm,attachment));
-			message.getAttachments().clear();
-			message.getAttachments().addAll(attachments);
+			if (event.isConfidential())
+			{
+				X509Certificate certificate = CPAUtils.getX509Certificate(CPAUtils.getEncryptionCertificate(deliveryChannel));
+				validateCertificate(trustStore,certificate);
+				String encryptionAlgorithm = CPAUtils.getEncryptionAlgorithm(deliveryChannel);
+				List<EbMSAttachment> attachments = new ArrayList<EbMSAttachment>();
+				for (EbMSAttachment attachment : message.getAttachments())
+					attachments.add(encrypt(certificate,encryptionAlgorithm,attachment));
+				message.getAttachments().clear();
+				message.getAttachments().addAll(attachments);
+			}
 		}
 		catch (TransformerFactoryConfigurationError | CertificateException | KeyStoreException | ValidationException | NoSuchAlgorithmException | XMLEncryptionException | TransformerConfigurationException e)
 		{
@@ -224,6 +234,21 @@ public class EbMSMessageEncrypter
 		Transformer transformer = transormerFactory.newTransformer();
 		transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION,"yes");
 		return transformer;
+	}
+
+	public void setCpaManager(CPAManager cpaManager)
+	{
+		this.cpaManager = cpaManager;
+	}
+
+	public void setTrustStorePath(String trustStorePath)
+	{
+		this.trustStorePath = trustStorePath;
+	}
+
+	public void setTrustStorePassword(String trustStorePassword)
+	{
+		this.trustStorePassword = trustStorePassword;
 	}
 
 	public static void main(String[] args) throws Exception

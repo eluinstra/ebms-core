@@ -222,10 +222,10 @@ public class EbMSMessageUtils
 		return response;
 	}
 
-	public static Reference createReference(int cid)
+	public static Reference createReference(String contentId)
 	{
 		Reference reference = new Reference();
-		reference.setHref(Constants.CID + cid);
+		reference.setHref(Constants.CID + contentId);
 		reference.setType("simple");
 		//reference.setRole("XLinkRole");
 		return reference;

@@ -47,12 +47,13 @@ import org.apache.xml.security.signature.XMLSignature;
 import org.apache.xml.security.signature.XMLSignatureException;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DeliveryChannel;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageHeader;
+import org.springframework.beans.factory.InitializingBean;
 import org.w3._2000._09.xmldsig.ReferenceType;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
-public class EbMSSignatureValidator
+public class EbMSSignatureValidator implements InitializingBean
 {
 	protected transient Log logger = LogFactory.getLog(getClass());
 	private CPAManager cpaManager;
@@ -63,9 +64,14 @@ public class EbMSSignatureValidator
 	public EbMSSignatureValidator() throws GeneralSecurityException, IOException
 	{
 		org.apache.xml.security.Init.init();
+	}
+
+	@Override
+	public void afterPropertiesSet() throws Exception
+	{
 		trustStore = SecurityUtils.loadKeyStore(trustStorePath,trustStorePassword);
 	}
-	
+
 	public void validate(EbMSMessage message) throws ValidatorException, ValidationException
 	{
 		try

@@ -99,10 +99,10 @@ public class EbMSContentHandler implements ContentHandler
 	@Override
 	public void body(BodyDescriptor bd, InputStream is) throws MimeException, IOException
 	{
-		String contentType = getHeader("Content-Type");
-		if (getHeader("Content-Transfer-Encoding").equalsIgnoreCase("base64"))
+		String encoding = getHeader("Content-Transfer-Encoding");
+		if (encoding != null && encoding.equalsIgnoreCase("base64"))
 			is = new Base64InputStream(is);
-		ByteArrayDataSource ds = new ByteArrayDataSource(is,contentType);
+		ByteArrayDataSource ds = new ByteArrayDataSource(is,getHeader("Content-Type"));
 		//ds.setName("");
 		String contentId = getHeader("Content-ID");
 		if (contentId != null)

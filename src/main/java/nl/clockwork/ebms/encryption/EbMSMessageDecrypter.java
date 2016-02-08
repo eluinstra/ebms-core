@@ -132,6 +132,21 @@ public class EbMSMessageDecrypter implements InitializingBean
 		return new EbMSAttachment(ds,attachment.getContentId());
 	}
 
+	public void setCpaManager(CPAManager cpaManager)
+	{
+		this.cpaManager = cpaManager;
+	}
+
+	public void setKeyStorePath(String keyStorePath)
+	{
+		this.keyStorePath = keyStorePath;
+	}
+
+	public void setKeyStorePassword(String keyStorePassword)
+	{
+		this.keyStorePassword = keyStorePassword;
+	}
+
 	private static Document loadEncryptionDocument() throws Exception
 	{
 		File encryptionFile = new File("/home/edwin/Downloads/A1453383414677.12095612@ebms.cv.prod.osb.overheid.nl_cn.xml");

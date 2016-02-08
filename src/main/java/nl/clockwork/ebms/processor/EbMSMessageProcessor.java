@@ -109,7 +109,6 @@ public class EbMSMessageProcessor implements InitializingBean
 		messageHeaderValidator.setAckSignatureRequested(PerMessageCharacteristicsType.NEVER);
 		manifestValidator = new ManifestValidator();
 		signatureTypeValidator = new SignatureTypeValidator(cpaManager,signatureValidator);
-		messageDecrypter = new EbMSMessageDecrypter();
 	}
 
 	public EbMSDocument processRequest(EbMSDocument document) throws EbMSProcessorException
@@ -425,4 +424,8 @@ public class EbMSMessageProcessor implements InitializingBean
 		this.signatureValidator = signatureValidator;
 	}
 
+	public void setMessageDecrypter(EbMSMessageDecrypter messageDecrypter)
+	{
+		this.messageDecrypter = messageDecrypter;
+	}
 }
