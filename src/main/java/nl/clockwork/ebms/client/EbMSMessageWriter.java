@@ -29,9 +29,12 @@ import nl.clockwork.ebms.model.EbMSAttachment;
 import nl.clockwork.ebms.model.EbMSDocument;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 public class EbMSMessageWriter
 {
+  protected transient Log logger = LogFactory.getLog(getClass());
 	protected HttpURLConnection connection;
 	
 	public EbMSMessageWriter(HttpURLConnection connection)
@@ -41,6 +44,8 @@ public class EbMSMessageWriter
 
 	public void write(EbMSDocument document) throws IOException, TransformerException
 	{
+		if (logger.isInfoEnabled() && !logger.isDebugEnabled())
+			logger.info(">>>>\n" + DOMUtils.toString(document.getMessage()));
 		if (document.getAttachments().size() > 0)
 			writeMimeMessage(document);
 		else
@@ -64,6 +69,8 @@ public class EbMSMessageWriter
 		connection.setRequestProperty("SOAPAction",Constants.EBMS_SOAP_ACTION);
 
 		OutputStream outputStream = connection.getOutputStream();
+		if (logger.isDebugEnabled())
+			outputStream = new LoggingOutputStream(outputStream);
 
 		try (OutputStreamWriter writer = new OutputStreamWriter(outputStream,"UTF-8"))
 		{

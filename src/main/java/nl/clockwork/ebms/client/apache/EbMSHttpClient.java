@@ -21,12 +21,9 @@ import javax.xml.transform.TransformerException;
 
 import nl.clockwork.ebms.client.EbMSClient;
 import nl.clockwork.ebms.client.EbMSProxy;
-import nl.clockwork.ebms.common.util.DOMUtils;
 import nl.clockwork.ebms.model.EbMSDocument;
 import nl.clockwork.ebms.processor.EbMSProcessorException;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
@@ -41,7 +38,6 @@ import org.apache.http.impl.client.HttpClients;
 
 public class EbMSHttpClient implements EbMSClient
 {
-  protected transient Log logger = LogFactory.getLog(getClass());
 	private SSLConnectionSocketFactory sslConnectionSocketFactory;
 	private boolean chunkedStreamingMode;
 	private EbMSProxy proxy;
@@ -51,14 +47,10 @@ public class EbMSHttpClient implements EbMSClient
 		try (CloseableHttpClient httpClient = getHttpClient(uri))
 		{
 			HttpPost httpPost = getHttpPost(uri);
-			if (logger.isDebugEnabled())
-				logger.debug(">>>>\n" + DOMUtils.toString(document.getMessage()));
 			EbMSMessageWriter ebMSMessageWriter = new EbMSMessageWriter(httpPost,chunkedStreaming(uri));
 			ebMSMessageWriter.write(document);
 			{
 				EbMSDocument in = httpClient.execute(httpPost,new EbMSResponseHandler());
-	      if (logger.isDebugEnabled())
-					logger.debug("<<<<\n" + (in == null || in.getMessage() == null ? "" : DOMUtils.toString(in.getMessage())));
 				return in;
 			}
 		}

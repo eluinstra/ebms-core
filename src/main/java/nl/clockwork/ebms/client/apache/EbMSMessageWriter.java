@@ -25,6 +25,8 @@ import nl.clockwork.ebms.common.util.DOMUtils;
 import nl.clockwork.ebms.model.EbMSAttachment;
 import nl.clockwork.ebms.model.EbMSDocument;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
@@ -34,6 +36,7 @@ import org.apache.http.entity.mime.content.StringBody;
 
 public class EbMSMessageWriter
 {
+  protected transient Log logger = LogFactory.getLog(getClass());
 	private HttpPost httpPost;
 	private boolean chunkedStreamingMode = true;
 	
@@ -50,6 +53,8 @@ public class EbMSMessageWriter
 
 	public void write(EbMSDocument document) throws IOException, TransformerException, UnsupportedEncodingException
 	{
+		if (logger.isInfoEnabled())
+			logger.info(">>>>\n" + DOMUtils.toString(document.getMessage()));
 		if (document.getAttachments().size() > 0)
 			writeMimeMessage(document);
 		else

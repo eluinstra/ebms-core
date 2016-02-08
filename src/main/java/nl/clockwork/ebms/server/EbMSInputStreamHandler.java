@@ -48,25 +48,26 @@ public abstract class EbMSInputStreamHandler
 	  	String soapAction = getRequestHeader("SOAPAction");
 	  	if (!Constants.EBMS_SOAP_ACTION.equals(soapAction))
 	  	{
-				if (logger.isDebugEnabled())
-					logger.debug("<<<<\n" + IOUtils.toString(request));
+				if (logger.isInfoEnabled())
+					logger.info("<<<<\n" + IOUtils.toString(request));
 				throw new EbMSProcessorException("Unable to process message! SOAPAction=" + soapAction);
 	  	}
-
+	  	if (logger.isDebugEnabled())
+	  		request = new LoggingInputStream(request);
 			EbMSMessageReader messageReader = new EbMSMessageReader(getRequestHeader("Content-ID"),getRequestHeader("Content-Type"));
 			EbMSDocument in = messageReader.read(request);
-			if (logger.isDebugEnabled())
-				logger.debug("<<<<\n" + DOMUtils.toString(in.getMessage()));
+			if (logger.isInfoEnabled() && !logger.isDebugEnabled())
+				logger.info("<<<<\n" + DOMUtils.toString(in.getMessage()));
 			EbMSDocument out = messageProcessor.processRequest(in);
 			if (out == null)
 			{
-				logger.debug(">>>> statusCode = " + 204 + "\n");
+				logger.info(">>>> statusCode = " + 204);
 				writeResponseStatus(204);
 			}
 			else
 			{
-				if (logger.isDebugEnabled())
-					logger.debug(">>>> statusCode = " + 200 + "\n" + DOMUtils.toString(out.getMessage()));
+				if (logger.isInfoEnabled())
+					logger.info(">>>> statusCode = " + 200 + "\n" + DOMUtils.toString(out.getMessage()));
 				writeResponseStatus(200);
 				writeResponseHeader("Content-Type","text/xml");
 				writeResponseHeader("SOAPAction",Constants.EBMS_SOAP_ACTION);
@@ -79,10 +80,10 @@ public abstract class EbMSInputStreamHandler
 			try
 			{
 				Document soapFault = EbMSMessageUtils.createSOAPFault(e);
-				if (logger.isDebugEnabled())
+				if (logger.isInfoEnabled())
 				{
-					logger.debug(">>>> statusCode = " + 500 + "\n" + DOMUtils.toString(soapFault));
-					logger.debug("",e);
+					logger.info(">>>> statusCode = " + 500 + "\n" + DOMUtils.toString(soapFault));
+					logger.info("",e);
 				}
 				writeResponseStatus(500);
 				writeResponseHeader("Content-Type","text/xml");

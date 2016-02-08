@@ -26,18 +26,14 @@ import javax.net.ssl.HttpsURLConnection;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
-import nl.clockwork.ebms.common.util.DOMUtils;
 import nl.clockwork.ebms.model.EbMSDocument;
 import nl.clockwork.ebms.processor.EbMSProcessingException;
 import nl.clockwork.ebms.processor.EbMSProcessorException;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.xml.sax.SAXException;
 
 public class EbMSHttpClient implements EbMSClient
 {
-  protected transient Log logger = LogFactory.getLog(getClass());
 	private SSLFactoryManager sslFactoryManager;
 	private boolean chunkedStreamingMode;
 	private EbMSProxy proxy;
@@ -51,15 +47,11 @@ public class EbMSHttpClient implements EbMSClient
 			//connection.setConnectTimeout(connectTimeout);
 			if (chunkedStreaming(uri))
 				connection.setChunkedStreamingMode(0);
-			if (logger.isDebugEnabled())
-				logger.debug(">>>>\n" + DOMUtils.toString(document.getMessage()));
 			EbMSMessageWriter writer = new EbMSMessageWriter(connection);
 			writer.write(document);
 			connection.connect();
 			EbMSResponseHandler handler = new EbMSResponseHandler(connection);
 			EbMSDocument in = handler.read();
-			if (logger.isDebugEnabled())
-				logger.debug("<<<< statusCode = " + connection.getResponseCode() + "\n" + (in == null || in.getMessage() == null ? "" : DOMUtils.toString(in.getMessage())));
 			return in;
 		}
 		catch (IOException | TransformerException | SAXException e)

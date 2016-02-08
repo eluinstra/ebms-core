@@ -21,7 +21,9 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
 
+import nl.clockwork.ebms.common.util.DOMUtils;
 import nl.clockwork.ebms.common.util.HTTPUtils;
 import nl.clockwork.ebms.model.EbMSDocument;
 import nl.clockwork.ebms.processor.EbMSProcessingException;
@@ -30,12 +32,15 @@ import nl.clockwork.ebms.server.EbMSMessageReader;
 import nl.clockwork.ebms.util.EbMSMessageUtils;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.util.StringUtils;
 import org.xml.sax.SAXException;
 import org.xmlsoap.schemas.soap.envelope.Fault;
 
 public class EbMSResponseHandler
 {
+  protected transient Log logger = LogFactory.getLog(getClass());
 	private HttpURLConnection connection;
 	
 	public EbMSResponseHandler(HttpURLConnection connection)
@@ -43,21 +48,27 @@ public class EbMSResponseHandler
 		this.connection = connection;
 	}
 
-	public EbMSDocument read() throws IOException, ParserConfigurationException, SAXException, EbMSProcessorException
+	public EbMSDocument read() throws IOException, ParserConfigurationException, SAXException, EbMSProcessorException, TransformerException
 	{
 		try
 		{
 			if (connection.getResponseCode() / 100 == 2)
 			{
 				if (connection.getResponseCode() == 204 || connection.getContentLength() == 0)
+				{
+					logger.info("<<<< statusCode = " + connection.getResponseCode());
 					return null;
+				}
 				else
 				{
 					try (InputStream input = connection.getInputStream())
 					{
 						EbMSMessageReader messageReader = new EbMSMessageReader(getHeaderField("Content-ID"),getHeaderField("Content-Type"));
-						//return messageReader.read(input);
-						return messageReader.readResponse(input,getEncoding());
+						//EbMSDocument result = messageReader.read(input);
+						EbMSDocument result = messageReader.readResponse(input,getEncoding());
+						if (logger.isInfoEnabled())
+							logger.info("<<<< statusCode = " + connection.getResponseCode() + (result == null || result.getMessage() == null ? "" : "\n" + DOMUtils.toString(result.getMessage())));
+						return result;
 					}
 				}
 			}
