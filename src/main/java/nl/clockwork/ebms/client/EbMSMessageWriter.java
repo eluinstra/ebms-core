@@ -44,8 +44,6 @@ public class EbMSMessageWriter
 
 	public void write(EbMSDocument document) throws IOException, TransformerException
 	{
-		if (logger.isInfoEnabled() && !logger.isDebugEnabled())
-			logger.info(">>>>\n" + DOMUtils.toString(document.getMessage()));
 		if (document.getAttachments().size() > 0)
 			writeMimeMessage(document);
 		else
@@ -54,13 +52,18 @@ public class EbMSMessageWriter
 
 	protected void writeMessage(EbMSDocument document) throws IOException, TransformerException
 	{
+		if (logger.isInfoEnabled())
+			logger.info(">>>>\n" + DOMUtils.toString(document.getMessage()));
 		connection.setRequestProperty("Content-Type","text/xml; charset=UTF-8");
 		connection.setRequestProperty("SOAPAction",Constants.EBMS_SOAP_ACTION);
+		//DOMUtils.write(document.getMessage(),logger.isInfoEnabled() ? new LoggingOutputStream(connection.getOutputStream()) : connection.getOutputStream(),"UTF-8");
 		DOMUtils.write(document.getMessage(),connection.getOutputStream(),"UTF-8");
 	}
 	
 	protected void writeMimeMessage(EbMSDocument document) throws IOException, TransformerException
 	{
+		if (logger.isInfoEnabled() && !logger.isDebugEnabled())
+			logger.info(">>>>\n" + DOMUtils.toString(document.getMessage()));
 		String boundary = createBoundary();
 		String contentType = createContentType(boundary,document.getContentId());
 
