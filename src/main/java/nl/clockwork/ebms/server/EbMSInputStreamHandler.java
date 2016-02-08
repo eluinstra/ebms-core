@@ -15,6 +15,7 @@
  */
 package nl.clockwork.ebms.server;
 
+import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -52,8 +53,15 @@ public abstract class EbMSInputStreamHandler
 					logger.info("<<<<\n" + IOUtils.toString(request));
 				throw new EbMSProcessorException("Unable to process message! SOAPAction=" + soapAction);
 	  	}
+//	  	if (logger.isDebugEnabled())
+//	  		request = new LoggingInputStream(request);
 	  	if (logger.isDebugEnabled())
-	  		request = new LoggingInputStream(request);
+	  	{
+	  		request = new BufferedInputStream(request);
+	  		request.mark(Integer.MAX_VALUE);
+				logger.info("<<<<\n" + IOUtils.toString(request));
+	  		request.reset();
+	  	}
 			EbMSMessageReader messageReader = new EbMSMessageReader(getRequestHeader("Content-ID"),getRequestHeader("Content-Type"));
 			EbMSDocument in = messageReader.read(request);
 			if (logger.isInfoEnabled() && !logger.isDebugEnabled())
