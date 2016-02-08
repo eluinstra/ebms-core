@@ -49,24 +49,24 @@ public abstract class EbMSInputStreamHandler
 	  	if (!Constants.EBMS_SOAP_ACTION.equals(soapAction))
 	  	{
 				if (logger.isDebugEnabled())
-					logger.debug("IN:\n" + IOUtils.toString(request));
+					logger.debug("<<<<\n" + IOUtils.toString(request));
 				throw new EbMSProcessorException("Unable to process message! SOAPAction=" + soapAction);
 	  	}
 
 			EbMSMessageReader messageReader = new EbMSMessageReader(getRequestHeader("Content-ID"),getRequestHeader("Content-Type"));
 			EbMSDocument in = messageReader.read(request);
 			if (logger.isDebugEnabled())
-				logger.debug("IN:\n" + DOMUtils.toString(in.getMessage()));
+				logger.debug("<<<<\n" + DOMUtils.toString(in.getMessage()));
 			EbMSDocument out = messageProcessor.processRequest(in);
 			if (out == null)
 			{
-				logger.debug("OUT:\n");
+				logger.debug(">>>> statusCode = " + 204 + "\n");
 				writeResponseStatus(204);
 			}
 			else
 			{
 				if (logger.isDebugEnabled())
-					logger.debug("OUT:\n" + DOMUtils.toString(out.getMessage()));
+					logger.debug(">>>> statusCode = " + 200 + "\n" + DOMUtils.toString(out.getMessage()));
 				writeResponseStatus(200);
 				writeResponseHeader("Content-Type","text/xml");
 				writeResponseHeader("SOAPAction",Constants.EBMS_SOAP_ACTION);
@@ -81,7 +81,7 @@ public abstract class EbMSInputStreamHandler
 				Document soapFault = EbMSMessageUtils.createSOAPFault(e);
 				if (logger.isDebugEnabled())
 				{
-					logger.debug("OUT:\n" + DOMUtils.toString(soapFault));
+					logger.debug(">>>> statusCode = " + 500 + "\n" + DOMUtils.toString(soapFault));
 					logger.debug("",e);
 				}
 				writeResponseStatus(500);

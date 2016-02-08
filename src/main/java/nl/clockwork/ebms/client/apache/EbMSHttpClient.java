@@ -52,13 +52,13 @@ public class EbMSHttpClient implements EbMSClient
 		{
 			HttpPost httpPost = getHttpPost(uri);
 			if (logger.isDebugEnabled())
-				logger.debug("OUT:\n" + DOMUtils.toString(document.getMessage()));
+				logger.debug(">>>>\n" + DOMUtils.toString(document.getMessage()));
 			EbMSMessageWriter ebMSMessageWriter = new EbMSMessageWriter(httpPost,chunkedStreaming(uri));
 			ebMSMessageWriter.write(document);
 			{
 				EbMSDocument in = httpClient.execute(httpPost,new EbMSResponseHandler());
 	      if (logger.isDebugEnabled())
-					logger.debug("IN:\n" + (in == null || in.getMessage() == null ? "" : DOMUtils.toString(in.getMessage())));
+					logger.debug("<<<<\n" + (in == null || in.getMessage() == null ? "" : DOMUtils.toString(in.getMessage())));
 				return in;
 			}
 		}

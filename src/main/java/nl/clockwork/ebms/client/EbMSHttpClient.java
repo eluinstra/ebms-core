@@ -52,14 +52,14 @@ public class EbMSHttpClient implements EbMSClient
 			if (chunkedStreaming(uri))
 				connection.setChunkedStreamingMode(0);
 			if (logger.isDebugEnabled())
-				logger.debug("OUT:\n" + DOMUtils.toString(document.getMessage()));
+				logger.debug(">>>>\n" + DOMUtils.toString(document.getMessage()));
 			EbMSMessageWriter writer = new EbMSMessageWriter(connection);
 			writer.write(document);
 			connection.connect();
 			EbMSResponseHandler handler = new EbMSResponseHandler(connection);
 			EbMSDocument in = handler.read();
 			if (logger.isDebugEnabled())
-				logger.debug("IN:\n" + (in == null || in.getMessage() == null ? "" : DOMUtils.toString(in.getMessage())));
+				logger.debug("<<<< statusCode = " + connection.getResponseCode() + "\n" + (in == null || in.getMessage() == null ? "" : DOMUtils.toString(in.getMessage())));
 			return in;
 		}
 		catch (IOException | TransformerException | SAXException e)
