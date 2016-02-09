@@ -47,12 +47,15 @@ import org.apache.xml.security.encryption.EncryptedKey;
 import org.apache.xml.security.encryption.XMLCipher;
 import org.apache.xml.security.encryption.XMLEncryptionException;
 import org.apache.xml.security.exceptions.XMLSecurityException;
+import org.apache.xml.security.utils.Constants;
 import org.apache.xml.security.utils.EncryptionConstants;
 import org.fusesource.hawtbuf.ByteArrayInputStream;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DeliveryChannel;
 import org.springframework.beans.factory.InitializingBean;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 public class EbMSMessageDecrypter implements InitializingBean
@@ -112,19 +115,36 @@ public class EbMSMessageDecrypter implements InitializingBean
 			throw new EbMSProcessingException("Attachment " + attachment.getContentId() + " not encrypted!");
 
 		Element encryptedDataElement = (Element)document.getElementsByTagNameNS(EncryptionConstants.EncryptionSpecNS,EncryptionConstants._TAG_ENCRYPTEDDATA).item(0);
-		EncryptedKey encryptedKey = xmlCipher.loadEncryptedKey(encryptedDataElement);
-		if (!encryptedKey.getKeyInfo().containsKeyName())
+//		EncryptedKey encryptedKey = xmlCipher.loadEncryptedKey(encryptedDataElement);
+		String keyName = getKeyName(encryptedDataElement);
+//	if (!encryptedKey.getKeyInfo().containsKeyName())
+		if (keyName == null)
 			throw new EbMSProcessingException("EncryptedData of attachment " + attachment.getContentId() + " does not contain a KeyName!");
-
-		String keyName = encryptedKey.getKeyInfo().itemKeyName(0).getKeyName();
+//	String keyName = encryptedKey.getKeyInfo().itemKeyName(0).getKeyName();
 		if (!certificate.getSubjectDN().getName().equals(keyName))
 			throw new EbMSProcessingException("KeyName " + keyName + " does match expected certificate subject " + certificate.getSubjectDN().getName() + "!");
-
 		byte[] buffer = xmlCipher.decryptToByteArray(encryptedDataElement);
 		String contentType = encryptedDataElement.getAttribute("MimeType");
 		ByteArrayDataSource ds = new ByteArrayDataSource(new ByteArrayInputStream(buffer),contentType);
 
 		return new EbMSAttachment(ds,attachment.getContentId());
+	}
+
+	private String getKeyName(Element encryptedDataElement)
+	{
+		String result = null;
+		NodeList encryptedKeys = encryptedDataElement.getElementsByTagNameNS(EncryptionConstants.EncryptionSpecNS,"EncryptedKey");
+		if (encryptedKeys.getLength() > 0)
+		{
+			NodeList keyInfos = ((Element)encryptedKeys.item(0)).getElementsByTagNameNS(Constants.SignatureSpecNS,"KeyInfo");
+			if (keyInfos.getLength() > 0)
+			{
+				NodeList keyNames = ((Element)keyInfos.item(0)).getElementsByTagNameNS(Constants.SignatureSpecNS,"KeyName");
+				if (keyNames.getLength() > 0)
+					result = ((Element)keyNames.item(0)).getTextContent();
+			}
+		}
+		return result;
 	}
 
 	public void setCpaManager(CPAManager cpaManager)
@@ -144,7 +164,7 @@ public class EbMSMessageDecrypter implements InitializingBean
 
 	private static Document loadEncryptionDocument() throws Exception
 	{
-		File encryptionFile = new File("/home/edwin/Downloads/A1453383414677.12095612@ebms.cv.prod.osb.overheid.nl_cn.xml");
+		File encryptionFile = new File("/home/edwin/Downloads/A.xml");
 		javax.xml.parsers.DocumentBuilderFactory dbf = javax.xml.parsers.DocumentBuilderFactory.newInstance();
 		dbf.setNamespaceAware(true);
 		return dbf.newDocumentBuilder().parse(encryptionFile);
@@ -157,17 +177,28 @@ public class EbMSMessageDecrypter implements InitializingBean
 		Document document = loadEncryptionDocument();
 		Element encryptedDataElement = (Element)document.getElementsByTagNameNS(EncryptionConstants.EncryptionSpecNS,EncryptionConstants._TAG_ENCRYPTEDDATA).item(0);
 
-		KeyStore keyStore = SecurityUtils.loadKeyStore("/home/edwin/Downloads/keystore.logius.jks","password");
-		KeyPair keyPair = SecurityUtils.getKeyPair(keyStore,"1","password");
+		KeyStore keyStore = SecurityUtils.loadKeyStore("/home/edwin/Downloads/keystore.jks","password");
+		KeyPair keyPair = SecurityUtils.getKeyPair(keyStore,"www.clockwork.nl","password");
 		PrivateKey privateKey = keyPair.getPrivate();
 
 		XMLCipher xmlCipher = XMLCipher.getInstance();
 		xmlCipher.init(XMLCipher.DECRYPT_MODE,null);
 		xmlCipher.setKEK(privateKey);
 
+//		EncryptedKey encryptedKey = xmlCipher.loadEncryptedKey(encryptedDataElement);
+//		if (!encryptedKey.getKeyInfo().containsKeyName())
+//			throw new EbMSProcessingException("EncryptedData does not contain a KeyName!");
+		Element encryptedKey = (Element)encryptedDataElement.getElementsByTagNameNS(EncryptionConstants.EncryptionSpecNS,"EncryptedKey").item(0);
+		Element keyInfo = (Element)encryptedKey.getElementsByTagNameNS(Constants.SignatureSpecNS,"KeyInfo").item(0);
+		Node keyName = keyInfo.getElementsByTagNameNS(Constants.SignatureSpecNS,"KeyName").item(0);
+		if (keyName == null)
+			throw new EbMSProcessingException("EncryptedData does not contain a KeyName!");
+		else
+			System.out.println(keyName.getTextContent());
+		
 		byte[] result = xmlCipher.decryptToByteArray(encryptedDataElement);
 
 		System.out.println(new String(result));
-		IOUtils.write(result,new FileOutputStream("/home/edwin/Downloads/A1453383414677.12095612@ebms.cv.prod.osb.overheid.nl_cn.decrypted.xml"));
+		IOUtils.write(result,new FileOutputStream("/home/edwin/Downloads/A.decrypted.xml"));
 	}
 }
