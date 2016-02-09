@@ -1,7 +1,4 @@
-- add raw inputstream and outputstream logging
+- improve cpa signing and encryption validation
 
 - implement packaging
 - implement message ordering
-
-- replace custom message writer by mime4j???
-- replace xmlsec by bouncycastle???
