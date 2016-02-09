@@ -189,7 +189,7 @@ public class EbMSMessageEncrypter implements InitializingBean
 		XMLCipher xmlCipher = createXmlCipher(encryptionAlgorithm,secretKey);
 		EncryptedKey encryptedKey = createEncryptedKey(certificate.getPublicKey(),secretKey);
 		setEncryptedData(xmlCipher,encryptedKey,certificate,attachment);
-		EncryptedData encryptedData = xmlCipher.encryptData(null,null,attachment.getInputStream());
+		EncryptedData encryptedData = xmlCipher.encryptData(document,null,attachment.getInputStream());
 		StringWriter buffer = new StringWriter();
 		createTransformer().transform(new DOMSource(xmlCipher.martial(document,encryptedData)),new StreamResult(buffer));
 		return new EbMSAttachment(new ByteArrayDataSource(buffer.toString().getBytes("UTF-8"),"application/xml"),attachment.getContentId());
