@@ -36,6 +36,7 @@ public class EbMSHttpClient implements EbMSClient
 {
 	private SSLFactoryManager sslFactoryManager;
 	private boolean chunkedStreamingMode;
+	private boolean base64Writer;
 	private EbMSProxy proxy;
 
 	public EbMSDocument sendMessage(String uri, EbMSDocument document) throws EbMSProcessorException
@@ -47,7 +48,7 @@ public class EbMSHttpClient implements EbMSClient
 			//connection.setConnectTimeout(connectTimeout);
 			if (chunkedStreaming(uri))
 				connection.setChunkedStreamingMode(0);
-			EbMSMessageWriter writer = new EbMSMessageWriter(connection);
+			EbMSMessageWriter writer = base64Writer ? new EbMSMessageBase64Writer(connection) : new EbMSMessageWriter(connection);
 			writer.write(document);
 			connection.connect();
 			EbMSResponseHandler handler = new EbMSResponseHandler(connection);
@@ -116,12 +117,17 @@ public class EbMSHttpClient implements EbMSClient
 	{
 		this.sslFactoryManager = sslFactoryManager;
 	}
-	
+
 	public void setChunkedStreamingMode(boolean chunkedStreamingMode)
 	{
 		this.chunkedStreamingMode = chunkedStreamingMode;
 	}
 	
+	public void setBase64Writer(boolean base64Writer)
+	{
+		this.base64Writer = base64Writer;
+	}
+
 	public void setProxy(EbMSProxy proxy)
 	{
 		this.proxy = proxy;

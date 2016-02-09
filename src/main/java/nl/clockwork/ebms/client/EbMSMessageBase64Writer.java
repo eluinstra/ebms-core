@@ -29,6 +29,7 @@ import nl.clockwork.ebms.model.EbMSDocument;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.james.mime4j.codec.Base64OutputStream;
+import org.springframework.util.StringUtils;
 
 public class EbMSMessageBase64Writer extends EbMSMessageWriter
 {
@@ -80,8 +81,11 @@ public class EbMSMessageBase64Writer extends EbMSMessageWriter
 		writer.write("\r\n");
 		writer.write("Content-Type: " + attachment.getContentType());
 		writer.write("\r\n");
-		writer.write("Content-Disposition: attachment; filename=" + attachment.getName() + ";");
-		writer.write("\r\n");
+		if (!StringUtils.isEmpty(attachment.getName()))
+		{
+			writer.write("Content-Disposition: attachment; filename=" + attachment.getName() + ";");
+			writer.write("\r\n");
+		}
 		writer.write("Content-ID: <" + attachment.getContentId() + ">");
 		writer.write("\r\n");
 		writer.write("\r\n");
@@ -97,8 +101,11 @@ public class EbMSMessageBase64Writer extends EbMSMessageWriter
 		writer.write("\r\n");
 		writer.write("Content-Type: " + attachment.getContentType());
 		writer.write("\r\n");
-		writer.write("Content-Disposition: attachment; filename=" + attachment.getName() + ";");
-		writer.write("\r\n");
+		if (!StringUtils.isEmpty(attachment.getName()))
+		{
+			writer.write("Content-Disposition: attachment; filename=" + attachment.getName() + ";");
+			writer.write("\r\n");
+		}
 		writer.write("Content-Transfer-Encoding: base64");
 		writer.write("\r\n");
 		writer.write("Content-ID: <" + attachment.getContentId() + ">");
