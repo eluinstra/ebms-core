@@ -41,6 +41,8 @@ public class EbMSMessageBase64Writer extends EbMSMessageWriter
 	@Override
 	protected void writeMimeMessage(EbMSDocument document) throws IOException, TransformerException
 	{
+		if (logger.isInfoEnabled() && !logger.isDebugEnabled())
+			logger.info(">>>>\n" + DOMUtils.toString(document.getMessage()));
 		String boundary = createBoundary();
 		String contentType = createContentType(boundary,document.getContentId());
 
@@ -49,6 +51,8 @@ public class EbMSMessageBase64Writer extends EbMSMessageWriter
 		connection.setRequestProperty("SOAPAction",Constants.EBMS_SOAP_ACTION);
 
 		OutputStream outputStream = connection.getOutputStream();
+		if (logger.isDebugEnabled())
+			outputStream = new LoggingOutputStream(outputStream);
 
 		try (OutputStreamWriter writer = new OutputStreamWriter(outputStream,"UTF-8"))
 		{

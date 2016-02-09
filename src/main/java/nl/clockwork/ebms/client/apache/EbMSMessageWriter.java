@@ -72,6 +72,8 @@ public class EbMSMessageWriter
 
 	private void writeMimeMessage(EbMSDocument document) throws IOException, TransformerException
 	{
+		if (logger.isInfoEnabled())
+			logger.info(">>>>\n" + DOMUtils.toString(document.getMessage()));
 		httpPost.setHeader("SOAPAction",Constants.EBMS_SOAP_ACTION);
 		MultipartEntityBuilder entity = MultipartEntityBuilder.create();
     entity.addPart("0",new StringBody(DOMUtils.toString(document.getMessage(),"UTF-8"),ContentType.create("text/xml; charset=UTF-8")));
