@@ -15,13 +15,9 @@
  */
 package nl.clockwork.ebms.encryption;
 
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
-import java.security.KeyPair;
 import java.security.KeyStore;
-import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.List;
@@ -40,10 +36,8 @@ import nl.clockwork.ebms.util.CPAUtils;
 import nl.clockwork.ebms.validation.ValidationException;
 import nl.clockwork.ebms.validation.ValidatorException;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.xml.security.encryption.EncryptedKey;
 import org.apache.xml.security.encryption.XMLCipher;
 import org.apache.xml.security.encryption.XMLEncryptionException;
 import org.apache.xml.security.exceptions.XMLSecurityException;
@@ -54,7 +48,6 @@ import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DeliveryChannel;
 import org.springframework.beans.factory.InitializingBean;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
@@ -162,43 +155,4 @@ public class EbMSMessageDecrypter implements InitializingBean
 		this.keyStorePassword = keyStorePassword;
 	}
 
-	private static Document loadEncryptionDocument() throws Exception
-	{
-		File encryptionFile = new File("/home/edwin/Downloads/A1453383414677.12095612@ebms.cv.prod.osb.overheid.nl_cn.xml");
-		javax.xml.parsers.DocumentBuilderFactory dbf = javax.xml.parsers.DocumentBuilderFactory.newInstance();
-		dbf.setNamespaceAware(true);
-		return dbf.newDocumentBuilder().parse(encryptionFile);
-	}
-
-	public static void main(String[] args) throws Exception
-	{
-		org.apache.xml.security.Init.init();
-
-		Document document = loadEncryptionDocument();
-		Element encryptedDataElement = (Element)document.getElementsByTagNameNS(EncryptionConstants.EncryptionSpecNS,EncryptionConstants._TAG_ENCRYPTEDDATA).item(0);
-
-		KeyStore keyStore = SecurityUtils.loadKeyStore("/home/edwin/Downloads/keystore.logius.jks","password");
-		KeyPair keyPair = SecurityUtils.getKeyPair(keyStore,"1","password");
-		PrivateKey privateKey = keyPair.getPrivate();
-
-		XMLCipher xmlCipher = XMLCipher.getInstance();
-		xmlCipher.init(XMLCipher.DECRYPT_MODE,null);
-		xmlCipher.setKEK(privateKey);
-
-//		EncryptedKey encryptedKey = xmlCipher.loadEncryptedKey(encryptedDataElement);
-//		if (!encryptedKey.getKeyInfo().containsKeyName())
-//			throw new EbMSProcessingException("EncryptedData does not contain a KeyName!");
-		Element encryptedKey = (Element)encryptedDataElement.getElementsByTagNameNS(EncryptionConstants.EncryptionSpecNS,"EncryptedKey").item(0);
-		Element keyInfo = (Element)encryptedKey.getElementsByTagNameNS(Constants.SignatureSpecNS,"KeyInfo").item(0);
-		Node keyName = keyInfo.getElementsByTagNameNS(Constants.SignatureSpecNS,"KeyName").item(0);
-		if (keyName == null)
-			throw new EbMSProcessingException("EncryptedData does not contain a KeyName!");
-		else
-			System.out.println(keyName.getTextContent());
-		
-		byte[] result = xmlCipher.decryptToByteArray(encryptedDataElement);
-
-		System.out.println(new String(result));
-		IOUtils.write(result,new FileOutputStream("/home/edwin/Downloads/A1453383414677.12095612@ebms.cv.prod.osb.overheid.nl_cn.decrypted1.xml"));
-	}
 }

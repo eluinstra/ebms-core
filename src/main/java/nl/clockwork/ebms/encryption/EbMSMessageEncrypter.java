@@ -15,18 +15,15 @@
  */
 package nl.clockwork.ebms.encryption;
 
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.security.GeneralSecurityException;
 import java.security.Key;
-import java.security.KeyPair;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
-import java.security.PublicKey;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateExpiredException;
@@ -73,7 +70,6 @@ import org.apache.xml.security.utils.EncryptionConstants;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DeliveryChannel;
 import org.springframework.beans.factory.InitializingBean;
 import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
@@ -251,48 +247,4 @@ public class EbMSMessageEncrypter implements InitializingBean
 		this.trustStorePassword = trustStorePassword;
 	}
 
-	public static void main(String[] args) throws Exception
-	{
-		org.apache.xml.security.Init.init();
-
-		SecretKey secretKey = SecurityUtils.GenerateKey("http://www.w3.org/2001/04/xmlenc#aes128-cbc");
-
-		KeyStore keyStore = SecurityUtils.loadKeyStore("/home/edwin/Downloads/keystore.logius.jks","password");
-		KeyPair keyPair = SecurityUtils.getKeyPair(keyStore,"1","password");
-		PublicKey publicKey = keyPair.getPublic();
-
-		DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-		dbFactory.setNamespaceAware(true);
-		DocumentBuilder builder = dbFactory.newDocumentBuilder();
-		Document document = builder.parse(new InputSource(new StringReader("<root></root>")));
-
-		XMLCipher keyCipher = XMLCipher.getInstance(XMLCipher.RSA_v1dot5);
-		keyCipher.init(XMLCipher.WRAP_MODE,publicKey);
-		EncryptedKey encryptedKey = keyCipher.encryptKey(document,secretKey);
-
-		XMLCipher xmlCipher = XMLCipher.getInstance(XMLCipher.AES_256);
-		xmlCipher.init(XMLCipher.ENCRYPT_MODE,secretKey);
-
-		EncryptedData encryptedData = xmlCipher.getEncryptedData();
-		KeyInfo encryptedKeyInfo = new KeyInfo(document);
-		encryptedKeyInfo.add(new KeyName(document,"CN=52487C45.cm-4-1b.dynamic.ziggo.nl, serialNumber=00000001820029336000, O=Ordina, C=NL"));
-		encryptedKey.setKeyInfo(encryptedKeyInfo);
-		KeyInfo keyInfo = new KeyInfo(document);
-		keyInfo.add(encryptedKey);
-		encryptedData.setKeyInfo(keyInfo);
-		encryptedData.setId("1234567890");
-		encryptedData.setMimeType("application/xml");
-		encryptedData.setType("http://www.w3.org/2001/04/xmlenc#Element");
-
-		encryptedData = xmlCipher.encryptData(null,null,new FileInputStream("/home/edwin/Downloads/A1453383414677.12095612@ebms.cv.prod.osb.overheid.nl_cn.decrypted.xml"));
-		Element element = xmlCipher.martial(document,encryptedData);
-		// System.out.println(DOMUtils.toString((Document)element));
-
-		TransformerFactory transFactory = TransformerFactory.newInstance();
-		Transformer transformer = transFactory.newTransformer();
-		transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION,"yes");
-		StringWriter buffer = new StringWriter();
-		transformer.transform(new DOMSource(element),new StreamResult(buffer));
-		System.out.println(buffer.toString());
-	}
 }
