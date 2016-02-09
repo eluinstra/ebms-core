@@ -164,7 +164,7 @@ public class EbMSMessageDecrypter implements InitializingBean
 
 	private static Document loadEncryptionDocument() throws Exception
 	{
-		File encryptionFile = new File("/home/edwin/Downloads/A.xml");
+		File encryptionFile = new File("/home/edwin/Downloads/A1453383414677.12095612@ebms.cv.prod.osb.overheid.nl_cn.xml");
 		javax.xml.parsers.DocumentBuilderFactory dbf = javax.xml.parsers.DocumentBuilderFactory.newInstance();
 		dbf.setNamespaceAware(true);
 		return dbf.newDocumentBuilder().parse(encryptionFile);
@@ -177,8 +177,8 @@ public class EbMSMessageDecrypter implements InitializingBean
 		Document document = loadEncryptionDocument();
 		Element encryptedDataElement = (Element)document.getElementsByTagNameNS(EncryptionConstants.EncryptionSpecNS,EncryptionConstants._TAG_ENCRYPTEDDATA).item(0);
 
-		KeyStore keyStore = SecurityUtils.loadKeyStore("/home/edwin/Downloads/keystore.jks","password");
-		KeyPair keyPair = SecurityUtils.getKeyPair(keyStore,"www.clockwork.nl","password");
+		KeyStore keyStore = SecurityUtils.loadKeyStore("/home/edwin/Downloads/keystore.logius.jks","password");
+		KeyPair keyPair = SecurityUtils.getKeyPair(keyStore,"1","password");
 		PrivateKey privateKey = keyPair.getPrivate();
 
 		XMLCipher xmlCipher = XMLCipher.getInstance();
@@ -199,6 +199,6 @@ public class EbMSMessageDecrypter implements InitializingBean
 		byte[] result = xmlCipher.decryptToByteArray(encryptedDataElement);
 
 		System.out.println(new String(result));
-		IOUtils.write(result,new FileOutputStream("/home/edwin/Downloads/A.decrypted.xml"));
+		IOUtils.write(result,new FileOutputStream("/home/edwin/Downloads/A1453383414677.12095612@ebms.cv.prod.osb.overheid.nl_cn.decrypted1.xml"));
 	}
 }
