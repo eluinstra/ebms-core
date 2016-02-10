@@ -17,6 +17,7 @@ package nl.clockwork.ebms.server;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Enumeration;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -45,15 +46,18 @@ public class EbMSHttpHandler
 					if ("Content-Type".equalsIgnoreCase(headerName))
 						result = request.getContentType();
 					if (result == null)
-						while (request.getHeaderNames().hasMoreElements())
+					{
+						Enumeration<?> headerNames = request.getHeaderNames();
+						while (headerNames.hasMoreElements())
 						{
-							String key = (String)request.getHeaderNames().nextElement();
+							String key = (String)headerNames.nextElement();
 							if (key.equalsIgnoreCase(headerName))
 							{
 								result = request.getHeader(key);
 								break;
 							}
 						}
+					}
 					return result;
 				}
 
