@@ -15,6 +15,7 @@
  */
 package nl.clockwork.ebms.encryption;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
@@ -43,7 +44,6 @@ import org.apache.xml.security.encryption.XMLEncryptionException;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.utils.Constants;
 import org.apache.xml.security.utils.EncryptionConstants;
-import org.fusesource.hawtbuf.ByteArrayInputStream;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DeliveryChannel;
 import org.springframework.beans.factory.InitializingBean;
 import org.w3c.dom.Document;
