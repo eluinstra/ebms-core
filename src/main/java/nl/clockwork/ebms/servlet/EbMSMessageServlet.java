@@ -17,6 +17,7 @@ package nl.clockwork.ebms.servlet;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Enumeration;
 
 import javax.servlet.GenericServlet;
 import javax.servlet.ServletConfig;
@@ -67,15 +68,18 @@ public class EbMSMessageServlet extends GenericServlet
 						if ("Content-Type".equalsIgnoreCase(headerName))
 							result = request.getContentType();
 						if (result == null)
-							while (((HttpServletRequest)request).getHeaderNames().hasMoreElements())
+						{
+							Enumeration<?> headerNames = ((HttpServletRequest)request).getHeaderNames();
+							while (headerNames.hasMoreElements())
 							{
-								String key = (String)((HttpServletRequest)request).getHeaderNames().nextElement();
+								String key = (String)headerNames.nextElement();
 								if (key.equalsIgnoreCase(headerName))
 								{
 									result = ((HttpServletRequest)request).getHeader(key);
 									break;
 								}
 							}
+						}
 						return result;
 					}
 
