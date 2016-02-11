@@ -51,24 +51,16 @@ public abstract class EbMSInputStreamHandler
 	  	if (!Constants.EBMS_SOAP_ACTION.equals(soapAction))
 	  	{
 				if (logger.isInfoEnabled())
-					logger.info("<<<<\n" + IOUtils.toString(request));
+					logger.info("<<<<\n" + getRequestHeaders() + "\n" + IOUtils.toString(request));
 				throw new EbMSProcessorException("Unable to process message! SOAPAction=" + soapAction);
 	  	}
 //	  	if (logger.isDebugEnabled())
 //	  		request = new LoggingInputStream(request);
 	  	if (logger.isDebugEnabled())
 	  	{
-	  		List<String> requestHeaderNames = getRequestHeaderNames();
-	  		StringBuffer requestHeaders = new StringBuffer();
-	  		for (String headerName : requestHeaderNames)
-	  		{
-	  			List<String> headers = getRequestHeaders(headerName);
-	  			for (String header : headers)
-	  				requestHeaders = requestHeaders.append(headerName).append(": ").append(header).append("\n");
-	  		}
 	  		request = new BufferedInputStream(request);
 	  		request.mark(Integer.MAX_VALUE);
-				logger.info("<<<<\n" + requestHeaders.toString() + "\n" + IOUtils.toString(request));
+				logger.info("<<<<\n" + getRequestHeaders() + "\n" + IOUtils.toString(request));
 	  		request.reset();
 	  	}
 			EbMSMessageReader messageReader = new EbMSMessageReader(getRequestHeader("Content-ID"),getRequestHeader("Content-Type"));
@@ -112,6 +104,19 @@ public abstract class EbMSInputStreamHandler
 				throw new EbMSProcessorException(e1);
 			}
 		}
+	}
+
+	private String getRequestHeaders()
+	{
+		List<String> requestHeaderNames = getRequestHeaderNames();
+		StringBuffer requestHeaders = new StringBuffer();
+		for (String headerName : requestHeaderNames)
+		{
+			List<String> headers = getRequestHeaders(headerName);
+			for (String header : headers)
+				requestHeaders = requestHeaders.append(headerName).append(": ").append(header).append("\n");
+		}
+		return requestHeaders.toString();
 	}
 	
 	public abstract List<String> getRequestHeaderNames();

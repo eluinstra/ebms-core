@@ -72,7 +72,7 @@ class LoggingOutputStream extends FilterOutputStream
 	@Override
 	public void close() throws IOException
 	{
-		logger.debug(">>>>\n" + HTTPUtils.toString(this.properties) + sb.toString());
+		logger.debug(">>>>\n" + HTTPUtils.toString(this.properties) + "\n" + sb.toString());
 		super.close();
 	}
 

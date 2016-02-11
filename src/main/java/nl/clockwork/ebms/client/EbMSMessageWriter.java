@@ -59,7 +59,7 @@ public class EbMSMessageWriter
 		connection.setRequestProperty("Content-Type","text/xml; charset=UTF-8");
 		connection.setRequestProperty("SOAPAction",Constants.EBMS_SOAP_ACTION);
 		if (logger.isInfoEnabled())
-			logger.info(">>>>\n" + (logger.isDebugEnabled() ? HTTPUtils.toString(connection.getRequestProperties()) : "") + DOMUtils.toString(document.getMessage()));
+			logger.info(">>>>\n" + (logger.isDebugEnabled() ? HTTPUtils.toString(connection.getRequestProperties()) + "\n" : "") + DOMUtils.toString(document.getMessage()));
 		//DOMUtils.write(document.getMessage(),logger.isInfoEnabled() ? new LoggingOutputStream(connection.getOutputStream()) : connection.getOutputStream(),"UTF-8");
 		DOMUtils.write(document.getMessage(),connection.getOutputStream(),"UTF-8");
 	}
