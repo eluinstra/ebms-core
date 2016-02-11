@@ -18,6 +18,10 @@ package nl.clockwork.mule.ebms.processor;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 
 import nl.clockwork.ebms.processor.EbMSMessageProcessor;
 import nl.clockwork.ebms.processor.EbMSProcessorException;
@@ -53,19 +57,24 @@ public class EbMSHttpHandler implements Callable
 	  		new EbMSInputStreamHandler(ebMSMessageProcessor)
 				{
 					@Override
+					public List<String> getRequestHeaderNames()
+					{
+						Map<String,String> headers = message.getProperty("http.headers",PropertyScope.INBOUND);
+						return new ArrayList<String>(headers.keySet());
+					}
+
+					@Override
+					public List<String> getRequestHeaders(String headerName)
+					{
+						Map<String,String> headers = message.getProperty("http.headers",PropertyScope.INBOUND);
+						return Arrays.asList(headers.get(headerName).toString());
+					}
+
+					@Override
 					public String getRequestHeader(String headerName)
 					{
-						String result = message.getProperty(headerName,PropertyScope.INBOUND);
-						if (result == null)
-							for (String key : message.getPropertyNames(PropertyScope.INBOUND))
-							{
-								if (key.equalsIgnoreCase(headerName))
-								{
-									result = message.getProperty(key,PropertyScope.INBOUND);
-									break;
-								}
-							}
-						return result;
+						Map<String,String> headers = message.getProperty("http.headers",PropertyScope.INBOUND);
+						return headers.get(headerName);
 					}
 					
 					@Override
