@@ -19,6 +19,7 @@ import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.List;
 
 import nl.clockwork.ebms.Constants;
 import nl.clockwork.ebms.common.util.DOMUtils;
@@ -57,9 +58,17 @@ public abstract class EbMSInputStreamHandler
 //	  		request = new LoggingInputStream(request);
 	  	if (logger.isDebugEnabled())
 	  	{
+	  		List<String> requestHeaderNames = getRequestHeaderNames();
+	  		StringBuffer requestHeaders = new StringBuffer();
+	  		for (String headerName : requestHeaderNames)
+	  		{
+	  			List<String> headers = getRequestHeaders(headerName);
+	  			for (String header : headers)
+	  				requestHeaders = requestHeaders.append(headerName).append(": ").append(header).append("\n");
+	  		}
 	  		request = new BufferedInputStream(request);
 	  		request.mark(Integer.MAX_VALUE);
-				logger.info("<<<<\n" + IOUtils.toString(request));
+				logger.info("<<<<\n" + requestHeaderNames.toString() + IOUtils.toString(request));
 	  		request.reset();
 	  	}
 			EbMSMessageReader messageReader = new EbMSMessageReader(getRequestHeader("Content-ID"),getRequestHeader("Content-Type"));
@@ -105,6 +114,10 @@ public abstract class EbMSInputStreamHandler
 		}
 	}
 	
+	public abstract List<String> getRequestHeaderNames();
+	
+	public abstract List<String> getRequestHeaders(String headerName);
+
 	public abstract String getRequestHeader(String headerName);
 	
 	public abstract void writeResponseStatus(int statusCode);

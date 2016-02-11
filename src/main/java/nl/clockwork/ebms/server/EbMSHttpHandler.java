@@ -17,7 +17,9 @@ package nl.clockwork.ebms.server;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -39,6 +41,26 @@ public class EbMSHttpHandler
 		{
 			EbMSInputStreamHandler inputStreamHandler = new EbMSInputStreamHandler(messageProcessor)
 			{
+				@Override
+				public List<String> getRequestHeaderNames()
+				{
+					List<String> result = new ArrayList<String>();
+					Enumeration<?> headerNames = request.getHeaderNames();
+					while (headerNames.hasMoreElements())
+						result.add((String)headerNames.nextElement());
+					return result;
+				}
+
+				@Override
+				public List<String> getRequestHeaders(String headerName)
+				{
+					List<String> result = new ArrayList<String>();
+					Enumeration<?> headers = ((HttpServletRequest)request).getHeaders(headerName);
+					while(headers.hasMoreElements())
+						result.add((String)headers.nextElement());
+					return result;
+				}
+
 				@Override
 				public String getRequestHeader(String headerName)
 				{

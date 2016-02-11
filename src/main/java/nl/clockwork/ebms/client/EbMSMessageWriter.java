@@ -19,12 +19,15 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
+import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import javax.xml.transform.TransformerException;
 
 import nl.clockwork.ebms.Constants;
 import nl.clockwork.ebms.common.util.DOMUtils;
+import nl.clockwork.ebms.common.util.HTTPUtils;
 import nl.clockwork.ebms.model.EbMSAttachment;
 import nl.clockwork.ebms.model.EbMSDocument;
 
@@ -53,10 +56,10 @@ public class EbMSMessageWriter
 
 	protected void writeMessage(EbMSDocument document) throws IOException, TransformerException
 	{
-		if (logger.isInfoEnabled())
-			logger.info(">>>>\n" + DOMUtils.toString(document.getMessage()));
 		connection.setRequestProperty("Content-Type","text/xml; charset=UTF-8");
 		connection.setRequestProperty("SOAPAction",Constants.EBMS_SOAP_ACTION);
+		if (logger.isInfoEnabled())
+			logger.info(">>>>\n" + (logger.isDebugEnabled() ? HTTPUtils.toString(connection.getRequestProperties()) : "") + DOMUtils.toString(document.getMessage()));
 		//DOMUtils.write(document.getMessage(),logger.isInfoEnabled() ? new LoggingOutputStream(connection.getOutputStream()) : connection.getOutputStream(),"UTF-8");
 		DOMUtils.write(document.getMessage(),connection.getOutputStream(),"UTF-8");
 	}
@@ -72,9 +75,10 @@ public class EbMSMessageWriter
 		connection.setRequestProperty("Content-Type",contentType);
 		connection.setRequestProperty("SOAPAction",Constants.EBMS_SOAP_ACTION);
 
+		Map<String,List<String>> requestProperties = connection.getRequestProperties();
 		OutputStream outputStream = connection.getOutputStream();
 		if (logger.isDebugEnabled())
-			outputStream = new LoggingOutputStream(outputStream);
+			outputStream = new LoggingOutputStream(requestProperties,outputStream);
 
 		try (OutputStreamWriter writer = new OutputStreamWriter(outputStream,"UTF-8"))
 		{

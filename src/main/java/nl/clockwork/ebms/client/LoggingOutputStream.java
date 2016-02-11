@@ -18,6 +18,10 @@ package nl.clockwork.ebms.client;
 import java.io.FilterOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.List;
+import java.util.Map;
+
+import nl.clockwork.ebms.common.util.HTTPUtils;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -25,15 +29,17 @@ import org.apache.commons.logging.LogFactory;
 class LoggingOutputStream extends FilterOutputStream
 {
   protected transient Log logger = LogFactory.getLog(getClass());
+	private Map<String,List<String>> properties;
 	private String charset;
 	private StringBuffer sb = new StringBuffer();
 
-	public LoggingOutputStream(OutputStream out)
+	public LoggingOutputStream(Map<String,List<String>> properties, OutputStream out)
 	{
-		this(out,"UTF-8");
+		this(properties,out,"UTF-8");
+		this.properties = properties;
 	}
 
-	public LoggingOutputStream(OutputStream out, String charset)
+	public LoggingOutputStream(Map<String,List<String>> properties, OutputStream out, String charset)
 	{
 		super(out);
 		this.charset = charset;
@@ -66,7 +72,8 @@ class LoggingOutputStream extends FilterOutputStream
 	@Override
 	public void close() throws IOException
 	{
-		logger.debug(">>>>\n" + sb.toString());
+		logger.debug(">>>>\n" + HTTPUtils.toString(this.properties) + sb.toString());
 		super.close();
 	}
+
 }

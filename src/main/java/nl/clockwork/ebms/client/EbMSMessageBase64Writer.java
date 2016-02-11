@@ -19,6 +19,8 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
+import java.util.List;
+import java.util.Map;
 
 import javax.xml.transform.TransformerException;
 
@@ -50,9 +52,10 @@ public class EbMSMessageBase64Writer extends EbMSMessageWriter
 		connection.setRequestProperty("Content-Type",contentType);
 		connection.setRequestProperty("SOAPAction",Constants.EBMS_SOAP_ACTION);
 
+		Map<String,List<String>> requestProperties = connection.getRequestProperties();
 		OutputStream outputStream = connection.getOutputStream();
 		if (logger.isDebugEnabled())
-			outputStream = new LoggingOutputStream(outputStream);
+			outputStream = new LoggingOutputStream(requestProperties,outputStream);
 
 		try (OutputStreamWriter writer = new OutputStreamWriter(outputStream,"UTF-8"))
 		{

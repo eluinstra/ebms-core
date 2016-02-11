@@ -15,6 +15,9 @@
  */
 package nl.clockwork.ebms.common.util;
 
+import java.util.List;
+import java.util.Map;
+
 
 public class HTTPUtils
 {
@@ -32,5 +35,13 @@ public class HTTPUtils
 		}
 		return charset;
 	}
-	
+
+	public static String toString(Map<String,List<String>> properties)
+	{
+		StringBuffer result = new StringBuffer();
+		for (String key : properties.keySet())
+			for (String value : properties.get(key))
+				result = result.append(key).append(": ").append(value).append("\n");
+		return result.toString();
+	}
 }
