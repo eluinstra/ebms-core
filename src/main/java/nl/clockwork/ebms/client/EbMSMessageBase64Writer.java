@@ -90,7 +90,7 @@ public class EbMSMessageBase64Writer extends EbMSMessageWriter
 		writer.write("\r\n");
 		if (!StringUtils.isEmpty(attachment.getName()))
 		{
-			writer.write("Content-Disposition: attachment; filename=" + attachment.getName() + ";");
+			writer.write("Content-Disposition: attachment; filename=\"" + attachment.getName() + "\"");
 			writer.write("\r\n");
 		}
 		writer.write("Content-ID: <" + attachment.getContentId() + ">");
@@ -110,7 +110,7 @@ public class EbMSMessageBase64Writer extends EbMSMessageWriter
 		writer.write("\r\n");
 		if (!StringUtils.isEmpty(attachment.getName()))
 		{
-			writer.write("Content-Disposition: attachment; filename=" + attachment.getName() + ";");
+			writer.write("Content-Disposition: attachment; filename=\"" + attachment.getName() + "\"");
 			writer.write("\r\n");
 		}
 		writer.write("Content-Transfer-Encoding: base64");

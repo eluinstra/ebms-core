@@ -33,6 +33,7 @@ import org.apache.james.mime4j.codec.Base64InputStream;
 import org.apache.james.mime4j.parser.ContentHandler;
 import org.apache.james.mime4j.stream.BodyDescriptor;
 import org.apache.james.mime4j.stream.Field;
+import org.springframework.util.StringUtils;
 
 public class EbMSContentHandler implements ContentHandler
 {
@@ -103,7 +104,13 @@ public class EbMSContentHandler implements ContentHandler
 		if (encoding != null && encoding.equalsIgnoreCase("base64"))
 			is = new Base64InputStream(is);
 		ByteArrayDataSource ds = new ByteArrayDataSource(is,getHeader("Content-Type"));
-		//ds.setName("");
+		String filename = getHeader("Content-Disposition");
+		if (filename != null && filename.startsWith("attachment"))
+		{
+			filename = filename.replaceAll("^attachment;\\s+filename=\"([^\"]*)\"$","$1");
+			if (!StringUtils.isEmpty(filename))
+				ds.setName(filename);
+		}
 		String contentId = getHeader("Content-ID");
 		if (contentId != null)
 			contentId = contentId.replaceAll("^<(.*)>$|^(.*)$","$1$2");
