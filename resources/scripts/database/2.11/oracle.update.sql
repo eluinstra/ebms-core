@@ -1,0 +1,1 @@
+ALTER TABLE ebms_event ADD COLUMN is_confidential NUMBER(5) DEFAULT 0 NOT NULL;
