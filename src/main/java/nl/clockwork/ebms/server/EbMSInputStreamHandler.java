@@ -68,7 +68,7 @@ public abstract class EbMSInputStreamHandler
 	  		}
 	  		request = new BufferedInputStream(request);
 	  		request.mark(Integer.MAX_VALUE);
-				logger.info("<<<<\n" + requestHeaderNames.toString() + IOUtils.toString(request));
+				logger.info("<<<<\n" + requestHeaders.toString() + "\n" + IOUtils.toString(request));
 	  		request.reset();
 	  	}
 			EbMSMessageReader messageReader = new EbMSMessageReader(getRequestHeader("Content-ID"),getRequestHeader("Content-Type"));

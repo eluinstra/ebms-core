@@ -86,23 +86,10 @@ public class EbMSMessageServlet extends GenericServlet
 					@Override
 					public String getRequestHeader(String headerName)
 					{
-						String result = ((HttpServletRequest)request).getHeader(headerName);
-						if ("Content-Type".equalsIgnoreCase(headerName))
-							result = request.getContentType();
-						if (result == null)
-						{
-							Enumeration<?> headerNames = ((HttpServletRequest)request).getHeaderNames();
-							while (headerNames.hasMoreElements())
-							{
-								String key = (String)headerNames.nextElement();
-								if (key.equalsIgnoreCase(headerName))
-								{
-									result = ((HttpServletRequest)request).getHeader(key);
-									break;
-								}
-							}
-						}
-						return result;
+						if ("Content-Type".equals(headerName))
+							return request.getContentType();
+						else
+							return ((HttpServletRequest)request).getHeader(headerName);
 					}
 
 					@Override
@@ -114,7 +101,7 @@ public class EbMSMessageServlet extends GenericServlet
 					@Override
 					public void writeResponseHeader(String name, String value)
 					{
-						if ("Content-Type".equalsIgnoreCase(name))
+						if ("Content-Type".equals(name))
 							response.setContentType(value);
 						else
 							((HttpServletResponse)response).setHeader(name,value);

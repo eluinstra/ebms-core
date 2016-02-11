@@ -64,23 +64,10 @@ public class EbMSHttpHandler
 				@Override
 				public String getRequestHeader(String headerName)
 				{
-					String result = request.getHeader(headerName);
-					if ("Content-Type".equalsIgnoreCase(headerName))
-						result = request.getContentType();
-					if (result == null)
-					{
-						Enumeration<?> headerNames = request.getHeaderNames();
-						while (headerNames.hasMoreElements())
-						{
-							String key = (String)headerNames.nextElement();
-							if (key.equalsIgnoreCase(headerName))
-							{
-								result = request.getHeader(key);
-								break;
-							}
-						}
-					}
-					return result;
+					if ("Content-Type".equals(headerName))
+						return request.getContentType();
+					else
+						return request.getHeader(headerName);
 				}
 
 				@Override
@@ -92,7 +79,7 @@ public class EbMSHttpHandler
 				@Override
 				public void writeResponseHeader(String name, String value)
 				{
-					if ("Content-Type".equalsIgnoreCase(name))
+					if ("Content-Type".equals(name))
 						response.setContentType(value);
 					else
 						response.setHeader(name,value);
