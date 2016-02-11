@@ -1,4 +1,2 @@
-- improve cpa signing and encryption validation
-
 - implement packaging
 - implement message ordering
