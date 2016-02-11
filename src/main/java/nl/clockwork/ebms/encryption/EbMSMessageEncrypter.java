@@ -192,7 +192,9 @@ public class EbMSMessageEncrypter implements InitializingBean
 		EncryptedData encryptedData = xmlCipher.encryptData(document,null,attachment.getInputStream());
 		StringWriter buffer = new StringWriter();
 		createTransformer().transform(new DOMSource(xmlCipher.martial(document,encryptedData)),new StreamResult(buffer));
-		return new EbMSAttachment(new ByteArrayDataSource(buffer.toString().getBytes("UTF-8"),"application/xml"),attachment.getContentId());
+		ByteArrayDataSource ds = new ByteArrayDataSource(buffer.toString().getBytes("UTF-8"),"application/xml");
+		ds.setName(attachment.getName());
+		return new EbMSAttachment(ds,attachment.getContentId());
 	}
 
 	private EncryptedKey createEncryptedKey(Key publicKey, SecretKey secretKey) throws XMLEncryptionException

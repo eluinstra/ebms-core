@@ -119,7 +119,7 @@ public class EbMSMessageDecrypter implements InitializingBean
 		byte[] buffer = xmlCipher.decryptToByteArray(encryptedDataElement);
 		String contentType = encryptedDataElement.getAttribute("MimeType");
 		ByteArrayDataSource ds = new ByteArrayDataSource(new ByteArrayInputStream(buffer),contentType);
-
+		ds.setName(attachment.getName());
 		return new EbMSAttachment(ds,attachment.getContentId());
 	}
 
