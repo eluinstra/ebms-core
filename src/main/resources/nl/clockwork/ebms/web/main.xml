@@ -41,6 +41,6 @@
 
 	<jaxws:endpoint implementor="#cpaService" address="/cpa" />
 
-	<jaxws:endpoint implementor="#ebMSMessageService" address="/ebMSMessage" />
+	<jaxws:endpoint implementor="#ebMSMessageService" address="/ebms" />
 
 </beans>
