@@ -32,9 +32,9 @@ import java.util.List;
 
 import nl.clockwork.ebms.common.CPAManager;
 import nl.clockwork.ebms.common.util.SecurityUtils;
+import nl.clockwork.ebms.model.CacheablePartyId;
 import nl.clockwork.ebms.model.EbMSAttachment;
 import nl.clockwork.ebms.model.EbMSMessage;
-import nl.clockwork.ebms.model.CacheablePartyId;
 import nl.clockwork.ebms.util.CPAUtils;
 import nl.clockwork.ebms.validation.ValidationException;
 import nl.clockwork.ebms.validation.ValidatorException;
@@ -49,7 +49,6 @@ import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DeliveryChannel;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageHeader;
 import org.springframework.beans.factory.InitializingBean;
 import org.w3._2000._09.xmldsig.ReferenceType;
-import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
@@ -76,7 +75,7 @@ public class EbMSSignatureValidator implements InitializingBean
 				NodeList signatureNodeList = message.getMessage().getElementsByTagNameNS(org.apache.xml.security.utils.Constants.SignatureSpecNS,org.apache.xml.security.utils.Constants._TAG_SIGNATURE);
 				if (signatureNodeList.getLength() > 0)
 				{
-					X509Certificate certificate = getCertificate(message.getMessage(),message.getMessageHeader());
+					X509Certificate certificate = getCertificate(message.getMessageHeader());
 					if (certificate != null)
 					{
 						validateCertificate(trustStore,certificate,message.getMessageHeader().getMessageData().getTimestamp() == null ? new Date() : message.getMessageHeader().getMessageData().getTimestamp());
@@ -110,7 +109,7 @@ public class EbMSSignatureValidator implements InitializingBean
 				NodeList signatureNodeList = responseMessage.getMessage().getElementsByTagNameNS(org.apache.xml.security.utils.Constants.SignatureSpecNS,org.apache.xml.security.utils.Constants._TAG_SIGNATURE);
 				if (signatureNodeList.getLength() > 0)
 				{
-					X509Certificate certificate = getCertificate(responseMessage.getMessage(),responseMessage.getMessageHeader());
+					X509Certificate certificate = getCertificate(responseMessage.getMessageHeader());
 					if (certificate != null)
 					{
 						validateCertificate(trustStore,certificate,responseMessage.getMessageHeader().getMessageData().getTimestamp() == null ? new Date() : responseMessage.getMessageHeader().getMessageData().getTimestamp());
@@ -143,7 +142,7 @@ public class EbMSSignatureValidator implements InitializingBean
 		return signature.checkSignatureValue(certificate);
 	}
 
-	private X509Certificate getCertificate(Document document, MessageHeader messageHeader)
+	private X509Certificate getCertificate(MessageHeader messageHeader)
 	{
 		try
 		{
@@ -158,21 +157,6 @@ public class EbMSSignatureValidator implements InitializingBean
 			return null;
 		}
 	}
-
-//	private X509Certificate getCertificate(Document document)
-//	{
-//		try
-//		{
-//			NodeList signatureNodeList = document.getElementsByTagNameNS(org.apache.xml.security.utils.Constants.SignatureSpecNS,org.apache.xml.security.utils.Constants._TAG_SIGNATURE);
-//			XMLSignature signature = new XMLSignature((Element)signatureNodeList.item(0),org.apache.xml.security.utils.Constants.SignatureSpecNS);
-//			return signature.getKeyInfo().getX509Certificate();
-//		}
-//		catch (XMLSignatureException | XMLSecurityException e)
-//		{
-//			logger.warn("",e);
-//			return null;
-//		}
-//	}
 
 	private void validateCertificate(KeyStore trustStore, X509Certificate certificate, Date date) throws KeyStoreException, ValidationException
 	{
