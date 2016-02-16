@@ -94,13 +94,6 @@ public class EbMSResponseHandler implements ResponseHandler<EbMSDocument>
 	private String getHeaderField(HttpResponse response, String name)
 	{
 		Header result = response.getFirstHeader(name);
-		if (result == null)
-			for (Header header : response.getAllHeaders())
-				if (header.getName().equalsIgnoreCase(name))
-				{
-					result = header;
-					break;
-				}
-		return result.getValue();
+		return result != null ? result.getValue() : null;
 	}
 }
