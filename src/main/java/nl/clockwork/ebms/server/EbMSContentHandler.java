@@ -107,7 +107,7 @@ public class EbMSContentHandler implements ContentHandler
 		String filename = getHeader("Content-Disposition");
 		if (filename != null && filename.startsWith("attachment"))
 		{
-			filename = filename.replaceAll("^attachment;\\s+filename=\"([^\"]*)\"$","$1");
+			filename = filename.replaceAll("^attachment;\\s+filename=\"?([^\"]*)\"?$","$1");
 			if (!StringUtils.isEmpty(filename))
 				ds.setName(filename);
 		}
