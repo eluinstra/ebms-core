@@ -26,6 +26,7 @@ import java.util.List;
 import javax.mail.util.ByteArrayDataSource;
 import javax.xml.parsers.ParserConfigurationException;
 
+import nl.clockwork.ebms.Constants;
 import nl.clockwork.ebms.common.CPAManager;
 import nl.clockwork.ebms.common.util.DOMUtils;
 import nl.clockwork.ebms.common.util.SecurityUtils;
@@ -34,6 +35,8 @@ import nl.clockwork.ebms.model.EbMSAttachment;
 import nl.clockwork.ebms.model.EbMSMessage;
 import nl.clockwork.ebms.processor.EbMSProcessingException;
 import nl.clockwork.ebms.util.CPAUtils;
+import nl.clockwork.ebms.util.EbMSMessageUtils;
+import nl.clockwork.ebms.validation.EbMSValidationException;
 import nl.clockwork.ebms.validation.ValidationException;
 import nl.clockwork.ebms.validation.ValidatorException;
 
@@ -81,11 +84,7 @@ public class EbMSMessageDecrypter implements InitializingBean
 				message.setAttachments(attachments);
 			}
 		}
-		catch (EbMSProcessingException | SAXException | XMLSecurityException e)
-		{
-			throw new ValidationException(e);
-		}
-		catch (ParserConfigurationException | IOException | GeneralSecurityException e)
+		catch (ParserConfigurationException | IOException | GeneralSecurityException | XMLEncryptionException e)
 		{
 			throw new ValidatorException(e);
 		}
@@ -99,18 +98,25 @@ public class EbMSMessageDecrypter implements InitializingBean
 		return result;
 	}
 
-	private EbMSAttachment decrypt(X509Certificate certificate, XMLCipher xmlCipher, EbMSAttachment attachment) throws ParserConfigurationException, SAXException, IOException, XMLSecurityException, GeneralSecurityException, EbMSProcessingException
+	private EbMSAttachment decrypt(X509Certificate certificate, XMLCipher xmlCipher, EbMSAttachment attachment) throws ParserConfigurationException, IOException, GeneralSecurityException, EbMSValidationException
 	{
-		Document document = DOMUtils.read((attachment.getInputStream()));
-		if (document.getElementsByTagNameNS(EncryptionConstants.EncryptionSpecNS,EncryptionConstants._TAG_ENCRYPTEDDATA).getLength() == 0)
-			throw new EbMSProcessingException("Attachment " + attachment.getContentId() + " not encrypted!");
-
-		Element encryptedDataElement = (Element)document.getElementsByTagNameNS(EncryptionConstants.EncryptionSpecNS,EncryptionConstants._TAG_ENCRYPTEDDATA).item(0);
-		byte[] buffer = xmlCipher.decryptToByteArray(encryptedDataElement);
-		String contentType = encryptedDataElement.getAttribute("MimeType");
-		ByteArrayDataSource ds = new ByteArrayDataSource(new ByteArrayInputStream(buffer),contentType);
-		ds.setName(attachment.getName());
-		return new EbMSAttachment(ds,attachment.getContentId());
+		try
+		{
+			Document document = DOMUtils.read((attachment.getInputStream()));
+			if (document.getElementsByTagNameNS(EncryptionConstants.EncryptionSpecNS,EncryptionConstants._TAG_ENCRYPTEDDATA).getLength() == 0)
+				throw new EbMSProcessingException("Attachment " + attachment.getContentId() + " not encrypted!");
+	
+			Element encryptedDataElement = (Element)document.getElementsByTagNameNS(EncryptionConstants.EncryptionSpecNS,EncryptionConstants._TAG_ENCRYPTEDDATA).item(0);
+			byte[] buffer = xmlCipher.decryptToByteArray(encryptedDataElement);
+			String contentType = encryptedDataElement.getAttribute("MimeType");
+			ByteArrayDataSource ds = new ByteArrayDataSource(new ByteArrayInputStream(buffer),contentType);
+			ds.setName(attachment.getName());
+			return new EbMSAttachment(ds,attachment.getContentId());
+		}
+		catch (EbMSProcessingException | SAXException | XMLSecurityException e)
+		{
+			throw new EbMSValidationException(EbMSMessageUtils.createError("cid:" + attachment.getContentId(),Constants.EbMSErrorCode.SECURITY_FAILURE.errorCode(),e.getMessage()));
+		}
 	}
 
 	public void setCpaManager(CPAManager cpaManager)
