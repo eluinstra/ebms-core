@@ -42,13 +42,11 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.xml.security.encryption.XMLCipher;
 import org.apache.xml.security.encryption.XMLEncryptionException;
 import org.apache.xml.security.exceptions.XMLSecurityException;
-import org.apache.xml.security.utils.Constants;
 import org.apache.xml.security.utils.EncryptionConstants;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DeliveryChannel;
 import org.springframework.beans.factory.InitializingBean;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 public class EbMSMessageDecrypter implements InitializingBean
@@ -108,36 +106,11 @@ public class EbMSMessageDecrypter implements InitializingBean
 			throw new EbMSProcessingException("Attachment " + attachment.getContentId() + " not encrypted!");
 
 		Element encryptedDataElement = (Element)document.getElementsByTagNameNS(EncryptionConstants.EncryptionSpecNS,EncryptionConstants._TAG_ENCRYPTEDDATA).item(0);
-//		EncryptedKey encryptedKey = xmlCipher.loadEncryptedKey(encryptedDataElement);
-		String keyName = getKeyName(encryptedDataElement);
-//	if (!encryptedKey.getKeyInfo().containsKeyName())
-		if (keyName == null)
-			throw new EbMSProcessingException("EncryptedData of attachment " + attachment.getContentId() + " does not contain a KeyName!");
-//	String keyName = encryptedKey.getKeyInfo().itemKeyName(0).getKeyName();
-		if (!certificate.getSubjectDN().getName().equals(keyName))
-			throw new EbMSProcessingException("KeyName " + keyName + " does match expected certificate subject " + certificate.getSubjectDN().getName() + "!");
 		byte[] buffer = xmlCipher.decryptToByteArray(encryptedDataElement);
 		String contentType = encryptedDataElement.getAttribute("MimeType");
 		ByteArrayDataSource ds = new ByteArrayDataSource(new ByteArrayInputStream(buffer),contentType);
 		ds.setName(attachment.getName());
 		return new EbMSAttachment(ds,attachment.getContentId());
-	}
-
-	private String getKeyName(Element encryptedDataElement)
-	{
-		String result = null;
-		NodeList encryptedKeys = encryptedDataElement.getElementsByTagNameNS(EncryptionConstants.EncryptionSpecNS,"EncryptedKey");
-		if (encryptedKeys.getLength() > 0)
-		{
-			NodeList keyInfos = ((Element)encryptedKeys.item(0)).getElementsByTagNameNS(Constants.SignatureSpecNS,"KeyInfo");
-			if (keyInfos.getLength() > 0)
-			{
-				NodeList keyNames = ((Element)keyInfos.item(0)).getElementsByTagNameNS(Constants.SignatureSpecNS,"KeyName");
-				if (keyNames.getLength() > 0)
-					result = ((Element)keyNames.item(0)).getTextContent();
-			}
-		}
-		return result;
 	}
 
 	public void setCpaManager(CPAManager cpaManager)
