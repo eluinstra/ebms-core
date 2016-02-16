@@ -47,7 +47,7 @@ CREATE TABLE ebms_event
 	message_id				VARCHAR(256)		NOT NULL UNIQUE,
 	time_to_live			TIMESTAMP				NULL,
 	time_stamp				TIMESTAMP				NOT NULL,
-	is_confidential		NUMBER(5)				NOT NULL,
+	is_confidential		NUMBER(1)				NOT NULL,
 	retries						NUMBER(5)				DEFAULT 0 NOT NULL
 );
 

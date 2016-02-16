@@ -50,7 +50,7 @@ CREATE TABLE ebms_event
 	message_id				VARCHAR(256)		NOT NULL,
 	time_to_live			TIMESTAMP				NULL,
 	time_stamp				TIMESTAMP				NOT NULL,
-	is_confidential		SMALLINT				NOT NULL,
+	is_confidential		TINYINT(1)			NOT NULL,
 	retries						SMALLINT				DEFAULT 0 NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
