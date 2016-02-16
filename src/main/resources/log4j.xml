@@ -43,11 +43,6 @@
 		<appender-ref ref="ASYNC"/>
 	</logger>
 	
-	<logger name="nl.clockwork.mule.ebms" additivity="false">
-		<level value="info"/>
-		<appender-ref ref="ASYNC"/>
-	</logger>
-	
 	<logger name="nl.clockwork.mule.ebms.processor" additivity="false">
 		<level value="debug"/>
 		<appender-ref ref="ASYNC"/>
