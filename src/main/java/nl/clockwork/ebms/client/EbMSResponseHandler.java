@@ -119,14 +119,6 @@ public class EbMSResponseHandler
 	
 	private String getHeaderField(String name)
 	{
-		String result = connection.getHeaderField(name);
-		if (result == null)
-			for (String key : connection.getHeaderFields().keySet())
-				if (key.equalsIgnoreCase(name))
-				{
-					result = connection.getHeaderField(key);
-					break;
-				}
-		return result;
+		return connection.getHeaderField(name);
 	}
 }
