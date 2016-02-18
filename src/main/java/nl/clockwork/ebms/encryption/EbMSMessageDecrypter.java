@@ -16,9 +16,13 @@
 package nl.clockwork.ebms.encryption;
 
 import java.io.ByteArrayInputStream;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
+import java.security.KeyPair;
 import java.security.KeyStore;
+import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.List;
@@ -40,6 +44,7 @@ import nl.clockwork.ebms.validation.EbMSValidationException;
 import nl.clockwork.ebms.validation.ValidationException;
 import nl.clockwork.ebms.validation.ValidatorException;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.xml.security.encryption.XMLCipher;
@@ -77,14 +82,13 @@ public class EbMSMessageDecrypter implements InitializingBean
 				String alias = keyStore.getCertificateAlias(certificate);
 				if (alias == null)
 					throw new ValidationException("No certificate found with subject \"" + certificate.getSubjectDN().getName() + "\" in keystore \"" + keyStorePath + "\"");
-				XMLCipher xmlCipher = createXmlCipher(certificate);
 				List<EbMSAttachment> attachments = new ArrayList<EbMSAttachment>();
 				for (EbMSAttachment attachment : message.getAttachments())
-					attachments.add(decrypt(certificate,xmlCipher,attachment));
+					attachments.add(decrypt(certificate,attachment));
 				message.setAttachments(attachments);
 			}
 		}
-		catch (ParserConfigurationException | IOException | GeneralSecurityException | XMLEncryptionException e)
+		catch (ParserConfigurationException | IOException | GeneralSecurityException e)
 		{
 			throw new ValidatorException(e);
 		}
@@ -98,15 +102,15 @@ public class EbMSMessageDecrypter implements InitializingBean
 		return result;
 	}
 
-	private EbMSAttachment decrypt(X509Certificate certificate, XMLCipher xmlCipher, EbMSAttachment attachment) throws ParserConfigurationException, IOException, GeneralSecurityException, EbMSValidationException
+	private EbMSAttachment decrypt(X509Certificate certificate, EbMSAttachment attachment) throws ParserConfigurationException, IOException, GeneralSecurityException, EbMSValidationException
 	{
 		try
 		{
 			Document document = DOMUtils.read((attachment.getInputStream()));
 			if (document.getElementsByTagNameNS(EncryptionConstants.EncryptionSpecNS,EncryptionConstants._TAG_ENCRYPTEDDATA).getLength() == 0)
 				throw new EbMSProcessingException("Attachment " + attachment.getContentId() + " not encrypted!");
-	
 			Element encryptedDataElement = (Element)document.getElementsByTagNameNS(EncryptionConstants.EncryptionSpecNS,EncryptionConstants._TAG_ENCRYPTEDDATA).item(0);
+			XMLCipher xmlCipher = createXmlCipher(certificate);
 			byte[] buffer = xmlCipher.decryptToByteArray(encryptedDataElement);
 			String contentType = encryptedDataElement.getAttribute("MimeType");
 			ByteArrayDataSource ds = new ByteArrayDataSource(new ByteArrayInputStream(buffer),contentType);
