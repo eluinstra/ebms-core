@@ -483,7 +483,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 					{
 						try
 						{
-							return new EbMSDocument(rs.getString("messageId"),DOMUtils.read(rs.getString("content")));
+							return new EbMSDocument(rs.getString("message_id"),DOMUtils.read(rs.getString("content")));
 						}
 						catch (ParserConfigurationException | SAXException | IOException e)
 						{
