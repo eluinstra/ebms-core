@@ -348,7 +348,6 @@ public class EbMSMessageProcessor implements InitializingBean
 					public void doInTransaction()
 					{
 						ebMSDAO.insertMessage(timestamp,responseMessage,null);
-						//ebMSDAO.deleteEvents(responseMessage.getMessageHeader().getMessageData().getRefToMessageId(),EbMSEventStatus.UNPROCESSED);
 						ebMSDAO.updateMessage(responseMessage.getMessageHeader().getMessageData().getRefToMessageId(),EbMSMessageStatus.SENT,status);
 						if (status.equals(EbMSMessageStatus.DELIVERED))
 							eventListener.onMessageAcknowledged(responseMessage.getMessageHeader().getMessageData().getRefToMessageId());
