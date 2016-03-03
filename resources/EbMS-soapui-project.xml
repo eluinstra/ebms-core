@@ -1367,4 +1367,626 @@
          </Message>
       </ns:SendMessage>
    </soapenv:Body>
-</soapenv:Envelope>]]></con:request><con:wsaConfig mustUnderstand="NONE" version="200508" action="http://www.ordina.nl/ebms/2.10/EbMSMessageService/SendMessage"/></con:call></con:operation></con:interface><con:properties/><con:wssContainer/><con:oAuth2ProfileContainer/></con:soapui-project>
+</soapenv:Envelope>]]></con:request><con:wsaConfig mustUnderstand="NONE" version="200508" action="http://www.ordina.nl/ebms/2.10/EbMSMessageService/SendMessage"/></con:call></con:operation></con:interface><con:interface xsi:type="con:WsdlInterface" id="357d7f75-9c79-41ff-9475-9e6d47f04e19" wsaVersion="NONE" name="EbMS" type="wsdl" bindingName="{http://www.ebms.com/ebms/v2}EbMS" soapVersion="1_1" anonymous="optional" definition="file:/home/edwin/ebms.wsdl" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:settings/><con:definitionCache type="TEXT" rootPart="file:/home/edwin/ebms/ebms-adapter-mule3/resources/ebms.wsdl"><con:part><con:url>file:/home/edwin/ebms/ebms-adapter-mule3/resources/ebms.wsdl</con:url><con:content><![CDATA[<definitions targetNamespace="http://www.ebms.com/ebms/v2" xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:tns="http://www.ebms.com/ebms/v2" xmlns:ns1="http://www.oasis-open.org/committees/ebxml-msg/schema/msg-header-2_0.xsd" xmlns:ns2="http://schemas.xmlsoap.org/soap/http" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <types>
+    <xsd:schema attributeFormDefault="unqualified" elementFormDefault="unqualified" targetNamespace="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/1999/xlink" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+      <xsd:element name="root" nillable="true" type="xs:anyType"/>
+      <xsd:attribute name="href" type="xs:anyURI"/>
+      <xsd:attribute name="role" type="xs:anyURI"/>
+      <xsd:attribute name="type" type="xs:string"/>
+    </xsd:schema>
+    <xsd:schema attributeFormDefault="unqualified" elementFormDefault="qualified" targetNamespace="http://www.w3.org/2000/09/xmldsig#" xmlns:tns="http://www.w3.org/2000/09/xmldsig#" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+      <xsd:element name="CanonicalizationMethod" nillable="true" type="tns:CanonicalizationMethodType"/>
+      <xsd:element name="DSAKeyValue" nillable="true" type="tns:DSAKeyValueType"/>
+      <xsd:element name="DigestMethod" nillable="true" type="tns:DigestMethodType"/>
+      <xsd:element name="DigestValue" nillable="true" type="xsd:base64Binary"/>
+      <xsd:element name="KeyInfo" nillable="true" type="tns:KeyInfoType"/>
+      <xsd:element name="KeyName" nillable="true" type="xsd:string"/>
+      <xsd:element name="KeyValue" nillable="true" type="tns:KeyValueType"/>
+      <xsd:element name="Manifest" nillable="true" type="tns:ManifestType"/>
+      <xsd:element name="MgmtData" nillable="true" type="xsd:string"/>
+      <xsd:element name="Object" nillable="true" type="tns:ObjectType"/>
+      <xsd:element name="PGPData" nillable="true" type="tns:PGPDataType"/>
+      <xsd:element name="RSAKeyValue" nillable="true" type="tns:RSAKeyValueType"/>
+      <xsd:element name="Reference" nillable="true" type="tns:ReferenceType"/>
+      <xsd:element name="RetrievalMethod" nillable="true" type="tns:RetrievalMethodType"/>
+      <xsd:element name="SPKIData" nillable="true" type="tns:SPKIDataType"/>
+      <xsd:element name="Signature" nillable="true" type="tns:SignatureType"/>
+      <xsd:element name="SignatureMethod" nillable="true" type="tns:SignatureMethodType"/>
+      <xsd:element name="SignatureProperties" nillable="true" type="tns:SignaturePropertiesType"/>
+      <xsd:element name="SignatureProperty" nillable="true" type="tns:SignaturePropertyType"/>
+      <xsd:element name="SignatureValue" nillable="true" type="tns:SignatureValueType"/>
+      <xsd:element name="SignedInfo" nillable="true" type="tns:SignedInfoType"/>
+      <xsd:element name="Transform" nillable="true" type="tns:TransformType"/>
+      <xsd:element name="Transforms" nillable="true" type="tns:TransformsType"/>
+      <xsd:element name="X509Data" nillable="true" type="tns:X509DataType"/>
+      <xsd:complexType name="ReferenceType">
+        <xsd:sequence>
+          <xsd:element minOccurs="0" name="Transforms" type="tns:TransformsType"/>
+          <xsd:element name="DigestMethod" type="tns:DigestMethodType"/>
+          <xsd:element name="DigestValue" type="xsd:base64Binary"/>
+        </xsd:sequence>
+        <xsd:attribute name="Id" type="xsd:ID"/>
+        <xsd:attribute name="URI" type="xsd:anyURI"/>
+        <xsd:attribute name="Type" type="xsd:anyURI"/>
+      </xsd:complexType>
+      <xsd:complexType name="TransformsType">
+        <xsd:sequence>
+          <xsd:element maxOccurs="unbounded" name="Transform" type="tns:TransformType"/>
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:complexType mixed="true" name="TransformType">
+        <xsd:sequence>
+          <xsd:choice maxOccurs="unbounded" minOccurs="0">
+            <xsd:element name="XPath" type="xsd:string"/>
+            <xsd:any namespace="##other" processContents="lax"/>
+          </xsd:choice>
+        </xsd:sequence>
+        <xsd:attribute name="Algorithm" type="xsd:anyURI" use="required"/>
+      </xsd:complexType>
+      <xsd:complexType mixed="true" name="ObjectType">
+        <xsd:sequence>
+          <xsd:any maxOccurs="unbounded" minOccurs="0" namespace="##other" processContents="lax"/>
+        </xsd:sequence>
+        <xsd:attribute name="Id" type="xsd:ID"/>
+        <xsd:attribute name="MimeType" type="xsd:string"/>
+        <xsd:attribute name="Encoding" type="xsd:anyURI"/>
+      </xsd:complexType>
+      <xsd:complexType name="DSAKeyValueType">
+        <xsd:sequence>
+          <xsd:element minOccurs="0" name="P" type="xsd:base64Binary"/>
+          <xsd:element minOccurs="0" name="Q" type="xsd:base64Binary"/>
+          <xsd:element minOccurs="0" name="G" type="xsd:base64Binary"/>
+          <xsd:element name="Y" type="xsd:base64Binary"/>
+          <xsd:element minOccurs="0" name="J" type="xsd:base64Binary"/>
+          <xsd:element minOccurs="0" name="Seed" type="xsd:base64Binary"/>
+          <xsd:element minOccurs="0" name="PgenCounter" type="xsd:base64Binary"/>
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:complexType name="SignedInfoType">
+        <xsd:sequence>
+          <xsd:element name="CanonicalizationMethod" type="tns:CanonicalizationMethodType"/>
+          <xsd:element name="SignatureMethod" type="tns:SignatureMethodType"/>
+          <xsd:element maxOccurs="unbounded" name="Reference" type="tns:ReferenceType"/>
+        </xsd:sequence>
+        <xsd:attribute name="Id" type="xsd:ID"/>
+      </xsd:complexType>
+      <xsd:complexType mixed="true" name="CanonicalizationMethodType">
+        <xsd:sequence>
+          <xsd:any maxOccurs="unbounded" minOccurs="0" namespace="##other" processContents="lax"/>
+        </xsd:sequence>
+        <xsd:attribute name="Algorithm" type="xsd:anyURI" use="required"/>
+      </xsd:complexType>
+      <xsd:complexType mixed="true" name="SignatureMethodType">
+        <xsd:sequence>
+          <xsd:choice maxOccurs="unbounded" minOccurs="0">
+            <xsd:element name="HMACOutputLength" type="xsd:integer"/>
+            <xsd:any namespace="##other" processContents="lax"/>
+          </xsd:choice>
+        </xsd:sequence>
+        <xsd:attribute name="Algorithm" type="xsd:anyURI" use="required"/>
+      </xsd:complexType>
+      <xsd:complexType name="PGPDataType">
+        <xsd:sequence>
+          <xsd:choice maxOccurs="unbounded" minOccurs="0">
+            <xsd:element name="PGPKeyID" type="xsd:base64Binary"/>
+            <xsd:element name="PGPKeyPacket" type="xsd:base64Binary"/>
+            <xsd:any namespace="##other" processContents="lax"/>
+          </xsd:choice>
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:complexType name="SignaturePropertiesType">
+        <xsd:sequence>
+          <xsd:element maxOccurs="unbounded" name="SignatureProperty" type="tns:SignaturePropertyType"/>
+        </xsd:sequence>
+        <xsd:attribute name="Id" type="xsd:ID"/>
+      </xsd:complexType>
+      <xsd:complexType mixed="true" name="SignaturePropertyType">
+        <xsd:sequence>
+          <xsd:any maxOccurs="unbounded" minOccurs="0" namespace="##other" processContents="lax"/>
+        </xsd:sequence>
+        <xsd:attribute name="Target" type="xsd:anyURI" use="required"/>
+        <xsd:attribute name="Id" type="xsd:ID"/>
+      </xsd:complexType>
+      <xsd:complexType name="ManifestType">
+        <xsd:sequence>
+          <xsd:element maxOccurs="unbounded" name="Reference" type="tns:ReferenceType"/>
+        </xsd:sequence>
+        <xsd:attribute name="Id" type="xsd:ID"/>
+      </xsd:complexType>
+      <xsd:complexType mixed="true" name="KeyValueType">
+        <xsd:sequence>
+          <xsd:choice maxOccurs="unbounded" minOccurs="0">
+            <xsd:element ref="tns:DSAKeyValue"/>
+            <xsd:element ref="tns:RSAKeyValue"/>
+            <xsd:any namespace="##other" processContents="lax"/>
+          </xsd:choice>
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:complexType name="SignatureValueType">
+        <xsd:simpleContent>
+          <xsd:extension base="xsd:base64Binary">
+            <xsd:attribute name="Id" type="xsd:ID"/>
+          </xsd:extension>
+        </xsd:simpleContent>
+      </xsd:complexType>
+      <xsd:complexType name="SignatureType">
+        <xsd:sequence>
+          <xsd:element name="SignedInfo" type="tns:SignedInfoType"/>
+          <xsd:element name="SignatureValue" type="tns:SignatureValueType"/>
+          <xsd:element minOccurs="0" name="KeyInfo" type="tns:KeyInfoType"/>
+          <xsd:element maxOccurs="unbounded" minOccurs="0" name="Object" type="tns:ObjectType"/>
+        </xsd:sequence>
+        <xsd:attribute name="Id" type="xsd:ID"/>
+      </xsd:complexType>
+      <xsd:complexType mixed="true" name="KeyInfoType">
+        <xsd:sequence>
+          <xsd:choice maxOccurs="unbounded" minOccurs="0">
+            <xsd:element ref="tns:SPKIData"/>
+            <xsd:element ref="tns:MgmtData"/>
+            <xsd:element ref="tns:KeyValue"/>
+            <xsd:element ref="tns:PGPData"/>
+            <xsd:element ref="tns:RetrievalMethod"/>
+            <xsd:element ref="tns:KeyName"/>
+            <xsd:element ref="tns:X509Data"/>
+            <xsd:any namespace="##other" processContents="lax"/>
+          </xsd:choice>
+        </xsd:sequence>
+        <xsd:attribute name="Id" type="xsd:ID"/>
+      </xsd:complexType>
+      <xsd:complexType name="SPKIDataType">
+        <xsd:sequence>
+          <xsd:choice maxOccurs="unbounded" minOccurs="0">
+            <xsd:element name="SPKISexp" type="xsd:base64Binary"/>
+            <xsd:any namespace="##other" processContents="lax"/>
+          </xsd:choice>
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:complexType name="X509DataType">
+        <xsd:sequence>
+          <xsd:choice maxOccurs="unbounded" minOccurs="0">
+            <xsd:element name="X509IssuerSerial" type="tns:X509IssuerSerialType"/>
+            <xsd:element name="X509Certificate" type="xsd:base64Binary"/>
+            <xsd:element name="X509SubjectName" type="xsd:string"/>
+            <xsd:element name="X509SKI" type="xsd:base64Binary"/>
+            <xsd:element name="X509CRL" type="xsd:base64Binary"/>
+            <xsd:any namespace="##other" processContents="lax"/>
+          </xsd:choice>
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:complexType name="X509IssuerSerialType">
+        <xsd:sequence>
+          <xsd:element name="X509IssuerName" type="xsd:string"/>
+          <xsd:element name="X509SerialNumber" type="xsd:integer"/>
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:complexType name="RSAKeyValueType">
+        <xsd:sequence>
+          <xsd:element name="Modulus" type="xsd:base64Binary"/>
+          <xsd:element name="Exponent" type="xsd:base64Binary"/>
+        </xsd:sequence>
+      </xsd:complexType>
+      <xsd:complexType mixed="true" name="DigestMethodType">
+        <xsd:sequence>
+          <xsd:any maxOccurs="unbounded" minOccurs="0" namespace="##other" processContents="lax"/>
+        </xsd:sequence>
+        <xsd:attribute name="Algorithm" type="xsd:anyURI" use="required"/>
+      </xsd:complexType>
+      <xsd:complexType name="RetrievalMethodType">
+        <xsd:sequence>
+          <xsd:element minOccurs="0" name="Transforms" type="tns:TransformsType"/>
+        </xsd:sequence>
+        <xsd:attribute name="URI" type="xsd:anyURI"/>
+        <xsd:attribute name="Type" type="xsd:anyURI"/>
+      </xsd:complexType>
+    </xsd:schema>
+    <xsd:schema attributeFormDefault="unqualified" elementFormDefault="unqualified" targetNamespace="http://www.ez.nl/ezpoort/v1" xmlns="http://www.ez.nl/ezpoort/v1" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+      <xsd:element name="Attachment" nillable="true" type="xsd:base64Binary"/>
+    </xsd:schema>
+    <xsd:schema attributeFormDefault="unqualified" elementFormDefault="qualified" targetNamespace="http://www.oasis-open.org/committees/ebxml-msg/schema/msg-header-2_0.xsd" xmlns:ns1="http://www.w3.org/2000/09/xmldsig#" xmlns:ns2="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns3="http://www.w3.org/1999/xlink" xmlns:tns="http://www.oasis-open.org/committees/ebxml-msg/schema/msg-header-2_0.xsd" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+      <xsd:import namespace="http://www.w3.org/2000/09/xmldsig#"/>
+      <xsd:import namespace="http://schemas.xmlsoap.org/soap/envelope/"/>
+      <xsd:import namespace="http://www.w3.org/1999/xlink"/>
+      <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
+      <xsd:element name="AckRequested">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:any maxOccurs="unbounded" minOccurs="0" namespace="##other" processContents="lax"/>
+          </xsd:sequence>
+          <xsd:attribute ref="ns2:actor"/>
+          <xsd:attribute ref="tns:signed" use="required"/>
+          <xsd:attribute ref="tns:id"/>
+          <xsd:attribute ref="tns:version" use="required"/>
+          <xsd:attribute ref="ns2:mustUnderstand" use="required"/>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="Acknowledgment">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="Timestamp" type="xsd:dateTime"/>
+            <xsd:element name="RefToMessageId" type="xsd:string"/>
+            <xsd:element minOccurs="0" ref="tns:From"/>
+            <xsd:element maxOccurs="unbounded" minOccurs="0" ref="ns1:Reference"/>
+            <xsd:any maxOccurs="unbounded" minOccurs="0" namespace="##other" processContents="lax"/>
+          </xsd:sequence>
+          <xsd:attribute ref="ns2:actor"/>
+          <xsd:attribute ref="tns:id"/>
+          <xsd:attribute ref="tns:version" use="required"/>
+          <xsd:attribute ref="ns2:mustUnderstand" use="required"/>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="Action" nillable="true" type="xsd:string"/>
+      <xsd:element name="CPAId" nillable="true" type="xsd:string"/>
+      <xsd:element name="ConversationId" nillable="true" type="xsd:string"/>
+      <xsd:element name="Description">
+        <xsd:complexType>
+          <xsd:simpleContent>
+            <xsd:extension base="xsd:string">
+              <xsd:attribute ref="xml:lang" use="required"/>
+            </xsd:extension>
+          </xsd:simpleContent>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="DuplicateElimination" nillable="true" type="xsd:anyType"/>
+      <xsd:element name="Error">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element minOccurs="0" ref="tns:Description"/>
+            <xsd:any maxOccurs="unbounded" minOccurs="0" namespace="##other" processContents="lax"/>
+          </xsd:sequence>
+          <xsd:attribute ref="tns:id"/>
+          <xsd:attribute ref="tns:codeContext"/>
+          <xsd:attribute ref="tns:errorCode" use="required"/>
+          <xsd:attribute ref="tns:severity" use="required"/>
+          <xsd:attribute ref="tns:location"/>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="ErrorList">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element maxOccurs="unbounded" ref="tns:Error"/>
+            <xsd:any maxOccurs="unbounded" minOccurs="0" namespace="##other" processContents="lax"/>
+          </xsd:sequence>
+          <xsd:attribute ref="tns:highestSeverity" use="required"/>
+          <xsd:attribute ref="tns:id"/>
+          <xsd:attribute ref="tns:version" use="required"/>
+          <xsd:attribute ref="ns2:mustUnderstand" use="required"/>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="From">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element maxOccurs="unbounded" ref="tns:PartyId"/>
+            <xsd:element minOccurs="0" name="Role" type="xsd:string"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="Manifest">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element maxOccurs="unbounded" ref="tns:Reference"/>
+            <xsd:any maxOccurs="unbounded" minOccurs="0" namespace="##other" processContents="lax"/>
+          </xsd:sequence>
+          <xsd:attribute ref="tns:id"/>
+          <xsd:attribute ref="tns:version" use="required"/>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="MessageData">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="MessageId" type="xsd:string"/>
+            <xsd:element name="Timestamp" type="xsd:dateTime"/>
+            <xsd:element minOccurs="0" name="RefToMessageId" type="xsd:string"/>
+            <xsd:element minOccurs="0" name="TimeToLive" type="xsd:dateTime"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="MessageHeader">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element ref="tns:From"/>
+            <xsd:element ref="tns:To"/>
+            <xsd:element name="CPAId" type="xsd:string"/>
+            <xsd:element name="ConversationId" type="xsd:string"/>
+            <xsd:element ref="tns:Service"/>
+            <xsd:element name="Action" type="xsd:string"/>
+            <xsd:element ref="tns:MessageData"/>
+            <xsd:element minOccurs="0" name="DuplicateElimination" type="xsd:anyType"/>
+            <xsd:element maxOccurs="unbounded" minOccurs="0" ref="tns:Description"/>
+            <xsd:any maxOccurs="unbounded" minOccurs="0" namespace="##other" processContents="lax"/>
+          </xsd:sequence>
+          <xsd:attribute ref="tns:id"/>
+          <xsd:attribute ref="tns:version" use="required"/>
+          <xsd:attribute ref="ns2:mustUnderstand" use="required"/>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="MessageId" nillable="true" type="xsd:string"/>
+      <xsd:element name="MessageOrder">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="SequenceNumber" type="tns:sequenceNumber.type"/>
+            <xsd:any maxOccurs="unbounded" minOccurs="0" namespace="##other" processContents="lax"/>
+          </xsd:sequence>
+          <xsd:attribute ref="tns:id"/>
+          <xsd:attribute ref="tns:version" use="required"/>
+          <xsd:attribute ref="ns2:mustUnderstand" use="required"/>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="PartyId">
+        <xsd:complexType>
+          <xsd:simpleContent>
+            <xsd:extension base="xsd:string">
+              <xsd:attribute ref="tns:type"/>
+            </xsd:extension>
+          </xsd:simpleContent>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="RefToMessageId" nillable="true" type="xsd:string"/>
+      <xsd:element name="Reference">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element maxOccurs="unbounded" minOccurs="0" ref="tns:Schema"/>
+            <xsd:element maxOccurs="unbounded" minOccurs="0" ref="tns:Description"/>
+            <xsd:any maxOccurs="unbounded" minOccurs="0" namespace="##other" processContents="lax"/>
+          </xsd:sequence>
+          <xsd:attribute ref="tns:id"/>
+          <xsd:attribute ref="ns3:type"/>
+          <xsd:attribute ref="ns3:href" use="required"/>
+          <xsd:attribute ref="ns3:role"/>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="Schema">
+        <xsd:complexType>
+          <xsd:sequence/>
+          <xsd:attribute ref="tns:location" use="required"/>
+          <xsd:attribute ref="tns:version"/>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="SequenceNumber" nillable="true" type="tns:sequenceNumber.type"/>
+      <xsd:element name="Service">
+        <xsd:complexType>
+          <xsd:simpleContent>
+            <xsd:extension base="xsd:string">
+              <xsd:attribute ref="tns:type"/>
+            </xsd:extension>
+          </xsd:simpleContent>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="StatusRequest">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="RefToMessageId" type="xsd:string"/>
+            <xsd:any maxOccurs="unbounded" minOccurs="0" namespace="##other" processContents="lax"/>
+          </xsd:sequence>
+          <xsd:attribute ref="tns:id"/>
+          <xsd:attribute ref="tns:version" use="required"/>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="StatusResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="RefToMessageId" type="xsd:string"/>
+            <xsd:element minOccurs="0" name="Timestamp" type="xsd:dateTime"/>
+            <xsd:any maxOccurs="unbounded" minOccurs="0" namespace="##other" processContents="lax"/>
+          </xsd:sequence>
+          <xsd:attribute ref="tns:messageStatus" use="required"/>
+          <xsd:attribute ref="tns:id"/>
+          <xsd:attribute ref="tns:version" use="required"/>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="SyncReply">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:any maxOccurs="unbounded" minOccurs="0" namespace="##other" processContents="lax"/>
+          </xsd:sequence>
+          <xsd:attribute ref="ns2:actor" use="required"/>
+          <xsd:attribute ref="tns:id"/>
+          <xsd:attribute ref="tns:version" use="required"/>
+          <xsd:attribute ref="ns2:mustUnderstand" use="required"/>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="TimeToLive" nillable="true" type="xsd:anySimpleType"/>
+      <xsd:element name="Timestamp" nillable="true" type="xsd:anySimpleType"/>
+      <xsd:element name="To">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element maxOccurs="unbounded" ref="tns:PartyId"/>
+            <xsd:element minOccurs="0" name="Role" type="xsd:string"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:complexType name="sequenceNumber.type">
+        <xsd:simpleContent>
+          <xsd:extension base="xsd:integer">
+            <xsd:attribute ref="tns:status"/>
+          </xsd:extension>
+        </xsd:simpleContent>
+      </xsd:complexType>
+      <xsd:simpleType name="status.type">
+        <xsd:restriction base="xsd:string">
+          <xsd:enumeration value="Reset"/>
+          <xsd:enumeration value="Continue"/>
+        </xsd:restriction>
+      </xsd:simpleType>
+      <xsd:simpleType name="severity.type">
+        <xsd:restriction base="xsd:string">
+          <xsd:enumeration value="Warning"/>
+          <xsd:enumeration value="Error"/>
+        </xsd:restriction>
+      </xsd:simpleType>
+      <xsd:simpleType name="messageStatus.type">
+        <xsd:restriction base="xsd:string">
+          <xsd:enumeration value="UnAuthorized"/>
+          <xsd:enumeration value="NotRecognized"/>
+          <xsd:enumeration value="Received"/>
+          <xsd:enumeration value="Processed"/>
+          <xsd:enumeration value="Forwarded"/>
+        </xsd:restriction>
+      </xsd:simpleType>
+      <xsd:attribute name="codeContext" type="xsd:anyURI"/>
+      <xsd:attribute name="errorCode" type="xsd:string"/>
+      <xsd:attribute name="highestSeverity" type="tns:severity.type"/>
+      <xsd:attribute name="id" type="xsd:ID"/>
+      <xsd:attribute name="location" type="xsd:string"/>
+      <xsd:attribute name="messageStatus" type="tns:messageStatus.type"/>
+      <xsd:attribute name="severity" type="tns:severity.type"/>
+      <xsd:attribute name="signed" type="xsd:boolean"/>
+      <xsd:attribute name="status" type="tns:status.type"/>
+      <xsd:attribute name="type" type="xsd:string"/>
+      <xsd:attribute name="version" type="xsd:string"/>
+    </xsd:schema>
+  </types>
+  <message name="EbMSRequest">
+    <part name="MessageHeader" element="ns1:MessageHeader"/>
+    <part name="Manifest" element="ns1:Manifest"/>
+  </message>
+  <message name="EbMSResponse">
+    <part name="MessageHeader" element="ns1:MessageHeader"/>
+  </message>
+  <portType name="EbMS">
+    <operation name="EbMSRequest">
+      <input message="tns:EbMSRequest"/>
+    </operation>
+    <operation name="EbMSResponse">
+      <input message="tns:EbMSResponse"/>
+    </operation>
+  </portType>
+  <binding name="EbMS" type="tns:EbMS">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <operation name="EbMSRequest">
+      <soap:operation soapAction="ebXML" style="document"/>
+      <input>
+        <soap:header part="MessageHeader" use="literal"/>
+        <soap:body parts="Manifest" use="literal"/>
+      </input>
+    </operation>
+    <operation name="EbMSResponse">
+      <soap:operation soapAction="ebXML" style="document"/>
+      <input>
+        <soap:header part="MessageHeader" use="literal"/>
+      </input>
+    </operation>
+  </binding>
+  <service name="EbMSService">
+    <port binding="tns:EbMS" name="EbMS">
+      <soap:address location="http://localhost:8080/ebms"/>
+    </port>
+  </service>
+</definitions>]]></con:content><con:type>http://schemas.xmlsoap.org/wsdl/</con:type></con:part></con:definitionCache><con:endpoints><con:endpoint>http://localhost:8080/ebms</con:endpoint><con:endpoint>http://localhost:8088/overheidStub</con:endpoint></con:endpoints><con:operation id="1b1a667e-a7dd-48f2-aeb7-5893e47625db" isOneWay="false" action="ebXML" name="EbMSRequest" bindingOperationName="EbMSRequest" type="One-Way" inputName="" sendsAttachments="false" anonymous="optional"><con:settings/><con:call id="0e518749-1bf8-4d9c-ad88-75baf7235460" name="Request Ok"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8088/overheidStub</con:endpoint><con:request><![CDATA[<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:eb="http://www.oasis-open.org/committees/ebxml-msg/schema/msg-header-2_0.xsd" xmlns:ns4="http://www.w3.org/2000/09/xmldsig#" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <soap:Header>
+        <eb:MessageHeader eb:version="2.0" soap:mustUnderstand="1">
+            <eb:From>
+                <eb:PartyId eb:type="urn:osb:oin">00000000000000000000</eb:PartyId>
+                <eb:Role>DIGIPOORT</eb:Role>
+            </eb:From>
+            <eb:To>
+                <eb:PartyId eb:type="urn:osb:oin">00000000000000000001</eb:PartyId>
+                <eb:Role>OVERHEID</eb:Role>
+            </eb:To>
+            <eb:CPAId>cpaStubEBF.rm.http.unsigned.sync</eb:CPAId>
+            <eb:ConversationId>ea1b1df9-3cf8-4362-8cb5-06da082dfae5</eb:ConversationId>
+            <eb:Service eb:type="urn:osb:services">osb:afleveren:1.1$1.0</eb:Service>
+            <eb:Action>afleveren</eb:Action>
+            <eb:MessageData>
+                <eb:MessageId>ea1b1df9-3cf8-4362-8cb5-06da082dfae5@localhost</eb:MessageId>
+                <eb:Timestamp>2016-03-03T14:38:11Z</eb:Timestamp>
+                <eb:TimeToLive>2016-03-03T15:08:11Z</eb:TimeToLive>
+            </eb:MessageData>
+            <eb:DuplicateElimination/>
+        </eb:MessageHeader>
+        <eb:SyncReply eb:version="2.0" soap:actor="http://schemas.xmlsoap.org/soap/actor/next" soap:mustUnderstand="1"/>
+        <eb:AckRequested eb:signed="false" eb:version="2.0" soap:actor="urn:oasis:names:tc:ebxml-msg:actor:toPartyMSH" soap:mustUnderstand="1"/>
+    </soap:Header>
+    <soap:Body>
+        <eb:Manifest eb:version="2.0">
+            <eb:Reference xlink:href="cid:ea1b1df9-3cf8-4362-8cb5-06da082dfae5-1@localhost" xlink:type="simple"/>
+        </eb:Manifest>
+    </soap:Body>
+</soap:Envelope>]]></con:request><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:attachment><con:name>Afleverbericht_Afleveren_ebMS_2.0_v1.1.xml</con:name><con:contentType>text/xml</con:contentType><con:size>1189</con:size><con:contentId>ea1b1df9-3cf8-4362-8cb5-06da082dfae5-1@localhost</con:contentId><con:url>/home/edwin/Downloads/Afleverbericht_Afleveren_ebMS_2.0_v1.1.xml</con:url><con:data>UEsDBBQACAgIAPB8Y0gAAAAAAAAAAAAAAAAqAAAAQWZsZXZlcmJlcmljaHRfQWZsZXZlcmVuX2ViTVNfMi4wX3YxLjEueG1snVTBitswED230H8wvseSs1BKSLwkh5aF3V6SltJLkK2prV1pZCwlcfv1lS3bsb0s2y0YzLx58+Y9S3h9WysZnKEyQuMmjCMaBoCZ5gLzTfjt8HnxKbxNPrxfWzQr9kuCo+6gEllhg9qIlckKUOxeZ8y2AoW15YoQqXNxMhFKwkUuSq0rSyBVhiwjSjoZA9VZZEDiKCbB1mOAR0gf9kdHO55dI6oNDwNn0W13Dv5bv9dwlgeNy+USXW4iXeVkSWlMfjzc79s0C4HGMswgdMHftcmfABVUT0n3XpMx2JNS/11M4yYZF54+ac9meqlpOZmbb2MM25g9Pqv97JzUD1vxyI0FVYLcMsyhJfFkSeOPCxq750Dpqn0i+tNLvTDSKwoOaIUFYXcgXb+ANAXk0BA8A0/KeUj8y2t20ECxv0tIdvuv3camavTJawva4UrLWecZ4pWeE2encYeFPvGrLSUUHBozpWQCiYW6O9KhMVBTaK4ON8iYSqwrIlsP5z9qDQPC7+Jfvv/h282myzoYmFyBq6+x2514lCwHHJnwSAu8JcHbI/xThj7E1dUk1ch/d2knvxkH/wVQSwcIQQDI1bUBAAClBAAAUEsBAhQAFAAICAgA8HxjSEEAyNW1AQAApQQAACoAAAAAAAAAAAAAAAAAAAAAAEFmbGV2ZXJiZXJpY2h0X0FmbGV2ZXJlbl9lYk1TXzIuMF92MS4xLnhtbFBLBQYAAAAAAQABAFgAAAANAgAAAAA=</con:data><con:id>5ff7447b-6c87-49fa-ab9a-5a05a473a4ca</con:id></con:attachment><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508" action="ebXML"/><con:wsrmConfig version="1.2"/></con:call><con:call id="94fe6e80-b9ff-4095-b3cb-02398b6b745d" name="Ping"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8088/overheidStub</con:endpoint><con:request><![CDATA[<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:eb="http://www.oasis-open.org/committees/ebxml-msg/schema/msg-header-2_0.xsd" xmlns:ns4="http://www.w3.org/2000/09/xmldsig#" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <soap:Header>
+        <eb:MessageHeader eb:version="2.0" soap:mustUnderstand="1">
+            <eb:From>
+                <eb:PartyId eb:type="urn:osb:oin">00000000000000000000</eb:PartyId>
+            </eb:From>
+            <eb:To>
+                <eb:PartyId eb:type="urn:osb:oin">00000000000000000001</eb:PartyId>
+            </eb:To>
+            <eb:CPAId>cpaStubEBF.rm.http.unsigned.sync</eb:CPAId>
+            <eb:ConversationId>215dc50d-e4b2-4739-9278-7d00a776c035</eb:ConversationId>
+            <eb:Service>urn:oasis:names:tc:ebxml-msg:service</eb:Service>
+            <eb:Action>Ping</eb:Action>
+            <eb:MessageData>
+                <eb:MessageId>215dc50d-e4b2-4739-9278-7d00a776c035@localhost</eb:MessageId>
+                <eb:Timestamp>2016-03-03T14:33:14Z</eb:Timestamp>
+            </eb:MessageData>
+        </eb:MessageHeader>
+        <eb:SyncReply eb:version="2.0" soap:actor="http://schemas.xmlsoap.org/soap/actor/next" soap:mustUnderstand="1"/>
+    </soap:Header>
+    <soap:Body/>
+</soap:Envelope>
+]]></con:request><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508" action="ebXML"/><con:wsrmConfig version="1.2"/></con:call><con:call id="ff9723a1-708e-41c7-a903-58ec482edba2" name="Request Expired"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8088/overheidStub</con:endpoint><con:request><![CDATA[<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:eb="http://www.oasis-open.org/committees/ebxml-msg/schema/msg-header-2_0.xsd" xmlns:ns4="http://www.w3.org/2000/09/xmldsig#" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <soap:Header>
+        <eb:MessageHeader eb:version="2.0" soap:mustUnderstand="1">
+            <eb:From>
+                <eb:PartyId eb:type="urn:osb:oin">00000000000000000000</eb:PartyId>
+                <eb:Role>DIGIPOORT</eb:Role>
+            </eb:From>
+            <eb:To>
+                <eb:PartyId eb:type="urn:osb:oin">00000000000000000001</eb:PartyId>
+                <eb:Role>OVERHEID</eb:Role>
+            </eb:To>
+            <eb:CPAId>cpaStubEBF.rm.http.unsigned.sync</eb:CPAId>
+            <eb:ConversationId>ea1b1df9-3cf8-4362-8cb5-06da082dfae5</eb:ConversationId>
+            <eb:Service eb:type="urn:osb:services">osb:afleveren:1.1$1.0</eb:Service>
+            <eb:Action>afleveren</eb:Action>
+            <eb:MessageData>
+                <eb:MessageId>ea1b1df9-3cf8-4362-8cb5-06da082dfae5@localhost</eb:MessageId>
+                <eb:Timestamp>2016-03-03T14:38:11Z</eb:Timestamp>
+                <eb:TimeToLive>2015-03-03T15:08:11Z</eb:TimeToLive>
+            </eb:MessageData>
+            <eb:DuplicateElimination/>
+        </eb:MessageHeader>
+        <eb:SyncReply eb:version="2.0" soap:actor="http://schemas.xmlsoap.org/soap/actor/next" soap:mustUnderstand="1"/>
+        <eb:AckRequested eb:signed="false" eb:version="2.0" soap:actor="urn:oasis:names:tc:ebxml-msg:actor:toPartyMSH" soap:mustUnderstand="1"/>
+    </soap:Header>
+    <soap:Body>
+        <eb:Manifest eb:version="2.0">
+            <eb:Reference xlink:href="cid:ea1b1df9-3cf8-4362-8cb5-06da082dfae5-1@localhost" xlink:type="simple"/>
+        </eb:Manifest>
+    </soap:Body>
+</soap:Envelope>]]></con:request><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:attachment><con:name>Afleverbericht_Afleveren_ebMS_2.0_v1.1.xml</con:name><con:contentType>text/xml</con:contentType><con:size>1189</con:size><con:contentId>ea1b1df9-3cf8-4362-8cb5-06da082dfae5-1@localhost</con:contentId><con:data>UEsDBBQACAgIAPB8Y0gAAAAAAAAAAAAAAAAqAAAAQWZsZXZlcmJlcmljaHRfQWZsZXZlcmVuX2ViTVNfMi4wX3YxLjEueG1snVTBitswED230H8wvseSs1BKSLwkh5aF3V6SltJLkK2prV1pZCwlcfv1lS3bsb0s2y0YzLx58+Y9S3h9WysZnKEyQuMmjCMaBoCZ5gLzTfjt8HnxKbxNPrxfWzQr9kuCo+6gEllhg9qIlckKUOxeZ8y2AoW15YoQqXNxMhFKwkUuSq0rSyBVhiwjSjoZA9VZZEDiKCbB1mOAR0gf9kdHO55dI6oNDwNn0W13Dv5bv9dwlgeNy+USXW4iXeVkSWlMfjzc79s0C4HGMswgdMHftcmfABVUT0n3XpMx2JNS/11M4yYZF54+ac9meqlpOZmbb2MM25g9Pqv97JzUD1vxyI0FVYLcMsyhJfFkSeOPCxq750Dpqn0i+tNLvTDSKwoOaIUFYXcgXb+ANAXk0BA8A0/KeUj8y2t20ECxv0tIdvuv3camavTJawva4UrLWecZ4pWeE2encYeFPvGrLSUUHBozpWQCiYW6O9KhMVBTaK4ON8iYSqwrIlsP5z9qDQPC7+Jfvv/h282myzoYmFyBq6+x2514lCwHHJnwSAu8JcHbI/xThj7E1dUk1ch/d2knvxkH/wVQSwcIQQDI1bUBAAClBAAAUEsBAhQAFAAICAgA8HxjSEEAyNW1AQAApQQAACoAAAAAAAAAAAAAAAAAAAAAAEFmbGV2ZXJiZXJpY2h0X0FmbGV2ZXJlbl9lYk1TXzIuMF92MS4xLnhtbFBLBQYAAAAAAQABAFgAAAANAgAAAAA=</con:data><con:id>5ff7447b-6c87-49fa-ab9a-5a05a473a4ca</con:id></con:attachment><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508" action="ebXML"/><con:wsrmConfig version="1.2"/></con:call></con:operation><con:operation id="a1c8df05-ec13-4e78-a114-756f259dfb4a" isOneWay="false" action="ebXML" name="EbMSResponse" bindingOperationName="EbMSResponse" type="One-Way" inputName="" sendsAttachments="false" anonymous="optional"><con:settings/><con:call id="8a5a28d8-2c38-432f-b2d4-236e2ce03991" name="Request 1"><con:settings/><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8080/ebms</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:msg="http://www.oasis-open.org/committees/ebxml-msg/schema/msg-header-2_0.xsd">
+   <soapenv:Header/>
+   <soapenv:Body>
+      <msg:MessageHeader msg:id="?" msg:version="?" soapenv:mustUnderstand="?">
+         <msg:From>
+            <!--1 or more repetitions:-->
+            <msg:PartyId msg:type="?">?</msg:PartyId>
+            <!--Optional:-->
+            <msg:Role>?</msg:Role>
+         </msg:From>
+         <msg:To>
+            <!--1 or more repetitions:-->
+            <msg:PartyId msg:type="?">?</msg:PartyId>
+            <!--Optional:-->
+            <msg:Role>?</msg:Role>
+         </msg:To>
+         <msg:CPAId>?</msg:CPAId>
+         <msg:ConversationId>?</msg:ConversationId>
+         <msg:Service msg:type="?">?</msg:Service>
+         <msg:Action>?</msg:Action>
+         <msg:MessageData>
+            <msg:MessageId>?</msg:MessageId>
+            <msg:Timestamp>?</msg:Timestamp>
+            <!--Optional:-->
+            <msg:RefToMessageId>?</msg:RefToMessageId>
+            <!--Optional:-->
+            <msg:TimeToLive>?</msg:TimeToLive>
+         </msg:MessageData>
+         <!--Optional:-->
+         <msg:DuplicateElimination>?</msg:DuplicateElimination>
+         <!--Zero or more repetitions:-->
+         <msg:Description xml:lang="?">?</msg:Description>
+         <!--You may enter ANY elements at this point-->
+      </msg:MessageHeader>
+   </soapenv:Body>
+</soapenv:Envelope>]]></con:request><con:wsaConfig mustUnderstand="NONE" version="200508" action="ebXML"/></con:call></con:operation></con:interface><con:properties/><con:wssContainer/><con:oAuth2ProfileContainer/></con:soapui-project>
