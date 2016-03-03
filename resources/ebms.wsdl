@@ -470,6 +470,9 @@
 		</xsd:schema>
 	</types>
 
+	<message name="EbMSMSHRequest">
+		<part name="MessageHeader" element="ns1:MessageHeader" />
+	</message>
 	<message name="EbMSRequest">
 		<part name="MessageHeader" element="ns1:MessageHeader" />
 		<part name="Manifest" element="ns1:Manifest" />
@@ -479,6 +482,17 @@
 	</message>
 
 	<portType name="EbMS">
+		<operation name="EbMSMSHRequestSync">
+			<input message="tns:EbMSMSHRequest"/>
+			<output message="tnsEbMSResponse"/>
+		</operation>
+		<operation name="EbMSRequestSync">
+			<input message="tns:EbMSRequest"/>
+			<output message="tnsEbMSResponse"/>
+		</operation>
+		<operation name="EbMSMSHRequest">
+			<input message="tns:EbMSMSHRequest"/>
+		</operation>
 		<operation name="EbMSRequest">
 			<input message="tns:EbMSRequest"/>
 		</operation>
@@ -489,6 +503,27 @@
 
 	<binding name="EbMS" type="tns:EbMS">
 		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http" />
+		<operation name="EbMSMSHRequestSync">
+			<soap:operation soapAction="ebXML" style="document"/>
+			<input>
+				<soap:header part="MessageHeader" use="literal"/>
+			</input>
+			<output><soap:header part="MessageHeader" use="literal"/></output>
+		</operation>
+		<operation name="EbMSRequestSync">
+			<soap:operation soapAction="ebXML" style="document"/>
+			<input>
+				<soap:header part="MessageHeader" use="literal"/>
+				<soap:body parts="Manifest" use="literal" />
+			</input>
+			<output><soap:header part="MessageHeader" use="literal"/></output>
+		</operation>
+		<operation name="EbMSMSHRequest">
+			<soap:operation soapAction="ebXML" style="document"/>
+			<input>
+				<soap:header part="MessageHeader" use="literal"/>
+			</input>
+		</operation>
 		<operation name="EbMSRequest">
 			<soap:operation soapAction="ebXML" style="document"/>
 			<input>

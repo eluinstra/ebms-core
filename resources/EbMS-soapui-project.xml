@@ -1367,7 +1367,7 @@
          </Message>
       </ns:SendMessage>
    </soapenv:Body>
-</soapenv:Envelope>]]></con:request><con:wsaConfig mustUnderstand="NONE" version="200508" action="http://www.ordina.nl/ebms/2.10/EbMSMessageService/SendMessage"/></con:call></con:operation></con:interface><con:interface xsi:type="con:WsdlInterface" id="357d7f75-9c79-41ff-9475-9e6d47f04e19" wsaVersion="NONE" name="EbMS" type="wsdl" bindingName="{http://www.ebms.com/ebms/v2}EbMS" soapVersion="1_1" anonymous="optional" definition="file:/home/edwin/ebms.wsdl" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:settings/><con:definitionCache type="TEXT" rootPart="file:/home/edwin/ebms/ebms-adapter-mule3/resources/ebms.wsdl"><con:part><con:url>file:/home/edwin/ebms/ebms-adapter-mule3/resources/ebms.wsdl</con:url><con:content><![CDATA[<definitions targetNamespace="http://www.ebms.com/ebms/v2" xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:tns="http://www.ebms.com/ebms/v2" xmlns:ns1="http://www.oasis-open.org/committees/ebxml-msg/schema/msg-header-2_0.xsd" xmlns:ns2="http://schemas.xmlsoap.org/soap/http" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+</soapenv:Envelope>]]></con:request><con:wsaConfig mustUnderstand="NONE" version="200508" action="http://www.ordina.nl/ebms/2.10/EbMSMessageService/SendMessage"/></con:call></con:operation></con:interface><con:interface xsi:type="con:WsdlInterface" id="357d7f75-9c79-41ff-9475-9e6d47f04e19" wsaVersion="NONE" name="EbMS" type="wsdl" bindingName="{http://www.ebms.com/ebms/v2}EbMS" soapVersion="1_1" anonymous="optional" definition="/home/edwin/ebms/ebms-adapter-mule3/resources/ebms.wsdl" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:settings/><con:definitionCache type="TEXT" rootPart="file:/home/edwin/ebms/ebms-adapter-mule3/resources/ebms.wsdl"><con:part><con:url>file:/home/edwin/ebms/ebms-adapter-mule3/resources/ebms.wsdl</con:url><con:content><![CDATA[<definitions targetNamespace="http://www.ebms.com/ebms/v2" xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:tns="http://www.ebms.com/ebms/v2" xmlns:ns1="http://www.oasis-open.org/committees/ebxml-msg/schema/msg-header-2_0.xsd" xmlns:ns2="http://schemas.xmlsoap.org/soap/http" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
   <types>
     <xsd:schema attributeFormDefault="unqualified" elementFormDefault="unqualified" targetNamespace="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/1999/xlink" xmlns:xs="http://www.w3.org/2001/XMLSchema">
       <xsd:element name="root" nillable="true" type="xs:anyType"/>
@@ -1836,6 +1836,9 @@
       <xsd:attribute name="version" type="xsd:string"/>
     </xsd:schema>
   </types>
+  <message name="EbMSMSHRequest">
+    <part name="MessageHeader" element="ns1:MessageHeader"/>
+  </message>
   <message name="EbMSRequest">
     <part name="MessageHeader" element="ns1:MessageHeader"/>
     <part name="Manifest" element="ns1:Manifest"/>
@@ -1844,6 +1847,17 @@
     <part name="MessageHeader" element="ns1:MessageHeader"/>
   </message>
   <portType name="EbMS">
+    <operation name="EbMSMSHRequestSync">
+      <input message="tns:EbMSMSHRequest"/>
+      <output message="tnsEbMSResponse"/>
+    </operation>
+    <operation name="EbMSRequestSync">
+      <input message="tns:EbMSRequest"/>
+      <output message="tnsEbMSResponse"/>
+    </operation>
+    <operation name="EbMSMSHRequest">
+      <input message="tns:EbMSMSHRequest"/>
+    </operation>
     <operation name="EbMSRequest">
       <input message="tns:EbMSRequest"/>
     </operation>
@@ -1853,6 +1867,31 @@
   </portType>
   <binding name="EbMS" type="tns:EbMS">
     <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <operation name="EbMSMSHRequestSync">
+      <soap:operation soapAction="ebXML" style="document"/>
+      <input>
+        <soap:header part="MessageHeader" use="literal"/>
+      </input>
+      <output>
+        <soap:header part="MessageHeader" use="literal"/>
+      </output>
+    </operation>
+    <operation name="EbMSRequestSync">
+      <soap:operation soapAction="ebXML" style="document"/>
+      <input>
+        <soap:header part="MessageHeader" use="literal"/>
+        <soap:body parts="Manifest" use="literal"/>
+      </input>
+      <output>
+        <soap:header part="MessageHeader" use="literal"/>
+      </output>
+    </operation>
+    <operation name="EbMSMSHRequest">
+      <soap:operation soapAction="ebXML" style="document"/>
+      <input>
+        <soap:header part="MessageHeader" use="literal"/>
+      </input>
+    </operation>
     <operation name="EbMSRequest">
       <soap:operation soapAction="ebXML" style="document"/>
       <input>
@@ -1872,7 +1911,79 @@
       <soap:address location="http://localhost:8080/ebms"/>
     </port>
   </service>
-</definitions>]]></con:content><con:type>http://schemas.xmlsoap.org/wsdl/</con:type></con:part></con:definitionCache><con:endpoints><con:endpoint>http://localhost:8080/ebms</con:endpoint><con:endpoint>http://localhost:8088/overheidStub</con:endpoint></con:endpoints><con:operation id="1b1a667e-a7dd-48f2-aeb7-5893e47625db" isOneWay="false" action="ebXML" name="EbMSRequest" bindingOperationName="EbMSRequest" type="One-Way" inputName="" sendsAttachments="false" anonymous="optional"><con:settings/><con:call id="0e518749-1bf8-4d9c-ad88-75baf7235460" name="Request Ok"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8088/overheidStub</con:endpoint><con:request><![CDATA[<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:eb="http://www.oasis-open.org/committees/ebxml-msg/schema/msg-header-2_0.xsd" xmlns:ns4="http://www.w3.org/2000/09/xmldsig#" xmlns:xlink="http://www.w3.org/1999/xlink">
+</definitions>]]></con:content><con:type>http://schemas.xmlsoap.org/wsdl/</con:type></con:part></con:definitionCache><con:endpoints><con:endpoint>http://localhost:8080/ebms</con:endpoint><con:endpoint>http://localhost:8088/overheidStub</con:endpoint></con:endpoints><con:operation id="1b1a667e-a7dd-48f2-aeb7-5893e47625db" isOneWay="false" action="ebXML" name="EbMSRequest" bindingOperationName="EbMSRequest" type="One-Way" inputName="" sendsAttachments="false" anonymous="optional"><con:settings/><con:call id="2a4e2aef-30a5-4d47-84fb-b66baa36439e" name="Request 1"><con:settings/><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8080/ebms</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:msg="http://www.oasis-open.org/committees/ebxml-msg/schema/msg-header-2_0.xsd" xmlns:xlin="http://www.w3.org/1999/xlink">
+   <soapenv:Header/>
+   <soapenv:Body>
+      <msg:Manifest msg:id="?" msg:version="?">
+         <!--1 or more repetitions:-->
+         <msg:Reference msg:id="?" xlin:type="?" xlin:href="?" xlin:role="?">
+            <!--Zero or more repetitions:-->
+            <msg:Schema msg:location="?" msg:version="?"/>
+            <!--Zero or more repetitions:-->
+            <msg:Description xml:lang="?">?</msg:Description>
+            <!--You may enter ANY elements at this point-->
+         </msg:Reference>
+         <!--You may enter ANY elements at this point-->
+      </msg:Manifest>
+   </soapenv:Body>
+</soapenv:Envelope>]]></con:request><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508" action="ebXML"/><con:wsrmConfig version="1.2"/></con:call></con:operation><con:operation id="a1c8df05-ec13-4e78-a114-756f259dfb4a" isOneWay="false" action="ebXML" name="EbMSResponse" bindingOperationName="EbMSResponse" type="One-Way" inputName="" sendsAttachments="false" anonymous="optional"><con:settings/><con:call id="8a5a28d8-2c38-432f-b2d4-236e2ce03991" name="Request 1"><con:settings/><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8080/ebms</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:msg="http://www.oasis-open.org/committees/ebxml-msg/schema/msg-header-2_0.xsd">
+   <soapenv:Header/>
+   <soapenv:Body>
+      <msg:MessageHeader msg:id="?" msg:version="?" soapenv:mustUnderstand="?">
+         <msg:From>
+            <!--1 or more repetitions:-->
+            <msg:PartyId msg:type="?">?</msg:PartyId>
+            <!--Optional:-->
+            <msg:Role>?</msg:Role>
+         </msg:From>
+         <msg:To>
+            <!--1 or more repetitions:-->
+            <msg:PartyId msg:type="?">?</msg:PartyId>
+            <!--Optional:-->
+            <msg:Role>?</msg:Role>
+         </msg:To>
+         <msg:CPAId>?</msg:CPAId>
+         <msg:ConversationId>?</msg:ConversationId>
+         <msg:Service msg:type="?">?</msg:Service>
+         <msg:Action>?</msg:Action>
+         <msg:MessageData>
+            <msg:MessageId>?</msg:MessageId>
+            <msg:Timestamp>?</msg:Timestamp>
+            <!--Optional:-->
+            <msg:RefToMessageId>?</msg:RefToMessageId>
+            <!--Optional:-->
+            <msg:TimeToLive>?</msg:TimeToLive>
+         </msg:MessageData>
+         <!--Optional:-->
+         <msg:DuplicateElimination>?</msg:DuplicateElimination>
+         <!--Zero or more repetitions:-->
+         <msg:Description xml:lang="?">?</msg:Description>
+         <!--You may enter ANY elements at this point-->
+      </msg:MessageHeader>
+   </soapenv:Body>
+</soapenv:Envelope>]]></con:request><con:wsaConfig mustUnderstand="NONE" version="200508" action="ebXML"/></con:call></con:operation><con:operation id="6d78932c-9d81-42dc-9206-0d8360b2b673" isOneWay="false" action="ebXML" name="EbMSMSHRequestSync" bindingOperationName="EbMSMSHRequestSync" type="Request-Response" inputName="" receivesAttachments="false" sendsAttachments="false" anonymous="optional"><con:settings/><con:call id="83fd17de-38bb-412f-940a-fbb51a875e86" name="Ping"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8088/overheidStub</con:endpoint><con:request><![CDATA[<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:eb="http://www.oasis-open.org/committees/ebxml-msg/schema/msg-header-2_0.xsd" xmlns:ns4="http://www.w3.org/2000/09/xmldsig#" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <soap:Header>
+        <eb:MessageHeader eb:version="2.0" soap:mustUnderstand="1">
+            <eb:From>
+                <eb:PartyId eb:type="urn:osb:oin">00000000000000000000</eb:PartyId>
+            </eb:From>
+            <eb:To>
+                <eb:PartyId eb:type="urn:osb:oin">00000000000000000001</eb:PartyId>
+            </eb:To>
+            <eb:CPAId>cpaStubEBF.rm.http.unsigned.sync</eb:CPAId>
+            <eb:ConversationId>215dc50d-e4b2-4739-9278-7d00a776c035</eb:ConversationId>
+            <eb:Service>urn:oasis:names:tc:ebxml-msg:service</eb:Service>
+            <eb:Action>Ping</eb:Action>
+            <eb:MessageData>
+                <eb:MessageId>215dc50d-e4b2-4739-9278-7d00a776c035@localhost</eb:MessageId>
+                <eb:Timestamp>2016-03-03T14:33:14Z</eb:Timestamp>
+            </eb:MessageData>
+        </eb:MessageHeader>
+        <eb:SyncReply eb:version="2.0" soap:actor="http://schemas.xmlsoap.org/soap/actor/next" soap:mustUnderstand="1"/>
+    </soap:Header>
+    <soap:Body/>
+</soap:Envelope>
+]]></con:request><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508" action="ebXML"/><con:wsrmConfig version="1.2"/></con:call></con:operation><con:operation id="d6ce61b5-2c68-4156-96a4-b60e2ff8442f" isOneWay="false" action="ebXML" name="EbMSRequestSync" bindingOperationName="EbMSRequestSync" type="Request-Response" inputName="" receivesAttachments="false" sendsAttachments="false" anonymous="optional"><con:settings/><con:call id="db0a8ca2-00f5-4082-90ac-edb92fee6828" name="Request Ok"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8088/overheidStub</con:endpoint><con:request><![CDATA[<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:eb="http://www.oasis-open.org/committees/ebxml-msg/schema/msg-header-2_0.xsd" xmlns:ns4="http://www.w3.org/2000/09/xmldsig#" xmlns:xlink="http://www.w3.org/1999/xlink">
     <soap:Header>
         <eb:MessageHeader eb:version="2.0" soap:mustUnderstand="1">
             <eb:From>
@@ -1902,29 +2013,7 @@
             <eb:Reference xlink:href="cid:ea1b1df9-3cf8-4362-8cb5-06da082dfae5-1@localhost" xlink:type="simple"/>
         </eb:Manifest>
     </soap:Body>
-</soap:Envelope>]]></con:request><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:attachment><con:name>Afleverbericht_Afleveren_ebMS_2.0_v1.1.xml</con:name><con:contentType>text/xml</con:contentType><con:size>1189</con:size><con:contentId>ea1b1df9-3cf8-4362-8cb5-06da082dfae5-1@localhost</con:contentId><con:url>/home/edwin/Downloads/Afleverbericht_Afleveren_ebMS_2.0_v1.1.xml</con:url><con:data>UEsDBBQACAgIAPB8Y0gAAAAAAAAAAAAAAAAqAAAAQWZsZXZlcmJlcmljaHRfQWZsZXZlcmVuX2ViTVNfMi4wX3YxLjEueG1snVTBitswED230H8wvseSs1BKSLwkh5aF3V6SltJLkK2prV1pZCwlcfv1lS3bsb0s2y0YzLx58+Y9S3h9WysZnKEyQuMmjCMaBoCZ5gLzTfjt8HnxKbxNPrxfWzQr9kuCo+6gEllhg9qIlckKUOxeZ8y2AoW15YoQqXNxMhFKwkUuSq0rSyBVhiwjSjoZA9VZZEDiKCbB1mOAR0gf9kdHO55dI6oNDwNn0W13Dv5bv9dwlgeNy+USXW4iXeVkSWlMfjzc79s0C4HGMswgdMHftcmfABVUT0n3XpMx2JNS/11M4yYZF54+ac9meqlpOZmbb2MM25g9Pqv97JzUD1vxyI0FVYLcMsyhJfFkSeOPCxq750Dpqn0i+tNLvTDSKwoOaIUFYXcgXb+ANAXk0BA8A0/KeUj8y2t20ECxv0tIdvuv3camavTJawva4UrLWecZ4pWeE2encYeFPvGrLSUUHBozpWQCiYW6O9KhMVBTaK4ON8iYSqwrIlsP5z9qDQPC7+Jfvv/h282myzoYmFyBq6+x2514lCwHHJnwSAu8JcHbI/xThj7E1dUk1ch/d2knvxkH/wVQSwcIQQDI1bUBAAClBAAAUEsBAhQAFAAICAgA8HxjSEEAyNW1AQAApQQAACoAAAAAAAAAAAAAAAAAAAAAAEFmbGV2ZXJiZXJpY2h0X0FmbGV2ZXJlbl9lYk1TXzIuMF92MS4xLnhtbFBLBQYAAAAAAQABAFgAAAANAgAAAAA=</con:data><con:id>5ff7447b-6c87-49fa-ab9a-5a05a473a4ca</con:id></con:attachment><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508" action="ebXML"/><con:wsrmConfig version="1.2"/></con:call><con:call id="94fe6e80-b9ff-4095-b3cb-02398b6b745d" name="Ping"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8088/overheidStub</con:endpoint><con:request><![CDATA[<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:eb="http://www.oasis-open.org/committees/ebxml-msg/schema/msg-header-2_0.xsd" xmlns:ns4="http://www.w3.org/2000/09/xmldsig#" xmlns:xlink="http://www.w3.org/1999/xlink">
-    <soap:Header>
-        <eb:MessageHeader eb:version="2.0" soap:mustUnderstand="1">
-            <eb:From>
-                <eb:PartyId eb:type="urn:osb:oin">00000000000000000000</eb:PartyId>
-            </eb:From>
-            <eb:To>
-                <eb:PartyId eb:type="urn:osb:oin">00000000000000000001</eb:PartyId>
-            </eb:To>
-            <eb:CPAId>cpaStubEBF.rm.http.unsigned.sync</eb:CPAId>
-            <eb:ConversationId>215dc50d-e4b2-4739-9278-7d00a776c035</eb:ConversationId>
-            <eb:Service>urn:oasis:names:tc:ebxml-msg:service</eb:Service>
-            <eb:Action>Ping</eb:Action>
-            <eb:MessageData>
-                <eb:MessageId>215dc50d-e4b2-4739-9278-7d00a776c035@localhost</eb:MessageId>
-                <eb:Timestamp>2016-03-03T14:33:14Z</eb:Timestamp>
-            </eb:MessageData>
-        </eb:MessageHeader>
-        <eb:SyncReply eb:version="2.0" soap:actor="http://schemas.xmlsoap.org/soap/actor/next" soap:mustUnderstand="1"/>
-    </soap:Header>
-    <soap:Body/>
-</soap:Envelope>
-]]></con:request><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508" action="ebXML"/><con:wsrmConfig version="1.2"/></con:call><con:call id="ff9723a1-708e-41c7-a903-58ec482edba2" name="Request Expired"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8088/overheidStub</con:endpoint><con:request><![CDATA[<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:eb="http://www.oasis-open.org/committees/ebxml-msg/schema/msg-header-2_0.xsd" xmlns:ns4="http://www.w3.org/2000/09/xmldsig#" xmlns:xlink="http://www.w3.org/1999/xlink">
+</soap:Envelope>]]></con:request><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:attachment><con:name>Afleverbericht_Afleveren_ebMS_2.0_v1.1.xml</con:name><con:contentType>text/xml</con:contentType><con:size>1189</con:size><con:contentId>ea1b1df9-3cf8-4362-8cb5-06da082dfae5-1@localhost</con:contentId><con:url>/home/edwin/Downloads/Afleverbericht_Afleveren_ebMS_2.0_v1.1.xml</con:url><con:data>UEsDBBQACAgIAJOCY0gAAAAAAAAAAAAAAAAqAAAAQWZsZXZlcmJlcmljaHRfQWZsZXZlcmVuX2ViTVNfMi4wX3YxLjEueG1snVTBitswED230H8wvseSs1BKSLwkh5aF3V6SltJLkK2prV1pZCwlcfv1lS3bsb0s2y0YzLx58+Y9S3h9WysZnKEyQuMmjCMaBoCZ5gLzTfjt8HnxKbxNPrxfWzQr9kuCo+6gEllhg9qIlckKUOxeZ8y2AoW15YoQqXNxMhFKwkUuSq0rSyBVhiwjSjoZA9VZZEDiKCbB1mOAR0gf9kdHO55dI6oNDwNn0W13Dv5bv9dwlgeNy+USXW4iXeVkSWlMfjzc79s0C4HGMswgdMHftcmfABVUT0n3XpMx2JNS/11M4yYZF54+ac9meqlpOZmbb2MM25g9Pqv97JzUD1vxyI0FVYLcMsyhJfFkSeOPCxq750Dpqn0i+tNLvTDSKwoOaIUFYXcgXb+ANAXk0BA8A0/KeUj8y2t20ECxv0tIdvuv3camavTJawva4UrLWecZ4pWeE2encYeFPvGrLSUUHBozpWQCiYW6O9KhMVBTaK4ON8iYSqwrIlsP5z9qDQPC7+Jfvv/h282myzoYmFyBq6+x2514lCwHHJnwSAu8JcHbI/xThj7E1dUk1ch/d2knvxkH/wVQSwcIQQDI1bUBAAClBAAAUEsBAhQAFAAICAgAk4JjSEEAyNW1AQAApQQAACoAAAAAAAAAAAAAAAAAAAAAAEFmbGV2ZXJiZXJpY2h0X0FmbGV2ZXJlbl9lYk1TXzIuMF92MS4xLnhtbFBLBQYAAAAAAQABAFgAAAANAgAAAAA=</con:data><con:id>9705d4d7-0d9e-449a-9777-229d56a7b320</con:id></con:attachment><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508" action="ebXML"/><con:wsrmConfig version="1.2"/></con:call><con:call id="a34b2b66-19d5-45ac-8711-fda6f3ffdb65" name="Request Expired"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8088/overheidStub</con:endpoint><con:request><![CDATA[<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:eb="http://www.oasis-open.org/committees/ebxml-msg/schema/msg-header-2_0.xsd" xmlns:ns4="http://www.w3.org/2000/09/xmldsig#" xmlns:xlink="http://www.w3.org/1999/xlink">
     <soap:Header>
         <eb:MessageHeader eb:version="2.0" soap:mustUnderstand="1">
             <eb:From>
@@ -1942,7 +2031,7 @@
             <eb:MessageData>
                 <eb:MessageId>ea1b1df9-3cf8-4362-8cb5-06da082dfae5@localhost</eb:MessageId>
                 <eb:Timestamp>2016-03-03T14:38:11Z</eb:Timestamp>
-                <eb:TimeToLive>2015-03-03T15:08:11Z</eb:TimeToLive>
+                <eb:TimeToLive>2016-03-03T15:08:11Z</eb:TimeToLive>
             </eb:MessageData>
             <eb:DuplicateElimination/>
         </eb:MessageHeader>
@@ -1954,7 +2043,7 @@
             <eb:Reference xlink:href="cid:ea1b1df9-3cf8-4362-8cb5-06da082dfae5-1@localhost" xlink:type="simple"/>
         </eb:Manifest>
     </soap:Body>
-</soap:Envelope>]]></con:request><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:attachment><con:name>Afleverbericht_Afleveren_ebMS_2.0_v1.1.xml</con:name><con:contentType>text/xml</con:contentType><con:size>1189</con:size><con:contentId>ea1b1df9-3cf8-4362-8cb5-06da082dfae5-1@localhost</con:contentId><con:data>UEsDBBQACAgIAPB8Y0gAAAAAAAAAAAAAAAAqAAAAQWZsZXZlcmJlcmljaHRfQWZsZXZlcmVuX2ViTVNfMi4wX3YxLjEueG1snVTBitswED230H8wvseSs1BKSLwkh5aF3V6SltJLkK2prV1pZCwlcfv1lS3bsb0s2y0YzLx58+Y9S3h9WysZnKEyQuMmjCMaBoCZ5gLzTfjt8HnxKbxNPrxfWzQr9kuCo+6gEllhg9qIlckKUOxeZ8y2AoW15YoQqXNxMhFKwkUuSq0rSyBVhiwjSjoZA9VZZEDiKCbB1mOAR0gf9kdHO55dI6oNDwNn0W13Dv5bv9dwlgeNy+USXW4iXeVkSWlMfjzc79s0C4HGMswgdMHftcmfABVUT0n3XpMx2JNS/11M4yYZF54+ac9meqlpOZmbb2MM25g9Pqv97JzUD1vxyI0FVYLcMsyhJfFkSeOPCxq750Dpqn0i+tNLvTDSKwoOaIUFYXcgXb+ANAXk0BA8A0/KeUj8y2t20ECxv0tIdvuv3camavTJawva4UrLWecZ4pWeE2encYeFPvGrLSUUHBozpWQCiYW6O9KhMVBTaK4ON8iYSqwrIlsP5z9qDQPC7+Jfvv/h282myzoYmFyBq6+x2514lCwHHJnwSAu8JcHbI/xThj7E1dUk1ch/d2knvxkH/wVQSwcIQQDI1bUBAAClBAAAUEsBAhQAFAAICAgA8HxjSEEAyNW1AQAApQQAACoAAAAAAAAAAAAAAAAAAAAAAEFmbGV2ZXJiZXJpY2h0X0FmbGV2ZXJlbl9lYk1TXzIuMF92MS4xLnhtbFBLBQYAAAAAAQABAFgAAAANAgAAAAA=</con:data><con:id>5ff7447b-6c87-49fa-ab9a-5a05a473a4ca</con:id></con:attachment><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508" action="ebXML"/><con:wsrmConfig version="1.2"/></con:call></con:operation><con:operation id="a1c8df05-ec13-4e78-a114-756f259dfb4a" isOneWay="false" action="ebXML" name="EbMSResponse" bindingOperationName="EbMSResponse" type="One-Way" inputName="" sendsAttachments="false" anonymous="optional"><con:settings/><con:call id="8a5a28d8-2c38-432f-b2d4-236e2ce03991" name="Request 1"><con:settings/><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8080/ebms</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:msg="http://www.oasis-open.org/committees/ebxml-msg/schema/msg-header-2_0.xsd">
+</soap:Envelope>]]></con:request><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:attachment><con:name>Afleverbericht_Afleveren_ebMS_2.0_v1.1.xml</con:name><con:contentType>text/xml</con:contentType><con:size>1189</con:size><con:contentId>ea1b1df9-3cf8-4362-8cb5-06da082dfae5-1@localhost</con:contentId><con:data>UEsDBBQACAgIAJOCY0gAAAAAAAAAAAAAAAAqAAAAQWZsZXZlcmJlcmljaHRfQWZsZXZlcmVuX2ViTVNfMi4wX3YxLjEueG1snVTBitswED230H8wvseSs1BKSLwkh5aF3V6SltJLkK2prV1pZCwlcfv1lS3bsb0s2y0YzLx58+Y9S3h9WysZnKEyQuMmjCMaBoCZ5gLzTfjt8HnxKbxNPrxfWzQr9kuCo+6gEllhg9qIlckKUOxeZ8y2AoW15YoQqXNxMhFKwkUuSq0rSyBVhiwjSjoZA9VZZEDiKCbB1mOAR0gf9kdHO55dI6oNDwNn0W13Dv5bv9dwlgeNy+USXW4iXeVkSWlMfjzc79s0C4HGMswgdMHftcmfABVUT0n3XpMx2JNS/11M4yYZF54+ac9meqlpOZmbb2MM25g9Pqv97JzUD1vxyI0FVYLcMsyhJfFkSeOPCxq750Dpqn0i+tNLvTDSKwoOaIUFYXcgXb+ANAXk0BA8A0/KeUj8y2t20ECxv0tIdvuv3camavTJawva4UrLWecZ4pWeE2encYeFPvGrLSUUHBozpWQCiYW6O9KhMVBTaK4ON8iYSqwrIlsP5z9qDQPC7+Jfvv/h282myzoYmFyBq6+x2514lCwHHJnwSAu8JcHbI/xThj7E1dUk1ch/d2knvxkH/wVQSwcIQQDI1bUBAAClBAAAUEsBAhQAFAAICAgAk4JjSEEAyNW1AQAApQQAACoAAAAAAAAAAAAAAAAAAAAAAEFmbGV2ZXJiZXJpY2h0X0FmbGV2ZXJlbl9lYk1TXzIuMF92MS4xLnhtbFBLBQYAAAAAAQABAFgAAAANAgAAAAA=</con:data><con:id>9705d4d7-0d9e-449a-9777-229d56a7b320</con:id></con:attachment><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508" action="ebXML"/><con:wsrmConfig version="1.2"/></con:call></con:operation><con:operation id="37749961-fef0-4b64-8234-2dd1ef024ad1" isOneWay="false" action="ebXML" name="EbMSMSHRequest" bindingOperationName="EbMSMSHRequest" type="One-Way" inputName="" sendsAttachments="false" anonymous="optional"><con:settings/><con:call id="87674421-c926-4e6e-a504-f6987d1812d0" name="Request 1"><con:settings/><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8080/ebms</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:msg="http://www.oasis-open.org/committees/ebxml-msg/schema/msg-header-2_0.xsd">
    <soapenv:Header/>
    <soapenv:Body>
       <msg:MessageHeader msg:id="?" msg:version="?" soapenv:mustUnderstand="?">
