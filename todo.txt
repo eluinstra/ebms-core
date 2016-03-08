@@ -1,2 +1,3 @@
+- implement ack Signature validation
 - implement packaging
 - implement message ordering
