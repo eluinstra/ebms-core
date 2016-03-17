@@ -119,7 +119,7 @@ public class MessageHeaderValidator
 				throw new EbMSValidationException(EbMSMessageUtils.createError("//Header/AckRequested[@signed]",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Wrong value."));
 
 			if (!checkSyncReply(deliveryChannel,syncReply))
-				throw new EbMSValidationException(EbMSMessageUtils.createError("//Header/SyncReply",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Wrong value."));
+				throw new EbMSSyncReplyException(EbMSMessageUtils.createError("//Header/SyncReply",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Wrong value."));
 			if (syncReply != null && !Constants.EBMS_VERSION.equals(syncReply.getVersion()))
 				throw new EbMSValidationException(EbMSMessageUtils.createError("//Header/SyncReply[@version]",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Invalid value."));
 			if (syncReply != null && syncReply.getActor() != null && !syncReply.getActor().equals(Constants.NSURI_SOAP_NEXT_ACTOR))
@@ -226,8 +226,8 @@ public class MessageHeaderValidator
 
 	private boolean checkSyncReply(DeliveryChannel deliveryChannel, SyncReply syncReply)
 	{
-		return !((deliveryChannel.getMessagingCharacteristics().getSyncReplyMode() == null || deliveryChannel.getMessagingCharacteristics().getSyncReplyMode().equals(SyncReplyModeType.NONE))
-				&& syncReply != null);
+		return ((deliveryChannel.getMessagingCharacteristics().getSyncReplyMode() == null || deliveryChannel.getMessagingCharacteristics().getSyncReplyMode().equals(SyncReplyModeType.NONE)) && syncReply == null)
+				|| ((deliveryChannel.getMessagingCharacteristics().getSyncReplyMode() != null && !deliveryChannel.getMessagingCharacteristics().getSyncReplyMode().equals(SyncReplyModeType.NONE)) && syncReply != null);
 	}
 	
 	private boolean checkActor(DeliveryChannel deliveryChannel, Acknowledgment acknowledgment)

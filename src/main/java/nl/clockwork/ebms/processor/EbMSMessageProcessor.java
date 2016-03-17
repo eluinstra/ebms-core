@@ -48,6 +48,7 @@ import nl.clockwork.ebms.signing.EbMSSignatureValidator;
 import nl.clockwork.ebms.util.CPAUtils;
 import nl.clockwork.ebms.util.EbMSMessageUtils;
 import nl.clockwork.ebms.validation.CPAValidator;
+import nl.clockwork.ebms.validation.EbMSSyncReplyException;
 import nl.clockwork.ebms.validation.EbMSValidationException;
 import nl.clockwork.ebms.validation.ManifestValidator;
 import nl.clockwork.ebms.validation.MessageHeaderValidator;
@@ -310,7 +311,7 @@ public class EbMSMessageProcessor implements InitializingBean
 					return message.getSyncReply() == null ? null : new EbMSDocument(acknowledgment.getContentId(),acknowledgment.getMessage());
 				}
 			}
-			catch (EbMSValidationException e)
+			catch (final EbMSValidationException e)
 			{
 				logger.warn("Message " + message.getMessageHeader().getMessageData().getMessageId() + " invalid.\n" + e.getMessage());
 				ErrorList errorList = EbMSMessageUtils.createErrorList();
@@ -326,12 +327,15 @@ public class EbMSMessageProcessor implements InitializingBean
 						{
 							ebMSDAO.insertMessage(timestamp,message,EbMSMessageStatus.FAILED);
 							ebMSDAO.insertMessage(timestamp,messageError,null);
-							if (message.getSyncReply() == null)
+							if (!(e instanceof EbMSSyncReplyException) && message.getSyncReply() == null)
 								eventManager.createEvent(cpaId,cpaManager.getToDeliveryChannel(cpaId,new CacheablePartyId(messageError.getMessageHeader().getTo().getPartyId()),messageError.getMessageHeader().getTo().getRole(),CPAUtils.toString(messageError.getMessageHeader().getService()),messageError.getMessageHeader().getAction()).getChannelId(),messageError.getMessageHeader().getMessageData().getMessageId(),messageError.getMessageHeader().getMessageData().getTimeToLive(),messageError.getMessageHeader().getMessageData().getTimestamp(),false);
 						}
 					}
 				);
-				return message.getSyncReply() == null ? null : new EbMSDocument(messageError.getContentId(),messageError.getMessage());
+				if (e instanceof EbMSSyncReplyException)
+					return message.getSyncReply() != null ? null : new EbMSDocument(messageError.getContentId(),messageError.getMessage());
+				else
+					return message.getSyncReply() == null ? null : new EbMSDocument(messageError.getContentId(),messageError.getMessage());
 			}
 		}
 	}
