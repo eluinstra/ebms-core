@@ -2,6 +2,9 @@
 <definitions xmlns="http://schemas.xmlsoap.org/wsdl/" targetNamespace="http://www.ebms.com/ebms/v2" xmlns:tns="http://www.ebms.com/ebms/v2" xmlns:ns1="http://www.oasis-open.org/committees/ebxml-msg/schema/msg-header-2_0.xsd" xmlns:ns2="http://schemas.xmlsoap.org/soap/http" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
 
 	<types>
+		<xsd:schema>
+			<xsd:import namespace="http://www.w3.org/XML/1998/namespace" schemaLocation="http://www.w3.org/2001/xml.xsd"/>
+		</xsd:schema>
 		<xsd:schema attributeFormDefault="unqualified" elementFormDefault="unqualified" targetNamespace="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/1999/xlink" xmlns:xs="http://www.w3.org/2001/XMLSchema">
 			<xsd:element name="root" nillable="true" type="xs:anyType" />
 			<xsd:attribute name="href" type="xs:anyURI" />
@@ -484,11 +487,11 @@
 	<portType name="EbMS">
 		<operation name="EbMSMSHRequestSync">
 			<input message="tns:EbMSMSHRequest"/>
-			<output message="tnsEbMSResponse"/>
+			<output message="tns:EbMSResponse"/>
 		</operation>
 		<operation name="EbMSRequestSync">
 			<input message="tns:EbMSRequest"/>
-			<output message="tnsEbMSResponse"/>
+			<output message="tns:EbMSResponse"/>
 		</operation>
 		<operation name="EbMSMSHRequest">
 			<input message="tns:EbMSMSHRequest"/>
@@ -506,34 +509,34 @@
 		<operation name="EbMSMSHRequestSync">
 			<soap:operation soapAction="ebXML" style="document"/>
 			<input>
-				<soap:header part="MessageHeader" use="literal"/>
+				<soap:header part="MessageHeader" message="tns:EbMSMSHRequest" use="literal"/>
 			</input>
-			<output><soap:header part="MessageHeader" use="literal"/></output>
+			<output><soap:header part="MessageHeader" message="tns:EbMSResponse" use="literal"/></output>
 		</operation>
 		<operation name="EbMSRequestSync">
 			<soap:operation soapAction="ebXML" style="document"/>
 			<input>
-				<soap:header part="MessageHeader" use="literal"/>
+				<soap:header part="MessageHeader" message="tns:EbMSRequest" use="literal"/>
 				<soap:body parts="Manifest" use="literal" />
 			</input>
-			<output><soap:header part="MessageHeader" use="literal"/></output>
+			<output><soap:header part="MessageHeader" message="tns:EbMSResponse" use="literal"/></output>
 		</operation>
 		<operation name="EbMSMSHRequest">
 			<soap:operation soapAction="ebXML" style="document"/>
 			<input>
-				<soap:header part="MessageHeader" use="literal"/>
+				<soap:header part="MessageHeader" message="tns:EbMSMSHRequest" use="literal"/>
 			</input>
 		</operation>
 		<operation name="EbMSRequest">
 			<soap:operation soapAction="ebXML" style="document"/>
 			<input>
-				<soap:header part="MessageHeader" use="literal"/>
+				<soap:header part="MessageHeader" message="tns:EbMSRequest" use="literal"/>
 				<soap:body parts="Manifest" use="literal" />
 			</input>
 		</operation>
 		<operation name="EbMSResponse">
 			<soap:operation soapAction="ebXML" style="document"/>
-			<input><soap:header part="MessageHeader" use="literal"/></input>
+			<input><soap:header part="MessageHeader" message="tns:EbMSResponse" use="literal"/></input>
 		</operation>
 	</binding>
 
