@@ -265,7 +265,10 @@ public class EbMSMessageProcessorX extends EbMSMessageProcessor implements Initi
 	private void processMessageError(String cpaId, final Date timestamp, final EbMSMessage requestMessage, final EbMSMessage responseMessage)
 	{
 		if (isDuplicateMessage(responseMessage))
+		{
+			logger.warn("MessageError " + responseMessage.getMessageHeader().getMessageData().getMessageId() + " is duplicate!");
 			ebMSDAO.insertDuplicateMessage(timestamp,responseMessage);
+		}
 		else
 		{
 			try
@@ -296,7 +299,10 @@ public class EbMSMessageProcessorX extends EbMSMessageProcessor implements Initi
 	private void processAcknowledgment(String cpaId, final Date timestamp, final EbMSMessage requestMessage, final EbMSMessage responseMessage)
 	{
 		if (isDuplicateMessage(responseMessage))
+		{
+			logger.warn("Acknowledgment " + responseMessage.getMessageHeader().getMessageData().getMessageId() + " is duplicate!");
 			ebMSDAO.insertDuplicateMessage(timestamp,responseMessage);
+		}
 		else
 		{
 			try
