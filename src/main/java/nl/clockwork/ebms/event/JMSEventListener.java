@@ -72,16 +72,6 @@ public class JMSEventListener implements EventListener
 	}
 
 	@Override
-	public void onMessageSent(String messageId) throws EventException
-	{
-	}
-
-	@Override
-	public void onSendingMessageFailed(String messageId)
-	{
-	}
-
-	@Override
 	public void onMessageAcknowledged(String messageId) throws EventException
 	{
 		logger.info("Message " + messageId + " acknowledged");

@@ -29,18 +29,6 @@ public class LoggingEventListener implements EventListener
 	}
 
 	@Override
-	public void onMessageSent(String messageId) throws EventException
-	{
-		logger.info("Message " + messageId + " sent");
-	}
-
-	@Override
-	public void onSendingMessageFailed(String messageId)
-	{
-		logger.info("Sending message " + messageId + " failed");
-	}
-
-	@Override
 	public void onMessageAcknowledged(String messageId) throws EventException
 	{
 		logger.info("Message " + messageId + " acknowledged");

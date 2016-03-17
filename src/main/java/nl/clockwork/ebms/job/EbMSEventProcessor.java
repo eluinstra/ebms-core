@@ -79,7 +79,6 @@ public class EbMSEventProcessor implements InitializingBean, Job
 						url = CPAUtils.getUri(deliveryChannel);
 					logger.info("Sending message " + event.getMessageId() + " to " + url);
 					EbMSDocument responseDocument = ebMSClient.sendMessage(url,requestDocument);
-					eventListener.onMessageSent(event.getMessageId());
 					messageProcessor.processResponse(requestDocument,responseDocument);
 					eventManager.updateEvent(event,url,EbMSEventStatus.SUCCEEDED);
 				}
@@ -102,8 +101,6 @@ public class EbMSEventProcessor implements InitializingBean, Job
 								ebMSDAO.updateMessage(event.getMessageId(),EbMSMessageStatus.SENT,EbMSMessageStatus.DELIVERY_FAILED);
 								eventListener.onMessageFailed(event.getMessageId());
 							}
-							else
-								eventListener.onSendingMessageFailed(event.getMessageId());
 						}
 					}
 				);
@@ -112,7 +109,6 @@ public class EbMSEventProcessor implements InitializingBean, Job
 			{
 				logger.error("",e);
 				eventManager.updateEvent(event,url,EbMSEventStatus.FAILED,ExceptionUtils.getStackTrace(e));
-				eventListener.onSendingMessageFailed(event.getMessageId());
 			}
 		}
 
