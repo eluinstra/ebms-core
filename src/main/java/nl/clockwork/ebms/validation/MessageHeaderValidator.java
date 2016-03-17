@@ -47,7 +47,7 @@ import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.SyncReply;
 public class MessageHeaderValidator
 {
   protected transient Log logger = LogFactory.getLog(getClass());
-	private PerMessageCharacteristicsType ackSignatureRequested;// = PerMessageCharacteristicsType.NEVER;
+	private PerMessageCharacteristicsType ackSignatureRequested;
 	private EbMSDAO ebMSDAO;
 	private CPAManager cpaManager;
 
@@ -227,7 +227,7 @@ public class MessageHeaderValidator
 	private boolean checkSyncReply(DeliveryChannel deliveryChannel, SyncReply syncReply)
 	{
 		return ((deliveryChannel.getMessagingCharacteristics().getSyncReplyMode() == null || deliveryChannel.getMessagingCharacteristics().getSyncReplyMode().equals(SyncReplyModeType.NONE)) && syncReply == null)
-				|| ((deliveryChannel.getMessagingCharacteristics().getSyncReplyMode() != null && !deliveryChannel.getMessagingCharacteristics().getSyncReplyMode().equals(SyncReplyModeType.NONE)) && syncReply != null);
+				|| (deliveryChannel.getMessagingCharacteristics().getSyncReplyMode() != null && !deliveryChannel.getMessagingCharacteristics().getSyncReplyMode().equals(SyncReplyModeType.NONE) && syncReply != null);
 	}
 	
 	private boolean checkActor(DeliveryChannel deliveryChannel, Acknowledgment acknowledgment)
@@ -238,7 +238,6 @@ public class MessageHeaderValidator
 
 	private void compare(List<PartyId> requestPartyIds, List<PartyId> responsePartyIds) throws ValidationException
 	{
-		//TODO improvement: use CPA to validate partyIds?
 		for (PartyId requestPartyId : requestPartyIds)
 			for (PartyId responsePartyId : responsePartyIds)
 				if (EbMSMessageUtils.toString(requestPartyId).equals(EbMSMessageUtils.toString(responsePartyId)))
