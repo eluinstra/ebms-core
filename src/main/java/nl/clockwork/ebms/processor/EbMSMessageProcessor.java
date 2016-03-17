@@ -253,6 +253,8 @@ public class EbMSMessageProcessor implements InitializingBean
 							EbMSMessageContext messageContext = ebMSDAO.getMessageContextByRefToMessageId(cpaId,messageHeader.getMessageData().getMessageId(),mshMessageService,EbMSAction.MESSAGE_ERROR.action(),EbMSAction.ACKNOWLEDGMENT.action());
 							if (messageContext != null)
 								eventManager.createEvent(cpaId,cpaManager.getToDeliveryChannel(cpaId,new CacheablePartyId(message.getMessageHeader().getFrom().getPartyId()),message.getMessageHeader().getFrom().getRole(),CPAUtils.toString(CPAUtils.createEbMSMessageService()),null).getChannelId(),messageContext.getMessageId(),message.getMessageHeader().getMessageData().getTimeToLive(),messageContext.getTimestamp(),false);
+							else
+								logger.warn("No response found for duplicate message " + message.getMessageHeader().getMessageData().getMessageId() + "!");
 						}
 					}
 				);
@@ -261,7 +263,10 @@ public class EbMSMessageProcessor implements InitializingBean
 			else
 			{
 				ebMSDAO.insertDuplicateMessage(timestamp,message);
-				return ebMSDAO.getEbMSDocumentByRefToMessageId(cpaId,messageHeader.getMessageData().getMessageId(),mshMessageService,EbMSAction.MESSAGE_ERROR.action(),EbMSAction.ACKNOWLEDGMENT.action());
+				EbMSDocument result = ebMSDAO.getEbMSDocumentByRefToMessageId(cpaId,messageHeader.getMessageData().getMessageId(),mshMessageService,EbMSAction.MESSAGE_ERROR.action(),EbMSAction.ACKNOWLEDGMENT.action());
+				if (result == null)
+					logger.warn("No response found for duplicate message " + message.getMessageHeader().getMessageData().getMessageId() + "!");
+				return result;
 			}
 		}
 		else
