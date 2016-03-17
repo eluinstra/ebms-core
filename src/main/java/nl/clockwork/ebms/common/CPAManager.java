@@ -41,6 +41,7 @@ import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.PartyInfo;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.PersistenceLevelType;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.ServiceBinding;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.StatusValueType;
+import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.SyncReplyModeType;
 
 public class CPAManager
 {
@@ -272,6 +273,12 @@ public class CPAManager
 		if (StringUtils.isEmpty(result))
 			result = CPAUtils.getUri(getToDeliveryChannel(cpaId,partyId,role,service,action));
 		return result;
+	}
+
+	public SyncReplyModeType getSyncReply(String cpaId, CacheablePartyId partyId, String role, String service, String action)
+	{
+		DeliveryChannel deliveryChannel = getFromDeliveryChannel(cpaId,partyId,role,service,action);
+		return deliveryChannel.getMessagingCharacteristics().getSyncReplyMode();
 	}
 
 	private void flushCPAMethodCache(String cpaId)
