@@ -79,6 +79,7 @@ public class EbMSEventProcessor implements InitializingBean, Job
 						url = CPAUtils.getUri(deliveryChannel);
 					logger.info("Sending message " + event.getMessageId() + " to " + url);
 					EbMSDocument responseDocument = ebMSClient.sendMessage(url,requestDocument);
+					eventListener.onMessageSent(event.getMessageId());
 					messageProcessor.processResponse(requestDocument,responseDocument);
 					eventManager.updateEvent(event,url,EbMSEventStatus.SUCCEEDED);
 				}
@@ -87,6 +88,7 @@ public class EbMSEventProcessor implements InitializingBean, Job
 			}
 			catch (final EbMSResponseException e)
 			{
+				logger.error("",e);
 				final String url_ = url;
 				ebMSDAO.executeTransaction(
 					new DAOTransactionCallback()
@@ -100,15 +102,17 @@ public class EbMSEventProcessor implements InitializingBean, Job
 								ebMSDAO.updateMessage(event.getMessageId(),EbMSMessageStatus.SENT,EbMSMessageStatus.DELIVERY_FAILED);
 								eventListener.onMessageFailed(event.getMessageId());
 							}
+							else
+								eventListener.onSendingMessageFailed(event.getMessageId());
 						}
 					}
 				);
-				logger.error("",e);
 			}
 			catch (Exception e)
 			{
-				eventManager.updateEvent(event,url,EbMSEventStatus.FAILED,ExceptionUtils.getStackTrace(e));
 				logger.error("",e);
+				eventManager.updateEvent(event,url,EbMSEventStatus.FAILED,ExceptionUtils.getStackTrace(e));
+				eventListener.onSendingMessageFailed(event.getMessageId());
 			}
 		}
 
