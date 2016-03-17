@@ -124,7 +124,7 @@ public class EbMSMessageProcessor implements InitializingBean
 			}
 			if (!Constants.EBMS_SERVICE_URI.equals(message.getMessageHeader().getService().getValue()))
 			{
-				return process(message.getMessageHeader().getCPAId(),timestamp,message);
+				return process(timestamp,message);
 			}
 			else if (EbMSAction.MESSAGE_ERROR.action().equals(message.getMessageHeader().getAction()))
 			{
@@ -139,13 +139,13 @@ public class EbMSMessageProcessor implements InitializingBean
 			else if (EbMSAction.STATUS_REQUEST.action().equals(message.getMessageHeader().getAction()))
 			{
 				EbMSMessage response = processStatusRequest(message.getMessageHeader().getCPAId(),timestamp,message);
-				if (isAsyncReply(message.getMessageHeader().getCPAId(),message))
+				if (isSyncReply(message))
+					return EbMSMessageUtils.getEbMSDocument(response);
+				else
 				{
 					deliveryManager.sendResponseMessage(cpaManager.getUri(response.getMessageHeader().getCPAId(),new CacheablePartyId(response.getMessageHeader().getTo().getPartyId()),response.getMessageHeader().getTo().getRole(),CPAUtils.toString(response.getMessageHeader().getService()),response.getMessageHeader().getAction()),response);
 					return null;
 				}
-				else
-					return EbMSMessageUtils.getEbMSDocument(response);
 			}
 			else if (EbMSAction.STATUS_RESPONSE.action().equals(message.getMessageHeader().getAction()))
 			{
@@ -155,13 +155,13 @@ public class EbMSMessageProcessor implements InitializingBean
 			else if (EbMSAction.PING.action().equals(message.getMessageHeader().getAction()))
 			{
 				EbMSMessage response = processPing(message.getMessageHeader().getCPAId(),timestamp,message);
-				if (isAsyncReply(message.getMessageHeader().getCPAId(),message))
+				if (isSyncReply(message))
+					return EbMSMessageUtils.getEbMSDocument(response);
+				else
 				{
 					deliveryManager.sendResponseMessage(cpaManager.getUri(response.getMessageHeader().getCPAId(),new CacheablePartyId(response.getMessageHeader().getTo().getPartyId()),response.getMessageHeader().getTo().getRole(),CPAUtils.toString(response.getMessageHeader().getService()),response.getMessageHeader().getAction()),response);
 					return null;
 				}
-				else
-					return EbMSMessageUtils.getEbMSDocument(response);
 			}
 			else if (EbMSAction.PONG.action().equals(message.getMessageHeader().getAction()))
 			{
@@ -200,7 +200,7 @@ public class EbMSMessageProcessor implements InitializingBean
 						process(timestamp,responseMessage,EbMSMessageStatus.DELIVERY_FAILED);
 					else if (EbMSAction.ACKNOWLEDGMENT.action().equals(responseMessage.getMessageHeader().getAction()))
 					{
-						if (requestMessage.getAckRequested() == null || isAsyncReply(requestMessage.getMessageHeader().getCPAId(),requestMessage))
+						if (requestMessage.getAckRequested() == null || !isSyncReply(requestMessage))
 							throw new EbMSProcessingException("No response expected for message " + requestMessage.getMessageHeader().getMessageData().getMessageId() + "\n" + DOMUtils.toString(response.getMessage()));
 						process(timestamp,responseMessage,EbMSMessageStatus.DELIVERED);
 					}
@@ -235,13 +235,21 @@ public class EbMSMessageProcessor implements InitializingBean
 		}
 	}
 	
-	protected EbMSDocument process(final String cpaId, final Date timestamp, final EbMSMessage message) throws DAOException, ValidatorException, DatatypeConfigurationException, JAXBException, SOAPException, ParserConfigurationException, SAXException, IOException, TransformerFactoryConfigurationError, TransformerException, EbMSProcessorException
+	protected EbMSDocument process(final Date timestamp, final EbMSMessage message) throws DAOException, ValidatorException, DatatypeConfigurationException, JAXBException, SOAPException, ParserConfigurationException, SAXException, IOException, TransformerFactoryConfigurationError, TransformerException, EbMSProcessorException
 	{
 		final MessageHeader messageHeader = message.getMessageHeader();
 		if (isDuplicateMessage(message))
 		{
 			logger.warn("Message " + message.getMessageHeader().getMessageData().getMessageId() + " is duplicate!");
-			if (isAsyncReply(cpaId,message))
+			if (isSyncReply(message))
+			{
+				ebMSDAO.insertDuplicateMessage(timestamp,message);
+				EbMSDocument result = ebMSDAO.getEbMSDocumentByRefToMessageId(messageHeader.getCPAId(),messageHeader.getMessageData().getMessageId(),mshMessageService,EbMSAction.MESSAGE_ERROR.action(),EbMSAction.ACKNOWLEDGMENT.action());
+				if (result == null)
+					logger.warn("No response found for duplicate message " + message.getMessageHeader().getMessageData().getMessageId() + "!");
+				return result;
+			}
+			else
 			{
 				ebMSDAO.executeTransaction(
 					new DAOTransactionCallback()
@@ -250,23 +258,15 @@ public class EbMSMessageProcessor implements InitializingBean
 						public void doInTransaction()
 						{
 							ebMSDAO.insertDuplicateMessage(timestamp,message);
-							EbMSMessageContext messageContext = ebMSDAO.getMessageContextByRefToMessageId(cpaId,messageHeader.getMessageData().getMessageId(),mshMessageService,EbMSAction.MESSAGE_ERROR.action(),EbMSAction.ACKNOWLEDGMENT.action());
+							EbMSMessageContext messageContext = ebMSDAO.getMessageContextByRefToMessageId(messageHeader.getCPAId(),messageHeader.getMessageData().getMessageId(),mshMessageService,EbMSAction.MESSAGE_ERROR.action(),EbMSAction.ACKNOWLEDGMENT.action());
 							if (messageContext != null)
-								eventManager.createEvent(cpaId,cpaManager.getToDeliveryChannel(cpaId,new CacheablePartyId(message.getMessageHeader().getFrom().getPartyId()),message.getMessageHeader().getFrom().getRole(),CPAUtils.toString(CPAUtils.createEbMSMessageService()),null).getChannelId(),messageContext.getMessageId(),message.getMessageHeader().getMessageData().getTimeToLive(),messageContext.getTimestamp(),false);
+								eventManager.createEvent(messageHeader.getCPAId(),cpaManager.getToDeliveryChannel(messageHeader.getCPAId(),new CacheablePartyId(message.getMessageHeader().getFrom().getPartyId()),message.getMessageHeader().getFrom().getRole(),CPAUtils.toString(CPAUtils.createEbMSMessageService()),null).getChannelId(),messageContext.getMessageId(),message.getMessageHeader().getMessageData().getTimeToLive(),messageContext.getTimestamp(),false);
 							else
 								logger.warn("No response found for duplicate message " + message.getMessageHeader().getMessageData().getMessageId() + "!");
 						}
 					}
 				);
 				return null;
-			}
-			else
-			{
-				ebMSDAO.insertDuplicateMessage(timestamp,message);
-				EbMSDocument result = ebMSDAO.getEbMSDocumentByRefToMessageId(cpaId,messageHeader.getMessageData().getMessageId(),mshMessageService,EbMSAction.MESSAGE_ERROR.action(),EbMSAction.ACKNOWLEDGMENT.action());
-				if (result == null)
-					logger.warn("No response found for duplicate message " + message.getMessageHeader().getMessageData().getMessageId() + "!");
-				return result;
 			}
 		}
 		else
@@ -296,7 +296,7 @@ public class EbMSMessageProcessor implements InitializingBean
 				}
 				else
 				{
-					final EbMSMessage acknowledgment = ebMSMessageFactory.createEbMSAcknowledgment(cpaId,message,timestamp);
+					final EbMSMessage acknowledgment = ebMSMessageFactory.createEbMSAcknowledgment(messageHeader.getCPAId(),message,timestamp);
 					signatureGenerator.generate(message.getAckRequested(),acknowledgment);
 					ebMSDAO.executeTransaction(
 						new DAOTransactionCallback()
@@ -306,13 +306,13 @@ public class EbMSMessageProcessor implements InitializingBean
 							{
 								ebMSDAO.insertMessage(timestamp,message,EbMSMessageStatus.RECEIVED);
 								ebMSDAO.insertMessage(timestamp,acknowledgment,null);
-								if (isAsyncReply(cpaId,message))
-									eventManager.createEvent(cpaId,cpaManager.getToDeliveryChannel(cpaId,new CacheablePartyId(acknowledgment.getMessageHeader().getTo().getPartyId()),acknowledgment.getMessageHeader().getTo().getRole(),CPAUtils.toString(acknowledgment.getMessageHeader().getService()),acknowledgment.getMessageHeader().getAction()).getChannelId(),acknowledgment.getMessageHeader().getMessageData().getMessageId(),acknowledgment.getMessageHeader().getMessageData().getTimeToLive(),acknowledgment.getMessageHeader().getMessageData().getTimestamp(),false);
+								if (!isSyncReply(message))
+									eventManager.createEvent(messageHeader.getCPAId(),cpaManager.getToDeliveryChannel(messageHeader.getCPAId(),new CacheablePartyId(acknowledgment.getMessageHeader().getTo().getPartyId()),acknowledgment.getMessageHeader().getTo().getRole(),CPAUtils.toString(acknowledgment.getMessageHeader().getService()),acknowledgment.getMessageHeader().getAction()).getChannelId(),acknowledgment.getMessageHeader().getMessageData().getMessageId(),acknowledgment.getMessageHeader().getMessageData().getTimeToLive(),acknowledgment.getMessageHeader().getMessageData().getTimestamp(),false);
 								eventListener.onMessageReceived(message.getMessageHeader().getMessageData().getMessageId());
 							}
 						}
 					);
-					return isAsyncReply(cpaId,message) ? null : new EbMSDocument(acknowledgment.getContentId(),acknowledgment.getMessage());
+					return isSyncReply(message) ? new EbMSDocument(acknowledgment.getContentId(),acknowledgment.getMessage()) : null;
 				}
 			}
 			catch (final EbMSValidationException e)
@@ -320,7 +320,7 @@ public class EbMSMessageProcessor implements InitializingBean
 				logger.warn("Message " + message.getMessageHeader().getMessageData().getMessageId() + " invalid.\n" + e.getMessage());
 				ErrorList errorList = EbMSMessageUtils.createErrorList();
 				errorList.getError().add(e.getError());
-				final EbMSMessage messageError = ebMSMessageFactory.createEbMSMessageError(cpaId,message,errorList,timestamp);
+				final EbMSMessage messageError = ebMSMessageFactory.createEbMSMessageError(messageHeader.getCPAId(),message,errorList,timestamp);
 				Document document = EbMSMessageUtils.createSOAPMessage(messageError);
 				messageError.setMessage(document);
 				ebMSDAO.executeTransaction(
@@ -331,26 +331,26 @@ public class EbMSMessageProcessor implements InitializingBean
 						{
 							ebMSDAO.insertMessage(timestamp,message,EbMSMessageStatus.FAILED);
 							ebMSDAO.insertMessage(timestamp,messageError,null);
-							if (isAsyncReply(cpaId,message))
-								eventManager.createEvent(cpaId,cpaManager.getToDeliveryChannel(cpaId,new CacheablePartyId(messageError.getMessageHeader().getTo().getPartyId()),messageError.getMessageHeader().getTo().getRole(),CPAUtils.toString(messageError.getMessageHeader().getService()),messageError.getMessageHeader().getAction()).getChannelId(),messageError.getMessageHeader().getMessageData().getMessageId(),messageError.getMessageHeader().getMessageData().getTimeToLive(),messageError.getMessageHeader().getMessageData().getTimestamp(),false);
+							if (!isSyncReply(message))
+								eventManager.createEvent(messageHeader.getCPAId(),cpaManager.getToDeliveryChannel(messageHeader.getCPAId(),new CacheablePartyId(messageError.getMessageHeader().getTo().getPartyId()),messageError.getMessageHeader().getTo().getRole(),CPAUtils.toString(messageError.getMessageHeader().getService()),messageError.getMessageHeader().getAction()).getChannelId(),messageError.getMessageHeader().getMessageData().getMessageId(),messageError.getMessageHeader().getMessageData().getTimeToLive(),messageError.getMessageHeader().getMessageData().getTimestamp(),false);
 						}
 					}
 				);
-				return isAsyncReply(cpaId,message) ? null : new EbMSDocument(messageError.getContentId(),messageError.getMessage());
+				return isSyncReply(message) ? new EbMSDocument(messageError.getContentId(),messageError.getMessage()) : null;
 			}
 		}
 	}
 
-	protected boolean isAsyncReply(String cpaId, EbMSMessage message)
+	protected boolean isSyncReply(EbMSMessage message)
 	{
 		try
 		{
-			SyncReplyModeType syncReply = cpaManager.getSyncReply(cpaId,new CacheablePartyId(message.getMessageHeader().getFrom().getPartyId()),message.getMessageHeader().getFrom().getRole(),CPAUtils.toString(message.getMessageHeader().getService()),message.getMessageHeader().getAction());
-			return syncReply == null || syncReply.equals(SyncReplyModeType.NONE);
+			SyncReplyModeType syncReply = cpaManager.getSyncReply(message.getMessageHeader().getCPAId(),new CacheablePartyId(message.getMessageHeader().getFrom().getPartyId()),message.getMessageHeader().getFrom().getRole(),CPAUtils.toString(message.getMessageHeader().getService()),message.getMessageHeader().getAction());
+			return syncReply != null && !syncReply.equals(SyncReplyModeType.NONE);
 		}
 		catch (Exception e)
 		{
-			return message.getSyncReply() == null;
+			return message.getSyncReply() != null;
 		}
 	}
 

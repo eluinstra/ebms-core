@@ -79,7 +79,7 @@ public class EbMSMessageProcessorX extends EbMSMessageProcessor implements Initi
 			}
 			if (!Constants.EBMS_SERVICE_URI.equals(message.getMessageHeader().getService().getValue()))
 			{
-				return process(message.getMessageHeader().getCPAId(),timestamp,message);
+				return process(timestamp,message);
 			}
 			else if (EbMSAction.MESSAGE_ERROR.action().equals(message.getMessageHeader().getAction()))
 			{
@@ -102,13 +102,13 @@ public class EbMSMessageProcessorX extends EbMSMessageProcessor implements Initi
 			else if (EbMSAction.STATUS_REQUEST.action().equals(message.getMessageHeader().getAction()))
 			{
 				EbMSMessage response = processStatusRequest(message.getMessageHeader().getCPAId(),timestamp,message);
-				if (isAsyncReply(message.getMessageHeader().getCPAId(),message))
+				if (isSyncReply(message))
+					return EbMSMessageUtils.getEbMSDocument(response);
+				else
 				{
 					deliveryManager.sendResponseMessage(cpaManager.getUri(response.getMessageHeader().getCPAId(),new CacheablePartyId(response.getMessageHeader().getTo().getPartyId()),response.getMessageHeader().getTo().getRole(),CPAUtils.toString(response.getMessageHeader().getService()),response.getMessageHeader().getAction()),response);
 					return null;
 				}
-				else
-					return EbMSMessageUtils.getEbMSDocument(response);
 			}
 			else if (EbMSAction.STATUS_RESPONSE.action().equals(message.getMessageHeader().getAction()))
 			{
@@ -118,13 +118,13 @@ public class EbMSMessageProcessorX extends EbMSMessageProcessor implements Initi
 			else if (EbMSAction.PING.action().equals(message.getMessageHeader().getAction()))
 			{
 				EbMSMessage response = processPing(message.getMessageHeader().getCPAId(),timestamp,message);
-				if (isAsyncReply(message.getMessageHeader().getCPAId(),message))
+				if (isSyncReply(message))
+					return EbMSMessageUtils.getEbMSDocument(response);
+				else
 				{
 					deliveryManager.sendResponseMessage(cpaManager.getUri(response.getMessageHeader().getCPAId(),new CacheablePartyId(response.getMessageHeader().getTo().getPartyId()),response.getMessageHeader().getTo().getRole(),CPAUtils.toString(response.getMessageHeader().getService()),response.getMessageHeader().getAction()),response);
 					return null;
 				}
-				else
-					return EbMSMessageUtils.getEbMSDocument(response);
 			}
 			else if (EbMSAction.PONG.action().equals(message.getMessageHeader().getAction()))
 			{
@@ -197,13 +197,13 @@ public class EbMSMessageProcessorX extends EbMSMessageProcessor implements Initi
 				{
 					if (EbMSAction.MESSAGE_ERROR.action().equals(responseMessage.getMessageHeader().getAction()))
 					{
-						if (isAsyncReply(requestMessage.getMessageHeader().getCPAId(),requestMessage))
+						if (!isSyncReply(requestMessage))
 							throw new EbMSProcessingException("No sync ErrorMessage expected for message " + requestMessage.getMessageHeader().getMessageData().getMessageId() + "\n" + DOMUtils.toString(response.getMessage()));
 						processMessageError(requestMessage.getMessageHeader().getCPAId(),timestamp,requestMessage,responseMessage);
 					}
 					else if (EbMSAction.ACKNOWLEDGMENT.action().equals(responseMessage.getMessageHeader().getAction()))
 					{
-						if (requestMessage.getAckRequested() == null || isAsyncReply(requestMessage.getMessageHeader().getCPAId(),requestMessage))
+						if (requestMessage.getAckRequested() == null || !isSyncReply(requestMessage))
 							throw new EbMSProcessingException("No sync Acknowledgment expected for message " + requestMessage.getMessageHeader().getMessageData().getMessageId() + "\n" + DOMUtils.toString(response.getMessage()));
 						processAcknowledgment(requestMessage.getMessageHeader().getCPAId(),timestamp,requestMessage,responseMessage);
 					}
