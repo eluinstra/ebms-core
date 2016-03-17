@@ -226,7 +226,7 @@ public class CPAUtils
 	{
 		try
 		{
-			return new URL(CPAUtils.getUri(deliveryChannel)).getHost();
+			return deliveryChannel == null ? "hostname" : new URL(CPAUtils.getUri(deliveryChannel)).getHost();
 		}
 		catch (MalformedURLException e)
 		{

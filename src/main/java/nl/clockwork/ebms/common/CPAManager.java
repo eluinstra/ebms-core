@@ -211,6 +211,7 @@ public class CPAManager
 	public DeliveryChannel getDefaultDeliveryChannel(String cpaId, CacheablePartyId partyId, String action)
 	{
 		PartyInfo partyInfo = getPartyInfo(cpaId,partyId);
+		if (partyInfo == null) return null;
 		for (OverrideMshActionBinding overrideMshActionBinding : partyInfo.getOverrideMshActionBinding())
 			if (overrideMshActionBinding.getAction().equals(action))
 				return (DeliveryChannel)overrideMshActionBinding.getChannelId();
