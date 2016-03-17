@@ -52,8 +52,7 @@ public class EbMSHttpClient implements EbMSClient
 			writer.write(document);
 			connection.connect();
 			EbMSResponseHandler handler = new EbMSResponseHandler(connection);
-			EbMSDocument in = handler.read();
-			return in;
+			return handler.read();
 		}
 		catch (IOException | TransformerException | SAXException e)
 		{
