@@ -47,7 +47,6 @@ import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.SyncReply;
 public class MessageHeaderValidator
 {
   protected transient Log logger = LogFactory.getLog(getClass());
-	private PerMessageCharacteristicsType ackSignatureRequested;
 	private EbMSDAO ebMSDAO;
 	private CPAManager cpaManager;
 
@@ -113,8 +112,6 @@ public class MessageHeaderValidator
 					throw new EbMSValidationException(EbMSMessageUtils.createError("//Header/AckRequested[@actor]",Constants.EbMSErrorCode.NOT_SUPPORTED.errorCode(),"NextMSH not supported."));
 				else
 					throw new EbMSValidationException(EbMSMessageUtils.createError("//Header/AckRequested[@actor]",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Invalid value."));
-			if (!checkAckSignatureRequested(deliveryChannel))
-				throw new EbMSValidationException(EbMSMessageUtils.createError("//Header/AckRequested[@signed]",Constants.EbMSErrorCode.NOT_SUPPORTED.errorCode(),"Signed Acknowledgment mode not supported."));
 			if (!checkAckSignatureRequested(deliveryChannel,ackRequested))
 				throw new EbMSValidationException(EbMSMessageUtils.createError("//Header/AckRequested[@signed]",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Wrong value."));
 
@@ -205,11 +202,6 @@ public class MessageHeaderValidator
 				|| (deliveryChannel.getMessagingCharacteristics().getAckRequested().equals(PerMessageCharacteristicsType.NEVER) && ackRequested == null);
 	}
 
-	private boolean checkAckSignatureRequested(DeliveryChannel deliveryChannel)
-	{
-		return ackSignatureRequested == null || deliveryChannel.getMessagingCharacteristics().getAckSignatureRequested().equals(ackSignatureRequested);
-	}
-
 	private boolean checkAckSignatureRequested(DeliveryChannel deliveryChannel, AckRequested ackRequested)
 	{
 		return deliveryChannel.getMessagingCharacteristics().getAckSignatureRequested() == null || deliveryChannel.getMessagingCharacteristics().getAckSignatureRequested().equals(PerMessageCharacteristicsType.PER_MESSAGE)
@@ -245,8 +237,4 @@ public class MessageHeaderValidator
 		throw new ValidationException("Request PartyIds do not match response PartyIds");
 	}
 
-	public void setAckSignatureRequested(PerMessageCharacteristicsType ackSignatureRequested)
-	{
-		this.ackSignatureRequested = ackSignatureRequested;
-	}
 }

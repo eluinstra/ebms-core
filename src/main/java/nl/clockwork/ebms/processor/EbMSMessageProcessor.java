@@ -59,7 +59,6 @@ import nl.clockwork.ebms.validation.XSDValidator;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.PerMessageCharacteristicsType;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.AckRequested;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.ErrorList;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageHeader;
@@ -107,7 +106,6 @@ public class EbMSMessageProcessor implements InitializingBean
 		xsdValidator = new XSDValidator("/nl/clockwork/ebms/xsd/msg-header-2_0.xsd");
 		cpaValidator = new CPAValidator(cpaManager);
 		messageHeaderValidator = new MessageHeaderValidator(ebMSDAO,cpaManager);
-		messageHeaderValidator.setAckSignatureRequested(PerMessageCharacteristicsType.NEVER);
 		manifestValidator = new ManifestValidator();
 		signatureTypeValidator = new SignatureTypeValidator(cpaManager,signatureValidator);
 	}
