@@ -359,7 +359,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	}
 
 	@Override
-	public EbMSMessageContext getMessageContextByRefToMessageId(String refToMessageId, Service service, String...actions) throws DAOException
+	public EbMSMessageContext getMessageContextByRefToMessageId(String cpaId, String refToMessageId, Service service, String...actions) throws DAOException
 	{
 		try
 		{
@@ -376,7 +376,8 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 				" message_id," +
 				" ref_to_message_id" +
 				" from ebms_message" + 
-				" where ref_to_message_id = ?" +
+				" where cpa_id = ?" +
+				" and ref_to_message_id = ?" +
 				" and message_nr = 0" +
 				(service == null ? "" : " and service = '" + EbMSMessageUtils.toString(service) + "'") +
 				(actions.length == 0 ? "" : " and action in ('" + StringUtils.join(actions,"','") + "')"),
@@ -399,6 +400,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 					}
 					
 				},
+				cpaId,
 				refToMessageId
 			);
 		}
@@ -464,14 +466,15 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	}
 	
 	@Override
-	public EbMSDocument getEbMSDocumentByRefToMessageId(final String refToMessageId, Service service, String...actions) throws DAOException
+	public EbMSDocument getEbMSDocumentByRefToMessageId(String cpaId, String refToMessageId, Service service, String...actions) throws DAOException
 	{
 		try
 		{
 			EbMSDocument document = jdbcTemplate.queryForObject(
 				"select message_id, content" +
 				" from ebms_message" +
-				" where ref_to_message_id = ?" +
+				" where cpa_id = ?" +
+				" and ref_to_message_id = ?" +
 				" and message_nr = 0" +
 				(service == null ? "" : " and service = '" + EbMSMessageUtils.toString(service) + "'") +
 				(actions.length == 0 ? "" : " and action in ('" + StringUtils.join(actions,"','") + "')"),
@@ -492,6 +495,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 					}
 					
 				},
+				cpaId,
 				refToMessageId
 			);
 			return new EbMSDocument(document.getContentId(),document.getMessage(),getAttachments(refToMessageId));
