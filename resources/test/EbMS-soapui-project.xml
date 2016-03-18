@@ -863,7 +863,7 @@
       <soap:address location="http://127.0.0.1:8089/adapter/ebms"/>
     </wsdl:port>
   </wsdl:service>
-</wsdl:definitions>]]></con:content><con:type>http://schemas.xmlsoap.org/wsdl/</con:type></con:part></con:definitionCache><con:endpoints><con:endpoint>http://127.0.0.1:8089/adapter/ebms</con:endpoint></con:endpoints><con:operation id="8c2f59a5-2338-4c05-adf4-1adca5e6af55" isOneWay="false" action="" name="GetMessage" bindingOperationName="GetMessage" type="Request-Response" outputName="GetMessageResponse" inputName="GetMessage" receivesAttachments="false" sendsAttachments="false" anonymous="optional"><con:settings/><con:call id="b44dda47-03b3-4fb6-b9bf-5beb5c31910e" name="Request 1"><con:settings/><con:encoding>UTF-8</con:encoding><con:endpoint>http://127.0.0.1:8089/adapter/ebms</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns="http://www.ordina.nl/ebms/2.10">
+</wsdl:definitions>]]></con:content><con:type>http://schemas.xmlsoap.org/wsdl/</con:type></con:part></con:definitionCache><con:endpoints><con:endpoint>http://127.0.0.1:8089/adapter/ebms</con:endpoint><con:endpoint>http://localhost:8088/ebms-adapter-web/service/ebms</con:endpoint></con:endpoints><con:operation id="8c2f59a5-2338-4c05-adf4-1adca5e6af55" isOneWay="false" action="" name="GetMessage" bindingOperationName="GetMessage" type="Request-Response" outputName="GetMessageResponse" inputName="GetMessage" receivesAttachments="false" sendsAttachments="false" anonymous="optional"><con:settings/><con:call id="b44dda47-03b3-4fb6-b9bf-5beb5c31910e" name="Request 1"><con:settings/><con:encoding>UTF-8</con:encoding><con:endpoint>http://127.0.0.1:8089/adapter/ebms</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns="http://www.ordina.nl/ebms/2.10">
    <soapenv:Header/>
    <soapenv:Body>
       <ns:GetMessage>
@@ -2322,7 +2322,189 @@ def response = new XmlHolder(messageExchange.responseContentAsXml)
 response.namespaces["eb"] = "http://www.oasis-open.org/committees/ebxml-msg/schema/msg-header-2_0.xsd"
 
 assert response["//eb:Acknowledgment/eb:RefToMessageId"] == request["//eb:MessageData/eb:MessageId"]
-</scriptText></con:configuration></con:assertion><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:attachment><con:name>Afleverbericht_Afleveren_ebMS_2.0_v1.1.xml</con:name><con:contentType>text/xml</con:contentType><con:size>1189</con:size><con:contentId>ea1b1df9-3cf8-4362-8cb5-06da082dfae5-1@localhost</con:contentId><con:data>UEsDBBQACAgIAPZaa0gAAAAAAAAAAAAAAAAqAAAAQWZsZXZlcmJlcmljaHRfQWZsZXZlcmVuX2ViTVNfMi4wX3YxLjEueG1snVTBitswED230H8wvseSs1BKSLwkh5aF3V6SltJLkK2prV1pZCwlcfv1lS3bsb0s2y0YzLx58+Y9S3h9WysZnKEyQuMmjCMaBoCZ5gLzTfjt8HnxKbxNPrxfWzQr9kuCo+6gEllhg9qIlckKUOxeZ8y2AoW15YoQqXNxMhFKwkUuSq0rSyBVhiwjSjoZA9VZZEDiKCbB1mOAR0gf9kdHO55dI6oNDwNn0W13Dv5bv9dwlgeNy+USXW4iXeVkSWlMfjzc79s0C4HGMswgdMHftcmfABVUT0n3XpMx2JNS/11M4yYZF54+ac9meqlpOZmbb2MM25g9Pqv97JzUD1vxyI0FVYLcMsyhJfFkSeOPCxq750Dpqn0i+tNLvTDSKwoOaIUFYXcgXb+ANAXk0BA8A0/KeUj8y2t20ECxv0tIdvuv3camavTJawva4UrLWecZ4pWeE2encYeFPvGrLSUUHBozpWQCiYW6O9KhMVBTaK4ON8iYSqwrIlsP5z9qDQPC7+Jfvv/h282myzoYmFyBq6+x2514lCwHHJnwSAu8JcHbI/xThj7E1dUk1ch/d2knvxkH/wVQSwcIQQDI1bUBAAClBAAAUEsBAhQAFAAICAgA9lprSEEAyNW1AQAApQQAACoAAAAAAAAAAAAAAAAAAAAAAEFmbGV2ZXJiZXJpY2h0X0FmbGV2ZXJlbl9lYk1TXzIuMF92MS4xLnhtbFBLBQYAAAAAAQABAFgAAAANAgAAAAA=</con:data><con:id>2f9a9828-fc67-4aba-9f39-9f26cd202083</con:id></con:attachment><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508"/><con:wsrmConfig version="1.2"/></con:request></con:config></con:testStep><con:testStep type="request" name="EbMSMessageDuplicate" id="2e1eb1d7-5b6d-47bd-99a7-c13ec5d614ab"><con:settings/><con:config xsi:type="con:RequestStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:interface>EbMS</con:interface><con:operation>EbMSRequestSync</con:operation><con:request name="EbMSMessageDuplicate" id="fc387b4c-1d5b-4b27-9a3a-554d0d6b0655"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8088/ebms-adapter-web/ebms</con:endpoint><con:request><![CDATA[<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:eb="http://www.oasis-open.org/committees/ebxml-msg/schema/msg-header-2_0.xsd" xmlns:ns4="http://www.w3.org/2000/09/xmldsig#" xmlns:xlink="http://www.w3.org/1999/xlink">
+</scriptText></con:configuration></con:assertion><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:attachment><con:name>Afleverbericht_Afleveren_ebMS_2.0_v1.1.xml</con:name><con:contentType>text/xml</con:contentType><con:size>1189</con:size><con:contentId>ea1b1df9-3cf8-4362-8cb5-06da082dfae5-1@localhost</con:contentId><con:data>UEsDBBQACAgIAPZaa0gAAAAAAAAAAAAAAAAqAAAAQWZsZXZlcmJlcmljaHRfQWZsZXZlcmVuX2ViTVNfMi4wX3YxLjEueG1snVTBitswED230H8wvseSs1BKSLwkh5aF3V6SltJLkK2prV1pZCwlcfv1lS3bsb0s2y0YzLx58+Y9S3h9WysZnKEyQuMmjCMaBoCZ5gLzTfjt8HnxKbxNPrxfWzQr9kuCo+6gEllhg9qIlckKUOxeZ8y2AoW15YoQqXNxMhFKwkUuSq0rSyBVhiwjSjoZA9VZZEDiKCbB1mOAR0gf9kdHO55dI6oNDwNn0W13Dv5bv9dwlgeNy+USXW4iXeVkSWlMfjzc79s0C4HGMswgdMHftcmfABVUT0n3XpMx2JNS/11M4yYZF54+ac9meqlpOZmbb2MM25g9Pqv97JzUD1vxyI0FVYLcMsyhJfFkSeOPCxq750Dpqn0i+tNLvTDSKwoOaIUFYXcgXb+ANAXk0BA8A0/KeUj8y2t20ECxv0tIdvuv3camavTJawva4UrLWecZ4pWeE2encYeFPvGrLSUUHBozpWQCiYW6O9KhMVBTaK4ON8iYSqwrIlsP5z9qDQPC7+Jfvv/h282myzoYmFyBq6+x2514lCwHHJnwSAu8JcHbI/xThj7E1dUk1ch/d2knvxkH/wVQSwcIQQDI1bUBAAClBAAAUEsBAhQAFAAICAgA9lprSEEAyNW1AQAApQQAACoAAAAAAAAAAAAAAAAAAAAAAEFmbGV2ZXJiZXJpY2h0X0FmbGV2ZXJlbl9lYk1TXzIuMF92MS4xLnhtbFBLBQYAAAAAAQABAFgAAAANAgAAAAA=</con:data><con:id>2f9a9828-fc67-4aba-9f39-9f26cd202083</con:id></con:attachment><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508"/><con:wsrmConfig version="1.2"/></con:request></con:config></con:testStep><con:testStep type="request" name="EbMSMessageStatus" id="921b9831-c97c-4e72-83b6-3052f1b651bd"><con:settings/><con:config xsi:type="con:RequestStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:interface>EbMS</con:interface><con:operation>EbMSMSHRequestSync</con:operation><con:request name="EbMSMessageStatus" id="63c309bb-eedc-4698-8d64-182348caea67"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8088/ebms-adapter-web/ebms</con:endpoint><con:request><![CDATA[<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:eb="http://www.oasis-open.org/committees/ebxml-msg/schema/msg-header-2_0.xsd" xmlns:ns4="http://www.w3.org/2000/09/xmldsig#" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <soap:Header>
+        <eb:MessageHeader eb:version="2.0" soap:mustUnderstand="1">
+            <eb:From>
+                <eb:PartyId eb:type="urn:osb:oin">00000000000000000000</eb:PartyId>
+            </eb:From>
+            <eb:To>
+                <eb:PartyId eb:type="urn:osb:oin">00000000000000000001</eb:PartyId>
+            </eb:To>
+            <eb:CPAId>cpaStubEBF.rm.http.unsigned.sync</eb:CPAId>
+            <eb:ConversationId>${MessageProperties#uuid}</eb:ConversationId>
+            <eb:Service>urn:oasis:names:tc:ebxml-msg:service</eb:Service>
+            <eb:Action>StatusRequest</eb:Action>
+            <eb:MessageData>
+                <eb:MessageId>${MessageProperties#uuid}@localhost</eb:MessageId>
+                <eb:Timestamp>${MessageProperties#timestamp}</eb:Timestamp>
+                <eb:TimeToLive>${MessageProperties#timestamp}</eb:TimeToLive>
+            </eb:MessageData>
+        </eb:MessageHeader>
+        <eb:SyncReply eb:version="2.0" soap:actor="http://schemas.xmlsoap.org/soap/actor/next" soap:mustUnderstand="1"/>
+    </soap:Header>
+    <soap:Body>
+        <eb:StatusRequest eb:version="2.0">
+            <eb:RefToMessageId>${EbMSMessageOk#Response#//eb:MessageData/eb:RefToMessageId}</eb:RefToMessageId>
+        </eb:StatusRequest>
+    </soap:Body>
+</soap:Envelope>]]></con:request><con:assertion type="Valid HTTP Status Codes" id="8b1a6d24-eada-44a8-8dd4-628955fde333" name="Valid HTTP Status Codes"><con:configuration><codes>200</codes></con:configuration></con:assertion><con:assertion type="GroovyScriptAssertion" id="65f2935a-1fea-4e45-8abd-acc74b13f59e" name="Validate Content-Type"><con:configuration><scriptText>assert messageExchange.responseHeaders["Content-Type"].get(0).equals("text/xml")</scriptText></con:configuration></con:assertion><con:assertion type="GroovyScriptAssertion" id="e0810f98-108b-4ac3-bea7-ebbdcc12c92b" name="Validate SOAPAction"><con:configuration><scriptText>assert messageExchange.responseHeaders["SOAPAction"].get(0).equals("\"ebXML\"")</scriptText></con:configuration></con:assertion><con:assertion type="SOAP Response" id="4ea5ff61-97e6-47b5-8a0c-73a878a00348" name="SOAP Response"/><con:assertion type="XPath Match" id="5d9899bf-5e38-46e6-8768-6e394f9fd6be" name="XPath Match CPAId"><con:configuration><path>declare namespace eb='http://www.oasis-open.org/committees/ebxml-msg/schema/msg-header-2_0.xsd';
+//eb:CPAId</path><content>${EbMSPing#Request#//eb:CPAId}</content><allowWildcards>false</allowWildcards><ignoreNamspaceDifferences>false</ignoreNamspaceDifferences><ignoreComments>false</ignoreComments></con:configuration></con:assertion><con:assertion type="GroovyScriptAssertion" id="ae340c57-3e0a-420a-829c-11119ef4d63b" name="Validate From Party"><con:configuration><scriptText>import com.eviware.soapui.support.XmlHolder
+
+def request = new XmlHolder(messageExchange.requestContentAsXml)
+request.namespaces["eb"] = "http://www.oasis-open.org/committees/ebxml-msg/schema/msg-header-2_0.xsd"
+def response = new XmlHolder(messageExchange.responseContentAsXml)
+response.namespaces["eb"] = "http://www.oasis-open.org/committees/ebxml-msg/schema/msg-header-2_0.xsd"
+
+assert response["//eb:MessageHeader/eb:From/eb:PartyId"] == request["//eb:MessageHeader/eb:To/eb:PartyId"]
+assert response["//eb:MessageHeader/eb:From/eb:PartyId/@eb:type"] == request["//eb:MessageHeader/eb:To/eb:PartyId/@eb:type"]
+</scriptText></con:configuration></con:assertion><con:assertion type="GroovyScriptAssertion" id="c7a3f80d-da16-488d-ae5e-ee4861768539" name="Validate To Party"><con:configuration><scriptText>import com.eviware.soapui.support.XmlHolder
+
+def request = new XmlHolder(messageExchange.requestContentAsXml)
+request.namespaces["eb"] = "http://www.oasis-open.org/committees/ebxml-msg/schema/msg-header-2_0.xsd"
+def response = new XmlHolder(messageExchange.responseContentAsXml)
+response.namespaces["eb"] = "http://www.oasis-open.org/committees/ebxml-msg/schema/msg-header-2_0.xsd"
+
+assert response["//eb:MessageHeader/eb:To/eb:PartyId"] == request["//eb:MessageHeader/eb:From/eb:PartyId"]
+assert response["//eb:MessageHeader/eb:To/eb:PartyId/@eb:type"] == request["//eb:MessageHeader/eb:From/eb:PartyId/@eb:type"]
+</scriptText></con:configuration></con:assertion><con:assertion type="XPath Match" id="0d7b2960-ec50-4ff5-8f66-d10c115d6023" name="XPath Match Service"><con:configuration><path>declare namespace eb='http://www.oasis-open.org/committees/ebxml-msg/schema/msg-header-2_0.xsd';
+//eb:Service</path><content>urn:oasis:names:tc:ebxml-msg:service</content><allowWildcards>false</allowWildcards><ignoreNamspaceDifferences>false</ignoreNamspaceDifferences><ignoreComments>false</ignoreComments></con:configuration></con:assertion><con:assertion type="XPath Match" id="33b1076c-7bfd-40d1-b1ee-c3de6062ea4d" name="XPath Match Action"><con:configuration><path>declare namespace eb='http://www.oasis-open.org/committees/ebxml-msg/schema/msg-header-2_0.xsd';
+//eb:Action</path><content>StatusResponse</content><allowWildcards>false</allowWildcards><ignoreNamspaceDifferences>false</ignoreNamspaceDifferences><ignoreComments>false</ignoreComments></con:configuration></con:assertion><con:assertion type="GroovyScriptAssertion" id="a9bab8f8-5cf3-435b-92e7-1956d71996e5" name="Validate ConversationId"><con:configuration><scriptText>import com.eviware.soapui.support.XmlHolder
+
+def request = new XmlHolder(messageExchange.requestContentAsXml)
+request.namespaces["eb"] = "http://www.oasis-open.org/committees/ebxml-msg/schema/msg-header-2_0.xsd"
+def response = new XmlHolder(messageExchange.responseContentAsXml)
+response.namespaces["eb"] = "http://www.oasis-open.org/committees/ebxml-msg/schema/msg-header-2_0.xsd"
+
+assert response["//eb:ConversationId"] == request["//eb:ConversationId"]
+</scriptText></con:configuration></con:assertion><con:assertion type="GroovyScriptAssertion" id="07cca6c3-edcd-477b-a548-83efce647990" name="Validate RefToMessageId"><con:configuration><scriptText>import com.eviware.soapui.support.XmlHolder
+
+def request = new XmlHolder(messageExchange.requestContentAsXml)
+request.namespaces["eb"] = "http://www.oasis-open.org/committees/ebxml-msg/schema/msg-header-2_0.xsd"
+def response = new XmlHolder(messageExchange.responseContentAsXml)
+response.namespaces["eb"] = "http://www.oasis-open.org/committees/ebxml-msg/schema/msg-header-2_0.xsd"
+
+assert response["//eb:MessageData/eb:RefToMessageId"] == request["//eb:MessageData/eb:MessageId"]
+</scriptText></con:configuration></con:assertion><con:assertion type="XPath Match" id="5d9899bf-5e38-46e6-8768-6e394f9fd6be" name="XPath Match messageStatus"><con:configuration><path>declare namespace eb='http://www.oasis-open.org/committees/ebxml-msg/schema/msg-header-2_0.xsd';
+//eb:StatusResponse/@eb:messageStatus</path><content>Received</content><allowWildcards>false</allowWildcards><ignoreNamspaceDifferences>false</ignoreNamspaceDifferences><ignoreComments>false</ignoreComments></con:configuration></con:assertion><con:assertion type="XPath Match" id="5d9899bf-5e38-46e6-8768-6e394f9fd6be" name="XPath Match RefToMessageId"><con:configuration><path>declare namespace eb='http://www.oasis-open.org/committees/ebxml-msg/schema/msg-header-2_0.xsd';
+//eb:StatusResponse/eb:RefToMessageId</path><content>${EbMSMessageOk#Response#//eb:MessageData/eb:RefToMessageId}</content><allowWildcards>false</allowWildcards><ignoreNamspaceDifferences>false</ignoreNamspaceDifferences><ignoreComments>false</ignoreComments></con:configuration></con:assertion><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508"/><con:wsrmConfig version="1.2"/></con:request></con:config></con:testStep><con:testStep type="request" name="getMessageIds" id="e8a5f3a1-7e97-4657-a501-615870b2ff61"><con:settings/><con:config xsi:type="con:RequestStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:interface>EbMSMessageServiceServiceSoapBinding</con:interface><con:operation>GetMessageIds</con:operation><con:request name="getMessageIds" id="2a476bfb-02bb-43c0-a5b6-f0c7082730f0"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8088/ebms-adapter-web/service/ebms</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns="http://www.ordina.nl/ebms/2.10">
+   <soapenv:Header/>
+   <soapenv:Body>
+      <ns:GetMessageIds>
+         <MessageContext>
+            <action>${MessageProperties#action}</action>
+            <cpaId>${MessageProperties#cpaId}</cpaId>
+            <fromRole>
+               <partyId>${MessageProperties#partyType}:${MessageProperties#fromPartyId}</partyId>
+               <role>${MessageProperties#fromRole}</role>
+            </fromRole>
+            <service>${MessageProperties#serviceType}:${MessageProperties#service}</service>
+            <toRole>
+               <partyId>${MessageProperties#partyType}:${MessageProperties#toPartyId}</partyId>
+               <role>${MessageProperties#toRole}</role>
+            </toRole>
+         </MessageContext>
+      </ns:GetMessageIds>
+   </soapenv:Body>
+</soapenv:Envelope>]]></con:request><con:assertion type="SOAP Response" id="a9b13e02-3133-4e27-941e-eecbdaadea27"/><con:assertion type="XPath Match" id="41f96659-f043-4bd3-930d-885847adbc62" name="XPath Match MessageId"><con:configuration><path>exists(//MessageIds[text() = '${EbMSMessageOk#Response#//eb:MessageData/eb:RefToMessageId}'])</path><content>true</content><allowWildcards>false</allowWildcards><ignoreNamspaceDifferences>false</ignoreNamspaceDifferences><ignoreComments>false</ignoreComments></con:configuration></con:assertion><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508"/><con:wsrmConfig version="1.2"/></con:request></con:config></con:testStep><con:testStep type="request" name="getMessage" id="9b7fa06c-43d8-4d5f-a59d-2f81ae0bb306"><con:settings/><con:config xsi:type="con:RequestStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:interface>EbMSMessageServiceServiceSoapBinding</con:interface><con:operation>GetMessage</con:operation><con:request name="getMessage" id="62c2ad06-a042-4adc-b72a-c8d187970035"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8088/ebms-adapter-web/service/ebms</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns="http://www.ordina.nl/ebms/2.10">
+   <soapenv:Header/>
+   <soapenv:Body>
+      <ns:GetMessage>
+         <MessageId>${EbMSMessageOk#Response#//eb:MessageData/eb:RefToMessageId}</MessageId>
+      </ns:GetMessage>
+   </soapenv:Body>
+</soapenv:Envelope>]]></con:request><con:assertion type="SOAP Response" id="9f8fc5e1-2c56-4ff5-b6a5-b7dece002dc3"/><con:assertion type="XPath Match" id="2bd19582-f97d-422c-8cc2-594d411626e5" name="XPath Match"><con:configuration><path>exists(//messageId[text() = '${EbMSMessageOk#Response#//eb:MessageData/eb:RefToMessageId}'])</path><content>true</content><allowWildcards>false</allowWildcards><ignoreNamspaceDifferences>false</ignoreNamspaceDifferences><ignoreComments>false</ignoreComments></con:configuration></con:assertion><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508"/><con:wsrmConfig version="1.2"/></con:request></con:config></con:testStep><con:testStep type="request" name="processMessage" id="c1ac6af3-2905-415e-bfd6-e267cd006d33"><con:settings/><con:config xsi:type="con:RequestStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:interface>EbMSMessageServiceServiceSoapBinding</con:interface><con:operation>ProcessMessage</con:operation><con:request name="processMessage" id="960d90a2-6481-4dcb-b826-382049f12188"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8088/ebms-adapter-web/service/ebms</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns="http://www.ordina.nl/ebms/2.10">
+   <soapenv:Header/>
+   <soapenv:Body>
+      <ns:ProcessMessage>
+         <MessageId>${EbMSMessageOk#Response#//eb:MessageData/eb:RefToMessageId}</MessageId>
+      </ns:ProcessMessage>
+   </soapenv:Body>
+</soapenv:Envelope>]]></con:request><con:assertion type="SOAP Response" id="e8b4a47c-65af-43ba-8811-101be1eaff48"/><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508"/><con:wsrmConfig version="1.2"/></con:request></con:config></con:testStep><con:testStep type="request" name="EbMSMessageStatusAgain" id="765039f1-09ae-4ba9-afaa-d9768d0fd180"><con:settings/><con:config xsi:type="con:RequestStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:interface>EbMS</con:interface><con:operation>EbMSMSHRequestSync</con:operation><con:request name="EbMSMessageStatusAgain" id="63c309bb-eedc-4698-8d64-182348caea67"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8088/ebms-adapter-web/ebms</con:endpoint><con:request><![CDATA[<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:eb="http://www.oasis-open.org/committees/ebxml-msg/schema/msg-header-2_0.xsd" xmlns:ns4="http://www.w3.org/2000/09/xmldsig#" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <soap:Header>
+        <eb:MessageHeader eb:version="2.0" soap:mustUnderstand="1">
+            <eb:From>
+                <eb:PartyId eb:type="urn:osb:oin">00000000000000000000</eb:PartyId>
+            </eb:From>
+            <eb:To>
+                <eb:PartyId eb:type="urn:osb:oin">00000000000000000001</eb:PartyId>
+            </eb:To>
+            <eb:CPAId>cpaStubEBF.rm.http.unsigned.sync</eb:CPAId>
+            <eb:ConversationId>${MessageProperties#uuid}</eb:ConversationId>
+            <eb:Service>urn:oasis:names:tc:ebxml-msg:service</eb:Service>
+            <eb:Action>StatusRequest</eb:Action>
+            <eb:MessageData>
+                <eb:MessageId>${MessageProperties#uuid}@localhost</eb:MessageId>
+                <eb:Timestamp>${MessageProperties#timestamp}</eb:Timestamp>
+                <eb:TimeToLive>${MessageProperties#timestamp}</eb:TimeToLive>
+            </eb:MessageData>
+        </eb:MessageHeader>
+        <eb:SyncReply eb:version="2.0" soap:actor="http://schemas.xmlsoap.org/soap/actor/next" soap:mustUnderstand="1"/>
+    </soap:Header>
+    <soap:Body>
+        <eb:StatusRequest eb:version="2.0">
+            <eb:RefToMessageId>${EbMSMessageOk#Response#//eb:MessageData/eb:RefToMessageId}</eb:RefToMessageId>
+        </eb:StatusRequest>
+    </soap:Body>
+</soap:Envelope>]]></con:request><con:assertion type="Valid HTTP Status Codes" id="8b1a6d24-eada-44a8-8dd4-628955fde333" name="Valid HTTP Status Codes"><con:configuration><codes>200</codes></con:configuration></con:assertion><con:assertion type="GroovyScriptAssertion" id="65f2935a-1fea-4e45-8abd-acc74b13f59e" name="Validate Content-Type"><con:configuration><scriptText>assert messageExchange.responseHeaders["Content-Type"].get(0).equals("text/xml")</scriptText></con:configuration></con:assertion><con:assertion type="GroovyScriptAssertion" id="e0810f98-108b-4ac3-bea7-ebbdcc12c92b" name="Validate SOAPAction"><con:configuration><scriptText>assert messageExchange.responseHeaders["SOAPAction"].get(0).equals("\"ebXML\"")</scriptText></con:configuration></con:assertion><con:assertion type="SOAP Response" id="4ea5ff61-97e6-47b5-8a0c-73a878a00348" name="SOAP Response"/><con:assertion type="XPath Match" id="5d9899bf-5e38-46e6-8768-6e394f9fd6be" name="XPath Match CPAId"><con:configuration><path>declare namespace eb='http://www.oasis-open.org/committees/ebxml-msg/schema/msg-header-2_0.xsd';
+//eb:CPAId</path><content>${EbMSPing#Request#//eb:CPAId}</content><allowWildcards>false</allowWildcards><ignoreNamspaceDifferences>false</ignoreNamspaceDifferences><ignoreComments>false</ignoreComments></con:configuration></con:assertion><con:assertion type="GroovyScriptAssertion" id="ae340c57-3e0a-420a-829c-11119ef4d63b" name="Validate From Party"><con:configuration><scriptText>import com.eviware.soapui.support.XmlHolder
+
+def request = new XmlHolder(messageExchange.requestContentAsXml)
+request.namespaces["eb"] = "http://www.oasis-open.org/committees/ebxml-msg/schema/msg-header-2_0.xsd"
+def response = new XmlHolder(messageExchange.responseContentAsXml)
+response.namespaces["eb"] = "http://www.oasis-open.org/committees/ebxml-msg/schema/msg-header-2_0.xsd"
+
+assert response["//eb:MessageHeader/eb:From/eb:PartyId"] == request["//eb:MessageHeader/eb:To/eb:PartyId"]
+assert response["//eb:MessageHeader/eb:From/eb:PartyId/@eb:type"] == request["//eb:MessageHeader/eb:To/eb:PartyId/@eb:type"]
+</scriptText></con:configuration></con:assertion><con:assertion type="GroovyScriptAssertion" id="c7a3f80d-da16-488d-ae5e-ee4861768539" name="Validate To Party"><con:configuration><scriptText>import com.eviware.soapui.support.XmlHolder
+
+def request = new XmlHolder(messageExchange.requestContentAsXml)
+request.namespaces["eb"] = "http://www.oasis-open.org/committees/ebxml-msg/schema/msg-header-2_0.xsd"
+def response = new XmlHolder(messageExchange.responseContentAsXml)
+response.namespaces["eb"] = "http://www.oasis-open.org/committees/ebxml-msg/schema/msg-header-2_0.xsd"
+
+assert response["//eb:MessageHeader/eb:To/eb:PartyId"] == request["//eb:MessageHeader/eb:From/eb:PartyId"]
+assert response["//eb:MessageHeader/eb:To/eb:PartyId/@eb:type"] == request["//eb:MessageHeader/eb:From/eb:PartyId/@eb:type"]
+</scriptText></con:configuration></con:assertion><con:assertion type="XPath Match" id="0d7b2960-ec50-4ff5-8f66-d10c115d6023" name="XPath Match Service"><con:configuration><path>declare namespace eb='http://www.oasis-open.org/committees/ebxml-msg/schema/msg-header-2_0.xsd';
+//eb:Service</path><content>urn:oasis:names:tc:ebxml-msg:service</content><allowWildcards>false</allowWildcards><ignoreNamspaceDifferences>false</ignoreNamspaceDifferences><ignoreComments>false</ignoreComments></con:configuration></con:assertion><con:assertion type="XPath Match" id="33b1076c-7bfd-40d1-b1ee-c3de6062ea4d" name="XPath Match Action"><con:configuration><path>declare namespace eb='http://www.oasis-open.org/committees/ebxml-msg/schema/msg-header-2_0.xsd';
+//eb:Action</path><content>StatusResponse</content><allowWildcards>false</allowWildcards><ignoreNamspaceDifferences>false</ignoreNamspaceDifferences><ignoreComments>false</ignoreComments></con:configuration></con:assertion><con:assertion type="GroovyScriptAssertion" id="a9bab8f8-5cf3-435b-92e7-1956d71996e5" name="Validate ConversationId"><con:configuration><scriptText>import com.eviware.soapui.support.XmlHolder
+
+def request = new XmlHolder(messageExchange.requestContentAsXml)
+request.namespaces["eb"] = "http://www.oasis-open.org/committees/ebxml-msg/schema/msg-header-2_0.xsd"
+def response = new XmlHolder(messageExchange.responseContentAsXml)
+response.namespaces["eb"] = "http://www.oasis-open.org/committees/ebxml-msg/schema/msg-header-2_0.xsd"
+
+assert response["//eb:ConversationId"] == request["//eb:ConversationId"]
+</scriptText></con:configuration></con:assertion><con:assertion type="GroovyScriptAssertion" id="07cca6c3-edcd-477b-a548-83efce647990" name="Validate RefToMessageId"><con:configuration><scriptText>import com.eviware.soapui.support.XmlHolder
+
+def request = new XmlHolder(messageExchange.requestContentAsXml)
+request.namespaces["eb"] = "http://www.oasis-open.org/committees/ebxml-msg/schema/msg-header-2_0.xsd"
+def response = new XmlHolder(messageExchange.responseContentAsXml)
+response.namespaces["eb"] = "http://www.oasis-open.org/committees/ebxml-msg/schema/msg-header-2_0.xsd"
+
+assert response["//eb:MessageData/eb:RefToMessageId"] == request["//eb:MessageData/eb:MessageId"]
+</scriptText></con:configuration></con:assertion><con:assertion type="XPath Match" id="5d9899bf-5e38-46e6-8768-6e394f9fd6be" name="XPath Match messageStatus"><con:configuration><path>declare namespace eb='http://www.oasis-open.org/committees/ebxml-msg/schema/msg-header-2_0.xsd';
+//eb:StatusResponse/@eb:messageStatus</path><content>Processed</content><allowWildcards>false</allowWildcards><ignoreNamspaceDifferences>false</ignoreNamspaceDifferences><ignoreComments>false</ignoreComments></con:configuration></con:assertion><con:assertion type="XPath Match" id="5d9899bf-5e38-46e6-8768-6e394f9fd6be" name="XPath Match RefToMessageId"><con:configuration><path>declare namespace eb='http://www.oasis-open.org/committees/ebxml-msg/schema/msg-header-2_0.xsd';
+//eb:StatusResponse/eb:RefToMessageId</path><content>${EbMSMessageOk#Response#//eb:MessageData/eb:RefToMessageId}</content><allowWildcards>false</allowWildcards><ignoreNamspaceDifferences>false</ignoreNamspaceDifferences><ignoreComments>false</ignoreComments></con:configuration></con:assertion><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508"/><con:wsrmConfig version="1.2"/></con:request></con:config></con:testStep><con:testStep type="request" name="getMessageIdsAgain" id="e2181283-43fb-4320-babc-f4f36436a48f"><con:settings/><con:config xsi:type="con:RequestStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:interface>EbMSMessageServiceServiceSoapBinding</con:interface><con:operation>GetMessageIds</con:operation><con:request name="getMessageIdsAgain" id="2a476bfb-02bb-43c0-a5b6-f0c7082730f0"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8088/ebms-adapter-web/service/ebms</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns="http://www.ordina.nl/ebms/2.10">
+   <soapenv:Header/>
+   <soapenv:Body>
+      <ns:GetMessageIds>
+         <MessageContext>
+            <action>${MessageProperties#action}</action>
+            <cpaId>${MessageProperties#cpaId}</cpaId>
+            <fromRole>
+               <partyId>${MessageProperties#partyType}:${MessageProperties#fromPartyId}</partyId>
+               <role>${MessageProperties#fromRole}</role>
+            </fromRole>
+            <service>${MessageProperties#serviceType}:${MessageProperties#service}</service>
+            <toRole>
+               <partyId>${MessageProperties#partyType}:${MessageProperties#toPartyId}</partyId>
+               <role>${MessageProperties#toRole}</role>
+            </toRole>
+         </MessageContext>
+      </ns:GetMessageIds>
+   </soapenv:Body>
+</soapenv:Envelope>]]></con:request><con:assertion type="SOAP Response" id="a9b13e02-3133-4e27-941e-eecbdaadea27"/><con:assertion type="XPath Match" id="41f96659-f043-4bd3-930d-885847adbc62" name="XPath Match MessageId"><con:configuration><path>exists(//MessageIds[text() = '${EbMSMessageOk#Response#//eb:MessageData/eb:RefToMessageId}'])</path><content>false</content><allowWildcards>false</allowWildcards><ignoreNamspaceDifferences>false</ignoreNamspaceDifferences><ignoreComments>false</ignoreComments></con:configuration></con:assertion><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508"/><con:wsrmConfig version="1.2"/></con:request></con:config></con:testStep><con:testStep type="request" name="EbMSMessageDuplicate" id="2e1eb1d7-5b6d-47bd-99a7-c13ec5d614ab"><con:settings/><con:config xsi:type="con:RequestStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:interface>EbMS</con:interface><con:operation>EbMSRequestSync</con:operation><con:request name="EbMSMessageDuplicate" id="fc387b4c-1d5b-4b27-9a3a-554d0d6b0655"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8088/ebms-adapter-web/ebms</con:endpoint><con:request><![CDATA[<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:eb="http://www.oasis-open.org/committees/ebxml-msg/schema/msg-header-2_0.xsd" xmlns:ns4="http://www.w3.org/2000/09/xmldsig#" xmlns:xlink="http://www.w3.org/1999/xlink">
     <soap:Header>
         <eb:MessageHeader eb:version="2.0" soap:mustUnderstand="1">
             <eb:From>
