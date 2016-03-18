@@ -36,7 +36,7 @@ public class ManifestValidator
 		if (message.getManifest() == null)
 			throw new EbMSValidationException(EbMSMessageUtils.createError("//Body/Manifest",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Invalid value."));
 		if (!Constants.EBMS_VERSION.equals(message.getManifest().getVersion()))
-			throw new EbMSValidationException(EbMSMessageUtils.createError("//Body/Manifest[@version]",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Invalid value."));
+			throw new EbMSValidationException(EbMSMessageUtils.createError("//Body/Manifest/@version",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Invalid value."));
 		List<EbMSAttachment> attachments = new ArrayList<EbMSAttachment>();
 		for (Reference reference : message.getManifest().getReference())
 		{

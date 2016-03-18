@@ -55,7 +55,7 @@ public class CPAValidator
 	public void validate(EbMSMessage message) throws EbMSValidationException
 	{
 		if (!cpaManager.isValid(message.getMessageHeader().getCPAId(),message.getMessageHeader().getMessageData().getTimestamp()))
-			throw new EbMSValidationException(EbMSMessageUtils.createError("//Header/MessageHeader[@cpaid]",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Invalid CPA."));
+			throw new EbMSValidationException(EbMSMessageUtils.createError("//Header/MessageHeader/@cpaid",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Invalid CPA."));
 	}
 
 	public void validate(String cpaId) throws ValidatorException

@@ -64,7 +64,7 @@ public class MessageHeaderValidator
 		MessageOrder messageOrder = message.getMessageOrder();
 		
 		if (!Constants.EBMS_VERSION.equals(messageHeader.getVersion()))
-			throw new EbMSValidationException(EbMSMessageUtils.createError("//Header/MessageHeader[@version]",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Invalid value."));
+			throw new EbMSValidationException(EbMSMessageUtils.createError("//Header/MessageHeader/@version",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Invalid value."));
 		if (!isValid(messageHeader.getFrom().getPartyId()))
 			throw new EbMSValidationException(EbMSMessageUtils.createError("//Header/MessageHeader/From/PartyId",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Invalid value."));
 		if (StringUtils.isEmpty(messageHeader.getFrom().getRole()))
@@ -106,36 +106,36 @@ public class MessageHeaderValidator
 			if (!checkAckRequested(deliveryChannel,ackRequested))
 				throw new EbMSValidationException(EbMSMessageUtils.createError("//Header/AckRequested",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Wrong value."));
 			if (ackRequested != null && !Constants.EBMS_VERSION.equals(ackRequested.getVersion()))
-				throw new EbMSValidationException(EbMSMessageUtils.createError("//Header/AckRequested[@version]",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Invalid value."));
+				throw new EbMSValidationException(EbMSMessageUtils.createError("//Header/AckRequested/@version",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Invalid value."));
 			if (ackRequested != null && ackRequested.getActor() != null && !ackRequested.getActor().equals(ActorType.URN_OASIS_NAMES_TC_EBXML_MSG_ACTOR_TO_PARTY_MSH.value()))
 				if (ackRequested.getActor().equals(ActorType.URN_OASIS_NAMES_TC_EBXML_MSG_ACTOR_NEXT_MSH.value()))
-					throw new EbMSValidationException(EbMSMessageUtils.createError("//Header/AckRequested[@actor]",Constants.EbMSErrorCode.NOT_SUPPORTED.errorCode(),"NextMSH not supported."));
+					throw new EbMSValidationException(EbMSMessageUtils.createError("//Header/AckRequested/@actor",Constants.EbMSErrorCode.NOT_SUPPORTED.errorCode(),"NextMSH not supported."));
 				else
-					throw new EbMSValidationException(EbMSMessageUtils.createError("//Header/AckRequested[@actor]",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Invalid value."));
+					throw new EbMSValidationException(EbMSMessageUtils.createError("//Header/AckRequested/@actor",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Invalid value."));
 			if (!checkAckSignatureRequested(deliveryChannel,ackRequested))
-				throw new EbMSValidationException(EbMSMessageUtils.createError("//Header/AckRequested[@signed]",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Wrong value."));
+				throw new EbMSValidationException(EbMSMessageUtils.createError("//Header/AckRequested/@signed",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Wrong value."));
 
 			if (!checkSyncReply(deliveryChannel,syncReply))
 				throw new EbMSValidationException(EbMSMessageUtils.createError("//Header/SyncReply",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Wrong value."));
 			if (syncReply != null && !Constants.EBMS_VERSION.equals(syncReply.getVersion()))
-				throw new EbMSValidationException(EbMSMessageUtils.createError("//Header/SyncReply[@version]",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Invalid value."));
+				throw new EbMSValidationException(EbMSMessageUtils.createError("//Header/SyncReply/@version",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Invalid value."));
 			if (syncReply != null && syncReply.getActor() != null && !syncReply.getActor().equals(Constants.NSURI_SOAP_NEXT_ACTOR))
-				throw new EbMSValidationException(EbMSMessageUtils.createError("//Header/SyncReply[@actor]",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Wrong value."));
+				throw new EbMSValidationException(EbMSMessageUtils.createError("//Header/SyncReply/@actor",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Wrong value."));
 
 			if (messageOrder != null)
 				throw new EbMSValidationException(EbMSMessageUtils.createError("//Header/MessageOrder",Constants.EbMSErrorCode.NOT_SUPPORTED.errorCode(),"MessageOrder not supported."));
 //			if (messageOrder != null && !Constants.EBMS_VERSION.equals(messageOrder.getVersion()))
-//				throw new EbMSValidationException(EbMSMessageUtils.createError("//Header/MessageOrder[@version]",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Invalid value."));
+//				throw new EbMSValidationException(EbMSMessageUtils.createError("//Header/MessageOrder/@version",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Invalid value."));
 		}
 		if (Constants.EBMS_SERVICE_URI.equals(messageHeader.getService().getValue()) && EbMSAction.ACKNOWLEDGMENT.action().equals(messageHeader.getAction()))
 		{
 			Acknowledgment acknowledgment = message.getAcknowledgment();
 			if (acknowledgment != null && !Constants.EBMS_VERSION.equals(acknowledgment.getVersion()))
-				throw new EbMSValidationException(EbMSMessageUtils.createError("//Header/Acknowledgment[@version]",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Invalid value."));
+				throw new EbMSValidationException(EbMSMessageUtils.createError("//Header/Acknowledgment/@version",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Invalid value."));
 			if (!checkActor(deliveryChannel,acknowledgment))
-				throw new EbMSValidationException(EbMSMessageUtils.createError("//Header/Acknowledgment[@actor]",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Wrong value."));
+				throw new EbMSValidationException(EbMSMessageUtils.createError("//Header/Acknowledgment/@actor",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Wrong value."));
 			if (acknowledgment.getActor() != null && acknowledgment.getActor().equals(ActorType.URN_OASIS_NAMES_TC_EBXML_MSG_ACTOR_NEXT_MSH.value()))
-				throw new EbMSValidationException(EbMSMessageUtils.createError("//Header/Acknowledgment[@actor]",Constants.EbMSErrorCode.NOT_SUPPORTED.errorCode(),"NextMSH not supported."));
+				throw new EbMSValidationException(EbMSMessageUtils.createError("//Header/Acknowledgment/@actor",Constants.EbMSErrorCode.NOT_SUPPORTED.errorCode(),"NextMSH not supported."));
 			if (!checkAckSignatureRequested(deliveryChannel,acknowledgment))
 				throw new EbMSValidationException(EbMSMessageUtils.createError("//Header/Acknowledgment/Reference",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Wrong value."));
 		}
