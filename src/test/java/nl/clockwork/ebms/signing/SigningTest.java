@@ -6,6 +6,8 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.activation.DataSource;
+import javax.mail.util.ByteArrayDataSource;
 import javax.xml.bind.JAXBException;
 
 import net.sf.ehcache.Ehcache;
@@ -14,12 +16,14 @@ import nl.clockwork.ebms.common.EbMSMessageFactory;
 import nl.clockwork.ebms.common.XMLMessageBuilder;
 import nl.clockwork.ebms.dao.DAOException;
 import nl.clockwork.ebms.dao.EbMSDAO;
+import nl.clockwork.ebms.model.EbMSAttachment;
 import nl.clockwork.ebms.model.EbMSDataSource;
 import nl.clockwork.ebms.model.EbMSMessage;
 import nl.clockwork.ebms.model.EbMSMessageContent;
 import nl.clockwork.ebms.model.EbMSMessageContext;
 import nl.clockwork.ebms.model.Role;
 import nl.clockwork.ebms.processor.EbMSProcessorException;
+import nl.clockwork.ebms.validation.ValidationException;
 import nl.clockwork.ebms.validation.ValidatorException;
 
 import org.apache.commons.io.IOUtils;
@@ -27,12 +31,14 @@ import org.apache.xml.security.Init;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CollaborationProtocolAgreement;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
 
 public class SigningTest
 {
 	private CPAManager cpaManager;
 	private EbMSMessageFactory messageFactory;
-	String cpaId = "cpaStubEBF.rm.https.signed";
+	private String cpaId = "cpaStubEBF.rm.https.signed";
 	private String keyStorePath = "keystore.jks";
 	private String keyStorePassword = "password";
 	private EbMSSignatureGenerator signatureGenerator;
@@ -47,6 +53,40 @@ public class SigningTest
 		signatureValidator = initSignatureValidator(cpaManager);
 	}
 
+	@Test
+	public void testSiging() throws EbMSProcessorException, ValidatorException
+	{
+		EbMSMessage message = createMessage();
+		signatureGenerator.generate(message);
+		signatureValidator.validate(message);
+	}
+
+	@Test(expected = ValidationException.class)
+	public void testSigingHeaderValidationFailure() throws EbMSProcessorException, ValidatorException
+	{
+		EbMSMessage message = createMessage();
+		signatureGenerator.generate(message);
+		change(message);
+		signatureValidator.validate(message);
+	}
+
+	private void change(EbMSMessage message)
+	{
+		Document d = message.getMessage();
+		Node conversationId = d.getElementsByTagNameNS("http://www.oasis-open.org/committees/ebxml-msg/schema/msg-header-2_0.xsd","ConversationId").item(0);
+		String s = conversationId.getTextContent();
+		conversationId.setTextContent(s + "0");
+	}
+
+	@Test(expected = ValidationException.class)
+	public void testSigingAttachmentValidationFailure() throws EbMSProcessorException, ValidatorException
+	{
+		EbMSMessage message = createMessage();
+		signatureGenerator.generate(message);
+		message.setAttachments(createAttachments(message.getMessageHeader().getMessageData().getMessageId()));
+		signatureValidator.validate(message);
+	}
+
 	private CPAManager initCPAManager() throws DAOException, IOException, JAXBException
 	{
 		CPAManager result = new CPAManager();
@@ -59,7 +99,6 @@ public class SigningTest
 	{
 		Ehcache result = Mockito.mock(Ehcache.class);
 		Mockito.when(result.remove(Mockito.any(Serializable.class))).thenReturn(true);
-		//Mockito.when(result.removeAll());
 		return result;
 	}
 
@@ -106,14 +145,6 @@ public class SigningTest
 		return result;
 	}
 
-	@Test
-	public void testSiging() throws EbMSProcessorException, ValidatorException
-	{
-		EbMSMessage message = createMessage();
-		signatureGenerator.generate(message);
-		signatureValidator.validate(message);
-	}
-
 	private EbMSMessage createMessage() throws EbMSProcessorException
 	{
 		EbMSMessageContent content = createEbMSMessageContent(cpaId);
@@ -146,5 +177,25 @@ public class SigningTest
 		result.add(new EbMSDataSource("test.txt","plain/text; charset=utf-8","Dit is een test.".getBytes(Charset.forName("UTF-8"))));
 		return result;
 	}
+
+	private List<EbMSAttachment> createAttachments(String messageId)
+	{
+		List<EbMSAttachment> result = new ArrayList<EbMSAttachment>();
+		result.add(new EbMSAttachment(createDataSource(),createContentId(messageId,1)));
+		return result;
+	}
+
+	private DataSource createDataSource()
+	{
+		ByteArrayDataSource result = new ByteArrayDataSource("Dit is een andere test.".getBytes(Charset.forName("UTF-8")),"plain/text; charset=utf-8");
+		result.setName("test.txt");
+		return result;
+	}
+
+	private String createContentId(String messageId, int i)
+	{
+		return messageId.replaceAll("^([^@]+)@(.+)$","$1-" + i + "@$2");
+	}
+
 
 }

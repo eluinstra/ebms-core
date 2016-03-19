@@ -32,11 +32,11 @@ public class EncryptionTest
 {
 	private CPAManager cpaManager;
 	private EbMSMessageFactory messageFactory;
-	String cpaId = "cpaStubEBF.rm.https.signed";
+	private String cpaId = "cpaStubEBF.rm.https.signed";
 	private String keyStorePath = "keystore.jks";
 	private String keyStorePassword = "password";
-	EbMSMessageEncrypter messageEncrypter;
-	EbMSMessageDecrypter messageDecrypter;
+	private EbMSMessageEncrypter messageEncrypter;
+	private EbMSMessageDecrypter messageDecrypter;
 
 	public EncryptionTest() throws Exception
 	{
@@ -45,6 +45,14 @@ public class EncryptionTest
 		messageFactory = initMessageFactory(cpaManager);
 		messageEncrypter = initMessageEncrypter(cpaManager);
 		messageDecrypter = initMessageDecrypter(cpaManager);
+	}
+
+	@Test
+	public void testEncryption() throws EbMSProcessorException, ValidatorException
+	{
+		EbMSMessage message = createMessage();
+		messageEncrypter.encrypt(message);
+		messageDecrypter.decrypt(message);
 	}
 
 	private CPAManager initCPAManager() throws DAOException, IOException, JAXBException
@@ -59,7 +67,6 @@ public class EncryptionTest
 	{
 		Ehcache result = Mockito.mock(Ehcache.class);
 		Mockito.when(result.remove(Mockito.any(Serializable.class))).thenReturn(true);
-		//Mockito.when(result.removeAll());
 		return result;
 	}
 
@@ -102,14 +109,6 @@ public class EncryptionTest
 		result.setKeyStorePassword(keyStorePassword);
 		result.afterPropertiesSet();
 		return result;
-	}
-
-	@Test
-	public void testEncryption() throws EbMSProcessorException, ValidatorException
-	{
-		EbMSMessage message = createMessage();
-		messageEncrypter.encrypt(message);
-		messageDecrypter.decrypt(message);
 	}
 
 	private EbMSMessage createMessage() throws EbMSProcessorException
