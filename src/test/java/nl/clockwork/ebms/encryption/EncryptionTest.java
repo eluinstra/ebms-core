@@ -1,4 +1,4 @@
-package nl.clockwork.ebms.signing;
+package nl.clockwork.ebms.encryption;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -28,23 +28,23 @@ import org.junit.Test;
 import org.mockito.Mockito;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CollaborationProtocolAgreement;
 
-public class SigningTest
+public class EncryptionTest
 {
 	private CPAManager cpaManager;
 	private EbMSMessageFactory messageFactory;
 	String cpaId = "cpaStubEBF.rm.https.signed";
 	private String keyStorePath = "keystore.jks";
 	private String keyStorePassword = "password";
-	private EbMSSignatureGenerator signatureGenerator;
-	private EbMSSignatureValidator signatureValidator;
+	EbMSMessageEncrypter messageEncrypter;
+	EbMSMessageDecrypter messageDecrypter;
 
-	public SigningTest() throws Exception
+	public EncryptionTest() throws Exception
 	{
 		Init.init();
 		cpaManager = initCPAManager();
 		messageFactory = initMessageFactory(cpaManager);
-		signatureGenerator = initSignatureGenerator(cpaManager);
-		signatureValidator = initSignatureValidator(cpaManager);
+		messageEncrypter = initMessageEncrypter(cpaManager);
+		messageDecrypter = initMessageDecrypter(cpaManager);
 	}
 
 	private CPAManager initCPAManager() throws DAOException, IOException, JAXBException
@@ -84,21 +84,9 @@ public class SigningTest
 		return result;
 	}
 
-	private EbMSSignatureGenerator initSignatureGenerator(CPAManager cpaManager) throws Exception
+	private EbMSMessageEncrypter initMessageEncrypter(CPAManager cpaManager) throws Exception
 	{
-		EbMSSignatureGenerator result = new EbMSSignatureGenerator();
-		result.setCpaManager(cpaManager);
-		result.setCanonicalizationMethodAlgorithm("http://www.w3.org/TR/2001/REC-xml-c14n-20010315");
-		result.setTransformAlgorithm("http://www.w3.org/TR/2001/REC-xml-c14n-20010315");
-		result.setKeyStorePath(keyStorePath);
-		result.setKeyStorePassword(keyStorePassword);
-		result.afterPropertiesSet();
-		return result;
-	}
-
-	private EbMSSignatureValidator initSignatureValidator(CPAManager cpaManager) throws Exception
-	{
-		EbMSSignatureValidator result = new EbMSSignatureValidator();
+		EbMSMessageEncrypter result = new EbMSMessageEncrypter();
 		result.setCpaManager(cpaManager);
 		result.setTrustStorePath(keyStorePath);
 		result.setTrustStorePassword(keyStorePassword);
@@ -106,12 +94,22 @@ public class SigningTest
 		return result;
 	}
 
+	private EbMSMessageDecrypter initMessageDecrypter(CPAManager cpaManager) throws Exception
+	{
+		EbMSMessageDecrypter result = new EbMSMessageDecrypter();
+		result.setCpaManager(cpaManager);
+		result.setKeyStorePath(keyStorePath);
+		result.setKeyStorePassword(keyStorePassword);
+		result.afterPropertiesSet();
+		return result;
+	}
+
 	@Test
-	public void testSiging() throws EbMSProcessorException, ValidatorException
+	public void testEncryption() throws EbMSProcessorException, ValidatorException
 	{
 		EbMSMessage message = createMessage();
-		signatureGenerator.generate(message);
-		signatureValidator.validate(message);
+		messageEncrypter.encrypt(message);
+		messageDecrypter.decrypt(message);
 	}
 
 	private EbMSMessage createMessage() throws EbMSProcessorException
