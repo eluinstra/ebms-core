@@ -211,7 +211,7 @@ public class EbMSMessageFactory
 		}
 	}
 
-	public EbMSMessage ebMSMessageContentToEbMSMessage(String cpaId, EbMSMessageContent content) throws EbMSProcessorException
+	public EbMSMessage createEbMSMessage(String cpaId, EbMSMessageContent content) throws EbMSProcessorException
 	{
 		try
 		{
