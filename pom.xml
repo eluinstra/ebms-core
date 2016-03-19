@@ -61,18 +61,18 @@
 		<snapshot.repo.url>http://sourceforge.net</snapshot.repo.url>
 	</properties>
 	<dependencies>
-		<!--dependency>
+		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<version>4.12</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.dbunit</groupId>
-			<artifactId>dbunit</artifactId>
-			<version>2.5.0</version>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-all</artifactId>
+			<version>1.9.5</version>
 			<scope>test</scope>
-		</dependency-->
+		</dependency>
 		<dependency>
 			<groupId>com.sun.xml.bind</groupId>
 			<artifactId>jaxb-impl</artifactId>
@@ -253,6 +253,8 @@
 						<include>pom.xml</include>
 						<include>src/main/java/**/*.java</include>
 						<include>src/main/resources/**/*</include>
+						<include>src/test/java/**/*.java</include>
+						<include>src/test/resources/**/*</include>
 					</includes>
 					<excludes>
 						<include>src/main/resources/**/*.jks</include>
