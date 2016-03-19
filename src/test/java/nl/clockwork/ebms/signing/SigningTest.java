@@ -66,16 +66,8 @@ public class SigningTest
 	{
 		EbMSMessage message = createMessage();
 		signatureGenerator.generate(message);
-		change(message);
+		changeConversationId(message);
 		signatureValidator.validate(message);
-	}
-
-	private void change(EbMSMessage message)
-	{
-		Document d = message.getMessage();
-		Node conversationId = d.getElementsByTagNameNS("http://www.oasis-open.org/committees/ebxml-msg/schema/msg-header-2_0.xsd","ConversationId").item(0);
-		String s = conversationId.getTextContent();
-		conversationId.setTextContent(s + "0");
 	}
 
 	@Test(expected = ValidationException.class)
@@ -85,6 +77,13 @@ public class SigningTest
 		signatureGenerator.generate(message);
 		message.setAttachments(createAttachments(message.getMessageHeader().getMessageData().getMessageId()));
 		signatureValidator.validate(message);
+	}
+
+	private void changeConversationId(EbMSMessage message)
+	{
+		Document d = message.getMessage();
+		Node conversationId = d.getElementsByTagNameNS("http://www.oasis-open.org/committees/ebxml-msg/schema/msg-header-2_0.xsd","ConversationId").item(0);
+		conversationId.setTextContent(conversationId.getTextContent() + "0");
 	}
 
 	private CPAManager initCPAManager() throws DAOException, IOException, JAXBException
@@ -196,6 +195,5 @@ public class SigningTest
 	{
 		return messageId.replaceAll("^([^@]+)@(.+)$","$1-" + i + "@$2");
 	}
-
 
 }
