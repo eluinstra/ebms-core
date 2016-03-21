@@ -1,5 +1,7 @@
 package nl.clockwork.ebms.encryption;
 
+import static org.junit.Assert.assertEquals;
+
 import java.io.IOException;
 import java.io.Serializable;
 import java.nio.charset.Charset;
@@ -58,11 +60,12 @@ public class EncryptionTest
 	}
 
 	@Test
-	public void testEncryption() throws EbMSProcessorException, ValidatorException
+	public void testEncryption() throws EbMSProcessorException, ValidatorException, IOException
 	{
 		EbMSMessage message = createMessage();
 		messageEncrypter.encrypt(message);
 		messageDecrypter.decrypt(message);
+		assertEquals("Dit is een test.",IOUtils.toString(message.getAttachments().get(0).getInputStream()));
 	}
 
 	@Test(expected = EbMSValidationException.class)
@@ -74,7 +77,7 @@ public class EncryptionTest
 		messageDecrypter.decrypt(message);
 	}
 
-	//@Test(expected = EbMSValidationException.class)
+	@Test(expected = EbMSValidationException.class)
 	public void testEncryptionAttachmentValidationFailure1() throws EbMSProcessorException, ParserConfigurationException, SAXException, IOException, TransformerException, ValidatorException
 	{
 		EbMSMessage message = createMessage();
@@ -97,7 +100,7 @@ public class EncryptionTest
 		EbMSAttachment attachment = message.getAttachments().get(0);
 		Document d = DOMUtils.read(attachment.getInputStream());
 		Node cipherValue = d.getElementsByTagNameNS("http://www.w3.org/2001/04/xmlenc#","CipherValue").item(0);
-		cipherValue.setTextContent(cipherValue.getTextContent().replace('0','1'));
+		cipherValue.setTextContent("XXXXXXX" + cipherValue.getTextContent());
 		ByteArrayDataSource ds = new ByteArrayDataSource(DOMUtils.toString(d).getBytes("UTF-8"),"application/xml");
 		ds.setName(attachment.getName());
 		message.getAttachments().remove(0);
@@ -106,10 +109,10 @@ public class EncryptionTest
 
 	private void changeAttachment1(EbMSMessage message) throws ParserConfigurationException, SAXException, IOException, TransformerException
 	{
-		EbMSAttachment attachment = message.getAttachments().get(1);
+		EbMSAttachment attachment = message.getAttachments().get(0);
 		Document d = DOMUtils.read(attachment.getInputStream());
-		Node cipherValue = d.getElementsByTagNameNS("http://www.w3.org/2001/04/xmlenc#","CipherValue").item(0);
-		cipherValue.setTextContent(cipherValue.getTextContent().replace('0','1'));
+		Node cipherValue = d.getElementsByTagNameNS("http://www.w3.org/2001/04/xmlenc#","CipherValue").item(1);
+		cipherValue.setTextContent("XXXXXXX" + cipherValue.getTextContent());
 		ByteArrayDataSource ds = new ByteArrayDataSource(DOMUtils.toString(d).getBytes("UTF-8"),"application/xml");
 		ds.setName(attachment.getName());
 		message.getAttachments().remove(0);
