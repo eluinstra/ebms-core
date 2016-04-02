@@ -69,6 +69,8 @@ import org.xmlsoap.schemas.soap.envelope.Header;
 
 public class EbMSMessageUtils
 {
+	private static boolean oraclePatch;
+
 	public static EbMSMessage getEbMSMessage(Document document) throws JAXBException, XPathExpressionException, ParserConfigurationException, SAXException, IOException
 	{
 		return getEbMSMessage(document,new ArrayList<EbMSAttachment>());
@@ -249,7 +251,7 @@ public class EbMSMessageUtils
 		
 		XMLMessageBuilder<Envelope> messageBuilder = XMLMessageBuilder.getInstance(Envelope.class,Envelope.class,MessageHeader.class,SyncReply.class,MessageOrder.class,AckRequested.class,ErrorList.class,Acknowledgment.class,Manifest.class,StatusRequest.class,StatusResponse.class);
 		//return DOMUtils.getDocumentBuilder().parse(new ByteArrayInputStream(messageBuilder.handle(new JAXBElement<Envelope>(new QName("http://schemas.xmlsoap.org/soap/envelope/","Envelope"),Envelope.class,envelope)).getBytes()));
-		return DOMUtils.getDocumentBuilder().parse(new ByteArrayInputStream(messageBuilder.handle(new JAXBElement<Envelope>(new QName("http://schemas.xmlsoap.org/soap/envelope/","Envelope"),Envelope.class,envelope),new EbMSNamespaceMapper()).getBytes()));
+		return DOMUtils.getDocumentBuilder().parse(new ByteArrayInputStream(messageBuilder.handle(new JAXBElement<Envelope>(new QName("http://schemas.xmlsoap.org/soap/envelope/","Envelope"),Envelope.class,envelope),oraclePatch ? new EbMSNamespaceMapper() : null).getBytes()));
 	}
 
 	public static Fault getSOAPFault(String s)
@@ -289,4 +291,8 @@ public class EbMSMessageUtils
 		return DOMUtils.getDocumentBuilder().parse(new ByteArrayInputStream(XMLMessageBuilder.getInstance(Envelope.class).handle(new JAXBElement<Envelope>(new QName("http://schemas.xmlsoap.org/soap/envelope/","Envelope"),Envelope.class,envelope)).getBytes()));
 	}
 	
+	public static void setOraclePatch(boolean oraclePatch)
+	{
+		EbMSMessageUtils.oraclePatch = oraclePatch;
+	}
 }

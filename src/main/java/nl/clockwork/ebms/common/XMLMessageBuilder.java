@@ -188,7 +188,8 @@ public class XMLMessageBuilder<T>
 		StringWriter result = new StringWriter();
 		Marshaller marshaller = context.createMarshaller();
 		marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT,Boolean.TRUE);
-		marshaller.setProperty("com.sun.xml.bind.namespacePrefixMapper",namespacePrefixMapper);
+		if (namespacePrefixMapper != null)
+			marshaller.setProperty("com.sun.xml.bind.namespacePrefixMapper",namespacePrefixMapper);
 		marshaller.marshal(e,result);
 		result.flush();
 		return result.toString();
