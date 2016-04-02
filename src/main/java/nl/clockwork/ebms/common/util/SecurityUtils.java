@@ -44,8 +44,6 @@ public class SecurityUtils
 			in = SecurityUtils.class.getResourceAsStream("/" + location);
 		if (in == null)
 			in = new FileInputStream(location);
-		if (in == null)
-			throw new IOException("Cannot find keystore " + location);
 		KeyStore keyStore = KeyStore.getInstance("JKS");
 		keyStore.load(in,password.toCharArray());
 		return keyStore;
