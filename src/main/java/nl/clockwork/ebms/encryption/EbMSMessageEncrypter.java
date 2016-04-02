@@ -185,7 +185,7 @@ public class EbMSMessageEncrypter implements InitializingBean
 
 	private EbMSAttachment encrypt(X509Certificate certificate, String encryptionAlgorithm, EbMSAttachment attachment) throws NoSuchAlgorithmException, XMLEncryptionException, FileNotFoundException, Exception
 	{
-		SecretKey secretKey = SecurityUtils.GenerateKey(encryptionAlgorithm);
+		SecretKey secretKey = SecurityUtils.generateKey(encryptionAlgorithm);
 		XMLCipher xmlCipher = createXmlCipher(encryptionAlgorithm,secretKey);
 		EncryptedKey encryptedKey = createEncryptedKey(certificate.getPublicKey(),secretKey);
 		setEncryptedData(xmlCipher,encryptedKey,certificate,attachment);

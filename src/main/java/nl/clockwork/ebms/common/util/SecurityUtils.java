@@ -79,30 +79,28 @@ public class SecurityUtils
 		return null;
 	}
 
-	public static SecretKey GenerateKey(String encryptionAlgorithm) throws NoSuchAlgorithmException
+	public static SecretKey generateKey(String encryptionAlgorithm) throws NoSuchAlgorithmException
 	{
-		KeyGenerator keyGenerator;
 		switch (encryptionAlgorithm)
 		{
 			case XMLCipher.AES_128:
-				keyGenerator = KeyGenerator.getInstance("AES");
-				keyGenerator.init(128);
-				return keyGenerator.generateKey();
+				return generateKey("AES",128);
 			case XMLCipher.AES_192:
-				keyGenerator = KeyGenerator.getInstance("AES");
-				keyGenerator.init(192);
-				return keyGenerator.generateKey();
+				return generateKey("AES",192);
 			case XMLCipher.AES_256:
-				keyGenerator = KeyGenerator.getInstance("AES");
-				keyGenerator.init(256);
-				return keyGenerator.generateKey();
+				return generateKey("AES",256);
 			case XMLCipher.TRIPLEDES:
-				keyGenerator = KeyGenerator.getInstance("DESede");
-				keyGenerator.init(192);
-				return keyGenerator.generateKey();
+				return generateKey("DESede",192);
 			default:
 				return null;
 		}
+	}
+
+	private static SecretKey generateKey(String algorithm, int keysize) throws NoSuchAlgorithmException
+	{
+		KeyGenerator keyGenerator = KeyGenerator.getInstance(algorithm);
+		keyGenerator.init(keysize);
+		return keyGenerator.generateKey();
 	}
 
 }

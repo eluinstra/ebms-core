@@ -135,7 +135,7 @@ public class CPAValidator
 					if (encryptionAlgorithm != null)
 						try
 						{
-							if (SecurityUtils.GenerateKey(encryptionAlgorithm) == null)
+							if (SecurityUtils.generateKey(encryptionAlgorithm) == null)
 								logger.warn("Encryption Algorithm " + encryptionAlgorithm + " not supported!");
 						}
 						catch (NoSuchAlgorithmException e)
