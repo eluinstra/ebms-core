@@ -67,11 +67,11 @@ public class MessageHeaderValidator
 			throw new EbMSValidationException(EbMSMessageUtils.createError("//Header/MessageHeader/@version",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Invalid value."));
 		if (!isValid(messageHeader.getFrom().getPartyId()))
 			throw new EbMSValidationException(EbMSMessageUtils.createError("//Header/MessageHeader/From/PartyId",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Invalid value."));
-		if (StringUtils.isEmpty(messageHeader.getFrom().getRole()))
+		if (!Constants.EBMS_SERVICE_URI.equals(message.getMessageHeader().getService().getValue()) && StringUtils.isEmpty(messageHeader.getFrom().getRole()))
 			throw new EbMSValidationException(EbMSMessageUtils.createError("//Header/MessageHeader/From/Role",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Invalid value."));
 		if (!isValid(messageHeader.getTo().getPartyId()))
 			throw new EbMSValidationException(EbMSMessageUtils.createError("//Header/MessageHeader/To/PartyId",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Invalid value."));
-		if (StringUtils.isEmpty(messageHeader.getTo().getRole()))
+		if (!Constants.EBMS_SERVICE_URI.equals(message.getMessageHeader().getService().getValue()) && StringUtils.isEmpty(messageHeader.getTo().getRole()))
 			throw new EbMSValidationException(EbMSMessageUtils.createError("//Header/MessageHeader/To/Role",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Invalid value."));
 		if (!isValid(messageHeader.getService()))
 			throw new EbMSValidationException(EbMSMessageUtils.createError("//Header/MessageHeader/Service",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Invalid value."));
