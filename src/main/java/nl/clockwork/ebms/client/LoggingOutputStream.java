@@ -26,7 +26,7 @@ import nl.clockwork.ebms.common.util.HTTPUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-class LoggingOutputStream extends FilterOutputStream
+public class LoggingOutputStream extends FilterOutputStream
 {
   protected transient Log logger = LogFactory.getLog(getClass());
 	private Map<String,List<String>> properties;
