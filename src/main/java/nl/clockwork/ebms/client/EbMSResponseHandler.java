@@ -79,6 +79,7 @@ public class EbMSResponseHandler
 					if (input != null)
 					{
 						String response = IOUtils.toString(input);
+						logger.info("<<<< statusCode = " + connection.getResponseCode() + "\n" + response);
 						if (connection.getResponseCode() == 500)
 						{
 							Fault soapFault = EbMSMessageUtils.getSOAPFault(response);
@@ -88,17 +89,24 @@ public class EbMSResponseHandler
 						throw new EbMSResponseException(connection.getResponseCode(),response);
 					}
 					else
+					{
+						logger.info("<<<< statusCode = " + connection.getResponseCode());
 						throw new EbMSResponseException(connection.getResponseCode());
+					}
 				}
 			}
 			else
+			{
+				logger.info("<<<< statusCode = " + connection.getResponseCode());
 				throw new EbMSResponseException(connection.getResponseCode());
+			}
 		}
 		catch (IOException e)
 		{
 			try (InputStream errorStream = new BufferedInputStream(connection.getErrorStream()))
 			{
 				String error = IOUtils.toString(errorStream,getEncoding());
+				logger.info("<<<< statusCode = " + connection.getResponseCode() + "\n" + error);
 				throw new EbMSResponseException(connection.getResponseCode(),error);
 			}
 			catch (IOException ignore)
