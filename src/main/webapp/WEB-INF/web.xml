@@ -15,7 +15,8 @@
 
   <servlet>
     <servlet-name>EbMSServlet</servlet-name>
-    <servlet-class>nl.clockwork.ebms.servlet.EbMSServlet</servlet-class>
+    <servlet-class>nl.clockwork.ebms.ext.servlet.LoggingEbMSMessageServlet</servlet-class>
+    <init-param><param-name>ebMSMessageProcessor</param-name><param-value>messageProcessor</param-value></init-param>
     <load-on-startup>1</load-on-startup>
   </servlet>
 

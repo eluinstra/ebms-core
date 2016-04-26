@@ -25,6 +25,7 @@
 		<property name="locations"> 
 			<list>
 				<value>classpath:nl/clockwork/ebms/default.properties</value>   
+				<value>classpath:nl/clockwork/ebms/ext/default.properties</value>   
 				<value>classpath:nl/clockwork/ebms/web/default.properties</value>   
 				<value>file:${catalina.base}/conf/ebms-web.properties</value>
 			</list>
@@ -34,13 +35,19 @@
 	<import resource="classpath:nl/clockwork/ebms/cache.xml" />
 	<import resource="classpath:nl/clockwork/ebms/datasource.xml"/>
 	<import resource="classpath:nl/clockwork/ebms/dao.xml" />
-	<import resource="classpath:nl/clockwork/ebms/processor.xml" />
+<!-- 	<import resource="classpath:nl/clockwork/ebms/processor.xml" /> -->
 	<import resource="classpath:nl/clockwork/ebms/eventListener.xml" />
 
 	<import resource="classpath:nl/clockwork/ebms/web/hsqldb/hsqldb.provider.xml"/>
 
+	<import resource="classpath:nl/clockwork/ebms/ext/dao.xml"/>
+	<import resource="classpath:nl/clockwork/ebms/ext/processor.xml"/>
+	<import resource="classpath:nl/clockwork/ebms/ext/echoService.xml"/>
+
 	<jaxws:endpoint implementor="#cpaService" address="/cpa" />
 
 	<jaxws:endpoint implementor="#ebMSMessageService" address="/ebms" />
+
+	<jaxws:endpoint implementor="#ebMSAdminService" address="/admin" />
 
 </beans>

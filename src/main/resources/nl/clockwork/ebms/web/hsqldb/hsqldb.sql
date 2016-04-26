@@ -79,3 +79,12 @@ CREATE TABLE ebms_event_log
 	error_message			CLOB						NULL,
 	FOREIGN KEY (message_id,message_nr) REFERENCES ebms_message (message_id,message_nr)
 );
+
+CREATE TABLE ebms_message_log
+(
+	time_stamp				TIMESTAMP				NOT NULL,
+	message_type			SMALLINT				NOT NULL,
+	cpa_id						VARCHAR(256)		NULL,
+	message_id				VARCHAR(256)		NULL,
+	content						BLOB						NULL
+);

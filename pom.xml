@@ -78,6 +78,11 @@
 			<version>2.11.5</version>
 		</dependency>
 		<dependency>
+			<groupId>nl.clockwork.ebms</groupId>
+			<artifactId>ebms-core-ext</artifactId>
+			<version>2.11.X.2</version>
+		</dependency>
+		<dependency>
 			<groupId>org.apache.cxf</groupId>
 			<artifactId>cxf-rt-frontend-jaxws</artifactId>
 			<version>${cxf.version}</version>
