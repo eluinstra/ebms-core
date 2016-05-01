@@ -200,7 +200,7 @@ public class CPAUtils
 		if (docExchange.getEbXMLSenderBinding() != null && docExchange.getEbXMLSenderBinding().getSenderNonRepudiation() != null && docExchange.getEbXMLSenderBinding().getSenderNonRepudiation().getSignatureAlgorithm() != null && !docExchange.getEbXMLSenderBinding().getSenderNonRepudiation().getSignatureAlgorithm().isEmpty())
 		{
 			SenderNonRepudiation senderNonRepudiation = docExchange.getEbXMLSenderBinding().getSenderNonRepudiation();
-			return senderNonRepudiation.getSignatureAlgorithm().get(0).getW3C() != null ? senderNonRepudiation.getSignatureAlgorithm().get(0).getW3C() : getSignatureAlgorithm(senderNonRepudiation.getSignatureAlgorithm().get(0).getValue());
+			return senderNonRepudiation.getSignatureAlgorithm().get(0).getW3C() != null ? senderNonRepudiation.getSignatureAlgorithm().get(0).getW3C() : senderNonRepudiation.getSignatureAlgorithm().get(0).getValue();
 		}
 		return null;
 	}
@@ -211,7 +211,7 @@ public class CPAUtils
 		if (docExchange.getEbXMLReceiverBinding() != null && docExchange.getEbXMLReceiverBinding().getReceiverDigitalEnvelope() != null && docExchange.getEbXMLReceiverBinding().getReceiverDigitalEnvelope().getEncryptionAlgorithm() != null && !docExchange.getEbXMLReceiverBinding().getReceiverDigitalEnvelope().getEncryptionAlgorithm().isEmpty())
 		{
 			ReceiverDigitalEnvelope receiverDigitalEnvelope = docExchange.getEbXMLReceiverBinding().getReceiverDigitalEnvelope();
-			return receiverDigitalEnvelope.getEncryptionAlgorithm().get(0).getW3C() != null ? receiverDigitalEnvelope.getEncryptionAlgorithm().get(0).getW3C() : getEncryptionAlgorithm(receiverDigitalEnvelope.getEncryptionAlgorithm().get(0).getValue());
+			return receiverDigitalEnvelope.getEncryptionAlgorithm().get(0).getW3C() != null ? receiverDigitalEnvelope.getEncryptionAlgorithm().get(0).getW3C() : receiverDigitalEnvelope.getEncryptionAlgorithm().get(0).getValue();
 		}
 		return null;
 	}
@@ -266,16 +266,4 @@ public class CPAUtils
 		return partyId.getValue().equals(cpaPartyId.getValue()) && (partyId.getType() == null || (cpaPartyId.getType() != null && partyId.getType().equals(cpaPartyId.getType())));
 	}
 	
-	private static String getSignatureAlgorithm(String value)
-	{
-		//TODO: Expected values include: RSA-MD5, RSA-SHA1, DSA-MD5, DSA-SHA1, SHA1withRSA, MD5withRSA, and so on.
-		return value;
-	}
-
-	private static String getEncryptionAlgorithm(String value)
-	{
-		//TODO: Expected values include:
-		return value;
-	}
-
 }
