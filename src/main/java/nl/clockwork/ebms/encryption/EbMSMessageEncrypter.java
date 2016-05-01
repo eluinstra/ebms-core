@@ -80,12 +80,6 @@ public class EbMSMessageEncrypter implements InitializingBean
 	private String trustStorePath;
 	private String trustStorePassword;
 	private KeyStore trustStore;
-	private Document document;
-
-	public EbMSMessageEncrypter() throws GeneralSecurityException, IOException, ParserConfigurationException, SAXException
-	{
-		document = createDocument();
-	}
 
 	@Override
 	public void afterPropertiesSet() throws Exception
@@ -105,7 +99,7 @@ public class EbMSMessageEncrypter implements InitializingBean
 				String encryptionAlgorithm = CPAUtils.getEncryptionAlgorithm(deliveryChannel);
 				List<EbMSAttachment> attachments = new ArrayList<EbMSAttachment>();
 				for (EbMSAttachment attachment : message.getAttachments())
-					attachments.add(encrypt(certificate,encryptionAlgorithm,attachment));
+					attachments.add(encrypt(createDocument(),certificate,encryptionAlgorithm,attachment));
 				message.setAttachments(attachments);
 			}
 		}
@@ -130,7 +124,7 @@ public class EbMSMessageEncrypter implements InitializingBean
 				String encryptionAlgorithm = CPAUtils.getEncryptionAlgorithm(deliveryChannel);
 				List<EbMSAttachment> attachments = new ArrayList<EbMSAttachment>();
 				for (EbMSAttachment attachment : message.getAttachments())
-					attachments.add(encrypt(certificate,encryptionAlgorithm,attachment));
+					attachments.add(encrypt(createDocument(),certificate,encryptionAlgorithm,attachment));
 				message.getAttachments().clear();
 				message.getAttachments().addAll(attachments);
 			}
@@ -183,12 +177,12 @@ public class EbMSMessageEncrypter implements InitializingBean
 		}
 	}
 
-	private EbMSAttachment encrypt(X509Certificate certificate, String encryptionAlgorithm, EbMSAttachment attachment) throws NoSuchAlgorithmException, XMLEncryptionException, FileNotFoundException, Exception
+	private EbMSAttachment encrypt(Document document, X509Certificate certificate, String encryptionAlgorithm, EbMSAttachment attachment) throws NoSuchAlgorithmException, XMLEncryptionException, FileNotFoundException, Exception
 	{
 		SecretKey secretKey = SecurityUtils.generateKey(encryptionAlgorithm);
 		XMLCipher xmlCipher = createXmlCipher(encryptionAlgorithm,secretKey);
-		EncryptedKey encryptedKey = createEncryptedKey(certificate.getPublicKey(),secretKey);
-		setEncryptedData(xmlCipher,encryptedKey,certificate,attachment);
+		EncryptedKey encryptedKey = createEncryptedKey(document,certificate.getPublicKey(),secretKey);
+		setEncryptedData(document,xmlCipher,encryptedKey,certificate,attachment);
 		EncryptedData encryptedData = xmlCipher.encryptData(document,null,attachment.getInputStream());
 		StringWriter buffer = new StringWriter();
 		createTransformer().transform(new DOMSource(xmlCipher.martial(document,encryptedData)),new StreamResult(buffer));
@@ -197,14 +191,14 @@ public class EbMSMessageEncrypter implements InitializingBean
 		return new EbMSAttachment(ds,attachment.getContentId());
 	}
 
-	private EncryptedKey createEncryptedKey(Key publicKey, SecretKey secretKey) throws XMLEncryptionException
+	private EncryptedKey createEncryptedKey(Document document, Key publicKey, SecretKey secretKey) throws XMLEncryptionException
 	{
 		XMLCipher keyCipher = XMLCipher.getInstance(XMLCipher.RSA_v1dot5);
 		keyCipher.init(XMLCipher.WRAP_MODE,publicKey);
 		return keyCipher.encryptKey(document,secretKey);
 	}
 
-	private void setEncryptedData(XMLCipher xmlCipher, EncryptedKey encryptedKey, X509Certificate certificate, EbMSAttachment attachment) throws XMLEncryptionException
+	private void setEncryptedData(Document document, XMLCipher xmlCipher, EncryptedKey encryptedKey, X509Certificate certificate, EbMSAttachment attachment) throws XMLEncryptionException
 	{
 		EncryptedData encryptedData = xmlCipher.getEncryptedData();
 		KeyInfo encryptedKeyInfo = new KeyInfo(document);
@@ -218,12 +212,19 @@ public class EbMSMessageEncrypter implements InitializingBean
 		encryptedData.setType(EncryptionConstants.TYPE_ELEMENT);
 	}
 
-	private Document createDocument() throws ParserConfigurationException, SAXException, IOException
+	private Document createDocument()
 	{
-		DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-		dbFactory.setNamespaceAware(true);
-		DocumentBuilder builder = dbFactory.newDocumentBuilder();
-		return builder.parse(new InputSource(new StringReader("<root></root>")));
+		try
+		{
+			DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+			dbFactory.setNamespaceAware(true);
+			DocumentBuilder builder = dbFactory.newDocumentBuilder();
+			return builder.parse(new InputSource(new StringReader("<root></root>")));
+		}
+		catch (ParserConfigurationException | SAXException | IOException e)
+		{
+			throw new RuntimeException(e);
+		}
 	}
 
 	private Transformer createTransformer() throws TransformerFactoryConfigurationError, TransformerConfigurationException
