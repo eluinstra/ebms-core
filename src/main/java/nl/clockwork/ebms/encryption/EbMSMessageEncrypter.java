@@ -55,6 +55,7 @@ import nl.clockwork.ebms.model.EbMSDocument;
 import nl.clockwork.ebms.model.EbMSEvent;
 import nl.clockwork.ebms.model.EbMSMessage;
 import nl.clockwork.ebms.processor.EbMSProcessingException;
+import nl.clockwork.ebms.processor.EbMSProcessorException;
 import nl.clockwork.ebms.util.CPAUtils;
 import nl.clockwork.ebms.validation.ValidationException;
 
@@ -212,7 +213,7 @@ public class EbMSMessageEncrypter implements InitializingBean
 		encryptedData.setType(EncryptionConstants.TYPE_ELEMENT);
 	}
 
-	private Document createDocument()
+	private Document createDocument() throws EbMSProcessorException
 	{
 		try
 		{
@@ -223,7 +224,7 @@ public class EbMSMessageEncrypter implements InitializingBean
 		}
 		catch (ParserConfigurationException | SAXException | IOException e)
 		{
-			throw new RuntimeException(e);
+			throw new EbMSProcessorException(e);
 		}
 	}
 

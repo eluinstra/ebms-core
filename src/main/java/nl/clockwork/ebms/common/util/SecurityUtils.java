@@ -92,7 +92,7 @@ public class SecurityUtils
 			case XMLCipher.TRIPLEDES:
 				return generateKey("DESede",192);
 			default:
-				return null;
+				throw new NoSuchAlgorithmException(encryptionAlgorithm);
 		}
 	}
 
