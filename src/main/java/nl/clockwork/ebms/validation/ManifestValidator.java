@@ -33,23 +33,24 @@ public class ManifestValidator
 
 	public void validate(EbMSMessage message) throws EbMSValidationException
 	{
-		if (message.getManifest() == null)
-			throw new EbMSValidationException(EbMSMessageUtils.createError("//Body/Manifest",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Invalid value."));
-		if (!Constants.EBMS_VERSION.equals(message.getManifest().getVersion()))
-			throw new EbMSValidationException(EbMSMessageUtils.createError("//Body/Manifest/@version",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Invalid value."));
 		List<EbMSAttachment> attachments = new ArrayList<EbMSAttachment>();
-		for (Reference reference : message.getManifest().getReference())
+		if (message.getManifest() != null)
 		{
-			if (reference.getHref().startsWith(Constants.CID))
+			if (!Constants.EBMS_VERSION.equals(message.getManifest().getVersion()))
+				throw new EbMSValidationException(EbMSMessageUtils.createError("//Body/Manifest/@version",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Invalid value."));
+			for (Reference reference : message.getManifest().getReference())
 			{
-				EbMSAttachment attachment = findAttachment(message.getAttachments(),reference.getHref());
-				if (attachment != null)
-					attachments.add(attachment);
+				if (reference.getHref().startsWith(Constants.CID))
+				{
+					EbMSAttachment attachment = findAttachment(message.getAttachments(),reference.getHref());
+					if (attachment != null)
+						attachments.add(attachment);
+					else
+						throw new EbMSValidationException(EbMSMessageUtils.createError(reference.getHref(),Constants.EbMSErrorCode.MIME_PROBLEM.errorCode(),"MIME part not found."));
+				}
 				else
-					throw new EbMSValidationException(EbMSMessageUtils.createError(reference.getHref(),Constants.EbMSErrorCode.MIME_PROBLEM.errorCode(),"MIME part not found."));
+					throw new EbMSValidationException(EbMSMessageUtils.createError("//Body/Manifest/Reference[@href='" + reference.getHref() + "']",Constants.EbMSErrorCode.MIME_PROBLEM.errorCode(),"URI cannot be resolved."));
 			}
-			else
-				throw new EbMSValidationException(EbMSMessageUtils.createError("//Body/Manifest/Reference[@href='" + reference.getHref() + "']",Constants.EbMSErrorCode.MIME_PROBLEM.errorCode(),"URI cannot be resolved."));
 		}
 		message.getAttachments().retainAll(attachments);
 	}
