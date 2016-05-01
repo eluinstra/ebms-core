@@ -215,28 +215,26 @@ public class EbMSMessageFactory
 	{
 		try
 		{
-			MessageHeader messageHeader = createMessageHeader(cpaId,content.getContext());
-			AckRequested ackRequested = createAckRequested(cpaId,content.getContext());
-			SyncReply syncReply = createSyncReply(cpaId,content.getContext());
-			Manifest manifest = EbMSMessageUtils.createManifest();
-	
-			List<EbMSAttachment> attachments = new ArrayList<EbMSAttachment>();
-			int i = 1;
-			for (EbMSDataSource dataSource : content.getDataSources())
-			{
-				String contentId = createContentId(messageHeader.getMessageData().getMessageId(),i++);
-				manifest.getReference().add(EbMSMessageUtils.createReference(contentId));
-				ByteArrayDataSource ds = new ByteArrayDataSource(dataSource.getContent(),dataSource.getContentType());
-				ds.setName(dataSource.getName());
-				attachments.add(new EbMSAttachment(ds,contentId));
-			}
-	
 			EbMSMessage result = new EbMSMessage();
-			result.setMessageHeader(messageHeader);
-			result.setAckRequested(ackRequested);
-			result.setSyncReply(syncReply);
-			result.setManifest(manifest);
-			result.setAttachments(attachments);
+			result.setMessageHeader(createMessageHeader(cpaId,content.getContext()));
+			result.setAckRequested(createAckRequested(cpaId,content.getContext()));
+			result.setSyncReply(createSyncReply(cpaId,content.getContext()));
+			if (content.getDataSources().size() > 0)
+			{
+				Manifest manifest = EbMSMessageUtils.createManifest();
+				List<EbMSAttachment> attachments = new ArrayList<EbMSAttachment>();
+				int i = 1;
+				for (EbMSDataSource dataSource : content.getDataSources())
+				{
+					String contentId = createContentId(result.getMessageHeader().getMessageData().getMessageId(),i++);
+					manifest.getReference().add(EbMSMessageUtils.createReference(contentId));
+					ByteArrayDataSource ds = new ByteArrayDataSource(dataSource.getContent(),dataSource.getContentType());
+					ds.setName(dataSource.getName());
+					attachments.add(new EbMSAttachment(ds,contentId));
+				}
+				result.setManifest(manifest);
+				result.setAttachments(attachments);
+			}
 			result.setMessage(EbMSMessageUtils.createSOAPMessage(result));
 			return result;
 		}
