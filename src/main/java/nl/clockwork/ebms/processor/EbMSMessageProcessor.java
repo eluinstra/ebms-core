@@ -59,7 +59,6 @@ import nl.clockwork.ebms.validation.XSDValidator;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.SyncReplyModeType;
-import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.AckRequested;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.ErrorList;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageHeader;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageStatusType;
@@ -86,19 +85,6 @@ public class EbMSMessageProcessor implements InitializingBean
   protected SignatureTypeValidator signatureTypeValidator;
   protected EbMSMessageDecrypter messageDecrypter;
   protected Service mshMessageService;
-
-  public EbMSMessageProcessor()
-	{
-		signatureGenerator = new EbMSSignatureGenerator()
-		{
-			@Override
-			public void generate(AckRequested ackRequested, EbMSMessage message) throws EbMSProcessorException
-			{
-			}
-		};
-		mshMessageService = new Service();
-		mshMessageService.setValue(Constants.EBMS_SERVICE_URI);
-	}
 
 	@Override
 	public void afterPropertiesSet() throws Exception
@@ -128,12 +114,20 @@ public class EbMSMessageProcessor implements InitializingBean
 			}
 			else if (EbMSAction.MESSAGE_ERROR.action().equals(message.getMessageHeader().getAction()))
 			{
-				process(timestamp,message,EbMSMessageStatus.DELIVERY_FAILED);
+				Document request = ebMSDAO.getDocument(message.getMessageHeader().getMessageData().getRefToMessageId());
+				EbMSMessage requestMessage = EbMSMessageUtils.getEbMSMessage(request);
+				if (requestMessage.getSyncReply() != null)
+					throw new EbMSProcessingException("No async ErrorMessage expected for message " + requestMessage.getMessageHeader().getMessageData().getMessageId() + "\n" + DOMUtils.toString(document.getMessage()));
+				processMessageError(message.getMessageHeader().getCPAId(),timestamp,requestMessage,message);
 				return null;
 			}
 			else if (EbMSAction.ACKNOWLEDGMENT.action().equals(message.getMessageHeader().getAction()))
 			{
-				process(timestamp,message,EbMSMessageStatus.DELIVERED);
+				Document request = ebMSDAO.getDocument(message.getAcknowledgment().getRefToMessageId());
+				EbMSMessage requestMessage = EbMSMessageUtils.getEbMSMessage(request);
+				if (requestMessage.getAckRequested() == null || requestMessage.getSyncReply() != null)
+					throw new EbMSProcessingException("No async Acknowledgment expected for message " + requestMessage.getMessageHeader().getMessageData().getMessageId() + "\n" + DOMUtils.toString(document.getMessage()));
+				processAcknowledgment(message.getMessageHeader().getCPAId(),timestamp,requestMessage,message);
 				return null;
 			}
 			else if (EbMSAction.STATUS_REQUEST.action().equals(message.getMessageHeader().getAction()))
@@ -197,12 +191,16 @@ public class EbMSMessageProcessor implements InitializingBean
 				if (Constants.EBMS_SERVICE_URI.equals(responseMessage.getMessageHeader().getService().getValue()))
 				{
 					if (EbMSAction.MESSAGE_ERROR.action().equals(responseMessage.getMessageHeader().getAction()))
-						process(timestamp,responseMessage,EbMSMessageStatus.DELIVERY_FAILED);
+					{
+						if (!isSyncReply(requestMessage))
+							throw new EbMSProcessingException("No sync ErrorMessage expected for message " + requestMessage.getMessageHeader().getMessageData().getMessageId() + "\n" + DOMUtils.toString(response.getMessage()));
+						processMessageError(requestMessage.getMessageHeader().getCPAId(),timestamp,requestMessage,responseMessage);
+					}
 					else if (EbMSAction.ACKNOWLEDGMENT.action().equals(responseMessage.getMessageHeader().getAction()))
 					{
 						if (requestMessage.getAckRequested() == null || !isSyncReply(requestMessage))
-							throw new EbMSProcessingException("No response expected for message " + requestMessage.getMessageHeader().getMessageData().getMessageId() + "\n" + DOMUtils.toString(response.getMessage()));
-						process(timestamp,responseMessage,EbMSMessageStatus.DELIVERED);
+							throw new EbMSProcessingException("No sync Acknowledgment expected for message " + requestMessage.getMessageHeader().getMessageData().getMessageId() + "\n" + DOMUtils.toString(response.getMessage()));
+						processAcknowledgment(requestMessage.getMessageHeader().getCPAId(),timestamp,requestMessage,responseMessage);
 					}
 					else
 						throw new EbMSProcessingException("Unexpected response received for message " + requestMessage.getMessageHeader().getMessageData().getMessageId() + "\n" + DOMUtils.toString(response.getMessage()));
@@ -232,6 +230,75 @@ public class EbMSMessageProcessor implements InitializingBean
 		catch (ValidatorException | XPathExpressionException | ParserConfigurationException e)
 		{
 			throw new EbMSProcessorException(e);
+		}
+	}
+	
+	private void processMessageError(String cpaId, final Date timestamp, final EbMSMessage requestMessage, final EbMSMessage responseMessage)
+	{
+		if (isDuplicateMessage(responseMessage))
+		{
+			logger.warn("MessageError " + responseMessage.getMessageHeader().getMessageData().getMessageId() + " is duplicate!");
+			ebMSDAO.insertDuplicateMessage(timestamp,responseMessage);
+		}
+		else
+		{
+			try
+			{
+				messageHeaderValidator.validate(requestMessage,responseMessage);
+				messageHeaderValidator.validate(responseMessage,timestamp);
+				ebMSDAO.executeTransaction(
+					new DAOTransactionCallback()
+					{
+						@Override
+						public void doInTransaction()
+						{
+							ebMSDAO.insertMessage(timestamp,responseMessage,null);
+							ebMSDAO.updateMessage(responseMessage.getMessageHeader().getMessageData().getRefToMessageId(),EbMSMessageStatus.SENT,EbMSMessageStatus.DELIVERY_FAILED);
+							eventListener.onMessageFailed(responseMessage.getMessageHeader().getMessageData().getRefToMessageId());
+						}
+					}
+				);
+			}
+			catch (ValidationException e)
+			{
+				ebMSDAO.insertMessage(timestamp,responseMessage,null);
+				logger.warn("Unable to process MessageError " + responseMessage.getMessageHeader().getMessageData().getMessageId(),e);
+			}
+		}
+	}
+	
+	private void processAcknowledgment(String cpaId, final Date timestamp, final EbMSMessage requestMessage, final EbMSMessage responseMessage)
+	{
+		if (isDuplicateMessage(responseMessage))
+		{
+			logger.warn("Acknowledgment " + responseMessage.getMessageHeader().getMessageData().getMessageId() + " is duplicate!");
+			ebMSDAO.insertDuplicateMessage(timestamp,responseMessage);
+		}
+		else
+		{
+			try
+			{
+				messageHeaderValidator.validate(requestMessage,responseMessage);
+				messageHeaderValidator.validate(responseMessage,timestamp);
+				signatureValidator.validate(requestMessage,responseMessage);
+				ebMSDAO.executeTransaction(
+					new DAOTransactionCallback()
+					{
+						@Override
+						public void doInTransaction()
+						{
+							ebMSDAO.insertMessage(timestamp,responseMessage,null);
+							ebMSDAO.updateMessage(responseMessage.getMessageHeader().getMessageData().getRefToMessageId(),EbMSMessageStatus.SENT,EbMSMessageStatus.DELIVERED);
+							eventListener.onMessageAcknowledged(responseMessage.getMessageHeader().getMessageData().getRefToMessageId());
+						}
+					}
+				);
+			}
+			catch (ValidatorException e)
+			{
+				ebMSDAO.insertMessage(timestamp,responseMessage,null);
+				logger.warn("Unable to process Acknowledgment " + responseMessage.getMessageHeader().getMessageData().getMessageId(),e);
+			}
 		}
 	}
 	
@@ -354,28 +421,6 @@ public class EbMSMessageProcessor implements InitializingBean
 		}
 	}
 
-	protected void process(final Date timestamp, final EbMSMessage responseMessage, final EbMSMessageStatus status)
-	{
-		if (isDuplicateMessage(responseMessage))
-			ebMSDAO.insertDuplicateMessage(timestamp,responseMessage);
-		else
-			ebMSDAO.executeTransaction(
-				new DAOTransactionCallback()
-				{
-					@Override
-					public void doInTransaction()
-					{
-						ebMSDAO.insertMessage(timestamp,responseMessage,null);
-						ebMSDAO.updateMessage(responseMessage.getMessageHeader().getMessageData().getRefToMessageId(),EbMSMessageStatus.SENT,status);
-						if (status.equals(EbMSMessageStatus.DELIVERED))
-							eventListener.onMessageAcknowledged(responseMessage.getMessageHeader().getMessageData().getRefToMessageId());
-						else if (status.equals(EbMSMessageStatus.DELIVERY_FAILED))
-							eventListener.onMessageFailed(responseMessage.getMessageHeader().getMessageData().getRefToMessageId());
-					}
-				}
-			);
-	}
-	
 	protected EbMSMessage processStatusRequest(String cpaId, final Date timestamp, final EbMSMessage message) throws DatatypeConfigurationException, JAXBException, EbMSValidationException, EbMSProcessorException
 	{
 		Date date = null;
@@ -436,6 +481,11 @@ public class EbMSMessageProcessor implements InitializingBean
 		this.eventManager = eventManager;
 	}
 
+	public void setSignatureGenerator(EbMSSignatureGenerator signatureGenerator)
+	{
+		this.signatureGenerator = signatureGenerator;
+	}
+	
 	public void setSignatureValidator(EbMSSignatureValidator signatureValidator)
 	{
 		this.signatureValidator = signatureValidator;
