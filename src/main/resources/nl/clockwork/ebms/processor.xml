@@ -73,6 +73,31 @@
 		<property name="eventManager" ref="eventManager"/>
 		<property name="signatureGenerator" ref="signatureGenerator"/>
 		<property name="signatureValidator" ref="signatureValidator"/>
+		<property name="xsdValidator">
+			<bean class="nl.clockwork.ebms.validation.XSDValidator">
+				<constructor-arg value="/nl/clockwork/ebms/xsd/msg-header-2_0.xsd"/>
+			</bean>
+		</property>
+		<property name="cpaValidator">
+			<bean class="nl.clockwork.ebms.validation.CPAValidator">
+				<constructor-arg ref="cpaManager"/>
+			</bean>
+		</property>
+		<property name="messageHeaderValidator">
+			<bean class="nl.clockwork.ebms.validation.MessageHeaderValidator">
+				<constructor-arg ref="ebMSDAO"/>
+				<constructor-arg ref="cpaManager"/>
+			</bean>
+		</property>
+		<property name="manifestValidator">
+			<bean class="nl.clockwork.ebms.validation.ManifestValidator"/>
+		</property>
+		<property name="signatureTypeValidator">
+			<bean class="nl.clockwork.ebms.validation.SignatureTypeValidator">
+				<constructor-arg ref="cpaManager"/>
+				<constructor-arg ref="signatureValidator"/>
+			</bean>
+		</property>
 		<property name="messageDecrypter" ref="messageDecrypter"/>
 	</bean>
 

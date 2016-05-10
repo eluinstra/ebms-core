@@ -63,11 +63,10 @@ import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.ErrorList;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageHeader;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageStatusType;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.Service;
-import org.springframework.beans.factory.InitializingBean;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
-public class EbMSMessageProcessor implements InitializingBean
+public class EbMSMessageProcessor
 {
   protected transient Log logger = LogFactory.getLog(getClass());
   protected DeliveryManager deliveryManager;
@@ -85,16 +84,6 @@ public class EbMSMessageProcessor implements InitializingBean
   protected SignatureTypeValidator signatureTypeValidator;
   protected EbMSMessageDecrypter messageDecrypter;
   protected Service mshMessageService;
-
-	@Override
-	public void afterPropertiesSet() throws Exception
-	{
-		xsdValidator = new XSDValidator("/nl/clockwork/ebms/xsd/msg-header-2_0.xsd");
-		cpaValidator = new CPAValidator(cpaManager);
-		messageHeaderValidator = new MessageHeaderValidator(ebMSDAO,cpaManager);
-		manifestValidator = new ManifestValidator();
-		signatureTypeValidator = new SignatureTypeValidator(cpaManager,signatureValidator);
-	}
 
 	public EbMSDocument processRequest(EbMSDocument document) throws EbMSProcessorException
 	{
@@ -489,6 +478,31 @@ public class EbMSMessageProcessor implements InitializingBean
 	public void setSignatureValidator(EbMSSignatureValidator signatureValidator)
 	{
 		this.signatureValidator = signatureValidator;
+	}
+
+	public void setXsdValidator(XSDValidator xsdValidator)
+	{
+		this.xsdValidator = xsdValidator;
+	}
+
+	public void setCpaValidator(CPAValidator cpaValidator)
+	{
+		this.cpaValidator = cpaValidator;
+	}
+
+	public void setMessageHeaderValidator(MessageHeaderValidator messageHeaderValidator)
+	{
+		this.messageHeaderValidator = messageHeaderValidator;
+	}
+
+	public void setManifestValidator(ManifestValidator manifestValidator)
+	{
+		this.manifestValidator = manifestValidator;
+	}
+
+	public void setSignatureTypeValidator(SignatureTypeValidator signatureTypeValidator)
+	{
+		this.signatureTypeValidator = signatureTypeValidator;
 	}
 
 	public void setMessageDecrypter(EbMSMessageDecrypter messageDecrypter)
