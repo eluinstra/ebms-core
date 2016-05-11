@@ -114,7 +114,7 @@ public class EbMSMessageDecrypter implements InitializingBean
 		}
 		catch (EbMSProcessingException | SAXException | XMLSecurityException e)
 		{
-			throw new EbMSValidationException(EbMSMessageUtils.createError("cid:" + attachment.getContentId(),Constants.EbMSErrorCode.SECURITY_FAILURE.errorCode(),e.getMessage()));
+			throw new EbMSValidationException(EbMSMessageUtils.createError("cid:" + attachment.getContentId(),Constants.EbMSErrorCode.SECURITY_FAILURE,e.getMessage()));
 		}
 	}
 

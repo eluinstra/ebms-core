@@ -78,7 +78,7 @@ public class EbMSMessageFactory
 		MessageHeader messageHeader = createMessageHeader(cpaId,message.getMessageHeader(),timestamp,EbMSAction.MESSAGE_ERROR);
 		if (errorList.getError().size() == 0)
 		{
-			errorList.getError().add(EbMSMessageUtils.createError(Constants.EbMSErrorCode.UNKNOWN.errorCode(),Constants.EbMSErrorCode.UNKNOWN.errorCode(),"An unknown error occurred!"));
+			errorList.getError().add(EbMSMessageUtils.createError(Constants.EbMSErrorCode.UNKNOWN.errorCode(),Constants.EbMSErrorCode.UNKNOWN,"An unknown error occurred!"));
 			errorList.setHighestSeverity(SeverityType.ERROR);
 		}
 		EbMSMessage result = new EbMSMessage();

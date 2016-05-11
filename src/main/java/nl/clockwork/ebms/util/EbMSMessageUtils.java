@@ -32,6 +32,7 @@ import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.xpath.XPathExpressionException;
 
 import nl.clockwork.ebms.Constants;
+import nl.clockwork.ebms.Constants.EbMSErrorCode;
 import nl.clockwork.ebms.Constants.EbMSMessageStatus;
 import nl.clockwork.ebms.common.XMLMessageBuilder;
 import nl.clockwork.ebms.common.util.DOMUtils;
@@ -163,17 +164,17 @@ public class EbMSMessageUtils
 		return result;
 	}
 	
-	public static Error createError(String location, String errorCode, String description)
+	public static Error createError(String location, EbMSErrorCode errorCode, String description)
 	{
 		return createError(location,errorCode,description,Constants.EBMS_DEFAULT_LANGUAGE,SeverityType.ERROR);
 	}
 	
-	public static Error createError(String location, String errorCode, String description, String language, SeverityType severity)
+	public static Error createError(String location, EbMSErrorCode errorCode, String description, String language, SeverityType severity)
 	{
 		Error error = new Error();
 		error.setCodeContext(Constants.EBMS_SERVICE_URI + ":errors");
 		error.setLocation(location);
-		error.setErrorCode(errorCode);
+		error.setErrorCode(errorCode.errorCode());
 		if (!StringUtils.isEmpty(description))
 		{
 			error.setDescription(new Description());

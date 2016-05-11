@@ -44,8 +44,8 @@ import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.Transport;
 
 public class CPAValidator
 {
-  protected transient Log logger = LogFactory.getLog(getClass());
-  private CPAManager cpaManager;
+	protected transient Log logger = LogFactory.getLog(getClass());
+	protected CPAManager cpaManager;
 
 	public CPAValidator(CPAManager cpaManager)
 	{
@@ -55,7 +55,7 @@ public class CPAValidator
 	public void validate(EbMSMessage message) throws EbMSValidationException
 	{
 		if (!cpaManager.isValid(message.getMessageHeader().getCPAId(),message.getMessageHeader().getMessageData().getTimestamp()))
-			throw new EbMSValidationException(EbMSMessageUtils.createError("//Header/MessageHeader/@cpaid",Constants.EbMSErrorCode.INCONSISTENT.errorCode(),"Invalid CPA."));
+			throw new EbMSValidationException(EbMSMessageUtils.createError("//Header/MessageHeader/@cpaid",Constants.EbMSErrorCode.INCONSISTENT,"Invalid CPA."));
 	}
 
 	public void validate(String cpaId) throws ValidatorException

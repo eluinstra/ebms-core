@@ -32,8 +32,8 @@ import org.xml.sax.SAXException;
 
 public class XSDValidator
 {
-  protected transient Log logger = LogFactory.getLog(getClass());
-	private Schema schema;
+	protected transient Log logger = LogFactory.getLog(getClass());
+  protected Schema schema;
 
 	public XSDValidator(String xsdFile)
 	{

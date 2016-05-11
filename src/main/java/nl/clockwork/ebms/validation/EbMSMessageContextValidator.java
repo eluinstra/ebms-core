@@ -29,7 +29,7 @@ import org.apache.commons.logging.LogFactory;
 public class EbMSMessageContextValidator
 {
 	protected transient Log logger = LogFactory.getLog(getClass());
-	private CPAManager cpaManager;
+	protected CPAManager cpaManager;
 
 	public EbMSMessageContextValidator(CPAManager cpaManager)
 	{
