@@ -84,55 +84,37 @@ public class EbMSMessageUtils
 	@SuppressWarnings("unchecked")
 	private static EbMSMessage getEbMSMessage(Document document, List<EbMSAttachment> attachments) throws JAXBException, XPathExpressionException, ParserConfigurationException, SAXException, IOException
 	{
-		XMLMessageBuilder<Envelope> messageBuilder = XMLMessageBuilder.getInstance(Envelope.class,Envelope.class,MessageHeader.class,SyncReply.class,MessageOrder.class,AckRequested.class,SignatureType.class,ErrorList.class,Acknowledgment.class,Manifest.class,StatusRequest.class,StatusResponse.class);
-		Envelope envelope = messageBuilder.handle(document);
-		SignatureType signature = null;
-		MessageHeader messageHeader = null;
-		SyncReply syncReply = null;
-		MessageOrder messageOrder = null;
-		AckRequested ackRequested = null;
-		ErrorList errorList = null;
-		Acknowledgment acknowledgment = null;
-		for (Object element : envelope.getHeader().getAny())
-			if (element instanceof JAXBElement && ((JAXBElement<?>)element).getValue() instanceof SignatureType)
-				signature = ((JAXBElement<SignatureType>)element).getValue();
-			else if (element instanceof MessageHeader)
-				messageHeader = (MessageHeader)element;
-			else if (element instanceof SyncReply)
-				syncReply = (SyncReply)element;
-			else if (element instanceof MessageOrder)
-				messageOrder = (MessageOrder)element;
-			else if (element instanceof AckRequested)
-				ackRequested = (AckRequested)element;
-			else if (element instanceof ErrorList)
-				errorList = (ErrorList)element;
-			else if (element instanceof Acknowledgment)
-				acknowledgment = (Acknowledgment)element;
-
-		Manifest manifest = null;
-		StatusRequest statusRequest = null;
-		StatusResponse statusResponse = null;
-		for (Object element : envelope.getBody().getAny())
-			if (element instanceof Manifest)
-				manifest = (Manifest)element;
-			else if (element instanceof StatusRequest)
-				statusRequest = (StatusRequest)element;
-			else if (element instanceof StatusResponse)
-				statusResponse = (StatusResponse)element;
-
 		EbMSMessage result = new EbMSMessage();
 		result.setMessage(document);
-		result.setSignature(signature);
-		result.setMessageHeader(messageHeader);
-		result.setSyncReply(syncReply);
-		result.setMessageOrder(messageOrder);
-		result.setAckRequested(ackRequested);
-		result.setErrorList(errorList);
-		result.setAcknowledgment(acknowledgment);
-		result.setManifest(manifest);
-		result.setStatusRequest(statusRequest);
-		result.setStatusResponse(statusResponse);
 		result.setAttachments(attachments);
+
+		XMLMessageBuilder<Envelope> messageBuilder = XMLMessageBuilder.getInstance(Envelope.class,Envelope.class,MessageHeader.class,SyncReply.class,MessageOrder.class,AckRequested.class,SignatureType.class,ErrorList.class,Acknowledgment.class,Manifest.class,StatusRequest.class,StatusResponse.class);
+		Envelope envelope = messageBuilder.handle(document);
+
+		for (Object element : envelope.getHeader().getAny())
+			if (element instanceof JAXBElement && ((JAXBElement<?>)element).getValue() instanceof SignatureType)
+				result.setSignature(((JAXBElement<SignatureType>)element).getValue());
+			else if (element instanceof MessageHeader)
+				result.setMessageHeader((MessageHeader)element);
+			else if (element instanceof SyncReply)
+				result.setSyncReply((SyncReply)element);
+			else if (element instanceof MessageOrder)
+				result.setMessageOrder((MessageOrder)element);
+			else if (element instanceof AckRequested)
+				result.setAckRequested((AckRequested)element);
+			else if (element instanceof ErrorList)
+				result.setErrorList((ErrorList)element);
+			else if (element instanceof Acknowledgment)
+				result.setAcknowledgment((Acknowledgment)element);
+
+		for (Object element : envelope.getBody().getAny())
+			if (element instanceof Manifest)
+				result.setManifest((Manifest)element);
+			else if (element instanceof StatusRequest)
+				result.setStatusRequest((StatusRequest)element);
+			else if (element instanceof StatusResponse)
+				result.setStatusResponse((StatusResponse)element);
+
 		return result;
 	}
 
