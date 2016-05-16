@@ -94,7 +94,7 @@ public class SSLFactoryManager implements InitializingBean
 	private String trustStorePassword;
 	private boolean verifyHostnames;
 	private String[] enabledProtocols = new String[]{};
-	private String[] allowedCipherSuites = new String[]{};
+	private String[] enabledCipherSuites = new String[]{};
 	private boolean requireClientAuthentication;
 	private String clientAlias;
 	private SSLSocketFactory sslSocketFactory;
@@ -126,8 +126,8 @@ public class SSLFactoryManager implements InitializingBean
 		SSLEngine engine = sslContext.createSSLEngine();
 		if (enabledProtocols.length > 0)
 			engine.setEnabledProtocols(enabledProtocols);
-		if (allowedCipherSuites.length > 0)
-			engine.setEnabledCipherSuites(allowedCipherSuites);
+		if (enabledCipherSuites.length > 0)
+			engine.setEnabledCipherSuites(enabledCipherSuites);
 		engine.setUseClientMode(requireClientAuthentication);
 
 		sslSocketFactory = sslContext.getSocketFactory();
@@ -193,9 +193,9 @@ public class SSLFactoryManager implements InitializingBean
 		this.enabledProtocols = enabledProtocols;
 	}
 
-	public void setAllowedCipherSuites(String[] allowedCipherSuites)
+	public void setEnabledCipherSuites(String[] enabledCipherSuites)
 	{
-		this.allowedCipherSuites = allowedCipherSuites;
+		this.enabledCipherSuites = enabledCipherSuites;
 	}
 
 	public void setRequireClientAuthentication(boolean requireClientAuthentication)

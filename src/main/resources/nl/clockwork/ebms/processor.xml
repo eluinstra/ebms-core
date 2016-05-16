@@ -232,7 +232,7 @@
 		<property name="trustStorePath" value="${truststore.path}"/>
 		<property name="trustStorePassword" value="${truststore.password}"/>
 		<property name="enabledProtocols" value="${https.enabledProtocols}"/>
-		<property name="allowedCipherSuites" value="${https.allowedCipherSuites}"/>
+		<property name="enabledCipherSuites" value="${https.enabledCipherSuites}"/>
 		<property name="requireClientAuthentication" value="${https.requireClientAuthentication}"/>
 		<property name="verifyHostnames" value="${https.verifyHostnames}"></property>
 	</bean>
