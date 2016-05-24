@@ -19,6 +19,8 @@ import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
+import java.util.List;
+import java.util.Map;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
@@ -56,7 +58,7 @@ public class EbMSResponseHandler
 			{
 				if (connection.getResponseCode() == 204 || connection.getContentLength() == 0)
 				{
-					logger.info("<<<< statusCode = " + connection.getResponseCode());
+					logger.info("<<<<\nstatusCode: " + connection.getResponseCode() + (logger.isDebugEnabled() ? "\n" + toString(connection.getHeaderFields()) : ""));
 					return null;
 				}
 				else
@@ -67,7 +69,7 @@ public class EbMSResponseHandler
 						//EbMSDocument result = messageReader.read(input);
 						EbMSDocument result = messageReader.readResponse(input,getEncoding());
 						if (logger.isInfoEnabled())
-							logger.info("<<<< statusCode = " + connection.getResponseCode() + (result == null || result.getMessage() == null ? "" : "\n" + DOMUtils.toString(result.getMessage())));
+							logger.info("<<<<\nstatusCode: " + connection.getResponseCode() + (logger.isDebugEnabled() ? "\n" + toString(connection.getHeaderFields()) : "") + (result == null || result.getMessage() == null ? "" : "\n" + DOMUtils.toString(result.getMessage())));
 						return result;
 					}
 				}
@@ -79,7 +81,7 @@ public class EbMSResponseHandler
 					if (input != null)
 					{
 						String response = IOUtils.toString(input);
-						logger.info("<<<< statusCode = " + connection.getResponseCode() + "\n" + response);
+						logger.info("<<<<\nstatusCode: " + connection.getResponseCode() + (logger.isDebugEnabled() ? "\n" + toString(connection.getHeaderFields()) : "") + "\n" + response);
 						if (connection.getResponseCode() == 500)
 						{
 							Fault soapFault = EbMSMessageUtils.getSOAPFault(response);
@@ -90,14 +92,14 @@ public class EbMSResponseHandler
 					}
 					else
 					{
-						logger.info("<<<< statusCode = " + connection.getResponseCode());
+						logger.info("<<<<\nstatusCode: " + connection.getResponseCode() + (logger.isDebugEnabled() ? "\n" + toString(connection.getHeaderFields()) : ""));
 						throw new EbMSResponseException(connection.getResponseCode());
 					}
 				}
 			}
 			else
 			{
-				logger.info("<<<< statusCode = " + connection.getResponseCode());
+				logger.info("<<<<\nstatusCode: " + connection.getResponseCode() + (logger.isDebugEnabled() ? "\n" + toString(connection.getHeaderFields()) : ""));
 				throw new EbMSResponseException(connection.getResponseCode());
 			}
 		}
@@ -106,7 +108,7 @@ public class EbMSResponseHandler
 			try (InputStream errorStream = new BufferedInputStream(connection.getErrorStream()))
 			{
 				String error = IOUtils.toString(errorStream,getEncoding());
-				logger.info("<<<< statusCode = " + connection.getResponseCode() + "\n" + error);
+				logger.info("<<<<\nstatusCode: " + connection.getResponseCode() + (logger.isDebugEnabled() ? "\n" + toString(connection.getHeaderFields()) : "") + "\n" + error);
 				throw new EbMSResponseException(connection.getResponseCode(),error);
 			}
 			catch (IOException ignore)
@@ -114,6 +116,15 @@ public class EbMSResponseHandler
 			}
 			throw e;
 		}
+	}
+
+	private String toString(Map<String,List<String>> headerFields)
+	{
+		String result = "";
+		for (String header : headerFields.keySet())
+			for (String field : headerFields.get(header))
+				result += header + ": " + field + "\n";
+		return result;
 	}
 
 	private String getEncoding() throws EbMSProcessingException

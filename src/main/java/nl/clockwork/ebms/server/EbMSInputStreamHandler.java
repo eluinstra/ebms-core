@@ -70,13 +70,13 @@ public abstract class EbMSInputStreamHandler
 			EbMSDocument out = messageProcessor.processRequest(in);
 			if (out == null)
 			{
-				logger.info(">>>> statusCode = " + 204);
+				logger.info(">>>>\nstatusCode: " + 204);
 				writeResponseStatus(204);
 			}
 			else
 			{
 				if (logger.isInfoEnabled())
-					logger.info(">>>> statusCode = " + 200 + "\n" + DOMUtils.toString(out.getMessage()));
+					logger.info(">>>>\nstatusCode: " + 200 + "\nContent-Type: text/xml\nSOAPAction: " + Constants.EBMS_SOAP_ACTION + "\n" + DOMUtils.toString(out.getMessage()));
 				writeResponseStatus(200);
 				writeResponseHeader("Content-Type","text/xml");
 				writeResponseHeader("SOAPAction",Constants.EBMS_SOAP_ACTION);
@@ -91,7 +91,7 @@ public abstract class EbMSInputStreamHandler
 				Document soapFault = EbMSMessageUtils.createSOAPFault(e);
 				if (logger.isInfoEnabled())
 				{
-					logger.info(">>>> statusCode = " + 500 + "\n" + DOMUtils.toString(soapFault));
+					logger.info(">>>>\nstatusCode: " + 500 + "\nContent-Type: text/xml\n" + DOMUtils.toString(soapFault));
 					logger.info("",e);
 				}
 				writeResponseStatus(500);
