@@ -1,3 +1,6 @@
+- validate duplicate message; if content not duplicate then return soap fault
+- validate MSH messages
+
 - use oid to determine encryption algorithm
 - implement packaging
 - implement message ordering
