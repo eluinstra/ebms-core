@@ -32,13 +32,13 @@ import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageHeader;
 import org.w3._2000._09.xmldsig.ReferenceType;
 import org.w3._2000._09.xmldsig.SignatureType;
 
-public class SignatureTypeValidator
+public class SignatureValidator
 {
 	protected transient Log logger = LogFactory.getLog(getClass());
 	protected CPAManager cpaManager;
 	protected EbMSSignatureValidator ebMSSignatureValidator;
 
-	public SignatureTypeValidator(CPAManager cpaManager, EbMSSignatureValidator ebMSSignatureValidator)
+	public SignatureValidator(CPAManager cpaManager, EbMSSignatureValidator ebMSSignatureValidator)
 	{
 		this.cpaManager = cpaManager;
 		this.ebMSSignatureValidator = ebMSSignatureValidator;
@@ -73,6 +73,11 @@ public class SignatureTypeValidator
 		{
 			throw new EbMSValidationException(EbMSMessageUtils.createError("//Header/Signature",Constants.EbMSErrorCode.SECURITY_FAILURE,e.getMessage()));
 		}
+	}
+
+	public void validate(EbMSMessage requestMessage, EbMSMessage responseMessage) throws ValidationException, ValidatorException
+	{
+		ebMSSignatureValidator.validate(requestMessage,responseMessage);
 	}
 
 	public void setCpaManager(CPAManager cpaManager)

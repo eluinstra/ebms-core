@@ -72,7 +72,6 @@
 		<property name="ebMSMessageFactory" ref="ebMSMessageFactory"/>
 		<property name="eventManager" ref="eventManager"/>
 		<property name="signatureGenerator" ref="signatureGenerator"/>
-		<property name="signatureValidator" ref="signatureValidator"/>
 		<property name="xsdValidator">
 			<bean class="nl.clockwork.ebms.validation.XSDValidator">
 				<constructor-arg value="/nl/clockwork/ebms/xsd/msg-header-2_0.xsd"/>
@@ -92,8 +91,8 @@
 		<property name="manifestValidator">
 			<bean class="nl.clockwork.ebms.validation.ManifestValidator"/>
 		</property>
-		<property name="signatureTypeValidator">
-			<bean class="nl.clockwork.ebms.validation.SignatureTypeValidator">
+		<property name="signatureValidator">
+			<bean class="nl.clockwork.ebms.validation.SignatureValidator">
 				<constructor-arg ref="cpaManager"/>
 				<constructor-arg ref="signatureValidator"/>
 			</bean>

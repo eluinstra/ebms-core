@@ -44,14 +44,13 @@ import nl.clockwork.ebms.model.EbMSDocument;
 import nl.clockwork.ebms.model.EbMSMessage;
 import nl.clockwork.ebms.model.EbMSMessageContext;
 import nl.clockwork.ebms.signing.EbMSSignatureGenerator;
-import nl.clockwork.ebms.signing.EbMSSignatureValidator;
 import nl.clockwork.ebms.util.CPAUtils;
 import nl.clockwork.ebms.util.EbMSMessageUtils;
 import nl.clockwork.ebms.validation.CPAValidator;
 import nl.clockwork.ebms.validation.EbMSValidationException;
 import nl.clockwork.ebms.validation.ManifestValidator;
 import nl.clockwork.ebms.validation.MessageHeaderValidator;
-import nl.clockwork.ebms.validation.SignatureTypeValidator;
+import nl.clockwork.ebms.validation.SignatureValidator;
 import nl.clockwork.ebms.validation.ValidationException;
 import nl.clockwork.ebms.validation.ValidatorException;
 import nl.clockwork.ebms.validation.XSDValidator;
@@ -76,12 +75,11 @@ public class EbMSMessageProcessor
 	protected EbMSMessageFactory ebMSMessageFactory;
 	protected EventManager eventManager;
   protected EbMSSignatureGenerator signatureGenerator;
-	protected EbMSSignatureValidator signatureValidator;
   protected XSDValidator xsdValidator;
   protected CPAValidator cpaValidator;
   protected MessageHeaderValidator messageHeaderValidator;
   protected ManifestValidator manifestValidator;
-  protected SignatureTypeValidator signatureTypeValidator;
+  protected SignatureValidator signatureValidator;
   protected EbMSMessageDecrypter messageDecrypter;
   protected Service mshMessageService;
 
@@ -331,10 +329,10 @@ public class EbMSMessageProcessor
 			{
 				cpaValidator.validate(message);
 				messageHeaderValidator.validate(message,timestamp);
-				signatureTypeValidator.validate(message);
+				signatureValidator.validate(message);
 				manifestValidator.validate(message);
 				messageDecrypter.decrypt(message);
-				signatureTypeValidator.validateSignature(message);
+				signatureValidator.validateSignature(message);
 				if (message.getAckRequested() == null)
 				{
 					ebMSDAO.executeTransaction(
@@ -475,11 +473,6 @@ public class EbMSMessageProcessor
 		this.signatureGenerator = signatureGenerator;
 	}
 	
-	public void setSignatureValidator(EbMSSignatureValidator signatureValidator)
-	{
-		this.signatureValidator = signatureValidator;
-	}
-
 	public void setXsdValidator(XSDValidator xsdValidator)
 	{
 		this.xsdValidator = xsdValidator;
@@ -500,9 +493,9 @@ public class EbMSMessageProcessor
 		this.manifestValidator = manifestValidator;
 	}
 
-	public void setSignatureTypeValidator(SignatureTypeValidator signatureTypeValidator)
+	public void setSignatureValidator(SignatureValidator signatureValidator)
 	{
-		this.signatureTypeValidator = signatureTypeValidator;
+		this.signatureValidator = signatureValidator;
 	}
 
 	public void setMessageDecrypter(EbMSMessageDecrypter messageDecrypter)
