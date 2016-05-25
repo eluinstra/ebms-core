@@ -1,3 +1,5 @@
+- return soap fault if cpaId not found
+- use SSLCertificateValidator
 - validate duplicate message; if content not identical then return soap fault
 - validate MSH messages
 
