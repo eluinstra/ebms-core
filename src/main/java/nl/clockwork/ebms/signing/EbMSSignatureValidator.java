@@ -19,7 +19,6 @@ import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
-import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateExpiredException;
 import java.security.cert.CertificateNotYetValidException;
@@ -27,7 +26,6 @@ import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.Enumeration;
 import java.util.List;
 
 import nl.clockwork.ebms.common.CPAManager;
@@ -78,7 +76,7 @@ public class EbMSSignatureValidator implements InitializingBean
 					X509Certificate certificate = getCertificate(message.getMessageHeader());
 					if (certificate != null)
 					{
-						validateCertificate(trustStore,certificate,message.getMessageHeader().getMessageData().getTimestamp() == null ? new Date() : message.getMessageHeader().getMessageData().getTimestamp());
+						SecurityUtils.validateCertificate(trustStore,certificate,message.getMessageHeader().getMessageData().getTimestamp() == null ? new Date() : message.getMessageHeader().getMessageData().getTimestamp());
 						if (!verify(certificate,(Element)signatureNodeList.item(0),message.getAttachments()))
 							throw new ValidationException("Invalid Signature!");
 					}
@@ -112,7 +110,7 @@ public class EbMSSignatureValidator implements InitializingBean
 					X509Certificate certificate = getCertificate(responseMessage.getMessageHeader());
 					if (certificate != null)
 					{
-						validateCertificate(trustStore,certificate,responseMessage.getMessageHeader().getMessageData().getTimestamp() == null ? new Date() : responseMessage.getMessageHeader().getMessageData().getTimestamp());
+						SecurityUtils.validateCertificate(trustStore,certificate,responseMessage.getMessageHeader().getMessageData().getTimestamp() == null ? new Date() : responseMessage.getMessageHeader().getMessageData().getTimestamp());
 						if (!verify(certificate,(Element)signatureNodeList.item(0),new ArrayList<EbMSAttachment>()))
 							throw new ValidationException("Invalid Signature!");
 						validateSignatureReferences(requestMessage,responseMessage);
@@ -158,37 +156,6 @@ public class EbMSSignatureValidator implements InitializingBean
 		}
 	}
 
-	private void validateCertificate(KeyStore trustStore, X509Certificate certificate, Date date) throws KeyStoreException, ValidationException
-	{
-		try
-		{
-			certificate.checkValidity(date);
-			Enumeration<String> aliases = trustStore.aliases();
-			while (aliases.hasMoreElements())
-			{
-				try
-				{
-					Certificate c = trustStore.getCertificate(aliases.nextElement());
-					if (c instanceof X509Certificate)
-						if (certificate.getIssuerDN().getName().equals(((X509Certificate)c).getSubjectDN().getName()))
-						{
-							certificate.verify(c.getPublicKey());
-							return;
-						}
-				}
-				catch (GeneralSecurityException e)
-				{
-					logger.trace("",e);
-				}
-			}
-			throw new ValidationException("Certificate " + certificate.getIssuerDN() + " not found!");
-		}
-		catch (CertificateExpiredException | CertificateNotYetValidException e)
-		{
-			throw new ValidationException(e);
-		}
-	}
-	
 	private void validateSignatureReferences(EbMSMessage requestMessage, EbMSMessage responseMessage) throws ValidationException
 	{
 		if (requestMessage.getSignature().getSignedInfo().getReference() == null || requestMessage.getSignature().getSignedInfo().getReference().size() == 0)

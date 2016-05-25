@@ -22,20 +22,32 @@ import java.security.GeneralSecurityException;
 import java.security.Key;
 import java.security.KeyPair;
 import java.security.KeyStore;
+import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.cert.Certificate;
+import java.security.cert.CertificateExpiredException;
+import java.security.cert.CertificateNotYetValidException;
 import java.security.cert.X509Certificate;
+import java.util.Date;
 import java.util.Enumeration;
 
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
+import javax.security.cert.CertificateException;
 
+import nl.clockwork.ebms.validation.ValidationException;
+import nl.clockwork.ebms.validation.ValidatorException;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.xml.security.encryption.XMLCipher;
 
 public class SecurityUtils
 {
+	protected static Log logger = LogFactory.getLog(SecurityUtils.class);
+
 	public static KeyStore loadKeyStore(String location, String password) throws GeneralSecurityException, IOException
 	{
 		//location = ResourceUtils.getURL(SystemPropertyUtils.resolvePlaceholders(location)).getFile();
@@ -59,6 +71,68 @@ public class SecurityUtils
 			return new KeyPair(publicKey,(PrivateKey)key);
 		}
 		return null;
+	}
+
+	public static void validateCertificate(KeyStore trustStore, X509Certificate certificate, Date date) throws KeyStoreException, ValidationException
+	{
+		try
+		{
+			certificate.checkValidity(date);
+			Enumeration<String> aliases = trustStore.aliases();
+			while (aliases.hasMoreElements())
+			{
+				try
+				{
+					Certificate c = trustStore.getCertificate(aliases.nextElement());
+					if (c instanceof X509Certificate)
+						if (certificate.getIssuerDN().getName().equals(((X509Certificate)c).getSubjectDN().getName()))
+						{
+							certificate.verify(c.getPublicKey());
+							return;
+						}
+				}
+				catch (GeneralSecurityException e)
+				{
+					logger.trace("",e);
+				}
+			}
+			throw new ValidationException("Certificate " + certificate.getIssuerDN() + " not found!");
+		}
+		catch (CertificateExpiredException | CertificateNotYetValidException e)
+		{
+			throw new ValidationException(e);
+		}
+	}
+	
+	public static void validateCertificate(KeyStore trustStore, javax.security.cert.X509Certificate certificate, Date date) throws KeyStoreException, ValidatorException
+	{
+		try
+		{
+			certificate.checkValidity(date);
+			Enumeration<String> aliases = trustStore.aliases();
+			while (aliases.hasMoreElements())
+			{
+				try
+				{
+					Certificate c = trustStore.getCertificate(aliases.nextElement());
+					if (c instanceof X509Certificate)
+						if (certificate.getIssuerDN().getName().equals(((X509Certificate)c).getSubjectDN().getName()))
+						{
+							certificate.verify(c.getPublicKey());
+							return;
+						}
+				}
+				catch (GeneralSecurityException | CertificateException e)
+				{
+					logger.trace("",e);
+				}
+			}
+			throw new ValidationException("Certificate " + certificate.getIssuerDN() + " not found!");
+		}
+		catch (javax.security.cert.CertificateExpiredException | javax.security.cert.CertificateNotYetValidException e)
+		{
+			throw new ValidationException(e);
+		}
 	}
 
 	public static KeyPair getKeyPairByCertificateSubject(KeyStore keyStore, String subject, String password) throws GeneralSecurityException

@@ -132,6 +132,11 @@ public class CPAUtils
 			return null;
 	}
 
+	private static Transport getTransport(DeliveryChannel deliveryChannel)
+	{
+		return (Transport)deliveryChannel.getTransportId();
+	}
+
 	public static DocExchange getDocExchange(DeliveryChannel deliveryChannel)
 	{
 		return (DocExchange)deliveryChannel.getDocExchangeId();
@@ -160,6 +165,14 @@ public class CPAUtils
 	public static Duration getRetryInterval(DeliveryChannel deliveryChannel)
 	{
 		return ((DocExchange)deliveryChannel.getDocExchangeId()).getEbXMLReceiverBinding().getReliableMessaging().getRetryInterval();
+	}
+	
+	public static Certificate getClientCertificate(DeliveryChannel deliveryChannel)
+	{
+		Transport transport = getTransport(deliveryChannel);
+		if (transport.getTransportSender().getTransportClientSecurity() != null && transport.getTransportSender().getTransportClientSecurity().getClientCertificateRef() != null)
+			return (Certificate)transport.getTransportSender().getTransportClientSecurity().getClientCertificateRef().getCertId();
+		return null;
 	}
 	
 	public static Certificate getSigningCertificate(DeliveryChannel deliveryChannel)
