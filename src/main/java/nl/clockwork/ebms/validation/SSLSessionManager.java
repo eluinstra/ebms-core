@@ -5,16 +5,16 @@ import nl.clockwork.ebms.model.SSLSession;
 
 public class SSLSessionManager 
 {
-	private static final ThreadLocal<SSLSession> certificateHolder = new ThreadLocal<SSLSession>();
+	private static final ThreadLocal<SSLSession> sessionHolder = new ThreadLocal<SSLSession>();
 
 	public static SSLSession getSSLSession()
 	{
-		return certificateHolder.get();
+		return sessionHolder.get();
 	}
 
 	public static void setSSLSession(SSLSession sslSession)
 	{
-		certificateHolder.set(sslSession);
+		sessionHolder.set(sslSession);
 	}
 
 }
