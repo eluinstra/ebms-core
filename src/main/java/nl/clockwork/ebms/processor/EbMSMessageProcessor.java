@@ -70,6 +70,7 @@ public class EbMSMessageProcessor
 {
   protected transient Log logger = LogFactory.getLog(getClass());
   protected boolean ignoreUnauthorizedMessages;
+  protected boolean checkDuplicateMessage;
   protected DeliveryManager deliveryManager;
   protected EventListener eventListener;
 	protected EbMSDAO ebMSDAO;
@@ -464,7 +465,7 @@ public class EbMSMessageProcessor
 	
 	private boolean isIdenticalMessage(EbMSMessage message)
 	{
-		return ebMSDAO.existsIdenticalMessage(message);
+		return !checkDuplicateMessage || ebMSDAO.existsIdenticalMessage(message);
 	}
 
 	public void setIgnoreUnauthorizedMessages(boolean ignoreUnauthorizedMessages)
