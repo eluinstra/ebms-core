@@ -234,14 +234,17 @@ public class CPAUtils
 	public static String getUri(DeliveryChannel deliveryChannel)
 	{
 		Transport transport = (Transport)deliveryChannel.getTransportId();
-		return transport.getTransportReceiver().getEndpoint().get(0).getUri();
+		if (transport != null && transport.getTransportReceiver() != null)
+			return transport.getTransportReceiver().getEndpoint().get(0).getUri();
+		else
+			return null;
 	}
 	
 	public static String getHostname(DeliveryChannel deliveryChannel)
 	{
 		try
 		{
-			return deliveryChannel == null ? defaultHostname : new URL(CPAUtils.getUri(deliveryChannel)).getHost();
+			return new URL(CPAUtils.getUri(deliveryChannel)).getHost();
 		}
 		catch (MalformedURLException e)
 		{
