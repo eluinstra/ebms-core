@@ -169,4 +169,8 @@ public class CPAValidator
 			}
 	}
 
+	public void setCpaManager(CPAManager cpaManager)
+	{
+		this.cpaManager = cpaManager;
+	}
 }

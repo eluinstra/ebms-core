@@ -38,12 +38,6 @@ public class SignatureValidator
 	protected CPAManager cpaManager;
 	protected EbMSSignatureValidator ebMSSignatureValidator;
 
-	public SignatureValidator(CPAManager cpaManager, EbMSSignatureValidator ebMSSignatureValidator)
-	{
-		this.cpaManager = cpaManager;
-		this.ebMSSignatureValidator = ebMSSignatureValidator;
-	}
-
 	public void validate(EbMSMessage message) throws ValidatorException
 	{
 		MessageHeader messageHeader = message.getMessageHeader();

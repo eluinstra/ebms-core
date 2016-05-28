@@ -50,12 +50,6 @@ public class MessageHeaderValidator
 	protected EbMSDAO ebMSDAO;
 	protected CPAManager cpaManager;
 
-	public MessageHeaderValidator(EbMSDAO ebMSDAO, CPAManager cpaManager)
-	{
-		this.ebMSDAO = ebMSDAO;
-		this.cpaManager = cpaManager;
-	}
-
 	public void validate(EbMSMessage message, Date timestamp) throws EbMSValidationException
 	{
 		MessageHeader messageHeader = message.getMessageHeader();
@@ -240,4 +234,13 @@ public class MessageHeaderValidator
 		throw new ValidationException("Request PartyIds do not match response PartyIds");
 	}
 
+	public void setEbMSDAO(EbMSDAO ebMSDAO)
+	{
+		this.ebMSDAO = ebMSDAO;
+	}
+
+	public void setCpaManager(CPAManager cpaManager)
+	{
+		this.cpaManager = cpaManager;
+	}
 }

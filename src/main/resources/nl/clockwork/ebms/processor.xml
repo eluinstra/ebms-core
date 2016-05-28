@@ -77,15 +77,22 @@
 				<constructor-arg value="/nl/clockwork/ebms/xsd/msg-header-2_0.xsd"/>
 			</bean>
 		</property>
+		<property name="sslCertificateValidator">
+			<bean class="nl.clockwork.ebms.validation.SSLSessionValidator">
+				<property name="cpaManager" ref="cpaManager"/>
+				<property name="trustStorePath" value="${truststore.path}"/>
+				<property name="trustStorePassword" value="${truststore.password}"/>
+			</bean>
+		</property>
 		<property name="cpaValidator">
 			<bean class="nl.clockwork.ebms.validation.CPAValidator">
-				<constructor-arg ref="cpaManager"/>
+				<property name="cpaManager" ref="cpaManager"/>
 			</bean>
 		</property>
 		<property name="messageHeaderValidator">
 			<bean class="nl.clockwork.ebms.validation.MessageHeaderValidator">
-				<constructor-arg ref="ebMSDAO"/>
-				<constructor-arg ref="cpaManager"/>
+				<property name="ebMSDAO" ref="ebMSDAO"/>
+				<property name="cpaManager" ref="cpaManager"/>
 			</bean>
 		</property>
 		<property name="manifestValidator">
@@ -93,11 +100,23 @@
 		</property>
 		<property name="signatureValidator">
 			<bean class="nl.clockwork.ebms.validation.SignatureValidator">
-				<constructor-arg ref="cpaManager"/>
-				<constructor-arg ref="signatureValidator"/>
+				<property name="cpaManager" ref="cpaManager"/>
+				<property name="ebMSSignatureValidator">
+					<bean class="nl.clockwork.ebms.signing.EbMSSignatureValidator">
+						<property name="cpaManager" ref="cpaManager"/>
+						<property name="trustStorePath" value="${truststore.path}"/>
+						<property name="trustStorePassword" value="${truststore.password}"/>
+					</bean>
+				</property>
 			</bean>
 		</property>
-		<property name="messageDecrypter" ref="messageDecrypter"/>
+		<property name="messageDecrypter">
+			<bean class="nl.clockwork.ebms.encryption.EbMSMessageDecrypter">
+				<property name="cpaManager" ref="cpaManager"/>
+				<property name="keyStorePath" value="${encryption.keystore.path}" />
+				<property name="keyStorePassword" value="${encryption.keystore.password}" />
+			</bean>
+		</property>
 	</bean>
 
 	<bean id="_cpaManager" class="nl.clockwork.ebms.common.CPAManager">
@@ -148,18 +167,6 @@
 	<bean id="eventManager" class="nl.clockwork.ebms.job.EventManager">
 		<property name="ebMSDAO" ref="ebMSDAO"/>
 		<property name="cpaManager" ref="cpaManager"/>
-	</bean>
-
-	<bean id="messageDecrypter" class="nl.clockwork.ebms.encryption.EbMSMessageDecrypter">
-		<property name="cpaManager" ref="cpaManager"/>
-		<property name="keyStorePath" value="${encryption.keystore.path}" />
-		<property name="keyStorePassword" value="${encryption.keystore.password}" />
-	</bean>
-
-	<bean id="signatureValidator" class="nl.clockwork.ebms.signing.EbMSSignatureValidator">
-		<property name="cpaManager" ref="cpaManager"/>
-		<property name="trustStorePath" value="${truststore.path}"/>
-		<property name="trustStorePassword" value="${truststore.password}"/>
 	</bean>
 
 	<bean id="jobScheduler" class="nl.clockwork.ebms.job.JobScheduler">
