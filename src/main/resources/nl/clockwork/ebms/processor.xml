@@ -79,7 +79,10 @@
 		</property>
 		<property name="sslCertificateValidator">
 			<bean class="nl.clockwork.ebms.validation.SSLSessionValidator">
+				<property name="enabled" value="${https.validate}"/>
 				<property name="cpaManager" ref="cpaManager"/>
+				<property name="keyStorePath" value="${keystore.path}"/>
+				<property name="keyStorePassword" value="${keystore.password}"/>
 				<property name="trustStorePath" value="${truststore.path}"/>
 				<property name="trustStorePassword" value="${truststore.password}"/>
 			</bean>

@@ -23,7 +23,7 @@ import org.springframework.beans.factory.InitializingBean;
 public class SSLSessionValidator implements InitializingBean
 {
 	protected transient Log logger = LogFactory.getLog(getClass());
-	private boolean validatorEnabled;
+	private boolean enabled;
 	private CPAManager cpaManager;
 	private String keyStorePath;
 	private String keyStorePassword;
@@ -41,7 +41,7 @@ public class SSLSessionValidator implements InitializingBean
 
 	public void validate(EbMSMessage message) throws ValidatorException
 	{
-		if (validatorEnabled)
+		if (enabled)
 			try
 			{
 				SSLSession sslSession = SSLSessionManager.getSSLSession();
@@ -101,9 +101,24 @@ public class SSLSessionValidator implements InitializingBean
 		}
 	}
 
+	public void setEnabled(boolean enabled)
+	{
+		this.enabled = enabled;
+	}
+
 	public void setCpaManager(CPAManager cpaManager)
 	{
 		this.cpaManager = cpaManager;
+	}
+
+	public void setKeyStorePath(String keyStorePath)
+	{
+		this.keyStorePath = keyStorePath;
+	}
+
+	public void setKeyStorePassword(String keyStorePassword)
+	{
+		this.keyStorePassword = keyStorePassword;
 	}
 
 	public void setTrustStorePath(String trustStorePath)

@@ -69,6 +69,7 @@ import org.xml.sax.SAXException;
 public class EbMSMessageProcessor
 {
   protected transient Log logger = LogFactory.getLog(getClass());
+  protected boolean ignoreUnauthorizedMessages;
   protected DeliveryManager deliveryManager;
   protected EventListener eventListener;
 	protected EbMSDAO ebMSDAO;
@@ -93,7 +94,13 @@ public class EbMSMessageProcessor
 			Date timestamp = new Date();
 			final EbMSMessage message = EbMSMessageUtils.getEbMSMessage(document);
 			if (!cpaManager.existsCPA(message.getMessageHeader().getCPAId()))
-				throw new EbMSProcessingException("CPA " + message.getMessageHeader().getCPAId() + " not found!");
+				if (ignoreUnauthorizedMessages)
+				{
+					logger.warn("CPA " + message.getMessageHeader().getCPAId() + " not found!");
+					return null;
+				}
+				else
+					throw new EbMSProcessingException("CPA " + message.getMessageHeader().getCPAId() + " not found!");
 			if (!Constants.EBMS_SERVICE_URI.equals(message.getMessageHeader().getService().getValue()))
 			{
 				return process(timestamp,message);
@@ -458,6 +465,11 @@ public class EbMSMessageProcessor
 	private boolean isIdenticalMessage(EbMSMessage message)
 	{
 		return ebMSDAO.existsIdenticalMessage(message);
+	}
+
+	public void setIgnoreUnauthorizedMessages(boolean ignoreUnauthorizedMessages)
+	{
+		this.ignoreUnauthorizedMessages = ignoreUnauthorizedMessages;
 	}
 
 	public void setDeliveryManager(DeliveryManager deliveryManager)
