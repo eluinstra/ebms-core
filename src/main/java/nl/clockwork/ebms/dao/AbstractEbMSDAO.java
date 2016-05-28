@@ -287,6 +287,35 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	}
 
 	@Override
+	public boolean existsIdenticalMessage(EbMSMessage message) throws DAOException
+	{
+		try
+		{
+			return jdbcTemplate.queryForInt(
+				"select count(message_id)" +
+				" from ebms_message" +
+				" where message_id = ?" +
+				" and message_nr = 0" +
+				" and cpa_id = ?" +
+				" and from_role," +
+				" and to_role," +
+				" and service = ?" +
+				" and action = ?",
+				message.getMessageHeader().getMessageData().getMessageId(),
+				message.getMessageHeader().getCPAId(),
+				message.getMessageHeader().getFrom().getRole(),
+				message.getMessageHeader().getTo().getRole(),
+				message.getMessageHeader().getService(),
+				message.getMessageHeader().getAction()
+			) > 0;
+		}
+		catch (DataAccessException e)
+		{
+			throw new DAOException(e);
+		}
+	}
+
+	@Override
 	public EbMSMessageContent getMessageContent(String messageId) throws DAOException
 	{
 		try

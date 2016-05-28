@@ -219,12 +219,17 @@ public class EbMSMessageProcessor
 		}
 	}
 	
-	private void processMessageError(String cpaId, final Date timestamp, final EbMSMessage requestMessage, final EbMSMessage responseMessage)
+	private void processMessageError(String cpaId, final Date timestamp, final EbMSMessage requestMessage, final EbMSMessage responseMessage) throws EbMSProcessingException
 	{
 		if (isDuplicateMessage(responseMessage))
 		{
-			logger.warn("MessageError " + responseMessage.getMessageHeader().getMessageData().getMessageId() + " is duplicate!");
-			ebMSDAO.insertDuplicateMessage(timestamp,responseMessage);
+			if (isIdenticalMessage(responseMessage))
+			{
+				logger.warn("MessageError " + responseMessage.getMessageHeader().getMessageData().getMessageId() + " is duplicate!");
+				ebMSDAO.insertDuplicateMessage(timestamp,responseMessage);
+			}
+			else
+				throw new EbMSProcessingException("MessageId " + responseMessage.getMessageHeader().getMessageData().getMessageId() + " already used!");
 		}
 		else
 		{
@@ -253,12 +258,17 @@ public class EbMSMessageProcessor
 		}
 	}
 	
-	private void processAcknowledgment(String cpaId, final Date timestamp, final EbMSMessage requestMessage, final EbMSMessage responseMessage)
+	private void processAcknowledgment(String cpaId, final Date timestamp, final EbMSMessage requestMessage, final EbMSMessage responseMessage) throws EbMSProcessingException
 	{
 		if (isDuplicateMessage(responseMessage))
 		{
-			logger.warn("Acknowledgment " + responseMessage.getMessageHeader().getMessageData().getMessageId() + " is duplicate!");
-			ebMSDAO.insertDuplicateMessage(timestamp,responseMessage);
+			if (isIdenticalMessage(responseMessage))
+			{
+				logger.warn("Acknowledgment " + responseMessage.getMessageHeader().getMessageData().getMessageId() + " is duplicate!");
+				ebMSDAO.insertDuplicateMessage(timestamp,responseMessage);
+			}
+			else
+				throw new EbMSProcessingException("MessageId " + responseMessage.getMessageHeader().getMessageData().getMessageId() + " already used!");
 		}
 		else
 		{
@@ -293,34 +303,39 @@ public class EbMSMessageProcessor
 		final MessageHeader messageHeader = message.getMessageHeader();
 		if (isDuplicateMessage(message))
 		{
-			logger.warn("Message " + message.getMessageHeader().getMessageData().getMessageId() + " is duplicate!");
-			if (isSyncReply(message))
+			if (isIdenticalMessage(message))
 			{
-				ebMSDAO.insertDuplicateMessage(timestamp,message);
-				EbMSDocument result = ebMSDAO.getEbMSDocumentByRefToMessageId(messageHeader.getCPAId(),messageHeader.getMessageData().getMessageId(),mshMessageService,EbMSAction.MESSAGE_ERROR.action(),EbMSAction.ACKNOWLEDGMENT.action());
-				if (result == null)
-					logger.warn("No response found for duplicate message " + message.getMessageHeader().getMessageData().getMessageId() + "!");
-				return result;
+				logger.warn("Message " + message.getMessageHeader().getMessageData().getMessageId() + " is duplicate!");
+				if (isSyncReply(message))
+				{
+					ebMSDAO.insertDuplicateMessage(timestamp,message);
+					EbMSDocument result = ebMSDAO.getEbMSDocumentByRefToMessageId(messageHeader.getCPAId(),messageHeader.getMessageData().getMessageId(),mshMessageService,EbMSAction.MESSAGE_ERROR.action(),EbMSAction.ACKNOWLEDGMENT.action());
+					if (result == null)
+						logger.warn("No response found for duplicate message " + message.getMessageHeader().getMessageData().getMessageId() + "!");
+					return result;
+				}
+				else
+				{
+					ebMSDAO.executeTransaction(
+						new DAOTransactionCallback()
+						{
+							@Override
+							public void doInTransaction()
+							{
+								ebMSDAO.insertDuplicateMessage(timestamp,message);
+								EbMSMessageContext messageContext = ebMSDAO.getMessageContextByRefToMessageId(messageHeader.getCPAId(),messageHeader.getMessageData().getMessageId(),mshMessageService,EbMSAction.MESSAGE_ERROR.action(),EbMSAction.ACKNOWLEDGMENT.action());
+								if (messageContext != null)
+									eventManager.createEvent(messageHeader.getCPAId(),cpaManager.getReceiveDeliveryChannel(messageHeader.getCPAId(),new CacheablePartyId(message.getMessageHeader().getFrom().getPartyId()),message.getMessageHeader().getFrom().getRole(),CPAUtils.toString(CPAUtils.createEbMSMessageService()),null).getChannelId(),messageContext.getMessageId(),message.getMessageHeader().getMessageData().getTimeToLive(),messageContext.getTimestamp(),false);
+								else
+									logger.warn("No response found for duplicate message " + message.getMessageHeader().getMessageData().getMessageId() + "!");
+							}
+						}
+					);
+					return null;
+				}
 			}
 			else
-			{
-				ebMSDAO.executeTransaction(
-					new DAOTransactionCallback()
-					{
-						@Override
-						public void doInTransaction()
-						{
-							ebMSDAO.insertDuplicateMessage(timestamp,message);
-							EbMSMessageContext messageContext = ebMSDAO.getMessageContextByRefToMessageId(messageHeader.getCPAId(),messageHeader.getMessageData().getMessageId(),mshMessageService,EbMSAction.MESSAGE_ERROR.action(),EbMSAction.ACKNOWLEDGMENT.action());
-							if (messageContext != null)
-								eventManager.createEvent(messageHeader.getCPAId(),cpaManager.getReceiveDeliveryChannel(messageHeader.getCPAId(),new CacheablePartyId(message.getMessageHeader().getFrom().getPartyId()),message.getMessageHeader().getFrom().getRole(),CPAUtils.toString(CPAUtils.createEbMSMessageService()),null).getChannelId(),messageContext.getMessageId(),message.getMessageHeader().getMessageData().getTimeToLive(),messageContext.getTimestamp(),false);
-							else
-								logger.warn("No response found for duplicate message " + message.getMessageHeader().getMessageData().getMessageId() + "!");
-						}
-					}
-				);
-				return null;
-			}
+				throw new EbMSProcessingException("MessageId " + message.getMessageHeader().getMessageData().getMessageId() + " already used!");
 		}
 		else
 		{
@@ -438,6 +453,11 @@ public class EbMSMessageProcessor
 		return /*message.getMessageHeader().getDuplicateElimination()!= null && */ebMSDAO.existsMessage(message.getMessageHeader().getMessageData().getMessageId());
 	}
 	
+	private boolean isIdenticalMessage(EbMSMessage message)
+	{
+		return ebMSDAO.existsIdenticalMessage(message);
+	}
+
 	public void setDeliveryManager(DeliveryManager deliveryManager)
 	{
 		this.deliveryManager = deliveryManager;

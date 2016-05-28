@@ -45,6 +45,7 @@ public interface EbMSDAO
 	int updateUrl(String cpaId, String url);
 
 	boolean existsMessage(String messageId) throws DAOException;
+	boolean existsIdenticalMessage(EbMSMessage message) throws DAOException;
 	EbMSMessageContent getMessageContent(String messageId) throws DAOException;
 	EbMSMessageContext getMessageContext(String messageId) throws DAOException;
 	EbMSMessageContext getMessageContextByRefToMessageId(String cpaId, String refToMessageId, Service service, String...actions) throws DAOException;
