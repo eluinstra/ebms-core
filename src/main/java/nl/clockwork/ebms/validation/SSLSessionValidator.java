@@ -52,14 +52,14 @@ public class SSLSessionValidator implements InitializingBean
 						java.security.cert.X509Certificate certificate = (java.security.cert.X509Certificate)sslSession.getLocalCertificates()[0];
 						SecurityUtils.validateCertificate(keyStore,certificate,message.getMessageHeader().getMessageData().getTimestamp() == null ? new Date() : message.getMessageHeader().getMessageData().getTimestamp());
 						if (!certificate.equals(getLocalCertificate(message.getMessageHeader())))
-							throw new ValidationException("Invalid Server Certificate!");
+							throw new ValidationException("Invalid SSL Server Certificate!");
 					}
 					if (sslSession.getPeerCertificateChain() != null && sslSession.getPeerCertificateChain().length > 0)
 					{
 						X509Certificate certificate = sslSession.getPeerCertificateChain()[0];
 						SecurityUtils.validateCertificate(trustStore,certificate,message.getMessageHeader().getMessageData().getTimestamp() == null ? new Date() : message.getMessageHeader().getMessageData().getTimestamp());
 						if (!certificate.equals(getPeerCertificate(message.getMessageHeader())))
-							throw new ValidationException("Invalid Client Certificate!");
+							throw new ValidationException("Invalid SSL Client Certificate!");
 					}
 				}
 			}
