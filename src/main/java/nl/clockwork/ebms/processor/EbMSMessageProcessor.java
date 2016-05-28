@@ -50,6 +50,7 @@ import nl.clockwork.ebms.validation.CPAValidator;
 import nl.clockwork.ebms.validation.EbMSValidationException;
 import nl.clockwork.ebms.validation.ManifestValidator;
 import nl.clockwork.ebms.validation.MessageHeaderValidator;
+import nl.clockwork.ebms.validation.SSLSessionValidator;
 import nl.clockwork.ebms.validation.SignatureValidator;
 import nl.clockwork.ebms.validation.ValidationException;
 import nl.clockwork.ebms.validation.ValidatorException;
@@ -74,14 +75,15 @@ public class EbMSMessageProcessor
 	protected CPAManager cpaManager;
 	protected EbMSMessageFactory ebMSMessageFactory;
 	protected EventManager eventManager;
-  protected EbMSSignatureGenerator signatureGenerator;
-  protected XSDValidator xsdValidator;
-  protected CPAValidator cpaValidator;
-  protected MessageHeaderValidator messageHeaderValidator;
-  protected ManifestValidator manifestValidator;
-  protected SignatureValidator signatureValidator;
-  protected EbMSMessageDecrypter messageDecrypter;
-  protected Service mshMessageService;
+	protected EbMSSignatureGenerator signatureGenerator;
+	protected XSDValidator xsdValidator;
+	protected SSLSessionValidator sslCertificateValidator;
+	protected CPAValidator cpaValidator;
+	protected MessageHeaderValidator messageHeaderValidator;
+	protected ManifestValidator manifestValidator;
+	protected SignatureValidator signatureValidator;
+	protected EbMSMessageDecrypter messageDecrypter;
+	protected Service mshMessageService;
 
 	public EbMSDocument processRequest(EbMSDocument document) throws EbMSProcessorException
 	{
@@ -327,6 +329,7 @@ public class EbMSMessageProcessor
 		{
 			try
 			{
+				sslCertificateValidator.validate(message);
 				cpaValidator.validate(message);
 				messageHeaderValidator.validate(message,timestamp);
 				signatureValidator.validate(message);
@@ -476,6 +479,11 @@ public class EbMSMessageProcessor
 	public void setXsdValidator(XSDValidator xsdValidator)
 	{
 		this.xsdValidator = xsdValidator;
+	}
+
+	public void setSslCertificateValidator(SSLSessionValidator sslCertificateValidator)
+	{
+		this.sslCertificateValidator = sslCertificateValidator;
 	}
 
 	public void setCpaValidator(CPAValidator cpaValidator)
