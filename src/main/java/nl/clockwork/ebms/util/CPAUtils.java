@@ -52,6 +52,8 @@ import org.w3._2000._09.xmldsig.X509DataType;
 //TODO use JXPath
 public class CPAUtils
 {
+	public static String defaultHostname;
+
 	public static boolean equals(List<PartyId> cpaPartyIds, List<org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.PartyId> headerPartyIds)
 	{
 		return headerPartyIds.size() <= cpaPartyIds.size() && containsAll(cpaPartyIds,headerPartyIds);
@@ -239,11 +241,11 @@ public class CPAUtils
 	{
 		try
 		{
-			return deliveryChannel == null ? "hostname" : new URL(CPAUtils.getUri(deliveryChannel)).getHost();
+			return deliveryChannel == null ? defaultHostname : new URL(CPAUtils.getUri(deliveryChannel)).getHost();
 		}
 		catch (MalformedURLException e)
 		{
-			return "hostname";
+			return defaultHostname;
 		}
 	}
 
@@ -278,5 +280,9 @@ public class CPAUtils
 	{
 		return partyId.getValue().equals(cpaPartyId.getValue()) && (partyId.getType() == null || (cpaPartyId.getType() != null && partyId.getType().equals(cpaPartyId.getType())));
 	}
-	
+
+	public static void setDefaultHostname(String defaultHostname)
+	{
+		CPAUtils.defaultHostname = defaultHostname;
+	}
 }
