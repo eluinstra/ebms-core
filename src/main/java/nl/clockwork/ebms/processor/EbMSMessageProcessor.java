@@ -95,13 +95,8 @@ public class EbMSMessageProcessor
 			Date timestamp = new Date();
 			final EbMSMessage message = EbMSMessageUtils.getEbMSMessage(document);
 			if (!cpaManager.existsCPA(message.getMessageHeader().getCPAId()))
-				if (ignoreUnauthorizedMessages)
-				{
-					logger.warn("CPA " + message.getMessageHeader().getCPAId() + " not found!");
-					return null;
-				}
-				else
-					throw new EbMSProcessingException("CPA " + message.getMessageHeader().getCPAId() + " not found!");
+				throw new EbMSProcessingException("CPA " + message.getMessageHeader().getCPAId() + " not found!");
+			sslCertificateValidator.validate(message);
 			if (!Constants.EBMS_SERVICE_URI.equals(message.getMessageHeader().getService().getValue()))
 			{
 				return process(timestamp,message);
@@ -243,7 +238,6 @@ public class EbMSMessageProcessor
 		{
 			try
 			{
-				sslCertificateValidator.validate(responseMessage);
 				messageHeaderValidator.validate(requestMessage,responseMessage);
 				messageHeaderValidator.validate(responseMessage,timestamp);
 				ebMSDAO.executeTransaction(
@@ -283,7 +277,6 @@ public class EbMSMessageProcessor
 		{
 			try
 			{
-				sslCertificateValidator.validate(responseMessage);
 				messageHeaderValidator.validate(requestMessage,responseMessage);
 				messageHeaderValidator.validate(responseMessage,timestamp);
 				signatureValidator.validate(requestMessage,responseMessage);
@@ -351,7 +344,6 @@ public class EbMSMessageProcessor
 		{
 			try
 			{
-				sslCertificateValidator.validate(message);
 				cpaValidator.validate(message);
 				messageHeaderValidator.validate(message,timestamp);
 				signatureValidator.validate(message);
@@ -466,6 +458,11 @@ public class EbMSMessageProcessor
 	private boolean isIdenticalMessage(EbMSMessage message)
 	{
 		return !checkDuplicateMessage || ebMSDAO.existsIdenticalMessage(message);
+	}
+
+	public boolean isIgnoreUnauthorizedMessages()
+	{
+		return ignoreUnauthorizedMessages;
 	}
 
 	public void setIgnoreUnauthorizedMessages(boolean ignoreUnauthorizedMessages)

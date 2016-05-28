@@ -94,10 +94,15 @@ public abstract class EbMSInputStreamHandler
 					logger.info(">>>>\nstatusCode: " + 500 + "\nContent-Type: text/xml\n" + DOMUtils.toString(soapFault));
 					logger.info("",e);
 				}
-				writeResponseStatus(500);
-				writeResponseHeader("Content-Type","text/xml");
-				OutputStream response = getOutputStream();
-				DOMUtils.write(soapFault,response);
+				if (messageProcessor.isIgnoreUnauthorizedMessages())
+					writeResponseStatus(204);
+				else
+				{
+					writeResponseStatus(500);
+					writeResponseHeader("Content-Type","text/xml");
+					OutputStream response = getOutputStream();
+					DOMUtils.write(soapFault,response);
+				}
 			}
 			catch (Exception e1)
 			{
