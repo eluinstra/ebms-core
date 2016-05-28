@@ -219,7 +219,7 @@ public class EbMSMessageProcessor
 		}
 	}
 	
-	private void processMessageError(String cpaId, final Date timestamp, final EbMSMessage requestMessage, final EbMSMessage responseMessage) throws EbMSProcessingException
+	private void processMessageError(String cpaId, final Date timestamp, final EbMSMessage requestMessage, final EbMSMessage responseMessage) throws EbMSProcessingException, ValidatorException
 	{
 		if (isDuplicateMessage(responseMessage))
 		{
@@ -235,6 +235,7 @@ public class EbMSMessageProcessor
 		{
 			try
 			{
+				sslCertificateValidator.validate(responseMessage);
 				messageHeaderValidator.validate(requestMessage,responseMessage);
 				messageHeaderValidator.validate(responseMessage,timestamp);
 				ebMSDAO.executeTransaction(
@@ -274,6 +275,7 @@ public class EbMSMessageProcessor
 		{
 			try
 			{
+				sslCertificateValidator.validate(responseMessage);
 				messageHeaderValidator.validate(requestMessage,responseMessage);
 				messageHeaderValidator.validate(responseMessage,timestamp);
 				signatureValidator.validate(requestMessage,responseMessage);
