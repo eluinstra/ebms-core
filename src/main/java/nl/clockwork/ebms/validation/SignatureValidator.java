@@ -43,7 +43,7 @@ public class SignatureValidator
 		MessageHeader messageHeader = message.getMessageHeader();
 		SignatureType signature = message.getSignature();
 		
-		DeliveryChannel deliveryChannel = cpaManager.getFromDeliveryChannel(message.getMessageHeader().getCPAId(),new CacheablePartyId(messageHeader.getFrom().getPartyId()),messageHeader.getFrom().getRole(),CPAUtils.toString(messageHeader.getService()),messageHeader.getAction());
+		DeliveryChannel deliveryChannel = cpaManager.getSendDeliveryChannel(message.getMessageHeader().getCPAId(),new CacheablePartyId(messageHeader.getFrom().getPartyId()),messageHeader.getFrom().getRole(),CPAUtils.toString(messageHeader.getService()),messageHeader.getAction());
 		if (cpaManager.isNonRepudiationRequired(message.getMessageHeader().getCPAId(),new CacheablePartyId(messageHeader.getFrom().getPartyId()),messageHeader.getFrom().getRole(),CPAUtils.toString(messageHeader.getService()),messageHeader.getAction()))
 		{
 			if (signature == null)

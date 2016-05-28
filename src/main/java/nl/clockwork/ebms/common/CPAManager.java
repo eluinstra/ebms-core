@@ -219,7 +219,7 @@ public class CPAManager
 		return (DeliveryChannel)partyInfo.getDefaultMshChannelId();
 	}
 
-	public DeliveryChannel getFromDeliveryChannel(String cpaId, CacheablePartyId partyId, String role, String service, String action)
+	public DeliveryChannel getSendDeliveryChannel(String cpaId, CacheablePartyId partyId, String role, String service, String action)
 	{
 		PartyInfo partyInfo = getPartyInfo(cpaId,partyId);
 		if (Constants.EBMS_SERVICE_URI.equals(service))
@@ -235,7 +235,7 @@ public class CPAManager
 		return null;
 	}
 	
-	public DeliveryChannel getToDeliveryChannel(String cpaId, CacheablePartyId partyId, String role, String service, String action)
+	public DeliveryChannel getReceiveDeliveryChannel(String cpaId, CacheablePartyId partyId, String role, String service, String action)
 	{
 		PartyInfo partyInfo = getPartyInfo(cpaId,partyId);
 		if (Constants.EBMS_SERVICE_URI.equals(service))
@@ -255,7 +255,7 @@ public class CPAManager
 	{
 		PartyInfo partyInfo = getPartyInfo(cpaId,partyId);
 		CanSend canSend = getCanSend(partyInfo,role,service,action);
-		DocExchange docExchange = CPAUtils.getDocExchange(getFromDeliveryChannel(cpaId,partyId,role,service,action));
+		DocExchange docExchange = CPAUtils.getDocExchange(getSendDeliveryChannel(cpaId,partyId,role,service,action));
 		return canSend.getThisPartyActionBinding().getBusinessTransactionCharacteristics().isIsNonRepudiationRequired() && docExchange.getEbXMLSenderBinding() != null && docExchange.getEbXMLSenderBinding().getSenderNonRepudiation() != null;
 	}
 
@@ -263,7 +263,7 @@ public class CPAManager
 	{
 		PartyInfo partyInfo = getPartyInfo(cpaId,partyId);
 		CanSend canSend = getCanSend(partyInfo,role,service,action);
-		DocExchange docExchange = CPAUtils.getDocExchange(getFromDeliveryChannel(cpaId,partyId,role,service,action));
+		DocExchange docExchange = CPAUtils.getDocExchange(getSendDeliveryChannel(cpaId,partyId,role,service,action));
 		return (PersistenceLevelType.PERSISTENT.equals(canSend.getThisPartyActionBinding().getBusinessTransactionCharacteristics().getIsConfidential()) || PersistenceLevelType.TRANSIENT_AND_PERSISTENT.equals(canSend.getThisPartyActionBinding().getBusinessTransactionCharacteristics().getIsConfidential())) && docExchange.getEbXMLReceiverBinding() != null && docExchange.getEbXMLReceiverBinding().getReceiverDigitalEnvelope() != null;
 	}
 
@@ -271,13 +271,13 @@ public class CPAManager
 	{
 		String result = getUrl(cpaId);
 		if (StringUtils.isEmpty(result))
-			result = CPAUtils.getUri(getToDeliveryChannel(cpaId,partyId,role,service,action));
+			result = CPAUtils.getUri(getReceiveDeliveryChannel(cpaId,partyId,role,service,action));
 		return result;
 	}
 
 	public SyncReplyModeType getSyncReply(String cpaId, CacheablePartyId partyId, String role, String service, String action)
 	{
-		DeliveryChannel deliveryChannel = getFromDeliveryChannel(cpaId,partyId,role,service,action);
+		DeliveryChannel deliveryChannel = getSendDeliveryChannel(cpaId,partyId,role,service,action);
 		return deliveryChannel.getMessagingCharacteristics().getSyncReplyMode();
 	}
 

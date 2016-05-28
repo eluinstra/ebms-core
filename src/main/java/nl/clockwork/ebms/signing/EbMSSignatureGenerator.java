@@ -104,7 +104,7 @@ public class EbMSSignatureGenerator implements InitializingBean
 
 	private void sign(EbMSMessage message) throws EbMSProcessorException, GeneralSecurityException, XMLSecurityException
 	{
-		DeliveryChannel deliveryChannel = cpaManager.getFromDeliveryChannel(message.getMessageHeader().getCPAId(),new CacheablePartyId(message.getMessageHeader().getFrom().getPartyId()),message.getMessageHeader().getFrom().getRole(),CPAUtils.toString(message.getMessageHeader().getService()),message.getMessageHeader().getAction());
+		DeliveryChannel deliveryChannel = cpaManager.getSendDeliveryChannel(message.getMessageHeader().getCPAId(),new CacheablePartyId(message.getMessageHeader().getFrom().getPartyId()),message.getMessageHeader().getFrom().getRole(),CPAUtils.toString(message.getMessageHeader().getService()),message.getMessageHeader().getAction());
 		X509Certificate certificate = CPAUtils.getX509Certificate(CPAUtils.getSigningCertificate(deliveryChannel));
 		String alias = keyStore.getCertificateAlias(certificate);
 		if (alias == null)

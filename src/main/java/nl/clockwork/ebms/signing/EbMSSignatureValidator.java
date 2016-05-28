@@ -144,7 +144,7 @@ public class EbMSSignatureValidator implements InitializingBean
 	{
 		try
 		{
-			DeliveryChannel deliveryChannel = cpaManager.getFromDeliveryChannel(messageHeader.getCPAId(),new CacheablePartyId(messageHeader.getFrom().getPartyId()),messageHeader.getFrom().getRole(),CPAUtils.toString(messageHeader.getService()),messageHeader.getAction());
+			DeliveryChannel deliveryChannel = cpaManager.getSendDeliveryChannel(messageHeader.getCPAId(),new CacheablePartyId(messageHeader.getFrom().getPartyId()),messageHeader.getFrom().getRole(),CPAUtils.toString(messageHeader.getService()),messageHeader.getAction());
 			if (deliveryChannel != null)
 				return CPAUtils.getX509Certificate(CPAUtils.getSigningCertificate(deliveryChannel));
 			return null;

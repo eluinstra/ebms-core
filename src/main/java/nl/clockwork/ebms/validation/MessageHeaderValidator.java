@@ -85,7 +85,7 @@ public class MessageHeaderValidator
 				throw new EbMSValidationException(EbMSMessageUtils.createError("//Header/MessageHeader/Action",Constants.EbMSErrorCode.VALUE_NOT_RECOGNIZED,"Value not found."));
 		}
 
-		DeliveryChannel deliveryChannel = cpaManager.getFromDeliveryChannel(message.getMessageHeader().getCPAId(),new CacheablePartyId(messageHeader.getFrom().getPartyId()),messageHeader.getFrom().getRole(),CPAUtils.toString(messageHeader.getService()),messageHeader.getAction());
+		DeliveryChannel deliveryChannel = cpaManager.getSendDeliveryChannel(message.getMessageHeader().getCPAId(),new CacheablePartyId(messageHeader.getFrom().getPartyId()),messageHeader.getFrom().getRole(),CPAUtils.toString(messageHeader.getService()),messageHeader.getAction());
 		if (deliveryChannel == null)
 			throw new EbMSValidationException(EbMSMessageUtils.createError(Constants.EbMSErrorCode.UNKNOWN.errorCode(),Constants.EbMSErrorCode.UNKNOWN,"No DeliveryChannel found."));
 		if (!existsRefToMessageId(messageHeader.getMessageData().getRefToMessageId()))
