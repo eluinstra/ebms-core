@@ -77,7 +77,7 @@ public class EbMSHttpClient implements EbMSClient
 		HttpPost result = new HttpPost(uri);
 		if (proxy != null && proxy.useProxy(uri))
 		{
-			result.setConfig(RequestConfig.custom().setProxy(new HttpHost("localhost", 8080)).build());
+			result.setConfig(RequestConfig.custom().setProxy(new HttpHost(proxy.getHost(),proxy.getPort())).build());
 		}
 		return result;
 	}
