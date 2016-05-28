@@ -63,8 +63,7 @@ public class SSLFactoryManager implements InitializingBean
 		@Override
 		public String chooseClientAlias(String[] keyType, Principal[] issuers, Socket socket)
 		{
-			//socket.getInetAddress().getHostName(); socket.getPort();
-			return clientAlias;
+			return clientAlias == null ? standardKeyManager.chooseClientAlias(keyType,issuers,socket) : clientAlias;
 		}
 
 		@Override
