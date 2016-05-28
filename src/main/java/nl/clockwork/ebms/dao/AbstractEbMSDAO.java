@@ -296,17 +296,17 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 				" from ebms_message" +
 				" where message_id = ?" +
 				" and message_nr = 0" +
-				" and cpa_id = ?" +
-				" and from_role," +
-				" and to_role," +
+				" and cpa_id = ?" /*+
+				" and from_role =?" +
+				" and to_role = ?" +
 				" and service = ?" +
-				" and action = ?",
+				" and action = ?"*/,
 				message.getMessageHeader().getMessageData().getMessageId(),
-				message.getMessageHeader().getCPAId(),
+				message.getMessageHeader().getCPAId()/*,
 				message.getMessageHeader().getFrom().getRole(),
 				message.getMessageHeader().getTo().getRole(),
 				message.getMessageHeader().getService(),
-				message.getMessageHeader().getAction()
+				message.getMessageHeader().getAction()*/
 			) > 0;
 		}
 		catch (DataAccessException e)

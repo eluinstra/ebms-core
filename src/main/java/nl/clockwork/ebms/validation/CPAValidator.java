@@ -47,6 +47,10 @@ public class CPAValidator
 	protected transient Log logger = LogFactory.getLog(getClass());
 	protected CPAManager cpaManager;
 
+	public CPAValidator()
+	{
+	}
+
 	public CPAValidator(CPAManager cpaManager)
 	{
 		this.cpaManager = cpaManager;

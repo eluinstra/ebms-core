@@ -22,7 +22,7 @@
 >
 	<bean class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
 		<property name="staticMethod" value="nl.clockwork.ebms.util.CPAUtils.setDefaultHostname"/>
-		<property name="arguments" value="${core.hostname.default}"/>
+		<property name="arguments" value="${ebms.defaultHostname}"/>
 	</bean>
 
 	<bean class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
@@ -70,8 +70,8 @@
 	</bean>
 
 	<bean id="messageProcessor" class="nl.clockwork.ebms.processor.EbMSMessageProcessor">
-		<property name="ignoreUnauthorizedMessages" value="${core.ignoreUnauthorizedMessages}"/>
-		<property name="checkDuplicateMessage" value="${core.checkDuplicateMessage}"/>
+		<property name="ignoreUnauthorizedMessages" value="${ebms.ignoreUnauthorizedMessages}"/>
+		<property name="checkDuplicateMessage" value="${ebms.checkDuplicateMessage}"/>
 		<property name="deliveryManager" ref="deliveryManager"/>
 		<property name="eventListener" ref="eventListener"/>
 		<property name="ebMSDAO" ref="ebMSDAO"/>

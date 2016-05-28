@@ -473,6 +473,11 @@ public class EbMSMessageProcessor
 		this.ignoreUnauthorizedMessages = ignoreUnauthorizedMessages;
 	}
 
+	public void setCheckDuplicateMessage(boolean checkDuplicateMessage)
+	{
+		this.checkDuplicateMessage = checkDuplicateMessage;
+	}
+
 	public void setDeliveryManager(DeliveryManager deliveryManager)
 	{
 		this.deliveryManager = deliveryManager;
