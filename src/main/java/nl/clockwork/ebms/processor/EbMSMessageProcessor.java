@@ -93,10 +93,7 @@ public class EbMSMessageProcessor
 			Date timestamp = new Date();
 			final EbMSMessage message = EbMSMessageUtils.getEbMSMessage(document);
 			if (!cpaManager.existsCPA(message.getMessageHeader().getCPAId()))
-			{
-				logger.warn("CPA " + message.getMessageHeader().getCPAId() + " not found!");
-				return null;
-			}
+				throw new EbMSProcessingException("CPA " + message.getMessageHeader().getCPAId() + " not found!");
 			if (!Constants.EBMS_SERVICE_URI.equals(message.getMessageHeader().getService().getValue()))
 			{
 				return process(timestamp,message);
