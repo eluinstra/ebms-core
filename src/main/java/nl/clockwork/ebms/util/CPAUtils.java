@@ -244,7 +244,7 @@ public class CPAUtils
 	{
 		try
 		{
-			return new URL(CPAUtils.getUri(deliveryChannel)).getHost();
+			return deliveryChannel != null ? new URL(CPAUtils.getUri(deliveryChannel)).getHost() : null;
 		}
 		catch (MalformedURLException e)
 		{
