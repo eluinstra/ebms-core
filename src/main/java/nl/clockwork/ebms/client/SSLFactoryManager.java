@@ -21,18 +21,22 @@ import java.security.Principal;
 import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
 
+import javax.net.ssl.HandshakeCompletedEvent;
+import javax.net.ssl.HandshakeCompletedListener;
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLEngine;
+import javax.net.ssl.SSLPeerUnverifiedException;
 import javax.net.ssl.SSLSession;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManagerFactory;
 import javax.net.ssl.X509KeyManager;
 
 import nl.clockwork.ebms.common.util.SecurityUtils;
+import nl.clockwork.ebms.validation.SSLSessionManager;
 
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.InitializingBean;
@@ -88,6 +92,28 @@ public class SSLFactoryManager implements InitializingBean
 		}
 	}
 
+	public static class SSLCertificateListener implements HandshakeCompletedListener
+	{
+		public void handshakeCompleted(HandshakeCompletedEvent event)
+		{
+			nl.clockwork.ebms.model.SSLSession sslSession = new nl.clockwork.ebms.model.SSLSession();
+			sslSession.setCipherSuite(event.getSession().getCipherSuite());
+			sslSession.setProtocol(event.getSession().getProtocol());
+			sslSession.setLocalCertificates(event.getSession().getLocalCertificates());
+			sslSession.setPeerHost(event.getSession().getPeerHost());
+			sslSession.setPeerPort(event.getSession().getPeerPort());
+			try
+			{
+				sslSession.setPeerCertificates(event.getSession().getPeerCertificates());
+				sslSession.setPeerCertificateChain(event.getSession().getPeerCertificateChain());
+			}
+			catch (SSLPeerUnverifiedException e)
+			{
+			}
+			SSLSessionManager.setSSLSession(sslSession);
+		}
+	}
+
 	private String keyStorePath;
 	private String keyStorePassword;
 	private String trustStorePath;
@@ -128,7 +154,7 @@ public class SSLFactoryManager implements InitializingBean
 			engine.setEnabledProtocols(enabledProtocols);
 		if (enabledCipherSuites.length > 0)
 			engine.setEnabledCipherSuites(enabledCipherSuites);
-		engine.setUseClientMode(requireClientAuthentication);
+		engine.setNeedClientAuth(requireClientAuthentication);
 
 		sslSocketFactory = sslContext.getSocketFactory();
 	}
