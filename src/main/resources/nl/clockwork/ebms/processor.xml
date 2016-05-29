@@ -70,7 +70,6 @@
 	</bean>
 
 	<bean id="messageProcessor" class="nl.clockwork.ebms.processor.EbMSMessageProcessor">
-		<property name="ignoreUnauthorizedMessages" value="${ebms.ignoreUnauthorizedMessages}"/>
 		<property name="checkDuplicateMessage" value="${ebms.checkDuplicateMessage}"/>
 		<property name="deliveryManager" ref="deliveryManager"/>
 		<property name="eventListener" ref="eventListener"/>

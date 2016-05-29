@@ -69,7 +69,6 @@ import org.xml.sax.SAXException;
 public class EbMSMessageProcessor
 {
   protected transient Log logger = LogFactory.getLog(getClass());
-  protected boolean ignoreUnauthorizedMessages;
   protected boolean checkDuplicateMessage;
   protected DeliveryManager deliveryManager;
   protected EventListener eventListener;
@@ -458,16 +457,6 @@ public class EbMSMessageProcessor
 	private boolean isIdenticalMessage(EbMSMessage message)
 	{
 		return !checkDuplicateMessage || ebMSDAO.existsIdenticalMessage(message);
-	}
-
-	public boolean isIgnoreUnauthorizedMessages()
-	{
-		return ignoreUnauthorizedMessages;
-	}
-
-	public void setIgnoreUnauthorizedMessages(boolean ignoreUnauthorizedMessages)
-	{
-		this.ignoreUnauthorizedMessages = ignoreUnauthorizedMessages;
 	}
 
 	public void setCheckDuplicateMessage(boolean checkDuplicateMessage)
