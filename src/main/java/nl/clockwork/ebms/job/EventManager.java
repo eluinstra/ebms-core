@@ -24,6 +24,7 @@ import nl.clockwork.ebms.dao.EbMSDAO;
 import nl.clockwork.ebms.model.EbMSEvent;
 import nl.clockwork.ebms.util.CPAUtils;
 
+import org.apache.commons.lang.StringUtils;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DeliveryChannel;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.ReliableMessaging;
 
@@ -32,9 +33,12 @@ public class EventManager
 	private EbMSDAO ebMSDAO;
 	private CPAManager cpaManager;
 
-	public void createEvent(String cpaId, String deliveryChannelId, String messageId, Date timeToLive, Date timestamp, boolean isConfidential)
+	public void createEvent(String cpaId, DeliveryChannel deliveryChannel, String messageId, Date timeToLive, Date timestamp, boolean isConfidential)
 	{
-		ebMSDAO.insertEvent(new EbMSEvent(cpaId,deliveryChannelId,messageId,timeToLive,timestamp,isConfidential,0));
+		if (!StringUtils.isEmpty(CPAUtils.getUri(deliveryChannel)))
+			ebMSDAO.insertEvent(new EbMSEvent(cpaId,deliveryChannel.getChannelId(),messageId,timeToLive,timestamp,isConfidential,0));
+		else
+			ebMSDAO.insertEventLog(messageId,timestamp,null,EbMSEventStatus.FAILED,"Could not resolve endpoint!");
 	}
 
 	public void updateEvent(final EbMSEvent event, final String url, final EbMSEventStatus status)

@@ -77,18 +77,10 @@ public class EbMSEventProcessor implements InitializingBean, Job
 					messageEncrypter.encrypt(event,deliveryChannel,requestDocument);
 					if (StringUtils.isEmpty(url))
 						url = CPAUtils.getUri(deliveryChannel);
-					if (url != null)
-					{
-						logger.info("Sending message " + event.getMessageId() + " to " + url);
-						EbMSDocument responseDocument = ebMSClient.sendMessage(url,requestDocument);
-						messageProcessor.processResponse(requestDocument,responseDocument);
-						eventManager.updateEvent(event,url,EbMSEventStatus.SUCCEEDED);
-					}
-					else
-					{
-						logger.info("Unable to send message " + event.getMessageId() + ". No url found!");
-						eventManager.updateEvent(event,url,EbMSEventStatus.FAILED);
-					}
+					logger.info("Sending message " + event.getMessageId() + " to " + url);
+					EbMSDocument responseDocument = ebMSClient.sendMessage(url,requestDocument);
+					messageProcessor.processResponse(requestDocument,responseDocument);
+					eventManager.updateEvent(event,url,EbMSEventStatus.SUCCEEDED);
 				}
 				else
 					eventManager.deleteEvent(event.getMessageId());
