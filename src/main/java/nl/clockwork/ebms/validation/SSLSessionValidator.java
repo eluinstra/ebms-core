@@ -8,6 +8,7 @@ import java.util.Date;
 import javax.security.cert.X509Certificate;
 
 import nl.clockwork.ebms.common.CPAManager;
+import nl.clockwork.ebms.common.KeyStoreManager;
 import nl.clockwork.ebms.common.util.SecurityUtils;
 import nl.clockwork.ebms.model.CacheablePartyId;
 import nl.clockwork.ebms.model.EbMSMessage;
@@ -35,8 +36,8 @@ public class SSLSessionValidator implements InitializingBean
 	@Override
 	public void afterPropertiesSet() throws Exception
 	{
-		keyStore = SecurityUtils.loadKeyStore(keyStorePath,keyStorePassword);
-		trustStore = SecurityUtils.loadKeyStore(trustStorePath,trustStorePassword);
+		keyStore = KeyStoreManager.getKeyStore(keyStorePath,keyStorePassword);
+		trustStore = KeyStoreManager.getKeyStore(trustStorePath,trustStorePassword);
 	}
 
 	public void validate(EbMSMessage message) throws ValidatorException

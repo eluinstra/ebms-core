@@ -28,6 +28,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import nl.clockwork.ebms.Constants;
 import nl.clockwork.ebms.common.CPAManager;
+import nl.clockwork.ebms.common.KeyStoreManager;
 import nl.clockwork.ebms.common.util.DOMUtils;
 import nl.clockwork.ebms.common.util.SecurityUtils;
 import nl.clockwork.ebms.model.CacheablePartyId;
@@ -63,7 +64,7 @@ public class EbMSMessageDecrypter implements InitializingBean
 	@Override
 	public void afterPropertiesSet() throws Exception
 	{
-		keyStore = SecurityUtils.loadKeyStore(keyStorePath,keyStorePassword);
+		keyStore = KeyStoreManager.getKeyStore(keyStorePath,keyStorePassword);
 	}
 
 	public void decrypt(EbMSMessage message) throws ValidatorException

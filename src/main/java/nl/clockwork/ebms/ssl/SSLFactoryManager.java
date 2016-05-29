@@ -31,6 +31,7 @@ import javax.net.ssl.SSLSession;
 import javax.net.ssl.TrustManagerFactory;
 import javax.net.ssl.X509KeyManager;
 
+import nl.clockwork.ebms.common.KeyStoreManager;
 import nl.clockwork.ebms.common.util.SecurityUtils;
 
 import org.apache.commons.lang.StringUtils;
@@ -100,8 +101,8 @@ public class SSLFactoryManager implements InitializingBean
 	@Override
 	public void afterPropertiesSet() throws Exception
 	{
-		KeyStore keyStore = SecurityUtils.loadKeyStore(keyStorePath,keyStorePassword);
-		KeyStore trustStore = SecurityUtils.loadKeyStore(trustStorePath,trustStorePassword);
+		KeyStore keyStore = KeyStoreManager.getKeyStore(keyStorePath,keyStorePassword);
+		KeyStore trustStore = KeyStoreManager.getKeyStore(trustStorePath,trustStorePassword);
 
 		//KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
 		KeyManagerFactory kmf = KeyManagerFactory.getInstance("SunX509");

@@ -48,6 +48,7 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
 import nl.clockwork.ebms.common.CPAManager;
+import nl.clockwork.ebms.common.KeyStoreManager;
 import nl.clockwork.ebms.common.util.SecurityUtils;
 import nl.clockwork.ebms.model.CacheablePartyId;
 import nl.clockwork.ebms.model.EbMSAttachment;
@@ -85,7 +86,7 @@ public class EbMSMessageEncrypter implements InitializingBean
 	@Override
 	public void afterPropertiesSet() throws Exception
 	{
-		trustStore = SecurityUtils.loadKeyStore(trustStorePath,trustStorePassword);
+		trustStore = KeyStoreManager.getKeyStore(trustStorePath,trustStorePassword);
 	}
 
 	public void encrypt(EbMSMessage message) throws EbMSProcessingException

@@ -15,7 +15,6 @@
  */
 package nl.clockwork.ebms.signing;
 
-import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
@@ -29,6 +28,7 @@ import java.util.Date;
 import java.util.List;
 
 import nl.clockwork.ebms.common.CPAManager;
+import nl.clockwork.ebms.common.KeyStoreManager;
 import nl.clockwork.ebms.common.util.SecurityUtils;
 import nl.clockwork.ebms.model.CacheablePartyId;
 import nl.clockwork.ebms.model.EbMSAttachment;
@@ -61,7 +61,7 @@ public class EbMSSignatureValidator implements InitializingBean
 	@Override
 	public void afterPropertiesSet() throws Exception
 	{
-		trustStore = SecurityUtils.loadKeyStore(trustStorePath,trustStorePassword);
+		trustStore = KeyStoreManager.getKeyStore(trustStorePath,trustStorePassword);
 	}
 
 	public void validate(EbMSMessage message) throws ValidatorException, ValidationException
@@ -103,7 +103,6 @@ public class EbMSSignatureValidator implements InitializingBean
 		{
 			if (requestMessage.getAckRequested().isSigned())
 			{
-				KeyStore trustStore = SecurityUtils.loadKeyStore(trustStorePath,trustStorePassword);
 				NodeList signatureNodeList = responseMessage.getMessage().getElementsByTagNameNS(org.apache.xml.security.utils.Constants.SignatureSpecNS,org.apache.xml.security.utils.Constants._TAG_SIGNATURE);
 				if (signatureNodeList.getLength() > 0)
 				{
@@ -122,7 +121,7 @@ public class EbMSSignatureValidator implements InitializingBean
 					throw new ValidationException("Signature not found!");
 			}
 		}
-		catch (GeneralSecurityException | IOException e)
+		catch (KeyStoreException e)
 		{
 			throw new ValidatorException(e);
 		}
@@ -132,7 +131,7 @@ public class EbMSSignatureValidator implements InitializingBean
 		}
 	}
 
-	private boolean verify(X509Certificate certificate, Element signatureElement, List<EbMSAttachment> attachments) throws XMLSignatureException, XMLSecurityException, CertificateExpiredException, CertificateNotYetValidException, KeyStoreException
+	private boolean verify(X509Certificate certificate, Element signatureElement, List<EbMSAttachment> attachments) throws XMLSignatureException, XMLSecurityException
 	{
 		XMLSignature signature = new XMLSignature(signatureElement,org.apache.xml.security.utils.Constants.SignatureSpecNS);
 		EbMSAttachmentResolver resolver = new EbMSAttachmentResolver(attachments);

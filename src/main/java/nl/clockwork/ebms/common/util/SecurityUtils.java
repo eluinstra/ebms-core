@@ -15,9 +15,6 @@
  */
 package nl.clockwork.ebms.common.util;
 
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.security.GeneralSecurityException;
 import java.security.Key;
 import java.security.KeyPair;
@@ -47,19 +44,6 @@ import org.apache.xml.security.encryption.XMLCipher;
 public class SecurityUtils
 {
 	protected static Log logger = LogFactory.getLog(SecurityUtils.class);
-
-	public static KeyStore loadKeyStore(String location, String password) throws GeneralSecurityException, IOException
-	{
-		//location = ResourceUtils.getURL(SystemPropertyUtils.resolvePlaceholders(location)).getFile();
-		InputStream in = SecurityUtils.class.getResourceAsStream(location);
-		if (in == null)
-			in = SecurityUtils.class.getResourceAsStream("/" + location);
-		if (in == null)
-			in = new FileInputStream(location);
-		KeyStore keyStore = KeyStore.getInstance("JKS");
-		keyStore.load(in,password.toCharArray());
-		return keyStore;
-	}
 
 	public static KeyPair getKeyPair(KeyStore keyStore, String alias, String password) throws GeneralSecurityException
 	{
