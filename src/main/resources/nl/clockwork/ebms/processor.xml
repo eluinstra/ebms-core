@@ -65,7 +65,6 @@
 	</bean>
 
 	<bean id="messageProcessor" class="nl.clockwork.ebms.processor.EbMSMessageProcessor">
-		<property name="checkDuplicateMessage" value="${ebms.checkDuplicateMessage}"/>
 		<property name="deliveryManager" ref="deliveryManager"/>
 		<property name="eventListener" ref="eventListener"/>
 		<property name="ebMSDAO" ref="ebMSDAO"/>

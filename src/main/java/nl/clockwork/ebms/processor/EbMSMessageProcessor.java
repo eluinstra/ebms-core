@@ -69,7 +69,6 @@ import org.xml.sax.SAXException;
 public class EbMSMessageProcessor
 {
   protected transient Log logger = LogFactory.getLog(getClass());
-  protected boolean checkDuplicateMessage;
   protected DeliveryManager deliveryManager;
   protected EventListener eventListener;
 	protected EbMSDAO ebMSDAO;
@@ -456,12 +455,7 @@ public class EbMSMessageProcessor
 	
 	private boolean isIdenticalMessage(EbMSMessage message)
 	{
-		return !checkDuplicateMessage || ebMSDAO.existsIdenticalMessage(message);
-	}
-
-	public void setCheckDuplicateMessage(boolean checkDuplicateMessage)
-	{
-		this.checkDuplicateMessage = checkDuplicateMessage;
+		return ebMSDAO.existsIdenticalMessage(message);
 	}
 
 	public void setDeliveryManager(DeliveryManager deliveryManager)
