@@ -105,7 +105,7 @@ public class EbMSMessageProcessor
 				Document request = ebMSDAO.getDocument(message.getMessageHeader().getMessageData().getRefToMessageId());
 				EbMSMessage requestMessage = EbMSMessageUtils.getEbMSMessage(request);
 				if (requestMessage.getSyncReply() != null)
-					throw new EbMSProcessingException("No async ErrorMessage expected for message " + requestMessage.getMessageHeader().getMessageData().getMessageId() + "\n" + DOMUtils.toString(document.getMessage()));
+					throw new EbMSProcessingException("No async ErrorMessage expected for message " + requestMessage.getMessageHeader().getMessageData().getMessageId());
 				processMessageError(message.getMessageHeader().getCPAId(),timestamp,requestMessage,message);
 				return null;
 			}
@@ -114,7 +114,7 @@ public class EbMSMessageProcessor
 				Document request = ebMSDAO.getDocument(message.getAcknowledgment().getRefToMessageId());
 				EbMSMessage requestMessage = EbMSMessageUtils.getEbMSMessage(request);
 				if (requestMessage.getAckRequested() == null || requestMessage.getSyncReply() != null)
-					throw new EbMSProcessingException("No async Acknowledgment expected for message " + requestMessage.getMessageHeader().getMessageData().getMessageId() + "\n" + DOMUtils.toString(document.getMessage()));
+					throw new EbMSProcessingException("No async Acknowledgment expected for message " + requestMessage.getMessageHeader().getMessageData().getMessageId());
 				processAcknowledgment(message.getMessageHeader().getCPAId(),timestamp,requestMessage,message);
 				return null;
 			}
@@ -151,7 +151,7 @@ public class EbMSMessageProcessor
 				return null;
 			}
 			else
-				throw new EbMSProcessingException("Unable to process message:\n" + DOMUtils.toString(document.getMessage()));
+				throw new EbMSProcessingException("Unable to process message! Action=" + message.getMessageHeader().getAction());
 		}
 		catch (ValidationException | JAXBException | SAXException | IOException | SOAPException | TransformerException e)
 		{
