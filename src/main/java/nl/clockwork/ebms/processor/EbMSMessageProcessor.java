@@ -151,7 +151,7 @@ public class EbMSMessageProcessor
 				return null;
 			}
 			else
-				throw new EbMSProcessingException("Unable to process message! Action=" + message.getMessageHeader().getAction());
+				throw new EbMSProcessingException("Unable to process message! Service=" + message.getMessageHeader().getService() + " and Action=" + message.getMessageHeader().getAction());
 		}
 		catch (ValidationException | JAXBException | SAXException | IOException | SOAPException | TransformerException e)
 		{
