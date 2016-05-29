@@ -1,4 +1,4 @@
-package nl.clockwork.ebms.client;
+package nl.clockwork.ebms.ssl;
 
 import javax.net.ssl.HandshakeCompletedEvent;
 import javax.net.ssl.HandshakeCompletedListener;

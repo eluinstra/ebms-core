@@ -241,7 +241,7 @@
 		<property name="verifyHostnames" value="${https.verifyHostnames}"></property>
 	</bean-->
 
-	<bean id="sslFactoryManager" class="nl.clockwork.ebms.client.SSLFactoryManager">
+	<bean id="sslFactoryManager" class="nl.clockwork.ebms.ssl.SSLFactoryManager">
 		<property name="keyStorePath" value="${keystore.path}"/>
 		<property name="keyStorePassword" value="${keystore.password}"/>
 		<property name="trustStorePath" value="${truststore.path}"/>

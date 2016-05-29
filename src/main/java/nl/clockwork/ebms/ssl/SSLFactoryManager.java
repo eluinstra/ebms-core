@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.clockwork.ebms.client;
+package nl.clockwork.ebms.ssl;
 
 import java.net.Socket;
 import java.security.KeyStore;
@@ -128,7 +128,7 @@ public class SSLFactoryManager implements InitializingBean
 			engine.setEnabledCipherSuites(enabledCipherSuites);
 		engine.setNeedClientAuth(requireClientAuthentication);
 
-		sslSocketFactory = new nl.clockwork.ebms.client.SSLSocketFactory(sslContext.getSocketFactory());
+		sslSocketFactory = new nl.clockwork.ebms.ssl.SSLSocketFactory(sslContext.getSocketFactory());
 	}
 
 	public HostnameVerifier getHostnameVerifier(HttpsURLConnection connection)

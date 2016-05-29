@@ -1,4 +1,4 @@
-package nl.clockwork.ebms.client;
+package nl.clockwork.ebms.ssl;
 
 import java.io.IOException;
 import java.net.InetAddress;
