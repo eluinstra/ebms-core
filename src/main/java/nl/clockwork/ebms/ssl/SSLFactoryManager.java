@@ -28,6 +28,7 @@ import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLEngine;
 import javax.net.ssl.SSLSession;
+import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManagerFactory;
 import javax.net.ssl.X509KeyManager;
 
@@ -128,7 +129,7 @@ public class SSLFactoryManager implements InitializingBean
 			engine.setEnabledCipherSuites(enabledCipherSuites);
 		engine.setNeedClientAuth(requireClientAuthentication);
 
-		sslSocketFactory = new nl.clockwork.ebms.ssl.SSLSocketFactory(sslContext.getSocketFactory());
+		sslSocketFactory = sslContext.getSocketFactory();
 	}
 
 	public HostnameVerifier getHostnameVerifier(HttpsURLConnection connection)

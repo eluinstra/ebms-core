@@ -15,8 +15,7 @@
  */
 package nl.clockwork.ebms.validation;
 
-import nl.clockwork.ebms.model.SSLSession;
-
+import javax.net.ssl.SSLSession;
 
 public class SSLSessionManager 
 {

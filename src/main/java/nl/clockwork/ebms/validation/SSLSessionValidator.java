@@ -20,14 +20,14 @@ import java.security.KeyStore;
 import java.security.cert.CertificateException;
 import java.util.Date;
 
-import javax.security.cert.X509Certificate;
+import javax.net.ssl.SSLPeerUnverifiedException;
+import javax.net.ssl.SSLSession;
 
 import nl.clockwork.ebms.common.CPAManager;
 import nl.clockwork.ebms.common.KeyStoreManager;
 import nl.clockwork.ebms.common.util.SecurityUtils;
 import nl.clockwork.ebms.model.CacheablePartyId;
 import nl.clockwork.ebms.model.EbMSMessage;
-import nl.clockwork.ebms.model.SSLSession;
 import nl.clockwork.ebms.util.CPAUtils;
 
 import org.apache.commons.logging.Log;
@@ -70,12 +70,18 @@ public class SSLSessionValidator implements InitializingBean
 						if (!certificate.equals(getLocalCertificate(message.getMessageHeader())))
 							throw new ValidationException("Invalid SSL Server Certificate!");
 					}
-					if (sslSession.getPeerCertificateChain() != null && sslSession.getPeerCertificateChain().length > 0)
+					try
 					{
-						X509Certificate certificate = sslSession.getPeerCertificateChain()[0];
-						SecurityUtils.validateCertificate(trustStore,certificate,message.getMessageHeader().getMessageData().getTimestamp() == null ? new Date() : message.getMessageHeader().getMessageData().getTimestamp());
-						if (!certificate.equals(getPeerCertificate(message.getMessageHeader())))
-							throw new ValidationException("Invalid SSL Client Certificate!");
+						if (sslSession.getPeerCertificates() != null && sslSession.getPeerCertificates().length > 0)
+						{
+							java.security.cert.X509Certificate certificate = (java.security.cert.X509Certificate)sslSession.getPeerCertificates()[0];
+							SecurityUtils.validateCertificate(trustStore,certificate,message.getMessageHeader().getMessageData().getTimestamp() == null ? new Date() : message.getMessageHeader().getMessageData().getTimestamp());
+							if (!certificate.equals(getPeerCertificate(message.getMessageHeader())))
+								throw new ValidationException("Invalid SSL Client Certificate!");
+						}
+					}
+					catch (SSLPeerUnverifiedException e)
+					{
 					}
 				}
 			}
