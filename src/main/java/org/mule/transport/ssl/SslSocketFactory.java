@@ -10,18 +10,16 @@
 
 package org.mule.transport.ssl;
 
-import nl.clockwork.ebms.ssl.SSLCertificateListener;
-
-import org.mule.api.security.tls.TlsConfiguration;
-import org.mule.transport.tcp.AbstractTcpSocketFactory;
-import org.mule.transport.tcp.TcpSocketKey;
-
 import java.io.IOException;
 import java.net.Socket;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 
 import javax.net.ssl.SSLSocket;
+
+import org.mule.api.security.tls.TlsConfiguration;
+import org.mule.transport.tcp.AbstractTcpSocketFactory;
+import org.mule.transport.tcp.TcpSocketKey;
 
 public class SslSocketFactory extends AbstractTcpSocketFactory
 {
