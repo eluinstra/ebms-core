@@ -20,6 +20,7 @@ import java.util.Date;
 
 import javax.xml.bind.annotation.XmlElement;
 
+import nl.clockwork.ebms.Constants.EbMSMessageStatus;
 import nl.clockwork.ebms.util.CPAUtils;
 
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageHeader;
@@ -37,6 +38,7 @@ public class EbMSMessageContext implements Serializable
 	private String messageId;
 	private String refToMessageId;
 	private Long sequenceNr;
+	private EbMSMessageStatus messageStatus;
 
 	public EbMSMessageContext()
 	{
@@ -155,6 +157,7 @@ public class EbMSMessageContext implements Serializable
 		this.refToMessageId = refToMessageId;
 	}
 
+	@XmlElement
 	public Long getSequenceNr()
 	{
 		return sequenceNr;
@@ -163,5 +166,16 @@ public class EbMSMessageContext implements Serializable
 	public void setSequenceNr(Long sequenceNr)
 	{
 		this.sequenceNr = sequenceNr;
+	}
+
+	@XmlElement
+	public EbMSMessageStatus getMessageStatus()
+	{
+		return messageStatus;
+	}
+
+	public void setMessageStatus(EbMSMessageStatus messageStatus)
+	{
+		this.messageStatus = messageStatus;
 	}
 }

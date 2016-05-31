@@ -423,7 +423,8 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 				" conversation_id," +
 				" message_id," +
 				" ref_to_message_id," +
-				" sequence_nr" +
+				" sequence_nr," +
+				" status" +
 				" from ebms_message" + 
 				" where message_id = ?" +
 				" and message_nr = 0",
@@ -443,6 +444,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 						result.setMessageId(rs.getString("message_id"));
 						result.setRefToMessageId(rs.getString("ref_to_message_id"));
 						result.setSequenceNr(rs.getObject("sequence_nr") == null ? null : rs.getLong("sequence_nr"));
+						result.setMessageStatus(rs.getObject("status") == null ? null : EbMSMessageStatus.values()[rs.getInt("status")]);
 						return result;
 					}
 					
@@ -477,7 +479,8 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 				" conversation_id," +
 				" message_id," +
 				" ref_to_message_id," +
-				" sequence_nr" +
+				" sequence_nr," +
+				" status" +
 				" from ebms_message" + 
 				" where cpa_id = ?" +
 				" and ref_to_message_id = ?" +
@@ -500,6 +503,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 						result.setMessageId(rs.getString("message_id"));
 						result.setRefToMessageId(rs.getString("ref_to_message_id"));
 						result.setSequenceNr(rs.getObject("sequence_nr") == null ? null : rs.getLong("sequence_nr"));
+						result.setMessageStatus(rs.getObject("status") == null ? null : EbMSMessageStatus.values()[rs.getInt("status")]);
 						return result;
 					}
 					
@@ -1179,6 +1183,11 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 			{
 				parameters.add(messageContext.getSequenceNr());
 				result.append(" and sequence_nr = ?");
+			}
+			if (messageContext.getMessageStatus() != null)
+			{
+				parameters.add(messageContext.getMessageStatus().ordinal());
+				result.append(" and status = ?");
 			}
 		}
 		return result.toString();
