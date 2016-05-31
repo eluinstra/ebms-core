@@ -17,7 +17,6 @@ package nl.clockwork.ebms.dao;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 import nl.clockwork.ebms.Constants.EbMSEventStatus;
 import nl.clockwork.ebms.Constants.EbMSMessageStatus;
@@ -44,7 +43,7 @@ public interface EbMSDAO
 	
 	boolean existsUrl(String source) throws DAOException;
 	String getUrl(String source) throws DAOException;
-	Map<String,String> getUrls() throws DAOException;
+	List<String> getUrls() throws DAOException;
 	void insertUrl(String source, String destination) throws DAOException;
 	int updateUrl(String source, String destination) throws DAOException;
 	int deleteUrl(String source) throws DAOException;

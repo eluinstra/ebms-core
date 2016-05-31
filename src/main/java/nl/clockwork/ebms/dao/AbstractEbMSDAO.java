@@ -23,9 +23,7 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.activation.DataSource;
 import javax.mail.util.ByteArrayDataSource;
@@ -58,7 +56,6 @@ import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
-import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -265,26 +262,15 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	}
 
 	@Override
-	public Map<String,String> getUrls() throws DAOException
+	public List<String> getUrls() throws DAOException
 	{
 		try
 		{
-			return jdbcTemplate.query(
-				"select source, destination" +
+			return jdbcTemplate.queryForList(
+				"select source" +
 				" from url" +
 				" order by source asc",
-				new ResultSetExtractor<Map<String,String>>()
-				{
-					@Override
-					public Map<String,String> extractData(ResultSet rs) throws SQLException, DataAccessException
-					{
-						Map<String,String> result = new HashMap<String,String>();
-						while(rs.next())
-							result.put(rs.getString("source"),rs.getString("destination"));
-						return result ;
-					}
-					
-				}
+				String.class
 			);
 		}
 		catch (DataAccessException e)

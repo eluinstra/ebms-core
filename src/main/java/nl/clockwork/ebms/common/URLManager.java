@@ -15,19 +15,19 @@
  */
 package nl.clockwork.ebms.common;
 
-import java.util.Map;
-
-import org.springframework.util.StringUtils;
+import java.util.List;
 
 import net.sf.ehcache.Ehcache;
 import nl.clockwork.ebms.dao.EbMSDAO;
+
+import org.springframework.util.StringUtils;
 
 public class URLManager
 {
 	private Ehcache methodCache;
 	private EbMSDAO ebMSDAO;
 
-	public Map<String,String> getUrls()
+	public List<String> getUrls()
 	{
 		return ebMSDAO.getUrls();
 	}

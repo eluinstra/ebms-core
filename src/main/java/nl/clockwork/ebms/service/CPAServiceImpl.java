@@ -16,7 +16,6 @@
 package nl.clockwork.ebms.service;
 
 import java.util.List;
-import java.util.Map;
 
 import javax.xml.bind.JAXBException;
 
@@ -141,7 +140,7 @@ public class CPAServiceImpl implements CPAService
 	}
 
 	@Override
-	public Map<String,String> getURLs() throws CPAServiceException
+	public List<String> getURLs() throws CPAServiceException
 	{
 		return urlManager.getUrls();
 	}
