@@ -53,6 +53,7 @@ public interface EbMSDAO
 	EbMSMessageContent getMessageContent(String messageId) throws DAOException;
 	EbMSMessageContext getMessageContext(String messageId) throws DAOException;
 	EbMSMessageContext getMessageContextByRefToMessageId(String cpaId, String refToMessageId, Service service, String...actions) throws DAOException;
+	EbMSMessageContext getLastReceivedMessage(String cpaId, String conversationId);
 	Document getDocument(String messageId) throws DAOException;
 	EbMSDocument getEbMSDocumentIfUnsent(String messageId) throws DAOException;
 	EbMSDocument getEbMSDocumentByRefToMessageId(String cpaId, String refToMessageId, Service service, String...actions) throws DAOException;
