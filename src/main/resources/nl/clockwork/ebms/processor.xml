@@ -36,6 +36,7 @@
 
 	<bean id="cpaService" class="nl.clockwork.ebms.service.CPAServiceImpl">
 		<property name="cpaManager" ref="cpaManager"/>
+		<property name="urlManager" ref="urlManager"/>
 	</bean>
 
 	<bean id="ebMSMessageService" class="nl.clockwork.ebms.service.EbMSMessageServiceImpl">

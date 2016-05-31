@@ -162,4 +162,8 @@ public class CPAServiceImpl implements CPAService
 		this.cpaManager = cpaManager;
 	}
 
+	public void setUrlManager(URLManager urlManager)
+	{
+		this.urlManager = urlManager;
+	}
 }
