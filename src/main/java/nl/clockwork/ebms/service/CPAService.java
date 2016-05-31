@@ -16,7 +16,6 @@
 package nl.clockwork.ebms.service;
 
 import java.util.List;
-import java.util.Map;
 
 import javax.jws.WebMethod;
 import javax.jws.WebParam;
@@ -51,7 +50,7 @@ public interface CPAService
 
 	@WebResult(name="URLs")
 	@WebMethod(operationName="GetURLs")
-	Map<String,String> getURLs() throws CPAServiceException;
+	List<String> getURLs() throws CPAServiceException;
 
 	@WebMethod(operationName="SetURL")
 	void setURL(@WebParam(name="SourceURL") @XmlElement(required=true) String source, @WebParam(name="DestinationURL") @XmlElement(required=true) String destination) throws CPAServiceException;
