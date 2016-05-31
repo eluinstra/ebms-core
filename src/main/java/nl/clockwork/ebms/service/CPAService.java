@@ -16,6 +16,7 @@
 package nl.clockwork.ebms.service;
 
 import java.util.List;
+import java.util.Map;
 
 import javax.jws.WebMethod;
 import javax.jws.WebParam;
@@ -23,7 +24,7 @@ import javax.jws.WebResult;
 import javax.jws.WebService;
 import javax.xml.bind.annotation.XmlElement;
 
-@WebService(targetNamespace="http://www.ordina.nl/cpa/2.10")
+@WebService(targetNamespace="http://www.ordina.nl/cpa/2.12")
 public interface CPAService
 {
 	@WebMethod(operationName="ValidateCPA")
@@ -31,7 +32,7 @@ public interface CPAService
 
 	@WebResult(name="CPAId")
 	@WebMethod(operationName="InsertCPA")
-	String insertCPA(@WebParam(name="CPA") @XmlElement(required=true) /*CollaborationProtocolAgreement*/String cpa, @WebParam(name="URL") String url, @WebParam(name="Overwrite") Boolean overwrite) throws CPAServiceException;
+	String insertCPA(@WebParam(name="CPA") @XmlElement(required=true) /*CollaborationProtocolAgreement*/String cpa, @WebParam(name="Overwrite") Boolean overwrite) throws CPAServiceException;
 
 	@WebMethod(operationName="DeleteCPA")
 	void deleteCPA(@WebParam(name="CPAId") @XmlElement(required=true) String cpaId) throws CPAServiceException;
@@ -46,9 +47,13 @@ public interface CPAService
 
 	@WebResult(name="URL")
 	@WebMethod(operationName="GetURL")
-	String getURL(@WebParam(name="CPAId") @XmlElement(required=true) String cpaId) throws CPAServiceException;
+	String getURL(@WebParam(name="SourceURL") @XmlElement(required=true) String source) throws CPAServiceException;
+
+	@WebResult(name="URLs")
+	@WebMethod(operationName="GetURLs")
+	Map<String,String> getURLs() throws CPAServiceException;
 
 	@WebMethod(operationName="SetURL")
-	void setURL(@WebParam(name="CPAId") @XmlElement(required=true) String cpaId, @WebParam(name="URL") @XmlElement(required=true) String url) throws CPAServiceException;
+	void setURL(@WebParam(name="SourceURL") @XmlElement(required=true) String source, @WebParam(name="DestinationURL") @XmlElement(required=true) String destination) throws CPAServiceException;
 
 }

@@ -17,6 +17,7 @@ package nl.clockwork.ebms.dao;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import nl.clockwork.ebms.Constants.EbMSEventStatus;
 import nl.clockwork.ebms.Constants.EbMSMessageStatus;
@@ -37,12 +38,16 @@ public interface EbMSDAO
 	boolean existsCPA(String cpaId) throws DAOException;
 	CollaborationProtocolAgreement getCPA(String cpaId) throws DAOException;
 	List<String> getCPAIds() throws DAOException;
-	void insertCPA(CollaborationProtocolAgreement cpa, String url) throws DAOException;
-	int updateCPA(CollaborationProtocolAgreement cpa, String url) throws DAOException;
+	void insertCPA(CollaborationProtocolAgreement cpa) throws DAOException;
+	int updateCPA(CollaborationProtocolAgreement cpa) throws DAOException;
 	int deleteCPA(String cpaId) throws DAOException;
 	
-	String getUrl(String cpaId);
-	int updateUrl(String cpaId, String url);
+	boolean existsUrl(String source) throws DAOException;
+	String getUrl(String source) throws DAOException;
+	Map<String,String> getUrls() throws DAOException;
+	void insertUrl(String source, String destination) throws DAOException;
+	int updateUrl(String source, String destination) throws DAOException;
+	int deleteUrl(String source) throws DAOException;
 
 	boolean existsMessage(String messageId) throws DAOException;
 	boolean existsIdenticalMessage(EbMSMessage message) throws DAOException;

@@ -16,10 +16,12 @@
 package nl.clockwork.ebms.service;
 
 import java.util.List;
+import java.util.Map;
 
 import javax.xml.bind.JAXBException;
 
 import nl.clockwork.ebms.common.CPAManager;
+import nl.clockwork.ebms.common.URLManager;
 import nl.clockwork.ebms.common.XMLMessageBuilder;
 import nl.clockwork.ebms.dao.DAOException;
 import nl.clockwork.ebms.validation.CPAValidator;
@@ -34,6 +36,7 @@ public class CPAServiceImpl implements CPAService
 {
   protected transient Log logger = LogFactory.getLog(getClass());
 	private CPAManager cpaManager;
+	private URLManager urlManager;
 	private XSDValidator xsdValidator;
 	private CPAValidator cpaValidator;
 	private Object cpaMonitor = new Object();
@@ -62,7 +65,7 @@ public class CPAServiceImpl implements CPAService
 	}
 	
 	@Override
-	public String insertCPA(/*CollaborationProtocolAgreement*/String cpa, String url, Boolean overwrite) throws CPAServiceException
+	public String insertCPA(/*CollaborationProtocolAgreement*/String cpa, Boolean overwrite) throws CPAServiceException
 	{
 		try
 		{
@@ -76,14 +79,14 @@ public class CPAServiceImpl implements CPAService
 				{
 					if (overwrite != null && overwrite)
 					{
-						if (cpaManager.updateCPA(cpa_,url) == 0)
+						if (cpaManager.updateCPA(cpa_) == 0)
 							throw new CPAServiceException("Could not update CPA " + cpa_.getCpaid() + "! CPA does not exists.");
 					}
 					else
 						throw new CPAServiceException("Did not insert CPA " + cpa_.getCpaid() + "! CPA already exists.");
 				}
 				else
-					cpaManager.insertCPA(cpa_,url);
+					cpaManager.insertCPA(cpa_);
 			}
 			return cpa_.getCpaid();
 		}
@@ -137,20 +140,27 @@ public class CPAServiceImpl implements CPAService
 		}
 	}
 
+	@Override
+	public Map<String,String> getURLs() throws CPAServiceException
+	{
+		return urlManager.getUrls();
+	}
+
+	@Override
+	public String getURL(String soource) throws CPAServiceException
+	{
+		return urlManager.getUrl(soource);
+	}
+
+	@Override
+	public void setURL(String source, String destination) throws CPAServiceException
+	{
+		urlManager.setUrl(source,destination);
+	}
+
 	public void setCpaManager(CPAManager cpaManager)
 	{
 		this.cpaManager = cpaManager;
 	}
 
-	@Override
-	public String getURL(String cpaId) throws CPAServiceException
-	{
-		return cpaManager.getUrl(cpaId);
-	}
-
-	@Override
-	public void setURL(String cpaId, String url) throws CPAServiceException
-	{
-		cpaManager.setUrl(cpaId,url);
-	}
 }

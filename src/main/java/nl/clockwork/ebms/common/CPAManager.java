@@ -47,6 +47,7 @@ public class CPAManager
 {
 	private Ehcache methodCache;
 	private EbMSDAO ebMSDAO;
+	private URLManager urlManager;
 
 	public boolean existsCPA(String cpaId)
 	{
@@ -63,16 +64,15 @@ public class CPAManager
 		return ebMSDAO.getCPAIds();
 	}
 
-	public void insertCPA(CollaborationProtocolAgreement cpa, String url)
+	public void insertCPA(CollaborationProtocolAgreement cpa)
 	{
-		ebMSDAO.insertCPA(cpa,url);
-		flushUrlMethodCache(cpa.getCpaid());
+		ebMSDAO.insertCPA(cpa);
 		flushCPAMethodCache(cpa.getCpaid());
 	}
 
-	public int updateCPA(CollaborationProtocolAgreement cpa, String url)
+	public int updateCPA(CollaborationProtocolAgreement cpa)
 	{
-		int result = ebMSDAO.updateCPA(cpa,url);
+		int result = ebMSDAO.updateCPA(cpa);
 		flushAllMethodCache();
 		return result;
 	}
@@ -82,17 +82,6 @@ public class CPAManager
 		int result = ebMSDAO.deleteCPA(cpaId);
 		flushAllMethodCache();
 		return result;
-	}
-
-	public String getUrl(String cpaId)
-	{
-		return ebMSDAO.getUrl(cpaId);
-	}
-
-	public void setUrl(String cpaId, String url)
-	{
-		ebMSDAO.updateUrl(cpaId,url);
-		flushUrlMethodCache(cpaId);
 	}
 
 	public boolean isValid(String cpaId, Date timestamp)
@@ -269,9 +258,9 @@ public class CPAManager
 
 	public String getUri(String cpaId, CacheablePartyId partyId, String role, String service, String action)
 	{
-		String result = getUrl(cpaId);
-		if (StringUtils.isEmpty(result))
-			result = CPAUtils.getUri(getReceiveDeliveryChannel(cpaId,partyId,role,service,action));
+		String result = CPAUtils.getUri(getReceiveDeliveryChannel(cpaId,partyId,role,service,action));
+		if (!StringUtils.isEmpty(result))
+			result = urlManager.getUrl(result);
 		return result;
 	}
 
@@ -286,11 +275,6 @@ public class CPAManager
 		methodCache.remove(MethodCacheInterceptor.getCacheKey("EbMSDAOImpl","existsCPA",cpaId));
 		methodCache.remove(MethodCacheInterceptor.getCacheKey("EbMSDAOImpl","getCPA",cpaId));
 		methodCache.remove(MethodCacheInterceptor.getCacheKey("EbMSDAOImpl","getCPAIds"));
-	}
-
-	private void flushUrlMethodCache(String cpaId)
-	{
-		methodCache.remove(MethodCacheInterceptor.getCacheKey("EbMSDAOImpl","getUrl",cpaId));
 	}
 
 	private void flushAllMethodCache()
@@ -336,4 +320,8 @@ public class CPAManager
 		this.ebMSDAO = ebMSDAO;
 	}
 
+	public void setUrlManager(URLManager urlManager)
+	{
+		this.urlManager = urlManager;
+	}
 }

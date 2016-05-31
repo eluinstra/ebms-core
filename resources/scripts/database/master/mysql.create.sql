@@ -1,11 +1,18 @@
 CREATE TABLE cpa
 (
 	cpa_id						VARCHAR(256)		NOT NULL,
-	cpa								MEDIUMTEXT			NOT NULL,
-	url								VARCHAR(256)		NULL
+	cpa								MEDIUMTEXT			NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 ALTER TABLE cpa ADD CONSTRAINT uc_cpa_id UNIQUE (cpa_id(255));
+
+CREATE TABLE url
+(
+	source						VARCHAR(256)		NOT NULL,
+	destination				VARCHAR(256)		NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+ALTER TABLE url ADD CONSTRAINT uc_url_source UNIQUE (source(255));
 
 CREATE TABLE ebms_message
 (
@@ -13,6 +20,7 @@ CREATE TABLE ebms_message
 	time_stamp				TIMESTAMP				NOT NULL,
 	cpa_id						VARCHAR(256)		NOT NULL,
 	conversation_id		VARCHAR(256)		NOT NULL,
+	sequence_nr				INTEGER					NULL,
 	message_id				VARCHAR(256)		NOT NULL,
 	message_nr				SMALLINT				NOT NULL DEFAULT 0,
 	ref_to_message_id	VARCHAR(256)		NULL,
