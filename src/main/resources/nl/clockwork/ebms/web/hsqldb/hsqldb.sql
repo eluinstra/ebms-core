@@ -86,6 +86,10 @@ CREATE TABLE ebms_message_log
 	time_stamp				TIMESTAMP				NOT NULL,
 	message_type			SMALLINT				NOT NULL,
 	cpa_id						VARCHAR(256)		NULL,
+	conversation_id		VARCHAR(256)		NULL,
 	message_id				VARCHAR(256)		NULL,
+	ref_to_message_id	VARCHAR(256)		NULL,
+	service						VARCHAR(256)		NULL,
+	action						VARCHAR(256)		NULL,
 	content						BLOB						NULL
 );
