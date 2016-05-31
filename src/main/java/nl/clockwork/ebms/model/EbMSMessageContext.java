@@ -20,6 +20,8 @@ import java.util.Date;
 
 import javax.xml.bind.annotation.XmlElement;
 
+import nl.clockwork.ebms.Constants.EbMSMessageStatus;
+
 public class EbMSMessageContext implements Serializable
 {
 	private static final long serialVersionUID = 1L;
@@ -32,6 +34,7 @@ public class EbMSMessageContext implements Serializable
 	private String conversationId;
 	private String messageId;
 	private String refToMessageId;
+	private EbMSMessageStatus messageStatus;
 
 	public EbMSMessageContext()
 	{
@@ -136,5 +139,15 @@ public class EbMSMessageContext implements Serializable
 	{
 		this.refToMessageId = refToMessageId;
 	}
-	
+
+	@XmlElement
+	public EbMSMessageStatus getMessageStatus()
+	{
+		return messageStatus;
+	}
+
+	public void setMessageStatus(EbMSMessageStatus messageStatus)
+	{
+		this.messageStatus = messageStatus;
+	}
 }
