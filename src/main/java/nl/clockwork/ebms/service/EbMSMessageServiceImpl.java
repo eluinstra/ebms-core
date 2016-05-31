@@ -134,10 +134,9 @@ public class EbMSMessageServiceImpl implements InitializingBean, EbMSMessageServ
 	{
 		try
 		{
-			EbMSMessageContent result = ebMSDAO.getMessageContent(messageId);
 			if (process != null && process)
 				ebMSDAO.updateMessage(messageId,EbMSMessageStatus.RECEIVED,EbMSMessageStatus.PROCESSED);
-			return result;
+			return ebMSDAO.getMessageContent(messageId);
 		}
 		catch (DAOException e)
 		{
