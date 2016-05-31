@@ -29,6 +29,7 @@ import nl.clockwork.ebms.client.EbMSClient;
 import nl.clockwork.ebms.client.EbMSResponseException;
 import nl.clockwork.ebms.client.EbMSResponseSOAPException;
 import nl.clockwork.ebms.common.CPAManager;
+import nl.clockwork.ebms.common.URLManager;
 import nl.clockwork.ebms.dao.DAOTransactionCallback;
 import nl.clockwork.ebms.dao.EbMSDAO;
 import nl.clockwork.ebms.encryption.EbMSMessageEncrypter;
@@ -68,7 +69,7 @@ public class EbMSEventProcessor implements InitializingBean, Job
 
 		private void sendEvent(final EbMSEvent event, DeliveryChannel deliveryChannel)
 		{
-			String url = cpaManager.getUrl(event.getCpaId());
+			String url = null;
 			try
 			{
 				EbMSDocument requestDocument = ebMSDAO.getEbMSDocumentIfUnsent(event.getMessageId());
@@ -76,8 +77,9 @@ public class EbMSEventProcessor implements InitializingBean, Job
 				{
 					if (event.isConfidential())
 						messageEncrypter.encrypt(deliveryChannel,requestDocument);
-					if (StringUtils.isEmpty(url))
-						url = CPAUtils.getUri(deliveryChannel);
+					url = CPAUtils.getUri(deliveryChannel);
+					if (!StringUtils.isEmpty(url))
+						url = urlManager.getUrl(url);
 					logger.info("Sending message " + event.getMessageId() + " to " + url);
 					EbMSDocument responseDocument = ebMSClient.sendMessage(url,requestDocument);
 					messageProcessor.processResponse(requestDocument,responseDocument);
@@ -151,6 +153,7 @@ public class EbMSEventProcessor implements InitializingBean, Job
 	private EventListener eventListener;
 	private EbMSDAO ebMSDAO;
 	private CPAManager cpaManager;
+	private URLManager urlManager;
 	private EventManager eventManager;
 	private EbMSClient ebMSClient;
 	private EbMSMessageEncrypter messageEncrypter;
@@ -218,6 +221,11 @@ public class EbMSEventProcessor implements InitializingBean, Job
   public void setEbMSDAO(EbMSDAO ebMSDAO)
 	{
 		this.ebMSDAO = ebMSDAO;
+	}
+
+  public void setUrlManager(URLManager urlManager)
+	{
+		this.urlManager = urlManager;
 	}
 
   public void setCpaManager(CPAManager cpaManager)

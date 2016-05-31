@@ -133,9 +133,15 @@
 		<property name="duplicateMessageHandler" ref="duplicateMessageHandler"/>
 	</bean>
 
+	<bean id="urlManager" class="nl.clockwork.ebms.common.URLManager">
+		<property name="methodCache" ref="ebMSMethodCache"/>
+		<property name="ebMSDAO" ref="ebMSDAO"/>
+	</bean>
+
 	<bean id="_cpaManager" class="nl.clockwork.ebms.common.CPAManager">
 		<property name="methodCache" ref="ebMSMethodCache"/>
 		<property name="ebMSDAO" ref="ebMSDAO"/>
+		<property name="urlManager" ref="urlManager"/>
 	</bean>
 
 	<bean id="cpaManager" class="org.springframework.aop.framework.ProxyFactoryBean">

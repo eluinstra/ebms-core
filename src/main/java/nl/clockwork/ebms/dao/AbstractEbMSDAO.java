@@ -23,7 +23,9 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.activation.DataSource;
 import javax.mail.util.ByteArrayDataSource;
@@ -56,6 +58,7 @@ import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
+import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -162,7 +165,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	}
 
 	@Override
-	public void insertCPA(CollaborationProtocolAgreement cpa, String url) throws DAOException
+	public void insertCPA(CollaborationProtocolAgreement cpa) throws DAOException
 	{
 		try
 		{
@@ -170,12 +173,10 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 			(
 				"insert into cpa (" +
 					"cpa_id," +
-					"cpa," +
-					"url" +
-				") values (?,?,?)",
+					"cpa" +
+				") values (?,?)",
 				cpa.getCpaid(),
-				XMLMessageBuilder.getInstance(CollaborationProtocolAgreement.class).handle(cpa),
-				url
+				XMLMessageBuilder.getInstance(CollaborationProtocolAgreement.class).handle(cpa)
 			);
 		}
 		catch (DataAccessException | JAXBException e)
@@ -185,18 +186,16 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	}
 
 	@Override
-	public int updateCPA(CollaborationProtocolAgreement cpa, String url) throws DAOException
+	public int updateCPA(CollaborationProtocolAgreement cpa) throws DAOException
 	{
 		try
 		{
 			return jdbcTemplate.update
 			(
 				"update cpa set" +
-				" cpa = ?," +
-				" url = ?" +
+				" cpa = ?" +
 				" where cpa_id = ?",
 				XMLMessageBuilder.getInstance(CollaborationProtocolAgreement.class).handle(cpa),
-				url,
 				cpa.getCpaid()
 			);
 		}
@@ -225,16 +224,34 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	}
 
 	@Override
-	public String getUrl(String cpaId)
+	public boolean existsUrl(String source) throws DAOException
+	{
+		try
+		{
+			return jdbcTemplate.queryForInt(
+				"select count(*)" +
+				" from url" +
+				" where source = ?",
+				source
+			) > 0;
+		}
+		catch (DataAccessException e)
+		{
+			throw new DAOException(e);
+		}
+	}
+
+	@Override
+	public String getUrl(String source)
 	{
 		try
 		{
 			return jdbcTemplate.queryForObject(
-				"select url" +
-				" from cpa" +
-				" where cpa_id = ?",
+				"select destination" +
+				" from url" +
+				" where source = ?",
 				String.class,
-				cpaId
+				source
 			);
 		}
 		catch(EmptyResultDataAccessException e)
@@ -248,17 +265,85 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	}
 
 	@Override
-	public int updateUrl(String cpaId, String url)
+	public Map<String,String> getUrls() throws DAOException
+	{
+		try
+		{
+			return jdbcTemplate.query(
+				"select source, destination" +
+				" from url" +
+				" order by source asc",
+				new ResultSetExtractor<Map<String,String>>()
+				{
+					@Override
+					public Map<String,String> extractData(ResultSet rs) throws SQLException, DataAccessException
+					{
+						Map<String,String> result = new HashMap<String,String>();
+						while(rs.next())
+							result.put(rs.getString("source"),rs.getString("destination"));
+						return result ;
+					}
+					
+				}
+			);
+		}
+		catch (DataAccessException e)
+		{
+			throw new DAOException(e);
+		}
+	}
+
+	@Override
+	public void insertUrl(String source, String destination) throws DAOException
+	{
+		try
+		{
+			jdbcTemplate.update
+			(
+				"insert into cpa (" +
+					"source," +
+					"destination" +
+				") values (?,?)",
+				source,
+				destination
+			);
+		}
+		catch (DataAccessException e)
+		{
+			throw new DAOException(e);
+		}
+	}
+
+	@Override
+	public int updateUrl(String source, String destination)
 	{
 		try
 		{
 			return jdbcTemplate.update
 			(
-				"update cpa set" +
-				" url = ?" +
-				" where cpa_id = ?",
-				url,
-				cpaId
+				"update url set" +
+				" destination = ?" +
+				" where source = ?",
+				destination,
+				source
+			);
+		}
+		catch (DataAccessException e)
+		{
+			throw new DAOException(e);
+		}
+	}
+
+	@Override
+	public int deleteUrl(String source)
+	{
+		try
+		{
+			return jdbcTemplate.update
+			(
+				"delete from url" +
+				" where source = ?",
+				source
 			);
 		}
 		catch (DataAccessException e)

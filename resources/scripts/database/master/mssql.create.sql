@@ -1,8 +1,13 @@
 CREATE TABLE cpa
 (
 	cpa_id						VARCHAR(256)		NOT NULL UNIQUE,
-	cpa								TEXT						NOT NULL,
-	url								VARCHAR(256)		NULL
+	cpa								TEXT						NOT NULL
+);
+
+CREATE TABLE url
+(
+	source						VARCHAR(256)		NOT NULL UNIQUE,
+	destination				VARCHAR(256)		NOT NULL
 );
 
 CREATE TABLE ebms_message
@@ -11,6 +16,7 @@ CREATE TABLE ebms_message
 	time_stamp				DATETIME				NOT NULL,
 	cpa_id						VARCHAR(256)		NOT NULL,
 	conversation_id		VARCHAR(256)		NOT NULL,
+	sequence_nr				INT							NULL,
 	message_id				VARCHAR(256)		NOT NULL,
 	message_nr				SMALLINT				NOT NULL DEFAULT 0,
 	ref_to_message_id	VARCHAR(256)		NULL,
