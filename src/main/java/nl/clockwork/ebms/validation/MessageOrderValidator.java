@@ -29,9 +29,9 @@ public class MessageOrderValidator
 			if (!Constants.EBMS_VERSION.equals(messageOrder.getVersion()))
 				throw new EbMSValidationException(EbMSMessageUtils.createError("//Header/MessageOrder/@version",Constants.EbMSErrorCode.INCONSISTENT,"Invalid value."));
 			long sequenceNr = messageOrder.getSequenceNumber().getValue().longValue();
+			EbMSMessageContext context = ebMSDAO.getLastReceivedMessage(messageHeader.getCPAId(),messageHeader.getConversationId());
 			if (sequenceNr > 0)
 			{
-				EbMSMessageContext context = ebMSDAO.getLastReceivedMessage(messageHeader.getCPAId(),messageHeader.getConversationId());
 				if (context != null)
 				{
 					if (context.getSequenceNr() == sequenceNr - 1)
@@ -44,6 +44,13 @@ public class MessageOrderValidator
 				else
 					throw new EbMSValidationException(EbMSMessageUtils.createError("//Header/MessageOrder/SequenceNumber",Constants.EbMSErrorCode.DELIVERY_FAILURE,"Missing message with SequenceNumber 0."));
 			}
+			else if (sequenceNr < 0)
+				throw new EbMSValidationException(EbMSMessageUtils.createError("//Header/MessageOrder/SequenceNumber",Constants.EbMSErrorCode.INCONSISTENT,"Invalid value."));
+			else if (sequenceNr > 99999999L)
+				throw new EbMSValidationException(EbMSMessageUtils.createError("//Header/MessageOrder/SequenceNumber",Constants.EbMSErrorCode.INCONSISTENT,"Invalid value."));
+			else
+				if (context != null)
+					throw new EbMSValidationException(EbMSMessageUtils.createError("//Header/MessageOrder/SequenceNumber",Constants.EbMSErrorCode.DELIVERY_FAILURE,"SequenceNumber already exists."));
 		}
 	}
 
