@@ -286,7 +286,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 		{
 			jdbcTemplate.update
 			(
-				"insert into cpa (" +
+				"insert into url (" +
 					"source," +
 					"destination" +
 				") values (?,?)",
