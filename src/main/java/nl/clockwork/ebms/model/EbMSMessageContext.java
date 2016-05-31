@@ -36,6 +36,7 @@ public class EbMSMessageContext implements Serializable
 	private String conversationId;
 	private String messageId;
 	private String refToMessageId;
+	private Long sequenceNr;
 
 	public EbMSMessageContext()
 	{
@@ -153,5 +154,14 @@ public class EbMSMessageContext implements Serializable
 	{
 		this.refToMessageId = refToMessageId;
 	}
-	
+
+	public Long getSequenceNr()
+	{
+		return sequenceNr;
+	}
+
+	public void setSequenceNr(Long sequenceNr)
+	{
+		this.sequenceNr = sequenceNr;
+	}
 }
