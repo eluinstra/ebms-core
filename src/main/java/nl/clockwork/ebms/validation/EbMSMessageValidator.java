@@ -18,6 +18,7 @@ public class EbMSMessageValidator
 	protected SSLSessionValidator sslCertificateValidator;
 	protected CPAValidator cpaValidator;
 	protected MessageHeaderValidator messageHeaderValidator;
+	protected MessageOrderValidator messageOrderValidator;
 	protected ManifestValidator manifestValidator;
 	protected SignatureValidator signatureValidator;
 	protected EbMSMessageDecrypter messageDecrypter;
@@ -29,6 +30,7 @@ public class EbMSMessageValidator
 			throw new DuplicateMessageException();
 		cpaValidator.validate(message);
 		messageHeaderValidator.validate(message,timestamp);
+		messageOrderValidator.validate(message);
 		signatureValidator.validate(message);
 		manifestValidator.validate(message);
 		messageDecrypter.decrypt(message);
@@ -116,6 +118,11 @@ public class EbMSMessageValidator
 	public void setMessageHeaderValidator(MessageHeaderValidator messageHeaderValidator)
 	{
 		this.messageHeaderValidator = messageHeaderValidator;
+	}
+
+	public void setMessageOrderValidator(MessageOrderValidator messageOrderValidator)
+	{
+		this.messageOrderValidator = messageOrderValidator;
 	}
 
 	public void setManifestValidator(ManifestValidator manifestValidator)

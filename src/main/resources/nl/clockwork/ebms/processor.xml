@@ -89,6 +89,12 @@
 				<property name="cpaManager" ref="cpaManager"/>
 			</bean>
 		</property>
+		<property name="messageOrderValidator">
+			<bean class="nl.clockwork.ebms.validation.MessageOrderValidator">
+				<property name="ebMSDAO" ref="ebMSDAO"/>
+				<property name="cpaManager" ref="cpaManager"/>
+			</bean>
+		</property>
 		<property name="manifestValidator">
 			<bean class="nl.clockwork.ebms.validation.ManifestValidator"/>
 		</property>
