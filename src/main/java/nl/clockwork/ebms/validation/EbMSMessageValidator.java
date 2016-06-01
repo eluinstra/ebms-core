@@ -58,21 +58,25 @@ public class EbMSMessageValidator
 
 	public void validateStatusRequest(EbMSMessage message, Date timestamp) throws ValidatorException
 	{
+		messageHeaderValidator.validate(message,timestamp);
 		sslCertificateValidator.validate(message);
 	}
 
 	public void validateStatusResponse(EbMSMessage message, Date timestamp) throws ValidatorException
 	{
+		messageHeaderValidator.validate(message,timestamp);
 		sslCertificateValidator.validate(message);
 	}
 
 	public void validatePing(EbMSMessage message, Date timestamp) throws ValidatorException
 	{
+		messageHeaderValidator.validate(message,timestamp);
 		sslCertificateValidator.validate(message);
 	}
 
 	public void validatePong(EbMSMessage message, Date timestamp) throws ValidatorException
 	{
+		messageHeaderValidator.validate(message,timestamp);
 		sslCertificateValidator.validate(message);
 	}
 
