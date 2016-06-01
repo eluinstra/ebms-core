@@ -118,8 +118,15 @@ public class EbMSMessageProcessor
 			}
 			else if (EbMSAction.STATUS_RESPONSE.action().equals(message.getMessageHeader().getAction()))
 			{
-				messageValidator.validateStatusResponse(message,timestamp);
-				deliveryManager.handleResponseMessage(message);
+				try
+				{
+					messageValidator.validateStatusResponse(message,timestamp);
+					deliveryManager.handleResponseMessage(message);
+				}
+				catch (ValidatorException e)
+				{
+					logger.warn("Unable to process StatusResponse " + message.getMessageHeader().getMessageData().getMessageId(),e);
+				}
 				return null;
 			}
 			else if (EbMSAction.PING.action().equals(message.getMessageHeader().getAction()))
@@ -135,8 +142,15 @@ public class EbMSMessageProcessor
 			}
 			else if (EbMSAction.PONG.action().equals(message.getMessageHeader().getAction()))
 			{
-				messageValidator.validatePong(message,timestamp);
-				deliveryManager.handleResponseMessage(message);
+				try
+				{
+					messageValidator.validatePong(message,timestamp);
+					deliveryManager.handleResponseMessage(message);
+				}
+				catch (ValidatorException e)
+				{
+					logger.warn("Unable to process Pong " + message.getMessageHeader().getMessageData().getMessageId(),e);
+				}
 				return null;
 			}
 			else
