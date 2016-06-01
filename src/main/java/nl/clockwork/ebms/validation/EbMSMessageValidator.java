@@ -25,11 +25,11 @@ public class EbMSMessageValidator
 
 	public void validateMessage(EbMSMessage message, Date timestamp) throws ValidatorException
 	{
-		sslCertificateValidator.validate(message);
 		if (isDuplicateMessage(message))
 			throw new DuplicateMessageException();
 		cpaValidator.validate(message);
 		messageHeaderValidator.validate(message,timestamp);
+		sslCertificateValidator.validate(message);
 		messageOrderValidator.validate(message);
 		signatureValidator.validate(message);
 		manifestValidator.validate(message);
@@ -39,20 +39,20 @@ public class EbMSMessageValidator
 
 	public void validateMessageError(EbMSMessage requestMessage, EbMSMessage responseMessage, Date timestamp) throws ValidatorException
 	{
-		sslCertificateValidator.validate(responseMessage);
 		if (isDuplicateMessage(responseMessage))
 			throw new DuplicateMessageException();
 		messageHeaderValidator.validate(requestMessage,responseMessage);
 		messageHeaderValidator.validate(responseMessage,timestamp);
+		sslCertificateValidator.validate(responseMessage);
 	}
 
 	public void validateAcknowledgment(EbMSMessage requestMessage, EbMSMessage responseMessage, Date timestamp) throws ValidatorException
 	{
-		sslCertificateValidator.validate(responseMessage);
 		if (isDuplicateMessage(responseMessage))
 			throw new DuplicateMessageException();
 		messageHeaderValidator.validate(requestMessage,responseMessage);
 		messageHeaderValidator.validate(responseMessage,timestamp);
+		sslCertificateValidator.validate(responseMessage);
 		signatureValidator.validate(requestMessage,responseMessage);
 	}
 
