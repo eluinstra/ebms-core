@@ -42,7 +42,7 @@ public class HTTPUtils
 	{
 		String result = "";
 		for (String key : properties.keySet())
-			result += key + ": " + StringUtils.collectionToCommaDelimitedString(properties.get(key)) + "\n";
+			result += (key != null ? key + ": " : "") + StringUtils.collectionToCommaDelimitedString(properties.get(key)) + "\n";
 		return result;
 	}
 }
