@@ -311,8 +311,9 @@ public class CPAManager
 		return null;
 	}
 
-	public MessageOrderSemanticsType getMessageOrderSemantics(DeliveryChannel deliveryChannel)
+	public MessageOrderSemanticsType getMessageOrderSemantics(String cpaId, CacheablePartyId partyId, String role, String service, String action)
 	{
+		DeliveryChannel deliveryChannel = getReceiveDeliveryChannel(cpaId,partyId,role,service,action);
 		if (((DocExchange)deliveryChannel.getDocExchangeId()).getEbXMLSenderBinding().getReliableMessaging() != null)
 			return ((DocExchange)deliveryChannel.getDocExchangeId()).getEbXMLSenderBinding().getReliableMessaging().getMessageOrderSemantics();
 		return null;

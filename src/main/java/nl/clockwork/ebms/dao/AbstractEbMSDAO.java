@@ -523,7 +523,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	}
 
 	@Override
-	public EbMSMessageContext getLastReceivedMessage(String cpaId, String conversationId)
+	public EbMSMessageContext getLastReceivedMessage(String cpaId, String conversationId) throws DAOException
 	{
 		try
 		{
@@ -547,6 +547,67 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 				" and message_nr = 0" +
 				" and status < 10" +
 				" and sequence_nr = (select max(sequence_nr) from from ebms_message where cpa_id = ? and conversation_id = ? and message_nr = 0 and status < 10)",
+				new ParameterizedRowMapper<EbMSMessageContext>()
+				{
+					@Override
+					public EbMSMessageContext mapRow(ResultSet rs, int rowNum) throws SQLException
+					{
+						EbMSMessageContext result = new EbMSMessageContext();
+						result.setCpaId(rs.getString("cpa_id"));
+						result.setFromRole(new Role(rs.getString("from_party_id"),rs.getString("from_role")));
+						result.setToRole(new Role(rs.getString("to_party_id"),rs.getString("to_role")));
+						result.setService(rs.getString("service"));
+						result.setAction(rs.getString("action"));
+						result.setTimestamp(rs.getTimestamp("time_stamp"));
+						result.setConversationId(rs.getString("conversation_id"));
+						result.setMessageId(rs.getString("message_id"));
+						result.setRefToMessageId(rs.getString("ref_to_message_id"));
+						result.setSequenceNr(rs.getObject("sequence_nr") == null ? null : rs.getLong("sequence_nr"));
+						result.setMessageStatus(rs.getObject("status") == null ? null : EbMSMessageStatus.values()[rs.getInt("status")]);
+						return result;
+					}
+				},
+				cpaId,
+				conversationId,
+				cpaId,
+				conversationId
+			);
+		}
+		catch(EmptyResultDataAccessException e)
+		{
+			return null;
+		}
+		catch (DataAccessException e)
+		{
+			throw new DAOException(e);
+		}
+	}
+
+	@Override
+	public EbMSMessageContext getLastSentMessage(String cpaId, String conversationId) throws DAOException
+	{
+		try
+		{
+			return jdbcTemplate.queryForObject(
+				"select cpa_id," +
+				" from_party_id," +
+				" from_role," +
+				" to_party_id," +
+				" to_role," +
+				" service," +
+				" action," +
+				" time_stamp," +
+				" conversation_id," +
+				" message_id," +
+				" ref_to_message_id," +
+				" sequence_nr," +
+				" status" +
+				" from ebms_message" + 
+				" where cpa_id = ?" +
+				" and conversation_id = ?" +
+				" and message_nr = 0" +
+				" and status < 10" +
+				" and sequence_nr = (select max(sequence_nr) from from ebms_message where cpa_id = ? and conversation_id = ? and message_nr = 0 and status > 10)",
 				new ParameterizedRowMapper<EbMSMessageContext>()
 				{
 					@Override

@@ -15,6 +15,7 @@
  */
 package nl.clockwork.ebms.model;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -26,149 +27,156 @@ import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.PartyId;
 
 public class CacheablePartyId implements List<PartyId>
 {
-	private List<PartyId> list;
+	private List<PartyId> partyIds;
 	
-	public CacheablePartyId(List<PartyId> list)
+	public CacheablePartyId(String partyId)
 	{
-		this.list = list;
+		PartyId p = new PartyId();
+		p.setValue(partyId);
+		this.partyIds = Arrays.asList(p);
+	}
+
+	public CacheablePartyId(List<PartyId> partyIds)
+	{
+		this.partyIds = partyIds;
 	}
 
 	@Override
 	public int size()
 	{
-		return list.size();
+		return partyIds.size();
 	}
 
 	@Override
 	public boolean isEmpty()
 	{
-		return list.isEmpty();
+		return partyIds.isEmpty();
 	}
 
 	@Override
 	public boolean contains(Object o)
 	{
-		return list.contains(o);
+		return partyIds.contains(o);
 	}
 
 	@Override
 	public Iterator<PartyId> iterator()
 	{
-		return list.iterator();
+		return partyIds.iterator();
 	}
 
 	@Override
 	public Object[] toArray()
 	{
-		return list.toArray();
+		return partyIds.toArray();
 	}
 
 	@Override
 	public <T> T[] toArray(T[] a)
 	{
-		return (T[])list.toArray(a);
+		return (T[])partyIds.toArray(a);
 	}
 
 	@Override
 	public boolean add(PartyId e)
 	{
-		return list.add(e);
+		return partyIds.add(e);
 	}
 
 	@Override
 	public boolean remove(Object o)
 	{
-		return list.remove(o);
+		return partyIds.remove(o);
 	}
 
 	@Override
 	public boolean containsAll(Collection<?> c)
 	{
-		return list.containsAll(c);
+		return partyIds.containsAll(c);
 	}
 
 	@Override
 	public boolean addAll(Collection<? extends PartyId> c)
 	{
-		return list.addAll(c);
+		return partyIds.addAll(c);
 	}
 
 	@Override
 	public boolean addAll(int index, Collection<? extends PartyId> c)
 	{
-		return list.addAll(index,c);
+		return partyIds.addAll(index,c);
 	}
 
 	@Override
 	public boolean removeAll(Collection<?> c)
 	{
-		return list.removeAll(c);
+		return partyIds.removeAll(c);
 	}
 
 	@Override
 	public boolean retainAll(Collection<?> c)
 	{
-		return list.retainAll(c);
+		return partyIds.retainAll(c);
 	}
 
 	@Override
 	public void clear()
 	{
-		list.clear();
+		partyIds.clear();
 	}
 
 	@Override
 	public PartyId get(int index)
 	{
-		return list.get(index);
+		return partyIds.get(index);
 	}
 
 	@Override
 	public PartyId set(int index, PartyId element)
 	{
-		return list.set(index,element);
+		return partyIds.set(index,element);
 	}
 
 	@Override
 	public void add(int index, PartyId element)
 	{
-		list.add(index,element);
+		partyIds.add(index,element);
 	}
 
 	@Override
 	public PartyId remove(int index)
 	{
-		return list.remove(index);
+		return partyIds.remove(index);
 	}
 
 	@Override
 	public int indexOf(Object o)
 	{
-		return list.indexOf(o);
+		return partyIds.indexOf(o);
 	}
 
 	@Override
 	public int lastIndexOf(Object o)
 	{
-		return list.lastIndexOf(o);
+		return partyIds.lastIndexOf(o);
 	}
 
 	@Override
 	public ListIterator<PartyId> listIterator()
 	{
-		return list.listIterator();
+		return partyIds.listIterator();
 	}
 
 	@Override
 	public ListIterator<PartyId> listIterator(int index)
 	{
-		return list.listIterator(index);
+		return partyIds.listIterator(index);
 	}
 
 	@Override
 	public List<PartyId> subList(int fromIndex, int toIndex)
 	{
-		return list.subList(fromIndex,toIndex);
+		return partyIds.subList(fromIndex,toIndex);
 	}
 
 	@Override

@@ -58,11 +58,14 @@ import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.From;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.Manifest;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageData;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageHeader;
+import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageOrder;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageStatusType;
+import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.SequenceNumberType;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.Service;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.SeverityType;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.StatusRequest;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.StatusResponse;
+import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.StatusType;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.SyncReply;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.To;
 import org.w3._2000._09.xmldsig.ReferenceType;
@@ -219,6 +222,7 @@ public class EbMSMessageFactory
 			result.setMessageHeader(createMessageHeader(cpaId,content.getContext()));
 			result.setAckRequested(createAckRequested(cpaId,content.getContext()));
 			result.setSyncReply(createSyncReply(cpaId,content.getContext()));
+			result.setMessageOrder(createMessageOrder(cpaId,content.getContext()));
 			if (content.getDataSources().size() > 0)
 			{
 				Manifest manifest = EbMSMessageUtils.createManifest();
@@ -403,6 +407,21 @@ public class EbMSMessageFactory
 			return null;
 	}
 	
+	private MessageOrder createMessageOrder(String cpaId, EbMSMessageContext context)
+	{
+		if (context.getSequenceNr() != null)
+		{
+			MessageOrder messageOrder = new MessageOrder();
+			messageOrder.setVersion(Constants.EBMS_VERSION);
+			messageOrder.setMustUnderstand(true);
+			SequenceNumberType sequenceNumber = new SequenceNumberType();
+			sequenceNumber.setStatus(context.getSequenceNr() == 0L ? StatusType.RESET : StatusType.CONTINUE);
+			messageOrder.setSequenceNumber(sequenceNumber);
+			return messageOrder;
+		}
+		return null;
+	}
+
 	private SyncReply createSyncReply(String cpaId, Party fromParty, String action)
 	{
 		return EbMSMessageUtils.createSyncReply(cpaManager.getDefaultDeliveryChannel(cpaId,new CacheablePartyId(cpaManager.getEbMSPartyInfo(cpaId,fromParty).getPartyIds()),action));
