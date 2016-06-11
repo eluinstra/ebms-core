@@ -34,6 +34,7 @@ public class EbMSMessageContext implements Serializable
 	private String service;
 	private String action;
 	private Date timestamp;
+	private Date timeToLive;
 	private String conversationId;
 	private String messageId;
 	private String refToMessageId;
@@ -52,6 +53,7 @@ public class EbMSMessageContext implements Serializable
 		service = CPAUtils.toString(messageHeader.getService());
 		action = messageHeader.getAction();
 		timestamp = messageHeader.getMessageData().getTimestamp();
+		timeToLive = messageHeader.getMessageData().getTimeToLive();
 		conversationId = messageHeader.getConversationId();
 		messageId = messageHeader.getMessageData().getMessageId();
 		refToMessageId = messageHeader.getMessageData().getRefToMessageId();
@@ -124,6 +126,17 @@ public class EbMSMessageContext implements Serializable
 		this.timestamp = timestamp;
 	}
 	
+	@XmlElement
+	public Date getTimeToLive()
+	{
+		return timeToLive;
+	}
+
+	public void setTimeToLive(Date timeToLive)
+	{
+		this.timeToLive = timeToLive;
+	}
+
 	@XmlElement
 	public String getConversationId()
 	{

@@ -58,6 +58,7 @@ CREATE TABLE ebms_event
 	time_to_live			TIMESTAMP				NULL,
 	time_stamp				TIMESTAMP				NOT NULL,
 	is_confidential		NUMBER(1)				NOT NULL,
+	is_ordered				NUMBER(1)				NOT NULL,
 	retries						NUMBER(5)				DEFAULT 0 NOT NULL,
 	FOREIGN KEY (cpa_id) REFERENCES cpa(cpa_id),
 	FOREIGN KEY (message_id,message_nr) REFERENCES ebms_message (message_id,message_nr)

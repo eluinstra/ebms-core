@@ -25,9 +25,10 @@ public class EbMSEvent
 	private Date timeToLive;
 	private Date timestamp;
 	private boolean isConfidential;
+	private boolean isOrdered;
 	private int retries;
 
-	public EbMSEvent(String cpaId, String deliveryChannelId, String messageId, Date timeToLive, Date timestamp, boolean isConfidential, int retries)
+	public EbMSEvent(String cpaId, String deliveryChannelId, String messageId, Date timeToLive, Date timestamp, boolean isConfidential, boolean isOrdered, int retries)
 	{
 		this.cpaId = cpaId;
 		this.deliveryChannelId = deliveryChannelId;
@@ -35,6 +36,7 @@ public class EbMSEvent
 		this.timeToLive = timeToLive;
 		this.timestamp = timestamp;
 		this.isConfidential = isConfidential;
+		this.isOrdered = isOrdered;
 		this.retries = retries;
 	}
 
@@ -66,6 +68,11 @@ public class EbMSEvent
 	public boolean isConfidential()
 	{
 		return isConfidential;
+	}
+
+	public boolean isOrdered()
+	{
+		return isOrdered;
 	}
 
 	public int getRetries()

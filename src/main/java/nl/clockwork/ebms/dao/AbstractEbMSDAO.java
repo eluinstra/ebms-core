@@ -69,6 +69,48 @@ import org.xml.sax.SAXException;
 
 public abstract class AbstractEbMSDAO implements EbMSDAO
 {
+	public static class EbMSMessageContextRowMapper implements ParameterizedRowMapper<EbMSMessageContext>
+	{
+		public static String getBaseQuery()
+		{
+			return
+				"select cpa_id," +
+				" from_party_id," +
+				" from_role," +
+				" to_party_id," +
+				" to_role," +
+				" service," +
+				" action," +
+				" time_stamp," +
+				" time_to_live," +
+				" conversation_id," +
+				" message_id," +
+				" ref_to_message_id," +
+				" sequence_nr," +
+				" status" +
+				" from ebms_message";
+		}
+		
+		@Override
+		public EbMSMessageContext mapRow(ResultSet rs, int rowNum) throws SQLException
+		{
+			EbMSMessageContext result = new EbMSMessageContext();
+			result.setCpaId(rs.getString("cpa_id"));
+			result.setFromRole(new Role(rs.getString("from_party_id"),rs.getString("from_role")));
+			result.setToRole(new Role(rs.getString("to_party_id"),rs.getString("to_role")));
+			result.setService(rs.getString("service"));
+			result.setAction(rs.getString("action"));
+			result.setTimestamp(rs.getTimestamp("time_stamp"));
+			result.setTimeToLive(rs.getTimestamp("time_to_live"));
+			result.setConversationId(rs.getString("conversation_id"));
+			result.setMessageId(rs.getString("message_id"));
+			result.setRefToMessageId(rs.getString("ref_to_message_id"));
+			result.setSequenceNr(rs.getObject("sequence_nr") == null ? null : rs.getLong("sequence_nr"));
+			result.setMessageStatus(rs.getObject("status") == null ? null : EbMSMessageStatus.values()[rs.getInt("status")]);
+			return result;
+		}
+	}
+
 	protected TransactionTemplate transactionTemplate;
 	protected JdbcTemplate jdbcTemplate;
 	
@@ -412,43 +454,10 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 		try
 		{
 			return jdbcTemplate.queryForObject(
-				"select cpa_id," +
-				" from_party_id," +
-				" from_role," +
-				" to_party_id," +
-				" to_role," +
-				" service," +
-				" action," +
-				" time_stamp," +
-				" conversation_id," +
-				" message_id," +
-				" ref_to_message_id," +
-				" sequence_nr," +
-				" status" +
-				" from ebms_message" + 
+				EbMSMessageContextRowMapper.getBaseQuery() +
 				" where message_id = ?" +
 				" and message_nr = 0",
-				new ParameterizedRowMapper<EbMSMessageContext>()
-				{
-					@Override
-					public EbMSMessageContext mapRow(ResultSet rs, int rowNum) throws SQLException
-					{
-						EbMSMessageContext result = new EbMSMessageContext();
-						result.setCpaId(rs.getString("cpa_id"));
-						result.setFromRole(new Role(rs.getString("from_party_id"),rs.getString("from_role")));
-						result.setToRole(new Role(rs.getString("to_party_id"),rs.getString("to_role")));
-						result.setService(rs.getString("service"));
-						result.setAction(rs.getString("action"));
-						result.setTimestamp(rs.getTimestamp("time_stamp"));
-						result.setConversationId(rs.getString("conversation_id"));
-						result.setMessageId(rs.getString("message_id"));
-						result.setRefToMessageId(rs.getString("ref_to_message_id"));
-						result.setSequenceNr(rs.getObject("sequence_nr") == null ? null : rs.getLong("sequence_nr"));
-						result.setMessageStatus(rs.getObject("status") == null ? null : EbMSMessageStatus.values()[rs.getInt("status")]);
-						return result;
-					}
-					
-				},
+				new EbMSMessageContextRowMapper(),
 				messageId
 			);
 		}
@@ -468,46 +477,13 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 		try
 		{
 			return jdbcTemplate.queryForObject(
-				"select cpa_id," +
-				" from_party_id," +
-				" from_role," +
-				" to_party_id," +
-				" to_role," +
-				" service," +
-				" action," +
-				" time_stamp," +
-				" conversation_id," +
-				" message_id," +
-				" ref_to_message_id," +
-				" sequence_nr," +
-				" status" +
-				" from ebms_message" + 
+				EbMSMessageContextRowMapper.getBaseQuery() +
 				" where cpa_id = ?" +
 				" and ref_to_message_id = ?" +
 				" and message_nr = 0" +
 				(service == null ? "" : " and service = '" + EbMSMessageUtils.toString(service) + "'") +
 				(actions.length == 0 ? "" : " and action in ('" + StringUtils.join(actions,"','") + "')"),
-				new ParameterizedRowMapper<EbMSMessageContext>()
-				{
-					@Override
-					public EbMSMessageContext mapRow(ResultSet rs, int rowNum) throws SQLException
-					{
-						EbMSMessageContext result = new EbMSMessageContext();
-						result.setCpaId(rs.getString("cpa_id"));
-						result.setFromRole(new Role(rs.getString("from_party_id"),rs.getString("from_role")));
-						result.setToRole(new Role(rs.getString("to_party_id"),rs.getString("to_role")));
-						result.setService(rs.getString("service"));
-						result.setAction(rs.getString("action"));
-						result.setTimestamp(rs.getTimestamp("time_stamp"));
-						result.setConversationId(rs.getString("conversation_id"));
-						result.setMessageId(rs.getString("message_id"));
-						result.setRefToMessageId(rs.getString("ref_to_message_id"));
-						result.setSequenceNr(rs.getObject("sequence_nr") == null ? null : rs.getLong("sequence_nr"));
-						result.setMessageStatus(rs.getObject("status") == null ? null : EbMSMessageStatus.values()[rs.getInt("status")]);
-						return result;
-					}
-					
-				},
+				new EbMSMessageContextRowMapper(),
 				cpaId,
 				refToMessageId
 			);
@@ -528,45 +504,13 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 		try
 		{
 			return jdbcTemplate.queryForObject(
-				"select cpa_id," +
-				" from_party_id," +
-				" from_role," +
-				" to_party_id," +
-				" to_role," +
-				" service," +
-				" action," +
-				" time_stamp," +
-				" conversation_id," +
-				" message_id," +
-				" ref_to_message_id," +
-				" sequence_nr," +
-				" status" +
-				" from ebms_message" + 
+				EbMSMessageContextRowMapper.getBaseQuery() +
 				" where cpa_id = ?" +
 				" and conversation_id = ?" +
 				" and message_nr = 0" +
 				" and status < 10" +
 				" and sequence_nr = (select max(sequence_nr) from from ebms_message where cpa_id = ? and conversation_id = ? and message_nr = 0 and status < 10)",
-				new ParameterizedRowMapper<EbMSMessageContext>()
-				{
-					@Override
-					public EbMSMessageContext mapRow(ResultSet rs, int rowNum) throws SQLException
-					{
-						EbMSMessageContext result = new EbMSMessageContext();
-						result.setCpaId(rs.getString("cpa_id"));
-						result.setFromRole(new Role(rs.getString("from_party_id"),rs.getString("from_role")));
-						result.setToRole(new Role(rs.getString("to_party_id"),rs.getString("to_role")));
-						result.setService(rs.getString("service"));
-						result.setAction(rs.getString("action"));
-						result.setTimestamp(rs.getTimestamp("time_stamp"));
-						result.setConversationId(rs.getString("conversation_id"));
-						result.setMessageId(rs.getString("message_id"));
-						result.setRefToMessageId(rs.getString("ref_to_message_id"));
-						result.setSequenceNr(rs.getObject("sequence_nr") == null ? null : rs.getLong("sequence_nr"));
-						result.setMessageStatus(rs.getObject("status") == null ? null : EbMSMessageStatus.values()[rs.getInt("status")]);
-						return result;
-					}
-				},
+				new EbMSMessageContextRowMapper(),
 				cpaId,
 				conversationId,
 				cpaId,
@@ -589,49 +533,42 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 		try
 		{
 			return jdbcTemplate.queryForObject(
-				"select cpa_id," +
-				" from_party_id," +
-				" from_role," +
-				" to_party_id," +
-				" to_role," +
-				" service," +
-				" action," +
-				" time_stamp," +
-				" conversation_id," +
-				" message_id," +
-				" ref_to_message_id," +
-				" sequence_nr," +
-				" status" +
-				" from ebms_message" + 
+				EbMSMessageContextRowMapper.getBaseQuery() +
 				" where cpa_id = ?" +
 				" and conversation_id = ?" +
 				" and message_nr = 0" +
 				" and status < 10" +
 				" and sequence_nr = (select max(sequence_nr) from from ebms_message where cpa_id = ? and conversation_id = ? and message_nr = 0 and status > 10)",
-				new ParameterizedRowMapper<EbMSMessageContext>()
-				{
-					@Override
-					public EbMSMessageContext mapRow(ResultSet rs, int rowNum) throws SQLException
-					{
-						EbMSMessageContext result = new EbMSMessageContext();
-						result.setCpaId(rs.getString("cpa_id"));
-						result.setFromRole(new Role(rs.getString("from_party_id"),rs.getString("from_role")));
-						result.setToRole(new Role(rs.getString("to_party_id"),rs.getString("to_role")));
-						result.setService(rs.getString("service"));
-						result.setAction(rs.getString("action"));
-						result.setTimestamp(rs.getTimestamp("time_stamp"));
-						result.setConversationId(rs.getString("conversation_id"));
-						result.setMessageId(rs.getString("message_id"));
-						result.setRefToMessageId(rs.getString("ref_to_message_id"));
-						result.setSequenceNr(rs.getObject("sequence_nr") == null ? null : rs.getLong("sequence_nr"));
-						result.setMessageStatus(rs.getObject("status") == null ? null : EbMSMessageStatus.values()[rs.getInt("status")]);
-						return result;
-					}
-				},
+				new EbMSMessageContextRowMapper(),
 				cpaId,
 				conversationId,
 				cpaId,
 				conversationId
+			);
+		}
+		catch(EmptyResultDataAccessException e)
+		{
+			return null;
+		}
+		catch (DataAccessException e)
+		{
+			throw new DAOException(e);
+		}
+	}
+
+	@Override
+	public EbMSMessageContext getNextOrderedMessage(String messageId)
+	{
+		try
+		{
+			return jdbcTemplate.queryForObject(
+				EbMSMessageContextRowMapper.getBaseQuery() +
+				" , (select cpa_id, conversation_id, sequence_nr from from ebms_message where message_id = ? and message_nr = 0) as last_message" + 
+				" where ebms_message.cpa_id = last_message.cpa_id" +
+				" and ebms_message.conversation_id = last_message.conversation_id" +
+				" and ebms_message.sequence_nr = last_message.sequence_nr + 1",
+				new EbMSMessageContextRowMapper(),
+				messageId
 			);
 		}
 		catch(EmptyResultDataAccessException e)
@@ -1033,11 +970,11 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	}
 
 	@Override
-	public void updateMessage(String messageId, EbMSMessageStatus oldStatus, EbMSMessageStatus newStatus) throws DAOException
+	public int updateMessage(String messageId, EbMSMessageStatus oldStatus, EbMSMessageStatus newStatus) throws DAOException
 	{
 		try
 		{
-			jdbcTemplate.update
+			return jdbcTemplate.update
 			(
 				"update ebms_message" +
 				" set status = ?," +
@@ -1103,7 +1040,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 		try
 		{
 			return jdbcTemplate.query(
-				"select cpa_id, channel_id, message_id, time_to_live, time_stamp, is_confidential, retries" +
+				"select cpa_id, channel_id, message_id, time_to_live, time_stamp, is_confidential, is_ordered, retries" +
 				" from ebms_event" +
 				" where time_stamp <= ?" +
 				" order by time_stamp asc",
@@ -1112,7 +1049,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 					@Override
 					public EbMSEvent mapRow(ResultSet rs, int rowNum) throws SQLException
 					{
-						return new EbMSEvent(rs.getString("cpa_id"),rs.getString("channel_id"),rs.getString("message_id"),rs.getTimestamp("time_to_live"),rs.getTimestamp("time_stamp"),rs.getBoolean("is_confidential"),rs.getInt("retries"));
+						return new EbMSEvent(rs.getString("cpa_id"),rs.getString("channel_id"),rs.getString("message_id"),rs.getTimestamp("time_to_live"),rs.getTimestamp("time_stamp"),rs.getBoolean("is_confidential"),rs.getBoolean("is_ordered"),rs.getInt("retries"));
 					}
 				},
 				timestamp

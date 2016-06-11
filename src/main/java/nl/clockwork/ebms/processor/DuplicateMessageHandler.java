@@ -18,7 +18,6 @@ import nl.clockwork.ebms.validation.EbMSMessageValidator;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageHeader;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.Service;
 
 public class DuplicateMessageHandler
@@ -37,7 +36,7 @@ public class DuplicateMessageHandler
 		mshMessageService.setValue(Constants.EBMS_SERVICE_URI);
 	}
 
-	public EbMSDocument handleMessage(final Date timestamp, final EbMSMessage message, final MessageHeader messageHeader) throws EbMSProcessingException
+	public EbMSDocument handleMessage(final Date timestamp, final EbMSMessage message) throws EbMSProcessingException
 	{
 		if (isIdenticalMessage(message))
 		{
@@ -45,7 +44,7 @@ public class DuplicateMessageHandler
 			if (messageValidator.isSyncReply(message))
 			{
 				ebMSDAO.insertDuplicateMessage(timestamp,message);
-				EbMSDocument result = ebMSDAO.getEbMSDocumentByRefToMessageId(messageHeader.getCPAId(),messageHeader.getMessageData().getMessageId(),mshMessageService,EbMSAction.MESSAGE_ERROR.action(),EbMSAction.ACKNOWLEDGMENT.action());
+				EbMSDocument result = ebMSDAO.getEbMSDocumentByRefToMessageId(message.getMessageHeader().getCPAId(),message.getMessageHeader().getMessageData().getMessageId(),mshMessageService,EbMSAction.MESSAGE_ERROR.action(),EbMSAction.ACKNOWLEDGMENT.action());
 				if (result == null)
 					logger.warn("No response found for duplicate message " + message.getMessageHeader().getMessageData().getMessageId() + "!");
 				return result;
@@ -59,9 +58,9 @@ public class DuplicateMessageHandler
 						public void doInTransaction()
 						{
 							ebMSDAO.insertDuplicateMessage(timestamp,message);
-							EbMSMessageContext messageContext = ebMSDAO.getMessageContextByRefToMessageId(messageHeader.getCPAId(),messageHeader.getMessageData().getMessageId(),mshMessageService,EbMSAction.MESSAGE_ERROR.action(),EbMSAction.ACKNOWLEDGMENT.action());
+							EbMSMessageContext messageContext = ebMSDAO.getMessageContextByRefToMessageId(message.getMessageHeader().getCPAId(),message.getMessageHeader().getMessageData().getMessageId(),mshMessageService,EbMSAction.MESSAGE_ERROR.action(),EbMSAction.ACKNOWLEDGMENT.action());
 							if (messageContext != null)
-								eventManager.createEvent(messageHeader.getCPAId(),cpaManager.getReceiveDeliveryChannel(messageHeader.getCPAId(),new CacheablePartyId(message.getMessageHeader().getFrom().getPartyId()),message.getMessageHeader().getFrom().getRole(),CPAUtils.toString(CPAUtils.createEbMSMessageService()),null),messageContext.getMessageId(),message.getMessageHeader().getMessageData().getTimeToLive(),messageContext.getTimestamp(),false);
+								eventManager.createEvent(message.getMessageHeader().getCPAId(),cpaManager.getReceiveDeliveryChannel(message.getMessageHeader().getCPAId(),new CacheablePartyId(message.getMessageHeader().getFrom().getPartyId()),message.getMessageHeader().getFrom().getRole(),CPAUtils.toString(CPAUtils.createEbMSMessageService()),null),messageContext.getMessageId(),message.getMessageHeader().getMessageData().getTimeToLive(),messageContext.getTimestamp(),false,false);
 							else
 								logger.warn("No response found for duplicate message " + message.getMessageHeader().getMessageData().getMessageId() + "!");
 						}

@@ -15,6 +15,7 @@
  */
 package nl.clockwork.ebms.service;
 
+import java.math.BigInteger;
 import java.util.Date;
 import java.util.List;
 
@@ -40,6 +41,7 @@ import nl.clockwork.ebms.processor.EbMSProcessorException;
 import nl.clockwork.ebms.signing.EbMSSignatureGenerator;
 import nl.clockwork.ebms.util.CPAUtils;
 import nl.clockwork.ebms.validation.EbMSMessageContextValidator;
+import nl.clockwork.ebms.validation.MessageOrderValidator;
 import nl.clockwork.ebms.validation.ValidationException;
 import nl.clockwork.ebms.validation.ValidatorException;
 
@@ -57,6 +59,7 @@ public class EbMSMessageServiceImpl implements InitializingBean, EbMSMessageServ
 	private EventManager eventManager;
 	private EbMSMessageContextValidator ebMSMessageContextValidator;
 	private EbMSSignatureGenerator signatureGenerator;
+	private MessageOrderValidator messageOrderValidator;
 
 	@Override
 	public void afterPropertiesSet() throws Exception
@@ -92,6 +95,7 @@ public class EbMSMessageServiceImpl implements InitializingBean, EbMSMessageServ
 		try
 		{
 			ebMSMessageContextValidator.validate(messageContent.getContext());
+			messageOrderValidator.generateSequenceNr(messageContent.getContext());
 			final EbMSMessage message = ebMSMessageFactory.createEbMSMessage(messageContent.getContext().getCpaId(),messageContent);
 			signatureGenerator.generate(message);
 			ebMSDAO.executeTransaction(
@@ -100,8 +104,22 @@ public class EbMSMessageServiceImpl implements InitializingBean, EbMSMessageServ
 					@Override
 					public void doInTransaction()
 					{
-						ebMSDAO.insertMessage(new Date(),message,EbMSMessageStatus.SENT);
-						eventManager.createEvent(message.getMessageHeader().getCPAId(),cpaManager.getReceiveDeliveryChannel(message.getMessageHeader().getCPAId(),new CacheablePartyId(message.getMessageHeader().getTo().getPartyId()),message.getMessageHeader().getTo().getRole(),CPAUtils.toString(message.getMessageHeader().getService()),message.getMessageHeader().getAction()),message.getMessageHeader().getMessageData().getMessageId(),message.getMessageHeader().getMessageData().getTimeToLive(),message.getMessageHeader().getMessageData().getTimestamp(),cpaManager.isConfidential(message.getMessageHeader().getCPAId(),new CacheablePartyId(message.getMessageHeader().getFrom().getPartyId()),message.getMessageHeader().getFrom().getRole(),CPAUtils.toString(message.getMessageHeader().getService()),message.getMessageHeader().getAction()));
+						if (message.getMessageOrder() != null)
+						{
+							ebMSDAO.insertMessage(new Date(),message,EbMSMessageStatus.SENT);
+							eventManager.createEvent(message.getMessageHeader().getCPAId(),cpaManager.getReceiveDeliveryChannel(message.getMessageHeader().getCPAId(),new CacheablePartyId(message.getMessageHeader().getTo().getPartyId()),message.getMessageHeader().getTo().getRole(),CPAUtils.toString(message.getMessageHeader().getService()),message.getMessageHeader().getAction()),message.getMessageHeader().getMessageData().getMessageId(),message.getMessageHeader().getMessageData().getTimeToLive(),message.getMessageHeader().getMessageData().getTimestamp(),cpaManager.isConfidential(message.getMessageHeader().getCPAId(),new CacheablePartyId(message.getMessageHeader().getFrom().getPartyId()),message.getMessageHeader().getFrom().getRole(),CPAUtils.toString(message.getMessageHeader().getService()),message.getMessageHeader().getAction()),message.getMessageOrder() != null);
+						}
+						else
+						{
+							EbMSMessageContext lastMessage = ebMSDAO.getLastSentMessage(message.getMessageHeader().getCPAId(),message.getMessageHeader().getConversationId());
+							if (BigInteger.ZERO.equals(message.getMessageOrder().getSequenceNumber().getValue()) || (lastMessage != null && EbMSMessageStatus.DELIVERED.equals(lastMessage.getMessageStatus())))
+							{
+								ebMSDAO.insertMessage(new Date(),message,EbMSMessageStatus.SENT);
+								eventManager.createEvent(message.getMessageHeader().getCPAId(),cpaManager.getReceiveDeliveryChannel(message.getMessageHeader().getCPAId(),new CacheablePartyId(message.getMessageHeader().getTo().getPartyId()),message.getMessageHeader().getTo().getRole(),CPAUtils.toString(message.getMessageHeader().getService()),message.getMessageHeader().getAction()),message.getMessageHeader().getMessageData().getMessageId(),message.getMessageHeader().getMessageData().getTimeToLive(),message.getMessageHeader().getMessageData().getTimestamp(),cpaManager.isConfidential(message.getMessageHeader().getCPAId(),new CacheablePartyId(message.getMessageHeader().getFrom().getPartyId()),message.getMessageHeader().getFrom().getRole(),CPAUtils.toString(message.getMessageHeader().getService()),message.getMessageHeader().getAction()),message.getMessageOrder() != null);
+							}
+							else
+								ebMSDAO.insertMessage(new Date(),message,EbMSMessageStatus.PENDING);
+						}
 					}
 				}
 			);

@@ -34,8 +34,10 @@ import nl.clockwork.ebms.dao.DAOTransactionCallback;
 import nl.clockwork.ebms.dao.EbMSDAO;
 import nl.clockwork.ebms.encryption.EbMSMessageEncrypter;
 import nl.clockwork.ebms.event.EventListener;
+import nl.clockwork.ebms.model.CacheablePartyId;
 import nl.clockwork.ebms.model.EbMSDocument;
 import nl.clockwork.ebms.model.EbMSEvent;
+import nl.clockwork.ebms.model.EbMSMessageContext;
 import nl.clockwork.ebms.processor.EbMSMessageProcessor;
 import nl.clockwork.ebms.util.CPAUtils;
 
@@ -44,6 +46,7 @@ import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DeliveryChannel;
+import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.MessageOrderSemanticsType;
 import org.springframework.beans.factory.InitializingBean;
 
 public class EbMSEventProcessor implements InitializingBean, Job
@@ -61,6 +64,7 @@ public class EbMSEventProcessor implements InitializingBean, Job
 		public void run()
 		{
 			DeliveryChannel deliveryChannel = cpaManager.getDeliveryChannel(event.getCpaId(),event.getDeliveryChannelId());
+			//TODO check max retries?
 			if (event.getTimeToLive() == null || new Date().before(event.getTimeToLive()))
 				sendEvent(event,deliveryChannel);
 			else
@@ -85,7 +89,7 @@ public class EbMSEventProcessor implements InitializingBean, Job
 					eventManager.updateEvent(event,url,EbMSEventStatus.SUCCEEDED);
 				}
 				else
-					eventManager.deleteEvent(event.getMessageId());
+					deleteEvent(event);
 			}
 			catch (final EbMSResponseException e)
 			{
@@ -100,8 +104,8 @@ public class EbMSEventProcessor implements InitializingBean, Job
 							eventManager.updateEvent(event,url_,EbMSEventStatus.FAILED,e.getMessage());
 							if (e instanceof EbMSResponseSOAPException && EbMSResponseSOAPException.CLIENT.equals(((EbMSResponseSOAPException)e).getFaultCode()))
 							{
-								ebMSDAO.updateMessage(event.getMessageId(),EbMSMessageStatus.SENT,EbMSMessageStatus.DELIVERY_FAILED);
-								eventListener.onMessageFailed(event.getMessageId());
+								if (ebMSDAO.updateMessage(event.getMessageId(),EbMSMessageStatus.SENT,EbMSMessageStatus.DELIVERY_FAILED) > 0)
+									eventListener.onMessageFailed(event.getMessageId());
 							}
 						}
 					}
@@ -118,7 +122,6 @@ public class EbMSEventProcessor implements InitializingBean, Job
 		{
 			try
 			{
-				logger.warn("Expiring message " +  event.getMessageId());
 				ebMSDAO.executeTransaction(
 					new DAOTransactionCallback()
 					{
@@ -129,11 +132,11 @@ public class EbMSEventProcessor implements InitializingBean, Job
 							if (requestDocument != null)
 							{
 								eventManager.updateEvent(event,null,EbMSEventStatus.SUCCEEDED);
-								ebMSDAO.updateMessage(event.getMessageId(),EbMSMessageStatus.SENT,EbMSMessageStatus.EXPIRED);
-								eventListener.onMessageExpired(event.getMessageId());
+								if (ebMSDAO.updateMessage(event.getMessageId(),EbMSMessageStatus.SENT,EbMSMessageStatus.EXPIRED) > 0)
+									eventListener.onMessageExpired(event.getMessageId());
 							}
 							else
-								eventManager.deleteEvent(event.getMessageId());
+								deleteEvent(event);
 						}
 					}
 				);
@@ -142,6 +145,26 @@ public class EbMSEventProcessor implements InitializingBean, Job
 			{
 				logger.error("",e);
 			}
+		}
+
+		private void deleteEvent(final EbMSEvent event)
+		{
+			ebMSDAO.executeTransaction(
+				new DAOTransactionCallback()
+				{
+					@Override
+					public void doInTransaction()
+					{
+						eventManager.deleteEvent(event.getMessageId());
+						if (event.isOrdered())
+						{
+							EbMSMessageContext context = ebMSDAO.getNextOrderedMessage(event.getMessageId());
+							if (context != null)
+								eventManager.createEvent(context.getCpaId(),cpaManager.getReceiveDeliveryChannel(context.getCpaId(),new CacheablePartyId(context.getToRole().getPartyId()),context.getToRole().getRole(),context.getService(),context.getAction()),context.getMessageId(),context.getTimeToLive(),context.getTimestamp(),cpaManager.isConfidential(context.getCpaId(),new CacheablePartyId(context.getFromRole().getPartyId()),context.getFromRole().getRole(),context.getService(),context.getAction()),MessageOrderSemanticsType.GUARANTEED.equals(cpaManager.getMessageOrderSemantics(context.getCpaId(),new CacheablePartyId(context.getToRole().getPartyId()),context.getToRole().getRole(),context.getService(),context.getAction())));
+						}
+					}
+				}
+			);
 		}
 
 	}

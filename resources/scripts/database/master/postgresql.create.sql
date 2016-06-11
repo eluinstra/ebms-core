@@ -54,6 +54,7 @@ CREATE TABLE ebms_event
 	time_to_live			TIMESTAMP				NULL,
 	time_stamp				TIMESTAMP				NOT NULL,
 	is_confidential		BOOLEAN					NOT NULL,
+	is_ordered				BOOLEAN					NOT NULL,
 	retries						SMALLINT				DEFAULT 0 NOT NULL
 );
 

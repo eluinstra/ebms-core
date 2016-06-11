@@ -59,6 +59,7 @@ CREATE TABLE ebms_event
 	time_to_live			TIMESTAMP				NULL,
 	time_stamp				TIMESTAMP				NOT NULL,
 	is_confidential		TINYINT(1)			NOT NULL,
+	is_ordered				TINYINT(1)			NOT NULL,
 	retries						SMALLINT				DEFAULT 0 NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
