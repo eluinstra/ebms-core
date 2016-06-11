@@ -563,7 +563,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 		{
 			return jdbcTemplate.queryForObject(
 				EbMSMessageContextRowMapper.getBaseQuery() +
-				" , (select cpa_id, conversation_id, sequence_nr from from ebms_message where message_id = ? and message_nr = 0) as last_message" + 
+				" , (select cpa_id, conversation_id, sequence_nr from ebms_message where message_id = ? and message_nr = 0) as last_message" + 
 				" where ebms_message.cpa_id = last_message.cpa_id" +
 				" and ebms_message.conversation_id = last_message.conversation_id" +
 				" and ebms_message.sequence_nr = last_message.sequence_nr + 1",
