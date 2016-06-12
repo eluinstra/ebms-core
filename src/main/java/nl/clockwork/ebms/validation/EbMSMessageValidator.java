@@ -160,4 +160,9 @@ public class EbMSMessageValidator
 	{
 		this.messageDecrypter = messageDecrypter;
 	}
+
+	public void setPackageValidator(PackageValidator packageValidator)
+	{
+		this.packageValidator = packageValidator;
+	}
 }

@@ -137,6 +137,11 @@
 				<property name="keyStorePassword" value="${encryption.keystore.password}" />
 			</bean>
 		</property>
+		<property name="packageValidator">
+			<bean class="nl.clockwork.ebms.validation.PackageValidator">
+				<property name="cpaManager" ref="cpaManager"/>
+			</bean>
+		</property>
 	</bean>
 
 	<bean id="duplicateMessageHandler" class="nl.clockwork.ebms.processor.DuplicateMessageHandler">
