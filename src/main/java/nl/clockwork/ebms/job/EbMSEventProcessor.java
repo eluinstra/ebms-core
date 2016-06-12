@@ -46,7 +46,6 @@ import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DeliveryChannel;
-import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.MessageOrderSemanticsType;
 import org.springframework.beans.factory.InitializingBean;
 
 public class EbMSEventProcessor implements InitializingBean, Job
@@ -160,7 +159,7 @@ public class EbMSEventProcessor implements InitializingBean, Job
 						{
 							EbMSMessageContext context = ebMSDAO.getNextOrderedMessage(event.getMessageId());
 							if (context != null)
-								eventManager.createEvent(context.getCpaId(),cpaManager.getReceiveDeliveryChannel(context.getCpaId(),new CacheablePartyId(context.getToRole().getPartyId()),context.getToRole().getRole(),context.getService(),context.getAction()),context.getMessageId(),context.getTimeToLive(),context.getTimestamp(),cpaManager.isConfidential(context.getCpaId(),new CacheablePartyId(context.getFromRole().getPartyId()),context.getFromRole().getRole(),context.getService(),context.getAction()),MessageOrderSemanticsType.GUARANTEED.equals(cpaManager.getMessageOrderSemantics(context.getCpaId(),new CacheablePartyId(context.getToRole().getPartyId()),context.getToRole().getRole(),context.getService(),context.getAction())));
+								eventManager.createEvent(context.getCpaId(),cpaManager.getReceiveDeliveryChannel(context.getCpaId(),new CacheablePartyId(context.getToRole().getPartyId()),context.getToRole().getRole(),context.getService(),context.getAction()),context.getMessageId(),context.getTimeToLive(),context.getTimestamp(),cpaManager.isConfidential(context.getCpaId(),new CacheablePartyId(context.getFromRole().getPartyId()),context.getFromRole().getRole(),context.getService(),context.getAction()),context.getSequenceNr() != null);
 						}
 					}
 				}
