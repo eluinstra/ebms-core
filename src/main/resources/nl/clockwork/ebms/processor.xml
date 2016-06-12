@@ -45,7 +45,27 @@
 		<property name="cpaManager" ref="cpaManager"/>
 		<property name="ebMSMessageFactory" ref="ebMSMessageFactory"/>
 		<property name="eventManager" ref="eventManager"/>
+		<property name="messageContentValidator" ref="messageContentValidator"/>
 		<property name="signatureGenerator" ref="signatureGenerator"/>
+	</bean>
+
+	<bean id="messageContentValidator" class="nl.clockwork.ebms.validation.EbMSMessageContentValidator">
+		<property name="messageContextValidator">
+			<bean class="nl.clockwork.ebms.validation.EbMSMessageContextValidator">
+				<property name="cpaManager" ref="cpaManager"/>
+			</bean>
+		</property>
+		<property name="messageOrderValidator">
+			<bean class="nl.clockwork.ebms.validation.MessageOrderValidator">
+				<property name="ebMSDAO" ref="ebMSDAO"/>
+				<property name="cpaManager" ref="cpaManager"/>
+			</bean>
+		</property>
+		<property name="packageValidator">
+			<bean class="nl.clockwork.ebms.validation.PackageValidator">
+				<property name="cpaManager" ref="cpaManager"/>
+			</bean>
+		</property>
 	</bean>
 
 	<bean id="deliveryManager" class="nl.clockwork.ebms.client.DeliveryManager">

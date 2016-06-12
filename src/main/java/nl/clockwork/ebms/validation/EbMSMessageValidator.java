@@ -22,6 +22,7 @@ public class EbMSMessageValidator
 	protected ManifestValidator manifestValidator;
 	protected SignatureValidator signatureValidator;
 	protected EbMSMessageDecrypter messageDecrypter;
+	protected PackageValidator packageValidator;
 
 	public void validateMessage(EbMSMessage message, Date timestamp) throws ValidatorException
 	{
@@ -35,6 +36,7 @@ public class EbMSMessageValidator
 		manifestValidator.validate(message);
 		messageDecrypter.decrypt(message);
 		signatureValidator.validateSignature(message);
+		packageValidator.validate(message);
 	}
 
 	public void validateMessageError(EbMSMessage requestMessage, EbMSMessage responseMessage, Date timestamp) throws ValidatorException

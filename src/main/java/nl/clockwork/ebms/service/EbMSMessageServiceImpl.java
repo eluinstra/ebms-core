@@ -40,16 +40,14 @@ import nl.clockwork.ebms.model.Party;
 import nl.clockwork.ebms.processor.EbMSProcessorException;
 import nl.clockwork.ebms.signing.EbMSSignatureGenerator;
 import nl.clockwork.ebms.util.CPAUtils;
-import nl.clockwork.ebms.validation.EbMSMessageContextValidator;
-import nl.clockwork.ebms.validation.MessageOrderValidator;
+import nl.clockwork.ebms.validation.EbMSMessageContentValidator;
 import nl.clockwork.ebms.validation.ValidationException;
 import nl.clockwork.ebms.validation.ValidatorException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.springframework.beans.factory.InitializingBean;
 
-public class EbMSMessageServiceImpl implements InitializingBean, EbMSMessageService
+public class EbMSMessageServiceImpl implements EbMSMessageService
 {
   protected transient Log logger = LogFactory.getLog(getClass());
 	private DeliveryManager deliveryManager;
@@ -57,22 +55,15 @@ public class EbMSMessageServiceImpl implements InitializingBean, EbMSMessageServ
 	private CPAManager cpaManager;
 	private EbMSMessageFactory ebMSMessageFactory;
 	private EventManager eventManager;
-	private EbMSMessageContextValidator ebMSMessageContextValidator;
+	private EbMSMessageContentValidator messageContentValidator;
 	private EbMSSignatureGenerator signatureGenerator;
-	private MessageOrderValidator messageOrderValidator;
 
-	@Override
-	public void afterPropertiesSet() throws Exception
-	{
-		ebMSMessageContextValidator = new EbMSMessageContextValidator(cpaManager);
-	}
-  
 	@Override
 	public void ping(String cpaId, Party fromParty, Party toParty) throws EbMSMessageServiceException
 	{
 		try
 		{
-			ebMSMessageContextValidator.validate(cpaId,fromParty,toParty);
+			messageContentValidator.validatePing(cpaId,fromParty,toParty);
 			EbMSMessage request = ebMSMessageFactory.createEbMSPing(cpaId,fromParty,toParty);
 			EbMSMessage response = deliveryManager.sendMessage(cpaManager.getUri(cpaId,new CacheablePartyId(request.getMessageHeader().getTo().getPartyId()),request.getMessageHeader().getTo().getRole(),CPAUtils.toString(request.getMessageHeader().getService()),request.getMessageHeader().getAction()),request);
 			if (response != null)
@@ -94,8 +85,7 @@ public class EbMSMessageServiceImpl implements InitializingBean, EbMSMessageServ
 	{
 		try
 		{
-			ebMSMessageContextValidator.validate(messageContent.getContext());
-			messageOrderValidator.generateSequenceNr(messageContent.getContext());
+			messageContentValidator.validateMessage(messageContent);
 			final EbMSMessage message = ebMSMessageFactory.createEbMSMessage(messageContent.getContext().getCpaId(),messageContent);
 			signatureGenerator.generate(message);
 			ebMSDAO.executeTransaction(
@@ -224,7 +214,7 @@ public class EbMSMessageServiceImpl implements InitializingBean, EbMSMessageServ
 	{
 		try
 		{
-			ebMSMessageContextValidator.validate(cpaId,fromParty,toParty);
+			messageContentValidator.validateMessageStatus(cpaId,fromParty,toParty);
 			EbMSMessage request = ebMSMessageFactory.createEbMSStatusRequest(cpaId,fromParty,toParty,messageId);
 			EbMSMessage response = deliveryManager.sendMessage(cpaManager.getUri(cpaId,new CacheablePartyId(request.getMessageHeader().getTo().getPartyId()),request.getMessageHeader().getTo().getRole(),CPAUtils.toString(request.getMessageHeader().getService()),request.getMessageHeader().getAction()),request);
 			if (response != null)
@@ -266,6 +256,11 @@ public class EbMSMessageServiceImpl implements InitializingBean, EbMSMessageServ
 	public void setEventManager(EventManager eventManager)
 	{
 		this.eventManager = eventManager;
+	}
+
+	public void setMessageContentValidator(EbMSMessageContentValidator messageContentValidator)
+	{
+		this.messageContentValidator = messageContentValidator;
 	}
 
 	public void setSignatureGenerator(EbMSSignatureGenerator signatureGenerator)

@@ -31,11 +31,6 @@ public class EbMSMessageContextValidator
 	protected transient Log logger = LogFactory.getLog(getClass());
 	protected CPAManager cpaManager;
 
-	public EbMSMessageContextValidator(CPAManager cpaManager)
-	{
-		this.cpaManager = cpaManager;
-	}
-
 	public void validate(String cpaId, Party fromParty, Party toParty) throws ValidationException
 	{
 		if (StringUtils.isEmpty(cpaId))
@@ -142,4 +137,8 @@ public class EbMSMessageContextValidator
 		}
 	}
 
+	public void setCpaManager(CPAManager cpaManager)
+	{
+		this.cpaManager = cpaManager;
+	}
 }
