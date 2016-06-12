@@ -1,3 +1,2 @@
 - use oid to determine encryption algorithm
 - implement packaging
-- implement message ordering
