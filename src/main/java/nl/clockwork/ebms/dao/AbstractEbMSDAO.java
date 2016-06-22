@@ -1243,11 +1243,11 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 				parameters.add(messageContext.getSequenceNr());
 				result.append(" and sequence_nr = ?");
 			}
-			if (messageContext.getMessageStatus() != null)
-			{
-				parameters.add(messageContext.getMessageStatus().ordinal());
-				result.append(" and status = ?");
-			}
+			//if (messageContext.getMessageStatus() != null)
+			//{
+			//	parameters.add(messageContext.getMessageStatus().ordinal());
+			//	result.append(" and status = ?");
+			//}
 		}
 		return result.toString();
 	}
