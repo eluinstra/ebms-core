@@ -92,8 +92,6 @@
 			<bean class="nl.clockwork.ebms.validation.ClientCertificateValidator">
 				<property name="enabled" value="${https.requireSSLAuthentication}"/>
 				<property name="cpaManager" ref="cpaManager"/>
-				<property name="trustStorePath" value="${truststore.path}"/>
-				<property name="trustStorePassword" value="${truststore.password}"/>
 			</bean>
 		</property>
 		<property name="cpaValidator">
