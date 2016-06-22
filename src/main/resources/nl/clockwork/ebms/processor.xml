@@ -88,12 +88,10 @@
 	<bean id="messageValidator" class="nl.clockwork.ebms.validation.EbMSMessageValidator">
 		<property name="ebMSDAO" ref="ebMSDAO"/>
 		<property name="cpaManager" ref="cpaManager"/>
-		<property name="sslCertificateValidator">
-			<bean class="nl.clockwork.ebms.validation.SSLSessionValidator">
+		<property name="clientCertificateValidator">
+			<bean class="nl.clockwork.ebms.validation.ClientCertificateValidator">
 				<property name="enabled" value="${https.validate}"/>
 				<property name="cpaManager" ref="cpaManager"/>
-				<property name="keyStorePath" value="${keystore.path}"/>
-				<property name="keyStorePassword" value="${keystore.password}"/>
 				<property name="trustStorePath" value="${truststore.path}"/>
 				<property name="trustStorePassword" value="${truststore.password}"/>
 			</bean>

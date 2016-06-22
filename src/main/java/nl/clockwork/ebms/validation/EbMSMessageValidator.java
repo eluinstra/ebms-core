@@ -30,13 +30,13 @@ public class EbMSMessageValidator
 {
 	protected EbMSDAO ebMSDAO;
 	protected CPAManager cpaManager;
-	protected SSLSessionValidator sslCertificateValidator;
 	protected CPAValidator cpaValidator;
 	protected MessageHeaderValidator messageHeaderValidator;
 	protected MessageOrderValidator messageOrderValidator;
 	protected ManifestValidator manifestValidator;
 	protected SignatureValidator signatureValidator;
 	protected EbMSMessageDecrypter messageDecrypter;
+	protected ClientCertificateValidator clientCertificateValidator;
 	protected PackageValidator packageValidator;
 
 	public void validateMessage(EbMSMessage message, Date timestamp) throws ValidatorException
@@ -45,7 +45,7 @@ public class EbMSMessageValidator
 			throw new DuplicateMessageException();
 		cpaValidator.validate(message);
 		messageHeaderValidator.validate(message,timestamp);
-		sslCertificateValidator.validate(message);
+		clientCertificateValidator.validate(message);
 		messageOrderValidator.validate(message);
 		signatureValidator.validate(message);
 		manifestValidator.validate(message);
@@ -60,7 +60,7 @@ public class EbMSMessageValidator
 			throw new DuplicateMessageException();
 		messageHeaderValidator.validate(requestMessage,responseMessage);
 		messageHeaderValidator.validate(responseMessage,timestamp);
-		sslCertificateValidator.validate(responseMessage);
+		clientCertificateValidator.validate(responseMessage);
 	}
 
 	public void validateAcknowledgment(EbMSMessage requestMessage, EbMSMessage responseMessage, Date timestamp) throws ValidatorException
@@ -69,32 +69,32 @@ public class EbMSMessageValidator
 			throw new DuplicateMessageException();
 		messageHeaderValidator.validate(requestMessage,responseMessage);
 		messageHeaderValidator.validate(responseMessage,timestamp);
-		sslCertificateValidator.validate(responseMessage);
+		clientCertificateValidator.validate(responseMessage);
 		signatureValidator.validate(requestMessage,responseMessage);
 	}
 
 	public void validateStatusRequest(EbMSMessage message, Date timestamp) throws ValidatorException
 	{
 		messageHeaderValidator.validate(message,timestamp);
-		sslCertificateValidator.validate(message);
+		clientCertificateValidator.validate(message);
 	}
 
 	public void validateStatusResponse(EbMSMessage message, Date timestamp) throws ValidatorException
 	{
 		messageHeaderValidator.validate(message,timestamp);
-		sslCertificateValidator.validate(message);
+		clientCertificateValidator.validate(message);
 	}
 
 	public void validatePing(EbMSMessage message, Date timestamp) throws ValidatorException
 	{
 		messageHeaderValidator.validate(message,timestamp);
-		sslCertificateValidator.validate(message);
+		clientCertificateValidator.validate(message);
 	}
 
 	public void validatePong(EbMSMessage message, Date timestamp) throws ValidatorException
 	{
 		messageHeaderValidator.validate(message,timestamp);
-		sslCertificateValidator.validate(message);
+		clientCertificateValidator.validate(message);
 	}
 
 	public boolean isSyncReply(EbMSMessage message)
@@ -126,11 +126,6 @@ public class EbMSMessageValidator
 		this.cpaManager = cpaManager;
 	}
 
-	public void setSslCertificateValidator(SSLSessionValidator sslCertificateValidator)
-	{
-		this.sslCertificateValidator = sslCertificateValidator;
-	}
-
 	public void setCpaValidator(CPAValidator cpaValidator)
 	{
 		this.cpaValidator = cpaValidator;
@@ -159,6 +154,11 @@ public class EbMSMessageValidator
 	public void setMessageDecrypter(EbMSMessageDecrypter messageDecrypter)
 	{
 		this.messageDecrypter = messageDecrypter;
+	}
+
+	public void setClientCertificateValidator(ClientCertificateValidator clientCertificateValidator)
+	{
+		this.clientCertificateValidator = clientCertificateValidator;
 	}
 
 	public void setPackageValidator(PackageValidator packageValidator)

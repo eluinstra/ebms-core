@@ -17,6 +17,7 @@ package nl.clockwork.ebms.servlet;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
@@ -32,6 +33,7 @@ import javax.servlet.http.HttpServletResponse;
 import nl.clockwork.ebms.processor.EbMSMessageProcessor;
 import nl.clockwork.ebms.processor.EbMSProcessorException;
 import nl.clockwork.ebms.server.EbMSInputStreamHandler;
+import nl.clockwork.ebms.validation.ClientCertificateManager;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -58,6 +60,7 @@ public class EbMSMessageServlet extends GenericServlet
 	@Override
 	public void service(final ServletRequest request, final ServletResponse response) throws ServletException, IOException
 	{
+		ClientCertificateManager.setCertificates((X509Certificate[])request.getAttribute("javax.servlet.request.X509Certificate"));
 		try
 		{
 			EbMSInputStreamHandler handler = 
