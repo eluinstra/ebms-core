@@ -125,7 +125,7 @@ public class SSLFactoryManager implements InitializingBean
 			engine.setEnabledCipherSuites(enabledCipherSuites);
 		engine.setNeedClientAuth(requireClientAuthentication);
 
-		sslSocketFactory = new nl.clockwork.ebms.ssl.SSLSocketFactory(sslContext.getSocketFactory());
+		sslSocketFactory = sslContext.getSocketFactory();
 	}
 
 	public SSLSocketFactory getSslSocketFactory()
