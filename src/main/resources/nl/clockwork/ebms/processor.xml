@@ -237,6 +237,7 @@
 		<property name="queueScaleFactor" value="${job.queueScaleFactor}"/>
 		<property name="eventListener" ref="eventListener"/>
 		<property name="ebMSDAO" ref="ebMSDAO"/>
+		<property name="urlManager" ref="urlManager"/>
 		<property name="cpaManager" ref="cpaManager"/>
 		<property name="eventManager" ref="eventManager"/>
 		<property name="ebMSClient" ref="ebMSClient"/>

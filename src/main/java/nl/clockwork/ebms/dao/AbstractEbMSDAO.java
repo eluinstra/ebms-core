@@ -1074,14 +1074,16 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 					"time_to_live," +
 					"time_stamp," +
 					"is_confidential," +
+					"is_ordered," +
 					"retries" +
-				") values (?,?,?,?,?,?,?)",
+				") values (?,?,?,?,?,?,?,?)",
 				event.getCpaId(),
 				event.getDeliveryChannelId(),
 				event.getMessageId(),
 				event.getTimeToLive(),
 				event.getTimestamp(),
 				event.isConfidential(),
+				event.isOrdered(),
 				event.getRetries()
 			);
 		}
