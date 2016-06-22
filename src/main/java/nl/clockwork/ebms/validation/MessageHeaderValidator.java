@@ -88,12 +88,12 @@ public class MessageHeaderValidator
 		DeliveryChannel deliveryChannel = cpaManager.getSendDeliveryChannel(message.getMessageHeader().getCPAId(),new CacheablePartyId(messageHeader.getFrom().getPartyId()),messageHeader.getFrom().getRole(),CPAUtils.toString(messageHeader.getService()),messageHeader.getAction());
 		if (deliveryChannel == null)
 			throw new EbMSValidationException(EbMSMessageUtils.createError(Constants.EbMSErrorCode.UNKNOWN.errorCode(),Constants.EbMSErrorCode.UNKNOWN,"No DeliveryChannel found."));
-		if (!existsRefToMessageId(messageHeader.getMessageData().getRefToMessageId()))
-			throw new EbMSValidationException(EbMSMessageUtils.createError("//Header/MessageHeader/MessageData/RefToMessageId",Constants.EbMSErrorCode.VALUE_NOT_RECOGNIZED,"Value not found."));
-		if (!checkTimeToLive(messageHeader,timestamp))
-			throw new EbMSValidationException(EbMSMessageUtils.createError("//Header/MessageHeader/MessageData/TimeToLive",Constants.EbMSErrorCode.TIME_TO_LIVE_EXPIRED,null));
 		if (!Constants.EBMS_SERVICE_URI.equals(messageHeader.getService().getValue()))
 		{
+			if (!existsRefToMessageId(messageHeader.getMessageData().getRefToMessageId()))
+				throw new EbMSValidationException(EbMSMessageUtils.createError("//Header/MessageHeader/MessageData/RefToMessageId",Constants.EbMSErrorCode.VALUE_NOT_RECOGNIZED,"Value not found."));
+			if (!checkTimeToLive(messageHeader,timestamp))
+				throw new EbMSValidationException(EbMSMessageUtils.createError("//Header/MessageHeader/MessageData/TimeToLive",Constants.EbMSErrorCode.TIME_TO_LIVE_EXPIRED,null));
 			if (!checkDuplicateElimination(deliveryChannel,messageHeader))
 				throw new EbMSValidationException(EbMSMessageUtils.createError("//Header/MessageHeader/DuplicateElimination",Constants.EbMSErrorCode.INCONSISTENT,"Wrong value."));
 
