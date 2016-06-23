@@ -39,6 +39,7 @@ public class SslServerSocketFactory extends TcpServerSocketFactory
             ServerSocketFactory ssf = tls.getServerSocketFactory();
             SSLServerSocket serverSocket = (SSLServerSocket)ssf.createServerSocket();
             //PATCH
+			serverSocket.setEnabledProtocols(new String[]{"TLSv1.2"});
             serverSocket.setEnabledCipherSuites(new String[]{"TLS_DHE_RSA_WITH_AES_128_CBC_SHA","TLS_RSA_WITH_AES_128_CBC_SHA"});
             return configure(serverSocket, reuse, new InetSocketAddress(address, port), backlog);
         }

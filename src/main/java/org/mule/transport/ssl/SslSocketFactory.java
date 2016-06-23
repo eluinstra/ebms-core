@@ -37,7 +37,8 @@ public class SslSocketFactory extends AbstractTcpSocketFactory
         {
             SSLSocket socket = (SSLSocket)tls.getSocketFactory().createSocket(key.getInetAddress(), key.getPort());
             //PATCH
-      		  socket.setEnabledCipherSuites(new String[]{"TLS_DHE_RSA_WITH_AES_128_CBC_SHA","TLS_RSA_WITH_AES_128_CBC_SHA"});
+			socket.setEnabledProtocols(new String[]{"TLSv1.2"});
+      	    socket.setEnabledCipherSuites(new String[]{"TLS_DHE_RSA_WITH_AES_128_CBC_SHA","TLS_RSA_WITH_AES_128_CBC_SHA"});
             return socket;
         }
         catch (NoSuchAlgorithmException e)
