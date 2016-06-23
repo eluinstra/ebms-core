@@ -202,9 +202,9 @@
 			<scope>runtime</scope>
 		</dependency-->
 		<dependency>
-			<groupId>oracle</groupId>
-			<artifactId>ojdbc6</artifactId>
-			<version>11.2.0.1.0</version>
+			<groupId>com.oracle</groupId>
+			<artifactId>ojdbc7</artifactId>
+			<version>12.1.0.2</version>
 			<scope>runtime</scope>
 		</dependency>
 	</dependencies>
@@ -212,15 +212,13 @@
 		<repository>
 			<id>muleforge-repo</id>
 			<name>MuleForge Repository</name>
-			<url>http://repository.muleforge.org</url>
+			<url>https://repository.mulesoft.org/nexus/content/repositories/public</url>
 			<layout>default</layout>
 		</repository>
 		<repository>
-			<id>codehaus-repo</id>
-			<name>Codehaus Repository</name>
-			<url>http://dist.codehaus.org/mule/dependencies/maven2</url>
-			<layout>default</layout>
-		</repository>		
+			<id>codelds</id>
+			<url>https://code.lds.org/nexus/content/groups/main-repo</url>
+		</repository>
 	</repositories>
 	<build>
 		<resources>
