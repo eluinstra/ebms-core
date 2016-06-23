@@ -1,2 +1,3 @@
 - use oid to determine encryption algorithm
-- implement packaging
+- improve server and client http 'wire' logging
+- implement packaging validation
