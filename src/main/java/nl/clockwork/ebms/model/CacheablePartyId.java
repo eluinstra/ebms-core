@@ -29,6 +29,7 @@ public class CacheablePartyId implements List<PartyId>
 {
 	private List<PartyId> partyIds;
 	
+	//TODO: needed for ordered messaging
 	public CacheablePartyId(String partyId)
 	{
 		PartyId p = new PartyId();

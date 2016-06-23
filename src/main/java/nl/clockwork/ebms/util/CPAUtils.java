@@ -280,7 +280,9 @@ public class CPAUtils
 
 	private static boolean equals(PartyId cpaPartyId, org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.PartyId partyId)
 	{
-		return partyId.getValue().equals(cpaPartyId.getValue()) && (partyId.getType() == null || (cpaPartyId.getType() != null && partyId.getType().equals(cpaPartyId.getType())));
+		//return partyId.getValue().equals(cpaPartyId.getValue()) && (partyId.getType() == null || (cpaPartyId.getType() != null && partyId.getType().equals(cpaPartyId.getType())));
+		//TODO: needed for ordered messaging
+		return toString(cpaPartyId).equals(toString(partyId));
 	}
 
 }
