@@ -106,7 +106,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 			result.setMessageId(rs.getString("message_id"));
 			result.setRefToMessageId(rs.getString("ref_to_message_id"));
 			result.setSequenceNr(rs.getObject("sequence_nr") == null ? null : rs.getLong("sequence_nr"));
-			result.setMessageStatus(rs.getObject("status") == null ? null : EbMSMessageStatus.values()[rs.getInt("status")]);
+			result.setMessageStatus(rs.getObject("status") == null ? null : EbMSMessageStatus.get(rs.getInt("status")));
 			return result;
 		}
 	}
@@ -509,7 +509,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 				" and conversation_id = ?" +
 				" and message_nr = 0" +
 				" and status < 10" +
-				" and sequence_nr = (select max(sequence_nr) from from ebms_message where cpa_id = ? and conversation_id = ? and message_nr = 0 and status < 10)",
+				" and sequence_nr = (select max(sequence_nr) from ebms_message where cpa_id = ? and conversation_id = ? and message_nr = 0 and status < 10)",
 				new EbMSMessageContextRowMapper(),
 				cpaId,
 				conversationId,
@@ -538,7 +538,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 				" and conversation_id = ?" +
 				" and message_nr = 0" +
 				" and status < 10" +
-				" and sequence_nr = (select max(sequence_nr) from from ebms_message where cpa_id = ? and conversation_id = ? and message_nr = 0 and status > 10)",
+				" and sequence_nr = (select max(sequence_nr) from ebms_message where cpa_id = ? and conversation_id = ? and message_nr = 0 and status > 10)",
 				new EbMSMessageContextRowMapper(),
 				cpaId,
 				conversationId,
