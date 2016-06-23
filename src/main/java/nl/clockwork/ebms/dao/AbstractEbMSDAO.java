@@ -537,8 +537,8 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 				" where cpa_id = ?" +
 				" and conversation_id = ?" +
 				" and message_nr = 0" +
-				" and status < 10" +
-				" and sequence_nr = (select max(sequence_nr) from ebms_message where cpa_id = ? and conversation_id = ? and message_nr = 0 and status > 10)",
+				" and status >= 10" +
+				" and sequence_nr = (select max(sequence_nr) from ebms_message where cpa_id = ? and conversation_id = ? and message_nr = 0 and status >= 10)",
 				new EbMSMessageContextRowMapper(),
 				cpaId,
 				conversationId,

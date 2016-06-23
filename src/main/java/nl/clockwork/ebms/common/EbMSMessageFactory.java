@@ -16,6 +16,7 @@
 package nl.clockwork.ebms.common;
 
 import java.io.IOException;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -416,6 +417,7 @@ public class EbMSMessageFactory
 			messageOrder.setMustUnderstand(true);
 			SequenceNumberType sequenceNumber = new SequenceNumberType();
 			sequenceNumber.setStatus(context.getSequenceNr() == 0L ? StatusType.RESET : StatusType.CONTINUE);
+			sequenceNumber.setValue(BigInteger.valueOf(context.getSequenceNr()));
 			messageOrder.setSequenceNumber(sequenceNumber);
 			return messageOrder;
 		}
