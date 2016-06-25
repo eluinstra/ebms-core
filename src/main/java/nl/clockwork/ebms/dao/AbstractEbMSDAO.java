@@ -74,6 +74,13 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 		public static String getBaseQuery()
 		{
 			return
+				getSelectStatement() +
+				" from ebms_message";
+		}
+		
+		public static String getSelectStatement()
+		{
+			return
 				"select cpa_id," +
 				" from_party_id," +
 				" from_role," +
@@ -87,8 +94,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 				" message_id," +
 				" ref_to_message_id," +
 				" sequence_nr," +
-				" status" +
-				" from ebms_message";
+				" status";
 		}
 		
 		@Override
@@ -503,13 +509,18 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	{
 		try
 		{
-			return jdbcTemplate.queryForObject(
-				EbMSMessageContextRowMapper.getBaseQuery() +
-				" where cpa_id = ?" +
-				" and conversation_id = ?" +
-				" and message_nr = 0" +
-				" and status < 10" +
-				" and sequence_nr = (select max(sequence_nr) from ebms_message where cpa_id = ? and conversation_id = ? and message_nr = 0 and status < 10)",
+			JdbcTemplate result = jdbcTemplate;
+			return result.queryForObject(
+				EbMSMessageContextRowMapper.getSelectStatement() +
+				" from " +
+					"(select *, row_number() over (order by sequence_nr desc, timestamp asc) as rn" +
+					" from ebms_message" +
+					" where cpa_id = ?" +
+					" and conversation_id = ?" +
+					" and message_nr = 0" +
+					" and status < 10" +
+					" ) m" +
+				" where rn = 1",
 				new EbMSMessageContextRowMapper(),
 				cpaId,
 				conversationId,

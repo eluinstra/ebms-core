@@ -69,11 +69,7 @@ public class MessageOrderValidator
 						else if (lastMessage.getSequenceNr() < sequenceNr - 1)
 							throw new EbMSValidationException(EbMSMessageUtils.createError("//Header/MessageOrder/SequenceNumber",Constants.EbMSErrorCode.DELIVERY_FAILURE,"Missing message with SequenceNumber " + (lastMessage.getSequenceNr() + 1) + "."));
 						else //if (lastMessage.getSequenceNr() > sequenceNr - 1)
-						{
-							//TODO: sequenceNr set to null to avoid finding multiple messages with the same sequenceNr
-							messageOrder.setSequenceNumber(null);
 							throw new EbMSValidationException(EbMSMessageUtils.createError("//Header/MessageOrder/SequenceNumber",Constants.EbMSErrorCode.DELIVERY_FAILURE,"Message with SequenceNumber " + lastMessage.getSequenceNr() + " already received."));
-						}
 					}
 					else
 						throw new EbMSValidationException(EbMSMessageUtils.createError("//Header/MessageOrder/SequenceNumber",Constants.EbMSErrorCode.DELIVERY_FAILURE,"Message with SequenceNumber " + lastMessage.getSequenceNr() + " failed with status " + lastMessage.getMessageStatus().statusCode() + "."));
