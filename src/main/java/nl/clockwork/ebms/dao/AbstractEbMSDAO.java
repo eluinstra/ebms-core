@@ -523,8 +523,6 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 				" where rn = 1",
 				new EbMSMessageContextRowMapper(),
 				cpaId,
-				conversationId,
-				cpaId,
 				conversationId
 			);
 		}
