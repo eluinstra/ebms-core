@@ -74,7 +74,8 @@ public class EbMSEventProcessor implements InitializingBean, Job
 				EbMSDocument requestDocument = ebMSDAO.getEbMSDocumentIfUnsent(event.getMessageId());
 				if (requestDocument != null)
 				{
-					messageEncrypter.encrypt(event,deliveryChannel,requestDocument);
+					if (event.isConfidential())
+						messageEncrypter.encrypt(deliveryChannel,requestDocument);
 					if (StringUtils.isEmpty(url))
 						url = CPAUtils.getUri(deliveryChannel);
 					logger.info("Sending message " + event.getMessageId() + " to " + url);

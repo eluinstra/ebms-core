@@ -53,7 +53,6 @@ import nl.clockwork.ebms.common.util.SecurityUtils;
 import nl.clockwork.ebms.model.CacheablePartyId;
 import nl.clockwork.ebms.model.EbMSAttachment;
 import nl.clockwork.ebms.model.EbMSDocument;
-import nl.clockwork.ebms.model.EbMSEvent;
 import nl.clockwork.ebms.model.EbMSMessage;
 import nl.clockwork.ebms.processor.EbMSProcessingException;
 import nl.clockwork.ebms.processor.EbMSProcessorException;
@@ -115,21 +114,18 @@ public class EbMSMessageEncrypter implements InitializingBean
 		}
 	}
 
-	public void encrypt(EbMSEvent event, DeliveryChannel deliveryChannel, EbMSDocument message) throws EbMSProcessingException
+	public void encrypt(DeliveryChannel deliveryChannel, EbMSDocument message) throws EbMSProcessingException
 	{
 		try
 		{
-			if (event.isConfidential())
-			{
-				X509Certificate certificate = CPAUtils.getX509Certificate(CPAUtils.getEncryptionCertificate(deliveryChannel));
-				validateCertificate(trustStore,certificate);
-				String encryptionAlgorithm = CPAUtils.getEncryptionAlgorithm(deliveryChannel);
-				List<EbMSAttachment> attachments = new ArrayList<EbMSAttachment>();
-				for (EbMSAttachment attachment : message.getAttachments())
-					attachments.add(encrypt(createDocument(),certificate,encryptionAlgorithm,attachment));
-				message.getAttachments().clear();
-				message.getAttachments().addAll(attachments);
-			}
+			X509Certificate certificate = CPAUtils.getX509Certificate(CPAUtils.getEncryptionCertificate(deliveryChannel));
+			validateCertificate(trustStore,certificate);
+			String encryptionAlgorithm = CPAUtils.getEncryptionAlgorithm(deliveryChannel);
+			List<EbMSAttachment> attachments = new ArrayList<EbMSAttachment>();
+			for (EbMSAttachment attachment : message.getAttachments())
+				attachments.add(encrypt(createDocument(),certificate,encryptionAlgorithm,attachment));
+			message.getAttachments().clear();
+			message.getAttachments().addAll(attachments);
 		}
 		catch (TransformerFactoryConfigurationError | CertificateException | KeyStoreException | ValidationException | NoSuchAlgorithmException | XMLEncryptionException | TransformerConfigurationException e)
 		{
