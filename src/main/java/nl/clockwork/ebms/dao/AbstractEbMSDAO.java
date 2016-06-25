@@ -545,14 +545,14 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 		{
 			return jdbcTemplate.queryForObject(
 				EbMSMessageContextRowMapper.getBaseQuery() +
-				" where cpa_id = ?" +
-				" and conversation_id = ?" +
-				" and message_nr = 0" +
-				" and status >= 10" +
-				" and sequence_nr = (select max(sequence_nr) from ebms_message where cpa_id = ? and conversation_id = ? and message_nr = 0 and status >= 10)",
+				" inner join" +
+				" (select cpa_id, conversation_id, message_nr, max(sequence_nr) as max_sequence_nr from ebms_message where cpa_id = ? and conversation_id = ? and message_nr = 0 and status >= 10 group by cpa_id, conversation_id, message_nr) last_message" +
+				" on ebms_message.cpa_id = last_message.cpa_id" +
+				" and ebms_message.conversation_id = last_message.conversation_id" +
+				" and ebms_message.message_nr = last_message.message_nr" +
+				" and ebms_message.sequence_nr = last_message.max_sequence_nr" +
+				" and ebms_message.status >= 10",
 				new EbMSMessageContextRowMapper(),
-				cpaId,
-				conversationId,
 				cpaId,
 				conversationId
 			);
@@ -574,8 +574,9 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 		{
 			return jdbcTemplate.queryForObject(
 				EbMSMessageContextRowMapper.getBaseQuery() +
-				" , (select cpa_id, conversation_id, sequence_nr from ebms_message where message_id = ? and message_nr = 0) as last_message" + 
-				" where ebms_message.cpa_id = last_message.cpa_id" +
+				" inner join" +
+				" (select cpa_id, conversation_id, sequence_nr from ebms_message where message_id = ? and message_nr = 0) last_message" + 
+				" on ebms_message.cpa_id = last_message.cpa_id" +
 				" and ebms_message.conversation_id = last_message.conversation_id" +
 				" and ebms_message.sequence_nr = last_message.sequence_nr + 1",
 				new EbMSMessageContextRowMapper(),

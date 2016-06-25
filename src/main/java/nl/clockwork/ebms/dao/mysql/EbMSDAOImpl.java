@@ -33,11 +33,13 @@ import nl.clockwork.ebms.dao.AbstractEbMSDAO;
 import nl.clockwork.ebms.dao.DAOException;
 import nl.clockwork.ebms.model.EbMSAttachment;
 import nl.clockwork.ebms.model.EbMSMessage;
+import nl.clockwork.ebms.model.EbMSMessageContext;
 import nl.clockwork.ebms.util.EbMSMessageUtils;
 
 import org.apache.commons.io.IOUtils;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageHeader;
 import org.springframework.dao.DataAccessException;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
@@ -53,6 +55,37 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 	public EbMSDAOImpl(TransactionTemplate transactionTemplate, JdbcTemplate jdbcTemplate)
 	{
 		super(transactionTemplate,jdbcTemplate);
+	}
+
+	@Override
+	public EbMSMessageContext getLastReceivedMessage(String cpaId, String conversationId) throws DAOException
+	{
+		try
+		{
+			JdbcTemplate result = jdbcTemplate;
+			return result.queryForObject(
+				EbMSMessageContextRowMapper.getBaseQuery() +
+				" where cpa_id = ?" +
+				" and conversation_id = ?" +
+				" and message_nr = 0" +
+				" and status < 10" +
+				" order by sequence_nr desc, timestamp asc" +
+				" limit 1",
+				new EbMSMessageContextRowMapper(),
+				cpaId,
+				conversationId,
+				cpaId,
+				conversationId
+			);
+		}
+		catch(EmptyResultDataAccessException e)
+		{
+			return null;
+		}
+		catch (DataAccessException e)
+		{
+			throw new DAOException(e);
+		}
 	}
 
 	@Override
