@@ -35,6 +35,7 @@ import nl.clockwork.ebms.dao.DAOTransactionCallback;
 import nl.clockwork.ebms.dao.EbMSDAO;
 import nl.clockwork.ebms.encryption.EbMSMessageEncrypter;
 import nl.clockwork.ebms.event.EventListener;
+import nl.clockwork.ebms.model.CacheablePartyId;
 import nl.clockwork.ebms.model.EbMSDocument;
 import nl.clockwork.ebms.model.EbMSEvent;
 import nl.clockwork.ebms.model.EbMSMessageContext;
@@ -101,7 +102,32 @@ public class EbMSEventProcessor implements InitializingBean, Job
 							eventManager.deleteEvent(event);
 					}
 					else
-						eventManager.deleteEvent(event);
+					{
+						ebMSDAO.executeTransaction(
+							new DAOTransactionCallback()
+							{
+								@Override
+								public void doInTransaction()
+								{
+									eventManager.deleteEvent(event);
+									if (!Constants.ENABLE_HARDENED_ORDERING)
+									{
+										if (event.isOrdered())
+										{
+											EbMSMessageContext context = ebMSDAO.getMessageContext(event.getMessageId());
+											if (context != null && EbMSMessageStatus.RECEIVED.equals(context.getMessageStatus()))
+											{
+												EbMSMessageContext nextMessage = ebMSDAO.getNextOrderedMessageContext(context.getMessageId());
+												if (nextMessage != null)
+													if (ebMSDAO.updateMessage(nextMessage.getMessageId(),EbMSMessageStatus.PENDING,EbMSMessageStatus.SENDING) > 0)
+														eventManager.createEvent(nextMessage.getCpaId(),cpaManager.getReceiveDeliveryChannel(nextMessage.getCpaId(),new CacheablePartyId(nextMessage.getToRole().getPartyId()),nextMessage.getToRole().getRole(),nextMessage.getService(),nextMessage.getAction()),nextMessage.getMessageId(),nextMessage.getTimeToLive(),nextMessage.getTimestamp(),cpaManager.isConfidential(nextMessage.getCpaId(),new CacheablePartyId(nextMessage.getFromRole().getPartyId()),nextMessage.getFromRole().getRole(),nextMessage.getService(),nextMessage.getAction()),nextMessage.getSequenceNr() != null);
+											}
+										}
+									}
+								}
+							}
+						);
+					}
 				}
 			}
 			catch (final EbMSResponseException e)
@@ -163,7 +189,32 @@ public class EbMSEventProcessor implements InitializingBean, Job
 										eventManager.deleteEvent(event);
 								}
 								else
-									eventManager.deleteEvent(event);
+								{
+									ebMSDAO.executeTransaction(
+										new DAOTransactionCallback()
+										{
+											@Override
+											public void doInTransaction()
+											{
+												eventManager.deleteEvent(event);
+												if (!Constants.ENABLE_HARDENED_ORDERING)
+												{
+													if (event.isOrdered())
+													{
+														EbMSMessageContext context = ebMSDAO.getMessageContext(event.getMessageId());
+														if (context != null && EbMSMessageStatus.RECEIVED.equals(context.getMessageStatus()))
+														{
+															EbMSMessageContext nextMessage = ebMSDAO.getNextOrderedMessageContext(context.getMessageId());
+															if (nextMessage != null)
+																if (ebMSDAO.updateMessage(nextMessage.getMessageId(),EbMSMessageStatus.PENDING,EbMSMessageStatus.SENDING) > 0)
+																	eventManager.createEvent(nextMessage.getCpaId(),cpaManager.getReceiveDeliveryChannel(nextMessage.getCpaId(),new CacheablePartyId(nextMessage.getToRole().getPartyId()),nextMessage.getToRole().getRole(),nextMessage.getService(),nextMessage.getAction()),nextMessage.getMessageId(),nextMessage.getTimeToLive(),nextMessage.getTimestamp(),cpaManager.isConfidential(nextMessage.getCpaId(),new CacheablePartyId(nextMessage.getFromRole().getPartyId()),nextMessage.getFromRole().getRole(),nextMessage.getService(),nextMessage.getAction()),nextMessage.getSequenceNr() != null);
+														}
+													}
+												}
+											}
+										}
+									);
+								}
 							}
 						}
 					}
