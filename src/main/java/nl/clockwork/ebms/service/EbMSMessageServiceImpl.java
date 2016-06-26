@@ -96,7 +96,7 @@ public class EbMSMessageServiceImpl implements EbMSMessageService
 					{
 						if (message.getMessageOrder() == null)
 						{
-							ebMSDAO.insertMessage(new Date(),message,EbMSMessageStatus.SENT);
+							ebMSDAO.insertMessage(new Date(),message,EbMSMessageStatus.SENDING);
 							eventManager.createEvent(message.getMessageHeader().getCPAId(),cpaManager.getReceiveDeliveryChannel(message.getMessageHeader().getCPAId(),new CacheablePartyId(message.getMessageHeader().getTo().getPartyId()),message.getMessageHeader().getTo().getRole(),CPAUtils.toString(message.getMessageHeader().getService()),message.getMessageHeader().getAction()),message.getMessageHeader().getMessageData().getMessageId(),message.getMessageHeader().getMessageData().getTimeToLive(),message.getMessageHeader().getMessageData().getTimestamp(),cpaManager.isConfidential(message.getMessageHeader().getCPAId(),new CacheablePartyId(message.getMessageHeader().getFrom().getPartyId()),message.getMessageHeader().getFrom().getRole(),CPAUtils.toString(message.getMessageHeader().getService()),message.getMessageHeader().getAction()),message.getMessageOrder() != null);
 						}
 						else
@@ -104,7 +104,7 @@ public class EbMSMessageServiceImpl implements EbMSMessageService
 							EbMSMessageContext lastMessage = ebMSDAO.getLastSentMessage(message.getMessageHeader().getCPAId(),message.getMessageHeader().getConversationId());
 							if (BigInteger.ZERO.equals(message.getMessageOrder().getSequenceNumber().getValue()) || (lastMessage != null && EbMSMessageStatus.DELIVERED.equals(lastMessage.getMessageStatus())))
 							{
-								ebMSDAO.insertMessage(new Date(),message,EbMSMessageStatus.SENT);
+								ebMSDAO.insertMessage(new Date(),message,EbMSMessageStatus.SENDING);
 								eventManager.createEvent(message.getMessageHeader().getCPAId(),cpaManager.getReceiveDeliveryChannel(message.getMessageHeader().getCPAId(),new CacheablePartyId(message.getMessageHeader().getTo().getPartyId()),message.getMessageHeader().getTo().getRole(),CPAUtils.toString(message.getMessageHeader().getService()),message.getMessageHeader().getAction()),message.getMessageHeader().getMessageData().getMessageId(),message.getMessageHeader().getMessageData().getTimeToLive(),message.getMessageHeader().getMessageData().getTimestamp(),cpaManager.isConfidential(message.getMessageHeader().getCPAId(),new CacheablePartyId(message.getMessageHeader().getFrom().getPartyId()),message.getMessageHeader().getFrom().getRole(),CPAUtils.toString(message.getMessageHeader().getService()),message.getMessageHeader().getAction()),message.getMessageOrder() != null);
 							}
 							else

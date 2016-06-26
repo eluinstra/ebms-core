@@ -638,7 +638,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 				" from ebms_message" +
 				" where message_id = ?" +
 				" and message_nr = 0" +
-				" and (status is null or status = " + EbMSMessageStatus.SENT.id() + ")",
+				" and (status is null or status = " + EbMSMessageStatus.SENDING.id() + ")",
 				String.class,
 				messageId
 			);

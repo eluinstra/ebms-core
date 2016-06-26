@@ -101,7 +101,7 @@ public class EbMSEventProcessor implements InitializingBean, Job
 							eventManager.updateEvent(event,url_,EbMSEventStatus.FAILED,e.getMessage());
 							if (e instanceof EbMSResponseSOAPException && EbMSResponseSOAPException.CLIENT.equals(((EbMSResponseSOAPException)e).getFaultCode()))
 							{
-								if (ebMSDAO.updateMessage(event.getMessageId(),EbMSMessageStatus.SENT,EbMSMessageStatus.DELIVERY_FAILED) > 0)
+								if (ebMSDAO.updateMessage(event.getMessageId(),EbMSMessageStatus.SENDING,EbMSMessageStatus.DELIVERY_FAILED) > 0)
 									eventListener.onMessageFailed(event.getMessageId());
 							}
 						}
@@ -129,7 +129,7 @@ public class EbMSEventProcessor implements InitializingBean, Job
 							if (requestDocument != null)
 							{
 								eventManager.updateEvent(event,null,EbMSEventStatus.SUCCEEDED);
-								if (ebMSDAO.updateMessage(event.getMessageId(),EbMSMessageStatus.SENT,EbMSMessageStatus.EXPIRED) > 0)
+								if (ebMSDAO.updateMessage(event.getMessageId(),EbMSMessageStatus.SENDING,EbMSMessageStatus.EXPIRED) > 0)
 									eventListener.onMessageExpired(event.getMessageId());
 							}
 							else
