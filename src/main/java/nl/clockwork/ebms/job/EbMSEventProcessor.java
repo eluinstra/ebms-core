@@ -115,7 +115,7 @@ public class EbMSEventProcessor implements InitializingBean, Job
 										if (event.isOrdered())
 										{
 											EbMSMessageContext context = ebMSDAO.getMessageContext(event.getMessageId());
-											if (context != null && EbMSMessageStatus.RECEIVED.equals(context.getMessageStatus()))
+											if (context != null && (EbMSMessageStatus.RECEIVED.equals(context.getMessageStatus()) || EbMSMessageStatus.PROCESSED.equals(context.getMessageStatus())))
 											{
 												EbMSMessageContext nextMessage = ebMSDAO.getNextOrderedMessageContext(context.getMessageId());
 												if (nextMessage != null)
@@ -202,7 +202,7 @@ public class EbMSEventProcessor implements InitializingBean, Job
 													if (event.isOrdered())
 													{
 														EbMSMessageContext context = ebMSDAO.getMessageContext(event.getMessageId());
-														if (context != null && EbMSMessageStatus.RECEIVED.equals(context.getMessageStatus()))
+														if (context != null && (EbMSMessageStatus.RECEIVED.equals(context.getMessageStatus()) || EbMSMessageStatus.PROCESSED.equals(context.getMessageStatus())))
 														{
 															EbMSMessageContext nextMessage = ebMSDAO.getNextOrderedMessageContext(context.getMessageId());
 															if (nextMessage != null)
