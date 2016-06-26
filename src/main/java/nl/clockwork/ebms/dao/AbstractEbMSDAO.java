@@ -524,7 +524,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 			return result.queryForObject(
 				EbMSMessageContextRowMapper.getSelectStatement() +
 				" from " +
-					"(select *, row_number() over (partition by conversation_id order by sequence_nr desc, time_stamp asc) as rn" +
+					"(select *, row_number() over (order by sequence_nr desc, time_stamp asc) as rn" +
 					" from ebms_message" +
 					" where cpa_id = ?" +
 					" and conversation_id = ?" +
