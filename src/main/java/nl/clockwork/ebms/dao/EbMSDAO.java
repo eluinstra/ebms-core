@@ -50,6 +50,7 @@ public interface EbMSDAO
 
 	boolean existsMessage(String messageId) throws DAOException;
 	boolean existsIdenticalMessage(EbMSMessage message) throws DAOException;
+	boolean isReadyToSentMessage(String messageId);
 	EbMSMessageContent getMessageContent(String messageId) throws DAOException;
 	EbMSMessageContent getNextOrderedMessage(String messageId);
 	EbMSMessageContext getMessageContext(String messageId) throws DAOException;

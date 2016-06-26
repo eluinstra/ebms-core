@@ -434,6 +434,32 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	}
 
 	@Override
+	public boolean isReadyToSentMessage(String messageId)
+	{
+		try
+		{
+			return jdbcTemplate.queryForInt(
+				"select count(message_id)" +
+				" from ebms_message" +
+				" inner join" +
+				" (select cpa_id, conversation_id, sequence_nr as max_sequence_nr from ebms_message where status = " + EbMSMessageStatus.DELIVERED.id() + ") last_message" + 
+				//" (select cpa_id, conversation_id, max(sequence_nr) as max_sequence_nr from ebms_message where status = " + EbMSMessageStatus.DELIVERED.id() + " and sequence_nr is not null group by cpa_id, conversation_id) last_message" + 
+				" on ebms_message.cpa_id = last_message.cpa_id" +
+				" and ebms_message.conversation_id = last_message.conversation_id" +
+				" and ebms_message.sequence_nr = last_message.max_sequence_nr + 1" +
+				" and message_id = ?" +
+				" and message_nr = 0" +
+				" and status = " + EbMSMessageStatus.PENDING.id(),
+				messageId
+			) > 0;
+		}
+		catch (DataAccessException e)
+		{
+			throw new DAOException(e);
+		}
+	}
+
+	@Override
 	public EbMSMessageContent getMessageContent(String messageId) throws DAOException
 	{
 		try

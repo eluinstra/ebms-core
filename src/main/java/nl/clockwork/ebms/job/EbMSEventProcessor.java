@@ -23,6 +23,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import nl.clockwork.ebms.Constants;
 import nl.clockwork.ebms.Constants.EbMSEventStatus;
 import nl.clockwork.ebms.Constants.EbMSMessageStatus;
 import nl.clockwork.ebms.client.EbMSClient;
@@ -36,6 +37,7 @@ import nl.clockwork.ebms.encryption.EbMSMessageEncrypter;
 import nl.clockwork.ebms.event.EventListener;
 import nl.clockwork.ebms.model.EbMSDocument;
 import nl.clockwork.ebms.model.EbMSEvent;
+import nl.clockwork.ebms.model.EbMSMessageContext;
 import nl.clockwork.ebms.processor.EbMSMessageProcessor;
 import nl.clockwork.ebms.util.CPAUtils;
 
@@ -86,7 +88,21 @@ public class EbMSEventProcessor implements InitializingBean, Job
 					eventManager.updateEvent(event,url,EbMSEventStatus.SUCCEEDED);
 				}
 				else
-					eventManager.deleteEvent(event);
+				{
+					if (Constants.ENABLE_HARDENED_ORDERING)
+					{
+						EbMSMessageContext context = ebMSDAO.getMessageContext(event.getMessageId());
+						if (context != null && EbMSMessageStatus.PENDING.equals(context.getMessageStatus()))
+						{
+							if (ebMSDAO.isReadyToSentMessage(event.getMessageId()))
+								ebMSDAO.updateMessage(context.getMessageId(),EbMSMessageStatus.PENDING,EbMSMessageStatus.SENDING);
+						}
+						else
+							eventManager.deleteEvent(event);
+					}
+					else
+						eventManager.deleteEvent(event);
+				}
 			}
 			catch (final EbMSResponseException e)
 			{
@@ -133,7 +149,22 @@ public class EbMSEventProcessor implements InitializingBean, Job
 									eventListener.onMessageExpired(event.getMessageId());
 							}
 							else
-								eventManager.deleteEvent(event);
+							{
+								if (Constants.ENABLE_HARDENED_ORDERING)
+								{
+									EbMSMessageContext context = ebMSDAO.getMessageContext(event.getMessageId());
+									if (context != null && EbMSMessageStatus.PENDING.equals(context.getMessageStatus()))
+									{
+										eventManager.updateEvent(event,null,EbMSEventStatus.SUCCEEDED);
+										if (ebMSDAO.updateMessage(event.getMessageId(),EbMSMessageStatus.PENDING,EbMSMessageStatus.EXPIRED) > 0)
+											eventListener.onMessageExpired(event.getMessageId());
+									}
+									else
+										eventManager.deleteEvent(event);
+								}
+								else
+									eventManager.deleteEvent(event);
+							}
 						}
 					}
 				);
