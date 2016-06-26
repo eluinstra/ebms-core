@@ -772,11 +772,11 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	}
 
 	@Override
-	public void updateMessage(String messageId, EbMSMessageStatus oldStatus, EbMSMessageStatus newStatus) throws DAOException
+	public int updateMessage(String messageId, EbMSMessageStatus oldStatus, EbMSMessageStatus newStatus) throws DAOException
 	{
 		try
 		{
-			jdbcTemplate.update
+			return jdbcTemplate.update
 			(
 				"update ebms_message" +
 				" set status = ?," +

@@ -219,8 +219,8 @@ public class EbMSMessageProcessorX extends EbMSMessageProcessor
 						@Override
 						public void doInTransaction()
 						{
-							ebMSDAO.updateMessage(requestMessage.getMessageHeader().getMessageData().getMessageId(),EbMSMessageStatus.SENT,EbMSMessageStatus.DELIVERED);
-							eventListener.onMessageAcknowledged(requestMessage.getMessageHeader().getMessageData().getMessageId());
+							if (ebMSDAO.updateMessage(requestMessage.getMessageHeader().getMessageData().getMessageId(),EbMSMessageStatus.SENT,EbMSMessageStatus.DELIVERED) > 0)
+								eventListener.onMessageAcknowledged(requestMessage.getMessageHeader().getMessageData().getMessageId());
 						}
 					}
 				);
@@ -277,8 +277,8 @@ public class EbMSMessageProcessorX extends EbMSMessageProcessor
 						public void doInTransaction()
 						{
 							ebMSDAO.insertMessage(timestamp,responseMessage,null);
-							ebMSDAO.updateMessage(responseMessage.getMessageHeader().getMessageData().getRefToMessageId(),EbMSMessageStatus.SENT,EbMSMessageStatus.DELIVERY_FAILED);
-							eventListener.onMessageFailed(responseMessage.getMessageHeader().getMessageData().getRefToMessageId());
+							if (ebMSDAO.updateMessage(responseMessage.getMessageHeader().getMessageData().getRefToMessageId(),EbMSMessageStatus.SENT,EbMSMessageStatus.DELIVERY_FAILED) > 0)
+								eventListener.onMessageFailed(responseMessage.getMessageHeader().getMessageData().getRefToMessageId());
 						}
 					}
 				);
@@ -309,8 +309,8 @@ public class EbMSMessageProcessorX extends EbMSMessageProcessor
 						public void doInTransaction()
 						{
 							ebMSDAO.insertMessage(timestamp,responseMessage,null);
-							ebMSDAO.updateMessage(responseMessage.getMessageHeader().getMessageData().getRefToMessageId(),EbMSMessageStatus.SENT,EbMSMessageStatus.DELIVERED);
-							eventListener.onMessageAcknowledged(responseMessage.getMessageHeader().getMessageData().getRefToMessageId());
+							if (ebMSDAO.updateMessage(responseMessage.getMessageHeader().getMessageData().getRefToMessageId(),EbMSMessageStatus.SENT,EbMSMessageStatus.DELIVERED) > 0)
+								eventListener.onMessageAcknowledged(responseMessage.getMessageHeader().getMessageData().getRefToMessageId());
 						}
 					}
 				);

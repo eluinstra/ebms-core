@@ -58,7 +58,7 @@ public interface EbMSDAO
 
 	void insertMessage(Date timestamp, EbMSMessage message, EbMSMessageStatus status) throws DAOException;
 	void insertDuplicateMessage(Date timestamp, EbMSMessage message) throws DAOException;
-	void updateMessage(String messageId, EbMSMessageStatus oldStatus, EbMSMessageStatus newStatus) throws DAOException;
+	int updateMessage(String messageId, EbMSMessageStatus oldStatus, EbMSMessageStatus newStatus) throws DAOException;
 	void updateMessages(List<String> messageIds, EbMSMessageStatus oldStatus, EbMSMessageStatus newStatus) throws DAOException;
 
 	List<EbMSEvent> getEventsBefore(Date timestamp) throws DAOException;
