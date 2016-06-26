@@ -18,13 +18,10 @@ package nl.clockwork.ebms.job;
 import java.util.Date;
 
 import nl.clockwork.ebms.Constants.EbMSEventStatus;
-import nl.clockwork.ebms.Constants.EbMSMessageStatus;
 import nl.clockwork.ebms.common.CPAManager;
 import nl.clockwork.ebms.dao.DAOTransactionCallback;
 import nl.clockwork.ebms.dao.EbMSDAO;
-import nl.clockwork.ebms.model.CacheablePartyId;
 import nl.clockwork.ebms.model.EbMSEvent;
-import nl.clockwork.ebms.model.EbMSMessageContext;
 import nl.clockwork.ebms.util.CPAUtils;
 
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DeliveryChannel;
@@ -52,7 +49,7 @@ public class EventManager
 				public void doInTransaction()
 				{
 					ebMSDAO.insertEventLog(event.getMessageId(),event.getTimestamp(),url,status,null);
-					deleteEvent(event);
+					ebMSDAO.deleteEvent(event.getMessageId());
 				}
 			}
 		);
@@ -71,7 +68,7 @@ public class EventManager
 					if (event.getTimeToLive() != null && CPAUtils.isReliableMessaging(deliveryChannel))
 						ebMSDAO.updateEvent(createNewEvent(event,deliveryChannel));
 					else
-						deleteEvent(event);
+						ebMSDAO.deleteEvent(event.getMessageId());
 				}
 			}
 		);
@@ -79,23 +76,7 @@ public class EventManager
 
 	public void deleteEvent(final EbMSEvent event)
 	{
-		ebMSDAO.executeTransaction(
-			new DAOTransactionCallback()
-			{
-				@Override
-				public void doInTransaction()
-				{
-					ebMSDAO.deleteEvent(event.getMessageId());
-					if (event.isOrdered())
-					{
-						EbMSMessageContext context = ebMSDAO.getNextOrderedMessage(event.getMessageId());
-						if (context != null)
-							if (ebMSDAO.updateMessage(context.getMessageId(),EbMSMessageStatus.PENDING,EbMSMessageStatus.SENT) > 0)
-								createEvent(context.getCpaId(),cpaManager.getReceiveDeliveryChannel(context.getCpaId(),new CacheablePartyId(context.getToRole().getPartyId()),context.getToRole().getRole(),context.getService(),context.getAction()),context.getMessageId(),context.getTimeToLive(),context.getTimestamp(),cpaManager.isConfidential(context.getCpaId(),new CacheablePartyId(context.getFromRole().getPartyId()),context.getFromRole().getRole(),context.getService(),context.getAction()),context.getSequenceNr() != null);
-					}
-				}
-			}
-		);
+		ebMSDAO.deleteEvent(event.getMessageId());
 	}
 
 	private EbMSEvent createNewEvent(EbMSEvent event, DeliveryChannel deliveryChannel)

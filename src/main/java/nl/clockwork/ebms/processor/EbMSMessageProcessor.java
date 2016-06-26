@@ -266,7 +266,16 @@ public class EbMSMessageProcessor
 					{
 						ebMSDAO.insertMessage(timestamp,responseMessage,null);
 						if (ebMSDAO.updateMessage(responseMessage.getMessageHeader().getMessageData().getRefToMessageId(),EbMSMessageStatus.SENT,EbMSMessageStatus.DELIVERED) > 0)
+						{
 							eventListener.onMessageAcknowledged(responseMessage.getMessageHeader().getMessageData().getRefToMessageId());
+							if (requestMessage.getMessageOrder() != null)
+							{
+								EbMSMessageContext nextMessage = ebMSDAO.getNextOrderedMessage(requestMessage.getMessageHeader().getMessageData().getMessageId());
+								if (nextMessage != null)
+									if (ebMSDAO.updateMessage(nextMessage.getMessageId(),EbMSMessageStatus.PENDING,EbMSMessageStatus.SENT) > 0)
+										eventManager.createEvent(nextMessage.getCpaId(),cpaManager.getReceiveDeliveryChannel(nextMessage.getCpaId(),new CacheablePartyId(nextMessage.getToRole().getPartyId()),nextMessage.getToRole().getRole(),nextMessage.getService(),nextMessage.getAction()),nextMessage.getMessageId(),nextMessage.getTimeToLive(),nextMessage.getTimestamp(),cpaManager.isConfidential(nextMessage.getCpaId(),new CacheablePartyId(nextMessage.getFromRole().getPartyId()),nextMessage.getFromRole().getRole(),nextMessage.getService(),nextMessage.getAction()),nextMessage.getSequenceNr() != null);
+							}
+						}
 					}
 				}
 			);
