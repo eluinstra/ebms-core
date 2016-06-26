@@ -39,17 +39,7 @@ public class EventManager
 
 	public void updateEvent(final EbMSEvent event, final String url, final EbMSEventStatus status)
 	{
-		ebMSDAO.executeTransaction(
-			new DAOTransactionCallback()
-			{
-				@Override
-				public void doInTransaction()
-				{
-					ebMSDAO.insertEventLog(event.getMessageId(),event.getTimestamp(),url,status,null);
-					ebMSDAO.deleteEvent(event.getMessageId());
-				}
-			}
-		);
+		updateEvent(event,url,status,null);
 	}
 
 	public void updateEvent(final EbMSEvent event, final String url, final EbMSEventStatus status, final String errorMessage)
