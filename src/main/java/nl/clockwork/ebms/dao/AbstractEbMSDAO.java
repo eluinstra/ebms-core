@@ -524,7 +524,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 			return result.queryForObject(
 				EbMSMessageContextRowMapper.getSelectStatement() +
 				" from " +
-					"(select *, row_number() over (order by sequence_nr desc, timestamp asc) as rn" +
+					"(select *, row_number() over (partition by conversation_id order by sequence_nr desc, time_stamp asc) as rn" +
 					" from ebms_message" +
 					" where cpa_id = ?" +
 					" and conversation_id = ?" +
@@ -584,9 +584,10 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 			return jdbcTemplate.queryForObject(
 				EbMSMessageContextRowMapper.getBaseQuery() +
 				" inner join" +
-				" (select cpa_id, conversation_id, sequence_nr from ebms_message where message_id = ? and message_nr = 0) last_message" + 
+				" (select cpa_id, conversation_id, message_nr, sequence_nr from ebms_message where message_id = ? and message_nr = 0) last_message" + 
 				" on ebms_message.cpa_id = last_message.cpa_id" +
 				" and ebms_message.conversation_id = last_message.conversation_id" +
+				" and ebms_message.message_nr = last_message.message_nr" +
 				" and ebms_message.sequence_nr = last_message.sequence_nr + 1",
 				new EbMSMessageContextRowMapper(),
 				messageId

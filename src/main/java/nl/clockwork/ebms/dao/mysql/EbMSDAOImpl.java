@@ -69,7 +69,7 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 				" and conversation_id = ?" +
 				" and message_nr = 0" +
 				" and status < 10" +
-				" order by sequence_nr desc, timestamp asc" +
+				" order by sequence_nr desc, time_stamp asc" +
 				" limit 1",
 				new EbMSMessageContextRowMapper(),
 				cpaId,

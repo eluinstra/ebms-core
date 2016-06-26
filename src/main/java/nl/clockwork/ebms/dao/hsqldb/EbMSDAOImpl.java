@@ -17,7 +17,11 @@ package nl.clockwork.ebms.dao.hsqldb;
 
 import nl.clockwork.ebms.Constants.EbMSMessageStatus;
 import nl.clockwork.ebms.dao.AbstractEbMSDAO;
+import nl.clockwork.ebms.dao.DAOException;
+import nl.clockwork.ebms.model.EbMSMessageContext;
 
+import org.springframework.dao.DataAccessException;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.transaction.support.TransactionTemplate;
 
@@ -26,6 +30,35 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 	public EbMSDAOImpl(TransactionTemplate transactionTemplate, JdbcTemplate jdbcTemplate)
 	{
 		super(transactionTemplate,jdbcTemplate);
+	}
+
+	@Override
+	public EbMSMessageContext getLastReceivedMessage(String cpaId, String conversationId) throws DAOException
+	{
+		try
+		{
+			JdbcTemplate result = jdbcTemplate;
+			return result.queryForObject(
+				EbMSMessageContextRowMapper.getBaseQuery() +
+				" where cpa_id = ?" +
+				" and conversation_id = ?" +
+				" and message_nr = 0" +
+				" and status < 10" +
+				" order by sequence_nr desc, time_stamp asc" +
+				" limit 1",
+				new EbMSMessageContextRowMapper(),
+				cpaId,
+				conversationId
+			);
+		}
+		catch(EmptyResultDataAccessException e)
+		{
+			return null;
+		}
+		catch (DataAccessException e)
+		{
+			throw new DAOException(e);
+		}
 	}
 
 	@Override
