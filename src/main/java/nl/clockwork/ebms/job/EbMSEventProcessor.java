@@ -23,7 +23,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import nl.clockwork.ebms.Constants;
 import nl.clockwork.ebms.Constants.EbMSEventStatus;
 import nl.clockwork.ebms.Constants.EbMSMessageStatus;
 import nl.clockwork.ebms.client.EbMSClient;
@@ -89,46 +88,7 @@ public class EbMSEventProcessor implements InitializingBean, Job
 					eventManager.updateEvent(event,url,EbMSEventStatus.SUCCEEDED);
 				}
 				else
-				{
-					if (Constants.ENABLE_HARDENED_ORDERING)
-					{
-						EbMSMessageContext context = ebMSDAO.getMessageContext(event.getMessageId());
-						if (context != null && EbMSMessageStatus.PENDING.equals(context.getMessageStatus()))
-						{
-							if (ebMSDAO.isReadyToSentMessage(event.getMessageId()))
-								ebMSDAO.updateMessage(context.getMessageId(),EbMSMessageStatus.PENDING,EbMSMessageStatus.SENDING);
-						}
-						else
-							eventManager.deleteEvent(event);
-					}
-					else
-					{
-						ebMSDAO.executeTransaction(
-							new DAOTransactionCallback()
-							{
-								@Override
-								public void doInTransaction()
-								{
-									eventManager.deleteEvent(event);
-									if (!Constants.ENABLE_HARDENED_ORDERING)
-									{
-										if (event.isOrdered())
-										{
-											EbMSMessageContext context = ebMSDAO.getMessageContext(event.getMessageId());
-											if (context != null && (EbMSMessageStatus.RECEIVED.equals(context.getMessageStatus()) || EbMSMessageStatus.PROCESSED.equals(context.getMessageStatus())))
-											{
-												EbMSMessageContext nextMessage = ebMSDAO.getNextOrderedMessageContext(context.getMessageId());
-												if (nextMessage != null)
-													if (ebMSDAO.updateMessage(nextMessage.getMessageId(),EbMSMessageStatus.PENDING,EbMSMessageStatus.SENDING) > 0)
-														eventManager.createEvent(nextMessage.getCpaId(),cpaManager.getReceiveDeliveryChannel(nextMessage.getCpaId(),new CacheablePartyId(nextMessage.getToRole().getPartyId()),nextMessage.getToRole().getRole(),nextMessage.getService(),nextMessage.getAction()),nextMessage.getMessageId(),nextMessage.getTimeToLive(),nextMessage.getTimestamp(),cpaManager.isConfidential(nextMessage.getCpaId(),new CacheablePartyId(nextMessage.getFromRole().getPartyId()),nextMessage.getFromRole().getRole(),nextMessage.getService(),nextMessage.getAction()),nextMessage.getSequenceNr() != null);
-											}
-										}
-									}
-								}
-							}
-						);
-					}
-				}
+					delete(event);
 			}
 			catch (final EbMSResponseException e)
 			{
@@ -175,47 +135,7 @@ public class EbMSEventProcessor implements InitializingBean, Job
 									eventListener.onMessageExpired(event.getMessageId());
 							}
 							else
-							{
-								if (Constants.ENABLE_HARDENED_ORDERING)
-								{
-									EbMSMessageContext context = ebMSDAO.getMessageContext(event.getMessageId());
-									if (context != null && EbMSMessageStatus.PENDING.equals(context.getMessageStatus()))
-									{
-										eventManager.updateEvent(event,null,EbMSEventStatus.SUCCEEDED);
-										if (ebMSDAO.updateMessage(event.getMessageId(),EbMSMessageStatus.PENDING,EbMSMessageStatus.EXPIRED) > 0)
-											eventListener.onMessageExpired(event.getMessageId());
-									}
-									else
-										eventManager.deleteEvent(event);
-								}
-								else
-								{
-									ebMSDAO.executeTransaction(
-										new DAOTransactionCallback()
-										{
-											@Override
-											public void doInTransaction()
-											{
-												eventManager.deleteEvent(event);
-												if (!Constants.ENABLE_HARDENED_ORDERING)
-												{
-													if (event.isOrdered())
-													{
-														EbMSMessageContext context = ebMSDAO.getMessageContext(event.getMessageId());
-														if (context != null && (EbMSMessageStatus.RECEIVED.equals(context.getMessageStatus()) || EbMSMessageStatus.PROCESSED.equals(context.getMessageStatus())))
-														{
-															EbMSMessageContext nextMessage = ebMSDAO.getNextOrderedMessageContext(context.getMessageId());
-															if (nextMessage != null)
-																if (ebMSDAO.updateMessage(nextMessage.getMessageId(),EbMSMessageStatus.PENDING,EbMSMessageStatus.SENDING) > 0)
-																	eventManager.createEvent(nextMessage.getCpaId(),cpaManager.getReceiveDeliveryChannel(nextMessage.getCpaId(),new CacheablePartyId(nextMessage.getToRole().getPartyId()),nextMessage.getToRole().getRole(),nextMessage.getService(),nextMessage.getAction()),nextMessage.getMessageId(),nextMessage.getTimeToLive(),nextMessage.getTimestamp(),cpaManager.isConfidential(nextMessage.getCpaId(),new CacheablePartyId(nextMessage.getFromRole().getPartyId()),nextMessage.getFromRole().getRole(),nextMessage.getService(),nextMessage.getAction()),nextMessage.getSequenceNr() != null);
-														}
-													}
-												}
-											}
-										}
-									);
-								}
-							}
+								delete(event);
 						}
 					}
 				);
@@ -224,6 +144,31 @@ public class EbMSEventProcessor implements InitializingBean, Job
 			{
 				logger.error("",e);
 			}
+		}
+
+		private void delete(final EbMSEvent event)
+		{
+			ebMSDAO.executeTransaction(
+				new DAOTransactionCallback()
+				{
+					@Override
+					public void doInTransaction()
+					{
+						eventManager.deleteEvent(event);
+						if (event.isOrdered())
+						{
+							EbMSMessageContext context = ebMSDAO.getMessageContext(event.getMessageId());
+							if (context != null && (EbMSMessageStatus.RECEIVED.equals(context.getMessageStatus()) || EbMSMessageStatus.PROCESSED.equals(context.getMessageStatus())))
+							{
+								EbMSMessageContext nextMessage = ebMSDAO.getNextOrderedMessageContext(context.getMessageId());
+								if (nextMessage != null)
+									if (ebMSDAO.updateMessage(nextMessage.getMessageId(),EbMSMessageStatus.PENDING,EbMSMessageStatus.SENDING) > 0)
+										eventManager.createEvent(nextMessage.getCpaId(),cpaManager.getReceiveDeliveryChannel(nextMessage.getCpaId(),new CacheablePartyId(nextMessage.getToRole().getPartyId()),nextMessage.getToRole().getRole(),nextMessage.getService(),nextMessage.getAction()),nextMessage.getMessageId(),nextMessage.getTimeToLive(),nextMessage.getTimestamp(),cpaManager.isConfidential(nextMessage.getCpaId(),new CacheablePartyId(nextMessage.getFromRole().getPartyId()),nextMessage.getFromRole().getRole(),nextMessage.getService(),nextMessage.getAction()),nextMessage.getSequenceNr() != null);
+							}
+						}
+					}
+				}
+			);
 		}
 
 	}
