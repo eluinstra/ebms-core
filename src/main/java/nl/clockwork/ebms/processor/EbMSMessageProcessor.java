@@ -207,8 +207,11 @@ public class EbMSMessageProcessor
 						@Override
 						public void doInTransaction()
 						{
-							ebMSDAO.updateMessage(requestMessage.getMessageHeader().getMessageData().getMessageId(),EbMSMessageStatus.SENDING,EbMSMessageStatus.DELIVERED);
-							eventListener.onMessageAcknowledged(requestMessage.getMessageHeader().getMessageData().getMessageId());
+							if (ebMSDAO.updateMessage(requestMessage.getMessageHeader().getMessageData().getMessageId(),EbMSMessageStatus.SENDING,EbMSMessageStatus.DELIVERED) > 0)
+							{
+								eventListener.onMessageAcknowledged(requestMessage.getMessageHeader().getMessageData().getMessageId());
+								//ebMSDAO.deleteEvent(requestMessage.getMessageHeader().getMessageData().getMessageId());
+							}
 						}
 					}
 				);
@@ -236,8 +239,11 @@ public class EbMSMessageProcessor
 					public void doInTransaction()
 					{
 						ebMSDAO.insertMessage(timestamp,responseMessage,null);
-						ebMSDAO.updateMessage(responseMessage.getMessageHeader().getMessageData().getRefToMessageId(),EbMSMessageStatus.SENDING,EbMSMessageStatus.DELIVERY_FAILED);
-						eventListener.onMessageFailed(responseMessage.getMessageHeader().getMessageData().getRefToMessageId());
+						if (ebMSDAO.updateMessage(responseMessage.getMessageHeader().getMessageData().getRefToMessageId(),EbMSMessageStatus.SENDING,EbMSMessageStatus.DELIVERY_FAILED) > 0)
+						{
+							eventListener.onMessageFailed(responseMessage.getMessageHeader().getMessageData().getRefToMessageId());
+							//ebMSDAO.deleteEvent(requestMessage.getMessageHeader().getMessageData().getMessageId());
+						}
 					}
 				}
 			);
@@ -269,13 +275,20 @@ public class EbMSMessageProcessor
 						{
 							eventListener.onMessageAcknowledged(responseMessage.getMessageHeader().getMessageData().getRefToMessageId());
 							if (!Constants.ENABLE_HARDENED_ORDERING)
+							{
 								if (requestMessage.getMessageOrder() != null)
 								{
 									EbMSMessageContext nextMessage = ebMSDAO.getNextOrderedMessageContext(requestMessage.getMessageHeader().getMessageData().getMessageId());
 									if (nextMessage != null)
+									{
 										if (ebMSDAO.updateMessage(nextMessage.getMessageId(),EbMSMessageStatus.PENDING,EbMSMessageStatus.SENDING) > 0)
 											eventManager.createEvent(nextMessage.getCpaId(),cpaManager.getReceiveDeliveryChannel(nextMessage.getCpaId(),new CacheablePartyId(nextMessage.getToRole().getPartyId()),nextMessage.getToRole().getRole(),nextMessage.getService(),nextMessage.getAction()),nextMessage.getMessageId(),nextMessage.getTimeToLive(),nextMessage.getTimestamp(),cpaManager.isConfidential(nextMessage.getCpaId(),new CacheablePartyId(nextMessage.getFromRole().getPartyId()),nextMessage.getFromRole().getRole(),nextMessage.getService(),nextMessage.getAction()),nextMessage.getSequenceNr() != null);
+									}
+									//else
+										//return;
 								}
+							}
+							//ebMSDAO.deleteEvent(requestMessage.getMessageHeader().getMessageData().getMessageId());
 						}
 					}
 				}
