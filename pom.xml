@@ -6,7 +6,7 @@
 	<artifactId>ebms-adapter-web</artifactId>
 	<packaging>war</packaging>
 	<name>EbMS Web Application</name>
-	<version>2.11.9</version>
+	<version>2.11.10</version>
 	<description></description>
 	<url>https://sourceforge.net/projects/muleebmsadapter/</url>
 	<issueManagement>
@@ -75,7 +75,7 @@
 		<dependency>
 			<groupId>nl.clockwork.ebms</groupId>
 			<artifactId>ebms-core</artifactId>
-			<version>2.11.9</version>
+			<version>2.11.10</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.cxf</groupId>
