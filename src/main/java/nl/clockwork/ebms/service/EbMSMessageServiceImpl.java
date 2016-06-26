@@ -100,7 +100,7 @@ public class EbMSMessageServiceImpl implements InitializingBean, EbMSMessageServ
 					@Override
 					public void doInTransaction()
 					{
-						ebMSDAO.insertMessage(new Date(),message,EbMSMessageStatus.SENT);
+						ebMSDAO.insertMessage(new Date(),message,EbMSMessageStatus.SENDING);
 						eventManager.createEvent(message.getMessageHeader().getCPAId(),cpaManager.getReceiveDeliveryChannel(message.getMessageHeader().getCPAId(),new CacheablePartyId(message.getMessageHeader().getTo().getPartyId()),message.getMessageHeader().getTo().getRole(),CPAUtils.toString(message.getMessageHeader().getService()),message.getMessageHeader().getAction()),message.getMessageHeader().getMessageData().getMessageId(),message.getMessageHeader().getMessageData().getTimeToLive(),message.getMessageHeader().getMessageData().getTimestamp(),cpaManager.isConfidential(message.getMessageHeader().getCPAId(),new CacheablePartyId(message.getMessageHeader().getFrom().getPartyId()),message.getMessageHeader().getFrom().getRole(),CPAUtils.toString(message.getMessageHeader().getService()),message.getMessageHeader().getAction()));
 					}
 				}

@@ -207,7 +207,7 @@ public class EbMSMessageProcessor
 						@Override
 						public void doInTransaction()
 						{
-							if (ebMSDAO.updateMessage(requestMessage.getMessageHeader().getMessageData().getMessageId(),EbMSMessageStatus.SENT,EbMSMessageStatus.DELIVERED) > 0)
+							if (ebMSDAO.updateMessage(requestMessage.getMessageHeader().getMessageData().getMessageId(),EbMSMessageStatus.SENDING,EbMSMessageStatus.DELIVERED) > 0)
 								eventListener.onMessageAcknowledged(requestMessage.getMessageHeader().getMessageData().getMessageId());
 						}
 					}
@@ -236,7 +236,7 @@ public class EbMSMessageProcessor
 					public void doInTransaction()
 					{
 						ebMSDAO.insertMessage(timestamp,responseMessage,null);
-						if (ebMSDAO.updateMessage(responseMessage.getMessageHeader().getMessageData().getRefToMessageId(),EbMSMessageStatus.SENT,EbMSMessageStatus.DELIVERY_FAILED) > 0)
+						if (ebMSDAO.updateMessage(responseMessage.getMessageHeader().getMessageData().getRefToMessageId(),EbMSMessageStatus.SENDING,EbMSMessageStatus.DELIVERY_FAILED) > 0)
 							eventListener.onMessageFailed(responseMessage.getMessageHeader().getMessageData().getRefToMessageId());
 					}
 				}
@@ -265,7 +265,7 @@ public class EbMSMessageProcessor
 					public void doInTransaction()
 					{
 						ebMSDAO.insertMessage(timestamp,responseMessage,null);
-						if (ebMSDAO.updateMessage(responseMessage.getMessageHeader().getMessageData().getRefToMessageId(),EbMSMessageStatus.SENT,EbMSMessageStatus.DELIVERED) > 0)
+						if (ebMSDAO.updateMessage(responseMessage.getMessageHeader().getMessageData().getRefToMessageId(),EbMSMessageStatus.SENDING,EbMSMessageStatus.DELIVERED) > 0)
 							eventListener.onMessageAcknowledged(responseMessage.getMessageHeader().getMessageData().getRefToMessageId());
 					}
 				}
