@@ -122,6 +122,28 @@ public class EbMSMessageServiceImpl implements EbMSMessageService
 	}
 
 	@Override
+	public String resetMessage(String messageId) throws EbMSMessageServiceException
+	{
+		EbMSMessageContent messageContent = ebMSDAO.getMessageContent(messageId);
+		if (messageContent.getContext().getSequenceNr() != null)
+			if (EbMSMessageStatus.DELIVERY_FAILED.equals(messageContent.getContext().getMessageStatus()) || EbMSMessageStatus.EXPIRED.equals(messageContent.getContext().getMessageStatus()))
+			{
+				messageContent.getContext().reset();
+				String result = sendMessage(messageContent);
+				while ((messageContent = ebMSDAO.getNextOrderedMessage(messageId)) != null)
+				{
+					messageContent.getContext().reset();
+					sendMessage(messageContent);
+				}
+				return result;
+			}
+			else
+				throw new EbMSMessageServiceException("Message delivery did not fail!");
+		else
+			throw new EbMSMessageServiceException("Message not ordered!");
+	}
+
+	@Override
 	public List<String> getMessageIds(EbMSMessageContext messageContext, Integer maxNr) throws EbMSMessageServiceException
 	{
 		try

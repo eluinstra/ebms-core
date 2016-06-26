@@ -25,7 +25,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import javax.activation.DataSource;
 import javax.mail.util.ByteArrayDataSource;
 import javax.xml.bind.JAXBException;
 import javax.xml.parsers.ParserConfigurationException;
@@ -442,13 +441,25 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 			EbMSMessageContext messageContext = getMessageContext(messageId);
 			if (messageContext == null)
 				return null;
-			List<EbMSAttachment> attachments = getAttachments(messageId);
-			List<EbMSDataSource> dataSources = new ArrayList<EbMSDataSource>();
-			for (DataSource dataSource : attachments)
-				dataSources.add(new EbMSDataSource(dataSource.getName(),dataSource.getContentType(),IOUtils.toByteArray(dataSource.getInputStream())));
-			return new EbMSMessageContent(messageContext,dataSources);
+			return new EbMSMessageContent(messageContext,getDataSources(messageId));
 		}
-		catch (DataAccessException | IOException e)
+		catch (DataAccessException e)
+		{
+			throw new DAOException(e);
+		}
+	}
+
+	@Override
+	public EbMSMessageContent getNextOrderedMessage(String messageId)
+	{
+		try
+		{
+			EbMSMessageContext messageContext = getNextOrderedMessageContext(messageId);
+			if (messageContext == null)
+				return null;
+			return new EbMSMessageContent(messageContext,getDataSources(messageId));
+		}
+		catch (DataAccessException e)
 		{
 			throw new DAOException(e);
 		}
@@ -566,7 +577,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	}
 
 	@Override
-	public EbMSMessageContext getNextOrderedMessage(String messageId)
+	public EbMSMessageContext getNextOrderedMessageContext(String messageId)
 	{
 		try
 		{
@@ -1183,6 +1194,26 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 					ByteArrayDataSource dataSource = new ByteArrayDataSource(rs.getBytes("content"),rs.getString("content_type"));
 					dataSource.setName(rs.getString("name"));
 					return new EbMSAttachment(dataSource,rs.getString("content_id"));
+				}
+			},
+			messageId
+		);
+	}
+
+	protected List<EbMSDataSource> getDataSources(String messageId)
+	{
+		return jdbcTemplate.query(
+			"select name, content_type, content" + 
+			" from ebms_attachment" + 
+			" where message_id = ?" +
+			" and message_nr = 0" +
+			" order by order_nr",
+			new ParameterizedRowMapper<EbMSDataSource>()
+			{
+				@Override
+				public EbMSDataSource mapRow(ResultSet rs, int rowNum) throws SQLException
+				{
+					return new EbMSDataSource(rs.getString("name"),rs.getString("content_type"),rs.getBytes("content"));
 				}
 			},
 			messageId

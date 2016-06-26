@@ -42,6 +42,16 @@ public class EbMSMessageContext implements Serializable
 	{
 	}
 	
+	public void reset()
+	{
+		timestamp = null;
+		timeToLive = null;
+		conversationId = null;
+		messageId = null;
+		sequenceNr = null;
+		messageStatus = null;
+	}
+	
 	@XmlElement(required=true)
 	public String getCpaId()
 	{
