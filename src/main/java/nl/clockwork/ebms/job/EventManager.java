@@ -42,6 +42,7 @@ public class EventManager
 
 	public void updateEvent(final EbMSEvent event, final String url, final EbMSEventStatus status)
 	{
+		final DeliveryChannel deliveryChannel = cpaManager.getDeliveryChannel(event.getCpaId(),event.getDeliveryChannelId());
 		ebMSDAO.executeTransaction(
 			new DAOTransactionCallback()
 			{
@@ -49,7 +50,10 @@ public class EventManager
 				public void doInTransaction()
 				{
 					ebMSDAO.insertEventLog(event.getMessageId(),event.getTimestamp(),url,status,null);
-					ebMSDAO.deleteEvent(event.getMessageId());
+					if (event.getTimeToLive() != null && CPAUtils.isReliableMessaging(deliveryChannel))
+						ebMSDAO.updateEvent(createNewEvent(event,deliveryChannel));
+					else
+						ebMSDAO.deleteEvent(event.getMessageId());
 				}
 			}
 		);
