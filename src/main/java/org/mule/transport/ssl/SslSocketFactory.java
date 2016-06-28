@@ -10,6 +10,8 @@
 
 package org.mule.transport.ssl;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.mule.api.security.tls.TlsConfiguration;
 import org.mule.transport.tcp.AbstractTcpSocketFactory;
 import org.mule.transport.tcp.TcpSocketKey;
@@ -23,11 +25,12 @@ import javax.net.ssl.SSLSocket;
 
 public class SslSocketFactory extends AbstractTcpSocketFactory
 {
-
+	protected static final Log logger = LogFactory.getLog(SslSocketFactory.class);
     private TlsConfiguration tls;
 
     public SslSocketFactory(TlsConfiguration tls)
     {
+		logger.info("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
         this.tls = tls;
     }
 
@@ -37,8 +40,18 @@ public class SslSocketFactory extends AbstractTcpSocketFactory
         {
             SSLSocket socket = (SSLSocket)tls.getSocketFactory().createSocket(key.getInetAddress(), key.getPort());
             //PATCH
-			socket.setEnabledProtocols(new String[]{"TLSv1.2"});
-      	    socket.setEnabledCipherSuites(new String[]{"TLS_DHE_RSA_WITH_AES_128_CBC_SHA","TLS_RSA_WITH_AES_128_CBC_SHA"});
+			String protocols = System.getProperty("https.protocols");
+			if (protocols != null)
+			{
+				socket.setEnabledProtocols(protocols.split(","));
+				logger.info("Enabled SSL Protocols: " + protocols);
+			}
+			String cipherSuites = System.getProperty("https.cipherSuites");
+			if (cipherSuites != null)
+			{
+				socket.setEnabledCipherSuites(cipherSuites.split(","));
+				logger.info("Enabled SSL Cipher Suites: " + cipherSuites);
+			}
             return socket;
         }
         catch (NoSuchAlgorithmException e)
