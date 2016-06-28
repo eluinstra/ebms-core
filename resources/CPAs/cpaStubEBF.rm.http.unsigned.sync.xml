@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?><tns:CollaborationProtocolAgreement xmlns:axsl="http://www.w3.org/1999/XSL/TransformAlias" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:functx="http://www.functx.com" xmlns:tns="http://www.oasis-open.org/committees/ebxml-cppa/schema/cpp-cpa-2_0.xsd" xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns:xlink="http://www.w3.org/1999/xlink" xsi:schemaLocation="http://www.oasis-open.org/committees/ebxml-cppa/schema/cpp-cpa-2_0.xsd http://www.oasis-open.org/committees/ebxml-cppa/schema/cpp-cpa-2_0.xsd" tns:cpaid="CPA_EBFStub" tns:version="1.0">
    <tns:Status tns:value="agreed"/>
    <tns:Start>2011-01-01T00:00:00Z</tns:Start>
-   <tns:End>2016-01-01T00:00:00Z</tns:End>
+   <tns:End>2020-01-01T00:00:00Z</tns:End>
    <tns:PartyInfo tns:partyName="Logius" tns:defaultMshChannelId="DIGIPOORT_defaultDeliveryChannel_ProfileBestEffortSigned" tns:defaultMshPackageId="defaultPackage">
       <tns:PartyId tns:type="urn:osb:oin">00000000000000000000</tns:PartyId>
       <tns:PartyRef xlink:href=""/>
