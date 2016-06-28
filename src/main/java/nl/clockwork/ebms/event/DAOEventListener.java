@@ -17,8 +17,6 @@ package nl.clockwork.ebms.event;
 
 import java.util.Date;
 
-import nl.clockwork.ebms.dao.DAOException;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.dao.DataAccessException;
@@ -36,51 +34,72 @@ public class DAOEventListener implements EventListener
 	@Override
 	public void onMessageReceived(String messageId) throws EventException
 	{
-		logger.info("Message " + messageId + " received");
-		insertEbMSMessageEvent(messageId,EventType.RECEIVED);
+		try
+		{
+			logger.info("Message " + messageId + " received");
+			insertEbMSMessageEvent(messageId,EventType.RECEIVED);
+		}
+		catch (DataAccessException e)
+		{
+			throw new EventException(e);
+		}
 	}
 
 	@Override
 	public void onMessageAcknowledged(String messageId) throws EventException
 	{
-		logger.info("Message " + messageId + " acknowledged");
-		insertEbMSMessageEvent(messageId,EventType.ACKNOWLEDGED);
+		try
+		{
+			logger.info("Message " + messageId + " acknowledged");
+			insertEbMSMessageEvent(messageId,EventType.ACKNOWLEDGED);
+		}
+		catch (DataAccessException e)
+		{
+			throw new EventException(e);
+		}
 	}
 	
 	@Override
 	public void onMessageFailed(String messageId) throws EventException
 	{
-		logger.info("Message " + messageId + " failed");
-		insertEbMSMessageEvent(messageId,EventType.FAILED);
+		try
+		{
+			logger.info("Message " + messageId + " failed");
+			insertEbMSMessageEvent(messageId,EventType.FAILED);
+		}
+		catch (DataAccessException e)
+		{
+			throw new EventException(e);
+		}
 	}
 
 	@Override
 	public void onMessageExpired(String messageId) throws EventException
 	{
-		logger.info("Message " + messageId + " expired");
-		insertEbMSMessageEvent(messageId,EventType.EXPIRED);
+		try
+		{
+			logger.info("Message " + messageId + " expired");
+			insertEbMSMessageEvent(messageId,EventType.EXPIRED);
+		}
+		catch (DataAccessException e)
+		{
+			throw new EventException(e);
+		}
 	}
 
 	private void insertEbMSMessageEvent(String messageId, EventType eventType)
 	{
-		try
-		{
-			jdbcTemplate.update
-			(
-				"insert into ebms_message_event (" +
-					"message_id," +
-					"event_type," +
-					"time_stamp" +
-				") values (?,?,?)",
-				messageId,
-				eventType.ordinal(),
-				new Date()
-			);
-		}
-		catch (DataAccessException e)
-		{
-			throw new DAOException(e);
-		}
+		jdbcTemplate.update
+		(
+			"insert into ebms_message_event (" +
+				"message_id," +
+				"event_type," +
+				"time_stamp" +
+			") values (?,?,?)",
+			messageId,
+			eventType.ordinal(),
+			new Date()
+		);
 	}
 
 	public void setJdbcTemplate(JdbcTemplate jdbcTemplate)
