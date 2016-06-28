@@ -24,6 +24,7 @@ import javax.jms.Session;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.jms.JmsException;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jms.core.MessageCreator;
 
@@ -54,29 +55,57 @@ public class SimpleJMSEventListener implements EventListener
 	@Override
 	public void onMessageReceived(String messageId) throws EventException
 	{
-		logger.info("Message " + messageId + " received");
-		jmsTemplate.send(destinations.get("EVENT.RECEIVED"),new EventMessageCreator(messageId));
+		try
+		{
+			logger.info("Message " + messageId + " received");
+			jmsTemplate.send(destinations.get("EVENT.RECEIVED"),new EventMessageCreator(messageId));
+		}
+		catch (JmsException e)
+		{
+			throw new EventException(e);
+		}
 	}
 
 	@Override
 	public void onMessageAcknowledged(String messageId) throws EventException
 	{
-		logger.info("Message " + messageId + " acknowledged");
-		jmsTemplate.send(destinations.get("EVENT.ACKNOWLEDGED"),new EventMessageCreator(messageId));
+		try
+		{
+			logger.info("Message " + messageId + " acknowledged");
+			jmsTemplate.send(destinations.get("EVENT.ACKNOWLEDGED"),new EventMessageCreator(messageId));
+		}
+		catch (JmsException e)
+		{
+			throw new EventException(e);
+		}
 	}
 	
 	@Override
 	public void onMessageFailed(String messageId) throws EventException
 	{
-		logger.info("Message " + messageId + " failed");
-		jmsTemplate.send(destinations.get("EVENT.FAILED"),new EventMessageCreator(messageId));
+		try
+		{
+			logger.info("Message " + messageId + " failed");
+			jmsTemplate.send(destinations.get("EVENT.FAILED"),new EventMessageCreator(messageId));
+		}
+		catch (JmsException e)
+		{
+			throw new EventException(e);
+		}
 	}
 
 	@Override
 	public void onMessageExpired(String messageId) throws EventException
 	{
-		logger.info("Message " + messageId + " expired");
-		jmsTemplate.send(destinations.get("EVENT.EXPIRED"),new EventMessageCreator(messageId));
+		try
+		{
+			logger.info("Message " + messageId + " expired");
+			jmsTemplate.send(destinations.get("EVENT.EXPIRED"),new EventMessageCreator(messageId));
+		}
+		catch (JmsException e)
+		{
+			throw new EventException(e);
+		}
 	}
 
 	public void setJmsTemplate(JmsTemplate jmsTemplate)
