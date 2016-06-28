@@ -75,7 +75,7 @@ public class EventManager
 		Date timestamp = new Date();
 		if (event.getRetries() < rm.getRetries().intValue())
 			rm.getRetryInterval().addTo(timestamp);
-		else //if (event.getRetries() < rm.getRetries().intValue())
+		else
 			timestamp = event.getTimeToLive();
 		return new EbMSEvent(event.getCpaId(),event.getDeliveryChannelId(),event.getMessageId(),event.getTimeToLive(),timestamp,event.isConfidential(),event.isOrdered(),event.getRetries() + 1);
 	}
