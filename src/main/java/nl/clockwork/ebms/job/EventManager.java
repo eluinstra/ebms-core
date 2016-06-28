@@ -73,7 +73,7 @@ public class EventManager
 	{
 		ReliableMessaging rm = CPAUtils.getReliableMessaging(deliveryChannel);
 		Date timestamp = new Date();
-		if (event.getRetries() < rm.getRetries().intValue() - 1)
+		if (event.getRetries() < rm.getRetries().intValue())
 			rm.getRetryInterval().addTo(timestamp);
 		else //if (event.getRetries() < rm.getRetries().intValue())
 			timestamp = event.getTimeToLive();
