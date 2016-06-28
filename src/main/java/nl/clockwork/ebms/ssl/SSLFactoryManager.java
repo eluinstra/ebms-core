@@ -23,7 +23,6 @@ import java.security.cert.X509Certificate;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.KeyManager;
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLEngine;
@@ -34,19 +33,16 @@ import javax.net.ssl.X509KeyManager;
 
 import nl.clockwork.ebms.common.KeyStoreManager;
 
-import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.InitializingBean;
 
 public class SSLFactoryManager implements InitializingBean
 {
 	public class EbMSX509KeyManager implements X509KeyManager
 	{
-		private final String clientAlias;
 		private final X509KeyManager standardKeyManager;
 
-		public EbMSX509KeyManager(X509KeyManager standardKeyManager, String clientAlias)
+		public EbMSX509KeyManager(X509KeyManager standardKeyManager)
 		{
-			this.clientAlias = clientAlias;
 			this.standardKeyManager = standardKeyManager;
 		}
 
@@ -59,7 +55,7 @@ public class SSLFactoryManager implements InitializingBean
 		@Override
 		public String chooseClientAlias(String[] keyType, Principal[] issuers, Socket socket)
 		{
-			return clientAlias == null ? standardKeyManager.chooseClientAlias(keyType,issuers,socket) : clientAlias;
+			return standardKeyManager.chooseClientAlias(keyType,issuers,socket);
 		}
 
 		@Override
@@ -95,7 +91,6 @@ public class SSLFactoryManager implements InitializingBean
 	private String[] enabledProtocols = new String[]{};
 	private String[] enabledCipherSuites = new String[]{};
 	private boolean requireClientAuthentication;
-	private String clientAlias;
 	private SSLSocketFactory sslSocketFactory;
 
 	@Override
@@ -108,18 +103,12 @@ public class SSLFactoryManager implements InitializingBean
 		KeyManagerFactory kmf = KeyManagerFactory.getInstance("SunX509");
 		kmf.init(keyStore,keyStorePassword.toCharArray());
 
-		KeyManager[] keyManagers = kmf.getKeyManagers();
-		if (!StringUtils.isEmpty(clientAlias))
-			for (int i = 0; i < keyManagers.length; i++)
-				if (keyManagers[i] instanceof X509KeyManager)
-					keyManagers[i] = new EbMSX509KeyManager((X509KeyManager)keyManagers[i],clientAlias);
-
 		//TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
 		TrustManagerFactory tmf = TrustManagerFactory.getInstance("SunX509");
 		tmf.init(trustStore);
 
 		SSLContext sslContext = SSLContext.getInstance("TLS");
-		sslContext.init(keyManagers,tmf.getTrustManagers(),null);
+		sslContext.init(kmf.getKeyManagers(),tmf.getTrustManagers(),null);
 
 		//SSLEngine engine = sslContext.createSSLEngine(hostname,port);
 		SSLEngine engine = sslContext.createSSLEngine();
@@ -202,8 +191,4 @@ public class SSLFactoryManager implements InitializingBean
 		this.requireClientAuthentication = requireClientAuthentication;
 	}
 	
-	public void setClientAlias(String clientAlias)
-	{
-		this.clientAlias = clientAlias;
-	}
 }
