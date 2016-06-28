@@ -276,7 +276,7 @@ public class EbMSMessageProcessor
 							eventListener.onMessageAcknowledged(responseMessage.getMessageHeader().getMessageData().getRefToMessageId());
 							if (requestMessage.getMessageOrder() != null)
 							{
-								EbMSMessageContext nextMessage = ebMSDAO.getNextOrderedMessageContext(requestMessage.getMessageHeader().getMessageData().getMessageId());
+								EbMSMessageContext nextMessage = ebMSDAO.getNextPendingMessageContext(requestMessage.getMessageHeader().getMessageData().getMessageId());
 								if (nextMessage != null)
 								{
 									if (ebMSDAO.updateMessage(nextMessage.getMessageId(),EbMSMessageStatus.PENDING,EbMSMessageStatus.SENDING) > 0)

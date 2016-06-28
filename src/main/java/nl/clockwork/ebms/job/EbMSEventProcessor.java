@@ -158,9 +158,9 @@ public class EbMSEventProcessor implements InitializingBean, Job
 						if (event.isOrdered())
 						{
 							EbMSMessageContext context = ebMSDAO.getMessageContext(event.getMessageId());
-							if (context != null && (EbMSMessageStatus.RECEIVED.equals(context.getMessageStatus()) || EbMSMessageStatus.PROCESSED.equals(context.getMessageStatus())))
+							if (context != null && (EbMSMessageStatus.DELIVERED.equals(context.getMessageStatus())))
 							{
-								EbMSMessageContext nextMessage = ebMSDAO.getNextOrderedMessageContext(context.getMessageId());
+								EbMSMessageContext nextMessage = ebMSDAO.getNextPendingMessageContext(context.getMessageId());
 								if (nextMessage != null)
 									if (ebMSDAO.updateMessage(nextMessage.getMessageId(),EbMSMessageStatus.PENDING,EbMSMessageStatus.SENDING) > 0)
 										eventManager.createEvent(nextMessage.getCpaId(),cpaManager.getReceiveDeliveryChannel(nextMessage.getCpaId(),new CacheablePartyId(nextMessage.getToRole().getPartyId()),nextMessage.getToRole().getRole(),nextMessage.getService(),nextMessage.getAction()),nextMessage.getMessageId(),nextMessage.getTimeToLive(),nextMessage.getTimestamp(),cpaManager.isConfidential(nextMessage.getCpaId(),new CacheablePartyId(nextMessage.getFromRole().getPartyId()),nextMessage.getFromRole().getRole(),nextMessage.getService(),nextMessage.getAction()),nextMessage.getSequenceNr() != null);

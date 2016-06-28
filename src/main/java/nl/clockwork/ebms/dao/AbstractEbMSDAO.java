@@ -480,7 +480,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	{
 		try
 		{
-			EbMSMessageContext messageContext = getNextOrderedMessageContext(messageId);
+			EbMSMessageContext messageContext = getNextPendingMessageContext(messageId);
 			if (messageContext == null)
 				return null;
 			return new EbMSMessageContent(messageContext,getDataSources(messageId));
@@ -603,18 +603,19 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	}
 
 	@Override
-	public EbMSMessageContext getNextOrderedMessageContext(String messageId)
+	public EbMSMessageContext getNextPendingMessageContext(String messageId)
 	{
 		try
 		{
 			return jdbcTemplate.queryForObject(
 				EbMSMessageContextRowMapper.getBaseQuery() +
 				" inner join" +
-				" (select cpa_id, conversation_id, message_nr, sequence_nr from ebms_message where message_id = ? and message_nr = 0) last_message" + 
+				" (select cpa_id, conversation_id, message_nr, sequence_nr from ebms_message where message_id = ? and message_nr = 0 and status = " + EbMSMessageStatus.DELIVERED.id() + ") last_message" + 
 				" on ebms_message.cpa_id = last_message.cpa_id" +
 				" and ebms_message.conversation_id = last_message.conversation_id" +
 				" and ebms_message.message_nr = last_message.message_nr" +
-				" and ebms_message.sequence_nr = last_message.sequence_nr + 1",
+				" and ebms_message.sequence_nr = last_message.sequence_nr + 1" +
+				" and ebms_message.status = " + EbMSMessageStatus.PENDING.id(),
 				new EbMSMessageContextRowMapper(),
 				messageId
 			);
