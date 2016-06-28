@@ -92,6 +92,11 @@ public class JMSEventListener implements EventListener
 		jmsTemplate.send(destinations.get("EVENT.EXPIRED"),new EventMessageCreator(ebMSDAO.getMessageContext(messageId)));
 	}
 
+	public void setEbMSDAO(EbMSDAO ebMSDAO)
+	{
+		this.ebMSDAO = ebMSDAO;
+	}
+
 	public void setJmsTemplate(JmsTemplate jmsTemplate)
 	{
 		this.jmsTemplate = jmsTemplate;
