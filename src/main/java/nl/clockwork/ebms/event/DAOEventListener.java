@@ -87,7 +87,7 @@ public class DAOEventListener implements EventListener
 		}
 	}
 
-	private void insertEbMSMessageEvent(String messageId, EventType eventType)
+	private void insertEbMSMessageEvent(String messageId, EventType eventType) throws DataAccessException
 	{
 		jdbcTemplate.update
 		(
