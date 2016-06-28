@@ -70,3 +70,12 @@ CREATE TABLE ebms_event_log
 );
 
 CREATE INDEX i_ebms_event_log ON ebms_event_log (message_id);
+
+CREATE TABLE ebms_message_event
+(
+	message_id				VARCHAR(256)		NOT NULL UNIQUE,
+	event_type				SMALLINT				NOT NULL,
+	time_stamp				TIMESTAMP				NOT NULL
+);
+
+CREATE INDEX i_ebms_message_event ON ebms_message_event (time_stamp);
