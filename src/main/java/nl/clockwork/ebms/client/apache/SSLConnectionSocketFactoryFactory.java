@@ -23,12 +23,14 @@ import org.springframework.beans.factory.FactoryBean;
 public class SSLConnectionSocketFactoryFactory implements FactoryBean<SSLConnectionSocketFactory>
 {
 	private SSLFactoryManager sslFactoryManager;
+	private String[] enabledProtocols = new String[]{};
+	private String[] enabledCipherSuites = new String[]{};
 	private boolean verifyHostnames;
 
 	@Override
 	public SSLConnectionSocketFactory getObject() throws Exception
 	{
-		return new SSLConnectionSocketFactory(sslFactoryManager.getSslSocketFactory(),verifyHostnames ? SSLConnectionSocketFactory.STRICT_HOSTNAME_VERIFIER : SSLConnectionSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
+		return new SSLConnectionSocketFactory(sslFactoryManager.getSslSocketFactory(),enabledProtocols,enabledCipherSuites,verifyHostnames ? SSLConnectionSocketFactory.STRICT_HOSTNAME_VERIFIER : SSLConnectionSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
 	}
 
 	@Override
@@ -47,7 +49,17 @@ public class SSLConnectionSocketFactoryFactory implements FactoryBean<SSLConnect
 	{
 		this.sslFactoryManager = sslFactoryManager;
 	}
-	
+
+	public void setEnabledProtocols(String[] enabledProtocols)
+	{
+		this.enabledProtocols = enabledProtocols;
+	}
+
+	public void setEnabledCipherSuites(String[] enabledCipherSuites)
+	{
+		this.enabledCipherSuites = enabledCipherSuites;
+	}
+
 	public void setVerifyHostnames(boolean verifyHostnames)
 	{
 		this.verifyHostnames = verifyHostnames;

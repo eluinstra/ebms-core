@@ -283,16 +283,15 @@
 	<bean id="sslConnectionSocketFactory" class="nl.clockwork.ebms.client.apache.SSLConnectionSocketFactoryFactory">
 		<property name="sslFactoryManager" ref="sslFactoryManager"/>
 		<property name="verifyHostnames" value="${https.verifyHostnames}"></property>
+		<property name="enabledProtocols" value="${https.enabledProtocols}"/>
+		<property name="enabledCipherSuites" value="${https.enabledCipherSuites}"/>
 	</bean-->
 
-	<bean id="sslFactoryManager" class="nl.clockwork.ebms.ssl.SSLFactoryManager">
+	<bean id="sslFactoryManager" class="nl.clockwork.ebms.client.SSLFactoryManager">
 		<property name="keyStorePath" value="${keystore.path}"/>
 		<property name="keyStorePassword" value="${keystore.password}"/>
 		<property name="trustStorePath" value="${truststore.path}"/>
 		<property name="trustStorePassword" value="${truststore.password}"/>
-		<property name="enabledProtocols" value="${https.enabledProtocols}"/>
-		<property name="enabledCipherSuites" value="${https.enabledCipherSuites}"/>
-		<property name="requireClientAuthentication" value="${https.requireClientAuthentication}"/>
 		<property name="verifyHostnames" value="${https.verifyHostnames}"></property>
 	</bean>
 
