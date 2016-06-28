@@ -54,7 +54,7 @@ CREATE TABLE ebms_event
 	cpa_id						VARCHAR(256)		NOT NULL,
 	channel_id				VARCHAR(256)		NOT NULL,
 	message_id				VARCHAR(256)		NOT NULL UNIQUE,
-	message_nr				SMALLINT				DEFAULT 0 NOT NULL,
+	message_nr				NUMBER(5)				DEFAULT 0 NOT NULL,
 	time_to_live			TIMESTAMP				NULL,
 	time_stamp				TIMESTAMP				NOT NULL,
 	is_confidential		NUMBER(1)				NOT NULL,
@@ -68,10 +68,19 @@ CREATE INDEX i_ebms_event ON ebms_event (time_stamp);
 CREATE TABLE ebms_event_log
 (
 	message_id				VARCHAR(256)		NOT NULL,
-	message_nr				SMALLINT				DEFAULT 0 NOT NULL,
+	message_nr				NUMBER(5)				DEFAULT 0 NOT NULL,
 	time_stamp				TIMESTAMP				NOT NULL,
 	uri								VARCHAR(256)		NULL,
 	status						NUMBER(5)				NOT NULL,
 	error_message			CLOB						NULL,
 	FOREIGN KEY (message_id,message_nr) REFERENCES ebms_message (message_id,message_nr)
 );
+
+CREATE TABLE ebms_message_event
+(
+	message_id				VARCHAR(256)		NOT NULL UNIQUE,
+	event_type				NUMBER(5)				NOT NULL,
+	time_stamp				TIMESTAMP				NOT NULL
+);
+
+CREATE INDEX i_ebms_message_event ON ebms_message_event (time_stamp);
