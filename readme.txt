@@ -23,6 +23,7 @@ Implemented:
 	o	Reliable Messaging Module
 	o	Message Status Service
 	o	Message Service Handler Ping Service
+	o	Message Order Module
 -	HTTP(S) Protocol
 -	Separate ErrorMessage and Acknowledgment messages
 
@@ -30,14 +31,12 @@ Not implemented:
 -	Core Functionality
 	o	Packaging
 -	Additional Features:
-	o	Message Order Module
 	o	Multi-Hop Module
 -	Multiple delivery channels per action
 
 Remarks:
 -	Duplicate messages will always be eliminated
 -	Only standalone MSH level messages are supported.
--	Only acts as ToPartyMSH, not as nextMSH
 -	Only 1 (allPurpose) Channel per Action is supported
 -	Manifest can only refer to payload data included as part of the message as payload document(s) contained in a Payload Container
 -	Extendible to support other communication protocols
@@ -112,6 +111,27 @@ You can configure them by configuring the right driver and connection string:
 If you want to let the adapter use the application datasource exclude the following file:
 - nl/clockwork/ebms/datasource.xml
 and add the name ebMSDataSource to the application datasource 
+
+==========
+Security =
+==========
+SSL:
+keystore.path=keystore.jks
+keystore.password=password
+
+truststore.path=keystore.jks
+truststore.password=password
+
+-Dhttps.protocols="TLSv1.2","TLSv1.1","TLSv1"
+-Dhttps.cipherSuites="TLS_RSA_WITH_AES_256_CBC_SHA256","TLS_RSA_WITH_AES_128_CBC_SHA256","TLS_RSA_WITH_AES_256_CBC_SHA","TLS_RSA_WITH_AES_128_CBC_SHA"
+
+Signing:
+signature.keystore.path=keystore.jks
+signature.keystore.password=password
+
+Encryption:
+encryption.keystore.path=keystore.jks
+encryption.keystore.password=password
 
 ===========
 Resources =
