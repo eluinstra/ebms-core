@@ -57,7 +57,7 @@ public class LoggingOutputStream extends FilterOutputStream
 	public void write(byte[] b) throws IOException
 	{
 		if (logger.isDebugEnabled())
-			sb.append(b);
+			sb.append(new String(b,charset));
 		out.write(b);
 	}
 

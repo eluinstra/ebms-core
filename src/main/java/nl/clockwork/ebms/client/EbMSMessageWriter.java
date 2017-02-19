@@ -106,7 +106,7 @@ public class EbMSMessageWriter
 		}
 	}
 
-	private void writeTextAttachment(String boundary, OutputStream outputStream, OutputStreamWriter writer, EbMSAttachment attachment) throws IOException
+	protected void writeTextAttachment(String boundary, OutputStream outputStream, OutputStreamWriter writer, EbMSAttachment attachment) throws IOException
 	{
 		writer.write("\r\n");
 		writer.write("Content-Type: " + attachment.getContentType());
@@ -126,7 +126,7 @@ public class EbMSMessageWriter
 		writer.write(boundary);
 	}
 
-	private void writeBinaryAttachment(String boundary, OutputStream outputStream, OutputStreamWriter writer, EbMSAttachment attachment) throws IOException
+	protected void writeBinaryAttachment(String boundary, OutputStream outputStream, OutputStreamWriter writer, EbMSAttachment attachment) throws IOException
 	{
 		writer.write("\r\n");
 		writer.write("Content-Type: " + attachment.getContentType());

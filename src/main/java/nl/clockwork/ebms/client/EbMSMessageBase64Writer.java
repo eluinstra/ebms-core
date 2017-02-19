@@ -19,18 +19,11 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
-import java.util.List;
-import java.util.Map;
 
-import javax.xml.transform.TransformerException;
-
-import nl.clockwork.ebms.Constants;
-import nl.clockwork.ebms.common.util.DOMUtils;
 import nl.clockwork.ebms.model.EbMSAttachment;
-import nl.clockwork.ebms.model.EbMSDocument;
 
+import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.IOUtils;
-import org.apache.james.mime4j.codec.Base64OutputStream;
 import org.springframework.util.StringUtils;
 
 public class EbMSMessageBase64Writer extends EbMSMessageWriter
@@ -40,70 +33,7 @@ public class EbMSMessageBase64Writer extends EbMSMessageWriter
 		super(connection);
 	}
 
-	@Override
-	protected void writeMimeMessage(EbMSDocument document) throws IOException, TransformerException
-	{
-		if (logger.isInfoEnabled() && !logger.isDebugEnabled())
-			logger.info(">>>>\n" + DOMUtils.toString(document.getMessage()));
-		String boundary = createBoundary();
-		String contentType = createContentType(boundary,document.getContentId());
-
-		connection.setRequestProperty("MIME-Version","1.0");
-		connection.setRequestProperty("Content-Type",contentType);
-		connection.setRequestProperty("SOAPAction",Constants.EBMS_SOAP_ACTION);
-
-		Map<String,List<String>> requestProperties = connection.getRequestProperties();
-		OutputStream outputStream = connection.getOutputStream();
-		if (logger.isDebugEnabled())
-			outputStream = new LoggingOutputStream(requestProperties,outputStream);
-
-		try (OutputStreamWriter writer = new OutputStreamWriter(outputStream,"UTF-8"))
-		{
-			writer.write("--");
-			writer.write(boundary);
-			writer.write("\r\n");
-
-			writer.write("Content-Type: text/xml; charset=UTF-8");
-			writer.write("\r\n");
-			writer.write("Content-ID: <" + document.getContentId() + ">");
-			writer.write("\r\n");
-			writer.write("\r\n");
-			DOMUtils.write(document.getMessage(),writer,"UTF-8");
-			writer.write("\r\n");
-			writer.write("--");
-			writer.write(boundary);
-
-			for (EbMSAttachment attachment : document.getAttachments())
-				if (attachment.getContentType().matches("^(text/.*|.*/xml)$"))
-					writeTextAttachment(boundary,outputStream,writer,attachment);
-				else
-					writeBinaryAttachment(boundary,outputStream,writer,attachment);
-
-			writer.write("--");
-		}
-	}
-
-	private void writeTextAttachment(String boundary, OutputStream outputStream, OutputStreamWriter writer, EbMSAttachment attachment) throws IOException
-	{
-		writer.write("\r\n");
-		writer.write("Content-Type: " + attachment.getContentType());
-		writer.write("\r\n");
-		if (!StringUtils.isEmpty(attachment.getName()))
-		{
-			writer.write("Content-Disposition: attachment; filename=\"" + attachment.getName() + "\"");
-			writer.write("\r\n");
-		}
-		writer.write("Content-ID: <" + attachment.getContentId() + ">");
-		writer.write("\r\n");
-		writer.write("\r\n");
-		writer.flush();
-		IOUtils.copy(attachment.getInputStream(),outputStream);
-		writer.write("\r\n");
-		writer.write("--");
-		writer.write(boundary);
-	}
-
-	private void writeBinaryAttachment(String boundary, OutputStream outputStream, OutputStreamWriter writer, EbMSAttachment attachment) throws IOException
+	protected void writeBinaryAttachment(String boundary, OutputStream outputStream, OutputStreamWriter writer, EbMSAttachment attachment) throws IOException
 	{
 		writer.write("\r\n");
 		writer.write("Content-Type: " + attachment.getContentType());
@@ -119,9 +49,10 @@ public class EbMSMessageBase64Writer extends EbMSMessageWriter
 		writer.write("\r\n");
 		writer.write("\r\n");
 		writer.flush();
-		Base64OutputStream base64OutputStream = new Base64OutputStream(outputStream);
-		IOUtils.copy(attachment.getInputStream(),base64OutputStream);
-		base64OutputStream.flush();
+//		Base64OutputStream base64OutputStream = new Base64OutputStream(outputStream);
+//		IOUtils.copy(attachment.getInputStream(),base64OutputStream);
+//		base64OutputStream.flush();
+		IOUtils.write(Base64.encodeBase64Chunked(IOUtils.toByteArray(attachment.getInputStream())),outputStream);
 		writer.write("\r\n");
 		writer.write("--");
 		writer.write(boundary);
