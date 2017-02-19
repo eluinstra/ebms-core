@@ -219,7 +219,7 @@ public class EbMSMessageFactory
 			result.setMessageHeader(createMessageHeader(cpaId,content.getContext()));
 			result.setAckRequested(createAckRequested(cpaId,content.getContext()));
 			result.setSyncReply(createSyncReply(cpaId,content.getContext()));
-			if (content.getDataSources().size() > 0)
+			if (content.getDataSources() != null && content.getDataSources().size() > 0)
 			{
 				Manifest manifest = EbMSMessageUtils.createManifest();
 				List<EbMSAttachment> attachments = new ArrayList<EbMSAttachment>();
