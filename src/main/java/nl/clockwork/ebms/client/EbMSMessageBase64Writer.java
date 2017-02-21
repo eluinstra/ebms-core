@@ -15,6 +15,9 @@
  */
 package nl.clockwork.ebms.client;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
@@ -22,7 +25,7 @@ import java.net.HttpURLConnection;
 
 import nl.clockwork.ebms.model.EbMSAttachment;
 
-import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.codec.binary.Base64InputStream;
 import org.apache.commons.io.IOUtils;
 import org.springframework.util.StringUtils;
 
@@ -49,13 +52,10 @@ public class EbMSMessageBase64Writer extends EbMSMessageWriter
 		writer.write("\r\n");
 		writer.write("\r\n");
 		writer.flush();
-//		Base64OutputStream base64OutputStream = new Base64OutputStream(outputStream);
-//		IOUtils.copy(attachment.getInputStream(),base64OutputStream);
-//		base64OutputStream.flush();
-		IOUtils.write(Base64.encodeBase64Chunked(IOUtils.toByteArray(attachment.getInputStream())),outputStream);
+		Base64InputStream base64InputStream = new Base64InputStream(attachment.getInputStream(),true);
+		IOUtils.copy(base64InputStream,outputStream);
 		writer.write("\r\n");
 		writer.write("--");
 		writer.write(boundary);
 	}
-
 }
