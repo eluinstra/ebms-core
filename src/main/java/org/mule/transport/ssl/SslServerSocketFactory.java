@@ -30,7 +30,7 @@ public class SslServerSocketFactory extends TcpServerSocketFactory
 
     public SslServerSocketFactory(TlsConfiguration tls)
     {
-		logger.info("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
+		logger.info("SSL Patch enabled");
         this.tls = tls;
     }
 
