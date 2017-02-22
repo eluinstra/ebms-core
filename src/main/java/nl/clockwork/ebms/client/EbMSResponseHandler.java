@@ -123,7 +123,7 @@ public class EbMSResponseHandler
 		String result = "";
 		for (String header : headerFields.keySet())
 			for (String field : headerFields.get(header))
-				result += header + ": " + field + "\n";
+				result += (header != null ? header + ": " : "") + field + "\n";
 		return result;
 	}
 
