@@ -113,6 +113,27 @@ If you want to let the adapter use the application datasource exclude the follow
 - nl/clockwork/ebms/datasource.xml
 and add the name ebMSDataSource to the application datasource 
 
+==========
+Security =
+==========
+SSL:
+keystore.path=keystore.jks
+keystore.password=password
+
+truststore.path=keystore.jks
+truststore.password=password
+
+-Dhttps.protocols="TLSv1.2","TLSv1.1","TLSv1"
+-Dhttps.cipherSuites="TLS_RSA_WITH_AES_256_CBC_SHA256","TLS_RSA_WITH_AES_128_CBC_SHA256","TLS_RSA_WITH_AES_256_CBC_SHA","TLS_RSA_WITH_AES_128_CBC_SHA"
+
+Signing:
+signature.keystore.path=keystore.jks
+signature.keystore.password=password
+
+Encryption:
+encryption.keystore.path=keystore.jks
+encryption.keystore.password=password
+
 ===========
 Resources =
 ===========
