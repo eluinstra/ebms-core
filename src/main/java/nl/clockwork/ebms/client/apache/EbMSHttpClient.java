@@ -23,6 +23,7 @@ import nl.clockwork.ebms.client.EbMSClient;
 import nl.clockwork.ebms.client.EbMSProxy;
 import nl.clockwork.ebms.model.EbMSDocument;
 import nl.clockwork.ebms.processor.EbMSProcessorException;
+import nl.clockwork.ebms.ssl.SSLFactoryManager;
 
 import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthScope;
@@ -41,7 +42,25 @@ public class EbMSHttpClient implements EbMSClient
 	private SSLConnectionSocketFactory sslConnectionSocketFactory;
 	private boolean chunkedStreamingMode;
 	private EbMSProxy proxy;
-	
+
+	public EbMSHttpClient()
+	{
+	}
+
+	public EbMSHttpClient(SSLConnectionSocketFactory sslConnectionSocketFactory, boolean chunkedStreamingMode, EbMSProxy proxy) throws Exception
+	{
+		this.sslConnectionSocketFactory = sslConnectionSocketFactory;
+		this.chunkedStreamingMode = chunkedStreamingMode;
+		this.proxy = proxy;
+	}
+
+	public EbMSHttpClient(SSLFactoryManager sslFactoryManager, String[] enabledProtocols, String[] enabledCipherSuites, boolean verifyHostnames, boolean chunkedStreamingMode, EbMSProxy proxy) throws Exception
+	{
+		this.sslConnectionSocketFactory = new SSLConnectionSocketFactoryFactory(sslFactoryManager,enabledProtocols,enabledCipherSuites,verifyHostnames).getObject();
+		this.chunkedStreamingMode = chunkedStreamingMode;
+		this.proxy = proxy;
+	}
+
 	public EbMSDocument sendMessage(String uri, EbMSDocument document) throws EbMSProcessorException
 	{
 		try (CloseableHttpClient httpClient = getHttpClient(uri))

@@ -27,6 +27,18 @@ public class SSLConnectionSocketFactoryFactory implements FactoryBean<SSLConnect
 	private String[] enabledCipherSuites = new String[]{};
 	private boolean verifyHostnames;
 
+	public SSLConnectionSocketFactoryFactory()
+	{
+	}
+
+	public SSLConnectionSocketFactoryFactory(SSLFactoryManager sslFactoryManager, String[] enabledProtocols, String[] enabledCipherSuites, boolean verifyHostnames)
+	{
+		this.sslFactoryManager = sslFactoryManager;
+		this.enabledProtocols = enabledProtocols;
+		this.enabledCipherSuites = enabledCipherSuites;
+		this.verifyHostnames = verifyHostnames;
+	}
+
 	@Override
 	public SSLConnectionSocketFactory getObject() throws Exception
 	{

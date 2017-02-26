@@ -40,6 +40,18 @@ public class EbMSHttpClient implements EbMSClient
 	private boolean base64Writer;
 	private EbMSProxy proxy;
 
+	public EbMSHttpClient()
+	{
+	}
+
+	public EbMSHttpClient(SSLFactoryManager sslFactoryManager, boolean chunkedStreamingMode, boolean base64Writer, EbMSProxy proxy)
+	{
+		this.sslFactoryManager = sslFactoryManager;
+		this.chunkedStreamingMode = chunkedStreamingMode;
+		this.base64Writer = base64Writer;
+		this.proxy = proxy;
+	}
+
 	public EbMSDocument sendMessage(String uri, EbMSDocument document) throws EbMSProcessorException
 	{
 		HttpURLConnection connection = null;

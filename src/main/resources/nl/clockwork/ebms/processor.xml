@@ -228,25 +228,16 @@
 		<property name="password" value="${http.proxy.password}"/>
 	</bean>
 
-	<bean id="ebMSClient" class="nl.clockwork.ebms.client.EbMSHttpClient">
+	<bean id="ebMSClient" class="nl.clockwork.ebms.client.EbMSHttpClientFactory">
+		<property name="type" value="${http.client}"/>
 		<property name="sslFactoryManager" ref="sslFactoryManager"/>
 		<property name="chunkedStreamingMode" value="${http.chunkedStreamingMode}"/>
 		<property name="base64Writer" value="${http.base64Writer}"/>
 		<property name="proxy" ref="ebMSProxy"/>
-	</bean>
-
-	<!--bean id="ebMSClient" class="nl.clockwork.ebms.client.apache.EbMSHttpClient">
-		<property name="sslConnectionSocketFactory" ref="sslConnectionSocketFactory"/>
-		<property name="chunkedStreamingMode" value="${http.chunkedStreamingMode}"/>
-		<property name="proxy" ref="ebMSProxy"/>
-	</bean>
-	
-	<bean id="sslConnectionSocketFactory" class="nl.clockwork.ebms.client.apache.SSLConnectionSocketFactoryFactory">
-		<property name="sslFactoryManager" ref="sslFactoryManager"/>
-		<property name="verifyHostnames" value="${https.verifyHostnames}"></property>
 		<property name="enabledProtocols" value="${https.enabledProtocols}"/>
 		<property name="enabledCipherSuites" value="${https.enabledCipherSuites}"/>
-	</bean-->
+		<property name="verifyHostnames" value="${https.verifyHostnames}"></property>
+	</bean>
 
 	<bean id="sslFactoryManager" class="nl.clockwork.ebms.client.SSLFactoryManager">
 		<property name="keyStorePath" value="${keystore.path}"/>
