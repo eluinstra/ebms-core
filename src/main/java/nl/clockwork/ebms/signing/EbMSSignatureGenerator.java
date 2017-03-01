@@ -132,7 +132,7 @@ public class EbMSSignatureGenerator implements InitializingBean
 		signature.addDocument("",transforms,digestAlgorithm);
 		
 		for (EbMSAttachment attachment : attachments)
-			signature.addDocument(Constants.CID + attachment.getContentId());
+			signature.addDocument(Constants.CID + attachment.getContentId(),null,digestAlgorithm);
 		
 		signature.addKeyInfo(keyPair.getPublic());
 		
