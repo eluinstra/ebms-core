@@ -68,10 +68,7 @@ public class EbMSHttpClient implements EbMSClient
 			HttpPost httpPost = getHttpPost(uri);
 			EbMSMessageWriter ebMSMessageWriter = new EbMSMessageWriter(httpPost,chunkedStreaming(uri));
 			ebMSMessageWriter.write(document);
-			{
-				EbMSDocument in = httpClient.execute(httpPost,new EbMSResponseHandler());
-				return in;
-			}
+			return httpClient.execute(httpPost,new EbMSResponseHandler());
 		}
 		catch (TransformerException | IOException e)
 		{
