@@ -10,6 +10,8 @@
 
 package org.mule.transport.ssl;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.mule.api.security.tls.TlsConfiguration;
 import org.mule.transport.tcp.TcpServerSocketFactory;
 
@@ -23,7 +25,7 @@ import javax.net.ssl.SSLServerSocket;
 
 public class SslServerSocketFactory extends TcpServerSocketFactory
 {
-
+	protected static final Log logger = LogFactory.getLog(SslSocketFactory.class);
 	private TlsConfiguration tls;
 
 	public SslServerSocketFactory(TlsConfiguration tls)
@@ -39,8 +41,18 @@ public class SslServerSocketFactory extends TcpServerSocketFactory
 			ServerSocketFactory ssf = tls.getServerSocketFactory();
 			SSLServerSocket serverSocket = (SSLServerSocket)ssf.createServerSocket();
 			// PATCH
-			serverSocket.setEnabledProtocols(new String[]{"TLSv1.2"});
-			serverSocket.setEnabledCipherSuites(new String[]{"TLS_DHE_RSA_WITH_AES_128_CBC_SHA","TLS_RSA_WITH_AES_128_CBC_SHA"});
+			String protocols = System.getProperty("https.protocols");
+			if (protocols != null)
+			{
+				serverSocket.setEnabledProtocols(protocols.split(","));
+				logger.info("Enabled SSL Protocols: " + protocols);
+			}
+			String cipherSuites = System.getProperty("https.cipherSuites");
+			if (cipherSuites != null)
+			{
+				serverSocket.setEnabledCipherSuites(cipherSuites.split(","));
+				logger.info("Enabled SSL Cipher Suites: " + cipherSuites);
+			}
 			return configure(serverSocket,reuse,new InetSocketAddress(address,port),backlog);
 		}
 		catch (IOException e)
@@ -61,8 +73,18 @@ public class SslServerSocketFactory extends TcpServerSocketFactory
 			ServerSocketFactory ssf = tls.getServerSocketFactory();
 			SSLServerSocket serverSocket = (SSLServerSocket)ssf.createServerSocket();
 			// PATCH
-			serverSocket.setEnabledProtocols(new String[]{"TLSv1.2"});
-			serverSocket.setEnabledCipherSuites(new String[]{"TLS_DHE_RSA_WITH_AES_128_CBC_SHA","TLS_RSA_WITH_AES_128_CBC_SHA"});
+			String protocols = System.getProperty("https.protocols");
+			if (protocols != null)
+			{
+				serverSocket.setEnabledProtocols(protocols.split(","));
+				logger.info("Enabled SSL Protocols: " + protocols);
+			}
+			String cipherSuites = System.getProperty("https.cipherSuites");
+			if (cipherSuites != null)
+			{
+				serverSocket.setEnabledCipherSuites(cipherSuites.split(","));
+				logger.info("Enabled SSL Cipher Suites: " + cipherSuites);
+			}
 			return configure(serverSocket,reuse,new InetSocketAddress(port),backlog);
 		}
 		catch (IOException e)
