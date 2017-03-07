@@ -234,8 +234,8 @@
 		<property name="chunkedStreamingMode" value="${http.chunkedStreamingMode}"/>
 		<property name="base64Writer" value="${http.base64Writer}"/>
 		<property name="proxy" ref="ebMSProxy"/>
-		<property name="enabledProtocols" value="${https.enabledProtocols}"/>
-		<property name="enabledCipherSuites" value="${https.enabledCipherSuites}"/>
+		<property name="enabledProtocols" value="${https.protocols}"/>
+		<property name="enabledCipherSuites" value="${https.cipherSuites}"/>
 		<property name="verifyHostnames" value="${https.verifyHostnames}"></property>
 	</bean>
 
