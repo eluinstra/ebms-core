@@ -6,7 +6,7 @@ import org.springframework.beans.factory.FactoryBean;
 
 public class EbMSHttpClientFactory implements FactoryBean<EbMSClient>
 {
-	enum EbMSHttpClientType
+	public enum EbMSHttpClientType
 	{
 		DEFAULT, APACHE;
 	}
