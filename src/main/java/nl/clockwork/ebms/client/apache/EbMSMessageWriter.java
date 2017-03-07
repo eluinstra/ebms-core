@@ -63,7 +63,7 @@ public class EbMSMessageWriter
 
 	protected void writeMessage(EbMSDocument document) throws UnsupportedEncodingException, TransformerException
 	{
-		if (logger.isInfoEnabled())
+		if (logger.isInfoEnabled() && !LogFactory.getLog("org.apache.http.wire").isDebugEnabled())
 			logger.info(">>>>\n" + DOMUtils.toString(document.getMessage()));
 		httpPost.setHeader("SOAPAction",Constants.EBMS_SOAP_ACTION);
 		StringEntity entity = new StringEntity(DOMUtils.toString(document.getMessage(),"UTF-8"),"UTF-8");
@@ -74,7 +74,7 @@ public class EbMSMessageWriter
 
 	protected void writeMimeMessage(EbMSDocument document) throws IOException, TransformerException
 	{
-		if (logger.isInfoEnabled())
+		if (logger.isInfoEnabled() && !LogFactory.getLog("org.apache.http.wire").isDebugEnabled())
 			logger.info(">>>>\n" + DOMUtils.toString(document.getMessage()));
 		httpPost.setHeader("SOAPAction",Constants.EBMS_SOAP_ACTION);
 		MultipartEntityBuilder entity = MultipartEntityBuilder.create();
