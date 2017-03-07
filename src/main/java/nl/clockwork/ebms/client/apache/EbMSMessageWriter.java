@@ -25,11 +25,13 @@ import nl.clockwork.ebms.common.util.DOMUtils;
 import nl.clockwork.ebms.model.EbMSAttachment;
 import nl.clockwork.ebms.model.EbMSDocument;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
+import org.apache.http.entity.mime.FormBodyPartBuilder;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.entity.mime.content.InputStreamBody;
 import org.apache.http.entity.mime.content.StringBody;
@@ -37,8 +39,8 @@ import org.apache.http.entity.mime.content.StringBody;
 public class EbMSMessageWriter
 {
   protected transient Log logger = LogFactory.getLog(getClass());
-	private HttpPost httpPost;
-	private boolean chunkedStreamingMode = true;
+	protected HttpPost httpPost;
+	protected boolean chunkedStreamingMode = true;
 	
 	public EbMSMessageWriter(HttpPost httpPost)
 	{
@@ -53,16 +55,16 @@ public class EbMSMessageWriter
 
 	public void write(EbMSDocument document) throws IOException, TransformerException, UnsupportedEncodingException
 	{
-		if (logger.isInfoEnabled())
-			logger.info(">>>>\n" + DOMUtils.toString(document.getMessage()));
 		if (document.getAttachments().size() > 0)
 			writeMimeMessage(document);
 		else
 			writeMessage(document);
 	}
 
-	private void writeMessage(EbMSDocument document) throws UnsupportedEncodingException, TransformerException
+	protected void writeMessage(EbMSDocument document) throws UnsupportedEncodingException, TransformerException
 	{
+		if (logger.isInfoEnabled())
+			logger.info(">>>>\n" + DOMUtils.toString(document.getMessage()));
 		httpPost.setHeader("SOAPAction",Constants.EBMS_SOAP_ACTION);
 		StringEntity entity = new StringEntity(DOMUtils.toString(document.getMessage(),"UTF-8"),"UTF-8");
 		entity.setContentType("text/xml");
@@ -70,16 +72,35 @@ public class EbMSMessageWriter
 		httpPost.setEntity(entity);
 	}
 
-	private void writeMimeMessage(EbMSDocument document) throws IOException, TransformerException
+	protected void writeMimeMessage(EbMSDocument document) throws IOException, TransformerException
 	{
 		if (logger.isInfoEnabled())
 			logger.info(">>>>\n" + DOMUtils.toString(document.getMessage()));
 		httpPost.setHeader("SOAPAction",Constants.EBMS_SOAP_ACTION);
 		MultipartEntityBuilder entity = MultipartEntityBuilder.create();
-    entity.addPart("0",new StringBody(DOMUtils.toString(document.getMessage(),"UTF-8"),ContentType.create("text/xml; charset=UTF-8")));
+		entity.addPart(document.getContentId(),new StringBody(DOMUtils.toString(document.getMessage(),"UTF-8"),ContentType.create("text/xml")));
 		for (EbMSAttachment attachment : document.getAttachments())
-	    entity.addPart(attachment.getContentId(),new InputStreamBody(attachment.getInputStream(),ContentType.create(attachment.getContentType()),attachment.getName()));
+			if (attachment.getContentType().matches("^(text/.*|.*/xml)$"))
+				writeTextAttachment(entity,attachment);
+			else
+				writeBinaryAttachment(entity,attachment);
 		httpPost.setEntity(entity.build());
+	}
+
+	protected void writeTextAttachment(MultipartEntityBuilder entity, EbMSAttachment attachment) throws IOException
+	{
+		StringBody contentBody = new StringBody(IOUtils.toString(attachment.getInputStream()),ContentType.create(attachment.getContentType()));
+		FormBodyPartBuilder formBodyPartBuilder = FormBodyPartBuilder.create(attachment.getName(),contentBody);
+		formBodyPartBuilder.addField("Content-ID",attachment.getContentId());
+		entity.addPart(formBodyPartBuilder.build());
+	}
+
+	protected void writeBinaryAttachment(MultipartEntityBuilder entity, EbMSAttachment attachment) throws IOException
+	{
+		InputStreamBody contentBody = new InputStreamBody(attachment.getInputStream(),ContentType.create(attachment.getContentType()),attachment.getName());
+		FormBodyPartBuilder formBodyPartBuilder = FormBodyPartBuilder.create(attachment.getName(),contentBody);
+		formBodyPartBuilder.addField("Content-ID",attachment.getContentId());
+		entity.addPart(formBodyPartBuilder.build());
 	}
 
 }

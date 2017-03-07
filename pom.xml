@@ -55,7 +55,7 @@
 		<jdk.version>1.7</jdk.version>
 		<spring.version>3.2.1.RELEASE</spring.version>
 		<mime4j.version>0.7.2</mime4j.version>
-		<httpclient.version>4.3.6</httpclient.version>
+		<httpclient.version>4.5.3</httpclient.version>
 		<activemq.version>5.10.0</activemq.version>
 		<release.repo.url>http://sourceforge.net</release.repo.url>
 		<snapshot.repo.url>http://sourceforge.net</snapshot.repo.url>

@@ -15,6 +15,10 @@
  */
 package nl.clockwork.ebms.client.apache;
 
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLSession;
+
 import nl.clockwork.ebms.ssl.SSLFactoryManager;
 
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
@@ -42,9 +46,21 @@ public class SSLConnectionSocketFactoryFactory implements FactoryBean<SSLConnect
 	@Override
 	public SSLConnectionSocketFactory getObject() throws Exception
 	{
-		return new SSLConnectionSocketFactory(sslFactoryManager.getSslSocketFactory(),enabledProtocols,enabledCipherSuites,verifyHostnames ? SSLConnectionSocketFactory.STRICT_HOSTNAME_VERIFIER : SSLConnectionSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
+		return new SSLConnectionSocketFactory(sslFactoryManager.getSslSocketFactory(),enabledProtocols.length == 0 ? null : enabledProtocols,enabledCipherSuites.length == 0 ? null : enabledCipherSuites,getHostnameVerifier());
 	}
 
+	private HostnameVerifier getHostnameVerifier()
+	{
+		return verifyHostnames ? HttpsURLConnection.getDefaultHostnameVerifier() : new HostnameVerifier()
+		{
+			@Override
+			public boolean verify(String hostname, SSLSession sslSession)
+			{
+				return true;
+			}
+		};
+	}
+	
 	@Override
 	public Class<?> getObjectType()
 	{
