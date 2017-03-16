@@ -240,8 +240,8 @@
 	</bean>
 
 	<bean id="sslFactoryManager" class="nl.clockwork.ebms.client.SSLFactoryManager">
-		<property name="keyStorePath" value="${keystore.path}"/>
-		<property name="keyStorePassword" value="${keystore.password}"/>
+		<property name="keyStorePath" value="${client.keystore.path}"/>
+		<property name="keyStorePassword" value="${client.keystore.password}"/>
 		<property name="trustStorePath" value="${truststore.path}"/>
 		<property name="trustStorePassword" value="${truststore.password}"/>
 		<property name="verifyHostnames" value="${https.verifyHostnames}"></property>
