@@ -38,36 +38,6 @@ download and copy one of the following libraries to <mule-standalone-3.x.x>/lib/
 
 to generate cleaner/smaller messages/signatures download and copy xmlsec-1.5.3.jar to <mule-standalone-3.x.x>/lib/user (optional)
 
-=================
-Configure Stubs =
-=================
-
-	============================
-	Configure digipoort EbMS stub =
-	============================
-	create file ${mule.home}/conf/ebf.digipoort.properties (this overrides properties from nl/clockwork/ebms/default.properties and nl/clockwork/mule/ebms/stub/ebf/default.digipoort.properties)
-	
-	edit and add the following lines to ${mule.home}/conf/ebf.digipoort.properties:
-	
-	service.port=4443
-	
-	dir.base=H:/tmp/ebms-stub/digipoort
-	
-	jmx.port=1099
-	
-	===========================
-	Configure overheid EbMS stub =
-	===========================
-	create file ${mule.home}/conf/ebf.overheid.properties (this overrides properties from nl/clockwork/mule/ebms/default.properties and nl/clockwork/mule/ebms/stub/ebf/default.overheid.properties)
-	
-	edit and add the following lines to ${mule.home}/conf/ebf.overheid.properties:
-	
-	service.port=443
-	
-	dir.base=H:/tmp/ebms-stub/overheid
-	
-	jmx.port=1099
-
 ===================================
 Configure EbMS Adapter Standalone =
 ===================================
@@ -93,52 +63,21 @@ Set Environment Vairables =
 
 > cd %MULE_HOME%\bin
 
-========================
-Start digipoort EbMS stub =
-========================
-> mule -config nl/clockwork/mule/ebms/stub/ebf/main.digipoort.xml
-
-=======================
-Start overheid EbMS stub =
-=======================
-> mule -config nl/clockwork/mule/ebms/stub/ebf/main.overheid.xml
-
 ===============================
 Start EbMS Adapter Standalone =
 ===============================
 add the following lines to <mule-standalone-3.x.x>/conf/wrapper.conf
 wrapper.java.additional.4=-Debms.protocol=http
+wrapper.java.additional.5=-Dhttps.protocols=TLSv1.2
+wrapper.java.additional.6=-Dhttps.cipherSuites=TLS_RSA_WITH_AES_256_CBC_SHA256,TLS_RSA_WITH_AES_128_CBC_SHA256,TLS_RSA_WITH_AES_256_CBC_SHA,TLS_RSA_WITH_AES_128_CBC_SHA
 
-> mule -config nl/clockwork/mule/ebms/main.xml
+place mule-ssl-1.0.jar in <mule-standalone-3.x.x>/lib/user
 
 CPA Webservice:
 http://localhost:8089/adapter/cpa
 
 Messaging Webservice:
 http://localhost:8089/adapter/ebms
-
-===============
-Testing Stubs =
-===============
-Load CPA in overheid EbMS stub:
-	copy ebms-adapter-mule3-x.x.x.zip/resources/CPAs/cpaStubEBF.xml to <overheid EbMS stub dir.base>/cpa
-		the file will be moved to <overheid EbMS stub dir.base>/cpa/processed when it's processed
-		an import report will be written to <overheid EbMS stub dir.base>/cpa/reports
-Now the CPA is loaded the overheid EbMS stub is ready to send and receive messages.
-
-Load CPA in digipoort EbMS stub:
-	copy ebms-adapter-mule3-x.x.x.zip/resources/CPAs/cpaStubEBF.xml to <digipoort EbMS stub dir.base>/cpa
-		the file will be moved to <digipoort EbMS stub dir.base>/cpa/processed when it's processed
-		an import report will be written to <digipoort EbMS stub dir.base>/cpa/reports
-Now the CPA is loaded the digipoort EbMS stub is ready to send and receive messages.
-
-Send afleverbericht message from digipoort EbMS stub to overheid EbMS stub:
-	copy ebms-adapter-mule3-x.x.x.zip/resources/data/afleveren/Afleverbericht_Afleveren_ebMS_2.0_v1.1.xml to <digipoort EbMS stub dir.base>/afleveren/request
-		check <digipoort EbMS stub dir.base>/afleveren/response for the response message
-
-Send aanleverbericht message from overheid EbMS stub to digipoort EbMS stub:
-	copy ebms-adapter-mule3-x.x.x.zip/resources/data/aanleveren/Aanleverbericht_Aanleveren_ebMS_2.0_v1.1.xml to <overheid EbMS stub dir.base>/aanleveren/request
-		check <overheid EbMS stub dir.base>/aanleveren/request for the response message
 
 =======
 Usage =
@@ -157,8 +96,6 @@ The application should wrap the content of the message in an object of type EbMS
 If the message is a response to a previous received message, then include the EbMSMessageContext of the previous message.
 The EbMS adapter will then correlate these two messages.
 If the message is a new message, then leave the EbMSMessageContext empty.
-
-You can use nl/clockwork/mule/ebms/stub/ebf/main.digipoort.xml as a Stub to test your own application.
 
 
 =====================================
