@@ -16,7 +16,7 @@ public class EventListenerFactory implements FactoryBean<EventListener>
 {
 	enum EventListenerType
 	{
-		DEFAULT, LOGGING, DAO, SIMPLE_JMS, JMS;
+		DEFAULT, DAO, SIMPLE_JMS, JMS;
 	}
 	
 	private EventListenerType type;
@@ -26,11 +26,7 @@ public class EventListenerFactory implements FactoryBean<EventListener>
 	@Override
 	public EventListener getObject() throws Exception
 	{
-		if (EventListenerType.LOGGING.equals(type))
-		{
-			return new LoggingEventListener();
-		}
-		else if (EventListenerType.DAO.equals(type))
+		if (EventListenerType.DAO.equals(type))
 		{
 			return new DAOEventListener(ebMSDAO);
 		}
@@ -38,13 +34,13 @@ public class EventListenerFactory implements FactoryBean<EventListener>
 		{
 			return new SimpleJMSEventListener(createJmsTemplate(jmsBrokerURL),createDestinations());
 		}
-		else if (EventListenerType.LOGGING.equals(type))
+		else if (EventListenerType.JMS.equals(type))
 		{
 			return new JMSEventListener(ebMSDAO,createJmsTemplate(jmsBrokerURL),createDestinations());
 		}
 		else
 		{
-			return new DefaultEventListener();
+			return new LoggingEventListener();
 		}
 	}
 
@@ -92,9 +88,16 @@ public class EventListenerFactory implements FactoryBean<EventListener>
 		return result;
 	}
 
-	public void setType(EventListenerType type)
+	public void setType(String type)
 	{
-		this.type = type;
+		try
+		{
+			this.type = EventListenerType.valueOf(type);
+		}
+		catch (IllegalArgumentException e)
+		{
+			this.type = EventListenerType.DEFAULT;
+		}
 	}
 
 	public void setEbMSDAO(EbMSDAO ebMSDAO)

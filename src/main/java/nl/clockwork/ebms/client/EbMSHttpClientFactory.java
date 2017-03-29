@@ -64,6 +64,7 @@ public class EbMSHttpClientFactory implements FactoryBean<EbMSClient>
 		}
 		catch (IllegalArgumentException e)
 		{
+			this.type = EbMSHttpClientType.DEFAULT;
 		}
 	}
 
