@@ -23,12 +23,14 @@ import javax.jws.WebResult;
 import javax.jws.WebService;
 import javax.xml.bind.annotation.XmlElement;
 
+import nl.clockwork.ebms.Constants.EbMSMessageEventType;
 import nl.clockwork.ebms.model.EbMSMessageContent;
 import nl.clockwork.ebms.model.EbMSMessageContext;
+import nl.clockwork.ebms.model.EbMSMessageEvent;
 import nl.clockwork.ebms.model.MessageStatus;
 import nl.clockwork.ebms.model.Party;
 
-@WebService(targetNamespace="http://www.ordina.nl/ebms/2.10")
+@WebService(targetNamespace="http://www.ordina.nl/ebms/2.12")
 public interface EbMSMessageService
 {
 	@WebMethod(operationName="Ping")
@@ -60,4 +62,13 @@ public interface EbMSMessageService
 	@WebMethod(operationName="GetMessageStatus")
 	MessageStatus getMessageStatus(@WebParam(name="CPAId") @XmlElement(required=true) String cpaId, @WebParam(name="FromParty") @XmlElement(required=true) Party fromParty, @WebParam(name="ToParty") @XmlElement(required=true) Party toParty, @WebParam(name="MessageId") @XmlElement(required=true) String messageId) throws EbMSMessageServiceException;
 
+	@WebResult(name="MessageEvents")
+	@WebMethod(operationName="GetMessageEvents")
+	List<EbMSMessageEvent> getMessageEvents(@WebParam(name="MessageContext") @XmlElement(required=true) EbMSMessageContext messageContext, @WebParam(name="EventType") @XmlElement(required=true) EbMSMessageEventType[] eventTypes, @WebParam(name="MaxNr") Integer maxNr) throws EbMSMessageServiceException;
+
+	@WebMethod(operationName="ProcessMessageEvent")
+	void processMessageEvent(@WebParam(name="MessageId") @XmlElement(required=true) String messageId) throws EbMSMessageServiceException;
+
+	@WebMethod(operationName="ProcessMessageEvents")
+	void processMessageEvents(@WebParam(name="MessageId") @XmlElement(required=true) List<String> messageIds) throws EbMSMessageServiceException;
 }

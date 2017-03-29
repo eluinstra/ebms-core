@@ -32,6 +32,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
 import nl.clockwork.ebms.Constants.EbMSEventStatus;
+import nl.clockwork.ebms.Constants.EbMSMessageEventType;
 import nl.clockwork.ebms.Constants.EbMSMessageStatus;
 import nl.clockwork.ebms.common.XMLMessageBuilder;
 import nl.clockwork.ebms.common.util.DOMUtils;
@@ -42,6 +43,7 @@ import nl.clockwork.ebms.model.EbMSEvent;
 import nl.clockwork.ebms.model.EbMSMessage;
 import nl.clockwork.ebms.model.EbMSMessageContent;
 import nl.clockwork.ebms.model.EbMSMessageContext;
+import nl.clockwork.ebms.model.EbMSMessageEvent;
 import nl.clockwork.ebms.model.Role;
 import nl.clockwork.ebms.util.EbMSMessageUtils;
 
@@ -1082,6 +1084,157 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 		}
 	}
 
+	protected String join(EbMSMessageEventType[] array, String delimiter)
+	{
+		StringBuffer result = new StringBuffer();
+		if (array.length > 0)
+		{
+			boolean first = true;
+			for (EbMSMessageEventType s : array)
+			{
+				if (first)
+					first = false;
+				else
+					result.append(delimiter);
+				result.append(s.ordinal());
+			}
+		}
+		return result.toString();
+	}
+	
+	@Override
+	public List<EbMSMessageEvent> getEbMSMessageEvents(EbMSMessageContext messageContext, EbMSMessageEventType[] types) throws DAOException
+	{
+		try
+		{
+			List<Object> parameters = new ArrayList<Object>();
+			return jdbcTemplate.query(
+				"select ebms_message_event.message_id, ebms_message_event.event_type" +
+				" from ebms_message_event, ebms_message" +
+				" where ebms_message_event.processed = 0" +
+				" and ebms_message_event.event_type in (" + join(types == null ? EbMSMessageEventType.values() : types,",") + ")" +
+				" and ebms_message_event.message_id = ebms_message.message_id" +
+				" and ebms_message.message_nr = 0" +
+				getMessageContextFilter(messageContext,parameters) +
+				" order by time_stamp asc",
+				parameters.toArray(new Object[0]),
+				new RowMapper<EbMSMessageEvent>()
+				{
+					@Override
+					public EbMSMessageEvent mapRow(ResultSet rs, int nr) throws SQLException
+					{
+						return new EbMSMessageEvent(rs.getString("message_id"),EbMSMessageEventType.values()[rs.getInt("event_type")]);
+					}
+				}
+			);
+		}
+		catch (DataAccessException e)
+		{
+			throw new DAOException(e);
+		}
+	}
+
+	protected abstract String getMessageEventsQuery(String messageContextFilter, EbMSMessageEventType[] types, int maxNr);
+
+	@Override
+	public List<EbMSMessageEvent> getEbMSMessageEvents(EbMSMessageContext messageContext, EbMSMessageEventType[] types, int maxNr) throws DAOException
+	{
+		try
+		{
+			List<Object> parameters = new ArrayList<Object>();
+			String messageContextFilter = getMessageContextFilter(messageContext,parameters);
+			return jdbcTemplate.query(
+				getMessageEventsQuery(messageContextFilter,types,maxNr),
+				parameters.toArray(new Object[0]),
+				new RowMapper<EbMSMessageEvent>()
+				{
+					@Override
+					public EbMSMessageEvent mapRow(ResultSet rs, int nr) throws SQLException
+					{
+						return new EbMSMessageEvent(rs.getString("message_id"),EbMSMessageEventType.values()[rs.getInt("event_type")]);
+					}
+				}
+			);
+		}
+		catch (DataAccessException e)
+		{
+			throw new DAOException(e);
+		}
+	}
+
+	@Override
+	public void insertEbMSMessageEvent(String messageId, EbMSMessageEventType type) throws DAOException
+	{
+		try
+		{
+			jdbcTemplate.update
+			(
+				"insert into ebms_message_event (" +
+					"message_id," +
+					"event_type," +
+					"time_stamp" +
+				") values (?,?,?)",
+				messageId,
+				type.ordinal(),
+				new Date()
+			);
+		}
+		catch (DataAccessException e)
+		{
+			throw new DAOException(e);
+		}
+	}
+
+	@Override
+	public int processEbMSMessageEvent(String messageId) throws DAOException
+	{
+		try
+		{
+			return jdbcTemplate.update
+			(
+				"update ebms_message_event" +
+				" set processed = 1" +
+				" where message_id = ?",
+				messageId
+			);
+		}
+		catch (DataAccessException e)
+		{
+			throw new DAOException(e);
+		}
+	}
+
+	@Override
+	public void processEbMSMessageEvents(final List<String> messageIds) throws DAOException
+	{
+		try
+		{
+			jdbcTemplate.batchUpdate(
+				"update ebms_message_event" +
+				" set procesed = 1," +
+				" where message_id = ?",
+				new BatchPreparedStatementSetter()
+				{
+					@Override
+					public void setValues(PreparedStatement ps, int row) throws SQLException
+					{
+						ps.setString(1,messageIds.get(row));
+					}
+
+					@Override
+					public int getBatchSize()
+					{
+						return messageIds.size();
+					}
+				}
+			);
+		}
+		catch (DataAccessException e)
+		{
+			throw new DAOException(e);
+		}
+	}
+
 	protected List<EbMSAttachment> getAttachments(String messageId)
 	{
 		return jdbcTemplate.query(
@@ -1173,5 +1326,5 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 		}
 		return result.toString();
 	}
-	
+
 }

@@ -254,4 +254,10 @@
 		<property name="verifyHostnames" value="${https.verifyHostnames}"></property>
 	</bean>
 
+	<bean id="eventListener" class="nl.clockwork.ebms.event.EventListenerFactory">
+		<property name="type" value="${eventListener}" />
+		<property name="ebMSDAO" ref="ebMSDAO" />
+		<property name="jmsBrokerURL" value="${jms.brokerURL}" />
+	</bean>
+
 </beans>

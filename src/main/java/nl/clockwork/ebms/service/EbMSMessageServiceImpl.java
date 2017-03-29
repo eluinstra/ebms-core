@@ -22,6 +22,7 @@ import javax.xml.transform.TransformerFactoryConfigurationError;
 
 import nl.clockwork.ebms.Constants;
 import nl.clockwork.ebms.Constants.EbMSAction;
+import nl.clockwork.ebms.Constants.EbMSMessageEventType;
 import nl.clockwork.ebms.Constants.EbMSMessageStatus;
 import nl.clockwork.ebms.client.DeliveryManager;
 import nl.clockwork.ebms.common.CPAManager;
@@ -34,6 +35,7 @@ import nl.clockwork.ebms.model.CacheablePartyId;
 import nl.clockwork.ebms.model.EbMSMessage;
 import nl.clockwork.ebms.model.EbMSMessageContent;
 import nl.clockwork.ebms.model.EbMSMessageContext;
+import nl.clockwork.ebms.model.EbMSMessageEvent;
 import nl.clockwork.ebms.model.MessageStatus;
 import nl.clockwork.ebms.model.Party;
 import nl.clockwork.ebms.processor.EbMSProcessorException;
@@ -253,6 +255,48 @@ public class EbMSMessageServiceImpl implements InitializingBean, EbMSMessageServ
 	public void setSignatureGenerator(EbMSSignatureGenerator signatureGenerator)
 	{
 		this.signatureGenerator = signatureGenerator;
+	}
+
+	@Override
+	public List<EbMSMessageEvent> getMessageEvents(EbMSMessageContext messageContext, EbMSMessageEventType[] eventTypes, Integer maxNr) throws EbMSMessageServiceException
+	{
+		try
+		{
+			if (maxNr == null || maxNr == 0)
+				return ebMSDAO.getEbMSMessageEvents(messageContext,eventTypes);
+			else
+				return ebMSDAO.getEbMSMessageEvents(messageContext,eventTypes,maxNr);
+		}
+		catch (DAOException e)
+		{
+			throw new EbMSMessageServiceException(e);
+		}
+	}
+
+	@Override
+	public void processMessageEvent(String messageId) throws EbMSMessageServiceException
+	{
+		try
+		{
+			ebMSDAO.processEbMSMessageEvent(messageId);
+		}
+		catch (DAOException e)
+		{
+			throw new EbMSMessageServiceException(e);
+		}
+	}
+
+	@Override
+	public void processMessageEvents(List<String> messageIds) throws EbMSMessageServiceException
+	{
+		try
+		{
+			ebMSDAO.processEbMSMessageEvents(messageIds);
+		}
+		catch (DAOException e)
+		{
+			throw new EbMSMessageServiceException(e);
+		}
 	}
 
 }

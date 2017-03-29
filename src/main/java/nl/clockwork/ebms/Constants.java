@@ -23,12 +23,6 @@ import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageStatusTy
 
 public class Constants
 {
-	public static String MESSAGE = "MESSAGE";
-	public static String EVENT_RECEIVED = "EVENT.RECEIVED";
-	public static String EVENT_ACKNOWLEDGED = "EVENT.ACKNOWLEDGED";
-	public static String EVENT_FAILED = "EVENT.FAILED";
-	public static String EVENT_EXPIRED = "EVENT.EXPIRED";
-
 	public static enum EbMSMessageStatus
 	{
 		UNAUTHORIZED(0,MessageStatusType.UN_AUTHORIZED), NOT_RECOGNIZED(1,MessageStatusType.NOT_RECOGNIZED), RECEIVED(2,MessageStatusType.RECEIVED), PROCESSED(3,MessageStatusType.PROCESSED), FORWARDED(4,MessageStatusType.FORWARDED), FAILED(5,MessageStatusType.RECEIVED), /*WAITING(6,MessageStatusType.RECEIVED), */SENDING(10), DELIVERY_FAILED(11), DELIVERED(12), EXPIRED(13);
@@ -122,6 +116,11 @@ public class Constants
 			return null;
 		}
   }
+
+	public static enum EbMSMessageEventType
+	{
+		RECEIVED,ACKNOWLEDGED,FAILED,EXPIRED;
+	}
 
 	public static final String EBMS_SOAP_ACTION = "\"ebXML\"";
 	public static final String EBMS_VERSION = "2.0";

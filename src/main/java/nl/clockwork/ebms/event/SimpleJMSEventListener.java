@@ -22,7 +22,7 @@ import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.Session;
 
-import nl.clockwork.ebms.Constants;
+import nl.clockwork.ebms.Constants.EbMSMessageEventType;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -54,13 +54,23 @@ public class SimpleJMSEventListener implements EventListener
 	private JmsTemplate jmsTemplate;
 	private Map<String,Destination> destinations;
 
+	public SimpleJMSEventListener()
+	{
+	}
+
+	public SimpleJMSEventListener(JmsTemplate jmsTemplate, Map<String,Destination> destinations)
+	{
+		this.jmsTemplate = jmsTemplate;
+		this.destinations = destinations;
+	}
+
 	@Override
 	public void onMessageReceived(String messageId) throws EventException
 	{
 		try
 		{
 			logger.info("Message " + messageId + " received");
-			jmsTemplate.send(destinations.get(Constants.EVENT_RECEIVED),new EventMessageCreator(messageId));
+			jmsTemplate.send(destinations.get(EbMSMessageEventType.RECEIVED),new EventMessageCreator(messageId));
 		}
 		catch (JmsException e)
 		{
@@ -74,7 +84,7 @@ public class SimpleJMSEventListener implements EventListener
 		try
 		{
 			logger.info("Message " + messageId + " acknowledged");
-			jmsTemplate.send(destinations.get(Constants.EVENT_ACKNOWLEDGED),new EventMessageCreator(messageId));
+			jmsTemplate.send(destinations.get(EbMSMessageEventType.ACKNOWLEDGED),new EventMessageCreator(messageId));
 		}
 		catch (JmsException e)
 		{
@@ -88,7 +98,7 @@ public class SimpleJMSEventListener implements EventListener
 		try
 		{
 			logger.info("Message " + messageId + " failed");
-			jmsTemplate.send(destinations.get(Constants.EVENT_FAILED),new EventMessageCreator(messageId));
+			jmsTemplate.send(destinations.get(EbMSMessageEventType.FAILED),new EventMessageCreator(messageId));
 		}
 		catch (JmsException e)
 		{
@@ -102,7 +112,7 @@ public class SimpleJMSEventListener implements EventListener
 		try
 		{
 			logger.info("Message " + messageId + " expired");
-			jmsTemplate.send(destinations.get(Constants.EVENT_EXPIRED),new EventMessageCreator(messageId));
+			jmsTemplate.send(destinations.get(EbMSMessageEventType.EXPIRED),new EventMessageCreator(messageId));
 		}
 		catch (JmsException e)
 		{

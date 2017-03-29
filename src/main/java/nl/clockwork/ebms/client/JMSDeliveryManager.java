@@ -26,7 +26,6 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.xpath.XPathExpressionException;
 
-import nl.clockwork.ebms.Constants;
 import nl.clockwork.ebms.model.EbMSDocument;
 import nl.clockwork.ebms.model.EbMSMessage;
 import nl.clockwork.ebms.processor.EbMSProcessingException;
@@ -41,6 +40,7 @@ import org.xml.sax.SAXException;
 
 public class JMSDeliveryManager extends DeliveryManager //DeliveryService
 {
+	protected static String MESSAGE = "MESSAGE";
 	protected transient Log logger = LogFactory.getLog(getClass());
 	private JmsTemplate jmsTemplate;
 
@@ -56,7 +56,7 @@ public class JMSDeliveryManager extends DeliveryManager //DeliveryService
 				if (document == null)
 				{
 					jmsTemplate.setReceiveTimeout(180000);
-					return (EbMSMessage)jmsTemplate.receiveSelectedAndConvert(Constants.MESSAGE,"JMSCorrelationID='" + message.getMessageHeader().getMessageData().getMessageId() + "'");
+					return (EbMSMessage)jmsTemplate.receiveSelectedAndConvert(MESSAGE,"JMSCorrelationID='" + message.getMessageHeader().getMessageData().getMessageId() + "'");
 				}
 				else
 					return EbMSMessageUtils.getEbMSMessage(document);
@@ -84,7 +84,7 @@ public class JMSDeliveryManager extends DeliveryManager //DeliveryService
 	{
 		jmsTemplate.setExplicitQosEnabled(true);
 		jmsTemplate.setTimeToLive(60000);
-		jmsTemplate.convertAndSend(Constants.MESSAGE,message,new MessagePostProcessor()
+		jmsTemplate.convertAndSend(MESSAGE,message,new MessagePostProcessor()
 		{
 			@Override
 			public Message postProcessMessage(Message m) throws JMSException

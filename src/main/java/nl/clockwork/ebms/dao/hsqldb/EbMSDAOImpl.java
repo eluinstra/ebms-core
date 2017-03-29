@@ -15,6 +15,7 @@
  */
 package nl.clockwork.ebms.dao.hsqldb;
 
+import nl.clockwork.ebms.Constants.EbMSMessageEventType;
 import nl.clockwork.ebms.Constants.EbMSMessageStatus;
 import nl.clockwork.ebms.dao.AbstractEbMSDAO;
 
@@ -38,6 +39,20 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 		messageContextFilter +
 		" order by time_stamp asc" +
 		" limit " + maxNr;
+	}
+
+	@Override
+	protected String getMessageEventsQuery(String messageContextFilter, EbMSMessageEventType[] types, int maxNr)
+	{
+		return "select ebms_message_event.message_id, ebms_message_event.event_type" +
+			" from ebms_message_event, ebms_message" +
+			" where ebms_message_event.processed = 0" +
+			" and ebms_message_event.event_type in (" + join(types == null ? EbMSMessageEventType.values() : types,",") + ")" +
+			" and ebms_message_event.message_id = ebms_message.message_id" +
+			" and ebms_message.message_nr = 0" +
+			messageContextFilter +
+			" order by time_stamp asc" +
+			" limit " + maxNr;
 	}
 
 }

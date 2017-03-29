@@ -35,6 +35,5 @@
 	<import resource="dao.xml" />
 
 	<import resource="processor.xml"/>
-	<import resource="eventListener.xml"/>
 
 </beans>
