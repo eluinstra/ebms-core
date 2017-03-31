@@ -70,7 +70,7 @@ public class SimpleJMSEventListener implements EventListener
 		try
 		{
 			logger.info("Message " + messageId + " received");
-			jmsTemplate.send(destinations.get(EbMSMessageEventType.RECEIVED),new EventMessageCreator(messageId));
+			jmsTemplate.send(destinations.get(EbMSMessageEventType.RECEIVED.name()),new EventMessageCreator(messageId));
 		}
 		catch (JmsException e)
 		{
@@ -84,7 +84,7 @@ public class SimpleJMSEventListener implements EventListener
 		try
 		{
 			logger.info("Message " + messageId + " acknowledged");
-			jmsTemplate.send(destinations.get(EbMSMessageEventType.ACKNOWLEDGED),new EventMessageCreator(messageId));
+			jmsTemplate.send(destinations.get(EbMSMessageEventType.ACKNOWLEDGED.name()),new EventMessageCreator(messageId));
 		}
 		catch (JmsException e)
 		{
@@ -98,7 +98,7 @@ public class SimpleJMSEventListener implements EventListener
 		try
 		{
 			logger.info("Message " + messageId + " failed");
-			jmsTemplate.send(destinations.get(EbMSMessageEventType.FAILED),new EventMessageCreator(messageId));
+			jmsTemplate.send(destinations.get(EbMSMessageEventType.FAILED.name()),new EventMessageCreator(messageId));
 		}
 		catch (JmsException e)
 		{
@@ -112,7 +112,7 @@ public class SimpleJMSEventListener implements EventListener
 		try
 		{
 			logger.info("Message " + messageId + " expired");
-			jmsTemplate.send(destinations.get(EbMSMessageEventType.EXPIRED),new EventMessageCreator(messageId));
+			jmsTemplate.send(destinations.get(EbMSMessageEventType.EXPIRED.name()),new EventMessageCreator(messageId));
 		}
 		catch (JmsException e)
 		{

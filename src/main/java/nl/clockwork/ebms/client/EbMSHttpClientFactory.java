@@ -17,6 +17,8 @@ package nl.clockwork.ebms.client;
 
 import nl.clockwork.ebms.ssl.SSLFactoryManager;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.FactoryBean;
 
 public class EbMSHttpClientFactory implements FactoryBean<EbMSClient>
@@ -26,6 +28,7 @@ public class EbMSHttpClientFactory implements FactoryBean<EbMSClient>
 		DEFAULT, APACHE;
 	}
 
+	protected transient Log logger = LogFactory.getLog(getClass());
 	private EbMSHttpClientType type;
 	private SSLFactoryManager sslFactoryManager;
 	private boolean chunkedStreamingMode;
@@ -38,6 +41,7 @@ public class EbMSHttpClientFactory implements FactoryBean<EbMSClient>
 	@Override
 	public EbMSClient getObject() throws Exception
 	{
+		logger.info("Using EbMSHttpClient " + type.name());
 		if (EbMSHttpClientType.APACHE.equals(type))
 			return new nl.clockwork.ebms.client.apache.EbMSHttpClient(sslFactoryManager,enabledProtocols,enabledCipherSuites,verifyHostnames,chunkedStreamingMode,proxy);
 		else

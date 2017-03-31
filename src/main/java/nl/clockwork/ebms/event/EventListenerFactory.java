@@ -9,16 +9,19 @@ import nl.clockwork.ebms.dao.EbMSDAO;
 import org.apache.activemq.command.ActiveMQQueue;
 import org.apache.activemq.pool.PooledConnectionFactory;
 import org.apache.activemq.spring.ActiveMQConnectionFactory;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.jms.core.JmsTemplate;
 
 public class EventListenerFactory implements FactoryBean<EventListener>
 {
-	enum EventListenerType
+	public enum EventListenerType
 	{
 		DEFAULT, DAO, SIMPLE_JMS, JMS;
 	}
 	
+	protected transient Log logger = LogFactory.getLog(getClass());
 	private EventListenerType type;
 	private EbMSDAO ebMSDAO;
 	private String jmsBrokerURL;
@@ -26,6 +29,7 @@ public class EventListenerFactory implements FactoryBean<EventListener>
 	@Override
 	public EventListener getObject() throws Exception
 	{
+		logger.info("Using EventListener " + type.name());
 		if (EventListenerType.DAO.equals(type))
 		{
 			return new DAOEventListener(ebMSDAO);
@@ -81,10 +85,10 @@ public class EventListenerFactory implements FactoryBean<EventListener>
 	private HashMap<String,Destination> createDestinations()
 	{
 		HashMap<String,Destination> result = new HashMap<String,Destination>();
-		result.put(nl.clockwork.ebms.Constants.EbMSMessageEventType.RECEIVED.toString(),new ActiveMQQueue(nl.clockwork.ebms.Constants.EbMSMessageEventType.RECEIVED.toString()));
-		result.put(nl.clockwork.ebms.Constants.EbMSMessageEventType.ACKNOWLEDGED.toString(),new ActiveMQQueue(nl.clockwork.ebms.Constants.EbMSMessageEventType.ACKNOWLEDGED.toString()));
-		result.put(nl.clockwork.ebms.Constants.EbMSMessageEventType.FAILED.toString(),new ActiveMQQueue(nl.clockwork.ebms.Constants.EbMSMessageEventType.FAILED.toString()));
-		result.put(nl.clockwork.ebms.Constants.EbMSMessageEventType.EXPIRED.toString(),new ActiveMQQueue(nl.clockwork.ebms.Constants.EbMSMessageEventType.EXPIRED.toString()));
+		result.put(nl.clockwork.ebms.Constants.EbMSMessageEventType.RECEIVED.name(),new ActiveMQQueue(nl.clockwork.ebms.Constants.EbMSMessageEventType.RECEIVED.name()));
+		result.put(nl.clockwork.ebms.Constants.EbMSMessageEventType.ACKNOWLEDGED.name(),new ActiveMQQueue(nl.clockwork.ebms.Constants.EbMSMessageEventType.ACKNOWLEDGED.name()));
+		result.put(nl.clockwork.ebms.Constants.EbMSMessageEventType.FAILED.name(),new ActiveMQQueue(nl.clockwork.ebms.Constants.EbMSMessageEventType.FAILED.name()));
+		result.put(nl.clockwork.ebms.Constants.EbMSMessageEventType.EXPIRED.name(),new ActiveMQQueue(nl.clockwork.ebms.Constants.EbMSMessageEventType.EXPIRED.name()));
 		return result;
 	}
 
