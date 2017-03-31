@@ -444,7 +444,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 						result.setConversationId(rs.getString("conversation_id"));
 						result.setMessageId(rs.getString("message_id"));
 						result.setRefToMessageId(rs.getString("ref_to_message_id"));
-						result.setMessageStatus(rs.getObject("status") == null ? null : EbMSMessageStatus.values()[rs.getInt("status")]);
+						result.setMessageStatus(rs.getObject("status") == null ? null : EbMSMessageStatus.get(rs.getInt("status")));
 						return result;
 					}
 					
