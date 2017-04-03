@@ -19,6 +19,7 @@ import java.util.List;
 
 import net.sf.ehcache.Ehcache;
 import nl.clockwork.ebms.dao.EbMSDAO;
+import nl.clockwork.ebms.model.URLMapping;
 
 import org.springframework.util.StringUtils;
 
@@ -27,32 +28,38 @@ public class URLManager
 	private Ehcache methodCache;
 	private EbMSDAO ebMSDAO;
 
-	public List<String> getUrls()
+	public List<URLMapping> getURLs()
 	{
-		return ebMSDAO.getUrls();
+		return ebMSDAO.getURLMappings();
 	}
 
-	public String getUrl(String source)
+	public String getURL(String source)
 	{
-		String result = ebMSDAO.getUrl(source);
+		String result = ebMSDAO.getURLMapping(source);
 		return result == null ? source : result;
 	}
 
-	public void setUrl(String source, String destination)
+	public void setURLMapping(URLMapping urlMapping)
 	{
-		if (StringUtils.isEmpty(destination))
-			ebMSDAO.deleteUrl(source);
+		if (StringUtils.isEmpty(urlMapping.getDestination()))
+			ebMSDAO.deleteURLMapping(urlMapping.getSource());
 		else
-			if (ebMSDAO.existsUrl(source))
-				ebMSDAO.updateUrl(source,destination);
+			if (ebMSDAO.existsURLMapping(urlMapping.getSource()))
+				ebMSDAO.updateURLMapping(urlMapping);
 			else
-				ebMSDAO.insertUrl(source,destination);
-		flushUrlMethodCache(source);
+				ebMSDAO.insertURLMapping(urlMapping);
+		flushURLMethodCache(urlMapping.getSource());
 	}
 
-	private void flushUrlMethodCache(String cpaId)
+	public void deleteURLMapping(String source)
 	{
-		methodCache.remove(MethodCacheInterceptor.getCacheKey("EbMSDAOImpl","getUrl",cpaId));
+		ebMSDAO.deleteURLMapping(source);
+		flushURLMethodCache(source);
+	}
+
+	private void flushURLMethodCache(String cpaId)
+	{
+		methodCache.remove(MethodCacheInterceptor.getCacheKey("EbMSDAOImpl","getURL",cpaId));
 	}
 
 	public void setMethodCache(Ehcache methodCache)

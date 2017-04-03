@@ -23,6 +23,8 @@ import javax.jws.WebResult;
 import javax.jws.WebService;
 import javax.xml.bind.annotation.XmlElement;
 
+import nl.clockwork.ebms.model.URLMapping;
+
 @WebService(targetNamespace="http://www.ordina.nl/cpa/2.12")
 public interface CPAService
 {
@@ -44,15 +46,14 @@ public interface CPAService
 	@WebMethod(operationName="GetCPA")
 	/*CollaborationProtocolAgreement*/String getCPA(@WebParam(name="CPAId") @XmlElement(required=true) String cpaId) throws CPAServiceException;
 
-	@WebResult(name="URL")
+	@WebMethod(operationName="SetURLMapping")
+	void setURLMapping(@WebParam(name="URLMapping") @XmlElement(required=true) URLMapping urlMapping) throws CPAServiceException;
+
 	@WebMethod(operationName="GetURL")
-	String getURL(@WebParam(name="SourceURL") @XmlElement(required=true) String source) throws CPAServiceException;
+	void deleteURLMapping(@WebParam(name="SourceURL") @XmlElement(required=true) String source) throws CPAServiceException;
 
 	@WebResult(name="URLs")
-	@WebMethod(operationName="GetURLs")
-	List<String> getURLs() throws CPAServiceException;
-
-	@WebMethod(operationName="SetURL")
-	void setURL(@WebParam(name="SourceURL") @XmlElement(required=true) String source, @WebParam(name="DestinationURL") @XmlElement(required=true) String destination) throws CPAServiceException;
+	@WebMethod(operationName="GetURLMappings")
+	List<URLMapping> getURLMappings() throws CPAServiceException;
 
 }

@@ -23,6 +23,7 @@ import nl.clockwork.ebms.common.CPAManager;
 import nl.clockwork.ebms.common.URLManager;
 import nl.clockwork.ebms.common.XMLMessageBuilder;
 import nl.clockwork.ebms.dao.DAOException;
+import nl.clockwork.ebms.model.URLMapping;
 import nl.clockwork.ebms.validation.CPAValidator;
 import nl.clockwork.ebms.validation.ValidatorException;
 import nl.clockwork.ebms.validation.XSDValidator;
@@ -140,21 +141,21 @@ public class CPAServiceImpl implements CPAService
 	}
 
 	@Override
-	public List<String> getURLs() throws CPAServiceException
+	public List<URLMapping> getURLMappings() throws CPAServiceException
 	{
-		return urlManager.getUrls();
+		return urlManager.getURLs();
 	}
 
 	@Override
-	public String getURL(String soource) throws CPAServiceException
+	public void deleteURLMapping(String source) throws CPAServiceException
 	{
-		return urlManager.getUrl(soource);
+		urlManager.deleteURLMapping(source);
 	}
 
 	@Override
-	public void setURL(String source, String destination) throws CPAServiceException
+	public void setURLMapping(URLMapping urlMapping) throws CPAServiceException
 	{
-		urlManager.setUrl(source,destination);
+		urlManager.setURLMapping(urlMapping);
 	}
 
 	public void setCpaManager(CPAManager cpaManager)

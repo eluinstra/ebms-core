@@ -27,6 +27,7 @@ import nl.clockwork.ebms.model.EbMSMessage;
 import nl.clockwork.ebms.model.EbMSMessageContent;
 import nl.clockwork.ebms.model.EbMSMessageContext;
 import nl.clockwork.ebms.model.EbMSMessageEvent;
+import nl.clockwork.ebms.model.URLMapping;
 
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CollaborationProtocolAgreement;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.Service;
@@ -43,12 +44,12 @@ public interface EbMSDAO
 	int updateCPA(CollaborationProtocolAgreement cpa) throws DAOException;
 	int deleteCPA(String cpaId) throws DAOException;
 	
-	boolean existsUrl(String source) throws DAOException;
-	String getUrl(String source) throws DAOException;
-	List<String> getUrls() throws DAOException;
-	void insertUrl(String source, String destination) throws DAOException;
-	int updateUrl(String source, String destination) throws DAOException;
-	int deleteUrl(String source) throws DAOException;
+	boolean existsURLMapping(String source) throws DAOException;
+	String getURLMapping(String source) throws DAOException;
+	List<URLMapping> getURLMappings() throws DAOException;
+	void insertURLMapping(URLMapping urlMapping) throws DAOException;
+	int updateURLMapping(URLMapping urlMapping) throws DAOException;
+	int deleteURLMapping(String source) throws DAOException;
 
 	boolean existsMessage(String messageId) throws DAOException;
 	boolean existsIdenticalMessage(EbMSMessage message) throws DAOException;

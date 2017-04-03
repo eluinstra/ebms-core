@@ -260,7 +260,7 @@ public class CPAManager
 	{
 		String result = CPAUtils.getUri(getReceiveDeliveryChannel(cpaId,partyId,role,service,action));
 		if (!StringUtils.isEmpty(result))
-			result = urlManager.getUrl(result);
+			result = urlManager.getURL(result);
 		return result;
 	}
 

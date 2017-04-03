@@ -45,6 +45,7 @@ import nl.clockwork.ebms.model.EbMSMessageContent;
 import nl.clockwork.ebms.model.EbMSMessageContext;
 import nl.clockwork.ebms.model.EbMSMessageEvent;
 import nl.clockwork.ebms.model.Role;
+import nl.clockwork.ebms.model.URLMapping;
 import nl.clockwork.ebms.util.EbMSMessageUtils;
 
 import org.apache.commons.io.IOUtils;
@@ -223,7 +224,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	}
 
 	@Override
-	public boolean existsUrl(String source) throws DAOException
+	public boolean existsURLMapping(String source) throws DAOException
 	{
 		try
 		{
@@ -241,7 +242,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	}
 
 	@Override
-	public String getUrl(String source)
+	public String getURLMapping(String source)
 	{
 		try
 		{
@@ -264,15 +265,22 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	}
 
 	@Override
-	public List<String> getUrls() throws DAOException
+	public List<URLMapping> getURLMappings() throws DAOException
 	{
 		try
 		{
-			return jdbcTemplate.queryForList(
-				"select source" +
+			return jdbcTemplate.query(
+				"select source, destination" +
 				" from url" +
 				" order by source asc",
-				String.class
+				new RowMapper<URLMapping>()
+				{
+					@Override
+					public URLMapping mapRow(ResultSet rs, int nr) throws SQLException
+					{
+						return new URLMapping(rs.getString("source"),rs.getString("destination"));
+					}
+				}
 			);
 		}
 		catch (DataAccessException e)
@@ -282,7 +290,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	}
 
 	@Override
-	public void insertUrl(String source, String destination) throws DAOException
+	public void insertURLMapping(URLMapping urlMapping) throws DAOException
 	{
 		try
 		{
@@ -292,8 +300,8 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 					"source," +
 					"destination" +
 				") values (?,?)",
-				source,
-				destination
+				urlMapping.getSource(),
+				urlMapping.getDestination()
 			);
 		}
 		catch (DataAccessException e)
@@ -303,7 +311,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	}
 
 	@Override
-	public int updateUrl(String source, String destination)
+	public int updateURLMapping(URLMapping urlMapping)
 	{
 		try
 		{
@@ -312,8 +320,8 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 				"update url set" +
 				" destination = ?" +
 				" where source = ?",
-				destination,
-				source
+				urlMapping.getDestination(),
+				urlMapping.getSource()
 			);
 		}
 		catch (DataAccessException e)
@@ -323,7 +331,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	}
 
 	@Override
-	public int deleteUrl(String source)
+	public int deleteURLMapping(String source)
 	{
 		try
 		{
