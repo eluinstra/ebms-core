@@ -40,6 +40,10 @@ public interface EbMSMessageService
 	@WebMethod(operationName="SendMessage")
 	String sendMessage(@WebParam(name="Message") @XmlElement(required=true) EbMSMessageContent messageContent) throws EbMSMessageServiceException;
 
+	@WebResult(name="MessageId")
+	@WebMethod(operationName="ResendMessage")
+	String resendMessage(@WebParam(name="MessageId") @XmlElement(required=true) String messageId) throws EbMSMessageServiceException;
+
 	@WebResult(name="MessageIds")
 	@WebMethod(operationName="GetMessageIds")
 	List<String> getMessageIds(@WebParam(name="MessageContext") @XmlElement(required=true) EbMSMessageContext messageContext, @WebParam(name="MaxNr") Integer maxNr) throws EbMSMessageServiceException;
