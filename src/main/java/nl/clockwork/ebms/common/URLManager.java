@@ -15,6 +15,8 @@
  */
 package nl.clockwork.ebms.common;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.List;
 
 import net.sf.ehcache.Ehcache;
@@ -39,16 +41,39 @@ public class URLManager
 		return result == null ? source : result;
 	}
 
-	public void setURLMapping(URLMapping urlMapping)
+	public void setURLMapping(URLMapping urlMapping) throws InvalidURLException
 	{
 		if (StringUtils.isEmpty(urlMapping.getDestination()))
 			ebMSDAO.deleteURLMapping(urlMapping.getSource());
 		else
+		{
+			validate(urlMapping);
 			if (ebMSDAO.existsURLMapping(urlMapping.getSource()))
 				ebMSDAO.updateURLMapping(urlMapping);
 			else
 				ebMSDAO.insertURLMapping(urlMapping);
+		}
 		flushURLMethodCache(urlMapping.getSource());
+	}
+
+	private void validate(URLMapping urlMapping) throws InvalidURLException
+	{
+		try
+		{
+			new URL(urlMapping.getSource());
+		}
+		catch (MalformedURLException e)
+		{
+			throw new InvalidURLException("Source invalid",e);
+		}
+		try
+		{
+			new URL(urlMapping.getDestination());
+		}
+		catch (MalformedURLException e)
+		{
+			throw new InvalidURLException("Destination invalid",e);
+		}
 	}
 
 	public void deleteURLMapping(String source)

@@ -20,6 +20,7 @@ import java.util.List;
 import javax.xml.bind.JAXBException;
 
 import nl.clockwork.ebms.common.CPAManager;
+import nl.clockwork.ebms.common.InvalidURLException;
 import nl.clockwork.ebms.common.URLManager;
 import nl.clockwork.ebms.common.XMLMessageBuilder;
 import nl.clockwork.ebms.dao.DAOException;
@@ -155,7 +156,14 @@ public class CPAServiceImpl implements CPAService
 	@Override
 	public void setURLMapping(URLMapping urlMapping) throws CPAServiceException
 	{
-		urlManager.setURLMapping(urlMapping);
+		try
+		{
+			urlManager.setURLMapping(urlMapping);
+		}
+		catch (InvalidURLException e)
+		{
+			throw new CPAServiceException(e);
+		}
 	}
 
 	public void setCpaManager(CPAManager cpaManager)
