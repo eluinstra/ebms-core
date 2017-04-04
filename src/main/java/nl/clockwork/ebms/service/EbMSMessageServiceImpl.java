@@ -108,7 +108,10 @@ public class EbMSMessageServiceImpl implements InitializingBean, EbMSMessageServ
 		try
 		{
 			EbMSMessageContent messageContent = ebMSDAO.getMessageContent(messageId);
-			return sendMessage_(messageContent);
+			if (messageContent != null)
+				return sendMessage_(messageContent);
+			else
+				throw new EbMSMessageServiceException("Message not found!");
 		}
 		catch (DAOException | EbMSProcessorException e)
 		{
