@@ -109,7 +109,10 @@ public class EbMSMessageServiceImpl implements InitializingBean, EbMSMessageServ
 		{
 			EbMSMessageContent messageContent = ebMSDAO.getMessageContent(messageId);
 			if (messageContent != null)
+			{
+				resetMessage(messageContent.getContext());
 				return sendMessage_(messageContent);
+			}
 			else
 				throw new EbMSMessageServiceException("Message not found!");
 		}
@@ -301,6 +304,12 @@ public class EbMSMessageServiceImpl implements InitializingBean, EbMSMessageServ
 		{
 			throw new EbMSMessageServiceException(e);
 		}
+	}
+
+	private void resetMessage(EbMSMessageContext context)
+	{
+		context.setMessageId(null);
+		context.setTimestamp(null);
 	}
 
 	private String sendMessage_(EbMSMessageContent messageContent) throws EbMSProcessorException
