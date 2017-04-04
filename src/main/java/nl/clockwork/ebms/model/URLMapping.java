@@ -1,7 +1,10 @@
 package nl.clockwork.ebms.model;
 
-public class URLMapping
+import java.io.Serializable;
+
+public class URLMapping implements Serializable
 {
+	private static final long serialVersionUID = 1L;
 	private String source;
 	private String destination;
 
