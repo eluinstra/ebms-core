@@ -82,7 +82,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	}
 
 	@Override
-	public void executeTransaction(final DAOTransactionCallback callback)
+	public void executeTransaction(final DAOTransactionCallback callback) throws DAOException
 	{
 		try
 		{

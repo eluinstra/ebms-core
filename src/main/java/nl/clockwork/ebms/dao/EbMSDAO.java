@@ -35,7 +35,7 @@ import org.w3c.dom.Document;
 
 public interface EbMSDAO
 {
-	void executeTransaction(DAOTransactionCallback callback);
+	void executeTransaction(DAOTransactionCallback callback) throws DAOException;
 
 	boolean existsCPA(String cpaId) throws DAOException;
 	CollaborationProtocolAgreement getCPA(String cpaId) throws DAOException;
