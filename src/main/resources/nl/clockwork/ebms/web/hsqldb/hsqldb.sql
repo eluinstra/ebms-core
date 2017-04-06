@@ -17,8 +17,13 @@
 CREATE TABLE cpa
 (
 	cpa_id						VARCHAR(256)		NOT NULL PRIMARY KEY,
-	cpa								CLOB						NOT NULL,
-	url								VARCHAR(256)		NULL
+	cpa								CLOB						NOT NULL
+);
+
+CREATE TABLE url
+(
+	source						VARCHAR(256)		NOT NULL UNIQUE,
+	destination				VARCHAR(256)		NOT NULL
 );
 
 CREATE TABLE ebms_message
@@ -63,8 +68,8 @@ CREATE TABLE ebms_event
 	message_nr				SMALLINT				DEFAULT 0 NOT NULL,
 	time_to_live			TIMESTAMP				NULL,
 	time_stamp				TIMESTAMP				NOT NULL,
-	is_confidential		BOOLEAN					NOT NULL,
-	retries						SMALLINT				DEFAULT 0 NOT NULL,
+	is_confidential		SMALLINT				NOT NULL,
+	retries						BOOLEAN					DEFAULT 0 NOT NULL,
 	FOREIGN KEY (cpa_id) REFERENCES cpa(cpa_id),
 	FOREIGN KEY (message_id,message_nr) REFERENCES ebms_message (message_id,message_nr)
 );
@@ -77,5 +82,15 @@ CREATE TABLE ebms_event_log
 	uri								VARCHAR(256)		NULL,
 	status						SMALLINT				NOT NULL,
 	error_message			CLOB						NULL,
+	FOREIGN KEY (message_id,message_nr) REFERENCES ebms_message (message_id,message_nr)
+);
+
+CREATE TABLE ebms_message_event
+(
+	message_id				VARCHAR(256)		NOT NULL UNIQUE,
+	message_nr				SMALLINT				DEFAULT 0 NOT NULL,
+	event_type				SMALLINT				NOT NULL,
+	time_stamp				TIMESTAMP				NOT NULL,
+	processed					SMALLINT				DEFAULT 0 NOT NULL,
 	FOREIGN KEY (message_id,message_nr) REFERENCES ebms_message (message_id,message_nr)
 );
