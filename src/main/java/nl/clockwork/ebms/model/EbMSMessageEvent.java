@@ -25,6 +25,9 @@ public class EbMSMessageEvent implements Serializable
 	private String messageId;
 	private EbMSMessageEventType type;
 	
+	public EbMSMessageEvent()
+	{
+	}
 	public EbMSMessageEvent(String messageId, EbMSMessageEventType type)
 	{
 		this.messageId = messageId;
