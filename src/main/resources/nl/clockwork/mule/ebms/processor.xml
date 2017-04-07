@@ -1,0 +1,262 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+    Copyright 2011 Clockwork
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd"
+>
+	<bean class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+		<property name="staticMethod" value="nl.clockwork.ebms.jaxb.EbMSDateTimeConverter.setDigipoortPatch"/>
+		<property name="arguments" value="${patch.digipoort.enable}"/>
+	</bean>
+
+	<bean class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+		<property name="staticMethod" value="nl.clockwork.ebms.util.EbMSMessageUtils.setOraclePatch"/>
+		<property name="arguments" value="${patch.oracle.enable}"/>
+	</bean>
+
+	<bean id="xmlSecurityInit" class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+		<property name="staticMethod" value="org.apache.xml.security.Init.init" />
+	</bean>
+
+	<bean id="cpaService" class="nl.clockwork.ebms.service.CPAServiceImpl">
+		<property name="cpaManager" ref="cpaManager"/>
+		<property name="urlManager" ref="urlManager"/>
+	</bean>
+
+	<bean id="ebMSMessageService" class="nl.clockwork.ebms.service.EbMSMessageServiceImpl">
+		<property name="deliveryManager" ref="deliveryManager"></property>
+		<property name="ebMSDAO" ref="ebMSDAO"/>
+		<property name="cpaManager" ref="cpaManager"/>
+		<property name="ebMSMessageFactory" ref="ebMSMessageFactory"/>
+		<property name="eventManager" ref="eventManager"/>
+		<property name="signatureGenerator" ref="signatureGenerator"/>
+	</bean>
+
+	<bean id="deliveryManager" class="nl.clockwork.ebms.client.DeliveryManager">
+		<property name="maxThreads" value="${deliveryManager.maxTreads}"/>
+		<property name="processorsScaleFactor" value="${deliveryManager.processorsScaleFactor}"/>
+		<property name="queueScaleFactor" value="${deliveryManager.queueScaleFactor}"/>
+		<property name="messageQueue" ref="messageQueue"/>
+		<property name="ebMSClient" ref="ebMSClient"/>
+	</bean>
+
+	<bean id="messageQueue" class="nl.clockwork.ebms.client.EbMSMessageQueue">
+		<property name="maxEntries" value="${messageQueue.maxEntries}"/>
+		<property name="timeout" value="${messageQueue.timeout}"/>
+	</bean>
+
+	<bean id="httpHandler" class="nl.clockwork.ebms.server.EbMSHttpHandler">
+		<property name="messageProcessor" ref="messageProcessor"/>
+	</bean>
+
+	<bean id="messageValidator" class="nl.clockwork.ebms.validation.EbMSMessageValidator">
+		<property name="ebMSDAO" ref="ebMSDAO"/>
+		<property name="cpaManager" ref="cpaManager"/>
+		<property name="clientCertificateValidator">
+			<bean class="nl.clockwork.ebms.validation.ClientCertificateValidator">
+				<property name="enabled" value="${https.requireSSLAuthentication}"/>
+				<property name="cpaManager" ref="cpaManager"/>
+			</bean>
+		</property>
+		<property name="cpaValidator">
+			<bean class="nl.clockwork.ebms.validation.CPAValidator">
+				<property name="cpaManager" ref="cpaManager"/>
+			</bean>
+		</property>
+		<property name="messageHeaderValidator">
+			<bean class="nl.clockwork.ebms.validation.MessageHeaderValidator">
+				<property name="ebMSDAO" ref="ebMSDAO"/>
+				<property name="cpaManager" ref="cpaManager"/>
+			</bean>
+		</property>
+		<property name="manifestValidator">
+			<bean class="nl.clockwork.ebms.validation.ManifestValidator"/>
+		</property>
+		<property name="signatureValidator">
+			<bean class="nl.clockwork.ebms.validation.SignatureValidator">
+				<property name="cpaManager" ref="cpaManager"/>
+				<property name="ebMSSignatureValidator">
+					<bean class="nl.clockwork.ebms.signing.EbMSSignatureValidator">
+						<property name="cpaManager" ref="cpaManager"/>
+						<property name="trustStorePath" value="${truststore.path}"/>
+						<property name="trustStorePassword" value="${truststore.password}"/>
+					</bean>
+				</property>
+			</bean>
+		</property>
+		<property name="messageDecrypter">
+			<bean class="nl.clockwork.ebms.encryption.EbMSMessageDecrypter">
+				<property name="cpaManager" ref="cpaManager"/>
+				<property name="keyStorePath" value="${encryption.keystore.path}" />
+				<property name="keyStorePassword" value="${encryption.keystore.password}" />
+			</bean>
+		</property>
+	</bean>
+
+	<bean id="duplicateMessageHandler" class="nl.clockwork.ebms.processor.DuplicateMessageHandler">
+		<property name="ebMSDAO" ref="ebMSDAO"/>
+		<property name="cpaManager" ref="cpaManager"/>
+		<property name="ebMSMessageFactory" ref="ebMSMessageFactory"/>
+		<property name="eventManager" ref="eventManager"/>
+		<property name="messageValidator" ref="messageValidator"/>
+	</bean>
+
+	<bean id="messageProcessor" class="nl.clockwork.ebms.processor.EbMSMessageProcessor">
+		<property name="deliveryManager" ref="deliveryManager"/>
+		<property name="eventListener" ref="eventListener"/>
+		<property name="ebMSDAO" ref="ebMSDAO"/>
+		<property name="cpaManager" ref="cpaManager"/>
+		<property name="ebMSMessageFactory" ref="ebMSMessageFactory"/>
+		<property name="eventManager" ref="eventManager"/>
+		<property name="signatureGenerator" ref="signatureGenerator"/>
+		<property name="xsdValidator">
+			<bean class="nl.clockwork.ebms.validation.XSDValidator">
+				<constructor-arg value="/nl/clockwork/ebms/xsd/msg-header-2_0.xsd"/>
+			</bean>
+		</property>
+		<property name="messageValidator" ref="messageValidator"/>
+		<property name="duplicateMessageHandler" ref="duplicateMessageHandler"/>
+	</bean>
+
+	<bean id="urlManager" class="nl.clockwork.ebms.common.URLManager">
+		<property name="methodCache" ref="ebMSMethodCache"/>
+		<property name="ebMSDAO" ref="ebMSDAO"/>
+	</bean>
+
+	<bean id="_cpaManager" class="nl.clockwork.ebms.common.CPAManager">
+		<property name="methodCache" ref="ebMSMethodCache"/>
+		<property name="ebMSDAO" ref="ebMSDAO"/>
+		<property name="urlManager" ref="urlManager"/>
+	</bean>
+
+	<bean id="cpaManager" class="org.springframework.aop.framework.ProxyFactoryBean">
+		<property name="target" ref="_cpaManager"/>
+		<property name="interceptorNames">
+			<list>
+				<value>ebMSCPAManagerMethodCachePointCut</value>
+			</list>
+		</property>
+	</bean>
+
+	<bean id="ebMSCPAManagerMethodCachePointCut" class="org.springframework.aop.support.RegexpMethodPointcutAdvisor">
+		<property name="advice" ref="ebMSMethodCacheInterceptor"/>
+		<property name="patterns">
+			<list>
+				<!--value>.*existsCPA</value>
+				<value>.*getCPA</value>
+				<value>.*getCPAIds</value>
+				<value>.*getUrl</value-->
+				<value>.*getFromParty</value>
+				<value>.*getToParty</value>
+				<value>.*getEbMSPartyInfo</value>
+				<value>.*getPartyInfo</value>
+				<value>.*getFromPartyInfo</value>
+				<value>.*getToPartyInfoByFromPartyActionBinding</value>
+				<value>.*getToPartyInfo</value>
+				<value>.*canSend</value>
+				<value>.*canReceive</value>
+				<value>.*getDefaultDeliveryChannel</value>
+				<value>.*getFromDeliveryChannel</value>
+				<value>.*getToDeliveryChannel</value>
+				<value>.*isNonRepudiationRequired</value>
+				<!--value>.*getUri</value-->
+			</list>
+		</property>
+	</bean>
+
+	<bean id="ebMSMessageFactory" class="nl.clockwork.ebms.common.EbMSMessageFactory">
+		<property name="cleoPatch" value="${patch.cleo.enable}"/>
+		<property name="cpaManager" ref="cpaManager"/>
+	</bean>
+
+	<bean id="eventManager" class="nl.clockwork.ebms.job.EventManager">
+		<property name="ebMSDAO" ref="ebMSDAO"/>
+		<property name="cpaManager" ref="cpaManager"/>
+	</bean>
+
+	<bean id="jobScheduler" class="nl.clockwork.ebms.job.JobScheduler">
+		<property name="delay" value="${jobScheduler.delay}"/>
+		<property name="period" value="${jobScheduler.period}"/>
+		<property name="jobs">
+			<list>
+				<ref bean="processEventsJob"/>
+			</list>
+		</property>
+	</bean>
+
+	<bean id="processEventsJob" class="nl.clockwork.ebms.job.EbMSEventProcessor">
+		<property name="maxThreads" value="${job.maxTreads}"/>
+		<property name="processorsScaleFactor" value="${job.processorsScaleFactor}"/>
+		<property name="queueScaleFactor" value="${job.queueScaleFactor}"/>
+		<property name="eventListener" ref="eventListener"/>
+		<property name="ebMSDAO" ref="ebMSDAO"/>
+		<property name="urlManager" ref="urlManager"/>
+		<property name="cpaManager" ref="cpaManager"/>
+		<property name="eventManager" ref="eventManager"/>
+		<property name="ebMSClient" ref="ebMSClient"/>
+		<property name="messageEncrypter" ref="messageEncrypter"/>
+		<property name="messageProcessor" ref="messageProcessor"/>
+	</bean>
+
+	<bean id="signatureGenerator" class="nl.clockwork.ebms.signing.EbMSSignatureGenerator">
+		<property name="cpaManager" ref="cpaManager"/>
+		<property name="canonicalizationMethodAlgorithm" value="${xmldsig.canonicalizationMethodAlgorithm}"/>
+		<property name="transformAlgorithm" value="${xmldsig.transformAlgorithm}"/>
+		<property name="keyStorePath" value="${signature.keystore.path}" />
+		<property name="keyStorePassword" value="${signature.keystore.password}" />
+	</bean>  
+
+	<bean id="messageEncrypter" class="nl.clockwork.ebms.encryption.EbMSMessageEncrypter">
+		<property name="cpaManager" ref="cpaManager"/>
+		<property name="trustStorePath" value="${truststore.path}"/>
+		<property name="trustStorePassword" value="${truststore.password}"/>
+	</bean>
+
+	<bean id="ebMSProxy" class="nl.clockwork.ebms.client.EbMSProxyFactory">
+		<property name="host" value="${http.proxy.host}"/>
+		<property name="port" value="${http.proxy.port}"/>
+		<property name="nonProxyHosts" value="${http.proxy.nonProxyHosts}"/>
+		<property name="username" value="${http.proxy.username}"/>
+		<property name="password" value="${http.proxy.password}"/>
+	</bean>
+
+	<bean id="ebMSClient" class="nl.clockwork.ebms.client.EbMSHttpClientFactory">
+		<property name="type" value="${http.client}"/>
+		<property name="sslFactoryManager" ref="sslFactoryManager"/>
+		<property name="chunkedStreamingMode" value="${http.chunkedStreamingMode}"/>
+		<property name="base64Writer" value="${http.base64Writer}"/>
+		<property name="proxy" ref="ebMSProxy"/>
+		<property name="enabledProtocols" value="${https.protocols}"/>
+		<property name="enabledCipherSuites" value="${https.cipherSuites}"/>
+		<property name="verifyHostnames" value="${https.verifyHostnames}"></property>
+	</bean>
+
+	<bean id="sslFactoryManager" class="nl.clockwork.ebms.client.SSLFactoryManager">
+		<property name="keyStorePath" value="${client.keystore.path}"/>
+		<property name="keyStorePassword" value="${client.keystore.password}"/>
+		<property name="trustStorePath" value="${truststore.path}"/>
+		<property name="trustStorePassword" value="${truststore.password}"/>
+		<property name="verifyHostnames" value="${https.verifyHostnames}"></property>
+	</bean>
+
+	<bean id="eventListener" class="nl.clockwork.ebms.event.DAOEventListener" >
+		<property name="ebMSDAO" ref="ebMSDAO" />
+	</bean>
+
+</beans>

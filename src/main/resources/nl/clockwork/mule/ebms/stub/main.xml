@@ -51,7 +51,7 @@
 		<import resource="classpath:nl/clockwork/ebms/cache.xml" />
 		<import resource="classpath:nl/clockwork/ebms/datasource.xml" />
 		<import resource="classpath:nl/clockwork/ebms/dao.xml" />
-		<import resource="classpath:nl/clockwork/ebms/processor.xml" />
+		<import resource="classpath:nl/clockwork/mule/ebms/processor.xml" />
 
 		<import resource="classpath:nl/clockwork/mule/ebms/hsqldb/hsqldb.provider.xml"/>
 
