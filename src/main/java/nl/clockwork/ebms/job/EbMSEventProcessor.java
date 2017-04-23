@@ -127,12 +127,10 @@ public class EbMSEventProcessor implements InitializingBean, Job
 							EbMSDocument requestDocument = ebMSDAO.getEbMSDocumentIfUnsent(event.getMessageId());
 							if (requestDocument != null)
 							{
-								eventManager.updateEvent(event,null,EbMSEventStatus.SUCCEEDED);
 								if (ebMSDAO.updateMessage(event.getMessageId(),EbMSMessageStatus.SENDING,EbMSMessageStatus.EXPIRED) > 0)
 									eventListener.onMessageExpired(event.getMessageId());
 							}
-							else
-								eventManager.deleteEvent(event.getMessageId());
+							eventManager.deleteEvent(event.getMessageId());
 						}
 					}
 				);
