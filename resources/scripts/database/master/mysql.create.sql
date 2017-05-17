@@ -24,6 +24,7 @@ CREATE TABLE ebms_message
 	message_nr				SMALLINT				NOT NULL DEFAULT 0,
 	ref_to_message_id	VARCHAR(256)		NULL,
 	time_to_live			TIMESTAMP				NULL,
+	persist_time			TIMESTAMP				NULL,
 	from_party_id			VARCHAR(256)		NOT NULL,
 	from_role					VARCHAR(256)		NULL,
 	to_party_id				VARCHAR(256)		NOT NULL,

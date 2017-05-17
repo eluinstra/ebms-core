@@ -71,7 +71,7 @@ public class EventManager
 
 	private EbMSEvent createNewEvent(EbMSEvent event, DeliveryChannel deliveryChannel)
 	{
-		ReliableMessaging rm = CPAUtils.getReliableMessaging(deliveryChannel);
+		ReliableMessaging rm = CPAUtils.getReceiverReliableMessaging(deliveryChannel);
 		Date timestamp = new Date();
 		if (event.getRetries() < rm.getRetries().intValue())
 			rm.getRetryInterval().addTo(timestamp);

@@ -702,7 +702,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	}
 
 	@Override
-	public void insertMessage(final Date timestamp, final EbMSMessage message, final EbMSMessageStatus status) throws DAOException
+	public void insertMessage(final Date timestamp, final Date persistTime, final EbMSMessage message, final EbMSMessageStatus status) throws DAOException
 	{
 		try
 		{
@@ -1241,6 +1241,12 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 		{
 			throw new DAOException(e);
 		}
+	}
+
+	@Override
+	public Date getPersistTime(String messageId)
+	{
+		return jdbcTemplate.queryForObject("select persist_time from ebms_message where message_id = ? and message_nr = 0",Date.class,messageId);
 	}
 
 	protected List<EbMSAttachment> getAttachments(String messageId)

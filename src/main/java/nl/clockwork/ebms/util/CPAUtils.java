@@ -151,9 +151,14 @@ public class CPAUtils
 		return !PerMessageCharacteristicsType.NEVER.equals((deliveryChannel.getMessagingCharacteristics().getAckRequested())) /*&& ((DocExchange)deliveryChannel.getDocExchangeId()).getEbXMLSenderBinding() != null && ((DocExchange)deliveryChannel.getDocExchangeId()).getEbXMLSenderBinding().getReliableMessaging() != null*/;
 	}
 	
-	public static ReliableMessaging getReliableMessaging(DeliveryChannel deliveryChannel)
+	public static ReliableMessaging getSenderReliableMessaging(DeliveryChannel deliveryChannel)
 	{
 		return ((DocExchange)deliveryChannel.getDocExchangeId()).getEbXMLSenderBinding().getReliableMessaging();
+	}
+
+	public static ReliableMessaging getReceiverReliableMessaging(DeliveryChannel deliveryChannel)
+	{
+		return ((DocExchange)deliveryChannel.getDocExchangeId()).getEbXMLReceiverBinding().getReliableMessaging();
 	}
 
 	public static Duration getPersistantDuration(DeliveryChannel deliveryChannel)

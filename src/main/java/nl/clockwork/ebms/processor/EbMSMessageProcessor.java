@@ -235,7 +235,8 @@ public class EbMSMessageProcessor
 					@Override
 					public void doInTransaction()
 					{
-						ebMSDAO.insertMessage(timestamp,responseMessage,null);
+						Date persistTime = ebMSDAO.getPersistTime(responseMessage.getMessageHeader().getMessageData().getRefToMessageId());
+						ebMSDAO.insertMessage(timestamp,persistTime,responseMessage,null);
 						if (ebMSDAO.updateMessage(responseMessage.getMessageHeader().getMessageData().getRefToMessageId(),EbMSMessageStatus.SENDING,EbMSMessageStatus.DELIVERY_FAILED) > 0)
 							eventListener.onMessageFailed(responseMessage.getMessageHeader().getMessageData().getRefToMessageId());
 					}
@@ -248,7 +249,8 @@ public class EbMSMessageProcessor
 		}
 		catch (ValidationException e)
 		{
-			ebMSDAO.insertMessage(timestamp,responseMessage,null);
+			Date persistTime = ebMSDAO.getPersistTime(responseMessage.getMessageHeader().getMessageData().getRefToMessageId());
+			ebMSDAO.insertMessage(timestamp,persistTime,responseMessage,null);
 			logger.warn("Unable to process MessageError " + responseMessage.getMessageHeader().getMessageData().getMessageId(),e);
 		}
 	}
@@ -264,7 +266,8 @@ public class EbMSMessageProcessor
 					@Override
 					public void doInTransaction()
 					{
-						ebMSDAO.insertMessage(timestamp,responseMessage,null);
+						Date persistTime = ebMSDAO.getPersistTime(responseMessage.getMessageHeader().getMessageData().getRefToMessageId());
+						ebMSDAO.insertMessage(timestamp,persistTime,responseMessage,null);
 						if (ebMSDAO.updateMessage(responseMessage.getMessageHeader().getMessageData().getRefToMessageId(),EbMSMessageStatus.SENDING,EbMSMessageStatus.DELIVERED) > 0)
 							eventListener.onMessageAcknowledged(responseMessage.getMessageHeader().getMessageData().getRefToMessageId());
 					}
@@ -277,7 +280,8 @@ public class EbMSMessageProcessor
 		}
 		catch (ValidatorException e)
 		{
-			ebMSDAO.insertMessage(timestamp,responseMessage,null);
+			Date persistTime = ebMSDAO.getPersistTime(responseMessage.getMessageHeader().getMessageData().getRefToMessageId());
+			ebMSDAO.insertMessage(timestamp,persistTime,responseMessage,null);
 			logger.warn("Unable to process Acknowledgment " + responseMessage.getMessageHeader().getMessageData().getMessageId(),e);
 		}
 	}

@@ -64,7 +64,7 @@ public interface EbMSDAO
 	List<String> getMessageIds(EbMSMessageContext messageContext, EbMSMessageStatus status) throws DAOException;
 	List<String> getMessageIds(EbMSMessageContext messageContext, EbMSMessageStatus status, int maxNr) throws DAOException;
 
-	void insertMessage(Date timestamp, EbMSMessage message, EbMSMessageStatus status) throws DAOException;
+	void insertMessage(Date timestamp, Date persistTime, EbMSMessage message, EbMSMessageStatus status) throws DAOException;
 	void insertDuplicateMessage(Date timestamp, EbMSMessage message) throws DAOException;
 	int updateMessage(String messageId, EbMSMessageStatus oldStatus, EbMSMessageStatus newStatus) throws DAOException;
 	void updateMessages(List<String> messageIds, EbMSMessageStatus oldStatus, EbMSMessageStatus newStatus) throws DAOException;
@@ -80,4 +80,6 @@ public interface EbMSDAO
 	void insertEbMSMessageEvent(String messageId, EbMSMessageEventType eventType) throws DAOException;
 	int processEbMSMessageEvent(String messageId) throws DAOException;
 	void processEbMSMessageEvents(List<String> messageIds) throws DAOException;
+	
+	Date getPersistTime(String messageId);
 }

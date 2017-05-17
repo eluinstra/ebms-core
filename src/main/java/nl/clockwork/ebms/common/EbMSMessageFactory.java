@@ -377,8 +377,7 @@ public class EbMSMessageFactory
 	{
 		if (CPAUtils.isReliableMessaging(deliveryChannel))
 		{
-			Duration duration = CPAUtils.getReliableMessaging(deliveryChannel).getRetryInterval().multiply(CPAUtils.getReliableMessaging(deliveryChannel).getRetries().intValue() + 1);
-			//Duration duration = CPAUtils.getPersistantDuration(deliveryChannel);
+			Duration duration = CPAUtils.getSenderReliableMessaging(deliveryChannel).getRetryInterval().multiply(CPAUtils.getSenderReliableMessaging(deliveryChannel).getRetries().intValue() + 1);
 			Date timestamp = (Date)messageHeader.getMessageData().getTimestamp().clone();
 			duration.addTo(timestamp);
 			messageHeader.getMessageData().setTimeToLive(timestamp);
