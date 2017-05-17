@@ -54,8 +54,9 @@ public class DuplicateMessageHandler
 		mshMessageService.setValue(Constants.EBMS_SERVICE_URI);
 	}
 
-	public EbMSDocument handleMessage(final Date timestamp, final EbMSMessage message, final MessageHeader messageHeader) throws EbMSProcessingException
+	public EbMSDocument handleMessage(final Date timestamp, final EbMSMessage message) throws EbMSProcessingException
 	{
+		final MessageHeader messageHeader = message.getMessageHeader();
 		if (isIdenticalMessage(message))
 		{
 			logger.warn("Message " + message.getMessageHeader().getMessageData().getMessageId() + " is duplicate!");
