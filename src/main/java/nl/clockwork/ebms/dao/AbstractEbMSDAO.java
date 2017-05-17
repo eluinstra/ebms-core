@@ -972,6 +972,53 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	}
 
 	@Override
+	public void deleteAttachments(String messageId)
+	{
+		try
+		{
+			jdbcTemplate.update(
+				"delete from ebms_attachment" +
+				" where message_id = ?" +
+				messageId
+			);
+		}
+		catch (DataAccessException e)
+		{
+			throw new DAOException(e);
+		}
+	}
+
+	@Override
+	public void deleteAttachments(final List<String> messageIds)
+	{
+		try
+		{
+			jdbcTemplate.batchUpdate(
+				"delete from ebms_attachment" +
+				" where message_id = ?",
+				new BatchPreparedStatementSetter()
+				{
+					@Override
+					public void setValues(PreparedStatement ps, int row) throws SQLException
+					{
+						ps.setString(1,messageIds.get(row));
+					}
+
+					@Override
+					public int getBatchSize()
+					{
+						return messageIds.size();
+					}
+				}
+			);
+		}
+		catch (DataAccessException e)
+		{
+			throw new DAOException(e);
+		}
+	}
+
+	@Override
 	public List<EbMSEvent> getEventsBefore(Date timestamp) throws DAOException
 	{
 		try

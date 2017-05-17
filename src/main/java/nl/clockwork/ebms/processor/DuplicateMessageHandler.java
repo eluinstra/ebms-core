@@ -44,6 +44,8 @@ public class DuplicateMessageHandler
   protected EbMSMessageFactory ebMSMessageFactory;
 	protected EventManager eventManager;
 	protected EbMSMessageValidator messageValidator;
+	protected boolean storeDuplicateMessage;
+	protected boolean storeDuplicateMessageAttachments;
 	protected Service mshMessageService;
 
 	public DuplicateMessageHandler()
@@ -59,7 +61,12 @@ public class DuplicateMessageHandler
 			logger.warn("Message " + message.getMessageHeader().getMessageData().getMessageId() + " is duplicate!");
 			if (messageValidator.isSyncReply(message))
 			{
-				ebMSDAO.insertDuplicateMessage(timestamp,message);
+				if (storeDuplicateMessage)
+				{
+					if (!storeDuplicateMessageAttachments)
+						message.getAttachments().clear();
+					ebMSDAO.insertDuplicateMessage(timestamp,message);
+				}
 				EbMSDocument result = ebMSDAO.getEbMSDocumentByRefToMessageId(messageHeader.getCPAId(),messageHeader.getMessageData().getMessageId(),mshMessageService,EbMSAction.MESSAGE_ERROR.action(),EbMSAction.ACKNOWLEDGMENT.action());
 				if (result == null)
 					logger.warn("No response found for duplicate message " + message.getMessageHeader().getMessageData().getMessageId() + "!");
@@ -73,7 +80,12 @@ public class DuplicateMessageHandler
 						@Override
 						public void doInTransaction()
 						{
-							ebMSDAO.insertDuplicateMessage(timestamp,message);
+							if (storeDuplicateMessage)
+							{
+								if (!storeDuplicateMessageAttachments)
+									message.getAttachments().clear();
+								ebMSDAO.insertDuplicateMessage(timestamp,message);
+							}
 							EbMSMessageContext messageContext = ebMSDAO.getMessageContextByRefToMessageId(messageHeader.getCPAId(),messageHeader.getMessageData().getMessageId(),mshMessageService,EbMSAction.MESSAGE_ERROR.action(),EbMSAction.ACKNOWLEDGMENT.action());
 							if (messageContext != null)
 								eventManager.createEvent(messageHeader.getCPAId(),cpaManager.getReceiveDeliveryChannel(messageHeader.getCPAId(),new CacheablePartyId(message.getMessageHeader().getFrom().getPartyId()),message.getMessageHeader().getFrom().getRole(),CPAUtils.toString(CPAUtils.createEbMSMessageService()),null),messageContext.getMessageId(),message.getMessageHeader().getMessageData().getTimeToLive(),messageContext.getTimestamp(),false);
@@ -94,7 +106,8 @@ public class DuplicateMessageHandler
 		if (isIdenticalMessage(responseMessage))
 		{
 			logger.warn("MessageError " + responseMessage.getMessageHeader().getMessageData().getMessageId() + " is duplicate!");
-			ebMSDAO.insertDuplicateMessage(timestamp,responseMessage);
+			if (storeDuplicateMessage)
+				ebMSDAO.insertDuplicateMessage(timestamp,responseMessage);
 		}
 		else
 			throw new EbMSProcessingException("MessageId " + responseMessage.getMessageHeader().getMessageData().getMessageId() + " already used!");
@@ -105,7 +118,8 @@ public class DuplicateMessageHandler
 		if (isIdenticalMessage(responseMessage))
 		{
 			logger.warn("Acknowledgment " + responseMessage.getMessageHeader().getMessageData().getMessageId() + " is duplicate!");
-			ebMSDAO.insertDuplicateMessage(timestamp,responseMessage);
+			if (storeDuplicateMessage)
+				ebMSDAO.insertDuplicateMessage(timestamp,responseMessage);
 		}
 		else
 			throw new EbMSProcessingException("MessageId " + responseMessage.getMessageHeader().getMessageData().getMessageId() + " already used!");
@@ -139,5 +153,15 @@ public class DuplicateMessageHandler
 	public void setMessageValidator(EbMSMessageValidator messageValidator)
 	{
 		this.messageValidator = messageValidator;
+	}
+
+	public void setStoreDuplicateMessage(boolean storeDuplicateMessage)
+	{
+		this.storeDuplicateMessage = storeDuplicateMessage;
+	}
+
+	public void setStoreDuplicateMessageAttachments(boolean storeDuplicateMessageAttachments)
+	{
+		this.storeDuplicateMessageAttachments = storeDuplicateMessageAttachments;
 	}
 }

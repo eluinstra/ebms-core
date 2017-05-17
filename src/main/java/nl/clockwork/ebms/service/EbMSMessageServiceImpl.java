@@ -59,6 +59,7 @@ public class EbMSMessageServiceImpl implements InitializingBean, EbMSMessageServ
 	private EventManager eventManager;
 	private EbMSMessageContextValidator ebMSMessageContextValidator;
 	private EbMSSignatureGenerator signatureGenerator;
+	protected boolean deleteEbMSAttachmentsOnMessageProcessed;
 
 	@Override
 	public void afterPropertiesSet() throws Exception
@@ -139,12 +140,21 @@ public class EbMSMessageServiceImpl implements InitializingBean, EbMSMessageServ
 	}
 
 	@Override
-	public EbMSMessageContent getMessage(String messageId, Boolean process) throws EbMSMessageServiceException
+	public EbMSMessageContent getMessage(final String messageId, Boolean process) throws EbMSMessageServiceException
 	{
 		try
 		{
 			if (process != null && process)
-				ebMSDAO.updateMessage(messageId,EbMSMessageStatus.RECEIVED,EbMSMessageStatus.PROCESSED);
+				ebMSDAO.executeTransaction(new DAOTransactionCallback()
+				{
+					@Override
+					public void doInTransaction() throws DAOException
+					{
+						ebMSDAO.updateMessage(messageId,EbMSMessageStatus.RECEIVED,EbMSMessageStatus.PROCESSED);
+						if (deleteEbMSAttachmentsOnMessageProcessed)
+							ebMSDAO.deleteAttachments(messageId);
+					}
+				});
 			return ebMSDAO.getMessageContent(messageId);
 		}
 		catch (DAOException e)
@@ -154,11 +164,20 @@ public class EbMSMessageServiceImpl implements InitializingBean, EbMSMessageServ
 	}
 
 	@Override
-	public void processMessage(String messageId) throws EbMSMessageServiceException
+	public void processMessage(final String messageId) throws EbMSMessageServiceException
 	{
 		try
 		{
-			ebMSDAO.updateMessage(messageId,EbMSMessageStatus.RECEIVED,EbMSMessageStatus.PROCESSED);
+			ebMSDAO.executeTransaction(new DAOTransactionCallback()
+			{
+				@Override
+				public void doInTransaction() throws DAOException
+				{
+					ebMSDAO.updateMessage(messageId,EbMSMessageStatus.RECEIVED,EbMSMessageStatus.PROCESSED);
+					if (deleteEbMSAttachmentsOnMessageProcessed)
+						ebMSDAO.deleteAttachments(messageId);
+				}
+			});
 		}
 		catch (DAOException e)
 		{
@@ -167,11 +186,20 @@ public class EbMSMessageServiceImpl implements InitializingBean, EbMSMessageServ
 	}
 
 	@Override
-	public void processMessages(List<String> messageIds) throws EbMSMessageServiceException
+	public void processMessages(final List<String> messageIds) throws EbMSMessageServiceException
 	{
 		try
 		{
-			ebMSDAO.updateMessages(messageIds,EbMSMessageStatus.RECEIVED,EbMSMessageStatus.PROCESSED);
+			ebMSDAO.executeTransaction(new DAOTransactionCallback()
+			{
+				@Override
+				public void doInTransaction() throws DAOException
+				{
+					ebMSDAO.updateMessages(messageIds,EbMSMessageStatus.RECEIVED,EbMSMessageStatus.PROCESSED);
+					if (deleteEbMSAttachmentsOnMessageProcessed)
+						ebMSDAO.deleteAttachments(messageIds);
+				}
+			});
 		}
 		catch (DAOException e)
 		{
@@ -261,7 +289,7 @@ public class EbMSMessageServiceImpl implements InitializingBean, EbMSMessageServ
 				public void doInTransaction() throws DAOException
 				{
 					ebMSDAO.processEbMSMessageEvent(messageId);
-					ebMSDAO.updateMessage(messageId,EbMSMessageStatus.RECEIVED,EbMSMessageStatus.PROCESSED);
+					processMessage(messageId);
 				}
 			});
 		}
@@ -282,7 +310,7 @@ public class EbMSMessageServiceImpl implements InitializingBean, EbMSMessageServ
 				public void doInTransaction() throws DAOException
 				{
 					ebMSDAO.processEbMSMessageEvents(messageIds);
-					ebMSDAO.updateMessages(messageIds,EbMSMessageStatus.RECEIVED,EbMSMessageStatus.PROCESSED);
+					processMessages(messageIds);
 				}
 			});
 		}
@@ -347,4 +375,8 @@ public class EbMSMessageServiceImpl implements InitializingBean, EbMSMessageServ
 		this.signatureGenerator = signatureGenerator;
 	}
 
+	public void setDeleteEbMSAttachmentsOnMessageProcessed(boolean deleteEbMSAttachmentsOnMessageProcessed)
+	{
+		this.deleteEbMSAttachmentsOnMessageProcessed = deleteEbMSAttachmentsOnMessageProcessed;
+	}
 }

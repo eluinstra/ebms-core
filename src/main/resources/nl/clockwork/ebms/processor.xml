@@ -46,6 +46,7 @@
 		<property name="ebMSMessageFactory" ref="ebMSMessageFactory"/>
 		<property name="eventManager" ref="eventManager"/>
 		<property name="signatureGenerator" ref="signatureGenerator"/>
+		<property name="deleteEbMSAttachmentsOnMessageProcessed" value="${ebmsMessage.deleteContentOnProcessed}"/>
 	</bean>
 
 	<bean id="deliveryManager" class="nl.clockwork.ebms.client.DeliveryManager">
@@ -115,6 +116,8 @@
 		<property name="ebMSMessageFactory" ref="ebMSMessageFactory"/>
 		<property name="eventManager" ref="eventManager"/>
 		<property name="messageValidator" ref="messageValidator"/>
+		<property name="storeDuplicateMessage" value="${ebmsMessage.storeDuplicate}" />
+		<property name="storeDuplicateMessageAttachments" value="${ebmsMessage.storeDuplicateContent}" />
 	</bean>
 
 	<bean id="messageProcessor" class="nl.clockwork.ebms.processor.EbMSMessageProcessor">

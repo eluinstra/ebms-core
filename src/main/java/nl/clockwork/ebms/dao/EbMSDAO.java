@@ -69,6 +69,9 @@ public interface EbMSDAO
 	int updateMessage(String messageId, EbMSMessageStatus oldStatus, EbMSMessageStatus newStatus) throws DAOException;
 	void updateMessages(List<String> messageIds, EbMSMessageStatus oldStatus, EbMSMessageStatus newStatus) throws DAOException;
 
+	void deleteAttachments(String messageId);
+	void deleteAttachments(List<String> messageIds);
+
 	List<EbMSEvent> getEventsBefore(Date timestamp) throws DAOException;
 	void insertEvent(EbMSEvent event) throws DAOException;
 	void updateEvent(EbMSEvent event) throws DAOException;
@@ -80,4 +83,5 @@ public interface EbMSDAO
 	void insertEbMSMessageEvent(String messageId, EbMSMessageEventType eventType) throws DAOException;
 	int processEbMSMessageEvent(String messageId) throws DAOException;
 	void processEbMSMessageEvents(List<String> messageIds) throws DAOException;
+
 }
