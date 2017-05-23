@@ -35,7 +35,7 @@
 
 	<beans xmlns="http://www.springframework.org/schema/beans">
 
-		<bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
 			<property name="ignoreResourceNotFound" value="true" />
 			<property name="locations"> 
 				<list>
