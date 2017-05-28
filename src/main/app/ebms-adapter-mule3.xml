@@ -1,7 +1,59 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
 
-<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
-	xmlns:spring="http://www.springframework.org/schema/beans" version="EE-3.8.4"
+    Copyright 2011 Clockwork
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<mule xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
-http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd"></mule>
+	xmlns:spring="http://www.springframework.org/schema/beans" version="CE-3.8.0"
+	xmlns:management="http://www.mulesoft.org/schema/mule/management"
+	xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+http://www.mulesoft.org/schema/mule/management http://www.mulesoft.org/schema/mule/management/current/mule-management.xsd">
+
+	<custom-transaction-manager class="org.mule.module.spring.transaction.SpringTransactionFactory">
+		<spring:property name="manager" ref="ebMSTXManager" />
+	</custom-transaction-manager>
+ 	    
+	<configuration defaultResponseTimeout="${mule.config.defaultResponseTimeout}" shutdownTimeout="${mule.config.shutdownTimeout}" doc:name="Configuration"/>
+
+	<beans xmlns="http://www.springframework.org/schema/beans">
+
+		<bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer" doc:name="Bean">
+			<property name="ignoreResourceNotFound" value="true" />
+			<property name="locations"> 
+				<list>
+					<value>classpath:nl/clockwork/ebms/default.properties</value>   
+					<value>classpath:nl/clockwork/mule/ebms/default.properties</value>   
+					<value>file:${mule.home}/conf/ebms.adapter.properties</value>
+				</list>
+			</property>
+		</bean>
+
+		<import resource="classpath:nl/clockwork/ebms/datasource.xml" doc:name="Import"/>
+		<import resource="classpath:nl/clockwork/ebms/dao.spring.xml" doc:name="Import"/>
+		<import resource="classpath:nl/clockwork/ebms/processor.xml" doc:name="Import"/>
+
+		<import resource="classpath:nl/clockwork/mule/ebms/hsqldb/hsqldb.provider.xml" doc:name="Import"/>
+
+		<import resource="classpath:nl/clockwork/mule/ebms/flows/ebms.endpoint.${ebms.protocol}.xml" doc:name="Import"/>
+
+		<import resource="classpath:nl/clockwork/mule/ebms/flows/ebms.interface.cxf.xml" doc:name="Import"/>
+
+	</beans>
+
+</mule>

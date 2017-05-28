@@ -21,6 +21,7 @@
 			</Policies>                               
 		</RollingFile>
 	</Appenders>
+
 	<Loggers>
 
 		<AsyncLogger name="nl.clockwork.ebms" level="INFO" />
@@ -80,5 +81,7 @@
 		<AsyncRoot level="INFO">
 			<AppenderRef ref="file" />
 		</AsyncRoot>
+
 	</Loggers>
+
 </Configuration>
