@@ -12,11 +12,14 @@
 <!-- 		<ConsoleAppender name="console" class="org.apache.log4j.ConsoleAppender"> -->
 <!-- 			<PatternLayout pattern="%d [%t] %-5p %c - %m%n" /> -->
 <!-- 		</ConsoleAppender> -->
-		<DailyRollingFile name="file" 
+		<RollingFile name="file" 
 			fileName="${sys:mule.home}${sys:file.separator}logs${sys:file.separator}ebms-adapter-mule3.log"
 			filePattern="${sys:mule.home}${sys:file.separator}logs${sys:file.separator}ebms-adapter-mule3-%d{yyyy-MM-dd}.log">
 			<PatternLayout pattern="%d [%t] %-5p %c - %m%n" />
-		</DailyRollingFile>
+			<Policies>
+				<TimeBasedTriggeringPolicy interval="1"/>
+			</Policies>                               
+		</RollingFile>
 	</Appenders>
 	<Loggers>
 
