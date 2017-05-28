@@ -16,34 +16,34 @@
     limitations under the License.
 
 -->
-<mule xmlns="http://www.mulesoft.org/schema/mule/core"
+<mule xmlns:tls="http://www.mulesoft.org/schema/mule/tls" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns="http://www.mulesoft.org/schema/mule/core"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xmlns:spring="http://www.springframework.org/schema/beans"
-	xmlns:https="http://www.mulesoft.org/schema/mule/https" 
+	xmlns:http="http://www.mulesoft.org/schema/mule/http" 
 	xmlns:vm="http://www.mulesoft.org/schema/mule/vm"
 	xmlns:jdbc="http://www.mulesoft.org/schema/mule/jdbc"
 	xmlns:script="http://www.mulesoft.org/schema/mule/scripting"
-	xsi:schemaLocation="
-		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
-		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-		http://www.mulesoft.org/schema/mule/https http://www.mulesoft.org/schema/mule/https/current/mule-https.xsd
-		http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
-		http://www.mulesoft.org/schema/mule/jdbc http://www.mulesoft.org/schema/mule/jdbc/current/mule-jdbc.xsd
-		http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/current/mule-scripting.xsd  
-	">
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/vm http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd
+http://www.mulesoft.org/schema/mule/jdbc http://www.mulesoft.org/schema/mule/jdbc/current/mule-jdbc.xsd
+http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/current/mule-scripting.xsd
+http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd">
 
-	<https:connector name="connector.https.ebms.in">
-		<receiver-threading-profile maxThreadsActive="${threading.profile.http.receiver.maxThreadsActive}" maxThreadsIdle="${threading.profile.http.receiver.maxThreadsIdle}" threadTTL="${threading.profile.http.receiver.threadTTL}" poolExhaustedAction="WAIT" maxBufferSize="${threading.profile.http.receiver.maxBufferSize}" />
-		<service-overrides messageFactory="org.mule.transport.http.HttpMuleMessageFactory" />
-		<https:tls-key-store path="${keystore.path}" storePassword="${keystore.password}" keyPassword="${keystore.password}"/>
-		<https:tls-server path="${truststore.path}" storePassword="${truststore.password}" requireClientAuthentication="${https.requireClientAuthentication}"/>
-	</https:connector>  
-
+    <http:listener-config name="HTTPS_Listener_Configuration" host="${service.host}" port="${service.port}" protocol="HTTPS" doc:name="HTTP Listener Configuration">
+        <tls:context enabledProtocols="${https.enabledProtocols}" enabledCipherSuites="${https.allowedCipherSuites}">
+            <tls:trust-store path="${truststore.path}" password="${truststore.password}" type="jks"/>
+            <tls:key-store type="jks" path="${keystore.path}" keyPassword="${keystore.password}" password="${keystore.password}"/>
+        </tls:context>
+    	<http:worker-threading-profile maxThreadsActive="${threading.profile.http.receiver.maxThreadsActive}" maxThreadsIdle="${threading.profile.http.receiver.maxThreadsIdle}" threadTTL="${threading.profile.http.receiver.threadTTL}" poolExhaustedAction="WAIT" maxBufferSize="${threading.profile.http.receiver.maxBufferSize}"/>
+    </http:listener-config>
+	
 	<flow name="ebms.https.receive">
-		<https:inbound-endpoint connector-ref="connector.https.ebms.in" address="https://${service.host}:${service.port}${service.url}" exchange-pattern="request-response"/>
-		<component>
+        <http:listener config-ref="HTTPS_Listener_Configuration" path="{service.path}" doc:name="HTTP"/>
+		<component doc:name="Java">
 			<singleton-object class="nl.clockwork.mule.ebms.processor.EbMSHttpHandler">
-				<property key="ebMSMessageProcessor" value-ref="messageProcessor"/>
+				<property key="ebMSMessageProcessor" value-ref="messageProcessor" value=""/>
 			</singleton-object>
 		</component>
 	</flow>
