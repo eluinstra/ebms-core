@@ -44,15 +44,15 @@ http://www.mulesoft.org/schema/mule/management http://www.mulesoft.org/schema/mu
 			</property>
 		</bean>
 
-		<import resource="classpath:nl/clockwork/ebms/datasource.xml" doc:name="Import"/>
-		<import resource="classpath:nl/clockwork/ebms/dao.spring.xml" doc:name="Import"/>
-		<import resource="classpath:nl/clockwork/ebms/processor.xml" doc:name="Import"/>
+		<import resource="classpath:nl/clockwork/ebms/datasource.xml" />
+		<import resource="classpath:nl/clockwork/ebms/dao.spring.xml" />
+		<import resource="classpath:nl/clockwork/ebms/processor.xml" />
 
-		<import resource="classpath:nl/clockwork/mule/ebms/hsqldb/hsqldb.provider.xml" doc:name="Import"/>
+		<import resource="classpath:nl/clockwork/mule/ebms/hsqldb/hsqldb.provider.xml" />
 
-		<import resource="classpath:nl/clockwork/mule/ebms/flows/ebms.endpoint.${ebms.protocol}.xml" doc:name="Import"/>
+		<import resource="classpath:nl/clockwork/mule/ebms/flows/ebms.endpoint.${ebms.protocol}.xml" />
 
-		<import resource="classpath:nl/clockwork/mule/ebms/flows/ebms.interface.cxf.xml" doc:name="Import"/>
+		<import resource="classpath:nl/clockwork/mule/ebms/flows/ebms.interface.cxf.xml" />
 
 	</beans>
 
