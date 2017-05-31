@@ -5,7 +5,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>nl.clockwork.ebms.mule</groupId>
 	<artifactId>ebms-adapter-mule3_8-bvv</artifactId>
-	<version>2.2.3-SNAPSHOT</version>
+	<version>2.2.3</version>
 	<packaging>mule</packaging>
 	<name>Mule ebms-adapter-mule3_8 Application</name>
 	<description></description>
