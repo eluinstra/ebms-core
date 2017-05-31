@@ -5,7 +5,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>nl.clockwork.ebms.mule</groupId>
 	<artifactId>ebms-adapter-mule3_8-bvv</artifactId>
-	<version>2.2.3</version>
+	<version>2.2.3-SNAPSHOT</version>
 	<packaging>mule</packaging>
 	<name>Mule ebms-adapter-mule3_8 Application</name>
 	<description></description>
@@ -55,43 +55,6 @@
 					<artifactId>maven-install-plugin</artifactId>
 					<version>2.3.1</version>
 				</plugin>
-				<plugin>
-					<groupId>org.eclipse.m2e</groupId>
-					<artifactId>lifecycle-mapping</artifactId>
-					<version>1.0.0</version>
-					<configuration>
-						<lifecycleMappingMetadata>
-							<pluginExecutions>
-								<pluginExecution>
-									<pluginExecutionFilter>
-										<groupId>org.apache.maven.plugins</groupId>
-										<artifactId>maven-enforcer-plugin</artifactId>
-										<versionRange>[1.0,)</versionRange>
-										<goals>
-											<goal>enforce</goal>
-										</goals>
-									</pluginExecutionFilter>
-									<action>
-										<ignore></ignore>
-									</action>
-								</pluginExecution>
-								<pluginExecution>
-									<pluginExecutionFilter>
-										<groupId>org.mule.tools</groupId>
-										<artifactId>maven-mule-plugin</artifactId>
-										<versionRange>[1.5,)</versionRange>
-										<goals>
-											<goal>attach-test-resources</goal>
-										</goals>
-									</pluginExecutionFilter>
-									<action>
-										<ignore></ignore>
-									</action>
-								</pluginExecution>
-							</pluginExecutions>
-						</lifecycleMappingMetadata>
-					</configuration>
-				</plugin>
 			</plugins>
 		</pluginManagement>
 		<plugins>
@@ -112,7 +75,6 @@
 					<excludes>
 						<exclude>src/main/java/org/mule/**/*.java</exclude>
 						<exclude>src/main/resources/**/*.jks</exclude>
-						<exclude>src/main/resources/nl/clockwork/mule/ebms/stub/ebf/xsd/**/*</exclude>
 					</excludes>
 				</configuration>
 				<executions>
@@ -120,65 +82,6 @@
 						<goals>
 							<goal>check</goal>
 						</goals>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>jaxb2-maven-plugin</artifactId>
-				<version>1.5</version>
-				<executions>
-					<execution>
-						<id>Afleveren_ebMS_2.0_v1.1</id>
-						<goals>
-							<goal>xjc</goal>
-						</goals>
-						<configuration>
-							<schemaDirectory>${project.basedir}/src/main/resources/nl/clockwork/mule/ebms/stub/ebf/xsd/</schemaDirectory>
-							<schemaFiles>Afleveren_ebMS_2.0_v1.1.xsd</schemaFiles>
-							<staleFile>${project.build.directory}/jaxb2/.Afleveren_ebMS_2.0_v1.1.StaleFlag</staleFile>
-							<clearOutputDir>false</clearOutputDir>
-							<verbose>false</verbose>
-						</configuration>
-					</execution>
-					<execution>
-						<id>Afleveren_ebMS_2.0_v1.1_</id>
-						<goals>
-							<goal>xjc</goal>
-						</goals>
-						<configuration>
-							<schemaDirectory>${project.basedir}/src/main/resources/nl/clockwork/mule/ebms/stub/ebf/xsd/</schemaDirectory>
-							<schemaFiles>Afleveren_bevestiging_ebMS_2.0_v1.1.xsd</schemaFiles>
-							<staleFile>${project.build.directory}/jaxb2/.Afleveren_ebMS_2.0_v1.1_.StaleFlag</staleFile>
-							<clearOutputDir>false</clearOutputDir>
-							<verbose>false</verbose>
-						</configuration>
-					</execution>
-					<execution>
-						<id>Aanleveren_ebMS_2.0_v1.1</id>
-						<goals>
-							<goal>xjc</goal>
-						</goals>
-						<configuration>
-							<schemaDirectory>${project.basedir}/src/main/resources/nl/clockwork/mule/ebms/stub/ebf/xsd/</schemaDirectory>
-							<schemaFiles>Aanleveren_ebMS_2.0_v1.1.xsd</schemaFiles>
-							<staleFile>${project.build.directory}/jaxb2/.Aanleveren_ebMS_2.0_v1.1.StaleFlag</staleFile>
-							<clearOutputDir>false</clearOutputDir>
-							<verbose>false</verbose>
-						</configuration>
-					</execution>
-					<execution>
-						<id>Aanleveren_ebMS_2.0_v1.1_</id>
-						<goals>
-							<goal>xjc</goal>
-						</goals>
-						<configuration>
-							<schemaDirectory>${project.basedir}/src/main/resources/nl/clockwork/mule/ebms/stub/ebf/xsd/</schemaDirectory>
-							<schemaFiles>Aanleveren_bevestiging_ebMS_2.0_v1.1.xsd</schemaFiles>
-							<staleFile>${project.build.directory}/jaxb2/.Aanleveren_ebMS_2.0_v1.1_.StaleFlag</staleFile>
-							<clearOutputDir>false</clearOutputDir>
-							<verbose>false</verbose>
-						</configuration>
 					</execution>
 				</executions>
 			</plugin>
@@ -325,7 +228,7 @@
 		</dependency>
 		<dependency>
 			<groupId>nl.clockwork.ebms</groupId>
-			<artifactId>ebms-core</artifactId>
+			<artifactId>ebms-core-bvv</artifactId>
 			<version>2.2.3</version>
 		</dependency>
 		<dependency>
