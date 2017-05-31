@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Configuration>
+
+	<!--These are some of the loggers you can enable. There are several more 
+		you can find in the documentation. Besides this log4j configuration, you 
+		can also use Java VM environment variables to enable other logs like network 
+		(-Djavax.net.debug=ssl or all) and Garbage Collector (-XX:+PrintGC). These 
+		will be append to the console, so you will see them in the mule_ee.log file. -->
+
+
+	<Appenders>
+<!-- 		<ConsoleAppender name="console" class="org.apache.log4j.ConsoleAppender"> -->
+<!-- 			<PatternLayout pattern="%d [%t] %-5p %c - %m%n" /> -->
+<!-- 		</ConsoleAppender> -->
+		<RollingFile name="file" 
+			fileName="${sys:mule.home}${sys:file.separator}logs${sys:file.separator}ebms-adapter-mule3.log"
+			filePattern="${sys:mule.home}${sys:file.separator}logs${sys:file.separator}ebms-adapter-mule3-%d{yyyy-MM-dd}.log">
+			<PatternLayout pattern="%d [%t] %-5p %c - %m%n" />
+			<Policies>
+				<TimeBasedTriggeringPolicy interval="1"/>
+			</Policies>                               
+		</RollingFile>
+	</Appenders>
+
+	<Loggers>
+
+		<AsyncLogger name="nl.clockwork.ebms" level="INFO" />
+
+		<AsyncLogger name="nl.clockwork.ebms.client" level="DEBUG" />
+
+		<AsyncLogger name="nl.clockwork.ebms.server" level="DEBUG" />
+
+		<AsyncLogger name="nl.clockwork.ebms.job" level="INFO" />
+
+		<AsyncLogger name="nl.clockwork.mule.ebms" level="INFO" />
+
+		<AsyncLogger name="nl.clockwork.mule.ebms.processor" level="DEBUG" />
+
+		<AsyncLogger name="org.apache" level="WARN" />
+
+		<AsyncLogger name="httpclient.wire" level="WARN" />
+
+		<AsyncLogger name="com.sun.org" level="WARN" />
+
+		<AsyncLogger name="javax.xml" level="DEBUG" />
+
+		<AsyncLogger name="org.xml.sax" level="DEBUG" />
+
+		<AsyncLogger name="net.sf.saxon" level="WARN" />
+
+		<AsyncLogger name="org.springframework.beans.factory" level="WARN" />
+
+		<AsyncLogger name="org.springframework.jdbc" level="WARN" />
+
+		<AsyncLogger name="com.mchange.v2" level="WARN" />
+
+		<!-- Http Logger shows wire traffic on DEBUG -->
+		<AsyncLogger name="org.mule.module.http.internal.HttpMessageLogger" level="WARN" />
+
+		<!-- JDBC Logger shows queries and parameters values on DEBUG -->
+		<AsyncLogger name="com.mulesoft.mule.transport.jdbc" level="WARN" />
+
+		<!-- CXF is used heavily by Mule for web services -->
+		<AsyncLogger name="org.apache.cxf" level="WARN" />
+
+		<!-- Apache Commons tend to make a lot of noise which can clutter the log -->
+		<AsyncLogger name="org.apache" level="WARN" />
+
+		<!-- Reduce startup noise -->
+		<AsyncLogger name="org.springframework.beans.factory" level="WARN" />
+
+		<AsyncLogger name="org.springframework.jdbc" level="WARN" />
+
+		<!-- Mule classes -->
+		<AsyncLogger name="org.mule" level="INFO" />
+
+		<AsyncLogger name="org.mule.module.client" level="WARN" />
+
+		<AsyncLogger name="com.mulesoft" level="INFO" />
+
+		<!-- Reduce DM verbosity -->
+		<AsyncLogger name="org.jetel" level="WARN" />
+		<AsyncLogger name="Tracking" level="WARN" />
+
+		<AsyncRoot level="INFO">
+			<AppenderRef ref="file" />
+		</AsyncRoot>
+
+	</Loggers>
+
+</Configuration>
