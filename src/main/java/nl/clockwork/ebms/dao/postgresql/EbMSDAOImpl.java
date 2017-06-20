@@ -91,7 +91,7 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 	}
 	
 	@Override
-	public void insertMessage(final Date timestamp, final EbMSMessage message, final EbMSMessageStatus status) throws DAOException
+	public void insertMessage(final Date timestamp, final Date persistTime, final EbMSMessage message, final EbMSMessageStatus status) throws DAOException
 	{
 		try
 		{
@@ -128,8 +128,9 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 													"action," +
 													"content," +
 													"status," +
-													"status_time" +
-												") values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)" +
+													"status_time," +
+													"persist_time" +
+												") values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)" +
 												" returning message_id, message_nr"
 											);
 											ps.setTimestamp(1,new Timestamp(timestamp.getTime()));
@@ -156,6 +157,7 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 												ps.setInt(14,status.id());
 												ps.setTimestamp(15,new Timestamp(timestamp.getTime()));
 											}
+											ps.setTimestamp(16,new Timestamp(persistTime.getTime()));
 											return ps;
 										}
 										catch (TransformerException e)

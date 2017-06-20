@@ -22,6 +22,7 @@ import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import javax.xml.bind.JAXBElement;
@@ -166,6 +167,13 @@ public class CPAUtils
 		return ((DocExchange)deliveryChannel.getDocExchangeId()).getEbXMLReceiverBinding().getPersistDuration();
 	}
 
+	public static Date getPersistTime(Date timestamp, DeliveryChannel deliveryChannel)
+	{
+		Duration persistDuration = CPAUtils.getDocExchange(deliveryChannel).getEbXMLReceiverBinding().getPersistDuration();
+		Date persistTime = (Date)timestamp.clone();
+		persistDuration.addTo(persistTime);
+		return persistTime;
+	}
 	public static Duration getRetryInterval(DeliveryChannel deliveryChannel)
 	{
 		return ((DocExchange)deliveryChannel.getDocExchangeId()).getEbXMLReceiverBinding().getReliableMessaging().getRetryInterval();

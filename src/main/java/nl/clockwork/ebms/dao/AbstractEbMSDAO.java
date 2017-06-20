@@ -741,8 +741,9 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 													"action," +
 													"content," +
 													"status," +
-													"status_time" +
-												") values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+													"status_time," +
+													"persist_time" +
+												") values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
 												new int[]{4,5}
 											);
 											ps.setTimestamp(1,new Timestamp(timestamp.getTime()));
@@ -769,6 +770,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 												ps.setInt(14,status.id());
 												ps.setTimestamp(15,new Timestamp(timestamp.getTime()));
 											}
+											ps.setTimestamp(16,new Timestamp(persistTime.getTime()));
 											return ps;
 										}
 										catch (TransformerException e)

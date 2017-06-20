@@ -54,6 +54,7 @@ import nl.clockwork.ebms.validation.XSDValidator;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DeliveryChannel;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.ErrorList;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageHeader;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageStatusType;
@@ -300,7 +301,8 @@ public class EbMSMessageProcessor
 						@Override
 						public void doInTransaction()
 						{
-							ebMSDAO.insertMessage(timestamp,message,EbMSMessageStatus.RECEIVED);
+							Date persistTime = ebMSDAO.getPersistTime(message.getMessageHeader().getMessageData().getRefToMessageId());
+							ebMSDAO.insertMessage(timestamp,persistTime,message,EbMSMessageStatus.RECEIVED);
 							eventListener.onMessageReceived(message.getMessageHeader().getMessageData().getMessageId());
 						}
 					}
@@ -317,10 +319,14 @@ public class EbMSMessageProcessor
 						@Override
 						public void doInTransaction()
 						{
-							ebMSDAO.insertMessage(timestamp,message,EbMSMessageStatus.RECEIVED);
-							ebMSDAO.insertMessage(timestamp,acknowledgment,null);
+							DeliveryChannel deliveryChannel = cpaManager.getReceiveDeliveryChannel(messageHeader.getCPAId(),new CacheablePartyId(acknowledgment.getMessageHeader().getTo().getPartyId()),acknowledgment.getMessageHeader().getTo().getRole(),CPAUtils.toString(acknowledgment.getMessageHeader().getService()),acknowledgment.getMessageHeader().getAction());
+							Date persistTime = CPAUtils.getPersistTime(timestamp,deliveryChannel);
+							ebMSDAO.insertMessage(timestamp,persistTime,message,EbMSMessageStatus.RECEIVED);
+							ebMSDAO.insertMessage(timestamp,persistTime,acknowledgment,null);
 							if (!messageValidator.isSyncReply(message))
-								eventManager.createEvent(messageHeader.getCPAId(),cpaManager.getReceiveDeliveryChannel(messageHeader.getCPAId(),new CacheablePartyId(acknowledgment.getMessageHeader().getTo().getPartyId()),acknowledgment.getMessageHeader().getTo().getRole(),CPAUtils.toString(acknowledgment.getMessageHeader().getService()),acknowledgment.getMessageHeader().getAction()),acknowledgment.getMessageHeader().getMessageData().getMessageId(),acknowledgment.getMessageHeader().getMessageData().getTimeToLive(),acknowledgment.getMessageHeader().getMessageData().getTimestamp(),false);
+							{
+								eventManager.createEvent(messageHeader.getCPAId(),deliveryChannel,acknowledgment.getMessageHeader().getMessageData().getMessageId(),acknowledgment.getMessageHeader().getMessageData().getTimeToLive(),acknowledgment.getMessageHeader().getMessageData().getTimestamp(),false);
+							}
 							eventListener.onMessageReceived(message.getMessageHeader().getMessageData().getMessageId());
 						}
 					}
@@ -346,10 +352,14 @@ public class EbMSMessageProcessor
 					@Override
 					public void doInTransaction()
 					{
-						ebMSDAO.insertMessage(timestamp,message,EbMSMessageStatus.FAILED);
-						ebMSDAO.insertMessage(timestamp,messageError,null);
+						DeliveryChannel deliveryChannel = cpaManager.getReceiveDeliveryChannel(messageHeader.getCPAId(),new CacheablePartyId(messageError.getMessageHeader().getTo().getPartyId()),messageError.getMessageHeader().getTo().getRole(),CPAUtils.toString(messageError.getMessageHeader().getService()),messageError.getMessageHeader().getAction());
+						Date persistTime = CPAUtils.getPersistTime(timestamp,deliveryChannel);
+						ebMSDAO.insertMessage(timestamp,persistTime,message,EbMSMessageStatus.FAILED);
+						ebMSDAO.insertMessage(timestamp,persistTime,messageError,null);
 						if (!messageValidator.isSyncReply(message))
-							eventManager.createEvent(messageHeader.getCPAId(),cpaManager.getReceiveDeliveryChannel(messageHeader.getCPAId(),new CacheablePartyId(messageError.getMessageHeader().getTo().getPartyId()),messageError.getMessageHeader().getTo().getRole(),CPAUtils.toString(messageError.getMessageHeader().getService()),messageError.getMessageHeader().getAction()),messageError.getMessageHeader().getMessageData().getMessageId(),messageError.getMessageHeader().getMessageData().getTimeToLive(),messageError.getMessageHeader().getMessageData().getTimestamp(),false);
+						{
+							eventManager.createEvent(messageHeader.getCPAId(),deliveryChannel,messageError.getMessageHeader().getMessageData().getMessageId(),messageError.getMessageHeader().getMessageData().getTimeToLive(),messageError.getMessageHeader().getMessageData().getTimestamp(),false);
+						}
 					}
 				}
 			);

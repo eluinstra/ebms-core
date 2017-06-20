@@ -18,7 +18,6 @@ package nl.clockwork.ebms.service;
 import java.util.Date;
 import java.util.List;
 
-import javax.xml.datatype.Duration;
 import javax.xml.transform.TransformerFactoryConfigurationError;
 
 import nl.clockwork.ebms.Constants;
@@ -311,12 +310,9 @@ public class EbMSMessageServiceImpl implements InitializingBean, EbMSMessageServ
 				@Override
 				public void doInTransaction()
 				{
-					DeliveryChannel deliveryChannel = cpaManager.getReceiveDeliveryChannel(result.getMessageHeader().getCPAId(),new CacheablePartyId(result.getMessageHeader().getTo().getPartyId()),result.getMessageHeader().getTo().getRole(),CPAUtils.toString(result.getMessageHeader().getService()),result.getMessageHeader().getAction());
-					Duration persistDuration = CPAUtils.getDocExchange(deliveryChannel).getEbXMLReceiverBinding().getPersistDuration();
 					Date timestamp = new Date();
-					Date persistTime = (Date)timestamp.clone();
-					persistDuration.addTo(persistTime);
-					ebMSDAO.insertMessage(timestamp,persistTime,result,EbMSMessageStatus.SENDING);
+					DeliveryChannel deliveryChannel = cpaManager.getReceiveDeliveryChannel(result.getMessageHeader().getCPAId(),new CacheablePartyId(result.getMessageHeader().getTo().getPartyId()),result.getMessageHeader().getTo().getRole(),CPAUtils.toString(result.getMessageHeader().getService()),result.getMessageHeader().getAction());
+					ebMSDAO.insertMessage(timestamp,CPAUtils.getPersistTime(timestamp,deliveryChannel),result,EbMSMessageStatus.SENDING);
 					eventManager.createEvent(result.getMessageHeader().getCPAId(),deliveryChannel,result.getMessageHeader().getMessageData().getMessageId(),result.getMessageHeader().getMessageData().getTimeToLive(),result.getMessageHeader().getMessageData().getTimestamp(),cpaManager.isConfidential(result.getMessageHeader().getCPAId(),new CacheablePartyId(result.getMessageHeader().getFrom().getPartyId()),result.getMessageHeader().getFrom().getRole(),CPAUtils.toString(result.getMessageHeader().getService()),result.getMessageHeader().getAction()));
 				}
 			}
