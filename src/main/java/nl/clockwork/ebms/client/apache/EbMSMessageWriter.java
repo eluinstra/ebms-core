@@ -78,6 +78,7 @@ public class EbMSMessageWriter
 			logger.info(">>>>\n" + DOMUtils.toString(document.getMessage()));
 		httpPost.setHeader("SOAPAction",Constants.EBMS_SOAP_ACTION);
 		MultipartEntityBuilder entity = MultipartEntityBuilder.create();
+		entity.setContentType(ContentType.create("multipart/related"));
 		entity.addPart(document.getContentId(),new StringBody(DOMUtils.toString(document.getMessage(),"UTF-8"),ContentType.create("text/xml")));
 		for (EbMSAttachment attachment : document.getAttachments())
 			if (attachment.getContentType().matches("^(text/.*|.*/xml)$"))
