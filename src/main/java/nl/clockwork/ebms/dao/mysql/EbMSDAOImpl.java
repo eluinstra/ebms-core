@@ -305,7 +305,7 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 			" and ebms_message_event.message_id = ebms_message.message_id" +
 			" and ebms_message.message_nr = 0" +
 			messageContextFilter +
-			" order by time_stamp asc" +
+			" order by ebms_message_event.time_stamp asc" +
 			" limit " + maxNr;
 	}
 
