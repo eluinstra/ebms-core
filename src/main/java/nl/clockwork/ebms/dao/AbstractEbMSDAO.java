@@ -1173,7 +1173,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 				" and ebms_message_event.message_id = ebms_message.message_id" +
 				" and ebms_message.message_nr = 0" +
 				getMessageContextFilter(messageContext,parameters) +
-				" order by time_stamp asc",
+				" order by ebms_message.time_stamp asc",
 				parameters.toArray(new Object[0]),
 				new RowMapper<EbMSMessageEvent>()
 				{
@@ -1328,19 +1328,19 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 			if (messageContext.getCpaId() != null)
 			{
 				parameters.add(messageContext.getCpaId());
-				result.append(" and cpa_id = ?");
+				result.append(" and ebms_message.cpa_id = ?");
 			}
 			if (messageContext.getFromRole() != null)
 			{
 				if (messageContext.getFromRole().getPartyId() != null)
 				{
 					parameters.add(messageContext.getFromRole().getPartyId());
-					result.append(" and from_party_id = ?");
+					result.append(" and ebms_message.from_party_id = ?");
 				}
 				if (messageContext.getFromRole().getRole() != null)
 				{
 					parameters.add(messageContext.getFromRole().getRole());
-					result.append(" and from_role = ?");
+					result.append(" and ebms_message.from_role = ?");
 				}
 			}
 			if (messageContext.getToRole() != null)
@@ -1348,43 +1348,43 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 				if (messageContext.getToRole().getPartyId() != null)
 				{
 					parameters.add(messageContext.getToRole().getPartyId());
-					result.append(" and to_party_id = ?");
+					result.append(" and ebms_message.to_party_id = ?");
 				}
 				if (messageContext.getToRole().getRole() != null)
 				{
 					parameters.add(messageContext.getToRole().getRole());
-					result.append(" and to_role = ?");
+					result.append(" and ebms_message.to_role = ?");
 				}
 			}
 			if (messageContext.getService() != null)
 			{
 				parameters.add(messageContext.getService());
-				result.append(" and service = ?");
+				result.append(" and ebms_message.service = ?");
 			}
 			if (messageContext.getAction() != null)
 			{
 				parameters.add(messageContext.getAction());
-				result.append(" and action = ?");
+				result.append(" and ebms_message.action = ?");
 			}
 			if (messageContext.getConversationId() != null)
 			{
 				parameters.add(messageContext.getConversationId());
-				result.append(" and conversation_id = ?");
+				result.append(" and ebms_message.conversation_id = ?");
 			}
 			if (messageContext.getMessageId() != null)
 			{
 				parameters.add(messageContext.getMessageId());
-				result.append(" and message_id = ?");
+				result.append(" and ebms_message.message_id = ?");
 			}
 			if (messageContext.getRefToMessageId() != null)
 			{
 				parameters.add(messageContext.getRefToMessageId());
-				result.append(" and ref_to_message_id = ?");
+				result.append(" and ebms_message.ref_to_message_id = ?");
 			}
 			if (messageContext.getMessageStatus() != null)
 			{
 				parameters.add(messageContext.getMessageStatus().ordinal());
-				result.append(" and status = ?");
+				result.append(" and ebms_message.status = ?");
 			}
 		}
 		return result.toString();
