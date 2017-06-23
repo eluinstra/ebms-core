@@ -170,9 +170,14 @@ public class CPAUtils
 	public static Date getPersistTime(Date timestamp, DeliveryChannel deliveryChannel)
 	{
 		Duration persistDuration = CPAUtils.getDocExchange(deliveryChannel).getEbXMLReceiverBinding().getPersistDuration();
-		Date persistTime = (Date)timestamp.clone();
-		persistDuration.addTo(persistTime);
-		return persistTime;
+		if (persistDuration != null)
+		{
+			Date persistTime = (Date)timestamp.clone();
+			persistDuration.addTo(persistTime);
+			return persistTime;
+		}
+		else
+			return null;
 	}
 	public static Duration getRetryInterval(DeliveryChannel deliveryChannel)
 	{
