@@ -82,9 +82,11 @@ public class URLManager
 		flushURLMethodCache(source);
 	}
 
-	private void flushURLMethodCache(String cpaId)
+	private void flushURLMethodCache(String source)
 	{
-		methodCache.remove(MethodCacheInterceptor.getCacheKey("EbMSDAOImpl","getURL",cpaId));
+		methodCache.remove(MethodCacheInterceptor.getCacheKey("EbMSDAOImpl","existsURLMapping",source));
+		methodCache.remove(MethodCacheInterceptor.getCacheKey("EbMSDAOImpl","getURLMapping",source));
+		methodCache.remove(MethodCacheInterceptor.getCacheKey("EbMSDAOImpl","getURLMappings"));
 	}
 
 	public void setMethodCache(Ehcache methodCache)

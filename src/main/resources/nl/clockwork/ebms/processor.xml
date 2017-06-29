@@ -163,22 +163,25 @@
 			<list>
 				<!--value>.*existsCPA</value>
 				<value>.*getCPA</value>
-				<value>.*getCPAIds</value>
-				<value>.*getUrl</value-->
-				<value>.*getFromParty</value>
-				<value>.*getToParty</value>
+				<value>.*getCPAIds</value-->
+				<value>.*existsParty</value>
 				<value>.*getEbMSPartyInfo</value>
 				<value>.*getPartyInfo</value>
+				<value>.*getFromParty</value>
+				<value>.*getToParty</value>
 				<value>.*getFromPartyInfo</value>
 				<value>.*getToPartyInfoByFromPartyActionBinding</value>
 				<value>.*getToPartyInfo</value>
 				<value>.*canSend</value>
 				<value>.*canReceive</value>
+				<value>.*getDeliveryChannel</value>
 				<value>.*getDefaultDeliveryChannel</value>
-				<value>.*getFromDeliveryChannel</value>
-				<value>.*getToDeliveryChannel</value>
+				<value>.*getSendDeliveryChannel</value>
+				<value>.*getReceiveDeliveryChannel</value>
 				<value>.*isNonRepudiationRequired</value>
+				<value>.*isConfidential</value>
 				<!--value>.*getUri</value-->
+				<value>.*getSyncReply</value>
 			</list>
 		</property>
 	</bean>
