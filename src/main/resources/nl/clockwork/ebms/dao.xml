@@ -36,7 +36,9 @@
 				<value>.*existsCPA</value>
 				<value>.*getCPA</value>
 				<value>.*getCPAIds</value>
-				<value>.*getUrl</value>
+				<value>.*existsURLMapping</value>
+				<value>.*getURLMapping</value>
+				<value>.*getURLMappings</value>
 			</list>
 		</property>
 	</bean>
