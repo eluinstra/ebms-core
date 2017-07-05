@@ -10,7 +10,7 @@
 	</appender>
 
 	<appender  name="FILE" class="org.apache.log4j.DailyRollingFileAppender">
-		<param name="File" value="${catalina.base}/logs/ebms-webapp.log"/>
+		<param name="File" value="${catalina.base}/logs/ebms-web.log"/>
 		<param name="DatePattern" value="yyyyMMdd'.log'"/>
 		<param name="Threshold" value="debug"/>
 		<param name="Append" value="true"/>
