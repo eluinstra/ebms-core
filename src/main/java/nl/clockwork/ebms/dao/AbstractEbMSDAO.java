@@ -770,7 +770,10 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 												ps.setInt(14,status.id());
 												ps.setTimestamp(15,new Timestamp(timestamp.getTime()));
 											}
-											ps.setTimestamp(16,new Timestamp(persistTime.getTime()));
+											if (persistTime == null)
+												ps.setNull(16,java.sql.Types.DATE);
+											else
+												ps.setTimestamp(16,new Timestamp(persistTime.getTime()));
 											return ps;
 										}
 										catch (TransformerException e)
