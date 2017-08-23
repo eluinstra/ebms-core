@@ -18,13 +18,10 @@ package nl.clockwork.mule.ebms.processor;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
-
-import nl.clockwork.ebms.processor.EbMSMessageProcessor;
-import nl.clockwork.ebms.processor.EbMSProcessorException;
-import nl.clockwork.ebms.server.EbMSInputStreamHandler;
-import nl.clockwork.ebms.server.EbMSInputStreamHandlerImpl;
 
 import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpVersion;
@@ -39,6 +36,10 @@ import org.mule.api.transport.PropertyScope;
 import org.mule.transport.http.HttpConstants;
 import org.mule.transport.http.HttpResponse;
 
+import nl.clockwork.ebms.processor.EbMSMessageProcessor;
+import nl.clockwork.ebms.processor.EbMSProcessorException;
+import nl.clockwork.ebms.server.EbMSInputStreamHandler;
+
 public class EbMSHttpHandler implements Callable
 {
 	private EbMSMessageProcessor ebMSMessageProcessor;
@@ -47,15 +48,35 @@ public class EbMSHttpHandler implements Callable
 	public Object onCall(MuleEventContext eventContext) throws Exception
 	{
 		final MuleMessage message = eventContext.getMessage();
-  	final InputStream request = (InputStream)message.getPayload();
-  	final HttpResponse response = new HttpResponse();
+		final InputStream request = (InputStream)message.getPayload();
+		final HttpResponse response = new HttpResponse();
 		final ByteArrayOutputStream output = new ByteArrayOutputStream();
-
 		try
 		{
 			EbMSInputStreamHandler messageHandler = 
-	  		new EbMSInputStreamHandlerImpl(ebMSMessageProcessor,getHeaders(message))
+	  		new EbMSInputStreamHandler(ebMSMessageProcessor)
 				{
+					@Override
+					public List<String> getRequestHeaderNames()
+					{
+						Map<String,String> headers = message.getProperty("http.headers",PropertyScope.INBOUND);
+						return new ArrayList<String>(headers.keySet());
+					}
+
+					@Override
+					public List<String> getRequestHeaders(String headerName)
+					{
+						Map<String,String> headers = message.getProperty("http.headers",PropertyScope.INBOUND);
+						return Arrays.asList(headers.get(headerName).toString());
+					}
+
+					@Override
+					public String getRequestHeader(String headerName)
+					{
+						Map<String,String> headers = message.getProperty("http.headers",PropertyScope.INBOUND);
+						return headers.get(headerName);
+					}
+					
 					@Override
 					public void writeResponseStatus(int statusCode)
 					{
@@ -100,15 +121,6 @@ public class EbMSHttpHandler implements Callable
 		);
 		message.setPayload(response);
 		return message;
-	}
-
-	private Map<String,String> getHeaders(MuleMessage message)
-	{
-		Map<String,String> result = new HashMap<String,String>();
-		for (Object name : message.getPropertyNames(PropertyScope.INBOUND))
-			if (message.getProperty((String)name,PropertyScope.INBOUND) instanceof String)
-				result.put((String)name,(String)message.getProperty((String)name,PropertyScope.INBOUND));
-		return result;
 	}
 
 	public void setEbMSMessageProcessor(EbMSMessageProcessor ebMSMessageProcessor)
