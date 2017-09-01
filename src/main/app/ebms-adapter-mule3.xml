@@ -47,7 +47,7 @@ http://www.mulesoft.org/schema/mule/management http://www.mulesoft.org/schema/mu
 		<import resource="classpath:nl/clockwork/ebms/cache.xml" />
 		<import resource="classpath:nl/clockwork/ebms/datasource.xml" />
 		<import resource="classpath:nl/clockwork/ebms/dao.xml" />
-		<import resource="classpath:nl/clockwork/mule/ebms/components/processor.xml" />
+		<import resource="classpath:nl/clockwork/ebms/processor.xml" />
 
 		<import resource="classpath:nl/clockwork/mule/ebms/hsqldb/hsqldb.provider.xml" />
 
