@@ -31,12 +31,13 @@ http://www.mulesoft.org/schema/mule/jdbc http://www.mulesoft.org/schema/mule/jdb
 http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/current/mule-scripting.xsd
 http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd">
 
-    <http:listener-config name="HTTP_Listener_Configuration" host="${service.host}" port="${service.port}" protocol="HTTP" doc:name="HTTP Listener Configuration">
-    	<http:worker-threading-profile maxThreadsActive="${threading.profile.http.receiver.maxThreadsActive}" maxThreadsIdle="${threading.profile.http.receiver.maxThreadsIdle}" threadTTL="${threading.profile.http.receiver.threadTTL}" poolExhaustedAction="WAIT" maxBufferSize="${threading.profile.http.receiver.maxBufferSize}"/>
-    </http:listener-config>
-	
+	<http:connector name="connector.http.ebms.in">
+		<receiver-threading-profile maxThreadsActive="${threading.profile.http.receiver.maxThreadsActive}" maxThreadsIdle="${threading.profile.http.receiver.maxThreadsIdle}" threadTTL="${threading.profile.http.receiver.threadTTL}" poolExhaustedAction="WAIT" maxBufferSize="${threading.profile.http.receiver.maxBufferSize}" />
+		<service-overrides messageFactory="org.mule.transport.http.HttpMuleMessageFactory" />
+	</http:connector>
+
 	<flow name="ebms.http.receive">
-        <http:listener config-ref="HTTP_Listener_Configuration" path="{service.path}" doc:name="HTTP"/>
+		<http:inbound-endpoint connector-ref="connector.http.ebms.in" address="http://${service.host}:${service.port}${service.path}" exchange-pattern="request-response"/>
 		<component doc:name="Java">
 			<singleton-object class="nl.clockwork.mule.ebms.processor.EbMSHttpHandler">
 				<property key="ebMSMessageProcessor" value-ref="messageProcessor" value=""/>
