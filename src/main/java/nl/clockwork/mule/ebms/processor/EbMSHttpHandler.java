@@ -21,7 +21,6 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpVersion;
@@ -32,7 +31,6 @@ import org.mule.api.MuleEventContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.lifecycle.Callable;
 import org.mule.api.transport.OutputHandler;
-import org.mule.api.transport.PropertyScope;
 import org.mule.transport.http.HttpConstants;
 import org.mule.transport.http.HttpResponse;
 
@@ -59,22 +57,19 @@ public class EbMSHttpHandler implements Callable
 					@Override
 					public List<String> getRequestHeaderNames()
 					{
-						Map<String,String> headers = message.getProperty("http.headers",PropertyScope.INBOUND);
-						return new ArrayList<String>(headers.keySet());
+						return new ArrayList<String>(message.getInboundPropertyNames());
 					}
 
 					@Override
 					public List<String> getRequestHeaders(String headerName)
 					{
-						Map<String,String> headers = message.getProperty("http.headers",PropertyScope.INBOUND);
-						return Arrays.asList(headers.get(headerName).toString());
+						return Arrays.asList(message.getInboundProperty(headerName).toString());
 					}
 
 					@Override
 					public String getRequestHeader(String headerName)
 					{
-						Map<String,String> headers = message.getProperty("http.headers",PropertyScope.INBOUND);
-						return headers.get(headerName);
+						return message.getInboundProperty(headerName);
 					}
 					
 					@Override
