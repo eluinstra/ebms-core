@@ -119,7 +119,7 @@ public class Constants
 
 	public static enum EbMSMessageEventType
 	{
-		RECEIVED,ACKNOWLEDGED,FAILED,EXPIRED;
+		RECEIVED,DELIVERED,FAILED,EXPIRED;
 	}
 
 	public static final String EBMS_SOAP_ACTION = "\"ebXML\"";

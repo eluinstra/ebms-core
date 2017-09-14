@@ -101,7 +101,7 @@ public class EventListenerFactory implements FactoryBean<EventListener>
 	{
 		HashMap<String,Destination> result = new HashMap<String,Destination>();
 		result.put(nl.clockwork.ebms.Constants.EbMSMessageEventType.RECEIVED.name(),new ActiveMQQueue(nl.clockwork.ebms.Constants.EbMSMessageEventType.RECEIVED.name()));
-		result.put(nl.clockwork.ebms.Constants.EbMSMessageEventType.ACKNOWLEDGED.name(),new ActiveMQQueue(nl.clockwork.ebms.Constants.EbMSMessageEventType.ACKNOWLEDGED.name()));
+		result.put(nl.clockwork.ebms.Constants.EbMSMessageEventType.DELIVERED.name(),new ActiveMQQueue(nl.clockwork.ebms.Constants.EbMSMessageEventType.DELIVERED.name()));
 		result.put(nl.clockwork.ebms.Constants.EbMSMessageEventType.FAILED.name(),new ActiveMQQueue(nl.clockwork.ebms.Constants.EbMSMessageEventType.FAILED.name()));
 		result.put(nl.clockwork.ebms.Constants.EbMSMessageEventType.EXPIRED.name(),new ActiveMQQueue(nl.clockwork.ebms.Constants.EbMSMessageEventType.EXPIRED.name()));
 		return result;

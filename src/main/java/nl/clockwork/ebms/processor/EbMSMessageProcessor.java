@@ -209,7 +209,7 @@ public class EbMSMessageProcessor
 						public void doInTransaction()
 						{
 							if (ebMSDAO.updateMessage(requestMessage.getMessageHeader().getMessageData().getMessageId(),EbMSMessageStatus.SENDING,EbMSMessageStatus.DELIVERED) > 0)
-								eventListener.onMessageAcknowledged(requestMessage.getMessageHeader().getMessageData().getMessageId());
+								eventListener.onMessageDelivered(requestMessage.getMessageHeader().getMessageData().getMessageId());
 						}
 					}
 				);
@@ -270,7 +270,7 @@ public class EbMSMessageProcessor
 						Date persistTime = ebMSDAO.getPersistTime(responseMessage.getMessageHeader().getMessageData().getRefToMessageId());
 						ebMSDAO.insertMessage(timestamp,persistTime,responseMessage,null);
 						if (ebMSDAO.updateMessage(responseMessage.getMessageHeader().getMessageData().getRefToMessageId(),EbMSMessageStatus.SENDING,EbMSMessageStatus.DELIVERED) > 0)
-							eventListener.onMessageAcknowledged(responseMessage.getMessageHeader().getMessageData().getRefToMessageId());
+							eventListener.onMessageDelivered(responseMessage.getMessageHeader().getMessageData().getRefToMessageId());
 					}
 				}
 			);

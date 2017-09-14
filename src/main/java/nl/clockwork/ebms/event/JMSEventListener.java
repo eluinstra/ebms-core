@@ -92,12 +92,12 @@ public class JMSEventListener implements EventListener
 	}
 
 	@Override
-	public void onMessageAcknowledged(String messageId) throws EventException
+	public void onMessageDelivered(String messageId) throws EventException
 	{
 		try
 		{
-			logger.info("Message " + messageId + " acknowledged");
-			jmsTemplate.send(destinations.get(EbMSMessageEventType.ACKNOWLEDGED.name()),new EventMessageCreator(ebMSDAO.getMessageContext(messageId)));
+			logger.info("Message " + messageId + " delivered");
+			jmsTemplate.send(destinations.get(EbMSMessageEventType.DELIVERED.name()),new EventMessageCreator(ebMSDAO.getMessageContext(messageId)));
 		}
 		catch (JmsException e)
 		{

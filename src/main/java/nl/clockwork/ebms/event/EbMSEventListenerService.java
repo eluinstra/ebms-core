@@ -20,7 +20,7 @@ import javax.jws.WebParam;
 import javax.jws.WebService;
 
 
-@WebService(targetNamespace="http://www.clockwork.nl/ebms/event/2.0")
+@WebService(targetNamespace="http://www.clockwork.nl/ebms/event/2.13")
 public interface EbMSEventListenerService extends EventListener
 {
 
@@ -29,15 +29,15 @@ public interface EbMSEventListenerService extends EventListener
 	public void onMessageReceived(@WebParam(name="MessageId") String messageId) throws EbMSEventListenerServiceException;
 
 	@Override
-	@WebMethod(operationName="MessageAcknowledged")
-	public void onMessageAcknowledged(@WebParam(name="MessageId") String messageId) throws EbMSEventListenerServiceException;
+	@WebMethod(operationName="MessageDelivered")
+	public void onMessageDelivered(@WebParam(name="MessageId") String messageId) throws EbMSEventListenerServiceException;
 
 	@Override
 	@WebMethod(operationName="MessageDeliveryFailed")
 	public void onMessageFailed(@WebParam(name="MessageId") String messageId) throws EbMSEventListenerServiceException;
 
 	@Override
-	@WebMethod(operationName="MessageNotAcknowledged")
+	@WebMethod(operationName="MessageExpired")
 	public void onMessageExpired(@WebParam(name="MessageId") String messageId) throws EbMSEventListenerServiceException;
 
 }

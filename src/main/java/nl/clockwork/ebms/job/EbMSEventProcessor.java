@@ -84,6 +84,9 @@ public class EbMSEventProcessor implements InitializingBean, Job
 					EbMSDocument responseDocument = ebMSClient.sendMessage(url,requestDocument);
 					messageProcessor.processResponse(requestDocument,responseDocument);
 					eventManager.updateEvent(event,url,EbMSEventStatus.SUCCEEDED);
+					if (!CPAUtils.isReliableMessaging(deliveryChannel))
+						if (ebMSDAO.updateMessage(event.getMessageId(),EbMSMessageStatus.SENDING,EbMSMessageStatus.DELIVERED) > 0)
+							eventListener.onMessageDelivered(event.getMessageId());
 				}
 				else
 					eventManager.deleteEvent(event.getMessageId());
@@ -110,6 +113,9 @@ public class EbMSEventProcessor implements InitializingBean, Job
 			{
 				logger.error("",e);
 				eventManager.updateEvent(event,url,EbMSEventStatus.FAILED,ExceptionUtils.getStackTrace(e));
+				if (!CPAUtils.isReliableMessaging(deliveryChannel))
+					if (ebMSDAO.updateMessage(event.getMessageId(),EbMSMessageStatus.SENDING,EbMSMessageStatus.DELIVERY_FAILED) > 0)
+						eventListener.onMessageFailed(event.getMessageId());
 			}
 		}
 
