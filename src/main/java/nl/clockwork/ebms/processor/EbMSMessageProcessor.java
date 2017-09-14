@@ -301,8 +301,7 @@ public class EbMSMessageProcessor
 						@Override
 						public void doInTransaction()
 						{
-							Date persistTime = ebMSDAO.getPersistTime(message.getMessageHeader().getMessageData().getRefToMessageId());
-							ebMSDAO.insertMessage(timestamp,persistTime,message,EbMSMessageStatus.RECEIVED);
+							ebMSDAO.insertMessage(timestamp,null,message,EbMSMessageStatus.RECEIVED);
 							eventListener.onMessageReceived(message.getMessageHeader().getMessageData().getMessageId());
 						}
 					}
