@@ -67,7 +67,7 @@ public class EbMSEventProcessor implements InitializingBean, Job
 				expireEvent(event);
 		}
 
-		private void sendEvent(final EbMSEvent event, DeliveryChannel deliveryChannel)
+		private void sendEvent(final EbMSEvent event, final DeliveryChannel deliveryChannel)
 		{
 			String url = null;
 			try
@@ -83,10 +83,20 @@ public class EbMSEventProcessor implements InitializingBean, Job
 					logger.info("Sending message " + event.getMessageId() + " to " + url);
 					EbMSDocument responseDocument = ebMSClient.sendMessage(url,requestDocument);
 					messageProcessor.processResponse(requestDocument,responseDocument);
-					eventManager.updateEvent(event,url,EbMSEventStatus.SUCCEEDED);
-					if (!CPAUtils.isReliableMessaging(deliveryChannel))
-						if (ebMSDAO.updateMessage(event.getMessageId(),EbMSMessageStatus.SENDING,EbMSMessageStatus.DELIVERED) > 0)
-							eventListener.onMessageDelivered(event.getMessageId());
+					final String url_ = url;
+					ebMSDAO.executeTransaction(
+						new DAOTransactionCallback()
+						{
+							@Override
+							public void doInTransaction()
+							{
+								eventManager.updateEvent(event,url_,EbMSEventStatus.SUCCEEDED);
+								if (!CPAUtils.isReliableMessaging(deliveryChannel))
+									if (ebMSDAO.updateMessage(event.getMessageId(),EbMSMessageStatus.SENDING,EbMSMessageStatus.DELIVERED) > 0)
+										eventListener.onMessageDelivered(event.getMessageId());
+							}
+						}
+					);
 				}
 				else
 					eventManager.deleteEvent(event.getMessageId());
@@ -102,20 +112,30 @@ public class EbMSEventProcessor implements InitializingBean, Job
 						public void doInTransaction()
 						{
 							eventManager.updateEvent(event,url_,EbMSEventStatus.FAILED,e.getMessage());
-							if (e instanceof EbMSResponseSOAPException && EbMSResponseSOAPException.CLIENT.equals(((EbMSResponseSOAPException)e).getFaultCode()))
+							if ((e instanceof EbMSResponseSOAPException && EbMSResponseSOAPException.CLIENT.equals(((EbMSResponseSOAPException)e).getFaultCode())) || !CPAUtils.isReliableMessaging(deliveryChannel))
 								if (ebMSDAO.updateMessage(event.getMessageId(),EbMSMessageStatus.SENDING,EbMSMessageStatus.DELIVERY_FAILED) > 0)
 									eventListener.onMessageFailed(event.getMessageId());
 						}
 					}
 				);
 			}
-			catch (Exception e)
+			catch (final Exception e)
 			{
 				logger.error("",e);
-				eventManager.updateEvent(event,url,EbMSEventStatus.FAILED,ExceptionUtils.getStackTrace(e));
-				if (!CPAUtils.isReliableMessaging(deliveryChannel))
-					if (ebMSDAO.updateMessage(event.getMessageId(),EbMSMessageStatus.SENDING,EbMSMessageStatus.DELIVERY_FAILED) > 0)
-						eventListener.onMessageFailed(event.getMessageId());
+				final String url_ = url;
+				ebMSDAO.executeTransaction(
+					new DAOTransactionCallback()
+					{
+						@Override
+						public void doInTransaction()
+						{
+							eventManager.updateEvent(event,url_,EbMSEventStatus.FAILED,ExceptionUtils.getStackTrace(e));
+							if (!CPAUtils.isReliableMessaging(deliveryChannel))
+								if (ebMSDAO.updateMessage(event.getMessageId(),EbMSMessageStatus.SENDING,EbMSMessageStatus.DELIVERY_FAILED) > 0)
+									eventListener.onMessageFailed(event.getMessageId());
+						}
+					}
+				);
 			}
 		}
 
