@@ -1,13 +1,30 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+    Copyright 2011 Clockwork
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>nl.clockwork.ebms.mule</groupId>
-	<artifactId>ebms-adapter-mule3_8-bvv</artifactId>
-	<version>2.2.3</version>
+	<artifactId>ebms-adapter-mule3_8</artifactId>
 	<packaging>mule</packaging>
-	<name>Mule ebms-adapter-mule3_8 Application</name>
+	<name>Mule3_8 EbMS Adapter</name>
+	<version>2.13.3-bvv</version>
 	<description></description>
 	<url>https://sourceforge.net/projects/muleebmsadapter/</url>
 	<issueManagement>
@@ -42,9 +59,9 @@
 		<jdk.version>1.8</jdk.version>
 
 		<mule.version>3.8.0</mule.version>
-		<mule.tools.version>1.2</mule.tools.version>
+    	<mule.tools.version>1.2</mule.tools.version>
 
-		<saxon.version>8.7</saxon.version>
+		<activemq.version>5.10.0</activemq.version>
 	</properties>
 
 	<build>
@@ -54,6 +71,43 @@
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-install-plugin</artifactId>
 					<version>2.3.1</version>
+				</plugin>
+				<plugin>
+					<groupId>org.eclipse.m2e</groupId>
+					<artifactId>lifecycle-mapping</artifactId>
+					<version>1.0.0</version>
+					<configuration>
+						<lifecycleMappingMetadata>
+							<pluginExecutions>
+								<pluginExecution>
+									<pluginExecutionFilter>
+										<groupId>org.apache.maven.plugins</groupId>
+										<artifactId>maven-enforcer-plugin</artifactId>
+										<versionRange>[1.0,)</versionRange>
+										<goals>
+											<goal>enforce</goal>
+										</goals>
+									</pluginExecutionFilter>
+									<action>
+										<ignore></ignore>
+									</action>
+								</pluginExecution>
+								<pluginExecution>
+									<pluginExecutionFilter>
+										<groupId>org.mule.tools</groupId>
+										<artifactId>maven-mule-plugin</artifactId>
+										<versionRange>[1.5,)</versionRange>
+										<goals>
+											<goal>attach-test-resources</goal>
+										</goals>
+									</pluginExecutionFilter>
+									<action>
+										<ignore></ignore>
+									</action>
+								</pluginExecution>
+							</pluginExecutions>
+						</lifecycleMappingMetadata>
+					</configuration>
 				</plugin>
 			</plugins>
 		</pluginManagement>
@@ -75,6 +129,7 @@
 					<excludes>
 						<exclude>src/main/java/org/mule/**/*.java</exclude>
 						<exclude>src/main/resources/**/*.jks</exclude>
+						<exclude>src/main/resources/nl/clockwork/mule/ebms/stub/ebf/xsd/**/*</exclude>
 					</excludes>
 				</configuration>
 				<executions>
@@ -157,13 +212,13 @@
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.mule.transports</groupId>
+        	<groupId>org.mule.transports</groupId>
 			<artifactId>mule-transport-jdbc</artifactId>
 			<version>${mule.version}</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.mule.transports</groupId>
+        	<groupId>org.mule.transports</groupId>
 			<artifactId>mule-transport-jms</artifactId>
 			<version>${mule.version}</version>
 			<scope>provided</scope>
@@ -194,31 +249,10 @@
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
-			<groupId>xerces</groupId>
-			<artifactId>xercesImpl</artifactId>
-			<version>2.9.1</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
 			<groupId>org.quartz-scheduler</groupId>
 			<artifactId>quartz</artifactId>
 			<version>2.2.1</version>
 			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>xalan</groupId>
-			<artifactId>xalan</artifactId>
-			<version>2.7.1</version>
-		</dependency>
-		<dependency>
-			<groupId>net.sf.saxon</groupId>
-			<artifactId>saxon</artifactId>
-			<version>${saxon.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>net.sf.saxon</groupId>
-			<artifactId>saxon-dom</artifactId>
-			<version>${saxon.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>commons-logging</groupId>
@@ -228,8 +262,13 @@
 		</dependency>
 		<dependency>
 			<groupId>nl.clockwork.ebms</groupId>
-			<artifactId>ebms-core-bvv</artifactId>
-			<version>2.2.3</version>
+			<artifactId>ebms-core</artifactId>
+			<version>2.13.3-bvv</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.activemq</groupId>
+			<artifactId>activemq-all</artifactId>
+			<version>${activemq.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>c3p0</groupId>

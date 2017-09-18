@@ -18,10 +18,9 @@ package nl.clockwork.mule.ebms.processor;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-
-import nl.clockwork.ebms.processor.EbMSMessageProcessor;
-import nl.clockwork.ebms.processor.EbMSProcessorException;
-import nl.clockwork.ebms.server.EbMSInputStreamHandler;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpVersion;
@@ -32,9 +31,12 @@ import org.mule.api.MuleEventContext;
 import org.mule.api.MuleMessage;
 import org.mule.api.lifecycle.Callable;
 import org.mule.api.transport.OutputHandler;
-import org.mule.api.transport.PropertyScope;
 import org.mule.transport.http.HttpConstants;
 import org.mule.transport.http.HttpResponse;
+
+import nl.clockwork.ebms.processor.EbMSMessageProcessor;
+import nl.clockwork.ebms.processor.EbMSProcessorException;
+import nl.clockwork.ebms.server.EbMSInputStreamHandler;
 
 public class EbMSHttpHandler implements Callable
 {
@@ -50,22 +52,24 @@ public class EbMSHttpHandler implements Callable
 		try
 		{
 			EbMSInputStreamHandler messageHandler = 
-	  		new EbMSInputStreamHandler(ebMSMessageProcessor)
+		  		new EbMSInputStreamHandler(ebMSMessageProcessor)
 				{
+					@Override
+					public List<String> getRequestHeaderNames()
+					{
+						return new ArrayList<String>(message.getInboundPropertyNames());
+					}
+	
+					@Override
+					public List<String> getRequestHeaders(String headerName)
+					{
+						return Arrays.asList(message.getInboundProperty(headerName).toString());
+					}
+	
 					@Override
 					public String getRequestHeader(String headerName)
 					{
-						String result = message.getProperty(headerName,PropertyScope.INBOUND);
-						if (result == null)
-							for (String key : message.getPropertyNames(PropertyScope.INBOUND))
-							{
-								if (key.equalsIgnoreCase(headerName))
-								{
-									result = message.getProperty(key,PropertyScope.INBOUND);
-									break;
-								}
-							}
-						return result;
+						return message.getInboundProperty(headerName);
 					}
 					
 					@Override
@@ -92,7 +96,7 @@ public class EbMSHttpHandler implements Callable
 						return output;
 					}
 				}
-	  	;
+			;
 			messageHandler.handle(request);
 		}
 		catch (EbMSProcessorException e)

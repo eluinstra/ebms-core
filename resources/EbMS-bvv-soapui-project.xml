@@ -1,25 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<con:soapui-project id="9eaa60bf-ab76-4bd3-a565-f10121259bd3" activeEnvironment="Default" name="EbMS-bvv" resourceRoot="" soapui-version="5.2.1" xmlns:con="http://eviware.com/soapui/config"><con:settings/><con:interface xsi:type="con:WsdlInterface" id="71f8de77-da42-4c59-a4e4-94a00b0d0389" wsaVersion="NONE" name="CPAServiceServiceSoapBinding" type="wsdl" bindingName="{http://www.ordina.nl/cpa/2.1}CPAServiceServiceSoapBinding" soapVersion="1_1" anonymous="optional" definition="http://127.0.0.1:8089/adapter/cpa?wsdl" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:settings/><con:definitionCache type="TEXT" rootPart="http://127.0.0.1:8089/adapter/cpa?wsdl"><con:part><con:url>http://127.0.0.1:8089/adapter/cpa?wsdl</con:url><con:content><![CDATA[<wsdl:definitions name="CPAServiceService" targetNamespace="http://www.ordina.nl/cpa/2.1" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:tns="http://www.ordina.nl/cpa/2.1" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:ns1="http://schemas.xmlsoap.org/soap/http">
+<con:soapui-project id="9eaa60bf-ab76-4bd3-a565-f10121259bd3" activeEnvironment="Default" name="EbMS-bvv" resourceRoot="" soapui-version="5.2.1" abortOnError="false" runType="SEQUENTIAL" xmlns:con="http://eviware.com/soapui/config"><con:settings/><con:interface xsi:type="con:WsdlInterface" id="71f8de77-da42-4c59-a4e4-94a00b0d0389" wsaVersion="NONE" name="CPAServiceServiceSoapBinding" type="wsdl" bindingName="{http://www.ordina.nl/cpa/2.12}CPAServiceServiceSoapBinding" soapVersion="1_1" anonymous="optional" definition="http://127.0.0.1:8089/adapter/cpa?wsdl" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:settings/><con:definitionCache type="TEXT" rootPart="http://127.0.0.1:8089/adapter/cpa?wsdl"><con:part><con:url>http://127.0.0.1:8089/adapter/cpa?wsdl</con:url><con:content><![CDATA[<wsdl:definitions name="CPAServiceService" targetNamespace="http://www.ordina.nl/cpa/2.12" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:tns="http://www.ordina.nl/cpa/2.12" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:ns1="http://schemas.xmlsoap.org/soap/http">
   <wsdl:types>
-    <xs:schema attributeFormDefault="unqualified" elementFormDefault="unqualified" targetNamespace="http://www.ordina.nl/cpa/2.1" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+    <xs:schema attributeFormDefault="unqualified" elementFormDefault="unqualified" targetNamespace="http://www.ordina.nl/cpa/2.12" xmlns:xs="http://www.w3.org/2001/XMLSchema">
       <xs:element name="DeleteCPA" type="tns:DeleteCPA"/>
       <xs:element name="DeleteCPAResponse" type="tns:DeleteCPAResponse"/>
       <xs:element name="GetCPA" type="tns:GetCPA"/>
       <xs:element name="GetCPAIds" type="tns:GetCPAIds"/>
       <xs:element name="GetCPAIdsResponse" type="tns:GetCPAIdsResponse"/>
       <xs:element name="GetCPAResponse" type="tns:GetCPAResponse"/>
+      <xs:element name="GetURL" type="tns:GetURL"/>
+      <xs:element name="GetURLMappings" type="tns:GetURLMappings"/>
+      <xs:element name="GetURLMappingsResponse" type="tns:GetURLMappingsResponse"/>
+      <xs:element name="GetURLResponse" type="tns:GetURLResponse"/>
       <xs:element name="InsertCPA" type="tns:InsertCPA"/>
       <xs:element name="InsertCPAResponse" type="tns:InsertCPAResponse"/>
+      <xs:element name="SetURLMapping" type="tns:SetURLMapping"/>
+      <xs:element name="SetURLMappingResponse" type="tns:SetURLMappingResponse"/>
       <xs:element name="ValidateCPA" type="tns:ValidateCPA"/>
       <xs:element name="ValidateCPAResponse" type="tns:ValidateCPAResponse"/>
-      <xs:complexType name="DeleteCPA">
-        <xs:sequence>
-          <xs:element name="CPAId" type="xs:string"/>
-        </xs:sequence>
-      </xs:complexType>
-      <xs:complexType name="DeleteCPAResponse">
-        <xs:sequence/>
-      </xs:complexType>
       <xs:complexType name="GetCPA">
         <xs:sequence>
           <xs:element name="CPAId" type="xs:string"/>
@@ -38,6 +36,44 @@
           <xs:element maxOccurs="unbounded" minOccurs="0" name="CPAIds" type="xs:string"/>
         </xs:sequence>
       </xs:complexType>
+      <xs:complexType name="GetURLMappings">
+        <xs:sequence/>
+      </xs:complexType>
+      <xs:complexType name="GetURLMappingsResponse">
+        <xs:sequence>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="URLs" type="tns:urlMapping"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="urlMapping">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="destination" type="xs:string"/>
+          <xs:element minOccurs="0" name="source" type="xs:string"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="GetURL">
+        <xs:sequence>
+          <xs:element name="SourceURL" type="xs:string"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="GetURLResponse">
+        <xs:sequence/>
+      </xs:complexType>
+      <xs:complexType name="ValidateCPA">
+        <xs:sequence>
+          <xs:element name="CPA" type="xs:string"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="ValidateCPAResponse">
+        <xs:sequence/>
+      </xs:complexType>
+      <xs:complexType name="DeleteCPA">
+        <xs:sequence>
+          <xs:element name="CPAId" type="xs:string"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="DeleteCPAResponse">
+        <xs:sequence/>
+      </xs:complexType>
       <xs:complexType name="InsertCPA">
         <xs:sequence>
           <xs:element name="CPA" type="xs:string"/>
@@ -49,12 +85,12 @@
           <xs:element minOccurs="0" name="CPAId" type="xs:string"/>
         </xs:sequence>
       </xs:complexType>
-      <xs:complexType name="ValidateCPA">
+      <xs:complexType name="SetURLMapping">
         <xs:sequence>
-          <xs:element name="CPA" type="xs:string"/>
+          <xs:element name="URLMapping" type="tns:urlMapping"/>
         </xs:sequence>
       </xs:complexType>
-      <xs:complexType name="ValidateCPAResponse">
+      <xs:complexType name="SetURLMappingResponse">
         <xs:sequence/>
       </xs:complexType>
       <xs:element name="CPAServiceException" type="tns:CPAServiceException"/>
@@ -65,6 +101,39 @@
       </xs:complexType>
     </xs:schema>
   </wsdl:types>
+  <wsdl:message name="GetCPAIds">
+    <wsdl:part element="tns:GetCPAIds" name="parameters"></wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="GetURLMappingsResponse">
+    <wsdl:part element="tns:GetURLMappingsResponse" name="parameters"></wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="ValidateCPAResponse">
+    <wsdl:part element="tns:ValidateCPAResponse" name="parameters"></wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="GetCPAResponse">
+    <wsdl:part element="tns:GetCPAResponse" name="parameters"></wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="GetURLResponse">
+    <wsdl:part element="tns:GetURLResponse" name="parameters"></wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="GetCPA">
+    <wsdl:part element="tns:GetCPA" name="parameters"></wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="CPAServiceException">
+    <wsdl:part element="tns:CPAServiceException" name="CPAServiceException"></wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="GetURLMappings">
+    <wsdl:part element="tns:GetURLMappings" name="parameters"></wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="GetURL">
+    <wsdl:part element="tns:GetURL" name="parameters"></wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="SetURLMappingResponse">
+    <wsdl:part element="tns:SetURLMappingResponse" name="parameters"></wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="ValidateCPA">
+    <wsdl:part element="tns:ValidateCPA" name="parameters"></wsdl:part>
+  </wsdl:message>
   <wsdl:message name="DeleteCPA">
     <wsdl:part element="tns:DeleteCPA" name="parameters"></wsdl:part>
   </wsdl:message>
@@ -74,36 +143,16 @@
   <wsdl:message name="InsertCPAResponse">
     <wsdl:part element="tns:InsertCPAResponse" name="parameters"></wsdl:part>
   </wsdl:message>
-  <wsdl:message name="ValidateCPAResponse">
-    <wsdl:part element="tns:ValidateCPAResponse" name="parameters"></wsdl:part>
-  </wsdl:message>
-  <wsdl:message name="GetCPAResponse">
-    <wsdl:part element="tns:GetCPAResponse" name="parameters"></wsdl:part>
-  </wsdl:message>
   <wsdl:message name="InsertCPA">
     <wsdl:part element="tns:InsertCPA" name="parameters"></wsdl:part>
   </wsdl:message>
   <wsdl:message name="GetCPAIdsResponse">
     <wsdl:part element="tns:GetCPAIdsResponse" name="parameters"></wsdl:part>
   </wsdl:message>
-  <wsdl:message name="CPAServiceException">
-    <wsdl:part element="tns:CPAServiceException" name="CPAServiceException"></wsdl:part>
-  </wsdl:message>
-  <wsdl:message name="GetCPA">
-    <wsdl:part element="tns:GetCPA" name="parameters"></wsdl:part>
-  </wsdl:message>
-  <wsdl:message name="GetCPAIds">
-    <wsdl:part element="tns:GetCPAIds" name="parameters"></wsdl:part>
-  </wsdl:message>
-  <wsdl:message name="ValidateCPA">
-    <wsdl:part element="tns:ValidateCPA" name="parameters"></wsdl:part>
+  <wsdl:message name="SetURLMapping">
+    <wsdl:part element="tns:SetURLMapping" name="parameters"></wsdl:part>
   </wsdl:message>
   <wsdl:portType name="CPAService">
-    <wsdl:operation name="DeleteCPA">
-      <wsdl:input message="tns:DeleteCPA" name="DeleteCPA"></wsdl:input>
-      <wsdl:output message="tns:DeleteCPAResponse" name="DeleteCPAResponse"></wsdl:output>
-      <wsdl:fault message="tns:CPAServiceException" name="CPAServiceException"></wsdl:fault>
-    </wsdl:operation>
     <wsdl:operation name="GetCPA">
       <wsdl:input message="tns:GetCPA" name="GetCPA"></wsdl:input>
       <wsdl:output message="tns:GetCPAResponse" name="GetCPAResponse"></wsdl:output>
@@ -114,9 +163,14 @@
       <wsdl:output message="tns:GetCPAIdsResponse" name="GetCPAIdsResponse"></wsdl:output>
       <wsdl:fault message="tns:CPAServiceException" name="CPAServiceException"></wsdl:fault>
     </wsdl:operation>
-    <wsdl:operation name="InsertCPA">
-      <wsdl:input message="tns:InsertCPA" name="InsertCPA"></wsdl:input>
-      <wsdl:output message="tns:InsertCPAResponse" name="InsertCPAResponse"></wsdl:output>
+    <wsdl:operation name="GetURLMappings">
+      <wsdl:input message="tns:GetURLMappings" name="GetURLMappings"></wsdl:input>
+      <wsdl:output message="tns:GetURLMappingsResponse" name="GetURLMappingsResponse"></wsdl:output>
+      <wsdl:fault message="tns:CPAServiceException" name="CPAServiceException"></wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="GetURL">
+      <wsdl:input message="tns:GetURL" name="GetURL"></wsdl:input>
+      <wsdl:output message="tns:GetURLResponse" name="GetURLResponse"></wsdl:output>
       <wsdl:fault message="tns:CPAServiceException" name="CPAServiceException"></wsdl:fault>
     </wsdl:operation>
     <wsdl:operation name="ValidateCPA">
@@ -124,21 +178,24 @@
       <wsdl:output message="tns:ValidateCPAResponse" name="ValidateCPAResponse"></wsdl:output>
       <wsdl:fault message="tns:CPAServiceException" name="CPAServiceException"></wsdl:fault>
     </wsdl:operation>
+    <wsdl:operation name="DeleteCPA">
+      <wsdl:input message="tns:DeleteCPA" name="DeleteCPA"></wsdl:input>
+      <wsdl:output message="tns:DeleteCPAResponse" name="DeleteCPAResponse"></wsdl:output>
+      <wsdl:fault message="tns:CPAServiceException" name="CPAServiceException"></wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="InsertCPA">
+      <wsdl:input message="tns:InsertCPA" name="InsertCPA"></wsdl:input>
+      <wsdl:output message="tns:InsertCPAResponse" name="InsertCPAResponse"></wsdl:output>
+      <wsdl:fault message="tns:CPAServiceException" name="CPAServiceException"></wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="SetURLMapping">
+      <wsdl:input message="tns:SetURLMapping" name="SetURLMapping"></wsdl:input>
+      <wsdl:output message="tns:SetURLMappingResponse" name="SetURLMappingResponse"></wsdl:output>
+      <wsdl:fault message="tns:CPAServiceException" name="CPAServiceException"></wsdl:fault>
+    </wsdl:operation>
   </wsdl:portType>
   <wsdl:binding name="CPAServiceServiceSoapBinding" type="tns:CPAService">
     <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
-    <wsdl:operation name="DeleteCPA">
-      <soap:operation soapAction="" style="document"/>
-      <wsdl:input name="DeleteCPA">
-        <soap:body use="literal"/>
-      </wsdl:input>
-      <wsdl:output name="DeleteCPAResponse">
-        <soap:body use="literal"/>
-      </wsdl:output>
-      <wsdl:fault name="CPAServiceException">
-        <soap:fault name="CPAServiceException" use="literal"/>
-      </wsdl:fault>
-    </wsdl:operation>
     <wsdl:operation name="GetCPA">
       <soap:operation soapAction="" style="document"/>
       <wsdl:input name="GetCPA">
@@ -163,12 +220,24 @@
         <soap:fault name="CPAServiceException" use="literal"/>
       </wsdl:fault>
     </wsdl:operation>
-    <wsdl:operation name="InsertCPA">
+    <wsdl:operation name="GetURLMappings">
       <soap:operation soapAction="" style="document"/>
-      <wsdl:input name="InsertCPA">
+      <wsdl:input name="GetURLMappings">
         <soap:body use="literal"/>
       </wsdl:input>
-      <wsdl:output name="InsertCPAResponse">
+      <wsdl:output name="GetURLMappingsResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="CPAServiceException">
+        <soap:fault name="CPAServiceException" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="GetURL">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="GetURL">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="GetURLResponse">
         <soap:body use="literal"/>
       </wsdl:output>
       <wsdl:fault name="CPAServiceException">
@@ -181,6 +250,42 @@
         <soap:body use="literal"/>
       </wsdl:input>
       <wsdl:output name="ValidateCPAResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="CPAServiceException">
+        <soap:fault name="CPAServiceException" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="DeleteCPA">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="DeleteCPA">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="DeleteCPAResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="CPAServiceException">
+        <soap:fault name="CPAServiceException" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="InsertCPA">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="InsertCPA">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="InsertCPAResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="CPAServiceException">
+        <soap:fault name="CPAServiceException" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="SetURLMapping">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="SetURLMapping">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="SetURLMappingResponse">
         <soap:body use="literal"/>
       </wsdl:output>
       <wsdl:fault name="CPAServiceException">
@@ -215,7 +320,7 @@
 </soapenv:Envelope>]]></con:request><con:wsaConfig mustUnderstand="NONE" version="200508" action="http://www.ordina.nl/cpa/2.1/CPAService/GetCPAIds"/></con:call></con:operation><con:operation id="726fb2b1-be9f-4b17-9ec9-784e1e907440" isOneWay="false" action="" name="InsertCPA" bindingOperationName="InsertCPA" type="Request-Response" outputName="InsertCPAResponse" inputName="InsertCPA" receivesAttachments="false" sendsAttachments="false" anonymous="optional"><con:settings/><con:call id="96fed32a-9b2d-47b9-a651-93c498efc548" name="Request 1"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://127.0.0.1:8089/adapter/cpa</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns="http://www.ordina.nl/cpa/2.1">
    <soapenv:Header/>
    <soapenv:Body>
-      <ns:InsertCPA>
+      <ns1:InsertCPA xmlns:ns1="http://www.ordina.nl/cpa/2.12">
          <CPA><![CDATA[
 <tns:CollaborationProtocolAgreement xmlns:axsl="http://www.w3.org/1999/XSL/TransformAlias" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:functx="http://www.functx.com" xmlns:tns="http://www.oasis-open.org/committees/ebxml-cppa/schema/cpp-cpa-2_0.xsd" xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns:xlink="http://www.w3.org/1999/xlink" xsi:schemaLocation="http://www.oasis-open.org/committees/ebxml-cppa/schema/cpp-cpa-2_0.xsd http://www.oasis-open.org/committees/ebxml-cppa/schema/cpp-cpa-2_0.xsd" tns:cpaid="cpaStubEBF.rm.https.signed" tns:version="1.0">
 	<tns:Status tns:value="agreed" />
@@ -780,7 +885,7 @@
 	</tns:Packaging>
 </tns:CollaborationProtocolAgreement>]]]]>><![CDATA[</CPA>
          <Overwrite>true</Overwrite>
-      </ns:InsertCPA>
+      </ns1:InsertCPA>
    </soapenv:Body>
 </soapenv:Envelope>]]></con:request><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508" action="http://www.ordina.nl/cpa/2.1/CPAService/InsertCPA"/><con:wsrmConfig version="1.2"/></con:call></con:operation><con:operation id="d9bdd35c-e83a-4fb0-8ad3-7fff12ce2472" isOneWay="false" action="" name="ValidateCPA" bindingOperationName="ValidateCPA" type="Request-Response" outputName="ValidateCPAResponse" inputName="ValidateCPA" receivesAttachments="false" sendsAttachments="false" anonymous="optional"><con:settings/><con:call id="d34a584d-b19c-4092-825b-aead53a0042d" name="Request 1"><con:settings/><con:encoding>UTF-8</con:encoding><con:endpoint>http://127.0.0.1:8089/adapter/cpa</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns="http://www.ordina.nl/cpa/2.1">
    <soapenv:Header/>
@@ -789,10 +894,36 @@
          <CPA>?</CPA>
       </ns:ValidateCPA>
    </soapenv:Body>
-</soapenv:Envelope>]]></con:request><con:wsaConfig mustUnderstand="NONE" version="200508" action="http://www.ordina.nl/cpa/2.1/CPAService/ValidateCPA"/></con:call></con:operation></con:interface><con:interface xsi:type="con:WsdlInterface" id="eb42106e-5364-44c6-b2cd-2c091860272b" wsaVersion="NONE" name="EbMSMessageServiceServiceSoapBinding" type="wsdl" bindingName="{http://www.ordina.nl/ebms/2.1}EbMSMessageServiceServiceSoapBinding" soapVersion="1_1" anonymous="optional" definition="http://127.0.0.1:8089/adapter/ebms?wsdl" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:settings/><con:definitionCache type="TEXT" rootPart="http://127.0.0.1:8089/adapter/ebms?wsdl"><con:part><con:url>http://127.0.0.1:8089/adapter/ebms?wsdl</con:url><con:content><![CDATA[<wsdl:definitions name="EbMSMessageServiceService" targetNamespace="http://www.ordina.nl/ebms/2.1" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:tns="http://www.ordina.nl/ebms/2.1" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:ns1="http://schemas.xmlsoap.org/soap/http">
+</soapenv:Envelope>]]></con:request><con:wsaConfig mustUnderstand="NONE" version="200508" action="http://www.ordina.nl/cpa/2.1/CPAService/ValidateCPA"/></con:call></con:operation><con:operation id="f6af0c85-3927-4c01-a74b-523947b6cff2" isOneWay="false" action="" name="GetURLMappings" bindingOperationName="GetURLMappings" type="Request-Response" outputName="GetURLMappingsResponse" inputName="GetURLMappings" receivesAttachments="false" sendsAttachments="false" anonymous="optional"><con:settings/><con:call id="b78c5ce7-4076-49a1-8554-4d75f639d306" name="Request 1"><con:settings/><con:encoding>UTF-8</con:encoding><con:endpoint>http://127.0.0.1:8089/adapter/cpa</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns="http://www.ordina.nl/cpa/2.12">
+   <soapenv:Header/>
+   <soapenv:Body>
+      <ns:GetURLMappings/>
+   </soapenv:Body>
+</soapenv:Envelope>]]></con:request><con:wsaConfig mustUnderstand="NONE" version="200508" action="http://www.ordina.nl/cpa/2.12/CPAService/GetURLMappings"/></con:call></con:operation><con:operation id="80b84c36-fcb5-4f24-933a-901739004a65" isOneWay="false" action="" name="GetURL" bindingOperationName="GetURL" type="Request-Response" outputName="GetURLResponse" inputName="GetURL" receivesAttachments="false" sendsAttachments="false" anonymous="optional"><con:settings/><con:call id="79d0bac4-7138-40cd-9536-f8315b1e110f" name="Request 1"><con:settings/><con:encoding>UTF-8</con:encoding><con:endpoint>http://127.0.0.1:8089/adapter/cpa</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns="http://www.ordina.nl/cpa/2.12">
+   <soapenv:Header/>
+   <soapenv:Body>
+      <ns:GetURL>
+         <SourceURL>?</SourceURL>
+      </ns:GetURL>
+   </soapenv:Body>
+</soapenv:Envelope>]]></con:request><con:wsaConfig mustUnderstand="NONE" version="200508" action="http://www.ordina.nl/cpa/2.12/CPAService/GetURL"/></con:call></con:operation><con:operation id="c073f915-a124-4d95-aca2-2d7f49fd5dbb" isOneWay="false" action="" name="SetURLMapping" bindingOperationName="SetURLMapping" type="Request-Response" outputName="SetURLMappingResponse" inputName="SetURLMapping" receivesAttachments="false" sendsAttachments="false" anonymous="optional"><con:settings/><con:call id="888f9534-e4b6-4e7b-a91a-a03634a720fc" name="Request 1"><con:settings/><con:encoding>UTF-8</con:encoding><con:endpoint>http://127.0.0.1:8089/adapter/cpa</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns="http://www.ordina.nl/cpa/2.12">
+   <soapenv:Header/>
+   <soapenv:Body>
+      <ns:SetURLMapping>
+         <URLMapping>
+            <!--Optional:-->
+            <destination>?</destination>
+            <!--Optional:-->
+            <source>?</source>
+         </URLMapping>
+      </ns:SetURLMapping>
+   </soapenv:Body>
+</soapenv:Envelope>]]></con:request><con:wsaConfig mustUnderstand="NONE" version="200508" action="http://www.ordina.nl/cpa/2.12/CPAService/SetURLMapping"/></con:call></con:operation></con:interface><con:interface xsi:type="con:WsdlInterface" id="eb42106e-5364-44c6-b2cd-2c091860272b" wsaVersion="NONE" name="EbMSMessageServiceServiceSoapBinding" type="wsdl" bindingName="{http://www.ordina.nl/ebms/2.12}EbMSMessageServiceServiceSoapBinding" soapVersion="1_1" anonymous="optional" definition="http://127.0.0.1:8089/adapter/ebms?wsdl" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:settings/><con:definitionCache type="TEXT" rootPart="http://127.0.0.1:8089/adapter/ebms?wsdl"><con:part><con:url>http://127.0.0.1:8089/adapter/ebms?wsdl</con:url><con:content><![CDATA[<wsdl:definitions name="EbMSMessageServiceService" targetNamespace="http://www.ordina.nl/ebms/2.12" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:tns="http://www.ordina.nl/ebms/2.12" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:ns1="http://schemas.xmlsoap.org/soap/http">
   <wsdl:types>
-    <xs:schema attributeFormDefault="unqualified" elementFormDefault="unqualified" targetNamespace="http://www.ordina.nl/ebms/2.1" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+    <xs:schema attributeFormDefault="unqualified" elementFormDefault="unqualified" targetNamespace="http://www.ordina.nl/ebms/2.12" xmlns:xs="http://www.w3.org/2001/XMLSchema">
       <xs:element name="GetMessage" type="tns:GetMessage"/>
+      <xs:element name="GetMessageEvents" type="tns:GetMessageEvents"/>
+      <xs:element name="GetMessageEventsResponse" type="tns:GetMessageEventsResponse"/>
       <xs:element name="GetMessageIds" type="tns:GetMessageIds"/>
       <xs:element name="GetMessageIdsResponse" type="tns:GetMessageIdsResponse"/>
       <xs:element name="GetMessageResponse" type="tns:GetMessageResponse"/>
@@ -803,9 +934,15 @@
       <xs:element name="Ping" type="tns:Ping"/>
       <xs:element name="PingResponse" type="tns:PingResponse"/>
       <xs:element name="ProcessMessage" type="tns:ProcessMessage"/>
+      <xs:element name="ProcessMessageEvent" type="tns:ProcessMessageEvent"/>
+      <xs:element name="ProcessMessageEventResponse" type="tns:ProcessMessageEventResponse"/>
+      <xs:element name="ProcessMessageEvents" type="tns:ProcessMessageEvents"/>
+      <xs:element name="ProcessMessageEventsResponse" type="tns:ProcessMessageEventsResponse"/>
       <xs:element name="ProcessMessageResponse" type="tns:ProcessMessageResponse"/>
       <xs:element name="ProcessMessages" type="tns:ProcessMessages"/>
       <xs:element name="ProcessMessagesResponse" type="tns:ProcessMessagesResponse"/>
+      <xs:element name="ResendMessage" type="tns:ResendMessage"/>
+      <xs:element name="ResendMessageResponse" type="tns:ResendMessageResponse"/>
       <xs:element name="SendMessage" type="tns:SendMessage"/>
       <xs:element name="SendMessageResponse" type="tns:SendMessageResponse"/>
       <xs:complexType name="ProcessMessages">
@@ -816,11 +953,50 @@
       <xs:complexType name="ProcessMessagesResponse">
         <xs:sequence/>
       </xs:complexType>
-      <xs:complexType name="Ping">
+      <xs:complexType name="GetMessageEvents">
+        <xs:sequence>
+          <xs:element name="MessageContext" type="tns:ebMSMessageContext"/>
+          <xs:element maxOccurs="unbounded" name="EventType" type="tns:ebMSMessageEventType"/>
+          <xs:element minOccurs="0" name="MaxNr" type="xs:int"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="ebMSMessageContext">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="action" type="xs:string"/>
+          <xs:element minOccurs="0" name="conversationId" type="xs:string"/>
+          <xs:element minOccurs="0" name="cpaId" type="xs:string"/>
+          <xs:element minOccurs="0" name="fromRole" type="tns:role"/>
+          <xs:element minOccurs="0" name="messageId" type="xs:string"/>
+          <xs:element minOccurs="0" name="messageStatus" type="tns:ebMSMessageStatus"/>
+          <xs:element minOccurs="0" name="refToMessageId" type="xs:string"/>
+          <xs:element minOccurs="0" name="service" type="xs:string"/>
+          <xs:element minOccurs="0" name="timestamp" type="xs:dateTime"/>
+          <xs:element minOccurs="0" name="toRole" type="tns:role"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="role">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="partyId" type="xs:string"/>
+          <xs:element name="role" type="xs:string"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="GetMessageEventsResponse">
+        <xs:sequence>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="MessageEvents" type="tns:ebMSMessageEvent"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="ebMSMessageEvent">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="messageId" type="xs:string"/>
+          <xs:element minOccurs="0" name="type" type="tns:ebMSMessageEventType"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="GetMessageStatus">
         <xs:sequence>
           <xs:element name="CPAId" type="xs:string"/>
           <xs:element name="FromParty" type="tns:party"/>
           <xs:element name="ToParty" type="tns:party"/>
+          <xs:element name="MessageId" type="xs:string"/>
         </xs:sequence>
       </xs:complexType>
       <xs:complexType name="party">
@@ -829,8 +1005,97 @@
           <xs:element minOccurs="0" name="role" type="xs:string"/>
         </xs:sequence>
       </xs:complexType>
+      <xs:complexType name="GetMessageStatusResponse">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="MessageStatus" type="tns:messageStatus"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="messageStatus">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="status" type="tns:ebMSMessageStatus"/>
+          <xs:element minOccurs="0" name="timestamp" type="xs:dateTime"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="ResendMessage">
+        <xs:sequence>
+          <xs:element name="MessageId" type="xs:string"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="ResendMessageResponse">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="MessageId" type="xs:string"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="GetMessageStatusByMessageId">
+        <xs:sequence>
+          <xs:element name="MessageId" type="xs:string"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="GetMessageStatusByMessageIdResponse">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="MessageStatus" type="tns:messageStatus"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="ProcessMessageEvent">
+        <xs:sequence>
+          <xs:element name="MessageId" type="xs:string"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="ProcessMessageEventResponse">
+        <xs:sequence/>
+      </xs:complexType>
+      <xs:complexType name="ProcessMessageEvents">
+        <xs:sequence>
+          <xs:element maxOccurs="unbounded" name="MessageId" type="xs:string"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="ProcessMessageEventsResponse">
+        <xs:sequence/>
+      </xs:complexType>
+      <xs:complexType name="Ping">
+        <xs:sequence>
+          <xs:element name="CPAId" type="xs:string"/>
+          <xs:element name="FromParty" type="tns:party"/>
+          <xs:element name="ToParty" type="tns:party"/>
+        </xs:sequence>
+      </xs:complexType>
       <xs:complexType name="PingResponse">
         <xs:sequence/>
+      </xs:complexType>
+      <xs:complexType name="GetMessageIds">
+        <xs:sequence>
+          <xs:element name="MessageContext" type="tns:ebMSMessageContext"/>
+          <xs:element minOccurs="0" name="MaxNr" type="xs:int"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="GetMessageIdsResponse">
+        <xs:sequence>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="MessageIds" type="xs:string"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="SendMessage">
+        <xs:sequence>
+          <xs:element name="Message" type="tns:ebMSMessageContent"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="ebMSMessageContent">
+        <xs:sequence>
+          <xs:element name="context" type="tns:ebMSMessageContext"/>
+          <xs:element maxOccurs="unbounded" name="dataSource" type="tns:ebMSDataSource"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="ebMSDataSource">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="content" type="xs:base64Binary"/>
+          <xs:element minOccurs="0" name="contentId" type="xs:string"/>
+          <xs:element minOccurs="0" name="contentType" type="xs:string"/>
+          <xs:element minOccurs="0" name="name" type="xs:string"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="SendMessageResponse">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="MessageId" type="xs:string"/>
+        </xs:sequence>
       </xs:complexType>
       <xs:complexType name="ProcessMessage">
         <xs:sequence>
@@ -851,90 +1116,6 @@
           <xs:element minOccurs="0" name="Message" type="tns:ebMSMessageContent"/>
         </xs:sequence>
       </xs:complexType>
-      <xs:complexType name="ebMSMessageContent">
-        <xs:sequence>
-          <xs:element name="context" type="tns:ebMSMessageContext"/>
-          <xs:element maxOccurs="unbounded" name="dataSource" type="tns:ebMSDataSource"/>
-        </xs:sequence>
-      </xs:complexType>
-      <xs:complexType name="ebMSMessageContext">
-        <xs:sequence>
-          <xs:element minOccurs="0" name="action" type="xs:string"/>
-          <xs:element minOccurs="0" name="conversationId" type="xs:string"/>
-          <xs:element minOccurs="0" name="cpaId" type="xs:string"/>
-          <xs:element minOccurs="0" name="fromRole" type="tns:role"/>
-          <xs:element minOccurs="0" name="messageId" type="xs:string"/>
-          <xs:element minOccurs="0" name="refToMessageId" type="xs:string"/>
-          <xs:element minOccurs="0" name="sequenceNr" type="xs:int"/>
-          <xs:element minOccurs="0" name="service" type="xs:string"/>
-          <xs:element minOccurs="0" name="timestamp" type="xs:dateTime"/>
-          <xs:element minOccurs="0" name="toRole" type="tns:role"/>
-        </xs:sequence>
-      </xs:complexType>
-      <xs:complexType name="role">
-        <xs:sequence>
-          <xs:element minOccurs="0" name="partyId" type="xs:string"/>
-          <xs:element name="role" type="xs:string"/>
-        </xs:sequence>
-      </xs:complexType>
-      <xs:complexType name="ebMSDataSource">
-        <xs:sequence>
-          <xs:element minOccurs="0" name="content" type="xs:base64Binary"/>
-          <xs:element minOccurs="0" name="contentId" type="xs:string"/>
-          <xs:element minOccurs="0" name="contentType" type="xs:string"/>
-          <xs:element minOccurs="0" name="name" type="xs:string"/>
-        </xs:sequence>
-      </xs:complexType>
-      <xs:complexType name="GetMessageStatusByMessageId">
-        <xs:sequence>
-          <xs:element name="MessageId" type="xs:string"/>
-        </xs:sequence>
-      </xs:complexType>
-      <xs:complexType name="GetMessageStatusByMessageIdResponse">
-        <xs:sequence>
-          <xs:element minOccurs="0" name="MessageStatus" type="tns:messageStatus"/>
-        </xs:sequence>
-      </xs:complexType>
-      <xs:complexType name="messageStatus">
-        <xs:sequence>
-          <xs:element minOccurs="0" name="status" type="tns:ebMSMessageStatus"/>
-          <xs:element minOccurs="0" name="timestamp" type="xs:dateTime"/>
-        </xs:sequence>
-      </xs:complexType>
-      <xs:complexType name="GetMessageIds">
-        <xs:sequence>
-          <xs:element name="MessageContext" type="tns:ebMSMessageContext"/>
-          <xs:element minOccurs="0" name="MaxNr" type="xs:int"/>
-        </xs:sequence>
-      </xs:complexType>
-      <xs:complexType name="GetMessageIdsResponse">
-        <xs:sequence>
-          <xs:element maxOccurs="unbounded" minOccurs="0" name="MessageIds" type="xs:string"/>
-        </xs:sequence>
-      </xs:complexType>
-      <xs:complexType name="GetMessageStatus">
-        <xs:sequence>
-          <xs:element name="CPAId" type="xs:string"/>
-          <xs:element name="FromParty" type="tns:party"/>
-          <xs:element name="ToParty" type="tns:party"/>
-          <xs:element name="MessageId" type="xs:string"/>
-        </xs:sequence>
-      </xs:complexType>
-      <xs:complexType name="GetMessageStatusResponse">
-        <xs:sequence>
-          <xs:element minOccurs="0" name="MessageStatus" type="tns:messageStatus"/>
-        </xs:sequence>
-      </xs:complexType>
-      <xs:complexType name="SendMessage">
-        <xs:sequence>
-          <xs:element name="Message" type="tns:ebMSMessageContent"/>
-        </xs:sequence>
-      </xs:complexType>
-      <xs:complexType name="SendMessageResponse">
-        <xs:sequence>
-          <xs:element minOccurs="0" name="MessageId" type="xs:string"/>
-        </xs:sequence>
-      </xs:complexType>
       <xs:simpleType name="ebMSMessageStatus">
         <xs:restriction base="xs:string">
           <xs:enumeration value="UNAUTHORIZED"/>
@@ -943,10 +1124,18 @@
           <xs:enumeration value="PROCESSED"/>
           <xs:enumeration value="FORWARDED"/>
           <xs:enumeration value="FAILED"/>
-          <xs:enumeration value="SENT"/>
-          <xs:enumeration value="DELIVERED"/>
-          <xs:enumeration value="DELIVERY_ERROR"/>
+          <xs:enumeration value="SENDING"/>
           <xs:enumeration value="DELIVERY_FAILED"/>
+          <xs:enumeration value="DELIVERED"/>
+          <xs:enumeration value="EXPIRED"/>
+        </xs:restriction>
+      </xs:simpleType>
+      <xs:simpleType name="ebMSMessageEventType">
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="RECEIVED"/>
+          <xs:enumeration value="DELIVERED"/>
+          <xs:enumeration value="FAILED"/>
+          <xs:enumeration value="EXPIRED"/>
         </xs:restriction>
       </xs:simpleType>
       <xs:element name="EbMSMessageServiceException" type="tns:EbMSMessageServiceException"/>
@@ -957,6 +1146,24 @@
       </xs:complexType>
     </xs:schema>
   </wsdl:types>
+  <wsdl:message name="GetMessageStatus">
+    <wsdl:part element="tns:GetMessageStatus" name="parameters"></wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="GetMessageEventsResponse">
+    <wsdl:part element="tns:GetMessageEventsResponse" name="parameters"></wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="PingResponse">
+    <wsdl:part element="tns:PingResponse" name="parameters"></wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="GetMessageStatusByMessageId">
+    <wsdl:part element="tns:GetMessageStatusByMessageId" name="parameters"></wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="ProcessMessageEvent">
+    <wsdl:part element="tns:ProcessMessageEvent" name="parameters"></wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="ProcessMessageEvents">
+    <wsdl:part element="tns:ProcessMessageEvents" name="parameters"></wsdl:part>
+  </wsdl:message>
   <wsdl:message name="ProcessMessageResponse">
     <wsdl:part element="tns:ProcessMessageResponse" name="parameters"></wsdl:part>
   </wsdl:message>
@@ -969,11 +1176,11 @@
   <wsdl:message name="GetMessageResponse">
     <wsdl:part element="tns:GetMessageResponse" name="parameters"></wsdl:part>
   </wsdl:message>
-  <wsdl:message name="Ping">
-    <wsdl:part element="tns:Ping" name="parameters"></wsdl:part>
+  <wsdl:message name="GetMessageIds">
+    <wsdl:part element="tns:GetMessageIds" name="parameters"></wsdl:part>
   </wsdl:message>
-  <wsdl:message name="GetMessageStatusByMessageIdResponse">
-    <wsdl:part element="tns:GetMessageStatusByMessageIdResponse" name="parameters"></wsdl:part>
+  <wsdl:message name="SendMessage">
+    <wsdl:part element="tns:SendMessage" name="parameters"></wsdl:part>
   </wsdl:message>
   <wsdl:message name="GetMessageStatusResponse">
     <wsdl:part element="tns:GetMessageStatusResponse" name="parameters"></wsdl:part>
@@ -981,32 +1188,38 @@
   <wsdl:message name="ProcessMessage">
     <wsdl:part element="tns:ProcessMessage" name="parameters"></wsdl:part>
   </wsdl:message>
-  <wsdl:message name="GetMessage">
-    <wsdl:part element="tns:GetMessage" name="parameters"></wsdl:part>
+  <wsdl:message name="ResendMessageResponse">
+    <wsdl:part element="tns:ResendMessageResponse" name="parameters"></wsdl:part>
   </wsdl:message>
-  <wsdl:message name="GetMessageIds">
-    <wsdl:part element="tns:GetMessageIds" name="parameters"></wsdl:part>
-  </wsdl:message>
-  <wsdl:message name="SendMessage">
-    <wsdl:part element="tns:SendMessage" name="parameters"></wsdl:part>
-  </wsdl:message>
-  <wsdl:message name="EbMSMessageServiceException">
-    <wsdl:part element="tns:EbMSMessageServiceException" name="EbMSMessageServiceException"></wsdl:part>
+  <wsdl:message name="ProcessMessageEventsResponse">
+    <wsdl:part element="tns:ProcessMessageEventsResponse" name="parameters"></wsdl:part>
   </wsdl:message>
   <wsdl:message name="ProcessMessages">
     <wsdl:part element="tns:ProcessMessages" name="parameters"></wsdl:part>
   </wsdl:message>
-  <wsdl:message name="PingResponse">
-    <wsdl:part element="tns:PingResponse" name="parameters"></wsdl:part>
-  </wsdl:message>
-  <wsdl:message name="GetMessageStatusByMessageId">
-    <wsdl:part element="tns:GetMessageStatusByMessageId" name="parameters"></wsdl:part>
+  <wsdl:message name="EbMSMessageServiceException">
+    <wsdl:part element="tns:EbMSMessageServiceException" name="EbMSMessageServiceException"></wsdl:part>
   </wsdl:message>
   <wsdl:message name="GetMessageIdsResponse">
     <wsdl:part element="tns:GetMessageIdsResponse" name="parameters"></wsdl:part>
   </wsdl:message>
-  <wsdl:message name="GetMessageStatus">
-    <wsdl:part element="tns:GetMessageStatus" name="parameters"></wsdl:part>
+  <wsdl:message name="GetMessageEvents">
+    <wsdl:part element="tns:GetMessageEvents" name="parameters"></wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="ResendMessage">
+    <wsdl:part element="tns:ResendMessage" name="parameters"></wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="Ping">
+    <wsdl:part element="tns:Ping" name="parameters"></wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="ProcessMessageEventResponse">
+    <wsdl:part element="tns:ProcessMessageEventResponse" name="parameters"></wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="GetMessageStatusByMessageIdResponse">
+    <wsdl:part element="tns:GetMessageStatusByMessageIdResponse" name="parameters"></wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="GetMessage">
+    <wsdl:part element="tns:GetMessage" name="parameters"></wsdl:part>
   </wsdl:message>
   <wsdl:portType name="EbMSMessageService">
     <wsdl:operation name="ProcessMessages">
@@ -1014,9 +1227,49 @@
       <wsdl:output message="tns:ProcessMessagesResponse" name="ProcessMessagesResponse"></wsdl:output>
       <wsdl:fault message="tns:EbMSMessageServiceException" name="EbMSMessageServiceException"></wsdl:fault>
     </wsdl:operation>
+    <wsdl:operation name="GetMessageEvents">
+      <wsdl:input message="tns:GetMessageEvents" name="GetMessageEvents"></wsdl:input>
+      <wsdl:output message="tns:GetMessageEventsResponse" name="GetMessageEventsResponse"></wsdl:output>
+      <wsdl:fault message="tns:EbMSMessageServiceException" name="EbMSMessageServiceException"></wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="GetMessageStatus">
+      <wsdl:input message="tns:GetMessageStatus" name="GetMessageStatus"></wsdl:input>
+      <wsdl:output message="tns:GetMessageStatusResponse" name="GetMessageStatusResponse"></wsdl:output>
+      <wsdl:fault message="tns:EbMSMessageServiceException" name="EbMSMessageServiceException"></wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="ResendMessage">
+      <wsdl:input message="tns:ResendMessage" name="ResendMessage"></wsdl:input>
+      <wsdl:output message="tns:ResendMessageResponse" name="ResendMessageResponse"></wsdl:output>
+      <wsdl:fault message="tns:EbMSMessageServiceException" name="EbMSMessageServiceException"></wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="GetMessageStatusByMessageId">
+      <wsdl:input message="tns:GetMessageStatusByMessageId" name="GetMessageStatusByMessageId"></wsdl:input>
+      <wsdl:output message="tns:GetMessageStatusByMessageIdResponse" name="GetMessageStatusByMessageIdResponse"></wsdl:output>
+      <wsdl:fault message="tns:EbMSMessageServiceException" name="EbMSMessageServiceException"></wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="ProcessMessageEvent">
+      <wsdl:input message="tns:ProcessMessageEvent" name="ProcessMessageEvent"></wsdl:input>
+      <wsdl:output message="tns:ProcessMessageEventResponse" name="ProcessMessageEventResponse"></wsdl:output>
+      <wsdl:fault message="tns:EbMSMessageServiceException" name="EbMSMessageServiceException"></wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="ProcessMessageEvents">
+      <wsdl:input message="tns:ProcessMessageEvents" name="ProcessMessageEvents"></wsdl:input>
+      <wsdl:output message="tns:ProcessMessageEventsResponse" name="ProcessMessageEventsResponse"></wsdl:output>
+      <wsdl:fault message="tns:EbMSMessageServiceException" name="EbMSMessageServiceException"></wsdl:fault>
+    </wsdl:operation>
     <wsdl:operation name="Ping">
       <wsdl:input message="tns:Ping" name="Ping"></wsdl:input>
       <wsdl:output message="tns:PingResponse" name="PingResponse"></wsdl:output>
+      <wsdl:fault message="tns:EbMSMessageServiceException" name="EbMSMessageServiceException"></wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="GetMessageIds">
+      <wsdl:input message="tns:GetMessageIds" name="GetMessageIds"></wsdl:input>
+      <wsdl:output message="tns:GetMessageIdsResponse" name="GetMessageIdsResponse"></wsdl:output>
+      <wsdl:fault message="tns:EbMSMessageServiceException" name="EbMSMessageServiceException"></wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="SendMessage">
+      <wsdl:input message="tns:SendMessage" name="SendMessage"></wsdl:input>
+      <wsdl:output message="tns:SendMessageResponse" name="SendMessageResponse"></wsdl:output>
       <wsdl:fault message="tns:EbMSMessageServiceException" name="EbMSMessageServiceException"></wsdl:fault>
     </wsdl:operation>
     <wsdl:operation name="ProcessMessage">
@@ -1027,26 +1280,6 @@
     <wsdl:operation name="GetMessage">
       <wsdl:input message="tns:GetMessage" name="GetMessage"></wsdl:input>
       <wsdl:output message="tns:GetMessageResponse" name="GetMessageResponse"></wsdl:output>
-      <wsdl:fault message="tns:EbMSMessageServiceException" name="EbMSMessageServiceException"></wsdl:fault>
-    </wsdl:operation>
-    <wsdl:operation name="GetMessageStatusByMessageId">
-      <wsdl:input message="tns:GetMessageStatusByMessageId" name="GetMessageStatusByMessageId"></wsdl:input>
-      <wsdl:output message="tns:GetMessageStatusByMessageIdResponse" name="GetMessageStatusByMessageIdResponse"></wsdl:output>
-      <wsdl:fault message="tns:EbMSMessageServiceException" name="EbMSMessageServiceException"></wsdl:fault>
-    </wsdl:operation>
-    <wsdl:operation name="GetMessageIds">
-      <wsdl:input message="tns:GetMessageIds" name="GetMessageIds"></wsdl:input>
-      <wsdl:output message="tns:GetMessageIdsResponse" name="GetMessageIdsResponse"></wsdl:output>
-      <wsdl:fault message="tns:EbMSMessageServiceException" name="EbMSMessageServiceException"></wsdl:fault>
-    </wsdl:operation>
-    <wsdl:operation name="GetMessageStatus">
-      <wsdl:input message="tns:GetMessageStatus" name="GetMessageStatus"></wsdl:input>
-      <wsdl:output message="tns:GetMessageStatusResponse" name="GetMessageStatusResponse"></wsdl:output>
-      <wsdl:fault message="tns:EbMSMessageServiceException" name="EbMSMessageServiceException"></wsdl:fault>
-    </wsdl:operation>
-    <wsdl:operation name="SendMessage">
-      <wsdl:input message="tns:SendMessage" name="SendMessage"></wsdl:input>
-      <wsdl:output message="tns:SendMessageResponse" name="SendMessageResponse"></wsdl:output>
       <wsdl:fault message="tns:EbMSMessageServiceException" name="EbMSMessageServiceException"></wsdl:fault>
     </wsdl:operation>
   </wsdl:portType>
@@ -1064,12 +1297,108 @@
         <soap:fault name="EbMSMessageServiceException" use="literal"/>
       </wsdl:fault>
     </wsdl:operation>
+    <wsdl:operation name="GetMessageEvents">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="GetMessageEvents">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="GetMessageEventsResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="EbMSMessageServiceException">
+        <soap:fault name="EbMSMessageServiceException" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="GetMessageStatus">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="GetMessageStatus">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="GetMessageStatusResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="EbMSMessageServiceException">
+        <soap:fault name="EbMSMessageServiceException" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="ResendMessage">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="ResendMessage">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="ResendMessageResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="EbMSMessageServiceException">
+        <soap:fault name="EbMSMessageServiceException" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="ProcessMessageEvent">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="ProcessMessageEvent">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="ProcessMessageEventResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="EbMSMessageServiceException">
+        <soap:fault name="EbMSMessageServiceException" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="GetMessageStatusByMessageId">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="GetMessageStatusByMessageId">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="GetMessageStatusByMessageIdResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="EbMSMessageServiceException">
+        <soap:fault name="EbMSMessageServiceException" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="ProcessMessageEvents">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="ProcessMessageEvents">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="ProcessMessageEventsResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="EbMSMessageServiceException">
+        <soap:fault name="EbMSMessageServiceException" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
     <wsdl:operation name="Ping">
       <soap:operation soapAction="" style="document"/>
       <wsdl:input name="Ping">
         <soap:body use="literal"/>
       </wsdl:input>
       <wsdl:output name="PingResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="EbMSMessageServiceException">
+        <soap:fault name="EbMSMessageServiceException" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="GetMessageIds">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="GetMessageIds">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="GetMessageIdsResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="EbMSMessageServiceException">
+        <soap:fault name="EbMSMessageServiceException" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="SendMessage">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="SendMessage">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="SendMessageResponse">
         <soap:body use="literal"/>
       </wsdl:output>
       <wsdl:fault name="EbMSMessageServiceException">
@@ -1094,54 +1423,6 @@
         <soap:body use="literal"/>
       </wsdl:input>
       <wsdl:output name="GetMessageResponse">
-        <soap:body use="literal"/>
-      </wsdl:output>
-      <wsdl:fault name="EbMSMessageServiceException">
-        <soap:fault name="EbMSMessageServiceException" use="literal"/>
-      </wsdl:fault>
-    </wsdl:operation>
-    <wsdl:operation name="GetMessageStatusByMessageId">
-      <soap:operation soapAction="" style="document"/>
-      <wsdl:input name="GetMessageStatusByMessageId">
-        <soap:body use="literal"/>
-      </wsdl:input>
-      <wsdl:output name="GetMessageStatusByMessageIdResponse">
-        <soap:body use="literal"/>
-      </wsdl:output>
-      <wsdl:fault name="EbMSMessageServiceException">
-        <soap:fault name="EbMSMessageServiceException" use="literal"/>
-      </wsdl:fault>
-    </wsdl:operation>
-    <wsdl:operation name="GetMessageIds">
-      <soap:operation soapAction="" style="document"/>
-      <wsdl:input name="GetMessageIds">
-        <soap:body use="literal"/>
-      </wsdl:input>
-      <wsdl:output name="GetMessageIdsResponse">
-        <soap:body use="literal"/>
-      </wsdl:output>
-      <wsdl:fault name="EbMSMessageServiceException">
-        <soap:fault name="EbMSMessageServiceException" use="literal"/>
-      </wsdl:fault>
-    </wsdl:operation>
-    <wsdl:operation name="GetMessageStatus">
-      <soap:operation soapAction="" style="document"/>
-      <wsdl:input name="GetMessageStatus">
-        <soap:body use="literal"/>
-      </wsdl:input>
-      <wsdl:output name="GetMessageStatusResponse">
-        <soap:body use="literal"/>
-      </wsdl:output>
-      <wsdl:fault name="EbMSMessageServiceException">
-        <soap:fault name="EbMSMessageServiceException" use="literal"/>
-      </wsdl:fault>
-    </wsdl:operation>
-    <wsdl:operation name="SendMessage">
-      <soap:operation soapAction="" style="document"/>
-      <wsdl:input name="SendMessage">
-        <soap:body use="literal"/>
-      </wsdl:input>
-      <wsdl:output name="SendMessageResponse">
         <soap:body use="literal"/>
       </wsdl:output>
       <wsdl:fault name="EbMSMessageServiceException">
@@ -1197,7 +1478,7 @@
 </soapenv:Envelope>]]></con:request><con:wsaConfig mustUnderstand="NONE" version="200508" action="http://www.ordina.nl/ebms/2.1/EbMSMessageService/GetMessageStatusByMessageId"/></con:call></con:operation><con:operation id="a89b8bfc-f68c-43d9-95fc-787418a98f53" isOneWay="false" action="" name="Ping" bindingOperationName="Ping" type="Request-Response" outputName="PingResponse" inputName="Ping" receivesAttachments="false" sendsAttachments="false" anonymous="optional"><con:settings/><con:call id="3e3401f5-8f11-424a-8c8a-b808d2997288" name="Request 1"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://127.0.0.1:8089/adapter/ebms</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns="http://www.ordina.nl/ebms/2.1">
    <soapenv:Header/>
    <soapenv:Body>
-      <ns:Ping>
+      <ns1:Ping xmlns:ns1="http://www.ordina.nl/ebms/2.12">
          <CPAId>cpaStubEBF.rm.https.signed</CPAId>
          <FromParty>
             <partyId>urn:osb:oin:00000000000000000000</partyId>
@@ -1205,7 +1486,7 @@
          <ToParty>
             <partyId>urn:osb:oin:00000000000000000001</partyId>
          </ToParty>
-      </ns:Ping>
+      </ns1:Ping>
    </soapenv:Body>
 </soapenv:Envelope>]]></con:request><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508" action="http://www.ordina.nl/ebms/2.1/EbMSMessageService/Ping"/><con:wsrmConfig version="1.2"/></con:call></con:operation><con:operation id="f3c5f4e3-a20c-4631-af12-98d1065f38cd" isOneWay="false" action="" name="ProcessMessage" bindingOperationName="ProcessMessage" type="Request-Response" outputName="ProcessMessageResponse" inputName="ProcessMessage" receivesAttachments="false" sendsAttachments="false" anonymous="optional"><con:settings/><con:call id="69987f3d-cc85-43ad-a89d-00b40a12cfe0" name="Request 1"><con:settings/><con:encoding>UTF-8</con:encoding><con:endpoint>http://127.0.0.1:8089/adapter/ebms</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns="http://www.ordina.nl/ebms/2.1">
    <soapenv:Header/>
@@ -1225,7 +1506,7 @@
 </soapenv:Envelope>]]></con:request><con:wsaConfig mustUnderstand="NONE" version="200508" action="http://www.ordina.nl/ebms/2.1/EbMSMessageService/ProcessMessages"/></con:call></con:operation><con:operation id="54ed4e76-32be-4f8c-8a69-5dd6192454b8" isOneWay="false" action="" name="SendMessage" bindingOperationName="SendMessage" type="Request-Response" outputName="SendMessageResponse" inputName="SendMessage" receivesAttachments="false" sendsAttachments="false" anonymous="optional"><con:settings/><con:call id="0d155ce1-e67b-45ba-be5f-1d04d845dff2" name="Request 1"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://127.0.0.1:8089/adapter/ebms</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns="http://www.ordina.nl/ebms/2.1">
    <soapenv:Header/>
    <soapenv:Body>
-      <ns:SendMessage>
+      <ns1:SendMessage xmlns:ns1="http://www.ordina.nl/ebms/2.12">
          <Message>
             <context>
                <action>afleveren</action>
@@ -1247,6 +1528,68 @@
                <name>file.xml</name>
             </dataSource>
          </Message>
-      </ns:SendMessage>
+      </ns1:SendMessage>
    </soapenv:Body>
-</soapenv:Envelope>]]></con:request><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:attachment><con:name>cpaStubEBF.rm.https.signed.xml</con:name><con:contentType>text/xml</con:contentType><con:contentId>966869996173</con:contentId><con:part xsi:nil="true"/><con:url>/home/edwin/test/cpaStubEBF.rm.https.signed.xml</con:url><con:id>5c35e3c6-537b-49df-84b6-229969933833</con:id></con:attachment><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508" action="http://www.ordina.nl/ebms/2.1/EbMSMessageService/SendMessage"/><con:wsrmConfig version="1.2"/></con:call></con:operation></con:interface><con:properties/><con:wssContainer/><con:oAuth2ProfileContainer/><con:sensitiveInformation/></con:soapui-project>
+</soapenv:Envelope>]]></con:request><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:attachment><con:name>cpaStubEBF.rm.https.signed.xml</con:name><con:contentType>text/xml</con:contentType><con:contentId>966869996173</con:contentId><con:part xsi:nil="true"/><con:url>/home/edwin/test/cpaStubEBF.rm.https.signed.xml</con:url><con:id>5c35e3c6-537b-49df-84b6-229969933833</con:id></con:attachment><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508" action="http://www.ordina.nl/ebms/2.1/EbMSMessageService/SendMessage"/><con:wsrmConfig version="1.2"/></con:call></con:operation><con:operation id="3e1174af-e3bc-470a-a0ba-01ce5e2c2b63" isOneWay="false" action="" name="GetMessageEvents" bindingOperationName="GetMessageEvents" type="Request-Response" outputName="GetMessageEventsResponse" inputName="GetMessageEvents" receivesAttachments="false" sendsAttachments="false" anonymous="optional"><con:settings/><con:call id="4325a12c-642a-4afe-bcbb-46c395b38451" name="Request 1"><con:settings/><con:encoding>UTF-8</con:encoding><con:endpoint>http://127.0.0.1:8089/adapter/ebms</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns="http://www.ordina.nl/ebms/2.12">
+   <soapenv:Header/>
+   <soapenv:Body>
+      <ns:GetMessageEvents>
+         <MessageContext>
+            <!--Optional:-->
+            <action>?</action>
+            <!--Optional:-->
+            <conversationId>?</conversationId>
+            <!--Optional:-->
+            <cpaId>?</cpaId>
+            <!--Optional:-->
+            <fromRole>
+               <!--Optional:-->
+               <partyId>?</partyId>
+               <role>?</role>
+            </fromRole>
+            <!--Optional:-->
+            <messageId>?</messageId>
+            <!--Optional:-->
+            <messageStatus>?</messageStatus>
+            <!--Optional:-->
+            <refToMessageId>?</refToMessageId>
+            <!--Optional:-->
+            <service>?</service>
+            <!--Optional:-->
+            <timestamp>?</timestamp>
+            <!--Optional:-->
+            <toRole>
+               <!--Optional:-->
+               <partyId>?</partyId>
+               <role>?</role>
+            </toRole>
+         </MessageContext>
+         <!--1 or more repetitions:-->
+         <EventType>?</EventType>
+         <!--Optional:-->
+         <MaxNr>?</MaxNr>
+      </ns:GetMessageEvents>
+   </soapenv:Body>
+</soapenv:Envelope>]]></con:request><con:wsaConfig mustUnderstand="NONE" version="200508" action="http://www.ordina.nl/ebms/2.12/EbMSMessageService/GetMessageEvents"/></con:call></con:operation><con:operation id="15bd1d54-c9f3-4148-89ca-6e7381a59abd" isOneWay="false" action="" name="ResendMessage" bindingOperationName="ResendMessage" type="Request-Response" outputName="ResendMessageResponse" inputName="ResendMessage" receivesAttachments="false" sendsAttachments="false" anonymous="optional"><con:settings/><con:call id="8cf45e78-bdb3-4623-b8d1-d8df52ea8229" name="Request 1"><con:settings/><con:encoding>UTF-8</con:encoding><con:endpoint>http://127.0.0.1:8089/adapter/ebms</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns="http://www.ordina.nl/ebms/2.12">
+   <soapenv:Header/>
+   <soapenv:Body>
+      <ns:ResendMessage>
+         <MessageId>?</MessageId>
+      </ns:ResendMessage>
+   </soapenv:Body>
+</soapenv:Envelope>]]></con:request><con:wsaConfig mustUnderstand="NONE" version="200508" action="http://www.ordina.nl/ebms/2.12/EbMSMessageService/ResendMessage"/></con:call></con:operation><con:operation id="26bd44cb-933d-4b89-8a84-f87bdc79c5f7" isOneWay="false" action="" name="ProcessMessageEvent" bindingOperationName="ProcessMessageEvent" type="Request-Response" outputName="ProcessMessageEventResponse" inputName="ProcessMessageEvent" receivesAttachments="false" sendsAttachments="false" anonymous="optional"><con:settings/><con:call id="c82aebe9-0fad-42c1-83ba-00b8bbb3ce77" name="Request 1"><con:settings/><con:encoding>UTF-8</con:encoding><con:endpoint>http://127.0.0.1:8089/adapter/ebms</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns="http://www.ordina.nl/ebms/2.12">
+   <soapenv:Header/>
+   <soapenv:Body>
+      <ns:ProcessMessageEvent>
+         <MessageId>?</MessageId>
+      </ns:ProcessMessageEvent>
+   </soapenv:Body>
+</soapenv:Envelope>]]></con:request><con:wsaConfig mustUnderstand="NONE" version="200508" action="http://www.ordina.nl/ebms/2.12/EbMSMessageService/ProcessMessageEvent"/></con:call></con:operation><con:operation id="bbab99e8-c12c-4246-ac80-cb29e01f9638" isOneWay="false" action="" name="ProcessMessageEvents" bindingOperationName="ProcessMessageEvents" type="Request-Response" outputName="ProcessMessageEventsResponse" inputName="ProcessMessageEvents" receivesAttachments="false" sendsAttachments="false" anonymous="optional"><con:settings/><con:call id="cfae5749-4229-466d-8249-9a2f9e019f99" name="Request 1"><con:settings/><con:encoding>UTF-8</con:encoding><con:endpoint>http://127.0.0.1:8089/adapter/ebms</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns="http://www.ordina.nl/ebms/2.12">
+   <soapenv:Header/>
+   <soapenv:Body>
+      <ns:ProcessMessageEvents>
+         <!--1 or more repetitions:-->
+         <MessageId>?</MessageId>
+      </ns:ProcessMessageEvents>
+   </soapenv:Body>
+</soapenv:Envelope>]]></con:request><con:wsaConfig mustUnderstand="NONE" version="200508" action="http://www.ordina.nl/ebms/2.12/EbMSMessageService/ProcessMessageEvents"/></con:call></con:operation></con:interface><con:properties/><con:wssContainer/><con:oAuth2ProfileContainer/><con:sensitiveInformation/></con:soapui-project>
