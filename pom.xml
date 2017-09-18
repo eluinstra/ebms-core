@@ -24,7 +24,7 @@
 	<artifactId>ebms-adapter-mule3_8</artifactId>
 	<packaging>mule</packaging>
 	<name>Mule3_8 EbMS Adapter</name>
-	<version>1.6.2b</version>
+	<version>1.6.2c</version>
 	<description></description>
 	<url>https://sourceforge.net/projects/muleebmsadapter/</url>
 	<issueManagement>
