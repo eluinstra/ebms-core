@@ -30,7 +30,7 @@ import nl.clockwork.ebms.model.EbMSMessageEvent;
 import nl.clockwork.ebms.model.MessageStatus;
 import nl.clockwork.ebms.model.Party;
 
-@WebService(targetNamespace="http://www.ordina.nl/ebms/2.12")
+@WebService(targetNamespace="http://www.ordina.nl/ebms/2.14")
 public interface EbMSMessageService
 {
 	@WebMethod(operationName="Ping")
