@@ -188,7 +188,7 @@ public class SigningTest
 	private List<EbMSDataSource> createDataSources()
 	{
 		List<EbMSDataSource> result = new ArrayList<EbMSDataSource>();
-		result.add(new EbMSDataSource("test.txt","plain/text; charset=utf-8","Dit is een test.".getBytes(Charset.forName("UTF-8"))));
+		result.add(new EbMSDataSource("test.txt",null,"plain/text; charset=utf-8","Dit is een test.".getBytes(Charset.forName("UTF-8"))));
 		return result;
 	}
 
