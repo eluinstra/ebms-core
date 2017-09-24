@@ -22,9 +22,9 @@ public class EbMSDataSource implements Serializable
 {
 	private static final long serialVersionUID = 1L;
 	private String name;
+	private String contentId;
 	private String contentType;
 	private byte[] content;
-	private String contentId;
 
 	public EbMSDataSource()
 	{
