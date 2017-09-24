@@ -223,10 +223,9 @@ public class EbMSMessageFactory
 			{
 				Manifest manifest = EbMSMessageUtils.createManifest();
 				List<EbMSAttachment> attachments = new ArrayList<EbMSAttachment>();
-				int i = 1;
 				for (EbMSDataSource dataSource : content.getDataSources())
 				{
-					String contentId = dataSource.getContentId() == null ? createContentId(result.getMessageHeader().getMessageData().getMessageId(),i++) : dataSource.getContentId();
+					String contentId = dataSource.getContentId() == null ? UUID.randomUUID().toString() : dataSource.getContentId();
 					manifest.getReference().add(EbMSMessageUtils.createReference(contentId));
 					ByteArrayDataSource ds = new ByteArrayDataSource(dataSource.getContent(),dataSource.getContentType());
 					ds.setName(dataSource.getName());
@@ -246,11 +245,6 @@ public class EbMSMessageFactory
 		{
 			throw new EbMSProcessorException(e);
 		}
-	}
-
-	private String createContentId(String messageId, int i)
-	{
-		return messageId.replaceAll("^([^@]+)@(.+)$","$1-" + i + "@$2");
 	}
 
 	private MessageHeader createMessageHeader(String cpaId, Party fromParty, Party toParty, String action)
