@@ -93,7 +93,11 @@ public class EbMSEventProcessor implements InitializingBean, Job
 								eventManager.updateEvent(event,url_,EbMSEventStatus.SUCCEEDED);
 								if (!CPAUtils.isReliableMessaging(deliveryChannel))
 									if (ebMSDAO.updateMessage(event.getMessageId(),EbMSMessageStatus.SENDING,EbMSMessageStatus.DELIVERED) > 0)
+									{
 										eventListener.onMessageDelivered(event.getMessageId());
+										if (deleteEbMSAttachmentsOnMessageProcessed)
+											ebMSDAO.deleteAttachments(event.getMessageId());
+									}
 							}
 						}
 					);
@@ -114,7 +118,11 @@ public class EbMSEventProcessor implements InitializingBean, Job
 							eventManager.updateEvent(event,url_,EbMSEventStatus.FAILED,e.getMessage());
 							if ((e instanceof EbMSResponseSOAPException && EbMSResponseSOAPException.CLIENT.equals(((EbMSResponseSOAPException)e).getFaultCode())) || !CPAUtils.isReliableMessaging(deliveryChannel))
 								if (ebMSDAO.updateMessage(event.getMessageId(),EbMSMessageStatus.SENDING,EbMSMessageStatus.DELIVERY_FAILED) > 0)
+								{
 									eventListener.onMessageFailed(event.getMessageId());
+									if (deleteEbMSAttachmentsOnMessageProcessed)
+										ebMSDAO.deleteAttachments(event.getMessageId());
+								}
 						}
 					}
 				);
@@ -132,7 +140,11 @@ public class EbMSEventProcessor implements InitializingBean, Job
 							eventManager.updateEvent(event,url_,EbMSEventStatus.FAILED,ExceptionUtils.getStackTrace(e));
 							if (!CPAUtils.isReliableMessaging(deliveryChannel))
 								if (ebMSDAO.updateMessage(event.getMessageId(),EbMSMessageStatus.SENDING,EbMSMessageStatus.DELIVERY_FAILED) > 0)
+								{
 									eventListener.onMessageFailed(event.getMessageId());
+									if (deleteEbMSAttachmentsOnMessageProcessed)
+										ebMSDAO.deleteAttachments(event.getMessageId());
+								}
 						}
 					}
 				);
@@ -152,10 +164,12 @@ public class EbMSEventProcessor implements InitializingBean, Job
 						{
 							EbMSDocument requestDocument = ebMSDAO.getEbMSDocumentIfUnsent(event.getMessageId());
 							if (requestDocument != null)
-							{
 								if (ebMSDAO.updateMessage(event.getMessageId(),EbMSMessageStatus.SENDING,EbMSMessageStatus.EXPIRED) > 0)
+								{
 									eventListener.onMessageExpired(event.getMessageId());
-							}
+									if (deleteEbMSAttachmentsOnMessageProcessed)
+										ebMSDAO.deleteAttachments(event.getMessageId());
+								}
 							eventManager.deleteEvent(event.getMessageId());
 						}
 					}
@@ -182,6 +196,7 @@ public class EbMSEventProcessor implements InitializingBean, Job
 	private EbMSClient ebMSClient;
 	private EbMSMessageEncrypter messageEncrypter;
 	private EbMSMessageProcessor messageProcessor;
+	private boolean deleteEbMSAttachmentsOnMessageProcessed;
 
 	@Override
 	public void afterPropertiesSet() throws Exception

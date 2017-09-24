@@ -135,6 +135,7 @@
 		</property>
 		<property name="messageValidator" ref="messageValidator"/>
 		<property name="duplicateMessageHandler" ref="duplicateMessageHandler"/>
+		<property name="deleteEbMSAttachmentsOnMessageProcessed" value="${ebmsMessage.deleteContentOnProcessed}"/>
 	</bean>
 
 	<bean id="urlManager" class="nl.clockwork.ebms.common.URLManager">

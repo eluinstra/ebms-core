@@ -71,9 +71,10 @@ public class EbMSMessageProcessor
 	protected EbMSMessageFactory ebMSMessageFactory;
 	protected EventManager eventManager;
 	protected EbMSSignatureGenerator signatureGenerator;
+	protected XSDValidator xsdValidator;
 	protected EbMSMessageValidator messageValidator;
 	protected DuplicateMessageHandler duplicateMessageHandler;
-	protected XSDValidator xsdValidator;
+	protected boolean deleteEbMSAttachmentsOnMessageProcessed;
 
 	public EbMSDocument processRequest(EbMSDocument document) throws EbMSProcessorException
 	{
@@ -209,7 +210,11 @@ public class EbMSMessageProcessor
 						public void doInTransaction()
 						{
 							if (ebMSDAO.updateMessage(requestMessage.getMessageHeader().getMessageData().getMessageId(),EbMSMessageStatus.SENDING,EbMSMessageStatus.DELIVERED) > 0)
+							{
 								eventListener.onMessageDelivered(requestMessage.getMessageHeader().getMessageData().getMessageId());
+								if (deleteEbMSAttachmentsOnMessageProcessed)
+									ebMSDAO.deleteAttachments(requestMessage.getMessageHeader().getMessageData().getMessageId());
+							}
 						}
 					}
 				);
@@ -239,7 +244,11 @@ public class EbMSMessageProcessor
 						Date persistTime = ebMSDAO.getPersistTime(responseMessage.getMessageHeader().getMessageData().getRefToMessageId());
 						ebMSDAO.insertMessage(timestamp,persistTime,responseMessage,null);
 						if (ebMSDAO.updateMessage(responseMessage.getMessageHeader().getMessageData().getRefToMessageId(),EbMSMessageStatus.SENDING,EbMSMessageStatus.DELIVERY_FAILED) > 0)
+						{
 							eventListener.onMessageFailed(responseMessage.getMessageHeader().getMessageData().getRefToMessageId());
+							if (deleteEbMSAttachmentsOnMessageProcessed)
+								ebMSDAO.deleteAttachments(responseMessage.getMessageHeader().getMessageData().getRefToMessageId());
+						}
 					}
 				}
 			);
@@ -270,7 +279,11 @@ public class EbMSMessageProcessor
 						Date persistTime = ebMSDAO.getPersistTime(responseMessage.getMessageHeader().getMessageData().getRefToMessageId());
 						ebMSDAO.insertMessage(timestamp,persistTime,responseMessage,null);
 						if (ebMSDAO.updateMessage(responseMessage.getMessageHeader().getMessageData().getRefToMessageId(),EbMSMessageStatus.SENDING,EbMSMessageStatus.DELIVERED) > 0)
+						{
 							eventListener.onMessageDelivered(responseMessage.getMessageHeader().getMessageData().getRefToMessageId());
+							if (deleteEbMSAttachmentsOnMessageProcessed)
+								ebMSDAO.deleteAttachments(responseMessage.getMessageHeader().getMessageData().getRefToMessageId());
+						}
 					}
 				}
 			);
@@ -442,5 +455,10 @@ public class EbMSMessageProcessor
 	public void setDuplicateMessageHandler(DuplicateMessageHandler duplicateMessageHandler)
 	{
 		this.duplicateMessageHandler = duplicateMessageHandler;
+	}
+
+	public void setDeleteEbMSAttachmentsOnMessageProcessed(boolean deleteEbMSAttachmentsOnMessageProcessed)
+	{
+		this.deleteEbMSAttachmentsOnMessageProcessed = deleteEbMSAttachmentsOnMessageProcessed;
 	}
 }
