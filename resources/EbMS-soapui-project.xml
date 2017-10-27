@@ -1,0 +1,1153 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<con:soapui-project id="d5260584-beb5-43ce-88ac-418e94ec5a3f" activeEnvironment="Default" name="EbMS" resourceRoot="" soapui-version="5.2.1" xmlns:con="http://eviware.com/soapui/config"><con:settings/><con:interface xsi:type="con:WsdlInterface" id="f9616b01-a31b-4695-87b8-c6235cc95442" wsaVersion="NONE" name="CPAServiceServiceSoapBinding" type="wsdl" bindingName="{http://www.clockwork.nl/cpa/1.2}CPAServiceServiceSoapBinding" soapVersion="1_1" anonymous="optional" definition="http://localhost:8089/adapter/cpa?wsdl" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:settings/><con:definitionCache type="TEXT" rootPart="http://localhost:8089/adapter/cpa?wsdl"><con:part><con:url>http://localhost:8089/adapter/cpa?wsdl</con:url><con:content><![CDATA[<wsdl:definitions name="CPAServiceService" targetNamespace="http://www.clockwork.nl/cpa/1.2" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:tns="http://www.clockwork.nl/cpa/1.2" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:ns1="http://schemas.xmlsoap.org/soap/http">
+  <wsdl:types>
+    <xs:schema attributeFormDefault="unqualified" elementFormDefault="unqualified" targetNamespace="http://www.clockwork.nl/cpa/1.2" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+      <xs:element name="DeleteCPA" type="tns:DeleteCPA"/>
+      <xs:element name="DeleteCPAResponse" type="tns:DeleteCPAResponse"/>
+      <xs:element name="GetCPA" type="tns:GetCPA"/>
+      <xs:element name="GetCPAIds" type="tns:GetCPAIds"/>
+      <xs:element name="GetCPAIdsResponse" type="tns:GetCPAIdsResponse"/>
+      <xs:element name="GetCPAResponse" type="tns:GetCPAResponse"/>
+      <xs:element name="InsertCPA" type="tns:InsertCPA"/>
+      <xs:element name="InsertCPAResponse" type="tns:InsertCPAResponse"/>
+      <xs:element name="ValidateCPA" type="tns:ValidateCPA"/>
+      <xs:element name="ValidateCPAResponse" type="tns:ValidateCPAResponse"/>
+      <xs:complexType name="DeleteCPA">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="CPAId" type="xs:string"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="DeleteCPAResponse">
+        <xs:sequence/>
+      </xs:complexType>
+      <xs:complexType name="GetCPA">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="CPAId" type="xs:string"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="GetCPAResponse">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="CPA" type="xs:string"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="InsertCPA">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="CPA" type="xs:string"/>
+          <xs:element minOccurs="0" name="Overwrite" type="xs:boolean"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="InsertCPAResponse">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="CPAId" type="xs:string"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="GetCPAIds">
+        <xs:sequence/>
+      </xs:complexType>
+      <xs:complexType name="GetCPAIdsResponse">
+        <xs:sequence>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="CPAIds" type="xs:string"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="ValidateCPA">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="CPA" type="xs:string"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="ValidateCPAResponse">
+        <xs:sequence/>
+      </xs:complexType>
+      <xs:element name="CPAServiceException" type="tns:CPAServiceException"/>
+      <xs:complexType name="CPAServiceException">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="message" type="xs:string"/>
+        </xs:sequence>
+      </xs:complexType>
+    </xs:schema>
+  </wsdl:types>
+  <wsdl:message name="DeleteCPA">
+    <wsdl:part element="tns:DeleteCPA" name="parameters"></wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="InsertCPAResponse">
+    <wsdl:part element="tns:InsertCPAResponse" name="parameters"></wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="ValidateCPAResponse">
+    <wsdl:part element="tns:ValidateCPAResponse" name="parameters"></wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="DeleteCPAResponse">
+    <wsdl:part element="tns:DeleteCPAResponse" name="parameters"></wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="GetCPAResponse">
+    <wsdl:part element="tns:GetCPAResponse" name="parameters"></wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="InsertCPA">
+    <wsdl:part element="tns:InsertCPA" name="parameters"></wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="GetCPAIdsResponse">
+    <wsdl:part element="tns:GetCPAIdsResponse" name="parameters"></wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="CPAServiceException">
+    <wsdl:part element="tns:CPAServiceException" name="CPAServiceException"></wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="GetCPA">
+    <wsdl:part element="tns:GetCPA" name="parameters"></wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="GetCPAIds">
+    <wsdl:part element="tns:GetCPAIds" name="parameters"></wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="ValidateCPA">
+    <wsdl:part element="tns:ValidateCPA" name="parameters"></wsdl:part>
+  </wsdl:message>
+  <wsdl:portType name="CPAService">
+    <wsdl:operation name="DeleteCPA">
+      <wsdl:input message="tns:DeleteCPA" name="DeleteCPA"></wsdl:input>
+      <wsdl:output message="tns:DeleteCPAResponse" name="DeleteCPAResponse"></wsdl:output>
+      <wsdl:fault message="tns:CPAServiceException" name="CPAServiceException"></wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="GetCPA">
+      <wsdl:input message="tns:GetCPA" name="GetCPA"></wsdl:input>
+      <wsdl:output message="tns:GetCPAResponse" name="GetCPAResponse"></wsdl:output>
+      <wsdl:fault message="tns:CPAServiceException" name="CPAServiceException"></wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="InsertCPA">
+      <wsdl:input message="tns:InsertCPA" name="InsertCPA"></wsdl:input>
+      <wsdl:output message="tns:InsertCPAResponse" name="InsertCPAResponse"></wsdl:output>
+      <wsdl:fault message="tns:CPAServiceException" name="CPAServiceException"></wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="GetCPAIds">
+      <wsdl:input message="tns:GetCPAIds" name="GetCPAIds"></wsdl:input>
+      <wsdl:output message="tns:GetCPAIdsResponse" name="GetCPAIdsResponse"></wsdl:output>
+      <wsdl:fault message="tns:CPAServiceException" name="CPAServiceException"></wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="ValidateCPA">
+      <wsdl:input message="tns:ValidateCPA" name="ValidateCPA"></wsdl:input>
+      <wsdl:output message="tns:ValidateCPAResponse" name="ValidateCPAResponse"></wsdl:output>
+      <wsdl:fault message="tns:CPAServiceException" name="CPAServiceException"></wsdl:fault>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="CPAServiceServiceSoapBinding" type="tns:CPAService">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsdl:operation name="DeleteCPA">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="DeleteCPA">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="DeleteCPAResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="CPAServiceException">
+        <soap:fault name="CPAServiceException" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="GetCPA">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="GetCPA">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="GetCPAResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="CPAServiceException">
+        <soap:fault name="CPAServiceException" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="InsertCPA">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="InsertCPA">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="InsertCPAResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="CPAServiceException">
+        <soap:fault name="CPAServiceException" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="GetCPAIds">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="GetCPAIds">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="GetCPAIdsResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="CPAServiceException">
+        <soap:fault name="CPAServiceException" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="ValidateCPA">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="ValidateCPA">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="ValidateCPAResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="CPAServiceException">
+        <soap:fault name="CPAServiceException" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="CPAServiceService">
+    <wsdl:port binding="tns:CPAServiceServiceSoapBinding" name="CPAServicePort">
+      <soap:address location="http://localhost:8089/adapter/cpa"/>
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>]]></con:content><con:type>http://schemas.xmlsoap.org/wsdl/</con:type></con:part></con:definitionCache><con:endpoints><con:endpoint>http://localhost:8089/adapter/cpa</con:endpoint></con:endpoints><con:operation id="f9b748e1-7031-47cd-a006-a1b3c9326e54" isOneWay="false" action="" name="DeleteCPA" bindingOperationName="DeleteCPA" type="Request-Response" outputName="DeleteCPAResponse" inputName="DeleteCPA" receivesAttachments="false" sendsAttachments="false" anonymous="optional"><con:settings/><con:call id="e009aa15-4221-479e-bd66-30ff30798584" name="Request 1"><con:settings/><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8089/adapter/cpa</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns="http://www.clockwork.nl/cpa/1.2">
+   <soapenv:Header/>
+   <soapenv:Body>
+      <ns:DeleteCPA>
+         <!--Optional:-->
+         <CPAId>?</CPAId>
+      </ns:DeleteCPA>
+   </soapenv:Body>
+</soapenv:Envelope>]]></con:request><con:wsaConfig mustUnderstand="NONE" version="200508" action="http://www.clockwork.nl/cpa/1.2/CPAService/DeleteCPA"/></con:call></con:operation><con:operation id="30624eeb-88c2-4e48-838c-9fa63f7134bd" isOneWay="false" action="" name="GetCPA" bindingOperationName="GetCPA" type="Request-Response" outputName="GetCPAResponse" inputName="GetCPA" receivesAttachments="false" sendsAttachments="false" anonymous="optional"><con:settings/><con:call id="1931e031-6510-4c7f-9c80-539bed24c8a1" name="Request 1"><con:settings/><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8089/adapter/cpa</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns="http://www.clockwork.nl/cpa/1.2">
+   <soapenv:Header/>
+   <soapenv:Body>
+      <ns:GetCPA>
+         <!--Optional:-->
+         <CPAId>?</CPAId>
+      </ns:GetCPA>
+   </soapenv:Body>
+</soapenv:Envelope>]]></con:request><con:wsaConfig mustUnderstand="NONE" version="200508" action="http://www.clockwork.nl/cpa/1.2/CPAService/GetCPA"/></con:call></con:operation><con:operation id="965c03d6-7acb-4d65-b729-86fa6e487fff" isOneWay="false" action="" name="GetCPAIds" bindingOperationName="GetCPAIds" type="Request-Response" outputName="GetCPAIdsResponse" inputName="GetCPAIds" receivesAttachments="false" sendsAttachments="false" anonymous="optional"><con:settings/><con:call id="0e147e0b-e4bc-467f-b8ed-3969eac2034c" name="Request 1"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8089/adapter/cpa</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns="http://www.clockwork.nl/cpa/1.2">
+   <soapenv:Header/>
+   <soapenv:Body>
+      <ns:GetCPAIds/>
+   </soapenv:Body>
+</soapenv:Envelope>]]></con:request><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508" action="http://www.clockwork.nl/cpa/1.2/CPAService/GetCPAIds"/><con:wsrmConfig version="1.2"/></con:call></con:operation><con:operation id="242588d0-8420-430b-ba3e-cddaaea3e568" isOneWay="false" action="" name="InsertCPA" bindingOperationName="InsertCPA" type="Request-Response" outputName="InsertCPAResponse" inputName="InsertCPA" receivesAttachments="false" sendsAttachments="false" anonymous="optional"><con:settings/><con:call id="0407b61c-dc07-40e6-9251-fdac29c5a690" name="Request 1"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8089/adapter/cpa</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns="http://www.clockwork.nl/cpa/1.2">
+   <soapenv:Header/>
+   <soapenv:Body>
+      <ns:InsertCPA>
+         <CPA><![CDATA[<ns1:CollaborationProtocolAgreement ns1:cpaid="cpaStubEBF.rm.https.signed" ns1:version="1.0" xmlns:ns2="http://www.w3.org/1999/xlink" xmlns:ns1="http://www.oasis-open.org/committees/ebxml-cppa/schema/cpp-cpa-2_0.xsd" xmlns:ns3="http://www.w3.org/2000/09/xmldsig#">
+    <ns1:Status ns1:value="agreed"/>
+    <ns1:Start>2011-01-01T00:00:00Z</ns1:Start>
+    <ns1:End>2021-01-01T00:00:00Z</ns1:End>
+    <ns1:PartyInfo ns1:partyName="Logius" ns1:defaultMshChannelId="DIGIPOORT_defaultDeliveryChannel_ProfileBestEffortSigned" ns1:defaultMshPackageId="MshSignalPackage">
+        <ns1:PartyId ns1:type="urn:osb:oin">00000000000000000000</ns1:PartyId>
+        <ns1:PartyRef ns2:href=""/>
+        <ns1:CollaborationRole>
+            <ns1:ProcessSpecification ns1:name="afleveren" ns1:version="1.0" ns1:uuid="urn:overheidsservicebus.nl:osr:Afleveren:OsbAfleveren11$10" ns2:href="http://www.overheidsservicebus.nl/osr/Afleveren"/>
+            <ns1:Role ns1:name="DIGIPOORT" ns2:href="http://www.overheidsservicebus.nl/osr/"/>
+            <ns1:ServiceBinding>
+                <ns1:Service ns1:type="urn:osb:services">osb:afleveren:1.1$1.0</ns1:Service>
+                <ns1:CanSend>
+                    <ns1:ThisPartyActionBinding ns1:id="DIGIPOORT_S_Afleveren" ns1:action="afleveren" ns1:packageId="XMLMessagePackage">
+                        <ns1:BusinessTransactionCharacteristics ns1:isNonRepudiationRequired="true" ns1:isNonRepudiationReceiptRequired="true" ns1:isConfidential="transient" ns1:isAuthenticated="transient-and-persistent" ns1:isTamperProof="transient-and-persistent" ns1:isAuthorizationRequired="true" ns1:isIntelligibleCheckRequired="false" ns1:timeToPerform="P2D"/>
+                        <ns1:ChannelId>DIGIPOORT_defaultDeliveryChannel_ProfileReliableMessagingSigned</ns1:ChannelId>
+                    </ns1:ThisPartyActionBinding>
+                    <ns1:OtherPartyActionBinding>OVERHEID_R_Afleveren</ns1:OtherPartyActionBinding>
+                </ns1:CanSend>
+                <ns1:CanReceive>
+                    <ns1:ThisPartyActionBinding ns1:id="DIGIPOORT_R_BevestigAfleveren" ns1:action="bevestigAfleveren" ns1:packageId="XMLMessagePackage">
+                        <ns1:BusinessTransactionCharacteristics ns1:isNonRepudiationRequired="true" ns1:isNonRepudiationReceiptRequired="true" ns1:isConfidential="transient" ns1:isAuthenticated="transient-and-persistent" ns1:isTamperProof="transient-and-persistent" ns1:isAuthorizationRequired="true" ns1:isIntelligibleCheckRequired="false" ns1:timeToPerform="P2D"/>
+                        <ns1:ChannelId>DIGIPOORT_defaultDeliveryChannel_ProfileReliableMessagingSigned</ns1:ChannelId>
+                    </ns1:ThisPartyActionBinding>
+                    <ns1:OtherPartyActionBinding>OVERHEID_S_BevestigAfleveren</ns1:OtherPartyActionBinding>
+                </ns1:CanReceive>
+            </ns1:ServiceBinding>
+        </ns1:CollaborationRole>
+        <ns1:CollaborationRole>
+            <ns1:ProcessSpecification ns1:name="aanleveren" ns1:version="1.0" ns1:uuid="urn:overheidsservicebus.nl:osr:Aanleveren:OsbAanleveren10$10" ns2:href="http://www.overheidsservicebus.nl/osr/Aanleveren"/>
+            <ns1:Role ns1:name="DIGIPOORT" ns2:href="http://www.overheidsservicebus.nl/osr/"/>
+            <ns1:ServiceBinding>
+                <ns1:Service ns1:type="urn:osb:services">osb:aanleveren:1.1$1.0</ns1:Service>
+                <ns1:CanSend>
+                    <ns1:ThisPartyActionBinding ns1:id="DIGIPOORT_S_BevestigAanleveren" ns1:action="bevestigAanleveren" ns1:packageId="XMLMessagePackage">
+                        <ns1:BusinessTransactionCharacteristics ns1:isNonRepudiationRequired="true" ns1:isNonRepudiationReceiptRequired="true" ns1:isConfidential="transient" ns1:isAuthenticated="transient-and-persistent" ns1:isTamperProof="transient-and-persistent" ns1:isAuthorizationRequired="true" ns1:isIntelligibleCheckRequired="false" ns1:timeToPerform="P2D"/>
+                        <ns1:ChannelId>DIGIPOORT_defaultDeliveryChannel_ProfileReliableMessagingSigned</ns1:ChannelId>
+                    </ns1:ThisPartyActionBinding>
+                    <ns1:OtherPartyActionBinding>OVERHEID_R_BevestigAanleveren</ns1:OtherPartyActionBinding>
+                </ns1:CanSend>
+                <ns1:CanReceive>
+                    <ns1:ThisPartyActionBinding ns1:id="DIGIPOORT_R_Aanleveren" ns1:action="aanleveren" ns1:packageId="XMLMessagePackage">
+                        <ns1:BusinessTransactionCharacteristics ns1:isNonRepudiationRequired="true" ns1:isNonRepudiationReceiptRequired="true" ns1:isConfidential="transient" ns1:isAuthenticated="transient-and-persistent" ns1:isTamperProof="transient-and-persistent" ns1:isAuthorizationRequired="true" ns1:isIntelligibleCheckRequired="false" ns1:timeToPerform="P2D"/>
+                        <ns1:ChannelId>DIGIPOORT_defaultDeliveryChannel_ProfileReliableMessagingSigned</ns1:ChannelId>
+                    </ns1:ThisPartyActionBinding>
+                    <ns1:OtherPartyActionBinding>OVERHEID_S_Aanleveren</ns1:OtherPartyActionBinding>
+                </ns1:CanReceive>
+            </ns1:ServiceBinding>
+        </ns1:CollaborationRole>
+        <ns1:Certificate ns1:certId="DIGIPOORT_SigningCert">
+            <ns3:KeyInfo>
+				
+                
+                <ns3:KeyValue>
+					
+                    
+                    <ns3:RSAKeyValue>
+                        <ns3:Modulus>1KkdUYLsAJpvJc/sW+dblxhCP6Xn0UekqW4CEcpYW1AEf5ahth0bQ4+lZobEG2jVzRMA9DFapQf71AafkX8RjE3DYi6J+rl6PLWJ/OSyrUBGS1CEJc6HJS/uLsb020vumCnSBsWkfGPSaBBp9ZaO/mIY97JiUrYlwwEFjbGSHnU=</ns3:Modulus>
+                        <ns3:Exponent>AQAB</ns3:Exponent>
+                    </ns3:RSAKeyValue>
+				</ns3:KeyValue>
+				
+                
+                <ns3:X509Data>
+                    <ns3:X509IssuerSerial>
+                        <ns3:X509IssuerName>CN=www.clockwork.nl,OU=Clockwork,O=Ordina,L=Groningen,ST=Groningen,C=NL</ns3:X509IssuerName>
+                        <ns3:X509SerialNumber>1321267627</ns3:X509SerialNumber>
+                    </ns3:X509IssuerSerial>
+                    <ns3:X509SubjectName>CN=www.clockwork.nl,OU=Clockwork,O=Ordina,L=Groningen,ST=Groningen,C=NL</ns3:X509SubjectName>
+                    <ns3:X509Certificate>MIICYTCCAcqgAwIBAgIETsDxqzANBgkqhkiG9w0BAQUFADB1MQswCQYDVQQGEwJOTDESMBAGA1UECBMJR3JvbmluZ2VuMRIwEAYDVQQHEwlHcm9uaW5nZW4xDzANBgNVBAoTBk9yZGluYTESMBAGA1UECxMJQ2xvY2t3b3JrMRkwFwYDVQQDExB3d3cuY2xvY2t3b3JrLm5sMB4XDTExMTExNDEwNDcwN1oXDTIxMTExMTEwNDcwN1owdTELMAkGA1UEBhMCTkwxEjAQBgNVBAgTCUdyb25pbmdlbjESMBAGA1UEBxMJR3JvbmluZ2VuMQ8wDQYDVQQKEwZPcmRpbmExEjAQBgNVBAsTCUNsb2Nrd29yazEZMBcGA1UEAxMQd3d3LmNsb2Nrd29yay5ubDCBnzANBgkqhkiG9w0BAQEFAAOBjQAwgYkCgYEA1KkdUYLsAJpvJc/sW+dblxhCP6Xn0UekqW4CEcpYW1AEf5ahth0bQ4+lZobEG2jVzRMA9DFapQf71AafkX8RjE3DYi6J+rl6PLWJ/OSyrUBGS1CEJc6HJS/uLsb020vumCnSBsWkfGPSaBBp9ZaO/mIY97JiUrYlwwEFjbGSHnUCAwEAATANBgkqhkiG9w0BAQUFAAOBgQCwDPHKtmuz4jLkEwP3CkfOL9+Q4LxhgUV7GtPm1XKIMN4VUey1NkFJUB5qwJXY1I7ql/VtZLjV2mPhS1SZkMKdFZ5uTKEr/KqT9Fazib5mK4YXOvFpOcDNBvpKX2SpoHffgXmdrExQshpIDzzofex0y/Kg4mulDQUPwVuIZtbnlQ==</ns3:X509Certificate>
+                </ns3:X509Data>
+			</ns3:KeyInfo>
+        </ns1:Certificate>
+        <ns1:Certificate ns1:certId="DIGIPOORT_EncryptionCert">
+            <ns3:KeyInfo>
+				
+                
+                <ns3:KeyValue>
+					
+                    
+                    <ns3:RSAKeyValue>
+                        <ns3:Modulus>1KkdUYLsAJpvJc/sW+dblxhCP6Xn0UekqW4CEcpYW1AEf5ahth0bQ4+lZobEG2jVzRMA9DFapQf71AafkX8RjE3DYi6J+rl6PLWJ/OSyrUBGS1CEJc6HJS/uLsb020vumCnSBsWkfGPSaBBp9ZaO/mIY97JiUrYlwwEFjbGSHnU=</ns3:Modulus>
+                        <ns3:Exponent>AQAB</ns3:Exponent>
+                    </ns3:RSAKeyValue>
+				</ns3:KeyValue>
+				
+                
+                <ns3:X509Data>
+                    <ns3:X509IssuerSerial>
+                        <ns3:X509IssuerName>CN=www.clockwork.nl,OU=Clockwork,O=Ordina,L=Groningen,ST=Groningen,C=NL</ns3:X509IssuerName>
+                        <ns3:X509SerialNumber>1321267627</ns3:X509SerialNumber>
+                    </ns3:X509IssuerSerial>
+                    <ns3:X509SubjectName>CN=www.clockwork.nl,OU=Clockwork,O=Ordina,L=Groningen,ST=Groningen,C=NL</ns3:X509SubjectName>
+                    <ns3:X509Certificate>MIICYTCCAcqgAwIBAgIETsDxqzANBgkqhkiG9w0BAQUFADB1MQswCQYDVQQGEwJOTDESMBAGA1UECBMJR3JvbmluZ2VuMRIwEAYDVQQHEwlHcm9uaW5nZW4xDzANBgNVBAoTBk9yZGluYTESMBAGA1UECxMJQ2xvY2t3b3JrMRkwFwYDVQQDExB3d3cuY2xvY2t3b3JrLm5sMB4XDTExMTExNDEwNDcwN1oXDTIxMTExMTEwNDcwN1owdTELMAkGA1UEBhMCTkwxEjAQBgNVBAgTCUdyb25pbmdlbjESMBAGA1UEBxMJR3JvbmluZ2VuMQ8wDQYDVQQKEwZPcmRpbmExEjAQBgNVBAsTCUNsb2Nrd29yazEZMBcGA1UEAxMQd3d3LmNsb2Nrd29yay5ubDCBnzANBgkqhkiG9w0BAQEFAAOBjQAwgYkCgYEA1KkdUYLsAJpvJc/sW+dblxhCP6Xn0UekqW4CEcpYW1AEf5ahth0bQ4+lZobEG2jVzRMA9DFapQf71AafkX8RjE3DYi6J+rl6PLWJ/OSyrUBGS1CEJc6HJS/uLsb020vumCnSBsWkfGPSaBBp9ZaO/mIY97JiUrYlwwEFjbGSHnUCAwEAATANBgkqhkiG9w0BAQUFAAOBgQCwDPHKtmuz4jLkEwP3CkfOL9+Q4LxhgUV7GtPm1XKIMN4VUey1NkFJUB5qwJXY1I7ql/VtZLjV2mPhS1SZkMKdFZ5uTKEr/KqT9Fazib5mK4YXOvFpOcDNBvpKX2SpoHffgXmdrExQshpIDzzofex0y/Kg4mulDQUPwVuIZtbnlQ==</ns3:X509Certificate>
+                </ns3:X509Data>
+			</ns3:KeyInfo>
+        </ns1:Certificate>
+        <ns1:Certificate ns1:certId="DIGIPOORT_ServerCert">
+            <ns3:KeyInfo>
+				
+                
+                <ns3:KeyValue>
+					
+                    
+                    <ns3:RSAKeyValue>
+                        <ns3:Modulus>1KkdUYLsAJpvJc/sW+dblxhCP6Xn0UekqW4CEcpYW1AEf5ahth0bQ4+lZobEG2jVzRMA9DFapQf71AafkX8RjE3DYi6J+rl6PLWJ/OSyrUBGS1CEJc6HJS/uLsb020vumCnSBsWkfGPSaBBp9ZaO/mIY97JiUrYlwwEFjbGSHnU=</ns3:Modulus>
+                        <ns3:Exponent>AQAB</ns3:Exponent>
+                    </ns3:RSAKeyValue>
+				</ns3:KeyValue>
+				
+                
+                <ns3:X509Data>
+                    <ns3:X509IssuerSerial>
+                        <ns3:X509IssuerName>CN=www.clockwork.nl,OU=Clockwork,O=Ordina,L=Groningen,ST=Groningen,C=NL</ns3:X509IssuerName>
+                        <ns3:X509SerialNumber>1321267627</ns3:X509SerialNumber>
+                    </ns3:X509IssuerSerial>
+                    <ns3:X509SubjectName>CN=www.clockwork.nl,OU=Clockwork,O=Ordina,L=Groningen,ST=Groningen,C=NL</ns3:X509SubjectName>
+                    <ns3:X509Certificate>MIICYTCCAcqgAwIBAgIETsDxqzANBgkqhkiG9w0BAQUFADB1MQswCQYDVQQGEwJOTDESMBAGA1UECBMJR3JvbmluZ2VuMRIwEAYDVQQHEwlHcm9uaW5nZW4xDzANBgNVBAoTBk9yZGluYTESMBAGA1UECxMJQ2xvY2t3b3JrMRkwFwYDVQQDExB3d3cuY2xvY2t3b3JrLm5sMB4XDTExMTExNDEwNDcwN1oXDTIxMTExMTEwNDcwN1owdTELMAkGA1UEBhMCTkwxEjAQBgNVBAgTCUdyb25pbmdlbjESMBAGA1UEBxMJR3JvbmluZ2VuMQ8wDQYDVQQKEwZPcmRpbmExEjAQBgNVBAsTCUNsb2Nrd29yazEZMBcGA1UEAxMQd3d3LmNsb2Nrd29yay5ubDCBnzANBgkqhkiG9w0BAQEFAAOBjQAwgYkCgYEA1KkdUYLsAJpvJc/sW+dblxhCP6Xn0UekqW4CEcpYW1AEf5ahth0bQ4+lZobEG2jVzRMA9DFapQf71AafkX8RjE3DYi6J+rl6PLWJ/OSyrUBGS1CEJc6HJS/uLsb020vumCnSBsWkfGPSaBBp9ZaO/mIY97JiUrYlwwEFjbGSHnUCAwEAATANBgkqhkiG9w0BAQUFAAOBgQCwDPHKtmuz4jLkEwP3CkfOL9+Q4LxhgUV7GtPm1XKIMN4VUey1NkFJUB5qwJXY1I7ql/VtZLjV2mPhS1SZkMKdFZ5uTKEr/KqT9Fazib5mK4YXOvFpOcDNBvpKX2SpoHffgXmdrExQshpIDzzofex0y/Kg4mulDQUPwVuIZtbnlQ==</ns3:X509Certificate>
+                </ns3:X509Data>
+			</ns3:KeyInfo>
+        </ns1:Certificate>
+        <ns1:Certificate ns1:certId="DIGIPOORT_ClientCert">
+            <ns3:KeyInfo>
+				
+                
+                <ns3:KeyValue>
+					
+                    
+                    <ns3:RSAKeyValue>
+                        <ns3:Modulus>1KkdUYLsAJpvJc/sW+dblxhCP6Xn0UekqW4CEcpYW1AEf5ahth0bQ4+lZobEG2jVzRMA9DFapQf71AafkX8RjE3DYi6J+rl6PLWJ/OSyrUBGS1CEJc6HJS/uLsb020vumCnSBsWkfGPSaBBp9ZaO/mIY97JiUrYlwwEFjbGSHnU=</ns3:Modulus>
+                        <ns3:Exponent>AQAB</ns3:Exponent>
+                    </ns3:RSAKeyValue>
+				</ns3:KeyValue>
+				
+                
+                <ns3:X509Data>
+                    <ns3:X509IssuerSerial>
+                        <ns3:X509IssuerName>CN=www.clockwork.nl,OU=Clockwork,O=Ordina,L=Groningen,ST=Groningen,C=NL</ns3:X509IssuerName>
+                        <ns3:X509SerialNumber>1321267627</ns3:X509SerialNumber>
+                    </ns3:X509IssuerSerial>
+                    <ns3:X509SubjectName>CN=www.clockwork.nl,OU=Clockwork,O=Ordina,L=Groningen,ST=Groningen,C=NL</ns3:X509SubjectName>
+                    <ns3:X509Certificate>MIICYTCCAcqgAwIBAgIETsDxqzANBgkqhkiG9w0BAQUFADB1MQswCQYDVQQGEwJOTDESMBAGA1UECBMJR3JvbmluZ2VuMRIwEAYDVQQHEwlHcm9uaW5nZW4xDzANBgNVBAoTBk9yZGluYTESMBAGA1UECxMJQ2xvY2t3b3JrMRkwFwYDVQQDExB3d3cuY2xvY2t3b3JrLm5sMB4XDTExMTExNDEwNDcwN1oXDTIxMTExMTEwNDcwN1owdTELMAkGA1UEBhMCTkwxEjAQBgNVBAgTCUdyb25pbmdlbjESMBAGA1UEBxMJR3JvbmluZ2VuMQ8wDQYDVQQKEwZPcmRpbmExEjAQBgNVBAsTCUNsb2Nrd29yazEZMBcGA1UEAxMQd3d3LmNsb2Nrd29yay5ubDCBnzANBgkqhkiG9w0BAQEFAAOBjQAwgYkCgYEA1KkdUYLsAJpvJc/sW+dblxhCP6Xn0UekqW4CEcpYW1AEf5ahth0bQ4+lZobEG2jVzRMA9DFapQf71AafkX8RjE3DYi6J+rl6PLWJ/OSyrUBGS1CEJc6HJS/uLsb020vumCnSBsWkfGPSaBBp9ZaO/mIY97JiUrYlwwEFjbGSHnUCAwEAATANBgkqhkiG9w0BAQUFAAOBgQCwDPHKtmuz4jLkEwP3CkfOL9+Q4LxhgUV7GtPm1XKIMN4VUey1NkFJUB5qwJXY1I7ql/VtZLjV2mPhS1SZkMKdFZ5uTKEr/KqT9Fazib5mK4YXOvFpOcDNBvpKX2SpoHffgXmdrExQshpIDzzofex0y/Kg4mulDQUPwVuIZtbnlQ==</ns3:X509Certificate>
+                </ns3:X509Data>
+			</ns3:KeyInfo>
+        </ns1:Certificate>
+        <ns1:SecurityDetails ns1:securityId="DIGIPOORT_Security">
+            <ns1:TrustAnchors>
+                <ns1:AnchorCertificateRef ns1:certId="DIGIPOORT_SigningCert"/>
+                <ns1:AnchorCertificateRef ns1:certId="DIGIPOORT_EncryptionCert"/>
+            </ns1:TrustAnchors>
+        </ns1:SecurityDetails>
+        <ns1:SecurityDetails ns1:securityId="DIGIPOORT_TransportSecurity">
+            <ns1:TrustAnchors>
+                <ns1:AnchorCertificateRef ns1:certId="DIGIPOORT_ServerCert"/>
+                <ns1:AnchorCertificateRef ns1:certId="DIGIPOORT_ClientCert"/>
+            </ns1:TrustAnchors>
+        </ns1:SecurityDetails>
+        <ns1:DeliveryChannel ns1:channelId="DIGIPOORT_defaultDeliveryChannel_ProfileBestEffortSigned" ns1:transportId="DIGIPOORT_transport_HTTPS" ns1:docExchangeId="DIGIPOORT_SIGNED_BestEffort">
+            <ns1:MessagingCharacteristics ns1:syncReplyMode="none" ns1:ackRequested="never" ns1:ackSignatureRequested="never" ns1:duplicateElimination="never" ns1:actor="urn:oasis:names:tc:ebxml-msg:actor:toPartyMSH"/>
+        </ns1:DeliveryChannel>
+        <ns1:DeliveryChannel ns1:channelId="DIGIPOORT_defaultDeliveryChannel_ProfileReliableMessagingSigned" ns1:transportId="DIGIPOORT_transport_HTTPS" ns1:docExchangeId="DIGIPOORT_SIGNED_ReliableMessaging">
+            <ns1:MessagingCharacteristics ns1:syncReplyMode="none" ns1:ackRequested="always" ns1:ackSignatureRequested="never" ns1:duplicateElimination="always" ns1:actor="urn:oasis:names:tc:ebxml-msg:actor:toPartyMSH"/>
+        </ns1:DeliveryChannel>
+        <ns1:Transport ns1:transportId="DIGIPOORT_transport_HTTPS">
+            <ns1:TransportSender>
+                <ns1:TransportProtocol ns1:version="1.1">HTTP</ns1:TransportProtocol>
+                <ns1:TransportClientSecurity>
+                    <ns1:TransportSecurityProtocol ns1:version="3.0">SSL</ns1:TransportSecurityProtocol>
+                    <ns1:ClientCertificateRef ns1:certId="DIGIPOORT_ClientCert"/>
+                    <ns1:ServerSecurityDetailsRef ns1:securityId="DIGIPOORT_TransportSecurity"/>
+                </ns1:TransportClientSecurity>
+            </ns1:TransportSender>
+            <ns1:TransportReceiver>
+                <ns1:TransportProtocol ns1:version="1.1">HTTP</ns1:TransportProtocol>
+                <ns1:Endpoint ns1:uri="https://localhost:8888/digipoortStub" ns1:type="allPurpose"/>
+                <ns1:TransportServerSecurity>
+                    <ns1:TransportSecurityProtocol ns1:version="3.0">SSL</ns1:TransportSecurityProtocol>
+                    <ns1:ServerCertificateRef ns1:certId="DIGIPOORT_ServerCert"/>
+                    <ns1:ClientSecurityDetailsRef ns1:securityId="DIGIPOORT_TransportSecurity"/>
+                </ns1:TransportServerSecurity>
+            </ns1:TransportReceiver>
+        </ns1:Transport>
+        <ns1:DocExchange ns1:docExchangeId="DIGIPOORT_SIGNED_BestEffort">
+            <ns1:ebXMLSenderBinding ns1:version="2.0">
+                <ns1:SenderNonRepudiation>
+                    <ns1:NonRepudiationProtocol>http://www.w3.org/2000/09/xmldsig#</ns1:NonRepudiationProtocol>
+                    <ns1:HashFunction>http://www.w3.org/2000/09/xmldsig#sha1</ns1:HashFunction>
+                    <ns1:SignatureAlgorithm>http://www.w3.org/2000/09/xmldsig#rsa-sha1</ns1:SignatureAlgorithm>
+                    <ns1:SigningCertificateRef ns1:certId="DIGIPOORT_SigningCert"/>
+                </ns1:SenderNonRepudiation>
+            </ns1:ebXMLSenderBinding>
+            <ns1:ebXMLReceiverBinding ns1:version="2.0">
+                <ns1:ReceiverNonRepudiation>
+                    <ns1:NonRepudiationProtocol>http://www.w3.org/2000/09/xmldsig#</ns1:NonRepudiationProtocol>
+                    <ns1:HashFunction>http://www.w3.org/2000/09/xmldsig#sha1</ns1:HashFunction>
+                    <ns1:SignatureAlgorithm>http://www.w3.org/2000/09/xmldsig#rsa-sha1</ns1:SignatureAlgorithm>
+                    <ns1:SigningSecurityDetailsRef ns1:securityId="DIGIPOORT_Security"/>
+                </ns1:ReceiverNonRepudiation>
+            </ns1:ebXMLReceiverBinding>
+        </ns1:DocExchange>
+        <ns1:DocExchange ns1:docExchangeId="DIGIPOORT_SIGNED_ReliableMessaging">
+            <ns1:ebXMLSenderBinding ns1:version="2.0">
+                <ns1:ReliableMessaging>
+                    <ns1:Retries>5</ns1:Retries>
+                    <ns1:RetryInterval>PT5M</ns1:RetryInterval>
+                    <ns1:MessageOrderSemantics>NotGuaranteed</ns1:MessageOrderSemantics>
+                </ns1:ReliableMessaging>
+                <ns1:PersistDuration>PT30M</ns1:PersistDuration>
+                <ns1:SenderNonRepudiation>
+                    <ns1:NonRepudiationProtocol>http://www.w3.org/2000/09/xmldsig#</ns1:NonRepudiationProtocol>
+                    <ns1:HashFunction>http://www.w3.org/2000/09/xmldsig#sha1</ns1:HashFunction>
+                    <ns1:SignatureAlgorithm>http://www.w3.org/2000/09/xmldsig#rsa-sha1</ns1:SignatureAlgorithm>
+                    <ns1:SigningCertificateRef ns1:certId="DIGIPOORT_SigningCert"/>
+                </ns1:SenderNonRepudiation>
+            </ns1:ebXMLSenderBinding>
+            <ns1:ebXMLReceiverBinding ns1:version="2.0">
+                <ns1:ReliableMessaging>
+                    <ns1:Retries>5</ns1:Retries>
+                    <ns1:RetryInterval>PT5M</ns1:RetryInterval>
+                    <ns1:MessageOrderSemantics>NotGuaranteed</ns1:MessageOrderSemantics>
+                </ns1:ReliableMessaging>
+                <ns1:PersistDuration>PT30M</ns1:PersistDuration>
+                <ns1:ReceiverNonRepudiation>
+                    <ns1:NonRepudiationProtocol>http://www.w3.org/2000/09/xmldsig#</ns1:NonRepudiationProtocol>
+                    <ns1:HashFunction>http://www.w3.org/2000/09/xmldsig#sha1</ns1:HashFunction>
+                    <ns1:SignatureAlgorithm>http://www.w3.org/2000/09/xmldsig#rsa-sha1</ns1:SignatureAlgorithm>
+                    <ns1:SigningSecurityDetailsRef ns1:securityId="DIGIPOORT_Security"/>
+                </ns1:ReceiverNonRepudiation>
+            </ns1:ebXMLReceiverBinding>
+        </ns1:DocExchange>
+    </ns1:PartyInfo>
+    <ns1:PartyInfo ns1:partyName="Overheid" ns1:defaultMshChannelId="OVERHEID_defaultDeliveryChannel_ProfileBestEffortSigned" ns1:defaultMshPackageId="MshSignalPackage">
+        <ns1:PartyId ns1:type="urn:osb:oin">00000000000000000001</ns1:PartyId>
+        <ns1:PartyRef ns2:href=""/>
+        <ns1:CollaborationRole>
+            <ns1:ProcessSpecification ns1:name="afleveren" ns1:version="1.0" ns1:uuid="urn:overheidsservicebus.nl:osr:Afleveren:OsbAfleveren11$10" ns2:href="http://www.overheidsservicebus.nl/osr/Afleveren"/>
+            <ns1:Role ns1:name="OVERHEID" ns2:href="http://www.overheidsservicebus.nl/osr/"/>
+            <ns1:ServiceBinding>
+                <ns1:Service ns1:type="urn:osb:services">osb:afleveren:1.1$1.0</ns1:Service>
+                <ns1:CanSend>
+                    <ns1:ThisPartyActionBinding ns1:id="OVERHEID_S_BevestigAfleveren" ns1:action="bevestigAfleveren" ns1:packageId="XMLMessagePackage">
+                        <ns1:BusinessTransactionCharacteristics ns1:isNonRepudiationRequired="true" ns1:isNonRepudiationReceiptRequired="true" ns1:isConfidential="transient" ns1:isAuthenticated="transient-and-persistent" ns1:isTamperProof="transient-and-persistent" ns1:isAuthorizationRequired="true" ns1:isIntelligibleCheckRequired="false" ns1:timeToPerform="P2D"/>
+                        <ns1:ChannelId>OVERHEID_defaultDeliveryChannel_ProfileReliableMessagingSigned</ns1:ChannelId>
+                    </ns1:ThisPartyActionBinding>
+                    <ns1:OtherPartyActionBinding>DIGIPOORT_R_BevestigAfleveren</ns1:OtherPartyActionBinding>
+                </ns1:CanSend>
+                <ns1:CanReceive>
+                    <ns1:ThisPartyActionBinding ns1:id="OVERHEID_R_Afleveren" ns1:action="afleveren" ns1:packageId="XMLMessagePackage">
+                        <ns1:BusinessTransactionCharacteristics ns1:isNonRepudiationRequired="true" ns1:isNonRepudiationReceiptRequired="true" ns1:isConfidential="transient" ns1:isAuthenticated="transient-and-persistent" ns1:isTamperProof="transient-and-persistent" ns1:isAuthorizationRequired="true" ns1:isIntelligibleCheckRequired="false" ns1:timeToPerform="P2D"/>
+                        <ns1:ChannelId>OVERHEID_defaultDeliveryChannel_ProfileReliableMessagingSigned</ns1:ChannelId>
+                    </ns1:ThisPartyActionBinding>
+                    <ns1:OtherPartyActionBinding>DIGIPOORT_S_Afleveren</ns1:OtherPartyActionBinding>
+                </ns1:CanReceive>
+            </ns1:ServiceBinding>
+        </ns1:CollaborationRole>
+        <ns1:CollaborationRole>
+            <ns1:ProcessSpecification ns1:name="aanleveren" ns1:version="1.0" ns1:uuid="urn:overheidsservicebus.nl:osr:Aanleveren:OsbAanleveren10$10" ns2:href="http://www.overheidsservicebus.nl/osr/Aanleveren"/>
+            <ns1:Role ns1:name="OVERHEID" ns2:href="http://www.overheidsservicebus.nl/osr/"/>
+            <ns1:ServiceBinding>
+                <ns1:Service ns1:type="urn:osb:services">osb:aanleveren:1.1$1.0</ns1:Service>
+                <ns1:CanSend>
+                    <ns1:ThisPartyActionBinding ns1:id="OVERHEID_S_Aanleveren" ns1:action="aanleveren" ns1:packageId="XMLMessagePackage">
+                        <ns1:BusinessTransactionCharacteristics ns1:isNonRepudiationRequired="true" ns1:isNonRepudiationReceiptRequired="true" ns1:isConfidential="transient" ns1:isAuthenticated="transient-and-persistent" ns1:isTamperProof="transient-and-persistent" ns1:isAuthorizationRequired="true" ns1:isIntelligibleCheckRequired="false" ns1:timeToPerform="P2D"/>
+                        <ns1:ChannelId>OVERHEID_defaultDeliveryChannel_ProfileReliableMessagingSigned</ns1:ChannelId>
+                    </ns1:ThisPartyActionBinding>
+                    <ns1:OtherPartyActionBinding>DIGIPOORT_R_Aanleveren</ns1:OtherPartyActionBinding>
+                </ns1:CanSend>
+                <ns1:CanReceive>
+                    <ns1:ThisPartyActionBinding ns1:id="OVERHEID_R_BevestigAanleveren" ns1:action="bevestigAanleveren" ns1:packageId="XMLMessagePackage">
+                        <ns1:BusinessTransactionCharacteristics ns1:isNonRepudiationRequired="true" ns1:isNonRepudiationReceiptRequired="true" ns1:isConfidential="transient" ns1:isAuthenticated="transient-and-persistent" ns1:isTamperProof="transient-and-persistent" ns1:isAuthorizationRequired="true" ns1:isIntelligibleCheckRequired="false" ns1:timeToPerform="P2D"/>
+                        <ns1:ChannelId>OVERHEID_defaultDeliveryChannel_ProfileReliableMessagingSigned</ns1:ChannelId>
+                    </ns1:ThisPartyActionBinding>
+                    <ns1:OtherPartyActionBinding>DIGIPOORT_S_BevestigAanleveren</ns1:OtherPartyActionBinding>
+                </ns1:CanReceive>
+            </ns1:ServiceBinding>
+        </ns1:CollaborationRole>
+        <ns1:Certificate ns1:certId="OVERHEID_SigningCert">
+            <ns3:KeyInfo>
+				
+                
+                <ns3:KeyValue>
+					
+                    
+                    <ns3:RSAKeyValue>
+                        <ns3:Modulus>1KkdUYLsAJpvJc/sW+dblxhCP6Xn0UekqW4CEcpYW1AEf5ahth0bQ4+lZobEG2jVzRMA9DFapQf71AafkX8RjE3DYi6J+rl6PLWJ/OSyrUBGS1CEJc6HJS/uLsb020vumCnSBsWkfGPSaBBp9ZaO/mIY97JiUrYlwwEFjbGSHnU=</ns3:Modulus>
+                        <ns3:Exponent>AQAB</ns3:Exponent>
+                    </ns3:RSAKeyValue>
+				</ns3:KeyValue>
+				
+                
+                <ns3:X509Data>
+                    <ns3:X509IssuerSerial>
+                        <ns3:X509IssuerName>CN=www.clockwork.nl,OU=Clockwork,O=Ordina,L=Groningen,ST=Groningen,C=NL</ns3:X509IssuerName>
+                        <ns3:X509SerialNumber>1321267627</ns3:X509SerialNumber>
+                    </ns3:X509IssuerSerial>
+                    <ns3:X509SubjectName>CN=www.clockwork.nl,OU=Clockwork,O=Ordina,L=Groningen,ST=Groningen,C=NL</ns3:X509SubjectName>
+                    <ns3:X509Certificate>MIICYTCCAcqgAwIBAgIETsDxqzANBgkqhkiG9w0BAQUFADB1MQswCQYDVQQGEwJOTDESMBAGA1UECBMJR3JvbmluZ2VuMRIwEAYDVQQHEwlHcm9uaW5nZW4xDzANBgNVBAoTBk9yZGluYTESMBAGA1UECxMJQ2xvY2t3b3JrMRkwFwYDVQQDExB3d3cuY2xvY2t3b3JrLm5sMB4XDTExMTExNDEwNDcwN1oXDTIxMTExMTEwNDcwN1owdTELMAkGA1UEBhMCTkwxEjAQBgNVBAgTCUdyb25pbmdlbjESMBAGA1UEBxMJR3JvbmluZ2VuMQ8wDQYDVQQKEwZPcmRpbmExEjAQBgNVBAsTCUNsb2Nrd29yazEZMBcGA1UEAxMQd3d3LmNsb2Nrd29yay5ubDCBnzANBgkqhkiG9w0BAQEFAAOBjQAwgYkCgYEA1KkdUYLsAJpvJc/sW+dblxhCP6Xn0UekqW4CEcpYW1AEf5ahth0bQ4+lZobEG2jVzRMA9DFapQf71AafkX8RjE3DYi6J+rl6PLWJ/OSyrUBGS1CEJc6HJS/uLsb020vumCnSBsWkfGPSaBBp9ZaO/mIY97JiUrYlwwEFjbGSHnUCAwEAATANBgkqhkiG9w0BAQUFAAOBgQCwDPHKtmuz4jLkEwP3CkfOL9+Q4LxhgUV7GtPm1XKIMN4VUey1NkFJUB5qwJXY1I7ql/VtZLjV2mPhS1SZkMKdFZ5uTKEr/KqT9Fazib5mK4YXOvFpOcDNBvpKX2SpoHffgXmdrExQshpIDzzofex0y/Kg4mulDQUPwVuIZtbnlQ==</ns3:X509Certificate>
+                </ns3:X509Data>
+			</ns3:KeyInfo>
+        </ns1:Certificate>
+        <ns1:Certificate ns1:certId="OVERHEID_EncryptionCert">
+            <ns3:KeyInfo>
+				
+                
+                <ns3:KeyValue>
+					
+                    
+                    <ns3:RSAKeyValue>
+                        <ns3:Modulus>1KkdUYLsAJpvJc/sW+dblxhCP6Xn0UekqW4CEcpYW1AEf5ahth0bQ4+lZobEG2jVzRMA9DFapQf71AafkX8RjE3DYi6J+rl6PLWJ/OSyrUBGS1CEJc6HJS/uLsb020vumCnSBsWkfGPSaBBp9ZaO/mIY97JiUrYlwwEFjbGSHnU=</ns3:Modulus>
+                        <ns3:Exponent>AQAB</ns3:Exponent>
+                    </ns3:RSAKeyValue>
+				</ns3:KeyValue>
+				
+                
+                <ns3:X509Data>
+                    <ns3:X509IssuerSerial>
+                        <ns3:X509IssuerName>CN=www.clockwork.nl,OU=Clockwork,O=Ordina,L=Groningen,ST=Groningen,C=NL</ns3:X509IssuerName>
+                        <ns3:X509SerialNumber>1321267627</ns3:X509SerialNumber>
+                    </ns3:X509IssuerSerial>
+                    <ns3:X509SubjectName>CN=www.clockwork.nl,OU=Clockwork,O=Ordina,L=Groningen,ST=Groningen,C=NL</ns3:X509SubjectName>
+                    <ns3:X509Certificate>MIICYTCCAcqgAwIBAgIETsDxqzANBgkqhkiG9w0BAQUFADB1MQswCQYDVQQGEwJOTDESMBAGA1UECBMJR3JvbmluZ2VuMRIwEAYDVQQHEwlHcm9uaW5nZW4xDzANBgNVBAoTBk9yZGluYTESMBAGA1UECxMJQ2xvY2t3b3JrMRkwFwYDVQQDExB3d3cuY2xvY2t3b3JrLm5sMB4XDTExMTExNDEwNDcwN1oXDTIxMTExMTEwNDcwN1owdTELMAkGA1UEBhMCTkwxEjAQBgNVBAgTCUdyb25pbmdlbjESMBAGA1UEBxMJR3JvbmluZ2VuMQ8wDQYDVQQKEwZPcmRpbmExEjAQBgNVBAsTCUNsb2Nrd29yazEZMBcGA1UEAxMQd3d3LmNsb2Nrd29yay5ubDCBnzANBgkqhkiG9w0BAQEFAAOBjQAwgYkCgYEA1KkdUYLsAJpvJc/sW+dblxhCP6Xn0UekqW4CEcpYW1AEf5ahth0bQ4+lZobEG2jVzRMA9DFapQf71AafkX8RjE3DYi6J+rl6PLWJ/OSyrUBGS1CEJc6HJS/uLsb020vumCnSBsWkfGPSaBBp9ZaO/mIY97JiUrYlwwEFjbGSHnUCAwEAATANBgkqhkiG9w0BAQUFAAOBgQCwDPHKtmuz4jLkEwP3CkfOL9+Q4LxhgUV7GtPm1XKIMN4VUey1NkFJUB5qwJXY1I7ql/VtZLjV2mPhS1SZkMKdFZ5uTKEr/KqT9Fazib5mK4YXOvFpOcDNBvpKX2SpoHffgXmdrExQshpIDzzofex0y/Kg4mulDQUPwVuIZtbnlQ==</ns3:X509Certificate>
+                </ns3:X509Data>
+			</ns3:KeyInfo>
+        </ns1:Certificate>
+        <ns1:Certificate ns1:certId="OVERHEID_ServerCert">
+            <ns3:KeyInfo>
+				
+                
+                <ns3:KeyValue>
+					
+                    
+                    <ns3:RSAKeyValue>
+                        <ns3:Modulus>1KkdUYLsAJpvJc/sW+dblxhCP6Xn0UekqW4CEcpYW1AEf5ahth0bQ4+lZobEG2jVzRMA9DFapQf71AafkX8RjE3DYi6J+rl6PLWJ/OSyrUBGS1CEJc6HJS/uLsb020vumCnSBsWkfGPSaBBp9ZaO/mIY97JiUrYlwwEFjbGSHnU=</ns3:Modulus>
+                        <ns3:Exponent>AQAB</ns3:Exponent>
+                    </ns3:RSAKeyValue>
+				</ns3:KeyValue>
+				
+                
+                <ns3:X509Data>
+                    <ns3:X509IssuerSerial>
+                        <ns3:X509IssuerName>CN=www.clockwork.nl,OU=Clockwork,O=Ordina,L=Groningen,ST=Groningen,C=NL</ns3:X509IssuerName>
+                        <ns3:X509SerialNumber>1321267627</ns3:X509SerialNumber>
+                    </ns3:X509IssuerSerial>
+                    <ns3:X509SubjectName>CN=www.clockwork.nl,OU=Clockwork,O=Ordina,L=Groningen,ST=Groningen,C=NL</ns3:X509SubjectName>
+                    <ns3:X509Certificate>MIICYTCCAcqgAwIBAgIETsDxqzANBgkqhkiG9w0BAQUFADB1MQswCQYDVQQGEwJOTDESMBAGA1UECBMJR3JvbmluZ2VuMRIwEAYDVQQHEwlHcm9uaW5nZW4xDzANBgNVBAoTBk9yZGluYTESMBAGA1UECxMJQ2xvY2t3b3JrMRkwFwYDVQQDExB3d3cuY2xvY2t3b3JrLm5sMB4XDTExMTExNDEwNDcwN1oXDTIxMTExMTEwNDcwN1owdTELMAkGA1UEBhMCTkwxEjAQBgNVBAgTCUdyb25pbmdlbjESMBAGA1UEBxMJR3JvbmluZ2VuMQ8wDQYDVQQKEwZPcmRpbmExEjAQBgNVBAsTCUNsb2Nrd29yazEZMBcGA1UEAxMQd3d3LmNsb2Nrd29yay5ubDCBnzANBgkqhkiG9w0BAQEFAAOBjQAwgYkCgYEA1KkdUYLsAJpvJc/sW+dblxhCP6Xn0UekqW4CEcpYW1AEf5ahth0bQ4+lZobEG2jVzRMA9DFapQf71AafkX8RjE3DYi6J+rl6PLWJ/OSyrUBGS1CEJc6HJS/uLsb020vumCnSBsWkfGPSaBBp9ZaO/mIY97JiUrYlwwEFjbGSHnUCAwEAATANBgkqhkiG9w0BAQUFAAOBgQCwDPHKtmuz4jLkEwP3CkfOL9+Q4LxhgUV7GtPm1XKIMN4VUey1NkFJUB5qwJXY1I7ql/VtZLjV2mPhS1SZkMKdFZ5uTKEr/KqT9Fazib5mK4YXOvFpOcDNBvpKX2SpoHffgXmdrExQshpIDzzofex0y/Kg4mulDQUPwVuIZtbnlQ==</ns3:X509Certificate>
+                </ns3:X509Data>
+			</ns3:KeyInfo>
+        </ns1:Certificate>
+        <ns1:Certificate ns1:certId="OVERHEID_ClientCert">
+            <ns3:KeyInfo>
+				
+                
+                <ns3:KeyValue>
+					
+                    
+                    <ns3:RSAKeyValue>
+                        <ns3:Modulus>1KkdUYLsAJpvJc/sW+dblxhCP6Xn0UekqW4CEcpYW1AEf5ahth0bQ4+lZobEG2jVzRMA9DFapQf71AafkX8RjE3DYi6J+rl6PLWJ/OSyrUBGS1CEJc6HJS/uLsb020vumCnSBsWkfGPSaBBp9ZaO/mIY97JiUrYlwwEFjbGSHnU=</ns3:Modulus>
+                        <ns3:Exponent>AQAB</ns3:Exponent>
+                    </ns3:RSAKeyValue>
+				</ns3:KeyValue>
+				
+                
+                <ns3:X509Data>
+                    <ns3:X509IssuerSerial>
+                        <ns3:X509IssuerName>CN=www.clockwork.nl,OU=Clockwork,O=Ordina,L=Groningen,ST=Groningen,C=NL</ns3:X509IssuerName>
+                        <ns3:X509SerialNumber>1321267627</ns3:X509SerialNumber>
+                    </ns3:X509IssuerSerial>
+                    <ns3:X509SubjectName>CN=www.clockwork.nl,OU=Clockwork,O=Ordina,L=Groningen,ST=Groningen,C=NL</ns3:X509SubjectName>
+                    <ns3:X509Certificate>MIICYTCCAcqgAwIBAgIETsDxqzANBgkqhkiG9w0BAQUFADB1MQswCQYDVQQGEwJOTDESMBAGA1UECBMJR3JvbmluZ2VuMRIwEAYDVQQHEwlHcm9uaW5nZW4xDzANBgNVBAoTBk9yZGluYTESMBAGA1UECxMJQ2xvY2t3b3JrMRkwFwYDVQQDExB3d3cuY2xvY2t3b3JrLm5sMB4XDTExMTExNDEwNDcwN1oXDTIxMTExMTEwNDcwN1owdTELMAkGA1UEBhMCTkwxEjAQBgNVBAgTCUdyb25pbmdlbjESMBAGA1UEBxMJR3JvbmluZ2VuMQ8wDQYDVQQKEwZPcmRpbmExEjAQBgNVBAsTCUNsb2Nrd29yazEZMBcGA1UEAxMQd3d3LmNsb2Nrd29yay5ubDCBnzANBgkqhkiG9w0BAQEFAAOBjQAwgYkCgYEA1KkdUYLsAJpvJc/sW+dblxhCP6Xn0UekqW4CEcpYW1AEf5ahth0bQ4+lZobEG2jVzRMA9DFapQf71AafkX8RjE3DYi6J+rl6PLWJ/OSyrUBGS1CEJc6HJS/uLsb020vumCnSBsWkfGPSaBBp9ZaO/mIY97JiUrYlwwEFjbGSHnUCAwEAATANBgkqhkiG9w0BAQUFAAOBgQCwDPHKtmuz4jLkEwP3CkfOL9+Q4LxhgUV7GtPm1XKIMN4VUey1NkFJUB5qwJXY1I7ql/VtZLjV2mPhS1SZkMKdFZ5uTKEr/KqT9Fazib5mK4YXOvFpOcDNBvpKX2SpoHffgXmdrExQshpIDzzofex0y/Kg4mulDQUPwVuIZtbnlQ==</ns3:X509Certificate>
+                </ns3:X509Data>
+			</ns3:KeyInfo>
+        </ns1:Certificate>
+        <ns1:SecurityDetails ns1:securityId="OVERHEID_Security">
+            <ns1:TrustAnchors>
+                <ns1:AnchorCertificateRef ns1:certId="OVERHEID_SigningCert"/>
+                <ns1:AnchorCertificateRef ns1:certId="OVERHEID_EncryptionCert"/>
+            </ns1:TrustAnchors>
+        </ns1:SecurityDetails>
+        <ns1:SecurityDetails ns1:securityId="OVERHEID_TransportSecurity">
+            <ns1:TrustAnchors>
+                <ns1:AnchorCertificateRef ns1:certId="OVERHEID_ServerCert"/>
+                <ns1:AnchorCertificateRef ns1:certId="OVERHEID_ClientCert"/>
+            </ns1:TrustAnchors>
+        </ns1:SecurityDetails>
+        <ns1:DeliveryChannel ns1:channelId="OVERHEID_defaultDeliveryChannel_ProfileBestEffortSigned" ns1:transportId="OVERHEID_transport_HTTPS" ns1:docExchangeId="OVERHEID_SIGNED_BestEffort">
+            <ns1:MessagingCharacteristics ns1:syncReplyMode="none" ns1:ackRequested="never" ns1:ackSignatureRequested="never" ns1:duplicateElimination="never" ns1:actor="urn:oasis:names:tc:ebxml-msg:actor:toPartyMSH"/>
+        </ns1:DeliveryChannel>
+        <ns1:DeliveryChannel ns1:channelId="OVERHEID_defaultDeliveryChannel_ProfileReliableMessagingSigned" ns1:transportId="OVERHEID_transport_HTTPS" ns1:docExchangeId="OVERHEID_SIGNED_ReliableMessaging">
+            <ns1:MessagingCharacteristics ns1:syncReplyMode="none" ns1:ackRequested="always" ns1:ackSignatureRequested="never" ns1:duplicateElimination="always" ns1:actor="urn:oasis:names:tc:ebxml-msg:actor:toPartyMSH"/>
+        </ns1:DeliveryChannel>
+        <ns1:Transport ns1:transportId="OVERHEID_transport_HTTPS">
+            <ns1:TransportSender>
+                <ns1:TransportProtocol ns1:version="1.1">HTTP</ns1:TransportProtocol>
+                <ns1:TransportClientSecurity>
+                    <ns1:TransportSecurityProtocol ns1:version="3.0">SSL</ns1:TransportSecurityProtocol>
+                    <ns1:ClientCertificateRef ns1:certId="OVERHEID_ClientCert"/>
+                    <ns1:ServerSecurityDetailsRef ns1:securityId="OVERHEID_TransportSecurity"/>
+                </ns1:TransportClientSecurity>
+            </ns1:TransportSender>
+            <ns1:TransportReceiver>
+                <ns1:TransportProtocol ns1:version="1.1">HTTP</ns1:TransportProtocol>
+                <ns1:Endpoint ns1:uri="https://localhost:8088/overheidStub" ns1:type="allPurpose"/>
+                <ns1:TransportServerSecurity>
+                    <ns1:TransportSecurityProtocol ns1:version="3.0">SSL</ns1:TransportSecurityProtocol>
+                    <ns1:ServerCertificateRef ns1:certId="OVERHEID_ServerCert"/>
+                    <ns1:ClientSecurityDetailsRef ns1:securityId="OVERHEID_TransportSecurity"/>
+                </ns1:TransportServerSecurity>
+            </ns1:TransportReceiver>
+        </ns1:Transport>
+        <ns1:DocExchange ns1:docExchangeId="OVERHEID_SIGNED_BestEffort">
+            <ns1:ebXMLSenderBinding ns1:version="2.0">
+                <ns1:SenderNonRepudiation>
+                    <ns1:NonRepudiationProtocol>http://www.w3.org/2000/09/xmldsig#</ns1:NonRepudiationProtocol>
+                    <ns1:HashFunction>http://www.w3.org/2000/09/xmldsig#sha1</ns1:HashFunction>
+                    <ns1:SignatureAlgorithm>http://www.w3.org/2000/09/xmldsig#rsa-sha1</ns1:SignatureAlgorithm>
+                    <ns1:SigningCertificateRef ns1:certId="OVERHEID_SigningCert"/>
+                </ns1:SenderNonRepudiation>
+            </ns1:ebXMLSenderBinding>
+            <ns1:ebXMLReceiverBinding ns1:version="2.0">
+                <ns1:ReceiverNonRepudiation>
+                    <ns1:NonRepudiationProtocol>http://www.w3.org/2000/09/xmldsig#</ns1:NonRepudiationProtocol>
+                    <ns1:HashFunction>http://www.w3.org/2000/09/xmldsig#sha1</ns1:HashFunction>
+                    <ns1:SignatureAlgorithm>http://www.w3.org/2000/09/xmldsig#rsa-sha1</ns1:SignatureAlgorithm>
+                    <ns1:SigningSecurityDetailsRef ns1:securityId="OVERHEID_Security"/>
+                </ns1:ReceiverNonRepudiation>
+            </ns1:ebXMLReceiverBinding>
+        </ns1:DocExchange>
+        <ns1:DocExchange ns1:docExchangeId="OVERHEID_SIGNED_ReliableMessaging">
+            <ns1:ebXMLSenderBinding ns1:version="2.0">
+                <ns1:ReliableMessaging>
+                    <ns1:Retries>5</ns1:Retries>
+                    <ns1:RetryInterval>PT5M</ns1:RetryInterval>
+                    <ns1:MessageOrderSemantics>NotGuaranteed</ns1:MessageOrderSemantics>
+                </ns1:ReliableMessaging>
+                <ns1:PersistDuration>PT30M</ns1:PersistDuration>
+                <ns1:SenderNonRepudiation>
+                    <ns1:NonRepudiationProtocol>http://www.w3.org/2000/09/xmldsig#</ns1:NonRepudiationProtocol>
+                    <ns1:HashFunction>http://www.w3.org/2000/09/xmldsig#sha1</ns1:HashFunction>
+                    <ns1:SignatureAlgorithm>http://www.w3.org/2000/09/xmldsig#rsa-sha1</ns1:SignatureAlgorithm>
+                    <ns1:SigningCertificateRef ns1:certId="OVERHEID_SigningCert"/>
+                </ns1:SenderNonRepudiation>
+            </ns1:ebXMLSenderBinding>
+            <ns1:ebXMLReceiverBinding ns1:version="2.0">
+                <ns1:ReliableMessaging>
+                    <ns1:Retries>5</ns1:Retries>
+                    <ns1:RetryInterval>PT5M</ns1:RetryInterval>
+                    <ns1:MessageOrderSemantics>NotGuaranteed</ns1:MessageOrderSemantics>
+                </ns1:ReliableMessaging>
+                <ns1:PersistDuration>PT30M</ns1:PersistDuration>
+                <ns1:ReceiverNonRepudiation>
+                    <ns1:NonRepudiationProtocol>http://www.w3.org/2000/09/xmldsig#</ns1:NonRepudiationProtocol>
+                    <ns1:HashFunction>http://www.w3.org/2000/09/xmldsig#sha1</ns1:HashFunction>
+                    <ns1:SignatureAlgorithm>http://www.w3.org/2000/09/xmldsig#rsa-sha1</ns1:SignatureAlgorithm>
+                    <ns1:SigningSecurityDetailsRef ns1:securityId="OVERHEID_Security"/>
+                </ns1:ReceiverNonRepudiation>
+            </ns1:ebXMLReceiverBinding>
+        </ns1:DocExchange>
+    </ns1:PartyInfo>
+    <ns1:SimplePart ns1:id="MsgHdr" ns1:mimetype="text/xml">
+        <ns1:NamespaceSupported ns1:location="http://www.oasis-open.org/committees/ebxml-msg/schema/msg-header-2_0.xsd" ns1:version="2.0">http://www.oasis-open.org/committees/ebxml-msg/schema/msg-header-2_0.xsd</ns1:NamespaceSupported>
+    </ns1:SimplePart>
+    <ns1:SimplePart ns1:id="XMLMsg" ns1:mimetype="application/xml"/>
+    <ns1:Packaging ns1:id="MshSignalPackage">
+        <ns1:ProcessingCapabilities ns1:parse="true" ns1:generate="true"/>
+        <ns1:CompositeList>
+            <ns1:Composite ns1:id="MshSignal" ns1:mimetype="multipart/related" ns1:mimeparameters="type=text/xml">
+                <ns1:Constituent ns1:idref="MsgHdr"/>
+            </ns1:Composite>
+        </ns1:CompositeList>
+    </ns1:Packaging>
+    <ns1:Packaging ns1:id="XMLMessagePackage">
+        <ns1:ProcessingCapabilities ns1:parse="true" ns1:generate="true"/>
+        <ns1:CompositeList>
+            <ns1:Composite ns1:id="Message" ns1:mimetype="multipart/related" ns1:mimeparameters="type=text/xml">
+                <ns1:Constituent ns1:idref="MsgHdr"/>
+                <ns1:Constituent ns1:idref="XMLMsg"/>
+            </ns1:Composite>
+        </ns1:CompositeList>
+    </ns1:Packaging>
+</ns1:CollaborationProtocolAgreement>
+]]]]>><![CDATA[</CPA>
+      </ns:InsertCPA>
+   </soapenv:Body>
+</soapenv:Envelope>]]></con:request><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508" action="http://www.clockwork.nl/cpa/1.2/CPAService/InsertCPA"/><con:wsrmConfig version="1.2"/></con:call></con:operation><con:operation id="8c0fb7e7-0f2c-4510-9e86-ca4137b43ccd" isOneWay="false" action="" name="ValidateCPA" bindingOperationName="ValidateCPA" type="Request-Response" outputName="ValidateCPAResponse" inputName="ValidateCPA" receivesAttachments="false" sendsAttachments="false" anonymous="optional"><con:settings/><con:call id="1aee38f1-7d64-4b94-af7b-ad20d97403ef" name="Request 1"><con:settings/><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8089/adapter/cpa</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns="http://www.clockwork.nl/cpa/1.2">
+   <soapenv:Header/>
+   <soapenv:Body>
+      <ns:ValidateCPA>
+         <!--Optional:-->
+         <CPA>?</CPA>
+      </ns:ValidateCPA>
+   </soapenv:Body>
+</soapenv:Envelope>]]></con:request><con:wsaConfig mustUnderstand="NONE" version="200508" action="http://www.clockwork.nl/cpa/1.2/CPAService/ValidateCPA"/></con:call></con:operation></con:interface><con:interface xsi:type="con:WsdlInterface" id="ecd52471-7c5d-4cc9-95c9-c00d303496ae" wsaVersion="NONE" name="EbMSMessageServiceServiceSoapBinding" type="wsdl" bindingName="{http://www.clockwork.nl/ebms/1.2}EbMSMessageServiceServiceSoapBinding" soapVersion="1_1" anonymous="optional" definition="http://localhost:8089/adapter/ebms?wsdl" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:settings/><con:definitionCache type="TEXT" rootPart="http://localhost:8089/adapter/ebms?wsdl"><con:part><con:url>http://localhost:8089/adapter/ebms?wsdl</con:url><con:content><![CDATA[<wsdl:definitions name="EbMSMessageServiceService" targetNamespace="http://www.clockwork.nl/ebms/1.2" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:tns="http://www.clockwork.nl/ebms/1.2" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:ns1="http://schemas.xmlsoap.org/soap/http">
+  <wsdl:types>
+    <xs:schema attributeFormDefault="unqualified" elementFormDefault="unqualified" targetNamespace="http://www.clockwork.nl/ebms/1.2" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+      <xs:element name="GetMessage" type="tns:GetMessage"/>
+      <xs:element name="GetMessageIds" type="tns:GetMessageIds"/>
+      <xs:element name="GetMessageIdsResponse" type="tns:GetMessageIdsResponse"/>
+      <xs:element name="GetMessageResponse" type="tns:GetMessageResponse"/>
+      <xs:element name="GetMessageStatus" type="tns:GetMessageStatus"/>
+      <xs:element name="GetMessageStatusResponse" type="tns:GetMessageStatusResponse"/>
+      <xs:element name="Ping" type="tns:Ping"/>
+      <xs:element name="PingResponse" type="tns:PingResponse"/>
+      <xs:element name="ProcessMessage" type="tns:ProcessMessage"/>
+      <xs:element name="ProcessMessageResponse" type="tns:ProcessMessageResponse"/>
+      <xs:element name="ProcessMessages" type="tns:ProcessMessages"/>
+      <xs:element name="ProcessMessagesResponse" type="tns:ProcessMessagesResponse"/>
+      <xs:element name="SendMessage" type="tns:SendMessage"/>
+      <xs:element name="SendMessageResponse" type="tns:SendMessageResponse"/>
+      <xs:complexType name="SendMessage">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="Message" type="tns:ebMSMessageContent"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="ebMSMessageContent">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="context" type="tns:ebMSMessageContext"/>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="dataSources" nillable="true" type="tns:ebMSDataSource"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="ebMSMessageContext">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="action" type="xs:string"/>
+          <xs:element minOccurs="0" name="conversationId" type="xs:string"/>
+          <xs:element minOccurs="0" name="cpaId" type="xs:string"/>
+          <xs:element minOccurs="0" name="fromRole" type="xs:string"/>
+          <xs:element minOccurs="0" name="messageId" type="xs:string"/>
+          <xs:element minOccurs="0" name="refToMessageId" type="xs:string"/>
+          <xs:element minOccurs="0" name="sequenceNr" type="xs:int"/>
+          <xs:element minOccurs="0" name="service" type="xs:string"/>
+          <xs:element minOccurs="0" name="timestamp" type="xs:dateTime"/>
+          <xs:element minOccurs="0" name="toRole" type="xs:string"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="ebMSDataSource">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="content" type="xs:base64Binary"/>
+          <xs:element minOccurs="0" name="contentType" type="xs:string"/>
+          <xs:element minOccurs="0" name="name" type="xs:string"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="SendMessageResponse">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="MessageId" type="xs:string"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="GetMessageStatus">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="CPAId" type="xs:string"/>
+          <xs:element minOccurs="0" name="FromParty" type="xs:string"/>
+          <xs:element minOccurs="0" name="ToParty" type="xs:string"/>
+          <xs:element minOccurs="0" name="MessageId" type="xs:string"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="GetMessageStatusResponse">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="MessageStatus" type="tns:messageStatus"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="messageStatus">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="status" type="tns:ebMSMessageStatus"/>
+          <xs:element minOccurs="0" name="timestamp" type="xs:dateTime"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="GetMessageIds">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="MessageContext" type="tns:ebMSMessageContext"/>
+          <xs:element minOccurs="0" name="MaxNr" type="xs:int"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="GetMessageIdsResponse">
+        <xs:sequence>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="MessageIds" type="xs:string"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="ProcessMessage">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="MessageId" type="xs:string"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="ProcessMessageResponse">
+        <xs:sequence/>
+      </xs:complexType>
+      <xs:complexType name="GetMessage">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="MessageId" type="xs:string"/>
+          <xs:element minOccurs="0" name="Process" type="xs:boolean"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="GetMessageResponse">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="Message" type="tns:ebMSMessageContent"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="Ping">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="CPAId" type="xs:string"/>
+          <xs:element minOccurs="0" name="FromParty" type="xs:string"/>
+          <xs:element minOccurs="0" name="ToParty" type="xs:string"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="PingResponse">
+        <xs:sequence/>
+      </xs:complexType>
+      <xs:complexType name="ProcessMessages">
+        <xs:sequence>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="MessageId" type="xs:string"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="ProcessMessagesResponse">
+        <xs:sequence/>
+      </xs:complexType>
+      <xs:simpleType name="ebMSMessageStatus">
+        <xs:restriction base="xs:string">
+          <xs:enumeration value="UNAUTHORIZED"/>
+          <xs:enumeration value="NOT_RECOGNIZED"/>
+          <xs:enumeration value="RECEIVED"/>
+          <xs:enumeration value="PROCESSED"/>
+          <xs:enumeration value="FORWARDED"/>
+          <xs:enumeration value="FAILED"/>
+          <xs:enumeration value="SENT"/>
+          <xs:enumeration value="DELIVERED"/>
+          <xs:enumeration value="DELIVERY_ERROR"/>
+          <xs:enumeration value="DELIVERY_FAILED"/>
+        </xs:restriction>
+      </xs:simpleType>
+      <xs:element name="EbMSMessageServiceException" type="tns:EbMSMessageServiceException"/>
+      <xs:complexType name="EbMSMessageServiceException">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="message" type="xs:string"/>
+        </xs:sequence>
+      </xs:complexType>
+    </xs:schema>
+  </wsdl:types>
+  <wsdl:message name="SendMessage">
+    <wsdl:part element="tns:SendMessage" name="parameters"></wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="GetMessageIds">
+    <wsdl:part element="tns:GetMessageIds" name="parameters"></wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="ProcessMessage">
+    <wsdl:part element="tns:ProcessMessage" name="parameters"></wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="GetMessageStatusResponse">
+    <wsdl:part element="tns:GetMessageStatusResponse" name="parameters"></wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="GetMessage">
+    <wsdl:part element="tns:GetMessage" name="parameters"></wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="Ping">
+    <wsdl:part element="tns:Ping" name="parameters"></wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="ProcessMessageResponse">
+    <wsdl:part element="tns:ProcessMessageResponse" name="parameters"></wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="GetMessageResponse">
+    <wsdl:part element="tns:GetMessageResponse" name="parameters"></wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="ProcessMessagesResponse">
+    <wsdl:part element="tns:ProcessMessagesResponse" name="parameters"></wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="SendMessageResponse">
+    <wsdl:part element="tns:SendMessageResponse" name="parameters"></wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="GetMessageIdsResponse">
+    <wsdl:part element="tns:GetMessageIdsResponse" name="parameters"></wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="GetMessageStatus">
+    <wsdl:part element="tns:GetMessageStatus" name="parameters"></wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="PingResponse">
+    <wsdl:part element="tns:PingResponse" name="parameters"></wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="ProcessMessages">
+    <wsdl:part element="tns:ProcessMessages" name="parameters"></wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="EbMSMessageServiceException">
+    <wsdl:part element="tns:EbMSMessageServiceException" name="EbMSMessageServiceException"></wsdl:part>
+  </wsdl:message>
+  <wsdl:portType name="EbMSMessageService">
+    <wsdl:operation name="SendMessage">
+      <wsdl:input message="tns:SendMessage" name="SendMessage"></wsdl:input>
+      <wsdl:output message="tns:SendMessageResponse" name="SendMessageResponse"></wsdl:output>
+      <wsdl:fault message="tns:EbMSMessageServiceException" name="EbMSMessageServiceException"></wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="GetMessageStatus">
+      <wsdl:input message="tns:GetMessageStatus" name="GetMessageStatus"></wsdl:input>
+      <wsdl:output message="tns:GetMessageStatusResponse" name="GetMessageStatusResponse"></wsdl:output>
+      <wsdl:fault message="tns:EbMSMessageServiceException" name="EbMSMessageServiceException"></wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="GetMessageIds">
+      <wsdl:input message="tns:GetMessageIds" name="GetMessageIds"></wsdl:input>
+      <wsdl:output message="tns:GetMessageIdsResponse" name="GetMessageIdsResponse"></wsdl:output>
+      <wsdl:fault message="tns:EbMSMessageServiceException" name="EbMSMessageServiceException"></wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="ProcessMessage">
+      <wsdl:input message="tns:ProcessMessage" name="ProcessMessage"></wsdl:input>
+      <wsdl:output message="tns:ProcessMessageResponse" name="ProcessMessageResponse"></wsdl:output>
+      <wsdl:fault message="tns:EbMSMessageServiceException" name="EbMSMessageServiceException"></wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="GetMessage">
+      <wsdl:input message="tns:GetMessage" name="GetMessage"></wsdl:input>
+      <wsdl:output message="tns:GetMessageResponse" name="GetMessageResponse"></wsdl:output>
+      <wsdl:fault message="tns:EbMSMessageServiceException" name="EbMSMessageServiceException"></wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="Ping">
+      <wsdl:input message="tns:Ping" name="Ping"></wsdl:input>
+      <wsdl:output message="tns:PingResponse" name="PingResponse"></wsdl:output>
+      <wsdl:fault message="tns:EbMSMessageServiceException" name="EbMSMessageServiceException"></wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="ProcessMessages">
+      <wsdl:input message="tns:ProcessMessages" name="ProcessMessages"></wsdl:input>
+      <wsdl:output message="tns:ProcessMessagesResponse" name="ProcessMessagesResponse"></wsdl:output>
+      <wsdl:fault message="tns:EbMSMessageServiceException" name="EbMSMessageServiceException"></wsdl:fault>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="EbMSMessageServiceServiceSoapBinding" type="tns:EbMSMessageService">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsdl:operation name="SendMessage">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="SendMessage">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="SendMessageResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="EbMSMessageServiceException">
+        <soap:fault name="EbMSMessageServiceException" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="GetMessageStatus">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="GetMessageStatus">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="GetMessageStatusResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="EbMSMessageServiceException">
+        <soap:fault name="EbMSMessageServiceException" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="GetMessageIds">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="GetMessageIds">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="GetMessageIdsResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="EbMSMessageServiceException">
+        <soap:fault name="EbMSMessageServiceException" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="ProcessMessage">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="ProcessMessage">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="ProcessMessageResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="EbMSMessageServiceException">
+        <soap:fault name="EbMSMessageServiceException" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="GetMessage">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="GetMessage">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="GetMessageResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="EbMSMessageServiceException">
+        <soap:fault name="EbMSMessageServiceException" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="Ping">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="Ping">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="PingResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="EbMSMessageServiceException">
+        <soap:fault name="EbMSMessageServiceException" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="ProcessMessages">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="ProcessMessages">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="ProcessMessagesResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="EbMSMessageServiceException">
+        <soap:fault name="EbMSMessageServiceException" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="EbMSMessageServiceService">
+    <wsdl:port binding="tns:EbMSMessageServiceServiceSoapBinding" name="EbMSMessageServicePort">
+      <soap:address location="http://localhost:8089/adapter/ebms"/>
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>]]></con:content><con:type>http://schemas.xmlsoap.org/wsdl/</con:type></con:part></con:definitionCache><con:endpoints><con:endpoint>http://localhost:8089/adapter/ebms</con:endpoint></con:endpoints><con:operation id="4e4d1837-40f4-459f-8e56-48b2716ce0d4" isOneWay="false" action="" name="GetMessage" bindingOperationName="GetMessage" type="Request-Response" outputName="GetMessageResponse" inputName="GetMessage" receivesAttachments="false" sendsAttachments="false" anonymous="optional"><con:settings/><con:call id="bb0f0ad4-1528-4a5d-98cf-d4d4188c2693" name="Request 1"><con:settings/><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8089/adapter/ebms</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns="http://www.clockwork.nl/ebms/1.2">
+   <soapenv:Header/>
+   <soapenv:Body>
+      <ns:GetMessage>
+         <!--Optional:-->
+         <MessageId>?</MessageId>
+         <!--Optional:-->
+         <Process>?</Process>
+      </ns:GetMessage>
+   </soapenv:Body>
+</soapenv:Envelope>]]></con:request><con:wsaConfig mustUnderstand="NONE" version="200508" action="http://www.clockwork.nl/ebms/1.2/EbMSMessageService/GetMessage"/></con:call></con:operation><con:operation id="8902e399-f208-41e4-9a90-dfa6f4c0c3c7" isOneWay="false" action="" name="GetMessageIds" bindingOperationName="GetMessageIds" type="Request-Response" outputName="GetMessageIdsResponse" inputName="GetMessageIds" receivesAttachments="false" sendsAttachments="false" anonymous="optional"><con:settings/><con:call id="14b07722-9aba-4fa2-a56b-d81913559c09" name="Request 1"><con:settings/><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8089/adapter/ebms</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns="http://www.clockwork.nl/ebms/1.2">
+   <soapenv:Header/>
+   <soapenv:Body>
+      <ns:GetMessageIds>
+         <!--Optional:-->
+         <MessageContext>
+            <!--Optional:-->
+            <action>?</action>
+            <!--Optional:-->
+            <conversationId>?</conversationId>
+            <!--Optional:-->
+            <cpaId>?</cpaId>
+            <!--Optional:-->
+            <fromRole>?</fromRole>
+            <!--Optional:-->
+            <messageId>?</messageId>
+            <!--Optional:-->
+            <refToMessageId>?</refToMessageId>
+            <!--Optional:-->
+            <sequenceNr>?</sequenceNr>
+            <!--Optional:-->
+            <service>?</service>
+            <!--Optional:-->
+            <timestamp>?</timestamp>
+            <!--Optional:-->
+            <toRole>?</toRole>
+         </MessageContext>
+         <!--Optional:-->
+         <MaxNr>?</MaxNr>
+      </ns:GetMessageIds>
+   </soapenv:Body>
+</soapenv:Envelope>]]></con:request><con:wsaConfig mustUnderstand="NONE" version="200508" action="http://www.clockwork.nl/ebms/1.2/EbMSMessageService/GetMessageIds"/></con:call></con:operation><con:operation id="2750a5a9-0284-494c-8aba-61eaedb4ef88" isOneWay="false" action="" name="GetMessageStatus" bindingOperationName="GetMessageStatus" type="Request-Response" outputName="GetMessageStatusResponse" inputName="GetMessageStatus" receivesAttachments="false" sendsAttachments="false" anonymous="optional"><con:settings/><con:call id="1cfd8d6b-75b3-474d-8307-a2e6ed015192" name="Request 1"><con:settings/><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8089/adapter/ebms</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns="http://www.clockwork.nl/ebms/1.2">
+   <soapenv:Header/>
+   <soapenv:Body>
+      <ns:GetMessageStatus>
+         <!--Optional:-->
+         <CPAId>?</CPAId>
+         <!--Optional:-->
+         <FromParty>?</FromParty>
+         <!--Optional:-->
+         <ToParty>?</ToParty>
+         <!--Optional:-->
+         <MessageId>?</MessageId>
+      </ns:GetMessageStatus>
+   </soapenv:Body>
+</soapenv:Envelope>]]></con:request><con:wsaConfig mustUnderstand="NONE" version="200508" action="http://www.clockwork.nl/ebms/1.2/EbMSMessageService/GetMessageStatus"/></con:call></con:operation><con:operation id="979b4634-f7c9-4119-b4b9-0d3068f5dae5" isOneWay="false" action="" name="Ping" bindingOperationName="Ping" type="Request-Response" outputName="PingResponse" inputName="Ping" receivesAttachments="false" sendsAttachments="false" anonymous="optional"><con:settings/><con:call id="184c0a79-1456-4642-a6a7-7f7ec2ebc674" name="Request 1"><con:settings/><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8089/adapter/ebms</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns="http://www.clockwork.nl/ebms/1.2">
+   <soapenv:Header/>
+   <soapenv:Body>
+      <ns:Ping>
+         <!--Optional:-->
+         <CPAId>?</CPAId>
+         <!--Optional:-->
+         <FromParty>?</FromParty>
+         <!--Optional:-->
+         <ToParty>?</ToParty>
+      </ns:Ping>
+   </soapenv:Body>
+</soapenv:Envelope>]]></con:request><con:wsaConfig mustUnderstand="NONE" version="200508" action="http://www.clockwork.nl/ebms/1.2/EbMSMessageService/Ping"/></con:call></con:operation><con:operation id="3a82ff83-e356-4df2-a6ae-e0fbf0fb8ac8" isOneWay="false" action="" name="ProcessMessage" bindingOperationName="ProcessMessage" type="Request-Response" outputName="ProcessMessageResponse" inputName="ProcessMessage" receivesAttachments="false" sendsAttachments="false" anonymous="optional"><con:settings/><con:call id="712643af-6343-48a2-95f4-150d68fce637" name="Request 1"><con:settings/><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8089/adapter/ebms</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns="http://www.clockwork.nl/ebms/1.2">
+   <soapenv:Header/>
+   <soapenv:Body>
+      <ns:ProcessMessage>
+         <!--Optional:-->
+         <MessageId>?</MessageId>
+      </ns:ProcessMessage>
+   </soapenv:Body>
+</soapenv:Envelope>]]></con:request><con:wsaConfig mustUnderstand="NONE" version="200508" action="http://www.clockwork.nl/ebms/1.2/EbMSMessageService/ProcessMessage"/></con:call></con:operation><con:operation id="6a0c31bc-7321-4ca6-9776-382428e326d7" isOneWay="false" action="" name="ProcessMessages" bindingOperationName="ProcessMessages" type="Request-Response" outputName="ProcessMessagesResponse" inputName="ProcessMessages" receivesAttachments="false" sendsAttachments="false" anonymous="optional"><con:settings/><con:call id="cdad6aba-292c-468b-a8b4-5d2d389d913f" name="Request 1"><con:settings/><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8089/adapter/ebms</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns="http://www.clockwork.nl/ebms/1.2">
+   <soapenv:Header/>
+   <soapenv:Body>
+      <ns:ProcessMessages>
+         <!--Zero or more repetitions:-->
+         <MessageId>?</MessageId>
+      </ns:ProcessMessages>
+   </soapenv:Body>
+</soapenv:Envelope>]]></con:request><con:wsaConfig mustUnderstand="NONE" version="200508" action="http://www.clockwork.nl/ebms/1.2/EbMSMessageService/ProcessMessages"/></con:call></con:operation><con:operation id="2ad7fac7-4ca5-413d-af49-5d716a6f4990" isOneWay="false" action="" name="SendMessage" bindingOperationName="SendMessage" type="Request-Response" outputName="SendMessageResponse" inputName="SendMessage" receivesAttachments="false" sendsAttachments="false" anonymous="optional"><con:settings/><con:call id="54447158-7678-4832-a5f0-f46a3de0d031" name="Request 1"><con:settings/><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8089/adapter/ebms</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns="http://www.clockwork.nl/ebms/1.2">
+   <soapenv:Header/>
+   <soapenv:Body>
+      <ns:SendMessage>
+         <!--Optional:-->
+         <Message>
+            <!--Optional:-->
+            <context>
+               <!--Optional:-->
+               <action>?</action>
+               <!--Optional:-->
+               <conversationId>?</conversationId>
+               <!--Optional:-->
+               <cpaId>?</cpaId>
+               <!--Optional:-->
+               <fromRole>?</fromRole>
+               <!--Optional:-->
+               <messageId>?</messageId>
+               <!--Optional:-->
+               <refToMessageId>?</refToMessageId>
+               <!--Optional:-->
+               <sequenceNr>?</sequenceNr>
+               <!--Optional:-->
+               <service>?</service>
+               <!--Optional:-->
+               <timestamp>?</timestamp>
+               <!--Optional:-->
+               <toRole>?</toRole>
+            </context>
+            <!--Zero or more repetitions:-->
+            <dataSources>
+               <!--Optional:-->
+               <content>cid:360889819758</content>
+               <!--Optional:-->
+               <contentType>?</contentType>
+               <!--Optional:-->
+               <name>?</name>
+            </dataSources>
+         </Message>
+      </ns:SendMessage>
+   </soapenv:Body>
+</soapenv:Envelope>]]></con:request><con:wsaConfig mustUnderstand="NONE" version="200508" action="http://www.clockwork.nl/ebms/1.2/EbMSMessageService/SendMessage"/></con:call></con:operation></con:interface><con:properties/><con:wssContainer/><con:oAuth2ProfileContainer/></con:soapui-project>
