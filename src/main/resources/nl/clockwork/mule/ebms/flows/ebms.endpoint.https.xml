@@ -40,7 +40,7 @@
 	</https:connector>  
 
 	<flow name="ebms.https.receive">
-		<https:inbound-endpoint connector-ref="connector.https.ebms.in" address="https://${service.host}:${service.port}${service.url}" exchange-pattern="request-response"/>
+		<https:inbound-endpoint connector-ref="connector.https.ebms.in" address="https://${service.host}:${service.port}${service.path}" exchange-pattern="request-response"/>
 		<component>
 			<singleton-object class="nl.clockwork.mule.ebms.processor.EbMSHttpHandler">
 				<property key="ebMSMessageProcessor" value-ref="messageProcessor"/>

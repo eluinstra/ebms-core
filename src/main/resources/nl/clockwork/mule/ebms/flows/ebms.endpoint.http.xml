@@ -38,7 +38,7 @@
 	</http:connector>
 	
 	<flow name="ebms.http.receive">
-		<http:inbound-endpoint connector-ref="connector.http.ebms.in" address="http://${service.host}:${service.port}${service.url}" exchange-pattern="request-response"/>
+		<http:inbound-endpoint connector-ref="connector.http.ebms.in" address="http://${service.host}:${service.port}${service.path}" exchange-pattern="request-response"/>
 		<component>
 			<singleton-object class="nl.clockwork.mule.ebms.processor.EbMSHttpHandler">
 				<property key="ebMSMessageProcessor" value-ref="messageProcessor"/>
