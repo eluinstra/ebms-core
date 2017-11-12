@@ -83,7 +83,7 @@ public class EbMSProxy
 	}
 	public boolean useProxy(String url)
 	{
-		return StringUtils.isNotBlank(host) && !nonProxyHosts.contains(url);
+		return StringUtils.isNotBlank(host);
 	}
 	public boolean useProxyAuthorization()
 	{
