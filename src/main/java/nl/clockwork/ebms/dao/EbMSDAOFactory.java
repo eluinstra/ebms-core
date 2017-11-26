@@ -59,6 +59,12 @@ public class EbMSDAOFactory extends AbstractDAOFactory<EbMSDAO>
 		return new nl.clockwork.ebms.dao.mssql.EbMSDAOImpl(transactionTemplate,jdbcTemplate);
 	}
 
+	@Override
+	public EbMSDAO createDB2DAO()
+	{
+		return new nl.clockwork.ebms.dao.db2.EbMSDAOImpl(transactionTemplate,jdbcTemplate);
+	}
+
 	public void setTransactionTemplate(TransactionTemplate transactionTemplate)
 	{
 		this.transactionTemplate = transactionTemplate;

@@ -42,6 +42,8 @@ public abstract class AbstractDAOFactory<T> implements FactoryBean<T>
 			return createMsSqlDAO();
 		else if ("com.microsoft.sqlserver.jdbc.SQLServerDriver".equals(((ComboPooledDataSource)dataSource).getDriverClass()))
 			return createMsSqlDAO();
+		else if ("com.ibm.db2.jcc.DB2Driver".equals(((ComboPooledDataSource)dataSource).getDriverClass()))
+			return createDB2DAO();
 		throw new RuntimeException("SQL Driver " + ((ComboPooledDataSource)dataSource).getDriverClass() + " not recognized!");
 	}
 
@@ -63,6 +65,8 @@ public abstract class AbstractDAOFactory<T> implements FactoryBean<T>
 	public abstract T createOracleDAO();
 
 	public abstract T createMsSqlDAO();
+
+	public abstract T createDB2DAO();
 
 	public void setDataSource(DataSource dataSource)
 	{
@@ -100,6 +104,13 @@ public abstract class AbstractDAOFactory<T> implements FactoryBean<T>
 		{
 			throw new RuntimeException("MSSQL not supported!");
 		}
+
+		@Override
+		public U createDB2DAO()
+		{
+			throw new RuntimeException("DB2 not supported!");
+		}
+
 	}
 
 }
