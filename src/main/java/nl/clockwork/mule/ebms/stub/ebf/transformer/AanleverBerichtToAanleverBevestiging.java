@@ -89,7 +89,7 @@ public class AanleverBerichtToAanleverBevestiging extends AbstractMessageTransfo
 				aanleverBevestiging.setFout(error);
 
 			List<EbMSDataSource> dataSources = new ArrayList<EbMSDataSource>();
-			dataSources.add(new EbMSDataSource(name,null,"application/xml",XMLMessageBuilder.getInstance(BevestigAanleverBericht.class).handle(aanleverBevestiging).getBytes()));
+			dataSources.add(new EbMSDataSource(name,"application/xml",XMLMessageBuilder.getInstance(BevestigAanleverBericht.class).handle(aanleverBevestiging).getBytes()));
 
 			EbMSMessageContext messageContext = new EbMSMessageContext();
 			messageContext.setCpaId(cpaId);

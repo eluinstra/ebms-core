@@ -41,7 +41,7 @@ public class XMLToEbMSDataSourceEnricher extends AbstractMessageTransformer
 	public Object transformMessage(final MuleMessage message, String outputEncoding) throws TransformerException
 	{
 		String fileName = message.getProperty("originalFilename",PropertyScope.SESSION);
-		EbMSDataSource dataSource = new EbMSDataSource(fileName,null,"application/xml",((String)message.getPayload()).getBytes());
+		EbMSDataSource dataSource = new EbMSDataSource(fileName,"application/xml",((String)message.getPayload()).getBytes());
 		message.setPayload(Arrays.asList(dataSource));
 		return message;
 	}

@@ -23,7 +23,7 @@
 	<artifactId>ebms-adapter-mule3</artifactId>
 	<packaging>mule</packaging>
 	<name>Mule3 EbMS Adapter</name>
-	<version>2.14.0</version>
+	<version>2.13.5</version>
 	<description></description>
 	<url>https://sourceforge.net/projects/muleebmsadapter/</url>
 	<issueManagement>
@@ -194,7 +194,7 @@
 		<dependency>
 			<groupId>nl.clockwork.ebms</groupId>
 			<artifactId>ebms-core</artifactId>
-			<version>2.14.0</version>
+			<version>2.13.5</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.activemq</groupId>
