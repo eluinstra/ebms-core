@@ -65,7 +65,7 @@ public class AfleverBerichtToAfleverBevestiging extends AbstractMessageTransform
 				afleverBevestiging.setFout(error);
 
 			List<EbMSDataSource> dataSources = new ArrayList<EbMSDataSource>();
-			dataSources.add(new EbMSDataSource(null,"application/xml",XMLMessageBuilder.getInstance(BevestigAfleverBericht.class).handle(afleverBevestiging).getBytes()));
+			dataSources.add(new EbMSDataSource(null,null,"application/xml",XMLMessageBuilder.getInstance(BevestigAfleverBericht.class).handle(afleverBevestiging).getBytes()));
 
 			EbMSMessageContext messageContext = new EbMSMessageContext();
 			messageContext.setCpaId(cpaId);
