@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!--
 
     Copyright 2011 Clockwork
@@ -15,17 +15,15 @@
     See the License for the specific language governing permissions and
     limitations under the License.
 
--->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+--><project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>nl.clockwork.ebms.mule</groupId>
-	<artifactId>ebms-adapter-mule3_8</artifactId>
+	<artifactId>ebms-adapter-mule3_9</artifactId>
 	<packaging>mule</packaging>
-	<name>Mule3_8 EbMS Adapter</name>
+	<name>Mule3_9 EbMS Adapter</name>
 	<version>2.13.3-bvv</version>
-	<description></description>
+	<description/>
 	<url>https://sourceforge.net/projects/muleebmsadapter/</url>
 	<issueManagement>
 		<system>Tickets</system>
@@ -58,7 +56,7 @@
 
 		<jdk.version>1.8</jdk.version>
 
-		<mule.version>3.8.0</mule.version>
+		<mule.version>3.9.0</mule.version>
     	<mule.tools.version>1.2</mule.tools.version>
 
 		<activemq.version>5.10.0</activemq.version>
@@ -89,7 +87,7 @@
 										</goals>
 									</pluginExecutionFilter>
 									<action>
-										<ignore></ignore>
+										<ignore/>
 									</action>
 								</pluginExecution>
 								<pluginExecution>
@@ -102,7 +100,7 @@
 										</goals>
 									</pluginExecutionFilter>
 									<action>
-										<ignore></ignore>
+										<ignore/>
 									</action>
 								</pluginExecution>
 							</pluginExecutions>
