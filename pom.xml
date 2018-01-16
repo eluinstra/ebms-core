@@ -19,9 +19,9 @@
 
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>nl.clockwork.ebms.mule</groupId>
-	<artifactId>ebms-adapter-mule3_8</artifactId>
+	<artifactId>ebms-adapter-mule3_9</artifactId>
 	<packaging>mule</packaging>
-	<name>Mule3_8 EbMS Adapter</name>
+	<name>Mule3_9 EbMS Adapter</name>
 	<version>1.6.2d</version>
 	<description/>
 	<url>https://sourceforge.net/projects/muleebmsadapter/</url>
