@@ -13,8 +13,8 @@
 <!-- 			<PatternLayout pattern="%d [%t] %-5p %c - %m%n" /> -->
 <!-- 		</ConsoleAppender> -->
 		<RollingFile name="file" 
-			fileName="${sys:mule.home}${sys:file.separator}logs${sys:file.separator}ebms-adapter-mule3-bvv.log"
-			filePattern="${sys:mule.home}${sys:file.separator}logs${sys:file.separator}ebms-adapter-mule3-bvv-%d{yyyy-MM-dd}.log">
+			fileName="${sys:mule.home}${sys:file.separator}logs${sys:file.separator}ebms-adapter-mule3.log"
+			filePattern="${sys:mule.home}${sys:file.separator}logs${sys:file.separator}ebms-adapter-mule3-%d{yyyy-MM-dd}.log">
 			<PatternLayout pattern="%d [%t] %-5p %c - %m%n" />
 			<Policies>
 				<TimeBasedTriggeringPolicy interval="1"/>

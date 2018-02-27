@@ -41,7 +41,7 @@
 				<list>
 					<value>classpath:nl/clockwork/ebms/default.properties</value>   
 					<value>classpath:nl/clockwork/mule/ebms/default.properties</value>   
-					<value>file:${mule.home}/conf/ebms.adapter.bvv.properties</value>
+					<value>file:${mule.home}/conf/ebms.adapter.properties</value>
 				</list>
 			</property>
 		</bean>
