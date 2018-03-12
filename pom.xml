@@ -124,12 +124,12 @@
 		<dependency>
 			<groupId>commons-codec</groupId>
 			<artifactId>commons-codec</artifactId>
-			<version>1.7</version>
+			<version>1.10</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.santuario</groupId>
 			<artifactId>xmlsec</artifactId>
-			<version>1.5.3</version>
+			<version>1.5.8</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.james</groupId>
