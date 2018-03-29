@@ -1,1 +1,1 @@
-ALTER TABLE ebms_message ADD COLUMN persist_time DATETIME NULL;
+ALTER TABLE ebms_message ADD persist_time DATETIME NULL;
