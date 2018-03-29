@@ -73,11 +73,14 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 {
 	protected TransactionTemplate transactionTemplate;
 	protected JdbcTemplate jdbcTemplate;
+	protected String serverId;
 	
-	public AbstractEbMSDAO(TransactionTemplate transactionTemplate, JdbcTemplate jdbcTemplate)
+	public AbstractEbMSDAO(TransactionTemplate transactionTemplate, JdbcTemplate jdbcTemplate, boolean identifyServer, String serverId)
 	{
 		this.transactionTemplate = transactionTemplate;
 		this.jdbcTemplate = jdbcTemplate;
+		if (identifyServer)
+			this.serverId = serverId;
 	}
 
 	@Override
@@ -1031,6 +1034,8 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 				"select cpa_id, channel_id, message_id, time_to_live, time_stamp, is_confidential, retries" +
 				" from ebms_event" +
 				" where time_stamp <= ?" +
+				//(serverId == null ? "" : " and server_id = " + serverId) +
+				" and (server_id = ? or (server_id is null and ? is null))" +
 				" order by time_stamp asc",
 				new ParameterizedRowMapper<EbMSEvent>()
 				{
@@ -1040,7 +1045,9 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 						return new EbMSEvent(rs.getString("cpa_id"),rs.getString("channel_id"),rs.getString("message_id"),rs.getTimestamp("time_to_live"),rs.getTimestamp("time_stamp"),rs.getBoolean("is_confidential"),rs.getInt("retries"));
 					}
 				},
-				timestamp
+				timestamp,
+				serverId,
+				serverId
 			);
 		}
 		catch (DataAccessException e)
@@ -1062,15 +1069,17 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 					"time_to_live," +
 					"time_stamp," +
 					"is_confidential," +
-					"retries" +
-				") values (?,?,?,?,?,?,?)",
+					"retries," +
+					"server_id" +
+				") values (?,?,?,?,?,?,?,?)",
 				event.getCpaId(),
 				event.getDeliveryChannelId(),
 				event.getMessageId(),
 				event.getTimeToLive(),
 				event.getTimestamp(),
 				event.isConfidential(),
-				event.getRetries()
+				event.getRetries(),
+				serverId
 			);
 		}
 		catch (DataAccessException e)

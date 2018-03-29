@@ -57,6 +57,7 @@ CREATE TABLE ebms_event
 	time_stamp				TIMESTAMP				NOT NULL,
 	is_confidential		SMALLINT				NOT NULL,
 	retries						SMALLINT				NOT NULL WITH DEFAULT 0,
+	server_id					VARCHAR(256)		NULL,
 	UNIQUE(message_id)
 );
 

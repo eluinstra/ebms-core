@@ -54,7 +54,8 @@ CREATE TABLE ebms_event
 	time_to_live			DATETIME				NULL,
 	time_stamp				DATETIME				NOT NULL,
 	is_confidential		BIT							NOT NULL,
-	retries						SMALLINT				DEFAULT 0 NOT NULL
+	retries						SMALLINT				DEFAULT 0 NOT NULL,
+	server_id					VARCHAR(256)		NULL
 );
 
 CREATE INDEX i_ebms_event ON ebms_event (time_stamp);

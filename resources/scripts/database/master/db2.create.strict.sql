@@ -60,6 +60,7 @@ CREATE TABLE ebms_event
 	time_stamp				TIMESTAMP				NOT NULL,
 	is_confidential		SMALLINT				NOT NULL,
 	retries						SMALLINT				NOT NULL WITH DEFAULT 0,
+	server_id					VARCHAR(256)		NULL,
 	FOREIGN KEY (cpa_id) REFERENCES cpa(cpa_id),
 	FOREIGN KEY (message_id,message_nr) REFERENCES ebms_message (message_id,message_nr),
 	UNIQUE(message_id)

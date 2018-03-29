@@ -43,9 +43,9 @@ import org.springframework.transaction.support.TransactionTemplate;
 
 public class EbMSDAOImpl extends nl.clockwork.ebms.dao.mysql.EbMSDAOImpl
 {
-	public EbMSDAOImpl(TransactionTemplate transactionTemplate, JdbcTemplate jdbcTemplate)
+	public EbMSDAOImpl(TransactionTemplate transactionTemplate, JdbcTemplate jdbcTemplate, boolean identifyServer, String serverId)
 	{
-		super(transactionTemplate,jdbcTemplate);
+		super(transactionTemplate,jdbcTemplate,identifyServer,serverId);
 	}
 
 	@Override

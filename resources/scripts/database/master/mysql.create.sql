@@ -59,7 +59,8 @@ CREATE TABLE ebms_event
 	time_to_live			TIMESTAMP				NULL,
 	time_stamp				TIMESTAMP				NOT NULL,
 	is_confidential		TINYINT(1)			NOT NULL,
-	retries						SMALLINT				DEFAULT 0 NOT NULL
+	retries						SMALLINT				DEFAULT 0 NOT NULL,
+	server_id					VARCHAR(256)		NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 ALTER TABLE ebms_event ADD CONSTRAINT uc_ebms_event UNIQUE (message_id(255));
