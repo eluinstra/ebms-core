@@ -266,6 +266,7 @@
 		<property name="type" value="${eventListener.type}" />
 		<property name="ebMSDAO" ref="ebMSDAO" />
 		<property name="jmsBrokerURL" value="${jms.brokerURL}" />
+		<property name="jmsVirtualTopics" value="${jms.virtualTopics:false}" />
 	</bean>
 
 </beans>

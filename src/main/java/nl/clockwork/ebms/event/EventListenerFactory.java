@@ -19,9 +19,11 @@ import java.util.HashMap;
 
 import javax.jms.Destination;
 
+import nl.clockwork.ebms.Constants.EbMSMessageEventType;
 import nl.clockwork.ebms.dao.EbMSDAO;
 
 import org.apache.activemq.command.ActiveMQQueue;
+import org.apache.activemq.command.ActiveMQTopic;
 import org.apache.activemq.pool.PooledConnectionFactory;
 import org.apache.activemq.spring.ActiveMQConnectionFactory;
 import org.apache.commons.logging.Log;
@@ -40,6 +42,7 @@ public class EventListenerFactory implements FactoryBean<EventListener>
 	private EventListenerType type;
 	private EbMSDAO ebMSDAO;
 	private String jmsBrokerURL;
+	private boolean jmsVirtualTopics;
 
 	@Override
 	public EventListener getObject() throws Exception
@@ -51,11 +54,11 @@ public class EventListenerFactory implements FactoryBean<EventListener>
 		}
 		else if (EventListenerType.SIMPLE_JMS.equals(type))
 		{
-			return new SimpleJMSEventListener(createJmsTemplate(jmsBrokerURL),createDestinations());
+			return new SimpleJMSEventListener(createJmsTemplate(jmsBrokerURL),createDestinations(true));
 		}
 		else if (EventListenerType.JMS.equals(type))
 		{
-			return new JMSEventListener(ebMSDAO,createJmsTemplate(jmsBrokerURL),createDestinations());
+			return new JMSEventListener(ebMSDAO,createJmsTemplate(jmsBrokerURL),createDestinations(true));
 		}
 		else
 		{
@@ -97,13 +100,14 @@ public class EventListenerFactory implements FactoryBean<EventListener>
 		return result;
 	}
 
-	private HashMap<String,Destination> createDestinations()
+	private HashMap<String,Destination> createDestinations(boolean createTopics)
 	{
 		HashMap<String,Destination> result = new HashMap<String,Destination>();
-		result.put(nl.clockwork.ebms.Constants.EbMSMessageEventType.RECEIVED.name(),new ActiveMQQueue(nl.clockwork.ebms.Constants.EbMSMessageEventType.RECEIVED.name()));
-		result.put(nl.clockwork.ebms.Constants.EbMSMessageEventType.DELIVERED.name(),new ActiveMQQueue(nl.clockwork.ebms.Constants.EbMSMessageEventType.DELIVERED.name()));
-		result.put(nl.clockwork.ebms.Constants.EbMSMessageEventType.FAILED.name(),new ActiveMQQueue(nl.clockwork.ebms.Constants.EbMSMessageEventType.FAILED.name()));
-		result.put(nl.clockwork.ebms.Constants.EbMSMessageEventType.EXPIRED.name(),new ActiveMQQueue(nl.clockwork.ebms.Constants.EbMSMessageEventType.EXPIRED.name()));
+		// define queues or virtual-topics for all types of events
+		for (EbMSMessageEventType event : nl.clockwork.ebms.Constants.EbMSMessageEventType.values())
+		{
+			result.put(event.name(), isJmsVirtualTopics() ? new ActiveMQTopic("VirtualTopic." + event.name()) : new ActiveMQQueue(event.name()) );
+		}
 		return result;
 	}
 
@@ -127,5 +131,15 @@ public class EventListenerFactory implements FactoryBean<EventListener>
 	public void setJmsBrokerURL(String jmsBrokerURL)
 	{
 		this.jmsBrokerURL = jmsBrokerURL;
+	}
+
+	public boolean isJmsVirtualTopics()
+	{
+		return jmsVirtualTopics;
+	}
+
+	public void setJmsVirtualTopics(boolean jmsVirtualTopics)
+	{
+		this.jmsVirtualTopics = jmsVirtualTopics;
 	}
 }
