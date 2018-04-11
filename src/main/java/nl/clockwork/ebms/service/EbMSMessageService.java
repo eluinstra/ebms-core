@@ -22,15 +22,18 @@ import javax.jws.WebParam;
 import javax.jws.WebResult;
 import javax.jws.WebService;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.ws.soap.MTOM;
 
 import nl.clockwork.ebms.Constants.EbMSMessageEventType;
+import nl.clockwork.ebms.model.EbMSMessageAttachment;
 import nl.clockwork.ebms.model.EbMSMessageContent;
 import nl.clockwork.ebms.model.EbMSMessageContext;
 import nl.clockwork.ebms.model.EbMSMessageEvent;
 import nl.clockwork.ebms.model.MessageStatus;
 import nl.clockwork.ebms.model.Party;
 
-@WebService(targetNamespace="http://www.ordina.nl/ebms/2.14")
+@MTOM(enabled=true)
+@WebService(targetNamespace="http://www.ordina.nl/ebms/2.15")
 public interface EbMSMessageService
 {
 	@WebMethod(operationName="Ping")
@@ -39,6 +42,10 @@ public interface EbMSMessageService
 	@WebResult(name="MessageId")
 	@WebMethod(operationName="SendMessage")
 	String sendMessage(@WebParam(name="Message") @XmlElement(required=true) EbMSMessageContent messageContent) throws EbMSMessageServiceException;
+
+	@WebResult(name="MessageId")
+	@WebMethod(operationName="SendMessageWithAttachments")
+	String sendMessageWithAttachments(@WebParam(name="Message") @XmlElement(required=true) EbMSMessageAttachment message) throws EbMSMessageServiceException;
 
 	@WebResult(name="MessageId")
 	@WebMethod(operationName="ResendMessage")

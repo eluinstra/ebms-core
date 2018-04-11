@@ -33,6 +33,7 @@ import nl.clockwork.ebms.dao.EbMSDAO;
 import nl.clockwork.ebms.job.EventManager;
 import nl.clockwork.ebms.model.CacheablePartyId;
 import nl.clockwork.ebms.model.EbMSMessage;
+import nl.clockwork.ebms.model.EbMSMessageAttachment;
 import nl.clockwork.ebms.model.EbMSMessageContent;
 import nl.clockwork.ebms.model.EbMSMessageContext;
 import nl.clockwork.ebms.model.EbMSMessageEvent;
@@ -97,6 +98,19 @@ public class EbMSMessageServiceImpl implements InitializingBean, EbMSMessageServ
 		{
 			ebMSMessageContextValidator.validate(messageContent.getContext());
 			return sendMessage_(messageContent);
+		}
+		catch (ValidatorException | DAOException | TransformerFactoryConfigurationError | EbMSProcessorException e)
+		{
+			throw new EbMSMessageServiceException(e);
+		}
+	}
+
+	@Override
+	public String sendMessageWithAttachments(EbMSMessageAttachment message) throws EbMSMessageServiceException {
+		try
+		{
+			ebMSMessageContextValidator.validate(message.getContext());
+			return sendMessage_(message.toContent());
 		}
 		catch (ValidatorException | DAOException | TransformerFactoryConfigurationError | EbMSProcessorException e)
 		{
@@ -382,4 +396,6 @@ public class EbMSMessageServiceImpl implements InitializingBean, EbMSMessageServ
 	{
 		this.deleteEbMSAttachmentsOnMessageProcessed = deleteEbMSAttachmentsOnMessageProcessed;
 	}
+
 }
+
