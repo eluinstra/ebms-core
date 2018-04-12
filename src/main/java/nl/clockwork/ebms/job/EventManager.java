@@ -18,7 +18,6 @@ package nl.clockwork.ebms.job;
 import java.util.Calendar;
 import java.util.Date;
 
-import nl.clockwork.ebms.Constants.EbMSAction;
 import nl.clockwork.ebms.Constants.EbMSEventStatus;
 import nl.clockwork.ebms.common.CPAManager;
 import nl.clockwork.ebms.dao.DAOTransactionCallback;
@@ -41,7 +40,10 @@ public class EventManager
 	public void createEvent(String cpaId, DeliveryChannel deliveryChannel, String messageId, Date timeToLive, Date timestamp, boolean isConfidential)
 	{
 		if (deliveryChannel != null)
+		{
+			ebMSDAO.deleteEvent(messageId);
 			ebMSDAO.insertEvent(new EbMSEvent(cpaId,deliveryChannel.getChannelId(),messageId,timeToLive,timestamp,isConfidential,0));
+		}
 		else
 			ebMSDAO.insertEventLog(messageId,timestamp,null,EbMSEventStatus.FAILED,"Could not resolve endpoint!");
 	}
@@ -67,18 +69,23 @@ public class EventManager
 					}
 					else
 					{
-						ebMSDAO.deleteEvent(event.getMessageId());
-						if (ebMSDAO.getMessageAction(event.getMessageId()) == EbMSAction.ACKNOWLEDGMENT)
+						switch(ebMSDAO.getMessageAction(event.getMessageId()))
 						{
-							// retry acknowledgements if enabled
-							if (autoRetryResponse && event.getRetries() < nrAutoRetries)
-							{
-								ebMSDAO.updateEvent(retryEvent(event, autoRetryInterval));
-							}
-							else
-							{
-								ebMSDAO.insertEventLog(event.getMessageId(),event.getTimestamp(),url,status, "Stopped retrying acknowledge");
-							}
+							case ACKNOWLEDGMENT:
+							case MESSAGE_ERROR:
+								// retry acknowledgements if enabled
+								if (autoRetryResponse && event.getRetries() < nrAutoRetries)
+								{
+									ebMSDAO.updateEvent(retryEvent(event, autoRetryInterval));
+									break;
+								}
+								else
+								{
+									ebMSDAO.insertEventLog(event.getMessageId(),event.getTimestamp(),url,status, "Stopped retrying acknowledge");
+								}
+
+							default:
+								ebMSDAO.deleteEvent(event.getMessageId());
 						}
 					}
 				}
