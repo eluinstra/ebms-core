@@ -15,8 +15,10 @@
  */
 package nl.clockwork.ebms.job;
 
+import java.util.Calendar;
 import java.util.Date;
 
+import nl.clockwork.ebms.Constants.EbMSAction;
 import nl.clockwork.ebms.Constants.EbMSEventStatus;
 import nl.clockwork.ebms.common.CPAManager;
 import nl.clockwork.ebms.dao.DAOTransactionCallback;
@@ -31,6 +33,10 @@ public class EventManager
 {
 	private EbMSDAO ebMSDAO;
 	private CPAManager cpaManager;
+	private boolean autoRetryResponse;
+	private int nrAutoRetries;
+	private int autoRetryInterval;
+	
 
 	public void createEvent(String cpaId, DeliveryChannel deliveryChannel, String messageId, Date timeToLive, Date timestamp, boolean isConfidential)
 	{
@@ -56,9 +62,25 @@ public class EventManager
 				{
 					ebMSDAO.insertEventLog(event.getMessageId(),event.getTimestamp(),url,status,errorMessage);
 					if (event.getTimeToLive() != null && CPAUtils.isReliableMessaging(deliveryChannel))
+					{
 						ebMSDAO.updateEvent(createNewEvent(event,deliveryChannel));
+					}
 					else
+					{
 						ebMSDAO.deleteEvent(event.getMessageId());
+						if (ebMSDAO.getMessageAction(event.getMessageId()) == EbMSAction.ACKNOWLEDGMENT)
+						{
+							// retry acknowledgements if enabled
+							if (autoRetryResponse && event.getRetries() < nrAutoRetries)
+							{
+								ebMSDAO.updateEvent(retryEvent(event, autoRetryInterval));
+							}
+							else
+							{
+								ebMSDAO.insertEventLog(event.getMessageId(),event.getTimestamp(),url,status, "Stopped retrying acknowledge");
+							}
+						}
+					}
 				}
 			}
 		);
@@ -67,6 +89,13 @@ public class EventManager
 	public void deleteEvent(String messageId)
 	{
 		ebMSDAO.deleteEvent(messageId);
+	}
+	
+	private EbMSEvent retryEvent(EbMSEvent event, int retryInterval)
+	{
+		Calendar timestamp = Calendar.getInstance();
+		timestamp.add(Calendar.MINUTE, retryInterval);
+		return new EbMSEvent(event.getCpaId(),event.getDeliveryChannelId(),event.getMessageId(),event.getTimeToLive(),timestamp.getTime(),event.isConfidential(),event.getRetries() + 1);
 	}
 
 	private EbMSEvent createNewEvent(EbMSEvent event, DeliveryChannel deliveryChannel)
@@ -88,6 +117,30 @@ public class EventManager
 	public void setCpaManager(CPAManager cpaManager)
 	{
 		this.cpaManager = cpaManager;
+	}
+
+	public boolean isAutoRetryResponse() {
+		return autoRetryResponse;
+	}
+
+	public void setAutoRetryResponse(boolean autoRetryResponse) {
+		this.autoRetryResponse = autoRetryResponse;
+	}
+
+	public int getNrAutoRetries() {
+		return nrAutoRetries;
+	}
+
+	public void setNrAutoRetries(int nrAutoRetries) {
+		this.nrAutoRetries = nrAutoRetries;
+	}
+
+	public int getAutoRetryInterval() {
+		return autoRetryInterval;
+	}
+
+	public void setAutoRetryInterval(int autoRetryInterval) {
+		this.autoRetryInterval = autoRetryInterval;
 	}
 
 }

@@ -30,6 +30,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
+import nl.clockwork.ebms.Constants.EbMSAction;
 import nl.clockwork.ebms.Constants.EbMSEventStatus;
 import nl.clockwork.ebms.Constants.EbMSMessageEventType;
 import nl.clockwork.ebms.Constants.EbMSMessageStatus;
@@ -659,6 +660,38 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 		}
 	}
 
+	@Override
+	public EbMSAction getMessageAction(String messageId) throws DAOException
+	{
+		try
+		{
+			return 
+				jdbcTemplate.queryForObject(
+					"select action" +
+					" from ebms_message" +
+					" where message_id = ?" +
+					" and message_nr = 0",
+					new RowMapper<EbMSAction>()
+					{
+						@Override
+						public EbMSAction mapRow(ResultSet rs, int rowNum) throws SQLException
+						{
+							return rs.getObject("action") == null ? null : EbMSAction.get(rs.getString("action"));
+						}
+					},
+					messageId
+				);
+		}
+		catch(EmptyResultDataAccessException e)
+		{
+			return null;
+		}
+		catch (DataAccessException e)
+		{
+			throw new DAOException(e);
+		}
+	}
+	
 	@Override
 	public List<String> getMessageIds(EbMSMessageContext messageContext, EbMSMessageStatus status) throws DAOException
 	{

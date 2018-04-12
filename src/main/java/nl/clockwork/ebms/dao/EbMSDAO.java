@@ -18,6 +18,7 @@ package nl.clockwork.ebms.dao;
 import java.util.Date;
 import java.util.List;
 
+import nl.clockwork.ebms.Constants.EbMSAction;
 import nl.clockwork.ebms.Constants.EbMSEventStatus;
 import nl.clockwork.ebms.Constants.EbMSMessageEventType;
 import nl.clockwork.ebms.Constants.EbMSMessageStatus;
@@ -60,6 +61,8 @@ public interface EbMSDAO
 	EbMSDocument getEbMSDocumentIfUnsent(String messageId) throws DAOException;
 	EbMSDocument getEbMSDocumentByRefToMessageId(String cpaId, String refToMessageId, Service service, String...actions) throws DAOException;
 	EbMSMessageStatus getMessageStatus(String messageId) throws DAOException;
+	EbMSAction getMessageAction(String messageId) throws DAOException;
+
 
 	List<String> getMessageIds(EbMSMessageContext messageContext, EbMSMessageStatus status) throws DAOException;
 	List<String> getMessageIds(EbMSMessageContext messageContext, EbMSMessageStatus status, int maxNr) throws DAOException;

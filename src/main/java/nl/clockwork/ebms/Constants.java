@@ -95,6 +95,13 @@ public class Constants
 		EbMSAction(String action) { this.action = action; }
 
 		public final String action() { return action; }
+		
+		public final static EbMSAction get(String action) {
+			for (EbMSAction enumaction : EbMSAction.values())
+				if (enumaction.action.contentEquals(action))
+					return enumaction;
+			return null;
+		}
 
   };
 

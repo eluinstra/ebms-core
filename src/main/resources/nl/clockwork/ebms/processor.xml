@@ -195,6 +195,9 @@
 	<bean id="eventManager" class="nl.clockwork.ebms.job.EventManager">
 		<property name="ebMSDAO" ref="ebMSDAO"/>
 		<property name="cpaManager" ref="cpaManager"/>
+		<property name="autoRetryResponse" value="${ebmsMessage.autoRetryResponse:false}"/>
+		<property name="nrAutoRetries" value="${ebmsMessage.nrAutoRetries:0}"/>
+		<property name="autoRetryInterval" value="${ebmsMessage.autoRetryInterval:15}"/>
 	</bean>
 
 	<bean id="jobScheduler" class="nl.clockwork.ebms.job.JobScheduler">
