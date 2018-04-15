@@ -24,6 +24,7 @@ import java.util.Date;
 
 import javax.xml.transform.TransformerException;
 
+import nl.clockwork.ebms.Constants.EbMSMessageEventType;
 import nl.clockwork.ebms.Constants.EbMSMessageStatus;
 import nl.clockwork.ebms.common.util.DOMUtils;
 import nl.clockwork.ebms.dao.DAOException;
@@ -137,6 +138,19 @@ public class EbMSDAOImpl extends nl.clockwork.ebms.dao.mysql.EbMSDAOImpl
 		{
 			throw new DAOException(e);
 		}
+	}
+
+	@Override
+	protected String getMessageEventsQuery(String messageContextFilter, EbMSMessageEventType[] types, int maxNr)
+	{
+		return "select top " + maxNr + " ebms_message_event.message_id, ebms_message_event.event_type" +
+			" from ebms_message_event, ebms_message" +
+			" where ebms_message_event.processed = 0" +
+			" and ebms_message_event.event_type in (" + join(types == null ? EbMSMessageEventType.values() : types,",") + ")" +
+			" and ebms_message_event.message_id = ebms_message.message_id" +
+			" and ebms_message.message_nr = 0" +
+			messageContextFilter +
+			" order by ebms_message_event.time_stamp asc";
 	}
 
 }
