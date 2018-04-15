@@ -265,17 +265,13 @@
 		<property name="verifyHostnames" value="${https.verifyHostnames}"></property>
 	</bean>
 
-	<bean id="eventListener" class="nl.clockwork.ebms.event.EventListenerFactory" depends-on="jmsBrokerFactory">
+	<bean id="eventListener" class="nl.clockwork.ebms.event.EventListenerFactory">
 		<property name="type" value="${eventListener.type}" />
 		<property name="ebMSDAO" ref="ebMSDAO" />
+		<property name="jmsBrokerConfig" value="${jms.broker.config}" />
+		<property name="jmsBrokerStart" value="${jms.broker.start}" />
 		<property name="jmsBrokerURL" value="${jms.brokerURL}" />
 		<property name="jmsVirtualTopics" value="${jms.virtualTopics:false}" />
 	</bean>
-
-	<bean id="jmsBrokerFactory" class="org.apache.activemq.xbean.BrokerFactoryBean" name="jmsBrokerFactory">
-		<property name="config" value="${jms.broker.config}" />
-		<property name="start" value="${jms.broker.start}" />
-	</bean>
-
 
 </beans>

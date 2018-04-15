@@ -15,6 +15,7 @@
  */
 package nl.clockwork.ebms.event;
 
+import java.io.IOException;
 import java.util.HashMap;
 
 import javax.jms.Destination;
@@ -26,12 +27,17 @@ import org.apache.activemq.command.ActiveMQQueue;
 import org.apache.activemq.command.ActiveMQTopic;
 import org.apache.activemq.pool.PooledConnectionFactory;
 import org.apache.activemq.spring.ActiveMQConnectionFactory;
+import org.apache.activemq.xbean.BrokerFactoryBean;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.FactoryBean;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
 import org.springframework.jms.core.JmsTemplate;
 
-public class EventListenerFactory implements FactoryBean<EventListener>
+public class EventListenerFactory implements FactoryBean<EventListener>, DisposableBean
 {
 	public enum EventListenerType
 	{
@@ -41,8 +47,11 @@ public class EventListenerFactory implements FactoryBean<EventListener>
 	protected transient Log logger = LogFactory.getLog(getClass());
 	private EventListenerType type;
 	private EbMSDAO ebMSDAO;
+	private String jmsBrokerConfig;
+	private boolean jmsBrokerStart;
 	private String jmsBrokerURL;
 	private boolean jmsVirtualTopics;
+	private BrokerFactoryBean brokerFactoryBean;
 
 	@Override
 	public EventListener getObject() throws Exception
@@ -54,10 +63,12 @@ public class EventListenerFactory implements FactoryBean<EventListener>
 		}
 		else if (EventListenerType.SIMPLE_JMS.equals(type))
 		{
+			startJMSBroker(jmsBrokerConfig,jmsBrokerStart);
 			return new SimpleJMSEventListener(createJmsTemplate(jmsBrokerURL),createDestinations(true));
 		}
 		else if (EventListenerType.JMS.equals(type))
 		{
+			startJMSBroker(jmsBrokerConfig,jmsBrokerStart);
 			return new JMSEventListener(ebMSDAO,createJmsTemplate(jmsBrokerURL),createDestinations(true));
 		}
 		else
@@ -75,7 +86,14 @@ public class EventListenerFactory implements FactoryBean<EventListener>
 	@Override
 	public boolean isSingleton()
 	{
-		return false;
+		return true;
+	}
+
+	@Override
+	public void destroy() throws Exception
+	{
+		if (brokerFactoryBean != null)
+			brokerFactoryBean.destroy();
 	}
 
 	private JmsTemplate createJmsTemplate(String jmsBrokerURL)
@@ -111,6 +129,27 @@ public class EventListenerFactory implements FactoryBean<EventListener>
 		return result;
 	}
 
+	private void startJMSBroker(String jmsBrokerConfig, boolean jmsBrokerStart) throws Exception
+	{
+		if (jmsBrokerStart)
+		{
+			brokerFactoryBean = new BrokerFactoryBean();
+			brokerFactoryBean.setConfig(createResource(jmsBrokerConfig));
+			brokerFactoryBean.setStart(true);
+			brokerFactoryBean.afterPropertiesSet();
+		}
+	}
+
+	private Resource createResource(String path) throws IOException
+	{
+		if (path.startsWith("classpath:"))
+			return new ClassPathResource(path.substring("classpath:".length()));
+		else if (path.startsWith("file:"))
+			return new FileSystemResource(path.substring("file:".length()));
+		else
+			throw new IOException(path + "not found!");
+	}
+
 	public void setType(String type)
 	{
 		try
@@ -128,6 +167,16 @@ public class EventListenerFactory implements FactoryBean<EventListener>
 		this.ebMSDAO = ebMSDAO;
 	}
 
+	public void setJmsBrokerConfig(String jmsBrokerConfig)
+	{
+		this.jmsBrokerConfig = jmsBrokerConfig;
+	}
+
+	public void setJmsBrokerStart(boolean jmsBrokerStart)
+	{
+		this.jmsBrokerStart = jmsBrokerStart;
+	}
+
 	public void setJmsBrokerURL(String jmsBrokerURL)
 	{
 		this.jmsBrokerURL = jmsBrokerURL;
@@ -137,4 +186,5 @@ public class EventListenerFactory implements FactoryBean<EventListener>
 	{
 		this.jmsVirtualTopics = jmsVirtualTopics;
 	}
+
 }
