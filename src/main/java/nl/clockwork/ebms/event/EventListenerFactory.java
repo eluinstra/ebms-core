@@ -147,7 +147,7 @@ public class EventListenerFactory implements FactoryBean<EventListener>, Disposa
 		else if (path.startsWith("file:"))
 			return new FileSystemResource(path.substring("file:".length()));
 		else
-			throw new IOException(path + "not found!");
+			return new FileSystemResource(path);
 	}
 
 	public void setType(String type)
