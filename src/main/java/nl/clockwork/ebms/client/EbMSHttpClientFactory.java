@@ -57,7 +57,7 @@ public class EbMSHttpClientFactory implements FactoryBean<EbMSClient>
 	@Override
 	public boolean isSingleton()
 	{
-		return false;
+		return true;
 	}
 
 	public void setType(String type)
