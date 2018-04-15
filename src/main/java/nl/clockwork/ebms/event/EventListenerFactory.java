@@ -106,7 +106,7 @@ public class EventListenerFactory implements FactoryBean<EventListener>
 		// define queues or virtual-topics for all types of events
 		for (EbMSMessageEventType event : nl.clockwork.ebms.Constants.EbMSMessageEventType.values())
 		{
-			result.put(event.name(), isJmsVirtualTopics() ? new ActiveMQTopic("VirtualTopic." + event.name()) : new ActiveMQQueue(event.name()) );
+			result.put(event.name(), jmsVirtualTopics ? new ActiveMQTopic("VirtualTopic." + event.name()) : new ActiveMQQueue(event.name()) );
 		}
 		return result;
 	}
@@ -131,11 +131,6 @@ public class EventListenerFactory implements FactoryBean<EventListener>
 	public void setJmsBrokerURL(String jmsBrokerURL)
 	{
 		this.jmsBrokerURL = jmsBrokerURL;
-	}
-
-	public boolean isJmsVirtualTopics()
-	{
-		return jmsVirtualTopics;
 	}
 
 	public void setJmsVirtualTopics(boolean jmsVirtualTopics)
