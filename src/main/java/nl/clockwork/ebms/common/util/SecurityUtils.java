@@ -119,24 +119,6 @@ public class SecurityUtils
 		}
 	}
 
-	public static KeyPair getKeyPairByCertificateSubject(KeyStore keyStore, String subject, String password) throws GeneralSecurityException
-	{
-		Enumeration<String> aliases = keyStore.aliases();
-		while (aliases.hasMoreElements())
-		{
-			String alias = aliases.nextElement();
-			X509Certificate certificate = (X509Certificate)keyStore.getCertificate(alias);
-			if (certificate.getSubjectDN().getName().equals(subject))
-			{
-				Key key = keyStore.getKey(alias,password.toCharArray());
-				if (key instanceof PrivateKey)
-					return new KeyPair(certificate.getPublicKey(),(PrivateKey)key);
-				break;
-			}
-		}
-		return null;
-	}
-
 	public static SecretKey generateKey(String encryptionAlgorithm) throws NoSuchAlgorithmException
 	{
 		switch (encryptionAlgorithm)
