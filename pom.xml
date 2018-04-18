@@ -4,6 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>nl.clockwork.ebms</groupId>
 	<artifactId>ebms-adapter-web</artifactId>
+	<version>2.15.1</version>
 	<packaging>war</packaging>
 	<name>EbMS Web Application</name>
 	<description></description>
@@ -95,7 +96,7 @@
 		<dependency>
 			<groupId>nl.clockwork.ebms</groupId>
 			<artifactId>ebms-core</artifactId>
-			<version>2.15.1-SNAPSHOT</version>
+			<version>2.15.1</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.geronimo.specs</groupId>
@@ -280,5 +281,4 @@
 			</plugin>
 		</plugins>
 	</reporting>	
-	<version>2.15.1-SNAPSHOT</version>
 </project>
