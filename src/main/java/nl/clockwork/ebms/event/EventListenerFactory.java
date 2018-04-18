@@ -41,7 +41,7 @@ public class EventListenerFactory implements FactoryBean<EventListener>, Disposa
 {
 	public enum EventListenerType
 	{
-		DEFAULT, DAO, SIMPLE_JMS, JMS;
+		DEFAULT, DAO, SIMPLE_JMS, JMS, JMS_TEXT;
 	}
 	
 	protected transient Log logger = LogFactory.getLog(getClass());
@@ -70,6 +70,10 @@ public class EventListenerFactory implements FactoryBean<EventListener>, Disposa
 			case JMS:
 				startJMSBroker(jmsBrokerConfig, jmsBrokerStart);
 				listener = new JMSEventListener(ebMSDAO, createJmsTemplate(jmsBrokerURL), createDestinations());
+				break;
+			case JMS_TEXT:
+				startJMSBroker(jmsBrokerConfig, jmsBrokerStart);
+				listener = new JMSTextEventListener(ebMSDAO, createJmsTemplate(jmsBrokerURL), createDestinations());
 				break;
 			default:
 				listener = new LoggingEventListener();
