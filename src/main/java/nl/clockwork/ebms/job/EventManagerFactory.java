@@ -103,7 +103,7 @@ public class EventManagerFactory implements FactoryBean<EventManager>
 	@Override
 	public boolean isSingleton()
 	{
-		return false;
+		return true;
 	}
 	
 }
