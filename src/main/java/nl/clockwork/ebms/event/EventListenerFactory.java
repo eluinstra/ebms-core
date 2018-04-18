@@ -56,25 +56,25 @@ public class EventListenerFactory implements FactoryBean<EventListener>, Disposa
 	@Override
 	public EventListener getObject() throws Exception
 	{
+		EventListener listener = null;
 		logger.info("Using EventListener " + type.name());
-		if (EventListenerType.DAO.equals(type))
+		switch (type)
 		{
-			return new DAOEventListener(ebMSDAO);
+			case DAO:
+				listener = new DAOEventListener(ebMSDAO);
+				break;
+			case SIMPLE_JMS:
+				startJMSBroker(jmsBrokerConfig, jmsBrokerStart);
+				listener = new SimpleJMSEventListener(createJmsTemplate(jmsBrokerURL), createDestinations());
+				break;
+			case JMS:
+				startJMSBroker(jmsBrokerConfig, jmsBrokerStart);
+				listener = new JMSEventListener(ebMSDAO, createJmsTemplate(jmsBrokerURL), createDestinations());
+				break;
+			default:
+				listener = new LoggingEventListener();
 		}
-		else if (EventListenerType.SIMPLE_JMS.equals(type))
-		{
-			startJMSBroker(jmsBrokerConfig,jmsBrokerStart);
-			return new SimpleJMSEventListener(createJmsTemplate(jmsBrokerURL),createDestinations(true));
-		}
-		else if (EventListenerType.JMS.equals(type))
-		{
-			startJMSBroker(jmsBrokerConfig,jmsBrokerStart);
-			return new JMSEventListener(ebMSDAO,createJmsTemplate(jmsBrokerURL),createDestinations(true));
-		}
-		else
-		{
-			return new LoggingEventListener();
-		}
+		return listener;
 	}
 
 	@Override
@@ -118,7 +118,7 @@ public class EventListenerFactory implements FactoryBean<EventListener>, Disposa
 		return result;
 	}
 
-	private HashMap<String,Destination> createDestinations(boolean createTopics)
+	private HashMap<String,Destination> createDestinations()
 	{
 		HashMap<String,Destination> result = new HashMap<String,Destination>();
 		// define queues or virtual-topics for all types of events
