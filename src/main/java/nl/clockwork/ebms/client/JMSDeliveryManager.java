@@ -26,6 +26,7 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.xpath.XPathExpressionException;
 
+import nl.clockwork.ebms.Constants;
 import nl.clockwork.ebms.model.EbMSDocument;
 import nl.clockwork.ebms.model.EbMSMessage;
 import nl.clockwork.ebms.processor.EbMSProcessingException;
@@ -40,8 +41,8 @@ import org.xml.sax.SAXException;
 
 public class JMSDeliveryManager extends DeliveryManager //DeliveryService
 {
-	protected static String MESSAGE = "MESSAGE";
-	protected transient Log logger = LogFactory.getLog(getClass());
+	private static final String MESSAGE = "MESSAGE";
+	private transient Log logger = LogFactory.getLog(getClass());
 	private JmsTemplate jmsTemplate;
 
 	@Override
@@ -55,7 +56,7 @@ public class JMSDeliveryManager extends DeliveryManager //DeliveryService
 				EbMSDocument document = ebMSClient.sendMessage(uri,EbMSMessageUtils.getEbMSDocument(message));
 				if (document == null)
 				{
-					jmsTemplate.setReceiveTimeout(180000);
+					jmsTemplate.setReceiveTimeout(3 * Constants.MINUTE_IN_MILLIS);
 					return (EbMSMessage)jmsTemplate.receiveSelectedAndConvert(MESSAGE,"JMSCorrelationID='" + message.getMessageHeader().getMessageData().getMessageId() + "'");
 				}
 				else
@@ -83,14 +84,14 @@ public class JMSDeliveryManager extends DeliveryManager //DeliveryService
 	public void handleResponseMessage(final EbMSMessage message) throws EbMSProcessorException
 	{
 		jmsTemplate.setExplicitQosEnabled(true);
-		jmsTemplate.setTimeToLive(60000);
+		jmsTemplate.setTimeToLive(Constants.MINUTE_IN_MILLIS);
 		jmsTemplate.convertAndSend(MESSAGE,message,new MessagePostProcessor()
 		{
 			@Override
 			public Message postProcessMessage(Message m) throws JMSException
 			{
 				m.setJMSCorrelationID(message.getMessageHeader().getMessageData().getRefToMessageId());
-				//m.setJMSExpiration(60000);
+				//m.setJMSExpiration(Constants.MINUTE_IN_MILLIS);
 				return m;
 			}
 		});

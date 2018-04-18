@@ -23,12 +23,9 @@ import nl.clockwork.ebms.model.Party;
 import nl.clockwork.ebms.model.ToPartyInfo;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 public class EbMSMessageContextValidator
 {
-	protected transient Log logger = LogFactory.getLog(getClass());
 	protected CPAManager cpaManager;
 
 	public EbMSMessageContextValidator(CPAManager cpaManager)

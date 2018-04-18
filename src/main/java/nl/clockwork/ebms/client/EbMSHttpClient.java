@@ -111,15 +111,15 @@ public class EbMSHttpClient implements EbMSClient
 	{
 		if (this.proxy != null && this.proxy.useProxy(url.toString()))
 		{
-			Proxy proxy = new Proxy(Proxy.Type.HTTP,new InetSocketAddress(this.proxy.getHost(),this.proxy.getPort()));
+			Proxy connectionProxy = new Proxy(Proxy.Type.HTTP,new InetSocketAddress(this.proxy.getHost(),this.proxy.getPort()));
 			if (this.proxy.useProxyAuthorization())
 			{
-				URLConnection connection = url.openConnection(proxy);
+				URLConnection connection = url.openConnection(connectionProxy);
 				connection.setRequestProperty(this.proxy.getProxyAuthorizationKey(),this.proxy.getProxyAuthorizationValue());
 				return connection;
 			}
 			else
-				return url.openConnection(proxy);
+				return url.openConnection(connectionProxy);
 		}
 		else
 			return url.openConnection();

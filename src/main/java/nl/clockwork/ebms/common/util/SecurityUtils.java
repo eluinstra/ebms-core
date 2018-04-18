@@ -43,7 +43,11 @@ import org.apache.xml.security.encryption.XMLCipher;
 
 public class SecurityUtils
 {
-	protected static Log logger = LogFactory.getLog(SecurityUtils.class);
+	private static final Log logger = LogFactory.getLog(SecurityUtils.class);
+	private static final int KEYSIZE_192 = 192;
+	private static final int KEYSIZE_128 = 128;
+	private static final int KEYSIZE_256 = 256;
+	
 
 	public static KeyPair getKeyPair(KeyStore keyStore, String alias, String password) throws GeneralSecurityException
 	{
@@ -124,13 +128,13 @@ public class SecurityUtils
 		switch (encryptionAlgorithm)
 		{
 			case XMLCipher.AES_128:
-				return generateKey("AES",128);
+				return generateKey("AES", KEYSIZE_128);
 			case XMLCipher.AES_192:
-				return generateKey("AES",192);
+				return generateKey("AES", KEYSIZE_192);
 			case XMLCipher.AES_256:
-				return generateKey("AES",256);
+				return generateKey("AES", KEYSIZE_256);
 			case XMLCipher.TRIPLEDES:
-				return generateKey("DESede",192);
+				return generateKey("DESede", KEYSIZE_192);
 			default:
 				throw new NoSuchAlgorithmException(encryptionAlgorithm);
 		}

@@ -71,10 +71,10 @@ public class EbMSMessageReader
 		return result;
 	}
 
-	private void parseEbMSMessage(EbMSContentHandler handler, String contentType, InputStream in) throws MimeException, IOException
+	private void parseEbMSMessage(EbMSContentHandler handler, String pcontentType, InputStream in) throws MimeException, IOException
 	{
 		MimeConfig mimeConfig = new MimeConfig();
-	  mimeConfig.setHeadlessParsing(contentType);
+	  mimeConfig.setHeadlessParsing(pcontentType);
 	  MimeStreamParser parser = new MimeStreamParser(mimeConfig);
 	  parser.setContentHandler(handler);
 		parser.parse(in);

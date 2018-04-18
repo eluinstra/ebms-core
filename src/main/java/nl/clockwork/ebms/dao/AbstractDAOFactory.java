@@ -73,7 +73,7 @@ public abstract class AbstractDAOFactory<T> implements FactoryBean<T>
 		this.dataSource = dataSource;
 	}
 	
-	public static abstract class DefaultDAOFactory<U> extends AbstractDAOFactory<U>
+	public abstract static class DefaultDAOFactory<U> extends AbstractDAOFactory<U>
 	{
 		@Override
 		public U createHSqlDbDAO()

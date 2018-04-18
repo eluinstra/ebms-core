@@ -51,13 +51,35 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 {
 	public class Key
 	{
-		public String messageId;
-		public int messageNr;
+		private String messageId;
+		private int messageNr;
+		
 		public Key(String messageId, int messageNr)
 		{
+			this.setMessageId(messageId);
+			this.setMessageNr(messageNr);
+		}
+		
+		public String getMessageId()
+		{
+			return messageId;
+		}
+		public void setMessageId(String messageId)
+		{
 			this.messageId = messageId;
+		}
+
+		public int getMessageNr()
+		{
+			return messageNr;
+		}
+
+		public void setMessageNr(int messageNr)
+		{
 			this.messageNr = messageNr;
 		}
+		
+		
 	}
 	public class KeyExtractor implements ResultSetExtractor<Key>
 	{
@@ -289,8 +311,8 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 					"content_type," +
 					"content" +
 				") values (?,?,?,?,?,?,?)",
-				key.messageId,
-				key.messageNr,
+				key.getMessageId(),
+				key.getMessageNr(),
 				orderNr++,
 				attachment.getName(),
 				attachment.getContentId(),

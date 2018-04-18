@@ -78,9 +78,9 @@ public class Party implements Serializable
 	{
 		if (getPartyId() == null || partyIds == null)
 			return null;
-		for (PartyId partyId : partyIds)
-			if (getPartyId().equals(CPAUtils.toString(partyId)))
-				return partyId;
+		for (PartyId id : partyIds)
+			if (getPartyId().equals(CPAUtils.toString(id)))
+				return id;
 		return null;
 	}
 
@@ -90,14 +90,14 @@ public class Party implements Serializable
 			return true;
 		if (getPartyId() == null || partyIds == null)
 			return false;
-		for (PartyId partyId : partyIds)
-			if (getPartyId().equals(CPAUtils.toString(partyId)))
+		for (PartyId id : partyIds)
+			if (getPartyId().equals(CPAUtils.toString(id)))
 				return true;
 		return false;
 	}
 
-	public boolean matches(Role role)
+	public boolean matches(Role prole)
 	{
-		return getRole() == null || getRole().equals(role.getName());
+		return getRole() == null || getRole().equals(prole.getName());
 	}
 }

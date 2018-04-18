@@ -26,18 +26,18 @@ public interface EbMSEventListenerService extends EventListener
 
 	@Override
 	@WebMethod(operationName="MessageReceived")
-	public void onMessageReceived(@WebParam(name="MessageId") String messageId) throws EbMSEventListenerServiceException;
+	void onMessageReceived(@WebParam(name="MessageId") String messageId) throws EbMSEventListenerServiceException;
 
 	@Override
 	@WebMethod(operationName="MessageDelivered")
-	public void onMessageDelivered(@WebParam(name="MessageId") String messageId) throws EbMSEventListenerServiceException;
+	void onMessageDelivered(@WebParam(name="MessageId") String messageId) throws EbMSEventListenerServiceException;
 
 	@Override
 	@WebMethod(operationName="MessageDeliveryFailed")
-	public void onMessageFailed(@WebParam(name="MessageId") String messageId) throws EbMSEventListenerServiceException;
+	void onMessageFailed(@WebParam(name="MessageId") String messageId) throws EbMSEventListenerServiceException;
 
 	@Override
 	@WebMethod(operationName="MessageExpired")
-	public void onMessageExpired(@WebParam(name="MessageId") String messageId) throws EbMSEventListenerServiceException;
+	void onMessageExpired(@WebParam(name="MessageId") String messageId) throws EbMSEventListenerServiceException;
 
 }

@@ -19,27 +19,50 @@ import java.util.LinkedHashMap;
 
 import org.springframework.beans.factory.InitializingBean;
 
+import nl.clockwork.ebms.Constants;
+
 public class MessageQueue<T> implements InitializingBean
 {
 	private class QueueEntry<U>
 	{
-		public Thread thread;
-		public U object;
+		private Thread thread;
+		private U object;
 		
 		public QueueEntry(Thread thread)
 		{
+			this.setThread(thread);
+		}
+
+		public Thread getThread()
+		{
+			return thread;
+		}
+
+		public void setThread(Thread thread)
+		{
 			this.thread = thread;
+		}
+
+		public U getObject()
+		{
+			return object;
+		}
+
+		public void setObject(U object)
+		{
+			this.object = object;
 		}
 	}
 	
 	private LinkedHashMap<String,QueueEntry<T>> queue;
 	private int maxEntries = 128;
-	private int timeout = 60000;
+	private static final float LOADFACTOR = .75F;
+	private int timeout = Constants.MINUTE_IN_MILLIS;
 
 	@Override
 	public void afterPropertiesSet() throws Exception
 	{
-		queue = new LinkedHashMap<String,QueueEntry<T>>(maxEntries + 1,.75F,true)
+		queue = new LinkedHashMap<String,QueueEntry<T>>(maxEntries + 1, LOADFACTOR, true)
 		{
 			private static final long serialVersionUID = 1L;
 
@@ -66,21 +89,22 @@ public class MessageQueue<T> implements InitializingBean
 		return get(correlationId,timeout);
 	}
 
-	public T get(String correlationId, int timeout)
+	public T get(String correlationId, int ptimeout)
 	{
 		try
 		{
-			Thread.sleep(timeout);
+			Thread.sleep(ptimeout);
 			//Thread.currentThread().wait(timeout);
 		}
 		catch (InterruptedException e)
 		{
+			// ignore
 		}
 		T result = null;
 		synchronized (queue)
 		{
 			if (queue.containsKey(correlationId))
-				result = queue.remove(correlationId).object;
+				result = queue.remove(correlationId).getObject();
 		}
 		return result;
 	}
@@ -91,8 +115,8 @@ public class MessageQueue<T> implements InitializingBean
 		{
 			if (queue.containsKey(correlationId))
 			{
-				queue.get(correlationId).object = object;
-				queue.get(correlationId).thread.interrupt();
+				queue.get(correlationId).setObject(object);
+				queue.get(correlationId).getThread().interrupt();
 				//queue.get(correlationId).thread.notify();
 			}
 		}

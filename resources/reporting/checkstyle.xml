@@ -99,7 +99,9 @@ under the License.
 
         <!-- Checks for Naming Conventions.                  -->
         <!-- See http://checkstyle.sf.net/config_naming.html -->
-        <module name="ConstantName"/>
+        <module name="ConstantName">
+          <property name="format" value="^log(ger)?|[A-Z][A-Z0-9]*(_[A-Z0-9]+)*$"/>
+        </module>
         <module name="LocalFinalVariableName"/>
         <module name="LocalVariableName"/>
         <module name="MethodName"/>
@@ -173,7 +175,10 @@ under the License.
           <property name="ignoreNumbers" value="-4, -3, -2, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 32, 64, 100, 128, 256, 512, 1000, 1024"/>
         </module>
         <module name="MissingSwitchDefault"/>
-        <module name="RedundantThrows"/>
+        <module name="RedundantThrows">
+        	<property name="allowUnchecked" value="true"/>
+        	<property name="allowSubclasses" value="true"/>
+        </module>
         <module name="SimplifyBooleanExpression"/>
         <module name="SimplifyBooleanReturn"/>
 

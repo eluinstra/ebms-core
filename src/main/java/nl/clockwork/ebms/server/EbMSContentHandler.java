@@ -21,13 +21,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.mail.util.ByteArrayDataSource;
 
 import nl.clockwork.ebms.model.EbMSAttachment;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.codec.Base64InputStream;
 import org.apache.james.mime4j.parser.ContentHandler;
@@ -37,7 +36,6 @@ import org.springframework.util.StringUtils;
 
 public class EbMSContentHandler implements ContentHandler
 {
-  protected transient Log logger = LogFactory.getLog(getClass());
 	private Map<String,String> headers = new HashMap<String,String>();
 	private List<EbMSAttachment> attachments = new ArrayList<EbMSAttachment>();
 
@@ -132,12 +130,16 @@ public class EbMSContentHandler implements ContentHandler
 	{
 		String result = headers.get(headerName);
 		if (result == null)
-			for (String key : headers.keySet())
-				if (headerName.equalsIgnoreCase(key))
+		{
+			for (Entry<String, String> entry : headers.entrySet())
+			{
+				if (headerName.equalsIgnoreCase(entry.getKey()))
 				{
-					result = headers.get(key);
+					result = entry.getValue();
 					break;
 				}
+			}
+		}
 		return result;
 	}
 
