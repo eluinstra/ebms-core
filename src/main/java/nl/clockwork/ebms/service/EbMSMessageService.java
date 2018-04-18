@@ -22,7 +22,6 @@ import javax.jws.WebParam;
 import javax.jws.WebResult;
 import javax.jws.WebService;
 import javax.xml.bind.annotation.XmlElement;
-import javax.xml.ws.soap.MTOM;
 
 import nl.clockwork.ebms.Constants.EbMSMessageEventType;
 import nl.clockwork.ebms.model.EbMSMessageAttachment;
@@ -32,7 +31,7 @@ import nl.clockwork.ebms.model.EbMSMessageEvent;
 import nl.clockwork.ebms.model.MessageStatus;
 import nl.clockwork.ebms.model.Party;
 
-@MTOM(enabled=true)
+//@MTOM(enabled=true)
 @WebService(targetNamespace="http://www.ordina.nl/ebms/2.15")
 public interface EbMSMessageService
 {
