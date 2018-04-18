@@ -32,20 +32,15 @@ public class EventManager
 {
 	private EbMSDAO ebMSDAO;
 	private CPAManager cpaManager;
-	private boolean autoRetryResponse;
-	private int nrAutoRetries;
-	private int autoRetryInterval;
-	
 
 	public void createEvent(String cpaId, DeliveryChannel deliveryChannel, String messageId, Date timeToLive, Date timestamp, boolean isConfidential)
 	{
 		if (deliveryChannel != null)
 		{
-			ebMSDAO.deleteEvent(messageId);
-			ebMSDAO.insertEvent(new EbMSEvent(cpaId,deliveryChannel.getChannelId(),messageId,timeToLive,timestamp,isConfidential,0));
+			ebMSDAO.insertEvent(new EbMSEvent(cpaId,deliveryChannel.getChannelId(), messageId, timeToLive, timestamp, isConfidential, 0));
 		}
 		else
-			ebMSDAO.insertEventLog(messageId,timestamp,null,EbMSEventStatus.FAILED,"Could not resolve endpoint!");
+			ebMSDAO.insertEventLog(messageId,timestamp,null,EbMSEventStatus.FAILED, "Could not resolve endpoint!");
 	}
 
 	public void updateEvent(final EbMSEvent event, final String url, final EbMSEventStatus status)
@@ -62,31 +57,14 @@ public class EventManager
 				@Override
 				public void doInTransaction()
 				{
-					ebMSDAO.insertEventLog(event.getMessageId(),event.getTimestamp(),url,status,errorMessage);
+					ebMSDAO.insertEventLog(event.getMessageId(),event.getTimestamp(), url, status, errorMessage);
 					if (event.getTimeToLive() != null && CPAUtils.isReliableMessaging(deliveryChannel))
 					{
 						ebMSDAO.updateEvent(createNewEvent(event,deliveryChannel));
 					}
 					else
 					{
-						switch(ebMSDAO.getMessageAction(event.getMessageId()))
-						{
-							case ACKNOWLEDGMENT:
-							case MESSAGE_ERROR:
-								// retry acknowledgements if enabled
-								if (autoRetryResponse && event.getRetries() < nrAutoRetries)
-								{
-									ebMSDAO.updateEvent(retryEvent(event, autoRetryInterval));
-									break;
-								}
-								else
-								{
-									ebMSDAO.insertEventLog(event.getMessageId(),event.getTimestamp(),url,status, "Stopped retrying acknowledge");
-								}
-
-							default:
-								ebMSDAO.deleteEvent(event.getMessageId());
-						}
+						ebMSDAO.deleteEvent(event.getMessageId());
 					}
 				}
 			}
@@ -98,14 +76,14 @@ public class EventManager
 		ebMSDAO.deleteEvent(messageId);
 	}
 	
-	private EbMSEvent retryEvent(EbMSEvent event, int retryInterval)
+	protected EbMSEvent retryEvent(EbMSEvent event, int retryInterval)
 	{
 		Calendar timestamp = Calendar.getInstance();
 		timestamp.add(Calendar.MINUTE, retryInterval);
 		return new EbMSEvent(event.getCpaId(),event.getDeliveryChannelId(),event.getMessageId(),event.getTimeToLive(),timestamp.getTime(),event.isConfidential(),event.getRetries() + 1);
 	}
 
-	private EbMSEvent createNewEvent(EbMSEvent event, DeliveryChannel deliveryChannel)
+	protected EbMSEvent createNewEvent(EbMSEvent event, DeliveryChannel deliveryChannel)
 	{
 		ReliableMessaging rm = CPAUtils.getReceiverReliableMessaging(deliveryChannel);
 		Date timestamp = new Date();
@@ -120,40 +98,19 @@ public class EventManager
 	{
 		this.ebMSDAO = ebMSDAO;
 	}
+	
+	public EbMSDAO getEbMSDAO()
+	{
+		return this.ebMSDAO;
+	}
 
 	public void setCpaManager(CPAManager cpaManager)
 	{
 		this.cpaManager = cpaManager;
 	}
 
-	public boolean isAutoRetryResponse()
+	public CPAManager getCpaManager()
 	{
-		return autoRetryResponse;
+		return this.cpaManager;
 	}
-
-	public void setAutoRetryResponse(boolean autoRetryResponse)
-	{
-		this.autoRetryResponse = autoRetryResponse;
-	}
-
-	public int getNrAutoRetries()
-	{
-		return nrAutoRetries;
-	}
-
-	public void setNrAutoRetries(int nrAutoRetries)
-	{
-		this.nrAutoRetries = nrAutoRetries;
-	}
-
-	public int getAutoRetryInterval()
-	{
-		return autoRetryInterval;
-	}
-
-	public void setAutoRetryInterval(int autoRetryInterval)
-	{
-		this.autoRetryInterval = autoRetryInterval;
-	}
-
 }
