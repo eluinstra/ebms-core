@@ -27,9 +27,10 @@ import javax.xml.bind.annotation.XmlElement;
 public class EbMSMessageAttachment implements Serializable
 {
 	private static final long serialVersionUID = 1L;
+	private static final int BUFFERSIZE = 10000;
 	private EbMSMessageContext context;
-	private List<DataHandler> attachments;
-	private EbMSMessageContent _msgContentCache = null;
+	private transient List<DataHandler> attachments;
+	private EbMSMessageContent msgContentCache = null;
 	
 	@XmlElement(required=true)
 	public EbMSMessageContext getContext()
@@ -47,6 +48,7 @@ public class EbMSMessageAttachment implements Serializable
 	{
 		return attachments;
 	}
+	
 	public void setAttachments(List<DataHandler> attachments)
 	{
 		this.attachments = attachments;
@@ -57,26 +59,30 @@ public class EbMSMessageAttachment implements Serializable
 	 */
 	public EbMSMessageContent toContent()
 	{
-		if (_msgContentCache == null) {
-			_msgContentCache = new EbMSMessageContent(context);
+		if (msgContentCache == null)
+		{
+			msgContentCache = new EbMSMessageContent(context);
 			for (DataHandler dh : attachments)
 			{
 				ByteArrayOutputStream bos = new ByteArrayOutputStream();
-		        try {
+		        try
+		        {
 		        	InputStream input = dh.getInputStream();
-		            byte[] b = new byte[100000];
+		            byte[] b = new byte[BUFFERSIZE];
 		            int bytesRead = 0;
-		            while ((bytesRead = input.read(b)) != -1) {
+		            while ((bytesRead = input.read(b)) != -1)
+		            {
 		                bos.write(b, 0, bytesRead);
 		            }
-	//		        bos.flush();
-		        } catch (IOException e) {
+		        }
+		        catch (IOException e)
+		        {
 		            e.printStackTrace();
 		        }
-		        _msgContentCache.getDataSources().add(new EbMSDataSource(dh.getName(), null, dh.getContentType(), bos.toByteArray()));
+		        msgContentCache.getDataSources().add(new EbMSDataSource(dh.getName(), null, dh.getContentType(), bos.toByteArray()));
 			}
 		}
 		
-		return _msgContentCache;
+		return msgContentCache;
 	}	
 }

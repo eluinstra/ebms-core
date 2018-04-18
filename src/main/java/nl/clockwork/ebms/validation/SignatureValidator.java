@@ -25,8 +25,6 @@ import nl.clockwork.ebms.signing.EbMSSignatureValidator;
 import nl.clockwork.ebms.util.CPAUtils;
 import nl.clockwork.ebms.util.EbMSMessageUtils;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DeliveryChannel;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageHeader;
 import org.w3._2000._09.xmldsig.ReferenceType;
@@ -34,7 +32,6 @@ import org.w3._2000._09.xmldsig.SignatureType;
 
 public class SignatureValidator
 {
-	protected transient Log logger = LogFactory.getLog(getClass());
 	protected CPAManager cpaManager;
 	protected EbMSSignatureValidator ebMSSignatureValidator;
 

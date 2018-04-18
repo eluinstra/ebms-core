@@ -126,27 +126,33 @@ public class EventManager
 		this.cpaManager = cpaManager;
 	}
 
-	public boolean isAutoRetryResponse() {
+	public boolean isAutoRetryResponse()
+	{
 		return autoRetryResponse;
 	}
 
-	public void setAutoRetryResponse(boolean autoRetryResponse) {
+	public void setAutoRetryResponse(boolean autoRetryResponse)
+	{
 		this.autoRetryResponse = autoRetryResponse;
 	}
 
-	public int getNrAutoRetries() {
+	public int getNrAutoRetries()
+	{
 		return nrAutoRetries;
 	}
 
-	public void setNrAutoRetries(int nrAutoRetries) {
+	public void setNrAutoRetries(int nrAutoRetries)
+	{
 		this.nrAutoRetries = nrAutoRetries;
 	}
 
-	public int getAutoRetryInterval() {
+	public int getAutoRetryInterval()
+	{
 		return autoRetryInterval;
 	}
 
-	public void setAutoRetryInterval(int autoRetryInterval) {
+	public void setAutoRetryInterval(int autoRetryInterval)
+	{
 		this.autoRetryInterval = autoRetryInterval;
 	}
 

@@ -23,13 +23,10 @@ import nl.clockwork.ebms.model.EbMSAttachment;
 import nl.clockwork.ebms.model.EbMSMessage;
 import nl.clockwork.ebms.util.EbMSMessageUtils;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.Reference;
 
 public class ManifestValidator
 {
-  protected transient Log logger = LogFactory.getLog(getClass());
 
 	public void validate(EbMSMessage message) throws EbMSValidationException
 	{

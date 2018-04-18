@@ -17,6 +17,7 @@ package nl.clockwork.ebms.common.util;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.springframework.util.StringUtils;
 
@@ -41,8 +42,11 @@ public class HTTPUtils
 	public static String toString(Map<String,List<String>> properties)
 	{
 		String result = "";
-		for (String key : properties.keySet())
-			result += (key != null ? key + ": " : "") + StringUtils.collectionToCommaDelimitedString(properties.get(key)) + "\n";
+		for (Entry<String, List<String>> entry : properties.entrySet())
+		{
+			result += (entry.getKey() != null ? entry.getKey() + ": " : "") + StringUtils.collectionToCommaDelimitedString(entry.getValue()) + "\n";
+		}
+
 		return result;
 	}
 }

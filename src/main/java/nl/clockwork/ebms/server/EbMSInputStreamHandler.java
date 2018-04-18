@@ -70,14 +70,14 @@ public abstract class EbMSInputStreamHandler
 			EbMSDocument out = messageProcessor.processRequest(in);
 			if (out == null)
 			{
-				logger.info(">>>>\nstatusCode: " + 204);
-				writeResponseStatus(204);
+				logger.info(">>>>\nstatusCode: " + Constants.SC_NOCONTENT);
+				writeResponseStatus(Constants.SC_NOCONTENT);
 			}
 			else
 			{
 				if (logger.isInfoEnabled())
-					logger.info(">>>>\nstatusCode: " + 200 + "\nContent-Type: text/xml\nSOAPAction: " + Constants.EBMS_SOAP_ACTION + "\n" + DOMUtils.toString(out.getMessage()));
-				writeResponseStatus(200);
+					logger.info(">>>>\nstatusCode: " + Constants.SC_OK + "\nContent-Type: text/xml\nSOAPAction: " + Constants.EBMS_SOAP_ACTION + "\n" + DOMUtils.toString(out.getMessage()));
+				writeResponseStatus(Constants.SC_OK);
 				writeResponseHeader("Content-Type","text/xml");
 				writeResponseHeader("SOAPAction",Constants.EBMS_SOAP_ACTION);
 				OutputStream response = getOutputStream();
@@ -91,10 +91,10 @@ public abstract class EbMSInputStreamHandler
 				Document soapFault = EbMSMessageUtils.createSOAPFault(e);
 				if (logger.isInfoEnabled())
 				{
-					logger.info(">>>>\nstatusCode: " + 500 + "\nContent-Type: text/xml\n" + DOMUtils.toString(soapFault));
+					logger.info(">>>>\nstatusCode: " + Constants.SC_INTERNAL_SERVER_ERROR + "\nContent-Type: text/xml\n" + DOMUtils.toString(soapFault));
 					logger.info("",e);
 				}
-				writeResponseStatus(500);
+				writeResponseStatus(Constants.SC_INTERNAL_SERVER_ERROR);
 				writeResponseHeader("Content-Type","text/xml");
 				OutputStream response = getOutputStream();
 				DOMUtils.write(soapFault,response);

@@ -42,8 +42,6 @@ import nl.clockwork.ebms.validation.EbMSValidationException;
 import nl.clockwork.ebms.validation.ValidationException;
 import nl.clockwork.ebms.validation.ValidatorException;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.xml.security.encryption.XMLCipher;
 import org.apache.xml.security.encryption.XMLEncryptionException;
 import org.apache.xml.security.exceptions.XMLSecurityException;
@@ -56,7 +54,6 @@ import org.xml.sax.SAXException;
 
 public class EbMSMessageDecrypter implements InitializingBean
 {
-	protected transient Log logger = LogFactory.getLog(getClass());
 	private CPAManager cpaManager;
 	private String keyStorePath;
 	private String keyStorePassword;

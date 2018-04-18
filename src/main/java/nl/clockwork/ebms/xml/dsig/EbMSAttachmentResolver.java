@@ -33,6 +33,7 @@ import org.w3c.dom.Attr;
 
 public class EbMSAttachmentResolver extends ResourceResolverSpi
 {
+	private static final int BUFFERSIZE = 4096;
 	private List<EbMSAttachment> attachments = new ArrayList<EbMSAttachment>();
 
 	public EbMSAttachmentResolver()
@@ -79,7 +80,7 @@ public class EbMSAttachmentResolver extends ResourceResolverSpi
 		{
 			final InputStream in = result.getInputStream();
 			final ByteArrayOutputStream out = new ByteArrayOutputStream();
-			final byte[] buffer = new byte[4096];
+			final byte[] buffer = new byte[BUFFERSIZE];
 			for (int c = in.read(buffer); c != -1; c = in.read(buffer))
 				out.write(buffer,0,c);
 			input = new XMLSignatureInput(out.toByteArray());

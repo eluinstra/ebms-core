@@ -46,14 +46,12 @@ import nl.clockwork.ebms.validation.EbMSMessageContextValidator;
 import nl.clockwork.ebms.validation.ValidationException;
 import nl.clockwork.ebms.validation.ValidatorException;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DeliveryChannel;
+import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageHeader;
 import org.springframework.beans.factory.InitializingBean;
 
 public class EbMSMessageServiceImpl implements InitializingBean, EbMSMessageService
 {
-  protected transient Log logger = LogFactory.getLog(getClass());
 	private DeliveryManager deliveryManager;
 	private EbMSDAO ebMSDAO;
 	private CPAManager cpaManager;
@@ -97,7 +95,7 @@ public class EbMSMessageServiceImpl implements InitializingBean, EbMSMessageServ
 		try
 		{
 			ebMSMessageContextValidator.validate(messageContent.getContext());
-			return sendMessage_(messageContent);
+			return storeMessageWithEvent(messageContent);
 		}
 		catch (ValidatorException | DAOException | TransformerFactoryConfigurationError | EbMSProcessorException e)
 		{
@@ -106,11 +104,12 @@ public class EbMSMessageServiceImpl implements InitializingBean, EbMSMessageServ
 	}
 
 	@Override
-	public String sendMessageWithAttachments(EbMSMessageAttachment message) throws EbMSMessageServiceException {
+	public String sendMessageWithAttachments(EbMSMessageAttachment message) throws EbMSMessageServiceException
+	{
 		try
 		{
 			ebMSMessageContextValidator.validate(message.getContext());
-			return sendMessage_(message.toContent());
+			return storeMessageWithEvent(message.toContent());
 		}
 		catch (ValidatorException | DAOException | TransformerFactoryConfigurationError | EbMSProcessorException e)
 		{
@@ -127,7 +126,7 @@ public class EbMSMessageServiceImpl implements InitializingBean, EbMSMessageServ
 			if (messageContent != null)
 			{
 				resetMessage(messageContent.getContext());
-				return sendMessage_(messageContent);
+				return storeMessageWithEvent(messageContent);
 			}
 			else
 				throw new EbMSMessageServiceException("Message not found!");
@@ -342,7 +341,7 @@ public class EbMSMessageServiceImpl implements InitializingBean, EbMSMessageServ
 		context.setTimestamp(null);
 	}
 
-	private String sendMessage_(EbMSMessageContent messageContent) throws EbMSProcessorException
+	private String storeMessageWithEvent(EbMSMessageContent messageContent) throws EbMSProcessorException
 	{
 		final EbMSMessage result = ebMSMessageFactory.createEbMSMessage(messageContent.getContext().getCpaId(),messageContent);
 		signatureGenerator.generate(result);
@@ -353,9 +352,27 @@ public class EbMSMessageServiceImpl implements InitializingBean, EbMSMessageServ
 				public void doInTransaction()
 				{
 					Date timestamp = new Date();
-					DeliveryChannel deliveryChannel = cpaManager.getReceiveDeliveryChannel(result.getMessageHeader().getCPAId(),new CacheablePartyId(result.getMessageHeader().getTo().getPartyId()),result.getMessageHeader().getTo().getRole(),CPAUtils.toString(result.getMessageHeader().getService()),result.getMessageHeader().getAction());
+					MessageHeader rmh = result.getMessageHeader();
+					DeliveryChannel deliveryChannel = 
+						cpaManager.getReceiveDeliveryChannel(result.getMessageHeader().getCPAId()
+							,new CacheablePartyId(result.getMessageHeader().getTo().getPartyId())
+							,rmh.getTo().getRole()
+							,CPAUtils.toString(rmh.getService())
+							,rmh.getAction());
 					ebMSDAO.insertMessage(timestamp,CPAUtils.getPersistTime(timestamp,deliveryChannel),result,EbMSMessageStatus.SENDING);
-					eventManager.createEvent(result.getMessageHeader().getCPAId(),deliveryChannel,result.getMessageHeader().getMessageData().getMessageId(),result.getMessageHeader().getMessageData().getTimeToLive(),result.getMessageHeader().getMessageData().getTimestamp(),cpaManager.isConfidential(result.getMessageHeader().getCPAId(),new CacheablePartyId(result.getMessageHeader().getFrom().getPartyId()),result.getMessageHeader().getFrom().getRole(),CPAUtils.toString(result.getMessageHeader().getService()),result.getMessageHeader().getAction()));
+					
+					eventManager.createEvent(
+							 rmh.getCPAId()
+							,deliveryChannel
+							,rmh.getMessageData().getMessageId()
+							,rmh.getMessageData().getTimeToLive()
+							,rmh.getMessageData().getTimestamp()
+							,cpaManager.isConfidential(rmh.getCPAId()
+									,new CacheablePartyId(rmh.getFrom().getPartyId())
+									,rmh.getFrom().getRole()
+									,CPAUtils.toString(rmh.getService())
+									,rmh.getAction())
+							);
 				}
 			}
 		);

@@ -67,61 +67,61 @@ public class EbMSEventProcessor implements InitializingBean, Job
 				expireEvent(event);
 		}
 
-		private void sendEvent(final EbMSEvent event, final DeliveryChannel deliveryChannel)
+		private void sendEvent(final EbMSEvent pevent, final DeliveryChannel deliveryChannel)
 		{
 			String url = null;
 			try
 			{
-				EbMSDocument requestDocument = ebMSDAO.getEbMSDocumentIfUnsent(event.getMessageId());
+				EbMSDocument requestDocument = ebMSDAO.getEbMSDocumentIfUnsent(pevent.getMessageId());
 				if (requestDocument != null)
 				{
-					if (event.isConfidential())
+					if (pevent.isConfidential())
 						messageEncrypter.encrypt(deliveryChannel,requestDocument);
 					url = CPAUtils.getUri(deliveryChannel);
 					if (!StringUtils.isEmpty(url))
 						url = urlManager.getURL(url);
-					logger.info("Sending message " + event.getMessageId() + " to " + url);
+					logger.info("Sending message " + pevent.getMessageId() + " to " + url);
 					EbMSDocument responseDocument = ebMSClient.sendMessage(url,requestDocument);
 					messageProcessor.processResponse(requestDocument,responseDocument);
-					final String url_ = url;
+					final String eventUrl = url;
 					ebMSDAO.executeTransaction(
 						new DAOTransactionCallback()
 						{
 							@Override
 							public void doInTransaction()
 							{
-								eventManager.updateEvent(event,url_,EbMSEventStatus.SUCCEEDED);
+								eventManager.updateEvent(pevent,eventUrl,EbMSEventStatus.SUCCEEDED);
 								if (!CPAUtils.isReliableMessaging(deliveryChannel))
-									if (ebMSDAO.updateMessage(event.getMessageId(),EbMSMessageStatus.SENDING,EbMSMessageStatus.DELIVERED) > 0)
+									if (ebMSDAO.updateMessage(pevent.getMessageId(),EbMSMessageStatus.SENDING,EbMSMessageStatus.DELIVERED) > 0)
 									{
-										eventListener.onMessageDelivered(event.getMessageId());
+										eventListener.onMessageDelivered(pevent.getMessageId());
 										if (deleteEbMSAttachmentsOnMessageProcessed)
-											ebMSDAO.deleteAttachments(event.getMessageId());
+											ebMSDAO.deleteAttachments(pevent.getMessageId());
 									}
 							}
 						}
 					);
 				}
 				else
-					eventManager.deleteEvent(event.getMessageId());
+					eventManager.deleteEvent(pevent.getMessageId());
 			}
 			catch (final EbMSResponseException e)
 			{
 				logger.error("",e);
-				final String url_ = url;
+				final String eventUrl = url;
 				ebMSDAO.executeTransaction(
 					new DAOTransactionCallback()
 					{
 						@Override
 						public void doInTransaction()
 						{
-							eventManager.updateEvent(event,url_,EbMSEventStatus.FAILED,e.getMessage());
+							eventManager.updateEvent(pevent,eventUrl,EbMSEventStatus.FAILED,e.getMessage());
 							if ((e instanceof EbMSResponseSOAPException && EbMSResponseSOAPException.CLIENT.equals(((EbMSResponseSOAPException)e).getFaultCode())) || !CPAUtils.isReliableMessaging(deliveryChannel))
-								if (ebMSDAO.updateMessage(event.getMessageId(),EbMSMessageStatus.SENDING,EbMSMessageStatus.DELIVERY_FAILED) > 0)
+								if (ebMSDAO.updateMessage(pevent.getMessageId(),EbMSMessageStatus.SENDING,EbMSMessageStatus.DELIVERY_FAILED) > 0)
 								{
-									eventListener.onMessageFailed(event.getMessageId());
+									eventListener.onMessageFailed(pevent.getMessageId());
 									if (deleteEbMSAttachmentsOnMessageProcessed)
-										ebMSDAO.deleteAttachments(event.getMessageId());
+										ebMSDAO.deleteAttachments(pevent.getMessageId());
 								}
 						}
 					}
@@ -130,20 +130,20 @@ public class EbMSEventProcessor implements InitializingBean, Job
 			catch (final Exception e)
 			{
 				logger.error("",e);
-				final String url_ = url;
+				final String eventUrl = url;
 				ebMSDAO.executeTransaction(
 					new DAOTransactionCallback()
 					{
 						@Override
 						public void doInTransaction()
 						{
-							eventManager.updateEvent(event,url_,EbMSEventStatus.FAILED,ExceptionUtils.getStackTrace(e));
+							eventManager.updateEvent(pevent,eventUrl,EbMSEventStatus.FAILED,ExceptionUtils.getStackTrace(e));
 							if (!CPAUtils.isReliableMessaging(deliveryChannel))
-								if (ebMSDAO.updateMessage(event.getMessageId(),EbMSMessageStatus.SENDING,EbMSMessageStatus.DELIVERY_FAILED) > 0)
+								if (ebMSDAO.updateMessage(pevent.getMessageId(),EbMSMessageStatus.SENDING,EbMSMessageStatus.DELIVERY_FAILED) > 0)
 								{
-									eventListener.onMessageFailed(event.getMessageId());
+									eventListener.onMessageFailed(pevent.getMessageId());
 									if (deleteEbMSAttachmentsOnMessageProcessed)
-										ebMSDAO.deleteAttachments(event.getMessageId());
+										ebMSDAO.deleteAttachments(pevent.getMessageId());
 								}
 						}
 					}
@@ -151,26 +151,26 @@ public class EbMSEventProcessor implements InitializingBean, Job
 			}
 		}
 
-		private void expireEvent(final EbMSEvent event)
+		private void expireEvent(final EbMSEvent pevent)
 		{
 			try
 			{
-				logger.warn("Expiring message " +  event.getMessageId());
+				logger.warn("Expiring message " +  pevent.getMessageId());
 				ebMSDAO.executeTransaction(
 					new DAOTransactionCallback()
 					{
 						@Override
 						public void doInTransaction()
 						{
-							EbMSDocument requestDocument = ebMSDAO.getEbMSDocumentIfUnsent(event.getMessageId());
+							EbMSDocument requestDocument = ebMSDAO.getEbMSDocumentIfUnsent(pevent.getMessageId());
 							if (requestDocument != null)
-								if (ebMSDAO.updateMessage(event.getMessageId(),EbMSMessageStatus.SENDING,EbMSMessageStatus.EXPIRED) > 0)
+								if (ebMSDAO.updateMessage(pevent.getMessageId(),EbMSMessageStatus.SENDING,EbMSMessageStatus.EXPIRED) > 0)
 								{
-									eventListener.onMessageExpired(event.getMessageId());
+									eventListener.onMessageExpired(pevent.getMessageId());
 									if (deleteEbMSAttachmentsOnMessageProcessed)
-										ebMSDAO.deleteAttachments(event.getMessageId());
+										ebMSDAO.deleteAttachments(pevent.getMessageId());
 								}
-							eventManager.deleteEvent(event.getMessageId());
+							eventManager.deleteEvent(pevent.getMessageId());
 						}
 					}
 				);
@@ -183,6 +183,7 @@ public class EbMSEventProcessor implements InitializingBean, Job
 
 	}
 
+	private static final int DEFAULTWAIT = 30;
 	protected transient Log logger = LogFactory.getLog(getClass());
 	private ExecutorService executorService;
 	private Integer maxThreads;
@@ -229,7 +230,10 @@ public class EbMSEventProcessor implements InitializingBean, Job
 		executorService.shutdown();
 		try
 		{
-			while (!executorService.awaitTermination(30,TimeUnit.MINUTES));
+			while (!executorService.awaitTermination(DEFAULTWAIT,TimeUnit.MINUTES))
+			{
+				// just loop, waiting
+			}
 		}
 		catch (InterruptedException e)
 		{

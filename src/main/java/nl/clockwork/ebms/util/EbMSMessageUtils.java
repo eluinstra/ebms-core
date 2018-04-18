@@ -247,6 +247,7 @@ public class EbMSMessageUtils
 		}
 		catch (JAXBException e)
 		{
+			// ignore error
 		}
 		return null;
 	}

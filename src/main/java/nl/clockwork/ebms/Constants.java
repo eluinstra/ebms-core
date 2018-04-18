@@ -23,23 +23,38 @@ import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageStatusTy
 
 public class Constants
 {
-	public static enum EbMSMessageStatus
+	public enum EbMSMessageStatus
 	{
 		UNAUTHORIZED(0,MessageStatusType.UN_AUTHORIZED), NOT_RECOGNIZED(1,MessageStatusType.NOT_RECOGNIZED), RECEIVED(2,MessageStatusType.RECEIVED), PROCESSED(3,MessageStatusType.PROCESSED), FORWARDED(4,MessageStatusType.FORWARDED), FAILED(5,MessageStatusType.RECEIVED), /*WAITING(6,MessageStatusType.RECEIVED), */SENDING(10), DELIVERY_FAILED(11), DELIVERED(12), EXPIRED(13);
 
-		private final static Collection<EbMSMessageStatus> receiveStatus = Collections.unmodifiableCollection(Arrays.asList(UNAUTHORIZED,NOT_RECOGNIZED,RECEIVED,PROCESSED,FORWARDED,FAILED));
-		private final static Collection<EbMSMessageStatus> sendStatus = Collections.unmodifiableCollection(Arrays.asList(SENDING,DELIVERY_FAILED,DELIVERED,EXPIRED));
+		private static final Collection<EbMSMessageStatus> RECEIVESTATUS = Collections.unmodifiableCollection(Arrays.asList(UNAUTHORIZED,NOT_RECOGNIZED,RECEIVED,PROCESSED,FORWARDED,FAILED));
+		private static final Collection<EbMSMessageStatus> SENDSTATUS = Collections.unmodifiableCollection(Arrays.asList(SENDING,DELIVERY_FAILED,DELIVERED,EXPIRED));
 		private final int id;
 		private final MessageStatusType statusCode;
 
-		EbMSMessageStatus(int id) { this.id = id; this.statusCode = null; }
-		EbMSMessageStatus(int id, MessageStatusType statusCode) { this.id = id; this.statusCode = statusCode; }
+		EbMSMessageStatus(int id)
+		{
+			this.id = id;
+			this.statusCode = null;
+		}
+		
+		EbMSMessageStatus(int id, MessageStatusType statusCode)
+		{
+			this.id = id;
+			this.statusCode = statusCode;
+		}
 
-		public final int id() { return id; }
+		public final int id()
+		{
+			return id;
+		}
 
-		public final MessageStatusType statusCode() { return statusCode; }
+		public final MessageStatusType statusCode()
+		{
+			return statusCode;
+		}
 
-		public final static EbMSMessageStatus get(int id)
+		public static final EbMSMessageStatus get(int id)
 		{
 			for (EbMSMessageStatus status : EbMSMessageStatus.values())
 				if (status.id() == id)
@@ -47,7 +62,7 @@ public class Constants
 			return null;
 		}
 
-		public final static EbMSMessageStatus get(String name)
+		public static final EbMSMessageStatus get(String name)
 		{
 			for (EbMSMessageStatus status : EbMSMessageStatus.values())
 				if (status.name().equals(name))
@@ -55,7 +70,7 @@ public class Constants
 			return null;
 		}
 
-		public final static EbMSMessageStatus get(MessageStatusType statusCode)
+		public static final EbMSMessageStatus get(MessageStatusType statusCode)
 		{
 			for (EbMSMessageStatus status : EbMSMessageStatus.values())
 				if (status.statusCode().equals(statusCode))
@@ -63,14 +78,14 @@ public class Constants
 			return null;
 		}
 
-		public final static Collection<EbMSMessageStatus> getReceiveStatus()
+		public static final Collection<EbMSMessageStatus> getReceiveStatus()
 		{
-			return receiveStatus;
+			return RECEIVESTATUS;
 		}
 
-		public final static Collection<EbMSMessageStatus> getSendStatus()
+		public static final Collection<EbMSMessageStatus> getSendStatus()
 		{
-			return sendStatus;
+			return SENDSTATUS;
 		}
 	};
 
@@ -80,51 +95,71 @@ public class Constants
 		
 		private final String errorCode;
 		
-		EbMSErrorCode(String errorCode) { this.errorCode = errorCode; }
+		EbMSErrorCode(String errorCode)
+		{
+			this.errorCode = errorCode;
+		}
 		
-		public final String errorCode() { return errorCode; }
+		public final String errorCode()
+		{
+			return errorCode;
+		}
 		
   };
 
-  public static enum EbMSAction
+  public enum EbMSAction
   {
 		MESSAGE_ERROR("MessageError"), ACKNOWLEDGMENT("Acknowledgment"), STATUS_REQUEST("StatusRequest"), STATUS_RESPONSE("StatusResponse"), PING("Ping"), PONG("Pong");
 
 		private final String action;
 
-		EbMSAction(String action) { this.action = action; }
+		EbMSAction(String action)
+		{
+			this.action = action;
+		}
 
-		public final String action() { return action; }
+		public final String action()
+		{
+			return action;
+		}
 		
-		public final static EbMSAction get(String action) {
+		public static final EbMSAction get(String action)
+		{
 			for (EbMSAction enumaction : EbMSAction.values())
 				if (enumaction.action.contentEquals(action))
 					return enumaction;
+
 			return null;
 		}
 
   };
 
-  public static enum EbMSEventStatus
+  public enum EbMSEventStatus
   {
 		SUCCEEDED(1), FAILED(2), EXPIRED(3);
 
 		private final int id;
 
-		EbMSEventStatus(int id) { this.id = id; }
+		EbMSEventStatus(int id)
+		{
+			this.id = id;
+		}
 
-		public final int id() { return id; }
+		public final int id()
+		{
+			return id;
+		}
 
-		public final static EbMSEventStatus get(int id)
+		public static final EbMSEventStatus get(int statusId)
 		{
 			for (EbMSEventStatus status : EbMSEventStatus.values())
-				if (status.id() == id)
+				if (status.id() == statusId)
 					return status;
 			return null;
 		}
   }
 
-	public static enum EbMSMessageEventType
+	public enum EbMSMessageEventType
 	{
 		RECEIVED,DELIVERED,FAILED,EXPIRED;
 	}
@@ -137,5 +172,14 @@ public class Constants
 	public static final String NSURI_SOAP_ENVELOPE = "http://schemas.xmlsoap.org/soap/envelope/";
 	public static final String NSURI_SOAP_NEXT_ACTOR = "http://schemas.xmlsoap.org/soap/actor/next";
 	public static final String CID = "cid:";
+	
+	/* http servicecodes */
+	public static final int SC_OK = 200;
+	public static final int SC_NOCONTENT = 204;
+	public static final int SC_BAD_REQUEST = 400;
+	public static final int SC_INTERNAL_SERVER_ERROR = 500;
+	
+	/* time based */
+	public static final int MINUTE_IN_MILLIS = 60000;
 
 }

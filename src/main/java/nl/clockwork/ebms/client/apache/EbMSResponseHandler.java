@@ -21,6 +21,7 @@ import java.io.InputStream;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
+import nl.clockwork.ebms.Constants;
 import nl.clockwork.ebms.common.util.DOMUtils;
 import nl.clockwork.ebms.common.util.HTTPUtils;
 import nl.clockwork.ebms.model.EbMSDocument;
@@ -50,25 +51,23 @@ public class EbMSResponseHandler implements ResponseHandler<EbMSDocument>
 			if (response.getStatusLine().getStatusCode() / 100 == 2)
 			{
 				HttpEntity entity = response.getEntity();
-				if (response.getStatusLine().getStatusCode() == 204 || entity == null || entity.getContentLength() == 0)
+				if (response.getStatusLine().getStatusCode() == Constants.SC_NOCONTENT || entity == null || entity.getContentLength() == 0)
 				{
 					logger.info("<<<< statusCode = " + response.getStatusLine().getStatusCode());
 					return null;
 				}
 				else
 				{
-					try (InputStream input = entity.getContent())
-					{
-						EbMSMessageReader messageReader = new EbMSMessageReader(getHeaderField(response,"Content-ID"),getHeaderField(response,"Content-Type"));
-						//EbMSDocument result = messageReader.read(input);
-						EbMSDocument result = messageReader.readResponse(input,getEncoding(entity));
-			      if (logger.isInfoEnabled())
-							logger.info("<<<< statusCode = " + response.getStatusLine().getStatusCode() + (result == null || result.getMessage() == null ? "" : "\n" + DOMUtils.toString(result.getMessage())));
-						return result;
-					}
+					InputStream input = entity.getContent();
+					EbMSMessageReader messageReader = new EbMSMessageReader(getHeaderField(response,"Content-ID"),getHeaderField(response,"Content-Type"));
+					//EbMSDocument result = messageReader.read(input);
+					EbMSDocument result = messageReader.readResponse(input,getEncoding(entity));
+					if (logger.isInfoEnabled())
+						logger.info("<<<< statusCode = " + response.getStatusLine().getStatusCode() + (result == null || result.getMessage() == null ? "" : "\n" + DOMUtils.toString(result.getMessage())));
+					return result;
 				}
 			}
-			else if (response.getStatusLine().getStatusCode() >= 400)
+			else if (response.getStatusLine().getStatusCode() >= Constants.SC_BAD_REQUEST)
 			{
 		    HttpEntity entity = response.getEntity();
 		    if (entity != null)

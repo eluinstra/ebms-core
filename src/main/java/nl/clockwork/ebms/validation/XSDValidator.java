@@ -25,15 +25,12 @@ import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
 public class XSDValidator
 {
-	protected transient Log logger = LogFactory.getLog(getClass());
-  protected Schema schema;
+	protected Schema schema;
 
 	public XSDValidator(String xsdFile)
 	{
@@ -54,7 +51,6 @@ public class XSDValidator
 		try
 		{
 			Validator validator = schema.newValidator();
-			//validator.validate(new SAXSource(new InputSource(new StringReader(xml))));
 			validator.validate(new StreamSource(new StringReader(xml)));
 		}
 		catch (SAXException e)

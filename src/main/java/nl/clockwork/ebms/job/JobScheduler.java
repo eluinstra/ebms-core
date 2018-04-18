@@ -28,7 +28,7 @@ import org.springframework.beans.factory.InitializingBean;
 public class JobScheduler implements InitializingBean, DisposableBean
 {
   protected transient Log logger = LogFactory.getLog(getClass());
-	private Timer timer;
+	private Timer jobTimer = null;
 	private long delay;
 	private long period;
 	private List<Job> jobs = new ArrayList<Job>();
@@ -36,9 +36,9 @@ public class JobScheduler implements InitializingBean, DisposableBean
 	@Override
 	public void afterPropertiesSet() throws Exception
 	{
-		Timer timer = new Timer();
+		jobTimer = new Timer();
 		for (final Job job : jobs)
-			timer.schedule(new TimerTask()
+			jobTimer.schedule(new TimerTask()
 			{
 				@Override
 				public void run()
@@ -61,8 +61,8 @@ public class JobScheduler implements InitializingBean, DisposableBean
 	@Override
 	public void destroy()
 	{
-		if (timer != null)
-			timer.cancel();
+		if (jobTimer != null)
+			jobTimer.cancel();
 	}
 	
 	public void setDelay(long delay)

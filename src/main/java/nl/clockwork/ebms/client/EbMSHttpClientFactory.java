@@ -28,7 +28,7 @@ public class EbMSHttpClientFactory implements FactoryBean<EbMSClient>
 		DEFAULT, APACHE;
 	}
 
-	protected transient Log logger = LogFactory.getLog(getClass());
+	private transient Log logger = LogFactory.getLog(getClass());
 	private EbMSHttpClientType type;
 	private SSLFactoryManager sslFactoryManager;
 	private boolean chunkedStreamingMode;

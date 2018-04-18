@@ -36,8 +36,6 @@ import nl.clockwork.ebms.processor.EbMSProcessorException;
 import nl.clockwork.ebms.util.CPAUtils;
 import nl.clockwork.ebms.xml.dsig.EbMSAttachmentResolver;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.signature.XMLSignature;
 import org.apache.xml.security.transforms.Transforms;
@@ -51,7 +49,6 @@ import org.w3c.dom.NodeList;
 
 public class EbMSSignatureGenerator implements InitializingBean
 {
-	protected transient Log logger = LogFactory.getLog(getClass());
 	private CPAManager cpaManager;
 	private String canonicalizationMethodAlgorithm = Transforms.TRANSFORM_C14N_OMIT_COMMENTS;
 	//private String signatureMethodAlgorithm = XMLSignature.ALGO_ID_SIGNATURE_DSA;
@@ -114,7 +111,7 @@ public class EbMSSignatureGenerator implements InitializingBean
 		sign(keyStore,keyPair,alias,message.getMessage(),message.getAttachments(),CPAUtils.getSignatureAlgorithm(deliveryChannel),CPAUtils.getHashFunction(deliveryChannel));
 	}
 	
-	private void sign(KeyStore keyStore, KeyPair keyPair, String alias, Document document, List<EbMSAttachment> attachments, String signatureMethodAlgorithm, String digestAlgorithm) throws XMLSecurityException, KeyStoreException
+	private void sign(KeyStore pkeyStore, KeyPair keyPair, String alias, Document document, List<EbMSAttachment> attachments, String signatureMethodAlgorithm, String digestAlgorithm) throws XMLSecurityException, KeyStoreException
 	{
 		XMLSignature signature = new XMLSignature(document,null,signatureMethodAlgorithm,canonicalizationMethodAlgorithm);
 
@@ -136,7 +133,7 @@ public class EbMSSignatureGenerator implements InitializingBean
 		
 		signature.addKeyInfo(keyPair.getPublic());
 		
-		Certificate[] certificates = keyStore.getCertificateChain(alias);
+		Certificate[] certificates = pkeyStore.getCertificateChain(alias);
 	  //for (Certificate certificate : certificates)
 	  //	signature.addKeyInfo((X509Certificate)certificate);
 		signature.addKeyInfo((X509Certificate)certificates[0]);

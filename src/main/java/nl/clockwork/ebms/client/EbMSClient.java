@@ -20,5 +20,5 @@ import nl.clockwork.ebms.processor.EbMSProcessorException;
 
 public interface EbMSClient
 {
-	public EbMSDocument sendMessage(String uri, EbMSDocument message) throws EbMSProcessorException;
+	EbMSDocument sendMessage(String uri, EbMSDocument message) throws EbMSProcessorException;
 }

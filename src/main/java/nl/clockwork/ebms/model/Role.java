@@ -77,9 +77,9 @@ public class Role implements Serializable// extends Party
 	{
 		if (getPartyId() == null || partyIds == null)
 			return null;
-		for (PartyId partyId : partyIds)
-			if (getPartyId().equals(CPAUtils.toString(partyId)))
-				return partyId;
+		for (PartyId id : partyIds)
+			if (getPartyId().equals(CPAUtils.toString(id)))
+				return id;
 		return null;
 	}
 
@@ -89,14 +89,14 @@ public class Role implements Serializable// extends Party
 			return true;
 		if (getPartyId() == null || partyIds == null)
 			return false;
-		for (PartyId partyId : partyIds)
-			if (getPartyId().equals(CPAUtils.toString(partyId)))
+		for (PartyId id : partyIds)
+			if (getPartyId().equals(CPAUtils.toString(id)))
 				return true;
 		return false;
 	}
 	
-	public boolean matches(org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.Role role)
+	public boolean matches(org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.Role prole)
 	{
-		return getRole().equals(role.getName());
+		return getRole().equals(prole.getName());
 	}
 }
