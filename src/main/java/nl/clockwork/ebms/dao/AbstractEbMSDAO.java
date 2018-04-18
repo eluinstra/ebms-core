@@ -1067,8 +1067,8 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 				"select cpa_id, channel_id, message_id, time_to_live, time_stamp, is_confidential, retries" +
 				" from ebms_event" +
 				" where time_stamp <= ?" +
-				//(serverId == null ? "" : " and server_id = " + serverId) +
-				" and (server_id = ? or (server_id is null and ? is null))" +
+				(serverId == null ? " and server_id is null" : " and server_id = '" + serverId + "'") +
+				//" and (server_id = ? or (server_id is null and ? is null))" +
 				" order by time_stamp asc",
 				new ParameterizedRowMapper<EbMSEvent>()
 				{
@@ -1078,9 +1078,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 						return new EbMSEvent(rs.getString("cpa_id"),rs.getString("channel_id"),rs.getString("message_id"),rs.getTimestamp("time_to_live"),rs.getTimestamp("time_stamp"),rs.getBoolean("is_confidential"),rs.getInt("retries"));
 					}
 				},
-				timestamp,
-				serverId,
-				serverId
+				timestamp
 			);
 		}
 		catch (DataAccessException e)
