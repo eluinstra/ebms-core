@@ -24,6 +24,8 @@ import java.util.List;
 import javax.activation.DataHandler;
 import javax.xml.bind.annotation.XmlElement;
 
+import nl.clockwork.ebms.processor.EbMSProcessorException;
+
 public class EbMSMessageAttachment implements Serializable
 {
 	private static final long serialVersionUID = 1L;
@@ -57,7 +59,7 @@ public class EbMSMessageAttachment implements Serializable
 	/*
 	 * convert to MessageContent class for further processing
 	 */
-	public EbMSMessageContent toContent()
+	public EbMSMessageContent toContent() throws EbMSProcessorException
 	{
 		if (msgContentCache == null)
 		{
@@ -77,7 +79,7 @@ public class EbMSMessageAttachment implements Serializable
 		        }
 		        catch (IOException e)
 		        {
-		            e.printStackTrace();
+		        	throw new EbMSProcessorException(e);
 		        }
 		        msgContentCache.getDataSources().add(new EbMSDataSource(dh.getName(), null, dh.getContentType(), bos.toByteArray()));
 			}
