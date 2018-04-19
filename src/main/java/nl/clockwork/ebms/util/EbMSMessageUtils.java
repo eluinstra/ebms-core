@@ -43,7 +43,6 @@ import nl.clockwork.ebms.xml.EbMSNamespaceMapper;
 
 import org.apache.commons.lang.StringUtils;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DeliveryChannel;
-import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.SyncReplyModeType;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.AckRequested;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.Acknowledgment;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.Description;
@@ -74,7 +73,7 @@ public class EbMSMessageUtils
 
 	public static EbMSMessage getEbMSMessage(Document document) throws JAXBException, XPathExpressionException, ParserConfigurationException, SAXException, IOException
 	{
-		return getEbMSMessage(document,new ArrayList<EbMSAttachment>());
+		return getEbMSMessage(document, new ArrayList<EbMSAttachment>());
 	}
 
 	public static EbMSMessage getEbMSMessage(EbMSDocument document) throws JAXBException, XPathExpressionException, ParserConfigurationException, SAXException, IOException
@@ -136,16 +135,22 @@ public class EbMSMessageUtils
 	
 	public static SyncReply createSyncReply(DeliveryChannel channel)
 	{
-		if (SyncReplyModeType.MSH_SIGNALS_ONLY.equals(channel.getMessagingCharacteristics().getSyncReplyMode()) || SyncReplyModeType.SIGNALS_ONLY.equals(channel.getMessagingCharacteristics().getSyncReplyMode()) || SyncReplyModeType.SIGNALS_AND_RESPONSE.equals(channel.getMessagingCharacteristics().getSyncReplyMode()))
+		SyncReply reply = null;
+		switch (channel.getMessagingCharacteristics().getSyncReplyMode())
 		{
-			SyncReply syncReply = new SyncReply();
-			syncReply.setVersion(Constants.EBMS_VERSION);
-			syncReply.setMustUnderstand(true);
-			syncReply.setActor(Constants.NSURI_SOAP_NEXT_ACTOR);
-			return syncReply;
+			case MSH_SIGNALS_ONLY:
+			case SIGNALS_ONLY:
+			case SIGNALS_AND_RESPONSE:
+				SyncReply syncReply = new SyncReply();
+				syncReply.setVersion(Constants.EBMS_VERSION);
+				syncReply.setMustUnderstand(true);
+				syncReply.setActor(Constants.NSURI_SOAP_NEXT_ACTOR);
+				reply = syncReply;
+			default:
+				break;
 		}
-		else
-			return null;
+
+		return reply;
 	}
 
 	public static Manifest createManifest()
