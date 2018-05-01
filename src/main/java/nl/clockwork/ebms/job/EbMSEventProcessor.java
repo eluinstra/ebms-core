@@ -39,7 +39,6 @@ import nl.clockwork.ebms.model.EbMSEvent;
 import nl.clockwork.ebms.processor.EbMSMessageProcessor;
 import nl.clockwork.ebms.util.CPAUtils;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -69,7 +68,7 @@ public class EbMSEventProcessor implements InitializingBean, Job
 
 		private void sendEvent(final EbMSEvent pevent, final DeliveryChannel deliveryChannel)
 		{
-			String url = null;
+			final String url = urlManager.getURL(CPAUtils.getUri(deliveryChannel));
 			try
 			{
 				EbMSDocument requestDocument = ebMSDAO.getEbMSDocumentIfUnsent(pevent.getMessageId());
@@ -77,20 +76,16 @@ public class EbMSEventProcessor implements InitializingBean, Job
 				{
 					if (pevent.isConfidential())
 						messageEncrypter.encrypt(deliveryChannel,requestDocument);
-					url = CPAUtils.getUri(deliveryChannel);
-					if (!StringUtils.isEmpty(url))
-						url = urlManager.getURL(url);
 					logger.info("Sending message " + pevent.getMessageId() + " to " + url);
 					EbMSDocument responseDocument = ebMSClient.sendMessage(url,requestDocument);
 					messageProcessor.processResponse(requestDocument,responseDocument);
-					final String eventUrl = url;
 					ebMSDAO.executeTransaction(
 						new DAOTransactionCallback()
 						{
 							@Override
 							public void doInTransaction()
 							{
-								eventManager.updateEvent(pevent,eventUrl,EbMSEventStatus.SUCCEEDED);
+								eventManager.updateEvent(pevent,url,EbMSEventStatus.SUCCEEDED);
 								if (!CPAUtils.isReliableMessaging(deliveryChannel))
 									if (ebMSDAO.updateMessage(pevent.getMessageId(),EbMSMessageStatus.SENDING,EbMSMessageStatus.DELIVERED) > 0)
 									{
@@ -108,14 +103,13 @@ public class EbMSEventProcessor implements InitializingBean, Job
 			catch (final EbMSResponseException e)
 			{
 				logger.error("",e);
-				final String eventUrl = url;
 				ebMSDAO.executeTransaction(
 					new DAOTransactionCallback()
 					{
 						@Override
 						public void doInTransaction()
 						{
-							eventManager.updateEvent(pevent,eventUrl,EbMSEventStatus.FAILED,e.getMessage());
+							eventManager.updateEvent(pevent,url,EbMSEventStatus.FAILED,e.getMessage());
 							if ((e instanceof EbMSResponseSOAPException && EbMSResponseSOAPException.CLIENT.equals(((EbMSResponseSOAPException)e).getFaultCode())) || !CPAUtils.isReliableMessaging(deliveryChannel))
 								if (ebMSDAO.updateMessage(pevent.getMessageId(),EbMSMessageStatus.SENDING,EbMSMessageStatus.DELIVERY_FAILED) > 0)
 								{
@@ -130,14 +124,13 @@ public class EbMSEventProcessor implements InitializingBean, Job
 			catch (final Exception e)
 			{
 				logger.error("",e);
-				final String eventUrl = url;
 				ebMSDAO.executeTransaction(
 					new DAOTransactionCallback()
 					{
 						@Override
 						public void doInTransaction()
 						{
-							eventManager.updateEvent(pevent,eventUrl,EbMSEventStatus.FAILED,ExceptionUtils.getStackTrace(e));
+							eventManager.updateEvent(pevent,url,EbMSEventStatus.FAILED,ExceptionUtils.getStackTrace(e));
 							if (!CPAUtils.isReliableMessaging(deliveryChannel))
 								if (ebMSDAO.updateMessage(pevent.getMessageId(),EbMSMessageStatus.SENDING,EbMSMessageStatus.DELIVERY_FAILED) > 0)
 								{

@@ -37,8 +37,13 @@ public class URLManager
 
 	public String getURL(String source)
 	{
-		String result = ebMSDAO.getURLMapping(source);
-		return result == null ? source : result;
+		if (!StringUtils.isEmpty(source))
+		{
+			String result = ebMSDAO.getURLMapping(source);
+			return result == null ? source : result;
+		}
+		else
+			return source;
 	}
 
 	public void setURLMapping(URLMapping urlMapping) throws InvalidURLException
