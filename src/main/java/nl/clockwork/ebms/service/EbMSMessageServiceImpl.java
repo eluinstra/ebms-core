@@ -66,7 +66,7 @@ public class EbMSMessageServiceImpl implements InitializingBean, EbMSMessageServ
 	{
 		ebMSMessageContextValidator = new EbMSMessageContextValidator(cpaManager);
 	}
-  
+
 	@Override
 	public void ping(String cpaId, Party fromParty, Party toParty) throws EbMSMessageServiceException
 	{
@@ -88,7 +88,7 @@ public class EbMSMessageServiceImpl implements InitializingBean, EbMSMessageServ
 			throw new EbMSMessageServiceException(e);
 		}
 	}
-	
+
 	@Override
 	public String sendMessage(EbMSMessageContent messageContent) throws EbMSMessageServiceException
 	{
@@ -220,7 +220,7 @@ public class EbMSMessageServiceImpl implements InitializingBean, EbMSMessageServ
 			throw new EbMSMessageServiceException(e);
 		}
 	}
-	
+
 	@Override
 	public MessageStatus getMessageStatus(String messageId) throws EbMSMessageServiceException
 	{
@@ -345,37 +345,18 @@ public class EbMSMessageServiceImpl implements InitializingBean, EbMSMessageServ
 	{
 		final EbMSMessage result = ebMSMessageFactory.createEbMSMessage(messageContent.getContext().getCpaId(),messageContent);
 		signatureGenerator.generate(result);
-		ebMSDAO.executeTransaction(
-			new DAOTransactionCallback()
+		ebMSDAO.executeTransaction(new DAOTransactionCallback()
+		{
+			@Override
+			public void doInTransaction()
 			{
-				@Override
-				public void doInTransaction()
-				{
-					Date timestamp = new Date();
-					MessageHeader rmh = result.getMessageHeader();
-					DeliveryChannel deliveryChannel = 
-						cpaManager.getReceiveDeliveryChannel(result.getMessageHeader().getCPAId()
-							,new CacheablePartyId(result.getMessageHeader().getTo().getPartyId())
-							,rmh.getTo().getRole()
-							,CPAUtils.toString(rmh.getService())
-							,rmh.getAction());
-					ebMSDAO.insertMessage(timestamp,CPAUtils.getPersistTime(timestamp,deliveryChannel),result,EbMSMessageStatus.SENDING);
-					
-					eventManager.createEvent(
-							 rmh.getCPAId()
-							,deliveryChannel
-							,rmh.getMessageData().getMessageId()
-							,rmh.getMessageData().getTimeToLive()
-							,rmh.getMessageData().getTimestamp()
-							,cpaManager.isConfidential(rmh.getCPAId()
-									,new CacheablePartyId(rmh.getFrom().getPartyId())
-									,rmh.getFrom().getRole()
-									,CPAUtils.toString(rmh.getService())
-									,rmh.getAction())
-							);
-				}
+				Date timestamp = new Date();
+				MessageHeader rmh = result.getMessageHeader();
+				DeliveryChannel deliveryChannel = cpaManager.getReceiveDeliveryChannel(result.getMessageHeader().getCPAId(),new CacheablePartyId(result.getMessageHeader().getTo().getPartyId()),rmh.getTo().getRole(),CPAUtils.toString(rmh.getService()),rmh.getAction());
+				ebMSDAO.insertMessage(timestamp,CPAUtils.getPersistTime(timestamp,deliveryChannel),result,EbMSMessageStatus.SENDING);
+				eventManager.createEvent(rmh.getCPAId(),deliveryChannel,rmh.getMessageData().getMessageId(),rmh.getMessageData().getTimeToLive(),rmh.getMessageData().getTimestamp(),cpaManager.isConfidential(rmh.getCPAId(),new CacheablePartyId(rmh.getFrom().getPartyId()),rmh.getFrom().getRole(),CPAUtils.toString(rmh.getService()),rmh.getAction()));
 			}
-		);
+		});
 		return result.getMessageHeader().getMessageData().getMessageId();
 	}
 
@@ -415,4 +396,3 @@ public class EbMSMessageServiceImpl implements InitializingBean, EbMSMessageServ
 	}
 
 }
-
