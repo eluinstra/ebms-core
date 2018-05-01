@@ -331,7 +331,7 @@ public class EbMSMessageProcessor
 						@Override
 						public void doInTransaction()
 						{
-							DeliveryChannel deliveryChannel = cpaManager.getSendDeliveryChannel(messageHeader.getCPAId(),new CacheablePartyId(message.getMessageHeader().getFrom().getPartyId()),message.getMessageHeader().getFrom().getRole(),CPAUtils.toString(message.getMessageHeader().getService()),message.getMessageHeader().getAction());
+							DeliveryChannel deliveryChannel = cpaManager.getReceiveDeliveryChannel(messageHeader.getCPAId(),new CacheablePartyId(message.getMessageHeader().getTo().getPartyId()),message.getMessageHeader().getTo().getRole(),CPAUtils.toString(message.getMessageHeader().getService()),message.getMessageHeader().getAction());
 							Date persistTime = CPAUtils.getPersistTime(messageHeader.getMessageData().getTimestamp(),deliveryChannel);
 							ebMSDAO.insertMessage(timestamp,persistTime,message,EbMSMessageStatus.RECEIVED);
 							ebMSDAO.insertMessage(timestamp,persistTime,acknowledgment,null);
