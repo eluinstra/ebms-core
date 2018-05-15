@@ -62,34 +62,38 @@ public class EbMSResponseHandler
 				}
 				else
 				{
-					InputStream input = connection.getInputStream();
-					EbMSMessageReader messageReader = new EbMSMessageReader(getHeaderField("Content-ID"),getHeaderField("Content-Type"));
-					//EbMSDocument result = messageReader.read(input);
-					EbMSDocument result = messageReader.readResponse(input,getEncoding());
-					if (logger.isInfoEnabled())
-						logger.info("<<<<\nstatusCode: " + connection.getResponseCode() + (logger.isDebugEnabled() ? "\n" + HTTPUtils.toString(connection.getHeaderFields()) : "") + (result == null || result.getMessage() == null ? "" : "\n" + DOMUtils.toString(result.getMessage())));
-					return result;
+					try (InputStream input = connection.getInputStream())
+					{
+						EbMSMessageReader messageReader = new EbMSMessageReader(getHeaderField("Content-ID"),getHeaderField("Content-Type"));
+						//EbMSDocument result = messageReader.read(input);
+						EbMSDocument result = messageReader.readResponse(input,getEncoding());
+						if (logger.isInfoEnabled())
+							logger.info("<<<<\nstatusCode: " + connection.getResponseCode() + (logger.isDebugEnabled() ? "\n" + HTTPUtils.toString(connection.getHeaderFields()) : "") + (result == null || result.getMessage() == null ? "" : "\n" + DOMUtils.toString(result.getMessage())));
+						return result;
+					}
 				}
 			}
 			else if (connection.getResponseCode() >= Constants.SC_BAD_REQUEST)
 			{
-				InputStream input = connection.getErrorStream();
-				if (input != null)
+				try (InputStream input = connection.getErrorStream())
 				{
-					String response = IOUtils.toString(input);
-					logger.info("<<<<\nstatusCode: " + connection.getResponseCode() + (logger.isDebugEnabled() ? "\n" + HTTPUtils.toString(connection.getHeaderFields()) : "") + "\n" + response);
-					if (connection.getResponseCode() == Constants.SC_INTERNAL_SERVER_ERROR)
+					if (input != null)
 					{
-						Fault soapFault = EbMSMessageUtils.getSOAPFault(response);
-						if (soapFault != null)
-							throw new EbMSResponseSOAPException(connection.getResponseCode(),soapFault.getFaultcode(),response);
+						String response = IOUtils.toString(input);
+						logger.info("<<<<\nstatusCode: " + connection.getResponseCode() + (logger.isDebugEnabled() ? "\n" + HTTPUtils.toString(connection.getHeaderFields()) : "") + "\n" + response);
+						if (connection.getResponseCode() == Constants.SC_INTERNAL_SERVER_ERROR)
+						{
+							Fault soapFault = EbMSMessageUtils.getSOAPFault(response);
+							if (soapFault != null)
+								throw new EbMSResponseSOAPException(connection.getResponseCode(),soapFault.getFaultcode(),response);
+						}
+						throw new EbMSResponseException(connection.getResponseCode(),response);
 					}
-					throw new EbMSResponseException(connection.getResponseCode(),response);
-				}
-				else
-				{
-					logger.info("<<<<\nstatusCode: " + connection.getResponseCode() + (logger.isDebugEnabled() ? "\n" + HTTPUtils.toString(connection.getHeaderFields()) : ""));
-					throw new EbMSResponseException(connection.getResponseCode());
+					else
+					{
+						logger.info("<<<<\nstatusCode: " + connection.getResponseCode() + (logger.isDebugEnabled() ? "\n" + HTTPUtils.toString(connection.getHeaderFields()) : ""));
+						throw new EbMSResponseException(connection.getResponseCode());
+					}
 				}
 			}
 			else
@@ -100,9 +104,8 @@ public class EbMSResponseHandler
 		}
 		catch (IOException e)
 		{
-			try
+			try (InputStream errorStream = new BufferedInputStream(connection.getErrorStream()))
 			{
-				InputStream errorStream = new BufferedInputStream(connection.getErrorStream());
 				String error = IOUtils.toString(errorStream,getEncoding());
 				logger.info("<<<<\nstatusCode: " + connection.getResponseCode() + (logger.isDebugEnabled() ? "\n" + HTTPUtils.toString(connection.getHeaderFields()) : "") + "\n" + error);
 				throw new EbMSResponseException(connection.getResponseCode(),error);

@@ -58,13 +58,15 @@ public class EbMSResponseHandler implements ResponseHandler<EbMSDocument>
 				}
 				else
 				{
-					InputStream input = entity.getContent();
-					EbMSMessageReader messageReader = new EbMSMessageReader(getHeaderField(response,"Content-ID"),getHeaderField(response,"Content-Type"));
-					//EbMSDocument result = messageReader.read(input);
-					EbMSDocument result = messageReader.readResponse(input,getEncoding(entity));
-					if (logger.isInfoEnabled())
-						logger.info("<<<< statusCode = " + response.getStatusLine().getStatusCode() + (result == null || result.getMessage() == null ? "" : "\n" + DOMUtils.toString(result.getMessage())));
-					return result;
+					try (InputStream input = entity.getContent())
+					{
+						EbMSMessageReader messageReader = new EbMSMessageReader(getHeaderField(response,"Content-ID"),getHeaderField(response,"Content-Type"));
+						//EbMSDocument result = messageReader.read(input);
+						EbMSDocument result = messageReader.readResponse(input,getEncoding(entity));
+			      if (logger.isInfoEnabled())
+							logger.info("<<<< statusCode = " + response.getStatusLine().getStatusCode() + (result == null || result.getMessage() == null ? "" : "\n" + DOMUtils.toString(result.getMessage())));
+						return result;
+					}
 				}
 			}
 			else if (response.getStatusLine().getStatusCode() >= Constants.SC_BAD_REQUEST)
