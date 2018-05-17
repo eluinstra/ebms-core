@@ -15,6 +15,8 @@
  */
 package nl.clockwork.ebms.service;
 
+import java.security.KeyStoreException;
+import java.security.cert.CertificateException;
 import java.util.Date;
 import java.util.List;
 
@@ -350,12 +352,21 @@ public class EbMSMessageServiceImpl implements InitializingBean, EbMSMessageServ
 			@Override
 			public void doInTransaction()
 			{
-				Date timestamp = new Date();
-				MessageHeader rmh = result.getMessageHeader();
-				DeliveryChannel deliveryChannel = cpaManager.getReceiveDeliveryChannel(result.getMessageHeader().getCPAId(),new CacheablePartyId(result.getMessageHeader().getTo().getPartyId()),rmh.getTo().getRole(),CPAUtils.toString(rmh.getService()),rmh.getAction());
-				ebMSDAO.insertMessage(timestamp,CPAUtils.getPersistTime(timestamp,deliveryChannel),result,EbMSMessageStatus.SENDING);
-				eventManager.createEvent(rmh.getCPAId(),deliveryChannel,rmh.getMessageData().getMessageId(),rmh.getMessageData().getTimeToLive(),rmh.getMessageData().getTimestamp(),cpaManager.isConfidential(rmh.getCPAId(),new CacheablePartyId(rmh.getFrom().getPartyId()),rmh.getFrom().getRole(),CPAUtils.toString(rmh.getService()),rmh.getAction()));
+				try
+				{
+					Date timestamp = new Date();
+					MessageHeader rmh = result.getMessageHeader();
+					String clientAlias = cpaManager.getClientAlias(rmh.getCPAId(),new CacheablePartyId(rmh.getFrom().getPartyId()),rmh.getFrom().getRole(),CPAUtils.toString(rmh.getService()),rmh.getAction());
+					DeliveryChannel deliveryChannel = cpaManager.getReceiveDeliveryChannel(rmh.getCPAId(),new CacheablePartyId(rmh.getTo().getPartyId()),rmh.getTo().getRole(),CPAUtils.toString(rmh.getService()),rmh.getAction());
+					ebMSDAO.insertMessage(timestamp,CPAUtils.getPersistTime(timestamp,deliveryChannel),result,EbMSMessageStatus.SENDING);
+					eventManager.createEvent(rmh.getCPAId(),clientAlias,deliveryChannel,rmh.getMessageData().getMessageId(),rmh.getMessageData().getTimeToLive(),rmh.getMessageData().getTimestamp(),cpaManager.isConfidential(rmh.getCPAId(),new CacheablePartyId(rmh.getFrom().getPartyId()),rmh.getFrom().getRole(),CPAUtils.toString(rmh.getService()),rmh.getAction()));
+				}
+				catch (CertificateException | KeyStoreException e)
+				{
+					throw new RuntimeException(e);
+				}
 			}
+
 		});
 		return result.getMessageHeader().getMessageData().getMessageId();
 	}

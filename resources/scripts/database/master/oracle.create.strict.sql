@@ -52,6 +52,7 @@ ALTER TABLE ebms_attachment ADD CONSTRAINT uc_ebms_attachment UNIQUE (message_id
 CREATE TABLE ebms_event
 (
 	cpa_id						VARCHAR(256)		NOT NULL,
+	client_alias			VARCHAR(256)		NULL,
 	channel_id				VARCHAR(256)		NOT NULL,
 	message_id				VARCHAR(256)		NOT NULL UNIQUE,
 	message_nr				NUMBER(5)				DEFAULT 0 NOT NULL,

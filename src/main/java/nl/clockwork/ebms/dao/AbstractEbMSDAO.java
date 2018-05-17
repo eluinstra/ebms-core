@@ -1064,7 +1064,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 		try
 		{
 			return jdbcTemplate.query(
-				"select cpa_id, channel_id, message_id, time_to_live, time_stamp, is_confidential, retries" +
+				"select cpa_id, client_alias, channel_id, message_id, time_to_live, time_stamp, is_confidential, retries" +
 				" from ebms_event" +
 				" where time_stamp <= ?" +
 				(serverId == null ? " and server_id is null" : " and server_id = '" + serverId + "'") +
@@ -1075,7 +1075,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 					@Override
 					public EbMSEvent mapRow(ResultSet rs, int rowNum) throws SQLException
 					{
-						return new EbMSEvent(rs.getString("cpa_id"),rs.getString("channel_id"),rs.getString("message_id"),rs.getTimestamp("time_to_live"),rs.getTimestamp("time_stamp"),rs.getBoolean("is_confidential"),rs.getInt("retries"));
+						return new EbMSEvent(rs.getString("cpa_id"),rs.getString("client_alias"),rs.getString("channel_id"),rs.getString("message_id"),rs.getTimestamp("time_to_live"),rs.getTimestamp("time_stamp"),rs.getBoolean("is_confidential"),rs.getInt("retries"));
 					}
 				},
 				timestamp
@@ -1095,6 +1095,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 			jdbcTemplate.update(
 				"insert into ebms_event (" +
 					"cpa_id," +
+					"client_alias," +
 					"channel_id," +
 					"message_id," +
 					"time_to_live," +
@@ -1102,8 +1103,9 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 					"is_confidential," +
 					"retries," +
 					"server_id" +
-				") values (?,?,?,?,?,?,?,?)",
+				") values (?,?,?,?,?,?,?,?,?)",
 				event.getCpaId(),
+				event.getClientAlias(),
 				event.getDeliveryChannelId(),
 				event.getMessageId(),
 				event.getTimeToLive(),

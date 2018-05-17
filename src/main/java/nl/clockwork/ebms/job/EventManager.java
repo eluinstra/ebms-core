@@ -33,11 +33,11 @@ public class EventManager
 	private EbMSDAO ebMSDAO;
 	private CPAManager cpaManager;
 
-	public void createEvent(String cpaId, DeliveryChannel deliveryChannel, String messageId, Date timeToLive, Date timestamp, boolean isConfidential)
+	public void createEvent(String cpaId, String clientAlias, DeliveryChannel deliveryChannel, String messageId, Date timeToLive, Date timestamp, boolean isConfidential)
 	{
 		if (deliveryChannel != null)
 		{
-			ebMSDAO.insertEvent(new EbMSEvent(cpaId,deliveryChannel.getChannelId(), messageId, timeToLive, timestamp, isConfidential, 0));
+			ebMSDAO.insertEvent(new EbMSEvent(cpaId,clientAlias,deliveryChannel.getChannelId(), messageId, timeToLive, timestamp, isConfidential, 0));
 		}
 		else
 			ebMSDAO.insertEventLog(messageId,timestamp,null,EbMSEventStatus.FAILED, "Could not resolve endpoint!");
@@ -80,7 +80,7 @@ public class EventManager
 	{
 		Calendar timestamp = Calendar.getInstance();
 		timestamp.add(Calendar.MINUTE, retryInterval);
-		return new EbMSEvent(event.getCpaId(),event.getDeliveryChannelId(),event.getMessageId(),event.getTimeToLive(),timestamp.getTime(),event.isConfidential(),event.getRetries() + 1);
+		return new EbMSEvent(event.getCpaId(),event.getClientAlias(),event.getDeliveryChannelId(),event.getMessageId(),event.getTimeToLive(),timestamp.getTime(),event.isConfidential(),event.getRetries() + 1);
 	}
 
 	protected EbMSEvent createNewEvent(EbMSEvent event, DeliveryChannel deliveryChannel)
@@ -91,7 +91,7 @@ public class EventManager
 			rm.getRetryInterval().addTo(timestamp);
 		else
 			timestamp = event.getTimeToLive();
-		return new EbMSEvent(event.getCpaId(),event.getDeliveryChannelId(),event.getMessageId(),event.getTimeToLive(),timestamp,event.isConfidential(),event.getRetries() + 1);
+		return new EbMSEvent(event.getCpaId(),event.getClientAlias(),event.getDeliveryChannelId(),event.getMessageId(),event.getTimeToLive(),timestamp,event.isConfidential(),event.getRetries() + 1);
 	}
 
 	public void setEbMSDAO(EbMSDAO ebMSDAO)

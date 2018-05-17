@@ -30,12 +30,12 @@ public class EventManagerRetryAck extends EventManager
 	private int autoRetryInterval;
 
 	@Override
-	public void createEvent(String cpaId, DeliveryChannel deliveryChannel, String messageId, Date timeToLive, Date timestamp, boolean isConfidential)
+	public void createEvent(String cpaId, String clientAlias, DeliveryChannel deliveryChannel, String messageId, Date timeToLive, Date timestamp, boolean isConfidential)
 	{
 		if (deliveryChannel != null)
 		{
 			getEbMSDAO().deleteEvent(messageId);
-			getEbMSDAO().insertEvent(new EbMSEvent(cpaId,deliveryChannel.getChannelId(),messageId,timeToLive,timestamp,isConfidential,0));
+			getEbMSDAO().insertEvent(new EbMSEvent(cpaId,clientAlias,deliveryChannel.getChannelId(),messageId,timeToLive,timestamp,isConfidential,0));
 		}
 		else
 			getEbMSDAO().insertEventLog(messageId,timestamp,null,EbMSEventStatus.FAILED, "Could not resolve endpoint!");

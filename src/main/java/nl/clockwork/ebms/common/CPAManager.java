@@ -15,6 +15,10 @@
  */
 package nl.clockwork.ebms.common;
 
+import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
 import java.util.Date;
 import java.util.List;
 
@@ -41,12 +45,22 @@ import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.PersistenceLevelT
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.ServiceBinding;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.StatusValueType;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.SyncReplyModeType;
+import org.springframework.beans.factory.InitializingBean;
 
-public class CPAManager
+public class CPAManager implements InitializingBean
 {
 	private Ehcache methodCache;
 	private EbMSDAO ebMSDAO;
 	private URLManager urlManager;
+	private String clientkeyStorePath;
+	private String clientKeyStorePassword;
+	private KeyStore clientKeyStore;
+
+	@Override
+	public void afterPropertiesSet() throws Exception
+	{
+		clientKeyStore = KeyStoreManager.getKeyStore(clientkeyStorePath,clientKeyStorePassword);
+	}
 
 	public boolean existsCPA(String cpaId)
 	{
@@ -255,6 +269,13 @@ public class CPAManager
 		return (PersistenceLevelType.PERSISTENT.equals(canSend.getThisPartyActionBinding().getBusinessTransactionCharacteristics().getIsConfidential()) || PersistenceLevelType.TRANSIENT_AND_PERSISTENT.equals(canSend.getThisPartyActionBinding().getBusinessTransactionCharacteristics().getIsConfidential())) && docExchange.getEbXMLReceiverBinding() != null && docExchange.getEbXMLReceiverBinding().getReceiverDigitalEnvelope() != null;
 	}
 
+	public String getClientAlias(String cpaId, CacheablePartyId cacheablePartyId, String role, String service, String action) throws CertificateException, KeyStoreException
+	{
+		DeliveryChannel sendDeliveryChannel = getSendDeliveryChannel(cpaId,cacheablePartyId,role,service,action);
+		X509Certificate certificate = CPAUtils.getX509Certificate(CPAUtils.getClientCertificate(sendDeliveryChannel));
+		return clientKeyStore.getCertificateAlias(certificate);
+	}
+
 	public String getUri(String cpaId, CacheablePartyId partyId, String role, String service, String action)
 	{
 		return urlManager.getURL(CPAUtils.getUri(getReceiveDeliveryChannel(cpaId,partyId,role,service,action)));
@@ -319,5 +340,15 @@ public class CPAManager
 	public void setUrlManager(URLManager urlManager)
 	{
 		this.urlManager = urlManager;
+	}
+
+	public void setClientkeyStorePath(String clientkeyStorePath)
+	{
+		this.clientkeyStorePath = clientkeyStorePath;
+	}
+
+	public void setClientKeyStorePassword(String clientKeyStorePassword)
+	{
+		this.clientKeyStorePassword = clientKeyStorePassword;
 	}
 }

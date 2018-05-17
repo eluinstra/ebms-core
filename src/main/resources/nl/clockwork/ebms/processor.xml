@@ -181,6 +181,7 @@
 				<value>.*getReceiveDeliveryChannel</value>
 				<value>.*isNonRepudiationRequired</value>
 				<value>.*isConfidential</value>
+				<value>.*getClientAlias</value>
 				<!--value>.*getUri</value-->
 				<value>.*getSyncReply</value>
 			</list>

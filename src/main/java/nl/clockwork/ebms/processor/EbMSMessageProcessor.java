@@ -16,6 +16,8 @@
 package nl.clockwork.ebms.processor;
 
 import java.io.IOException;
+import java.security.KeyStoreException;
+import java.security.cert.CertificateException;
 import java.util.Date;
 
 import javax.xml.bind.JAXBException;
@@ -331,16 +333,24 @@ public class EbMSMessageProcessor
 						@Override
 						public void doInTransaction()
 						{
-							DeliveryChannel deliveryChannel = cpaManager.getReceiveDeliveryChannel(messageHeader.getCPAId(),new CacheablePartyId(message.getMessageHeader().getTo().getPartyId()),message.getMessageHeader().getTo().getRole(),CPAUtils.toString(message.getMessageHeader().getService()),message.getMessageHeader().getAction());
-							Date persistTime = CPAUtils.getPersistTime(messageHeader.getMessageData().getTimestamp(),deliveryChannel);
-							ebMSDAO.insertMessage(timestamp,persistTime,message,EbMSMessageStatus.RECEIVED);
-							ebMSDAO.insertMessage(timestamp,persistTime,acknowledgment,null);
-							deliveryChannel = cpaManager.getReceiveDeliveryChannel(messageHeader.getCPAId(),new CacheablePartyId(acknowledgment.getMessageHeader().getTo().getPartyId()),acknowledgment.getMessageHeader().getTo().getRole(),CPAUtils.toString(acknowledgment.getMessageHeader().getService()),acknowledgment.getMessageHeader().getAction());
-							if (!messageValidator.isSyncReply(message))
+							try
 							{
-								eventManager.createEvent(messageHeader.getCPAId(),deliveryChannel,acknowledgment.getMessageHeader().getMessageData().getMessageId(),acknowledgment.getMessageHeader().getMessageData().getTimeToLive(),acknowledgment.getMessageHeader().getMessageData().getTimestamp(),false);
+								DeliveryChannel deliveryChannel = cpaManager.getReceiveDeliveryChannel(messageHeader.getCPAId(),new CacheablePartyId(message.getMessageHeader().getTo().getPartyId()),message.getMessageHeader().getTo().getRole(),CPAUtils.toString(message.getMessageHeader().getService()),message.getMessageHeader().getAction());
+								Date persistTime = CPAUtils.getPersistTime(messageHeader.getMessageData().getTimestamp(),deliveryChannel);
+								ebMSDAO.insertMessage(timestamp,persistTime,message,EbMSMessageStatus.RECEIVED);
+								ebMSDAO.insertMessage(timestamp,persistTime,acknowledgment,null);
+								deliveryChannel = cpaManager.getReceiveDeliveryChannel(messageHeader.getCPAId(),new CacheablePartyId(acknowledgment.getMessageHeader().getTo().getPartyId()),acknowledgment.getMessageHeader().getTo().getRole(),CPAUtils.toString(acknowledgment.getMessageHeader().getService()),acknowledgment.getMessageHeader().getAction());
+								if (!messageValidator.isSyncReply(message))
+								{
+									String clientAlias = cpaManager.getClientAlias(messageHeader.getCPAId(),new CacheablePartyId(messageHeader.getFrom().getPartyId()),messageHeader.getFrom().getRole(),CPAUtils.toString(messageHeader.getService()),messageHeader.getAction());
+									eventManager.createEvent(messageHeader.getCPAId(),clientAlias,deliveryChannel,acknowledgment.getMessageHeader().getMessageData().getMessageId(),acknowledgment.getMessageHeader().getMessageData().getTimeToLive(),acknowledgment.getMessageHeader().getMessageData().getTimestamp(),false);
+								}
+								eventListener.onMessageReceived(message.getMessageHeader().getMessageData().getMessageId());
 							}
-							eventListener.onMessageReceived(message.getMessageHeader().getMessageData().getMessageId());
+							catch (CertificateException | KeyStoreException e)
+							{
+								throw new RuntimeException(e);
+							}
 						}
 					}
 				);
@@ -365,13 +375,21 @@ public class EbMSMessageProcessor
 					@Override
 					public void doInTransaction()
 					{
-						DeliveryChannel deliveryChannel = cpaManager.getReceiveDeliveryChannel(messageHeader.getCPAId(),new CacheablePartyId(messageError.getMessageHeader().getTo().getPartyId()),messageError.getMessageHeader().getTo().getRole(),CPAUtils.toString(messageError.getMessageHeader().getService()),messageError.getMessageHeader().getAction());
-						Date persistTime = CPAUtils.getPersistTime(timestamp,deliveryChannel);
-						ebMSDAO.insertMessage(timestamp,persistTime,message,EbMSMessageStatus.FAILED);
-						ebMSDAO.insertMessage(timestamp,persistTime,messageError,null);
-						if (!messageValidator.isSyncReply(message))
+						try
 						{
-							eventManager.createEvent(messageHeader.getCPAId(),deliveryChannel,messageError.getMessageHeader().getMessageData().getMessageId(),messageError.getMessageHeader().getMessageData().getTimeToLive(),messageError.getMessageHeader().getMessageData().getTimestamp(),false);
+							DeliveryChannel deliveryChannel = cpaManager.getReceiveDeliveryChannel(messageHeader.getCPAId(),new CacheablePartyId(messageError.getMessageHeader().getTo().getPartyId()),messageError.getMessageHeader().getTo().getRole(),CPAUtils.toString(messageError.getMessageHeader().getService()),messageError.getMessageHeader().getAction());
+							Date persistTime = CPAUtils.getPersistTime(timestamp,deliveryChannel);
+							ebMSDAO.insertMessage(timestamp,persistTime,message,EbMSMessageStatus.FAILED);
+							ebMSDAO.insertMessage(timestamp,persistTime,messageError,null);
+							if (!messageValidator.isSyncReply(message))
+							{
+								String clientAlias = cpaManager.getClientAlias(messageHeader.getCPAId(),new CacheablePartyId(messageHeader.getFrom().getPartyId()),messageHeader.getFrom().getRole(),CPAUtils.toString(messageHeader.getService()),messageHeader.getAction());
+								eventManager.createEvent(messageHeader.getCPAId(),clientAlias,deliveryChannel,messageError.getMessageHeader().getMessageData().getMessageId(),messageError.getMessageHeader().getMessageData().getTimeToLive(),messageError.getMessageHeader().getMessageData().getTimestamp(),false);
+							}
+						}
+						catch (CertificateException | KeyStoreException e)
+						{
+							throw new RuntimeException(e);
 						}
 					}
 				}

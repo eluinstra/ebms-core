@@ -15,25 +15,82 @@
  */
 package nl.clockwork.ebms.client;
 
+import java.net.Socket;
 import java.security.KeyStore;
+import java.security.Principal;
+import java.security.PrivateKey;
+import java.security.cert.X509Certificate;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.KeyManager;
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSession;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManagerFactory;
+import javax.net.ssl.X509KeyManager;
+
+import org.apache.commons.lang.StringUtils;
 
 import nl.clockwork.ebms.common.KeyStoreManager;
 
 public class SSLFactoryManager extends nl.clockwork.ebms.ssl.SSLFactoryManager
 {
+	public class EbMSX509KeyManager implements X509KeyManager
+	{
+		private final String clientAlias;
+		private final X509KeyManager standardKeyManager;
+
+		public EbMSX509KeyManager(X509KeyManager standardKeyManager, String clientAlias)
+		{
+			this.clientAlias = clientAlias;
+			this.standardKeyManager = standardKeyManager;
+		}
+
+		@Override
+		public String chooseServerAlias(String keyType, Principal[] issuers, Socket socket)
+		{
+			return standardKeyManager.chooseServerAlias(keyType,issuers,socket);
+		}
+
+		@Override
+		public String chooseClientAlias(String[] keyType, Principal[] issuers, Socket socket)
+		{
+			return clientAlias;
+		}
+
+		@Override
+		public String[] getServerAliases(String keyType, Principal[] issuers)
+		{
+			return standardKeyManager.getServerAliases(keyType,issuers);
+		}
+
+		@Override
+		public String[] getClientAliases(String keyType, Principal[] issuers)
+		{
+			return standardKeyManager.getClientAliases(keyType,issuers);
+		}
+
+		@Override
+		public X509Certificate[] getCertificateChain(String alias)
+		{
+			return standardKeyManager.getCertificateChain(alias);
+		}
+
+		@Override
+		public PrivateKey getPrivateKey(String alias)
+		{
+			return standardKeyManager.getPrivateKey(alias);
+		}
+	}
+
 	private String keyStorePath;
 	private String keyStorePassword;
 	private String trustStorePath;
 	private String trustStorePassword;
 	private boolean verifyHostnames;
+	private String clientAlias;
 	private SSLSocketFactory sslSocketFactory;
 
 	@Override
@@ -45,6 +102,11 @@ public class SSLFactoryManager extends nl.clockwork.ebms.ssl.SSLFactoryManager
 		//KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
 		KeyManagerFactory kmf = KeyManagerFactory.getInstance("SunX509");
 		kmf.init(keyStore,keyStorePassword.toCharArray());
+
+		KeyManager[] keyManagers = kmf.getKeyManagers();
+		for (int i = 0; i < keyManagers.length; i++)
+			if (keyManagers[i] instanceof X509KeyManager)
+				keyManagers[i] = new EbMSX509KeyManager((X509KeyManager)keyManagers[i],clientAlias);
 
 		//TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
 		TrustManagerFactory tmf = TrustManagerFactory.getInstance("SunX509");
@@ -106,6 +168,11 @@ public class SSLFactoryManager extends nl.clockwork.ebms.ssl.SSLFactoryManager
 		this.trustStorePassword = trustStorePassword;
 	}
 	
+	public void setClientAlias(String clientAlias)
+	{
+		this.clientAlias = clientAlias;
+	}
+
 	public void setVerifyHostnames(boolean verifyHostnames)
 	{
 		this.verifyHostnames = verifyHostnames;

@@ -15,6 +15,8 @@
  */
 package nl.clockwork.ebms.processor;
 
+import java.security.KeyStoreException;
+import java.security.cert.CertificateException;
 import java.util.Date;
 
 import nl.clockwork.ebms.Constants;
@@ -33,6 +35,7 @@ import nl.clockwork.ebms.validation.EbMSMessageValidator;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DeliveryChannel;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageHeader;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.Service;
 
@@ -81,17 +84,28 @@ public class DuplicateMessageHandler
 						@Override
 						public void doInTransaction()
 						{
-							if (storeDuplicateMessage)
+							try
 							{
-								if (!storeDuplicateMessageAttachments)
-									message.getAttachments().clear();
-								ebMSDAO.insertDuplicateMessage(timestamp,message);
+								if (storeDuplicateMessage)
+								{
+									if (!storeDuplicateMessageAttachments)
+										message.getAttachments().clear();
+									ebMSDAO.insertDuplicateMessage(timestamp,message);
+								}
+								EbMSMessageContext messageContext = ebMSDAO.getMessageContextByRefToMessageId(messageHeader.getCPAId(),messageHeader.getMessageData().getMessageId(),mshMessageService,EbMSAction.MESSAGE_ERROR.action(),EbMSAction.ACKNOWLEDGMENT.action());
+								if (messageContext != null)
+								{
+									String clientAlias = cpaManager.getClientAlias(messageHeader.getCPAId(),new CacheablePartyId(messageHeader.getFrom().getPartyId()),messageHeader.getFrom().getRole(),CPAUtils.toString(messageHeader.getService()),messageHeader.getAction());
+									DeliveryChannel deliveryChannel = cpaManager.getReceiveDeliveryChannel(messageHeader.getCPAId(),new CacheablePartyId(messageHeader.getFrom().getPartyId()),messageHeader.getFrom().getRole(),CPAUtils.toString(CPAUtils.createEbMSMessageService()),null);
+									eventManager.createEvent(messageHeader.getCPAId(),clientAlias,deliveryChannel,messageContext.getMessageId(),messageHeader.getMessageData().getTimeToLive(),messageContext.getTimestamp(),false);
+								}
+								else
+									logger.warn("No response found for duplicate message " + messageHeader.getMessageData().getMessageId() + "!");
 							}
-							EbMSMessageContext messageContext = ebMSDAO.getMessageContextByRefToMessageId(messageHeader.getCPAId(),messageHeader.getMessageData().getMessageId(),mshMessageService,EbMSAction.MESSAGE_ERROR.action(),EbMSAction.ACKNOWLEDGMENT.action());
-							if (messageContext != null)
-								eventManager.createEvent(messageHeader.getCPAId(),cpaManager.getReceiveDeliveryChannel(messageHeader.getCPAId(),new CacheablePartyId(message.getMessageHeader().getFrom().getPartyId()),message.getMessageHeader().getFrom().getRole(),CPAUtils.toString(CPAUtils.createEbMSMessageService()),null),messageContext.getMessageId(),message.getMessageHeader().getMessageData().getTimeToLive(),messageContext.getTimestamp(),false);
-							else
-								logger.warn("No response found for duplicate message " + message.getMessageHeader().getMessageData().getMessageId() + "!");
+							catch (CertificateException | KeyStoreException e)
+							{
+								throw new RuntimeException(e);
+							}
 						}
 					}
 				);
@@ -99,7 +113,7 @@ public class DuplicateMessageHandler
 			}
 		}
 		else
-			throw new EbMSProcessingException("MessageId " + message.getMessageHeader().getMessageData().getMessageId() + " already used!");
+			throw new EbMSProcessingException("MessageId " + messageHeader.getMessageData().getMessageId() + " already used!");
 	}
 
 	public void handleMessageError(final Date timestamp, final EbMSMessage responseMessage) throws EbMSProcessingException
