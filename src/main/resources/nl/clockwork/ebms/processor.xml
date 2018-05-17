@@ -144,6 +144,8 @@
 	</bean>
 
 	<bean id="_cpaManager" class="nl.clockwork.ebms.common.CPAManager">
+		<constructor-arg name="clientkeyStorePath" value="${client.keystore.path}"/>
+		<constructor-arg name="clientKeyStorePassword" value="${client.keystore.password}"/>
 		<property name="methodCache" ref="ebMSMethodCache"/>
 		<property name="ebMSDAO" ref="ebMSDAO"/>
 		<property name="urlManager" ref="urlManager"/>

@@ -15,6 +15,8 @@
  */
 package nl.clockwork.ebms.common;
 
+import java.io.IOException;
+import java.security.GeneralSecurityException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.cert.CertificateException;
@@ -45,19 +47,19 @@ import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.PersistenceLevelT
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.ServiceBinding;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.StatusValueType;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.SyncReplyModeType;
-import org.springframework.beans.factory.InitializingBean;
 
-public class CPAManager implements InitializingBean
+public class CPAManager
 {
 	private Ehcache methodCache;
 	private EbMSDAO ebMSDAO;
 	private URLManager urlManager;
-	private String clientkeyStorePath;
-	private String clientKeyStorePassword;
 	private KeyStore clientKeyStore;
 
-	@Override
-	public void afterPropertiesSet() throws Exception
+	public CPAManager()
+	{
+	}
+
+	public CPAManager(String clientkeyStorePath, String clientKeyStorePassword) throws GeneralSecurityException, IOException
 	{
 		clientKeyStore = KeyStoreManager.getKeyStore(clientkeyStorePath,clientKeyStorePassword);
 	}
@@ -342,13 +344,4 @@ public class CPAManager implements InitializingBean
 		this.urlManager = urlManager;
 	}
 
-	public void setClientkeyStorePath(String clientkeyStorePath)
-	{
-		this.clientkeyStorePath = clientkeyStorePath;
-	}
-
-	public void setClientKeyStorePassword(String clientKeyStorePassword)
-	{
-		this.clientKeyStorePassword = clientKeyStorePassword;
-	}
 }
