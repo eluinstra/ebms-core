@@ -31,8 +31,6 @@ import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManagerFactory;
 import javax.net.ssl.X509KeyManager;
 
-import org.apache.commons.lang.StringUtils;
-
 import nl.clockwork.ebms.common.KeyStoreManager;
 
 public class SSLFactoryManager extends nl.clockwork.ebms.ssl.SSLFactoryManager
