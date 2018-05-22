@@ -15,11 +15,7 @@
  */
 package nl.clockwork.ebms.ssl;
 
-import java.net.Socket;
 import java.security.KeyStore;
-import java.security.Principal;
-import java.security.PrivateKey;
-import java.security.cert.X509Certificate;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
@@ -29,7 +25,6 @@ import javax.net.ssl.SSLEngine;
 import javax.net.ssl.SSLSession;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManagerFactory;
-import javax.net.ssl.X509KeyManager;
 
 import nl.clockwork.ebms.common.KeyStoreManager;
 
@@ -37,52 +32,6 @@ import org.springframework.beans.factory.InitializingBean;
 
 public class SSLFactoryManager implements InitializingBean
 {
-	public class EbMSX509KeyManager implements X509KeyManager
-	{
-		private final X509KeyManager standardKeyManager;
-
-		public EbMSX509KeyManager(X509KeyManager standardKeyManager)
-		{
-			this.standardKeyManager = standardKeyManager;
-		}
-
-		@Override
-		public String chooseServerAlias(String keyType, Principal[] issuers, Socket socket)
-		{
-			return standardKeyManager.chooseServerAlias(keyType,issuers,socket);
-		}
-
-		@Override
-		public String chooseClientAlias(String[] keyType, Principal[] issuers, Socket socket)
-		{
-			return standardKeyManager.chooseClientAlias(keyType,issuers,socket);
-		}
-
-		@Override
-		public String[] getServerAliases(String keyType, Principal[] issuers)
-		{
-			return standardKeyManager.getServerAliases(keyType,issuers);
-		}
-
-		@Override
-		public String[] getClientAliases(String keyType, Principal[] issuers)
-		{
-			return standardKeyManager.getClientAliases(keyType,issuers);
-		}
-
-		@Override
-		public X509Certificate[] getCertificateChain(String alias)
-		{
-			return standardKeyManager.getCertificateChain(alias);
-		}
-
-		@Override
-		public PrivateKey getPrivateKey(String alias)
-		{
-			return standardKeyManager.getPrivateKey(alias);
-		}
-	}
-
 	private String keyStorePath;
 	private String keyStorePassword;
 	private String trustStorePath;
