@@ -238,6 +238,10 @@
 		<property name="eventManager" ref="eventManager"/>
 		<property name="messageEncrypter" ref="messageEncrypter"/>
 		<property name="messageProcessor" ref="messageProcessor"/>
+		<property name="ebMSHttpMIClientFactory" ref="ebMSHttpMIClientFactory"/>
+	</bean>
+
+	<bean id="ebMSHttpMIClientFactory" class="nl.clockwork.ebms.client.EbMSHttpMIClientFactory">
 		<property name="type" value="${http.client}"/>
 		<property name="chunkedStreamingMode" value="${http.chunkedStreamingMode}"/>
 		<property name="base64Writer" value="${http.base64Writer}"/>
