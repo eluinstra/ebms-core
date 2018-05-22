@@ -15,8 +15,6 @@
  */
 package nl.clockwork.ebms.client;
 
-import nl.clockwork.ebms.ssl.SSLFactoryManager;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.FactoryBean;
