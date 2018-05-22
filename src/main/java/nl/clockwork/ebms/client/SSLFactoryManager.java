@@ -55,7 +55,7 @@ public class SSLFactoryManager extends nl.clockwork.ebms.ssl.SSLFactoryManager
 		@Override
 		public String chooseClientAlias(String[] keyType, Principal[] issuers, Socket socket)
 		{
-			return clientAlias;
+			return clientAlias == null ? standardKeyManager.chooseClientAlias(keyType,issuers,socket) : clientAlias;
 		}
 
 		@Override

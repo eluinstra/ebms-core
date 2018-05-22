@@ -77,7 +77,7 @@ public class EbMSEventProcessor implements InitializingBean, Job
 					if (pevent.isConfidential())
 						messageEncrypter.encrypt(deliveryChannel,requestDocument);
 					logger.info("Sending message " + pevent.getMessageId() + " to " + url);
-					EbMSDocument responseDocument = ebMSClient.sendMessage(url,requestDocument);
+					EbMSDocument responseDocument = getEbMSClient(pevent.getClientAlias()).sendMessage(url,requestDocument);
 					messageProcessor.processResponse(requestDocument,responseDocument);
 					ebMSDAO.executeTransaction(
 						new DAOTransactionCallback()
@@ -234,6 +234,11 @@ public class EbMSEventProcessor implements InitializingBean, Job
 		}
   }
   
+  protected EbMSClient getEbMSClient(String clientAlias)
+	{
+		return ebMSClient;
+	}
+
 	public void setMaxThreads(Integer maxThreads)
 	{
 		this.maxThreads = maxThreads;
