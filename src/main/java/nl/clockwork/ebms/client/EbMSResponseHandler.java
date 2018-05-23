@@ -106,9 +106,10 @@ public class EbMSResponseHandler
 		{
 			try (InputStream errorStream = new BufferedInputStream(connection.getErrorStream()))
 			{
-				String error = IOUtils.toString(errorStream,getEncoding());
-				logger.info("<<<<\nstatusCode: " + connection.getResponseCode() + (logger.isDebugEnabled() ? "\n" + HTTPUtils.toString(connection.getHeaderFields()) : "") + "\n" + error);
-				throw new EbMSResponseException(connection.getResponseCode(),error);
+//				String error = IOUtils.toString(errorStream,getEncoding());
+//				logger.info("<<<<\nstatusCode: " + connection.getResponseCode() + (logger.isDebugEnabled() ? "\n" + HTTPUtils.toString(connection.getHeaderFields()) : "") + "\n" + error);
+//				throw new EbMSResponseException(connection.getResponseCode(),error);
+				throw new EbMSResponseException(connection.getResponseCode(),e.getMessage());
 			}
 			catch (IOException ignore)
 			{
