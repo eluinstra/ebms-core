@@ -15,23 +15,17 @@
  */
 package nl.clockwork.ebms.job;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
 import nl.clockwork.ebms.client.EbMSClient;
 import nl.clockwork.ebms.client.EbMSHttpMIClientFactory;
 
 public class EbMSEventMICProcessor extends EbMSEventProcessor
 {
 	private EbMSHttpMIClientFactory ebMSHttpMIClientFactory;
-	private Map<String,EbMSClient> clients = new ConcurrentHashMap<String,EbMSClient>();
 
 	@Override
 	protected EbMSClient getEbMSClient(String clientAlias)
 	{
-		if (!clients.containsKey(clientAlias))
-			clients.put(clientAlias,ebMSHttpMIClientFactory.createEbMSClient(clientAlias));
-		return clients.get(clientAlias);
+		return ebMSHttpMIClientFactory.getEbMSClient(clientAlias);
 	}
 
 	public void setEbMSHttpMIClientFactory(EbMSHttpMIClientFactory ebMSHttpMIClientFactory)

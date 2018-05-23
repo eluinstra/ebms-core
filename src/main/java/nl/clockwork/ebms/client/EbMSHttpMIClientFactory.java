@@ -1,5 +1,8 @@
 package nl.clockwork.ebms.client;
 
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
 import nl.clockwork.ebms.client.EbMSHttpClientFactory.EbMSHttpClientType;
 
 public class EbMSHttpMIClientFactory
@@ -15,6 +18,7 @@ public class EbMSHttpMIClientFactory
 	private String keyStorePassword;
 	private String trustStorePath;
 	private String trustStorePassword;
+	private Map<String,EbMSClient> clients = new ConcurrentHashMap<String,EbMSClient>();
 
 	public EbMSClient createEbMSClient(String clientAlias)
 	{
@@ -54,6 +58,13 @@ public class EbMSHttpMIClientFactory
 		result.setClientAlias(clientAlias);
 		result.afterPropertiesSet();
 		return result;
+	}
+
+	public EbMSClient getEbMSClient(String clientAlias)
+	{
+		if (!clients.containsKey(clientAlias))
+			clients.put(clientAlias,createEbMSClient(clientAlias));
+		return clients.get(clientAlias);
 	}
 
 	public void setType(String type)

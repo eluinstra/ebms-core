@@ -76,7 +76,7 @@ public class EbMSEventProcessor implements InitializingBean, Job
 				{
 					if (pevent.isConfidential())
 						messageEncrypter.encrypt(deliveryChannel,requestDocument);
-					logger.info("Sending message " + pevent.getMessageId() + " to " + url);
+					logger.info("Sending message " + pevent.getMessageId() + " to " + url + " using clientAlias " + pevent.getClientAlias());
 					EbMSDocument responseDocument = getEbMSClient(pevent.getClientAlias()).sendMessage(url,requestDocument);
 					messageProcessor.processResponse(requestDocument,responseDocument);
 					ebMSDAO.executeTransaction(

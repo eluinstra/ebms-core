@@ -49,12 +49,21 @@
 		<property name="deleteEbMSAttachmentsOnMessageProcessed" value="${ebmsMessage.deleteContentOnProcessed}"/>
 	</bean>
 
-	<bean id="deliveryManager" class="nl.clockwork.ebms.client.DeliveryManager">
+	<!--bean id="deliveryManager" class="nl.clockwork.ebms.client.DeliveryManager">
 		<property name="maxThreads" value="${deliveryManager.maxTreads}"/>
 		<property name="processorsScaleFactor" value="${deliveryManager.processorsScaleFactor}"/>
 		<property name="queueScaleFactor" value="${deliveryManager.queueScaleFactor}"/>
 		<property name="messageQueue" ref="messageQueue"/>
 		<property name="ebMSClient" ref="ebMSClient"/>
+	</bean-->
+
+	<bean id="deliveryManager" class="nl.clockwork.ebms.client.DeliveryManagerMIC">
+		<property name="maxThreads" value="${deliveryManager.maxTreads}"/>
+		<property name="processorsScaleFactor" value="${deliveryManager.processorsScaleFactor}"/>
+		<property name="queueScaleFactor" value="${deliveryManager.queueScaleFactor}"/>
+		<property name="messageQueue" ref="messageQueue"/>
+		<property name="cpaManager" ref="cpaManager"/>
+		<property name="ebMSHttpMIClientFactory" ref="ebMSHttpMIClientFactory"/>
 	</bean>
 
 	<bean id="messageQueue" class="nl.clockwork.ebms.client.EbMSMessageQueue">
@@ -277,7 +286,7 @@
 		<property name="password" value="${http.proxy.password}"/>
 	</bean>
 
-	<bean id="ebMSClient" class="nl.clockwork.ebms.client.EbMSHttpClientFactory">
+	<!--bean id="ebMSClient" class="nl.clockwork.ebms.client.EbMSHttpClientFactory">
 		<property name="type" value="${http.client}"/>
 		<property name="sslFactoryManager" ref="sslFactoryManager"/>
 		<property name="chunkedStreamingMode" value="${http.chunkedStreamingMode}"/>
@@ -294,7 +303,7 @@
 		<property name="trustStorePath" value="${truststore.path}"/>
 		<property name="trustStorePassword" value="${truststore.password}"/>
 		<property name="verifyHostnames" value="${https.verifyHostnames}"></property>
-	</bean>
+	</bean-->
 
 	<bean id="eventListener" class="nl.clockwork.ebms.event.EventListenerFactory">
 		<property name="type" value="${eventListener.type}" />

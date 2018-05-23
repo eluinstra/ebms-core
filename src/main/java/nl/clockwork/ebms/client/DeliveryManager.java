@@ -47,7 +47,7 @@ public class DeliveryManager implements InitializingBean //DeliveryService
 	private Integer maxThreads;
 	private Integer processorsScaleFactor;
 	private Integer queueScaleFactor;
-	private MessageQueue<EbMSMessage> messageQueue;
+	protected MessageQueue<EbMSMessage> messageQueue;
 	protected EbMSClient ebMSClient;
 
 	@Override
