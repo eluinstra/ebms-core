@@ -99,6 +99,7 @@ public class DeliveryManager implements InitializingBean //DeliveryService
 			}
 			else
 			{
+				logger.info("Sending message " + message.getMessageHeader().getMessageData().getMessageId() + " to " + uri);
 				EbMSDocument response = ebMSClient.sendMessage(uri,EbMSMessageUtils.getEbMSDocument(message));
 				if (response != null)
 					return EbMSMessageUtils.getEbMSMessage(response);
