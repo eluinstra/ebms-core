@@ -275,8 +275,7 @@ public class CPAManager
 	{
 		DeliveryChannel sendDeliveryChannel = getSendDeliveryChannel(cpaId,cacheablePartyId,role,service,action);
 		X509Certificate certificate = CPAUtils.getX509Certificate(CPAUtils.getClientCertificate(sendDeliveryChannel));
-		String certificateAlias = clientKeyStore.getCertificateAlias(certificate);
-		return certificateAlias == null ? "" : certificateAlias;
+		return clientKeyStore.getCertificateAlias(certificate);
 	}
 
 	public String getUri(String cpaId, CacheablePartyId partyId, String role, String service, String action)

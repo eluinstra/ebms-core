@@ -77,6 +77,8 @@ public class EbMSHttpMIClientFactory
 
 	public EbMSClient getEbMSClient(String clientAlias)
 	{
+		if (clientAlias == null)
+			clientAlias = "";
 		if (!clients.containsKey(clientAlias))
 			clients.put(clientAlias,createEbMSClient(clientAlias));
 		return clients.get(clientAlias);
