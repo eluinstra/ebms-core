@@ -159,16 +159,7 @@ public class EbMSMessageServiceImpl implements InitializingBean, EbMSMessageServ
 		try
 		{
 			if (process != null && process)
-				ebMSDAO.executeTransaction(new DAOTransactionCallback()
-				{
-					@Override
-					public void doInTransaction() throws DAOException
-					{
-						ebMSDAO.updateMessage(messageId,EbMSMessageStatus.RECEIVED,EbMSMessageStatus.PROCESSED);
-						if (deleteEbMSAttachmentsOnMessageProcessed)
-							ebMSDAO.deleteAttachments(messageId);
-					}
-				});
+				processMessage(messageId);
 			return ebMSDAO.getMessageContent(messageId);
 		}
 		catch (DAOException e)
