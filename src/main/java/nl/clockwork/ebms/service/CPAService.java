@@ -25,7 +25,7 @@ import javax.xml.bind.annotation.XmlElement;
 
 import nl.clockwork.ebms.model.URLMapping;
 
-@WebService(targetNamespace="http://www.ordina.nl/cpa/2.12")
+@WebService(targetNamespace="http://www.ordina.nl/cpa/2.12a")
 public interface CPAService
 {
 	@WebMethod(operationName="ValidateCPA")
@@ -49,7 +49,7 @@ public interface CPAService
 	@WebMethod(operationName="SetURLMapping")
 	void setURLMapping(@WebParam(name="URLMapping") @XmlElement(required=true) URLMapping urlMapping) throws CPAServiceException;
 
-	@WebMethod(operationName="GetURL")
+	@WebMethod(operationName="DeleteURLMapping")
 	void deleteURLMapping(@WebParam(name="SourceURL") @XmlElement(required=true) String source) throws CPAServiceException;
 
 	@WebResult(name="URLs")
