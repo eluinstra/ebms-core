@@ -234,6 +234,7 @@
 		<property name="ebMSClient" ref="ebMSClient"/>
 		<property name="messageEncrypter" ref="messageEncrypter"/>
 		<property name="messageProcessor" ref="messageProcessor"/>
+		<property name="deleteEbMSAttachmentsOnMessageProcessed" value="${ebmsMessage.deleteContentOnProcessed}"/>
 	</bean-->
 
 	<bean id="processEventsJob" class="nl.clockwork.ebms.job.EbMSEventMICProcessor">
@@ -247,6 +248,7 @@
 		<property name="eventManager" ref="eventManager"/>
 		<property name="messageEncrypter" ref="messageEncrypter"/>
 		<property name="messageProcessor" ref="messageProcessor"/>
+		<property name="deleteEbMSAttachmentsOnMessageProcessed" value="${ebmsMessage.deleteContentOnProcessed}"/>
 		<property name="ebMSHttpMIClientFactory" ref="ebMSHttpMIClientFactory"/>
 	</bean>
 

@@ -294,4 +294,8 @@ public class EbMSEventProcessor implements InitializingBean, Job
 		this.messageProcessor = messageProcessor;
 	}
 
+  public void setDeleteEbMSAttachmentsOnMessageProcessed(boolean deleteEbMSAttachmentsOnMessageProcessed)
+	{
+		this.deleteEbMSAttachmentsOnMessageProcessed = deleteEbMSAttachmentsOnMessageProcessed;
+	}
 }
