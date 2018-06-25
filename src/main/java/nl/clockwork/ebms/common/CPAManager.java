@@ -53,6 +53,7 @@ public class CPAManager
 	private Ehcache methodCache;
 	private EbMSDAO ebMSDAO;
 	private URLManager urlManager;
+	private String clientkeyStorePath;
 	private KeyStore clientKeyStore;
 
 	public CPAManager()
@@ -61,6 +62,7 @@ public class CPAManager
 
 	public CPAManager(String clientkeyStorePath, String clientKeyStorePassword) throws GeneralSecurityException, IOException
 	{
+		this.clientkeyStorePath = clientkeyStorePath;
 		clientKeyStore = KeyStoreManager.getKeyStore(clientkeyStorePath,clientKeyStorePassword);
 	}
 
@@ -275,7 +277,14 @@ public class CPAManager
 	{
 		DeliveryChannel sendDeliveryChannel = getSendDeliveryChannel(cpaId,cacheablePartyId,role,service,action);
 		X509Certificate certificate = CPAUtils.getX509Certificate(CPAUtils.getClientCertificate(sendDeliveryChannel));
-		return clientKeyStore.getCertificateAlias(certificate);
+		if (certificate == null)
+			return null;
+		String certificateAlias = clientKeyStore.getCertificateAlias(certificate);
+		if (certificateAlias != null)
+			return certificateAlias;
+		else
+			throw new CertificateException("No certificate found with subject \"" + certificate.getSubjectDN().getName() + "\" (" + certificate.getSerialNumber().toString(16) + ") in keystore \"" + clientkeyStorePath + "\"");
+			//throw new CertificateException("No cetificate found for CPA " + cpaId + " and DeliveryChannel " + sendDeliveryChannel.getChannelId());
 	}
 
 	public String getUri(String cpaId, CacheablePartyId partyId, String role, String service, String action)
