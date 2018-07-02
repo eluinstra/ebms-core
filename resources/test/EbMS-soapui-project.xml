@@ -1,14 +1,38 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<con:soapui-project id="2fc37c22-76d0-4392-8280-36f3b7d181fb" activeEnvironment="Default" name="EbMS" resourceRoot="" soapui-version="5.1.3" abortOnError="false" runType="SEQUENTIAL" xmlns:con="http://eviware.com/soapui/config"><con:settings/><con:interface xsi:type="con:WsdlInterface" id="1515ca53-392d-47a7-80a5-8f3d4d0bf334" wsaVersion="NONE" name="CPAServiceImplServiceSoapBinding" type="wsdl" bindingName="{http://service.ebms.clockwork.nl/}CPAServiceImplServiceSoapBinding" soapVersion="1_1" anonymous="optional" definition="http://localhost:8080/service/cpa?wsdl" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:settings/><con:definitionCache type="TEXT" rootPart="http://localhost:8080/service/cpa?wsdl"><con:part><con:url>http://localhost:8080/service/cpa?wsdl</con:url><con:content><![CDATA[<wsdl:definitions name="CPAServiceImplService" targetNamespace="http://service.ebms.clockwork.nl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:tns="http://service.ebms.clockwork.nl/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:ns2="http://schemas.xmlsoap.org/soap/http" xmlns:ns1="http://www.ordina.nl/cpa/2.12">
-  <wsdl:import location="http://localhost:8080/service/cpa?wsdl=CPAService.wsdl" namespace="http://www.ordina.nl/cpa/2.12"></wsdl:import>
+<con:soapui-project id="2fc37c22-76d0-4392-8280-36f3b7d181fb" activeEnvironment="Default" name="EbMS" resourceRoot="" soapui-version="5.1.3" abortOnError="false" runType="SEQUENTIAL" xmlns:con="http://eviware.com/soapui/config"><con:settings/><con:interface xsi:type="con:WsdlInterface" id="1515ca53-392d-47a7-80a5-8f3d4d0bf334" wsaVersion="NONE" name="CPAServiceImplServiceSoapBinding" type="wsdl" bindingName="{http://service.ebms.clockwork.nl/}CPAServiceImplServiceSoapBinding" soapVersion="1_1" anonymous="optional" definition="http://localhost:8088/ebms-adapter-web/service/cpa?wsdl" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:settings/><con:definitionCache type="TEXT" rootPart="http://localhost:8088/ebms-adapter-web/service/cpa?wsdl"><con:part><con:url>http://localhost:8088/ebms-adapter-web/service/cpa?wsdl</con:url><con:content><![CDATA[<wsdl:definitions name="CPAServiceImplService" targetNamespace="http://service.ebms.clockwork.nl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:tns="http://service.ebms.clockwork.nl/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:ns2="http://schemas.xmlsoap.org/soap/http" xmlns:ns1="http://www.ordina.nl/cpa/2.12a">
+  <wsdl:import location="http://localhost:8088/ebms-adapter-web/service/cpa?wsdl=CPAService.wsdl" namespace="http://www.ordina.nl/cpa/2.12a"></wsdl:import>
   <wsdl:binding name="CPAServiceImplServiceSoapBinding" type="ns1:CPAService">
     <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
-    <wsdl:operation name="InsertCPA">
+    <wsdl:operation name="GetCPAIds">
       <soap:operation soapAction="" style="document"/>
-      <wsdl:input name="InsertCPA">
+      <wsdl:input name="GetCPAIds">
         <soap:body use="literal"/>
       </wsdl:input>
-      <wsdl:output name="InsertCPAResponse">
+      <wsdl:output name="GetCPAIdsResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="CPAServiceException">
+        <soap:fault name="CPAServiceException" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="SetURLMapping">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="SetURLMapping">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="SetURLMappingResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="CPAServiceException">
+        <soap:fault name="CPAServiceException" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="DeleteURLMapping">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="DeleteURLMapping">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="DeleteURLMappingResponse">
         <soap:body use="literal"/>
       </wsdl:output>
       <wsdl:fault name="CPAServiceException">
@@ -39,12 +63,24 @@
         <soap:fault name="CPAServiceException" use="literal"/>
       </wsdl:fault>
     </wsdl:operation>
-    <wsdl:operation name="SetURLMapping">
+    <wsdl:operation name="DeleteCPA">
       <soap:operation soapAction="" style="document"/>
-      <wsdl:input name="SetURLMapping">
+      <wsdl:input name="DeleteCPA">
         <soap:body use="literal"/>
       </wsdl:input>
-      <wsdl:output name="SetURLMappingResponse">
+      <wsdl:output name="DeleteCPAResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="CPAServiceException">
+        <soap:fault name="CPAServiceException" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="InsertCPA">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="InsertCPA">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="InsertCPAResponse">
         <soap:body use="literal"/>
       </wsdl:output>
       <wsdl:fault name="CPAServiceException">
@@ -63,96 +99,31 @@
         <soap:fault name="CPAServiceException" use="literal"/>
       </wsdl:fault>
     </wsdl:operation>
-    <wsdl:operation name="GetURL">
-      <soap:operation soapAction="" style="document"/>
-      <wsdl:input name="GetURL">
-        <soap:body use="literal"/>
-      </wsdl:input>
-      <wsdl:output name="GetURLResponse">
-        <soap:body use="literal"/>
-      </wsdl:output>
-      <wsdl:fault name="CPAServiceException">
-        <soap:fault name="CPAServiceException" use="literal"/>
-      </wsdl:fault>
-    </wsdl:operation>
-    <wsdl:operation name="DeleteCPA">
-      <soap:operation soapAction="" style="document"/>
-      <wsdl:input name="DeleteCPA">
-        <soap:body use="literal"/>
-      </wsdl:input>
-      <wsdl:output name="DeleteCPAResponse">
-        <soap:body use="literal"/>
-      </wsdl:output>
-      <wsdl:fault name="CPAServiceException">
-        <soap:fault name="CPAServiceException" use="literal"/>
-      </wsdl:fault>
-    </wsdl:operation>
-    <wsdl:operation name="GetCPAIds">
-      <soap:operation soapAction="" style="document"/>
-      <wsdl:input name="GetCPAIds">
-        <soap:body use="literal"/>
-      </wsdl:input>
-      <wsdl:output name="GetCPAIdsResponse">
-        <soap:body use="literal"/>
-      </wsdl:output>
-      <wsdl:fault name="CPAServiceException">
-        <soap:fault name="CPAServiceException" use="literal"/>
-      </wsdl:fault>
-    </wsdl:operation>
   </wsdl:binding>
   <wsdl:service name="CPAServiceImplService">
     <wsdl:port binding="tns:CPAServiceImplServiceSoapBinding" name="CPAServiceImplPort">
-      <soap:address location="http://localhost:8080/service/cpa"/>
+      <soap:address location="http://localhost:8088/ebms-adapter-web/service/cpa"/>
     </wsdl:port>
   </wsdl:service>
-</wsdl:definitions>]]></con:content><con:type>http://schemas.xmlsoap.org/wsdl/</con:type></con:part><con:part><con:url>http://localhost:8080/service/cpa?wsdl=CPAService.wsdl</con:url><con:content><![CDATA[<wsdl:definitions name="CPAService" targetNamespace="http://www.ordina.nl/cpa/2.12" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:ns1="http://www.ordina.nl/cpa/2.12">
+</wsdl:definitions>]]></con:content><con:type>http://schemas.xmlsoap.org/wsdl/</con:type></con:part><con:part><con:url>http://localhost:8088/ebms-adapter-web/service/cpa?wsdl=CPAService.wsdl</con:url><con:content><![CDATA[<wsdl:definitions name="CPAService" targetNamespace="http://www.ordina.nl/cpa/2.12a" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:ns1="http://www.ordina.nl/cpa/2.12a">
   <wsdl:types>
-    <xs:schema attributeFormDefault="unqualified" elementFormDefault="unqualified" targetNamespace="http://www.ordina.nl/cpa/2.12" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://www.ordina.nl/cpa/2.12">
+    <xs:schema attributeFormDefault="unqualified" elementFormDefault="unqualified" targetNamespace="http://www.ordina.nl/cpa/2.12a" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://www.ordina.nl/cpa/2.12a">
       <xs:element name="DeleteCPA" type="tns:DeleteCPA"/>
       <xs:element name="DeleteCPAResponse" type="tns:DeleteCPAResponse"/>
+      <xs:element name="DeleteURLMapping" type="tns:DeleteURLMapping"/>
+      <xs:element name="DeleteURLMappingResponse" type="tns:DeleteURLMappingResponse"/>
       <xs:element name="GetCPA" type="tns:GetCPA"/>
       <xs:element name="GetCPAIds" type="tns:GetCPAIds"/>
       <xs:element name="GetCPAIdsResponse" type="tns:GetCPAIdsResponse"/>
       <xs:element name="GetCPAResponse" type="tns:GetCPAResponse"/>
-      <xs:element name="GetURL" type="tns:GetURL"/>
       <xs:element name="GetURLMappings" type="tns:GetURLMappings"/>
       <xs:element name="GetURLMappingsResponse" type="tns:GetURLMappingsResponse"/>
-      <xs:element name="GetURLResponse" type="tns:GetURLResponse"/>
       <xs:element name="InsertCPA" type="tns:InsertCPA"/>
       <xs:element name="InsertCPAResponse" type="tns:InsertCPAResponse"/>
       <xs:element name="SetURLMapping" type="tns:SetURLMapping"/>
       <xs:element name="SetURLMappingResponse" type="tns:SetURLMappingResponse"/>
       <xs:element name="ValidateCPA" type="tns:ValidateCPA"/>
       <xs:element name="ValidateCPAResponse" type="tns:ValidateCPAResponse"/>
-      <xs:complexType name="InsertCPA">
-        <xs:sequence>
-          <xs:element name="CPA" type="xs:string"/>
-          <xs:element minOccurs="0" name="Overwrite" type="xs:boolean"/>
-        </xs:sequence>
-      </xs:complexType>
-      <xs:complexType name="InsertCPAResponse">
-        <xs:sequence>
-          <xs:element minOccurs="0" name="CPAId" type="xs:string"/>
-        </xs:sequence>
-      </xs:complexType>
-      <xs:complexType name="ValidateCPA">
-        <xs:sequence>
-          <xs:element name="CPA" type="xs:string"/>
-        </xs:sequence>
-      </xs:complexType>
-      <xs:complexType name="ValidateCPAResponse">
-        <xs:sequence/>
-      </xs:complexType>
-      <xs:complexType name="GetCPA">
-        <xs:sequence>
-          <xs:element name="CPAId" type="xs:string"/>
-        </xs:sequence>
-      </xs:complexType>
-      <xs:complexType name="GetCPAResponse">
-        <xs:sequence>
-          <xs:element minOccurs="0" name="CPA" type="xs:string"/>
-        </xs:sequence>
-      </xs:complexType>
       <xs:complexType name="SetURLMapping">
         <xs:sequence>
           <xs:element name="URLMapping" type="tns:urlMapping"/>
@@ -167,28 +138,49 @@
       <xs:complexType name="SetURLMappingResponse">
         <xs:sequence/>
       </xs:complexType>
-      <xs:complexType name="GetURLMappings">
-        <xs:sequence/>
-      </xs:complexType>
-      <xs:complexType name="GetURLMappingsResponse">
-        <xs:sequence>
-          <xs:element maxOccurs="unbounded" minOccurs="0" name="URLs" type="tns:urlMapping"/>
-        </xs:sequence>
-      </xs:complexType>
-      <xs:complexType name="GetURL">
-        <xs:sequence>
-          <xs:element name="SourceURL" type="xs:string"/>
-        </xs:sequence>
-      </xs:complexType>
-      <xs:complexType name="GetURLResponse">
-        <xs:sequence/>
-      </xs:complexType>
       <xs:complexType name="GetCPAIds">
         <xs:sequence/>
       </xs:complexType>
       <xs:complexType name="GetCPAIdsResponse">
         <xs:sequence>
           <xs:element maxOccurs="unbounded" minOccurs="0" name="CPAIds" type="xs:string"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="DeleteURLMapping">
+        <xs:sequence>
+          <xs:element name="SourceURL" type="xs:string"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="DeleteURLMappingResponse">
+        <xs:sequence/>
+      </xs:complexType>
+      <xs:complexType name="GetCPA">
+        <xs:sequence>
+          <xs:element name="CPAId" type="xs:string"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="GetCPAResponse">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="CPA" type="xs:string"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="ValidateCPA">
+        <xs:sequence>
+          <xs:element name="CPA" type="xs:string"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="ValidateCPAResponse">
+        <xs:sequence/>
+      </xs:complexType>
+      <xs:complexType name="InsertCPA">
+        <xs:sequence>
+          <xs:element name="CPA" type="xs:string"/>
+          <xs:element minOccurs="0" name="Overwrite" type="xs:boolean"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="InsertCPAResponse">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="CPAId" type="xs:string"/>
         </xs:sequence>
       </xs:complexType>
       <xs:complexType name="DeleteCPA">
@@ -199,6 +191,14 @@
       <xs:complexType name="DeleteCPAResponse">
         <xs:sequence/>
       </xs:complexType>
+      <xs:complexType name="GetURLMappings">
+        <xs:sequence/>
+      </xs:complexType>
+      <xs:complexType name="GetURLMappingsResponse">
+        <xs:sequence>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="URLs" type="tns:urlMapping"/>
+        </xs:sequence>
+      </xs:complexType>
       <xs:element name="CPAServiceException" type="tns:CPAServiceException"/>
       <xs:complexType name="CPAServiceException">
         <xs:sequence>
@@ -207,26 +207,8 @@
       </xs:complexType>
     </xs:schema>
   </wsdl:types>
-  <wsdl:message name="GetURLResponse">
-    <wsdl:part element="ns1:GetURLResponse" name="parameters"></wsdl:part>
-  </wsdl:message>
-  <wsdl:message name="GetURLMappingsResponse">
-    <wsdl:part element="ns1:GetURLMappingsResponse" name="parameters"></wsdl:part>
-  </wsdl:message>
-  <wsdl:message name="SetURLMappingResponse">
-    <wsdl:part element="ns1:SetURLMappingResponse" name="parameters"></wsdl:part>
-  </wsdl:message>
-  <wsdl:message name="GetCPAResponse">
-    <wsdl:part element="ns1:GetCPAResponse" name="parameters"></wsdl:part>
-  </wsdl:message>
-  <wsdl:message name="GetCPAIds">
-    <wsdl:part element="ns1:GetCPAIds" name="parameters"></wsdl:part>
-  </wsdl:message>
-  <wsdl:message name="DeleteCPAResponse">
-    <wsdl:part element="ns1:DeleteCPAResponse" name="parameters"></wsdl:part>
-  </wsdl:message>
-  <wsdl:message name="InsertCPA">
-    <wsdl:part element="ns1:InsertCPA" name="parameters"></wsdl:part>
+  <wsdl:message name="SetURLMapping">
+    <wsdl:part element="ns1:SetURLMapping" name="parameters"></wsdl:part>
   </wsdl:message>
   <wsdl:message name="InsertCPAResponse">
     <wsdl:part element="ns1:InsertCPAResponse" name="parameters"></wsdl:part>
@@ -234,23 +216,17 @@
   <wsdl:message name="GetCPA">
     <wsdl:part element="ns1:GetCPA" name="parameters"></wsdl:part>
   </wsdl:message>
-  <wsdl:message name="SetURLMapping">
-    <wsdl:part element="ns1:SetURLMapping" name="parameters"></wsdl:part>
+  <wsdl:message name="InsertCPA">
+    <wsdl:part element="ns1:InsertCPA" name="parameters"></wsdl:part>
   </wsdl:message>
   <wsdl:message name="ValidateCPA">
     <wsdl:part element="ns1:ValidateCPA" name="parameters"></wsdl:part>
   </wsdl:message>
-  <wsdl:message name="CPAServiceException">
-    <wsdl:part element="ns1:CPAServiceException" name="CPAServiceException"></wsdl:part>
-  </wsdl:message>
-  <wsdl:message name="GetURL">
-    <wsdl:part element="ns1:GetURL" name="parameters"></wsdl:part>
-  </wsdl:message>
   <wsdl:message name="GetURLMappings">
     <wsdl:part element="ns1:GetURLMappings" name="parameters"></wsdl:part>
   </wsdl:message>
-  <wsdl:message name="ValidateCPAResponse">
-    <wsdl:part element="ns1:ValidateCPAResponse" name="parameters"></wsdl:part>
+  <wsdl:message name="CPAServiceException">
+    <wsdl:part element="ns1:CPAServiceException" name="CPAServiceException"></wsdl:part>
   </wsdl:message>
   <wsdl:message name="GetCPAIdsResponse">
     <wsdl:part element="ns1:GetCPAIdsResponse" name="parameters"></wsdl:part>
@@ -258,35 +234,34 @@
   <wsdl:message name="DeleteCPA">
     <wsdl:part element="ns1:DeleteCPA" name="parameters"></wsdl:part>
   </wsdl:message>
+  <wsdl:message name="DeleteURLMappingResponse">
+    <wsdl:part element="ns1:DeleteURLMappingResponse" name="parameters"></wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="ValidateCPAResponse">
+    <wsdl:part element="ns1:ValidateCPAResponse" name="parameters"></wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="GetURLMappingsResponse">
+    <wsdl:part element="ns1:GetURLMappingsResponse" name="parameters"></wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="DeleteURLMapping">
+    <wsdl:part element="ns1:DeleteURLMapping" name="parameters"></wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="SetURLMappingResponse">
+    <wsdl:part element="ns1:SetURLMappingResponse" name="parameters"></wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="DeleteCPAResponse">
+    <wsdl:part element="ns1:DeleteCPAResponse" name="parameters"></wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="GetCPAResponse">
+    <wsdl:part element="ns1:GetCPAResponse" name="parameters"></wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="GetCPAIds">
+    <wsdl:part element="ns1:GetCPAIds" name="parameters"></wsdl:part>
+  </wsdl:message>
   <wsdl:portType name="CPAService">
-    <wsdl:operation name="InsertCPA">
-      <wsdl:input message="ns1:InsertCPA" name="InsertCPA"></wsdl:input>
-      <wsdl:output message="ns1:InsertCPAResponse" name="InsertCPAResponse"></wsdl:output>
-      <wsdl:fault message="ns1:CPAServiceException" name="CPAServiceException"></wsdl:fault>
-    </wsdl:operation>
-    <wsdl:operation name="ValidateCPA">
-      <wsdl:input message="ns1:ValidateCPA" name="ValidateCPA"></wsdl:input>
-      <wsdl:output message="ns1:ValidateCPAResponse" name="ValidateCPAResponse"></wsdl:output>
-      <wsdl:fault message="ns1:CPAServiceException" name="CPAServiceException"></wsdl:fault>
-    </wsdl:operation>
-    <wsdl:operation name="GetCPA">
-      <wsdl:input message="ns1:GetCPA" name="GetCPA"></wsdl:input>
-      <wsdl:output message="ns1:GetCPAResponse" name="GetCPAResponse"></wsdl:output>
-      <wsdl:fault message="ns1:CPAServiceException" name="CPAServiceException"></wsdl:fault>
-    </wsdl:operation>
     <wsdl:operation name="SetURLMapping">
       <wsdl:input message="ns1:SetURLMapping" name="SetURLMapping"></wsdl:input>
       <wsdl:output message="ns1:SetURLMappingResponse" name="SetURLMappingResponse"></wsdl:output>
-      <wsdl:fault message="ns1:CPAServiceException" name="CPAServiceException"></wsdl:fault>
-    </wsdl:operation>
-    <wsdl:operation name="GetURLMappings">
-      <wsdl:input message="ns1:GetURLMappings" name="GetURLMappings"></wsdl:input>
-      <wsdl:output message="ns1:GetURLMappingsResponse" name="GetURLMappingsResponse"></wsdl:output>
-      <wsdl:fault message="ns1:CPAServiceException" name="CPAServiceException"></wsdl:fault>
-    </wsdl:operation>
-    <wsdl:operation name="GetURL">
-      <wsdl:input message="ns1:GetURL" name="GetURL"></wsdl:input>
-      <wsdl:output message="ns1:GetURLResponse" name="GetURLResponse"></wsdl:output>
       <wsdl:fault message="ns1:CPAServiceException" name="CPAServiceException"></wsdl:fault>
     </wsdl:operation>
     <wsdl:operation name="GetCPAIds">
@@ -294,42 +269,67 @@
       <wsdl:output message="ns1:GetCPAIdsResponse" name="GetCPAIdsResponse"></wsdl:output>
       <wsdl:fault message="ns1:CPAServiceException" name="CPAServiceException"></wsdl:fault>
     </wsdl:operation>
+    <wsdl:operation name="DeleteURLMapping">
+      <wsdl:input message="ns1:DeleteURLMapping" name="DeleteURLMapping"></wsdl:input>
+      <wsdl:output message="ns1:DeleteURLMappingResponse" name="DeleteURLMappingResponse"></wsdl:output>
+      <wsdl:fault message="ns1:CPAServiceException" name="CPAServiceException"></wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="GetCPA">
+      <wsdl:input message="ns1:GetCPA" name="GetCPA"></wsdl:input>
+      <wsdl:output message="ns1:GetCPAResponse" name="GetCPAResponse"></wsdl:output>
+      <wsdl:fault message="ns1:CPAServiceException" name="CPAServiceException"></wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="ValidateCPA">
+      <wsdl:input message="ns1:ValidateCPA" name="ValidateCPA"></wsdl:input>
+      <wsdl:output message="ns1:ValidateCPAResponse" name="ValidateCPAResponse"></wsdl:output>
+      <wsdl:fault message="ns1:CPAServiceException" name="CPAServiceException"></wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="InsertCPA">
+      <wsdl:input message="ns1:InsertCPA" name="InsertCPA"></wsdl:input>
+      <wsdl:output message="ns1:InsertCPAResponse" name="InsertCPAResponse"></wsdl:output>
+      <wsdl:fault message="ns1:CPAServiceException" name="CPAServiceException"></wsdl:fault>
+    </wsdl:operation>
     <wsdl:operation name="DeleteCPA">
       <wsdl:input message="ns1:DeleteCPA" name="DeleteCPA"></wsdl:input>
       <wsdl:output message="ns1:DeleteCPAResponse" name="DeleteCPAResponse"></wsdl:output>
       <wsdl:fault message="ns1:CPAServiceException" name="CPAServiceException"></wsdl:fault>
     </wsdl:operation>
+    <wsdl:operation name="GetURLMappings">
+      <wsdl:input message="ns1:GetURLMappings" name="GetURLMappings"></wsdl:input>
+      <wsdl:output message="ns1:GetURLMappingsResponse" name="GetURLMappingsResponse"></wsdl:output>
+      <wsdl:fault message="ns1:CPAServiceException" name="CPAServiceException"></wsdl:fault>
+    </wsdl:operation>
   </wsdl:portType>
-</wsdl:definitions>]]></con:content><con:type>http://schemas.xmlsoap.org/wsdl/</con:type></con:part></con:definitionCache><con:endpoints><con:endpoint>http://127.0.0.1:8443/adapter/cpa</con:endpoint><con:endpoint>http://82.72.124.69:8443/adapter/cpa</con:endpoint><con:endpoint>http://localhost:8080/service/cpa</con:endpoint><con:endpoint>http://localhost:8088/ebms-adapter-web/service/cpa</con:endpoint><con:endpoint>http://localhost:8089/adapter/cpa</con:endpoint></con:endpoints><con:operation id="749daf65-d6a9-4966-b9a4-4d620d61b812" isOneWay="false" action="" name="DeleteCPA" bindingOperationName="DeleteCPA" type="Request-Response" outputName="DeleteCPAResponse" inputName="DeleteCPA" receivesAttachments="false" sendsAttachments="false" anonymous="optional"><con:settings/><con:call id="b7d1ac92-a992-4444-b965-b8174f46d0c9" name="Request 1"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8080/service/cpa</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns="http://www.ordina.nl/cpa/2.12">
+</wsdl:definitions>]]></con:content><con:type>http://schemas.xmlsoap.org/wsdl/</con:type></con:part></con:definitionCache><con:endpoints><con:endpoint>http://127.0.0.1:8443/adapter/cpa</con:endpoint><con:endpoint>http://82.72.124.69:8443/adapter/cpa</con:endpoint><con:endpoint>http://localhost:8080/service/cpa</con:endpoint><con:endpoint>http://localhost:8088/ebms-adapter-web/service/cpa</con:endpoint><con:endpoint>http://localhost:8089/adapter/cpa</con:endpoint></con:endpoints><con:operation id="749daf65-d6a9-4966-b9a4-4d620d61b812" isOneWay="false" action="" name="DeleteCPA" bindingOperationName="DeleteCPA" type="Request-Response" outputName="DeleteCPAResponse" inputName="DeleteCPA" receivesAttachments="false" sendsAttachments="false" anonymous="optional"><con:settings/><con:call id="b7d1ac92-a992-4444-b965-b8174f46d0c9" name="Request 1"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8080/service/cpa</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:a="http://www.ordina.nl/cpa/2.12a">
    <soapenv:Header/>
    <soapenv:Body>
-      <ns:DeleteCPA>
+      <a:DeleteCPA>
          <CPAId>?</CPAId>
-      </ns:DeleteCPA>
+      </a:DeleteCPA>
    </soapenv:Body>
-</soapenv:Envelope>]]></con:request><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508" action="http://www.ordina.nl/cpa/2.10/CPAService/DeleteCPA"/><con:wsrmConfig version="1.2"/></con:call></con:operation><con:operation id="6977a7d0-c77e-4ec4-8c2c-dbaf5a6c4a5e" isOneWay="false" action="" name="GetCPA" bindingOperationName="GetCPA" type="Request-Response" outputName="GetCPAResponse" inputName="GetCPA" receivesAttachments="false" sendsAttachments="false" anonymous="optional"><con:settings/><con:call id="27fc996f-6244-427e-952d-5e5beb93340d" name="Request 1"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8080/service/cpa</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns="http://www.ordina.nl/cpa/2.12">
+</soapenv:Envelope>]]></con:request><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508" action="http://www.ordina.nl/cpa/2.10/CPAService/DeleteCPA"/><con:wsrmConfig version="1.2"/></con:call></con:operation><con:operation id="6977a7d0-c77e-4ec4-8c2c-dbaf5a6c4a5e" isOneWay="false" action="" name="GetCPA" bindingOperationName="GetCPA" type="Request-Response" outputName="GetCPAResponse" inputName="GetCPA" receivesAttachments="false" sendsAttachments="false" anonymous="optional"><con:settings/><con:call id="27fc996f-6244-427e-952d-5e5beb93340d" name="Request 1"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8080/service/cpa</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:a="http://www.ordina.nl/cpa/2.12a">
    <soapenv:Header/>
    <soapenv:Body>
-      <ns:GetCPA>
+      <a:GetCPA>
          <CPAId>CPA_EBFStub</CPAId>
-      </ns:GetCPA>
+      </a:GetCPA>
    </soapenv:Body>
-</soapenv:Envelope>]]></con:request><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508" action="http://www.ordina.nl/cpa/2.10/CPAService/GetCPA"/><con:wsrmConfig version="1.2"/></con:call></con:operation><con:operation id="ad8ddf03-d52c-45a7-9ea3-a8bb32b1db2b" isOneWay="false" action="" name="GetCPAIds" bindingOperationName="GetCPAIds" type="Request-Response" outputName="GetCPAIdsResponse" inputName="GetCPAIds" receivesAttachments="false" sendsAttachments="false" anonymous="optional"><con:settings/><con:call id="8fa3b4c4-202b-4a2b-a6e8-9de21cde0474" name="Request 1"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8080/service/cpa</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns="http://www.ordina.nl/cpa/2.12">
+</soapenv:Envelope>]]></con:request><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508" action="http://www.ordina.nl/cpa/2.10/CPAService/GetCPA"/><con:wsrmConfig version="1.2"/></con:call></con:operation><con:operation id="ad8ddf03-d52c-45a7-9ea3-a8bb32b1db2b" isOneWay="false" action="" name="GetCPAIds" bindingOperationName="GetCPAIds" type="Request-Response" outputName="GetCPAIdsResponse" inputName="GetCPAIds" receivesAttachments="false" sendsAttachments="false" anonymous="optional"><con:settings/><con:call id="8fa3b4c4-202b-4a2b-a6e8-9de21cde0474" name="Request 1"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8080/service/cpa</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:a="http://www.ordina.nl/cpa/2.12a">
    <soapenv:Header/>
    <soapenv:Body>
-      <ns:GetCPAIds/>
+      <a:GetCPAIds/>
    </soapenv:Body>
-</soapenv:Envelope>]]></con:request><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508" action="http://www.ordina.nl/cpa/2.10/CPAService/GetCPAIds"/><con:wsrmConfig version="1.2"/></con:call></con:operation><con:operation id="b4816d1a-f1a4-4d1e-9d6e-cd009d5e09cd" isOneWay="false" action="" name="GetURL" bindingOperationName="GetURL" type="Request-Response" outputName="GetURLResponse" inputName="GetURL" receivesAttachments="false" sendsAttachments="false" anonymous="optional"><con:settings/><con:call id="94fe6ec6-9431-458e-b7cb-c82aada367a2" name="Request 1"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8080/service/cpa</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns="http://www.ordina.nl/cpa/2.12">
+</soapenv:Envelope>]]></con:request><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508" action="http://www.ordina.nl/cpa/2.10/CPAService/GetCPAIds"/><con:wsrmConfig version="1.2"/></con:call></con:operation><con:operation id="b4816d1a-f1a4-4d1e-9d6e-cd009d5e09cd" isOneWay="false" action="" name="DeleteURLMapping" bindingOperationName="DeleteURLMapping" type="Request-Response" outputName="DeleteURLMappingResponse" inputName="DeleteURLMapping" receivesAttachments="false" sendsAttachments="false" anonymous="optional"><con:settings/><con:call id="94fe6ec6-9431-458e-b7cb-c82aada367a2" name="Request 1"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8080/service/cpa</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:a="http://www.ordina.nl/cpa/2.12a">
    <soapenv:Header/>
    <soapenv:Body>
-      <ns:GetURL>
+      <a:DeleteURLMapping>
          <SourceURL>?</SourceURL>
-      </ns:GetURL>
+      </a:DeleteURLMapping>
    </soapenv:Body>
-</soapenv:Envelope>]]></con:request><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508" action="http://www.ordina.nl/cpa/2.10/CPAService/GetURL"/><con:wsrmConfig version="1.2"/></con:call></con:operation><con:operation id="64dd0667-8b83-4100-a5f0-00adb539a455" isOneWay="false" action="" name="InsertCPA" bindingOperationName="InsertCPA" type="Request-Response" outputName="InsertCPAResponse" inputName="InsertCPA" receivesAttachments="false" sendsAttachments="false" anonymous="optional"><con:settings/><con:call id="fb00b7d0-d8c4-4d4b-aa3f-114dad73956a" name="Request 1"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8080/service/cpa</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns="http://www.ordina.nl/cpa/2.12">
+</soapenv:Envelope>]]></con:request><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508" action="http://www.ordina.nl/cpa/2.10/CPAService/GetURL"/><con:wsrmConfig version="1.2"/></con:call></con:operation><con:operation id="64dd0667-8b83-4100-a5f0-00adb539a455" isOneWay="false" action="" name="InsertCPA" bindingOperationName="InsertCPA" type="Request-Response" outputName="InsertCPAResponse" inputName="InsertCPA" receivesAttachments="false" sendsAttachments="false" anonymous="optional"><con:settings/><con:call id="fb00b7d0-d8c4-4d4b-aa3f-114dad73956a" name="Request 1"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8080/service/cpa</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:a="http://www.ordina.nl/cpa/2.12a">
    <soapenv:Header/>
    <soapenv:Body>
-      <ns:InsertCPA>
+      <a:InsertCPA>
          <CPA><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
 <tns:CollaborationProtocolAgreement xmlns:axsl="http://www.w3.org/1999/XSL/TransformAlias" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:functx="http://www.functx.com" xmlns:tns="http://www.oasis-open.org/committees/ebxml-cppa/schema/cpp-cpa-2_0.xsd" xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns:xlink="http://www.w3.org/1999/xlink" xsi:schemaLocation="http://www.oasis-open.org/committees/ebxml-cppa/schema/cpp-cpa-2_0.xsd http://www.oasis-open.org/committees/ebxml-cppa/schema/cpp-cpa-2_0.xsd" tns:cpaid="cpaStubEBF.rm.http.unsigned.sync" tns:version="1.0">
 	<tns:Status tns:value="agreed" />
@@ -524,12 +524,12 @@
 	</tns:Packaging>
 </tns:CollaborationProtocolAgreement>]]]]>><![CDATA[</CPA>
          <Overwrite>true</Overwrite>
-      </ns:InsertCPA>
+      </a:InsertCPA>
    </soapenv:Body>
-</soapenv:Envelope>]]></con:request><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508" action="http://www.ordina.nl/cpa/2.10/CPAService/InsertCPA"/><con:wsrmConfig version="1.2"/></con:call><con:call id="b998c40a-6988-4f4c-a259-372e6731dd50" name="Request 2"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8080/service/cpa</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns="http://www.ordina.nl/cpa/2.12">
+</soapenv:Envelope>]]></con:request><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508" action="http://www.ordina.nl/cpa/2.10/CPAService/InsertCPA"/><con:wsrmConfig version="1.2"/></con:call><con:call id="b998c40a-6988-4f4c-a259-372e6731dd50" name="Request 2"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8080/service/cpa</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:a="http://www.ordina.nl/cpa/2.12a">
    <soapenv:Header/>
    <soapenv:Body>
-      <ns:InsertCPA>
+      <a:InsertCPA>
          <CPA><![CDATA[<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <ns1:CollaborationProtocolAgreement ns1:cpaid="CPA_EBFStub" ns1:version="1.0" xmlns:ns2="http://www.w3.org/1999/xlink" xmlns:ns1="http://www.oasis-open.org/committees/ebxml-cppa/schema/cpp-cpa-2_0.xsd" xmlns:ns3="http://www.w3.org/2000/09/xmldsig#">
     <ns1:Status ns1:value="agreed"/>
@@ -1012,34 +1012,34 @@
     </ns1:Packaging>
 </ns1:CollaborationProtocolAgreement>]]]]>><![CDATA[</CPA>
          <Overwrite>true</Overwrite>
-      </ns:InsertCPA>
+      </a:InsertCPA>
    </soapenv:Body>
-</soapenv:Envelope>]]></con:request><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508" action="http://www.ordina.nl/cpa/2.10/CPAService/InsertCPA"/><con:wsrmConfig version="1.2"/></con:call></con:operation><con:operation id="69a2eb9b-015b-418f-8b62-c3434e8c6fa9" isOneWay="false" action="" name="SetURLMapping" bindingOperationName="SetURLMapping" type="Request-Response" outputName="SetURLMappingResponse" inputName="SetURLMapping" receivesAttachments="false" sendsAttachments="false" anonymous="optional"><con:settings/><con:call id="bc54080b-2de6-4b54-9a35-b553731e0523" name="Request 1"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8080/service/cpa</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns="http://www.ordina.nl/cpa/2.12">
+</soapenv:Envelope>]]></con:request><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508" action="http://www.ordina.nl/cpa/2.10/CPAService/InsertCPA"/><con:wsrmConfig version="1.2"/></con:call></con:operation><con:operation id="69a2eb9b-015b-418f-8b62-c3434e8c6fa9" isOneWay="false" action="" name="SetURLMapping" bindingOperationName="SetURLMapping" type="Request-Response" outputName="SetURLMappingResponse" inputName="SetURLMapping" receivesAttachments="false" sendsAttachments="false" anonymous="optional"><con:settings/><con:call id="bc54080b-2de6-4b54-9a35-b553731e0523" name="Request 1"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8080/service/cpa</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:a="http://www.ordina.nl/cpa/2.12a">
    <soapenv:Header/>
    <soapenv:Body>
-      <ns:SetURLMapping>
+      <a:SetURLMapping>
          <URLMapping>
             <!--Optional:-->
             <destination>?</destination>
             <!--Optional:-->
             <source>?</source>
          </URLMapping>
-      </ns:SetURLMapping>
+      </a:SetURLMapping>
    </soapenv:Body>
-</soapenv:Envelope>]]></con:request><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508" action="http://www.ordina.nl/cpa/2.10/CPAService/SetURL"/><con:wsrmConfig version="1.2"/></con:call></con:operation><con:operation id="354b869d-2430-493b-af66-22532dc9299e" isOneWay="false" action="" name="ValidateCPA" bindingOperationName="ValidateCPA" type="Request-Response" outputName="ValidateCPAResponse" inputName="ValidateCPA" receivesAttachments="false" sendsAttachments="false" anonymous="optional"><con:settings/><con:call id="59751ddf-00d5-4cea-9a3e-c623ffb2ddcf" name="Request 1"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8080/service/cpa</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns="http://www.ordina.nl/cpa/2.12">
+</soapenv:Envelope>]]></con:request><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508" action="http://www.ordina.nl/cpa/2.10/CPAService/SetURL"/><con:wsrmConfig version="1.2"/></con:call></con:operation><con:operation id="354b869d-2430-493b-af66-22532dc9299e" isOneWay="false" action="" name="ValidateCPA" bindingOperationName="ValidateCPA" type="Request-Response" outputName="ValidateCPAResponse" inputName="ValidateCPA" receivesAttachments="false" sendsAttachments="false" anonymous="optional"><con:settings/><con:call id="59751ddf-00d5-4cea-9a3e-c623ffb2ddcf" name="Request 1"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8080/service/cpa</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:a="http://www.ordina.nl/cpa/2.12a" xmlns:ns="http://www.ordina.nl/cpa/2.12">
    <soapenv:Header/>
    <soapenv:Body>
-      <ns:ValidateCPA>
+      <a:ValidateCPA>
          <CPA>?</CPA>
-      </ns:ValidateCPA>
+      </a:ValidateCPA>
    </soapenv:Body>
-</soapenv:Envelope>]]></con:request><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508" action="http://www.ordina.nl/cpa/2.10/CPAService/ValidateCPA"/><con:wsrmConfig version="1.2"/></con:call></con:operation><con:operation id="2e350261-3a1a-450b-91dd-6891e84a5a6a" isOneWay="false" action="" name="GetURLMappings" bindingOperationName="GetURLMappings" type="Request-Response" outputName="GetURLMappingsResponse" inputName="GetURLMappings" receivesAttachments="false" sendsAttachments="false" anonymous="optional"><con:settings/><con:call id="e2f5de0d-ff3b-40d5-91f6-e0ecdaebadac" name="Request 1"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8080/service/cpa</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns="http://www.ordina.nl/cpa/2.12">
+</soapenv:Envelope>]]></con:request><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508" action="http://www.ordina.nl/cpa/2.10/CPAService/ValidateCPA"/><con:wsrmConfig version="1.2"/></con:call></con:operation><con:operation id="2e350261-3a1a-450b-91dd-6891e84a5a6a" isOneWay="false" action="" name="GetURLMappings" bindingOperationName="GetURLMappings" type="Request-Response" outputName="GetURLMappingsResponse" inputName="GetURLMappings" receivesAttachments="false" sendsAttachments="false" anonymous="optional"><con:settings/><con:call id="e2f5de0d-ff3b-40d5-91f6-e0ecdaebadac" name="Request 1"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8080/service/cpa</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:a="http://www.ordina.nl/cpa/2.12a">
    <soapenv:Header/>
    <soapenv:Body>
-      <ns:GetURLMappings/>
+      <a:GetURLMappings/>
    </soapenv:Body>
-</soapenv:Envelope>]]></con:request><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508" action="http://service.ebms.clockwork.nl/CPAService/GetURLMappings"/><con:wsrmConfig version="1.2"/></con:call></con:operation></con:interface><con:interface xsi:type="con:WsdlInterface" id="78916d5a-3f95-4156-8601-7cda69d502d9" wsaVersion="NONE" name="EbMSMessageServiceImplServiceSoapBinding" type="wsdl" bindingName="{http://service.ebms.clockwork.nl/}EbMSMessageServiceImplServiceSoapBinding" soapVersion="1_1" anonymous="optional" definition="http://localhost:8080/service/ebms?wsdl" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:settings/><con:definitionCache type="TEXT" rootPart="http://localhost:8080/service/ebms?wsdl"><con:part><con:url>http://localhost:8080/service/ebms?wsdl</con:url><con:content><![CDATA[<wsdl:definitions name="EbMSMessageServiceImplService" targetNamespace="http://service.ebms.clockwork.nl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:tns="http://service.ebms.clockwork.nl/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:ns3="http://schemas.xmlsoap.org/soap/http" xmlns:ns1="http://www.ordina.nl/ebms/2.15">
-  <wsdl:import location="http://localhost:8080/service/ebms?wsdl=EbMSMessageService.wsdl" namespace="http://www.ordina.nl/ebms/2.15"></wsdl:import>
+</soapenv:Envelope>]]></con:request><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508" action="http://service.ebms.clockwork.nl/CPAService/GetURLMappings"/><con:wsrmConfig version="1.2"/></con:call></con:operation></con:interface><con:interface xsi:type="con:WsdlInterface" id="78916d5a-3f95-4156-8601-7cda69d502d9" wsaVersion="NONE" name="EbMSMessageServiceImplServiceSoapBinding" type="wsdl" bindingName="{http://service.ebms.clockwork.nl/}EbMSMessageServiceImplServiceSoapBinding" soapVersion="1_1" anonymous="optional" definition="http://localhost:8088/ebms-adapter-web/service/ebms?wsdl" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:settings/><con:definitionCache type="TEXT" rootPart="http://localhost:8088/ebms-adapter-web/service/ebms?wsdl"><con:part><con:url>http://localhost:8088/ebms-adapter-web/service/ebms?wsdl</con:url><con:content><![CDATA[<wsdl:definitions name="EbMSMessageServiceImplService" targetNamespace="http://service.ebms.clockwork.nl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:tns="http://service.ebms.clockwork.nl/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:ns3="http://schemas.xmlsoap.org/soap/http" xmlns:ns1="http://www.ordina.nl/ebms/2.15">
+  <wsdl:import location="http://localhost:8088/ebms-adapter-web/service/ebms?wsdl=EbMSMessageService.wsdl" namespace="http://www.ordina.nl/ebms/2.15"></wsdl:import>
   <wsdl:binding name="EbMSMessageServiceImplServiceSoapBinding" type="ns1:EbMSMessageService">
     <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
     <wsdl:operation name="GetMessageStatusByMessageId">
@@ -1201,10 +1201,10 @@
   </wsdl:binding>
   <wsdl:service name="EbMSMessageServiceImplService">
     <wsdl:port binding="tns:EbMSMessageServiceImplServiceSoapBinding" name="EbMSMessageServiceImplPort">
-      <soap:address location="http://localhost:8080/service/ebms"/>
+      <soap:address location="http://localhost:8088/ebms-adapter-web/service/ebms"/>
     </wsdl:port>
   </wsdl:service>
-</wsdl:definitions>]]></con:content><con:type>http://schemas.xmlsoap.org/wsdl/</con:type></con:part><con:part><con:url>http://localhost:8080/service/ebms?wsdl=EbMSMessageService.wsdl</con:url><con:content><![CDATA[<wsdl:definitions name="EbMSMessageService" targetNamespace="http://www.ordina.nl/ebms/2.15" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:ns2="http://www.ordina.nl/ebms/2.14" xmlns:ns1="http://www.ordina.nl/ebms/2.15">
+</wsdl:definitions>]]></con:content><con:type>http://schemas.xmlsoap.org/wsdl/</con:type></con:part><con:part><con:url>http://localhost:8088/ebms-adapter-web/service/ebms?wsdl=EbMSMessageService.wsdl</con:url><con:content><![CDATA[<wsdl:definitions name="EbMSMessageService" targetNamespace="http://www.ordina.nl/ebms/2.15" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:ns2="http://www.ordina.nl/ebms/2.14" xmlns:ns1="http://www.ordina.nl/ebms/2.15">
   <wsdl:types>
     <xs:schema elementFormDefault="unqualified" targetNamespace="http://www.ordina.nl/ebms/2.15" version="1.0" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://www.ordina.nl/ebms/2.15">
       <xs:element name="GetMessage" type="tns:GetMessage"/>
@@ -1600,7 +1600,7 @@
       <wsdl:fault message="ns1:EbMSMessageServiceException" name="EbMSMessageServiceException"></wsdl:fault>
     </wsdl:operation>
   </wsdl:portType>
-</wsdl:definitions>]]></con:content><con:type>http://schemas.xmlsoap.org/wsdl/</con:type></con:part></con:definitionCache><con:endpoints><con:endpoint>http://127.0.0.1:8089/adapter/ebms</con:endpoint><con:endpoint>http://localhost:8080/service/ebms</con:endpoint><con:endpoint>http://localhost:8089/ebms-adapter-web/service/ebms</con:endpoint></con:endpoints><con:operation id="8c2f59a5-2338-4c05-adf4-1adca5e6af55" isOneWay="false" action="" name="GetMessage" bindingOperationName="GetMessage" type="Request-Response" outputName="GetMessageResponse" inputName="GetMessage" receivesAttachments="false" sendsAttachments="false" anonymous="optional"><con:settings/><con:call id="b44dda47-03b3-4fb6-b9bf-5beb5c31910e" name="Request 1"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8080/service/ebms</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns="http://www.ordina.nl/ebms/2.15">
+</wsdl:definitions>]]></con:content><con:type>http://schemas.xmlsoap.org/wsdl/</con:type></con:part></con:definitionCache><con:endpoints><con:endpoint>http://127.0.0.1:8089/adapter/ebms</con:endpoint><con:endpoint>http://localhost:8080/service/ebms</con:endpoint><con:endpoint>http://localhost:8088/ebms-adapter-web/service/ebms</con:endpoint><con:endpoint>http://localhost:8089/ebms-adapter-web/service/ebms</con:endpoint></con:endpoints><con:operation id="8c2f59a5-2338-4c05-adf4-1adca5e6af55" isOneWay="false" action="" name="GetMessage" bindingOperationName="GetMessage" type="Request-Response" outputName="GetMessageResponse" inputName="GetMessage" receivesAttachments="false" sendsAttachments="false" anonymous="optional"><con:settings/><con:call id="b44dda47-03b3-4fb6-b9bf-5beb5c31910e" name="Request 1"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8088/ebms-adapter-web/service/ebms</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns="http://www.ordina.nl/ebms/2.15">
    <soapenv:Header/>
    <soapenv:Body>
       <ns:GetMessage>
@@ -1609,7 +1609,7 @@
          <Process>?</Process>
       </ns:GetMessage>
    </soapenv:Body>
-</soapenv:Envelope>]]></con:request><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508" action="http://www.ordina.nl/ebms/2.10/EbMSMessageService/GetMessage"/><con:wsrmConfig version="1.2"/></con:call></con:operation><con:operation id="af00c61b-55df-4982-826d-c3426a504c8f" isOneWay="false" action="" name="GetMessageIds" bindingOperationName="GetMessageIds" type="Request-Response" outputName="GetMessageIdsResponse" inputName="GetMessageIds" receivesAttachments="false" sendsAttachments="false" anonymous="optional"><con:settings/><con:call id="ff0677fc-8882-4849-86dc-228e1ccae732" name="Request 1"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8080/service/ebms</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns="http://www.ordina.nl/ebms/2.15">
+</soapenv:Envelope>]]></con:request><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508" action="http://www.ordina.nl/ebms/2.10/EbMSMessageService/GetMessage"/><con:wsrmConfig version="1.2"/></con:call></con:operation><con:operation id="af00c61b-55df-4982-826d-c3426a504c8f" isOneWay="false" action="" name="GetMessageIds" bindingOperationName="GetMessageIds" type="Request-Response" outputName="GetMessageIdsResponse" inputName="GetMessageIds" receivesAttachments="false" sendsAttachments="false" anonymous="optional"><con:settings/><con:call id="ff0677fc-8882-4849-86dc-228e1ccae732" name="Request 1"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8088/ebms-adapter-web/service/ebms</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns="http://www.ordina.nl/ebms/2.15">
    <soapenv:Header/>
    <soapenv:Body>
       <ns:GetMessageIds>
@@ -1647,7 +1647,7 @@
          <MaxNr>?</MaxNr>
       </ns:GetMessageIds>
    </soapenv:Body>
-</soapenv:Envelope>]]></con:request><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508" action="http://www.ordina.nl/ebms/2.10/EbMSMessageService/GetMessageIds"/><con:wsrmConfig version="1.2"/></con:call></con:operation><con:operation id="ba2991e2-9e89-4275-b4e3-156687240c11" isOneWay="false" action="" name="GetMessageStatus" bindingOperationName="GetMessageStatus" type="Request-Response" outputName="GetMessageStatusResponse" inputName="GetMessageStatus" receivesAttachments="false" sendsAttachments="false" anonymous="optional"><con:settings/><con:call id="a84ef8f2-96bc-4f2c-a7cc-ac7c481d34f9" name="Request 1"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8080/service/ebms</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns="http://www.ordina.nl/ebms/2.15">
+</soapenv:Envelope>]]></con:request><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508" action="http://www.ordina.nl/ebms/2.10/EbMSMessageService/GetMessageIds"/><con:wsrmConfig version="1.2"/></con:call></con:operation><con:operation id="ba2991e2-9e89-4275-b4e3-156687240c11" isOneWay="false" action="" name="GetMessageStatus" bindingOperationName="GetMessageStatus" type="Request-Response" outputName="GetMessageStatusResponse" inputName="GetMessageStatus" receivesAttachments="false" sendsAttachments="false" anonymous="optional"><con:settings/><con:call id="a84ef8f2-96bc-4f2c-a7cc-ac7c481d34f9" name="Request 1"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8088/ebms-adapter-web/service/ebms</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns="http://www.ordina.nl/ebms/2.15">
    <soapenv:Header/>
    <soapenv:Body>
       <ns:GetMessageStatus>
@@ -1665,14 +1665,14 @@
          <MessageId>?</MessageId>
       </ns:GetMessageStatus>
    </soapenv:Body>
-</soapenv:Envelope>]]></con:request><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508" action="http://www.ordina.nl/ebms/2.10/EbMSMessageService/GetMessageStatus"/><con:wsrmConfig version="1.2"/></con:call></con:operation><con:operation id="5f68cf5f-71a3-49cf-b4e1-2113f8474abd" isOneWay="false" action="" name="GetMessageStatusByMessageId" bindingOperationName="GetMessageStatusByMessageId" type="Request-Response" outputName="GetMessageStatusByMessageIdResponse" inputName="GetMessageStatusByMessageId" receivesAttachments="false" sendsAttachments="false" anonymous="optional"><con:settings/><con:call id="35179a80-8ddc-419f-8a79-3d3aacd1a43d" name="Request 1"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8080/service/ebms</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns="http://www.ordina.nl/ebms/2.15">
+</soapenv:Envelope>]]></con:request><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508" action="http://www.ordina.nl/ebms/2.10/EbMSMessageService/GetMessageStatus"/><con:wsrmConfig version="1.2"/></con:call></con:operation><con:operation id="5f68cf5f-71a3-49cf-b4e1-2113f8474abd" isOneWay="false" action="" name="GetMessageStatusByMessageId" bindingOperationName="GetMessageStatusByMessageId" type="Request-Response" outputName="GetMessageStatusByMessageIdResponse" inputName="GetMessageStatusByMessageId" receivesAttachments="false" sendsAttachments="false" anonymous="optional"><con:settings/><con:call id="35179a80-8ddc-419f-8a79-3d3aacd1a43d" name="Request 1"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8088/ebms-adapter-web/service/ebms</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns="http://www.ordina.nl/ebms/2.15">
    <soapenv:Header/>
    <soapenv:Body>
       <ns:GetMessageStatusByMessageId>
          <MessageId>?</MessageId>
       </ns:GetMessageStatusByMessageId>
    </soapenv:Body>
-</soapenv:Envelope>]]></con:request><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508" action="http://www.ordina.nl/ebms/2.10/EbMSMessageService/GetMessageStatusByMessageId"/><con:wsrmConfig version="1.2"/></con:call></con:operation><con:operation id="0b59312b-f3c1-48d9-9415-8a51be3d99d4" isOneWay="false" action="" name="Ping" bindingOperationName="Ping" type="Request-Response" outputName="PingResponse" inputName="Ping" receivesAttachments="false" sendsAttachments="false" anonymous="optional"><con:settings/><con:call id="897578f0-0ca5-404d-a5f0-61c054946e90" name="Request 1"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8080/service/ebms</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns="http://www.ordina.nl/ebms/2.15">
+</soapenv:Envelope>]]></con:request><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508" action="http://www.ordina.nl/ebms/2.10/EbMSMessageService/GetMessageStatusByMessageId"/><con:wsrmConfig version="1.2"/></con:call></con:operation><con:operation id="0b59312b-f3c1-48d9-9415-8a51be3d99d4" isOneWay="false" action="" name="Ping" bindingOperationName="Ping" type="Request-Response" outputName="PingResponse" inputName="Ping" receivesAttachments="false" sendsAttachments="false" anonymous="optional"><con:settings/><con:call id="897578f0-0ca5-404d-a5f0-61c054946e90" name="Request 1"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8088/ebms-adapter-web/service/ebms</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns="http://www.ordina.nl/ebms/2.15">
    <soapenv:Header/>
    <soapenv:Body>
       <ns:Ping>
@@ -1685,14 +1685,14 @@
          </ToParty>
       </ns:Ping>
    </soapenv:Body>
-</soapenv:Envelope>]]></con:request><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508" action="http://www.ordina.nl/ebms/2.10/EbMSMessageService/Ping"/><con:wsrmConfig version="1.2"/></con:call></con:operation><con:operation id="134418dd-f9ac-466d-89ba-f51423a9b455" isOneWay="false" action="" name="ProcessMessage" bindingOperationName="ProcessMessage" type="Request-Response" outputName="ProcessMessageResponse" inputName="ProcessMessage" receivesAttachments="false" sendsAttachments="false" anonymous="optional"><con:settings/><con:call id="179911e9-f7fc-4606-96c5-7f6e035c5b4d" name="Request 1"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8080/service/ebms</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns="http://www.ordina.nl/ebms/2.15">
+</soapenv:Envelope>]]></con:request><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508" action="http://www.ordina.nl/ebms/2.10/EbMSMessageService/Ping"/><con:wsrmConfig version="1.2"/></con:call></con:operation><con:operation id="134418dd-f9ac-466d-89ba-f51423a9b455" isOneWay="false" action="" name="ProcessMessage" bindingOperationName="ProcessMessage" type="Request-Response" outputName="ProcessMessageResponse" inputName="ProcessMessage" receivesAttachments="false" sendsAttachments="false" anonymous="optional"><con:settings/><con:call id="179911e9-f7fc-4606-96c5-7f6e035c5b4d" name="Request 1"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8088/ebms-adapter-web/service/ebms</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns="http://www.ordina.nl/ebms/2.15">
    <soapenv:Header/>
    <soapenv:Body>
       <ns:ProcessMessage>
          <MessageId>?</MessageId>
       </ns:ProcessMessage>
    </soapenv:Body>
-</soapenv:Envelope>]]></con:request><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508" action="http://www.ordina.nl/ebms/2.10/EbMSMessageService/ProcessMessage"/><con:wsrmConfig version="1.2"/></con:call></con:operation><con:operation id="65ce3853-c69e-4ac7-b966-149986f07731" isOneWay="false" action="" name="ProcessMessages" bindingOperationName="ProcessMessages" type="Request-Response" outputName="ProcessMessagesResponse" inputName="ProcessMessages" receivesAttachments="false" sendsAttachments="false" anonymous="optional"><con:settings/><con:call id="c00f73b8-5099-48fa-8b6f-4dbd622c812e" name="Request 1"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8080/service/ebms</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns="http://www.ordina.nl/ebms/2.15">
+</soapenv:Envelope>]]></con:request><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508" action="http://www.ordina.nl/ebms/2.10/EbMSMessageService/ProcessMessage"/><con:wsrmConfig version="1.2"/></con:call></con:operation><con:operation id="65ce3853-c69e-4ac7-b966-149986f07731" isOneWay="false" action="" name="ProcessMessages" bindingOperationName="ProcessMessages" type="Request-Response" outputName="ProcessMessagesResponse" inputName="ProcessMessages" receivesAttachments="false" sendsAttachments="false" anonymous="optional"><con:settings/><con:call id="c00f73b8-5099-48fa-8b6f-4dbd622c812e" name="Request 1"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8088/ebms-adapter-web/service/ebms</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns="http://www.ordina.nl/ebms/2.15">
    <soapenv:Header/>
    <soapenv:Body>
       <ns:ProcessMessages>
@@ -1700,7 +1700,7 @@
          <MessageId>?</MessageId>
       </ns:ProcessMessages>
    </soapenv:Body>
-</soapenv:Envelope>]]></con:request><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508" action="http://www.ordina.nl/ebms/2.10/EbMSMessageService/ProcessMessages"/><con:wsrmConfig version="1.2"/></con:call></con:operation><con:operation id="f62f6da8-7737-4d9a-906a-89977ca7d81a" isOneWay="false" action="" name="SendMessage" bindingOperationName="SendMessage" type="Request-Response" outputName="SendMessageResponse" inputName="SendMessage" receivesAttachments="false" sendsAttachments="false" anonymous="optional"><con:settings/><con:call id="3841c52f-aa48-4075-b461-0159cc124f62" name="Request 1"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8080/service/ebms</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns="http://www.ordina.nl/ebms/2.15">
+</soapenv:Envelope>]]></con:request><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508" action="http://www.ordina.nl/ebms/2.10/EbMSMessageService/ProcessMessages"/><con:wsrmConfig version="1.2"/></con:call></con:operation><con:operation id="f62f6da8-7737-4d9a-906a-89977ca7d81a" isOneWay="false" action="" name="SendMessage" bindingOperationName="SendMessage" type="Request-Response" outputName="SendMessageResponse" inputName="SendMessage" receivesAttachments="false" sendsAttachments="false" anonymous="optional"><con:settings/><con:call id="3841c52f-aa48-4075-b461-0159cc124f62" name="Request 1"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8088/ebms-adapter-web/service/ebms</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns="http://www.ordina.nl/ebms/2.15">
    <soapenv:Header/>
    <soapenv:Body>
       <ns:SendMessage>
@@ -1726,7 +1726,7 @@
          </Message>
       </ns:SendMessage>
    </soapenv:Body>
-</soapenv:Envelope>]]></con:request><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508" action="http://www.ordina.nl/ebms/2.10/EbMSMessageService/SendMessage"/><con:wsrmConfig version="1.2"/></con:call><con:call id="363549a8-fa5e-488b-8063-a5941b4e0d83" name="Request 2"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8080/service/ebms</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns="http://www.ordina.nl/ebms/2.15">
+</soapenv:Envelope>]]></con:request><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508" action="http://www.ordina.nl/ebms/2.10/EbMSMessageService/SendMessage"/><con:wsrmConfig version="1.2"/></con:call><con:call id="363549a8-fa5e-488b-8063-a5941b4e0d83" name="Request 2"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8088/ebms-adapter-web/service/ebms</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns="http://www.ordina.nl/ebms/2.15">
    <soapenv:Header/>
    <soapenv:Body>
       <ns:SendMessage>
@@ -1752,7 +1752,7 @@
          </Message>
       </ns:SendMessage>
    </soapenv:Body>
-</soapenv:Envelope>]]></con:request><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508" action="http://service.ebms.clockwork.nl/EbMSMessageService/SendMessage"/><con:wsrmConfig version="1.2"/></con:call><con:call id="aaaf2b8e-6aa8-4e7f-b3a9-0d4469a36cd7" name="Request 3"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://127.0.0.1:8089/adapter/ebms</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns="http://www.ordina.nl/ebms/2.15">
+</soapenv:Envelope>]]></con:request><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508" action="http://service.ebms.clockwork.nl/EbMSMessageService/SendMessage"/><con:wsrmConfig version="1.2"/></con:call><con:call id="aaaf2b8e-6aa8-4e7f-b3a9-0d4469a36cd7" name="Request 3"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8088/ebms-adapter-web/service/ebms</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns="http://www.ordina.nl/ebms/2.15">
    <soapenv:Header/>
    <soapenv:Body>
       <ns:SendMessage>
@@ -1778,7 +1778,7 @@
          </Message>
       </ns:SendMessage>
    </soapenv:Body>
-</soapenv:Envelope>]]></con:request><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508" action="http://service.ebms.clockwork.nl/EbMSMessageService/SendMessage"/><con:wsrmConfig version="1.2"/></con:call></con:operation><con:operation id="611e0c10-7066-438c-a405-9b211fa1e8f2" isOneWay="false" action="" name="SendMessageWithAttachments" bindingOperationName="SendMessageWithAttachments" type="Request-Response" outputName="SendMessageWithAttachmentsResponse" inputName="SendMessageWithAttachments" receivesAttachments="false" sendsAttachments="false" anonymous="optional"><con:settings/><con:call id="35ec6c3e-98d8-4596-8008-619d447e3bb1" name="Request 1"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting><con:setting id="WsdlSettings@enable-mtom">true</con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8080/service/ebms</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns="http://www.ordina.nl/ebms/2.15">
+</soapenv:Envelope>]]></con:request><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508" action="http://service.ebms.clockwork.nl/EbMSMessageService/SendMessage"/><con:wsrmConfig version="1.2"/></con:call></con:operation><con:operation id="611e0c10-7066-438c-a405-9b211fa1e8f2" isOneWay="false" action="" name="SendMessageWithAttachments" bindingOperationName="SendMessageWithAttachments" type="Request-Response" outputName="SendMessageWithAttachmentsResponse" inputName="SendMessageWithAttachments" receivesAttachments="false" sendsAttachments="false" anonymous="optional"><con:settings/><con:call id="35ec6c3e-98d8-4596-8008-619d447e3bb1" name="Request 1"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting><con:setting id="WsdlSettings@enable-mtom">true</con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8088/ebms-adapter-web/service/ebms</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns="http://www.ordina.nl/ebms/2.15">
    <soapenv:Header/>
    <soapenv:Body>
       <ns:SendMessageWithAttachments>
@@ -1801,21 +1801,21 @@
          </Message>
       </ns:SendMessageWithAttachments>
    </soapenv:Body>
-</soapenv:Envelope>]]></con:request><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:attachment><con:name>cpaStubEBF.rm.https.signed.xml</con:name><con:contentType>application/xml</con:contentType><con:size>34830</con:size><con:contentId>276116437874</con:contentId><con:data>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</con:data><con:id>545e74ef-54d7-4f70-95e4-35573328380c</con:id></con:attachment><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508" action="http://service.ebms.clockwork.nl/EbMSMessageService/SendMessageWithAttachments"/><con:wsrmConfig version="1.2"/></con:call></con:operation><con:operation id="ddc7c97e-c784-4d57-b978-3f59cf4dd4ed" isOneWay="false" action="" name="ProcessMessageEvent" bindingOperationName="ProcessMessageEvent" type="Request-Response" outputName="ProcessMessageEventResponse" inputName="ProcessMessageEvent" receivesAttachments="false" sendsAttachments="false" anonymous="optional"><con:settings/><con:call id="ff23a3e6-c0b5-4639-a39d-54c39248a91d" name="Request 1"><con:settings/><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8080/service/ebms</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns="http://www.ordina.nl/ebms/2.15">
+</soapenv:Envelope>]]></con:request><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:attachment><con:name>cpaStubEBF.rm.https.signed.xml</con:name><con:contentType>application/xml</con:contentType><con:size>34830</con:size><con:contentId>276116437874</con:contentId><con:data>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</con:data><con:id>545e74ef-54d7-4f70-95e4-35573328380c</con:id></con:attachment><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508" action="http://service.ebms.clockwork.nl/EbMSMessageService/SendMessageWithAttachments"/><con:wsrmConfig version="1.2"/></con:call></con:operation><con:operation id="ddc7c97e-c784-4d57-b978-3f59cf4dd4ed" isOneWay="false" action="" name="ProcessMessageEvent" bindingOperationName="ProcessMessageEvent" type="Request-Response" outputName="ProcessMessageEventResponse" inputName="ProcessMessageEvent" receivesAttachments="false" sendsAttachments="false" anonymous="optional"><con:settings/><con:call id="ff23a3e6-c0b5-4639-a39d-54c39248a91d" name="Request 1"><con:settings/><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8088/ebms-adapter-web/service/ebms</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns="http://www.ordina.nl/ebms/2.15">
    <soapenv:Header/>
    <soapenv:Body>
       <ns:ProcessMessageEvent>
          <MessageId>?</MessageId>
       </ns:ProcessMessageEvent>
    </soapenv:Body>
-</soapenv:Envelope>]]></con:request><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508" action="http://service.ebms.clockwork.nl/EbMSMessageService/ProcessMessageEvent"/><con:wsrmConfig version="1.2"/></con:call></con:operation><con:operation id="c38c0079-9842-4265-8f74-818ba812de02" isOneWay="false" action="" name="ResendMessage" bindingOperationName="ResendMessage" type="Request-Response" outputName="ResendMessageResponse" inputName="ResendMessage" receivesAttachments="false" sendsAttachments="false" anonymous="optional"><con:settings/><con:call id="e4a5b7f0-1517-4bef-8e4c-7d699516f37b" name="Request 1"><con:settings/><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8080/service/ebms</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns="http://www.ordina.nl/ebms/2.15">
+</soapenv:Envelope>]]></con:request><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508" action="http://service.ebms.clockwork.nl/EbMSMessageService/ProcessMessageEvent"/><con:wsrmConfig version="1.2"/></con:call></con:operation><con:operation id="c38c0079-9842-4265-8f74-818ba812de02" isOneWay="false" action="" name="ResendMessage" bindingOperationName="ResendMessage" type="Request-Response" outputName="ResendMessageResponse" inputName="ResendMessage" receivesAttachments="false" sendsAttachments="false" anonymous="optional"><con:settings/><con:call id="e4a5b7f0-1517-4bef-8e4c-7d699516f37b" name="Request 1"><con:settings/><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8088/ebms-adapter-web/service/ebms</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns="http://www.ordina.nl/ebms/2.15">
    <soapenv:Header/>
    <soapenv:Body>
       <ns:ResendMessage>
          <MessageId>?</MessageId>
       </ns:ResendMessage>
    </soapenv:Body>
-</soapenv:Envelope>]]></con:request><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508" action="http://service.ebms.clockwork.nl/EbMSMessageService/ResendMessage"/><con:wsrmConfig version="1.2"/></con:call></con:operation><con:operation id="8c7773f8-1a4c-4cf1-a8c4-873f613b6e7c" isOneWay="false" action="" name="GetMessageEvents" bindingOperationName="GetMessageEvents" type="Request-Response" outputName="GetMessageEventsResponse" inputName="GetMessageEvents" receivesAttachments="false" sendsAttachments="false" anonymous="optional"><con:settings/><con:call id="8608a40a-fe8e-4f5c-b65a-65179a77a622" name="Request 1"><con:settings/><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8080/service/ebms</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns="http://www.ordina.nl/ebms/2.15">
+</soapenv:Envelope>]]></con:request><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508" action="http://service.ebms.clockwork.nl/EbMSMessageService/ResendMessage"/><con:wsrmConfig version="1.2"/></con:call></con:operation><con:operation id="8c7773f8-1a4c-4cf1-a8c4-873f613b6e7c" isOneWay="false" action="" name="GetMessageEvents" bindingOperationName="GetMessageEvents" type="Request-Response" outputName="GetMessageEventsResponse" inputName="GetMessageEvents" receivesAttachments="false" sendsAttachments="false" anonymous="optional"><con:settings/><con:call id="8608a40a-fe8e-4f5c-b65a-65179a77a622" name="Request 1"><con:settings/><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8088/ebms-adapter-web/service/ebms</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns="http://www.ordina.nl/ebms/2.15">
    <soapenv:Header/>
    <soapenv:Body>
       <ns:GetMessageEvents>
@@ -1855,7 +1855,7 @@
          <MaxNr>?</MaxNr>
       </ns:GetMessageEvents>
    </soapenv:Body>
-</soapenv:Envelope>]]></con:request><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508" action="http://service.ebms.clockwork.nl/EbMSMessageService/GetMessageEvents"/><con:wsrmConfig version="1.2"/></con:call></con:operation><con:operation id="6fd1decd-b698-4a25-b3b3-923c93effa8e" isOneWay="false" action="" name="ProcessMessageEvents" bindingOperationName="ProcessMessageEvents" type="Request-Response" outputName="ProcessMessageEventsResponse" inputName="ProcessMessageEvents" receivesAttachments="false" sendsAttachments="false" anonymous="optional"><con:settings/><con:call id="94947c0e-0e25-435f-b6d7-a9f99ee77942" name="Request 1"><con:settings/><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8080/service/ebms</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns="http://www.ordina.nl/ebms/2.15">
+</soapenv:Envelope>]]></con:request><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508" action="http://service.ebms.clockwork.nl/EbMSMessageService/GetMessageEvents"/><con:wsrmConfig version="1.2"/></con:call></con:operation><con:operation id="6fd1decd-b698-4a25-b3b3-923c93effa8e" isOneWay="false" action="" name="ProcessMessageEvents" bindingOperationName="ProcessMessageEvents" type="Request-Response" outputName="ProcessMessageEventsResponse" inputName="ProcessMessageEvents" receivesAttachments="false" sendsAttachments="false" anonymous="optional"><con:settings/><con:call id="94947c0e-0e25-435f-b6d7-a9f99ee77942" name="Request 1"><con:settings/><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8088/ebms-adapter-web/service/ebms</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns="http://www.ordina.nl/ebms/2.15">
    <soapenv:Header/>
    <soapenv:Body>
       <ns:ProcessMessageEvents>
@@ -2819,10 +2819,10 @@
          <!--You may enter ANY elements at this point-->
       </msg:MessageHeader>
    </soapenv:Body>
-</soapenv:Envelope>]]></con:request><con:wsaConfig mustUnderstand="NONE" version="200508" action="ebXML"/></con:call></con:operation></con:interface><con:testSuite id="d3ef2ce9-79c2-453d-9812-cc421918cf10" name="TestSuite EbMS Sync"><con:settings/><con:runType>SEQUENTIAL</con:runType><con:testCase id="bafa7153-5df5-4ce6-bb3d-dc40c2a25956" failOnError="true" failTestCaseOnErrors="true" keepSession="false" maxResults="0" name="TestCase EbMS" searchProperties="true"><con:settings/><con:testStep type="request" name="InsertCPA" id="b030077b-47c5-4424-9fa5-10db4fbe34ba"><con:settings/><con:config xsi:type="con:RequestStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:interface>CPAServiceImplServiceSoapBinding</con:interface><con:operation>InsertCPA</con:operation><con:request name="InsertCPA" id="ea8d1990-dc13-46b3-a016-82d50ab93d47"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8088/ebms-adapter-web/service/cpa</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns="http://www.ordina.nl/cpa/2.10">
+</soapenv:Envelope>]]></con:request><con:wsaConfig mustUnderstand="NONE" version="200508" action="ebXML"/></con:call></con:operation></con:interface><con:testSuite id="d3ef2ce9-79c2-453d-9812-cc421918cf10" name="TestSuite EbMS Sync"><con:settings/><con:runType>SEQUENTIAL</con:runType><con:testCase id="bafa7153-5df5-4ce6-bb3d-dc40c2a25956" failOnError="true" failTestCaseOnErrors="true" keepSession="false" maxResults="0" name="TestCase EbMS" searchProperties="true"><con:settings/><con:testStep type="request" name="InsertCPA" id="b030077b-47c5-4424-9fa5-10db4fbe34ba"><con:settings/><con:config xsi:type="con:RequestStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:interface>CPAServiceImplServiceSoapBinding</con:interface><con:operation>InsertCPA</con:operation><con:request name="InsertCPA" id="ea8d1990-dc13-46b3-a016-82d50ab93d47"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8088/ebms-adapter-web/service/cpa</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:a="http://www.ordina.nl/cpa/2.12a">
    <soapenv:Header/>
    <soapenv:Body>
-      <ns:InsertCPA>
+      <a:InsertCPA>
          <CPA><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
 <tns:CollaborationProtocolAgreement xmlns:axsl="http://www.w3.org/1999/XSL/TransformAlias" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:functx="http://www.functx.com" xmlns:tns="http://www.oasis-open.org/committees/ebxml-cppa/schema/cpp-cpa-2_0.xsd" xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns:xlink="http://www.w3.org/1999/xlink" xsi:schemaLocation="http://www.oasis-open.org/committees/ebxml-cppa/schema/cpp-cpa-2_0.xsd http://www.oasis-open.org/committees/ebxml-cppa/schema/cpp-cpa-2_0.xsd" tns:cpaid="cpaStubEBF.rm.http.unsigned.sync" tns:version="1.0">
 	<tns:Status tns:value="agreed" />
@@ -3016,10 +3016,11 @@
 		</tns:CompositeList>
 	</tns:Packaging>
 </tns:CollaborationProtocolAgreement>]]]]>><![CDATA[</CPA>
+         <!--Optional:-->
          <Overwrite>true</Overwrite>
-      </ns:InsertCPA>
+      </a:InsertCPA>
    </soapenv:Body>
-</soapenv:Envelope>]]></con:request><con:assertion type="SOAP Response" id="79282250-da6a-447e-adfe-3415bb0ff165"/><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508"/><con:wsrmConfig version="1.2"/></con:request></con:config></con:testStep><con:testStep type="properties" name="MessageProperties" id="e9d437ce-c4dd-4811-8c92-1557d6bef896"><con:settings/><con:config xsi:type="con:PropertiesStep" saveFirst="true" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:properties><con:property><con:name>uuid</con:name><con:value>${=java.util.UUID.randomUUID()}</con:value></con:property><con:property><con:name>timestamp</con:name><con:value>${=new java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX").format(new Date(System.currentTimeMillis() + 3600 * 1000))}</con:value></con:property><con:property><con:name>timestampExpired</con:name><con:value>${=new java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX").format(new Date(System.currentTimeMillis() - 3600 * 1000))}</con:value></con:property><con:property><con:name>cpaId</con:name><con:value>cpaStubEBF.rm.http.unsigned.sync</con:value></con:property><con:property><con:name>partyType</con:name><con:value>urn:osb:oin</con:value></con:property><con:property><con:name>fromPartyId</con:name><con:value>00000000000000000000</con:value></con:property><con:property><con:name>fromRole</con:name><con:value>DIGIPOORT</con:value></con:property><con:property><con:name>toPartyId</con:name><con:value>00000000000000000001</con:value></con:property><con:property><con:name>toRole</con:name><con:value>OVERHEID</con:value></con:property><con:property><con:name>service</con:name><con:value>osb:afleveren:1.1$1.0</con:value></con:property><con:property><con:name>serviceType</con:name><con:value>urn:osb:services</con:value></con:property><con:property><con:name>action</con:name><con:value>afleveren</con:value></con:property><con:property><con:name>mshService</con:name><con:value>urn:oasis:names:tc:ebxml-msg:service</con:value></con:property></con:properties></con:config></con:testStep><con:testStep type="request" name="EbMSPing" id="1e2bd6b0-008f-43a1-9bb1-6bf0de3c1758"><con:settings/><con:config xsi:type="con:RequestStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:interface>EbMS</con:interface><con:operation>EbMSMSHRequestSync</con:operation><con:request name="EbMSPing" id="63c309bb-eedc-4698-8d64-182348caea67"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8088/ebms-adapter-web/ebms</con:endpoint><con:request><![CDATA[<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:eb="http://www.oasis-open.org/committees/ebxml-msg/schema/msg-header-2_0.xsd" xmlns:ns4="http://www.w3.org/2000/09/xmldsig#" xmlns:xlink="http://www.w3.org/1999/xlink">
+</soapenv:Envelope>]]></con:request><con:assertion type="SOAP Response" id="79282250-da6a-447e-adfe-3415bb0ff165"/><con:assertion type="SOAP Fault Assertion" id="c2507c46-f6eb-4302-a3d7-16994e613932" name="Not SOAP Fault"/><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508"/><con:wsrmConfig version="1.2"/></con:request></con:config></con:testStep><con:testStep type="properties" name="MessageProperties" id="e9d437ce-c4dd-4811-8c92-1557d6bef896"><con:settings/><con:config xsi:type="con:PropertiesStep" saveFirst="true" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:properties><con:property><con:name>uuid</con:name><con:value>${=java.util.UUID.randomUUID()}</con:value></con:property><con:property><con:name>timestamp</con:name><con:value>${=new java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX").format(new Date(System.currentTimeMillis() + 3600 * 1000))}</con:value></con:property><con:property><con:name>timestampExpired</con:name><con:value>${=new java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX").format(new Date(System.currentTimeMillis() - 3600 * 1000))}</con:value></con:property><con:property><con:name>cpaId</con:name><con:value>cpaStubEBF.rm.http.unsigned.sync</con:value></con:property><con:property><con:name>partyType</con:name><con:value>urn:osb:oin</con:value></con:property><con:property><con:name>fromPartyId</con:name><con:value>00000000000000000000</con:value></con:property><con:property><con:name>fromRole</con:name><con:value>DIGIPOORT</con:value></con:property><con:property><con:name>toPartyId</con:name><con:value>00000000000000000001</con:value></con:property><con:property><con:name>toRole</con:name><con:value>OVERHEID</con:value></con:property><con:property><con:name>service</con:name><con:value>osb:afleveren:1.1$1.0</con:value></con:property><con:property><con:name>serviceType</con:name><con:value>urn:osb:services</con:value></con:property><con:property><con:name>action</con:name><con:value>afleveren</con:value></con:property><con:property><con:name>mshService</con:name><con:value>urn:oasis:names:tc:ebxml-msg:service</con:value></con:property></con:properties></con:config></con:testStep><con:testStep type="request" name="EbMSPing" id="1e2bd6b0-008f-43a1-9bb1-6bf0de3c1758"><con:settings/><con:config xsi:type="con:RequestStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:interface>EbMS</con:interface><con:operation>EbMSMSHRequestSync</con:operation><con:request name="EbMSPing" id="63c309bb-eedc-4698-8d64-182348caea67"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8088/ebms-adapter-web/ebms</con:endpoint><con:request><![CDATA[<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:eb="http://www.oasis-open.org/committees/ebxml-msg/schema/msg-header-2_0.xsd" xmlns:ns4="http://www.w3.org/2000/09/xmldsig#" xmlns:xlink="http://www.w3.org/1999/xlink">
     <soap:Header>
         <eb:MessageHeader eb:version="2.0" soap:mustUnderstand="1">
             <eb:From>
@@ -3252,7 +3253,7 @@ response.namespaces["eb"] = "http://www.oasis-open.org/committees/ebxml-msg/sche
 assert response["//eb:MessageData/eb:RefToMessageId"] == request["//eb:MessageData/eb:MessageId"]
 </scriptText></con:configuration></con:assertion><con:assertion type="XPath Match" id="5d9899bf-5e38-46e6-8768-6e394f9fd6be" name="XPath Match messageStatus"><con:configuration><path>declare namespace eb='http://www.oasis-open.org/committees/ebxml-msg/schema/msg-header-2_0.xsd';
 //eb:StatusResponse/@eb:messageStatus</path><content>Received</content><allowWildcards>false</allowWildcards><ignoreNamspaceDifferences>false</ignoreNamspaceDifferences><ignoreComments>false</ignoreComments></con:configuration></con:assertion><con:assertion type="XPath Match" id="5d9899bf-5e38-46e6-8768-6e394f9fd6be" name="XPath Match RefToMessageId"><con:configuration><path>declare namespace eb='http://www.oasis-open.org/committees/ebxml-msg/schema/msg-header-2_0.xsd';
-//eb:StatusResponse/eb:RefToMessageId</path><content>${EbMSMessageOk#Response#//eb:MessageData/eb:RefToMessageId}</content><allowWildcards>false</allowWildcards><ignoreNamspaceDifferences>false</ignoreNamspaceDifferences><ignoreComments>false</ignoreComments></con:configuration></con:assertion><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508"/><con:wsrmConfig version="1.2"/></con:request></con:config></con:testStep><con:testStep type="request" name="getMessageIds" id="e8a5f3a1-7e97-4657-a501-615870b2ff61"><con:settings/><con:config xsi:type="con:RequestStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:interface>EbMSMessageServiceImplServiceSoapBinding</con:interface><con:operation>GetMessageIds</con:operation><con:request name="getMessageIds" id="2a476bfb-02bb-43c0-a5b6-f0c7082730f0"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8089/ebms-adapter-web/service/ebms</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns="http://www.ordina.nl/ebms/2.10">
+//eb:StatusResponse/eb:RefToMessageId</path><content>${EbMSMessageOk#Response#//eb:MessageData/eb:RefToMessageId}</content><allowWildcards>false</allowWildcards><ignoreNamspaceDifferences>false</ignoreNamspaceDifferences><ignoreComments>false</ignoreComments></con:configuration></con:assertion><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508"/><con:wsrmConfig version="1.2"/></con:request></con:config></con:testStep><con:testStep type="request" name="getMessageIds" id="e8a5f3a1-7e97-4657-a501-615870b2ff61"><con:settings/><con:config xsi:type="con:RequestStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:interface>EbMSMessageServiceImplServiceSoapBinding</con:interface><con:operation>GetMessageIds</con:operation><con:request name="getMessageIds" id="2a476bfb-02bb-43c0-a5b6-f0c7082730f0"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8088/ebms-adapter-web/service/ebms</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns="http://www.ordina.nl/ebms/2.15">
    <soapenv:Header/>
    <soapenv:Body>
       <ns:GetMessageIds>
@@ -3271,14 +3272,14 @@ assert response["//eb:MessageData/eb:RefToMessageId"] == request["//eb:MessageDa
          </MessageContext>
       </ns:GetMessageIds>
    </soapenv:Body>
-</soapenv:Envelope>]]></con:request><con:assertion type="SOAP Response" id="a9b13e02-3133-4e27-941e-eecbdaadea27"/><con:assertion type="XPath Match" id="41f96659-f043-4bd3-930d-885847adbc62" name="XPath Match MessageId"><con:configuration><path>exists(//MessageIds[text() = '${EbMSMessageOk#Response#//eb:MessageData/eb:RefToMessageId}'])</path><content>true</content><allowWildcards>false</allowWildcards><ignoreNamspaceDifferences>false</ignoreNamspaceDifferences><ignoreComments>false</ignoreComments></con:configuration></con:assertion><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508"/><con:wsrmConfig version="1.2"/></con:request></con:config></con:testStep><con:testStep type="request" name="getMessage" id="9b7fa06c-43d8-4d5f-a59d-2f81ae0bb306"><con:settings/><con:config xsi:type="con:RequestStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:interface>EbMSMessageServiceImplServiceSoapBinding</con:interface><con:operation>GetMessage</con:operation><con:request name="getMessage" id="62c2ad06-a042-4adc-b72a-c8d187970035"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8089/ebms-adapter-web/service/ebms</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns="http://www.ordina.nl/ebms/2.10">
+</soapenv:Envelope>]]></con:request><con:assertion type="SOAP Response" id="a9b13e02-3133-4e27-941e-eecbdaadea27"/><con:assertion type="XPath Match" id="41f96659-f043-4bd3-930d-885847adbc62" name="XPath Match MessageId"><con:configuration><path>exists(//MessageIds[text() = '${EbMSMessageOk#Response#//eb:MessageData/eb:RefToMessageId}'])</path><content>true</content><allowWildcards>false</allowWildcards><ignoreNamspaceDifferences>false</ignoreNamspaceDifferences><ignoreComments>false</ignoreComments></con:configuration></con:assertion><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508"/><con:wsrmConfig version="1.2"/></con:request></con:config></con:testStep><con:testStep type="request" name="getMessage" id="9b7fa06c-43d8-4d5f-a59d-2f81ae0bb306"><con:settings/><con:config xsi:type="con:RequestStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:interface>EbMSMessageServiceImplServiceSoapBinding</con:interface><con:operation>GetMessage</con:operation><con:request name="getMessage" id="62c2ad06-a042-4adc-b72a-c8d187970035"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8088/ebms-adapter-web/service/ebms</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns="http://www.ordina.nl/ebms/2.15">
    <soapenv:Header/>
    <soapenv:Body>
       <ns:GetMessage>
          <MessageId>${EbMSMessageOk#Response#//eb:MessageData/eb:RefToMessageId}</MessageId>
       </ns:GetMessage>
    </soapenv:Body>
-</soapenv:Envelope>]]></con:request><con:assertion type="SOAP Response" id="9f8fc5e1-2c56-4ff5-b6a5-b7dece002dc3"/><con:assertion type="XPath Match" id="2bd19582-f97d-422c-8cc2-594d411626e5" name="XPath Match"><con:configuration><path>exists(//messageId[text() = '${EbMSMessageOk#Response#//eb:MessageData/eb:RefToMessageId}'])</path><content>true</content><allowWildcards>false</allowWildcards><ignoreNamspaceDifferences>false</ignoreNamspaceDifferences><ignoreComments>false</ignoreComments></con:configuration></con:assertion><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508"/><con:wsrmConfig version="1.2"/></con:request></con:config></con:testStep><con:testStep type="request" name="processMessage" id="c1ac6af3-2905-415e-bfd6-e267cd006d33"><con:settings/><con:config xsi:type="con:RequestStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:interface>EbMSMessageServiceImplServiceSoapBinding</con:interface><con:operation>ProcessMessage</con:operation><con:request name="processMessage" id="960d90a2-6481-4dcb-b826-382049f12188"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8089/ebms-adapter-web/service/ebms</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns="http://www.ordina.nl/ebms/2.10">
+</soapenv:Envelope>]]></con:request><con:assertion type="SOAP Response" id="9f8fc5e1-2c56-4ff5-b6a5-b7dece002dc3"/><con:assertion type="XPath Match" id="2bd19582-f97d-422c-8cc2-594d411626e5" name="XPath Match"><con:configuration><path>exists(//messageId[text() = '${EbMSMessageOk#Response#//eb:MessageData/eb:RefToMessageId}'])</path><content>true</content><allowWildcards>false</allowWildcards><ignoreNamspaceDifferences>false</ignoreNamspaceDifferences><ignoreComments>false</ignoreComments></con:configuration></con:assertion><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508"/><con:wsrmConfig version="1.2"/></con:request></con:config></con:testStep><con:testStep type="request" name="processMessage" id="c1ac6af3-2905-415e-bfd6-e267cd006d33"><con:settings/><con:config xsi:type="con:RequestStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:interface>EbMSMessageServiceImplServiceSoapBinding</con:interface><con:operation>ProcessMessage</con:operation><con:request name="processMessage" id="960d90a2-6481-4dcb-b826-382049f12188"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8088/ebms-adapter-web/service/ebms</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns="http://www.ordina.nl/ebms/2.15">
    <soapenv:Header/>
    <soapenv:Body>
       <ns:ProcessMessage>
@@ -3350,7 +3351,7 @@ response.namespaces["eb"] = "http://www.oasis-open.org/committees/ebxml-msg/sche
 assert response["//eb:MessageData/eb:RefToMessageId"] == request["//eb:MessageData/eb:MessageId"]
 </scriptText></con:configuration></con:assertion><con:assertion type="XPath Match" id="5d9899bf-5e38-46e6-8768-6e394f9fd6be" name="XPath Match messageStatus"><con:configuration><path>declare namespace eb='http://www.oasis-open.org/committees/ebxml-msg/schema/msg-header-2_0.xsd';
 //eb:StatusResponse/@eb:messageStatus</path><content>Processed</content><allowWildcards>false</allowWildcards><ignoreNamspaceDifferences>false</ignoreNamspaceDifferences><ignoreComments>false</ignoreComments></con:configuration></con:assertion><con:assertion type="XPath Match" id="5d9899bf-5e38-46e6-8768-6e394f9fd6be" name="XPath Match RefToMessageId"><con:configuration><path>declare namespace eb='http://www.oasis-open.org/committees/ebxml-msg/schema/msg-header-2_0.xsd';
-//eb:StatusResponse/eb:RefToMessageId</path><content>${EbMSMessageOk#Response#//eb:MessageData/eb:RefToMessageId}</content><allowWildcards>false</allowWildcards><ignoreNamspaceDifferences>false</ignoreNamspaceDifferences><ignoreComments>false</ignoreComments></con:configuration></con:assertion><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508"/><con:wsrmConfig version="1.2"/></con:request></con:config></con:testStep><con:testStep type="request" name="getMessageIdsAgain" id="e2181283-43fb-4320-babc-f4f36436a48f"><con:settings/><con:config xsi:type="con:RequestStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:interface>EbMSMessageServiceImplServiceSoapBinding</con:interface><con:operation>GetMessageIds</con:operation><con:request name="getMessageIdsAgain" id="2a476bfb-02bb-43c0-a5b6-f0c7082730f0"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8089/ebms-adapter-web/service/ebms</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns="http://www.ordina.nl/ebms/2.10">
+//eb:StatusResponse/eb:RefToMessageId</path><content>${EbMSMessageOk#Response#//eb:MessageData/eb:RefToMessageId}</content><allowWildcards>false</allowWildcards><ignoreNamspaceDifferences>false</ignoreNamspaceDifferences><ignoreComments>false</ignoreComments></con:configuration></con:assertion><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508"/><con:wsrmConfig version="1.2"/></con:request></con:config></con:testStep><con:testStep type="request" name="getMessageIdsAgain" id="e2181283-43fb-4320-babc-f4f36436a48f"><con:settings/><con:config xsi:type="con:RequestStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:interface>EbMSMessageServiceImplServiceSoapBinding</con:interface><con:operation>GetMessageIds</con:operation><con:request name="getMessageIdsAgain" id="2a476bfb-02bb-43c0-a5b6-f0c7082730f0"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8088/ebms-adapter-web/service/ebms</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns="http://www.ordina.nl/ebms/2.15">
    <soapenv:Header/>
    <soapenv:Body>
       <ns:GetMessageIds>
