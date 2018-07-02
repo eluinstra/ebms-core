@@ -369,6 +369,7 @@ public class EbMSMessageProcessor
 			final EbMSMessage messageError = ebMSMessageFactory.createEbMSMessageError(messageHeader.getCPAId(),message,errorList,timestamp);
 			Document document = EbMSMessageUtils.createSOAPMessage(messageError);
 			messageError.setMessage(document);
+			final DeliveryChannel deliveryChannel = getDeliveryChannel(messageHeader,messageError);
 			ebMSDAO.executeTransaction(
 				new DAOTransactionCallback()
 				{
@@ -377,11 +378,10 @@ public class EbMSMessageProcessor
 					{
 						try
 						{
-							DeliveryChannel deliveryChannel = cpaManager.getReceiveDeliveryChannel(messageHeader.getCPAId(),new CacheablePartyId(messageError.getMessageHeader().getTo().getPartyId()),messageError.getMessageHeader().getTo().getRole(),CPAUtils.toString(messageError.getMessageHeader().getService()),messageError.getMessageHeader().getAction());
-							Date persistTime = CPAUtils.getPersistTime(timestamp,deliveryChannel);
+							Date persistTime = deliveryChannel != null ? CPAUtils.getPersistTime(timestamp,deliveryChannel) : null;
 							ebMSDAO.insertMessage(timestamp,persistTime,message,EbMSMessageStatus.FAILED);
 							ebMSDAO.insertMessage(timestamp,persistTime,messageError,null);
-							if (!messageValidator.isSyncReply(message))
+							if (!messageValidator.isSyncReply(message) && deliveryChannel != null)
 							{
 								String clientAlias = cpaManager.getClientAlias(messageHeader.getCPAId(),new CacheablePartyId(messageHeader.getFrom().getPartyId()),messageHeader.getFrom().getRole(),CPAUtils.toString(messageHeader.getService()),messageHeader.getAction());
 								eventManager.createEvent(messageHeader.getCPAId(),clientAlias,deliveryChannel,messageError.getMessageHeader().getMessageData().getMessageId(),messageError.getMessageHeader().getMessageData().getTimeToLive(),messageError.getMessageHeader().getMessageData().getTimestamp(),false);
@@ -394,8 +394,16 @@ public class EbMSMessageProcessor
 					}
 				}
 			);
-			return messageValidator.isSyncReply(message) ? new EbMSDocument(messageError.getContentId(),messageError.getMessage()) : null;
+			return messageValidator.isSyncReply(message) || deliveryChannel == null ? new EbMSDocument(messageError.getContentId(),messageError.getMessage()) : null;
 		}
+	}
+
+	private DeliveryChannel getDeliveryChannel(final MessageHeader messageHeader, final EbMSMessage messageError)
+	{
+		DeliveryChannel deliveryChannel = cpaManager.getReceiveDeliveryChannel(messageHeader.getCPAId(),new CacheablePartyId(messageError.getMessageHeader().getTo().getPartyId()),messageError.getMessageHeader().getTo().getRole(),CPAUtils.toString(messageError.getMessageHeader().getService()),messageError.getMessageHeader().getAction());
+		if (deliveryChannel == null)
+			deliveryChannel = cpaManager.getSendDeliveryChannel(messageHeader.getCPAId(),new CacheablePartyId(messageError.getMessageHeader().getFrom().getPartyId()),messageError.getMessageHeader().getFrom().getRole(),CPAUtils.toString(messageError.getMessageHeader().getService()),messageError.getMessageHeader().getAction());
+		return deliveryChannel;
 	}
 
 	protected EbMSMessage processStatusRequest(String cpaId, final Date timestamp, final EbMSMessage message) throws ValidatorException, DatatypeConfigurationException, JAXBException, EbMSProcessorException
