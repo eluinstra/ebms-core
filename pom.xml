@@ -23,7 +23,7 @@
 	<artifactId>ebms-core</artifactId>
 	<packaging>jar</packaging>
 	<name>EbMS Core</name>
-	<version>2.15.1-mic</version>
+	<version>2.15.2-mic</version>
 	<description></description>
 	<url>https://sourceforge.net/projects/muleebmsadapter/</url>
 	<issueManagement>
