@@ -284,7 +284,6 @@ public class CPAManager
 			return certificateAlias;
 		else
 			throw new CertificateException("No certificate found with subject \"" + certificate.getSubjectDN().getName() + "\" (" + certificate.getSerialNumber().toString(16) + ") in keystore \"" + clientkeyStorePath + "\"");
-			//throw new CertificateException("No cetificate found for CPA " + cpaId + " and DeliveryChannel " + sendDeliveryChannel.getChannelId());
 	}
 
 	public String getUri(String cpaId, CacheablePartyId partyId, String role, String service, String action)
