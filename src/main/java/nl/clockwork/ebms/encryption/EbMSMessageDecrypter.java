@@ -75,7 +75,7 @@ public class EbMSMessageDecrypter implements InitializingBean
 				X509Certificate certificate = CPAUtils.getX509Certificate(CPAUtils.getEncryptionCertificate(deliveryChannel));
 				String alias = keyStore.getCertificateAlias(certificate);
 				if (alias == null)
-					throw new ValidationException("No certificate found with subject \"" + certificate.getSubjectDN().getName() + "\" in keystore \"" + keyStorePath + "\"");
+					throw new ValidationException("No certificate found with subject \"" + certificate.getSubjectDN().getName() + "\" (" + certificate.getSerialNumber().toString(16) + ") in keystore \"" + keyStorePath + "\"");
 				KeyPair keyPair = SecurityUtils.getKeyPair(keyStore,alias,keyStorePassword);
 				List<EbMSAttachment> attachments = new ArrayList<EbMSAttachment>();
 				for (EbMSAttachment attachment : message.getAttachments())

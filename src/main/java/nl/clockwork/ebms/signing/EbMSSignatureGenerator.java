@@ -106,7 +106,7 @@ public class EbMSSignatureGenerator implements InitializingBean
 		X509Certificate certificate = CPAUtils.getX509Certificate(CPAUtils.getSigningCertificate(deliveryChannel));
 		String alias = keyStore.getCertificateAlias(certificate);
 		if (alias == null)
-			throw new EbMSProcessorException("No certificate found with subject \"" + certificate.getSubjectDN().getName() + "\" in keystore \"" + keyStorePath + "\"");
+			throw new EbMSProcessorException("No certificate found with subject \"" + certificate.getSubjectDN().getName() + "\" (" + certificate.getSerialNumber().toString(16) + ") in keystore \"" + keyStorePath + "\"");
 		KeyPair keyPair = SecurityUtils.getKeyPair(keyStore,alias,keyStorePassword);
 		sign(keyStore,keyPair,alias,message.getMessage(),message.getAttachments(),CPAUtils.getSignatureAlgorithm(deliveryChannel),CPAUtils.getHashFunction(deliveryChannel));
 	}
