@@ -4,4 +4,24 @@
 
 Uitbreiding throttling:
 Het automatisch versturen vanuit de ebms-adapter kan worden uitgezet, zodat een externe client dit proces kan overnemen.
-Er wordt een nieuwe broker en client voor het versturen geimplementeerd. De broker geeft een client pas een bericht als dit bericht ook daadwerkelijk verstuurd kan worden. De client vraagt dus om een bericht bij de broker. Zo wacht een client dus niet met een bericht versturen totdat dat mag, maar wacht een client op een bericht van de broker dat verstuurd mag worden. Zo heb je geen concurrency problemen, heb je geen clients/channels per afnemer nodig en worden de clients optimaal gebruikt. Als er 1 client uitvalt, loopt het berichtenverkeer ongehinderd door. Als het te druk is, kun je gewoon het aantal clients opschalen. Hierbij komt alle complexiteit in de broker te zitten en die kun je op verschillende manieren invullen en tunen. De broker kan meervoudig worden uitgevoerd, maar er is altijd maar 1 actieve broker die berichten uitgeeft. Het bepalen van de actieve broker kan in de clients worden ingebouwd, maar kan ook door containers worden gerealiseerd. Dit laatste heeft waarschijnlijk de voorkeur. Misschien kan de broker als stored procedure op de database worden uitgevoerd, waarmee voorgaande probleem ook meteen is opgelost. Het uitgangspunt is dat de client het bericht verstuurd op het moment dat deze het bericht aanneemt. Retryen ten gevolge van een haperende client gebeurt op basis van het ebms protocol. Als de client een connectie error tegenkomt, dan kan deze het bericht zelf (of via de broker) weer in de event queue opslaan, zodat de broker het event later weer op kan pakken en vervolgens de url registreren bij de broker zodat deze de url tijdelijk kan negeren bij het uitgeven van berichten.
+
+Er wordt een nieuwe broker en client voor het versturen geimplementeerd.
+De broker geeft een client pas een bericht als dit bericht ook daadwerkelijk verstuurd kan worden.
+De client vraagt dus om een bericht bij de broker.
+Zo wacht een client dus niet met een bericht versturen totdat dat mag, maar wacht een client op een bericht van de broker dat verstuurd mag worden.
+Zo heb je geen concurrency problemen, heb je geen clients/channels per afnemer nodig en worden de clients optimaal gebruikt.
+Als er 1 client uitvalt, loopt het berichtenverkeer ongehinderd door.
+Als het te druk is, kun je gewoon het aantal clients opschalen.
+Hierbij komt alle complexiteit in de broker te zitten en die kun je op verschillende manieren invullen en tunen.
+De broker kan meervoudig worden uitgevoerd, maar er is altijd maar 1 actieve broker die berichten uitgeeft.
+Het bepalen van de actieve broker kan in de clients worden ingebouwd, maar kan ook door containers worden gerealiseerd. Dit laatste heeft waarschijnlijk de voorkeur.
+Misschien kan de broker als stored procedure op de database worden uitgevoerd, waarmee voorgaande probleem ook meteen is opgelost.
+Het uitgangspunt is dat de client het bericht verstuurd op het moment dat deze het bericht aanneemt.
+Retryen ten gevolge van een falende client gebeurt op basis van het ebms protocol.
+Als de client een connectie error tegenkomt, dan kan deze het bericht zelf (of via de broker) weer in de event queue opslaan, zodat de broker het event later weer op kan pakken en vervolgens de url registreren bij de broker zodat deze de url tijdelijk kan negeren bij het uitgeven van berichten.
+
+Er kunnen verschillende channels worden gerealiseerd dmv. verschillende broker.
+Elke broker bedient een channel met 1 of meerdere afnemers.
+Een afnemer wordt bedient vanuit 1 channel.
+
+(Eventueel kan een client terugmelden dat een event is uitgevoerd zodat de broker het event daadwerkelijk wist (event staat tot die tijd in status pending))
