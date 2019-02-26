@@ -20,8 +20,15 @@ Het uitgangspunt is dat de client het bericht verstuurd op het moment dat deze h
 Retryen ten gevolge van een falende client gebeurt op basis van het ebms protocol.
 Als de client een connectie error tegenkomt, dan kan deze het bericht zelf (of via de broker) weer in de event queue opslaan, zodat de broker het event later weer op kan pakken en vervolgens de url registreren bij de broker zodat deze de url tijdelijk kan negeren bij het uitgeven van berichten.
 
+Een broker kan bijv als volgt worden geimplementeerd:
+Een producer leest de berichten uit de event queue (en locked deze) en plaatst de berichten in channels per afnemer.
+Een consumer leest de berichten uit de verschillende channels.
+De channels leveren pas een bericht als dit mag worden verzonden.
+De channels zijn ingedeeld in high en low priority channels, waarbij de high priority de throttled channels zijn (die weer gerangschikt zijn op basis van throttling timeout (van hoog naar laag)) en de low priority de overige.
+De consumer bevraagt de channels op basis van priority (en begint eventueel opnieuw na een opgegeven tijd (waarbij in de low priority channels verder wordt gegaan waar de de vorige run is gestopt) of als alle channels zijn bevraagd).
+De consumer bevraagt volgende channel pas als de volgende client zich aandient.
+
 Er kunnen verschillende channels worden gerealiseerd dmv. verschillende broker.
 Elke broker bedient een channel met 1 of meerdere afnemers.
 Een afnemer wordt bedient vanuit 1 channel.
 
-(Eventueel kan een client terugmelden dat een event is uitgevoerd zodat de broker het event daadwerkelijk wist (event staat tot die tijd in status pending))
