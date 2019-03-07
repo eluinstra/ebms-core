@@ -1,3 +1,5 @@
+- log ebms messages to a separate log group
+
 - use oid to determine encryption algorithm
 - implement packaging
 - implement message ordering
@@ -5,6 +7,12 @@
 Uitbreiding throttling:
 Het automatisch versturen vanuit de ebms-adapter kan worden uitgezet, zodat een externe client dit proces kan overnemen.
 
+Oplossing 1:
+Implementeer een client die per afnemer kan worden geconfigureerd.
+Een client handelt dus precies 1 afnemer af en een afnemer wordt door precies 1 client afgehandeld.
+Failover kan door middel van containers worden gerealiseerd
+
+Oplossing 2:
 Er wordt een nieuwe broker en client voor het versturen geimplementeerd.
 De broker geeft een client pas een bericht als dit bericht ook daadwerkelijk verstuurd kan worden.
 De client vraagt dus om een bericht bij de broker.
