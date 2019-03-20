@@ -201,6 +201,7 @@
 	</bean>
  
 	<bean id="jobScheduler" class="nl.clockwork.ebms.job.JobScheduler">
+		<property name="enabled" value="${jobScheduler.enabled}"/>
 		<property name="delay" value="${jobScheduler.delay}"/>
 		<property name="period" value="${jobScheduler.period}"/>
 		<property name="jobs">

@@ -29,6 +29,7 @@ public class JobScheduler implements InitializingBean, DisposableBean
 {
   protected transient Log logger = LogFactory.getLog(getClass());
 	private Timer jobTimer = null;
+	private boolean enabled;
 	private long delay;
 	private long period;
 	private List<Job> jobs = new ArrayList<Job>();
@@ -36,26 +37,29 @@ public class JobScheduler implements InitializingBean, DisposableBean
 	@Override
 	public void afterPropertiesSet() throws Exception
 	{
-		jobTimer = new Timer();
-		for (final Job job : jobs)
-			jobTimer.schedule(new TimerTask()
-			{
-				@Override
-				public void run()
+		if (enabled)
+		{
+			jobTimer = new Timer();
+			for (final Job job : jobs)
+				jobTimer.schedule(new TimerTask()
 				{
-					try
+					@Override
+					public void run()
 					{
-						logger.debug("Executing job " + job.getClass());
-						job.execute();
+						try
+						{
+							logger.debug("Executing job " + job.getClass());
+							job.execute();
+						}
+						catch (Exception e)
+						{
+							logger.error("",e);
+						}
 					}
-					catch (Exception e)
-					{
-						logger.error("",e);
-					}
-				}
-			},
-			delay,
-			period);
+				},
+				delay,
+				period);
+		}
 	}
 	
 	@Override
@@ -63,6 +67,11 @@ public class JobScheduler implements InitializingBean, DisposableBean
 	{
 		if (jobTimer != null)
 			jobTimer.cancel();
+	}
+	
+	public void setEnabled(boolean enabled)
+	{
+		this.enabled = enabled;
 	}
 	
 	public void setDelay(long delay)
