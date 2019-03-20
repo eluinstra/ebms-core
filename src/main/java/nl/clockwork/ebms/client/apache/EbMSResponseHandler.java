@@ -41,7 +41,7 @@ import org.xml.sax.SAXException;
 
 public class EbMSResponseHandler implements ResponseHandler<EbMSDocument>
 {
-  protected transient Log logger = LogFactory.getLog(getClass());
+	protected transient Log messageLogger = LogFactory.getLog(Constants.MESSAGE_LOG);
 
 	@Override
 	public EbMSDocument handleResponse(HttpResponse response) throws ClientProtocolException, IOException
@@ -53,7 +53,7 @@ public class EbMSResponseHandler implements ResponseHandler<EbMSDocument>
 				HttpEntity entity = response.getEntity();
 				if (response.getStatusLine().getStatusCode() == Constants.SC_NOCONTENT || entity == null || entity.getContentLength() == 0)
 				{
-					logger.info("<<<< statusCode = " + response.getStatusLine().getStatusCode());
+					messageLogger.info("<<<< statusCode = " + response.getStatusLine().getStatusCode());
 					return null;
 				}
 				else
@@ -63,8 +63,8 @@ public class EbMSResponseHandler implements ResponseHandler<EbMSDocument>
 						EbMSMessageReader messageReader = new EbMSMessageReader(getHeaderField(response,"Content-ID"),getHeaderField(response,"Content-Type"));
 						//EbMSDocument result = messageReader.read(input);
 						EbMSDocument result = messageReader.readResponse(input,getEncoding(entity));
-			      if (logger.isInfoEnabled())
-							logger.info("<<<< statusCode = " + response.getStatusLine().getStatusCode() + (result == null || result.getMessage() == null ? "" : "\n" + DOMUtils.toString(result.getMessage())));
+			      if (messageLogger.isInfoEnabled())
+			      	messageLogger.info("<<<< statusCode = " + response.getStatusLine().getStatusCode() + (result == null || result.getMessage() == null ? "" : "\n" + DOMUtils.toString(result.getMessage())));
 						return result;
 					}
 				}

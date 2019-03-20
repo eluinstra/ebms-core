@@ -36,6 +36,7 @@ import org.w3c.dom.Document;
 public abstract class EbMSInputStreamHandler
 {
   protected transient Log logger = LogFactory.getLog(nl.clockwork.ebms.server.EbMSInputStreamHandler.class);
+  protected transient Log messageLogger = LogFactory.getLog(Constants.MESSAGE_LOG);
 	private EbMSMessageProcessor messageProcessor;
 
 	public EbMSInputStreamHandler(EbMSMessageProcessor messageProcessor)
@@ -50,33 +51,33 @@ public abstract class EbMSInputStreamHandler
 	  	String soapAction = getRequestHeader("SOAPAction");
 	  	if (!Constants.EBMS_SOAP_ACTION.equals(soapAction))
 	  	{
-				if (logger.isInfoEnabled())
-					logger.info("<<<<\n" + getRequestHeaders() + "\n" + IOUtils.toString(request));
+				if (messageLogger.isInfoEnabled())
+					messageLogger.info("<<<<\n" + getRequestHeaders() + "\n" + IOUtils.toString(request));
 				throw new EbMSProcessorException("Unable to process message! SOAPAction=" + soapAction);
 	  	}
 //	  	if (logger.isDebugEnabled())
 //	  		request = new LoggingInputStream(request);
-	  	if (logger.isDebugEnabled())
+	  	if (messageLogger.isDebugEnabled())
 	  	{
 	  		request = new BufferedInputStream(request);
 	  		request.mark(Integer.MAX_VALUE);
-				logger.info("<<<<\n" + getRequestHeaders() + "\n" + IOUtils.toString(request));
+	  		messageLogger.info("<<<<\n" + getRequestHeaders() + "\n" + IOUtils.toString(request));
 	  		request.reset();
 	  	}
 			EbMSMessageReader messageReader = new EbMSMessageReader(getRequestHeader("Content-ID"),getRequestHeader("Content-Type"));
 			EbMSDocument in = messageReader.read(request);
-			if (logger.isInfoEnabled() && !logger.isDebugEnabled())
-				logger.info("<<<<\n" + DOMUtils.toString(in.getMessage()));
+			if (messageLogger.isInfoEnabled() && !messageLogger.isDebugEnabled())
+				messageLogger.info("<<<<\n" + DOMUtils.toString(in.getMessage()));
 			EbMSDocument out = messageProcessor.processRequest(in);
 			if (out == null)
 			{
-				logger.info(">>>>\nstatusCode: " + Constants.SC_NOCONTENT);
+				messageLogger.info(">>>>\nstatusCode: " + Constants.SC_NOCONTENT);
 				writeResponseStatus(Constants.SC_NOCONTENT);
 			}
 			else
 			{
-				if (logger.isInfoEnabled())
-					logger.info(">>>>\nstatusCode: " + Constants.SC_OK + "\nContent-Type: text/xml\nSOAPAction: " + Constants.EBMS_SOAP_ACTION + "\n" + DOMUtils.toString(out.getMessage()));
+				if (messageLogger.isInfoEnabled())
+					messageLogger.info(">>>>\nstatusCode: " + Constants.SC_OK + "\nContent-Type: text/xml\nSOAPAction: " + Constants.EBMS_SOAP_ACTION + "\n" + DOMUtils.toString(out.getMessage()));
 				writeResponseStatus(Constants.SC_OK);
 				writeResponseHeader("Content-Type","text/xml");
 				writeResponseHeader("SOAPAction",Constants.EBMS_SOAP_ACTION);
@@ -89,11 +90,9 @@ public abstract class EbMSInputStreamHandler
 			try
 			{
 				Document soapFault = EbMSMessageUtils.createSOAPFault(e);
-				if (logger.isInfoEnabled())
-				{
-					logger.info(">>>>\nstatusCode: " + Constants.SC_INTERNAL_SERVER_ERROR + "\nContent-Type: text/xml\n" + DOMUtils.toString(soapFault));
-					logger.info("",e);
-				}
+				if (messageLogger.isInfoEnabled())
+					messageLogger.info(">>>>\nstatusCode: " + Constants.SC_INTERNAL_SERVER_ERROR + "\nContent-Type: text/xml\n" + DOMUtils.toString(soapFault));
+				logger.info("",e);
 				writeResponseStatus(Constants.SC_INTERNAL_SERVER_ERROR);
 				writeResponseHeader("Content-Type","text/xml");
 				OutputStream response = getOutputStream();

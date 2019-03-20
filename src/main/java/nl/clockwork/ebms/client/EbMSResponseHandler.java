@@ -40,7 +40,7 @@ import org.xml.sax.SAXException;
 
 public class EbMSResponseHandler
 {
-  protected transient Log logger = LogFactory.getLog(getClass());
+	protected transient Log messageLogger = LogFactory.getLog(Constants.MESSAGE_LOG);
 	private HttpURLConnection connection;
 	private List<Integer> recoverableHttpErrors;
 	private List<Integer> irrecoverableHttpErrors;
@@ -60,7 +60,7 @@ public class EbMSResponseHandler
 			{
 				if (connection.getResponseCode() == Constants.SC_NOCONTENT || connection.getContentLength() == 0)
 				{
-					logger.info("<<<<\nstatusCode: " + connection.getResponseCode() + (logger.isDebugEnabled() ? "\n" + HTTPUtils.toString(connection.getHeaderFields()) : ""));
+					messageLogger.info("<<<<\nstatusCode: " + connection.getResponseCode() + (messageLogger.isDebugEnabled() ? "\n" + HTTPUtils.toString(connection.getHeaderFields()) : ""));
 					return null;
 				}
 				else
@@ -70,8 +70,8 @@ public class EbMSResponseHandler
 						EbMSMessageReader messageReader = new EbMSMessageReader(getHeaderField("Content-ID"),getHeaderField("Content-Type"));
 						//EbMSDocument result = messageReader.read(input);
 						EbMSDocument result = messageReader.readResponse(input,getEncoding());
-						if (logger.isInfoEnabled())
-							logger.info("<<<<\nstatusCode: " + connection.getResponseCode() + (logger.isDebugEnabled() ? "\n" + HTTPUtils.toString(connection.getHeaderFields()) : "") + (result == null || result.getMessage() == null ? "" : "\n" + DOMUtils.toString(result.getMessage())));
+						if (messageLogger.isInfoEnabled())
+							messageLogger.info("<<<<\nstatusCode: " + connection.getResponseCode() + (messageLogger.isDebugEnabled() ? "\n" + HTTPUtils.toString(connection.getHeaderFields()) : "") + (result == null || result.getMessage() == null ? "" : "\n" + DOMUtils.toString(result.getMessage())));
 						return result;
 					}
 				}
@@ -84,7 +84,7 @@ public class EbMSResponseHandler
 					if (input != null)
 					{
 						response = IOUtils.toString(input);
-						logger.info("<<<<\nstatusCode: " + connection.getResponseCode() + (logger.isDebugEnabled() ? "\n" + HTTPUtils.toString(connection.getHeaderFields()) : "") + "\n" + response);
+						messageLogger.info("<<<<\nstatusCode: " + connection.getResponseCode() + (messageLogger.isDebugEnabled() ? "\n" + HTTPUtils.toString(connection.getHeaderFields()) : "") + "\n" + response);
 					}
 					if (recoverableHttpErrors.contains(connection.getResponseCode()))
 						throw new EbMSResponseException(connection.getResponseCode(),response);
@@ -100,7 +100,7 @@ public class EbMSResponseHandler
 					if (input != null)
 					{
 						response = IOUtils.toString(input);
-						logger.info("<<<<\nstatusCode: " + connection.getResponseCode() + (logger.isDebugEnabled() ? "\n" + HTTPUtils.toString(connection.getHeaderFields()) : "") + "\n" + response);
+						messageLogger.info("<<<<\nstatusCode: " + connection.getResponseCode() + (messageLogger.isDebugEnabled() ? "\n" + HTTPUtils.toString(connection.getHeaderFields()) : "") + "\n" + response);
 					}
 					if (irrecoverableHttpErrors.contains(connection.getResponseCode()))
 						throw new EbMSIrrecoverableResponsexception(connection.getResponseCode(),response);
@@ -110,7 +110,7 @@ public class EbMSResponseHandler
 			}
 			else
 			{
-				logger.info("<<<<\nstatusCode: " + connection.getResponseCode() + (logger.isDebugEnabled() ? "\n" + HTTPUtils.toString(connection.getHeaderFields()) : ""));
+				messageLogger.info("<<<<\nstatusCode: " + connection.getResponseCode() + (messageLogger.isDebugEnabled() ? "\n" + HTTPUtils.toString(connection.getHeaderFields()) : ""));
 				throw new EbMSIrrecoverableResponsexception(connection.getResponseCode());
 			}
 		}
@@ -119,7 +119,7 @@ public class EbMSResponseHandler
 			try (InputStream errorStream = new BufferedInputStream(connection.getErrorStream()))
 			{
 //				String error = IOUtils.toString(errorStream,getEncoding());
-//				logger.info("<<<<\nstatusCode: " + connection.getResponseCode() + (logger.isDebugEnabled() ? "\n" + HTTPUtils.toString(connection.getHeaderFields()) : "") + "\n" + error);
+//				messageLogger.info("<<<<\nstatusCode: " + connection.getResponseCode() + (logger.isDebugEnabled() ? "\n" + HTTPUtils.toString(connection.getHeaderFields()) : "") + "\n" + error);
 //				throw new EbMSResponseException(connection.getResponseCode(),error);
 				throw new EbMSResponseException(connection.getResponseCode(),e.getMessage());
 			}

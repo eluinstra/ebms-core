@@ -38,7 +38,7 @@ import org.apache.http.entity.mime.content.StringBody;
 
 public class EbMSMessageWriter
 {
-  protected transient Log logger = LogFactory.getLog(getClass());
+	protected transient Log messageLogger = LogFactory.getLog(Constants.MESSAGE_LOG);
 	protected HttpPost httpPost;
 	protected boolean chunkedStreamingMode = true;
 	
@@ -63,8 +63,8 @@ public class EbMSMessageWriter
 
 	protected void writeMessage(EbMSDocument document) throws UnsupportedEncodingException, TransformerException
 	{
-		if (logger.isInfoEnabled() && !LogFactory.getLog("org.apache.http.wire").isDebugEnabled())
-			logger.info(">>>>\n" + DOMUtils.toString(document.getMessage()));
+		if (messageLogger.isInfoEnabled() && !LogFactory.getLog("org.apache.http.wire").isDebugEnabled())
+			messageLogger.info(">>>>\n" + DOMUtils.toString(document.getMessage()));
 		httpPost.setHeader("SOAPAction",Constants.EBMS_SOAP_ACTION);
 		StringEntity entity = new StringEntity(DOMUtils.toString(document.getMessage(),"UTF-8"),"UTF-8");
 		entity.setContentType("text/xml");
@@ -74,8 +74,8 @@ public class EbMSMessageWriter
 
 	protected void writeMimeMessage(EbMSDocument document) throws IOException, TransformerException
 	{
-		if (logger.isInfoEnabled() && !LogFactory.getLog("org.apache.http.wire").isDebugEnabled())
-			logger.info(">>>>\n" + DOMUtils.toString(document.getMessage()));
+		if (messageLogger.isInfoEnabled() && !LogFactory.getLog("org.apache.http.wire").isDebugEnabled())
+			messageLogger.info(">>>>\n" + DOMUtils.toString(document.getMessage()));
 		httpPost.setHeader("SOAPAction",Constants.EBMS_SOAP_ACTION);
 		MultipartEntityBuilder entity = MultipartEntityBuilder.create();
 		entity.setContentType(ContentType.create("multipart/related"));

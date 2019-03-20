@@ -21,6 +21,7 @@ import java.io.OutputStream;
 import java.util.List;
 import java.util.Map;
 
+import nl.clockwork.ebms.Constants;
 import nl.clockwork.ebms.common.util.HTTPUtils;
 
 import org.apache.commons.logging.Log;
@@ -28,7 +29,7 @@ import org.apache.commons.logging.LogFactory;
 
 public class LoggingOutputStream extends FilterOutputStream
 {
-  protected transient Log logger = LogFactory.getLog(getClass());
+	protected transient Log messageLogger = LogFactory.getLog(Constants.MESSAGE_LOG);
 	private Map<String,List<String>> properties;
 	private String charset;
 	private StringBuffer sb = new StringBuffer();
@@ -48,7 +49,7 @@ public class LoggingOutputStream extends FilterOutputStream
 	@Override
 	public void write(int b) throws IOException
 	{
-		if (logger.isDebugEnabled())
+		if (messageLogger.isDebugEnabled())
 			sb.append(b);
 		out.write(b);
 	}
@@ -56,7 +57,7 @@ public class LoggingOutputStream extends FilterOutputStream
 	@Override
 	public void write(byte[] b) throws IOException
 	{
-		if (logger.isDebugEnabled())
+		if (messageLogger.isDebugEnabled())
 			sb.append(new String(b,charset));
 		out.write(b);
 	}
@@ -64,7 +65,7 @@ public class LoggingOutputStream extends FilterOutputStream
 	@Override
 	public void write(byte[] b, int off, int len) throws IOException
 	{
-		if (logger.isDebugEnabled())
+		if (messageLogger.isDebugEnabled())
 			sb.append(new String(b,off,len,charset));
 		out.write(b,off,len);
 	}
@@ -72,7 +73,7 @@ public class LoggingOutputStream extends FilterOutputStream
 	@Override
 	public void close() throws IOException
 	{
-		logger.debug(">>>>\n" + HTTPUtils.toString(this.properties) + "\n" + sb.toString());
+		messageLogger.debug(">>>>\n" + HTTPUtils.toString(this.properties) + "\n" + sb.toString());
 		super.close();
 	}
 

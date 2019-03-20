@@ -38,7 +38,7 @@ import org.springframework.util.StringUtils;
 
 public class EbMSMessageWriter
 {
-  protected transient Log logger = LogFactory.getLog(getClass());
+	protected transient Log messageLogger = LogFactory.getLog(Constants.MESSAGE_LOG);
 	protected HttpURLConnection connection;
 	
 	public EbMSMessageWriter(HttpURLConnection connection)
@@ -58,16 +58,16 @@ public class EbMSMessageWriter
 	{
 		connection.setRequestProperty("Content-Type","text/xml; charset=UTF-8");
 		connection.setRequestProperty("SOAPAction",Constants.EBMS_SOAP_ACTION);
-		if (logger.isInfoEnabled())
-			logger.info(">>>>\n" + (logger.isDebugEnabled() ? HTTPUtils.toString(connection.getRequestProperties()) + "\n" : "") + DOMUtils.toString(document.getMessage()));
-		//DOMUtils.write(document.getMessage(),logger.isInfoEnabled() ? new LoggingOutputStream(connection.getOutputStream()) : connection.getOutputStream(),"UTF-8");
+		if (messageLogger.isInfoEnabled())
+			messageLogger.info(">>>>\n" + (messageLogger.isDebugEnabled() ? HTTPUtils.toString(connection.getRequestProperties()) + "\n" : "") + DOMUtils.toString(document.getMessage()));
+		//DOMUtils.write(document.getMessage(),messageLogger.isInfoEnabled() ? new LoggingOutputStream(connection.getOutputStream()) : connection.getOutputStream(),"UTF-8");
 		DOMUtils.write(document.getMessage(),connection.getOutputStream(),"UTF-8");
 	}
 	
 	protected void writeMimeMessage(EbMSDocument document) throws IOException, TransformerException
 	{
-		if (logger.isInfoEnabled() && !logger.isDebugEnabled())
-			logger.info(">>>>\n" + DOMUtils.toString(document.getMessage()));
+		if (messageLogger.isInfoEnabled() && !messageLogger.isDebugEnabled())
+			messageLogger.info(">>>>\n" + DOMUtils.toString(document.getMessage()));
 		String boundary = createBoundary();
 		String contentType = createContentType(boundary,document.getContentId());
 
@@ -77,7 +77,7 @@ public class EbMSMessageWriter
 
 		Map<String,List<String>> requestProperties = connection.getRequestProperties();
 		OutputStream outputStream = connection.getOutputStream();
-		if (logger.isDebugEnabled())
+		if (messageLogger.isDebugEnabled())
 			outputStream = new LoggingOutputStream(requestProperties,outputStream);
 
 		try (OutputStreamWriter writer = new OutputStreamWriter(outputStream,"UTF-8"))

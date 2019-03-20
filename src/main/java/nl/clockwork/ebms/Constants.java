@@ -181,5 +181,7 @@ public class Constants
 	
 	/* time based */
 	public static final int MINUTE_IN_MILLIS = 60000;
+	
+	public static final String MESSAGE_LOG = "nl.clockwork.ebms.message";
 
 }
