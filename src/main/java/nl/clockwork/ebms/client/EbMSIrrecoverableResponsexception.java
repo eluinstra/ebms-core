@@ -15,31 +15,19 @@
  */
 package nl.clockwork.ebms.client;
 
-import javax.xml.namespace.QName;
 
-
-public class EbMSResponseSOAPException extends EbMSResponseException
+public class EbMSIrrecoverableResponsexception extends EbMSResponseException
 {
-	public static final QName CLIENT = new QName("http://schemas.xmlsoap.org/soap/envelope/","Client");
-	public static final QName SERVER = new QName("http://schemas.xmlsoap.org/soap/envelope/","Server");
 	private static final long serialVersionUID = 1L;
-	private QName faultCode;
 
-	public EbMSResponseSOAPException(int statusCode, QName faultCode)
+	public EbMSIrrecoverableResponsexception(int statusCode)
 	{
 		super(statusCode);
-		this.faultCode = faultCode;
 	}
 	
-	public EbMSResponseSOAPException(int statusCode, QName faultCode, String message)
+	public EbMSIrrecoverableResponsexception(int statusCode, String message)
 	{
 		super(statusCode,message);
-		this.faultCode = faultCode;
-	}
-	
-	public QName getFaultCode()
-	{
-		return faultCode;
 	}
 	
 }

@@ -15,6 +15,9 @@
  */
 package nl.clockwork.ebms.client;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import nl.clockwork.ebms.ssl.SSLFactoryManager;
 
 import org.apache.commons.logging.Log;
@@ -37,6 +40,8 @@ public class EbMSHttpClientFactory implements FactoryBean<EbMSClient>
 	private String[] enabledProtocols = new String[]{};
 	private String[] enabledCipherSuites = new String[]{};
 	private boolean verifyHostnames;
+	private List<Integer> recoverableHttpErrors = new ArrayList<Integer>();
+	private List<Integer> irrecoverableHttpErrors = new ArrayList<Integer>();
 
 	@Override
 	public EbMSClient getObject() throws Exception
@@ -45,7 +50,7 @@ public class EbMSHttpClientFactory implements FactoryBean<EbMSClient>
 		if (EbMSHttpClientType.APACHE.equals(type))
 			return new nl.clockwork.ebms.client.apache.EbMSHttpClient(sslFactoryManager,enabledProtocols,enabledCipherSuites,verifyHostnames,chunkedStreamingMode,proxy);
 		else
-			return new EbMSHttpClient(sslFactoryManager,chunkedStreamingMode,base64Writer,proxy);
+			return new EbMSHttpClient(sslFactoryManager,chunkedStreamingMode,base64Writer,proxy,recoverableHttpErrors,irrecoverableHttpErrors);
 	}
 
 	@Override
@@ -105,5 +110,21 @@ public class EbMSHttpClientFactory implements FactoryBean<EbMSClient>
 	public void setVerifyHostnames(boolean verifyHostnames)
 	{
 		this.verifyHostnames = verifyHostnames;
+	}
+	public void setRecoverableInfromationalHttpErrors(List<Integer> recoverableInfromationalHttpErrors)
+	{
+		this.recoverableHttpErrors.addAll(recoverableInfromationalHttpErrors);
+	}
+	public void setRecoverableRedirectionHttpErrors(List<Integer> recoverableRedirectionHttpErrors)
+	{
+		this.recoverableHttpErrors.addAll(recoverableRedirectionHttpErrors);
+	}
+	public void setRecoverableClientHttpErrors(List<Integer> recoverableClientHttpErrors)
+	{
+		this.recoverableHttpErrors.addAll(recoverableClientHttpErrors);
+	}
+	public void setIrrecoverableServerHttpErrors(List<Integer> irrecoverableServerHttpErrors)
+	{
+		this.irrecoverableHttpErrors = irrecoverableServerHttpErrors;
 	}
 }

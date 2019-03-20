@@ -19,34 +19,37 @@ import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
-import nl.clockwork.ebms.Constants;
+import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
+import nl.clockwork.ebms.Constants;
 import nl.clockwork.ebms.common.util.DOMUtils;
 import nl.clockwork.ebms.common.util.HTTPUtils;
 import nl.clockwork.ebms.model.EbMSDocument;
 import nl.clockwork.ebms.processor.EbMSProcessingException;
 import nl.clockwork.ebms.processor.EbMSProcessorException;
 import nl.clockwork.ebms.server.EbMSMessageReader;
-import nl.clockwork.ebms.util.EbMSMessageUtils;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.util.StringUtils;
 import org.xml.sax.SAXException;
-import org.xmlsoap.schemas.soap.envelope.Fault;
 
 public class EbMSResponseHandler
 {
   protected transient Log logger = LogFactory.getLog(getClass());
 	private HttpURLConnection connection;
+	private List<Integer> recoverableHttpErrors;
+	private List<Integer> irrecoverableHttpErrors;
 	
-	public EbMSResponseHandler(HttpURLConnection connection)
+	public EbMSResponseHandler(HttpURLConnection connection, List<Integer> recoverableHttpErrors, List<Integer> irrecoverableHttpErrors)
 	{
 		this.connection = connection;
+		this.recoverableHttpErrors = recoverableHttpErrors;
+		this.irrecoverableHttpErrors = irrecoverableHttpErrors;
 	}
 
 	public EbMSDocument read() throws IOException, ParserConfigurationException, SAXException, EbMSProcessorException, TransformerException
@@ -73,33 +76,42 @@ public class EbMSResponseHandler
 					}
 				}
 			}
-			else if (connection.getResponseCode() >= Constants.SC_BAD_REQUEST)
+			else if (connection.getResponseCode() / 100 == 1 || connection.getResponseCode() / 100 == 3 || connection.getResponseCode() / 100 == 4)
 			{
 				try (InputStream input = connection.getErrorStream())
 				{
+					String response = null;
 					if (input != null)
 					{
-						String response = IOUtils.toString(input);
+						response = IOUtils.toString(input);
 						logger.info("<<<<\nstatusCode: " + connection.getResponseCode() + (logger.isDebugEnabled() ? "\n" + HTTPUtils.toString(connection.getHeaderFields()) : "") + "\n" + response);
-						if (connection.getResponseCode() == Constants.SC_INTERNAL_SERVER_ERROR)
-						{
-							Fault soapFault = EbMSMessageUtils.getSOAPFault(response);
-							if (soapFault != null)
-								throw new EbMSResponseSOAPException(connection.getResponseCode(),soapFault.getFaultcode(),response);
-						}
+					}
+					if (recoverableHttpErrors.contains(connection.getResponseCode()))
 						throw new EbMSResponseException(connection.getResponseCode(),response);
-					}
 					else
+						throw new EbMSIrrecoverableResponsexception(connection.getResponseCode(),response);
+				}
+			}
+			else if (connection.getResponseCode() / 100 == 5)
+			{
+				try (InputStream input = connection.getErrorStream())
+				{
+					String response = null;
+					if (input != null)
 					{
-						logger.info("<<<<\nstatusCode: " + connection.getResponseCode() + (logger.isDebugEnabled() ? "\n" + HTTPUtils.toString(connection.getHeaderFields()) : ""));
-						throw new EbMSResponseException(connection.getResponseCode());
+						response = IOUtils.toString(input);
+						logger.info("<<<<\nstatusCode: " + connection.getResponseCode() + (logger.isDebugEnabled() ? "\n" + HTTPUtils.toString(connection.getHeaderFields()) : "") + "\n" + response);
 					}
+					if (irrecoverableHttpErrors.contains(connection.getResponseCode()))
+						throw new EbMSIrrecoverableResponsexception(connection.getResponseCode(),response);
+					else
+						throw new EbMSResponseException(connection.getResponseCode(),response);
 				}
 			}
 			else
 			{
 				logger.info("<<<<\nstatusCode: " + connection.getResponseCode() + (logger.isDebugEnabled() ? "\n" + HTTPUtils.toString(connection.getHeaderFields()) : ""));
-				throw new EbMSResponseException(connection.getResponseCode());
+				throw new EbMSIrrecoverableResponsexception(connection.getResponseCode());
 			}
 		}
 		catch (IOException e)

@@ -256,6 +256,10 @@
 		<property name="enabledProtocols" value="${https.protocols}"/>
 		<property name="enabledCipherSuites" value="${https.cipherSuites}"/>
 		<property name="verifyHostnames" value="${https.verifyHostnames}"></property>
+		<property name="recoverable InfromationalHttpErrors" value="${http.errors.informational.recoverable}"></property>
+		<property name="recoverableRedirectionHttpErrors" value="${http.errors.redirection.recoverable}"></property>
+		<property name="recoverableClientHttpErrors" value="${http.errors.client.recoverable}"></property>
+		<property name="irrecoverableServerHttpErrors" value="${http.errors.server.irrecoverable}"></property>
 	</bean>
 
 	<bean id="sslFactoryManager" class="nl.clockwork.ebms.client.SSLFactoryManager">

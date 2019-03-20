@@ -21,6 +21,7 @@ import java.net.InetSocketAddress;
 import java.net.Proxy;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.List;
 
 import javax.net.ssl.HttpsURLConnection;
 import javax.xml.parsers.ParserConfigurationException;
@@ -39,17 +40,21 @@ public class EbMSHttpClient implements EbMSClient
 	private boolean chunkedStreamingMode;
 	private boolean base64Writer;
 	private EbMSProxy proxy;
+	private List<Integer> recoverableHttpErrors;
+	private List<Integer> irrecoverableHttpErrors;
 
 	public EbMSHttpClient()
 	{
 	}
 
-	public EbMSHttpClient(SSLFactoryManager sslFactoryManager, boolean chunkedStreamingMode, boolean base64Writer, EbMSProxy proxy)
+	public EbMSHttpClient(SSLFactoryManager sslFactoryManager, boolean chunkedStreamingMode, boolean base64Writer, EbMSProxy proxy, List<Integer> recoverableHttpErrors, List<Integer> irrecoverableHttpErrors)
 	{
 		this.sslFactoryManager = sslFactoryManager;
 		this.chunkedStreamingMode = chunkedStreamingMode;
 		this.base64Writer = base64Writer;
 		this.proxy = proxy;
+		this.recoverableHttpErrors = recoverableHttpErrors;
+		this.irrecoverableHttpErrors = irrecoverableHttpErrors;
 	}
 
 	public EbMSDocument sendMessage(String uri, EbMSDocument document) throws EbMSProcessorException
@@ -64,7 +69,7 @@ public class EbMSHttpClient implements EbMSClient
 			EbMSMessageWriter writer = base64Writer ? new EbMSMessageBase64Writer(connection) : new EbMSMessageWriter(connection);
 			writer.write(document);
 			connection.connect();
-			EbMSResponseHandler handler = new EbMSResponseHandler(connection);
+			EbMSResponseHandler handler = new EbMSResponseHandler(connection,recoverableHttpErrors,irrecoverableHttpErrors);
 			return handler.read();
 		}
 		catch (IOException | TransformerException | SAXException e)

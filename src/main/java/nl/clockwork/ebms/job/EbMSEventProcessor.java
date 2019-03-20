@@ -27,7 +27,7 @@ import nl.clockwork.ebms.Constants.EbMSEventStatus;
 import nl.clockwork.ebms.Constants.EbMSMessageStatus;
 import nl.clockwork.ebms.client.EbMSClient;
 import nl.clockwork.ebms.client.EbMSResponseException;
-import nl.clockwork.ebms.client.EbMSResponseSOAPException;
+import nl.clockwork.ebms.client.EbMSIrrecoverableResponsexception;
 import nl.clockwork.ebms.common.CPAManager;
 import nl.clockwork.ebms.common.URLManager;
 import nl.clockwork.ebms.dao.DAOTransactionCallback;
@@ -110,7 +110,7 @@ public class EbMSEventProcessor implements InitializingBean, Job
 						public void doInTransaction()
 						{
 							eventManager.updateEvent(pevent,url,EbMSEventStatus.FAILED,e.getMessage());
-							if ((e instanceof EbMSResponseSOAPException && EbMSResponseSOAPException.CLIENT.equals(((EbMSResponseSOAPException)e).getFaultCode())) || !CPAUtils.isReliableMessaging(deliveryChannel))
+							if ((e instanceof EbMSIrrecoverableResponsexception) || !CPAUtils.isReliableMessaging(deliveryChannel))
 								if (ebMSDAO.updateMessage(pevent.getMessageId(),EbMSMessageStatus.SENDING,EbMSMessageStatus.DELIVERY_FAILED) > 0)
 								{
 									eventListener.onMessageFailed(pevent.getMessageId());
