@@ -53,7 +53,7 @@
 	</organization>
 	<properties>
 		<jdk.version>1.8</jdk.version>
-		<spring.version>3.2.1.RELEASE</spring.version>
+		<spring.version>5.1.6.RELEASE</spring.version>
 		<mime4j.version>0.7.2</mime4j.version>
 		<httpclient.version>4.5.3</httpclient.version>
 		<activemq.version>5.10.0</activemq.version>

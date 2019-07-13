@@ -41,7 +41,7 @@ import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageHeader;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
-import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.transaction.TransactionException;
@@ -286,7 +286,7 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 			" and m.message_nr = 0" +
 			" and m.id = a.ebms_message_id" +
 			" order by a.order_nr",
-			new ParameterizedRowMapper<EbMSAttachment>()
+			new RowMapper<EbMSAttachment>()
 			{
 				@Override
 				public EbMSAttachment mapRow(ResultSet rs, int rowNum) throws SQLException

@@ -60,7 +60,6 @@ import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.RowMapper;
-import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.transaction.TransactionException;
@@ -112,11 +111,12 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	{
 		try
 		{
-			return jdbcTemplate.queryForInt(
+			return jdbcTemplate.queryForObject(
 				"select count(*)" +
 				" from cpa" +
 				" where cpa_id = ?",
-				cpaId
+				new Object[]{cpaId},
+				Integer.class
 			) > 0;
 		}
 		catch (DataAccessException e)
@@ -231,11 +231,12 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	{
 		try
 		{
-			return jdbcTemplate.queryForInt(
+			return jdbcTemplate.queryForObject(
 				"select count(*)" +
 				" from url" +
 				" where source = ?",
-				source
+				new Object[]{source},
+				Integer.class
 			) > 0;
 		}
 		catch (DataAccessException e)
@@ -356,12 +357,13 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	{
 		try
 		{
-			return jdbcTemplate.queryForInt(
+			return jdbcTemplate.queryForObject(
 				"select count(message_id)" +
 				" from ebms_message" +
 				" where message_id = ?" +
 				" and message_nr = 0",
-				messageId
+				new Object[]{messageId},
+				Integer.class
 			) > 0;
 		}
 		catch (DataAccessException e)
@@ -375,7 +377,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	{
 		try
 		{
-			return jdbcTemplate.queryForInt(
+			return jdbcTemplate.queryForObject(
 				"select count(message_id)" +
 				" from ebms_message" +
 				" where message_id = ?" +
@@ -385,12 +387,15 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 				" and to_role = ?" +
 				" and service = ?" +
 				" and action = ?"*/,
-				message.getMessageHeader().getMessageData().getMessageId(),
-				message.getMessageHeader().getCPAId()/*,
-				message.getMessageHeader().getFrom().getRole(),
-				message.getMessageHeader().getTo().getRole(),
-				message.getMessageHeader().getService(),
-				message.getMessageHeader().getAction()*/
+				new Object[]{
+					message.getMessageHeader().getMessageData().getMessageId(),
+					message.getMessageHeader().getCPAId()/*,
+					message.getMessageHeader().getFrom().getRole(),
+					message.getMessageHeader().getTo().getRole(),
+					message.getMessageHeader().getService(),
+					message.getMessageHeader().getAction()*/
+				},
+				Integer.class
 			) > 0;
 		}
 		catch (DataAccessException e)
@@ -440,7 +445,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 				" from ebms_message" + 
 				" where message_id = ?" +
 				" and message_nr = 0",
-				new ParameterizedRowMapper<EbMSMessageContext>()
+				new RowMapper<EbMSMessageContext>()
 				{
 					@Override
 					public EbMSMessageContext mapRow(ResultSet rs, int rowNum) throws SQLException
@@ -497,7 +502,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 				" and message_nr = 0" +
 				(service == null ? "" : " and service = '" + EbMSMessageUtils.toString(service) + "'") +
 				(actions.length == 0 ? "" : " and action in ('" + StringUtils.join(actions,"','") + "')"),
-				new ParameterizedRowMapper<EbMSMessageContext>()
+				new RowMapper<EbMSMessageContext>()
 				{
 					@Override
 					public EbMSMessageContext mapRow(ResultSet rs, int rowNum) throws SQLException
@@ -638,7 +643,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 					" from ebms_message" +
 					" where message_id = ?" +
 					" and message_nr = 0",
-					new ParameterizedRowMapper<Integer>()
+					new RowMapper<Integer>()
 					{
 						@Override
 						public Integer mapRow(ResultSet rs, int rowNum) throws SQLException
@@ -1070,7 +1075,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 				(serverId == null ? " and server_id is null" : " and server_id = '" + serverId + "'") +
 				//" and (server_id = ? or (server_id is null and ? is null))" +
 				" order by time_stamp asc",
-				new ParameterizedRowMapper<EbMSEvent>()
+				new RowMapper<EbMSEvent>()
 				{
 					@Override
 					public EbMSEvent mapRow(ResultSet rs, int rowNum) throws SQLException
@@ -1348,7 +1353,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 			" where message_id = ?" +
 			" and message_nr = 0" +
 			" order by order_nr",
-			new ParameterizedRowMapper<EbMSAttachment>()
+			new RowMapper<EbMSAttachment>()
 			{
 				@Override
 				public EbMSAttachment mapRow(ResultSet rs, int rowNum) throws SQLException
