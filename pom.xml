@@ -52,7 +52,7 @@
 		<url>www.ordina.nl</url>
 	</organization>
 	<properties>
-		<jdk.version>1.7</jdk.version>
+		<jdk.version>1.8</jdk.version>
 		<spring.version>3.2.1.RELEASE</spring.version>
 		<mime4j.version>0.7.2</mime4j.version>
 		<httpclient.version>4.5.3</httpclient.version>
