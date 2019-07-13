@@ -143,18 +143,19 @@ the reources directory resides in ebms-adapter-x.x.x.zip/resources and contains 
 ==========
 Building =
 ==========
-> mvn package
+mvn package
 
 ====================
 Generating reports =
 ====================
-> mvn site
+mvn site
 
 Or to generate individual reports:
-> mvn jxr:jxr
-> mvn jxr:test-jxr
-> mvn checkstyle:checkstyle
-> mvn findbugs:findbugs
-> mvn pmd:pmd
-> mvn jdepend:generate
-> mvn cobertura:cobertura
+mvn jxr:jxr
+mvn jxr:test-jxr
+mvn checkstyle:checkstyle
+mvn findbugs:findbugs
+mvn pmd:pmd
+mvn jdepend:generate
+mvn cobertura:cobertura
+mvn org.owasp:dependency-check-maven:5.1.0:check

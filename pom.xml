@@ -57,6 +57,9 @@
 		<mime4j.version>0.7.2</mime4j.version>
 		<httpclient.version>4.5.3</httpclient.version>
 		<activemq.version>5.10.0</activemq.version>
+		<checkstyle.config.location>${basedir}/resources/reporting/checkstyle.xml</checkstyle.config.location>
+		<checkstyle.header.file>${basedir}/resources/reporting/license.txt</checkstyle.header.file>
+		<checkstyle.cache.file>${project.build.directory}/checkstyle-cachefile</checkstyle.cache.file>
 		<release.repo.url>http://sourceforge.net</release.repo.url>
 		<snapshot.repo.url>http://sourceforge.net</snapshot.repo.url>
 	</properties>
@@ -300,7 +303,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.1</version>
+				<version>3.8.1</version>
 				<configuration>
 					<source>${jdk.version}</source>
 					<target>${jdk.version}</target>
@@ -370,7 +373,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-javadoc-plugin</artifactId>
-				<version>3.0.0</version>
+				<version>3.1.1</version>
 				<configuration>
 					<source>${jdk.version}</source>
 					<doclint>none</doclint>
@@ -379,22 +382,22 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-report-plugin</artifactId>
-				<version>2.14.1</version>
+				<version>2.22.2</version>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-site-plugin</artifactId>
-				<version>3.7</version>
+				<version>3.7.1</version>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jxr-plugin</artifactId>
-				<version>2.3</version>
+				<version>3.0.0</version>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-checkstyle-plugin</artifactId>
-				<version>2.9.1</version>
+				<version>3.1.0</version>
 				<configuration>
 					<detail>true</detail>
 					<enableFilesSummary>true</enableFilesSummary>
@@ -415,7 +418,7 @@
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>findbugs-maven-plugin</artifactId>
-				<version>3.0.1</version>
+				<version>3.0.5</version>
 				<configuration>
 					<findbugsXmlOutputDirectory>${basedir}/target</findbugsXmlOutputDirectory>
 					<xmlOutput>true</xmlOutput>
@@ -425,7 +428,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-pmd-plugin</artifactId>
-				<version>2.7.1</version>
+				<version>3.12.0</version>
 				<configuration>
 					<linkXref>true</linkXref>
 					<targetJdk>${jdk.version}</targetJdk>
@@ -437,7 +440,7 @@
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>jdepend-maven-plugin</artifactId>
-				<version>2.0-beta-2</version>
+				<version>2.0</version>
 			</plugin>		
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
@@ -457,6 +460,18 @@
 						<tag>@deprecated</tag>
 					</tags>
 				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.owasp</groupId>
+				<artifactId>dependency-check-maven</artifactId>
+				<version>5.1.0</version>
+				<reportSets>
+					<reportSet>
+						<reports>
+							<report>aggregate</report>
+						</reports>
+					</reportSet>
+				</reportSets>
 			</plugin>
 		</plugins>
 	</reporting>
