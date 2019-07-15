@@ -15,6 +15,8 @@
  */
 package nl.clockwork.ebms.signing;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import java.io.IOException;
 import java.io.Serializable;
 import java.nio.charset.Charset;
@@ -43,7 +45,7 @@ import nl.clockwork.ebms.validation.ValidatorException;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.xml.security.Init;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CollaborationProtocolAgreement;
 import org.w3c.dom.Document;
@@ -76,22 +78,22 @@ public class SigningTest
 		signatureValidator.validate(message);
 	}
 
-	@Test(expected = ValidationException.class)
+	@Test
 	public void testSigingHeaderValidationFailure() throws EbMSProcessorException, ValidatorException
 	{
 		EbMSMessage message = createMessage();
 		signatureGenerator.generate(message);
 		changeConversationId(message);
-		signatureValidator.validate(message);
+		assertThrows(ValidationException.class,()->signatureValidator.validate(message));
 	}
 
-	@Test(expected = ValidationException.class)
+	@Test
 	public void testSigingAttachmentValidationFailure() throws EbMSProcessorException, ValidatorException
 	{
 		EbMSMessage message = createMessage();
 		signatureGenerator.generate(message);
 		message.setAttachments(createAttachments(message.getMessageHeader().getMessageData().getMessageId()));
-		signatureValidator.validate(message);
+		assertThrows(ValidationException.class,()->signatureValidator.validate(message));
 	}
 
 	private void changeConversationId(EbMSMessage message)

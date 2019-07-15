@@ -15,10 +15,10 @@
  */
 package nl.clockwork.ebms.dao;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.mchange.v2.c3p0.ComboPooledDataSource;
 
@@ -27,7 +27,7 @@ public class DAOFactoryTest {
 	ComboPooledDataSource ds = new ComboPooledDataSource();
 	EbMSDAO dao = null;
 	
-	@Before
+	@BeforeEach
 	public void init()
 	{
 		daoFactory = new EbMSDAOFactory();
@@ -65,12 +65,11 @@ public class DAOFactoryTest {
 		assertEquals(nl.clockwork.ebms.dao.mysql.EbMSDAOImpl.class, dao.getClass());
 	}
 	
-	@Test(expected=RuntimeException.class)
+	@Test
 	public void testUnknown() throws Exception
 	{
 		ds.setDriverClass("none");
-		dao = daoFactory.getObject();
-		fail("Should have thrown exception");
+		assertThrows(RuntimeException.class,()->daoFactory.getObject());
 	}
 
 	@Test

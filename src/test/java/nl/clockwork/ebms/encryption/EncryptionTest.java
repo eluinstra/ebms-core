@@ -15,7 +15,7 @@
  */
 package nl.clockwork.ebms.encryption;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -48,7 +48,7 @@ import nl.clockwork.ebms.validation.ValidatorException;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.xml.security.Init;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CollaborationProtocolAgreement;
 import org.w3c.dom.Document;
@@ -83,31 +83,31 @@ public class EncryptionTest
 		assertEquals("Dit is een test.",IOUtils.toString(message.getAttachments().get(0).getInputStream()));
 	}
 
-	@Test(expected = EbMSValidationException.class)
+	@Test
 	public void testEncryptionAttachmentValidationFailure() throws EbMSProcessorException, ParserConfigurationException, SAXException, IOException, TransformerException, ValidatorException
 	{
 		EbMSMessage message = createMessage();
 		messageEncrypter.encrypt(message);
 		changeAttachment(message);
-		messageDecrypter.decrypt(message);
+		assertThrows(EbMSValidationException.class,()->messageDecrypter.decrypt(message));
 	}
 
-	@Test(expected = EbMSValidationException.class)
+	@Test
 	public void testEncryptionAttachmentValidationFailure1() throws EbMSProcessorException, ParserConfigurationException, SAXException, IOException, TransformerException, ValidatorException
 	{
 		EbMSMessage message = createMessage();
 		messageEncrypter.encrypt(message);
 		changeAttachment1(message);
-		messageDecrypter.decrypt(message);
+		assertThrows(EbMSValidationException.class,()->messageDecrypter.decrypt(message));
 	}
 
-	@Test(expected = EbMSValidationException.class)
+	@Test
 	public void testEncryptionAttachmentNotEncrypted() throws EbMSProcessorException, ValidatorException
 	{
 		EbMSMessage message = createMessage();
 		messageEncrypter.encrypt(message);
 		message.setAttachments(createAttachments(message.getMessageHeader().getMessageData().getMessageId()));
-		messageDecrypter.decrypt(message);
+		assertThrows(EbMSValidationException.class,()->messageDecrypter.decrypt(message));
 	}
 
 	private void changeAttachment(EbMSMessage message) throws ParserConfigurationException, SAXException, IOException, TransformerException
