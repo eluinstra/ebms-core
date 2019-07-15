@@ -54,7 +54,7 @@
 	<properties>
 		<jdk.version>1.8</jdk.version>
 		<spring.version>5.1.6.RELEASE</spring.version>
-		<mime4j.version>0.7.2</mime4j.version>
+		<mime4j.version>0.8.3</mime4j.version>
 		<httpclient.version>4.5.3</httpclient.version>
 		<activemq.version>5.10.0</activemq.version>
 		<checkstyle.config.location>${basedir}/resources/reporting/checkstyle.xml</checkstyle.config.location>
@@ -240,7 +240,7 @@
 		<repository>
 		  <id>springsource-repo</id>
 		  <name>SpringSource Repository</name>
-		  <url>http://repo.springsource.org/release</url>
+		  <url>https://repo.springsource.org/release</url>
 		</repository>
 		<repository>
 			<id>codelds</id>
