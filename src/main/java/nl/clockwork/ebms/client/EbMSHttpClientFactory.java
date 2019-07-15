@@ -111,9 +111,9 @@ public class EbMSHttpClientFactory implements FactoryBean<EbMSClient>
 	{
 		this.verifyHostnames = verifyHostnames;
 	}
-	public void setRecoverableInfromationalHttpErrors(List<Integer> recoverableInfromationalHttpErrors)
+	public void setRecoverableInformationalHttpErrors(List<Integer> recoverableInformationalHttpErrors)
 	{
-		this.recoverableHttpErrors.addAll(recoverableInfromationalHttpErrors);
+		this.recoverableHttpErrors.addAll(recoverableInformationalHttpErrors);
 	}
 	public void setRecoverableRedirectionHttpErrors(List<Integer> recoverableRedirectionHttpErrors)
 	{
