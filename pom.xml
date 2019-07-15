@@ -56,7 +56,7 @@
 		<spring.version>5.1.6.RELEASE</spring.version>
 		<mime4j.version>0.8.3</mime4j.version>
 		<httpclient.version>4.5.9</httpclient.version>
-		<activemq.version>5.10.0</activemq.version>
+		<activemq.version>5.15.9</activemq.version>
 		<checkstyle.config.location>${basedir}/resources/reporting/checkstyle.xml</checkstyle.config.location>
 		<checkstyle.header.file>${basedir}/resources/reporting/license.txt</checkstyle.header.file>
 		<checkstyle.cache.file>${project.build.directory}/checkstyle-cachefile</checkstyle.cache.file>
