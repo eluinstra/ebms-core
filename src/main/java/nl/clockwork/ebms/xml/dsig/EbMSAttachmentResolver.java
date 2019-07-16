@@ -23,13 +23,13 @@ import java.util.List;
 
 import javax.activation.DataSource;
 
-import nl.clockwork.ebms.Constants;
-import nl.clockwork.ebms.model.EbMSAttachment;
-
 import org.apache.xml.security.signature.XMLSignatureInput;
+import org.apache.xml.security.utils.resolver.ResourceResolverContext;
 import org.apache.xml.security.utils.resolver.ResourceResolverException;
 import org.apache.xml.security.utils.resolver.ResourceResolverSpi;
-import org.w3c.dom.Attr;
+
+import nl.clockwork.ebms.Constants;
+import nl.clockwork.ebms.model.EbMSAttachment;
 
 public class EbMSAttachmentResolver extends ResourceResolverSpi
 {
@@ -46,34 +46,31 @@ public class EbMSAttachmentResolver extends ResourceResolverSpi
 	}
 
 	@Override
-	public boolean engineCanResolve(Attr uri, String baseUri)
+	public boolean engineCanResolveURI(ResourceResolverContext context)
 	{
-		String href = uri.getNodeValue();
-		if (href.startsWith(Constants.CID))
+		if (context.uriToResolve.startsWith(Constants.CID))
 			for (EbMSAttachment attachment: attachments)
-				if (href.substring(Constants.CID.length()).equals(attachment.getContentId()))
+				if (context.uriToResolve.substring(Constants.CID.length()).equals(attachment.getContentId()))
 					return true;
 		return false;
 	}
-
+	
 	@Override
-	public XMLSignatureInput engineResolve(Attr uri, String baseUri) throws ResourceResolverException
+	public XMLSignatureInput engineResolveURI(ResourceResolverContext context) throws ResourceResolverException
 	{
-		String href = uri.getNodeValue();
-
-		if (!href.startsWith(Constants.CID))
-			throw new ResourceResolverException(href,new Object[]{"Reference URI does not start with '" + Constants.CID + "'"},uri,baseUri);
+		if (!context.uriToResolve.startsWith(Constants.CID))
+			throw new ResourceResolverException(context.uriToResolve,new Object[]{"Reference URI does not start with '" + Constants.CID + "'"},context.uriToResolve,context.baseUri);
 
 		DataSource result = null;
 		for (EbMSAttachment attachment : attachments)
-			if (href.substring(Constants.CID.length()).equals(attachment.getContentId()))
+			if (context.uriToResolve.substring(Constants.CID.length()).equals(attachment.getContentId()))
 			{
 				result = attachment;
 				break;
 			}
 
 		if (result == null)
-			throw new ResourceResolverException(href,new Object[]{"Reference URI = " + href + " does not exist!"},uri,baseUri);
+			throw new ResourceResolverException(context.uriToResolve,new Object[]{"Reference URI = " + context.uriToResolve + " does not exist!"},context.uriToResolve,context.baseUri);
 
 		XMLSignatureInput input;
 		try
@@ -87,9 +84,9 @@ public class EbMSAttachmentResolver extends ResourceResolverSpi
 		}
 		catch (IOException e)
 		{
-			throw new ResourceResolverException(href,e,uri,baseUri);
+			throw new ResourceResolverException(e,context.uriToResolve,context.baseUri,context.uriToResolve);
 		}
-		input.setSourceURI(href);
+		input.setSourceURI(context.uriToResolve);
 		input.setMIMEType(result.getContentType());
 
 		return input;
@@ -99,5 +96,5 @@ public class EbMSAttachmentResolver extends ResourceResolverSpi
 	{
 		return attachments;
 	}
-	
+
 }
