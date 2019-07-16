@@ -27,7 +27,6 @@ import javax.activation.DataSource;
 import javax.mail.util.ByteArrayDataSource;
 import javax.xml.bind.JAXBException;
 
-import net.sf.ehcache.Ehcache;
 import nl.clockwork.ebms.common.CPAManager;
 import nl.clockwork.ebms.common.EbMSMessageFactory;
 import nl.clockwork.ebms.common.XMLMessageBuilder;
@@ -45,12 +44,19 @@ import nl.clockwork.ebms.validation.ValidatorException;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.xml.security.Init;
+import org.ehcache.core.Ehcache;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.TestInstance.Lifecycle;
+import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CollaborationProtocolAgreement;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
+@TestInstance(value = Lifecycle.PER_CLASS)
 public class SigningTest
 {
 	private CPAManager cpaManager;
@@ -60,9 +66,13 @@ public class SigningTest
 	private String keyStorePassword = "password";
 	private EbMSSignatureGenerator signatureGenerator;
 	private EbMSSignatureValidator signatureValidator;
+	@Mock
+	private Ehcache<String,Object> ehCacheMock;
 
-	public SigningTest() throws Exception
+	@BeforeAll
+	public void init() throws Exception
 	{
+		MockitoAnnotations.initMocks(this);
 		Init.init();
 		cpaManager = initCPAManager();
 		messageFactory = initMessageFactory(cpaManager);
@@ -111,11 +121,10 @@ public class SigningTest
 		return result;
 	}
 
-	private Ehcache initMethodCacheMock()
+	private Ehcache<String,Object> initMethodCacheMock()
 	{
-		Ehcache result = Mockito.mock(Ehcache.class);
-		Mockito.when(result.remove(Mockito.any(Serializable.class))).thenReturn(true);
-		return result;
+		Mockito.when(ehCacheMock.remove(Mockito.anyString(),Mockito.any(Serializable.class))).thenReturn(true);
+		return ehCacheMock;
 	}
 
 	private EbMSDAO initEbMSDAOMock() throws DAOException, IOException, JAXBException
@@ -127,7 +136,7 @@ public class SigningTest
 
 	private CollaborationProtocolAgreement loadCPA(String cpaId) throws IOException, JAXBException
 	{
-		String s = IOUtils.toString(this.getClass().getResourceAsStream("/nl/clockwork/ebms/cpa/" + cpaId + ".xml"));
+		String s = IOUtils.toString(this.getClass().getResourceAsStream("/nl/clockwork/ebms/cpa/" + cpaId + ".xml"),Charset.forName("UTF-8"));
 		return XMLMessageBuilder.getInstance(CollaborationProtocolAgreement.class).handle(s);
 	}
 

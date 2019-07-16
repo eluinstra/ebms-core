@@ -15,7 +15,8 @@
  */
 package nl.clockwork.ebms.encryption;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -29,7 +30,21 @@ import javax.xml.bind.JAXBException;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
-import net.sf.ehcache.Ehcache;
+import org.apache.commons.io.IOUtils;
+import org.apache.xml.security.Init;
+import org.ehcache.core.Ehcache;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.TestInstance.Lifecycle;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
+import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CollaborationProtocolAgreement;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.xml.sax.SAXException;
+
 import nl.clockwork.ebms.common.CPAManager;
 import nl.clockwork.ebms.common.EbMSMessageFactory;
 import nl.clockwork.ebms.common.XMLMessageBuilder;
@@ -46,15 +61,7 @@ import nl.clockwork.ebms.processor.EbMSProcessorException;
 import nl.clockwork.ebms.validation.EbMSValidationException;
 import nl.clockwork.ebms.validation.ValidatorException;
 
-import org.apache.commons.io.IOUtils;
-import org.apache.xml.security.Init;
-import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
-import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CollaborationProtocolAgreement;
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.xml.sax.SAXException;
-
+@TestInstance(value = Lifecycle.PER_CLASS)
 public class EncryptionTest
 {
 	private CPAManager cpaManager;
@@ -64,9 +71,13 @@ public class EncryptionTest
 	private String keyStorePassword = "password";
 	private EbMSMessageEncrypter messageEncrypter;
 	private EbMSMessageDecrypter messageDecrypter;
+	@Mock
+	Ehcache<String,Object> ehCacheMock;
 
-	public EncryptionTest() throws Exception
+	@BeforeAll
+	public void init() throws Exception
 	{
+		MockitoAnnotations.initMocks(this);
 		Init.init();
 		cpaManager = initCPAManager();
 		messageFactory = initMessageFactory(cpaManager);
@@ -80,7 +91,7 @@ public class EncryptionTest
 		EbMSMessage message = createMessage();
 		messageEncrypter.encrypt(message);
 		messageDecrypter.decrypt(message);
-		assertEquals("Dit is een test.",IOUtils.toString(message.getAttachments().get(0).getInputStream()));
+		assertEquals("Dit is een test.",IOUtils.toString(message.getAttachments().get(0).getInputStream(),Charset.forName("UTF-8")));
 	}
 
 	@Test
@@ -142,11 +153,11 @@ public class EncryptionTest
 		return result;
 	}
 
-	private Ehcache initMethodCacheMock()
+	private Ehcache<String,Object> initMethodCacheMock()
 	{
-		Ehcache result = Mockito.mock(Ehcache.class);
-		Mockito.when(result.remove(Mockito.any(Serializable.class))).thenReturn(true);
-		return result;
+		//Ehcache<String,Object> ehCacheMock = Mockito.mock(Ehcache.class);
+		Mockito.when(ehCacheMock.remove(Mockito.anyString(),Mockito.any(Serializable.class))).thenReturn(true);
+		return ehCacheMock;
 	}
 
 	private EbMSDAO initEbMSDAOMock() throws DAOException, IOException, JAXBException
@@ -158,7 +169,7 @@ public class EncryptionTest
 
 	private CollaborationProtocolAgreement loadCPA(String cpaId) throws IOException, JAXBException
 	{
-		String s = IOUtils.toString(this.getClass().getResourceAsStream("/nl/clockwork/ebms/cpa/" + cpaId + ".xml"));
+		String s = IOUtils.toString(this.getClass().getResourceAsStream("/nl/clockwork/ebms/cpa/" + cpaId + ".xml"),Charset.forName("UTF-8"));
 		return XMLMessageBuilder.getInstance(CollaborationProtocolAgreement.class).handle(s);
 	}
 

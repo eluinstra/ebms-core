@@ -15,15 +15,13 @@
  */
 package nl.clockwork.ebms.common;
 
-import net.sf.ehcache.Cache;
-import net.sf.ehcache.Element;
-
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
+import org.ehcache.Cache;
 
 public class MethodCacheInterceptor implements MethodInterceptor
 {
-	private Cache cache;
+	private Cache<String,Object> cache;
 
 	public Object invoke(MethodInvocation invocation) throws Throwable
 	{
@@ -32,14 +30,13 @@ public class MethodCacheInterceptor implements MethodInterceptor
 		Object[] arguments = invocation.getArguments();
 
 		String cacheKey = getCacheKey(targetName,methodName,arguments);
-		Element element = cache.get(cacheKey);
+		Object element = cache.get(cacheKey);
 		if (element == null)
 		{
 			Object result = invocation.proceed();
-			element = new Element(cacheKey,result);
-			cache.put(element);
+			cache.put(cacheKey,result);
 		}
-		return element.getObjectValue();
+		return element;
 	}
 
 	public static String getCacheKey(String targetName, String methodName, Object...arguments)
@@ -52,7 +49,7 @@ public class MethodCacheInterceptor implements MethodInterceptor
 		return sb.toString();
 	}
 
-	public void setCache(Cache cache)
+	public void setCache(Cache<String,Object> cache)
 	{
 		this.cache = cache;
 	}

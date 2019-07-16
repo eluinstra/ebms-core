@@ -112,7 +112,7 @@ public class EbMSMessageDecrypter implements InitializingBean
 			ds.setName(attachment.getName());
 			return new EbMSAttachment(ds,attachment.getContentId());
 		}
-		catch (EbMSProcessingException | SAXException | XMLSecurityException e)
+		catch (EbMSProcessingException | SAXException | XMLSecurityException | IllegalArgumentException e)
 		{
 			throw new EbMSValidationException(EbMSMessageUtils.createError("cid:" + attachment.getContentId(),Constants.EbMSErrorCode.SECURITY_FAILURE,e.getMessage()));
 		}

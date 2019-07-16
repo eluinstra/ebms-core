@@ -19,15 +19,15 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
 
-import net.sf.ehcache.Ehcache;
 import nl.clockwork.ebms.dao.EbMSDAO;
 import nl.clockwork.ebms.model.URLMapping;
 
+import org.ehcache.core.Ehcache;
 import org.springframework.util.StringUtils;
 
 public class URLManager
 {
-	private Ehcache methodCache;
+	private Ehcache<String,Object> methodCache;
 	private EbMSDAO ebMSDAO;
 
 	public List<URLMapping> getURLs()
@@ -94,7 +94,7 @@ public class URLManager
 		methodCache.remove(MethodCacheInterceptor.getCacheKey("EbMSDAOImpl","getURLMappings"));
 	}
 
-	public void setMethodCache(Ehcache methodCache)
+	public void setMethodCache(Ehcache<String,Object> methodCache)
 	{
 		this.methodCache = methodCache;
 	}

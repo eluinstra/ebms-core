@@ -18,7 +18,6 @@ package nl.clockwork.ebms.common;
 import java.util.Date;
 import java.util.List;
 
-import net.sf.ehcache.Ehcache;
 import nl.clockwork.ebms.Constants;
 import nl.clockwork.ebms.dao.EbMSDAO;
 import nl.clockwork.ebms.model.CacheablePartyId;
@@ -29,6 +28,7 @@ import nl.clockwork.ebms.model.Role;
 import nl.clockwork.ebms.model.ToPartyInfo;
 import nl.clockwork.ebms.util.CPAUtils;
 
+import org.ehcache.core.Ehcache;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CanReceive;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CanSend;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CollaborationProtocolAgreement;
@@ -44,7 +44,7 @@ import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.SyncReplyModeType
 
 public class CPAManager
 {
-	private Ehcache methodCache;
+	private Ehcache<String,Object> methodCache;
 	private EbMSDAO ebMSDAO;
 	private URLManager urlManager;
 
@@ -72,14 +72,14 @@ public class CPAManager
 	public int updateCPA(CollaborationProtocolAgreement cpa)
 	{
 		int result = ebMSDAO.updateCPA(cpa);
-		flushAllMethodCache();
+		flushCPAMethodCache(cpa.getCpaid());
 		return result;
 	}
 
 	public int deleteCPA(String cpaId)
 	{
 		int result = ebMSDAO.deleteCPA(cpaId);
-		flushAllMethodCache();
+		flushCPAMethodCache(cpaId);
 		return result;
 	}
 
@@ -273,11 +273,6 @@ public class CPAManager
 		methodCache.remove(MethodCacheInterceptor.getCacheKey("EbMSDAOImpl","getCPAIds"));
 	}
 
-	private void flushAllMethodCache()
-	{
-		methodCache.removeAll();
-	}
-
 	private ServiceBinding getServiceBinding(PartyInfo partyInfo, String role, String service)
 	{
 		for (CollaborationRole collaborationRole : partyInfo.getCollaborationRole())
@@ -306,7 +301,7 @@ public class CPAManager
 		return null;
 	}
 
-	public void setMethodCache(Ehcache methodCache)
+	public void setMethodCache(Ehcache<String,Object> methodCache)
 	{
 		this.methodCache = methodCache;
 	}
