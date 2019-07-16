@@ -15,14 +15,14 @@
  */
 package nl.clockwork.ebms.validation;
 
+import org.apache.commons.lang3.StringUtils;
+
 import nl.clockwork.ebms.common.CPAManager;
 import nl.clockwork.ebms.dao.DAOException;
 import nl.clockwork.ebms.model.EbMSMessageContext;
 import nl.clockwork.ebms.model.FromPartyInfo;
 import nl.clockwork.ebms.model.Party;
 import nl.clockwork.ebms.model.ToPartyInfo;
-
-import org.apache.commons.lang.StringUtils;
 
 public class EbMSMessageContextValidator
 {

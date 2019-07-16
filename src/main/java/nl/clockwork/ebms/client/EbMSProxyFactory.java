@@ -15,7 +15,7 @@
  */
 package nl.clockwork.ebms.client;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.FactoryBean;
 
 public class EbMSProxyFactory extends EbMSProxy implements FactoryBean<EbMSProxy>
