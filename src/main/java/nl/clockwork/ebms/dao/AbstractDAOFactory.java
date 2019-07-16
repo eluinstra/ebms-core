@@ -38,8 +38,6 @@ public abstract class AbstractDAOFactory<T> implements FactoryBean<T>
 			return createPostgresDAO();
 		else if ("oracle.jdbc.OracleDriver".equals(((ComboPooledDataSource)dataSource).getDriverClass()))
 			return createOracleDAO();
-		else if ("net.sourceforge.jtds.jdbc.Driver".equals(((ComboPooledDataSource)dataSource).getDriverClass()))
-			return createMsSqlDAO();
 		else if ("com.microsoft.sqlserver.jdbc.SQLServerDriver".equals(((ComboPooledDataSource)dataSource).getDriverClass()))
 			return createMsSqlDAO();
 		else if ("com.ibm.db2.jcc.DB2Driver".equals(((ComboPooledDataSource)dataSource).getDriverClass()))
