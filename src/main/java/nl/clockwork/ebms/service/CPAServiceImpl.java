@@ -50,13 +50,13 @@ public class CPAServiceImpl implements CPAService
 	
 	@Override
 	public
-	void validateCPA(/*CollaborationProtocolAgreement*/String pCPA) throws CPAServiceException
+	void validateCPA(/*CollaborationProtocolAgreement*/String cpa) throws CPAServiceException
 	{
 		try
 		{
-			xsdValidator.validate(pCPA);
-			CollaborationProtocolAgreement cpa = XMLMessageBuilder.getInstance(CollaborationProtocolAgreement.class).handle(pCPA);
-			cpaValidator.validate(cpa);
+			xsdValidator.validate(cpa);
+			CollaborationProtocolAgreement cpa_ = XMLMessageBuilder.getInstance(CollaborationProtocolAgreement.class).handle(cpa);
+			cpaValidator.validate(cpa_);
 		}
 		catch (JAXBException | ValidatorException e)
 		{
@@ -66,30 +66,30 @@ public class CPAServiceImpl implements CPAService
 	}
 	
 	@Override
-	public String insertCPA(/*CollaborationProtocolAgreement*/String pCPA, Boolean overwrite) throws CPAServiceException
+	public String insertCPA(/*CollaborationProtocolAgreement*/String cpa, Boolean overwrite) throws CPAServiceException
 	{
 		try
 		{
-			xsdValidator.validate(pCPA);
-			CollaborationProtocolAgreement cpa = XMLMessageBuilder.getInstance(CollaborationProtocolAgreement.class).handle(pCPA);
+			xsdValidator.validate(cpa);
+			CollaborationProtocolAgreement cpa_ = XMLMessageBuilder.getInstance(CollaborationProtocolAgreement.class).handle(cpa);
 			CPAValidator currentValidator = new CPAValidator(cpaManager);
-			currentValidator.validate(cpa);
+			currentValidator.validate(cpa_);
 			synchronized (cpaMonitor)
 			{
-				if (cpaManager.existsCPA(cpa.getCpaid()))
+				if (cpaManager.existsCPA(cpa_.getCpaid()))
 				{
 					if (overwrite != null && overwrite)
 					{
-						if (cpaManager.updateCPA(cpa) == 0)
-							throw new CPAServiceException("Could not update CPA " + cpa.getCpaid() + "! CPA does not exists.");
+						if (cpaManager.updateCPA(cpa_) == 0)
+							throw new CPAServiceException("Could not update CPA " + cpa_.getCpaid() + "! CPA does not exists.");
 					}
 					else
-						throw new CPAServiceException("Did not insert CPA " + cpa.getCpaid() + "! CPA already exists.");
+						throw new CPAServiceException("Did not insert CPA " + cpa_.getCpaid() + "! CPA already exists.");
 				}
 				else
-					cpaManager.insertCPA(cpa);
+					cpaManager.insertCPA(cpa_);
 			}
-			return cpa.getCpaid();
+			return cpa_.getCpaid();
 		}
 		catch (JAXBException | ValidatorException | DAOException e)
 		{

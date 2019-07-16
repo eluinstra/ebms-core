@@ -144,17 +144,17 @@ public class EbMSMessageEncrypter implements InitializingBean
 		return result;
 	}
 
-	private void validateCertificate(KeyStore ptrustStore, X509Certificate certificate) throws KeyStoreException, ValidationException
+	private void validateCertificate(KeyStore trustStore, X509Certificate certificate) throws KeyStoreException, ValidationException
 	{
 		try
 		{
 			certificate.checkValidity(new Date());
-			Enumeration<String> aliases = ptrustStore.aliases();
+			Enumeration<String> aliases = trustStore.aliases();
 			while (aliases.hasMoreElements())
 			{
 				try
 				{
-					Certificate c = ptrustStore.getCertificate(aliases.nextElement());
+					Certificate c = trustStore.getCertificate(aliases.nextElement());
 					if (c instanceof X509Certificate)
 						if (certificate.getIssuerDN().getName().equals(((X509Certificate)c).getSubjectDN().getName()))
 						{

@@ -66,17 +66,17 @@ public class EbMSEventProcessor implements InitializingBean, Job
 				expireEvent(event);
 		}
 
-		private void sendEvent(final EbMSEvent pevent, final DeliveryChannel deliveryChannel)
+		private void sendEvent(final EbMSEvent event, final DeliveryChannel deliveryChannel)
 		{
 			final String url = urlManager.getURL(CPAUtils.getUri(deliveryChannel));
 			try
 			{
-				EbMSDocument requestDocument = ebMSDAO.getEbMSDocumentIfUnsent(pevent.getMessageId());
+				EbMSDocument requestDocument = ebMSDAO.getEbMSDocumentIfUnsent(event.getMessageId());
 				if (requestDocument != null)
 				{
-					if (pevent.isConfidential())
+					if (event.isConfidential())
 						messageEncrypter.encrypt(deliveryChannel,requestDocument);
-					logger.info("Sending message " + pevent.getMessageId() + " to " + url);
+					logger.info("Sending message " + event.getMessageId() + " to " + url);
 					EbMSDocument responseDocument = ebMSClient.sendMessage(url,requestDocument);
 					messageProcessor.processResponse(requestDocument,responseDocument);
 					ebMSDAO.executeTransaction(
@@ -85,20 +85,20 @@ public class EbMSEventProcessor implements InitializingBean, Job
 							@Override
 							public void doInTransaction()
 							{
-								eventManager.updateEvent(pevent,url,EbMSEventStatus.SUCCEEDED);
+								eventManager.updateEvent(event,url,EbMSEventStatus.SUCCEEDED);
 								if (!CPAUtils.isReliableMessaging(deliveryChannel))
-									if (ebMSDAO.updateMessage(pevent.getMessageId(),EbMSMessageStatus.SENDING,EbMSMessageStatus.DELIVERED) > 0)
+									if (ebMSDAO.updateMessage(event.getMessageId(),EbMSMessageStatus.SENDING,EbMSMessageStatus.DELIVERED) > 0)
 									{
-										eventListener.onMessageDelivered(pevent.getMessageId());
+										eventListener.onMessageDelivered(event.getMessageId());
 										if (deleteEbMSAttachmentsOnMessageProcessed)
-											ebMSDAO.deleteAttachments(pevent.getMessageId());
+											ebMSDAO.deleteAttachments(event.getMessageId());
 									}
 							}
 						}
 					);
 				}
 				else
-					eventManager.deleteEvent(pevent.getMessageId());
+					eventManager.deleteEvent(event.getMessageId());
 			}
 			catch (final EbMSResponseException e)
 			{
@@ -109,13 +109,13 @@ public class EbMSEventProcessor implements InitializingBean, Job
 						@Override
 						public void doInTransaction()
 						{
-							eventManager.updateEvent(pevent,url,EbMSEventStatus.FAILED,e.getMessage());
+							eventManager.updateEvent(event,url,EbMSEventStatus.FAILED,e.getMessage());
 							if ((e instanceof EbMSIrrecoverableResponsexception) || !CPAUtils.isReliableMessaging(deliveryChannel))
-								if (ebMSDAO.updateMessage(pevent.getMessageId(),EbMSMessageStatus.SENDING,EbMSMessageStatus.DELIVERY_FAILED) > 0)
+								if (ebMSDAO.updateMessage(event.getMessageId(),EbMSMessageStatus.SENDING,EbMSMessageStatus.DELIVERY_FAILED) > 0)
 								{
-									eventListener.onMessageFailed(pevent.getMessageId());
+									eventListener.onMessageFailed(event.getMessageId());
 									if (deleteEbMSAttachmentsOnMessageProcessed)
-										ebMSDAO.deleteAttachments(pevent.getMessageId());
+										ebMSDAO.deleteAttachments(event.getMessageId());
 								}
 						}
 					}
@@ -130,13 +130,13 @@ public class EbMSEventProcessor implements InitializingBean, Job
 						@Override
 						public void doInTransaction()
 						{
-							eventManager.updateEvent(pevent,url,EbMSEventStatus.FAILED,ExceptionUtils.getStackTrace(e));
+							eventManager.updateEvent(event,url,EbMSEventStatus.FAILED,ExceptionUtils.getStackTrace(e));
 							if (!CPAUtils.isReliableMessaging(deliveryChannel))
-								if (ebMSDAO.updateMessage(pevent.getMessageId(),EbMSMessageStatus.SENDING,EbMSMessageStatus.DELIVERY_FAILED) > 0)
+								if (ebMSDAO.updateMessage(event.getMessageId(),EbMSMessageStatus.SENDING,EbMSMessageStatus.DELIVERY_FAILED) > 0)
 								{
-									eventListener.onMessageFailed(pevent.getMessageId());
+									eventListener.onMessageFailed(event.getMessageId());
 									if (deleteEbMSAttachmentsOnMessageProcessed)
-										ebMSDAO.deleteAttachments(pevent.getMessageId());
+										ebMSDAO.deleteAttachments(event.getMessageId());
 								}
 						}
 					}
@@ -144,26 +144,26 @@ public class EbMSEventProcessor implements InitializingBean, Job
 			}
 		}
 
-		private void expireEvent(final EbMSEvent pevent)
+		private void expireEvent(final EbMSEvent event)
 		{
 			try
 			{
-				logger.warn("Expiring message " +  pevent.getMessageId());
+				logger.warn("Expiring message " +  event.getMessageId());
 				ebMSDAO.executeTransaction(
 					new DAOTransactionCallback()
 					{
 						@Override
 						public void doInTransaction()
 						{
-							EbMSDocument requestDocument = ebMSDAO.getEbMSDocumentIfUnsent(pevent.getMessageId());
+							EbMSDocument requestDocument = ebMSDAO.getEbMSDocumentIfUnsent(event.getMessageId());
 							if (requestDocument != null)
-								if (ebMSDAO.updateMessage(pevent.getMessageId(),EbMSMessageStatus.SENDING,EbMSMessageStatus.EXPIRED) > 0)
+								if (ebMSDAO.updateMessage(event.getMessageId(),EbMSMessageStatus.SENDING,EbMSMessageStatus.EXPIRED) > 0)
 								{
-									eventListener.onMessageExpired(pevent.getMessageId());
+									eventListener.onMessageExpired(event.getMessageId());
 									if (deleteEbMSAttachmentsOnMessageProcessed)
-										ebMSDAO.deleteAttachments(pevent.getMessageId());
+										ebMSDAO.deleteAttachments(event.getMessageId());
 								}
-							eventManager.deleteEvent(pevent.getMessageId());
+							eventManager.deleteEvent(event.getMessageId());
 						}
 					}
 				);

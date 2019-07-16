@@ -89,11 +89,11 @@ public class MessageQueue<T> implements InitializingBean
 		return get(correlationId,timeout);
 	}
 
-	public T get(String correlationId, int ptimeout)
+	public T get(String correlationId, int timeout)
 	{
 		try
 		{
-			Thread.sleep(ptimeout);
+			Thread.sleep(timeout);
 			//Thread.currentThread().wait(timeout);
 		}
 		catch (InterruptedException e)

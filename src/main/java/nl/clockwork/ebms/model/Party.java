@@ -96,8 +96,8 @@ public class Party implements Serializable
 		return false;
 	}
 
-	public boolean matches(Role prole)
+	public boolean matches(Role role)
 	{
-		return getRole() == null || getRole().equals(prole.getName());
+		return getRole() == null || getRole().equals(role.getName());
 	}
 }

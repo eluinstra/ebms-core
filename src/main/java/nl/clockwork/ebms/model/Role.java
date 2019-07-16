@@ -95,8 +95,8 @@ public class Role implements Serializable// extends Party
 		return false;
 	}
 	
-	public boolean matches(org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.Role prole)
+	public boolean matches(org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.Role role)
 	{
-		return getRole().equals(prole.getName());
+		return getRole().equals(role.getName());
 	}
 }

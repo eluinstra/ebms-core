@@ -111,7 +111,7 @@ public class EbMSSignatureGenerator implements InitializingBean
 		sign(keyStore,keyPair,alias,message.getMessage(),message.getAttachments(),CPAUtils.getSignatureAlgorithm(deliveryChannel),CPAUtils.getHashFunction(deliveryChannel));
 	}
 	
-	private void sign(KeyStore pkeyStore, KeyPair keyPair, String alias, Document document, List<EbMSAttachment> attachments, String signatureMethodAlgorithm, String digestAlgorithm) throws XMLSecurityException, KeyStoreException
+	private void sign(KeyStore keyStore, KeyPair keyPair, String alias, Document document, List<EbMSAttachment> attachments, String signatureMethodAlgorithm, String digestAlgorithm) throws XMLSecurityException, KeyStoreException
 	{
 		XMLSignature signature = new XMLSignature(document,null,signatureMethodAlgorithm,canonicalizationMethodAlgorithm);
 
@@ -133,7 +133,7 @@ public class EbMSSignatureGenerator implements InitializingBean
 		
 		signature.addKeyInfo(keyPair.getPublic());
 		
-		Certificate[] certificates = pkeyStore.getCertificateChain(alias);
+		Certificate[] certificates = keyStore.getCertificateChain(alias);
 	  //for (Certificate certificate : certificates)
 	  //	signature.addKeyInfo((X509Certificate)certificate);
 		signature.addKeyInfo((X509Certificate)certificates[0]);

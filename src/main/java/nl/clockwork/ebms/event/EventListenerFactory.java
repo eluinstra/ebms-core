@@ -100,25 +100,25 @@ public class EventListenerFactory implements FactoryBean<EventListener>, Disposa
 			brokerFactoryBean.destroy();
 	}
 
-	private JmsTemplate createJmsTemplate(String pjmsBrokerURL)
+	private JmsTemplate createJmsTemplate(String jmsBrokerURL)
 	{
-		PooledConnectionFactory pooledConnectionFactory = createConnectionFactory(pjmsBrokerURL);
+		PooledConnectionFactory pooledConnectionFactory = createConnectionFactory(jmsBrokerURL);
 		JmsTemplate jmsTemplate = new JmsTemplate();
 		jmsTemplate.setConnectionFactory(pooledConnectionFactory);
 		return jmsTemplate;
 	}
 
-	private PooledConnectionFactory createConnectionFactory(String pjmsBrokerURL)
+	private PooledConnectionFactory createConnectionFactory(String jmsBrokerURL)
 	{
 		PooledConnectionFactory result = new PooledConnectionFactory();
-		result.setConnectionFactory(createActiveMQConnectionFactory(pjmsBrokerURL));
+		result.setConnectionFactory(createActiveMQConnectionFactory(jmsBrokerURL));
 		return result;
 	}
 
-	private ActiveMQConnectionFactory createActiveMQConnectionFactory(String pjmsBrokerURL)
+	private ActiveMQConnectionFactory createActiveMQConnectionFactory(String jmsBrokerURL)
 	{
 		ActiveMQConnectionFactory result = new ActiveMQConnectionFactory();
-		result.setBrokerURL(pjmsBrokerURL);
+		result.setBrokerURL(jmsBrokerURL);
 		return result;
 	}
 
@@ -133,12 +133,12 @@ public class EventListenerFactory implements FactoryBean<EventListener>, Disposa
 		return result;
 	}
 
-	private void startJMSBroker(String pjmsBrokerConfig, boolean pjmsBrokerStart) throws Exception
+	private void startJMSBroker(String jmsBrokerConfig, boolean jmsBrokerStart) throws Exception
 	{
-		if (pjmsBrokerStart)
+		if (jmsBrokerStart)
 		{
 			brokerFactoryBean = new BrokerFactoryBean();
-			brokerFactoryBean.setConfig(createResource(pjmsBrokerConfig));
+			brokerFactoryBean.setConfig(createResource(jmsBrokerConfig));
 			brokerFactoryBean.setStart(true);
 			brokerFactoryBean.afterPropertiesSet();
 		}
