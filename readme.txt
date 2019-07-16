@@ -143,6 +143,33 @@ the reources directory resides in ebms-adapter-x.x.x.zip/resources and contains 
 ==========
 Building =
 ==========
+The Maven settings.xml requires additional settings to support the Oracle Maven Repository. Add the following <server> element to the <servers> section of the Maven settings.xml:
+
+ <server>
+    <id>maven.oracle.com</id>
+    <username>username</username>
+    <password>password</password>
+    <configuration>
+      <basicAuthScope>
+        <host>ANY</host>
+        <port>ANY</port>
+        <realm>OAM 11g</realm>
+      </basicAuthScope>
+      <httpConfiguration>
+        <all>
+          <params>
+            <property>
+              <name>http.protocol.allow-circular-redirects</name>
+              <value>%b,true</value>
+            </property>
+          </params>
+        </all>
+      </httpConfiguration>
+    </configuration>
+  </server>
+
+Replace the <username> and <password> entries with your OTN user name and password.
+
 mvn package
 
 ====================
