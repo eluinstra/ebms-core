@@ -19,7 +19,9 @@ import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.charset.Charset;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import nl.clockwork.ebms.Constants;
 import nl.clockwork.ebms.common.util.DOMUtils;
@@ -52,7 +54,7 @@ public abstract class EbMSInputStreamHandler
 	  	if (!Constants.EBMS_SOAP_ACTION.equals(soapAction))
 	  	{
 				if (messageLogger.isInfoEnabled())
-					messageLogger.info("<<<<\n" + getRequestHeaders() + "\n" + IOUtils.toString(request));
+					messageLogger.info("<<<<\n" + getRequestHeaders() + "\n" + IOUtils.toString(request,Charset.defaultCharset()));
 				throw new EbMSProcessorException("Unable to process message! SOAPAction=" + soapAction);
 	  	}
 //	  	if (logger.isDebugEnabled())
@@ -61,7 +63,7 @@ public abstract class EbMSInputStreamHandler
 	  	{
 	  		request = new BufferedInputStream(request);
 	  		request.mark(Integer.MAX_VALUE);
-	  		messageLogger.info("<<<<\n" + getRequestHeaders() + "\n" + IOUtils.toString(request));
+	  		messageLogger.info("<<<<\n" + getRequestHeaders() + "\n" + IOUtils.toString(request,Charset.defaultCharset()));
 	  		request.reset();
 	  	}
 			EbMSMessageReader messageReader = new EbMSMessageReader(getRequestHeader("Content-ID"),getRequestHeader("Content-Type"));
@@ -107,15 +109,7 @@ public abstract class EbMSInputStreamHandler
 
 	private String getRequestHeaders()
 	{
-		List<String> requestHeaderNames = getRequestHeaderNames();
-		StringBuffer requestHeaders = new StringBuffer();
-		for (String headerName : requestHeaderNames)
-		{
-			List<String> headers = getRequestHeaders(headerName);
-			for (String header : headers)
-				requestHeaders = requestHeaders.append(headerName).append(": ").append(header).append("\n");
-		}
-		return requestHeaders.toString();
+		return getRequestHeaderNames().stream().flatMap(n -> getRequestHeaders(n).stream().map(h -> n + ": " + h)).collect(Collectors.joining("\n"));
 	}
 	
 	public abstract List<String> getRequestHeaderNames();

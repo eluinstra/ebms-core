@@ -23,12 +23,14 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.mail.util.ByteArrayDataSource;
 import javax.xml.transform.TransformerException;
 
 import nl.clockwork.ebms.Constants.EbMSMessageEventType;
 import nl.clockwork.ebms.Constants.EbMSMessageStatus;
+import nl.clockwork.ebms.ThrowingConsumer;
 import nl.clockwork.ebms.common.util.DOMUtils;
 import nl.clockwork.ebms.dao.AbstractEbMSDAO;
 import nl.clockwork.ebms.dao.DAOException;
@@ -253,8 +255,8 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 
 	protected void insertAttachments(long messageId, List<EbMSAttachment> attachments) throws DataAccessException, IOException
 	{
-		int orderNr = 0;
-		for (EbMSAttachment attachment : attachments)
+		AtomicInteger orderNr = new AtomicInteger(0);
+		attachments.stream().forEach(ThrowingConsumer.throwingConsumerWrapper(a ->
 		{
 			jdbcTemplate.update
 			(
@@ -267,13 +269,13 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 					"content" +
 				") values (?,?,?,?,?,?)",
 				messageId,
-				orderNr++,
-				attachment.getName(),
-				attachment.getContentId(),
-				attachment.getContentType(),
-				IOUtils.toByteArray(attachment.getInputStream())
+				orderNr.getAndIncrement(),
+				a.getName(),
+				a.getContentId(),
+				a.getContentType(),
+				IOUtils.toByteArray(a.getInputStream())
 			);
-		}
+		}));
 	}
 
 	@Override

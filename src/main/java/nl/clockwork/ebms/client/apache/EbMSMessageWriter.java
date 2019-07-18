@@ -17,10 +17,12 @@ package nl.clockwork.ebms.client.apache;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
 
 import javax.xml.transform.TransformerException;
 
 import nl.clockwork.ebms.Constants;
+import nl.clockwork.ebms.ThrowingConsumer;
 import nl.clockwork.ebms.common.util.DOMUtils;
 import nl.clockwork.ebms.model.EbMSAttachment;
 import nl.clockwork.ebms.model.EbMSDocument;
@@ -80,17 +82,19 @@ public class EbMSMessageWriter
 		MultipartEntityBuilder entity = MultipartEntityBuilder.create();
 		entity.setContentType(ContentType.create("multipart/related"));
 		entity.addPart(document.getContentId(),new StringBody(DOMUtils.toString(document.getMessage(),"UTF-8"),ContentType.create("text/xml")));
-		for (EbMSAttachment attachment : document.getAttachments())
-			if (attachment.getContentType().matches("^(text/.*|.*/xml)$"))
-				writeTextAttachment(entity,attachment);
+		document.getAttachments().stream().forEach(ThrowingConsumer.throwingConsumerWrapper(a ->
+		{
+			if (a.getContentType().matches("^(text/.*|.*/xml)$"))
+				writeTextAttachment(entity,a);
 			else
-				writeBinaryAttachment(entity,attachment);
+				writeBinaryAttachment(entity,a);
+		}));
 		httpPost.setEntity(entity.build());
 	}
 
 	protected void writeTextAttachment(MultipartEntityBuilder entity, EbMSAttachment attachment) throws IOException
 	{
-		StringBody contentBody = new StringBody(IOUtils.toString(attachment.getInputStream()),ContentType.create(attachment.getContentType()));
+		StringBody contentBody = new StringBody(IOUtils.toString(attachment.getInputStream(),Charset.defaultCharset()),ContentType.create(attachment.getContentType()));
 		FormBodyPartBuilder formBodyPartBuilder = FormBodyPartBuilder.create(attachment.getName(),contentBody);
 		formBodyPartBuilder.addField("Content-ID",attachment.getContentId());
 		entity.addPart(formBodyPartBuilder.build());

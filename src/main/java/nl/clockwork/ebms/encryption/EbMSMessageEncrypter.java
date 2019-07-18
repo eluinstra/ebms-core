@@ -47,18 +47,6 @@ import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
-import nl.clockwork.ebms.common.CPAManager;
-import nl.clockwork.ebms.common.KeyStoreManager;
-import nl.clockwork.ebms.common.util.SecurityUtils;
-import nl.clockwork.ebms.model.CacheablePartyId;
-import nl.clockwork.ebms.model.EbMSAttachment;
-import nl.clockwork.ebms.model.EbMSDocument;
-import nl.clockwork.ebms.model.EbMSMessage;
-import nl.clockwork.ebms.processor.EbMSProcessingException;
-import nl.clockwork.ebms.processor.EbMSProcessorException;
-import nl.clockwork.ebms.util.CPAUtils;
-import nl.clockwork.ebms.validation.ValidationException;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.xml.security.encryption.EncryptedData;
@@ -74,6 +62,20 @@ import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
+import nl.clockwork.ebms.ThrowingConsumer;
+import nl.clockwork.ebms.common.CPAManager;
+import nl.clockwork.ebms.common.KeyStoreManager;
+import nl.clockwork.ebms.common.util.SecurityUtils;
+import nl.clockwork.ebms.model.CacheablePartyId;
+import nl.clockwork.ebms.model.EbMSAttachment;
+import nl.clockwork.ebms.model.EbMSDocument;
+import nl.clockwork.ebms.model.EbMSMessage;
+import nl.clockwork.ebms.processor.EbMSProcessingException;
+import nl.clockwork.ebms.processor.EbMSProcessorException;
+import nl.clockwork.ebms.util.CPAUtils;
+import nl.clockwork.ebms.validation.ValidationException;
+import nl.clockwork.ebms.validation.ValidatorException;
+
 public class EbMSMessageEncrypter implements InitializingBean
 {
 	protected transient Log logger = LogFactory.getLog(getClass());
@@ -88,7 +90,7 @@ public class EbMSMessageEncrypter implements InitializingBean
 		trustStore = KeyStoreManager.getKeyStore(trustStorePath,trustStorePassword);
 	}
 
-	public void encrypt(EbMSMessage message) throws EbMSProcessingException
+	public void encrypt(EbMSMessage message) throws EbMSProcessorException
 	{
 		try
 		{
@@ -99,14 +101,13 @@ public class EbMSMessageEncrypter implements InitializingBean
 				validateCertificate(trustStore,certificate);
 				String encryptionAlgorithm = CPAUtils.getEncryptionAlgorithm(deliveryChannel);
 				List<EbMSAttachment> attachments = new ArrayList<EbMSAttachment>();
-				for (EbMSAttachment attachment : message.getAttachments())
-					attachments.add(encrypt(createDocument(),certificate,encryptionAlgorithm,attachment));
+				message.getAttachments().stream().forEach(ThrowingConsumer.throwingConsumerWrapper(a -> attachments.add(encrypt(createDocument(),certificate,encryptionAlgorithm,a))));
 				message.setAttachments(attachments);
 			}
 		}
-		catch (CertificateException | NoSuchAlgorithmException | KeyStoreException | ValidationException | XMLEncryptionException | FileNotFoundException e)
+		catch (CertificateException | NoSuchAlgorithmException | KeyStoreException | XMLEncryptionException | FileNotFoundException e)
 		{
-			throw new EbMSProcessingException(e);
+			throw new EbMSProcessorException(e);
 		}
 		catch (Exception e)
 		{
@@ -114,7 +115,7 @@ public class EbMSMessageEncrypter implements InitializingBean
 		}
 	}
 
-	public void encrypt(DeliveryChannel deliveryChannel, EbMSDocument message) throws EbMSProcessingException
+	public void encrypt(DeliveryChannel deliveryChannel, EbMSDocument message) throws EbMSProcessorException
 	{
 		try
 		{
@@ -122,14 +123,15 @@ public class EbMSMessageEncrypter implements InitializingBean
 			validateCertificate(trustStore,certificate);
 			String encryptionAlgorithm = CPAUtils.getEncryptionAlgorithm(deliveryChannel);
 			List<EbMSAttachment> attachments = new ArrayList<EbMSAttachment>();
-			for (EbMSAttachment attachment : message.getAttachments())
-				attachments.add(encrypt(createDocument(),certificate,encryptionAlgorithm,attachment));
+			message.getAttachments().stream().forEach(ThrowingConsumer.throwingConsumerWrapper(a ->
+				attachments.add(encrypt(createDocument(),certificate,encryptionAlgorithm,a))
+			));
 			message.getAttachments().clear();
 			message.getAttachments().addAll(attachments);
 		}
-		catch (TransformerFactoryConfigurationError | CertificateException | KeyStoreException | ValidationException | NoSuchAlgorithmException | XMLEncryptionException | TransformerConfigurationException e)
+		catch (TransformerFactoryConfigurationError | CertificateException | KeyStoreException | ValidatorException e)
 		{
-			throw new EbMSProcessingException(e);
+			throw new EbMSProcessorException(e);
 		}
 		catch (Exception e)
 		{
@@ -175,18 +177,29 @@ public class EbMSMessageEncrypter implements InitializingBean
 		}
 	}
 
-	private EbMSAttachment encrypt(Document document, X509Certificate certificate, String encryptionAlgorithm, EbMSAttachment attachment) throws NoSuchAlgorithmException, XMLEncryptionException, FileNotFoundException, Exception
+	private EbMSAttachment encrypt(Document document, X509Certificate certificate, String encryptionAlgorithm, EbMSAttachment attachment) throws ValidatorException
 	{
-		SecretKey secretKey = SecurityUtils.generateKey(encryptionAlgorithm);
-		XMLCipher xmlCipher = createXmlCipher(encryptionAlgorithm,secretKey);
-		EncryptedKey encryptedKey = createEncryptedKey(document,certificate.getPublicKey(),secretKey);
-		setEncryptedData(document,xmlCipher,encryptedKey,certificate,attachment);
-		EncryptedData encryptedData = xmlCipher.encryptData(document,null,attachment.getInputStream());
-		StringWriter buffer = new StringWriter();
-		createTransformer().transform(new DOMSource(xmlCipher.martial(document,encryptedData)),new StreamResult(buffer));
-		ByteArrayDataSource ds = new ByteArrayDataSource(buffer.toString().getBytes("UTF-8"),"application/xml");
-		ds.setName(attachment.getName());
-		return new EbMSAttachment(ds,attachment.getContentId());
+		try
+		{
+			SecretKey secretKey = SecurityUtils.generateKey(encryptionAlgorithm);
+			XMLCipher xmlCipher = createXmlCipher(encryptionAlgorithm,secretKey);
+			EncryptedKey encryptedKey = createEncryptedKey(document,certificate.getPublicKey(),secretKey);
+			setEncryptedData(document,xmlCipher,encryptedKey,certificate,attachment);
+			EncryptedData encryptedData = xmlCipher.encryptData(document,null,attachment.getInputStream());
+			StringWriter buffer = new StringWriter();
+			createTransformer().transform(new DOMSource(xmlCipher.martial(document,encryptedData)),new StreamResult(buffer));
+			ByteArrayDataSource ds = new ByteArrayDataSource(buffer.toString().getBytes("UTF-8"),"application/xml");
+			ds.setName(attachment.getName());
+			return new EbMSAttachment(ds,attachment.getContentId());
+		}
+		catch (NoSuchAlgorithmException | XMLEncryptionException | TransformerConfigurationException | TransformerFactoryConfigurationError e)
+		{
+			throw new ValidatorException(e);
+		}
+		catch (Exception e)
+		{
+			throw new ValidationException(e);
+		}
 	}
 
 	private EncryptedKey createEncryptedKey(Document document, Key publicKey, SecretKey secretKey) throws XMLEncryptionException

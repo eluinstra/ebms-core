@@ -19,6 +19,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.stream.Collectors;
 
 import nl.clockwork.ebms.util.CPAUtils;
 
@@ -174,10 +175,6 @@ public class CacheablePartyId implements List<PartyId>
 	@Override
 	public String toString()
 	{
-		StringBuffer result = new StringBuffer();
-		for (PartyId partyId : this)
-			result.append(CPAUtils.toString((PartyId)partyId)).append(",");
-		result.setLength(result.length() > 0 ? result.length() - 1 : result.length());
-		return result.toString();
+		return this.stream().map(id -> CPAUtils.toString((PartyId)id)).collect(Collectors.joining(","));
 	}
 }

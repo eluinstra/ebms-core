@@ -20,10 +20,9 @@ import java.util.List;
 
 import javax.xml.bind.annotation.XmlElement;
 
-import nl.clockwork.ebms.util.CPAUtils;
-
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.PartyId;
-import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.Role;
+
+import nl.clockwork.ebms.util.CPAUtils;
 
 public class Party implements Serializable
 {
@@ -78,10 +77,7 @@ public class Party implements Serializable
 	{
 		if (getPartyId() == null || partyIds == null)
 			return null;
-		for (PartyId id : partyIds)
-			if (getPartyId().equals(CPAUtils.toString(id)))
-				return id;
-		return null;
+		return partyIds.stream().filter(id -> getPartyId().equals(CPAUtils.toString(id))).findFirst().orElse(null);
 	}
 
 	public boolean matches(List<PartyId> partyIds)
@@ -90,14 +86,7 @@ public class Party implements Serializable
 			return true;
 		if (getPartyId() == null || partyIds == null)
 			return false;
-		for (PartyId id : partyIds)
-			if (getPartyId().equals(CPAUtils.toString(id)))
-				return true;
-		return false;
+		return partyIds.stream().anyMatch(id -> getPartyId().equals(CPAUtils.toString(id)));
 	}
 
-	public boolean matches(Role role)
-	{
-		return getRole() == null || getRole().equals(role.getName());
-	}
 }

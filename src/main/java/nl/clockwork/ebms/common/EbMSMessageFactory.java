@@ -30,24 +30,6 @@ import javax.xml.soap.SOAPException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactoryConfigurationError;
 
-import nl.clockwork.ebms.Constants;
-import nl.clockwork.ebms.Constants.EbMSAction;
-import nl.clockwork.ebms.Constants.EbMSMessageStatus;
-import nl.clockwork.ebms.model.EbMSAttachment;
-import nl.clockwork.ebms.model.EbMSDataSource;
-import nl.clockwork.ebms.model.EbMSMessage;
-import nl.clockwork.ebms.model.EbMSMessageContent;
-import nl.clockwork.ebms.model.EbMSMessageContext;
-import nl.clockwork.ebms.model.EbMSPartyInfo;
-import nl.clockwork.ebms.model.FromPartyInfo;
-import nl.clockwork.ebms.model.Party;
-import nl.clockwork.ebms.model.CacheablePartyId;
-import nl.clockwork.ebms.model.ToPartyInfo;
-import nl.clockwork.ebms.processor.EbMSProcessingException;
-import nl.clockwork.ebms.processor.EbMSProcessorException;
-import nl.clockwork.ebms.util.CPAUtils;
-import nl.clockwork.ebms.util.EbMSMessageUtils;
-
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.ActorType;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DeliveryChannel;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.PerMessageCharacteristicsType;
@@ -65,8 +47,24 @@ import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.StatusRequest;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.StatusResponse;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.SyncReply;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.To;
-import org.w3._2000._09.xmldsig.ReferenceType;
 import org.xml.sax.SAXException;
+
+import nl.clockwork.ebms.Constants;
+import nl.clockwork.ebms.Constants.EbMSAction;
+import nl.clockwork.ebms.Constants.EbMSMessageStatus;
+import nl.clockwork.ebms.model.CacheablePartyId;
+import nl.clockwork.ebms.model.EbMSAttachment;
+import nl.clockwork.ebms.model.EbMSMessage;
+import nl.clockwork.ebms.model.EbMSMessageContent;
+import nl.clockwork.ebms.model.EbMSMessageContext;
+import nl.clockwork.ebms.model.EbMSPartyInfo;
+import nl.clockwork.ebms.model.FromPartyInfo;
+import nl.clockwork.ebms.model.Party;
+import nl.clockwork.ebms.model.ToPartyInfo;
+import nl.clockwork.ebms.processor.EbMSProcessingException;
+import nl.clockwork.ebms.processor.EbMSProcessorException;
+import nl.clockwork.ebms.util.CPAUtils;
+import nl.clockwork.ebms.util.EbMSMessageUtils;
 
 public class EbMSMessageFactory
 {
@@ -108,8 +106,7 @@ public class EbMSMessageFactory
 			acknowledgment.setActor(ActorType.URN_OASIS_NAMES_TC_EBXML_MSG_ACTOR_TO_PARTY_MSH.value());
 			
 			if (message.getAckRequested().isSigned() && message.getSignature() != null)
-				for (ReferenceType reference : message.getSignature().getSignedInfo().getReference())
-					acknowledgment.getReference().add(reference);
+				message.getSignature().getSignedInfo().getReference().stream().forEach(r -> acknowledgment.getReference().add(r));
 
 			EbMSMessage result = new EbMSMessage();
 			result.setMessageHeader(messageHeader);
@@ -223,14 +220,14 @@ public class EbMSMessageFactory
 			{
 				Manifest manifest = EbMSMessageUtils.createManifest();
 				List<EbMSAttachment> attachments = new ArrayList<EbMSAttachment>();
-				for (EbMSDataSource dataSource : content.getDataSources())
+				content.getDataSources().stream().forEach(ds ->
 				{
-					String contentId = dataSource.getContentId() == null ? UUID.randomUUID().toString() : dataSource.getContentId();
+					String contentId = ds.getContentId() == null ? UUID.randomUUID().toString() : ds.getContentId();
 					manifest.getReference().add(EbMSMessageUtils.createReference(contentId));
-					ByteArrayDataSource ds = new ByteArrayDataSource(dataSource.getContent(),dataSource.getContentType());
-					ds.setName(dataSource.getName());
-					attachments.add(new EbMSAttachment(ds,contentId));
-				}
+					ByteArrayDataSource dataSource = new ByteArrayDataSource(ds.getContent(),ds.getContentType());
+					dataSource.setName(ds.getName());
+					attachments.add(new EbMSAttachment(dataSource,contentId));
+				});
 				result.setManifest(manifest);
 				result.setAttachments(attachments);
 			}

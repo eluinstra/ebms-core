@@ -218,8 +218,7 @@ public class EbMSEventProcessor implements InitializingBean, Job
 		executorService = new ThreadPoolExecutor(maxThreads,maxThreads,1,TimeUnit.MINUTES,new ArrayBlockingQueue<Runnable>(maxThreads * queueScaleFactor,true),new ThreadPoolExecutor.CallerRunsPolicy());
 		GregorianCalendar timestamp = new GregorianCalendar();
 		List<EbMSEvent> events = ebMSDAO.getEventsBefore(timestamp.getTime());
-		for (final EbMSEvent event : events)
-			executorService.submit(new HandleEventTask(event));
+		events.stream().forEach(e -> executorService.submit(new HandleEventTask(e)));
 		executorService.shutdown();
 		try
 		{

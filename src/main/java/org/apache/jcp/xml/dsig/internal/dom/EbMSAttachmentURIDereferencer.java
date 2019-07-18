@@ -50,15 +50,10 @@ public class EbMSAttachmentURIDereferencer implements URIDereferencer
 		{
 			if (uriReference.getURI().startsWith(Constants.CID))
 			{
-				DataSource ds = null;
-				for (EbMSAttachment attachment : attachments)
-					if (uriReference.getURI().substring(Constants.CID.length()).equals(attachment.getContentId()))
-					{
-						ds = attachment;
-						break;
-					}
-				if (ds == null)
-					throw new URIReferenceException("Reference URI = " + uriReference.getURI() + " does not exist!");
+				DataSource ds = attachments.stream()
+						.filter(a -> uriReference.getURI().substring(Constants.CID.length()).equals(a.getContentId()))
+						.findFirst()
+						.orElseThrow(() -> new URIReferenceException("Reference URI = " + uriReference.getURI() + " does not exist!"));
 				XMLSignatureInput in = new XMLSignatureInput(ds.getInputStream());
 				if (in.isOctetStream())
 					return new ApacheOctetStreamData(in);

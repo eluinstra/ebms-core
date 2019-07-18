@@ -24,17 +24,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
-
-import nl.clockwork.ebms.common.CPAManager;
-import nl.clockwork.ebms.common.KeyStoreManager;
-import nl.clockwork.ebms.common.util.SecurityUtils;
-import nl.clockwork.ebms.model.CacheablePartyId;
-import nl.clockwork.ebms.model.EbMSAttachment;
-import nl.clockwork.ebms.model.EbMSMessage;
-import nl.clockwork.ebms.util.CPAUtils;
-import nl.clockwork.ebms.validation.ValidationException;
-import nl.clockwork.ebms.validation.ValidatorException;
-import nl.clockwork.ebms.xml.dsig.EbMSAttachmentResolver;
+import java.util.stream.Collectors;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -47,6 +37,17 @@ import org.springframework.beans.factory.InitializingBean;
 import org.w3._2000._09.xmldsig.ReferenceType;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
+
+import nl.clockwork.ebms.common.CPAManager;
+import nl.clockwork.ebms.common.KeyStoreManager;
+import nl.clockwork.ebms.common.util.SecurityUtils;
+import nl.clockwork.ebms.model.CacheablePartyId;
+import nl.clockwork.ebms.model.EbMSAttachment;
+import nl.clockwork.ebms.model.EbMSMessage;
+import nl.clockwork.ebms.util.CPAUtils;
+import nl.clockwork.ebms.validation.ValidationException;
+import nl.clockwork.ebms.validation.ValidatorException;
+import nl.clockwork.ebms.xml.dsig.EbMSAttachmentResolver;
 
 public class EbMSSignatureValidator implements InitializingBean
 {
@@ -161,24 +162,21 @@ public class EbMSSignatureValidator implements InitializingBean
 			throw new ValidationException("No signature references found in response message " + responseMessage.getMessageHeader().getMessageData().getMessageId());
 		if (requestMessage.getSignature().getSignedInfo().getReference().size() != responseMessage.getAcknowledgment().getReference().size())
 			throw new ValidationException("Nr of signature references found in request message " + requestMessage.getMessageHeader().getMessageData().getMessageId() + " and response message " + responseMessage.getMessageHeader().getMessageData().getMessageId() + " do not match");
-		for (ReferenceType requestReference : requestMessage.getSignature().getSignedInfo().getReference())
-		{
-			boolean found = false;
-			for (ReferenceType responseReference : responseMessage.getAcknowledgment().getReference())
-			{
-				found = equals(requestReference,responseReference);
-				if (found) break;
-			}
-			if (!found)
-				throw new ValidationException("Signature references found in request message " + requestMessage.getMessageHeader().getMessageData().getMessageId() + " and response message " + responseMessage.getMessageHeader().getMessageData().getMessageId() + " do not match");
-		}
-				
+//		if (responseMessage.getAcknowledgment().getReference().stream()
+//				.distinct()
+//				.filter(r -> requestMessage.getSignature().getSignedInfo().getReference().contains(r))
+//				.collect(Collectors.toSet()).size() > 0)
+//			throw new ValidationException("Signature references found in request message " + requestMessage.getMessageHeader().getMessageData().getMessageId() + " and response message " + responseMessage.getMessageHeader().getMessageData().getMessageId() + " do not match");
+		if (responseMessage.getAcknowledgment().getReference().stream()
+				.filter(r -> contains(requestMessage.getSignature().getSignedInfo().getReference(),r))
+				.collect(Collectors.toSet()).size() > 0)
+			throw new ValidationException("Signature references found in request message " + requestMessage.getMessageHeader().getMessageData().getMessageId() + " and response message " + responseMessage.getMessageHeader().getMessageData().getMessageId() + " do not match");
 	}
 
-	private boolean equals(ReferenceType requestReference, ReferenceType responseReference)
+	private boolean contains(List<ReferenceType> requestReferences, ReferenceType responseReference)
 	{
-		return requestReference.getURI().equals(responseReference.getURI())
-				&& Arrays.equals(requestReference.getDigestValue(),responseReference.getDigestValue());
+		return requestReferences.stream().anyMatch(r -> responseReference.getURI().equals(r.getURI())
+				&& Arrays.equals(r.getDigestValue(),responseReference.getDigestValue()));
 	}
 
 	public void setCpaManager(CPAManager cpaManager)

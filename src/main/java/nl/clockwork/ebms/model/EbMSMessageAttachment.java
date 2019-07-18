@@ -24,6 +24,7 @@ import java.util.List;
 import javax.activation.DataHandler;
 import javax.xml.bind.annotation.XmlElement;
 
+import nl.clockwork.ebms.ThrowingConsumer;
 import nl.clockwork.ebms.processor.EbMSProcessorException;
 
 public class EbMSMessageAttachment implements Serializable
@@ -64,25 +65,25 @@ public class EbMSMessageAttachment implements Serializable
 		if (msgContentCache == null)
 		{
 			msgContentCache = new EbMSMessageContent(context);
-			for (DataHandler dh : attachments)
+			attachments.forEach(ThrowingConsumer.throwingConsumerWrapper(a ->
 			{
 				ByteArrayOutputStream bos = new ByteArrayOutputStream();
-		        try
-		        {
-		        	InputStream input = dh.getInputStream();
-		            byte[] b = new byte[BUFFERSIZE];
-		            int bytesRead = 0;
-		            while ((bytesRead = input.read(b)) != -1)
-		            {
-		                bos.write(b, 0, bytesRead);
-		            }
-		        }
-		        catch (IOException e)
-		        {
-		        	throw new EbMSProcessorException(e);
-		        }
-		        msgContentCache.getDataSources().add(new EbMSDataSource(dh.getName(), null, dh.getContentType(), bos.toByteArray()));
-			}
+				try
+				{
+					InputStream input = a.getInputStream();
+					byte[] b = new byte[BUFFERSIZE];
+					int bytesRead = 0;
+					while ((bytesRead = input.read(b)) != -1)
+					{
+						bos.write(b, 0, bytesRead);
+					}
+				}
+				catch (IOException e)
+				{
+					throw new EbMSProcessorException(e);
+				}
+				msgContentCache.getDataSources().add(new EbMSDataSource(a.getName(),null,a.getContentType(),bos.toByteArray()));
+			}));
 		}
 		
 		return msgContentCache;

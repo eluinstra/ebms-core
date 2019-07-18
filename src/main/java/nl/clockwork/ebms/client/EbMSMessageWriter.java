@@ -26,6 +26,7 @@ import java.util.UUID;
 import javax.xml.transform.TransformerException;
 
 import nl.clockwork.ebms.Constants;
+import nl.clockwork.ebms.ThrowingConsumer;
 import nl.clockwork.ebms.common.util.DOMUtils;
 import nl.clockwork.ebms.common.util.HTTPUtils;
 import nl.clockwork.ebms.model.EbMSAttachment;
@@ -76,9 +77,7 @@ public class EbMSMessageWriter
 		connection.setRequestProperty("SOAPAction",Constants.EBMS_SOAP_ACTION);
 
 		Map<String,List<String>> requestProperties = connection.getRequestProperties();
-		OutputStream outputStream = connection.getOutputStream();
-		if (messageLogger.isDebugEnabled())
-			outputStream = new LoggingOutputStream(requestProperties,outputStream);
+		OutputStream outputStream = messageLogger.isDebugEnabled() ? new LoggingOutputStream(requestProperties,connection.getOutputStream()) : connection.getOutputStream();
 
 		try (OutputStreamWriter writer = new OutputStreamWriter(outputStream,"UTF-8"))
 		{
@@ -96,11 +95,13 @@ public class EbMSMessageWriter
 			writer.write("--");
 			writer.write(boundary);
 
-			for (EbMSAttachment attachment : document.getAttachments())
-				if (attachment.getContentType().matches("^(text/.*|.*/xml)$"))
-					writeTextAttachment(boundary,outputStream,writer,attachment);
+			document.getAttachments().stream().forEach(ThrowingConsumer.throwingConsumerWrapper(a ->
+			{
+				if (a.getContentType().matches("^(text/.*|.*/xml)$"))
+					writeTextAttachment(boundary,outputStream,writer,a);
 				else
-					writeBinaryAttachment(boundary,outputStream,writer,attachment);
+					writeBinaryAttachment(boundary,outputStream,writer,a);
+			}));
 
 			writer.write("--");
 		}

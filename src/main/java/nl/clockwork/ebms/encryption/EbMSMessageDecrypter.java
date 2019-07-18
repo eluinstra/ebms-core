@@ -27,7 +27,17 @@ import java.util.List;
 import javax.mail.util.ByteArrayDataSource;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.apache.xml.security.encryption.XMLCipher;
+import org.apache.xml.security.encryption.XMLEncryptionException;
+import org.apache.xml.security.utils.EncryptionConstants;
+import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DeliveryChannel;
+import org.springframework.beans.factory.InitializingBean;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.xml.sax.SAXException;
+
 import nl.clockwork.ebms.Constants;
+import nl.clockwork.ebms.ThrowingConsumer;
 import nl.clockwork.ebms.common.CPAManager;
 import nl.clockwork.ebms.common.KeyStoreManager;
 import nl.clockwork.ebms.common.util.DOMUtils;
@@ -41,16 +51,6 @@ import nl.clockwork.ebms.util.EbMSMessageUtils;
 import nl.clockwork.ebms.validation.EbMSValidationException;
 import nl.clockwork.ebms.validation.ValidationException;
 import nl.clockwork.ebms.validation.ValidatorException;
-
-import org.apache.xml.security.encryption.XMLCipher;
-import org.apache.xml.security.encryption.XMLEncryptionException;
-import org.apache.xml.security.exceptions.XMLSecurityException;
-import org.apache.xml.security.utils.EncryptionConstants;
-import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DeliveryChannel;
-import org.springframework.beans.factory.InitializingBean;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.xml.sax.SAXException;
 
 public class EbMSMessageDecrypter implements InitializingBean
 {
@@ -78,12 +78,11 @@ public class EbMSMessageDecrypter implements InitializingBean
 					throw new ValidationException("No certificate found with subject \"" + certificate.getSubjectDN().getName() + "\" in keystore \"" + keyStorePath + "\"");
 				KeyPair keyPair = SecurityUtils.getKeyPair(keyStore,alias,keyStorePassword);
 				List<EbMSAttachment> attachments = new ArrayList<EbMSAttachment>();
-				for (EbMSAttachment attachment : message.getAttachments())
-					attachments.add(decrypt(keyPair,attachment));
+				message.getAttachments().stream().forEach(ThrowingConsumer.throwingConsumerWrapper(a -> attachments.add(decrypt(keyPair,a))));
 				message.setAttachments(attachments);
 			}
 		}
-		catch (ParserConfigurationException | IOException | GeneralSecurityException e)
+		catch (GeneralSecurityException e)
 		{
 			throw new ValidatorException(e);
 		}
@@ -97,7 +96,7 @@ public class EbMSMessageDecrypter implements InitializingBean
 		return result;
 	}
 
-	private EbMSAttachment decrypt(KeyPair keyPair, EbMSAttachment attachment) throws ParserConfigurationException, IOException, GeneralSecurityException, EbMSValidationException
+	private EbMSAttachment decrypt(KeyPair keyPair, EbMSAttachment attachment) throws ValidatorException
 	{
 		try
 		{
@@ -112,7 +111,11 @@ public class EbMSMessageDecrypter implements InitializingBean
 			ds.setName(attachment.getName());
 			return new EbMSAttachment(ds,attachment.getContentId());
 		}
-		catch (EbMSProcessingException | SAXException | XMLSecurityException | IllegalArgumentException e)
+		catch (ParserConfigurationException | GeneralSecurityException e)
+		{
+			throw new ValidatorException(e);
+		}
+		catch (SAXException | IOException | EbMSProcessingException | XMLEncryptionException | IllegalArgumentException e)
 		{
 			throw new EbMSValidationException(EbMSMessageUtils.createError("cid:" + attachment.getContentId(),Constants.EbMSErrorCode.SECURITY_FAILURE,e.getMessage()));
 		}

@@ -21,11 +21,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import javax.mail.util.ByteArrayDataSource;
-
-import nl.clockwork.ebms.model.EbMSAttachment;
 
 import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.codec.Base64InputStream;
@@ -33,6 +30,8 @@ import org.apache.james.mime4j.parser.ContentHandler;
 import org.apache.james.mime4j.stream.BodyDescriptor;
 import org.apache.james.mime4j.stream.Field;
 import org.springframework.util.StringUtils;
+
+import nl.clockwork.ebms.model.EbMSAttachment;
 
 public class EbMSContentHandler implements ContentHandler
 {
@@ -130,16 +129,7 @@ public class EbMSContentHandler implements ContentHandler
 	{
 		String result = headers.get(headerName);
 		if (result == null)
-		{
-			for (Entry<String, String> entry : headers.entrySet())
-			{
-				if (headerName.equalsIgnoreCase(entry.getKey()))
-				{
-					result = entry.getValue();
-					break;
-				}
-			}
-		}
+			result = headers.entrySet().stream().filter(e -> headerName.equalsIgnoreCase(e.getKey())).findFirst().map(e -> e.getValue()).orElse(null);
 		return result;
 	}
 

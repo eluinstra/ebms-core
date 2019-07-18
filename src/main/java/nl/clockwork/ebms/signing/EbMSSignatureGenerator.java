@@ -23,7 +23,19 @@ import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import java.util.List;
 
+import org.apache.xml.security.exceptions.XMLSecurityException;
+import org.apache.xml.security.signature.XMLSignature;
+import org.apache.xml.security.transforms.Transforms;
+import org.apache.xml.security.transforms.params.XPathContainer;
+import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DeliveryChannel;
+import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.AckRequested;
+import org.springframework.beans.factory.InitializingBean;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
+
 import nl.clockwork.ebms.Constants;
+import nl.clockwork.ebms.ThrowingConsumer;
 import nl.clockwork.ebms.common.CPAManager;
 import nl.clockwork.ebms.common.KeyStoreManager;
 import nl.clockwork.ebms.common.util.DOMUtils;
@@ -35,17 +47,6 @@ import nl.clockwork.ebms.processor.EbMSProcessingException;
 import nl.clockwork.ebms.processor.EbMSProcessorException;
 import nl.clockwork.ebms.util.CPAUtils;
 import nl.clockwork.ebms.xml.dsig.EbMSAttachmentResolver;
-
-import org.apache.xml.security.exceptions.XMLSecurityException;
-import org.apache.xml.security.signature.XMLSignature;
-import org.apache.xml.security.transforms.Transforms;
-import org.apache.xml.security.transforms.params.XPathContainer;
-import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DeliveryChannel;
-import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.AckRequested;
-import org.springframework.beans.factory.InitializingBean;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
 
 public class EbMSSignatureGenerator implements InitializingBean
 {
@@ -128,14 +129,12 @@ public class EbMSSignatureGenerator implements InitializingBean
 		
 		signature.addDocument("",transforms,digestAlgorithm);
 		
-		for (EbMSAttachment attachment : attachments)
-			signature.addDocument(Constants.CID + attachment.getContentId(),null,digestAlgorithm);
+		attachments.stream().forEach(ThrowingConsumer.throwingConsumerWrapper(a -> signature.addDocument(Constants.CID + a.getContentId(),null,digestAlgorithm)));
 		
 		signature.addKeyInfo(keyPair.getPublic());
 		
 		Certificate[] certificates = keyStore.getCertificateChain(alias);
-	  //for (Certificate certificate : certificates)
-	  //	signature.addKeyInfo((X509Certificate)certificate);
+		//Stream.of(certificates).forEach(ThrowingConsumer.throwingConsumerWrapper(c -> signature.addKeyInfo((X509Certificate)c)));
 		signature.addKeyInfo((X509Certificate)certificates[0]);
 
 		signature.sign(keyPair.getPrivate());

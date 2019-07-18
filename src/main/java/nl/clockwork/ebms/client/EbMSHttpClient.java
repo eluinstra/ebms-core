@@ -92,7 +92,7 @@ public class EbMSHttpClient implements EbMSClient
 		return chunkedStreamingMode;
 	}
 
-	@SuppressWarnings({"restriction","deprecation"})
+	@SuppressWarnings({"deprecation"})
 	private URLConnection openConnection(String uri) throws IOException
 	{
 		URL url = new URL(uri);

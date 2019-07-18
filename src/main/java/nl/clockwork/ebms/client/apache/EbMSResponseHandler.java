@@ -17,6 +17,7 @@ package nl.clockwork.ebms.client.apache;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.Charset;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
@@ -73,7 +74,7 @@ public class EbMSResponseHandler implements ResponseHandler<EbMSDocument>
 			{
 		    HttpEntity entity = response.getEntity();
 		    if (entity != null)
-					throw new IOException("StatusCode: " + response.getStatusLine().getStatusCode() + "\n" + IOUtils.toString(entity.getContent()));
+					throw new IOException("StatusCode: " + response.getStatusLine().getStatusCode() + "\n" + IOUtils.toString(entity.getContent(),Charset.defaultCharset()));
 			}
 			throw new IOException("StatusCode: " + response.getStatusLine().getStatusCode());
 		}

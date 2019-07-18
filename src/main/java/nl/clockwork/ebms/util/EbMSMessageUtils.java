@@ -91,29 +91,33 @@ public class EbMSMessageUtils
 		XMLMessageBuilder<Envelope> messageBuilder = XMLMessageBuilder.getInstance(Envelope.class,Envelope.class,MessageHeader.class,SyncReply.class,MessageOrder.class,AckRequested.class,SignatureType.class,ErrorList.class,Acknowledgment.class,Manifest.class,StatusRequest.class,StatusResponse.class);
 		Envelope envelope = messageBuilder.handle(document);
 
-		for (Object element : envelope.getHeader().getAny())
-			if (element instanceof JAXBElement && ((JAXBElement<?>)element).getValue() instanceof SignatureType)
-				result.setSignature(((JAXBElement<SignatureType>)element).getValue());
-			else if (element instanceof MessageHeader)
-				result.setMessageHeader((MessageHeader)element);
-			else if (element instanceof SyncReply)
-				result.setSyncReply((SyncReply)element);
-			else if (element instanceof MessageOrder)
-				result.setMessageOrder((MessageOrder)element);
-			else if (element instanceof AckRequested)
-				result.setAckRequested((AckRequested)element);
-			else if (element instanceof ErrorList)
-				result.setErrorList((ErrorList)element);
-			else if (element instanceof Acknowledgment)
-				result.setAcknowledgment((Acknowledgment)element);
+		envelope.getHeader().getAny().stream().forEach(e ->
+		{
+			if (e instanceof JAXBElement && ((JAXBElement<?>)e).getValue() instanceof SignatureType)
+				result.setSignature(((JAXBElement<SignatureType>)e).getValue());
+			else if (e instanceof MessageHeader)
+				result.setMessageHeader((MessageHeader)e);
+			else if (e instanceof SyncReply)
+				result.setSyncReply((SyncReply)e);
+			else if (e instanceof MessageOrder)
+				result.setMessageOrder((MessageOrder)e);
+			else if (e instanceof AckRequested)
+				result.setAckRequested((AckRequested)e);
+			else if (e instanceof ErrorList)
+				result.setErrorList((ErrorList)e);
+			else if (e instanceof Acknowledgment)
+				result.setAcknowledgment((Acknowledgment)e);
+		});
 
-		for (Object element : envelope.getBody().getAny())
-			if (element instanceof Manifest)
-				result.setManifest((Manifest)element);
-			else if (element instanceof StatusRequest)
-				result.setStatusRequest((StatusRequest)element);
-			else if (element instanceof StatusResponse)
-				result.setStatusResponse((StatusResponse)element);
+		envelope.getBody().getAny().stream().forEach(e ->
+		{
+			if (e instanceof Manifest)
+				result.setManifest((Manifest)e);
+			else if (e instanceof StatusRequest)
+				result.setStatusRequest((StatusRequest)e);
+			else if (e instanceof StatusResponse)
+				result.setStatusResponse((StatusResponse)e);
+		});
 
 		return result;
 	}
@@ -260,9 +264,11 @@ public class EbMSMessageUtils
 	public static Fault getSOAPFault(Envelope envelope)
 	{
 		if (envelope.getBody() != null /*&& envelope.getBody().getAny() != null*/)
-			for (Object element : envelope.getBody().getAny())
-				if (((JAXBElement<?>)element).getDeclaredType().equals(Fault.class))
-					return (Fault)((JAXBElement<?>)element).getValue();
+			return envelope.getBody().getAny().stream()
+					.filter(e -> ((JAXBElement<?>)e).getDeclaredType().equals(Fault.class))
+					.map(e -> (Fault)((JAXBElement<?>)e).getValue())
+					.findFirst()
+					.orElse(null);
 		return null;
 	}
 	

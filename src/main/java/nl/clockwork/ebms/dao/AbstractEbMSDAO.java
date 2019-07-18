@@ -24,29 +24,14 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.mail.util.ByteArrayDataSource;
 import javax.xml.bind.JAXBException;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
-
-import nl.clockwork.ebms.Constants.EbMSAction;
-import nl.clockwork.ebms.Constants.EbMSEventStatus;
-import nl.clockwork.ebms.Constants.EbMSMessageEventType;
-import nl.clockwork.ebms.Constants.EbMSMessageStatus;
-import nl.clockwork.ebms.common.XMLMessageBuilder;
-import nl.clockwork.ebms.common.util.DOMUtils;
-import nl.clockwork.ebms.model.EbMSAttachment;
-import nl.clockwork.ebms.model.EbMSDataSource;
-import nl.clockwork.ebms.model.EbMSDocument;
-import nl.clockwork.ebms.model.EbMSEvent;
-import nl.clockwork.ebms.model.EbMSMessage;
-import nl.clockwork.ebms.model.EbMSMessageContent;
-import nl.clockwork.ebms.model.EbMSMessageContext;
-import nl.clockwork.ebms.model.EbMSMessageEvent;
-import nl.clockwork.ebms.model.Role;
-import nl.clockwork.ebms.model.URLMapping;
-import nl.clockwork.ebms.util.EbMSMessageUtils;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -68,6 +53,25 @@ import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 import org.springframework.transaction.support.TransactionTemplate;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
+
+import nl.clockwork.ebms.Constants.EbMSAction;
+import nl.clockwork.ebms.Constants.EbMSEventStatus;
+import nl.clockwork.ebms.Constants.EbMSMessageEventType;
+import nl.clockwork.ebms.Constants.EbMSMessageStatus;
+import nl.clockwork.ebms.ThrowingConsumer;
+import nl.clockwork.ebms.common.XMLMessageBuilder;
+import nl.clockwork.ebms.common.util.DOMUtils;
+import nl.clockwork.ebms.model.EbMSAttachment;
+import nl.clockwork.ebms.model.EbMSDataSource;
+import nl.clockwork.ebms.model.EbMSDocument;
+import nl.clockwork.ebms.model.EbMSEvent;
+import nl.clockwork.ebms.model.EbMSMessage;
+import nl.clockwork.ebms.model.EbMSMessageContent;
+import nl.clockwork.ebms.model.EbMSMessageContext;
+import nl.clockwork.ebms.model.EbMSMessageEvent;
+import nl.clockwork.ebms.model.Role;
+import nl.clockwork.ebms.model.URLMapping;
+import nl.clockwork.ebms.util.EbMSMessageUtils;
 
 public abstract class AbstractEbMSDAO implements EbMSDAO
 {
@@ -414,8 +418,9 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 				return null;
 			List<EbMSAttachment> attachments = getAttachments(messageId);
 			List<EbMSDataSource> dataSources = new ArrayList<EbMSDataSource>();
-			for (EbMSAttachment attachment : attachments)
-				dataSources.add(new EbMSDataSource(attachment.getName(),attachment.getContentId(),attachment.getContentType(),IOUtils.toByteArray(attachment.getInputStream())));
+			attachments.stream().forEach(ThrowingConsumer.throwingConsumerWrapper(a ->
+					dataSources.add(new EbMSDataSource(a.getName(),a.getContentId(),a.getContentType(),IOUtils.toByteArray(a.getInputStream())))
+			));
 			return new EbMSMessageContent(messageContext,dataSources);
 		}
 		catch (DataAccessException | IOException e)
@@ -926,8 +931,8 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 
 	protected void insertAttachments(KeyHolder keyHolder, List<EbMSAttachment> attachments) throws InvalidDataAccessApiUsageException, DataAccessException, IOException
 	{
-		int orderNr = 0;
-		for (EbMSAttachment attachment : attachments)
+		AtomicInteger orderNr = new AtomicInteger(0);
+		attachments.stream().forEach(ThrowingConsumer.throwingConsumerWrapper(a ->
 		{
 			jdbcTemplate.update
 			(
@@ -942,13 +947,13 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 				") values (?,?,?,?,?,?,?)",
 				keyHolder.getKeys().get("message_id"),
 				keyHolder.getKeys().get("message_nr"),
-				orderNr++,
-				attachment.getName(),
-				attachment.getContentId(),
-				attachment.getContentType(),
-				IOUtils.toByteArray(attachment.getInputStream())
+				orderNr.getAndIncrement(),
+				a.getName(),
+				a.getContentId(),
+				a.getContentType(),
+				IOUtils.toByteArray(a.getInputStream())
 			);
-		}
+		}));
 	}
 
 	@Override
@@ -1190,20 +1195,10 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 
 	protected String join(EbMSMessageEventType[] array, String delimiter)
 	{
-		StringBuffer result = new StringBuffer();
-		if (array.length > 0)
-		{
-			boolean first = true;
-			for (EbMSMessageEventType s : array)
-			{
-				if (first)
-					first = false;
-				else
-					result.append(delimiter);
-				result.append(s.ordinal());
-			}
-		}
-		return result.toString();
+		return Stream.of(array)
+				.mapToInt(e -> e.ordinal())
+				.mapToObj(String::valueOf)
+				.collect(Collectors.joining(delimiter));
 	}
 	
 	@Override

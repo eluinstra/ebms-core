@@ -125,11 +125,7 @@ public class EventListenerFactory implements FactoryBean<EventListener>, Disposa
 	private HashMap<String,Destination> createDestinations()
 	{
 		HashMap<String,Destination> result = new HashMap<String,Destination>();
-		// define queues or virtual-topics for all types of events
-		for (EbMSMessageEventType event : nl.clockwork.ebms.Constants.EbMSMessageEventType.values())
-		{
-			result.put(event.name(), jmsVirtualTopics ? new ActiveMQTopic("VirtualTopic." + event.name()) : new ActiveMQQueue(event.name()) );
-		}
+		EbMSMessageEventType.stream().forEach(e -> result.put(e.name(),jmsVirtualTopics ? new ActiveMQTopic("VirtualTopic." + e.name()) : new ActiveMQQueue(e.name())));
 		return result;
 	}
 

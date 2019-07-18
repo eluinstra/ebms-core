@@ -17,36 +17,26 @@ package nl.clockwork.ebms.common.util;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.springframework.util.StringUtils;
 
-
 public class HTTPUtils
 {
-
 	public static String getCharSet(String contentType)
 	{
-		String charset = null;
-		for (String param: contentType.replace(" ","").split(";"))
-		{
-			if (param.startsWith("charset="))
-			{
-				charset = param.split("=",2)[1];
-				break;
-			}
-		}
-		return charset;
+		return Stream.of(contentType.replace(" ","").split(";"))
+				.filter(p -> p.startsWith("charset="))
+				.findFirst()
+				.map(p -> p.split("=",2)[1])
+				.orElse(null);
 	}
 
 	public static String toString(Map<String,List<String>> properties)
 	{
-		String result = "";
-		for (Entry<String, List<String>> entry : properties.entrySet())
-		{
-			result += (entry.getKey() != null ? entry.getKey() + ": " : "") + StringUtils.collectionToCommaDelimitedString(entry.getValue()) + "\n";
-		}
-
-		return result;
+		return properties.entrySet().stream()
+				.map(e -> (e.getKey() != null ? e.getKey() + ": " : "") + StringUtils.collectionToCommaDelimitedString(e.getValue()))
+				.collect(Collectors.joining("\n"));
 	}
 }

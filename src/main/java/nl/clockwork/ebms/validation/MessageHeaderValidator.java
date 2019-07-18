@@ -147,10 +147,7 @@ public class MessageHeaderValidator
 	
 	private boolean isValid(List<PartyId> partyIds)
 	{
-		for (PartyId partyId : partyIds)
-			if (!StringUtils.isEmpty(partyId.getType()) || isValidURI(partyId.getValue())/*FIXME replace by: org.apache.commons.validator.UrlValidator.isValid(partyId.getValue())*/)
-				return true;
-		return false;
+		return partyIds.stream().anyMatch(p -> !StringUtils.isEmpty(p.getType()) || isValidURI(p.getValue()));//FIXME replace by: org.apache.commons.validator.UrlValidator.isValid(partyId.getValue())
 	}
 
 	private boolean isValidURI(String s)

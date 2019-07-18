@@ -19,6 +19,7 @@ import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
+import java.nio.charset.Charset;
 import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -83,7 +84,7 @@ public class EbMSResponseHandler
 					String response = null;
 					if (input != null)
 					{
-						response = IOUtils.toString(input);
+						response = IOUtils.toString(input,Charset.defaultCharset());
 						messageLogger.info("<<<<\nstatusCode: " + connection.getResponseCode() + (messageLogger.isDebugEnabled() ? "\n" + HTTPUtils.toString(connection.getHeaderFields()) : "") + "\n" + response);
 					}
 					if (recoverableHttpErrors.contains(connection.getResponseCode()))
@@ -99,7 +100,7 @@ public class EbMSResponseHandler
 					String response = null;
 					if (input != null)
 					{
-						response = IOUtils.toString(input);
+						response = IOUtils.toString(input,Charset.defaultCharset());
 						messageLogger.info("<<<<\nstatusCode: " + connection.getResponseCode() + (messageLogger.isDebugEnabled() ? "\n" + HTTPUtils.toString(connection.getHeaderFields()) : "") + "\n" + response);
 					}
 					if (irrecoverableHttpErrors.contains(connection.getResponseCode()))

@@ -19,11 +19,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import nl.clockwork.ebms.Constants;
+import nl.clockwork.ebms.ThrowingConsumer;
 import nl.clockwork.ebms.model.EbMSAttachment;
 import nl.clockwork.ebms.model.EbMSMessage;
 import nl.clockwork.ebms.util.EbMSMessageUtils;
-
-import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.Reference;
 
 public class ManifestValidator
 {
@@ -35,28 +34,28 @@ public class ManifestValidator
 		{
 			if (!Constants.EBMS_VERSION.equals(message.getManifest().getVersion()))
 				throw new EbMSValidationException(EbMSMessageUtils.createError("//Body/Manifest/@version",Constants.EbMSErrorCode.INCONSISTENT,"Invalid value."));
-			for (Reference reference : message.getManifest().getReference())
+			message.getManifest().getReference().forEach(ThrowingConsumer.throwingConsumerWrapper(r ->
 			{
-				if (reference.getHref().startsWith(Constants.CID))
+				if (r.getHref().startsWith(Constants.CID))
 				{
-					EbMSAttachment attachment = findAttachment(message.getAttachments(),reference.getHref());
+					EbMSAttachment attachment = findAttachment(message.getAttachments(),r.getHref());
 					if (attachment != null)
 						attachments.add(attachment);
 					else
-						throw new EbMSValidationException(EbMSMessageUtils.createError(reference.getHref(),Constants.EbMSErrorCode.MIME_PROBLEM,"MIME part not found."));
+						throw new EbMSValidationException(EbMSMessageUtils.createError(r.getHref(),Constants.EbMSErrorCode.MIME_PROBLEM,"MIME part not found."));
 				}
 				else
-					throw new EbMSValidationException(EbMSMessageUtils.createError("//Body/Manifest/Reference[@href='" + reference.getHref() + "']",Constants.EbMSErrorCode.MIME_PROBLEM,"URI cannot be resolved."));
-			}
+					throw new EbMSValidationException(EbMSMessageUtils.createError("//Body/Manifest/Reference[@href='" + r.getHref() + "']",Constants.EbMSErrorCode.MIME_PROBLEM,"URI cannot be resolved."));
+			}));
 		}
 		message.getAttachments().retainAll(attachments);
 	}
 
 	private EbMSAttachment findAttachment(List<EbMSAttachment> attachments, String href)
 	{
-		for (EbMSAttachment attachment : attachments)
-			if (href.substring(Constants.CID.length()).equals(attachment.getContentId()))
-				return attachment;
-		return null;
+		return attachments.stream()
+				.filter(a -> href.substring(Constants.CID.length()).equals(a.getContentId()))
+				.findFirst()
+				.orElse(null);
 	}
 }

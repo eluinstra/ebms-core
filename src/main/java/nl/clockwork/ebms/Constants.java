@@ -18,6 +18,7 @@ package nl.clockwork.ebms;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.stream.Stream;
 
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageStatusType;
 
@@ -54,28 +55,24 @@ public class Constants
 			return statusCode;
 		}
 
+		public static Stream<EbMSMessageStatus> stream()
+		{
+			return Stream.of(EbMSMessageStatus.values());
+		}
+
 		public static final EbMSMessageStatus get(int id)
 		{
-			for (EbMSMessageStatus status : EbMSMessageStatus.values())
-				if (status.id() == id)
-					return status;
-			return null;
+			return EbMSMessageStatus.stream().filter(s -> s.id() == id).findFirst().orElse(null);//orElseThrow(() -> new IllegalStateException("Unsupported id " + id));
 		}
 
 		public static final EbMSMessageStatus get(String name)
 		{
-			for (EbMSMessageStatus status : EbMSMessageStatus.values())
-				if (status.name().equals(name))
-					return status;
-			return null;
+			return EbMSMessageStatus.stream().filter(s -> s.name().equals(name)).findFirst().orElse(null);
 		}
 
 		public static final EbMSMessageStatus get(MessageStatusType statusCode)
 		{
-			for (EbMSMessageStatus status : EbMSMessageStatus.values())
-				if (status.statusCode().equals(statusCode))
-					return status;
-			return null;
+			return EbMSMessageStatus.stream().filter(s -> s.statusCode.equals(statusCode)).findFirst().orElse(null);
 		}
 
 		public static final Collection<EbMSMessageStatus> getReceiveStatus()
@@ -123,13 +120,14 @@ public class Constants
 			return action;
 		}
 		
+		public static Stream<EbMSAction> stream()
+		{
+			return Stream.of(EbMSAction.values());
+		}
+		
 		public static final EbMSAction get(String action)
 		{
-			for (EbMSAction enumaction : EbMSAction.values())
-				if (enumaction.action.contentEquals(action))
-					return enumaction;
-
-			return null;
+			return EbMSAction.stream().filter(a -> a.action.equals(action)).findFirst().orElse(null);
 		}
 
   };
@@ -150,18 +148,25 @@ public class Constants
 			return id;
 		}
 
-		public static final EbMSEventStatus get(int statusId)
+		public static Stream<EbMSEventStatus> stream()
 		{
-			for (EbMSEventStatus status : EbMSEventStatus.values())
-				if (status.id() == statusId)
-					return status;
-			return null;
+			return Stream.of(EbMSEventStatus.values());
+		}
+
+		public static final EbMSEventStatus get(int id)
+		{
+			return EbMSEventStatus.stream().filter(s -> s.id() == id).findFirst().orElse(null);
 		}
   }
 
 	public enum EbMSMessageEventType
 	{
 		RECEIVED,DELIVERED,FAILED,EXPIRED;
+		
+		public static Stream<EbMSMessageEventType> stream()
+		{
+			return Stream.of(EbMSMessageEventType.values());
+		}
 	}
 
 	public static final String EBMS_SOAP_ACTION = "\"ebXML\"";

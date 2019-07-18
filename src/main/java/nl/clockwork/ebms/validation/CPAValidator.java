@@ -19,13 +19,6 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Date;
 import java.util.List;
 
-import nl.clockwork.ebms.Constants;
-import nl.clockwork.ebms.common.CPAManager;
-import nl.clockwork.ebms.common.util.SecurityUtils;
-import nl.clockwork.ebms.model.EbMSMessage;
-import nl.clockwork.ebms.util.CPAUtils;
-import nl.clockwork.ebms.util.EbMSMessageUtils;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.ActorType;
@@ -33,14 +26,19 @@ import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CanReceive;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CanSend;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CollaborationProtocolAgreement;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CollaborationRole;
-import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DeliveryChannel;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DocExchange;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.EncryptionAlgorithm;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.MessageOrderSemanticsType;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.PartyInfo;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.PerMessageCharacteristicsType;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.SyncReplyModeType;
-import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.Transport;
+
+import nl.clockwork.ebms.Constants;
+import nl.clockwork.ebms.common.CPAManager;
+import nl.clockwork.ebms.common.util.SecurityUtils;
+import nl.clockwork.ebms.model.EbMSMessage;
+import nl.clockwork.ebms.util.CPAUtils;
+import nl.clockwork.ebms.util.EbMSMessageUtils;
 
 public class CPAValidator
 {
@@ -128,22 +126,22 @@ public class CPAValidator
 
 	private void validateChannels(CollaborationProtocolAgreement cpa)
 	{
-		for (PartyInfo partyInfo : cpa.getPartyInfo())
-			for (DeliveryChannel deliveryChannel : partyInfo.getDeliveryChannel())
+		cpa.getPartyInfo().stream()
+				.flatMap(p -> p.getDeliveryChannel().stream()).forEach(d ->
 			{
-				if (((DocExchange)deliveryChannel.getDocExchangeId()).getEbXMLSenderBinding().getReliableMessaging() != null && MessageOrderSemanticsType.GUARANTEED.equals(((DocExchange)deliveryChannel.getDocExchangeId()).getEbXMLSenderBinding().getReliableMessaging().getMessageOrderSemantics()))
-					logger.warn("Message Order as defined in DocExchange " + ((DocExchange)deliveryChannel.getDocExchangeId()).getDocExchangeId() + " not implemented!");
-				if (SyncReplyModeType.SIGNALS_ONLY.equals(deliveryChannel.getMessagingCharacteristics().getSyncReplyMode()) || SyncReplyModeType.SIGNALS_AND_RESPONSE.equals(deliveryChannel.getMessagingCharacteristics().getSyncReplyMode()))
-					logger.warn("Business signals defined in Channel " + deliveryChannel.getChannelId() + " not supported!");
-				if (PerMessageCharacteristicsType.NEVER.equals(deliveryChannel.getMessagingCharacteristics().getDuplicateElimination()))
-					logger.warn("Duplicate Elimination defined in Channel " + deliveryChannel.getChannelId() + " always enabled!");
-				if (ActorType.URN_OASIS_NAMES_TC_EBXML_MSG_ACTOR_NEXT_MSH.equals(deliveryChannel.getMessagingCharacteristics().getActor()))
+				if (((DocExchange)d.getDocExchangeId()).getEbXMLSenderBinding().getReliableMessaging() != null && MessageOrderSemanticsType.GUARANTEED.equals(((DocExchange)d.getDocExchangeId()).getEbXMLSenderBinding().getReliableMessaging().getMessageOrderSemantics()))
+					logger.warn("Message Order as defined in DocExchange " + ((DocExchange)d.getDocExchangeId()).getDocExchangeId() + " not implemented!");
+				if (SyncReplyModeType.SIGNALS_ONLY.equals(d.getMessagingCharacteristics().getSyncReplyMode()) || SyncReplyModeType.SIGNALS_AND_RESPONSE.equals(d.getMessagingCharacteristics().getSyncReplyMode()))
+					logger.warn("Business signals defined in Channel " + d.getChannelId() + " not supported!");
+				if (PerMessageCharacteristicsType.NEVER.equals(d.getMessagingCharacteristics().getDuplicateElimination()))
+					logger.warn("Duplicate Elimination defined in Channel " + d.getChannelId() + " always enabled!");
+				if (ActorType.URN_OASIS_NAMES_TC_EBXML_MSG_ACTOR_NEXT_MSH.equals(d.getMessagingCharacteristics().getActor()))
 					logger.warn("Actor NextMSH not supported!");
-				if (((DocExchange)deliveryChannel.getDocExchangeId()).getEbXMLReceiverBinding().getReceiverDigitalEnvelope() != null)
+				if (((DocExchange)d.getDocExchangeId()).getEbXMLReceiverBinding().getReceiverDigitalEnvelope() != null)
 				{
-					if (((DocExchange)deliveryChannel.getDocExchangeId()).getEbXMLReceiverBinding().getReceiverDigitalEnvelope().getDigitalEnvelopeProtocol() != null && !"XMLENC".equals(((DocExchange)deliveryChannel.getDocExchangeId()).getEbXMLReceiverBinding().getReceiverDigitalEnvelope().getDigitalEnvelopeProtocol().getValue()))
-						logger.warn("Digital Envelope Protocol" + ((DocExchange)deliveryChannel.getDocExchangeId()).getEbXMLReceiverBinding().getReceiverDigitalEnvelope().getDigitalEnvelopeProtocol().getValue() + " not supported!");
-					String encryptionAlgorithm = getEncryptionAlgorithm(((DocExchange)deliveryChannel.getDocExchangeId()).getEbXMLReceiverBinding().getReceiverDigitalEnvelope().getEncryptionAlgorithm());
+					if (((DocExchange)d.getDocExchangeId()).getEbXMLReceiverBinding().getReceiverDigitalEnvelope().getDigitalEnvelopeProtocol() != null && !"XMLENC".equals(((DocExchange)d.getDocExchangeId()).getEbXMLReceiverBinding().getReceiverDigitalEnvelope().getDigitalEnvelopeProtocol().getValue()))
+						logger.warn("Digital Envelope Protocol" + ((DocExchange)d.getDocExchangeId()).getEbXMLReceiverBinding().getReceiverDigitalEnvelope().getDigitalEnvelopeProtocol().getValue() + " not supported!");
+					String encryptionAlgorithm = getEncryptionAlgorithm(((DocExchange)d.getDocExchangeId()).getEbXMLReceiverBinding().getReceiverDigitalEnvelope().getEncryptionAlgorithm());
 					if (encryptionAlgorithm != null)
 						try
 						{
@@ -155,7 +153,7 @@ public class CPAValidator
 							logger.warn("Encryption Algorithm " + encryptionAlgorithm + " not supported!",e);
 						}
 				}
-			}
+			});
 	}
 
 	private String getEncryptionAlgorithm(List<EncryptionAlgorithm> encryptionAlgorithm)
@@ -168,17 +166,17 @@ public class CPAValidator
 
 	private void validateTransports(CollaborationProtocolAgreement cpa)
 	{
-		for (PartyInfo partyInfo : cpa.getPartyInfo())
-			for (Transport transport : partyInfo.getTransport())
-			{
-				if (!"HTTP".equals(transport.getTransportSender().getTransportProtocol().getValue()))
-					logger.warn("Transport protocol " + transport.getTransportSender().getTransportProtocol().getValue() + " defined in TransportSender of Transport " + transport.getTransportId() + " not implemented!");
-				if (!"HTTP".equals(transport.getTransportReceiver().getTransportProtocol().getValue()))
-					logger.warn("Transport protocol " + transport.getTransportReceiver().getTransportProtocol().getValue() + " defined in TransportReceiver of Transport " + transport.getTransportId() + " not implemented!");
-				if (transport.getTransportReceiver().getEndpoint().size() > 1)
-					logger.warn("Multiple endpoints defined in TransportReceiver of Transport " + transport.getTransportId() + "not supported! Only allPurpose endpoint supported. Using first endpoint.");
-					return;
-			}
+		cpa.getPartyInfo().stream()
+				.flatMap(p -> p.getTransport().stream()).forEach(t ->
+				{
+					if (!"HTTP".equals(t.getTransportSender().getTransportProtocol().getValue()))
+						logger.warn("Transport protocol " + t.getTransportSender().getTransportProtocol().getValue() + " defined in TransportSender of Transport " + t.getTransportId() + " not implemented!");
+					if (!"HTTP".equals(t.getTransportReceiver().getTransportProtocol().getValue()))
+						logger.warn("Transport protocol " + t.getTransportReceiver().getTransportProtocol().getValue() + " defined in TransportReceiver of Transport " + t.getTransportId() + " not implemented!");
+					if (t.getTransportReceiver().getEndpoint().size() > 1)
+						logger.warn("Multiple endpoints defined in TransportReceiver of Transport " + t.getTransportId() + "not supported! Only allPurpose endpoint supported. Using first endpoint.");
+						return;
+				});
 	}
 
 	public void setCpaManager(CPAManager cpaManager)
