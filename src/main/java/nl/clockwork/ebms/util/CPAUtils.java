@@ -273,7 +273,7 @@ public class CPAUtils
 	public static X509Certificate getX509Certificate(Certificate certificate) throws CertificateException
 	{
 		if (certificate != null)
-			certificate.getKeyInfo().getContent().stream()
+			return certificate.getKeyInfo().getContent().stream()
 					.filter(c -> c instanceof JAXBElement<?> && ((JAXBElement<?>)c).getValue() instanceof X509DataType)
 					.flatMap(c -> ((X509DataType)((JAXBElement<?>)c).getValue()).getX509IssuerSerialOrX509SKIOrX509SubjectName().stream())
 					.filter(n -> n instanceof JAXBElement<?> && "X509Certificate".equals(((JAXBElement<?>)n).getName().getLocalPart()))
@@ -285,7 +285,7 @@ public class CPAUtils
 
 	private static boolean containsAll(List<PartyId> cpaPartyIds, List<org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.PartyId> headerPartyIds)
 	{
-		return headerPartyIds.stream().anyMatch(id -> !contains(cpaPartyIds,id));
+		return headerPartyIds.stream().anyMatch(id -> contains(cpaPartyIds,id));
 	}
 
 	private static boolean contains(List<PartyId> cpaPartyIds, org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.PartyId partyId)

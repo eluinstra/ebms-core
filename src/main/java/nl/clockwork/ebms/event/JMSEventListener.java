@@ -83,7 +83,8 @@ public class JMSEventListener implements EventListener
 		try
 		{
 			logger.info("Message " + messageId + " received");
-			jmsTemplate.send(destinations.get(EbMSMessageEventType.RECEIVED.name()),new EventMessageCreator(ebMSDAO.getMessageContext(messageId)));
+			ebMSDAO.getMessageContext(messageId)
+					.ifPresent(mc -> jmsTemplate.send(destinations.get(EbMSMessageEventType.RECEIVED.name()),new EventMessageCreator(mc)));
 		}
 		catch (JmsException e)
 		{
@@ -97,7 +98,8 @@ public class JMSEventListener implements EventListener
 		try
 		{
 			logger.info("Message " + messageId + " delivered");
-			jmsTemplate.send(destinations.get(EbMSMessageEventType.DELIVERED.name()),new EventMessageCreator(ebMSDAO.getMessageContext(messageId)));
+			ebMSDAO.getMessageContext(messageId)
+					.ifPresent(mc -> jmsTemplate.send(destinations.get(EbMSMessageEventType.DELIVERED.name()),new EventMessageCreator(mc)));
 		}
 		catch (JmsException e)
 		{
@@ -111,7 +113,8 @@ public class JMSEventListener implements EventListener
 		try
 		{
 			logger.info("Message " + messageId + " failed");
-			jmsTemplate.send(destinations.get(EbMSMessageEventType.FAILED.name()),new EventMessageCreator(ebMSDAO.getMessageContext(messageId)));
+			ebMSDAO.getMessageContext(messageId)
+					.ifPresent(mc -> jmsTemplate.send(destinations.get(EbMSMessageEventType.FAILED.name()),new EventMessageCreator(mc)));
 		}
 		catch (JmsException e)
 		{
@@ -125,7 +128,8 @@ public class JMSEventListener implements EventListener
 		try
 		{
 			logger.info("Message " + messageId + " expired");
-			jmsTemplate.send(destinations.get(EbMSMessageEventType.EXPIRED.name()),new EventMessageCreator(ebMSDAO.getMessageContext(messageId)));
+			ebMSDAO.getMessageContext(messageId)
+					.ifPresent(mc -> jmsTemplate.send(destinations.get(EbMSMessageEventType.EXPIRED.name()),new EventMessageCreator(mc)));
 		}
 		catch (JmsException e)
 		{

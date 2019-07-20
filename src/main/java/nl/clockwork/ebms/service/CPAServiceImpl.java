@@ -133,7 +133,7 @@ public class CPAServiceImpl implements CPAService
 	{
 		try
 		{
-			return XMLMessageBuilder.getInstance(CollaborationProtocolAgreement.class).handle(cpaManager.getCPA(cpaId));
+			return XMLMessageBuilder.getInstance(CollaborationProtocolAgreement.class).handle(cpaManager.getCPA(cpaId).orElse(null));
 		}
 		catch (DAOException | JAXBException e)
 		{

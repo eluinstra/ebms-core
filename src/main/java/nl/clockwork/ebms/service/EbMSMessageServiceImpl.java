@@ -24,6 +24,7 @@ import nl.clockwork.ebms.Constants;
 import nl.clockwork.ebms.Constants.EbMSAction;
 import nl.clockwork.ebms.Constants.EbMSMessageEventType;
 import nl.clockwork.ebms.Constants.EbMSMessageStatus;
+import nl.clockwork.ebms.ThrowingFunction;
 import nl.clockwork.ebms.client.DeliveryManager;
 import nl.clockwork.ebms.common.CPAManager;
 import nl.clockwork.ebms.common.EbMSMessageFactory;
@@ -122,14 +123,13 @@ public class EbMSMessageServiceImpl implements InitializingBean, EbMSMessageServ
 	{
 		try
 		{
-			EbMSMessageContent messageContent = ebMSDAO.getMessageContent(messageId);
-			if (messageContent != null)
-			{
-				resetMessage(messageContent.getContext());
-				return storeMessageWithEvent(messageContent);
-			}
-			else
-				throw new EbMSMessageServiceException("Message not found!");
+			return ebMSDAO.getMessageContent(messageId)
+					.map(ThrowingFunction.throwingFunctionWrapper(mc ->
+					{
+						resetMessage(mc.getContext());
+						return storeMessageWithEvent(mc);
+					}))
+					.orElseThrow(() -> new EbMSMessageServiceException("Message not found!"));
 		}
 		catch (DAOException | EbMSProcessorException e)
 		{
@@ -160,7 +160,7 @@ public class EbMSMessageServiceImpl implements InitializingBean, EbMSMessageServ
 		{
 			if (process != null && process)
 				processMessage(messageId);
-			return ebMSDAO.getMessageContent(messageId);
+			return ebMSDAO.getMessageContent(messageId).orElse(null);
 		}
 		catch (DAOException e)
 		{
@@ -217,25 +217,28 @@ public class EbMSMessageServiceImpl implements InitializingBean, EbMSMessageServ
 	{
 		try
 		{
-			EbMSMessageContext context = ebMSDAO.getMessageContext(messageId);
-			if (context == null)
-				throw new EbMSMessageServiceException("No message found with messageId " + messageId + "!");
-			else if (Constants.EBMS_SERVICE_URI.equals(context.getService()))
-				throw new EbMSMessageServiceException("Message with messageId " + messageId + " is an EbMS service message!");
-			else
-			{
-				EbMSMessage request = ebMSMessageFactory.createEbMSStatusRequest(context.getCpaId(),cpaManager.getFromParty(context.getCpaId(),context.getFromRole(),context.getService(),context.getAction()),cpaManager.getToParty(context.getCpaId(),context.getToRole(),context.getService(),context.getAction()),messageId);
-				EbMSMessage response = deliveryManager.sendMessage(cpaManager.getUri(context.getCpaId(),new CacheablePartyId(request.getMessageHeader().getTo().getPartyId()),request.getMessageHeader().getTo().getRole(),CPAUtils.toString(request.getMessageHeader().getService()),request.getMessageHeader().getAction()),request);
-				if (response != null)
-				{
-					if (EbMSAction.STATUS_RESPONSE.action().equals(response.getMessageHeader().getAction()) && response.getStatusResponse() != null)
-						return new MessageStatus(response.getStatusResponse().getTimestamp() == null ? null : response.getStatusResponse().getTimestamp(),EbMSMessageStatus.get(response.getStatusResponse().getMessageStatus()));
-					else
-						throw new EbMSMessageServiceException("No valid response received!");
-				}
-				else
-					throw new EbMSMessageServiceException("No response received!");
-			}
+			return ebMSDAO.getMessageContext(messageId)
+					.map(ThrowingFunction.throwingFunctionWrapper(mc ->
+					{
+						if (Constants.EBMS_SERVICE_URI.equals(mc.getService()))
+							throw new EbMSMessageServiceException("Message with messageId " + messageId + " is an EbMS service message!");
+						else
+						{
+							EbMSMessage request = ebMSMessageFactory.createEbMSStatusRequest(mc.getCpaId(),cpaManager.getFromParty(mc.getCpaId(),mc.getFromRole(),mc.getService(),mc.getAction()),cpaManager.getToParty(mc.getCpaId(),mc.getToRole(),mc.getService(),mc.getAction()),messageId);
+							EbMSMessage response = deliveryManager.sendMessage(cpaManager.getUri(mc.getCpaId(),new CacheablePartyId(request.getMessageHeader().getTo().getPartyId()),request.getMessageHeader().getTo().getRole(),CPAUtils.toString(request.getMessageHeader().getService()),request.getMessageHeader().getAction()),request);
+							if (response != null)
+							{
+								if (EbMSAction.STATUS_RESPONSE.action().equals(response.getMessageHeader().getAction()) && response.getStatusResponse() != null)
+									return new MessageStatus(response.getStatusResponse().getTimestamp() == null ? null : response.getStatusResponse().getTimestamp(),EbMSMessageStatus.get(response.getStatusResponse().getMessageStatus()));
+								else
+									throw new EbMSMessageServiceException("No valid response received!");
+							}
+							else
+								throw new EbMSMessageServiceException("No response received!");
+						}
+					}))
+					.orElseThrow(() -> new EbMSMessageServiceException("No message found with messageId " + messageId + "!"));
+					
 		}
 		catch (DAOException | EbMSProcessorException e)
 		{

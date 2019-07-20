@@ -38,10 +38,7 @@ public class URLManager
 	public String getURL(String source)
 	{
 		if (!StringUtils.isEmpty(source))
-		{
-			String result = ebMSDAO.getURLMapping(source);
-			return result == null ? source : result;
-		}
+			return ebMSDAO.getURLMapping(source).orElse(source);
 		else
 			return source;
 	}

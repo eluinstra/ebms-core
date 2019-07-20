@@ -62,7 +62,7 @@ public class CPAValidator
 
 	public void validate(String cpaId) throws ValidatorException
 	{
-		validate(cpaManager.getCPA(cpaId));
+		validate(cpaManager.getCPA(cpaId).orElse(null));
 	}
 
 	public void validate(CollaborationProtocolAgreement cpa) throws ValidatorException

@@ -23,6 +23,7 @@ import java.io.Serializable;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import javax.activation.DataSource;
 import javax.mail.util.ByteArrayDataSource;
@@ -167,10 +168,10 @@ public class EncryptionTest
 		return result;
 	}
 
-	private CollaborationProtocolAgreement loadCPA(String cpaId) throws IOException, JAXBException
+	private Optional<CollaborationProtocolAgreement> loadCPA(String cpaId) throws IOException, JAXBException
 	{
 		String s = IOUtils.toString(this.getClass().getResourceAsStream("/nl/clockwork/ebms/cpa/" + cpaId + ".xml"),Charset.forName("UTF-8"));
-		return XMLMessageBuilder.getInstance(CollaborationProtocolAgreement.class).handle(s);
+		return Optional.of(XMLMessageBuilder.getInstance(CollaborationProtocolAgreement.class).handle(s));
 	}
 
 	private EbMSMessageFactory initMessageFactory(CPAManager cpaManager)

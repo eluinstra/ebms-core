@@ -18,6 +18,7 @@ package nl.clockwork.ebms.job;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -25,6 +26,8 @@ import java.util.concurrent.TimeUnit;
 
 import nl.clockwork.ebms.Constants.EbMSEventStatus;
 import nl.clockwork.ebms.Constants.EbMSMessageStatus;
+import nl.clockwork.ebms.StreamUtils;
+import nl.clockwork.ebms.ThrowingConsumer;
 import nl.clockwork.ebms.client.EbMSClient;
 import nl.clockwork.ebms.client.EbMSResponseException;
 import nl.clockwork.ebms.client.EbMSIrrecoverableResponsexception;
@@ -71,34 +74,34 @@ public class EbMSEventProcessor implements InitializingBean, Job
 			final String url = urlManager.getURL(CPAUtils.getUri(deliveryChannel));
 			try
 			{
-				EbMSDocument requestDocument = ebMSDAO.getEbMSDocumentIfUnsent(event.getMessageId());
-				if (requestDocument != null)
-				{
-					if (event.isConfidential())
-						messageEncrypter.encrypt(deliveryChannel,requestDocument);
-					logger.info("Sending message " + event.getMessageId() + " to " + url);
-					EbMSDocument responseDocument = ebMSClient.sendMessage(url,requestDocument);
-					messageProcessor.processResponse(requestDocument,responseDocument);
-					ebMSDAO.executeTransaction(
-						new DAOTransactionCallback()
+				Optional<EbMSDocument> requestDocument = ebMSDAO.getEbMSDocumentIfUnsent(event.getMessageId());
+				StreamUtils.ifPresentOrElse(requestDocument,
+						ThrowingConsumer.throwingConsumerWrapper(d ->
 						{
-							@Override
-							public void doInTransaction()
-							{
-								eventManager.updateEvent(event,url,EbMSEventStatus.SUCCEEDED);
-								if (!CPAUtils.isReliableMessaging(deliveryChannel))
-									if (ebMSDAO.updateMessage(event.getMessageId(),EbMSMessageStatus.SENDING,EbMSMessageStatus.DELIVERED) > 0)
+							if (event.isConfidential())
+								messageEncrypter.encrypt(deliveryChannel,d);
+							logger.info("Sending message " + event.getMessageId() + " to " + url);
+							EbMSDocument responseDocument = ebMSClient.sendMessage(url,d);
+							messageProcessor.processResponse(d,responseDocument);
+							ebMSDAO.executeTransaction(
+								new DAOTransactionCallback()
+								{
+									@Override
+									public void doInTransaction()
 									{
-										eventListener.onMessageDelivered(event.getMessageId());
-										if (deleteEbMSAttachmentsOnMessageProcessed)
-											ebMSDAO.deleteAttachments(event.getMessageId());
+										eventManager.updateEvent(event,url,EbMSEventStatus.SUCCEEDED);
+										if (!CPAUtils.isReliableMessaging(deliveryChannel))
+											if (ebMSDAO.updateMessage(event.getMessageId(),EbMSMessageStatus.SENDING,EbMSMessageStatus.DELIVERED) > 0)
+											{
+												eventListener.onMessageDelivered(event.getMessageId());
+												if (deleteEbMSAttachmentsOnMessageProcessed)
+													ebMSDAO.deleteAttachments(event.getMessageId());
+											}
 									}
-							}
-						}
+								});
+						}),
+						() -> eventManager.deleteEvent(event.getMessageId())
 					);
-				}
-				else
-					eventManager.deleteEvent(event.getMessageId());
 			}
 			catch (final EbMSResponseException e)
 			{
@@ -155,14 +158,16 @@ public class EbMSEventProcessor implements InitializingBean, Job
 						@Override
 						public void doInTransaction()
 						{
-							EbMSDocument requestDocument = ebMSDAO.getEbMSDocumentIfUnsent(event.getMessageId());
-							if (requestDocument != null)
-								if (ebMSDAO.updateMessage(event.getMessageId(),EbMSMessageStatus.SENDING,EbMSMessageStatus.EXPIRED) > 0)
-								{
-									eventListener.onMessageExpired(event.getMessageId());
-									if (deleteEbMSAttachmentsOnMessageProcessed)
-										ebMSDAO.deleteAttachments(event.getMessageId());
-								}
+							ebMSDAO.getEbMSDocumentIfUnsent(event.getMessageId())
+									.ifPresent(d ->
+									{
+											if (ebMSDAO.updateMessage(event.getMessageId(),EbMSMessageStatus.SENDING,EbMSMessageStatus.EXPIRED) > 0)
+											{
+												eventListener.onMessageExpired(event.getMessageId());
+												if (deleteEbMSAttachmentsOnMessageProcessed)
+													ebMSDAO.deleteAttachments(event.getMessageId());
+											}
+									});
 							eventManager.deleteEvent(event.getMessageId());
 						}
 					}

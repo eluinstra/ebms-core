@@ -58,7 +58,7 @@ public class EventManagerRetryAck extends EventManager
 					}
 					else
 					{
-						switch(getEbMSDAO().getMessageAction(event.getMessageId()))
+						switch(getEbMSDAO().getMessageAction(event.getMessageId()).orElse(null))
 						{
 							case ACKNOWLEDGMENT:
 							case MESSAGE_ERROR:
