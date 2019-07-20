@@ -82,19 +82,6 @@ public class SSLFactoryManager implements InitializingBean
 		};
 	}
 	
-	@SuppressWarnings({"deprecation"})
-	public com.sun.net.ssl.HostnameVerifier getHostnameVerifier(com.sun.net.ssl.HttpsURLConnection connection)
-	{
-		return verifyHostnames ? com.sun.net.ssl.HttpsURLConnection.getDefaultHostnameVerifier() : new com.sun.net.ssl.HostnameVerifier()
-		{
-			@Override
-			public boolean verify(String urlHostname, String certHostname)
-			{
-				return true;
-			}
-		};
-	}
-
 	public SSLSocketFactory getSslSocketFactory()
 	{
 		return sslSocketFactory;
