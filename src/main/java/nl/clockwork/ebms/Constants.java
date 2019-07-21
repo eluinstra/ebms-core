@@ -26,10 +26,22 @@ public class Constants
 {
 	public enum EbMSMessageStatus
 	{
-		UNAUTHORIZED(0,MessageStatusType.UN_AUTHORIZED), NOT_RECOGNIZED(1,MessageStatusType.NOT_RECOGNIZED), RECEIVED(2,MessageStatusType.RECEIVED), PROCESSED(3,MessageStatusType.PROCESSED), FORWARDED(4,MessageStatusType.FORWARDED), FAILED(5,MessageStatusType.RECEIVED), /*WAITING(6,MessageStatusType.RECEIVED), */SENDING(10), DELIVERY_FAILED(11), DELIVERED(12), EXPIRED(13);
+		UNAUTHORIZED(0,MessageStatusType.UN_AUTHORIZED),
+		NOT_RECOGNIZED(1,MessageStatusType.NOT_RECOGNIZED),
+		RECEIVED(2,MessageStatusType.RECEIVED),
+		PROCESSED(3,MessageStatusType.PROCESSED),
+		FORWARDED(4,MessageStatusType.FORWARDED),
+		FAILED(5,MessageStatusType.RECEIVED),
+		/*WAITING(6,MessageStatusType.RECEIVED),*/
+		SENDING(10),
+		DELIVERY_FAILED(11),
+		DELIVERED(12),
+		EXPIRED(13);
 
-		private static final Collection<EbMSMessageStatus> RECEIVESTATUS = Collections.unmodifiableCollection(Arrays.asList(UNAUTHORIZED,NOT_RECOGNIZED,RECEIVED,PROCESSED,FORWARDED,FAILED));
-		private static final Collection<EbMSMessageStatus> SENDSTATUS = Collections.unmodifiableCollection(Arrays.asList(SENDING,DELIVERY_FAILED,DELIVERED,EXPIRED));
+		private static final Collection<EbMSMessageStatus> RECEIVESTATUS =
+				Collections.unmodifiableCollection(Arrays.asList(UNAUTHORIZED,NOT_RECOGNIZED,RECEIVED,PROCESSED,FORWARDED,FAILED));
+		private static final Collection<EbMSMessageStatus> SENDSTATUS =
+				Collections.unmodifiableCollection(Arrays.asList(SENDING,DELIVERY_FAILED,DELIVERED,EXPIRED));
 		private final int id;
 		private final MessageStatusType statusCode;
 
@@ -62,7 +74,8 @@ public class Constants
 
 		public static final EbMSMessageStatus get(int id)
 		{
-			return EbMSMessageStatus.stream().filter(s -> s.id() == id).findFirst().orElse(null);//orElseThrow(() -> new IllegalStateException("Unsupported id " + id));
+			return EbMSMessageStatus.stream().filter(s -> s.id() == id).findFirst().orElse(null);
+			//orElseThrow(() -> new IllegalStateException("Unsupported EbMSMessageStatus Id: " + id));
 		}
 
 		public static final EbMSMessageStatus get(String name)
@@ -88,7 +101,15 @@ public class Constants
 
   public enum EbMSErrorCode
   {
-  	VALUE_NOT_RECOGNIZED("ValueNotRecognized"), NOT_SUPPORTED("NotSupported"), INCONSISTENT("Inconsistent"), OTHER_XML("OtherXml"), DELIVERY_FAILURE("DeliveryFailure"), TIME_TO_LIVE_EXPIRED("TimeToLiveExpired"), SECURITY_FAILURE("SecurityFailure"), MIME_PROBLEM("MimeProblem"), UNKNOWN("Unknown");
+  	VALUE_NOT_RECOGNIZED("ValueNotRecognized"),
+  	NOT_SUPPORTED("NotSupported"),
+  	INCONSISTENT("Inconsistent"),
+  	OTHER_XML("OtherXml"),
+  	DELIVERY_FAILURE("DeliveryFailure"),
+  	TIME_TO_LIVE_EXPIRED("TimeToLiveExpired"),
+  	SECURITY_FAILURE("SecurityFailure"),
+  	MIME_PROBLEM("MimeProblem"),
+  	UNKNOWN("Unknown");
 		
 		private final String errorCode;
 		
@@ -106,7 +127,12 @@ public class Constants
 
   public enum EbMSAction
   {
-		MESSAGE_ERROR("MessageError"), ACKNOWLEDGMENT("Acknowledgment"), STATUS_REQUEST("StatusRequest"), STATUS_RESPONSE("StatusResponse"), PING("Ping"), PONG("Pong");
+		MESSAGE_ERROR("MessageError"),
+		ACKNOWLEDGMENT("Acknowledgment"),
+		STATUS_REQUEST("StatusRequest"),
+		STATUS_RESPONSE("StatusResponse"),
+		PING("Ping"),
+		PONG("Pong");
 
 		private final String action;
 

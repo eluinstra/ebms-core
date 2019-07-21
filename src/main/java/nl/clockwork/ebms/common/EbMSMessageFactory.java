@@ -50,6 +50,7 @@ import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.To;
 import org.xml.sax.SAXException;
 
 import nl.clockwork.ebms.Constants;
+import nl.clockwork.ebms.StreamUtils;
 import nl.clockwork.ebms.Constants.EbMSAction;
 import nl.clockwork.ebms.Constants.EbMSMessageStatus;
 import nl.clockwork.ebms.model.CacheablePartyId;
@@ -76,7 +77,10 @@ public class EbMSMessageFactory
 		MessageHeader messageHeader = createMessageHeader(cpaId,message.getMessageHeader(),timestamp,EbMSAction.MESSAGE_ERROR);
 		if (errorList.getError().size() == 0)
 		{
-			errorList.getError().add(EbMSMessageUtils.createError(Constants.EbMSErrorCode.UNKNOWN.errorCode(),Constants.EbMSErrorCode.UNKNOWN,"An unknown error occurred!"));
+			errorList.getError().add(EbMSMessageUtils.createError(
+					Constants.EbMSErrorCode.UNKNOWN.errorCode(),
+					Constants.EbMSErrorCode.UNKNOWN,
+					"An unknown error occurred!"));
 			errorList.setHighestSeverity(SeverityType.ERROR);
 		}
 		EbMSMessage result = new EbMSMessage();
@@ -247,9 +251,14 @@ public class EbMSMessageFactory
 	private MessageHeader createMessageHeader(String cpaId, Party fromParty, Party toParty, String action)
 	{
 		String uuid = UUID.randomUUID().toString();
-		EbMSPartyInfo fromPartyInfo = cpaManager.getEbMSPartyInfo(cpaId,fromParty);
-		EbMSPartyInfo toPartyInfo = cpaManager.getEbMSPartyInfo(cpaId,toParty);
-		String hostname = CPAUtils.getHostname(cpaManager.getDefaultDeliveryChannel(cpaId,new CacheablePartyId(fromPartyInfo.getPartyIds()),action));
+		EbMSPartyInfo fromPartyInfo = cpaManager.getEbMSPartyInfo(cpaId,fromParty)
+				.orElseThrow(() -> StreamUtils.illegalStateException("EbMSPartyInfo",cpaId,fromParty));
+		EbMSPartyInfo toPartyInfo = cpaManager.getEbMSPartyInfo(cpaId,toParty)
+				.orElseThrow(() -> StreamUtils.illegalStateException("EbMSPartyInfo",cpaId,toParty));
+		CacheablePartyId partyId = new CacheablePartyId(fromPartyInfo.getPartyIds());
+		String hostname = CPAUtils.getHostname(
+				cpaManager.getDefaultDeliveryChannel(cpaId,partyId,action)
+				.orElseThrow(() -> StreamUtils.illegalStateException("DefaultDeliveryChannel",cpaId,partyId,action)));
 
 		MessageHeader messageHeader = new MessageHeader();
 
@@ -289,10 +298,15 @@ public class EbMSMessageFactory
 	private MessageHeader createMessageHeader(String cpaId, EbMSMessageContext context) throws DatatypeConfigurationException
 	{
 		String uuid = context.getMessageId() == null ? UUID.randomUUID().toString() : context.getMessageId();
-		FromPartyInfo fromPartyInfo = cpaManager.getFromPartyInfo(cpaId,context.getFromRole(),context.getService(),context.getAction());
-		ToPartyInfo toPartyInfo = cpaManager.getToPartyInfoByFromPartyActionBinding(cpaId,context.getFromRole(),context.getService(),context.getAction());
-		if (toPartyInfo == null)
-			toPartyInfo = cpaManager.getToPartyInfo(cpaId,context.getToRole(),context.getService(),context.getAction());
+		FromPartyInfo fromPartyInfo =
+				cpaManager.getFromPartyInfo(cpaId,context.getFromRole(),context.getService(),context.getAction())
+				.orElseThrow(() ->
+				StreamUtils.illegalStateException("FromPartyInfo",cpaId,context.getFromRole(),context.getService(),context.getAction()));
+		ToPartyInfo toPartyInfo =
+				cpaManager.getToPartyInfoByFromPartyActionBinding(cpaId,context.getFromRole(),context.getService(),context.getAction())
+				.orElse(cpaManager.getToPartyInfo(cpaId,context.getToRole(),context.getService(),context.getAction())
+						.orElseThrow(() ->
+						StreamUtils.illegalStateException("ToPartyInfo",cpaId,context.getToRole(),context.getService(),context.getAction())));
 		DeliveryChannel deliveryChannel = CPAUtils.getDeliveryChannel(fromPartyInfo.getCanSend().getThisPartyActionBinding());
 		String hostname = CPAUtils.getHostname(deliveryChannel);
 
@@ -324,14 +338,17 @@ public class EbMSMessageFactory
 
 		setTimeToLive(deliveryChannel,messageHeader);
 
-		messageHeader.setDuplicateElimination(PerMessageCharacteristicsType.ALWAYS.equals(deliveryChannel.getMessagingCharacteristics().getDuplicateElimination()) ? "" : null);
+		messageHeader.setDuplicateElimination(
+				PerMessageCharacteristicsType.ALWAYS.equals(deliveryChannel.getMessagingCharacteristics().getDuplicateElimination()) ? "" : null);
 		
 		return messageHeader;
 	}
 
 	private MessageHeader createMessageHeader(String cpaId, MessageHeader messageHeader, Date timestamp, EbMSAction action) throws DatatypeConfigurationException, JAXBException
 	{
-		DeliveryChannel deliveryChannel = cpaManager.getDefaultDeliveryChannel(cpaId,new CacheablePartyId(messageHeader.getTo().getPartyId()),action.action());
+		CacheablePartyId partyId = new CacheablePartyId(messageHeader.getTo().getPartyId());
+		DeliveryChannel deliveryChannel = cpaManager.getDefaultDeliveryChannel(cpaId,partyId,action.action())
+				.orElseThrow(() -> StreamUtils.illegalStateException("DefaultDeliveryChannel",cpaId,partyId,action.action()));
 		String hostname = CPAUtils.getHostname(deliveryChannel);
 
 		MessageHeader result = XMLMessageBuilder.deepCopy(messageHeader);
@@ -368,7 +385,9 @@ public class EbMSMessageFactory
 	{
 		if (CPAUtils.isReliableMessaging(deliveryChannel))
 		{
-			Duration duration = CPAUtils.getSenderReliableMessaging(deliveryChannel).getRetryInterval().multiply(CPAUtils.getSenderReliableMessaging(deliveryChannel).getRetries().intValue() + 1);
+			Duration duration = CPAUtils.getSenderReliableMessaging(deliveryChannel)
+					.getRetryInterval()
+					.multiply(CPAUtils.getSenderReliableMessaging(deliveryChannel).getRetries().intValue() + 1);
 			Date timestamp = (Date)messageHeader.getMessageData().getTimestamp().clone();
 			duration.addTo(timestamp);
 			messageHeader.getMessageData().setTimeToLive(timestamp);
@@ -377,8 +396,10 @@ public class EbMSMessageFactory
 
 	private AckRequested createAckRequested(String cpaId, EbMSMessageContext context)
 	{
-		FromPartyInfo partyInfo = cpaManager.getFromPartyInfo(cpaId,context.getFromRole(),context.getService(),context.getAction());
-		DeliveryChannel channel = CPAUtils.getDeliveryChannel(partyInfo.getCanSend().getThisPartyActionBinding());
+		DeliveryChannel channel = cpaManager.getFromPartyInfo(cpaId,context.getFromRole(),context.getService(),context.getAction())
+				.map(p -> CPAUtils.getDeliveryChannel(p.getCanSend().getThisPartyActionBinding()))
+				.orElseThrow(() ->
+				StreamUtils.illegalStateException("FromPartyInfo",cpaId,context.getFromRole(),context.getService(),context.getAction()));
 
 		if (PerMessageCharacteristicsType.ALWAYS.equals(channel.getMessagingCharacteristics().getAckRequested()))
 		{
@@ -395,12 +416,24 @@ public class EbMSMessageFactory
 	
 	private SyncReply createSyncReply(String cpaId, Party fromParty, String action)
 	{
-		return EbMSMessageUtils.createSyncReply(cpaManager.getDefaultDeliveryChannel(cpaId,new CacheablePartyId(cpaManager.getEbMSPartyInfo(cpaId,fromParty).getPartyIds()),action));
+		CacheablePartyId partyId = new CacheablePartyId(
+				cpaManager.getEbMSPartyInfo(cpaId,fromParty)
+				.orElseThrow(() -> StreamUtils.illegalStateException("EbMSPartyInfo",cpaId,fromParty)).getPartyIds());
+		return EbMSMessageUtils.createSyncReply(
+				cpaManager.getDefaultDeliveryChannel(cpaId,partyId,action)
+				.orElseThrow(() -> StreamUtils.illegalStateException("DefaultDeliveryChannel",cpaId,partyId,action)));
 	}
 	
 	private SyncReply createSyncReply(String cpaId, EbMSMessageContext context)
 	{
-		return EbMSMessageUtils.createSyncReply(cpaManager.getDefaultDeliveryChannel(cpaId,new CacheablePartyId(cpaManager.getFromPartyInfo(cpaId,context.getFromRole(),context.getService(),context.getAction()).getPartyIds()),context.getAction()));
+		CacheablePartyId partyId = new CacheablePartyId(
+				cpaManager.getFromPartyInfo(cpaId,context.getFromRole(),context.getService(),context.getAction())
+				.orElseThrow(() ->
+				StreamUtils.illegalStateException("FromPartyInfo",cpaId,context.getFromRole(),context.getService(),context.getAction()))
+				.getPartyIds());
+		return EbMSMessageUtils.createSyncReply(
+				cpaManager.getDefaultDeliveryChannel(cpaId,partyId,context.getAction())
+				.orElseThrow(() -> StreamUtils.illegalStateException("DefaultDeliveryChannel",cpaId,partyId,context.getAction())));
 	}
 
 	private StatusResponse createStatusResponse(StatusRequest statusRequest, EbMSMessageStatus status, Date timestamp) throws DatatypeConfigurationException

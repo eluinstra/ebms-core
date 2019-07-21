@@ -15,6 +15,8 @@
  */
 package nl.clockwork.ebms.validation;
 
+import java.util.Optional;
+
 import org.apache.commons.lang3.StringUtils;
 
 import nl.clockwork.ebms.common.CPAManager;
@@ -73,8 +75,9 @@ public class EbMSMessageContextValidator
 			if (!cpaManager.existsCPA(context.getCpaId()))
 				throw new ValidationException("No CPA found for: context.cpaId=" + context.getCpaId());
 
-			FromPartyInfo fromPartyInfo = cpaManager.getFromPartyInfo(context.getCpaId(),context.getFromRole(),context.getService(),context.getAction());
-			if (fromPartyInfo == null)
+			Optional<FromPartyInfo> fromPartyInfo =
+					cpaManager.getFromPartyInfo(context.getCpaId(),context.getFromRole(),context.getService(),context.getAction());
+			if (!fromPartyInfo.isPresent())
 			{
 				StringBuffer msg = new StringBuffer();
 				msg.append("No CanSend action found for:");
@@ -90,14 +93,15 @@ public class EbMSMessageContextValidator
 			}
 
 			//ToPartyInfo otherPartyInfo = CPAUtils.getToPartyInfo(cpa,(ActionBindingType)fromPartyInfo.getCanSend().getOtherPartyActionBinding());
-			ToPartyInfo toPartyInfo = cpaManager.getToPartyInfo(context.getCpaId(),context.getToRole(),context.getService(),context.getAction());
+			Optional<ToPartyInfo> toPartyInfo =
+					cpaManager.getToPartyInfo(context.getCpaId(),context.getToRole(),context.getService(),context.getAction());
 			//if (otherPartyInfo == null && toPartyInfo == null)
-			if (fromPartyInfo.getCanSend().getOtherPartyActionBinding() == null && toPartyInfo == null)
+			if (fromPartyInfo.get().getCanSend().getOtherPartyActionBinding() == null && !toPartyInfo.isPresent())
 			{
 				StringBuffer msg = new StringBuffer();
 				msg.append("No CanReceive action found for:");
 				msg.append(" context.cpaId=").append(context.getCpaId());
-				if (fromPartyInfo.getCanSend().getOtherPartyActionBinding() != null && context.getFromRole() != null)
+				if (fromPartyInfo.get().getCanSend().getOtherPartyActionBinding() != null && context.getFromRole() != null)
 				{
 					msg.append(", context.fromRole.partyId=").append(context.getFromRole().getPartyId());
 					msg.append(", context.fromRole.role=").append(context.getFromRole().getRole());
@@ -112,12 +116,14 @@ public class EbMSMessageContextValidator
 				throw new ValidationException(msg.toString());
 			}
 			//else if (toPartyInfo != null && toPartyInfo1 != null && toPartyInfo.getCanReceive().getThisPartyActionBinding() != toPartyInfo1.getCanReceive().getThisPartyActionBinding())
-			else if (fromPartyInfo.getCanSend().getOtherPartyActionBinding() != null && toPartyInfo != null && fromPartyInfo.getCanSend().getOtherPartyActionBinding() != toPartyInfo.getCanReceive().getThisPartyActionBinding())
+			else if (fromPartyInfo.get().getCanSend().getOtherPartyActionBinding() != null
+					&& toPartyInfo.isPresent()
+					&& fromPartyInfo.get().getCanSend().getOtherPartyActionBinding() != toPartyInfo.get().getCanReceive().getThisPartyActionBinding())
 			{
 				StringBuffer msg = new StringBuffer();
 				msg.append("Action for to party does not match action for from party for:");
 				msg.append(" context.cpaId=").append(context.getCpaId());
-				if (fromPartyInfo.getCanSend().getOtherPartyActionBinding() != null && context.getFromRole() != null)
+				if (fromPartyInfo.get().getCanSend().getOtherPartyActionBinding() != null && context.getFromRole() != null)
 				{
 					msg.append(", context.fromRole.partyId=").append(context.getFromRole().getPartyId());
 					msg.append(", context.fromRole.role=").append(context.getFromRole().getRole());

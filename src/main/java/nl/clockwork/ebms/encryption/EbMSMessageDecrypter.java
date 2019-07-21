@@ -31,12 +31,14 @@ import org.apache.xml.security.encryption.XMLCipher;
 import org.apache.xml.security.encryption.XMLEncryptionException;
 import org.apache.xml.security.utils.EncryptionConstants;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DeliveryChannel;
+import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageHeader;
 import org.springframework.beans.factory.InitializingBean;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 
 import nl.clockwork.ebms.Constants;
+import nl.clockwork.ebms.StreamUtils;
 import nl.clockwork.ebms.ThrowingConsumer;
 import nl.clockwork.ebms.common.CPAManager;
 import nl.clockwork.ebms.common.KeyStoreManager;
@@ -69,13 +71,21 @@ public class EbMSMessageDecrypter implements InitializingBean
 	{
 		try
 		{
-			if (cpaManager.isConfidential(message.getMessageHeader().getCPAId(),new CacheablePartyId(message.getMessageHeader().getFrom().getPartyId()),message.getMessageHeader().getFrom().getRole(),CPAUtils.toString(message.getMessageHeader().getService()),message.getMessageHeader().getAction()))
+			MessageHeader messageHeader = message.getMessageHeader();
+			CacheablePartyId fromPartyId = new CacheablePartyId(messageHeader.getFrom().getPartyId());
+			String service = CPAUtils.toString(messageHeader.getService());
+			if (cpaManager.isConfidential(messageHeader.getCPAId(),fromPartyId,messageHeader.getFrom().getRole(),service,messageHeader.getAction()))
 			{
-				DeliveryChannel deliveryChannel = cpaManager.getReceiveDeliveryChannel(message.getMessageHeader().getCPAId(),new CacheablePartyId(message.getMessageHeader().getTo().getPartyId()),message.getMessageHeader().getTo().getRole(),CPAUtils.toString(message.getMessageHeader().getService()),message.getMessageHeader().getAction());
+				CacheablePartyId toPartyId = new CacheablePartyId(messageHeader.getTo().getPartyId());
+				DeliveryChannel deliveryChannel =
+						cpaManager.getReceiveDeliveryChannel(messageHeader.getCPAId(),toPartyId,messageHeader.getTo().getRole(),service,messageHeader.getAction())
+						.orElseThrow(() ->
+						StreamUtils.illegalStateException("ReceiveDeliveryChannel",messageHeader.getCPAId(),toPartyId,messageHeader.getTo().getRole(),service,messageHeader.getAction()));
 				X509Certificate certificate = CPAUtils.getX509Certificate(CPAUtils.getEncryptionCertificate(deliveryChannel));
 				String alias = keyStore.getCertificateAlias(certificate);
 				if (alias == null)
-					throw new ValidationException("No certificate found with subject \"" + certificate.getSubjectDN().getName() + "\" in keystore \"" + keyStorePath + "\"");
+					throw new ValidationException(
+							"No certificate found with subject \"" + certificate.getSubjectDN().getName() + "\" in keystore \"" + keyStorePath + "\"");
 				KeyPair keyPair = SecurityUtils.getKeyPair(keyStore,alias,keyStorePassword);
 				List<EbMSAttachment> attachments = new ArrayList<EbMSAttachment>();
 				message.getAttachments().stream().forEach(ThrowingConsumer.throwingConsumerWrapper(a -> attachments.add(decrypt(keyPair,a))));
@@ -103,7 +113,8 @@ public class EbMSMessageDecrypter implements InitializingBean
 			Document document = DOMUtils.read((attachment.getInputStream()));
 			if (document.getElementsByTagNameNS(EncryptionConstants.EncryptionSpecNS,EncryptionConstants._TAG_ENCRYPTEDDATA).getLength() == 0)
 				throw new EbMSProcessingException("Attachment " + attachment.getContentId() + " not encrypted!");
-			Element encryptedDataElement = (Element)document.getElementsByTagNameNS(EncryptionConstants.EncryptionSpecNS,EncryptionConstants._TAG_ENCRYPTEDDATA).item(0);
+			Element encryptedDataElement =
+					(Element)document.getElementsByTagNameNS(EncryptionConstants.EncryptionSpecNS,EncryptionConstants._TAG_ENCRYPTEDDATA).item(0);
 			XMLCipher xmlCipher = createXmlCipher(keyPair);
 			byte[] buffer = xmlCipher.decryptToByteArray(encryptedDataElement);
 			String contentType = encryptedDataElement.getAttribute("MimeType");
@@ -117,7 +128,8 @@ public class EbMSMessageDecrypter implements InitializingBean
 		}
 		catch (SAXException | IOException | EbMSProcessingException | XMLEncryptionException | IllegalArgumentException e)
 		{
-			throw new EbMSValidationException(EbMSMessageUtils.createError("cid:" + attachment.getContentId(),Constants.EbMSErrorCode.SECURITY_FAILURE,e.getMessage()));
+			throw new EbMSValidationException(
+					EbMSMessageUtils.createError("cid:" + attachment.getContentId(),Constants.EbMSErrorCode.SECURITY_FAILURE,e.getMessage()));
 		}
 	}
 

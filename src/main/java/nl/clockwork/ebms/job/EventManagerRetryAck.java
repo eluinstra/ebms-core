@@ -17,6 +17,7 @@ package nl.clockwork.ebms.job;
 
 import java.util.Date;
 
+import nl.clockwork.ebms.StreamUtils;
 import nl.clockwork.ebms.Constants.EbMSEventStatus;
 import nl.clockwork.ebms.dao.DAOTransactionCallback;
 import nl.clockwork.ebms.model.EbMSEvent;
@@ -44,7 +45,10 @@ public class EventManagerRetryAck extends EventManager
 	@Override
 	public void updateEvent(final EbMSEvent event, final String url, final EbMSEventStatus status, final String errorMessage)
 	{
-		final DeliveryChannel deliveryChannel = getCpaManager().getDeliveryChannel(event.getCpaId(),event.getDeliveryChannelId());
+		final DeliveryChannel deliveryChannel = getCpaManager().getDeliveryChannel(
+				event.getCpaId(),
+				event.getDeliveryChannelId())
+					.orElseThrow(() -> StreamUtils.illegalStateException("DeliveryChannel",event.getCpaId(),event.getDeliveryChannelId()));
 		getEbMSDAO().executeTransaction(
 			new DAOTransactionCallback()
 			{

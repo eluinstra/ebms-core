@@ -57,11 +57,13 @@ import org.apache.xml.security.keys.KeyInfo;
 import org.apache.xml.security.keys.content.KeyName;
 import org.apache.xml.security.utils.EncryptionConstants;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DeliveryChannel;
+import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageHeader;
 import org.springframework.beans.factory.InitializingBean;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
+import nl.clockwork.ebms.StreamUtils;
 import nl.clockwork.ebms.ThrowingConsumer;
 import nl.clockwork.ebms.common.CPAManager;
 import nl.clockwork.ebms.common.KeyStoreManager;
@@ -94,14 +96,22 @@ public class EbMSMessageEncrypter implements InitializingBean
 	{
 		try
 		{
-			if (cpaManager.isConfidential(message.getMessageHeader().getCPAId(),new CacheablePartyId(message.getMessageHeader().getFrom().getPartyId()),message.getMessageHeader().getFrom().getRole(),CPAUtils.toString(message.getMessageHeader().getService()),message.getMessageHeader().getAction()))
+			MessageHeader messageHeader = message.getMessageHeader();
+			CacheablePartyId fromPartyId = new CacheablePartyId(messageHeader.getFrom().getPartyId());
+			String service = CPAUtils.toString(messageHeader.getService());
+			if (cpaManager.isConfidential(messageHeader.getCPAId(),fromPartyId,messageHeader.getFrom().getRole(),service,messageHeader.getAction()))
 			{
-				DeliveryChannel deliveryChannel = cpaManager.getReceiveDeliveryChannel(message.getMessageHeader().getCPAId(),new CacheablePartyId(message.getMessageHeader().getTo().getPartyId()),message.getMessageHeader().getTo().getRole(),CPAUtils.toString(message.getMessageHeader().getService()),message.getMessageHeader().getAction());
+				CacheablePartyId toPartyId = new CacheablePartyId(messageHeader.getTo().getPartyId());
+				DeliveryChannel deliveryChannel =
+						cpaManager.getReceiveDeliveryChannel(messageHeader.getCPAId(),toPartyId,messageHeader.getTo().getRole(),service,messageHeader.getAction())
+						.orElseThrow(() -> 
+						StreamUtils.illegalStateException("ReceiveDeliveryChannel",messageHeader.getCPAId(),toPartyId,messageHeader.getTo().getRole(),service,messageHeader.getAction()));
 				X509Certificate certificate = CPAUtils.getX509Certificate(CPAUtils.getEncryptionCertificate(deliveryChannel));
 				validateCertificate(trustStore,certificate);
 				String encryptionAlgorithm = CPAUtils.getEncryptionAlgorithm(deliveryChannel);
 				List<EbMSAttachment> attachments = new ArrayList<EbMSAttachment>();
-				message.getAttachments().stream().forEach(ThrowingConsumer.throwingConsumerWrapper(a -> attachments.add(encrypt(createDocument(),certificate,encryptionAlgorithm,a))));
+				message.getAttachments().stream().forEach(
+						ThrowingConsumer.throwingConsumerWrapper(a -> attachments.add(encrypt(createDocument(),certificate,encryptionAlgorithm,a))));
 				message.setAttachments(attachments);
 			}
 		}

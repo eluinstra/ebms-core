@@ -62,7 +62,10 @@ public class EbMSEventProcessor implements InitializingBean, Job
 		@Override
 		public void run()
 		{
-			DeliveryChannel deliveryChannel = cpaManager.getDeliveryChannel(event.getCpaId(),event.getDeliveryChannelId());
+			DeliveryChannel deliveryChannel = cpaManager.getDeliveryChannel(
+					event.getCpaId(),
+					event.getDeliveryChannelId())
+						.orElseThrow(() -> StreamUtils.illegalStateException("DeliveryChannel",event.getCpaId(),event.getDeliveryChannelId()));
 			if (event.getTimeToLive() == null || new Date().before(event.getTimeToLive()))
 				sendEvent(event,deliveryChannel);
 			else
@@ -220,7 +223,13 @@ public class EbMSEventProcessor implements InitializingBean, Job
   @Override
   public void execute()
   {
-		executorService = new ThreadPoolExecutor(maxThreads,maxThreads,1,TimeUnit.MINUTES,new ArrayBlockingQueue<Runnable>(maxThreads * queueScaleFactor,true),new ThreadPoolExecutor.CallerRunsPolicy());
+		executorService = new ThreadPoolExecutor(
+				maxThreads,
+				maxThreads,
+				1,
+				TimeUnit.MINUTES,
+				new ArrayBlockingQueue<Runnable>(maxThreads * queueScaleFactor,true),
+				new ThreadPoolExecutor.CallerRunsPolicy());
 		GregorianCalendar timestamp = new GregorianCalendar();
 		List<EbMSEvent> events = ebMSDAO.getEventsBefore(timestamp.getTime());
 		events.stream().forEach(e -> executorService.submit(new HandleEventTask(e)));

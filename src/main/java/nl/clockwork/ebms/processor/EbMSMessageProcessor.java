@@ -40,6 +40,7 @@ import org.xml.sax.SAXException;
 import nl.clockwork.ebms.Constants;
 import nl.clockwork.ebms.Constants.EbMSAction;
 import nl.clockwork.ebms.Constants.EbMSMessageStatus;
+import nl.clockwork.ebms.StreamUtils;
 import nl.clockwork.ebms.client.DeliveryManager;
 import nl.clockwork.ebms.common.CPAManager;
 import nl.clockwork.ebms.common.EbMSMessageFactory;
@@ -84,42 +85,56 @@ public class EbMSMessageProcessor
 			xsdValidator.validate(document.getMessage());
 			Date timestamp = new Date();
 			final EbMSMessage message = EbMSMessageUtils.getEbMSMessage(document);
-			if (!cpaManager.existsCPA(message.getMessageHeader().getCPAId()))
-				throw new EbMSProcessingException("CPA " + message.getMessageHeader().getCPAId() + " not found!");
-			if (!Constants.EBMS_SERVICE_URI.equals(message.getMessageHeader().getService().getValue()))
+			MessageHeader messageHeader = message.getMessageHeader();
+			if (!cpaManager.existsCPA(messageHeader.getCPAId()))
+				throw new EbMSProcessingException("CPA " + messageHeader.getCPAId() + " not found!");
+			if (!Constants.EBMS_SERVICE_URI.equals(messageHeader.getService().getValue()))
 			{
 				return process(timestamp,message);
 			}
-			else if (EbMSAction.MESSAGE_ERROR.action().equals(message.getMessageHeader().getAction()))
+			else if (EbMSAction.MESSAGE_ERROR.action().equals(messageHeader.getAction()))
 			{
-				Optional<Document> request = ebMSDAO.getDocument(message.getMessageHeader().getMessageData().getRefToMessageId());
-				EbMSMessage requestMessage = EbMSMessageUtils.getEbMSMessage(request.orElse(null));
+				Document request = ebMSDAO.getDocument(messageHeader.getMessageData().getRefToMessageId())
+						.orElseThrow(() -> StreamUtils.illegalStateException("Document",messageHeader.getMessageData().getRefToMessageId()));
+				EbMSMessage requestMessage = EbMSMessageUtils.getEbMSMessage(request);
 				if (requestMessage.getSyncReply() != null)
-					throw new EbMSProcessingException("No async ErrorMessage expected for message " + requestMessage.getMessageHeader().getMessageData().getMessageId());
-				processMessageError(message.getMessageHeader().getCPAId(),timestamp,requestMessage,message);
+					throw new EbMSProcessingException(
+							"No async ErrorMessage expected for message " + requestMessage.getMessageHeader().getMessageData().getMessageId());
+				processMessageError(messageHeader.getCPAId(),timestamp,requestMessage,message);
 				return null;
 			}
-			else if (EbMSAction.ACKNOWLEDGMENT.action().equals(message.getMessageHeader().getAction()))
+			else if (EbMSAction.ACKNOWLEDGMENT.action().equals(messageHeader.getAction()))
 			{
-				Optional<Document> request = ebMSDAO.getDocument(message.getAcknowledgment().getRefToMessageId());
-				EbMSMessage requestMessage = EbMSMessageUtils.getEbMSMessage(request.orElse(null));
+				Document request = ebMSDAO.getDocument(message.getAcknowledgment().getRefToMessageId())
+						.orElseThrow(() -> StreamUtils.illegalStateException("Document",message.getAcknowledgment().getRefToMessageId()));
+				EbMSMessage requestMessage = EbMSMessageUtils.getEbMSMessage(request);
 				if (requestMessage.getAckRequested() == null || requestMessage.getSyncReply() != null)
-					throw new EbMSProcessingException("No async Acknowledgment expected for message " + requestMessage.getMessageHeader().getMessageData().getMessageId());
-				processAcknowledgment(message.getMessageHeader().getCPAId(),timestamp,requestMessage,message);
+					throw new EbMSProcessingException(
+							"No async Acknowledgment expected for message " + requestMessage.getMessageHeader().getMessageData().getMessageId());
+				processAcknowledgment(messageHeader.getCPAId(),timestamp,requestMessage,message);
 				return null;
 			}
-			else if (EbMSAction.STATUS_REQUEST.action().equals(message.getMessageHeader().getAction()))
+			else if (EbMSAction.STATUS_REQUEST.action().equals(messageHeader.getAction()))
 			{
-				EbMSMessage response = processStatusRequest(message.getMessageHeader().getCPAId(),timestamp,message);
+				EbMSMessage response = processStatusRequest(messageHeader.getCPAId(),timestamp,message);
 				if (messageValidator.isSyncReply(message))
 					return EbMSMessageUtils.getEbMSDocument(response);
 				else
 				{
-					deliveryManager.sendResponseMessage(cpaManager.getUri(response.getMessageHeader().getCPAId(),new CacheablePartyId(response.getMessageHeader().getTo().getPartyId()),response.getMessageHeader().getTo().getRole(),CPAUtils.toString(response.getMessageHeader().getService()),response.getMessageHeader().getAction()),response);
+					MessageHeader responseMessageHeader = response.getMessageHeader();
+					CacheablePartyId toPartyId = new CacheablePartyId(responseMessageHeader.getTo().getPartyId());
+					String service = CPAUtils.toString(responseMessageHeader.getService());
+					String uri = cpaManager.getUri(
+							responseMessageHeader.getCPAId(),
+							toPartyId,
+							responseMessageHeader.getTo().getRole(),
+							service,
+							responseMessageHeader.getAction());
+					deliveryManager.sendResponseMessage(uri,response);
 					return null;
 				}
 			}
-			else if (EbMSAction.STATUS_RESPONSE.action().equals(message.getMessageHeader().getAction()))
+			else if (EbMSAction.STATUS_RESPONSE.action().equals(messageHeader.getAction()))
 			{
 				try
 				{
@@ -128,22 +143,31 @@ public class EbMSMessageProcessor
 				}
 				catch (ValidatorException e)
 				{
-					logger.warn("Unable to process StatusResponse " + message.getMessageHeader().getMessageData().getMessageId(),e);
+					logger.warn("Unable to process StatusResponse " + messageHeader.getMessageData().getMessageId(),e);
 				}
 				return null;
 			}
-			else if (EbMSAction.PING.action().equals(message.getMessageHeader().getAction()))
+			else if (EbMSAction.PING.action().equals(messageHeader.getAction()))
 			{
-				EbMSMessage response = processPing(message.getMessageHeader().getCPAId(),timestamp,message);
+				EbMSMessage response = processPing(messageHeader.getCPAId(),timestamp,message);
 				if (messageValidator.isSyncReply(message))
 					return EbMSMessageUtils.getEbMSDocument(response);
 				else
 				{
-					deliveryManager.sendResponseMessage(cpaManager.getUri(response.getMessageHeader().getCPAId(),new CacheablePartyId(response.getMessageHeader().getTo().getPartyId()),response.getMessageHeader().getTo().getRole(),CPAUtils.toString(response.getMessageHeader().getService()),response.getMessageHeader().getAction()),response);
+					MessageHeader responseMessageHeader = response.getMessageHeader();
+					CacheablePartyId toPartyId = new CacheablePartyId(responseMessageHeader.getTo().getPartyId());
+					String service = CPAUtils.toString(responseMessageHeader.getService());
+					String uri = cpaManager.getUri(
+							responseMessageHeader.getCPAId(),
+							toPartyId,
+							responseMessageHeader.getTo().getRole(),
+							service,
+							responseMessageHeader.getAction());
+					deliveryManager.sendResponseMessage(uri,response);
 					return null;
 				}
 			}
-			else if (EbMSAction.PONG.action().equals(message.getMessageHeader().getAction()))
+			else if (EbMSAction.PONG.action().equals(messageHeader.getAction()))
 			{
 				try
 				{
@@ -152,12 +176,13 @@ public class EbMSMessageProcessor
 				}
 				catch (ValidatorException e)
 				{
-					logger.warn("Unable to process Pong " + message.getMessageHeader().getMessageData().getMessageId(),e);
+					logger.warn("Unable to process Pong " + messageHeader.getMessageData().getMessageId(),e);
 				}
 				return null;
 			}
 			else
-				throw new EbMSProcessingException("Unable to process message! Service=" + message.getMessageHeader().getService() + " and Action=" + message.getMessageHeader().getAction());
+				throw new EbMSProcessingException(
+						"Unable to process message! Service=" + messageHeader.getService() + " and Action=" + messageHeader.getAction());
 		}
 		catch (ValidationException | JAXBException | SAXException | IOException | SOAPException | TransformerException e)
 		{
@@ -174,33 +199,39 @@ public class EbMSMessageProcessor
 		try
 		{
 			final EbMSMessage requestMessage = EbMSMessageUtils.getEbMSMessage(request);
+			MessageHeader requestMessageHeader = requestMessage.getMessageHeader();
 			if (requestMessage.getAckRequested() != null && requestMessage.getSyncReply() != null && response == null)
-				throw new EbMSProcessingException("No response received for message " + requestMessage.getMessageHeader().getMessageData().getMessageId());
+				throw new EbMSProcessingException("No response received for message " + requestMessageHeader.getMessageData().getMessageId());
 			
 			if (response != null)
 			{
 				xsdValidator.validate(response.getMessage());
 				Date timestamp = new Date();
 				final EbMSMessage responseMessage = EbMSMessageUtils.getEbMSMessage(response);
-				if (Constants.EBMS_SERVICE_URI.equals(responseMessage.getMessageHeader().getService().getValue()))
+				MessageHeader responseMessageHeader = responseMessage.getMessageHeader();
+				if (Constants.EBMS_SERVICE_URI.equals(responseMessageHeader.getService().getValue()))
 				{
-					if (EbMSAction.MESSAGE_ERROR.action().equals(responseMessage.getMessageHeader().getAction()))
+					if (EbMSAction.MESSAGE_ERROR.action().equals(responseMessageHeader.getAction()))
 					{
 						if (!messageValidator.isSyncReply(requestMessage))
-							throw new EbMSProcessingException("No sync ErrorMessage expected for message " + requestMessage.getMessageHeader().getMessageData().getMessageId() + "\n" + DOMUtils.toString(response.getMessage()));
-						processMessageError(requestMessage.getMessageHeader().getCPAId(),timestamp,requestMessage,responseMessage);
+							throw new EbMSProcessingException(
+									"No sync ErrorMessage expected for message " + requestMessageHeader.getMessageData().getMessageId() + "\n" + DOMUtils.toString(response.getMessage()));
+						processMessageError(requestMessageHeader.getCPAId(),timestamp,requestMessage,responseMessage);
 					}
-					else if (EbMSAction.ACKNOWLEDGMENT.action().equals(responseMessage.getMessageHeader().getAction()))
+					else if (EbMSAction.ACKNOWLEDGMENT.action().equals(responseMessageHeader.getAction()))
 					{
 						if (requestMessage.getAckRequested() == null || !messageValidator.isSyncReply(requestMessage))
-							throw new EbMSProcessingException("No sync Acknowledgment expected for message " + requestMessage.getMessageHeader().getMessageData().getMessageId() + "\n" + DOMUtils.toString(response.getMessage()));
-						processAcknowledgment(requestMessage.getMessageHeader().getCPAId(),timestamp,requestMessage,responseMessage);
+							throw new EbMSProcessingException(
+									"No sync Acknowledgment expected for message " + requestMessageHeader.getMessageData().getMessageId() + "\n" + DOMUtils.toString(response.getMessage()));
+						processAcknowledgment(requestMessageHeader.getCPAId(),timestamp,requestMessage,responseMessage);
 					}
 					else
-						throw new EbMSProcessingException("Unexpected response received for message " + requestMessage.getMessageHeader().getMessageData().getMessageId() + "\n" + DOMUtils.toString(response.getMessage()));
+						throw new EbMSProcessingException(
+								"Unexpected response received for message " + requestMessageHeader.getMessageData().getMessageId() + "\n" + DOMUtils.toString(response.getMessage()));
 				}
 				else
-					throw new EbMSProcessingException("Unexpected response received for message " + requestMessage.getMessageHeader().getMessageData().getMessageId() + "\n" + DOMUtils.toString(response.getMessage()));
+					throw new EbMSProcessingException(
+							"Unexpected response received for message " + requestMessageHeader.getMessageData().getMessageId() + "\n" + DOMUtils.toString(response.getMessage()));
 			}
 			else if (requestMessage.getAckRequested() == null && requestMessage.getSyncReply() != null)
 			{
@@ -210,11 +241,14 @@ public class EbMSMessageProcessor
 						@Override
 						public void doInTransaction()
 						{
-							if (ebMSDAO.updateMessage(requestMessage.getMessageHeader().getMessageData().getMessageId(),EbMSMessageStatus.SENDING,EbMSMessageStatus.DELIVERED) > 0)
+							if (ebMSDAO.updateMessage(
+									requestMessageHeader.getMessageData().getMessageId(),
+									EbMSMessageStatus.SENDING,
+									EbMSMessageStatus.DELIVERED) > 0)
 							{
-								eventListener.onMessageDelivered(requestMessage.getMessageHeader().getMessageData().getMessageId());
+								eventListener.onMessageDelivered(requestMessageHeader.getMessageData().getMessageId());
 								if (deleteEbMSAttachmentsOnMessageProcessed)
-									ebMSDAO.deleteAttachments(requestMessage.getMessageHeader().getMessageData().getMessageId());
+									ebMSDAO.deleteAttachments(requestMessageHeader.getMessageData().getMessageId());
 							}
 						}
 					}
@@ -242,13 +276,17 @@ public class EbMSMessageProcessor
 					@Override
 					public void doInTransaction()
 					{
-						Optional<Date> persistTime = ebMSDAO.getPersistTime(responseMessage.getMessageHeader().getMessageData().getRefToMessageId());
+						MessageHeader responseMessageHeader = responseMessage.getMessageHeader();
+						Optional<Date> persistTime = ebMSDAO.getPersistTime(responseMessageHeader.getMessageData().getRefToMessageId());
 						ebMSDAO.insertMessage(timestamp,persistTime.orElse(null),responseMessage,null);
-						if (ebMSDAO.updateMessage(responseMessage.getMessageHeader().getMessageData().getRefToMessageId(),EbMSMessageStatus.SENDING,EbMSMessageStatus.DELIVERY_FAILED) > 0)
+						if (ebMSDAO.updateMessage(
+								responseMessageHeader.getMessageData().getRefToMessageId(),
+								EbMSMessageStatus.SENDING,
+								EbMSMessageStatus.DELIVERY_FAILED) > 0)
 						{
-							eventListener.onMessageFailed(responseMessage.getMessageHeader().getMessageData().getRefToMessageId());
+							eventListener.onMessageFailed(responseMessageHeader.getMessageData().getRefToMessageId());
 							if (deleteEbMSAttachmentsOnMessageProcessed)
-								ebMSDAO.deleteAttachments(responseMessage.getMessageHeader().getMessageData().getRefToMessageId());
+								ebMSDAO.deleteAttachments(responseMessageHeader.getMessageData().getRefToMessageId());
 						}
 					}
 				}
@@ -277,13 +315,17 @@ public class EbMSMessageProcessor
 					@Override
 					public void doInTransaction()
 					{
-						Optional<Date> persistTime = ebMSDAO.getPersistTime(responseMessage.getMessageHeader().getMessageData().getRefToMessageId());
+						MessageHeader responseMessageHeader = responseMessage.getMessageHeader();
+						Optional<Date> persistTime = ebMSDAO.getPersistTime(responseMessageHeader.getMessageData().getRefToMessageId());
 						ebMSDAO.insertMessage(timestamp,persistTime.orElse(null),responseMessage,null);
-						if (ebMSDAO.updateMessage(responseMessage.getMessageHeader().getMessageData().getRefToMessageId(),EbMSMessageStatus.SENDING,EbMSMessageStatus.DELIVERED) > 0)
+						if (ebMSDAO.updateMessage(
+								responseMessageHeader.getMessageData().getRefToMessageId(),
+								EbMSMessageStatus.SENDING,
+								EbMSMessageStatus.DELIVERED) > 0)
 						{
-							eventListener.onMessageDelivered(responseMessage.getMessageHeader().getMessageData().getRefToMessageId());
+							eventListener.onMessageDelivered(responseMessageHeader.getMessageData().getRefToMessageId());
 							if (deleteEbMSAttachmentsOnMessageProcessed)
-								ebMSDAO.deleteAttachments(responseMessage.getMessageHeader().getMessageData().getRefToMessageId());
+								ebMSDAO.deleteAttachments(responseMessageHeader.getMessageData().getRefToMessageId());
 						}
 					}
 				}
@@ -332,14 +374,32 @@ public class EbMSMessageProcessor
 						@Override
 						public void doInTransaction()
 						{
-							DeliveryChannel deliveryChannel = cpaManager.getReceiveDeliveryChannel(messageHeader.getCPAId(),new CacheablePartyId(message.getMessageHeader().getTo().getPartyId()),message.getMessageHeader().getTo().getRole(),CPAUtils.toString(message.getMessageHeader().getService()),message.getMessageHeader().getAction());
-							Date persistTime = CPAUtils.getPersistTime(messageHeader.getMessageData().getTimestamp(),deliveryChannel);
-							ebMSDAO.insertMessage(timestamp,persistTime,message,EbMSMessageStatus.RECEIVED);
-							ebMSDAO.insertMessage(timestamp,persistTime,acknowledgment,null);
-							deliveryChannel = cpaManager.getReceiveDeliveryChannel(messageHeader.getCPAId(),new CacheablePartyId(acknowledgment.getMessageHeader().getTo().getPartyId()),acknowledgment.getMessageHeader().getTo().getRole(),CPAUtils.toString(acknowledgment.getMessageHeader().getService()),acknowledgment.getMessageHeader().getAction());
-							if (!messageValidator.isSyncReply(message))
 							{
-								eventManager.createEvent(messageHeader.getCPAId(),deliveryChannel,acknowledgment.getMessageHeader().getMessageData().getMessageId(),acknowledgment.getMessageHeader().getMessageData().getTimeToLive(),acknowledgment.getMessageHeader().getMessageData().getTimestamp(),false);
+								CacheablePartyId toPartyId = new CacheablePartyId(message.getMessageHeader().getTo().getPartyId());
+								String service = CPAUtils.toString(message.getMessageHeader().getService());
+								DeliveryChannel deliveryChannel =
+										cpaManager.getReceiveDeliveryChannel(messageHeader.getCPAId(),toPartyId,message.getMessageHeader().getTo().getRole(),service,message.getMessageHeader().getAction())
+										.orElseThrow(() ->
+										StreamUtils.illegalStateException("ReceiveDeliveryChannel",messageHeader.getCPAId(),toPartyId,message.getMessageHeader().getTo().getRole(),service,message.getMessageHeader().getAction()));
+								Date persistTime = CPAUtils.getPersistTime(messageHeader.getMessageData().getTimestamp(),deliveryChannel);
+								ebMSDAO.insertMessage(timestamp,persistTime,message,EbMSMessageStatus.RECEIVED);
+								ebMSDAO.insertMessage(timestamp,persistTime,acknowledgment,null);
+							}
+							{
+								CacheablePartyId toPartyId = new CacheablePartyId(acknowledgment.getMessageHeader().getTo().getPartyId());
+								String service = CPAUtils.toString(acknowledgment.getMessageHeader().getService());
+								DeliveryChannel deliveryChannel =
+										cpaManager.getReceiveDeliveryChannel(messageHeader.getCPAId(),toPartyId,acknowledgment.getMessageHeader().getTo().getRole(),service,acknowledgment.getMessageHeader().getAction())
+										.orElseThrow(() ->
+										StreamUtils.illegalStateException("ReceiveDeliveryChannel",messageHeader.getCPAId(),toPartyId,acknowledgment.getMessageHeader().getTo().getRole(),service,acknowledgment.getMessageHeader().getAction()));
+								if (!messageValidator.isSyncReply(message))
+									eventManager.createEvent(
+											messageHeader.getCPAId(),
+											deliveryChannel,
+											acknowledgment.getMessageHeader().getMessageData().getMessageId(),
+											acknowledgment.getMessageHeader().getMessageData().getTimeToLive(),
+											acknowledgment.getMessageHeader().getMessageData().getTimestamp(),
+											false);
 							}
 							eventListener.onMessageReceived(message.getMessageHeader().getMessageData().getMessageId());
 						}
@@ -366,13 +426,22 @@ public class EbMSMessageProcessor
 					@Override
 					public void doInTransaction()
 					{
-						DeliveryChannel deliveryChannel = cpaManager.getReceiveDeliveryChannel(messageHeader.getCPAId(),new CacheablePartyId(messageError.getMessageHeader().getTo().getPartyId()),messageError.getMessageHeader().getTo().getRole(),CPAUtils.toString(messageError.getMessageHeader().getService()),messageError.getMessageHeader().getAction());
+						CacheablePartyId toPartyId = new CacheablePartyId(messageError.getMessageHeader().getTo().getPartyId());
+						String service = CPAUtils.toString(messageError.getMessageHeader().getService());
+						DeliveryChannel deliveryChannel = cpaManager.getReceiveDeliveryChannel(messageHeader.getCPAId(),toPartyId,messageError.getMessageHeader().getTo().getRole(),service,messageError.getMessageHeader().getAction())
+								.orElseThrow(() -> StreamUtils.illegalStateException("ReceiveDeliveryChannel",messageHeader.getCPAId(),toPartyId,messageError.getMessageHeader().getTo().getRole(),service,messageError.getMessageHeader().getAction()));
 						Date persistTime = CPAUtils.getPersistTime(timestamp,deliveryChannel);
 						ebMSDAO.insertMessage(timestamp,persistTime,message,EbMSMessageStatus.FAILED);
 						ebMSDAO.insertMessage(timestamp,persistTime,messageError,null);
 						if (!messageValidator.isSyncReply(message))
 						{
-							eventManager.createEvent(messageHeader.getCPAId(),deliveryChannel,messageError.getMessageHeader().getMessageData().getMessageId(),messageError.getMessageHeader().getMessageData().getTimeToLive(),messageError.getMessageHeader().getMessageData().getTimestamp(),false);
+							eventManager.createEvent(
+									messageHeader.getCPAId(),
+									deliveryChannel,
+									messageError.getMessageHeader().getMessageData().getMessageId(),
+									messageError.getMessageHeader().getMessageData().getTimeToLive(),
+									messageError.getMessageHeader().getMessageData().getTimestamp(),
+									false);
 						}
 					}
 				}
@@ -396,7 +465,10 @@ public class EbMSMessageProcessor
 						return ebMSDAO.getMessageStatus(message.getStatusRequest().getRefToMessageId())
 								.map(s ->
 								{
-									if (s != null && (MessageStatusType.RECEIVED.equals(s.statusCode()) || MessageStatusType.PROCESSED.equals(s.statusCode()) || MessageStatusType.FORWARDED.equals(s.statusCode())))
+									if (s != null
+											&& (MessageStatusType.RECEIVED.equals(s.statusCode())
+													|| MessageStatusType.PROCESSED.equals(s.statusCode())
+													|| MessageStatusType.FORWARDED.equals(s.statusCode())))
 										return new Pair<EbMSMessageStatus,Date>(s,mc.getTimestamp());
 									else
 										return new Pair<EbMSMessageStatus,Date>(EbMSMessageStatus.NOT_RECOGNIZED,null);

@@ -18,6 +18,7 @@ package nl.clockwork.ebms.job;
 import java.util.Calendar;
 import java.util.Date;
 
+import nl.clockwork.ebms.StreamUtils;
 import nl.clockwork.ebms.Constants.EbMSEventStatus;
 import nl.clockwork.ebms.common.CPAManager;
 import nl.clockwork.ebms.dao.DAOTransactionCallback;
@@ -50,7 +51,10 @@ public class EventManager
 
 	public void updateEvent(final EbMSEvent event, final String url, final EbMSEventStatus status, final String errorMessage)
 	{
-		final DeliveryChannel deliveryChannel = cpaManager.getDeliveryChannel(event.getCpaId(),event.getDeliveryChannelId());
+		final DeliveryChannel deliveryChannel = cpaManager.getDeliveryChannel(
+				event.getCpaId(),
+				event.getDeliveryChannelId())
+					.orElseThrow(() -> StreamUtils.illegalStateException("DeliveryChannel",event.getCpaId(),event.getDeliveryChannelId()));
 		ebMSDAO.executeTransaction(
 			new DAOTransactionCallback()
 			{
@@ -80,7 +84,14 @@ public class EventManager
 	{
 		Calendar timestamp = Calendar.getInstance();
 		timestamp.add(Calendar.MINUTE, retryInterval);
-		return new EbMSEvent(event.getCpaId(),event.getDeliveryChannelId(),event.getMessageId(),event.getTimeToLive(),timestamp.getTime(),event.isConfidential(),event.getRetries() + 1);
+		return new EbMSEvent(
+				event.getCpaId(),
+				event.getDeliveryChannelId(),
+				event.getMessageId(),
+				event.getTimeToLive(),
+				timestamp.getTime(),
+				event.isConfidential(),
+				event.getRetries() + 1);
 	}
 
 	protected EbMSEvent createNewEvent(EbMSEvent event, DeliveryChannel deliveryChannel)
@@ -91,7 +102,14 @@ public class EventManager
 			rm.getRetryInterval().addTo(timestamp);
 		else
 			timestamp = event.getTimeToLive();
-		return new EbMSEvent(event.getCpaId(),event.getDeliveryChannelId(),event.getMessageId(),event.getTimeToLive(),timestamp,event.isConfidential(),event.getRetries() + 1);
+		return new EbMSEvent(
+				event.getCpaId(),
+				event.getDeliveryChannelId(),
+				event.getMessageId(),
+				event.getTimeToLive(),
+				timestamp,
+				event.isConfidential(),
+				event.getRetries() + 1);
 	}
 
 	public void setEbMSDAO(EbMSDAO ebMSDAO)

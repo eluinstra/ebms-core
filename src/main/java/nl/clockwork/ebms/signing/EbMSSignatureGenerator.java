@@ -29,12 +29,14 @@ import org.apache.xml.security.transforms.Transforms;
 import org.apache.xml.security.transforms.params.XPathContainer;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DeliveryChannel;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.AckRequested;
+import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageHeader;
 import org.springframework.beans.factory.InitializingBean;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
 import nl.clockwork.ebms.Constants;
+import nl.clockwork.ebms.StreamUtils;
 import nl.clockwork.ebms.ThrowingConsumer;
 import nl.clockwork.ebms.common.CPAManager;
 import nl.clockwork.ebms.common.KeyStoreManager;
@@ -69,7 +71,15 @@ public class EbMSSignatureGenerator implements InitializingBean
 	{
 		try
 		{
-			if (cpaManager.isNonRepudiationRequired(message.getMessageHeader().getCPAId(),new CacheablePartyId(message.getMessageHeader().getFrom().getPartyId()),message.getMessageHeader().getFrom().getRole(),CPAUtils.toString(message.getMessageHeader().getService()),message.getMessageHeader().getAction()))
+			MessageHeader messageHeader = message.getMessageHeader();
+			CacheablePartyId fromPartyId = new CacheablePartyId(messageHeader.getFrom().getPartyId());
+			String service = CPAUtils.toString(messageHeader.getService());
+			if (cpaManager.isNonRepudiationRequired(
+					messageHeader.getCPAId(),
+					fromPartyId,
+					messageHeader.getFrom().getRole(),
+					service,
+					messageHeader.getAction()))
 				sign(message);
 		}
 		catch (GeneralSecurityException e)
@@ -103,13 +113,22 @@ public class EbMSSignatureGenerator implements InitializingBean
 
 	private void sign(EbMSMessage message) throws EbMSProcessorException, GeneralSecurityException, XMLSecurityException
 	{
-		DeliveryChannel deliveryChannel = cpaManager.getSendDeliveryChannel(message.getMessageHeader().getCPAId(),new CacheablePartyId(message.getMessageHeader().getFrom().getPartyId()),message.getMessageHeader().getFrom().getRole(),CPAUtils.toString(message.getMessageHeader().getService()),message.getMessageHeader().getAction());
+		MessageHeader messageHeader = message.getMessageHeader();
+		CacheablePartyId fromPartyId = new CacheablePartyId(messageHeader.getFrom().getPartyId());
+		String service = CPAUtils.toString(messageHeader.getService());
+		DeliveryChannel deliveryChannel =
+				cpaManager.getSendDeliveryChannel(messageHeader.getCPAId(),fromPartyId,messageHeader.getFrom().getRole(),service,messageHeader.getAction())
+				.orElseThrow(() ->
+				StreamUtils.illegalStateException("SendDeliveryChannel",messageHeader.getCPAId(),fromPartyId,messageHeader.getFrom().getRole(),service,messageHeader.getAction()));
 		X509Certificate certificate = CPAUtils.getX509Certificate(CPAUtils.getSigningCertificate(deliveryChannel));
 		String alias = keyStore.getCertificateAlias(certificate);
 		if (alias == null)
-			throw new EbMSProcessorException("No certificate found with subject \"" + certificate.getSubjectDN().getName() + "\" in keystore \"" + keyStorePath + "\"");
+			throw new EbMSProcessorException(
+					"No certificate found with subject \"" + certificate.getSubjectDN().getName() + "\" in keystore \"" + keyStorePath + "\"");
 		KeyPair keyPair = SecurityUtils.getKeyPair(keyStore,alias,keyStorePassword);
-		sign(keyStore,keyPair,alias,message.getMessage(),message.getAttachments(),CPAUtils.getSignatureAlgorithm(deliveryChannel),CPAUtils.getHashFunction(deliveryChannel));
+		String signatureAlgorithm = CPAUtils.getSignatureAlgorithm(deliveryChannel);
+		String hashFunction = CPAUtils.getHashFunction(deliveryChannel);
+		sign(keyStore,keyPair,alias,message.getMessage(),message.getAttachments(),signatureAlgorithm,hashFunction);
 	}
 	
 	private void sign(KeyStore keyStore, KeyPair keyPair, String alias, Document document, List<EbMSAttachment> attachments, String signatureMethodAlgorithm, String digestAlgorithm) throws XMLSecurityException, KeyStoreException
@@ -129,7 +148,8 @@ public class EbMSSignatureGenerator implements InitializingBean
 		
 		signature.addDocument("",transforms,digestAlgorithm);
 		
-		attachments.stream().forEach(ThrowingConsumer.throwingConsumerWrapper(a -> signature.addDocument(Constants.CID + a.getContentId(),null,digestAlgorithm)));
+		attachments.stream()
+		.forEach(ThrowingConsumer.throwingConsumerWrapper(a -> signature.addDocument(Constants.CID + a.getContentId(),null,digestAlgorithm)));
 		
 		signature.addKeyInfo(keyPair.getPublic());
 		

@@ -2,6 +2,8 @@ package nl.clockwork.ebms;
 
 import java.util.Optional;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class StreamUtils
 {
@@ -17,5 +19,10 @@ public class StreamUtils
 	{
 		if (!optional.isPresent())
 			emptyAction.run();
+	}
+	
+	public static IllegalStateException illegalStateException(String message, Object...elements)
+	{
+		return new IllegalStateException(message + ": "+ Stream.of(elements).map(o -> o.toString()).collect(Collectors.joining(",")));
 	}
 }

@@ -47,7 +47,13 @@ public class EbMSHttpClient implements EbMSClient
 	{
 	}
 
-	public EbMSHttpClient(SSLFactoryManager sslFactoryManager, boolean chunkedStreamingMode, boolean base64Writer, EbMSProxy proxy, List<Integer> recoverableHttpErrors, List<Integer> irrecoverableHttpErrors)
+	public EbMSHttpClient(
+			SSLFactoryManager sslFactoryManager,
+			boolean chunkedStreamingMode,
+			boolean base64Writer,
+			EbMSProxy proxy,
+			List<Integer> recoverableHttpErrors,
+			List<Integer> irrecoverableHttpErrors)
 	{
 		this.sslFactoryManager = sslFactoryManager;
 		this.chunkedStreamingMode = chunkedStreamingMode;
@@ -104,7 +110,7 @@ public class EbMSHttpClient implements EbMSClient
 			((HttpsURLConnection)connection).setSSLSocketFactory(sslFactoryManager.getSslSocketFactory());
 		}
 		else
-			throw new IllegalStateException(connection.getClass().getName());
+			throw new IllegalStateException("URLConnection :" + connection.getClass().getName());
 		return connection;
 	}
 

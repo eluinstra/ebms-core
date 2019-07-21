@@ -18,7 +18,9 @@ package nl.clockwork.ebms.validation;
 import java.util.Date;
 
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.SyncReplyModeType;
+import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageHeader;
 
+import nl.clockwork.ebms.StreamUtils;
 import nl.clockwork.ebms.common.CPAManager;
 import nl.clockwork.ebms.dao.EbMSDAO;
 import nl.clockwork.ebms.encryption.EbMSMessageDecrypter;
@@ -98,7 +100,13 @@ public class EbMSMessageValidator
 		try
 		{
 			//return message.getSyncReply() != null;
-			SyncReplyModeType syncReply = cpaManager.getSyncReply(message.getMessageHeader().getCPAId(),new CacheablePartyId(message.getMessageHeader().getFrom().getPartyId()),message.getMessageHeader().getFrom().getRole(),CPAUtils.toString(message.getMessageHeader().getService()),message.getMessageHeader().getAction());
+			MessageHeader messageHeader = message.getMessageHeader();
+			CacheablePartyId fromPartyId = new CacheablePartyId(messageHeader.getFrom().getPartyId());
+			String service = CPAUtils.toString(messageHeader.getService());
+			SyncReplyModeType syncReply =
+					cpaManager.getSyncReply(messageHeader.getCPAId(),fromPartyId,messageHeader.getFrom().getRole(),service,messageHeader.getAction())
+					.orElseThrow(() ->
+					StreamUtils.illegalStateException("SyncReply",messageHeader.getCPAId(),fromPartyId,messageHeader.getFrom().getRole(),service,messageHeader.getAction()));
 			return syncReply != null && !syncReply.equals(SyncReplyModeType.NONE);
 		}
 		catch (Exception e)
@@ -109,7 +117,8 @@ public class EbMSMessageValidator
 
 	public boolean isDuplicateMessage(EbMSMessage message)
 	{
-		return /*message.getMessageHeader().getDuplicateElimination()!= null && */ebMSDAO.existsMessage(message.getMessageHeader().getMessageData().getMessageId());
+		return /*message.getMessageHeader().getDuplicateElimination()!= null && */
+				ebMSDAO.existsMessage(message.getMessageHeader().getMessageData().getMessageId());
 	}
 	
 	public void setEbMSDAO(EbMSDAO ebMSDAO)

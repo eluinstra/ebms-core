@@ -31,16 +31,6 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.xpath.XPathExpressionException;
 
-import nl.clockwork.ebms.Constants;
-import nl.clockwork.ebms.Constants.EbMSErrorCode;
-import nl.clockwork.ebms.Constants.EbMSMessageStatus;
-import nl.clockwork.ebms.common.XMLMessageBuilder;
-import nl.clockwork.ebms.common.util.DOMUtils;
-import nl.clockwork.ebms.model.EbMSAttachment;
-import nl.clockwork.ebms.model.EbMSDocument;
-import nl.clockwork.ebms.model.EbMSMessage;
-import nl.clockwork.ebms.xml.EbMSNamespaceMapper;
-
 import org.apache.commons.lang3.StringUtils;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DeliveryChannel;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.AckRequested;
@@ -67,6 +57,18 @@ import org.xmlsoap.schemas.soap.envelope.Envelope;
 import org.xmlsoap.schemas.soap.envelope.Fault;
 import org.xmlsoap.schemas.soap.envelope.Header;
 
+import com.sun.xml.bind.marshaller.NamespacePrefixMapper;
+
+import nl.clockwork.ebms.Constants;
+import nl.clockwork.ebms.Constants.EbMSErrorCode;
+import nl.clockwork.ebms.Constants.EbMSMessageStatus;
+import nl.clockwork.ebms.common.XMLMessageBuilder;
+import nl.clockwork.ebms.common.util.DOMUtils;
+import nl.clockwork.ebms.model.EbMSAttachment;
+import nl.clockwork.ebms.model.EbMSDocument;
+import nl.clockwork.ebms.model.EbMSMessage;
+import nl.clockwork.ebms.xml.EbMSNamespaceMapper;
+
 public class EbMSMessageUtils
 {
 	private static boolean oraclePatch;
@@ -88,7 +90,19 @@ public class EbMSMessageUtils
 		result.setMessage(document);
 		result.setAttachments(attachments);
 
-		XMLMessageBuilder<Envelope> messageBuilder = XMLMessageBuilder.getInstance(Envelope.class,Envelope.class,MessageHeader.class,SyncReply.class,MessageOrder.class,AckRequested.class,SignatureType.class,ErrorList.class,Acknowledgment.class,Manifest.class,StatusRequest.class,StatusResponse.class);
+		XMLMessageBuilder<Envelope> messageBuilder = XMLMessageBuilder.getInstance(
+				Envelope.class,
+				Envelope.class,
+				MessageHeader.class,
+				SyncReply.class,
+				MessageOrder.class,
+				AckRequested.class,
+				SignatureType.class,
+				ErrorList.class,
+				Acknowledgment.class,
+				Manifest.class,
+				StatusRequest.class,
+				StatusResponse.class);
 		Envelope envelope = messageBuilder.handle(document);
 
 		envelope.getHeader().getAny().stream().forEach(e ->
@@ -241,9 +255,25 @@ public class EbMSMessageUtils
 		envelope.getBody().getAny().add(ebMSMessage.getStatusRequest());
 		envelope.getBody().getAny().add(ebMSMessage.getStatusResponse());
 		
-		XMLMessageBuilder<Envelope> messageBuilder = XMLMessageBuilder.getInstance(Envelope.class,Envelope.class,MessageHeader.class,SyncReply.class,MessageOrder.class,AckRequested.class,ErrorList.class,Acknowledgment.class,Manifest.class,StatusRequest.class,StatusResponse.class);
-		//return DOMUtils.getDocumentBuilder().parse(new ByteArrayInputStream(messageBuilder.handle(new JAXBElement<Envelope>(new QName("http://schemas.xmlsoap.org/soap/envelope/","Envelope"),Envelope.class,envelope)).getBytes()));
-		return DOMUtils.getDocumentBuilder().parse(new ByteArrayInputStream(messageBuilder.handle(new JAXBElement<Envelope>(new QName("http://schemas.xmlsoap.org/soap/envelope/","Envelope"),Envelope.class,envelope),oraclePatch ? new EbMSNamespaceMapper() : null).getBytes()));
+		XMLMessageBuilder<Envelope> messageBuilder = XMLMessageBuilder.getInstance(
+				Envelope.class,
+				Envelope.class,
+				MessageHeader.class,
+				SyncReply.class,
+				MessageOrder.class,
+				AckRequested.class,
+				ErrorList.class,
+				Acknowledgment.class,
+				Manifest.class,
+				StatusRequest.class,
+				StatusResponse.class);
+//		JAXBElement<Envelope> e = new JAXBElement<Envelope>(new QName("http://schemas.xmlsoap.org/soap/envelope/","Envelope"),Envelope.class,envelope);
+//		ByteArrayInputStream is = new ByteArrayInputStream(messageBuilder.handle(e).getBytes());
+//		return DOMUtils.getDocumentBuilder().parse(is);
+		NamespacePrefixMapper namespacePrefixMapper = oraclePatch ? new EbMSNamespaceMapper() : null;
+		JAXBElement<Envelope> e = new JAXBElement<Envelope>(new QName("http://schemas.xmlsoap.org/soap/envelope/","Envelope"),Envelope.class,envelope);
+		ByteArrayInputStream is = new ByteArrayInputStream(messageBuilder.handle(e,namespacePrefixMapper).getBytes());
+		return DOMUtils.getDocumentBuilder().parse(is);
 	}
 
 	public static Fault getSOAPFault(String s)
@@ -280,8 +310,10 @@ public class EbMSMessageUtils
 		fault.setFaultcode(new QName("http://schemas.xmlsoap.org/soap/envelope/","Server"));
 		fault.setFaultstring(e.getMessage());
 		//fault.setDetail(new Detail());
-		//fault.getDetail().getAny().add(new JAXBElement<String>(new QName("","String"),String.class,ExceptionUtils.getStackTrace(e)));
-		envelope.getBody().getAny().add(new JAXBElement<Fault>(new QName("http://schemas.xmlsoap.org/soap/envelope/","Fault"),Fault.class,fault));
+		//JAXBElement<String> f = new JAXBElement<String>(new QName("","String"),String.class,ExceptionUtils.getStackTrace(e));
+		//fault.getDetail().getAny().add(f);
+		JAXBElement<Fault> f = new JAXBElement<Fault>(new QName("http://schemas.xmlsoap.org/soap/envelope/","Fault"),Fault.class,fault);
+		envelope.getBody().getAny().add(f);
 
 		return DOMUtils.getDocumentBuilder().parse(new ByteArrayInputStream(XMLMessageBuilder.getInstance(Envelope.class).handle(new JAXBElement<Envelope>(new QName("http://schemas.xmlsoap.org/soap/envelope/","Envelope"),Envelope.class,envelope)).getBytes()));
 	}

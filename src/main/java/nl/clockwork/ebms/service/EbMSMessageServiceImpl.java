@@ -21,6 +21,7 @@ import java.util.List;
 import javax.xml.transform.TransformerFactoryConfigurationError;
 
 import nl.clockwork.ebms.Constants;
+import nl.clockwork.ebms.StreamUtils;
 import nl.clockwork.ebms.Constants.EbMSAction;
 import nl.clockwork.ebms.Constants.EbMSMessageEventType;
 import nl.clockwork.ebms.Constants.EbMSMessageStatus;
@@ -75,7 +76,11 @@ public class EbMSMessageServiceImpl implements InitializingBean, EbMSMessageServ
 		{
 			ebMSMessageContextValidator.validate(cpaId,fromParty,toParty);
 			EbMSMessage request = ebMSMessageFactory.createEbMSPing(cpaId,fromParty,toParty);
-			EbMSMessage response = deliveryManager.sendMessage(cpaManager.getUri(cpaId,new CacheablePartyId(request.getMessageHeader().getTo().getPartyId()),request.getMessageHeader().getTo().getRole(),CPAUtils.toString(request.getMessageHeader().getService()),request.getMessageHeader().getAction()),request);
+			MessageHeader requestMessageHeader = request.getMessageHeader();
+			CacheablePartyId toPartyId = new CacheablePartyId(requestMessageHeader.getTo().getPartyId());
+			String service = CPAUtils.toString(requestMessageHeader.getService());
+			String uri = cpaManager.getUri(cpaId,toPartyId,requestMessageHeader.getTo().getRole(),service,requestMessageHeader.getAction());
+			EbMSMessage response = deliveryManager.sendMessage(uri,request);
 			if (response != null)
 			{
 				if (!EbMSAction.PONG.action().equals(response.getMessageHeader().getAction()))
@@ -224,12 +229,26 @@ public class EbMSMessageServiceImpl implements InitializingBean, EbMSMessageServ
 							throw new EbMSMessageServiceException("Message with messageId " + messageId + " is an EbMS service message!");
 						else
 						{
-							EbMSMessage request = ebMSMessageFactory.createEbMSStatusRequest(mc.getCpaId(),cpaManager.getFromParty(mc.getCpaId(),mc.getFromRole(),mc.getService(),mc.getAction()),cpaManager.getToParty(mc.getCpaId(),mc.getToRole(),mc.getService(),mc.getAction()),messageId);
-							EbMSMessage response = deliveryManager.sendMessage(cpaManager.getUri(mc.getCpaId(),new CacheablePartyId(request.getMessageHeader().getTo().getPartyId()),request.getMessageHeader().getTo().getRole(),CPAUtils.toString(request.getMessageHeader().getService()),request.getMessageHeader().getAction()),request);
+							Party fromParty = cpaManager.getFromParty(mc.getCpaId(),mc.getFromRole(),mc.getService(),mc.getAction())
+									.orElseThrow(() -> StreamUtils.illegalStateException("FromParty",mc.getCpaId(),mc.getFromRole(),mc.getService(),mc.getAction()));
+							Party toParty = cpaManager.getToParty(mc.getCpaId(),mc.getToRole(),mc.getService(),mc.getAction())
+									.orElseThrow(() -> StreamUtils.illegalStateException("ToParty",mc.getCpaId(),mc.getToRole(),mc.getService(),mc.getAction()));
+							EbMSMessage request = ebMSMessageFactory.createEbMSStatusRequest(mc.getCpaId(),fromParty,toParty,messageId);
+							String uri = cpaManager.getUri(
+									mc.getCpaId(),
+									new CacheablePartyId(request.getMessageHeader().getTo().getPartyId()),
+									request.getMessageHeader().getTo().getRole(),
+									CPAUtils.toString(request.getMessageHeader().getService()),
+									request.getMessageHeader().getAction());
+							EbMSMessage response = deliveryManager.sendMessage(uri,request);
 							if (response != null)
 							{
 								if (EbMSAction.STATUS_RESPONSE.action().equals(response.getMessageHeader().getAction()) && response.getStatusResponse() != null)
-									return new MessageStatus(response.getStatusResponse().getTimestamp() == null ? null : response.getStatusResponse().getTimestamp(),EbMSMessageStatus.get(response.getStatusResponse().getMessageStatus()));
+								{
+									Date timestamp = response.getStatusResponse().getTimestamp() == null ? null : response.getStatusResponse().getTimestamp();
+									EbMSMessageStatus status = EbMSMessageStatus.get(response.getStatusResponse().getMessageStatus());
+									return new MessageStatus(timestamp,status);
+								}
 								else
 									throw new EbMSMessageServiceException("No valid response received!");
 							}
@@ -253,11 +272,19 @@ public class EbMSMessageServiceImpl implements InitializingBean, EbMSMessageServ
 		{
 			ebMSMessageContextValidator.validate(cpaId,fromParty,toParty);
 			EbMSMessage request = ebMSMessageFactory.createEbMSStatusRequest(cpaId,fromParty,toParty,messageId);
-			EbMSMessage response = deliveryManager.sendMessage(cpaManager.getUri(cpaId,new CacheablePartyId(request.getMessageHeader().getTo().getPartyId()),request.getMessageHeader().getTo().getRole(),CPAUtils.toString(request.getMessageHeader().getService()),request.getMessageHeader().getAction()),request);
+			MessageHeader requestMessageHeader = request.getMessageHeader();
+			CacheablePartyId toPartyId = new CacheablePartyId(requestMessageHeader.getTo().getPartyId());
+			String service = CPAUtils.toString(requestMessageHeader.getService());
+			String uri = cpaManager.getUri(cpaId,toPartyId,requestMessageHeader.getTo().getRole(),service,requestMessageHeader.getAction());
+			EbMSMessage response = deliveryManager.sendMessage(uri,request);
 			if (response != null)
 			{
 				if (EbMSAction.STATUS_RESPONSE.action().equals(response.getMessageHeader().getAction()) && response.getStatusResponse() != null)
-					return new MessageStatus(response.getStatusResponse().getTimestamp() == null ? null : response.getStatusResponse().getTimestamp(),EbMSMessageStatus.get(response.getStatusResponse().getMessageStatus()));
+				{
+					Date timestamp = response.getStatusResponse().getTimestamp() == null ? null : response.getStatusResponse().getTimestamp();
+					EbMSMessageStatus status = EbMSMessageStatus.get(response.getStatusResponse().getMessageStatus());
+					return new MessageStatus(timestamp,status);
+				}
 				else
 					throw new EbMSMessageServiceException("No valid response received!");
 			}
@@ -345,10 +372,24 @@ public class EbMSMessageServiceImpl implements InitializingBean, EbMSMessageServ
 			public void doInTransaction()
 			{
 				Date timestamp = new Date();
-				MessageHeader rmh = result.getMessageHeader();
-				DeliveryChannel deliveryChannel = cpaManager.getReceiveDeliveryChannel(result.getMessageHeader().getCPAId(),new CacheablePartyId(result.getMessageHeader().getTo().getPartyId()),rmh.getTo().getRole(),CPAUtils.toString(rmh.getService()),rmh.getAction());
+				MessageHeader messageHeader = result.getMessageHeader();
+				MessageHeader rmh = messageHeader;
+				CacheablePartyId toPartyId = new CacheablePartyId(messageHeader.getTo().getPartyId());
+				String service = CPAUtils.toString(rmh.getService());
+				DeliveryChannel deliveryChannel =
+						cpaManager.getReceiveDeliveryChannel(messageHeader.getCPAId(),toPartyId,rmh.getTo().getRole(),service,rmh.getAction())
+						.orElseThrow(() ->
+						StreamUtils.illegalStateException("ReceiveDeliveryChannel",messageHeader.getCPAId(),toPartyId,rmh.getTo().getRole(),service,rmh.getAction()));
 				ebMSDAO.insertMessage(timestamp,CPAUtils.getPersistTime(timestamp,deliveryChannel),result,EbMSMessageStatus.SENDING);
-				eventManager.createEvent(rmh.getCPAId(),deliveryChannel,rmh.getMessageData().getMessageId(),rmh.getMessageData().getTimeToLive(),rmh.getMessageData().getTimestamp(),cpaManager.isConfidential(rmh.getCPAId(),new CacheablePartyId(rmh.getFrom().getPartyId()),rmh.getFrom().getRole(),CPAUtils.toString(rmh.getService()),rmh.getAction()));
+				CacheablePartyId fromPartyId = new CacheablePartyId(rmh.getFrom().getPartyId());
+				boolean confidential = cpaManager.isConfidential(rmh.getCPAId(),fromPartyId,rmh.getFrom().getRole(),service,rmh.getAction());
+				eventManager.createEvent(
+						rmh.getCPAId(),
+						deliveryChannel,
+						rmh.getMessageData().getMessageId(),
+						rmh.getMessageData().getTimeToLive(),
+						rmh.getMessageData().getTimestamp(),
+						confidential);
 			}
 		});
 		return result.getMessageHeader().getMessageData().getMessageId();
