@@ -31,6 +31,7 @@ import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.EncryptionAlgorit
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.MessageOrderSemanticsType;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.PartyInfo;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.PerMessageCharacteristicsType;
+import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.StatusValueType;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.SyncReplyModeType;
 
 import nl.clockwork.ebms.Constants;
@@ -69,7 +70,7 @@ public class CPAValidator
 	{
 		if (!"2_0b".equals(cpa.getVersion()))
 			logger.warn("CPA version " + cpa.getVersion() + " detected! CPA version 2_0b expected.");
-		if ("proposed".equals(cpa.getStatus()))
+		if (StatusValueType.PROPOSED.equals(cpa.getStatus().getValue()))
 			throw new ValidationException("CPA Status is proposed!");
 		if (!cpa.getStart().before(cpa.getEnd()))
 			throw new ValidationException("CPA Start date not before End date!");
