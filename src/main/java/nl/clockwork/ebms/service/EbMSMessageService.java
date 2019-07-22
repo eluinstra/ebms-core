@@ -35,50 +35,149 @@ import nl.clockwork.ebms.model.Party;
 @WebService(targetNamespace="http://www.ordina.nl/ebms/2.15")
 public interface EbMSMessageService
 {
+	/**
+	 * Performs an EbMS ping action for CPA cpaId from party fromParty to party toParty
+	 * 
+	 * @param cpaId
+	 * @param fromParty
+	 * @param toParty
+	 * @throws EbMSMessageServiceException
+	 */
 	@WebMethod(operationName="Ping")
 	void ping(@WebParam(name="CPAId") @XmlElement(required=true) String cpaId, @WebParam(name="FromParty") @XmlElement(required=true) Party fromParty, @WebParam(name="ToParty") @XmlElement(required=true) Party toParty) throws EbMSMessageServiceException;
-	
+
+	/**
+	 * Sends the message content messageContent as an EbMS message
+	 * 
+	 * @param messageContent
+	 * @return The messageId of the EbMS message
+	 * @throws EbMSMessageServiceException
+	 */
 	@WebResult(name="MessageId")
 	@WebMethod(operationName="SendMessage")
 	String sendMessage(@WebParam(name="Message") @XmlElement(required=true) EbMSMessageContent messageContent) throws EbMSMessageServiceException;
 
+	/**
+	 * Sends the message content message as an EbMS message. The attachments are attached as SOAP attachments
+	 * 
+	 * @param message
+	 * @return The messageId of the EbMS message
+	 * @throws EbMSMessageServiceException
+	 */
 	@WebResult(name="MessageId")
 	@WebMethod(operationName="SendMessageWithAttachments")
 	String sendMessageWithAttachments(@WebParam(name="Message") @XmlElement(required=true) EbMSMessageAttachment message) throws EbMSMessageServiceException;
 
+	/**
+	 * Resends the content of message messageId as an EbMS message
+	 * 
+	 * @param messageId
+	 * @return The messageId of the EbMS message
+	 * @throws EbMSMessageServiceException
+	 */
 	@WebResult(name="MessageId")
 	@WebMethod(operationName="ResendMessage")
 	String resendMessage(@WebParam(name="MessageId") @XmlElement(required=true) String messageId) throws EbMSMessageServiceException;
 
+	/**
+	 * Gets all messageIds of messages with the RECEIVED status that satisfy the filter messageContext. If maxNr is given, then maxNr messageIds are returned
+	 * 
+	 * @param messageContext
+	 * @param maxNr
+	 * @return The list of messageIds
+	 * @throws EbMSMessageServiceException
+	 */
 	@WebResult(name="MessageIds")
 	@WebMethod(operationName="GetMessageIds")
 	List<String> getMessageIds(@WebParam(name="MessageContext") @XmlElement(required=true) EbMSMessageContext messageContext, @WebParam(name="MaxNr") Integer maxNr) throws EbMSMessageServiceException;
 
+	/**
+	 * Gets the message content of messageId. If process is true, the message is given the status PROCESSED, which means that it is no longer returned in the list of getMessageIds
+	 * 
+	 * @param messageId
+	 * @param process
+	 * @return The message
+	 * @throws EbMSMessageServiceException
+	 */
 	@WebResult(name="Message")
 	@WebMethod(operationName="GetMessage")
 	EbMSMessageContent getMessage(@WebParam(name="MessageId") @XmlElement(required=true) String messageId, @WebParam(name="Process") Boolean process) throws EbMSMessageServiceException;
 
+	/**
+	 * Sets the status of the message messageId to PROCESSED, so that it is no longer returned in the list of getMessageIds
+	 * 
+	 * @param messageId
+	 * @throws EbMSMessageServiceException
+	 */
 	@WebMethod(operationName="ProcessMessage")
 	void processMessage(@WebParam(name="MessageId") @XmlElement(required=true) String messageId) throws EbMSMessageServiceException;
 
+	/**
+	 * Sets the statuses of the message list messageIds to PROCESSED, so that they are no longer returned in the list of getMessageIds
+	 * 
+	 * @param messageIds
+	 * @throws EbMSMessageServiceException
+	 */
 	@WebMethod(operationName="ProcessMessages")
 	void processMessages(@WebParam(name="MessageId") @XmlElement(required=true) List<String> messageIds) throws EbMSMessageServiceException;
 
+	/**
+	 * Gets the message status of message messageId
+	 * 
+	 * @param messageId
+	 * @return The message status
+	 * @throws EbMSMessageServiceException
+	 */
 	@WebResult(name="MessageStatus")
 	@WebMethod(operationName="GetMessageStatusByMessageId")
 	MessageStatus getMessageStatus(@WebParam(name="MessageId") @XmlElement(required=true) String messageId) throws EbMSMessageServiceException;
 
+	/**
+	 * Gets the message status of message messageId for CPA id cpaId, from party fromParty and to party toParty
+	 * 
+	 * @param cpaId
+	 * @param fromParty
+	 * @param toParty
+	 * @param messageId
+	 * @return The message status
+	 * @throws EbMSMessageServiceException
+	 */
 	@WebResult(name="MessageStatus")
 	@WebMethod(operationName="GetMessageStatus")
 	MessageStatus getMessageStatus(@WebParam(name="CPAId") @XmlElement(required=true) String cpaId, @WebParam(name="FromParty") @XmlElement(required=true) Party fromParty, @WebParam(name="ToParty") @XmlElement(required=true) Party toParty, @WebParam(name="MessageId") @XmlElement(required=true) String messageId) throws EbMSMessageServiceException;
 
+	/**
+	 * Gets the events that satisfy the messageContext filter and the eventTypes eventTypes. If maxNr is included, then maxNr events are returned. The possible event types are:
+	 * - RECEIVED – when a message is received
+	 * - DELIVERED – if a message has been sent successfully
+	 * - FAILED – if a message returns an error while sending
+	 * - EXPIRED – if a message could not be sent within the number of attempts and time agreed in the CPA
+	 * 
+	 * @param messageContext
+	 * @param eventTypes
+	 * @param maxNr
+	 * @return The list of events
+	 * @throws EbMSMessageServiceException
+	 */
 	@WebResult(name="MessageEvents")
 	@WebMethod(operationName="GetMessageEvents")
 	List<EbMSMessageEvent> getMessageEvents(@WebParam(name="MessageContext") @XmlElement(required=true) EbMSMessageContext messageContext, @WebParam(name="EventType") @XmlElement(required=true) EbMSMessageEventType[] eventTypes, @WebParam(name="MaxNr") Integer maxNr) throws EbMSMessageServiceException;
 
+	/**
+	 * Sets processed to true for event with message id messageId, so that it is no longer returned in the list of getMessageEvents (and getMessageIds)
+	 * 
+	 * @param messageId
+	 * @throws EbMSMessageServiceException
+	 */
 	@WebMethod(operationName="ProcessMessageEvent")
 	void processMessageEvent(@WebParam(name="MessageId") @XmlElement(required=true) String messageId) throws EbMSMessageServiceException;
 
+	/**
+	 * See processMessageEvent, but then for a list of messageIds
+	 * 
+	 * @param messageIds
+	 * @throws EbMSMessageServiceException
+	 */
 	@WebMethod(operationName="ProcessMessageEvents")
 	void processMessageEvents(@WebParam(name="MessageId") @XmlElement(required=true) List<String> messageIds) throws EbMSMessageServiceException;
 }
