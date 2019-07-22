@@ -22,7 +22,7 @@ import javax.xml.bind.JAXBException;
 import nl.clockwork.ebms.common.CPAManager;
 import nl.clockwork.ebms.common.InvalidURLException;
 import nl.clockwork.ebms.common.URLManager;
-import nl.clockwork.ebms.common.XMLMessageBuilder;
+import nl.clockwork.ebms.common.JAXBParser;
 import nl.clockwork.ebms.dao.DAOException;
 import nl.clockwork.ebms.model.URLMapping;
 import nl.clockwork.ebms.validation.CPAValidator;
@@ -55,7 +55,7 @@ public class CPAServiceImpl implements CPAService
 		try
 		{
 			xsdValidator.validate(cpa);
-			CollaborationProtocolAgreement cpa_ = XMLMessageBuilder.getInstance(CollaborationProtocolAgreement.class).handle(cpa);
+			CollaborationProtocolAgreement cpa_ = JAXBParser.getInstance(CollaborationProtocolAgreement.class).handle(cpa);
 			cpaValidator.validate(cpa_);
 		}
 		catch (JAXBException | ValidatorException e)
@@ -71,7 +71,7 @@ public class CPAServiceImpl implements CPAService
 		try
 		{
 			xsdValidator.validate(cpa);
-			CollaborationProtocolAgreement cpa_ = XMLMessageBuilder.getInstance(CollaborationProtocolAgreement.class).handle(cpa);
+			CollaborationProtocolAgreement cpa_ = JAXBParser.getInstance(CollaborationProtocolAgreement.class).handle(cpa);
 			CPAValidator currentValidator = new CPAValidator(cpaManager);
 			currentValidator.validate(cpa_);
 			synchronized (cpaMonitor)
@@ -133,7 +133,7 @@ public class CPAServiceImpl implements CPAService
 	{
 		try
 		{
-			return XMLMessageBuilder.getInstance(CollaborationProtocolAgreement.class).handle(cpaManager.getCPA(cpaId).orElse(null));
+			return JAXBParser.getInstance(CollaborationProtocolAgreement.class).handle(cpaManager.getCPA(cpaId).orElse(null));
 		}
 		catch (DAOException | JAXBException e)
 		{

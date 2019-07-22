@@ -351,7 +351,7 @@ public class EbMSMessageFactory
 				.orElseThrow(() -> StreamUtils.illegalStateException("DefaultDeliveryChannel",cpaId,partyId,action.action()));
 		String hostname = CPAUtils.getHostname(deliveryChannel);
 
-		MessageHeader result = XMLMessageBuilder.deepCopy(messageHeader);
+		MessageHeader result = JAXBParser.deepCopy(messageHeader);
 
 		result.getFrom().getPartyId().clear();
 		result.getFrom().getPartyId().addAll(messageHeader.getTo().getPartyId());

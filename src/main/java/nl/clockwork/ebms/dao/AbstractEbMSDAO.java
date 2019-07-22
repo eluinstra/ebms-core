@@ -61,7 +61,7 @@ import nl.clockwork.ebms.Constants.EbMSMessageEventType;
 import nl.clockwork.ebms.Constants.EbMSMessageStatus;
 import nl.clockwork.ebms.ThrowingConsumer;
 import nl.clockwork.ebms.ThrowingFunction;
-import nl.clockwork.ebms.common.XMLMessageBuilder;
+import nl.clockwork.ebms.common.JAXBParser;
 import nl.clockwork.ebms.common.util.DOMUtils;
 import nl.clockwork.ebms.model.EbMSAttachment;
 import nl.clockwork.ebms.model.EbMSDataSource;
@@ -143,7 +143,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 				String.class,
 				cpaId
 			);
-			return Optional.of(XMLMessageBuilder.getInstance(CollaborationProtocolAgreement.class).handle(result));
+			return Optional.of(JAXBParser.getInstance(CollaborationProtocolAgreement.class).handle(result));
 		}
 		catch(EmptyResultDataAccessException e)
 		{
@@ -185,7 +185,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 					"cpa" +
 				") values (?,?)",
 				cpa.getCpaid(),
-				XMLMessageBuilder.getInstance(CollaborationProtocolAgreement.class).handle(cpa)
+				JAXBParser.getInstance(CollaborationProtocolAgreement.class).handle(cpa)
 			);
 		}
 		catch (DataAccessException | JAXBException e)
@@ -204,7 +204,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 				"update cpa set" +
 				" cpa = ?" +
 				" where cpa_id = ?",
-				XMLMessageBuilder.getInstance(CollaborationProtocolAgreement.class).handle(cpa),
+				JAXBParser.getInstance(CollaborationProtocolAgreement.class).handle(cpa),
 				cpa.getCpaid()
 			);
 		}

@@ -17,7 +17,7 @@ package nl.clockwork.ebms.validation;
 
 import javax.xml.bind.JAXBException;
 
-import nl.clockwork.ebms.common.XMLMessageBuilder;
+import nl.clockwork.ebms.common.JAXBParser;
 
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.Error;
 
@@ -36,7 +36,7 @@ public class EbMSValidationException extends ValidationException
 	{
 		try
 		{
-			return XMLMessageBuilder.getInstance(Error.class).handle(error);
+			return JAXBParser.getInstance(Error.class).handle(error);
 		}
 		catch (JAXBException e)
 		{

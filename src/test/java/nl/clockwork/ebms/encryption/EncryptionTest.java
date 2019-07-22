@@ -48,7 +48,7 @@ import org.xml.sax.SAXException;
 
 import nl.clockwork.ebms.common.CPAManager;
 import nl.clockwork.ebms.common.EbMSMessageFactory;
-import nl.clockwork.ebms.common.XMLMessageBuilder;
+import nl.clockwork.ebms.common.JAXBParser;
 import nl.clockwork.ebms.common.util.DOMUtils;
 import nl.clockwork.ebms.dao.DAOException;
 import nl.clockwork.ebms.dao.EbMSDAO;
@@ -171,7 +171,7 @@ public class EncryptionTest
 	private Optional<CollaborationProtocolAgreement> loadCPA(String cpaId) throws IOException, JAXBException
 	{
 		String s = IOUtils.toString(this.getClass().getResourceAsStream("/nl/clockwork/ebms/cpa/" + cpaId + ".xml"),Charset.forName("UTF-8"));
-		return Optional.of(XMLMessageBuilder.getInstance(CollaborationProtocolAgreement.class).handle(s));
+		return Optional.of(JAXBParser.getInstance(CollaborationProtocolAgreement.class).handle(s));
 	}
 
 	private EbMSMessageFactory initMessageFactory(CPAManager cpaManager)

@@ -37,12 +37,12 @@ import org.w3c.dom.Node;
 
 import com.sun.xml.bind.marshaller.NamespacePrefixMapper;
 
-public class XMLMessageBuilder<T>
+public class JAXBParser<T>
 {
-	private static HashMap<Class<?>,XMLMessageBuilder<?>> xmlHandlers = new HashMap<Class<?>,XMLMessageBuilder<?>>();
+	private static HashMap<Class<?>,JAXBParser<?>> xmlHandlers = new HashMap<Class<?>,JAXBParser<?>>();
 	private JAXBContext context;
 
-	private XMLMessageBuilder(JAXBContext context)
+	private JAXBParser(JAXBContext context)
 	{
 		this.context = context;
 	}
@@ -221,25 +221,25 @@ public class XMLMessageBuilder<T>
 	}
 
 	@SuppressWarnings("unchecked")
-	public static <L> XMLMessageBuilder<L> getInstance(Class<L> clazz) throws JAXBException
+	public static <L> JAXBParser<L> getInstance(Class<L> clazz) throws JAXBException
 	{
 		if (xmlHandlers.get(clazz) == null)
 		{
 			JAXBContext context = JAXBContext.newInstance(clazz);
-			xmlHandlers.put(clazz,new XMLMessageBuilder<L>(context));
+			xmlHandlers.put(clazz,new JAXBParser<L>(context));
 		}
-		return (XMLMessageBuilder<L>)xmlHandlers.get(clazz);
+		return (JAXBParser<L>)xmlHandlers.get(clazz);
 	}
 
 	@SuppressWarnings("unchecked")
-	public static <L> XMLMessageBuilder<L> getInstance(Class<L> clazz, Class<?>...clazzes) throws JAXBException
+	public static <L> JAXBParser<L> getInstance(Class<L> clazz, Class<?>...clazzes) throws JAXBException
 	{
 		if (xmlHandlers.get(clazz) == null)
 		{
 			JAXBContext context = JAXBContext.newInstance(clazzes);
-			xmlHandlers.put(clazz,new XMLMessageBuilder<L>(context));
+			xmlHandlers.put(clazz,new JAXBParser<L>(context));
 		}
-		return (XMLMessageBuilder<L>)xmlHandlers.get(clazz);
+		return (JAXBParser<L>)xmlHandlers.get(clazz);
 	}
 
 	@SuppressWarnings("unchecked")

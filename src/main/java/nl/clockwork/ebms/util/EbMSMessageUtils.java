@@ -62,7 +62,7 @@ import com.sun.xml.bind.marshaller.NamespacePrefixMapper;
 import nl.clockwork.ebms.Constants;
 import nl.clockwork.ebms.Constants.EbMSErrorCode;
 import nl.clockwork.ebms.Constants.EbMSMessageStatus;
-import nl.clockwork.ebms.common.XMLMessageBuilder;
+import nl.clockwork.ebms.common.JAXBParser;
 import nl.clockwork.ebms.common.util.DOMUtils;
 import nl.clockwork.ebms.model.EbMSAttachment;
 import nl.clockwork.ebms.model.EbMSDocument;
@@ -90,7 +90,7 @@ public class EbMSMessageUtils
 		result.setMessage(document);
 		result.setAttachments(attachments);
 
-		XMLMessageBuilder<Envelope> messageBuilder = XMLMessageBuilder.getInstance(
+		JAXBParser<Envelope> messageBuilder = JAXBParser.getInstance(
 				Envelope.class,
 				Envelope.class,
 				MessageHeader.class,
@@ -255,7 +255,7 @@ public class EbMSMessageUtils
 		envelope.getBody().getAny().add(ebMSMessage.getStatusRequest());
 		envelope.getBody().getAny().add(ebMSMessage.getStatusResponse());
 		
-		XMLMessageBuilder<Envelope> messageBuilder = XMLMessageBuilder.getInstance(
+		JAXBParser<Envelope> messageBuilder = JAXBParser.getInstance(
 				Envelope.class,
 				Envelope.class,
 				MessageHeader.class,
@@ -280,7 +280,7 @@ public class EbMSMessageUtils
 	{
 		try
 		{
-			Envelope envelope = XMLMessageBuilder.getInstance(Envelope.class).handle(s);
+			Envelope envelope = JAXBParser.getInstance(Envelope.class).handle(s);
 			if (envelope != null)
 				return getSOAPFault(envelope);
 		}
@@ -315,7 +315,7 @@ public class EbMSMessageUtils
 		JAXBElement<Fault> f = new JAXBElement<Fault>(new QName("http://schemas.xmlsoap.org/soap/envelope/","Fault"),Fault.class,fault);
 		envelope.getBody().getAny().add(f);
 
-		return DOMUtils.getDocumentBuilder().parse(new ByteArrayInputStream(XMLMessageBuilder.getInstance(Envelope.class).handle(new JAXBElement<Envelope>(new QName("http://schemas.xmlsoap.org/soap/envelope/","Envelope"),Envelope.class,envelope)).getBytes()));
+		return DOMUtils.getDocumentBuilder().parse(new ByteArrayInputStream(JAXBParser.getInstance(Envelope.class).handle(new JAXBElement<Envelope>(new QName("http://schemas.xmlsoap.org/soap/envelope/","Envelope"),Envelope.class,envelope)).getBytes()));
 	}
 	
 	public static void setOraclePatch(boolean oraclePatch)
