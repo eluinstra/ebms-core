@@ -115,10 +115,10 @@ public class EbMSMessageContextValidator
 				msg.append(", context.action=").append(context.getAction());
 				throw new ValidationException(msg.toString());
 			}
-			//else if (toPartyInfo != null && toPartyInfo1 != null && toPartyInfo.getCanReceive().getThisPartyActionBinding() != toPartyInfo1.getCanReceive().getThisPartyActionBinding())
+			//else if (toPartyInfo != null && toPartyInfo1 != null && !toPartyInfo.getCanReceive().getThisPartyActionBinding().equals(toPartyInfo1.getCanReceive().getThisPartyActionBinding()))
 			else if (fromPartyInfo.get().getCanSend().getOtherPartyActionBinding() != null
 					&& toPartyInfo.isPresent()
-					&& fromPartyInfo.get().getCanSend().getOtherPartyActionBinding() != toPartyInfo.get().getCanReceive().getThisPartyActionBinding())
+					&& !fromPartyInfo.get().getCanSend().getOtherPartyActionBinding().equals(toPartyInfo.get().getCanReceive().getThisPartyActionBinding()))
 			{
 				StringBuffer msg = new StringBuffer();
 				msg.append("Action for to party does not match action for from party for:");
