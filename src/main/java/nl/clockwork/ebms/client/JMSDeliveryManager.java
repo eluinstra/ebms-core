@@ -16,6 +16,7 @@
 package nl.clockwork.ebms.client;
 
 import java.io.IOException;
+import java.util.Optional;
 
 import javax.jms.JMSException;
 import javax.jms.Message;
@@ -46,7 +47,7 @@ public class JMSDeliveryManager extends DeliveryManager //DeliveryService
 	private JmsTemplate jmsTemplate;
 
 	@Override
-	public EbMSMessage sendMessage(final String uri, final EbMSMessage message) throws EbMSProcessorException
+	public Optional<EbMSMessage> sendMessage(final String uri, final EbMSMessage message) throws EbMSProcessorException
 	{
 		try
 		{
@@ -57,19 +58,19 @@ public class JMSDeliveryManager extends DeliveryManager //DeliveryService
 				if (document == null)
 				{
 					jmsTemplate.setReceiveTimeout(3 * Constants.MINUTE_IN_MILLIS);
-					return (EbMSMessage)jmsTemplate.receiveSelectedAndConvert(MESSAGE,"JMSCorrelationID='" + message.getMessageHeader().getMessageData().getMessageId() + "'");
+					return Optional.ofNullable((EbMSMessage)jmsTemplate.receiveSelectedAndConvert(MESSAGE,"JMSCorrelationID='" + message.getMessageHeader().getMessageData().getMessageId() + "'"));
 				}
 				else
-					return EbMSMessageUtils.getEbMSMessage(document);
+					return Optional.of(EbMSMessageUtils.getEbMSMessage(document));
 			}
 			else
 			{
 				logger.info("Sending message " + message.getMessageHeader().getMessageData().getMessageId() + " to " + uri);
 				EbMSDocument response = ebMSClient.sendMessage(uri,EbMSMessageUtils.getEbMSDocument(message));
 				if (response != null)
-					return EbMSMessageUtils.getEbMSMessage(response);
+					return Optional.of(EbMSMessageUtils.getEbMSMessage(response));
 			}
-			return null;
+			return Optional.empty();
 		}
 		catch (SOAPException | JAXBException | SAXException | IOException | TransformerException e)
 		{

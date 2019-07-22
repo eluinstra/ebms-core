@@ -130,19 +130,19 @@ public class CPAManager
 	
 	public Optional<Party> getFromParty(String cpaId, Role fromRole, String service, String action)
 	{
-		return Optional.of(fromRole.getPartyId() == null ? 
-				CPAUtils.toString(getFromPartyInfo(cpaId,fromRole,service,action)
-						.orElseThrow(() -> StreamUtils.illegalStateException("FromPartyInfo",cpaId,fromRole,service,action)).getPartyIds().get(0)) : 
-							fromRole.getPartyId())
+		String partyId = fromRole.getPartyId() == null ? CPAUtils.toString(getFromPartyInfo(cpaId,fromRole,service,action)
+				.orElseThrow(() -> StreamUtils.illegalStateException("FromPartyInfo",cpaId,fromRole,service,action)).getPartyIds().get(0)) :
+					fromRole.getPartyId();
+		return Optional.of(partyId)
 			.map(id -> new Party(id,fromRole.getRole()));
 	}
 	
 	public Optional<Party> getToParty(String cpaId, Role toRole, String service, String action)
 	{
-		return Optional.of(toRole.getPartyId() == null ?
-				CPAUtils.toString(getToPartyInfo(cpaId,toRole,service,action)
-						.orElseThrow(() -> StreamUtils.illegalStateException("ToPartyInfo",cpaId,toRole,service,action)).getPartyIds().get(0)) :
-							toRole.getPartyId())
+		String partyId = toRole.getPartyId() == null ? CPAUtils.toString(getToPartyInfo(cpaId,toRole,service,action)
+				.orElseThrow(() -> StreamUtils.illegalStateException("ToPartyInfo",cpaId,toRole,service,action)).getPartyIds().get(0)) :
+					toRole.getPartyId();
+		return Optional.of(partyId)
 				.map(id -> new Party(id,toRole.getRole()));
 	}
 	

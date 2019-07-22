@@ -17,6 +17,7 @@ package nl.clockwork.ebms.service;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 import javax.xml.transform.TransformerFactoryConfigurationError;
 
@@ -80,14 +81,15 @@ public class EbMSMessageServiceImpl implements InitializingBean, EbMSMessageServ
 			CacheablePartyId toPartyId = new CacheablePartyId(requestMessageHeader.getTo().getPartyId());
 			String service = CPAUtils.toString(requestMessageHeader.getService());
 			String uri = cpaManager.getUri(cpaId,toPartyId,requestMessageHeader.getTo().getRole(),service,requestMessageHeader.getAction());
-			EbMSMessage response = deliveryManager.sendMessage(uri,request);
-			if (response != null)
-			{
-				if (!EbMSAction.PONG.action().equals(response.getMessageHeader().getAction()))
-					throw new EbMSMessageServiceException("No valid response received!");
-			}
-			else
-				throw new EbMSMessageServiceException("No response received!");
+			Optional<EbMSMessage> response = deliveryManager.sendMessage(uri,request);
+			StreamUtils.ifPresentOrElse(
+					response,
+					r ->
+					{
+						if (!EbMSAction.PONG.action().equals(r.getMessageHeader().getAction()))
+							throw new EbMSMessageServiceException("No valid response received!");
+					},
+					() -> new EbMSMessageServiceException("No response received!"));
 		}
 		catch (ValidationException | EbMSProcessorException e)
 		{
@@ -240,20 +242,19 @@ public class EbMSMessageServiceImpl implements InitializingBean, EbMSMessageServ
 									request.getMessageHeader().getTo().getRole(),
 									CPAUtils.toString(request.getMessageHeader().getService()),
 									request.getMessageHeader().getAction());
-							EbMSMessage response = deliveryManager.sendMessage(uri,request);
-							if (response != null)
+							Optional<EbMSMessage> response = deliveryManager.sendMessage(uri,request);
+							return response.map(r ->
 							{
-								if (EbMSAction.STATUS_RESPONSE.action().equals(response.getMessageHeader().getAction()) && response.getStatusResponse() != null)
+								if (EbMSAction.STATUS_RESPONSE.action().equals(r.getMessageHeader().getAction()) && r.getStatusResponse() != null)
 								{
-									Date timestamp = response.getStatusResponse().getTimestamp() == null ? null : response.getStatusResponse().getTimestamp();
-									EbMSMessageStatus status = EbMSMessageStatus.get(response.getStatusResponse().getMessageStatus());
+									Date timestamp = r.getStatusResponse().getTimestamp() == null ? null : r.getStatusResponse().getTimestamp();
+									EbMSMessageStatus status = EbMSMessageStatus.get(r.getStatusResponse().getMessageStatus());
 									return new MessageStatus(timestamp,status);
 								}
 								else
 									throw new EbMSMessageServiceException("No valid response received!");
-							}
-							else
-								throw new EbMSMessageServiceException("No response received!");
+							})
+							.orElseThrow(() -> new EbMSMessageServiceException("No response received!"));
 						}
 					}))
 					.orElseThrow(() -> new EbMSMessageServiceException("No message found with messageId " + messageId + "!"));
@@ -276,20 +277,19 @@ public class EbMSMessageServiceImpl implements InitializingBean, EbMSMessageServ
 			CacheablePartyId toPartyId = new CacheablePartyId(requestMessageHeader.getTo().getPartyId());
 			String service = CPAUtils.toString(requestMessageHeader.getService());
 			String uri = cpaManager.getUri(cpaId,toPartyId,requestMessageHeader.getTo().getRole(),service,requestMessageHeader.getAction());
-			EbMSMessage response = deliveryManager.sendMessage(uri,request);
-			if (response != null)
+			Optional<EbMSMessage> response = deliveryManager.sendMessage(uri,request);
+			return response.map(r ->
 			{
-				if (EbMSAction.STATUS_RESPONSE.action().equals(response.getMessageHeader().getAction()) && response.getStatusResponse() != null)
+				if (EbMSAction.STATUS_RESPONSE.action().equals(r.getMessageHeader().getAction()) && r.getStatusResponse() != null)
 				{
-					Date timestamp = response.getStatusResponse().getTimestamp() == null ? null : response.getStatusResponse().getTimestamp();
-					EbMSMessageStatus status = EbMSMessageStatus.get(response.getStatusResponse().getMessageStatus());
+					Date timestamp = r.getStatusResponse().getTimestamp() == null ? null : r.getStatusResponse().getTimestamp();
+					EbMSMessageStatus status = EbMSMessageStatus.get(r.getStatusResponse().getMessageStatus());
 					return new MessageStatus(timestamp,status);
 				}
 				else
 					throw new EbMSMessageServiceException("No valid response received!");
-			}
-			else
-				throw new EbMSMessageServiceException("No response received!");
+			})
+			.orElseThrow(() -> new EbMSMessageServiceException("No response received!"));
 		}
 		catch (ValidationException | DAOException | EbMSProcessorException e)
 		{

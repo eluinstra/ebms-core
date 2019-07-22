@@ -16,6 +16,7 @@
 package nl.clockwork.ebms.client;
 
 import java.io.IOException;
+import java.util.Optional;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -72,7 +73,7 @@ public class DeliveryManager implements InitializingBean //DeliveryService
 		executorService = new ThreadPoolExecutor(maxThreads,maxThreads,1,TimeUnit.MINUTES,new ArrayBlockingQueue<Runnable>(maxThreads * queueScaleFactor,true),new ThreadPoolExecutor.CallerRunsPolicy());
 	}
 
-	public EbMSMessage sendMessage(final String uri, final EbMSMessage message) throws EbMSProcessorException
+	public Optional<EbMSMessage> sendMessage(final String uri, final EbMSMessage message) throws EbMSProcessorException
 	{
 		try
 		{
@@ -88,7 +89,7 @@ public class DeliveryManager implements InitializingBean //DeliveryService
 					else
 					{
 						messageQueue.remove(message.getMessageHeader().getMessageData().getMessageId());
-						return EbMSMessageUtils.getEbMSMessage(document);
+						return Optional.of(EbMSMessageUtils.getEbMSMessage(document));
 					}
 				}
 				catch (Exception e)
@@ -102,9 +103,9 @@ public class DeliveryManager implements InitializingBean //DeliveryService
 				logger.info("Sending message " + message.getMessageHeader().getMessageData().getMessageId() + " to " + uri);
 				EbMSDocument response = ebMSClient.sendMessage(uri,EbMSMessageUtils.getEbMSDocument(message));
 				if (response != null)
-					return EbMSMessageUtils.getEbMSMessage(response);
+					return Optional.of(EbMSMessageUtils.getEbMSMessage(response));
 			}
-			return null;
+			return Optional.empty();
 		}
 		catch (SOAPException | JAXBException | SAXException | IOException | TransformerException e)
 		{

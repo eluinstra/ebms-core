@@ -16,6 +16,7 @@
 package nl.clockwork.ebms.common;
 
 import java.util.LinkedHashMap;
+import java.util.Optional;
 
 import org.springframework.beans.factory.InitializingBean;
 
@@ -84,12 +85,12 @@ public class MessageQueue<T> implements InitializingBean
 		}
 	}
 
-	public T get(String correlationId)
+	public Optional<T> get(String correlationId)
 	{
 		return get(correlationId,timeout);
 	}
 
-	public T get(String correlationId, int timeout)
+	public Optional<T> get(String correlationId, int timeout)
 	{
 		try
 		{
@@ -100,11 +101,11 @@ public class MessageQueue<T> implements InitializingBean
 		{
 			// ignore
 		}
-		T result = null;
+		Optional<T> result = Optional.empty();
 		synchronized (queue)
 		{
 			if (queue.containsKey(correlationId))
-				result = queue.remove(correlationId).getObject();
+				result = Optional.ofNullable(queue.remove(correlationId).getObject());
 		}
 		return result;
 	}
