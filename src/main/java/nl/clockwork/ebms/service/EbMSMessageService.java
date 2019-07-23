@@ -36,7 +36,7 @@ import nl.clockwork.ebms.model.Party;
 public interface EbMSMessageService
 {
 	/**
-	 * Performs an EbMS ping action for CPA cpaId from party fromParty to party toParty
+	 * Performs an EbMS ping action for CPA cpaId, from party fromParty and to party toParty
 	 * 
 	 * @param cpaId
 	 * @param fromParty
@@ -50,7 +50,7 @@ public interface EbMSMessageService
 	 * Sends the message content messageContent as an EbMS message
 	 * 
 	 * @param messageContent
-	 * @return The messageId of the EbMS message
+	 * @return The messageId of the generated EbMS message
 	 * @throws EbMSMessageServiceException
 	 */
 	@WebResult(name="MessageId")
@@ -61,7 +61,7 @@ public interface EbMSMessageService
 	 * Sends the message content message as an EbMS message. The attachments are attached as SOAP attachments
 	 * 
 	 * @param message
-	 * @return The messageId of the EbMS message
+	 * @return The messageId of the generated EbMS message
 	 * @throws EbMSMessageServiceException
 	 */
 	@WebResult(name="MessageId")
@@ -69,10 +69,10 @@ public interface EbMSMessageService
 	String sendMessageWithAttachments(@WebParam(name="Message") @XmlElement(required=true) EbMSMessageAttachment message) throws EbMSMessageServiceException;
 
 	/**
-	 * Resends the content of message messageId as an EbMS message
+	 * Resends the content of message identified by messageId as an EbMS message
 	 * 
 	 * @param messageId
-	 * @return The messageId of the EbMS message
+	 * @return The messageId of the generated EbMS message
 	 * @throws EbMSMessageServiceException
 	 */
 	@WebResult(name="MessageId")
@@ -92,11 +92,11 @@ public interface EbMSMessageService
 	List<String> getMessageIds(@WebParam(name="MessageContext") @XmlElement(required=true) EbMSMessageContext messageContext, @WebParam(name="MaxNr") Integer maxNr) throws EbMSMessageServiceException;
 
 	/**
-	 * Gets the message content of messageId. If process is true, the message is given the status PROCESSED, which means that it is no longer returned in the list of getMessageIds
+	 * Gets the message content of the message identified messageId. If process is true, the message is given the status PROCESSED, which means that it is no longer returned in the list of getMessageIds
 	 * 
 	 * @param messageId
 	 * @param process
-	 * @return The message
+	 * @return The messageContent
 	 * @throws EbMSMessageServiceException
 	 */
 	@WebResult(name="Message")
@@ -104,7 +104,7 @@ public interface EbMSMessageService
 	EbMSMessageContent getMessage(@WebParam(name="MessageId") @XmlElement(required=true) String messageId, @WebParam(name="Process") Boolean process) throws EbMSMessageServiceException;
 
 	/**
-	 * Sets the status of the message messageId to PROCESSED, so that it is no longer returned in the list of getMessageIds
+	 * Sets the status of the message identified by messageId to PROCESSED, so that it is no longer returned in the list of getMessageIds
 	 * 
 	 * @param messageId
 	 * @throws EbMSMessageServiceException
@@ -113,7 +113,7 @@ public interface EbMSMessageService
 	void processMessage(@WebParam(name="MessageId") @XmlElement(required=true) String messageId) throws EbMSMessageServiceException;
 
 	/**
-	 * Sets the statuses of the message list messageIds to PROCESSED, so that they are no longer returned in the list of getMessageIds
+	 * see processMessage, but for a list of messageIds
 	 * 
 	 * @param messageIds
 	 * @throws EbMSMessageServiceException
@@ -122,7 +122,7 @@ public interface EbMSMessageService
 	void processMessages(@WebParam(name="MessageId") @XmlElement(required=true) List<String> messageIds) throws EbMSMessageServiceException;
 
 	/**
-	 * Gets the message status of message messageId
+	 * Gets the message status of the message identified by messageId
 	 * 
 	 * @param messageId
 	 * @return The message status
@@ -133,7 +133,7 @@ public interface EbMSMessageService
 	MessageStatus getMessageStatus(@WebParam(name="MessageId") @XmlElement(required=true) String messageId) throws EbMSMessageServiceException;
 
 	/**
-	 * Gets the message status of message messageId for CPA id cpaId, from party fromParty and to party toParty
+	 * Gets the message status of the message identified by messageId for CPA cpaId, from party fromParty and to party toParty
 	 * 
 	 * @param cpaId
 	 * @param fromParty
@@ -164,7 +164,7 @@ public interface EbMSMessageService
 	List<EbMSMessageEvent> getMessageEvents(@WebParam(name="MessageContext") @XmlElement(required=true) EbMSMessageContext messageContext, @WebParam(name="EventType") @XmlElement(required=true) EbMSMessageEventType[] eventTypes, @WebParam(name="MaxNr") Integer maxNr) throws EbMSMessageServiceException;
 
 	/**
-	 * Sets processed to true for event with message id messageId, so that it is no longer returned in the list of getMessageEvents (and getMessageIds)
+	 * Sets processed to true for all the current events for the message identified by messageId, so that it is no longer returned in the list of getMessageEvents (and getMessageIds)
 	 * 
 	 * @param messageId
 	 * @throws EbMSMessageServiceException

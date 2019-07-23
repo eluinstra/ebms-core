@@ -38,7 +38,7 @@ public interface CPAService
 	void validateCPA(@WebParam(name="CPA") @XmlElement(required=true) /*CollaborationProtocolAgreement*/String cpa) throws CPAServiceException;
 
 	/**
-	 * Stores CPA cpa in the database. If overwrite is true and the CPA exists, it will be overwritten
+	 * Stores CPA cpa in the database. If overwrite is true and the CPA exists, the CPA will be overwritten
 	 * 
 	 * @param cpa
 	 * @param overwrite
@@ -50,7 +50,7 @@ public interface CPAService
 	String insertCPA(@WebParam(name="CPA") @XmlElement(required=true) /*CollaborationProtocolAgreement*/String cpa, @WebParam(name="Overwrite") Boolean overwrite) throws CPAServiceException;
 
 	/**
-	 * Removes CPA with CPA id cpaId from the database
+	 * Removes CPA identified by cpaId from the database
 	 * 
 	 * @param cpaId
 	 * @throws CPAServiceException
@@ -59,9 +59,9 @@ public interface CPAService
 	void deleteCPA(@WebParam(name="CPAId") @XmlElement(required=true) String cpaId) throws CPAServiceException;
 
 	/**
-	 * Returns all CPA id's that are stored in the database
+	 * Returns all cpaIds that are stored in the database
 	 * 
-	 * @return The list of CPA id's
+	 * @return The list of cpaIds
 	 * @throws CPAServiceException
 	 */
 	@WebResult(name="CPAIds")
@@ -69,7 +69,7 @@ public interface CPAService
 	List<String> getCPAIds() throws CPAServiceException;
 
 	/**
-	 * Gets the CPA with CPA id cpaId from the database
+	 * Gets the CPA identified by cpaId from the database
 	 * 
 	 * @param cpaId
 	 * @return The CPA
@@ -89,7 +89,7 @@ public interface CPAService
 	void setURLMapping(@WebParam(name="URLMapping") @XmlElement(required=true) URLMapping urlMapping) throws CPAServiceException;
 
 	/**
-	 * Removes URL mapping with source URL source from the database
+	 * Removes URL mapping identified by source URL source from the database
 	 * 
 	 * @param source
 	 * @throws CPAServiceException
