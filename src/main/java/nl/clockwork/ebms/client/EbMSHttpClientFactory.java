@@ -18,11 +18,12 @@ package nl.clockwork.ebms.client;
 import java.util.ArrayList;
 import java.util.List;
 
-import nl.clockwork.ebms.ssl.SSLFactoryManager;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.FactoryBean;
+
+import nl.clockwork.ebms.common.util.Utils;
+import nl.clockwork.ebms.ssl.SSLFactoryManager;
 
 public class EbMSHttpClientFactory implements FactoryBean<EbMSClient>
 {
@@ -111,20 +112,36 @@ public class EbMSHttpClientFactory implements FactoryBean<EbMSClient>
 	{
 		this.verifyHostnames = verifyHostnames;
 	}
-	public void setRecoverableInfromationalHttpErrors(List<Integer> recoverableInfromationalHttpErrors)
+	//public void setRecoverableInfromationalHttpErrors(List<Integer> recoverableInfromationalHttpErrors)
+	//{
+	//	this.recoverableHttpErrors.addAll(recoverableInfromationalHttpErrors);
+	//}
+	public void setRecoverableInfromationalHttpErrors(String recoverableInfromationalHttpErrors)
 	{
-		this.recoverableHttpErrors.addAll(recoverableInfromationalHttpErrors);
+		this.recoverableHttpErrors.addAll(Utils.getIntegerList(recoverableInfromationalHttpErrors));
 	}
-	public void setRecoverableRedirectionHttpErrors(List<Integer> recoverableRedirectionHttpErrors)
+	//public void setRecoverableRedirectionHttpErrors(List<Integer> recoverableRedirectionHttpErrors)
+	//{
+	//	this.recoverableHttpErrors.addAll(recoverableRedirectionHttpErrors);
+	//}
+	public void setRecoverableRedirectionHttpErrors(String recoverableRedirectionHttpErrors)
 	{
-		this.recoverableHttpErrors.addAll(recoverableRedirectionHttpErrors);
+		this.recoverableHttpErrors.addAll(Utils.getIntegerList(recoverableRedirectionHttpErrors));
 	}
-	public void setRecoverableClientHttpErrors(List<Integer> recoverableClientHttpErrors)
+	//public void setRecoverableClientHttpErrors(List<Integer> recoverableClientHttpErrors)
+	//{
+	//	this.recoverableHttpErrors.addAll(recoverableClientHttpErrors);
+	//}
+	public void setRecoverableClientHttpErrors(String recoverableClientHttpErrors)
 	{
-		this.recoverableHttpErrors.addAll(recoverableClientHttpErrors);
+		this.recoverableHttpErrors.addAll(Utils.getIntegerList(recoverableClientHttpErrors));
 	}
-	public void setIrrecoverableServerHttpErrors(List<Integer> irrecoverableServerHttpErrors)
+	//public void setIrrecoverableServerHttpErrors(List<Integer> irrecoverableServerHttpErrors)
+	//{
+	//	this.irrecoverableHttpErrors = irrecoverableServerHttpErrors;
+	//}
+	public void setIrrecoverableServerHttpErrors(String irrecoverableServerHttpErrors)
 	{
-		this.irrecoverableHttpErrors = irrecoverableServerHttpErrors;
+		this.irrecoverableHttpErrors = Utils.getIntegerList(irrecoverableServerHttpErrors);
 	}
 }
