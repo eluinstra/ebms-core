@@ -277,7 +277,9 @@ public class CPAUtils
 					.filter(c -> c instanceof JAXBElement<?> && ((JAXBElement<?>)c).getValue() instanceof X509DataType)
 					.flatMap(c -> ((X509DataType)((JAXBElement<?>)c).getValue()).getX509IssuerSerialOrX509SKIOrX509SubjectName().stream())
 					.filter(n -> n instanceof JAXBElement<?> && "X509Certificate".equals(((JAXBElement<?>)n).getName().getLocalPart()))
-					.map(ThrowingFunction.throwingFunctionWrapper(n -> (X509Certificate)CertificateFactory.getInstance("X.509").generateCertificate(new ByteArrayInputStream((byte[])((JAXBElement<?>)n).getValue()))))
+					.map(ThrowingFunction.throwingFunctionWrapper(
+							n -> (X509Certificate)CertificateFactory.getInstance("X.509").generateCertificate(
+									new ByteArrayInputStream((byte[])((JAXBElement<?>)n).getValue()))))
 					.findFirst()
 					.orElse(null);
 		return null;
