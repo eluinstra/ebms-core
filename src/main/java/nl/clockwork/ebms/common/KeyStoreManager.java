@@ -16,6 +16,7 @@
 package nl.clockwork.ebms.common;
 
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.GeneralSecurityException;
@@ -39,14 +40,22 @@ public class KeyStoreManager
 	private static KeyStore loadKeyStore(String location, String password) throws GeneralSecurityException, IOException
 	{
 		//location = ResourceUtils.getURL(SystemPropertyUtils.resolvePlaceholders(location)).getFile();
-		InputStream in = SecurityUtils.class.getResourceAsStream(location);
-		if (in == null)
-			in = SecurityUtils.class.getResourceAsStream("/" + location);
-		if (in == null)
-			in = new FileInputStream(location);
-		KeyStore keyStore = KeyStore.getInstance("JKS");
-		keyStore.load(in,password.toCharArray());
-		return keyStore;
+		try (InputStream in = getInputStream(location))
+		{
+			KeyStore keyStore = KeyStore.getInstance("JKS");
+			keyStore.load(in,password.toCharArray());
+			return keyStore;
+		}
+	}
+
+	private static InputStream getInputStream(String location) throws FileNotFoundException
+	{
+		InputStream result = SecurityUtils.class.getResourceAsStream(location);
+		if (result == null)
+			result = SecurityUtils.class.getResourceAsStream("/" + location);
+		if (result == null)
+			result = new FileInputStream(location);
+		return result;
 	}
 
 }
