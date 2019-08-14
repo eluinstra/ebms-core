@@ -34,7 +34,7 @@
 		<url>www.clockwork.nl</url>
 	</organization>
 	<properties>
-		<jdk.version>1.7</jdk.version>
+		<jdk.version>1.8</jdk.version>
 		<spring.version>3.2.1.RELEASE</spring.version>
 		<cxf.version>2.7.14</cxf.version>
 		<activemq.version>5.10.0</activemq.version>
