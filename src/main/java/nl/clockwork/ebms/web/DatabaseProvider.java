@@ -16,6 +16,7 @@
 package nl.clockwork.ebms.web;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -47,7 +48,7 @@ public class DatabaseProvider
 					try (Statement s = c.createStatement())
 					{
 						logger.info("Executing file " + sqlFile);
-						s.executeUpdate(IOUtils.toString(DatabaseProvider.class.getResourceAsStream(sqlFile.trim())));
+						s.executeUpdate(IOUtils.toString(DatabaseProvider.class.getResourceAsStream(sqlFile.trim()),Charset.defaultCharset()));
 					}
 				}
 			}
@@ -87,8 +88,8 @@ public class DatabaseProvider
 		this.execute = execute;
 	}
 	
-	public void setSqlFiles(String sqlFiles)
+	public void setSqlFiles(String[] sqlFiles)
 	{
-		this.sqlFiles = sqlFiles.split(",");
+		this.sqlFiles = sqlFiles;
 	}
 }
