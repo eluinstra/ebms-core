@@ -19,7 +19,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
-import org.ehcache.core.Ehcache;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CanSend;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CollaborationProtocolAgreement;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DeliveryChannel;
@@ -29,6 +28,7 @@ import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.PersistenceLevelT
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.StatusValueType;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.SyncReplyModeType;
 
+import net.sf.ehcache.Ehcache;
 import nl.clockwork.ebms.Constants;
 import nl.clockwork.ebms.StreamUtils;
 import nl.clockwork.ebms.dao.EbMSDAO;
@@ -42,7 +42,7 @@ import nl.clockwork.ebms.util.CPAUtils;
 
 public class CPAManager
 {
-	private Ehcache<String,Object> methodCache;
+	private Ehcache methodCache;
 	private EbMSDAO ebMSDAO;
 	private URLManager urlManager;
 
@@ -345,7 +345,7 @@ public class CPAManager
 		methodCache.remove(MethodCacheInterceptor.getCacheKey("EbMSDAOImpl","getCPAIds"));
 	}
 
-	public void setMethodCache(Ehcache<String,Object> methodCache)
+	public void setMethodCache(Ehcache methodCache)
 	{
 		this.methodCache = methodCache;
 	}

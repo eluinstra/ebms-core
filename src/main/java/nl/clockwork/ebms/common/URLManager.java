@@ -22,12 +22,13 @@ import java.util.List;
 import nl.clockwork.ebms.dao.EbMSDAO;
 import nl.clockwork.ebms.model.URLMapping;
 
-import org.ehcache.core.Ehcache;
 import org.springframework.util.StringUtils;
+
+import net.sf.ehcache.Ehcache;
 
 public class URLManager
 {
-	private Ehcache<String,Object> methodCache;
+	private Ehcache methodCache;
 	private EbMSDAO ebMSDAO;
 
 	public List<URLMapping> getURLs()
@@ -91,7 +92,7 @@ public class URLManager
 		methodCache.remove(MethodCacheInterceptor.getCacheKey("EbMSDAOImpl","getURLMappings"));
 	}
 
-	public void setMethodCache(Ehcache<String,Object> methodCache)
+	public void setMethodCache(Ehcache methodCache)
 	{
 		this.methodCache = methodCache;
 	}

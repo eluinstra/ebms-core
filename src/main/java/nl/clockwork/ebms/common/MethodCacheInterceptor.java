@@ -19,11 +19,13 @@ import java.util.stream.Stream;
 
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
-import org.ehcache.Cache;
+
+import net.sf.ehcache.Cache;
+import net.sf.ehcache.Element;
 
 public class MethodCacheInterceptor implements MethodInterceptor
 {
-	private Cache<String,Object> cache;
+	private Cache cache;
 
 	public Object invoke(MethodInvocation invocation) throws Throwable
 	{
@@ -32,13 +34,14 @@ public class MethodCacheInterceptor implements MethodInterceptor
 		Object[] arguments = invocation.getArguments();
 
 		String cacheKey = getCacheKey(targetName,methodName,arguments);
-		Object element = cache.get(cacheKey);
+		Element element = cache.get(cacheKey);
 		if (element == null)
 		{
 			Object result = invocation.proceed();
-			cache.put(cacheKey,result);
+			element = new Element(cacheKey,result);
+			cache.put(element);
 		}
-		return element;
+		return element.getObjectValue();
 	}
 
 	public static String getCacheKey(String targetName, String methodName, Object...arguments)
@@ -50,7 +53,7 @@ public class MethodCacheInterceptor implements MethodInterceptor
 		return sb.toString();
 	}
 
-	public void setCache(Cache<String,Object> cache)
+	public void setCache(Cache cache)
 	{
 		this.cache = cache;
 	}
