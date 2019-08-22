@@ -33,7 +33,6 @@ import javax.xml.transform.TransformerException;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.xml.security.Init;
-import org.ehcache.core.Ehcache;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -46,6 +45,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
+import net.sf.ehcache.Ehcache;
 import nl.clockwork.ebms.common.CPAManager;
 import nl.clockwork.ebms.common.EbMSMessageFactory;
 import nl.clockwork.ebms.common.JAXBParser;
@@ -73,7 +73,7 @@ public class EncryptionTest
 	private EbMSMessageEncrypter messageEncrypter;
 	private EbMSMessageDecrypter messageDecrypter;
 	@Mock
-	Ehcache<String,Object> ehCacheMock;
+	Ehcache ehCacheMock;
 
 	@BeforeAll
 	public void init() throws Exception
@@ -154,11 +154,11 @@ public class EncryptionTest
 		return result;
 	}
 
-	private Ehcache<String,Object> initMethodCacheMock()
+	private Ehcache initMethodCacheMock()
 	{
-		//Ehcache<String,Object> ehCacheMock = Mockito.mock(Ehcache.class);
-		Mockito.when(ehCacheMock.remove(Mockito.anyString(),Mockito.any(Serializable.class))).thenReturn(true);
-		return ehCacheMock;
+		Ehcache result = Mockito.mock(Ehcache.class);
+		Mockito.when(result.remove(Mockito.any(Serializable.class))).thenReturn(true);
+		return result;
 	}
 
 	private EbMSDAO initEbMSDAOMock() throws DAOException, IOException, JAXBException

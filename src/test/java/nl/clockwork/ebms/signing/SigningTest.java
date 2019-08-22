@@ -45,7 +45,6 @@ import nl.clockwork.ebms.validation.ValidatorException;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.xml.security.Init;
-import org.ehcache.core.Ehcache;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -56,6 +55,8 @@ import org.mockito.MockitoAnnotations;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CollaborationProtocolAgreement;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
+
+import net.sf.ehcache.Ehcache;
 
 @TestInstance(value = Lifecycle.PER_CLASS)
 public class SigningTest
@@ -68,7 +69,7 @@ public class SigningTest
 	private EbMSSignatureGenerator signatureGenerator;
 	private EbMSSignatureValidator signatureValidator;
 	@Mock
-	private Ehcache<String,Object> ehCacheMock;
+	private Ehcache ehCacheMock;
 
 	@BeforeAll
 	public void init() throws Exception
@@ -122,10 +123,11 @@ public class SigningTest
 		return result;
 	}
 
-	private Ehcache<String,Object> initMethodCacheMock()
+	private Ehcache initMethodCacheMock()
 	{
-		Mockito.when(ehCacheMock.remove(Mockito.anyString(),Mockito.any(Serializable.class))).thenReturn(true);
-		return ehCacheMock;
+		Ehcache result = Mockito.mock(Ehcache.class);
+		Mockito.when(result.remove(Mockito.any(Serializable.class))).thenReturn(true);
+		return result;
 	}
 
 	private EbMSDAO initEbMSDAOMock() throws DAOException, IOException, JAXBException
