@@ -81,7 +81,7 @@ public class MessageQueue<T> implements InitializingBean
 		{
 			if (queue.containsKey(correlationId))
 				throw new RuntimeException("key " + correlationId + " already exists!");
-			queue.put(correlationId,new QueueEntry<T>(Thread.currentThread()));
+			queue.put(correlationId,new QueueEntry<>(Thread.currentThread()));
 		}
 	}
 

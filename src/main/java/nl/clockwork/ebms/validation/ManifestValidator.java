@@ -29,7 +29,7 @@ public class ManifestValidator
 
 	public void validate(EbMSMessage message) throws EbMSValidationException
 	{
-		List<EbMSAttachment> attachments = new ArrayList<EbMSAttachment>();
+		List<EbMSAttachment> attachments = new ArrayList<>();
 		if (message.getManifest() != null)
 		{
 			if (!Constants.EBMS_VERSION.equals(message.getManifest().getVersion()))

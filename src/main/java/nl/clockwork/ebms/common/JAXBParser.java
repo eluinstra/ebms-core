@@ -39,7 +39,7 @@ import com.sun.xml.bind.marshaller.NamespacePrefixMapper;
 
 public class JAXBParser<T>
 {
-	private static HashMap<Class<?>,JAXBParser<?>> xmlHandlers = new HashMap<Class<?>,JAXBParser<?>>();
+	private static HashMap<Class<?>,JAXBParser<?>> xmlHandlers = new HashMap<>();
 	private JAXBContext context;
 
 	private JAXBParser(JAXBContext context)
@@ -248,7 +248,7 @@ public class JAXBParser<T>
 		if (object == null)
 			return null;
 		JAXBContext jaxbContext = JAXBContext.newInstance(object.getClass());
-		JAXBElement<T> contentObject = new JAXBElement<T>(new QName(object.getClass().getSimpleName()),(Class<T>)object.getClass(),object);
+		JAXBElement<T> contentObject = new JAXBElement<>(new QName(object.getClass().getSimpleName()),(Class<T>)object.getClass(),object);
 		JAXBSource source = new JAXBSource(jaxbContext,contentObject);
 		return jaxbContext.createUnmarshaller().unmarshal(source,(Class<T>)object.getClass()).getValue();
 	}

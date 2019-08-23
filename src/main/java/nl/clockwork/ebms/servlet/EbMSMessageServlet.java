@@ -69,7 +69,7 @@ public class EbMSMessageServlet extends GenericServlet
 					@Override
 					public List<String> getRequestHeaderNames()
 					{
-						List<String> result = new ArrayList<String>();
+						List<String> result = new ArrayList<>();
 						Enumeration<?> headerNames = ((HttpServletRequest)request).getHeaderNames();
 						while (headerNames.hasMoreElements())
 							result.add((String)headerNames.nextElement());
@@ -79,7 +79,7 @@ public class EbMSMessageServlet extends GenericServlet
 					@Override
 					public List<String> getRequestHeaders(String headerName)
 					{
-						List<String> result = new ArrayList<String>();
+						List<String> result = new ArrayList<>();
 						Enumeration<?> headers = ((HttpServletRequest)request).getHeaders(headerName);
 						while(headers.hasMoreElements())
 							result.add((String)headers.nextElement());

@@ -87,7 +87,7 @@ public class EbMSMessageDecrypter implements InitializingBean
 					throw new ValidationException(
 							"No certificate found with subject \"" + certificate.getSubjectDN().getName() + "\" in keystore \"" + keyStorePath + "\"");
 				KeyPair keyPair = SecurityUtils.getKeyPair(keyStore,alias,keyStorePassword);
-				List<EbMSAttachment> attachments = new ArrayList<EbMSAttachment>();
+				List<EbMSAttachment> attachments = new ArrayList<>();
 				message.getAttachments().forEach(ThrowingConsumer.throwingConsumerWrapper(a -> attachments.add(decrypt(keyPair,a))));
 				message.setAttachments(attachments);
 			}

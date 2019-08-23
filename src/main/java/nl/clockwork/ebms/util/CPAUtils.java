@@ -92,7 +92,7 @@ public class CPAUtils
 	
 	public static List<org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.PartyId> toPartyId(PartyId partyId)
 	{
-		List<org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.PartyId> result = new ArrayList<org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.PartyId>();
+		List<org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.PartyId> result = new ArrayList<>();
 		org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.PartyId p = new org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.PartyId();
 		p.setType(partyId.getType());
 		p.setValue(partyId.getValue());

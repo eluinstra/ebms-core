@@ -24,7 +24,7 @@ public class EbMSDocument
 {
 	private String contentId;
 	private Document message;
-	private List<EbMSAttachment> attachments = new ArrayList<EbMSAttachment>();
+	private List<EbMSAttachment> attachments = new ArrayList<>();
 	
 	protected EbMSDocument()
 	{
@@ -32,7 +32,7 @@ public class EbMSDocument
 
 	public EbMSDocument(String contentId, Document message)
 	{
-		this(contentId,message,new ArrayList<EbMSAttachment>());
+		this(contentId,message,new ArrayList<>());
 	}
 
 	public EbMSDocument(String contentId, Document message, List<EbMSAttachment> attachments)

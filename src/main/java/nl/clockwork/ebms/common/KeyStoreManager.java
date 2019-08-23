@@ -28,7 +28,7 @@ import nl.clockwork.ebms.common.util.SecurityUtils;
 
 public class KeyStoreManager
 {
-	private static Map<String,KeyStore> keystores = new HashMap<String,KeyStore>();
+	private static Map<String,KeyStore> keystores = new HashMap<>();
 
 	public static KeyStore getKeyStore(String path, String password) throws GeneralSecurityException, IOException
 	{

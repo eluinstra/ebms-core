@@ -66,7 +66,7 @@ public class EbMSMessageReader
 		if (StringUtils.isNotBlank(message))
 		{
 			Document d = DOMUtils.read(message);
-			result = new EbMSDocument(contentId,d,new ArrayList<EbMSAttachment>());
+			result = new EbMSDocument(contentId,d,new ArrayList<>());
 		}
 		return result;
 	}
@@ -82,7 +82,7 @@ public class EbMSMessageReader
 	private EbMSDocument getEbMSMessage(InputStream in) throws ParserConfigurationException, SAXException, IOException
 	{
 		Document d = DOMUtils.read(in);
-		return new EbMSDocument(contentId,d,new ArrayList<EbMSAttachment>());
+		return new EbMSDocument(contentId,d,new ArrayList<>());
 	}
 
 	private EbMSDocument getEbMSMessage(List<EbMSAttachment> attachments) throws ParserConfigurationException, SAXException, IOException

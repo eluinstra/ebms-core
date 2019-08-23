@@ -33,7 +33,7 @@ public class EbMSMessageContent implements Serializable
 	
 	public EbMSMessageContent(EbMSMessageContext context)
 	{
-		this(context,new ArrayList<EbMSDataSource>());
+		this(context,new ArrayList<>());
 	}
 
 	public EbMSMessageContent(EbMSMessageContext context, List<EbMSDataSource> dataSources)

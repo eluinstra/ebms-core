@@ -19,7 +19,7 @@ import java.security.cert.X509Certificate;
 
 public class ClientCertificateManager
 {
-	private static final ThreadLocal<X509Certificate[]> certificatesHolder = new ThreadLocal<X509Certificate[]>();
+	private static final ThreadLocal<X509Certificate[]> certificatesHolder = new ThreadLocal<>();
 	
 	public static X509Certificate[] getCertificates()
 	{

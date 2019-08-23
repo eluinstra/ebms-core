@@ -35,8 +35,8 @@ import nl.clockwork.ebms.model.EbMSAttachment;
 
 public class EbMSContentHandler implements ContentHandler
 {
-	private Map<String,String> headers = new HashMap<String,String>();
-	private List<EbMSAttachment> attachments = new ArrayList<EbMSAttachment>();
+	private Map<String,String> headers = new HashMap<>();
+	private List<EbMSAttachment> attachments = new ArrayList<>();
 
 	@Override
 	public void startMessage() throws MimeException

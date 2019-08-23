@@ -418,7 +418,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 			return getMessageContext(messageId).map(ThrowingFunction.throwingFunctionWrapper(mc ->
 			{
 				List<EbMSAttachment> attachments = getAttachments(messageId);
-				List<EbMSDataSource> dataSources = new ArrayList<EbMSDataSource>();
+				List<EbMSDataSource> dataSources = new ArrayList<>();
 				attachments.forEach(ThrowingConsumer.throwingConsumerWrapper(a ->
 						dataSources.add(new EbMSDataSource(a.getName(),a.getContentId(),a.getContentType(),IOUtils.toByteArray(a.getInputStream())))
 				));
@@ -710,7 +710,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	{
 		try
 		{
-			List<Object> parameters = new ArrayList<Object>();
+			List<Object> parameters = new ArrayList<>();
 			return jdbcTemplate.queryForList(
 					"select message_id" +
 					" from ebms_message" +
@@ -735,7 +735,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	{
 		try
 		{
-			List<Object> parameters = new ArrayList<Object>();
+			List<Object> parameters = new ArrayList<>();
 			String messageContextFilter = getMessageContextFilter(messageContext,parameters);
 			return jdbcTemplate.queryForList(
 					getMessageIdsQuery(messageContextFilter,status,maxNr),
@@ -1209,7 +1209,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	{
 		try
 		{
-			List<Object> parameters = new ArrayList<Object>();
+			List<Object> parameters = new ArrayList<>();
 			return jdbcTemplate.query(
 				"select ebms_message_event.message_id, ebms_message_event.event_type" +
 				" from ebms_message_event, ebms_message" +
@@ -1243,7 +1243,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	{
 		try
 		{
-			List<Object> parameters = new ArrayList<Object>();
+			List<Object> parameters = new ArrayList<>();
 			String messageContextFilter = getMessageContextFilter(messageContext,parameters);
 			return jdbcTemplate.query(
 				getMessageEventsQuery(messageContextFilter,types,maxNr),

@@ -41,8 +41,8 @@ public class EbMSHttpClientFactory implements FactoryBean<EbMSClient>
 	private String[] enabledProtocols = new String[]{};
 	private String[] enabledCipherSuites = new String[]{};
 	private boolean verifyHostnames;
-	private List<Integer> recoverableHttpErrors = new ArrayList<Integer>();
-	private List<Integer> irrecoverableHttpErrors = new ArrayList<Integer>();
+	private List<Integer> recoverableHttpErrors = new ArrayList<>();
+	private List<Integer> irrecoverableHttpErrors = new ArrayList<>();
 
 	@Override
 	public EbMSClient getObject() throws Exception

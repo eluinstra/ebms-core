@@ -38,8 +38,8 @@ public class CPAUtilsTest {
 	@Test
 	public void testEquals()
 	{
-		List<PartyId> cpaPartyIds = new ArrayList<PartyId>();;
-		List<org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.PartyId> headerPartyIds = new ArrayList<org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.PartyId>();
+		List<PartyId> cpaPartyIds = new ArrayList<>();
+		List<org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.PartyId> headerPartyIds = new ArrayList<>();
 		
 		cpaPartyIds.add(new PartyId());
 		cpaPartyIds.get(0).setType("TYPE1");

@@ -223,7 +223,7 @@ public class EbMSMessageFactory
 			if (content.getDataSources() != null && content.getDataSources().size() > 0)
 			{
 				Manifest manifest = EbMSMessageUtils.createManifest();
-				List<EbMSAttachment> attachments = new ArrayList<EbMSAttachment>();
+				List<EbMSAttachment> attachments = new ArrayList<>();
 				content.getDataSources().forEach(ds ->
 				{
 					String contentId = ds.getContentId() == null ? UUID.randomUUID().toString() : ds.getContentId();

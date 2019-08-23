@@ -32,7 +32,7 @@ public class JobScheduler implements InitializingBean, DisposableBean
 	private boolean enabled;
 	private long delay;
 	private long period;
-	private List<Job> jobs = new ArrayList<Job>();
+	private List<Job> jobs = new ArrayList<>();
 
 	@Override
 	public void afterPropertiesSet() throws Exception

@@ -75,7 +75,7 @@ public class EbMSMessageUtils
 
 	public static EbMSMessage getEbMSMessage(Document document) throws JAXBException, XPathExpressionException, ParserConfigurationException, SAXException, IOException
 	{
-		return getEbMSMessage(document, new ArrayList<EbMSAttachment>());
+		return getEbMSMessage(document, new ArrayList<>());
 	}
 
 	public static EbMSMessage getEbMSMessage(EbMSDocument document) throws JAXBException, XPathExpressionException, ParserConfigurationException, SAXException, IOException
@@ -267,11 +267,11 @@ public class EbMSMessageUtils
 				Manifest.class,
 				StatusRequest.class,
 				StatusResponse.class);
-//		JAXBElement<Envelope> e = new JAXBElement<Envelope>(new QName("http://schemas.xmlsoap.org/soap/envelope/","Envelope"),Envelope.class,envelope);
+//		JAXBElement<Envelope> e = new JAXBElement<>(new QName("http://schemas.xmlsoap.org/soap/envelope/","Envelope"),Envelope.class,envelope);
 //		ByteArrayInputStream is = new ByteArrayInputStream(messageBuilder.handle(e).getBytes());
 //		return DOMUtils.getDocumentBuilder().parse(is);
 		NamespacePrefixMapper namespacePrefixMapper = oraclePatch ? new EbMSNamespaceMapper() : null;
-		JAXBElement<Envelope> e = new JAXBElement<Envelope>(new QName("http://schemas.xmlsoap.org/soap/envelope/","Envelope"),Envelope.class,envelope);
+		JAXBElement<Envelope> e = new JAXBElement<>(new QName("http://schemas.xmlsoap.org/soap/envelope/","Envelope"),Envelope.class,envelope);
 		ByteArrayInputStream is = new ByteArrayInputStream(messageBuilder.handle(e,namespacePrefixMapper).getBytes());
 		return DOMUtils.getDocumentBuilder().parse(is);
 	}
@@ -310,12 +310,12 @@ public class EbMSMessageUtils
 		fault.setFaultcode(new QName("http://schemas.xmlsoap.org/soap/envelope/","Server"));
 		fault.setFaultstring(e.getMessage());
 		//fault.setDetail(new Detail());
-		//JAXBElement<String> f = new JAXBElement<String>(new QName("","String"),String.class,ExceptionUtils.getStackTrace(e));
+		//JAXBElement<String> f = new JAXBElement<>(new QName("","String"),String.class,ExceptionUtils.getStackTrace(e));
 		//fault.getDetail().getAny().add(f);
-		JAXBElement<Fault> f = new JAXBElement<Fault>(new QName("http://schemas.xmlsoap.org/soap/envelope/","Fault"),Fault.class,fault);
+		JAXBElement<Fault> f = new JAXBElement<>(new QName("http://schemas.xmlsoap.org/soap/envelope/","Fault"),Fault.class,fault);
 		envelope.getBody().getAny().add(f);
 
-		return DOMUtils.getDocumentBuilder().parse(new ByteArrayInputStream(JAXBParser.getInstance(Envelope.class).handle(new JAXBElement<Envelope>(new QName("http://schemas.xmlsoap.org/soap/envelope/","Envelope"),Envelope.class,envelope)).getBytes()));
+		return DOMUtils.getDocumentBuilder().parse(new ByteArrayInputStream(JAXBParser.getInstance(Envelope.class).handle(new JAXBElement<>(new QName("http://schemas.xmlsoap.org/soap/envelope/","Envelope"),Envelope.class,envelope)).getBytes()));
 	}
 	
 	public static void setOraclePatch(boolean oraclePatch)

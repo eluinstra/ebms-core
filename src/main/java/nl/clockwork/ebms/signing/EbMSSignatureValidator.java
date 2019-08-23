@@ -121,7 +121,7 @@ public class EbMSSignatureValidator implements InitializingBean
 					{
 						Date date = responseMessage.getMessageHeader().getMessageData().getTimestamp() == null ? new Date() : responseMessage.getMessageHeader().getMessageData().getTimestamp();
 						SecurityUtils.validateCertificate(trustStore,certificate,date);
-						if (!verify(certificate,(Element)signatureNodeList.item(0),new ArrayList<EbMSAttachment>()))
+						if (!verify(certificate,(Element)signatureNodeList.item(0),new ArrayList<>()))
 							throw new ValidationException("Invalid Signature!");
 						validateSignatureReferences(requestMessage,responseMessage);
 					}

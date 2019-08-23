@@ -43,7 +43,7 @@ public class EbMSMessage extends EbMSDocument
 	private Manifest manifest;
 	private StatusRequest statusRequest;
 	private StatusResponse statusResponse;
-	private List<EbMSAttachment> attachments = new ArrayList<EbMSAttachment>();
+	private List<EbMSAttachment> attachments = new ArrayList<>();
 
 	@Override
 	public String getContentId()

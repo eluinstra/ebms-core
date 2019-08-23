@@ -228,7 +228,7 @@ public class EbMSEventProcessor implements InitializingBean, Job
 				maxThreads,
 				1,
 				TimeUnit.MINUTES,
-				new ArrayBlockingQueue<Runnable>(maxThreads * queueScaleFactor,true),
+				new ArrayBlockingQueue<>(maxThreads * queueScaleFactor,true),
 				new ThreadPoolExecutor.CallerRunsPolicy());
 		GregorianCalendar timestamp = new GregorianCalendar();
 		List<EbMSEvent> events = ebMSDAO.getEventsBefore(timestamp.getTime());

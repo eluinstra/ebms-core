@@ -201,14 +201,14 @@ public class SigningTest
 
 	private List<EbMSDataSource> createDataSources()
 	{
-		List<EbMSDataSource> result = new ArrayList<EbMSDataSource>();
+		List<EbMSDataSource> result = new ArrayList<>();
 		result.add(new EbMSDataSource("test.txt","plain/text; charset=utf-8","Dit is een test.".getBytes(Charset.forName("UTF-8"))));
 		return result;
 	}
 
 	private List<EbMSAttachment> createAttachments(String messageId)
 	{
-		List<EbMSAttachment> result = new ArrayList<EbMSAttachment>();
+		List<EbMSAttachment> result = new ArrayList<>();
 		result.add(new EbMSAttachment(createDataSource(),createContentId(messageId,1)));
 		return result;
 	}

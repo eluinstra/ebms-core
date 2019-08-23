@@ -34,7 +34,7 @@ import nl.clockwork.ebms.model.EbMSAttachment;
 public class EbMSAttachmentResolver extends ResourceResolverSpi
 {
 	private static final int BUFFERSIZE = 4096;
-	private List<EbMSAttachment> attachments = new ArrayList<EbMSAttachment>();
+	private List<EbMSAttachment> attachments = new ArrayList<>();
 
 	public EbMSAttachmentResolver()
 	{

@@ -109,7 +109,7 @@ public class EbMSMessageEncrypter implements InitializingBean
 				X509Certificate certificate = CPAUtils.getX509Certificate(CPAUtils.getEncryptionCertificate(deliveryChannel));
 				validateCertificate(trustStore,certificate);
 				String encryptionAlgorithm = CPAUtils.getEncryptionAlgorithm(deliveryChannel);
-				List<EbMSAttachment> attachments = new ArrayList<EbMSAttachment>();
+				List<EbMSAttachment> attachments = new ArrayList<>();
 				message.getAttachments().forEach(ThrowingConsumer.throwingConsumerWrapper(a ->
 						attachments.add(encrypt(createDocument(),certificate,encryptionAlgorithm,a))));
 				message.setAttachments(attachments);
@@ -132,7 +132,7 @@ public class EbMSMessageEncrypter implements InitializingBean
 			X509Certificate certificate = CPAUtils.getX509Certificate(CPAUtils.getEncryptionCertificate(deliveryChannel));
 			validateCertificate(trustStore,certificate);
 			String encryptionAlgorithm = CPAUtils.getEncryptionAlgorithm(deliveryChannel);
-			List<EbMSAttachment> attachments = new ArrayList<EbMSAttachment>();
+			List<EbMSAttachment> attachments = new ArrayList<>();
 			message.getAttachments().forEach(ThrowingConsumer.throwingConsumerWrapper(a ->
 					attachments.add(encrypt(createDocument(),certificate,encryptionAlgorithm,a))));
 			message.getAttachments().clear();
