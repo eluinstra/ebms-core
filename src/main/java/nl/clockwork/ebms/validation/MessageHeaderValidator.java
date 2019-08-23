@@ -267,7 +267,7 @@ public class MessageHeaderValidator
 				|| deliveryChannel.getMessagingCharacteristics().getActor().value().equals(acknowledgment.getActor());
 	}
 
-	private static void compare(List<PartyId> requestPartyIds, List<PartyId> responsePartyIds) throws ValidationException
+	private void compare(List<PartyId> requestPartyIds, List<PartyId> responsePartyIds) throws ValidationException
 	{
 		boolean anyMatch = requestPartyIds.stream()
 				.map(req -> EbMSMessageUtils.toString(req))
