@@ -30,6 +30,11 @@ public class EbMSDataSource implements Serializable
 	{
 	}
 	
+	public EbMSDataSource(String name, String contentType, byte[] content)
+	{
+		this(name,null,contentType,content);
+	}
+
 	public EbMSDataSource(String name, String contentId, String contentType, byte[] content)
 	{
 		this.name = name;

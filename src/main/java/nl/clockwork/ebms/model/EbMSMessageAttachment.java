@@ -82,7 +82,7 @@ public class EbMSMessageAttachment implements Serializable
 				{
 					throw new EbMSProcessorException(e);
 				}
-				msgContentCache.getDataSources().add(new EbMSDataSource(a.getName(),null,a.getContentType(),bos.toByteArray()));
+				msgContentCache.getDataSources().add(new EbMSDataSource(a.getName(),a.getContentType(),bos.toByteArray()));
 			}));
 		}
 		
