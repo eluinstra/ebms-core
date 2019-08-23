@@ -19,6 +19,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import nl.clockwork.ebms.Constants;
 import nl.clockwork.ebms.Constants.EbMSAction;
@@ -269,11 +270,16 @@ public class MessageHeaderValidator
 
 	private void compare(List<PartyId> requestPartyIds, List<PartyId> responsePartyIds) throws ValidationException
 	{
-		for (PartyId requestPartyId : requestPartyIds)
-			for (PartyId responsePartyId : responsePartyIds)
-				if (EbMSMessageUtils.toString(requestPartyId).equals(EbMSMessageUtils.toString(responsePartyId)))
-					return;
-		throw new ValidationException("Request PartyIds do not match response PartyIds");
+		boolean containsAll = requestPartyIds.stream()
+				.map(r -> EbMSMessageUtils.toString(r))
+				.collect(Collectors.toList())
+				.containsAll(responsePartyIds.stream()
+						.map(r -> EbMSMessageUtils.toString(r))
+						.collect(Collectors.toList()));
+		if (containsAll)
+			return;
+		else
+			throw new ValidationException("Request PartyIds do not match response PartyIds");
 	}
 
 	public void setEbMSDAO(EbMSDAO ebMSDAO)

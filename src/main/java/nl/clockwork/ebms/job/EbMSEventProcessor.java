@@ -232,7 +232,7 @@ public class EbMSEventProcessor implements InitializingBean, Job
 				new ThreadPoolExecutor.CallerRunsPolicy());
 		GregorianCalendar timestamp = new GregorianCalendar();
 		List<EbMSEvent> events = ebMSDAO.getEventsBefore(timestamp.getTime());
-		events.stream().forEach(e -> executorService.submit(new HandleEventTask(e)));
+		events.forEach(e -> executorService.submit(new HandleEventTask(e)));
 		executorService.shutdown();
 		try
 		{

@@ -1,7 +1,8 @@
 package nl.clockwork.ebms.common.util;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -9,13 +10,6 @@ public class Utils
 {
 	public static List<Integer> getIntegerList(String input)
 	{
-		List<Integer> result = new ArrayList<>();
-		if (!StringUtils.isEmpty(input))
-		{
-			String[] strings = input.split(",");
-			for (String s : strings)
-				result.add(Integer.parseInt(s.trim()));
-		}
-		return result;
+		return Arrays.stream(StringUtils.split(input,',')).map(s -> Integer.parseInt(s.trim())).collect(Collectors.toList());
 	}
 }

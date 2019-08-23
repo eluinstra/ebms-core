@@ -419,7 +419,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 			{
 				List<EbMSAttachment> attachments = getAttachments(messageId);
 				List<EbMSDataSource> dataSources = new ArrayList<EbMSDataSource>();
-				attachments.stream().forEach(ThrowingConsumer.throwingConsumerWrapper(a ->
+				attachments.forEach(ThrowingConsumer.throwingConsumerWrapper(a ->
 						dataSources.add(new EbMSDataSource(a.getName(),a.getContentId(),a.getContentType(),IOUtils.toByteArray(a.getInputStream())))
 				));
 				return new EbMSMessageContent(mc,dataSources);
@@ -935,7 +935,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	protected void insertAttachments(KeyHolder keyHolder, List<EbMSAttachment> attachments) throws InvalidDataAccessApiUsageException, DataAccessException, IOException
 	{
 		AtomicInteger orderNr = new AtomicInteger(0);
-		attachments.stream().forEach(ThrowingConsumer.throwingConsumerWrapper(a ->
+		attachments.forEach(ThrowingConsumer.throwingConsumerWrapper(a ->
 		{
 			jdbcTemplate.update
 			(

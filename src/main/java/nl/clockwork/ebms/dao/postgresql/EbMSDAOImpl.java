@@ -300,7 +300,7 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 	protected void insertAttachments(Key key, List<EbMSAttachment> attachments) throws InvalidDataAccessApiUsageException, DataAccessException, IOException
 	{
 		AtomicInteger orderNr = new AtomicInteger(0);
-		attachments.stream().forEach(ThrowingConsumer.throwingConsumerWrapper(a ->
+		attachments.forEach(ThrowingConsumer.throwingConsumerWrapper(a ->
 		{
 			jdbcTemplate.update
 			(

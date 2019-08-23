@@ -105,7 +105,7 @@ public class EbMSMessageUtils
 				StatusResponse.class);
 		Envelope envelope = messageBuilder.handle(document);
 
-		envelope.getHeader().getAny().stream().forEach(e ->
+		envelope.getHeader().getAny().forEach(e ->
 		{
 			if (e instanceof JAXBElement && ((JAXBElement<?>)e).getValue() instanceof SignatureType)
 				result.setSignature(((JAXBElement<SignatureType>)e).getValue());
@@ -123,7 +123,7 @@ public class EbMSMessageUtils
 				result.setAcknowledgment((Acknowledgment)e);
 		});
 
-		envelope.getBody().getAny().stream().forEach(e ->
+		envelope.getBody().getAny().forEach(e ->
 		{
 			if (e instanceof Manifest)
 				result.setManifest((Manifest)e);

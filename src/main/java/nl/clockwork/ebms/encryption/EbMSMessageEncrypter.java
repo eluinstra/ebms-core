@@ -110,8 +110,8 @@ public class EbMSMessageEncrypter implements InitializingBean
 				validateCertificate(trustStore,certificate);
 				String encryptionAlgorithm = CPAUtils.getEncryptionAlgorithm(deliveryChannel);
 				List<EbMSAttachment> attachments = new ArrayList<EbMSAttachment>();
-				message.getAttachments().stream().forEach(
-						ThrowingConsumer.throwingConsumerWrapper(a -> attachments.add(encrypt(createDocument(),certificate,encryptionAlgorithm,a))));
+				message.getAttachments().forEach(ThrowingConsumer.throwingConsumerWrapper(a ->
+						attachments.add(encrypt(createDocument(),certificate,encryptionAlgorithm,a))));
 				message.setAttachments(attachments);
 			}
 		}
@@ -133,9 +133,8 @@ public class EbMSMessageEncrypter implements InitializingBean
 			validateCertificate(trustStore,certificate);
 			String encryptionAlgorithm = CPAUtils.getEncryptionAlgorithm(deliveryChannel);
 			List<EbMSAttachment> attachments = new ArrayList<EbMSAttachment>();
-			message.getAttachments().stream().forEach(ThrowingConsumer.throwingConsumerWrapper(a ->
-				attachments.add(encrypt(createDocument(),certificate,encryptionAlgorithm,a))
-			));
+			message.getAttachments().forEach(ThrowingConsumer.throwingConsumerWrapper(a ->
+					attachments.add(encrypt(createDocument(),certificate,encryptionAlgorithm,a))));
 			message.getAttachments().clear();
 			message.getAttachments().addAll(attachments);
 		}

@@ -40,25 +40,25 @@ public class JobScheduler implements InitializingBean, DisposableBean
 		if (enabled)
 		{
 			jobTimer = new Timer();
-			jobs.stream().forEach(j ->
-				jobTimer.schedule(new TimerTask()
-				{
-					@Override
-					public void run()
+			jobs.forEach(j ->
+					jobTimer.schedule(new TimerTask()
 					{
-						try
+						@Override
+						public void run()
 						{
-							logger.debug("Executing job " + j.getClass());
-							j.execute();
+							try
+							{
+								logger.debug("Executing job " + j.getClass());
+								j.execute();
+							}
+							catch (Exception e)
+							{
+								logger.error("",e);
+							}
 						}
-						catch (Exception e)
-						{
-							logger.error("",e);
-						}
-					}
-				},
-				delay,
-				period));
+					},
+					delay,
+					period));
 		}
 	}
 	

@@ -110,7 +110,7 @@ public class EbMSMessageFactory
 			acknowledgment.setActor(ActorType.URN_OASIS_NAMES_TC_EBXML_MSG_ACTOR_TO_PARTY_MSH.value());
 			
 			if (message.getAckRequested().isSigned() && message.getSignature() != null)
-				message.getSignature().getSignedInfo().getReference().stream().forEach(r -> acknowledgment.getReference().add(r));
+				message.getSignature().getSignedInfo().getReference().forEach(r -> acknowledgment.getReference().add(r));
 
 			EbMSMessage result = new EbMSMessage();
 			result.setMessageHeader(messageHeader);
@@ -224,7 +224,7 @@ public class EbMSMessageFactory
 			{
 				Manifest manifest = EbMSMessageUtils.createManifest();
 				List<EbMSAttachment> attachments = new ArrayList<EbMSAttachment>();
-				content.getDataSources().stream().forEach(ds ->
+				content.getDataSources().forEach(ds ->
 				{
 					String contentId = ds.getContentId() == null ? UUID.randomUUID().toString() : ds.getContentId();
 					manifest.getReference().add(EbMSMessageUtils.createReference(contentId));

@@ -95,7 +95,7 @@ public class EbMSMessageWriter
 			writer.write("--");
 			writer.write(boundary);
 
-			document.getAttachments().stream().forEach(ThrowingConsumer.throwingConsumerWrapper(a ->
+			document.getAttachments().forEach(ThrowingConsumer.throwingConsumerWrapper(a ->
 			{
 				if (a.getContentType().matches("^(text/.*|.*/xml)$"))
 					writeTextAttachment(boundary,outputStream,writer,a);

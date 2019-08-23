@@ -22,14 +22,10 @@ import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.ActorType;
-import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CanReceive;
-import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CanSend;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CollaborationProtocolAgreement;
-import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CollaborationRole;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DocExchange;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.EncryptionAlgorithm;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.MessageOrderSemanticsType;
-import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.PartyInfo;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.PerMessageCharacteristicsType;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.StatusValueType;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.SyncReplyModeType;
@@ -89,10 +85,11 @@ public class CPAValidator
 
 	private void validateActions(CollaborationProtocolAgreement cpa)
 	{
-		for (PartyInfo partyInfo : cpa.getPartyInfo())
-			for (CollaborationRole role : partyInfo.getCollaborationRole())
+		cpa.getPartyInfo().forEach(partyInfo ->
+		{
+			partyInfo.getCollaborationRole().forEach(role ->
 			{
-				for (CanSend canSend : role.getServiceBinding().getCanSend())
+				role.getServiceBinding().getCanSend().forEach(canSend ->
 				{
 					if (canSend.getCanReceive() != null && canSend.getCanReceive().size() > 0)
 						logger.warn("Nesting of actions under CanSend in Service " + CPAUtils.toString(role.getServiceBinding().getService()) +  " not supported!");
@@ -106,8 +103,8 @@ public class CPAValidator
 						logger.warn("Business signals defined in Action " + canSend.getThisPartyActionBinding().getAction() + " of Service " + CPAUtils.toString(role.getServiceBinding().getService()) + " not supported!");
 					//if (canSend.getThisPartyActionBinding().getBusinessTransactionCharacteristics().isIsAuthorizationRequired())
 						//logger.warn("Authorization Required defined in Action " + canSend.getThisPartyActionBinding().getAction() + " of Service " + CPAUtils.toString(role.getServiceBinding().getService()) + " ignored!");
-				}
-				for (CanReceive canReceive : role.getServiceBinding().getCanReceive())
+				});
+				role.getServiceBinding().getCanReceive().forEach(canReceive ->
 				{
 					if (canReceive.getCanSend() != null && canReceive.getCanSend().size() > 0)
 						logger.warn("Nesting of actions under CanReceive in Service " + CPAUtils.toString(role.getServiceBinding().getService()) +  " not supported!");
@@ -121,40 +118,42 @@ public class CPAValidator
 						logger.warn("Business signals defined in Action " + canReceive.getThisPartyActionBinding().getAction() + " of Service " + CPAUtils.toString(role.getServiceBinding().getService()) + " not supported!");
 					//if (canReceive.getThisPartyActionBinding().getBusinessTransactionCharacteristics().isIsAuthorizationRequired())
 						//logger.warn("Authorization Required defined in Action " + canReceive.getThisPartyActionBinding().getAction() + " of Service " + CPAUtils.toString(role.getServiceBinding().getService()) + " ignored!");
-				}
-			}
+				});
+			});
+		});
 	}
 
 	private void validateChannels(CollaborationProtocolAgreement cpa)
 	{
 		cpa.getPartyInfo().stream()
-				.flatMap(p -> p.getDeliveryChannel().stream()).forEach(d ->
-			{
-				if (((DocExchange)d.getDocExchangeId()).getEbXMLSenderBinding().getReliableMessaging() != null && MessageOrderSemanticsType.GUARANTEED.equals(((DocExchange)d.getDocExchangeId()).getEbXMLSenderBinding().getReliableMessaging().getMessageOrderSemantics()))
-					logger.warn("Message Order as defined in DocExchange " + ((DocExchange)d.getDocExchangeId()).getDocExchangeId() + " not implemented!");
-				if (SyncReplyModeType.SIGNALS_ONLY.equals(d.getMessagingCharacteristics().getSyncReplyMode()) || SyncReplyModeType.SIGNALS_AND_RESPONSE.equals(d.getMessagingCharacteristics().getSyncReplyMode()))
-					logger.warn("Business signals defined in Channel " + d.getChannelId() + " not supported!");
-				if (PerMessageCharacteristicsType.NEVER.equals(d.getMessagingCharacteristics().getDuplicateElimination()))
-					logger.warn("Duplicate Elimination defined in Channel " + d.getChannelId() + " always enabled!");
-				if (ActorType.URN_OASIS_NAMES_TC_EBXML_MSG_ACTOR_NEXT_MSH.equals(d.getMessagingCharacteristics().getActor()))
-					logger.warn("Actor NextMSH not supported!");
-				if (((DocExchange)d.getDocExchangeId()).getEbXMLReceiverBinding().getReceiverDigitalEnvelope() != null)
+				.flatMap(p -> p.getDeliveryChannel().stream())
+				.forEach(d ->
 				{
-					if (((DocExchange)d.getDocExchangeId()).getEbXMLReceiverBinding().getReceiverDigitalEnvelope().getDigitalEnvelopeProtocol() != null && !"XMLENC".equals(((DocExchange)d.getDocExchangeId()).getEbXMLReceiverBinding().getReceiverDigitalEnvelope().getDigitalEnvelopeProtocol().getValue()))
-						logger.warn("Digital Envelope Protocol" + ((DocExchange)d.getDocExchangeId()).getEbXMLReceiverBinding().getReceiverDigitalEnvelope().getDigitalEnvelopeProtocol().getValue() + " not supported!");
-					String encryptionAlgorithm = getEncryptionAlgorithm(((DocExchange)d.getDocExchangeId()).getEbXMLReceiverBinding().getReceiverDigitalEnvelope().getEncryptionAlgorithm());
-					if (encryptionAlgorithm != null)
-						try
-						{
-							if (SecurityUtils.generateKey(encryptionAlgorithm) == null)
-								logger.warn("Encryption Algorithm " + encryptionAlgorithm + " not supported!");
-						}
-						catch (NoSuchAlgorithmException e)
-						{
-							logger.warn("Encryption Algorithm " + encryptionAlgorithm + " not supported!",e);
-						}
-				}
-			});
+					if (((DocExchange)d.getDocExchangeId()).getEbXMLSenderBinding().getReliableMessaging() != null && MessageOrderSemanticsType.GUARANTEED.equals(((DocExchange)d.getDocExchangeId()).getEbXMLSenderBinding().getReliableMessaging().getMessageOrderSemantics()))
+						logger.warn("Message Order as defined in DocExchange " + ((DocExchange)d.getDocExchangeId()).getDocExchangeId() + " not implemented!");
+					if (SyncReplyModeType.SIGNALS_ONLY.equals(d.getMessagingCharacteristics().getSyncReplyMode()) || SyncReplyModeType.SIGNALS_AND_RESPONSE.equals(d.getMessagingCharacteristics().getSyncReplyMode()))
+						logger.warn("Business signals defined in Channel " + d.getChannelId() + " not supported!");
+					if (PerMessageCharacteristicsType.NEVER.equals(d.getMessagingCharacteristics().getDuplicateElimination()))
+						logger.warn("Duplicate Elimination defined in Channel " + d.getChannelId() + " always enabled!");
+					if (ActorType.URN_OASIS_NAMES_TC_EBXML_MSG_ACTOR_NEXT_MSH.equals(d.getMessagingCharacteristics().getActor()))
+						logger.warn("Actor NextMSH not supported!");
+					if (((DocExchange)d.getDocExchangeId()).getEbXMLReceiverBinding().getReceiverDigitalEnvelope() != null)
+					{
+						if (((DocExchange)d.getDocExchangeId()).getEbXMLReceiverBinding().getReceiverDigitalEnvelope().getDigitalEnvelopeProtocol() != null && !"XMLENC".equals(((DocExchange)d.getDocExchangeId()).getEbXMLReceiverBinding().getReceiverDigitalEnvelope().getDigitalEnvelopeProtocol().getValue()))
+							logger.warn("Digital Envelope Protocol" + ((DocExchange)d.getDocExchangeId()).getEbXMLReceiverBinding().getReceiverDigitalEnvelope().getDigitalEnvelopeProtocol().getValue() + " not supported!");
+						String encryptionAlgorithm = getEncryptionAlgorithm(((DocExchange)d.getDocExchangeId()).getEbXMLReceiverBinding().getReceiverDigitalEnvelope().getEncryptionAlgorithm());
+						if (encryptionAlgorithm != null)
+							try
+							{
+								if (SecurityUtils.generateKey(encryptionAlgorithm) == null)
+									logger.warn("Encryption Algorithm " + encryptionAlgorithm + " not supported!");
+							}
+							catch (NoSuchAlgorithmException e)
+							{
+								logger.warn("Encryption Algorithm " + encryptionAlgorithm + " not supported!",e);
+							}
+					}
+				});
 	}
 
 	private String getEncryptionAlgorithm(List<EncryptionAlgorithm> encryptionAlgorithm)
@@ -168,7 +167,8 @@ public class CPAValidator
 	private void validateTransports(CollaborationProtocolAgreement cpa)
 	{
 		cpa.getPartyInfo().stream()
-				.flatMap(p -> p.getTransport().stream()).forEach(t ->
+				.flatMap(p -> p.getTransport().stream())
+				.forEach(t ->
 				{
 					if (!"HTTP".equals(t.getTransportSender().getTransportProtocol().getValue()))
 						logger.warn("Transport protocol " + t.getTransportSender().getTransportProtocol().getValue() + " defined in TransportSender of Transport " + t.getTransportId() + " not implemented!");

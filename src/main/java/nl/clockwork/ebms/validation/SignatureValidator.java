@@ -16,6 +16,7 @@
 package nl.clockwork.ebms.validation;
 
 import java.util.List;
+import java.util.Optional;
 
 import nl.clockwork.ebms.Constants;
 import nl.clockwork.ebms.StreamUtils;
@@ -52,11 +53,11 @@ public class SignatureValidator
 			if (signature == null)
 				throw new EbMSValidationException(
 						EbMSMessageUtils.createError("//Header/Signature",Constants.EbMSErrorCode.SECURITY_FAILURE,"Signature not found."));
-			List<ReferenceType> references = signature.getSignedInfo().getReference();
-			for (ReferenceType reference : references)
-				if (!CPAUtils.getHashFunction(deliveryChannel).equals(reference.getDigestMethod().getAlgorithm()))
-					throw new EbMSValidationException(
-							EbMSMessageUtils.createError("//Header/Signature/SignedInfo/Reference[@URI='" + reference.getURI() + "']/DigestMethod/@Algorithm",Constants.EbMSErrorCode.SECURITY_FAILURE,"Invalid DigestMethod."));
+			Optional<ReferenceType> reference = signature.getSignedInfo().getReference().stream()
+					.filter(r -> !CPAUtils.getHashFunction(deliveryChannel).equals(r.getDigestMethod().getAlgorithm())).findFirst();
+			if (reference.isPresent())
+				throw new EbMSValidationException(
+						EbMSMessageUtils.createError("//Header/Signature/SignedInfo/Reference[@URI='" + reference.get().getURI() + "']/DigestMethod/@Algorithm",Constants.EbMSErrorCode.SECURITY_FAILURE,"Invalid DigestMethod."));
 			if (!CPAUtils.getSignatureAlgorithm(deliveryChannel).equals(signature.getSignedInfo().getSignatureMethod().getAlgorithm()))
 				throw new EbMSValidationException(
 						EbMSMessageUtils.createError("//Header/Signature/SignedInfo/SignatureMethod/@Algorithm",Constants.EbMSErrorCode.SECURITY_FAILURE,"Invalid SignatureMethod."));
