@@ -19,17 +19,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Date;
 import java.util.List;
-import java.util.stream.Collectors;
-
-import nl.clockwork.ebms.Constants;
-import nl.clockwork.ebms.Constants.EbMSAction;
-import nl.clockwork.ebms.StreamUtils;
-import nl.clockwork.ebms.common.CPAManager;
-import nl.clockwork.ebms.dao.EbMSDAO;
-import nl.clockwork.ebms.model.CacheablePartyId;
-import nl.clockwork.ebms.model.EbMSMessage;
-import nl.clockwork.ebms.util.CPAUtils;
-import nl.clockwork.ebms.util.EbMSMessageUtils;
 
 import org.apache.commons.lang3.StringUtils;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.ActorType;
@@ -43,6 +32,16 @@ import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageOrder;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.PartyId;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.Service;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.SyncReply;
+
+import nl.clockwork.ebms.Constants;
+import nl.clockwork.ebms.Constants.EbMSAction;
+import nl.clockwork.ebms.StreamUtils;
+import nl.clockwork.ebms.common.CPAManager;
+import nl.clockwork.ebms.dao.EbMSDAO;
+import nl.clockwork.ebms.model.CacheablePartyId;
+import nl.clockwork.ebms.model.EbMSMessage;
+import nl.clockwork.ebms.util.CPAUtils;
+import nl.clockwork.ebms.util.EbMSMessageUtils;
 
 public class MessageHeaderValidator
 {
@@ -268,18 +267,21 @@ public class MessageHeaderValidator
 				|| deliveryChannel.getMessagingCharacteristics().getActor().value().equals(acknowledgment.getActor());
 	}
 
-	private void compare(List<PartyId> requestPartyIds, List<PartyId> responsePartyIds) throws ValidationException
+	private static void compare(List<PartyId> requestPartyIds, List<PartyId> responsePartyIds) throws ValidationException
 	{
-		boolean containsAll = requestPartyIds.stream()
-				.map(r -> EbMSMessageUtils.toString(r))
-				.collect(Collectors.toList())
-				.containsAll(responsePartyIds.stream()
-						.map(r -> EbMSMessageUtils.toString(r))
-						.collect(Collectors.toList()));
-		if (containsAll)
-			return;
-		else
+		boolean anyMatch = requestPartyIds.stream()
+				.map(req -> EbMSMessageUtils.toString(req))
+				.anyMatch(req -> responsePartyIds.stream().map(res -> EbMSMessageUtils.toString(res)).anyMatch(res -> req.equals(res)));
+		if (!anyMatch)
 			throw new ValidationException("Request PartyIds do not match response PartyIds");
+    
+//		HashSet<PartyId> request = new HashSet<>(requestPartyIds);
+//		HashSet<PartyId> response = new HashSet<>(responsePartyIds);
+//		boolean allMatch = request.size() == response.size() && request.stream()
+//				.map(req -> EbMSMessageUtils.toString(req))
+//				.allMatch(req -> response.stream().map(res -> EbMSMessageUtils.toString(res)).anyMatch(res -> req.equals(res)));
+//		if (!allMatch)
+//			throw new ValidationException("Request PartyIds do not match response PartyIds");
 	}
 
 	public void setEbMSDAO(EbMSDAO ebMSDAO)
