@@ -39,7 +39,6 @@ import org.xml.sax.SAXException;
 
 import nl.clockwork.ebms.Constants;
 import nl.clockwork.ebms.StreamUtils;
-import nl.clockwork.ebms.ThrowingConsumer;
 import nl.clockwork.ebms.common.CPAManager;
 import nl.clockwork.ebms.common.KeyStoreManager;
 import nl.clockwork.ebms.common.util.DOMUtils;
@@ -88,7 +87,7 @@ public class EbMSMessageDecrypter implements InitializingBean
 							"No certificate found with subject \"" + certificate.getSubjectDN().getName() + "\" in keystore \"" + keyStorePath + "\"");
 				KeyPair keyPair = SecurityUtils.getKeyPair(keyStore,alias,keyStorePassword);
 				List<EbMSAttachment> attachments = new ArrayList<>();
-				message.getAttachments().forEach(ThrowingConsumer.throwingConsumerWrapper(a -> attachments.add(decrypt(keyPair,a))));
+				message.getAttachments().forEach(a -> attachments.add(decrypt(keyPair,a)));
 				message.setAttachments(attachments);
 			}
 		}

@@ -59,8 +59,6 @@ import nl.clockwork.ebms.Constants.EbMSAction;
 import nl.clockwork.ebms.Constants.EbMSEventStatus;
 import nl.clockwork.ebms.Constants.EbMSMessageEventType;
 import nl.clockwork.ebms.Constants.EbMSMessageStatus;
-import nl.clockwork.ebms.ThrowingConsumer;
-import nl.clockwork.ebms.ThrowingFunction;
 import nl.clockwork.ebms.common.JAXBParser;
 import nl.clockwork.ebms.common.util.DOMUtils;
 import nl.clockwork.ebms.model.EbMSAttachment;
@@ -415,15 +413,12 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	{
 		try
 		{
-			return getMessageContext(messageId).map(ThrowingFunction.throwingFunctionWrapper(mc ->
-			{
-				List<EbMSAttachment> attachments = getAttachments(messageId);
-				List<EbMSDataSource> dataSources = new ArrayList<>();
-				attachments.forEach(ThrowingConsumer.throwingConsumerWrapper(a ->
-						dataSources.add(new EbMSDataSource(a.getName(),a.getContentId(),a.getContentType(),IOUtils.toByteArray(a.getInputStream())))
-				));
-				return new EbMSMessageContent(mc,dataSources);
-			}));
+			List<EbMSDataSource> dataSources = new ArrayList<>();
+			List<EbMSAttachment> attachments = getAttachments(messageId);
+			for (EbMSAttachment attachment: attachments)
+				dataSources.add(new EbMSDataSource(attachment.getName(),attachment.getContentId(),attachment.getContentType(),IOUtils.toByteArray(attachment.getInputStream())));
+			return getMessageContext(messageId).map(mc -> new EbMSMessageContent(mc,dataSources)
+			);
 		}
 		catch (DataAccessException | IOException e)
 		{
@@ -935,7 +930,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	protected void insertAttachments(KeyHolder keyHolder, List<EbMSAttachment> attachments) throws InvalidDataAccessApiUsageException, DataAccessException, IOException
 	{
 		AtomicInteger orderNr = new AtomicInteger(0);
-		attachments.forEach(ThrowingConsumer.throwingConsumerWrapper(a ->
+		for (EbMSAttachment attachment: attachments)
 		{
 			jdbcTemplate.update
 			(
@@ -951,12 +946,12 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 				keyHolder.getKeys().get("message_id"),
 				keyHolder.getKeys().get("message_nr"),
 				orderNr.getAndIncrement(),
-				a.getName(),
-				a.getContentId(),
-				a.getContentType(),
-				IOUtils.toByteArray(a.getInputStream())
+				attachment.getName(),
+				attachment.getContentId(),
+				attachment.getContentType(),
+				IOUtils.toByteArray(attachment.getInputStream())
 			);
-		}));
+		};
 	}
 
 	@Override

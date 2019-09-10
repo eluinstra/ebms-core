@@ -37,7 +37,6 @@ import org.w3c.dom.NodeList;
 
 import nl.clockwork.ebms.Constants;
 import nl.clockwork.ebms.StreamUtils;
-import nl.clockwork.ebms.ThrowingConsumer;
 import nl.clockwork.ebms.common.CPAManager;
 import nl.clockwork.ebms.common.KeyStoreManager;
 import nl.clockwork.ebms.common.util.DOMUtils;
@@ -148,8 +147,8 @@ public class EbMSSignatureGenerator implements InitializingBean
 		
 		signature.addDocument("",transforms,digestAlgorithm);
 		
-		attachments.stream()
-		.forEach(ThrowingConsumer.throwingConsumerWrapper(a -> signature.addDocument(Constants.CID + a.getContentId(),null,digestAlgorithm)));
+		for (EbMSAttachment attachment: attachments)
+			signature.addDocument(Constants.CID + attachment.getContentId(),null,digestAlgorithm);
 		
 		signature.addKeyInfo(keyPair.getPublic());
 		

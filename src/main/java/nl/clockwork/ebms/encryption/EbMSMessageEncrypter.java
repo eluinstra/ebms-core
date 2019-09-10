@@ -15,7 +15,6 @@
  */
 package nl.clockwork.ebms.encryption;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
@@ -64,7 +63,6 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 import nl.clockwork.ebms.StreamUtils;
-import nl.clockwork.ebms.ThrowingConsumer;
 import nl.clockwork.ebms.common.CPAManager;
 import nl.clockwork.ebms.common.KeyStoreManager;
 import nl.clockwork.ebms.common.util.SecurityUtils;
@@ -105,17 +103,16 @@ public class EbMSMessageEncrypter implements InitializingBean
 				DeliveryChannel deliveryChannel =
 						cpaManager.getReceiveDeliveryChannel(messageHeader.getCPAId(),toPartyId,messageHeader.getTo().getRole(),service,messageHeader.getAction())
 						.orElseThrow(() -> 
-						StreamUtils.illegalStateException("ReceiveDeliveryChannel",messageHeader.getCPAId(),toPartyId,messageHeader.getTo().getRole(),service,messageHeader.getAction()));
+								StreamUtils.illegalStateException("ReceiveDeliveryChannel",messageHeader.getCPAId(),toPartyId,messageHeader.getTo().getRole(),service,messageHeader.getAction()));
 				X509Certificate certificate = CPAUtils.getX509Certificate(CPAUtils.getEncryptionCertificate(deliveryChannel));
 				validateCertificate(trustStore,certificate);
 				String encryptionAlgorithm = CPAUtils.getEncryptionAlgorithm(deliveryChannel);
 				List<EbMSAttachment> attachments = new ArrayList<>();
-				message.getAttachments().forEach(ThrowingConsumer.throwingConsumerWrapper(a ->
-						attachments.add(encrypt(createDocument(),certificate,encryptionAlgorithm,a))));
+				message.getAttachments().forEach(a -> attachments.add(encrypt(createDocument(),certificate,encryptionAlgorithm,a)));
 				message.setAttachments(attachments);
 			}
 		}
-		catch (CertificateException | NoSuchAlgorithmException | KeyStoreException | XMLEncryptionException | FileNotFoundException e)
+		catch (CertificateException | KeyStoreException | ValidatorException e)
 		{
 			throw new EbMSProcessorException(e);
 		}
@@ -133,8 +130,7 @@ public class EbMSMessageEncrypter implements InitializingBean
 			validateCertificate(trustStore,certificate);
 			String encryptionAlgorithm = CPAUtils.getEncryptionAlgorithm(deliveryChannel);
 			List<EbMSAttachment> attachments = new ArrayList<>();
-			message.getAttachments().forEach(ThrowingConsumer.throwingConsumerWrapper(a ->
-					attachments.add(encrypt(createDocument(),certificate,encryptionAlgorithm,a))));
+			message.getAttachments().forEach(a -> attachments.add(encrypt(createDocument(),certificate,encryptionAlgorithm,a)));
 			message.getAttachments().clear();
 			message.getAttachments().addAll(attachments);
 		}

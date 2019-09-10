@@ -24,7 +24,6 @@ import java.util.List;
 import javax.activation.DataHandler;
 import javax.xml.bind.annotation.XmlElement;
 
-import nl.clockwork.ebms.ThrowingConsumer;
 import nl.clockwork.ebms.processor.EbMSProcessorException;
 
 public class EbMSMessageAttachment implements Serializable
@@ -65,7 +64,7 @@ public class EbMSMessageAttachment implements Serializable
 		if (msgContentCache == null)
 		{
 			msgContentCache = new EbMSMessageContent(context);
-			attachments.forEach(ThrowingConsumer.throwingConsumerWrapper(a ->
+			attachments.forEach(a ->
 			{
 				ByteArrayOutputStream bos = new ByteArrayOutputStream();
 				try
@@ -83,7 +82,7 @@ public class EbMSMessageAttachment implements Serializable
 					throw new EbMSProcessorException(e);
 				}
 				msgContentCache.getDataSources().add(new EbMSDataSource(a.getName(),a.getContentType(),bos.toByteArray()));
-			}));
+			});
 		}
 		
 		return msgContentCache;

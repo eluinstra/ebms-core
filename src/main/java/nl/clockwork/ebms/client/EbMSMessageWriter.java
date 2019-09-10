@@ -25,17 +25,16 @@ import java.util.UUID;
 
 import javax.xml.transform.TransformerException;
 
-import nl.clockwork.ebms.Constants;
-import nl.clockwork.ebms.ThrowingConsumer;
-import nl.clockwork.ebms.common.util.DOMUtils;
-import nl.clockwork.ebms.common.util.HTTPUtils;
-import nl.clockwork.ebms.model.EbMSAttachment;
-import nl.clockwork.ebms.model.EbMSDocument;
-
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.util.StringUtils;
+
+import nl.clockwork.ebms.Constants;
+import nl.clockwork.ebms.common.util.DOMUtils;
+import nl.clockwork.ebms.common.util.HTTPUtils;
+import nl.clockwork.ebms.model.EbMSAttachment;
+import nl.clockwork.ebms.model.EbMSDocument;
 
 public class EbMSMessageWriter
 {
@@ -95,13 +94,13 @@ public class EbMSMessageWriter
 			writer.write("--");
 			writer.write(boundary);
 
-			document.getAttachments().forEach(ThrowingConsumer.throwingConsumerWrapper(a ->
+			for (EbMSAttachment attachment: document.getAttachments())
 			{
-				if (a.getContentType().matches("^(text/.*|.*/xml)$"))
-					writeTextAttachment(boundary,outputStream,writer,a);
+				if (attachment.getContentType().matches("^(text/.*|.*/xml)$"))
+					writeTextAttachment(boundary,outputStream,writer,attachment);
 				else
-					writeBinaryAttachment(boundary,outputStream,writer,a);
-			}));
+					writeBinaryAttachment(boundary,outputStream,writer,attachment);
+			}
 
 			writer.write("--");
 		}

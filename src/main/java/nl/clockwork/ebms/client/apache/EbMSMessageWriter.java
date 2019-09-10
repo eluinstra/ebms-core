@@ -21,12 +21,6 @@ import java.nio.charset.Charset;
 
 import javax.xml.transform.TransformerException;
 
-import nl.clockwork.ebms.Constants;
-import nl.clockwork.ebms.ThrowingConsumer;
-import nl.clockwork.ebms.common.util.DOMUtils;
-import nl.clockwork.ebms.model.EbMSAttachment;
-import nl.clockwork.ebms.model.EbMSDocument;
-
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -37,6 +31,11 @@ import org.apache.http.entity.mime.FormBodyPartBuilder;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.entity.mime.content.InputStreamBody;
 import org.apache.http.entity.mime.content.StringBody;
+
+import nl.clockwork.ebms.Constants;
+import nl.clockwork.ebms.common.util.DOMUtils;
+import nl.clockwork.ebms.model.EbMSAttachment;
+import nl.clockwork.ebms.model.EbMSDocument;
 
 public class EbMSMessageWriter
 {
@@ -82,13 +81,13 @@ public class EbMSMessageWriter
 		MultipartEntityBuilder entity = MultipartEntityBuilder.create();
 		entity.setContentType(ContentType.create("multipart/related"));
 		entity.addPart(document.getContentId(),new StringBody(DOMUtils.toString(document.getMessage(),"UTF-8"),ContentType.create("text/xml")));
-		document.getAttachments().forEach(ThrowingConsumer.throwingConsumerWrapper(a ->
+		for (EbMSAttachment attachment: document.getAttachments())
 		{
-			if (a.getContentType().matches("^(text/.*|.*/xml)$"))
-				writeTextAttachment(entity,a);
+			if (attachment.getContentType().matches("^(text/.*|.*/xml)$"))
+				writeTextAttachment(entity,attachment);
 			else
-				writeBinaryAttachment(entity,a);
-		}));
+				writeBinaryAttachment(entity,attachment);
+		}
 		httpPost.setEntity(entity.build());
 	}
 

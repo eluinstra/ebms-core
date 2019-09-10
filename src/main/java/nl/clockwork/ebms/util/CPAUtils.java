@@ -28,11 +28,6 @@ import java.util.List;
 import javax.xml.bind.JAXBElement;
 import javax.xml.datatype.Duration;
 
-import nl.clockwork.ebms.Constants;
-import nl.clockwork.ebms.ThrowingFunction;
-import nl.clockwork.ebms.model.FromPartyInfo;
-import nl.clockwork.ebms.model.ToPartyInfo;
-
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.ActionBindingType;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CanReceive;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CanSend;
@@ -50,6 +45,10 @@ import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.ServiceType;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.Transport;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.Service;
 import org.w3._2000._09.xmldsig.X509DataType;
+
+import nl.clockwork.ebms.Constants;
+import nl.clockwork.ebms.model.FromPartyInfo;
+import nl.clockwork.ebms.model.ToPartyInfo;
 
 public class CPAUtils
 {
@@ -273,15 +272,11 @@ public class CPAUtils
 	public static X509Certificate getX509Certificate(Certificate certificate) throws CertificateException
 	{
 		if (certificate != null)
-			return certificate.getKeyInfo().getContent().stream()
-					.filter(c -> c instanceof JAXBElement<?> && ((JAXBElement<?>)c).getValue() instanceof X509DataType)
-					.flatMap(c -> ((X509DataType)((JAXBElement<?>)c).getValue()).getX509IssuerSerialOrX509SKIOrX509SubjectName().stream())
-					.filter(n -> n instanceof JAXBElement<?> && "X509Certificate".equals(((JAXBElement<?>)n).getName().getLocalPart()))
-					.map(ThrowingFunction.throwingFunctionWrapper(
-							n -> (X509Certificate)CertificateFactory.getInstance("X.509").generateCertificate(
-									new ByteArrayInputStream((byte[])((JAXBElement<?>)n).getValue()))))
-					.findFirst()
-					.orElse(null);
+			for (Object o : certificate.getKeyInfo().getContent())
+				if (o instanceof JAXBElement<?> && ((JAXBElement<?>)o).getValue() instanceof X509DataType)
+					for (Object p : ((X509DataType)((JAXBElement<?>)o).getValue()).getX509IssuerSerialOrX509SKIOrX509SubjectName())
+						if (p instanceof JAXBElement<?> && "X509Certificate".equals(((JAXBElement<?>)p).getName().getLocalPart()))
+							return (X509Certificate)CertificateFactory.getInstance("X.509").generateCertificate(new ByteArrayInputStream((byte[])((JAXBElement<?>)p).getValue())); 
 		return null;
 	}
 

@@ -24,13 +24,18 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DeliveryChannel;
+import org.springframework.beans.factory.InitializingBean;
+
 import nl.clockwork.ebms.Constants.EbMSEventStatus;
 import nl.clockwork.ebms.Constants.EbMSMessageStatus;
 import nl.clockwork.ebms.StreamUtils;
-import nl.clockwork.ebms.ThrowingConsumer;
 import nl.clockwork.ebms.client.EbMSClient;
-import nl.clockwork.ebms.client.EbMSResponseException;
 import nl.clockwork.ebms.client.EbMSIrrecoverableResponsexception;
+import nl.clockwork.ebms.client.EbMSResponseException;
 import nl.clockwork.ebms.common.CPAManager;
 import nl.clockwork.ebms.common.URLManager;
 import nl.clockwork.ebms.dao.DAOTransactionCallback;
@@ -41,12 +46,6 @@ import nl.clockwork.ebms.model.EbMSDocument;
 import nl.clockwork.ebms.model.EbMSEvent;
 import nl.clockwork.ebms.processor.EbMSMessageProcessor;
 import nl.clockwork.ebms.util.CPAUtils;
-
-import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DeliveryChannel;
-import org.springframework.beans.factory.InitializingBean;
 
 public class EbMSEventProcessor implements InitializingBean, Job
 {
@@ -78,8 +77,7 @@ public class EbMSEventProcessor implements InitializingBean, Job
 			try
 			{
 				Optional<EbMSDocument> requestDocument = ebMSDAO.getEbMSDocumentIfUnsent(event.getMessageId());
-				StreamUtils.ifPresentOrElse(requestDocument,
-						ThrowingConsumer.throwingConsumerWrapper(d ->
+				StreamUtils.ifPresentOrElse(requestDocument, d ->
 						{
 							if (event.isConfidential())
 								messageEncrypter.encrypt(deliveryChannel,d);
@@ -102,7 +100,7 @@ public class EbMSEventProcessor implements InitializingBean, Job
 											}
 									}
 								});
-						}),
+						},
 						() -> eventManager.deleteEvent(event.getMessageId())
 					);
 			}

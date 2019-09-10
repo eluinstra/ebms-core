@@ -19,7 +19,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import nl.clockwork.ebms.Constants;
-import nl.clockwork.ebms.ThrowingConsumer;
 import nl.clockwork.ebms.model.EbMSAttachment;
 import nl.clockwork.ebms.model.EbMSMessage;
 import nl.clockwork.ebms.util.EbMSMessageUtils;
@@ -34,7 +33,7 @@ public class ManifestValidator
 		{
 			if (!Constants.EBMS_VERSION.equals(message.getManifest().getVersion()))
 				throw new EbMSValidationException(EbMSMessageUtils.createError("//Body/Manifest/@version",Constants.EbMSErrorCode.INCONSISTENT,"Invalid value."));
-			message.getManifest().getReference().forEach(ThrowingConsumer.throwingConsumerWrapper(r ->
+			message.getManifest().getReference().forEach(r ->
 			{
 				if (r.getHref().startsWith(Constants.CID))
 				{
@@ -46,7 +45,7 @@ public class ManifestValidator
 				}
 				else
 					throw new EbMSValidationException(EbMSMessageUtils.createError("//Body/Manifest/Reference[@href='" + r.getHref() + "']",Constants.EbMSErrorCode.MIME_PROBLEM,"URI cannot be resolved."));
-			}));
+			});
 		}
 		message.getAttachments().retainAll(attachments);
 	}

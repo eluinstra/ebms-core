@@ -27,16 +27,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.xml.transform.TransformerException;
 
-import nl.clockwork.ebms.Constants.EbMSMessageEventType;
-import nl.clockwork.ebms.Constants.EbMSMessageStatus;
-import nl.clockwork.ebms.ThrowingConsumer;
-import nl.clockwork.ebms.common.util.DOMUtils;
-import nl.clockwork.ebms.dao.AbstractEbMSDAO;
-import nl.clockwork.ebms.dao.DAOException;
-import nl.clockwork.ebms.model.EbMSAttachment;
-import nl.clockwork.ebms.model.EbMSMessage;
-import nl.clockwork.ebms.util.EbMSMessageUtils;
-
 import org.apache.commons.io.IOUtils;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageHeader;
 import org.springframework.dao.DataAccessException;
@@ -48,6 +38,15 @@ import org.springframework.transaction.TransactionException;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 import org.springframework.transaction.support.TransactionTemplate;
+
+import nl.clockwork.ebms.Constants.EbMSMessageEventType;
+import nl.clockwork.ebms.Constants.EbMSMessageStatus;
+import nl.clockwork.ebms.common.util.DOMUtils;
+import nl.clockwork.ebms.dao.AbstractEbMSDAO;
+import nl.clockwork.ebms.dao.DAOException;
+import nl.clockwork.ebms.model.EbMSAttachment;
+import nl.clockwork.ebms.model.EbMSMessage;
+import nl.clockwork.ebms.util.EbMSMessageUtils;
 
 public class EbMSDAOImpl extends AbstractEbMSDAO
 {
@@ -300,7 +299,7 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 	protected void insertAttachments(Key key, List<EbMSAttachment> attachments) throws InvalidDataAccessApiUsageException, DataAccessException, IOException
 	{
 		AtomicInteger orderNr = new AtomicInteger(0);
-		attachments.forEach(ThrowingConsumer.throwingConsumerWrapper(a ->
+		for (EbMSAttachment attachment: attachments)
 		{
 			jdbcTemplate.update
 			(
@@ -316,12 +315,12 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 				key.getMessageId(),
 				key.getMessageNr(),
 				orderNr.getAndIncrement(),
-				a.getName(),
-				a.getContentId(),
-				a.getContentType(),
-				IOUtils.toByteArray(a.getInputStream())
+				attachment.getName(),
+				attachment.getContentId(),
+				attachment.getContentType(),
+				IOUtils.toByteArray(attachment.getInputStream())
 			);
-		}));
+		}
 	}
 
 	@Override
