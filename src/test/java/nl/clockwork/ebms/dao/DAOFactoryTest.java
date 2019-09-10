@@ -97,11 +97,6 @@ public class DAOFactoryTest {
 	@Test
 	public void testMssql() throws Exception
 	{
-		ds.setDriverClass("net.sourceforge.jtds.jdbc.Driver");
-		dao = daoFactory.getObject();
-		assertNotNull(dao);
-		assertEquals(nl.clockwork.ebms.dao.mssql.EbMSDAOImpl.class, dao.getClass());
-		
 		ds.setDriverClass("com.microsoft.sqlserver.jdbc.SQLServerDriver");
 		dao = daoFactory.getObject();
 		assertNotNull(dao);
