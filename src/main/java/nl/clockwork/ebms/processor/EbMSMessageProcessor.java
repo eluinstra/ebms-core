@@ -53,6 +53,7 @@ import nl.clockwork.ebms.job.EventManager;
 import nl.clockwork.ebms.model.CacheablePartyId;
 import nl.clockwork.ebms.model.EbMSDocument;
 import nl.clockwork.ebms.model.EbMSMessage;
+import nl.clockwork.ebms.model.EbMSMessageContext;
 import nl.clockwork.ebms.signing.EbMSSignatureGenerator;
 import nl.clockwork.ebms.util.CPAUtils;
 import nl.clockwork.ebms.util.EbMSMessageUtils;
@@ -380,7 +381,7 @@ public class EbMSMessageProcessor
 								DeliveryChannel deliveryChannel =
 										cpaManager.getReceiveDeliveryChannel(messageHeader.getCPAId(),toPartyId,message.getMessageHeader().getTo().getRole(),service,message.getMessageHeader().getAction())
 										.orElseThrow(() ->
-										StreamUtils.illegalStateException("ReceiveDeliveryChannel",messageHeader.getCPAId(),toPartyId,message.getMessageHeader().getTo().getRole(),service,message.getMessageHeader().getAction()));
+												StreamUtils.illegalStateException("ReceiveDeliveryChannel",messageHeader.getCPAId(),toPartyId,message.getMessageHeader().getTo().getRole(),service,message.getMessageHeader().getAction()));
 								Date persistTime = CPAUtils.getPersistTime(messageHeader.getMessageData().getTimestamp(),deliveryChannel);
 								ebMSDAO.insertMessage(timestamp,persistTime,message,EbMSMessageStatus.RECEIVED);
 								ebMSDAO.insertMessage(timestamp,persistTime,acknowledgment,null);
@@ -391,7 +392,7 @@ public class EbMSMessageProcessor
 								DeliveryChannel deliveryChannel =
 										cpaManager.getReceiveDeliveryChannel(messageHeader.getCPAId(),toPartyId,acknowledgment.getMessageHeader().getTo().getRole(),service,acknowledgment.getMessageHeader().getAction())
 										.orElseThrow(() ->
-										StreamUtils.illegalStateException("ReceiveDeliveryChannel",messageHeader.getCPAId(),toPartyId,acknowledgment.getMessageHeader().getTo().getRole(),service,acknowledgment.getMessageHeader().getAction()));
+												StreamUtils.illegalStateException("ReceiveDeliveryChannel",messageHeader.getCPAId(),toPartyId,acknowledgment.getMessageHeader().getTo().getRole(),service,acknowledgment.getMessageHeader().getAction()));
 								if (!messageValidator.isSyncReply(message))
 									eventManager.createEvent(
 											messageHeader.getCPAId(),
@@ -454,31 +455,36 @@ public class EbMSMessageProcessor
 	{
 		messageValidator.validateStatusRequest(message,timestamp);
 		Pair<EbMSMessageStatus,Date> result = ebMSDAO.getMessageContext(message.getStatusRequest().getRefToMessageId())
-				.map(mc ->
-				{
-					if (mc == null || Constants.EBMS_SERVICE_URI.equals(mc.getService()))
-						return new Pair<EbMSMessageStatus,Date>(EbMSMessageStatus.NOT_RECOGNIZED,null);
-					else if (!mc.getCpaId().equals(message.getMessageHeader().getCPAId()))
-						return new Pair<EbMSMessageStatus,Date>(EbMSMessageStatus.UNAUTHORIZED,null);
-					else
-					{
-						return ebMSDAO.getMessageStatus(message.getStatusRequest().getRefToMessageId())
-								.map(s ->
-								{
-									if (s != null
-											&& (MessageStatusType.RECEIVED.equals(s.statusCode())
-													|| MessageStatusType.PROCESSED.equals(s.statusCode())
-													|| MessageStatusType.FORWARDED.equals(s.statusCode())))
-										return new Pair<EbMSMessageStatus,Date>(s,mc.getTimestamp());
-									else
-										return new Pair<EbMSMessageStatus,Date>(EbMSMessageStatus.NOT_RECOGNIZED,null);
-								}).get();
-					}
-				})
+				.map(mc -> createEbMSMessageStatus(message,mc))
 				.get();
 		return ebMSMessageFactory.createEbMSStatusResponse(cpaId,message,result.getValue0(),result.getValue1()); 
 	}
 	
+	private Pair<EbMSMessageStatus,Date> createEbMSMessageStatus(EbMSMessage message, EbMSMessageContext messageContext)
+	{
+		if (messageContext == null || Constants.EBMS_SERVICE_URI.equals(messageContext.getService()))
+			return new Pair<EbMSMessageStatus,Date>(EbMSMessageStatus.NOT_RECOGNIZED,null);
+		else if (!messageContext.getCpaId().equals(message.getMessageHeader().getCPAId()))
+			return new Pair<EbMSMessageStatus,Date>(EbMSMessageStatus.UNAUTHORIZED,null);
+		else
+		{
+			return ebMSDAO.getMessageStatus(message.getStatusRequest().getRefToMessageId())
+					.map(s -> createEbMSMessageStatus(messageContext.getTimestamp(),s))
+					.get();
+		}
+	}
+
+	private Pair<EbMSMessageStatus,Date> createEbMSMessageStatus(Date timestamp, EbMSMessageStatus status)
+	{
+		if (status != null
+				&& (MessageStatusType.RECEIVED.equals(status.statusCode())
+						|| MessageStatusType.PROCESSED.equals(status.statusCode())
+						|| MessageStatusType.FORWARDED.equals(status.statusCode())))
+			return new Pair<EbMSMessageStatus,Date>(status,timestamp);
+		else
+			return new Pair<EbMSMessageStatus,Date>(EbMSMessageStatus.NOT_RECOGNIZED,null);
+	}
+
 	protected EbMSMessage processPing(String cpaId, final Date timestamp, final EbMSMessage message) throws ValidatorException, EbMSProcessorException
 	{
 		messageValidator.validatePing(message,timestamp);
