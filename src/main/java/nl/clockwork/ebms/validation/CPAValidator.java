@@ -36,6 +36,7 @@ import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.SyncReplyModeType
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.Transport;
 
 import nl.clockwork.ebms.Constants;
+import nl.clockwork.ebms.StreamUtils;
 import nl.clockwork.ebms.common.CPAManager;
 import nl.clockwork.ebms.common.util.SecurityUtils;
 import nl.clockwork.ebms.model.EbMSMessage;
@@ -64,7 +65,7 @@ public class CPAValidator
 
 	public void validate(String cpaId) throws ValidatorException
 	{
-		validate(cpaManager.getCPA(cpaId).orElse(null));
+		validate(cpaManager.getCPA(cpaId).orElseThrow(() -> StreamUtils.illegalStateException("CPA",cpaId)));
 	}
 
 	public void validate(CollaborationProtocolAgreement cpa) throws ValidatorException
