@@ -115,10 +115,8 @@ public class EbMSSignatureGenerator implements InitializingBean
 		MessageHeader messageHeader = message.getMessageHeader();
 		CacheablePartyId fromPartyId = new CacheablePartyId(messageHeader.getFrom().getPartyId());
 		String service = CPAUtils.toString(messageHeader.getService());
-		DeliveryChannel deliveryChannel =
-				cpaManager.getSendDeliveryChannel(messageHeader.getCPAId(),fromPartyId,messageHeader.getFrom().getRole(),service,messageHeader.getAction())
-				.orElseThrow(() ->
-				StreamUtils.illegalStateException("SendDeliveryChannel",messageHeader.getCPAId(),fromPartyId,messageHeader.getFrom().getRole(),service,messageHeader.getAction()));
+		DeliveryChannel deliveryChannel = cpaManager.getSendDeliveryChannel(messageHeader.getCPAId(),fromPartyId,messageHeader.getFrom().getRole(),service,messageHeader.getAction())
+				.orElseThrow(() -> StreamUtils.illegalStateException("SendDeliveryChannel",messageHeader.getCPAId(),fromPartyId,messageHeader.getFrom().getRole(),service,messageHeader.getAction()));
 		X509Certificate certificate = CPAUtils.getX509Certificate(CPAUtils.getSigningCertificate(deliveryChannel));
 		String alias = keyStore.getCertificateAlias(certificate);
 		if (alias == null)

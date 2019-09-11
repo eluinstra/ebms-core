@@ -18,6 +18,8 @@ package nl.clockwork.ebms.validation;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.Reference;
+
 import nl.clockwork.ebms.Constants;
 import nl.clockwork.ebms.model.EbMSAttachment;
 import nl.clockwork.ebms.model.EbMSMessage;
@@ -33,21 +35,23 @@ public class ManifestValidator
 		{
 			if (!Constants.EBMS_VERSION.equals(message.getManifest().getVersion()))
 				throw new EbMSValidationException(EbMSMessageUtils.createError("//Body/Manifest/@version",Constants.EbMSErrorCode.INCONSISTENT,"Invalid value."));
-			message.getManifest().getReference().forEach(r ->
-			{
-				if (r.getHref().startsWith(Constants.CID))
-				{
-					EbMSAttachment attachment = findAttachment(message.getAttachments(),r.getHref());
-					if (attachment != null)
-						attachments.add(attachment);
-					else
-						throw new EbMSValidationException(EbMSMessageUtils.createError(r.getHref(),Constants.EbMSErrorCode.MIME_PROBLEM,"MIME part not found."));
-				}
-				else
-					throw new EbMSValidationException(EbMSMessageUtils.createError("//Body/Manifest/Reference[@href='" + r.getHref() + "']",Constants.EbMSErrorCode.MIME_PROBLEM,"URI cannot be resolved."));
-			});
+			message.getManifest().getReference().forEach(r -> addAttachment(attachments,message.getAttachments(),r));
 		}
 		message.getAttachments().retainAll(attachments);
+	}
+
+	private void addAttachment(List<EbMSAttachment> destAttachments, List<EbMSAttachment> srcAttachments, Reference reference)
+	{
+		if (reference.getHref().startsWith(Constants.CID))
+		{
+			EbMSAttachment attachment = findAttachment(srcAttachments,reference.getHref());
+			if (attachment != null)
+				destAttachments.add(attachment);
+			else
+				throw new EbMSValidationException(EbMSMessageUtils.createError(reference.getHref(),Constants.EbMSErrorCode.MIME_PROBLEM,"MIME part not found."));
+		}
+		else
+			throw new EbMSValidationException(EbMSMessageUtils.createError("//Body/Manifest/Reference[@href='" + reference.getHref() + "']",Constants.EbMSErrorCode.MIME_PROBLEM,"URI cannot be resolved."));
 	}
 
 	private EbMSAttachment findAttachment(List<EbMSAttachment> attachments, String href)

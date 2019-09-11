@@ -77,8 +77,7 @@ public class DuplicateMessageHandler
 						mshMessageService,
 						EbMSAction.MESSAGE_ERROR.action(),
 						EbMSAction.ACKNOWLEDGMENT.action());
-				StreamUtils.ifNotPresent(result,
-						() -> logger.warn("No response found for duplicate message " + messageHeader.getMessageData().getMessageId() + "!"));
+				StreamUtils.ifNotPresent(result, () -> logger.warn("No response found for duplicate message " + messageHeader.getMessageData().getMessageId() + "!"));
 				return result.orElse(null);
 			}
 			else
@@ -104,17 +103,9 @@ public class DuplicateMessageHandler
 							String service = CPAUtils.toString(CPAUtils.createEbMSMessageService());
 							DeliveryChannel deliveryChannel =
 									cpaManager.getReceiveDeliveryChannel(messageHeader.getCPAId(),fromPartyId,messageHeader.getFrom().getRole(),service,null)
-									.orElseThrow(() -> 
-									StreamUtils.illegalStateException("ReceiveDeliveryChannel",messageHeader.getCPAId(),fromPartyId,messageHeader.getFrom().getRole(),service));
-							StreamUtils.ifPresentOrElse(
-									context,
-									c ->eventManager.createEvent(
-											messageHeader.getCPAId(),
-											deliveryChannel,
-											c.getMessageId(),
-											messageHeader.getMessageData().getTimeToLive(),
-											c.getTimestamp(),
-											false),
+									.orElseThrow(() -> StreamUtils.illegalStateException("ReceiveDeliveryChannel",messageHeader.getCPAId(),fromPartyId,messageHeader.getFrom().getRole(),service));
+							StreamUtils.ifPresentOrElse(context,
+									c ->eventManager.createEvent(messageHeader.getCPAId(),deliveryChannel,c.getMessageId(),messageHeader.getMessageData().getTimeToLive(),c.getTimestamp(),false),
 									() -> logger.warn("No response found for duplicate message " + messageHeader.getMessageData().getMessageId() + "!"));
 						}
 					}

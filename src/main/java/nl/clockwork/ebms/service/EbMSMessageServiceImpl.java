@@ -81,8 +81,7 @@ public class EbMSMessageServiceImpl implements InitializingBean, EbMSMessageServ
 			String service = CPAUtils.toString(requestMessageHeader.getService());
 			String uri = cpaManager.getUri(cpaId,toPartyId,requestMessageHeader.getTo().getRole(),service,requestMessageHeader.getAction());
 			Optional<EbMSMessage> response = deliveryManager.sendMessage(uri,request);
-			StreamUtils.ifPresentOrElse(
-					response,
+			StreamUtils.ifPresentOrElse(response,
 					r ->
 					{
 						if (!EbMSAction.PONG.action().equals(r.getMessageHeader().getAction()))
@@ -251,8 +250,7 @@ public class EbMSMessageServiceImpl implements InitializingBean, EbMSMessageServ
 					CPAUtils.toString(request.getMessageHeader().getService()),
 					request.getMessageHeader().getAction());
 			Optional<EbMSMessage> response = deliveryManager.sendMessage(uri,request);
-			return response.map(r -> (createMessageStatus(r)))
-					.orElseThrow(() -> new EbMSMessageServiceException("No response received!"));
+			return response.map(r -> (createMessageStatus(r))).orElseThrow(() -> new EbMSMessageServiceException("No response received!"));
 		}
 	}
 	
@@ -280,18 +278,7 @@ public class EbMSMessageServiceImpl implements InitializingBean, EbMSMessageServ
 			String service = CPAUtils.toString(requestMessageHeader.getService());
 			String uri = cpaManager.getUri(cpaId,toPartyId,requestMessageHeader.getTo().getRole(),service,requestMessageHeader.getAction());
 			Optional<EbMSMessage> response = deliveryManager.sendMessage(uri,request);
-			return response.map(r ->
-			{
-				if (EbMSAction.STATUS_RESPONSE.action().equals(r.getMessageHeader().getAction()) && r.getStatusResponse() != null)
-				{
-					Date timestamp = r.getStatusResponse().getTimestamp() == null ? null : r.getStatusResponse().getTimestamp();
-					EbMSMessageStatus status = EbMSMessageStatus.get(r.getStatusResponse().getMessageStatus());
-					return new MessageStatus(timestamp,status);
-				}
-				else
-					throw new EbMSMessageServiceException("No valid response received!");
-			})
-			.orElseThrow(() -> new EbMSMessageServiceException("No response received!"));
+			return response.map(r ->createMessageStatus(r)).orElseThrow(() -> new EbMSMessageServiceException("No response received!"));
 		}
 		catch (ValidationException | DAOException | EbMSProcessorException e)
 		{
@@ -378,20 +365,12 @@ public class EbMSMessageServiceImpl implements InitializingBean, EbMSMessageServ
 				MessageHeader rmh = messageHeader;
 				CacheablePartyId toPartyId = new CacheablePartyId(messageHeader.getTo().getPartyId());
 				String service = CPAUtils.toString(rmh.getService());
-				DeliveryChannel deliveryChannel =
-						cpaManager.getReceiveDeliveryChannel(messageHeader.getCPAId(),toPartyId,rmh.getTo().getRole(),service,rmh.getAction())
-						.orElseThrow(() ->
-						StreamUtils.illegalStateException("ReceiveDeliveryChannel",messageHeader.getCPAId(),toPartyId,rmh.getTo().getRole(),service,rmh.getAction()));
+				DeliveryChannel deliveryChannel = cpaManager.getReceiveDeliveryChannel(messageHeader.getCPAId(),toPartyId,rmh.getTo().getRole(),service,rmh.getAction())
+						.orElseThrow(() ->StreamUtils.illegalStateException("ReceiveDeliveryChannel",messageHeader.getCPAId(),toPartyId,rmh.getTo().getRole(),service,rmh.getAction()));
 				ebMSDAO.insertMessage(timestamp,CPAUtils.getPersistTime(timestamp,deliveryChannel),result,EbMSMessageStatus.SENDING);
 				CacheablePartyId fromPartyId = new CacheablePartyId(rmh.getFrom().getPartyId());
 				boolean confidential = cpaManager.isConfidential(rmh.getCPAId(),fromPartyId,rmh.getFrom().getRole(),service,rmh.getAction());
-				eventManager.createEvent(
-						rmh.getCPAId(),
-						deliveryChannel,
-						rmh.getMessageData().getMessageId(),
-						rmh.getMessageData().getTimeToLive(),
-						rmh.getMessageData().getTimestamp(),
-						confidential);
+				eventManager.createEvent(rmh.getCPAId(),deliveryChannel,rmh.getMessageData().getMessageId(),rmh.getMessageData().getTimeToLive(),rmh.getMessageData().getTimestamp(),confidential);
 			}
 		});
 		return result.getMessageHeader().getMessageData().getMessageId();

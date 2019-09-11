@@ -55,6 +55,7 @@ import nl.clockwork.ebms.Constants.EbMSAction;
 import nl.clockwork.ebms.Constants.EbMSMessageStatus;
 import nl.clockwork.ebms.model.CacheablePartyId;
 import nl.clockwork.ebms.model.EbMSAttachment;
+import nl.clockwork.ebms.model.EbMSDataSource;
 import nl.clockwork.ebms.model.EbMSMessage;
 import nl.clockwork.ebms.model.EbMSMessageContent;
 import nl.clockwork.ebms.model.EbMSMessageContext;
@@ -224,14 +225,7 @@ public class EbMSMessageFactory
 			{
 				Manifest manifest = EbMSMessageUtils.createManifest();
 				List<EbMSAttachment> attachments = new ArrayList<>();
-				content.getDataSources().forEach(ds ->
-				{
-					String contentId = ds.getContentId() == null ? UUID.randomUUID().toString() : ds.getContentId();
-					manifest.getReference().add(EbMSMessageUtils.createReference(contentId));
-					ByteArrayDataSource dataSource = new ByteArrayDataSource(ds.getContent(),ds.getContentType());
-					dataSource.setName(ds.getName());
-					attachments.add(new EbMSAttachment(dataSource,contentId));
-				});
+				content.getDataSources().forEach(ds -> attachments.add(createEbMSAttachment(manifest,ds)));
 				result.setManifest(manifest);
 				result.setAttachments(attachments);
 			}
@@ -246,6 +240,16 @@ public class EbMSMessageFactory
 		{
 			throw new EbMSProcessorException(e);
 		}
+	}
+
+	private EbMSAttachment createEbMSAttachment(Manifest manifest, EbMSDataSource ds)
+	{
+		String contentId = ds.getContentId() == null ? UUID.randomUUID().toString() : ds.getContentId();
+		manifest.getReference().add(EbMSMessageUtils.createReference(contentId));
+		ByteArrayDataSource dataSource = new ByteArrayDataSource(ds.getContent(),ds.getContentType());
+		dataSource.setName(ds.getName());
+		EbMSAttachment e = new EbMSAttachment(dataSource,contentId);
+		return e;
 	}
 
 	private MessageHeader createMessageHeader(String cpaId, Party fromParty, Party toParty, String action)
@@ -298,15 +302,11 @@ public class EbMSMessageFactory
 	private MessageHeader createMessageHeader(String cpaId, EbMSMessageContext context) throws DatatypeConfigurationException
 	{
 		String uuid = context.getMessageId() == null ? UUID.randomUUID().toString() : context.getMessageId();
-		FromPartyInfo fromPartyInfo =
-				cpaManager.getFromPartyInfo(cpaId,context.getFromRole(),context.getService(),context.getAction())
-				.orElseThrow(() ->
-				StreamUtils.illegalStateException("FromPartyInfo",cpaId,context.getFromRole(),context.getService(),context.getAction()));
-		ToPartyInfo toPartyInfo =
-				cpaManager.getToPartyInfoByFromPartyActionBinding(cpaId,context.getFromRole(),context.getService(),context.getAction())
+		FromPartyInfo fromPartyInfo = cpaManager.getFromPartyInfo(cpaId,context.getFromRole(),context.getService(),context.getAction())
+				.orElseThrow(() -> StreamUtils.illegalStateException("FromPartyInfo",cpaId,context.getFromRole(),context.getService(),context.getAction()));
+		ToPartyInfo toPartyInfo = cpaManager.getToPartyInfoByFromPartyActionBinding(cpaId,context.getFromRole(),context.getService(),context.getAction())
 				.orElse(cpaManager.getToPartyInfo(cpaId,context.getToRole(),context.getService(),context.getAction())
-						.orElseThrow(() ->
-						StreamUtils.illegalStateException("ToPartyInfo",cpaId,context.getToRole(),context.getService(),context.getAction())));
+						.orElseThrow(() -> StreamUtils.illegalStateException("ToPartyInfo",cpaId,context.getToRole(),context.getService(),context.getAction())));
 		DeliveryChannel deliveryChannel = CPAUtils.getDeliveryChannel(fromPartyInfo.getCanSend().getThisPartyActionBinding());
 		String hostname = CPAUtils.getHostname(deliveryChannel);
 
@@ -398,8 +398,7 @@ public class EbMSMessageFactory
 	{
 		DeliveryChannel channel = cpaManager.getFromPartyInfo(cpaId,context.getFromRole(),context.getService(),context.getAction())
 				.map(p -> CPAUtils.getDeliveryChannel(p.getCanSend().getThisPartyActionBinding()))
-				.orElseThrow(() ->
-				StreamUtils.illegalStateException("FromPartyInfo",cpaId,context.getFromRole(),context.getService(),context.getAction()));
+				.orElseThrow(() -> StreamUtils.illegalStateException("FromPartyInfo",cpaId,context.getFromRole(),context.getService(),context.getAction()));
 
 		if (PerMessageCharacteristicsType.ALWAYS.equals(channel.getMessagingCharacteristics().getAckRequested()))
 		{
@@ -416,23 +415,18 @@ public class EbMSMessageFactory
 	
 	private SyncReply createSyncReply(String cpaId, Party fromParty, String action)
 	{
-		CacheablePartyId partyId = new CacheablePartyId(
-				cpaManager.getEbMSPartyInfo(cpaId,fromParty)
+		CacheablePartyId partyId = new CacheablePartyId(cpaManager.getEbMSPartyInfo(cpaId,fromParty)
 				.orElseThrow(() -> StreamUtils.illegalStateException("EbMSPartyInfo",cpaId,fromParty)).getPartyIds());
-		return EbMSMessageUtils.createSyncReply(
-				cpaManager.getDefaultDeliveryChannel(cpaId,partyId,action)
+		return EbMSMessageUtils.createSyncReply(cpaManager.getDefaultDeliveryChannel(cpaId,partyId,action)
 				.orElseThrow(() -> StreamUtils.illegalStateException("DefaultDeliveryChannel",cpaId,partyId,action)));
 	}
 	
 	private SyncReply createSyncReply(String cpaId, EbMSMessageContext context)
 	{
-		CacheablePartyId partyId = new CacheablePartyId(
-				cpaManager.getFromPartyInfo(cpaId,context.getFromRole(),context.getService(),context.getAction())
-				.orElseThrow(() ->
-				StreamUtils.illegalStateException("FromPartyInfo",cpaId,context.getFromRole(),context.getService(),context.getAction()))
+		CacheablePartyId partyId = new CacheablePartyId(cpaManager.getFromPartyInfo(cpaId,context.getFromRole(),context.getService(),context.getAction())
+				.orElseThrow(() -> StreamUtils.illegalStateException("FromPartyInfo",cpaId,context.getFromRole(),context.getService(),context.getAction()))
 				.getPartyIds());
-		return EbMSMessageUtils.createSyncReply(
-				cpaManager.getDefaultDeliveryChannel(cpaId,partyId,context.getAction())
+		return EbMSMessageUtils.createSyncReply(cpaManager.getDefaultDeliveryChannel(cpaId,partyId,context.getAction())
 				.orElseThrow(() -> StreamUtils.illegalStateException("DefaultDeliveryChannel",cpaId,partyId,context.getAction())));
 	}
 

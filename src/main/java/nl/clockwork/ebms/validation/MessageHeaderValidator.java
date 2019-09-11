@@ -80,13 +80,11 @@ public class MessageHeaderValidator
 		CacheablePartyId fromPartyId = new CacheablePartyId(messageHeader.getFrom().getPartyId());
 		StreamUtils.ifNotPresent(
 				cpaManager.getPartyInfo(messageHeader.getCPAId(),fromPartyId),
-				() -> new EbMSValidationException(
-						EbMSMessageUtils.createError("//Header/MessageHeader/From/PartyId",Constants.EbMSErrorCode.INCONSISTENT,"Value not found."))
+				() -> new EbMSValidationException(EbMSMessageUtils.createError("//Header/MessageHeader/From/PartyId",Constants.EbMSErrorCode.INCONSISTENT,"Value not found."))
 		);
 		StreamUtils.ifNotPresent(
 				cpaManager.getPartyInfo(messageHeader.getCPAId(),new CacheablePartyId(messageHeader.getTo().getPartyId())),
-				() -> new EbMSValidationException(
-						EbMSMessageUtils.createError("//Header/MessageHeader/To/PartyId",Constants.EbMSErrorCode.INCONSISTENT,"Value not found."))
+				() -> new EbMSValidationException(EbMSMessageUtils.createError("//Header/MessageHeader/To/PartyId",Constants.EbMSErrorCode.INCONSISTENT,"Value not found."))
 		);
 
 		String service = CPAUtils.toString(messageHeader.getService());
@@ -100,10 +98,8 @@ public class MessageHeaderValidator
 						EbMSMessageUtils.createError("//Header/MessageHeader/Action",Constants.EbMSErrorCode.VALUE_NOT_RECOGNIZED,"Value not found."));
 		}
 
-		DeliveryChannel deliveryChannel =
-				cpaManager.getSendDeliveryChannel(messageHeader.getCPAId(),fromPartyId,messageHeader.getFrom().getRole(),service,messageHeader.getAction())
-				.orElseThrow(() ->
-				StreamUtils.illegalStateException("SendDeliveryChannel",messageHeader.getCPAId(),fromPartyId,messageHeader.getFrom().getRole(),service,messageHeader.getAction()));
+		DeliveryChannel deliveryChannel = cpaManager.getSendDeliveryChannel(messageHeader.getCPAId(),fromPartyId,messageHeader.getFrom().getRole(),service,messageHeader.getAction())
+				.orElseThrow(() -> StreamUtils.illegalStateException("SendDeliveryChannel",messageHeader.getCPAId(),fromPartyId,messageHeader.getFrom().getRole(),service,messageHeader.getAction()));
 		if (deliveryChannel == null)
 			throw new EbMSValidationException(
 					EbMSMessageUtils.createError(Constants.EbMSErrorCode.UNKNOWN.errorCode(),Constants.EbMSErrorCode.UNKNOWN,"No DeliveryChannel found."));

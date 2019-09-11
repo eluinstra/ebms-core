@@ -380,8 +380,7 @@ public class EbMSMessageProcessor
 								String service = CPAUtils.toString(message.getMessageHeader().getService());
 								DeliveryChannel deliveryChannel =
 										cpaManager.getReceiveDeliveryChannel(messageHeader.getCPAId(),toPartyId,message.getMessageHeader().getTo().getRole(),service,message.getMessageHeader().getAction())
-										.orElseThrow(() ->
-												StreamUtils.illegalStateException("ReceiveDeliveryChannel",messageHeader.getCPAId(),toPartyId,message.getMessageHeader().getTo().getRole(),service,message.getMessageHeader().getAction()));
+										.orElseThrow(() -> StreamUtils.illegalStateException("ReceiveDeliveryChannel",messageHeader.getCPAId(),toPartyId,message.getMessageHeader().getTo().getRole(),service,message.getMessageHeader().getAction()));
 								Date persistTime = CPAUtils.getPersistTime(messageHeader.getMessageData().getTimestamp(),deliveryChannel);
 								ebMSDAO.insertMessage(timestamp,persistTime,message,EbMSMessageStatus.RECEIVED);
 								ebMSDAO.insertMessage(timestamp,persistTime,acknowledgment,null);
@@ -391,8 +390,7 @@ public class EbMSMessageProcessor
 								String service = CPAUtils.toString(acknowledgment.getMessageHeader().getService());
 								DeliveryChannel deliveryChannel =
 										cpaManager.getReceiveDeliveryChannel(messageHeader.getCPAId(),toPartyId,acknowledgment.getMessageHeader().getTo().getRole(),service,acknowledgment.getMessageHeader().getAction())
-										.orElseThrow(() ->
-												StreamUtils.illegalStateException("ReceiveDeliveryChannel",messageHeader.getCPAId(),toPartyId,acknowledgment.getMessageHeader().getTo().getRole(),service,acknowledgment.getMessageHeader().getAction()));
+										.orElseThrow(() -> StreamUtils.illegalStateException("ReceiveDeliveryChannel",messageHeader.getCPAId(),toPartyId,acknowledgment.getMessageHeader().getTo().getRole(),service,acknowledgment.getMessageHeader().getAction()));
 								if (!messageValidator.isSyncReply(message))
 									eventManager.createEvent(
 											messageHeader.getCPAId(),

@@ -100,10 +100,8 @@ public class EbMSMessageEncrypter implements InitializingBean
 			if (cpaManager.isConfidential(messageHeader.getCPAId(),fromPartyId,messageHeader.getFrom().getRole(),service,messageHeader.getAction()))
 			{
 				CacheablePartyId toPartyId = new CacheablePartyId(messageHeader.getTo().getPartyId());
-				DeliveryChannel deliveryChannel =
-						cpaManager.getReceiveDeliveryChannel(messageHeader.getCPAId(),toPartyId,messageHeader.getTo().getRole(),service,messageHeader.getAction())
-						.orElseThrow(() -> 
-								StreamUtils.illegalStateException("ReceiveDeliveryChannel",messageHeader.getCPAId(),toPartyId,messageHeader.getTo().getRole(),service,messageHeader.getAction()));
+				DeliveryChannel deliveryChannel = cpaManager.getReceiveDeliveryChannel(messageHeader.getCPAId(),toPartyId,messageHeader.getTo().getRole(),service,messageHeader.getAction())
+						.orElseThrow(() -> StreamUtils.illegalStateException("ReceiveDeliveryChannel",messageHeader.getCPAId(),toPartyId,messageHeader.getTo().getRole(),service,messageHeader.getAction()));
 				X509Certificate certificate = CPAUtils.getX509Certificate(CPAUtils.getEncryptionCertificate(deliveryChannel));
 				validateCertificate(trustStore,certificate);
 				String encryptionAlgorithm = CPAUtils.getEncryptionAlgorithm(deliveryChannel);

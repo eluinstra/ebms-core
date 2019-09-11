@@ -24,7 +24,7 @@ import java.util.List;
 import javax.activation.DataHandler;
 import javax.xml.bind.annotation.XmlElement;
 
-import nl.clockwork.ebms.processor.EbMSProcessorException;
+import nl.clockwork.ebms.processor.EbMSProcessingException;
 
 public class EbMSMessageAttachment implements Serializable
 {
@@ -59,32 +59,34 @@ public class EbMSMessageAttachment implements Serializable
 	/*
 	 * convert to MessageContent class for further processing
 	 */
-	public EbMSMessageContent toContent() throws EbMSProcessorException
+	public EbMSMessageContent toContent() throws EbMSProcessingException
 	{
 		if (msgContentCache == null)
 		{
 			msgContentCache = new EbMSMessageContent(context);
-			attachments.forEach(a ->
-			{
-				ByteArrayOutputStream bos = new ByteArrayOutputStream();
-				try
-				{
-					InputStream input = a.getInputStream();
-					byte[] b = new byte[BUFFERSIZE];
-					int bytesRead = 0;
-					while ((bytesRead = input.read(b)) != -1)
-					{
-						bos.write(b, 0, bytesRead);
-					}
-				}
-				catch (IOException e)
-				{
-					throw new EbMSProcessorException(e);
-				}
-				msgContentCache.getDataSources().add(new EbMSDataSource(a.getName(),a.getContentType(),bos.toByteArray()));
-			});
+			attachments.forEach(a -> msgContentCache.getDataSources().add(new EbMSDataSource(a.getName(),a.getContentType(),getByteArrayOutputStream(a).toByteArray())));
 		}
 		
 		return msgContentCache;
+	}
+
+	private ByteArrayOutputStream getByteArrayOutputStream(DataHandler a) throws EbMSProcessingException
+	{
+		ByteArrayOutputStream bos = new ByteArrayOutputStream();
+		try
+		{
+			InputStream input = a.getInputStream();
+			byte[] b = new byte[BUFFERSIZE];
+			int bytesRead = 0;
+			while ((bytesRead = input.read(b)) != -1)
+			{
+				bos.write(b, 0, bytesRead);
+			}
+		}
+		catch (IOException e)
+		{
+			throw new EbMSProcessingException(e);
+		}
+		return bos;
 	}	
 }

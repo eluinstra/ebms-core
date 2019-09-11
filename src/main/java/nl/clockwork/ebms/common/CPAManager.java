@@ -106,17 +106,18 @@ public class CPAManager
 		return getCPA(cpaId)
 				.map(c -> c.getPartyInfo().stream()
 						.filter(p -> party.matches(p.getPartyId()))
-						.filter(p -> p.getCollaborationRole().stream().anyMatch(r -> party.getRole() == null
-						|| party.getRole().equals(r.getRole().getName())))
-						.map(p -> 
-						{
-							EbMSPartyInfo result = new EbMSPartyInfo();
-							result.setPartyIds(CPAUtils.toPartyId(party.getPartyId(p.getPartyId())));
-							result.setRole(party.getRole());
-							return result;
-						})
+						.filter(p -> p.getCollaborationRole().stream().anyMatch(r -> party.getRole() == null || party.getRole().equals(r.getRole().getName())))
+						.map(p -> createEbMSPartyInfo(party,p))
 						.findFirst()
 						.orElse(null));
+	}
+
+	private EbMSPartyInfo createEbMSPartyInfo(Party party, PartyInfo partyInfo)
+	{
+		EbMSPartyInfo result = new EbMSPartyInfo();
+		result.setPartyIds(CPAUtils.toPartyId(party.getPartyId(partyInfo.getPartyId())));
+		result.setRole(party.getRole());
+		return result;
 	}
 
 	public Optional<PartyInfo> getPartyInfo(String cpaId, CacheablePartyId partyId)
@@ -152,9 +153,7 @@ public class CPAManager
 				.map(c -> c.getPartyInfo().stream()
 						.filter(p -> fromRole == null || fromRole.matches(p.getPartyId()))
 						.flatMap(p -> p.getCollaborationRole().stream()
-								.filter(r -> fromRole == null
-								|| fromRole.matches(r.getRole())
-								&& service.equals(CPAUtils.toString(r.getServiceBinding().getService())))
+								.filter(r -> fromRole == null || fromRole.matches(r.getRole()) && service.equals(CPAUtils.toString(r.getServiceBinding().getService())))
 								.flatMap(r -> r.getServiceBinding().getCanSend().stream()
 										.filter(cs -> action.equals(cs.getThisPartyActionBinding().getAction()))
 										.map(cs -> CPAUtils.getFromPartyInfo(fromRole == null ? p.getPartyId().get(0) : fromRole.getPartyId(p.getPartyId()),r,cs))))
@@ -182,9 +181,7 @@ public class CPAManager
 				.map(c -> c.getPartyInfo().stream()
 						.filter(p -> toRole == null || toRole.matches(p.getPartyId()))
 						.flatMap(p -> p.getCollaborationRole().stream()
-								.filter(r -> toRole == null
-								|| toRole.matches(r.getRole())
-								&& service.equals(CPAUtils.toString(r.getServiceBinding().getService())))
+								.filter(r -> toRole == null || toRole.matches(r.getRole()) && service.equals(CPAUtils.toString(r.getServiceBinding().getService())))
 								.flatMap(r -> r.getServiceBinding().getCanReceive().stream()
 									.filter(cr -> action.equals(cr.getThisPartyActionBinding().getAction()))
 									.map(cr -> CPAUtils.getToPartyInfo(toRole == null ? p.getPartyId().get(0) : toRole.getPartyId(p.getPartyId()),r,cr))))
@@ -295,8 +292,7 @@ public class CPAManager
 				getSendDeliveryChannel(cpaId,partyId,role,service,action)
 					.orElseThrow(() -> StreamUtils.illegalStateException("SendDeliveryChannel",cpaId,partyId,role,service,action)));
 		return canSend
-				.map(cs -> 
-					cs.getThisPartyActionBinding().getBusinessTransactionCharacteristics().isIsNonRepudiationRequired()
+				.map(cs -> cs.getThisPartyActionBinding().getBusinessTransactionCharacteristics().isIsNonRepudiationRequired()
 					&& docExchange.getEbXMLSenderBinding() != null
 					&& docExchange.getEbXMLSenderBinding().getSenderNonRepudiation() != null)
 				.orElse(null);
@@ -316,11 +312,10 @@ public class CPAManager
 		DocExchange docExchange = CPAUtils.getDocExchange(
 				getSendDeliveryChannel(cpaId,partyId,role,service,action)
 					.orElseThrow(() -> StreamUtils.illegalStateException("SendDeliveryChannel",cpaId,partyId,role,service,action)));
-		return canSend.map(cs -> 
-			(PersistenceLevelType.PERSISTENT.equals(cs.getThisPartyActionBinding().getBusinessTransactionCharacteristics().getIsConfidential())
-			|| PersistenceLevelType.TRANSIENT_AND_PERSISTENT.equals(cs.getThisPartyActionBinding().getBusinessTransactionCharacteristics().getIsConfidential()))
-			&& docExchange.getEbXMLReceiverBinding() != null
-			&& docExchange.getEbXMLReceiverBinding().getReceiverDigitalEnvelope() != null)
+		return canSend.map(cs ->(PersistenceLevelType.PERSISTENT.equals(cs.getThisPartyActionBinding().getBusinessTransactionCharacteristics().getIsConfidential()) 
+				|| PersistenceLevelType.TRANSIENT_AND_PERSISTENT.equals(cs.getThisPartyActionBinding().getBusinessTransactionCharacteristics().getIsConfidential()))
+				&& docExchange.getEbXMLReceiverBinding() != null
+				&& docExchange.getEbXMLReceiverBinding().getReceiverDigitalEnvelope() != null)
 				.orElse(false);
 	}
 

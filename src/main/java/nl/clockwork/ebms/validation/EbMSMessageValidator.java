@@ -103,10 +103,8 @@ public class EbMSMessageValidator
 			MessageHeader messageHeader = message.getMessageHeader();
 			CacheablePartyId fromPartyId = new CacheablePartyId(messageHeader.getFrom().getPartyId());
 			String service = CPAUtils.toString(messageHeader.getService());
-			SyncReplyModeType syncReply =
-					cpaManager.getSyncReply(messageHeader.getCPAId(),fromPartyId,messageHeader.getFrom().getRole(),service,messageHeader.getAction())
-					.orElseThrow(() ->
-					StreamUtils.illegalStateException("SyncReply",messageHeader.getCPAId(),fromPartyId,messageHeader.getFrom().getRole(),service,messageHeader.getAction()));
+			SyncReplyModeType syncReply = cpaManager.getSyncReply(messageHeader.getCPAId(),fromPartyId,messageHeader.getFrom().getRole(),service,messageHeader.getAction())
+					.orElseThrow(() -> StreamUtils.illegalStateException("SyncReply",messageHeader.getCPAId(),fromPartyId,messageHeader.getFrom().getRole(),service,messageHeader.getAction()));
 			return syncReply != null && !syncReply.equals(SyncReplyModeType.NONE);
 		}
 		catch (Exception e)

@@ -156,10 +156,8 @@ public class EbMSSignatureValidator implements InitializingBean
 		{
 			CacheablePartyId fromPartyId = new CacheablePartyId(messageHeader.getFrom().getPartyId());
 			String service = CPAUtils.toString(messageHeader.getService());
-			DeliveryChannel deliveryChannel =
-					cpaManager.getSendDeliveryChannel(messageHeader.getCPAId(),fromPartyId,messageHeader.getFrom().getRole(),service,messageHeader.getAction())
-					.orElseThrow(() ->
-					StreamUtils.illegalStateException("SendDeliveryChannel",messageHeader.getCPAId(),fromPartyId,messageHeader.getFrom().getRole(),service,messageHeader.getAction()));
+			DeliveryChannel deliveryChannel = cpaManager.getSendDeliveryChannel(messageHeader.getCPAId(),fromPartyId,messageHeader.getFrom().getRole(),service,messageHeader.getAction())
+					.orElseThrow(() -> StreamUtils.illegalStateException("SendDeliveryChannel",messageHeader.getCPAId(),fromPartyId,messageHeader.getFrom().getRole(),service,messageHeader.getAction()));
 			if (deliveryChannel != null)
 				return CPAUtils.getX509Certificate(CPAUtils.getSigningCertificate(deliveryChannel));
 			return null;
@@ -173,11 +171,9 @@ public class EbMSSignatureValidator implements InitializingBean
 
 	private void validateSignatureReferences(EbMSMessage requestMessage, EbMSMessage responseMessage) throws ValidationException
 	{
-		if (requestMessage.getSignature().getSignedInfo().getReference() == null
-				|| requestMessage.getSignature().getSignedInfo().getReference().size() == 0)
+		if (requestMessage.getSignature().getSignedInfo().getReference() == null || requestMessage.getSignature().getSignedInfo().getReference().size() == 0)
 			throw new ValidationException("No signature references found in request message " + requestMessage.getMessageHeader().getMessageData().getMessageId());
-		if (responseMessage.getAcknowledgment().getReference() == null
-				|| responseMessage.getAcknowledgment().getReference().size() == 0)
+		if (responseMessage.getAcknowledgment().getReference() == null || responseMessage.getAcknowledgment().getReference().size() == 0)
 			throw new ValidationException("No signature references found in response message " + responseMessage.getMessageHeader().getMessageData().getMessageId());
 		if (requestMessage.getSignature().getSignedInfo().getReference().size() != responseMessage.getAcknowledgment().getReference().size())
 			throw new ValidationException("Nr of signature references found in request message " + requestMessage.getMessageHeader().getMessageData().getMessageId() + " and response message " + responseMessage.getMessageHeader().getMessageData().getMessageId() + " do not match");

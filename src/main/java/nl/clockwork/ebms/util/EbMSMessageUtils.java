@@ -83,7 +83,6 @@ public class EbMSMessageUtils
 		return getEbMSMessage(document.getMessage(),document.getAttachments());
 	}
 
-	@SuppressWarnings("unchecked")
 	private static EbMSMessage getEbMSMessage(Document document, List<EbMSAttachment> attachments) throws JAXBException, XPathExpressionException, ParserConfigurationException, SAXException, IOException
 	{
 		EbMSMessage result = new EbMSMessage();
@@ -104,36 +103,34 @@ public class EbMSMessageUtils
 				StatusRequest.class,
 				StatusResponse.class);
 		Envelope envelope = messageBuilder.handle(document);
-
-		envelope.getHeader().getAny().forEach(e ->
-		{
-			if (e instanceof JAXBElement && ((JAXBElement<?>)e).getValue() instanceof SignatureType)
-				result.setSignature(((JAXBElement<SignatureType>)e).getValue());
-			else if (e instanceof MessageHeader)
-				result.setMessageHeader((MessageHeader)e);
-			else if (e instanceof SyncReply)
-				result.setSyncReply((SyncReply)e);
-			else if (e instanceof MessageOrder)
-				result.setMessageOrder((MessageOrder)e);
-			else if (e instanceof AckRequested)
-				result.setAckRequested((AckRequested)e);
-			else if (e instanceof ErrorList)
-				result.setErrorList((ErrorList)e);
-			else if (e instanceof Acknowledgment)
-				result.setAcknowledgment((Acknowledgment)e);
-		});
-
-		envelope.getBody().getAny().forEach(e ->
-		{
-			if (e instanceof Manifest)
-				result.setManifest((Manifest)e);
-			else if (e instanceof StatusRequest)
-				result.setStatusRequest((StatusRequest)e);
-			else if (e instanceof StatusResponse)
-				result.setStatusResponse((StatusResponse)e);
-		});
-
+		envelope.getHeader().getAny().forEach(e -> setEbMSMessage(result,e));
+		envelope.getBody().getAny().forEach(e -> setEbMSMessage(result,e));
 		return result;
+	}
+
+	@SuppressWarnings("unchecked")
+	private static void setEbMSMessage(EbMSMessage result, Object e)
+	{
+		if (e instanceof JAXBElement && ((JAXBElement<?>)e).getValue() instanceof SignatureType)
+			result.setSignature(((JAXBElement<SignatureType>)e).getValue());
+		else if (e instanceof MessageHeader)
+			result.setMessageHeader((MessageHeader)e);
+		else if (e instanceof SyncReply)
+			result.setSyncReply((SyncReply)e);
+		else if (e instanceof MessageOrder)
+			result.setMessageOrder((MessageOrder)e);
+		else if (e instanceof AckRequested)
+			result.setAckRequested((AckRequested)e);
+		else if (e instanceof ErrorList)
+			result.setErrorList((ErrorList)e);
+		else if (e instanceof Acknowledgment)
+			result.setAcknowledgment((Acknowledgment)e);
+		if (e instanceof Manifest)
+			result.setManifest((Manifest)e);
+		else if (e instanceof StatusRequest)
+			result.setStatusRequest((StatusRequest)e);
+		else if (e instanceof StatusResponse)
+			result.setStatusResponse((StatusResponse)e);
 	}
 
 	public static String toString(PartyId partyId)
