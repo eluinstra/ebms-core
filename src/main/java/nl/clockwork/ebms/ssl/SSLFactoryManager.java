@@ -22,13 +22,12 @@ import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLEngine;
-import javax.net.ssl.SSLSession;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManagerFactory;
 
-import nl.clockwork.ebms.common.KeyStoreManager;
-
 import org.springframework.beans.factory.InitializingBean;
+
+import nl.clockwork.ebms.common.KeyStoreManager;
 
 public class SSLFactoryManager implements InitializingBean
 {
@@ -72,14 +71,7 @@ public class SSLFactoryManager implements InitializingBean
 
 	public HostnameVerifier getHostnameVerifier(HttpsURLConnection connection)
 	{
-		return verifyHostnames ? HttpsURLConnection.getDefaultHostnameVerifier() : new HostnameVerifier()
-		{
-			@Override
-			public boolean verify(String hostname, SSLSession sslSession)
-			{
-				return true;
-			}
-		};
+		return verifyHostnames ? HttpsURLConnection.getDefaultHostnameVerifier() : (h,s) -> true;
 	}
 	
 	public SSLSocketFactory getSslSocketFactory()

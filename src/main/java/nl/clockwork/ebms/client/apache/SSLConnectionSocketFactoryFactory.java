@@ -17,12 +17,11 @@ package nl.clockwork.ebms.client.apache;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLSession;
-
-import nl.clockwork.ebms.ssl.SSLFactoryManager;
 
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.springframework.beans.factory.FactoryBean;
+
+import nl.clockwork.ebms.ssl.SSLFactoryManager;
 
 public class SSLConnectionSocketFactoryFactory implements FactoryBean<SSLConnectionSocketFactory>
 {
@@ -51,14 +50,7 @@ public class SSLConnectionSocketFactoryFactory implements FactoryBean<SSLConnect
 
 	private HostnameVerifier getHostnameVerifier()
 	{
-		return verifyHostnames ? HttpsURLConnection.getDefaultHostnameVerifier() : new HostnameVerifier()
-		{
-			@Override
-			public boolean verify(String hostname, SSLSession sslSession)
-			{
-				return true;
-			}
-		};
+		return verifyHostnames ? HttpsURLConnection.getDefaultHostnameVerifier() : (h,s) -> true;
 	}
 	
 	@Override

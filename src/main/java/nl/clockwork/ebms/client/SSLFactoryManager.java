@@ -21,7 +21,6 @@ import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLSession;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManagerFactory;
 
@@ -58,14 +57,7 @@ public class SSLFactoryManager extends nl.clockwork.ebms.ssl.SSLFactoryManager
 
 	public HostnameVerifier getHostnameVerifier(HttpsURLConnection connection)
 	{
-		return verifyHostnames ? HttpsURLConnection.getDefaultHostnameVerifier() : new HostnameVerifier()
-		{
-			@Override
-			public boolean verify(String hostname, SSLSession sslSession)
-			{
-				return true;
-			}
-		};
+		return verifyHostnames ? HttpsURLConnection.getDefaultHostnameVerifier() : (h,s) -> true;
 	}
 	
 	public SSLSocketFactory getSslSocketFactory()
