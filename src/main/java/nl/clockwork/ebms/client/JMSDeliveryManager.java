@@ -102,20 +102,16 @@ public class JMSDeliveryManager extends DeliveryManager //DeliveryService
 	@Override
 	public void sendResponseMessage(final String uri, final EbMSMessage response) throws EbMSProcessorException
 	{
-		Runnable command = new Runnable()
+		Runnable command = () ->
 		{
-			@Override
-			public void run()
+			try
 			{
-				try
-				{
-					logger.info("Sending message " + response.getMessageHeader().getMessageData().getMessageId() + " to " + uri);
-					ebMSClient.sendMessage(uri,EbMSMessageUtils.getEbMSDocument(response));
-				}
-				catch (Exception e)
-				{
-					logger.error("",e);
-				}
+				logger.info("Sending message " + response.getMessageHeader().getMessageData().getMessageId() + " to " + uri);
+				ebMSClient.sendMessage(uri,EbMSMessageUtils.getEbMSDocument(response));
+			}
+			catch (Exception e)
+			{
+				logger.error("",e);
 			}
 		};
 		executorService.execute(command);
