@@ -42,19 +42,6 @@ Remarks:
 -	Manifest can only refer to payload data included as part of the message as payload document(s) contained in a Payload Container
 -	Extendible to support other communication protocols
 
-===============
-Prerequisites =
-===============
-download and copy the following libraries:
-- c3p0-0.9.1.2.jar
-- depending on the database used:
-	- hsqldb-2.2.9.jar
-	- mysql-connector-java-5.1.18.jar
-	- mariadb-java-client-1.1.9.jar
-	- postgresql-9.1-901.jdbc3.jar or postgresql-9.1-901.jdbc4.jar
-	- jtds-1.2.4.jar or sqljdbc4-201004.jar
-	- ojdbc6-11.2.0.1.0.jar (and orai18n-11.2.0.1.0.jar)
-
 =======
 Usage =
 =======
@@ -102,8 +89,6 @@ You can configure them by configuring the right driver and connection string:
 	ebms.jdbc.url=jdbc:postgresql://<host>:<port>/<dbname>
 
 - ebms.jdbc.driverClassName=com.microsoft.sqlserver.jdbc.SQLServerDriver
-	or
-	ebms.jdbc.driverClassName=net.sourceforge.jtds.jdbc.Driver
 	ebms.jdbc.url=jdbc:sqlserver://<host>:<port>;databaseName=<dbname>;
 
 - ebms.jdbc.driverClassName=oracle.jdbc.OracleDriver
