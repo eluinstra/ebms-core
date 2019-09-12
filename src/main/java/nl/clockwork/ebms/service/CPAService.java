@@ -25,7 +25,7 @@ import javax.xml.bind.annotation.XmlElement;
 
 import nl.clockwork.ebms.model.URLMapping;
 
-@WebService(targetNamespace="http://www.ordina.nl/cpa/2.12a")
+@WebService(targetNamespace="http://www.ordina.nl/cpa/2.16")
 public interface CPAService
 {
 	/**
