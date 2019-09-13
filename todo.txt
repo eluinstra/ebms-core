@@ -1,3 +1,4 @@
 - use oid to determine encryption algorithm
 - implement packaging
 - implement message ordering
+- replace org.codehaus.mojo.jaxb2-maven-plugin by org.jvnet.jaxb2.maven2.maven-jaxb2-plugin

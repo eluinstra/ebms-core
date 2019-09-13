@@ -282,12 +282,10 @@
 				</executions>
 			</plugin>
 			<plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>jaxb2-maven-plugin</artifactId>
-        <version>1.5</version>
-				<!--groupId>org.jvnet.jaxb2.maven2</groupId>
-				<artifactId>maven-jaxb2-plugin</artifactId>
-				<version>0.14.0</version-->
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>jaxb2-maven-plugin</artifactId>
+				<version>1.5</version>
+				<!--version>1.6</version-->
 				<executions>
 					<execution>
 						<goals>
@@ -305,6 +303,57 @@
 					</execution>
 				</executions>
 			</plugin>
+<!-- 			<plugin> -->
+<!-- 				<groupId>org.codehaus.mojo</groupId> -->
+<!-- 				<artifactId>jaxb2-maven-plugin</artifactId> -->
+<!-- 				<version>2.5.0</version> -->
+<!-- 				<executions> -->
+<!-- 					<execution> -->
+<!-- 						<goals> -->
+<!-- 							<goal>xjc</goal> -->
+<!-- 						</goals> -->
+<!-- 						<configuration> -->
+<!-- 							<target>2.1</target> -->
+<!-- 							<sources> -->
+<!-- 								<source>src/main/resources/nl/clockwork/ebms/xsd/cpp-cpa-2_0.xsd</source> -->
+<!-- 								<source>src/main/resources/nl/clockwork/ebms/xsd/msg-header-2_0.xsd</source> -->
+<!-- 							</sources> -->
+<!-- 							<xjbSources> -->
+<!-- 								<xjbSource>src/main/resources/nl/clockwork/ebms/xsd/cpp-cpa-2_0.xjb</xjbSource> -->
+<!-- 								<xjbSource>src/main/resources/nl/clockwork/ebms/xsd/msg-header-2_0.xjb</xjbSource> -->
+<!-- 							</xjbSources> -->
+<!-- 							<extension>true</extension> -->
+<!-- 							<clearOutputDir>false</clearOutputDir> -->
+<!-- 							<verbose>false</verbose> -->
+<!-- 						</configuration> -->
+<!-- 					</execution> -->
+<!-- 				</executions> -->
+<!-- 			</plugin> -->
+<!-- 			<plugin> -->
+<!-- 				<groupId>org.jvnet.jaxb2.maven2</groupId> -->
+<!-- 				<artifactId>maven-jaxb2-plugin</artifactId> -->
+<!-- 				<version>0.14.0</version> -->
+<!-- 				<executions> -->
+<!-- 					<execution> -->
+<!-- 						<goals> -->
+<!-- 							<goal>generate</goal> -->
+<!-- 						</goals> -->
+<!-- 						<configuration> -->
+<!-- 							<schemaDirectory>${project.basedir}/src/main/resources/nl/clockwork/ebms/xsd/</schemaDirectory> -->
+<!-- 							<schemaIncludes> -->
+<!-- 								<include>*.xsd</include> -->
+<!-- 							</schemaIncludes> -->
+<!-- 							<bindingDirectory>${project.basedir}/src/main/resources/nl/clockwork/ebms/xsd/</bindingDirectory> -->
+<!-- 							<bindingIncludes> -->
+<!-- 								<include>*.xjb</include> -->
+<!-- 							</bindingIncludes> -->
+<!-- 							<extension>true</extension> -->
+<!-- 							<clearOutputDir>false</clearOutputDir> -->
+<!-- 							<verbose>false</verbose> -->
+<!-- 						</configuration> -->
+<!-- 					</execution> -->
+<!-- 				</executions> -->
+<!-- 			</plugin> -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
