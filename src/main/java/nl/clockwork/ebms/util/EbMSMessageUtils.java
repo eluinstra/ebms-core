@@ -304,7 +304,7 @@ public class EbMSMessageUtils
 		Envelope envelope = new Envelope();
 		envelope.setBody(new Body());
 		Fault fault = new Fault();
-		fault.setFaultcode(new QName("http://schemas.xmlsoap.org/soap/envelope/","Server"));
+		fault.setFaultcode(new QName("http://schemas.xmlsoap.org/soap/envelope/","Client"));
 		fault.setFaultstring(e.getMessage());
 		//fault.setDetail(new Detail());
 		//JAXBElement<String> f = new JAXBElement<>(new QName("","String"),String.class,ExceptionUtils.getStackTrace(e));
