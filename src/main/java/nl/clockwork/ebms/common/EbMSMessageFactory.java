@@ -348,7 +348,7 @@ public class EbMSMessageFactory
 	{
 		CacheablePartyId partyId = new CacheablePartyId(messageHeader.getTo().getPartyId());
 		DeliveryChannel deliveryChannel = cpaManager.getDefaultDeliveryChannel(cpaId,partyId,action.action())
-				.orElseThrow(() -> StreamUtils.illegalStateException("DefaultDeliveryChannel",cpaId,partyId,action.action()));
+				.orElse(null);
 		String hostname = CPAUtils.getHostname(deliveryChannel);
 
 		MessageHeader result = JAXBParser.deepCopy(messageHeader);

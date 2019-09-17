@@ -425,15 +425,16 @@ public class EbMSMessageProcessor
 					@Override
 					public void doInTransaction()
 					{
-						CacheablePartyId toPartyId = new CacheablePartyId(messageError.getMessageHeader().getTo().getPartyId());
 						String service = CPAUtils.toString(messageError.getMessageHeader().getService());
-						DeliveryChannel deliveryChannel = cpaManager.getReceiveDeliveryChannel(messageHeader.getCPAId(),toPartyId,messageError.getMessageHeader().getTo().getRole(),service,messageError.getMessageHeader().getAction())
-								.orElseThrow(() -> StreamUtils.illegalStateException("ReceiveDeliveryChannel",messageHeader.getCPAId(),toPartyId,messageError.getMessageHeader().getTo().getRole(),service,messageError.getMessageHeader().getAction()));
-						Date persistTime = CPAUtils.getPersistTime(timestamp,deliveryChannel);
+						DeliveryChannel deliveryChannel = cpaManager.getReceiveDeliveryChannel(messageHeader.getCPAId(),new CacheablePartyId(messageError.getMessageHeader().getTo().getPartyId()),messageError.getMessageHeader().getTo().getRole(),service,messageError.getMessageHeader().getAction())
+								.orElse(null);
+						Date persistTime = deliveryChannel != null ? CPAUtils.getPersistTime(timestamp,deliveryChannel) : null;
 						ebMSDAO.insertMessage(timestamp,persistTime,message,EbMSMessageStatus.FAILED);
 						ebMSDAO.insertMessage(timestamp,persistTime,messageError,null);
 						if (!messageValidator.isSyncReply(message))
 						{
+							if (deliveryChannel == null)
+								new EbMSProcessingException(e.getMessage());
 							eventManager.createEvent(
 									messageHeader.getCPAId(),
 									deliveryChannel,
