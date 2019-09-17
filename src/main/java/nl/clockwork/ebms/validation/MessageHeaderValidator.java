@@ -78,14 +78,9 @@ public class MessageHeaderValidator
 					EbMSMessageUtils.createError("//Header/MessageHeader/Action",Constants.EbMSErrorCode.INCONSISTENT,"Invalid value."));
 		
 		CacheablePartyId fromPartyId = new CacheablePartyId(messageHeader.getFrom().getPartyId());
-		StreamUtils.ifNotPresent(
-				cpaManager.getPartyInfo(messageHeader.getCPAId(),fromPartyId),
-				() -> new EbMSValidationException(EbMSMessageUtils.createError("//Header/MessageHeader/From/PartyId",Constants.EbMSErrorCode.INCONSISTENT,"Value not found."))
-		);
-		StreamUtils.ifNotPresent(
-				cpaManager.getPartyInfo(messageHeader.getCPAId(),new CacheablePartyId(messageHeader.getTo().getPartyId())),
-				() -> new EbMSValidationException(EbMSMessageUtils.createError("//Header/MessageHeader/To/PartyId",Constants.EbMSErrorCode.INCONSISTENT,"Value not found."))
-		);
+		cpaManager.getPartyInfo(messageHeader.getCPAId(),fromPartyId).orElseThrow(() -> new EbMSValidationException(EbMSMessageUtils.createError("//Header/MessageHeader/From/PartyId",Constants.EbMSErrorCode.INCONSISTENT,"Value not found.")));
+		CacheablePartyId toPartyId = new CacheablePartyId(messageHeader.getTo().getPartyId());
+		cpaManager.getPartyInfo(messageHeader.getCPAId(),toPartyId).orElseThrow(() -> new EbMSValidationException(EbMSMessageUtils.createError("//Header/MessageHeader/To/PartyId",Constants.EbMSErrorCode.INCONSISTENT,"Value not found.")));
 
 		String service = CPAUtils.toString(messageHeader.getService());
 		if (!Constants.EBMS_SERVICE_URI.equals(messageHeader.getService().getValue()))
@@ -93,7 +88,7 @@ public class MessageHeaderValidator
 			if (!cpaManager.canSend(messageHeader.getCPAId(),fromPartyId,messageHeader.getFrom().getRole(),service,messageHeader.getAction()))
 				throw new EbMSValidationException(
 						EbMSMessageUtils.createError("//Header/MessageHeader/Action",Constants.EbMSErrorCode.VALUE_NOT_RECOGNIZED,"Value not found."));
-			if (!cpaManager.canReceive(messageHeader.getCPAId(),new CacheablePartyId(messageHeader.getTo().getPartyId()),messageHeader.getTo().getRole(),service,messageHeader.getAction()))
+			if (!cpaManager.canReceive(messageHeader.getCPAId(),toPartyId,messageHeader.getTo().getRole(),service,messageHeader.getAction()))
 				throw new EbMSValidationException(
 						EbMSMessageUtils.createError("//Header/MessageHeader/Action",Constants.EbMSErrorCode.VALUE_NOT_RECOGNIZED,"Value not found."));
 		}
