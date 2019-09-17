@@ -163,6 +163,7 @@ Generating reports =
 mvn site
 
 Or to generate individual reports:
+mvn surefire:test
 mvn jxr:jxr
 mvn jxr:test-jxr
 mvn checkstyle:checkstyle
