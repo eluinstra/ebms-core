@@ -81,13 +81,13 @@ public class EbMSMessageServiceImpl implements InitializingBean, EbMSMessageServ
 			String service = CPAUtils.toString(requestMessageHeader.getService());
 			String uri = cpaManager.getUri(cpaId,toPartyId,requestMessageHeader.getTo().getRole(),service,requestMessageHeader.getAction());
 			Optional<EbMSMessage> response = deliveryManager.sendMessage(uri,request);
-			StreamUtils.ifPresentOrElse(response,
-					r ->
-					{
-						if (!EbMSAction.PONG.action().equals(r.getMessageHeader().getAction()))
-							throw new EbMSMessageServiceException("No valid response received!");
-					},
-					() -> new EbMSMessageServiceException("No response received!"));
+			if (response.isPresent())
+			{
+				if (!EbMSAction.PONG.action().equals(response.get().getMessageHeader().getAction()))
+					throw new EbMSMessageServiceException("No valid response received!");
+			}
+			else
+				throw new EbMSMessageServiceException("No response received!");
 		}
 		catch (ValidationException | EbMSProcessorException e)
 		{
@@ -278,7 +278,7 @@ public class EbMSMessageServiceImpl implements InitializingBean, EbMSMessageServ
 			String service = CPAUtils.toString(requestMessageHeader.getService());
 			String uri = cpaManager.getUri(cpaId,toPartyId,requestMessageHeader.getTo().getRole(),service,requestMessageHeader.getAction());
 			Optional<EbMSMessage> response = deliveryManager.sendMessage(uri,request);
-			return response.map(r ->createMessageStatus(r)).orElseThrow(() -> new EbMSMessageServiceException("No response received!"));
+			return response.map(r -> createMessageStatus(r)).orElseThrow(() -> new EbMSMessageServiceException("No response received!"));
 		}
 		catch (ValidationException | DAOException | EbMSProcessorException e)
 		{
