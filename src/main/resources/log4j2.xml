@@ -35,7 +35,7 @@
 	<Loggers>
 
 		<AsyncRoot level="INFO">
-			<AppenderRef ref="STDOUT" />
+			<AppenderRef ref="File" />
 		</AsyncRoot>
 
 		<AsyncLogger name="nl.clockwork.ebms" level="INFO" />
