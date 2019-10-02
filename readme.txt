@@ -4,25 +4,26 @@ Introduction =
 This library contains the core functionality of the EbMS adapter including:
 - a servlet to use the adapter in a servlet container
 - database support for the following databases:
-	- hsqldb (>=2.2.9)
-	- mysql/mariadb (>=5.5)
-	- postgresql (>=9)
-	- mssql (>=2008 R2)
-	- oracle (>=11)
+	- hsqldb
+	- mysql/mariadb
+	- postgresql
+	- mssql
+	- oracle
+	- db2
 - CPA and EbMSMessage SOAP Services to control the EbMS adapter
 - See SourceForge for the EbMS Admin Console.
 
 Implemented:
 -	Core Functionality
-	o	Security Module
-			Signature
-			Encryption
-	o	Error Handling Module
-	o	SyncReply Module
+	-	Security Module
+		-	Signature
+		-	Encryption
+	-	Error Handling Module
+	-	SyncReply Module
 -	Additional Features:
-	o	Reliable Messaging Module
-	o	Message Status Service
-	o	Message Service Handler Ping Service
+	-	Reliable Messaging Module
+	-	Message Status Service
+	-	Message Service Handler Ping Service
 -	HTTP(S) Protocol
 -	Separate ErrorMessage and Acknowledgment messages
 
@@ -45,20 +46,15 @@ Remarks:
 =======
 Usage =
 =======
-You can use the ebms-adapter in your own application you can include this project in your project and configure the adapter into your application.
-Use nl/clockwork/ebms/main.xml as a starting point.
-You will have to generate your own CPAs and application flow.
-
-At the defined endpoint the application will receive an object of type EbMSMessageContent that contains:
-- EbMSMessageContext (needed to reply on this message)
-- properties (contain the properties from the EbMS Header defined in application property ebms.message.header.properties
-- attachments (the actual EbMS Message content)
-
-The application can instantiate a new message or reply to a received message by calling the EbMSMessageService.
-The application should wrap the content of the message in an object of type EbMSMessageContent as attachments.
-If the message is a response to a previous received message, then include the EbMSMessageContext of the previous message.
-The EbMS adapter will then correlate these two messages.
-If the message is a new message, then leave the EbMSMessageContext empty.
+You can use the ebms-core by integrating it into your own java application, or you can use it as a standalone SOAP service through one of the application wrappers (ebms-admin, ebms-adapter-web or ebms-adapter-mule)
+ 
+If you want to use the ebms-core in your own application you can include the jar into your application and configure the adapter through spring properties.
+You can include the spring configuration file nl/clockwork/ebms/main.xml into your application or modify it to your needs.
+The default spring properties are defined in nl/clockwork/ebms/default.poperties
+An application should call the ebms-core through the interfaces defined in nl.clockwork.embs.service.CPAService and nl.clockwork.embs.service.EbMSMessageService
+The CPAService contains functionality to control CPAs
+The EbMSMessageService contains functionality for sending and receiving ebms messages
+To receive ebms messages configure the servlet nl.clockwork.ebms.servlet.EbMSServlet in your application
 
 =======================
 EbMS Adapter Database =
@@ -70,29 +66,52 @@ The EbMS adapter supports different databases:
 - PostgreSQL
 - MSSQL
 - Oracle
+- DB2
 
 You can configure them by configuring the right driver and connection string:
-- ebms.jdbc.driverClassName=org.hsqldb.jdbcDriver
-	ebms.jdbc.url=jdbc:hsqldb:mem:<dbname>
-	or
-	ebms.jdbc.url=jdbc:hsqldb:file:<path>
-	or
-	ebms.jdbc.url=jdbc:hsqldb:hsql://<host>:<port>/<dbname>
 
-- ebms.jdbc.driverClassName=com.mysql.jdbc.Driver
-	ebms.jdbc.url=jdbc:mysql://<host>:<port>/<dbname>
+# Set username and password
+ebms.jdbc.username=<username>
+ebms.jdbc.password=<password>
 
-- ebms.jdbc.driverClassName=org.mariadb.jdbc.Driver
-  ebms.jdbc.url=jdbc:mysql://localhost:3306/ebms
+HSQLDB:
+ebms.jdbc.driverClassName=org.hsqldb.jdbcDriver
+# In memory
+ebms.jdbc.url=jdbc:hsqldb:mem:<dbname>
+# or file
+ebms.jdbc.url=jdbc:hsqldb:file:<path>
+# or external
+ebms.jdbc.url=jdbc:hsqldb:hsql://<host>:<port>/<dbname>
+ebms.pool.preferredTestQuery=select 1 from information_schema.system_tables
 
-- ebms.jdbc.driverClassName=org.postgresql.Driver
-	ebms.jdbc.url=jdbc:postgresql://<host>:<port>/<dbname>
+MySQL:
+ebms.jdbc.driverClassName=com.mysql.jdbc.Driver
+ebms.jdbc.url=jdbc:mysql://<host>:<port>/<dbname>
+ebms.pool.preferredTestQuery=select 1
 
-- ebms.jdbc.driverClassName=com.microsoft.sqlserver.jdbc.SQLServerDriver
-	ebms.jdbc.url=jdbc:sqlserver://<host>:<port>;databaseName=<dbname>;
+MariaDB:
+ebms.jdbc.driverClassName=org.mariadb.jdbc.Driver
+ebms.jdbc.url=jdbc:mysql://localhost:3306/ebms
+ebms.pool.preferredTestQuery=select 1
 
-- ebms.jdbc.driverClassName=oracle.jdbc.OracleDriver
-	ebms.jdbc.url=jdbc:oracle:thin:@<host>:<port>:<dbname>
+PostgreSQL:
+ebms.jdbc.driverClassName=org.postgresql.Driver
+ebms.jdbc.url=jdbc:postgresql://<host>:<port>/<dbname>
+ebms.pool.preferredTestQuery=select 1
+
+MSSQL:
+ebms.jdbc.driverClassName=com.microsoft.sqlserver.jdbc.SQLServerDriver
+ebms.jdbc.url=jdbc:sqlserver://<host>:<port>;databaseName=<dbname>;
+ebms.pool.preferredTestQuery=select 1
+
+Oracle:
+ebms.jdbc.driverClassName=oracle.jdbc.OracleDriver
+ebms.jdbc.url=jdbc:oracle:thin:@<host>:<port>:<dbname>
+
+DB2:
+ebms.jdbc.driverClassName=com.ibm.db2.jcc.DB2Driver
+ebms.jdbc.url=jdbc:db2://localhost:50000/ebms
+ebms.pool.preferredTestQuery=select 1 from sysibm.sysdummy1
 
 If you want to let the adapter use the application datasource exclude the following file:
 - nl/clockwork/ebms/datasource.xml
@@ -108,7 +127,7 @@ keystore.password=password
 truststore.path=keystore.jks
 truststore.password=password
 
--Dhttps.protocols="TLSv1.2","TLSv1.1","TLSv1"
+-Dhttps.protocols="TLSv1.2"
 -Dhttps.cipherSuites="TLS_RSA_WITH_AES_256_CBC_SHA256","TLS_RSA_WITH_AES_128_CBC_SHA256","TLS_RSA_WITH_AES_256_CBC_SHA","TLS_RSA_WITH_AES_128_CBC_SHA"
 
 Signing:
@@ -123,7 +142,7 @@ encryption.keystore.password=password
 Resources =
 ===========
 the reources directory resides in ebms-adapter-x.x.x.zip/resources and contains the following data:
-	scripts/database/ - contains the database scripts for the supported databases
+- scripts/database/ - contains the database scripts for the supported databases
 
 ==========
 Building =
