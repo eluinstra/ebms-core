@@ -124,7 +124,7 @@ SSL:
 keystore.path=keystore.jks
 keystore.password=password
 
-truststore.path=keystore.jks
+truststore.path=truststore.jks
 truststore.password=password
 
 -Dhttps.protocols="TLSv1.2"
