@@ -24,7 +24,7 @@
 	<packaging>jar</packaging>
 	<name>EbMS Core</name>
 	<version>2.16.0-SNAPSHOT</version>
-	<description></description>
+	<description>This library implements the ebXML Message Specification version 2.0, which defines a communications-protocol neutral method for exchanging electronic business messages through the exchange of XML based messages.</description>
 	<url>https://sourceforge.net/projects/muleebmsadapter/</url>
 	<issueManagement>
 		<system>Tickets</system>
@@ -65,6 +65,13 @@
 		<name>Ordina</name>
 		<url>www.ordina.nl</url>
 	</organization>
+	<licenses>
+		<license>
+			<name>Apache License, Version 2.0</name>
+			<url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
 	<properties>
 		<jdk.version>1.8</jdk.version>
 		<junit.jupiter.version>5.5.0</junit.jupiter.version>
