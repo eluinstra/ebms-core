@@ -434,7 +434,7 @@ public class EbMSMessageProcessor
 						if (!messageValidator.isSyncReply(message))
 						{
 							if (deliveryChannel == null)
-								new EbMSProcessingException(e.getMessage());
+								throw new EbMSProcessingException(e.getMessage());
 							eventManager.createEvent(
 									messageHeader.getCPAId(),
 									deliveryChannel,
