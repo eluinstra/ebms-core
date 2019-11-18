@@ -109,8 +109,6 @@ public class EbMSHttpClient implements EbMSClient
 			((HttpsURLConnection)connection).setHostnameVerifier(sslFactoryManager.getHostnameVerifier((HttpsURLConnection)connection));
 			((HttpsURLConnection)connection).setSSLSocketFactory(sslFactoryManager.getSslSocketFactory());
 		}
-		else
-			throw new IllegalStateException("URLConnection :" + connection.getClass().getName());
 		return connection;
 	}
 
