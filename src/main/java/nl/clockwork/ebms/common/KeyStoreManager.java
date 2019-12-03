@@ -50,12 +50,19 @@ public class KeyStoreManager
 
 	private static InputStream getInputStream(String location) throws FileNotFoundException
 	{
-		InputStream result = SecurityUtils.class.getResourceAsStream(location);
-		if (result == null)
-			result = SecurityUtils.class.getResourceAsStream("/" + location);
-		if (result == null)
-			result = new FileInputStream(location);
-		return result;
+		try
+		{
+			return new FileInputStream(location);
+		}
+		catch (FileNotFoundException e)
+		{
+			InputStream result = SecurityUtils.class.getResourceAsStream(location);
+			if (result == null)
+				result = SecurityUtils.class.getResourceAsStream("/" + location);
+			if (result == null)
+				throw e;
+			return result;
+		}
 	}
 
 }
