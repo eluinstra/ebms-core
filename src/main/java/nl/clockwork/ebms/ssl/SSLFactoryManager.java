@@ -22,6 +22,7 @@ import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLEngine;
+import javax.net.ssl.SSLParameters;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManagerFactory;
 
@@ -60,6 +61,7 @@ public class SSLFactoryManager implements InitializingBean
 
 		//SSLEngine engine = sslContext.createSSLEngine(hostname,port);
 		SSLEngine engine = sslContext.createSSLEngine();
+		//engine.setSSLParameters(createSSLParameters());
 		if (enabledProtocols.length > 0)
 			engine.setEnabledProtocols(enabledProtocols);
 		if (enabledCipherSuites.length > 0)
@@ -67,6 +69,17 @@ public class SSLFactoryManager implements InitializingBean
 		engine.setNeedClientAuth(requireClientAuthentication);
 
 		sslSocketFactory = sslContext.getSocketFactory();
+	}
+
+	@SuppressWarnings("unused")
+	private SSLParameters createSSLParameters()
+	{
+		SSLParameters result = new SSLParameters();
+		result.setProtocols(enabledProtocols);
+		result.setCipherSuites(enabledCipherSuites);
+		result.setUseCipherSuitesOrder(true);
+		result.setNeedClientAuth(requireClientAuthentication);
+		return result;
 	}
 
 	public HostnameVerifier getHostnameVerifier(HttpsURLConnection connection)

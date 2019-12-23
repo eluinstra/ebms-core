@@ -25,7 +25,7 @@ import javax.net.ssl.TrustManagerFactory;
 
 import nl.clockwork.ebms.common.KeyStoreManager;
 
-public class SSLFactoryManager extends nl.clockwork.ebms.ssl.SSLFactoryManager
+public class SSLFactoryManager
 {
 	private String keyStorePath;
 	private String keyStorePassword;
@@ -36,7 +36,6 @@ public class SSLFactoryManager extends nl.clockwork.ebms.ssl.SSLFactoryManager
 	private boolean requireClientAuthentication;
 	private SSLSocketFactory sslSocketFactory;
 
-	@Override
 	public void afterPropertiesSet() throws Exception
 	{
 		KeyStore keyStore = KeyStoreManager.getKeyStore(keyStorePath,keyStorePassword);
@@ -55,6 +54,7 @@ public class SSLFactoryManager extends nl.clockwork.ebms.ssl.SSLFactoryManager
 
 		//SSLEngine engine = sslContext.createSSLEngine(hostname,port);
 		SSLEngine engine = sslContext.createSSLEngine();
+		engine.setUseClientMode(false);
 		if (enabledProtocols.length > 0)
 			engine.setEnabledProtocols(enabledProtocols);
 		if (enabledCipherSuites.length > 0)

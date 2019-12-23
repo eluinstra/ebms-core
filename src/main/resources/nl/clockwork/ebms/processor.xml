@@ -269,6 +269,8 @@
 		<property name="trustStorePath" value="${truststore.path}"/>
 		<property name="trustStorePassword" value="${truststore.password}"/>
 		<property name="verifyHostnames" value="${https.verifyHostnames}"></property>
+		<property name="enabledProtocols" value="${https.protocols}"/>
+		<property name="enabledCipherSuites" value="${https.cipherSuites}"/>
 	</bean>
 
 	<bean id="eventListener" class="nl.clockwork.ebms.event.EventListenerFactory">
