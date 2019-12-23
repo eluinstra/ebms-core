@@ -1,9 +1,3 @@
-=============
-= Important =
-=============
-add java cmd line parameters -Dhttps.protocols=<protocols> and -Dhttps.cipherSuites=<cipherSuites> to configure the correct TLS protocols and cipherSuites:
--Dhttps.protocols=TLSv1.2 -Dhttps.cipherSuites=TLS_RSA_WITH_AES_256_CBC_SHA256,TLS_RSA_WITH_AES_256_CBC_SHA,TLS_RSA_WITH_AES_128_CBC_SHA256,TLS_RSA_WITH_AES_128_CBC_SHA
-
 ==============
 Introduction =
 ==============
