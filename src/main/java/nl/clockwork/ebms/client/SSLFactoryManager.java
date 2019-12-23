@@ -211,13 +211,14 @@ public class SSLFactoryManager
 		this.verifyHostnames = verifyHostnames;
 	}
 
-	public String[] getEnabledProtocols()
+	public void setEnabledProtocols(String enabledProtocols)
 	{
-		return enabledProtocols;
+		this.enabledProtocols = enabledProtocols.split(",");
+	}
+	
+	public void setEnabledCipherSuites(String enabledCipherSuites)
+	{
+		this.enabledCipherSuites = enabledCipherSuites.split(",");
 	}
 
-	public String[] getEnabledCipherSuites()
-	{
-		return enabledCipherSuites;
-	}
 }
