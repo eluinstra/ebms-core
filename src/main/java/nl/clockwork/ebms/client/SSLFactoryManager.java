@@ -32,6 +32,7 @@ import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManagerFactory;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.InitializingBean;
 
 import nl.clockwork.ebms.common.KeyStoreManager;
@@ -203,12 +204,12 @@ public class SSLFactoryManager implements InitializingBean
 
 	public void setEnabledProtocols(String enabledProtocols)
 	{
-		this.enabledProtocols = enabledProtocols.split(",");
+		this.enabledProtocols = StringUtils.split(enabledProtocols,",");
 	}
 	
 	public void setEnabledCipherSuites(String enabledCipherSuites)
 	{
-		this.enabledCipherSuites = enabledCipherSuites.split(",");
+		this.enabledCipherSuites = StringUtils.split(enabledCipherSuites,",");
 	}
 
 }
