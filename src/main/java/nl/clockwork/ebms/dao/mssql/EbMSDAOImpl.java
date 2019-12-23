@@ -61,7 +61,7 @@ public class EbMSDAOImpl extends nl.clockwork.ebms.dao.mysql.EbMSDAOImpl
 	}
 
 	@Override
-	public void insertDuplicateMessage(final Date timestamp, final EbMSMessage message) throws DAOException
+	public void insertDuplicateMessage(final Date timestamp, final EbMSMessage message, boolean storeAttachments) throws DAOException
 	{
 		try
 		{
@@ -124,7 +124,8 @@ public class EbMSDAOImpl extends nl.clockwork.ebms.dao.mysql.EbMSDAOImpl
 								},
 								keyHolder
 							);
-							insertAttachments(keyHolder.getKey().longValue(),message.getAttachments());
+							if (storeAttachments)
+								insertAttachments(keyHolder.getKey().longValue(),message.getAttachments());
 						}
 						catch (IOException e)
 						{

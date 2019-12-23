@@ -69,7 +69,7 @@ public interface EbMSDAO
 	List<String> getMessageIds(EbMSMessageContext messageContext, EbMSMessageStatus status, int maxNr) throws DAOException;
 
 	void insertMessage(Date timestamp, Date persistTime, EbMSMessage message, EbMSMessageStatus status) throws DAOException;
-	void insertDuplicateMessage(Date timestamp, EbMSMessage message) throws DAOException;
+	void insertDuplicateMessage(Date timestamp, EbMSMessage message, boolean storeAttachments) throws DAOException;
 	int updateMessage(String messageId, EbMSMessageStatus oldStatus, EbMSMessageStatus newStatus) throws DAOException;
 	void updateMessages(List<String> messageIds, EbMSMessageStatus oldStatus, EbMSMessageStatus newStatus) throws DAOException;
 

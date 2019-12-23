@@ -844,7 +844,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	}
 
 	@Override
-	public void insertDuplicateMessage(final Date timestamp, final EbMSMessage message) throws DAOException
+	public void insertDuplicateMessage(final Date timestamp, final EbMSMessage message, boolean storeAttachments) throws DAOException
 	{
 		try
 		{
@@ -911,7 +911,8 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 								},
 								keyHolder
 							);
-							insertAttachments(keyHolder,message.getAttachments());
+							if (storeAttachments)
+								insertAttachments(keyHolder,message.getAttachments());
 						}
 						catch (IOException e)
 						{
