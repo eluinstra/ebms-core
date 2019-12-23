@@ -46,6 +46,8 @@ public class ClientCertificateValidator
 				if (!certificate.equals(getClientCertificate(message.getMessageHeader())))
 					throw new ValidationException("Invalid SSL Client Certificate!");
 			}
+			else
+				logger.warn("No certificates found.");
 		}
 	}
 
