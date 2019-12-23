@@ -118,6 +118,9 @@ public class EbMSSignatureGenerator implements InitializingBean
 		DeliveryChannel deliveryChannel = cpaManager.getSendDeliveryChannel(messageHeader.getCPAId(),fromPartyId,messageHeader.getFrom().getRole(),service,messageHeader.getAction())
 				.orElseThrow(() -> StreamUtils.illegalStateException("SendDeliveryChannel",messageHeader.getCPAId(),fromPartyId,messageHeader.getFrom().getRole(),service,messageHeader.getAction()));
 		X509Certificate certificate = CPAUtils.getX509Certificate(CPAUtils.getSigningCertificate(deliveryChannel));
+		if (certificate == null)
+			throw new EbMSProcessingException(
+					"No signing certificate found for deliveryChannel \"" + deliveryChannel.getChannelId() + "\" in CPA \"" + messageHeader.getCPAId() + "\"");
 		String alias = keyStore.getCertificateAlias(certificate);
 		if (alias == null)
 			throw new EbMSProcessorException(
