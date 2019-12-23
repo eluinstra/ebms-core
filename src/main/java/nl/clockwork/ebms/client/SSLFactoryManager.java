@@ -21,6 +21,7 @@ import java.net.InetAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.security.KeyStore;
+import java.util.Objects;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
@@ -41,11 +42,13 @@ public class SSLFactoryManager implements InitializingBean
 {
 	public class SSLSocketFactoryWrapper extends SSLSocketFactory
 	{
-		private SSLSocketFactory sslSocketFactory;
-		private SSLParameters sslParameters;
+		private final SSLSocketFactory sslSocketFactory;
+		private final SSLParameters sslParameters;
 
 		public SSLSocketFactoryWrapper(SSLSocketFactory sslSocketFactory, SSLParameters sslParameters)
 		{
+			Objects.requireNonNull(sslSocketFactory);
+			Objects.requireNonNull(sslParameters);
 			this.sslSocketFactory = sslSocketFactory;
 			this.sslParameters = sslParameters;
 		}
