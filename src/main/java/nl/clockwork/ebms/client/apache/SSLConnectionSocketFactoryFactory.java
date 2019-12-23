@@ -21,7 +21,7 @@ import javax.net.ssl.HttpsURLConnection;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.springframework.beans.factory.FactoryBean;
 
-import nl.clockwork.ebms.ssl.SSLFactoryManager;
+import nl.clockwork.ebms.client.SSLFactoryManager;
 
 public class SSLConnectionSocketFactoryFactory implements FactoryBean<SSLConnectionSocketFactory>
 {

@@ -30,7 +30,7 @@ import javax.xml.transform.TransformerException;
 import nl.clockwork.ebms.model.EbMSDocument;
 import nl.clockwork.ebms.processor.EbMSProcessingException;
 import nl.clockwork.ebms.processor.EbMSProcessorException;
-import nl.clockwork.ebms.ssl.SSLFactoryManager;
+import nl.clockwork.ebms.client.SSLFactoryManager;
 
 import org.xml.sax.SAXException;
 

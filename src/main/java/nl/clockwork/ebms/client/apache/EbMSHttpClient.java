@@ -23,7 +23,7 @@ import nl.clockwork.ebms.client.EbMSClient;
 import nl.clockwork.ebms.client.EbMSProxy;
 import nl.clockwork.ebms.model.EbMSDocument;
 import nl.clockwork.ebms.processor.EbMSProcessorException;
-import nl.clockwork.ebms.ssl.SSLFactoryManager;
+import nl.clockwork.ebms.client.SSLFactoryManager;
 
 import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthScope;
