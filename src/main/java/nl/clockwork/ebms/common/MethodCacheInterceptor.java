@@ -15,6 +15,7 @@
  */
 package nl.clockwork.ebms.common;
 
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.aopalliance.intercept.MethodInterceptor;
@@ -48,8 +49,7 @@ public class MethodCacheInterceptor implements MethodInterceptor
 	{
 		StringBuffer sb = new StringBuffer();
 		sb.append(targetName).append(".").append(methodName);
-		if (arguments != null && arguments.length != 0)
-			Stream.of(arguments).forEach(a -> sb.append(".").append(a));
+		sb.append(Stream.of(arguments).map(a -> String.valueOf(a)).collect(Collectors.joining(",","(",")")));
 		return sb.toString();
 	}
 
