@@ -23,9 +23,11 @@ import javax.net.ssl.SSLEngine;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManagerFactory;
 
+import org.springframework.beans.factory.InitializingBean;
+
 import nl.clockwork.ebms.common.KeyStoreManager;
 
-public class SSLFactoryManager
+public class SSLFactoryManager implements InitializingBean
 {
 	private String keyStorePath;
 	private String keyStorePassword;
@@ -36,6 +38,7 @@ public class SSLFactoryManager
 	private boolean requireClientAuthentication;
 	private SSLSocketFactory sslSocketFactory;
 
+	@Override
 	public void afterPropertiesSet() throws Exception
 	{
 		KeyStore keyStore = KeyStoreManager.getKeyStore(keyStorePath,keyStorePassword);

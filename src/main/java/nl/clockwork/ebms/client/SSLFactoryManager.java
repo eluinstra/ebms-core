@@ -32,9 +32,11 @@ import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManagerFactory;
 
+import org.springframework.beans.factory.InitializingBean;
+
 import nl.clockwork.ebms.common.KeyStoreManager;
 
-public class SSLFactoryManager
+public class SSLFactoryManager implements InitializingBean
 {
 	public class SSLSocketFactoryWrapper extends SSLSocketFactory
 	{
@@ -137,6 +139,7 @@ public class SSLFactoryManager
 	private String[] enabledCipherSuites = new String[]{};
 	private SSLSocketFactory sslSocketFactory;
 
+	@Override
 	public void afterPropertiesSet() throws Exception
 	{
 		KeyStore keyStore = KeyStoreManager.getKeyStore(keyStorePath,keyStorePassword);
