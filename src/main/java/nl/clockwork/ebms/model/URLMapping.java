@@ -47,4 +47,9 @@ public class URLMapping implements Serializable
 	{
 		this.destination = destination;
 	}
+	@Override
+	public String toString()
+	{
+		return source + "->" + destination;
+	}
 }

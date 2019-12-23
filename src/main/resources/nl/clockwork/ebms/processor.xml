@@ -139,12 +139,13 @@
 	</bean>
 
 	<bean id="urlManager" class="nl.clockwork.ebms.common.URLManager">
-		<property name="methodCache" ref="ebMSMethodCache"/>
+		<property name="daoMethodCache" ref="ebMSDAOMethodCache"/>
 		<property name="ebMSDAO" ref="ebMSDAO"/>
 	</bean>
 
 	<bean id="_cpaManager" class="nl.clockwork.ebms.common.CPAManager">
-		<property name="methodCache" ref="ebMSMethodCache"/>
+		<property name="daoMethodCache" ref="ebMSDAOMethodCache"/>
+		<property name="cpaMethodCache" ref="cpaMethodCache"/>
 		<property name="ebMSDAO" ref="ebMSDAO"/>
 		<property name="urlManager" ref="urlManager"/>
 	</bean>
@@ -153,13 +154,13 @@
 		<property name="target" ref="_cpaManager"/>
 		<property name="interceptorNames">
 			<list>
-				<value>ebMSCPAManagerMethodCachePointCut</value>
+				<value>cpaManagerMethodCachePointCut</value>
 			</list>
 		</property>
 	</bean>
 
-	<bean id="ebMSCPAManagerMethodCachePointCut" class="org.springframework.aop.support.RegexpMethodPointcutAdvisor">
-		<property name="advice" ref="ebMSMethodCacheInterceptor"/>
+	<bean id="cpaManagerMethodCachePointCut" class="org.springframework.aop.support.RegexpMethodPointcutAdvisor">
+		<property name="advice" ref="cpaMethodCacheInterceptor"/>
 		<property name="patterns">
 			<list>
 				<!--value>.*existsCPA</value>
@@ -185,6 +186,22 @@
 				<value>.*getSyncReply</value>
 			</list>
 		</property>
+	</bean>
+
+	<bean id="cpaMethodCacheInterceptor" class="nl.clockwork.ebms.common.MethodCacheInterceptor">
+		<property name="cache" ref="cpaMethodCache" />
+	</bean>
+
+	<bean id="cpaMethodCache" class="org.springframework.cache.ehcache.EhCacheFactoryBean">
+		<property name="cacheManager" ref="cacheManager"/>
+		<property name="cacheName" value="nl.clockwork.ebms.cpa.METHOD_CACHE"/>
+		<property name="disabled" value="${cache.disabled}"/>
+		<property name="memoryStoreEvictionPolicy" value="${cache.memoryStoreEvictionPolicy}"/>
+		<property name="timeToIdle" value="${cache.timeToIdle}"/>
+		<property name="timeToLive" value="${cache.timeToLive}"/>
+		<property name="overflowToDisk" value="${cache.overflowToDisk}"/>
+		<property name="maxElementsInMemory" value="${cache.maxElementsInMemory}"/>
+		<property name="maxElementsOnDisk" value="${cache.maxElementsOnDisk}"/>
 	</bean>
 
 	<bean id="ebMSMessageFactory" class="nl.clockwork.ebms.common.EbMSMessageFactory">

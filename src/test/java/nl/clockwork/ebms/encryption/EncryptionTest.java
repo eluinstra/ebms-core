@@ -149,7 +149,8 @@ public class EncryptionTest
 	private CPAManager initCPAManager() throws DAOException, IOException, JAXBException
 	{
 		CPAManager result = new CPAManager();
-		result.setMethodCache(initMethodCacheMock());
+		result.setDaoMethodCache(initMethodCacheMock());
+		result.setCpaMethodCache(initMethodCacheMock());
 		result.setEbMSDAO(initEbMSDAOMock());
 		return result;
 	}

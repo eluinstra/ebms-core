@@ -42,7 +42,8 @@ import nl.clockwork.ebms.util.CPAUtils;
 
 public class CPAManager
 {
-	private Ehcache methodCache;
+	private Ehcache daoMethodCache;
+	private Ehcache cpaMethodCache;
 	private EbMSDAO ebMSDAO;
 	private URLManager urlManager;
 
@@ -335,14 +336,20 @@ public class CPAManager
 
 	private void flushCPAMethodCache(String cpaId)
 	{
-		methodCache.remove(MethodCacheInterceptor.getCacheKey("EbMSDAOImpl","existsCPA",cpaId));
-		methodCache.remove(MethodCacheInterceptor.getCacheKey("EbMSDAOImpl","getCPA",cpaId));
-		methodCache.remove(MethodCacheInterceptor.getCacheKey("EbMSDAOImpl","getCPAIds"));
+		daoMethodCache.remove(MethodCacheInterceptor.getCacheKey("EbMSDAOImpl","existsCPA",cpaId));
+		daoMethodCache.remove(MethodCacheInterceptor.getCacheKey("EbMSDAOImpl","getCPA",cpaId));
+		daoMethodCache.remove(MethodCacheInterceptor.getCacheKey("EbMSDAOImpl","getCPAIds"));
+		cpaMethodCache.removeAll();
 	}
 
-	public void setMethodCache(Ehcache methodCache)
+	public void setDaoMethodCache(Ehcache daoMethodCache)
 	{
-		this.methodCache = methodCache;
+		this.daoMethodCache = daoMethodCache;
+	}
+
+	public void setCpaMethodCache(Ehcache cpaMethodCache)
+	{
+		this.cpaMethodCache = cpaMethodCache;
 	}
 
 	public void setEbMSDAO(EbMSDAO ebMSDAO)

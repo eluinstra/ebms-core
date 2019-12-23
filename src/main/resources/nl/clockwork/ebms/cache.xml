@@ -20,22 +20,6 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-	<bean id="ebMSMethodCacheInterceptor" class="nl.clockwork.ebms.common.MethodCacheInterceptor">
-		<property name="cache" ref="ebMSMethodCache" />
-	</bean>
-
-	<bean id="ebMSMethodCache" class="org.springframework.cache.ehcache.EhCacheFactoryBean">
-		<property name="cacheManager" ref="cacheManager"/>
-		<property name="cacheName" value="nl.clockwork.ebms.METHOD_CACHE"/>
-		<property name="disabled" value="${cache.disabled}"/>
-		<property name="memoryStoreEvictionPolicy" value="${cache.memoryStoreEvictionPolicy}"/>
-		<property name="timeToIdle" value="${cache.timeToIdle}"/>
-		<property name="timeToLive" value="${cache.timeToLive}"/>
-		<property name="overflowToDisk" value="${cache.overflowToDisk}"/>
-		<property name="maxElementsInMemory" value="${cache.maxElementsInMemory}"/>
-		<property name="maxElementsOnDisk" value="${cache.maxElementsOnDisk}"/>
-	</bean>
-
 	<bean id="cacheManager" class="org.springframework.cache.ehcache.EhCacheManagerFactoryBean">
 		<property name="configLocation" value="${cache.configLocation}"/>
 	</bean>

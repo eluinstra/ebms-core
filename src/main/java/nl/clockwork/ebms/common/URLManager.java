@@ -28,7 +28,7 @@ import net.sf.ehcache.Ehcache;
 
 public class URLManager
 {
-	private Ehcache methodCache;
+	private Ehcache daoMethodCache;
 	private EbMSDAO ebMSDAO;
 
 	public List<URLMapping> getURLs()
@@ -56,7 +56,7 @@ public class URLManager
 			else
 				ebMSDAO.insertURLMapping(urlMapping);
 		}
-		flushURLMethodCache(urlMapping.getSource());
+		flushDAOMethodCache(urlMapping.getSource());
 	}
 
 	private void validate(URLMapping urlMapping) throws InvalidURLException
@@ -82,19 +82,19 @@ public class URLManager
 	public void deleteURLMapping(String source)
 	{
 		ebMSDAO.deleteURLMapping(source);
-		flushURLMethodCache(source);
+		flushDAOMethodCache(source);
 	}
 
-	private void flushURLMethodCache(String source)
+	private void flushDAOMethodCache(String source)
 	{
-		methodCache.remove(MethodCacheInterceptor.getCacheKey("EbMSDAOImpl","existsURLMapping",source));
-		methodCache.remove(MethodCacheInterceptor.getCacheKey("EbMSDAOImpl","getURLMapping",source));
-		methodCache.remove(MethodCacheInterceptor.getCacheKey("EbMSDAOImpl","getURLMappings"));
+		daoMethodCache.remove(MethodCacheInterceptor.getCacheKey("EbMSDAOImpl","existsURLMapping",source));
+		daoMethodCache.remove(MethodCacheInterceptor.getCacheKey("EbMSDAOImpl","getURLMapping",source));
+		daoMethodCache.remove(MethodCacheInterceptor.getCacheKey("EbMSDAOImpl","getURLMappings"));
 	}
 
-	public void setMethodCache(Ehcache methodCache)
+	public void setDaoMethodCache(Ehcache daoMethodCache)
 	{
-		this.methodCache = methodCache;
+		this.daoMethodCache = daoMethodCache;
 	}
 
 	public void setEbMSDAO(EbMSDAO ebMSDAO)
