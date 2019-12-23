@@ -91,21 +91,7 @@ public class DuplicateMessageHandler
 						//.orElseThrow(() -> StreamUtils.illegalStateException("ReceiveDeliveryChannel",messageHeader.getCPAId(),fromPartyId,messageHeader.getFrom().getRole(),service));
 						.orElse(null);
 				if (context.isPresent())
-				{
-					if (deliveryChannel != null)
-						eventManager.createEvent(messageHeader.getCPAId(),deliveryChannel,context.get().getMessageId(),messageHeader.getMessageData().getTimeToLive(),context.get().getTimestamp(),false);
-					else
-					{
-						Optional<EbMSDocument> result = ebMSDAO.getEbMSDocumentByRefToMessageId(
-								messageHeader.getCPAId(),
-								messageHeader.getMessageData().getMessageId(),
-								mshMessageService,
-								EbMSAction.MESSAGE_ERROR.action(),
-								EbMSAction.ACKNOWLEDGMENT.action());
-						StreamUtils.ifNotPresent(result, () -> logger.warn("No response found for duplicate message " + messageHeader.getMessageData().getMessageId() + "!"));
-						return result.orElse(null);
-					}
-				}
+					eventManager.createEvent(messageHeader.getCPAId(),deliveryChannel,context.get().getMessageId(),messageHeader.getMessageData().getTimeToLive(),context.get().getTimestamp(),false);
 				else
 					logger.warn("No response found for duplicate message " + messageHeader.getMessageData().getMessageId() + "!");
 				return null;
