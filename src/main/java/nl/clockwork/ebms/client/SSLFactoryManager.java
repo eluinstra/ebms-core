@@ -41,19 +41,19 @@ public class SSLFactoryManager implements InitializingBean
 	public class SSLSocketFactoryWrapper extends SSLSocketFactory
 	{
 		private SSLSocketFactory sslSocketFactory;
+		private SSLParameters sslParameters;
 
-		public SSLSocketFactoryWrapper(SSLSocketFactory sslSocketFactory)
+		public SSLSocketFactoryWrapper(SSLSocketFactory sslSocketFactory, SSLParameters sslParameters)
 		{
 			this.sslSocketFactory = sslSocketFactory;
+			this.sslParameters = sslParameters;
 		}
 
 		@Override
 		public Socket createSocket() throws IOException
 		{
 			SSLSocket socket = (SSLSocket)sslSocketFactory.createSocket();
-			socket.setEnabledProtocols(enabledProtocols);
-			socket.setEnabledCipherSuites(enabledCipherSuites);
-//			socket.setSSLParameters(createSSLParameters());
+			socket.setSSLParameters(sslParameters);
 			return socket;
 		}
 
@@ -61,9 +61,7 @@ public class SSLFactoryManager implements InitializingBean
 		public Socket createSocket(Socket s, InputStream consumed, boolean autoClose) throws IOException
 		{
 			SSLSocket socket = (SSLSocket)sslSocketFactory.createSocket(s,consumed,autoClose);
-			socket.setEnabledProtocols(enabledProtocols);
-			socket.setEnabledCipherSuites(enabledCipherSuites);
-//			socket.setSSLParameters(createSSLParameters());
+			socket.setSSLParameters(sslParameters);
 			return socket;
 		}
 
@@ -71,16 +69,14 @@ public class SSLFactoryManager implements InitializingBean
 		public Socket createSocket(Socket s, String host, int port, boolean autoClose) throws IOException
 		{
 			SSLSocket socket = (SSLSocket)sslSocketFactory.createSocket(s,host,port,autoClose);
-			socket.setEnabledProtocols(enabledProtocols);
-			socket.setEnabledCipherSuites(enabledCipherSuites);
-//			socket.setSSLParameters(createSSLParameters());
+			socket.setSSLParameters(sslParameters);
 			return socket;
 		}
 
 		@Override
 		public String[] getDefaultCipherSuites()
 		{
-			return sslSocketFactory.getDefaultCipherSuites();//enabledCipherSuites;
+			return sslSocketFactory.getDefaultCipherSuites();
 		}
 
 		@Override
@@ -93,9 +89,7 @@ public class SSLFactoryManager implements InitializingBean
 		public Socket createSocket(String host, int port) throws IOException, UnknownHostException
 		{
 			SSLSocket socket = (SSLSocket)sslSocketFactory.createSocket(host,port);
-			socket.setEnabledProtocols(enabledProtocols);
-			socket.setEnabledCipherSuites(enabledCipherSuites);
-//			socket.setSSLParameters(createSSLParameters());
+			socket.setSSLParameters(sslParameters);
 			return socket;
 		}
 
@@ -103,9 +97,7 @@ public class SSLFactoryManager implements InitializingBean
 		public Socket createSocket(InetAddress host, int port) throws IOException
 		{
 			SSLSocket socket = (SSLSocket)sslSocketFactory.createSocket(host,port);
-			socket.setEnabledProtocols(enabledProtocols);
-			socket.setEnabledCipherSuites(enabledCipherSuites);
-//			socket.setSSLParameters(createSSLParameters());
+			socket.setSSLParameters(sslParameters);
 			return socket;
 		}
 
@@ -113,9 +105,7 @@ public class SSLFactoryManager implements InitializingBean
 		public Socket createSocket(String host, int port, InetAddress localHost, int localPort) throws IOException, UnknownHostException
 		{
 			SSLSocket socket = (SSLSocket)sslSocketFactory.createSocket(host,port,localHost,localPort);
-			socket.setEnabledProtocols(enabledProtocols);
-			socket.setEnabledCipherSuites(enabledCipherSuites);
-//			socket.setSSLParameters(createSSLParameters());
+			socket.setSSLParameters(sslParameters);
 			return socket;
 		}
 
@@ -123,9 +113,7 @@ public class SSLFactoryManager implements InitializingBean
 		public Socket createSocket(InetAddress address, int port, InetAddress localAddress, int localPort) throws IOException
 		{
 			SSLSocket socket = (SSLSocket)sslSocketFactory.createSocket(address,port,localAddress,localPort);
-			socket.setEnabledProtocols(enabledProtocols);
-			socket.setEnabledCipherSuites(enabledCipherSuites);
-//			socket.setSSLParameters(createSSLParameters());
+			socket.setSSLParameters(sslParameters);
 			return socket;
 		}
 	}
@@ -159,23 +147,22 @@ public class SSLFactoryManager implements InitializingBean
 		//SSLEngine engine = sslContext.createSSLEngine(hostname,port);
 		SSLEngine engine = sslContext.createSSLEngine();
 		engine.setUseClientMode(true);
-		if (enabledProtocols.length > 0)
-			engine.setEnabledProtocols(enabledProtocols);
-		if (enabledCipherSuites.length > 0)
-			engine.setEnabledCipherSuites(enabledCipherSuites);
-//		engine.setSSLParameters(createSSLParameters());
+		//engine.setSSLParameters(createSSLParameters());
 
-		sslSocketFactory = sslContext.getSocketFactory();
-//		sslSocketFactory = new SSLSocketFactoryWrapper(sslContext.getSocketFactory());
+		//sslSocketFactory = sslContext.getSocketFactory();
+		sslSocketFactory = new SSLSocketFactoryWrapper(sslContext.getSocketFactory(),createSSLParameters());
 	}
 
-	@SuppressWarnings("unused")
 	private SSLParameters createSSLParameters()
 	{
 		SSLParameters result = new SSLParameters();
-		result.setProtocols(enabledProtocols);
-		result.setCipherSuites(enabledCipherSuites);
-		result.setUseCipherSuitesOrder(true);
+		if (enabledProtocols.length > 0)
+			result.setProtocols(enabledProtocols);
+		if (enabledProtocols.length > 0)
+		{
+			result.setCipherSuites(enabledCipherSuites);
+			result.setUseCipherSuitesOrder(true);
+		}
 		return result;
 	}
 

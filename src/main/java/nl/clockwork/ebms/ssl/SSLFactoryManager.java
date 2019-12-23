@@ -61,23 +61,22 @@ public class SSLFactoryManager implements InitializingBean
 
 		//SSLEngine engine = sslContext.createSSLEngine(hostname,port);
 		SSLEngine engine = sslContext.createSSLEngine();
-		//engine.setSSLParameters(createSSLParameters());
-		if (enabledProtocols.length > 0)
-			engine.setEnabledProtocols(enabledProtocols);
-		if (enabledCipherSuites.length > 0)
-			engine.setEnabledCipherSuites(enabledCipherSuites);
+		engine.setSSLParameters(createSSLParameters());
 		engine.setNeedClientAuth(requireClientAuthentication);
 
 		sslSocketFactory = sslContext.getSocketFactory();
 	}
 
-	@SuppressWarnings("unused")
 	private SSLParameters createSSLParameters()
 	{
 		SSLParameters result = new SSLParameters();
-		result.setProtocols(enabledProtocols);
-		result.setCipherSuites(enabledCipherSuites);
-		result.setUseCipherSuitesOrder(true);
+		if (enabledProtocols.length > 0)
+			result.setProtocols(enabledProtocols);
+		if (enabledProtocols.length > 0)
+		{
+			result.setCipherSuites(enabledCipherSuites);
+			result.setUseCipherSuitesOrder(true);
+		}
 		result.setNeedClientAuth(requireClientAuthentication);
 		return result;
 	}

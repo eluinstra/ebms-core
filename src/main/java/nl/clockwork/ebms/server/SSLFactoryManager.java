@@ -20,6 +20,7 @@ import java.security.KeyStore;
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLEngine;
+import javax.net.ssl.SSLParameters;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManagerFactory;
 
@@ -58,13 +59,24 @@ public class SSLFactoryManager implements InitializingBean
 		//SSLEngine engine = sslContext.createSSLEngine(hostname,port);
 		SSLEngine engine = sslContext.createSSLEngine();
 		engine.setUseClientMode(false);
-		if (enabledProtocols.length > 0)
-			engine.setEnabledProtocols(enabledProtocols);
-		if (enabledCipherSuites.length > 0)
-			engine.setEnabledCipherSuites(enabledCipherSuites);
+		engine.setSSLParameters(createSSLParameters());
 		engine.setNeedClientAuth(requireClientAuthentication);
 
 		sslSocketFactory = sslContext.getSocketFactory();
+	}
+
+	private SSLParameters createSSLParameters()
+	{
+		SSLParameters result = new SSLParameters();
+		if (enabledProtocols.length > 0)
+			result.setProtocols(enabledProtocols);
+		if (enabledProtocols.length > 0)
+		{
+			result.setCipherSuites(enabledCipherSuites);
+			result.setUseCipherSuitesOrder(true);
+		}
+		result.setNeedClientAuth(requireClientAuthentication);
+		return result;
 	}
 
 	public SSLSocketFactory getSslSocketFactory()
