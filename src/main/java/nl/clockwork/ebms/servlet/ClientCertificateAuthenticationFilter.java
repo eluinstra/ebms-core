@@ -30,10 +30,10 @@ public class ClientCertificateAuthenticationFilter implements Filter
 	{
 		try
 		{
-			String truststoreType = filterConfig.getInitParameter("truststoreType");
-			String truststorePath = filterConfig.getInitParameter("truststorePath");
-			String truststorePassword = filterConfig.getInitParameter("truststorePassword");
-			trustStore = KeyStoreManager.getKeyStore(KeyStoreType.valueOf(truststoreType),truststorePath,truststorePassword);
+			String trustStoreType = filterConfig.getInitParameter("trustStoreType");
+			String trustStorePath = filterConfig.getInitParameter("trustStorePath");
+			String trustStorePassword = filterConfig.getInitParameter("trustStorePassword");
+			trustStore = KeyStoreManager.getKeyStore(KeyStoreType.valueOf(trustStoreType),trustStorePath,trustStorePassword);
 		}
 		catch (GeneralSecurityException | IOException e)
 		{

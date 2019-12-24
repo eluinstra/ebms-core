@@ -15,6 +15,7 @@
  */
 package nl.clockwork.ebms.common.util;
 
+import java.io.UnsupportedEncodingException;
 import java.security.GeneralSecurityException;
 import java.security.Key;
 import java.security.KeyPair;
@@ -37,6 +38,7 @@ import javax.security.cert.CertificateException;
 import nl.clockwork.ebms.validation.ValidationException;
 import nl.clockwork.ebms.validation.ValidatorException;
 
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.xml.security.encryption.XMLCipher;
@@ -145,6 +147,11 @@ public class SecurityUtils
 		KeyGenerator keyGenerator = KeyGenerator.getInstance(algorithm);
 		keyGenerator.init(keysize);
 		return keyGenerator.generateKey();
+	}
+
+	public static String toMD5(String s) throws NoSuchAlgorithmException, UnsupportedEncodingException
+	{
+		return "MD5:" + DigestUtils.md5Hex(s);
 	}
 
 }

@@ -2,7 +2,9 @@ package nl.clockwork.ebms.servlet;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
+import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
 import java.util.List;
 import java.util.Map;
@@ -19,6 +21,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
+
+import nl.clockwork.ebms.common.util.SecurityUtils;
 
 public class BasicAuthenticationFilter implements Filter
 {
@@ -59,17 +63,37 @@ public class BasicAuthenticationFilter implements Filter
 		}
 	}
 
-	private boolean validate(Map<String,String> users, String authorization)
+	private boolean validate(Map<String,String> users, String authorization) throws ServletException
 	{
-		if (authorization != null && authorization.toLowerCase().startsWith("basic"))
+		try
 		{
-			authorization = authorization.substring("basic".length()).trim();
-			authorization = new String(Base64.getDecoder().decode(authorization));
-			String[] credenitals = StringUtils.split(authorization,":");
-			if (credenitals.length == 2)
-				return credenitals[1].equals(users.get(credenitals[0]));
+			if (authorization != null && authorization.toLowerCase().startsWith("basic"))
+			{
+				authorization = authorization.substring("basic".length()).trim();
+				authorization = new String(Base64.getDecoder().decode(authorization));
+				String[] credenitals = StringUtils.split(authorization,":");
+				if (credenitals.length == 2)
+					return validate(users.get(credenitals[0]),credenitals[1]);
+			}
+			return false;
 		}
-		return false;
+		catch (NoSuchAlgorithmException | UnsupportedEncodingException e)
+		{
+			throw new ServletException(e);
+		}
+	}
+
+	//TODO: support all allowed password encodings
+	private boolean validate(String savedPassword, String password) throws NoSuchAlgorithmException, UnsupportedEncodingException
+	{
+		if (savedPassword.startsWith("MD5:"))
+			return SecurityUtils.toMD5(password).equals(savedPassword);
+		else if (savedPassword.startsWith("OBF:"))
+			throw new NoSuchAlgorithmException("OBF");
+		else if (savedPassword.startsWith("CRYPT:"))
+			throw new NoSuchAlgorithmException("CRYPT");
+		else
+			return password.equals(savedPassword);
 	}
 
 	@Override
