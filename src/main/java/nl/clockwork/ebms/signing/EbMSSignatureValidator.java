@@ -42,6 +42,7 @@ import org.w3c.dom.NodeList;
 import nl.clockwork.ebms.StreamUtils;
 import nl.clockwork.ebms.common.CPAManager;
 import nl.clockwork.ebms.common.KeyStoreManager;
+import nl.clockwork.ebms.common.KeyStoreManager.KeyStoreType;
 import nl.clockwork.ebms.common.util.SecurityUtils;
 import nl.clockwork.ebms.model.CacheablePartyId;
 import nl.clockwork.ebms.model.EbMSAttachment;
@@ -55,6 +56,7 @@ public class EbMSSignatureValidator implements InitializingBean
 {
 	protected transient Log logger = LogFactory.getLog(getClass());
 	private CPAManager cpaManager;
+	private KeyStoreType trustStoreType;
 	private String trustStorePath;
 	private String trustStorePassword;
 	private KeyStore trustStore;
@@ -62,7 +64,7 @@ public class EbMSSignatureValidator implements InitializingBean
 	@Override
 	public void afterPropertiesSet() throws Exception
 	{
-		trustStore = KeyStoreManager.getKeyStore(trustStorePath,trustStorePassword);
+		trustStore = KeyStoreManager.getKeyStore(trustStoreType,trustStorePath,trustStorePassword);
 	}
 
 	public void validate(EbMSMessage message) throws ValidatorException, ValidationException
@@ -197,6 +199,11 @@ public class EbMSSignatureValidator implements InitializingBean
 	public void setCpaManager(CPAManager cpaManager)
 	{
 		this.cpaManager = cpaManager;
+	}
+
+	public void setTrustStoreType(KeyStoreType trustStoreType)
+	{
+		this.trustStoreType = trustStoreType;
 	}
 
 	public void setTrustStorePath(String trustStorePath)

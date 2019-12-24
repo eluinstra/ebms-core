@@ -121,21 +121,25 @@ and add the name ebMSDataSource to the application datasource
 Security =
 ==========
 SSL:
-keystore.path=keystore.jks
+keystore.type=PKCS12
+keystore.path=keystore.p12
 keystore.password=password
 
-truststore.path=truststore.jks
+truststore.type=PKCS12
+truststore.path=truststore.p12
 truststore.password=password
 
 -Dhttps.protocols="TLSv1.2"
 -Dhttps.cipherSuites="TLS_RSA_WITH_AES_256_CBC_SHA256","TLS_RSA_WITH_AES_128_CBC_SHA256","TLS_RSA_WITH_AES_256_CBC_SHA","TLS_RSA_WITH_AES_128_CBC_SHA"
 
 Signing:
-signature.keystore.path=keystore.jks
+signature.keystore.type=PKCS12
+signature.keystore.path=keystore.p12
 signature.keystore.password=password
 
 Encryption:
-encryption.keystore.path=keystore.jks
+encryption.keystore.type=PKCS12
+encryption.keystore.path=keystore.p12
 encryption.keystore.password=password
 
 ===========

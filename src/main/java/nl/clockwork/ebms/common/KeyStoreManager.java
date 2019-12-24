@@ -28,21 +28,22 @@ import nl.clockwork.ebms.common.util.SecurityUtils;
 
 public class KeyStoreManager
 {
+	public static enum KeyStoreType {JCEKS, JKS, DKS, PKCS11, PKCS12};
 	private static Map<String,KeyStore> keystores = new HashMap<>();
 
-	public static KeyStore getKeyStore(String path, String password) throws GeneralSecurityException, IOException
+	public static KeyStore getKeyStore(KeyStoreType type, String path, String password) throws GeneralSecurityException, IOException
 	{
 		if (!keystores.containsKey(path))
-			keystores.put(path,loadKeyStore(path,password));
+			keystores.put(path,loadKeyStore(type,path,password));
 		return keystores.get(path);
 	}
 
-	private static KeyStore loadKeyStore(String location, String password) throws GeneralSecurityException, IOException
+	private static KeyStore loadKeyStore(KeyStoreType type, String location, String password) throws GeneralSecurityException, IOException
 	{
 		//location = ResourceUtils.getURL(SystemPropertyUtils.resolvePlaceholders(location)).getFile();
 		try (InputStream in = getInputStream(location))
 		{
-			KeyStore keyStore = KeyStore.getInstance("JKS");
+			KeyStore keyStore = KeyStore.getInstance(type.name());
 			keyStore.load(in,password.toCharArray());
 			return keyStore;
 		}

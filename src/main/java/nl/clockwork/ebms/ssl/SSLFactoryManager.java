@@ -29,11 +29,14 @@ import javax.net.ssl.TrustManagerFactory;
 import org.springframework.beans.factory.InitializingBean;
 
 import nl.clockwork.ebms.common.KeyStoreManager;
+import nl.clockwork.ebms.common.KeyStoreManager.KeyStoreType;
 
 public class SSLFactoryManager implements InitializingBean
 {
+	private KeyStoreType keyStoreType;
 	private String keyStorePath;
 	private String keyStorePassword;
+	private KeyStoreType trustStoreType;
 	private String trustStorePath;
 	private String trustStorePassword;
 	private boolean verifyHostnames;
@@ -45,8 +48,8 @@ public class SSLFactoryManager implements InitializingBean
 	@Override
 	public void afterPropertiesSet() throws Exception
 	{
-		KeyStore keyStore = KeyStoreManager.getKeyStore(keyStorePath,keyStorePassword);
-		KeyStore trustStore = KeyStoreManager.getKeyStore(trustStorePath,trustStorePassword);
+		KeyStore keyStore = KeyStoreManager.getKeyStore(keyStoreType,keyStorePath,keyStorePassword);
+		KeyStore trustStore = KeyStoreManager.getKeyStore(trustStoreType,trustStorePath,trustStorePassword);
 
 		//KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
 		KeyManagerFactory kmf = KeyManagerFactory.getInstance("SunX509");
@@ -91,6 +94,11 @@ public class SSLFactoryManager implements InitializingBean
 		return sslSocketFactory;
 	}
 
+	public void setKeyStoreType(KeyStoreType keyStoreType)
+	{
+		this.keyStoreType = keyStoreType;
+	}
+
 	public void setKeyStorePath(String keyStorePath)
 	{
 		this.keyStorePath = keyStorePath;
@@ -99,6 +107,11 @@ public class SSLFactoryManager implements InitializingBean
 	public void setKeyStorePassword(String keyStorePassword)
 	{
 		this.keyStorePassword = keyStorePassword;
+	}
+
+	public void setTrustStoreType(KeyStoreType trustStoreType)
+	{
+		this.trustStoreType = trustStoreType;
 	}
 
 	public void setTrustStorePath(String trustStorePath)

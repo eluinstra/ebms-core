@@ -95,6 +95,7 @@
 				<property name="ebMSSignatureValidator">
 					<bean class="nl.clockwork.ebms.signing.EbMSSignatureValidator">
 						<property name="cpaManager" ref="cpaManager"/>
+						<property name="trustStoreType" value="${truststore.type}"/>
 						<property name="trustStorePath" value="${truststore.path}"/>
 						<property name="trustStorePassword" value="${truststore.password}"/>
 					</bean>
@@ -104,6 +105,7 @@
 		<property name="messageDecrypter">
 			<bean class="nl.clockwork.ebms.encryption.EbMSMessageDecrypter">
 				<property name="cpaManager" ref="cpaManager"/>
+				<property name="keyStoreType" value="${encryption.keystore.type}"/>
 				<property name="keyStorePath" value="${encryption.keystore.path}" />
 				<property name="keyStorePassword" value="${encryption.keystore.password}" />
 			</bean>
@@ -247,12 +249,14 @@
 		<property name="cpaManager" ref="cpaManager"/>
 		<property name="canonicalizationMethodAlgorithm" value="${xmldsig.canonicalizationMethodAlgorithm}"/>
 		<property name="transformAlgorithm" value="${xmldsig.transformAlgorithm}"/>
+		<property name="keyStoreType" value="${signature.keystore.type}"/>
 		<property name="keyStorePath" value="${signature.keystore.path}" />
 		<property name="keyStorePassword" value="${signature.keystore.password}" />
 	</bean>  
 
 	<bean id="messageEncrypter" class="nl.clockwork.ebms.encryption.EbMSMessageEncrypter">
 		<property name="cpaManager" ref="cpaManager"/>
+		<property name="trustStoreType" value="${truststore.type}"/>
 		<property name="trustStorePath" value="${truststore.path}"/>
 		<property name="trustStorePassword" value="${truststore.password}"/>
 	</bean>
@@ -281,8 +285,10 @@
 	</bean>
 
 	<bean id="sslFactoryManager" class="nl.clockwork.ebms.client.SSLFactoryManager">
+		<property name="keyStoreType" value="${client.keystore.type}"/>
 		<property name="keyStorePath" value="${client.keystore.path}"/>
 		<property name="keyStorePassword" value="${client.keystore.password}"/>
+		<property name="trustStoreType" value="${truststore.type}"/>
 		<property name="trustStorePath" value="${truststore.path}"/>
 		<property name="trustStorePassword" value="${truststore.password}"/>
 		<property name="verifyHostnames" value="${https.verifyHostnames}"></property>

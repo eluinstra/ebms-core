@@ -41,6 +41,7 @@ import nl.clockwork.ebms.Constants;
 import nl.clockwork.ebms.StreamUtils;
 import nl.clockwork.ebms.common.CPAManager;
 import nl.clockwork.ebms.common.KeyStoreManager;
+import nl.clockwork.ebms.common.KeyStoreManager.KeyStoreType;
 import nl.clockwork.ebms.common.util.DOMUtils;
 import nl.clockwork.ebms.common.util.SecurityUtils;
 import nl.clockwork.ebms.model.CacheablePartyId;
@@ -56,6 +57,7 @@ import nl.clockwork.ebms.validation.ValidatorException;
 public class EbMSMessageDecrypter implements InitializingBean
 {
 	private CPAManager cpaManager;
+	private KeyStoreType keyStoreType;
 	private String keyStorePath;
 	private String keyStorePassword;
 	private KeyStore keyStore;
@@ -63,7 +65,7 @@ public class EbMSMessageDecrypter implements InitializingBean
 	@Override
 	public void afterPropertiesSet() throws Exception
 	{
-		keyStore = KeyStoreManager.getKeyStore(keyStorePath,keyStorePassword);
+		keyStore = KeyStoreManager.getKeyStore(keyStoreType,keyStorePath,keyStorePassword);
 	}
 
 	public void decrypt(EbMSMessage message) throws ValidatorException
@@ -136,6 +138,11 @@ public class EbMSMessageDecrypter implements InitializingBean
 	public void setCpaManager(CPAManager cpaManager)
 	{
 		this.cpaManager = cpaManager;
+	}
+
+	public void setKeyStoreType(KeyStoreType keyStoreType)
+	{
+		this.keyStoreType = keyStoreType;
 	}
 
 	public void setKeyStorePath(String keyStorePath)

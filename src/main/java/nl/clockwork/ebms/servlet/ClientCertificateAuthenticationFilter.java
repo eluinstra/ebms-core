@@ -18,6 +18,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import nl.clockwork.ebms.common.KeyStoreManager;
+import nl.clockwork.ebms.common.KeyStoreManager.KeyStoreType;
 
 public class ClientCertificateAuthenticationFilter implements Filter
 {
@@ -29,9 +30,10 @@ public class ClientCertificateAuthenticationFilter implements Filter
 	{
 		try
 		{
-			String truststorePath = filterConfig.getInitParameter("truststore");
+			String truststoreType = filterConfig.getInitParameter("truststoreType");
+			String truststorePath = filterConfig.getInitParameter("truststorePath");
 			String truststorePassword = filterConfig.getInitParameter("truststorePassword");
-			trustStore = KeyStoreManager.getKeyStore(truststorePath,truststorePassword);
+			trustStore = KeyStoreManager.getKeyStore(KeyStoreType.valueOf(truststoreType),truststorePath,truststorePassword);
 		}
 		catch (GeneralSecurityException | IOException e)
 		{

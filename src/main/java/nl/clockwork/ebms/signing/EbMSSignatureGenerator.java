@@ -39,6 +39,7 @@ import nl.clockwork.ebms.Constants;
 import nl.clockwork.ebms.StreamUtils;
 import nl.clockwork.ebms.common.CPAManager;
 import nl.clockwork.ebms.common.KeyStoreManager;
+import nl.clockwork.ebms.common.KeyStoreManager.KeyStoreType;
 import nl.clockwork.ebms.common.util.DOMUtils;
 import nl.clockwork.ebms.common.util.SecurityUtils;
 import nl.clockwork.ebms.model.CacheablePartyId;
@@ -56,6 +57,7 @@ public class EbMSSignatureGenerator implements InitializingBean
 	//private String signatureMethodAlgorithm = XMLSignature.ALGO_ID_SIGNATURE_DSA;
 	private String transformAlgorithm = Transforms.TRANSFORM_C14N_OMIT_COMMENTS;
 	//private String digestAlgorithm = org.apache.xml.security.utils.Constants.ALGO_ID_DIGEST_SHA1;
+	private KeyStoreType keyStoreType;
 	private String keyStorePath;
 	private String keyStorePassword;
 	private KeyStore keyStore;
@@ -63,7 +65,7 @@ public class EbMSSignatureGenerator implements InitializingBean
 	@Override
 	public void afterPropertiesSet() throws Exception
 	{
-		keyStore = KeyStoreManager.getKeyStore(keyStorePath,keyStorePassword);
+		keyStore = KeyStoreManager.getKeyStore(keyStoreType,keyStorePath,keyStorePassword);
 	}
 	
 	public void generate(EbMSMessage message) throws EbMSProcessorException
@@ -183,6 +185,11 @@ public class EbMSSignatureGenerator implements InitializingBean
 	public void setTransformAlgorithm(String transformAlgorithm)
 	{
 		this.transformAlgorithm = transformAlgorithm;
+	}
+
+	public void setKeyStoreType(KeyStoreType keyStoreType)
+	{
+		this.keyStoreType = keyStoreType;
 	}
 
 	public void setKeyStorePath(String keyStorePath)
