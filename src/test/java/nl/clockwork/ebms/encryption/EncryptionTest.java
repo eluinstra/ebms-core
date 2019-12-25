@@ -49,6 +49,7 @@ import net.sf.ehcache.Ehcache;
 import nl.clockwork.ebms.common.CPAManager;
 import nl.clockwork.ebms.common.EbMSMessageFactory;
 import nl.clockwork.ebms.common.JAXBParser;
+import nl.clockwork.ebms.common.KeyStoreManager.KeyStoreType;
 import nl.clockwork.ebms.common.util.DOMUtils;
 import nl.clockwork.ebms.dao.DAOException;
 import nl.clockwork.ebms.dao.EbMSDAO;
@@ -68,6 +69,7 @@ public class EncryptionTest
 	private CPAManager cpaManager;
 	private EbMSMessageFactory messageFactory;
 	private String cpaId = "cpaStubEBF.rm.https.signed.encrypted";
+	private KeyStoreType keyStoreType = KeyStoreType.JKS;
 	private String keyStorePath = "keystore.jks";
 	private String keyStorePassword = "password";
 	private EbMSMessageEncrypter messageEncrypter;
@@ -187,6 +189,7 @@ public class EncryptionTest
 	{
 		EbMSMessageEncrypter result = new EbMSMessageEncrypter();
 		result.setCpaManager(cpaManager);
+		result.setTrustStoreType(keyStoreType);
 		result.setTrustStorePath(keyStorePath);
 		result.setTrustStorePassword(keyStorePassword);
 		result.afterPropertiesSet();

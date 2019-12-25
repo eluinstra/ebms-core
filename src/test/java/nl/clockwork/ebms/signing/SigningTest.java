@@ -31,6 +31,7 @@ import javax.xml.bind.JAXBException;
 import nl.clockwork.ebms.common.CPAManager;
 import nl.clockwork.ebms.common.EbMSMessageFactory;
 import nl.clockwork.ebms.common.JAXBParser;
+import nl.clockwork.ebms.common.KeyStoreManager.KeyStoreType;
 import nl.clockwork.ebms.dao.DAOException;
 import nl.clockwork.ebms.dao.EbMSDAO;
 import nl.clockwork.ebms.model.EbMSAttachment;
@@ -64,6 +65,7 @@ public class SigningTest
 	private CPAManager cpaManager;
 	private EbMSMessageFactory messageFactory;
 	private String cpaId = "cpaStubEBF.rm.https.signed";
+	private KeyStoreType keyStoreType = KeyStoreType.JKS;
 	private String keyStorePath = "keystore.jks";
 	private String keyStorePassword = "password";
 	private EbMSSignatureGenerator signatureGenerator;
@@ -158,6 +160,7 @@ public class SigningTest
 		result.setCpaManager(cpaManager);
 		result.setCanonicalizationMethodAlgorithm("http://www.w3.org/TR/2001/REC-xml-c14n-20010315");
 		result.setTransformAlgorithm("http://www.w3.org/TR/2001/REC-xml-c14n-20010315");
+		result.setKeyStoreType(keyStoreType);
 		result.setKeyStorePath(keyStorePath);
 		result.setKeyStorePassword(keyStorePassword);
 		result.afterPropertiesSet();
