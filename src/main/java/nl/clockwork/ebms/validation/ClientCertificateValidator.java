@@ -39,10 +39,9 @@ public class ClientCertificateValidator
 	{
 		if (enabled)
 		{
-			X509Certificate[] certificates = ClientCertificateManager.getCertificates();
-			if (certificates != null && certificates.length > 0)
+			X509Certificate certificate = ClientCertificateManager.getCertificate();
+			if (certificate != null)
 			{
-				java.security.cert.X509Certificate certificate = certificates[0];
 				if (!certificate.equals(getClientCertificate(message.getMessageHeader())))
 					throw new ValidationException("Invalid SSL Client Certificate!");
 			}
@@ -51,7 +50,7 @@ public class ClientCertificateValidator
 		}
 	}
 
-	private java.security.cert.X509Certificate getClientCertificate(MessageHeader messageHeader)
+	private X509Certificate getClientCertificate(MessageHeader messageHeader)
 	{
 		try
 		{
