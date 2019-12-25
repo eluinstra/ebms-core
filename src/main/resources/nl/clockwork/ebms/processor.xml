@@ -66,6 +66,10 @@
 		<property name="messageProcessor" ref="messageProcessor"/>
 	</bean>
 
+	<bean id="ebMSIdGenerator" class="nl.clockwork.ebms.common.EbMSIdGenerator">
+		<constructor-arg name="serverId" value="${ebms.serverId}"/>
+	</bean>
+
 	<bean id="messageValidator" class="nl.clockwork.ebms.validation.EbMSMessageValidator">
 		<property name="ebMSDAO" ref="ebMSDAO"/>
 		<property name="cpaManager" ref="cpaManager"/>
@@ -209,6 +213,7 @@
 	<bean id="ebMSMessageFactory" class="nl.clockwork.ebms.common.EbMSMessageFactory">
 		<property name="cleoPatch" value="${patch.cleo.enable}"/>
 		<property name="cpaManager" ref="cpaManager"/>
+		<property name="ebMSIdGenerator" ref="ebMSIdGenerator"/>
 	</bean>
 	
 	<bean id="eventManager" class="nl.clockwork.ebms.job.EventManagerFactory">

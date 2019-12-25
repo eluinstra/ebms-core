@@ -72,6 +72,7 @@ public class EbMSMessageFactory
 {
 	private boolean cleoPatch;
 	private CPAManager cpaManager;
+	private EbMSIdGenerator ebMSIdGenerator;
 
 	public EbMSMessage createEbMSMessageError(String cpaId, EbMSMessage message, ErrorList errorList, Date timestamp) throws DatatypeConfigurationException, JAXBException
 	{
@@ -254,7 +255,6 @@ public class EbMSMessageFactory
 
 	private MessageHeader createMessageHeader(String cpaId, Party fromParty, Party toParty, String action)
 	{
-		String uuid = UUID.randomUUID().toString();
 		EbMSPartyInfo fromPartyInfo = cpaManager.getEbMSPartyInfo(cpaId,fromParty)
 				.orElseThrow(() -> StreamUtils.illegalStateException("EbMSPartyInfo",cpaId,fromParty));
 		EbMSPartyInfo toPartyInfo = cpaManager.getEbMSPartyInfo(cpaId,toParty)
@@ -263,6 +263,7 @@ public class EbMSMessageFactory
 		String hostname = CPAUtils.getHostname(
 				cpaManager.getDefaultDeliveryChannel(cpaId,partyId,action)
 				.orElseThrow(() -> StreamUtils.illegalStateException("DefaultDeliveryChannel",cpaId,partyId,action)));
+		String conversationId = ebMSIdGenerator.generateConversationId();
 
 		MessageHeader messageHeader = new MessageHeader();
 
@@ -270,7 +271,7 @@ public class EbMSMessageFactory
 		messageHeader.setMustUnderstand(true);
 
 		messageHeader.setCPAId(cpaId);
-		messageHeader.setConversationId(uuid);
+		messageHeader.setConversationId(conversationId);
 		
 		messageHeader.setFrom(new From());
 		messageHeader.getFrom().getPartyId().addAll(fromPartyInfo.getPartyIds());
@@ -288,7 +289,7 @@ public class EbMSMessageFactory
 		messageHeader.setAction(action);
 
 		messageHeader.setMessageData(new MessageData());
-		messageHeader.getMessageData().setMessageId(uuid + "@" + hostname);
+		messageHeader.getMessageData().setMessageId(ebMSIdGenerator.generateMessageId(hostname,conversationId));
 		//messageHeader.getMessageData().setRefToMessageId(null);
 		messageHeader.getMessageData().setTimestamp(new Date());
 
@@ -301,7 +302,6 @@ public class EbMSMessageFactory
 
 	private MessageHeader createMessageHeader(String cpaId, EbMSMessageContext context) throws DatatypeConfigurationException
 	{
-		String uuid = context.getMessageId() == null ? UUID.randomUUID().toString() : context.getMessageId();
 		FromPartyInfo fromPartyInfo = cpaManager.getFromPartyInfo(cpaId,context.getFromRole(),context.getService(),context.getAction())
 				.orElseThrow(() -> StreamUtils.illegalStateException("FromPartyInfo",cpaId,context.getFromRole(),context.getService(),context.getAction()));
 		ToPartyInfo toPartyInfo = cpaManager.getToPartyInfoByFromPartyActionBinding(cpaId,context.getFromRole(),context.getService(),context.getAction())
@@ -309,6 +309,8 @@ public class EbMSMessageFactory
 						.orElseThrow(() -> StreamUtils.illegalStateException("ToPartyInfo",cpaId,context.getToRole(),context.getService(),context.getAction())));
 		DeliveryChannel deliveryChannel = CPAUtils.getDeliveryChannel(fromPartyInfo.getCanSend().getThisPartyActionBinding());
 		String hostname = CPAUtils.getHostname(deliveryChannel);
+		String conversationId = context.getConversationId() == null ? ebMSIdGenerator.generateConversationId() : context.getConversationId();
+		String messageId = context.getMessageId() == null ? ebMSIdGenerator.generateMessageId(hostname,conversationId) : context.getMessageId();
 
 		MessageHeader messageHeader = new MessageHeader();
 
@@ -316,7 +318,7 @@ public class EbMSMessageFactory
 		messageHeader.setMustUnderstand(true);
 
 		messageHeader.setCPAId(cpaId);
-		messageHeader.setConversationId(context.getConversationId() != null ? context.getConversationId() : uuid);
+		messageHeader.setConversationId(context.getConversationId() != null ? context.getConversationId() : conversationId);
 		
 		messageHeader.setFrom(new From());
 		messageHeader.getFrom().getPartyId().addAll(fromPartyInfo.getPartyIds());
@@ -332,7 +334,7 @@ public class EbMSMessageFactory
 		messageHeader.setAction(fromPartyInfo.getCanSend().getThisPartyActionBinding().getAction());
 
 		messageHeader.setMessageData(new MessageData());
-		messageHeader.getMessageData().setMessageId(uuid + "@" + hostname);
+		messageHeader.getMessageData().setMessageId(messageId);
 		messageHeader.getMessageData().setRefToMessageId(context.getRefToMessageId());
 		messageHeader.getMessageData().setTimestamp(new Date());
 
@@ -368,7 +370,7 @@ public class EbMSMessageFactory
 			result.getTo().setRole(null);
 
 		result.getMessageData().setRefToMessageId(messageHeader.getMessageData().getMessageId());
-		result.getMessageData().setMessageId(UUID.randomUUID().toString() + "@" + hostname);
+		result.getMessageData().setMessageId(ebMSIdGenerator.generateMessageId(hostname));
 		result.getMessageData().setTimestamp(timestamp);
 		result.getMessageData().setTimeToLive(null);
 
@@ -452,5 +454,10 @@ public class EbMSMessageFactory
 	public void setCpaManager(CPAManager cpaManager)
 	{
 		this.cpaManager = cpaManager;
+	}
+
+	public void setEbMSIdGenerator(EbMSIdGenerator ebMSIdGenerator)
+	{
+		this.ebMSIdGenerator = ebMSIdGenerator;
 	}
 }
