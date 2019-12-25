@@ -29,6 +29,7 @@ import javax.mail.util.ByteArrayDataSource;
 import javax.xml.bind.JAXBException;
 
 import nl.clockwork.ebms.common.CPAManager;
+import nl.clockwork.ebms.common.EbMSIdGenerator;
 import nl.clockwork.ebms.common.EbMSMessageFactory;
 import nl.clockwork.ebms.common.JAXBParser;
 import nl.clockwork.ebms.common.KeyStoreManager.KeyStoreType;
@@ -149,6 +150,7 @@ public class SigningTest
 	private EbMSMessageFactory initMessageFactory(CPAManager cpaManager)
 	{
 		EbMSMessageFactory result = new EbMSMessageFactory();
+		result.setEbMSIdGenerator(new EbMSIdGenerator(null));
 		result.setCpaManager(cpaManager);
 		result.setCleoPatch(false);
 		return result;
