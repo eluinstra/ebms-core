@@ -2,10 +2,11 @@ package nl.clockwork.ebms.servlet;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.Charset;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
-import java.util.Base64;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -61,10 +62,9 @@ public class ClientCertificateManagerFilter implements Filter
 				String s = (String)certificate;
 				if (StringUtils.isNotBlank(s))
 				{
-					byte[] c = Base64.getDecoder().decode(s);
-					ByteArrayInputStream is = new ByteArrayInputStream(c);
+					InputStream is = new ByteArrayInputStream(s.getBytes(Charset.defaultCharset()));
 					CertificateFactory cf = CertificateFactory.getInstance("X509");
-					return (X509Certificate)cf.generateCertificate(is);			
+					return (X509Certificate)cf.generateCertificate(is);
 				}
 			}
 			else if (certificate instanceof X509Certificate)
