@@ -74,9 +74,9 @@
 		<property name="ebMSDAO" ref="ebMSDAO"/>
 		<property name="cpaManager" ref="cpaManager"/>
 		<property name="clientCertificateValidator">
-			<bean class="nl.clockwork.ebms.validation.ClientCertificateValidator">
-				<property name="enabled" value="${https.clientCertificateAuthentication}"/>
-				<property name="cpaManager" ref="cpaManager"/>
+			<bean class="nl.clockwork.ebms.validation.ClientCertificateValidator" factory-method="createInstance">
+				<constructor-arg name="enabled" value="${https.clientCertificateAuthentication}"/>
+				<constructor-arg name="cpaManager" ref="cpaManager"/>
 			</bean>
 		</property>
 		<property name="cpaValidator">

@@ -31,23 +31,55 @@ import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageHeader;
 
 public class ClientCertificateValidator
 {
-	protected transient Log logger = LogFactory.getLog(getClass());
-	private boolean enabled;
+	protected transient final Log logger = LogFactory.getLog(getClass());
+//	private static ClientCertificateValidator instance;
 	private CPAManager cpaManager;
+
+//	public static ClientCertificateValidator getInstance(boolean enabled, CPAManager cpaManager)
+//	{
+//		instance = instance != null ? instance :
+//				enabled ? new ClientCertificateValidator(cpaManager) :
+//					new ClientCertificateValidator()
+//					{
+//						@Override
+//						public void validate(EbMSMessage message) throws ValidatorException
+//						{
+//						}
+//					};
+//		return instance;
+//	}
+
+	public static ClientCertificateValidator createInstance(boolean enabled, CPAManager cpaManager)
+	{
+		return enabled ? new ClientCertificateValidator(cpaManager) :
+				new ClientCertificateValidator()
+				{
+					@Override
+					public void validate(EbMSMessage message) throws ValidatorException
+					{
+					}
+				};
+	}
+
+	private ClientCertificateValidator()
+	{
+	}
+
+	private ClientCertificateValidator(CPAManager cpaManager)
+	{
+		this.cpaManager = cpaManager;
+	}
 
 	public void validate(EbMSMessage message) throws ValidatorException
 	{
-		if (enabled)
+		X509Certificate certificate = ClientCertificateManager.getCertificate();
+		if (certificate != null)
 		{
-			X509Certificate certificate = ClientCertificateManager.getCertificate();
-			if (certificate != null)
-			{
-				if (!certificate.equals(getClientCertificate(message.getMessageHeader())))
-					throw new ValidationException("Invalid SSL Client Certificate!");
-			}
-			else
-				logger.warn("No certificates found.");
+			if (!certificate.equals(getClientCertificate(message.getMessageHeader())))
+				throw new ValidationException("Invalid SSL Client Certificate!");
 		}
+		else
+			logger.warn("No certificates found.");
 	}
 
 	private X509Certificate getClientCertificate(MessageHeader messageHeader)
@@ -67,16 +99,6 @@ public class ClientCertificateValidator
 			logger.warn("",e);
 			return null;
 		}
-	}
-
-	public void setEnabled(boolean enabled)
-	{
-		this.enabled = enabled;
-	}
-
-	public void setCpaManager(CPAManager cpaManager)
-	{
-		this.cpaManager = cpaManager;
 	}
 
 }
