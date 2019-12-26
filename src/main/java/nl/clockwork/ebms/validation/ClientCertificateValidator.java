@@ -17,6 +17,7 @@ package nl.clockwork.ebms.validation;
 
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.util.Objects;
 
 import nl.clockwork.ebms.StreamUtils;
 import nl.clockwork.ebms.common.CPAManager;
@@ -31,23 +32,8 @@ import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageHeader;
 
 public class ClientCertificateValidator
 {
-	protected transient final Log logger = LogFactory.getLog(getClass());
-//	private static ClientCertificateValidator instance;
+	private transient final Log logger = LogFactory.getLog(getClass());
 	private CPAManager cpaManager;
-
-//	public static ClientCertificateValidator getInstance(boolean enabled, CPAManager cpaManager)
-//	{
-//		instance = instance != null ? instance :
-//				enabled ? new ClientCertificateValidator(cpaManager) :
-//					new ClientCertificateValidator()
-//					{
-//						@Override
-//						public void validate(EbMSMessage message) throws ValidatorException
-//						{
-//						}
-//					};
-//		return instance;
-//	}
 
 	public static ClientCertificateValidator createInstance(boolean enabled, CPAManager cpaManager)
 	{
@@ -67,6 +53,7 @@ public class ClientCertificateValidator
 
 	private ClientCertificateValidator(CPAManager cpaManager)
 	{
+		Objects.requireNonNull(cpaManager);
 		this.cpaManager = cpaManager;
 	}
 
