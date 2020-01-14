@@ -71,7 +71,6 @@ public class EbMSMessageWriter
 		String boundary = createBoundary();
 		String contentType = createContentType(boundary,document.getContentId());
 
-		connection.setRequestProperty("MIME-Version","1.0");
 		connection.setRequestProperty("Content-Type",contentType);
 		connection.setRequestProperty("SOAPAction",Constants.EBMS_SOAP_ACTION);
 
