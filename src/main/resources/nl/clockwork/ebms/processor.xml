@@ -216,7 +216,7 @@
 		<property name="ebMSIdGenerator" ref="ebMSIdGenerator"/>
 	</bean>
 	
-	<bean id="eventManager" class="nl.clockwork.ebms.job.EventManagerFactory">
+	<bean id="eventManager" class="nl.clockwork.ebms.event.processor.EventManagerFactory">
 		<property name="ebMSDAO" ref="ebMSDAO"/>
 		<property name="cpaManager" ref="cpaManager"/>
 		<property name="autoRetryResponse" value="${ebmsMessage.autoRetryResponse:false}"/>
@@ -224,21 +224,13 @@
 		<property name="autoRetryInterval" value="${ebmsMessage.autoRetryInterval:15}"/>
 	</bean>
  
-	<bean id="jobScheduler" class="nl.clockwork.ebms.job.JobScheduler">
-		<property name="enabled" value="${jobScheduler.enabled}"/>
-		<property name="delay" value="${jobScheduler.delay}"/>
-		<property name="period" value="${jobScheduler.period}"/>
-		<property name="jobs">
-			<list>
-				<ref bean="processEventsJob"/>
-			</list>
-		</property>
-	</bean>
-
-	<bean id="processEventsJob" class="nl.clockwork.ebms.job.EbMSEventProcessor">
-		<property name="maxThreads" value="${job.maxTreads}"/>
-		<property name="processorsScaleFactor" value="${job.processorsScaleFactor}"/>
-		<property name="queueScaleFactor" value="${job.queueScaleFactor}"/>
+	<bean id="ebMSEventProcessor" class="nl.clockwork.ebms.event.processor.EbMSEventProcessor">
+		<property name="enabled" value="${eventProcessor.enabled}"/>
+		<property name="delay" value="${eventProcessor.delay}"/>
+		<property name="period" value="${eventProcessor.period}"/>
+		<property name="maxThreads" value="${eventProcessor.maxTreads}"/>
+		<property name="processorsScaleFactor" value="${eventProcessor.processorsScaleFactor}"/>
+		<property name="queueScaleFactor" value="${eventProcessor.queueScaleFactor}"/>
 		<property name="eventListener" ref="eventListener"/>
 		<property name="ebMSDAO" ref="ebMSDAO"/>
 		<property name="urlManager" ref="urlManager"/>
@@ -301,7 +293,7 @@
 		<property name="enabledCipherSuites" value="${https.cipherSuites}"/>
 	</bean>
 
-	<bean id="eventListener" class="nl.clockwork.ebms.event.EventListenerFactory">
+	<bean id="eventListener" class="nl.clockwork.ebms.event.listener.EventListenerFactory">
 		<property name="type" value="${eventListener.type}" />
 		<property name="ebMSDAO" ref="ebMSDAO" />
 		<property name="jmsBrokerConfig" value="${jms.broker.config}" />

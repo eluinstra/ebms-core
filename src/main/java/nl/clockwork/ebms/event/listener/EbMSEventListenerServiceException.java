@@ -13,28 +13,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.clockwork.ebms.event;
+package nl.clockwork.ebms.event.listener;
 
-public class EventException extends RuntimeException
+import javax.xml.ws.WebFault;
+
+
+@WebFault(name="EbMSEventListenerServiceException", targetNamespace="http://www.clockwork.nl/ebms/event/2.0")
+public class EbMSEventListenerServiceException extends EventException
 {
 	private static final long serialVersionUID = 1L;
 
-	public EventException()
+	public EbMSEventListenerServiceException()
 	{
 		super();
 	}
 
-	public EventException(String message, Throwable cause)
+	public EbMSEventListenerServiceException(String message, Throwable cause)
 	{
 		super(message,cause);
 	}
 
-	public EventException(String message)
+	public EbMSEventListenerServiceException(String message)
 	{
 		super(message);
 	}
 
-	public EventException(Throwable cause)
+	public EbMSEventListenerServiceException(Throwable cause)
 	{
 		super(cause);
 	}

@@ -30,7 +30,7 @@ import nl.clockwork.ebms.StreamUtils;
 import nl.clockwork.ebms.common.CPAManager;
 import nl.clockwork.ebms.common.EbMSMessageFactory;
 import nl.clockwork.ebms.dao.EbMSDAO;
-import nl.clockwork.ebms.job.EventManager;
+import nl.clockwork.ebms.event.processor.EventManager;
 import nl.clockwork.ebms.model.CacheablePartyId;
 import nl.clockwork.ebms.model.EbMSDocument;
 import nl.clockwork.ebms.model.EbMSMessage;
