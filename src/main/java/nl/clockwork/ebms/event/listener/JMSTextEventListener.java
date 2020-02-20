@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.clockwork.ebms.event;
+package nl.clockwork.ebms.event.listener;
 
 import java.util.Map;
 
@@ -21,6 +21,7 @@ import javax.jms.Destination;
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.Session;
+import javax.jms.TextMessage;
 
 import nl.clockwork.ebms.Constants.EbMSMessageEventType;
 import nl.clockwork.ebms.dao.EbMSDAO;
@@ -32,7 +33,7 @@ import org.springframework.jms.JmsException;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jms.core.MessageCreator;
 
-public class JMSEventListener implements EventListener
+public class JMSTextEventListener implements EventListener
 {
 	public class EventMessageCreator implements MessageCreator
 	{
@@ -46,7 +47,7 @@ public class JMSEventListener implements EventListener
 		@Override
 		public Message createMessage(Session session) throws JMSException
 		{
-			Message result = session.createMessage();
+			TextMessage result = session.createTextMessage();
 			result.setStringProperty("cpaId",messageContext.getCpaId());
 			result.setStringProperty("fromPartyId",messageContext.getFromRole().getPartyId());
 			result.setStringProperty("fromRole",messageContext.getFromRole().getRole());
@@ -57,6 +58,7 @@ public class JMSEventListener implements EventListener
 			result.setStringProperty("conversationId",messageContext.getConversationId());
 			result.setStringProperty("messageId",messageContext.getMessageId());
 			result.setStringProperty("refToMessageId",messageContext.getRefToMessageId());
+			result.setText("EbMS Message Context");
 			return result;
 		}
 	}
@@ -66,11 +68,11 @@ public class JMSEventListener implements EventListener
 	private JmsTemplate jmsTemplate;
 	private Map<String,Destination> destinations;
 
-	public JMSEventListener()
+	public JMSTextEventListener()
 	{
 	}
 
-	public JMSEventListener(EbMSDAO ebMSDAO, JmsTemplate jmsTemplate, Map<String,Destination> destinations)
+	public JMSTextEventListener(EbMSDAO ebMSDAO, JmsTemplate jmsTemplate, Map<String,Destination> destinations)
 	{
 		this.ebMSDAO = ebMSDAO;
 		this.jmsTemplate = jmsTemplate;

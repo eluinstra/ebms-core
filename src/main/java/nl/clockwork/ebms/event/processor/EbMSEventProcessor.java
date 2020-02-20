@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.clockwork.ebms.job;
+package nl.clockwork.ebms.event.processor;
 
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -41,13 +41,13 @@ import nl.clockwork.ebms.common.URLManager;
 import nl.clockwork.ebms.dao.DAOTransactionCallback;
 import nl.clockwork.ebms.dao.EbMSDAO;
 import nl.clockwork.ebms.encryption.EbMSMessageEncrypter;
-import nl.clockwork.ebms.event.EventListener;
+import nl.clockwork.ebms.event.listener.EventListener;
 import nl.clockwork.ebms.model.EbMSDocument;
 import nl.clockwork.ebms.model.EbMSEvent;
 import nl.clockwork.ebms.processor.EbMSMessageProcessor;
 import nl.clockwork.ebms.util.CPAUtils;
 
-public class EbMSEventProcessor implements InitializingBean, Job
+public class EbMSEventProcessor implements Runnable, InitializingBean
 {
 	private class HandleEventTask implements Runnable
 	{
@@ -188,6 +188,9 @@ public class EbMSEventProcessor implements InitializingBean, Job
 	private static final int DEFAULTWAIT = 30;
 	protected transient Log logger = LogFactory.getLog(getClass());
 	private ExecutorService executorService;
+	private boolean enabled;
+	private int delay;
+	private int period;
 	private Integer maxThreads;
 	private Integer processorsScaleFactor;
 	private Integer queueScaleFactor;
@@ -204,50 +207,79 @@ public class EbMSEventProcessor implements InitializingBean, Job
 	@Override
 	public void afterPropertiesSet() throws Exception
 	{
-		if (processorsScaleFactor == null || processorsScaleFactor <= 0)
+		if (enabled)
 		{
-			processorsScaleFactor = 1;
-			logger.info(this.getClass().getName() + " using processors scale factor " + processorsScaleFactor);
-		}
-		if (maxThreads == null || maxThreads <= 0)
-		{
-			maxThreads = Runtime.getRuntime().availableProcessors() * processorsScaleFactor;
-			logger.info(this.getClass().getName() + " using " + maxThreads + " threads");
-		}
-		if (queueScaleFactor == null || queueScaleFactor <= 0)
-		{
-			queueScaleFactor = 1;
-			logger.info(this.getClass().getName() + " using queue scale factor " + queueScaleFactor);
+			if (processorsScaleFactor == null || processorsScaleFactor <= 0)
+			{
+				processorsScaleFactor = 1;
+				logger.info(this.getClass().getName() + " using processors scale factor " + processorsScaleFactor);
+			}
+			if (maxThreads == null || maxThreads <= 0)
+			{
+				maxThreads = Runtime.getRuntime().availableProcessors() * processorsScaleFactor;
+				logger.info(this.getClass().getName() + " using " + maxThreads + " threads");
+			}
+			if (queueScaleFactor == null || queueScaleFactor <= 0)
+			{
+				queueScaleFactor = 1;
+				logger.info(this.getClass().getName() + " using queue scale factor " + queueScaleFactor);
+			}
+			Thread.sleep(delay);
+			Thread thread = new Thread(this);
+			thread.setDaemon(true);
+			thread.start();
 		}
 	}
 	
-  @Override
-  public void execute()
+  public void run()
   {
-		executorService = new ThreadPoolExecutor(
-				maxThreads,
-				maxThreads,
-				1,
-				TimeUnit.MINUTES,
-				new ArrayBlockingQueue<>(maxThreads * queueScaleFactor,true),
-				new ThreadPoolExecutor.CallerRunsPolicy());
-		GregorianCalendar timestamp = new GregorianCalendar();
-		List<EbMSEvent> events = ebMSDAO.getEventsBefore(timestamp.getTime());
-		events.forEach(e -> executorService.submit(new HandleEventTask(e)));
-		executorService.shutdown();
-		try
-		{
-			while (!executorService.awaitTermination(DEFAULTWAIT,TimeUnit.MINUTES))
+  	while (true)
+  	{
+  		long start = new Date().getTime();
+			executorService = new ThreadPoolExecutor(
+					maxThreads,
+					maxThreads,
+					1,
+					TimeUnit.MINUTES,
+					new ArrayBlockingQueue<>(maxThreads * queueScaleFactor,true),
+					new ThreadPoolExecutor.CallerRunsPolicy());
+			GregorianCalendar timestamp = new GregorianCalendar();
+			List<EbMSEvent> events = ebMSDAO.getEventsBefore(timestamp.getTime());
+			events.forEach(e -> executorService.submit(new HandleEventTask(e)));
+			executorService.shutdown();
+			try
 			{
-				// just loop, waiting
+				while (!executorService.awaitTermination(DEFAULTWAIT,TimeUnit.MINUTES))
+				{
+					// just loop, waiting
+				}
+				long end = new Date().getTime();
+				long sleep = period - (end - start);
+				if (sleep > 0)
+					Thread.sleep(sleep);
 			}
-		}
-		catch (InterruptedException e)
-		{
-			logger.trace(e);
-		}
+			catch (InterruptedException e)
+			{
+				logger.trace(e);
+			}
+  	}
   }
-  
+
+	public void setEnabled(boolean enabled)
+	{
+		this.enabled = enabled;
+	}
+
+	public void setDelay(int delay)
+	{
+		this.delay = delay;
+	}
+
+	public void setPeriod(int period)
+	{
+		this.period = period;
+	}
+
 	public void setMaxThreads(Integer maxThreads)
 	{
 		this.maxThreads = maxThreads;

@@ -13,9 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.clockwork.ebms.job;
+package nl.clockwork.ebms.event.listener;
 
-public interface Job
+public interface EventListener
 {
-	void execute();
+	void onMessageReceived(String messageId) throws EventException;
+	void onMessageDelivered(String messageId) throws EventException;
+	void onMessageFailed(String messageId) throws EventException;
+	void onMessageExpired(String messageId) throws EventException;
 }
