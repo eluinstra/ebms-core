@@ -15,7 +15,6 @@
  */
 package nl.clockwork.ebms.client;
 
-import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
@@ -23,7 +22,6 @@ import java.nio.charset.Charset;
 import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerException;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
@@ -43,16 +41,16 @@ public class EbMSResponseHandler
 	protected transient Log messageLogger = LogFactory.getLog(Constants.MESSAGE_LOG);
 	private HttpURLConnection connection;
 	private List<Integer> recoverableHttpErrors;
-	private List<Integer> irrecoverableHttpErrors;
+	private List<Integer> unrecoverableHttpErrors;
 	
-	public EbMSResponseHandler(HttpURLConnection connection, List<Integer> recoverableHttpErrors, List<Integer> irrecoverableHttpErrors)
+	public EbMSResponseHandler(HttpURLConnection connection, List<Integer> recoverableHttpErrors, List<Integer> unrecoverableHttpErrors)
 	{
 		this.connection = connection;
 		this.recoverableHttpErrors = recoverableHttpErrors;
-		this.irrecoverableHttpErrors = irrecoverableHttpErrors;
+		this.unrecoverableHttpErrors = unrecoverableHttpErrors;
 	}
 
-	public EbMSDocument read() throws IOException, ParserConfigurationException, SAXException, EbMSProcessorException, TransformerException
+	public EbMSDocument read() throws EbMSProcessorException
 	{
 		try
 		{
@@ -60,73 +58,90 @@ public class EbMSResponseHandler
 			{
 				if (connection.getResponseCode() == Constants.SC_NOCONTENT || connection.getContentLength() == 0)
 				{
-					messageLogger.info("<<<<\nstatusCode: " + connection.getResponseCode() + (messageLogger.isDebugEnabled() ? "\n" + HTTPUtils.toString(connection.getHeaderFields()) : ""));
+					logResponse(connection);
 					return null;
 				}
 				else
-				{
-					try (InputStream input = connection.getInputStream())
-					{
-						EbMSMessageReader messageReader = new EbMSMessageReader(getHeaderField("Content-ID"),getHeaderField("Content-Type"));
-						String response = IOUtils.toString(input,getEncoding());
-						messageLogger.info("<<<<\nstatusCode: " + connection.getResponseCode() + (messageLogger.isDebugEnabled() ? "\n" + HTTPUtils.toString(connection.getHeaderFields()) : "") + "\n" + response);
-						return messageReader.readResponse(response);
-					}
-				}
+					return readSuccesResponse(connection);
 			}
 			else if (connection.getResponseCode() / 100 == 1 || connection.getResponseCode() / 100 == 3 || connection.getResponseCode() / 100 == 4)
-			{
-				try (InputStream input = connection.getErrorStream())
-				{
-					String response = null;
-					if (input != null)
-					{
-						response = IOUtils.toString(input,Charset.defaultCharset());
-						messageLogger.info("<<<<\nstatusCode: " + connection.getResponseCode() + (messageLogger.isDebugEnabled() ? "\n" + HTTPUtils.toString(connection.getHeaderFields()) : "") + "\n" + response);
-					}
-					if (recoverableHttpErrors.contains(connection.getResponseCode()))
-						throw new EbMSResponseException(connection.getResponseCode(),response);
-					else
-						throw new EbMSIrrecoverableResponsexception(connection.getResponseCode(),response);
-				}
-			}
+				throw createRecoverableErrorException(connection);
 			else if (connection.getResponseCode() / 100 == 5)
-			{
-				try (InputStream input = connection.getErrorStream())
-				{
-					String response = null;
-					if (input != null)
-					{
-						response = IOUtils.toString(input,Charset.defaultCharset());
-						messageLogger.info("<<<<\nstatusCode: " + connection.getResponseCode() + (messageLogger.isDebugEnabled() ? "\n" + HTTPUtils.toString(connection.getHeaderFields()) : "") + "\n" + response);
-					}
-					if (irrecoverableHttpErrors.contains(connection.getResponseCode()))
-						throw new EbMSIrrecoverableResponsexception(connection.getResponseCode(),response);
-					else
-						throw new EbMSResponseException(connection.getResponseCode(),response);
-				}
-			}
+				throw createUnrecoverableErrorException(connection);
 			else
 			{
-				messageLogger.info("<<<<\nstatusCode: " + connection.getResponseCode() + (messageLogger.isDebugEnabled() ? "\n" + HTTPUtils.toString(connection.getHeaderFields()) : ""));
-				throw new EbMSIrrecoverableResponsexception(connection.getResponseCode());
+				logResponse(connection);
+				throw new EbMSUnrecoverableResponseException(connection.getResponseCode(),connection.getHeaderFields());
 			}
 		}
 		catch (IOException e)
 		{
-			try (InputStream errorStream = new BufferedInputStream(connection.getErrorStream()))
+			try
 			{
-//				String error = IOUtils.toString(errorStream,getEncoding());
-//				messageLogger.info("<<<<\nstatusCode: " + connection.getResponseCode() + (logger.isDebugEnabled() ? "\n" + HTTPUtils.toString(connection.getHeaderFields()) : "") + "\n" + error);
-//				throw new EbMSResponseException(connection.getResponseCode(),error);
-				throw new EbMSResponseException(connection.getResponseCode(),e.getMessage());
+				throw new EbMSResponseException(connection.getResponseCode(),connection.getHeaderFields(),e);
 			}
-			catch (IOException ignore)
+			catch (IOException e1)
 			{
-				// ignore error
+				throw new EbMSProcessingException(e);
 			}
-			throw e;
 		}
+	}
+
+	private EbMSDocument readSuccesResponse(HttpURLConnection connection) throws IOException
+	{
+		try (InputStream input = connection.getInputStream())
+		{
+			EbMSMessageReader messageReader = new EbMSMessageReader(getHeaderField("Content-ID"),getHeaderField("Content-Type"));
+			String response = IOUtils.toString(input,getEncoding());
+			logResponse(connection,response);
+			try
+			{
+				return messageReader.readResponse(response);
+			}
+			catch (ParserConfigurationException e)
+			{
+				throw new EbMSProcessorException(e);
+			}
+			catch (SAXException e)
+			{
+				throw new EbMSResponseException(connection.getResponseCode(),connection.getHeaderFields(),response);
+			}
+		}
+	}
+
+	private EbMSResponseException createRecoverableErrorException(HttpURLConnection connection) throws IOException
+	{
+		try (InputStream input = connection.getErrorStream())
+		{
+			String response = readResponse(connection,input);
+			if (recoverableHttpErrors.contains(connection.getResponseCode()))
+				return new EbMSResponseException(connection.getResponseCode(),connection.getHeaderFields(),response);
+			else
+				return new EbMSUnrecoverableResponseException(connection.getResponseCode(),connection.getHeaderFields(),response);
+		}
+	}
+
+	private EbMSResponseException createUnrecoverableErrorException(HttpURLConnection connection) throws IOException
+	{
+		try (InputStream input = connection.getErrorStream())
+		{
+			String response = readResponse(connection,input);
+			if (unrecoverableHttpErrors.contains(connection.getResponseCode()))
+				return new EbMSUnrecoverableResponseException(connection.getResponseCode(),connection.getHeaderFields(),response);
+			else
+				return new EbMSResponseException(connection.getResponseCode(),connection.getHeaderFields(),response);
+		}
+	}
+
+	private String readResponse(HttpURLConnection connection, InputStream input) throws IOException
+	{
+		String response = null;
+		if (input != null)
+		{
+			response = IOUtils.toString(input,Charset.defaultCharset());
+			logResponse(connection,response);
+		}
+		return response;
 	}
 
 	private String getEncoding() throws EbMSProcessingException
@@ -142,4 +157,17 @@ public class EbMSResponseHandler
 	{
 		return connection.getHeaderField(name);
 	}
+
+	private void logResponse(HttpURLConnection connection) throws IOException
+	{
+		logResponse(connection,null);
+	}
+
+	private void logResponse(HttpURLConnection connection, String response) throws IOException
+	{
+		String headers = connection.getResponseCode() + (messageLogger.isDebugEnabled() ? "\n" + HTTPUtils.toString(connection.getHeaderFields()) : "");
+		response = response != null ? "\n" + response : "";
+		messageLogger.info("<<<<\nstatusCode: " + headers + response);
+	}
+
 }

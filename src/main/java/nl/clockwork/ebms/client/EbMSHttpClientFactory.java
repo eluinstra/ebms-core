@@ -42,7 +42,7 @@ public class EbMSHttpClientFactory implements FactoryBean<EbMSClient>
 	private String[] enabledCipherSuites = new String[]{};
 	private boolean verifyHostnames;
 	private List<Integer> recoverableHttpErrors = new ArrayList<>();
-	private List<Integer> irrecoverableHttpErrors = new ArrayList<>();
+	private List<Integer> unrecoverableHttpErrors = new ArrayList<>();
 
 	@Override
 	public EbMSClient getObject() throws Exception
@@ -51,7 +51,7 @@ public class EbMSHttpClientFactory implements FactoryBean<EbMSClient>
 		if (EbMSHttpClientType.APACHE.equals(type))
 			return new nl.clockwork.ebms.client.apache.EbMSHttpClient(sslFactoryManager,enabledProtocols,enabledCipherSuites,verifyHostnames,chunkedStreamingMode,proxy);
 		else
-			return new EbMSHttpClient(sslFactoryManager,chunkedStreamingMode,base64Writer,proxy,recoverableHttpErrors,irrecoverableHttpErrors);
+			return new EbMSHttpClient(sslFactoryManager,chunkedStreamingMode,base64Writer,proxy,recoverableHttpErrors,unrecoverableHttpErrors);
 	}
 
 	@Override
@@ -124,8 +124,8 @@ public class EbMSHttpClientFactory implements FactoryBean<EbMSClient>
 	{
 		this.recoverableHttpErrors.addAll(Utils.getIntegerList(recoverableClientHttpErrors));
 	}
-	public void setIrrecoverableServerHttpErrors(String irrecoverableServerHttpErrors)
+	public void setUnrecoverableServerHttpErrors(String unrecoverableServerHttpErrors)
 	{
-		this.irrecoverableHttpErrors = Utils.getIntegerList(irrecoverableServerHttpErrors);
+		this.unrecoverableHttpErrors = Utils.getIntegerList(unrecoverableServerHttpErrors);
 	}
 }
