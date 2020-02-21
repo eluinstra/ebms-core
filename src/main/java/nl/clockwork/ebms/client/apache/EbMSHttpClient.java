@@ -22,6 +22,7 @@ import javax.xml.transform.TransformerException;
 import nl.clockwork.ebms.client.EbMSClient;
 import nl.clockwork.ebms.client.EbMSProxy;
 import nl.clockwork.ebms.model.EbMSDocument;
+import nl.clockwork.ebms.processor.EbMSProcessingException;
 import nl.clockwork.ebms.processor.EbMSProcessorException;
 import nl.clockwork.ebms.client.SSLFactoryManager;
 
@@ -72,7 +73,7 @@ public class EbMSHttpClient implements EbMSClient
 		}
 		catch (TransformerException | IOException e)
 		{
-			throw new EbMSProcessorException(e);
+			throw new EbMSProcessingException(e);
 		}
 	}
 	
