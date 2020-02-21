@@ -278,7 +278,7 @@
 		<property name="recoverableInformationalHttpErrors" value="${http.errors.informational.recoverable}"></property>
 		<property name="recoverableRedirectionHttpErrors" value="${http.errors.redirection.recoverable}"></property>
 		<property name="recoverableClientHttpErrors" value="${http.errors.client.recoverable}"></property>
-		<property name="irrecoverableServerHttpErrors" value="${http.errors.server.irrecoverable}"></property>
+		<property name="unrecoverableServerHttpErrors" value="${http.errors.server.unrecoverable}"></property>
 	</bean>
 
 	<bean id="sslFactoryManager" class="nl.clockwork.ebms.client.SSLFactoryManager">

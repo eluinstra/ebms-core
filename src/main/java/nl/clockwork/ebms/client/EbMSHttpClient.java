@@ -24,15 +24,11 @@ import java.net.URLConnection;
 import java.util.List;
 
 import javax.net.ssl.HttpsURLConnection;
-import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
 import nl.clockwork.ebms.model.EbMSDocument;
 import nl.clockwork.ebms.processor.EbMSProcessingException;
 import nl.clockwork.ebms.processor.EbMSProcessorException;
-import nl.clockwork.ebms.client.SSLFactoryManager;
-
-import org.xml.sax.SAXException;
 
 public class EbMSHttpClient implements EbMSClient
 {
@@ -41,7 +37,7 @@ public class EbMSHttpClient implements EbMSClient
 	private boolean base64Writer;
 	private EbMSProxy proxy;
 	private List<Integer> recoverableHttpErrors;
-	private List<Integer> irrecoverableHttpErrors;
+	private List<Integer> unrecoverableHttpErrors;
 
 	public EbMSHttpClient()
 	{
@@ -53,14 +49,14 @@ public class EbMSHttpClient implements EbMSClient
 			boolean base64Writer,
 			EbMSProxy proxy,
 			List<Integer> recoverableHttpErrors,
-			List<Integer> irrecoverableHttpErrors)
+			List<Integer> unrecoverableHttpErrors)
 	{
 		this.sslFactoryManager = sslFactoryManager;
 		this.chunkedStreamingMode = chunkedStreamingMode;
 		this.base64Writer = base64Writer;
 		this.proxy = proxy;
 		this.recoverableHttpErrors = recoverableHttpErrors;
-		this.irrecoverableHttpErrors = irrecoverableHttpErrors;
+		this.unrecoverableHttpErrors = unrecoverableHttpErrors;
 	}
 
 	public EbMSDocument sendMessage(String uri, EbMSDocument document) throws EbMSProcessorException
@@ -75,16 +71,12 @@ public class EbMSHttpClient implements EbMSClient
 			EbMSMessageWriter writer = base64Writer ? new EbMSMessageBase64Writer(connection) : new EbMSMessageWriter(connection);
 			writer.write(document);
 			connection.connect();
-			EbMSResponseHandler handler = new EbMSResponseHandler(connection,recoverableHttpErrors,irrecoverableHttpErrors);
+			EbMSResponseHandler handler = new EbMSResponseHandler(connection,recoverableHttpErrors,unrecoverableHttpErrors);
 			return handler.read();
 		}
-		catch (IOException | TransformerException | SAXException e)
+		catch (IOException | TransformerException e)
 		{
 			throw new EbMSProcessingException(e);
-		}
-		catch (ParserConfigurationException e)
-		{
-			throw new EbMSProcessorException(e);
 		}
 		finally
 		{

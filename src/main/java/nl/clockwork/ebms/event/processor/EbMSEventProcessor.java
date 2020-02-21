@@ -34,7 +34,7 @@ import nl.clockwork.ebms.Constants.EbMSEventStatus;
 import nl.clockwork.ebms.Constants.EbMSMessageStatus;
 import nl.clockwork.ebms.StreamUtils;
 import nl.clockwork.ebms.client.EbMSClient;
-import nl.clockwork.ebms.client.EbMSIrrecoverableResponsexception;
+import nl.clockwork.ebms.client.EbMSUnrecoverableResponseException;
 import nl.clockwork.ebms.client.EbMSResponseException;
 import nl.clockwork.ebms.common.CPAManager;
 import nl.clockwork.ebms.common.URLManager;
@@ -91,7 +91,7 @@ public class EbMSEventProcessor implements Runnable, InitializingBean
 						public void doInTransaction()
 						{
 							eventManager.updateEvent(event,url,EbMSEventStatus.FAILED,e.getMessage());
-							if ((e instanceof EbMSIrrecoverableResponsexception) || !CPAUtils.isReliableMessaging(deliveryChannel))
+							if ((e instanceof EbMSUnrecoverableResponseException) || !CPAUtils.isReliableMessaging(deliveryChannel))
 								if (ebMSDAO.updateMessage(event.getMessageId(),EbMSMessageStatus.SENDING,EbMSMessageStatus.DELIVERY_FAILED) > 0)
 								{
 									eventListener.onMessageFailed(event.getMessageId());
