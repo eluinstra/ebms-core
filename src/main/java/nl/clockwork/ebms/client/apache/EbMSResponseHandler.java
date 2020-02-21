@@ -20,16 +20,9 @@ import java.io.InputStream;
 import java.nio.charset.Charset;
 
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerException;
-
-import nl.clockwork.ebms.Constants;
-import nl.clockwork.ebms.common.util.DOMUtils;
-import nl.clockwork.ebms.common.util.HTTPUtils;
-import nl.clockwork.ebms.model.EbMSDocument;
-import nl.clockwork.ebms.processor.EbMSProcessingException;
-import nl.clockwork.ebms.server.EbMSMessageReader;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.Header;
@@ -37,8 +30,13 @@ import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.ResponseHandler;
-import org.springframework.util.StringUtils;
 import org.xml.sax.SAXException;
+
+import nl.clockwork.ebms.Constants;
+import nl.clockwork.ebms.common.util.HTTPUtils;
+import nl.clockwork.ebms.model.EbMSDocument;
+import nl.clockwork.ebms.processor.EbMSProcessingException;
+import nl.clockwork.ebms.server.EbMSMessageReader;
 
 public class EbMSResponseHandler implements ResponseHandler<EbMSDocument>
 {
@@ -62,11 +60,9 @@ public class EbMSResponseHandler implements ResponseHandler<EbMSDocument>
 					try (InputStream input = entity.getContent())
 					{
 						EbMSMessageReader messageReader = new EbMSMessageReader(getHeaderField(response,"Content-ID"),getHeaderField(response,"Content-Type"));
-						//EbMSDocument result = messageReader.read(input);
-						EbMSDocument result = messageReader.readResponse(input,getEncoding(entity));
-			      if (messageLogger.isInfoEnabled())
-			      	messageLogger.info("<<<< statusCode = " + response.getStatusLine().getStatusCode() + (result == null || result.getMessage() == null ? "" : "\n" + DOMUtils.toString(result.getMessage())));
-						return result;
+						String message = IOUtils.toString(input,getEncoding(entity));
+		      	messageLogger.info("<<<< statusCode = " + response.getStatusLine().getStatusCode() + "\n" + message);
+						return messageReader.readResponse(message);
 					}
 				}
 			}
@@ -78,7 +74,7 @@ public class EbMSResponseHandler implements ResponseHandler<EbMSDocument>
 			}
 			throw new IOException("StatusCode: " + response.getStatusLine().getStatusCode());
 		}
-		catch (ParserConfigurationException | SAXException | TransformerException | EbMSProcessingException e)
+		catch (ParserConfigurationException | SAXException | EbMSProcessingException e)
 		{
 			throw new IOException(e);
 		}

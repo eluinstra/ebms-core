@@ -22,17 +22,16 @@ import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import nl.clockwork.ebms.common.util.DOMUtils;
-import nl.clockwork.ebms.model.EbMSAttachment;
-import nl.clockwork.ebms.model.EbMSDocument;
-
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.parser.MimeStreamParser;
 import org.apache.james.mime4j.stream.MimeConfig;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
+
+import nl.clockwork.ebms.common.util.DOMUtils;
+import nl.clockwork.ebms.model.EbMSAttachment;
+import nl.clockwork.ebms.model.EbMSDocument;
 
 public class EbMSMessageReader
 {
@@ -59,10 +58,9 @@ public class EbMSMessageReader
 			return getEbMSMessage(in);
 	}
 
-	public EbMSDocument readResponse(InputStream in, String encoding) throws IOException, ParserConfigurationException, SAXException
+	public EbMSDocument readResponse(String message) throws IOException, ParserConfigurationException, SAXException
 	{
 		EbMSDocument result = null;
-		String message = IOUtils.toString(in,encoding);
 		if (StringUtils.isNotBlank(message))
 		{
 			Document d = DOMUtils.read(message);

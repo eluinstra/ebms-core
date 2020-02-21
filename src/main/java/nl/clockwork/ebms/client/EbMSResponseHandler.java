@@ -25,19 +25,18 @@ import java.util.List;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
-import nl.clockwork.ebms.Constants;
-import nl.clockwork.ebms.common.util.DOMUtils;
-import nl.clockwork.ebms.common.util.HTTPUtils;
-import nl.clockwork.ebms.model.EbMSDocument;
-import nl.clockwork.ebms.processor.EbMSProcessingException;
-import nl.clockwork.ebms.processor.EbMSProcessorException;
-import nl.clockwork.ebms.server.EbMSMessageReader;
-
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.util.StringUtils;
 import org.xml.sax.SAXException;
+
+import nl.clockwork.ebms.Constants;
+import nl.clockwork.ebms.common.util.HTTPUtils;
+import nl.clockwork.ebms.model.EbMSDocument;
+import nl.clockwork.ebms.processor.EbMSProcessingException;
+import nl.clockwork.ebms.processor.EbMSProcessorException;
+import nl.clockwork.ebms.server.EbMSMessageReader;
 
 public class EbMSResponseHandler
 {
@@ -69,11 +68,9 @@ public class EbMSResponseHandler
 					try (InputStream input = connection.getInputStream())
 					{
 						EbMSMessageReader messageReader = new EbMSMessageReader(getHeaderField("Content-ID"),getHeaderField("Content-Type"));
-						//EbMSDocument result = messageReader.read(input);
-						EbMSDocument result = messageReader.readResponse(input,getEncoding());
-						if (messageLogger.isInfoEnabled())
-							messageLogger.info("<<<<\nstatusCode: " + connection.getResponseCode() + (messageLogger.isDebugEnabled() ? "\n" + HTTPUtils.toString(connection.getHeaderFields()) : "") + (result == null || result.getMessage() == null ? "" : "\n" + DOMUtils.toString(result.getMessage())));
-						return result;
+						String response = IOUtils.toString(input,getEncoding());
+						messageLogger.info("<<<<\nstatusCode: " + connection.getResponseCode() + (messageLogger.isDebugEnabled() ? "\n" + HTTPUtils.toString(connection.getHeaderFields()) : "") + "\n" + response);
+						return messageReader.readResponse(response);
 					}
 				}
 			}
