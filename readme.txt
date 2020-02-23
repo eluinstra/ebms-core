@@ -66,7 +66,6 @@ Implemented:
 	-	Message Status Service
 	-	Message Service Handler Ping Service
 -	HTTP(S) Protocol
--	Separate ErrorMessage and Acknowledgment messages
 
 Not implemented:
 -	Core Functionality
@@ -74,14 +73,13 @@ Not implemented:
 -	Additional Features:
 	o	Message Order Module
 	o	Multi-Hop Module
--	Multiple delivery channels per action
 
 Remarks:
 -	Duplicate messages will always be eliminated
--	Only standalone MSH level messages are supported.
+-	Only standalone MSH level messages are supported
 -	Only acts as ToPartyMSH, not as nextMSH
--	Only 1 (allPurpose) Channel per Action is supported
--	Manifest can only refer to payload data included as part of the message as payload document(s) contained in a Payload Container
+-	Only 1 (=allPurpose) Channel per Action is supported
+-	Manifest can only refer to payload data included as part of the message
 -	Extendible to support other communication protocols
 
 =======
