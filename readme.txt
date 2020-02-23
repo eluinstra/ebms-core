@@ -1,3 +1,45 @@
+ebms-core implements EbMS 2.0.
+
+ebms-core-2.16.0.jar and up needs jdk 8 and is compiled and tested with openjdk 8
+ebms-core version 2.16.0 and up are released in the Central Maven repository:
+
+<dependency>
+  <groupId>nl.clockwork.ebms</groupId>
+  <artifactId>ebms-core</artifactId>
+  <version>2.16.3</version>
+</dependency>
+
+ebms adapter for mule and web are no longer released; use ebms-admin instead
+
+For the ebms-admin console see https://sourceforge.net/projects/javaebmsadmin/
+
+===============
+= Release Notes
+===============
+ebms-core-2.16.3.jar:
+- fixed bug: messages are sometimes sent more than once at (almost) the same time
+- improved EbMSEventProcessor
+- renamed property jobScheduler.enabled to eventProcessor.enabled
+- renamed property jobScheduler.delay to eventProcessor.delay
+- renamed property jobScheduler.period to eventProcessor.period
+- renamed property job.maxTreads to eventProcessor.maxTreads
+- renamed property job.processorsScaleFactor to eventProcessor.processorsScaleFactor
+- renamed property job.queueScaleFactor to eventProcessor.queueScaleFactor
+- improved EbMSResponseHandler
+- renamed property http.errors.server.irrecoverable to http.errors.server.unrecoverable
+
+ebms-core-2.16.2.jar:
+- removed MIME-Version header
+
+ebms-core-2.16.1.jar:
+- improved client ssl behaviour
+- added keystore type support
+- minor improvements
+
+ebms-core-2.16.0.jar:
+- upgraded to java 8
+- minor improvements
+
 ==============
 Introduction =
 ==============
@@ -11,7 +53,6 @@ This library contains the core functionality of the EbMS adapter including:
 	- oracle
 	- db2
 - CPA and EbMSMessage SOAP Services to control the EbMS adapter
-- See SourceForge for the EbMS Admin Console.
 
 Implemented:
 -	Core Functionality
@@ -46,7 +87,7 @@ Remarks:
 =======
 Usage =
 =======
-You can use the ebms-core by integrating it into your own java application, or you can use it as a standalone SOAP service through one of the application wrappers (ebms-admin, ebms-adapter-web or ebms-adapter-mule)
+You can use the ebms-core by integrating it into your own java application, or you can use it as a standalone SOAP service through ebms-admin console
  
 If you want to use the ebms-core in your own application you can include the jar into your application and configure the adapter through spring properties.
 You can include the spring configuration file nl/clockwork/ebms/main.xml into your application or modify it to your needs.
@@ -68,7 +109,7 @@ The EbMS adapter supports different databases:
 - Oracle
 - DB2
 
-You can configure them by configuring the right driver and connection string:
+You can configure the database by adding the right JDBC driver to the classpath and configuring the right driver and connection string:
 
 # Set username and password
 ebms.jdbc.username=<username>
@@ -120,24 +161,25 @@ and add the name ebMSDataSource to the application datasource
 ==========
 Security =
 ==========
-SSL:
-keystore.type=PKCS12
-keystore.path=keystore.p12
-keystore.password=password
-
+# SSL truststore:
 truststore.type=PKCS12
 truststore.path=truststore.p12
 truststore.password=password
 
+# SSL client keystore:
+client.keystore.type=PKCS12
+client.keystore.path=keystore.p12
+client.keystore.password=password
+
 -Dhttps.protocols="TLSv1.2"
 -Dhttps.cipherSuites="TLS_RSA_WITH_AES_256_CBC_SHA256","TLS_RSA_WITH_AES_128_CBC_SHA256","TLS_RSA_WITH_AES_256_CBC_SHA","TLS_RSA_WITH_AES_128_CBC_SHA"
 
-Signing:
+# EbMS Signing keystore
 signature.keystore.type=PKCS12
 signature.keystore.path=keystore.p12
 signature.keystore.password=password
 
-Encryption:
+# EbMS Encryption keystore
 encryption.keystore.type=PKCS12
 encryption.keystore.path=keystore.p12
 encryption.keystore.password=password
@@ -145,7 +187,7 @@ encryption.keystore.password=password
 ===========
 Resources =
 ===========
-the reources directory resides in ebms-adapter-x.x.x.zip/resources and contains the following data:
+the reources directory resides in ebms-core-x.x.x-src.zip/resources and contains the following data:
 - scripts/database/ - contains the database scripts for the supported databases
 
 ==========
