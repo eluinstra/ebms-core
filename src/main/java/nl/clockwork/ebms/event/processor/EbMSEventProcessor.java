@@ -224,7 +224,6 @@ public class EbMSEventProcessor implements Runnable, InitializingBean
 				queueScaleFactor = 1;
 				logger.info(this.getClass().getName() + " using queue scale factor " + queueScaleFactor);
 			}
-			Thread.sleep(delay);
 			Thread thread = new Thread(this);
 			thread.setDaemon(true);
 			thread.start();
@@ -233,6 +232,7 @@ public class EbMSEventProcessor implements Runnable, InitializingBean
 	
   public void run()
   {
+		sleep(delay);
   	while (true)
   	{
   		long start = new Date().getTime();
@@ -256,7 +256,7 @@ public class EbMSEventProcessor implements Runnable, InitializingBean
 				long end = new Date().getTime();
 				long sleep = period - (end - start);
 				if (sleep > 0)
-					Thread.sleep(sleep);
+					sleep(sleep);
 			}
 			catch (InterruptedException e)
 			{
@@ -264,6 +264,18 @@ public class EbMSEventProcessor implements Runnable, InitializingBean
 			}
   	}
   }
+
+	private void sleep(long millis)
+	{
+		try
+		{
+			Thread.sleep(millis);
+		}
+		catch (InterruptedException e)
+		{
+			logger.trace(e);
+		}
+	}
 
 	public void setEnabled(boolean enabled)
 	{
