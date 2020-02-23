@@ -22,7 +22,7 @@
 	<artifactId>ebms-core</artifactId>
 	<packaging>jar</packaging>
 	<name>EbMS Core</name>
-	<version>2.16.3-SNAPSHOT</version>
+	<version>2.16.3</version>
 	<description>This library implements the ebXML Message Specification version 2.0, which defines a communications-protocol neutral method for exchanging electronic business messages through the exchange of XML based messages.</description>
 	<url>https://sourceforge.net/projects/muleebmsadapter/</url>
 	<issueManagement>
@@ -58,7 +58,7 @@
 		<connection>scm:git:https://git.code.sf.net/p/muleebmsadapter/code</connection>
 		<developerConnection>scm:git:https://git.code.sf.net/p/muleebmsadapter/code</developerConnection>
 		<url>https://sourceforge.net/projects/muleebmsadapter/</url>
-		<tag>HEAD</tag>
+		<tag>ebms-core-2.16.3</tag>
 	</scm>
 	<organization>
 		<name>Ordina</name>
