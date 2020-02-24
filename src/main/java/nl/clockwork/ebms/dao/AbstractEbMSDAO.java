@@ -1027,7 +1027,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 		{
 			jdbcTemplate.update(
 				"delete from ebms_attachment" +
-				" where message_id = ?" +
+				" where message_id = ?",
 				messageId
 			);
 		}
