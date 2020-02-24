@@ -185,7 +185,6 @@ public class EbMSEventProcessor implements Runnable, InitializingBean
 
 	}
 
-	private static final int DEFAULTWAIT = 30;
 	protected transient Log logger = LogFactory.getLog(getClass());
 	private ExecutorService executorService;
 	private boolean enabled;
@@ -247,21 +246,9 @@ public class EbMSEventProcessor implements Runnable, InitializingBean
 			List<EbMSEvent> events = ebMSDAO.getEventsBefore(timestamp.getTime());
 			events.forEach(e -> executorService.submit(new HandleEventTask(e)));
 			executorService.shutdown();
-			try
-			{
-				while (!executorService.awaitTermination(DEFAULTWAIT,TimeUnit.MINUTES))
-				{
-					// just loop, waiting
-				}
-				long end = new Date().getTime();
-				long sleep = period - (end - start);
-				if (sleep > 0)
-					sleep(sleep);
-			}
-			catch (InterruptedException e)
-			{
-				logger.trace(e);
-			}
+			long end = new Date().getTime();
+			long sleep = period - (end - start);
+			sleep(sleep);
   	}
   }
 
@@ -269,7 +256,8 @@ public class EbMSEventProcessor implements Runnable, InitializingBean
 	{
 		try
 		{
-			Thread.sleep(millis);
+			if (millis > 0)
+				Thread.sleep(millis);
 		}
 		catch (InterruptedException e)
 		{
