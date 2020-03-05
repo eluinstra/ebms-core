@@ -15,12 +15,14 @@
  */
 package nl.clockwork.ebms.event.processor;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
@@ -30,12 +32,13 @@ import org.apache.commons.logging.LogFactory;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DeliveryChannel;
 import org.springframework.beans.factory.InitializingBean;
 
+import io.vavr.control.Try;
 import nl.clockwork.ebms.Constants.EbMSEventStatus;
 import nl.clockwork.ebms.Constants.EbMSMessageStatus;
 import nl.clockwork.ebms.StreamUtils;
 import nl.clockwork.ebms.client.EbMSClient;
-import nl.clockwork.ebms.client.EbMSUnrecoverableResponseException;
 import nl.clockwork.ebms.client.EbMSResponseException;
+import nl.clockwork.ebms.client.EbMSUnrecoverableResponseException;
 import nl.clockwork.ebms.common.CPAManager;
 import nl.clockwork.ebms.common.URLManager;
 import nl.clockwork.ebms.dao.DAOTransactionCallback;
@@ -223,6 +226,13 @@ public class EbMSEventProcessor implements Runnable, InitializingBean
 				queueScaleFactor = 1;
 				logger.info(this.getClass().getName() + " using queue scale factor " + queueScaleFactor);
 			}
+			executorService = new ThreadPoolExecutor(
+					maxThreads,
+					maxThreads,
+					1,
+					TimeUnit.MINUTES,
+					new ArrayBlockingQueue<>(maxThreads * queueScaleFactor,true),
+					new ThreadPoolExecutor.CallerRunsPolicy());
 			Thread thread = new Thread(this);
 			thread.setDaemon(true);
 			thread.start();
@@ -235,17 +245,18 @@ public class EbMSEventProcessor implements Runnable, InitializingBean
   	while (true)
   	{
   		long start = new Date().getTime();
-			executorService = new ThreadPoolExecutor(
-					maxThreads,
-					maxThreads,
-					1,
-					TimeUnit.MINUTES,
-					new ArrayBlockingQueue<>(maxThreads * queueScaleFactor,true),
-					new ThreadPoolExecutor.CallerRunsPolicy());
-			GregorianCalendar timestamp = new GregorianCalendar();
-			List<EbMSEvent> events = ebMSDAO.getEventsBefore(timestamp.getTime());
-			events.forEach(e -> executorService.submit(new HandleEventTask(e)));
-			executorService.shutdown();
+			List<Future<?>> futures = new ArrayList<Future<?>>();
+			try
+			{
+				GregorianCalendar timestamp = new GregorianCalendar();
+				List<EbMSEvent> events = ebMSDAO.getEventsBefore(timestamp.getTime());
+				events.forEach(e -> futures.add(executorService.submit(new HandleEventTask(e))));
+			}
+			catch (Exception e)
+			{
+				logger.error("",e);
+			}
+			futures.forEach(f -> Try.of(() -> f.get()).onFailure(e -> logger.error("",e)));
 			long end = new Date().getTime();
 			long sleep = period - (end - start);
 			sleep(sleep);

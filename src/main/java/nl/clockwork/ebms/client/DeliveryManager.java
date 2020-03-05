@@ -70,7 +70,13 @@ public class DeliveryManager implements InitializingBean //DeliveryService
 			queueScaleFactor = 1;
 			logger.info(this.getClass().getName() + " using queue scale factor " + queueScaleFactor);
 		}
-		executorService = new ThreadPoolExecutor(maxThreads,maxThreads,1,TimeUnit.MINUTES,new ArrayBlockingQueue<>(maxThreads * queueScaleFactor,true),new ThreadPoolExecutor.CallerRunsPolicy());
+		executorService = new ThreadPoolExecutor(
+				maxThreads,
+				maxThreads,
+				1,
+				TimeUnit.MINUTES,
+				new ArrayBlockingQueue<>(maxThreads * queueScaleFactor,true),
+				new ThreadPoolExecutor.CallerRunsPolicy());
 	}
 
 	public Optional<EbMSMessage> sendMessage(final String uri, final EbMSMessage message) throws EbMSProcessorException
