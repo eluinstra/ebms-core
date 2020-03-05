@@ -264,6 +264,7 @@ public class EbMSMessageFactory
 				cpaManager.getDefaultDeliveryChannel(cpaId,partyId,action)
 				.orElseThrow(() -> StreamUtils.illegalStateException("DefaultDeliveryChannel",cpaId,partyId,action)));
 		String conversationId = ebMSIdGenerator.generateConversationId();
+		String messageId = ebMSIdGenerator.createMessageId(hostname,conversationId);
 
 		MessageHeader messageHeader = new MessageHeader();
 
@@ -289,7 +290,7 @@ public class EbMSMessageFactory
 		messageHeader.setAction(action);
 
 		messageHeader.setMessageData(new MessageData());
-		messageHeader.getMessageData().setMessageId(ebMSIdGenerator.generateMessageId(hostname,conversationId));
+		messageHeader.getMessageData().setMessageId(messageId);
 		//messageHeader.getMessageData().setRefToMessageId(null);
 		messageHeader.getMessageData().setTimestamp(new Date());
 
@@ -310,7 +311,7 @@ public class EbMSMessageFactory
 		DeliveryChannel deliveryChannel = CPAUtils.getDeliveryChannel(fromPartyInfo.getCanSend().getThisPartyActionBinding());
 		String hostname = CPAUtils.getHostname(deliveryChannel);
 		String conversationId = context.getConversationId() == null ? ebMSIdGenerator.generateConversationId() : context.getConversationId();
-		String messageId = context.getMessageId() == null ? ebMSIdGenerator.generateMessageId(hostname,conversationId) : context.getMessageId();
+		String messageId = ebMSIdGenerator.createMessageId(hostname,conversationId,context.getMessageId());
 
 		MessageHeader messageHeader = new MessageHeader();
 
