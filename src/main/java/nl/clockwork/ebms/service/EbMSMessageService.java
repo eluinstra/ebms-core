@@ -58,7 +58,7 @@ public interface EbMSMessageService
 	String sendMessage(@WebParam(name="Message") @XmlElement(required=true) EbMSMessageContent messageContent) throws EbMSMessageServiceException;
 
 	/**
-	 * Sends the message content message as an EbMS message. The attachments are attached as SOAP attachments
+	 * Sends the message content message as an EbMS message using MTOM/XOP.
 	 * 
 	 * @param message
 	 * @return The messageId of the generated EbMS message

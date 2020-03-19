@@ -23,6 +23,7 @@ import java.util.List;
 
 import javax.activation.DataHandler;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlMimeType;
 
 import nl.clockwork.ebms.processor.EbMSProcessingException;
 
@@ -46,6 +47,7 @@ public class EbMSMessageAttachment implements Serializable
 	}
 	
 	@XmlElement(name="attachment",required=true)
+	@XmlMimeType("application/octet-stream")
 	public List<DataHandler> getAttachments()
 	{
 		return attachments;
