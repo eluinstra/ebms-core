@@ -1096,6 +1096,32 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 		}
 	}
 	
+	public abstract String getEventsBeforeQuery(int maxNr);
+
+	@Override
+	public List<EbMSEvent> getEventsBefore(Date timestamp, int maxNr) throws DAOException
+	{
+		try
+		{
+			return jdbcTemplate.query(
+				getEventsBeforeQuery(maxNr),
+				new RowMapper<EbMSEvent>()
+				{
+					@Override
+					public EbMSEvent mapRow(ResultSet rs, int rowNum) throws SQLException
+					{
+						return new EbMSEvent(rs.getString("cpa_id"),rs.getString("channel_id"),rs.getString("message_id"),rs.getTimestamp("time_to_live"),rs.getTimestamp("time_stamp"),rs.getBoolean("is_confidential"),rs.getInt("retries"));
+					}
+				},
+				timestamp
+			);
+		}
+		catch (DataAccessException e)
+		{
+			throw new DAOException(e);
+		}
+	}
+	
 	@Override
 	public void insertEvent(EbMSEvent event) throws DAOException
 	{

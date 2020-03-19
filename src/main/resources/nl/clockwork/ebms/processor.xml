@@ -231,6 +231,7 @@
 		<property name="maxThreads" value="${eventProcessor.maxTreads}"/>
 		<property name="processorsScaleFactor" value="${eventProcessor.processorsScaleFactor}"/>
 		<property name="queueScaleFactor" value="${eventProcessor.queueScaleFactor}"/>
+		<property name="maxEvents" value="${eventProcessor.maxEvents}"/>
 		<property name="eventListener" ref="eventListener"/>
 		<property name="ebMSDAO" ref="ebMSDAO"/>
 		<property name="urlManager" ref="urlManager"/>

@@ -196,6 +196,7 @@ public class EbMSEventProcessor implements Runnable, InitializingBean
 	private Integer maxThreads;
 	private Integer processorsScaleFactor;
 	private Integer queueScaleFactor;
+	private int maxEvents;
 	private EventListener eventListener;
 	private EbMSDAO ebMSDAO;
 	private CPAManager cpaManager;
@@ -249,7 +250,7 @@ public class EbMSEventProcessor implements Runnable, InitializingBean
 			try
 			{
 				GregorianCalendar timestamp = new GregorianCalendar();
-				List<EbMSEvent> events = ebMSDAO.getEventsBefore(timestamp.getTime());
+				List<EbMSEvent> events = maxEvents > 0 ? ebMSDAO.getEventsBefore(timestamp.getTime(),maxEvents) : ebMSDAO.getEventsBefore(timestamp.getTime());
 				events.forEach(e -> futures.add(executorService.submit(new HandleEventTask(e))));
 			}
 			catch (Exception e)
@@ -304,6 +305,11 @@ public class EbMSEventProcessor implements Runnable, InitializingBean
 	public void setQueueScaleFactor(Integer queueScaleFactor)
 	{
 		this.queueScaleFactor = queueScaleFactor;
+	}
+
+	public void setMaxEvents(int maxEvents)
+	{
+		this.maxEvents = maxEvents;
 	}
 
 	public void setEventListener(EventListener eventListener)

@@ -77,6 +77,7 @@ public interface EbMSDAO
 	void deleteAttachments(List<String> messageIds);
 
 	List<EbMSEvent> getEventsBefore(Date timestamp) throws DAOException;
+	List<EbMSEvent> getEventsBefore(Date timestamp, int maxNr) throws DAOException;
 	void insertEvent(EbMSEvent event) throws DAOException;
 	void updateEvent(EbMSEvent event) throws DAOException;
 	void deleteEvent(String messageId) throws DAOException;
