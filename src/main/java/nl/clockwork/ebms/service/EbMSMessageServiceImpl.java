@@ -21,11 +21,15 @@ import java.util.Optional;
 
 import javax.xml.transform.TransformerFactoryConfigurationError;
 
+import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DeliveryChannel;
+import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageHeader;
+import org.springframework.beans.factory.InitializingBean;
+
 import nl.clockwork.ebms.Constants;
-import nl.clockwork.ebms.StreamUtils;
 import nl.clockwork.ebms.Constants.EbMSAction;
 import nl.clockwork.ebms.Constants.EbMSMessageEventType;
 import nl.clockwork.ebms.Constants.EbMSMessageStatus;
+import nl.clockwork.ebms.StreamUtils;
 import nl.clockwork.ebms.client.DeliveryManager;
 import nl.clockwork.ebms.common.CPAManager;
 import nl.clockwork.ebms.common.EbMSMessageFactory;
@@ -48,19 +52,15 @@ import nl.clockwork.ebms.validation.EbMSMessageContextValidator;
 import nl.clockwork.ebms.validation.ValidationException;
 import nl.clockwork.ebms.validation.ValidatorException;
 
-import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DeliveryChannel;
-import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageHeader;
-import org.springframework.beans.factory.InitializingBean;
-
 public class EbMSMessageServiceImpl implements InitializingBean, EbMSMessageService
 {
-	private DeliveryManager deliveryManager;
-	private EbMSDAO ebMSDAO;
-	private CPAManager cpaManager;
-	private EbMSMessageFactory ebMSMessageFactory;
-	private EventManager eventManager;
-	private EbMSMessageContextValidator ebMSMessageContextValidator;
-	private EbMSSignatureGenerator signatureGenerator;
+	protected DeliveryManager deliveryManager;
+	protected EbMSDAO ebMSDAO;
+	protected CPAManager cpaManager;
+	protected EbMSMessageFactory ebMSMessageFactory;
+	protected EventManager eventManager;
+	protected EbMSMessageContextValidator ebMSMessageContextValidator;
+	protected EbMSSignatureGenerator signatureGenerator;
 	protected boolean deleteEbMSAttachmentsOnMessageProcessed;
 
 	@Override
@@ -351,7 +351,7 @@ public class EbMSMessageServiceImpl implements InitializingBean, EbMSMessageServ
 		context.setTimestamp(null);
 	}
 
-	private String storeMessageWithEvent(EbMSMessageContent messageContent) throws EbMSProcessorException
+	protected String storeMessageWithEvent(EbMSMessageContent messageContent) throws EbMSProcessorException
 	{
 		final EbMSMessage result = ebMSMessageFactory.createEbMSMessage(messageContent.getContext().getCpaId(),messageContent);
 		signatureGenerator.generate(result);
@@ -410,5 +410,4 @@ public class EbMSMessageServiceImpl implements InitializingBean, EbMSMessageServ
 	{
 		this.deleteEbMSAttachmentsOnMessageProcessed = deleteEbMSAttachmentsOnMessageProcessed;
 	}
-
 }

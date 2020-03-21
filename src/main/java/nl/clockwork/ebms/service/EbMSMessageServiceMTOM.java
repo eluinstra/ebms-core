@@ -22,17 +22,18 @@ import javax.jws.WebParam;
 import javax.jws.WebResult;
 import javax.jws.WebService;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.ws.soap.MTOM;
 
 import nl.clockwork.ebms.Constants.EbMSMessageEventType;
-import nl.clockwork.ebms.model.EbMSMessageAttachment;
-import nl.clockwork.ebms.model.EbMSMessageContent;
+import nl.clockwork.ebms.model.EbMSMessageContentMTOM;
 import nl.clockwork.ebms.model.EbMSMessageContext;
 import nl.clockwork.ebms.model.EbMSMessageEvent;
 import nl.clockwork.ebms.model.MessageStatus;
 import nl.clockwork.ebms.model.Party;
 
-@WebService(targetNamespace="http://www.ordina.nl/ebms/2.16")
-public interface EbMSMessageService
+@MTOM(enabled=true)
+@WebService(name = "EbMSMessageService", targetNamespace="http://www.ordina.nl/ebms/2.16", serviceName = "EbMSMessageServiceImplService", endpointInterface = "EbMSMessageServiceImplServiceSoapBinding", portName = "EbMSMessageServiceImplPort")
+public interface EbMSMessageServiceMTOM
 {
 	/**
 	 * Performs an EbMS ping action for CPA cpaId, from party fromParty and to party toParty
@@ -46,7 +47,7 @@ public interface EbMSMessageService
 	void ping(@WebParam(name="CPAId") @XmlElement(required=true) String cpaId, @WebParam(name="FromParty") @XmlElement(required=true) Party fromParty, @WebParam(name="ToParty") @XmlElement(required=true) Party toParty) throws EbMSMessageServiceException;
 
 	/**
-	 * Sends the message content messageContent as an EbMS message
+	 * Sends the message content messageContent as an EbMS message using MTOM/XOP
 	 * 
 	 * @param messageContent
 	 * @return The messageId of the generated EbMS message
@@ -54,19 +55,7 @@ public interface EbMSMessageService
 	 */
 	@WebResult(name="MessageId")
 	@WebMethod(operationName="SendMessage")
-	String sendMessage(@WebParam(name="Message") @XmlElement(required=true) EbMSMessageContent messageContent) throws EbMSMessageServiceException;
-
-	/**
-	 * Sends the message content message as an EbMS message using MTOM/XOP.
-	 * 
-	 * @param message
-	 * @return The messageId of the generated EbMS message
-	 * @throws EbMSMessageServiceException
-	 */
-	@Deprecated
-	@WebResult(name="MessageId")
-	@WebMethod(operationName="SendMessageWithAttachments")
-	String sendMessageWithAttachments(@WebParam(name="Message") @XmlElement(required=true) EbMSMessageAttachment message) throws EbMSMessageServiceException;
+	String sendMessageMTOM(@WebParam(name="Message") @XmlElement(required=true) EbMSMessageContentMTOM messageContent) throws EbMSMessageServiceException;
 
 	/**
 	 * Resends the content of message identified by messageId as an EbMS message
@@ -92,7 +81,7 @@ public interface EbMSMessageService
 	List<String> getMessageIds(@WebParam(name="MessageContext") @XmlElement(required=true) EbMSMessageContext messageContext, @WebParam(name="MaxNr") Integer maxNr) throws EbMSMessageServiceException;
 
 	/**
-	 * Gets the message content of the message identified by messageId. If process is true, the message is given the status PROCESSED, which means that it is no longer returned in the list of getMessageIds
+	 * Gets the message content of the message identified by messageId using MTOM/XOP. If process is true, the message is given the status PROCESSED, which means that it is no longer returned in the list of getMessageIds
 	 * 
 	 * @param messageId
 	 * @param process
@@ -101,7 +90,7 @@ public interface EbMSMessageService
 	 */
 	@WebResult(name="Message")
 	@WebMethod(operationName="GetMessage")
-	EbMSMessageContent getMessage(@WebParam(name="MessageId") @XmlElement(required=true) String messageId, @WebParam(name="Process") Boolean process) throws EbMSMessageServiceException;
+	EbMSMessageContentMTOM getMessageMTOM(@WebParam(name="MessageId") @XmlElement(required=true) String messageId, @WebParam(name="Process") Boolean process) throws EbMSMessageServiceException;
 
 	/**
 	 * Sets the status of the message identified by messageId to PROCESSED, so that it is no longer returned in the list of getMessageIds

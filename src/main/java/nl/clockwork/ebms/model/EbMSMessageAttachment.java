@@ -17,13 +17,17 @@ package nl.clockwork.ebms.model;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.activation.DataHandler;
+import javax.mail.internet.ContentType;
+import javax.mail.internet.ParseException;
 import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlMimeType;
+
+import org.apache.commons.io.IOUtils;
 
 import nl.clockwork.ebms.processor.EbMSProcessingException;
 
@@ -32,9 +36,24 @@ public class EbMSMessageAttachment implements Serializable
 	private static final long serialVersionUID = 1L;
 	private static final int BUFFERSIZE = 10000;
 	private EbMSMessageContext context;
-	private transient List<DataHandler> attachments;
+	private transient List<DataHandler> attachments = new ArrayList<>();
 	private EbMSMessageContent msgContentCache = null;
-	
+
+	public EbMSMessageAttachment()
+	{
+	}
+
+	public EbMSMessageAttachment(EbMSMessageContext context)
+	{
+		this(context,new ArrayList<>());
+	}
+
+	public EbMSMessageAttachment(EbMSMessageContext context, List<DataHandler> attachments)
+	{
+		this.context = context;
+		this.attachments = attachments;
+	}
+
 	@XmlElement(required=true)
 	public EbMSMessageContext getContext()
 	{
@@ -46,8 +65,7 @@ public class EbMSMessageAttachment implements Serializable
 		this.context = context;
 	}
 	
-	@XmlElement(name="attachment",required=true)
-	@XmlMimeType("application/octet-stream")
+	@XmlElement(name="attachment")
 	public List<DataHandler> getAttachments()
 	{
 		return attachments;
@@ -66,29 +84,38 @@ public class EbMSMessageAttachment implements Serializable
 		if (msgContentCache == null)
 		{
 			msgContentCache = new EbMSMessageContent(context);
-			attachments.forEach(a -> msgContentCache.getDataSources().add(new EbMSDataSource(a.getName(),a.getContentType(),getByteArrayOutputStream(a).toByteArray())));
+			msgContentCache.setDataSources(
+					attachments.stream()
+					.map(a -> toDataSource(a))
+					.collect(Collectors.toList()));
 		}
-		
 		return msgContentCache;
+	}
+
+	private EbMSDataSource toDataSource(DataHandler a)
+	{
+		try
+		{
+			ContentType contentType = new ContentType(a.getContentType());
+			return new EbMSDataSource(contentType.getParameter("name"),contentType.getBaseType(),getByteArrayOutputStream(a).toByteArray());
+		}
+		catch (ParseException e)
+		{
+			return new EbMSDataSource(null,a.getContentType(),getByteArrayOutputStream(a).toByteArray());
+		}
 	}
 
 	private ByteArrayOutputStream getByteArrayOutputStream(DataHandler a) throws EbMSProcessingException
 	{
-		ByteArrayOutputStream bos = new ByteArrayOutputStream();
 		try
 		{
-			InputStream input = a.getInputStream();
-			byte[] b = new byte[BUFFERSIZE];
-			int bytesRead = 0;
-			while ((bytesRead = input.read(b)) != -1)
-			{
-				bos.write(b, 0, bytesRead);
-			}
+			ByteArrayOutputStream bos = new ByteArrayOutputStream();
+			IOUtils.copy(a.getInputStream(),bos,BUFFERSIZE);
+			return bos;
 		}
 		catch (IOException e)
 		{
 			throw new EbMSProcessingException(e);
 		}
-		return bos;
 	}	
 }

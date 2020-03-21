@@ -49,6 +49,16 @@
 		<property name="deleteEbMSAttachmentsOnMessageProcessed" value="${ebmsMessage.deleteContentOnProcessed}"/>
 	</bean>
 
+	<bean id="ebMSMessageServiceMTOM" class="nl.clockwork.ebms.service.EbMSMessageServiceMTOMImpl">
+		<property name="deliveryManager" ref="deliveryManager"></property>
+		<property name="ebMSDAO" ref="ebMSDAO"/>
+		<property name="cpaManager" ref="cpaManager"/>
+		<property name="ebMSMessageFactory" ref="ebMSMessageFactory"/>
+		<property name="eventManager" ref="eventManager"/>
+		<property name="signatureGenerator" ref="signatureGenerator"/>
+		<property name="deleteEbMSAttachmentsOnMessageProcessed" value="${ebmsMessage.deleteContentOnProcessed}"/>
+	</bean>
+
 	<bean id="deliveryManager" class="nl.clockwork.ebms.client.DeliveryManager">
 		<property name="maxThreads" value="${deliveryManager.maxTreads}"/>
 		<property name="processorsScaleFactor" value="${deliveryManager.processorsScaleFactor}"/>

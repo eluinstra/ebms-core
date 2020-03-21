@@ -20,23 +20,25 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlType;
 
-public class EbMSMessageContent implements Serializable
+@XmlType(name = "EbMSMessageContent")
+public class EbMSMessageContentMTOM implements Serializable
 {
 	private static final long serialVersionUID = 1L;
 	private EbMSMessageContext context;
-	private List<EbMSDataSource> dataSources;
+	private List<EbMSDataSourceMTOM> dataSources;
 
-	public EbMSMessageContent()
+	public EbMSMessageContentMTOM()
 	{
 	}
 	
-	public EbMSMessageContent(EbMSMessageContext context)
+	public EbMSMessageContentMTOM(EbMSMessageContext context)
 	{
 		this(context,new ArrayList<>());
 	}
 
-	public EbMSMessageContent(EbMSMessageContext context, List<EbMSDataSource> dataSources)
+	public EbMSMessageContentMTOM(EbMSMessageContext context, List<EbMSDataSourceMTOM> dataSources)
 	{
 		this.context = context;
 		this.dataSources = dataSources;
@@ -54,12 +56,12 @@ public class EbMSMessageContent implements Serializable
 	}
 	
 	@XmlElement(name="dataSource")
-	public List<EbMSDataSource> getDataSources()
+	public List<EbMSDataSourceMTOM> getDataSources()
 	{
 		return dataSources;
 	}
 	
-	public void setDataSources(List<EbMSDataSource> dataSources)
+	public void setDataSources(List<EbMSDataSourceMTOM> dataSources)
 	{
 		this.dataSources = dataSources;
 	}
