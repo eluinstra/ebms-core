@@ -15,11 +15,13 @@
  */
 package nl.clockwork.ebms.model;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
 import javax.activation.DataSource;
+import javax.activation.FileDataSource;
 
 public class EbMSAttachment implements DataSource
 {
@@ -61,4 +63,22 @@ public class EbMSAttachment implements DataSource
 		return contentId;
 	}
 
+	@Override
+	protected void finalize() throws Throwable
+	{
+		if (dataSource instanceof FileDataSource)
+		{
+			try
+			{
+				File file = ((FileDataSource)dataSource).getFile();
+				file.delete();
+				file.getParentFile().delete();
+			}
+			catch (Exception e)
+			{
+				//do nothing
+			}
+		}
+		super.finalize();
+	}
 }

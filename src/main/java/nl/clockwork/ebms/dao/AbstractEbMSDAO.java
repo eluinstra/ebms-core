@@ -15,7 +15,10 @@
  */
 package nl.clockwork.ebms.dao;
 
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -29,11 +32,13 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import javax.mail.util.ByteArrayDataSource;
+import javax.activation.DataHandler;
+import javax.activation.FileDataSource;
 import javax.xml.bind.JAXBException;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CollaborationProtocolAgreement;
@@ -63,14 +68,17 @@ import nl.clockwork.ebms.common.JAXBParser;
 import nl.clockwork.ebms.common.util.DOMUtils;
 import nl.clockwork.ebms.model.EbMSAttachment;
 import nl.clockwork.ebms.model.EbMSDataSource;
+import nl.clockwork.ebms.model.EbMSDataSourceMTOM;
 import nl.clockwork.ebms.model.EbMSDocument;
 import nl.clockwork.ebms.model.EbMSEvent;
 import nl.clockwork.ebms.model.EbMSMessage;
 import nl.clockwork.ebms.model.EbMSMessageContent;
+import nl.clockwork.ebms.model.EbMSMessageContentMTOM;
 import nl.clockwork.ebms.model.EbMSMessageContext;
 import nl.clockwork.ebms.model.EbMSMessageEvent;
 import nl.clockwork.ebms.model.Role;
 import nl.clockwork.ebms.model.URLMapping;
+import nl.clockwork.ebms.processor.EbMSProcessingException;
 import nl.clockwork.ebms.util.EbMSMessageUtils;
 
 public abstract class AbstractEbMSDAO implements EbMSDAO
@@ -421,6 +429,24 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 			);
 		}
 		catch (DataAccessException | IOException e)
+		{
+			throw new DAOException(e);
+		}
+	}
+
+	@Override
+	public Optional<EbMSMessageContentMTOM> getMessageContentMTOM(String messageId) throws DAOException
+	{
+		try
+		{
+			List<EbMSAttachment> attachments = getAttachments(messageId);
+			List<EbMSDataSourceMTOM> dataSources = attachments.stream()
+					.map(a -> new EbMSDataSourceMTOM(a.getContentId(),new DataHandler(a)))
+					.collect(Collectors.toList());
+			return getMessageContext(messageId).map(mc -> new EbMSMessageContentMTOM(mc,dataSources)
+			);
+		}
+		catch (DataAccessException e)
 		{
 			throw new DAOException(e);
 		}
@@ -931,28 +957,62 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	protected void insertAttachments(KeyHolder keyHolder, List<EbMSAttachment> attachments) throws InvalidDataAccessApiUsageException, DataAccessException, IOException
 	{
 		AtomicInteger orderNr = new AtomicInteger(0);
-		for (EbMSAttachment attachment: attachments)
-		{
+		attachments.forEach(a ->
 			jdbcTemplate.update
 			(
-				"insert into ebms_attachment (" +
-					"message_id," +
-					"message_nr," +
-					"order_nr," +
-					"name," +
-					"content_id," +
-					"content_type," +
-					"content" +
-				") values (?,?,?,?,?,?,?)",
-				keyHolder.getKeys().get("message_id"),
-				keyHolder.getKeys().get("message_nr"),
-				orderNr.getAndIncrement(),
-				attachment.getName(),
-				attachment.getContentId(),
-				attachment.getContentType(),
-				IOUtils.toByteArray(attachment.getInputStream())
-			);
-		};
+//				"insert into ebms_attachment (" +
+//						"message_id," +
+//						"message_nr," +
+//						"order_nr," +
+//						"name," +
+//						"content_id," +
+//						"content_type," +
+//						"content" +
+//					") values (?,?,?,?,?,?,?)",
+//					keyHolder.getKeys().get("message_id"),
+//					keyHolder.getKeys().get("message_nr"),
+//					orderNr.getAndIncrement(),
+//					a.getName(),
+//					a.getContentId(),
+//					a.getContentType(),
+//					IOUtils.toByteArray(a.getInputStream())
+				new PreparedStatementCreator()
+				{
+					@Override
+					public PreparedStatement createPreparedStatement(Connection connection) throws SQLException
+					{
+						try
+						{
+							PreparedStatement ps = connection.prepareStatement
+							(
+								"insert into ebms_attachment (" +
+									"message_id," +
+									"message_nr," +
+									"order_nr," +
+									"name," +
+									"content_id," +
+									"content_type," +
+									"content" +
+								") values (?,?,?,?,?,?,?)"
+							);
+							ps.setObject(1,keyHolder.getKeys().get("message_id"));
+							ps.setObject(2,(int)keyHolder.getKeys().get("message_nr"));
+							ps.setInt(3,orderNr.getAndIncrement());
+							ps.setString(4,a.getName());
+							ps.setString(5,a.getContentId());
+							ps.setString(6,a.getContentType());
+							//ps.setBytes(7,IOUtils.toByteArray(attachment.getInputStream()));
+							ps.setBlob(7,a.getInputStream());
+							return ps;
+						}
+						catch (IOException e)
+						{
+							throw new SQLException(e);
+						}
+					}
+				}
+			)//;
+		);//};
 	}
 
 	@Override
@@ -1378,9 +1438,21 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 				@Override
 				public EbMSAttachment mapRow(ResultSet rs, int rowNum) throws SQLException
 				{
-					ByteArrayDataSource dataSource = new ByteArrayDataSource(rs.getBytes("content"),rs.getString("content_type"));
-					dataSource.setName(rs.getString("name"));
-					return new EbMSAttachment(dataSource,rs.getString("content_id"));
+					try
+					{
+//						ByteArrayDataSource dataSource = new ByteArrayDataSource(rs.getBytes("content"),rs.getString("content_type"));
+//						dataSource.setName(rs.getString("name"));
+						Path tempDir = Files.createTempDirectory("EbMS");
+						File tempFile = tempDir.resolve(rs.getString("name")).toFile();
+						FileUtils.copyInputStreamToFile(rs.getBlob("content").getBinaryStream(),tempFile);
+						//TODO: content_type is missing
+						FileDataSource dataSource = new FileDataSource(tempFile);
+						return new EbMSAttachment(dataSource,rs.getString("content_id"));
+					}
+					catch (IOException e)
+					{
+						throw new EbMSProcessingException(e);
+					}
 				}
 			},
 			messageId
