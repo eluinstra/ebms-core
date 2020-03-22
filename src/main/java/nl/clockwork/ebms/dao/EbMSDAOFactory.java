@@ -22,6 +22,7 @@ public class EbMSDAOFactory extends AbstractDAOFactory<EbMSDAO>
 {
 	protected TransactionTemplate transactionTemplate;
 	protected JdbcTemplate jdbcTemplate;
+	protected long attachmentMemoryTreshold;
 	private boolean identifyServer;
 	private String serverId;
 
@@ -34,37 +35,37 @@ public class EbMSDAOFactory extends AbstractDAOFactory<EbMSDAO>
 	@Override
 	public EbMSDAO createHSqlDbDAO()
 	{
-		return new nl.clockwork.ebms.dao.hsqldb.EbMSDAOImpl(transactionTemplate,jdbcTemplate,identifyServer,serverId);
+		return new nl.clockwork.ebms.dao.hsqldb.EbMSDAOImpl(transactionTemplate,jdbcTemplate,attachmentMemoryTreshold,identifyServer,serverId);
 	}
 
 	@Override
 	public EbMSDAO createMySqlDAO()
 	{
-		return new nl.clockwork.ebms.dao.mysql.EbMSDAOImpl(transactionTemplate,jdbcTemplate,identifyServer,serverId);
+		return new nl.clockwork.ebms.dao.mysql.EbMSDAOImpl(transactionTemplate,jdbcTemplate,attachmentMemoryTreshold,identifyServer,serverId);
 	}
 
 	@Override
 	public EbMSDAO createPostgresDAO()
 	{
-		return new nl.clockwork.ebms.dao.postgresql.EbMSDAOImpl(transactionTemplate,jdbcTemplate,identifyServer,serverId);
+		return new nl.clockwork.ebms.dao.postgresql.EbMSDAOImpl(transactionTemplate,jdbcTemplate,attachmentMemoryTreshold,identifyServer,serverId);
 	}
 
 	@Override
 	public EbMSDAO createOracleDAO()
 	{
-		return new nl.clockwork.ebms.dao.oracle.EbMSDAOImpl(transactionTemplate,jdbcTemplate,identifyServer,serverId);
+		return new nl.clockwork.ebms.dao.oracle.EbMSDAOImpl(transactionTemplate,jdbcTemplate,attachmentMemoryTreshold,identifyServer,serverId);
 	}
 
 	@Override
 	public EbMSDAO createMsSqlDAO()
 	{
-		return new nl.clockwork.ebms.dao.mssql.EbMSDAOImpl(transactionTemplate,jdbcTemplate,identifyServer,serverId);
+		return new nl.clockwork.ebms.dao.mssql.EbMSDAOImpl(transactionTemplate,jdbcTemplate,attachmentMemoryTreshold,identifyServer,serverId);
 	}
 
 	@Override
 	public EbMSDAO createDB2DAO()
 	{
-		return new nl.clockwork.ebms.dao.db2.EbMSDAOImpl(transactionTemplate,jdbcTemplate,identifyServer,serverId);
+		return new nl.clockwork.ebms.dao.db2.EbMSDAOImpl(transactionTemplate,jdbcTemplate,attachmentMemoryTreshold,identifyServer,serverId);
 	}
 
 	public void setTransactionTemplate(TransactionTemplate transactionTemplate)
@@ -75,6 +76,11 @@ public class EbMSDAOFactory extends AbstractDAOFactory<EbMSDAO>
 	public void setJdbcTemplate(JdbcTemplate jdbcTemplate)
 	{
 		this.jdbcTemplate = jdbcTemplate;
+	}
+
+	public void setAttachmentMemoryTreshold(long attachmentMemoryTreshold)
+	{
+		this.attachmentMemoryTreshold = attachmentMemoryTreshold;
 	}
 
 	public void setIdentifyServer(boolean identifyServer)

@@ -86,13 +86,14 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 {
 	protected TransactionTemplate transactionTemplate;
 	protected JdbcTemplate jdbcTemplate;
-	protected String serverId;
 	protected long attachmentMemoryTreshold;
+	protected String serverId;
 	
-	public AbstractEbMSDAO(TransactionTemplate transactionTemplate, JdbcTemplate jdbcTemplate, boolean identifyServer, String serverId)
+	public AbstractEbMSDAO(TransactionTemplate transactionTemplate, JdbcTemplate jdbcTemplate, long attachmentMemoryTreshold, boolean identifyServer, String serverId)
 	{
 		this.transactionTemplate = transactionTemplate;
 		this.jdbcTemplate = jdbcTemplate;
+		this.attachmentMemoryTreshold = attachmentMemoryTreshold;
 		if (identifyServer)
 			this.serverId = serverId;
 	}
@@ -1426,7 +1427,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 					try
 					{
 						Blob contentBlob = rs.getBlob("content");
-						if (attachmentMemoryTreshold < 0 || contentBlob.length() < attachmentMemoryTreshold)
+						if (attachmentMemoryTreshold <= 0 || contentBlob.length() < attachmentMemoryTreshold)
 						{
 							//ByteArrayDataSource dataSource = new ByteArrayDataSource(rs.getBytes("content"),rs.getString("content_type"));
 							ByteArrayDataSource dataSource = new ByteArrayDataSource(contentBlob.getBinaryStream(),rs.getString("content_type"));
@@ -1435,7 +1436,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 						}
 						else
 						{
-							File tempFile = Files.createTempFile("ebms-temp-",".bin").toFile();
+							File tempFile = Files.createTempFile("ebms-",".tmp").toFile();
 							FileUtils.copyInputStreamToFile(rs.getBlob("content").getBinaryStream(),tempFile);
 							EbMSFileDataSource dataSource = new EbMSFileDataSource(rs.getString("name"),rs.getString("content_type"),tempFile);
 							return new EbMSAttachment(dataSource,rs.getString("content_id"));
