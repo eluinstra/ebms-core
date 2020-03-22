@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -955,46 +956,47 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 		}
 	}
 
-	protected void insertAttachments(KeyHolder keyHolder, List<EbMSAttachment> attachments) throws InvalidDataAccessApiUsageException, DataAccessException, IOException
+	protected void insertAttachments(final KeyHolder keyHolder, final List<EbMSAttachment> attachments) throws InvalidDataAccessApiUsageException, DataAccessException, IOException
 	{
-		jdbcTemplate.batchUpdate(
-			"insert into ebms_attachment (" +
-				"message_id," +
-				"message_nr," +
-				"order_nr," +
-				"name," +
-				"content_id," +
-				"content_type," +
-				"content" +
-			") values (?,?,?,?,?,?,?)",
-			new BatchPreparedStatementSetter()
-			{
-				@Override
-				public void setValues(PreparedStatement ps, int row) throws SQLException
+		AtomicInteger orderNr = new AtomicInteger();
+		attachments.forEach(a ->
+			jdbcTemplate.update(
+				new PreparedStatementCreator()
 				{
-					try
+					@Override
+					public PreparedStatement createPreparedStatement(Connection connection) throws SQLException
 					{
-						ps.setObject(1,keyHolder.getKeys().get("message_id"));
-						ps.setObject(2,(int)keyHolder.getKeys().get("message_nr"));
-						ps.setInt(3,row);
-						ps.setString(4,attachments.get(row).getName());
-						ps.setString(5,attachments.get(row).getContentId());
-						ps.setString(6,attachments.get(row).getContentType());
-						//ps.setBytes(7,IOUtils.toByteArray(attachment.getInputStream()));
-						ps.setBlob(7,attachments.get(row).getInputStream());
-					}
-					catch (IOException e)
-					{
-						throw new SQLException(e);
+						try
+						{
+							PreparedStatement ps = connection.prepareStatement
+							(
+								"insert into ebms_attachment (" +
+									"message_id," +
+									"message_nr," +
+									"order_nr," +
+									"name," +
+									"content_id," +
+									"content_type," +
+									"content" +
+								") values (?,?,?,?,?,?,?)"
+							);
+							ps.setObject(1,keyHolder.getKeys().get("message_id"));
+							ps.setObject(2,keyHolder.getKeys().get("message_nr"));
+							ps.setInt(3,orderNr.getAndIncrement());
+							ps.setString(4,a.getName());
+							ps.setString(5,a.getContentId());
+							ps.setString(6,a.getContentType());
+							//ps.setBytes(7,IOUtils.toByteArray(a.getInputStream()));
+							ps.setBlob(7,a.getInputStream());
+							return ps;
+						}
+						catch (IOException e)
+						{
+							throw new SQLException(e);
+						}
 					}
 				}
-
-				@Override
-				public int getBatchSize()
-				{
-					return attachments.size();
-				}
-			}
+			)
 		);
 	}
 
