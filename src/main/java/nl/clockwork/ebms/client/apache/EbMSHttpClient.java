@@ -41,6 +41,7 @@ import org.apache.http.impl.client.HttpClients;
 public class EbMSHttpClient implements EbMSClient
 {
 	private SSLConnectionSocketFactory sslConnectionSocketFactory;
+	private int connectTimeout;
 	private boolean chunkedStreamingMode;
 	private EbMSProxy proxy;
 
@@ -48,16 +49,18 @@ public class EbMSHttpClient implements EbMSClient
 	{
 	}
 
-	public EbMSHttpClient(SSLConnectionSocketFactory sslConnectionSocketFactory, boolean chunkedStreamingMode, EbMSProxy proxy) throws Exception
+	public EbMSHttpClient(SSLConnectionSocketFactory sslConnectionSocketFactory, int connectTimeout, boolean chunkedStreamingMode, EbMSProxy proxy) throws Exception
 	{
 		this.sslConnectionSocketFactory = sslConnectionSocketFactory;
+		this.connectTimeout = connectTimeout;
 		this.chunkedStreamingMode = chunkedStreamingMode;
 		this.proxy = proxy;
 	}
 
-	public EbMSHttpClient(SSLFactoryManager sslFactoryManager, String[] enabledProtocols, String[] enabledCipherSuites, boolean verifyHostnames, boolean chunkedStreamingMode, EbMSProxy proxy) throws Exception
+	public EbMSHttpClient(SSLFactoryManager sslFactoryManager, String[] enabledProtocols, String[] enabledCipherSuites, boolean verifyHostnames, int connectTimeout, boolean chunkedStreamingMode, EbMSProxy proxy) throws Exception
 	{
 		this.sslConnectionSocketFactory = new SSLConnectionSocketFactoryFactory(sslFactoryManager,enabledProtocols,enabledCipherSuites,verifyHostnames).getObject();
+		this.connectTimeout = connectTimeout;
 		this.chunkedStreamingMode = chunkedStreamingMode;
 		this.proxy = proxy;
 	}
@@ -94,7 +97,7 @@ public class EbMSHttpClient implements EbMSClient
 		HttpPost result = new HttpPost(uri);
 		if (proxy != null && proxy.useProxy(uri))
 		{
-			result.setConfig(RequestConfig.custom().setProxy(new HttpHost(proxy.getHost(),proxy.getPort())).build());
+			result.setConfig(RequestConfig.custom().setConnectTimeout(connectTimeout).setProxy(new HttpHost(proxy.getHost(),proxy.getPort())).build());
 		}
 		return result;
 	}

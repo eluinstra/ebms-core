@@ -280,6 +280,7 @@
 	<bean id="ebMSClient" class="nl.clockwork.ebms.client.EbMSHttpClientFactory">
 		<property name="type" value="${http.client}"/>
 		<property name="sslFactoryManager" ref="sslFactoryManager"/>
+		<property name="connectTimeout" value="${http.connectTimeout}"/>
 		<property name="chunkedStreamingMode" value="${http.chunkedStreamingMode}"/>
 		<property name="base64Writer" value="${http.base64Writer}"/>
 		<property name="proxy" ref="ebMSProxy"/>
