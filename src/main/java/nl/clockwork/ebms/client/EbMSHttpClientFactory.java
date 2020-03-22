@@ -35,6 +35,7 @@ public class EbMSHttpClientFactory implements FactoryBean<EbMSClient>
 	private transient Log logger = LogFactory.getLog(getClass());
 	private EbMSHttpClientType type;
 	private SSLFactoryManager sslFactoryManager;
+	private int connectTimeout;
 	private boolean chunkedStreamingMode;
 	private boolean base64Writer;
 	private EbMSProxy proxy;
@@ -49,9 +50,9 @@ public class EbMSHttpClientFactory implements FactoryBean<EbMSClient>
 	{
 		logger.info("Using EbMSHttpClient " + type.name());
 		if (EbMSHttpClientType.APACHE.equals(type))
-			return new nl.clockwork.ebms.client.apache.EbMSHttpClient(sslFactoryManager,enabledProtocols,enabledCipherSuites,verifyHostnames,chunkedStreamingMode,proxy);
+			return new nl.clockwork.ebms.client.apache.EbMSHttpClient(sslFactoryManager,enabledProtocols,enabledCipherSuites,verifyHostnames,connectTimeout,chunkedStreamingMode,proxy);
 		else
-			return new EbMSHttpClient(sslFactoryManager,chunkedStreamingMode,base64Writer,proxy,recoverableHttpErrors,unrecoverableHttpErrors);
+			return new EbMSHttpClient(sslFactoryManager,connectTimeout,chunkedStreamingMode,base64Writer,proxy,recoverableHttpErrors,unrecoverableHttpErrors);
 	}
 
 	@Override
@@ -81,6 +82,11 @@ public class EbMSHttpClientFactory implements FactoryBean<EbMSClient>
 	public void setSslFactoryManager(SSLFactoryManager sslFactoryManager)
 	{
 		this.sslFactoryManager = sslFactoryManager;
+	}
+
+	public void setConnectTimeout(int connectTimeout)
+	{
+		this.connectTimeout = connectTimeout;
 	}
 
 	public void setChunkedStreamingMode(boolean chunkedStreamingMode)

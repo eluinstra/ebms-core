@@ -33,6 +33,7 @@ import nl.clockwork.ebms.processor.EbMSProcessorException;
 public class EbMSHttpClient implements EbMSClient
 {
 	private SSLFactoryManager sslFactoryManager;
+	private int connectTimeout;
 	private boolean chunkedStreamingMode;
 	private boolean base64Writer;
 	private EbMSProxy proxy;
@@ -45,6 +46,7 @@ public class EbMSHttpClient implements EbMSClient
 
 	public EbMSHttpClient(
 			SSLFactoryManager sslFactoryManager,
+			int connectTimeout,
 			boolean chunkedStreamingMode,
 			boolean base64Writer,
 			EbMSProxy proxy,
@@ -52,6 +54,7 @@ public class EbMSHttpClient implements EbMSClient
 			List<Integer> unrecoverableHttpErrors)
 	{
 		this.sslFactoryManager = sslFactoryManager;
+		this.connectTimeout = connectTimeout;
 		this.chunkedStreamingMode = chunkedStreamingMode;
 		this.base64Writer = base64Writer;
 		this.proxy = proxy;
@@ -65,7 +68,7 @@ public class EbMSHttpClient implements EbMSClient
 		try
 		{
 			connection = (HttpURLConnection)openConnection(uri);
-			//connection.setConnectTimeout(connectTimeout);
+			connection.setConnectTimeout(connectTimeout);
 			if (chunkedStreaming(uri))
 				connection.setChunkedStreamingMode(0);
 			EbMSMessageWriter writer = base64Writer ? new EbMSMessageBase64Writer(connection) : new EbMSMessageWriter(connection);
