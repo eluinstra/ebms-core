@@ -18,7 +18,7 @@ package nl.clockwork.ebms.dao;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Path;
+import java.sql.Blob;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -28,12 +28,11 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.activation.DataHandler;
-import javax.activation.FileDataSource;
+import javax.mail.util.ByteArrayDataSource;
 import javax.xml.bind.JAXBException;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
@@ -71,6 +70,7 @@ import nl.clockwork.ebms.model.EbMSDataSource;
 import nl.clockwork.ebms.model.EbMSDataSourceMTOM;
 import nl.clockwork.ebms.model.EbMSDocument;
 import nl.clockwork.ebms.model.EbMSEvent;
+import nl.clockwork.ebms.model.EbMSFileDataSource;
 import nl.clockwork.ebms.model.EbMSMessage;
 import nl.clockwork.ebms.model.EbMSMessageContent;
 import nl.clockwork.ebms.model.EbMSMessageContentMTOM;
@@ -86,6 +86,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	protected TransactionTemplate transactionTemplate;
 	protected JdbcTemplate jdbcTemplate;
 	protected String serverId;
+	protected long attachmentMemoryTreshold;
 	
 	public AbstractEbMSDAO(TransactionTemplate transactionTemplate, JdbcTemplate jdbcTemplate, boolean identifyServer, String serverId)
 	{
@@ -956,63 +957,45 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 
 	protected void insertAttachments(KeyHolder keyHolder, List<EbMSAttachment> attachments) throws InvalidDataAccessApiUsageException, DataAccessException, IOException
 	{
-		AtomicInteger orderNr = new AtomicInteger(0);
-		attachments.forEach(a ->
-			jdbcTemplate.update
-			(
-//				"insert into ebms_attachment (" +
-//						"message_id," +
-//						"message_nr," +
-//						"order_nr," +
-//						"name," +
-//						"content_id," +
-//						"content_type," +
-//						"content" +
-//					") values (?,?,?,?,?,?,?)",
-//					keyHolder.getKeys().get("message_id"),
-//					keyHolder.getKeys().get("message_nr"),
-//					orderNr.getAndIncrement(),
-//					a.getName(),
-//					a.getContentId(),
-//					a.getContentType(),
-//					IOUtils.toByteArray(a.getInputStream())
-				new PreparedStatementCreator()
+		jdbcTemplate.batchUpdate(
+			"insert into ebms_attachment (" +
+				"message_id," +
+				"message_nr," +
+				"order_nr," +
+				"name," +
+				"content_id," +
+				"content_type," +
+				"content" +
+			") values (?,?,?,?,?,?,?)",
+			new BatchPreparedStatementSetter()
+			{
+				@Override
+				public void setValues(PreparedStatement ps, int row) throws SQLException
 				{
-					@Override
-					public PreparedStatement createPreparedStatement(Connection connection) throws SQLException
+					try
 					{
-						try
-						{
-							PreparedStatement ps = connection.prepareStatement
-							(
-								"insert into ebms_attachment (" +
-									"message_id," +
-									"message_nr," +
-									"order_nr," +
-									"name," +
-									"content_id," +
-									"content_type," +
-									"content" +
-								") values (?,?,?,?,?,?,?)"
-							);
-							ps.setObject(1,keyHolder.getKeys().get("message_id"));
-							ps.setObject(2,(int)keyHolder.getKeys().get("message_nr"));
-							ps.setInt(3,orderNr.getAndIncrement());
-							ps.setString(4,a.getName());
-							ps.setString(5,a.getContentId());
-							ps.setString(6,a.getContentType());
-							//ps.setBytes(7,IOUtils.toByteArray(attachment.getInputStream()));
-							ps.setBlob(7,a.getInputStream());
-							return ps;
-						}
-						catch (IOException e)
-						{
-							throw new SQLException(e);
-						}
+						ps.setObject(1,keyHolder.getKeys().get("message_id"));
+						ps.setObject(2,(int)keyHolder.getKeys().get("message_nr"));
+						ps.setInt(3,row);
+						ps.setString(4,attachments.get(row).getName());
+						ps.setString(5,attachments.get(row).getContentId());
+						ps.setString(6,attachments.get(row).getContentType());
+						//ps.setBytes(7,IOUtils.toByteArray(attachment.getInputStream()));
+						ps.setBlob(7,attachments.get(row).getInputStream());
+					}
+					catch (IOException e)
+					{
+						throw new SQLException(e);
 					}
 				}
-			)//;
-		);//};
+
+				@Override
+				public int getBatchSize()
+				{
+					return attachments.size();
+				}
+			}
+		);
 	}
 
 	@Override
@@ -1440,14 +1423,21 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 				{
 					try
 					{
-//						ByteArrayDataSource dataSource = new ByteArrayDataSource(rs.getBytes("content"),rs.getString("content_type"));
-//						dataSource.setName(rs.getString("name"));
-						Path tempDir = Files.createTempDirectory("EbMS");
-						File tempFile = tempDir.resolve(rs.getString("name")).toFile();
-						FileUtils.copyInputStreamToFile(rs.getBlob("content").getBinaryStream(),tempFile);
-						//TODO: content_type is missing
-						FileDataSource dataSource = new FileDataSource(tempFile);
-						return new EbMSAttachment(dataSource,rs.getString("content_id"));
+						Blob contentBlob = rs.getBlob("content");
+						if (attachmentMemoryTreshold < 0 || contentBlob.length() < attachmentMemoryTreshold)
+						{
+							//ByteArrayDataSource dataSource = new ByteArrayDataSource(rs.getBytes("content"),rs.getString("content_type"));
+							ByteArrayDataSource dataSource = new ByteArrayDataSource(contentBlob.getBinaryStream(),rs.getString("content_type"));
+							dataSource.setName(rs.getString("name"));
+							return new EbMSAttachment(dataSource,rs.getString("content_id"));
+						}
+						else
+						{
+							File tempFile = Files.createTempFile("ebms-temp-",".bin").toFile();
+							FileUtils.copyInputStreamToFile(rs.getBlob("content").getBinaryStream(),tempFile);
+							EbMSFileDataSource dataSource = new EbMSFileDataSource(rs.getString("name"),rs.getString("content_type"),tempFile);
+							return new EbMSAttachment(dataSource,rs.getString("content_id"));
+						}
 					}
 					catch (IOException e)
 					{

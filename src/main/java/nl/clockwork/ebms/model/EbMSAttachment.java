@@ -15,7 +15,6 @@
  */
 package nl.clockwork.ebms.model;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -70,9 +69,7 @@ public class EbMSAttachment implements DataSource
 		{
 			try
 			{
-				File file = ((FileDataSource)dataSource).getFile();
-				file.delete();
-				file.getParentFile().delete();
+				((FileDataSource)dataSource).getFile().delete();
 			}
 			catch (Exception e)
 			{
