@@ -16,6 +16,12 @@ For the ebms-admin console see https://sourceforge.net/projects/javaebmsadmin/
 ===============
 = Release Notes
 ===============
+ebms-core-2.16.4.jar:
+- fixed EbMSEventProcessor: the processor sometimes stops processing after an error occurs, so the ebms adapter stops sending messages
+- fixed query in deleteEbMSAttachmentsOnMessageProcessed
+- fixed messageId: the hostname is not prepended anymore when the messageId is given
+- added new MTOM EbMS soap service
+
 ebms-core-2.16.3.jar:
 - fixed bug: messages are sometimes sent more than once at (almost) the same time
 - improved EbMSEventProcessor
