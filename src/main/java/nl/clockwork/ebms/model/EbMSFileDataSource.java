@@ -19,6 +19,8 @@ import java.io.File;
 
 import javax.activation.FileDataSource;
 
+import nl.clockwork.ebms.FileManager;
+
 public class EbMSFileDataSource extends FileDataSource
 {
 	private String name;
@@ -41,5 +43,12 @@ public class EbMSFileDataSource extends FileDataSource
 	public String getContentType()
 	{
 		return contentType;
+	}
+
+	@Override
+	protected void finalize() throws Throwable
+	{
+		FileManager.markFileForDeletion(getFile());
+		super.finalize();
 	}
 }

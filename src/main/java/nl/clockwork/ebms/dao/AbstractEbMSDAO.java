@@ -17,7 +17,6 @@ package nl.clockwork.ebms.dao;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.sql.Blob;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -64,6 +63,7 @@ import nl.clockwork.ebms.Constants.EbMSAction;
 import nl.clockwork.ebms.Constants.EbMSEventStatus;
 import nl.clockwork.ebms.Constants.EbMSMessageEventType;
 import nl.clockwork.ebms.Constants.EbMSMessageStatus;
+import nl.clockwork.ebms.FileManager;
 import nl.clockwork.ebms.common.JAXBParser;
 import nl.clockwork.ebms.common.util.DOMUtils;
 import nl.clockwork.ebms.model.EbMSAttachment;
@@ -1436,7 +1436,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 						}
 						else
 						{
-							File tempFile = Files.createTempFile("ebms-",".tmp").toFile();
+							File tempFile = FileManager.createTempFile();
 							FileUtils.copyInputStreamToFile(rs.getBlob("content").getBinaryStream(),tempFile);
 							EbMSFileDataSource dataSource = new EbMSFileDataSource(rs.getString("name"),rs.getString("content_type"),tempFile);
 							return new EbMSAttachment(dataSource,rs.getString("content_id"));

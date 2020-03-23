@@ -20,7 +20,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 import javax.activation.DataSource;
-import javax.activation.FileDataSource;
 
 public class EbMSAttachment implements DataSource
 {
@@ -60,22 +59,5 @@ public class EbMSAttachment implements DataSource
 	public String getContentId()
 	{
 		return contentId;
-	}
-
-	@Override
-	protected void finalize() throws Throwable
-	{
-		if (dataSource instanceof FileDataSource)
-		{
-			try
-			{
-				((FileDataSource)dataSource).getFile().delete();
-			}
-			catch (Exception e)
-			{
-				//do nothing
-			}
-		}
-		super.finalize();
 	}
 }
