@@ -34,6 +34,10 @@
 		<property name="staticMethod" value="org.apache.xml.security.Init.init" />
 	</bean>
 
+	<bean class="nl.clockwork.ebms.FileManager">
+		<property name="attachmentDirectory" value="${ebmsMessage.attachmentDirectory}"/>
+	</bean>
+
 	<bean id="cpaService" class="nl.clockwork.ebms.service.CPAServiceImpl">
 		<property name="cpaManager" ref="cpaManager"/>
 		<property name="urlManager" ref="urlManager"/>

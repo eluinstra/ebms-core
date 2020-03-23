@@ -19,21 +19,29 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Date;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
-public class FileManager implements Runnable
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.InitializingBean;
+
+public class FileManager implements InitializingBean, Runnable
 {
 	private static FileManager fileManager;
+	private String attachmentDirectory;
 	private Path tempDir;
 	private ConcurrentLinkedDeque<File> files = new ConcurrentLinkedDeque<>();
 	private ConcurrentLinkedDeque<File> markedFilesForDeletion = new ConcurrentLinkedDeque<>();
 
-	static
+	@Override
+	public void afterPropertiesSet() throws Exception
 	{
 		try
 		{
-			fileManager = new FileManager();
+			fileManager = this;
+			Path attachmentDirectory = StringUtils.isNotEmpty(this.attachmentDirectory) ? Paths.get(this.attachmentDirectory) : null;
+			this.tempDir = attachmentDirectory == null ? Files.createTempDirectory("ebms-tmp-") : Files.createTempDirectory(attachmentDirectory,"ebms-tmp-");
 			Thread thread = new Thread(fileManager);
 			thread.setDaemon(true);
 			thread.start();
@@ -42,11 +50,6 @@ public class FileManager implements Runnable
 		{
 			//do nothing
 		}
-	}
-	
-	public FileManager() throws IOException
-	{
-		tempDir = Files.createTempDirectory("ebms-tmp-");
 	}
 	
 	public static File createTempFile() throws IOException
@@ -67,27 +70,35 @@ public class FileManager implements Runnable
   	while (true)
   	{
   		long start = new Date().getTime();
-			while (markedFilesForDeletion.size() > 0)
-			{
-				File file = markedFilesForDeletion.peek();
-				delete(file);
-				markedFilesForDeletion.remove();
-				files.remove(file);
-			}
-			long t = new Date().getTime() - 600000;
-			while (files.size() > 0)
-			{
-				File file = files.peek();
-				if (file.lastModified() < t)
-					delete(file);
-				else
-					break;
-				files.remove();
-			}
+			deleteMarkedFiles();
+			deleteOldFiles();
 			long end = new Date().getTime();
 			long sleep = 10000 - (end - start);
 			sleep(sleep);
   	}
+	}
+
+	private void deleteMarkedFiles()
+	{
+		while (markedFilesForDeletion.size() > 0)
+		{
+			File file = markedFilesForDeletion.remove();
+			delete(file);
+			files.remove(file);
+		}
+	}
+
+	private void deleteOldFiles()
+	{
+		long treshold = new Date().getTime() - 600000;
+		while (files.size() > 0)
+		{
+			File file = files.remove();
+			if (file.lastModified() < treshold)
+				delete(file);
+			else
+				break;
+		}
 	}
 
 	private void delete(File file)
@@ -96,7 +107,7 @@ public class FileManager implements Runnable
 		{
 			file.delete();
 		}
-		catch (Exception e)
+		catch (SecurityException e)
 		{
 			//do nothing
 		}
@@ -113,5 +124,10 @@ public class FileManager implements Runnable
 		{
 			//do nothing
 		}
+	}
+
+	public void setAttachmentDirectory(String attachmentDirectory) throws IOException
+	{
+		this.attachmentDirectory = attachmentDirectory;
 	}
 }
