@@ -82,34 +82,43 @@ public class FileManager implements InitializingBean, Runnable
 	{
 		while (markedFilesForDeletion.size() > 0)
 		{
-			File file = markedFilesForDeletion.remove();
-			delete(file);
-			files.remove(file);
+			File file = markedFilesForDeletion.peek();
+			if (delete(file))
+				files.remove(file);
+			markedFilesForDeletion.remove();
 		}
 	}
 
 	private void deleteOldFiles()
 	{
-		long treshold = new Date().getTime() - 600000;
+		long treshold = new Date().getTime() - 300000;
 		while (files.size() > 0)
 		{
-			File file = files.remove();
+			File file = files.peek();
 			if (file.lastModified() < treshold)
-				delete(file);
+			{
+				if (delete(file))
+					files.remove();
+				else
+					break;
+			}
 			else
 				break;
 		}
 	}
 
-	private void delete(File file)
+	private boolean delete(File file)
 	{
 		try
 		{
-			file.delete();
+			if (file.exists())
+				return file.delete();
+			else
+				return true;
 		}
-		catch (SecurityException e)
+		catch (Exception e)
 		{
-			//do nothing
+			return false;
 		}
 	}
 

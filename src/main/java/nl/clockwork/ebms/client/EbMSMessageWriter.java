@@ -16,6 +16,7 @@
 package nl.clockwork.ebms.client;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
@@ -107,44 +108,50 @@ public class EbMSMessageWriter
 
 	protected void writeTextAttachment(String boundary, OutputStream outputStream, OutputStreamWriter writer, EbMSAttachment attachment) throws IOException
 	{
-		writer.write("\r\n");
-		writer.write("Content-Type: " + attachment.getContentType());
-		writer.write("\r\n");
-		if (!StringUtils.isEmpty(attachment.getName()))
+		try (InputStream a = attachment.getInputStream())
 		{
-			writer.write("Content-Disposition: attachment; filename=\"" + attachment.getName() + "\"");
 			writer.write("\r\n");
+			writer.write("Content-Type: " + attachment.getContentType());
+			writer.write("\r\n");
+			if (!StringUtils.isEmpty(attachment.getName()))
+			{
+				writer.write("Content-Disposition: attachment; filename=\"" + attachment.getName() + "\"");
+				writer.write("\r\n");
+			}
+			writer.write("Content-ID: <" + attachment.getContentId() + ">");
+			writer.write("\r\n");
+			writer.write("\r\n");
+			writer.flush();
+			IOUtils.copy(a,outputStream);
+			writer.write("\r\n");
+			writer.write("--");
+			writer.write(boundary);
 		}
-		writer.write("Content-ID: <" + attachment.getContentId() + ">");
-		writer.write("\r\n");
-		writer.write("\r\n");
-		writer.flush();
-		IOUtils.copy(attachment.getInputStream(),outputStream);
-		writer.write("\r\n");
-		writer.write("--");
-		writer.write(boundary);
 	}
 
 	protected void writeBinaryAttachment(String boundary, OutputStream outputStream, OutputStreamWriter writer, EbMSAttachment attachment) throws IOException
 	{
-		writer.write("\r\n");
-		writer.write("Content-Type: " + attachment.getContentType());
-		writer.write("\r\n");
-		if (!StringUtils.isEmpty(attachment.getName()))
+		try (InputStream a = attachment.getInputStream())
 		{
-			writer.write("Content-Disposition: attachment; filename=\"" + attachment.getName() + "\"");
 			writer.write("\r\n");
+			writer.write("Content-Type: " + attachment.getContentType());
+			writer.write("\r\n");
+			if (!StringUtils.isEmpty(attachment.getName()))
+			{
+				writer.write("Content-Disposition: attachment; filename=\"" + attachment.getName() + "\"");
+				writer.write("\r\n");
+			}
+			writer.write("Content-Transfer-Encoding: binary");
+			writer.write("\r\n");
+			writer.write("Content-ID: <" + attachment.getContentId() + ">");
+			writer.write("\r\n");
+			writer.write("\r\n");
+			writer.flush();
+			IOUtils.copy(a,outputStream);
+			writer.write("\r\n");
+			writer.write("--");
+			writer.write(boundary);
 		}
-		writer.write("Content-Transfer-Encoding: binary");
-		writer.write("\r\n");
-		writer.write("Content-ID: <" + attachment.getContentId() + ">");
-		writer.write("\r\n");
-		writer.write("\r\n");
-		writer.flush();
-		IOUtils.copy(attachment.getInputStream(),outputStream);
-		writer.write("\r\n");
-		writer.write("--");
-		writer.write(boundary);
 	}
 
 	protected String createBoundary()
