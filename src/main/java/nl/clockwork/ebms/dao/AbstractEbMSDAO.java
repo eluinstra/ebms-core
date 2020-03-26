@@ -84,12 +84,14 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 {
 	protected TransactionTemplate transactionTemplate;
 	protected JdbcTemplate jdbcTemplate;
+	protected int attachmentMemoryTreshold;
 	protected String serverId;
 	
-	public AbstractEbMSDAO(TransactionTemplate transactionTemplate, JdbcTemplate jdbcTemplate, boolean identifyServer, String serverId)
+	public AbstractEbMSDAO(TransactionTemplate transactionTemplate, JdbcTemplate jdbcTemplate, int attachmentMemoryTreshold, boolean identifyServer, String serverId)
 	{
 		this.transactionTemplate = transactionTemplate;
 		this.jdbcTemplate = jdbcTemplate;
+		this.attachmentMemoryTreshold = attachmentMemoryTreshold;
 		if (identifyServer)
 			this.serverId = serverId;
 	}
@@ -1424,8 +1426,8 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 					try
 					{
 						InputStream content = contentBlob.getBinaryStream();
-						CachedOutputStream cachedOutputStream = new CachedOutputStream();
-						CachedOutputStream.copyStream(content,cachedOutputStream,1024);
+						CachedOutputStream cachedOutputStream = contentBlob.length() >= attachmentMemoryTreshold ? new CachedOutputStream(0) : new CachedOutputStream();
+						CachedOutputStream.copyStream(content,cachedOutputStream,4096);
 						cachedOutputStream.lockOutputStream();
 						return new EbMSAttachmentDataSource(rs.getString("name"),rs.getString("content_id"),rs.getString("content_type"),cachedOutputStream);
 					}
