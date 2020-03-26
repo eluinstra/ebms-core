@@ -1424,7 +1424,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 					try
 					{
 						InputStream content = contentBlob.getBinaryStream();
-						CachedOutputStream cachedOutputStream = new CachedOutputStream(1024 * 1024);
+						CachedOutputStream cachedOutputStream = new CachedOutputStream();
 						CachedOutputStream.copyStream(content,cachedOutputStream,1024);
 						cachedOutputStream.lockOutputStream();
 						return new EbMSAttachmentDataSource(rs.getString("name"),rs.getString("content_id"),rs.getString("content_type"),cachedOutputStream);

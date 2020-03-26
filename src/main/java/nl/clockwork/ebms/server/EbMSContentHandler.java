@@ -167,7 +167,7 @@ public class EbMSContentHandler implements ContentHandler
 
 	private EbMSAttachmentDataSource createEbMSAttachmentDataSource(InputStream is, String filename, String contentId, String contentType) throws IOException
 	{
-		CachedOutputStream content = new CachedOutputStream(1024 * 1024);
+		CachedOutputStream content = new CachedOutputStream();
 		CachedOutputStream.copyStream(is,content,1024);
 		return new EbMSAttachmentDataSource(filename,contentId,contentType,content);
 	}
