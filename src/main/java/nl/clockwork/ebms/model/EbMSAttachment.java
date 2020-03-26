@@ -21,7 +21,7 @@ import java.io.OutputStream;
 
 import javax.activation.DataSource;
 
-public class EbMSAttachment implements DataSource
+public class EbMSAttachment implements AutoCloseable, DataSource
 {
 	private DataSource dataSource;
 	private String contentId;
@@ -59,6 +59,11 @@ public class EbMSAttachment implements DataSource
 	public String getContentId()
 	{
 		return contentId;
+	}
+
+	@Override
+	public void close()
+	{
 	}
 
 }

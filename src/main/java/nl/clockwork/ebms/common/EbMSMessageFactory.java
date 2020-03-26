@@ -56,8 +56,10 @@ import nl.clockwork.ebms.Constants.EbMSMessageStatus;
 import nl.clockwork.ebms.model.CacheablePartyId;
 import nl.clockwork.ebms.model.EbMSAttachment;
 import nl.clockwork.ebms.model.EbMSDataSource;
+import nl.clockwork.ebms.model.EbMSDataSourceMTOM;
 import nl.clockwork.ebms.model.EbMSMessage;
 import nl.clockwork.ebms.model.EbMSMessageContent;
+import nl.clockwork.ebms.model.EbMSMessageContentMTOM;
 import nl.clockwork.ebms.model.EbMSMessageContext;
 import nl.clockwork.ebms.model.EbMSPartyInfo;
 import nl.clockwork.ebms.model.FromPartyInfo;
@@ -250,6 +252,43 @@ public class EbMSMessageFactory
 		ByteArrayDataSource dataSource = new ByteArrayDataSource(ds.getContent(),ds.getContentType());
 		dataSource.setName(ds.getName());
 		EbMSAttachment e = new EbMSAttachment(dataSource,contentId);
+		return e;
+	}
+
+	public EbMSMessage createEbMSMessageMTOM(String cpaId, EbMSMessageContentMTOM content) throws EbMSProcessorException
+	{
+		try
+		{
+			EbMSMessage result = new EbMSMessage();
+			result.setMessageHeader(createMessageHeader(cpaId,content.getContext()));
+			result.setAckRequested(createAckRequested(cpaId,content.getContext()));
+			result.setSyncReply(createSyncReply(cpaId,content.getContext()));
+			if (content.getDataSources() != null && content.getDataSources().size() > 0)
+			{
+				Manifest manifest = EbMSMessageUtils.createManifest();
+				List<EbMSAttachment> attachments = new ArrayList<>();
+				content.getDataSources().forEach(ds -> attachments.add(createEbMSAttachmentMTOM(manifest,ds)));
+				result.setManifest(manifest);
+				result.setAttachments(attachments);
+			}
+			result.setMessage(EbMSMessageUtils.createSOAPMessage(result));
+			return result;
+		}
+		catch (JAXBException | SOAPException | SAXException | IOException | TransformerException e)
+		{
+			throw new EbMSProcessingException(e);
+		}
+		catch (DatatypeConfigurationException | ParserConfigurationException | TransformerFactoryConfigurationError e)
+		{
+			throw new EbMSProcessorException(e);
+		}
+	}
+
+	private EbMSAttachment createEbMSAttachmentMTOM(Manifest manifest, EbMSDataSourceMTOM ds)
+	{
+		String contentId = ds.getContentId() == null ? UUID.randomUUID().toString() : ds.getContentId();
+		manifest.getReference().add(EbMSMessageUtils.createReference(contentId));
+		EbMSAttachment e = new EbMSAttachment(ds.getAttachment().getDataSource(),contentId);
 		return e;
 	}
 

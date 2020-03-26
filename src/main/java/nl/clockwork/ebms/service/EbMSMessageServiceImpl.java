@@ -101,7 +101,10 @@ public class EbMSMessageServiceImpl implements InitializingBean, EbMSMessageServ
 		try
 		{
 			ebMSMessageContextValidator.validate(messageContent.getContext());
-			return storeMessageWithEvent(messageContent);
+			final EbMSMessage message = ebMSMessageFactory.createEbMSMessage(messageContent.getContext().getCpaId(),messageContent);
+			signatureGenerator.generate(message);
+			storeMessage(message);
+			return message.getMessageHeader().getMessageData().getMessageId();
 		}
 		catch (ValidatorException | DAOException | TransformerFactoryConfigurationError | EbMSProcessorException e)
 		{
@@ -115,7 +118,10 @@ public class EbMSMessageServiceImpl implements InitializingBean, EbMSMessageServ
 		try
 		{
 			ebMSMessageContextValidator.validate(message.getContext());
-			return storeMessageWithEvent(message.toContent());
+			final EbMSMessage result = ebMSMessageFactory.createEbMSMessage(message.toContent().getContext().getCpaId(),message.toContent());
+			signatureGenerator.generate(result);
+			storeMessage(result);
+			return result.getMessageHeader().getMessageData().getMessageId();
 		}
 		catch (ValidatorException | DAOException | TransformerFactoryConfigurationError | EbMSProcessorException e)
 		{
@@ -132,7 +138,10 @@ public class EbMSMessageServiceImpl implements InitializingBean, EbMSMessageServ
 					.map(mc ->
 					{
 						resetMessage(mc.getContext());
-						return storeMessageWithEvent(mc);
+						final EbMSMessage message = ebMSMessageFactory.createEbMSMessage(mc.getContext().getCpaId(),mc);
+						signatureGenerator.generate(message);
+						storeMessage(message);
+						return message.getMessageHeader().getMessageData().getMessageId();
 					})
 					.orElseThrow(() -> new EbMSMessageServiceException("Message not found!"));
 		}
@@ -351,29 +360,26 @@ public class EbMSMessageServiceImpl implements InitializingBean, EbMSMessageServ
 		context.setTimestamp(null);
 	}
 
-	protected String storeMessageWithEvent(EbMSMessageContent messageContent) throws EbMSProcessorException
+	protected void storeMessage(EbMSMessage message) throws EbMSProcessorException
 	{
-		final EbMSMessage result = ebMSMessageFactory.createEbMSMessage(messageContent.getContext().getCpaId(),messageContent);
-		signatureGenerator.generate(result);
 		ebMSDAO.executeTransaction(new DAOTransactionCallback()
 		{
 			@Override
 			public void doInTransaction()
 			{
 				Date timestamp = new Date();
-				MessageHeader messageHeader = result.getMessageHeader();
+				MessageHeader messageHeader = message.getMessageHeader();
 				MessageHeader rmh = messageHeader;
 				CacheablePartyId toPartyId = new CacheablePartyId(messageHeader.getTo().getPartyId());
 				String service = CPAUtils.toString(rmh.getService());
 				DeliveryChannel deliveryChannel = cpaManager.getReceiveDeliveryChannel(messageHeader.getCPAId(),toPartyId,rmh.getTo().getRole(),service,rmh.getAction())
 						.orElseThrow(() ->StreamUtils.illegalStateException("ReceiveDeliveryChannel",messageHeader.getCPAId(),toPartyId,rmh.getTo().getRole(),service,rmh.getAction()));
-				ebMSDAO.insertMessage(timestamp,CPAUtils.getPersistTime(timestamp,deliveryChannel),result,EbMSMessageStatus.SENDING);
+				ebMSDAO.insertMessage(timestamp,CPAUtils.getPersistTime(timestamp,deliveryChannel),message,EbMSMessageStatus.SENDING);
 				CacheablePartyId fromPartyId = new CacheablePartyId(rmh.getFrom().getPartyId());
 				boolean confidential = cpaManager.isConfidential(rmh.getCPAId(),fromPartyId,rmh.getFrom().getRole(),service,rmh.getAction());
 				eventManager.createEvent(rmh.getCPAId(),deliveryChannel,rmh.getMessageData().getMessageId(),rmh.getMessageData().getTimeToLive(),rmh.getMessageData().getTimestamp(),confidential);
 			}
 		});
-		return result.getMessageHeader().getMessageData().getMessageId();
 	}
 
 	public void setDeliveryManager(DeliveryManager deliveryManager)
