@@ -26,7 +26,6 @@ import java.util.List;
 import java.util.Optional;
 
 import javax.activation.DataSource;
-import javax.mail.util.ByteArrayDataSource;
 import javax.xml.bind.JAXBException;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
@@ -46,6 +45,7 @@ import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
 import net.sf.ehcache.Ehcache;
+import nl.clockwork.ebms.EbMSAttachmentFactory;
 import nl.clockwork.ebms.common.CPAManager;
 import nl.clockwork.ebms.common.EbMSIdGenerator;
 import nl.clockwork.ebms.common.EbMSMessageFactory;
@@ -131,10 +131,8 @@ public class EncryptionTest
 		Document d = DOMUtils.read(attachment.getInputStream());
 		Node cipherValue = d.getElementsByTagNameNS("http://www.w3.org/2001/04/xmlenc#","CipherValue").item(0);
 		cipherValue.setTextContent("XXXXXXX" + cipherValue.getTextContent());
-		ByteArrayDataSource ds = new ByteArrayDataSource(DOMUtils.toString(d).getBytes("UTF-8"),"application/xml");
-		ds.setName(attachment.getName());
 		message.getAttachments().remove(0);
-		message.getAttachments().add(new EbMSAttachment(ds,attachment.getContentId()));
+		message.getAttachments().add(EbMSAttachmentFactory.createEbMSAttachment(attachment.getName(),attachment.getContentId(),"application/xml",DOMUtils.toString(d).getBytes("UTF-8")));
 	}
 
 	private void changeAttachment1(EbMSMessage message) throws ParserConfigurationException, SAXException, IOException, TransformerException
@@ -143,10 +141,8 @@ public class EncryptionTest
 		Document d = DOMUtils.read(attachment.getInputStream());
 		Node cipherValue = d.getElementsByTagNameNS("http://www.w3.org/2001/04/xmlenc#","CipherValue").item(1);
 		cipherValue.setTextContent("XXXXXXX" + cipherValue.getTextContent());
-		ByteArrayDataSource ds = new ByteArrayDataSource(DOMUtils.toString(d).getBytes("UTF-8"),"application/xml");
-		ds.setName(attachment.getName());
 		message.getAttachments().remove(0);
-		message.getAttachments().add(new EbMSAttachment(ds,attachment.getContentId()));
+		message.getAttachments().add(EbMSAttachmentFactory.createEbMSAttachment(attachment.getName(),attachment.getContentId(),"application/xml",DOMUtils.toString(d).getBytes("UTF-8")));
 	}
 
 	private CPAManager initCPAManager() throws DAOException, IOException, JAXBException
@@ -244,15 +240,13 @@ public class EncryptionTest
 	private List<EbMSAttachment> createAttachments(String messageId)
 	{
 		List<EbMSAttachment> result = new ArrayList<>();
-		result.add(new EbMSAttachment(createDataSource(),createContentId(messageId,1)));
+		result.add(EbMSAttachmentFactory.createCachedEbMSAttachment(createContentId(messageId,1),createDataSource()));
 		return result;
 	}
 
 	private DataSource createDataSource()
 	{
-		ByteArrayDataSource result = new ByteArrayDataSource("Dit is een andere test.".getBytes(Charset.forName("UTF-8")),"plain/text; charset=utf-8");
-		result.setName("test.txt");
-		return result;
+		return EbMSAttachmentFactory.createEbMSAttachment("test.txt","plain/text; charset=utf-8","Dit is een andere test.".getBytes(Charset.forName("UTF-8"))); 
 	}
 
 	private String createContentId(String messageId, int i)

@@ -24,7 +24,6 @@ import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.mail.util.ByteArrayDataSource;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.xml.security.encryption.XMLCipher;
@@ -38,6 +37,7 @@ import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 
 import nl.clockwork.ebms.Constants;
+import nl.clockwork.ebms.EbMSAttachmentFactory;
 import nl.clockwork.ebms.StreamUtils;
 import nl.clockwork.ebms.common.CPAManager;
 import nl.clockwork.ebms.common.KeyStoreManager;
@@ -120,9 +120,7 @@ public class EbMSMessageDecrypter implements InitializingBean
 			XMLCipher xmlCipher = createXmlCipher(keyPair);
 			byte[] buffer = xmlCipher.decryptToByteArray(encryptedDataElement);
 			String contentType = encryptedDataElement.getAttribute("MimeType");
-			ByteArrayDataSource ds = new ByteArrayDataSource(new ByteArrayInputStream(buffer),contentType);
-			ds.setName(attachment.getName());
-			return new EbMSAttachment(ds,attachment.getContentId());
+			return EbMSAttachmentFactory.createCachedEbMSAttachment(attachment.getName(),attachment.getContentId(),contentType,new ByteArrayInputStream(buffer));
 		}
 		catch (ParserConfigurationException | GeneralSecurityException e)
 		{

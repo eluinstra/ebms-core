@@ -34,9 +34,8 @@
 		<property name="staticMethod" value="org.apache.xml.security.Init.init" />
 	</bean>
 
-	<bean class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
-		<property name="staticMethod" value="org.apache.cxf.io.CachedOutputStream.setDefaultThreshold" />
-		<property name="arguments" value="${ebmsMessage.attachmentMemoryTreshold}" />
+	<bean class="nl.clockwork.ebms.EbMSAttachmentFactory">
+		<property name="attachmentMemoryTreshold" value="${ebmsMessage.attachmentMemoryTreshold}" />
 	</bean>
 
 	<bean id="cpaService" class="nl.clockwork.ebms.service.CPAServiceImpl">

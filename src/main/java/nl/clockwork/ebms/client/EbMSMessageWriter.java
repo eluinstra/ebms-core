@@ -27,7 +27,6 @@ import javax.xml.transform.TransformerException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.cxf.io.CachedOutputStream;
 import org.springframework.util.StringUtils;
 
 import nl.clockwork.ebms.Constants;
@@ -107,21 +106,21 @@ public class EbMSMessageWriter
 
 	protected void writeTextAttachment(String boundary, OutputStream outputStream, OutputStreamWriter writer, EbMSAttachment attachment) throws IOException
 	{
-		try (CachedOutputStream out = (CachedOutputStream)attachment.getOutputStream())
+		try (EbMSAttachment a = attachment)
 		{
 			writer.write("\r\n");
-			writer.write("Content-Type: " + attachment.getContentType());
+			writer.write("Content-Type: " + a.getContentType());
 			writer.write("\r\n");
-			if (!StringUtils.isEmpty(attachment.getName()))
+			if (!StringUtils.isEmpty(a.getName()))
 			{
-				writer.write("Content-Disposition: attachment; filename=\"" + attachment.getName() + "\"");
+				writer.write("Content-Disposition: attachment; filename=\"" + a.getName() + "\"");
 				writer.write("\r\n");
 			}
-			writer.write("Content-ID: <" + attachment.getContentId() + ">");
+			writer.write("Content-ID: <" + a.getContentId() + ">");
 			writer.write("\r\n");
 			writer.write("\r\n");
 			writer.flush();
-			out.writeCacheTo(outputStream);
+			a.writeTo(outputStream);
 			writer.write("\r\n");
 			writer.write("--");
 			writer.write(boundary);
@@ -130,23 +129,23 @@ public class EbMSMessageWriter
 
 	protected void writeBinaryAttachment(String boundary, OutputStream outputStream, OutputStreamWriter writer, EbMSAttachment attachment) throws IOException
 	{
-		try (CachedOutputStream out = (CachedOutputStream)attachment.getOutputStream())
+		try (EbMSAttachment a = attachment)
 		{
 			writer.write("\r\n");
-			writer.write("Content-Type: " + attachment.getContentType());
+			writer.write("Content-Type: " + a.getContentType());
 			writer.write("\r\n");
-			if (!StringUtils.isEmpty(attachment.getName()))
+			if (!StringUtils.isEmpty(a.getName()))
 			{
-				writer.write("Content-Disposition: attachment; filename=\"" + attachment.getName() + "\"");
+				writer.write("Content-Disposition: attachment; filename=\"" + a.getName() + "\"");
 				writer.write("\r\n");
 			}
 			writer.write("Content-Transfer-Encoding: binary");
 			writer.write("\r\n");
-			writer.write("Content-ID: <" + attachment.getContentId() + ">");
+			writer.write("Content-ID: <" + a.getContentId() + ">");
 			writer.write("\r\n");
 			writer.write("\r\n");
 			writer.flush();
-			out.writeCacheTo(outputStream);
+			a.writeTo(outputStream);
 			writer.write("\r\n");
 			writer.write("--");
 			writer.write(boundary);

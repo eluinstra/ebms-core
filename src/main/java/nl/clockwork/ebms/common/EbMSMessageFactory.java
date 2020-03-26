@@ -21,7 +21,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
-import javax.mail.util.ByteArrayDataSource;
 import javax.xml.bind.JAXBException;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.Duration;
@@ -50,9 +49,10 @@ import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.To;
 import org.xml.sax.SAXException;
 
 import nl.clockwork.ebms.Constants;
-import nl.clockwork.ebms.StreamUtils;
 import nl.clockwork.ebms.Constants.EbMSAction;
 import nl.clockwork.ebms.Constants.EbMSMessageStatus;
+import nl.clockwork.ebms.EbMSAttachmentFactory;
+import nl.clockwork.ebms.StreamUtils;
 import nl.clockwork.ebms.model.CacheablePartyId;
 import nl.clockwork.ebms.model.EbMSAttachment;
 import nl.clockwork.ebms.model.EbMSDataSource;
@@ -249,10 +249,7 @@ public class EbMSMessageFactory
 	{
 		String contentId = ds.getContentId() == null ? UUID.randomUUID().toString() : ds.getContentId();
 		manifest.getReference().add(EbMSMessageUtils.createReference(contentId));
-		ByteArrayDataSource dataSource = new ByteArrayDataSource(ds.getContent(),ds.getContentType());
-		dataSource.setName(ds.getName());
-		EbMSAttachment e = new EbMSAttachment(dataSource,contentId);
-		return e;
+		return EbMSAttachmentFactory.createEbMSAttachment(ds.getName(),contentId,ds.getContentType(),ds.getContent());
 	}
 
 	public EbMSMessage createEbMSMessageMTOM(String cpaId, EbMSMessageContentMTOM content) throws EbMSProcessorException
@@ -287,9 +284,7 @@ public class EbMSMessageFactory
 	private EbMSAttachment createEbMSAttachmentMTOM(Manifest manifest, EbMSDataSourceMTOM ds)
 	{
 		String contentId = ds.getContentId() == null ? UUID.randomUUID().toString() : ds.getContentId();
-		manifest.getReference().add(EbMSMessageUtils.createReference(contentId));
-		EbMSAttachment e = new EbMSAttachment(ds.getAttachment().getDataSource(),contentId);
-		return e;
+		return EbMSAttachmentFactory.createCachedEbMSAttachment(contentId,ds.getAttachment().getDataSource());
 	}
 
 	private MessageHeader createMessageHeader(String cpaId, Party fromParty, Party toParty, String action)

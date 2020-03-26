@@ -15,7 +15,7 @@
  */
 package nl.clockwork.ebms.signing;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -25,9 +25,23 @@ import java.util.List;
 import java.util.Optional;
 
 import javax.activation.DataSource;
-import javax.mail.util.ByteArrayDataSource;
 import javax.xml.bind.JAXBException;
 
+import org.apache.commons.io.IOUtils;
+import org.apache.xml.security.Init;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.TestInstance.Lifecycle;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
+import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CollaborationProtocolAgreement;
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+
+import net.sf.ehcache.Ehcache;
+import nl.clockwork.ebms.EbMSAttachmentFactory;
 import nl.clockwork.ebms.common.CPAManager;
 import nl.clockwork.ebms.common.EbMSIdGenerator;
 import nl.clockwork.ebms.common.EbMSMessageFactory;
@@ -44,21 +58,6 @@ import nl.clockwork.ebms.model.Role;
 import nl.clockwork.ebms.processor.EbMSProcessorException;
 import nl.clockwork.ebms.validation.ValidationException;
 import nl.clockwork.ebms.validation.ValidatorException;
-
-import org.apache.commons.io.IOUtils;
-import org.apache.xml.security.Init;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
-import org.junit.jupiter.api.TestInstance.Lifecycle;
-import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
-import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CollaborationProtocolAgreement;
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-
-import net.sf.ehcache.Ehcache;
 
 @TestInstance(value = Lifecycle.PER_CLASS)
 public class SigningTest
@@ -215,15 +214,13 @@ public class SigningTest
 	private List<EbMSAttachment> createAttachments(String messageId)
 	{
 		List<EbMSAttachment> result = new ArrayList<>();
-		result.add(new EbMSAttachment(createDataSource(),createContentId(messageId,1)));
+		result.add(EbMSAttachmentFactory.createCachedEbMSAttachment(createContentId(messageId,1),createDataSource()));
 		return result;
 	}
 
 	private DataSource createDataSource()
 	{
-		ByteArrayDataSource result = new ByteArrayDataSource("Dit is een andere test.".getBytes(Charset.forName("UTF-8")),"plain/text; charset=utf-8");
-		result.setName("test.txt");
-		return result;
+		return EbMSAttachmentFactory.createEbMSAttachment("test.txt","plain/text; charset=utf-8","Dit is een andere test.".getBytes(Charset.forName("UTF-8"))); 
 	}
 
 	private String createContentId(String messageId, int i)

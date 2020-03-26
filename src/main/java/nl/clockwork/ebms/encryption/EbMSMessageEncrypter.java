@@ -34,7 +34,6 @@ import java.util.Enumeration;
 import java.util.List;
 
 import javax.crypto.SecretKey;
-import javax.mail.util.ByteArrayDataSource;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -62,6 +61,7 @@ import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
+import nl.clockwork.ebms.EbMSAttachmentFactory;
 import nl.clockwork.ebms.StreamUtils;
 import nl.clockwork.ebms.common.CPAManager;
 import nl.clockwork.ebms.common.KeyStoreManager;
@@ -193,9 +193,7 @@ public class EbMSMessageEncrypter implements InitializingBean
 			EncryptedData encryptedData = xmlCipher.encryptData(document,null,attachment.getInputStream());
 			StringWriter buffer = new StringWriter();
 			createTransformer().transform(new DOMSource(xmlCipher.martial(document,encryptedData)),new StreamResult(buffer));
-			ByteArrayDataSource ds = new ByteArrayDataSource(buffer.toString().getBytes("UTF-8"),"application/xml");
-			ds.setName(attachment.getName());
-			return new EbMSAttachment(ds,attachment.getContentId());
+			return EbMSAttachmentFactory.createEbMSAttachment(attachment.getName(),attachment.getContentId(),"application/xml",buffer.toString().getBytes("UTF-8"));
 		}
 		catch (NoSuchAlgorithmException | XMLEncryptionException | TransformerConfigurationException | TransformerFactoryConfigurationError e)
 		{

@@ -25,7 +25,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import javax.mail.util.ByteArrayDataSource;
 import javax.xml.transform.TransformerException;
 
 import org.apache.commons.io.IOUtils;
@@ -43,6 +42,7 @@ import org.springframework.transaction.support.TransactionTemplate;
 
 import nl.clockwork.ebms.Constants.EbMSMessageEventType;
 import nl.clockwork.ebms.Constants.EbMSMessageStatus;
+import nl.clockwork.ebms.EbMSAttachmentFactory;
 import nl.clockwork.ebms.common.util.DOMUtils;
 import nl.clockwork.ebms.dao.AbstractEbMSDAO;
 import nl.clockwork.ebms.dao.DAOException;
@@ -52,9 +52,9 @@ import nl.clockwork.ebms.util.EbMSMessageUtils;
 
 public class EbMSDAOImpl extends AbstractEbMSDAO
 {
-	public EbMSDAOImpl(TransactionTemplate transactionTemplate, JdbcTemplate jdbcTemplate, int attachmentMemoryTreshold, boolean identifyServer, String serverId)
+	public EbMSDAOImpl(TransactionTemplate transactionTemplate, JdbcTemplate jdbcTemplate, boolean identifyServer, String serverId)
 	{
-		super(transactionTemplate,jdbcTemplate,attachmentMemoryTreshold,identifyServer,serverId);
+		super(transactionTemplate,jdbcTemplate,identifyServer,serverId);
 	}
 
 	@Override
@@ -293,9 +293,7 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 				@Override
 				public EbMSAttachment mapRow(ResultSet rs, int rowNum) throws SQLException
 				{
-					ByteArrayDataSource dataSource = new ByteArrayDataSource(rs.getBytes("content"),rs.getString("content_type"));
-					dataSource.setName(rs.getString("name"));
-					return new EbMSAttachment(dataSource,rs.getString("content_id"));
+					return EbMSAttachmentFactory.createEbMSAttachment(rs.getString("name"),rs.getString("content_id"),rs.getString("content_type"),rs.getBytes("content"));
 				}
 			},
 			messageId

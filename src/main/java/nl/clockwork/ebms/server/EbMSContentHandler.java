@@ -22,18 +22,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.mail.util.ByteArrayDataSource;
-
-import org.apache.cxf.io.CachedOutputStream;
 import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.codec.Base64InputStream;
 import org.apache.james.mime4j.parser.ContentHandler;
 import org.apache.james.mime4j.stream.BodyDescriptor;
 import org.apache.james.mime4j.stream.Field;
-import org.springframework.util.StringUtils;
 
+import nl.clockwork.ebms.EbMSAttachmentFactory;
 import nl.clockwork.ebms.model.EbMSAttachment;
-import nl.clockwork.ebms.model.EbMSAttachmentDataSource;
 
 public class EbMSContentHandler implements ContentHandler
 {
@@ -104,9 +100,9 @@ public class EbMSContentHandler implements ContentHandler
 		String contentId = getContentId();
 		String contentType = getContentType();
 		if (attachments.size() == 0)
-			attachments.add(new EbMSAttachment(createByteArrayDataSource(is,filename,contentType),contentId));
+			attachments.add(EbMSAttachmentFactory.createEbMSAttachment(filename,contentId,contentType,is));
 		else
-			attachments.add(createEbMSAttachmentDataSource(is,filename,contentId,contentType));
+			attachments.add(EbMSAttachmentFactory.createCachedEbMSAttachment(filename,contentId,contentType,is));
 		headers.clear();
 	}
 
@@ -155,21 +151,6 @@ public class EbMSContentHandler implements ContentHandler
 	private String getContentType()
 	{
 		return getHeader("Content-Type");
-	}
-
-	private ByteArrayDataSource createByteArrayDataSource(InputStream is, String filename, String contenType) throws IOException
-	{
-		ByteArrayDataSource result = new ByteArrayDataSource(is,contenType);
-		if (!StringUtils.isEmpty(filename))
-			result.setName(filename);
-		return result;
-	}
-
-	private EbMSAttachmentDataSource createEbMSAttachmentDataSource(InputStream is, String filename, String contentId, String contentType) throws IOException
-	{
-		CachedOutputStream content = new CachedOutputStream();
-		CachedOutputStream.copyStream(is,content,4096);
-		return new EbMSAttachmentDataSource(filename,contentId,contentType,content);
 	}
 
 }

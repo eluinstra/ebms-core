@@ -21,16 +21,15 @@ import java.io.OutputStream;
 
 import org.apache.cxf.io.CachedOutputStream;
 
-public class EbMSAttachmentDataSource extends EbMSAttachment
+public class CachedEbMSAttachment implements EbMSAttachment
 {
 	private String name;
 	private String contentId;
 	private String contentType;
 	private CachedOutputStream content;
 
-	public EbMSAttachmentDataSource(String name, String contentId, String contentType, CachedOutputStream content)
+	public CachedEbMSAttachment(String name, String contentId, String contentType, CachedOutputStream content)
 	{
-		super(null,contentId);
 		this.name = name;
 		this.contentId = contentId;
 		this.contentType = contentType;
@@ -65,6 +64,12 @@ public class EbMSAttachmentDataSource extends EbMSAttachment
 	public String getContentId()
 	{
 		return contentId;
+	}
+
+	@Override
+	public void writeTo(OutputStream outputStream) throws IOException
+	{
+		content.writeCacheTo(outputStream);
 	}
 
 	@Override

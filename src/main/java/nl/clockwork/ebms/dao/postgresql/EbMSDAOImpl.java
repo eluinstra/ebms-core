@@ -96,9 +96,9 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 		
 	}
 
-	public EbMSDAOImpl(TransactionTemplate transactionTemplate, JdbcTemplate jdbcTemplate, int attachmentMemoryTreshold, boolean identifyServer, String serverId)
+	public EbMSDAOImpl(TransactionTemplate transactionTemplate, JdbcTemplate jdbcTemplate, boolean identifyServer, String serverId)
 	{
-		super(transactionTemplate,jdbcTemplate,attachmentMemoryTreshold,identifyServer,serverId);
+		super(transactionTemplate,jdbcTemplate,identifyServer,serverId);
 	}
 
 	@Override

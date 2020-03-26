@@ -38,7 +38,6 @@ import javax.xml.transform.TransformerException;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.cxf.io.CachedOutputStream;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CollaborationProtocolAgreement;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageHeader;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.Service;
@@ -62,10 +61,10 @@ import nl.clockwork.ebms.Constants.EbMSAction;
 import nl.clockwork.ebms.Constants.EbMSEventStatus;
 import nl.clockwork.ebms.Constants.EbMSMessageEventType;
 import nl.clockwork.ebms.Constants.EbMSMessageStatus;
+import nl.clockwork.ebms.EbMSAttachmentFactory;
 import nl.clockwork.ebms.common.JAXBParser;
 import nl.clockwork.ebms.common.util.DOMUtils;
 import nl.clockwork.ebms.model.EbMSAttachment;
-import nl.clockwork.ebms.model.EbMSAttachmentDataSource;
 import nl.clockwork.ebms.model.EbMSDataSource;
 import nl.clockwork.ebms.model.EbMSDataSourceMTOM;
 import nl.clockwork.ebms.model.EbMSDocument;
@@ -84,14 +83,12 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 {
 	protected TransactionTemplate transactionTemplate;
 	protected JdbcTemplate jdbcTemplate;
-	protected int attachmentMemoryTreshold;
 	protected String serverId;
 	
-	public AbstractEbMSDAO(TransactionTemplate transactionTemplate, JdbcTemplate jdbcTemplate, int attachmentMemoryTreshold, boolean identifyServer, String serverId)
+	public AbstractEbMSDAO(TransactionTemplate transactionTemplate, JdbcTemplate jdbcTemplate, boolean identifyServer, String serverId)
 	{
 		this.transactionTemplate = transactionTemplate;
 		this.jdbcTemplate = jdbcTemplate;
-		this.attachmentMemoryTreshold = attachmentMemoryTreshold;
 		if (identifyServer)
 			this.serverId = serverId;
 	}
@@ -958,16 +955,16 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	protected void insertAttachments(KeyHolder keyHolder, List<EbMSAttachment> attachments) throws InvalidDataAccessApiUsageException, DataAccessException, IOException
 	{
 		AtomicInteger orderNr = new AtomicInteger();
-		attachments.forEach(attachment ->
+		attachments.forEach(a ->
 			jdbcTemplate.update(
 				new PreparedStatementCreator()
 				{
 					@Override
 					public PreparedStatement createPreparedStatement(Connection connection) throws SQLException
 					{
-						try (EbMSAttachment a = attachment)
+						try (EbMSAttachment attachment = a)
 						{
-							InputStream content = a.getInputStream();
+							InputStream content = attachment.getInputStream();
 							PreparedStatement ps = connection.prepareStatement
 							(
 								"insert into ebms_attachment (" +					"message_id," +
@@ -982,9 +979,9 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 							ps.setObject(1,keyHolder.getKeys().get("message_id"));
 							ps.setObject(2,keyHolder.getKeys().get("message_nr"));
 							ps.setInt(3,orderNr.getAndIncrement());
-							ps.setString(4,a.getName());
-							ps.setString(5,a.getContentId());
-							ps.setString(6,a.getContentType());
+							ps.setString(4,attachment.getName());
+							ps.setString(5,attachment.getContentId());
+							ps.setString(6,attachment.getContentType());
 							//ps.setBytes(7,IOUtils.toByteArray(content));
 							ps.setBlob(7,content);
 							return ps;
@@ -1426,10 +1423,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 					try
 					{
 						InputStream content = contentBlob.getBinaryStream();
-						CachedOutputStream cachedOutputStream = contentBlob.length() >= attachmentMemoryTreshold ? new CachedOutputStream(0) : new CachedOutputStream();
-						CachedOutputStream.copyStream(content,cachedOutputStream,4096);
-						cachedOutputStream.lockOutputStream();
-						return new EbMSAttachmentDataSource(rs.getString("name"),rs.getString("content_id"),rs.getString("content_type"),cachedOutputStream);
+						return EbMSAttachmentFactory.createCachedEbMSAttachment(rs.getString("name"),rs.getString("content_id"),rs.getString("content_type"),content,contentBlob.length());
 					}
 					catch (IOException e)
 					{
