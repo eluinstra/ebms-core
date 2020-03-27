@@ -15,13 +15,9 @@
  */
 package nl.clockwork.ebms.xml.dsig;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.activation.DataSource;
 
 import org.apache.xml.security.signature.XMLSignatureInput;
 import org.apache.xml.security.utils.resolver.ResourceResolverContext;
@@ -33,7 +29,6 @@ import nl.clockwork.ebms.model.EbMSAttachment;
 
 public class EbMSAttachmentResolver extends ResourceResolverSpi
 {
-	private static final int BUFFERSIZE = 4096;
 	private List<EbMSAttachment> attachments = new ArrayList<>();
 
 	public EbMSAttachmentResolver()
@@ -59,7 +54,7 @@ public class EbMSAttachmentResolver extends ResourceResolverSpi
 		if (!context.uriToResolve.startsWith(Constants.CID))
 			throw new ResourceResolverException(context.uriToResolve,new Object[]{"Reference URI does not start with '" + Constants.CID + "'"},context.uriToResolve,context.baseUri);
 
-		DataSource result = attachments.stream()
+		EbMSAttachment result = attachments.stream()
 				.filter(a -> context.uriToResolve.substring(Constants.CID.length()).equals(a.getContentId()))
 				.findFirst()
 				.orElseThrow(() -> new ResourceResolverException(context.uriToResolve,new Object[]{"Reference URI = " + context.uriToResolve + " does not exist!"},context.uriToResolve,context.baseUri));
@@ -67,12 +62,7 @@ public class EbMSAttachmentResolver extends ResourceResolverSpi
 		XMLSignatureInput input;
 		try
 		{
-			final InputStream in = result.getInputStream();
-			final ByteArrayOutputStream out = new ByteArrayOutputStream();
-			final byte[] buffer = new byte[BUFFERSIZE];
-			for (int c = in.read(buffer); c != -1; c = in.read(buffer))
-				out.write(buffer,0,c);
-			input = new XMLSignatureInput(out.toByteArray());
+			input = new XMLSignatureInput(result.getInputStream());
 		}
 		catch (IOException e)
 		{

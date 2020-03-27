@@ -77,6 +77,12 @@ public class EbMSAttachmentFactory implements InitializingBean
 		return createCachedEbMSAttachment(dataHandler.getName(),contentId,dataHandler.getContentType(),dataHandler.getInputStream());
 	}
 
+	public static EbMSAttachment createCachedEbMSAttachment(String filename, String contentId, String contentType, CachedOutputStream content) throws IOException
+	{
+		content.lockOutputStream();
+		return new CachedEbMSAttachment(filename,contentId,contentType,content);
+	}
+
 	public static EbMSAttachment createCachedEbMSAttachment(String filename, String contentId, String contentType, InputStream content) throws IOException
 	{
 		return createCachedEbMSAttachment(filename,contentId,contentType,content,0);

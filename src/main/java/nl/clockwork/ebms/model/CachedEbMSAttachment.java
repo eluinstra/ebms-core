@@ -19,6 +19,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+import org.apache.commons.io.input.CloseShieldInputStream;
+import org.apache.commons.io.output.CloseShieldOutputStream;
 import org.apache.cxf.io.CachedOutputStream;
 
 public class CachedEbMSAttachment implements EbMSAttachment
@@ -39,13 +41,13 @@ public class CachedEbMSAttachment implements EbMSAttachment
 	@Override
 	public InputStream getInputStream() throws IOException
 	{
-		return content.getInputStream();
+		return new CloseShieldInputStream(content.getInputStream());
 	}
 
 	@Override
 	public OutputStream getOutputStream() throws IOException
 	{
-		return content;//.getOut();
+		return new CloseShieldOutputStream(content.getOut());
 	}
 
 	@Override
