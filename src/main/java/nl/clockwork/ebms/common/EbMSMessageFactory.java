@@ -283,8 +283,16 @@ public class EbMSMessageFactory
 
 	private EbMSAttachment createEbMSAttachmentMTOM(Manifest manifest, EbMSDataSourceMTOM ds)
 	{
-		String contentId = ds.getContentId() == null ? UUID.randomUUID().toString() : ds.getContentId();
-		return EbMSAttachmentFactory.createCachedEbMSAttachment(contentId,ds.getAttachment().getDataSource());
+		try
+		{
+			String contentId = ds.getContentId() == null ? UUID.randomUUID().toString() : ds.getContentId();
+			manifest.getReference().add(EbMSMessageUtils.createReference(contentId));
+			return EbMSAttachmentFactory.createCachedEbMSAttachment(contentId,ds.getAttachment());
+		}
+		catch (IOException e)
+		{
+			throw new EbMSProcessingException(e);
+		}
 	}
 
 	private MessageHeader createMessageHeader(String cpaId, Party fromParty, Party toParty, String action)

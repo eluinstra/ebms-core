@@ -77,7 +77,9 @@ public class CachedEbMSAttachment implements EbMSAttachment
 	{
 		try
 		{
-			content.close();
+			CachedOutputStream c = content;
+			content = null;
+			c.close();
 		}
 		catch (IOException e)
 		{

@@ -676,7 +676,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 						@Override
 						public Integer mapRow(ResultSet rs, int rowNum) throws SQLException
 						{
-							return rs.getObject("status") == null ? null : rs.getInt("status");
+							return rs.getObject("status",Integer.class);
 						}
 					},
 					messageId
@@ -708,7 +708,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 						@Override
 						public EbMSAction mapRow(ResultSet rs, int rowNum) throws SQLException
 						{
-							return rs.getObject("action") == null ? null : EbMSAction.get(rs.getString("action"));
+							return EbMSAction.get(rs.getString("action"));
 						}
 					},
 					messageId
@@ -964,10 +964,10 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 					{
 						try (EbMSAttachment attachment = a)
 						{
-							InputStream content = attachment.getInputStream();
 							PreparedStatement ps = connection.prepareStatement
 							(
-								"insert into ebms_attachment (" +					"message_id," +
+								"insert into ebms_attachment (" +
+								"message_id," +
 								"message_nr," +
 								"order_nr," +
 								"name," +
@@ -982,8 +982,8 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 							ps.setString(4,attachment.getName());
 							ps.setString(5,attachment.getContentId());
 							ps.setString(6,attachment.getContentType());
-							//ps.setBytes(7,IOUtils.toByteArray(content));
-							ps.setBlob(7,content);
+							//ps.setBytes(7,IOUtils.toByteArray(attachment.getInputStream()));
+							ps.setBlob(7,attachment.getInputStream());
 							return ps;
 						}
 						catch (IOException e)

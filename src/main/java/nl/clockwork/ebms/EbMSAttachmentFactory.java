@@ -18,12 +18,13 @@ package nl.clockwork.ebms;
 import java.io.IOException;
 import java.io.InputStream;
 
+import javax.activation.DataHandler;
 import javax.activation.DataSource;
 import javax.mail.util.ByteArrayDataSource;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.cxf.io.CachedOutputStream;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.util.StringUtils;
 
 import nl.clockwork.ebms.model.CachedEbMSAttachment;
 import nl.clockwork.ebms.model.EbMSAttachment;
@@ -32,6 +33,7 @@ import nl.clockwork.ebms.model.PlainEbMSAttachment;
 public class EbMSAttachmentFactory implements InitializingBean
 {
 	private static int attachmentMemoryTreshold;
+	private static String attachmentCipherTransformation;
 	@SuppressWarnings("unused")
 	private EbMSAttachmentFactory attachmentFactory;
 
@@ -39,10 +41,12 @@ public class EbMSAttachmentFactory implements InitializingBean
 	public void afterPropertiesSet() throws Exception
 	{
 		CachedOutputStream.setDefaultThreshold(attachmentMemoryTreshold);
+		if (StringUtils.isNotEmpty(attachmentCipherTransformation))
+			CachedOutputStream.setDefaultCipherTransformation(attachmentCipherTransformation);
 		attachmentFactory = this;
 	}
 
-	public static EbMSAttachment createCachedEbMSAttachment(String contentId, DataSource ds)
+	public static EbMSAttachment createEbMSAttachment(String contentId, DataSource ds)
 	{
 		return new PlainEbMSAttachment(contentId,ds);
 	}
@@ -57,7 +61,7 @@ public class EbMSAttachmentFactory implements InitializingBean
 		ByteArrayDataSource result = new ByteArrayDataSource(content,contentType);
 		if (!StringUtils.isEmpty(filename))
 			result.setName(filename);
-		return createCachedEbMSAttachment(contentId,result);
+		return createEbMSAttachment(contentId,result);
 	}
 
 	public static EbMSAttachment createEbMSAttachment(String filename, String contentId, String contentType, InputStream content) throws IOException
@@ -65,7 +69,12 @@ public class EbMSAttachmentFactory implements InitializingBean
 		ByteArrayDataSource result = new ByteArrayDataSource(content,contentType);
 		if (!StringUtils.isEmpty(filename))
 			result.setName(filename);
-		return createCachedEbMSAttachment(contentId,result);
+		return createEbMSAttachment(contentId,result);
+	}
+
+	public static EbMSAttachment createCachedEbMSAttachment(String contentId, DataHandler dataHandler) throws IOException
+	{
+		return createCachedEbMSAttachment(dataHandler.getName(),contentId,dataHandler.getContentType(),dataHandler.getInputStream());
 	}
 
 	public static EbMSAttachment createCachedEbMSAttachment(String filename, String contentId, String contentType, InputStream content) throws IOException
@@ -84,5 +93,10 @@ public class EbMSAttachmentFactory implements InitializingBean
 	public static void setAttachmentMemoryTreshold(int treshold)
 	{
 		attachmentMemoryTreshold = treshold;
+	}
+
+	public static void setAttachmentCipherTransformation(String attachmentCipherTransformation)
+	{
+		EbMSAttachmentFactory.attachmentCipherTransformation = attachmentCipherTransformation;
 	}
 }

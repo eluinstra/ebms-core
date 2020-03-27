@@ -214,7 +214,7 @@ public class SigningTest
 	private List<EbMSAttachment> createAttachments(String messageId)
 	{
 		List<EbMSAttachment> result = new ArrayList<>();
-		result.add(EbMSAttachmentFactory.createCachedEbMSAttachment(createContentId(messageId,1),createDataSource()));
+		result.add(EbMSAttachmentFactory.createEbMSAttachment(createContentId(messageId,1),createDataSource()));
 		return result;
 	}
 

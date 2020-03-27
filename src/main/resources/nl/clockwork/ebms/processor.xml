@@ -36,6 +36,7 @@
 
 	<bean class="nl.clockwork.ebms.EbMSAttachmentFactory">
 		<property name="attachmentMemoryTreshold" value="${ebmsMessage.attachmentMemoryTreshold}" />
+		<property name="attachmentCipherTransformation" value="${ebmsMessage.attachmentCipherTransformation}" />
 	</bean>
 
 	<bean id="cpaService" class="nl.clockwork.ebms.service.CPAServiceImpl">

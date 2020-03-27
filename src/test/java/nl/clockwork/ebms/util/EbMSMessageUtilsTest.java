@@ -247,7 +247,7 @@ public class EbMSMessageUtilsTest
 		msg2.setMessage(doc);
 		msg2.setAttachments(new ArrayList<>());
 		javax.activation.DataSource dataSource = null;
-		EbMSAttachment att = EbMSAttachmentFactory.createCachedEbMSAttachment("cid1",dataSource);
+		EbMSAttachment att = EbMSAttachmentFactory.createEbMSAttachment("cid1",dataSource);
 		msg2.getAttachments().add(att);
 		
 		EbMSMessage result2 = EbMSMessageUtils.getEbMSMessage(msg2);
