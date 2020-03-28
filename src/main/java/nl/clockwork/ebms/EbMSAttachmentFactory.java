@@ -33,6 +33,7 @@ import nl.clockwork.ebms.model.PlainEbMSAttachment;
 public class EbMSAttachmentFactory implements InitializingBean
 {
 	private static int attachmentMemoryTreshold;
+	private static String attachmentOutputDirectory;
 	private static String attachmentCipherTransformation;
 	@SuppressWarnings("unused")
 	private EbMSAttachmentFactory attachmentFactory;
@@ -40,6 +41,8 @@ public class EbMSAttachmentFactory implements InitializingBean
 	@Override
 	public void afterPropertiesSet() throws Exception
 	{
+		if (StringUtils.isNotEmpty(attachmentOutputDirectory))
+			System.setProperty("org.apache.cxf.io.CachedOutputStream.OutputDirectory",attachmentOutputDirectory);
 		CachedOutputStream.setDefaultThreshold(attachmentMemoryTreshold);
 		if (StringUtils.isNotEmpty(attachmentCipherTransformation))
 			CachedOutputStream.setDefaultCipherTransformation(attachmentCipherTransformation);
@@ -79,7 +82,6 @@ public class EbMSAttachmentFactory implements InitializingBean
 
 	public static EbMSAttachment createCachedEbMSAttachment(String filename, String contentId, String contentType, CachedOutputStream content) throws IOException
 	{
-		content.lockOutputStream();
 		return new CachedEbMSAttachment(filename,contentId,contentType,content);
 	}
 
@@ -93,12 +95,17 @@ public class EbMSAttachmentFactory implements InitializingBean
 		CachedOutputStream cos = length >= attachmentMemoryTreshold ? new CachedOutputStream(0) : new CachedOutputStream();
 		CachedOutputStream.copyStream(content,cos,4096);
 		cos.lockOutputStream();
-		return new CachedEbMSAttachment(filename,contentId,contentType,cos);
+		return createCachedEbMSAttachment(filename,contentId,contentType,cos);
 	}
 
-	public static void setAttachmentMemoryTreshold(int treshold)
+	public static void setAttachmentMemoryTreshold(int attachmentMemoryTreshold)
 	{
-		attachmentMemoryTreshold = treshold;
+		EbMSAttachmentFactory.attachmentMemoryTreshold = attachmentMemoryTreshold;
+	}
+
+	public static void setAttachmentOutputDirectory(String attachmentOutputDirectory)
+	{
+		EbMSAttachmentFactory.attachmentOutputDirectory = attachmentOutputDirectory;
 	}
 
 	public static void setAttachmentCipherTransformation(String attachmentCipherTransformation)

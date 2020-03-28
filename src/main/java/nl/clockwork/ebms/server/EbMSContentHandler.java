@@ -95,14 +95,14 @@ public class EbMSContentHandler implements ContentHandler
 	@Override
 	public void body(BodyDescriptor bd, InputStream is) throws MimeException, IOException
 	{
-		is = applyTransferEncoding(is);
 		String filename = getFilename();
 		String contentId = getContentId();
 		String contentType = getContentType();
+		InputStream content = applyTransferEncoding(is);
 		if (attachments.size() == 0)
-			attachments.add(EbMSAttachmentFactory.createEbMSAttachment(filename,contentId,contentType,is));
+			attachments.add(EbMSAttachmentFactory.createEbMSAttachment(filename,contentId,contentType,content));
 		else
-			attachments.add(EbMSAttachmentFactory.createCachedEbMSAttachment(filename,contentId,contentType,is));
+			attachments.add(EbMSAttachmentFactory.createCachedEbMSAttachment(filename,contentId,contentType,content));
 		headers.clear();
 	}
 

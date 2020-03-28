@@ -52,6 +52,7 @@ import nl.clockwork.ebms.validation.EbMSMessageContextValidator;
 import nl.clockwork.ebms.validation.ValidationException;
 import nl.clockwork.ebms.validation.ValidatorException;
 
+@SuppressWarnings("deprecation")
 public class EbMSMessageServiceImpl implements InitializingBean, EbMSMessageService
 {
 	protected DeliveryManager deliveryManager;

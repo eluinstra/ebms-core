@@ -31,6 +31,7 @@ import nl.clockwork.ebms.model.EbMSMessageEvent;
 import nl.clockwork.ebms.model.MessageStatus;
 import nl.clockwork.ebms.model.Party;
 
+@SuppressWarnings("deprecation")
 @WebService(targetNamespace="http://www.ordina.nl/ebms/2.16")
 public interface EbMSMessageService
 {
