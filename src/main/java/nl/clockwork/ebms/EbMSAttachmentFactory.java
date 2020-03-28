@@ -87,12 +87,7 @@ public class EbMSAttachmentFactory implements InitializingBean
 
 	public static EbMSAttachment createCachedEbMSAttachment(String filename, String contentId, String contentType, InputStream content) throws IOException
 	{
-		return createCachedEbMSAttachment(filename,contentId,contentType,content,0);
-	}
-
-	public static EbMSAttachment createCachedEbMSAttachment(String filename, String contentId, String contentType, InputStream content, long length) throws IOException
-	{
-		CachedOutputStream cos = length >= attachmentMemoryTreshold ? new CachedOutputStream(0) : new CachedOutputStream();
+		CachedOutputStream cos = new CachedOutputStream();
 		CachedOutputStream.copyStream(content,cos,4096);
 		cos.lockOutputStream();
 		return createCachedEbMSAttachment(filename,contentId,contentType,cos);
