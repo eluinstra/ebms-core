@@ -81,6 +81,39 @@ import nl.clockwork.ebms.util.EbMSMessageUtils;
 
 public abstract class AbstractEbMSDAO implements EbMSDAO
 {
+	public class Key
+	{
+		private String messageId;
+		private int messageNr;
+
+		public Key(KeyHolder keyHolder)
+		{
+			this.setMessageId((String)keyHolder.getKeys().get("message_id"));
+			this.setMessageNr((int)keyHolder.getKeys().get("message_nr"));
+		}
+		public Key(String messageId, int messageNr)
+		{
+			this.setMessageId(messageId);
+			this.setMessageNr(messageNr);
+		}
+		public String getMessageId()
+		{
+			return messageId;
+		}
+		public void setMessageId(String messageId)
+		{
+			this.messageId = messageId;
+		}
+		public int getMessageNr()
+		{
+			return messageNr;
+		}
+		public void setMessageNr(int messageNr)
+		{
+			this.messageNr = messageNr;
+		}
+	}
+
 	protected TransactionTemplate transactionTemplate;
 	protected JdbcTemplate jdbcTemplate;
 	protected String serverId;
@@ -851,7 +884,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 								},
 								keyHolder
 							);
-							insertAttachments(keyHolder,message.getAttachments());
+							insertAttachments(new Key(keyHolder),message.getAttachments());
 						}
 						catch (IOException e)
 						{
@@ -936,7 +969,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 								keyHolder
 							);
 							if (storeAttachments)
-								insertAttachments(keyHolder,message.getAttachments());
+								insertAttachments(new Key(keyHolder),message.getAttachments());
 						}
 						catch (IOException e)
 						{
@@ -952,17 +985,18 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 		}
 	}
 
-	protected void insertAttachments(KeyHolder keyHolder, List<EbMSAttachment> attachments) throws InvalidDataAccessApiUsageException, DataAccessException, IOException
+	protected void insertAttachments(Key keyHolder, List<EbMSAttachment> attachments) throws InvalidDataAccessApiUsageException, DataAccessException, IOException
 	{
 		AtomicInteger orderNr = new AtomicInteger();
-		attachments.forEach(a ->
+		for (EbMSAttachment attachment: attachments)
+		{
 			jdbcTemplate.update(
 				new PreparedStatementCreator()
 				{
 					@Override
 					public PreparedStatement createPreparedStatement(Connection connection) throws SQLException
 					{
-						try (EbMSAttachment attachment = a)
+						try (EbMSAttachment a = attachment)
 						{
 							PreparedStatement ps = connection.prepareStatement
 							(
@@ -976,14 +1010,14 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 								"content" +
 								") values (?,?,?,?,?,?,?)"
 							);
-							ps.setObject(1,keyHolder.getKeys().get("message_id"));
-							ps.setObject(2,keyHolder.getKeys().get("message_nr"));
+							ps.setObject(1,keyHolder.getMessageId());
+							ps.setObject(2,keyHolder.getMessageNr());
 							ps.setInt(3,orderNr.getAndIncrement());
-							ps.setString(4,attachment.getName());
-							ps.setString(5,attachment.getContentId());
-							ps.setString(6,attachment.getContentType());
+							ps.setString(4,a.getName());
+							ps.setString(5,a.getContentId());
+							ps.setString(6,a.getContentType());
 							//ps.setBytes(7,IOUtils.toByteArray(attachment.getInputStream()));
-							ps.setBlob(7,attachment.getInputStream());
+							ps.setBlob(7,a.getInputStream());
 							return ps;
 						}
 						catch (IOException e)
@@ -992,8 +1026,8 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 						}
 					}
 				}
-			)
-		);
+			);
+		}
 	}
 
 	@Override

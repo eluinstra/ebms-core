@@ -27,7 +27,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.xml.transform.TransformerException;
 
-import org.apache.commons.io.IOUtils;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageHeader;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -258,22 +257,40 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 		AtomicInteger orderNr = new AtomicInteger(0);
 		for (EbMSAttachment attachment: attachments)
 		{
-			jdbcTemplate.update
-			(
-				"insert into ebms_attachment (" +
-					"ebms_message_id," +
-					"order_nr," +
-					"name," +
-					"content_id," +
-					"content_type," +
-					"content" +
-				") values (?,?,?,?,?,?)",
-				messageId,
-				orderNr.getAndIncrement(),
-				attachment.getName(),
-				attachment.getContentId(),
-				attachment.getContentType(),
-				IOUtils.toByteArray(attachment.getInputStream())
+			jdbcTemplate.update(
+				new PreparedStatementCreator()
+				{
+					@Override
+					public PreparedStatement createPreparedStatement(Connection connection) throws SQLException
+					{
+						try (EbMSAttachment a = attachment)
+						{
+							PreparedStatement ps = connection.prepareStatement
+							(
+								"insert into ebms_attachment (" +
+									"ebms_message_id," +
+									"order_nr," +
+									"name," +
+									"content_id," +
+									"content_type," +
+									"content" +
+								") values (?,?,?,?,?,?)"
+							);
+							ps.setObject(1,messageId);
+							ps.setInt(2,orderNr.getAndIncrement());
+							ps.setString(3,a.getName());
+							ps.setString(4,a.getContentId());
+							ps.setString(5,a.getContentType());
+							//ps.setBytes(6,IOUtils.toByteArray(attachment.getInputStream()));
+							ps.setBlob(6,a.getInputStream());
+							return ps;
+						}
+						catch (IOException e)
+						{
+							throw new SQLException(e);
+						}
+					}
+				}
 			);
 		}
 	}

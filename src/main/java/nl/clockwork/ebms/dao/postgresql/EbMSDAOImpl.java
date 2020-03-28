@@ -22,15 +22,11 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.Date;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.xml.transform.TransformerException;
 
-import org.apache.commons.io.IOUtils;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageHeader;
 import org.springframework.dao.DataAccessException;
-import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.ResultSetExtractor;
@@ -44,44 +40,11 @@ import nl.clockwork.ebms.Constants.EbMSMessageStatus;
 import nl.clockwork.ebms.common.util.DOMUtils;
 import nl.clockwork.ebms.dao.AbstractEbMSDAO;
 import nl.clockwork.ebms.dao.DAOException;
-import nl.clockwork.ebms.model.EbMSAttachment;
 import nl.clockwork.ebms.model.EbMSMessage;
 import nl.clockwork.ebms.util.EbMSMessageUtils;
 
 public class EbMSDAOImpl extends AbstractEbMSDAO
 {
-	public class Key
-	{
-		private String messageId;
-		private int messageNr;
-		
-		public Key(String messageId, int messageNr)
-		{
-			this.setMessageId(messageId);
-			this.setMessageNr(messageNr);
-		}
-		
-		public String getMessageId()
-		{
-			return messageId;
-		}
-		public void setMessageId(String messageId)
-		{
-			this.messageId = messageId;
-		}
-
-		public int getMessageNr()
-		{
-			return messageNr;
-		}
-
-		public void setMessageNr(int messageNr)
-		{
-			this.messageNr = messageNr;
-		}
-		
-		
-	}
 	public class KeyExtractor implements ResultSetExtractor<Key>
 	{
 
@@ -294,33 +257,6 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 		catch (TransactionException e)
 		{
 			throw new DAOException(e);
-		}
-	}
-
-	protected void insertAttachments(Key key, List<EbMSAttachment> attachments) throws InvalidDataAccessApiUsageException, DataAccessException, IOException
-	{
-		AtomicInteger orderNr = new AtomicInteger(0);
-		for (EbMSAttachment attachment: attachments)
-		{
-			jdbcTemplate.update
-			(
-				"insert into ebms_attachment (" +
-					"message_id," +
-					"message_nr," +
-					"order_nr," +
-					"name," +
-					"content_id," +
-					"content_type," +
-					"content" +
-				") values (?,?,?,?,?,?,?)",
-				key.getMessageId(),
-				key.getMessageNr(),
-				orderNr.getAndIncrement(),
-				attachment.getName(),
-				attachment.getContentId(),
-				attachment.getContentType(),
-				IOUtils.toByteArray(attachment.getInputStream())
-			);
 		}
 	}
 
