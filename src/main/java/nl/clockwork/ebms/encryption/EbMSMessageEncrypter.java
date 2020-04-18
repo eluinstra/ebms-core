@@ -17,7 +17,6 @@ package nl.clockwork.ebms.encryption;
 
 import java.io.IOException;
 import java.io.StringReader;
-import java.io.StringWriter;
 import java.security.GeneralSecurityException;
 import java.security.Key;
 import java.security.KeyStore;
@@ -47,6 +46,7 @@ import javax.xml.transform.stream.StreamResult;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.cxf.io.CachedOutputStream;
 import org.apache.xml.security.encryption.EncryptedData;
 import org.apache.xml.security.encryption.EncryptedKey;
 import org.apache.xml.security.encryption.XMLCipher;
@@ -191,9 +191,10 @@ public class EbMSMessageEncrypter implements InitializingBean
 			EncryptedKey encryptedKey = createEncryptedKey(document,certificate.getPublicKey(),secretKey);
 			setEncryptedData(document,xmlCipher,encryptedKey,certificate,attachment);
 			EncryptedData encryptedData = xmlCipher.encryptData(document,null,attachment.getInputStream());
-			StringWriter buffer = new StringWriter();
-			createTransformer().transform(new DOMSource(xmlCipher.martial(document,encryptedData)),new StreamResult(buffer));
-			return EbMSAttachmentFactory.createEbMSAttachment(attachment.getName(),attachment.getContentId(),"application/xml",buffer.toString().getBytes("UTF-8"));
+			CachedOutputStream content = new CachedOutputStream();
+			createTransformer().transform(new DOMSource(xmlCipher.martial(document,encryptedData)),new StreamResult(content));
+			content.lockOutputStream();
+			return EbMSAttachmentFactory.createCachedEbMSAttachment(attachment.getName(),attachment.getContentId(),"application/xml",content);
 		}
 		catch (NoSuchAlgorithmException | XMLEncryptionException | TransformerConfigurationException | TransformerFactoryConfigurationError e)
 		{
