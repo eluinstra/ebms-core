@@ -6,7 +6,7 @@ ebms-core version 2.16.0 and up are released in the Central Maven repository:
 <dependency>
   <groupId>nl.clockwork.ebms</groupId>
   <artifactId>ebms-core</artifactId>
-  <version>2.16.3</version>
+  <version>2.16.5</version>
 </dependency>
 
 ebms adapter for mule and web are no longer released; use ebms-admin instead
@@ -16,6 +16,12 @@ For the ebms-admin console see https://sourceforge.net/projects/javaebmsadmin/
 ===============
 = Release Notes
 ===============
+ebms-core-2.16.5.jar:
+- optimized memory usage by using CachedOutputStream for attachments that overflows to disk:
+	- added property ebmsMessage.attachmentMemoryTreshold - default: 1MB 
+	- added property ebmsMessage.attachmentCipherTransformation - default: none
+	- added property ebmsMessage.attachment.outputDirectory - default: <tempDirectory>
+
 ebms-core-2.16.4.jar:
 - fixed EbMSEventProcessor: the processor sometimes stops processing after an error occurs, so the ebms adapter stops sending messages
 - fixed query in deleteEbMSAttachmentsOnMessageProcessed
