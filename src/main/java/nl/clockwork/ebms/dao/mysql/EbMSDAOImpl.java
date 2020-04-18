@@ -25,10 +25,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import javax.mail.util.ByteArrayDataSource;
 import javax.xml.transform.TransformerException;
 
-import org.apache.commons.io.IOUtils;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageHeader;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -43,6 +41,7 @@ import org.springframework.transaction.support.TransactionTemplate;
 
 import nl.clockwork.ebms.Constants.EbMSMessageEventType;
 import nl.clockwork.ebms.Constants.EbMSMessageStatus;
+import nl.clockwork.ebms.EbMSAttachmentFactory;
 import nl.clockwork.ebms.common.util.DOMUtils;
 import nl.clockwork.ebms.dao.AbstractEbMSDAO;
 import nl.clockwork.ebms.dao.DAOException;
@@ -258,22 +257,40 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 		AtomicInteger orderNr = new AtomicInteger(0);
 		for (EbMSAttachment attachment: attachments)
 		{
-			jdbcTemplate.update
-			(
-				"insert into ebms_attachment (" +
-					"ebms_message_id," +
-					"order_nr," +
-					"name," +
-					"content_id," +
-					"content_type," +
-					"content" +
-				") values (?,?,?,?,?,?)",
-				messageId,
-				orderNr.getAndIncrement(),
-				attachment.getName(),
-				attachment.getContentId(),
-				attachment.getContentType(),
-				IOUtils.toByteArray(attachment.getInputStream())
+			jdbcTemplate.update(
+				new PreparedStatementCreator()
+				{
+					@Override
+					public PreparedStatement createPreparedStatement(Connection connection) throws SQLException
+					{
+						try (EbMSAttachment a = attachment)
+						{
+							PreparedStatement ps = connection.prepareStatement
+							(
+								"insert into ebms_attachment (" +
+									"ebms_message_id," +
+									"order_nr," +
+									"name," +
+									"content_id," +
+									"content_type," +
+									"content" +
+								") values (?,?,?,?,?,?)"
+							);
+							ps.setObject(1,messageId);
+							ps.setInt(2,orderNr.getAndIncrement());
+							ps.setString(3,a.getName());
+							ps.setString(4,a.getContentId());
+							ps.setString(5,a.getContentType());
+							//ps.setBytes(6,IOUtils.toByteArray(attachment.getInputStream()));
+							ps.setBlob(6,a.getInputStream());
+							return ps;
+						}
+						catch (IOException e)
+						{
+							throw new SQLException(e);
+						}
+					}
+				}
 			);
 		}
 	}
@@ -293,9 +310,7 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 				@Override
 				public EbMSAttachment mapRow(ResultSet rs, int rowNum) throws SQLException
 				{
-					ByteArrayDataSource dataSource = new ByteArrayDataSource(rs.getBytes("content"),rs.getString("content_type"));
-					dataSource.setName(rs.getString("name"));
-					return new EbMSAttachment(dataSource,rs.getString("content_id"));
+					return EbMSAttachmentFactory.createEbMSAttachment(rs.getString("name"),rs.getString("content_id"),rs.getString("content_type"),rs.getBytes("content"));
 				}
 			},
 			messageId

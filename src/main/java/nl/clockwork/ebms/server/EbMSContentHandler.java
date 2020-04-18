@@ -22,15 +22,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.mail.util.ByteArrayDataSource;
-
 import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.codec.Base64InputStream;
 import org.apache.james.mime4j.parser.ContentHandler;
 import org.apache.james.mime4j.stream.BodyDescriptor;
 import org.apache.james.mime4j.stream.Field;
-import org.springframework.util.StringUtils;
 
+import nl.clockwork.ebms.EbMSAttachmentFactory;
 import nl.clockwork.ebms.model.EbMSAttachment;
 
 public class EbMSContentHandler implements ContentHandler
@@ -97,21 +95,14 @@ public class EbMSContentHandler implements ContentHandler
 	@Override
 	public void body(BodyDescriptor bd, InputStream is) throws MimeException, IOException
 	{
-		String encoding = getHeader("Content-Transfer-Encoding");
-		if (encoding != null && encoding.equalsIgnoreCase("base64"))
-			is = new Base64InputStream(is);
-		ByteArrayDataSource ds = new ByteArrayDataSource(is,getHeader("Content-Type"));
-		String filename = getHeader("Content-Disposition");
-		if (filename != null && filename.startsWith("attachment"))
-		{
-			filename = filename.replaceAll("^attachment;\\s+filename=\"?([^\"]*)\"?$","$1");
-			if (!StringUtils.isEmpty(filename))
-				ds.setName(filename);
-		}
-		String contentId = getHeader("Content-ID");
-		if (contentId != null)
-			contentId = contentId.replaceAll("^<(.*)>$|^(.*)$","$1$2");
-		attachments.add(new EbMSAttachment(ds,contentId));
+		String filename = getFilename();
+		String contentId = getContentId();
+		String contentType = getContentType();
+		InputStream content = applyTransferEncoding(is);
+		if (attachments.size() == 0)
+			attachments.add(EbMSAttachmentFactory.createEbMSAttachment(filename,contentId,contentType,content));
+		else
+			attachments.add(EbMSAttachmentFactory.createCachedEbMSAttachment(filename,contentId,contentType,content));
 		headers.clear();
 	}
 
@@ -131,6 +122,35 @@ public class EbMSContentHandler implements ContentHandler
 		if (result == null)
 			result = headers.entrySet().stream().filter(e -> headerName.equalsIgnoreCase(e.getKey())).findFirst().map(e -> e.getValue()).orElse(null);
 		return result;
+	}
+
+	private InputStream applyTransferEncoding(InputStream result)
+	{
+		String encoding = getHeader("Content-Transfer-Encoding");
+		if (encoding != null && encoding.equalsIgnoreCase("base64"))
+			result = new Base64InputStream(result);
+		return result;
+	}
+
+	private String getFilename()
+	{
+		String result = getHeader("Content-Disposition");
+		if (result != null && result.startsWith("attachment"))
+			result = result.replaceAll("^attachment;\\s+filename=\"?([^\"]*)\"?$","$1");
+		return result;
+	}
+
+	private String getContentId()
+	{
+		String result = getHeader("Content-ID");
+		if (result != null)
+			result = result.replaceAll("^<(.*)>$|^(.*)$","$1$2");
+		return result;
+	}
+
+	private String getContentType()
+	{
+		return getHeader("Content-Type");
 	}
 
 }

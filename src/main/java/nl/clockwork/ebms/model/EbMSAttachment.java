@@ -16,49 +16,15 @@
 package nl.clockwork.ebms.model;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 
 import javax.activation.DataSource;
 
-public class EbMSAttachment implements DataSource
+public interface EbMSAttachment extends AutoCloseable, DataSource
 {
-	private DataSource dataSource;
-	private String contentId;
-	
-	public EbMSAttachment(DataSource dataSource, String contentId)
-	{
-		this.dataSource = dataSource;
-		this.contentId = contentId;
-	}
-	
-	@Override
-	public String getContentType()
-	{
-		return dataSource.getContentType();
-	}
+	public String getContentId();
 
-	@Override
-	public InputStream getInputStream() throws IOException
-	{
-		return dataSource.getInputStream();
-	}
+	public void writeTo(OutputStream outputStream) throws IOException;
 
-	@Override
-	public String getName()
-	{
-		return dataSource.getName();
-	}
-
-	@Override
-	public OutputStream getOutputStream() throws IOException
-	{
-		return dataSource.getOutputStream();
-	}
-
-	public String getContentId()
-	{
-		return contentId;
-	}
-
+	public void close();
 }

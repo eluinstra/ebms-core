@@ -21,19 +21,22 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.Map;
 
 import javax.xml.transform.TransformerException;
 
-import org.apache.commons.io.IOUtils;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageHeader;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.ResultSetExtractor;
+import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.transaction.TransactionException;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallbackWithoutResult;
@@ -41,55 +44,49 @@ import org.springframework.transaction.support.TransactionTemplate;
 
 import nl.clockwork.ebms.Constants.EbMSMessageEventType;
 import nl.clockwork.ebms.Constants.EbMSMessageStatus;
+import nl.clockwork.ebms.EbMSAttachmentFactory;
 import nl.clockwork.ebms.common.util.DOMUtils;
 import nl.clockwork.ebms.dao.AbstractEbMSDAO;
 import nl.clockwork.ebms.dao.DAOException;
 import nl.clockwork.ebms.model.EbMSAttachment;
 import nl.clockwork.ebms.model.EbMSMessage;
+import nl.clockwork.ebms.processor.EbMSProcessingException;
 import nl.clockwork.ebms.util.EbMSMessageUtils;
 
 public class EbMSDAOImpl extends AbstractEbMSDAO
 {
-	public class Key
-	{
-		private String messageId;
-		private int messageNr;
-		
-		public Key(String messageId, int messageNr)
-		{
-			this.setMessageId(messageId);
-			this.setMessageNr(messageNr);
-		}
-		
-		public String getMessageId()
-		{
-			return messageId;
-		}
-		public void setMessageId(String messageId)
-		{
-			this.messageId = messageId;
-		}
-
-		public int getMessageNr()
-		{
-			return messageNr;
-		}
-
-		public void setMessageNr(int messageNr)
-		{
-			this.messageNr = messageNr;
-		}
-		
-		
-	}
-	public class KeyExtractor implements ResultSetExtractor<Key>
+	public class KeyExtractor implements ResultSetExtractor<KeyHolder>
 	{
 
 		@Override
-		public Key extractData(ResultSet rs) throws SQLException, DataAccessException
+		public KeyHolder extractData(ResultSet rs) throws SQLException, DataAccessException
 		{
 			if (rs.next())
-				return new Key(rs.getString("message_id"),rs.getInt("message_nr"));
+			{
+				final Map<String,Object> keys = new HashMap<>();
+				keys.put("message_id",rs.getString("message_id"));
+				keys.put("message_nr",rs.getInt("message_nr"));
+				return new KeyHolder()
+				{
+					@Override
+					public Map<String,Object> getKeys() throws InvalidDataAccessApiUsageException
+					{
+						return keys;
+					}
+					
+					@Override
+					public List<Map<String,Object>> getKeyList()
+					{
+						return Arrays.asList(keys);
+					}
+					
+					@Override
+					public Number getKey() throws InvalidDataAccessApiUsageException
+					{
+						throw new InvalidDataAccessApiUsageException("");
+					}
+				};
+			}
 			else
 				return null;
 		}
@@ -112,7 +109,35 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 		" order by time_stamp asc" +
 		" limit " + maxNr;
 	}
-	
+
+	@Override
+	protected List<EbMSAttachment> getAttachments(String messageId)
+	{
+		return jdbcTemplate.query(
+			"select name, content_id, content_type, content" + 
+			" from ebms_attachment" + 
+			" where message_id = ?" +
+			" and message_nr = 0" +
+			" order by order_nr",
+			new RowMapper<EbMSAttachment>()
+			{
+				@Override
+				public EbMSAttachment mapRow(ResultSet rs, int rowNum) throws SQLException
+				{
+					try
+					{
+						return EbMSAttachmentFactory.createCachedEbMSAttachment(rs.getString("name"),rs.getString("content_id"),rs.getString("content_type"),rs.getBinaryStream("content"));
+					}
+					catch (IOException e)
+					{
+						throw new EbMSProcessingException(e);
+					}
+				}
+			},
+			messageId
+		);
+	}
+
 	@Override
 	public void insertMessage(final Date timestamp, final Date persistTime, final EbMSMessage message, final EbMSMessageStatus status) throws DAOException
 	{
@@ -126,7 +151,7 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 					{
 						try
 						{
-							Key key = (Key)jdbcTemplate.query(
+							KeyHolder keyHolder = (KeyHolder)jdbcTemplate.query(
 								new PreparedStatementCreator()
 								{
 									@Override
@@ -194,7 +219,7 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 								},
 								new KeyExtractor()
 							);
-							insertAttachments(key,message.getAttachments());
+							insertAttachments(keyHolder,message.getAttachments());
 						}
 						catch (IOException e)
 						{
@@ -223,7 +248,7 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 					{
 						try
 						{
-							Key key = (Key)jdbcTemplate.query(
+							KeyHolder keyHolder = (KeyHolder)jdbcTemplate.query(
 								new PreparedStatementCreator()
 								{
 									@Override
@@ -277,7 +302,7 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 								new KeyExtractor()
 							);
 							if (storeAttachments)
-								insertAttachments(key,message.getAttachments());
+								insertAttachments(keyHolder,message.getAttachments());
 						}
 						catch (IOException e)
 						{
@@ -294,33 +319,6 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 		catch (TransactionException e)
 		{
 			throw new DAOException(e);
-		}
-	}
-
-	protected void insertAttachments(Key key, List<EbMSAttachment> attachments) throws InvalidDataAccessApiUsageException, DataAccessException, IOException
-	{
-		AtomicInteger orderNr = new AtomicInteger(0);
-		for (EbMSAttachment attachment: attachments)
-		{
-			jdbcTemplate.update
-			(
-				"insert into ebms_attachment (" +
-					"message_id," +
-					"message_nr," +
-					"order_nr," +
-					"name," +
-					"content_id," +
-					"content_type," +
-					"content" +
-				") values (?,?,?,?,?,?,?)",
-				key.getMessageId(),
-				key.getMessageNr(),
-				orderNr.getAndIncrement(),
-				attachment.getName(),
-				attachment.getContentId(),
-				attachment.getContentType(),
-				IOUtils.toByteArray(attachment.getInputStream())
-			);
 		}
 	}
 

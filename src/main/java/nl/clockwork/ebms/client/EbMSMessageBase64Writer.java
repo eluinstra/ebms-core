@@ -20,11 +20,10 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 
-import nl.clockwork.ebms.model.EbMSAttachment;
-
-import org.apache.commons.codec.binary.Base64InputStream;
-import org.apache.commons.io.IOUtils;
+import org.apache.commons.codec.binary.Base64OutputStream;
 import org.springframework.util.StringUtils;
+
+import nl.clockwork.ebms.model.EbMSAttachment;
 
 public class EbMSMessageBase64Writer extends EbMSMessageWriter
 {
@@ -35,24 +34,28 @@ public class EbMSMessageBase64Writer extends EbMSMessageWriter
 
 	protected void writeBinaryAttachment(String boundary, OutputStream outputStream, OutputStreamWriter writer, EbMSAttachment attachment) throws IOException
 	{
-		writer.write("\r\n");
-		writer.write("Content-Type: " + attachment.getContentType());
-		writer.write("\r\n");
-		if (!StringUtils.isEmpty(attachment.getName()))
+		try (EbMSAttachment a = attachment)
 		{
-			writer.write("Content-Disposition: attachment; filename=\"" + attachment.getName() + "\"");
 			writer.write("\r\n");
+			writer.write("Content-Type: " + attachment.getContentType());
+			writer.write("\r\n");
+			if (!StringUtils.isEmpty(attachment.getName()))
+			{
+				writer.write("Content-Disposition: attachment; filename=\"" + attachment.getName() + "\"");
+				writer.write("\r\n");
+			}
+			writer.write("Content-Transfer-Encoding: base64");
+			writer.write("\r\n");
+			writer.write("Content-ID: <" + attachment.getContentId() + ">");
+			writer.write("\r\n");
+			writer.write("\r\n");
+			writer.flush();
+			Base64OutputStream out = new Base64OutputStream(outputStream);
+			a.writeTo(out);
+			out.flush();
+			writer.write("\r\n");
+			writer.write("--");
+			writer.write(boundary);
 		}
-		writer.write("Content-Transfer-Encoding: base64");
-		writer.write("\r\n");
-		writer.write("Content-ID: <" + attachment.getContentId() + ">");
-		writer.write("\r\n");
-		writer.write("\r\n");
-		writer.flush();
-		Base64InputStream base64InputStream = new Base64InputStream(attachment.getInputStream(),true);
-		IOUtils.copy(base64InputStream,outputStream);
-		writer.write("\r\n");
-		writer.write("--");
-		writer.write(boundary);
 	}
 }

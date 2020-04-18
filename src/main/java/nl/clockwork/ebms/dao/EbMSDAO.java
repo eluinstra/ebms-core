@@ -27,6 +27,7 @@ import nl.clockwork.ebms.model.EbMSDocument;
 import nl.clockwork.ebms.model.EbMSEvent;
 import nl.clockwork.ebms.model.EbMSMessage;
 import nl.clockwork.ebms.model.EbMSMessageContent;
+import nl.clockwork.ebms.model.EbMSMessageContentMTOM;
 import nl.clockwork.ebms.model.EbMSMessageContext;
 import nl.clockwork.ebms.model.EbMSMessageEvent;
 import nl.clockwork.ebms.model.URLMapping;
@@ -56,6 +57,7 @@ public interface EbMSDAO
 	boolean existsMessage(String messageId) throws DAOException;
 	boolean existsIdenticalMessage(EbMSMessage message) throws DAOException;
 	Optional<EbMSMessageContent> getMessageContent(String messageId) throws DAOException;
+	Optional<EbMSMessageContentMTOM> getMessageContentMTOM(String messageId) throws DAOException;
 	Optional<EbMSMessageContext> getMessageContext(String messageId) throws DAOException;
 	Optional<EbMSMessageContext> getMessageContextByRefToMessageId(String cpaId, String refToMessageId, Service service, String...actions) throws DAOException;
 	Optional<Document> getDocument(String messageId) throws DAOException;
@@ -90,5 +92,4 @@ public interface EbMSDAO
 	void processEbMSMessageEvents(List<String> messageIds) throws DAOException;
 	
 	Optional<Date> getPersistTime(String messageId);
-
 }

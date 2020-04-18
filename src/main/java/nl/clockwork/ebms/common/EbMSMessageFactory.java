@@ -21,7 +21,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
-import javax.mail.util.ByteArrayDataSource;
 import javax.xml.bind.JAXBException;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.Duration;
@@ -50,14 +49,17 @@ import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.To;
 import org.xml.sax.SAXException;
 
 import nl.clockwork.ebms.Constants;
-import nl.clockwork.ebms.StreamUtils;
 import nl.clockwork.ebms.Constants.EbMSAction;
 import nl.clockwork.ebms.Constants.EbMSMessageStatus;
+import nl.clockwork.ebms.EbMSAttachmentFactory;
+import nl.clockwork.ebms.StreamUtils;
 import nl.clockwork.ebms.model.CacheablePartyId;
 import nl.clockwork.ebms.model.EbMSAttachment;
 import nl.clockwork.ebms.model.EbMSDataSource;
+import nl.clockwork.ebms.model.EbMSDataSourceMTOM;
 import nl.clockwork.ebms.model.EbMSMessage;
 import nl.clockwork.ebms.model.EbMSMessageContent;
+import nl.clockwork.ebms.model.EbMSMessageContentMTOM;
 import nl.clockwork.ebms.model.EbMSMessageContext;
 import nl.clockwork.ebms.model.EbMSPartyInfo;
 import nl.clockwork.ebms.model.FromPartyInfo;
@@ -247,10 +249,50 @@ public class EbMSMessageFactory
 	{
 		String contentId = ds.getContentId() == null ? UUID.randomUUID().toString() : ds.getContentId();
 		manifest.getReference().add(EbMSMessageUtils.createReference(contentId));
-		ByteArrayDataSource dataSource = new ByteArrayDataSource(ds.getContent(),ds.getContentType());
-		dataSource.setName(ds.getName());
-		EbMSAttachment e = new EbMSAttachment(dataSource,contentId);
-		return e;
+		return EbMSAttachmentFactory.createEbMSAttachment(ds.getName(),contentId,ds.getContentType(),ds.getContent());
+	}
+
+	public EbMSMessage createEbMSMessageMTOM(String cpaId, EbMSMessageContentMTOM content) throws EbMSProcessorException
+	{
+		try
+		{
+			EbMSMessage result = new EbMSMessage();
+			result.setMessageHeader(createMessageHeader(cpaId,content.getContext()));
+			result.setAckRequested(createAckRequested(cpaId,content.getContext()));
+			result.setSyncReply(createSyncReply(cpaId,content.getContext()));
+			if (content.getDataSources() != null && content.getDataSources().size() > 0)
+			{
+				Manifest manifest = EbMSMessageUtils.createManifest();
+				List<EbMSAttachment> attachments = new ArrayList<>();
+				content.getDataSources().forEach(ds -> attachments.add(createEbMSAttachmentMTOM(manifest,ds)));
+				result.setManifest(manifest);
+				result.setAttachments(attachments);
+			}
+			result.setMessage(EbMSMessageUtils.createSOAPMessage(result));
+			return result;
+		}
+		catch (JAXBException | SOAPException | SAXException | IOException | TransformerException e)
+		{
+			throw new EbMSProcessingException(e);
+		}
+		catch (DatatypeConfigurationException | ParserConfigurationException | TransformerFactoryConfigurationError e)
+		{
+			throw new EbMSProcessorException(e);
+		}
+	}
+
+	private EbMSAttachment createEbMSAttachmentMTOM(Manifest manifest, EbMSDataSourceMTOM ds)
+	{
+		try
+		{
+			String contentId = ds.getContentId() == null ? UUID.randomUUID().toString() : ds.getContentId();
+			manifest.getReference().add(EbMSMessageUtils.createReference(contentId));
+			return EbMSAttachmentFactory.createCachedEbMSAttachment(contentId,ds.getAttachment());
+		}
+		catch (IOException e)
+		{
+			throw new EbMSProcessingException(e);
+		}
 	}
 
 	private MessageHeader createMessageHeader(String cpaId, Party fromParty, Party toParty, String action)

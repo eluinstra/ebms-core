@@ -35,6 +35,7 @@ import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageHeader;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.transaction.TransactionException;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallbackWithoutResult;
@@ -72,7 +73,7 @@ public class EbMSDAOImpl extends nl.clockwork.ebms.dao.postgresql.EbMSDAOImpl
 					{
 						try
 						{
-							Key key = (Key)jdbcTemplate.query(
+							KeyHolder keyHolder = (KeyHolder)jdbcTemplate.query(
 								new PreparedStatementCreator()
 								{
 									@Override
@@ -140,7 +141,7 @@ public class EbMSDAOImpl extends nl.clockwork.ebms.dao.postgresql.EbMSDAOImpl
 								},
 								new KeyExtractor()
 							);
-							insertAttachments(key,message.getAttachments());
+							insertAttachments(keyHolder,message.getAttachments());
 						}
 						catch (IOException e)
 						{
@@ -169,7 +170,7 @@ public class EbMSDAOImpl extends nl.clockwork.ebms.dao.postgresql.EbMSDAOImpl
 					{
 						try
 						{
-							Key key = (Key)jdbcTemplate.query(
+							KeyHolder keyHolder = (KeyHolder)jdbcTemplate.query(
 								new PreparedStatementCreator()
 								{
 									@Override
@@ -223,7 +224,7 @@ public class EbMSDAOImpl extends nl.clockwork.ebms.dao.postgresql.EbMSDAOImpl
 								new KeyExtractor()
 							);
 							if (storeAttachments)
-								insertAttachments(key,message.getAttachments());
+								insertAttachments(keyHolder,message.getAttachments());
 						}
 						catch (IOException e)
 						{

@@ -31,6 +31,7 @@ import org.apache.commons.io.IOUtils;
 
 import nl.clockwork.ebms.processor.EbMSProcessingException;
 
+@Deprecated
 public class EbMSMessageAttachment implements Serializable
 {
 	private static final long serialVersionUID = 1L;

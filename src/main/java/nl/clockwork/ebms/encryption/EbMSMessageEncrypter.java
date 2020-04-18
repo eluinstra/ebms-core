@@ -17,7 +17,6 @@ package nl.clockwork.ebms.encryption;
 
 import java.io.IOException;
 import java.io.StringReader;
-import java.io.StringWriter;
 import java.security.GeneralSecurityException;
 import java.security.Key;
 import java.security.KeyStore;
@@ -34,7 +33,6 @@ import java.util.Enumeration;
 import java.util.List;
 
 import javax.crypto.SecretKey;
-import javax.mail.util.ByteArrayDataSource;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -48,6 +46,7 @@ import javax.xml.transform.stream.StreamResult;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.cxf.io.CachedOutputStream;
 import org.apache.xml.security.encryption.EncryptedData;
 import org.apache.xml.security.encryption.EncryptedKey;
 import org.apache.xml.security.encryption.XMLCipher;
@@ -62,6 +61,7 @@ import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
+import nl.clockwork.ebms.EbMSAttachmentFactory;
 import nl.clockwork.ebms.StreamUtils;
 import nl.clockwork.ebms.common.CPAManager;
 import nl.clockwork.ebms.common.KeyStoreManager;
@@ -191,11 +191,10 @@ public class EbMSMessageEncrypter implements InitializingBean
 			EncryptedKey encryptedKey = createEncryptedKey(document,certificate.getPublicKey(),secretKey);
 			setEncryptedData(document,xmlCipher,encryptedKey,certificate,attachment);
 			EncryptedData encryptedData = xmlCipher.encryptData(document,null,attachment.getInputStream());
-			StringWriter buffer = new StringWriter();
-			createTransformer().transform(new DOMSource(xmlCipher.martial(document,encryptedData)),new StreamResult(buffer));
-			ByteArrayDataSource ds = new ByteArrayDataSource(buffer.toString().getBytes("UTF-8"),"application/xml");
-			ds.setName(attachment.getName());
-			return new EbMSAttachment(ds,attachment.getContentId());
+			CachedOutputStream content = new CachedOutputStream();
+			createTransformer().transform(new DOMSource(xmlCipher.martial(document,encryptedData)),new StreamResult(content));
+			content.lockOutputStream();
+			return EbMSAttachmentFactory.createCachedEbMSAttachment(attachment.getName(),attachment.getContentId(),"application/xml",content);
 		}
 		catch (NoSuchAlgorithmException | XMLEncryptionException | TransformerConfigurationException | TransformerFactoryConfigurationError e)
 		{
