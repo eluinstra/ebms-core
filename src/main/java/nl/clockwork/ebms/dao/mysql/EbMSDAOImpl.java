@@ -281,7 +281,6 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 							ps.setString(3,a.getName());
 							ps.setString(4,a.getContentId());
 							ps.setString(5,a.getContentType());
-							//ps.setBytes(6,IOUtils.toByteArray(attachment.getInputStream()));
 							ps.setBlob(6,a.getInputStream());
 							return ps;
 						}
