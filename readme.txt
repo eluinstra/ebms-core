@@ -18,9 +18,9 @@ For the ebms-admin console see https://sourceforge.net/projects/javaebmsadmin/
 ===============
 ebms-core-2.16.5.jar:
 - optimized memory usage by using CachedOutputStream for attachments that overflows to disk:
-	- added property ebmsMessage.attachmentMemoryTreshold - default: 1MB 
-	- added property ebmsMessage.attachmentCipherTransformation - default: none
-	- added property ebmsMessage.attachment.outputDirectory - default: <tempDirectory>
+	- added property ebmsMessage.attachment.memoryTreshold - default: 128KB 
+	- added property ebmsMessage.attachment.outputDirectory - default: <tempDir>
+	- added property ebmsMessage.attachment.cipherTransformation - default: none
 
 ebms-core-2.16.4.jar:
 - fixed EbMSEventProcessor: the processor sometimes stops processing after an error occurs, so the ebms adapter stops sending messages
