@@ -17,6 +17,7 @@ package nl.clockwork.ebms.common;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -40,6 +41,7 @@ import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.Manifest;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageData;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageHeader;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageStatusType;
+import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.PartyId;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.Service;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.SeverityType;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.StatusRequest;
@@ -78,7 +80,7 @@ public class EbMSMessageFactory
 
 	public EbMSMessage createEbMSMessageError(String cpaId, EbMSMessage message, ErrorList errorList, Date timestamp) throws DatatypeConfigurationException, JAXBException
 	{
-		MessageHeader messageHeader = createMessageHeader(cpaId,message.getMessageHeader(),timestamp,EbMSAction.MESSAGE_ERROR);
+		MessageHeader messageHeader = createResponseMessageHeader(cpaId,message.getMessageHeader(),timestamp,EbMSAction.MESSAGE_ERROR);
 		if (errorList.getError().size() == 0)
 		{
 			errorList.getError().add(EbMSMessageUtils.createError(
@@ -97,7 +99,7 @@ public class EbMSMessageFactory
 	{
 		try
 		{
-			MessageHeader messageHeader = createMessageHeader(cpaId,message.getMessageHeader(),timestamp,EbMSAction.ACKNOWLEDGMENT);
+			MessageHeader messageHeader = createResponseMessageHeader(cpaId,message.getMessageHeader(),timestamp,EbMSAction.ACKNOWLEDGMENT);
 			
 			Acknowledgment acknowledgment = new Acknowledgment();
 
@@ -137,7 +139,7 @@ public class EbMSMessageFactory
 		try
 		{
 			EbMSMessage result = new EbMSMessage();
-			result.setMessageHeader(createMessageHeader(cpaId,fromParty,toParty,EbMSAction.PING.action()));
+			result.setMessageHeader(createMessageHeader(cpaId,fromParty,toParty,EbMSAction.PING));
 			result.setSyncReply(createSyncReply(cpaId,fromParty,EbMSAction.PING.action()));
 			result.setMessage(EbMSMessageUtils.createSOAPMessage(result));
 			return result;
@@ -157,7 +159,7 @@ public class EbMSMessageFactory
 		try
 		{
 			EbMSMessage result = new EbMSMessage();
-			result.setMessageHeader(createMessageHeader(cpaId,ping.getMessageHeader(),new Date(),EbMSAction.PONG));
+			result.setMessageHeader(createResponseMessageHeader(cpaId,ping.getMessageHeader(),new Date(),EbMSAction.PONG));
 			result.setMessage(EbMSMessageUtils.createSOAPMessage(result));
 			return result;
 		}
@@ -175,7 +177,7 @@ public class EbMSMessageFactory
 	{
 		try
 		{
-			MessageHeader messageHeader = createMessageHeader(cpaId,fromParty,toParty,EbMSAction.STATUS_REQUEST.action());
+			MessageHeader messageHeader = createMessageHeader(cpaId,fromParty,toParty,EbMSAction.STATUS_REQUEST);
 			StatusRequest statusRequest = EbMSMessageUtils.createStatusRequest(messageId);
 			EbMSMessage result = new EbMSMessage();
 			result.setMessageHeader(messageHeader);
@@ -198,7 +200,7 @@ public class EbMSMessageFactory
 	{
 		try
 		{
-			MessageHeader messageHeader = createMessageHeader(cpaId,request.getMessageHeader(),new Date(),EbMSAction.STATUS_RESPONSE);
+			MessageHeader messageHeader = createResponseMessageHeader(cpaId,request.getMessageHeader(),new Date(),EbMSAction.STATUS_RESPONSE);
 			StatusResponse statusResponse = createStatusResponse(request.getStatusRequest(),status,timestamp);
 			EbMSMessage result = new EbMSMessage();
 			result.setMessageHeader(messageHeader);
@@ -295,7 +297,23 @@ public class EbMSMessageFactory
 		}
 	}
 
-	private MessageHeader createMessageHeader(String cpaId, Party fromParty, Party toParty, String action)
+	private MessageHeader createMessageHeader(String cpaId, String conversationId, From from, To to, Service service, String action, MessageData messageData, PerMessageCharacteristicsType duplicateElimination)
+	{
+		MessageHeader messageHeader = new MessageHeader();
+		messageHeader.setVersion(Constants.EBMS_VERSION);
+		messageHeader.setMustUnderstand(true);
+		messageHeader.setCPAId(cpaId);
+		messageHeader.setConversationId(conversationId);
+		messageHeader.setFrom(from);
+		messageHeader.setTo(to);
+		messageHeader.setService(service);
+		messageHeader.setAction(action);
+		messageHeader.setMessageData(messageData);
+		messageHeader.setDuplicateElimination(PerMessageCharacteristicsType.ALWAYS.equals(duplicateElimination) ? "" : null);
+		return messageHeader;
+	}
+
+	private MessageHeader createMessageHeader(String cpaId, Party fromParty, Party toParty, EbMSAction action)
 	{
 		EbMSPartyInfo fromPartyInfo = cpaManager.getEbMSPartyInfo(cpaId,fromParty)
 				.orElseThrow(() -> StreamUtils.illegalStateException("EbMSPartyInfo",cpaId,fromParty));
@@ -303,44 +321,15 @@ public class EbMSMessageFactory
 				.orElseThrow(() -> StreamUtils.illegalStateException("EbMSPartyInfo",cpaId,toParty));
 		CacheablePartyId partyId = new CacheablePartyId(fromPartyInfo.getPartyIds());
 		String hostname = CPAUtils.getHostname(
-				cpaManager.getDefaultDeliveryChannel(cpaId,partyId,action)
+				cpaManager.getDefaultDeliveryChannel(cpaId,partyId,action.action())
 				.orElseThrow(() -> StreamUtils.illegalStateException("DefaultDeliveryChannel",cpaId,partyId,action)));
 		String conversationId = ebMSIdGenerator.generateConversationId();
+		From from = createForm(fromPartyInfo.getPartyIds(),fromPartyInfo.getRole());
+		To to = createTo(toPartyInfo.getPartyIds(),toPartyInfo.getRole());
+		Service service = createService(null,Constants.EBMS_SERVICE_URI);
 		String messageId = ebMSIdGenerator.createMessageId(hostname,conversationId);
-
-		MessageHeader messageHeader = new MessageHeader();
-
-		messageHeader.setVersion(Constants.EBMS_VERSION);
-		messageHeader.setMustUnderstand(true);
-
-		messageHeader.setCPAId(cpaId);
-		messageHeader.setConversationId(conversationId);
-		
-		messageHeader.setFrom(new From());
-		messageHeader.getFrom().getPartyId().addAll(fromPartyInfo.getPartyIds());
-		if (cleoPatch)
-			messageHeader.getFrom().setRole(fromParty.getRole());
-
-		messageHeader.setTo(new To());
-		messageHeader.getTo().getPartyId().addAll(toPartyInfo.getPartyIds());
-		if (cleoPatch)
-			messageHeader.getTo().setRole(toParty.getRole());
-		
-		messageHeader.setService(new Service());
-		messageHeader.getService().setType(null);
-		messageHeader.getService().setValue(Constants.EBMS_SERVICE_URI);
-		messageHeader.setAction(action);
-
-		messageHeader.setMessageData(new MessageData());
-		messageHeader.getMessageData().setMessageId(messageId);
-		//messageHeader.getMessageData().setRefToMessageId(null);
-		messageHeader.getMessageData().setTimestamp(new Date());
-
-		//setTimeToLive(cpa,deliveryChannel,messageHeader);
-
-		//messageHeader.setDuplicateElimination(PerMessageCharacteristicsType.ALWAYS.equals(deliveryChannel.getMessagingCharacteristics().getDuplicateElimination()) ? "" : null);
-		
-		return messageHeader;
+		MessageData messageData = createMessageData(messageId,null,new Date(),null);
+		return createMessageHeader(cpaId,conversationId,from,to,service,action.action(),messageData,null); //deliveryChannel.getMessagingCharacteristics().getDuplicateElimination()
 	}
 
 	private MessageHeader createMessageHeader(String cpaId, EbMSMessageContext context) throws DatatypeConfigurationException
@@ -353,90 +342,77 @@ public class EbMSMessageFactory
 		DeliveryChannel deliveryChannel = CPAUtils.getDeliveryChannel(fromPartyInfo.getCanSend().getThisPartyActionBinding());
 		String hostname = CPAUtils.getHostname(deliveryChannel);
 		String conversationId = context.getConversationId() == null ? ebMSIdGenerator.generateConversationId() : context.getConversationId();
+		From from = createForm(fromPartyInfo.getPartyIds(),fromPartyInfo.getRole());
+		To to = createTo(toPartyInfo.getPartyIds(),toPartyInfo.getRole());
+		Service service = createService(fromPartyInfo.getService().getType(),fromPartyInfo.getService().getValue());
+		String action = fromPartyInfo.getCanSend().getThisPartyActionBinding().getAction();
 		String messageId = ebMSIdGenerator.createMessageId(hostname,conversationId,context.getMessageId());
-
-		MessageHeader messageHeader = new MessageHeader();
-
-		messageHeader.setVersion(Constants.EBMS_VERSION);
-		messageHeader.setMustUnderstand(true);
-
-		messageHeader.setCPAId(cpaId);
-		messageHeader.setConversationId(context.getConversationId() != null ? context.getConversationId() : conversationId);
-		
-		messageHeader.setFrom(new From());
-		messageHeader.getFrom().getPartyId().addAll(fromPartyInfo.getPartyIds());
-		messageHeader.getFrom().setRole(fromPartyInfo.getRole());
-
-		messageHeader.setTo(new To());
-		messageHeader.getTo().getPartyId().addAll(toPartyInfo.getPartyIds());
-		messageHeader.getTo().setRole(toPartyInfo.getRole());
-		
-		messageHeader.setService(new Service());
-		messageHeader.getService().setType(fromPartyInfo.getService().getType());
-		messageHeader.getService().setValue(fromPartyInfo.getService().getValue());
-		messageHeader.setAction(fromPartyInfo.getCanSend().getThisPartyActionBinding().getAction());
-
-		messageHeader.setMessageData(new MessageData());
-		messageHeader.getMessageData().setMessageId(messageId);
-		messageHeader.getMessageData().setRefToMessageId(context.getRefToMessageId());
-		messageHeader.getMessageData().setTimestamp(new Date());
-
-		setTimeToLive(deliveryChannel,messageHeader);
-
-		messageHeader.setDuplicateElimination(
-				PerMessageCharacteristicsType.ALWAYS.equals(deliveryChannel.getMessagingCharacteristics().getDuplicateElimination()) ? "" : null);
-		
-		return messageHeader;
+		Date timestamp = new Date();
+		Date timeToLive = createTimeToLive(deliveryChannel,timestamp);
+		MessageData messageData = createMessageData(messageId,context.getRefToMessageId(),timestamp,timeToLive);
+		return createMessageHeader(cpaId,conversationId,from,to,service,action,messageData,deliveryChannel.getMessagingCharacteristics().getDuplicateElimination());
 	}
 
-	private MessageHeader createMessageHeader(String cpaId, MessageHeader messageHeader, Date timestamp, EbMSAction action) throws DatatypeConfigurationException, JAXBException
+	private MessageHeader createResponseMessageHeader(String cpaId, MessageHeader messageHeader, Date timestamp, EbMSAction action) throws DatatypeConfigurationException, JAXBException
 	{
 		CacheablePartyId partyId = new CacheablePartyId(messageHeader.getTo().getPartyId());
-		DeliveryChannel deliveryChannel = cpaManager.getDefaultDeliveryChannel(cpaId,partyId,action.action())
-				.orElse(null);
+		DeliveryChannel deliveryChannel = cpaManager.getDefaultDeliveryChannel(cpaId,partyId,action.action()).orElse(null);
 		String hostname = CPAUtils.getHostname(deliveryChannel);
+		From from = createForm(messageHeader.getTo().getPartyId(),cleoPatch ? messageHeader.getTo().getRole() : null);
+		To to = createTo(messageHeader.getFrom().getPartyId(),cleoPatch ? messageHeader.getFrom().getRole() : null);
+		Service service = createService(null,Constants.EBMS_SERVICE_URI);
+		String messageId = ebMSIdGenerator.generateMessageId(hostname);
+		MessageData messageData = createMessageData(messageId,messageHeader.getMessageData().getMessageId(),timestamp,null);
+		return createMessageHeader(messageHeader.getCPAId(),messageHeader.getConversationId(),from,to,service,action.action(),messageData,null);
+	}
 
-		MessageHeader result = JAXBParser.deepCopy(messageHeader);
-
-		result.getFrom().getPartyId().clear();
-		result.getFrom().getPartyId().addAll(messageHeader.getTo().getPartyId());
-		if (cleoPatch)
-			result.getFrom().setRole(messageHeader.getTo().getRole());
-		else
-			result.getFrom().setRole(null);
-
-		result.getTo().getPartyId().clear();
-		result.getTo().getPartyId().addAll(messageHeader.getFrom().getPartyId());
-		if (cleoPatch)
-			result.getTo().setRole(messageHeader.getFrom().getRole());
-		else
-			result.getTo().setRole(null);
-
-		result.getMessageData().setRefToMessageId(messageHeader.getMessageData().getMessageId());
-		result.getMessageData().setMessageId(ebMSIdGenerator.generateMessageId(hostname));
-		result.getMessageData().setTimestamp(timestamp);
-		result.getMessageData().setTimeToLive(null);
-
-		result.setService(new Service());
-		result.getService().setValue(Constants.EBMS_SERVICE_URI);
-		result.setAction(action.action());
-
-		result.setDuplicateElimination(null);
-
+	private From createForm(Collection<? extends PartyId> partyIds, String role)
+	{
+		From result = new From();
+		result.getPartyId().addAll(partyIds);
+		result.setRole(role);
 		return result;
 	}
 
-	private void setTimeToLive(DeliveryChannel deliveryChannel, MessageHeader messageHeader) throws DatatypeConfigurationException
+	private To createTo(List<PartyId> partyIds, String role)
+	{
+		To result = new To();
+		result.getPartyId().addAll(partyIds);
+		result.setRole(role);
+		return result;
+	}
+
+	private Service createService(String type, String value)
+	{
+		Service result = new Service();
+		result.setType(type);
+		result.setValue(value);
+		return result;
+	}
+
+	private MessageData createMessageData(String messageId, String refToMessageId, Date timestamp, Date timeToLive)
+	{
+		MessageData result = new MessageData();
+		result.setMessageId(messageId);
+		result.setRefToMessageId(refToMessageId);
+		result.setTimestamp(timestamp);
+		result.setTimeToLive(timeToLive);
+		return result;
+	}
+
+	private Date createTimeToLive(DeliveryChannel deliveryChannel, Date date) throws DatatypeConfigurationException
 	{
 		if (CPAUtils.isReliableMessaging(deliveryChannel))
 		{
 			Duration duration = CPAUtils.getSenderReliableMessaging(deliveryChannel)
 					.getRetryInterval()
 					.multiply(CPAUtils.getSenderReliableMessaging(deliveryChannel).getRetries().intValue() + 1);
-			Date timestamp = (Date)messageHeader.getMessageData().getTimestamp().clone();
-			duration.addTo(timestamp);
-			messageHeader.getMessageData().setTimeToLive(timestamp);
+			Date result = (Date)date.clone();
+			duration.addTo(result);
+			return result;
 		}
+		else
+			return null;
 	}
 
 	private AckRequested createAckRequested(String cpaId, EbMSMessageContext context)
