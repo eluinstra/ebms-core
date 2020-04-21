@@ -95,6 +95,21 @@ public class JMSTextEventListener implements EventListener
 	}
 
 	@Override
+	public void onMessageProcessed(String messageId) throws EventException
+	{
+		try
+		{
+			logger.info("Message " + messageId + " processed");
+			ebMSDAO.getMessageContext(messageId)
+					.ifPresent(mc -> jmsTemplate.send(destinations.get(EbMSMessageEventType.PROCESSED.name()),new EventMessageCreator(mc)));
+		}
+		catch (JmsException e)
+		{
+			throw new EventException(e);
+		}
+	}
+
+	@Override
 	public void onMessageDelivered(String messageId) throws EventException
 	{
 		try

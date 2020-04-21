@@ -43,6 +43,13 @@ public class DAOEventListener implements EventListener
 	}
 
 	@Override
+	public void onMessageProcessed(String messageId) throws EventException
+	{
+		logger.info("Message " + messageId + " processed");
+		ebMSDAO.insertEbMSMessageEvent(messageId,EbMSMessageEventType.PROCESSED);
+	}
+
+	@Override
 	public void onMessageDelivered(String messageId) throws EventException
 	{
 		logger.info("Message " + messageId + " delivered");

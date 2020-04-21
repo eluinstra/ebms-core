@@ -36,6 +36,7 @@ import nl.clockwork.ebms.common.EbMSMessageFactory;
 import nl.clockwork.ebms.dao.DAOException;
 import nl.clockwork.ebms.dao.DAOTransactionCallback;
 import nl.clockwork.ebms.dao.EbMSDAO;
+import nl.clockwork.ebms.event.listener.EventListener;
 import nl.clockwork.ebms.event.processor.EventManager;
 import nl.clockwork.ebms.model.CacheablePartyId;
 import nl.clockwork.ebms.model.EbMSMessage;
@@ -62,6 +63,7 @@ public class EbMSMessageServiceImpl implements InitializingBean, EbMSMessageServ
 	protected EventManager eventManager;
 	protected EbMSMessageContextValidator ebMSMessageContextValidator;
 	protected EbMSSignatureGenerator signatureGenerator;
+	protected EventListener eventListener;
 	protected boolean deleteEbMSAttachmentsOnMessageProcessed;
 
 	@Override
@@ -193,9 +195,9 @@ public class EbMSMessageServiceImpl implements InitializingBean, EbMSMessageServ
 				@Override
 				public void doInTransaction() throws DAOException
 				{
-					ebMSDAO.updateMessage(messageId,EbMSMessageStatus.RECEIVED,EbMSMessageStatus.PROCESSED);
-					if (deleteEbMSAttachmentsOnMessageProcessed)
-						ebMSDAO.deleteAttachments(messageId);
+					if (ebMSDAO.updateMessage(messageId,EbMSMessageStatus.RECEIVED,EbMSMessageStatus.PROCESSED) > 0)
+					{
+						eventListener.onMessageProcessed(messageId);
 						if (deleteEbMSAttachmentsOnMessageProcessed)
 							ebMSDAO.deleteAttachments(messageId);
 					}

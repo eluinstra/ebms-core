@@ -79,6 +79,20 @@ public class SimpleJMSEventListener implements EventListener
 	}
 
 	@Override
+	public void onMessageProcessed(String messageId) throws EventException
+	{
+		try
+		{
+			logger.info("Message " + messageId + " processed");
+			jmsTemplate.send(destinations.get(EbMSMessageEventType.PROCESSED.name()),new EventMessageCreator(messageId));
+		}
+		catch (JmsException e)
+		{
+			throw new EventException(e);
+		}
+	}
+
+	@Override
 	public void onMessageDelivered(String messageId) throws EventException
 	{
 		try

@@ -187,7 +187,7 @@ public class Constants
 
 	public enum EbMSMessageEventType
 	{
-		RECEIVED,DELIVERED,FAILED,EXPIRED;
+		RECEIVED,DELIVERED,FAILED,EXPIRED,PROCESSED;
 		
 		public static Stream<EbMSMessageEventType> stream()
 		{
