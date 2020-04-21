@@ -22,7 +22,6 @@ public class EbMSDAOFactory extends AbstractDAOFactory<EbMSDAO>
 {
 	protected TransactionTemplate transactionTemplate;
 	protected JdbcTemplate jdbcTemplate;
-	private boolean identifyServer;
 	private String serverId;
 
 	@Override
@@ -34,37 +33,37 @@ public class EbMSDAOFactory extends AbstractDAOFactory<EbMSDAO>
 	@Override
 	public EbMSDAO createHSqlDbDAO()
 	{
-		return new nl.clockwork.ebms.dao.hsqldb.EbMSDAOImpl(transactionTemplate,jdbcTemplate,identifyServer,serverId);
+		return new nl.clockwork.ebms.dao.hsqldb.EbMSDAOImpl(transactionTemplate,jdbcTemplate,serverId);
 	}
 
 	@Override
 	public EbMSDAO createMySqlDAO()
 	{
-		return new nl.clockwork.ebms.dao.mysql.EbMSDAOImpl(transactionTemplate,jdbcTemplate,identifyServer,serverId);
+		return new nl.clockwork.ebms.dao.mysql.EbMSDAOImpl(transactionTemplate,jdbcTemplate,serverId);
 	}
 
 	@Override
 	public EbMSDAO createPostgresDAO()
 	{
-		return new nl.clockwork.ebms.dao.postgresql.EbMSDAOImpl(transactionTemplate,jdbcTemplate,identifyServer,serverId);
+		return new nl.clockwork.ebms.dao.postgresql.EbMSDAOImpl(transactionTemplate,jdbcTemplate,serverId);
 	}
 
 	@Override
 	public EbMSDAO createOracleDAO()
 	{
-		return new nl.clockwork.ebms.dao.oracle.EbMSDAOImpl(transactionTemplate,jdbcTemplate,identifyServer,serverId);
+		return new nl.clockwork.ebms.dao.oracle.EbMSDAOImpl(transactionTemplate,jdbcTemplate,serverId);
 	}
 
 	@Override
 	public EbMSDAO createMsSqlDAO()
 	{
-		return new nl.clockwork.ebms.dao.mssql.EbMSDAOImpl(transactionTemplate,jdbcTemplate,identifyServer,serverId);
+		return new nl.clockwork.ebms.dao.mssql.EbMSDAOImpl(transactionTemplate,jdbcTemplate,serverId);
 	}
 
 	@Override
 	public EbMSDAO createDB2DAO()
 	{
-		return new nl.clockwork.ebms.dao.db2.EbMSDAOImpl(transactionTemplate,jdbcTemplate,identifyServer,serverId);
+		return new nl.clockwork.ebms.dao.db2.EbMSDAOImpl(transactionTemplate,jdbcTemplate,serverId);
 	}
 
 	public void setTransactionTemplate(TransactionTemplate transactionTemplate)
@@ -75,11 +74,6 @@ public class EbMSDAOFactory extends AbstractDAOFactory<EbMSDAO>
 	public void setJdbcTemplate(JdbcTemplate jdbcTemplate)
 	{
 		this.jdbcTemplate = jdbcTemplate;
-	}
-
-	public void setIdentifyServer(boolean identifyServer)
-	{
-		this.identifyServer = identifyServer;
 	}
 
 	public void setServerId(String serverId)

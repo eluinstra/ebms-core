@@ -19,10 +19,6 @@ import java.util.UUID;
 
 public class EbMSIdGenerator
 {
-	public EbMSIdGenerator(String serverId)
-	{
-	}
-
 	public String generateConversationId()
 	{
 		return UUID.randomUUID().toString();

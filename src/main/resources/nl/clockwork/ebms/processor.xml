@@ -82,9 +82,7 @@
 		<property name="messageProcessor" ref="messageProcessor"/>
 	</bean>
 
-	<bean id="ebMSIdGenerator" class="nl.clockwork.ebms.common.EbMSIdGenerator">
-		<constructor-arg name="serverId" value="${ebms.serverId}"/>
-	</bean>
+	<bean id="ebMSIdGenerator" class="nl.clockwork.ebms.common.EbMSIdGenerator"/>
 
 	<bean id="messageValidator" class="nl.clockwork.ebms.validation.EbMSMessageValidator">
 		<property name="ebMSDAO" ref="ebMSDAO"/>

@@ -63,7 +63,6 @@
 		<property name="dataSource" ref="ebMSDataSource"/>
 		<property name="transactionTemplate" ref="ebMSTransactionTemplate"/>
 		<property name="jdbcTemplate" ref="ebMSJdbcTemplate"/>
-		<property name="identifyServer" value="${ebms.allowMultipleServers}"/>
 		<property name="serverId" value="${ebms.serverId}"/>
 	</bean>
 

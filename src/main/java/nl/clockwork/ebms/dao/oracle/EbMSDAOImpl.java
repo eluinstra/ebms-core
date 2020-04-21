@@ -24,9 +24,9 @@ import org.springframework.transaction.support.TransactionTemplate;
 
 public class EbMSDAOImpl extends AbstractEbMSDAO
 {
-	public EbMSDAOImpl(TransactionTemplate transactionTemplate, JdbcTemplate jdbcTemplate, boolean identifyServer, String serverId)
+	public EbMSDAOImpl(TransactionTemplate transactionTemplate, JdbcTemplate jdbcTemplate, String serverId)
 	{
-		super(transactionTemplate,jdbcTemplate,identifyServer,serverId);
+		super(transactionTemplate,jdbcTemplate,serverId);
 	}
 
 	@Override

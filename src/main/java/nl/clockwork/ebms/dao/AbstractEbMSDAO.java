@@ -83,11 +83,11 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	protected JdbcTemplate jdbcTemplate;
 	protected String serverId;
 	
-	public AbstractEbMSDAO(TransactionTemplate transactionTemplate, JdbcTemplate jdbcTemplate, boolean identifyServer, String serverId)
+	public AbstractEbMSDAO(TransactionTemplate transactionTemplate, JdbcTemplate jdbcTemplate, String serverId)
 	{
 		this.transactionTemplate = transactionTemplate;
 		this.jdbcTemplate = jdbcTemplate;
-		if (identifyServer)
+		if (StringUtils.isNotBlank(serverId))
 			this.serverId = serverId;
 	}
 
