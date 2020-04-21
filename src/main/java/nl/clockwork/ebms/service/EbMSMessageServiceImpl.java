@@ -196,28 +196,9 @@ public class EbMSMessageServiceImpl implements InitializingBean, EbMSMessageServ
 					ebMSDAO.updateMessage(messageId,EbMSMessageStatus.RECEIVED,EbMSMessageStatus.PROCESSED);
 					if (deleteEbMSAttachmentsOnMessageProcessed)
 						ebMSDAO.deleteAttachments(messageId);
-				}
-			});
-		}
-		catch (DAOException e)
-		{
-			throw new EbMSMessageServiceException(e);
-		}
-	}
-
-	@Override
-	public void processMessages(final List<String> messageIds) throws EbMSMessageServiceException
-	{
-		try
-		{
-			ebMSDAO.executeTransaction(new DAOTransactionCallback()
-			{
-				@Override
-				public void doInTransaction() throws DAOException
-				{
-					ebMSDAO.updateMessages(messageIds,EbMSMessageStatus.RECEIVED,EbMSMessageStatus.PROCESSED);
-					if (deleteEbMSAttachmentsOnMessageProcessed)
-						ebMSDAO.deleteAttachments(messageIds);
+						if (deleteEbMSAttachmentsOnMessageProcessed)
+							ebMSDAO.deleteAttachments(messageId);
+					}
 				}
 			});
 		}
@@ -324,27 +305,6 @@ public class EbMSMessageServiceImpl implements InitializingBean, EbMSMessageServ
 				{
 					ebMSDAO.processEbMSMessageEvent(messageId);
 					processMessage(messageId);
-				}
-			});
-		}
-		catch (DAOException e)
-		{
-			throw new EbMSMessageServiceException(e);
-		}
-	}
-
-	@Override
-	public void processMessageEvents(final List<String> messageIds) throws EbMSMessageServiceException
-	{
-		try
-		{
-			ebMSDAO.executeTransaction(new DAOTransactionCallback()
-			{
-				@Override
-				public void doInTransaction() throws DAOException
-				{
-					ebMSDAO.processEbMSMessageEvents(messageIds);
-					processMessages(messageIds);
 				}
 			});
 		}

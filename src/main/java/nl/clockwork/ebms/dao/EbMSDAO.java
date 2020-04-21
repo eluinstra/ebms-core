@@ -73,10 +73,8 @@ public interface EbMSDAO
 	void insertMessage(Date timestamp, Date persistTime, EbMSMessage message, EbMSMessageStatus status) throws DAOException;
 	void insertDuplicateMessage(Date timestamp, EbMSMessage message, boolean storeAttachments) throws DAOException;
 	int updateMessage(String messageId, EbMSMessageStatus oldStatus, EbMSMessageStatus newStatus) throws DAOException;
-	void updateMessages(List<String> messageIds, EbMSMessageStatus oldStatus, EbMSMessageStatus newStatus) throws DAOException;
 
 	void deleteAttachments(String messageId);
-	void deleteAttachments(List<String> messageIds);
 
 	List<EbMSEvent> getEventsBefore(Date timestamp) throws DAOException;
 	List<EbMSEvent> getEventsBefore(Date timestamp, int maxNr) throws DAOException;
@@ -89,7 +87,6 @@ public interface EbMSDAO
 	List<EbMSMessageEvent> getEbMSMessageEvents(EbMSMessageContext messageContext, EbMSMessageEventType[] types, int maxNr) throws DAOException;
 	void insertEbMSMessageEvent(String messageId, EbMSMessageEventType eventType) throws DAOException;
 	int processEbMSMessageEvent(String messageId) throws DAOException;
-	void processEbMSMessageEvents(List<String> messageIds) throws DAOException;
 	
 	Optional<Date> getPersistTime(String messageId);
 }

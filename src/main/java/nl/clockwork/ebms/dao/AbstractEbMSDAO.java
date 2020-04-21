@@ -42,7 +42,6 @@ import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.Service;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
-import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.RowMapper;
@@ -1020,46 +1019,6 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	}
 
 	@Override
-	public void updateMessages(final List<String> messageIds, final EbMSMessageStatus oldStatus, final EbMSMessageStatus newStatus) throws DAOException
-	{
-		try
-		{
-			jdbcTemplate.batchUpdate(
-					"update ebms_message" +
-					" set status = ?," +
-					" status_time = ?" +
-					" where message_id = ?" +
-					" and message_nr = 0" +
-					" and status = ?",
-					new BatchPreparedStatementSetter()
-					{
-						@Override
-						public void setValues(PreparedStatement ps, int row) throws SQLException
-						{
-							ps.setInt(1,newStatus.id());
-							ps.setTimestamp(2,new Timestamp(new Date().getTime()));
-							ps.setString(3,messageIds.get(row));
-							if (oldStatus == null)
-								ps.setNull(4,java.sql.Types.INTEGER);
-							else
-								ps.setInt(4,oldStatus.id());
-						}
-
-						@Override
-						public int getBatchSize()
-						{
-							return messageIds.size();
-						}
-					}
-			);
-		}
-		catch (DataAccessException e)
-		{
-			throw new DAOException(e);
-		}
-	}
-
-	@Override
 	public void deleteAttachments(String messageId)
 	{
 		try
@@ -1068,36 +1027,6 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 				"delete from ebms_attachment" +
 				" where message_id = ?",
 				messageId
-			);
-		}
-		catch (DataAccessException e)
-		{
-			throw new DAOException(e);
-		}
-	}
-
-	@Override
-	public void deleteAttachments(final List<String> messageIds)
-	{
-		try
-		{
-			jdbcTemplate.batchUpdate(
-				"delete from ebms_attachment" +
-				" where message_id = ?",
-				new BatchPreparedStatementSetter()
-				{
-					@Override
-					public void setValues(PreparedStatement ps, int row) throws SQLException
-					{
-						ps.setString(1,messageIds.get(row));
-					}
-
-					@Override
-					public int getBatchSize()
-					{
-						return messageIds.size();
-					}
-				}
 			);
 		}
 		catch (DataAccessException e)
@@ -1359,37 +1288,6 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 				" set processed = 1" +
 				" where message_id = ?",
 				messageId
-			);
-		}
-		catch (DataAccessException e)
-		{
-			throw new DAOException(e);
-		}
-	}
-
-	@Override
-	public void processEbMSMessageEvents(final List<String> messageIds) throws DAOException
-	{
-		try
-		{
-			jdbcTemplate.batchUpdate(
-				"update ebms_message_event" +
-				" set procesed = 1," +
-				" where message_id = ?",
-				new BatchPreparedStatementSetter()
-				{
-					@Override
-					public void setValues(PreparedStatement ps, int row) throws SQLException
-					{
-						ps.setString(1,messageIds.get(row));
-					}
-
-					@Override
-					public int getBatchSize()
-					{
-						return messageIds.size();
-					}
-				}
 			);
 		}
 		catch (DataAccessException e)

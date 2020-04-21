@@ -114,15 +114,6 @@ public interface EbMSMessageService
 	void processMessage(@WebParam(name="MessageId") @XmlElement(required=true) String messageId) throws EbMSMessageServiceException;
 
 	/**
-	 * see processMessage, but for a list of messageIds
-	 * 
-	 * @param messageIds
-	 * @throws EbMSMessageServiceException
-	 */
-	@WebMethod(operationName="ProcessMessages")
-	void processMessages(@WebParam(name="MessageId") @XmlElement(required=true) List<String> messageIds) throws EbMSMessageServiceException;
-
-	/**
 	 * Gets the message status of the message identified by messageId
 	 * 
 	 * @param messageId
@@ -173,12 +164,4 @@ public interface EbMSMessageService
 	@WebMethod(operationName="ProcessMessageEvent")
 	void processMessageEvent(@WebParam(name="MessageId") @XmlElement(required=true) String messageId) throws EbMSMessageServiceException;
 
-	/**
-	 * See processMessageEvent, but then for a list of messageIds
-	 * 
-	 * @param messageIds
-	 * @throws EbMSMessageServiceException
-	 */
-	@WebMethod(operationName="ProcessMessageEvents")
-	void processMessageEvents(@WebParam(name="MessageId") @XmlElement(required=true) List<String> messageIds) throws EbMSMessageServiceException;
 }
