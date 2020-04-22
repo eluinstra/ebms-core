@@ -37,13 +37,13 @@ import nl.clockwork.ebms.validation.ClientCertificateManager;
 public class ClientCertificateManagerFilter implements Filter
 {
 	private String x509CertificateHeader;
-	private boolean useX509CertificateHeader;
+	private boolean useX509Certificate;
 
 	@Override
 	public void init(FilterConfig filterConfig) throws ServletException
 	{
 		x509CertificateHeader = filterConfig.getInitParameter("x509CertificateHeader");
-		useX509CertificateHeader = StringUtils.isEmpty(x509CertificateHeader);
+		useX509Certificate = StringUtils.isEmpty(x509CertificateHeader);
 	}
 
 	@Override
@@ -51,7 +51,7 @@ public class ClientCertificateManagerFilter implements Filter
 	{
 		try
 		{
-			if (useX509CertificateHeader)
+			if (useX509Certificate)
 			{
 				X509Certificate[] certificates = (X509Certificate[])request.getAttribute("javax.servlet.request.X509Certificate");
 				ClientCertificateManager.setCertificate(certificates != null && certificates.length > 0 ? certificates[0] : null);
