@@ -74,7 +74,6 @@ import nl.clockwork.ebms.util.EbMSMessageUtils;
 
 public class EbMSMessageFactory
 {
-	private boolean cleoPatch;
 	private CPAManager cpaManager;
 	private EbMSIdGenerator ebMSIdGenerator;
 
@@ -324,8 +323,8 @@ public class EbMSMessageFactory
 				cpaManager.getDefaultDeliveryChannel(cpaId,partyId,action.action())
 				.orElseThrow(() -> StreamUtils.illegalStateException("DefaultDeliveryChannel",cpaId,partyId,action)));
 		String conversationId = ebMSIdGenerator.generateConversationId();
-		From from = createForm(fromPartyInfo.getPartyIds(),fromPartyInfo.getRole());
-		To to = createTo(toPartyInfo.getPartyIds(),toPartyInfo.getRole());
+		From from = createForm(fromPartyInfo.getPartyIds(),null);
+		To to = createTo(toPartyInfo.getPartyIds(),null);
 		Service service = createService(null,Constants.EBMS_SERVICE_URI);
 		String messageId = ebMSIdGenerator.createMessageId(hostname,conversationId);
 		MessageData messageData = createMessageData(messageId,null,new Date(),null);
@@ -358,8 +357,8 @@ public class EbMSMessageFactory
 		CacheablePartyId partyId = new CacheablePartyId(messageHeader.getTo().getPartyId());
 		DeliveryChannel deliveryChannel = cpaManager.getDefaultDeliveryChannel(cpaId,partyId,action.action()).orElse(null);
 		String hostname = CPAUtils.getHostname(deliveryChannel);
-		From from = createForm(messageHeader.getTo().getPartyId(),cleoPatch ? messageHeader.getTo().getRole() : null);
-		To to = createTo(messageHeader.getFrom().getPartyId(),cleoPatch ? messageHeader.getFrom().getRole() : null);
+		From from = createForm(messageHeader.getTo().getPartyId(),null);
+		To to = createTo(messageHeader.getFrom().getPartyId(),null);
 		Service service = createService(null,Constants.EBMS_SERVICE_URI);
 		String messageId = ebMSIdGenerator.generateMessageId(hostname);
 		MessageData messageData = createMessageData(messageId,messageHeader.getMessageData().getMessageId(),timestamp,null);
@@ -463,11 +462,6 @@ public class EbMSMessageFactory
 				response.setTimestamp(timestamp);
 		}
 		return response;
-	}
-
-	public void setCleoPatch(boolean cleoPatch)
-	{
-		this.cleoPatch = cleoPatch;
 	}
 
 	public void setCpaManager(CPAManager cpaManager)

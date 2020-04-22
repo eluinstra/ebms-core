@@ -151,7 +151,6 @@ public class SigningTest
 		EbMSMessageFactory result = new EbMSMessageFactory();
 		result.setEbMSIdGenerator(new EbMSIdGenerator());
 		result.setCpaManager(cpaManager);
-		result.setCleoPatch(false);
 		return result;
 	}
 
