@@ -3,17 +3,16 @@ package nl.clockwork.ebms.security;
 import org.springframework.beans.factory.FactoryBean;
 
 import lombok.AccessLevel;
-import lombok.EqualsAndHashCode;
+import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import lombok.ToString;
 import lombok.val;
 import lombok.experimental.FieldDefaults;
+import lombok.experimental.NonFinal;
 
 @FieldDefaults(level=AccessLevel.PRIVATE, makeFinal=true)
+@AllArgsConstructor
 @RequiredArgsConstructor
-@EqualsAndHashCode
-@ToString
 public class KeyStoreFactory implements FactoryBean<EbMSKeyStore>
 {
 	@NonNull
@@ -24,6 +23,7 @@ public class KeyStoreFactory implements FactoryBean<EbMSKeyStore>
 	String password;
 	@NonNull
 	String keyPassword;
+	@NonFinal
 	String defaultAlias;
 
 	@Override

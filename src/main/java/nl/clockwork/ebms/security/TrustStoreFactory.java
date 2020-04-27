@@ -3,17 +3,13 @@ package nl.clockwork.ebms.security;
 import org.springframework.beans.factory.FactoryBean;
 
 import lombok.AccessLevel;
-import lombok.EqualsAndHashCode;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import lombok.ToString;
 import lombok.val;
 import lombok.experimental.FieldDefaults;
 
 @FieldDefaults(level=AccessLevel.PRIVATE, makeFinal=true)
 @RequiredArgsConstructor
-@EqualsAndHashCode
-@ToString
 public class TrustStoreFactory implements FactoryBean<EbMSTrustStore>
 {
 	@NonNull
