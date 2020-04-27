@@ -46,7 +46,7 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 	public String getEventsBeforeQuery(int maxNr)
 	{
 		return "select * from (" +
-			"select cpa_id, channel_id, message_id, time_to_live, time_stamp, is_confidential, retries" +
+			"select cpa_id, send_channel_id, receive_channel_id, message_id, time_to_live, time_stamp, is_confidential, retries" +
 			" from ebms_event" +
 			" where time_stamp <= ?" +
 			(serverId == null ? " and server_id is null" : " and server_id = '" + serverId + "'") +

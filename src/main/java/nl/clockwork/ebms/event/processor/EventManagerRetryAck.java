@@ -15,15 +15,13 @@
  */
 package nl.clockwork.ebms.event.processor;
 
-import java.util.Date;
+import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DeliveryChannel;
 
-import nl.clockwork.ebms.StreamUtils;
 import nl.clockwork.ebms.Constants.EbMSEventStatus;
+import nl.clockwork.ebms.StreamUtils;
 import nl.clockwork.ebms.dao.DAOTransactionCallback;
 import nl.clockwork.ebms.model.EbMSEvent;
 import nl.clockwork.ebms.util.CPAUtils;
-
-import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DeliveryChannel;
 
 public class EventManagerRetryAck extends EventManager
 {
@@ -31,24 +29,12 @@ public class EventManagerRetryAck extends EventManager
 	private int autoRetryInterval;
 
 	@Override
-	public void createEvent(String cpaId, DeliveryChannel deliveryChannel, String messageId, Date timeToLive, Date timestamp, boolean isConfidential)
-	{
-		if (deliveryChannel != null)
-		{
-			getEbMSDAO().deleteEvent(messageId);
-			getEbMSDAO().insertEvent(new EbMSEvent(cpaId,deliveryChannel.getChannelId(),messageId,timeToLive,timestamp,isConfidential,0));
-		}
-		else
-			getEbMSDAO().insertEventLog(messageId,timestamp,null,EbMSEventStatus.FAILED, "Could not resolve endpoint!");
-	}
-
-	@Override
 	public void updateEvent(final EbMSEvent event, final String url, final EbMSEventStatus status, final String errorMessage)
 	{
 		final DeliveryChannel deliveryChannel = getCpaManager().getDeliveryChannel(
 				event.getCpaId(),
-				event.getDeliveryChannelId())
-					.orElseThrow(() -> StreamUtils.illegalStateException("DeliveryChannel",event.getCpaId(),event.getDeliveryChannelId()));
+				event.getReceiveDeliveryChannelId())
+					.orElseThrow(() -> StreamUtils.illegalStateException("DeliveryChannel",event.getCpaId(),event.getReceiveDeliveryChannelId()));
 		getEbMSDAO().executeTransaction(
 			new DAOTransactionCallback()
 			{

@@ -247,7 +247,7 @@ public class EbMSDAOImpl extends nl.clockwork.ebms.dao.postgresql.EbMSDAOImpl
 	@Override
 	public String getEventsBeforeQuery(int maxNr)
 	{
-		return "select cpa_id, channel_id, message_id, time_to_live, time_stamp, is_confidential, retries" +
+		return "select cpa_id, send_channel_id, receive_channel_id, message_id, time_to_live, time_stamp, is_confidential, retries" +
 			" from ebms_event" +
 			" where time_stamp <= ?" +
 			(serverId == null ? " and server_id is null" : " and server_id = '" + serverId + "'") +

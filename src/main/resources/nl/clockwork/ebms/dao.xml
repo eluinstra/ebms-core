@@ -39,6 +39,9 @@
 				<value>.*existsURLMapping</value>
 				<value>.*getURLMapping</value>
 				<value>.*getURLMappings</value>
+				<value>.*existsCertificateMapping</value>
+				<value>.*getCertificateMapping</value>
+				<value>.*getCertificateMappings</value>
 			</list>
 		</property>
 	</bean>

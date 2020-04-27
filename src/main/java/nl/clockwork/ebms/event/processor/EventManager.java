@@ -34,14 +34,9 @@ public class EventManager
 	private EbMSDAO ebMSDAO;
 	private CPAManager cpaManager;
 
-	public void createEvent(String cpaId, DeliveryChannel deliveryChannel, String messageId, Date timeToLive, Date timestamp, boolean isConfidential)
+	public void createEvent(String cpaId, DeliveryChannel sendDeliveryChannel, DeliveryChannel receiveDeliveryChannel, String messageId, Date timeToLive, Date timestamp, boolean isConfidential)
 	{
-		if (deliveryChannel != null)
-		{
-			ebMSDAO.insertEvent(new EbMSEvent(cpaId,deliveryChannel.getChannelId(), messageId, timeToLive, timestamp, isConfidential, 0));
-		}
-		else
-			ebMSDAO.insertEventLog(messageId,timestamp,null,EbMSEventStatus.FAILED, "Could not resolve endpoint!");
+		ebMSDAO.insertEvent(new EbMSEvent(cpaId,sendDeliveryChannel.getChannelId(),receiveDeliveryChannel.getChannelId(), messageId, timeToLive, timestamp, isConfidential, 0));
 	}
 
 	public void updateEvent(final EbMSEvent event, final String url, final EbMSEventStatus status)
@@ -53,8 +48,8 @@ public class EventManager
 	{
 		final DeliveryChannel deliveryChannel = cpaManager.getDeliveryChannel(
 				event.getCpaId(),
-				event.getDeliveryChannelId())
-					.orElseThrow(() -> StreamUtils.illegalStateException("DeliveryChannel",event.getCpaId(),event.getDeliveryChannelId()));
+				event.getReceiveDeliveryChannelId())
+					.orElseThrow(() -> StreamUtils.illegalStateException("DeliveryChannel",event.getCpaId(),event.getReceiveDeliveryChannelId()));
 		ebMSDAO.executeTransaction(
 			new DAOTransactionCallback()
 			{
@@ -86,7 +81,8 @@ public class EventManager
 		timestamp.add(Calendar.MINUTE, retryInterval);
 		return new EbMSEvent(
 				event.getCpaId(),
-				event.getDeliveryChannelId(),
+				event.getSendDeliveryChannelId(),
+				event.getReceiveDeliveryChannelId(),
 				event.getMessageId(),
 				event.getTimeToLive(),
 				timestamp.getTime(),
@@ -104,7 +100,8 @@ public class EventManager
 			timestamp = event.getTimeToLive();
 		return new EbMSEvent(
 				event.getCpaId(),
-				event.getDeliveryChannelId(),
+				event.getSendDeliveryChannelId(),
+				event.getReceiveDeliveryChannelId(),
 				event.getMessageId(),
 				event.getTimeToLive(),
 				timestamp,

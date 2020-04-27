@@ -15,6 +15,7 @@
  */
 package nl.clockwork.ebms.dao;
 
+import java.security.cert.X509Certificate;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -23,6 +24,7 @@ import nl.clockwork.ebms.Constants.EbMSAction;
 import nl.clockwork.ebms.Constants.EbMSEventStatus;
 import nl.clockwork.ebms.Constants.EbMSMessageEventType;
 import nl.clockwork.ebms.Constants.EbMSMessageStatus;
+import nl.clockwork.ebms.model.CertificateMapping;
 import nl.clockwork.ebms.model.EbMSDocument;
 import nl.clockwork.ebms.model.EbMSEvent;
 import nl.clockwork.ebms.model.EbMSMessage;
@@ -53,6 +55,13 @@ public interface EbMSDAO
 	void insertURLMapping(URLMapping urlMapping) throws DAOException;
 	int updateURLMapping(URLMapping urlMapping) throws DAOException;
 	int deleteURLMapping(String source) throws DAOException;
+
+	boolean existsCertificateMapping(String id) throws DAOException;
+	Optional<X509Certificate> getCertificateMapping(String id) throws DAOException;
+	List<CertificateMapping> getCertificateMappings() throws DAOException;
+	void insertCertificateMapping(String id, CertificateMapping mapping) throws DAOException;
+	int updateCertificateMapping(String id, CertificateMapping mapping) throws DAOException;
+	int deleteCertificateMapping(String id) throws DAOException;
 
 	boolean existsMessage(String messageId) throws DAOException;
 	boolean existsIdenticalMessage(EbMSMessage message) throws DAOException;
@@ -89,4 +98,5 @@ public interface EbMSDAO
 	int processEbMSMessageEvent(String messageId) throws DAOException;
 	
 	Optional<Date> getPersistTime(String messageId);
+
 }

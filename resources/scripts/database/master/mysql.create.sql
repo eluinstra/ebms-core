@@ -14,6 +14,15 @@ CREATE TABLE url
 
 ALTER TABLE url ADD CONSTRAINT uc_url_source UNIQUE (source(255));
 
+CREATE TABLE certificate_mapping
+(
+	id								VARCHAR(256)	NOT NULL,
+	source						BLOB					NOT NULL,
+	destination				BLOB					NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+ALTER TABLE client_certificate ADD CONSTRAINT uc_client_certificate_id UNIQUE (source(255));
+
 CREATE TABLE ebms_message
 (
 	id								INTEGER					AUTO_INCREMENT PRIMARY KEY,
@@ -53,14 +62,15 @@ CREATE TABLE ebms_attachment
 
 CREATE TABLE ebms_event
 (
-	cpa_id						VARCHAR(256)		NOT NULL,
-	channel_id				VARCHAR(256)		NOT NULL,
-	message_id				VARCHAR(256)		NOT NULL,
-	time_to_live			TIMESTAMP				NULL,
-	time_stamp				TIMESTAMP				NOT NULL,
-	is_confidential		TINYINT(1)			NOT NULL,
-	retries						SMALLINT				DEFAULT 0 NOT NULL,
-	server_id					VARCHAR(256)		NULL
+	cpa_id							VARCHAR(256)		NOT NULL,
+	send_channel_id			VARCHAR(256)		NOT NULL,
+	receive_channel_id	VARCHAR(256)		NOT NULL,
+	message_id					VARCHAR(256)		NOT NULL,
+	time_to_live				TIMESTAMP				NULL,
+	time_stamp					TIMESTAMP				NOT NULL,
+	is_confidential			TINYINT(1)			NOT NULL,
+	retries							SMALLINT				DEFAULT 0 NOT NULL,
+	server_id						VARCHAR(256)		NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 ALTER TABLE ebms_event ADD CONSTRAINT uc_ebms_event UNIQUE (message_id(255));

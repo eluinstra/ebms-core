@@ -15,6 +15,7 @@
  */
 package nl.clockwork.ebms.event.processor;
 
+import java.security.cert.CertificateException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -37,6 +38,7 @@ import nl.clockwork.ebms.Constants.EbMSEventStatus;
 import nl.clockwork.ebms.Constants.EbMSMessageStatus;
 import nl.clockwork.ebms.StreamUtils;
 import nl.clockwork.ebms.client.EbMSClient;
+import nl.clockwork.ebms.client.EbMSHttpClientFactory;
 import nl.clockwork.ebms.client.EbMSResponseException;
 import nl.clockwork.ebms.client.EbMSUnrecoverableResponseException;
 import nl.clockwork.ebms.common.CPAManager;
@@ -48,6 +50,7 @@ import nl.clockwork.ebms.event.listener.EventListener;
 import nl.clockwork.ebms.model.EbMSDocument;
 import nl.clockwork.ebms.model.EbMSEvent;
 import nl.clockwork.ebms.processor.EbMSMessageProcessor;
+import nl.clockwork.ebms.processor.EbMSProcessingException;
 import nl.clockwork.ebms.util.CPAUtils;
 
 public class EbMSEventProcessor implements Runnable, InitializingBean
@@ -64,24 +67,24 @@ public class EbMSEventProcessor implements Runnable, InitializingBean
 		@Override
 		public void run()
 		{
-			DeliveryChannel deliveryChannel = cpaManager.getDeliveryChannel(
-					event.getCpaId(),
-					event.getDeliveryChannelId())
-						.orElseThrow(() -> StreamUtils.illegalStateException("DeliveryChannel",event.getCpaId(),event.getDeliveryChannelId()));
 			if (event.getTimeToLive() == null || new Date().before(event.getTimeToLive()))
-				sendEvent(event,deliveryChannel);
+				sendEvent(event);
 			else
 				expireEvent(event);
 		}
 
-		private void sendEvent(final EbMSEvent event, final DeliveryChannel deliveryChannel)
+		private void sendEvent(final EbMSEvent event)
 		{
-			final String url = urlManager.getURL(CPAUtils.getUri(deliveryChannel));
+			DeliveryChannel receiveDeliveryChannel = cpaManager.getDeliveryChannel(
+					event.getCpaId(),
+					event.getReceiveDeliveryChannelId())
+						.orElseThrow(() -> StreamUtils.illegalStateException("ReceiveDeliveryChannel",event.getCpaId(),event.getReceiveDeliveryChannelId()));
+			final String url = urlManager.getURL(CPAUtils.getUri(receiveDeliveryChannel));
 			try
 			{
 				Optional<EbMSDocument> requestDocument = ebMSDAO.getEbMSDocumentIfUnsent(event.getMessageId());
 				StreamUtils.ifPresentOrElse(requestDocument,
-						d -> sendMessage(event,deliveryChannel,url,d),
+						d -> sendMessage(event,receiveDeliveryChannel,url,d),
 						() -> eventManager.deleteEvent(event.getMessageId()));
 			}
 			catch (final EbMSResponseException e)
@@ -94,7 +97,7 @@ public class EbMSEventProcessor implements Runnable, InitializingBean
 						public void doInTransaction()
 						{
 							eventManager.updateEvent(event,url,EbMSEventStatus.FAILED,e.getMessage());
-							if ((e instanceof EbMSUnrecoverableResponseException) || !CPAUtils.isReliableMessaging(deliveryChannel))
+							if ((e instanceof EbMSUnrecoverableResponseException) || !CPAUtils.isReliableMessaging(receiveDeliveryChannel))
 								if (ebMSDAO.updateMessage(event.getMessageId(),EbMSMessageStatus.SENDING,EbMSMessageStatus.DELIVERY_FAILED) > 0)
 								{
 									eventListener.onMessageFailed(event.getMessageId());
@@ -115,7 +118,7 @@ public class EbMSEventProcessor implements Runnable, InitializingBean
 						public void doInTransaction()
 						{
 							eventManager.updateEvent(event,url,EbMSEventStatus.FAILED,ExceptionUtils.getStackTrace(e));
-							if (!CPAUtils.isReliableMessaging(deliveryChannel))
+							if (!CPAUtils.isReliableMessaging(receiveDeliveryChannel))
 								if (ebMSDAO.updateMessage(event.getMessageId(),EbMSMessageStatus.SENDING,EbMSMessageStatus.DELIVERY_FAILED) > 0)
 								{
 									eventListener.onMessageFailed(event.getMessageId());
@@ -128,29 +131,44 @@ public class EbMSEventProcessor implements Runnable, InitializingBean
 			}
 		}
 
-		private void sendMessage(final EbMSEvent event, final DeliveryChannel deliveryChannel, final String url, EbMSDocument requestDocument)
+		private void sendMessage(final EbMSEvent event, DeliveryChannel receiveDeliveryChannel, final String url, EbMSDocument requestDocument)
 		{
-			if (event.isConfidential())
-				messageEncrypter.encrypt(deliveryChannel,requestDocument);
-			logger.info("Sending message " + event.getMessageId() + " to " + url);
-			EbMSDocument responseDocument = ebMSClient.sendMessage(url,requestDocument);
-			messageProcessor.processResponse(requestDocument,responseDocument);
-			ebMSDAO.executeTransaction(
-				new DAOTransactionCallback()
-				{
-					@Override
-					public void doInTransaction()
+			try
+			{
+				if (event.isConfidential())
+					messageEncrypter.encrypt(receiveDeliveryChannel,requestDocument);
+				logger.info("Sending message " + event.getMessageId() + " to " + url);
+				EbMSDocument responseDocument = createClient(event).sendMessage(url,requestDocument);
+				messageProcessor.processResponse(requestDocument,responseDocument);
+				ebMSDAO.executeTransaction(
+					new DAOTransactionCallback()
 					{
-						eventManager.updateEvent(event,url,EbMSEventStatus.SUCCEEDED);
-						if (!CPAUtils.isReliableMessaging(deliveryChannel))
-							if (ebMSDAO.updateMessage(event.getMessageId(),EbMSMessageStatus.SENDING,EbMSMessageStatus.DELIVERED) > 0)
-							{
-								eventListener.onMessageDelivered(event.getMessageId());
-								if (deleteEbMSAttachmentsOnMessageProcessed)
-									ebMSDAO.deleteAttachments(event.getMessageId());
-							}
-					}
-				});
+						@Override
+						public void doInTransaction()
+						{
+							eventManager.updateEvent(event,url,EbMSEventStatus.SUCCEEDED);
+							if (!CPAUtils.isReliableMessaging(receiveDeliveryChannel))
+								if (ebMSDAO.updateMessage(event.getMessageId(),EbMSMessageStatus.SENDING,EbMSMessageStatus.DELIVERED) > 0)
+								{
+									eventListener.onMessageDelivered(event.getMessageId());
+									if (deleteEbMSAttachmentsOnMessageProcessed)
+										ebMSDAO.deleteAttachments(event.getMessageId());
+								}
+						}
+					});
+			}
+			catch (CertificateException e)
+			{
+				throw new EbMSProcessingException(e);
+			}
+		}
+
+		private EbMSClient createClient(EbMSEvent event) throws CertificateException
+		{
+			DeliveryChannel sendDeliveryChannel = 
+					cpaManager.getDeliveryChannel(event.getCpaId(),event.getSendDeliveryChannelId())
+					.orElse(null);
+			return ebMSClientFactory.getEbMSClient(sendDeliveryChannel);
 		}
 
 		private void expireEvent(final EbMSEvent event)
@@ -202,7 +220,7 @@ public class EbMSEventProcessor implements Runnable, InitializingBean
 	private CPAManager cpaManager;
 	private URLManager urlManager;
 	private EventManager eventManager;
-	private EbMSClient ebMSClient;
+	private EbMSHttpClientFactory ebMSClientFactory;
 	private EbMSMessageEncrypter messageEncrypter;
 	private EbMSMessageProcessor messageProcessor;
 	private boolean deleteEbMSAttachmentsOnMessageProcessed;
@@ -322,14 +340,14 @@ public class EbMSEventProcessor implements Runnable, InitializingBean
 		this.ebMSDAO = ebMSDAO;
 	}
 
-  public void setUrlManager(URLManager urlManager)
-	{
-		this.urlManager = urlManager;
-	}
-
   public void setCpaManager(CPAManager cpaManager)
 	{
 		this.cpaManager = cpaManager;
+	}
+
+  public void setUrlManager(URLManager urlManager)
+	{
+		this.urlManager = urlManager;
 	}
 
   public void setEventManager(EventManager eventManager)
@@ -337,9 +355,9 @@ public class EbMSEventProcessor implements Runnable, InitializingBean
 		this.eventManager = eventManager;
 	}
 
-  public void setEbMSClient(EbMSClient ebMSClient)
+  public void setEbMSClientFactory(EbMSHttpClientFactory ebMSClientFactory)
 	{
-		this.ebMSClient = ebMSClient;
+		this.ebMSClientFactory = ebMSClientFactory;
 	}
 
   public void setMessageEncrypter(EbMSMessageEncrypter messageEncrypter)

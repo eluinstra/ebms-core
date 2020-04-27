@@ -84,14 +84,19 @@ public class DuplicateMessageHandler
 						messageHeader.getMessageData().getMessageId(),
 						mshMessageService,EbMSAction.MESSAGE_ERROR.action(),
 						EbMSAction.ACKNOWLEDGMENT.action());
+				CacheablePartyId toPartyId = new CacheablePartyId(messageHeader.getTo().getPartyId());
 				CacheablePartyId fromPartyId = new CacheablePartyId(messageHeader.getFrom().getPartyId());
 				String service = CPAUtils.toString(CPAUtils.createEbMSMessageService());
-				DeliveryChannel deliveryChannel =
+				DeliveryChannel sendDeliveryChannel =
+						cpaManager.getSendDeliveryChannel(messageHeader.getCPAId(),toPartyId,messageHeader.getTo().getRole(),service,null)
+						//.orElseThrow(() -> StreamUtils.illegalStateException("SendDeliveryChannel",messageHeader.getCPAId(),toPartyId,messageHeader.getTo().getRole(),service));
+						.orElse(null);
+				DeliveryChannel receiveDeliveryChannel =
 						cpaManager.getReceiveDeliveryChannel(messageHeader.getCPAId(),fromPartyId,messageHeader.getFrom().getRole(),service,null)
 						//.orElseThrow(() -> StreamUtils.illegalStateException("ReceiveDeliveryChannel",messageHeader.getCPAId(),fromPartyId,messageHeader.getFrom().getRole(),service));
 						.orElse(null);
 				if (context.isPresent())
-					eventManager.createEvent(messageHeader.getCPAId(),deliveryChannel,context.get().getMessageId(),messageHeader.getMessageData().getTimeToLive(),context.get().getTimestamp(),false);
+					eventManager.createEvent(messageHeader.getCPAId(),sendDeliveryChannel,receiveDeliveryChannel,context.get().getMessageId(),messageHeader.getMessageData().getTimeToLive(),context.get().getTimestamp(),false);
 				else
 					logger.warn("No response found for duplicate message " + messageHeader.getMessageData().getMessageId() + "!");
 				return null;

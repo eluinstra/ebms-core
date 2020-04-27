@@ -16,6 +16,10 @@
 package nl.clockwork.ebms.dao;
 
 import java.io.IOException;
+import java.security.cert.CertificateEncodingException;
+import java.security.cert.CertificateException;
+import java.security.cert.CertificateFactory;
+import java.security.cert.X509Certificate;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -61,6 +65,7 @@ import nl.clockwork.ebms.Constants.EbMSMessageStatus;
 import nl.clockwork.ebms.EbMSAttachmentFactory;
 import nl.clockwork.ebms.common.JAXBParser;
 import nl.clockwork.ebms.common.util.DOMUtils;
+import nl.clockwork.ebms.model.CertificateMapping;
 import nl.clockwork.ebms.model.EbMSAttachment;
 import nl.clockwork.ebms.model.EbMSDataSource;
 import nl.clockwork.ebms.model.EbMSDataSourceMTOM;
@@ -351,6 +356,159 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 				"delete from url" +
 				" where source = ?",
 				source
+			);
+		}
+		catch (DataAccessException e)
+		{
+			throw new DAOException(e);
+		}
+	}
+
+	@Override
+	public boolean existsCertificateMapping(String id) throws DAOException
+	{
+		try
+		{
+			return jdbcTemplate.queryForObject(
+				"select count(*)" +
+				" from certificate_mapping" +
+				" where id = ?",
+				new Object[]{id},
+				Integer.class
+			) > 0;
+		}
+		catch (DataAccessException e)
+		{
+			throw new DAOException(e);
+		}
+	}
+
+	@Override
+	public Optional<X509Certificate> getCertificateMapping(String id) throws DAOException
+	{
+		try
+		{
+			return Optional.of(jdbcTemplate.queryForObject(
+				"select destination" +
+				" from certificate_mapping" +
+				" where id = ?",
+				new RowMapper<X509Certificate>()
+				{
+					@Override
+					public X509Certificate mapRow(ResultSet rs, int rowNum) throws SQLException
+					{
+						try
+						{
+							CertificateFactory certificateFactory = CertificateFactory.getInstance("X509");
+							return (X509Certificate)certificateFactory.generateCertificate(rs.getBinaryStream("source"));
+						}
+						catch (CertificateException e)
+						{
+							throw new SQLException(e);
+						}
+					}
+				},
+				id
+			));
+		}
+		catch(EmptyResultDataAccessException e)
+		{
+			return Optional.empty();
+		}
+		catch (DataAccessException e)
+		{
+			throw new DAOException(e);
+		}
+	}
+
+	@Override
+	public List<CertificateMapping> getCertificateMappings() throws DAOException
+	{
+		try
+		{
+			return jdbcTemplate.query(
+				"select source, destination" +
+				" from certificate_mapping" +
+				" order by source asc",
+				new RowMapper<CertificateMapping>()
+				{
+					@Override
+					public CertificateMapping mapRow(ResultSet rs, int nr) throws SQLException
+					{
+						try
+						{
+							CertificateFactory certificateFactory = CertificateFactory.getInstance("X509");
+							X509Certificate source = (X509Certificate)certificateFactory.generateCertificate(rs.getBinaryStream("source"));
+							X509Certificate destination = (X509Certificate)certificateFactory.generateCertificate(rs.getBinaryStream("destination"));
+							return new CertificateMapping(source,destination);
+						}
+						catch (CertificateException e)
+						{
+							throw new SQLException(e);
+						}
+					}
+				}
+			);
+		}
+		catch (DataAccessException e)
+		{
+			throw new DAOException(e);
+		}
+	}
+
+	@Override
+	public void insertCertificateMapping(String id, CertificateMapping mapping) throws DAOException
+	{
+		try
+		{
+			jdbcTemplate.update
+			(
+				"insert into certificate_mapping (" +
+					"id," +
+					"source," +
+					"destination" +
+				") values (?,?)",
+				id,
+				mapping.getSource().getEncoded(),
+				mapping.getDestination().getEncoded()
+			);
+		}
+		catch (CertificateEncodingException | DataAccessException e)
+		{
+			throw new DAOException(e);
+		}
+	}
+
+	@Override
+	public int updateCertificateMapping(String id, CertificateMapping mapping) throws DAOException
+	{
+		try
+		{
+			return jdbcTemplate.update
+			(
+				"update certificate_mapping set" +
+				" destination = ?" +
+				" where id = ?",
+				mapping.getDestination(),
+				id
+			);
+		}
+		catch (DataAccessException e)
+		{
+			throw new DAOException(e);
+		}
+	}
+
+	@Override
+	public int deleteCertificateMapping(String id) throws DAOException
+	{
+		try
+		{
+			return jdbcTemplate.update
+			(
+				"delete from certificate_mapping" +
+				" where id = ?",
+				id
 			);
 		}
 		catch (DataAccessException e)
@@ -1041,7 +1199,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 		try
 		{
 			return jdbcTemplate.query(
-				"select cpa_id, channel_id, message_id, time_to_live, time_stamp, is_confidential, retries" +
+				"select cpa_id, send_channel_id, receive_channel_id, message_id, time_to_live, time_stamp, is_confidential, retries" +
 				" from ebms_event" +
 				" where time_stamp <= ?" +
 				(serverId == null ? " and server_id is null" : " and server_id = '" + serverId + "'") +
@@ -1052,7 +1210,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 					@Override
 					public EbMSEvent mapRow(ResultSet rs, int rowNum) throws SQLException
 					{
-						return new EbMSEvent(rs.getString("cpa_id"),rs.getString("channel_id"),rs.getString("message_id"),rs.getTimestamp("time_to_live"),rs.getTimestamp("time_stamp"),rs.getBoolean("is_confidential"),rs.getInt("retries"));
+						return new EbMSEvent(rs.getString("cpa_id"),rs.getString("send_channel_id"),rs.getString("receive_channel_id"),rs.getString("message_id"),rs.getTimestamp("time_to_live"),rs.getTimestamp("time_stamp"),rs.getBoolean("is_confidential"),rs.getInt("retries"));
 					}
 				},
 				timestamp
@@ -1078,7 +1236,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 					@Override
 					public EbMSEvent mapRow(ResultSet rs, int rowNum) throws SQLException
 					{
-						return new EbMSEvent(rs.getString("cpa_id"),rs.getString("channel_id"),rs.getString("message_id"),rs.getTimestamp("time_to_live"),rs.getTimestamp("time_stamp"),rs.getBoolean("is_confidential"),rs.getInt("retries"));
+						return new EbMSEvent(rs.getString("cpa_id"),rs.getString("send_channel_id"),rs.getString("receive_channel_id"),rs.getString("message_id"),rs.getTimestamp("time_to_live"),rs.getTimestamp("time_stamp"),rs.getBoolean("is_confidential"),rs.getInt("retries"));
 					}
 				},
 				timestamp
@@ -1098,16 +1256,18 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 			jdbcTemplate.update(
 				"insert into ebms_event (" +
 					"cpa_id," +
-					"channel_id," +
+					"send_channel_id," +
+					"receive_channel_id," +
 					"message_id," +
 					"time_to_live," +
 					"time_stamp," +
 					"is_confidential," +
 					"retries," +
 					"server_id" +
-				") values (?,?,?,?,?,?,?,?)",
+				") values (?,?,?,?,?,?,?,?,?)",
 				event.getCpaId(),
-				event.getDeliveryChannelId(),
+				event.getSendDeliveryChannelId(),
+				event.getReceiveDeliveryChannelId(),
 				event.getMessageId(),
 				event.getTimeToLive(),
 				event.getTimestamp(),

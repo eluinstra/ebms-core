@@ -20,17 +20,19 @@ import java.util.Date;
 public class EbMSEvent
 {
 	private String cpaId;
-	private String deliveryChannelId;
+	private String sendDeliveryChannelId;
+	private String receiveDeliveryChannelId;
 	private String messageId;
 	private Date timeToLive;
 	private Date timestamp;
 	private boolean isConfidential;
 	private int retries;
 
-	public EbMSEvent(String cpaId, String deliveryChannelId, String messageId, Date timeToLive, Date timestamp, boolean isConfidential, int retries)
+	public EbMSEvent(String cpaId, String sendDeliveryChannelId, String receiveDeliveryChannelId, String messageId, Date timeToLive, Date timestamp, boolean isConfidential, int retries)
 	{
 		this.cpaId = cpaId;
-		this.deliveryChannelId = deliveryChannelId;
+		this.sendDeliveryChannelId = sendDeliveryChannelId;
+		this.receiveDeliveryChannelId = receiveDeliveryChannelId;
 		this.messageId = messageId;
 		this.timeToLive = timeToLive;
 		this.timestamp = timestamp;
@@ -43,9 +45,14 @@ public class EbMSEvent
 		return cpaId;
 	}
 
-	public String getDeliveryChannelId()
+	public String getSendDeliveryChannelId()
 	{
-		return deliveryChannelId;
+		return sendDeliveryChannelId;
+	}
+
+	public String getReceiveDeliveryChannelId()
+	{
+		return receiveDeliveryChannelId;
 	}
 
 	public String getMessageId()

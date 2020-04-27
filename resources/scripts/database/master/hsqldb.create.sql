@@ -10,6 +10,13 @@ CREATE TABLE url
 	destination				VARCHAR(256)		NOT NULL
 );
 
+CREATE TABLE certificate_mapping
+(
+	id								VARCHAR(256)	NOT NULL UNIQUE,
+	source						BLOB					NOT NULL,
+	destination				BLOB					NOT NULL
+);
+
 CREATE TABLE ebms_message
 (
 	time_stamp				TIMESTAMP				NOT NULL,
@@ -48,14 +55,15 @@ CREATE TABLE ebms_attachment
 
 CREATE TABLE ebms_event
 (
-	cpa_id						VARCHAR(256)		NOT NULL,
-	channel_id				VARCHAR(256)		NOT NULL,
-	message_id				VARCHAR(256)		NOT NULL UNIQUE,
-	time_to_live			TIMESTAMP				NULL,
-	time_stamp				TIMESTAMP				NOT NULL,
-	is_confidential		BOOLEAN					NOT NULL,
-	retries						SMALLINT				DEFAULT 0 NOT NULL,
-	server_id					VARCHAR(256)		NULL
+	cpa_id							VARCHAR(256)		NOT NULL,
+	send_channel_id			VARCHAR(256)		NOT NULL,
+	receive_channel_id	VARCHAR(256)		NOT NULL,
+	message_id					VARCHAR(256)		NOT NULL UNIQUE,
+	time_to_live				TIMESTAMP				NULL,
+	time_stamp					TIMESTAMP				NOT NULL,
+	is_confidential			BOOLEAN					NOT NULL,
+	retries							SMALLINT				DEFAULT 0 NOT NULL,
+	server_id						VARCHAR(256)		NULL
 );
 
 CREATE INDEX i_ebms_event ON ebms_event (time_stamp);

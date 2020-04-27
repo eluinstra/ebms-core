@@ -16,6 +16,7 @@
 package nl.clockwork.ebms.client;
 
 import java.io.IOException;
+import java.security.cert.CertificateException;
 import java.util.Optional;
 
 import javax.jms.JMSException;
@@ -36,6 +37,7 @@ import nl.clockwork.ebms.util.EbMSMessageUtils;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageHeader;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jms.core.MessagePostProcessor;
 import org.xml.sax.SAXException;
@@ -47,32 +49,34 @@ public class JMSDeliveryManager extends DeliveryManager //DeliveryService
 	private JmsTemplate jmsTemplate;
 
 	@Override
-	public Optional<EbMSMessage> sendMessage(final String uri, final EbMSMessage message) throws EbMSProcessorException
+	public Optional<EbMSMessage> sendMessage(final EbMSMessage message) throws EbMSProcessorException
 	{
 		try
 		{
+			MessageHeader messageHeader = message.getMessageHeader();
+			final String uri = getUri(messageHeader);
 			if (message.getSyncReply() == null)
 			{
-				logger.info("Sending message " + message.getMessageHeader().getMessageData().getMessageId() + " to " + uri);
-				EbMSDocument document = ebMSClient.sendMessage(uri,EbMSMessageUtils.getEbMSDocument(message));
+				logger.info("Sending message " + messageHeader.getMessageData().getMessageId() + " to " + uri);
+				EbMSDocument document = createClient(messageHeader).sendMessage(uri,EbMSMessageUtils.getEbMSDocument(message));
 				if (document == null)
 				{
 					jmsTemplate.setReceiveTimeout(3 * Constants.MINUTE_IN_MILLIS);
-					return Optional.ofNullable((EbMSMessage)jmsTemplate.receiveSelectedAndConvert(MESSAGE,"JMSCorrelationID='" + message.getMessageHeader().getMessageData().getMessageId() + "'"));
+					return Optional.ofNullable((EbMSMessage)jmsTemplate.receiveSelectedAndConvert(MESSAGE,"JMSCorrelationID='" + messageHeader.getMessageData().getMessageId() + "'"));
 				}
 				else
 					return Optional.of(EbMSMessageUtils.getEbMSMessage(document));
 			}
 			else
 			{
-				logger.info("Sending message " + message.getMessageHeader().getMessageData().getMessageId() + " to " + uri);
-				EbMSDocument response = ebMSClient.sendMessage(uri,EbMSMessageUtils.getEbMSDocument(message));
+				logger.info("Sending message " + messageHeader.getMessageData().getMessageId() + " to " + uri);
+				EbMSDocument response = createClient(messageHeader).sendMessage(uri,EbMSMessageUtils.getEbMSDocument(message));
 				if (response != null)
 					return Optional.of(EbMSMessageUtils.getEbMSMessage(response));
 			}
 			return Optional.empty();
 		}
-		catch (SOAPException | JAXBException | SAXException | IOException | TransformerException e)
+		catch (SOAPException | JAXBException | SAXException | IOException | TransformerException | CertificateException e)
 		{
 			throw new EbMSProcessingException(e);
 		}
@@ -107,7 +111,7 @@ public class JMSDeliveryManager extends DeliveryManager //DeliveryService
 			try
 			{
 				logger.info("Sending message " + response.getMessageHeader().getMessageData().getMessageId() + " to " + uri);
-				ebMSClient.sendMessage(uri,EbMSMessageUtils.getEbMSDocument(response));
+				createClient(response.getMessageHeader()).sendMessage(uri,EbMSMessageUtils.getEbMSDocument(response));
 			}
 			catch (Exception e)
 			{

@@ -10,13 +10,20 @@ CREATE TABLE url
 	destination				VARCHAR(256)		NOT NULL
 );
 
+CREATE TABLE certificate_mapping
+(
+	id								VARCHAR(256)	NOT NULL UNIQUE,
+	source						BYTEA					NOT NULL,
+	destination				BYTEA					NOT NULL
+);
+
 CREATE TABLE ebms_message
 (
 	time_stamp				TIMESTAMP				NOT NULL,
 	cpa_id						VARCHAR(256)		NOT NULL,
 	conversation_id		VARCHAR(256)		NOT NULL,
 	message_id				VARCHAR(256)		NOT NULL,
-	message_nr				SMALLINT				NOT NULL DEFAULT 0,
+	message_nr				SMALLINT				DEFAULT 0 NOT NULL,
 	ref_to_message_id	VARCHAR(256)		NULL,
 	time_to_live			TIMESTAMP				NULL,
 	persist_time			TIMESTAMP				NULL,
@@ -51,15 +58,16 @@ ALTER TABLE ebms_attachment ADD CONSTRAINT uc_ebms_attachment UNIQUE (message_id
 
 CREATE TABLE ebms_event
 (
-	cpa_id						VARCHAR(256)		NOT NULL,
-	channel_id				VARCHAR(256)		NOT NULL,
-	message_id				VARCHAR(256)		NOT NULL UNIQUE,
-	message_nr				SMALLINT				DEFAULT 0 NOT NULL,
-	time_to_live			TIMESTAMP				NULL,
-	time_stamp				TIMESTAMP				NOT NULL,
-	is_confidential		BOOLEAN					NOT NULL,
-	retries						SMALLINT				DEFAULT 0 NOT NULL,
-	server_id					VARCHAR(256)		NULL,
+	cpa_id							VARCHAR(256)		NOT NULL,
+	send_channel_id			VARCHAR(256)		NOT NULL,
+	receive_channel_id	VARCHAR(256)		NOT NULL,
+	message_id					VARCHAR(256)		NOT NULL UNIQUE,
+	message_nr					SMALLINT				DEFAULT 0 NOT NULL,
+	time_to_live				TIMESTAMP				NULL,
+	time_stamp					TIMESTAMP				NOT NULL,
+	is_confidential			BOOLEAN					NOT NULL,
+	retries							SMALLINT				DEFAULT 0 NOT NULL,
+	server_id						VARCHAR(256)		NULL,
 	FOREIGN KEY (cpa_id) REFERENCES cpa(cpa_id),
 	FOREIGN KEY (message_id,message_nr) REFERENCES ebms_message (message_id,message_nr)
 );

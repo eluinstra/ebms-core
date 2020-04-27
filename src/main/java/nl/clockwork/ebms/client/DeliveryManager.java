@@ -16,6 +16,7 @@
 package nl.clockwork.ebms.client;
 
 import java.io.IOException;
+import java.security.cert.CertificateException;
 import java.util.Optional;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ExecutorService;
@@ -29,17 +30,22 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.xpath.XPathExpressionException;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DeliveryChannel;
+import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageHeader;
+import org.springframework.beans.factory.InitializingBean;
+import org.xml.sax.SAXException;
+
+import nl.clockwork.ebms.common.CPAManager;
 import nl.clockwork.ebms.common.MessageQueue;
+import nl.clockwork.ebms.model.CacheablePartyId;
 import nl.clockwork.ebms.model.EbMSDocument;
 import nl.clockwork.ebms.model.EbMSMessage;
 import nl.clockwork.ebms.processor.EbMSProcessingException;
 import nl.clockwork.ebms.processor.EbMSProcessorException;
+import nl.clockwork.ebms.util.CPAUtils;
 import nl.clockwork.ebms.util.EbMSMessageUtils;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.springframework.beans.factory.InitializingBean;
-import org.xml.sax.SAXException;
 
 public class DeliveryManager implements InitializingBean //DeliveryService
 {
@@ -49,7 +55,8 @@ public class DeliveryManager implements InitializingBean //DeliveryService
 	private Integer processorsScaleFactor;
 	private Integer queueScaleFactor;
 	private MessageQueue<EbMSMessage> messageQueue;
-	protected EbMSClient ebMSClient;
+	private CPAManager cpaManager;
+	private EbMSHttpClientFactory ebMSClientFactory;
 
 	@Override
 	public void afterPropertiesSet() throws Exception
@@ -79,41 +86,43 @@ public class DeliveryManager implements InitializingBean //DeliveryService
 				new ThreadPoolExecutor.CallerRunsPolicy());
 	}
 
-	public Optional<EbMSMessage> sendMessage(final String uri, final EbMSMessage message) throws EbMSProcessorException
+	public Optional<EbMSMessage> sendMessage(final EbMSMessage message) throws EbMSProcessorException
 	{
 		try
 		{
+			MessageHeader messageHeader = message.getMessageHeader();
+			final String uri = getUri(messageHeader);
 			if (message.getSyncReply() == null)
 			{
 				try
 				{
-					messageQueue.register(message.getMessageHeader().getMessageData().getMessageId());
-					logger.info("Sending message " + message.getMessageHeader().getMessageData().getMessageId() + " to " + uri);
-					EbMSDocument document = ebMSClient.sendMessage(uri,EbMSMessageUtils.getEbMSDocument(message));
+					messageQueue.register(messageHeader.getMessageData().getMessageId());
+					logger.info("Sending message " + messageHeader.getMessageData().getMessageId() + " to " + uri);
+					EbMSDocument document = createClient(messageHeader).sendMessage(uri,EbMSMessageUtils.getEbMSDocument(message));
 					if (document == null)
-						return messageQueue.get(message.getMessageHeader().getMessageData().getMessageId());
+						return messageQueue.get(messageHeader.getMessageData().getMessageId());
 					else
 					{
-						messageQueue.remove(message.getMessageHeader().getMessageData().getMessageId());
+						messageQueue.remove(messageHeader.getMessageData().getMessageId());
 						return Optional.of(EbMSMessageUtils.getEbMSMessage(document));
 					}
 				}
 				catch (Exception e)
 				{
-					messageQueue.remove(message.getMessageHeader().getMessageData().getMessageId());
+					messageQueue.remove(messageHeader.getMessageData().getMessageId());
 					throw e;
 				}
 			}
 			else
 			{
-				logger.info("Sending message " + message.getMessageHeader().getMessageData().getMessageId() + " to " + uri);
-				EbMSDocument response = ebMSClient.sendMessage(uri,EbMSMessageUtils.getEbMSDocument(message));
+				logger.info("Sending message " + messageHeader.getMessageData().getMessageId() + " to " + uri);
+				EbMSDocument response = createClient(messageHeader).sendMessage(uri,EbMSMessageUtils.getEbMSDocument(message));
 				if (response != null)
 					return Optional.of(EbMSMessageUtils.getEbMSMessage(response));
 			}
 			return Optional.empty();
 		}
-		catch (SOAPException | JAXBException | SAXException | IOException | TransformerException e)
+		catch (SOAPException | JAXBException | SAXException | IOException | TransformerException | CertificateException e)
 		{
 			throw new EbMSProcessingException(e);
 		}
@@ -121,6 +130,16 @@ public class DeliveryManager implements InitializingBean //DeliveryService
 		{
 			throw new EbMSProcessorException(e);
 		}
+	}
+
+	protected String getUri(MessageHeader messageHeader)
+	{
+		return cpaManager.getUri(
+				messageHeader.getCPAId(),
+				new CacheablePartyId(messageHeader.getTo().getPartyId()),
+				messageHeader.getTo().getRole(),
+				CPAUtils.toString(messageHeader.getService()),
+				messageHeader.getAction());
 	}
 
 	public void handleResponseMessage(final EbMSMessage message) throws EbMSProcessorException
@@ -134,8 +153,9 @@ public class DeliveryManager implements InitializingBean //DeliveryService
 		{
 			try
 			{
-				logger.info("Sending message " + response.getMessageHeader().getMessageData().getMessageId() + " to " + uri);
-				ebMSClient.sendMessage(uri,EbMSMessageUtils.getEbMSDocument(response));
+				MessageHeader messageHeader = response.getMessageHeader();
+				logger.info("Sending message " + messageHeader.getMessageData().getMessageId() + " to " + uri);
+				createClient(messageHeader).sendMessage(uri,response);
 			}
 			catch (Exception e)
 			{
@@ -143,6 +163,19 @@ public class DeliveryManager implements InitializingBean //DeliveryService
 			}
 		};
 		executorService.execute(command);
+	}
+
+	protected EbMSClient createClient(MessageHeader messageHeader) throws CertificateException
+	{
+		DeliveryChannel sendDeliveryChannel = 
+				cpaManager.getSendDeliveryChannel(
+						messageHeader.getCPAId(),
+						new CacheablePartyId(messageHeader.getFrom().getPartyId()),
+						messageHeader.getFrom().getRole(),
+						CPAUtils.toString(messageHeader.getService()),
+						messageHeader.getAction())
+				.orElse(null);
+		return ebMSClientFactory.getEbMSClient(sendDeliveryChannel);
 	}
 
 	public void setMaxThreads(Integer maxThreads)
@@ -165,9 +198,13 @@ public class DeliveryManager implements InitializingBean //DeliveryService
 		this.messageQueue = messageQueue;
 	}
 
-	public void setEbMSClient(EbMSClient ebMSClient)
+	public void setCpaManager(CPAManager cpaManager)
 	{
-		this.ebMSClient = ebMSClient;
+		this.cpaManager = cpaManager;
 	}
 
+	public void setEbMSClientFactory(EbMSHttpClientFactory ebMSClientFactory)
+	{
+		this.ebMSClientFactory = ebMSClientFactory;
+	}
 }

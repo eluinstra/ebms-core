@@ -11,6 +11,14 @@ CREATE TABLE url
 	UNIQUE(source)
 );
 
+CREATE TABLE certificate_mapping
+(
+	id								VARCHAR(256)	NOT NULL,
+	source						BLOB					NOT NULL,
+	destination				BLOB					NOT NULL,
+	UNIQUE(id)
+);
+
 CREATE TABLE ebms_message
 (
 	time_stamp				TIMESTAMP				NOT NULL,
@@ -52,15 +60,16 @@ ALTER TABLE ebms_attachment ADD CONSTRAINT uc_ebms_attachment UNIQUE (message_id
 
 CREATE TABLE ebms_event
 (
-	cpa_id						VARCHAR(256)		NOT NULL,
-	channel_id				VARCHAR(256)		NOT NULL,
-	message_id				VARCHAR(256)		NOT NULL,
-	message_nr				SMALLINT				NOT NULL WITH DEFAULT 0,
-	time_to_live			TIMESTAMP				NULL,
-	time_stamp				TIMESTAMP				NOT NULL,
-	is_confidential		SMALLINT				NOT NULL,
-	retries						SMALLINT				NOT NULL WITH DEFAULT 0,
-	server_id					VARCHAR(256)		NULL,
+	cpa_id							VARCHAR(256)		NOT NULL,
+	send_channel_id			VARCHAR(256)		NOT NULL,
+	receive_channel_id	VARCHAR(256)		NOT NULL,
+	message_id					VARCHAR(256)		NOT NULL,
+	message_nr					SMALLINT				NOT NULL WITH DEFAULT 0,
+	time_to_live				TIMESTAMP				NULL,
+	time_stamp					TIMESTAMP				NOT NULL,
+	is_confidential			SMALLINT				NOT NULL,
+	retries							SMALLINT				NOT NULL WITH DEFAULT 0,
+	server_id						VARCHAR(256)		NULL,
 	FOREIGN KEY (cpa_id) REFERENCES cpa(cpa_id),
 	FOREIGN KEY (message_id,message_nr) REFERENCES ebms_message (message_id,message_nr),
 	UNIQUE(message_id)

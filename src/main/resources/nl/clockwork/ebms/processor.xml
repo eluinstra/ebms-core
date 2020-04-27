@@ -70,7 +70,8 @@
 		<property name="processorsScaleFactor" value="${deliveryManager.processorsScaleFactor}"/>
 		<property name="queueScaleFactor" value="${deliveryManager.queueScaleFactor}"/>
 		<property name="messageQueue" ref="messageQueue"/>
-		<property name="ebMSClient" ref="ebMSClient"/>
+		<property name="cpaManager" ref="cpaManager"/>
+		<property name="ebMSClientFactory" ref="ebMSHttpClientFactory"/>
 	</bean>
 
 	<bean id="messageQueue" class="nl.clockwork.ebms.client.EbMSMessageQueue">
@@ -163,6 +164,11 @@
 		<property name="ebMSDAO" ref="ebMSDAO"/>
 	</bean>
 
+	<bean id="certificateManager" class="nl.clockwork.ebms.common.CertificateManager">
+		<property name="daoMethodCache" ref="ebMSDAOMethodCache"/>
+		<property name="ebMSDAO" ref="ebMSDAO"/>
+	</bean>
+
 	<bean id="_cpaManager" class="nl.clockwork.ebms.common.CPAManager">
 		<property name="daoMethodCache" ref="ebMSDAOMethodCache"/>
 		<property name="cpaMethodCache" ref="cpaMethodCache"/>
@@ -250,7 +256,7 @@
 		<property name="urlManager" ref="urlManager"/>
 		<property name="cpaManager" ref="cpaManager"/>
 		<property name="eventManager" ref="eventManager"/>
-		<property name="ebMSClient" ref="ebMSClient"/>
+		<property name="ebMSClientFactory" ref="ebMSHttpClientFactory"/>
 		<property name="messageEncrypter" ref="messageEncrypter"/>
 		<property name="messageProcessor" ref="messageProcessor"/>
 		<property name="deleteEbMSAttachmentsOnMessageProcessed" value="${ebmsMessage.deleteContentOnProcessed}"/>
@@ -280,9 +286,8 @@
 		<property name="password" value="${http.proxy.password}"/>
 	</bean>
 
-	<bean id="ebMSClient" class="nl.clockwork.ebms.client.EbMSHttpClientFactory">
+	<bean id="ebMSHttpClientFactory" class="nl.clockwork.ebms.client.EbMSHttpClientFactory">
 		<property name="type" value="${http.client}"/>
-		<property name="sslFactoryManager" ref="sslFactoryManager"/>
 		<property name="connectTimeout" value="${http.connectTimeout}"/>
 		<property name="chunkedStreamingMode" value="${http.chunkedStreamingMode}"/>
 		<property name="base64Writer" value="${http.base64Writer}"/>
@@ -290,22 +295,19 @@
 		<property name="enabledProtocols" value="${https.protocols}"/>
 		<property name="enabledCipherSuites" value="${https.cipherSuites}"/>
 		<property name="verifyHostnames" value="${https.verifyHostnames}"></property>
-		<property name="recoverableInformationalHttpErrors" value="${http.errors.informational.recoverable}"></property>
-		<property name="recoverableRedirectionHttpErrors" value="${http.errors.redirection.recoverable}"></property>
-		<property name="recoverableClientHttpErrors" value="${http.errors.client.recoverable}"></property>
-		<property name="unrecoverableServerHttpErrors" value="${http.errors.server.unrecoverable}"></property>
-	</bean>
-
-	<bean id="sslFactoryManager" class="nl.clockwork.ebms.client.SSLFactoryManager">
 		<property name="keyStoreType" value="${client.keystore.type}"/>
 		<property name="keyStorePath" value="${client.keystore.path}"/>
 		<property name="keyStorePassword" value="${client.keystore.password}"/>
 		<property name="trustStoreType" value="${truststore.type}"/>
 		<property name="trustStorePath" value="${truststore.path}"/>
 		<property name="trustStorePassword" value="${truststore.password}"/>
-		<property name="verifyHostnames" value="${https.verifyHostnames}"></property>
-		<property name="enabledProtocols" value="${https.protocols}"/>
-		<property name="enabledCipherSuites" value="${https.cipherSuites}"/>
+		<property name="recoverableInformationalHttpErrors" value="${http.errors.informational.recoverable}"/>
+		<property name="recoverableRedirectionHttpErrors" value="${http.errors.redirection.recoverable}"/>
+		<property name="recoverableClientHttpErrors" value="${http.errors.client.recoverable}"/>
+		<property name="unrecoverableServerHttpErrors" value="${http.errors.server.unrecoverable}"/>
+		<property name="defaultClientCertificateAlias" value="${client.keystore.defaultAlias}"/>
+		<property name="certificateManager" ref="certificateManager"/>
+		<property name="useClientCertificate" value="${https.useClientCertificate}"/>
 	</bean>
 
 	<bean id="eventListener" class="nl.clockwork.ebms.event.listener.EventListenerFactory">

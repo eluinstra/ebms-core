@@ -386,15 +386,20 @@ public class EbMSMessageProcessor
 								ebMSDAO.insertMessage(timestamp,persistTime,acknowledgment,null);
 							}
 							{
+								CacheablePartyId fromPartyId = new CacheablePartyId(acknowledgment.getMessageHeader().getFrom().getPartyId());
 								CacheablePartyId toPartyId = new CacheablePartyId(acknowledgment.getMessageHeader().getTo().getPartyId());
 								String service = CPAUtils.toString(acknowledgment.getMessageHeader().getService());
-								DeliveryChannel deliveryChannel =
+								DeliveryChannel sendDeliveryChannel =
+										cpaManager.getReceiveDeliveryChannel(messageHeader.getCPAId(),fromPartyId,acknowledgment.getMessageHeader().getFrom().getRole(),service,acknowledgment.getMessageHeader().getAction())
+										.orElseThrow(() -> StreamUtils.illegalStateException("SendDeliveryChannel",messageHeader.getCPAId(),fromPartyId,acknowledgment.getMessageHeader().getFrom().getRole(),service,acknowledgment.getMessageHeader().getAction()));
+								DeliveryChannel receiveDeliveryChannel =
 										cpaManager.getReceiveDeliveryChannel(messageHeader.getCPAId(),toPartyId,acknowledgment.getMessageHeader().getTo().getRole(),service,acknowledgment.getMessageHeader().getAction())
 										.orElseThrow(() -> StreamUtils.illegalStateException("ReceiveDeliveryChannel",messageHeader.getCPAId(),toPartyId,acknowledgment.getMessageHeader().getTo().getRole(),service,acknowledgment.getMessageHeader().getAction()));
 								if (!messageValidator.isSyncReply(message))
 									eventManager.createEvent(
 											messageHeader.getCPAId(),
-											deliveryChannel,
+											sendDeliveryChannel,
+											receiveDeliveryChannel,
 											acknowledgment.getMessageHeader().getMessageData().getMessageId(),
 											acknowledgment.getMessageHeader().getMessageData().getTimeToLive(),
 											acknowledgment.getMessageHeader().getMessageData().getTimestamp(),
@@ -437,13 +442,14 @@ public class EbMSMessageProcessor
 							if (!messageValidator.isSyncReply(message))
 							{
 								String service = CPAUtils.toString(messageError.getMessageHeader().getService());
-								final DeliveryChannel deliveryChannel = cpaManager.getReceiveDeliveryChannel(messageHeader.getCPAId(),new CacheablePartyId(messageError.getMessageHeader().getTo().getPartyId()),messageError.getMessageHeader().getTo().getRole(),service,messageError.getMessageHeader().getAction())
-										.orElse(null);
-								if (deliveryChannel == null)
-									throw new EbMSProcessingException(e.getMessage());
+								final DeliveryChannel sendDeliveryChannel = cpaManager.getSendDeliveryChannel(messageHeader.getCPAId(),new CacheablePartyId(messageError.getMessageHeader().getFrom().getPartyId()),messageError.getMessageHeader().getFrom().getRole(),service,messageError.getMessageHeader().getAction())
+										.orElseThrow(() -> new EbMSProcessingException(e.getMessage()));
+								final DeliveryChannel receiveDeliveryChannel = cpaManager.getReceiveDeliveryChannel(messageHeader.getCPAId(),new CacheablePartyId(messageError.getMessageHeader().getTo().getPartyId()),messageError.getMessageHeader().getTo().getRole(),service,messageError.getMessageHeader().getAction())
+										.orElseThrow(() -> new EbMSProcessingException(e.getMessage()));
 								eventManager.createEvent(
 										messageHeader.getCPAId(),
-										deliveryChannel,
+										sendDeliveryChannel,
+										receiveDeliveryChannel,
 										messageError.getMessageHeader().getMessageData().getMessageId(),
 										messageError.getMessageHeader().getMessageData().getTimeToLive(),
 										messageError.getMessageHeader().getMessageData().getTimestamp(),

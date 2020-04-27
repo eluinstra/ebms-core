@@ -21,10 +21,14 @@ import java.net.InetAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.security.KeyStore;
+import java.security.Principal;
+import java.security.PrivateKey;
+import java.security.cert.X509Certificate;
 import java.util.Objects;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.KeyManager;
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLEngine;
@@ -32,6 +36,7 @@ import javax.net.ssl.SSLParameters;
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManagerFactory;
+import javax.net.ssl.X509KeyManager;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.InitializingBean;
@@ -41,6 +46,54 @@ import nl.clockwork.ebms.common.KeyStoreManager.KeyStoreType;
 
 public class SSLFactoryManager implements InitializingBean
 {
+	public class EbMSX509KeyManager implements X509KeyManager
+	{
+		private final String clientAlias;
+		private final X509KeyManager standardKeyManager;
+
+		public EbMSX509KeyManager(X509KeyManager standardKeyManager, String clientAlias)
+		{
+			this.clientAlias = clientAlias;
+			this.standardKeyManager = standardKeyManager;
+		}
+
+		@Override
+		public String chooseServerAlias(String keyType, Principal[] issuers, Socket socket)
+		{
+			return standardKeyManager.chooseServerAlias(keyType,issuers,socket);
+		}
+
+		@Override
+		public String chooseClientAlias(String[] keyType, Principal[] issuers, Socket socket)
+		{
+			return clientAlias == null ? standardKeyManager.chooseClientAlias(keyType,issuers,socket) : clientAlias;
+		}
+
+		@Override
+		public String[] getServerAliases(String keyType, Principal[] issuers)
+		{
+			return standardKeyManager.getServerAliases(keyType,issuers);
+		}
+
+		@Override
+		public String[] getClientAliases(String keyType, Principal[] issuers)
+		{
+			return standardKeyManager.getClientAliases(keyType,issuers);
+		}
+
+		@Override
+		public X509Certificate[] getCertificateChain(String alias)
+		{
+			return standardKeyManager.getCertificateChain(alias);
+		}
+
+		@Override
+		public PrivateKey getPrivateKey(String alias)
+		{
+			return standardKeyManager.getPrivateKey(alias);
+		}
+	}
+
 	public class SSLSocketFactoryWrapper extends SSLSocketFactory
 	{
 		private final SSLSocketFactory sslSocketFactory;
@@ -132,6 +185,7 @@ public class SSLFactoryManager implements InitializingBean
 	private boolean verifyHostnames;
 	private String[] enabledProtocols = new String[]{};
 	private String[] enabledCipherSuites = new String[]{};
+	private String clientAlias;
 	private SSLSocketFactory sslSocketFactory;
 
 	@Override
@@ -143,6 +197,11 @@ public class SSLFactoryManager implements InitializingBean
 		//KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
 		KeyManagerFactory kmf = KeyManagerFactory.getInstance("SunX509");
 		kmf.init(keyStore,keyStorePassword.toCharArray());
+
+		KeyManager[] keyManagers = kmf.getKeyManagers();
+		for (int i = 0; i < keyManagers.length; i++)
+			if (keyManagers[i] instanceof X509KeyManager)
+				keyManagers[i] = new EbMSX509KeyManager((X509KeyManager)keyManagers[i],clientAlias);
 
 		//TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
 		TrustManagerFactory tmf = TrustManagerFactory.getInstance("SunX509");
@@ -218,14 +277,29 @@ public class SSLFactoryManager implements InitializingBean
 		this.verifyHostnames = verifyHostnames;
 	}
 
+	public void setEnabledProtocols(String[] enabledProtocols)
+	{
+		this.enabledProtocols = enabledProtocols;
+	}
+
 	public void setEnabledProtocols(String enabledProtocols)
 	{
 		this.enabledProtocols = StringUtils.split(enabledProtocols,",");
 	}
-	
+
+	public void setEnabledCipherSuites(String[] enabledCipherSuites)
+	{
+		this.enabledCipherSuites = enabledCipherSuites;
+	}
+
 	public void setEnabledCipherSuites(String enabledCipherSuites)
 	{
 		this.enabledCipherSuites = StringUtils.split(enabledCipherSuites,",");
+	}
+
+	public void setClientAlias(String clientAlias)
+	{
+		this.clientAlias = clientAlias;
 	}
 
 }
