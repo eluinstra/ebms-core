@@ -32,12 +32,13 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.FactoryBean;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.jms.core.JmsTemplate;
 
-public class EventListenerFactory implements FactoryBean<EventListener>, DisposableBean
+public class EventListenerFactory implements FactoryBean<EventListener>, InitializingBean, DisposableBean
 {
 	public enum EventListenerType
 	{
@@ -52,32 +53,37 @@ public class EventListenerFactory implements FactoryBean<EventListener>, Disposa
 	private String jmsBrokerURL;
 	private boolean jmsVirtualTopics;
 	private BrokerFactoryBean brokerFactoryBean;
+	private EventListener listener = null;
 
 	@Override
-	public EventListener getObject() throws Exception
+	public void afterPropertiesSet() throws Exception
 	{
-		EventListener listener = null;
-		logger.info("Using EventListener " + type.name());
 		switch (type)
 		{
 			case DAO:
 				listener = new DAOEventListener(ebMSDAO);
 				break;
 			case SIMPLE_JMS:
-				startJMSBroker(jmsBrokerConfig, jmsBrokerStart);
-				listener = new SimpleJMSEventListener(createJmsTemplate(jmsBrokerURL), createDestinations());
+				startJMSBroker(jmsBrokerConfig,jmsBrokerStart);
+				listener = new SimpleJMSEventListener(createJmsTemplate(jmsBrokerURL),createDestinations());
 				break;
 			case JMS:
-				startJMSBroker(jmsBrokerConfig, jmsBrokerStart);
-				listener = new JMSEventListener(ebMSDAO, createJmsTemplate(jmsBrokerURL), createDestinations());
+				startJMSBroker(jmsBrokerConfig,jmsBrokerStart);
+				listener = new JMSEventListener(ebMSDAO,createJmsTemplate(jmsBrokerURL),createDestinations());
 				break;
 			case JMS_TEXT:
-				startJMSBroker(jmsBrokerConfig, jmsBrokerStart);
-				listener = new JMSTextEventListener(ebMSDAO, createJmsTemplate(jmsBrokerURL), createDestinations());
+				startJMSBroker(jmsBrokerConfig,jmsBrokerStart);
+				listener = new JMSTextEventListener(ebMSDAO,createJmsTemplate(jmsBrokerURL),createDestinations());
 				break;
 			default:
 				listener = new LoggingEventListener();
 		}
+	}
+
+	@Override
+	public EventListener getObject() throws Exception
+	{
+		logger.info("Using EventListener " + type.name());
 		return listener;
 	}
 
@@ -131,7 +137,7 @@ public class EventListenerFactory implements FactoryBean<EventListener>, Disposa
 
 	private void startJMSBroker(String jmsBrokerConfig, boolean jmsBrokerStart) throws Exception
 	{
-		if (jmsBrokerStart)
+		if (jmsBrokerStart && brokerFactoryBean != null)
 		{
 			brokerFactoryBean = new BrokerFactoryBean();
 			brokerFactoryBean.setConfig(createResource(jmsBrokerConfig));
