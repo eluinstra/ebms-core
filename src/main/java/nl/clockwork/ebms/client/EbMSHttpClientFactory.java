@@ -15,9 +15,7 @@
  */
 package nl.clockwork.ebms.client;
 
-import java.io.IOException;
-import java.security.GeneralSecurityException;
-import java.security.KeyStore;
+import java.security.KeyStoreException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
@@ -29,9 +27,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DeliveryChannel;
 
 import nl.clockwork.ebms.common.CertificateManager;
-import nl.clockwork.ebms.common.KeyStoreManager;
-import nl.clockwork.ebms.common.KeyStoreManager.KeyStoreType;
 import nl.clockwork.ebms.common.util.Utils;
+import nl.clockwork.ebms.security.EbMSKeyStore;
+import nl.clockwork.ebms.security.EbMSTrustStore;
 import nl.clockwork.ebms.util.CPAUtils;
 
 public class EbMSHttpClientFactory
@@ -49,19 +47,13 @@ public class EbMSHttpClientFactory
 	private String[] enabledProtocols = new String[]{};
 	private String[] enabledCipherSuites = new String[]{};
 	private boolean verifyHostnames;
-	private KeyStoreType keyStoreType;
-	private String keyStorePath;
-	private String keyStorePassword;
-	private KeyStoreType trustStoreType;
-	private String trustStorePath;
-	private String trustStorePassword;
+	private EbMSKeyStore keyStore;
+	private EbMSTrustStore trustStore;
 	private List<Integer> recoverableHttpErrors = new ArrayList<>();
 	private List<Integer> unrecoverableHttpErrors = new ArrayList<>();
-	private String defaultClientCertificateAlias;
 	private CertificateManager certificateManager;
 	private boolean useClientCertificate;
 	private Map<String,EbMSClient> clients = new ConcurrentHashMap<String,EbMSClient>();
-	private KeyStore clientKeyStore;
 
 	public EbMSClient createEbMSClient(String clientAlias)
 	{
@@ -92,10 +84,10 @@ public class EbMSHttpClientFactory
 		try
 		{
 			X509Certificate clientCertificate = getClientCertificate(sendDeliveryChannel);
-			String clientAlias = clientCertificate != null ? getClientKeyStore().getCertificateAlias(clientCertificate) : null;
+			String clientAlias = clientCertificate != null ? keyStore.getCertificateAlias(clientCertificate) : null;
 			return getEbMSClient(clientAlias);
 		}
-		catch (GeneralSecurityException | IOException e)
+		catch (CertificateException | KeyStoreException e)
 		{
 			throw new RuntimeException(e);
 		}
@@ -103,7 +95,7 @@ public class EbMSHttpClientFactory
 
 	private String getClientAlias(String clientAlias)
 	{
-		return clientAlias == null && StringUtils.isNotEmpty(defaultClientCertificateAlias) ? defaultClientCertificateAlias : clientAlias;
+		return clientAlias == null && StringUtils.isNotEmpty(keyStore.getDefaultAlias()) ? keyStore.getDefaultAlias() : clientAlias;
 	}
 
 	private X509Certificate getClientCertificate(DeliveryChannel deliveryChannel) throws CertificateException
@@ -111,22 +103,11 @@ public class EbMSHttpClientFactory
 		return useClientCertificate && deliveryChannel != null ? certificateManager.getCertificate(CPAUtils.getX509Certificate(CPAUtils.getClientCertificate(deliveryChannel))) : null;
 	}
 
-	private KeyStore getClientKeyStore() throws GeneralSecurityException, IOException
-	{
-		if (clientKeyStore == null)
-			clientKeyStore = KeyStoreManager.getKeyStore(null,keyStorePath,keyStorePassword);
-		return clientKeyStore;
-	}
-
 	private SSLFactoryManager createSslFactoryManager(String clientAlias) throws Exception
 	{
 		SSLFactoryManager result = new SSLFactoryManager();
-		result.setKeyStoreType(keyStoreType);
-		result.setKeyStorePath(keyStorePath);
-		result.setKeyStorePassword(keyStorePassword);
-		result.setTrustStoreType(trustStoreType);
-		result.setTrustStorePath(trustStorePath);
-		result.setTrustStorePassword(trustStorePassword);
+		result.setKeyStore(keyStore);
+		result.setTrustStore(trustStore);
 		result.setVerifyHostnames(verifyHostnames);
 		result.setEnabledProtocols(enabledProtocols);
 		result.setEnabledCipherSuites(enabledCipherSuites);
@@ -182,29 +163,13 @@ public class EbMSHttpClientFactory
 	{
 		this.verifyHostnames = verifyHostnames;
 	}
-	public void setKeyStoreType(KeyStoreType keyStoreType)
+	public void setKeyStore(EbMSKeyStore keyStore)
 	{
-		this.keyStoreType = keyStoreType;
+		this.keyStore = keyStore;
 	}
-	public void setKeyStorePath(String keyStorePath)
+	public void setTrustStore(EbMSTrustStore trustStore)
 	{
-		this.keyStorePath = keyStorePath;
-	}
-	public void setKeyStorePassword(String keyStorePassword)
-	{
-		this.keyStorePassword = keyStorePassword;
-	}
-	public void setTrustStoreType(KeyStoreType trustStoreType)
-	{
-		this.trustStoreType = trustStoreType;
-	}
-	public void setTrustStorePath(String trustStorePath)
-	{
-		this.trustStorePath = trustStorePath;
-	}
-	public void setTrustStorePassword(String trustStorePassword)
-	{
-		this.trustStorePassword = trustStorePassword;
+		this.trustStore = trustStore;
 	}
 	public void setRecoverableInformationalHttpErrors(String recoverableInformationalHttpErrors)
 	{
@@ -221,10 +186,6 @@ public class EbMSHttpClientFactory
 	public void setUnrecoverableServerHttpErrors(String unrecoverableServerHttpErrors)
 	{
 		this.unrecoverableHttpErrors = Utils.getIntegerList(unrecoverableServerHttpErrors);
-	}
-	public void setDefaultClientCertificateAlias(String defaultClientCertificateAlias)
-	{
-		this.defaultClientCertificateAlias = defaultClientCertificateAlias;
 	}
 	public void setCertificateManager(CertificateManager certificateManager)
 	{

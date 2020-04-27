@@ -40,6 +40,36 @@
 		<property name="attachmentCipherTransformation" value="${ebmsMessage.attachment.cipherTransformation}" />
 	</bean>
 
+	<bean id="trustStore" class="nl.clockwork.ebms.security.TrustStoreFactory">
+		<constructor-arg name="type" value="${truststore.type}"/>
+		<constructor-arg name="path" value="${truststore.path}"/>
+		<constructor-arg name="password" value="${truststore.password}"/>
+	</bean>
+
+	<bean id="clientKeyStore" class="nl.clockwork.ebms.security.KeyStoreFactory">
+		<constructor-arg name="type" value="${client.keystore.type}"/>
+		<constructor-arg name="path" value="${client.keystore.path}"/>
+		<constructor-arg name="password" value="${client.keystore.password}"/>
+		<constructor-arg name="keyPassword" value="${client.keystore.keyPassword}"/>
+		<constructor-arg name="defaultAlias" value="${client.keystore.defaultAlias}"/>
+	</bean>
+
+	<bean id="signingKeyStore" class="nl.clockwork.ebms.security.KeyStoreFactory">
+		<constructor-arg name="type" value="${signature.keystore.type}"/>
+		<constructor-arg name="path" value="${signature.keystore.path}"/>
+		<constructor-arg name="password" value="${signature.keystore.password}"/>
+		<constructor-arg name="keyPassword" value="${signature.keystore.keyPassword}"/>
+		<constructor-arg name="defaultAlias" value="${signature.keystore.defaultAlias}"/>
+	</bean>
+
+	<bean id="encryptionKeyStore" class="nl.clockwork.ebms.security.KeyStoreFactory">
+		<constructor-arg name="type" value="${encryption.keystore.type}"/>
+		<constructor-arg name="path" value="${encryption.keystore.path}"/>
+		<constructor-arg name="password" value="${encryption.keystore.password}"/>
+		<constructor-arg name="keyPassword" value="${encryption.keystore.keyPassword}"/>
+		<constructor-arg name="defaultAlias" value="${encryption.keystore.defaultAlias}"/>
+	</bean>
+
 	<bean id="cpaService" class="nl.clockwork.ebms.service.CPAServiceImpl">
 		<property name="cpaManager" ref="cpaManager"/>
 		<property name="urlManager" ref="urlManager"/>
@@ -114,9 +144,7 @@
 				<property name="ebMSSignatureValidator">
 					<bean class="nl.clockwork.ebms.signing.EbMSSignatureValidator">
 						<property name="cpaManager" ref="cpaManager"/>
-						<property name="trustStoreType" value="${truststore.type}"/>
-						<property name="trustStorePath" value="${truststore.path}"/>
-						<property name="trustStorePassword" value="${truststore.password}"/>
+						<property name="trustStore" ref="trustStore"/>
 					</bean>
 				</property>
 			</bean>
@@ -124,9 +152,7 @@
 		<property name="messageDecrypter">
 			<bean class="nl.clockwork.ebms.encryption.EbMSMessageDecrypter">
 				<property name="cpaManager" ref="cpaManager"/>
-				<property name="keyStoreType" value="${encryption.keystore.type}"/>
-				<property name="keyStorePath" value="${encryption.keystore.path}" />
-				<property name="keyStorePassword" value="${encryption.keystore.password}" />
+				<property name="keyStore" ref="encryptionKeyStore"/>
 			</bean>
 		</property>
 	</bean>
@@ -266,16 +292,12 @@
 		<property name="cpaManager" ref="cpaManager"/>
 		<property name="canonicalizationMethodAlgorithm" value="${xmldsig.canonicalizationMethodAlgorithm}"/>
 		<property name="transformAlgorithm" value="${xmldsig.transformAlgorithm}"/>
-		<property name="keyStoreType" value="${signature.keystore.type}"/>
-		<property name="keyStorePath" value="${signature.keystore.path}" />
-		<property name="keyStorePassword" value="${signature.keystore.password}" />
+		<property name="keyStore" ref="signatureKeyStore"/>
 	</bean>  
 
 	<bean id="messageEncrypter" class="nl.clockwork.ebms.encryption.EbMSMessageEncrypter">
 		<property name="cpaManager" ref="cpaManager"/>
-		<property name="trustStoreType" value="${truststore.type}"/>
-		<property name="trustStorePath" value="${truststore.path}"/>
-		<property name="trustStorePassword" value="${truststore.password}"/>
+		<property name="trustStore" ref="trustStore"/>
 	</bean>
 
 	<bean id="ebMSProxy" class="nl.clockwork.ebms.client.EbMSProxyFactory">
@@ -295,17 +317,12 @@
 		<property name="enabledProtocols" value="${https.protocols}"/>
 		<property name="enabledCipherSuites" value="${https.cipherSuites}"/>
 		<property name="verifyHostnames" value="${https.verifyHostnames}"></property>
-		<property name="keyStoreType" value="${client.keystore.type}"/>
-		<property name="keyStorePath" value="${client.keystore.path}"/>
-		<property name="keyStorePassword" value="${client.keystore.password}"/>
-		<property name="trustStoreType" value="${truststore.type}"/>
-		<property name="trustStorePath" value="${truststore.path}"/>
-		<property name="trustStorePassword" value="${truststore.password}"/>
+		<property name="keyStore" ref="clientKeyStore"/>
+		<property name="trustStore" ref="trustStore"/>
 		<property name="recoverableInformationalHttpErrors" value="${http.errors.informational.recoverable}"/>
 		<property name="recoverableRedirectionHttpErrors" value="${http.errors.redirection.recoverable}"/>
 		<property name="recoverableClientHttpErrors" value="${http.errors.client.recoverable}"/>
 		<property name="unrecoverableServerHttpErrors" value="${http.errors.server.unrecoverable}"/>
-		<property name="defaultClientCertificateAlias" value="${client.keystore.defaultAlias}"/>
 		<property name="certificateManager" ref="certificateManager"/>
 		<property name="useClientCertificate" value="${https.useClientCertificate}"/>
 	</bean>

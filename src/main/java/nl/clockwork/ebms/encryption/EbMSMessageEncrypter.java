@@ -19,7 +19,6 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.security.GeneralSecurityException;
 import java.security.Key;
-import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.Certificate;
@@ -56,7 +55,6 @@ import org.apache.xml.security.keys.content.KeyName;
 import org.apache.xml.security.utils.EncryptionConstants;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DeliveryChannel;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageHeader;
-import org.springframework.beans.factory.InitializingBean;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -64,8 +62,6 @@ import org.xml.sax.SAXException;
 import nl.clockwork.ebms.EbMSAttachmentFactory;
 import nl.clockwork.ebms.StreamUtils;
 import nl.clockwork.ebms.common.CPAManager;
-import nl.clockwork.ebms.common.KeyStoreManager;
-import nl.clockwork.ebms.common.KeyStoreManager.KeyStoreType;
 import nl.clockwork.ebms.common.util.SecurityUtils;
 import nl.clockwork.ebms.model.CacheablePartyId;
 import nl.clockwork.ebms.model.EbMSAttachment;
@@ -73,24 +69,16 @@ import nl.clockwork.ebms.model.EbMSDocument;
 import nl.clockwork.ebms.model.EbMSMessage;
 import nl.clockwork.ebms.processor.EbMSProcessingException;
 import nl.clockwork.ebms.processor.EbMSProcessorException;
+import nl.clockwork.ebms.security.EbMSTrustStore;
 import nl.clockwork.ebms.util.CPAUtils;
 import nl.clockwork.ebms.validation.ValidationException;
 import nl.clockwork.ebms.validation.ValidatorException;
 
-public class EbMSMessageEncrypter implements InitializingBean
+public class EbMSMessageEncrypter
 {
 	protected transient Log logger = LogFactory.getLog(getClass());
 	private CPAManager cpaManager;
-	private KeyStoreType trustStoreType;
-	private String trustStorePath;
-	private String trustStorePassword;
-	private KeyStore trustStore;
-
-	@Override
-	public void afterPropertiesSet() throws Exception
-	{
-		trustStore = KeyStoreManager.getKeyStore(trustStoreType,trustStorePath,trustStorePassword);
-	}
+	private EbMSTrustStore trustStore;
 
 	public void encrypt(EbMSMessage message) throws EbMSProcessorException
 	{
@@ -151,7 +139,7 @@ public class EbMSMessageEncrypter implements InitializingBean
 		return result;
 	}
 
-	private void validateCertificate(KeyStore trustStore, X509Certificate certificate) throws KeyStoreException, ValidationException
+	private void validateCertificate(EbMSTrustStore trustStore, X509Certificate certificate) throws KeyStoreException, ValidationException
 	{
 		try
 		{
@@ -255,19 +243,9 @@ public class EbMSMessageEncrypter implements InitializingBean
 		this.cpaManager = cpaManager;
 	}
 
-	public void setTrustStoreType(KeyStoreType trustStoreType)
+	public void setTrustStore(EbMSTrustStore trustStore)
 	{
-		this.trustStoreType = trustStoreType;
-	}
-
-	public void setTrustStorePath(String trustStorePath)
-	{
-		this.trustStorePath = trustStorePath;
-	}
-
-	public void setTrustStorePassword(String trustStorePassword)
-	{
-		this.trustStorePassword = trustStorePassword;
+		this.trustStore = trustStore;
 	}
 
 }

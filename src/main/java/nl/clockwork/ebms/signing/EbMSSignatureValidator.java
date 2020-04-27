@@ -16,7 +16,6 @@
 package nl.clockwork.ebms.signing;
 
 import java.security.GeneralSecurityException;
-import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
@@ -34,38 +33,27 @@ import org.apache.xml.security.signature.XMLSignatureException;
 import org.apache.xml.security.utils.Constants;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DeliveryChannel;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageHeader;
-import org.springframework.beans.factory.InitializingBean;
 import org.w3._2000._09.xmldsig.ReferenceType;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
 import nl.clockwork.ebms.StreamUtils;
 import nl.clockwork.ebms.common.CPAManager;
-import nl.clockwork.ebms.common.KeyStoreManager;
-import nl.clockwork.ebms.common.KeyStoreManager.KeyStoreType;
 import nl.clockwork.ebms.common.util.SecurityUtils;
 import nl.clockwork.ebms.model.CacheablePartyId;
 import nl.clockwork.ebms.model.EbMSAttachment;
 import nl.clockwork.ebms.model.EbMSMessage;
+import nl.clockwork.ebms.security.EbMSTrustStore;
 import nl.clockwork.ebms.util.CPAUtils;
 import nl.clockwork.ebms.validation.ValidationException;
 import nl.clockwork.ebms.validation.ValidatorException;
 import nl.clockwork.ebms.xml.dsig.EbMSAttachmentResolver;
 
-public class EbMSSignatureValidator implements InitializingBean
+public class EbMSSignatureValidator
 {
 	protected transient Log logger = LogFactory.getLog(getClass());
 	private CPAManager cpaManager;
-	private KeyStoreType trustStoreType;
-	private String trustStorePath;
-	private String trustStorePassword;
-	private KeyStore trustStore;
-
-	@Override
-	public void afterPropertiesSet() throws Exception
-	{
-		trustStore = KeyStoreManager.getKeyStore(trustStoreType,trustStorePath,trustStorePassword);
-	}
+	private EbMSTrustStore trustStore;
 
 	public void validate(EbMSMessage message) throws ValidatorException, ValidationException
 	{
@@ -201,19 +189,9 @@ public class EbMSSignatureValidator implements InitializingBean
 		this.cpaManager = cpaManager;
 	}
 
-	public void setTrustStoreType(KeyStoreType trustStoreType)
+	public void setTrustStore(EbMSTrustStore trustStore)
 	{
-		this.trustStoreType = trustStoreType;
-	}
-
-	public void setTrustStorePath(String trustStorePath)
-	{
-		this.trustStorePath = trustStorePath;
-	}
-	
-	public void setTrustStorePassword(String trustStorePassword)
-	{
-		this.trustStorePassword = trustStorePassword;
+		this.trustStore = trustStore;
 	}
 
 }

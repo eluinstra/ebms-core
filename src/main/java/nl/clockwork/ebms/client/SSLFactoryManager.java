@@ -20,7 +20,6 @@ import java.io.InputStream;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
-import java.security.KeyStore;
 import java.security.Principal;
 import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
@@ -41,8 +40,8 @@ import javax.net.ssl.X509KeyManager;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.InitializingBean;
 
-import nl.clockwork.ebms.common.KeyStoreManager;
-import nl.clockwork.ebms.common.KeyStoreManager.KeyStoreType;
+import nl.clockwork.ebms.security.EbMSKeyStore;
+import nl.clockwork.ebms.security.EbMSTrustStore;
 
 public class SSLFactoryManager implements InitializingBean
 {
@@ -176,12 +175,8 @@ public class SSLFactoryManager implements InitializingBean
 		}
 	}
 
-	private KeyStoreType keyStoreType;
-	private String keyStorePath;
-	private String keyStorePassword;
-	private KeyStoreType trustStoreType;
-	private String trustStorePath;
-	private String trustStorePassword;
+	private EbMSKeyStore keyStore;
+	private EbMSTrustStore trustStore;
 	private boolean verifyHostnames;
 	private String[] enabledProtocols = new String[]{};
 	private String[] enabledCipherSuites = new String[]{};
@@ -191,12 +186,9 @@ public class SSLFactoryManager implements InitializingBean
 	@Override
 	public void afterPropertiesSet() throws Exception
 	{
-		KeyStore keyStore = KeyStoreManager.getKeyStore(keyStoreType,keyStorePath,keyStorePassword);
-		KeyStore trustStore = KeyStoreManager.getKeyStore(trustStoreType,trustStorePath,trustStorePassword);
-
 		//KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
 		KeyManagerFactory kmf = KeyManagerFactory.getInstance("SunX509");
-		kmf.init(keyStore,keyStorePassword.toCharArray());
+		kmf.init(keyStore.getKeyStore(),keyStore.getKeyPassword().toCharArray());
 
 		KeyManager[] keyManagers = kmf.getKeyManagers();
 		for (int i = 0; i < keyManagers.length; i++)
@@ -205,7 +197,7 @@ public class SSLFactoryManager implements InitializingBean
 
 		//TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
 		TrustManagerFactory tmf = TrustManagerFactory.getInstance("SunX509");
-		tmf.init(trustStore);
+		tmf.init(trustStore.getKeyStore());
 
 		SSLContext sslContext = SSLContext.getInstance("TLS");
 		sslContext.init(kmf.getKeyManagers(),tmf.getTrustManagers(),null);
@@ -242,36 +234,16 @@ public class SSLFactoryManager implements InitializingBean
 		return sslSocketFactory;
 	}
 
-	public void setKeyStoreType(KeyStoreType keyStoreType)
+	public void setKeyStore(EbMSKeyStore keyStore)
 	{
-		this.keyStoreType = keyStoreType;
+		this.keyStore = keyStore;
 	}
 
-	public void setKeyStorePath(String keyStorePath)
+	public void setTrustStore(EbMSTrustStore trustStore)
 	{
-		this.keyStorePath = keyStorePath;
+		this.trustStore = trustStore;
 	}
 
-	public void setKeyStorePassword(String keyStorePassword)
-	{
-		this.keyStorePassword = keyStorePassword;
-	}
-
-	public void setTrustStoreType(KeyStoreType trustStoreType)
-	{
-		this.trustStoreType = trustStoreType;
-	}
-
-	public void setTrustStorePath(String trustStorePath)
-	{
-		this.trustStorePath = trustStorePath;
-	}
-
-	public void setTrustStorePassword(String trustStorePassword)
-	{
-		this.trustStorePassword = trustStorePassword;
-	}
-	
 	public void setVerifyHostnames(boolean verifyHostnames)
 	{
 		this.verifyHostnames = verifyHostnames;

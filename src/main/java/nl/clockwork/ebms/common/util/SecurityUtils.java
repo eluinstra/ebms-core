@@ -19,7 +19,6 @@ import java.io.UnsupportedEncodingException;
 import java.security.GeneralSecurityException;
 import java.security.Key;
 import java.security.KeyPair;
-import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
@@ -35,13 +34,15 @@ import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import javax.security.cert.CertificateException;
 
-import nl.clockwork.ebms.validation.ValidationException;
-import nl.clockwork.ebms.validation.ValidatorException;
-
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.xml.security.encryption.XMLCipher;
+
+import nl.clockwork.ebms.security.EbMSKeyStore;
+import nl.clockwork.ebms.security.EbMSTrustStore;
+import nl.clockwork.ebms.validation.ValidationException;
+import nl.clockwork.ebms.validation.ValidatorException;
 
 public class SecurityUtils
 {
@@ -51,7 +52,7 @@ public class SecurityUtils
 	private static final int KEYSIZE_256 = 256;
 	
 
-	public static KeyPair getKeyPair(KeyStore keyStore, String alias, String password) throws GeneralSecurityException
+	public static KeyPair getKeyPair(EbMSKeyStore keyStore, String alias, String password) throws GeneralSecurityException
 	{
 		Key key = keyStore.getKey(alias,password.toCharArray());
 		if (key instanceof PrivateKey)
@@ -63,7 +64,7 @@ public class SecurityUtils
 		return null;
 	}
 
-	public static void validateCertificate(KeyStore trustStore, X509Certificate certificate, Date date) throws KeyStoreException, ValidationException
+	public static void validateCertificate(EbMSTrustStore trustStore, X509Certificate certificate, Date date) throws KeyStoreException, ValidationException
 	{
 		try
 		{
@@ -94,7 +95,7 @@ public class SecurityUtils
 		}
 	}
 	
-	public static void validateCertificate(KeyStore trustStore, javax.security.cert.X509Certificate certificate, Date date) throws KeyStoreException, ValidatorException
+	public static void validateCertificate(EbMSTrustStore trustStore, javax.security.cert.X509Certificate certificate, Date date) throws KeyStoreException, ValidatorException
 	{
 		try
 		{

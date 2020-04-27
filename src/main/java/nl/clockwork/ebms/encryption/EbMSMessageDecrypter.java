@@ -19,7 +19,6 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.security.KeyPair;
-import java.security.KeyStore;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.List;
@@ -31,7 +30,6 @@ import org.apache.xml.security.encryption.XMLEncryptionException;
 import org.apache.xml.security.utils.EncryptionConstants;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DeliveryChannel;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageHeader;
-import org.springframework.beans.factory.InitializingBean;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
@@ -40,33 +38,23 @@ import nl.clockwork.ebms.Constants;
 import nl.clockwork.ebms.EbMSAttachmentFactory;
 import nl.clockwork.ebms.StreamUtils;
 import nl.clockwork.ebms.common.CPAManager;
-import nl.clockwork.ebms.common.KeyStoreManager;
-import nl.clockwork.ebms.common.KeyStoreManager.KeyStoreType;
 import nl.clockwork.ebms.common.util.DOMUtils;
 import nl.clockwork.ebms.common.util.SecurityUtils;
 import nl.clockwork.ebms.model.CacheablePartyId;
 import nl.clockwork.ebms.model.EbMSAttachment;
 import nl.clockwork.ebms.model.EbMSMessage;
 import nl.clockwork.ebms.processor.EbMSProcessingException;
+import nl.clockwork.ebms.security.EbMSKeyStore;
 import nl.clockwork.ebms.util.CPAUtils;
 import nl.clockwork.ebms.util.EbMSMessageUtils;
 import nl.clockwork.ebms.validation.EbMSValidationException;
 import nl.clockwork.ebms.validation.ValidationException;
 import nl.clockwork.ebms.validation.ValidatorException;
 
-public class EbMSMessageDecrypter implements InitializingBean
+public class EbMSMessageDecrypter
 {
 	private CPAManager cpaManager;
-	private KeyStoreType keyStoreType;
-	private String keyStorePath;
-	private String keyStorePassword;
-	private KeyStore keyStore;
-
-	@Override
-	public void afterPropertiesSet() throws Exception
-	{
-		keyStore = KeyStoreManager.getKeyStore(keyStoreType,keyStorePath,keyStorePassword);
-	}
+	private EbMSKeyStore keyStore;
 
 	public void decrypt(EbMSMessage message) throws ValidatorException
 	{
@@ -87,8 +75,8 @@ public class EbMSMessageDecrypter implements InitializingBean
 				String alias = keyStore.getCertificateAlias(certificate);
 				if (alias == null)
 					throw new ValidationException(
-							"No certificate found with subject \"" + certificate.getSubjectDN().getName() + "\" in keystore \"" + keyStorePath + "\"");
-				KeyPair keyPair = SecurityUtils.getKeyPair(keyStore,alias,keyStorePassword);
+							"No certificate found with subject \"" + certificate.getSubjectDN().getName() + "\" in keystore \"" + keyStore.getPath() + "\"");
+				KeyPair keyPair = SecurityUtils.getKeyPair(keyStore,alias,keyStore.getKeyPassword());
 				List<EbMSAttachment> attachments = new ArrayList<>();
 				message.getAttachments().forEach(a -> attachments.add(decrypt(keyPair,a)));
 				message.setAttachments(attachments);
@@ -138,19 +126,9 @@ public class EbMSMessageDecrypter implements InitializingBean
 		this.cpaManager = cpaManager;
 	}
 
-	public void setKeyStoreType(KeyStoreType keyStoreType)
+	public void setKeyStore(EbMSKeyStore keyStore)
 	{
-		this.keyStoreType = keyStoreType;
-	}
-
-	public void setKeyStorePath(String keyStorePath)
-	{
-		this.keyStorePath = keyStorePath;
-	}
-
-	public void setKeyStorePassword(String keyStorePassword)
-	{
-		this.keyStorePassword = keyStorePassword;
+		this.keyStore = keyStore;
 	}
 
 }

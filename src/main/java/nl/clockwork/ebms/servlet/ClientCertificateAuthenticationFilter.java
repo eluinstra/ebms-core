@@ -16,8 +16,6 @@
 package nl.clockwork.ebms.servlet;
 
 import java.io.IOException;
-import java.security.GeneralSecurityException;
-import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.cert.X509Certificate;
 
@@ -31,30 +29,25 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 
-import nl.clockwork.ebms.common.KeyStoreManager;
-import nl.clockwork.ebms.common.KeyStoreManager.KeyStoreType;
+import nl.clockwork.ebms.security.EbMSTrustStore;
 import nl.clockwork.ebms.validation.ClientCertificateManager;
 
 public class ClientCertificateAuthenticationFilter implements Filter
 {
 	protected transient Log logger = LogFactory.getLog(getClass());
-	private KeyStore trustStore;
+	private EbMSTrustStore trustStore;
 
 	@Override
-	public void init(FilterConfig filterConfig) throws ServletException
+	public void init(FilterConfig config) throws ServletException
 	{
-		try
-		{
-			String trustStoreType = filterConfig.getInitParameter("trustStoreType");
-			String trustStorePath = filterConfig.getInitParameter("trustStorePath");
-			String trustStorePassword = filterConfig.getInitParameter("trustStorePassword");
-			trustStore = KeyStoreManager.getKeyStore(KeyStoreType.valueOf(trustStoreType),trustStorePath,trustStorePassword);
-		}
-		catch (GeneralSecurityException | IOException e)
-		{
-			throw new ServletException(e);
-		}
+		WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(config.getServletContext());
+		String id = config.getInitParameter("trustStore");
+		if (id == null)
+			id = "trustStore";
+		trustStore = wac.getBean(id,EbMSTrustStore.class);
 	}
 
 	@Override
@@ -74,7 +67,7 @@ public class ClientCertificateAuthenticationFilter implements Filter
 		}
 	}
 
-	private boolean validate(KeyStore trustStore, X509Certificate x509Certificate) throws KeyStoreException
+	private boolean validate(EbMSTrustStore trustStore, X509Certificate x509Certificate) throws KeyStoreException
 	{
 		return x509Certificate != null && trustStore.getCertificateAlias(x509Certificate) != null;
 	}

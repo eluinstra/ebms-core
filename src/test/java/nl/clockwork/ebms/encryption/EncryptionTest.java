@@ -50,7 +50,6 @@ import nl.clockwork.ebms.common.CPAManager;
 import nl.clockwork.ebms.common.EbMSIdGenerator;
 import nl.clockwork.ebms.common.EbMSMessageFactory;
 import nl.clockwork.ebms.common.JAXBParser;
-import nl.clockwork.ebms.common.KeyStoreManager.KeyStoreType;
 import nl.clockwork.ebms.common.util.DOMUtils;
 import nl.clockwork.ebms.dao.DAOException;
 import nl.clockwork.ebms.dao.EbMSDAO;
@@ -61,6 +60,9 @@ import nl.clockwork.ebms.model.EbMSMessageContent;
 import nl.clockwork.ebms.model.EbMSMessageContext;
 import nl.clockwork.ebms.model.Role;
 import nl.clockwork.ebms.processor.EbMSProcessorException;
+import nl.clockwork.ebms.security.KeyStoreFactory;
+import nl.clockwork.ebms.security.KeyStoreType;
+import nl.clockwork.ebms.security.TrustStoreFactory;
 import nl.clockwork.ebms.validation.EbMSValidationException;
 import nl.clockwork.ebms.validation.ValidatorException;
 
@@ -186,10 +188,7 @@ public class EncryptionTest
 	{
 		EbMSMessageEncrypter result = new EbMSMessageEncrypter();
 		result.setCpaManager(cpaManager);
-		result.setTrustStoreType(keyStoreType);
-		result.setTrustStorePath(keyStorePath);
-		result.setTrustStorePassword(keyStorePassword);
-		result.afterPropertiesSet();
+		result.setTrustStore(new TrustStoreFactory(keyStoreType,keyStorePath,keyStorePassword).getObject());
 		return result;
 	}
 
@@ -197,9 +196,7 @@ public class EncryptionTest
 	{
 		EbMSMessageDecrypter result = new EbMSMessageDecrypter();
 		result.setCpaManager(cpaManager);
-		result.setKeyStorePath(keyStorePath);
-		result.setKeyStorePassword(keyStorePassword);
-		result.afterPropertiesSet();
+		result.setKeyStore(new KeyStoreFactory(keyStoreType,keyStorePath,keyStorePassword,keyStorePassword,null).getObject());
 		return result;
 	}
 

@@ -17,7 +17,6 @@ package nl.clockwork.ebms.signing;
 
 import java.security.GeneralSecurityException;
 import java.security.KeyPair;
-import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
@@ -30,7 +29,6 @@ import org.apache.xml.security.transforms.params.XPathContainer;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DeliveryChannel;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.AckRequested;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageHeader;
-import org.springframework.beans.factory.InitializingBean;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -38,8 +36,6 @@ import org.w3c.dom.NodeList;
 import nl.clockwork.ebms.Constants;
 import nl.clockwork.ebms.StreamUtils;
 import nl.clockwork.ebms.common.CPAManager;
-import nl.clockwork.ebms.common.KeyStoreManager;
-import nl.clockwork.ebms.common.KeyStoreManager.KeyStoreType;
 import nl.clockwork.ebms.common.util.DOMUtils;
 import nl.clockwork.ebms.common.util.SecurityUtils;
 import nl.clockwork.ebms.model.CacheablePartyId;
@@ -47,27 +43,19 @@ import nl.clockwork.ebms.model.EbMSAttachment;
 import nl.clockwork.ebms.model.EbMSMessage;
 import nl.clockwork.ebms.processor.EbMSProcessingException;
 import nl.clockwork.ebms.processor.EbMSProcessorException;
+import nl.clockwork.ebms.security.EbMSKeyStore;
 import nl.clockwork.ebms.util.CPAUtils;
 import nl.clockwork.ebms.xml.dsig.EbMSAttachmentResolver;
 
-public class EbMSSignatureGenerator implements InitializingBean
+public class EbMSSignatureGenerator
 {
 	private CPAManager cpaManager;
 	private String canonicalizationMethodAlgorithm = Transforms.TRANSFORM_C14N_OMIT_COMMENTS;
 	//private String signatureMethodAlgorithm = XMLSignature.ALGO_ID_SIGNATURE_DSA;
 	private String transformAlgorithm = Transforms.TRANSFORM_C14N_OMIT_COMMENTS;
 	//private String digestAlgorithm = org.apache.xml.security.utils.Constants.ALGO_ID_DIGEST_SHA1;
-	private KeyStoreType keyStoreType;
-	private String keyStorePath;
-	private String keyStorePassword;
-	private KeyStore keyStore;
+	private EbMSKeyStore keyStore;
 
-	@Override
-	public void afterPropertiesSet() throws Exception
-	{
-		keyStore = KeyStoreManager.getKeyStore(keyStoreType,keyStorePath,keyStorePassword);
-	}
-	
 	public void generate(EbMSMessage message) throws EbMSProcessorException
 	{
 		try
@@ -126,14 +114,14 @@ public class EbMSSignatureGenerator implements InitializingBean
 		String alias = keyStore.getCertificateAlias(certificate);
 		if (alias == null)
 			throw new EbMSProcessorException(
-					"No certificate found with subject \"" + certificate.getSubjectDN().getName() + "\" in keystore \"" + keyStorePath + "\"");
-		KeyPair keyPair = SecurityUtils.getKeyPair(keyStore,alias,keyStorePassword);
+					"No certificate found with subject \"" + certificate.getSubjectDN().getName() + "\" in keystore \"" + keyStore.getPath() + "\"");
+		KeyPair keyPair = SecurityUtils.getKeyPair(keyStore,alias,keyStore.getKeyPassword());
 		String signatureAlgorithm = CPAUtils.getSignatureAlgorithm(deliveryChannel);
 		String hashFunction = CPAUtils.getHashFunction(deliveryChannel);
 		sign(keyStore,keyPair,alias,message.getMessage(),message.getAttachments(),signatureAlgorithm,hashFunction);
 	}
 	
-	private void sign(KeyStore keyStore, KeyPair keyPair, String alias, Document document, List<EbMSAttachment> attachments, String signatureMethodAlgorithm, String digestAlgorithm) throws XMLSecurityException, KeyStoreException
+	private void sign(EbMSKeyStore keyStore, KeyPair keyPair, String alias, Document document, List<EbMSAttachment> attachments, String signatureMethodAlgorithm, String digestAlgorithm) throws XMLSecurityException, KeyStoreException
 	{
 		XMLSignature signature = new XMLSignature(document,null,signatureMethodAlgorithm,canonicalizationMethodAlgorithm);
 
@@ -187,19 +175,9 @@ public class EbMSSignatureGenerator implements InitializingBean
 		this.transformAlgorithm = transformAlgorithm;
 	}
 
-	public void setKeyStoreType(KeyStoreType keyStoreType)
+	public void setKeyStore(EbMSKeyStore keyStore)
 	{
-		this.keyStoreType = keyStoreType;
-	}
-
-	public void setKeyStorePath(String keyStorePath)
-	{
-		this.keyStorePath = keyStorePath;
-	}
-	
-	public void setKeyStorePassword(String keyStorePassword)
-	{
-		this.keyStorePassword = keyStorePassword;
+		this.keyStore = keyStore;
 	}
 
 }
