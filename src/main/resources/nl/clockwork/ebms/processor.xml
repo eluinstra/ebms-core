@@ -25,11 +25,6 @@
 		<property name="arguments" value="${patch.digipoort.enable}"/>
 	</bean>
 
-	<bean class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
-		<property name="staticMethod" value="nl.clockwork.ebms.util.EbMSMessageUtils.setOraclePatch"/>
-		<property name="arguments" value="${patch.oracle.enable}"/>
-	</bean>
-
 	<bean id="xmlSecurityInit" class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
 		<property name="staticMethod" value="org.apache.xml.security.Init.init" />
 	</bean>

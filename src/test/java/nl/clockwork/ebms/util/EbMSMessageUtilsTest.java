@@ -298,10 +298,8 @@ public class EbMSMessageUtilsTest
 		assertTrue(documentString.contains("ref1"));
 		assertTrue(documentString.contains("highestSeverity=\"Error\""));
 
-		EbMSMessageUtils.setOraclePatch(true);
 		doc = EbMSMessageUtils.createSOAPMessage(ebMSMessage);
 		documentString = documentToString(doc);
-		EbMSMessageUtils.setOraclePatch(false);
 		assertTrue(documentString.contains("http://www.w3.org/1999/xlink"));
 	}
 	
