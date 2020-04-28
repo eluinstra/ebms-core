@@ -40,13 +40,13 @@
 		<property name="attachmentCipherTransformation" value="${ebmsMessage.attachment.cipherTransformation}" />
 	</bean>
 
-	<bean id="trustStore" class="nl.clockwork.ebms.security.TrustStoreFactory">
+	<bean id="trustStore" class="nl.clockwork.ebms.security.EbMSTrustStore">
 		<constructor-arg name="type" value="${truststore.type}"/>
 		<constructor-arg name="path" value="${truststore.path}"/>
 		<constructor-arg name="password" value="${truststore.password}"/>
 	</bean>
 
-	<bean id="clientKeyStore" class="nl.clockwork.ebms.security.KeyStoreFactory">
+	<bean id="clientKeyStore" class="nl.clockwork.ebms.security.EbMSKeyStore">
 		<constructor-arg name="type" value="${client.keystore.type}"/>
 		<constructor-arg name="path" value="${client.keystore.path}"/>
 		<constructor-arg name="password" value="${client.keystore.password}"/>
@@ -54,14 +54,14 @@
 		<constructor-arg name="defaultAlias" value="${client.keystore.defaultAlias}"/>
 	</bean>
 
-	<bean id="signatureKeyStore" class="nl.clockwork.ebms.security.KeyStoreFactory">
+	<bean id="signatureKeyStore" class="nl.clockwork.ebms.security.EbMSKeyStore">
 		<constructor-arg name="type" value="${signature.keystore.type}"/>
 		<constructor-arg name="path" value="${signature.keystore.path}"/>
 		<constructor-arg name="password" value="${signature.keystore.password}"/>
 		<constructor-arg name="keyPassword" value="${signature.keystore.keyPassword}"/>
 	</bean>
 
-	<bean id="encryptionKeyStore" class="nl.clockwork.ebms.security.KeyStoreFactory">
+	<bean id="encryptionKeyStore" class="nl.clockwork.ebms.security.EbMSKeyStore">
 		<constructor-arg name="type" value="${encryption.keystore.type}"/>
 		<constructor-arg name="path" value="${encryption.keystore.path}"/>
 		<constructor-arg name="password" value="${encryption.keystore.password}"/>
@@ -326,12 +326,12 @@
 	</bean>
 
 	<bean id="eventListener" class="nl.clockwork.ebms.event.listener.EventListenerFactory">
-		<property name="type" value="${eventListener.type}" />
-		<property name="ebMSDAO" ref="ebMSDAO" />
-		<property name="jmsBrokerConfig" value="${jms.broker.config}" />
-		<property name="jmsBrokerStart" value="${jms.broker.start}" />
-		<property name="jmsBrokerURL" value="${jms.brokerURL}" />
-		<property name="jmsVirtualTopics" value="${jms.virtualTopics:false}" />
+		<constructor-arg name="type" value="${eventListener.type}" />
+		<constructor-arg name="ebMSDAO" ref="ebMSDAO" />
+		<constructor-arg name="jmsBrokerConfig" value="${jms.broker.config}" />
+		<constructor-arg name="jmsBrokerStart" value="${jms.broker.start}" />
+		<constructor-arg name="jmsBrokerURL" value="${jms.brokerURL}" />
+		<constructor-arg name="jmsVirtualTopics" value="${jms.virtualTopics:false}" />
 	</bean>
 
 </beans>

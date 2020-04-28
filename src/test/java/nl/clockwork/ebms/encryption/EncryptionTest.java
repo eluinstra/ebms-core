@@ -60,9 +60,9 @@ import nl.clockwork.ebms.model.EbMSMessageContent;
 import nl.clockwork.ebms.model.EbMSMessageContext;
 import nl.clockwork.ebms.model.Role;
 import nl.clockwork.ebms.processor.EbMSProcessorException;
-import nl.clockwork.ebms.security.KeyStoreFactory;
+import nl.clockwork.ebms.security.EbMSKeyStore;
+import nl.clockwork.ebms.security.EbMSTrustStore;
 import nl.clockwork.ebms.security.KeyStoreType;
-import nl.clockwork.ebms.security.TrustStoreFactory;
 import nl.clockwork.ebms.validation.EbMSValidationException;
 import nl.clockwork.ebms.validation.ValidatorException;
 
@@ -188,7 +188,7 @@ public class EncryptionTest
 	{
 		EbMSMessageEncrypter result = new EbMSMessageEncrypter();
 		result.setCpaManager(cpaManager);
-		result.setTrustStore(new TrustStoreFactory(keyStoreType,keyStorePath,keyStorePassword).getObject());
+		result.setTrustStore(new EbMSTrustStore(keyStoreType,keyStorePath,keyStorePassword));
 		return result;
 	}
 
@@ -196,7 +196,7 @@ public class EncryptionTest
 	{
 		EbMSMessageDecrypter result = new EbMSMessageDecrypter();
 		result.setCpaManager(cpaManager);
-		result.setKeyStore(new KeyStoreFactory(keyStoreType,keyStorePath,keyStorePassword,keyStorePassword,null).getObject());
+		result.setKeyStore(new EbMSKeyStore(keyStoreType,keyStorePath,keyStorePassword,keyStorePassword));
 		return result;
 	}
 

@@ -55,9 +55,9 @@ import nl.clockwork.ebms.model.EbMSMessageContent;
 import nl.clockwork.ebms.model.EbMSMessageContext;
 import nl.clockwork.ebms.model.Role;
 import nl.clockwork.ebms.processor.EbMSProcessorException;
-import nl.clockwork.ebms.security.KeyStoreFactory;
+import nl.clockwork.ebms.security.EbMSKeyStore;
+import nl.clockwork.ebms.security.EbMSTrustStore;
 import nl.clockwork.ebms.security.KeyStoreType;
-import nl.clockwork.ebms.security.TrustStoreFactory;
 import nl.clockwork.ebms.validation.ValidationException;
 import nl.clockwork.ebms.validation.ValidatorException;
 
@@ -162,7 +162,7 @@ public class SigningTest
 		result.setCpaManager(cpaManager);
 		result.setCanonicalizationMethodAlgorithm("http://www.w3.org/TR/2001/REC-xml-c14n-20010315");
 		result.setTransformAlgorithm("http://www.w3.org/TR/2001/REC-xml-c14n-20010315");
-		result.setKeyStore(new KeyStoreFactory(keyStoreType,keyStorePath,keyStorePassword,keyStorePassword,null).getObject());
+		result.setKeyStore(new EbMSKeyStore(keyStoreType,keyStorePath,keyStorePassword,keyStorePassword));
 		return result;
 	}
 
@@ -170,7 +170,7 @@ public class SigningTest
 	{
 		EbMSSignatureValidator result = new EbMSSignatureValidator();
 		result.setCpaManager(cpaManager);
-		result.setTrustStore(new TrustStoreFactory(keyStoreType,keyStorePath,keyStorePassword).getObject());
+		result.setTrustStore(new EbMSTrustStore(keyStoreType,keyStorePath,keyStorePassword));
 		return result;
 	}
 
