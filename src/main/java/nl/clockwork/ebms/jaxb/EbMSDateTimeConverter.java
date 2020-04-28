@@ -15,18 +15,13 @@
  */
 package nl.clockwork.ebms.jaxb;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.GregorianCalendar;
-import java.util.TimeZone;
 
 import javax.xml.bind.DatatypeConverter;
 
 public class EbMSDateTimeConverter
 {
-	private static boolean digipoortPatch;
-
 	public static Date parseDateTime(String date)
 	{
 		return DatatypeConverter.parseDateTime(date).getTime();
@@ -34,22 +29,8 @@ public class EbMSDateTimeConverter
 
 	public static String printDateTime(Date date)
 	{
-		if (digipoortPatch)
-		{
-			DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssX");
-			df.setTimeZone(TimeZone.getTimeZone("GMT"));
-			return df.format(date);
-		}
-		else
-		{
-			GregorianCalendar calendar = new GregorianCalendar();
-			calendar.setTime(date);
-			return DatatypeConverter.printDateTime(calendar);
-		}
-	}
-
-	public static void setDigipoortPatch(boolean digipoortPatch)
-	{
-		EbMSDateTimeConverter.digipoortPatch = digipoortPatch;
+		GregorianCalendar calendar = new GregorianCalendar();
+		calendar.setTime(date);
+		return DatatypeConverter.printDateTime(calendar);
 	}
 }
