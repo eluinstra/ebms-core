@@ -4,7 +4,7 @@ CREATE TABLE cpa
 	cpa								TEXT						NOT NULL
 );
 
-CREATE TABLE url
+CREATE TABLE url_mapping
 (
 	source						VARCHAR(256)		NOT NULL UNIQUE,
 	destination				VARCHAR(256)		NOT NULL

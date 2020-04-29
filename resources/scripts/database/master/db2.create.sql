@@ -5,7 +5,7 @@ CREATE TABLE cpa
 	UNIQUE(cpa_id)
 );
 
-CREATE TABLE url
+CREATE TABLE url_mapping
 (
 	source						VARCHAR(256)		NOT NULL,
 	destination				VARCHAR(256)		NOT NULL,

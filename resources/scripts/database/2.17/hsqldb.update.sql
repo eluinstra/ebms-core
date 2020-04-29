@@ -1,3 +1,5 @@
+ALTER TABLE url RENAME TO url_mapping; 
+
 CREATE TABLE certificate_mapping
 (
 	id								VARCHAR(256)	NOT NULL UNIQUE,

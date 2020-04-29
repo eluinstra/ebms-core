@@ -245,7 +245,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 		{
 			return jdbcTemplate.queryForObject(
 				"select count(*)" +
-				" from url" +
+				" from url_mapping" +
 				" where source = ?",
 				new Object[]{source},
 				Integer.class
@@ -264,7 +264,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 		{
 			return Optional.of(jdbcTemplate.queryForObject(
 				"select destination" +
-				" from url" +
+				" from url_mapping" +
 				" where source = ?",
 				String.class,
 				source
@@ -287,7 +287,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 		{
 			return jdbcTemplate.query(
 				"select source, destination" +
-				" from url" +
+				" from url_mapping" +
 				" order by source asc",
 				new RowMapper<URLMapping>()
 				{
@@ -312,7 +312,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 		{
 			jdbcTemplate.update
 			(
-				"insert into url (" +
+				"insert into url_mapping (" +
 					"source," +
 					"destination" +
 				") values (?,?)",
@@ -333,7 +333,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 		{
 			return jdbcTemplate.update
 			(
-				"update url set" +
+				"update url_mapping set" +
 				" destination = ?" +
 				" where source = ?",
 				urlMapping.getDestination(),
@@ -353,7 +353,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 		{
 			return jdbcTemplate.update
 			(
-				"delete from url" +
+				"delete from url_mapping" +
 				" where source = ?",
 				source
 			);

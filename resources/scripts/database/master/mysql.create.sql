@@ -6,7 +6,7 @@ CREATE TABLE cpa
 
 ALTER TABLE cpa ADD CONSTRAINT uc_cpa_id UNIQUE (cpa_id(255));
 
-CREATE TABLE url
+CREATE TABLE url_mapping
 (
 	source						VARCHAR(256)		NOT NULL,
 	destination				VARCHAR(256)		NOT NULL
