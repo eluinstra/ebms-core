@@ -15,6 +15,7 @@
  */
 package nl.clockwork.ebms.service;
 
+import java.security.cert.X509Certificate;
 import java.util.List;
 
 import javax.jws.WebMethod;
@@ -23,6 +24,7 @@ import javax.jws.WebResult;
 import javax.jws.WebService;
 import javax.xml.bind.annotation.XmlElement;
 
+import nl.clockwork.ebms.model.CertificateMapping;
 import nl.clockwork.ebms.model.URLMapping;
 
 @WebService(targetNamespace="http://www.ordina.nl/cpa/2.16")
@@ -106,5 +108,33 @@ public interface CPAService
 	@WebResult(name="URLs")
 	@WebMethod(operationName="GetURLMappings")
 	List<URLMapping> getURLMappings() throws CPAServiceException;
+
+	/**
+	 * Stores Certificate mapping certificateMapping in the database
+	 * 
+	 * @param certificateMapping - Maps the source Certificate to the destination Certificate
+	 * @throws CPAServiceException
+	 */
+	@WebMethod(operationName="SetCertificateMapping")
+	void setCertificateMapping(@WebParam(name="CertificateMapping") @XmlElement(required=true) CertificateMapping certificateMapping) throws CPAServiceException;
+
+	/**
+	 * Removes Certificate mapping identified by source Certificate source from the database
+	 * 
+	 * @param source
+	 * @throws CPAServiceException
+	 */
+	@WebMethod(operationName="DeleteCertificateMapping")
+	void deleteCertificateMapping(@WebParam(name="SourceCertificate") @XmlElement(required=true) X509Certificate source) throws CPAServiceException;
+
+	/**
+	 * Gets all Certificate mappings that are stored in the database
+	 * 
+	 * @return The list of Certificate mappings
+	 * @throws CPAServiceException
+	 */
+	@WebResult(name="Certificates")
+	@WebMethod(operationName="GetCertificateMappings")
+	List<CertificateMapping> getCertificateMappings() throws CPAServiceException;
 
 }

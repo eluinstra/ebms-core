@@ -15,15 +15,18 @@
  */
 package nl.clockwork.ebms.service;
 
+import java.security.cert.X509Certificate;
 import java.util.List;
 
 import javax.xml.bind.JAXBException;
 
 import nl.clockwork.ebms.common.CPAManager;
+import nl.clockwork.ebms.common.CertificateManager;
 import nl.clockwork.ebms.common.InvalidURLException;
 import nl.clockwork.ebms.common.URLManager;
 import nl.clockwork.ebms.common.JAXBParser;
 import nl.clockwork.ebms.dao.DAOException;
+import nl.clockwork.ebms.model.CertificateMapping;
 import nl.clockwork.ebms.model.URLMapping;
 import nl.clockwork.ebms.validation.CPAValidator;
 import nl.clockwork.ebms.validation.ValidatorException;
@@ -38,6 +41,7 @@ public class CPAServiceImpl implements CPAService
   protected transient Log logger = LogFactory.getLog(getClass());
 	private CPAManager cpaManager;
 	private URLManager urlManager;
+	private CertificateManager certificateManager;
 	private XSDValidator xsdValidator;
 	private CPAValidator cpaValidator;
 	private Object cpaMonitor = new Object();
@@ -142,18 +146,6 @@ public class CPAServiceImpl implements CPAService
 	}
 
 	@Override
-	public List<URLMapping> getURLMappings() throws CPAServiceException
-	{
-		return urlManager.getURLs();
-	}
-
-	@Override
-	public void deleteURLMapping(String source) throws CPAServiceException
-	{
-		urlManager.deleteURLMapping(source);
-	}
-
-	@Override
 	public void setURLMapping(URLMapping urlMapping) throws CPAServiceException
 	{
 		try
@@ -164,6 +156,36 @@ public class CPAServiceImpl implements CPAService
 		{
 			throw new CPAServiceException(e);
 		}
+	}
+
+	@Override
+	public void deleteURLMapping(String source) throws CPAServiceException
+	{
+		urlManager.deleteURLMapping(source);
+	}
+
+	@Override
+	public List<URLMapping> getURLMappings() throws CPAServiceException
+	{
+		return urlManager.getURLs();
+	}
+
+	@Override
+	public void setCertificateMapping(CertificateMapping certificateMapping) throws CPAServiceException
+	{
+		certificateManager.setCertificateMapping(certificateMapping);
+	}
+
+	@Override
+	public void deleteCertificateMapping(X509Certificate source) throws CPAServiceException
+	{
+		certificateManager.deleteCertificateMapping(source);
+	}
+
+	@Override
+	public List<CertificateMapping> getCertificateMappings() throws CPAServiceException
+	{
+		return certificateManager.getCertificates();
 	}
 
 	public void setCpaManager(CPAManager cpaManager)
