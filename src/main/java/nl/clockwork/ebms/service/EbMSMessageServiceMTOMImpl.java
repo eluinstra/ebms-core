@@ -33,7 +33,7 @@ public class EbMSMessageServiceMTOMImpl extends EbMSMessageServiceImpl implement
 		try
 		{
 			ebMSMessageContextValidator.validate(messageContent.getContext());
-			final EbMSMessage message = ebMSMessageFactory.createEbMSMessageMTOM(messageContent.getContext().getCpaId(),messageContent);
+			final EbMSMessage message = ebMSMessageFactory.createEbMSMessageMTOM(messageContent);
 			signatureGenerator.generate(message);
 			storeMessage(message);
 			return message.getMessageHeader().getMessageData().getMessageId();

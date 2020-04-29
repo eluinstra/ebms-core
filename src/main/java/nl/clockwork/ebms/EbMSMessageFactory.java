@@ -73,9 +73,9 @@ public class EbMSMessageFactory
 	private CPAManager cpaManager;
 	private EbMSIdGenerator ebMSIdGenerator;
 
-	public EbMSMessage createEbMSMessageError(String cpaId, EbMSMessage message, ErrorList errorList, Date timestamp) throws DatatypeConfigurationException, JAXBException
+	public EbMSMessage createEbMSMessageError(EbMSMessage message, ErrorList errorList, Date timestamp) throws DatatypeConfigurationException, JAXBException
 	{
-		MessageHeader messageHeader = createResponseMessageHeader(cpaId,message.getMessageHeader(),timestamp,EbMSAction.MESSAGE_ERROR);
+		MessageHeader messageHeader = createResponseMessageHeader(message.getMessageHeader(),timestamp,EbMSAction.MESSAGE_ERROR);
 		if (errorList.getError().size() == 0)
 		{
 			errorList.getError().add(EbMSMessageUtils.createError(
@@ -90,11 +90,11 @@ public class EbMSMessageFactory
 		return result;
 	}
 
-	public EbMSMessage createEbMSAcknowledgment(String cpaId, EbMSMessage message, Date timestamp) throws EbMSProcessorException
+	public EbMSMessage createEbMSAcknowledgment(EbMSMessage message, Date timestamp) throws EbMSProcessorException
 	{
 		try
 		{
-			MessageHeader messageHeader = createResponseMessageHeader(cpaId,message.getMessageHeader(),timestamp,EbMSAction.ACKNOWLEDGMENT);
+			MessageHeader messageHeader = createResponseMessageHeader(message.getMessageHeader(),timestamp,EbMSAction.ACKNOWLEDGMENT);
 			
 			Acknowledgment acknowledgment = new Acknowledgment();
 
@@ -149,12 +149,12 @@ public class EbMSMessageFactory
 		}
 	}
 	
-	public EbMSMessage createEbMSPong(String cpaId, EbMSMessage ping) throws EbMSProcessorException
+	public EbMSMessage createEbMSPong(EbMSMessage message) throws EbMSProcessorException
 	{
 		try
 		{
 			EbMSMessage result = new EbMSMessage();
-			result.setMessageHeader(createResponseMessageHeader(cpaId,ping.getMessageHeader(),new Date(),EbMSAction.PONG));
+			result.setMessageHeader(createResponseMessageHeader(message.getMessageHeader(),new Date(),EbMSAction.PONG));
 			result.setMessage(EbMSMessageUtils.createSOAPMessage(result));
 			return result;
 		}
@@ -191,11 +191,11 @@ public class EbMSMessageFactory
 		}
 	}
 
-	public EbMSMessage createEbMSStatusResponse(String cpaId, EbMSMessage request, EbMSMessageStatus status, Date timestamp) throws EbMSProcessorException
+	public EbMSMessage createEbMSStatusResponse(EbMSMessage request, EbMSMessageStatus status, Date timestamp) throws EbMSProcessorException
 	{
 		try
 		{
-			MessageHeader messageHeader = createResponseMessageHeader(cpaId,request.getMessageHeader(),new Date(),EbMSAction.STATUS_RESPONSE);
+			MessageHeader messageHeader = createResponseMessageHeader(request.getMessageHeader(),new Date(),EbMSAction.STATUS_RESPONSE);
 			StatusResponse statusResponse = createStatusResponse(request.getStatusRequest(),status,timestamp);
 			EbMSMessage result = new EbMSMessage();
 			result.setMessageHeader(messageHeader);
@@ -213,14 +213,14 @@ public class EbMSMessageFactory
 		}
 	}
 
-	public EbMSMessage createEbMSMessage(String cpaId, EbMSMessageContent content) throws EbMSProcessorException
+	public EbMSMessage createEbMSMessage(EbMSMessageContent content) throws EbMSProcessorException
 	{
 		try
 		{
 			EbMSMessage result = new EbMSMessage();
-			result.setMessageHeader(createMessageHeader(cpaId,content.getContext()));
-			result.setAckRequested(createAckRequested(cpaId,content.getContext()));
-			result.setSyncReply(createSyncReply(cpaId,content.getContext()));
+			result.setMessageHeader(createMessageHeader(content.getContext()));
+			result.setAckRequested(createAckRequested(content.getContext()));
+			result.setSyncReply(createSyncReply(content.getContext()));
 			if (content.getDataSources() != null && content.getDataSources().size() > 0)
 			{
 				Manifest manifest = EbMSMessageUtils.createManifest();
@@ -249,14 +249,14 @@ public class EbMSMessageFactory
 		return EbMSAttachmentFactory.createEbMSAttachment(ds.getName(),contentId,ds.getContentType(),ds.getContent());
 	}
 
-	public EbMSMessage createEbMSMessageMTOM(String cpaId, EbMSMessageContentMTOM content) throws EbMSProcessorException
+	public EbMSMessage createEbMSMessageMTOM(EbMSMessageContentMTOM content) throws EbMSProcessorException
 	{
 		try
 		{
 			EbMSMessage result = new EbMSMessage();
-			result.setMessageHeader(createMessageHeader(cpaId,content.getContext()));
-			result.setAckRequested(createAckRequested(cpaId,content.getContext()));
-			result.setSyncReply(createSyncReply(cpaId,content.getContext()));
+			result.setMessageHeader(createMessageHeader(content.getContext()));
+			result.setAckRequested(createAckRequested(content.getContext()));
+			result.setSyncReply(createSyncReply(content.getContext()));
 			if (content.getDataSources() != null && content.getDataSources().size() > 0)
 			{
 				Manifest manifest = EbMSMessageUtils.createManifest();
@@ -327,8 +327,9 @@ public class EbMSMessageFactory
 		return createMessageHeader(cpaId,conversationId,from,to,service,action.action(),messageData,null); //deliveryChannel.getMessagingCharacteristics().getDuplicateElimination()
 	}
 
-	private MessageHeader createMessageHeader(String cpaId, EbMSMessageContext context) throws DatatypeConfigurationException
+	private MessageHeader createMessageHeader(EbMSMessageContext context) throws DatatypeConfigurationException
 	{
+		String cpaId = context.getCpaId();
 		FromPartyInfo fromPartyInfo = cpaManager.getFromPartyInfo(cpaId,context.getFromRole(),context.getService(),context.getAction())
 				.orElseThrow(() -> StreamUtils.illegalStateException("FromPartyInfo",cpaId,context.getFromRole(),context.getService(),context.getAction()));
 		ToPartyInfo toPartyInfo = cpaManager.getToPartyInfoByFromPartyActionBinding(cpaId,context.getFromRole(),context.getService(),context.getAction())
@@ -348,8 +349,9 @@ public class EbMSMessageFactory
 		return createMessageHeader(cpaId,conversationId,from,to,service,action,messageData,deliveryChannel.getMessagingCharacteristics().getDuplicateElimination());
 	}
 
-	private MessageHeader createResponseMessageHeader(String cpaId, MessageHeader messageHeader, Date timestamp, EbMSAction action) throws DatatypeConfigurationException, JAXBException
+	private MessageHeader createResponseMessageHeader(MessageHeader messageHeader, Date timestamp, EbMSAction action) throws DatatypeConfigurationException, JAXBException
 	{
+		String cpaId = messageHeader.getCPAId();
 		CacheablePartyId partyId = new CacheablePartyId(messageHeader.getTo().getPartyId());
 		DeliveryChannel deliveryChannel = cpaManager.getDefaultDeliveryChannel(cpaId,partyId,action.action()).orElse(null);
 		String hostname = CPAUtils.getHostname(deliveryChannel);
@@ -410,8 +412,9 @@ public class EbMSMessageFactory
 			return null;
 	}
 
-	private AckRequested createAckRequested(String cpaId, EbMSMessageContext context)
+	private AckRequested createAckRequested(EbMSMessageContext context)
 	{
+		String cpaId = context.getCpaId();
 		DeliveryChannel channel = cpaManager.getFromPartyInfo(cpaId,context.getFromRole(),context.getService(),context.getAction())
 				.map(p -> CPAUtils.getDeliveryChannel(p.getCanSend().getThisPartyActionBinding()))
 				.orElseThrow(() -> StreamUtils.illegalStateException("FromPartyInfo",cpaId,context.getFromRole(),context.getService(),context.getAction()));
@@ -437,8 +440,9 @@ public class EbMSMessageFactory
 				.orElseThrow(() -> StreamUtils.illegalStateException("DefaultDeliveryChannel",cpaId,partyId,action)));
 	}
 	
-	private SyncReply createSyncReply(String cpaId, EbMSMessageContext context)
+	private SyncReply createSyncReply(EbMSMessageContext context)
 	{
+		String cpaId = context.getCpaId();
 		CacheablePartyId partyId = new CacheablePartyId(cpaManager.getFromPartyInfo(cpaId,context.getFromRole(),context.getService(),context.getAction())
 				.orElseThrow(() -> StreamUtils.illegalStateException("FromPartyInfo",cpaId,context.getFromRole(),context.getService(),context.getAction()))
 				.getPartyIds());

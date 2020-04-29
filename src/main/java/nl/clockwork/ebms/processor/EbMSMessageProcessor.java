@@ -117,7 +117,7 @@ public class EbMSMessageProcessor
 			}
 			else if (EbMSAction.STATUS_REQUEST.action().equals(messageHeader.getAction()))
 			{
-				EbMSMessage response = processStatusRequest(messageHeader.getCPAId(),timestamp,message);
+				EbMSMessage response = processStatusRequest(message,timestamp);
 				if (messageValidator.isSyncReply(message))
 					return EbMSMessageUtils.getEbMSDocument(response);
 				else
@@ -150,7 +150,7 @@ public class EbMSMessageProcessor
 			}
 			else if (EbMSAction.PING.action().equals(messageHeader.getAction()))
 			{
-				EbMSMessage response = processPing(messageHeader.getCPAId(),timestamp,message);
+				EbMSMessage response = processPing(message,timestamp);
 				if (messageValidator.isSyncReply(message))
 					return EbMSMessageUtils.getEbMSDocument(response);
 				else
@@ -367,7 +367,7 @@ public class EbMSMessageProcessor
 			}
 			else
 			{
-				final EbMSMessage acknowledgment = ebMSMessageFactory.createEbMSAcknowledgment(messageHeader.getCPAId(),message,timestamp);
+				final EbMSMessage acknowledgment = ebMSMessageFactory.createEbMSAcknowledgment(message,timestamp);
 				signatureGenerator.generate(message.getAckRequested(),acknowledgment);
 				ebMSDAO.executeTransaction(
 					new DAOTransactionCallback()
@@ -421,7 +421,7 @@ public class EbMSMessageProcessor
 			logger.warn("Message " + message.getMessageHeader().getMessageData().getMessageId() + " invalid.\n" + e.getMessage());
 			ErrorList errorList = EbMSMessageUtils.createErrorList();
 			errorList.getError().add(e.getError());
-			final EbMSMessage messageError = ebMSMessageFactory.createEbMSMessageError(messageHeader.getCPAId(),message,errorList,timestamp);
+			final EbMSMessage messageError = ebMSMessageFactory.createEbMSMessageError(message,errorList,timestamp);
 			Document document = EbMSMessageUtils.createSOAPMessage(messageError);
 			messageError.setMessage(document);
 			ebMSDAO.executeTransaction(
@@ -462,13 +462,13 @@ public class EbMSMessageProcessor
 		}
 	}
 
-	protected EbMSMessage processStatusRequest(String cpaId, final Date timestamp, final EbMSMessage message) throws ValidatorException, DatatypeConfigurationException, JAXBException, EbMSProcessorException
+	protected EbMSMessage processStatusRequest(final EbMSMessage message, final Date timestamp) throws ValidatorException, DatatypeConfigurationException, JAXBException, EbMSProcessorException
 	{
 		messageValidator.validateStatusRequest(message,timestamp);
 		Pair<EbMSMessageStatus,Date> result = ebMSDAO.getMessageContext(message.getStatusRequest().getRefToMessageId())
 				.map(mc -> createEbMSMessageStatus(message,mc))
 				.get();
-		return ebMSMessageFactory.createEbMSStatusResponse(cpaId,message,result.getValue0(),result.getValue1()); 
+		return ebMSMessageFactory.createEbMSStatusResponse(message,result.getValue0(),result.getValue1()); 
 	}
 	
 	private Pair<EbMSMessageStatus,Date> createEbMSMessageStatus(EbMSMessage message, EbMSMessageContext messageContext)
@@ -496,10 +496,10 @@ public class EbMSMessageProcessor
 			return new Pair<EbMSMessageStatus,Date>(EbMSMessageStatus.NOT_RECOGNIZED,null);
 	}
 
-	protected EbMSMessage processPing(String cpaId, final Date timestamp, final EbMSMessage message) throws ValidatorException, EbMSProcessorException
+	protected EbMSMessage processPing(final EbMSMessage message, final Date timestamp) throws ValidatorException, EbMSProcessorException
 	{
 		messageValidator.validatePing(message,timestamp);
-		return ebMSMessageFactory.createEbMSPong(cpaId,message);
+		return ebMSMessageFactory.createEbMSPong(message);
 	}
 	
 	public void setDeliveryManager(DeliveryManager deliveryManager)

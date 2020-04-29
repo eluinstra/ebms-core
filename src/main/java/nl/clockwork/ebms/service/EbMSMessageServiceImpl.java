@@ -101,7 +101,7 @@ public class EbMSMessageServiceImpl implements InitializingBean, EbMSMessageServ
 		try
 		{
 			ebMSMessageContextValidator.validate(messageContent.getContext());
-			final EbMSMessage message = ebMSMessageFactory.createEbMSMessage(messageContent.getContext().getCpaId(),messageContent);
+			final EbMSMessage message = ebMSMessageFactory.createEbMSMessage(messageContent);
 			signatureGenerator.generate(message);
 			storeMessage(message);
 			String messageId = message.getMessageHeader().getMessageData().getMessageId();
@@ -120,7 +120,7 @@ public class EbMSMessageServiceImpl implements InitializingBean, EbMSMessageServ
 		try
 		{
 			ebMSMessageContextValidator.validate(message.getContext());
-			final EbMSMessage result = ebMSMessageFactory.createEbMSMessage(message.toContent().getContext().getCpaId(),message.toContent());
+			final EbMSMessage result = ebMSMessageFactory.createEbMSMessage(message.toContent());
 			signatureGenerator.generate(result);
 			storeMessage(result);
 			String messageId = result.getMessageHeader().getMessageData().getMessageId();
@@ -142,7 +142,7 @@ public class EbMSMessageServiceImpl implements InitializingBean, EbMSMessageServ
 					.map(mc ->
 					{
 						resetMessage(mc.getContext());
-						final EbMSMessage message = ebMSMessageFactory.createEbMSMessage(mc.getContext().getCpaId(),mc);
+						final EbMSMessage message = ebMSMessageFactory.createEbMSMessage(mc);
 						signatureGenerator.generate(message);
 						storeMessage(message);
 						String newMessageId = message.getMessageHeader().getMessageData().getMessageId();

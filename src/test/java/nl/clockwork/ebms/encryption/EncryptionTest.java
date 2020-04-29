@@ -203,7 +203,7 @@ public class EncryptionTest
 	private EbMSMessage createMessage() throws EbMSProcessorException
 	{
 		EbMSMessageContent content = createEbMSMessageContent(cpaId);
-		EbMSMessage result = messageFactory.createEbMSMessage(cpaId,content);
+		EbMSMessage result = messageFactory.createEbMSMessage(content);
 		return result;
 	}
 
