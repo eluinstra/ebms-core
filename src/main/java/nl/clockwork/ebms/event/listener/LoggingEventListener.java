@@ -29,12 +29,6 @@ public class LoggingEventListener implements EventListener
 	}
 
 	@Override
-	public void onMessageProcessed(String messageId) throws EventException
-	{
-		logger.info("Message " + messageId + " processed");
-	}
-
-	@Override
 	public void onMessageDelivered(String messageId) throws EventException
 	{
 		logger.info("Message " + messageId + " delivered");

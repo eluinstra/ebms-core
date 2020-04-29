@@ -37,7 +37,6 @@ import nl.clockwork.ebms.cpa.CPAUtils;
 import nl.clockwork.ebms.dao.DAOException;
 import nl.clockwork.ebms.dao.DAOTransactionCallback;
 import nl.clockwork.ebms.dao.EbMSDAO;
-import nl.clockwork.ebms.event.listener.EventListener;
 import nl.clockwork.ebms.event.processor.EventManager;
 import nl.clockwork.ebms.model.CacheablePartyId;
 import nl.clockwork.ebms.model.EbMSMessage;
@@ -56,6 +55,7 @@ import nl.clockwork.ebms.validation.ValidatorException;
 @SuppressWarnings("deprecation")
 public class EbMSMessageServiceImpl implements InitializingBean, EbMSMessageService
 {
+	private transient Log logger = LogFactory.getLog(this.getClass());
 	protected DeliveryManager deliveryManager;
 	protected EbMSDAO ebMSDAO;
 	protected CPAManager cpaManager;
@@ -63,7 +63,6 @@ public class EbMSMessageServiceImpl implements InitializingBean, EbMSMessageServ
 	protected EventManager eventManager;
 	protected EbMSMessageContextValidator ebMSMessageContextValidator;
 	protected EbMSSignatureGenerator signatureGenerator;
-	protected EventListener eventListener;
 	protected boolean deleteEbMSAttachmentsOnMessageProcessed;
 
 	@Override
@@ -193,7 +192,6 @@ public class EbMSMessageServiceImpl implements InitializingBean, EbMSMessageServ
 				{
 					if (ebMSDAO.updateMessage(messageId,EbMSMessageStatus.RECEIVED,EbMSMessageStatus.PROCESSED) > 0)
 					{
-						eventListener.onMessageProcessed(messageId);
 						if (deleteEbMSAttachmentsOnMessageProcessed)
 							ebMSDAO.deleteAttachments(messageId);
 					}

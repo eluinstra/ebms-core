@@ -4,7 +4,7 @@ import java.util.stream.Stream;
 
 public enum EbMSMessageEventType
 {
-	RECEIVED,DELIVERED,FAILED,EXPIRED,PROCESSED;
+	RECEIVED,DELIVERED,FAILED,EXPIRED;
 	
 	public static Stream<EbMSMessageEventType> stream()
 	{
