@@ -43,7 +43,7 @@ import nl.clockwork.ebms.client.EbMSUnrecoverableResponseException;
 import nl.clockwork.ebms.common.util.StreamUtils;
 import nl.clockwork.ebms.cpa.CPAManager;
 import nl.clockwork.ebms.cpa.CPAUtils;
-import nl.clockwork.ebms.cpa.URLManager;
+import nl.clockwork.ebms.cpa.URLMapper;
 import nl.clockwork.ebms.dao.DAOTransactionCallback;
 import nl.clockwork.ebms.dao.EbMSDAO;
 import nl.clockwork.ebms.encryption.EbMSMessageEncrypter;
@@ -79,7 +79,7 @@ public class EbMSEventProcessor implements Runnable, InitializingBean
 					event.getCpaId(),
 					event.getReceiveDeliveryChannelId())
 						.orElseThrow(() -> StreamUtils.illegalStateException("ReceiveDeliveryChannel",event.getCpaId(),event.getReceiveDeliveryChannelId()));
-			final String url = urlManager.getURL(CPAUtils.getUri(receiveDeliveryChannel));
+			final String url = urlMapper.getURL(CPAUtils.getUri(receiveDeliveryChannel));
 			try
 			{
 				Optional<EbMSDocument> requestDocument = ebMSDAO.getEbMSDocumentIfUnsent(event.getMessageId());
@@ -218,7 +218,7 @@ public class EbMSEventProcessor implements Runnable, InitializingBean
 	private EventListener eventListener;
 	private EbMSDAO ebMSDAO;
 	private CPAManager cpaManager;
-	private URLManager urlManager;
+	private URLMapper urlMapper;
 	private EventManager eventManager;
 	private EbMSHttpClientFactory ebMSClientFactory;
 	private EbMSMessageEncrypter messageEncrypter;
@@ -345,9 +345,9 @@ public class EbMSEventProcessor implements Runnable, InitializingBean
 		this.cpaManager = cpaManager;
 	}
 
-  public void setUrlManager(URLManager urlManager)
+  public void setUrlMapper(URLMapper urlManager)
 	{
-		this.urlManager = urlManager;
+		this.urlMapper = urlManager;
 	}
 
   public void setEventManager(EventManager eventManager)

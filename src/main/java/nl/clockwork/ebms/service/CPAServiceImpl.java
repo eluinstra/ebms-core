@@ -22,8 +22,8 @@ import javax.xml.bind.JAXBException;
 
 import nl.clockwork.ebms.common.InvalidURLException;
 import nl.clockwork.ebms.cpa.CPAManager;
-import nl.clockwork.ebms.cpa.CertificateManager;
-import nl.clockwork.ebms.cpa.URLManager;
+import nl.clockwork.ebms.cpa.CertificateMapper;
+import nl.clockwork.ebms.cpa.URLMapper;
 import nl.clockwork.ebms.common.JAXBParser;
 import nl.clockwork.ebms.dao.DAOException;
 import nl.clockwork.ebms.model.CertificateMapping;
@@ -40,8 +40,8 @@ public class CPAServiceImpl implements CPAService
 {
   protected transient Log logger = LogFactory.getLog(getClass());
 	private CPAManager cpaManager;
-	private URLManager urlManager;
-	private CertificateManager certificateManager;
+	private URLMapper urlMapper;
+	private CertificateMapper certificateMapper;
 	private XSDValidator xsdValidator;
 	private CPAValidator cpaValidator;
 	private Object cpaMonitor = new Object();
@@ -150,7 +150,7 @@ public class CPAServiceImpl implements CPAService
 	{
 		try
 		{
-			urlManager.setURLMapping(urlMapping);
+			urlMapper.setURLMapping(urlMapping);
 		}
 		catch (InvalidURLException e)
 		{
@@ -161,31 +161,31 @@ public class CPAServiceImpl implements CPAService
 	@Override
 	public void deleteURLMapping(String source) throws CPAServiceException
 	{
-		urlManager.deleteURLMapping(source);
+		urlMapper.deleteURLMapping(source);
 	}
 
 	@Override
 	public List<URLMapping> getURLMappings() throws CPAServiceException
 	{
-		return urlManager.getURLs();
+		return urlMapper.getURLs();
 	}
 
 	@Override
 	public void setCertificateMapping(CertificateMapping certificateMapping) throws CPAServiceException
 	{
-		certificateManager.setCertificateMapping(certificateMapping);
+		certificateMapper.setCertificateMapping(certificateMapping);
 	}
 
 	@Override
 	public void deleteCertificateMapping(X509Certificate source) throws CPAServiceException
 	{
-		certificateManager.deleteCertificateMapping(source);
+		certificateMapper.deleteCertificateMapping(source);
 	}
 
 	@Override
 	public List<CertificateMapping> getCertificateMappings() throws CPAServiceException
 	{
-		return certificateManager.getCertificates();
+		return certificateMapper.getCertificates();
 	}
 
 	public void setCpaManager(CPAManager cpaManager)
@@ -193,8 +193,13 @@ public class CPAServiceImpl implements CPAService
 		this.cpaManager = cpaManager;
 	}
 
-	public void setUrlManager(URLManager urlManager)
+	public void setUrlMapper(URLMapper urlManager)
 	{
-		this.urlManager = urlManager;
+		this.urlMapper = urlManager;
+	}
+
+	public void setCertificateMapper(CertificateMapper certificateMapper)
+	{
+		this.certificateMapper = certificateMapper;
 	}
 }

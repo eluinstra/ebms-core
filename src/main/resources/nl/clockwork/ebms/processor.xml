@@ -60,7 +60,8 @@
 
 	<bean id="cpaService" class="nl.clockwork.ebms.service.CPAServiceImpl">
 		<property name="cpaManager" ref="cpaManager"/>
-		<property name="urlManager" ref="urlManager"/>
+		<property name="urlMapper" ref="urlMapper"/>
+		<property name="certificateMapper" ref="certificateMapper"/>
 	</bean>
 
 	<bean id="ebMSMessageService" class="nl.clockwork.ebms.service.EbMSMessageServiceImpl">
@@ -173,12 +174,12 @@
 		<property name="deleteEbMSAttachmentsOnMessageProcessed" value="${ebmsMessage.deleteContentOnProcessed}"/>
 	</bean>
 
-	<bean id="urlManager" class="nl.clockwork.ebms.cpa.URLManager">
+	<bean id="urlMapper" class="nl.clockwork.ebms.cpa.URLMapper">
 		<property name="daoMethodCache" ref="ebMSDAOMethodCache"/>
 		<property name="ebMSDAO" ref="ebMSDAO"/>
 	</bean>
 
-	<bean id="certificateManager" class="nl.clockwork.ebms.cpa.CertificateManager">
+	<bean id="certificateMapper" class="nl.clockwork.ebms.cpa.CertificateMapper">
 		<property name="daoMethodCache" ref="ebMSDAOMethodCache"/>
 		<property name="ebMSDAO" ref="ebMSDAO"/>
 	</bean>
@@ -187,7 +188,7 @@
 		<property name="daoMethodCache" ref="ebMSDAOMethodCache"/>
 		<property name="cpaMethodCache" ref="cpaMethodCache"/>
 		<property name="ebMSDAO" ref="ebMSDAO"/>
-		<property name="urlManager" ref="urlManager"/>
+		<property name="urlMapper" ref="urlMapper"/>
 	</bean>
 
 	<bean id="cpaManager" class="org.springframework.aop.framework.ProxyFactoryBean">
@@ -267,8 +268,8 @@
 		<property name="maxEvents" value="${eventProcessor.maxEvents}"/>
 		<property name="eventListener" ref="eventListener"/>
 		<property name="ebMSDAO" ref="ebMSDAO"/>
-		<property name="urlManager" ref="urlManager"/>
 		<property name="cpaManager" ref="cpaManager"/>
+		<property name="urlMapper" ref="urlMapper"/>
 		<property name="eventManager" ref="eventManager"/>
 		<property name="ebMSClientFactory" ref="ebMSHttpClientFactory"/>
 		<property name="messageEncrypter" ref="messageEncrypter"/>
@@ -311,7 +312,7 @@
 		<property name="recoverableRedirectionHttpErrors" value="${http.errors.redirection.recoverable}"/>
 		<property name="recoverableClientHttpErrors" value="${http.errors.client.recoverable}"/>
 		<property name="unrecoverableServerHttpErrors" value="${http.errors.server.unrecoverable}"/>
-		<property name="certificateManager" ref="certificateManager"/>
+		<property name="certificateMapper" ref="certificateMapper"/>
 		<property name="useClientCertificate" value="${https.useClientCertificate}"/>
 	</bean>
 

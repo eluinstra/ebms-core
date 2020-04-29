@@ -23,7 +23,7 @@ import nl.clockwork.ebms.common.MethodCacheInterceptor;
 import nl.clockwork.ebms.dao.EbMSDAO;
 import nl.clockwork.ebms.model.CertificateMapping;
 
-public class CertificateManager
+public class CertificateMapper
 {
 	private Ehcache daoMethodCache;
 	private EbMSDAO ebMSDAO;

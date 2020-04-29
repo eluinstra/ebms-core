@@ -28,7 +28,7 @@ import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DeliveryChannel;
 
 import nl.clockwork.ebms.common.util.Utils;
 import nl.clockwork.ebms.cpa.CPAUtils;
-import nl.clockwork.ebms.cpa.CertificateManager;
+import nl.clockwork.ebms.cpa.CertificateMapper;
 import nl.clockwork.ebms.security.EbMSKeyStore;
 import nl.clockwork.ebms.security.EbMSTrustStore;
 
@@ -51,7 +51,7 @@ public class EbMSHttpClientFactory
 	private EbMSTrustStore trustStore;
 	private List<Integer> recoverableHttpErrors = new ArrayList<>();
 	private List<Integer> unrecoverableHttpErrors = new ArrayList<>();
-	private CertificateManager certificateManager;
+	private CertificateMapper certificateMapper;
 	private boolean useClientCertificate;
 	private Map<String,EbMSClient> clients = new ConcurrentHashMap<String,EbMSClient>();
 
@@ -100,7 +100,7 @@ public class EbMSHttpClientFactory
 
 	private X509Certificate getClientCertificate(DeliveryChannel deliveryChannel) throws CertificateException
 	{
-		return useClientCertificate && deliveryChannel != null ? certificateManager.getCertificate(CPAUtils.getX509Certificate(CPAUtils.getClientCertificate(deliveryChannel))) : null;
+		return useClientCertificate && deliveryChannel != null ? certificateMapper.getCertificate(CPAUtils.getX509Certificate(CPAUtils.getClientCertificate(deliveryChannel))) : null;
 	}
 
 	private SSLFactoryManager createSslFactoryManager(String clientAlias) throws Exception
@@ -187,9 +187,9 @@ public class EbMSHttpClientFactory
 	{
 		this.unrecoverableHttpErrors = Utils.getIntegerList(unrecoverableServerHttpErrors);
 	}
-	public void setCertificateManager(CertificateManager certificateManager)
+	public void setCertificateMapper(CertificateMapper certificateMapper)
 	{
-		this.certificateManager = certificateManager;
+		this.certificateMapper = certificateMapper;
 	}
 	public void setUseClientCertificate(boolean useClientCertificate)
 	{

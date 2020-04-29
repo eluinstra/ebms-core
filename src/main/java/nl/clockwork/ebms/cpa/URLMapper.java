@@ -28,7 +28,7 @@ import org.springframework.util.StringUtils;
 
 import net.sf.ehcache.Ehcache;
 
-public class URLManager
+public class URLMapper
 {
 	private Ehcache daoMethodCache;
 	private EbMSDAO ebMSDAO;

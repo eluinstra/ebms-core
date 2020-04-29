@@ -45,7 +45,7 @@ public class CPAManager
 	private Ehcache daoMethodCache;
 	private Ehcache cpaMethodCache;
 	private EbMSDAO ebMSDAO;
-	private URLManager urlManager;
+	private URLMapper urlMapper;
 
 	public boolean existsCPA(String cpaId)
 	{
@@ -322,7 +322,7 @@ public class CPAManager
 
 	public String getUri(String cpaId, CacheablePartyId partyId, String role, String service, String action)
 	{
-		return urlManager.getURL(CPAUtils.getUri(
+		return urlMapper.getURL(CPAUtils.getUri(
 				getReceiveDeliveryChannel(cpaId,partyId,role,service,action)
 					.orElseThrow(() -> StreamUtils.illegalStateException("ReceiveDeliveryChannel",cpaId,partyId,role,service,action))
 		));
@@ -357,8 +357,8 @@ public class CPAManager
 		this.ebMSDAO = ebMSDAO;
 	}
 
-	public void setUrlManager(URLManager urlManager)
+	public void setUrlMapper(URLMapper urlManager)
 	{
-		this.urlManager = urlManager;
+		this.urlMapper = urlManager;
 	}
 }
