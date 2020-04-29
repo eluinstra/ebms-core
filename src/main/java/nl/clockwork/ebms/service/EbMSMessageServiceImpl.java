@@ -21,6 +21,8 @@ import java.util.Optional;
 
 import javax.xml.transform.TransformerFactoryConfigurationError;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DeliveryChannel;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageHeader;
 import org.springframework.beans.factory.InitializingBean;
@@ -102,7 +104,9 @@ public class EbMSMessageServiceImpl implements InitializingBean, EbMSMessageServ
 			final EbMSMessage message = ebMSMessageFactory.createEbMSMessage(messageContent.getContext().getCpaId(),messageContent);
 			signatureGenerator.generate(message);
 			storeMessage(message);
-			return message.getMessageHeader().getMessageData().getMessageId();
+			String messageId = message.getMessageHeader().getMessageData().getMessageId();
+			logger.info("Sending message " + messageId);
+			return messageId;
 		}
 		catch (ValidatorException | DAOException | TransformerFactoryConfigurationError | EbMSProcessorException e)
 		{
@@ -119,7 +123,9 @@ public class EbMSMessageServiceImpl implements InitializingBean, EbMSMessageServ
 			final EbMSMessage result = ebMSMessageFactory.createEbMSMessage(message.toContent().getContext().getCpaId(),message.toContent());
 			signatureGenerator.generate(result);
 			storeMessage(result);
-			return result.getMessageHeader().getMessageData().getMessageId();
+			String messageId = result.getMessageHeader().getMessageData().getMessageId();
+			logger.info("Sending message " + messageId);
+			return messageId;
 		}
 		catch (ValidatorException | DAOException | TransformerFactoryConfigurationError | EbMSProcessorException e)
 		{
@@ -139,7 +145,9 @@ public class EbMSMessageServiceImpl implements InitializingBean, EbMSMessageServ
 						final EbMSMessage message = ebMSMessageFactory.createEbMSMessage(mc.getContext().getCpaId(),mc);
 						signatureGenerator.generate(message);
 						storeMessage(message);
-						return message.getMessageHeader().getMessageData().getMessageId();
+						String newMessageId = message.getMessageHeader().getMessageData().getMessageId();
+						logger.info("Sending message " + newMessageId);
+						return newMessageId;
 					})
 					.orElseThrow(() -> new EbMSMessageServiceException("Message not found!"));
 		}
@@ -194,6 +202,7 @@ public class EbMSMessageServiceImpl implements InitializingBean, EbMSMessageServ
 					{
 						if (deleteEbMSAttachmentsOnMessageProcessed)
 							ebMSDAO.deleteAttachments(messageId);
+						logger.info("Message " + messageId + " processed");
 					}
 				}
 			});
