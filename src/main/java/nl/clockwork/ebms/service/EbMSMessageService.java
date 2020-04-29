@@ -32,7 +32,7 @@ import nl.clockwork.ebms.model.MessageStatus;
 import nl.clockwork.ebms.model.Party;
 
 @SuppressWarnings("deprecation")
-@WebService(targetNamespace="http://www.ordina.nl/ebms/2.16")
+@WebService(targetNamespace="http://www.ordina.nl/ebms/2.17")
 public interface EbMSMessageService
 {
 	/**

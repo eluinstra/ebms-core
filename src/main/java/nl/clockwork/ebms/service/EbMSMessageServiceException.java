@@ -18,7 +18,7 @@ package nl.clockwork.ebms.service;
 import javax.xml.ws.WebFault;
 
 
-@WebFault(name="EbMSMessageServiceException", targetNamespace="http://www.ordina.nl/ebms/2.16")
+@WebFault(name="EbMSMessageServiceException", targetNamespace="http://www.ordina.nl/ebms/2.17")
 public class EbMSMessageServiceException extends RuntimeException
 {
 	private static final long serialVersionUID = 1L;

@@ -32,7 +32,7 @@ import nl.clockwork.ebms.model.MessageStatus;
 import nl.clockwork.ebms.model.Party;
 
 @MTOM(enabled=true)
-@WebService(name = "EbMSMessageService", targetNamespace="http://www.ordina.nl/ebms/2.16", serviceName = "EbMSMessageServiceImplService", endpointInterface = "EbMSMessageServiceImplServiceSoapBinding", portName = "EbMSMessageServiceImplPort")
+@WebService(name = "EbMSMessageService", targetNamespace="http://www.ordina.nl/ebms/2.17", serviceName = "EbMSMessageServiceImplService", endpointInterface = "EbMSMessageServiceImplServiceSoapBinding", portName = "EbMSMessageServiceImplPort")
 public interface EbMSMessageServiceMTOM
 {
 	/**
