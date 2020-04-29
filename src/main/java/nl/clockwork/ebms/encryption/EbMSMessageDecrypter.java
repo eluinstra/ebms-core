@@ -34,19 +34,19 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 
-import nl.clockwork.ebms.Constants;
 import nl.clockwork.ebms.EbMSAttachmentFactory;
-import nl.clockwork.ebms.StreamUtils;
-import nl.clockwork.ebms.common.CPAManager;
+import nl.clockwork.ebms.EbMSErrorCode;
+import nl.clockwork.ebms.EbMSMessageUtils;
 import nl.clockwork.ebms.common.util.DOMUtils;
 import nl.clockwork.ebms.common.util.SecurityUtils;
+import nl.clockwork.ebms.common.util.StreamUtils;
+import nl.clockwork.ebms.cpa.CPAManager;
+import nl.clockwork.ebms.cpa.CPAUtils;
 import nl.clockwork.ebms.model.CacheablePartyId;
 import nl.clockwork.ebms.model.EbMSAttachment;
 import nl.clockwork.ebms.model.EbMSMessage;
 import nl.clockwork.ebms.processor.EbMSProcessingException;
 import nl.clockwork.ebms.security.EbMSKeyStore;
-import nl.clockwork.ebms.util.CPAUtils;
-import nl.clockwork.ebms.util.EbMSMessageUtils;
 import nl.clockwork.ebms.validation.EbMSValidationException;
 import nl.clockwork.ebms.validation.ValidationException;
 import nl.clockwork.ebms.validation.ValidatorException;
@@ -117,7 +117,7 @@ public class EbMSMessageDecrypter
 		catch (SAXException | IOException | EbMSProcessingException | XMLEncryptionException | IllegalArgumentException e)
 		{
 			throw new EbMSValidationException(
-					EbMSMessageUtils.createError("cid:" + attachment.getContentId(),Constants.EbMSErrorCode.SECURITY_FAILURE,e.getMessage()));
+					EbMSMessageUtils.createError("cid:" + attachment.getContentId(),EbMSErrorCode.SECURITY_FAILURE,e.getMessage()));
 		}
 	}
 

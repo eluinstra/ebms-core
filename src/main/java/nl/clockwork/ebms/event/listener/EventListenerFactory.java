@@ -38,7 +38,7 @@ import lombok.AccessLevel;
 import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.NonFinal;
-import nl.clockwork.ebms.Constants.EbMSMessageEventType;
+import nl.clockwork.ebms.EbMSMessageEventType;
 import nl.clockwork.ebms.dao.EbMSDAO;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)

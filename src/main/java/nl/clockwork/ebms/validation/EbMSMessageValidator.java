@@ -20,13 +20,13 @@ import java.util.Date;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.SyncReplyModeType;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageHeader;
 
-import nl.clockwork.ebms.StreamUtils;
-import nl.clockwork.ebms.common.CPAManager;
+import nl.clockwork.ebms.common.util.StreamUtils;
+import nl.clockwork.ebms.cpa.CPAManager;
+import nl.clockwork.ebms.cpa.CPAUtils;
 import nl.clockwork.ebms.dao.EbMSDAO;
 import nl.clockwork.ebms.encryption.EbMSMessageDecrypter;
 import nl.clockwork.ebms.model.CacheablePartyId;
 import nl.clockwork.ebms.model.EbMSMessage;
-import nl.clockwork.ebms.util.CPAUtils;
 
 public class EbMSMessageValidator
 {

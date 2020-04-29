@@ -15,8 +15,8 @@
  */
 package nl.clockwork.ebms.dao.hsqldb;
 
-import nl.clockwork.ebms.Constants.EbMSMessageEventType;
-import nl.clockwork.ebms.Constants.EbMSMessageStatus;
+import nl.clockwork.ebms.EbMSMessageEventType;
+import nl.clockwork.ebms.EbMSMessageStatus;
 import nl.clockwork.ebms.dao.AbstractEbMSDAO;
 
 import org.springframework.jdbc.core.JdbcTemplate;

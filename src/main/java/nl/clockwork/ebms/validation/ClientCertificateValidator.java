@@ -19,11 +19,11 @@ import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.Objects;
 
-import nl.clockwork.ebms.StreamUtils;
-import nl.clockwork.ebms.common.CPAManager;
+import nl.clockwork.ebms.common.util.StreamUtils;
+import nl.clockwork.ebms.cpa.CPAManager;
+import nl.clockwork.ebms.cpa.CPAUtils;
 import nl.clockwork.ebms.model.CacheablePartyId;
 import nl.clockwork.ebms.model.EbMSMessage;
-import nl.clockwork.ebms.util.CPAUtils;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

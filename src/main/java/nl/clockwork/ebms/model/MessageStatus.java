@@ -17,7 +17,7 @@ package nl.clockwork.ebms.model;
 
 import java.util.Date;
 
-import nl.clockwork.ebms.Constants.EbMSMessageStatus;
+import nl.clockwork.ebms.EbMSMessageStatus;
 
 public class MessageStatus
 {

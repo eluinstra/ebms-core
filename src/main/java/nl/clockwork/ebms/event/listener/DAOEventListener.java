@@ -15,7 +15,7 @@
  */
 package nl.clockwork.ebms.event.listener;
 
-import nl.clockwork.ebms.Constants.EbMSMessageEventType;
+import nl.clockwork.ebms.EbMSMessageEventType;
 import nl.clockwork.ebms.dao.EbMSDAO;
 
 import org.apache.commons.logging.Log;

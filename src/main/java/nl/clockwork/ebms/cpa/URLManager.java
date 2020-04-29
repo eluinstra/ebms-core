@@ -13,12 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.clockwork.ebms.common;
+package nl.clockwork.ebms.cpa;
 
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
 
+import nl.clockwork.ebms.common.InvalidURLException;
+import nl.clockwork.ebms.common.MethodCacheInterceptor;
 import nl.clockwork.ebms.dao.EbMSDAO;
 import nl.clockwork.ebms.model.URLMapping;
 

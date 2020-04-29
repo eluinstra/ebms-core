@@ -42,10 +42,10 @@ import org.w3c.dom.Node;
 
 import net.sf.ehcache.Ehcache;
 import nl.clockwork.ebms.EbMSAttachmentFactory;
-import nl.clockwork.ebms.common.CPAManager;
-import nl.clockwork.ebms.common.EbMSIdGenerator;
-import nl.clockwork.ebms.common.EbMSMessageFactory;
+import nl.clockwork.ebms.EbMSIdGenerator;
+import nl.clockwork.ebms.EbMSMessageFactory;
 import nl.clockwork.ebms.common.JAXBParser;
+import nl.clockwork.ebms.cpa.CPAManager;
 import nl.clockwork.ebms.dao.DAOException;
 import nl.clockwork.ebms.dao.EbMSDAO;
 import nl.clockwork.ebms.model.EbMSAttachment;

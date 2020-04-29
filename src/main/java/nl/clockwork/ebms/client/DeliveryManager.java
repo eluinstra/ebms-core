@@ -37,15 +37,15 @@ import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageHeader;
 import org.springframework.beans.factory.InitializingBean;
 import org.xml.sax.SAXException;
 
-import nl.clockwork.ebms.common.CPAManager;
+import nl.clockwork.ebms.EbMSMessageUtils;
 import nl.clockwork.ebms.common.MessageQueue;
+import nl.clockwork.ebms.cpa.CPAManager;
+import nl.clockwork.ebms.cpa.CPAUtils;
 import nl.clockwork.ebms.model.CacheablePartyId;
 import nl.clockwork.ebms.model.EbMSDocument;
 import nl.clockwork.ebms.model.EbMSMessage;
 import nl.clockwork.ebms.processor.EbMSProcessingException;
 import nl.clockwork.ebms.processor.EbMSProcessorException;
-import nl.clockwork.ebms.util.CPAUtils;
-import nl.clockwork.ebms.util.EbMSMessageUtils;
 
 public class DeliveryManager implements InitializingBean //DeliveryService
 {

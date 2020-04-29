@@ -20,10 +20,10 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
-import nl.clockwork.ebms.Constants.EbMSAction;
-import nl.clockwork.ebms.Constants.EbMSEventStatus;
-import nl.clockwork.ebms.Constants.EbMSMessageEventType;
-import nl.clockwork.ebms.Constants.EbMSMessageStatus;
+import nl.clockwork.ebms.EbMSAction;
+import nl.clockwork.ebms.EbMSEventStatus;
+import nl.clockwork.ebms.EbMSMessageEventType;
+import nl.clockwork.ebms.EbMSMessageStatus;
 import nl.clockwork.ebms.model.CertificateMapping;
 import nl.clockwork.ebms.model.EbMSDocument;
 import nl.clockwork.ebms.model.EbMSEvent;

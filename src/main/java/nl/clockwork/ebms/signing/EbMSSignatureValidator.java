@@ -37,14 +37,14 @@ import org.w3._2000._09.xmldsig.ReferenceType;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
-import nl.clockwork.ebms.StreamUtils;
-import nl.clockwork.ebms.common.CPAManager;
 import nl.clockwork.ebms.common.util.SecurityUtils;
+import nl.clockwork.ebms.common.util.StreamUtils;
+import nl.clockwork.ebms.cpa.CPAManager;
+import nl.clockwork.ebms.cpa.CPAUtils;
 import nl.clockwork.ebms.model.CacheablePartyId;
 import nl.clockwork.ebms.model.EbMSAttachment;
 import nl.clockwork.ebms.model.EbMSMessage;
 import nl.clockwork.ebms.security.EbMSTrustStore;
-import nl.clockwork.ebms.util.CPAUtils;
 import nl.clockwork.ebms.validation.ValidationException;
 import nl.clockwork.ebms.validation.ValidatorException;
 import nl.clockwork.ebms.xml.dsig.EbMSAttachmentResolver;

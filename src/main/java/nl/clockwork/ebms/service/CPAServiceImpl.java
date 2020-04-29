@@ -20,10 +20,10 @@ import java.util.List;
 
 import javax.xml.bind.JAXBException;
 
-import nl.clockwork.ebms.common.CPAManager;
-import nl.clockwork.ebms.common.CertificateManager;
 import nl.clockwork.ebms.common.InvalidURLException;
-import nl.clockwork.ebms.common.URLManager;
+import nl.clockwork.ebms.cpa.CPAManager;
+import nl.clockwork.ebms.cpa.CertificateManager;
+import nl.clockwork.ebms.cpa.URLManager;
 import nl.clockwork.ebms.common.JAXBParser;
 import nl.clockwork.ebms.dao.DAOException;
 import nl.clockwork.ebms.model.CertificateMapping;

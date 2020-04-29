@@ -101,7 +101,7 @@
 		<property name="messageProcessor" ref="messageProcessor"/>
 	</bean>
 
-	<bean id="ebMSIdGenerator" class="nl.clockwork.ebms.common.EbMSIdGenerator"/>
+	<bean id="ebMSIdGenerator" class="nl.clockwork.ebms.EbMSIdGenerator"/>
 
 	<bean id="messageValidator" class="nl.clockwork.ebms.validation.EbMSMessageValidator">
 		<property name="ebMSDAO" ref="ebMSDAO"/>
@@ -173,17 +173,17 @@
 		<property name="deleteEbMSAttachmentsOnMessageProcessed" value="${ebmsMessage.deleteContentOnProcessed}"/>
 	</bean>
 
-	<bean id="urlManager" class="nl.clockwork.ebms.common.URLManager">
+	<bean id="urlManager" class="nl.clockwork.ebms.cpa.URLManager">
 		<property name="daoMethodCache" ref="ebMSDAOMethodCache"/>
 		<property name="ebMSDAO" ref="ebMSDAO"/>
 	</bean>
 
-	<bean id="certificateManager" class="nl.clockwork.ebms.common.CertificateManager">
+	<bean id="certificateManager" class="nl.clockwork.ebms.cpa.CertificateManager">
 		<property name="daoMethodCache" ref="ebMSDAOMethodCache"/>
 		<property name="ebMSDAO" ref="ebMSDAO"/>
 	</bean>
 
-	<bean id="_cpaManager" class="nl.clockwork.ebms.common.CPAManager">
+	<bean id="_cpaManager" class="nl.clockwork.ebms.cpa.CPAManager">
 		<property name="daoMethodCache" ref="ebMSDAOMethodCache"/>
 		<property name="cpaMethodCache" ref="cpaMethodCache"/>
 		<property name="ebMSDAO" ref="ebMSDAO"/>
@@ -244,7 +244,7 @@
 		<property name="maxElementsOnDisk" value="${cache.maxElementsOnDisk}"/>
 	</bean>
 
-	<bean id="ebMSMessageFactory" class="nl.clockwork.ebms.common.EbMSMessageFactory">
+	<bean id="ebMSMessageFactory" class="nl.clockwork.ebms.EbMSMessageFactory">
 		<property name="cpaManager" ref="cpaManager"/>
 		<property name="ebMSIdGenerator" ref="ebMSIdGenerator"/>
 	</bean>

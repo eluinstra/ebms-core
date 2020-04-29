@@ -22,7 +22,7 @@ import javax.xml.bind.annotation.XmlElement;
 
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.PartyId;
 
-import nl.clockwork.ebms.util.CPAUtils;
+import nl.clockwork.ebms.cpa.CPAUtils;
 
 public class Party implements Serializable
 {

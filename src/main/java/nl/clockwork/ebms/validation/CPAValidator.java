@@ -35,13 +35,13 @@ import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.StatusValueType;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.SyncReplyModeType;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.Transport;
 
-import nl.clockwork.ebms.Constants;
-import nl.clockwork.ebms.StreamUtils;
-import nl.clockwork.ebms.common.CPAManager;
+import nl.clockwork.ebms.EbMSErrorCode;
+import nl.clockwork.ebms.EbMSMessageUtils;
 import nl.clockwork.ebms.common.util.SecurityUtils;
+import nl.clockwork.ebms.common.util.StreamUtils;
+import nl.clockwork.ebms.cpa.CPAManager;
+import nl.clockwork.ebms.cpa.CPAUtils;
 import nl.clockwork.ebms.model.EbMSMessage;
-import nl.clockwork.ebms.util.CPAUtils;
-import nl.clockwork.ebms.util.EbMSMessageUtils;
 
 public class CPAValidator
 {
@@ -60,7 +60,7 @@ public class CPAValidator
 	public void validate(EbMSMessage message) throws EbMSValidationException
 	{
 		if (!cpaManager.isValid(message.getMessageHeader().getCPAId(),message.getMessageHeader().getMessageData().getTimestamp()))
-			throw new EbMSValidationException(EbMSMessageUtils.createError("//Header/MessageHeader/@cpaid",Constants.EbMSErrorCode.INCONSISTENT,"Invalid CPA."));
+			throw new EbMSValidationException(EbMSMessageUtils.createError("//Header/MessageHeader/@cpaid",EbMSErrorCode.INCONSISTENT,"Invalid CPA."));
 	}
 
 	public void validate(String cpaId) throws ValidatorException

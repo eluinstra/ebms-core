@@ -17,7 +17,7 @@ package nl.clockwork.ebms.model;
 
 import java.io.Serializable;
 
-import nl.clockwork.ebms.Constants.EbMSMessageEventType;
+import nl.clockwork.ebms.EbMSMessageEventType;
 
 public class EbMSMessageEvent implements Serializable
 {

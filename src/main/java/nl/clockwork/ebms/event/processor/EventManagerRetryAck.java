@@ -17,11 +17,11 @@ package nl.clockwork.ebms.event.processor;
 
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DeliveryChannel;
 
-import nl.clockwork.ebms.Constants.EbMSEventStatus;
-import nl.clockwork.ebms.StreamUtils;
+import nl.clockwork.ebms.EbMSEventStatus;
+import nl.clockwork.ebms.common.util.StreamUtils;
+import nl.clockwork.ebms.cpa.CPAUtils;
 import nl.clockwork.ebms.dao.DAOTransactionCallback;
 import nl.clockwork.ebms.model.EbMSEvent;
-import nl.clockwork.ebms.util.CPAUtils;
 
 public class EventManagerRetryAck extends EventManager
 {

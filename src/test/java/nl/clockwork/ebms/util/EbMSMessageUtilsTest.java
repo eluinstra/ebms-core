@@ -50,9 +50,10 @@ import org.w3c.dom.Document;
 import org.xmlsoap.schemas.soap.envelope.Fault;
 
 import nl.clockwork.ebms.Constants;
-import nl.clockwork.ebms.Constants.EbMSErrorCode;
-import nl.clockwork.ebms.Constants.EbMSMessageStatus;
 import nl.clockwork.ebms.EbMSAttachmentFactory;
+import nl.clockwork.ebms.EbMSErrorCode;
+import nl.clockwork.ebms.EbMSMessageStatus;
+import nl.clockwork.ebms.EbMSMessageUtils;
 import nl.clockwork.ebms.model.EbMSAttachment;
 import nl.clockwork.ebms.model.EbMSMessage;
 

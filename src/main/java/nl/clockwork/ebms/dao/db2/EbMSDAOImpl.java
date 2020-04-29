@@ -24,12 +24,12 @@ import java.util.Date;
 
 import javax.xml.transform.TransformerException;
 
-import nl.clockwork.ebms.Constants.EbMSMessageEventType;
-import nl.clockwork.ebms.Constants.EbMSMessageStatus;
+import nl.clockwork.ebms.EbMSMessageUtils;
+import nl.clockwork.ebms.EbMSMessageEventType;
+import nl.clockwork.ebms.EbMSMessageStatus;
 import nl.clockwork.ebms.common.util.DOMUtils;
 import nl.clockwork.ebms.dao.DAOException;
 import nl.clockwork.ebms.model.EbMSMessage;
-import nl.clockwork.ebms.util.EbMSMessageUtils;
 
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageHeader;
 import org.springframework.dao.DataAccessException;

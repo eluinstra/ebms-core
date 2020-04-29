@@ -58,11 +58,12 @@ import org.springframework.transaction.support.TransactionTemplate;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
-import nl.clockwork.ebms.Constants.EbMSAction;
-import nl.clockwork.ebms.Constants.EbMSEventStatus;
-import nl.clockwork.ebms.Constants.EbMSMessageEventType;
-import nl.clockwork.ebms.Constants.EbMSMessageStatus;
+import nl.clockwork.ebms.EbMSAction;
 import nl.clockwork.ebms.EbMSAttachmentFactory;
+import nl.clockwork.ebms.EbMSEventStatus;
+import nl.clockwork.ebms.EbMSMessageEventType;
+import nl.clockwork.ebms.EbMSMessageStatus;
+import nl.clockwork.ebms.EbMSMessageUtils;
 import nl.clockwork.ebms.common.JAXBParser;
 import nl.clockwork.ebms.common.util.DOMUtils;
 import nl.clockwork.ebms.model.CertificateMapping;
@@ -79,7 +80,6 @@ import nl.clockwork.ebms.model.EbMSMessageEvent;
 import nl.clockwork.ebms.model.Role;
 import nl.clockwork.ebms.model.URLMapping;
 import nl.clockwork.ebms.processor.EbMSProcessingException;
-import nl.clockwork.ebms.util.EbMSMessageUtils;
 
 public abstract class AbstractEbMSDAO implements EbMSDAO
 {

@@ -24,7 +24,7 @@ import javax.jws.WebService;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.ws.soap.MTOM;
 
-import nl.clockwork.ebms.Constants.EbMSMessageEventType;
+import nl.clockwork.ebms.EbMSMessageEventType;
 import nl.clockwork.ebms.model.EbMSMessageContentMTOM;
 import nl.clockwork.ebms.model.EbMSMessageContext;
 import nl.clockwork.ebms.model.EbMSMessageEvent;

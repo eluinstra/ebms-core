@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.clockwork.ebms.common;
+package nl.clockwork.ebms;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -50,11 +50,9 @@ import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.SyncReply;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.To;
 import org.xml.sax.SAXException;
 
-import nl.clockwork.ebms.Constants;
-import nl.clockwork.ebms.Constants.EbMSAction;
-import nl.clockwork.ebms.Constants.EbMSMessageStatus;
-import nl.clockwork.ebms.EbMSAttachmentFactory;
-import nl.clockwork.ebms.StreamUtils;
+import nl.clockwork.ebms.common.util.StreamUtils;
+import nl.clockwork.ebms.cpa.CPAManager;
+import nl.clockwork.ebms.cpa.CPAUtils;
 import nl.clockwork.ebms.model.CacheablePartyId;
 import nl.clockwork.ebms.model.EbMSAttachment;
 import nl.clockwork.ebms.model.EbMSDataSource;
@@ -69,8 +67,6 @@ import nl.clockwork.ebms.model.Party;
 import nl.clockwork.ebms.model.ToPartyInfo;
 import nl.clockwork.ebms.processor.EbMSProcessingException;
 import nl.clockwork.ebms.processor.EbMSProcessorException;
-import nl.clockwork.ebms.util.CPAUtils;
-import nl.clockwork.ebms.util.EbMSMessageUtils;
 
 public class EbMSMessageFactory
 {
@@ -83,8 +79,8 @@ public class EbMSMessageFactory
 		if (errorList.getError().size() == 0)
 		{
 			errorList.getError().add(EbMSMessageUtils.createError(
-					Constants.EbMSErrorCode.UNKNOWN.errorCode(),
-					Constants.EbMSErrorCode.UNKNOWN,
+					EbMSErrorCode.UNKNOWN.errorCode(),
+					EbMSErrorCode.UNKNOWN,
 					"An unknown error occurred!"));
 			errorList.setHighestSeverity(SeverityType.ERROR);
 		}

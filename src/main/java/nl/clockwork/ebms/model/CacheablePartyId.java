@@ -21,9 +21,9 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.stream.Collectors;
 
-import nl.clockwork.ebms.util.CPAUtils;
-
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.PartyId;
+
+import nl.clockwork.ebms.cpa.CPAUtils;
 
 public class CacheablePartyId implements List<PartyId>
 {

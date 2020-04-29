@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.clockwork.ebms.common;
+package nl.clockwork.ebms.cpa;
 
 import java.util.Date;
 import java.util.List;
@@ -30,7 +30,8 @@ import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.SyncReplyModeType
 
 import net.sf.ehcache.Ehcache;
 import nl.clockwork.ebms.Constants;
-import nl.clockwork.ebms.StreamUtils;
+import nl.clockwork.ebms.common.MethodCacheInterceptor;
+import nl.clockwork.ebms.common.util.StreamUtils;
 import nl.clockwork.ebms.dao.EbMSDAO;
 import nl.clockwork.ebms.model.CacheablePartyId;
 import nl.clockwork.ebms.model.EbMSPartyInfo;
@@ -38,7 +39,6 @@ import nl.clockwork.ebms.model.FromPartyInfo;
 import nl.clockwork.ebms.model.Party;
 import nl.clockwork.ebms.model.Role;
 import nl.clockwork.ebms.model.ToPartyInfo;
-import nl.clockwork.ebms.util.CPAUtils;
 
 public class CPAManager
 {

@@ -23,7 +23,7 @@ import javax.jws.WebResult;
 import javax.jws.WebService;
 import javax.xml.bind.annotation.XmlElement;
 
-import nl.clockwork.ebms.Constants.EbMSMessageEventType;
+import nl.clockwork.ebms.EbMSMessageEventType;
 import nl.clockwork.ebms.model.EbMSMessageAttachment;
 import nl.clockwork.ebms.model.EbMSMessageContent;
 import nl.clockwork.ebms.model.EbMSMessageContext;

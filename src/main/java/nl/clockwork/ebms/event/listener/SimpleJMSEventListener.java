@@ -22,13 +22,13 @@ import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.Session;
 
-import nl.clockwork.ebms.Constants.EbMSMessageEventType;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.jms.JmsException;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jms.core.MessageCreator;
+
+import nl.clockwork.ebms.EbMSMessageEventType;
 
 public class SimpleJMSEventListener implements EventListener
 {

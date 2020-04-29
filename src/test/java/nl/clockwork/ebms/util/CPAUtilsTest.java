@@ -27,6 +27,8 @@ import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.PartyId;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.Transport;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.TransportReceiver;
 
+import nl.clockwork.ebms.cpa.CPAUtils;
+
 public class CPAUtilsTest {
 	
 	@SuppressWarnings("serial")

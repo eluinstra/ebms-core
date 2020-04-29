@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.clockwork.ebms.util;
+package nl.clockwork.ebms.cpa;
 
 import java.io.ByteArrayInputStream;
 import java.net.MalformedURLException;
@@ -47,6 +47,7 @@ import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.Service;
 import org.w3._2000._09.xmldsig.X509DataType;
 
 import nl.clockwork.ebms.Constants;
+import nl.clockwork.ebms.EbMSMessageUtils;
 import nl.clockwork.ebms.model.FromPartyInfo;
 import nl.clockwork.ebms.model.ToPartyInfo;
 

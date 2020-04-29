@@ -13,12 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.clockwork.ebms.common;
+package nl.clockwork.ebms.cpa;
 
 import java.security.cert.X509Certificate;
 import java.util.List;
 
 import net.sf.ehcache.Ehcache;
+import nl.clockwork.ebms.common.MethodCacheInterceptor;
 import nl.clockwork.ebms.dao.EbMSDAO;
 import nl.clockwork.ebms.model.CertificateMapping;
 

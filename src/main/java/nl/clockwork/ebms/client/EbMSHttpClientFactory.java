@@ -26,11 +26,11 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.apache.commons.lang3.StringUtils;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DeliveryChannel;
 
-import nl.clockwork.ebms.common.CertificateManager;
 import nl.clockwork.ebms.common.util.Utils;
+import nl.clockwork.ebms.cpa.CPAUtils;
+import nl.clockwork.ebms.cpa.CertificateManager;
 import nl.clockwork.ebms.security.EbMSKeyStore;
 import nl.clockwork.ebms.security.EbMSTrustStore;
-import nl.clockwork.ebms.util.CPAUtils;
 
 public class EbMSHttpClientFactory
 {

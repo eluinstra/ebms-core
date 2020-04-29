@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.clockwork.ebms;
+package nl.clockwork.ebms.common.util;
 
 import java.util.Optional;
 import java.util.function.Consumer;

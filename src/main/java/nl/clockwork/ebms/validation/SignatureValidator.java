@@ -17,14 +17,14 @@ package nl.clockwork.ebms.validation;
 
 import java.util.Optional;
 
-import nl.clockwork.ebms.Constants;
-import nl.clockwork.ebms.StreamUtils;
-import nl.clockwork.ebms.common.CPAManager;
+import nl.clockwork.ebms.EbMSErrorCode;
+import nl.clockwork.ebms.EbMSMessageUtils;
+import nl.clockwork.ebms.common.util.StreamUtils;
+import nl.clockwork.ebms.cpa.CPAManager;
+import nl.clockwork.ebms.cpa.CPAUtils;
 import nl.clockwork.ebms.model.CacheablePartyId;
 import nl.clockwork.ebms.model.EbMSMessage;
 import nl.clockwork.ebms.signing.EbMSSignatureValidator;
-import nl.clockwork.ebms.util.CPAUtils;
-import nl.clockwork.ebms.util.EbMSMessageUtils;
 
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DeliveryChannel;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageHeader;
@@ -49,15 +49,15 @@ public class SignatureValidator
 		{
 			if (signature == null)
 				throw new EbMSValidationException(
-						EbMSMessageUtils.createError("//Header/Signature",Constants.EbMSErrorCode.SECURITY_FAILURE,"Signature not found."));
+						EbMSMessageUtils.createError("//Header/Signature",EbMSErrorCode.SECURITY_FAILURE,"Signature not found."));
 			Optional<ReferenceType> reference = signature.getSignedInfo().getReference().stream()
 					.filter(r -> !CPAUtils.getHashFunction(deliveryChannel).equals(r.getDigestMethod().getAlgorithm())).findFirst();
 			if (reference.isPresent())
 				throw new EbMSValidationException(
-						EbMSMessageUtils.createError("//Header/Signature/SignedInfo/Reference[@URI='" + reference.get().getURI() + "']/DigestMethod/@Algorithm",Constants.EbMSErrorCode.SECURITY_FAILURE,"Invalid DigestMethod."));
+						EbMSMessageUtils.createError("//Header/Signature/SignedInfo/Reference[@URI='" + reference.get().getURI() + "']/DigestMethod/@Algorithm",EbMSErrorCode.SECURITY_FAILURE,"Invalid DigestMethod."));
 			if (!CPAUtils.getSignatureAlgorithm(deliveryChannel).equals(signature.getSignedInfo().getSignatureMethod().getAlgorithm()))
 				throw new EbMSValidationException(
-						EbMSMessageUtils.createError("//Header/Signature/SignedInfo/SignatureMethod/@Algorithm",Constants.EbMSErrorCode.SECURITY_FAILURE,"Invalid SignatureMethod."));
+						EbMSMessageUtils.createError("//Header/Signature/SignedInfo/SignatureMethod/@Algorithm",EbMSErrorCode.SECURITY_FAILURE,"Invalid SignatureMethod."));
 		}
 	}
 
@@ -70,7 +70,7 @@ public class SignatureValidator
 		catch (ValidationException e)
 		{
 			throw new EbMSValidationException(
-					EbMSMessageUtils.createError("//Header/Signature",Constants.EbMSErrorCode.SECURITY_FAILURE,e.getMessage()));
+					EbMSMessageUtils.createError("//Header/Signature",EbMSErrorCode.SECURITY_FAILURE,e.getMessage()));
 		}
 	}
 

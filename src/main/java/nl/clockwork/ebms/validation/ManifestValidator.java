@@ -21,9 +21,10 @@ import java.util.List;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.Reference;
 
 import nl.clockwork.ebms.Constants;
+import nl.clockwork.ebms.EbMSErrorCode;
+import nl.clockwork.ebms.EbMSMessageUtils;
 import nl.clockwork.ebms.model.EbMSAttachment;
 import nl.clockwork.ebms.model.EbMSMessage;
-import nl.clockwork.ebms.util.EbMSMessageUtils;
 
 public class ManifestValidator
 {
@@ -34,7 +35,7 @@ public class ManifestValidator
 		if (message.getManifest() != null)
 		{
 			if (!Constants.EBMS_VERSION.equals(message.getManifest().getVersion()))
-				throw new EbMSValidationException(EbMSMessageUtils.createError("//Body/Manifest/@version",Constants.EbMSErrorCode.INCONSISTENT,"Invalid value."));
+				throw new EbMSValidationException(EbMSMessageUtils.createError("//Body/Manifest/@version",EbMSErrorCode.INCONSISTENT,"Invalid value."));
 			message.getManifest().getReference().forEach(r -> addAttachment(attachments,message.getAttachments(),r));
 		}
 		message.getAttachments().retainAll(attachments);
@@ -48,10 +49,10 @@ public class ManifestValidator
 			if (attachment != null)
 				destAttachments.add(attachment);
 			else
-				throw new EbMSValidationException(EbMSMessageUtils.createError(reference.getHref(),Constants.EbMSErrorCode.MIME_PROBLEM,"MIME part not found."));
+				throw new EbMSValidationException(EbMSMessageUtils.createError(reference.getHref(),EbMSErrorCode.MIME_PROBLEM,"MIME part not found."));
 		}
 		else
-			throw new EbMSValidationException(EbMSMessageUtils.createError("//Body/Manifest/Reference[@href='" + reference.getHref() + "']",Constants.EbMSErrorCode.MIME_PROBLEM,"URI cannot be resolved."));
+			throw new EbMSValidationException(EbMSMessageUtils.createError("//Body/Manifest/Reference[@href='" + reference.getHref() + "']",EbMSErrorCode.MIME_PROBLEM,"URI cannot be resolved."));
 	}
 
 	private EbMSAttachment findAttachment(List<EbMSAttachment> attachments, String href)

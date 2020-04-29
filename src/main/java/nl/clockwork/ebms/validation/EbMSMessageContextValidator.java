@@ -19,7 +19,7 @@ import java.util.Optional;
 
 import org.apache.commons.lang3.StringUtils;
 
-import nl.clockwork.ebms.common.CPAManager;
+import nl.clockwork.ebms.cpa.CPAManager;
 import nl.clockwork.ebms.dao.DAOException;
 import nl.clockwork.ebms.model.EbMSMessageContext;
 import nl.clockwork.ebms.model.FromPartyInfo;

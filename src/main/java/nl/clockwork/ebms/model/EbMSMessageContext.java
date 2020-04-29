@@ -20,7 +20,7 @@ import java.util.Date;
 
 import javax.xml.bind.annotation.XmlElement;
 
-import nl.clockwork.ebms.Constants.EbMSMessageStatus;
+import nl.clockwork.ebms.EbMSMessageStatus;
 
 public class EbMSMessageContext implements Serializable
 {
