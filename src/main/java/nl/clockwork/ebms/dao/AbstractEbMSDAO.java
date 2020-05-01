@@ -41,7 +41,6 @@ import javax.xml.transform.TransformerException;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CollaborationProtocolAgreement;
-import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageHeader;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.Service;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -58,14 +57,19 @@ import org.springframework.transaction.support.TransactionTemplate;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.NonNull;
+import lombok.val;
+import lombok.experimental.FieldDefaults;
 import nl.clockwork.ebms.EbMSAction;
 import nl.clockwork.ebms.EbMSAttachmentFactory;
-import nl.clockwork.ebms.EbMSEventStatus;
-import nl.clockwork.ebms.EbMSMessageEventType;
 import nl.clockwork.ebms.EbMSMessageStatus;
 import nl.clockwork.ebms.EbMSMessageUtils;
 import nl.clockwork.ebms.common.JAXBParser;
 import nl.clockwork.ebms.common.util.DOMUtils;
+import nl.clockwork.ebms.event.listener.EbMSMessageEventType;
+import nl.clockwork.ebms.event.processor.EbMSEventStatus;
 import nl.clockwork.ebms.model.CertificateMapping;
 import nl.clockwork.ebms.model.EbMSAttachment;
 import nl.clockwork.ebms.model.EbMSDataSource;
@@ -76,25 +80,22 @@ import nl.clockwork.ebms.model.EbMSMessage;
 import nl.clockwork.ebms.model.EbMSMessageContent;
 import nl.clockwork.ebms.model.EbMSMessageContentMTOM;
 import nl.clockwork.ebms.model.EbMSMessageContext;
+import nl.clockwork.ebms.model.EbMSMessageContext.EbMSMessageContextBuilder;
 import nl.clockwork.ebms.model.EbMSMessageEvent;
 import nl.clockwork.ebms.model.Role;
 import nl.clockwork.ebms.model.URLMapping;
 import nl.clockwork.ebms.processor.EbMSProcessingException;
 
+@FieldDefaults(level = AccessLevel.PROTECTED, makeFinal = true)
+@AllArgsConstructor
 public abstract class AbstractEbMSDAO implements EbMSDAO
 {
-	protected TransactionTemplate transactionTemplate;
-	protected JdbcTemplate jdbcTemplate;
-	protected String serverId;
+	@NonNull
+	TransactionTemplate transactionTemplate;
+	@NonNull
+	JdbcTemplate jdbcTemplate;
+	String serverId;
 	
-	public AbstractEbMSDAO(TransactionTemplate transactionTemplate, JdbcTemplate jdbcTemplate, String serverId)
-	{
-		this.transactionTemplate = transactionTemplate;
-		this.jdbcTemplate = jdbcTemplate;
-		if (StringUtils.isNotBlank(serverId))
-			this.serverId = serverId;
-	}
-
 	@Override
 	public void executeTransaction(final DAOTransactionCallback callback) throws DAOException
 	{
@@ -142,7 +143,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	{
 		try
 		{
-			String result = jdbcTemplate.queryForObject(
+			val result = jdbcTemplate.queryForObject(
 				"select cpa" +
 				" from cpa" +
 				" where cpa_id = ?",
@@ -437,9 +438,9 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 					{
 						try
 						{
-							CertificateFactory certificateFactory = CertificateFactory.getInstance("X509");
-							X509Certificate source = (X509Certificate)certificateFactory.generateCertificate(rs.getBinaryStream("source"));
-							X509Certificate destination = (X509Certificate)certificateFactory.generateCertificate(rs.getBinaryStream("destination"));
+							val certificateFactory = CertificateFactory.getInstance("X509");
+							val source = (X509Certificate)certificateFactory.generateCertificate(rs.getBinaryStream("source"));
+							val destination = (X509Certificate)certificateFactory.generateCertificate(rs.getBinaryStream("destination"));
 							return new CertificateMapping(source,destination);
 						}
 						catch (CertificateException e)
@@ -574,10 +575,15 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	{
 		try
 		{
-			List<EbMSDataSource> dataSources = new ArrayList<>();
-			List<EbMSAttachment> attachments = getAttachments(messageId);
-			for (EbMSAttachment attachment: attachments)
-				dataSources.add(new EbMSDataSource(attachment.getName(),attachment.getContentId(),attachment.getContentType(),IOUtils.toByteArray(attachment.getInputStream())));
+			val dataSources = new ArrayList<EbMSDataSource>();
+			val attachments = getAttachments(messageId);
+			for (val attachment: attachments)
+				dataSources.add(EbMSDataSource.builder()
+						.name(attachment.getName())
+						.contentId(attachment.getContentId())
+						.contentType(attachment.getContentType())
+						.content(IOUtils.toByteArray(attachment.getInputStream()))
+						.build());
 			return getMessageContext(messageId).map(mc -> new EbMSMessageContent(mc,dataSources)
 			);
 		}
@@ -592,8 +598,8 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	{
 		try
 		{
-			List<EbMSAttachment> attachments = getAttachments(messageId);
-			List<EbMSDataSourceMTOM> dataSources = attachments.stream()
+			val attachments = getAttachments(messageId);
+			val dataSources = attachments.stream()
 					.map(a -> new EbMSDataSourceMTOM(a.getContentId(),new DataHandler(a)))
 					.collect(Collectors.toList());
 			return getMessageContext(messageId).map(mc -> new EbMSMessageContentMTOM(mc,dataSources)
@@ -631,18 +637,18 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 					@Override
 					public EbMSMessageContext mapRow(ResultSet rs, int rowNum) throws SQLException
 					{
-						EbMSMessageContext result = new EbMSMessageContext();
-						result.setCpaId(rs.getString("cpa_id"));
-						result.setFromRole(new Role(rs.getString("from_party_id"),rs.getString("from_role")));
-						result.setToRole(new Role(rs.getString("to_party_id"),rs.getString("to_role")));
-						result.setService(rs.getString("service"));
-						result.setAction(rs.getString("action"));
-						result.setTimestamp(rs.getTimestamp("time_stamp"));
-						result.setConversationId(rs.getString("conversation_id"));
-						result.setMessageId(rs.getString("message_id"));
-						result.setRefToMessageId(rs.getString("ref_to_message_id"));
-						result.setMessageStatus(rs.getObject("status") == null ? null : EbMSMessageStatus.get(rs.getInt("status")));
-						return result;
+						val builder = EbMSMessageContext.builder();
+						builder.cpaId(rs.getString("cpa_id"));
+						builder.fromRole(new Role(rs.getString("from_party_id"),rs.getString("from_role")));
+						builder.toRole(new Role(rs.getString("to_party_id"),rs.getString("to_role")));
+						builder.service(rs.getString("service"));
+						builder.action(rs.getString("action"));
+						builder.timestamp(rs.getTimestamp("time_stamp"));
+						builder.conversationId(rs.getString("conversation_id"));
+						builder.messageId(rs.getString("message_id"));
+						builder.refToMessageId(rs.getString("ref_to_message_id"));
+						builder.messageStatus(rs.getObject("status") == null ? null : EbMSMessageStatus.get(rs.getInt("status")));
+						return builder.build();
 					}
 					
 				},
@@ -688,18 +694,18 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 					@Override
 					public EbMSMessageContext mapRow(ResultSet rs, int rowNum) throws SQLException
 					{
-						EbMSMessageContext result = new EbMSMessageContext();
-						result.setCpaId(rs.getString("cpa_id"));
-						result.setFromRole(new Role(rs.getString("from_party_id"),rs.getString("from_role")));
-						result.setToRole(new Role(rs.getString("to_party_id"),rs.getString("to_role")));
-						result.setService(rs.getString("service"));
-						result.setAction(rs.getString("action"));
-						result.setTimestamp(rs.getTimestamp("time_stamp"));
-						result.setConversationId(rs.getString("conversation_id"));
-						result.setMessageId(rs.getString("message_id"));
-						result.setRefToMessageId(rs.getString("ref_to_message_id"));
-						result.setMessageStatus(rs.getObject("status") == null ? null : EbMSMessageStatus.values()[rs.getInt("status")]);
-						return result;
+						EbMSMessageContextBuilder builder = EbMSMessageContext.builder();
+						builder.cpaId(rs.getString("cpa_id"));
+						builder.fromRole(new Role(rs.getString("from_party_id"),rs.getString("from_role")));
+						builder.toRole(new Role(rs.getString("to_party_id"),rs.getString("to_role")));
+						builder.service(rs.getString("service"));
+						builder.action(rs.getString("action"));
+						builder.timestamp(rs.getTimestamp("time_stamp"));
+						builder.conversationId(rs.getString("conversation_id"));
+						builder.messageId(rs.getString("message_id"));
+						builder.refToMessageId(rs.getString("ref_to_message_id"));
+						builder.messageStatus(rs.getObject("status") == null ? null : EbMSMessageStatus.values()[rs.getInt("status")]);
+						return builder.build();
 					}
 					
 				},
@@ -748,17 +754,19 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	{
 		try
 		{
-			return Optional.of(new EbMSDocument(messageId,DOMUtils.read(
-					jdbcTemplate.queryForObject(
-							"select content" +
-							" from ebms_message" +
-							" where message_id = ?" +
-							" and message_nr = 0" +
-							" and (status is null or status = " + EbMSMessageStatus.SENDING.id() + ")",
-							String.class,
-							messageId
-						)
-			),getAttachments(messageId)));
+			val content = jdbcTemplate.queryForObject(
+					"select content" +
+					" from ebms_message" +
+					" where message_id = ?" +
+					" and message_nr = 0" +
+					" and (status is null or status = " + EbMSMessageStatus.SENDING.getId() + ")",
+					String.class,
+					messageId);
+			val builder = EbMSDocument.builder()
+				.contentId(messageId)
+				.message(DOMUtils.read(content))
+				.attachments(getAttachments(messageId));
+			return Optional.of(builder.build());
 		}
 		catch(EmptyResultDataAccessException e)
 		{
@@ -775,7 +783,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	{
 		try
 		{
-			EbMSDocument document = jdbcTemplate.queryForObject(
+			val document = jdbcTemplate.queryForObject(
 				"select message_id, content" +
 				" from ebms_message" +
 				" where cpa_id = ?" +
@@ -785,25 +793,30 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 				(actions.length == 0 ? "" : " and action in ('" + StringUtils.join(actions,"','") + "')"),
 				new RowMapper<EbMSDocument>()
 				{
-
 					@Override
 					public EbMSDocument mapRow(ResultSet rs, int rowNum) throws SQLException
 					{
 						try
 						{
-							return new EbMSDocument(rs.getString("message_id"),DOMUtils.read(rs.getString("content")));
+							return EbMSDocument.builder()
+									.contentId(rs.getString("message_id"))
+									.message(DOMUtils.read(rs.getString("content")))
+									.build();
 						}
 						catch (ParserConfigurationException | SAXException | IOException e)
 						{
 							throw new SQLException(e);
 						}
 					}
-					
 				},
 				cpaId,
 				refToMessageId
 			);
-			return Optional.of(new EbMSDocument(document.getContentId(),document.getMessage(),getAttachments(refToMessageId)));
+			val builder = EbMSDocument.builder()
+					.contentId(document.getContentId())
+					.message(document.getMessage())
+					.attachments(getAttachments(refToMessageId));
+			return Optional.of(builder.build());
 		}
 		catch(EmptyResultDataAccessException e)
 		{
@@ -884,12 +897,12 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	{
 		try
 		{
-			List<Object> parameters = new ArrayList<>();
+			val parameters = new ArrayList<Object>();
 			return jdbcTemplate.queryForList(
 					"select message_id" +
 					" from ebms_message" +
 					" where message_nr = 0" +
-					" and status = " + status.id() +
+					" and status = " + status.getId() +
 					getMessageContextFilter(messageContext,parameters) +
 					" order by time_stamp asc",
 					parameters.toArray(new Object[0]),
@@ -909,8 +922,8 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	{
 		try
 		{
-			List<Object> parameters = new ArrayList<>();
-			String messageContextFilter = getMessageContextFilter(messageContext,parameters);
+			val parameters = new ArrayList<Object>();
+			val messageContextFilter = getMessageContextFilter(messageContext,parameters);
 			return jdbcTemplate.queryForList(
 					getMessageIdsQuery(messageContextFilter,status,maxNr),
 					parameters.toArray(new Object[0]),
@@ -924,7 +937,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	}
 
 	@Override
-	public void insertMessage(final Date timestamp, final Date persistTime, final EbMSMessage message, final EbMSMessageStatus status) throws DAOException
+	public void insertMessage(final Date timestamp, final Date persistTime, final Document document, final EbMSMessage message, final EbMSMessageStatus status) throws DAOException
 	{
 		try
 		{
@@ -936,7 +949,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 					{
 						try
 						{
-							KeyHolder keyHolder = new GeneratedKeyHolder();
+							val keyHolder = new GeneratedKeyHolder();
 							jdbcTemplate.update(
 								new PreparedStatementCreator()
 								{
@@ -946,7 +959,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 									{
 										try
 										{
-											PreparedStatement ps = connection.prepareStatement
+											val ps = connection.prepareStatement
 											(
 												"insert into ebms_message (" +
 													"time_stamp," +
@@ -969,7 +982,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 												new int[]{4,5}
 											);
 											ps.setTimestamp(1,new Timestamp(timestamp.getTime()));
-											MessageHeader messageHeader = message.getMessageHeader();
+											val messageHeader = message.getMessageHeader();
 											ps.setString(2,messageHeader.getCPAId());
 											ps.setString(3,messageHeader.getConversationId());
 											ps.setString(4,messageHeader.getMessageData().getMessageId());
@@ -981,7 +994,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 											ps.setString(10,messageHeader.getTo().getRole());
 											ps.setString(11,EbMSMessageUtils.toString(messageHeader.getService()));
 											ps.setString(12,messageHeader.getAction());
-											ps.setString(13,DOMUtils.toString(message.getMessage(),"UTF-8"));
+											ps.setString(13,DOMUtils.toString(document,"UTF-8"));
 											if (status == null)
 											{
 												ps.setNull(14,java.sql.Types.INTEGER);
@@ -989,7 +1002,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 											}
 											else
 											{
-												ps.setInt(14,status.id());
+												ps.setInt(14,status.getId());
 												ps.setTimestamp(15,new Timestamp(timestamp.getTime()));
 											}
 											if (persistTime == null)
@@ -1023,7 +1036,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	}
 
 	@Override
-	public void insertDuplicateMessage(final Date timestamp, final EbMSMessage message, boolean storeAttachments) throws DAOException
+	public void insertDuplicateMessage(final Date timestamp, final Document document, final EbMSMessage message, boolean storeAttachments) throws DAOException
 	{
 		try
 		{
@@ -1035,7 +1048,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 					{
 						try
 						{
-							KeyHolder keyHolder = new GeneratedKeyHolder();
+							val keyHolder = new GeneratedKeyHolder();
 							jdbcTemplate.update(
 								new PreparedStatementCreator()
 								{
@@ -1045,7 +1058,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 									{
 										try
 										{
-											PreparedStatement ps = connection.prepareStatement
+											val ps = connection.prepareStatement
 											(
 												"insert into ebms_message (" +
 													"time_stamp," +
@@ -1066,7 +1079,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 												new int[]{4,5}
 											);
 											ps.setTimestamp(1,new Timestamp(timestamp.getTime()));
-											MessageHeader messageHeader = message.getMessageHeader();
+											val messageHeader = message.getMessageHeader();
 											ps.setString(2,messageHeader.getCPAId());
 											ps.setString(3,messageHeader.getConversationId());
 											ps.setString(4,messageHeader.getMessageData().getMessageId());
@@ -1079,7 +1092,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 											ps.setString(11,messageHeader.getTo().getRole());
 											ps.setString(12,EbMSMessageUtils.toString(messageHeader.getService()));
 											ps.setString(13,messageHeader.getAction());
-											ps.setString(14,DOMUtils.toString(message.getMessage(),"UTF-8"));
+											ps.setString(14,DOMUtils.toString(document,"UTF-8"));
 											return ps;
 										}
 										catch (TransformerException e)
@@ -1109,8 +1122,8 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 
 	protected void insertAttachments(KeyHolder keyHolder, List<EbMSAttachment> attachments) throws InvalidDataAccessApiUsageException, DataAccessException, IOException
 	{
-		AtomicInteger orderNr = new AtomicInteger();
-		for (EbMSAttachment attachment: attachments)
+		val orderNr = new AtomicInteger();
+		for (val attachment: attachments)
 		{
 			jdbcTemplate.update(
 				new PreparedStatementCreator()
@@ -1118,9 +1131,9 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 					@Override
 					public PreparedStatement createPreparedStatement(Connection connection) throws SQLException
 					{
-						try (EbMSAttachment a = attachment)
+						try (val a = attachment)
 						{
-							PreparedStatement ps = connection.prepareStatement
+							val ps = connection.prepareStatement
 							(
 								"insert into ebms_attachment (" +
 								"message_id," +
@@ -1164,10 +1177,10 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 				" where message_id = ?" +
 				" and message_nr = 0" +
 				" and status = ?",
-				newStatus.id(),
+				newStatus.getId(),
 				new Date(),
 				messageId,
-				oldStatus != null ? oldStatus.id() : null
+				oldStatus != null ? oldStatus.getId() : null
 			);
 		}
 		catch (DataAccessException e)
@@ -1336,7 +1349,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 				messageId,
 				timestamp,
 				uri,
-				status.id(),
+				status.getId(),
 				errorMessage
 			);
 		}
@@ -1359,7 +1372,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	{
 		try
 		{
-			List<Object> parameters = new ArrayList<>();
+			val parameters = new ArrayList<Object>();
 			return jdbcTemplate.query(
 				"select ebms_message_event.message_id, ebms_message_event.event_type" +
 				" from ebms_message_event, ebms_message" +
@@ -1393,8 +1406,8 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	{
 		try
 		{
-			List<Object> parameters = new ArrayList<>();
-			String messageContextFilter = getMessageContextFilter(messageContext,parameters);
+			val parameters = new ArrayList<Object>();
+			val messageContextFilter = getMessageContextFilter(messageContext,parameters);
 			return jdbcTemplate.query(
 				getMessageEventsQuery(messageContextFilter,types,maxNr),
 				parameters.toArray(new Object[0]),
@@ -1491,7 +1504,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 
 	protected String getMessageContextFilter(EbMSMessageContext messageContext, List<Object> parameters)
 	{
-		StringBuffer result = new StringBuffer();
+		val result = new StringBuffer();
 		if (messageContext != null)
 		{
 			if (messageContext.getCpaId() != null)

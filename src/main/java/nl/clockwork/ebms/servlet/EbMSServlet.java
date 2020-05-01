@@ -25,26 +25,27 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
+import lombok.AccessLevel;
+import lombok.val;
+import lombok.var;
+import lombok.experimental.FieldDefaults;
 import nl.clockwork.ebms.processor.EbMSProcessorException;
 import nl.clockwork.ebms.server.EbMSHttpHandler;
 
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class EbMSServlet extends GenericServlet
 {
 	private static final long serialVersionUID = 1L;
-	protected transient Log logger = LogFactory.getLog(getClass());
-	private EbMSHttpHandler httpHandler;
+	EbMSHttpHandler httpHandler;
 
 	@Override
 	public void init(ServletConfig config) throws ServletException
 	{
 		super.init(config);
-		WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(getServletContext());
-		String id = config.getInitParameter("httpHandler");
+		val wac = WebApplicationContextUtils.getRequiredWebApplicationContext(getServletContext());
+		var id = config.getInitParameter("httpHandler");
 		if (id == null)
 			id = "httpHandler";
 		httpHandler = wac.getBean(id,EbMSHttpHandler.class);

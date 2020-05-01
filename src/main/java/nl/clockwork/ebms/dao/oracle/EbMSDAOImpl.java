@@ -15,12 +15,12 @@
  */
 package nl.clockwork.ebms.dao.oracle;
 
-import nl.clockwork.ebms.EbMSMessageEventType;
-import nl.clockwork.ebms.EbMSMessageStatus;
-import nl.clockwork.ebms.dao.AbstractEbMSDAO;
-
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.transaction.support.TransactionTemplate;
+
+import nl.clockwork.ebms.EbMSMessageStatus;
+import nl.clockwork.ebms.dao.AbstractEbMSDAO;
+import nl.clockwork.ebms.event.listener.EbMSMessageEventType;
 
 public class EbMSDAOImpl extends AbstractEbMSDAO
 {
@@ -36,7 +36,7 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 		"select message_id" +
 		" from ebms_message" +
 		" where message_nr = 0" +
-		" and status = " + status.id() +
+		" and status = " + status.getId() +
 		messageContextFilter +
 		" order by time_stamp asc)" +
 		" where ROWNUM <= " + maxNr;

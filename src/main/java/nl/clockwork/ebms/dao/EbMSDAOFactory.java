@@ -15,14 +15,36 @@
  */
 package nl.clockwork.ebms.dao;
 
+import javax.sql.DataSource;
+
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.transaction.support.TransactionTemplate;
 
+import lombok.AccessLevel;
+import lombok.NonNull;
+import lombok.experimental.FieldDefaults;
+
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class EbMSDAOFactory extends AbstractDAOFactory<EbMSDAO>
 {
-	protected TransactionTemplate transactionTemplate;
-	protected JdbcTemplate jdbcTemplate;
-	private String serverId;
+	@NonNull
+	TransactionTemplate transactionTemplate;
+	@NonNull
+	JdbcTemplate jdbcTemplate;
+	String serverId;
+
+	public EbMSDAOFactory(DataSource dataSource, @NonNull TransactionTemplate transactionTemplate, @NonNull JdbcTemplate jdbcTemplate)
+	{
+		this(dataSource,transactionTemplate,jdbcTemplate,null);
+	}
+
+	public EbMSDAOFactory(DataSource dataSource, @NonNull TransactionTemplate transactionTemplate, @NonNull JdbcTemplate jdbcTemplate, String serverId)
+	{
+		super(dataSource);
+		this.transactionTemplate = transactionTemplate;
+		this.jdbcTemplate = jdbcTemplate;
+		this.serverId = serverId;
+	}
 
 	@Override
 	public Class<EbMSDAO> getObjectType()
@@ -64,20 +86,5 @@ public class EbMSDAOFactory extends AbstractDAOFactory<EbMSDAO>
 	public EbMSDAO createDB2DAO()
 	{
 		return new nl.clockwork.ebms.dao.db2.EbMSDAOImpl(transactionTemplate,jdbcTemplate,serverId);
-	}
-
-	public void setTransactionTemplate(TransactionTemplate transactionTemplate)
-	{
-		this.transactionTemplate = transactionTemplate;
-	}
-	
-	public void setJdbcTemplate(JdbcTemplate jdbcTemplate)
-	{
-		this.jdbcTemplate = jdbcTemplate;
-	}
-
-	public void setServerId(String serverId)
-	{
-		this.serverId = serverId;
 	}
 }

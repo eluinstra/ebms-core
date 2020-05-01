@@ -21,7 +21,6 @@ import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
-import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -37,12 +36,16 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import lombok.AccessLevel;
+import lombok.val;
+import lombok.experimental.FieldDefaults;
 import nl.clockwork.ebms.common.util.SecurityUtils;
 
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class BasicAuthenticationFilter implements Filter
 {
-	private String realm;
-	private Map<String,String> users;
+	String realm;
+	Map<String,String> users;
 
 	@Override
 	public void init(FilterConfig filterConfig) throws ServletException
@@ -50,8 +53,8 @@ public class BasicAuthenticationFilter implements Filter
 		try
 		{
 			realm = filterConfig.getInitParameter("realm");
-			File realmFile = new File(filterConfig.getInitParameter("realmFile"));
-			List<String> lines = FileUtils.readLines(realmFile,Charset.defaultCharset());
+			val realmFile = new File(filterConfig.getInitParameter("realmFile"));
+			val lines = FileUtils.readLines(realmFile,Charset.defaultCharset());
 			users = lines.stream()
 					.map(s -> StringUtils.split(s,","))
 					.filter(a -> a.length == 2 && "user".equals(a[1]))
@@ -68,7 +71,7 @@ public class BasicAuthenticationFilter implements Filter
 	@Override
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException
 	{
-		String authorization = ((HttpServletRequest)request).getHeader("Authorization");
+		val authorization = ((HttpServletRequest)request).getHeader("Authorization");
 		if (validate(users,authorization))
 			chain.doFilter(request,response);
 		else
@@ -86,7 +89,7 @@ public class BasicAuthenticationFilter implements Filter
 			{
 				authorization = authorization.substring("basic".length()).trim();
 				authorization = new String(Base64.getDecoder().decode(authorization));
-				String[] credenitals = StringUtils.split(authorization,":");
+				val credenitals = StringUtils.split(authorization,":");
 				if (credenitals.length == 2)
 					return validate(users.get(credenitals[0]),credenitals[1]);
 			}

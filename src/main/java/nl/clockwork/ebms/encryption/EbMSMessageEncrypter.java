@@ -21,18 +21,14 @@ import java.security.GeneralSecurityException;
 import java.security.Key;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
-import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateExpiredException;
 import java.security.cert.CertificateNotYetValidException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Enumeration;
-import java.util.List;
 
 import javax.crypto.SecretKey;
-import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.OutputKeys;
@@ -43,10 +39,7 @@ import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.cxf.io.CachedOutputStream;
-import org.apache.xml.security.encryption.EncryptedData;
 import org.apache.xml.security.encryption.EncryptedKey;
 import org.apache.xml.security.encryption.XMLCipher;
 import org.apache.xml.security.encryption.XMLEncryptionException;
@@ -54,11 +47,16 @@ import org.apache.xml.security.keys.KeyInfo;
 import org.apache.xml.security.keys.content.KeyName;
 import org.apache.xml.security.utils.EncryptionConstants;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DeliveryChannel;
-import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageHeader;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
+import lombok.AccessLevel;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
+import lombok.val;
+import lombok.experimental.FieldDefaults;
+import lombok.extern.apachecommons.CommonsLog;
 import nl.clockwork.ebms.EbMSAttachmentFactory;
 import nl.clockwork.ebms.common.util.SecurityUtils;
 import nl.clockwork.ebms.common.util.StreamUtils;
@@ -74,30 +72,32 @@ import nl.clockwork.ebms.security.EbMSTrustStore;
 import nl.clockwork.ebms.validation.ValidationException;
 import nl.clockwork.ebms.validation.ValidatorException;
 
+@CommonsLog
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@RequiredArgsConstructor
 public class EbMSMessageEncrypter
 {
-	protected transient Log logger = LogFactory.getLog(getClass());
-	private CPAManager cpaManager;
-	private EbMSTrustStore trustStore;
+	@NonNull
+	CPAManager cpaManager;
+	@NonNull
+	EbMSTrustStore trustStore;
 
 	public void encrypt(EbMSMessage message) throws EbMSProcessorException
 	{
 		try
 		{
-			MessageHeader messageHeader = message.getMessageHeader();
-			CacheablePartyId fromPartyId = new CacheablePartyId(messageHeader.getFrom().getPartyId());
-			String service = CPAUtils.toString(messageHeader.getService());
+			val messageHeader = message.getMessageHeader();
+			val fromPartyId = new CacheablePartyId(messageHeader.getFrom().getPartyId());
+			val service = CPAUtils.toString(messageHeader.getService());
 			if (cpaManager.isConfidential(messageHeader.getCPAId(),fromPartyId,messageHeader.getFrom().getRole(),service,messageHeader.getAction()))
 			{
-				CacheablePartyId toPartyId = new CacheablePartyId(messageHeader.getTo().getPartyId());
-				DeliveryChannel deliveryChannel = cpaManager.getReceiveDeliveryChannel(messageHeader.getCPAId(),toPartyId,messageHeader.getTo().getRole(),service,messageHeader.getAction())
+				val toPartyId = new CacheablePartyId(messageHeader.getTo().getPartyId());
+				val deliveryChannel = cpaManager.getReceiveDeliveryChannel(messageHeader.getCPAId(),toPartyId,messageHeader.getTo().getRole(),service,messageHeader.getAction())
 						.orElseThrow(() -> StreamUtils.illegalStateException("ReceiveDeliveryChannel",messageHeader.getCPAId(),toPartyId,messageHeader.getTo().getRole(),service,messageHeader.getAction()));
-				X509Certificate certificate = CPAUtils.getX509Certificate(CPAUtils.getEncryptionCertificate(deliveryChannel));
+				val certificate = CPAUtils.getX509Certificate(CPAUtils.getEncryptionCertificate(deliveryChannel));
 				validateCertificate(trustStore,certificate);
-				String encryptionAlgorithm = CPAUtils.getEncryptionAlgorithm(deliveryChannel);
-				List<EbMSAttachment> attachments = new ArrayList<>();
-				message.getAttachments().forEach(a -> attachments.add(encrypt(createDocument(),certificate,encryptionAlgorithm,a)));
-				message.setAttachments(attachments);
+				val encryptionAlgorithm = CPAUtils.getEncryptionAlgorithm(deliveryChannel);
+				message.getAttachments().replaceAll(a -> encrypt(createDocument(),certificate,encryptionAlgorithm,a));
 			}
 		}
 		catch (CertificateException | KeyStoreException | ValidatorException e)
@@ -114,10 +114,10 @@ public class EbMSMessageEncrypter
 	{
 		try
 		{
-			X509Certificate certificate = CPAUtils.getX509Certificate(CPAUtils.getEncryptionCertificate(deliveryChannel));
+			val certificate = CPAUtils.getX509Certificate(CPAUtils.getEncryptionCertificate(deliveryChannel));
 			validateCertificate(trustStore,certificate);
-			String encryptionAlgorithm = CPAUtils.getEncryptionAlgorithm(deliveryChannel);
-			List<EbMSAttachment> attachments = new ArrayList<>();
+			val encryptionAlgorithm = CPAUtils.getEncryptionAlgorithm(deliveryChannel);
+			val attachments = new ArrayList<EbMSAttachment>();
 			message.getAttachments().forEach(a -> attachments.add(encrypt(createDocument(),certificate,encryptionAlgorithm,a)));
 			message.getAttachments().clear();
 			message.getAttachments().addAll(attachments);
@@ -134,7 +134,7 @@ public class EbMSMessageEncrypter
 
 	private XMLCipher createXmlCipher(String encryptionAlgorithm, SecretKey secretKey) throws XMLEncryptionException
 	{
-		XMLCipher result = XMLCipher.getInstance(encryptionAlgorithm);
+		val result = XMLCipher.getInstance(encryptionAlgorithm);
 		result.init(XMLCipher.ENCRYPT_MODE,secretKey);
 		return result;
 	}
@@ -144,12 +144,12 @@ public class EbMSMessageEncrypter
 		try
 		{
 			certificate.checkValidity(new Date());
-			Enumeration<String> aliases = trustStore.aliases();
+			val aliases = trustStore.aliases();
 			while (aliases.hasMoreElements())
 			{
 				try
 				{
-					Certificate c = trustStore.getCertificate(aliases.nextElement());
+					val c = trustStore.getCertificate(aliases.nextElement());
 					if (c instanceof X509Certificate)
 						if (certificate.getIssuerDN().getName().equals(((X509Certificate)c).getSubjectDN().getName()))
 						{
@@ -159,7 +159,7 @@ public class EbMSMessageEncrypter
 				}
 				catch (GeneralSecurityException e)
 				{
-					logger.trace("",e);
+					log.trace("",e);
 				}
 			}
 			throw new ValidationException("Certificate " + certificate.getIssuerDN() + " not found!");
@@ -174,12 +174,12 @@ public class EbMSMessageEncrypter
 	{
 		try
 		{
-			SecretKey secretKey = SecurityUtils.generateKey(encryptionAlgorithm);
-			XMLCipher xmlCipher = createXmlCipher(encryptionAlgorithm,secretKey);
-			EncryptedKey encryptedKey = createEncryptedKey(document,certificate.getPublicKey(),secretKey);
+			val secretKey = SecurityUtils.generateKey(encryptionAlgorithm);
+			val xmlCipher = createXmlCipher(encryptionAlgorithm,secretKey);
+			val encryptedKey = createEncryptedKey(document,certificate.getPublicKey(),secretKey);
 			setEncryptedData(document,xmlCipher,encryptedKey,certificate,attachment);
-			EncryptedData encryptedData = xmlCipher.encryptData(document,null,attachment.getInputStream());
-			CachedOutputStream content = new CachedOutputStream();
+			val encryptedData = xmlCipher.encryptData(document,null,attachment.getInputStream());
+			val content = new CachedOutputStream();
 			createTransformer().transform(new DOMSource(xmlCipher.martial(document,encryptedData)),new StreamResult(content));
 			content.lockOutputStream();
 			return EbMSAttachmentFactory.createCachedEbMSAttachment(attachment.getName(),attachment.getContentId(),"application/xml",content);
@@ -196,18 +196,18 @@ public class EbMSMessageEncrypter
 
 	private EncryptedKey createEncryptedKey(Document document, Key publicKey, SecretKey secretKey) throws XMLEncryptionException
 	{
-		XMLCipher keyCipher = XMLCipher.getInstance(XMLCipher.RSA_v1dot5);
+		val keyCipher = XMLCipher.getInstance(XMLCipher.RSA_v1dot5);
 		keyCipher.init(XMLCipher.WRAP_MODE,publicKey);
 		return keyCipher.encryptKey(document,secretKey);
 	}
 
 	private void setEncryptedData(Document document, XMLCipher xmlCipher, EncryptedKey encryptedKey, X509Certificate certificate, EbMSAttachment attachment) throws XMLEncryptionException
 	{
-		EncryptedData encryptedData = xmlCipher.getEncryptedData();
-		KeyInfo encryptedKeyInfo = new KeyInfo(document);
+		val encryptedData = xmlCipher.getEncryptedData();
+		val encryptedKeyInfo = new KeyInfo(document);
 		encryptedKeyInfo.add(new KeyName(document,certificate.getSubjectDN().getName()));
 		encryptedKey.setKeyInfo(encryptedKeyInfo);
-		KeyInfo keyInfo = new KeyInfo(document);
+		val keyInfo = new KeyInfo(document);
 		keyInfo.add(encryptedKey);
 		encryptedData.setKeyInfo(keyInfo);
 		encryptedData.setId(attachment.getContentId());
@@ -219,9 +219,9 @@ public class EbMSMessageEncrypter
 	{
 		try
 		{
-			DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+			val dbFactory = DocumentBuilderFactory.newInstance();
 			dbFactory.setNamespaceAware(true);
-			DocumentBuilder builder = dbFactory.newDocumentBuilder();
+			val builder = dbFactory.newDocumentBuilder();
 			return builder.parse(new InputSource(new StringReader("<root></root>")));
 		}
 		catch (ParserConfigurationException | SAXException | IOException e)
@@ -232,20 +232,10 @@ public class EbMSMessageEncrypter
 
 	private Transformer createTransformer() throws TransformerFactoryConfigurationError, TransformerConfigurationException
 	{
-		TransformerFactory transormerFactory = TransformerFactory.newInstance();
-		Transformer transformer = transormerFactory.newTransformer();
+		val transormerFactory = TransformerFactory.newInstance();
+		val transformer = transormerFactory.newTransformer();
 		transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION,"yes");
 		return transformer;
-	}
-
-	public void setCpaManager(CPAManager cpaManager)
-	{
-		this.cpaManager = cpaManager;
-	}
-
-	public void setTrustStore(EbMSTrustStore trustStore)
-	{
-		this.trustStore = trustStore;
 	}
 
 }

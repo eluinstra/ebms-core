@@ -15,16 +15,32 @@
  */
 package nl.clockwork.ebms.client;
 
+import java.util.Set;
+
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.FactoryBean;
 
-public class EbMSProxyFactory extends EbMSProxy implements FactoryBean<EbMSProxy>
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.experimental.FieldDefaults;
+
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@Getter
+@AllArgsConstructor
+public class EbMSProxyFactory implements FactoryBean<EbMSProxy>
 {
+	String host;
+	int port;
+	String username;
+	String password;
+	Set<String> nonProxyHosts;
+
 	@Override
 	public EbMSProxy getObject() throws Exception
 	{
-		if (StringUtils.isNotBlank(getHost()))
-			return new EbMSProxy(getHost(),getPort(),getUsername(),getPassword(),getNonProxyHosts());
+		if (StringUtils.isNotBlank(host))
+			return EbMSProxy.of(host,port,username,password,nonProxyHosts);
 		else
 			return null;
 	}

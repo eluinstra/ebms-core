@@ -19,8 +19,6 @@ import java.security.cert.CertificateException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.GregorianCalendar;
-import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
@@ -28,13 +26,16 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DeliveryChannel;
-import org.springframework.beans.factory.InitializingBean;
 
 import io.vavr.control.Try;
-import nl.clockwork.ebms.EbMSEventStatus;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.NonNull;
+import lombok.val;
+import lombok.experimental.FieldDefaults;
+import lombok.extern.apachecommons.CommonsLog;
 import nl.clockwork.ebms.EbMSMessageStatus;
 import nl.clockwork.ebms.client.EbMSClient;
 import nl.clockwork.ebms.client.EbMSHttpClientFactory;
@@ -53,16 +54,16 @@ import nl.clockwork.ebms.model.EbMSEvent;
 import nl.clockwork.ebms.processor.EbMSMessageProcessor;
 import nl.clockwork.ebms.processor.EbMSProcessingException;
 
-public class EbMSEventProcessor implements Runnable, InitializingBean
+@CommonsLog
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+public class EbMSEventProcessor implements Runnable
 {
+	@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+	@AllArgsConstructor
 	private class HandleEventTask implements Runnable
 	{
-		private EbMSEvent event;
-		
-		public HandleEventTask(EbMSEvent event)
-		{
-			this.event = event;
-		}
+		@NonNull
+		EbMSEvent event;
 		
 		@Override
 		public void run()
@@ -75,21 +76,21 @@ public class EbMSEventProcessor implements Runnable, InitializingBean
 
 		private void sendEvent(final EbMSEvent event)
 		{
-			DeliveryChannel receiveDeliveryChannel = cpaManager.getDeliveryChannel(
+			val receiveDeliveryChannel = cpaManager.getDeliveryChannel(
 					event.getCpaId(),
 					event.getReceiveDeliveryChannelId())
 						.orElseThrow(() -> StreamUtils.illegalStateException("ReceiveDeliveryChannel",event.getCpaId(),event.getReceiveDeliveryChannelId()));
-			final String url = urlMapper.getURL(CPAUtils.getUri(receiveDeliveryChannel));
+			val url = urlMapper.getURL(CPAUtils.getUri(receiveDeliveryChannel));
 			try
 			{
-				Optional<EbMSDocument> requestDocument = ebMSDAO.getEbMSDocumentIfUnsent(event.getMessageId());
+				val requestDocument = ebMSDAO.getEbMSDocumentIfUnsent(event.getMessageId());
 				StreamUtils.ifPresentOrElse(requestDocument,
 						d -> sendMessage(event,receiveDeliveryChannel,url,d),
 						() -> eventManager.deleteEvent(event.getMessageId()));
 			}
 			catch (final EbMSResponseException e)
 			{
-				logger.error("",e);
+				log.error("",e);
 				ebMSDAO.executeTransaction(
 					new DAOTransactionCallback()
 					{
@@ -110,7 +111,7 @@ public class EbMSEventProcessor implements Runnable, InitializingBean
 			}
 			catch (final Exception e)
 			{
-				logger.error("",e);
+				log.error("",e);
 				ebMSDAO.executeTransaction(
 					new DAOTransactionCallback()
 					{
@@ -137,8 +138,8 @@ public class EbMSEventProcessor implements Runnable, InitializingBean
 			{
 				if (event.isConfidential())
 					messageEncrypter.encrypt(receiveDeliveryChannel,requestDocument);
-				logger.info("Sending message " + event.getMessageId() + " to " + url);
-				EbMSDocument responseDocument = createClient(event).sendMessage(url,requestDocument);
+				log.info("Sending message " + event.getMessageId() + " to " + url);
+				val responseDocument = createClient(event).sendMessage(url,requestDocument);
 				messageProcessor.processResponse(requestDocument,responseDocument);
 				ebMSDAO.executeTransaction(
 					new DAOTransactionCallback()
@@ -165,7 +166,7 @@ public class EbMSEventProcessor implements Runnable, InitializingBean
 
 		private EbMSClient createClient(EbMSEvent event) throws CertificateException
 		{
-			DeliveryChannel sendDeliveryChannel = 
+			val sendDeliveryChannel = 
 					cpaManager.getDeliveryChannel(event.getCpaId(),event.getSendDeliveryChannelId())
 					.orElse(null);
 			return ebMSClientFactory.getEbMSClient(sendDeliveryChannel);
@@ -175,7 +176,7 @@ public class EbMSEventProcessor implements Runnable, InitializingBean
 		{
 			try
 			{
-				logger.warn("Expiring message " +  event.getMessageId());
+				log.warn("Expiring message " +  event.getMessageId());
 				ebMSDAO.executeTransaction(
 					new DAOTransactionCallback()
 					{
@@ -200,84 +201,117 @@ public class EbMSEventProcessor implements Runnable, InitializingBean
 			}
 			catch (Exception e)
 			{
-				logger.error("",e);
+				log.error("",e);
 			}
 		}
 
 	}
 
-	protected transient Log logger = LogFactory.getLog(getClass());
-	private ExecutorService executorService;
-	private boolean enabled;
-	private int delay;
-	private int period;
-	private Integer maxThreads;
-	private Integer processorsScaleFactor;
-	private Integer queueScaleFactor;
-	private int maxEvents;
-	private EventListener eventListener;
-	private EbMSDAO ebMSDAO;
-	private CPAManager cpaManager;
-	private URLMapper urlMapper;
-	private EventManager eventManager;
-	private EbMSHttpClientFactory ebMSClientFactory;
-	private EbMSMessageEncrypter messageEncrypter;
-	private EbMSMessageProcessor messageProcessor;
-	private boolean deleteEbMSAttachmentsOnMessageProcessed;
+	int delay;
+	int period;
+	int maxEvents;
+	@NonNull
+	EventListener eventListener;
+	@NonNull
+	EbMSDAO ebMSDAO;
+	@NonNull
+	CPAManager cpaManager;
+	@NonNull
+	URLMapper urlMapper;
+	@NonNull
+	EventManager eventManager;
+	@NonNull
+	EbMSHttpClientFactory ebMSClientFactory;
+	@NonNull
+	EbMSMessageEncrypter messageEncrypter;
+	@NonNull
+	EbMSMessageProcessor messageProcessor;
+	boolean deleteEbMSAttachmentsOnMessageProcessed;
+	ExecutorService executorService;
 
-	@Override
-	public void afterPropertiesSet() throws Exception
+	@Builder
+	public EbMSEventProcessor(
+			boolean enabled,
+			int delay,
+			int period,
+			Integer maxThreads,
+			Integer processorsScaleFactor,
+			Integer queueScaleFactor,
+			int maxEvents,
+			@NonNull EventListener eventListener,
+			@NonNull EbMSDAO ebMSDAO,
+			@NonNull CPAManager cpaManager,
+			@NonNull URLMapper urlMapper,
+			@NonNull EventManager eventManager,
+			@NonNull EbMSHttpClientFactory ebMSClientFactory,
+			@NonNull EbMSMessageEncrypter messageEncrypter,
+			@NonNull EbMSMessageProcessor messageProcessor,
+			boolean deleteEbMSAttachmentsOnMessageProcessed)
 	{
+		this.delay = delay;
+		this.period = period;
+		this.maxEvents = maxEvents;
+		this.eventListener = eventListener;
+		this.ebMSDAO = ebMSDAO;
+		this.cpaManager = cpaManager;
+		this.urlMapper = urlMapper;
+		this.eventManager = eventManager;
+		this.ebMSClientFactory = ebMSClientFactory;
+		this.messageEncrypter = messageEncrypter;
+		this.messageProcessor = messageProcessor;
+		this.deleteEbMSAttachmentsOnMessageProcessed = deleteEbMSAttachmentsOnMessageProcessed;
 		if (enabled)
 		{
 			if (processorsScaleFactor == null || processorsScaleFactor <= 0)
 			{
 				processorsScaleFactor = 1;
-				logger.info(this.getClass().getName() + " using processors scale factor " + processorsScaleFactor);
+				log.info(this.getClass().getName() + " using processors scale factor " + processorsScaleFactor);
 			}
 			if (maxThreads == null || maxThreads <= 0)
 			{
 				maxThreads = Runtime.getRuntime().availableProcessors() * processorsScaleFactor;
-				logger.info(this.getClass().getName() + " using " + maxThreads + " threads");
+				log.info(this.getClass().getName() + " using " + maxThreads + " threads");
 			}
 			if (queueScaleFactor == null || queueScaleFactor <= 0)
 			{
 				queueScaleFactor = 1;
-				logger.info(this.getClass().getName() + " using queue scale factor " + queueScaleFactor);
+				log.info(this.getClass().getName() + " using queue scale factor " + queueScaleFactor);
 			}
-			executorService = new ThreadPoolExecutor(
+			this.executorService = new ThreadPoolExecutor(
 					maxThreads,
 					maxThreads,
 					1,
 					TimeUnit.MINUTES,
 					new ArrayBlockingQueue<>(maxThreads * queueScaleFactor,true),
 					new ThreadPoolExecutor.CallerRunsPolicy());
-			Thread thread = new Thread(this);
+			val thread = new Thread(this);
 			thread.setDaemon(true);
 			thread.start();
 		}
+		else
+			this.executorService = null;
 	}
-	
+
   public void run()
   {
 		sleep(delay);
   	while (true)
   	{
-  		long start = new Date().getTime();
-			List<Future<?>> futures = new ArrayList<Future<?>>();
+  		val start = new Date().getTime();
+			val futures = new ArrayList<Future<?>>();
 			try
 			{
-				GregorianCalendar timestamp = new GregorianCalendar();
-				List<EbMSEvent> events = maxEvents > 0 ? ebMSDAO.getEventsBefore(timestamp.getTime(),maxEvents) : ebMSDAO.getEventsBefore(timestamp.getTime());
+				val timestamp = new GregorianCalendar();
+				val events = maxEvents > 0 ? ebMSDAO.getEventsBefore(timestamp.getTime(),maxEvents) : ebMSDAO.getEventsBefore(timestamp.getTime());
 				events.forEach(e -> futures.add(executorService.submit(new HandleEventTask(e))));
 			}
 			catch (Exception e)
 			{
-				logger.error("",e);
+				log.error("",e);
 			}
-			futures.forEach(f -> Try.of(() -> f.get()).onFailure(e -> logger.error("",e)));
-			long end = new Date().getTime();
-			long sleep = period - (end - start);
+			futures.forEach(f -> Try.of(() -> f.get()).onFailure(e -> log.error("",e)));
+			val end = new Date().getTime();
+			val sleep = period - (end - start);
 			sleep(sleep);
   	}
   }
@@ -291,87 +325,7 @@ public class EbMSEventProcessor implements Runnable, InitializingBean
 		}
 		catch (InterruptedException e)
 		{
-			logger.trace(e);
+			log.trace(e);
 		}
-	}
-
-	public void setEnabled(boolean enabled)
-	{
-		this.enabled = enabled;
-	}
-
-	public void setDelay(int delay)
-	{
-		this.delay = delay;
-	}
-
-	public void setPeriod(int period)
-	{
-		this.period = period;
-	}
-
-	public void setMaxThreads(Integer maxThreads)
-	{
-		this.maxThreads = maxThreads;
-	}
-
-	public void setProcessorsScaleFactor(Integer processorsScaleFactor)
-	{
-		this.processorsScaleFactor = processorsScaleFactor;
-	}
-
-	public void setQueueScaleFactor(Integer queueScaleFactor)
-	{
-		this.queueScaleFactor = queueScaleFactor;
-	}
-
-	public void setMaxEvents(int maxEvents)
-	{
-		this.maxEvents = maxEvents;
-	}
-
-	public void setEventListener(EventListener eventListener)
-	{
-		this.eventListener = eventListener;
-	}
-
-  public void setEbMSDAO(EbMSDAO ebMSDAO)
-	{
-		this.ebMSDAO = ebMSDAO;
-	}
-
-  public void setCpaManager(CPAManager cpaManager)
-	{
-		this.cpaManager = cpaManager;
-	}
-
-  public void setUrlMapper(URLMapper urlManager)
-	{
-		this.urlMapper = urlManager;
-	}
-
-  public void setEventManager(EventManager eventManager)
-	{
-		this.eventManager = eventManager;
-	}
-
-  public void setEbMSClientFactory(EbMSHttpClientFactory ebMSClientFactory)
-	{
-		this.ebMSClientFactory = ebMSClientFactory;
-	}
-
-  public void setMessageEncrypter(EbMSMessageEncrypter messageEncrypter)
-	{
-		this.messageEncrypter = messageEncrypter;
-	}
-
-  public void setMessageProcessor(EbMSMessageProcessor messageProcessor)
-	{
-		this.messageProcessor = messageProcessor;
-	}
-
-  public void setDeleteEbMSAttachmentsOnMessageProcessed(boolean deleteEbMSAttachmentsOnMessageProcessed)
-	{
-		this.deleteEbMSAttachmentsOnMessageProcessed = deleteEbMSAttachmentsOnMessageProcessed;
 	}
 }

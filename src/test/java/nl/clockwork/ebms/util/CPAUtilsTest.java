@@ -15,10 +15,11 @@
  */
 package nl.clockwork.ebms.util;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import org.junit.jupiter.api.Test;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DeliveryChannel;
@@ -27,6 +28,7 @@ import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.PartyId;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.Transport;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.TransportReceiver;
 
+import lombok.val;
 import nl.clockwork.ebms.cpa.CPAUtils;
 
 public class CPAUtilsTest {
@@ -40,8 +42,8 @@ public class CPAUtilsTest {
 	@Test
 	public void testEquals()
 	{
-		List<PartyId> cpaPartyIds = new ArrayList<>();
-		List<org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.PartyId> headerPartyIds = new ArrayList<>();
+		val cpaPartyIds = new ArrayList<PartyId>();
+		val headerPartyIds = new ArrayList<org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.PartyId>();
 		
 		cpaPartyIds.add(new PartyId());
 		cpaPartyIds.get(0).setType("TYPE1");
@@ -76,10 +78,10 @@ public class CPAUtilsTest {
 	{
 		assertEquals("", CPAUtils.getHostname(null));
 
-		DeliveryChannel dc = new DeliveryChannel();
+		val dc = new DeliveryChannel();
 		assertEquals("", CPAUtils.getHostname(dc));
 
-		Endpoint ep = new Endpoint();
+		val ep = new Endpoint();
 		dc.setTransportId(new Transport());
 		((Transport) dc.getTransportId()).setTransportId("test");
 		assertEquals("", CPAUtils.getHostname(dc));

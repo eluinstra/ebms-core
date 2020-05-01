@@ -21,9 +21,17 @@ import org.springframework.beans.factory.FactoryBean;
 
 import com.mchange.v2.c3p0.ComboPooledDataSource;
 
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.NonNull;
+import lombok.experimental.FieldDefaults;
+
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@AllArgsConstructor
 public abstract class AbstractDAOFactory<T> implements FactoryBean<T>
 {
-	protected DataSource dataSource;
+	@NonNull
+	DataSource dataSource;
 
 	@Override
 	public T getObject() throws Exception
@@ -66,13 +74,13 @@ public abstract class AbstractDAOFactory<T> implements FactoryBean<T>
 
 	public abstract T createDB2DAO();
 
-	public void setDataSource(DataSource dataSource)
-	{
-		this.dataSource = dataSource;
-	}
-	
 	public abstract static class DefaultDAOFactory<U> extends AbstractDAOFactory<U>
 	{
+		public DefaultDAOFactory(@NonNull DataSource dataSource)
+		{
+			super(dataSource);
+		}
+
 		@Override
 		public U createHSqlDbDAO()
 		{

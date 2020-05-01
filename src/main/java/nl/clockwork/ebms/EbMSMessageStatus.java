@@ -7,6 +7,17 @@ import java.util.stream.Stream;
 
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageStatusType;
 
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
+import lombok.experimental.NonFinal;
+
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@AllArgsConstructor
+@RequiredArgsConstructor
+@Getter
 public enum EbMSMessageStatus
 {
 	UNAUTHORIZED(0,MessageStatusType.UN_AUTHORIZED),
@@ -25,30 +36,9 @@ public enum EbMSMessageStatus
 			Collections.unmodifiableCollection(Arrays.asList(UNAUTHORIZED,NOT_RECOGNIZED,RECEIVED,PROCESSED,FORWARDED,FAILED));
 	private static final Collection<EbMSMessageStatus> SENDSTATUS =
 			Collections.unmodifiableCollection(Arrays.asList(SENDING,DELIVERY_FAILED,DELIVERED,EXPIRED));
-	private final int id;
-	private final MessageStatusType statusCode;
-
-	EbMSMessageStatus(int id)
-	{
-		this.id = id;
-		this.statusCode = null;
-	}
-	
-	EbMSMessageStatus(int id, MessageStatusType statusCode)
-	{
-		this.id = id;
-		this.statusCode = statusCode;
-	}
-
-	public final int id()
-	{
-		return id;
-	}
-
-	public final MessageStatusType statusCode()
-	{
-		return statusCode;
-	}
+	int id;
+	@NonFinal
+	MessageStatusType statusCode = null;
 
 	public static Stream<EbMSMessageStatus> stream()
 	{
@@ -57,7 +47,7 @@ public enum EbMSMessageStatus
 
 	public static final EbMSMessageStatus get(int id)
 	{
-		return EbMSMessageStatus.stream().filter(s -> s.id() == id).findFirst().orElse(null);
+		return EbMSMessageStatus.stream().filter(s -> s.getId() == id).findFirst().orElse(null);
 		//orElseThrow(() -> new IllegalStateException("Unsupported EbMSMessageStatus Id: " + id));
 	}
 

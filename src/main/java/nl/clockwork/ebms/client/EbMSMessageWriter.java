@@ -19,8 +19,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
-import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 import javax.xml.transform.TransformerException;
@@ -29,22 +27,25 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.util.StringUtils;
 
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.NonNull;
+import lombok.val;
+import lombok.experimental.FieldDefaults;
 import nl.clockwork.ebms.Constants;
 import nl.clockwork.ebms.common.util.DOMUtils;
 import nl.clockwork.ebms.common.util.HTTPUtils;
 import nl.clockwork.ebms.model.EbMSAttachment;
 import nl.clockwork.ebms.model.EbMSDocument;
 
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@AllArgsConstructor
 public class EbMSMessageWriter
 {
-	protected transient Log messageLogger = LogFactory.getLog(Constants.MESSAGE_LOG);
-	protected HttpURLConnection connection;
+	transient Log messageLogger = LogFactory.getLog(Constants.MESSAGE_LOG);
+	@NonNull
+	HttpURLConnection connection;
 	
-	public EbMSMessageWriter(HttpURLConnection connection)
-	{
-		this.connection = connection;
-	}
-
 	public void write(EbMSDocument document) throws IOException, TransformerException
 	{
 		if (document.getAttachments().size() > 0)
@@ -67,16 +68,16 @@ public class EbMSMessageWriter
 	{
 		if (messageLogger.isInfoEnabled() && !messageLogger.isDebugEnabled())
 			messageLogger.info(">>>>\n" + DOMUtils.toString(document.getMessage()));
-		String boundary = createBoundary();
+		val boundary = createBoundary();
 		String contentType = createContentType(boundary,document.getContentId());
 
 		connection.setRequestProperty("Content-Type",contentType);
 		connection.setRequestProperty("SOAPAction",Constants.EBMS_SOAP_ACTION);
 
-		Map<String,List<String>> requestProperties = connection.getRequestProperties();
-		OutputStream outputStream = messageLogger.isDebugEnabled() ? new LoggingOutputStream(requestProperties,connection.getOutputStream()) : connection.getOutputStream();
+		val requestProperties = connection.getRequestProperties();
+		val outputStream = messageLogger.isDebugEnabled() ? new LoggingOutputStream(requestProperties,connection.getOutputStream()) : connection.getOutputStream();
 
-		try (OutputStreamWriter writer = new OutputStreamWriter(outputStream,"UTF-8"))
+		try (val writer = new OutputStreamWriter(outputStream,"UTF-8"))
 		{
 			writer.write("--");
 			writer.write(boundary);
@@ -92,7 +93,7 @@ public class EbMSMessageWriter
 			writer.write("--");
 			writer.write(boundary);
 
-			for (EbMSAttachment attachment: document.getAttachments())
+			for (val attachment: document.getAttachments())
 			{
 				if (attachment.getContentType().matches("^(text/.*|.*/xml)$"))
 					writeTextAttachment(boundary,outputStream,writer,attachment);
@@ -106,7 +107,7 @@ public class EbMSMessageWriter
 
 	protected void writeTextAttachment(String boundary, OutputStream outputStream, OutputStreamWriter writer, EbMSAttachment attachment) throws IOException
 	{
-		try (EbMSAttachment a = attachment)
+		try (val a = attachment)
 		{
 			writer.write("\r\n");
 			writer.write("Content-Type: " + a.getContentType());
@@ -129,7 +130,7 @@ public class EbMSMessageWriter
 
 	protected void writeBinaryAttachment(String boundary, OutputStream outputStream, OutputStreamWriter writer, EbMSAttachment attachment) throws IOException
 	{
-		try (EbMSAttachment a = attachment)
+		try (val a = attachment)
 		{
 			writer.write("\r\n");
 			writer.write("Content-Type: " + a.getContentType());

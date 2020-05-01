@@ -25,8 +25,6 @@ import org.apache.activemq.command.ActiveMQTopic;
 import org.apache.activemq.pool.PooledConnectionFactory;
 import org.apache.activemq.spring.ActiveMQConnectionFactory;
 import org.apache.activemq.xbean.BrokerFactoryBean;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.core.io.ClassPathResource;
@@ -36,9 +34,9 @@ import org.springframework.jms.core.JmsTemplate;
 
 import lombok.AccessLevel;
 import lombok.NonNull;
+import lombok.val;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.NonFinal;
-import nl.clockwork.ebms.EbMSMessageEventType;
 import nl.clockwork.ebms.dao.EbMSDAO;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -49,10 +47,10 @@ public class EventListenerFactory implements FactoryBean<EventListener>, Disposa
 		DEFAULT, DAO, SIMPLE_JMS, JMS, JMS_TEXT;
 	}
 	
-	protected transient Log logger = LogFactory.getLog(getClass());
+	@NonNull
+	EventListener listener;
 	@NonFinal
 	BrokerFactoryBean brokerFactoryBean;
-	EventListener listener;
 
 	public EventListenerFactory(@NonNull EventListenerType type, @NonNull EbMSDAO ebMSDAO, @NonNull String jmsBrokerConfig, boolean jmsBrokerStart, @NonNull String jmsBrokerURL, boolean jmsVirtualTopics) throws Exception
 	{
@@ -105,29 +103,29 @@ public class EventListenerFactory implements FactoryBean<EventListener>, Disposa
 
 	private JmsTemplate createJmsTemplate(String jmsBrokerURL)
 	{
-		PooledConnectionFactory pooledConnectionFactory = createConnectionFactory(jmsBrokerURL);
-		JmsTemplate jmsTemplate = new JmsTemplate();
+		val pooledConnectionFactory = createConnectionFactory(jmsBrokerURL);
+		val jmsTemplate = new JmsTemplate();
 		jmsTemplate.setConnectionFactory(pooledConnectionFactory);
 		return jmsTemplate;
 	}
 
 	private PooledConnectionFactory createConnectionFactory(String jmsBrokerURL)
 	{
-		PooledConnectionFactory result = new PooledConnectionFactory();
+		val result = new PooledConnectionFactory();
 		result.setConnectionFactory(createActiveMQConnectionFactory(jmsBrokerURL));
 		return result;
 	}
 
 	private ActiveMQConnectionFactory createActiveMQConnectionFactory(String jmsBrokerURL)
 	{
-		ActiveMQConnectionFactory result = new ActiveMQConnectionFactory();
+		val result = new ActiveMQConnectionFactory();
 		result.setBrokerURL(jmsBrokerURL);
 		return result;
 	}
 
 	private HashMap<String,Destination> createDestinations(boolean jmsVirtualTopics)
 	{
-		HashMap<String,Destination> result = new HashMap<>();
+		val result = new HashMap<String,Destination>();
 		EbMSMessageEventType.stream().forEach(e -> result.put(e.name(),jmsVirtualTopics ? new ActiveMQTopic("VirtualTopic." + e.name()) : new ActiveMQQueue(e.name())));
 		return result;
 	}

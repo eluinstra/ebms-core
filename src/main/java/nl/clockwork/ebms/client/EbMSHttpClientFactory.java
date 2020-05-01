@@ -18,20 +18,25 @@ package nl.clockwork.ebms.client;
 import java.security.KeyStoreException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.lang3.StringUtils;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DeliveryChannel;
 
-import nl.clockwork.ebms.common.util.Utils;
+import lombok.AccessLevel;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
+import lombok.val;
+import lombok.experimental.FieldDefaults;
+import lombok.experimental.NonFinal;
 import nl.clockwork.ebms.cpa.CPAUtils;
 import nl.clockwork.ebms.cpa.CertificateMapper;
 import nl.clockwork.ebms.security.EbMSKeyStore;
 import nl.clockwork.ebms.security.EbMSTrustStore;
 
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@RequiredArgsConstructor
 public class EbMSHttpClientFactory
 {
 	public enum EbMSHttpClientType
@@ -39,31 +44,32 @@ public class EbMSHttpClientFactory
 		DEFAULT, APACHE;
 	}
 
-	private EbMSHttpClientType type;
-	private int connectTimeout;
-	private boolean chunkedStreamingMode;
-	private boolean base64Writer;
-	private EbMSProxy proxy;
-	private String[] enabledProtocols = new String[]{};
-	private String[] enabledCipherSuites = new String[]{};
-	private boolean verifyHostnames;
-	private EbMSKeyStore keyStore;
-	private EbMSTrustStore trustStore;
-	private List<Integer> recoverableHttpErrors = new ArrayList<>();
-	private List<Integer> unrecoverableHttpErrors = new ArrayList<>();
-	private CertificateMapper certificateMapper;
-	private boolean useClientCertificate;
-	private Map<String,EbMSClient> clients = new ConcurrentHashMap<String,EbMSClient>();
+	@NonNull
+	EbMSHttpClientType type;
+	int connectTimeout;
+	boolean chunkedStreamingMode;
+	boolean base64Writer;
+	EbMSProxy proxy;
+	String[] enabledProtocols;
+	String[] enabledCipherSuites;
+	boolean verifyHostnames;
+	EbMSKeyStore keyStore;
+	EbMSTrustStore trustStore;
+	HttpErrors httpErrors;
+	CertificateMapper certificateMapper;
+	boolean useClientCertificate;
+	@NonFinal
+	Map<String,EbMSClient> clients = new ConcurrentHashMap<String,EbMSClient>();
 
 	public EbMSClient createEbMSClient(String clientAlias)
 	{
 		try
 		{
-			SSLFactoryManager sslFactoryManager = createSslFactoryManager(getClientAlias(clientAlias));
+			val sslFactoryManager = createSslFactoryManager(getClientAlias(clientAlias));
 			if (EbMSHttpClientType.APACHE.equals(type))
 				return new nl.clockwork.ebms.client.apache.EbMSHttpClient(sslFactoryManager,enabledProtocols,enabledCipherSuites,verifyHostnames,connectTimeout,chunkedStreamingMode,proxy);
 			else
-				return new EbMSHttpClient(sslFactoryManager,connectTimeout,chunkedStreamingMode,base64Writer,proxy,recoverableHttpErrors,unrecoverableHttpErrors);
+				return new EbMSHttpClient(sslFactoryManager,connectTimeout,chunkedStreamingMode,base64Writer,proxy,httpErrors.getRecoverableHttpErrors(),httpErrors.getUnrecoverableHttpErrors());
 		}
 		catch (Exception e)
 		{
@@ -73,7 +79,7 @@ public class EbMSHttpClientFactory
 
 	public EbMSClient getEbMSClient(String clientAlias)
 	{
-		String key = clientAlias == null ? "" : clientAlias;
+		val key = clientAlias == null ? "" : clientAlias;
 		if (!clients.containsKey(key))
 			clients.put(key,createEbMSClient(clientAlias));
 		return clients.get(key);
@@ -83,8 +89,8 @@ public class EbMSHttpClientFactory
 	{
 		try
 		{
-			X509Certificate clientCertificate = getClientCertificate(sendDeliveryChannel);
-			String clientAlias = clientCertificate != null ? keyStore.getCertificateAlias(clientCertificate) : null;
+			val clientCertificate = getClientCertificate(sendDeliveryChannel);
+			val clientAlias = clientCertificate != null ? keyStore.getCertificateAlias(clientCertificate) : null;
 			return getEbMSClient(clientAlias);
 		}
 		catch (CertificateException | KeyStoreException e)
@@ -105,94 +111,13 @@ public class EbMSHttpClientFactory
 
 	private SSLFactoryManager createSslFactoryManager(String clientAlias) throws Exception
 	{
-		SSLFactoryManager result = new SSLFactoryManager();
-		result.setKeyStore(keyStore);
-		result.setTrustStore(trustStore);
-		result.setVerifyHostnames(verifyHostnames);
-		result.setEnabledProtocols(enabledProtocols);
-		result.setEnabledCipherSuites(enabledCipherSuites);
-		result.setClientAlias(clientAlias);
-		result.afterPropertiesSet();
-		return result;
-	}
-
-	public void setType(String type)
-	{
-		try
-		{
-			this.type = EbMSHttpClientType.valueOf(type);
-		}
-		catch (IllegalArgumentException e)
-		{
-			this.type = EbMSHttpClientType.DEFAULT;
-		}
-	}
-	public void setConnectTimeout(int connectTimeout)
-	{
-		this.connectTimeout = connectTimeout;
-	}
-	public void setChunkedStreamingMode(boolean chunkedStreamingMode)
-	{
-		this.chunkedStreamingMode = chunkedStreamingMode;
-	}
-	public void setBase64Writer(boolean base64Writer)
-	{
-		this.base64Writer = base64Writer;
-	}
-	public void setProxy(EbMSProxy proxy)
-	{
-		this.proxy = proxy;
-	}
-	public void setEnabledProtocols(String[] enabledProtocols)
-	{
-		this.enabledProtocols = enabledProtocols;
-	}
-	public void setEnabledProtocols(String enabledProtocols)
-	{
-		this.enabledProtocols = StringUtils.split(enabledProtocols,",");
-	}
-	public void setEnabledCipherSuites(String[] enabledCipherSuites)
-	{
-		this.enabledCipherSuites = enabledCipherSuites;
-	}
-	public void setEnabledCipherSuites(String enabledCipherSuites)
-	{
-		this.enabledCipherSuites = StringUtils.split(enabledCipherSuites,",");
-	}
-	public void setVerifyHostnames(boolean verifyHostnames)
-	{
-		this.verifyHostnames = verifyHostnames;
-	}
-	public void setKeyStore(EbMSKeyStore keyStore)
-	{
-		this.keyStore = keyStore;
-	}
-	public void setTrustStore(EbMSTrustStore trustStore)
-	{
-		this.trustStore = trustStore;
-	}
-	public void setRecoverableInformationalHttpErrors(String recoverableInformationalHttpErrors)
-	{
-		this.recoverableHttpErrors.addAll(Utils.getIntegerList(recoverableInformationalHttpErrors));
-	}
-	public void setRecoverableRedirectionHttpErrors(String recoverableRedirectionHttpErrors)
-	{
-		this.recoverableHttpErrors.addAll(Utils.getIntegerList(recoverableRedirectionHttpErrors));
-	}
-	public void setRecoverableClientHttpErrors(String recoverableClientHttpErrors)
-	{
-		this.recoverableHttpErrors.addAll(Utils.getIntegerList(recoverableClientHttpErrors));
-	}
-	public void setUnrecoverableServerHttpErrors(String unrecoverableServerHttpErrors)
-	{
-		this.unrecoverableHttpErrors = Utils.getIntegerList(unrecoverableServerHttpErrors);
-	}
-	public void setCertificateMapper(CertificateMapper certificateMapper)
-	{
-		this.certificateMapper = certificateMapper;
-	}
-	public void setUseClientCertificate(boolean useClientCertificate)
-	{
-		this.useClientCertificate = useClientCertificate;
+		val builder = SSLFactoryManager.builder();
+		builder.keyStore(keyStore);
+		builder.trustStore(trustStore);
+		builder.verifyHostnames(verifyHostnames);
+		builder.enabledProtocols(enabledProtocols);
+		builder.enabledCipherSuites(enabledCipherSuites);
+		builder.clientAlias(clientAlias);
+		return builder.build();
 	}
 }

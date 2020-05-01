@@ -21,24 +21,32 @@ import java.util.stream.Stream;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.NonNull;
+import lombok.val;
+import lombok.var;
+import lombok.experimental.FieldDefaults;
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.Element;
 
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@AllArgsConstructor
 public class MethodCacheInterceptor implements MethodInterceptor
 {
-	private Cache cache;
+	@NonNull
+	Cache cache;
 
 	public Object invoke(MethodInvocation invocation) throws Throwable
 	{
-		String targetName = invocation.getThis().getClass().getSimpleName();
-		String methodName = invocation.getMethod().getName();
-		Object[] arguments = invocation.getArguments();
-
-		String cacheKey = getCacheKey(targetName,methodName,arguments);
-		Element element = cache.get(cacheKey);
+		val targetName = invocation.getThis().getClass().getSimpleName();
+		val methodName = invocation.getMethod().getName();
+		val arguments = invocation.getArguments();
+		val cacheKey = getCacheKey(targetName,methodName,arguments);
+		var element = cache.get(cacheKey);
 		if (element == null)
 		{
-			Object result = invocation.proceed();
+			val result = invocation.proceed();
 			element = new Element(cacheKey,result);
 			cache.put(element);
 		}
@@ -47,15 +55,9 @@ public class MethodCacheInterceptor implements MethodInterceptor
 
 	public static String getCacheKey(String targetName, String methodName, Object...arguments)
 	{
-		StringBuffer sb = new StringBuffer();
+		val sb = new StringBuffer();
 		sb.append(targetName).append(".").append(methodName);
 		sb.append(Stream.of(arguments).map(a -> String.valueOf(a)).collect(Collectors.joining(",","(",")")));
 		return sb.toString();
 	}
-
-	public void setCache(Cache cache)
-	{
-		this.cache = cache;
-	}
-
 }

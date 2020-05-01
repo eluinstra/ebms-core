@@ -17,19 +17,23 @@ package nl.clockwork.ebms.validation;
 
 import javax.xml.bind.JAXBException;
 
-import nl.clockwork.ebms.common.JAXBParser;
-
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.Error;
 
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.experimental.FieldDefaults;
+import nl.clockwork.ebms.common.JAXBParser;
+
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@AllArgsConstructor
+@Getter
 public class EbMSValidationException extends ValidationException
 {
 	private static final long serialVersionUID = 1L;
-	private Error error;
-
-	public EbMSValidationException(Error error)
-	{
-		this.error = error;
-	}
+	@NonNull
+	Error error;
 
 	@Override
 	public String getMessage()
@@ -43,10 +47,4 @@ public class EbMSValidationException extends ValidationException
 			return error.getErrorCode();
 		}
 	}
-
-	public Error getError()
-	{
-		return error;
-	}
-	
 }

@@ -59,136 +59,136 @@
 	</bean>
 
 	<bean id="cpaService" class="nl.clockwork.ebms.service.CPAServiceImpl">
-		<property name="cpaManager" ref="cpaManager"/>
-		<property name="urlMapper" ref="urlMapper"/>
-		<property name="certificateMapper" ref="certificateMapper"/>
+		<constructor-arg name="cpaManager" ref="cpaManager"/>
+		<constructor-arg name="urlMapper" ref="urlMapper"/>
+		<constructor-arg name="certificateMapper" ref="certificateMapper"/>
+		<constructor-arg name="cpaValidator" ref="cpaValidator"/>
 	</bean>
 
 	<bean id="ebMSMessageService" class="nl.clockwork.ebms.service.EbMSMessageServiceImpl">
-		<property name="deliveryManager" ref="deliveryManager"></property>
-		<property name="ebMSDAO" ref="ebMSDAO"/>
-		<property name="cpaManager" ref="cpaManager"/>
-		<property name="ebMSMessageFactory" ref="ebMSMessageFactory"/>
-		<property name="eventManager" ref="eventManager"/>
-		<property name="signatureGenerator" ref="signatureGenerator"/>
-		<property name="deleteEbMSAttachmentsOnMessageProcessed" value="${ebmsMessage.deleteContentOnProcessed}"/>
+		<constructor-arg name="deliveryManager" ref="deliveryManager"/>
+		<constructor-arg name="ebMSDAO" ref="ebMSDAO"/>
+		<constructor-arg name="cpaManager" ref="cpaManager"/>
+		<constructor-arg name="ebMSMessageFactory" ref="ebMSMessageFactory"/>
+		<constructor-arg name="eventManager" ref="eventManager"/>
+		<constructor-arg name="ebMSMessageContextValidator" ref="ebMSMessageContextValidator"/>
+		<constructor-arg name="signatureGenerator" ref="signatureGenerator"/>
+		<constructor-arg name="deleteEbMSAttachmentsOnMessageProcessed" value="${ebmsMessage.deleteContentOnProcessed}"/>
 	</bean>
 
 	<bean id="ebMSMessageServiceMTOM" class="nl.clockwork.ebms.service.EbMSMessageServiceMTOMImpl">
-		<property name="deliveryManager" ref="deliveryManager"></property>
-		<property name="ebMSDAO" ref="ebMSDAO"/>
-		<property name="cpaManager" ref="cpaManager"/>
-		<property name="ebMSMessageFactory" ref="ebMSMessageFactory"/>
-		<property name="eventManager" ref="eventManager"/>
-		<property name="signatureGenerator" ref="signatureGenerator"/>
-		<property name="deleteEbMSAttachmentsOnMessageProcessed" value="${ebmsMessage.deleteContentOnProcessed}"/>
+		<constructor-arg name="deliveryManager" ref="deliveryManager"/>
+		<constructor-arg name="ebMSDAO" ref="ebMSDAO"/>
+		<constructor-arg name="cpaManager" ref="cpaManager"/>
+		<constructor-arg name="ebMSMessageFactory" ref="ebMSMessageFactory"/>
+		<constructor-arg name="eventManager" ref="eventManager"/>
+		<constructor-arg name="signatureGenerator" ref="signatureGenerator"/>
+		<constructor-arg name="deleteEbMSAttachmentsOnMessageProcessed" value="${ebmsMessage.deleteContentOnProcessed}"/>
 	</bean>
 
 	<bean id="deliveryManager" class="nl.clockwork.ebms.client.DeliveryManager">
-		<property name="maxThreads" value="${deliveryManager.maxTreads}"/>
-		<property name="processorsScaleFactor" value="${deliveryManager.processorsScaleFactor}"/>
-		<property name="queueScaleFactor" value="${deliveryManager.queueScaleFactor}"/>
-		<property name="messageQueue" ref="messageQueue"/>
-		<property name="cpaManager" ref="cpaManager"/>
-		<property name="ebMSClientFactory" ref="ebMSHttpClientFactory"/>
+		<constructor-arg name="maxThreads" value="${deliveryManager.maxTreads}"/>
+		<constructor-arg name="processorsScaleFactor" value="${deliveryManager.processorsScaleFactor}"/>
+		<constructor-arg name="queueScaleFactor" value="${deliveryManager.queueScaleFactor}"/>
+		<constructor-arg name="messageQueue" ref="messageQueue"/>
+		<constructor-arg name="cpaManager" ref="cpaManager"/>
+		<constructor-arg name="ebMSClientFactory" ref="ebMSHttpClientFactory"/>
 	</bean>
 
 	<bean id="messageQueue" class="nl.clockwork.ebms.client.EbMSMessageQueue">
-		<property name="maxEntries" value="${messageQueue.maxEntries}"/>
-		<property name="timeout" value="${messageQueue.timeout}"/>
+		<constructor-arg name="maxEntries" value="${messageQueue.maxEntries}"/>
+		<constructor-arg name="timeout" value="${messageQueue.timeout}"/>
 	</bean>
 
 	<bean id="httpHandler" class="nl.clockwork.ebms.server.EbMSHttpHandler">
-		<property name="messageProcessor" ref="messageProcessor"/>
+		<constructor-arg name="messageProcessor" ref="messageProcessor"/>
 	</bean>
 
 	<bean id="ebMSIdGenerator" class="nl.clockwork.ebms.EbMSIdGenerator"/>
 
 	<bean id="messageValidator" class="nl.clockwork.ebms.validation.EbMSMessageValidator">
-		<property name="ebMSDAO" ref="ebMSDAO"/>
-		<property name="cpaManager" ref="cpaManager"/>
-		<property name="clientCertificateValidator">
-			<bean class="nl.clockwork.ebms.validation.ClientCertificateValidator" factory-method="createInstance">
+		<constructor-arg name="ebMSDAO" ref="ebMSDAO"/>
+		<constructor-arg name="cpaManager" ref="cpaManager"/>
+		<constructor-arg name="clientCertificateValidator">
+			<bean class="nl.clockwork.ebms.validation.ClientCertificateValidator" factory-method="of">
+				<constructor-arg name="cpaManager" ref="cpaManager"/>
 				<constructor-arg name="enabled" value="${https.clientCertificateAuthentication}"/>
+			</bean>
+		</constructor-arg>
+		<constructor-arg name="cpaValidator" ref="cpaValidator"/>
+		<constructor-arg name="messageHeaderValidator">
+			<bean class="nl.clockwork.ebms.validation.MessageHeaderValidator">
+				<constructor-arg name="ebMSDAO" ref="ebMSDAO"/>
 				<constructor-arg name="cpaManager" ref="cpaManager"/>
 			</bean>
-		</property>
-		<property name="cpaValidator">
-			<bean class="nl.clockwork.ebms.validation.CPAValidator">
-				<property name="cpaManager" ref="cpaManager"/>
-			</bean>
-		</property>
-		<property name="messageHeaderValidator">
-			<bean class="nl.clockwork.ebms.validation.MessageHeaderValidator">
-				<property name="ebMSDAO" ref="ebMSDAO"/>
-				<property name="cpaManager" ref="cpaManager"/>
-			</bean>
-		</property>
-		<property name="manifestValidator">
+		</constructor-arg>
+		<constructor-arg name="manifestValidator">
 			<bean class="nl.clockwork.ebms.validation.ManifestValidator"/>
-		</property>
-		<property name="signatureValidator">
+		</constructor-arg>
+		<constructor-arg name="signatureValidator">
 			<bean class="nl.clockwork.ebms.validation.SignatureValidator">
-				<property name="cpaManager" ref="cpaManager"/>
-				<property name="ebMSSignatureValidator">
+				<constructor-arg name="cpaManager" ref="cpaManager"/>
+				<constructor-arg name="ebMSSignatureValidator">
 					<bean class="nl.clockwork.ebms.signing.EbMSSignatureValidator">
-						<property name="cpaManager" ref="cpaManager"/>
-						<property name="trustStore" ref="trustStore"/>
+						<constructor-arg name="cpaManager" ref="cpaManager"/>
+						<constructor-arg name="trustStore" ref="trustStore"/>
 					</bean>
-				</property>
+				</constructor-arg>
 			</bean>
-		</property>
-		<property name="messageDecrypter">
+		</constructor-arg>
+		<constructor-arg name="messageDecrypter">
 			<bean class="nl.clockwork.ebms.encryption.EbMSMessageDecrypter">
-				<property name="cpaManager" ref="cpaManager"/>
-				<property name="keyStore" ref="encryptionKeyStore"/>
+				<constructor-arg name="cpaManager" ref="cpaManager"/>
+				<constructor-arg name="keyStore" ref="encryptionKeyStore"/>
 			</bean>
-		</property>
+		</constructor-arg>
 	</bean>
 
 	<bean id="duplicateMessageHandler" class="nl.clockwork.ebms.processor.DuplicateMessageHandler">
-		<property name="ebMSDAO" ref="ebMSDAO"/>
-		<property name="cpaManager" ref="cpaManager"/>
-		<property name="ebMSMessageFactory" ref="ebMSMessageFactory"/>
-		<property name="eventManager" ref="eventManager"/>
-		<property name="messageValidator" ref="messageValidator"/>
-		<property name="storeDuplicateMessage" value="${ebmsMessage.storeDuplicate}" />
-		<property name="storeDuplicateMessageAttachments" value="${ebmsMessage.storeDuplicateContent}" />
+		<constructor-arg name="ebMSDAO" ref="ebMSDAO"/>
+		<constructor-arg name="cpaManager" ref="cpaManager"/>
+		<constructor-arg name="eventManager" ref="eventManager"/>
+		<constructor-arg name="messageValidator" ref="messageValidator"/>
+		<constructor-arg name="storeDuplicateMessage" value="${ebmsMessage.storeDuplicate}" />
+		<constructor-arg name="storeDuplicateMessageAttachments" value="${ebmsMessage.storeDuplicateContent}" />
 	</bean>
 
 	<bean id="messageProcessor" class="nl.clockwork.ebms.processor.EbMSMessageProcessor">
-		<property name="deliveryManager" ref="deliveryManager"/>
-		<property name="eventListener" ref="eventListener"/>
-		<property name="ebMSDAO" ref="ebMSDAO"/>
-		<property name="cpaManager" ref="cpaManager"/>
-		<property name="ebMSMessageFactory" ref="ebMSMessageFactory"/>
-		<property name="eventManager" ref="eventManager"/>
-		<property name="signatureGenerator" ref="signatureGenerator"/>
-		<property name="xsdValidator">
-			<bean class="nl.clockwork.ebms.validation.XSDValidator">
-				<constructor-arg value="/nl/clockwork/ebms/xsd/msg-header-2_0.xsd"/>
-			</bean>
-		</property>
-		<property name="messageValidator" ref="messageValidator"/>
-		<property name="duplicateMessageHandler" ref="duplicateMessageHandler"/>
-		<property name="deleteEbMSAttachmentsOnMessageProcessed" value="${ebmsMessage.deleteContentOnProcessed}"/>
+		<constructor-arg name="deliveryManager" ref="deliveryManager"/>
+		<constructor-arg name="eventListener" ref="eventListener"/>
+		<constructor-arg name="ebMSDAO" ref="ebMSDAO"/>
+		<constructor-arg name="cpaManager" ref="cpaManager"/>
+		<constructor-arg name="ebMSMessageFactory" ref="ebMSMessageFactory"/>
+		<constructor-arg name="eventManager" ref="eventManager"/>
+		<constructor-arg name="signatureGenerator" ref="signatureGenerator"/>
+		<constructor-arg name="messageValidator" ref="messageValidator"/>
+		<constructor-arg name="duplicateMessageHandler" ref="duplicateMessageHandler"/>
+		<constructor-arg name="deleteEbMSAttachmentsOnMessageProcessed" value="${ebmsMessage.deleteContentOnProcessed}"/>
+	</bean>
+
+	<bean id="cpaValidator" class="nl.clockwork.ebms.validation.CPAValidator">
+		<constructor-arg name="cpaManager" ref="cpaManager"/>
+	</bean>
+
+	<bean id="ebMSMessageContextValidator" class="nl.clockwork.ebms.validation.EbMSMessageContextValidator">
+		<constructor-arg name="cpaManager" ref="cpaManager"/>
 	</bean>
 
 	<bean id="urlMapper" class="nl.clockwork.ebms.cpa.URLMapper">
-		<property name="daoMethodCache" ref="ebMSDAOMethodCache"/>
-		<property name="ebMSDAO" ref="ebMSDAO"/>
+		<constructor-arg name="daoMethodCache" ref="ebMSDAOMethodCache"/>
+		<constructor-arg name="ebMSDAO" ref="ebMSDAO"/>
 	</bean>
 
 	<bean id="certificateMapper" class="nl.clockwork.ebms.cpa.CertificateMapper">
-		<property name="daoMethodCache" ref="ebMSDAOMethodCache"/>
-		<property name="ebMSDAO" ref="ebMSDAO"/>
+		<constructor-arg name="daoMethodCache" ref="ebMSDAOMethodCache"/>
+		<constructor-arg name="ebMSDAO" ref="ebMSDAO"/>
 	</bean>
 
 	<bean id="_cpaManager" class="nl.clockwork.ebms.cpa.CPAManager">
-		<property name="daoMethodCache" ref="ebMSDAOMethodCache"/>
-		<property name="cpaMethodCache" ref="cpaMethodCache"/>
-		<property name="ebMSDAO" ref="ebMSDAO"/>
-		<property name="urlMapper" ref="urlMapper"/>
+		<constructor-arg name="daoMethodCache" ref="ebMSDAOMethodCache"/>
+		<constructor-arg name="cpaMethodCache" ref="cpaMethodCache"/>
+		<constructor-arg name="ebMSDAO" ref="ebMSDAO"/>
+		<constructor-arg name="urlMapper" ref="urlMapper"/>
 	</bean>
 
 	<bean id="cpaManager" class="org.springframework.aop.framework.ProxyFactoryBean">
@@ -201,8 +201,7 @@
 	</bean>
 
 	<bean id="cpaManagerMethodCachePointCut" class="org.springframework.aop.support.RegexpMethodPointcutAdvisor">
-		<property name="advice" ref="cpaMethodCacheInterceptor"/>
-		<property name="patterns">
+		<constructor-arg name="patterns">
 			<list>
 				<!--value>.*existsCPA</value>
 				<value>.*getCPA</value>
@@ -226,11 +225,12 @@
 				<!--value>.*getUri</value-->
 				<value>.*getSyncReply</value>
 			</list>
-		</property>
+		</constructor-arg>
+		<constructor-arg name="advice" ref="cpaMethodCacheInterceptor"/>
 	</bean>
 
 	<bean id="cpaMethodCacheInterceptor" class="nl.clockwork.ebms.common.MethodCacheInterceptor">
-		<property name="cache" ref="cpaMethodCache" />
+		<constructor-arg name="cache" ref="cpaMethodCache" />
 	</bean>
 
 	<bean id="cpaMethodCache" class="org.springframework.cache.ehcache.EhCacheFactoryBean">
@@ -246,74 +246,76 @@
 	</bean>
 
 	<bean id="ebMSMessageFactory" class="nl.clockwork.ebms.EbMSMessageFactory">
-		<property name="cpaManager" ref="cpaManager"/>
-		<property name="ebMSIdGenerator" ref="ebMSIdGenerator"/>
+		<constructor-arg name="cpaManager" ref="cpaManager"/>
+		<constructor-arg name="ebMSIdGenerator" ref="ebMSIdGenerator"/>
 	</bean>
 	
 	<bean id="eventManager" class="nl.clockwork.ebms.event.processor.EventManagerFactory">
-		<property name="ebMSDAO" ref="ebMSDAO"/>
-		<property name="cpaManager" ref="cpaManager"/>
-		<property name="autoRetryResponse" value="${ebmsMessage.autoRetryResponse:false}"/>
-		<property name="nrAutoRetries" value="${ebmsMessage.nrAutoRetries:0}"/>
-		<property name="autoRetryInterval" value="${ebmsMessage.autoRetryInterval:15}"/>
+		<constructor-arg name="ebMSDAO" ref="ebMSDAO"/>
+		<constructor-arg name="cpaManager" ref="cpaManager"/>
+		<constructor-arg name="autoRetryResponse" value="${ebmsMessage.autoRetryResponse:false}"/>
+		<constructor-arg name="nrAutoRetries" value="${ebmsMessage.nrAutoRetries:0}"/>
+		<constructor-arg name="autoRetryInterval" value="${ebmsMessage.autoRetryInterval:15}"/>
 	</bean>
- 
+
 	<bean id="ebMSEventProcessor" class="nl.clockwork.ebms.event.processor.EbMSEventProcessor">
-		<property name="enabled" value="${eventProcessor.enabled}"/>
-		<property name="delay" value="${eventProcessor.delay}"/>
-		<property name="period" value="${eventProcessor.period}"/>
-		<property name="maxThreads" value="${eventProcessor.maxTreads}"/>
-		<property name="processorsScaleFactor" value="${eventProcessor.processorsScaleFactor}"/>
-		<property name="queueScaleFactor" value="${eventProcessor.queueScaleFactor}"/>
-		<property name="maxEvents" value="${eventProcessor.maxEvents}"/>
-		<property name="eventListener" ref="eventListener"/>
-		<property name="ebMSDAO" ref="ebMSDAO"/>
-		<property name="cpaManager" ref="cpaManager"/>
-		<property name="urlMapper" ref="urlMapper"/>
-		<property name="eventManager" ref="eventManager"/>
-		<property name="ebMSClientFactory" ref="ebMSHttpClientFactory"/>
-		<property name="messageEncrypter" ref="messageEncrypter"/>
-		<property name="messageProcessor" ref="messageProcessor"/>
-		<property name="deleteEbMSAttachmentsOnMessageProcessed" value="${ebmsMessage.deleteContentOnProcessed}"/>
+		<constructor-arg name="enabled" value="${eventProcessor.enabled}"/>
+		<constructor-arg name="delay" value="${eventProcessor.delay}"/>
+		<constructor-arg name="period" value="${eventProcessor.period}"/>
+		<constructor-arg name="maxThreads" value="${eventProcessor.maxTreads}"/>
+		<constructor-arg name="processorsScaleFactor" value="${eventProcessor.processorsScaleFactor}"/>
+		<constructor-arg name="queueScaleFactor" value="${eventProcessor.queueScaleFactor}"/>
+		<constructor-arg name="maxEvents" value="${eventProcessor.maxEvents}"/>
+		<constructor-arg name="eventListener" ref="eventListener"/>
+		<constructor-arg name="ebMSDAO" ref="ebMSDAO"/>
+		<constructor-arg name="cpaManager" ref="cpaManager"/>
+		<constructor-arg name="urlMapper" ref="urlMapper"/>
+		<constructor-arg name="eventManager" ref="eventManager"/>
+		<constructor-arg name="ebMSClientFactory" ref="ebMSHttpClientFactory"/>
+		<constructor-arg name="messageEncrypter" ref="messageEncrypter"/>
+		<constructor-arg name="messageProcessor" ref="messageProcessor"/>
+		<constructor-arg name="deleteEbMSAttachmentsOnMessageProcessed" value="${ebmsMessage.deleteContentOnProcessed}"/>
 	</bean>
 
 	<bean id="signatureGenerator" class="nl.clockwork.ebms.signing.EbMSSignatureGenerator">
-		<property name="cpaManager" ref="cpaManager"/>
-		<property name="canonicalizationMethodAlgorithm" value="${xmldsig.canonicalizationMethodAlgorithm}"/>
-		<property name="transformAlgorithm" value="${xmldsig.transformAlgorithm}"/>
-		<property name="keyStore" ref="signatureKeyStore"/>
+		<constructor-arg name="cpaManager" ref="cpaManager"/>
+		<constructor-arg name="keyStore" ref="signatureKeyStore"/>
 	</bean>  
 
 	<bean id="messageEncrypter" class="nl.clockwork.ebms.encryption.EbMSMessageEncrypter">
-		<property name="cpaManager" ref="cpaManager"/>
-		<property name="trustStore" ref="trustStore"/>
+		<constructor-arg name="cpaManager" ref="cpaManager"/>
+		<constructor-arg name="trustStore" ref="trustStore"/>
 	</bean>
 
 	<bean id="ebMSProxy" class="nl.clockwork.ebms.client.EbMSProxyFactory">
-		<property name="host" value="${http.proxy.host}"/>
-		<property name="port" value="${http.proxy.port}"/>
-		<property name="nonProxyHosts" value="${http.proxy.nonProxyHosts}"/>
-		<property name="username" value="${http.proxy.username}"/>
-		<property name="password" value="${http.proxy.password}"/>
+		<constructor-arg name="host" value="${http.proxy.host}"/>
+		<constructor-arg name="port" value="${http.proxy.port}"/>
+		<constructor-arg name="nonProxyHosts" value="${http.proxy.nonProxyHosts}"/>
+		<constructor-arg name="username" value="${http.proxy.username}"/>
+		<constructor-arg name="password" value="${http.proxy.password}"/>
 	</bean>
 
 	<bean id="ebMSHttpClientFactory" class="nl.clockwork.ebms.client.EbMSHttpClientFactory">
-		<property name="type" value="${http.client}"/>
-		<property name="connectTimeout" value="${http.connectTimeout}"/>
-		<property name="chunkedStreamingMode" value="${http.chunkedStreamingMode}"/>
-		<property name="base64Writer" value="${http.base64Writer}"/>
-		<property name="proxy" ref="ebMSProxy"/>
-		<property name="enabledProtocols" value="${https.protocols}"/>
-		<property name="enabledCipherSuites" value="${https.cipherSuites}"/>
-		<property name="verifyHostnames" value="${https.verifyHostnames}"></property>
-		<property name="keyStore" ref="clientKeyStore"/>
-		<property name="trustStore" ref="trustStore"/>
-		<property name="recoverableInformationalHttpErrors" value="${http.errors.informational.recoverable}"/>
-		<property name="recoverableRedirectionHttpErrors" value="${http.errors.redirection.recoverable}"/>
-		<property name="recoverableClientHttpErrors" value="${http.errors.client.recoverable}"/>
-		<property name="unrecoverableServerHttpErrors" value="${http.errors.server.unrecoverable}"/>
-		<property name="certificateMapper" ref="certificateMapper"/>
-		<property name="useClientCertificate" value="${https.useClientCertificate}"/>
+		<constructor-arg name="type" value="${http.client}"/>
+		<constructor-arg name="connectTimeout" value="${http.connectTimeout}"/>
+		<constructor-arg name="chunkedStreamingMode" value="${http.chunkedStreamingMode}"/>
+		<constructor-arg name="base64Writer" value="${http.base64Writer}"/>
+		<constructor-arg name="proxy" ref="ebMSProxy"/>
+		<constructor-arg name="enabledProtocols" value="${https.protocols}"/>
+		<constructor-arg name="enabledCipherSuites" value="${https.cipherSuites}"/>
+		<constructor-arg name="verifyHostnames" value="${https.verifyHostnames}"/>
+		<constructor-arg name="keyStore" ref="clientKeyStore"/>
+		<constructor-arg name="trustStore" ref="trustStore"/>
+		<constructor-arg name="httpErrors">
+			<bean class="nl.clockwork.ebms.client.HttpErrors">
+				<constructor-arg name="recoverableInformationalHttpErrors" value="${http.errors.informational.recoverable}"/>
+				<constructor-arg name="recoverableRedirectionHttpErrors" value="${http.errors.redirection.recoverable}"/>
+				<constructor-arg name="recoverableClientHttpErrors" value="${http.errors.client.recoverable}"/>
+				<constructor-arg name="unrecoverableServerHttpErrors" value="${http.errors.server.unrecoverable}"/>
+			</bean>
+		</constructor-arg>
+		<constructor-arg name="certificateMapper" ref="certificateMapper"/>
+		<constructor-arg name="useClientCertificate" value="${https.useClientCertificate}"/>
 	</bean>
 
 	<bean id="eventListener" class="nl.clockwork.ebms.event.listener.EventListenerFactory">

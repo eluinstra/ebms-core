@@ -19,42 +19,63 @@ import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLEngine;
 import javax.net.ssl.SSLParameters;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManagerFactory;
 
-import org.springframework.beans.factory.InitializingBean;
-
+import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.val;
+import lombok.experimental.FieldDefaults;
 import nl.clockwork.ebms.security.EbMSKeyStore;
 import nl.clockwork.ebms.security.EbMSTrustStore;
 
-public class SSLFactoryManager implements InitializingBean
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+public class SSLFactoryManager
 {
-	private EbMSKeyStore keyStore;
-	private EbMSTrustStore trustStore;
-	private boolean verifyHostnames;
-	private String[] enabledProtocols = new String[]{};
-	private String[] enabledCipherSuites = new String[]{};
-	private boolean requireClientAuthentication;
-	private SSLSocketFactory sslSocketFactory;
+	@NonNull
+	EbMSKeyStore keyStore;
+	@NonNull
+	EbMSTrustStore trustStore;
+	boolean verifyHostnames;
+	@NonNull
+	String[] enabledProtocols;
+	@NonNull
+	String[] enabledCipherSuites;
+	boolean requireClientAuthentication;
+	@Getter
+	SSLSocketFactory sslSocketFactory;
 
-	@Override
-	public void afterPropertiesSet() throws Exception
+	@Builder(toBuilder = true)
+	public SSLFactoryManager(
+			@NonNull EbMSKeyStore keyStore,
+			@NonNull EbMSTrustStore trustStore,
+			boolean verifyHostnames,
+			String[] enabledProtocols,
+			String[] enabledCipherSuites,
+			boolean requireClientAuthentication) throws Exception
 	{
+		this.keyStore = keyStore;
+		this.trustStore = trustStore;
+		this.verifyHostnames = verifyHostnames;
+		this.enabledProtocols = enabledProtocols == null ? new String[]{} : enabledProtocols;
+		this.enabledCipherSuites = enabledCipherSuites == null ? new String[]{} : enabledCipherSuites;
+		this.requireClientAuthentication = requireClientAuthentication;
 		//KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
-		KeyManagerFactory kmf = KeyManagerFactory.getInstance("SunX509");
+		val kmf = KeyManagerFactory.getInstance("SunX509");
 		kmf.init(keyStore.getKeyStore(),keyStore.getKeyPassword().toCharArray());
 
 		//TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
-		TrustManagerFactory tmf = TrustManagerFactory.getInstance("SunX509");
+		val tmf = TrustManagerFactory.getInstance("SunX509");
 		tmf.init(trustStore.getKeyStore());
 
-		SSLContext sslContext = SSLContext.getInstance("TLS");
+		val sslContext = SSLContext.getInstance("TLS");
 		sslContext.init(kmf.getKeyManagers(),tmf.getTrustManagers(),null);
 
-		//SSLEngine engine = sslContext.createSSLEngine(hostname,port);
-		SSLEngine engine = sslContext.createSSLEngine();
+		//val engine = sslContext.createSSLEngine(hostname,port);
+		val engine = sslContext.createSSLEngine();
 		engine.setSSLParameters(createSSLParameters());
 		engine.setNeedClientAuth(requireClientAuthentication);
 
@@ -63,7 +84,7 @@ public class SSLFactoryManager implements InitializingBean
 
 	private SSLParameters createSSLParameters()
 	{
-		SSLParameters result = new SSLParameters();
+		val result = new SSLParameters();
 		if (enabledProtocols.length > 0)
 			result.setProtocols(enabledProtocols);
 		if (enabledProtocols.length > 0)
@@ -79,40 +100,4 @@ public class SSLFactoryManager implements InitializingBean
 	{
 		return verifyHostnames ? HttpsURLConnection.getDefaultHostnameVerifier() : (h,s) -> true;
 	}
-	
-	public SSLSocketFactory getSslSocketFactory()
-	{
-		return sslSocketFactory;
-	}
-
-	public void setKeyStore(EbMSKeyStore keyStore)
-	{
-		this.keyStore = keyStore;
-	}
-
-	public void setTrustStore(EbMSTrustStore trustStore)
-	{
-		this.trustStore = trustStore;
-	}
-
-	public void setVerifyHostnames(boolean verifyHostnames)
-	{
-		this.verifyHostnames = verifyHostnames;
-	}
-
-	public void setEnabledProtocols(String[] enabledProtocols)
-	{
-		this.enabledProtocols = enabledProtocols;
-	}
-
-	public void setEnabledCipherSuites(String[] enabledCipherSuites)
-	{
-		this.enabledCipherSuites = enabledCipherSuites;
-	}
-
-	public void setRequireClientAuthentication(boolean requireClientAuthentication)
-	{
-		this.requireClientAuthentication = requireClientAuthentication;
-	}
-	
 }

@@ -21,33 +21,34 @@ import javax.jms.Destination;
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.Session;
-import javax.jms.TextMessage;
 
-import nl.clockwork.ebms.EbMSMessageEventType;
-import nl.clockwork.ebms.dao.EbMSDAO;
-import nl.clockwork.ebms.model.EbMSMessageContext;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.springframework.jms.JmsException;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jms.core.MessageCreator;
 
-public class JMSTextEventListener implements EventListener
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.NonNull;
+import lombok.val;
+import lombok.experimental.FieldDefaults;
+import nl.clockwork.ebms.dao.EbMSDAO;
+import nl.clockwork.ebms.model.EbMSMessageContext;
+
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@AllArgsConstructor
+public class JMSTextEventListener extends LoggingEventListener
 {
+	@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+	@AllArgsConstructor
 	public class EventMessageCreator implements MessageCreator
 	{
-		private EbMSMessageContext messageContext;
-
-		public EventMessageCreator(EbMSMessageContext messageContext)
-		{
-			this.messageContext = messageContext;
-		}
+		@NonNull
+		EbMSMessageContext messageContext;
 
 		@Override
 		public Message createMessage(Session session) throws JMSException
 		{
-			TextMessage result = session.createTextMessage();
+			val result = session.createTextMessage();
 			result.setStringProperty("cpaId",messageContext.getCpaId());
 			result.setStringProperty("fromPartyId",messageContext.getFromRole().getPartyId());
 			result.setStringProperty("fromRole",messageContext.getFromRole().getRole());
@@ -63,30 +64,21 @@ public class JMSTextEventListener implements EventListener
 		}
 	}
 
-	protected transient Log logger = LogFactory.getLog(getClass());
-	private EbMSDAO ebMSDAO;
-	private JmsTemplate jmsTemplate;
-	private Map<String,Destination> destinations;
-
-	public JMSTextEventListener()
-	{
-	}
-
-	public JMSTextEventListener(EbMSDAO ebMSDAO, JmsTemplate jmsTemplate, Map<String,Destination> destinations)
-	{
-		this.ebMSDAO = ebMSDAO;
-		this.jmsTemplate = jmsTemplate;
-		this.destinations = destinations;
-	}
+	@NonNull
+	EbMSDAO ebMSDAO;
+	@NonNull
+	JmsTemplate jmsTemplate;
+	@NonNull
+	Map<String,Destination> destinations;
 
 	@Override
 	public void onMessageReceived(String messageId) throws EventException
 	{
 		try
 		{
-			logger.info("Message " + messageId + " received");
 			ebMSDAO.getMessageContext(messageId)
 					.ifPresent(mc -> jmsTemplate.send(destinations.get(EbMSMessageEventType.RECEIVED.name()),new EventMessageCreator(mc)));
+			super.onMessageReceived(messageId);
 		}
 		catch (JmsException e)
 		{
@@ -99,9 +91,9 @@ public class JMSTextEventListener implements EventListener
 	{
 		try
 		{
-			logger.info("Message " + messageId + " delivered");
 			ebMSDAO.getMessageContext(messageId)
 					.ifPresent(mc -> jmsTemplate.send(destinations.get(EbMSMessageEventType.DELIVERED.name()),new EventMessageCreator(mc)));
+			super.onMessageDelivered(messageId);
 		}
 		catch (JmsException e)
 		{
@@ -114,9 +106,9 @@ public class JMSTextEventListener implements EventListener
 	{
 		try
 		{
-			logger.info("Message " + messageId + " failed");
 			ebMSDAO.getMessageContext(messageId)
 					.ifPresent(mc -> jmsTemplate.send(destinations.get(EbMSMessageEventType.FAILED.name()),new EventMessageCreator(mc)));
+			super.onMessageFailed(messageId);
 		}
 		catch (JmsException e)
 		{
@@ -129,28 +121,13 @@ public class JMSTextEventListener implements EventListener
 	{
 		try
 		{
-			logger.info("Message " + messageId + " expired");
 			ebMSDAO.getMessageContext(messageId)
 					.ifPresent(mc -> jmsTemplate.send(destinations.get(EbMSMessageEventType.EXPIRED.name()),new EventMessageCreator(mc)));
+			super.onMessageExpired(messageId);
 		}
 		catch (JmsException e)
 		{
 			throw new EventException(e);
 		}
-	}
-
-	public void setEbMSDAO(EbMSDAO ebMSDAO)
-	{
-		this.ebMSDAO = ebMSDAO;
-	}
-
-	public void setJmsTemplate(JmsTemplate jmsTemplate)
-	{
-		this.jmsTemplate = jmsTemplate;
-	}
-	
-	public void setDestinations(Map<String,Destination> destinations)
-	{
-		this.destinations = destinations;
 	}
 }

@@ -41,14 +41,16 @@ import org.springframework.transaction.TransactionException;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 import org.springframework.transaction.support.TransactionTemplate;
+import org.w3c.dom.Document;
 
+import lombok.val;
 import nl.clockwork.ebms.EbMSAttachmentFactory;
-import nl.clockwork.ebms.EbMSMessageEventType;
 import nl.clockwork.ebms.EbMSMessageStatus;
 import nl.clockwork.ebms.EbMSMessageUtils;
 import nl.clockwork.ebms.common.util.DOMUtils;
 import nl.clockwork.ebms.dao.AbstractEbMSDAO;
 import nl.clockwork.ebms.dao.DAOException;
+import nl.clockwork.ebms.event.listener.EbMSMessageEventType;
 import nl.clockwork.ebms.model.EbMSAttachment;
 import nl.clockwork.ebms.model.EbMSMessage;
 import nl.clockwork.ebms.processor.EbMSProcessingException;
@@ -57,13 +59,12 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 {
 	public class KeyExtractor implements ResultSetExtractor<KeyHolder>
 	{
-
 		@Override
 		public KeyHolder extractData(ResultSet rs) throws SQLException, DataAccessException
 		{
 			if (rs.next())
 			{
-				final Map<String,Object> keys = new HashMap<>();
+				val keys = new HashMap<String,Object>();
 				keys.put("message_id",rs.getString("message_id"));
 				keys.put("message_nr",rs.getInt("message_nr"));
 				return new KeyHolder()
@@ -73,13 +74,11 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 					{
 						return keys;
 					}
-					
 					@Override
 					public List<Map<String,Object>> getKeyList()
 					{
 						return Arrays.asList(keys);
 					}
-					
 					@Override
 					public Number getKey() throws InvalidDataAccessApiUsageException
 					{
@@ -90,7 +89,6 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 			else
 				return null;
 		}
-		
 	}
 
 	public EbMSDAOImpl(TransactionTemplate transactionTemplate, JdbcTemplate jdbcTemplate, String serverId)
@@ -104,7 +102,7 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 		return "select message_id" +
 		" from ebms_message" +
 		" where message_nr = 0" +
-		" and status=" + status.id() +
+		" and status=" + status.getId() +
 		messageContextFilter +
 		" order by time_stamp asc" +
 		" limit " + maxNr;
@@ -139,7 +137,7 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 	}
 
 	@Override
-	public void insertMessage(final Date timestamp, final Date persistTime, final EbMSMessage message, final EbMSMessageStatus status) throws DAOException
+	public void insertMessage(final Date timestamp, final Date persistTime, final Document document, final EbMSMessage message, final EbMSMessageStatus status) throws DAOException
 	{
 		try
 		{
@@ -151,7 +149,7 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 					{
 						try
 						{
-							KeyHolder keyHolder = (KeyHolder)jdbcTemplate.query(
+							val keyHolder = (KeyHolder)jdbcTemplate.query(
 								new PreparedStatementCreator()
 								{
 									@Override
@@ -159,7 +157,7 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 									{
 										try
 										{
-											PreparedStatement ps = connection.prepareStatement
+											val ps = connection.prepareStatement
 											(
 												"insert into ebms_message (" +
 													"time_stamp," +
@@ -182,7 +180,7 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 												" returning message_id, message_nr"
 											);
 											ps.setTimestamp(1,new Timestamp(timestamp.getTime()));
-											MessageHeader messageHeader = message.getMessageHeader();
+											val messageHeader = message.getMessageHeader();
 											ps.setString(2,messageHeader.getCPAId());
 											ps.setString(3,messageHeader.getConversationId());
 											ps.setString(4,messageHeader.getMessageData().getMessageId());
@@ -194,7 +192,7 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 											ps.setString(10,messageHeader.getTo().getRole());
 											ps.setString(11,EbMSMessageUtils.toString(messageHeader.getService()));
 											ps.setString(12,messageHeader.getAction());
-											ps.setString(13,DOMUtils.toString(message.getMessage(),"UTF-8"));
+											ps.setString(13,DOMUtils.toString(document,"UTF-8"));
 											if (status == null)
 											{
 												ps.setNull(14,java.sql.Types.INTEGER);
@@ -202,7 +200,7 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 											}
 											else
 											{
-												ps.setInt(14,status.id());
+												ps.setInt(14,status.getId());
 												ps.setTimestamp(15,new Timestamp(timestamp.getTime()));
 											}
 											if (persistTime == null)
@@ -236,7 +234,7 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 	}
 	
 	@Override
-	public void insertDuplicateMessage(final Date timestamp, final EbMSMessage message, boolean storeAttachments) throws DAOException
+	public void insertDuplicateMessage(final Date timestamp, final Document document, final EbMSMessage message, boolean storeAttachments) throws DAOException
 	{
 		try
 		{
@@ -248,7 +246,7 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 					{
 						try
 						{
-							KeyHolder keyHolder = (KeyHolder)jdbcTemplate.query(
+							val keyHolder = (KeyHolder)jdbcTemplate.query(
 								new PreparedStatementCreator()
 								{
 									@Override
@@ -256,7 +254,7 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 									{
 										try
 										{
-											PreparedStatement ps = connection.prepareStatement
+											val ps = connection.prepareStatement
 											(
 												"insert into ebms_message (" +
 													"time_stamp," +
@@ -290,7 +288,7 @@ public class EbMSDAOImpl extends AbstractEbMSDAO
 											ps.setString(11,messageHeader.getTo().getRole());
 											ps.setString(12,EbMSMessageUtils.toString(messageHeader.getService()));
 											ps.setString(13,messageHeader.getAction());
-											ps.setString(14,DOMUtils.toString(message.getMessage(),"UTF-8"));
+											ps.setString(14,DOMUtils.toString(document,"UTF-8"));
 											return ps;
 										}
 										catch (TransformerException e)

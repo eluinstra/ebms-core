@@ -15,14 +15,12 @@
  */
 package nl.clockwork.ebms.event.listener;
 
+import lombok.NoArgsConstructor;
+
+@NoArgsConstructor
 public class EventException extends RuntimeException
 {
 	private static final long serialVersionUID = 1L;
-
-	public EventException()
-	{
-		super();
-	}
 
 	public EventException(String message, Throwable cause)
 	{

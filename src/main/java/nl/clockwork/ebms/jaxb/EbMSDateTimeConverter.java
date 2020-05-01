@@ -20,6 +20,8 @@ import java.util.GregorianCalendar;
 
 import javax.xml.bind.DatatypeConverter;
 
+import lombok.val;
+
 public class EbMSDateTimeConverter
 {
 	public static Date parseDateTime(String date)
@@ -29,7 +31,7 @@ public class EbMSDateTimeConverter
 
 	public static String printDateTime(Date date)
 	{
-		GregorianCalendar calendar = new GregorianCalendar();
+		val calendar = new GregorianCalendar();
 		calendar.setTime(date);
 		return DatatypeConverter.printDateTime(calendar);
 	}

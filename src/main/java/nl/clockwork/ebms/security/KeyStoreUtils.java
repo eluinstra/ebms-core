@@ -22,6 +22,8 @@ import java.io.InputStream;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
 
+import lombok.val;
+import lombok.var;
 import nl.clockwork.ebms.common.util.SecurityUtils;
 
 public class KeyStoreUtils
@@ -29,9 +31,9 @@ public class KeyStoreUtils
 	public static KeyStore loadKeyStore(KeyStoreType type, String location, String password) throws GeneralSecurityException, IOException
 	{
 		//location = ResourceUtils.getURL(SystemPropertyUtils.resolvePlaceholders(location)).getFile();
-		try (InputStream in = getInputStream(location))
+		try (val in = getInputStream(location))
 		{
-			KeyStore keyStore = KeyStore.getInstance(type.name());
+			val keyStore = KeyStore.getInstance(type.name());
 			keyStore.load(in,password.toCharArray());
 			return keyStore;
 		}
@@ -45,7 +47,7 @@ public class KeyStoreUtils
 		}
 		catch (FileNotFoundException e)
 		{
-			InputStream result = SecurityUtils.class.getResourceAsStream(location);
+			var result = SecurityUtils.class.getResourceAsStream(location);
 			if (result == null)
 				result = SecurityUtils.class.getResourceAsStream("/" + location);
 			if (result == null)

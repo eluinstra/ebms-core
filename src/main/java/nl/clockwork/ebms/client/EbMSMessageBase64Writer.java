@@ -23,6 +23,7 @@ import java.net.HttpURLConnection;
 import org.apache.commons.codec.binary.Base64OutputStream;
 import org.springframework.util.StringUtils;
 
+import lombok.val;
 import nl.clockwork.ebms.model.EbMSAttachment;
 
 public class EbMSMessageBase64Writer extends EbMSMessageWriter
@@ -34,7 +35,7 @@ public class EbMSMessageBase64Writer extends EbMSMessageWriter
 
 	protected void writeBinaryAttachment(String boundary, OutputStream outputStream, OutputStreamWriter writer, EbMSAttachment attachment) throws IOException
 	{
-		try (EbMSAttachment a = attachment)
+		try (val a = attachment)
 		{
 			writer.write("\r\n");
 			writer.write("Content-Type: " + attachment.getContentType());
@@ -50,7 +51,7 @@ public class EbMSMessageBase64Writer extends EbMSMessageWriter
 			writer.write("\r\n");
 			writer.write("\r\n");
 			writer.flush();
-			Base64OutputStream out = new Base64OutputStream(outputStream);
+			val out = new Base64OutputStream(outputStream);
 			a.writeTo(out);
 			out.flush();
 			writer.write("\r\n");

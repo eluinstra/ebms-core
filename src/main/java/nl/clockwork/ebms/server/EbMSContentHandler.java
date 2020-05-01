@@ -28,13 +28,18 @@ import org.apache.james.mime4j.parser.ContentHandler;
 import org.apache.james.mime4j.stream.BodyDescriptor;
 import org.apache.james.mime4j.stream.Field;
 
+import lombok.AccessLevel;
+import lombok.val;
+import lombok.var;
+import lombok.experimental.FieldDefaults;
 import nl.clockwork.ebms.EbMSAttachmentFactory;
 import nl.clockwork.ebms.model.EbMSAttachment;
 
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class EbMSContentHandler implements ContentHandler
 {
-	private Map<String,String> headers = new HashMap<>();
-	private List<EbMSAttachment> attachments = new ArrayList<>();
+	Map<String,String> headers = new HashMap<>();
+	List<EbMSAttachment> attachments = new ArrayList<>();
 
 	@Override
 	public void startMessage() throws MimeException
@@ -95,10 +100,10 @@ public class EbMSContentHandler implements ContentHandler
 	@Override
 	public void body(BodyDescriptor bd, InputStream is) throws MimeException, IOException
 	{
-		String filename = getFilename();
-		String contentId = getContentId();
-		String contentType = getContentType();
-		InputStream content = applyTransferEncoding(is);
+		val filename = getFilename();
+		val contentId = getContentId();
+		val contentType = getContentType();
+		val content = applyTransferEncoding(is);
 		if (attachments.size() == 0)
 			attachments.add(EbMSAttachmentFactory.createEbMSAttachment(filename,contentId,contentType,content));
 		else
@@ -118,7 +123,7 @@ public class EbMSContentHandler implements ContentHandler
 
 	private String getHeader(String headerName)
 	{
-		String result = headers.get(headerName);
+		var result = headers.get(headerName);
 		if (result == null)
 			result = headers.entrySet().stream().filter(e -> headerName.equalsIgnoreCase(e.getKey())).findFirst().map(e -> e.getValue()).orElse(null);
 		return result;
@@ -126,7 +131,7 @@ public class EbMSContentHandler implements ContentHandler
 
 	private InputStream applyTransferEncoding(InputStream result)
 	{
-		String encoding = getHeader("Content-Transfer-Encoding");
+		val encoding = getHeader("Content-Transfer-Encoding");
 		if (encoding != null && encoding.equalsIgnoreCase("base64"))
 			result = new Base64InputStream(result);
 		return result;
@@ -134,7 +139,7 @@ public class EbMSContentHandler implements ContentHandler
 
 	private String getFilename()
 	{
-		String result = getHeader("Content-Disposition");
+		var result = getHeader("Content-Disposition");
 		if (result != null && result.startsWith("attachment"))
 			result = result.replaceAll("^attachment;\\s+filename=\"?([^\"]*)\"?$","$1");
 		return result;
@@ -142,7 +147,7 @@ public class EbMSContentHandler implements ContentHandler
 
 	private String getContentId()
 	{
-		String result = getHeader("Content-ID");
+		var result = getHeader("Content-ID");
 		if (result != null)
 			result = result.replaceAll("^<(.*)>$|^(.*)$","$1$2");
 		return result;

@@ -15,83 +15,31 @@
  */
 package nl.clockwork.ebms.event.processor;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.FactoryBean;
 
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.NonNull;
+import lombok.experimental.FieldDefaults;
 import nl.clockwork.ebms.cpa.CPAManager;
 import nl.clockwork.ebms.dao.EbMSDAO;
 
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@AllArgsConstructor
 public class EventManagerFactory implements FactoryBean<EventManager>
 {
-	private static final Log logger = LogFactory.getLog(EventManagerFactory.class);
-	private EbMSDAO ebMSDAO;
-	private CPAManager cpaManager;
-	private boolean autoRetryResponse;
-	private int nrAutoRetries;
-	private int autoRetryInterval;
+	@NonNull
+	EbMSDAO ebMSDAO;
+	@NonNull
+	CPAManager cpaManager;
+	boolean autoRetryResponse;
+	int nrAutoRetries;
+	int autoRetryInterval;
 	
-	public EbMSDAO getEbMSDAO()
-	{
-		return ebMSDAO;
-	}
-	public void setEbMSDAO(EbMSDAO ebMSDAO)
-	{
-		this.ebMSDAO = ebMSDAO;
-	}
-	public CPAManager getCpaManager()
-	{
-		return cpaManager;
-	}
-	public void setCpaManager(CPAManager cpaManager)
-	{
-		this.cpaManager = cpaManager;
-	}
-	public boolean isAutoRetryResponse()
-	{
-		return autoRetryResponse;
-	}
-	public void setAutoRetryResponse(boolean autoRetryResponse) 
-	{
-		this.autoRetryResponse = autoRetryResponse;
-	}
-	public int getNrAutoRetries()
-	{
-		return nrAutoRetries;
-	}
-	public void setNrAutoRetries(int nrAutoRetries)
-	{
-		this.nrAutoRetries = nrAutoRetries;
-	}
-	public int getAutoRetryInterval()
-	{
-		return autoRetryInterval;
-	}
-	public void setAutoRetryInterval(int autoRetryInterval)
-	{
-		this.autoRetryInterval = autoRetryInterval;
-	}
-
 	@Override
 	public EventManager getObject() throws Exception
 	{
-		EventManager mgr = null;
-		if (autoRetryResponse)
-		{
-			logger.info("Using EventManager RetryAck");
-			mgr = new EventManagerRetryAck();
-			((EventManagerRetryAck) mgr).setNrAutoRetries(nrAutoRetries);
-			((EventManagerRetryAck) mgr).setAutoRetryInterval(autoRetryInterval);			
-		}
-		else
-		{
-			logger.info("Using EventManager DEFAULT");
-			mgr = new EventManager();
-		}
-		mgr.setCpaManager(cpaManager);
-		mgr.setEbMSDAO(ebMSDAO);
-		
-		return mgr;
+		return autoRetryResponse ? new EventManagerRetryAck(ebMSDAO,cpaManager,nrAutoRetries,autoRetryInterval) : new EventManager(ebMSDAO,cpaManager);
 	}
 	
 	@Override

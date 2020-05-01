@@ -17,39 +17,23 @@ package nl.clockwork.ebms.model;
 
 import java.io.Serializable;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.NonNull;
+
+@XmlAccessorType(XmlAccessType.FIELD)
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class URLMapping implements Serializable
 {
 	private static final long serialVersionUID = 1L;
-	private String source;
-	private String destination;
-
-	public URLMapping()
-	{
-	}
-	public URLMapping(String source, String destination)
-	{
-		this.source = source;
-		this.destination = destination;
-	}
-	public String getSource()
-	{
-		return source;
-	}
-	public void setSource(String source)
-	{
-		this.source = source;
-	}
-	public String getDestination()
-	{
-		return destination;
-	}
-	public void setDestination(String destination)
-	{
-		this.destination = destination;
-	}
-	@Override
-	public String toString()
-	{
-		return source + "->" + destination;
-	}
+	@NonNull
+	String source;
+	@NonNull
+	String destination;
 }

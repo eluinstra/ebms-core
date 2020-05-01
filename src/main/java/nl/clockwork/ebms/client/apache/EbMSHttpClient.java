@@ -19,13 +19,6 @@ import java.io.IOException;
 
 import javax.xml.transform.TransformerException;
 
-import nl.clockwork.ebms.client.EbMSClient;
-import nl.clockwork.ebms.client.EbMSProxy;
-import nl.clockwork.ebms.model.EbMSDocument;
-import nl.clockwork.ebms.processor.EbMSProcessingException;
-import nl.clockwork.ebms.processor.EbMSProcessorException;
-import nl.clockwork.ebms.client.SSLFactoryManager;
-
 import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
@@ -38,31 +31,31 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
 
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.NonNull;
+import lombok.experimental.FieldDefaults;
+import nl.clockwork.ebms.client.EbMSClient;
+import nl.clockwork.ebms.client.EbMSProxy;
+import nl.clockwork.ebms.client.SSLFactoryManager;
+import nl.clockwork.ebms.model.EbMSDocument;
+import nl.clockwork.ebms.processor.EbMSProcessingException;
+import nl.clockwork.ebms.processor.EbMSProcessorException;
+
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@AllArgsConstructor
 public class EbMSHttpClient implements EbMSClient
 {
-	private SSLConnectionSocketFactory sslConnectionSocketFactory;
-	private int connectTimeout;
-	private boolean chunkedStreamingMode;
-	private EbMSProxy proxy;
-
-	public EbMSHttpClient()
-	{
-	}
-
-	public EbMSHttpClient(SSLConnectionSocketFactory sslConnectionSocketFactory, int connectTimeout, boolean chunkedStreamingMode, EbMSProxy proxy) throws Exception
-	{
-		this.sslConnectionSocketFactory = sslConnectionSocketFactory;
-		this.connectTimeout = connectTimeout;
-		this.chunkedStreamingMode = chunkedStreamingMode;
-		this.proxy = proxy;
-	}
+	@NonNull
+	SSLConnectionSocketFactory sslConnectionSocketFactory;
+	int connectTimeout;
+	boolean chunkedStreamingMode;
+	@NonNull
+	EbMSProxy proxy;
 
 	public EbMSHttpClient(SSLFactoryManager sslFactoryManager, String[] enabledProtocols, String[] enabledCipherSuites, boolean verifyHostnames, int connectTimeout, boolean chunkedStreamingMode, EbMSProxy proxy) throws Exception
 	{
-		this.sslConnectionSocketFactory = new SSLConnectionSocketFactoryFactory(sslFactoryManager,enabledProtocols,enabledCipherSuites,verifyHostnames).getObject();
-		this.connectTimeout = connectTimeout;
-		this.chunkedStreamingMode = chunkedStreamingMode;
-		this.proxy = proxy;
+		this(new SSLConnectionSocketFactoryFactory(sslFactoryManager,enabledProtocols,enabledCipherSuites,verifyHostnames).getObject(),connectTimeout,chunkedStreamingMode,proxy);
 	}
 
 	public EbMSDocument sendMessage(String uri, EbMSDocument document) throws EbMSProcessorException
@@ -70,7 +63,7 @@ public class EbMSHttpClient implements EbMSClient
 		try (CloseableHttpClient httpClient = getHttpClient(uri))
 		{
 			HttpPost httpPost = getHttpPost(uri);
-			EbMSMessageWriter ebMSMessageWriter = new EbMSMessageWriter(httpPost,chunkedStreaming(uri));
+			EbMSMessageWriter ebMSMessageWriter = new EbMSMessageWriter(httpPost,chunkedStreamingMode);
 			ebMSMessageWriter.write(document);
 			return httpClient.execute(httpPost,new EbMSResponseHandler());
 		}
@@ -83,7 +76,7 @@ public class EbMSHttpClient implements EbMSClient
 	private CloseableHttpClient getHttpClient(String uri)
 	{
 		HttpClientBuilder custom = HttpClients.custom().setSSLSocketFactory(sslConnectionSocketFactory);
-		if (proxy != null && proxy.useProxy(uri) && proxy.useProxyAuthorization())
+		if (proxy != null && proxy.useProxyAuthorization())
 		{
 			CredentialsProvider credsProvider = new BasicCredentialsProvider();
 			credsProvider.setCredentials(new AuthScope(proxy.getHost(),proxy.getPort()),new UsernamePasswordCredentials(proxy.getUsername(),proxy.getPassword()));
@@ -95,30 +88,10 @@ public class EbMSHttpClient implements EbMSClient
 	private HttpPost getHttpPost(String uri)
 	{
 		HttpPost result = new HttpPost(uri);
-		if (proxy != null && proxy.useProxy(uri))
+		if (proxy != null)
 		{
 			result.setConfig(RequestConfig.custom().setConnectTimeout(connectTimeout).setProxy(new HttpHost(proxy.getHost(),proxy.getPort())).build());
 		}
 		return result;
-	}
-
-	public boolean chunkedStreaming(String uri)
-	{
-		return chunkedStreamingMode;
-	}
-
-	public void setSslConnectionSocketFactory(SSLConnectionSocketFactory sslConnectionSocketFactory)
-	{
-		this.sslConnectionSocketFactory = sslConnectionSocketFactory;
-	}
-	
-	public void setChunkedStreamingMode(boolean chunkedStreamingMode)
-	{
-		this.chunkedStreamingMode = chunkedStreamingMode;
-	}
-	
-	public void setProxy(EbMSProxy proxy)
-	{
-		this.proxy = proxy;
 	}
 }

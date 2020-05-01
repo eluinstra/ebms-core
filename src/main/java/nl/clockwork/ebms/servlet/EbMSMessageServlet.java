@@ -18,7 +18,6 @@ package nl.clockwork.ebms.servlet;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.List;
 
 import javax.servlet.GenericServlet;
@@ -29,27 +28,28 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
+import lombok.AccessLevel;
+import lombok.val;
+import lombok.var;
+import lombok.experimental.FieldDefaults;
 import nl.clockwork.ebms.processor.EbMSMessageProcessor;
 import nl.clockwork.ebms.processor.EbMSProcessorException;
 import nl.clockwork.ebms.server.EbMSInputStreamHandler;
 
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class EbMSMessageServlet extends GenericServlet
 {
 	private static final long serialVersionUID = 1L;
-	protected transient Log logger = LogFactory.getLog(getClass());
-	private EbMSMessageProcessor ebMSMessageProcessor;
+	EbMSMessageProcessor ebMSMessageProcessor;
 
 	@Override
 	public void init(ServletConfig config) throws ServletException
 	{
 		super.init(config);
-		WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(getServletContext());
-		String id = config.getInitParameter("ebMSMessageProcessor");
+		val wac = WebApplicationContextUtils.getRequiredWebApplicationContext(getServletContext());
+		var id = config.getInitParameter("ebMSMessageProcessor");
 		if (id == null)
 			id = "ebMSMessageProcessor";
 		ebMSMessageProcessor = wac.getBean(id,EbMSMessageProcessor.class);
@@ -60,14 +60,14 @@ public class EbMSMessageServlet extends GenericServlet
 	{
 		try
 		{
-			EbMSInputStreamHandler handler = 
+			val handler = 
 				new EbMSInputStreamHandler(ebMSMessageProcessor)
 				{
 					@Override
 					public List<String> getRequestHeaderNames()
 					{
-						List<String> result = new ArrayList<>();
-						Enumeration<?> headerNames = ((HttpServletRequest)request).getHeaderNames();
+						val result = new ArrayList<String>();
+						val headerNames = ((HttpServletRequest)request).getHeaderNames();
 						while (headerNames.hasMoreElements())
 							result.add((String)headerNames.nextElement());
 						return result;
@@ -76,8 +76,8 @@ public class EbMSMessageServlet extends GenericServlet
 					@Override
 					public List<String> getRequestHeaders(String headerName)
 					{
-						List<String> result = new ArrayList<>();
-						Enumeration<?> headers = ((HttpServletRequest)request).getHeaders(headerName);
+						val result = new ArrayList<String>();
+						val headers = ((HttpServletRequest)request).getHeaders(headerName);
 						while(headers.hasMoreElements())
 							result.add((String)headers.nextElement());
 						return result;

@@ -29,6 +29,11 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.util.StringUtils;
 import org.xml.sax.SAXException;
 
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.NonNull;
+import lombok.val;
+import lombok.experimental.FieldDefaults;
 import nl.clockwork.ebms.Constants;
 import nl.clockwork.ebms.common.util.HTTPUtils;
 import nl.clockwork.ebms.model.EbMSDocument;
@@ -36,20 +41,18 @@ import nl.clockwork.ebms.processor.EbMSProcessingException;
 import nl.clockwork.ebms.processor.EbMSProcessorException;
 import nl.clockwork.ebms.server.EbMSMessageReader;
 
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@AllArgsConstructor
 public class EbMSResponseHandler
 {
-	protected transient Log messageLogger = LogFactory.getLog(Constants.MESSAGE_LOG);
-	private HttpURLConnection connection;
-	private List<Integer> recoverableHttpErrors;
-	private List<Integer> unrecoverableHttpErrors;
+	transient Log messageLogger = LogFactory.getLog(Constants.MESSAGE_LOG);
+	@NonNull
+	HttpURLConnection connection;
+	@NonNull
+	List<Integer> recoverableHttpErrors;
+	@NonNull
+	List<Integer> unrecoverableHttpErrors;
 	
-	public EbMSResponseHandler(HttpURLConnection connection, List<Integer> recoverableHttpErrors, List<Integer> unrecoverableHttpErrors)
-	{
-		this.connection = connection;
-		this.recoverableHttpErrors = recoverableHttpErrors;
-		this.unrecoverableHttpErrors = unrecoverableHttpErrors;
-	}
-
 	public EbMSDocument read() throws EbMSProcessorException
 	{
 		try
@@ -89,10 +92,10 @@ public class EbMSResponseHandler
 
 	private EbMSDocument readSuccesResponse(HttpURLConnection connection) throws IOException
 	{
-		try (InputStream input = connection.getInputStream())
+		try (val input = connection.getInputStream())
 		{
-			EbMSMessageReader messageReader = new EbMSMessageReader(getHeaderField("Content-ID"),getHeaderField("Content-Type"));
-			String response = IOUtils.toString(input,getEncoding());
+			val messageReader = new EbMSMessageReader(getHeaderField("Content-ID"),getHeaderField("Content-Type"));
+			val response = IOUtils.toString(input,getEncoding());
 			logResponse(connection,response);
 			try
 			{
@@ -111,9 +114,9 @@ public class EbMSResponseHandler
 
 	private EbMSResponseException createRecoverableErrorException(HttpURLConnection connection) throws IOException
 	{
-		try (InputStream input = connection.getErrorStream())
+		try (val input = connection.getErrorStream())
 		{
-			String response = readResponse(connection,input);
+			val response = readResponse(connection,input);
 			if (recoverableHttpErrors.contains(connection.getResponseCode()))
 				return new EbMSResponseException(connection.getResponseCode(),connection.getHeaderFields(),response);
 			else
@@ -123,9 +126,9 @@ public class EbMSResponseHandler
 
 	private EbMSResponseException createUnrecoverableErrorException(HttpURLConnection connection) throws IOException
 	{
-		try (InputStream input = connection.getErrorStream())
+		try (val input = connection.getErrorStream())
 		{
-			String response = readResponse(connection,input);
+			val response = readResponse(connection,input);
 			if (unrecoverableHttpErrors.contains(connection.getResponseCode()))
 				return new EbMSUnrecoverableResponseException(connection.getResponseCode(),connection.getHeaderFields(),response);
 			else
@@ -146,7 +149,7 @@ public class EbMSResponseHandler
 
 	private String getEncoding() throws EbMSProcessingException
 	{
-		String contentType = getHeaderField("Content-Type");
+		val contentType = getHeaderField("Content-Type");
 		if (!StringUtils.isEmpty(contentType))
 			return HTTPUtils.getCharSet(contentType);
 		else
@@ -165,9 +168,8 @@ public class EbMSResponseHandler
 
 	private void logResponse(HttpURLConnection connection, String response) throws IOException
 	{
-		String headers = connection.getResponseCode() + (messageLogger.isDebugEnabled() ? "\n" + HTTPUtils.toString(connection.getHeaderFields()) : "");
-		response = response != null ? "\n" + response : "";
-		messageLogger.info("<<<<\nstatusCode: " + headers + response);
+		val headers = connection.getResponseCode() + (messageLogger.isDebugEnabled() ? "\n" + HTTPUtils.toString(connection.getHeaderFields()) : "");
+		messageLogger.info("<<<<\nstatusCode: " + headers + (response != null ? "\n" + response : ""));
 	}
 
 }

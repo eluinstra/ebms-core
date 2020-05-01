@@ -19,23 +19,31 @@ import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-import nl.clockwork.ebms.Constants;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import lombok.AccessLevel;
+import lombok.NonNull;
+import lombok.val;
+import lombok.experimental.FieldDefaults;
+import lombok.experimental.NonFinal;
+import nl.clockwork.ebms.Constants;
+
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class LoggingInputStream extends FilterInputStream
 {
-	protected transient Log messageLogger = LogFactory.getLog(Constants.MESSAGE_LOG);
-	private String charset;
-	private StringBuffer sb = new StringBuffer();
+	transient Log messageLogger = LogFactory.getLog(Constants.MESSAGE_LOG);
+	@NonNull
+	StringBuffer sb = new StringBuffer();
+	@NonFinal
+	String charset;
 
-	public LoggingInputStream(InputStream in)
+	public LoggingInputStream(@NonNull InputStream in)
 	{
 		this(in,"UTF-8");
 	}
 
-	protected LoggingInputStream(InputStream in, String charset)
+	protected LoggingInputStream(@NonNull InputStream in, String charset)
 	{
 		super(in);
 		this.charset = charset;
@@ -44,7 +52,7 @@ public class LoggingInputStream extends FilterInputStream
 	@Override
 	public int read() throws IOException
 	{
-		int result = super.read();
+		val result = super.read();
 		if (messageLogger.isDebugEnabled() && result != -1)
 			sb.append(result);
 		return result;
@@ -53,7 +61,7 @@ public class LoggingInputStream extends FilterInputStream
 	@Override
 	public int read(byte[] b) throws IOException
 	{
-		int len = super.read(b);
+		val len = super.read(b);
 		if (messageLogger.isDebugEnabled() && len != -1)
 			sb.append(new String(b,0,len,charset));
 		return len;

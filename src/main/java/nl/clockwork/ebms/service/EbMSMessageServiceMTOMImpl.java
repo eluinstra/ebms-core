@@ -15,30 +15,59 @@
  */
 package nl.clockwork.ebms.service;
 
+import java.io.IOException;
+
+import javax.xml.bind.JAXBException;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.soap.SOAPException;
+import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactoryConfigurationError;
 
-import org.springframework.beans.factory.InitializingBean;
+import org.xml.sax.SAXException;
 
+import lombok.NonNull;
+import lombok.val;
+import nl.clockwork.ebms.EbMSMessageFactory;
+import nl.clockwork.ebms.EbMSMessageUtils;
+import nl.clockwork.ebms.client.DeliveryManager;
+import nl.clockwork.ebms.cpa.CPAManager;
 import nl.clockwork.ebms.dao.DAOException;
-import nl.clockwork.ebms.model.EbMSMessage;
+import nl.clockwork.ebms.dao.EbMSDAO;
+import nl.clockwork.ebms.event.processor.EventManager;
 import nl.clockwork.ebms.model.EbMSMessageContentMTOM;
 import nl.clockwork.ebms.processor.EbMSProcessorException;
+import nl.clockwork.ebms.signing.EbMSSignatureGenerator;
+import nl.clockwork.ebms.validation.EbMSMessageContextValidator;
 import nl.clockwork.ebms.validation.ValidatorException;
 
-public class EbMSMessageServiceMTOMImpl extends EbMSMessageServiceImpl implements InitializingBean, EbMSMessageServiceMTOM
+public class EbMSMessageServiceMTOMImpl extends EbMSMessageServiceImpl implements EbMSMessageServiceMTOM
 {
+	public EbMSMessageServiceMTOMImpl(
+			@NonNull DeliveryManager deliveryManager,
+			@NonNull EbMSDAO ebMSDAO,
+			@NonNull CPAManager cpaManager,
+			@NonNull EbMSMessageFactory ebMSMessageFactory,
+			@NonNull EventManager eventManager,
+			@NonNull EbMSMessageContextValidator ebMSMessageContextValidator,
+			@NonNull EbMSSignatureGenerator signatureGenerator,
+			boolean deleteEbMSAttachmentsOnMessageProcessed)
+	{
+		super(deliveryManager,ebMSDAO,cpaManager,ebMSMessageFactory,eventManager,ebMSMessageContextValidator,signatureGenerator,deleteEbMSAttachmentsOnMessageProcessed);
+	}
+
 	@Override
 	public String sendMessageMTOM(EbMSMessageContentMTOM messageContent) throws EbMSMessageServiceException
 	{
 		try
 		{
 			ebMSMessageContextValidator.validate(messageContent.getContext());
-			final EbMSMessage message = ebMSMessageFactory.createEbMSMessageMTOM(messageContent);
-			signatureGenerator.generate(message);
-			storeMessage(message);
+			val message = ebMSMessageFactory.createEbMSMessageMTOM(messageContent);
+			val document = EbMSMessageUtils.getEbMSDocument(message);
+			signatureGenerator.generate(document,message);
+			storeMessage(document.getMessage(),message);
 			return message.getMessageHeader().getMessageData().getMessageId();
 		}
-		catch (ValidatorException | DAOException | TransformerFactoryConfigurationError | EbMSProcessorException e)
+		catch (ValidatorException | DAOException | TransformerFactoryConfigurationError | EbMSProcessorException | SOAPException | JAXBException | ParserConfigurationException | SAXException | IOException | TransformerException e)
 		{
 			throw new EbMSMessageServiceException(e);
 		}

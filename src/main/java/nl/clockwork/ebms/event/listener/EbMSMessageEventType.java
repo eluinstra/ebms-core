@@ -1,4 +1,4 @@
-package nl.clockwork.ebms;
+package nl.clockwork.ebms.event.listener;
 
 import java.util.stream.Stream;
 

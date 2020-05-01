@@ -18,54 +18,30 @@ package nl.clockwork.ebms.model;
 import java.io.Serializable;
 import java.util.List;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.PartyId;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import nl.clockwork.ebms.cpa.CPAUtils;
 
+@XmlAccessorType(XmlAccessType.FIELD)
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+//@RequiredArgsConstructor
 public class Role implements Serializable// extends Party
 {
 	private static final long serialVersionUID = 1L;
-	private String partyId;
-	private String role;
-
-	public Role()
-	{
-	}
-
-	public Role(String role)
-	{
-		this.role = role;
-	}
-
-	public Role(String partyId, String role)
-	{
-		this.partyId = partyId;
-		this.role = role;
-	}
-
 	@XmlElement
-	public String getPartyId()
-	{
-		return partyId;
-	}
-
-	public void setPartyId(String partyId)
-	{
-		this.partyId = partyId;
-	}
-
+	String partyId;
 	@XmlElement(required=true)
-	public String getRole()
-	{
-		return role;
-	}
-
-	public void setRole(String role)
-	{
-		this.role = role;
-	}
+	//@NonNull
+	String role;
 
 	@Override
 	public String toString()

@@ -16,7 +16,6 @@
 package nl.clockwork.ebms.xml.dsig;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.xml.security.signature.XMLSignatureInput;
@@ -24,21 +23,22 @@ import org.apache.xml.security.utils.resolver.ResourceResolverContext;
 import org.apache.xml.security.utils.resolver.ResourceResolverException;
 import org.apache.xml.security.utils.resolver.ResourceResolverSpi;
 
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.val;
+import lombok.experimental.FieldDefaults;
 import nl.clockwork.ebms.Constants;
 import nl.clockwork.ebms.model.EbMSAttachment;
 
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@AllArgsConstructor
+@Getter
 public class EbMSAttachmentResolver extends ResourceResolverSpi
 {
-	private List<EbMSAttachment> attachments = new ArrayList<>();
-
-	public EbMSAttachmentResolver()
-	{
-	}
-	
-	public EbMSAttachmentResolver(List<EbMSAttachment> attachments)
-	{
-		this.attachments = attachments;
-	}
+	@NonNull
+	List<EbMSAttachment> attachments;
 
 	@Override
 	public boolean engineCanResolveURI(ResourceResolverContext context)
@@ -53,30 +53,20 @@ public class EbMSAttachmentResolver extends ResourceResolverSpi
 	{
 		if (!context.uriToResolve.startsWith(Constants.CID))
 			throw new ResourceResolverException(context.uriToResolve,new Object[]{"Reference URI does not start with '" + Constants.CID + "'"},context.uriToResolve,context.baseUri);
-
-		EbMSAttachment result = attachments.stream()
+		val result = attachments.stream()
 				.filter(a -> context.uriToResolve.substring(Constants.CID.length()).equals(a.getContentId()))
 				.findFirst()
 				.orElseThrow(() -> new ResourceResolverException(context.uriToResolve,new Object[]{"Reference URI = " + context.uriToResolve + " does not exist!"},context.uriToResolve,context.baseUri));
-
-		XMLSignatureInput input;
 		try
 		{
-			input = new XMLSignatureInput(result.getInputStream());
+			val input = new XMLSignatureInput(result.getInputStream());
+			input.setSourceURI(context.uriToResolve);
+			input.setMIMEType(result.getContentType());
+			return input;
 		}
 		catch (IOException e)
 		{
 			throw new ResourceResolverException(e,context.uriToResolve,context.baseUri,context.uriToResolve);
 		}
-		input.setSourceURI(context.uriToResolve);
-		input.setMIMEType(result.getContentType());
-
-		return input;
 	}
-
-	public List<EbMSAttachment> getAttachments()
-	{
-		return attachments;
-	}
-
 }

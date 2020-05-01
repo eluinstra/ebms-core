@@ -17,36 +17,26 @@ package nl.clockwork.ebms.model;
 
 import java.io.Serializable;
 
-import nl.clockwork.ebms.EbMSMessageEventType;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.NonNull;
+import nl.clockwork.ebms.event.listener.EbMSMessageEventType;
+
+@XmlAccessorType(XmlAccessType.FIELD)
+@Builder(toBuilder = true)
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class EbMSMessageEvent implements Serializable
 {
 	private static final long serialVersionUID = 1L;
-	private String messageId;
-	private EbMSMessageEventType type;
-	
-	public EbMSMessageEvent()
-	{
-	}
-	public EbMSMessageEvent(String messageId, EbMSMessageEventType type)
-	{
-		this.messageId = messageId;
-		this.type = type;
-	}
-	public String getMessageId()
-	{
-		return messageId;
-	}
-	public void setMessageId(String messageId)
-	{
-		this.messageId = messageId;
-	}
-	public EbMSMessageEventType getType()
-	{
-		return type;
-	}
-	public void setType(EbMSMessageEventType type)
-	{
-		this.type = type;
-	}
+	@NonNull
+	String messageId;
+	@NonNull
+	EbMSMessageEventType type;
 }

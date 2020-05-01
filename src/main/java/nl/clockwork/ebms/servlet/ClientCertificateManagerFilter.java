@@ -17,7 +17,6 @@ package nl.clockwork.ebms.servlet;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
@@ -32,12 +31,16 @@ import javax.servlet.ServletResponse;
 
 import org.apache.commons.lang3.StringUtils;
 
+import lombok.AccessLevel;
+import lombok.val;
+import lombok.experimental.FieldDefaults;
 import nl.clockwork.ebms.validation.ClientCertificateManager;
 
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class ClientCertificateManagerFilter implements Filter
 {
-	private String x509CertificateHeader;
-	private boolean useX509Certificate;
+	String x509CertificateHeader;
+	boolean useX509Certificate;
 
 	@Override
 	public void init(FilterConfig filterConfig) throws ServletException
@@ -53,12 +56,12 @@ public class ClientCertificateManagerFilter implements Filter
 		{
 			if (useX509Certificate)
 			{
-				X509Certificate[] certificates = (X509Certificate[])request.getAttribute("javax.servlet.request.X509Certificate");
+				val certificates = (X509Certificate[])request.getAttribute("javax.servlet.request.X509Certificate");
 				ClientCertificateManager.setCertificate(certificates != null && certificates.length > 0 ? certificates[0] : null);
 			}
 			else
 			{
-				X509Certificate certificate = decode(request.getAttribute(x509CertificateHeader));
+				val certificate = decode(request.getAttribute(x509CertificateHeader));
 				ClientCertificateManager.setCertificate(certificate);
 			}
 			chain.doFilter(request,response);
@@ -75,11 +78,11 @@ public class ClientCertificateManagerFilter implements Filter
 		{
 			if (certificate instanceof String)
 			{
-				String s = (String)certificate;
+				val s = (String)certificate;
 				if (StringUtils.isNotBlank(s))
 				{
-					InputStream is = new ByteArrayInputStream(s.getBytes(Charset.defaultCharset()));
-					CertificateFactory cf = CertificateFactory.getInstance("X509");
+					val is = new ByteArrayInputStream(s.getBytes(Charset.defaultCharset()));
+					val cf = CertificateFactory.getInstance("X509");
 					return (X509Certificate)cf.generateCertificate(is);
 				}
 			}

@@ -28,15 +28,19 @@ import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.SyncReplyModeType
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.AckRequested;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.Acknowledgment;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageHeader;
-import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageOrder;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.PartyId;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.Service;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.SyncReply;
 
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.NonNull;
+import lombok.val;
+import lombok.experimental.FieldDefaults;
 import nl.clockwork.ebms.Constants;
 import nl.clockwork.ebms.EbMSAction;
-import nl.clockwork.ebms.EbMSMessageUtils;
 import nl.clockwork.ebms.EbMSErrorCode;
+import nl.clockwork.ebms.EbMSMessageUtils;
 import nl.clockwork.ebms.common.util.StreamUtils;
 import nl.clockwork.ebms.cpa.CPAManager;
 import nl.clockwork.ebms.cpa.CPAUtils;
@@ -44,17 +48,21 @@ import nl.clockwork.ebms.dao.EbMSDAO;
 import nl.clockwork.ebms.model.CacheablePartyId;
 import nl.clockwork.ebms.model.EbMSMessage;
 
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@AllArgsConstructor
 public class MessageHeaderValidator
 {
-	protected EbMSDAO ebMSDAO;
-	protected CPAManager cpaManager;
+	@NonNull
+	EbMSDAO ebMSDAO;
+	@NonNull
+	CPAManager cpaManager;
 
 	public void validate(EbMSMessage message, Date timestamp) throws EbMSValidationException
 	{
-		MessageHeader messageHeader = message.getMessageHeader();
-		AckRequested ackRequested = message.getAckRequested();
-		SyncReply syncReply = message.getSyncReply();
-		MessageOrder messageOrder = message.getMessageOrder();
+		val messageHeader = message.getMessageHeader();
+		val ackRequested = message.getAckRequested();
+		val syncReply = message.getSyncReply();
+		val messageOrder = message.getMessageOrder();
 		
 		if (!Constants.EBMS_VERSION.equals(messageHeader.getVersion()))
 			throw new EbMSValidationException(
@@ -78,12 +86,12 @@ public class MessageHeaderValidator
 			throw new EbMSValidationException(
 					EbMSMessageUtils.createError("//Header/MessageHeader/Action",EbMSErrorCode.INCONSISTENT,"Invalid value."));
 		
-		CacheablePartyId fromPartyId = new CacheablePartyId(messageHeader.getFrom().getPartyId());
+		val fromPartyId = new CacheablePartyId(messageHeader.getFrom().getPartyId());
 		cpaManager.getPartyInfo(messageHeader.getCPAId(),fromPartyId).orElseThrow(() -> new EbMSValidationException(EbMSMessageUtils.createError("//Header/MessageHeader/From/PartyId",EbMSErrorCode.INCONSISTENT,"Value not found.")));
-		CacheablePartyId toPartyId = new CacheablePartyId(messageHeader.getTo().getPartyId());
+		val toPartyId = new CacheablePartyId(messageHeader.getTo().getPartyId());
 		cpaManager.getPartyInfo(messageHeader.getCPAId(),toPartyId).orElseThrow(() -> new EbMSValidationException(EbMSMessageUtils.createError("//Header/MessageHeader/To/PartyId",EbMSErrorCode.INCONSISTENT,"Value not found.")));
 
-		String service = CPAUtils.toString(messageHeader.getService());
+		val service = CPAUtils.toString(messageHeader.getService());
 		if (!Constants.EBMS_SERVICE_URI.equals(messageHeader.getService().getValue()))
 		{
 			if (!cpaManager.canSend(messageHeader.getCPAId(),fromPartyId,messageHeader.getFrom().getRole(),service,messageHeader.getAction()))
@@ -94,11 +102,11 @@ public class MessageHeaderValidator
 						EbMSMessageUtils.createError("//Header/MessageHeader/Action",EbMSErrorCode.VALUE_NOT_RECOGNIZED,"Value not found."));
 		}
 
-		DeliveryChannel deliveryChannel = cpaManager.getSendDeliveryChannel(messageHeader.getCPAId(),fromPartyId,messageHeader.getFrom().getRole(),service,messageHeader.getAction())
+		val deliveryChannel = cpaManager.getSendDeliveryChannel(messageHeader.getCPAId(),fromPartyId,messageHeader.getFrom().getRole(),service,messageHeader.getAction())
 				.orElseThrow(() -> StreamUtils.illegalStateException("SendDeliveryChannel",messageHeader.getCPAId(),fromPartyId,messageHeader.getFrom().getRole(),service,messageHeader.getAction()));
 		if (deliveryChannel == null)
 			throw new EbMSValidationException(
-					EbMSMessageUtils.createError(EbMSErrorCode.UNKNOWN.errorCode(),EbMSErrorCode.UNKNOWN,"No DeliveryChannel found."));
+					EbMSMessageUtils.createError(EbMSErrorCode.UNKNOWN.getErrorCode(),EbMSErrorCode.UNKNOWN,"No DeliveryChannel found."));
 		if (!Constants.EBMS_SERVICE_URI.equals(messageHeader.getService().getValue()))
 		{
 			if (!existsRefToMessageId(messageHeader.getMessageData().getRefToMessageId()))
@@ -146,9 +154,9 @@ public class MessageHeaderValidator
 //				throw new EbMSValidationException(
 //						EbMSMessageUtils.createError("//Header/MessageOrder/@version",Constants.EbMSErrorCode.INCONSISTENT,"Invalid value."));
 		}
-		if (Constants.EBMS_SERVICE_URI.equals(messageHeader.getService().getValue()) && EbMSAction.ACKNOWLEDGMENT.action().equals(messageHeader.getAction()))
+		if (Constants.EBMS_SERVICE_URI.equals(messageHeader.getService().getValue()) && EbMSAction.ACKNOWLEDGMENT.getAction().equals(messageHeader.getAction()))
 		{
-			Acknowledgment acknowledgment = message.getAcknowledgment();
+			val acknowledgment = message.getAcknowledgment();
 			if (acknowledgment != null && !Constants.EBMS_VERSION.equals(acknowledgment.getVersion()))
 				throw new EbMSValidationException(
 						EbMSMessageUtils.createError("//Header/Acknowledgment/@version",EbMSErrorCode.INCONSISTENT,"Invalid value."));
@@ -261,28 +269,18 @@ public class MessageHeaderValidator
 
 	private void compare(List<PartyId> requestPartyIds, List<PartyId> responsePartyIds) throws ValidationException
 	{
-		boolean anyMatch = requestPartyIds.stream()
+		val anyMatch = requestPartyIds.stream()
 				.map(req -> EbMSMessageUtils.toString(req))
 				.anyMatch(req -> responsePartyIds.stream().map(res -> EbMSMessageUtils.toString(res)).anyMatch(res -> req.equals(res)));
 		if (!anyMatch)
 			throw new ValidationException("Request PartyIds do not match response PartyIds");
     
-//		HashSet<PartyId> request = new HashSet<>(requestPartyIds);
-//		HashSet<PartyId> response = new HashSet<>(responsePartyIds);
-//		boolean allMatch = request.size() == response.size() && request.stream()
+//		val request = new HashSet<PartyId>(requestPartyIds);
+//		val response = new HashSet<PartyId>(responsePartyIds);
+//		val allMatch = request.size() == response.size() && request.stream()
 //				.map(req -> EbMSMessageUtils.toString(req))
 //				.allMatch(req -> response.stream().map(res -> EbMSMessageUtils.toString(res)).anyMatch(res -> req.equals(res)));
 //		if (!allMatch)
 //			throw new ValidationException("Request PartyIds do not match response PartyIds");
-	}
-
-	public void setEbMSDAO(EbMSDAO ebMSDAO)
-	{
-		this.ebMSDAO = ebMSDAO;
-	}
-
-	public void setCpaManager(CPAManager cpaManager)
-	{
-		this.cpaManager = cpaManager;
 	}
 }

@@ -18,34 +18,36 @@ package nl.clockwork.ebms.server;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.NonNull;
+import lombok.val;
+import lombok.experimental.FieldDefaults;
 import nl.clockwork.ebms.processor.EbMSMessageProcessor;
 import nl.clockwork.ebms.processor.EbMSProcessorException;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@AllArgsConstructor
 public class EbMSHttpHandler
 {
-	protected transient Log logger = LogFactory.getLog(getClass());
-	private EbMSMessageProcessor messageProcessor;
+	@NonNull
+	EbMSMessageProcessor messageProcessor;
 
 	public void handle(final HttpServletRequest request, final HttpServletResponse response) throws EbMSProcessorException
 	{
 		try
 		{
-			EbMSInputStreamHandler inputStreamHandler = new EbMSInputStreamHandler(messageProcessor)
+			val inputStreamHandler = new EbMSInputStreamHandler(messageProcessor)
 			{
 				@Override
 				public List<String> getRequestHeaderNames()
 				{
-					List<String> result = new ArrayList<>();
-					Enumeration<?> headerNames = request.getHeaderNames();
+					val result = new ArrayList<String>();
+					val headerNames = request.getHeaderNames();
 					while (headerNames.hasMoreElements())
 						result.add((String)headerNames.nextElement());
 					return result;
@@ -54,8 +56,8 @@ public class EbMSHttpHandler
 				@Override
 				public List<String> getRequestHeaders(String headerName)
 				{
-					List<String> result = new ArrayList<>();
-					Enumeration<?> headers = ((HttpServletRequest)request).getHeaders(headerName);
+					val result = new ArrayList<String>();
+					val headers = ((HttpServletRequest)request).getHeaders(headerName);
 					while(headers.hasMoreElements())
 						result.add((String)headers.nextElement());
 					return result;
@@ -98,10 +100,5 @@ public class EbMSHttpHandler
 		{
 			throw new EbMSProcessorException(e);
 		}
-	}
-	
-	public void setMessageProcessor(EbMSMessageProcessor messageProcessor)
-	{
-		this.messageProcessor = messageProcessor;
 	}
 }

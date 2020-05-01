@@ -21,7 +21,6 @@ import javax.xml.bind.annotation.adapters.XmlAdapter;
 
 public class EbMSDateTimeAdapter extends XmlAdapter<String,Date>
 {
-
 	public Date unmarshal(String value)
 	{
 		return (EbMSDateTimeConverter.parseDateTime(value));
@@ -31,5 +30,4 @@ public class EbMSDateTimeAdapter extends XmlAdapter<String,Date>
 	{
 		return (EbMSDateTimeConverter.printDateTime(value));
 	}
-
 }

@@ -37,9 +37,7 @@ import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
-import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
@@ -49,18 +47,21 @@ import org.w3c.dom.Node;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
+import lombok.val;
+import lombok.var;
+
 public class DOMUtils
 {
 	public static DocumentBuilder getDocumentBuilder() throws ParserConfigurationException
 	{
-		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-		dbf.setNamespaceAware(true);
-		return dbf.newDocumentBuilder();
+		val factory = DocumentBuilderFactory.newInstance();
+		factory.setNamespaceAware(true);
+		return factory.newDocumentBuilder();
 	}
 	
 	public static Transformer getTransformer() throws TransformerConfigurationException, TransformerFactoryConfigurationError
 	{
-		Transformer result = TransformerFactory.newInstance().newTransformer();
+		val result = TransformerFactory.newInstance().newTransformer();
 		result.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION,"yes");
 		//result.setOutputProperty(OutputKeys.METHOD,"xml");
 		//result.setOutputProperty(OutputKeys.INDENT,"yes");
@@ -70,7 +71,7 @@ public class DOMUtils
 
 	public static Transformer getTransformer(String xslFile) throws TransformerConfigurationException, TransformerFactoryConfigurationError
 	{
-		Transformer result = TransformerFactory.newInstance().newTransformer(new StreamSource(DOMUtils.class.getResourceAsStream(xslFile)));
+		val result = TransformerFactory.newInstance().newTransformer(new StreamSource(DOMUtils.class.getResourceAsStream(xslFile)));
 		result.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION,"yes");
 		//result.setOutputProperty(OutputKeys.METHOD,"xml");
 		//result.setOutputProperty(OutputKeys.INDENT,"yes");
@@ -80,7 +81,7 @@ public class DOMUtils
 
 	public static Element getFirstChildElement(Node node)
 	{
-		Node child = node.getFirstChild();
+		var child = node.getFirstChild();
 		while ((child != null) && (child.getNodeType() != Node.ELEMENT_NODE))
 			child = child.getNextSibling();
 		return (Element)child;
@@ -88,28 +89,28 @@ public class DOMUtils
 	
 	public static Document read(String s) throws ParserConfigurationException, SAXException, IOException
 	{
-		DocumentBuilder db = getDocumentBuilder();
+		val db = getDocumentBuilder();
 		return db.parse(new InputSource(new StringReader(s)));
 	}
 
 	public static Document read(String s, String encoding) throws ParserConfigurationException, SAXException, IOException
 	{
-		DocumentBuilder db = getDocumentBuilder();
-		InputSource is = new InputSource(new ByteArrayInputStream(s.getBytes(encoding)));
+		val db = getDocumentBuilder();
+		val is = new InputSource(new ByteArrayInputStream(s.getBytes(encoding)));
 		is.setEncoding(encoding);
 		return db.parse(is);
 	}
 
 	public static Document read(InputStream stream) throws ParserConfigurationException, SAXException, IOException
 	{
-		DocumentBuilder db = getDocumentBuilder();
+		val db = getDocumentBuilder();
 		return db.parse(stream);
 	}
 
 	public static Document read(InputStream stream, String encoding) throws ParserConfigurationException, SAXException, IOException
 	{
-		DocumentBuilder db = getDocumentBuilder();
-		InputSource is = new InputSource(stream);
+		val db = getDocumentBuilder();
+		val is = new InputSource(stream);
 		is.setEncoding(encoding);
 		return db.parse(is);
 	}
@@ -117,8 +118,8 @@ public class DOMUtils
 	public static String toString(Document document) throws TransformerException
 	{
 		//return document.getDocumentElement().toString();
-		StringWriter writer = new StringWriter();
-		Transformer transformer = getTransformer();
+		val writer = new StringWriter();
+		val transformer = getTransformer();
 		transformer.transform(new DOMSource(document),new StreamResult(writer));
 		return writer.toString();
 	}
@@ -126,8 +127,8 @@ public class DOMUtils
 	public static String toString(Document document, String encoding) throws TransformerException
 	{
 		//return document.getDocumentElement().toString();
-		StringWriter writer = new StringWriter();
-		Transformer transformer = getTransformer();
+		val writer = new StringWriter();
+		val transformer = getTransformer();
 		transformer.setOutputProperty(OutputKeys.ENCODING,encoding);
 		transformer.transform(new DOMSource(document),new StreamResult(writer));
 		return writer.toString();
@@ -135,26 +136,26 @@ public class DOMUtils
 
 	public static void write(Document document, OutputStream outputStream) throws TransformerException
 	{
-		Transformer transformer = getTransformer();
+		val transformer = getTransformer();
 		transformer.transform(new DOMSource(document),new StreamResult(outputStream));
 	}
 
 	public static void write(Document document, OutputStream outputStream, String encoding) throws TransformerException
 	{
-		Transformer transformer = getTransformer();
+		val transformer = getTransformer();
 		transformer.setOutputProperty(OutputKeys.ENCODING,encoding);
 		transformer.transform(new DOMSource(document),new StreamResult(outputStream));
 	}
 
 	public static void write(Document document, Writer writer) throws TransformerException
 	{
-		Transformer transformer = getTransformer();
+		val transformer = getTransformer();
 		transformer.transform(new DOMSource(document),new StreamResult(writer));
 	}
 	
 	public static void write(Document document, Writer writer, String encoding) throws TransformerException
 	{
-		Transformer transformer = getTransformer();
+		val transformer = getTransformer();
 		transformer.setOutputProperty(OutputKeys.ENCODING,encoding);
 		transformer.transform(new DOMSource(document),new StreamResult(writer));
 	}
@@ -166,9 +167,9 @@ public class DOMUtils
 
 	public static Object executeXPathQuery(NamespaceContext namespaceContext, Document document, String query, QName returnType) throws ParserConfigurationException, SAXException, IOException, XPathExpressionException
 	{
-		XPath xpath = XPathFactory.newInstance().newXPath();
+		val xpath = XPathFactory.newInstance().newXPath();
 		xpath.setNamespaceContext(namespaceContext);
-		XPathExpression expr = xpath.compile(query);
+		val expr = xpath.compile(query);
 		return (Node)expr.evaluate(document,returnType);
 	}
 

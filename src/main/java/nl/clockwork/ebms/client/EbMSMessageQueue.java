@@ -20,5 +20,8 @@ import nl.clockwork.ebms.model.EbMSMessage;
 
 public class EbMSMessageQueue extends MessageQueue<EbMSMessage>
 {
-
+	public EbMSMessageQueue(int maxEntries, int timeout)
+	{
+		super(maxEntries,timeout);
+	}
 }

@@ -19,19 +19,26 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
 
+import org.springframework.util.StringUtils;
+
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.NonNull;
+import lombok.experimental.FieldDefaults;
+import net.sf.ehcache.Ehcache;
 import nl.clockwork.ebms.common.InvalidURLException;
 import nl.clockwork.ebms.common.MethodCacheInterceptor;
 import nl.clockwork.ebms.dao.EbMSDAO;
 import nl.clockwork.ebms.model.URLMapping;
 
-import org.springframework.util.StringUtils;
-
-import net.sf.ehcache.Ehcache;
-
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@AllArgsConstructor
 public class URLMapper
 {
-	private Ehcache daoMethodCache;
-	private EbMSDAO ebMSDAO;
+	@NonNull
+	Ehcache daoMethodCache;
+	@NonNull
+	EbMSDAO ebMSDAO;
 
 	public List<URLMapping> getURLs()
 	{
@@ -93,15 +100,4 @@ public class URLMapper
 		daoMethodCache.remove(MethodCacheInterceptor.getCacheKey("EbMSDAOImpl","getURLMapping",source));
 		daoMethodCache.remove(MethodCacheInterceptor.getCacheKey("EbMSDAOImpl","getURLMappings"));
 	}
-
-	public void setDaoMethodCache(Ehcache daoMethodCache)
-	{
-		this.daoMethodCache = daoMethodCache;
-	}
-
-	public void setEbMSDAO(EbMSDAO ebMSDAO)
-	{
-		this.ebMSDAO = ebMSDAO;
-	}
-
 }

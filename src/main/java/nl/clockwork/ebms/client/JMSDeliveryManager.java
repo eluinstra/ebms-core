@@ -28,37 +28,55 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.xpath.XPathExpressionException;
 
-import nl.clockwork.ebms.Constants;
-import nl.clockwork.ebms.EbMSMessageUtils;
-import nl.clockwork.ebms.model.EbMSDocument;
-import nl.clockwork.ebms.model.EbMSMessage;
-import nl.clockwork.ebms.processor.EbMSProcessingException;
-import nl.clockwork.ebms.processor.EbMSProcessorException;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageHeader;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jms.core.MessagePostProcessor;
 import org.xml.sax.SAXException;
 
-public class JMSDeliveryManager extends DeliveryManager //DeliveryService
+import lombok.AccessLevel;
+import lombok.NonNull;
+import lombok.val;
+import lombok.experimental.FieldDefaults;
+import lombok.extern.apachecommons.CommonsLog;
+import nl.clockwork.ebms.Constants;
+import nl.clockwork.ebms.EbMSMessageUtils;
+import nl.clockwork.ebms.common.MessageQueue;
+import nl.clockwork.ebms.cpa.CPAManager;
+import nl.clockwork.ebms.model.EbMSMessage;
+import nl.clockwork.ebms.processor.EbMSProcessingException;
+import nl.clockwork.ebms.processor.EbMSProcessorException;
+
+@CommonsLog
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+public class JMSDeliveryManager extends DeliveryManager
 {
 	private static final String MESSAGE = "MESSAGE";
-	private transient Log logger = LogFactory.getLog(getClass());
-	private JmsTemplate jmsTemplate;
+	@NonNull
+	JmsTemplate jmsTemplate;
+
+	public JMSDeliveryManager(
+			Integer maxThreads,
+			Integer processorsScaleFactor,
+			Integer queueScaleFactor,
+			MessageQueue<EbMSMessage> messageQueue,
+			CPAManager cpaManager,
+			EbMSHttpClientFactory ebMSClientFactory,
+			@NonNull JmsTemplate jmsTemplate)
+	{
+		super(maxThreads,processorsScaleFactor,queueScaleFactor,messageQueue,cpaManager,ebMSClientFactory);
+		this.jmsTemplate = jmsTemplate;
+	}
 
 	@Override
 	public Optional<EbMSMessage> sendMessage(final EbMSMessage message) throws EbMSProcessorException
 	{
 		try
 		{
-			MessageHeader messageHeader = message.getMessageHeader();
-			final String uri = getUri(messageHeader);
+			val messageHeader = message.getMessageHeader();
+			val uri = getUri(messageHeader);
 			if (message.getSyncReply() == null)
 			{
-				logger.info("Sending message " + messageHeader.getMessageData().getMessageId() + " to " + uri);
-				EbMSDocument document = createClient(messageHeader).sendMessage(uri,EbMSMessageUtils.getEbMSDocument(message));
+				log.info("Sending message " + messageHeader.getMessageData().getMessageId() + " to " + uri);
+				val document = createClient(messageHeader).sendMessage(uri,EbMSMessageUtils.getEbMSDocument(message));
 				if (document == null)
 				{
 					jmsTemplate.setReceiveTimeout(3 * Constants.MINUTE_IN_MILLIS);
@@ -69,8 +87,8 @@ public class JMSDeliveryManager extends DeliveryManager //DeliveryService
 			}
 			else
 			{
-				logger.info("Sending message " + messageHeader.getMessageData().getMessageId() + " to " + uri);
-				EbMSDocument response = createClient(messageHeader).sendMessage(uri,EbMSMessageUtils.getEbMSDocument(message));
+				log.info("Sending message " + messageHeader.getMessageData().getMessageId() + " to " + uri);
+				val response = createClient(messageHeader).sendMessage(uri,EbMSMessageUtils.getEbMSDocument(message));
 				if (response != null)
 					return Optional.of(EbMSMessageUtils.getEbMSMessage(response));
 			}
@@ -110,20 +128,14 @@ public class JMSDeliveryManager extends DeliveryManager //DeliveryService
 		{
 			try
 			{
-				logger.info("Sending message " + response.getMessageHeader().getMessageData().getMessageId() + " to " + uri);
+				log.info("Sending message " + response.getMessageHeader().getMessageData().getMessageId() + " to " + uri);
 				createClient(response.getMessageHeader()).sendMessage(uri,EbMSMessageUtils.getEbMSDocument(response));
 			}
 			catch (Exception e)
 			{
-				logger.error("",e);
+				log.error("",e);
 			}
 		};
 		executorService.execute(command);
 	}
-
-	public void setJmsTemplate(JmsTemplate jmsTemplate)
-	{
-		this.jmsTemplate = jmsTemplate;
-	}
-
 }

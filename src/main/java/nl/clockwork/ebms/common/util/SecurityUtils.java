@@ -17,36 +17,32 @@ package nl.clockwork.ebms.common.util;
 
 import java.io.UnsupportedEncodingException;
 import java.security.GeneralSecurityException;
-import java.security.Key;
 import java.security.KeyPair;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
-import java.security.PublicKey;
-import java.security.cert.Certificate;
 import java.security.cert.CertificateExpiredException;
 import java.security.cert.CertificateNotYetValidException;
 import java.security.cert.X509Certificate;
 import java.util.Date;
-import java.util.Enumeration;
 
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import javax.security.cert.CertificateException;
 
 import org.apache.commons.codec.digest.DigestUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.xml.security.encryption.XMLCipher;
 
+import lombok.val;
+import lombok.extern.apachecommons.CommonsLog;
 import nl.clockwork.ebms.security.EbMSKeyStore;
 import nl.clockwork.ebms.security.EbMSTrustStore;
 import nl.clockwork.ebms.validation.ValidationException;
 import nl.clockwork.ebms.validation.ValidatorException;
 
+@CommonsLog
 public class SecurityUtils
 {
-	private static final Log logger = LogFactory.getLog(SecurityUtils.class);
 	private static final int KEYSIZE_192 = 192;
 	private static final int KEYSIZE_128 = 128;
 	private static final int KEYSIZE_256 = 256;
@@ -54,11 +50,11 @@ public class SecurityUtils
 
 	public static KeyPair getKeyPair(EbMSKeyStore keyStore, String alias, String password) throws GeneralSecurityException
 	{
-		Key key = keyStore.getKey(alias,password.toCharArray());
+		val key = keyStore.getKey(alias,password.toCharArray());
 		if (key instanceof PrivateKey)
 		{
-			Certificate cert = keyStore.getCertificate(alias);
-			PublicKey publicKey = cert.getPublicKey();
+			val cert = keyStore.getCertificate(alias);
+			val publicKey = cert.getPublicKey();
 			return new KeyPair(publicKey,(PrivateKey)key);
 		}
 		return null;
@@ -69,12 +65,12 @@ public class SecurityUtils
 		try
 		{
 			certificate.checkValidity(date);
-			Enumeration<String> aliases = trustStore.aliases();
+			val aliases = trustStore.aliases();
 			while (aliases.hasMoreElements())
 			{
 				try
 				{
-					Certificate c = trustStore.getCertificate(aliases.nextElement());
+					val c = trustStore.getCertificate(aliases.nextElement());
 					if (c instanceof X509Certificate)
 						if (certificate.getIssuerDN().getName().equals(((X509Certificate)c).getSubjectDN().getName()))
 						{
@@ -84,7 +80,7 @@ public class SecurityUtils
 				}
 				catch (GeneralSecurityException e)
 				{
-					logger.trace("",e);
+					log.trace("",e);
 				}
 			}
 			throw new ValidationException("Certificate " + certificate.getIssuerDN() + " not found!");
@@ -100,12 +96,12 @@ public class SecurityUtils
 		try
 		{
 			certificate.checkValidity(date);
-			Enumeration<String> aliases = trustStore.aliases();
+			val aliases = trustStore.aliases();
 			while (aliases.hasMoreElements())
 			{
 				try
 				{
-					Certificate c = trustStore.getCertificate(aliases.nextElement());
+					val c = trustStore.getCertificate(aliases.nextElement());
 					if (c instanceof X509Certificate)
 						if (certificate.getIssuerDN().getName().equals(((X509Certificate)c).getSubjectDN().getName()))
 						{
@@ -115,7 +111,7 @@ public class SecurityUtils
 				}
 				catch (GeneralSecurityException | CertificateException e)
 				{
-					logger.trace("",e);
+					log.trace("",e);
 				}
 			}
 			throw new ValidationException("Certificate " + certificate.getIssuerDN() + " not found!");
@@ -145,7 +141,7 @@ public class SecurityUtils
 
 	private static SecretKey generateKey(String algorithm, int keysize) throws NoSuchAlgorithmException
 	{
-		KeyGenerator keyGenerator = KeyGenerator.getInstance(algorithm);
+		val keyGenerator = KeyGenerator.getInstance(algorithm);
 		keyGenerator.init(keysize);
 		return keyGenerator.generateKey();
 	}

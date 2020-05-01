@@ -15,34 +15,32 @@
  */
 package nl.clockwork.ebms.event.listener;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import lombok.extern.apachecommons.CommonsLog;
 
+@CommonsLog
 public class LoggingEventListener implements EventListener
 {
-	protected transient Log logger = LogFactory.getLog(getClass());
-
 	@Override
 	public void onMessageReceived(String messageId) throws EventException
 	{
-		logger.info("Message " + messageId + " received");
+		log.info("Message " + messageId + " received");
 	}
 
 	@Override
 	public void onMessageDelivered(String messageId) throws EventException
 	{
-		logger.info("Message " + messageId + " delivered");
+		log.info("Message " + messageId + " delivered");
 	}
 	
 	@Override
 	public void onMessageFailed(String messageId) throws EventException
 	{
-		logger.info("Message " + messageId + " failed");
+		log.info("Message " + messageId + " failed");
 	}
 
 	@Override
 	public void onMessageExpired(String messageId) throws EventException
 	{
-		logger.info("Message " + messageId + " expired");
+		log.info("Message " + messageId + " expired");
 	}
 }

@@ -19,11 +19,9 @@ import javax.jws.WebMethod;
 import javax.jws.WebParam;
 import javax.jws.WebService;
 
-
-@WebService(targetNamespace="http://www.clockwork.nl/ebms/event/2.13")
+@WebService(targetNamespace="http://www.clockwork.nl/ebms/event/2.17")
 public interface EbMSEventListenerService extends EventListener
 {
-
 	@Override
 	@WebMethod(operationName="MessageReceived")
 	void onMessageReceived(@WebParam(name="MessageId") String messageId) throws EbMSEventListenerServiceException;
@@ -39,5 +37,4 @@ public interface EbMSEventListenerService extends EventListener
 	@Override
 	@WebMethod(operationName="MessageExpired")
 	void onMessageExpired(@WebParam(name="MessageId") String messageId) throws EbMSEventListenerServiceException;
-
 }

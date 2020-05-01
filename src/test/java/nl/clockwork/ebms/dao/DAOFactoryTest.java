@@ -22,10 +22,19 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import com.mchange.v2.c3p0.ComboPooledDataSource;
 
-public class DAOFactoryTest {
+import lombok.AccessLevel;
+import lombok.val;
+import lombok.experimental.FieldDefaults;
+
+@FieldDefaults(level = AccessLevel.PRIVATE)
+public class DAOFactoryTest
+{
 	EbMSDAOFactory daoFactory;
 	ComboPooledDataSource ds;
 	EbMSDAO dao;
@@ -33,9 +42,10 @@ public class DAOFactoryTest {
 	@BeforeEach
 	public void init()
 	{
-		daoFactory = new EbMSDAOFactory();
 		ds = new ComboPooledDataSource();
-		daoFactory.setDataSource(ds);
+		val tt = new TransactionTemplate(new DataSourceTransactionManager(ds));
+		val jt = new JdbcTemplate(ds);
+		daoFactory = new EbMSDAOFactory(ds,tt,jt);
 	}
 
 	@Test

@@ -25,7 +25,6 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
-import javax.xml.bind.Unmarshaller;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
@@ -35,15 +34,17 @@ import org.w3c.dom.Node;
 
 import com.sun.xml.bind.marshaller.NamespacePrefixMapper;
 
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.val;
+import lombok.experimental.FieldDefaults;
+
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class JAXBParser<T>
 {
 	private static HashMap<Class<?>,JAXBParser<?>> xmlHandlers = new HashMap<>();
-	private JAXBContext context;
-
-	private JAXBParser(JAXBContext context)
-	{
-		this.context = context;
-	}
+	JAXBContext context;
 
 	public T handle(String xml) throws JAXBException
 	{
@@ -77,10 +78,10 @@ public class JAXBParser<T>
 	{
 		if (is == null)
 			return null;
-		Unmarshaller unmarshaller = context.createUnmarshaller();
+		val unmarshaller = context.createUnmarshaller();
 		if (schema != null)
 			unmarshaller.setSchema(schema);
-		Object o = clazz == null ? unmarshaller.unmarshal(is) : unmarshaller.unmarshal(new StreamSource(is),clazz);
+		val o = clazz == null ? unmarshaller.unmarshal(is) : unmarshaller.unmarshal(new StreamSource(is),clazz);
 		if (o instanceof JAXBElement<?>)
 			return ((JAXBElement<T>)o).getValue();
 		else
@@ -107,10 +108,10 @@ public class JAXBParser<T>
 	{
 		if (r == null)
 			return null;
-		Unmarshaller unmarshaller = context.createUnmarshaller();
+		val unmarshaller = context.createUnmarshaller();
 		if (schema != null)
 			unmarshaller.setSchema(schema);
-		Object o = clazz == null ? unmarshaller.unmarshal(r) : unmarshaller.unmarshal(new StreamSource(r),clazz);
+		val o = clazz == null ? unmarshaller.unmarshal(r) : unmarshaller.unmarshal(new StreamSource(r),clazz);
 		if (o instanceof JAXBElement<?>)
 			return ((JAXBElement<T>)o).getValue();
 		else
@@ -137,10 +138,10 @@ public class JAXBParser<T>
 	{
 		if (r == null)
 			return null;
-		Unmarshaller unmarshaller = context.createUnmarshaller();
+		val unmarshaller = context.createUnmarshaller();
 		if (schema != null)
 			unmarshaller.setSchema(schema);
-		Object o = clazz == null ? unmarshaller.unmarshal(r) : unmarshaller.unmarshal(r,clazz);
+		val o = clazz == null ? unmarshaller.unmarshal(r) : unmarshaller.unmarshal(r,clazz);
 		if (o instanceof JAXBElement<?>)
 			return ((JAXBElement<T>)o).getValue();
 		else
@@ -157,10 +158,10 @@ public class JAXBParser<T>
 	{
 		if (n == null)
 			return null;
-		Unmarshaller unmarshaller = context.createUnmarshaller();
+		val unmarshaller = context.createUnmarshaller();
 		if (schema != null)
 			unmarshaller.setSchema(schema);
-		Object o = unmarshaller.unmarshal(n);
+		val o = unmarshaller.unmarshal(n);
 		if (o instanceof JAXBElement<?>)
 			return ((JAXBElement<T>)o).getValue();
 		else
@@ -171,8 +172,8 @@ public class JAXBParser<T>
 	{
 		if (e == null)
 			return null;
-		StringWriter result = new StringWriter();
-		Marshaller marshaller = context.createMarshaller();
+		val result = new StringWriter();
+		val marshaller = context.createMarshaller();
 		marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT,Boolean.TRUE);
 		marshaller.marshal(e,result);
 		result.flush();
@@ -183,8 +184,8 @@ public class JAXBParser<T>
 	{
 		if (e == null)
 			return null;
-		StringWriter result = new StringWriter();
-		Marshaller marshaller = context.createMarshaller();
+		val result = new StringWriter();
+		val marshaller = context.createMarshaller();
 		marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT,Boolean.TRUE);
 		if (namespacePrefixMapper != null)
 			marshaller.setProperty("com.sun.xml.bind.namespacePrefixMapper",namespacePrefixMapper);
@@ -197,8 +198,8 @@ public class JAXBParser<T>
 	{
 		if (object == null)
 			return null;
-		StringWriter result = new StringWriter();
-		Marshaller marshaller = context.createMarshaller();
+		val result = new StringWriter();
+		val marshaller = context.createMarshaller();
 		marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT,Boolean.TRUE);
 		marshaller.marshal(object,result);
 		result.flush();
@@ -209,8 +210,8 @@ public class JAXBParser<T>
 	{
 		if (object == null)
 			return null;
-		StringWriter result = new StringWriter();
-		Marshaller marshaller = context.createMarshaller();
+		val result = new StringWriter();
+		val marshaller = context.createMarshaller();
 		marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT,Boolean.TRUE);
 		marshaller.setProperty("com.sun.xml.bind.namespacePrefixMapper",namespacePrefixMapper);
 		marshaller.marshal(object,result);
@@ -223,7 +224,7 @@ public class JAXBParser<T>
 	{
 		if (xmlHandlers.get(clazz) == null)
 		{
-			JAXBContext context = JAXBContext.newInstance(clazz);
+			val context = JAXBContext.newInstance(clazz);
 			xmlHandlers.put(clazz,new JAXBParser<L>(context));
 		}
 		return (JAXBParser<L>)xmlHandlers.get(clazz);
@@ -234,7 +235,7 @@ public class JAXBParser<T>
 	{
 		if (xmlHandlers.get(clazz) == null)
 		{
-			JAXBContext context = JAXBContext.newInstance(clazzes);
+			val context = JAXBContext.newInstance(clazzes);
 			xmlHandlers.put(clazz,new JAXBParser<L>(context));
 		}
 		return (JAXBParser<L>)xmlHandlers.get(clazz);

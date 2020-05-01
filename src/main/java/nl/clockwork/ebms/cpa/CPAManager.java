@@ -19,15 +19,18 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
-import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CanSend;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CollaborationProtocolAgreement;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DeliveryChannel;
-import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DocExchange;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.PartyInfo;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.PersistenceLevelType;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.StatusValueType;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.SyncReplyModeType;
 
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.NonNull;
+import lombok.val;
+import lombok.experimental.FieldDefaults;
 import net.sf.ehcache.Ehcache;
 import nl.clockwork.ebms.Constants;
 import nl.clockwork.ebms.common.MethodCacheInterceptor;
@@ -40,12 +43,18 @@ import nl.clockwork.ebms.model.Party;
 import nl.clockwork.ebms.model.Role;
 import nl.clockwork.ebms.model.ToPartyInfo;
 
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@AllArgsConstructor
 public class CPAManager
 {
-	private Ehcache daoMethodCache;
-	private Ehcache cpaMethodCache;
-	private EbMSDAO ebMSDAO;
-	private URLMapper urlMapper;
+	@NonNull
+	Ehcache daoMethodCache;
+	@NonNull
+	Ehcache cpaMethodCache;
+	@NonNull
+	EbMSDAO ebMSDAO;
+	@NonNull
+	URLMapper urlMapper;
 
 	public boolean existsCPA(String cpaId)
 	{
@@ -70,21 +79,21 @@ public class CPAManager
 
 	public int updateCPA(CollaborationProtocolAgreement cpa)
 	{
-		int result = ebMSDAO.updateCPA(cpa);
+		val result = ebMSDAO.updateCPA(cpa);
 		flushCPAMethodCache(cpa.getCpaid());
 		return result;
 	}
 
 	public int deleteCPA(String cpaId)
 	{
-		int result = ebMSDAO.deleteCPA(cpaId);
+		val result = ebMSDAO.deleteCPA(cpaId);
 		flushCPAMethodCache(cpaId);
 		return result;
 	}
 
 	public boolean isValid(String cpaId, Date timestamp)
 	{
-		Optional<CollaborationProtocolAgreement> cpa = getCPA(cpaId);
+		val cpa = getCPA(cpaId);
 		return cpa
 				.map(c -> StatusValueType.AGREED.equals(c.getStatus().getValue())
 						&& timestamp.compareTo(c.getStart()) >= 0
@@ -115,7 +124,7 @@ public class CPAManager
 
 	private EbMSPartyInfo createEbMSPartyInfo(Party party, PartyInfo partyInfo)
 	{
-		EbMSPartyInfo result = new EbMSPartyInfo();
+		val result = new EbMSPartyInfo();
 		result.setPartyIds(CPAUtils.toPartyId(party.getPartyId(partyInfo.getPartyId())));
 		result.setRole(party.getRole());
 		return result;
@@ -132,7 +141,7 @@ public class CPAManager
 	
 	public Optional<Party> getFromParty(String cpaId, Role fromRole, String service, String action)
 	{
-		String partyId = fromRole.getPartyId() == null ? CPAUtils.toString(getFromPartyInfo(cpaId,fromRole,service,action)
+		val partyId = fromRole.getPartyId() == null ? CPAUtils.toString(getFromPartyInfo(cpaId,fromRole,service,action)
 				.orElseThrow(() -> StreamUtils.illegalStateException("FromPartyInfo",cpaId,fromRole,service,action)).getPartyIds().get(0)) :
 					fromRole.getPartyId();
 		return Optional.of(partyId)
@@ -141,7 +150,7 @@ public class CPAManager
 	
 	public Optional<Party> getToParty(String cpaId, Role toRole, String service, String action)
 	{
-		String partyId = toRole.getPartyId() == null ? CPAUtils.toString(getToPartyInfo(cpaId,toRole,service,action)
+		val partyId = toRole.getPartyId() == null ? CPAUtils.toString(getToPartyInfo(cpaId,toRole,service,action)
 				.orElseThrow(() -> StreamUtils.illegalStateException("ToPartyInfo",cpaId,toRole,service,action)).getPartyIds().get(0)) :
 					toRole.getPartyId();
 		return Optional.of(partyId)
@@ -280,7 +289,7 @@ public class CPAManager
 	
 	public boolean isNonRepudiationRequired(String cpaId, CacheablePartyId partyId, String role, String service, String action)
 	{
-		Optional<CanSend> canSend =  getCPA(cpaId)
+		val canSend =  getCPA(cpaId)
 				.map(c -> c.getPartyInfo().stream()
 						.filter(p -> CPAUtils.equals(p.getPartyId(),partyId))
 						.flatMap(p -> p.getCollaborationRole().stream())
@@ -289,7 +298,7 @@ public class CPAManager
 						.filter(cs -> action.equals(cs.getThisPartyActionBinding().getAction()))
 						.findFirst()
 						.orElse(null));
-		DocExchange docExchange = CPAUtils.getDocExchange(
+		val docExchange = CPAUtils.getDocExchange(
 				getSendDeliveryChannel(cpaId,partyId,role,service,action)
 					.orElseThrow(() -> StreamUtils.illegalStateException("SendDeliveryChannel",cpaId,partyId,role,service,action)));
 		return canSend
@@ -301,7 +310,7 @@ public class CPAManager
 
 	public boolean isConfidential(String cpaId, CacheablePartyId partyId, String role, String service, String action)
 	{
-		Optional<CanSend> canSend =  getCPA(cpaId)
+		val canSend =  getCPA(cpaId)
 				.map(c -> c.getPartyInfo().stream()
 				.filter(p -> CPAUtils.equals(p.getPartyId(),partyId))
 				.flatMap(p -> p.getCollaborationRole().stream())
@@ -310,7 +319,7 @@ public class CPAManager
 				.filter(cs -> action.equals(cs.getThisPartyActionBinding().getAction()))
 				.findFirst()
 				.orElse(null));
-		DocExchange docExchange = CPAUtils.getDocExchange(
+		val docExchange = CPAUtils.getDocExchange(
 				getSendDeliveryChannel(cpaId,partyId,role,service,action)
 					.orElseThrow(() -> StreamUtils.illegalStateException("SendDeliveryChannel",cpaId,partyId,role,service,action)));
 		return canSend.map(cs ->(PersistenceLevelType.PERSISTENT.equals(cs.getThisPartyActionBinding().getBusinessTransactionCharacteristics().getIsConfidential()) 
@@ -340,25 +349,5 @@ public class CPAManager
 		daoMethodCache.remove(MethodCacheInterceptor.getCacheKey("EbMSDAOImpl","getCPA",cpaId));
 		daoMethodCache.remove(MethodCacheInterceptor.getCacheKey("EbMSDAOImpl","getCPAIds"));
 		cpaMethodCache.removeAll();
-	}
-
-	public void setDaoMethodCache(Ehcache daoMethodCache)
-	{
-		this.daoMethodCache = daoMethodCache;
-	}
-
-	public void setCpaMethodCache(Ehcache cpaMethodCache)
-	{
-		this.cpaMethodCache = cpaMethodCache;
-	}
-
-	public void setEbMSDAO(EbMSDAO ebMSDAO)
-	{
-		this.ebMSDAO = ebMSDAO;
-	}
-
-	public void setUrlMapper(URLMapper urlManager)
-	{
-		this.urlMapper = urlManager;
 	}
 }

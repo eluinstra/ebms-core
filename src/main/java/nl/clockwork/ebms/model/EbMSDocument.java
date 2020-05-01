@@ -20,41 +20,24 @@ import java.util.List;
 
 import org.w3c.dom.Document;
 
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Builder.Default;
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.experimental.FieldDefaults;
+
+@Builder(toBuilder = true)
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@Getter
 public class EbMSDocument
 {
-	private String contentId;
-	private Document message;
-	private List<EbMSAttachment> attachments = new ArrayList<>();
-	
-	protected EbMSDocument()
-	{
-	}
-
-	public EbMSDocument(String contentId, Document message)
-	{
-		this(contentId,message,new ArrayList<>());
-	}
-
-	public EbMSDocument(String contentId, Document message, List<EbMSAttachment> attachments)
-	{
-		this.contentId = contentId;
-		this.message = message;
-		this.attachments = attachments;
-	}
-
-	public String getContentId()
-	{
-		return contentId;
-	}
-
-	public Document getMessage()
-	{
-		return message;
-	}
-
-	public List<EbMSAttachment> getAttachments()
-	{
-		return attachments;
-	}
-
+	String contentId;
+	@NonNull
+	Document message;
+	@NonNull
+	@Default
+	List<EbMSAttachment> attachments = new ArrayList<>();
 }

@@ -18,15 +18,24 @@ package nl.clockwork.ebms.cpa;
 import java.security.cert.X509Certificate;
 import java.util.List;
 
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.NonNull;
+import lombok.val;
+import lombok.experimental.FieldDefaults;
 import net.sf.ehcache.Ehcache;
 import nl.clockwork.ebms.common.MethodCacheInterceptor;
 import nl.clockwork.ebms.dao.EbMSDAO;
 import nl.clockwork.ebms.model.CertificateMapping;
 
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@AllArgsConstructor
 public class CertificateMapper
 {
-	private Ehcache daoMethodCache;
-	private EbMSDAO ebMSDAO;
+	@NonNull
+	Ehcache daoMethodCache;
+	@NonNull
+	EbMSDAO ebMSDAO;
 
 	public List<CertificateMapping> getCertificates()
 	{
@@ -40,7 +49,7 @@ public class CertificateMapper
 
 	public void setCertificateMapping(CertificateMapping mapping)
 	{
-		String id = getId(mapping.getSource());
+		val id = getId(mapping.getSource());
 		if (mapping.getDestination() == null)
 			ebMSDAO.deleteCertificateMapping(id);
 		else
@@ -55,7 +64,7 @@ public class CertificateMapper
 
 	public void deleteCertificateMapping(X509Certificate source)
 	{
-		String key = getId(source);
+		val key = getId(source);
 		ebMSDAO.deleteCertificateMapping(key);
 		flushDAOMethodCache(key);
 	}
@@ -71,15 +80,4 @@ public class CertificateMapper
 		daoMethodCache.remove(MethodCacheInterceptor.getCacheKey("EbMSDAOImpl","getCertificateMapping",key));
 		daoMethodCache.remove(MethodCacheInterceptor.getCacheKey("EbMSDAOImpl","getCertificateMappings"));
 	}
-
-	public void setDaoMethodCache(Ehcache daoMethodCache)
-	{
-		this.daoMethodCache = daoMethodCache;
-	}
-
-	public void setEbMSDAO(EbMSDAO ebMSDAO)
-	{
-		this.ebMSDAO = ebMSDAO;
-	}
-
 }

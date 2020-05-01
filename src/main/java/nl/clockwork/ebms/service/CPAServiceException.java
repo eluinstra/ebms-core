@@ -17,15 +17,13 @@ package nl.clockwork.ebms.service;
 
 import javax.xml.ws.WebFault;
 
+import lombok.NoArgsConstructor;
+
 @WebFault(name="CPAServiceException", targetNamespace="http://www.ordina.nl/cpa/2.17")
+@NoArgsConstructor
 public class CPAServiceException extends RuntimeException
 {
 	private static final long serialVersionUID = 1L;
-
-	public CPAServiceException()
-	{
-		super();
-	}
 
 	public CPAServiceException(String message, Throwable cause)
 	{

@@ -26,65 +26,46 @@ import java.util.List;
 import javax.net.ssl.HttpsURLConnection;
 import javax.xml.transform.TransformerException;
 
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Cleanup;
+import lombok.NonNull;
+import lombok.val;
+import lombok.experimental.FieldDefaults;
 import nl.clockwork.ebms.model.EbMSDocument;
 import nl.clockwork.ebms.processor.EbMSProcessingException;
 import nl.clockwork.ebms.processor.EbMSProcessorException;
 
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@AllArgsConstructor
 public class EbMSHttpClient implements EbMSClient
 {
-	private SSLFactoryManager sslFactoryManager;
-	private int connectTimeout;
-	private boolean chunkedStreamingMode;
-	private boolean base64Writer;
-	private EbMSProxy proxy;
-	private List<Integer> recoverableHttpErrors;
-	private List<Integer> unrecoverableHttpErrors;
-
-	public EbMSHttpClient()
-	{
-	}
-
-	public EbMSHttpClient(
-			SSLFactoryManager sslFactoryManager,
-			int connectTimeout,
-			boolean chunkedStreamingMode,
-			boolean base64Writer,
-			EbMSProxy proxy,
-			List<Integer> recoverableHttpErrors,
-			List<Integer> unrecoverableHttpErrors)
-	{
-		this.sslFactoryManager = sslFactoryManager;
-		this.connectTimeout = connectTimeout;
-		this.chunkedStreamingMode = chunkedStreamingMode;
-		this.base64Writer = base64Writer;
-		this.proxy = proxy;
-		this.recoverableHttpErrors = recoverableHttpErrors;
-		this.unrecoverableHttpErrors = unrecoverableHttpErrors;
-	}
+	@NonNull
+	SSLFactoryManager sslFactoryManager;
+	int connectTimeout;
+	boolean chunkedStreamingMode;
+	boolean base64Writer;
+	EbMSProxy proxy;
+	List<Integer> recoverableHttpErrors;
+	List<Integer> unrecoverableHttpErrors;
 
 	public EbMSDocument sendMessage(String uri, EbMSDocument document) throws EbMSProcessorException
 	{
-		HttpURLConnection connection = null;
 		try
 		{
-			connection = (HttpURLConnection)openConnection(uri);
+			@Cleanup("disconnect") val connection = (HttpURLConnection)openConnection(uri);
 			connection.setConnectTimeout(connectTimeout);
 			if (chunkedStreaming(uri))
 				connection.setChunkedStreamingMode(0);
-			EbMSMessageWriter writer = base64Writer ? new EbMSMessageBase64Writer(connection) : new EbMSMessageWriter(connection);
+			val writer = base64Writer ? new EbMSMessageBase64Writer(connection) : new EbMSMessageWriter(connection);
 			writer.write(document);
 			connection.connect();
-			EbMSResponseHandler handler = new EbMSResponseHandler(connection,recoverableHttpErrors,unrecoverableHttpErrors);
+			val handler = new EbMSResponseHandler(connection,recoverableHttpErrors,unrecoverableHttpErrors);
 			return handler.read();
 		}
 		catch (IOException | TransformerException e)
 		{
 			throw new EbMSProcessingException(e);
-		}
-		finally
-		{
-			if (connection != null)
-				connection.disconnect();
 		}
 	}
 	
@@ -95,8 +76,8 @@ public class EbMSHttpClient implements EbMSClient
 
 	private URLConnection openConnection(String uri) throws IOException
 	{
-		URL url = new URL(uri);
-		URLConnection connection = openConnection(url);
+		val url = new URL(uri);
+		val connection = openConnection(url);
 		connection.setDoOutput(true);
 		//connection.setMethod("POST");
 		if (connection instanceof HttpsURLConnection)
@@ -109,12 +90,12 @@ public class EbMSHttpClient implements EbMSClient
 
 	private URLConnection openConnection(URL url) throws IOException
 	{
-		if (this.proxy != null && this.proxy.useProxy(url.toString()))
+		if (this.proxy != null)
 		{
-			Proxy connectionProxy = new Proxy(Proxy.Type.HTTP,new InetSocketAddress(this.proxy.getHost(),this.proxy.getPort()));
+			val connectionProxy = new Proxy(Proxy.Type.HTTP,new InetSocketAddress(this.proxy.getHost(),this.proxy.getPort()));
 			if (this.proxy.useProxyAuthorization())
 			{
-				URLConnection connection = url.openConnection(connectionProxy);
+				val connection = url.openConnection(connectionProxy);
 				connection.setRequestProperty(this.proxy.getProxyAuthorizationKey(),this.proxy.getProxyAuthorizationValue());
 				return connection;
 			}
@@ -123,25 +104,5 @@ public class EbMSHttpClient implements EbMSClient
 		}
 		else
 			return url.openConnection();
-	}
-
-	public void setSslFactoryManager(SSLFactoryManager sslFactoryManager)
-	{
-		this.sslFactoryManager = sslFactoryManager;
-	}
-
-	public void setChunkedStreamingMode(boolean chunkedStreamingMode)
-	{
-		this.chunkedStreamingMode = chunkedStreamingMode;
-	}
-	
-	public void setBase64Writer(boolean base64Writer)
-	{
-		this.base64Writer = base64Writer;
-	}
-
-	public void setProxy(EbMSProxy proxy)
-	{
-		this.proxy = proxy;
 	}
 }

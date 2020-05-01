@@ -38,14 +38,13 @@ import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DocExchange;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.Packaging;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.PartyId;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.PerMessageCharacteristicsType;
-import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.ReceiverDigitalEnvelope;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.ReliableMessaging;
-import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.SenderNonRepudiation;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.ServiceType;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.Transport;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.Service;
 import org.w3._2000._09.xmldsig.X509DataType;
 
+import lombok.val;
 import nl.clockwork.ebms.Constants;
 import nl.clockwork.ebms.EbMSMessageUtils;
 import nl.clockwork.ebms.model.FromPartyInfo;
@@ -92,8 +91,8 @@ public class CPAUtils
 	
 	public static List<org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.PartyId> toPartyId(PartyId partyId)
 	{
-		List<org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.PartyId> result = new ArrayList<>();
-		org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.PartyId p = new org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.PartyId();
+		val result = new ArrayList<org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.PartyId>();
+		val p = new org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.PartyId();
 		p.setType(partyId.getType());
 		p.setValue(partyId.getValue());
 		result.add(p);
@@ -102,7 +101,7 @@ public class CPAUtils
 
 	public static FromPartyInfo getFromPartyInfo(PartyId partyId, CollaborationRole role, CanSend canSend)
 	{
-		FromPartyInfo result = new FromPartyInfo();
+		val result = new FromPartyInfo();
 		result.setPartyIds(toPartyId(partyId));
 		result.setRole(role.getRole().getName());
 		result.setService(role.getServiceBinding().getService());
@@ -112,7 +111,7 @@ public class CPAUtils
 
 	public static ToPartyInfo getToPartyInfo(PartyId partyId, CollaborationRole role, CanReceive canReceive)
 	{
-		ToPartyInfo result = new ToPartyInfo();
+		val result = new ToPartyInfo();
 		result.setPartyIds(toPartyId(partyId));
 		result.setRole(role.getRole().getName());
 		result.setService(role.getServiceBinding().getService());
@@ -170,10 +169,10 @@ public class CPAUtils
 
 	public static Date getPersistTime(Date timestamp, DeliveryChannel deliveryChannel)
 	{
-		Duration persistDuration = CPAUtils.getDocExchange(deliveryChannel).getEbXMLReceiverBinding().getPersistDuration();
+		val persistDuration = CPAUtils.getDocExchange(deliveryChannel).getEbXMLReceiverBinding().getPersistDuration();
 		if (persistDuration != null)
 		{
-			Date persistTime = (Date)timestamp.clone();
+			val persistTime = (Date)timestamp.clone();
 			persistDuration.addTo(persistTime);
 			return persistTime;
 		}
@@ -187,7 +186,7 @@ public class CPAUtils
 	
 	public static Certificate getClientCertificate(DeliveryChannel deliveryChannel)
 	{
-		Transport transport = getTransport(deliveryChannel);
+		val transport = getTransport(deliveryChannel);
 		if (transport.getTransportSender().getTransportClientSecurity() != null && transport.getTransportSender().getTransportClientSecurity().getClientCertificateRef() != null)
 			return (Certificate)transport.getTransportSender().getTransportClientSecurity().getClientCertificateRef().getCertId();
 		return null;
@@ -195,7 +194,7 @@ public class CPAUtils
 	
 	public static Certificate getSigningCertificate(DeliveryChannel deliveryChannel)
 	{
-		DocExchange docExchange = getDocExchange(deliveryChannel);
+		val docExchange = getDocExchange(deliveryChannel);
 		if (docExchange.getEbXMLSenderBinding() != null && docExchange.getEbXMLSenderBinding().getSenderNonRepudiation() != null && docExchange.getEbXMLSenderBinding().getSenderNonRepudiation().getSigningCertificateRef() != null)
 			return (Certificate)docExchange.getEbXMLSenderBinding().getSenderNonRepudiation().getSigningCertificateRef().getCertId();
 		return null;
@@ -203,7 +202,7 @@ public class CPAUtils
 	
 	public static Certificate getEncryptionCertificate(DeliveryChannel deliveryChannel)
 	{
-		DocExchange docExchange = getDocExchange(deliveryChannel);
+		val docExchange = getDocExchange(deliveryChannel);
 		if (docExchange.getEbXMLReceiverBinding() != null && docExchange.getEbXMLReceiverBinding().getReceiverDigitalEnvelope() != null && docExchange.getEbXMLReceiverBinding().getReceiverDigitalEnvelope().getEncryptionCertificateRef() != null)
 			return (Certificate)docExchange.getEbXMLReceiverBinding().getReceiverDigitalEnvelope().getEncryptionCertificateRef().getCertId();
 		return null;
@@ -211,7 +210,7 @@ public class CPAUtils
 	
 	public static String getNonRepudiationProtocol(DeliveryChannel deliveryChannel)
 	{
-		DocExchange docExchange = getDocExchange(deliveryChannel);
+		val docExchange = getDocExchange(deliveryChannel);
 		if (docExchange.getEbXMLSenderBinding() != null && docExchange.getEbXMLSenderBinding().getSenderNonRepudiation() != null && docExchange.getEbXMLSenderBinding().getSenderNonRepudiation().getHashFunction() != null)
 			return docExchange.getEbXMLSenderBinding().getSenderNonRepudiation().getNonRepudiationProtocol().getValue();
 		return null;
@@ -219,7 +218,7 @@ public class CPAUtils
 
 	public static String getHashFunction(DeliveryChannel deliveryChannel)
 	{
-		DocExchange docExchange = getDocExchange(deliveryChannel);
+		val docExchange = getDocExchange(deliveryChannel);
 		if (docExchange.getEbXMLSenderBinding() != null && docExchange.getEbXMLSenderBinding().getSenderNonRepudiation() != null && docExchange.getEbXMLSenderBinding().getSenderNonRepudiation().getHashFunction() != null)
 			return docExchange.getEbXMLSenderBinding().getSenderNonRepudiation().getHashFunction();
 		return null;
@@ -227,10 +226,10 @@ public class CPAUtils
 
 	public static String getSignatureAlgorithm(DeliveryChannel deliveryChannel)
 	{
-		DocExchange docExchange = getDocExchange(deliveryChannel);
+		val docExchange = getDocExchange(deliveryChannel);
 		if (docExchange.getEbXMLSenderBinding() != null && docExchange.getEbXMLSenderBinding().getSenderNonRepudiation() != null && docExchange.getEbXMLSenderBinding().getSenderNonRepudiation().getSignatureAlgorithm() != null && !docExchange.getEbXMLSenderBinding().getSenderNonRepudiation().getSignatureAlgorithm().isEmpty())
 		{
-			SenderNonRepudiation senderNonRepudiation = docExchange.getEbXMLSenderBinding().getSenderNonRepudiation();
+			val senderNonRepudiation = docExchange.getEbXMLSenderBinding().getSenderNonRepudiation();
 			return senderNonRepudiation.getSignatureAlgorithm().get(0).getW3C() != null ? senderNonRepudiation.getSignatureAlgorithm().get(0).getW3C() : senderNonRepudiation.getSignatureAlgorithm().get(0).getValue();
 		}
 		return null;
@@ -238,10 +237,10 @@ public class CPAUtils
 
 	public static String getEncryptionAlgorithm(DeliveryChannel deliveryChannel)
 	{
-		DocExchange docExchange = getDocExchange(deliveryChannel);
+		val docExchange = getDocExchange(deliveryChannel);
 		if (docExchange.getEbXMLReceiverBinding() != null && docExchange.getEbXMLReceiverBinding().getReceiverDigitalEnvelope() != null && docExchange.getEbXMLReceiverBinding().getReceiverDigitalEnvelope().getEncryptionAlgorithm() != null && !docExchange.getEbXMLReceiverBinding().getReceiverDigitalEnvelope().getEncryptionAlgorithm().isEmpty())
 		{
-			ReceiverDigitalEnvelope receiverDigitalEnvelope = docExchange.getEbXMLReceiverBinding().getReceiverDigitalEnvelope();
+			val receiverDigitalEnvelope = docExchange.getEbXMLReceiverBinding().getReceiverDigitalEnvelope();
 			return receiverDigitalEnvelope.getEncryptionAlgorithm().get(0).getW3C() != null ? receiverDigitalEnvelope.getEncryptionAlgorithm().get(0).getW3C() : receiverDigitalEnvelope.getEncryptionAlgorithm().get(0).getValue();
 		}
 		return null;
@@ -251,7 +250,7 @@ public class CPAUtils
 	{
 		if (deliveryChannel != null)
 		{
-			Transport transport = (Transport)deliveryChannel.getTransportId();
+			val transport = (Transport)deliveryChannel.getTransportId();
 			if (transport != null && transport.getTransportReceiver() != null)
 				return transport.getTransportReceiver().getEndpoint().get(0).getUri();
 		}

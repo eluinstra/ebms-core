@@ -17,16 +17,13 @@ package nl.clockwork.ebms.service;
 
 import javax.xml.ws.WebFault;
 
+import lombok.NoArgsConstructor;
 
 @WebFault(name="EbMSMessageServiceException", targetNamespace="http://www.ordina.nl/ebms/2.17")
+@NoArgsConstructor
 public class EbMSMessageServiceException extends RuntimeException
 {
 	private static final long serialVersionUID = 1L;
-
-	public EbMSMessageServiceException()
-	{
-		super();
-	}
 
 	public EbMSMessageServiceException(String message, Throwable cause)
 	{

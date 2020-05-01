@@ -19,21 +19,23 @@ import java.util.Optional;
 
 import org.apache.commons.lang3.StringUtils;
 
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.NonNull;
+import lombok.val;
+import lombok.experimental.FieldDefaults;
 import nl.clockwork.ebms.cpa.CPAManager;
 import nl.clockwork.ebms.dao.DAOException;
 import nl.clockwork.ebms.model.EbMSMessageContext;
-import nl.clockwork.ebms.model.FromPartyInfo;
 import nl.clockwork.ebms.model.Party;
 import nl.clockwork.ebms.model.ToPartyInfo;
 
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@AllArgsConstructor
 public class EbMSMessageContextValidator
 {
-	protected CPAManager cpaManager;
-
-	public EbMSMessageContextValidator(CPAManager cpaManager)
-	{
-		this.cpaManager = cpaManager;
-	}
+	@NonNull
+	CPAManager cpaManager;
 
 	public void validate(String cpaId, Party fromParty, Party toParty) throws ValidationException
 	{
@@ -43,7 +45,7 @@ public class EbMSMessageContextValidator
 			throw new ValidationException("No CPA found for cpaId=" + cpaId);
 		if (!cpaManager.existsParty(cpaId,fromParty))
 		{
-			StringBuffer msg = new StringBuffer();
+			val msg = new StringBuffer();
 			msg.append("No fromParty found for:");
 			msg.append(" context.cpaId=").append(cpaId);
 			msg.append(", context.fromParty.partyId=").append(fromParty.getPartyId());
@@ -52,7 +54,7 @@ public class EbMSMessageContextValidator
 		}
 		if (!cpaManager.existsParty(cpaId,toParty))
 		{
-			StringBuffer msg = new StringBuffer();
+			val msg = new StringBuffer();
 			msg.append("No toParty found for:");
 			msg.append(" context.cpaId=").append(cpaId);
 			msg.append(", context.toParty.partyId=").append(toParty.getPartyId());
@@ -75,11 +77,11 @@ public class EbMSMessageContextValidator
 			if (!cpaManager.existsCPA(context.getCpaId()))
 				throw new ValidationException("No CPA found for: context.cpaId=" + context.getCpaId());
 
-			Optional<FromPartyInfo> fromPartyInfo =
+			val fromPartyInfo =
 					cpaManager.getFromPartyInfo(context.getCpaId(),context.getFromRole(),context.getService(),context.getAction());
 			if (!fromPartyInfo.isPresent())
 			{
-				StringBuffer msg = new StringBuffer();
+				val msg = new StringBuffer();
 				msg.append("No CanSend action found for:");
 				msg.append(" context.cpaId=").append(context.getCpaId());
 				if (context.getFromRole() != null)
@@ -98,7 +100,7 @@ public class EbMSMessageContextValidator
 			//if (otherPartyInfo == null && toPartyInfo == null)
 			if (fromPartyInfo.get().getCanSend().getOtherPartyActionBinding() == null && !toPartyInfo.isPresent())
 			{
-				StringBuffer msg = new StringBuffer();
+				val msg = new StringBuffer();
 				msg.append("No CanReceive action found for:");
 				msg.append(" context.cpaId=").append(context.getCpaId());
 				if (fromPartyInfo.get().getCanSend().getOtherPartyActionBinding() != null && context.getFromRole() != null)
@@ -120,7 +122,7 @@ public class EbMSMessageContextValidator
 					&& toPartyInfo.isPresent()
 					&& !fromPartyInfo.get().getCanSend().getOtherPartyActionBinding().equals(toPartyInfo.get().getCanReceive().getThisPartyActionBinding()))
 			{
-				StringBuffer msg = new StringBuffer();
+				val msg = new StringBuffer();
 				msg.append("Action for to party does not match action for from party for:");
 				msg.append(" context.cpaId=").append(context.getCpaId());
 				if (fromPartyInfo.get().getCanSend().getOtherPartyActionBinding() != null && context.getFromRole() != null)

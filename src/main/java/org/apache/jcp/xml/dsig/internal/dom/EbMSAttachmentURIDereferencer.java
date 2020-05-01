@@ -18,30 +18,29 @@ package org.apache.jcp.xml.dsig.internal.dom;
 import java.io.IOException;
 import java.util.List;
 
-import javax.activation.DataSource;
 import javax.xml.crypto.Data;
 import javax.xml.crypto.URIDereferencer;
 import javax.xml.crypto.URIReference;
 import javax.xml.crypto.URIReferenceException;
 import javax.xml.crypto.XMLCryptoContext;
 
-import nl.clockwork.ebms.Constants;
-import nl.clockwork.ebms.model.EbMSAttachment;
-
-import org.apache.jcp.xml.dsig.internal.dom.ApacheNodeSetData;
-import org.apache.jcp.xml.dsig.internal.dom.ApacheOctetStreamData;
-import org.apache.jcp.xml.dsig.internal.dom.DOMURIDereferencer;
 import org.apache.xml.security.c14n.CanonicalizationException;
 import org.apache.xml.security.signature.XMLSignatureInput;
 
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.NonNull;
+import lombok.val;
+import lombok.experimental.FieldDefaults;
+import nl.clockwork.ebms.Constants;
+import nl.clockwork.ebms.model.EbMSAttachment;
+
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@AllArgsConstructor
 public class EbMSAttachmentURIDereferencer implements URIDereferencer
 {
-	private List<EbMSAttachment> attachments;
-
-	public EbMSAttachmentURIDereferencer(List<EbMSAttachment> attachments)
-	{
-		this.attachments = attachments;
-	}
+	@NonNull
+	List<EbMSAttachment> attachments;
 
 	@Override
 	public Data dereference(URIReference uriReference, XMLCryptoContext context) throws URIReferenceException
@@ -50,11 +49,11 @@ public class EbMSAttachmentURIDereferencer implements URIDereferencer
 		{
 			if (uriReference.getURI().startsWith(Constants.CID))
 			{
-				DataSource ds = attachments.stream()
+				val a = attachments.stream()
 						.filter(a -> uriReference.getURI().substring(Constants.CID.length()).equals(a.getContentId()))
 						.findFirst()
 						.orElseThrow(() -> new URIReferenceException("Reference URI = " + uriReference.getURI() + " does not exist!"));
-				XMLSignatureInput in = new XMLSignatureInput(ds.getInputStream());
+				val in = new XMLSignatureInput(a.getInputStream());
 				if (in.isOctetStream())
 					return new ApacheOctetStreamData(in);
 				else

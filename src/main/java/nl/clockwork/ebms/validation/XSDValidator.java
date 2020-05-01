@@ -23,21 +23,27 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
-import javax.xml.validation.Validator;
 
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
+import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.val;
+import lombok.experimental.FieldDefaults;
+
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class XSDValidator
 {
-	protected Schema schema;
+	Schema schema;
 
+	@Builder()
 	public XSDValidator(String xsdFile)
 	{
 		try
 		{
-			SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-      String systemId = this.getClass().getResource(xsdFile).toString();
+			val factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+      val systemId = this.getClass().getResource(xsdFile).toString();
 			schema = factory.newSchema(new StreamSource(this.getClass().getResourceAsStream(xsdFile),systemId));
 		}
 		catch (SAXException e)
@@ -50,7 +56,7 @@ public class XSDValidator
 	{
 		try
 		{
-			Validator validator = schema.newValidator();
+			val validator = schema.newValidator();
 			validator.validate(new StreamSource(new StringReader(xml)));
 		}
 		catch (SAXException e)
@@ -67,7 +73,7 @@ public class XSDValidator
 	{
 		try
 		{
-			Validator validator = schema.newValidator();
+			val validator = schema.newValidator();
 			validator.validate(new DOMSource(node));
 		}
 		catch (SAXException e)

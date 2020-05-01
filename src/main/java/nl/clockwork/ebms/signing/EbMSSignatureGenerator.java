@@ -18,7 +18,6 @@ package nl.clockwork.ebms.signing;
 import java.security.GeneralSecurityException;
 import java.security.KeyPair;
 import java.security.KeyStoreException;
-import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import java.util.List;
 
@@ -26,13 +25,16 @@ import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.signature.XMLSignature;
 import org.apache.xml.security.transforms.Transforms;
 import org.apache.xml.security.transforms.params.XPathContainer;
-import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DeliveryChannel;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.AckRequested;
-import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageHeader;
 import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.NonNull;
+import lombok.val;
+import lombok.var;
+import lombok.experimental.FieldDefaults;
 import nl.clockwork.ebms.Constants;
 import nl.clockwork.ebms.common.util.DOMUtils;
 import nl.clockwork.ebms.common.util.SecurityUtils;
@@ -41,35 +43,38 @@ import nl.clockwork.ebms.cpa.CPAManager;
 import nl.clockwork.ebms.cpa.CPAUtils;
 import nl.clockwork.ebms.model.CacheablePartyId;
 import nl.clockwork.ebms.model.EbMSAttachment;
+import nl.clockwork.ebms.model.EbMSDocument;
 import nl.clockwork.ebms.model.EbMSMessage;
 import nl.clockwork.ebms.processor.EbMSProcessingException;
 import nl.clockwork.ebms.processor.EbMSProcessorException;
 import nl.clockwork.ebms.security.EbMSKeyStore;
 import nl.clockwork.ebms.xml.dsig.EbMSAttachmentResolver;
 
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@AllArgsConstructor
 public class EbMSSignatureGenerator
 {
-	private CPAManager cpaManager;
-	private String canonicalizationMethodAlgorithm = Transforms.TRANSFORM_C14N_OMIT_COMMENTS;
-	//private String signatureMethodAlgorithm = XMLSignature.ALGO_ID_SIGNATURE_DSA;
-	private String transformAlgorithm = Transforms.TRANSFORM_C14N_OMIT_COMMENTS;
-	//private String digestAlgorithm = org.apache.xml.security.utils.Constants.ALGO_ID_DIGEST_SHA1;
-	private EbMSKeyStore keyStore;
+	String canonicalizationMethodAlgorithm = Transforms.TRANSFORM_C14N_OMIT_COMMENTS;
+	String transformAlgorithm = Transforms.TRANSFORM_C14N_OMIT_COMMENTS;
+	@NonNull
+	CPAManager cpaManager;
+	@NonNull
+	EbMSKeyStore keyStore;
 
-	public void generate(EbMSMessage message) throws EbMSProcessorException
+	public void generate(EbMSDocument document, EbMSMessage message) throws EbMSProcessorException
 	{
 		try
 		{
-			MessageHeader messageHeader = message.getMessageHeader();
-			CacheablePartyId fromPartyId = new CacheablePartyId(messageHeader.getFrom().getPartyId());
-			String service = CPAUtils.toString(messageHeader.getService());
+			val messageHeader = message.getMessageHeader();
+			val fromPartyId = new CacheablePartyId(messageHeader.getFrom().getPartyId());
+			val service = CPAUtils.toString(messageHeader.getService());
 			if (cpaManager.isNonRepudiationRequired(
 					messageHeader.getCPAId(),
 					fromPartyId,
 					messageHeader.getFrom().getRole(),
 					service,
 					messageHeader.getAction()))
-				sign(message);
+				sign(document,message);
 		}
 		catch (GeneralSecurityException e)
 		{
@@ -81,13 +86,13 @@ public class EbMSSignatureGenerator
 		}
 	}
 
-	public void generate(AckRequested ackRequested, EbMSMessage message) throws EbMSProcessorException
+	public void generate(AckRequested ackRequested, EbMSDocument document, EbMSMessage message) throws EbMSProcessorException
 	{
 		try
 		{
 			if (ackRequested != null && ackRequested.isSigned())
 			{
-				sign(message);
+				sign(document,message);
 			}
 		}
 		catch (GeneralSecurityException e)
@@ -100,50 +105,50 @@ public class EbMSSignatureGenerator
 		}
 	}
 
-	private void sign(EbMSMessage message) throws EbMSProcessorException, GeneralSecurityException, XMLSecurityException
+	private void sign(EbMSDocument document, EbMSMessage message) throws EbMSProcessorException, GeneralSecurityException, XMLSecurityException
 	{
-		MessageHeader messageHeader = message.getMessageHeader();
-		CacheablePartyId fromPartyId = new CacheablePartyId(messageHeader.getFrom().getPartyId());
-		String service = CPAUtils.toString(messageHeader.getService());
-		DeliveryChannel deliveryChannel = cpaManager.getSendDeliveryChannel(messageHeader.getCPAId(),fromPartyId,messageHeader.getFrom().getRole(),service,messageHeader.getAction())
+		val messageHeader = message.getMessageHeader();
+		val fromPartyId = new CacheablePartyId(messageHeader.getFrom().getPartyId());
+		val service = CPAUtils.toString(messageHeader.getService());
+		val deliveryChannel = cpaManager.getSendDeliveryChannel(messageHeader.getCPAId(),fromPartyId,messageHeader.getFrom().getRole(),service,messageHeader.getAction())
 				.orElseThrow(() -> StreamUtils.illegalStateException("SendDeliveryChannel",messageHeader.getCPAId(),fromPartyId,messageHeader.getFrom().getRole(),service,messageHeader.getAction()));
-		X509Certificate certificate = CPAUtils.getX509Certificate(CPAUtils.getSigningCertificate(deliveryChannel));
+		val certificate = CPAUtils.getX509Certificate(CPAUtils.getSigningCertificate(deliveryChannel));
 		if (certificate == null)
 			throw new EbMSProcessingException(
 					"No signing certificate found for deliveryChannel \"" + deliveryChannel.getChannelId() + "\" in CPA \"" + messageHeader.getCPAId() + "\"");
-		String alias = keyStore.getCertificateAlias(certificate);
+		val alias = keyStore.getCertificateAlias(certificate);
 		if (alias == null)
 			throw new EbMSProcessorException(
 					"No certificate found with subject \"" + certificate.getSubjectDN().getName() + "\" in keystore \"" + keyStore.getPath() + "\"");
-		KeyPair keyPair = SecurityUtils.getKeyPair(keyStore,alias,keyStore.getKeyPassword());
-		String signatureAlgorithm = CPAUtils.getSignatureAlgorithm(deliveryChannel);
-		String hashFunction = CPAUtils.getHashFunction(deliveryChannel);
-		sign(keyStore,keyPair,alias,message.getMessage(),message.getAttachments(),signatureAlgorithm,hashFunction);
+		val keyPair = SecurityUtils.getKeyPair(keyStore,alias,keyStore.getKeyPassword());
+		val signatureAlgorithm = CPAUtils.getSignatureAlgorithm(deliveryChannel);
+		val hashFunction = CPAUtils.getHashFunction(deliveryChannel);
+		sign(keyStore,keyPair,alias,document.getMessage(),message.getAttachments(),signatureAlgorithm,hashFunction);
 	}
 	
 	private void sign(EbMSKeyStore keyStore, KeyPair keyPair, String alias, Document document, List<EbMSAttachment> attachments, String signatureMethodAlgorithm, String digestAlgorithm) throws XMLSecurityException, KeyStoreException
 	{
-		XMLSignature signature = new XMLSignature(document,null,signatureMethodAlgorithm,canonicalizationMethodAlgorithm);
+		val signature = new XMLSignature(document,null,signatureMethodAlgorithm,canonicalizationMethodAlgorithm);
 
-		Element soapHeader = DOMUtils.getFirstChildElement(document.getDocumentElement());
+		val soapHeader = DOMUtils.getFirstChildElement(document.getDocumentElement());
 		soapHeader.appendChild(signature.getElement());
 		
-		EbMSAttachmentResolver resolver = new EbMSAttachmentResolver(attachments);
+		val resolver = new EbMSAttachmentResolver(attachments);
 		signature.getSignedInfo().addResourceResolver(resolver);
 			
-		Transforms transforms = new Transforms(document);
+		val transforms = new Transforms(document);
 		transforms.addTransform(Transforms.TRANSFORM_ENVELOPED_SIGNATURE);
 		transforms.addTransform(Transforms.TRANSFORM_XPATH,getXPathTransform(document));
 		transforms.addTransform(transformAlgorithm);
 		
 		signature.addDocument("",transforms,digestAlgorithm);
 		
-		for (EbMSAttachment attachment: attachments)
+		for (val attachment: attachments)
 			signature.addDocument(Constants.CID + attachment.getContentId(),null,digestAlgorithm);
 		
 		signature.addKeyInfo(keyPair.getPublic());
 		
-		Certificate[] certificates = keyStore.getCertificateChain(alias);
+		val certificates = keyStore.getCertificateChain(alias);
 		//Stream.of(certificates).forEach(ThrowingConsumer.throwingConsumerWrapper(c -> signature.addKeyInfo((X509Certificate)c)));
 		signature.addKeyInfo((X509Certificate)certificates[0]);
 
@@ -152,32 +157,11 @@ public class EbMSSignatureGenerator
 	
 	private NodeList getXPathTransform(Document document) throws XMLSecurityException
 	{
-		String prefix = document.lookupPrefix(Constants.NSURI_SOAP_ENVELOPE);
+		var prefix = document.lookupPrefix(Constants.NSURI_SOAP_ENVELOPE);
 		prefix = prefix == null ? "" : prefix + ":";
-		XPathContainer container = new XPathContainer(document);
+		val container = new XPathContainer(document);
 		//container.setXPathNamespaceContext(prefix,Constants.NSURI_SOAP_ENVELOPE);
 		container.setXPath("not(ancestor-or-self::node()[@" + prefix + "actor=\"urn:oasis:names:tc:ebxml-msg:actor:nextMSH\"]|ancestor-or-self::node()[@" + prefix + "actor=\"" + Constants.NSURI_SOAP_NEXT_ACTOR + "\"])");
 		return container.getElementPlusReturns();
 	}
-	
-	public void setCpaManager(CPAManager cpaManager)
-	{
-		this.cpaManager = cpaManager;
-	}
-
-	public void setCanonicalizationMethodAlgorithm(String canonicalizationMethodAlgorithm)
-	{
-		this.canonicalizationMethodAlgorithm = canonicalizationMethodAlgorithm;
-	}
-	
-	public void setTransformAlgorithm(String transformAlgorithm)
-	{
-		this.transformAlgorithm = transformAlgorithm;
-	}
-
-	public void setKeyStore(EbMSKeyStore keyStore)
-	{
-		this.keyStore = keyStore;
-	}
-
 }

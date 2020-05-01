@@ -28,148 +28,39 @@ import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.StatusRequest;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.StatusResponse;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.SyncReply;
 import org.w3._2000._09.xmldsig.SignatureType;
-import org.w3c.dom.Document;
 
-public class EbMSMessage extends EbMSDocument
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Builder.Default;
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.experimental.FieldDefaults;
+
+@Builder(toBuilder = true)
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = false)
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@Getter
+public class EbMSMessage// extends EbMSDocument
 {
-	private Document message;
-	private SignatureType signature;
-	private MessageHeader messageHeader;
-	private SyncReply syncReply;
-	private MessageOrder messageOrder;
-	private AckRequested ackRequested;
-	private ErrorList errorList;
-	private Acknowledgment acknowledgment;
-	private Manifest manifest;
-	private StatusRequest statusRequest;
-	private StatusResponse statusResponse;
-	private List<EbMSAttachment> attachments = new ArrayList<>();
+	//EbMSDocument message;
+	SignatureType signature;
+	@NonNull
+	MessageHeader messageHeader;
+	SyncReply syncReply;
+	MessageOrder messageOrder;
+	AckRequested ackRequested;
+	ErrorList errorList;
+	Acknowledgment acknowledgment;
+	Manifest manifest;
+	StatusRequest statusRequest;
+	StatusResponse statusResponse;
+	@NonNull
+	@Default
+	List<EbMSAttachment> attachments = new ArrayList<>();
 
-	@Override
 	public String getContentId()
 	{
-		return getMessageHeader() != null ? getMessageHeader().getMessageData().getMessageId() : super.getContentId();
-	}
-
-	@Override
-	public Document getMessage()
-	{
-		return message;
-	}
-	
-	public void setMessage(Document document)
-	{
-		this.message = document;
-	}
-
-	public SignatureType getSignature()
-	{
-		return signature;
-	}
-	
-	public void setSignature(SignatureType signature)
-	{
-		this.signature = signature;
-	}
-	
-	public MessageHeader getMessageHeader()
-	{
-		return messageHeader;
-	}
-	
-	public void setMessageHeader(MessageHeader messageHeader)
-	{
-		this.messageHeader = messageHeader;
-	}
-	
-	public SyncReply getSyncReply()
-	{
-		return syncReply;
-	}
-	
-	public void setSyncReply(SyncReply syncReply)
-	{
-		this.syncReply = syncReply;
-	}
-	
-	public MessageOrder getMessageOrder()
-	{
-		return messageOrder;
-	}
-	
-	public void setMessageOrder(MessageOrder messageOrder)
-	{
-		this.messageOrder = messageOrder;
-	}
-	
-	public AckRequested getAckRequested()
-	{
-		return ackRequested;
-	}
-	
-	public void setAckRequested(AckRequested ackRequested)
-	{
-		this.ackRequested = ackRequested;
-	}
-	
-	public ErrorList getErrorList()
-	{
-		return errorList;
-	}
-	
-	public void setErrorList(ErrorList errorList)
-	{
-		this.errorList = errorList;
-	}
-	
-	public Acknowledgment getAcknowledgment()
-	{
-		return acknowledgment;
-	}
-	
-	public void setAcknowledgment(Acknowledgment acknowledgment)
-	{
-		this.acknowledgment = acknowledgment;
-	}
-	
-	public Manifest getManifest()
-	{
-		return manifest;
-	}
-	
-	public void setManifest(Manifest manifest)
-	{
-		this.manifest = manifest;
-	}
-	
-	public StatusRequest getStatusRequest()
-	{
-		return statusRequest;
-	}
-	
-	public void setStatusRequest(StatusRequest statusRequest)
-	{
-		this.statusRequest = statusRequest;
-	}
-	
-	public StatusResponse getStatusResponse()
-	{
-		return statusResponse;
-	}
-	
-	public void setStatusResponse(StatusResponse statusResponse)
-	{
-		this.statusResponse = statusResponse;
-	}
-
-	@Override
-	public List<EbMSAttachment> getAttachments()
-	{
-		return attachments;
-	}
-	
-	public void setAttachments(List<EbMSAttachment> attachments)
-	{
-		this.attachments = attachments;
+		return messageHeader.getMessageData().getMessageId();
 	}
 }

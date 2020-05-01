@@ -18,34 +18,23 @@ package nl.clockwork.ebms.model;
 import java.io.Serializable;
 import java.security.cert.X509Certificate;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.NonNull;
+
+@XmlAccessorType(XmlAccessType.FIELD)
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class CertificateMapping implements Serializable
 {
 	private static final long serialVersionUID = 1L;
-	private X509Certificate source;
-	private X509Certificate destination;
-
-	public CertificateMapping()
-	{
-	}
-	public CertificateMapping(X509Certificate source, X509Certificate destination)
-	{
-		this.source = source;
-		this.destination = destination;
-	}
-	public X509Certificate getSource()
-	{
-		return source;
-	}
-	public void setSource(X509Certificate source)
-	{
-		this.source = source;
-	}
-	public X509Certificate getDestination()
-	{
-		return destination;
-	}
-	public void setDestination(X509Certificate destination)
-	{
-		this.destination = destination;
-	}
+	@NonNull
+	X509Certificate source;
+	@NonNull
+	X509Certificate destination;
 }

@@ -18,132 +18,45 @@ package nl.clockwork.ebms.model;
 import java.io.Serializable;
 import java.util.Date;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import nl.clockwork.ebms.EbMSMessageStatus;
 
+@XmlAccessorType(XmlAccessType.FIELD)
+@Builder(toBuilder = true)
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@RequiredArgsConstructor
 public class EbMSMessageContext implements Serializable
 {
 	private static final long serialVersionUID = 1L;
-	private String cpaId;
-	private Role fromRole;
-	private Role toRole;
-	private String service;
-	private String action;
-	private Date timestamp;
-	private String conversationId;
-	private String messageId;
-	private String refToMessageId;
-	private EbMSMessageStatus messageStatus;
-
-	public EbMSMessageContext()
-	{
-	}
-	
-	public String getCpaId()
-	{
-		return cpaId;
-	}
-	
-	public void setCpaId(String cpaId)
-	{
-		this.cpaId = cpaId;
-	}
-
-	public Role getFromRole()
-	{
-		return fromRole;
-	}
-	
-	public void setFromRole(Role fromRole)
-	{
-		this.fromRole = fromRole;
-	}
-	
+	@NonNull
+	String cpaId;
+	@NonNull
+	Role fromRole;
 	@XmlElement
-	public Role getToRole()
-	{
-		return toRole;
-	}
-	
-	public void setToRole(Role toRole)
-	{
-		this.toRole = toRole;
-	}
-	
-	
-	public String getService()
-	{
-		return service;
-	}
-	
-	public void setService(String service)
-	{
-		this.service = service;
-	}
-	
-	public String getAction()
-	{
-		return action;
-	}
-	
-	public void setAction(String action)
-	{
-		this.action = action;
-	}
-	
+	Role toRole;
+	//@NonNull
+	String service;
+	//@NonNull
+	String action;
 	@XmlElement
-	public Date getTimestamp()
-	{
-		return timestamp;
-	}
-	
-	public void setTimestamp(Date timestamp)
-	{
-		this.timestamp = timestamp;
-	}
-	
+	Date timestamp;
 	@XmlElement
-	public String getConversationId()
-	{
-		return conversationId;
-	}
-	
-	public void setConversationId(String conversationId)
-	{
-		this.conversationId = conversationId;
-	}
-	
+	String conversationId;
 	@XmlElement
-	public String getMessageId()
-	{
-		return messageId;
-	}
-	
-	public void setMessageId(String messageId)
-	{
-		this.messageId = messageId;
-	}
-	
+	String messageId;
 	@XmlElement
-	public String getRefToMessageId()
-	{
-		return refToMessageId;
-	}
-	
-	public void setRefToMessageId(String refToMessageId)
-	{
-		this.refToMessageId = refToMessageId;
-	}
-
+	String refToMessageId;
 	@XmlElement
-	public EbMSMessageStatus getMessageStatus()
-	{
-		return messageStatus;
-	}
-
-	public void setMessageStatus(EbMSMessageStatus messageStatus)
-	{
-		this.messageStatus = messageStatus;
-	}
+	EbMSMessageStatus messageStatus;
 }

@@ -30,8 +30,7 @@
 	</bean>
 
 	<bean id="ebMSDAOMethodCachePointCut" class="org.springframework.aop.support.RegexpMethodPointcutAdvisor">
-		<property name="advice" ref="ebMSDAOMethodCacheInterceptor"/>
-		<property name="patterns">
+		<constructor-arg name="patterns">
 			<list>
 				<value>.*existsCPA</value>
 				<value>.*getCPA</value>
@@ -43,11 +42,12 @@
 				<value>.*getCertificateMapping</value>
 				<value>.*getCertificateMappings</value>
 			</list>
-		</property>
+		</constructor-arg>
+		<constructor-arg name="advice" ref="ebMSDAOMethodCacheInterceptor"/>
 	</bean>
 
 	<bean id="ebMSDAOMethodCacheInterceptor" class="nl.clockwork.ebms.common.MethodCacheInterceptor">
-		<property name="cache" ref="ebMSDAOMethodCache" />
+		<constructor-arg name="cache" ref="ebMSDAOMethodCache" />
 	</bean>
 
 	<bean id="ebMSDAOMethodCache" class="org.springframework.cache.ehcache.EhCacheFactoryBean">
@@ -63,22 +63,22 @@
 	</bean>
 
 	<bean id="_ebMSDAO" class="nl.clockwork.ebms.dao.EbMSDAOFactory">
-		<property name="dataSource" ref="ebMSDataSource"/>
-		<property name="transactionTemplate" ref="ebMSTransactionTemplate"/>
-		<property name="jdbcTemplate" ref="ebMSJdbcTemplate"/>
-		<property name="serverId" value="${ebms.serverId}"/>
+		<constructor-arg name="dataSource" ref="ebMSDataSource"/>
+		<constructor-arg name="transactionTemplate" ref="ebMSTransactionTemplate"/>
+		<constructor-arg name="jdbcTemplate" ref="ebMSJdbcTemplate"/>
+		<constructor-arg name="serverId" value="${ebms.serverId}"/>
 	</bean>
 
 	<bean id="ebMSTransactionTemplate" class="org.springframework.transaction.support.TransactionTemplate">
-		<property name="transactionManager" ref="ebMSTXManager"/>
+		<constructor-arg name="transactionManager" ref="ebMSTXManager"/>
 	</bean>
 
 	<bean id="ebMSTXManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
-		<property name="dataSource" ref="ebMSDataSource"/>
+		<constructor-arg name="dataSource" ref="ebMSDataSource"/>
 	</bean>
 
 	<bean id="ebMSJdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
-		<property name="dataSource" ref="ebMSDataSource"/>
+		<constructor-arg name="dataSource" ref="ebMSDataSource"/>
 	</bean>
 
 </beans>

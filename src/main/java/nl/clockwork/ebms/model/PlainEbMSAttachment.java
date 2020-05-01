@@ -23,21 +23,24 @@ import javax.activation.DataSource;
 
 import org.apache.commons.io.IOUtils;
 
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
+import lombok.experimental.NonFinal;
+
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@AllArgsConstructor
+@RequiredArgsConstructor
 public class PlainEbMSAttachment implements EbMSAttachment
 {
-	private DataSource dataSource;
-	private String contentId;
-	
-	public PlainEbMSAttachment(DataSource dataSource)
-	{
-		this(null,dataSource);
-	}
-	
-	public PlainEbMSAttachment(String contentId, DataSource dataSource)
-	{
-		this.dataSource = dataSource;
-		this.contentId = contentId;
-	}
+	@NonFinal
+	@Getter
+	String contentId;
+	@NonNull
+	DataSource dataSource;
 	
 	@Override
 	public String getContentType()
@@ -61,12 +64,6 @@ public class PlainEbMSAttachment implements EbMSAttachment
 	public OutputStream getOutputStream() throws IOException
 	{
 		return dataSource.getOutputStream();
-	}
-
-	@Override
-	public String getContentId()
-	{
-		return contentId;
 	}
 
 	@Override

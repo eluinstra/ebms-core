@@ -26,6 +26,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.cxf.io.CachedOutputStream;
 import org.springframework.beans.factory.InitializingBean;
 
+import lombok.val;
 import nl.clockwork.ebms.model.CachedEbMSAttachment;
 import nl.clockwork.ebms.model.EbMSAttachment;
 import nl.clockwork.ebms.model.PlainEbMSAttachment;
@@ -61,7 +62,7 @@ public class EbMSAttachmentFactory implements InitializingBean
 
 	public static EbMSAttachment createEbMSAttachment(String filename, String contentId, String contentType, byte[] content)
 	{
-		ByteArrayDataSource result = new ByteArrayDataSource(content,contentType);
+		val result = new ByteArrayDataSource(content,contentType);
 		if (!StringUtils.isEmpty(filename))
 			result.setName(filename);
 		return createEbMSAttachment(contentId,result);
@@ -87,7 +88,7 @@ public class EbMSAttachmentFactory implements InitializingBean
 
 	public static EbMSAttachment createCachedEbMSAttachment(String filename, String contentId, String contentType, InputStream content) throws IOException
 	{
-		CachedOutputStream cos = new CachedOutputStream();
+		val cos = new CachedOutputStream();
 		CachedOutputStream.copyStream(content,cos,4096);
 		cos.lockOutputStream();
 		return createCachedEbMSAttachment(filename,contentId,contentType,cos);

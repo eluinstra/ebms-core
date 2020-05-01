@@ -15,15 +15,12 @@
  */
 package nl.clockwork.ebms.dao;
 
+import lombok.NoArgsConstructor;
+
+@NoArgsConstructor
 public class DAOException extends RuntimeException
 {
-
 	private static final long serialVersionUID = 1L;
-
-	public DAOException()
-	{
-		super();
-	}
 
 	public DAOException(String message, Throwable cause)
 	{

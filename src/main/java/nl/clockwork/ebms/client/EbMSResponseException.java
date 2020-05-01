@@ -18,29 +18,32 @@ package nl.clockwork.ebms.client;
 import java.util.List;
 import java.util.Map;
 
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.experimental.FieldDefaults;
 import nl.clockwork.ebms.common.util.HTTPUtils;
 import nl.clockwork.ebms.processor.EbMSProcessingException;
 
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@AllArgsConstructor
+@Getter
 public class EbMSResponseException extends EbMSProcessingException
 {
 	private static final long serialVersionUID = 1L;
-	private int statusCode;
-	private Map<String,List<String>> headers;
+	int statusCode;
+	@NonNull
+	Map<String,List<String>> headers;
 
-	public EbMSResponseException(int statusCode, Map<String,List<String>> headers)
-	{
-		this.statusCode = statusCode;
-		this.headers = headers;
-	}
-	
-	public EbMSResponseException(int statusCode, Map<String,List<String>> headers, String message)
+	public EbMSResponseException(int statusCode, @NonNull Map<String,List<String>> headers, String message)
 	{
 		super(message);
 		this.statusCode = statusCode;
 		this.headers = headers;
 	}
 	
-	public EbMSResponseException(int statusCode, Map<String,List<String>> headers, Throwable cause)
+	public EbMSResponseException(int statusCode, @NonNull Map<String,List<String>> headers, Throwable cause)
 	{
 		super(cause);
 		this.statusCode = statusCode;
@@ -51,15 +54,5 @@ public class EbMSResponseException extends EbMSProcessingException
 	public String getMessage()
 	{
 		return "StatusCode: " + statusCode + "\n" + HTTPUtils.toString(headers) + "\n" + (super.getMessage() != null ? super.getMessage() : "");
-	}
-
-	public int getStatusCode()
-	{
-		return statusCode;
-	}
-
-	public Map<String,List<String>> getHeaders()
-	{
-		return headers;
 	}
 }

@@ -17,67 +17,27 @@ package nl.clockwork.ebms.model;
 
 import java.util.Date;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.NonNull;
+import lombok.Value;
+
+@Builder(toBuilder = true)
+@Value
+@AllArgsConstructor
 public class EbMSEvent
 {
-	private String cpaId;
-	private String sendDeliveryChannelId;
-	private String receiveDeliveryChannelId;
-	private String messageId;
-	private Date timeToLive;
-	private Date timestamp;
-	private boolean isConfidential;
-	private int retries;
-
-	public EbMSEvent(String cpaId, String sendDeliveryChannelId, String receiveDeliveryChannelId, String messageId, Date timeToLive, Date timestamp, boolean isConfidential, int retries)
-	{
-		this.cpaId = cpaId;
-		this.sendDeliveryChannelId = sendDeliveryChannelId;
-		this.receiveDeliveryChannelId = receiveDeliveryChannelId;
-		this.messageId = messageId;
-		this.timeToLive = timeToLive;
-		this.timestamp = timestamp;
-		this.isConfidential = isConfidential;
-		this.retries = retries;
-	}
-
-	public String getCpaId()
-	{
-		return cpaId;
-	}
-
-	public String getSendDeliveryChannelId()
-	{
-		return sendDeliveryChannelId;
-	}
-
-	public String getReceiveDeliveryChannelId()
-	{
-		return receiveDeliveryChannelId;
-	}
-
-	public String getMessageId()
-	{
-		return messageId;
-	}
-
-	public Date getTimeToLive()
-	{
-		return timeToLive;
-	}
-
-	public Date getTimestamp()
-	{
-		return timestamp;
-	}
-
-	public boolean isConfidential()
-	{
-		return isConfidential;
-	}
-
-	public int getRetries()
-	{
-		return retries;
-	}
-
+	@NonNull
+	String cpaId;
+	@NonNull
+	String sendDeliveryChannelId;
+	@NonNull
+	String receiveDeliveryChannelId;
+	@NonNull
+	String messageId;
+	Date timeToLive;
+	@NonNull
+	Date timestamp;
+	boolean isConfidential;
+	int retries;
 }

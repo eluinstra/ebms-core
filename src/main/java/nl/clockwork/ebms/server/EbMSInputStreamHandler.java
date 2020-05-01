@@ -23,41 +23,43 @@ import java.nio.charset.Charset;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import nl.clockwork.ebms.Constants;
-import nl.clockwork.ebms.EbMSMessageUtils;
-import nl.clockwork.ebms.common.util.DOMUtils;
-import nl.clockwork.ebms.model.EbMSDocument;
-import nl.clockwork.ebms.processor.EbMSMessageProcessor;
-import nl.clockwork.ebms.processor.EbMSProcessorException;
-
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.w3c.dom.Document;
 
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.NonNull;
+import lombok.val;
+import lombok.experimental.FieldDefaults;
+import lombok.extern.apachecommons.CommonsLog;
+import nl.clockwork.ebms.Constants;
+import nl.clockwork.ebms.EbMSMessageUtils;
+import nl.clockwork.ebms.common.util.DOMUtils;
+import nl.clockwork.ebms.processor.EbMSMessageProcessor;
+import nl.clockwork.ebms.processor.EbMSProcessorException;
+
+@CommonsLog
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@AllArgsConstructor
 public abstract class EbMSInputStreamHandler
 {
-  protected transient Log logger = LogFactory.getLog(nl.clockwork.ebms.server.EbMSInputStreamHandler.class);
-  protected transient Log messageLogger = LogFactory.getLog(Constants.MESSAGE_LOG);
-	private EbMSMessageProcessor messageProcessor;
-
-	public EbMSInputStreamHandler(EbMSMessageProcessor messageProcessor)
-	{
-		this.messageProcessor = messageProcessor;
-	}
+  transient Log messageLogger = LogFactory.getLog(Constants.MESSAGE_LOG);
+  @NonNull
+	EbMSMessageProcessor messageProcessor;
 
 	public void handle(InputStream request) throws EbMSProcessorException
 	{
 	  try
 		{
-	  	String soapAction = getRequestHeader("SOAPAction");
+	  	val soapAction = getRequestHeader("SOAPAction");
 	  	if (!Constants.EBMS_SOAP_ACTION.equals(soapAction))
 	  	{
 				if (messageLogger.isInfoEnabled())
 					messageLogger.info("<<<<\n" + getRequestHeaders() + "\n" + IOUtils.toString(request,Charset.defaultCharset()));
 				throw new EbMSProcessorException("Unable to process message! SOAPAction=" + soapAction);
 	  	}
-//	  	if (logger.isDebugEnabled())
+//	  	if (log.isDebugEnabled())
 //	  		request = new LoggingInputStream(request);
 	  	if (messageLogger.isDebugEnabled())
 	  	{
@@ -66,11 +68,11 @@ public abstract class EbMSInputStreamHandler
 	  		messageLogger.info("<<<<\n" + getRequestHeaders() + "\n" + IOUtils.toString(request,Charset.defaultCharset()));
 	  		request.reset();
 	  	}
-			EbMSMessageReader messageReader = new EbMSMessageReader(getRequestHeader("Content-ID"),getRequestHeader("Content-Type"));
-			EbMSDocument in = messageReader.read(request);
+			val messageReader = new EbMSMessageReader(getRequestHeader("Content-ID"),getRequestHeader("Content-Type"));
+			val in = messageReader.read(request);
 			if (messageLogger.isInfoEnabled() && !messageLogger.isDebugEnabled())
 				messageLogger.info("<<<<\n" + DOMUtils.toString(in.getMessage()));
-			EbMSDocument out = messageProcessor.processRequest(in);
+			val out = messageProcessor.processRequest(in);
 			if (out == null)
 			{
 				messageLogger.info(">>>>\nstatusCode: " + Constants.SC_NOCONTENT);
@@ -83,7 +85,7 @@ public abstract class EbMSInputStreamHandler
 				writeResponseStatus(Constants.SC_OK);
 				writeResponseHeader("Content-Type","text/xml");
 				writeResponseHeader("SOAPAction",Constants.EBMS_SOAP_ACTION);
-				OutputStream response = getOutputStream();
+				val response = getOutputStream();
 				DOMUtils.write(out.getMessage(),response);
 			}
 		}
@@ -91,13 +93,13 @@ public abstract class EbMSInputStreamHandler
 		{
 			try
 			{
-				Document soapFault = EbMSMessageUtils.createSOAPFault(e);
+				val soapFault = EbMSMessageUtils.createSOAPFault(e);
 				if (messageLogger.isInfoEnabled())
 					messageLogger.info(">>>>\nstatusCode: " + Constants.SC_INTERNAL_SERVER_ERROR + "\nContent-Type: text/xml\n" + DOMUtils.toString(soapFault));
-				logger.info("",e);
+				log.info("",e);
 				writeResponseStatus(Constants.SC_INTERNAL_SERVER_ERROR);
 				writeResponseHeader("Content-Type","text/xml");
-				OutputStream response = getOutputStream();
+				val response = getOutputStream();
 				DOMUtils.write(soapFault,response);
 			}
 			catch (Exception e1)

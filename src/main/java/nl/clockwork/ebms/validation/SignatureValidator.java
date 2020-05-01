@@ -15,42 +15,45 @@
  */
 package nl.clockwork.ebms.validation;
 
-import java.util.Optional;
-
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.NonNull;
+import lombok.val;
+import lombok.experimental.FieldDefaults;
 import nl.clockwork.ebms.EbMSErrorCode;
 import nl.clockwork.ebms.EbMSMessageUtils;
 import nl.clockwork.ebms.common.util.StreamUtils;
 import nl.clockwork.ebms.cpa.CPAManager;
 import nl.clockwork.ebms.cpa.CPAUtils;
 import nl.clockwork.ebms.model.CacheablePartyId;
+import nl.clockwork.ebms.model.EbMSDocument;
 import nl.clockwork.ebms.model.EbMSMessage;
 import nl.clockwork.ebms.signing.EbMSSignatureValidator;
 
-import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DeliveryChannel;
-import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageHeader;
-import org.w3._2000._09.xmldsig.ReferenceType;
-import org.w3._2000._09.xmldsig.SignatureType;
-
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@AllArgsConstructor
 public class SignatureValidator
 {
-	protected CPAManager cpaManager;
-	protected EbMSSignatureValidator ebMSSignatureValidator;
+	@NonNull
+	CPAManager cpaManager;
+	@NonNull
+	EbMSSignatureValidator ebMSSignatureValidator;
 
 	public void validate(EbMSMessage message) throws ValidatorException
 	{
-		MessageHeader messageHeader = message.getMessageHeader();
-		SignatureType signature = message.getSignature();
+		val messageHeader = message.getMessageHeader();
+		val signature = message.getSignature();
 		
-		CacheablePartyId fromPartyId = new CacheablePartyId(messageHeader.getFrom().getPartyId());
-		String service = CPAUtils.toString(messageHeader.getService());
-		DeliveryChannel deliveryChannel = cpaManager.getSendDeliveryChannel(messageHeader.getCPAId(),fromPartyId,messageHeader.getFrom().getRole(),service,messageHeader.getAction())
+		val fromPartyId = new CacheablePartyId(messageHeader.getFrom().getPartyId());
+		val service = CPAUtils.toString(messageHeader.getService());
+		val deliveryChannel = cpaManager.getSendDeliveryChannel(messageHeader.getCPAId(),fromPartyId,messageHeader.getFrom().getRole(),service,messageHeader.getAction())
 				.orElseThrow(() -> StreamUtils.illegalStateException("SendDeliveryChannel",messageHeader.getCPAId(),fromPartyId,messageHeader.getFrom().getRole(),service,messageHeader.getAction()));
 		if (cpaManager.isNonRepudiationRequired(messageHeader.getCPAId(),fromPartyId,messageHeader.getFrom().getRole(),service,messageHeader.getAction()))
 		{
 			if (signature == null)
 				throw new EbMSValidationException(
 						EbMSMessageUtils.createError("//Header/Signature",EbMSErrorCode.SECURITY_FAILURE,"Signature not found."));
-			Optional<ReferenceType> reference = signature.getSignedInfo().getReference().stream()
+			val reference = signature.getSignedInfo().getReference().stream()
 					.filter(r -> !CPAUtils.getHashFunction(deliveryChannel).equals(r.getDigestMethod().getAlgorithm())).findFirst();
 			if (reference.isPresent())
 				throw new EbMSValidationException(
@@ -61,32 +64,20 @@ public class SignatureValidator
 		}
 	}
 
-	public void validateSignature(EbMSMessage message) throws ValidatorException
+	public void validateSignature(EbMSDocument document, EbMSMessage message) throws ValidatorException
 	{
 		try
 		{
-			ebMSSignatureValidator.validate(message);
+			ebMSSignatureValidator.validate(document,message);
 		}
 		catch (ValidationException e)
 		{
-			throw new EbMSValidationException(
-					EbMSMessageUtils.createError("//Header/Signature",EbMSErrorCode.SECURITY_FAILURE,e.getMessage()));
+			throw new EbMSValidationException(EbMSMessageUtils.createError("//Header/Signature",EbMSErrorCode.SECURITY_FAILURE,e.getMessage()));
 		}
 	}
 
-	public void validate(EbMSMessage requestMessage, EbMSMessage responseMessage) throws ValidationException, ValidatorException
+	public void validate(EbMSDocument responseDocument, EbMSMessage requestMessage, EbMSMessage responseMessage) throws ValidationException, ValidatorException
 	{
-		ebMSSignatureValidator.validate(requestMessage,responseMessage);
+		ebMSSignatureValidator.validate(responseDocument,requestMessage,responseMessage);
 	}
-
-	public void setCpaManager(CPAManager cpaManager)
-	{
-		this.cpaManager = cpaManager;
-	}
-
-	public void setEbMSSignatureValidator(EbMSSignatureValidator ebMSSignatureValidator)
-	{
-		this.ebMSSignatureValidator = ebMSSignatureValidator;
-	}
-
 }

@@ -23,17 +23,19 @@ import java.util.stream.Collectors;
 
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.PartyId;
 
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.NonNull;
+import lombok.experimental.FieldDefaults;
 import nl.clockwork.ebms.cpa.CPAUtils;
 
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@AllArgsConstructor
 public class CacheablePartyId implements List<PartyId>
 {
-	private List<PartyId> list;
+	@NonNull
+	List<PartyId> list;
 	
-	public CacheablePartyId(List<PartyId> list)
-	{
-		this.list = list;
-	}
-
 	@Override
 	public int size()
 	{

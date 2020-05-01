@@ -25,43 +25,50 @@ import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.signature.XMLSignature;
 import org.apache.xml.security.signature.XMLSignatureException;
 import org.apache.xml.security.utils.Constants;
-import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DeliveryChannel;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageHeader;
 import org.w3._2000._09.xmldsig.ReferenceType;
 import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
 
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.NonNull;
+import lombok.val;
+import lombok.experimental.FieldDefaults;
+import lombok.extern.apachecommons.CommonsLog;
 import nl.clockwork.ebms.common.util.SecurityUtils;
 import nl.clockwork.ebms.common.util.StreamUtils;
 import nl.clockwork.ebms.cpa.CPAManager;
 import nl.clockwork.ebms.cpa.CPAUtils;
 import nl.clockwork.ebms.model.CacheablePartyId;
 import nl.clockwork.ebms.model.EbMSAttachment;
+import nl.clockwork.ebms.model.EbMSDocument;
 import nl.clockwork.ebms.model.EbMSMessage;
 import nl.clockwork.ebms.security.EbMSTrustStore;
 import nl.clockwork.ebms.validation.ValidationException;
 import nl.clockwork.ebms.validation.ValidatorException;
 import nl.clockwork.ebms.xml.dsig.EbMSAttachmentResolver;
 
+@CommonsLog
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@AllArgsConstructor
 public class EbMSSignatureValidator
 {
-	protected transient Log logger = LogFactory.getLog(getClass());
-	private CPAManager cpaManager;
-	private EbMSTrustStore trustStore;
+	@NonNull
+	CPAManager cpaManager;
+	@NonNull
+	EbMSTrustStore trustStore;
 
-	public void validate(EbMSMessage message) throws ValidatorException, ValidationException
+	public void validate(EbMSDocument document, EbMSMessage message) throws ValidatorException, ValidationException
 	{
 		try
 		{
-			MessageHeader messageHeader = message.getMessageHeader();
-			CacheablePartyId fromPartyId = new CacheablePartyId(messageHeader.getFrom().getPartyId());
-			String service = CPAUtils.toString(messageHeader.getService());
+			val messageHeader = message.getMessageHeader();
+			val fromPartyId = new CacheablePartyId(messageHeader.getFrom().getPartyId());
+			val service = CPAUtils.toString(messageHeader.getService());
 			if (cpaManager.isNonRepudiationRequired(
 					messageHeader.getCPAId(),
 					fromPartyId,
@@ -69,13 +76,13 @@ public class EbMSSignatureValidator
 					service,
 					messageHeader.getAction()))
 			{
-				NodeList signatureNodeList = message.getMessage().getElementsByTagNameNS(Constants.SignatureSpecNS,Constants._TAG_SIGNATURE);
+				val signatureNodeList = document.getMessage().getElementsByTagNameNS(Constants.SignatureSpecNS,Constants._TAG_SIGNATURE);
 				if (signatureNodeList.getLength() > 0)
 				{
-					X509Certificate certificate = getCertificate(messageHeader);
+					val certificate = getCertificate(messageHeader);
 					if (certificate != null)
 					{
-						Date timestamp = messageHeader.getMessageData().getTimestamp() == null ? new Date() : messageHeader.getMessageData().getTimestamp();
+						val timestamp = messageHeader.getMessageData().getTimestamp() == null ? new Date() : messageHeader.getMessageData().getTimestamp();
 						SecurityUtils.validateCertificate(trustStore,certificate,timestamp);
 						if (!verify(certificate,(Element)signatureNodeList.item(0),message.getAttachments()))
 							throw new ValidationException("Invalid Signature!");
@@ -97,19 +104,19 @@ public class EbMSSignatureValidator
 		}
 	}
 
-	public void validate(EbMSMessage requestMessage, EbMSMessage responseMessage) throws ValidatorException, ValidationException
+	public void validate(EbMSDocument responseDocument, EbMSMessage requestMessage, EbMSMessage responseMessage) throws ValidatorException, ValidationException
 	{
 		try
 		{
 			if (requestMessage.getAckRequested().isSigned())
 			{
-				NodeList signatureNodeList = responseMessage.getMessage().getElementsByTagNameNS(Constants.SignatureSpecNS,Constants._TAG_SIGNATURE);
+				val signatureNodeList = responseDocument.getMessage().getElementsByTagNameNS(Constants.SignatureSpecNS,Constants._TAG_SIGNATURE);
 				if (signatureNodeList.getLength() > 0)
 				{
-					X509Certificate certificate = getCertificate(responseMessage.getMessageHeader());
+					val certificate = getCertificate(responseMessage.getMessageHeader());
 					if (certificate != null)
 					{
-						Date date = responseMessage.getMessageHeader().getMessageData().getTimestamp() == null ? new Date() : responseMessage.getMessageHeader().getMessageData().getTimestamp();
+						val date = responseMessage.getMessageHeader().getMessageData().getTimestamp() == null ? new Date() : responseMessage.getMessageHeader().getMessageData().getTimestamp();
 						SecurityUtils.validateCertificate(trustStore,certificate,date);
 						if (!verify(certificate,(Element)signatureNodeList.item(0),new ArrayList<>()))
 							throw new ValidationException("Invalid Signature!");
@@ -134,8 +141,8 @@ public class EbMSSignatureValidator
 
 	private boolean verify(X509Certificate certificate, Element signatureElement, List<EbMSAttachment> attachments) throws XMLSignatureException, XMLSecurityException
 	{
-		XMLSignature signature = new XMLSignature(signatureElement,org.apache.xml.security.utils.Constants.SignatureSpecNS);
-		EbMSAttachmentResolver resolver = new EbMSAttachmentResolver(attachments);
+		val signature = new XMLSignature(signatureElement,org.apache.xml.security.utils.Constants.SignatureSpecNS);
+		val resolver = new EbMSAttachmentResolver(attachments);
 		signature.addResourceResolver(resolver);
 		return signature.checkSignatureValue(certificate);
 	}
@@ -144,9 +151,9 @@ public class EbMSSignatureValidator
 	{
 		try
 		{
-			CacheablePartyId fromPartyId = new CacheablePartyId(messageHeader.getFrom().getPartyId());
-			String service = CPAUtils.toString(messageHeader.getService());
-			DeliveryChannel deliveryChannel = cpaManager.getSendDeliveryChannel(messageHeader.getCPAId(),fromPartyId,messageHeader.getFrom().getRole(),service,messageHeader.getAction())
+			val fromPartyId = new CacheablePartyId(messageHeader.getFrom().getPartyId());
+			val service = CPAUtils.toString(messageHeader.getService());
+			val deliveryChannel = cpaManager.getSendDeliveryChannel(messageHeader.getCPAId(),fromPartyId,messageHeader.getFrom().getRole(),service,messageHeader.getAction())
 					.orElseThrow(() -> StreamUtils.illegalStateException("SendDeliveryChannel",messageHeader.getCPAId(),fromPartyId,messageHeader.getFrom().getRole(),service,messageHeader.getAction()));
 			if (deliveryChannel != null)
 				return CPAUtils.getX509Certificate(CPAUtils.getSigningCertificate(deliveryChannel));
@@ -154,7 +161,7 @@ public class EbMSSignatureValidator
 		}
 		catch (CertificateException e)
 		{
-			logger.warn("",e);
+			log.warn("",e);
 			return null;
 		}
 	}
@@ -183,15 +190,4 @@ public class EbMSSignatureValidator
 		return requestReferences.stream().anyMatch(r -> responseReference.getURI().equals(r.getURI())
 				&& Arrays.equals(r.getDigestValue(),responseReference.getDigestValue()));
 	}
-
-	public void setCpaManager(CPAManager cpaManager)
-	{
-		this.cpaManager = cpaManager;
-	}
-
-	public void setTrustStore(EbMSTrustStore trustStore)
-	{
-		this.trustStore = trustStore;
-	}
-
 }

@@ -27,24 +27,25 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
+import lombok.AccessLevel;
+import lombok.val;
+import lombok.var;
+import lombok.experimental.FieldDefaults;
 import nl.clockwork.ebms.security.EbMSTrustStore;
 import nl.clockwork.ebms.validation.ClientCertificateManager;
 
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class ClientCertificateAuthenticationFilter implements Filter
 {
-	protected transient Log logger = LogFactory.getLog(getClass());
-	private EbMSTrustStore trustStore;
+	EbMSTrustStore trustStore;
 
 	@Override
 	public void init(FilterConfig config) throws ServletException
 	{
-		WebApplicationContext wac = WebApplicationContextUtils.getRequiredWebApplicationContext(config.getServletContext());
-		String id = config.getInitParameter("trustStore");
+		val wac = WebApplicationContextUtils.getRequiredWebApplicationContext(config.getServletContext());
+		var id = config.getInitParameter("trustStore");
 		if (id == null)
 			id = "trustStore";
 		trustStore = wac.getBean(id,EbMSTrustStore.class);
@@ -55,7 +56,7 @@ public class ClientCertificateAuthenticationFilter implements Filter
 	{
 		try
 		{
-			X509Certificate certificate = ClientCertificateManager.getCertificate();
+			val certificate = ClientCertificateManager.getCertificate();
 			if (validate(trustStore,certificate))
 				chain.doFilter(request,response);
 			else

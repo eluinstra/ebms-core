@@ -20,6 +20,7 @@ import java.util.List;
 
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.Reference;
 
+import lombok.val;
 import nl.clockwork.ebms.Constants;
 import nl.clockwork.ebms.EbMSErrorCode;
 import nl.clockwork.ebms.EbMSMessageUtils;
@@ -28,10 +29,9 @@ import nl.clockwork.ebms.model.EbMSMessage;
 
 public class ManifestValidator
 {
-
 	public void validate(EbMSMessage message) throws EbMSValidationException
 	{
-		List<EbMSAttachment> attachments = new ArrayList<>();
+		val attachments = new ArrayList<EbMSAttachment>();
 		if (message.getManifest() != null)
 		{
 			if (!Constants.EBMS_VERSION.equals(message.getManifest().getVersion()))
@@ -45,7 +45,7 @@ public class ManifestValidator
 	{
 		if (reference.getHref().startsWith(Constants.CID))
 		{
-			EbMSAttachment attachment = findAttachment(srcAttachments,reference.getHref());
+			val attachment = findAttachment(srcAttachments,reference.getHref());
 			if (attachment != null)
 				destAttachments.add(attachment);
 			else

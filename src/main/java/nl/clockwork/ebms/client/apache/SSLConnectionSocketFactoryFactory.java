@@ -21,26 +21,26 @@ import javax.net.ssl.HttpsURLConnection;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.springframework.beans.factory.FactoryBean;
 
+import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.Builder.Default;
+import lombok.NonNull;
+import lombok.experimental.FieldDefaults;
 import nl.clockwork.ebms.client.SSLFactoryManager;
 
+@Builder(toBuilder = true)
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class SSLConnectionSocketFactoryFactory implements FactoryBean<SSLConnectionSocketFactory>
 {
-	private SSLFactoryManager sslFactoryManager;
-	private String[] enabledProtocols = new String[]{};
-	private String[] enabledCipherSuites = new String[]{};
-	private boolean verifyHostnames;
-
-	public SSLConnectionSocketFactoryFactory()
-	{
-	}
-
-	public SSLConnectionSocketFactoryFactory(SSLFactoryManager sslFactoryManager, String[] enabledProtocols, String[] enabledCipherSuites, boolean verifyHostnames)
-	{
-		this.sslFactoryManager = sslFactoryManager;
-		this.enabledProtocols = enabledProtocols;
-		this.enabledCipherSuites = enabledCipherSuites;
-		this.verifyHostnames = verifyHostnames;
-	}
+	@NonNull
+	SSLFactoryManager sslFactoryManager;
+	@NonNull
+	@Default
+	String[] enabledProtocols = new String[]{};
+	@NonNull
+	@Default
+	String[] enabledCipherSuites = new String[]{};
+	boolean verifyHostnames;
 
 	@Override
 	public SSLConnectionSocketFactory getObject() throws Exception
@@ -63,25 +63,5 @@ public class SSLConnectionSocketFactoryFactory implements FactoryBean<SSLConnect
 	public boolean isSingleton()
 	{
 		return true;
-	}
-
-	public void setSslFactoryManager(SSLFactoryManager sslFactoryManager)
-	{
-		this.sslFactoryManager = sslFactoryManager;
-	}
-
-	public void setEnabledProtocols(String[] enabledProtocols)
-	{
-		this.enabledProtocols = enabledProtocols;
-	}
-
-	public void setEnabledCipherSuites(String[] enabledCipherSuites)
-	{
-		this.enabledCipherSuites = enabledCipherSuites;
-	}
-
-	public void setVerifyHostnames(boolean verifyHostnames)
-	{
-		this.verifyHostnames = verifyHostnames;
 	}
 }

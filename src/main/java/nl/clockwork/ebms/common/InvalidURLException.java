@@ -15,14 +15,12 @@
  */
 package nl.clockwork.ebms.common;
 
+import lombok.NoArgsConstructor;
+
+@NoArgsConstructor
 public class InvalidURLException extends Exception
 {
 	private static final long serialVersionUID = 1L;
-
-	public InvalidURLException()
-	{
-		super();
-	}
 
 	public InvalidURLException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace)
 	{

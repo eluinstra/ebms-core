@@ -24,23 +24,23 @@ import java.util.Date;
 
 import javax.xml.transform.TransformerException;
 
-import nl.clockwork.ebms.EbMSMessageUtils;
-import nl.clockwork.ebms.EbMSMessageEventType;
-import nl.clockwork.ebms.EbMSMessageStatus;
-import nl.clockwork.ebms.common.util.DOMUtils;
-import nl.clockwork.ebms.dao.DAOException;
-import nl.clockwork.ebms.model.EbMSMessage;
-
-import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageHeader;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
-import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.transaction.TransactionException;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 import org.springframework.transaction.support.TransactionTemplate;
+import org.w3c.dom.Document;
+
+import lombok.val;
+import nl.clockwork.ebms.EbMSMessageStatus;
+import nl.clockwork.ebms.EbMSMessageUtils;
+import nl.clockwork.ebms.common.util.DOMUtils;
+import nl.clockwork.ebms.dao.DAOException;
+import nl.clockwork.ebms.event.listener.EbMSMessageEventType;
+import nl.clockwork.ebms.model.EbMSMessage;
 
 public class EbMSDAOImpl extends nl.clockwork.ebms.dao.mysql.EbMSDAOImpl
 {
@@ -55,13 +55,13 @@ public class EbMSDAOImpl extends nl.clockwork.ebms.dao.mysql.EbMSDAOImpl
 		return "select top " + maxNr + " message_id" +
 		" from ebms_message" +
 		" where message_nr = 0" +
-		" and status = " + status.id() +
+		" and status = " + status.getId() +
 		messageContextFilter +
 		" order by time_stamp asc";
 	}
 
 	@Override
-	public void insertDuplicateMessage(final Date timestamp, final EbMSMessage message, boolean storeAttachments) throws DAOException
+	public void insertDuplicateMessage(final Date timestamp, final Document document, final EbMSMessage message, boolean storeAttachments) throws DAOException
 	{
 		try
 		{
@@ -73,7 +73,7 @@ public class EbMSDAOImpl extends nl.clockwork.ebms.dao.mysql.EbMSDAOImpl
 					{
 						try
 						{
-							KeyHolder keyHolder = new GeneratedKeyHolder();
+							val keyHolder = new GeneratedKeyHolder();
 							jdbcTemplate.update(
 								new PreparedStatementCreator()
 								{
@@ -83,7 +83,7 @@ public class EbMSDAOImpl extends nl.clockwork.ebms.dao.mysql.EbMSDAOImpl
 									{
 										try
 										{
-											PreparedStatement ps = connection.prepareStatement
+											val ps = connection.prepareStatement
 											(
 												"insert into ebms_message (" +
 													"time_stamp," +
@@ -102,7 +102,7 @@ public class EbMSDAOImpl extends nl.clockwork.ebms.dao.mysql.EbMSDAOImpl
 												new int[]{1}
 											);
 											ps.setTimestamp(1,new Timestamp(timestamp.getTime()));
-											MessageHeader messageHeader = message.getMessageHeader();
+											val messageHeader = message.getMessageHeader();
 											ps.setString(2,messageHeader.getCPAId());
 											ps.setString(3,messageHeader.getConversationId());
 											ps.setString(4,messageHeader.getMessageData().getMessageId());
@@ -113,7 +113,7 @@ public class EbMSDAOImpl extends nl.clockwork.ebms.dao.mysql.EbMSDAOImpl
 											ps.setString(9,messageHeader.getTo().getRole());
 											ps.setString(10,EbMSMessageUtils.toString(messageHeader.getService()));
 											ps.setString(11,messageHeader.getAction());
-											ps.setString(12,DOMUtils.toString(message.getMessage(),"UTF-8"));
+											ps.setString(12,DOMUtils.toString(document,"UTF-8"));
 											return ps;
 										}
 										catch (TransformerException e)

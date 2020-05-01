@@ -20,12 +20,9 @@ import java.io.StringReader;
 
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.namespace.QName;
-import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
@@ -33,13 +30,15 @@ import org.w3c.dom.Node;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
+import lombok.val;
+
 public class XMLUtils
 {
 	public static String executeXPathQuery(String content, String query) throws ParserConfigurationException, SAXException, IOException, XPathExpressionException
 	{
-		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+		val factory = DocumentBuilderFactory.newInstance();
 		//factory.setNamespaceAware(true);
-		DocumentBuilder builder = factory.newDocumentBuilder();
+		val builder = factory.newDocumentBuilder();
 		return executeXPathQuery(builder.parse(new InputSource(new StringReader(content))),query);
 	}
 	
@@ -50,16 +49,16 @@ public class XMLUtils
 	
 	public static Object executeXPathQuery(Node node, String query, QName returnType) throws ParserConfigurationException, SAXException, IOException, XPathExpressionException
 	{
-		XPath xpath = XPathFactory.newInstance().newXPath();
-		XPathExpression expr = xpath.compile(query);
+		val xpath = XPathFactory.newInstance().newXPath();
+		val expr = xpath.compile(query);
 		return expr.evaluate(node,returnType);
 	}
 	
 	public static String executeXPathQuery(NamespaceContext namespaceContext, String content, String query) throws ParserConfigurationException, SAXException, IOException, XPathExpressionException
 	{
-		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+		val factory = DocumentBuilderFactory.newInstance();
 		factory.setNamespaceAware(true);
-		DocumentBuilder builder = factory.newDocumentBuilder();
+		val builder = factory.newDocumentBuilder();
 		return executeXPathQuery(namespaceContext,builder.parse(new InputSource(new StringReader(content))),query);
 	}
 
@@ -70,9 +69,9 @@ public class XMLUtils
 
 	public static Object executeXPathQuery(NamespaceContext namespaceContext, Node node, String query, QName returnType) throws ParserConfigurationException, SAXException, IOException, XPathExpressionException
 	{
-		XPath xpath = XPathFactory.newInstance().newXPath();
+		val xpath = XPathFactory.newInstance().newXPath();
 		xpath.setNamespaceContext(namespaceContext);
-		XPathExpression expr = xpath.compile(query);
+		val expr = xpath.compile(query);
 		return expr.evaluate(node,returnType);
 	}
 

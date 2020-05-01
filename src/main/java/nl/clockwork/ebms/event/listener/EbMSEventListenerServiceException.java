@@ -17,16 +17,13 @@ package nl.clockwork.ebms.event.listener;
 
 import javax.xml.ws.WebFault;
 
+import lombok.NoArgsConstructor;
 
-@WebFault(name="EbMSEventListenerServiceException", targetNamespace="http://www.clockwork.nl/ebms/event/2.0")
+@WebFault(name="EbMSEventListenerServiceException", targetNamespace="http://www.clockwork.nl/ebms/event/2.17")
+@NoArgsConstructor
 public class EbMSEventListenerServiceException extends EventException
 {
 	private static final long serialVersionUID = 1L;
-
-	public EbMSEventListenerServiceException()
-	{
-		super();
-	}
 
 	public EbMSEventListenerServiceException(String message, Throwable cause)
 	{
@@ -42,5 +39,4 @@ public class EbMSEventListenerServiceException extends EventException
 	{
 		super(cause);
 	}
-
 }

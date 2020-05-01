@@ -18,7 +18,6 @@ package nl.clockwork.ebms.event.processor;
 import java.util.Calendar;
 import java.util.Date;
 
-import nl.clockwork.ebms.EbMSEventStatus;
 import nl.clockwork.ebms.common.util.StreamUtils;
 import nl.clockwork.ebms.cpa.CPAManager;
 import nl.clockwork.ebms.cpa.CPAUtils;
@@ -29,10 +28,20 @@ import nl.clockwork.ebms.model.EbMSEvent;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DeliveryChannel;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.ReliableMessaging;
 
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.NonNull;
+import lombok.val;
+import lombok.experimental.FieldDefaults;
+
+@FieldDefaults(level = AccessLevel.PROTECTED, makeFinal = true)
+@AllArgsConstructor
 public class EventManager
 {
-	private EbMSDAO ebMSDAO;
-	private CPAManager cpaManager;
+	@NonNull
+	EbMSDAO ebMSDAO;
+	@NonNull
+	CPAManager cpaManager;
 
 	public void createEvent(String cpaId, DeliveryChannel sendDeliveryChannel, DeliveryChannel receiveDeliveryChannel, String messageId, Date timeToLive, Date timestamp, boolean isConfidential)
 	{
@@ -46,7 +55,7 @@ public class EventManager
 
 	public void updateEvent(final EbMSEvent event, final String url, final EbMSEventStatus status, final String errorMessage)
 	{
-		final DeliveryChannel deliveryChannel = cpaManager.getDeliveryChannel(
+		val deliveryChannel = cpaManager.getDeliveryChannel(
 				event.getCpaId(),
 				event.getReceiveDeliveryChannelId())
 					.orElseThrow(() -> StreamUtils.illegalStateException("DeliveryChannel",event.getCpaId(),event.getReceiveDeliveryChannelId()));
@@ -77,17 +86,18 @@ public class EventManager
 	
 	protected EbMSEvent retryEvent(EbMSEvent event, int retryInterval)
 	{
-		Calendar timestamp = Calendar.getInstance();
+		val timestamp = Calendar.getInstance();
 		timestamp.add(Calendar.MINUTE, retryInterval);
-		return new EbMSEvent(
-				event.getCpaId(),
-				event.getSendDeliveryChannelId(),
-				event.getReceiveDeliveryChannelId(),
-				event.getMessageId(),
-				event.getTimeToLive(),
-				timestamp.getTime(),
-				event.isConfidential(),
-				event.getRetries() + 1);
+		return EbMSEvent.builder()
+				.cpaId(event.getCpaId())
+				.sendDeliveryChannelId(event.getSendDeliveryChannelId())
+				.receiveDeliveryChannelId(event.getReceiveDeliveryChannelId())
+				.messageId(event.getMessageId())
+				.timeToLive(event.getTimeToLive())
+				.timestamp(timestamp.getTime())
+				.isConfidential(event.isConfidential())
+				.retries(event.getRetries() + 1)
+				.build();
 	}
 
 	protected EbMSEvent createNewEvent(EbMSEvent event, DeliveryChannel deliveryChannel)
@@ -98,34 +108,15 @@ public class EventManager
 			rm.getRetryInterval().addTo(timestamp);
 		else
 			timestamp = event.getTimeToLive();
-		return new EbMSEvent(
-				event.getCpaId(),
-				event.getSendDeliveryChannelId(),
-				event.getReceiveDeliveryChannelId(),
-				event.getMessageId(),
-				event.getTimeToLive(),
-				timestamp,
-				event.isConfidential(),
-				event.getRetries() + 1);
-	}
-
-	public void setEbMSDAO(EbMSDAO ebMSDAO)
-	{
-		this.ebMSDAO = ebMSDAO;
-	}
-	
-	public EbMSDAO getEbMSDAO()
-	{
-		return this.ebMSDAO;
-	}
-
-	public void setCpaManager(CPAManager cpaManager)
-	{
-		this.cpaManager = cpaManager;
-	}
-
-	public CPAManager getCpaManager()
-	{
-		return this.cpaManager;
+		return EbMSEvent.builder()
+				.cpaId(event.getCpaId())
+				.sendDeliveryChannelId(event.getSendDeliveryChannelId())
+				.receiveDeliveryChannelId(event.getReceiveDeliveryChannelId())
+				.messageId(event.getMessageId())
+				.timeToLive(event.getTimeToLive())
+				.timestamp(timestamp)
+				.isConfidential(event.isConfidential())
+				.retries(event.getRetries() + 1)
+				.build();
 	}
 }

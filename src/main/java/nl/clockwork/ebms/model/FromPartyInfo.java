@@ -15,48 +15,28 @@
  */
 package nl.clockwork.ebms.model;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CanSend;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.ServiceType;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.NonNull;
+
+@XmlAccessorType(XmlAccessType.FIELD)
+@Data
+@EqualsAndHashCode(callSuper = false)
+@NoArgsConstructor
+@AllArgsConstructor
 public class FromPartyInfo extends EbMSPartyInfo
 {
 	private static final long serialVersionUID = 1L;
-	private String role;
-	private ServiceType service;
-	private CanSend canSend;
-	
-	public FromPartyInfo()
-	{
-	}
-
-	public ServiceType getService()
-	{
-		return service;
-	}
-
-	public void setService(ServiceType service)
-	{
-		this.service = service;
-	}
-
-	public CanSend getCanSend()
-	{
-		return canSend;
-	}
-
-	public void setCanSend(CanSend canSend)
-	{
-		this.canSend = canSend;
-	}
-
-	public String getRole()
-	{
-		return role;
-	}
-
-	public void setRole(String role)
-	{
-		this.role = role;
-	}
-	
+	@NonNull
+	ServiceType service;
+	@NonNull
+	CanSend canSend;
 }

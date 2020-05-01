@@ -16,7 +16,6 @@
 package nl.clockwork.ebms.client.apache;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.charset.Charset;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -32,15 +31,19 @@ import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.ResponseHandler;
 import org.xml.sax.SAXException;
 
+import lombok.AccessLevel;
+import lombok.val;
+import lombok.experimental.FieldDefaults;
 import nl.clockwork.ebms.Constants;
 import nl.clockwork.ebms.common.util.HTTPUtils;
 import nl.clockwork.ebms.model.EbMSDocument;
 import nl.clockwork.ebms.processor.EbMSProcessingException;
 import nl.clockwork.ebms.server.EbMSMessageReader;
 
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class EbMSResponseHandler implements ResponseHandler<EbMSDocument>
 {
-	protected transient Log messageLogger = LogFactory.getLog(Constants.MESSAGE_LOG);
+	transient Log messageLogger = LogFactory.getLog(Constants.MESSAGE_LOG);
 
 	@Override
 	public EbMSDocument handleResponse(HttpResponse response) throws ClientProtocolException, IOException
@@ -49,7 +52,7 @@ public class EbMSResponseHandler implements ResponseHandler<EbMSDocument>
 		{
 			if (response.getStatusLine().getStatusCode() / 100 == 2)
 			{
-				HttpEntity entity = response.getEntity();
+				val entity = response.getEntity();
 				if (response.getStatusLine().getStatusCode() == Constants.SC_NOCONTENT || entity == null || entity.getContentLength() == 0)
 				{
 					messageLogger.info("<<<< statusCode = " + response.getStatusLine().getStatusCode());
@@ -57,10 +60,10 @@ public class EbMSResponseHandler implements ResponseHandler<EbMSDocument>
 				}
 				else
 				{
-					try (InputStream input = entity.getContent())
+					try (val input = entity.getContent())
 					{
-						EbMSMessageReader messageReader = new EbMSMessageReader(getHeaderField(response,"Content-ID"),getHeaderField(response,"Content-Type"));
-						String message = IOUtils.toString(input,getEncoding(entity));
+						val messageReader = new EbMSMessageReader(getHeaderField(response,"Content-ID"),getHeaderField(response,"Content-Type"));
+						val message = IOUtils.toString(input,getEncoding(entity));
 		      	messageLogger.info("<<<< statusCode = " + response.getStatusLine().getStatusCode() + "\n" + message);
 						return messageReader.readResponse(message);
 					}
@@ -68,7 +71,7 @@ public class EbMSResponseHandler implements ResponseHandler<EbMSDocument>
 			}
 			else if (response.getStatusLine().getStatusCode() >= Constants.SC_BAD_REQUEST)
 			{
-		    HttpEntity entity = response.getEntity();
+		    val entity = response.getEntity();
 		    if (entity != null)
 					throw new IOException("StatusCode: " + response.getStatusLine().getStatusCode() + "\n" + IOUtils.toString(entity.getContent(),Charset.defaultCharset()));
 			}
@@ -82,7 +85,7 @@ public class EbMSResponseHandler implements ResponseHandler<EbMSDocument>
 
 	private String getEncoding(HttpEntity entity) throws EbMSProcessingException
 	{
-		String contentType = entity.getContentType().getValue();
+		val contentType = entity.getContentType().getValue();
 		if (!StringUtils.isEmpty(contentType))
 			return HTTPUtils.getCharSet(contentType);
 		else

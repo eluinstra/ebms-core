@@ -18,52 +18,37 @@ package nl.clockwork.ebms.common;
 import java.util.LinkedHashMap;
 import java.util.Optional;
 
-import org.springframework.beans.factory.InitializingBean;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
+import lombok.experimental.FieldDefaults;
+import lombok.experimental.NonFinal;
 
-import nl.clockwork.ebms.Constants;
-
-public class MessageQueue<T> implements InitializingBean
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+public class MessageQueue<T>
 {
+	@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+	@RequiredArgsConstructor
+	@Getter
 	private class QueueEntry<U>
 	{
 		private Thread thread;
+		@NonFinal
+		@Setter
 		private U object;
-		
-		public QueueEntry(Thread thread)
-		{
-			this.setThread(thread);
-		}
-
-		public Thread getThread()
-		{
-			return thread;
-		}
-
-		public void setThread(Thread thread)
-		{
-			this.thread = thread;
-		}
-
-		public U getObject()
-		{
-			return object;
-		}
-
-		public void setObject(U object)
-		{
-			this.object = object;
-		}
 	}
 	
-	private LinkedHashMap<String,QueueEntry<T>> queue;
-	private int maxEntries = 128;
-	private static final float LOADFACTOR = .75F;
-	private int timeout = Constants.MINUTE_IN_MILLIS;
+	private static final float LOAD_FACTOR = .75F;
+	int timeout;
+	@NonNull
+	LinkedHashMap<String,QueueEntry<T>> queue;
 
-	@Override
-	public void afterPropertiesSet() throws Exception
+	public MessageQueue(int maxEntries, int timeout)
 	{
-		queue = new LinkedHashMap<String,QueueEntry<T>>(maxEntries + 1, LOADFACTOR, true)
+		this.timeout = timeout;
+		this.queue = new LinkedHashMap<String,QueueEntry<T>>(maxEntries + 1, LOAD_FACTOR, true)
 		{
 			private static final long serialVersionUID = 1L;
 
@@ -74,7 +59,7 @@ public class MessageQueue<T> implements InitializingBean
 			}
 		};
 	}
-	
+
 	public void register(String correlationId)
 	{
 		synchronized (queue)
@@ -101,13 +86,12 @@ public class MessageQueue<T> implements InitializingBean
 		{
 			// ignore
 		}
-		Optional<T> result = Optional.empty();
 		synchronized (queue)
 		{
 			if (queue.containsKey(correlationId))
-				result = Optional.ofNullable(queue.remove(correlationId).getObject());
+				return Optional.ofNullable(queue.remove(correlationId).getObject());
 		}
-		return result;
+		return Optional.empty();
 	}
 
 	public void put(String correlationId, T object)
@@ -130,15 +114,4 @@ public class MessageQueue<T> implements InitializingBean
 			queue.remove(correlationId);
 		}
 	}
-	
-	public void setMaxEntries(int maxEntries)
-	{
-		this.maxEntries = maxEntries;
-	}
-	
-	public void setTimeout(int timeout)
-	{
-		this.timeout = timeout;
-	}
-
 }

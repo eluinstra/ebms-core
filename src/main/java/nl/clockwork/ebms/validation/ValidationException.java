@@ -15,14 +15,12 @@
  */
 package nl.clockwork.ebms.validation;
 
+import lombok.NoArgsConstructor;
+
+@NoArgsConstructor
 public class ValidationException extends ValidatorException
 {
 	private static final long serialVersionUID = 1L;
-
-	public ValidationException()
-	{
-		super();
-	}
 
 	public ValidationException(String message, Throwable cause)
 	{

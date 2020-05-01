@@ -40,10 +40,11 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CollaborationProtocolAgreement;
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
+import lombok.AccessLevel;
+import lombok.val;
+import lombok.experimental.FieldDefaults;
 import net.sf.ehcache.Ehcache;
 import nl.clockwork.ebms.EbMSAttachmentFactory;
 import nl.clockwork.ebms.EbMSIdGenerator;
@@ -51,6 +52,7 @@ import nl.clockwork.ebms.EbMSMessageFactory;
 import nl.clockwork.ebms.common.JAXBParser;
 import nl.clockwork.ebms.common.util.DOMUtils;
 import nl.clockwork.ebms.cpa.CPAManager;
+import nl.clockwork.ebms.cpa.URLMapper;
 import nl.clockwork.ebms.dao.DAOException;
 import nl.clockwork.ebms.dao.EbMSDAO;
 import nl.clockwork.ebms.model.EbMSAttachment;
@@ -67,16 +69,17 @@ import nl.clockwork.ebms.validation.EbMSValidationException;
 import nl.clockwork.ebms.validation.ValidatorException;
 
 @TestInstance(value = Lifecycle.PER_CLASS)
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class EncryptionTest
 {
-	private CPAManager cpaManager;
-	private EbMSMessageFactory messageFactory;
-	private String cpaId = "cpaStubEBF.rm.https.signed.encrypted";
-	private KeyStoreType keyStoreType = KeyStoreType.JKS;
-	private String keyStorePath = "keystore.jks";
-	private String keyStorePassword = "password";
-	private EbMSMessageEncrypter messageEncrypter;
-	private EbMSMessageDecrypter messageDecrypter;
+	CPAManager cpaManager;
+	EbMSMessageFactory messageFactory;
+	String cpaId = "cpaStubEBF.rm.https.signed.encrypted";
+	KeyStoreType keyStoreType = KeyStoreType.JKS;
+	String keyStorePath = "keystore.jks";
+	String keyStorePassword = "password";
+	EbMSMessageEncrypter messageEncrypter;
+	EbMSMessageDecrypter messageDecrypter;
 	@Mock
 	Ehcache ehCacheMock;
 
@@ -94,7 +97,7 @@ public class EncryptionTest
 	@Test
 	public void testEncryption() throws EbMSProcessorException, ValidatorException, IOException
 	{
-		EbMSMessage message = createMessage();
+		val message = createMessage();
 		messageEncrypter.encrypt(message);
 		messageDecrypter.decrypt(message);
 		assertEquals("Dit is een test.",IOUtils.toString(message.getAttachments().get(0).getInputStream(),Charset.forName("UTF-8")));
@@ -103,7 +106,7 @@ public class EncryptionTest
 	@Test
 	public void testEncryptionAttachmentValidationFailure() throws EbMSProcessorException, ParserConfigurationException, SAXException, IOException, TransformerException, ValidatorException
 	{
-		EbMSMessage message = createMessage();
+		val message = createMessage();
 		messageEncrypter.encrypt(message);
 		changeAttachment(message);
 		assertThrows(EbMSValidationException.class,()->messageDecrypter.decrypt(message));
@@ -112,7 +115,7 @@ public class EncryptionTest
 	@Test
 	public void testEncryptionAttachmentValidationFailure1() throws EbMSProcessorException, ParserConfigurationException, SAXException, IOException, TransformerException, ValidatorException
 	{
-		EbMSMessage message = createMessage();
+		val message = createMessage();
 		messageEncrypter.encrypt(message);
 		changeAttachment1(message);
 		assertThrows(EbMSValidationException.class,()->messageDecrypter.decrypt(message));
@@ -121,17 +124,18 @@ public class EncryptionTest
 	@Test
 	public void testEncryptionAttachmentNotEncrypted() throws EbMSProcessorException, ValidatorException
 	{
-		EbMSMessage message = createMessage();
+		val message = createMessage();
 		messageEncrypter.encrypt(message);
-		message.setAttachments(createAttachments(message.getMessageHeader().getMessageData().getMessageId()));
+		message.getAttachments().clear();
+		message.getAttachments().addAll(createAttachments(message.getMessageHeader().getMessageData().getMessageId()));
 		assertThrows(EbMSValidationException.class,()->messageDecrypter.decrypt(message));
 	}
 
 	private void changeAttachment(EbMSMessage message) throws ParserConfigurationException, SAXException, IOException, TransformerException
 	{
-		EbMSAttachment attachment = message.getAttachments().get(0);
-		Document d = DOMUtils.read(attachment.getInputStream());
-		Node cipherValue = d.getElementsByTagNameNS("http://www.w3.org/2001/04/xmlenc#","CipherValue").item(0);
+		val attachment = message.getAttachments().get(0);
+		val d = DOMUtils.read(attachment.getInputStream());
+		val cipherValue = d.getElementsByTagNameNS("http://www.w3.org/2001/04/xmlenc#","CipherValue").item(0);
 		cipherValue.setTextContent("XXXXXXX" + cipherValue.getTextContent());
 		message.getAttachments().remove(0);
 		message.getAttachments().add(EbMSAttachmentFactory.createEbMSAttachment(attachment.getName(),attachment.getContentId(),"application/xml",DOMUtils.toString(d).getBytes("UTF-8")));
@@ -139,9 +143,9 @@ public class EncryptionTest
 
 	private void changeAttachment1(EbMSMessage message) throws ParserConfigurationException, SAXException, IOException, TransformerException
 	{
-		EbMSAttachment attachment = message.getAttachments().get(0);
-		Document d = DOMUtils.read(attachment.getInputStream());
-		Node cipherValue = d.getElementsByTagNameNS("http://www.w3.org/2001/04/xmlenc#","CipherValue").item(1);
+		val attachment = message.getAttachments().get(0);
+		val d = DOMUtils.read(attachment.getInputStream());
+		val cipherValue = d.getElementsByTagNameNS("http://www.w3.org/2001/04/xmlenc#","CipherValue").item(1);
 		cipherValue.setTextContent("XXXXXXX" + cipherValue.getTextContent());
 		message.getAttachments().remove(0);
 		message.getAttachments().add(EbMSAttachmentFactory.createEbMSAttachment(attachment.getName(),attachment.getContentId(),"application/xml",DOMUtils.toString(d).getBytes("UTF-8")));
@@ -149,67 +153,56 @@ public class EncryptionTest
 
 	private CPAManager initCPAManager() throws DAOException, IOException, JAXBException
 	{
-		CPAManager result = new CPAManager();
-		result.setDaoMethodCache(initMethodCacheMock());
-		result.setCpaMethodCache(initMethodCacheMock());
-		result.setEbMSDAO(initEbMSDAOMock());
-		return result;
+		return new CPAManager(initMethodCacheMock(),initMethodCacheMock(),initEbMSDAOMock(),new URLMapper(initMethodCacheMock(),initEbMSDAOMock()));
 	}
 
 	private Ehcache initMethodCacheMock()
 	{
-		Ehcache result = Mockito.mock(Ehcache.class);
+		val result = Mockito.mock(Ehcache.class);
 		Mockito.when(result.remove(Mockito.any(Serializable.class))).thenReturn(true);
 		return result;
 	}
 
 	private EbMSDAO initEbMSDAOMock() throws DAOException, IOException, JAXBException
 	{
-		EbMSDAO result = Mockito.mock(EbMSDAO.class);
+		val result = Mockito.mock(EbMSDAO.class);
 		Mockito.when(result.getCPA(cpaId)).thenReturn(loadCPA(cpaId));
 		return result;
 	}
 
 	private Optional<CollaborationProtocolAgreement> loadCPA(String cpaId) throws IOException, JAXBException
 	{
-		String s = IOUtils.toString(this.getClass().getResourceAsStream("/nl/clockwork/ebms/cpa/" + cpaId + ".xml"),Charset.forName("UTF-8"));
+		val s = IOUtils.toString(this.getClass().getResourceAsStream("/nl/clockwork/ebms/cpa/" + cpaId + ".xml"),Charset.forName("UTF-8"));
 		return Optional.of(JAXBParser.getInstance(CollaborationProtocolAgreement.class).handle(s));
 	}
 
 	private EbMSMessageFactory initMessageFactory(CPAManager cpaManager)
 	{
-		EbMSMessageFactory result = new EbMSMessageFactory();
-		result.setEbMSIdGenerator(new EbMSIdGenerator());
-		result.setCpaManager(cpaManager);
-		return result;
+		return new EbMSMessageFactory(cpaManager,new EbMSIdGenerator());
 	}
 
 	private EbMSMessageEncrypter initMessageEncrypter(CPAManager cpaManager) throws Exception
 	{
-		EbMSMessageEncrypter result = new EbMSMessageEncrypter();
-		result.setCpaManager(cpaManager);
-		result.setTrustStore(new EbMSTrustStore(keyStoreType,keyStorePath,keyStorePassword));
-		return result;
+		val trustStore = new EbMSTrustStore(keyStoreType,keyStorePath,keyStorePassword);
+		return new EbMSMessageEncrypter(cpaManager,trustStore);
 	}
 
 	private EbMSMessageDecrypter initMessageDecrypter(CPAManager cpaManager) throws Exception
 	{
-		EbMSMessageDecrypter result = new EbMSMessageDecrypter();
-		result.setCpaManager(cpaManager);
-		result.setKeyStore(new EbMSKeyStore(keyStoreType,keyStorePath,keyStorePassword,keyStorePassword));
-		return result;
+		val keyStore = new EbMSKeyStore(keyStoreType,keyStorePath,keyStorePassword,keyStorePassword);
+		return new EbMSMessageDecrypter(cpaManager,keyStore);
 	}
 
 	private EbMSMessage createMessage() throws EbMSProcessorException
 	{
-		EbMSMessageContent content = createEbMSMessageContent(cpaId);
-		EbMSMessage result = messageFactory.createEbMSMessage(content);
+		val content = createEbMSMessageContent(cpaId);
+		val result = messageFactory.createEbMSMessage(content);
 		return result;
 	}
 
 	private EbMSMessageContent createEbMSMessageContent(String cpaId)
 	{
-		EbMSMessageContent result = new EbMSMessageContent();
+		val result = new EbMSMessageContent();
 		result.setContext(createEbMSMessageContext(cpaId));
 		result.setDataSources(createDataSources());
 		return result;
@@ -217,7 +210,7 @@ public class EncryptionTest
 
 	private EbMSMessageContext createEbMSMessageContext(String cpaId)
 	{
-		EbMSMessageContext result = new EbMSMessageContext();
+		val result = new EbMSMessageContext();
 		result.setCpaId(cpaId);
 		result.setFromRole(new Role("urn:osb:oin:00000000000000000000","DIGIPOORT"));
 		result.setToRole(new Role("urn:osb:oin:00000000000000000001","OVERHEID"));
@@ -228,14 +221,14 @@ public class EncryptionTest
 
 	private List<EbMSDataSource> createDataSources()
 	{
-		List<EbMSDataSource> result = new ArrayList<>();
+		val result = new ArrayList<EbMSDataSource>();
 		result.add(new EbMSDataSource("test.txt","plain/text; charset=utf-8","Dit is een test.".getBytes(Charset.forName("UTF-8"))));
 		return result;
 	}
 
 	private List<EbMSAttachment> createAttachments(String messageId)
 	{
-		List<EbMSAttachment> result = new ArrayList<>();
+		val result = new ArrayList<EbMSAttachment>();
 		result.add(EbMSAttachmentFactory.createEbMSAttachment(createContentId(messageId,1),createDataSource()));
 		return result;
 	}

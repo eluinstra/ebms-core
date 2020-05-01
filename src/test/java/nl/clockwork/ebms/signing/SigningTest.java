@@ -26,6 +26,10 @@ import java.util.Optional;
 
 import javax.activation.DataSource;
 import javax.xml.bind.JAXBException;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.soap.SOAPException;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactoryConfigurationError;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.xml.security.Init;
@@ -37,19 +41,24 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CollaborationProtocolAgreement;
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
+import org.xml.sax.SAXException;
 
+import lombok.AccessLevel;
+import lombok.val;
+import lombok.experimental.FieldDefaults;
 import net.sf.ehcache.Ehcache;
 import nl.clockwork.ebms.EbMSAttachmentFactory;
 import nl.clockwork.ebms.EbMSIdGenerator;
 import nl.clockwork.ebms.EbMSMessageFactory;
+import nl.clockwork.ebms.EbMSMessageUtils;
 import nl.clockwork.ebms.common.JAXBParser;
 import nl.clockwork.ebms.cpa.CPAManager;
+import nl.clockwork.ebms.cpa.URLMapper;
 import nl.clockwork.ebms.dao.DAOException;
 import nl.clockwork.ebms.dao.EbMSDAO;
 import nl.clockwork.ebms.model.EbMSAttachment;
 import nl.clockwork.ebms.model.EbMSDataSource;
+import nl.clockwork.ebms.model.EbMSDocument;
 import nl.clockwork.ebms.model.EbMSMessage;
 import nl.clockwork.ebms.model.EbMSMessageContent;
 import nl.clockwork.ebms.model.EbMSMessageContext;
@@ -62,18 +71,19 @@ import nl.clockwork.ebms.validation.ValidationException;
 import nl.clockwork.ebms.validation.ValidatorException;
 
 @TestInstance(value = Lifecycle.PER_CLASS)
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class SigningTest
 {
-	private CPAManager cpaManager;
-	private EbMSMessageFactory messageFactory;
-	private String cpaId = "cpaStubEBF.rm.https.signed";
-	private KeyStoreType keyStoreType = KeyStoreType.JKS;
-	private String keyStorePath = "keystore.jks";
-	private String keyStorePassword = "password";
-	private EbMSSignatureGenerator signatureGenerator;
-	private EbMSSignatureValidator signatureValidator;
+	CPAManager cpaManager;
+	EbMSMessageFactory messageFactory;
+	String cpaId = "cpaStubEBF.rm.https.signed";
+	KeyStoreType keyStoreType = KeyStoreType.JKS;
+	String keyStorePath = "keystore.jks";
+	String keyStorePassword = "password";
+	EbMSSignatureGenerator signatureGenerator;
+	EbMSSignatureValidator signatureValidator;
 	@Mock
-	private Ehcache ehCacheMock;
+	Ehcache ehCacheMock;
 
 	@BeforeAll
 	public void init() throws Exception
@@ -87,103 +97,93 @@ public class SigningTest
 	}
 
 	@Test
-	public void testSiging() throws EbMSProcessorException, ValidatorException
+	public void testSiging() throws EbMSProcessorException, ValidatorException, SOAPException, JAXBException, ParserConfigurationException, SAXException, IOException, TransformerFactoryConfigurationError, TransformerException
 	{
-		EbMSMessage message = createMessage();
-		signatureGenerator.generate(message);
-		signatureValidator.validate(message);
+		val message = createMessage();
+		val document = EbMSMessageUtils.getEbMSDocument(message);
+		signatureGenerator.generate(document,message);
+		signatureValidator.validate(document,message);
 	}
 
 	@Test
-	public void testSigingHeaderValidationFailure() throws EbMSProcessorException, ValidatorException
+	public void testSigingHeaderValidationFailure() throws EbMSProcessorException, ValidatorException, SOAPException, JAXBException, ParserConfigurationException, SAXException, IOException, TransformerFactoryConfigurationError, TransformerException
 	{
-		EbMSMessage message = createMessage();
-		signatureGenerator.generate(message);
-		changeConversationId(message);
-		assertThrows(ValidationException.class,()->signatureValidator.validate(message));
+		val message = createMessage();
+		val document = EbMSMessageUtils.getEbMSDocument(message);
+		signatureGenerator.generate(document,message);
+		changeConversationId(document);
+		assertThrows(ValidationException.class,()->signatureValidator.validate(document,message));
 	}
 
 	@Test
-	public void testSigingAttachmentValidationFailure() throws EbMSProcessorException, ValidatorException
+	public void testSigingAttachmentValidationFailure() throws EbMSProcessorException, ValidatorException, SOAPException, JAXBException, ParserConfigurationException, SAXException, IOException, TransformerFactoryConfigurationError, TransformerException
 	{
-		EbMSMessage message = createMessage();
-		signatureGenerator.generate(message);
-		message.setAttachments(createAttachments(message.getMessageHeader().getMessageData().getMessageId()));
-		assertThrows(ValidationException.class,()->signatureValidator.validate(message));
+		val message = createMessage();
+		val document = EbMSMessageUtils.getEbMSDocument(message);
+		signatureGenerator.generate(document,message);
+		message.getAttachments().clear();
+		message.getAttachments().addAll(createAttachments(message.getMessageHeader().getMessageData().getMessageId()));
+		assertThrows(ValidationException.class,()->signatureValidator.validate(document,message));
 	}
 
-	private void changeConversationId(EbMSMessage message)
+	private void changeConversationId(EbMSDocument message)
 	{
-		Document d = message.getMessage();
-		Node conversationId = d.getElementsByTagNameNS("http://www.oasis-open.org/committees/ebxml-msg/schema/msg-header-2_0.xsd","ConversationId").item(0);
+		val d = message.getMessage();
+		val conversationId = d.getElementsByTagNameNS("http://www.oasis-open.org/committees/ebxml-msg/schema/msg-header-2_0.xsd","ConversationId").item(0);
 		conversationId.setTextContent(conversationId.getTextContent() + "0");
 	}
 
 	private CPAManager initCPAManager() throws DAOException, IOException, JAXBException
 	{
-		CPAManager result = new CPAManager();
-		result.setDaoMethodCache(initMethodCacheMock());
-		result.setCpaMethodCache(initMethodCacheMock());
-		result.setEbMSDAO(initEbMSDAOMock());
-		return result;
+		return new CPAManager(initMethodCacheMock(),initMethodCacheMock(),initEbMSDAOMock(),new URLMapper(initMethodCacheMock(),initEbMSDAOMock()));
 	}
 
 	private Ehcache initMethodCacheMock()
 	{
-		Ehcache result = Mockito.mock(Ehcache.class);
+		val result = Mockito.mock(Ehcache.class);
 		Mockito.when(result.remove(Mockito.any(Serializable.class))).thenReturn(true);
 		return result;
 	}
 
 	private EbMSDAO initEbMSDAOMock() throws DAOException, IOException, JAXBException
 	{
-		EbMSDAO result = Mockito.mock(EbMSDAO.class);
+		val result = Mockito.mock(EbMSDAO.class);
 		Mockito.when(result.getCPA(cpaId)).thenReturn(loadCPA(cpaId));
 		return result;
 	}
 
 	private Optional<CollaborationProtocolAgreement> loadCPA(String cpaId) throws IOException, JAXBException
 	{
-		String s = IOUtils.toString(this.getClass().getResourceAsStream("/nl/clockwork/ebms/cpa/" + cpaId + ".xml"),Charset.forName("UTF-8"));
+		val s = IOUtils.toString(this.getClass().getResourceAsStream("/nl/clockwork/ebms/cpa/" + cpaId + ".xml"),Charset.forName("UTF-8"));
 		return Optional.of(JAXBParser.getInstance(CollaborationProtocolAgreement.class).handle(s));
 	}
 
 	private EbMSMessageFactory initMessageFactory(CPAManager cpaManager)
 	{
-		EbMSMessageFactory result = new EbMSMessageFactory();
-		result.setEbMSIdGenerator(new EbMSIdGenerator());
-		result.setCpaManager(cpaManager);
-		return result;
+		return new EbMSMessageFactory(cpaManager,new EbMSIdGenerator());
 	}
 
 	private EbMSSignatureGenerator initSignatureGenerator(CPAManager cpaManager) throws Exception
 	{
-		EbMSSignatureGenerator result = new EbMSSignatureGenerator();
-		result.setCpaManager(cpaManager);
-		result.setCanonicalizationMethodAlgorithm("http://www.w3.org/TR/2001/REC-xml-c14n-20010315");
-		result.setTransformAlgorithm("http://www.w3.org/TR/2001/REC-xml-c14n-20010315");
-		result.setKeyStore(new EbMSKeyStore(keyStoreType,keyStorePath,keyStorePassword,keyStorePassword));
-		return result;
+		return new EbMSSignatureGenerator(cpaManager,new EbMSKeyStore(keyStoreType,keyStorePath,keyStorePassword,keyStorePassword));
 	}
 
 	private EbMSSignatureValidator initSignatureValidator(CPAManager cpaManager) throws Exception
 	{
-		EbMSSignatureValidator result = new EbMSSignatureValidator();
-		result.setCpaManager(cpaManager);
-		result.setTrustStore(new EbMSTrustStore(keyStoreType,keyStorePath,keyStorePassword));
-		return result;
+		val trustStore = new EbMSTrustStore(keyStoreType,keyStorePath,keyStorePassword);
+		return new EbMSSignatureValidator(cpaManager,trustStore);
 	}
 
 	private EbMSMessage createMessage() throws EbMSProcessorException
 	{
-		EbMSMessageContent content = createEbMSMessageContent(cpaId);
-		EbMSMessage result = messageFactory.createEbMSMessage(content);
+		val content = createEbMSMessageContent(cpaId);
+		val result = messageFactory.createEbMSMessage(content);
 		return result;
 	}
 
 	private EbMSMessageContent createEbMSMessageContent(String cpaId)
 	{
-		EbMSMessageContent result = new EbMSMessageContent();
+		val result = new EbMSMessageContent();
 		result.setContext(createEbMSMessageContext(cpaId));
 		result.setDataSources(createDataSources());
 		return result;
@@ -191,7 +191,7 @@ public class SigningTest
 
 	private EbMSMessageContext createEbMSMessageContext(String cpaId)
 	{
-		EbMSMessageContext result = new EbMSMessageContext();
+		val result = new EbMSMessageContext();
 		result.setCpaId(cpaId);
 		result.setFromRole(new Role("urn:osb:oin:00000000000000000000","DIGIPOORT"));
 		result.setToRole(new Role("urn:osb:oin:00000000000000000001","OVERHEID"));
@@ -202,14 +202,14 @@ public class SigningTest
 
 	private List<EbMSDataSource> createDataSources()
 	{
-		List<EbMSDataSource> result = new ArrayList<>();
+		val result = new ArrayList<EbMSDataSource>();
 		result.add(new EbMSDataSource("test.txt","plain/text; charset=utf-8","Dit is een test.".getBytes(Charset.forName("UTF-8"))));
 		return result;
 	}
 
 	private List<EbMSAttachment> createAttachments(String messageId)
 	{
-		List<EbMSAttachment> result = new ArrayList<>();
+		val result = new ArrayList<EbMSAttachment>();
 		result.add(EbMSAttachmentFactory.createEbMSAttachment(createContentId(messageId,1),createDataSource()));
 		return result;
 	}

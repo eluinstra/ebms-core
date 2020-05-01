@@ -20,11 +20,19 @@ import java.util.List;
 
 import javax.xml.bind.JAXBException;
 
+import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CollaborationProtocolAgreement;
+
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.NonNull;
+import lombok.val;
+import lombok.experimental.FieldDefaults;
+import lombok.extern.apachecommons.CommonsLog;
 import nl.clockwork.ebms.common.InvalidURLException;
+import nl.clockwork.ebms.common.JAXBParser;
 import nl.clockwork.ebms.cpa.CPAManager;
 import nl.clockwork.ebms.cpa.CertificateMapper;
 import nl.clockwork.ebms.cpa.URLMapper;
-import nl.clockwork.ebms.common.JAXBParser;
 import nl.clockwork.ebms.dao.DAOException;
 import nl.clockwork.ebms.model.CertificateMapping;
 import nl.clockwork.ebms.model.URLMapping;
@@ -32,39 +40,34 @@ import nl.clockwork.ebms.validation.CPAValidator;
 import nl.clockwork.ebms.validation.ValidatorException;
 import nl.clockwork.ebms.validation.XSDValidator;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CollaborationProtocolAgreement;
-
+@CommonsLog
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@AllArgsConstructor
 public class CPAServiceImpl implements CPAService
 {
-  protected transient Log logger = LogFactory.getLog(getClass());
-	private CPAManager cpaManager;
-	private URLMapper urlMapper;
-	private CertificateMapper certificateMapper;
-	private XSDValidator xsdValidator;
-	private CPAValidator cpaValidator;
-	private Object cpaMonitor = new Object();
+  @NonNull
+	CPAManager cpaManager;
+  @NonNull
+	URLMapper urlMapper;
+  @NonNull
+	CertificateMapper certificateMapper;
+  @NonNull
+	CPAValidator cpaValidator;
+	XSDValidator xsdValidator = new XSDValidator("/nl/clockwork/ebms/xsd/cpp-cpa-2_0.xsd");
+	Object cpaMonitor = new Object();
 
-	public CPAServiceImpl()
-	{
-		xsdValidator = new XSDValidator("/nl/clockwork/ebms/xsd/cpp-cpa-2_0.xsd");
-		cpaValidator = new CPAValidator(cpaManager);
-	}
-	
 	@Override
-	public
-	void validateCPA(/*CollaborationProtocolAgreement*/String cpa) throws CPAServiceException
+	public void validateCPA(/*CollaborationProtocolAgreement*/String cpa) throws CPAServiceException
 	{
 		try
 		{
 			xsdValidator.validate(cpa);
-			CollaborationProtocolAgreement cpa_ = JAXBParser.getInstance(CollaborationProtocolAgreement.class).handle(cpa);
+			val cpa_ = JAXBParser.getInstance(CollaborationProtocolAgreement.class).handle(cpa);
 			cpaValidator.validate(cpa_);
 		}
 		catch (JAXBException | ValidatorException e)
 		{
-			logger.warn("",e);
+			log.warn("",e);
 			throw new CPAServiceException(e);
 		}
 	}
@@ -75,8 +78,8 @@ public class CPAServiceImpl implements CPAService
 		try
 		{
 			xsdValidator.validate(cpa);
-			CollaborationProtocolAgreement cpa_ = JAXBParser.getInstance(CollaborationProtocolAgreement.class).handle(cpa);
-			CPAValidator currentValidator = new CPAValidator(cpaManager);
+			val cpa_ = JAXBParser.getInstance(CollaborationProtocolAgreement.class).handle(cpa);
+			val currentValidator = new CPAValidator(cpaManager);
 			currentValidator.validate(cpa_);
 			synchronized (cpaMonitor)
 			{
@@ -97,7 +100,7 @@ public class CPAServiceImpl implements CPAService
 		}
 		catch (JAXBException | ValidatorException | DAOException e)
 		{
-			logger.warn("",e);
+			log.warn("",e);
 			throw new CPAServiceException(e);
 		}
 	}
@@ -186,20 +189,5 @@ public class CPAServiceImpl implements CPAService
 	public List<CertificateMapping> getCertificateMappings() throws CPAServiceException
 	{
 		return certificateMapper.getCertificates();
-	}
-
-	public void setCpaManager(CPAManager cpaManager)
-	{
-		this.cpaManager = cpaManager;
-	}
-
-	public void setUrlMapper(URLMapper urlManager)
-	{
-		this.urlMapper = urlManager;
-	}
-
-	public void setCertificateMapper(CertificateMapper certificateMapper)
-	{
-		this.certificateMapper = certificateMapper;
 	}
 }

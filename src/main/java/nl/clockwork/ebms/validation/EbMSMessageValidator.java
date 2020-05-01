@@ -18,28 +18,43 @@ package nl.clockwork.ebms.validation;
 import java.util.Date;
 
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.SyncReplyModeType;
-import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageHeader;
 
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.NonNull;
+import lombok.val;
+import lombok.experimental.FieldDefaults;
 import nl.clockwork.ebms.common.util.StreamUtils;
 import nl.clockwork.ebms.cpa.CPAManager;
 import nl.clockwork.ebms.cpa.CPAUtils;
 import nl.clockwork.ebms.dao.EbMSDAO;
 import nl.clockwork.ebms.encryption.EbMSMessageDecrypter;
 import nl.clockwork.ebms.model.CacheablePartyId;
+import nl.clockwork.ebms.model.EbMSDocument;
 import nl.clockwork.ebms.model.EbMSMessage;
 
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@AllArgsConstructor
 public class EbMSMessageValidator
 {
-	protected EbMSDAO ebMSDAO;
-	protected CPAManager cpaManager;
-	protected CPAValidator cpaValidator;
-	protected MessageHeaderValidator messageHeaderValidator;
-	protected ManifestValidator manifestValidator;
-	protected SignatureValidator signatureValidator;
-	protected EbMSMessageDecrypter messageDecrypter;
-	protected ClientCertificateValidator clientCertificateValidator;
+	@NonNull
+	EbMSDAO ebMSDAO;
+	@NonNull
+	CPAManager cpaManager;
+	@NonNull
+	CPAValidator cpaValidator;
+	@NonNull
+	MessageHeaderValidator messageHeaderValidator;
+	@NonNull
+	ManifestValidator manifestValidator;
+	@NonNull
+	SignatureValidator signatureValidator;
+	@NonNull
+	EbMSMessageDecrypter messageDecrypter;
+	@NonNull
+	ClientCertificateValidator clientCertificateValidator;
 
-	public void validateMessage(EbMSMessage message, Date timestamp) throws ValidatorException
+	public void validateMessage(EbMSDocument document, EbMSMessage message, Date timestamp) throws ValidatorException
 	{
 		if (isDuplicateMessage(message))
 			throw new DuplicateMessageException();
@@ -49,7 +64,7 @@ public class EbMSMessageValidator
 		signatureValidator.validate(message);
 		manifestValidator.validate(message);
 		messageDecrypter.decrypt(message);
-		signatureValidator.validateSignature(message);
+		signatureValidator.validateSignature(document,message);
 	}
 
 	public void validateMessageError(EbMSMessage requestMessage, EbMSMessage responseMessage, Date timestamp) throws ValidatorException
@@ -61,14 +76,14 @@ public class EbMSMessageValidator
 		clientCertificateValidator.validate(responseMessage);
 	}
 
-	public void validateAcknowledgment(EbMSMessage requestMessage, EbMSMessage responseMessage, Date timestamp) throws ValidatorException
+	public void validateAcknowledgment(EbMSDocument responseDocument, EbMSMessage requestMessage, EbMSMessage responseMessage, Date timestamp) throws ValidatorException
 	{
 		if (isDuplicateMessage(responseMessage))
 			throw new DuplicateMessageException();
 		messageHeaderValidator.validate(requestMessage,responseMessage);
 		messageHeaderValidator.validate(responseMessage,timestamp);
 		clientCertificateValidator.validate(responseMessage);
-		signatureValidator.validate(requestMessage,responseMessage);
+		signatureValidator.validate(responseDocument,requestMessage,responseMessage);
 	}
 
 	public void validateStatusRequest(EbMSMessage message, Date timestamp) throws ValidatorException
@@ -100,10 +115,10 @@ public class EbMSMessageValidator
 		try
 		{
 			//return message.getSyncReply() != null;
-			MessageHeader messageHeader = message.getMessageHeader();
-			CacheablePartyId fromPartyId = new CacheablePartyId(messageHeader.getFrom().getPartyId());
-			String service = CPAUtils.toString(messageHeader.getService());
-			SyncReplyModeType syncReply = cpaManager.getSyncReply(messageHeader.getCPAId(),fromPartyId,messageHeader.getFrom().getRole(),service,messageHeader.getAction())
+			val messageHeader = message.getMessageHeader();
+			val fromPartyId = new CacheablePartyId(messageHeader.getFrom().getPartyId());
+			val service = CPAUtils.toString(messageHeader.getService());
+			val syncReply = cpaManager.getSyncReply(messageHeader.getCPAId(),fromPartyId,messageHeader.getFrom().getRole(),service,messageHeader.getAction())
 					.orElseThrow(() -> StreamUtils.illegalStateException("SyncReply",messageHeader.getCPAId(),fromPartyId,messageHeader.getFrom().getRole(),service,messageHeader.getAction()));
 			return syncReply != null && !syncReply.equals(SyncReplyModeType.NONE);
 		}
@@ -117,44 +132,5 @@ public class EbMSMessageValidator
 	{
 		return /*message.getMessageHeader().getDuplicateElimination()!= null && */
 				ebMSDAO.existsMessage(message.getMessageHeader().getMessageData().getMessageId());
-	}
-	
-	public void setEbMSDAO(EbMSDAO ebMSDAO)
-	{
-		this.ebMSDAO = ebMSDAO;
-	}
-
-	public void setCpaManager(CPAManager cpaManager)
-	{
-		this.cpaManager = cpaManager;
-	}
-
-	public void setCpaValidator(CPAValidator cpaValidator)
-	{
-		this.cpaValidator = cpaValidator;
-	}
-
-	public void setMessageHeaderValidator(MessageHeaderValidator messageHeaderValidator)
-	{
-		this.messageHeaderValidator = messageHeaderValidator;
-	}
-
-	public void setManifestValidator(ManifestValidator manifestValidator)
-	{
-		this.manifestValidator = manifestValidator;
-	}
-
-	public void setSignatureValidator(SignatureValidator signatureValidator)
-	{
-		this.signatureValidator = signatureValidator;
-	}
-
-	public void setMessageDecrypter(EbMSMessageDecrypter messageDecrypter)
-	{
-		this.messageDecrypter = messageDecrypter;
-	}
-	public void setClientCertificateValidator(ClientCertificateValidator clientCertificateValidator)
-	{
-		this.clientCertificateValidator = clientCertificateValidator;
 	}
 }

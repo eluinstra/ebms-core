@@ -27,22 +27,29 @@ import nl.clockwork.ebms.common.util.HTTPUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import lombok.AccessLevel;
+import lombok.NonNull;
+import lombok.experimental.FieldDefaults;
+
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class LoggingOutputStream extends FilterOutputStream
 {
-	protected transient Log messageLogger = LogFactory.getLog(Constants.MESSAGE_LOG);
-	private Map<String,List<String>> properties;
-	private String charset;
-	private StringBuffer sb = new StringBuffer();
+	transient Log messageLogger = LogFactory.getLog(Constants.MESSAGE_LOG);
+	@NonNull
+	Map<String,List<String>> properties;
+	@NonNull
+	String charset;
+	StringBuffer sb = new StringBuffer();
 
 	public LoggingOutputStream(Map<String,List<String>> properties, OutputStream out)
 	{
 		this(properties,out,"UTF-8");
-		this.properties = properties;
 	}
 
-	public LoggingOutputStream(Map<String,List<String>> properties, OutputStream out, String charset)
+	public LoggingOutputStream(@NonNull Map<String,List<String>> properties, @NonNull OutputStream out, @NonNull String charset)
 	{
 		super(out);
+		this.properties = properties;
 		this.charset = charset;
 	}
 

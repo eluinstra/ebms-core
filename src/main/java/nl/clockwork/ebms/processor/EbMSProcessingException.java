@@ -15,14 +15,12 @@
  */
 package nl.clockwork.ebms.processor;
 
+import lombok.NoArgsConstructor;
+
+@NoArgsConstructor
 public class EbMSProcessingException extends EbMSProcessorException
 {
 	private static final long serialVersionUID = 1L;
-
-	public EbMSProcessingException()
-	{
-		super();
-	}
 
 	public EbMSProcessingException(String message, Throwable cause)
 	{

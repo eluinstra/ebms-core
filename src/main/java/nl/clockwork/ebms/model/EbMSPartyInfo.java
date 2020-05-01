@@ -18,35 +18,26 @@ package nl.clockwork.ebms.model;
 import java.io.Serializable;
 import java.util.List;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.PartyId;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
+
+@XmlAccessorType(XmlAccessType.FIELD)
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@RequiredArgsConstructor
 public class EbMSPartyInfo implements Serializable
 {
 	private static final long serialVersionUID = 1L;
-	private List<PartyId> partyIds;
-	private String role;
-
-	public EbMSPartyInfo()
-	{
-	}
-
-	public List<PartyId> getPartyIds()
-	{
-		return partyIds;
-	}
-
-	public void setPartyIds(List<PartyId> partyIds)
-	{
-		this.partyIds = partyIds;
-	}
-
-	public String getRole()
-	{
-		return role;
-	}
-
-	public void setRole(String role)
-	{
-		this.role = role;
-	}
+	@NonNull
+	List<PartyId> partyIds;
+	String role;
 }

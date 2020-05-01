@@ -25,13 +25,10 @@ import java.security.UnrecoverableKeyException;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 
-import lombok.AccessLevel;
-import lombok.Getter;
 import lombok.NonNull;
-import lombok.experimental.FieldDefaults;
+import lombok.Value;
 
-@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-@Getter
+@Value
 public class EbMSKeyStore
 {
 	@NonNull

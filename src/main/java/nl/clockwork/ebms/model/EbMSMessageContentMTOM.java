@@ -16,54 +16,31 @@
 package nl.clockwork.ebms.model;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.List;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
+
 @XmlType(name = "EbMSMessageContent")
+@XmlAccessorType(XmlAccessType.FIELD)
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@RequiredArgsConstructor
 public class EbMSMessageContentMTOM implements Serializable
 {
 	private static final long serialVersionUID = 1L;
-	private EbMSMessageContext context;
-	private List<EbMSDataSourceMTOM> dataSources;
-
-	public EbMSMessageContentMTOM()
-	{
-	}
-	
-	public EbMSMessageContentMTOM(EbMSMessageContext context)
-	{
-		this(context,new ArrayList<>());
-	}
-
-	public EbMSMessageContentMTOM(EbMSMessageContext context, List<EbMSDataSourceMTOM> dataSources)
-	{
-		this.context = context;
-		this.dataSources = dataSources;
-	}
-
 	@XmlElement(required=true)
-	public EbMSMessageContext getContext()
-	{
-		return context;
-	}
-	
-	public void setContext(EbMSMessageContext context)
-	{
-		this.context = context;
-	}
-	
+	@NonNull
+	EbMSMessageContext context;
 	@XmlElement(name="dataSource")
-	public List<EbMSDataSourceMTOM> getDataSources()
-	{
-		return dataSources;
-	}
-	
-	public void setDataSources(List<EbMSDataSourceMTOM> dataSources)
-	{
-		this.dataSources = dataSources;
-	}
-	
+	List<EbMSDataSourceMTOM> dataSources;
 }

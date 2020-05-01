@@ -23,20 +23,29 @@ import org.apache.commons.io.input.CloseShieldInputStream;
 import org.apache.commons.io.output.CloseShieldOutputStream;
 import org.apache.cxf.io.CachedOutputStream;
 
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.experimental.FieldDefaults;
+import lombok.experimental.NonFinal;
+
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@AllArgsConstructor
 public class CachedEbMSAttachment implements EbMSAttachment
 {
-	private String name;
-	private String contentId;
-	private String contentType;
-	private CachedOutputStream content;
-
-	public CachedEbMSAttachment(String name, String contentId, String contentType, CachedOutputStream content)
-	{
-		this.name = name;
-		this.contentId = contentId;
-		this.contentType = contentType;
-		this.content = content;
-	}
+	@NonNull
+	@Getter
+	String name;
+	@NonNull
+	@Getter
+	String contentId;
+	@NonNull
+	@Getter
+	String contentType;
+	@NonNull
+	@NonFinal
+	CachedOutputStream content;
 
 	@Override
 	public InputStream getInputStream() throws IOException
@@ -48,24 +57,6 @@ public class CachedEbMSAttachment implements EbMSAttachment
 	public OutputStream getOutputStream() throws IOException
 	{
 		return new CloseShieldOutputStream(content.getOut());
-	}
-
-	@Override
-	public String getContentType()
-	{
-		return contentType;
-	}
-
-	@Override
-	public String getName()
-	{
-		return name;
-	}
-
-	@Override
-	public String getContentId()
-	{
-		return contentId;
 	}
 
 	@Override

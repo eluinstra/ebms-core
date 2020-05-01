@@ -25,79 +25,49 @@ import java.util.stream.Collectors;
 import javax.activation.DataHandler;
 import javax.mail.internet.ContentType;
 import javax.mail.internet.ParseException;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 
 import org.apache.commons.io.IOUtils;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
+import lombok.val;
 import nl.clockwork.ebms.processor.EbMSProcessingException;
 
 @Deprecated
+@XmlAccessorType(XmlAccessType.FIELD)
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@RequiredArgsConstructor
 public class EbMSMessageAttachment implements Serializable
 {
 	private static final long serialVersionUID = 1L;
 	private static final int BUFFERSIZE = 10000;
-	private EbMSMessageContext context;
-	private transient List<DataHandler> attachments = new ArrayList<>();
-	private EbMSMessageContent msgContentCache = null;
-
-	public EbMSMessageAttachment()
-	{
-	}
-
-	public EbMSMessageAttachment(EbMSMessageContext context)
-	{
-		this(context,new ArrayList<>());
-	}
-
-	public EbMSMessageAttachment(EbMSMessageContext context, List<DataHandler> attachments)
-	{
-		this.context = context;
-		this.attachments = attachments;
-	}
-
 	@XmlElement(required=true)
-	public EbMSMessageContext getContext()
-	{
-		return context;
-	}
-	
-	public void setContext(EbMSMessageContext context)
-	{
-		this.context = context;
-	}
-	
+	@NonNull
+	EbMSMessageContext context;
 	@XmlElement(name="attachment")
-	public List<DataHandler> getAttachments()
-	{
-		return attachments;
-	}
-	
-	public void setAttachments(List<DataHandler> attachments)
-	{
-		this.attachments = attachments;
-	}
-	
+	List<DataHandler> attachments = new ArrayList<>();
+
 	/*
 	 * convert to MessageContent class for further processing
 	 */
 	public EbMSMessageContent toContent() throws EbMSProcessingException
 	{
-		if (msgContentCache == null)
-		{
-			msgContentCache = new EbMSMessageContent(context);
-			msgContentCache.setDataSources(
-					attachments.stream()
-					.map(a -> toDataSource(a))
-					.collect(Collectors.toList()));
-		}
-		return msgContentCache;
+		return new EbMSMessageContent(context,attachments.stream().map(a -> toDataSource(a)).collect(Collectors.toList()));
 	}
 
 	private EbMSDataSource toDataSource(DataHandler a)
 	{
 		try
 		{
-			ContentType contentType = new ContentType(a.getContentType());
+			val contentType = new ContentType(a.getContentType());
 			return new EbMSDataSource(contentType.getParameter("name"),contentType.getBaseType(),getByteArrayOutputStream(a).toByteArray());
 		}
 		catch (ParseException e)
@@ -110,7 +80,7 @@ public class EbMSMessageAttachment implements Serializable
 	{
 		try
 		{
-			ByteArrayOutputStream bos = new ByteArrayOutputStream();
+			val bos = new ByteArrayOutputStream();
 			IOUtils.copy(a.getInputStream(),bos,BUFFERSIZE);
 			return bos;
 		}

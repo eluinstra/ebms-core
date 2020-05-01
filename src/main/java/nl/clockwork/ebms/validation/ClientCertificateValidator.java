@@ -17,28 +17,33 @@ package nl.clockwork.ebms.validation;
 
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
-import java.util.Objects;
 
+import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageHeader;
+
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.NonNull;
+import lombok.val;
+import lombok.experimental.FieldDefaults;
+import lombok.extern.apachecommons.CommonsLog;
 import nl.clockwork.ebms.common.util.StreamUtils;
 import nl.clockwork.ebms.cpa.CPAManager;
 import nl.clockwork.ebms.cpa.CPAUtils;
 import nl.clockwork.ebms.model.CacheablePartyId;
 import nl.clockwork.ebms.model.EbMSMessage;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DeliveryChannel;
-import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageHeader;
-
+@CommonsLog
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class ClientCertificateValidator
 {
-	private transient final Log logger = LogFactory.getLog(getClass());
-	private CPAManager cpaManager;
+	@NonNull
+	CPAManager cpaManager;
 
-	public static ClientCertificateValidator createInstance(boolean enabled, CPAManager cpaManager)
+	public static ClientCertificateValidator of(CPAManager cpaManager, boolean enabled)
 	{
 		return enabled ? new ClientCertificateValidator(cpaManager) :
-				new ClientCertificateValidator()
+				new ClientCertificateValidator(null)
 				{
 					@Override
 					public void validate(EbMSMessage message) throws ValidatorException
@@ -47,43 +52,31 @@ public class ClientCertificateValidator
 				};
 	}
 
-	private ClientCertificateValidator()
-	{
-	}
-
-	private ClientCertificateValidator(CPAManager cpaManager)
-	{
-		Objects.requireNonNull(cpaManager);
-		this.cpaManager = cpaManager;
-	}
-
 	public void validate(EbMSMessage message) throws ValidatorException
 	{
-		X509Certificate certificate = ClientCertificateManager.getCertificate();
+		val certificate = ClientCertificateManager.getCertificate();
 		if (certificate != null)
 		{
 			if (!certificate.equals(getClientCertificate(message.getMessageHeader())))
 				throw new ValidationException("Invalid SSL Client Certificate!");
 		}
 		else
-			logger.warn("No certificates found.");
+			log.warn("No certificates found.");
 	}
 
 	private X509Certificate getClientCertificate(MessageHeader messageHeader)
 	{
 		try
 		{
-			CacheablePartyId fromPartyId = new CacheablePartyId(messageHeader.getFrom().getPartyId());
-			String service = CPAUtils.toString(messageHeader.getService());
-			DeliveryChannel deliveryChannel = cpaManager.getSendDeliveryChannel(messageHeader.getCPAId(),fromPartyId,messageHeader.getFrom().getRole(),service,messageHeader.getAction())
+			val fromPartyId = new CacheablePartyId(messageHeader.getFrom().getPartyId());
+			val service = CPAUtils.toString(messageHeader.getService());
+			val deliveryChannel = cpaManager.getSendDeliveryChannel(messageHeader.getCPAId(),fromPartyId,messageHeader.getFrom().getRole(),service,messageHeader.getAction())
 					.orElseThrow(() -> StreamUtils.illegalStateException("SendDeliveryChannel",messageHeader.getCPAId(),fromPartyId,messageHeader.getFrom().getRole(),service,messageHeader.getAction()));
-			if (deliveryChannel != null)
-				return CPAUtils.getX509Certificate(CPAUtils.getClientCertificate(deliveryChannel));
-			return null;
+			return CPAUtils.getX509Certificate(CPAUtils.getClientCertificate(deliveryChannel));
 		}
 		catch (CertificateException e)
 		{
-			logger.warn("",e);
+			log.warn("",e);
 			return null;
 		}
 	}

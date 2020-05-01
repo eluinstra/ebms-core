@@ -22,55 +22,48 @@ import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.Session;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.springframework.jms.JmsException;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jms.core.MessageCreator;
 
-import nl.clockwork.ebms.EbMSMessageEventType;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.NonNull;
+import lombok.val;
+import lombok.experimental.FieldDefaults;
 
-public class SimpleJMSEventListener implements EventListener
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@AllArgsConstructor
+public class SimpleJMSEventListener extends LoggingEventListener
 {
+	@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+	@AllArgsConstructor
 	public class EventMessageCreator implements MessageCreator
 	{
-		private String messageId;
-
-		public EventMessageCreator(String messageId)
-		{
-			this.messageId = messageId;
-		}
+		@NonNull
+		String messageId;
 
 		@Override
 		public Message createMessage(Session session) throws JMSException
 		{
-			Message result = session.createMessage();
+			val result = session.createMessage();
 			result.setStringProperty("messageId",messageId);
 			return result;
 		}
 	}
 
-	protected transient Log logger = LogFactory.getLog(getClass());
-	private JmsTemplate jmsTemplate;
-	private Map<String,Destination> destinations;
-
-	public SimpleJMSEventListener()
-	{
-	}
-
-	public SimpleJMSEventListener(JmsTemplate jmsTemplate, Map<String,Destination> destinations)
-	{
-		this.jmsTemplate = jmsTemplate;
-		this.destinations = destinations;
-	}
+	@NonNull
+	JmsTemplate jmsTemplate;
+	@NonNull
+	Map<String,Destination> destinations;
 
 	@Override
 	public void onMessageReceived(String messageId) throws EventException
 	{
 		try
 		{
-			logger.info("Message " + messageId + " received");
 			jmsTemplate.send(destinations.get(EbMSMessageEventType.RECEIVED.name()),new EventMessageCreator(messageId));
+			super.onMessageReceived(messageId);
 		}
 		catch (JmsException e)
 		{
@@ -83,8 +76,8 @@ public class SimpleJMSEventListener implements EventListener
 	{
 		try
 		{
-			logger.info("Message " + messageId + " delivered");
 			jmsTemplate.send(destinations.get(EbMSMessageEventType.DELIVERED.name()),new EventMessageCreator(messageId));
+			super.onMessageDelivered(messageId);
 		}
 		catch (JmsException e)
 		{
@@ -97,8 +90,8 @@ public class SimpleJMSEventListener implements EventListener
 	{
 		try
 		{
-			logger.info("Message " + messageId + " failed");
 			jmsTemplate.send(destinations.get(EbMSMessageEventType.FAILED.name()),new EventMessageCreator(messageId));
+			super.onMessageFailed(messageId);
 		}
 		catch (JmsException e)
 		{
@@ -111,22 +104,12 @@ public class SimpleJMSEventListener implements EventListener
 	{
 		try
 		{
-			logger.info("Message " + messageId + " expired");
 			jmsTemplate.send(destinations.get(EbMSMessageEventType.EXPIRED.name()),new EventMessageCreator(messageId));
+			super.onMessageExpired(messageId);
 		}
 		catch (JmsException e)
 		{
 			throw new EventException(e);
 		}
-	}
-
-	public void setJmsTemplate(JmsTemplate jmsTemplate)
-	{
-		this.jmsTemplate = jmsTemplate;
-	}
-	
-	public void setDestinations(Map<String,Destination> destinations)
-	{
-		this.destinations = destinations;
 	}
 }

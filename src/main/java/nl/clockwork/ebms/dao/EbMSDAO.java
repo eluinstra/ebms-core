@@ -21,9 +21,9 @@ import java.util.List;
 import java.util.Optional;
 
 import nl.clockwork.ebms.EbMSAction;
-import nl.clockwork.ebms.EbMSEventStatus;
-import nl.clockwork.ebms.EbMSMessageEventType;
 import nl.clockwork.ebms.EbMSMessageStatus;
+import nl.clockwork.ebms.event.listener.EbMSMessageEventType;
+import nl.clockwork.ebms.event.processor.EbMSEventStatus;
 import nl.clockwork.ebms.model.CertificateMapping;
 import nl.clockwork.ebms.model.EbMSDocument;
 import nl.clockwork.ebms.model.EbMSEvent;
@@ -79,8 +79,8 @@ public interface EbMSDAO
 	List<String> getMessageIds(EbMSMessageContext messageContext, EbMSMessageStatus status) throws DAOException;
 	List<String> getMessageIds(EbMSMessageContext messageContext, EbMSMessageStatus status, int maxNr) throws DAOException;
 
-	void insertMessage(Date timestamp, Date persistTime, EbMSMessage message, EbMSMessageStatus status) throws DAOException;
-	void insertDuplicateMessage(Date timestamp, EbMSMessage message, boolean storeAttachments) throws DAOException;
+	void insertMessage(Date timestamp, Date persistTime, Document document, EbMSMessage message, EbMSMessageStatus status) throws DAOException;
+	void insertDuplicateMessage(Date timestamp, Document document, EbMSMessage message, boolean storeAttachments) throws DAOException;
 	int updateMessage(String messageId, EbMSMessageStatus oldStatus, EbMSMessageStatus newStatus) throws DAOException;
 
 	void deleteAttachments(String messageId);

@@ -17,70 +17,26 @@ package nl.clockwork.ebms.model;
 
 import java.io.Serializable;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 
+@Builder(toBuilder = true)
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@RequiredArgsConstructor
 public class EbMSDataSource implements Serializable
 {
 	private static final long serialVersionUID = 1L;
-	private String name;
-	private String contentId;
-	private String contentType;
-	private byte[] content;
-
-	public EbMSDataSource()
-	{
-	}
-	
-	public EbMSDataSource(String name, String contentType, byte[] content)
-	{
-		this(name,null,contentType,content);
-	}
-
-	public EbMSDataSource(String name, String contentId, String contentType, byte[] content)
-	{
-		this.name = name;
-		this.contentId = contentId;
-		this.contentType = contentType;
-		this.content = content;
-	}
-	
-	public String getName()
-	{
-		return name;
-	}
-	
-	public void setName(String name)
-	{
-		this.name = name;
-	}
-	
-	public String getContentId()
-	{
-		return contentId;
-	}
-
-	public void setContentId(String contentId)
-	{
-		this.contentId = contentId;
-	}
-
-	public String getContentType()
-	{
-		return contentType;
-	}
-
-	public void setContentType(String contentType)
-	{
-		this.contentType = contentType;
-	}
-	
-	public byte[] getContent()
-	{
-		return content;
-	}
-	
-	public void setContent(byte[] content)
-	{
-		this.content = content;
-	}
-	
+	@NonNull
+	String name;
+	String contentId;
+	@NonNull
+	String contentType;
+	@NonNull
+	byte[] content;
 }

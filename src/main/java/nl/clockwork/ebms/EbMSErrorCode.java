@@ -1,5 +1,13 @@
 package nl.clockwork.ebms;
 
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.experimental.FieldDefaults;
+
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@AllArgsConstructor
+@Getter
 public enum EbMSErrorCode
 {
 	VALUE_NOT_RECOGNIZED("ValueNotRecognized"),
@@ -12,16 +20,5 @@ public enum EbMSErrorCode
 	MIME_PROBLEM("MimeProblem"),
 	UNKNOWN("Unknown");
 	
-	private final String errorCode;
-	
-	EbMSErrorCode(String errorCode)
-	{
-		this.errorCode = errorCode;
-	}
-	
-	public final String errorCode()
-	{
-		return errorCode;
-	}
-	
+	String errorCode;
 }
