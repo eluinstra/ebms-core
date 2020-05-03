@@ -29,7 +29,7 @@ import lombok.NonNull;
 
 @XmlAccessorType(XmlAccessType.FIELD)
 @Data
-@EqualsAndHashCode(callSuper = false)
+@EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
 @AllArgsConstructor
 public class ToPartyInfo extends EbMSPartyInfo

@@ -28,7 +28,7 @@ import lombok.NonNull;
 import nl.clockwork.ebms.event.listener.EbMSMessageEventType;
 
 @XmlAccessorType(XmlAccessType.FIELD)
-@Builder(toBuilder = true)
+@Builder
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

@@ -37,7 +37,7 @@ import lombok.Getter;
 import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
 
-@Builder(toBuilder = true)
+@Builder
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = false)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter

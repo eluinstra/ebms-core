@@ -31,7 +31,7 @@ import lombok.RequiredArgsConstructor;
 import nl.clockwork.ebms.EbMSMessageStatus;
 
 @XmlAccessorType(XmlAccessType.FIELD)
-@Builder(toBuilder = true)
+@Builder
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

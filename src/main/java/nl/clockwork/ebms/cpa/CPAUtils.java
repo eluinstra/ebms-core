@@ -272,9 +272,9 @@ public class CPAUtils
 	public static X509Certificate getX509Certificate(Certificate certificate) throws CertificateException
 	{
 		if (certificate != null)
-			for (Object o : certificate.getKeyInfo().getContent())
+			for (val o : certificate.getKeyInfo().getContent())
 				if (o instanceof JAXBElement<?> && ((JAXBElement<?>)o).getValue() instanceof X509DataType)
-					for (Object p : ((X509DataType)((JAXBElement<?>)o).getValue()).getX509IssuerSerialOrX509SKIOrX509SubjectName())
+					for (val p : ((X509DataType)((JAXBElement<?>)o).getValue()).getX509IssuerSerialOrX509SKIOrX509SubjectName())
 						if (p instanceof JAXBElement<?> && "X509Certificate".equals(((JAXBElement<?>)p).getName().getLocalPart()))
 							return (X509Certificate)CertificateFactory.getInstance("X.509").generateCertificate(new ByteArrayInputStream((byte[])((JAXBElement<?>)p).getValue())); 
 		return null;

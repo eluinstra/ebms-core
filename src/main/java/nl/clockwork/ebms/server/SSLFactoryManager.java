@@ -45,7 +45,7 @@ public class SSLFactoryManager
 	@Getter
 	SSLSocketFactory sslSocketFactory;
 
-	@Builder(toBuilder = true)
+	@Builder
 	public SSLFactoryManager(
 			@NonNull EbMSKeyStore keyStore,
 			@NonNull EbMSTrustStore trustStore,

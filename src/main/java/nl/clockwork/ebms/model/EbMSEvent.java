@@ -22,7 +22,7 @@ import lombok.Builder;
 import lombok.NonNull;
 import lombok.Value;
 
-@Builder(toBuilder = true)
+@Builder
 @Value
 @AllArgsConstructor
 public class EbMSEvent

@@ -22,18 +22,17 @@ import javax.xml.transform.TransformerException;
 import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
+import lombok.val;
 import lombok.experimental.FieldDefaults;
 import nl.clockwork.ebms.client.EbMSClient;
 import nl.clockwork.ebms.client.EbMSProxy;
@@ -60,10 +59,10 @@ public class EbMSHttpClient implements EbMSClient
 
 	public EbMSDocument sendMessage(String uri, EbMSDocument document) throws EbMSProcessorException
 	{
-		try (CloseableHttpClient httpClient = getHttpClient(uri))
+		try (val httpClient = getHttpClient(uri))
 		{
-			HttpPost httpPost = getHttpPost(uri);
-			EbMSMessageWriter ebMSMessageWriter = new EbMSMessageWriter(httpPost,chunkedStreamingMode);
+			val httpPost = getHttpPost(uri);
+			val ebMSMessageWriter = new EbMSMessageWriter(httpPost,chunkedStreamingMode);
 			ebMSMessageWriter.write(document);
 			return httpClient.execute(httpPost,new EbMSResponseHandler());
 		}
@@ -75,10 +74,10 @@ public class EbMSHttpClient implements EbMSClient
 	
 	private CloseableHttpClient getHttpClient(String uri)
 	{
-		HttpClientBuilder custom = HttpClients.custom().setSSLSocketFactory(sslConnectionSocketFactory);
+		val custom = HttpClients.custom().setSSLSocketFactory(sslConnectionSocketFactory);
 		if (proxy != null && proxy.useProxyAuthorization())
 		{
-			CredentialsProvider credsProvider = new BasicCredentialsProvider();
+			val credsProvider = new BasicCredentialsProvider();
 			credsProvider.setCredentials(new AuthScope(proxy.getHost(),proxy.getPort()),new UsernamePasswordCredentials(proxy.getUsername(),proxy.getPassword()));
 			custom.setDefaultCredentialsProvider(credsProvider);
 		}
@@ -87,7 +86,7 @@ public class EbMSHttpClient implements EbMSClient
 
 	private HttpPost getHttpPost(String uri)
 	{
-		HttpPost result = new HttpPost(uri);
+		val result = new HttpPost(uri);
 		if (proxy != null)
 		{
 			result.setConfig(RequestConfig.custom().setConnectTimeout(connectTimeout).setProxy(new HttpHost(proxy.getHost(),proxy.getPort())).build());
