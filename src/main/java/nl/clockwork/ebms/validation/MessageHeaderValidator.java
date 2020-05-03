@@ -28,6 +28,7 @@ import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.SyncReplyModeType
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.AckRequested;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.Acknowledgment;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageHeader;
+import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageOrder;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.PartyId;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.Service;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.SyncReply;
@@ -59,117 +60,15 @@ public class MessageHeaderValidator
 	public void validate(EbMSMessage message, Date timestamp) throws EbMSValidationException
 	{
 		val messageHeader = message.getMessageHeader();
-		val ackRequested = message.getAckRequested();
-		val syncReply = message.getSyncReply();
-		val messageOrder = message.getMessageOrder();
-		
-		if (!Constants.EBMS_VERSION.equals(messageHeader.getVersion()))
-			throw new EbMSValidationException(
-					EbMSMessageUtils.createError("//Header/MessageHeader/@version",EbMSErrorCode.INCONSISTENT,"Invalid value."));
-		if (!isValid(messageHeader.getFrom().getPartyId()))
-			throw new EbMSValidationException(
-					EbMSMessageUtils.createError("//Header/MessageHeader/From/PartyId",EbMSErrorCode.INCONSISTENT,"Invalid value."));
-		if (!Constants.EBMS_SERVICE_URI.equals(messageHeader.getService().getValue()) && StringUtils.isEmpty(messageHeader.getFrom().getRole()))
-			throw new EbMSValidationException(
-					EbMSMessageUtils.createError("//Header/MessageHeader/From/Role",EbMSErrorCode.INCONSISTENT,"Invalid value."));
-		if (!isValid(messageHeader.getTo().getPartyId()))
-			throw new EbMSValidationException(
-					EbMSMessageUtils.createError("//Header/MessageHeader/To/PartyId",EbMSErrorCode.INCONSISTENT,"Invalid value."));
-		if (!Constants.EBMS_SERVICE_URI.equals(messageHeader.getService().getValue()) && StringUtils.isEmpty(messageHeader.getTo().getRole()))
-			throw new EbMSValidationException(
-					EbMSMessageUtils.createError("//Header/MessageHeader/To/Role",EbMSErrorCode.INCONSISTENT,"Invalid value."));
-		if (!isValid(messageHeader.getService()))
-			throw new EbMSValidationException(
-					EbMSMessageUtils.createError("//Header/MessageHeader/Service",EbMSErrorCode.INCONSISTENT,"Invalid value."));
-		if (StringUtils.isEmpty(messageHeader.getAction()))
-			throw new EbMSValidationException(
-					EbMSMessageUtils.createError("//Header/MessageHeader/Action",EbMSErrorCode.INCONSISTENT,"Invalid value."));
-		
-		val fromPartyId = new CacheablePartyId(messageHeader.getFrom().getPartyId());
-		cpaManager.getPartyInfo(messageHeader.getCPAId(),fromPartyId).orElseThrow(() -> new EbMSValidationException(EbMSMessageUtils.createError("//Header/MessageHeader/From/PartyId",EbMSErrorCode.INCONSISTENT,"Value not found.")));
-		val toPartyId = new CacheablePartyId(messageHeader.getTo().getPartyId());
-		cpaManager.getPartyInfo(messageHeader.getCPAId(),toPartyId).orElseThrow(() -> new EbMSValidationException(EbMSMessageUtils.createError("//Header/MessageHeader/To/PartyId",EbMSErrorCode.INCONSISTENT,"Value not found.")));
-
-		val service = CPAUtils.toString(messageHeader.getService());
-		if (!Constants.EBMS_SERVICE_URI.equals(messageHeader.getService().getValue()))
-		{
-			if (!cpaManager.canSend(messageHeader.getCPAId(),fromPartyId,messageHeader.getFrom().getRole(),service,messageHeader.getAction()))
-				throw new EbMSValidationException(
-						EbMSMessageUtils.createError("//Header/MessageHeader/Action",EbMSErrorCode.VALUE_NOT_RECOGNIZED,"Value not found."));
-			if (!cpaManager.canReceive(messageHeader.getCPAId(),toPartyId,messageHeader.getTo().getRole(),service,messageHeader.getAction()))
-				throw new EbMSValidationException(
-						EbMSMessageUtils.createError("//Header/MessageHeader/Action",EbMSErrorCode.VALUE_NOT_RECOGNIZED,"Value not found."));
-		}
-
-		val deliveryChannel = cpaManager.getSendDeliveryChannel(messageHeader.getCPAId(),fromPartyId,messageHeader.getFrom().getRole(),service,messageHeader.getAction())
+		validateMessageHeader(messageHeader);
+		val deliveryChannel = cpaManager.getSendDeliveryChannel(messageHeader.getCPAId(),new CacheablePartyId(messageHeader.getFrom().getPartyId()),messageHeader.getFrom().getRole(),CPAUtils.toString(messageHeader.getService()),messageHeader.getAction())
 				.orElseThrow(() -> new EbMSValidationException(EbMSMessageUtils.createError(EbMSErrorCode.UNKNOWN.getErrorCode(),EbMSErrorCode.UNKNOWN,"No DeliveryChannel found.")));
 		if (!Constants.EBMS_SERVICE_URI.equals(messageHeader.getService().getValue()))
-		{
-			if (!existsRefToMessageId(messageHeader.getMessageData().getRefToMessageId()))
-				throw new EbMSValidationException(
-						EbMSMessageUtils.createError("//Header/MessageHeader/MessageData/RefToMessageId",EbMSErrorCode.VALUE_NOT_RECOGNIZED,"Value not found."));
-			if (!checkTimeToLive(messageHeader,timestamp))
-				throw new EbMSValidationException(
-						EbMSMessageUtils.createError("//Header/MessageHeader/MessageData/TimeToLive",EbMSErrorCode.TIME_TO_LIVE_EXPIRED,null));
-			if (!checkDuplicateElimination(deliveryChannel,messageHeader))
-				throw new EbMSValidationException(
-						EbMSMessageUtils.createError("//Header/MessageHeader/DuplicateElimination",EbMSErrorCode.INCONSISTENT,"Wrong value."));
-
-			if (!checkAckRequested(deliveryChannel,ackRequested))
-				throw new EbMSValidationException(
-						EbMSMessageUtils.createError("//Header/AckRequested",EbMSErrorCode.INCONSISTENT,"Wrong value."));
-			if (ackRequested != null && !Constants.EBMS_VERSION.equals(ackRequested.getVersion()))
-				throw new EbMSValidationException(
-						EbMSMessageUtils.createError("//Header/AckRequested/@version",EbMSErrorCode.INCONSISTENT,"Invalid value."));
-			if (ackRequested != null && ackRequested.getActor() != null
-					&& !ackRequested.getActor().equals(ActorType.URN_OASIS_NAMES_TC_EBXML_MSG_ACTOR_TO_PARTY_MSH.value()))
-				if (ackRequested.getActor().equals(ActorType.URN_OASIS_NAMES_TC_EBXML_MSG_ACTOR_NEXT_MSH.value()))
-					throw new EbMSValidationException(
-							EbMSMessageUtils.createError("//Header/AckRequested/@actor",EbMSErrorCode.NOT_SUPPORTED,"NextMSH not supported."));
-				else
-					throw new EbMSValidationException(
-							EbMSMessageUtils.createError("//Header/AckRequested/@actor",EbMSErrorCode.INCONSISTENT,"Invalid value."));
-			if (!checkAckSignatureRequested(deliveryChannel,ackRequested))
-				throw new EbMSValidationException(
-						EbMSMessageUtils.createError("//Header/AckRequested/@signed",EbMSErrorCode.INCONSISTENT,"Wrong value."));
-
-			if (!checkSyncReply(deliveryChannel,syncReply))
-				throw new EbMSValidationException(
-						EbMSMessageUtils.createError("//Header/SyncReply",EbMSErrorCode.INCONSISTENT,"Wrong value."));
-			if (syncReply != null && !Constants.EBMS_VERSION.equals(syncReply.getVersion()))
-				throw new EbMSValidationException(
-						EbMSMessageUtils.createError("//Header/SyncReply/@version",EbMSErrorCode.INCONSISTENT,"Invalid value."));
-			if (syncReply != null && syncReply.getActor() != null && !syncReply.getActor().equals(Constants.NSURI_SOAP_NEXT_ACTOR))
-				throw new EbMSValidationException(
-						EbMSMessageUtils.createError("//Header/SyncReply/@actor",EbMSErrorCode.INCONSISTENT,"Wrong value."));
-
-			if (messageOrder != null)
-				throw new EbMSValidationException(
-						EbMSMessageUtils.createError("//Header/MessageOrder",EbMSErrorCode.NOT_SUPPORTED,"MessageOrder not supported."));
-//			if (messageOrder != null && !Constants.EBMS_VERSION.equals(messageOrder.getVersion()))
-//				throw new EbMSValidationException(
-//						EbMSMessageUtils.createError("//Header/MessageOrder/@version",Constants.EbMSErrorCode.INCONSISTENT,"Invalid value."));
-		}
+			validateMessage(message,timestamp,deliveryChannel);
 		if (Constants.EBMS_SERVICE_URI.equals(messageHeader.getService().getValue()) && EbMSAction.ACKNOWLEDGMENT.getAction().equals(messageHeader.getAction()))
 		{
 			val acknowledgment = message.getAcknowledgment();
-			if (acknowledgment != null && !Constants.EBMS_VERSION.equals(acknowledgment.getVersion()))
-				throw new EbMSValidationException(
-						EbMSMessageUtils.createError("//Header/Acknowledgment/@version",EbMSErrorCode.INCONSISTENT,"Invalid value."));
-			if (!checkActor(deliveryChannel,acknowledgment))
-				throw new EbMSValidationException(
-						EbMSMessageUtils.createError("//Header/Acknowledgment/@actor",EbMSErrorCode.INCONSISTENT,"Wrong value."));
-			if (acknowledgment.getActor() != null
-					&& !acknowledgment.getActor().equals(ActorType.URN_OASIS_NAMES_TC_EBXML_MSG_ACTOR_TO_PARTY_MSH.value()))
-				if (acknowledgment.getActor().equals(ActorType.URN_OASIS_NAMES_TC_EBXML_MSG_ACTOR_NEXT_MSH.value()))
-					throw new EbMSValidationException(
-							EbMSMessageUtils.createError("//Header/Acknowledgment/@actor",EbMSErrorCode.NOT_SUPPORTED,"NextMSH not supported."));
-				else
-					throw new EbMSValidationException(
-							EbMSMessageUtils.createError("//Header/Acknowledgment/@actor",EbMSErrorCode.INCONSISTENT,"Invalid value."));
-			if (!checkAckSignatureRequested(deliveryChannel,acknowledgment))
-				throw new EbMSValidationException(
-						EbMSMessageUtils.createError("//Header/Acknowledgment/Reference",EbMSErrorCode.INCONSISTENT,"Wrong value."));
+			validateAcknowledgment(acknowledgment,deliveryChannel);
 		}
 	}
 
@@ -185,6 +84,162 @@ public class MessageHeaderValidator
 		compare(requestMessage.getMessageHeader().getTo().getPartyId(),responseMessage.getMessageHeader().getFrom().getPartyId());
 	}
 	
+	private void validateMessageHeader(MessageHeader messageHeader)
+	{
+		validateVersion(messageHeader);
+		validateFrom(messageHeader);
+		validateTo(messageHeader);
+		validateServiceAction(messageHeader);
+	}
+
+	private void validateVersion(MessageHeader messageHeader)
+	{
+		if (!Constants.EBMS_VERSION.equals(messageHeader.getVersion()))
+			throw new EbMSValidationException(
+					EbMSMessageUtils.createError("//Header/MessageHeader/@version",EbMSErrorCode.INCONSISTENT,"Invalid value."));
+	}
+
+	private void validateFrom(MessageHeader messageHeader)
+	{
+		if (!isValid(messageHeader.getFrom().getPartyId()))
+			throw new EbMSValidationException(
+					EbMSMessageUtils.createError("//Header/MessageHeader/From/PartyId",EbMSErrorCode.INCONSISTENT,"Invalid value."));
+		if (!Constants.EBMS_SERVICE_URI.equals(messageHeader.getService().getValue()) && StringUtils.isEmpty(messageHeader.getFrom().getRole()))
+			throw new EbMSValidationException(
+					EbMSMessageUtils.createError("//Header/MessageHeader/From/Role",EbMSErrorCode.INCONSISTENT,"Invalid value."));
+		val fromPartyId = new CacheablePartyId(messageHeader.getFrom().getPartyId());
+		cpaManager.getPartyInfo(messageHeader.getCPAId(),fromPartyId).orElseThrow(() -> new EbMSValidationException(EbMSMessageUtils.createError("//Header/MessageHeader/From/PartyId",EbMSErrorCode.INCONSISTENT,"Value not found.")));
+	}
+
+	private void validateTo(MessageHeader messageHeader)
+	{
+		if (!isValid(messageHeader.getTo().getPartyId()))
+			throw new EbMSValidationException(
+					EbMSMessageUtils.createError("//Header/MessageHeader/To/PartyId",EbMSErrorCode.INCONSISTENT,"Invalid value."));
+		if (!Constants.EBMS_SERVICE_URI.equals(messageHeader.getService().getValue()) && StringUtils.isEmpty(messageHeader.getTo().getRole()))
+			throw new EbMSValidationException(
+					EbMSMessageUtils.createError("//Header/MessageHeader/To/Role",EbMSErrorCode.INCONSISTENT,"Invalid value."));
+		val toPartyId = new CacheablePartyId(messageHeader.getTo().getPartyId());
+		cpaManager.getPartyInfo(messageHeader.getCPAId(),toPartyId).orElseThrow(() -> new EbMSValidationException(EbMSMessageUtils.createError("//Header/MessageHeader/To/PartyId",EbMSErrorCode.INCONSISTENT,"Value not found.")));
+	}
+
+	private void validateServiceAction(MessageHeader messageHeader)
+	{
+		if (!isValid(messageHeader.getService()))
+			throw new EbMSValidationException(
+					EbMSMessageUtils.createError("//Header/MessageHeader/Service",EbMSErrorCode.INCONSISTENT,"Invalid value."));
+		if (StringUtils.isEmpty(messageHeader.getAction()))
+			throw new EbMSValidationException(
+					EbMSMessageUtils.createError("//Header/MessageHeader/Action",EbMSErrorCode.INCONSISTENT,"Invalid value."));
+	}
+
+	private void validateMessage(EbMSMessage message, Date timestamp, DeliveryChannel deliveryChannel)
+	{
+		val messageHeader = message.getMessageHeader();
+		val service = CPAUtils.toString(messageHeader.getService());
+		validateService(messageHeader,service);
+		validateMessageData(timestamp,messageHeader);
+		validateDuplicateElimination(deliveryChannel,messageHeader);
+		val ackRequested = message.getAckRequested();
+		validateAckRequested(deliveryChannel,ackRequested);
+		val syncReply = message.getSyncReply();
+		validateSyncReply(deliveryChannel,syncReply);
+		val messageOrder = message.getMessageOrder();
+		validateMessageOrder(messageOrder);
+	}
+
+	private void validateService(final org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageHeader messageHeader, final java.lang.String service)
+	{
+		if (!cpaManager.canSend(messageHeader.getCPAId(),new CacheablePartyId(messageHeader.getFrom().getPartyId()),messageHeader.getFrom().getRole(),service,messageHeader.getAction()))
+			throw new EbMSValidationException(
+					EbMSMessageUtils.createError("//Header/MessageHeader/Action",EbMSErrorCode.VALUE_NOT_RECOGNIZED,"Value not found."));
+		if (!cpaManager.canReceive(messageHeader.getCPAId(),new CacheablePartyId(messageHeader.getTo().getPartyId()),messageHeader.getTo().getRole(),service,messageHeader.getAction()))
+			throw new EbMSValidationException(
+					EbMSMessageUtils.createError("//Header/MessageHeader/Action",EbMSErrorCode.VALUE_NOT_RECOGNIZED,"Value not found."));
+	}
+
+	private void validateMessageData(Date timestamp, final org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageHeader messageHeader)
+	{
+		if (!existsRefToMessageId(messageHeader.getMessageData().getRefToMessageId()))
+			throw new EbMSValidationException(
+					EbMSMessageUtils.createError("//Header/MessageHeader/MessageData/RefToMessageId",EbMSErrorCode.VALUE_NOT_RECOGNIZED,"Value not found."));
+		if (!checkTimeToLive(messageHeader,timestamp))
+			throw new EbMSValidationException(
+					EbMSMessageUtils.createError("//Header/MessageHeader/MessageData/TimeToLive",EbMSErrorCode.TIME_TO_LIVE_EXPIRED,null));
+	}
+
+	private void validateDuplicateElimination(DeliveryChannel deliveryChannel, final org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageHeader messageHeader)
+	{
+		if (!checkDuplicateElimination(deliveryChannel,messageHeader))
+			throw new EbMSValidationException(
+					EbMSMessageUtils.createError("//Header/MessageHeader/DuplicateElimination",EbMSErrorCode.INCONSISTENT,"Wrong value."));
+	}
+
+	private void validateAckRequested(final org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DeliveryChannel deliveryChannel, final org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.AckRequested ackRequested)
+	{
+		if (!checkAckRequested(deliveryChannel,ackRequested))
+			throw new EbMSValidationException(
+					EbMSMessageUtils.createError("//Header/AckRequested",EbMSErrorCode.INCONSISTENT,"Wrong value."));
+		if (ackRequested != null && !Constants.EBMS_VERSION.equals(ackRequested.getVersion()))
+			throw new EbMSValidationException(
+					EbMSMessageUtils.createError("//Header/AckRequested/@version",EbMSErrorCode.INCONSISTENT,"Invalid value."));
+		if (ackRequested != null && ackRequested.getActor() != null
+				&& !ackRequested.getActor().equals(ActorType.URN_OASIS_NAMES_TC_EBXML_MSG_ACTOR_TO_PARTY_MSH.value()))
+			if (ackRequested.getActor().equals(ActorType.URN_OASIS_NAMES_TC_EBXML_MSG_ACTOR_NEXT_MSH.value()))
+				throw new EbMSValidationException(
+						EbMSMessageUtils.createError("//Header/AckRequested/@actor",EbMSErrorCode.NOT_SUPPORTED,"NextMSH not supported."));
+			else
+				throw new EbMSValidationException(
+						EbMSMessageUtils.createError("//Header/AckRequested/@actor",EbMSErrorCode.INCONSISTENT,"Invalid value."));
+		if (!checkAckSignatureRequested(deliveryChannel,ackRequested))
+			throw new EbMSValidationException(
+					EbMSMessageUtils.createError("//Header/AckRequested/@signed",EbMSErrorCode.INCONSISTENT,"Wrong value."));
+	}
+
+	private void validateSyncReply(final org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DeliveryChannel deliveryChannel, final org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.SyncReply syncReply)
+	{
+		if (!checkSyncReply(deliveryChannel,syncReply))
+			throw new EbMSValidationException(
+					EbMSMessageUtils.createError("//Header/SyncReply",EbMSErrorCode.INCONSISTENT,"Wrong value."));
+		if (syncReply != null && !Constants.EBMS_VERSION.equals(syncReply.getVersion()))
+			throw new EbMSValidationException(
+					EbMSMessageUtils.createError("//Header/SyncReply/@version",EbMSErrorCode.INCONSISTENT,"Invalid value."));
+		if (syncReply != null && syncReply.getActor() != null && !syncReply.getActor().equals(Constants.NSURI_SOAP_NEXT_ACTOR))
+			throw new EbMSValidationException(
+					EbMSMessageUtils.createError("//Header/SyncReply/@actor",EbMSErrorCode.INCONSISTENT,"Wrong value."));
+	}
+
+	private void validateMessageOrder(MessageOrder messageOrder)
+	{
+		if (messageOrder != null)
+			throw new EbMSValidationException(
+					EbMSMessageUtils.createError("//Header/MessageOrder",EbMSErrorCode.NOT_SUPPORTED,"MessageOrder not supported."));
+//			if (messageOrder != null && !Constants.EBMS_VERSION.equals(messageOrder.getVersion()))
+//				throw new EbMSValidationException(
+//						EbMSMessageUtils.createError("//Header/MessageOrder/@version",Constants.EbMSErrorCode.INCONSISTENT,"Invalid value."));
+	}
+
+	private void validateAcknowledgment(Acknowledgment acknowledgment, final org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DeliveryChannel deliveryChannel)
+	{
+		if (acknowledgment != null && !Constants.EBMS_VERSION.equals(acknowledgment.getVersion()))
+			throw new EbMSValidationException(
+					EbMSMessageUtils.createError("//Header/Acknowledgment/@version",EbMSErrorCode.INCONSISTENT,"Invalid value."));
+		if (!checkActor(deliveryChannel,acknowledgment))
+			throw new EbMSValidationException(
+					EbMSMessageUtils.createError("//Header/Acknowledgment/@actor",EbMSErrorCode.INCONSISTENT,"Wrong value."));
+		if (acknowledgment.getActor() != null
+				&& !acknowledgment.getActor().equals(ActorType.URN_OASIS_NAMES_TC_EBXML_MSG_ACTOR_TO_PARTY_MSH.value()))
+			if (acknowledgment.getActor().equals(ActorType.URN_OASIS_NAMES_TC_EBXML_MSG_ACTOR_NEXT_MSH.value()))
+				throw new EbMSValidationException(
+						EbMSMessageUtils.createError("//Header/Acknowledgment/@actor",EbMSErrorCode.NOT_SUPPORTED,"NextMSH not supported."));
+			else
+				throw new EbMSValidationException(
+						EbMSMessageUtils.createError("//Header/Acknowledgment/@actor",EbMSErrorCode.INCONSISTENT,"Invalid value."));
+		if (!checkAckSignatureRequested(deliveryChannel,acknowledgment))
+			throw new EbMSValidationException(
+					EbMSMessageUtils.createError("//Header/Acknowledgment/Reference",EbMSErrorCode.INCONSISTENT,"Wrong value."));
+	}
+
 	private boolean isValid(List<PartyId> partyIds)
 	{
 		return partyIds.stream().anyMatch(p -> !StringUtils.isEmpty(p.getType())|| isValidURI(p.getValue()));//FIXME replace by: org.apache.commons.validator.UrlValidator.isValid(partyId.getValue())

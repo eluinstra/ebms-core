@@ -20,7 +20,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
-import java.util.UUID;
 
 import javax.xml.bind.JAXBException;
 import javax.xml.datatype.DatatypeConfigurationException;
@@ -221,7 +220,7 @@ public class EbMSMessageFactory
 
 	private EbMSAttachment createEbMSAttachment(Manifest manifest, EbMSDataSource ds)
 	{
-		val contentId = ds.getContentId() == null ? UUID.randomUUID().toString() : ds.getContentId();
+		val contentId = ds.getContentId() == null ? ebMSIdGenerator.generateConversationId() : ds.getContentId();
 		manifest.getReference().add(EbMSMessageUtils.createReference(contentId));
 		return EbMSAttachmentFactory.createEbMSAttachment(ds.getName(),contentId,ds.getContentType(),ds.getContent());
 	}
@@ -254,7 +253,7 @@ public class EbMSMessageFactory
 	{
 		try
 		{
-			val contentId = ds.getContentId() == null ? UUID.randomUUID().toString() : ds.getContentId();
+			val contentId = ds.getContentId() == null ? ebMSIdGenerator.generateContentId() : ds.getContentId();
 			manifest.getReference().add(EbMSMessageUtils.createReference(contentId));
 			return EbMSAttachmentFactory.createCachedEbMSAttachment(contentId,ds.getAttachment());
 		}

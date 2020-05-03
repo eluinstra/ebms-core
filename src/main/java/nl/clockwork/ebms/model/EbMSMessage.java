@@ -41,9 +41,8 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = false)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
-public class EbMSMessage// extends EbMSDocument
+public class EbMSMessage
 {
-	//EbMSDocument message;
 	SignatureType signature;
 	@NonNull
 	MessageHeader messageHeader;

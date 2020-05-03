@@ -39,4 +39,9 @@ public class EbMSIdGenerator
 		return (messageId == null ? conversationId : messageId) + "@" + hostname;
 	}
 
+	public String generateContentId()
+	{
+		return UUID.randomUUID().toString();
+	}
+
 }
