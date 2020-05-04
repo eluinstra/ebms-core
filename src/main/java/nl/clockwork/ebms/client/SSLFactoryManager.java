@@ -180,7 +180,6 @@ public class SSLFactoryManager
 	String[] enabledProtocols;
 	@NonNull
 	String[] enabledCipherSuites;
-	String clientAlias;
 	@Getter
 	SSLSocketFactory sslSocketFactory;
 
@@ -198,7 +197,6 @@ public class SSLFactoryManager
 		this.verifyHostnames = verifyHostnames;
 		this.enabledProtocols = enabledProtocols == null ? new String[]{} : enabledProtocols;
 		this.enabledCipherSuites = enabledCipherSuites == null ? new String[]{} : enabledCipherSuites;
-		this.clientAlias = clientAlias;
 		//KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
 		val kmf = KeyManagerFactory.getInstance("SunX509");
 		kmf.init(keyStore.getKeyStore(),keyStore.getKeyPassword().toCharArray());

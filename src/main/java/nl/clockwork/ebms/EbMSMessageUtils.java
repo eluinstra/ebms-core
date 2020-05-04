@@ -80,7 +80,7 @@ public class EbMSMessageUtils
 	private static EbMSMessage getEbMSMessage(Document document, List<EbMSAttachment> attachments) throws JAXBException, XPathExpressionException, ParserConfigurationException, SAXException, IOException
 	{
 		val builder = EbMSMessage.builder();
-		JAXBParser<Envelope> messageBuilder = JAXBParser.getInstance(
+		JAXBParser<Envelope> jaxbParser = JAXBParser.getInstance(
 				Envelope.class,
 				Envelope.class,
 				MessageHeader.class,
@@ -93,7 +93,7 @@ public class EbMSMessageUtils
 				Manifest.class,
 				StatusRequest.class,
 				StatusResponse.class);
-		val envelope = messageBuilder.handle(document);
+		val envelope = jaxbParser.handle(document);
 		envelope.getHeader().getAny().forEach(e -> setEbMSMessage(builder,e));
 		envelope.getBody().getAny().forEach(e -> setEbMSMessage(builder,e));
 		builder.attachments(attachments);
@@ -103,9 +103,7 @@ public class EbMSMessageUtils
 	@SuppressWarnings("unchecked")
 	private static void setEbMSMessage(EbMSMessage.EbMSMessageBuilder result, Object e)
 	{
-		if (e instanceof JAXBElement && ((JAXBElement<?>)e).getValue() instanceof SignatureType)
-			result.signature(((JAXBElement<SignatureType>)e).getValue());
-		else if (e instanceof MessageHeader)
+		if (e instanceof MessageHeader)
 			result.messageHeader((MessageHeader)e);
 		else if (e instanceof SyncReply)
 			result.syncReply((SyncReply)e);
@@ -123,6 +121,8 @@ public class EbMSMessageUtils
 			result.statusRequest((StatusRequest)e);
 		else if (e instanceof StatusResponse)
 			result.statusResponse((StatusResponse)e);
+		else if (e instanceof JAXBElement && ((JAXBElement<?>)e).getValue() instanceof SignatureType)
+			result.signature(((JAXBElement<SignatureType>)e).getValue());
 	}
 
 	public static String toString(PartyId partyId)

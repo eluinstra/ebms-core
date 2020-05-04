@@ -25,18 +25,20 @@ import org.apache.commons.lang3.StringUtils;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DeliveryChannel;
 
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Builder.Default;
 import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 import lombok.val;
 import lombok.experimental.FieldDefaults;
-import lombok.experimental.NonFinal;
 import nl.clockwork.ebms.cpa.CPAUtils;
 import nl.clockwork.ebms.cpa.CertificateMapper;
 import nl.clockwork.ebms.security.EbMSKeyStore;
 import nl.clockwork.ebms.security.EbMSTrustStore;
 
+@Builder(setterPrefix = "set")
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-@RequiredArgsConstructor
+@AllArgsConstructor
 public class EbMSHttpClientFactory
 {
 	public enum EbMSHttpClientType
@@ -45,7 +47,8 @@ public class EbMSHttpClientFactory
 	}
 
 	@NonNull
-	EbMSHttpClientType type;
+	@Default
+	EbMSHttpClientType type = EbMSHttpClientType.DEFAULT;
 	int connectTimeout;
 	boolean chunkedStreamingMode;
 	boolean base64Writer;
@@ -53,12 +56,15 @@ public class EbMSHttpClientFactory
 	String[] enabledProtocols;
 	String[] enabledCipherSuites;
 	boolean verifyHostnames;
+	@NonNull
 	EbMSKeyStore keyStore;
 	EbMSTrustStore trustStore;
 	HttpErrors httpErrors;
+	@NonNull
 	CertificateMapper certificateMapper;
 	boolean useClientCertificate;
-	@NonFinal
+	@NonNull
+	@Default
 	Map<String,EbMSClient> clients = new ConcurrentHashMap<String,EbMSClient>();
 
 	public EbMSClient createEbMSClient(String clientAlias)

@@ -24,88 +24,114 @@ import javax.mail.util.ByteArrayDataSource;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.cxf.io.CachedOutputStream;
-import org.springframework.beans.factory.InitializingBean;
 
 import lombok.val;
 import nl.clockwork.ebms.model.CachedEbMSAttachment;
 import nl.clockwork.ebms.model.EbMSAttachment;
 import nl.clockwork.ebms.model.PlainEbMSAttachment;
 
-public class EbMSAttachmentFactory implements InitializingBean
+public class EbMSAttachmentFactory
 {
-	private static int attachmentMemoryTreshold;
-	private static String attachmentOutputDirectory;
-	private static String attachmentCipherTransformation;
-	@SuppressWarnings("unused")
-	private EbMSAttachmentFactory attachmentFactory;
-
-	@Override
-	public void afterPropertiesSet() throws Exception
-	{
-		if (StringUtils.isNotEmpty(attachmentOutputDirectory))
-			System.setProperty("org.apache.cxf.io.CachedOutputStream.OutputDirectory",attachmentOutputDirectory);
-		CachedOutputStream.setDefaultThreshold(attachmentMemoryTreshold);
-		if (StringUtils.isNotEmpty(attachmentCipherTransformation))
-			CachedOutputStream.setDefaultCipherTransformation(attachmentCipherTransformation);
-		attachmentFactory = this;
-	}
+	private static DefaultEbMSAttachmentFactory instance;
 
 	public static EbMSAttachment createEbMSAttachment(String contentId, DataSource ds)
 	{
-		return new PlainEbMSAttachment(contentId,ds);
+		return instance.createEbMSAttachment(contentId,ds);
 	}
 
 	public static EbMSAttachment createEbMSAttachment(String filename, String contentType, byte[] content)
 	{
-		return createEbMSAttachment(filename,null,contentType,content);
+		return instance.createEbMSAttachment(filename,contentType,content);
 	}
 
 	public static EbMSAttachment createEbMSAttachment(String filename, String contentId, String contentType, byte[] content)
 	{
-		val result = new ByteArrayDataSource(content,contentType);
-		if (!StringUtils.isEmpty(filename))
-			result.setName(filename);
-		return createEbMSAttachment(contentId,result);
+		return instance.createEbMSAttachment(filename,contentId,contentType,content);
 	}
 
 	public static EbMSAttachment createEbMSAttachment(String filename, String contentId, String contentType, InputStream content) throws IOException
 	{
-		ByteArrayDataSource result = new ByteArrayDataSource(content,contentType);
-		if (!StringUtils.isEmpty(filename))
-			result.setName(filename);
-		return createEbMSAttachment(contentId,result);
+		return instance.createEbMSAttachment(filename,contentId,contentType,content);
 	}
 
 	public static EbMSAttachment createCachedEbMSAttachment(String contentId, DataHandler dataHandler) throws IOException
 	{
-		return createCachedEbMSAttachment(dataHandler.getName(),contentId,dataHandler.getContentType(),dataHandler.getInputStream());
+		return instance.createCachedEbMSAttachment(contentId,dataHandler);
 	}
 
 	public static EbMSAttachment createCachedEbMSAttachment(String filename, String contentId, String contentType, CachedOutputStream content) throws IOException
 	{
-		return new CachedEbMSAttachment(filename,contentId,contentType,content);
+		return instance.createCachedEbMSAttachment(filename,contentId,contentType,content);
 	}
 
 	public static EbMSAttachment createCachedEbMSAttachment(String filename, String contentId, String contentType, InputStream content) throws IOException
 	{
-		val cos = new CachedOutputStream();
-		CachedOutputStream.copyStream(content,cos,4096);
-		cos.lockOutputStream();
-		return createCachedEbMSAttachment(filename,contentId,contentType,cos);
+		return instance.createCachedEbMSAttachment(filename,contentId,contentType,content);
 	}
 
-	public static void setAttachmentMemoryTreshold(int attachmentMemoryTreshold)
+	public static DefaultEbMSAttachmentFactory getInstance()
 	{
-		EbMSAttachmentFactory.attachmentMemoryTreshold = attachmentMemoryTreshold;
+		return instance;
 	}
 
-	public static void setAttachmentOutputDirectory(String attachmentOutputDirectory)
+	public static void setInstance(DefaultEbMSAttachmentFactory ebMSAttachmentFactory)
 	{
-		EbMSAttachmentFactory.attachmentOutputDirectory = attachmentOutputDirectory;
+		instance = ebMSAttachmentFactory;
 	}
 
-	public static void setAttachmentCipherTransformation(String attachmentCipherTransformation)
+	public static class DefaultEbMSAttachmentFactory
 	{
-		EbMSAttachmentFactory.attachmentCipherTransformation = attachmentCipherTransformation;
+		public DefaultEbMSAttachmentFactory(int attachmentMemoryTreshold, String attachmentOutputDirectory, String attachmentCipherTransformation)
+		{
+			if (StringUtils.isNotEmpty(attachmentOutputDirectory))
+				System.setProperty("org.apache.cxf.io.CachedOutputStream.OutputDirectory",attachmentOutputDirectory);
+			CachedOutputStream.setDefaultThreshold(attachmentMemoryTreshold);
+			if (StringUtils.isNotEmpty(attachmentCipherTransformation))
+				CachedOutputStream.setDefaultCipherTransformation(attachmentCipherTransformation);
+		}
+	
+		public EbMSAttachment createEbMSAttachment(String contentId, DataSource ds)
+		{
+			return new PlainEbMSAttachment(contentId,ds);
+		}
+	
+		public EbMSAttachment createEbMSAttachment(String filename, String contentType, byte[] content)
+		{
+			return createEbMSAttachment(filename,null,contentType,content);
+		}
+	
+		public EbMSAttachment createEbMSAttachment(String filename, String contentId, String contentType, byte[] content)
+		{
+			val result = new ByteArrayDataSource(content,contentType);
+			if (!StringUtils.isEmpty(filename))
+				result.setName(filename);
+			return createEbMSAttachment(contentId,result);
+		}
+	
+		public EbMSAttachment createEbMSAttachment(String filename, String contentId, String contentType, InputStream content) throws IOException
+		{
+			ByteArrayDataSource result = new ByteArrayDataSource(content,contentType);
+			if (!StringUtils.isEmpty(filename))
+				result.setName(filename);
+			return createEbMSAttachment(contentId,result);
+		}
+	
+		public EbMSAttachment createCachedEbMSAttachment(String contentId, DataHandler dataHandler) throws IOException
+		{
+			return createCachedEbMSAttachment(dataHandler.getName(),contentId,dataHandler.getContentType(),dataHandler.getInputStream());
+		}
+	
+		public EbMSAttachment createCachedEbMSAttachment(String filename, String contentId, String contentType, CachedOutputStream content) throws IOException
+		{
+			return new CachedEbMSAttachment(filename,contentId,contentType,content);
+		}
+	
+		public EbMSAttachment createCachedEbMSAttachment(String filename, String contentId, String contentType, InputStream content) throws IOException
+		{
+			val cos = new CachedOutputStream();
+			CachedOutputStream.copyStream(content,cos,4096);
+			cos.lockOutputStream();
+			return createCachedEbMSAttachment(filename,contentId,contentType,cos);
+		}
 	}
 }

@@ -16,6 +16,7 @@
 package nl.clockwork.ebms.service;
 
 import java.io.IOException;
+import java.util.List;
 
 import javax.xml.bind.JAXBException;
 import javax.xml.parsers.ParserConfigurationException;
@@ -25,34 +26,31 @@ import javax.xml.transform.TransformerFactoryConfigurationError;
 
 import org.xml.sax.SAXException;
 
-import lombok.NonNull;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.val;
-import nl.clockwork.ebms.EbMSMessageFactory;
+import lombok.experimental.FieldDefaults;
 import nl.clockwork.ebms.EbMSMessageUtils;
-import nl.clockwork.ebms.client.DeliveryManager;
-import nl.clockwork.ebms.cpa.CPAManager;
 import nl.clockwork.ebms.dao.DAOException;
-import nl.clockwork.ebms.dao.EbMSDAO;
-import nl.clockwork.ebms.event.processor.EventManager;
+import nl.clockwork.ebms.event.listener.EbMSMessageEventType;
 import nl.clockwork.ebms.model.EbMSMessageContentMTOM;
+import nl.clockwork.ebms.model.EbMSMessageContext;
+import nl.clockwork.ebms.model.EbMSMessageEvent;
+import nl.clockwork.ebms.model.MessageStatus;
+import nl.clockwork.ebms.model.Party;
 import nl.clockwork.ebms.processor.EbMSProcessorException;
-import nl.clockwork.ebms.signing.EbMSSignatureGenerator;
-import nl.clockwork.ebms.validation.EbMSMessageContextValidator;
 import nl.clockwork.ebms.validation.ValidatorException;
 
-public class EbMSMessageServiceMTOMImpl extends EbMSMessageServiceImpl implements EbMSMessageServiceMTOM
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@AllArgsConstructor
+public class EbMSMessageServiceMTOMImpl implements EbMSMessageServiceMTOM
 {
-	public EbMSMessageServiceMTOMImpl(
-			@NonNull DeliveryManager deliveryManager,
-			@NonNull EbMSDAO ebMSDAO,
-			@NonNull CPAManager cpaManager,
-			@NonNull EbMSMessageFactory ebMSMessageFactory,
-			@NonNull EventManager eventManager,
-			@NonNull EbMSMessageContextValidator ebMSMessageContextValidator,
-			@NonNull EbMSSignatureGenerator signatureGenerator,
-			boolean deleteEbMSAttachmentsOnMessageProcessed)
+	EbMSMessageServiceImpl ebMSMessageService;
+
+	@Override
+	public void ping(String cpaId, Party fromParty, Party toParty) throws EbMSMessageServiceException
 	{
-		super(deliveryManager,ebMSDAO,cpaManager,ebMSMessageFactory,eventManager,ebMSMessageContextValidator,signatureGenerator,deleteEbMSAttachmentsOnMessageProcessed);
+		ebMSMessageService.ping(cpaId,fromParty,toParty);
 	}
 
 	@Override
@@ -60,11 +58,11 @@ public class EbMSMessageServiceMTOMImpl extends EbMSMessageServiceImpl implement
 	{
 		try
 		{
-			ebMSMessageContextValidator.validate(messageContent.getContext());
-			val message = ebMSMessageFactory.createEbMSMessageMTOM(messageContent);
+			ebMSMessageService.ebMSMessageContextValidator.validate(messageContent.getContext());
+			val message = ebMSMessageService.ebMSMessageFactory.createEbMSMessageMTOM(messageContent);
 			val document = EbMSMessageUtils.getEbMSDocument(message);
-			signatureGenerator.generate(document,message);
-			storeMessage(document.getMessage(),message);
+			ebMSMessageService.signatureGenerator.generate(document,message);
+			ebMSMessageService.storeMessage(document.getMessage(),message);
 			return message.getMessageHeader().getMessageData().getMessageId();
 		}
 		catch (ValidatorException | DAOException | TransformerFactoryConfigurationError | EbMSProcessorException | SOAPException | JAXBException | ParserConfigurationException | SAXException | IOException | TransformerException e)
@@ -74,17 +72,59 @@ public class EbMSMessageServiceMTOMImpl extends EbMSMessageServiceImpl implement
 	}
 
 	@Override
+	public String resendMessage(String messageId) throws EbMSMessageServiceException
+	{
+		return ebMSMessageService.resendMessage(messageId);
+	}
+
+	@Override
+	public List<String> getMessageIds(EbMSMessageContext messageContext, Integer maxNr) throws EbMSMessageServiceException
+	{
+		return ebMSMessageService.getMessageIds(messageContext,maxNr);
+	}
+
+	@Override
 	public EbMSMessageContentMTOM getMessageMTOM(String messageId, Boolean process) throws EbMSMessageServiceException
 	{
 		try
 		{
 			if (process != null && process)
 				processMessage(messageId);
-			return ebMSDAO.getMessageContentMTOM(messageId).orElse(null);
+			return ebMSMessageService.ebMSDAO.getMessageContentMTOM(messageId).orElse(null);
 		}
 		catch (DAOException e)
 		{
 			throw new EbMSMessageServiceException(e);
 		}
+	}
+
+	@Override
+	public void processMessage(String messageId) throws EbMSMessageServiceException
+	{
+		ebMSMessageService.processMessage(messageId);
+	}
+
+	@Override
+	public MessageStatus getMessageStatus(String messageId) throws EbMSMessageServiceException
+	{
+		return ebMSMessageService.getMessageStatus(messageId);
+	}
+
+	@Override
+	public MessageStatus getMessageStatus(String cpaId, Party fromParty, Party toParty, String messageId) throws EbMSMessageServiceException
+	{
+		return ebMSMessageService.getMessageStatus(cpaId,fromParty,toParty,messageId);
+	}
+
+	@Override
+	public List<EbMSMessageEvent> getMessageEvents(EbMSMessageContext messageContext, EbMSMessageEventType[] eventTypes, Integer maxNr) throws EbMSMessageServiceException
+	{
+		return ebMSMessageService.getMessageEvents(messageContext,eventTypes,maxNr);
+	}
+
+	@Override
+	public void processMessageEvent(String messageId) throws EbMSMessageServiceException
+	{
+		ebMSMessageService.processMessageEvent(messageId);
 	}
 }

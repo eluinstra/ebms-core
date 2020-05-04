@@ -34,6 +34,7 @@ import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageHeader;
 import org.xml.sax.SAXException;
 
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.NonNull;
 import lombok.val;
 import lombok.experimental.FieldDefaults;
@@ -65,6 +66,7 @@ public class DeliveryManager //DeliveryService
 		this(null,null,null,messageQueue,cpaManager,ebMSClientFactory);
 	}
 
+	@Builder(setterPrefix = "set")
 	public DeliveryManager(
 			Integer maxThreads,
 			Integer processorsScaleFactor,

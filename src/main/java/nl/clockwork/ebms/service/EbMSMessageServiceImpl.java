@@ -30,6 +30,7 @@ import org.xml.sax.SAXException;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.NonNull;
 import lombok.val;
 import lombok.experimental.FieldDefaults;
@@ -62,8 +63,9 @@ import nl.clockwork.ebms.validation.EbMSMessageContextValidator;
 import nl.clockwork.ebms.validation.ValidationException;
 import nl.clockwork.ebms.validation.ValidatorException;
 
+@Builder(setterPrefix = "set")
 @CommonsLog
-@FieldDefaults(level = AccessLevel.PROTECTED, makeFinal = true)
+@FieldDefaults(level = AccessLevel.PACKAGE, makeFinal = true)
 @AllArgsConstructor
 @SuppressWarnings("deprecation")
 public class EbMSMessageServiceImpl implements EbMSMessageService
@@ -331,7 +333,7 @@ public class EbMSMessageServiceImpl implements EbMSMessageService
 		context.setTimestamp(null);
 	}
 
-	protected void storeMessage(Document document, EbMSMessage message) throws EbMSProcessorException
+	void storeMessage(Document document, EbMSMessage message) throws EbMSProcessorException
 	{
 		ebMSDAO.executeTransaction(new DAOTransactionCallback()
 		{

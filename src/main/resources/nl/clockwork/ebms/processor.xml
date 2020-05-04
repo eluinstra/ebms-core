@@ -25,10 +25,15 @@
 	</bean>
 
 	<bean class="nl.clockwork.ebms.EbMSAttachmentFactory">
-		<property name="attachmentMemoryTreshold" value="${ebmsMessage.attachment.memoryTreshold}" />
-		<property name="attachmentOutputDirectory" value="${ebmsMessage.attachment.outputDirectory}" />
-		<property name="attachmentCipherTransformation" value="${ebmsMessage.attachment.cipherTransformation}" />
+		<property name="instance">
+			<bean class="nl.clockwork.ebms.EbMSAttachmentFactory$DefaultEbMSAttachmentFactory">
+				<constructor-arg name="attachmentMemoryTreshold" value="${ebmsMessage.attachment.memoryTreshold}" />
+				<constructor-arg name="attachmentOutputDirectory" value="${ebmsMessage.attachment.outputDirectory}" />
+				<constructor-arg name="attachmentCipherTransformation" value="${ebmsMessage.attachment.cipherTransformation}" />
+			</bean>
+		</property>
 	</bean>
+
 
 	<bean id="trustStore" class="nl.clockwork.ebms.security.EbMSTrustStore">
 		<constructor-arg name="type" value="${truststore.type}"/>
@@ -65,34 +70,30 @@
 		<constructor-arg name="cpaValidator" ref="cpaValidator"/>
 	</bean>
 
-	<bean id="ebMSMessageService" class="nl.clockwork.ebms.service.EbMSMessageServiceImpl">
-		<constructor-arg name="deliveryManager" ref="deliveryManager"/>
-		<constructor-arg name="ebMSDAO" ref="ebMSDAO"/>
-		<constructor-arg name="cpaManager" ref="cpaManager"/>
-		<constructor-arg name="ebMSMessageFactory" ref="ebMSMessageFactory"/>
-		<constructor-arg name="eventManager" ref="eventManager"/>
-		<constructor-arg name="ebMSMessageContextValidator" ref="ebMSMessageContextValidator"/>
-		<constructor-arg name="signatureGenerator" ref="signatureGenerator"/>
-		<constructor-arg name="deleteEbMSAttachmentsOnMessageProcessed" value="${ebmsMessage.deleteContentOnProcessed}"/>
+	<bean id="ebMSMessageService" factory-bean="ebMSMessageServiceBuilder" factory-method="build"/>
+	<bean id="ebMSMessageServiceBuilder" class="nl.clockwork.ebms.service.EbMSMessageServiceImpl$EbMSMessageServiceImplBuilder">
+		<property name="deliveryManager" ref="deliveryManager"/>
+		<property name="ebMSDAO" ref="ebMSDAO"/>
+		<property name="cpaManager" ref="cpaManager"/>
+		<property name="ebMSMessageFactory" ref="ebMSMessageFactory"/>
+		<property name="eventManager" ref="eventManager"/>
+		<property name="ebMSMessageContextValidator" ref="ebMSMessageContextValidator"/>
+		<property name="signatureGenerator" ref="signatureGenerator"/>
+		<property name="deleteEbMSAttachmentsOnMessageProcessed" value="${ebmsMessage.deleteContentOnProcessed}"/>
 	</bean>
 
 	<bean id="ebMSMessageServiceMTOM" class="nl.clockwork.ebms.service.EbMSMessageServiceMTOMImpl">
-		<constructor-arg name="deliveryManager" ref="deliveryManager"/>
-		<constructor-arg name="ebMSDAO" ref="ebMSDAO"/>
-		<constructor-arg name="cpaManager" ref="cpaManager"/>
-		<constructor-arg name="ebMSMessageFactory" ref="ebMSMessageFactory"/>
-		<constructor-arg name="eventManager" ref="eventManager"/>
-		<constructor-arg name="signatureGenerator" ref="signatureGenerator"/>
-		<constructor-arg name="deleteEbMSAttachmentsOnMessageProcessed" value="${ebmsMessage.deleteContentOnProcessed}"/>
+		<constructor-arg name="ebMSMessageService" ref="ebMSMessageService"/>
 	</bean>
 
-	<bean id="deliveryManager" class="nl.clockwork.ebms.client.DeliveryManager">
-		<constructor-arg name="maxThreads" value="${deliveryManager.maxTreads}"/>
-		<constructor-arg name="processorsScaleFactor" value="${deliveryManager.processorsScaleFactor}"/>
-		<constructor-arg name="queueScaleFactor" value="${deliveryManager.queueScaleFactor}"/>
-		<constructor-arg name="messageQueue" ref="messageQueue"/>
-		<constructor-arg name="cpaManager" ref="cpaManager"/>
-		<constructor-arg name="ebMSClientFactory" ref="ebMSHttpClientFactory"/>
+	<bean id="deliveryManager" factory-bean="deliveryManagerBuilder" factory-method="build"/>
+	<bean id="deliveryManagerBuilder" class="nl.clockwork.ebms.client.DeliveryManager$DeliveryManagerBuilder">
+		<property name="maxThreads" value="${deliveryManager.maxTreads}"/>
+		<property name="processorsScaleFactor" value="${deliveryManager.processorsScaleFactor}"/>
+		<property name="queueScaleFactor" value="${deliveryManager.queueScaleFactor}"/>
+		<property name="messageQueue" ref="messageQueue"/>
+		<property name="cpaManager" ref="cpaManager"/>
+		<property name="ebMSClientFactory" ref="ebMSHttpClientFactory"/>
 	</bean>
 
 	<bean id="messageQueue" class="nl.clockwork.ebms.client.EbMSMessageQueue">
@@ -106,26 +107,27 @@
 
 	<bean id="ebMSIdGenerator" class="nl.clockwork.ebms.EbMSIdGenerator"/>
 
-	<bean id="messageValidator" class="nl.clockwork.ebms.validation.EbMSMessageValidator">
-		<constructor-arg name="ebMSDAO" ref="ebMSDAO"/>
-		<constructor-arg name="cpaManager" ref="cpaManager"/>
-		<constructor-arg name="clientCertificateValidator">
+	<bean id="messageValidator" factory-bean="messageValidatorBuilder" factory-method="build"/>
+	<bean id="messageValidatorBuilder" class="nl.clockwork.ebms.validation.EbMSMessageValidator$EbMSMessageValidatorBuilder">
+		<property name="ebMSDAO" ref="ebMSDAO"/>
+		<property name="cpaManager" ref="cpaManager"/>
+		<property name="clientCertificateValidator">
 			<bean class="nl.clockwork.ebms.validation.ClientCertificateValidator" factory-method="of">
 				<constructor-arg name="cpaManager" ref="cpaManager"/>
 				<constructor-arg name="enabled" value="${https.clientCertificateAuthentication}"/>
 			</bean>
-		</constructor-arg>
-		<constructor-arg name="cpaValidator" ref="cpaValidator"/>
-		<constructor-arg name="messageHeaderValidator">
+		</property>
+		<property name="cpaValidator" ref="cpaValidator"/>
+		<property name="messageHeaderValidator">
 			<bean class="nl.clockwork.ebms.validation.MessageHeaderValidator">
 				<constructor-arg name="ebMSDAO" ref="ebMSDAO"/>
 				<constructor-arg name="cpaManager" ref="cpaManager"/>
 			</bean>
-		</constructor-arg>
-		<constructor-arg name="manifestValidator">
+		</property>
+		<property name="manifestValidator">
 			<bean class="nl.clockwork.ebms.validation.ManifestValidator"/>
-		</constructor-arg>
-		<constructor-arg name="signatureValidator">
+		</property>
+		<property name="signatureValidator">
 			<bean class="nl.clockwork.ebms.validation.SignatureValidator">
 				<constructor-arg name="cpaManager" ref="cpaManager"/>
 				<constructor-arg name="ebMSSignatureValidator">
@@ -135,35 +137,37 @@
 					</bean>
 				</constructor-arg>
 			</bean>
-		</constructor-arg>
-		<constructor-arg name="messageDecrypter">
+		</property>
+		<property name="messageDecrypter">
 			<bean class="nl.clockwork.ebms.encryption.EbMSMessageDecrypter">
 				<constructor-arg name="cpaManager" ref="cpaManager"/>
 				<constructor-arg name="keyStore" ref="encryptionKeyStore"/>
 			</bean>
-		</constructor-arg>
+		</property>
 	</bean>
 
-	<bean id="duplicateMessageHandler" class="nl.clockwork.ebms.processor.DuplicateMessageHandler">
-		<constructor-arg name="ebMSDAO" ref="ebMSDAO"/>
-		<constructor-arg name="cpaManager" ref="cpaManager"/>
-		<constructor-arg name="eventManager" ref="eventManager"/>
-		<constructor-arg name="messageValidator" ref="messageValidator"/>
-		<constructor-arg name="storeDuplicateMessage" value="${ebmsMessage.storeDuplicate}" />
-		<constructor-arg name="storeDuplicateMessageAttachments" value="${ebmsMessage.storeDuplicateContent}" />
+	<bean id="duplicateMessageHandler" factory-bean="duplicateMessageHandlerBuilder" factory-method="build"/>
+	<bean id="duplicateMessageHandlerBuilder" class="nl.clockwork.ebms.processor.DuplicateMessageHandler$DuplicateMessageHandlerBuilder">
+		<property name="ebMSDAO" ref="ebMSDAO"/>
+		<property name="cpaManager" ref="cpaManager"/>
+		<property name="eventManager" ref="eventManager"/>
+		<property name="messageValidator" ref="messageValidator"/>
+		<property name="storeDuplicateMessage" value="${ebmsMessage.storeDuplicate}" />
+		<property name="storeDuplicateMessageAttachments" value="${ebmsMessage.storeDuplicateContent}" />
 	</bean>
 
-	<bean id="messageProcessor" class="nl.clockwork.ebms.processor.EbMSMessageProcessor">
-		<constructor-arg name="deliveryManager" ref="deliveryManager"/>
-		<constructor-arg name="eventListener" ref="eventListener"/>
-		<constructor-arg name="ebMSDAO" ref="ebMSDAO"/>
-		<constructor-arg name="cpaManager" ref="cpaManager"/>
-		<constructor-arg name="ebMSMessageFactory" ref="ebMSMessageFactory"/>
-		<constructor-arg name="eventManager" ref="eventManager"/>
-		<constructor-arg name="signatureGenerator" ref="signatureGenerator"/>
-		<constructor-arg name="messageValidator" ref="messageValidator"/>
-		<constructor-arg name="duplicateMessageHandler" ref="duplicateMessageHandler"/>
-		<constructor-arg name="deleteEbMSAttachmentsOnMessageProcessed" value="${ebmsMessage.deleteContentOnProcessed}"/>
+	<bean id="messageProcessor" factory-bean="messageProcessorBuilder" factory-method="build"/>
+	<bean id="messageProcessorBuilder" class="nl.clockwork.ebms.processor.EbMSMessageProcessor$EbMSMessageProcessorBuilder">
+		<property name="deliveryManager" ref="deliveryManager"/>
+		<property name="eventListener" ref="eventListener"/>
+		<property name="ebMSDAO" ref="ebMSDAO"/>
+		<property name="cpaManager" ref="cpaManager"/>
+		<property name="ebMSMessageFactory" ref="ebMSMessageFactory"/>
+		<property name="eventManager" ref="eventManager"/>
+		<property name="signatureGenerator" ref="signatureGenerator"/>
+		<property name="messageValidator" ref="messageValidator"/>
+		<property name="duplicateMessageHandler" ref="duplicateMessageHandler"/>
+		<property name="deleteEbMSAttachmentsOnMessageProcessed" value="${ebmsMessage.deleteContentOnProcessed}"/>
 	</bean>
 
 	<bean id="cpaValidator" class="nl.clockwork.ebms.validation.CPAValidator">
@@ -258,23 +262,24 @@
 		<constructor-arg name="autoRetryInterval" value="${ebmsMessage.autoRetryInterval:15}"/>
 	</bean>
 
-	<bean id="ebMSEventProcessor" class="nl.clockwork.ebms.event.processor.EbMSEventProcessor">
-		<constructor-arg name="enabled" value="${eventProcessor.enabled}"/>
-		<constructor-arg name="delay" value="${eventProcessor.delay}"/>
-		<constructor-arg name="period" value="${eventProcessor.period}"/>
-		<constructor-arg name="maxThreads" value="${eventProcessor.maxTreads}"/>
-		<constructor-arg name="processorsScaleFactor" value="${eventProcessor.processorsScaleFactor}"/>
-		<constructor-arg name="queueScaleFactor" value="${eventProcessor.queueScaleFactor}"/>
-		<constructor-arg name="maxEvents" value="${eventProcessor.maxEvents}"/>
-		<constructor-arg name="eventListener" ref="eventListener"/>
-		<constructor-arg name="ebMSDAO" ref="ebMSDAO"/>
-		<constructor-arg name="cpaManager" ref="cpaManager"/>
-		<constructor-arg name="urlMapper" ref="urlMapper"/>
-		<constructor-arg name="eventManager" ref="eventManager"/>
-		<constructor-arg name="ebMSClientFactory" ref="ebMSHttpClientFactory"/>
-		<constructor-arg name="messageEncrypter" ref="messageEncrypter"/>
-		<constructor-arg name="messageProcessor" ref="messageProcessor"/>
-		<constructor-arg name="deleteEbMSAttachmentsOnMessageProcessed" value="${ebmsMessage.deleteContentOnProcessed}"/>
+	<bean id="ebMSEventProcessor" factory-bean="ebMSEventProcessorBuilder" factory-method="build"/>
+	<bean id="ebMSEventProcessorBuilder" class="nl.clockwork.ebms.event.processor.EbMSEventProcessor$EbMSEventProcessorBuilder">
+		<property name="enabled" value="${eventProcessor.enabled}"/>
+		<property name="delay" value="${eventProcessor.delay}"/>
+		<property name="period" value="${eventProcessor.period}"/>
+		<property name="maxThreads" value="${eventProcessor.maxTreads}"/>
+		<property name="processorsScaleFactor" value="${eventProcessor.processorsScaleFactor}"/>
+		<property name="queueScaleFactor" value="${eventProcessor.queueScaleFactor}"/>
+		<property name="maxEvents" value="${eventProcessor.maxEvents}"/>
+		<property name="eventListener" ref="eventListener"/>
+		<property name="ebMSDAO" ref="ebMSDAO"/>
+		<property name="cpaManager" ref="cpaManager"/>
+		<property name="urlMapper" ref="urlMapper"/>
+		<property name="eventManager" ref="eventManager"/>
+		<property name="ebMSClientFactory" ref="ebMSHttpClientFactory"/>
+		<property name="messageEncrypter" ref="messageEncrypter"/>
+		<property name="messageProcessor" ref="messageProcessor"/>
+		<property name="deleteEbMSAttachmentsOnMessageProcessed" value="${ebmsMessage.deleteContentOnProcessed}"/>
 	</bean>
 
 	<bean id="signatureGenerator" class="nl.clockwork.ebms.signing.EbMSSignatureGenerator">
@@ -295,36 +300,38 @@
 		<constructor-arg name="password" value="${http.proxy.password}"/>
 	</bean>
 
-	<bean id="ebMSHttpClientFactory" class="nl.clockwork.ebms.client.EbMSHttpClientFactory">
-		<constructor-arg name="type" value="${http.client}"/>
-		<constructor-arg name="connectTimeout" value="${http.connectTimeout}"/>
-		<constructor-arg name="chunkedStreamingMode" value="${http.chunkedStreamingMode}"/>
-		<constructor-arg name="base64Writer" value="${http.base64Writer}"/>
-		<constructor-arg name="proxy" ref="ebMSProxy"/>
-		<constructor-arg name="enabledProtocols" value="${https.protocols}"/>
-		<constructor-arg name="enabledCipherSuites" value="${https.cipherSuites}"/>
-		<constructor-arg name="verifyHostnames" value="${https.verifyHostnames}"/>
-		<constructor-arg name="keyStore" ref="clientKeyStore"/>
-		<constructor-arg name="trustStore" ref="trustStore"/>
-		<constructor-arg name="httpErrors">
+	<bean id="ebMSHttpClientFactory" factory-bean="ebMSHttpClientFactoryBuilder" factory-method="build"/>
+	<bean id="ebMSHttpClientFactoryBuilder" class="nl.clockwork.ebms.client.EbMSHttpClientFactory$EbMSHttpClientFactoryBuilder">
+		<property name="type" value="${http.client}"/>
+		<property name="connectTimeout" value="${http.connectTimeout}"/>
+		<property name="chunkedStreamingMode" value="${http.chunkedStreamingMode}"/>
+		<property name="base64Writer" value="${http.base64Writer}"/>
+		<property name="proxy" ref="ebMSProxy"/>
+		<property name="enabledProtocols" value="${https.protocols}"/>
+		<property name="enabledCipherSuites" value="${https.cipherSuites}"/>
+		<property name="verifyHostnames" value="${https.verifyHostnames}"/>
+		<property name="keyStore" ref="clientKeyStore"/>
+		<property name="trustStore" ref="trustStore"/>
+		<property name="httpErrors">
 			<bean class="nl.clockwork.ebms.client.HttpErrors">
 				<constructor-arg name="recoverableInformationalHttpErrors" value="${http.errors.informational.recoverable}"/>
 				<constructor-arg name="recoverableRedirectionHttpErrors" value="${http.errors.redirection.recoverable}"/>
 				<constructor-arg name="recoverableClientHttpErrors" value="${http.errors.client.recoverable}"/>
 				<constructor-arg name="unrecoverableServerHttpErrors" value="${http.errors.server.unrecoverable}"/>
 			</bean>
-		</constructor-arg>
-		<constructor-arg name="certificateMapper" ref="certificateMapper"/>
-		<constructor-arg name="useClientCertificate" value="${https.useClientCertificate}"/>
+		</property>
+		<property name="certificateMapper" ref="certificateMapper"/>
+		<property name="useClientCertificate" value="${https.useClientCertificate}"/>
 	</bean>
 
-	<bean id="eventListener" class="nl.clockwork.ebms.event.listener.EventListenerFactory">
-		<constructor-arg name="type" value="${eventListener.type}" />
-		<constructor-arg name="ebMSDAO" ref="ebMSDAO" />
-		<constructor-arg name="jmsBrokerConfig" value="${jms.broker.config}" />
-		<constructor-arg name="jmsBrokerStart" value="${jms.broker.start}" />
-		<constructor-arg name="jmsBrokerURL" value="${jms.brokerURL}" />
-		<constructor-arg name="jmsVirtualTopics" value="${jms.virtualTopics:false}" />
+	<bean id="eventListener" factory-bean="eventListenerBuilder" factory-method="build"/>
+	<bean id="eventListenerBuilder" class="nl.clockwork.ebms.event.listener.EventListenerFactory$EventListenerFactoryBuilder">
+		<property name="type" value="${eventListener.type}" />
+		<property name="ebMSDAO" ref="ebMSDAO" />
+		<property name="jmsBrokerConfig" value="${jms.broker.config}" />
+		<property name="jmsBrokerStart" value="${jms.broker.start}" />
+		<property name="jmsBrokerURL" value="${jms.brokerURL}" />
+		<property name="jmsVirtualTopics" value="${jms.virtualTopics:false}" />
 	</bean>
 
 </beans>

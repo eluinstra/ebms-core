@@ -32,6 +32,7 @@ import org.xml.sax.SAXException;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.NonNull;
 import lombok.val;
 import lombok.experimental.FieldDefaults;
@@ -63,6 +64,7 @@ import nl.clockwork.ebms.validation.ValidationException;
 import nl.clockwork.ebms.validation.ValidatorException;
 import nl.clockwork.ebms.validation.XSDValidator;
 
+@Builder(setterPrefix = "set")
 @CommonsLog
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor

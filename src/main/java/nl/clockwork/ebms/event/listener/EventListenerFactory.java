@@ -33,6 +33,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.jms.core.JmsTemplate;
 
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.NonNull;
 import lombok.val;
 import lombok.experimental.FieldDefaults;
@@ -52,6 +53,7 @@ public class EventListenerFactory implements FactoryBean<EventListener>, Disposa
 	@NonFinal
 	BrokerFactoryBean brokerFactoryBean;
 
+	@Builder(setterPrefix = "set")
 	public EventListenerFactory(@NonNull EventListenerType type, @NonNull EbMSDAO ebMSDAO, @NonNull String jmsBrokerConfig, boolean jmsBrokerStart, @NonNull String jmsBrokerURL, boolean jmsVirtualTopics) throws Exception
 	{
 		switch (type)

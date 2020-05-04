@@ -43,7 +43,6 @@ import lombok.experimental.FieldDefaults;
 @Getter
 public class EbMSMessage
 {
-	SignatureType signature;
 	@NonNull
 	MessageHeader messageHeader;
 	SyncReply syncReply;
@@ -54,6 +53,7 @@ public class EbMSMessage
 	Manifest manifest;
 	StatusRequest statusRequest;
 	StatusResponse statusResponse;
+	SignatureType signature;
 	@NonNull
 	@Default
 	List<EbMSAttachment> attachments = new ArrayList<>();

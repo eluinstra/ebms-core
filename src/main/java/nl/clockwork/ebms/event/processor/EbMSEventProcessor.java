@@ -229,7 +229,7 @@ public class EbMSEventProcessor implements Runnable
 	boolean deleteEbMSAttachmentsOnMessageProcessed;
 	ExecutorService executorService;
 
-	@Builder
+	@Builder(setterPrefix = "set")
 	public EbMSEventProcessor(
 			boolean enabled,
 			int delay,

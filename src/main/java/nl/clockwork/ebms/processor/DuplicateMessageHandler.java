@@ -21,6 +21,7 @@ import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.Service;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.NonNull;
 import lombok.val;
 import lombok.experimental.FieldDefaults;
@@ -37,6 +38,7 @@ import nl.clockwork.ebms.model.EbMSDocument;
 import nl.clockwork.ebms.model.EbMSMessage;
 import nl.clockwork.ebms.validation.EbMSMessageValidator;
 
+@Builder(setterPrefix = "set")
 @CommonsLog
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor

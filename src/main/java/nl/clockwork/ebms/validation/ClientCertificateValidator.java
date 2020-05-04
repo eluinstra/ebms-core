@@ -37,19 +37,25 @@ import nl.clockwork.ebms.model.EbMSMessage;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class ClientCertificateValidator
 {
+	private static class DisabledClientCertificateValidator extends ClientCertificateValidator
+	{
+		public DisabledClientCertificateValidator(CPAManager cpaManager)
+		{
+			super(cpaManager);
+		}
+
+		@Override
+		public void validate(EbMSMessage message) throws ValidatorException
+		{
+		}
+	}
+
 	@NonNull
 	CPAManager cpaManager;
 
-	public static ClientCertificateValidator of(CPAManager cpaManager, boolean enabled)
+	public static ClientCertificateValidator of(@NonNull CPAManager cpaManager, boolean enabled)
 	{
-		return enabled ? new ClientCertificateValidator(cpaManager) :
-				new ClientCertificateValidator(null)
-				{
-					@Override
-					public void validate(EbMSMessage message) throws ValidatorException
-					{
-					}
-				};
+		return enabled ? new ClientCertificateValidator(cpaManager) : new DisabledClientCertificateValidator(cpaManager);
 	}
 
 	public void validate(EbMSMessage message) throws ValidatorException
