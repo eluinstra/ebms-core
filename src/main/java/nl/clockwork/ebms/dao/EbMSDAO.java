@@ -20,23 +20,24 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
+import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CollaborationProtocolAgreement;
+import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.Service;
+import org.w3c.dom.Document;
+
 import nl.clockwork.ebms.EbMSAction;
 import nl.clockwork.ebms.EbMSMessageStatus;
 import nl.clockwork.ebms.event.listener.EbMSMessageEventType;
 import nl.clockwork.ebms.event.processor.EbMSEventStatus;
 import nl.clockwork.ebms.model.CertificateMapping;
+import nl.clockwork.ebms.model.EbMSAttachment;
+import nl.clockwork.ebms.model.EbMSBaseMessage;
 import nl.clockwork.ebms.model.EbMSDocument;
 import nl.clockwork.ebms.model.EbMSEvent;
-import nl.clockwork.ebms.model.EbMSMessage;
 import nl.clockwork.ebms.model.EbMSMessageContent;
 import nl.clockwork.ebms.model.EbMSMessageContentMTOM;
 import nl.clockwork.ebms.model.EbMSMessageContext;
 import nl.clockwork.ebms.model.EbMSMessageEvent;
 import nl.clockwork.ebms.model.URLMapping;
-
-import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CollaborationProtocolAgreement;
-import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.Service;
-import org.w3c.dom.Document;
 
 public interface EbMSDAO
 {
@@ -64,7 +65,7 @@ public interface EbMSDAO
 	int deleteCertificateMapping(String id) throws DAOException;
 
 	boolean existsMessage(String messageId) throws DAOException;
-	boolean existsIdenticalMessage(EbMSMessage message) throws DAOException;
+	boolean existsIdenticalMessage(EbMSBaseMessage message) throws DAOException;
 	Optional<EbMSMessageContent> getMessageContent(String messageId) throws DAOException;
 	Optional<EbMSMessageContentMTOM> getMessageContentMTOM(String messageId) throws DAOException;
 	Optional<EbMSMessageContext> getMessageContext(String messageId) throws DAOException;
@@ -79,8 +80,8 @@ public interface EbMSDAO
 	List<String> getMessageIds(EbMSMessageContext messageContext, EbMSMessageStatus status) throws DAOException;
 	List<String> getMessageIds(EbMSMessageContext messageContext, EbMSMessageStatus status, int maxNr) throws DAOException;
 
-	void insertMessage(Date timestamp, Date persistTime, Document document, EbMSMessage message, EbMSMessageStatus status) throws DAOException;
-	void insertDuplicateMessage(Date timestamp, Document document, EbMSMessage message, boolean storeAttachments) throws DAOException;
+	void insertMessage(Date timestamp, Date persistTime, Document document, EbMSBaseMessage message, List<EbMSAttachment> attachments, EbMSMessageStatus status) throws DAOException;
+	void insertDuplicateMessage(Date timestamp, Document document, EbMSBaseMessage message, List<EbMSAttachment> attachments) throws DAOException;
 	int updateMessage(String messageId, EbMSMessageStatus oldStatus, EbMSMessageStatus newStatus) throws DAOException;
 
 	void deleteAttachments(String messageId);

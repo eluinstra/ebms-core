@@ -16,9 +16,9 @@
 package nl.clockwork.ebms.client;
 
 import nl.clockwork.ebms.common.MessageQueue;
-import nl.clockwork.ebms.model.EbMSMessage;
+import nl.clockwork.ebms.model.EbMSResponseMessage;
 
-public class EbMSMessageQueue extends MessageQueue<EbMSMessage>
+public class EbMSMessageQueue extends MessageQueue<EbMSResponseMessage>
 {
 	public EbMSMessageQueue(int maxEntries, int timeout)
 	{

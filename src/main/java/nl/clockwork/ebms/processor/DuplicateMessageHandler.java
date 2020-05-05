@@ -15,6 +15,7 @@
  */
 package nl.clockwork.ebms.processor;
 
+import java.util.ArrayList;
 import java.util.Date;
 
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.Service;
@@ -34,8 +35,11 @@ import nl.clockwork.ebms.cpa.CPAUtils;
 import nl.clockwork.ebms.dao.EbMSDAO;
 import nl.clockwork.ebms.event.processor.EventManager;
 import nl.clockwork.ebms.model.CacheablePartyId;
+import nl.clockwork.ebms.model.EbMSAcknowledgment;
+import nl.clockwork.ebms.model.EbMSBaseMessage;
 import nl.clockwork.ebms.model.EbMSDocument;
 import nl.clockwork.ebms.model.EbMSMessage;
+import nl.clockwork.ebms.model.EbMSMessageError;
 import nl.clockwork.ebms.validation.EbMSMessageValidator;
 
 @Builder(setterPrefix = "set")
@@ -72,7 +76,7 @@ public class DuplicateMessageHandler
 			if (messageValidator.isSyncReply(message))
 			{
 				if (storeDuplicateMessage)
-					ebMSDAO.insertDuplicateMessage(timestamp,document.getMessage(),message,storeDuplicateMessageAttachments);
+					ebMSDAO.insertDuplicateMessage(timestamp,document.getMessage(),message,storeDuplicateMessageAttachments ? message.getAttachments() : new ArrayList<>());
 				val result = ebMSDAO.getEbMSDocumentByRefToMessageId(
 						messageHeader.getCPAId(),
 						messageHeader.getMessageData().getMessageId(),
@@ -85,7 +89,7 @@ public class DuplicateMessageHandler
 			else
 			{
 				if (storeDuplicateMessage)
-					ebMSDAO.insertDuplicateMessage(timestamp,document.getMessage(),message,storeDuplicateMessageAttachments);
+					ebMSDAO.insertDuplicateMessage(timestamp,document.getMessage(),message,storeDuplicateMessageAttachments ? message.getAttachments() : new ArrayList<>());
 				val context = ebMSDAO.getMessageContextByRefToMessageId(
 						messageHeader.getCPAId(),
 						messageHeader.getMessageData().getMessageId(),
@@ -113,31 +117,31 @@ public class DuplicateMessageHandler
 			throw new EbMSProcessingException("MessageId " + messageHeader.getMessageData().getMessageId() + " already used!");
 	}
 
-	public void handleMessageError(final Date timestamp, EbMSDocument responseDocument, final EbMSMessage responseMessage) throws EbMSProcessingException
+	public void handleMessageError(final Date timestamp, EbMSDocument responseDocument, final EbMSMessageError responseMessage) throws EbMSProcessingException
 	{
 		if (isIdenticalMessage(responseMessage))
 		{
 			log.warn("MessageError " + responseMessage.getMessageHeader().getMessageData().getMessageId() + " is duplicate!");
 			if (storeDuplicateMessage)
-				ebMSDAO.insertDuplicateMessage(timestamp,responseDocument.getMessage(),responseMessage,true);
+				ebMSDAO.insertDuplicateMessage(timestamp,responseDocument.getMessage(),responseMessage,new ArrayList<>());
 		}
 		else
 			throw new EbMSProcessingException("MessageId " + responseMessage.getMessageHeader().getMessageData().getMessageId() + " already used!");
 	}
 	
-	public void handleAcknowledgment(final Date timestamp, EbMSDocument responseDocument, final EbMSMessage responseMessage) throws EbMSProcessingException
+	public void handleAcknowledgment(final Date timestamp, EbMSDocument responseDocument, final EbMSAcknowledgment responseMessage) throws EbMSProcessingException
 	{
 		if (isIdenticalMessage(responseMessage))
 		{
 			log.warn("Acknowledgment " + responseMessage.getMessageHeader().getMessageData().getMessageId() + " is duplicate!");
 			if (storeDuplicateMessage)
-				ebMSDAO.insertDuplicateMessage(timestamp,responseDocument.getMessage(),responseMessage,true);
+				ebMSDAO.insertDuplicateMessage(timestamp,responseDocument.getMessage(),responseMessage,new ArrayList<>());
 		}
 		else
 			throw new EbMSProcessingException("MessageId " + responseMessage.getMessageHeader().getMessageData().getMessageId() + " already used!");
 	}
 	
-	private boolean isIdenticalMessage(EbMSMessage message)
+	private boolean isIdenticalMessage(EbMSBaseMessage message)
 	{
 		return ebMSDAO.existsIdenticalMessage(message);
 	}

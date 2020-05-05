@@ -18,6 +18,7 @@ package nl.clockwork.ebms.validation;
 import java.util.Date;
 
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.SyncReplyModeType;
+import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageHeader;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -31,8 +32,12 @@ import nl.clockwork.ebms.cpa.CPAUtils;
 import nl.clockwork.ebms.dao.EbMSDAO;
 import nl.clockwork.ebms.encryption.EbMSMessageDecrypter;
 import nl.clockwork.ebms.model.CacheablePartyId;
+import nl.clockwork.ebms.model.EbMSAcknowledgment;
+import nl.clockwork.ebms.model.EbMSBaseMessage;
 import nl.clockwork.ebms.model.EbMSDocument;
 import nl.clockwork.ebms.model.EbMSMessage;
+import nl.clockwork.ebms.model.EbMSMessageError;
+import nl.clockwork.ebms.model.EbMSRequestMessage;
 
 @Builder(setterPrefix = "set")
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -58,7 +63,7 @@ public class EbMSMessageValidator
 
 	public void validateMessage(EbMSDocument document, EbMSMessage message, Date timestamp) throws ValidatorException
 	{
-		if (isDuplicateMessage(message))
+		if (isDuplicateMessage(message.getMessageHeader()))
 			throw new DuplicateMessageException();
 		cpaValidator.validate(message);
 		messageHeaderValidator.validate(message,timestamp);
@@ -69,18 +74,18 @@ public class EbMSMessageValidator
 		signatureValidator.validateSignature(document,message);
 	}
 
-	public void validateMessageError(EbMSMessage requestMessage, EbMSMessage responseMessage, Date timestamp) throws ValidatorException
+	public void validateMessageError(EbMSMessage requestMessage, EbMSMessageError responseMessage, Date timestamp) throws ValidatorException
 	{
-		if (isDuplicateMessage(responseMessage))
+		if (isDuplicateMessage(responseMessage.getMessageHeader()))
 			throw new DuplicateMessageException();
 		messageHeaderValidator.validate(requestMessage,responseMessage);
 		messageHeaderValidator.validate(responseMessage,timestamp);
 		clientCertificateValidator.validate(responseMessage);
 	}
 
-	public void validateAcknowledgment(EbMSDocument responseDocument, EbMSMessage requestMessage, EbMSMessage responseMessage, Date timestamp) throws ValidatorException
+	public void validateAcknowledgment(EbMSDocument responseDocument, EbMSMessage requestMessage, EbMSAcknowledgment responseMessage, Date timestamp) throws ValidatorException
 	{
-		if (isDuplicateMessage(responseMessage))
+		if (isDuplicateMessage(responseMessage.getMessageHeader()))
 			throw new DuplicateMessageException();
 		messageHeaderValidator.validate(requestMessage,responseMessage);
 		messageHeaderValidator.validate(responseMessage,timestamp);
@@ -88,31 +93,13 @@ public class EbMSMessageValidator
 		signatureValidator.validate(responseDocument,requestMessage,responseMessage);
 	}
 
-	public void validateStatusRequest(EbMSMessage message, Date timestamp) throws ValidatorException
+	public void validate(EbMSBaseMessage message, Date timestamp) throws ValidatorException
 	{
 		messageHeaderValidator.validate(message,timestamp);
 		clientCertificateValidator.validate(message);
 	}
 
-	public void validateStatusResponse(EbMSMessage message, Date timestamp) throws ValidatorException
-	{
-		messageHeaderValidator.validate(message,timestamp);
-		clientCertificateValidator.validate(message);
-	}
-
-	public void validatePing(EbMSMessage message, Date timestamp) throws ValidatorException
-	{
-		messageHeaderValidator.validate(message,timestamp);
-		clientCertificateValidator.validate(message);
-	}
-
-	public void validatePong(EbMSMessage message, Date timestamp) throws ValidatorException
-	{
-		messageHeaderValidator.validate(message,timestamp);
-		clientCertificateValidator.validate(message);
-	}
-
-	public boolean isSyncReply(EbMSMessage message)
+	public boolean isSyncReply(EbMSRequestMessage message)
 	{
 		try
 		{
@@ -130,9 +117,9 @@ public class EbMSMessageValidator
 		}
 	}
 
-	public boolean isDuplicateMessage(EbMSMessage message)
+	public boolean isDuplicateMessage(MessageHeader messageHeader)
 	{
-		return /*message.getMessageHeader().getDuplicateElimination()!= null && */
-				ebMSDAO.existsMessage(message.getMessageHeader().getMessageData().getMessageId());
+		return /*messageHeader.getDuplicateElimination()!= null && */
+				ebMSDAO.existsMessage(messageHeader.getMessageData().getMessageId());
 	}
 }

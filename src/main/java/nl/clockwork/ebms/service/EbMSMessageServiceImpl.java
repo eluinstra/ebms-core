@@ -50,11 +50,13 @@ import nl.clockwork.ebms.dao.EbMSDAO;
 import nl.clockwork.ebms.event.listener.EbMSMessageEventType;
 import nl.clockwork.ebms.event.processor.EventManager;
 import nl.clockwork.ebms.model.CacheablePartyId;
+import nl.clockwork.ebms.model.EbMSBaseMessage;
 import nl.clockwork.ebms.model.EbMSMessage;
 import nl.clockwork.ebms.model.EbMSMessageAttachment;
 import nl.clockwork.ebms.model.EbMSMessageContent;
 import nl.clockwork.ebms.model.EbMSMessageContext;
 import nl.clockwork.ebms.model.EbMSMessageEvent;
+import nl.clockwork.ebms.model.EbMSStatusResponse;
 import nl.clockwork.ebms.model.MessageStatus;
 import nl.clockwork.ebms.model.Party;
 import nl.clockwork.ebms.processor.EbMSProcessorException;
@@ -261,12 +263,12 @@ public class EbMSMessageServiceImpl implements EbMSMessageService
 		}
 	}
 
-	private MessageStatus createMessageStatus(EbMSMessage message)
+	private MessageStatus createMessageStatus(EbMSBaseMessage message)
 	{
-		if (EbMSAction.STATUS_RESPONSE.getAction().equals(message.getMessageHeader().getAction()) && message.getStatusResponse() != null)
+		if (message instanceof EbMSStatusResponse)
 		{
-			val timestamp = message.getStatusResponse().getTimestamp() == null ? null : message.getStatusResponse().getTimestamp();
-			val status = EbMSMessageStatus.get(message.getStatusResponse().getMessageStatus());
+			val timestamp = ((EbMSStatusResponse)message).getStatusResponse().getTimestamp() == null ? null : ((EbMSStatusResponse)message).getStatusResponse().getTimestamp();
+			val status = EbMSMessageStatus.get(((EbMSStatusResponse)message).getStatusResponse().getMessageStatus());
 			return new MessageStatus(timestamp,status);
 		}
 		else
@@ -351,7 +353,7 @@ public class EbMSMessageServiceImpl implements EbMSMessageService
 					val receiveDeliveryChannel = cpaManager.getReceiveDeliveryChannel(messageHeader.getCPAId(),toPartyId,messageHeader.getTo().getRole(),service,messageHeader.getAction()).orElseThrow(() -> StreamUtils.illegalStateException("ReceiveDeliveryChannel",messageHeader.getCPAId(),toPartyId,messageHeader.getTo().getRole(),service,messageHeader.getAction()));
 					val persistTime = CPAUtils.getPersistTime(timestamp,receiveDeliveryChannel);
 					val confidential = cpaManager.isConfidential(messageHeader.getCPAId(),fromPartyId,messageHeader.getFrom().getRole(),service,messageHeader.getAction());
-					ebMSDAO.insertMessage(timestamp,persistTime,document,message,EbMSMessageStatus.SENDING);
+					ebMSDAO.insertMessage(timestamp,persistTime,document,message,message.getAttachments(),EbMSMessageStatus.SENDING);
 					eventManager.createEvent(messageHeader.getCPAId(),sendDeliveryChannel,receiveDeliveryChannel,messageHeader.getMessageData().getMessageId(),messageHeader.getMessageData().getTimeToLive(),messageHeader.getMessageData().getTimestamp(),confidential);
 				}
 				catch (IllegalStateException | DAOException | TransformerFactoryConfigurationError e)

@@ -19,6 +19,7 @@ import java.security.GeneralSecurityException;
 import java.security.KeyPair;
 import java.security.KeyStoreException;
 import java.security.cert.X509Certificate;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.xml.security.exceptions.XMLSecurityException;
@@ -43,8 +44,10 @@ import nl.clockwork.ebms.cpa.CPAManager;
 import nl.clockwork.ebms.cpa.CPAUtils;
 import nl.clockwork.ebms.model.CacheablePartyId;
 import nl.clockwork.ebms.model.EbMSAttachment;
+import nl.clockwork.ebms.model.EbMSBaseMessage;
 import nl.clockwork.ebms.model.EbMSDocument;
 import nl.clockwork.ebms.model.EbMSMessage;
+import nl.clockwork.ebms.model.EbMSResponseMessage;
 import nl.clockwork.ebms.processor.EbMSProcessingException;
 import nl.clockwork.ebms.processor.EbMSProcessorException;
 import nl.clockwork.ebms.security.EbMSKeyStore;
@@ -74,7 +77,7 @@ public class EbMSSignatureGenerator
 					messageHeader.getFrom().getRole(),
 					service,
 					messageHeader.getAction()))
-				sign(document,message);
+				sign(document,message,message.getAttachments());
 		}
 		catch (GeneralSecurityException e)
 		{
@@ -86,13 +89,13 @@ public class EbMSSignatureGenerator
 		}
 	}
 
-	public void generate(AckRequested ackRequested, EbMSDocument document, EbMSMessage message) throws EbMSProcessorException
+	public void generate(AckRequested ackRequested, EbMSDocument document, EbMSResponseMessage message) throws EbMSProcessorException
 	{
 		try
 		{
 			if (ackRequested != null && ackRequested.isSigned())
 			{
-				sign(document,message);
+				sign(document,message,new ArrayList<>());
 			}
 		}
 		catch (GeneralSecurityException e)
@@ -105,7 +108,7 @@ public class EbMSSignatureGenerator
 		}
 	}
 
-	private void sign(EbMSDocument document, EbMSMessage message) throws EbMSProcessorException, GeneralSecurityException, XMLSecurityException
+	private void sign(EbMSDocument document, EbMSBaseMessage message, List<EbMSAttachment> attachments) throws EbMSProcessorException, GeneralSecurityException, XMLSecurityException
 	{
 		val messageHeader = message.getMessageHeader();
 		val fromPartyId = new CacheablePartyId(messageHeader.getFrom().getPartyId());
@@ -123,7 +126,7 @@ public class EbMSSignatureGenerator
 		val keyPair = SecurityUtils.getKeyPair(keyStore,alias,keyStore.getKeyPassword());
 		val signatureAlgorithm = CPAUtils.getSignatureAlgorithm(deliveryChannel);
 		val hashFunction = CPAUtils.getHashFunction(deliveryChannel);
-		sign(keyStore,keyPair,alias,document.getMessage(),message.getAttachments(),signatureAlgorithm,hashFunction);
+		sign(keyStore,keyPair,alias,document.getMessage(),attachments,signatureAlgorithm,hashFunction);
 	}
 	
 	private void sign(EbMSKeyStore keyStore, KeyPair keyPair, String alias, Document document, List<EbMSAttachment> attachments, String signatureMethodAlgorithm, String digestAlgorithm) throws XMLSecurityException, KeyStoreException

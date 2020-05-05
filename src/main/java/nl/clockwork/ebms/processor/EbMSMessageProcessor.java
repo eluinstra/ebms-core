@@ -16,6 +16,7 @@
 package nl.clockwork.ebms.processor;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Date;
 
 import javax.xml.bind.JAXBException;
@@ -38,7 +39,6 @@ import lombok.val;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.apachecommons.CommonsLog;
 import nl.clockwork.ebms.Constants;
-import nl.clockwork.ebms.EbMSAction;
 import nl.clockwork.ebms.EbMSMessageFactory;
 import nl.clockwork.ebms.EbMSMessageStatus;
 import nl.clockwork.ebms.EbMSMessageUtils;
@@ -53,9 +53,15 @@ import nl.clockwork.ebms.dao.EbMSDAO;
 import nl.clockwork.ebms.event.listener.EventListener;
 import nl.clockwork.ebms.event.processor.EventManager;
 import nl.clockwork.ebms.model.CacheablePartyId;
+import nl.clockwork.ebms.model.EbMSAcknowledgment;
 import nl.clockwork.ebms.model.EbMSDocument;
 import nl.clockwork.ebms.model.EbMSMessage;
 import nl.clockwork.ebms.model.EbMSMessageContext;
+import nl.clockwork.ebms.model.EbMSMessageError;
+import nl.clockwork.ebms.model.EbMSPing;
+import nl.clockwork.ebms.model.EbMSPong;
+import nl.clockwork.ebms.model.EbMSStatusRequest;
+import nl.clockwork.ebms.model.EbMSStatusResponse;
 import nl.clockwork.ebms.signing.EbMSSignatureGenerator;
 import nl.clockwork.ebms.validation.DuplicateMessageException;
 import nl.clockwork.ebms.validation.EbMSMessageValidator;
@@ -101,36 +107,36 @@ public class EbMSMessageProcessor
 			val messageHeader = message.getMessageHeader();
 			if (!cpaManager.existsCPA(messageHeader.getCPAId()))
 				throw new EbMSProcessingException("CPA " + messageHeader.getCPAId() + " not found!");
-			if (!Constants.EBMS_SERVICE_URI.equals(messageHeader.getService().getValue()))
+			if (message instanceof EbMSMessage)
 			{
-				return process(timestamp,document,message);
+				return process(timestamp,document,(EbMSMessage)message);
 			}
-			else if (EbMSAction.MESSAGE_ERROR.getAction().equals(messageHeader.getAction()))
+			else if (message instanceof EbMSMessageError)
 			{
 				val request = ebMSDAO.getDocument(messageHeader.getMessageData().getRefToMessageId())
 						.orElseThrow(() -> StreamUtils.illegalStateException("Document",messageHeader.getMessageData().getRefToMessageId()));
-				val requestMessage = EbMSMessageUtils.getEbMSMessage(request);
+				val requestMessage = (EbMSMessage)EbMSMessageUtils.getEbMSMessage(request);
 				if (requestMessage.getSyncReply() != null)
 					throw new EbMSProcessingException(
 							"No async ErrorMessage expected for message " + requestMessage.getMessageHeader().getMessageData().getMessageId());
-				processMessageError(messageHeader.getCPAId(),timestamp,document,requestMessage,message);
+				processMessageError(messageHeader.getCPAId(),timestamp,document,requestMessage,(EbMSMessageError)message);
 				return null;
 			}
-			else if (EbMSAction.ACKNOWLEDGMENT.getAction().equals(messageHeader.getAction()))
+			else if (message instanceof EbMSAcknowledgment)
 			{
-				val request = ebMSDAO.getDocument(message.getAcknowledgment().getRefToMessageId())
-						.orElseThrow(() -> StreamUtils.illegalStateException("Document",message.getAcknowledgment().getRefToMessageId()));
-				val requestMessage = EbMSMessageUtils.getEbMSMessage(request);
+				val request = ebMSDAO.getDocument(((EbMSAcknowledgment)message).getAcknowledgment().getRefToMessageId())
+						.orElseThrow(() -> StreamUtils.illegalStateException("Document",((EbMSAcknowledgment)message).getAcknowledgment().getRefToMessageId()));
+				val requestMessage = (EbMSMessage)EbMSMessageUtils.getEbMSMessage(request);
 				if (requestMessage.getAckRequested() == null || requestMessage.getSyncReply() != null)
 					throw new EbMSProcessingException(
 							"No async Acknowledgment expected for message " + requestMessage.getMessageHeader().getMessageData().getMessageId());
-				processAcknowledgment(messageHeader.getCPAId(),timestamp,document,requestMessage,message);
+				processAcknowledgment(messageHeader.getCPAId(),timestamp,document,requestMessage,(EbMSAcknowledgment)message);
 				return null;
 			}
-			else if (EbMSAction.STATUS_REQUEST.getAction().equals(messageHeader.getAction()))
+			else if (message instanceof EbMSStatusRequest)
 			{
-				val response = processStatusRequest(message,timestamp);
-				if (messageValidator.isSyncReply(message))
+				val response = processStatusRequest((EbMSStatusRequest)message,timestamp);
+				if (messageValidator.isSyncReply((EbMSStatusRequest)message))
 					return EbMSMessageUtils.getEbMSDocument(response);
 				else
 				{
@@ -147,12 +153,12 @@ public class EbMSMessageProcessor
 					return null;
 				}
 			}
-			else if (EbMSAction.STATUS_RESPONSE.getAction().equals(messageHeader.getAction()))
+			else if (message instanceof EbMSStatusResponse)
 			{
 				try
 				{
-					messageValidator.validateStatusResponse(message,timestamp);
-					deliveryManager.handleResponseMessage(message);
+					messageValidator.validate(message,timestamp);
+					deliveryManager.handleResponseMessage((EbMSStatusResponse)message);
 				}
 				catch (ValidatorException e)
 				{
@@ -160,10 +166,10 @@ public class EbMSMessageProcessor
 				}
 				return null;
 			}
-			else if (EbMSAction.PING.getAction().equals(messageHeader.getAction()))
+			else if (message instanceof EbMSPing)
 			{
-				val response = processPing(message,timestamp);
-				if (messageValidator.isSyncReply(message))
+				val response = processPing((EbMSPing)message,timestamp);
+				if (messageValidator.isSyncReply((EbMSPing)message))
 					return EbMSMessageUtils.getEbMSDocument(response);
 				else
 				{
@@ -180,12 +186,12 @@ public class EbMSMessageProcessor
 					return null;
 				}
 			}
-			else if (EbMSAction.PONG.getAction().equals(messageHeader.getAction()))
+			else if (message instanceof EbMSPong)
 			{
 				try
 				{
-					messageValidator.validatePong(message,timestamp);
-					deliveryManager.handleResponseMessage(message);
+					messageValidator.validate(message,timestamp);
+					deliveryManager.handleResponseMessage((EbMSPong)message);
 				}
 				catch (ValidatorException e)
 				{
@@ -211,7 +217,7 @@ public class EbMSMessageProcessor
 	{
 		try
 		{
-			val requestMessage = EbMSMessageUtils.getEbMSMessage(request);
+			val requestMessage = (EbMSMessage)EbMSMessageUtils.getEbMSMessage(request);
 			val requestMessageHeader = requestMessage.getMessageHeader();
 			if (requestMessage.getAckRequested() != null && requestMessage.getSyncReply() != null && response == null)
 				throw new EbMSProcessingException("No response received for message " + requestMessageHeader.getMessageData().getMessageId());
@@ -221,26 +227,19 @@ public class EbMSMessageProcessor
 				xsdValidator.validate(response.getMessage());
 				val timestamp = new Date();
 				val responseMessage = EbMSMessageUtils.getEbMSMessage(response);
-				val responseMessageHeader = responseMessage.getMessageHeader();
-				if (Constants.EBMS_SERVICE_URI.equals(responseMessageHeader.getService().getValue()))
+				if (responseMessage instanceof EbMSMessageError)
 				{
-					if (EbMSAction.MESSAGE_ERROR.getAction().equals(responseMessageHeader.getAction()))
-					{
-						if (!messageValidator.isSyncReply(requestMessage))
-							throw new EbMSProcessingException(
-									"No sync ErrorMessage expected for message " + requestMessageHeader.getMessageData().getMessageId() + "\n" + DOMUtils.toString(response.getMessage()));
-						processMessageError(requestMessageHeader.getCPAId(),timestamp,response,requestMessage,responseMessage);
-					}
-					else if (EbMSAction.ACKNOWLEDGMENT.getAction().equals(responseMessageHeader.getAction()))
-					{
-						if (requestMessage.getAckRequested() == null || !messageValidator.isSyncReply(requestMessage))
-							throw new EbMSProcessingException(
-									"No sync Acknowledgment expected for message " + requestMessageHeader.getMessageData().getMessageId() + "\n" + DOMUtils.toString(response.getMessage()));
-						processAcknowledgment(requestMessageHeader.getCPAId(),timestamp,response,requestMessage,responseMessage);
-					}
-					else
+					if (!messageValidator.isSyncReply(requestMessage))
 						throw new EbMSProcessingException(
-								"Unexpected response received for message " + requestMessageHeader.getMessageData().getMessageId() + "\n" + DOMUtils.toString(response.getMessage()));
+								"No sync ErrorMessage expected for message " + requestMessageHeader.getMessageData().getMessageId() + "\n" + DOMUtils.toString(response.getMessage()));
+					processMessageError(requestMessageHeader.getCPAId(),timestamp,response,requestMessage,(EbMSMessageError)responseMessage);
+				}
+				else if (responseMessage instanceof EbMSAcknowledgment)
+				{
+					if (requestMessage.getAckRequested() == null || !messageValidator.isSyncReply(requestMessage))
+						throw new EbMSProcessingException(
+								"No sync Acknowledgment expected for message " + requestMessageHeader.getMessageData().getMessageId() + "\n" + DOMUtils.toString(response.getMessage()));
+					processAcknowledgment(requestMessageHeader.getCPAId(),timestamp,response,requestMessage,(EbMSAcknowledgment)responseMessage);
 				}
 				else
 					throw new EbMSProcessingException(
@@ -278,7 +277,7 @@ public class EbMSMessageProcessor
 		}
 	}
 	
-	private void processMessageError(String cpaId, final Date timestamp, final EbMSDocument responseDocument, final EbMSMessage requestMessage, final EbMSMessage responseMessage) throws EbMSProcessingException, ValidatorException
+	private void processMessageError(String cpaId, final Date timestamp, final EbMSDocument responseDocument, final EbMSMessage requestMessage, final EbMSMessageError responseMessage) throws EbMSProcessingException, ValidatorException
 	{
 		try
 		{
@@ -291,7 +290,7 @@ public class EbMSMessageProcessor
 					{
 						val responseMessageHeader = responseMessage.getMessageHeader();
 						val persistTime = ebMSDAO.getPersistTime(responseMessageHeader.getMessageData().getRefToMessageId());
-						ebMSDAO.insertMessage(timestamp,persistTime.orElse(null),responseDocument.getMessage(),responseMessage,null);
+						ebMSDAO.insertMessage(timestamp,persistTime.orElse(null),responseDocument.getMessage(),responseMessage,new ArrayList<>(),null);
 						if (ebMSDAO.updateMessage(
 								responseMessageHeader.getMessageData().getRefToMessageId(),
 								EbMSMessageStatus.SENDING,
@@ -312,12 +311,12 @@ public class EbMSMessageProcessor
 		catch (ValidationException e)
 		{
 			val persistTime = ebMSDAO.getPersistTime(responseMessage.getMessageHeader().getMessageData().getRefToMessageId());
-			ebMSDAO.insertMessage(timestamp,persistTime.orElse(null),responseDocument.getMessage(),responseMessage,null);
+			ebMSDAO.insertMessage(timestamp,persistTime.orElse(null),responseDocument.getMessage(),responseMessage,new ArrayList<>(),null);
 			log.warn("Unable to process MessageError " + responseMessage.getMessageHeader().getMessageData().getMessageId(),e);
 		}
 	}
 
-	private void processAcknowledgment(String cpaId, final Date timestamp, final EbMSDocument responseDocument, final EbMSMessage requestMessage, final EbMSMessage responseMessage) throws EbMSProcessingException
+	private void processAcknowledgment(String cpaId, final Date timestamp, final EbMSDocument responseDocument, final EbMSMessage requestMessage, final EbMSAcknowledgment responseMessage) throws EbMSProcessingException
 	{
 		try
 		{
@@ -330,7 +329,7 @@ public class EbMSMessageProcessor
 					{
 						val responseMessageHeader = responseMessage.getMessageHeader();
 						val persistTime = ebMSDAO.getPersistTime(responseMessageHeader.getMessageData().getRefToMessageId());
-						ebMSDAO.insertMessage(timestamp,persistTime.orElse(null),responseDocument.getMessage(),responseMessage,null);
+						ebMSDAO.insertMessage(timestamp,persistTime.orElse(null),responseDocument.getMessage(),responseMessage,new ArrayList<>(),null);
 						if (ebMSDAO.updateMessage(
 								responseMessageHeader.getMessageData().getRefToMessageId(),
 								EbMSMessageStatus.SENDING,
@@ -351,12 +350,12 @@ public class EbMSMessageProcessor
 		catch (ValidatorException e)
 		{
 			val persistTime = ebMSDAO.getPersistTime(responseMessage.getMessageHeader().getMessageData().getRefToMessageId());
-			ebMSDAO.insertMessage(timestamp,persistTime.orElse(null),responseDocument.getMessage(),responseMessage,null);
+			ebMSDAO.insertMessage(timestamp,persistTime.orElse(null),responseDocument.getMessage(),responseMessage,new ArrayList<>(),null);
 			log.warn("Unable to process Acknowledgment " + responseMessage.getMessageHeader().getMessageData().getMessageId(),e);
 		}
 	}
 
-	protected EbMSDocument process(final Date timestamp, final EbMSDocument document, final EbMSMessage message) throws DAOException, ValidatorException, DatatypeConfigurationException, JAXBException, SOAPException, ParserConfigurationException, SAXException, IOException, TransformerFactoryConfigurationError, TransformerException, EbMSProcessorException
+	public EbMSDocument process(final Date timestamp, final EbMSDocument document, final EbMSMessage message) throws DAOException, ValidatorException, DatatypeConfigurationException, JAXBException, SOAPException, ParserConfigurationException, SAXException, IOException, TransformerFactoryConfigurationError, TransformerException, EbMSProcessorException
 	{
 		val messageHeader = message.getMessageHeader();
 		try
@@ -370,7 +369,7 @@ public class EbMSMessageProcessor
 						@Override
 						public void doInTransaction()
 						{
-							ebMSDAO.insertMessage(timestamp,null,document.getMessage(),message,EbMSMessageStatus.RECEIVED);
+							ebMSDAO.insertMessage(timestamp,null,document.getMessage(),message,message.getAttachments(),EbMSMessageStatus.RECEIVED);
 							eventListener.onMessageReceived(message.getMessageHeader().getMessageData().getMessageId());
 						}
 					}
@@ -395,8 +394,8 @@ public class EbMSMessageProcessor
 										cpaManager.getReceiveDeliveryChannel(messageHeader.getCPAId(),toPartyId,messageHeader.getTo().getRole(),service,messageHeader.getAction())
 										.orElseThrow(() -> StreamUtils.illegalStateException("ReceiveDeliveryChannel",messageHeader.getCPAId(),toPartyId,messageHeader.getTo().getRole(),service,messageHeader.getAction()));
 								val persistTime = CPAUtils.getPersistTime(messageHeader.getMessageData().getTimestamp(),deliveryChannel);
-								ebMSDAO.insertMessage(timestamp,persistTime,document.getMessage(),message,EbMSMessageStatus.RECEIVED);
-								ebMSDAO.insertMessage(timestamp,persistTime,acknowledgmentDocument.getMessage(),acknowledgment,null);
+								ebMSDAO.insertMessage(timestamp,persistTime,document.getMessage(),message,message.getAttachments(),EbMSMessageStatus.RECEIVED);
+								ebMSDAO.insertMessage(timestamp,persistTime,acknowledgmentDocument.getMessage(),acknowledgment,new ArrayList<>(),null);
 							}
 							{
 								val fromPartyId = new CacheablePartyId(acknowledgment.getMessageHeader().getFrom().getPartyId());
@@ -449,8 +448,8 @@ public class EbMSMessageProcessor
 								val deliveryChannel = cpaManager.getReceiveDeliveryChannel(messageHeader.getCPAId(),toPartyId,messageHeader.getTo().getRole(),service,messageHeader.getAction())
 										.orElse(null);
 								val persistTime = deliveryChannel != null ? CPAUtils.getPersistTime(timestamp,deliveryChannel) : null;
-								ebMSDAO.insertMessage(timestamp,persistTime,document.getMessage(),message,EbMSMessageStatus.FAILED);
-								ebMSDAO.insertMessage(timestamp,persistTime,messageErrorDocument.getMessage(),messageError,null);
+								ebMSDAO.insertMessage(timestamp,persistTime,document.getMessage(),message,message.getAttachments(),EbMSMessageStatus.FAILED);
+								ebMSDAO.insertMessage(timestamp,persistTime,messageErrorDocument.getMessage(),messageError,new ArrayList<>(),null);
 							}
 							if (!messageValidator.isSyncReply(message))
 							{
@@ -475,16 +474,16 @@ public class EbMSMessageProcessor
 		}
 	}
 
-	protected EbMSMessage processStatusRequest(final EbMSMessage message, final Date timestamp) throws ValidatorException, DatatypeConfigurationException, JAXBException, EbMSProcessorException
+	protected EbMSStatusResponse processStatusRequest(final EbMSStatusRequest message, final Date timestamp) throws ValidatorException, DatatypeConfigurationException, JAXBException, EbMSProcessorException
 	{
-		messageValidator.validateStatusRequest(message,timestamp);
+		messageValidator.validate(message,timestamp);
 		val result = ebMSDAO.getMessageContext(message.getStatusRequest().getRefToMessageId())
 				.map(mc -> createEbMSMessageStatus(message,mc))
 				.get();
 		return ebMSMessageFactory.createEbMSStatusResponse(message,result.getValue0(),result.getValue1()); 
 	}
 	
-	private Pair<EbMSMessageStatus,Date> createEbMSMessageStatus(EbMSMessage message, EbMSMessageContext messageContext)
+	private Pair<EbMSMessageStatus,Date> createEbMSMessageStatus(EbMSStatusRequest message, EbMSMessageContext messageContext)
 	{
 		if (messageContext == null || Constants.EBMS_SERVICE_URI.equals(messageContext.getService()))
 			return new Pair<EbMSMessageStatus,Date>(EbMSMessageStatus.NOT_RECOGNIZED,null);
@@ -509,9 +508,9 @@ public class EbMSMessageProcessor
 			return new Pair<EbMSMessageStatus,Date>(EbMSMessageStatus.NOT_RECOGNIZED,null);
 	}
 
-	protected EbMSMessage processPing(final EbMSMessage message, final Date timestamp) throws ValidatorException, EbMSProcessorException
+	protected EbMSPong processPing(final EbMSPing message, final Date timestamp) throws ValidatorException, EbMSProcessorException
 	{
-		messageValidator.validatePing(message,timestamp);
+		messageValidator.validate(message,timestamp);
 		return ebMSMessageFactory.createEbMSPong(message);
 	}
 }

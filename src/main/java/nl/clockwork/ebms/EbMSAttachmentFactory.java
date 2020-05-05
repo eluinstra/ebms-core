@@ -25,6 +25,7 @@ import javax.mail.util.ByteArrayDataSource;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.cxf.io.CachedOutputStream;
 
+import lombok.Builder;
 import lombok.val;
 import nl.clockwork.ebms.model.CachedEbMSAttachment;
 import nl.clockwork.ebms.model.EbMSAttachment;
@@ -81,6 +82,7 @@ public class EbMSAttachmentFactory
 
 	public static class DefaultEbMSAttachmentFactory
 	{
+		@Builder
 		public DefaultEbMSAttachmentFactory(int attachmentMemoryTreshold, String attachmentOutputDirectory, String attachmentCipherTransformation)
 		{
 			if (StringUtils.isNotEmpty(attachmentOutputDirectory))

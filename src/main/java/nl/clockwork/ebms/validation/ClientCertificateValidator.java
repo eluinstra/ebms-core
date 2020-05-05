@@ -30,7 +30,7 @@ import nl.clockwork.ebms.common.util.StreamUtils;
 import nl.clockwork.ebms.cpa.CPAManager;
 import nl.clockwork.ebms.cpa.CPAUtils;
 import nl.clockwork.ebms.model.CacheablePartyId;
-import nl.clockwork.ebms.model.EbMSMessage;
+import nl.clockwork.ebms.model.EbMSBaseMessage;
 
 @CommonsLog
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -45,7 +45,7 @@ public class ClientCertificateValidator
 		}
 
 		@Override
-		public void validate(EbMSMessage message) throws ValidatorException
+		public void validate(EbMSBaseMessage message) throws ValidatorException
 		{
 		}
 	}
@@ -58,7 +58,7 @@ public class ClientCertificateValidator
 		return enabled ? new ClientCertificateValidator(cpaManager) : new DisabledClientCertificateValidator(cpaManager);
 	}
 
-	public void validate(EbMSMessage message) throws ValidatorException
+	public void validate(EbMSBaseMessage message) throws ValidatorException
 	{
 		val certificate = ClientCertificateManager.getCertificate();
 		if (certificate != null)

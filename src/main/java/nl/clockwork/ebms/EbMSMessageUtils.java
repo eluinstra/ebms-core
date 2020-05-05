@@ -61,25 +61,31 @@ import lombok.val;
 import nl.clockwork.ebms.common.JAXBParser;
 import nl.clockwork.ebms.common.util.DOMUtils;
 import nl.clockwork.ebms.cpa.CPAUtils;
+import nl.clockwork.ebms.model.EbMSAcknowledgment;
 import nl.clockwork.ebms.model.EbMSAttachment;
+import nl.clockwork.ebms.model.EbMSBaseMessage;
 import nl.clockwork.ebms.model.EbMSDocument;
 import nl.clockwork.ebms.model.EbMSMessage;
+import nl.clockwork.ebms.model.EbMSMessageBuilder;
+import nl.clockwork.ebms.model.EbMSMessageError;
+import nl.clockwork.ebms.model.EbMSStatusRequest;
+import nl.clockwork.ebms.model.EbMSStatusResponse;
 
 public class EbMSMessageUtils
 {
-	public static EbMSMessage getEbMSMessage(Document document) throws JAXBException, XPathExpressionException, ParserConfigurationException, SAXException, IOException
+	public static EbMSBaseMessage getEbMSMessage(Document document) throws JAXBException, XPathExpressionException, ParserConfigurationException, SAXException, IOException
 	{
 		return getEbMSMessage(document,new ArrayList<>());
 	}
 
-	public static EbMSMessage getEbMSMessage(EbMSDocument document) throws JAXBException, XPathExpressionException, ParserConfigurationException, SAXException, IOException
+	public static EbMSBaseMessage getEbMSMessage(EbMSDocument document) throws JAXBException, XPathExpressionException, ParserConfigurationException, SAXException, IOException
 	{
 		return getEbMSMessage(document.getMessage(),document.getAttachments());
 	}
 
-	private static EbMSMessage getEbMSMessage(Document document, List<EbMSAttachment> attachments) throws JAXBException, XPathExpressionException, ParserConfigurationException, SAXException, IOException
+	private static EbMSBaseMessage getEbMSMessage(Document document, List<EbMSAttachment> attachments) throws JAXBException, XPathExpressionException, ParserConfigurationException, SAXException, IOException
 	{
-		val builder = EbMSMessage.builder();
+		val builder = new EbMSMessageBuilder();
 		JAXBParser<Envelope> jaxbParser = JAXBParser.getInstance(
 				Envelope.class,
 				Envelope.class,
@@ -94,14 +100,14 @@ public class EbMSMessageUtils
 				StatusRequest.class,
 				StatusResponse.class);
 		val envelope = jaxbParser.handle(document);
-		envelope.getHeader().getAny().forEach(e -> setEbMSMessage(builder,e));
-		envelope.getBody().getAny().forEach(e -> setEbMSMessage(builder,e));
+		envelope.getHeader().getAny().forEach(e -> setEbMSMessageBuilder(builder,e));
+		envelope.getBody().getAny().forEach(e -> setEbMSMessageBuilder(builder,e));
 		builder.attachments(attachments);
 		return builder.build();
 	}
 
 	@SuppressWarnings("unchecked")
-	private static void setEbMSMessage(EbMSMessage.EbMSMessageBuilder result, Object e)
+	private static void setEbMSMessageBuilder(EbMSMessageBuilder result, Object e)
 	{
 		if (e instanceof MessageHeader)
 			result.messageHeader((MessageHeader)e);
@@ -135,6 +141,13 @@ public class EbMSMessageUtils
 		return CPAUtils.toString(service.getType(),service.getValue());
 	}
 
+	public static EbMSDocument getEbMSDocument(EbMSBaseMessage message) throws SOAPException, JAXBException, ParserConfigurationException, SAXException, IOException, TransformerFactoryConfigurationError, TransformerException
+	{
+		return EbMSDocument.builder()
+			.message(EbMSMessageUtils.createSOAPMessage(message))
+			.build();
+	}
+	
 	public static EbMSDocument getEbMSDocument(EbMSMessage message) throws SOAPException, JAXBException, ParserConfigurationException, SAXException, IOException, TransformerFactoryConfigurationError, TransformerException
 	{
 		return EbMSDocument.builder()
@@ -230,21 +243,29 @@ public class EbMSMessageUtils
 		return result;
 	}
 
-	public static Document createSOAPMessage(EbMSMessage ebMSMessage) throws SOAPException, JAXBException, ParserConfigurationException, SAXException, IOException, TransformerFactoryConfigurationError, TransformerException
+	public static Document createSOAPMessage(EbMSBaseMessage ebMSMessage) throws SOAPException, JAXBException, ParserConfigurationException, SAXException, IOException, TransformerFactoryConfigurationError, TransformerException
 	{
 		val envelope = new Envelope();
 		envelope.setHeader(new Header());
 		envelope.setBody(new Body());
 		
 		envelope.getHeader().getAny().add(ebMSMessage.getMessageHeader());
-		envelope.getHeader().getAny().add(ebMSMessage.getSyncReply());
-		envelope.getHeader().getAny().add(ebMSMessage.getMessageOrder());
-		envelope.getHeader().getAny().add(ebMSMessage.getAckRequested());
-		envelope.getHeader().getAny().add(ebMSMessage.getErrorList());
-		envelope.getHeader().getAny().add(ebMSMessage.getAcknowledgment());
-		envelope.getBody().getAny().add(ebMSMessage.getManifest());
-		envelope.getBody().getAny().add(ebMSMessage.getStatusRequest());
-		envelope.getBody().getAny().add(ebMSMessage.getStatusResponse());
+
+		if (ebMSMessage instanceof EbMSMessage)
+		{
+			envelope.getHeader().getAny().add(((EbMSMessage)ebMSMessage).getSyncReply());
+			envelope.getHeader().getAny().add(((EbMSMessage)ebMSMessage).getMessageOrder());
+			envelope.getHeader().getAny().add(((EbMSMessage)ebMSMessage).getAckRequested());
+			envelope.getBody().getAny().add(((EbMSMessage)ebMSMessage).getManifest());
+		}
+		else if (ebMSMessage instanceof EbMSMessageError)
+			envelope.getHeader().getAny().add(((EbMSMessageError)ebMSMessage).getErrorList());
+		else if (ebMSMessage instanceof EbMSAcknowledgment)
+			envelope.getHeader().getAny().add(((EbMSAcknowledgment)ebMSMessage).getAcknowledgment());
+		else if (ebMSMessage instanceof EbMSStatusRequest)
+			envelope.getBody().getAny().add(((EbMSStatusRequest)ebMSMessage).getStatusRequest());
+		else if (ebMSMessage instanceof EbMSStatusResponse)
+			envelope.getBody().getAny().add(((EbMSStatusResponse)ebMSMessage).getStatusResponse());
 		
 		val parser = JAXBParser.getInstance(
 				Envelope.class,

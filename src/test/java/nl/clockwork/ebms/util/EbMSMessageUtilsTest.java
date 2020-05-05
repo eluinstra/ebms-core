@@ -21,22 +21,30 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.StringWriter;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 
+import javax.activation.DataSource;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DeliveryChannel;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.MessagingCharacteristics;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.SyncReplyModeType;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.AckRequested;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.Acknowledgment;
+import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.Manifest;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageHeader;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageStatusType;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.PartyId;
@@ -52,11 +60,22 @@ import nl.clockwork.ebms.EbMSAttachmentFactory;
 import nl.clockwork.ebms.EbMSErrorCode;
 import nl.clockwork.ebms.EbMSMessageStatus;
 import nl.clockwork.ebms.EbMSMessageUtils;
+import nl.clockwork.ebms.EbMSAttachmentFactory.DefaultEbMSAttachmentFactory;
+import nl.clockwork.ebms.model.EbMSAcknowledgment;
 import nl.clockwork.ebms.model.EbMSDocument;
 import nl.clockwork.ebms.model.EbMSMessage;
+import nl.clockwork.ebms.model.EbMSMessageError;
+import nl.clockwork.ebms.model.EbMSStatusRequest;
+import nl.clockwork.ebms.model.EbMSStatusResponse;
 
+@TestInstance(value = Lifecycle.PER_CLASS)
 public class EbMSMessageUtilsTest
 {
+	@BeforeAll
+	public void init() throws Exception
+	{
+		EbMSAttachmentFactory.setInstance(DefaultEbMSAttachmentFactory.builder().build());
+	}
 
 	@Test
 	public void partyIdToString()
@@ -177,7 +196,6 @@ public class EbMSMessageUtilsTest
 		createError = EbMSMessageUtils.createError(location, errorCode, description);
 		assertEquals(Constants.EBMS_DEFAULT_LANGUAGE, createError.getDescription().getLang());
 		assertEquals(SeverityType.ERROR, createError.getSeverity());
-
 	}
 
 	
@@ -236,19 +254,45 @@ public class EbMSMessageUtilsTest
 		ackRequested.setActor("Actor1");
 		builder.messageHeader(createMessageHeader());
 		builder.ackRequested(ackRequested);
+		builder.manifest(new Manifest());
+		builder.attachments(new ArrayList<>());
 		val doc = EbMSMessageUtils.createSOAPMessage(builder.build());
 		
-		
-		val result = EbMSMessageUtils.getEbMSMessage(doc);
+		val result = (EbMSMessage)EbMSMessageUtils.getEbMSMessage(doc);
 		assertEquals("Actor1", result.getAckRequested().getActor());
 		
 		val builder2 = EbMSDocument.builder();
 		builder2.message(doc);
-		javax.activation.DataSource dataSource = null;
+		val dataSource = new DataSource()
+		{
+			@Override
+			public OutputStream getOutputStream() throws IOException
+			{
+				return null;
+			}
+			
+			@Override
+			public String getName()
+			{
+				return null;
+			}
+			
+			@Override
+			public InputStream getInputStream() throws IOException
+			{
+				return null;
+			}
+			
+			@Override
+			public String getContentType()
+			{
+				return null;
+			}
+		};
 		val attachment = EbMSAttachmentFactory.createEbMSAttachment("cid1",dataSource);
 		builder2.attachments(Arrays.asList(attachment));
 		
-		val result2 = EbMSMessageUtils.getEbMSMessage(builder2.build());
+		val result2 = (EbMSMessage)EbMSMessageUtils.getEbMSMessage(builder2.build());
 		assertEquals(1, result2.getAttachments().size());
 	}
 
@@ -260,35 +304,97 @@ public class EbMSMessageUtilsTest
 	}
 	
 	@Test
-	public void createSOAPMessage() throws Exception
+	public void createEbMSMessageSOAPMessage() throws Exception
 	{
 		val builder = EbMSMessage.builder();
 		builder.messageHeader(createMessageHeader());
 		builder.signature(createSignature());
-		
-		builder.acknowledgment(createAcknowledgment());
-		
 		builder.ackRequested(createAckRequested());
-		
-		builder.errorList(EbMSMessageUtils.createErrorList());
 		builder.manifest(EbMSMessageUtils.createManifest());
-
-		val statusRequest = EbMSMessageUtils.createStatusRequest("ref1");
-		val statusResponse = EbMSMessageUtils.createStatusResponse(statusRequest, EbMSMessageStatus.EXPIRED, new Date());
-	
-		builder.statusRequest(statusRequest);
-		builder.statusResponse(statusResponse);
-		
+		builder.attachments(new ArrayList<>());
 		val ebMSMessage = builder.build();
 		var doc = EbMSMessageUtils.createSOAPMessage(ebMSMessage);
 
 		var documentString = documentToString(doc);
 		assertTrue(documentString.contains("AckRequested"));
+
+		doc = EbMSMessageUtils.createSOAPMessage(ebMSMessage);
+		documentString = documentToString(doc);
+		assertTrue(documentString.contains("http://www.w3.org/1999/xlink"));
+	}
+
+	@Test
+	public void createEbMSMessageErrorSOAPMessage() throws Exception
+	{
+		val builder = EbMSMessageError.builder();
+		builder.messageHeader(createMessageHeader());
+		builder.signature(createSignature());
+		builder.errorList(EbMSMessageUtils.createErrorList());
+		val ebMSMessage = builder.build();
+		var doc = EbMSMessageUtils.createSOAPMessage(ebMSMessage);
+
+		var documentString = documentToString(doc);
 		assertTrue(documentString.contains("ErrorList"));
+		assertTrue(documentString.contains("highestSeverity=\"Error\""));
+
+		doc = EbMSMessageUtils.createSOAPMessage(ebMSMessage);
+		documentString = documentToString(doc);
+		assertTrue(documentString.contains("http://www.w3.org/1999/xlink"));
+	}
+
+	@Test
+	public void createEbMSAcknowledgmentSOAPMessage() throws Exception
+	{
+		val builder = EbMSAcknowledgment.builder();
+		builder.messageHeader(createMessageHeader());
+		builder.signature(createSignature());
+		builder.acknowledgment(createAcknowledgment());
+		val ebMSMessage = builder.build();
+		var doc = EbMSMessageUtils.createSOAPMessage(ebMSMessage);
+
+		var documentString = documentToString(doc);
+		assertTrue(documentString.contains("Acknowledgment"));
+
+		doc = EbMSMessageUtils.createSOAPMessage(ebMSMessage);
+		documentString = documentToString(doc);
+		assertTrue(documentString.contains("http://www.w3.org/1999/xlink"));
+	}
+
+	@Test
+	public void createEbMSStatusRequestSOAPMessage() throws Exception
+	{
+		val builder = EbMSStatusRequest.builder();
+		builder.messageHeader(createMessageHeader());
+		builder.signature(createSignature());
+		val statusRequest = EbMSMessageUtils.createStatusRequest("ref1");
+		builder.statusRequest(statusRequest);
+		val ebMSMessage = builder.build();
+		var doc = EbMSMessageUtils.createSOAPMessage(ebMSMessage);
+
+		var documentString = documentToString(doc);
 		assertTrue(documentString.contains("StatusRequest"));
+		assertTrue(documentString.contains("ref1"));
+
+		doc = EbMSMessageUtils.createSOAPMessage(ebMSMessage);
+		documentString = documentToString(doc);
+		assertTrue(documentString.contains("http://www.w3.org/1999/xlink"));
+	}
+
+	@Test
+	public void createSOAPMessage() throws Exception
+	{
+		val builder = EbMSStatusResponse.builder();
+		builder.messageHeader(createMessageHeader());
+		builder.signature(createSignature());
+		val statusRequest = EbMSMessageUtils.createStatusRequest("ref1");
+		val statusResponse = EbMSMessageUtils.createStatusResponse(statusRequest, EbMSMessageStatus.EXPIRED, new Date());
+		builder.statusResponse(statusResponse);
+		val ebMSMessage = builder.build();
+		var doc = EbMSMessageUtils.createSOAPMessage(ebMSMessage);
+
+		var documentString = documentToString(doc);
 		assertTrue(documentString.contains("StatusResponse"));
 		assertTrue(documentString.contains("ref1"));
-		assertTrue(documentString.contains("highestSeverity=\"Error\""));
 
 		doc = EbMSMessageUtils.createSOAPMessage(ebMSMessage);
 		documentString = documentToString(doc);

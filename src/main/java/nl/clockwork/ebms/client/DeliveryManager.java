@@ -44,7 +44,9 @@ import nl.clockwork.ebms.common.MessageQueue;
 import nl.clockwork.ebms.cpa.CPAManager;
 import nl.clockwork.ebms.cpa.CPAUtils;
 import nl.clockwork.ebms.model.CacheablePartyId;
-import nl.clockwork.ebms.model.EbMSMessage;
+import nl.clockwork.ebms.model.EbMSBaseMessage;
+import nl.clockwork.ebms.model.EbMSRequestMessage;
+import nl.clockwork.ebms.model.EbMSResponseMessage;
 import nl.clockwork.ebms.processor.EbMSProcessingException;
 import nl.clockwork.ebms.processor.EbMSProcessorException;
 
@@ -53,7 +55,7 @@ import nl.clockwork.ebms.processor.EbMSProcessorException;
 public class DeliveryManager //DeliveryService
 {
 	@NonNull
-	MessageQueue<EbMSMessage> messageQueue;
+	MessageQueue<EbMSResponseMessage> messageQueue;
 	@NonNull
 	CPAManager cpaManager;
 	@NonNull
@@ -61,7 +63,7 @@ public class DeliveryManager //DeliveryService
 	@NonNull
 	protected ExecutorService executorService;
 
-	public DeliveryManager(MessageQueue<EbMSMessage> messageQueue, CPAManager cpaManager, EbMSHttpClientFactory ebMSClientFactory)
+	public DeliveryManager(MessageQueue<EbMSResponseMessage> messageQueue, CPAManager cpaManager, EbMSHttpClientFactory ebMSClientFactory)
 	{
 		this(null,null,null,messageQueue,cpaManager,ebMSClientFactory);
 	}
@@ -71,7 +73,7 @@ public class DeliveryManager //DeliveryService
 			Integer maxThreads,
 			Integer processorsScaleFactor,
 			Integer queueScaleFactor,
-			@NonNull MessageQueue<EbMSMessage> messageQueue,
+			@NonNull MessageQueue<EbMSResponseMessage> messageQueue,
 			@NonNull CPAManager cpaManager,
 			@NonNull EbMSHttpClientFactory ebMSClientFactory)
 	{
@@ -103,7 +105,7 @@ public class DeliveryManager //DeliveryService
 		this.ebMSClientFactory = ebMSClientFactory;
 	}
 
-	public Optional<EbMSMessage> sendMessage(final EbMSMessage message) throws EbMSProcessorException
+	public Optional<EbMSResponseMessage> sendMessage(final EbMSRequestMessage message) throws EbMSProcessorException
 	{
 		try
 		{
@@ -115,13 +117,13 @@ public class DeliveryManager //DeliveryService
 				{
 					messageQueue.register(messageHeader.getMessageData().getMessageId());
 					log.info("Sending message " + messageHeader.getMessageData().getMessageId() + " to " + uri);
-					val document = createClient(messageHeader).sendMessage(uri,EbMSMessageUtils.getEbMSDocument(message));
-					if (document == null)
+					val response = createClient(messageHeader).sendMessage(uri,EbMSMessageUtils.getEbMSDocument(message));
+					if (response == null)
 						return messageQueue.get(messageHeader.getMessageData().getMessageId());
 					else
 					{
 						messageQueue.remove(messageHeader.getMessageData().getMessageId());
-						return Optional.of(EbMSMessageUtils.getEbMSMessage(document));
+						return Optional.of((EbMSResponseMessage)EbMSMessageUtils.getEbMSMessage(response));
 					}
 				}
 				catch (Exception e)
@@ -135,7 +137,7 @@ public class DeliveryManager //DeliveryService
 				log.info("Sending message " + messageHeader.getMessageData().getMessageId() + " to " + uri);
 				val response = createClient(messageHeader).sendMessage(uri,EbMSMessageUtils.getEbMSDocument(message));
 				if (response != null)
-					return Optional.of(EbMSMessageUtils.getEbMSMessage(response));
+					return Optional.of((EbMSResponseMessage)EbMSMessageUtils.getEbMSMessage(response));
 			}
 			return Optional.empty();
 		}
@@ -159,12 +161,12 @@ public class DeliveryManager //DeliveryService
 				messageHeader.getAction());
 	}
 
-	public void handleResponseMessage(final EbMSMessage message) throws EbMSProcessorException
+	public void handleResponseMessage(final EbMSResponseMessage message) throws EbMSProcessorException
 	{
 		messageQueue.put(message.getMessageHeader().getMessageData().getRefToMessageId(),message);
 	}
 	
-	public void sendResponseMessage(final String uri, final EbMSMessage response) throws EbMSProcessorException
+	public void sendResponseMessage(final String uri, final EbMSBaseMessage response) throws EbMSProcessorException
 	{
 		Runnable command = () ->
 		{

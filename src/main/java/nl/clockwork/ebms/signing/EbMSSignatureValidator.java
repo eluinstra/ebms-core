@@ -44,6 +44,7 @@ import nl.clockwork.ebms.common.util.StreamUtils;
 import nl.clockwork.ebms.cpa.CPAManager;
 import nl.clockwork.ebms.cpa.CPAUtils;
 import nl.clockwork.ebms.model.CacheablePartyId;
+import nl.clockwork.ebms.model.EbMSAcknowledgment;
 import nl.clockwork.ebms.model.EbMSAttachment;
 import nl.clockwork.ebms.model.EbMSDocument;
 import nl.clockwork.ebms.model.EbMSMessage;
@@ -104,7 +105,7 @@ public class EbMSSignatureValidator
 		}
 	}
 
-	public void validate(EbMSDocument responseDocument, EbMSMessage requestMessage, EbMSMessage responseMessage) throws ValidatorException, ValidationException
+	public void validate(EbMSDocument responseDocument, EbMSMessage requestMessage, EbMSAcknowledgment responseMessage) throws ValidatorException, ValidationException
 	{
 		try
 		{
@@ -120,7 +121,7 @@ public class EbMSSignatureValidator
 						SecurityUtils.validateCertificate(trustStore,certificate,date);
 						if (!verify(certificate,(Element)signatureNodeList.item(0),new ArrayList<>()))
 							throw new ValidationException("Invalid Signature!");
-						validateSignatureReferences(requestMessage,responseMessage);
+							validateSignatureReferences(requestMessage,responseMessage);
 					}
 					else
 						throw new ValidationException("Certificate not found!");
@@ -166,7 +167,7 @@ public class EbMSSignatureValidator
 		}
 	}
 
-	private void validateSignatureReferences(EbMSMessage requestMessage, EbMSMessage responseMessage) throws ValidationException
+	private void validateSignatureReferences(EbMSMessage requestMessage, EbMSAcknowledgment responseMessage) throws ValidationException
 	{
 		if (requestMessage.getSignature().getSignedInfo().getReference() == null || requestMessage.getSignature().getSignedInfo().getReference().size() == 0)
 			throw new ValidationException("No signature references found in request message " + requestMessage.getMessageHeader().getMessageData().getMessageId());

@@ -39,13 +39,14 @@ import lombok.NonNull;
 import lombok.val;
 import lombok.experimental.FieldDefaults;
 import nl.clockwork.ebms.Constants;
-import nl.clockwork.ebms.EbMSAction;
 import nl.clockwork.ebms.EbMSErrorCode;
 import nl.clockwork.ebms.EbMSMessageUtils;
 import nl.clockwork.ebms.cpa.CPAManager;
 import nl.clockwork.ebms.cpa.CPAUtils;
 import nl.clockwork.ebms.dao.EbMSDAO;
 import nl.clockwork.ebms.model.CacheablePartyId;
+import nl.clockwork.ebms.model.EbMSAcknowledgment;
+import nl.clockwork.ebms.model.EbMSBaseMessage;
 import nl.clockwork.ebms.model.EbMSMessage;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -63,16 +64,40 @@ public class MessageHeaderValidator
 		validateMessageHeader(messageHeader);
 		val deliveryChannel = cpaManager.getSendDeliveryChannel(messageHeader.getCPAId(),new CacheablePartyId(messageHeader.getFrom().getPartyId()),messageHeader.getFrom().getRole(),CPAUtils.toString(messageHeader.getService()),messageHeader.getAction())
 				.orElseThrow(() -> new EbMSValidationException(EbMSMessageUtils.createError(EbMSErrorCode.UNKNOWN.getErrorCode(),EbMSErrorCode.UNKNOWN,"No DeliveryChannel found.")));
-		if (!Constants.EBMS_SERVICE_URI.equals(messageHeader.getService().getValue()))
-			validateMessage(message,timestamp,deliveryChannel);
-		if (Constants.EBMS_SERVICE_URI.equals(messageHeader.getService().getValue()) && EbMSAction.ACKNOWLEDGMENT.getAction().equals(messageHeader.getAction()))
-		{
-			val acknowledgment = message.getAcknowledgment();
-			validateAcknowledgment(acknowledgment,deliveryChannel);
-		}
+		validateMessage(message,timestamp,deliveryChannel);
+	}
+
+	public void validate(EbMSBaseMessage message, Date timestamp) throws EbMSValidationException
+	{
+		val messageHeader = message.getMessageHeader();
+		validateMessageHeader(messageHeader);
+		cpaManager.getSendDeliveryChannel(messageHeader.getCPAId(),new CacheablePartyId(messageHeader.getFrom().getPartyId()),messageHeader.getFrom().getRole(),CPAUtils.toString(messageHeader.getService()),messageHeader.getAction())
+				.orElseThrow(() -> new EbMSValidationException(EbMSMessageUtils.createError(EbMSErrorCode.UNKNOWN.getErrorCode(),EbMSErrorCode.UNKNOWN,"No DeliveryChannel found.")));
+	}
+
+	public void validate(EbMSAcknowledgment message, Date timestamp) throws EbMSValidationException
+	{
+		val messageHeader = message.getMessageHeader();
+		validateMessageHeader(messageHeader);
+		val deliveryChannel = cpaManager.getSendDeliveryChannel(messageHeader.getCPAId(),new CacheablePartyId(messageHeader.getFrom().getPartyId()),messageHeader.getFrom().getRole(),CPAUtils.toString(messageHeader.getService()),messageHeader.getAction())
+				.orElseThrow(() -> new EbMSValidationException(EbMSMessageUtils.createError(EbMSErrorCode.UNKNOWN.getErrorCode(),EbMSErrorCode.UNKNOWN,"No DeliveryChannel found.")));
+		val acknowledgment = message.getAcknowledgment();
+		validateAcknowledgment(acknowledgment,deliveryChannel);
 	}
 
 	public void validate(EbMSMessage requestMessage, EbMSMessage responseMessage) throws ValidationException
+	{
+		if (!requestMessage.getMessageHeader().getCPAId().equals(responseMessage.getMessageHeader().getCPAId()))
+			throw new ValidationException(
+					"Request cpaId " + requestMessage.getMessageHeader().getCPAId() + " does not equal response cpaId " + responseMessage.getMessageHeader().getCPAId());
+		if (!requestMessage.getMessageHeader().getMessageData().getMessageId().equals(responseMessage.getMessageHeader().getMessageData().getRefToMessageId()))
+			throw new ValidationException(
+					"Request messageId " + requestMessage.getMessageHeader().getMessageData().getMessageId() + " does not equal response refToMessageId " + responseMessage.getMessageHeader().getMessageData().getRefToMessageId());
+		compare(requestMessage.getMessageHeader().getFrom().getPartyId(),responseMessage.getMessageHeader().getTo().getPartyId());
+		compare(requestMessage.getMessageHeader().getTo().getPartyId(),responseMessage.getMessageHeader().getFrom().getPartyId());
+	}
+	
+	public void validate(EbMSBaseMessage requestMessage, EbMSBaseMessage responseMessage) throws ValidationException
 	{
 		if (!requestMessage.getMessageHeader().getCPAId().equals(responseMessage.getMessageHeader().getCPAId()))
 			throw new ValidationException(

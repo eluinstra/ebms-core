@@ -41,7 +41,9 @@ import nl.clockwork.ebms.Constants;
 import nl.clockwork.ebms.EbMSMessageUtils;
 import nl.clockwork.ebms.common.MessageQueue;
 import nl.clockwork.ebms.cpa.CPAManager;
-import nl.clockwork.ebms.model.EbMSMessage;
+import nl.clockwork.ebms.model.EbMSBaseMessage;
+import nl.clockwork.ebms.model.EbMSRequestMessage;
+import nl.clockwork.ebms.model.EbMSResponseMessage;
 import nl.clockwork.ebms.processor.EbMSProcessingException;
 import nl.clockwork.ebms.processor.EbMSProcessorException;
 
@@ -57,7 +59,7 @@ public class JMSDeliveryManager extends DeliveryManager
 			Integer maxThreads,
 			Integer processorsScaleFactor,
 			Integer queueScaleFactor,
-			MessageQueue<EbMSMessage> messageQueue,
+			MessageQueue<EbMSResponseMessage> messageQueue,
 			CPAManager cpaManager,
 			EbMSHttpClientFactory ebMSClientFactory,
 			@NonNull JmsTemplate jmsTemplate)
@@ -67,30 +69,20 @@ public class JMSDeliveryManager extends DeliveryManager
 	}
 
 	@Override
-	public Optional<EbMSMessage> sendMessage(final EbMSMessage message) throws EbMSProcessorException
+	public Optional<EbMSResponseMessage> sendMessage(final EbMSRequestMessage message) throws EbMSProcessorException
 	{
 		try
 		{
 			val messageHeader = message.getMessageHeader();
 			val uri = getUri(messageHeader);
-			if (message.getSyncReply() == null)
+			log.info("Sending message " + messageHeader.getMessageData().getMessageId() + " to " + uri);
+			val response = createClient(messageHeader).sendMessage(uri,EbMSMessageUtils.getEbMSDocument(message));
+			if (response != null)
+				return Optional.of((EbMSResponseMessage)EbMSMessageUtils.getEbMSMessage(response));
+			else if (message.getSyncReply() == null)
 			{
-				log.info("Sending message " + messageHeader.getMessageData().getMessageId() + " to " + uri);
-				val document = createClient(messageHeader).sendMessage(uri,EbMSMessageUtils.getEbMSDocument(message));
-				if (document == null)
-				{
-					jmsTemplate.setReceiveTimeout(3 * Constants.MINUTE_IN_MILLIS);
-					return Optional.ofNullable((EbMSMessage)jmsTemplate.receiveSelectedAndConvert(MESSAGE,"JMSCorrelationID='" + messageHeader.getMessageData().getMessageId() + "'"));
-				}
-				else
-					return Optional.of(EbMSMessageUtils.getEbMSMessage(document));
-			}
-			else
-			{
-				log.info("Sending message " + messageHeader.getMessageData().getMessageId() + " to " + uri);
-				val response = createClient(messageHeader).sendMessage(uri,EbMSMessageUtils.getEbMSDocument(message));
-				if (response != null)
-					return Optional.of(EbMSMessageUtils.getEbMSMessage(response));
+				jmsTemplate.setReceiveTimeout(3 * Constants.MINUTE_IN_MILLIS);
+				return Optional.ofNullable((EbMSResponseMessage)jmsTemplate.receiveSelectedAndConvert(MESSAGE,"JMSCorrelationID='" + messageHeader.getMessageData().getMessageId() + "'"));
 			}
 			return Optional.empty();
 		}
@@ -105,7 +97,7 @@ public class JMSDeliveryManager extends DeliveryManager
 	}
 
 	@Override
-	public void handleResponseMessage(final EbMSMessage message) throws EbMSProcessorException
+	public void handleResponseMessage(final EbMSResponseMessage message) throws EbMSProcessorException
 	{
 		jmsTemplate.setExplicitQosEnabled(true);
 		jmsTemplate.setTimeToLive(Constants.MINUTE_IN_MILLIS);
@@ -122,7 +114,7 @@ public class JMSDeliveryManager extends DeliveryManager
 	}
 
 	@Override
-	public void sendResponseMessage(final String uri, final EbMSMessage response) throws EbMSProcessorException
+	public void sendResponseMessage(final String uri, final EbMSBaseMessage response) throws EbMSProcessorException
 	{
 		Runnable command = () ->
 		{

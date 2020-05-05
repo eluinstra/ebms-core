@@ -21,6 +21,7 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.Date;
+import java.util.List;
 
 import javax.xml.transform.TransformerException;
 
@@ -40,7 +41,8 @@ import nl.clockwork.ebms.EbMSMessageUtils;
 import nl.clockwork.ebms.common.util.DOMUtils;
 import nl.clockwork.ebms.dao.DAOException;
 import nl.clockwork.ebms.event.listener.EbMSMessageEventType;
-import nl.clockwork.ebms.model.EbMSMessage;
+import nl.clockwork.ebms.model.EbMSAttachment;
+import nl.clockwork.ebms.model.EbMSBaseMessage;
 
 public class EbMSDAOImpl extends nl.clockwork.ebms.dao.postgresql.EbMSDAOImpl
 {
@@ -62,7 +64,7 @@ public class EbMSDAOImpl extends nl.clockwork.ebms.dao.postgresql.EbMSDAOImpl
 	}
 
 	@Override
-	public void insertMessage(final Date timestamp, final Date persistTime, final Document document, final EbMSMessage message, final EbMSMessageStatus status) throws DAOException
+	public void insertMessage(final Date timestamp, final Date persistTime, final Document document, final EbMSBaseMessage message, final List<EbMSAttachment> attachments, final EbMSMessageStatus status) throws DAOException
 	{
 		try
 		{
@@ -142,7 +144,7 @@ public class EbMSDAOImpl extends nl.clockwork.ebms.dao.postgresql.EbMSDAOImpl
 								},
 								new KeyExtractor()
 							);
-							insertAttachments(keyHolder,message.getAttachments());
+							insertAttachments(keyHolder,attachments);
 						}
 						catch (IOException e)
 						{
@@ -159,7 +161,7 @@ public class EbMSDAOImpl extends nl.clockwork.ebms.dao.postgresql.EbMSDAOImpl
 	}
 	
 	@Override
-	public void insertDuplicateMessage(final Date timestamp, final Document document, final EbMSMessage message, boolean storeAttachments) throws DAOException
+	public void insertDuplicateMessage(final Date timestamp, final Document document, final EbMSBaseMessage message, final List<EbMSAttachment> attachments) throws DAOException
 	{
 		try
 		{
@@ -224,8 +226,7 @@ public class EbMSDAOImpl extends nl.clockwork.ebms.dao.postgresql.EbMSDAOImpl
 								},
 								new KeyExtractor()
 							);
-							if (storeAttachments)
-								insertAttachments(keyHolder,message.getAttachments());
+							insertAttachments(keyHolder,attachments);
 						}
 						catch (IOException e)
 						{

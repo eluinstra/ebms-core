@@ -72,11 +72,11 @@ import nl.clockwork.ebms.event.listener.EbMSMessageEventType;
 import nl.clockwork.ebms.event.processor.EbMSEventStatus;
 import nl.clockwork.ebms.model.CertificateMapping;
 import nl.clockwork.ebms.model.EbMSAttachment;
+import nl.clockwork.ebms.model.EbMSBaseMessage;
 import nl.clockwork.ebms.model.EbMSDataSource;
 import nl.clockwork.ebms.model.EbMSDataSourceMTOM;
 import nl.clockwork.ebms.model.EbMSDocument;
 import nl.clockwork.ebms.model.EbMSEvent;
-import nl.clockwork.ebms.model.EbMSMessage;
 import nl.clockwork.ebms.model.EbMSMessageContent;
 import nl.clockwork.ebms.model.EbMSMessageContentMTOM;
 import nl.clockwork.ebms.model.EbMSMessageContext;
@@ -539,7 +539,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	}
 
 	@Override
-	public boolean existsIdenticalMessage(EbMSMessage message) throws DAOException
+	public boolean existsIdenticalMessage(EbMSBaseMessage message) throws DAOException
 	{
 		try
 		{
@@ -937,7 +937,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	}
 
 	@Override
-	public void insertMessage(final Date timestamp, final Date persistTime, final Document document, final EbMSMessage message, final EbMSMessageStatus status) throws DAOException
+	public void insertMessage(final Date timestamp, final Date persistTime, final Document document, final EbMSBaseMessage message, final List<EbMSAttachment> attachments, final EbMSMessageStatus status) throws DAOException
 	{
 		try
 		{
@@ -1019,7 +1019,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 								},
 								keyHolder
 							);
-							insertAttachments(keyHolder,message.getAttachments());
+							insertAttachments(keyHolder,attachments);
 						}
 						catch (IOException e)
 						{
@@ -1036,7 +1036,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	}
 
 	@Override
-	public void insertDuplicateMessage(final Date timestamp, final Document document, final EbMSMessage message, boolean storeAttachments) throws DAOException
+	public void insertDuplicateMessage(final Date timestamp, final Document document, final EbMSBaseMessage message, final List<EbMSAttachment> attachments) throws DAOException
 	{
 		try
 		{
@@ -1103,8 +1103,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 								},
 								keyHolder
 							);
-							if (storeAttachments)
-								insertAttachments(keyHolder,message.getAttachments());
+							insertAttachments(keyHolder,attachments);
 						}
 						catch (IOException e)
 						{

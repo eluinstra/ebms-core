@@ -26,6 +26,7 @@ import nl.clockwork.ebms.common.util.StreamUtils;
 import nl.clockwork.ebms.cpa.CPAManager;
 import nl.clockwork.ebms.cpa.CPAUtils;
 import nl.clockwork.ebms.model.CacheablePartyId;
+import nl.clockwork.ebms.model.EbMSAcknowledgment;
 import nl.clockwork.ebms.model.EbMSDocument;
 import nl.clockwork.ebms.model.EbMSMessage;
 import nl.clockwork.ebms.signing.EbMSSignatureValidator;
@@ -76,7 +77,7 @@ public class SignatureValidator
 		}
 	}
 
-	public void validate(EbMSDocument responseDocument, EbMSMessage requestMessage, EbMSMessage responseMessage) throws ValidationException, ValidatorException
+	public void validate(EbMSDocument responseDocument, EbMSMessage requestMessage, EbMSAcknowledgment responseMessage) throws ValidationException, ValidatorException
 	{
 		ebMSSignatureValidator.validate(responseDocument,requestMessage,responseMessage);
 	}

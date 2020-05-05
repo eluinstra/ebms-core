@@ -53,6 +53,7 @@ import nl.clockwork.ebms.common.util.StreamUtils;
 import nl.clockwork.ebms.cpa.CPAManager;
 import nl.clockwork.ebms.cpa.CPAUtils;
 import nl.clockwork.ebms.model.CacheablePartyId;
+import nl.clockwork.ebms.model.EbMSAcknowledgment;
 import nl.clockwork.ebms.model.EbMSAttachment;
 import nl.clockwork.ebms.model.EbMSDataSource;
 import nl.clockwork.ebms.model.EbMSDataSourceMTOM;
@@ -60,6 +61,11 @@ import nl.clockwork.ebms.model.EbMSMessage;
 import nl.clockwork.ebms.model.EbMSMessageContent;
 import nl.clockwork.ebms.model.EbMSMessageContentMTOM;
 import nl.clockwork.ebms.model.EbMSMessageContext;
+import nl.clockwork.ebms.model.EbMSMessageError;
+import nl.clockwork.ebms.model.EbMSPing;
+import nl.clockwork.ebms.model.EbMSPong;
+import nl.clockwork.ebms.model.EbMSStatusRequest;
+import nl.clockwork.ebms.model.EbMSStatusResponse;
 import nl.clockwork.ebms.model.Party;
 import nl.clockwork.ebms.processor.EbMSProcessingException;
 import nl.clockwork.ebms.processor.EbMSProcessorException;
@@ -73,7 +79,7 @@ public class EbMSMessageFactory
 	@NonNull
 	EbMSIdGenerator ebMSIdGenerator;
 
-	public EbMSMessage createEbMSMessageError(EbMSMessage message, ErrorList errorList, Date timestamp) throws DatatypeConfigurationException, JAXBException
+	public EbMSMessageError createEbMSMessageError(EbMSMessage message, ErrorList errorList, Date timestamp) throws DatatypeConfigurationException, JAXBException
 	{
 		val messageHeader = createResponseMessageHeader(message.getMessageHeader(),timestamp,EbMSAction.MESSAGE_ERROR);
 		if (errorList.getError().size() == 0)
@@ -84,13 +90,13 @@ public class EbMSMessageFactory
 					"An unknown error occurred!"));
 			errorList.setHighestSeverity(SeverityType.ERROR);
 		}
-		return EbMSMessage.builder()
+		return EbMSMessageError.builder()
 				.messageHeader(messageHeader)
 				.errorList(errorList)
 				.build();
 	}
 
-	public EbMSMessage createEbMSAcknowledgment(EbMSMessage message, Date timestamp) throws EbMSProcessorException
+	public EbMSAcknowledgment createEbMSAcknowledgment(EbMSMessage message, Date timestamp) throws EbMSProcessorException
 	{
 		try
 		{
@@ -107,7 +113,7 @@ public class EbMSMessageFactory
 			acknowledgment.setActor(ActorType.URN_OASIS_NAMES_TC_EBXML_MSG_ACTOR_TO_PARTY_MSH.value());
 			if (message.getAckRequested().isSigned() && message.getSignature() != null)
 				message.getSignature().getSignedInfo().getReference().forEach(r -> acknowledgment.getReference().add(r));
-			return EbMSMessage.builder()
+			return EbMSAcknowledgment.builder()
 					.messageHeader(messageHeader)
 					.acknowledgment(acknowledgment)
 					.build();
@@ -122,11 +128,11 @@ public class EbMSMessageFactory
 		}
 	}
 	
-	public EbMSMessage createEbMSPing(String cpaId, Party fromParty, Party toParty) throws EbMSProcessorException
+	public EbMSPing createEbMSPing(String cpaId, Party fromParty, Party toParty) throws EbMSProcessorException
 	{
 		try
 		{
-			return EbMSMessage.builder()
+			return EbMSPing.builder()
 					.messageHeader(createMessageHeader(cpaId,fromParty,toParty,EbMSAction.PING))
 					.syncReply(createSyncReply(cpaId,fromParty,EbMSAction.PING.getAction()))
 					.build();
@@ -137,11 +143,11 @@ public class EbMSMessageFactory
 		}
 	}
 	
-	public EbMSMessage createEbMSPong(EbMSMessage message) throws EbMSProcessorException
+	public EbMSPong createEbMSPong(EbMSPing message) throws EbMSProcessorException
 	{
 		try
 		{
-			return EbMSMessage.builder()
+			return EbMSPong.builder()
 					.messageHeader(createResponseMessageHeader(message.getMessageHeader(),new Date(),EbMSAction.PONG))
 					.build();
 		}
@@ -155,13 +161,13 @@ public class EbMSMessageFactory
 		}
 	}
 	
-	public EbMSMessage createEbMSStatusRequest(String cpaId, Party fromParty, Party toParty, String messageId) throws EbMSProcessorException
+	public EbMSStatusRequest createEbMSStatusRequest(String cpaId, Party fromParty, Party toParty, String messageId) throws EbMSProcessorException
 	{
 		try
 		{
 			val messageHeader = createMessageHeader(cpaId,fromParty,toParty,EbMSAction.STATUS_REQUEST);
 			val statusRequest = EbMSMessageUtils.createStatusRequest(messageId);
-			return EbMSMessage.builder()
+			return EbMSStatusRequest.builder()
 					.messageHeader(messageHeader)
 					.syncReply(createSyncReply(cpaId,fromParty,EbMSAction.STATUS_REQUEST.getAction()))
 					.statusRequest(statusRequest)
@@ -173,13 +179,13 @@ public class EbMSMessageFactory
 		}
 	}
 
-	public EbMSMessage createEbMSStatusResponse(EbMSMessage request, EbMSMessageStatus status, Date timestamp) throws EbMSProcessorException
+	public EbMSStatusResponse createEbMSStatusResponse(EbMSStatusRequest request, EbMSMessageStatus status, Date timestamp) throws EbMSProcessorException
 	{
 		try
 		{
 			val messageHeader = createResponseMessageHeader(request.getMessageHeader(),new Date(),EbMSAction.STATUS_RESPONSE);
 			val statusResponse = createStatusResponse(request.getStatusRequest(),status,timestamp);
-			return EbMSMessage.builder()
+			return EbMSStatusResponse.builder()
 					.messageHeader(messageHeader)
 					.statusResponse(statusResponse)
 					.build();
@@ -210,7 +216,7 @@ public class EbMSMessageFactory
 				builder.manifest(manifest);
 				builder.attachments(attachments);
 			}
-			return builder.build();
+			return (EbMSMessage)builder.build();
 		}
 		catch (DatatypeConfigurationException | TransformerFactoryConfigurationError e)
 		{
@@ -241,7 +247,7 @@ public class EbMSMessageFactory
 				builder.manifest(manifest);
 				builder.attachments(attachments);
 			}
-			return builder.build();
+			return (EbMSMessage)builder.build();
 		}
 		catch (DatatypeConfigurationException | TransformerFactoryConfigurationError e)
 		{

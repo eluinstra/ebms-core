@@ -15,51 +15,45 @@
  */
 package nl.clockwork.ebms.model;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.AckRequested;
-import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.Acknowledgment;
-import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.ErrorList;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.Manifest;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageHeader;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageOrder;
-import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.StatusRequest;
-import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.StatusResponse;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.SyncReply;
 import org.w3._2000._09.xmldsig.SignatureType;
 
 import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Builder.Default;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
 
-@Builder
-@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = false)
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @Getter
-public class EbMSMessage
+public class EbMSMessage extends EbMSRequestMessage
 {
-	@NonNull
-	MessageHeader messageHeader;
-	SyncReply syncReply;
 	MessageOrder messageOrder;
 	AckRequested ackRequested;
-	ErrorList errorList;
-	Acknowledgment acknowledgment;
-	Manifest manifest;
-	StatusRequest statusRequest;
-	StatusResponse statusResponse;
-	SignatureType signature;
 	@NonNull
-	@Default
-	List<EbMSAttachment> attachments = new ArrayList<>();
+	Manifest manifest;
+	@NonNull
+	List<EbMSAttachment> attachments;
+
+	@Builder
+	public EbMSMessage(@NonNull MessageHeader messageHeader, SignatureType signature, SyncReply syncReply, MessageOrder messageOrder, AckRequested ackRequested, @NonNull Manifest manifest, @NonNull List<EbMSAttachment> attachments)
+	{
+		super(messageHeader,signature,syncReply);
+		this.messageOrder = messageOrder;
+		this.ackRequested = ackRequested;
+		this.manifest = manifest;
+		this.attachments = attachments;
+	}
 
 	public String getContentId()
 	{
-		return messageHeader.getMessageData().getMessageId();
+		return getMessageHeader().getMessageData().getMessageId();
 	}
+
 }
