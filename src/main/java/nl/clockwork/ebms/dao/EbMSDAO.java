@@ -15,57 +15,28 @@
  */
 package nl.clockwork.ebms.dao;
 
-import java.security.cert.X509Certificate;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
-import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CollaborationProtocolAgreement;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.Service;
 import org.w3c.dom.Document;
 
-import nl.clockwork.ebms.EbMSAction;
 import nl.clockwork.ebms.EbMSMessageStatus;
-import nl.clockwork.ebms.event.listener.EbMSMessageEventType;
-import nl.clockwork.ebms.event.processor.EbMSEvent;
-import nl.clockwork.ebms.event.processor.EbMSEventStatus;
 import nl.clockwork.ebms.model.EbMSAttachment;
 import nl.clockwork.ebms.model.EbMSBaseMessage;
 import nl.clockwork.ebms.model.EbMSDocument;
-import nl.clockwork.ebms.service.model.CertificateMapping;
 import nl.clockwork.ebms.service.model.EbMSMessageContent;
 import nl.clockwork.ebms.service.model.EbMSMessageContentMTOM;
 import nl.clockwork.ebms.service.model.EbMSMessageContext;
-import nl.clockwork.ebms.service.model.EbMSMessageEvent;
-import nl.clockwork.ebms.service.model.URLMapping;
 
 public interface EbMSDAO
 {
 	void executeTransaction(DAOTransactionCallback callback) throws DAOException;
 
-	boolean existsCPA(String cpaId) throws DAOException;
-	Optional<CollaborationProtocolAgreement> getCPA(String cpaId) throws DAOException;
-	List<String> getCPAIds() throws DAOException;
-	void insertCPA(CollaborationProtocolAgreement cpa) throws DAOException;
-	int updateCPA(CollaborationProtocolAgreement cpa) throws DAOException;
-	int deleteCPA(String cpaId) throws DAOException;
-	
-	boolean existsURLMapping(String source) throws DAOException;
-	Optional<String> getURLMapping(String source) throws DAOException;
-	List<URLMapping> getURLMappings() throws DAOException;
-	void insertURLMapping(URLMapping urlMapping) throws DAOException;
-	int updateURLMapping(URLMapping urlMapping) throws DAOException;
-	int deleteURLMapping(String source) throws DAOException;
-
-	boolean existsCertificateMapping(String id) throws DAOException;
-	Optional<X509Certificate> getCertificateMapping(String id) throws DAOException;
-	List<CertificateMapping> getCertificateMappings() throws DAOException;
-	void insertCertificateMapping(String id, CertificateMapping mapping) throws DAOException;
-	int updateCertificateMapping(String id, CertificateMapping mapping) throws DAOException;
-	int deleteCertificateMapping(String id) throws DAOException;
-
 	boolean existsMessage(String messageId) throws DAOException;
 	boolean existsIdenticalMessage(EbMSBaseMessage message) throws DAOException;
+
 	Optional<EbMSMessageContent> getMessageContent(String messageId) throws DAOException;
 	Optional<EbMSMessageContentMTOM> getMessageContentMTOM(String messageId) throws DAOException;
 	Optional<EbMSMessageContext> getMessageContext(String messageId) throws DAOException;
@@ -74,30 +45,15 @@ public interface EbMSDAO
 	Optional<EbMSDocument> getEbMSDocumentIfUnsent(String messageId) throws DAOException;
 	Optional<EbMSDocument> getEbMSDocumentByRefToMessageId(String cpaId, String refToMessageId, Service service, String...actions) throws DAOException;
 	Optional<EbMSMessageStatus> getMessageStatus(String messageId) throws DAOException;
-	Optional<EbMSAction> getMessageAction(String messageId) throws DAOException;
-
+	Optional<Date> getPersistTime(String messageId);
 
 	List<String> getMessageIds(EbMSMessageContext messageContext, EbMSMessageStatus status) throws DAOException;
 	List<String> getMessageIds(EbMSMessageContext messageContext, EbMSMessageStatus status, int maxNr) throws DAOException;
 
 	void insertMessage(Date timestamp, Date persistTime, Document document, EbMSBaseMessage message, List<EbMSAttachment> attachments, EbMSMessageStatus status) throws DAOException;
 	void insertDuplicateMessage(Date timestamp, Document document, EbMSBaseMessage message, List<EbMSAttachment> attachments) throws DAOException;
+
 	int updateMessage(String messageId, EbMSMessageStatus oldStatus, EbMSMessageStatus newStatus) throws DAOException;
 
 	void deleteAttachments(String messageId);
-
-	List<EbMSEvent> getEventsBefore(Date timestamp) throws DAOException;
-	List<EbMSEvent> getEventsBefore(Date timestamp, int maxNr) throws DAOException;
-	void insertEvent(EbMSEvent event) throws DAOException;
-	void updateEvent(EbMSEvent event) throws DAOException;
-	void deleteEvent(String messageId) throws DAOException;
-	void insertEventLog(String messageId, Date timestamp, String uri, EbMSEventStatus status, String errorMessage) throws DAOException;
-
-	List<EbMSMessageEvent> getEbMSMessageEvents(EbMSMessageContext messageContext, EbMSMessageEventType[] types) throws DAOException;
-	List<EbMSMessageEvent> getEbMSMessageEvents(EbMSMessageContext messageContext, EbMSMessageEventType[] types, int maxNr) throws DAOException;
-	void insertEbMSMessageEvent(String messageId, EbMSMessageEventType eventType) throws DAOException;
-	int processEbMSMessageEvent(String messageId) throws DAOException;
-	
-	Optional<Date> getPersistTime(String messageId);
-
 }

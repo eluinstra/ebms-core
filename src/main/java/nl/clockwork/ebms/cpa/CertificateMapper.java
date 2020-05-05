@@ -25,7 +25,7 @@ import lombok.val;
 import lombok.experimental.FieldDefaults;
 import net.sf.ehcache.Ehcache;
 import nl.clockwork.ebms.common.MethodCacheInterceptor;
-import nl.clockwork.ebms.dao.EbMSDAO;
+import nl.clockwork.ebms.cpa.dao.CertificateMappingDAO;
 import nl.clockwork.ebms.service.model.CertificateMapping;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -35,29 +35,29 @@ public class CertificateMapper
 	@NonNull
 	Ehcache daoMethodCache;
 	@NonNull
-	EbMSDAO ebMSDAO;
+	CertificateMappingDAO certificateMappingDAO;
 
 	public List<CertificateMapping> getCertificates()
 	{
-		return ebMSDAO.getCertificateMappings();
+		return certificateMappingDAO.getCertificateMappings();
 	}
 
 	public X509Certificate getCertificate(X509Certificate certificate)
 	{
-		return certificate != null ? ebMSDAO.getCertificateMapping(getId(certificate)).orElse(certificate) : null;
+		return certificate != null ? certificateMappingDAO.getCertificateMapping(getId(certificate)).orElse(certificate) : null;
 	}
 
 	public void setCertificateMapping(CertificateMapping mapping)
 	{
 		val id = getId(mapping.getSource());
 		if (mapping.getDestination() == null)
-			ebMSDAO.deleteCertificateMapping(id);
+			certificateMappingDAO.deleteCertificateMapping(id);
 		else
 		{
-			if (ebMSDAO.existsCertificateMapping(id))
-				ebMSDAO.updateCertificateMapping(id,mapping);
+			if (certificateMappingDAO.existsCertificateMapping(id))
+				certificateMappingDAO.updateCertificateMapping(id,mapping);
 			else
-				ebMSDAO.insertCertificateMapping(id,mapping);
+				certificateMappingDAO.insertCertificateMapping(id,mapping);
 		}
 		flushDAOMethodCache(id);
 	}
@@ -65,7 +65,7 @@ public class CertificateMapper
 	public void deleteCertificateMapping(X509Certificate source)
 	{
 		val key = getId(source);
-		ebMSDAO.deleteCertificateMapping(key);
+		certificateMappingDAO.deleteCertificateMapping(key);
 		flushDAOMethodCache(key);
 	}
 	

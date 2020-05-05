@@ -22,14 +22,14 @@ import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
 import nl.clockwork.ebms.cpa.CPAManager;
-import nl.clockwork.ebms.dao.EbMSDAO;
+import nl.clockwork.ebms.event.processor.dao.EbMSEventDAO;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor
 public class EventManagerFactory implements FactoryBean<EventManager>
 {
 	@NonNull
-	EbMSDAO ebMSDAO;
+	EbMSEventDAO ebMSEventDAO;
 	@NonNull
 	CPAManager cpaManager;
 	boolean autoRetryResponse;
@@ -39,7 +39,7 @@ public class EventManagerFactory implements FactoryBean<EventManager>
 	@Override
 	public EventManager getObject() throws Exception
 	{
-		return autoRetryResponse ? new EventManagerRetryAck(ebMSDAO,cpaManager,nrAutoRetries,autoRetryInterval) : new EventManager(ebMSDAO,cpaManager);
+		return autoRetryResponse ? new EventManagerRetryAck(ebMSEventDAO,cpaManager,nrAutoRetries,autoRetryInterval) : new EventManager(ebMSEventDAO,cpaManager);
 	}
 	
 	@Override

@@ -74,6 +74,7 @@
 	<bean id="ebMSMessageServiceBuilder" class="nl.clockwork.ebms.service.EbMSMessageServiceImpl$EbMSMessageServiceImplBuilder">
 		<property name="deliveryManager" ref="deliveryManager"/>
 		<property name="ebMSDAO" ref="ebMSDAO"/>
+		<property name="ebMSMessageEventDAO" ref="ebMSDAO"/>
 		<property name="cpaManager" ref="cpaManager"/>
 		<property name="ebMSMessageFactory" ref="ebMSMessageFactory"/>
 		<property name="eventManager" ref="eventManager"/>
@@ -328,6 +329,7 @@
 	<bean id="eventListenerBuilder" class="nl.clockwork.ebms.event.listener.EventListenerFactory$EventListenerFactoryBuilder">
 		<property name="type" value="${eventListener.type}" />
 		<property name="ebMSDAO" ref="ebMSDAO" />
+		<property name="ebMSMessageEventDAO" ref="ebMSDAO" />
 		<property name="jmsBrokerConfig" value="${jms.broker.config}" />
 		<property name="jmsBrokerStart" value="${jms.broker.start}" />
 		<property name="jmsBrokerURL" value="${jms.brokerURL}" />

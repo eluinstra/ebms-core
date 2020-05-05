@@ -68,9 +68,14 @@ import nl.clockwork.ebms.EbMSMessageStatus;
 import nl.clockwork.ebms.EbMSMessageUtils;
 import nl.clockwork.ebms.common.JAXBParser;
 import nl.clockwork.ebms.common.util.DOMUtils;
+import nl.clockwork.ebms.cpa.dao.CPADAO;
+import nl.clockwork.ebms.cpa.dao.CertificateMappingDAO;
+import nl.clockwork.ebms.cpa.dao.URLMappingDAO;
 import nl.clockwork.ebms.event.listener.EbMSMessageEventType;
+import nl.clockwork.ebms.event.listener.dao.EbMSMessageEventDAO;
 import nl.clockwork.ebms.event.processor.EbMSEvent;
 import nl.clockwork.ebms.event.processor.EbMSEventStatus;
+import nl.clockwork.ebms.event.processor.dao.EbMSEventDAO;
 import nl.clockwork.ebms.model.EbMSAttachment;
 import nl.clockwork.ebms.model.EbMSBaseMessage;
 import nl.clockwork.ebms.model.EbMSDocument;
@@ -88,7 +93,7 @@ import nl.clockwork.ebms.service.model.EbMSMessageContext.EbMSMessageContextBuil
 
 @FieldDefaults(level = AccessLevel.PROTECTED, makeFinal = true)
 @AllArgsConstructor
-public abstract class AbstractEbMSDAO implements EbMSDAO
+public abstract class AbstractEbMSDAO implements EbMSDAO, CPADAO, URLMappingDAO, CertificateMappingDAO, EbMSEventDAO, EbMSMessageEventDAO
 {
 	@NonNull
 	TransactionTemplate transactionTemplate;
@@ -893,6 +898,12 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 	}
 	
 	@Override
+	public Optional<Date> getPersistTime(String messageId)
+	{
+		return Optional.of(jdbcTemplate.queryForObject("select persist_time from ebms_message where message_id = ? and message_nr = 0",Date.class,messageId));
+	}
+
+	@Override
 	public List<String> getMessageIds(EbMSMessageContext messageContext, EbMSMessageStatus status) throws DAOException
 	{
 		try
@@ -1466,12 +1477,6 @@ public abstract class AbstractEbMSDAO implements EbMSDAO
 		{
 			throw new DAOException(e);
 		}
-	}
-
-	@Override
-	public Optional<Date> getPersistTime(String messageId)
-	{
-		return Optional.of(jdbcTemplate.queryForObject("select persist_time from ebms_message where message_id = ? and message_nr = 0",Date.class,messageId));
 	}
 
 	protected List<EbMSAttachment> getAttachments(String messageId)

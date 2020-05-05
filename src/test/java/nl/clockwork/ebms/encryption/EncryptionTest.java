@@ -49,12 +49,14 @@ import net.sf.ehcache.Ehcache;
 import nl.clockwork.ebms.EbMSAttachmentFactory;
 import nl.clockwork.ebms.EbMSIdGenerator;
 import nl.clockwork.ebms.EbMSMessageFactory;
+import nl.clockwork.ebms.EbMSAttachmentFactory.DefaultEbMSAttachmentFactory;
 import nl.clockwork.ebms.common.JAXBParser;
 import nl.clockwork.ebms.common.util.DOMUtils;
 import nl.clockwork.ebms.cpa.CPAManager;
 import nl.clockwork.ebms.cpa.URLMapper;
+import nl.clockwork.ebms.cpa.dao.CPADAO;
+import nl.clockwork.ebms.cpa.dao.URLMappingDAO;
 import nl.clockwork.ebms.dao.DAOException;
-import nl.clockwork.ebms.dao.EbMSDAO;
 import nl.clockwork.ebms.model.EbMSAttachment;
 import nl.clockwork.ebms.model.EbMSMessage;
 import nl.clockwork.ebms.processor.EbMSProcessorException;
@@ -88,6 +90,7 @@ public class EncryptionTest
 	{
 		MockitoAnnotations.initMocks(this);
 		Init.init();
+		EbMSAttachmentFactory.setInstance(DefaultEbMSAttachmentFactory.builder().build());
 		cpaManager = initCPAManager();
 		messageFactory = initMessageFactory(cpaManager);
 		messageEncrypter = initMessageEncrypter(cpaManager);
@@ -153,7 +156,7 @@ public class EncryptionTest
 
 	private CPAManager initCPAManager() throws DAOException, IOException, JAXBException
 	{
-		return new CPAManager(initMethodCacheMock(),initMethodCacheMock(),initEbMSDAOMock(),new URLMapper(initMethodCacheMock(),initEbMSDAOMock()));
+		return new CPAManager(initMethodCacheMock(),initMethodCacheMock(),initCPADAOMock(),new URLMapper(initMethodCacheMock(),initURLMappingDAOMock()));
 	}
 
 	private Ehcache initMethodCacheMock()
@@ -163,9 +166,9 @@ public class EncryptionTest
 		return result;
 	}
 
-	private EbMSDAO initEbMSDAOMock() throws DAOException, IOException, JAXBException
+	private CPADAO initCPADAOMock() throws DAOException, IOException, JAXBException
 	{
-		val result = Mockito.mock(EbMSDAO.class);
+		val result = Mockito.mock(CPADAO.class);
 		Mockito.when(result.getCPA(cpaId)).thenReturn(loadCPA(cpaId));
 		return result;
 	}
@@ -174,6 +177,12 @@ public class EncryptionTest
 	{
 		val s = IOUtils.toString(this.getClass().getResourceAsStream("/nl/clockwork/ebms/cpa/" + cpaId + ".xml"),Charset.forName("UTF-8"));
 		return Optional.of(JAXBParser.getInstance(CollaborationProtocolAgreement.class).handle(s));
+	}
+
+	private URLMappingDAO initURLMappingDAOMock()
+	{
+		val result = Mockito.mock(URLMappingDAO.class);
+		return result;
 	}
 
 	private EbMSMessageFactory initMessageFactory(CPAManager cpaManager)

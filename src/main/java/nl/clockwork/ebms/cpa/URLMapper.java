@@ -28,7 +28,7 @@ import lombok.experimental.FieldDefaults;
 import net.sf.ehcache.Ehcache;
 import nl.clockwork.ebms.common.InvalidURLException;
 import nl.clockwork.ebms.common.MethodCacheInterceptor;
-import nl.clockwork.ebms.dao.EbMSDAO;
+import nl.clockwork.ebms.cpa.dao.URLMappingDAO;
 import nl.clockwork.ebms.service.model.URLMapping;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -38,17 +38,17 @@ public class URLMapper
 	@NonNull
 	Ehcache daoMethodCache;
 	@NonNull
-	EbMSDAO ebMSDAO;
+	URLMappingDAO urlMappingDAO;
 
 	public List<URLMapping> getURLs()
 	{
-		return ebMSDAO.getURLMappings();
+		return urlMappingDAO.getURLMappings();
 	}
 
 	public String getURL(String source)
 	{
 		if (!StringUtils.isEmpty(source))
-			return ebMSDAO.getURLMapping(source).orElse(source);
+			return urlMappingDAO.getURLMapping(source).orElse(source);
 		else
 			return source;
 	}
@@ -56,14 +56,14 @@ public class URLMapper
 	public void setURLMapping(URLMapping urlMapping) throws InvalidURLException
 	{
 		if (StringUtils.isEmpty(urlMapping.getDestination()))
-			ebMSDAO.deleteURLMapping(urlMapping.getSource());
+			urlMappingDAO.deleteURLMapping(urlMapping.getSource());
 		else
 		{
 			validate(urlMapping);
-			if (ebMSDAO.existsURLMapping(urlMapping.getSource()))
-				ebMSDAO.updateURLMapping(urlMapping);
+			if (urlMappingDAO.existsURLMapping(urlMapping.getSource()))
+				urlMappingDAO.updateURLMapping(urlMapping);
 			else
-				ebMSDAO.insertURLMapping(urlMapping);
+				urlMappingDAO.insertURLMapping(urlMapping);
 		}
 		flushDAOMethodCache(urlMapping.getSource());
 	}
@@ -90,7 +90,7 @@ public class URLMapper
 
 	public void deleteURLMapping(String source)
 	{
-		ebMSDAO.deleteURLMapping(source);
+		urlMappingDAO.deleteURLMapping(source);
 		flushDAOMethodCache(source);
 	}
 

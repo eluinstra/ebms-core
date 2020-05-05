@@ -35,7 +35,7 @@ import net.sf.ehcache.Ehcache;
 import nl.clockwork.ebms.Constants;
 import nl.clockwork.ebms.common.MethodCacheInterceptor;
 import nl.clockwork.ebms.common.util.StreamUtils;
-import nl.clockwork.ebms.dao.EbMSDAO;
+import nl.clockwork.ebms.cpa.dao.CPADAO;
 import nl.clockwork.ebms.model.CacheablePartyId;
 import nl.clockwork.ebms.model.EbMSPartyInfo;
 import nl.clockwork.ebms.model.FromPartyInfo;
@@ -52,41 +52,41 @@ public class CPAManager
 	@NonNull
 	Ehcache cpaMethodCache;
 	@NonNull
-	EbMSDAO ebMSDAO;
+	CPADAO cpaDAO;
 	@NonNull
 	URLMapper urlMapper;
 
 	public boolean existsCPA(String cpaId)
 	{
-		return ebMSDAO.existsCPA(cpaId);
+		return cpaDAO.existsCPA(cpaId);
 	}
 
 	public Optional<CollaborationProtocolAgreement> getCPA(String cpaId)
 	{
-		return ebMSDAO.getCPA(cpaId);
+		return cpaDAO.getCPA(cpaId);
 	}
 
 	public List<String> getCPAIds()
 	{
-		return ebMSDAO.getCPAIds();
+		return cpaDAO.getCPAIds();
 	}
 
 	public void insertCPA(CollaborationProtocolAgreement cpa)
 	{
-		ebMSDAO.insertCPA(cpa);
+		cpaDAO.insertCPA(cpa);
 		flushCPAMethodCache(cpa.getCpaid());
 	}
 
 	public int updateCPA(CollaborationProtocolAgreement cpa)
 	{
-		val result = ebMSDAO.updateCPA(cpa);
+		val result = cpaDAO.updateCPA(cpa);
 		flushCPAMethodCache(cpa.getCpaid());
 		return result;
 	}
 
 	public int deleteCPA(String cpaId)
 	{
-		val result = ebMSDAO.deleteCPA(cpaId);
+		val result = cpaDAO.deleteCPA(cpaId);
 		flushCPAMethodCache(cpaId);
 		return result;
 	}

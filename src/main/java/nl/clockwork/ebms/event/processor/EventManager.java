@@ -17,12 +17,7 @@ package nl.clockwork.ebms.event.processor;
 
 import java.util.Calendar;
 import java.util.Date;
-
-import nl.clockwork.ebms.common.util.StreamUtils;
-import nl.clockwork.ebms.cpa.CPAManager;
-import nl.clockwork.ebms.cpa.CPAUtils;
-import nl.clockwork.ebms.dao.DAOTransactionCallback;
-import nl.clockwork.ebms.dao.EbMSDAO;
+import java.util.List;
 
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DeliveryChannel;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.ReliableMessaging;
@@ -32,19 +27,24 @@ import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.val;
 import lombok.experimental.FieldDefaults;
+import nl.clockwork.ebms.common.util.StreamUtils;
+import nl.clockwork.ebms.cpa.CPAManager;
+import nl.clockwork.ebms.cpa.CPAUtils;
+import nl.clockwork.ebms.dao.DAOTransactionCallback;
+import nl.clockwork.ebms.event.processor.dao.EbMSEventDAO;
 
 @FieldDefaults(level = AccessLevel.PROTECTED, makeFinal = true)
 @AllArgsConstructor
 public class EventManager
 {
 	@NonNull
-	EbMSDAO ebMSDAO;
+	EbMSEventDAO ebMSeventDAO;
 	@NonNull
 	CPAManager cpaManager;
 
 	public void createEvent(String cpaId, DeliveryChannel sendDeliveryChannel, DeliveryChannel receiveDeliveryChannel, String messageId, Date timeToLive, Date timestamp, boolean isConfidential)
 	{
-		ebMSDAO.insertEvent(new EbMSEvent(cpaId,sendDeliveryChannel.getChannelId(),receiveDeliveryChannel.getChannelId(), messageId, timeToLive, timestamp, isConfidential, 0));
+		ebMSeventDAO.insertEvent(new EbMSEvent(cpaId,sendDeliveryChannel.getChannelId(),receiveDeliveryChannel.getChannelId(), messageId, timeToLive, timestamp, isConfidential, 0));
 	}
 
 	public void updateEvent(final EbMSEvent event, final String url, final EbMSEventStatus status)
@@ -58,20 +58,20 @@ public class EventManager
 				event.getCpaId(),
 				event.getReceiveDeliveryChannelId())
 					.orElseThrow(() -> StreamUtils.illegalStateException("DeliveryChannel",event.getCpaId(),event.getReceiveDeliveryChannelId()));
-		ebMSDAO.executeTransaction(
+		ebMSeventDAO.executeTransaction(
 			new DAOTransactionCallback()
 			{
 				@Override
 				public void doInTransaction()
 				{
-					ebMSDAO.insertEventLog(event.getMessageId(),event.getTimestamp(), url, status, errorMessage);
+					ebMSeventDAO.insertEventLog(event.getMessageId(),event.getTimestamp(), url, status, errorMessage);
 					if (event.getTimeToLive() != null && CPAUtils.isReliableMessaging(deliveryChannel))
 					{
-						ebMSDAO.updateEvent(createNewEvent(event,deliveryChannel));
+						ebMSeventDAO.updateEvent(createNewEvent(event,deliveryChannel));
 					}
 					else
 					{
-						ebMSDAO.deleteEvent(event.getMessageId());
+						ebMSeventDAO.deleteEvent(event.getMessageId());
 					}
 				}
 			}
@@ -80,7 +80,7 @@ public class EventManager
 
 	public void deleteEvent(String messageId)
 	{
-		ebMSDAO.deleteEvent(messageId);
+		ebMSeventDAO.deleteEvent(messageId);
 	}
 	
 	protected EbMSEvent retryEvent(EbMSEvent event, int retryInterval)
@@ -117,5 +117,15 @@ public class EventManager
 				.isConfidential(event.isConfidential())
 				.retries(event.getRetries() + 1)
 				.build();
+	}
+
+	public List<EbMSEvent> getEventsBefore(Date timestamp)
+	{
+		return ebMSeventDAO.getEventsBefore(timestamp);
+	}
+
+	public List<EbMSEvent> getEventsBefore(Date timestamp, int maxEvents)
+	{
+		return ebMSeventDAO.getEventsBefore(timestamp,maxEvents);
 	}
 }

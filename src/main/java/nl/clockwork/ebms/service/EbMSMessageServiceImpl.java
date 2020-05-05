@@ -48,6 +48,7 @@ import nl.clockwork.ebms.dao.DAOException;
 import nl.clockwork.ebms.dao.DAOTransactionCallback;
 import nl.clockwork.ebms.dao.EbMSDAO;
 import nl.clockwork.ebms.event.listener.EbMSMessageEventType;
+import nl.clockwork.ebms.event.listener.dao.EbMSMessageEventDAO;
 import nl.clockwork.ebms.event.processor.EventManager;
 import nl.clockwork.ebms.model.CacheablePartyId;
 import nl.clockwork.ebms.model.EbMSBaseMessage;
@@ -76,6 +77,8 @@ public class EbMSMessageServiceImpl implements EbMSMessageService
 	DeliveryManager deliveryManager;
   @NonNull
 	EbMSDAO ebMSDAO;
+  @NonNull
+	EbMSMessageEventDAO ebMSMessageEventDAO;
   @NonNull
 	CPAManager cpaManager;
   @NonNull
@@ -297,9 +300,9 @@ public class EbMSMessageServiceImpl implements EbMSMessageService
 		try
 		{
 			if (maxNr == null || maxNr == 0)
-				return ebMSDAO.getEbMSMessageEvents(messageContext,eventTypes);
+				return ebMSMessageEventDAO.getEbMSMessageEvents(messageContext,eventTypes);
 			else
-				return ebMSDAO.getEbMSMessageEvents(messageContext,eventTypes,maxNr);
+				return ebMSMessageEventDAO.getEbMSMessageEvents(messageContext,eventTypes,maxNr);
 		}
 		catch (DAOException e)
 		{
@@ -317,7 +320,7 @@ public class EbMSMessageServiceImpl implements EbMSMessageService
 				@Override
 				public void doInTransaction() throws DAOException
 				{
-					ebMSDAO.processEbMSMessageEvent(messageId);
+					ebMSMessageEventDAO.processEbMSMessageEvent(messageId);
 					processMessage(messageId);
 				}
 			});

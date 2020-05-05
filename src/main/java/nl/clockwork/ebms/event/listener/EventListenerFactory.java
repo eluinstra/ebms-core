@@ -39,6 +39,7 @@ import lombok.val;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.NonFinal;
 import nl.clockwork.ebms.dao.EbMSDAO;
+import nl.clockwork.ebms.event.listener.dao.EbMSMessageEventDAO;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class EventListenerFactory implements FactoryBean<EventListener>, DisposableBean
@@ -54,12 +55,12 @@ public class EventListenerFactory implements FactoryBean<EventListener>, Disposa
 	BrokerFactoryBean brokerFactoryBean;
 
 	@Builder(setterPrefix = "set")
-	public EventListenerFactory(@NonNull EventListenerType type, @NonNull EbMSDAO ebMSDAO, @NonNull String jmsBrokerConfig, boolean jmsBrokerStart, @NonNull String jmsBrokerURL, boolean jmsVirtualTopics) throws Exception
+	public EventListenerFactory(@NonNull EventListenerType type, @NonNull EbMSDAO ebMSDAO, @NonNull EbMSMessageEventDAO ebMSMessageEventDAO, @NonNull String jmsBrokerConfig, boolean jmsBrokerStart, @NonNull String jmsBrokerURL, boolean jmsVirtualTopics) throws Exception
 	{
 		switch (type)
 		{
 			case DAO:
-				listener = new DAOEventListener(ebMSDAO);
+				listener = new DAOEventListener(ebMSMessageEventDAO);
 				break;
 			case SIMPLE_JMS:
 				startJMSBroker(jmsBrokerStart,jmsBrokerConfig);

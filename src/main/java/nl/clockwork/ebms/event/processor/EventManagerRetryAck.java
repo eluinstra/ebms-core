@@ -22,7 +22,7 @@ import nl.clockwork.ebms.common.util.StreamUtils;
 import nl.clockwork.ebms.cpa.CPAManager;
 import nl.clockwork.ebms.cpa.CPAUtils;
 import nl.clockwork.ebms.dao.DAOTransactionCallback;
-import nl.clockwork.ebms.dao.EbMSDAO;
+import nl.clockwork.ebms.event.processor.dao.EbMSEventDAO;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class EventManagerRetryAck extends EventManager
@@ -30,9 +30,9 @@ public class EventManagerRetryAck extends EventManager
 	int nrAutoRetries;
 	int autoRetryInterval;
 
-	public EventManagerRetryAck(EbMSDAO ebMSDAO, CPAManager cpaManager, int nrAutoRetries, int autoRetryInterval)
+	public EventManagerRetryAck(EbMSEventDAO ebMSEventDAO, CPAManager cpaManager, int nrAutoRetries, int autoRetryInterval)
 	{
-		super(ebMSDAO,cpaManager);
+		super(ebMSEventDAO,cpaManager);
 		this.nrAutoRetries = nrAutoRetries;
 		this.autoRetryInterval = autoRetryInterval;
 	}
@@ -44,35 +44,35 @@ public class EventManagerRetryAck extends EventManager
 				event.getCpaId(),
 				event.getReceiveDeliveryChannelId())
 					.orElseThrow(() -> StreamUtils.illegalStateException("DeliveryChannel",event.getCpaId(),event.getReceiveDeliveryChannelId()));
-		ebMSDAO.executeTransaction(
+		ebMSeventDAO.executeTransaction(
 			new DAOTransactionCallback()
 			{
 				@Override
 				public void doInTransaction()
 				{
-					ebMSDAO.insertEventLog(event.getMessageId(),event.getTimestamp(),url,status,errorMessage);
+					ebMSeventDAO.insertEventLog(event.getMessageId(),event.getTimestamp(),url,status,errorMessage);
 					if (event.getTimeToLive() != null && CPAUtils.isReliableMessaging(deliveryChannel))
 					{
-						ebMSDAO.updateEvent(createNewEvent(event,deliveryChannel));
+						ebMSeventDAO.updateEvent(createNewEvent(event,deliveryChannel));
 					}
 					else
 					{
-						switch(ebMSDAO.getMessageAction(event.getMessageId()).orElse(null))
+						switch(ebMSeventDAO.getMessageAction(event.getMessageId()).orElse(null))
 						{
 							case ACKNOWLEDGMENT:
 							case MESSAGE_ERROR:
 								if (event.getRetries() < nrAutoRetries)
 								{
-									ebMSDAO.updateEvent(retryEvent(event, autoRetryInterval));
+									ebMSeventDAO.updateEvent(retryEvent(event, autoRetryInterval));
 									break;
 								}
 								else
 								{
-									ebMSDAO.insertEventLog(event.getMessageId(),event.getTimestamp(),url,status, "Stopped retrying acknowledge");
+									ebMSeventDAO.insertEventLog(event.getMessageId(),event.getTimestamp(),url,status, "Stopped retrying acknowledge");
 								}
 
 							default:
-								ebMSDAO.deleteEvent(event.getMessageId());
+								ebMSeventDAO.deleteEvent(event.getMessageId());
 						}
 					}
 				}
