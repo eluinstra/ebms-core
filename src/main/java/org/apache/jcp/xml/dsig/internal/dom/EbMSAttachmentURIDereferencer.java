@@ -49,11 +49,11 @@ public class EbMSAttachmentURIDereferencer implements URIDereferencer
 		{
 			if (uriReference.getURI().startsWith(Constants.CID))
 			{
-				val a = attachments.stream()
+				val attachment = attachments.stream()
 						.filter(a -> uriReference.getURI().substring(Constants.CID.length()).equals(a.getContentId()))
 						.findFirst()
 						.orElseThrow(() -> new URIReferenceException("Reference URI = " + uriReference.getURI() + " does not exist!"));
-				val in = new XMLSignatureInput(a.getInputStream());
+				val in = new XMLSignatureInput(attachment.getInputStream());
 				if (in.isOctetStream())
 					return new ApacheOctetStreamData(in);
 				else
