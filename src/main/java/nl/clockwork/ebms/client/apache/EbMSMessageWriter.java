@@ -34,10 +34,8 @@ import org.apache.http.entity.mime.content.StringBody;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
-import lombok.RequiredArgsConstructor;
 import lombok.val;
 import lombok.experimental.FieldDefaults;
-import lombok.experimental.NonFinal;
 import nl.clockwork.ebms.Constants;
 import nl.clockwork.ebms.common.util.DOMUtils;
 import nl.clockwork.ebms.model.EbMSAttachment;
@@ -45,14 +43,17 @@ import nl.clockwork.ebms.model.EbMSDocument;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor
-@RequiredArgsConstructor
 public class EbMSMessageWriter
 {
 	transient Log messageLogger = LogFactory.getLog(Constants.MESSAGE_LOG);
 	HttpPost httpPost;
-	@NonFinal
-	boolean chunkedStreamingMode = true;
+	boolean chunkedStreamingMode;
 	
+	public EbMSMessageWriter(HttpPost httpPost)
+	{
+		this(httpPost,true);
+	}
+
 	public void write(EbMSDocument document) throws IOException, TransformerException, UnsupportedEncodingException
 	{
 		if (document.getAttachments().size() > 0)

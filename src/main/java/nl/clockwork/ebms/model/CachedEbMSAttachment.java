@@ -28,7 +28,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
-import lombok.experimental.NonFinal;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor
@@ -44,7 +43,6 @@ public class CachedEbMSAttachment implements EbMSAttachment
 	@Getter
 	String contentType;
 	@NonNull
-	@NonFinal
 	CachedOutputStream content;
 
 	@Override
@@ -70,9 +68,7 @@ public class CachedEbMSAttachment implements EbMSAttachment
 	{
 		try
 		{
-			CachedOutputStream c = content;
-			content = null;
-			c.close();
+			content.close();
 		}
 		catch (IOException e)
 		{

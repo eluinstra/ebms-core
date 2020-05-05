@@ -15,7 +15,8 @@
  */
 package nl.clockwork.ebms;
 
-import java.util.Arrays;
+import java.util.EnumSet;
+import java.util.Set;
 import java.util.stream.Stream;
 
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageStatusType;
@@ -23,13 +24,10 @@ import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageStatusTy
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import lombok.experimental.NonFinal;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor
-@RequiredArgsConstructor
 @Getter
 public enum EbMSMessageStatus
 {
@@ -45,12 +43,16 @@ public enum EbMSMessageStatus
 	DELIVERED(12),
 	EXPIRED(13);
 
-	private static final EbMSMessageStatus[] RECEIVE_STATUS = {UNAUTHORIZED,NOT_RECOGNIZED,RECEIVED,PROCESSED,FORWARDED,FAILED};
-	private static final EbMSMessageStatus[] SEND_STATUS = {SENDING,DELIVERY_FAILED,DELIVERED,EXPIRED};
+	private static final Set<EbMSMessageStatus> RECEIVE_STATUS = EnumSet.of(UNAUTHORIZED,NOT_RECOGNIZED,RECEIVED,PROCESSED,FORWARDED,FAILED);
+	private static final Set<EbMSMessageStatus> SEND_STATUS = EnumSet.of(SENDING,DELIVERY_FAILED,DELIVERED,EXPIRED);
 	int id;
-	@NonFinal
-	MessageStatusType statusCode = null;
+	MessageStatusType statusCode;
 
+	private EbMSMessageStatus(int id)
+	{
+		this(id,null);
+	}
+	
 	public static Stream<EbMSMessageStatus> stream()
 	{
 		return Stream.of(EbMSMessageStatus.values());
@@ -74,11 +76,11 @@ public enum EbMSMessageStatus
 
 	public static final EbMSMessageStatus[] getReceiveStatus()
 	{
-		return Arrays.copyOf(RECEIVE_STATUS,RECEIVE_STATUS.length);
+		return RECEIVE_STATUS.toArray(new EbMSMessageStatus[]{});
 	}
 
 	public static final EbMSMessageStatus[] getSendStatus()
 	{
-		return Arrays.copyOf(SEND_STATUS,SEND_STATUS.length);
+		return SEND_STATUS.toArray(new EbMSMessageStatus[] {});
 	}
 }

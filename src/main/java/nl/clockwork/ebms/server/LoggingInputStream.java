@@ -26,7 +26,6 @@ import lombok.AccessLevel;
 import lombok.NonNull;
 import lombok.val;
 import lombok.experimental.FieldDefaults;
-import lombok.experimental.NonFinal;
 import nl.clockwork.ebms.Constants;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -35,7 +34,7 @@ public class LoggingInputStream extends FilterInputStream
 	transient Log messageLogger = LogFactory.getLog(Constants.MESSAGE_LOG);
 	@NonNull
 	StringBuffer sb = new StringBuffer();
-	@NonFinal
+	@NonNull
 	String charset;
 
 	public LoggingInputStream(@NonNull InputStream in)
@@ -43,7 +42,7 @@ public class LoggingInputStream extends FilterInputStream
 		this(in,"UTF-8");
 	}
 
-	protected LoggingInputStream(@NonNull InputStream in, String charset)
+	protected LoggingInputStream(@NonNull InputStream in, @NonNull String charset)
 	{
 		super(in);
 		this.charset = charset;

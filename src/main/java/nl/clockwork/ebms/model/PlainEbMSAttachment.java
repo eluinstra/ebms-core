@@ -27,16 +27,12 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import lombok.experimental.NonFinal;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor
-@RequiredArgsConstructor
 public class PlainEbMSAttachment implements EbMSAttachment
 {
-	@NonFinal
 	@Getter
 	String contentId;
 	@NonNull
