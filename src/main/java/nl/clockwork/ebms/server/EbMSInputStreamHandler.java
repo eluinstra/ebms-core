@@ -35,6 +35,7 @@ import lombok.experimental.FieldDefaults;
 import lombok.extern.apachecommons.CommonsLog;
 import nl.clockwork.ebms.Constants;
 import nl.clockwork.ebms.EbMSMessageUtils;
+import nl.clockwork.ebms.HttpStatusCode;
 import nl.clockwork.ebms.common.util.DOMUtils;
 import nl.clockwork.ebms.processor.EbMSMessageProcessor;
 import nl.clockwork.ebms.processor.EbMSProcessorException;
@@ -75,14 +76,14 @@ public abstract class EbMSInputStreamHandler
 			val out = messageProcessor.processRequest(in);
 			if (out == null)
 			{
-				messageLogger.info(">>>>\nstatusCode: " + Constants.SC_NOCONTENT);
-				writeResponseStatus(Constants.SC_NOCONTENT);
+				messageLogger.info(">>>>\nstatusCode: " + HttpStatusCode.SC_NOCONTENT.getCode());
+				writeResponseStatus(HttpStatusCode.SC_NOCONTENT.getCode());
 			}
 			else
 			{
 				if (messageLogger.isInfoEnabled())
-					messageLogger.info(">>>>\nstatusCode: " + Constants.SC_OK + "\nContent-Type: text/xml\nSOAPAction: " + Constants.EBMS_SOAP_ACTION + "\n" + DOMUtils.toString(out.getMessage()));
-				writeResponseStatus(Constants.SC_OK);
+					messageLogger.info(">>>>\nstatusCode: " + HttpStatusCode.SC_OK.getCode() + "\nContent-Type: text/xml\nSOAPAction: " + Constants.EBMS_SOAP_ACTION + "\n" + DOMUtils.toString(out.getMessage()));
+				writeResponseStatus(HttpStatusCode.SC_OK.getCode());
 				writeResponseHeader("Content-Type","text/xml");
 				writeResponseHeader("SOAPAction",Constants.EBMS_SOAP_ACTION);
 				val response = getOutputStream();
@@ -95,9 +96,9 @@ public abstract class EbMSInputStreamHandler
 			{
 				val soapFault = EbMSMessageUtils.createSOAPFault(e);
 				if (messageLogger.isInfoEnabled())
-					messageLogger.info(">>>>\nstatusCode: " + Constants.SC_INTERNAL_SERVER_ERROR + "\nContent-Type: text/xml\n" + DOMUtils.toString(soapFault));
+					messageLogger.info(">>>>\nstatusCode: " + HttpStatusCode.SC_INTERNAL_SERVER_ERROR.getCode() + "\nContent-Type: text/xml\n" + DOMUtils.toString(soapFault));
 				log.info("",e);
-				writeResponseStatus(Constants.SC_INTERNAL_SERVER_ERROR);
+				writeResponseStatus(HttpStatusCode.SC_INTERNAL_SERVER_ERROR.getCode());
 				writeResponseHeader("Content-Type","text/xml");
 				val response = getOutputStream();
 				DOMUtils.write(soapFault,response);

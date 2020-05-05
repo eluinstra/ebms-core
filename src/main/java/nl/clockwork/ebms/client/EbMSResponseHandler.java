@@ -35,6 +35,7 @@ import lombok.NonNull;
 import lombok.val;
 import lombok.experimental.FieldDefaults;
 import nl.clockwork.ebms.Constants;
+import nl.clockwork.ebms.HttpStatusCode;
 import nl.clockwork.ebms.common.util.HTTPUtils;
 import nl.clockwork.ebms.model.EbMSDocument;
 import nl.clockwork.ebms.processor.EbMSProcessingException;
@@ -59,7 +60,7 @@ public class EbMSResponseHandler
 		{
 			if (connection.getResponseCode() / 100 == 2)
 			{
-				if (connection.getResponseCode() == Constants.SC_NOCONTENT || connection.getContentLength() == 0)
+				if (connection.getResponseCode() == HttpStatusCode.SC_NOCONTENT.getCode() || connection.getContentLength() == 0)
 				{
 					logResponse(connection);
 					return null;

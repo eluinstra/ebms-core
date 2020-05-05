@@ -35,6 +35,7 @@ import lombok.AccessLevel;
 import lombok.val;
 import lombok.experimental.FieldDefaults;
 import nl.clockwork.ebms.Constants;
+import nl.clockwork.ebms.HttpStatusCode;
 import nl.clockwork.ebms.common.util.HTTPUtils;
 import nl.clockwork.ebms.model.EbMSDocument;
 import nl.clockwork.ebms.processor.EbMSProcessingException;
@@ -53,7 +54,7 @@ public class EbMSResponseHandler implements ResponseHandler<EbMSDocument>
 			if (response.getStatusLine().getStatusCode() / 100 == 2)
 			{
 				val entity = response.getEntity();
-				if (response.getStatusLine().getStatusCode() == Constants.SC_NOCONTENT || entity == null || entity.getContentLength() == 0)
+				if (response.getStatusLine().getStatusCode() == HttpStatusCode.SC_NOCONTENT.getCode() || entity == null || entity.getContentLength() == 0)
 				{
 					messageLogger.info("<<<< statusCode = " + response.getStatusLine().getStatusCode());
 					return null;
@@ -69,7 +70,7 @@ public class EbMSResponseHandler implements ResponseHandler<EbMSDocument>
 					}
 				}
 			}
-			else if (response.getStatusLine().getStatusCode() >= Constants.SC_BAD_REQUEST)
+			else if (response.getStatusLine().getStatusCode() >= HttpStatusCode.SC_BAD_REQUEST.getCode())
 			{
 		    val entity = response.getEntity();
 		    if (entity != null)

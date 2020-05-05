@@ -26,13 +26,6 @@ public class Constants
 	public static final String NSURI_SOAP_NEXT_ACTOR = "http://schemas.xmlsoap.org/soap/actor/next";
 	public static final String CID = "cid:";
 	
-	/* http servicecodes */
-	public static final int SC_OK = 200;
-	public static final int SC_NOCONTENT = 204;
-	public static final int SC_BAD_REQUEST = 400;
-	public static final int SC_INTERNAL_SERVER_ERROR = 500;
-	
-	/* time based */
 	public static final int MINUTE_IN_MILLIS = 60000;
 	
 	public static final String MESSAGE_LOG = "nl.clockwork.ebms.message";
