@@ -15,6 +15,7 @@
  */
 package nl.clockwork.ebms.model;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.AckRequested;
@@ -36,19 +37,18 @@ public class EbMSMessage extends EbMSRequestMessage
 {
 	MessageOrder messageOrder;
 	AckRequested ackRequested;
-	@NonNull
 	Manifest manifest;
 	@NonNull
 	List<EbMSAttachment> attachments;
 
 	@Builder
-	public EbMSMessage(@NonNull MessageHeader messageHeader, SignatureType signature, SyncReply syncReply, MessageOrder messageOrder, AckRequested ackRequested, @NonNull Manifest manifest, @NonNull List<EbMSAttachment> attachments)
+	public EbMSMessage(@NonNull MessageHeader messageHeader, SignatureType signature, SyncReply syncReply, MessageOrder messageOrder, AckRequested ackRequested, Manifest manifest, List<EbMSAttachment> attachments)
 	{
 		super(messageHeader,signature,syncReply);
 		this.messageOrder = messageOrder;
 		this.ackRequested = ackRequested;
 		this.manifest = manifest;
-		this.attachments = attachments;
+		this.attachments = attachments == null ? new ArrayList<EbMSAttachment>() : attachments;
 	}
 
 	public String getContentId()

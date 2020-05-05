@@ -1,8 +1,6 @@
 package nl.clockwork.ebms;
 
 import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.stream.Stream;
 
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageStatusType;
@@ -32,10 +30,8 @@ public enum EbMSMessageStatus
 	DELIVERED(12),
 	EXPIRED(13);
 
-	private static final Collection<EbMSMessageStatus> RECEIVESTATUS =
-			Collections.unmodifiableCollection(Arrays.asList(UNAUTHORIZED,NOT_RECOGNIZED,RECEIVED,PROCESSED,FORWARDED,FAILED));
-	private static final Collection<EbMSMessageStatus> SENDSTATUS =
-			Collections.unmodifiableCollection(Arrays.asList(SENDING,DELIVERY_FAILED,DELIVERED,EXPIRED));
+	private static final EbMSMessageStatus[] RECEIVE_STATUS = {UNAUTHORIZED,NOT_RECOGNIZED,RECEIVED,PROCESSED,FORWARDED,FAILED};
+	private static final EbMSMessageStatus[] SEND_STATUS = {SENDING,DELIVERY_FAILED,DELIVERED,EXPIRED};
 	int id;
 	@NonFinal
 	MessageStatusType statusCode = null;
@@ -61,13 +57,13 @@ public enum EbMSMessageStatus
 		return EbMSMessageStatus.stream().filter(s -> s.statusCode.equals(statusCode)).findFirst().orElse(null);
 	}
 
-	public static final Collection<EbMSMessageStatus> getReceiveStatus()
+	public static final EbMSMessageStatus[] getReceiveStatus()
 	{
-		return RECEIVESTATUS;
+		return Arrays.copyOf(RECEIVE_STATUS,RECEIVE_STATUS.length);
 	}
 
-	public static final Collection<EbMSMessageStatus> getSendStatus()
+	public static final EbMSMessageStatus[] getSendStatus()
 	{
-		return SENDSTATUS;
+		return Arrays.copyOf(SEND_STATUS,SEND_STATUS.length);
 	}
 }
