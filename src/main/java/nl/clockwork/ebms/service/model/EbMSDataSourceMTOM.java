@@ -13,30 +13,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.clockwork.ebms.model;
+package nl.clockwork.ebms.service.model;
 
 import java.io.Serializable;
 
+import javax.activation.DataHandler;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlMimeType;
+import javax.xml.bind.annotation.XmlType;
+
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
-@Builder
+@XmlType(name = "EbMSDataSource")
+@XmlAccessorType(XmlAccessType.FIELD)
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @RequiredArgsConstructor
-public class EbMSDataSource implements Serializable
+public class EbMSDataSourceMTOM implements Serializable
 {
 	private static final long serialVersionUID = 1L;
-	@NonNull
-	String name;
 	String contentId;
 	@NonNull
-	String contentType;
-	@NonNull
-	byte[] content;
+	@XmlMimeType("application/octet-stream")
+	DataHandler attachment;
 }

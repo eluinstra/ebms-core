@@ -13,14 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.clockwork.ebms.model;
+package nl.clockwork.ebms.service.model;
 
 import java.io.Serializable;
-import java.util.Date;
-
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -28,35 +23,20 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import nl.clockwork.ebms.EbMSMessageStatus;
 
-@XmlAccessorType(XmlAccessType.FIELD)
 @Builder
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @RequiredArgsConstructor
-public class EbMSMessageContext implements Serializable
+public class EbMSDataSource implements Serializable
 {
 	private static final long serialVersionUID = 1L;
 	@NonNull
-	String cpaId;
+	String name;
+	String contentId;
 	@NonNull
-	Role fromRole;
-	@XmlElement
-	Role toRole;
-	//@NonNull
-	String service;
-	//@NonNull
-	String action;
-	@XmlElement
-	Date timestamp;
-	@XmlElement
-	String conversationId;
-	@XmlElement
-	String messageId;
-	@XmlElement
-	String refToMessageId;
-	@XmlElement
-	EbMSMessageStatus messageStatus;
+	String contentType;
+	@NonNull
+	byte[] content;
 }

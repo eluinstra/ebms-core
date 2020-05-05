@@ -29,7 +29,7 @@ import net.sf.ehcache.Ehcache;
 import nl.clockwork.ebms.common.InvalidURLException;
 import nl.clockwork.ebms.common.MethodCacheInterceptor;
 import nl.clockwork.ebms.dao.EbMSDAO;
-import nl.clockwork.ebms.model.URLMapping;
+import nl.clockwork.ebms.service.model.URLMapping;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor

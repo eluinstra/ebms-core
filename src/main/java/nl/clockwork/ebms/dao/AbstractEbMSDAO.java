@@ -69,22 +69,22 @@ import nl.clockwork.ebms.EbMSMessageUtils;
 import nl.clockwork.ebms.common.JAXBParser;
 import nl.clockwork.ebms.common.util.DOMUtils;
 import nl.clockwork.ebms.event.listener.EbMSMessageEventType;
+import nl.clockwork.ebms.event.processor.EbMSEvent;
 import nl.clockwork.ebms.event.processor.EbMSEventStatus;
-import nl.clockwork.ebms.model.CertificateMapping;
 import nl.clockwork.ebms.model.EbMSAttachment;
 import nl.clockwork.ebms.model.EbMSBaseMessage;
-import nl.clockwork.ebms.model.EbMSDataSource;
-import nl.clockwork.ebms.model.EbMSDataSourceMTOM;
 import nl.clockwork.ebms.model.EbMSDocument;
-import nl.clockwork.ebms.model.EbMSEvent;
-import nl.clockwork.ebms.model.EbMSMessageContent;
-import nl.clockwork.ebms.model.EbMSMessageContentMTOM;
-import nl.clockwork.ebms.model.EbMSMessageContext;
-import nl.clockwork.ebms.model.EbMSMessageContext.EbMSMessageContextBuilder;
-import nl.clockwork.ebms.model.EbMSMessageEvent;
-import nl.clockwork.ebms.model.Role;
-import nl.clockwork.ebms.model.URLMapping;
 import nl.clockwork.ebms.processor.EbMSProcessingException;
+import nl.clockwork.ebms.service.model.CertificateMapping;
+import nl.clockwork.ebms.service.model.EbMSDataSource;
+import nl.clockwork.ebms.service.model.EbMSDataSourceMTOM;
+import nl.clockwork.ebms.service.model.EbMSMessageContent;
+import nl.clockwork.ebms.service.model.EbMSMessageContentMTOM;
+import nl.clockwork.ebms.service.model.EbMSMessageContext;
+import nl.clockwork.ebms.service.model.EbMSMessageEvent;
+import nl.clockwork.ebms.service.model.Role;
+import nl.clockwork.ebms.service.model.URLMapping;
+import nl.clockwork.ebms.service.model.EbMSMessageContext.EbMSMessageContextBuilder;
 
 @FieldDefaults(level = AccessLevel.PROTECTED, makeFinal = true)
 @AllArgsConstructor

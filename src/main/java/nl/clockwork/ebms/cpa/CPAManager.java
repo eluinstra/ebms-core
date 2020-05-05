@@ -39,9 +39,9 @@ import nl.clockwork.ebms.dao.EbMSDAO;
 import nl.clockwork.ebms.model.CacheablePartyId;
 import nl.clockwork.ebms.model.EbMSPartyInfo;
 import nl.clockwork.ebms.model.FromPartyInfo;
-import nl.clockwork.ebms.model.Party;
-import nl.clockwork.ebms.model.Role;
 import nl.clockwork.ebms.model.ToPartyInfo;
+import nl.clockwork.ebms.service.model.Party;
+import nl.clockwork.ebms.service.model.Role;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor

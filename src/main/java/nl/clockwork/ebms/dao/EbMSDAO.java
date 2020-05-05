@@ -27,17 +27,17 @@ import org.w3c.dom.Document;
 import nl.clockwork.ebms.EbMSAction;
 import nl.clockwork.ebms.EbMSMessageStatus;
 import nl.clockwork.ebms.event.listener.EbMSMessageEventType;
+import nl.clockwork.ebms.event.processor.EbMSEvent;
 import nl.clockwork.ebms.event.processor.EbMSEventStatus;
-import nl.clockwork.ebms.model.CertificateMapping;
 import nl.clockwork.ebms.model.EbMSAttachment;
 import nl.clockwork.ebms.model.EbMSBaseMessage;
 import nl.clockwork.ebms.model.EbMSDocument;
-import nl.clockwork.ebms.model.EbMSEvent;
-import nl.clockwork.ebms.model.EbMSMessageContent;
-import nl.clockwork.ebms.model.EbMSMessageContentMTOM;
-import nl.clockwork.ebms.model.EbMSMessageContext;
-import nl.clockwork.ebms.model.EbMSMessageEvent;
-import nl.clockwork.ebms.model.URLMapping;
+import nl.clockwork.ebms.service.model.CertificateMapping;
+import nl.clockwork.ebms.service.model.EbMSMessageContent;
+import nl.clockwork.ebms.service.model.EbMSMessageContentMTOM;
+import nl.clockwork.ebms.service.model.EbMSMessageContext;
+import nl.clockwork.ebms.service.model.EbMSMessageEvent;
+import nl.clockwork.ebms.service.model.URLMapping;
 
 public interface EbMSDAO
 {

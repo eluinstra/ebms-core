@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.clockwork.ebms.model;
+package nl.clockwork.ebms.service.model;
 
 import java.io.Serializable;
 import java.util.List;
@@ -22,23 +22,49 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 
+import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.PartyId;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import nl.clockwork.ebms.cpa.CPAUtils;
 
 @XmlAccessorType(XmlAccessType.FIELD)
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @RequiredArgsConstructor
-public class EbMSMessageContent implements Serializable
+public class Party implements Serializable
 {
 	private static final long serialVersionUID = 1L;
 	@XmlElement(required=true)
 	@NonNull
-	EbMSMessageContext context;
-	@XmlElement(name="dataSource")
-	List<EbMSDataSource> dataSources;
+	String partyId;
+	@XmlElement
+	String role;
+	
+	@Override
+	public String toString()
+	{
+		return new StringBuffer().append(partyId).append(":").append(role).toString();
+	}
+	
+	public PartyId getPartyId(List<PartyId> partyIds)
+	{
+		if (getPartyId() == null || partyIds == null)
+			return null;
+		return partyIds.stream().filter(id -> getPartyId().equals(CPAUtils.toString(id))).findFirst().orElse(null);
+	}
+
+	public boolean matches(List<PartyId> partyIds)
+	{
+		if (getPartyId() == null && (partyIds == null || partyIds.size() == 0))
+			return true;
+		if (getPartyId() == null || partyIds == null)
+			return false;
+		return partyIds.stream().anyMatch(id -> getPartyId().equals(CPAUtils.toString(id)));
+	}
+
 }

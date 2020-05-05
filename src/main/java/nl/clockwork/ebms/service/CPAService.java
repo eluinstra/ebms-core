@@ -24,8 +24,8 @@ import javax.jws.WebResult;
 import javax.jws.WebService;
 import javax.xml.bind.annotation.XmlElement;
 
-import nl.clockwork.ebms.model.CertificateMapping;
-import nl.clockwork.ebms.model.URLMapping;
+import nl.clockwork.ebms.service.model.CertificateMapping;
+import nl.clockwork.ebms.service.model.URLMapping;
 
 @WebService(targetNamespace="http://www.ordina.nl/cpa/2.17")
 public interface CPAService

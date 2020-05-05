@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.clockwork.ebms.model;
+package nl.clockwork.ebms.service.model;
 
 import java.io.Serializable;
 import java.util.List;
@@ -27,30 +27,28 @@ import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.PartyId;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 import nl.clockwork.ebms.cpa.CPAUtils;
 
 @XmlAccessorType(XmlAccessType.FIELD)
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@RequiredArgsConstructor
-public class Party implements Serializable
+//@RequiredArgsConstructor
+public class Role implements Serializable// extends Party
 {
 	private static final long serialVersionUID = 1L;
-	@XmlElement(required=true)
-	@NonNull
-	String partyId;
 	@XmlElement
+	String partyId;
+	@XmlElement(required=true)
+	//@NonNull
 	String role;
-	
+
 	@Override
 	public String toString()
 	{
 		return new StringBuffer().append(partyId).append(":").append(role).toString();
 	}
-	
+
 	public PartyId getPartyId(List<PartyId> partyIds)
 	{
 		if (getPartyId() == null || partyIds == null)
@@ -66,5 +64,9 @@ public class Party implements Serializable
 			return false;
 		return partyIds.stream().anyMatch(id -> getPartyId().equals(CPAUtils.toString(id)));
 	}
-
+	
+	public boolean matches(org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.Role role)
+	{
+		return getRole().equals(role.getName());
+	}
 }

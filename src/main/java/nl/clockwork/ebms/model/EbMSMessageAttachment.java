@@ -38,6 +38,9 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
 import nl.clockwork.ebms.processor.EbMSProcessingException;
+import nl.clockwork.ebms.service.model.EbMSDataSource;
+import nl.clockwork.ebms.service.model.EbMSMessageContent;
+import nl.clockwork.ebms.service.model.EbMSMessageContext;
 
 @Deprecated
 @XmlAccessorType(XmlAccessType.FIELD)

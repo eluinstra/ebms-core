@@ -23,7 +23,6 @@ import nl.clockwork.ebms.cpa.CPAManager;
 import nl.clockwork.ebms.cpa.CPAUtils;
 import nl.clockwork.ebms.dao.DAOTransactionCallback;
 import nl.clockwork.ebms.dao.EbMSDAO;
-import nl.clockwork.ebms.model.EbMSEvent;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class EventManagerRetryAck extends EventManager

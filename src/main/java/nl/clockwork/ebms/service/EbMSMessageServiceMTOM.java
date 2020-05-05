@@ -25,11 +25,11 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.ws.soap.MTOM;
 
 import nl.clockwork.ebms.event.listener.EbMSMessageEventType;
-import nl.clockwork.ebms.model.EbMSMessageContentMTOM;
-import nl.clockwork.ebms.model.EbMSMessageContext;
-import nl.clockwork.ebms.model.EbMSMessageEvent;
-import nl.clockwork.ebms.model.MessageStatus;
-import nl.clockwork.ebms.model.Party;
+import nl.clockwork.ebms.service.model.EbMSMessageContentMTOM;
+import nl.clockwork.ebms.service.model.EbMSMessageContext;
+import nl.clockwork.ebms.service.model.EbMSMessageEvent;
+import nl.clockwork.ebms.service.model.MessageStatus;
+import nl.clockwork.ebms.service.model.Party;
 
 @MTOM(enabled=true)
 @WebService(name = "EbMSMessageService", targetNamespace="http://www.ordina.nl/ebms/2.17", serviceName = "EbMSMessageServiceImplService", endpointInterface = "EbMSMessageServiceImplServiceSoapBinding", portName = "EbMSMessageServiceImplPort")

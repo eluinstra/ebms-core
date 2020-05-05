@@ -50,7 +50,6 @@ import nl.clockwork.ebms.dao.EbMSDAO;
 import nl.clockwork.ebms.encryption.EbMSMessageEncrypter;
 import nl.clockwork.ebms.event.listener.EventListener;
 import nl.clockwork.ebms.model.EbMSDocument;
-import nl.clockwork.ebms.model.EbMSEvent;
 import nl.clockwork.ebms.processor.EbMSMessageProcessor;
 import nl.clockwork.ebms.processor.EbMSProcessingException;
 

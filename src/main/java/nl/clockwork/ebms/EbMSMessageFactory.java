@@ -55,20 +55,20 @@ import nl.clockwork.ebms.cpa.CPAUtils;
 import nl.clockwork.ebms.model.CacheablePartyId;
 import nl.clockwork.ebms.model.EbMSAcknowledgment;
 import nl.clockwork.ebms.model.EbMSAttachment;
-import nl.clockwork.ebms.model.EbMSDataSource;
-import nl.clockwork.ebms.model.EbMSDataSourceMTOM;
 import nl.clockwork.ebms.model.EbMSMessage;
-import nl.clockwork.ebms.model.EbMSMessageContent;
-import nl.clockwork.ebms.model.EbMSMessageContentMTOM;
-import nl.clockwork.ebms.model.EbMSMessageContext;
 import nl.clockwork.ebms.model.EbMSMessageError;
 import nl.clockwork.ebms.model.EbMSPing;
 import nl.clockwork.ebms.model.EbMSPong;
 import nl.clockwork.ebms.model.EbMSStatusRequest;
 import nl.clockwork.ebms.model.EbMSStatusResponse;
-import nl.clockwork.ebms.model.Party;
 import nl.clockwork.ebms.processor.EbMSProcessingException;
 import nl.clockwork.ebms.processor.EbMSProcessorException;
+import nl.clockwork.ebms.service.model.EbMSDataSource;
+import nl.clockwork.ebms.service.model.EbMSDataSourceMTOM;
+import nl.clockwork.ebms.service.model.EbMSMessageContent;
+import nl.clockwork.ebms.service.model.EbMSMessageContentMTOM;
+import nl.clockwork.ebms.service.model.EbMSMessageContext;
+import nl.clockwork.ebms.service.model.Party;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor

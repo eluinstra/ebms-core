@@ -13,10 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.clockwork.ebms.model;
+package nl.clockwork.ebms.service.model;
 
 import java.io.Serializable;
-import java.security.cert.X509Certificate;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -30,11 +29,11 @@ import lombok.NonNull;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class CertificateMapping implements Serializable
+public class URLMapping implements Serializable
 {
 	private static final long serialVersionUID = 1L;
 	@NonNull
-	X509Certificate source;
+	String source;
 	@NonNull
-	X509Certificate destination;
+	String destination;
 }

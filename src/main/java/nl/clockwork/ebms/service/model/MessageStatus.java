@@ -13,31 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.clockwork.ebms.model;
+package nl.clockwork.ebms.service.model;
 
 import java.util.Date;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.NonNull;
-import lombok.Value;
+import nl.clockwork.ebms.EbMSMessageStatus;
 
-@Builder
-@Value
+@Data
+@NoArgsConstructor
 @AllArgsConstructor
-public class EbMSEvent
+public class MessageStatus
 {
 	@NonNull
-	String cpaId;
-	@NonNull
-	String sendDeliveryChannelId;
-	@NonNull
-	String receiveDeliveryChannelId;
-	@NonNull
-	String messageId;
-	Date timeToLive;
-	@NonNull
 	Date timestamp;
-	boolean isConfidential;
-	int retries;
+	@NonNull
+	EbMSMessageStatus status;
 }

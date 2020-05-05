@@ -33,12 +33,12 @@ import lombok.experimental.FieldDefaults;
 import nl.clockwork.ebms.EbMSMessageUtils;
 import nl.clockwork.ebms.dao.DAOException;
 import nl.clockwork.ebms.event.listener.EbMSMessageEventType;
-import nl.clockwork.ebms.model.EbMSMessageContentMTOM;
-import nl.clockwork.ebms.model.EbMSMessageContext;
-import nl.clockwork.ebms.model.EbMSMessageEvent;
-import nl.clockwork.ebms.model.MessageStatus;
-import nl.clockwork.ebms.model.Party;
 import nl.clockwork.ebms.processor.EbMSProcessorException;
+import nl.clockwork.ebms.service.model.EbMSMessageContentMTOM;
+import nl.clockwork.ebms.service.model.EbMSMessageContext;
+import nl.clockwork.ebms.service.model.EbMSMessageEvent;
+import nl.clockwork.ebms.service.model.MessageStatus;
+import nl.clockwork.ebms.service.model.Party;
 import nl.clockwork.ebms.validation.ValidatorException;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
