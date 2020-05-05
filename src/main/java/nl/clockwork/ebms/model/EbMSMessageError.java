@@ -12,7 +12,7 @@ import lombok.experimental.FieldDefaults;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @Getter
-public class EbMSMessageError extends EbMSResponseMessage
+public class EbMSMessageError extends EbMSMessageResponse
 {
 	@NonNull
 	ErrorList errorList;

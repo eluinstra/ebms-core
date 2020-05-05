@@ -165,12 +165,10 @@ public class EbMSMessageFactory
 	{
 		try
 		{
-			val messageHeader = createMessageHeader(cpaId,fromParty,toParty,EbMSAction.STATUS_REQUEST);
-			val statusRequest = EbMSMessageUtils.createStatusRequest(messageId);
 			return EbMSStatusRequest.builder()
-					.messageHeader(messageHeader)
+					.messageHeader(createMessageHeader(cpaId,fromParty,toParty,EbMSAction.STATUS_REQUEST))
 					.syncReply(createSyncReply(cpaId,fromParty,EbMSAction.STATUS_REQUEST.getAction()))
-					.statusRequest(statusRequest)
+					.statusRequest(EbMSMessageUtils.createStatusRequest(messageId))
 					.build();
 		}
 		catch (DatatypeConfigurationException | TransformerFactoryConfigurationError e)
@@ -183,11 +181,9 @@ public class EbMSMessageFactory
 	{
 		try
 		{
-			val messageHeader = createResponseMessageHeader(request.getMessageHeader(),new Date(),EbMSAction.STATUS_RESPONSE);
-			val statusResponse = createStatusResponse(request.getStatusRequest(),status,timestamp);
 			return EbMSStatusResponse.builder()
-					.messageHeader(messageHeader)
-					.statusResponse(statusResponse)
+					.messageHeader(createResponseMessageHeader(request.getMessageHeader(),new Date(),EbMSAction.STATUS_RESPONSE))
+					.statusResponse(createStatusResponse(request.getStatusRequest(),status,timestamp))
 					.build();
 		}
 		catch (JAXBException e)
@@ -216,7 +212,7 @@ public class EbMSMessageFactory
 				builder.manifest(manifest);
 				builder.attachments(attachments);
 			}
-			return (EbMSMessage)builder.build();
+			return builder.build();
 		}
 		catch (DatatypeConfigurationException | TransformerFactoryConfigurationError e)
 		{
@@ -247,7 +243,7 @@ public class EbMSMessageFactory
 				builder.manifest(manifest);
 				builder.attachments(attachments);
 			}
-			return (EbMSMessage)builder.build();
+			return builder.build();
 		}
 		catch (DatatypeConfigurationException | TransformerFactoryConfigurationError e)
 		{
@@ -429,15 +425,15 @@ public class EbMSMessageFactory
 
 	private StatusResponse createStatusResponse(StatusRequest statusRequest, EbMSMessageStatus status, Date timestamp) throws DatatypeConfigurationException
 	{
-		val response = new StatusResponse();
-		response.setVersion(Constants.EBMS_VERSION);
-		response.setRefToMessageId(statusRequest.getRefToMessageId());
+		val result = new StatusResponse();
+		result.setVersion(Constants.EBMS_VERSION);
+		result.setRefToMessageId(statusRequest.getRefToMessageId());
 		if (status != null)
 		{
-			response.setMessageStatus(status.getStatusCode());
+			result.setMessageStatus(status.getStatusCode());
 			if (MessageStatusType.RECEIVED.equals(status.getStatusCode()) || MessageStatusType.PROCESSED.equals(status.getStatusCode()))
-				response.setTimestamp(timestamp);
+				result.setTimestamp(timestamp);
 		}
-		return response;
+		return result;
 	}
 }

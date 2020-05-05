@@ -28,6 +28,7 @@ import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.xpath.XPathExpressionException;
 
 import org.javatuples.Pair;
+import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageHeader;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageStatusType;
 import org.xml.sax.SAXException;
 
@@ -54,6 +55,7 @@ import nl.clockwork.ebms.event.listener.EventListener;
 import nl.clockwork.ebms.event.processor.EventManager;
 import nl.clockwork.ebms.model.CacheablePartyId;
 import nl.clockwork.ebms.model.EbMSAcknowledgment;
+import nl.clockwork.ebms.model.EbMSBaseMessage;
 import nl.clockwork.ebms.model.EbMSDocument;
 import nl.clockwork.ebms.model.EbMSMessage;
 import nl.clockwork.ebms.model.EbMSMessageContext;
@@ -104,104 +106,10 @@ public class EbMSMessageProcessor
 			xsdValidator.validate(document.getMessage());
 			val timestamp = new Date();
 			val message = EbMSMessageUtils.getEbMSMessage(document);
-			val messageHeader = message.getMessageHeader();
-			if (!cpaManager.existsCPA(messageHeader.getCPAId()))
-				throw new EbMSProcessingException("CPA " + messageHeader.getCPAId() + " not found!");
-			if (message instanceof EbMSMessage)
-			{
-				return process(timestamp,document,(EbMSMessage)message);
-			}
-			else if (message instanceof EbMSMessageError)
-			{
-				val request = ebMSDAO.getDocument(messageHeader.getMessageData().getRefToMessageId())
-						.orElseThrow(() -> StreamUtils.illegalStateException("Document",messageHeader.getMessageData().getRefToMessageId()));
-				val requestMessage = (EbMSMessage)EbMSMessageUtils.getEbMSMessage(request);
-				if (requestMessage.getSyncReply() != null)
-					throw new EbMSProcessingException(
-							"No async ErrorMessage expected for message " + requestMessage.getMessageHeader().getMessageData().getMessageId());
-				processMessageError(messageHeader.getCPAId(),timestamp,document,requestMessage,(EbMSMessageError)message);
-				return null;
-			}
-			else if (message instanceof EbMSAcknowledgment)
-			{
-				val request = ebMSDAO.getDocument(((EbMSAcknowledgment)message).getAcknowledgment().getRefToMessageId())
-						.orElseThrow(() -> StreamUtils.illegalStateException("Document",((EbMSAcknowledgment)message).getAcknowledgment().getRefToMessageId()));
-				val requestMessage = (EbMSMessage)EbMSMessageUtils.getEbMSMessage(request);
-				if (requestMessage.getAckRequested() == null || requestMessage.getSyncReply() != null)
-					throw new EbMSProcessingException(
-							"No async Acknowledgment expected for message " + requestMessage.getMessageHeader().getMessageData().getMessageId());
-				processAcknowledgment(messageHeader.getCPAId(),timestamp,document,requestMessage,(EbMSAcknowledgment)message);
-				return null;
-			}
-			else if (message instanceof EbMSStatusRequest)
-			{
-				val response = processStatusRequest((EbMSStatusRequest)message,timestamp);
-				if (messageValidator.isSyncReply((EbMSStatusRequest)message))
-					return EbMSMessageUtils.getEbMSDocument(response);
-				else
-				{
-					val responseMessageHeader = response.getMessageHeader();
-					val toPartyId = new CacheablePartyId(responseMessageHeader.getTo().getPartyId());
-					val service = CPAUtils.toString(responseMessageHeader.getService());
-					val uri = cpaManager.getUri(
-							responseMessageHeader.getCPAId(),
-							toPartyId,
-							responseMessageHeader.getTo().getRole(),
-							service,
-							responseMessageHeader.getAction());
-					deliveryManager.sendResponseMessage(uri,response);
-					return null;
-				}
-			}
-			else if (message instanceof EbMSStatusResponse)
-			{
-				try
-				{
-					messageValidator.validate(message,timestamp);
-					deliveryManager.handleResponseMessage((EbMSStatusResponse)message);
-				}
-				catch (ValidatorException e)
-				{
-					log.warn("Unable to process StatusResponse " + messageHeader.getMessageData().getMessageId(),e);
-				}
-				return null;
-			}
-			else if (message instanceof EbMSPing)
-			{
-				val response = processPing((EbMSPing)message,timestamp);
-				if (messageValidator.isSyncReply((EbMSPing)message))
-					return EbMSMessageUtils.getEbMSDocument(response);
-				else
-				{
-					val responseMessageHeader = response.getMessageHeader();
-					val toPartyId = new CacheablePartyId(responseMessageHeader.getTo().getPartyId());
-					val service = CPAUtils.toString(responseMessageHeader.getService());
-					val uri = cpaManager.getUri(
-							responseMessageHeader.getCPAId(),
-							toPartyId,
-							responseMessageHeader.getTo().getRole(),
-							service,
-							responseMessageHeader.getAction());
-					deliveryManager.sendResponseMessage(uri,response);
-					return null;
-				}
-			}
-			else if (message instanceof EbMSPong)
-			{
-				try
-				{
-					messageValidator.validate(message,timestamp);
-					deliveryManager.handleResponseMessage((EbMSPong)message);
-				}
-				catch (ValidatorException e)
-				{
-					log.warn("Unable to process Pong " + messageHeader.getMessageData().getMessageId(),e);
-				}
-				return null;
-			}
-			else
-				throw new EbMSProcessingException(
-						"Unable to process message! Service=" + messageHeader.getService() + " and Action=" + messageHeader.getAction());
+			val cpaId = message.getMessageHeader().getCPAId();
+			if (!cpaManager.existsCPA(cpaId))
+				throw new EbMSProcessingException("CPA " + cpaId + " not found!");
+			return processRequest(timestamp,document,message);
 		}
 		catch (ValidationException | JAXBException | SAXException | IOException | SOAPException | TransformerException e)
 		{
@@ -212,7 +120,44 @@ public class EbMSMessageProcessor
 			throw new EbMSProcessorException(e);
 		}
 	}
-	
+
+	private EbMSDocument processRequest(Date timestamp, EbMSDocument document, EbMSBaseMessage message) throws DatatypeConfigurationException, JAXBException, SOAPException, ParserConfigurationException, SAXException, IOException, TransformerFactoryConfigurationError, TransformerException, XPathExpressionException
+	{
+		if (message instanceof EbMSMessage)
+			return process(timestamp,document,(EbMSMessage)message);
+		else if (message instanceof EbMSMessageError)
+		{
+			processMessageError(timestamp,document,(EbMSMessageError)message);
+			return null;
+		}
+		else if (message instanceof EbMSAcknowledgment)
+		{
+			processAcknowledgment(timestamp,document,(EbMSAcknowledgment)message);
+			return null;
+		}
+		else if (message instanceof EbMSStatusRequest)
+		{
+			return processStatusRequest(timestamp,(EbMSStatusRequest)message);
+		}
+		else if (message instanceof EbMSStatusResponse)
+		{
+			processStatusResponse(timestamp,(EbMSStatusResponse)message);
+			return null;
+		}
+		else if (message instanceof EbMSPing)
+		{
+			return processPing(timestamp,(EbMSPing)message);
+		}
+		else if (message instanceof EbMSPong)
+		{
+			processPong(timestamp,(EbMSPong)message);
+			return null;
+		}
+		else
+			throw new EbMSProcessingException(
+					"Unable to process message! Service=" + message.getMessageHeader().getService() + " and Action=" + message.getMessageHeader().getAction());
+	}
+
 	public void processResponse(EbMSDocument request, EbMSDocument response) throws EbMSProcessorException
 	{
 		try
@@ -232,14 +177,14 @@ public class EbMSMessageProcessor
 					if (!messageValidator.isSyncReply(requestMessage))
 						throw new EbMSProcessingException(
 								"No sync ErrorMessage expected for message " + requestMessageHeader.getMessageData().getMessageId() + "\n" + DOMUtils.toString(response.getMessage()));
-					processMessageError(requestMessageHeader.getCPAId(),timestamp,response,requestMessage,(EbMSMessageError)responseMessage);
+					processMessageError(timestamp,response,requestMessage,(EbMSMessageError)responseMessage);
 				}
 				else if (responseMessage instanceof EbMSAcknowledgment)
 				{
 					if (requestMessage.getAckRequested() == null || !messageValidator.isSyncReply(requestMessage))
 						throw new EbMSProcessingException(
 								"No sync Acknowledgment expected for message " + requestMessageHeader.getMessageData().getMessageId() + "\n" + DOMUtils.toString(response.getMessage()));
-					processAcknowledgment(requestMessageHeader.getCPAId(),timestamp,response,requestMessage,(EbMSAcknowledgment)responseMessage);
+					processAcknowledgment(timestamp,response,requestMessage,(EbMSAcknowledgment)responseMessage);
 				}
 				else
 					throw new EbMSProcessingException(
@@ -277,20 +222,32 @@ public class EbMSMessageProcessor
 		}
 	}
 	
-	private void processMessageError(String cpaId, final Date timestamp, final EbMSDocument responseDocument, final EbMSMessage requestMessage, final EbMSMessageError responseMessage) throws EbMSProcessingException, ValidatorException
+	private void processMessageError(Date timestamp, EbMSDocument messageErrorDocument, EbMSMessageError messageError) throws XPathExpressionException, JAXBException, ParserConfigurationException, SAXException, IOException
+	{
+		MessageHeader messageHeader = messageError.getMessageHeader();
+		val request = ebMSDAO.getDocument(messageHeader .getMessageData().getRefToMessageId())
+				.orElseThrow(() -> StreamUtils.illegalStateException("Document",messageHeader.getMessageData().getRefToMessageId()));
+		val requestMessage = (EbMSMessage)EbMSMessageUtils.getEbMSMessage(request);
+		if (requestMessage.getSyncReply() != null)
+			throw new EbMSProcessingException(
+					"No async ErrorMessage expected for message " + requestMessage.getMessageHeader().getMessageData().getMessageId());
+		processMessageError(timestamp,messageErrorDocument,requestMessage,messageError);
+	}
+
+	private void processMessageError(final Date timestamp, final EbMSDocument messageErrorDocument, final EbMSMessage message, final EbMSMessageError messageError) throws EbMSProcessingException, ValidatorException
 	{
 		try
 		{
-			messageValidator.validateMessageError(requestMessage,responseMessage,timestamp);
+			messageValidator.validateMessageError(message,messageError,timestamp);
 			ebMSDAO.executeTransaction(
 				new DAOTransactionCallback()
 				{
 					@Override
 					public void doInTransaction()
 					{
-						val responseMessageHeader = responseMessage.getMessageHeader();
+						val responseMessageHeader = messageError.getMessageHeader();
 						val persistTime = ebMSDAO.getPersistTime(responseMessageHeader.getMessageData().getRefToMessageId());
-						ebMSDAO.insertMessage(timestamp,persistTime.orElse(null),responseDocument.getMessage(),responseMessage,new ArrayList<>(),null);
+						ebMSDAO.insertMessage(timestamp,persistTime.orElse(null),messageErrorDocument.getMessage(),messageError,new ArrayList<>(),null);
 						if (ebMSDAO.updateMessage(
 								responseMessageHeader.getMessageData().getRefToMessageId(),
 								EbMSMessageStatus.SENDING,
@@ -306,30 +263,41 @@ public class EbMSMessageProcessor
 		}
 		catch (DuplicateMessageException e)
 		{
-			duplicateMessageHandler.handleMessageError(timestamp,responseDocument,responseMessage);
+			duplicateMessageHandler.handleMessageError(timestamp,messageErrorDocument,messageError);
 		}
 		catch (ValidationException e)
 		{
-			val persistTime = ebMSDAO.getPersistTime(responseMessage.getMessageHeader().getMessageData().getRefToMessageId());
-			ebMSDAO.insertMessage(timestamp,persistTime.orElse(null),responseDocument.getMessage(),responseMessage,new ArrayList<>(),null);
-			log.warn("Unable to process MessageError " + responseMessage.getMessageHeader().getMessageData().getMessageId(),e);
+			val persistTime = ebMSDAO.getPersistTime(messageError.getMessageHeader().getMessageData().getRefToMessageId());
+			ebMSDAO.insertMessage(timestamp,persistTime.orElse(null),messageErrorDocument.getMessage(),messageError,new ArrayList<>(),null);
+			log.warn("Unable to process MessageError " + messageError.getMessageHeader().getMessageData().getMessageId(),e);
 		}
 	}
 
-	private void processAcknowledgment(String cpaId, final Date timestamp, final EbMSDocument responseDocument, final EbMSMessage requestMessage, final EbMSAcknowledgment responseMessage) throws EbMSProcessingException
+	private void processAcknowledgment(Date timestamp, EbMSDocument acknowledgmentDocument, EbMSAcknowledgment acknowledgment) throws XPathExpressionException, JAXBException, ParserConfigurationException, SAXException, IOException
+	{
+		val request = ebMSDAO.getDocument(acknowledgment.getAcknowledgment().getRefToMessageId())
+				.orElseThrow(() -> StreamUtils.illegalStateException("Document",acknowledgment.getAcknowledgment().getRefToMessageId()));
+		val requestMessage = (EbMSMessage)EbMSMessageUtils.getEbMSMessage(request);
+		if (requestMessage.getAckRequested() == null || requestMessage.getSyncReply() != null)
+			throw new EbMSProcessingException(
+					"No async Acknowledgment expected for message " + requestMessage.getMessageHeader().getMessageData().getMessageId());
+		processAcknowledgment(timestamp,acknowledgmentDocument,requestMessage,acknowledgment);
+	}
+
+	private void processAcknowledgment(final Date timestamp, final EbMSDocument acknowledgmentDocument, final EbMSMessage message, final EbMSAcknowledgment acknowledgment) throws EbMSProcessingException
 	{
 		try
 		{
-			messageValidator.validateAcknowledgment(responseDocument,requestMessage,responseMessage,timestamp);
+			messageValidator.validateAcknowledgment(acknowledgmentDocument,message,acknowledgment,timestamp);
 			ebMSDAO.executeTransaction(
 				new DAOTransactionCallback()
 				{
 					@Override
 					public void doInTransaction()
 					{
-						val responseMessageHeader = responseMessage.getMessageHeader();
+						val responseMessageHeader = acknowledgment.getMessageHeader();
 						val persistTime = ebMSDAO.getPersistTime(responseMessageHeader.getMessageData().getRefToMessageId());
-						ebMSDAO.insertMessage(timestamp,persistTime.orElse(null),responseDocument.getMessage(),responseMessage,new ArrayList<>(),null);
+						ebMSDAO.insertMessage(timestamp,persistTime.orElse(null),acknowledgmentDocument.getMessage(),acknowledgment,new ArrayList<>(),null);
 						if (ebMSDAO.updateMessage(
 								responseMessageHeader.getMessageData().getRefToMessageId(),
 								EbMSMessageStatus.SENDING,
@@ -345,13 +313,81 @@ public class EbMSMessageProcessor
 		}
 		catch (DuplicateMessageException e)
 		{
-			duplicateMessageHandler.handleAcknowledgment(timestamp,responseDocument,responseMessage);
+			duplicateMessageHandler.handleAcknowledgment(timestamp,acknowledgmentDocument,acknowledgment);
 		}
 		catch (ValidatorException e)
 		{
-			val persistTime = ebMSDAO.getPersistTime(responseMessage.getMessageHeader().getMessageData().getRefToMessageId());
-			ebMSDAO.insertMessage(timestamp,persistTime.orElse(null),responseDocument.getMessage(),responseMessage,new ArrayList<>(),null);
-			log.warn("Unable to process Acknowledgment " + responseMessage.getMessageHeader().getMessageData().getMessageId(),e);
+			val persistTime = ebMSDAO.getPersistTime(acknowledgment.getMessageHeader().getMessageData().getRefToMessageId());
+			ebMSDAO.insertMessage(timestamp,persistTime.orElse(null),acknowledgmentDocument.getMessage(),acknowledgment,new ArrayList<>(),null);
+			log.warn("Unable to process Acknowledgment " + acknowledgment.getMessageHeader().getMessageData().getMessageId(),e);
+		}
+	}
+
+	private EbMSDocument processStatusRequest(Date timestamp, EbMSStatusRequest statusRequest) throws DatatypeConfigurationException, JAXBException, SOAPException, ParserConfigurationException, SAXException, IOException, TransformerFactoryConfigurationError, TransformerException
+	{
+		val statusResponse = processStatusRequest(statusRequest,timestamp);
+		if (messageValidator.isSyncReply(statusRequest))
+			return EbMSMessageUtils.getEbMSDocument(statusResponse);
+		else
+		{
+			val messageHeader = statusResponse.getMessageHeader();
+			val toPartyId = new CacheablePartyId(messageHeader.getTo().getPartyId());
+			val service = CPAUtils.toString(messageHeader.getService());
+			val uri = cpaManager.getUri(
+					messageHeader.getCPAId(),
+					toPartyId,
+					messageHeader.getTo().getRole(),
+					service,
+					messageHeader.getAction());
+			deliveryManager.sendResponseMessage(uri,statusResponse);
+			return null;
+		}
+	}
+	
+	private void processStatusResponse(Date timestamp, EbMSStatusResponse statusResponse)
+	{
+		try
+		{
+			messageValidator.validate(statusResponse,timestamp);
+			deliveryManager.handleResponseMessage(statusResponse);
+		}
+		catch (ValidatorException e)
+		{
+			log.warn("Unable to process StatusResponse " + statusResponse.getMessageHeader().getMessageData().getMessageId(),e);
+		}
+	}
+
+	private EbMSDocument processPing(Date timestamp, EbMSPing ping) throws SOAPException, JAXBException, ParserConfigurationException, SAXException, IOException, TransformerFactoryConfigurationError, TransformerException
+	{
+		val response = processPing(ping,timestamp);
+		if (messageValidator.isSyncReply(ping))
+			return EbMSMessageUtils.getEbMSDocument(response);
+		else
+		{
+			val responseMessageHeader = response.getMessageHeader();
+			val toPartyId = new CacheablePartyId(responseMessageHeader.getTo().getPartyId());
+			val service = CPAUtils.toString(responseMessageHeader.getService());
+			val uri = cpaManager.getUri(
+					responseMessageHeader.getCPAId(),
+					toPartyId,
+					responseMessageHeader.getTo().getRole(),
+					service,
+					responseMessageHeader.getAction());
+			deliveryManager.sendResponseMessage(uri,response);
+			return null;
+		}
+	}
+
+	private void processPong(Date timestamp, EbMSPong pong)
+	{
+		try
+		{
+			messageValidator.validate(pong,timestamp);
+			deliveryManager.handleResponseMessage(pong);
+		}
+		catch (ValidatorException e)
+		{
+			log.warn("Unable to process Pong " + pong.getMessageHeader().getMessageData().getMessageId(),e);
 		}
 	}
 

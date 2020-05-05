@@ -12,7 +12,7 @@ import lombok.experimental.FieldDefaults;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @Getter
-public class EbMSAcknowledgment extends EbMSResponseMessage
+public class EbMSAcknowledgment extends EbMSMessageResponse
 {
 	@NonNull
 	Acknowledgment acknowledgment;
