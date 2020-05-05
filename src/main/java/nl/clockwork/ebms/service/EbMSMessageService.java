@@ -24,7 +24,7 @@ import javax.jws.WebService;
 import javax.xml.bind.annotation.XmlElement;
 
 import nl.clockwork.ebms.event.listener.EbMSMessageEventType;
-import nl.clockwork.ebms.model.EbMSMessageAttachment;
+import nl.clockwork.ebms.service.model.EbMSMessageAttachment;
 import nl.clockwork.ebms.service.model.EbMSMessageContent;
 import nl.clockwork.ebms.service.model.EbMSMessageContext;
 import nl.clockwork.ebms.service.model.EbMSMessageEvent;

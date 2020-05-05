@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.clockwork.ebms.model;
+package nl.clockwork.ebms.service.model;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -38,9 +38,6 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
 import nl.clockwork.ebms.processor.EbMSProcessingException;
-import nl.clockwork.ebms.service.model.EbMSDataSource;
-import nl.clockwork.ebms.service.model.EbMSMessageContent;
-import nl.clockwork.ebms.service.model.EbMSMessageContext;
 
 @Deprecated
 @XmlAccessorType(XmlAccessType.FIELD)
