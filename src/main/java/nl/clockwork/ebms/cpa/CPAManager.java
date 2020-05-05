@@ -32,7 +32,7 @@ import lombok.NonNull;
 import lombok.val;
 import lombok.experimental.FieldDefaults;
 import net.sf.ehcache.Ehcache;
-import nl.clockwork.ebms.Constants;
+import nl.clockwork.ebms.EbMSAction;
 import nl.clockwork.ebms.common.MethodCacheInterceptor;
 import nl.clockwork.ebms.common.util.StreamUtils;
 import nl.clockwork.ebms.cpa.dao.CPADAO;
@@ -257,7 +257,7 @@ public class CPAManager
 
 	public Optional<DeliveryChannel> getSendDeliveryChannel(String cpaId, CacheablePartyId partyId, String role, String service, String action)
 	{
-		if (Constants.EBMS_SERVICE_URI.equals(service))
+		if (EbMSAction.EBMS_SERVICE_URI.equals(service))
 			return getDefaultDeliveryChannel(cpaId,partyId,action);
 		else
 		{
@@ -274,7 +274,7 @@ public class CPAManager
 	
 	public Optional<DeliveryChannel> getReceiveDeliveryChannel(String cpaId, CacheablePartyId partyId, String role, String service, String action)
 	{
-		if (Constants.EBMS_SERVICE_URI.equals(service))
+		if (EbMSAction.EBMS_SERVICE_URI.equals(service))
 			return getDefaultDeliveryChannel(cpaId,partyId,action);
 		else
 			return getPartyInfo(cpaId,partyId)

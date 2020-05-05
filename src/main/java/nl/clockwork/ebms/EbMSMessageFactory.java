@@ -294,7 +294,7 @@ public class EbMSMessageFactory
 		val conversationId = ebMSIdGenerator.generateConversationId();
 		val from = createForm(fromPartyInfo.getPartyIds(),null);
 		val to = createTo(toPartyInfo.getPartyIds(),null);
-		val service = createService(null,Constants.EBMS_SERVICE_URI);
+		val service = createService(null,action.getServiceUri());
 		val messageId = ebMSIdGenerator.createMessageId(hostname,conversationId);
 		val messageData = createMessageData(messageId,null,new Date(),null);
 		return createMessageHeader(cpaId,conversationId,from,to,service,action.getAction(),messageData,null); //deliveryChannel.getMessagingCharacteristics().getDuplicateElimination()
@@ -330,7 +330,7 @@ public class EbMSMessageFactory
 		val hostname = CPAUtils.getHostname(deliveryChannel);
 		val from = createForm(messageHeader.getTo().getPartyId(),null);
 		val to = createTo(messageHeader.getFrom().getPartyId(),null);
-		val service = createService(null,Constants.EBMS_SERVICE_URI);
+		val service = createService(null,action.getServiceUri());
 		val messageId = ebMSIdGenerator.generateMessageId(hostname);
 		val messageData = createMessageData(messageId,messageHeader.getMessageData().getMessageId(),timestamp,null);
 		return createMessageHeader(messageHeader.getCPAId(),messageHeader.getConversationId(),from,to,service,action.getAction(),messageData,null);

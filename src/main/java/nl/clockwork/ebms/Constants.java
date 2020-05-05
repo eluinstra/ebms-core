@@ -19,7 +19,6 @@ public class Constants
 {
 	public static final String EBMS_SOAP_ACTION = "\"ebXML\"";
 	public static final String EBMS_VERSION = "2.0";
-	public static final String EBMS_SERVICE_URI = "urn:oasis:names:tc:ebxml-msg:service";
 	public static final String EBMS_DEFAULT_LANGUAGE = "en-US";
 
 	public static final String NSURI_SOAP_ENVELOPE = "http://schemas.xmlsoap.org/soap/envelope/";

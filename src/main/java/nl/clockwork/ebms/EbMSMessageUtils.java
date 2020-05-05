@@ -199,7 +199,7 @@ public class EbMSMessageUtils
 	public static Error createError(String location, EbMSErrorCode errorCode, String description, String language, SeverityType severity)
 	{
 		val result = new Error();
-		result.setCodeContext(Constants.EBMS_SERVICE_URI + ":errors");
+		result.setCodeContext(EbMSAction.EBMS_SERVICE_URI + ":errors");
 		result.setLocation(location);
 		result.setErrorCode(errorCode.getErrorCode());
 		if (!StringUtils.isEmpty(description))

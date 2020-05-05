@@ -45,7 +45,7 @@ import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.Service;
 import org.w3._2000._09.xmldsig.X509DataType;
 
 import lombok.val;
-import nl.clockwork.ebms.Constants;
+import nl.clockwork.ebms.EbMSAction;
 import nl.clockwork.ebms.EbMSMessageUtils;
 import nl.clockwork.ebms.model.FromPartyInfo;
 import nl.clockwork.ebms.model.ToPartyInfo;
@@ -85,7 +85,7 @@ public class CPAUtils
 	public static Service createEbMSMessageService()
 	{
 		Service result = new Service();
-		result.setValue(Constants.EBMS_SERVICE_URI);
+		result.setValue(EbMSAction.EBMS_SERVICE_URI);
 		return result;
 	}
 	

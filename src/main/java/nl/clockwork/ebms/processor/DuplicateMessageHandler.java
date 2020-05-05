@@ -27,7 +27,6 @@ import lombok.NonNull;
 import lombok.val;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.apachecommons.CommonsLog;
-import nl.clockwork.ebms.Constants;
 import nl.clockwork.ebms.EbMSAction;
 import nl.clockwork.ebms.common.util.StreamUtils;
 import nl.clockwork.ebms.cpa.CPAManager;
@@ -63,7 +62,7 @@ public class DuplicateMessageHandler
 	private Service createMSHMessageService()
 	{
 		val result = new Service();
-		result.setValue(Constants.EBMS_SERVICE_URI);
+		result.setValue(EbMSAction.EBMS_SERVICE_URI);
 		return result;
 	}
 

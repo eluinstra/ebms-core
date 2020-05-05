@@ -34,6 +34,7 @@ public enum EbMSAction
 	PING("Ping"),
 	PONG("Pong");
 
+	public static final String EBMS_SERVICE_URI = "urn:oasis:names:tc:ebxml-msg:service";
 	String action;
 
 	public static Stream<EbMSAction> stream()
@@ -46,4 +47,8 @@ public enum EbMSAction
 		return EbMSAction.stream().filter(a -> a.action.equals(action)).findFirst().orElse(null);
 	}
 
+	public String getServiceUri()
+	{
+		return EBMS_SERVICE_URI;
+	}
 }

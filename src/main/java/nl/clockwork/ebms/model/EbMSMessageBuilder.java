@@ -30,8 +30,8 @@ import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.SyncReply;
 import org.w3._2000._09.xmldsig.SignatureType;
 
 import lombok.NonNull;
-import nl.clockwork.ebms.Constants;
 import nl.clockwork.ebms.EbMSAction;
+import nl.clockwork.ebms.cpa.CPAUtils;
 import nl.clockwork.ebms.processor.EbMSProcessingException;
 
 public class EbMSMessageBuilder
@@ -130,7 +130,7 @@ public class EbMSMessageBuilder
 		{
 			List<EbMSAttachment> attachments$value = this.attachments$value;
 			if (!this.attachments$set) attachments$value = new ArrayList<EbMSAttachment>();
-			if (!Constants.EBMS_SERVICE_URI.equals(messageHeader.getService().getValue()))
+			if (!EbMSAction.EBMS_SERVICE_URI.equals(messageHeader.getService().getValue()))
 				return EbMSMessage.builder()
 						.messageHeader(messageHeader)
 						.signature(signature)
@@ -153,11 +153,11 @@ public class EbMSMessageBuilder
 			else if (EbMSAction.PONG.getAction().equals(messageHeader.getAction()))
 				return new EbMSPong(messageHeader,signature);
 			else
-				throw new EbMSProcessingException("Unable to create message!");
+				throw new EbMSProcessingException("Unable to build message from service " + CPAUtils.toString(messageHeader.getService()) + " and action " + messageHeader.getAction());
 		}
 		catch (Exception e)
 		{
-			throw new EbMSProcessingException(e);
+			throw new EbMSProcessingException("Unable to build a valid message message!",e);
 		}
 	}
 

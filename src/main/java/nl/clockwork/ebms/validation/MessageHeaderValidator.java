@@ -39,6 +39,7 @@ import lombok.NonNull;
 import lombok.val;
 import lombok.experimental.FieldDefaults;
 import nl.clockwork.ebms.Constants;
+import nl.clockwork.ebms.EbMSAction;
 import nl.clockwork.ebms.EbMSErrorCode;
 import nl.clockwork.ebms.EbMSMessageUtils;
 import nl.clockwork.ebms.cpa.CPAManager;
@@ -129,7 +130,7 @@ public class MessageHeaderValidator
 		if (!isValid(messageHeader.getFrom().getPartyId()))
 			throw new EbMSValidationException(
 					EbMSMessageUtils.createError("//Header/MessageHeader/From/PartyId",EbMSErrorCode.INCONSISTENT,"Invalid value."));
-		if (!Constants.EBMS_SERVICE_URI.equals(messageHeader.getService().getValue()) && StringUtils.isEmpty(messageHeader.getFrom().getRole()))
+		if (!EbMSAction.EBMS_SERVICE_URI.equals(messageHeader.getService().getValue()) && StringUtils.isEmpty(messageHeader.getFrom().getRole()))
 			throw new EbMSValidationException(
 					EbMSMessageUtils.createError("//Header/MessageHeader/From/Role",EbMSErrorCode.INCONSISTENT,"Invalid value."));
 		val fromPartyId = new CacheablePartyId(messageHeader.getFrom().getPartyId());
@@ -141,7 +142,7 @@ public class MessageHeaderValidator
 		if (!isValid(messageHeader.getTo().getPartyId()))
 			throw new EbMSValidationException(
 					EbMSMessageUtils.createError("//Header/MessageHeader/To/PartyId",EbMSErrorCode.INCONSISTENT,"Invalid value."));
-		if (!Constants.EBMS_SERVICE_URI.equals(messageHeader.getService().getValue()) && StringUtils.isEmpty(messageHeader.getTo().getRole()))
+		if (!EbMSAction.EBMS_SERVICE_URI.equals(messageHeader.getService().getValue()) && StringUtils.isEmpty(messageHeader.getTo().getRole()))
 			throw new EbMSValidationException(
 					EbMSMessageUtils.createError("//Header/MessageHeader/To/Role",EbMSErrorCode.INCONSISTENT,"Invalid value."));
 		val toPartyId = new CacheablePartyId(messageHeader.getTo().getPartyId());

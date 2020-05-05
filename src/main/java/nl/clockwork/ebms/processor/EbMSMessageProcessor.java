@@ -39,7 +39,7 @@ import lombok.NonNull;
 import lombok.val;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.apachecommons.CommonsLog;
-import nl.clockwork.ebms.Constants;
+import nl.clockwork.ebms.EbMSAction;
 import nl.clockwork.ebms.EbMSMessageFactory;
 import nl.clockwork.ebms.EbMSMessageStatus;
 import nl.clockwork.ebms.EbMSMessageUtils;
@@ -520,7 +520,7 @@ public class EbMSMessageProcessor
 	
 	private Pair<EbMSMessageStatus,Date> createEbMSMessageStatusAndTimestamp(EbMSStatusRequest statusRequest, EbMSMessageContext messageContext)
 	{
-		if (messageContext == null || Constants.EBMS_SERVICE_URI.equals(messageContext.getService()))
+		if (messageContext == null || EbMSAction.EBMS_SERVICE_URI.equals(messageContext.getService()))
 			return new Pair<EbMSMessageStatus,Date>(EbMSMessageStatus.NOT_RECOGNIZED,null);
 		else if (!messageContext.getCpaId().equals(statusRequest.getMessageHeader().getCPAId()))
 			return new Pair<EbMSMessageStatus,Date>(EbMSMessageStatus.UNAUTHORIZED,null);

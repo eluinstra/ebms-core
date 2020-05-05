@@ -35,7 +35,6 @@ import lombok.NonNull;
 import lombok.val;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.apachecommons.CommonsLog;
-import nl.clockwork.ebms.Constants;
 import nl.clockwork.ebms.EbMSAction;
 import nl.clockwork.ebms.EbMSMessageFactory;
 import nl.clockwork.ebms.EbMSMessageStatus;
@@ -254,7 +253,7 @@ public class EbMSMessageServiceImpl implements EbMSMessageService
 
 	private MessageStatus getMessageStatus(String messageId, EbMSMessageContext messageContext) throws EbMSProcessorException
 	{
-		if (Constants.EBMS_SERVICE_URI.equals(messageContext.getService()))
+		if (EbMSAction.EBMS_SERVICE_URI.equals(messageContext.getService()))
 			throw new EbMSMessageServiceException("Message with messageId " + messageId + " is an EbMS service message!");
 		else
 		{
