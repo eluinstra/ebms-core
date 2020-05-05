@@ -60,7 +60,7 @@ public class DAOFactoryTest
 		ds.setDriverClass("org.hsqldb.jdbcDriver");
 		dao = daoFactory.getObject();
 		assertNotNull(dao);
-		assertEquals(nl.clockwork.ebms.dao.hsqldb.EbMSDAOImpl.class, dao.getClass());	
+		assertEquals(nl.clockwork.ebms.dao.HSQLDBEbMSDAOImpl.class, dao.getClass());	
 	}
 	
 	
@@ -70,12 +70,12 @@ public class DAOFactoryTest
 		ds.setDriverClass("com.mysql.jdbc.Driver");
 		dao = daoFactory.getObject();
 		assertNotNull(dao);
-		assertEquals(nl.clockwork.ebms.dao.mysql.EbMSDAOImpl.class, dao.getClass());
+		assertEquals(nl.clockwork.ebms.dao.MySQLEbMSDAOImpl.class, dao.getClass());
 		
 		ds.setDriverClass("org.mariadb.jdbc.Driver");
 		dao = daoFactory.getObject();
 		assertNotNull(dao);
-		assertEquals(nl.clockwork.ebms.dao.mysql.EbMSDAOImpl.class, dao.getClass());
+		assertEquals(nl.clockwork.ebms.dao.MySQLEbMSDAOImpl.class, dao.getClass());
 	}
 	
 	@Test
@@ -91,7 +91,7 @@ public class DAOFactoryTest
 		ds.setDriverClass("org.postgresql.Driver");
 		dao = daoFactory.getObject();
 		assertNotNull(dao);
-		assertEquals(nl.clockwork.ebms.dao.postgresql.EbMSDAOImpl.class, dao.getClass());
+		assertEquals(nl.clockwork.ebms.dao.PostgreSQLEbMSDAOImpl.class, dao.getClass());
 	}
 
 	
@@ -101,7 +101,7 @@ public class DAOFactoryTest
 		ds.setDriverClass("oracle.jdbc.OracleDriver");
 		dao = daoFactory.getObject();
 		assertNotNull(dao);
-		assertEquals(nl.clockwork.ebms.dao.oracle.EbMSDAOImpl.class, dao.getClass());
+		assertEquals(nl.clockwork.ebms.dao.OracleEbMSDAOImpl.class, dao.getClass());
 	}
 
 	@Test
@@ -110,7 +110,7 @@ public class DAOFactoryTest
 		ds.setDriverClass("com.microsoft.sqlserver.jdbc.SQLServerDriver");
 		dao = daoFactory.getObject();
 		assertNotNull(dao);
-		assertEquals(nl.clockwork.ebms.dao.mssql.EbMSDAOImpl.class, dao.getClass());
+		assertEquals(nl.clockwork.ebms.dao.MSSQLEbMSDAOImpl.class, dao.getClass());
 	}
 	
 	@Test
@@ -119,7 +119,7 @@ public class DAOFactoryTest
 		ds.setDriverClass("com.ibm.db2.jcc.DB2Driver");
 		dao = daoFactory.getObject();
 		assertNotNull(dao);
-		assertEquals(nl.clockwork.ebms.dao.db2.EbMSDAOImpl.class, dao.getClass());
+		assertEquals(nl.clockwork.ebms.dao.DB2EbMSDAOImpl.class, dao.getClass());
 	}
 	
 }

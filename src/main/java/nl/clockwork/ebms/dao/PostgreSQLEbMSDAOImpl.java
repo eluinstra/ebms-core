@@ -13,21 +13,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.clockwork.ebms.dao.db2;
+package nl.clockwork.ebms.dao;
 
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.xml.transform.TransformerException;
 
+import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageHeader;
 import org.springframework.dao.DataAccessException;
+import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
+import org.springframework.jdbc.core.ResultSetExtractor;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.transaction.TransactionException;
 import org.springframework.transaction.TransactionStatus;
@@ -36,17 +44,52 @@ import org.springframework.transaction.support.TransactionTemplate;
 import org.w3c.dom.Document;
 
 import lombok.val;
+import nl.clockwork.ebms.EbMSAttachmentFactory;
 import nl.clockwork.ebms.EbMSMessageStatus;
 import nl.clockwork.ebms.EbMSMessageUtils;
 import nl.clockwork.ebms.common.util.DOMUtils;
-import nl.clockwork.ebms.dao.DAOException;
 import nl.clockwork.ebms.event.listener.EbMSMessageEventType;
 import nl.clockwork.ebms.model.EbMSAttachment;
 import nl.clockwork.ebms.model.EbMSBaseMessage;
+import nl.clockwork.ebms.processor.EbMSProcessingException;
 
-public class EbMSDAOImpl extends nl.clockwork.ebms.dao.postgresql.EbMSDAOImpl
+public class PostgreSQLEbMSDAOImpl extends AbstractEbMSDAO
 {
-	public EbMSDAOImpl(TransactionTemplate transactionTemplate, JdbcTemplate jdbcTemplate, String serverId)
+	public class KeyExtractor implements ResultSetExtractor<KeyHolder>
+	{
+		@Override
+		public KeyHolder extractData(ResultSet rs) throws SQLException, DataAccessException
+		{
+			if (rs.next())
+			{
+				val keys = new HashMap<String,Object>();
+				keys.put("message_id",rs.getString("message_id"));
+				keys.put("message_nr",rs.getInt("message_nr"));
+				return new KeyHolder()
+				{
+					@Override
+					public Map<String,Object> getKeys() throws InvalidDataAccessApiUsageException
+					{
+						return keys;
+					}
+					@Override
+					public List<Map<String,Object>> getKeyList()
+					{
+						return Arrays.asList(keys);
+					}
+					@Override
+					public Number getKey() throws InvalidDataAccessApiUsageException
+					{
+						throw new InvalidDataAccessApiUsageException("");
+					}
+				};
+			}
+			else
+				return null;
+		}
+	}
+
+	public PostgreSQLEbMSDAOImpl(TransactionTemplate transactionTemplate, JdbcTemplate jdbcTemplate, String serverId)
 	{
 		super(transactionTemplate,jdbcTemplate,serverId);
 	}
@@ -56,11 +99,39 @@ public class EbMSDAOImpl extends nl.clockwork.ebms.dao.postgresql.EbMSDAOImpl
 	{
 		return "select message_id" +
 		" from ebms_message" +
-		" where message_nr = 0" + 
-		" and status = " + status.getId() +
+		" where message_nr = 0" +
+		" and status=" + status.getId() +
 		messageContextFilter +
 		" order by time_stamp asc" +
-		" fetch first " + maxNr + " rows only";
+		" limit " + maxNr;
+	}
+
+	@Override
+	protected List<EbMSAttachment> getAttachments(String messageId)
+	{
+		return jdbcTemplate.query(
+			"select name, content_id, content_type, content" + 
+			" from ebms_attachment" + 
+			" where message_id = ?" +
+			" and message_nr = 0" +
+			" order by order_nr",
+			new RowMapper<EbMSAttachment>()
+			{
+				@Override
+				public EbMSAttachment mapRow(ResultSet rs, int rowNum) throws SQLException
+				{
+					try
+					{
+						return EbMSAttachmentFactory.createCachedEbMSAttachment(rs.getString("name"),rs.getString("content_id"),rs.getString("content_type"),rs.getBinaryStream("content"));
+					}
+					catch (IOException e)
+					{
+						throw new EbMSProcessingException(e);
+					}
+				}
+			},
+			messageId
+		);
 	}
 
 	@Override
@@ -86,7 +157,6 @@ public class EbMSDAOImpl extends nl.clockwork.ebms.dao.postgresql.EbMSDAOImpl
 										{
 											val ps = connection.prepareStatement
 											(
-												"select message_id, message_nr from final table(" +
 												"insert into ebms_message (" +
 													"time_stamp," +
 													"cpa_id," +
@@ -104,7 +174,8 @@ public class EbMSDAOImpl extends nl.clockwork.ebms.dao.postgresql.EbMSDAOImpl
 													"status," +
 													"status_time," +
 													"persist_time" +
-												") values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?))"
+												") values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)" +
+												" returning message_id, message_nr"
 											);
 											ps.setTimestamp(1,new Timestamp(timestamp.getTime()));
 											val messageHeader = message.getMessageHeader();
@@ -183,8 +254,7 @@ public class EbMSDAOImpl extends nl.clockwork.ebms.dao.postgresql.EbMSDAOImpl
 										{
 											val ps = connection.prepareStatement
 											(
-													"select message_id, message_nr from final table(" +
-													"insert into ebms_message (" +
+												"insert into ebms_message (" +
 													"time_stamp," +
 													"cpa_id," +
 													"conversation_id," +
@@ -199,10 +269,11 @@ public class EbMSDAOImpl extends nl.clockwork.ebms.dao.postgresql.EbMSDAOImpl
 													"service," +
 													"action," +
 													"content" +
-												") values (?,?,?,?,(select max(message_nr) + 1 from ebms_message where message_id = ?),?,?,?,?,?,?,?,?,?))"
+												") values (?,?,?,?,(select max(message_nr) + 1 from ebms_message where message_id = ?),?,?,?,?,?,?,?,?,?)" +
+												" returning message_id, message_nr"
 											);
 											ps.setTimestamp(1,new Timestamp(timestamp.getTime()));
-											val messageHeader = message.getMessageHeader();
+											MessageHeader messageHeader = message.getMessageHeader();
 											ps.setString(2,messageHeader.getCPAId());
 											ps.setString(3,messageHeader.getConversationId());
 											ps.setString(4,messageHeader.getMessageData().getMessageId());
@@ -255,7 +326,7 @@ public class EbMSDAOImpl extends nl.clockwork.ebms.dao.postgresql.EbMSDAOImpl
 			(serverId == null ? " and server_id is null" : " and server_id = '" + serverId + "'") +
 			//" and (server_id = ? or (server_id is null and ? is null))" +
 			" order by time_stamp asc" +
-			" fetch first " + maxNr + " rows only";
+			" limit " + maxNr;
 	}
 
 	@Override
@@ -269,7 +340,7 @@ public class EbMSDAOImpl extends nl.clockwork.ebms.dao.postgresql.EbMSDAOImpl
 			" and ebms_message.message_nr = 0" +
 			messageContextFilter +
 			" order by ebms_message_event.time_stamp asc" +
-			" fetch first " + maxNr + " rows only";
+			" limit " + maxNr;
 	}
-
+	
 }

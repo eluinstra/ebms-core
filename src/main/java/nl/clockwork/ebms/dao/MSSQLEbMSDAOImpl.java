@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.clockwork.ebms.dao.mssql;
+package nl.clockwork.ebms.dao;
 
 import java.io.IOException;
 import java.sql.Connection;
@@ -39,14 +39,13 @@ import lombok.val;
 import nl.clockwork.ebms.EbMSMessageStatus;
 import nl.clockwork.ebms.EbMSMessageUtils;
 import nl.clockwork.ebms.common.util.DOMUtils;
-import nl.clockwork.ebms.dao.DAOException;
 import nl.clockwork.ebms.event.listener.EbMSMessageEventType;
 import nl.clockwork.ebms.model.EbMSAttachment;
 import nl.clockwork.ebms.model.EbMSBaseMessage;
 
-public class EbMSDAOImpl extends nl.clockwork.ebms.dao.mysql.EbMSDAOImpl
+public class MSSQLEbMSDAOImpl extends nl.clockwork.ebms.dao.MySQLEbMSDAOImpl
 {
-	public EbMSDAOImpl(TransactionTemplate transactionTemplate, JdbcTemplate jdbcTemplate, String serverId)
+	public MSSQLEbMSDAOImpl(TransactionTemplate transactionTemplate, JdbcTemplate jdbcTemplate, String serverId)
 	{
 		super(transactionTemplate,jdbcTemplate,serverId);
 	}

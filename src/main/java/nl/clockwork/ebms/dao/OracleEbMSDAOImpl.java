@@ -13,18 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.clockwork.ebms.dao.oracle;
+package nl.clockwork.ebms.dao;
 
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.transaction.support.TransactionTemplate;
 
 import nl.clockwork.ebms.EbMSMessageStatus;
-import nl.clockwork.ebms.dao.AbstractEbMSDAO;
 import nl.clockwork.ebms.event.listener.EbMSMessageEventType;
 
-public class EbMSDAOImpl extends AbstractEbMSDAO
+public class OracleEbMSDAOImpl extends AbstractEbMSDAO
 {
-	public EbMSDAOImpl(TransactionTemplate transactionTemplate, JdbcTemplate jdbcTemplate, String serverId)
+	public OracleEbMSDAOImpl(TransactionTemplate transactionTemplate, JdbcTemplate jdbcTemplate, String serverId)
 	{
 		super(transactionTemplate,jdbcTemplate,serverId);
 	}
