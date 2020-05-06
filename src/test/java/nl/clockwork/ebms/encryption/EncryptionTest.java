@@ -219,13 +219,13 @@ public class EncryptionTest
 
 	private EbMSMessageContext createEbMSMessageContext(String cpaId)
 	{
-		val result = new EbMSMessageContext();
-		result.setCpaId(cpaId);
-		result.setFromRole(new Role("urn:osb:oin:00000000000000000000","DIGIPOORT"));
-		result.setToRole(new Role("urn:osb:oin:00000000000000000001","OVERHEID"));
-		result.setService("urn:osb:services:osb:afleveren:1.1$1.0");
-		result.setAction("afleveren");
-		return result;
+		return EbMSMessageContext.builder()
+				.cpaId(cpaId)
+				.fromRole(new Role("urn:osb:oin:00000000000000000000","DIGIPOORT"))
+				.toRole(new Role("urn:osb:oin:00000000000000000001","OVERHEID"))
+				.service("urn:osb:services:osb:afleveren:1.1$1.0")
+				.action("afleveren")
+				.build();
 	}
 
 	private List<EbMSDataSource> createDataSources()

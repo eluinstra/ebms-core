@@ -117,13 +117,13 @@ public class EbMSHttpClientFactory
 
 	private SSLFactoryManager createSslFactoryManager(String clientAlias) throws Exception
 	{
-		val builder = SSLFactoryManager.builder();
-		builder.keyStore(keyStore);
-		builder.trustStore(trustStore);
-		builder.verifyHostnames(verifyHostnames);
-		builder.enabledProtocols(enabledProtocols);
-		builder.enabledCipherSuites(enabledCipherSuites);
-		builder.clientAlias(clientAlias);
-		return builder.build();
+		return SSLFactoryManager.builder()
+				.keyStore(keyStore)
+				.trustStore(trustStore)
+				.verifyHostnames(verifyHostnames)
+				.enabledProtocols(enabledProtocols)
+				.enabledCipherSuites(enabledCipherSuites)
+				.clientAlias(clientAlias)
+				.build();
 	}
 }

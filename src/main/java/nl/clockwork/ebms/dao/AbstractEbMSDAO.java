@@ -89,7 +89,6 @@ import nl.clockwork.ebms.service.model.EbMSMessageContext;
 import nl.clockwork.ebms.service.model.EbMSMessageEvent;
 import nl.clockwork.ebms.service.model.Role;
 import nl.clockwork.ebms.service.model.URLMapping;
-import nl.clockwork.ebms.service.model.EbMSMessageContext.EbMSMessageContextBuilder;
 
 @FieldDefaults(level = AccessLevel.PROTECTED, makeFinal = true)
 @AllArgsConstructor
@@ -642,18 +641,18 @@ public abstract class AbstractEbMSDAO implements EbMSDAO, CPADAO, URLMappingDAO,
 					@Override
 					public EbMSMessageContext mapRow(ResultSet rs, int rowNum) throws SQLException
 					{
-						val builder = EbMSMessageContext.builder();
-						builder.cpaId(rs.getString("cpa_id"));
-						builder.fromRole(new Role(rs.getString("from_party_id"),rs.getString("from_role")));
-						builder.toRole(new Role(rs.getString("to_party_id"),rs.getString("to_role")));
-						builder.service(rs.getString("service"));
-						builder.action(rs.getString("action"));
-						builder.timestamp(rs.getTimestamp("time_stamp"));
-						builder.conversationId(rs.getString("conversation_id"));
-						builder.messageId(rs.getString("message_id"));
-						builder.refToMessageId(rs.getString("ref_to_message_id"));
-						builder.messageStatus(rs.getObject("status") == null ? null : EbMSMessageStatus.get(rs.getInt("status")));
-						return builder.build();
+						return EbMSMessageContext.builder()
+								.cpaId(rs.getString("cpa_id"))
+								.fromRole(new Role(rs.getString("from_party_id"),rs.getString("from_role")))
+								.toRole(new Role(rs.getString("to_party_id"),rs.getString("to_role")))
+								.service(rs.getString("service"))
+								.action(rs.getString("action"))
+								.timestamp(rs.getTimestamp("time_stamp"))
+								.conversationId(rs.getString("conversation_id"))
+								.messageId(rs.getString("message_id"))
+								.refToMessageId(rs.getString("ref_to_message_id"))
+								.messageStatus(rs.getObject("status") == null ? null : EbMSMessageStatus.get(rs.getInt("status")))
+								.build();
 					}
 					
 				},
@@ -699,20 +698,19 @@ public abstract class AbstractEbMSDAO implements EbMSDAO, CPADAO, URLMappingDAO,
 					@Override
 					public EbMSMessageContext mapRow(ResultSet rs, int rowNum) throws SQLException
 					{
-						EbMSMessageContextBuilder builder = EbMSMessageContext.builder();
-						builder.cpaId(rs.getString("cpa_id"));
-						builder.fromRole(new Role(rs.getString("from_party_id"),rs.getString("from_role")));
-						builder.toRole(new Role(rs.getString("to_party_id"),rs.getString("to_role")));
-						builder.service(rs.getString("service"));
-						builder.action(rs.getString("action"));
-						builder.timestamp(rs.getTimestamp("time_stamp"));
-						builder.conversationId(rs.getString("conversation_id"));
-						builder.messageId(rs.getString("message_id"));
-						builder.refToMessageId(rs.getString("ref_to_message_id"));
-						builder.messageStatus(rs.getObject("status") == null ? null : EbMSMessageStatus.values()[rs.getInt("status")]);
-						return builder.build();
+						return EbMSMessageContext.builder()
+								.cpaId(rs.getString("cpa_id"))
+								.fromRole(new Role(rs.getString("from_party_id"),rs.getString("from_role")))
+								.toRole(new Role(rs.getString("to_party_id"),rs.getString("to_role")))
+								.service(rs.getString("service"))
+								.action(rs.getString("action"))
+								.timestamp(rs.getTimestamp("time_stamp"))
+								.conversationId(rs.getString("conversation_id"))
+								.messageId(rs.getString("message_id"))
+								.refToMessageId(rs.getString("ref_to_message_id"))
+								.messageStatus(rs.getObject("status") == null ? null : EbMSMessageStatus.values()[rs.getInt("status")])
+								.build();
 					}
-					
 				},
 				cpaId,
 				refToMessageId

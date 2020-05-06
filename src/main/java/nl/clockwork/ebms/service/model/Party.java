@@ -24,15 +24,18 @@ import javax.xml.bind.annotation.XmlElement;
 
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.PartyId;
 
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import nl.clockwork.ebms.cpa.CPAUtils;
 
 @XmlAccessorType(XmlAccessType.FIELD)
 @Data
+@FieldDefaults(level = AccessLevel.PRIVATE)
 @NoArgsConstructor
 @AllArgsConstructor
 @RequiredArgsConstructor

@@ -249,13 +249,13 @@ public class EbMSMessageUtilsTest
 	@Test
 	public void getEbMSMessage() throws Exception
 	{
-		val builder = EbMSMessage.builder();
 		val ackRequested = new AckRequested();
 		ackRequested.setActor("Actor1");
-		builder.messageHeader(createMessageHeader());
-		builder.ackRequested(ackRequested);
-		builder.manifest(new Manifest());
-		builder.attachments(new ArrayList<>());
+		val builder = EbMSMessage.builder()
+				.messageHeader(createMessageHeader())
+				.ackRequested(ackRequested)
+				.manifest(new Manifest())
+				.attachments(new ArrayList<>());
 		val doc = EbMSMessageUtils.createSOAPMessage(builder.build());
 		
 		val result = (EbMSMessage)EbMSMessageUtils.getEbMSMessage(doc);
@@ -306,19 +306,18 @@ public class EbMSMessageUtilsTest
 	@Test
 	public void createEbMSMessageSOAPMessage() throws Exception
 	{
-		val builder = EbMSMessage.builder();
-		builder.messageHeader(createMessageHeader());
-		builder.signature(createSignature());
-		builder.ackRequested(createAckRequested());
-		builder.manifest(EbMSMessageUtils.createManifest());
-		builder.attachments(new ArrayList<>());
-		val ebMSMessage = builder.build();
-		var doc = EbMSMessageUtils.createSOAPMessage(ebMSMessage);
+		val builder = EbMSMessage.builder()
+				.messageHeader(createMessageHeader())
+				.signature(createSignature())
+				.ackRequested(createAckRequested())
+				.manifest(EbMSMessageUtils.createManifest())
+				.attachments(new ArrayList<>());
+		var doc = EbMSMessageUtils.createSOAPMessage(builder.build());
 
 		var documentString = documentToString(doc);
 		assertTrue(documentString.contains("AckRequested"));
 
-		doc = EbMSMessageUtils.createSOAPMessage(ebMSMessage);
+		doc = EbMSMessageUtils.createSOAPMessage(builder.build());
 		documentString = documentToString(doc);
 		assertTrue(documentString.contains("http://www.w3.org/1999/xlink"));
 	}
@@ -326,18 +325,17 @@ public class EbMSMessageUtilsTest
 	@Test
 	public void createEbMSMessageErrorSOAPMessage() throws Exception
 	{
-		val builder = EbMSMessageError.builder();
-		builder.messageHeader(createMessageHeader());
-		builder.signature(createSignature());
-		builder.errorList(EbMSMessageUtils.createErrorList());
-		val ebMSMessage = builder.build();
-		var doc = EbMSMessageUtils.createSOAPMessage(ebMSMessage);
+		val builder = EbMSMessageError.builder()
+				.messageHeader(createMessageHeader())
+				.signature(createSignature())
+				.errorList(EbMSMessageUtils.createErrorList());
+		var doc = EbMSMessageUtils.createSOAPMessage(builder.build());
 
 		var documentString = documentToString(doc);
 		assertTrue(documentString.contains("ErrorList"));
 		assertTrue(documentString.contains("highestSeverity=\"Error\""));
 
-		doc = EbMSMessageUtils.createSOAPMessage(ebMSMessage);
+		doc = EbMSMessageUtils.createSOAPMessage(builder.build());
 		documentString = documentToString(doc);
 		assertTrue(documentString.contains("http://www.w3.org/1999/xlink"));
 	}
@@ -345,17 +343,16 @@ public class EbMSMessageUtilsTest
 	@Test
 	public void createEbMSAcknowledgmentSOAPMessage() throws Exception
 	{
-		val builder = EbMSAcknowledgment.builder();
-		builder.messageHeader(createMessageHeader());
-		builder.signature(createSignature());
-		builder.acknowledgment(createAcknowledgment());
-		val ebMSMessage = builder.build();
-		var doc = EbMSMessageUtils.createSOAPMessage(ebMSMessage);
+		val builder = EbMSAcknowledgment.builder()
+				.messageHeader(createMessageHeader())
+				.signature(createSignature())
+				.acknowledgment(createAcknowledgment());
+		var doc = EbMSMessageUtils.createSOAPMessage(builder.build());
 
 		var documentString = documentToString(doc);
 		assertTrue(documentString.contains("Acknowledgment"));
 
-		doc = EbMSMessageUtils.createSOAPMessage(ebMSMessage);
+		doc = EbMSMessageUtils.createSOAPMessage(builder.build());
 		documentString = documentToString(doc);
 		assertTrue(documentString.contains("http://www.w3.org/1999/xlink"));
 	}
@@ -363,19 +360,18 @@ public class EbMSMessageUtilsTest
 	@Test
 	public void createEbMSStatusRequestSOAPMessage() throws Exception
 	{
-		val builder = EbMSStatusRequest.builder();
-		builder.messageHeader(createMessageHeader());
-		builder.signature(createSignature());
 		val statusRequest = EbMSMessageUtils.createStatusRequest("ref1");
-		builder.statusRequest(statusRequest);
-		val ebMSMessage = builder.build();
-		var doc = EbMSMessageUtils.createSOAPMessage(ebMSMessage);
+		val builder = EbMSStatusRequest.builder()
+				.messageHeader(createMessageHeader())
+				.signature(createSignature())
+				.statusRequest(statusRequest);
+		var doc = EbMSMessageUtils.createSOAPMessage(builder.build());
 
 		var documentString = documentToString(doc);
 		assertTrue(documentString.contains("StatusRequest"));
 		assertTrue(documentString.contains("ref1"));
 
-		doc = EbMSMessageUtils.createSOAPMessage(ebMSMessage);
+		doc = EbMSMessageUtils.createSOAPMessage(builder.build());
 		documentString = documentToString(doc);
 		assertTrue(documentString.contains("http://www.w3.org/1999/xlink"));
 	}
@@ -383,20 +379,19 @@ public class EbMSMessageUtilsTest
 	@Test
 	public void createSOAPMessage() throws Exception
 	{
-		val builder = EbMSStatusResponse.builder();
-		builder.messageHeader(createMessageHeader());
-		builder.signature(createSignature());
 		val statusRequest = EbMSMessageUtils.createStatusRequest("ref1");
 		val statusResponse = EbMSMessageUtils.createStatusResponse(statusRequest, EbMSMessageStatus.EXPIRED, new Date());
-		builder.statusResponse(statusResponse);
-		val ebMSMessage = builder.build();
-		var doc = EbMSMessageUtils.createSOAPMessage(ebMSMessage);
+		val builder = EbMSStatusResponse.builder()
+				.messageHeader(createMessageHeader())
+				.signature(createSignature())
+				.statusResponse(statusResponse);
+		var doc = EbMSMessageUtils.createSOAPMessage(builder.build());
 
 		var documentString = documentToString(doc);
 		assertTrue(documentString.contains("StatusResponse"));
 		assertTrue(documentString.contains("ref1"));
 
-		doc = EbMSMessageUtils.createSOAPMessage(ebMSMessage);
+		doc = EbMSMessageUtils.createSOAPMessage(builder.build());
 		documentString = documentToString(doc);
 		assertTrue(documentString.contains("http://www.w3.org/1999/xlink"));
 	}
