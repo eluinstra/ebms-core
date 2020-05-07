@@ -19,7 +19,7 @@ import java.security.GeneralSecurityException;
 import java.security.KeyPair;
 import java.security.KeyStoreException;
 import java.security.cert.X509Certificate;
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.xml.security.exceptions.XMLSecurityException;
@@ -95,7 +95,7 @@ public class EbMSSignatureGenerator
 		{
 			if (ackRequested != null && ackRequested.isSigned())
 			{
-				sign(document,message,new ArrayList<>());
+				sign(document,message,Collections.emptyList());
 			}
 		}
 		catch (GeneralSecurityException e)

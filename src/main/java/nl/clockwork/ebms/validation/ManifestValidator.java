@@ -36,7 +36,8 @@ public class ManifestValidator
 		{
 			if (!Constants.EBMS_VERSION.equals(message.getManifest().getVersion()))
 				throw new EbMSValidationException(EbMSMessageUtils.createError("//Body/Manifest/@version",EbMSErrorCode.INCONSISTENT,"Invalid value."));
-			message.getManifest().getReference().forEach(r -> addAttachment(attachments,message.getAttachments(),r));
+			for (Reference reference : message.getManifest().getReference())
+				addAttachment(attachments,message.getAttachments(),reference);
 		}
 		message.getAttachments().retainAll(attachments);
 	}

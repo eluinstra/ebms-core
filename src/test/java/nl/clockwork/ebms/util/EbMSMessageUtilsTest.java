@@ -24,8 +24,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.StringWriter;
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 
 import javax.activation.DataSource;
@@ -247,7 +247,7 @@ public class EbMSMessageUtilsTest
 				.messageHeader(createMessageHeader())
 				.ackRequested(ackRequested)
 				.manifest(new Manifest())
-				.attachments(new ArrayList<>());
+				.attachments(Collections.emptyList());
 		val doc = EbMSMessageUtils.createSOAPMessage(builder.build());
 		
 		val result = (EbMSMessage)EbMSMessageUtils.getEbMSMessage(doc);
@@ -303,7 +303,7 @@ public class EbMSMessageUtilsTest
 				.signature(createSignature())
 				.ackRequested(createAckRequested())
 				.manifest(EbMSMessageUtils.createManifest())
-				.attachments(new ArrayList<>());
+				.attachments(Collections.emptyList());
 		var doc = EbMSMessageUtils.createSOAPMessage(builder.build());
 
 		var documentString = documentToString(doc);

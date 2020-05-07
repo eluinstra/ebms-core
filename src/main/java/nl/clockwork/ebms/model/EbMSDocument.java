@@ -15,7 +15,7 @@
  */
 package nl.clockwork.ebms.model;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.w3c.dom.Document;
@@ -39,5 +39,5 @@ public class EbMSDocument
 	Document message;
 	@NonNull
 	@Default
-	List<EbMSAttachment> attachments = new ArrayList<>();
+	List<EbMSAttachment> attachments = Collections.emptyList();
 }

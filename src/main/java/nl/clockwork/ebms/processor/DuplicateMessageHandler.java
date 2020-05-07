@@ -15,7 +15,7 @@
  */
 package nl.clockwork.ebms.processor;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 
 import lombok.AccessLevel;
@@ -65,7 +65,7 @@ public class DuplicateMessageHandler
 			if (messageValidator.isSyncReply(message))
 			{
 				if (storeDuplicateMessage)
-					ebMSDAO.insertDuplicateMessage(timestamp,document.getMessage(),message,storeDuplicateMessageAttachments ? message.getAttachments() : new ArrayList<>());
+					ebMSDAO.insertDuplicateMessage(timestamp,document.getMessage(),message,storeDuplicateMessageAttachments ? message.getAttachments() : Collections.emptyList());
 				val result = ebMSDAO.getEbMSDocumentByRefToMessageId(
 						messageHeader.getCPAId(),
 						messageHeader.getMessageData().getMessageId(),
@@ -77,7 +77,7 @@ public class DuplicateMessageHandler
 			else
 			{
 				if (storeDuplicateMessage)
-					ebMSDAO.insertDuplicateMessage(timestamp,document.getMessage(),message,storeDuplicateMessageAttachments ? message.getAttachments() : new ArrayList<>());
+					ebMSDAO.insertDuplicateMessage(timestamp,document.getMessage(),message,storeDuplicateMessageAttachments ? message.getAttachments() : Collections.emptyList());
 				val context = ebMSDAO.getMessageContextByRefToMessageId(
 						messageHeader.getCPAId(),
 						messageHeader.getMessageData().getMessageId(),
@@ -111,7 +111,7 @@ public class DuplicateMessageHandler
 		{
 			log.warn("MessageError " + responseMessage.getMessageHeader().getMessageData().getMessageId() + " is duplicate!");
 			if (storeDuplicateMessage)
-				ebMSDAO.insertDuplicateMessage(timestamp,responseDocument.getMessage(),responseMessage,new ArrayList<>());
+				ebMSDAO.insertDuplicateMessage(timestamp,responseDocument.getMessage(),responseMessage,Collections.emptyList());
 		}
 		else
 			throw new EbMSProcessingException("MessageId " + responseMessage.getMessageHeader().getMessageData().getMessageId() + " already used!");
@@ -123,7 +123,7 @@ public class DuplicateMessageHandler
 		{
 			log.warn("Acknowledgment " + responseMessage.getMessageHeader().getMessageData().getMessageId() + " is duplicate!");
 			if (storeDuplicateMessage)
-				ebMSDAO.insertDuplicateMessage(timestamp,responseDocument.getMessage(),responseMessage,new ArrayList<>());
+				ebMSDAO.insertDuplicateMessage(timestamp,responseDocument.getMessage(),responseMessage,Collections.emptyList());
 		}
 		else
 			throw new EbMSProcessingException("MessageId " + responseMessage.getMessageHeader().getMessageData().getMessageId() + " already used!");

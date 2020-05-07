@@ -18,7 +18,7 @@ package nl.clockwork.ebms.service.model;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -56,7 +56,7 @@ public class EbMSMessageAttachment implements Serializable
 	@NonNull
 	EbMSMessageContext context;
 	@XmlElement(name="attachment")
-	List<DataHandler> attachments = new ArrayList<>();
+	List<DataHandler> attachments = Collections.emptyList();
 
 	/*
 	 * convert to MessageContent class for further processing

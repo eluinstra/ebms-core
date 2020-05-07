@@ -15,7 +15,7 @@
  */
 package nl.clockwork.ebms.model;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.AckRequested;
@@ -48,7 +48,7 @@ public class EbMSMessage extends EbMSRequestMessage
 		this.messageOrder = messageOrder;
 		this.ackRequested = ackRequested;
 		this.manifest = manifest;
-		this.attachments = attachments == null ? new ArrayList<EbMSAttachment>() : attachments;
+		this.attachments = attachments == null ? Collections.emptyList() : attachments;
 	}
 
 	public String getContentId()

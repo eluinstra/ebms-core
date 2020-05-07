@@ -17,7 +17,7 @@ package nl.clockwork.ebms.server;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -64,7 +64,7 @@ public class EbMSMessageReader
 		return StringUtils.isNotBlank(message) ? EbMSDocument.builder()
 				.contentId(contentId)
 				.message(DOMUtils.read(message))
-				.attachments(new ArrayList<>())
+				.attachments(Collections.emptyList())
 				.build()
 				: null;
 	}
@@ -82,7 +82,7 @@ public class EbMSMessageReader
 		return EbMSDocument.builder()
 				.contentId(contentId)
 				.message(DOMUtils.read(in))
-				.attachments(new ArrayList<>())
+				.attachments(Collections.emptyList())
 				.build();
 	}
 

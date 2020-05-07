@@ -19,8 +19,8 @@ import java.security.GeneralSecurityException;
 import java.security.KeyStoreException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -119,7 +119,7 @@ public class EbMSSignatureValidator
 					{
 						val date = responseMessage.getMessageHeader().getMessageData().getTimestamp() == null ? new Date() : responseMessage.getMessageHeader().getMessageData().getTimestamp();
 						SecurityUtils.validateCertificate(trustStore,certificate,date);
-						if (!verify(certificate,(Element)signatureNodeList.item(0),new ArrayList<>()))
+						if (!verify(certificate,(Element)signatureNodeList.item(0),Collections.emptyList()))
 							throw new ValidationException("Invalid Signature!");
 							validateSignatureReferences(requestMessage,responseMessage);
 					}

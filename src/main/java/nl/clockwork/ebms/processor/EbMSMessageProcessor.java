@@ -16,7 +16,7 @@
 package nl.clockwork.ebms.processor;
 
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 
 import javax.xml.bind.JAXBException;
@@ -247,7 +247,7 @@ public class EbMSMessageProcessor
 					{
 						val responseMessageHeader = messageError.getMessageHeader();
 						val persistTime = ebMSDAO.getPersistTime(responseMessageHeader.getMessageData().getRefToMessageId());
-						ebMSDAO.insertMessage(timestamp,persistTime.orElse(null),messageErrorDocument.getMessage(),messageError,new ArrayList<>(),null);
+						ebMSDAO.insertMessage(timestamp,persistTime.orElse(null),messageErrorDocument.getMessage(),messageError,Collections.emptyList(),null);
 						if (ebMSDAO.updateMessage(
 								responseMessageHeader.getMessageData().getRefToMessageId(),
 								EbMSMessageStatus.SENDING,
@@ -268,7 +268,7 @@ public class EbMSMessageProcessor
 		catch (ValidationException e)
 		{
 			val persistTime = ebMSDAO.getPersistTime(messageError.getMessageHeader().getMessageData().getRefToMessageId());
-			ebMSDAO.insertMessage(timestamp,persistTime.orElse(null),messageErrorDocument.getMessage(),messageError,new ArrayList<>(),null);
+			ebMSDAO.insertMessage(timestamp,persistTime.orElse(null),messageErrorDocument.getMessage(),messageError,Collections.emptyList(),null);
 			log.warn("Unable to process MessageError " + messageError.getMessageHeader().getMessageData().getMessageId(),e);
 		}
 	}
@@ -297,7 +297,7 @@ public class EbMSMessageProcessor
 					{
 						val responseMessageHeader = acknowledgment.getMessageHeader();
 						val persistTime = ebMSDAO.getPersistTime(responseMessageHeader.getMessageData().getRefToMessageId());
-						ebMSDAO.insertMessage(timestamp,persistTime.orElse(null),acknowledgmentDocument.getMessage(),acknowledgment,new ArrayList<>(),null);
+						ebMSDAO.insertMessage(timestamp,persistTime.orElse(null),acknowledgmentDocument.getMessage(),acknowledgment,Collections.emptyList(),null);
 						if (ebMSDAO.updateMessage(
 								responseMessageHeader.getMessageData().getRefToMessageId(),
 								EbMSMessageStatus.SENDING,
@@ -318,7 +318,7 @@ public class EbMSMessageProcessor
 		catch (ValidatorException e)
 		{
 			val persistTime = ebMSDAO.getPersistTime(acknowledgment.getMessageHeader().getMessageData().getRefToMessageId());
-			ebMSDAO.insertMessage(timestamp,persistTime.orElse(null),acknowledgmentDocument.getMessage(),acknowledgment,new ArrayList<>(),null);
+			ebMSDAO.insertMessage(timestamp,persistTime.orElse(null),acknowledgmentDocument.getMessage(),acknowledgment,Collections.emptyList(),null);
 			log.warn("Unable to process Acknowledgment " + acknowledgment.getMessageHeader().getMessageData().getMessageId(),e);
 		}
 	}
@@ -431,7 +431,7 @@ public class EbMSMessageProcessor
 										.orElseThrow(() -> StreamUtils.illegalStateException("ReceiveDeliveryChannel",messageHeader.getCPAId(),toPartyId,messageHeader.getTo().getRole(),service,messageHeader.getAction()));
 								val persistTime = CPAUtils.getPersistTime(messageHeader.getMessageData().getTimestamp(),deliveryChannel);
 								ebMSDAO.insertMessage(timestamp,persistTime,messageDocument.getMessage(),message,message.getAttachments(),EbMSMessageStatus.RECEIVED);
-								ebMSDAO.insertMessage(timestamp,persistTime,acknowledgmentDocument.getMessage(),acknowledgment,new ArrayList<>(),null);
+								ebMSDAO.insertMessage(timestamp,persistTime,acknowledgmentDocument.getMessage(),acknowledgment,Collections.emptyList(),null);
 							}
 							{
 								val fromPartyId = new CacheablePartyId(acknowledgment.getMessageHeader().getFrom().getPartyId());
@@ -485,7 +485,7 @@ public class EbMSMessageProcessor
 										.orElse(null);
 								val persistTime = deliveryChannel != null ? CPAUtils.getPersistTime(timestamp,deliveryChannel) : null;
 								ebMSDAO.insertMessage(timestamp,persistTime,messageDocument.getMessage(),message,message.getAttachments(),EbMSMessageStatus.FAILED);
-								ebMSDAO.insertMessage(timestamp,persistTime,messageErrorDocument.getMessage(),messageError,new ArrayList<>(),null);
+								ebMSDAO.insertMessage(timestamp,persistTime,messageErrorDocument.getMessage(),messageError,Collections.emptyList(),null);
 							}
 							if (!messageValidator.isSyncReply(message))
 							{

@@ -16,10 +16,10 @@
 package nl.clockwork.ebms;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.xml.bind.JAXBException;
 import javax.xml.datatype.DatatypeConfigurationException;
@@ -206,8 +206,9 @@ public class EbMSMessageFactory
 			if (content.getDataSources() != null && content.getDataSources().size() > 0)
 			{
 				val manifest = EbMSMessageUtils.createManifest();
-				val attachments = new ArrayList<EbMSAttachment>();
-				content.getDataSources().forEach(ds -> attachments.add(createEbMSAttachment(manifest,ds)));
+				val attachments = content.getDataSources().stream()
+						.map(ds -> createEbMSAttachment(manifest,ds))
+						.collect(Collectors.toList());
 				builder.manifest(manifest);
 				builder.attachments(attachments);
 			}
@@ -237,8 +238,9 @@ public class EbMSMessageFactory
 			if (content.getDataSources() != null && content.getDataSources().size() > 0)
 			{
 				val manifest = EbMSMessageUtils.createManifest();
-				val attachments = new ArrayList<EbMSAttachment>();
-				content.getDataSources().forEach(ds -> attachments.add(createEbMSAttachmentMTOM(manifest,ds)));
+				val attachments = content.getDataSources().stream()
+						.map(ds -> createEbMSAttachmentMTOM(manifest,ds))
+						.collect(Collectors.toList());
 				builder.manifest(manifest);
 				builder.attachments(attachments);
 			}

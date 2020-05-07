@@ -61,7 +61,7 @@ public class EbMSAttachmentFactory
 
 	public static EbMSAttachment createEbMSAttachment(String filename, String contentId, String contentType, InputStream content) throws IOException
 	{
-		ByteArrayDataSource result = new ByteArrayDataSource(content,contentType);
+		val result = new ByteArrayDataSource(content,contentType);
 		if (!StringUtils.isEmpty(filename))
 			result.setName(filename);
 		return createEbMSAttachment(contentId,result);

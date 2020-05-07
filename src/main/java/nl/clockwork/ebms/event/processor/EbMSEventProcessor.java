@@ -302,7 +302,8 @@ public class EbMSEventProcessor implements Runnable
 			{
 				val timestamp = new GregorianCalendar();
 				val events = maxEvents > 0 ? eventManager.getEventsBefore(timestamp.getTime(),maxEvents) : eventManager.getEventsBefore(timestamp.getTime());
-				events.forEach(e -> futures.add(executorService.submit(new HandleEventTask(e))));
+				for (EbMSEvent event : events)
+					futures.add(executorService.submit(new HandleEventTask(event)));
 			}
 			catch (Exception e)
 			{

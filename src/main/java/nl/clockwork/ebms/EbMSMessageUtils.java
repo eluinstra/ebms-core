@@ -17,7 +17,7 @@ package nl.clockwork.ebms;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -75,7 +75,7 @@ public class EbMSMessageUtils
 {
 	public static EbMSBaseMessage getEbMSMessage(Document document) throws JAXBException, XPathExpressionException, ParserConfigurationException, SAXException, IOException
 	{
-		return getEbMSMessage(document,new ArrayList<>());
+		return getEbMSMessage(document,Collections.emptyList());
 	}
 
 	public static EbMSBaseMessage getEbMSMessage(EbMSDocument document) throws JAXBException, XPathExpressionException, ParserConfigurationException, SAXException, IOException
