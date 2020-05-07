@@ -165,4 +165,9 @@ public class MSSQLEbMSDAOImpl extends nl.clockwork.ebms.dao.MySQLEbMSDAOImpl
 			" order by ebms_message_event.time_stamp asc";
 	}
 
+	@Override
+	public String getTargetName()
+	{
+		return "MSSQLEbMSDAOImpl";
+	}
 }

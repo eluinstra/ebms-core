@@ -69,4 +69,10 @@ public class OracleEbMSDAOImpl extends AbstractEbMSDAO
 			" where ROWNUM <= " + maxNr;
 	}
 
+	@Override
+	public String getTargetName()
+	{
+		return "OracleEbMSDAOImpl";
+	}
+
 }

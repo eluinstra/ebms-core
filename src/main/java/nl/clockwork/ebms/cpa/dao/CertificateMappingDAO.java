@@ -30,4 +30,5 @@ public interface CertificateMappingDAO
 	void insertCertificateMapping(String id, CertificateMapping mapping) throws DAOException;
 	int updateCertificateMapping(String id, CertificateMapping mapping) throws DAOException;
 	int deleteCertificateMapping(String id) throws DAOException;
+	String getTargetName();
 }

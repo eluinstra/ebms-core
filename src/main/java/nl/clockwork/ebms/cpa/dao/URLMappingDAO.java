@@ -29,4 +29,5 @@ public interface URLMappingDAO
 	void insertURLMapping(URLMapping urlMapping) throws DAOException;
 	int updateURLMapping(URLMapping urlMapping) throws DAOException;
 	int deleteURLMapping(String source) throws DAOException;
+	String getTargetName();
 }

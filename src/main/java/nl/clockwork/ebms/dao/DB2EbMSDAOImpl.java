@@ -271,4 +271,9 @@ public class DB2EbMSDAOImpl extends nl.clockwork.ebms.dao.PostgreSQLEbMSDAOImpl
 			" fetch first " + maxNr + " rows only";
 	}
 
+	@Override
+	public String getTargetName()
+	{
+		return "DB2EbMSDAOImpl";
+	}
 }

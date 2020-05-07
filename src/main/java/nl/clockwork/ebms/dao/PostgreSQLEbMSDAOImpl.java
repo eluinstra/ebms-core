@@ -342,5 +342,11 @@ public class PostgreSQLEbMSDAOImpl extends AbstractEbMSDAO
 			" order by ebms_message_event.time_stamp asc" +
 			" limit " + maxNr;
 	}
+
+	@Override
+	public String getTargetName()
+	{
+		return "PostgreSQLEbMSDAOImpl";
+	}
 	
 }

@@ -30,4 +30,5 @@ public interface CPADAO
 	void insertCPA(CollaborationProtocolAgreement cpa) throws DAOException;
 	int updateCPA(CollaborationProtocolAgreement cpa) throws DAOException;
 	int deleteCPA(String cpaId) throws DAOException;
+	String getTargetName();
 }

@@ -66,4 +66,10 @@ public class HSQLDBEbMSDAOImpl extends AbstractEbMSDAO
 			" limit " + maxNr;
 	}
 
+	@Override
+	public String getTargetName()
+	{
+		return "HSQLDBEbMSDAOImpl";
+	}
+
 }

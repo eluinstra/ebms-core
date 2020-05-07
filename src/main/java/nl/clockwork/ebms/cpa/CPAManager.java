@@ -325,9 +325,10 @@ public class CPAManager
 
 	private void flushCPAMethodCache(String cpaId)
 	{
-		daoMethodCache.remove(MethodCacheInterceptor.getCacheKey("EbMSDAOImpl","existsCPA",cpaId));
-		daoMethodCache.remove(MethodCacheInterceptor.getCacheKey("EbMSDAOImpl","getCPA",cpaId));
-		daoMethodCache.remove(MethodCacheInterceptor.getCacheKey("EbMSDAOImpl","getCPAIds"));
+		//val targetName = cpaDAO.toString().replaceFirst("^(.*\\.)*([^@]*)@.*$","$2");
+		daoMethodCache.remove(MethodCacheInterceptor.getCacheKey(cpaDAO.getTargetName(),"existsCPA",cpaId));
+		daoMethodCache.remove(MethodCacheInterceptor.getCacheKey(cpaDAO.getTargetName(),"getCPA",cpaId));
+		daoMethodCache.remove(MethodCacheInterceptor.getCacheKey(cpaDAO.getTargetName(),"getCPAIds"));
 		cpaMethodCache.removeAll();
 	}
 }

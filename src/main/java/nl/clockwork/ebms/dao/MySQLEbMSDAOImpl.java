@@ -339,4 +339,10 @@ public class MySQLEbMSDAOImpl extends AbstractEbMSDAO
 			" limit " + maxNr;
 	}
 
+	@Override
+	public String getTargetName()
+	{
+		return "MySQLEbMSDAOImpl";
+	}
+
 }

@@ -96,8 +96,9 @@ public class URLMapper
 
 	private void flushDAOMethodCache(String source)
 	{
-		daoMethodCache.remove(MethodCacheInterceptor.getCacheKey("EbMSDAOImpl","existsURLMapping",source));
-		daoMethodCache.remove(MethodCacheInterceptor.getCacheKey("EbMSDAOImpl","getURLMapping",source));
-		daoMethodCache.remove(MethodCacheInterceptor.getCacheKey("EbMSDAOImpl","getURLMappings"));
+		//val targetName = urlMappingDAO.toString().replaceFirst("^(.*\\.)*([^@]*)@.*$","$2");
+		daoMethodCache.remove(MethodCacheInterceptor.getCacheKey(urlMappingDAO.getTargetName(),"existsURLMapping",source));
+		daoMethodCache.remove(MethodCacheInterceptor.getCacheKey(urlMappingDAO.getTargetName(),"getURLMapping",source));
+		daoMethodCache.remove(MethodCacheInterceptor.getCacheKey(urlMappingDAO.getTargetName(),"getURLMappings"));
 	}
 }
