@@ -190,13 +190,13 @@ public class EncryptionTest
 
 	private EbMSMessageEncrypter initMessageEncrypter(CPAManager cpaManager) throws Exception
 	{
-		val trustStore = new EbMSTrustStore(keyStoreType,keyStorePath,keyStorePassword);
+		val trustStore = EbMSTrustStore.of(keyStoreType,keyStorePath,keyStorePassword);
 		return new EbMSMessageEncrypter(cpaManager,trustStore);
 	}
 
 	private EbMSMessageDecrypter initMessageDecrypter(CPAManager cpaManager) throws Exception
 	{
-		val keyStore = new EbMSKeyStore(keyStoreType,keyStorePath,keyStorePassword,keyStorePassword);
+		val keyStore = EbMSKeyStore.of(keyStoreType,keyStorePath,keyStorePassword,keyStorePassword);
 		return new EbMSMessageDecrypter(cpaManager,keyStore);
 	}
 

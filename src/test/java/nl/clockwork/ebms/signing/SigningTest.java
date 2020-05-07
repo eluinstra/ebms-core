@@ -172,12 +172,12 @@ public class SigningTest
 
 	private EbMSSignatureGenerator initSignatureGenerator(CPAManager cpaManager) throws Exception
 	{
-		return new EbMSSignatureGenerator(cpaManager,new EbMSKeyStore(keyStoreType,keyStorePath,keyStorePassword,keyStorePassword));
+		return new EbMSSignatureGenerator(cpaManager,EbMSKeyStore.of(keyStoreType,keyStorePath,keyStorePassword,keyStorePassword));
 	}
 
 	private EbMSSignatureValidator initSignatureValidator(CPAManager cpaManager) throws Exception
 	{
-		val trustStore = new EbMSTrustStore(keyStoreType,keyStorePath,keyStorePassword);
+		val trustStore = EbMSTrustStore.of(keyStoreType,keyStorePath,keyStorePassword);
 		return new EbMSSignatureValidator(cpaManager,trustStore);
 	}
 
