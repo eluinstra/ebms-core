@@ -51,4 +51,10 @@ public enum EbMSAction
 	{
 		return EBMS_SERVICE_URI;
 	}
+
+	@Override
+	public String toString()
+	{
+		return action;
+	}
 }

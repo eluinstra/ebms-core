@@ -18,8 +18,6 @@ package nl.clockwork.ebms.processor;
 import java.util.ArrayList;
 import java.util.Date;
 
-import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.Service;
-
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -57,14 +55,6 @@ public class DuplicateMessageHandler
 	EbMSMessageValidator messageValidator;
 	boolean storeDuplicateMessage;
 	boolean storeDuplicateMessageAttachments;
-	Service mshMessageService = createMSHMessageService();
-
-	private Service createMSHMessageService()
-	{
-		val result = new Service();
-		result.setValue(EbMSAction.EBMS_SERVICE_URI);
-		return result;
-	}
 
 	public EbMSDocument handleMessage(final Date timestamp, EbMSDocument document, final EbMSMessage message) throws EbMSProcessingException
 	{
@@ -79,9 +69,8 @@ public class DuplicateMessageHandler
 				val result = ebMSDAO.getEbMSDocumentByRefToMessageId(
 						messageHeader.getCPAId(),
 						messageHeader.getMessageData().getMessageId(),
-						mshMessageService,
-						EbMSAction.MESSAGE_ERROR.getAction(),
-						EbMSAction.ACKNOWLEDGMENT.getAction());
+						EbMSAction.MESSAGE_ERROR,
+						EbMSAction.ACKNOWLEDGMENT);
 				StreamUtils.ifNotPresent(result, () -> log.warn("No response found for duplicate message " + messageHeader.getMessageData().getMessageId() + "!"));
 				return result.orElse(null);
 			}
@@ -92,8 +81,8 @@ public class DuplicateMessageHandler
 				val context = ebMSDAO.getMessageContextByRefToMessageId(
 						messageHeader.getCPAId(),
 						messageHeader.getMessageData().getMessageId(),
-						mshMessageService,EbMSAction.MESSAGE_ERROR.getAction(),
-						EbMSAction.ACKNOWLEDGMENT.getAction());
+						EbMSAction.MESSAGE_ERROR,
+						EbMSAction.ACKNOWLEDGMENT);
 				val toPartyId = new CacheablePartyId(messageHeader.getTo().getPartyId());
 				val fromPartyId = new CacheablePartyId(messageHeader.getFrom().getPartyId());
 				val service = CPAUtils.toString(CPAUtils.createEbMSMessageService());

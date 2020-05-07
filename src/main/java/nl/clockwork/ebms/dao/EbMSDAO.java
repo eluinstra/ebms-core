@@ -19,9 +19,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
-import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.Service;
 import org.w3c.dom.Document;
 
+import nl.clockwork.ebms.EbMSAction;
 import nl.clockwork.ebms.EbMSMessageStatus;
 import nl.clockwork.ebms.model.EbMSAttachment;
 import nl.clockwork.ebms.model.EbMSBaseMessage;
@@ -40,10 +40,10 @@ public interface EbMSDAO
 	Optional<EbMSMessageContent> getMessageContent(String messageId) throws DAOException;
 	Optional<EbMSMessageContentMTOM> getMessageContentMTOM(String messageId) throws DAOException;
 	Optional<EbMSMessageContext> getMessageContext(String messageId) throws DAOException;
-	Optional<EbMSMessageContext> getMessageContextByRefToMessageId(String cpaId, String refToMessageId, Service service, String...actions) throws DAOException;
+	Optional<EbMSMessageContext> getMessageContextByRefToMessageId(String cpaId, String refToMessageId, EbMSAction...actions) throws DAOException;
 	Optional<Document> getDocument(String messageId) throws DAOException;
 	Optional<EbMSDocument> getEbMSDocumentIfUnsent(String messageId) throws DAOException;
-	Optional<EbMSDocument> getEbMSDocumentByRefToMessageId(String cpaId, String refToMessageId, Service service, String...actions) throws DAOException;
+	Optional<EbMSDocument> getEbMSDocumentByRefToMessageId(String cpaId, String refToMessageId, EbMSAction...actions) throws DAOException;
 	Optional<EbMSMessageStatus> getMessageStatus(String messageId) throws DAOException;
 	Optional<Date> getPersistTime(String messageId);
 
