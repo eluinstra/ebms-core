@@ -50,10 +50,10 @@ public class JMSEventListener extends LoggingEventListener
 		{
 			val result = session.createMessage();
 			result.setStringProperty("cpaId",messageContext.getCpaId());
-			result.setStringProperty("fromPartyId",messageContext.getFromRole().getPartyId());
-			result.setStringProperty("fromRole",messageContext.getFromRole().getRole());
-			result.setStringProperty("toPartyId",messageContext.getToRole().getPartyId());
-			result.setStringProperty("toRole",messageContext.getToRole().getRole());
+			result.setStringProperty("fromPartyId",messageContext.getFromParty().getPartyId());
+			result.setStringProperty("fromRole",messageContext.getFromParty().getRole());
+			result.setStringProperty("toPartyId",messageContext.getToParty().getPartyId());
+			result.setStringProperty("toRole",messageContext.getToParty().getRole());
 			result.setStringProperty("service",messageContext.getService());
 			result.setStringProperty("action",messageContext.getAction());
 			result.setStringProperty("conversationId",messageContext.getConversationId());

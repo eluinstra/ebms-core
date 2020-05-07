@@ -43,9 +43,9 @@ public class EbMSMessageContext implements Serializable
 	@NonNull
 	String cpaId;
 	@NonNull
-	Role fromRole;
+	Party fromParty;
 	@XmlElement
-	Role toRole;
+	Party toParty;
 	//@NonNull
 	String service;
 	//@NonNull

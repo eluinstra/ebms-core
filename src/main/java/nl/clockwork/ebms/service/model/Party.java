@@ -28,8 +28,6 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import nl.clockwork.ebms.cpa.CPAUtils;
 
@@ -38,22 +36,22 @@ import nl.clockwork.ebms.cpa.CPAUtils;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @NoArgsConstructor
 @AllArgsConstructor
-@RequiredArgsConstructor
+//@RequiredArgsConstructor
 public class Party implements Serializable
 {
 	private static final long serialVersionUID = 1L;
 	@XmlElement(required=true)
-	@NonNull
+	//@NonNull
 	String partyId;
 	@XmlElement
 	String role;
-	
+
 	@Override
 	public String toString()
 	{
 		return new StringBuffer().append(partyId).append(":").append(role).toString();
 	}
-	
+
 	public PartyId getPartyId(List<PartyId> partyIds)
 	{
 		if (getPartyId() == null || partyIds == null)
@@ -69,5 +67,9 @@ public class Party implements Serializable
 			return false;
 		return partyIds.stream().anyMatch(id -> getPartyId().equals(CPAUtils.toString(id)));
 	}
-
+	
+	public boolean matches(org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.Role role)
+	{
+		return getRole().equals(role.getName());
+	}
 }

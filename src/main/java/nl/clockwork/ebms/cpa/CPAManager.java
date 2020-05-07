@@ -41,7 +41,6 @@ import nl.clockwork.ebms.model.EbMSPartyInfo;
 import nl.clockwork.ebms.model.FromPartyInfo;
 import nl.clockwork.ebms.model.ToPartyInfo;
 import nl.clockwork.ebms.service.model.Party;
-import nl.clockwork.ebms.service.model.Role;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor
@@ -101,32 +100,31 @@ public class CPAManager
 				.orElse(false);
 	}
 
-	public boolean existsParty(String cpaId, Party party)
+	public boolean existsPartyId(String cpaId, String partyId)
 	{
 		return getCPA(cpaId)
 				.map(c -> c.getPartyInfo().stream()
-						.filter(p -> party.matches(p.getPartyId()))
-						.flatMap(p -> p.getCollaborationRole().stream())
-						.anyMatch(r -> party.getRole() == null || party.getRole().equals(r.getRole().getName())))
+						.flatMap(p -> p.getPartyId().stream())
+						.anyMatch(id -> partyId.equals(CPAUtils.toString(id))))
 				.orElse(false);
 	}
 
-	public Optional<EbMSPartyInfo> getEbMSPartyInfo(String cpaId, Party party)
+	public Optional<EbMSPartyInfo> getEbMSPartyInfo(String cpaId, String partyId)
 	{
 		return getCPA(cpaId)
 				.map(c -> c.getPartyInfo().stream()
-						.filter(p -> party.matches(p.getPartyId()))
-						.filter(p -> p.getCollaborationRole().stream().anyMatch(r -> party.getRole() == null || party.getRole().equals(r.getRole().getName())))
-						.map(p -> createEbMSPartyInfo(party,p))
+						.filter(p -> p.getPartyId().stream()
+								.anyMatch(id -> partyId.equals(CPAUtils.toString(id))))
+						.map(p -> createEbMSPartyInfo(partyId,p))
 						.findFirst()
 						.orElse(null));
 	}
 
-	private EbMSPartyInfo createEbMSPartyInfo(Party party, PartyInfo partyInfo)
+	private EbMSPartyInfo createEbMSPartyInfo(String partyId, PartyInfo partyInfo)
 	{
 		val result = new EbMSPartyInfo();
-		result.setPartyIds(CPAUtils.toPartyId(party.getPartyId(partyInfo.getPartyId())));
-		result.setRole(party.getRole());
+		result.setPartyIds(CPAUtils.toPartyId(partyInfo.getPartyId().stream()
+				.filter(id -> partyId.equals(CPAUtils.toString(id))).findFirst().orElse(null)));
 		return result;
 	}
 
@@ -139,41 +137,23 @@ public class CPAManager
 						.orElse(null));
 	}
 	
-	public Optional<Party> getFromParty(String cpaId, Role fromRole, String service, String action)
-	{
-		val partyId = fromRole.getPartyId() == null ? CPAUtils.toString(getFromPartyInfo(cpaId,fromRole,service,action)
-				.orElseThrow(() -> StreamUtils.illegalStateException("FromPartyInfo",cpaId,fromRole,service,action)).getPartyIds().get(0)) :
-					fromRole.getPartyId();
-		return Optional.of(partyId)
-			.map(id -> new Party(id,fromRole.getRole()));
-	}
-	
-	public Optional<Party> getToParty(String cpaId, Role toRole, String service, String action)
-	{
-		val partyId = toRole.getPartyId() == null ? CPAUtils.toString(getToPartyInfo(cpaId,toRole,service,action)
-				.orElseThrow(() -> StreamUtils.illegalStateException("ToPartyInfo",cpaId,toRole,service,action)).getPartyIds().get(0)) :
-					toRole.getPartyId();
-		return Optional.of(partyId)
-				.map(id -> new Party(id,toRole.getRole()));
-	}
-	
-	public Optional<FromPartyInfo> getFromPartyInfo(String cpaId, Role fromRole, String service, String action)
+	public Optional<FromPartyInfo> getFromPartyInfo(String cpaId, Party fromParty, String service, String action)
 	{
 		return getCPA(cpaId)
 				.map(c -> c.getPartyInfo().stream()
-						.filter(p -> fromRole == null || fromRole.matches(p.getPartyId()))
+						.filter(p -> fromParty == null || fromParty.matches(p.getPartyId()))
 						.flatMap(p -> p.getCollaborationRole().stream()
-								.filter(r -> fromRole == null || fromRole.matches(r.getRole()) && service.equals(CPAUtils.toString(r.getServiceBinding().getService())))
+								.filter(r -> fromParty == null || fromParty.matches(r.getRole()) && service.equals(CPAUtils.toString(r.getServiceBinding().getService())))
 								.flatMap(r -> r.getServiceBinding().getCanSend().stream()
 										.filter(cs -> action.equals(cs.getThisPartyActionBinding().getAction()))
-										.map(cs -> CPAUtils.getFromPartyInfo(fromRole == null ? p.getPartyId().get(0) : fromRole.getPartyId(p.getPartyId()),r,cs))))
+										.map(cs -> CPAUtils.getFromPartyInfo(fromParty == null ? p.getPartyId().get(0) : fromParty.getPartyId(p.getPartyId()),r,cs))))
 						.findFirst()
 						.orElse(null));
 	}
 
-	public Optional<ToPartyInfo> getToPartyInfoByFromPartyActionBinding(String cpaId, Role fromRole, String service, String action)
+	public Optional<ToPartyInfo> getToPartyInfoByFromPartyActionBinding(String cpaId, Party fromParty, String service, String action)
 	{
-		return getFromPartyInfo(cpaId,fromRole,service,action)
+		return getFromPartyInfo(cpaId,fromParty,service,action)
 				.map(fpi -> getCPA(cpaId)
 					.map(c -> c.getPartyInfo().stream()
 							.flatMap(p -> p.getCollaborationRole().stream()
@@ -185,16 +165,16 @@ public class CPAManager
 					.orElse(null));
 	}
 
-	public Optional<ToPartyInfo> getToPartyInfo(String cpaId, Role toRole, String service, String action)
+	public Optional<ToPartyInfo> getToPartyInfo(String cpaId, Party toParty, String service, String action)
 	{
 		return getCPA(cpaId)
 				.map(c -> c.getPartyInfo().stream()
-						.filter(p -> toRole == null || toRole.matches(p.getPartyId()))
+						.filter(p -> toParty == null || toParty.matches(p.getPartyId()))
 						.flatMap(p -> p.getCollaborationRole().stream()
-								.filter(r -> toRole == null || toRole.matches(r.getRole()) && service.equals(CPAUtils.toString(r.getServiceBinding().getService())))
+								.filter(r -> toParty == null || toParty.matches(r.getRole()) && service.equals(CPAUtils.toString(r.getServiceBinding().getService())))
 								.flatMap(r -> r.getServiceBinding().getCanReceive().stream()
 									.filter(cr -> action.equals(cr.getThisPartyActionBinding().getAction()))
-									.map(cr -> CPAUtils.getToPartyInfo(toRole == null ? p.getPartyId().get(0) : toRole.getPartyId(p.getPartyId()),r,cr))))
+									.map(cr -> CPAUtils.getToPartyInfo(toParty == null ? p.getPartyId().get(0) : toParty.getPartyId(p.getPartyId()),r,cr))))
 						.findFirst()
 						.orElse(null));
 	}

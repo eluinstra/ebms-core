@@ -66,7 +66,7 @@ import nl.clockwork.ebms.security.KeyStoreType;
 import nl.clockwork.ebms.service.model.EbMSDataSource;
 import nl.clockwork.ebms.service.model.EbMSMessageContent;
 import nl.clockwork.ebms.service.model.EbMSMessageContext;
-import nl.clockwork.ebms.service.model.Role;
+import nl.clockwork.ebms.service.model.Party;
 import nl.clockwork.ebms.validation.EbMSValidationException;
 import nl.clockwork.ebms.validation.ValidatorException;
 
@@ -221,8 +221,8 @@ public class EncryptionTest
 	{
 		return EbMSMessageContext.builder()
 				.cpaId(cpaId)
-				.fromRole(new Role("urn:osb:oin:00000000000000000000","DIGIPOORT"))
-				.toRole(new Role("urn:osb:oin:00000000000000000001","OVERHEID"))
+				.fromParty(new Party("urn:osb:oin:00000000000000000000","DIGIPOORT"))
+				.toParty(new Party("urn:osb:oin:00000000000000000001","OVERHEID"))
 				.service("urn:osb:services:osb:afleveren:1.1$1.0")
 				.action("afleveren")
 				.build();

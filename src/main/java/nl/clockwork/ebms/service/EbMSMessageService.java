@@ -29,7 +29,6 @@ import nl.clockwork.ebms.service.model.EbMSMessageContent;
 import nl.clockwork.ebms.service.model.EbMSMessageContext;
 import nl.clockwork.ebms.service.model.EbMSMessageEvent;
 import nl.clockwork.ebms.service.model.MessageStatus;
-import nl.clockwork.ebms.service.model.Party;
 
 @SuppressWarnings("deprecation")
 @WebService(targetNamespace="http://www.ordina.nl/ebms/2.17")
@@ -39,12 +38,12 @@ public interface EbMSMessageService
 	 * Performs an EbMS ping action for CPA cpaId, from party fromParty and to party toParty
 	 * 
 	 * @param cpaId
-	 * @param fromParty
-	 * @param toParty
+	 * @param fromPartyId
+	 * @param toPartyId
 	 * @throws EbMSMessageServiceException
 	 */
 	@WebMethod(operationName="Ping")
-	void ping(@WebParam(name="CPAId") @XmlElement(required=true) String cpaId, @WebParam(name="FromParty") @XmlElement(required=true) Party fromParty, @WebParam(name="ToParty") @XmlElement(required=true) Party toParty) throws EbMSMessageServiceException;
+	void ping(@WebParam(name="CPAId") @XmlElement(required=true) String cpaId, @WebParam(name="FromPartyId") @XmlElement(required=true) String fromPartyId, @WebParam(name="ToPartyId") @XmlElement(required=true) String toPartyId) throws EbMSMessageServiceException;
 
 	/**
 	 * Sends the message content messageContent as an EbMS message

@@ -59,7 +59,6 @@ import nl.clockwork.ebms.service.model.EbMSMessageContent;
 import nl.clockwork.ebms.service.model.EbMSMessageContext;
 import nl.clockwork.ebms.service.model.EbMSMessageEvent;
 import nl.clockwork.ebms.service.model.MessageStatus;
-import nl.clockwork.ebms.service.model.Party;
 import nl.clockwork.ebms.signing.EbMSSignatureGenerator;
 import nl.clockwork.ebms.validation.EbMSMessageContextValidator;
 import nl.clockwork.ebms.validation.ValidationException;
@@ -91,12 +90,12 @@ public class EbMSMessageServiceImpl implements EbMSMessageService
 	boolean deleteEbMSAttachmentsOnMessageProcessed;
 
 	@Override
-	public void ping(String cpaId, Party fromParty, Party toParty) throws EbMSMessageServiceException
+	public void ping(String cpaId, String fromPartyId, String toPartyId) throws EbMSMessageServiceException
 	{
 		try
 		{
-			ebMSMessageContextValidator.validate(cpaId,fromParty,toParty);
-			val request = ebMSMessageFactory.createEbMSPing(cpaId,fromParty,toParty);
+			ebMSMessageContextValidator.validate(cpaId,fromPartyId,toPartyId);
+			val request = ebMSMessageFactory.createEbMSPing(cpaId,fromPartyId,toPartyId);
 			val response = deliveryManager.sendMessage(request);
 			if (response.isPresent())
 			{
@@ -243,7 +242,9 @@ public class EbMSMessageServiceImpl implements EbMSMessageService
 	{
 		try
 		{
-			return ebMSDAO.getMessageContext(messageId).map(mc -> getMessageStatus(messageId,mc)).orElseThrow(() -> new EbMSMessageServiceException("No message found with messageId " + messageId + "!"));
+			return ebMSDAO.getMessageContext(messageId)
+					.map(mc -> getMessageStatus(messageId,mc))
+					.orElseThrow(() -> new EbMSMessageServiceException("No message found with messageId " + messageId + "!"));
 		}
 		catch (EbMSProcessorException e)
 		{
@@ -257,9 +258,9 @@ public class EbMSMessageServiceImpl implements EbMSMessageService
 			throw new EbMSMessageServiceException("Message with messageId " + messageId + " is an EbMS service message!");
 		else
 		{
-			val fromParty = cpaManager.getFromParty(messageContext.getCpaId(),messageContext.getFromRole(),messageContext.getService(),messageContext.getAction()).orElseThrow(() -> StreamUtils.illegalStateException("FromParty",messageContext.getCpaId(),messageContext.getFromRole(),messageContext.getService(),messageContext.getAction()));
-			val toParty = cpaManager.getToParty(messageContext.getCpaId(),messageContext.getToRole(),messageContext.getService(),messageContext.getAction()).orElseThrow(() -> StreamUtils.illegalStateException("ToParty",messageContext.getCpaId(),messageContext.getToRole(),messageContext.getService(),messageContext.getAction()));
-			val request = ebMSMessageFactory.createEbMSStatusRequest(messageContext.getCpaId(),fromParty,toParty,messageId);
+			val fromPartyId = messageContext.getFromParty().getPartyId();
+			val toPartyId = messageContext.getToParty().getPartyId();
+			val request = ebMSMessageFactory.createEbMSStatusRequest(messageContext.getCpaId(),fromPartyId,toPartyId,messageId);
 			val response = deliveryManager.sendMessage(request);
 			return response.map(r -> (createMessageStatus(r))).orElseThrow(() -> new EbMSMessageServiceException("No response received!"));
 		}

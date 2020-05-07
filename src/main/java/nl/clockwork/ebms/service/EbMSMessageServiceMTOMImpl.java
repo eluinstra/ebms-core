@@ -38,7 +38,6 @@ import nl.clockwork.ebms.service.model.EbMSMessageContentMTOM;
 import nl.clockwork.ebms.service.model.EbMSMessageContext;
 import nl.clockwork.ebms.service.model.EbMSMessageEvent;
 import nl.clockwork.ebms.service.model.MessageStatus;
-import nl.clockwork.ebms.service.model.Party;
 import nl.clockwork.ebms.validation.ValidatorException;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -48,9 +47,9 @@ public class EbMSMessageServiceMTOMImpl implements EbMSMessageServiceMTOM
 	EbMSMessageServiceImpl ebMSMessageService;
 
 	@Override
-	public void ping(String cpaId, Party fromParty, Party toParty) throws EbMSMessageServiceException
+	public void ping(String cpaId, String fromPartyId, String toPartyId) throws EbMSMessageServiceException
 	{
-		ebMSMessageService.ping(cpaId,fromParty,toParty);
+		ebMSMessageService.ping(cpaId,fromPartyId,toPartyId);
 	}
 
 	@Override

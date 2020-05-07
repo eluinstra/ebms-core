@@ -87,7 +87,7 @@ import nl.clockwork.ebms.service.model.EbMSMessageContent;
 import nl.clockwork.ebms.service.model.EbMSMessageContentMTOM;
 import nl.clockwork.ebms.service.model.EbMSMessageContext;
 import nl.clockwork.ebms.service.model.EbMSMessageEvent;
-import nl.clockwork.ebms.service.model.Role;
+import nl.clockwork.ebms.service.model.Party;
 import nl.clockwork.ebms.service.model.URLMapping;
 
 @FieldDefaults(level = AccessLevel.PROTECTED, makeFinal = true)
@@ -643,8 +643,8 @@ public abstract class AbstractEbMSDAO implements EbMSDAO, CPADAO, URLMappingDAO,
 					{
 						return EbMSMessageContext.builder()
 								.cpaId(rs.getString("cpa_id"))
-								.fromRole(new Role(rs.getString("from_party_id"),rs.getString("from_role")))
-								.toRole(new Role(rs.getString("to_party_id"),rs.getString("to_role")))
+								.fromParty(new Party(rs.getString("from_party_id"),rs.getString("from_role")))
+								.toParty(new Party(rs.getString("to_party_id"),rs.getString("to_role")))
 								.service(rs.getString("service"))
 								.action(rs.getString("action"))
 								.timestamp(rs.getTimestamp("time_stamp"))
@@ -700,8 +700,8 @@ public abstract class AbstractEbMSDAO implements EbMSDAO, CPADAO, URLMappingDAO,
 					{
 						return EbMSMessageContext.builder()
 								.cpaId(rs.getString("cpa_id"))
-								.fromRole(new Role(rs.getString("from_party_id"),rs.getString("from_role")))
-								.toRole(new Role(rs.getString("to_party_id"),rs.getString("to_role")))
+								.fromParty(new Party(rs.getString("from_party_id"),rs.getString("from_role")))
+								.toParty(new Party(rs.getString("to_party_id"),rs.getString("to_role")))
 								.service(rs.getString("service"))
 								.action(rs.getString("action"))
 								.timestamp(rs.getTimestamp("time_stamp"))
@@ -1514,29 +1514,29 @@ public abstract class AbstractEbMSDAO implements EbMSDAO, CPADAO, URLMappingDAO,
 				parameters.add(messageContext.getCpaId());
 				result.append(" and ebms_message.cpa_id = ?");
 			}
-			if (messageContext.getFromRole() != null)
+			if (messageContext.getFromParty() != null)
 			{
-				if (messageContext.getFromRole().getPartyId() != null)
+				if (messageContext.getFromParty().getPartyId() != null)
 				{
-					parameters.add(messageContext.getFromRole().getPartyId());
+					parameters.add(messageContext.getFromParty().getPartyId());
 					result.append(" and ebms_message.from_party_id = ?");
 				}
-				if (messageContext.getFromRole().getRole() != null)
+				if (messageContext.getFromParty().getRole() != null)
 				{
-					parameters.add(messageContext.getFromRole().getRole());
+					parameters.add(messageContext.getFromParty().getRole());
 					result.append(" and ebms_message.from_role = ?");
 				}
 			}
-			if (messageContext.getToRole() != null)
+			if (messageContext.getToParty() != null)
 			{
-				if (messageContext.getToRole().getPartyId() != null)
+				if (messageContext.getToParty().getPartyId() != null)
 				{
-					parameters.add(messageContext.getToRole().getPartyId());
+					parameters.add(messageContext.getToParty().getPartyId());
 					result.append(" and ebms_message.to_party_id = ?");
 				}
-				if (messageContext.getToRole().getRole() != null)
+				if (messageContext.getToParty().getRole() != null)
 				{
-					parameters.add(messageContext.getToRole().getRole());
+					parameters.add(messageContext.getToParty().getRole());
 					result.append(" and ebms_message.to_role = ?");
 				}
 			}
