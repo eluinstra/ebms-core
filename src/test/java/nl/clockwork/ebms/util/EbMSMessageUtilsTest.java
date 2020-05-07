@@ -35,7 +35,6 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestInstance.Lifecycle;
@@ -60,7 +59,6 @@ import nl.clockwork.ebms.EbMSAttachmentFactory;
 import nl.clockwork.ebms.EbMSErrorCode;
 import nl.clockwork.ebms.EbMSMessageStatus;
 import nl.clockwork.ebms.EbMSMessageUtils;
-import nl.clockwork.ebms.EbMSAttachmentFactory.DefaultEbMSAttachmentFactory;
 import nl.clockwork.ebms.model.EbMSAcknowledgment;
 import nl.clockwork.ebms.model.EbMSDocument;
 import nl.clockwork.ebms.model.EbMSMessage;
@@ -71,12 +69,6 @@ import nl.clockwork.ebms.model.EbMSStatusResponse;
 @TestInstance(value = Lifecycle.PER_CLASS)
 public class EbMSMessageUtilsTest
 {
-	@BeforeAll
-	public void init() throws Exception
-	{
-		EbMSAttachmentFactory.setInstance(DefaultEbMSAttachmentFactory.builder().build());
-	}
-
 	@Test
 	public void partyIdToString()
 	{

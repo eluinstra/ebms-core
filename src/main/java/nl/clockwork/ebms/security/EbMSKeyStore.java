@@ -24,6 +24,8 @@ import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import lombok.NonNull;
 import lombok.Value;
@@ -31,6 +33,7 @@ import lombok.Value;
 @Value
 public class EbMSKeyStore
 {
+	private static Map<String,EbMSKeyStore> keyStores = new ConcurrentHashMap<>();
 	@NonNull
 	String path;
 	@NonNull
@@ -39,12 +42,21 @@ public class EbMSKeyStore
 	String keyPassword;
 	String defaultAlias;
 
-	public EbMSKeyStore(@NonNull KeyStoreType type, @NonNull String path, @NonNull String password, @NonNull String keyPassword) throws GeneralSecurityException, IOException
+	public static EbMSKeyStore of(@NonNull KeyStoreType type, @NonNull String path, @NonNull String password, @NonNull String keyPassword) throws GeneralSecurityException, IOException
 	{
-		this(type,path,password,keyPassword,null);
+		if (!keyStores.containsKey(path))
+			keyStores.put(path,new EbMSKeyStore(type,path,password,keyPassword,null));
+		return keyStores.get(path);
 	}
 
-	public EbMSKeyStore(@NonNull KeyStoreType type, @NonNull String path, @NonNull String password, @NonNull String keyPassword, String defaultAlias) throws GeneralSecurityException, IOException
+	public static EbMSKeyStore of(@NonNull KeyStoreType type, @NonNull String path, @NonNull String password, @NonNull String keyPassword, String defaultAlias) throws GeneralSecurityException, IOException
+	{
+		if (!keyStores.containsKey(path))
+			keyStores.put(path,new EbMSKeyStore(type,path,password,keyPassword,defaultAlias));
+		return keyStores.get(path);
+	}
+
+	private EbMSKeyStore(@NonNull KeyStoreType type, @NonNull String path, @NonNull String password, @NonNull String keyPassword, String defaultAlias) throws GeneralSecurityException, IOException
 	{
 		this.path = path;
 		this.keyPassword = keyPassword;

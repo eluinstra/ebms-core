@@ -22,6 +22,8 @@ import java.security.KeyStoreException;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import java.util.Enumeration;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import lombok.NonNull;
 import lombok.Value;
@@ -29,14 +31,22 @@ import lombok.Value;
 @Value
 public class EbMSTrustStore
 {
+	private static Map<String,EbMSTrustStore> trustStores = new ConcurrentHashMap<>();
 	@NonNull
 	KeyStore keyStore;
 
-	public EbMSTrustStore(@NonNull KeyStoreType type, @NonNull String path, @NonNull String password) throws GeneralSecurityException, IOException
+	public static EbMSTrustStore of(KeyStoreType type, String path, String password) throws GeneralSecurityException, IOException
+	{
+		if (!trustStores.containsKey(path))
+			trustStores.put(path,new EbMSTrustStore(type,path,password));
+		return trustStores.get(path);
+	}
+	
+	private EbMSTrustStore(@NonNull KeyStoreType type, @NonNull String path, @NonNull String password) throws GeneralSecurityException, IOException
 	{
 		this.keyStore = KeyStoreUtils.loadKeyStore(type,path,password);
 	}
-	
+
 	public Enumeration<String> aliases() throws KeyStoreException
 	{
 		return keyStore.aliases();

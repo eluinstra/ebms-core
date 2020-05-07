@@ -49,7 +49,6 @@ import net.sf.ehcache.Ehcache;
 import nl.clockwork.ebms.EbMSAttachmentFactory;
 import nl.clockwork.ebms.EbMSIdGenerator;
 import nl.clockwork.ebms.EbMSMessageFactory;
-import nl.clockwork.ebms.EbMSAttachmentFactory.DefaultEbMSAttachmentFactory;
 import nl.clockwork.ebms.common.JAXBParser;
 import nl.clockwork.ebms.common.util.DOMUtils;
 import nl.clockwork.ebms.cpa.CPAManager;
@@ -90,7 +89,6 @@ public class EncryptionTest
 	{
 		MockitoAnnotations.initMocks(this);
 		Init.init();
-		EbMSAttachmentFactory.setInstance(DefaultEbMSAttachmentFactory.builder().build());
 		cpaManager = initCPAManager();
 		messageFactory = initMessageFactory(cpaManager);
 		messageEncrypter = initMessageEncrypter(cpaManager);

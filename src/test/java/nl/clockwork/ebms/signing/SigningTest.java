@@ -51,7 +51,6 @@ import nl.clockwork.ebms.EbMSAttachmentFactory;
 import nl.clockwork.ebms.EbMSIdGenerator;
 import nl.clockwork.ebms.EbMSMessageFactory;
 import nl.clockwork.ebms.EbMSMessageUtils;
-import nl.clockwork.ebms.EbMSAttachmentFactory.DefaultEbMSAttachmentFactory;
 import nl.clockwork.ebms.common.JAXBParser;
 import nl.clockwork.ebms.cpa.CPAManager;
 import nl.clockwork.ebms.cpa.URLMapper;
@@ -92,7 +91,6 @@ public class SigningTest
 	{
 		MockitoAnnotations.initMocks(this);
 		Init.init();
-		EbMSAttachmentFactory.setInstance(DefaultEbMSAttachmentFactory.builder().build());
 		cpaManager = initCPAManager();
 		messageFactory = initMessageFactory(cpaManager);
 		signatureGenerator = initSignatureGenerator(cpaManager);

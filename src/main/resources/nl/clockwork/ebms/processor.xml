@@ -20,20 +20,20 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd"
 >
-	<bean id="xmlSecurityInit" class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+	<bean class="org.springframework.beans.factory.config.MethodInvokingBean">
 		<property name="staticMethod" value="org.apache.xml.security.Init.init" />
 	</bean>
 
-	<bean class="nl.clockwork.ebms.EbMSAttachmentFactory">
-		<property name="instance">
-			<bean class="nl.clockwork.ebms.EbMSAttachmentFactory$DefaultEbMSAttachmentFactory">
-				<constructor-arg name="attachmentMemoryTreshold" value="${ebmsMessage.attachment.memoryTreshold}" />
-				<constructor-arg name="attachmentOutputDirectory" value="${ebmsMessage.attachment.outputDirectory}" />
-				<constructor-arg name="attachmentCipherTransformation" value="${ebmsMessage.attachment.cipherTransformation}" />
-			</bean>
+	<bean class="org.springframework.beans.factory.config.MethodInvokingBean">
+		<property name="staticMethod" value="nl.clockwork.ebms.EbMSAttachmentFactory.init" />
+		<property name="arguments">
+			<list>
+				<value>${ebmsMessage.attachment.outputDirectory}</value>
+				<value>${ebmsMessage.attachment.memoryTreshold}</value>
+				<value>${ebmsMessage.attachment.cipherTransformation}</value>
+			</list>
 		</property>
 	</bean>
-
 
 	<bean id="trustStore" class="nl.clockwork.ebms.security.EbMSTrustStore">
 		<constructor-arg name="type" value="${truststore.type}"/>
