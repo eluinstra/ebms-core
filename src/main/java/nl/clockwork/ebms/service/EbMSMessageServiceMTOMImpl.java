@@ -111,12 +111,6 @@ public class EbMSMessageServiceMTOMImpl implements EbMSMessageServiceMTOM
 	}
 
 	@Override
-	public MessageStatus getMessageStatus(String cpaId, Party fromParty, Party toParty, String messageId) throws EbMSMessageServiceException
-	{
-		return ebMSMessageService.getMessageStatus(cpaId,fromParty,toParty,messageId);
-	}
-
-	@Override
 	public List<EbMSMessageEvent> getMessageEvents(EbMSMessageContext messageContext, EbMSMessageEventType[] eventTypes, Integer maxNr) throws EbMSMessageServiceException
 	{
 		return ebMSMessageService.getMessageEvents(messageContext,eventTypes,maxNr);

@@ -121,22 +121,8 @@ public interface EbMSMessageService
 	 * @throws EbMSMessageServiceException
 	 */
 	@WebResult(name="MessageStatus")
-	@WebMethod(operationName="GetMessageStatusByMessageId")
-	MessageStatus getMessageStatus(@WebParam(name="MessageId") @XmlElement(required=true) String messageId) throws EbMSMessageServiceException;
-
-	/**
-	 * Gets the message status of the message identified by messageId for CPA cpaId, from party fromParty and to party toParty
-	 * 
-	 * @param cpaId
-	 * @param fromParty
-	 * @param toParty
-	 * @param messageId
-	 * @return The message status
-	 * @throws EbMSMessageServiceException
-	 */
-	@WebResult(name="MessageStatus")
 	@WebMethod(operationName="GetMessageStatus")
-	MessageStatus getMessageStatus(@WebParam(name="CPAId") @XmlElement(required=true) String cpaId, @WebParam(name="FromParty") @XmlElement(required=true) Party fromParty, @WebParam(name="ToParty") @XmlElement(required=true) Party toParty, @WebParam(name="MessageId") @XmlElement(required=true) String messageId) throws EbMSMessageServiceException;
+	MessageStatus getMessageStatus(@WebParam(name="MessageId") @XmlElement(required=true) String messageId) throws EbMSMessageServiceException;
 
 	/**
 	 * Gets the events that satisfy the messageContext filter and the eventTypes eventTypes. If maxNr is included, then maxNr events are returned. The possible event types are:

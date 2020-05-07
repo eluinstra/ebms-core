@@ -278,22 +278,6 @@ public class EbMSMessageServiceImpl implements EbMSMessageService
 	}
 
 	@Override
-	public MessageStatus getMessageStatus(String cpaId, Party fromParty, Party toParty, String messageId) throws EbMSMessageServiceException
-	{
-		try
-		{
-			ebMSMessageContextValidator.validate(cpaId,fromParty,toParty);
-			val request = ebMSMessageFactory.createEbMSStatusRequest(cpaId,fromParty,toParty,messageId);
-			val response = deliveryManager.sendMessage(request);
-			return response.map(r -> createMessageStatus(r)).orElseThrow(() -> new EbMSMessageServiceException("No response received!"));
-		}
-		catch (ValidationException | DAOException | EbMSProcessorException e)
-		{
-			throw new EbMSMessageServiceException(e);
-		}
-	}
-
-	@Override
 	public List<EbMSMessageEvent> getMessageEvents(EbMSMessageContext messageContext, EbMSMessageEventType[] eventTypes, Integer maxNr) throws EbMSMessageServiceException
 	{
 		try
