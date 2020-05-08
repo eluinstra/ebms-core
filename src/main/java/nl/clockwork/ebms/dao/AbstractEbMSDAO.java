@@ -93,6 +93,73 @@ import nl.clockwork.ebms.service.model.URLMapping;
 @AllArgsConstructor
 public abstract class AbstractEbMSDAO implements EbMSDAO, CPADAO, URLMappingDAO, CertificateMappingDAO, EbMSEventDAO, EbMSMessageEventDAO
 {
+	@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+	@AllArgsConstructor
+	private static class EbMSMessageContextRowMapper implements RowMapper<EbMSMessageContext>
+	{
+		public static final String SELECT =
+				"select cpa_id," +
+				" from_party_id," +
+				" from_role," +
+				" to_party_id," +
+				" to_role," +
+				" service," +
+				" action," +
+				" time_stamp," +
+				" conversation_id," +
+				" message_id," +
+				" ref_to_message_id," +
+				" status";
+		EbMSDAO ebMSDAO;
+
+		@Override
+		public EbMSMessageContext mapRow(ResultSet rs, int rowNum) throws SQLException
+		{
+			return EbMSMessageContext.builder()
+					.cpaId(rs.getString("cpa_id"))
+					.fromParty(new Party(rs.getString("from_party_id"),rs.getString("from_role")))
+					.toParty(new Party(rs.getString("to_party_id"),rs.getString("to_role")))
+					.service(rs.getString("service"))
+					.action(rs.getString("action"))
+					.timestamp(ebMSDAO.toInstant(rs.getTimestamp("time_stamp")))
+					.conversationId(rs.getString("conversation_id"))
+					.messageId(rs.getString("message_id"))
+					.refToMessageId(rs.getString("ref_to_message_id"))
+					.messageStatus(rs.getObject("status") == null ? null : EbMSMessageStatus.get(rs.getInt("status")))
+					.build();
+		}
+	}
+	@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+	@AllArgsConstructor
+	private static class EbMSEventRowMapper implements RowMapper<EbMSEvent>
+	{
+		public static final String SELECT = "select cpa_id, send_channel_id, receive_channel_id, message_id, time_to_live, time_stamp, is_confidential, retries";
+		EbMSDAO ebMSDAO;
+
+		@Override
+		public EbMSEvent mapRow(ResultSet rs, int rowNum) throws SQLException
+		{
+			return EbMSEvent.builder()
+					.cpaId(rs.getString("cpa_id"))
+					.sendDeliveryChannelId(rs.getString("send_channel_id"))
+					.receiveDeliveryChannelId(rs.getString("receive_channel_id"))
+					.messageId(rs.getString("message_id"))
+					.timeToLive(ebMSDAO.toInstant(rs.getTimestamp("time_to_live")))
+					.timestamp(ebMSDAO.toInstant(rs.getTimestamp("time_stamp")))
+					.isConfidential(rs.getBoolean("is_confidential"))
+					.retries(rs.getInt("retries"))
+					.build();
+		}
+	}
+	public static class EbMSMessageEventRowMapper implements RowMapper<EbMSMessageEvent>
+	{
+		@Override
+		public EbMSMessageEvent mapRow(ResultSet rs, int nr) throws SQLException
+		{
+			return new EbMSMessageEvent(rs.getString("message_id"),EbMSMessageEventType.values()[rs.getInt("event_type")]);
+		}
+	}
+
 	@NonNull
 	TransactionTemplate transactionTemplate;
 	@NonNull
@@ -620,44 +687,15 @@ public abstract class AbstractEbMSDAO implements EbMSDAO, CPADAO, URLMappingDAO,
 		try
 		{
 			return Optional.of(jdbcTemplate.queryForObject(
-				"select cpa_id," +
-				" from_party_id," +
-				" from_role," +
-				" to_party_id," +
-				" to_role," +
-				" service," +
-				" action," +
-				" time_stamp," +
-				" conversation_id," +
-				" message_id," +
-				" ref_to_message_id," +
-				" status" +
+				EbMSMessageContextRowMapper.SELECT +
 				" from ebms_message" + 
 				" where message_id = ?" +
 				" and message_nr = 0",
-				new RowMapper<EbMSMessageContext>()
-				{
-					@Override
-					public EbMSMessageContext mapRow(ResultSet rs, int rowNum) throws SQLException
-					{
-						return EbMSMessageContext.builder()
-								.cpaId(rs.getString("cpa_id"))
-								.fromParty(new Party(rs.getString("from_party_id"),rs.getString("from_role")))
-								.toParty(new Party(rs.getString("to_party_id"),rs.getString("to_role")))
-								.service(rs.getString("service"))
-								.action(rs.getString("action"))
-								.timestamp(toInstant(rs.getTimestamp("time_stamp")))
-								.conversationId(rs.getString("conversation_id"))
-								.messageId(rs.getString("message_id"))
-								.refToMessageId(rs.getString("ref_to_message_id"))
-								.messageStatus(rs.getObject("status") == null ? null : EbMSMessageStatus.get(rs.getInt("status")))
-								.build();
-					}
-					
-				},
+				new EbMSMessageContextRowMapper(this),
 				messageId
 			));
 		}
+		
 		catch(EmptyResultDataAccessException e)
 		{
 			return Optional.empty();
@@ -674,43 +712,14 @@ public abstract class AbstractEbMSDAO implements EbMSDAO, CPADAO, URLMappingDAO,
 		try
 		{
 			return Optional.of(jdbcTemplate.queryForObject(
-				"select cpa_id," +
-				" from_party_id," +
-				" from_role," +
-				" to_party_id," +
-				" to_role," +
-				" service," +
-				" action," +
-				" time_stamp," +
-				" conversation_id," +
-				" message_id," +
-				" ref_to_message_id," +
-				" status" +
+				EbMSMessageContextRowMapper.SELECT +
 				" from ebms_message" + 
 				" where cpa_id = ?" +
 				" and ref_to_message_id = ?" +
 				" and message_nr = 0" +
 				(actions.length == 0 ? "" : " and service = '" + EbMSAction.EBMS_SERVICE_URI + "'") +
 				(actions.length == 0 ? "" : " and action in ('" + StringUtils.join(actions,"','") + "')"),
-				new RowMapper<EbMSMessageContext>()
-				{
-					@Override
-					public EbMSMessageContext mapRow(ResultSet rs, int rowNum) throws SQLException
-					{
-						return EbMSMessageContext.builder()
-								.cpaId(rs.getString("cpa_id"))
-								.fromParty(new Party(rs.getString("from_party_id"),rs.getString("from_role")))
-								.toParty(new Party(rs.getString("to_party_id"),rs.getString("to_role")))
-								.service(rs.getString("service"))
-								.action(rs.getString("action"))
-								.timestamp(toInstant(rs.getTimestamp("time_stamp")))
-								.conversationId(rs.getString("conversation_id"))
-								.messageId(rs.getString("message_id"))
-								.refToMessageId(rs.getString("ref_to_message_id"))
-								.messageStatus(rs.getObject("status") == null ? null : EbMSMessageStatus.values()[rs.getInt("status")])
-								.build();
-					}
-				},
+				new EbMSMessageContextRowMapper(this),
 				cpaId,
 				refToMessageId
 			));
@@ -897,7 +906,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO, CPADAO, URLMappingDAO,
 	@Override
 	public Optional<Instant> getPersistTime(String messageId)
 	{
-		return Optional.of(jdbcTemplate.queryForObject("select persist_time from ebms_message where message_id = ? and message_nr = 0",Instant.class,messageId));
+		return Optional.ofNullable(toInstant(jdbcTemplate.queryForObject("select persist_time from ebms_message where message_id = ? and message_nr = 0",Timestamp.class,messageId)));
 	}
 
 	@Override
@@ -1174,7 +1183,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO, CPADAO, URLMappingDAO,
 				" and message_nr = 0" +
 				" and status = ?",
 				newStatus.getId(),
-				Instant.now(),
+				Timestamp.from(Instant.now()),
 				messageId,
 				oldStatus != null ? oldStatus.getId() : null
 			);
@@ -1208,30 +1217,14 @@ public abstract class AbstractEbMSDAO implements EbMSDAO, CPADAO, URLMappingDAO,
 		try
 		{
 			return jdbcTemplate.query(
-				"select cpa_id, send_channel_id, receive_channel_id, message_id, time_to_live, time_stamp, is_confidential, retries" +
+				EbMSEventRowMapper.SELECT +
 				" from ebms_event" +
 				" where time_stamp <= ?" +
 				(serverId == null ? " and server_id is null" : " and server_id = '" + serverId + "'") +
 				//" and (server_id = ? or (server_id is null and ? is null))" +
 				" order by time_stamp asc",
-				new RowMapper<EbMSEvent>()
-				{
-					@Override
-					public EbMSEvent mapRow(ResultSet rs, int rowNum) throws SQLException
-					{
-						return EbMSEvent.builder()
-								.cpaId(rs.getString("cpa_id"))
-								.sendDeliveryChannelId(rs.getString("send_channel_id"))
-								.receiveDeliveryChannelId(rs.getString("receive_channel_id"))
-								.messageId(rs.getString("message_id"))
-								.timeToLive(toInstant(rs.getTimestamp("time_to_live")))
-								.timestamp(toInstant(rs.getTimestamp("time_stamp")))
-								.isConfidential(rs.getBoolean("is_confidential"))
-								.retries(rs.getInt("retries"))
-								.build();
-					}
-				},
-				timestamp
+				new EbMSEventRowMapper(this),
+				Timestamp.from(timestamp)
 			);
 		}
 		catch (DataAccessException e)
@@ -1249,24 +1242,8 @@ public abstract class AbstractEbMSDAO implements EbMSDAO, CPADAO, URLMappingDAO,
 		{
 			return jdbcTemplate.query(
 				getEventsBeforeQuery(maxNr),
-				new RowMapper<EbMSEvent>()
-				{
-					@Override
-					public EbMSEvent mapRow(ResultSet rs, int rowNum) throws SQLException
-					{
-						return EbMSEvent.builder()
-								.cpaId(rs.getString("cpa_id"))
-								.sendDeliveryChannelId(rs.getString("send_channel_id"))
-								.receiveDeliveryChannelId(rs.getString("receive_channel_id"))
-								.messageId(rs.getString("message_id"))
-								.timeToLive(toInstant(rs.getTimestamp("time_to_live")))
-								.timestamp(toInstant(rs.getTimestamp("time_stamp")))
-								.isConfidential(rs.getBoolean("is_confidential"))
-								.retries(rs.getInt("retries"))
-								.build();
-					}
-				},
-				timestamp
+				new EbMSEventRowMapper(this),
+				Timestamp.from(timestamp)
 			);
 		}
 		catch (DataAccessException e)
@@ -1296,8 +1273,8 @@ public abstract class AbstractEbMSDAO implements EbMSDAO, CPADAO, URLMappingDAO,
 				event.getSendDeliveryChannelId(),
 				event.getReceiveDeliveryChannelId(),
 				event.getMessageId(),
-				event.getTimeToLive(),
-				event.getTimestamp(),
+				Timestamp.from(event.getTimeToLive()),
+				Timestamp.from(event.getTimestamp()),
 				event.isConfidential(),
 				event.getRetries(),
 				serverId
@@ -1319,7 +1296,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO, CPADAO, URLMappingDAO,
 				" time_stamp = ?," +
 				" retries = ?" +
 				" where message_id = ?",
-				event.getTimestamp(),
+				Timestamp.from(event.getTimestamp()),
 				event.getRetries(),
 				event.getMessageId()
 			);
@@ -1397,14 +1374,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO, CPADAO, URLMappingDAO,
 				getMessageContextFilter(messageContext,parameters) +
 				" order by ebms_message.time_stamp asc",
 				parameters.toArray(new Object[0]),
-				new RowMapper<EbMSMessageEvent>()
-				{
-					@Override
-					public EbMSMessageEvent mapRow(ResultSet rs, int nr) throws SQLException
-					{
-						return new EbMSMessageEvent(rs.getString("message_id"),EbMSMessageEventType.values()[rs.getInt("event_type")]);
-					}
-				}
+				new EbMSMessageEventRowMapper()
 			);
 		}
 		catch (DataAccessException e)
@@ -1425,14 +1395,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO, CPADAO, URLMappingDAO,
 			return jdbcTemplate.query(
 				getMessageEventsQuery(messageContextFilter,types,maxNr),
 				parameters.toArray(new Object[0]),
-				new RowMapper<EbMSMessageEvent>()
-				{
-					@Override
-					public EbMSMessageEvent mapRow(ResultSet rs, int nr) throws SQLException
-					{
-						return new EbMSMessageEvent(rs.getString("message_id"),EbMSMessageEventType.values()[rs.getInt("event_type")]);
-					}
-				}
+				new EbMSMessageEventRowMapper()
 			);
 		}
 		catch (DataAccessException e)
@@ -1455,7 +1418,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO, CPADAO, URLMappingDAO,
 				") values (?,?,?)",
 				messageId,
 				type.ordinal(),
-				Instant.now()
+				Timestamp.from(Instant.now())
 			);
 		}
 		catch (DataAccessException e)
