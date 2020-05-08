@@ -31,7 +31,6 @@ import nl.clockwork.ebms.cpa.CPAManager;
 import nl.clockwork.ebms.cpa.CPAUtils;
 import nl.clockwork.ebms.dao.DAOTransactionCallback;
 import nl.clockwork.ebms.event.processor.dao.EbMSEventDAO;
-import nl.clockwork.ebms.jaxb.DurationConverter;
 
 @FieldDefaults(level = AccessLevel.PROTECTED, makeFinal = true)
 @AllArgsConstructor
@@ -103,7 +102,7 @@ public class EventManager
 		val rm = CPAUtils.getReceiverReliableMessaging(deliveryChannel);
 		var timestamp = Instant.now();
 		if (event.getRetries() < rm.getRetries().intValue())
-			timestamp.plus(DurationConverter.toDuration(rm.getRetryInterval()));
+			timestamp.plus(rm.getRetryInterval());
 		else
 			timestamp = event.getTimeToLive();
 		return EbMSEvent.builder()

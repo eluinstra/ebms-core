@@ -21,12 +21,12 @@ import java.net.URL;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
+import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.xml.bind.JAXBElement;
-import javax.xml.datatype.Duration;
 
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.ActionBindingType;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CanReceive;
@@ -47,7 +47,6 @@ import org.w3._2000._09.xmldsig.X509DataType;
 import lombok.val;
 import nl.clockwork.ebms.EbMSAction;
 import nl.clockwork.ebms.EbMSMessageUtils;
-import nl.clockwork.ebms.jaxb.DurationConverter;
 import nl.clockwork.ebms.model.FromPartyInfo;
 import nl.clockwork.ebms.model.ToPartyInfo;
 
@@ -174,7 +173,7 @@ public class CPAUtils
 		if (persistDuration != null)
 		{
 			val persistTime = Instant.from(timestamp);
-			return persistTime.plus(DurationConverter.toDuration(persistDuration));
+			return persistTime.plus(persistDuration);
 		}
 		else
 			return null;
