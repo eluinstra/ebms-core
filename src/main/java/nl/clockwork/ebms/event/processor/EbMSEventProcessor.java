@@ -16,9 +16,9 @@
 package nl.clockwork.ebms.event.processor;
 
 import java.security.cert.CertificateException;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
@@ -67,7 +67,7 @@ public class EbMSEventProcessor implements Runnable
 		@Override
 		public void run()
 		{
-			if (event.getTimeToLive() == null || new Date().before(event.getTimeToLive()))
+			if (event.getTimeToLive() == null || Instant.now().isBefore(event.getTimeToLive()))
 				sendEvent(event);
 			else
 				expireEvent(event);
@@ -296,12 +296,12 @@ public class EbMSEventProcessor implements Runnable
 		sleep(delay);
   	while (true)
   	{
-  		val start = new Date().getTime();
+  		val start = Instant.now();
 			val futures = new ArrayList<Future<?>>();
 			try
 			{
-				val timestamp = new GregorianCalendar();
-				val events = maxEvents > 0 ? eventManager.getEventsBefore(timestamp.getTime(),maxEvents) : eventManager.getEventsBefore(timestamp.getTime());
+				val timestamp = Instant.now();
+				val events = maxEvents > 0 ? eventManager.getEventsBefore(timestamp,maxEvents) : eventManager.getEventsBefore(timestamp);
 				for (EbMSEvent event : events)
 					futures.add(executorService.submit(new HandleEventTask(event)));
 			}
@@ -310,8 +310,8 @@ public class EbMSEventProcessor implements Runnable
 				log.error("",e);
 			}
 			futures.forEach(f -> Try.of(() -> f.get()).onFailure(e -> log.error("",e)));
-			val end = new Date().getTime();
-			val sleep = period - (end - start);
+			val end = Instant.now();
+			val sleep = period - ChronoUnit.MILLIS.between(start,end);
 			sleep(sleep);
   	}
   }

@@ -16,7 +16,7 @@
 package nl.clockwork.ebms.service;
 
 import java.io.IOException;
-import java.util.Date;
+import java.time.Instant;
 import java.util.List;
 
 import javax.xml.bind.JAXBException;
@@ -331,7 +331,7 @@ public class EbMSMessageServiceImpl implements EbMSMessageService
 			{
 				try
 				{
-					val timestamp = new Date();
+					val timestamp = Instant.now();
 					val messageHeader = message.getMessageHeader();
 					val fromPartyId = new CacheablePartyId(messageHeader.getFrom().getPartyId());
 					val toPartyId = new CacheablePartyId(messageHeader.getTo().getPartyId());

@@ -15,7 +15,7 @@
  */
 package nl.clockwork.ebms.event.processor;
 
-import java.util.Date;
+import java.time.Instant;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -35,9 +35,9 @@ public class EbMSEvent
 	String receiveDeliveryChannelId;
 	@NonNull
 	String messageId;
-	Date timeToLive;
+	Instant timeToLive;
 	@NonNull
-	Date timestamp;
+	Instant timestamp;
 	boolean isConfidential;
 	int retries;
 }

@@ -24,6 +24,7 @@ import java.security.PrivateKey;
 import java.security.cert.CertificateExpiredException;
 import java.security.cert.CertificateNotYetValidException;
 import java.security.cert.X509Certificate;
+import java.time.Instant;
 import java.util.Date;
 
 import javax.crypto.KeyGenerator;
@@ -60,11 +61,11 @@ public class SecurityUtils
 		return null;
 	}
 
-	public static void validateCertificate(EbMSTrustStore trustStore, X509Certificate certificate, Date date) throws KeyStoreException, ValidationException
+	public static void validateCertificate(EbMSTrustStore trustStore, X509Certificate certificate, Instant date) throws KeyStoreException, ValidationException
 	{
 		try
 		{
-			certificate.checkValidity(date);
+			certificate.checkValidity(Date.from(date));
 			val aliases = trustStore.aliases();
 			while (aliases.hasMoreElements())
 			{
@@ -91,11 +92,11 @@ public class SecurityUtils
 		}
 	}
 	
-	public static void validateCertificate(EbMSTrustStore trustStore, javax.security.cert.X509Certificate certificate, Date date) throws KeyStoreException, ValidatorException
+	public static void validateCertificate(EbMSTrustStore trustStore, javax.security.cert.X509Certificate certificate, Instant date) throws KeyStoreException, ValidatorException
 	{
 		try
 		{
-			certificate.checkValidity(date);
+			certificate.checkValidity(Date.from(date));
 			val aliases = trustStore.aliases();
 			while (aliases.hasMoreElements())
 			{

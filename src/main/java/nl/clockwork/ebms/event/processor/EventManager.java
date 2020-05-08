@@ -15,23 +15,23 @@
  */
 package nl.clockwork.ebms.event.processor;
 
-import java.util.Calendar;
-import java.util.Date;
+import java.time.Instant;
 import java.util.List;
 
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DeliveryChannel;
-import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.ReliableMessaging;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.val;
+import lombok.var;
 import lombok.experimental.FieldDefaults;
 import nl.clockwork.ebms.common.util.StreamUtils;
 import nl.clockwork.ebms.cpa.CPAManager;
 import nl.clockwork.ebms.cpa.CPAUtils;
 import nl.clockwork.ebms.dao.DAOTransactionCallback;
 import nl.clockwork.ebms.event.processor.dao.EbMSEventDAO;
+import nl.clockwork.ebms.jaxb.DurationConverter;
 
 @FieldDefaults(level = AccessLevel.PROTECTED, makeFinal = true)
 @AllArgsConstructor
@@ -42,7 +42,7 @@ public class EventManager
 	@NonNull
 	CPAManager cpaManager;
 
-	public void createEvent(String cpaId, DeliveryChannel sendDeliveryChannel, DeliveryChannel receiveDeliveryChannel, String messageId, Date timeToLive, Date timestamp, boolean isConfidential)
+	public void createEvent(String cpaId, DeliveryChannel sendDeliveryChannel, DeliveryChannel receiveDeliveryChannel, String messageId, Instant timeToLive, Instant timestamp, boolean isConfidential)
 	{
 		ebMSeventDAO.insertEvent(new EbMSEvent(cpaId,sendDeliveryChannel.getChannelId(),receiveDeliveryChannel.getChannelId(), messageId, timeToLive, timestamp, isConfidential, 0));
 	}
@@ -85,15 +85,14 @@ public class EventManager
 	
 	protected EbMSEvent retryEvent(EbMSEvent event, int retryInterval)
 	{
-		val timestamp = Calendar.getInstance();
-		timestamp.add(Calendar.MINUTE, retryInterval);
+		val timestamp = Instant.now().plusSeconds(60 * retryInterval);
 		return EbMSEvent.builder()
 				.cpaId(event.getCpaId())
 				.sendDeliveryChannelId(event.getSendDeliveryChannelId())
 				.receiveDeliveryChannelId(event.getReceiveDeliveryChannelId())
 				.messageId(event.getMessageId())
 				.timeToLive(event.getTimeToLive())
-				.timestamp(timestamp.getTime())
+				.timestamp(timestamp)
 				.isConfidential(event.isConfidential())
 				.retries(event.getRetries() + 1)
 				.build();
@@ -101,10 +100,10 @@ public class EventManager
 
 	protected EbMSEvent createNewEvent(EbMSEvent event, DeliveryChannel deliveryChannel)
 	{
-		ReliableMessaging rm = CPAUtils.getReceiverReliableMessaging(deliveryChannel);
-		Date timestamp = new Date();
+		val rm = CPAUtils.getReceiverReliableMessaging(deliveryChannel);
+		var timestamp = Instant.now();
 		if (event.getRetries() < rm.getRetries().intValue())
-			rm.getRetryInterval().addTo(timestamp);
+			timestamp.plus(DurationConverter.toDuration(rm.getRetryInterval()));
 		else
 			timestamp = event.getTimeToLive();
 		return EbMSEvent.builder()
@@ -119,12 +118,12 @@ public class EventManager
 				.build();
 	}
 
-	public List<EbMSEvent> getEventsBefore(Date timestamp)
+	public List<EbMSEvent> getEventsBefore(Instant timestamp)
 	{
 		return ebMSeventDAO.getEventsBefore(timestamp);
 	}
 
-	public List<EbMSEvent> getEventsBefore(Date timestamp, int maxEvents)
+	public List<EbMSEvent> getEventsBefore(Instant timestamp, int maxEvents)
 	{
 		return ebMSeventDAO.getEventsBefore(timestamp,maxEvents);
 	}

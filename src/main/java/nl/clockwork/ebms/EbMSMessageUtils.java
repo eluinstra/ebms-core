@@ -17,8 +17,8 @@ package nl.clockwork.ebms;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.time.Instant;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 
 import javax.xml.bind.JAXBElement;
@@ -220,7 +220,7 @@ public class EbMSMessageUtils
 		return result;
 	}
 
-	public static StatusResponse createStatusResponse(StatusRequest statusRequest, EbMSMessageStatus status, Date timestamp) throws DatatypeConfigurationException
+	public static StatusResponse createStatusResponse(StatusRequest statusRequest, EbMSMessageStatus status, Instant timestamp) throws DatatypeConfigurationException
 	{
 		val result = new StatusResponse();
 		result.setVersion(Constants.EBMS_VERSION);

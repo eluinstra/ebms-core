@@ -16,8 +16,8 @@
 package nl.clockwork.ebms.processor;
 
 import java.io.IOException;
+import java.time.Instant;
 import java.util.Collections;
-import java.util.Date;
 
 import javax.xml.bind.JAXBException;
 import javax.xml.datatype.DatatypeConfigurationException;
@@ -104,7 +104,7 @@ public class EbMSMessageProcessor
 		try
 		{
 			xsdValidator.validate(document.getMessage());
-			val timestamp = new Date();
+			val timestamp = Instant.now();
 			val message = EbMSMessageUtils.getEbMSMessage(document);
 			val cpaId = message.getMessageHeader().getCPAId();
 			if (!cpaManager.existsCPA(cpaId))
@@ -121,7 +121,7 @@ public class EbMSMessageProcessor
 		}
 	}
 
-	private EbMSDocument processRequest(Date timestamp, EbMSDocument document, EbMSBaseMessage message) throws DatatypeConfigurationException, JAXBException, SOAPException, ParserConfigurationException, SAXException, IOException, TransformerFactoryConfigurationError, TransformerException, XPathExpressionException
+	private EbMSDocument processRequest(Instant timestamp, EbMSDocument document, EbMSBaseMessage message) throws DatatypeConfigurationException, JAXBException, SOAPException, ParserConfigurationException, SAXException, IOException, TransformerFactoryConfigurationError, TransformerException, XPathExpressionException
 	{
 		if (message instanceof EbMSMessage)
 			return processMessage(timestamp,document,(EbMSMessage)message);
@@ -170,7 +170,7 @@ public class EbMSMessageProcessor
 			if (response != null)
 			{
 				xsdValidator.validate(response.getMessage());
-				val timestamp = new Date();
+				val timestamp = Instant.now();
 				val responseMessage = EbMSMessageUtils.getEbMSMessage(response);
 				if (responseMessage instanceof EbMSMessageError)
 				{
@@ -222,7 +222,7 @@ public class EbMSMessageProcessor
 		}
 	}
 	
-	private void processMessageError(Date timestamp, EbMSDocument messageErrorDocument, EbMSMessageError messageError) throws XPathExpressionException, JAXBException, ParserConfigurationException, SAXException, IOException
+	private void processMessageError(Instant timestamp, EbMSDocument messageErrorDocument, EbMSMessageError messageError) throws XPathExpressionException, JAXBException, ParserConfigurationException, SAXException, IOException
 	{
 		MessageHeader messageHeader = messageError.getMessageHeader();
 		val request = ebMSDAO.getDocument(messageHeader .getMessageData().getRefToMessageId())
@@ -234,7 +234,7 @@ public class EbMSMessageProcessor
 		processMessageError(timestamp,messageErrorDocument,requestMessage,messageError);
 	}
 
-	private void processMessageError(final Date timestamp, final EbMSDocument messageErrorDocument, final EbMSMessage message, final EbMSMessageError messageError) throws EbMSProcessingException, ValidatorException
+	private void processMessageError(final Instant timestamp, final EbMSDocument messageErrorDocument, final EbMSMessage message, final EbMSMessageError messageError) throws EbMSProcessingException, ValidatorException
 	{
 		try
 		{
@@ -273,7 +273,7 @@ public class EbMSMessageProcessor
 		}
 	}
 
-	private void processAcknowledgment(Date timestamp, EbMSDocument acknowledgmentDocument, EbMSAcknowledgment acknowledgment) throws XPathExpressionException, JAXBException, ParserConfigurationException, SAXException, IOException
+	private void processAcknowledgment(Instant timestamp, EbMSDocument acknowledgmentDocument, EbMSAcknowledgment acknowledgment) throws XPathExpressionException, JAXBException, ParserConfigurationException, SAXException, IOException
 	{
 		val request = ebMSDAO.getDocument(acknowledgment.getAcknowledgment().getRefToMessageId())
 				.orElseThrow(() -> StreamUtils.illegalStateException("Document",acknowledgment.getAcknowledgment().getRefToMessageId()));
@@ -284,7 +284,7 @@ public class EbMSMessageProcessor
 		processAcknowledgment(timestamp,acknowledgmentDocument,requestMessage,acknowledgment);
 	}
 
-	private void processAcknowledgment(final Date timestamp, final EbMSDocument acknowledgmentDocument, final EbMSMessage message, final EbMSAcknowledgment acknowledgment) throws EbMSProcessingException
+	private void processAcknowledgment(final Instant timestamp, final EbMSDocument acknowledgmentDocument, final EbMSMessage message, final EbMSAcknowledgment acknowledgment) throws EbMSProcessingException
 	{
 		try
 		{
@@ -323,7 +323,7 @@ public class EbMSMessageProcessor
 		}
 	}
 
-	private EbMSDocument processStatusRequest(Date timestamp, EbMSStatusRequest statusRequest) throws DatatypeConfigurationException, JAXBException, SOAPException, ParserConfigurationException, SAXException, IOException, TransformerFactoryConfigurationError, TransformerException
+	private EbMSDocument processStatusRequest(Instant timestamp, EbMSStatusRequest statusRequest) throws DatatypeConfigurationException, JAXBException, SOAPException, ParserConfigurationException, SAXException, IOException, TransformerFactoryConfigurationError, TransformerException
 	{
 		val statusResponse = processStatusRequest(statusRequest,timestamp);
 		if (messageValidator.isSyncReply(statusRequest))
@@ -344,7 +344,7 @@ public class EbMSMessageProcessor
 		}
 	}
 	
-	private void processStatusResponse(Date timestamp, EbMSStatusResponse statusResponse)
+	private void processStatusResponse(Instant timestamp, EbMSStatusResponse statusResponse)
 	{
 		try
 		{
@@ -357,7 +357,7 @@ public class EbMSMessageProcessor
 		}
 	}
 
-	private EbMSDocument processPing(Date timestamp, EbMSPing ping) throws SOAPException, JAXBException, ParserConfigurationException, SAXException, IOException, TransformerFactoryConfigurationError, TransformerException
+	private EbMSDocument processPing(Instant timestamp, EbMSPing ping) throws SOAPException, JAXBException, ParserConfigurationException, SAXException, IOException, TransformerFactoryConfigurationError, TransformerException
 	{
 		val response = processPing(ping,timestamp);
 		if (messageValidator.isSyncReply(ping))
@@ -378,7 +378,7 @@ public class EbMSMessageProcessor
 		}
 	}
 
-	private void processPong(Date timestamp, EbMSPong pong)
+	private void processPong(Instant timestamp, EbMSPong pong)
 	{
 		try
 		{
@@ -391,7 +391,7 @@ public class EbMSMessageProcessor
 		}
 	}
 
-	public EbMSDocument processMessage(final Date timestamp, final EbMSDocument messageDocument, final EbMSMessage message) throws DAOException, ValidatorException, DatatypeConfigurationException, JAXBException, SOAPException, ParserConfigurationException, SAXException, IOException, TransformerFactoryConfigurationError, TransformerException, EbMSProcessorException
+	public EbMSDocument processMessage(final Instant timestamp, final EbMSDocument messageDocument, final EbMSMessage message) throws DAOException, ValidatorException, DatatypeConfigurationException, JAXBException, SOAPException, ParserConfigurationException, SAXException, IOException, TransformerFactoryConfigurationError, TransformerException, EbMSProcessorException
 	{
 		val messageHeader = message.getMessageHeader();
 		try
@@ -510,7 +510,7 @@ public class EbMSMessageProcessor
 		}
 	}
 
-	protected EbMSStatusResponse processStatusRequest(final EbMSStatusRequest statusRequest, final Date timestamp) throws ValidatorException, DatatypeConfigurationException, JAXBException, EbMSProcessorException
+	protected EbMSStatusResponse processStatusRequest(final EbMSStatusRequest statusRequest, final Instant timestamp) throws ValidatorException, DatatypeConfigurationException, JAXBException, EbMSProcessorException
 	{
 		messageValidator.validate(statusRequest,timestamp);
 		val mc = ebMSDAO.getMessageContext(statusRequest.getStatusRequest().getRefToMessageId()).orElse(null);
@@ -518,12 +518,12 @@ public class EbMSMessageProcessor
 		return ebMSMessageFactory.createEbMSStatusResponse(statusRequest,result.getValue0(),result.getValue1()); 
 	}
 	
-	private Pair<EbMSMessageStatus,Date> createEbMSMessageStatusAndTimestamp(EbMSStatusRequest statusRequest, EbMSMessageContext messageContext)
+	private Pair<EbMSMessageStatus,Instant> createEbMSMessageStatusAndTimestamp(EbMSStatusRequest statusRequest, EbMSMessageContext messageContext)
 	{
 		if (messageContext == null || EbMSAction.EBMS_SERVICE_URI.equals(messageContext.getService()))
-			return new Pair<EbMSMessageStatus,Date>(EbMSMessageStatus.NOT_RECOGNIZED,null);
+			return new Pair<EbMSMessageStatus,Instant>(EbMSMessageStatus.NOT_RECOGNIZED,null);
 		else if (!messageContext.getCpaId().equals(statusRequest.getMessageHeader().getCPAId()))
-			return new Pair<EbMSMessageStatus,Date>(EbMSMessageStatus.UNAUTHORIZED,null);
+			return new Pair<EbMSMessageStatus,Instant>(EbMSMessageStatus.UNAUTHORIZED,null);
 		else
 		{
 			return ebMSDAO.getMessageStatus(statusRequest.getStatusRequest().getRefToMessageId())
@@ -532,18 +532,18 @@ public class EbMSMessageProcessor
 		}
 	}
 
-	private Pair<EbMSMessageStatus,Date> mapEbMSMessageStatusAndTimestamp(EbMSMessageStatus status, Date timestamp)
+	private Pair<EbMSMessageStatus,Instant> mapEbMSMessageStatusAndTimestamp(EbMSMessageStatus status, Instant timestamp)
 	{
 		if (status != null
 				&& (MessageStatusType.RECEIVED.equals(status.getStatusCode())
 						|| MessageStatusType.PROCESSED.equals(status.getStatusCode())
 						|| MessageStatusType.FORWARDED.equals(status.getStatusCode())))
-			return new Pair<EbMSMessageStatus,Date>(status,timestamp);
+			return new Pair<EbMSMessageStatus,Instant>(status,timestamp);
 		else
-			return new Pair<EbMSMessageStatus,Date>(EbMSMessageStatus.NOT_RECOGNIZED,null);
+			return new Pair<EbMSMessageStatus,Instant>(EbMSMessageStatus.NOT_RECOGNIZED,null);
 	}
 
-	protected EbMSPong processPing(EbMSPing message, Date timestamp) throws ValidatorException, EbMSProcessorException
+	protected EbMSPong processPing(EbMSPing message, Instant timestamp) throws ValidatorException, EbMSProcessorException
 	{
 		messageValidator.validate(message,timestamp);
 		return ebMSMessageFactory.createEbMSPong(message);

@@ -15,19 +15,25 @@
  */
 package nl.clockwork.ebms.jaxb;
 
+import java.time.Instant;
 import java.util.Date;
+import java.util.GregorianCalendar;
 
-import javax.xml.bind.annotation.adapters.XmlAdapter;
+import javax.xml.bind.DatatypeConverter;
 
-public class EbMSDateTimeAdapter extends XmlAdapter<String,Date>
+import lombok.val;
+
+public class InstantConverter
 {
-	public Date unmarshal(String value)
+	public static Instant parseDateTime(String date)
 	{
-		return (EbMSDateTimeConverter.parseDateTime(value));
+		return DatatypeConverter.parseDateTime(date).getTime().toInstant();
 	}
 
-	public String marshal(Date value)
+	public static String printDateTime(Instant date)
 	{
-		return (EbMSDateTimeConverter.printDateTime(value));
+		val calendar = new GregorianCalendar();
+		calendar.setTime(Date.from(date));
+		return DatatypeConverter.printDateTime(calendar);
 	}
 }

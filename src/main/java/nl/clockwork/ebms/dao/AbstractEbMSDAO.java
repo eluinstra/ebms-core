@@ -25,8 +25,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -646,7 +646,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO, CPADAO, URLMappingDAO,
 								.toParty(new Party(rs.getString("to_party_id"),rs.getString("to_role")))
 								.service(rs.getString("service"))
 								.action(rs.getString("action"))
-								.timestamp(rs.getTimestamp("time_stamp"))
+								.timestamp(toInstant(rs.getTimestamp("time_stamp")))
 								.conversationId(rs.getString("conversation_id"))
 								.messageId(rs.getString("message_id"))
 								.refToMessageId(rs.getString("ref_to_message_id"))
@@ -703,7 +703,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO, CPADAO, URLMappingDAO,
 								.toParty(new Party(rs.getString("to_party_id"),rs.getString("to_role")))
 								.service(rs.getString("service"))
 								.action(rs.getString("action"))
-								.timestamp(rs.getTimestamp("time_stamp"))
+								.timestamp(toInstant(rs.getTimestamp("time_stamp")))
 								.conversationId(rs.getString("conversation_id"))
 								.messageId(rs.getString("message_id"))
 								.refToMessageId(rs.getString("ref_to_message_id"))
@@ -895,9 +895,9 @@ public abstract class AbstractEbMSDAO implements EbMSDAO, CPADAO, URLMappingDAO,
 	}
 	
 	@Override
-	public Optional<Date> getPersistTime(String messageId)
+	public Optional<Instant> getPersistTime(String messageId)
 	{
-		return Optional.of(jdbcTemplate.queryForObject("select persist_time from ebms_message where message_id = ? and message_nr = 0",Date.class,messageId));
+		return Optional.of(jdbcTemplate.queryForObject("select persist_time from ebms_message where message_id = ? and message_nr = 0",Instant.class,messageId));
 	}
 
 	@Override
@@ -945,7 +945,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO, CPADAO, URLMappingDAO,
 	}
 
 	@Override
-	public void insertMessage(final Date timestamp, final Date persistTime, final Document document, final EbMSBaseMessage message, final List<EbMSAttachment> attachments, final EbMSMessageStatus status) throws DAOException
+	public void insertMessage(final Instant timestamp, final Instant persistTime, final Document document, final EbMSBaseMessage message, final List<EbMSAttachment> attachments, final EbMSMessageStatus status) throws DAOException
 	{
 		try
 		{
@@ -989,13 +989,13 @@ public abstract class AbstractEbMSDAO implements EbMSDAO, CPADAO, URLMappingDAO,
 												") values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
 												new int[]{4,5}
 											);
-											ps.setTimestamp(1,new Timestamp(timestamp.getTime()));
+											ps.setTimestamp(1,Timestamp.from(timestamp));
 											val messageHeader = message.getMessageHeader();
 											ps.setString(2,messageHeader.getCPAId());
 											ps.setString(3,messageHeader.getConversationId());
 											ps.setString(4,messageHeader.getMessageData().getMessageId());
 											ps.setString(5,messageHeader.getMessageData().getRefToMessageId());
-											ps.setTimestamp(6,messageHeader.getMessageData().getTimeToLive() == null ? null : new Timestamp(messageHeader.getMessageData().getTimeToLive().getTime()));
+											ps.setTimestamp(6,messageHeader.getMessageData().getTimeToLive() == null ? null : Timestamp.from(messageHeader.getMessageData().getTimeToLive()));
 											ps.setString(7,EbMSMessageUtils.toString(messageHeader.getFrom().getPartyId().get(0)));
 											ps.setString(8,messageHeader.getFrom().getRole());
 											ps.setString(9,EbMSMessageUtils.toString(messageHeader.getTo().getPartyId().get(0)));
@@ -1003,20 +1003,9 @@ public abstract class AbstractEbMSDAO implements EbMSDAO, CPADAO, URLMappingDAO,
 											ps.setString(11,EbMSMessageUtils.toString(messageHeader.getService()));
 											ps.setString(12,messageHeader.getAction());
 											ps.setString(13,DOMUtils.toString(document,"UTF-8"));
-											if (status == null)
-											{
-												ps.setNull(14,java.sql.Types.INTEGER);
-												ps.setNull(15,java.sql.Types.TIMESTAMP);
-											}
-											else
-											{
-												ps.setInt(14,status.getId());
-												ps.setTimestamp(15,new Timestamp(timestamp.getTime()));
-											}
-											if (persistTime == null)
-												ps.setNull(16,java.sql.Types.DATE);
-											else
-												ps.setTimestamp(16,new Timestamp(persistTime.getTime()));
+											ps.setObject(14,status != null ? status.getId() : null,java.sql.Types.INTEGER);
+											ps.setTimestamp(15,status != null ? Timestamp.from(timestamp) : null);
+											ps.setTimestamp(16,persistTime != null ? Timestamp.from(persistTime) : null);
 											return ps;
 										}
 										catch (TransformerException e)
@@ -1044,7 +1033,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO, CPADAO, URLMappingDAO,
 	}
 
 	@Override
-	public void insertDuplicateMessage(final Date timestamp, final Document document, final EbMSBaseMessage message, final List<EbMSAttachment> attachments) throws DAOException
+	public void insertDuplicateMessage(final Instant timestamp, final Document document, final EbMSBaseMessage message, final List<EbMSAttachment> attachments) throws DAOException
 	{
 		try
 		{
@@ -1086,14 +1075,14 @@ public abstract class AbstractEbMSDAO implements EbMSDAO, CPADAO, URLMappingDAO,
 												") values (?,?,?,?,(select max(message_nr) + 1 from ebms_message where message_id = ?),?,?,?,?,?,?,?,?,?)",
 												new int[]{4,5}
 											);
-											ps.setTimestamp(1,new Timestamp(timestamp.getTime()));
+											ps.setTimestamp(1,Timestamp.from(timestamp));
 											val messageHeader = message.getMessageHeader();
 											ps.setString(2,messageHeader.getCPAId());
 											ps.setString(3,messageHeader.getConversationId());
 											ps.setString(4,messageHeader.getMessageData().getMessageId());
 											ps.setString(5,messageHeader.getMessageData().getMessageId());
 											ps.setString(6,messageHeader.getMessageData().getRefToMessageId());
-											ps.setTimestamp(7,messageHeader.getMessageData().getTimeToLive() == null ? null : new Timestamp(messageHeader.getMessageData().getTimeToLive().getTime()));
+											ps.setTimestamp(7,messageHeader.getMessageData().getTimeToLive() == null ? null : Timestamp.from(messageHeader.getMessageData().getTimeToLive()));
 											ps.setString(8,EbMSMessageUtils.toString(messageHeader.getFrom().getPartyId().get(0)));
 											ps.setString(9,messageHeader.getFrom().getRole());
 											ps.setString(10,EbMSMessageUtils.toString(messageHeader.getTo().getPartyId().get(0)));
@@ -1185,7 +1174,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO, CPADAO, URLMappingDAO,
 				" and message_nr = 0" +
 				" and status = ?",
 				newStatus.getId(),
-				new Date(),
+				Instant.now(),
 				messageId,
 				oldStatus != null ? oldStatus.getId() : null
 			);
@@ -1214,7 +1203,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO, CPADAO, URLMappingDAO,
 	}
 
 	@Override
-	public List<EbMSEvent> getEventsBefore(Date timestamp) throws DAOException
+	public List<EbMSEvent> getEventsBefore(Instant timestamp) throws DAOException
 	{
 		try
 		{
@@ -1230,7 +1219,16 @@ public abstract class AbstractEbMSDAO implements EbMSDAO, CPADAO, URLMappingDAO,
 					@Override
 					public EbMSEvent mapRow(ResultSet rs, int rowNum) throws SQLException
 					{
-						return new EbMSEvent(rs.getString("cpa_id"),rs.getString("send_channel_id"),rs.getString("receive_channel_id"),rs.getString("message_id"),rs.getTimestamp("time_to_live"),rs.getTimestamp("time_stamp"),rs.getBoolean("is_confidential"),rs.getInt("retries"));
+						return EbMSEvent.builder()
+								.cpaId(rs.getString("cpa_id"))
+								.sendDeliveryChannelId(rs.getString("send_channel_id"))
+								.receiveDeliveryChannelId(rs.getString("receive_channel_id"))
+								.messageId(rs.getString("message_id"))
+								.timeToLive(toInstant(rs.getTimestamp("time_to_live")))
+								.timestamp(toInstant(rs.getTimestamp("time_stamp")))
+								.isConfidential(rs.getBoolean("is_confidential"))
+								.retries(rs.getInt("retries"))
+								.build();
 					}
 				},
 				timestamp
@@ -1245,7 +1243,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO, CPADAO, URLMappingDAO,
 	public abstract String getEventsBeforeQuery(int maxNr);
 
 	@Override
-	public List<EbMSEvent> getEventsBefore(Date timestamp, int maxNr) throws DAOException
+	public List<EbMSEvent> getEventsBefore(Instant timestamp, int maxNr) throws DAOException
 	{
 		try
 		{
@@ -1256,7 +1254,16 @@ public abstract class AbstractEbMSDAO implements EbMSDAO, CPADAO, URLMappingDAO,
 					@Override
 					public EbMSEvent mapRow(ResultSet rs, int rowNum) throws SQLException
 					{
-						return new EbMSEvent(rs.getString("cpa_id"),rs.getString("send_channel_id"),rs.getString("receive_channel_id"),rs.getString("message_id"),rs.getTimestamp("time_to_live"),rs.getTimestamp("time_stamp"),rs.getBoolean("is_confidential"),rs.getInt("retries"));
+						return EbMSEvent.builder()
+								.cpaId(rs.getString("cpa_id"))
+								.sendDeliveryChannelId(rs.getString("send_channel_id"))
+								.receiveDeliveryChannelId(rs.getString("receive_channel_id"))
+								.messageId(rs.getString("message_id"))
+								.timeToLive(toInstant(rs.getTimestamp("time_to_live")))
+								.timestamp(toInstant(rs.getTimestamp("time_stamp")))
+								.isConfidential(rs.getBoolean("is_confidential"))
+								.retries(rs.getInt("retries"))
+								.build();
 					}
 				},
 				timestamp
@@ -1341,7 +1348,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO, CPADAO, URLMappingDAO,
 	}
 
 	@Override
-	public void insertEventLog(String messageId, Date timestamp, String uri, EbMSEventStatus status, String errorMessage) throws DAOException
+	public void insertEventLog(String messageId, Instant timestamp, String uri, EbMSEventStatus status, String errorMessage) throws DAOException
 	{
 		try
 		{
@@ -1448,7 +1455,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO, CPADAO, URLMappingDAO,
 				") values (?,?,?)",
 				messageId,
 				type.ordinal(),
-				new Date()
+				Instant.now()
 			);
 		}
 		catch (DataAccessException e)

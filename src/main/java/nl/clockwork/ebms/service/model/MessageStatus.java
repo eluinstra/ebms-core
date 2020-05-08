@@ -15,7 +15,7 @@
  */
 package nl.clockwork.ebms.service.model;
 
-import java.util.Date;
+import java.time.Instant;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -32,7 +32,7 @@ import nl.clockwork.ebms.EbMSMessageStatus;
 public class MessageStatus
 {
 	@NonNull
-	Date timestamp;
+	Instant timestamp;
 	@NonNull
 	EbMSMessageStatus status;
 }

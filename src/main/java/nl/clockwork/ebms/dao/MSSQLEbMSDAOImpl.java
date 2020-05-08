@@ -20,7 +20,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Timestamp;
-import java.util.Date;
+import java.time.Instant;
 import java.util.List;
 
 import javax.xml.transform.TransformerException;
@@ -62,7 +62,7 @@ public class MSSQLEbMSDAOImpl extends nl.clockwork.ebms.dao.MySQLEbMSDAOImpl
 	}
 
 	@Override
-	public void insertDuplicateMessage(final Date timestamp, final Document document, final EbMSBaseMessage message, final List<EbMSAttachment> attachments) throws DAOException
+	public void insertDuplicateMessage(final Instant timestamp, final Document document, final EbMSBaseMessage message, final List<EbMSAttachment> attachments) throws DAOException
 	{
 		try
 		{
@@ -102,14 +102,14 @@ public class MSSQLEbMSDAOImpl extends nl.clockwork.ebms.dao.MySQLEbMSDAOImpl
 												") values (?,?,?,?,(select max(message_nr) + 1 as nr from ebms_message where message_id = ?),?,?,?,?,?,?,?)",
 												new int[]{1}
 											);
-											ps.setTimestamp(1,new Timestamp(timestamp.getTime()));
+											ps.setTimestamp(1,Timestamp.from(timestamp));
 											val messageHeader = message.getMessageHeader();
 											ps.setString(2,messageHeader.getCPAId());
 											ps.setString(3,messageHeader.getConversationId());
 											ps.setString(4,messageHeader.getMessageData().getMessageId());
 											ps.setString(5,messageHeader.getMessageData().getMessageId());
 											ps.setString(6,messageHeader.getMessageData().getRefToMessageId());
-											ps.setTimestamp(7,messageHeader.getMessageData().getTimeToLive() == null ? null : new Timestamp(messageHeader.getMessageData().getTimeToLive().getTime()));
+											ps.setTimestamp(7,messageHeader.getMessageData().getTimeToLive() == null ? null : Timestamp.from(messageHeader.getMessageData().getTimeToLive()));
 											ps.setString(8,messageHeader.getFrom().getRole());
 											ps.setString(9,messageHeader.getTo().getRole());
 											ps.setString(10,EbMSMessageUtils.toString(messageHeader.getService()));

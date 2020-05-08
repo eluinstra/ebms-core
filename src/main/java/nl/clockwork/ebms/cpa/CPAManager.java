@@ -15,7 +15,7 @@
  */
 package nl.clockwork.ebms.cpa;
 
-import java.util.Date;
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
@@ -90,7 +90,7 @@ public class CPAManager
 		return result;
 	}
 
-	public boolean isValid(String cpaId, Date timestamp)
+	public boolean isValid(String cpaId, Instant timestamp)
 	{
 		val cpa = getCPA(cpaId);
 		return cpa

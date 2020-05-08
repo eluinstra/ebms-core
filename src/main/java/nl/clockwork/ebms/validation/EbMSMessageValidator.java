@@ -15,7 +15,7 @@
  */
 package nl.clockwork.ebms.validation;
 
-import java.util.Date;
+import java.time.Instant;
 
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.SyncReplyModeType;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageHeader;
@@ -61,7 +61,7 @@ public class EbMSMessageValidator
 	@NonNull
 	ClientCertificateValidator clientCertificateValidator;
 
-	public void validateMessage(EbMSDocument document, EbMSMessage message, Date timestamp) throws ValidatorException
+	public void validateMessage(EbMSDocument document, EbMSMessage message, Instant timestamp) throws ValidatorException
 	{
 		if (isDuplicateMessage(message.getMessageHeader()))
 			throw new DuplicateMessageException();
@@ -74,7 +74,7 @@ public class EbMSMessageValidator
 		signatureValidator.validateSignature(document,message);
 	}
 
-	public void validateMessageError(EbMSMessage requestMessage, EbMSMessageError responseMessage, Date timestamp) throws ValidatorException
+	public void validateMessageError(EbMSMessage requestMessage, EbMSMessageError responseMessage, Instant timestamp) throws ValidatorException
 	{
 		if (isDuplicateMessage(responseMessage.getMessageHeader()))
 			throw new DuplicateMessageException();
@@ -83,7 +83,7 @@ public class EbMSMessageValidator
 		clientCertificateValidator.validate(responseMessage);
 	}
 
-	public void validateAcknowledgment(EbMSDocument responseDocument, EbMSMessage requestMessage, EbMSAcknowledgment responseMessage, Date timestamp) throws ValidatorException
+	public void validateAcknowledgment(EbMSDocument responseDocument, EbMSMessage requestMessage, EbMSAcknowledgment responseMessage, Instant timestamp) throws ValidatorException
 	{
 		if (isDuplicateMessage(responseMessage.getMessageHeader()))
 			throw new DuplicateMessageException();
@@ -93,7 +93,7 @@ public class EbMSMessageValidator
 		signatureValidator.validate(responseDocument,requestMessage,responseMessage);
 	}
 
-	public void validate(EbMSBaseMessage message, Date timestamp) throws ValidatorException
+	public void validate(EbMSBaseMessage message, Instant timestamp) throws ValidatorException
 	{
 		messageHeaderValidator.validate(message,timestamp);
 		clientCertificateValidator.validate(message);

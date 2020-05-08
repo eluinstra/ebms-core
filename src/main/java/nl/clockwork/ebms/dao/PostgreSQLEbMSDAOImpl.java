@@ -21,8 +21,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -135,7 +135,7 @@ public class PostgreSQLEbMSDAOImpl extends AbstractEbMSDAO
 	}
 
 	@Override
-	public void insertMessage(final Date timestamp, final Date persistTime, final Document document, final EbMSBaseMessage message, final List<EbMSAttachment> attachments, final EbMSMessageStatus status) throws DAOException
+	public void insertMessage(final Instant timestamp, final Instant persistTime, final Document document, final EbMSBaseMessage message, final List<EbMSAttachment> attachments, final EbMSMessageStatus status) throws DAOException
 	{
 		try
 		{
@@ -177,13 +177,13 @@ public class PostgreSQLEbMSDAOImpl extends AbstractEbMSDAO
 												") values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)" +
 												" returning message_id, message_nr"
 											);
-											ps.setTimestamp(1,new Timestamp(timestamp.getTime()));
+											ps.setTimestamp(1,Timestamp.from(timestamp));
 											val messageHeader = message.getMessageHeader();
 											ps.setString(2,messageHeader.getCPAId());
 											ps.setString(3,messageHeader.getConversationId());
 											ps.setString(4,messageHeader.getMessageData().getMessageId());
 											ps.setString(5,messageHeader.getMessageData().getRefToMessageId());
-											ps.setTimestamp(6,messageHeader.getMessageData().getTimeToLive() == null ? null : new Timestamp(messageHeader.getMessageData().getTimeToLive().getTime()));
+											ps.setTimestamp(6,messageHeader.getMessageData().getTimeToLive() == null ? null : Timestamp.from(messageHeader.getMessageData().getTimeToLive()));
 											ps.setString(7,EbMSMessageUtils.toString(messageHeader.getFrom().getPartyId().get(0)));
 											ps.setString(8,messageHeader.getFrom().getRole());
 											ps.setString(9,EbMSMessageUtils.toString(messageHeader.getTo().getPartyId().get(0)));
@@ -191,20 +191,9 @@ public class PostgreSQLEbMSDAOImpl extends AbstractEbMSDAO
 											ps.setString(11,EbMSMessageUtils.toString(messageHeader.getService()));
 											ps.setString(12,messageHeader.getAction());
 											ps.setString(13,DOMUtils.toString(document,"UTF-8"));
-											if (status == null)
-											{
-												ps.setNull(14,java.sql.Types.INTEGER);
-												ps.setNull(15,java.sql.Types.TIMESTAMP);
-											}
-											else
-											{
-												ps.setInt(14,status.getId());
-												ps.setTimestamp(15,new Timestamp(timestamp.getTime()));
-											}
-											if (persistTime == null)
-												ps.setNull(16,java.sql.Types.DATE);
-											else
-												ps.setTimestamp(16,new Timestamp(persistTime.getTime()));
+											ps.setObject(14,status != null ? status.getId() : null,java.sql.Types.INTEGER);
+											ps.setTimestamp(15,status != null ? Timestamp.from(timestamp) : null);
+											ps.setTimestamp(16,persistTime != null ? Timestamp.from(persistTime) : null);
 											return ps;
 										}
 										catch (TransformerException e)
@@ -232,7 +221,7 @@ public class PostgreSQLEbMSDAOImpl extends AbstractEbMSDAO
 	}
 	
 	@Override
-	public void insertDuplicateMessage(final Date timestamp, final Document document, final EbMSBaseMessage message, final List<EbMSAttachment> attachments) throws DAOException
+	public void insertDuplicateMessage(final Instant timestamp, final Document document, final EbMSBaseMessage message, final List<EbMSAttachment> attachments) throws DAOException
 	{
 		try
 		{
@@ -272,14 +261,14 @@ public class PostgreSQLEbMSDAOImpl extends AbstractEbMSDAO
 												") values (?,?,?,?,(select max(message_nr) + 1 from ebms_message where message_id = ?),?,?,?,?,?,?,?,?,?)" +
 												" returning message_id, message_nr"
 											);
-											ps.setTimestamp(1,new Timestamp(timestamp.getTime()));
+											ps.setTimestamp(1,Timestamp.from(timestamp));
 											MessageHeader messageHeader = message.getMessageHeader();
 											ps.setString(2,messageHeader.getCPAId());
 											ps.setString(3,messageHeader.getConversationId());
 											ps.setString(4,messageHeader.getMessageData().getMessageId());
 											ps.setString(5,messageHeader.getMessageData().getMessageId());
 											ps.setString(6,messageHeader.getMessageData().getRefToMessageId());
-											ps.setTimestamp(7,messageHeader.getMessageData().getTimeToLive() == null ? null : new Timestamp(messageHeader.getMessageData().getTimeToLive().getTime()));
+											ps.setTimestamp(7,messageHeader.getMessageData().getTimeToLive() == null ? null : Timestamp.from(messageHeader.getMessageData().getTimeToLive()));
 											ps.setString(8,EbMSMessageUtils.toString(messageHeader.getFrom().getPartyId().get(0)));
 											ps.setString(9,messageHeader.getFrom().getRole());
 											ps.setString(10,EbMSMessageUtils.toString(messageHeader.getTo().getPartyId().get(0)));

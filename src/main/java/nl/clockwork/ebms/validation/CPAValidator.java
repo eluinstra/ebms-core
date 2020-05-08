@@ -16,7 +16,7 @@
 package nl.clockwork.ebms.validation;
 
 import java.security.NoSuchAlgorithmException;
-import java.util.Date;
+import java.time.Instant;
 import java.util.List;
 
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.ActorType;
@@ -72,9 +72,9 @@ public class CPAValidator
 			log.warn("CPA version " + cpa.getVersion() + " detected! CPA version 2_0b expected.");
 		if (StatusValueType.PROPOSED.equals(cpa.getStatus().getValue()))
 			throw new ValidationException("CPA Status is proposed!");
-		if (!cpa.getStart().before(cpa.getEnd()))
+		if (!cpa.getStart().isBefore(cpa.getEnd()))
 			throw new ValidationException("CPA Start date not before End date!");
-		if (!new Date().before(cpa.getEnd()))
+		if (!Instant.now().isBefore(cpa.getEnd()))
 			throw new ValidationException("CPA expired on " + cpa.getEnd());
 		if (cpa.getConversationConstraints() != null)
 			log.warn("CPA Conversation Constraints not implemented!");

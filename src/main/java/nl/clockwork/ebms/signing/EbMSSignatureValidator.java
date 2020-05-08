@@ -19,9 +19,9 @@ import java.security.GeneralSecurityException;
 import java.security.KeyStoreException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.time.Instant;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -83,7 +83,7 @@ public class EbMSSignatureValidator
 					val certificate = getCertificate(messageHeader);
 					if (certificate != null)
 					{
-						val timestamp = messageHeader.getMessageData().getTimestamp() == null ? new Date() : messageHeader.getMessageData().getTimestamp();
+						val timestamp = messageHeader.getMessageData().getTimestamp() == null ? Instant.now() : messageHeader.getMessageData().getTimestamp();
 						SecurityUtils.validateCertificate(trustStore,certificate,timestamp);
 						if (!verify(certificate,(Element)signatureNodeList.item(0),message.getAttachments()))
 							throw new ValidationException("Invalid Signature!");
@@ -117,7 +117,7 @@ public class EbMSSignatureValidator
 					val certificate = getCertificate(responseMessage.getMessageHeader());
 					if (certificate != null)
 					{
-						val date = responseMessage.getMessageHeader().getMessageData().getTimestamp() == null ? new Date() : responseMessage.getMessageHeader().getMessageData().getTimestamp();
+						val date = responseMessage.getMessageHeader().getMessageData().getTimestamp() == null ? Instant.now() : responseMessage.getMessageHeader().getMessageData().getTimestamp();
 						SecurityUtils.validateCertificate(trustStore,certificate,date);
 						if (!verify(certificate,(Element)signatureNodeList.item(0),Collections.emptyList()))
 							throw new ValidationException("Invalid Signature!");

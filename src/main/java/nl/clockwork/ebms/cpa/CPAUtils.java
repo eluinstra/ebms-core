@@ -21,8 +21,8 @@ import java.net.URL;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
+import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import javax.xml.bind.JAXBElement;
@@ -47,6 +47,7 @@ import org.w3._2000._09.xmldsig.X509DataType;
 import lombok.val;
 import nl.clockwork.ebms.EbMSAction;
 import nl.clockwork.ebms.EbMSMessageUtils;
+import nl.clockwork.ebms.jaxb.DurationConverter;
 import nl.clockwork.ebms.model.FromPartyInfo;
 import nl.clockwork.ebms.model.ToPartyInfo;
 
@@ -167,14 +168,13 @@ public class CPAUtils
 		return ((DocExchange)deliveryChannel.getDocExchangeId()).getEbXMLReceiverBinding().getPersistDuration();
 	}
 
-	public static Date getPersistTime(Date timestamp, DeliveryChannel deliveryChannel)
+	public static Instant getPersistTime(Instant timestamp, DeliveryChannel deliveryChannel)
 	{
 		val persistDuration = CPAUtils.getDocExchange(deliveryChannel).getEbXMLReceiverBinding().getPersistDuration();
 		if (persistDuration != null)
 		{
-			val persistTime = (Date)timestamp.clone();
-			persistDuration.addTo(persistTime);
-			return persistTime;
+			val persistTime = Instant.from(timestamp);
+			return persistTime.plus(DurationConverter.toDuration(persistDuration));
 		}
 		else
 			return null;

@@ -16,8 +16,8 @@
 package nl.clockwork.ebms;
 
 import java.io.IOException;
+import java.time.Instant;
 import java.util.Collection;
-import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -52,6 +52,7 @@ import lombok.experimental.FieldDefaults;
 import nl.clockwork.ebms.common.util.StreamUtils;
 import nl.clockwork.ebms.cpa.CPAManager;
 import nl.clockwork.ebms.cpa.CPAUtils;
+import nl.clockwork.ebms.jaxb.DurationConverter;
 import nl.clockwork.ebms.model.CacheablePartyId;
 import nl.clockwork.ebms.model.EbMSAcknowledgment;
 import nl.clockwork.ebms.model.EbMSAttachment;
@@ -78,7 +79,7 @@ public class EbMSMessageFactory
 	@NonNull
 	EbMSIdGenerator ebMSIdGenerator;
 
-	public EbMSMessageError createEbMSMessageError(EbMSMessage message, ErrorList errorList, Date timestamp) throws DatatypeConfigurationException, JAXBException
+	public EbMSMessageError createEbMSMessageError(EbMSMessage message, ErrorList errorList, Instant timestamp) throws DatatypeConfigurationException, JAXBException
 	{
 		val messageHeader = createResponseMessageHeader(message.getMessageHeader(),timestamp,EbMSAction.MESSAGE_ERROR);
 		if (errorList.getError().size() == 0)
@@ -95,7 +96,7 @@ public class EbMSMessageFactory
 				.build();
 	}
 
-	public EbMSAcknowledgment createEbMSAcknowledgment(EbMSMessage message, Date timestamp) throws EbMSProcessorException
+	public EbMSAcknowledgment createEbMSAcknowledgment(EbMSMessage message, Instant timestamp) throws EbMSProcessorException
 	{
 		try
 		{
@@ -147,7 +148,7 @@ public class EbMSMessageFactory
 		try
 		{
 			return EbMSPong.builder()
-					.messageHeader(createResponseMessageHeader(message.getMessageHeader(),new Date(),EbMSAction.PONG))
+					.messageHeader(createResponseMessageHeader(message.getMessageHeader(),Instant.now(),EbMSAction.PONG))
 					.build();
 		}
 		catch (JAXBException e)
@@ -176,12 +177,12 @@ public class EbMSMessageFactory
 		}
 	}
 
-	public EbMSStatusResponse createEbMSStatusResponse(EbMSStatusRequest request, EbMSMessageStatus status, Date timestamp) throws EbMSProcessorException
+	public EbMSStatusResponse createEbMSStatusResponse(EbMSStatusRequest request, EbMSMessageStatus status, Instant timestamp) throws EbMSProcessorException
 	{
 		try
 		{
 			return EbMSStatusResponse.builder()
-					.messageHeader(createResponseMessageHeader(request.getMessageHeader(),new Date(),EbMSAction.STATUS_RESPONSE))
+					.messageHeader(createResponseMessageHeader(request.getMessageHeader(),Instant.now(),EbMSAction.STATUS_RESPONSE))
 					.statusResponse(createStatusResponse(request.getStatusRequest(),status,timestamp))
 					.build();
 		}
@@ -297,7 +298,7 @@ public class EbMSMessageFactory
 		val to = createTo(toPartyInfo.getPartyIds(),null);
 		val service = createService(null,action.getServiceUri());
 		val messageId = ebMSIdGenerator.createMessageId(hostname,conversationId);
-		val messageData = createMessageData(messageId,null,new Date(),null);
+		val messageData = createMessageData(messageId,null,Instant.now(),null);
 		return createMessageHeader(cpaId,conversationId,from,to,service,action.getAction(),messageData,null); //deliveryChannel.getMessagingCharacteristics().getDuplicateElimination()
 	}
 
@@ -317,13 +318,13 @@ public class EbMSMessageFactory
 		val service = createService(fromPartyInfo.getService().getType(),fromPartyInfo.getService().getValue());
 		val action = fromPartyInfo.getCanSend().getThisPartyActionBinding().getAction();
 		val messageId = ebMSIdGenerator.createMessageId(hostname,conversationId,context.getMessageId());
-		val timestamp = new Date();
+		val timestamp = Instant.now();
 		val timeToLive = createTimeToLive(deliveryChannel,timestamp);
 		val messageData = createMessageData(messageId,context.getRefToMessageId(),timestamp,timeToLive);
 		return createMessageHeader(cpaId,conversationId,from,to,service,action,messageData,deliveryChannel.getMessagingCharacteristics().getDuplicateElimination());
 	}
 
-	private MessageHeader createResponseMessageHeader(MessageHeader messageHeader, Date timestamp, EbMSAction action) throws DatatypeConfigurationException, JAXBException
+	private MessageHeader createResponseMessageHeader(MessageHeader messageHeader, Instant timestamp, EbMSAction action) throws DatatypeConfigurationException, JAXBException
 	{
 		val cpaId = messageHeader.getCPAId();
 		val partyId = new CacheablePartyId(messageHeader.getTo().getPartyId());
@@ -361,7 +362,7 @@ public class EbMSMessageFactory
 		return result;
 	}
 
-	private MessageData createMessageData(String messageId, String refToMessageId, Date timestamp, Date timeToLive)
+	private MessageData createMessageData(String messageId, String refToMessageId, Instant timestamp, Instant timeToLive)
 	{
 		val result = new MessageData();
 		result.setMessageId(messageId);
@@ -371,16 +372,14 @@ public class EbMSMessageFactory
 		return result;
 	}
 
-	private Date createTimeToLive(DeliveryChannel deliveryChannel, Date date)
+	private Instant createTimeToLive(DeliveryChannel deliveryChannel, Instant date)
 	{
 		if (CPAUtils.isReliableMessaging(deliveryChannel))
 		{
-			val result = (Date)date.clone();
 			val duration = CPAUtils.getSenderReliableMessaging(deliveryChannel)
 					.getRetryInterval()
 					.multiply(CPAUtils.getSenderReliableMessaging(deliveryChannel).getRetries().intValue() + 1);
-			duration.addTo(result);
-			return result;
+			return date.plus(DurationConverter.toDuration(duration));
 		}
 		else
 			return null;
@@ -424,7 +423,7 @@ public class EbMSMessageFactory
 				.orElseThrow(() -> StreamUtils.illegalStateException("DefaultDeliveryChannel",cpaId,partyId,context.getAction())));
 	}
 
-	private StatusResponse createStatusResponse(StatusRequest statusRequest, EbMSMessageStatus status, Date timestamp) throws DatatypeConfigurationException
+	private StatusResponse createStatusResponse(StatusRequest statusRequest, EbMSMessageStatus status, Instant timestamp) throws DatatypeConfigurationException
 	{
 		val result = new StatusResponse();
 		result.setVersion(Constants.EBMS_VERSION);

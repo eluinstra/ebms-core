@@ -15,8 +15,8 @@
  */
 package nl.clockwork.ebms.processor;
 
+import java.time.Instant;
 import java.util.Collections;
-import java.util.Date;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -56,7 +56,7 @@ public class DuplicateMessageHandler
 	boolean storeDuplicateMessage;
 	boolean storeDuplicateMessageAttachments;
 
-	public EbMSDocument handleMessage(final Date timestamp, EbMSDocument document, final EbMSMessage message) throws EbMSProcessingException
+	public EbMSDocument handleMessage(final Instant timestamp, EbMSDocument document, final EbMSMessage message) throws EbMSProcessingException
 	{
 		val messageHeader = message.getMessageHeader();
 		if (isIdenticalMessage(message))
@@ -105,7 +105,7 @@ public class DuplicateMessageHandler
 			throw new EbMSProcessingException("MessageId " + messageHeader.getMessageData().getMessageId() + " already used!");
 	}
 
-	public void handleMessageError(final Date timestamp, EbMSDocument responseDocument, final EbMSMessageError responseMessage) throws EbMSProcessingException
+	public void handleMessageError(final Instant timestamp, EbMSDocument responseDocument, final EbMSMessageError responseMessage) throws EbMSProcessingException
 	{
 		if (isIdenticalMessage(responseMessage))
 		{
@@ -117,7 +117,7 @@ public class DuplicateMessageHandler
 			throw new EbMSProcessingException("MessageId " + responseMessage.getMessageHeader().getMessageData().getMessageId() + " already used!");
 	}
 	
-	public void handleAcknowledgment(final Date timestamp, EbMSDocument responseDocument, final EbMSAcknowledgment responseMessage) throws EbMSProcessingException
+	public void handleAcknowledgment(final Instant timestamp, EbMSDocument responseDocument, final EbMSAcknowledgment responseMessage) throws EbMSProcessingException
 	{
 		if (isIdenticalMessage(responseMessage))
 		{

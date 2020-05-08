@@ -15,7 +15,8 @@
  */
 package nl.clockwork.ebms.dao;
 
-import java.util.Date;
+import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
@@ -45,15 +46,20 @@ public interface EbMSDAO
 	Optional<EbMSDocument> getEbMSDocumentIfUnsent(String messageId) throws DAOException;
 	Optional<EbMSDocument> getEbMSDocumentByRefToMessageId(String cpaId, String refToMessageId, EbMSAction...actions) throws DAOException;
 	Optional<EbMSMessageStatus> getMessageStatus(String messageId) throws DAOException;
-	Optional<Date> getPersistTime(String messageId);
+	Optional<Instant> getPersistTime(String messageId);
 
 	List<String> getMessageIds(EbMSMessageContext messageContext, EbMSMessageStatus status) throws DAOException;
 	List<String> getMessageIds(EbMSMessageContext messageContext, EbMSMessageStatus status, int maxNr) throws DAOException;
 
-	void insertMessage(Date timestamp, Date persistTime, Document document, EbMSBaseMessage message, List<EbMSAttachment> attachments, EbMSMessageStatus status) throws DAOException;
-	void insertDuplicateMessage(Date timestamp, Document document, EbMSBaseMessage message, List<EbMSAttachment> attachments) throws DAOException;
+	void insertMessage(Instant timestamp, Instant persistTime, Document document, EbMSBaseMessage message, List<EbMSAttachment> attachments, EbMSMessageStatus status) throws DAOException;
+	void insertDuplicateMessage(Instant timestamp, Document document, EbMSBaseMessage message, List<EbMSAttachment> attachments) throws DAOException;
 
 	int updateMessage(String messageId, EbMSMessageStatus oldStatus, EbMSMessageStatus newStatus) throws DAOException;
 
 	void deleteAttachments(String messageId);
+
+	default Instant toInstant(Timestamp timestamp)
+	{
+		return timestamp != null ? timestamp.toInstant() : null;
+	}
 }

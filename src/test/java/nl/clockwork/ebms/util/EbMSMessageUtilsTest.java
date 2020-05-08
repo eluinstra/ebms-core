@@ -24,9 +24,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.StringWriter;
+import java.time.Instant;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Date;
 
 import javax.activation.DataSource;
 import javax.xml.datatype.DatatypeConfigurationException;
@@ -113,7 +113,7 @@ public class EbMSMessageUtilsTest
 		val msgRef2 = "ref2";
 		
 		/* createStatusRequest */
-		var timestamp = new Date();
+		var timestamp = Instant.now();
 		val statusRequest = EbMSMessageUtils.createStatusRequest(msgRef1);
 		assertEquals(Constants.EBMS_VERSION, statusRequest.getVersion());
 		assertEquals(msgRef1, statusRequest.getRefToMessageId());
@@ -128,7 +128,7 @@ public class EbMSMessageUtilsTest
 		assertEquals(Constants.EBMS_VERSION, createStatusResponse.getVersion());
 		
 		/* createStatusResponse 2 */
-		timestamp = new Date();
+		timestamp = Instant.now();
 		createStatusResponse = EbMSMessageUtils.createStatusResponse(statusRequest, null, timestamp);
 		assertNull(createStatusResponse.getTimestamp());
 		assertNull(createStatusResponse.getMessageStatus());
@@ -137,13 +137,13 @@ public class EbMSMessageUtilsTest
 		assertNull(createStatusResponse.getId());
 
 		/* createStatusResponse 3 */
-		timestamp = new Date();
+		timestamp = Instant.now();
 		createStatusResponse = EbMSMessageUtils.createStatusResponse(statusRequest, EbMSMessageStatus.RECEIVED, timestamp);
 		assertEquals(timestamp, createStatusResponse.getTimestamp());
 		assertEquals(MessageStatusType.RECEIVED.value(), createStatusResponse.getMessageStatus().value());
 
 		/* createStatusResponse 4 */
-		timestamp = new Date();
+		timestamp = Instant.now();
 		createStatusResponse = EbMSMessageUtils.createStatusResponse(statusRequest, EbMSMessageStatus.PROCESSED, timestamp);
 		assertEquals(timestamp, createStatusResponse.getTimestamp());
 		assertEquals(MessageStatusType.PROCESSED.value(), createStatusResponse.getMessageStatus().value());
@@ -372,7 +372,7 @@ public class EbMSMessageUtilsTest
 	public void createSOAPMessage() throws Exception
 	{
 		val statusRequest = EbMSMessageUtils.createStatusRequest("ref1");
-		val statusResponse = EbMSMessageUtils.createStatusResponse(statusRequest, EbMSMessageStatus.EXPIRED, new Date());
+		val statusResponse = EbMSMessageUtils.createStatusResponse(statusRequest, EbMSMessageStatus.EXPIRED, Instant.now());
 		val builder = EbMSStatusResponse.builder()
 				.messageHeader(createMessageHeader())
 				.signature(createSignature())

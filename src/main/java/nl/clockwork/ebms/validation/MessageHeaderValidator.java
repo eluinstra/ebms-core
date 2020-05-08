@@ -17,7 +17,7 @@ package nl.clockwork.ebms.validation;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.Date;
+import java.time.Instant;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
@@ -59,7 +59,7 @@ public class MessageHeaderValidator
 	@NonNull
 	CPAManager cpaManager;
 
-	public void validate(EbMSMessage message, Date timestamp) throws EbMSValidationException
+	public void validate(EbMSMessage message, Instant timestamp) throws EbMSValidationException
 	{
 		val messageHeader = message.getMessageHeader();
 		validateMessageHeader(messageHeader);
@@ -68,7 +68,7 @@ public class MessageHeaderValidator
 		validateMessage(message,timestamp,deliveryChannel);
 	}
 
-	public void validate(EbMSBaseMessage message, Date timestamp) throws EbMSValidationException
+	public void validate(EbMSBaseMessage message, Instant timestamp) throws EbMSValidationException
 	{
 		val messageHeader = message.getMessageHeader();
 		validateMessageHeader(messageHeader);
@@ -76,7 +76,7 @@ public class MessageHeaderValidator
 				.orElseThrow(() -> new EbMSValidationException(EbMSMessageUtils.createError(EbMSErrorCode.UNKNOWN.getErrorCode(),EbMSErrorCode.UNKNOWN,"No DeliveryChannel found.")));
 	}
 
-	public void validate(EbMSAcknowledgment message, Date timestamp) throws EbMSValidationException
+	public void validate(EbMSAcknowledgment message, Instant timestamp) throws EbMSValidationException
 	{
 		val messageHeader = message.getMessageHeader();
 		validateMessageHeader(messageHeader);
@@ -159,7 +159,7 @@ public class MessageHeaderValidator
 					EbMSMessageUtils.createError("//Header/MessageHeader/Action",EbMSErrorCode.INCONSISTENT,"Invalid value."));
 	}
 
-	private void validateMessage(EbMSMessage message, Date timestamp, DeliveryChannel deliveryChannel)
+	private void validateMessage(EbMSMessage message, Instant timestamp, DeliveryChannel deliveryChannel)
 	{
 		val messageHeader = message.getMessageHeader();
 		val service = CPAUtils.toString(messageHeader.getService());
@@ -184,7 +184,7 @@ public class MessageHeaderValidator
 					EbMSMessageUtils.createError("//Header/MessageHeader/Action",EbMSErrorCode.VALUE_NOT_RECOGNIZED,"Value not found."));
 	}
 
-	private void validateMessageData(Date timestamp, final org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageHeader messageHeader)
+	private void validateMessageData(Instant timestamp, final org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageHeader messageHeader)
 	{
 		if (!existsRefToMessageId(messageHeader.getMessageData().getRefToMessageId()))
 			throw new EbMSValidationException(
@@ -294,10 +294,10 @@ public class MessageHeaderValidator
 		return refToMessageId == null || ebMSDAO.existsMessage(refToMessageId);
 	}
 	
-	private boolean checkTimeToLive(MessageHeader messageHeader, Date timestamp)
+	private boolean checkTimeToLive(MessageHeader messageHeader, Instant timestamp)
 	{
 		return messageHeader.getMessageData().getTimeToLive() == null
-				|| timestamp.before(messageHeader.getMessageData().getTimeToLive());
+				|| timestamp.isBefore(messageHeader.getMessageData().getTimeToLive());
 	}
 	
 	private boolean checkDuplicateElimination(DeliveryChannel deliveryChannel, MessageHeader messageHeader)
