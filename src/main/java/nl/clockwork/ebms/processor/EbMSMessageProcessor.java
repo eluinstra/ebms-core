@@ -171,8 +171,8 @@ public class EbMSMessageProcessor
 			return processMessage(timestamp,document,(EbMSMessage)message);
 		else if (message instanceof EbMSMessageError)
 		{
-			EbMSMessageError messageError = (EbMSMessageError)message;
-			val requestMessage = findRequestMessage(messageError);
+			val messageError = (EbMSMessageError)message;
+			val requestMessage = getRequestMessage(messageError);
 			if (requestMessage.getSyncReply() != null)
 				throw new EbMSProcessingException("No async ErrorMessage expected for message " + requestMessage.getMessageHeader().getMessageData().getMessageId());
 			messageErrorProcessor.processMessageError(timestamp,document,requestMessage,messageError);
@@ -180,8 +180,8 @@ public class EbMSMessageProcessor
 		}
 		else if (message instanceof EbMSAcknowledgment)
 		{
-			EbMSAcknowledgment acknowledgment = (EbMSAcknowledgment)message;
-			val requestMessage = findRequestMessage(acknowledgment);
+			val acknowledgment = (EbMSAcknowledgment)message;
+			val requestMessage = getRequestMessage(acknowledgment);
 			if (requestMessage.getAckRequested() == null || requestMessage.getSyncReply() != null)
 				throw new EbMSProcessingException("No async Acknowledgment expected for message " + requestMessage.getMessageHeader().getMessageData().getMessageId());
 			acknowledgmentProcessor.processAcknowledgment(timestamp,document,requestMessage,acknowledgment);
@@ -354,7 +354,7 @@ public class EbMSMessageProcessor
 		}
 	}
 
-	private EbMSMessage findRequestMessage(EbMSMessageResponse messageResponse) throws EbMSProcessingException
+	private EbMSMessage getRequestMessage(EbMSMessageResponse messageResponse) throws EbMSProcessingException
 	{
 		val request = ebMSDAO.getDocument(messageResponse.getMessageHeader().getMessageData().getRefToMessageId());
 		val requestMessage = request.map(r -> {
