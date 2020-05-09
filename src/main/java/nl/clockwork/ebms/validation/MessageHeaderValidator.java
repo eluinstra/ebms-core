@@ -86,18 +86,6 @@ public class MessageHeaderValidator
 		validateAcknowledgment(acknowledgment,deliveryChannel);
 	}
 
-	public void validate(EbMSMessage requestMessage, EbMSMessage responseMessage) throws ValidationException
-	{
-		if (!requestMessage.getMessageHeader().getCPAId().equals(responseMessage.getMessageHeader().getCPAId()))
-			throw new ValidationException(
-					"Request cpaId " + requestMessage.getMessageHeader().getCPAId() + " does not equal response cpaId " + responseMessage.getMessageHeader().getCPAId());
-		if (!requestMessage.getMessageHeader().getMessageData().getMessageId().equals(responseMessage.getMessageHeader().getMessageData().getRefToMessageId()))
-			throw new ValidationException(
-					"Request messageId " + requestMessage.getMessageHeader().getMessageData().getMessageId() + " does not equal response refToMessageId " + responseMessage.getMessageHeader().getMessageData().getRefToMessageId());
-		compare(requestMessage.getMessageHeader().getFrom().getPartyId(),responseMessage.getMessageHeader().getTo().getPartyId());
-		compare(requestMessage.getMessageHeader().getTo().getPartyId(),responseMessage.getMessageHeader().getFrom().getPartyId());
-	}
-	
 	public void validate(EbMSBaseMessage requestMessage, EbMSBaseMessage responseMessage) throws ValidationException
 	{
 		if (!requestMessage.getMessageHeader().getCPAId().equals(responseMessage.getMessageHeader().getCPAId()))
@@ -174,7 +162,7 @@ public class MessageHeaderValidator
 		validateMessageOrder(messageOrder);
 	}
 
-	private void validateService(final org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageHeader messageHeader, final java.lang.String service)
+	private void validateService(MessageHeader messageHeader, String service)
 	{
 		if (!cpaManager.canSend(messageHeader.getCPAId(),new CacheablePartyId(messageHeader.getFrom().getPartyId()),messageHeader.getFrom().getRole(),service,messageHeader.getAction()))
 			throw new EbMSValidationException(
@@ -184,7 +172,7 @@ public class MessageHeaderValidator
 					EbMSMessageUtils.createError("//Header/MessageHeader/Action",EbMSErrorCode.VALUE_NOT_RECOGNIZED,"Value not found."));
 	}
 
-	private void validateMessageData(Instant timestamp, final org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageHeader messageHeader)
+	private void validateMessageData(Instant timestamp, MessageHeader messageHeader)
 	{
 		if (!existsRefToMessageId(messageHeader.getMessageData().getRefToMessageId()))
 			throw new EbMSValidationException(
@@ -194,14 +182,14 @@ public class MessageHeaderValidator
 					EbMSMessageUtils.createError("//Header/MessageHeader/MessageData/TimeToLive",EbMSErrorCode.TIME_TO_LIVE_EXPIRED,null));
 	}
 
-	private void validateDuplicateElimination(DeliveryChannel deliveryChannel, final org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageHeader messageHeader)
+	private void validateDuplicateElimination(DeliveryChannel deliveryChannel, MessageHeader messageHeader)
 	{
 		if (!checkDuplicateElimination(deliveryChannel,messageHeader))
 			throw new EbMSValidationException(
 					EbMSMessageUtils.createError("//Header/MessageHeader/DuplicateElimination",EbMSErrorCode.INCONSISTENT,"Wrong value."));
 	}
 
-	private void validateAckRequested(final org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DeliveryChannel deliveryChannel, final org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.AckRequested ackRequested)
+	private void validateAckRequested(DeliveryChannel deliveryChannel, AckRequested ackRequested)
 	{
 		if (!checkAckRequested(deliveryChannel,ackRequested))
 			throw new EbMSValidationException(
@@ -222,7 +210,7 @@ public class MessageHeaderValidator
 					EbMSMessageUtils.createError("//Header/AckRequested/@signed",EbMSErrorCode.INCONSISTENT,"Wrong value."));
 	}
 
-	private void validateSyncReply(final org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DeliveryChannel deliveryChannel, final org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.SyncReply syncReply)
+	private void validateSyncReply(DeliveryChannel deliveryChannel, SyncReply syncReply)
 	{
 		if (!checkSyncReply(deliveryChannel,syncReply))
 			throw new EbMSValidationException(
@@ -245,7 +233,7 @@ public class MessageHeaderValidator
 //						EbMSMessageUtils.createError("//Header/MessageOrder/@version",Constants.EbMSErrorCode.INCONSISTENT,"Invalid value."));
 	}
 
-	private void validateAcknowledgment(Acknowledgment acknowledgment, final org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DeliveryChannel deliveryChannel)
+	private void validateAcknowledgment(Acknowledgment acknowledgment, DeliveryChannel deliveryChannel)
 	{
 		if (acknowledgment != null && !Constants.EBMS_VERSION.equals(acknowledgment.getVersion()))
 			throw new EbMSValidationException(
