@@ -24,7 +24,6 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.val;
-import lombok.var;
 import lombok.experimental.FieldDefaults;
 import nl.clockwork.ebms.common.util.StreamUtils;
 import nl.clockwork.ebms.cpa.CPAManager;
@@ -65,13 +64,9 @@ public class EventManager
 				{
 					ebMSeventDAO.insertEventLog(event.getMessageId(),event.getTimestamp(), url, status, errorMessage);
 					if (event.getTimeToLive() != null && CPAUtils.isReliableMessaging(deliveryChannel))
-					{
 						ebMSeventDAO.updateEvent(createNewEvent(event,deliveryChannel));
-					}
 					else
-					{
 						ebMSeventDAO.deleteEvent(event.getMessageId());
-					}
 				}
 			}
 		);
@@ -100,11 +95,7 @@ public class EventManager
 	protected EbMSEvent createNewEvent(EbMSEvent event, DeliveryChannel deliveryChannel)
 	{
 		val rm = CPAUtils.getReceiverReliableMessaging(deliveryChannel);
-		var timestamp = Instant.now();
-		if (event.getRetries() < rm.getRetries().intValue())
-			timestamp.plus(rm.getRetryInterval());
-		else
-			timestamp = event.getTimeToLive();
+		val timestamp = event.getRetries() < rm.getRetries().intValue() ? Instant.now().plus(rm.getRetryInterval()) : event.getTimeToLive();
 		return EbMSEvent.builder()
 				.cpaId(event.getCpaId())
 				.sendDeliveryChannelId(event.getSendDeliveryChannelId())

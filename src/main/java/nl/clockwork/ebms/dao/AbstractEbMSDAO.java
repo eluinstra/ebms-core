@@ -1338,7 +1338,7 @@ public abstract class AbstractEbMSDAO implements EbMSDAO, CPADAO, URLMappingDAO,
 					"error_message" +
 				") values (?,?,?,?,?)",
 				messageId,
-				timestamp,
+				Timestamp.from(timestamp),
 				uri,
 				status.getId(),
 				errorMessage

@@ -10,9 +10,16 @@ public class DurationConverter
 {
 	private static DatatypeFactory datatypeFactory;
 	
-	public DurationConverter() throws DatatypeConfigurationException
+	static
 	{
-		datatypeFactory = DatatypeFactory.newInstance();
+		try
+		{
+			datatypeFactory = DatatypeFactory.newInstance();
+		}
+		catch (DatatypeConfigurationException e)
+		{
+			throw new RuntimeException(e);
+		}
 	}
 
 	public static java.time.Duration parseDuration(String duration)
@@ -22,7 +29,7 @@ public class DurationConverter
 
 	public static String printDuration(java.time.Duration duration)
 	{
-		return toDuration(duration).toString();
+		return duration != null ? toDuration(duration).toString() : null;
 	}
 
 	private static java.time.Duration toDuration(Duration duration)
@@ -32,6 +39,6 @@ public class DurationConverter
 	
 	private static Duration toDuration(java.time.Duration duration)
 	{
-		return datatypeFactory.newDuration(duration.toMillis());
+		return duration != null ? datatypeFactory.newDuration(duration.toMillis()) : null;
 	}
 }
