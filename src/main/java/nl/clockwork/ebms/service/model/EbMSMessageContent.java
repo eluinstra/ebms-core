@@ -44,10 +44,4 @@ public class EbMSMessageContent implements Serializable
 	EbMSMessageContext context;
 	@XmlElement(name="dataSource")
 	List<EbMSDataSource> dataSources;
-
-	@Override
-	public String toString()
-	{
-		return context.toString();
-	}
 }
