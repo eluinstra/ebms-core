@@ -18,6 +18,8 @@ package nl.clockwork.ebms.processor;
 import java.time.Instant;
 import java.util.Collections;
 
+import javax.xml.transform.TransformerException;
+
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -26,9 +28,12 @@ import lombok.val;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.apachecommons.CommonsLog;
 import nl.clockwork.ebms.EbMSAction;
+import nl.clockwork.ebms.common.util.DOMUtils;
 import nl.clockwork.ebms.common.util.StreamUtils;
 import nl.clockwork.ebms.cpa.CPAManager;
 import nl.clockwork.ebms.cpa.CPAUtils;
+import nl.clockwork.ebms.dao.DAOException;
+import nl.clockwork.ebms.dao.DAOTransactionCallback;
 import nl.clockwork.ebms.dao.EbMSDAO;
 import nl.clockwork.ebms.event.processor.EventManager;
 import nl.clockwork.ebms.model.CacheablePartyId;
@@ -38,6 +43,7 @@ import nl.clockwork.ebms.model.EbMSDocument;
 import nl.clockwork.ebms.model.EbMSMessage;
 import nl.clockwork.ebms.model.EbMSMessageError;
 import nl.clockwork.ebms.validation.EbMSMessageValidator;
+import nl.clockwork.ebms.validation.ValidationException;
 
 @Builder(setterPrefix = "set")
 @CommonsLog
@@ -76,28 +82,42 @@ class DuplicateMessageHandler
 			}
 			else
 			{
-				if (storeDuplicateMessage)
-					ebMSDAO.insertDuplicateMessage(timestamp,document.getMessage(),message,storeDuplicateMessageAttachments ? message.getAttachments() : Collections.emptyList());
 				val context = ebMSDAO.getMessageContextByRefToMessageId(
 						messageHeader.getCPAId(),
 						messageHeader.getMessageData().getMessageId(),
 						EbMSAction.MESSAGE_ERROR,
 						EbMSAction.ACKNOWLEDGMENT);
+				StreamUtils.ifNotPresent(context, () -> log.warn("No response found for duplicate message " + messageHeader.getMessageData().getMessageId() + "!"));
 				val toPartyId = new CacheablePartyId(messageHeader.getTo().getPartyId());
 				val fromPartyId = new CacheablePartyId(messageHeader.getFrom().getPartyId());
 				val service = CPAUtils.toString(CPAUtils.createEbMSMessageService());
-				val sendDeliveryChannel =
-						cpaManager.getSendDeliveryChannel(messageHeader.getCPAId(),toPartyId,messageHeader.getTo().getRole(),service,null)
-						//.orElseThrow(() -> StreamUtils.illegalStateException("SendDeliveryChannel",messageHeader.getCPAId(),toPartyId,messageHeader.getTo().getRole(),service));
+				val sendDeliveryChannel =	cpaManager.getSendDeliveryChannel(messageHeader.getCPAId(),toPartyId,messageHeader.getTo().getRole(),service,null)
 						.orElse(null);
-				val receiveDeliveryChannel =
-						cpaManager.getReceiveDeliveryChannel(messageHeader.getCPAId(),fromPartyId,messageHeader.getFrom().getRole(),service,null)
-						//.orElseThrow(() -> StreamUtils.illegalStateException("ReceiveDeliveryChannel",messageHeader.getCPAId(),fromPartyId,messageHeader.getFrom().getRole(),service));
+				val receiveDeliveryChannel = cpaManager.getReceiveDeliveryChannel(messageHeader.getCPAId(),fromPartyId,messageHeader.getFrom().getRole(),service,null)
 						.orElse(null);
-				if (context.isPresent())
-					eventManager.createEvent(messageHeader.getCPAId(),sendDeliveryChannel,receiveDeliveryChannel,context.get().getMessageId(),messageHeader.getMessageData().getTimeToLive(),context.get().getTimestamp(),false);
-				else
-					log.warn("No response found for duplicate message " + messageHeader.getMessageData().getMessageId() + "!");
+				ebMSDAO.executeTransaction(
+						new DAOTransactionCallback()
+						{
+							@Override
+							public void doInTransaction()
+							{
+								if (storeDuplicateMessage)
+									ebMSDAO.insertDuplicateMessage(timestamp,document.getMessage(),message,storeDuplicateMessageAttachments ? message.getAttachments() : Collections.emptyList());
+								if (sendDeliveryChannel != null && receiveDeliveryChannel != null && context.isPresent())
+									eventManager.createEvent(messageHeader.getCPAId(),sendDeliveryChannel,receiveDeliveryChannel,context.get().getMessageId(),messageHeader.getMessageData().getTimeToLive(),context.get().getTimestamp(),false);
+							}
+						}
+				);
+				if ((sendDeliveryChannel == null || receiveDeliveryChannel == null) && context.isPresent())
+					try
+					{
+						val result = ebMSDAO.getDocument(context.get().getMessageId());
+						throw new ValidationException(DOMUtils.toString(result.get()));
+					}
+					catch (DAOException | TransformerException e)
+					{
+						throw new EbMSProcessingException("Error creating response message for MessageId " + messageHeader.getMessageData().getMessageId() + "!");
+					}
 				return null;
 			}
 		}

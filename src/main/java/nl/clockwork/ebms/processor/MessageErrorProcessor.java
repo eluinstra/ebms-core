@@ -38,6 +38,7 @@ import lombok.extern.apachecommons.CommonsLog;
 import nl.clockwork.ebms.EbMSMessageFactory;
 import nl.clockwork.ebms.EbMSMessageStatus;
 import nl.clockwork.ebms.EbMSMessageUtils;
+import nl.clockwork.ebms.common.util.DOMUtils;
 import nl.clockwork.ebms.cpa.CPAManager;
 import nl.clockwork.ebms.cpa.CPAUtils;
 import nl.clockwork.ebms.dao.DAOTransactionCallback;
@@ -83,6 +84,14 @@ class MessageErrorProcessor
 		val messageError = createMessageError(timestamp,message,e);
 		val result = EbMSMessageUtils.getEbMSDocument(messageError);
 		signatureGenerator.generate(message.getAckRequested(),result,messageError);
+
+		val messageHeader = message.getMessageHeader();
+		val service = CPAUtils.toString(messageError.getMessageHeader().getService());
+		val sendDeliveryChannel = cpaManager.getSendDeliveryChannel(messageHeader.getCPAId(),new CacheablePartyId(messageError.getMessageHeader().getFrom().getPartyId()),messageError.getMessageHeader().getFrom().getRole(),service,messageError.getMessageHeader().getAction())
+				.orElse(null);
+		val receiveDeliveryChannel = cpaManager.getReceiveDeliveryChannel(messageHeader.getCPAId(),new CacheablePartyId(messageError.getMessageHeader().getTo().getPartyId()),messageError.getMessageHeader().getTo().getRole(),service,messageError.getMessageHeader().getAction())
+				.orElse(null);
+
 		ebMSDAO.executeTransaction(
 				new DAOTransactionCallback()
 				{
@@ -90,7 +99,8 @@ class MessageErrorProcessor
 					public void doInTransaction()
 					{
 						storeMessages(timestamp,messageDocument,message,result,messageError);
-						storeEvent(message,messageError,e,isSyncReply);
+						if (sendDeliveryChannel != null && receiveDeliveryChannel != null)
+							storeEvent(message,messageError,e,isSyncReply);
 					}
 
 					private void storeMessages(Instant timestamp, EbMSDocument messageDocument, EbMSMessage message, EbMSDocument messageErrorDocument, EbMSMessageError messageError)
@@ -109,12 +119,6 @@ class MessageErrorProcessor
 					{
 						if (!isSyncReply)
 						{
-							val messageHeader = message.getMessageHeader();
-							val service = CPAUtils.toString(messageError.getMessageHeader().getService());
-							val sendDeliveryChannel = cpaManager.getSendDeliveryChannel(messageHeader.getCPAId(),new CacheablePartyId(messageError.getMessageHeader().getFrom().getPartyId()),messageError.getMessageHeader().getFrom().getRole(),service,messageError.getMessageHeader().getAction())
-									.orElseThrow(() -> new EbMSProcessingException(e.getMessage()));
-							val receiveDeliveryChannel = cpaManager.getReceiveDeliveryChannel(messageHeader.getCPAId(),new CacheablePartyId(messageError.getMessageHeader().getTo().getPartyId()),messageError.getMessageHeader().getTo().getRole(),service,messageError.getMessageHeader().getAction())
-									.orElseThrow(() -> new EbMSProcessingException(e.getMessage()));
 							eventManager.createEvent(
 									messageHeader.getCPAId(),
 									sendDeliveryChannel,
@@ -127,6 +131,8 @@ class MessageErrorProcessor
 					}
 				}
 		);
+		if (sendDeliveryChannel == null || receiveDeliveryChannel == null)
+			throw new ValidationException(DOMUtils.toString(result.getMessage()));
 		return result;
 	}
 
