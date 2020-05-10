@@ -53,6 +53,7 @@ import nl.clockwork.ebms.model.CacheablePartyId;
 import nl.clockwork.ebms.model.EbMSBaseMessage;
 import nl.clockwork.ebms.model.EbMSMessage;
 import nl.clockwork.ebms.model.EbMSStatusResponse;
+import nl.clockwork.ebms.processor.EbMSProcessingException;
 import nl.clockwork.ebms.processor.EbMSProcessorException;
 import nl.clockwork.ebms.service.model.EbMSMessageAttachment;
 import nl.clockwork.ebms.service.model.EbMSMessageContent;
@@ -61,8 +62,6 @@ import nl.clockwork.ebms.service.model.EbMSMessageEvent;
 import nl.clockwork.ebms.service.model.MessageStatus;
 import nl.clockwork.ebms.signing.EbMSSignatureGenerator;
 import nl.clockwork.ebms.validation.EbMSMessageContextValidator;
-import nl.clockwork.ebms.validation.ValidationException;
-import nl.clockwork.ebms.validation.ValidatorException;
 
 @Builder(setterPrefix = "set")
 @CommonsLog
@@ -94,19 +93,22 @@ public class EbMSMessageServiceImpl implements EbMSMessageService
 	{
 		try
 		{
+			log.info("Ping cpaId " + cpaId + " fromPartyId " + fromPartyId + " toPartyId " + toPartyId);
 			ebMSMessageContextValidator.validate(cpaId,fromPartyId,toPartyId);
 			val request = ebMSMessageFactory.createEbMSPing(cpaId,fromPartyId,toPartyId);
 			val response = deliveryManager.sendMessage(request);
 			if (response.isPresent())
 			{
 				if (!EbMSAction.PONG.getAction().equals(response.get().getMessageHeader().getAction()))
-					throw new EbMSMessageServiceException("No valid response received!");
+					throw new EbMSProcessingException("No valid response received!");
 			}
 			else
-				throw new EbMSMessageServiceException("No response received!");
+				throw new EbMSProcessingException("No response received!");
+			log.info("Ping cpaId " + cpaId + " fromPartyId " + fromPartyId + " toPartyId " + toPartyId + " done");
 		}
-		catch (ValidationException | EbMSProcessorException e)
+		catch (Exception e)
 		{
+			log.info("Ping cpaId " + cpaId + " fromPartyId " + fromPartyId + " toPartyId " + toPartyId + " error",e);
 			throw new EbMSMessageServiceException(e);
 		}
 	}
@@ -116,17 +118,20 @@ public class EbMSMessageServiceImpl implements EbMSMessageService
 	{
 		try
 		{
+			log.info("SendMessage");
 			ebMSMessageContextValidator.validate(messageContent.getContext());
 			val message = ebMSMessageFactory.createEbMSMessage(messageContent);
 			val document = EbMSMessageUtils.getEbMSDocument(message);
 			signatureGenerator.generate(document,message);
 			storeMessage(document.getMessage(),message);
-			val messageId = message.getMessageHeader().getMessageData().getMessageId();
-			log.info("Sending message " + messageId);
-			return messageId;
+			val result = message.getMessageHeader().getMessageData().getMessageId();
+			log.info("Sending message " + result);
+			log.info("SendMessage done");
+			return result;
 		}
-		catch (ValidatorException | DAOException | TransformerFactoryConfigurationError | EbMSProcessorException | SOAPException | JAXBException | ParserConfigurationException | SAXException | IOException | TransformerException e)
+		catch (Exception e)
 		{
+			log.info("SendMessage error",e);
 			throw new EbMSMessageServiceException(e);
 		}
 	}
@@ -136,6 +141,7 @@ public class EbMSMessageServiceImpl implements EbMSMessageService
 	{
 		try
 		{
+			log.info("SendMessageWithAttachments");
 			ebMSMessageContextValidator.validate(message.getContext());
 			val result = ebMSMessageFactory.createEbMSMessage(message.toContent());
 			val document = EbMSMessageUtils.getEbMSDocument(result);
@@ -143,10 +149,12 @@ public class EbMSMessageServiceImpl implements EbMSMessageService
 			storeMessage(document.getMessage(),result);
 			val messageId = result.getMessageHeader().getMessageData().getMessageId();
 			log.info("Sending message " + messageId);
+			log.info("SendMessageWithAttachments done");
 			return messageId;
 		}
-		catch (ValidatorException | DAOException | TransformerFactoryConfigurationError | EbMSProcessorException | SOAPException | JAXBException | ParserConfigurationException | SAXException | IOException | TransformerException e)
+		catch (Exception e)
 		{
+			log.info("SendMessageWithAttachments error",e);
 			throw new EbMSMessageServiceException(e);
 		}
 	}
@@ -156,7 +164,8 @@ public class EbMSMessageServiceImpl implements EbMSMessageService
 	{
 		try
 		{
-			return ebMSDAO.getMessageContent(messageId).map(mc ->
+			log.info("ResendMessage " + messageId);
+			val result = ebMSDAO.getMessageContent(messageId).map(mc ->
 			{
 				try
 				{
@@ -174,9 +183,12 @@ public class EbMSMessageServiceImpl implements EbMSMessageService
 					throw new EbMSProcessorException(e);
 				}
 			}).orElseThrow(() -> new EbMSMessageServiceException("Message not found!"));
+			log.info("ResendMessage " + messageId + " done");
+			return result;
 		}
-		catch (DAOException | EbMSProcessorException e)
+		catch (Exception e)
 		{
+			log.info("ResendMessage " + messageId + " done");
 			throw new EbMSMessageServiceException(e);
 		}
 	}
@@ -186,13 +198,14 @@ public class EbMSMessageServiceImpl implements EbMSMessageService
 	{
 		try
 		{
-			if (maxNr == null || maxNr == 0)
-				return ebMSDAO.getMessageIds(messageContext,EbMSMessageStatus.RECEIVED);
-			else
-				return ebMSDAO.getMessageIds(messageContext,EbMSMessageStatus.RECEIVED,maxNr);
+			log.info("GetMessageIds");
+			val result = maxNr == null || maxNr == 0 ? ebMSDAO.getMessageIds(messageContext,EbMSMessageStatus.RECEIVED) : ebMSDAO.getMessageIds(messageContext,EbMSMessageStatus.RECEIVED,maxNr);
+			log.info("GetMessageIds done");
+			return result;
 		}
-		catch (DAOException e)
+		catch (Exception e)
 		{
+			log.info("GetMessageIds error",e);
 			throw new EbMSMessageServiceException(e);
 		}
 	}
@@ -202,12 +215,16 @@ public class EbMSMessageServiceImpl implements EbMSMessageService
 	{
 		try
 		{
+			log.info("GetMessage " + messageId);
 			if (process != null && process)
 				processMessage(messageId);
-			return ebMSDAO.getMessageContent(messageId).orElse(null);
+			val result = ebMSDAO.getMessageContent(messageId).orElse(null);
+			log.info("GetMessage " + messageId + " done");
+			return result;
 		}
-		catch (DAOException e)
+		catch (Exception e)
 		{
+			log.info("GetMessage " + messageId + " error",e);
 			throw new EbMSMessageServiceException(e);
 		}
 	}
@@ -217,6 +234,7 @@ public class EbMSMessageServiceImpl implements EbMSMessageService
 	{
 		try
 		{
+			log.info("ProcessMessage " + messageId);
 			ebMSDAO.executeTransaction(new DAOTransactionCallback()
 			{
 				@Override
@@ -230,9 +248,11 @@ public class EbMSMessageServiceImpl implements EbMSMessageService
 					}
 				}
 			});
+			log.info("ProcessMessage " + messageId + " done");
 		}
-		catch (DAOException e)
+		catch (Exception e)
 		{
+			log.info("ProcessMessage " + messageId + " error",e);
 			throw new EbMSMessageServiceException(e);
 		}
 	}
@@ -242,12 +262,16 @@ public class EbMSMessageServiceImpl implements EbMSMessageService
 	{
 		try
 		{
-			return ebMSDAO.getMessageContext(messageId)
+			log.info("GetMessageStatus " + messageId);
+			val result = ebMSDAO.getMessageContext(messageId)
 					.map(mc -> getMessageStatus(messageId,mc))
 					.orElseThrow(() -> new EbMSMessageServiceException("No message found with messageId " + messageId + "!"));
+			log.info("GetMessageStatus " + messageId + " done");
+			return result;
 		}
-		catch (EbMSProcessorException e)
+		catch (Exception e)
 		{
+			log.info("GetMessageStatus " + messageId + " error",e);
 			throw new EbMSMessageServiceException(e);
 		}
 	}
@@ -283,13 +307,14 @@ public class EbMSMessageServiceImpl implements EbMSMessageService
 	{
 		try
 		{
-			if (maxNr == null || maxNr == 0)
-				return ebMSMessageEventDAO.getEbMSMessageEvents(messageContext,eventTypes);
-			else
-				return ebMSMessageEventDAO.getEbMSMessageEvents(messageContext,eventTypes,maxNr);
+			log.info("GetMessageEvents");
+			val result = maxNr == null || maxNr == 0 ? ebMSMessageEventDAO.getEbMSMessageEvents(messageContext,eventTypes) : ebMSMessageEventDAO.getEbMSMessageEvents(messageContext,eventTypes,maxNr);
+			log.info("GetMessageEvents done");
+			return result;
 		}
-		catch (DAOException e)
+		catch (Exception e)
 		{
+			log.info("GetMessageEvents error",e);
 			throw new EbMSMessageServiceException(e);
 		}
 	}
@@ -299,6 +324,7 @@ public class EbMSMessageServiceImpl implements EbMSMessageService
 	{
 		try
 		{
+			log.info("ProcessMessageEvent " + messageId);
 			ebMSDAO.executeTransaction(new DAOTransactionCallback()
 			{
 				@Override
@@ -308,9 +334,11 @@ public class EbMSMessageServiceImpl implements EbMSMessageService
 					processMessage(messageId);
 				}
 			});
+			log.info("ProcessMessageEvent " + messageId + " done");
 		}
-		catch (DAOException e)
+		catch (Exception e)
 		{
+			log.info("ProcessMessageEvent " + messageId + " error",e);
 			throw new EbMSMessageServiceException(e);
 		}
 	}
@@ -322,7 +350,7 @@ public class EbMSMessageServiceImpl implements EbMSMessageService
 		context.setTimestamp(null);
 	}
 
-	void storeMessage(Document document, EbMSMessage message) throws EbMSProcessorException
+	protected void storeMessage(Document document, EbMSMessage message) throws EbMSProcessorException
 	{
 		ebMSDAO.executeTransaction(new DAOTransactionCallback()
 		{

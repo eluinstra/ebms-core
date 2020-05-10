@@ -15,31 +15,22 @@
  */
 package nl.clockwork.ebms.service;
 
-import java.io.IOException;
 import java.util.List;
-
-import javax.xml.bind.JAXBException;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.soap.SOAPException;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactoryConfigurationError;
-
-import org.xml.sax.SAXException;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.val;
 import lombok.experimental.FieldDefaults;
+import lombok.extern.apachecommons.CommonsLog;
 import nl.clockwork.ebms.EbMSMessageUtils;
 import nl.clockwork.ebms.dao.DAOException;
 import nl.clockwork.ebms.event.listener.EbMSMessageEventType;
-import nl.clockwork.ebms.processor.EbMSProcessorException;
 import nl.clockwork.ebms.service.model.EbMSMessageContentMTOM;
 import nl.clockwork.ebms.service.model.EbMSMessageContext;
 import nl.clockwork.ebms.service.model.EbMSMessageEvent;
 import nl.clockwork.ebms.service.model.MessageStatus;
-import nl.clockwork.ebms.validation.ValidatorException;
 
+@CommonsLog
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor
 public class EbMSMessageServiceMTOMImpl implements EbMSMessageServiceMTOM
@@ -57,15 +48,20 @@ public class EbMSMessageServiceMTOMImpl implements EbMSMessageServiceMTOM
 	{
 		try
 		{
+			log.info("SendMessage");
 			ebMSMessageService.ebMSMessageContextValidator.validate(messageContent.getContext());
 			val message = ebMSMessageService.ebMSMessageFactory.createEbMSMessageMTOM(messageContent);
 			val document = EbMSMessageUtils.getEbMSDocument(message);
 			ebMSMessageService.signatureGenerator.generate(document,message);
 			ebMSMessageService.storeMessage(document.getMessage(),message);
-			return message.getMessageHeader().getMessageData().getMessageId();
+			String result = message.getMessageHeader().getMessageData().getMessageId();
+			log.info("Sending message " + result);
+			log.info("SendMessage done");
+			return result;
 		}
-		catch (ValidatorException | DAOException | TransformerFactoryConfigurationError | EbMSProcessorException | SOAPException | JAXBException | ParserConfigurationException | SAXException | IOException | TransformerException e)
+		catch (Exception e)
 		{
+			log.info("SendMessage error",e);
 			throw new EbMSMessageServiceException(e);
 		}
 	}
@@ -87,12 +83,16 @@ public class EbMSMessageServiceMTOMImpl implements EbMSMessageServiceMTOM
 	{
 		try
 		{
+			log.info("GetMessage " + messageId);
 			if (process != null && process)
 				processMessage(messageId);
-			return ebMSMessageService.ebMSDAO.getMessageContentMTOM(messageId).orElse(null);
+			val result = ebMSMessageService.ebMSDAO.getMessageContentMTOM(messageId).orElse(null);
+			log.info("GetMessage " + messageId + " done");
+			return result;
 		}
 		catch (DAOException e)
 		{
+			log.info("GetMessage " + messageId + " error",e);
 			throw new EbMSMessageServiceException(e);
 		}
 	}
