@@ -121,7 +121,7 @@ public class EbMSSignatureValidator
 						SecurityUtils.validateCertificate(trustStore,certificate,date);
 						if (!verify(certificate,(Element)signatureNodeList.item(0),Collections.emptyList()))
 							throw new ValidationException("Invalid Signature!");
-							validateSignatureReferences(requestMessage,responseMessage);
+						validateSignatureReferences(requestMessage,responseMessage);
 					}
 					else
 						throw new ValidationException("Certificate not found!");
@@ -180,8 +180,8 @@ public class EbMSSignatureValidator
 //				.filter(r -> requestMessage.getSignature().getSignedInfo().getReference().contains(r))
 //				.collect(Collectors.toSet()).size() > 0)
 //			throw new ValidationException("Signature references found in request message " + requestMessage.getMessageHeader().getMessageData().getMessageId() + " and response message " + responseMessage.getMessageHeader().getMessageData().getMessageId() + " do not match");
-		if (responseMessage.getAcknowledgment().getReference().stream()
-				.filter(r -> contains(requestMessage.getSignature().getSignedInfo().getReference(),r))
+		if (requestMessage.getSignature().getSignedInfo().getReference().stream()
+				.filter(r -> !contains(responseMessage.getAcknowledgment().getReference(),r))
 				.collect(Collectors.toSet()).size() > 0)
 			throw new ValidationException("Signature references found in request message " + requestMessage.getMessageHeader().getMessageData().getMessageId() + " and response message " + responseMessage.getMessageHeader().getMessageData().getMessageId() + " do not match");
 	}
