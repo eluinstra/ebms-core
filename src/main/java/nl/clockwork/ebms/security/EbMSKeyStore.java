@@ -49,11 +49,12 @@ public class EbMSKeyStore
 		return keyStores.get(path);
 	}
 
-	public static EbMSKeyStore of(@NonNull KeyStoreType type, @NonNull String path, @NonNull String password, @NonNull String keyPassword, String defaultAlias) throws GeneralSecurityException, IOException
+	public static EbMSKeyStore of(@NonNull KeyStoreType type, @NonNull String path, @NonNull String password, @NonNull String keyPassword, @NonNull String defaultAlias) throws GeneralSecurityException, IOException
 	{
-		if (!keyStores.containsKey(path))
-			keyStores.put(path,new EbMSKeyStore(type,path,password,keyPassword,defaultAlias));
-		return keyStores.get(path);
+		String key = path + defaultAlias;
+		if (!keyStores.containsKey(key))
+			keyStores.put(key,new EbMSKeyStore(type,path,password,keyPassword,defaultAlias));
+		return keyStores.get(key);
 	}
 
 	private EbMSKeyStore(@NonNull KeyStoreType type, @NonNull String path, @NonNull String password, @NonNull String keyPassword, String defaultAlias) throws GeneralSecurityException, IOException
