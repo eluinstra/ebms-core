@@ -99,7 +99,7 @@ class MessageErrorProcessor
 					public void doInTransaction()
 					{
 						storeMessages(timestamp,messageDocument,message,result,messageError);
-						if (sendDeliveryChannel != null && receiveDeliveryChannel != null)
+						if (receiveDeliveryChannel != null)
 							storeEvent(message,messageError,e,isSyncReply);
 					}
 
@@ -131,7 +131,7 @@ class MessageErrorProcessor
 					}
 				}
 		);
-		if (sendDeliveryChannel == null || receiveDeliveryChannel == null)
+		if (receiveDeliveryChannel == null)
 			throw new ValidationException(DOMUtils.toString(result.getMessage()));
 		return result;
 	}

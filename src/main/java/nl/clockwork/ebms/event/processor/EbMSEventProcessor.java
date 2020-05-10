@@ -165,9 +165,9 @@ public class EbMSEventProcessor implements Runnable
 
 		private EbMSClient createClient(EbMSEvent event) throws CertificateException
 		{
-			val sendDeliveryChannel = 
+			val sendDeliveryChannel = event.getSendDeliveryChannelId() != null ?
 					cpaManager.getDeliveryChannel(event.getCpaId(),event.getSendDeliveryChannelId())
-					.orElse(null);
+					.orElse(null) : null;
 			return ebMSClientFactory.getEbMSClient(sendDeliveryChannel);
 		}
 

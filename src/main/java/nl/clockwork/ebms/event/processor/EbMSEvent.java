@@ -29,7 +29,6 @@ public class EbMSEvent
 {
 	@NonNull
 	String cpaId;
-	@NonNull
 	String sendDeliveryChannelId;
 	@NonNull
 	String receiveDeliveryChannelId;

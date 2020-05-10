@@ -103,12 +103,12 @@ class DuplicateMessageHandler
 							{
 								if (storeDuplicateMessage)
 									ebMSDAO.insertDuplicateMessage(timestamp,document.getMessage(),message,storeDuplicateMessageAttachments ? message.getAttachments() : Collections.emptyList());
-								if (sendDeliveryChannel != null && receiveDeliveryChannel != null && context.isPresent())
+								if (receiveDeliveryChannel != null && context.isPresent())
 									eventManager.createEvent(messageHeader.getCPAId(),sendDeliveryChannel,receiveDeliveryChannel,context.get().getMessageId(),messageHeader.getMessageData().getTimeToLive(),context.get().getTimestamp(),false);
 							}
 						}
 				);
-				if ((sendDeliveryChannel == null || receiveDeliveryChannel == null) && context.isPresent())
+				if (receiveDeliveryChannel == null && context.isPresent())
 					try
 					{
 						val result = ebMSDAO.getDocument(context.get().getMessageId());

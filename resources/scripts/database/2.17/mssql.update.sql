@@ -8,4 +8,4 @@ CREATE TABLE certificate_mapping
 );
 
 EXEC sp_rename 'ebms_event.channel_id', 'receive_channel_id', 'COLUMN';
-ALTER TABLE ebms_event ADD send_channel_id VARCHAR(256) NOT NULL DEFAULT 'DUMMY';
+ALTER TABLE ebms_event ADD send_channel_id VARCHAR(256) NULL;

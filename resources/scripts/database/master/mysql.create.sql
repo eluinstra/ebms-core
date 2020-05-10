@@ -63,7 +63,7 @@ CREATE TABLE ebms_attachment
 CREATE TABLE ebms_event
 (
 	cpa_id							VARCHAR(256)		NOT NULL,
-	send_channel_id			VARCHAR(256)		NOT NULL,
+	send_channel_id			VARCHAR(256)		NULL,
 	receive_channel_id	VARCHAR(256)		NOT NULL,
 	message_id					VARCHAR(256)		NOT NULL,
 	time_to_live				TIMESTAMP				NULL,
