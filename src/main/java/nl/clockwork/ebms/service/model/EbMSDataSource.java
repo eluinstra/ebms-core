@@ -24,6 +24,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import lombok.ToString;
 import lombok.experimental.FieldDefaults;
 
 @Builder
@@ -32,6 +33,7 @@ import lombok.experimental.FieldDefaults;
 @NoArgsConstructor
 @AllArgsConstructor
 @RequiredArgsConstructor
+@ToString()
 public class EbMSDataSource implements Serializable
 {
 	private static final long serialVersionUID = 1L;
@@ -41,5 +43,6 @@ public class EbMSDataSource implements Serializable
 	@NonNull
 	String contentType;
 	@NonNull
+	@ToString.Exclude
 	byte[] content;
 }

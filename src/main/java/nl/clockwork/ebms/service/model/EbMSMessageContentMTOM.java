@@ -46,4 +46,10 @@ public class EbMSMessageContentMTOM implements Serializable
 	EbMSMessageContext context;
 	@XmlElement(name="dataSource")
 	List<EbMSDataSourceMTOM> dataSources;
+
+	@Override
+	public String toString()
+	{
+		return context.toString();
+	}
 }

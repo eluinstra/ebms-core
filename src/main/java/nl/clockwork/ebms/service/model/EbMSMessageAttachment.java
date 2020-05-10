@@ -91,5 +91,11 @@ public class EbMSMessageAttachment implements Serializable
 		{
 			throw new EbMSProcessingException(e);
 		}
-	}	
+	}
+
+	@Override
+	public String toString()
+	{
+		return context.toString();
+	}
 }

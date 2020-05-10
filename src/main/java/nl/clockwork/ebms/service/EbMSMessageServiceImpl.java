@@ -93,7 +93,7 @@ public class EbMSMessageServiceImpl implements EbMSMessageService
 	{
 		try
 		{
-			log.info("Ping cpaId " + cpaId + " fromPartyId " + fromPartyId + " toPartyId " + toPartyId);
+			log.info("Ping " + cpaId);
 			ebMSMessageContextValidator.validate(cpaId,fromPartyId,toPartyId);
 			val request = ebMSMessageFactory.createEbMSPing(cpaId,fromPartyId,toPartyId);
 			val response = deliveryManager.sendMessage(request);
@@ -104,11 +104,11 @@ public class EbMSMessageServiceImpl implements EbMSMessageService
 			}
 			else
 				throw new EbMSProcessingException("No response received!");
-			log.info("Ping cpaId " + cpaId + " fromPartyId " + fromPartyId + " toPartyId " + toPartyId + " done");
+			log.info("Ping " + cpaId + " done");
 		}
 		catch (Exception e)
 		{
-			log.info("Ping cpaId " + cpaId + " fromPartyId " + fromPartyId + " toPartyId " + toPartyId + " error",e);
+			log.info("Ping " + cpaId + " error",e);
 			throw new EbMSMessageServiceException(e);
 		}
 	}

@@ -26,6 +26,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
+import lombok.ToString;
 import lombok.experimental.FieldDefaults;
 import nl.clockwork.ebms.event.listener.EbMSMessageEventType;
 
@@ -35,6 +36,7 @@ import nl.clockwork.ebms.event.listener.EbMSMessageEventType;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @NoArgsConstructor
 @AllArgsConstructor
+@ToString
 public class EbMSMessageEvent implements Serializable
 {
 	private static final long serialVersionUID = 1L;

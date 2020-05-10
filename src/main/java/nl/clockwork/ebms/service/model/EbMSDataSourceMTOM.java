@@ -29,6 +29,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import lombok.ToString;
 import lombok.experimental.FieldDefaults;
 
 @XmlType(name = "EbMSDataSource")
@@ -38,11 +39,13 @@ import lombok.experimental.FieldDefaults;
 @NoArgsConstructor
 @AllArgsConstructor
 @RequiredArgsConstructor
+@ToString
 public class EbMSDataSourceMTOM implements Serializable
 {
 	private static final long serialVersionUID = 1L;
 	String contentId;
-	@NonNull
 	@XmlMimeType("application/octet-stream")
+	@NonNull
+	@ToString.Exclude
 	DataHandler attachment;
 }
