@@ -29,7 +29,7 @@ import lombok.experimental.FieldDefaults;
 import nl.clockwork.ebms.Constants;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-public class LoggingInputStream extends FilterInputStream
+class LoggingInputStream extends FilterInputStream
 {
 	transient Log messageLogger = LogFactory.getLog(Constants.MESSAGE_LOG);
 	@NonNull

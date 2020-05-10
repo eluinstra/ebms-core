@@ -47,7 +47,7 @@ import nl.clockwork.ebms.event.listener.EbMSMessageEventType;
 import nl.clockwork.ebms.model.EbMSAttachment;
 import nl.clockwork.ebms.model.EbMSBaseMessage;
 
-public class MySQLEbMSDAOImpl extends AbstractEbMSDAO
+class MySQLEbMSDAOImpl extends AbstractEbMSDAO
 {
 	public MySQLEbMSDAOImpl(TransactionTemplate transactionTemplate, JdbcTemplate jdbcTemplate, String serverId)
 	{

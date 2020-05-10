@@ -13,21 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.clockwork.ebms.cpa.dao;
+package nl.clockwork.ebms.event.listener;
 
 import java.util.List;
-import java.util.Optional;
 
 import nl.clockwork.ebms.dao.DAOException;
-import nl.clockwork.ebms.service.model.URLMapping;
+import nl.clockwork.ebms.service.model.EbMSMessageContext;
+import nl.clockwork.ebms.service.model.EbMSMessageEvent;
 
-public interface URLMappingDAO
+public interface EbMSMessageEventDAO
 {
-	boolean existsURLMapping(String source) throws DAOException;
-	Optional<String> getURLMapping(String source) throws DAOException;
-	List<URLMapping> getURLMappings() throws DAOException;
-	void insertURLMapping(URLMapping urlMapping) throws DAOException;
-	int updateURLMapping(URLMapping urlMapping) throws DAOException;
-	int deleteURLMapping(String source) throws DAOException;
-	String getTargetName();
+	List<EbMSMessageEvent> getEbMSMessageEvents(EbMSMessageContext messageContext, EbMSMessageEventType[] types) throws DAOException;
+	List<EbMSMessageEvent> getEbMSMessageEvents(EbMSMessageContext messageContext, EbMSMessageEventType[] types, int maxNr) throws DAOException;
+	void insertEbMSMessageEvent(String messageId, EbMSMessageEventType eventType) throws DAOException;
+	int processEbMSMessageEvent(String messageId) throws DAOException;
 }

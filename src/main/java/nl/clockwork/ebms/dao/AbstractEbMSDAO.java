@@ -67,14 +67,14 @@ import nl.clockwork.ebms.EbMSMessageStatus;
 import nl.clockwork.ebms.EbMSMessageUtils;
 import nl.clockwork.ebms.common.JAXBParser;
 import nl.clockwork.ebms.common.util.DOMUtils;
-import nl.clockwork.ebms.cpa.dao.CPADAO;
-import nl.clockwork.ebms.cpa.dao.CertificateMappingDAO;
-import nl.clockwork.ebms.cpa.dao.URLMappingDAO;
+import nl.clockwork.ebms.cpa.CPADAO;
+import nl.clockwork.ebms.cpa.CertificateMappingDAO;
+import nl.clockwork.ebms.cpa.URLMappingDAO;
+import nl.clockwork.ebms.event.listener.EbMSMessageEventDAO;
 import nl.clockwork.ebms.event.listener.EbMSMessageEventType;
-import nl.clockwork.ebms.event.listener.dao.EbMSMessageEventDAO;
 import nl.clockwork.ebms.event.processor.EbMSEvent;
+import nl.clockwork.ebms.event.processor.EbMSEventDAO;
 import nl.clockwork.ebms.event.processor.EbMSEventStatus;
-import nl.clockwork.ebms.event.processor.dao.EbMSEventDAO;
 import nl.clockwork.ebms.model.EbMSAttachment;
 import nl.clockwork.ebms.model.EbMSBaseMessage;
 import nl.clockwork.ebms.model.EbMSDocument;
@@ -91,7 +91,7 @@ import nl.clockwork.ebms.service.model.URLMapping;
 
 @FieldDefaults(level = AccessLevel.PROTECTED, makeFinal = true)
 @AllArgsConstructor
-public abstract class AbstractEbMSDAO implements EbMSDAO, CPADAO, URLMappingDAO, CertificateMappingDAO, EbMSEventDAO, EbMSMessageEventDAO
+abstract class AbstractEbMSDAO implements EbMSDAO, CPADAO, URLMappingDAO, CertificateMappingDAO, EbMSEventDAO, EbMSMessageEventDAO
 {
 	@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 	@AllArgsConstructor

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.clockwork.ebms.event.processor.dao;
+package nl.clockwork.ebms.event.processor;
 
 import java.time.Instant;
 import java.util.List;
@@ -22,8 +22,6 @@ import java.util.Optional;
 import nl.clockwork.ebms.EbMSAction;
 import nl.clockwork.ebms.dao.DAOException;
 import nl.clockwork.ebms.dao.DAOTransactionCallback;
-import nl.clockwork.ebms.event.processor.EbMSEvent;
-import nl.clockwork.ebms.event.processor.EbMSEventStatus;
 
 public interface EbMSEventDAO
 {

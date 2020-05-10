@@ -33,7 +33,7 @@ import nl.clockwork.ebms.validation.ValidatorException;
 @CommonsLog
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor
-public class StatusResponseProcessor
+class StatusResponseProcessor
 {
   @NonNull
 	EbMSDAO ebMSDAO;

@@ -63,7 +63,7 @@ public class CPAServiceImpl implements CPAService
 		{
 			xsdValidator.validate(cpa);
 			val cpa_ = JAXBParser.getInstance(CollaborationProtocolAgreement.class).handle(cpa);
-			cpaValidator.validate(cpa_);
+			cpaValidator.validate(cpa);
 		}
 		catch (JAXBException | ValidatorException e)
 		{

@@ -43,7 +43,7 @@ import nl.clockwork.ebms.validation.EbMSMessageValidator;
 @CommonsLog
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor
-public class DuplicateMessageHandler
+class DuplicateMessageHandler
 {
   @NonNull
   EbMSDAO ebMSDAO;

@@ -33,7 +33,7 @@ import nl.clockwork.ebms.signing.EbMSSignatureValidator;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor
-public class SignatureValidator
+class SignatureValidator
 {
 	@NonNull
 	CPAManager cpaManager;

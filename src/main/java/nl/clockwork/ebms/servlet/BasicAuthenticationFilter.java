@@ -33,13 +33,13 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import lombok.AccessLevel;
 import lombok.val;
 import lombok.experimental.FieldDefaults;
-import nl.clockwork.ebms.common.util.SecurityUtils;
 
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class BasicAuthenticationFilter implements Filter
@@ -105,13 +105,18 @@ public class BasicAuthenticationFilter implements Filter
 	private boolean validate(String savedPassword, String password) throws NoSuchAlgorithmException, UnsupportedEncodingException
 	{
 		if (savedPassword.startsWith("MD5:"))
-			return SecurityUtils.toMD5(password).equals(savedPassword);
+			return toMD5(password).equals(savedPassword);
 		else if (savedPassword.startsWith("OBF:"))
 			throw new NoSuchAlgorithmException("OBF");
 		else if (savedPassword.startsWith("CRYPT:"))
 			throw new NoSuchAlgorithmException("CRYPT");
 		else
 			return password.equals(savedPassword);
+	}
+
+	private String toMD5(String s) throws NoSuchAlgorithmException, UnsupportedEncodingException
+	{
+		return "MD5:" + DigestUtils.md5Hex(s);
 	}
 
 	@Override

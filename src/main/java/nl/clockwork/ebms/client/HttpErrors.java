@@ -33,7 +33,7 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor
 @Getter
-public class HttpErrors
+class HttpErrors
 {
 	@NonNull
 	List<Integer> recoverableHttpErrors;

@@ -27,7 +27,7 @@ import nl.clockwork.ebms.EbMSMessageUtils;
 import nl.clockwork.ebms.model.EbMSAttachment;
 import nl.clockwork.ebms.model.EbMSMessage;
 
-public class ManifestValidator
+class ManifestValidator
 {
 	public void validate(EbMSMessage message) throws EbMSValidationException
 	{

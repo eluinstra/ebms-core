@@ -23,7 +23,7 @@ import nl.clockwork.ebms.validation.ValidatorException;
 @CommonsLog
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor
-public class PongProcessor
+class PongProcessor
 {
   @NonNull
 	CPAManager cpaManager;

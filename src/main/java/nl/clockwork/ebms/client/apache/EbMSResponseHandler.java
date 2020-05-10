@@ -35,14 +35,14 @@ import lombok.AccessLevel;
 import lombok.val;
 import lombok.experimental.FieldDefaults;
 import nl.clockwork.ebms.Constants;
+import nl.clockwork.ebms.EbMSMessageReader;
 import nl.clockwork.ebms.HttpStatusCode;
-import nl.clockwork.ebms.common.util.HTTPUtils;
+import nl.clockwork.ebms.client.HTTPUtils;
 import nl.clockwork.ebms.model.EbMSDocument;
 import nl.clockwork.ebms.processor.EbMSProcessingException;
-import nl.clockwork.ebms.server.EbMSMessageReader;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-public class EbMSResponseHandler implements ResponseHandler<EbMSDocument>
+class EbMSResponseHandler implements ResponseHandler<EbMSDocument>
 {
 	transient Log messageLogger = LogFactory.getLog(Constants.MESSAGE_LOG);
 

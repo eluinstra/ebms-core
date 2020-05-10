@@ -43,7 +43,7 @@ import nl.clockwork.ebms.model.EbMSDocument;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor
-public class EbMSMessageWriter
+class EbMSMessageWriter
 {
 	transient Log messageLogger = LogFactory.getLog(Constants.MESSAGE_LOG);
 	HttpPost httpPost;

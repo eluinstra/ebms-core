@@ -43,7 +43,7 @@ import nl.clockwork.ebms.event.listener.EbMSMessageEventType;
 import nl.clockwork.ebms.model.EbMSAttachment;
 import nl.clockwork.ebms.model.EbMSBaseMessage;
 
-public class DB2EbMSDAOImpl extends nl.clockwork.ebms.dao.PostgreSQLEbMSDAOImpl
+class DB2EbMSDAOImpl extends nl.clockwork.ebms.dao.PostgreSQLEbMSDAOImpl
 {
 	public DB2EbMSDAOImpl(TransactionTemplate transactionTemplate, JdbcTemplate jdbcTemplate, String serverId)
 	{

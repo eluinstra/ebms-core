@@ -13,22 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.clockwork.ebms.cpa.dao;
+package nl.clockwork.ebms.cpa;
 
 import java.util.List;
 import java.util.Optional;
 
-import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CollaborationProtocolAgreement;
-
 import nl.clockwork.ebms.dao.DAOException;
+import nl.clockwork.ebms.service.model.URLMapping;
 
-public interface CPADAO
+public interface URLMappingDAO
 {
-	boolean existsCPA(String cpaId) throws DAOException;
-	Optional<CollaborationProtocolAgreement> getCPA(String cpaId) throws DAOException;
-	List<String> getCPAIds() throws DAOException;
-	void insertCPA(CollaborationProtocolAgreement cpa) throws DAOException;
-	int updateCPA(CollaborationProtocolAgreement cpa) throws DAOException;
-	int deleteCPA(String cpaId) throws DAOException;
+	boolean existsURLMapping(String source) throws DAOException;
+	Optional<String> getURLMapping(String source) throws DAOException;
+	List<URLMapping> getURLMappings() throws DAOException;
+	void insertURLMapping(URLMapping urlMapping) throws DAOException;
+	int updateURLMapping(URLMapping urlMapping) throws DAOException;
+	int deleteURLMapping(String source) throws DAOException;
 	String getTargetName();
 }

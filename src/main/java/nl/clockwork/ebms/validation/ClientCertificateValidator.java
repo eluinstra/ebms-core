@@ -35,7 +35,7 @@ import nl.clockwork.ebms.model.EbMSBaseMessage;
 @CommonsLog
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-public class ClientCertificateValidator
+class ClientCertificateValidator
 {
 	private static class DisabledClientCertificateValidator extends ClientCertificateValidator
 	{

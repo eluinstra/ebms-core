@@ -30,7 +30,7 @@ import nl.clockwork.ebms.client.SSLFactoryManager;
 
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-public class SSLConnectionSocketFactoryFactory implements FactoryBean<SSLConnectionSocketFactory>
+class SSLConnectionSocketFactoryFactory implements FactoryBean<SSLConnectionSocketFactory>
 {
 	@NonNull
 	SSLFactoryManager sslFactoryManager;

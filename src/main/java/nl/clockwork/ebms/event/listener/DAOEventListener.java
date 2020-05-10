@@ -19,11 +19,10 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
-import nl.clockwork.ebms.event.listener.dao.EbMSMessageEventDAO;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor
-public class DAOEventListener extends LoggingEventListener
+class DAOEventListener extends LoggingEventListener
 {
 	@NonNull
 	EbMSMessageEventDAO ebMSMessageEventDAO;

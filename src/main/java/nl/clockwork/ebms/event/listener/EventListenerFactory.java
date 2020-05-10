@@ -39,7 +39,6 @@ import lombok.val;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.NonFinal;
 import nl.clockwork.ebms.dao.EbMSDAO;
-import nl.clockwork.ebms.event.listener.dao.EbMSMessageEventDAO;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class EventListenerFactory implements FactoryBean<EventListener>, DisposableBean

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.clockwork.ebms.server;
+package nl.clockwork.ebms;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -32,11 +32,10 @@ import lombok.AccessLevel;
 import lombok.val;
 import lombok.var;
 import lombok.experimental.FieldDefaults;
-import nl.clockwork.ebms.EbMSAttachmentFactory;
 import nl.clockwork.ebms.model.EbMSAttachment;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-public class EbMSContentHandler implements ContentHandler
+class EbMSContentHandler implements ContentHandler
 {
 	Map<String,String> headers = new HashMap<>();
 	List<EbMSAttachment> attachments = new ArrayList<>();

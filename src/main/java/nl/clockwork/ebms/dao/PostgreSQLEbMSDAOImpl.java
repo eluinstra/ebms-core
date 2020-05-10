@@ -53,7 +53,7 @@ import nl.clockwork.ebms.model.EbMSAttachment;
 import nl.clockwork.ebms.model.EbMSBaseMessage;
 import nl.clockwork.ebms.processor.EbMSProcessingException;
 
-public class PostgreSQLEbMSDAOImpl extends AbstractEbMSDAO
+class PostgreSQLEbMSDAOImpl extends AbstractEbMSDAO
 {
 	public class KeyExtractor implements ResultSetExtractor<KeyHolder>
 	{

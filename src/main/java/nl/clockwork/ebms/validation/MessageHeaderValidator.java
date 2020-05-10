@@ -52,7 +52,7 @@ import nl.clockwork.ebms.model.EbMSMessage;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor
-public class MessageHeaderValidator
+class MessageHeaderValidator
 {
 	@NonNull
 	EbMSDAO ebMSDAO;

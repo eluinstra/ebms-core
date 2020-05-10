@@ -21,7 +21,7 @@ import org.springframework.transaction.support.TransactionTemplate;
 import nl.clockwork.ebms.EbMSMessageStatus;
 import nl.clockwork.ebms.event.listener.EbMSMessageEventType;
 
-public class HSQLDBEbMSDAOImpl extends AbstractEbMSDAO
+class HSQLDBEbMSDAOImpl extends AbstractEbMSDAO
 {
 	public HSQLDBEbMSDAOImpl(TransactionTemplate transactionTemplate, JdbcTemplate jdbcTemplate, String serverId)
 	{

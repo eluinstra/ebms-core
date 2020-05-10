@@ -31,7 +31,7 @@ import nl.clockwork.ebms.security.EbMSKeyStore;
 import nl.clockwork.ebms.security.EbMSTrustStore;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-public class SSLFactoryManager
+class SSLFactoryManager
 {
 	@NonNull
 	EbMSKeyStore keyStore;

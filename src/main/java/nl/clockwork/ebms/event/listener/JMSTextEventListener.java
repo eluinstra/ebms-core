@@ -36,7 +36,7 @@ import nl.clockwork.ebms.service.model.EbMSMessageContext;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor
-public class JMSTextEventListener extends LoggingEventListener
+class JMSTextEventListener extends LoggingEventListener
 {
 	@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 	@AllArgsConstructor

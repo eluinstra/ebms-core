@@ -28,7 +28,6 @@ import lombok.experimental.FieldDefaults;
 import net.sf.ehcache.Ehcache;
 import nl.clockwork.ebms.common.InvalidURLException;
 import nl.clockwork.ebms.common.MethodCacheInterceptor;
-import nl.clockwork.ebms.cpa.dao.URLMappingDAO;
 import nl.clockwork.ebms.service.model.URLMapping;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)

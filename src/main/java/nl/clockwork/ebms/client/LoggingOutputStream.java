@@ -22,7 +22,6 @@ import java.util.List;
 import java.util.Map;
 
 import nl.clockwork.ebms.Constants;
-import nl.clockwork.ebms.common.util.HTTPUtils;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -32,7 +31,7 @@ import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-public class LoggingOutputStream extends FilterOutputStream
+class LoggingOutputStream extends FilterOutputStream
 {
 	transient Log messageLogger = LogFactory.getLog(Constants.MESSAGE_LOG);
 	@NonNull

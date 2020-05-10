@@ -18,7 +18,7 @@ package nl.clockwork.ebms.event.listener;
 import lombok.extern.apachecommons.CommonsLog;
 
 @CommonsLog
-public class LoggingEventListener implements EventListener
+class LoggingEventListener implements EventListener
 {
 	@Override
 	public void onMessageReceived(String messageId) throws EventException

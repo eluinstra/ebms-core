@@ -35,7 +35,6 @@ import net.sf.ehcache.Ehcache;
 import nl.clockwork.ebms.EbMSAction;
 import nl.clockwork.ebms.common.MethodCacheInterceptor;
 import nl.clockwork.ebms.common.util.StreamUtils;
-import nl.clockwork.ebms.cpa.dao.CPADAO;
 import nl.clockwork.ebms.model.CacheablePartyId;
 import nl.clockwork.ebms.model.EbMSPartyInfo;
 import nl.clockwork.ebms.model.FromPartyInfo;

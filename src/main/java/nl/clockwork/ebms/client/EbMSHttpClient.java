@@ -38,7 +38,7 @@ import nl.clockwork.ebms.processor.EbMSProcessorException;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor
-public class EbMSHttpClient implements EbMSClient
+class EbMSHttpClient implements EbMSClient
 {
 	@NonNull
 	SSLFactoryManager sslFactoryManager;

@@ -26,7 +26,7 @@ import org.springframework.util.StringUtils;
 import lombok.val;
 import nl.clockwork.ebms.model.EbMSAttachment;
 
-public class EbMSMessageBase64Writer extends EbMSMessageWriter
+class EbMSMessageBase64Writer extends EbMSMessageWriter
 {
 	public EbMSMessageBase64Writer(HttpURLConnection connection)
 	{

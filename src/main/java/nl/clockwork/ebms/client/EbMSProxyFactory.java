@@ -28,7 +28,7 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @Getter
 @AllArgsConstructor
-public class EbMSProxyFactory implements FactoryBean<EbMSProxy>
+class EbMSProxyFactory implements FactoryBean<EbMSProxy>
 {
 	String host;
 	int port;

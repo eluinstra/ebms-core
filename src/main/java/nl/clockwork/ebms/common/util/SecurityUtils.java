@@ -15,7 +15,6 @@
  */
 package nl.clockwork.ebms.common.util;
 
-import java.io.UnsupportedEncodingException;
 import java.security.GeneralSecurityException;
 import java.security.KeyPair;
 import java.security.KeyStoreException;
@@ -29,9 +28,7 @@ import java.util.Date;
 
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
-import javax.security.cert.CertificateException;
 
-import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.xml.security.encryption.XMLCipher;
 
 import lombok.val;
@@ -39,7 +36,6 @@ import lombok.extern.apachecommons.CommonsLog;
 import nl.clockwork.ebms.security.EbMSKeyStore;
 import nl.clockwork.ebms.security.EbMSTrustStore;
 import nl.clockwork.ebms.validation.ValidationException;
-import nl.clockwork.ebms.validation.ValidatorException;
 
 @CommonsLog
 public class SecurityUtils
@@ -92,49 +88,18 @@ public class SecurityUtils
 		}
 	}
 	
-	public static void validateCertificate(EbMSTrustStore trustStore, javax.security.cert.X509Certificate certificate, Instant date) throws KeyStoreException, ValidatorException
-	{
-		try
-		{
-			certificate.checkValidity(Date.from(date));
-			val aliases = trustStore.aliases();
-			while (aliases.hasMoreElements())
-			{
-				try
-				{
-					val c = trustStore.getCertificate(aliases.nextElement());
-					if (c instanceof X509Certificate)
-						if (certificate.getIssuerDN().getName().equals(((X509Certificate)c).getSubjectDN().getName()))
-						{
-							certificate.verify(c.getPublicKey());
-							return;
-						}
-				}
-				catch (GeneralSecurityException | CertificateException e)
-				{
-					log.trace("",e);
-				}
-			}
-			throw new ValidationException("Certificate " + certificate.getIssuerDN() + " not found!");
-		}
-		catch (javax.security.cert.CertificateExpiredException | javax.security.cert.CertificateNotYetValidException e)
-		{
-			throw new ValidationException(e);
-		}
-	}
-
 	public static SecretKey generateKey(String encryptionAlgorithm) throws NoSuchAlgorithmException
 	{
 		switch (encryptionAlgorithm)
 		{
 			case XMLCipher.AES_128:
-				return generateKey("AES", KEYSIZE_128);
+				return generateKey("AES",KEYSIZE_128);
 			case XMLCipher.AES_192:
-				return generateKey("AES", KEYSIZE_192);
+				return generateKey("AES",KEYSIZE_192);
 			case XMLCipher.AES_256:
-				return generateKey("AES", KEYSIZE_256);
+				return generateKey("AES",KEYSIZE_256);
 			case XMLCipher.TRIPLEDES:
-				return generateKey("DESede", KEYSIZE_192);
+				return generateKey("DESede",KEYSIZE_192);
 			default:
 				throw new NoSuchAlgorithmException(encryptionAlgorithm);
 		}
@@ -145,11 +110,6 @@ public class SecurityUtils
 		val keyGenerator = KeyGenerator.getInstance(algorithm);
 		keyGenerator.init(keysize);
 		return keyGenerator.generateKey();
-	}
-
-	public static String toMD5(String s) throws NoSuchAlgorithmException, UnsupportedEncodingException
-	{
-		return "MD5:" + DigestUtils.md5Hex(s);
 	}
 
 }

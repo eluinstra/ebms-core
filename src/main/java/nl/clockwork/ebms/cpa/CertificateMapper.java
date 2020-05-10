@@ -25,7 +25,6 @@ import lombok.val;
 import lombok.experimental.FieldDefaults;
 import net.sf.ehcache.Ehcache;
 import nl.clockwork.ebms.common.MethodCacheInterceptor;
-import nl.clockwork.ebms.cpa.dao.CertificateMappingDAO;
 import nl.clockwork.ebms.service.model.CertificateMapping;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)

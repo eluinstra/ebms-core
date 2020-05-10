@@ -26,7 +26,7 @@ import lombok.val;
 import lombok.var;
 import nl.clockwork.ebms.common.util.SecurityUtils;
 
-public class KeyStoreUtils
+class KeyStoreUtils
 {
 	public static KeyStore loadKeyStore(KeyStoreType type, String location, String password) throws GeneralSecurityException, IOException
 	{

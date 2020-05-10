@@ -34,6 +34,7 @@ import lombok.val;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.apachecommons.CommonsLog;
 import nl.clockwork.ebms.Constants;
+import nl.clockwork.ebms.EbMSMessageReader;
 import nl.clockwork.ebms.EbMSMessageUtils;
 import nl.clockwork.ebms.HttpStatusCode;
 import nl.clockwork.ebms.common.util.DOMUtils;
