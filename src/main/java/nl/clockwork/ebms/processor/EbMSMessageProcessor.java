@@ -218,38 +218,45 @@ public class EbMSMessageProcessor
 	{
 		try
 		{
-			val requestMessage = (EbMSMessage)EbMSMessageUtils.getEbMSMessage(request);
-			val requestMessageHeader = requestMessage.getMessageHeader();
-			if (requestMessage.getAckRequested() != null && requestMessage.getSyncReply() != null && response == null)
-				throw new EbMSProcessingException("No response received for message " + requestMessageHeader.getMessageData().getMessageId());
-			
-			if (response != null)
+			val message = EbMSMessageUtils.getEbMSMessage(request);
+			val requestMessageHeader = message.getMessageHeader();
+			if (message instanceof EbMSMessage)
 			{
-				xsdValidator.validate(response.getMessage());
-				val timestamp = Instant.now();
-				val responseMessage = EbMSMessageUtils.getEbMSMessage(response);
-				if (responseMessage instanceof EbMSMessageError)
+				val requestMessage = (EbMSMessage)message;
+				if (requestMessage.getAckRequested() != null && requestMessage.getSyncReply() != null && response == null)
+					throw new EbMSProcessingException("No response received for message " + requestMessageHeader.getMessageData().getMessageId());
+				
+				if (response != null)
 				{
-					if (!messageValidator.isSyncReply(requestMessage))
+					xsdValidator.validate(response.getMessage());
+					val timestamp = Instant.now();
+					val responseMessage = EbMSMessageUtils.getEbMSMessage(response);
+					if (responseMessage instanceof EbMSMessageError)
+					{
+						if (!messageValidator.isSyncReply(requestMessage))
+							throw new EbMSProcessingException(
+									"No sync ErrorMessage expected for message " + requestMessage.getMessageHeader().getMessageData().getMessageId() + "\n" + DOMUtils.toString(response.getMessage()));
+						messageErrorProcessor.processMessageError(timestamp,response,requestMessage,(EbMSMessageError)responseMessage);
+					}
+					else if (responseMessage instanceof EbMSAcknowledgment)
+					{
+						if (requestMessage.getAckRequested() == null || !messageValidator.isSyncReply(requestMessage))
+							throw new EbMSProcessingException(
+									"No sync Acknowledgment expected for message " + requestMessageHeader.getMessageData().getMessageId() + "\n" + DOMUtils.toString(response.getMessage()));
+						acknowledgmentProcessor.processAcknowledgment(timestamp,response,requestMessage,(EbMSAcknowledgment)responseMessage);
+					}
+					else
 						throw new EbMSProcessingException(
-								"No sync ErrorMessage expected for message " + requestMessage.getMessageHeader().getMessageData().getMessageId() + "\n" + DOMUtils.toString(response.getMessage()));
-					messageErrorProcessor.processMessageError(timestamp,response,requestMessage,(EbMSMessageError)responseMessage);
+								"Unexpected response received for message " + requestMessageHeader.getMessageData().getMessageId() + "\n" + DOMUtils.toString(response.getMessage()));
 				}
-				else if (responseMessage instanceof EbMSAcknowledgment)
+				else if (requestMessage.getAckRequested() == null && requestMessage.getSyncReply() != null)
 				{
-					if (requestMessage.getAckRequested() == null || !messageValidator.isSyncReply(requestMessage))
-						throw new EbMSProcessingException(
-								"No sync Acknowledgment expected for message " + requestMessageHeader.getMessageData().getMessageId() + "\n" + DOMUtils.toString(response.getMessage()));
-					acknowledgmentProcessor.processAcknowledgment(timestamp,response,requestMessage,(EbMSAcknowledgment)responseMessage);
+					processMessage(requestMessage);
 				}
-				else
-					throw new EbMSProcessingException(
-							"Unexpected response received for message " + requestMessageHeader.getMessageData().getMessageId() + "\n" + DOMUtils.toString(response.getMessage()));
 			}
-			else if (requestMessage.getAckRequested() == null && requestMessage.getSyncReply() != null)
-			{
-				processMessage(requestMessage);
-			}
+			else if (response != null)
+				throw new EbMSProcessingException(
+						"Unexpected response received for message " + requestMessageHeader.getMessageData().getMessageId() + "\n" + DOMUtils.toString(response.getMessage()));
 		}
 		catch (ValidationException | JAXBException | SAXException | IOException | TransformerException e)
 		{

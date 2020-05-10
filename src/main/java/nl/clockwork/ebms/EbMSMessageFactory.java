@@ -111,7 +111,7 @@ public class EbMSMessageFactory
 			//TODO resolve actor from CPA
 			acknowledgment.setActor(ActorType.URN_OASIS_NAMES_TC_EBXML_MSG_ACTOR_TO_PARTY_MSH.value());
 			if (message.getAckRequested().isSigned() && message.getSignature() != null)
-				message.getSignature().getSignedInfo().getReference().forEach(r -> acknowledgment.getReference().add(r));
+				acknowledgment.getReference().addAll(message.getSignature().getSignedInfo().getReference().stream().collect(Collectors.toList()));
 			return EbMSAcknowledgment.builder()
 					.messageHeader(messageHeader)
 					.acknowledgment(acknowledgment)

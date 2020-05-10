@@ -1273,7 +1273,7 @@ abstract class AbstractEbMSDAO implements EbMSDAO, CPADAO, URLMappingDAO, Certif
 				event.getSendDeliveryChannelId(),
 				event.getReceiveDeliveryChannelId(),
 				event.getMessageId(),
-				Timestamp.from(event.getTimeToLive()),
+				event.getTimeToLive() != null ? Timestamp.from(event.getTimeToLive()) : null,
 				Timestamp.from(event.getTimestamp()),
 				event.isConfidential(),
 				event.getRetries(),
