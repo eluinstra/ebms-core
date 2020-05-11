@@ -185,7 +185,7 @@ public class EbMSSignatureValidator implements InitializingBean
 //				.collect(Collectors.toSet()).size() > 0)
 //			throw new ValidationException("Signature references found in request message " + requestMessage.getMessageHeader().getMessageData().getMessageId() + " and response message " + responseMessage.getMessageHeader().getMessageData().getMessageId() + " do not match");
 		if (responseMessage.getAcknowledgment().getReference().stream()
-				.filter(r -> contains(requestMessage.getSignature().getSignedInfo().getReference(),r))
+				.filter(r -> !contains(requestMessage.getSignature().getSignedInfo().getReference(),r))
 				.collect(Collectors.toSet()).size() > 0)
 			throw new ValidationException("Signature references found in request message " + requestMessage.getMessageHeader().getMessageData().getMessageId() + " and response message " + responseMessage.getMessageHeader().getMessageData().getMessageId() + " do not match");
 	}
