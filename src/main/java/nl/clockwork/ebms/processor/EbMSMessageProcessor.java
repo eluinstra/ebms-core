@@ -419,6 +419,9 @@ public class EbMSMessageProcessor
 			final EbMSMessage messageError = ebMSMessageFactory.createEbMSMessageError(messageHeader.getCPAId(),message,errorList,timestamp);
 			Document document = EbMSMessageUtils.createSOAPMessage(messageError);
 			messageError.setMessage(document);
+			String service = CPAUtils.toString(messageError.getMessageHeader().getService());
+			final DeliveryChannel deliveryChannel = cpaManager.getReceiveDeliveryChannel(messageHeader.getCPAId(),new CacheablePartyId(messageError.getMessageHeader().getTo().getPartyId()),messageError.getMessageHeader().getTo().getRole(),service,messageError.getMessageHeader().getAction())
+					.orElse(null);
 			ebMSDAO.executeTransaction(
 					new DAOTransactionCallback()
 					{
@@ -436,22 +439,20 @@ public class EbMSMessageProcessor
 							}
 							if (!messageValidator.isSyncReply(message))
 							{
-								String service = CPAUtils.toString(messageError.getMessageHeader().getService());
-								final DeliveryChannel deliveryChannel = cpaManager.getReceiveDeliveryChannel(messageHeader.getCPAId(),new CacheablePartyId(messageError.getMessageHeader().getTo().getPartyId()),messageError.getMessageHeader().getTo().getRole(),service,messageError.getMessageHeader().getAction())
-										.orElse(null);
-								if (deliveryChannel == null)
-									throw new EbMSProcessingException(e.getMessage());
-								eventManager.createEvent(
-										messageHeader.getCPAId(),
-										deliveryChannel,
-										messageError.getMessageHeader().getMessageData().getMessageId(),
-										messageError.getMessageHeader().getMessageData().getTimeToLive(),
-										messageError.getMessageHeader().getMessageData().getTimestamp(),
-										false);
+								if (deliveryChannel != null)
+									eventManager.createEvent(
+											messageHeader.getCPAId(),
+											deliveryChannel,
+											messageError.getMessageHeader().getMessageData().getMessageId(),
+											messageError.getMessageHeader().getMessageData().getTimeToLive(),
+											messageError.getMessageHeader().getMessageData().getTimestamp(),
+											false);
 							}
 						}
 					}
 			);
+			if (deliveryChannel == null)
+				throw new ValidationException(DOMUtils.toString(messageError.getMessage()));
 			return messageValidator.isSyncReply(message) ? new EbMSDocument(messageError.getContentId(),messageError.getMessage()) : null;
 		}
 	}

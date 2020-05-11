@@ -18,17 +18,23 @@ package nl.clockwork.ebms.processor;
 import java.util.Date;
 import java.util.Optional;
 
+import javax.xml.transform.TransformerException;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DeliveryChannel;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageHeader;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.Service;
+import org.w3c.dom.Document;
 
 import nl.clockwork.ebms.Constants;
 import nl.clockwork.ebms.Constants.EbMSAction;
 import nl.clockwork.ebms.StreamUtils;
 import nl.clockwork.ebms.common.CPAManager;
 import nl.clockwork.ebms.common.EbMSMessageFactory;
+import nl.clockwork.ebms.common.util.DOMUtils;
+import nl.clockwork.ebms.dao.DAOException;
+import nl.clockwork.ebms.dao.DAOTransactionCallback;
 import nl.clockwork.ebms.dao.EbMSDAO;
 import nl.clockwork.ebms.event.processor.EventManager;
 import nl.clockwork.ebms.model.CacheablePartyId;
@@ -37,6 +43,7 @@ import nl.clockwork.ebms.model.EbMSMessage;
 import nl.clockwork.ebms.model.EbMSMessageContext;
 import nl.clockwork.ebms.util.CPAUtils;
 import nl.clockwork.ebms.validation.EbMSMessageValidator;
+import nl.clockwork.ebms.validation.ValidationException;
 
 public class DuplicateMessageHandler
 {
@@ -77,23 +84,39 @@ public class DuplicateMessageHandler
 			}
 			else
 			{
-				if (storeDuplicateMessage)
-					ebMSDAO.insertDuplicateMessage(timestamp,message,storeDuplicateMessageAttachments);
 				Optional<EbMSMessageContext> context = ebMSDAO.getMessageContextByRefToMessageId(
 						messageHeader.getCPAId(),
 						messageHeader.getMessageData().getMessageId(),
 						mshMessageService,EbMSAction.MESSAGE_ERROR.action(),
 						EbMSAction.ACKNOWLEDGMENT.action());
+				StreamUtils.ifNotPresent(context, () -> logger.warn("No response found for duplicate message " + messageHeader.getMessageData().getMessageId() + "!"));
 				CacheablePartyId fromPartyId = new CacheablePartyId(messageHeader.getFrom().getPartyId());
 				String service = CPAUtils.toString(CPAUtils.createEbMSMessageService());
-				DeliveryChannel deliveryChannel =
-						cpaManager.getReceiveDeliveryChannel(messageHeader.getCPAId(),fromPartyId,messageHeader.getFrom().getRole(),service,null)
-						//.orElseThrow(() -> StreamUtils.illegalStateException("ReceiveDeliveryChannel",messageHeader.getCPAId(),fromPartyId,messageHeader.getFrom().getRole(),service));
+				DeliveryChannel deliveryChannel = cpaManager.getReceiveDeliveryChannel(messageHeader.getCPAId(),fromPartyId,messageHeader.getFrom().getRole(),service,null)
 						.orElse(null);
-				if (context.isPresent())
-					eventManager.createEvent(messageHeader.getCPAId(),deliveryChannel,context.get().getMessageId(),messageHeader.getMessageData().getTimeToLive(),context.get().getTimestamp(),false);
-				else
-					logger.warn("No response found for duplicate message " + messageHeader.getMessageData().getMessageId() + "!");
+				ebMSDAO.executeTransaction(
+						new DAOTransactionCallback()
+						{
+							@Override
+							public void doInTransaction()
+							{
+								if (storeDuplicateMessage)
+									ebMSDAO.insertDuplicateMessage(timestamp,message,storeDuplicateMessageAttachments);
+								if (deliveryChannel != null && context.isPresent())
+									eventManager.createEvent(messageHeader.getCPAId(),deliveryChannel,context.get().getMessageId(),messageHeader.getMessageData().getTimeToLive(),context.get().getTimestamp(),false);
+							}
+						}
+				);
+				if (deliveryChannel == null && context.isPresent())
+					try
+					{
+						Optional<Document> result = ebMSDAO.getDocument(context.get().getMessageId());
+						throw new ValidationException(DOMUtils.toString(result.get()));
+					}
+					catch (DAOException | TransformerException e)
+					{
+						throw new EbMSProcessingException("Error creating response message for MessageId " + messageHeader.getMessageData().getMessageId() + "!");
+					}
 				return null;
 			}
 		}
