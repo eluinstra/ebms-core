@@ -48,7 +48,7 @@ public class EbMSMessageServiceMTOMImpl implements EbMSMessageServiceMTOM
 	{
 		try
 		{
-			log.info("SendMessage");
+			log.debug("SendMessage");
 			ebMSMessageService.ebMSMessageContextValidator.validate(messageContent.getContext());
 			val message = ebMSMessageService.ebMSMessageFactory.createEbMSMessageMTOM(messageContent);
 			val document = EbMSMessageUtils.getEbMSDocument(message);
@@ -56,12 +56,11 @@ public class EbMSMessageServiceMTOMImpl implements EbMSMessageServiceMTOM
 			ebMSMessageService.storeMessage(document.getMessage(),message);
 			String result = message.getMessageHeader().getMessageData().getMessageId();
 			log.info("Sending message " + result);
-			log.info("SendMessage done");
 			return result;
 		}
 		catch (Exception e)
 		{
-			log.info("SendMessage error",e);
+			log.error("SendMessage " + messageContent,e);
 			throw new EbMSMessageServiceException(e);
 		}
 	}
@@ -83,16 +82,14 @@ public class EbMSMessageServiceMTOMImpl implements EbMSMessageServiceMTOM
 	{
 		try
 		{
-			log.info("GetMessage " + messageId);
+			log.debug("GetMessage " + messageId);
 			if (process != null && process)
 				processMessage(messageId);
-			val result = ebMSMessageService.ebMSDAO.getMessageContentMTOM(messageId).orElse(null);
-			log.info("GetMessage " + messageId + " done");
-			return result;
+			return ebMSMessageService.ebMSDAO.getMessageContentMTOM(messageId).orElse(null);
 		}
 		catch (DAOException e)
 		{
-			log.info("GetMessage " + messageId + " error",e);
+			log.error("GetMessage " + messageId,e);
 			throw new EbMSMessageServiceException(e);
 		}
 	}

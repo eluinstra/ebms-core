@@ -56,16 +56,15 @@ public class CPAServiceImpl implements CPAService
 	{
 		try
 		{
-			log.info("ValidateCPA");
+			log.debug("ValidateCPA");
 			xsdValidator.validate(cpa);
 			val cpa_ = JAXBParser.getInstance(CollaborationProtocolAgreement.class).handle(cpa);
 			log.info("Validating CPA " + cpa_.getCpaid());
 			cpaValidator.validate(cpa_);
-			log.info("ValidateCPA done");
 		}
 		catch (Exception e)
 		{
-			log.warn("ValidateCPA error",e);
+			log.error("ValidateCPA\n" + cpa,e);
 			throw new CPAServiceException(e);
 		}
 	}
@@ -75,10 +74,9 @@ public class CPAServiceImpl implements CPAService
 	{
 		try
 		{
-			log.info("InsertCPA");
+			log.debug("InsertCPA");
 			xsdValidator.validate(cpa);
 			val cpa_ = JAXBParser.getInstance(CollaborationProtocolAgreement.class).handle(cpa);
-			log.info("Inserting CPA " + cpa_.getCpaid());
 			val currentValidator = new CPAValidator(cpaManager);
 			currentValidator.validate(cpa_);
 			synchronized (cpaMonitor)
@@ -96,12 +94,12 @@ public class CPAServiceImpl implements CPAService
 				else
 					cpaManager.insertCPA(cpa_);
 			}
-			log.info("InsertCPA done");
+			log.debug("InsertCPA done");
 			return cpa_.getCpaid();
 		}
 		catch (Exception e)
 		{
-			log.warn("InsertCPA error",e);
+			log.error("InsertCPA\n" + cpa,e);
 			throw new CPAServiceException(e);
 		}
 	}
@@ -111,17 +109,16 @@ public class CPAServiceImpl implements CPAService
 	{
 		try
 		{
-			log.info("DeleteCPA " + cpaId);
+			log.debug("DeleteCPA " + cpaId);
 			synchronized(cpaMonitor)
 			{
 				if (cpaManager.deleteCPA(cpaId) == 0)
 					throw new IllegalArgumentException("Could not delete CPA " + cpaId + "! CPA does not exists.");
 			}
-			log.info("DeleteCPA " + cpaId + " done");
 		}
 		catch (Exception e)
 		{
-			log.warn("DeleteCPA " + cpaId + " error",e);
+			log.error("DeleteCPA " + cpaId,e);
 			throw new CPAServiceException(e);
 		}
 	}
@@ -131,14 +128,12 @@ public class CPAServiceImpl implements CPAService
 	{
 		try
 		{
-			log.info("GetCPAIds");
-			val result = cpaManager.getCPAIds();
-			log.info("GetCPAIds done");
-			return result;
+			log.debug("GetCPAIds");
+			return cpaManager.getCPAIds();
 		}
 		catch (Exception e)
 		{
-			log.info("GetCPAIds error",e);
+			log.error("GetCPAIds",e);
 			throw new CPAServiceException(e);
 		}
 	}
@@ -148,14 +143,12 @@ public class CPAServiceImpl implements CPAService
 	{
 		try
 		{
-			log.info("GetCPAId " + cpaId);
-			val result = JAXBParser.getInstance(CollaborationProtocolAgreement.class).handle(cpaManager.getCPA(cpaId).orElse(null));
-			log.info("GetCPAId " + cpaId + " done");
-			return result;
+			log.debug("GetCPAId " + cpaId);
+			return JAXBParser.getInstance(CollaborationProtocolAgreement.class).handle(cpaManager.getCPA(cpaId).orElse(null));
 		}
 		catch (Exception e)
 		{
-			log.info("GetCPAId " + cpaId + " error",e);
+			log.error("GetCPAId " + cpaId,e);
 			throw new CPAServiceException(e);
 		}
 	}
@@ -165,13 +158,13 @@ public class CPAServiceImpl implements CPAService
 	{
 		try
 		{
-			log.info("SetURLMapping " + urlMapping.getSource());
+			if (log.isDebugEnabled())
+				log.debug("SetURLMapping " + urlMapping);
 			urlMapper.setURLMapping(urlMapping);
-			log.info("SetURLMapping " + urlMapping.getSource() + " done");
 		}
 		catch (Exception e)
 		{
-			log.info("SetURLMapping " + urlMapping.getSource() + " error",e);
+			log.error("SetURLMapping " + urlMapping,e);
 			throw new CPAServiceException(e);
 		}
 	}
@@ -181,13 +174,12 @@ public class CPAServiceImpl implements CPAService
 	{
 		try
 		{
-			log.info("DeleteURLMapping " + source);
+			log.debug("DeleteURLMapping " + source);
 			urlMapper.deleteURLMapping(source);
-			log.info("DeleteURLMapping " + source + " done");
 		}
 		catch (Exception e)
 		{
-			log.info("DeleteURLMapping " + source + " error",e);
+			log.error("DeleteURLMapping " + source,e);
 			throw new CPAServiceException(e);
 		}
 	}
@@ -197,14 +189,12 @@ public class CPAServiceImpl implements CPAService
 	{
 		try
 		{
-			log.info("GetURLMappings");
-			val result = urlMapper.getURLs();
-			log.info("GetURLMappings done");
-			return result;
+			log.debug("GetURLMappings");
+			return urlMapper.getURLs();
 		}
 		catch (Exception e)
 		{
-			log.info("GetURLMappings error",e);
+			log.error("GetURLMappings",e);
 			throw new CPAServiceException(e);
 		}
 	}
@@ -214,13 +204,13 @@ public class CPAServiceImpl implements CPAService
 	{
 		try
 		{
-			log.info("SetCertificateMapping" + certificateMapping.getSource().getSubjectDN());
+			if (log.isDebugEnabled())
+				log.debug("SetCertificateMapping" + certificateMapping);
 			certificateMapper.setCertificateMapping(certificateMapping);
-			log.info("SetCertificateMapping" + certificateMapping.getSource().getSubjectDN() + " done");
 		}
 		catch (Exception e)
 		{
-			log.info("SetCertificateMapping" + certificateMapping.getSource().getSubjectDN() + " error",e);
+			log.error("SetCertificateMapping " + certificateMapping,e);
 			throw new CPAServiceException(e);
 		}
 	}
@@ -230,13 +220,13 @@ public class CPAServiceImpl implements CPAService
 	{
 		try
 		{
-			log.info("SetCertificateMapping" + source.getSubjectDN());
+			if (log.isDebugEnabled())
+				log.debug("SetCertificateMapping" + source);
 			certificateMapper.deleteCertificateMapping(source);
-			log.info("SetCertificateMapping" + source.getSubjectDN() + " done");
 		}
 		catch (Exception e)
 		{
-			log.info("SetCertificateMapping" + source.getSubjectDN() + " error",e);
+			log.error("SetCertificateMapping" + source,e);
 			throw new CPAServiceException(e);
 		}
 	}
@@ -246,14 +236,12 @@ public class CPAServiceImpl implements CPAService
 	{
 		try
 		{
-			log.info("SetCertificateMapping");
-			val result = certificateMapper.getCertificates();
-			log.info("SetCertificateMapping done");
-			return result;
+			log.debug("SetCertificateMapping");
+			return certificateMapper.getCertificates();
 		}
 		catch (Exception e)
 		{
-			log.info("SetCertificateMapping error",e);
+			log.error("SetCertificateMapping",e);
 			throw new CPAServiceException(e);
 		}
 	}
