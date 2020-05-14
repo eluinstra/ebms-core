@@ -17,10 +17,20 @@ package nl.clockwork.ebms.event.listener;
 
 import java.util.stream.Stream;
 
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.experimental.FieldDefaults;
+
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@AllArgsConstructor
+@Getter
 public enum EbMSMessageEventType
 {
-	RECEIVED,DELIVERED,FAILED,EXPIRED;
-	
+	RECEIVED(0),DELIVERED(1),FAILED(2),EXPIRED(3);
+
+	int id;
+
 	public static Stream<EbMSMessageEventType> stream()
 	{
 		return Stream.of(EbMSMessageEventType.values());

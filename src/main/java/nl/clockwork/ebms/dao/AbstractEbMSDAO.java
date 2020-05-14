@@ -1353,7 +1353,7 @@ abstract class AbstractEbMSDAO implements EbMSDAO, CPADAO, URLMappingDAO, Certif
 	protected String join(EbMSMessageEventType[] array, String delimiter)
 	{
 		return Stream.of(array)
-				.mapToInt(e -> e.ordinal())
+				.mapToInt(e -> e.getId())
 				.mapToObj(String::valueOf)
 				.collect(Collectors.joining(delimiter));
 	}
@@ -1417,7 +1417,7 @@ abstract class AbstractEbMSDAO implements EbMSDAO, CPADAO, URLMappingDAO, Certif
 					"time_stamp" +
 				") values (?,?,?)",
 				messageId,
-				type.ordinal(),
+				type.getId(),
 				Timestamp.from(Instant.now())
 			);
 		}
@@ -1536,7 +1536,7 @@ abstract class AbstractEbMSDAO implements EbMSDAO, CPADAO, URLMappingDAO, Certif
 			}
 			if (messageContext.getMessageStatus() != null)
 			{
-				parameters.add(messageContext.getMessageStatus().ordinal());
+				parameters.add(messageContext.getMessageStatus().getId());
 				result.append(" and ebms_message.status = ?");
 			}
 		}
