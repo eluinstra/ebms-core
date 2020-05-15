@@ -25,22 +25,24 @@ import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.FieldDefaults;
-import lombok.experimental.SuperBuilder;
 import nl.clockwork.ebms.EbMSMessageStatus;
 import nl.clockwork.ebms.jaxb.InstantAdapter;
 
 @XmlAccessorType(XmlAccessType.FIELD)
-@SuperBuilder
+@Builder
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @NoArgsConstructor
 @RequiredArgsConstructor
+@AllArgsConstructor
 @ToString
 public class EbMSMessageContext implements Serializable
 {
