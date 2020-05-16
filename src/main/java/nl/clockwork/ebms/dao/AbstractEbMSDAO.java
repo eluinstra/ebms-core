@@ -499,8 +499,7 @@ abstract class AbstractEbMSDAO implements EbMSDAO, CPADAO, URLMappingDAO, Certif
 		{
 			return jdbcTemplate.query(
 				"select source, destination" +
-				" from certificate_mapping" +
-				" order by source asc",
+				" from certificate_mapping",
 				new RowMapper<CertificateMapping>()
 				{
 					@Override
@@ -538,7 +537,7 @@ abstract class AbstractEbMSDAO implements EbMSDAO, CPADAO, URLMappingDAO, Certif
 					"id," +
 					"source," +
 					"destination" +
-				") values (?,?)",
+				") values (?,?,?)",
 				id,
 				mapping.getSource().getEncoded(),
 				mapping.getDestination().getEncoded()

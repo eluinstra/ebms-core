@@ -27,6 +27,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
+import nl.clockwork.ebms.cpa.CertificateMapper;
 
 @XmlAccessorType(XmlAccessType.FIELD)
 @Data
@@ -44,6 +45,15 @@ public class CertificateMapping implements Serializable
 	@Override
 	public String toString()
 	{
-		return this.getClass().getSimpleName() + "(source=" + source.getSubjectDN() + "(" + source.getSerialNumber()+ ")," + " destination=" + destination.getSubjectDN() + "(" + destination.getSerialNumber()+ "))";
+		return this.getClass().getSimpleName() + "(" + printSource() + ", " + printDestination() + ")";
+	}
+
+	private String printSource()
+	{
+		return "source=" + source.getSubjectDN() + "(" + CertificateMapper.getId(source) + ")";
+	}
+	private String printDestination()
+	{
+		return "destination=" + destination.getSubjectDN() + "(" + CertificateMapper.getId(destination) + ")";
 	}
 }

@@ -36,6 +36,11 @@ public class CertificateMapper
 	@NonNull
 	CertificateMappingDAO certificateMappingDAO;
 
+	public static String getId(X509Certificate certificate)
+	{
+		return "issuer=" + certificate.getIssuerX500Principal().getName() + "; serialNr=" + certificate.getSerialNumber().toString();
+	}
+
 	public List<CertificateMapping> getCertificates()
 	{
 		return certificateMappingDAO.getCertificateMappings();
@@ -68,11 +73,6 @@ public class CertificateMapper
 		flushDAOMethodCache(key);
 	}
 	
-	private String getId(X509Certificate certificate)
-	{
-		return certificate.getIssuerX500Principal().getName() + certificate.getSerialNumber().toString();
-	}
-
 	private void flushDAOMethodCache(String key)
 	{
 		//val targetName = certificateMappingDAO.toString().replaceFirst("^(.*\\.)*([^@]*)@.*$","$2");
