@@ -63,27 +63,23 @@ class MessageHeaderValidator
 	{
 		val messageHeader = message.getMessageHeader();
 		validateMessageHeader(messageHeader);
-		val deliveryChannel = cpaManager.getSendDeliveryChannel(messageHeader.getCPAId(),new CacheablePartyId(messageHeader.getFrom().getPartyId()),messageHeader.getFrom().getRole(),CPAUtils.toString(messageHeader.getService()),messageHeader.getAction())
-				.orElseThrow(() -> new EbMSValidationException(EbMSMessageUtils.createError(EbMSErrorCode.UNKNOWN.getErrorCode(),EbMSErrorCode.UNKNOWN,"No DeliveryChannel found.")));
-		validateMessage(message,timestamp,deliveryChannel);
+		validateMessage(message,timestamp);
 	}
 
 	public void validate(EbMSBaseMessage message, Instant timestamp) throws EbMSValidationException
 	{
 		val messageHeader = message.getMessageHeader();
 		validateMessageHeader(messageHeader);
+		//TODO: remove???
 		cpaManager.getSendDeliveryChannel(messageHeader.getCPAId(),new CacheablePartyId(messageHeader.getFrom().getPartyId()),messageHeader.getFrom().getRole(),CPAUtils.toString(messageHeader.getService()),messageHeader.getAction())
 				.orElseThrow(() -> new EbMSValidationException(EbMSMessageUtils.createError(EbMSErrorCode.UNKNOWN.getErrorCode(),EbMSErrorCode.UNKNOWN,"No DeliveryChannel found.")));
 	}
 
-	public void validate(EbMSAcknowledgment message, Instant timestamp) throws EbMSValidationException
+	public void validate(EbMSAcknowledgment acknowledgment, Instant timestamp) throws EbMSValidationException
 	{
-		val messageHeader = message.getMessageHeader();
+		val messageHeader = acknowledgment.getMessageHeader();
 		validateMessageHeader(messageHeader);
-		val deliveryChannel = cpaManager.getSendDeliveryChannel(messageHeader.getCPAId(),new CacheablePartyId(messageHeader.getFrom().getPartyId()),messageHeader.getFrom().getRole(),CPAUtils.toString(messageHeader.getService()),messageHeader.getAction())
-				.orElseThrow(() -> new EbMSValidationException(EbMSMessageUtils.createError(EbMSErrorCode.UNKNOWN.getErrorCode(),EbMSErrorCode.UNKNOWN,"No DeliveryChannel found.")));
-		val acknowledgment = message.getAcknowledgment();
-		validateAcknowledgment(acknowledgment,deliveryChannel);
+		validateAcknowledgment(acknowledgment);
 	}
 
 	public void validate(EbMSBaseMessage requestMessage, EbMSBaseMessage responseMessage) throws ValidationException
@@ -147,12 +143,14 @@ class MessageHeaderValidator
 					EbMSMessageUtils.createError("//Header/MessageHeader/Action",EbMSErrorCode.INCONSISTENT,"Invalid value."));
 	}
 
-	private void validateMessage(EbMSMessage message, Instant timestamp, DeliveryChannel deliveryChannel)
+	private void validateMessage(EbMSMessage message, Instant timestamp)
 	{
 		val messageHeader = message.getMessageHeader();
 		val service = CPAUtils.toString(messageHeader.getService());
 		validateService(messageHeader,service);
 		validateMessageData(timestamp,messageHeader);
+		val deliveryChannel = cpaManager.getSendDeliveryChannel(messageHeader.getCPAId(),new CacheablePartyId(messageHeader.getFrom().getPartyId()),messageHeader.getFrom().getRole(),CPAUtils.toString(messageHeader.getService()),messageHeader.getAction())
+				.orElseThrow(() -> new EbMSValidationException(EbMSMessageUtils.createError(EbMSErrorCode.UNKNOWN.getErrorCode(),EbMSErrorCode.UNKNOWN,"No DeliveryChannel found.")));
 		validateDuplicateElimination(deliveryChannel,messageHeader);
 		val ackRequested = message.getAckRequested();
 		validateAckRequested(deliveryChannel,ackRequested);
@@ -233,8 +231,12 @@ class MessageHeaderValidator
 //						EbMSMessageUtils.createError("//Header/MessageOrder/@version",Constants.EbMSErrorCode.INCONSISTENT,"Invalid value."));
 	}
 
-	private void validateAcknowledgment(Acknowledgment acknowledgment, DeliveryChannel deliveryChannel)
+	private void validateAcknowledgment(EbMSAcknowledgment message)
 	{
+		val messageHeader = message.getMessageHeader();
+		val deliveryChannel = cpaManager.getSendDeliveryChannel(messageHeader.getCPAId(),new CacheablePartyId(messageHeader.getFrom().getPartyId()),messageHeader.getFrom().getRole(),CPAUtils.toString(messageHeader.getService()),messageHeader.getAction())
+				.orElseThrow(() -> new EbMSValidationException(EbMSMessageUtils.createError(EbMSErrorCode.UNKNOWN.getErrorCode(),EbMSErrorCode.UNKNOWN,"No DeliveryChannel found.")));
+		val acknowledgment = message.getAcknowledgment();
 		if (acknowledgment != null && !Constants.EBMS_VERSION.equals(acknowledgment.getVersion()))
 			throw new EbMSValidationException(
 					EbMSMessageUtils.createError("//Header/Acknowledgment/@version",EbMSErrorCode.INCONSISTENT,"Invalid value."));

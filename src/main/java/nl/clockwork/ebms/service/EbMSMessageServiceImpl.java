@@ -162,7 +162,7 @@ public class EbMSMessageServiceImpl implements EbMSMessageService
 		try
 		{
 			log.debug("ResendMessage " + messageId);
-			val result = ebMSDAO.getMessageContent(messageId).map(mc ->
+			return ebMSDAO.getMessageContent(messageId).map(mc ->
 			{
 				try
 				{
@@ -180,7 +180,6 @@ public class EbMSMessageServiceImpl implements EbMSMessageService
 					throw new EbMSProcessorException(e);
 				}
 			}).orElseThrow(() -> new EbMSMessageServiceException("Message not found!"));
-			return result;
 		}
 		catch (Exception e)
 		{

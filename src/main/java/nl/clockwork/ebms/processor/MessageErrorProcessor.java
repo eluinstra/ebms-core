@@ -83,15 +83,12 @@ class MessageErrorProcessor
 	{
 		val messageError = createMessageError(timestamp,message,e);
 		val result = EbMSMessageUtils.getEbMSDocument(messageError);
-		signatureGenerator.generate(message.getAckRequested(),result,messageError);
-
 		val messageHeader = message.getMessageHeader();
 		val service = CPAUtils.toString(messageError.getMessageHeader().getService());
 		val sendDeliveryChannel = cpaManager.getSendDeliveryChannel(messageHeader.getCPAId(),new CacheablePartyId(messageError.getMessageHeader().getFrom().getPartyId()),messageError.getMessageHeader().getFrom().getRole(),service,messageError.getMessageHeader().getAction())
 				.orElse(null);
 		val receiveDeliveryChannel = cpaManager.getReceiveDeliveryChannel(messageHeader.getCPAId(),new CacheablePartyId(messageError.getMessageHeader().getTo().getPartyId()),messageError.getMessageHeader().getTo().getRole(),service,messageError.getMessageHeader().getAction())
 				.orElse(null);
-
 		ebMSDAO.executeTransaction(
 				new DAOTransactionCallback()
 				{
@@ -131,7 +128,7 @@ class MessageErrorProcessor
 					}
 				}
 		);
-		if (receiveDeliveryChannel == null)
+		if (!isSyncReply && receiveDeliveryChannel == null)
 			throw new ValidationException(DOMUtils.toString(result.getMessage()));
 		return result;
 	}
