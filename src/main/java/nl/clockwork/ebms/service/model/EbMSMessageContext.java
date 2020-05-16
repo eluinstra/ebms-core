@@ -20,7 +20,6 @@ import java.time.Instant;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
@@ -29,8 +28,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.FieldDefaults;
 import nl.clockwork.ebms.EbMSMessageStatus;
@@ -41,32 +38,29 @@ import nl.clockwork.ebms.jaxb.InstantAdapter;
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @NoArgsConstructor
-@RequiredArgsConstructor
 @AllArgsConstructor
 @ToString
 public class EbMSMessageContext implements Serializable
 {
 	private static final long serialVersionUID = 1L;
-	@NonNull
+	//@XmlElement(required=true)
+	//@NonNull
 	String cpaId;
-	@NonNull
+	//@XmlElement(required=true)
+	//@NonNull
 	Party fromParty;
-	@XmlElement
 	Party toParty;
+	//@XmlElement(required=true)
 	//@NonNull
 	String service;
+	//@XmlElement(required=true)
 	//@NonNull
 	String action;
-	@XmlElement
 	@XmlJavaTypeAdapter(InstantAdapter.class)
 	@XmlSchemaType(name="dateTime")
 	Instant timestamp;
-	@XmlElement
 	String conversationId;
-	@XmlElement
 	String messageId;
-	@XmlElement
 	String refToMessageId;
-	@XmlElement
 	EbMSMessageStatus messageStatus;
 }

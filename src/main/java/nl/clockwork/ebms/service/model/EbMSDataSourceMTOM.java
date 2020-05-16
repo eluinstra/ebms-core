@@ -20,6 +20,7 @@ import java.io.Serializable;
 import javax.activation.DataHandler;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlMimeType;
 import javax.xml.bind.annotation.XmlType;
 
@@ -45,6 +46,7 @@ public class EbMSDataSourceMTOM implements Serializable
 	private static final long serialVersionUID = 1L;
 	String contentId;
 	@XmlMimeType("application/octet-stream")
+	@XmlElement(required=true)
 	@NonNull
 	@ToString.Exclude
 	DataHandler attachment;

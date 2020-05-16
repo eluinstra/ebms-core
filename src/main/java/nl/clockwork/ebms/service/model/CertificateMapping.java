@@ -20,6 +20,7 @@ import java.security.cert.X509Certificate;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -37,8 +38,10 @@ import nl.clockwork.ebms.cpa.CertificateMapper;
 public class CertificateMapping implements Serializable
 {
 	private static final long serialVersionUID = 1L;
+	@XmlElement(required=true)
 	@NonNull
 	X509Certificate source;
+	@XmlElement(required=true)
 	@NonNull
 	X509Certificate destination;
 

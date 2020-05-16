@@ -19,6 +19,7 @@ import java.io.Serializable;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -40,8 +41,10 @@ import nl.clockwork.ebms.event.listener.EbMSMessageEventType;
 public class EbMSMessageEvent implements Serializable
 {
 	private static final long serialVersionUID = 1L;
+	@XmlElement(required=true)
 	@NonNull
 	String messageId;
+	@XmlElement(required=true)
 	@NonNull
 	EbMSMessageEventType type;
 }

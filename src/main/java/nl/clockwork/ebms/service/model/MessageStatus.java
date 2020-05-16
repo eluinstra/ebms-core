@@ -17,6 +17,10 @@ package nl.clockwork.ebms.service.model;
 
 import java.time.Instant;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -26,6 +30,7 @@ import lombok.ToString;
 import lombok.experimental.FieldDefaults;
 import nl.clockwork.ebms.EbMSMessageStatus;
 
+@XmlAccessorType(XmlAccessType.FIELD)
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @NoArgsConstructor
@@ -33,8 +38,10 @@ import nl.clockwork.ebms.EbMSMessageStatus;
 @ToString
 public class MessageStatus
 {
+	@XmlElement(required=true)
 	@NonNull
 	Instant timestamp;
+	@XmlElement(required=true)
 	@NonNull
 	EbMSMessageStatus status;
 }

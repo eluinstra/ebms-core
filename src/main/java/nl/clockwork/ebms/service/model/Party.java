@@ -43,7 +43,6 @@ public class Party implements Serializable
 	@XmlElement(required=true)
 	//@NonNull
 	String partyId;
-	@XmlElement
 	String role;
 
 	@Override

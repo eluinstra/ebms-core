@@ -17,6 +17,10 @@ package nl.clockwork.ebms.service.model;
 
 import java.io.Serializable;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -27,6 +31,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.FieldDefaults;
 
+@XmlAccessorType(XmlAccessType.FIELD)
 @Builder
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
@@ -37,11 +42,14 @@ import lombok.experimental.FieldDefaults;
 public class EbMSDataSource implements Serializable
 {
 	private static final long serialVersionUID = 1L;
+	@XmlElement(required=true)
 	@NonNull
 	String name;
 	String contentId;
+	@XmlElement(required=true)
 	@NonNull
 	String contentType;
+	@XmlElement(required=true)
 	@NonNull
 	@ToString.Exclude
 	byte[] content;
