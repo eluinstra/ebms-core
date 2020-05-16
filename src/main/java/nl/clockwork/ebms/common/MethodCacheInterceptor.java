@@ -42,18 +42,18 @@ public class MethodCacheInterceptor implements MethodInterceptor
 		val targetName = invocation.getThis().getClass().getSimpleName();
 		val methodName = invocation.getMethod().getName();
 		val arguments = invocation.getArguments();
-		val cacheKey = getCacheKey(targetName,methodName,arguments);
-		var element = cache.get(cacheKey);
-		if (element == null)
+		val key = getKey(targetName,methodName,arguments);
+		var o = cache.get(key);
+		if (o == null)
 		{
 			val result = invocation.proceed();
-			element = new Element(cacheKey,result);
-			cache.put(element);
+			o = new Element(key,result);
+			cache.put(o);
 		}
-		return element.getObjectValue();
+		return o;
 	}
 
-	public static String getCacheKey(String targetName, String methodName, Object...arguments)
+	public static String getKey(String targetName, String methodName, Object...arguments)
 	{
 		val sb = new StringBuffer();
 		sb.append(targetName).append(".").append(methodName);

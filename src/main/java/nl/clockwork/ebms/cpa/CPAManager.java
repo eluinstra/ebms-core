@@ -325,9 +325,9 @@ public class CPAManager
 	private void flushCPAMethodCache(String cpaId)
 	{
 		//val targetName = cpaDAO.toString().replaceFirst("^(.*\\.)*([^@]*)@.*$","$2");
-		daoMethodCache.remove(MethodCacheInterceptor.getCacheKey(cpaDAO.getTargetName(),"existsCPA",cpaId));
-		daoMethodCache.remove(MethodCacheInterceptor.getCacheKey(cpaDAO.getTargetName(),"getCPA",cpaId));
-		daoMethodCache.remove(MethodCacheInterceptor.getCacheKey(cpaDAO.getTargetName(),"getCPAIds"));
+		daoMethodCache.remove(MethodCacheInterceptor.getKey(cpaDAO.getTargetName(),"existsCPA",cpaId));
+		daoMethodCache.remove(MethodCacheInterceptor.getKey(cpaDAO.getTargetName(),"getCPA",cpaId));
+		daoMethodCache.remove(MethodCacheInterceptor.getKey(cpaDAO.getTargetName(),"getCPAIds"));
 		cpaMethodCache.removeAll();
 	}
 }

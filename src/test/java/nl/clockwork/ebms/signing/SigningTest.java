@@ -142,7 +142,7 @@ public class SigningTest
 	private Ehcache initMethodCacheMock()
 	{
 		val result = Mockito.mock(Ehcache.class);
-		Mockito.when(result.remove(Mockito.any(Serializable.class))).thenReturn(true);
+		Mockito.when(result.remove((Serializable)Mockito.any(Serializable.class))).thenReturn(true);
 		return result;
 	}
 

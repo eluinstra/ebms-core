@@ -76,8 +76,8 @@ public class CertificateMapper
 	private void flushDAOMethodCache(String key)
 	{
 		//val targetName = certificateMappingDAO.toString().replaceFirst("^(.*\\.)*([^@]*)@.*$","$2");
-		daoMethodCache.remove(MethodCacheInterceptor.getCacheKey(certificateMappingDAO.getTargetName(),"existsCertificateMapping",key));
-		daoMethodCache.remove(MethodCacheInterceptor.getCacheKey(certificateMappingDAO.getTargetName(),"getCertificateMapping",key));
-		daoMethodCache.remove(MethodCacheInterceptor.getCacheKey(certificateMappingDAO.getTargetName(),"getCertificateMappings"));
+		daoMethodCache.remove(MethodCacheInterceptor.getKey(certificateMappingDAO.getTargetName(),"existsCertificateMapping",key));
+		daoMethodCache.remove(MethodCacheInterceptor.getKey(certificateMappingDAO.getTargetName(),"getCertificateMapping",key));
+		daoMethodCache.remove(MethodCacheInterceptor.getKey(certificateMappingDAO.getTargetName(),"getCertificateMappings"));
 	}
 }
