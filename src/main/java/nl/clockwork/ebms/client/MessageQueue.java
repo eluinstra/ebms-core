@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.clockwork.ebms.common;
+package nl.clockwork.ebms.client;
 
 import java.util.LinkedHashMap;
 import java.util.Optional;
