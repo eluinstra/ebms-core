@@ -51,7 +51,7 @@ public class URLMapper
 			return source;
 	}
 
-	public void setURLMapping(URLMapping urlMapping) throws InvalidURLException
+	public void setURLMapping(URLMapping urlMapping)
 	{
 		if (StringUtils.isEmpty(urlMapping.getDestination()))
 			urlMappingDAO.deleteURLMapping(urlMapping.getSource());
@@ -66,7 +66,7 @@ public class URLMapper
 		flushDAOMethodCache(urlMapping.getSource());
 	}
 
-	private void validate(URLMapping urlMapping) throws InvalidURLException
+	private void validate(URLMapping urlMapping)
 	{
 		try
 		{
@@ -74,7 +74,7 @@ public class URLMapper
 		}
 		catch (MalformedURLException e)
 		{
-			throw new InvalidURLException("Source invalid",e);
+			throw new IllegalArgumentException("Source invalid",e);
 		}
 		try
 		{
@@ -82,7 +82,7 @@ public class URLMapper
 		}
 		catch (MalformedURLException e)
 		{
-			throw new InvalidURLException("Destination invalid",e);
+			throw new IllegalArgumentException("Destination invalid",e);
 		}
 	}
 
