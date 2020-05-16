@@ -50,7 +50,7 @@ public class MethodCacheInterceptor implements MethodInterceptor
 			o = new Element(key,result);
 			cache.put(o);
 		}
-		return o;
+		return o.getObjectValue();
 	}
 
 	public static String getKey(String targetName, String methodName, Object...arguments)
