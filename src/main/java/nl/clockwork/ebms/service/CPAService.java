@@ -23,7 +23,10 @@ import javax.jws.WebParam;
 import javax.jws.WebResult;
 import javax.jws.WebService;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlSchemaType;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
+import nl.clockwork.ebms.jaxb.X509CertificateAdapter;
 import nl.clockwork.ebms.service.model.CertificateMapping;
 import nl.clockwork.ebms.service.model.URLMapping;
 
@@ -125,7 +128,7 @@ public interface CPAService
 	 * @throws CPAServiceException
 	 */
 	@WebMethod(operationName="DeleteCertificateMapping")
-	void deleteCertificateMapping(@WebParam(name="SourceCertificate") @XmlElement(required=true) X509Certificate source) throws CPAServiceException;
+	void deleteCertificateMapping(@WebParam(name="SourceCertificate") @XmlElement(required=true) @XmlJavaTypeAdapter(X509CertificateAdapter.class) X509Certificate source) throws CPAServiceException;
 
 	/**
 	 * Gets all Certificate mappings that are stored in the database

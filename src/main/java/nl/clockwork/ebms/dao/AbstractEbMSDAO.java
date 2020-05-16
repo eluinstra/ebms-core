@@ -559,11 +559,11 @@ abstract class AbstractEbMSDAO implements EbMSDAO, CPADAO, URLMappingDAO, Certif
 				"update certificate_mapping set" +
 				" destination = ?" +
 				" where id = ?",
-				mapping.getDestination(),
+				mapping.getDestination().getEncoded(),
 				id
 			);
 		}
-		catch (DataAccessException e)
+		catch (CertificateEncodingException | DataAccessException e)
 		{
 			throw new DAOException(e);
 		}
