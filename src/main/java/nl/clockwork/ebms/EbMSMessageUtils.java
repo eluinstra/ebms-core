@@ -61,6 +61,7 @@ import lombok.val;
 import nl.clockwork.ebms.common.JAXBParser;
 import nl.clockwork.ebms.common.util.DOMUtils;
 import nl.clockwork.ebms.cpa.CPAUtils;
+import nl.clockwork.ebms.jaxb.EbMSNamespaceMapper;
 import nl.clockwork.ebms.model.EbMSAcknowledgment;
 import nl.clockwork.ebms.model.EbMSAttachment;
 import nl.clockwork.ebms.model.EbMSBaseMessage;
@@ -280,7 +281,7 @@ public class EbMSMessageUtils
 				StatusRequest.class,
 				StatusResponse.class);
 		val e = new JAXBElement<>(new QName("http://schemas.xmlsoap.org/soap/envelope/","Envelope"),Envelope.class,envelope);
-		val is = new ByteArrayInputStream(parser.handle(e).getBytes());
+		val is = new ByteArrayInputStream(parser.handle(e,new EbMSNamespaceMapper()).getBytes());
 		return DOMUtils.getDocumentBuilder().parse(is);
 	}
 
