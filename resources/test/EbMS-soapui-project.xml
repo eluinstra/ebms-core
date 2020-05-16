@@ -1235,18 +1235,6 @@ X2SpoHffgXmdrExQshpIDzzofex0y/Kg4mulDQUPwVuIZtbnlQ==</destination>
   <wsdl:import location="http://localhost:8080/service/ebms?wsdl=EbMSMessageService.wsdl" namespace="http://www.ordina.nl/ebms/2.17"></wsdl:import>
   <wsdl:binding name="EbMSMessageServiceImplServiceSoapBinding" type="ns1:EbMSMessageService">
     <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
-    <wsdl:operation name="SendMessageWithAttachments">
-      <soap:operation soapAction="" style="document"/>
-      <wsdl:input name="SendMessageWithAttachments">
-        <soap:body use="literal"/>
-      </wsdl:input>
-      <wsdl:output name="SendMessageWithAttachmentsResponse">
-        <soap:body use="literal"/>
-      </wsdl:output>
-      <wsdl:fault name="EbMSMessageServiceException">
-        <soap:fault name="EbMSMessageServiceException" use="literal"/>
-      </wsdl:fault>
-    </wsdl:operation>
     <wsdl:operation name="Ping">
       <soap:operation soapAction="" style="document"/>
       <wsdl:input name="Ping">
@@ -1382,44 +1370,6 @@ X2SpoHffgXmdrExQshpIDzzofex0y/Kg4mulDQUPwVuIZtbnlQ==</destination>
       <xs:element name="ResendMessageResponse" type="tns:ResendMessageResponse"/>
       <xs:element name="SendMessage" type="tns:SendMessage"/>
       <xs:element name="SendMessageResponse" type="tns:SendMessageResponse"/>
-      <xs:element name="SendMessageWithAttachments" type="tns:SendMessageWithAttachments"/>
-      <xs:element name="SendMessageWithAttachmentsResponse" type="tns:SendMessageWithAttachmentsResponse"/>
-      <xs:complexType name="SendMessageWithAttachments">
-        <xs:sequence>
-          <xs:element name="Message" type="tns:ebMSMessageAttachment"/>
-        </xs:sequence>
-      </xs:complexType>
-      <xs:complexType name="ebMSMessageAttachment">
-        <xs:sequence>
-          <xs:element name="context" type="tns:ebMSMessageContext"/>
-          <xs:element maxOccurs="unbounded" minOccurs="0" name="attachment" type="xs:base64Binary"/>
-        </xs:sequence>
-      </xs:complexType>
-      <xs:complexType name="ebMSMessageContext">
-        <xs:sequence>
-          <xs:element minOccurs="0" name="cpaId" type="xs:string"/>
-          <xs:element minOccurs="0" name="fromParty" type="tns:party"/>
-          <xs:element minOccurs="0" name="toParty" type="tns:party"/>
-          <xs:element minOccurs="0" name="service" type="xs:string"/>
-          <xs:element minOccurs="0" name="action" type="xs:string"/>
-          <xs:element minOccurs="0" name="timestamp" type="xs:dateTime"/>
-          <xs:element minOccurs="0" name="conversationId" type="xs:string"/>
-          <xs:element minOccurs="0" name="messageId" type="xs:string"/>
-          <xs:element minOccurs="0" name="refToMessageId" type="xs:string"/>
-          <xs:element minOccurs="0" name="messageStatus" type="tns:ebMSMessageStatus"/>
-        </xs:sequence>
-      </xs:complexType>
-      <xs:complexType name="party">
-        <xs:sequence>
-          <xs:element name="partyId" type="xs:string"/>
-          <xs:element minOccurs="0" name="role" type="xs:string"/>
-        </xs:sequence>
-      </xs:complexType>
-      <xs:complexType name="SendMessageWithAttachmentsResponse">
-        <xs:sequence>
-          <xs:element minOccurs="0" name="MessageId" type="xs:string"/>
-        </xs:sequence>
-      </xs:complexType>
       <xs:complexType name="Ping">
         <xs:sequence>
           <xs:element name="CPAId" type="xs:string"/>
@@ -1463,6 +1413,26 @@ X2SpoHffgXmdrExQshpIDzzofex0y/Kg4mulDQUPwVuIZtbnlQ==</destination>
         <xs:sequence>
           <xs:element name="context" type="tns:ebMSMessageContext"/>
           <xs:element maxOccurs="unbounded" minOccurs="0" name="dataSource" type="tns:ebMSDataSource"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="ebMSMessageContext">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="cpaId" type="xs:string"/>
+          <xs:element minOccurs="0" name="fromParty" type="tns:party"/>
+          <xs:element minOccurs="0" name="toParty" type="tns:party"/>
+          <xs:element minOccurs="0" name="service" type="xs:string"/>
+          <xs:element minOccurs="0" name="action" type="xs:string"/>
+          <xs:element minOccurs="0" name="timestamp" type="xs:dateTime"/>
+          <xs:element minOccurs="0" name="conversationId" type="xs:string"/>
+          <xs:element minOccurs="0" name="messageId" type="xs:string"/>
+          <xs:element minOccurs="0" name="refToMessageId" type="xs:string"/>
+          <xs:element minOccurs="0" name="messageStatus" type="tns:ebMSMessageStatus"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="party">
+        <xs:sequence>
+          <xs:element name="partyId" type="xs:string"/>
+          <xs:element minOccurs="0" name="role" type="xs:string"/>
         </xs:sequence>
       </xs:complexType>
       <xs:complexType name="ebMSDataSource">
@@ -1572,9 +1542,6 @@ X2SpoHffgXmdrExQshpIDzzofex0y/Kg4mulDQUPwVuIZtbnlQ==</destination>
   <wsdl:message name="EbMSMessageServiceException">
     <wsdl:part element="ns1:EbMSMessageServiceException" name="EbMSMessageServiceException"></wsdl:part>
   </wsdl:message>
-  <wsdl:message name="SendMessageWithAttachmentsResponse">
-    <wsdl:part element="ns1:SendMessageWithAttachmentsResponse" name="parameters"></wsdl:part>
-  </wsdl:message>
   <wsdl:message name="ResendMessage">
     <wsdl:part element="ns1:ResendMessage" name="parameters"></wsdl:part>
   </wsdl:message>
@@ -1595,9 +1562,6 @@ X2SpoHffgXmdrExQshpIDzzofex0y/Kg4mulDQUPwVuIZtbnlQ==</destination>
   </wsdl:message>
   <wsdl:message name="GetMessageStatus">
     <wsdl:part element="ns1:GetMessageStatus" name="parameters"></wsdl:part>
-  </wsdl:message>
-  <wsdl:message name="SendMessageWithAttachments">
-    <wsdl:part element="ns1:SendMessageWithAttachments" name="parameters"></wsdl:part>
   </wsdl:message>
   <wsdl:message name="ProcessMessageResponse">
     <wsdl:part element="ns1:ProcessMessageResponse" name="parameters"></wsdl:part>
@@ -1633,11 +1597,6 @@ X2SpoHffgXmdrExQshpIDzzofex0y/Kg4mulDQUPwVuIZtbnlQ==</destination>
     <wsdl:part element="ns1:GetMessageIds" name="parameters"></wsdl:part>
   </wsdl:message>
   <wsdl:portType name="EbMSMessageService">
-    <wsdl:operation name="SendMessageWithAttachments">
-      <wsdl:input message="ns1:SendMessageWithAttachments" name="SendMessageWithAttachments"></wsdl:input>
-      <wsdl:output message="ns1:SendMessageWithAttachmentsResponse" name="SendMessageWithAttachmentsResponse"></wsdl:output>
-      <wsdl:fault message="ns1:EbMSMessageServiceException" name="EbMSMessageServiceException"></wsdl:fault>
-    </wsdl:operation>
     <wsdl:operation name="Ping">
       <wsdl:input message="ns1:Ping" name="Ping"></wsdl:input>
       <wsdl:output message="ns1:PingResponse" name="PingResponse"></wsdl:output>
@@ -1802,29 +1761,7 @@ X2SpoHffgXmdrExQshpIDzzofex0y/Kg4mulDQUPwVuIZtbnlQ==</destination>
          </Message>
       </ns:SendMessage>
    </soapenv:Body>
-</soapenv:Envelope>]]></con:request><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508" action="http://service.ebms.clockwork.nl/EbMSMessageService/SendMessage"/><con:wsrmConfig version="1.2"/></con:call></con:operation><con:operation id="611e0c10-7066-438c-a405-9b211fa1e8f2" isOneWay="false" action="" name="SendMessageWithAttachments" bindingOperationName="SendMessageWithAttachments" type="Request-Response" outputName="SendMessageWithAttachmentsResponse" inputName="SendMessageWithAttachments" receivesAttachments="false" sendsAttachments="false" anonymous="optional"><con:settings/><con:call id="35ec6c3e-98d8-4596-8008-619d447e3bb1" name="Request 1"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting><con:setting id="WsdlSettings@enable-mtom">true</con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8080/service/ebms</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns="http://www.ordina.nl/ebms/2.17">
-   <soapenv:Header/>
-   <soapenv:Body>
-      <ns:SendMessageWithAttachments>
-         <Message>
-            <context>
-               <cpaId>cpaStubEBF.rm.https.signed</cpaId>
-               <fromParty>
-                  <partyId>urn:osb:oin:00000000000000000000</partyId>
-                  <role>DIGIPOORT</role>
-               </fromParty>
-               <toParty>
-                  <partyId>urn:osb:oin:00000000000000000001</partyId>
-                  <role>OVERHEID</role>
-               </toParty>
-               <service>urn:osb:services:osb:afleveren:1.1$1.0</service>
-               <action>afleveren</action>
-            </context>
-            <attachment>cid:276116437874</attachment>
-         </Message>
-      </ns:SendMessageWithAttachments>
-   </soapenv:Body>
-</soapenv:Envelope>]]></con:request><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:attachment><con:name>truststore.pem</con:name><con:contentType>application/octet-stream</con:contentType><con:size>887</con:size><con:contentId>276116437874</con:contentId><con:part>276116437874</con:part><con:url>/home/edwin/ebms/ebms-admin/resources/CPAs/truststore.pem</con:url><con:data>UEsDBBQACAgIAM6ysFAAAAAAAAAAAAAAAAAOAAAAdHJ1c3RzdG9yZS5wZW1lU8mSokAQvfMVc+/oUBB0OPShNpClkJJF4MbSogKKIhb69YNOdExPdEXk5dWrl/myMt/fxwOJbji/EFn7hmYg4JMn+C5Qw0CxjxDIzyXgBgSlQfwOD+cHcGBZnXfVXlf5FAIWaABDkbKOIxbjkDGdcHMl+Jh4FAIdiAFBkJrrmXnLmrpPpLCna4MT8CIvCa+XeaP26UY5Jht5wK8ETihAcPJhpd4Tve5j/5vYQE0mDbdYus6ymXmh64pr/CWGyQBnxSzv4/Fe+CLYjdJRKEfYJwMdw8GEOzjnjngaMeOFjfGF8cInNgWVLjyzwR1FfsUHcgDsWdbYCB8FxT2TlDZrijo7/KsMDv/bFCj7zfHfpliEJ27erMdH5JtYN4o5XSY5l0JS7+mDJBTmLzEwUCYUoxu7+Ua4K32GETz++AWiAbCCBwZ4GVeojAkQraoQgtjugNnezHzSbd6KrB52yJ1Hx2nwWZ03MiJ5G29EQLZKurvuphmT3+rklBFdOoSPNQWCirW0ZduFCNJtFf1eH8gMx/u5+Xap5669MScr734JoO6JiJj5fGl6k97usqk0vfUNOnoC7DbVVne9FMJWTdLVpDFidWHug0tcc060Q6Z7y2OAwDgRwP85XMLTV8kQx+7Sujb9Qz7YFeHuDFXbla2+MdkedmUQLvSr24iRZVBHDoPPu+hUmhlA5SxwM4pFY3GuJ+E1sQ+h1Lg7T/SSilqFlii9b5HLxDr7qpY+9pnSWHIcrW5au8qxA2+tJUSS156W220ZNcWFDKzbtQZ+PE7bz2F6n1il3PQ1ZoHLw95IrtmxZh8fwmuNiIN/rtYfUEsHCKX1dZhuAgAAdwMAAFBLAQIUABQACAgIAM6ysFCl9XWYbgIAAHcDAAAOAAAAAAAAAAAAAAAAAAAAAAB0cnVzdHN0b3JlLnBlbVBLBQYAAAAAAQABADwAAACqAgAAAAA=</con:data><con:id>5f4e7444-bbbd-4258-b8da-dd82feee8a0c</con:id></con:attachment><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508" action="http://service.ebms.clockwork.nl/EbMSMessageService/SendMessageWithAttachments"/><con:wsrmConfig version="1.2"/></con:call></con:operation><con:operation id="ddc7c97e-c784-4d57-b978-3f59cf4dd4ed" isOneWay="false" action="" name="ProcessMessageEvent" bindingOperationName="ProcessMessageEvent" type="Request-Response" outputName="ProcessMessageEventResponse" inputName="ProcessMessageEvent" receivesAttachments="false" sendsAttachments="false" anonymous="optional"><con:settings/><con:call id="ff23a3e6-c0b5-4639-a39d-54c39248a91d" name="Request 1"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8080/service/ebms</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns="http://www.ordina.nl/ebms/2.17">
+</soapenv:Envelope>]]></con:request><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508" action="http://service.ebms.clockwork.nl/EbMSMessageService/SendMessage"/><con:wsrmConfig version="1.2"/></con:call></con:operation><con:operation id="ddc7c97e-c784-4d57-b978-3f59cf4dd4ed" isOneWay="false" action="" name="ProcessMessageEvent" bindingOperationName="ProcessMessageEvent" type="Request-Response" outputName="ProcessMessageEventResponse" inputName="ProcessMessageEvent" receivesAttachments="false" sendsAttachments="false" anonymous="optional"><con:settings/><con:call id="ff23a3e6-c0b5-4639-a39d-54c39248a91d" name="Request 1"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8080/service/ebms</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns="http://www.ordina.nl/ebms/2.17">
    <soapenv:Header/>
    <soapenv:Body>
       <ns:ProcessMessageEvent>

@@ -55,7 +55,6 @@ import nl.clockwork.ebms.model.EbMSMessage;
 import nl.clockwork.ebms.model.EbMSStatusResponse;
 import nl.clockwork.ebms.processor.EbMSProcessingException;
 import nl.clockwork.ebms.processor.EbMSProcessorException;
-import nl.clockwork.ebms.service.model.EbMSMessageAttachment;
 import nl.clockwork.ebms.service.model.EbMSMessageContent;
 import nl.clockwork.ebms.service.model.EbMSMessageContext;
 import nl.clockwork.ebms.service.model.EbMSMessageEvent;
@@ -67,7 +66,6 @@ import nl.clockwork.ebms.validation.EbMSMessageContextValidator;
 @CommonsLog
 @FieldDefaults(level = AccessLevel.PACKAGE, makeFinal = true)
 @AllArgsConstructor
-@SuppressWarnings("deprecation")
 public class EbMSMessageServiceImpl implements EbMSMessageService
 {
   @NonNull
@@ -130,28 +128,6 @@ public class EbMSMessageServiceImpl implements EbMSMessageService
 		catch (Exception e)
 		{
 			log.error("SendMessage " + messageContent,e);
-			throw new EbMSMessageServiceException(e);
-		}
-	}
-
-	@Override
-	public String sendMessageWithAttachments(EbMSMessageAttachment message) throws EbMSMessageServiceException
-	{
-		try
-		{
-			log.debug("SendMessageWithAttachments");
-			ebMSMessageContextValidator.validate(message.getContext());
-			val result = ebMSMessageFactory.createEbMSMessage(message.toContent());
-			val document = EbMSMessageUtils.getEbMSDocument(result);
-			signatureGenerator.generate(document,result);
-			storeMessage(document.getMessage(),result);
-			val messageId = result.getMessageHeader().getMessageData().getMessageId();
-			log.info("Sending message " + messageId);
-			return messageId;
-		}
-		catch (Exception e)
-		{
-			log.error("SendMessageWithAttachments " + message,e);
 			throw new EbMSMessageServiceException(e);
 		}
 	}

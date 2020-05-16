@@ -24,13 +24,11 @@ import javax.jws.WebService;
 import javax.xml.bind.annotation.XmlElement;
 
 import nl.clockwork.ebms.event.listener.EbMSMessageEventType;
-import nl.clockwork.ebms.service.model.EbMSMessageAttachment;
 import nl.clockwork.ebms.service.model.EbMSMessageContent;
 import nl.clockwork.ebms.service.model.EbMSMessageContext;
 import nl.clockwork.ebms.service.model.EbMSMessageEvent;
 import nl.clockwork.ebms.service.model.MessageStatus;
 
-@SuppressWarnings("deprecation")
 @WebService(targetNamespace="http://www.ordina.nl/ebms/2.17")
 public interface EbMSMessageService
 {
@@ -63,10 +61,6 @@ public interface EbMSMessageService
 	 * @return The messageId of the generated EbMS message
 	 * @throws EbMSMessageServiceException
 	 */
-	@Deprecated
-	@WebResult(name="MessageId")
-	@WebMethod(operationName="SendMessageWithAttachments")
-	String sendMessageWithAttachments(@WebParam(name="Message") @XmlElement(required=true) EbMSMessageAttachment message) throws EbMSMessageServiceException;
 
 	/**
 	 * Resends the content of message identified by messageId as an EbMS message
