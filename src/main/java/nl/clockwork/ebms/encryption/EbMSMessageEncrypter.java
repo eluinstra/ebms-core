@@ -60,7 +60,7 @@ import lombok.extern.apachecommons.CommonsLog;
 import nl.clockwork.ebms.EbMSAttachmentFactory;
 import nl.clockwork.ebms.cpa.CPAManager;
 import nl.clockwork.ebms.cpa.CPAUtils;
-import nl.clockwork.ebms.model.CacheablePartyId;
+import nl.clockwork.ebms.cpa.CacheablePartyId;
 import nl.clockwork.ebms.model.EbMSAttachment;
 import nl.clockwork.ebms.model.EbMSDocument;
 import nl.clockwork.ebms.model.EbMSMessage;

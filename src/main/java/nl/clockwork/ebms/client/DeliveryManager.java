@@ -42,7 +42,7 @@ import lombok.extern.apachecommons.CommonsLog;
 import nl.clockwork.ebms.EbMSMessageUtils;
 import nl.clockwork.ebms.cpa.CPAManager;
 import nl.clockwork.ebms.cpa.CPAUtils;
-import nl.clockwork.ebms.model.CacheablePartyId;
+import nl.clockwork.ebms.cpa.CacheablePartyId;
 import nl.clockwork.ebms.model.EbMSBaseMessage;
 import nl.clockwork.ebms.model.EbMSRequestMessage;
 import nl.clockwork.ebms.model.EbMSResponseMessage;
