@@ -40,7 +40,6 @@ import nl.clockwork.ebms.EbMSMessageFactory;
 import nl.clockwork.ebms.EbMSMessageStatus;
 import nl.clockwork.ebms.EbMSMessageUtils;
 import nl.clockwork.ebms.client.DeliveryManager;
-import nl.clockwork.ebms.common.util.StreamUtils;
 import nl.clockwork.ebms.cpa.CPAManager;
 import nl.clockwork.ebms.cpa.CPAUtils;
 import nl.clockwork.ebms.dao.DAOException;
@@ -60,6 +59,7 @@ import nl.clockwork.ebms.service.model.EbMSMessageContext;
 import nl.clockwork.ebms.service.model.EbMSMessageEvent;
 import nl.clockwork.ebms.service.model.MessageStatus;
 import nl.clockwork.ebms.signing.EbMSSignatureGenerator;
+import nl.clockwork.ebms.util.StreamUtils;
 import nl.clockwork.ebms.validation.EbMSMessageContextValidator;
 
 @Builder(setterPrefix = "set")

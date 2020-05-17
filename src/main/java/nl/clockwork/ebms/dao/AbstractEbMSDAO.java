@@ -66,7 +66,6 @@ import nl.clockwork.ebms.EbMSAttachmentFactory;
 import nl.clockwork.ebms.EbMSMessageStatus;
 import nl.clockwork.ebms.EbMSMessageUtils;
 import nl.clockwork.ebms.common.JAXBParser;
-import nl.clockwork.ebms.common.util.DOMUtils;
 import nl.clockwork.ebms.cpa.CPADAO;
 import nl.clockwork.ebms.cpa.CertificateMappingDAO;
 import nl.clockwork.ebms.cpa.URLMappingDAO;
@@ -88,6 +87,7 @@ import nl.clockwork.ebms.service.model.EbMSMessageContext;
 import nl.clockwork.ebms.service.model.EbMSMessageEvent;
 import nl.clockwork.ebms.service.model.Party;
 import nl.clockwork.ebms.service.model.URLMapping;
+import nl.clockwork.ebms.util.DOMUtils;
 
 @FieldDefaults(level = AccessLevel.PROTECTED, makeFinal = true)
 @AllArgsConstructor

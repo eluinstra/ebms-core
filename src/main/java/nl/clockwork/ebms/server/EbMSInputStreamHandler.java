@@ -37,9 +37,9 @@ import nl.clockwork.ebms.Constants;
 import nl.clockwork.ebms.EbMSMessageReader;
 import nl.clockwork.ebms.EbMSMessageUtils;
 import nl.clockwork.ebms.HttpStatusCode;
-import nl.clockwork.ebms.common.util.DOMUtils;
 import nl.clockwork.ebms.processor.EbMSMessageProcessor;
 import nl.clockwork.ebms.processor.EbMSProcessorException;
+import nl.clockwork.ebms.util.DOMUtils;
 
 @CommonsLog
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)

@@ -58,8 +58,6 @@ import lombok.val;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.apachecommons.CommonsLog;
 import nl.clockwork.ebms.EbMSAttachmentFactory;
-import nl.clockwork.ebms.common.util.SecurityUtils;
-import nl.clockwork.ebms.common.util.StreamUtils;
 import nl.clockwork.ebms.cpa.CPAManager;
 import nl.clockwork.ebms.cpa.CPAUtils;
 import nl.clockwork.ebms.model.CacheablePartyId;
@@ -69,6 +67,8 @@ import nl.clockwork.ebms.model.EbMSMessage;
 import nl.clockwork.ebms.processor.EbMSProcessingException;
 import nl.clockwork.ebms.processor.EbMSProcessorException;
 import nl.clockwork.ebms.security.EbMSTrustStore;
+import nl.clockwork.ebms.util.SecurityUtils;
+import nl.clockwork.ebms.util.StreamUtils;
 import nl.clockwork.ebms.validation.ValidationException;
 import nl.clockwork.ebms.validation.ValidatorException;
 

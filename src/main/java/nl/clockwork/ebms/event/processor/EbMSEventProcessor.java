@@ -41,7 +41,6 @@ import nl.clockwork.ebms.client.EbMSClient;
 import nl.clockwork.ebms.client.EbMSHttpClientFactory;
 import nl.clockwork.ebms.client.EbMSResponseException;
 import nl.clockwork.ebms.client.EbMSUnrecoverableResponseException;
-import nl.clockwork.ebms.common.util.StreamUtils;
 import nl.clockwork.ebms.cpa.CPAManager;
 import nl.clockwork.ebms.cpa.CPAUtils;
 import nl.clockwork.ebms.cpa.URLMapper;
@@ -52,6 +51,7 @@ import nl.clockwork.ebms.event.listener.EventListener;
 import nl.clockwork.ebms.model.EbMSDocument;
 import nl.clockwork.ebms.processor.EbMSMessageProcessor;
 import nl.clockwork.ebms.processor.EbMSProcessingException;
+import nl.clockwork.ebms.util.StreamUtils;
 
 @CommonsLog
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)

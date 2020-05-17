@@ -50,7 +50,6 @@ import nl.clockwork.ebms.EbMSAttachmentFactory;
 import nl.clockwork.ebms.EbMSIdGenerator;
 import nl.clockwork.ebms.EbMSMessageFactory;
 import nl.clockwork.ebms.common.JAXBParser;
-import nl.clockwork.ebms.common.util.DOMUtils;
 import nl.clockwork.ebms.cpa.CPADAO;
 import nl.clockwork.ebms.cpa.CPAManager;
 import nl.clockwork.ebms.cpa.URLMapper;
@@ -66,6 +65,7 @@ import nl.clockwork.ebms.service.model.EbMSDataSource;
 import nl.clockwork.ebms.service.model.EbMSMessageContent;
 import nl.clockwork.ebms.service.model.EbMSMessageContext;
 import nl.clockwork.ebms.service.model.Party;
+import nl.clockwork.ebms.util.DOMUtils;
 import nl.clockwork.ebms.validation.EbMSValidationException;
 import nl.clockwork.ebms.validation.ValidatorException;
 

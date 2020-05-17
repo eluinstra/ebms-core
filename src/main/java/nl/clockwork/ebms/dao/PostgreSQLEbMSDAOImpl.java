@@ -47,11 +47,11 @@ import lombok.val;
 import nl.clockwork.ebms.EbMSAttachmentFactory;
 import nl.clockwork.ebms.EbMSMessageStatus;
 import nl.clockwork.ebms.EbMSMessageUtils;
-import nl.clockwork.ebms.common.util.DOMUtils;
 import nl.clockwork.ebms.event.listener.EbMSMessageEventType;
 import nl.clockwork.ebms.model.EbMSAttachment;
 import nl.clockwork.ebms.model.EbMSBaseMessage;
 import nl.clockwork.ebms.processor.EbMSProcessingException;
+import nl.clockwork.ebms.util.DOMUtils;
 
 class PostgreSQLEbMSDAOImpl extends AbstractEbMSDAO
 {

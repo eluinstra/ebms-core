@@ -26,7 +26,6 @@ import lombok.Builder;
 import lombok.NonNull;
 import lombok.val;
 import lombok.experimental.FieldDefaults;
-import nl.clockwork.ebms.common.util.StreamUtils;
 import nl.clockwork.ebms.cpa.CPAManager;
 import nl.clockwork.ebms.cpa.CPAUtils;
 import nl.clockwork.ebms.dao.EbMSDAO;
@@ -38,6 +37,7 @@ import nl.clockwork.ebms.model.EbMSDocument;
 import nl.clockwork.ebms.model.EbMSMessage;
 import nl.clockwork.ebms.model.EbMSMessageError;
 import nl.clockwork.ebms.model.EbMSRequestMessage;
+import nl.clockwork.ebms.util.StreamUtils;
 
 @Builder(setterPrefix = "set")
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)

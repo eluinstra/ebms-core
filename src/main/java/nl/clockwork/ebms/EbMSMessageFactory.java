@@ -49,7 +49,6 @@ import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.val;
 import lombok.experimental.FieldDefaults;
-import nl.clockwork.ebms.common.util.StreamUtils;
 import nl.clockwork.ebms.cpa.CPAManager;
 import nl.clockwork.ebms.cpa.CPAUtils;
 import nl.clockwork.ebms.model.CacheablePartyId;
@@ -68,6 +67,7 @@ import nl.clockwork.ebms.service.model.EbMSDataSourceMTOM;
 import nl.clockwork.ebms.service.model.EbMSMessageContent;
 import nl.clockwork.ebms.service.model.EbMSMessageContentMTOM;
 import nl.clockwork.ebms.service.model.EbMSMessageContext;
+import nl.clockwork.ebms.util.StreamUtils;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor

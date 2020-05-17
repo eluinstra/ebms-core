@@ -26,11 +26,11 @@ import lombok.NonNull;
 import lombok.val;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.apachecommons.CommonsLog;
-import nl.clockwork.ebms.common.util.StreamUtils;
 import nl.clockwork.ebms.cpa.CPAManager;
 import nl.clockwork.ebms.cpa.CPAUtils;
 import nl.clockwork.ebms.model.CacheablePartyId;
 import nl.clockwork.ebms.model.EbMSBaseMessage;
+import nl.clockwork.ebms.util.StreamUtils;
 
 @CommonsLog
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)

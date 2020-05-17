@@ -59,7 +59,6 @@ import org.xmlsoap.schemas.soap.envelope.Header;
 
 import lombok.val;
 import nl.clockwork.ebms.common.JAXBParser;
-import nl.clockwork.ebms.common.util.DOMUtils;
 import nl.clockwork.ebms.cpa.CPAUtils;
 import nl.clockwork.ebms.jaxb.EbMSNamespaceMapper;
 import nl.clockwork.ebms.model.EbMSAcknowledgment;
@@ -71,6 +70,7 @@ import nl.clockwork.ebms.model.EbMSMessageBuilder;
 import nl.clockwork.ebms.model.EbMSMessageError;
 import nl.clockwork.ebms.model.EbMSStatusRequest;
 import nl.clockwork.ebms.model.EbMSStatusResponse;
+import nl.clockwork.ebms.util.DOMUtils;
 
 public class EbMSMessageUtils
 {

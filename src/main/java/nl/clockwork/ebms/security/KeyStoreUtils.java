@@ -24,7 +24,7 @@ import java.security.KeyStore;
 
 import lombok.val;
 import lombok.var;
-import nl.clockwork.ebms.common.util.SecurityUtils;
+import nl.clockwork.ebms.util.SecurityUtils;
 
 class KeyStoreUtils
 {
