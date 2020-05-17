@@ -234,7 +234,7 @@
 		<constructor-arg name="advice" ref="cpaMethodCacheInterceptor"/>
 	</bean>
 
-	<bean id="cpaMethodCacheInterceptor" class="nl.clockwork.ebms.common.MethodCacheInterceptor">
+	<bean id="cpaMethodCacheInterceptor" class="nl.clockwork.ebms.cache.MethodCacheInterceptor">
 		<constructor-arg name="cache" ref="cpaMethodCache" />
 	</bean>
 
