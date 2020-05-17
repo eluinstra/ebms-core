@@ -13,9 +13,35 @@ ebms adapter for mule and web are no longer released; use ebms-admin instead
 
 For the ebms-admin console see https://sourceforge.net/projects/javaebmsadmin/
 
-===============
+================
 = Release Notes
-===============
+================
+ebms-core-2.17.0.jar:
+- added option to use SSL clientCerttificate defined in the CPA to send messages (https.useClientCertificate)
+	+ CertificateMapper to override defined SSL clientCertificate
+- cleaned up and split up SOAP interfaces
+- removed properties:
+	- ebms.allowMultipleServers (leave property ebms.serverId empty to set allowMultipleServers to false)
+	- patch.digipoort.enable (not necessary anymore)
+	- patch.oracle.enable (not necessary anymore)
+	- patch.cleo.enable (not necessary anymore)
+- changed default value of property
+	- http.base64Writer to false
+	- https.clientCertificateAuthentication to false
+- added properties:
+	- https.useClientCertificate=false
+	- client.keystore.keyPassword=${client.keystore.password}
+	- client.keystore.defaultAlias=
+	- signature.keystore.keyPassword=${signature.keystore.password}
+	- encryption.keystore.keyPassword=${encryption.keystore.password}
+- coding improvements
+	- added lombok
+	- made objects immutable where possible
+	- changed spring bean configuration from using setters to using constructors and builders
+	- restructured classes and packages
+	- lots of other improvements
+- database updates
+
 ebms-core-2.16.6.jar:
 - fixed bug: the references in a signed acknowledgment is not validated correctly, which will not set the status of the message to DELIVERED but eventually to EXPIRED instead
 - fixed issue using asynchronous messaging and no receive deliveryChannel can be found. The message will be stored and returned synchronously as an error now
@@ -57,9 +83,18 @@ ebms-core-2.16.0.jar:
 - upgraded to java 8
 - minor improvements
 
-==============
+==========
+= RoapMap
+==========
+release 2.18.x:
+- implement Message Ordering
+
+release 2.19.x:
+- upgrade to Java 11
+
+===============
 = Introduction
-==============
+===============
 This library contains the core functionality of the EbMS adapter including:
 - a servlet to use the adapter in a servlet container
 - database support for the following databases:
@@ -99,9 +134,9 @@ Remarks:
 -	Manifest can only refer to payload data included as part of the message
 -	Extendible to support other communication protocols
 
-=======
+========
 = Usage
-=======
+========
 You can use the ebms-core by integrating it into your own java application, or you can use it as a standalone SOAP service through ebms-admin console
  
 If you want to use the ebms-core in your own application you can include the jar into your application and configure the adapter through spring properties.
@@ -112,9 +147,9 @@ The CPAService contains functionality to control CPAs
 The EbMSMessageService contains functionality for sending and receiving ebms messages
 To receive ebms messages configure the servlet nl.clockwork.ebms.servlet.EbMSServlet in your application
 
-=======================
+========================
 = EbMS Adapter Database
-=======================
+========================
 The EbMS adapter supports different databases:
 - HSQLDB
 - MySQL
@@ -123,6 +158,8 @@ The EbMS adapter supports different databases:
 - MSSQL
 - Oracle
 - DB2
+
+The database scripts can be found in https://repo.maven.apache.org/maven2/nl/clockwork/ebms/ebms-core/2.17.0/ebms-core-2.17.0-sources.jar/resources/scripts/database/
 
 You can configure the database by adding the right JDBC driver to the classpath and configuring the right driver and connection string:
 
@@ -195,15 +232,15 @@ encryption.keystore.type=PKCS12
 encryption.keystore.path=keystore.p12
 encryption.keystore.password=password
 
-===========
+============
 = Resources
-===========
-the reources directory resides in ebms-core-x.x.x-src.zip/resources and contains the following data:
+============
+the resources directory resides in https://repo.maven.apache.org/maven2/nl/clockwork/ebms/ebms-core/2.17.0/ebms-core-2.17.0-sources.jar/resources and contains the following data:
 - scripts/database/ - contains the database scripts for the supported databases
 
-==========
+===========
 = Building
-==========
+===========
 The Maven settings.xml requires additional settings to support the Oracle Maven Repository. Add the following <server> element to the <servers> section of the Maven settings.xml:
 
  <server>
@@ -233,9 +270,9 @@ Replace the <username> and <password> entries with your OTN user name and passwo
 
 mvn package
 
-====================
+=====================
 = Generating reports
-====================
+=====================
 mvn site
 
 Or to generate individual reports:
