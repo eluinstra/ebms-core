@@ -40,6 +40,7 @@ ebms-core-2.17.0.jar:
 	- changed spring bean configuration from using setters to using constructors and builders
 	- restructured classes and packages
 	- lots of other improvements
+- updated libraries
 - database updates
 
 ebms-core-2.16.6.jar:
