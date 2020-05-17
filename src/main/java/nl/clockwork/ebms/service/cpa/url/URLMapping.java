@@ -13,57 +13,35 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.clockwork.ebms.service.model;
+package nl.clockwork.ebms.service.cpa.url;
 
 import java.io.Serializable;
-import java.security.cert.X509Certificate;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlSchemaType;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
+import lombok.ToString;
 import lombok.experimental.FieldDefaults;
-import nl.clockwork.ebms.cpa.CertificateMapper;
-import nl.clockwork.ebms.jaxb.X509CertificateAdapter;
 
 @XmlAccessorType(XmlAccessType.FIELD)
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @NoArgsConstructor
 @AllArgsConstructor
-public class CertificateMapping implements Serializable
+@ToString
+public class URLMapping implements Serializable
 {
 	private static final long serialVersionUID = 1L;
 	@XmlElement(required=true)
-	@XmlJavaTypeAdapter(X509CertificateAdapter.class)
-	@XmlSchemaType(name="base64Binary")
 	@NonNull
-	X509Certificate source;
+	String source;
 	@XmlElement(required=true)
-	@XmlJavaTypeAdapter(X509CertificateAdapter.class)
-	@XmlSchemaType(name="base64Binary")
 	@NonNull
-	X509Certificate destination;
-
-	@Override
-	public String toString()
-	{
-		return this.getClass().getSimpleName() + "(" + printSource() + ", " + printDestination() + ")";
-	}
-
-	private String printSource()
-	{
-		return "source=" + source.getSubjectDN() + "(" + CertificateMapper.getId(source) + ")";
-	}
-	private String printDestination()
-	{
-		return "destination=" + destination.getSubjectDN() + "(" + CertificateMapper.getId(destination) + ")";
-	}
+	String destination;
 }

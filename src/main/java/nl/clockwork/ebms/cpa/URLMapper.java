@@ -27,7 +27,7 @@ import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
 import net.sf.ehcache.Ehcache;
 import nl.clockwork.ebms.cache.MethodCacheInterceptor;
-import nl.clockwork.ebms.service.model.URLMapping;
+import nl.clockwork.ebms.service.cpa.url.URLMapping;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor

@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Optional;
 
 import nl.clockwork.ebms.dao.DAOException;
-import nl.clockwork.ebms.service.model.URLMapping;
+import nl.clockwork.ebms.service.cpa.url.URLMapping;
 
 public interface URLMappingDAO
 {

@@ -78,7 +78,8 @@ import nl.clockwork.ebms.model.EbMSAttachment;
 import nl.clockwork.ebms.model.EbMSBaseMessage;
 import nl.clockwork.ebms.model.EbMSDocument;
 import nl.clockwork.ebms.processor.EbMSProcessingException;
-import nl.clockwork.ebms.service.model.CertificateMapping;
+import nl.clockwork.ebms.service.cpa.certificate.CertificateMapping;
+import nl.clockwork.ebms.service.cpa.url.URLMapping;
 import nl.clockwork.ebms.service.model.EbMSDataSource;
 import nl.clockwork.ebms.service.model.EbMSDataSourceMTOM;
 import nl.clockwork.ebms.service.model.EbMSMessageContent;
@@ -86,7 +87,6 @@ import nl.clockwork.ebms.service.model.EbMSMessageContentMTOM;
 import nl.clockwork.ebms.service.model.EbMSMessageContext;
 import nl.clockwork.ebms.service.model.EbMSMessageEvent;
 import nl.clockwork.ebms.service.model.Party;
-import nl.clockwork.ebms.service.model.URLMapping;
 import nl.clockwork.ebms.util.DOMUtils;
 
 @FieldDefaults(level = AccessLevel.PROTECTED, makeFinal = true)

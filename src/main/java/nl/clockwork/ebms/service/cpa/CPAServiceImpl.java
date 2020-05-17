@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.clockwork.ebms.service;
+package nl.clockwork.ebms.service.cpa;
 
 import java.security.cert.X509Certificate;
 import java.util.List;
@@ -30,15 +30,15 @@ import nl.clockwork.ebms.cpa.CPAManager;
 import nl.clockwork.ebms.cpa.CertificateMapper;
 import nl.clockwork.ebms.cpa.URLMapper;
 import nl.clockwork.ebms.jaxb.JAXBParser;
-import nl.clockwork.ebms.service.model.CertificateMapping;
-import nl.clockwork.ebms.service.model.URLMapping;
+import nl.clockwork.ebms.service.cpa.certificate.CertificateMapping;
+import nl.clockwork.ebms.service.cpa.certificate.CertificateMappingService;
 import nl.clockwork.ebms.validation.CPAValidator;
 import nl.clockwork.ebms.validation.XSDValidator;
 
 @CommonsLog
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor
-public class CPAServiceImpl implements CPAService
+public class CPAServiceImpl implements CPAService, CertificateMappingService
 {
   @NonNull
 	CPAManager cpaManager;
@@ -149,52 +149,6 @@ public class CPAServiceImpl implements CPAService
 		catch (Exception e)
 		{
 			log.error("GetCPAId " + cpaId,e);
-			throw new CPAServiceException(e);
-		}
-	}
-
-	@Override
-	public void setURLMapping(URLMapping urlMapping) throws CPAServiceException
-	{
-		try
-		{
-			if (log.isDebugEnabled())
-				log.debug("SetURLMapping " + urlMapping);
-			urlMapper.setURLMapping(urlMapping);
-		}
-		catch (Exception e)
-		{
-			log.error("SetURLMapping " + urlMapping,e);
-			throw new CPAServiceException(e);
-		}
-	}
-
-	@Override
-	public void deleteURLMapping(String source) throws CPAServiceException
-	{
-		try
-		{
-			log.debug("DeleteURLMapping " + source);
-			urlMapper.deleteURLMapping(source);
-		}
-		catch (Exception e)
-		{
-			log.error("DeleteURLMapping " + source,e);
-			throw new CPAServiceException(e);
-		}
-	}
-
-	@Override
-	public List<URLMapping> getURLMappings() throws CPAServiceException
-	{
-		try
-		{
-			log.debug("GetURLMappings");
-			return urlMapper.getURLs();
-		}
-		catch (Exception e)
-		{
-			log.error("GetURLMappings",e);
 			throw new CPAServiceException(e);
 		}
 	}

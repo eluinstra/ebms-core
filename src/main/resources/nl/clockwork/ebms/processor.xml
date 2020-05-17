@@ -63,11 +63,17 @@
 		<constructor-arg name="keyPassword" value="${encryption.keystore.keyPassword}"/>
 	</bean>
 
-	<bean id="cpaService" class="nl.clockwork.ebms.service.CPAServiceImpl">
+	<bean id="cpaService" class="nl.clockwork.ebms.service.cpa.CPAServiceImpl">
 		<constructor-arg name="cpaManager" ref="cpaManager"/>
-		<constructor-arg name="urlMapper" ref="urlMapper"/>
-		<constructor-arg name="certificateMapper" ref="certificateMapper"/>
 		<constructor-arg name="cpaValidator" ref="cpaValidator"/>
+	</bean>
+
+	<bean id="urlMappingService" class="nl.clockwork.ebms.service.cpa.url.URLMappingServiceImpl">
+		<constructor-arg name="urlMapper" ref="urlMapper"/>
+	</bean>
+
+	<bean id="certificateMappingService" class="nl.clockwork.ebms.service.cpa.certificate.CertificateMappingServiceImpl">
+		<constructor-arg name="certificateMapper" ref="certificateMapper"/>
 	</bean>
 
 	<bean id="ebMSMessageService" factory-bean="ebMSMessageServiceBuilder" factory-method="build"/>

@@ -13,9 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.clockwork.ebms.service;
+package nl.clockwork.ebms.service.cpa;
 
-import java.security.cert.X509Certificate;
 import java.util.List;
 
 import javax.jws.WebMethod;
@@ -23,11 +22,6 @@ import javax.jws.WebParam;
 import javax.jws.WebResult;
 import javax.jws.WebService;
 import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-
-import nl.clockwork.ebms.jaxb.X509CertificateAdapter;
-import nl.clockwork.ebms.service.model.CertificateMapping;
-import nl.clockwork.ebms.service.model.URLMapping;
 
 @WebService(targetNamespace="http://www.ordina.nl/cpa/2.17")
 public interface CPAService
@@ -82,61 +76,4 @@ public interface CPAService
 	@WebResult(name="CPA")
 	@WebMethod(operationName="GetCPA")
 	/*CollaborationProtocolAgreement*/String getCPA(@WebParam(name="CPAId") @XmlElement(required=true) String cpaId) throws CPAServiceException;
-
-	/**
-	 * Stores URL mapping urlMapping in the database
-	 * 
-	 * @param urlMapping - Maps the source URL to the destination URL
-	 * @throws CPAServiceException
-	 */
-	@WebMethod(operationName="SetURLMapping")
-	void setURLMapping(@WebParam(name="URLMapping") @XmlElement(required=true) URLMapping urlMapping) throws CPAServiceException;
-
-	/**
-	 * Removes URL mapping identified by source URL source from the database
-	 * 
-	 * @param source
-	 * @throws CPAServiceException
-	 */
-	@WebMethod(operationName="DeleteURLMapping")
-	void deleteURLMapping(@WebParam(name="SourceURL") @XmlElement(required=true) String source) throws CPAServiceException;
-
-	/**
-	 * Gets all URL mappings that are stored in the database
-	 * 
-	 * @return The list of URL mappings
-	 * @throws CPAServiceException
-	 */
-	@WebResult(name="URLs")
-	@WebMethod(operationName="GetURLMappings")
-	List<URLMapping> getURLMappings() throws CPAServiceException;
-
-	/**
-	 * Stores Certificate mapping certificateMapping in the database
-	 * 
-	 * @param certificateMapping - Maps the source Certificate to the destination Certificate
-	 * @throws CPAServiceException
-	 */
-	@WebMethod(operationName="SetCertificateMapping")
-	void setCertificateMapping(@WebParam(name="CertificateMapping") @XmlElement(required=true) CertificateMapping certificateMapping) throws CPAServiceException;
-
-	/**
-	 * Removes Certificate mapping identified by source Certificate source from the database
-	 * 
-	 * @param source
-	 * @throws CPAServiceException
-	 */
-	@WebMethod(operationName="DeleteCertificateMapping")
-	void deleteCertificateMapping(@WebParam(name="SourceCertificate") @XmlElement(required=true) @XmlJavaTypeAdapter(X509CertificateAdapter.class) X509Certificate source) throws CPAServiceException;
-
-	/**
-	 * Gets all Certificate mappings that are stored in the database
-	 * 
-	 * @return The list of Certificate mappings
-	 * @throws CPAServiceException
-	 */
-	@WebResult(name="Certificates")
-	@WebMethod(operationName="GetCertificateMappings")
-	List<CertificateMapping> getCertificateMappings() throws CPAServiceException;
-
 }

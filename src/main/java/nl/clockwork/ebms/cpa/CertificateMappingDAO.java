@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.Optional;
 
 import nl.clockwork.ebms.dao.DAOException;
-import nl.clockwork.ebms.service.model.CertificateMapping;
+import nl.clockwork.ebms.service.cpa.certificate.CertificateMapping;
 
 public interface CertificateMappingDAO
 {
