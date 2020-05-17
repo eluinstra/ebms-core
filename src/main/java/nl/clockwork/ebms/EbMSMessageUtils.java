@@ -66,7 +66,6 @@ import nl.clockwork.ebms.model.EbMSAttachment;
 import nl.clockwork.ebms.model.EbMSBaseMessage;
 import nl.clockwork.ebms.model.EbMSDocument;
 import nl.clockwork.ebms.model.EbMSMessage;
-import nl.clockwork.ebms.model.EbMSMessageBuilder;
 import nl.clockwork.ebms.model.EbMSMessageError;
 import nl.clockwork.ebms.model.EbMSStatusRequest;
 import nl.clockwork.ebms.model.EbMSStatusResponse;

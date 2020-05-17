@@ -51,7 +51,7 @@ import lombok.val;
 import lombok.experimental.FieldDefaults;
 import nl.clockwork.ebms.cpa.CPAManager;
 import nl.clockwork.ebms.cpa.CPAUtils;
-import nl.clockwork.ebms.model.CacheablePartyId;
+import nl.clockwork.ebms.cpa.CacheablePartyId;
 import nl.clockwork.ebms.model.EbMSAcknowledgment;
 import nl.clockwork.ebms.model.EbMSAttachment;
 import nl.clockwork.ebms.model.EbMSMessage;

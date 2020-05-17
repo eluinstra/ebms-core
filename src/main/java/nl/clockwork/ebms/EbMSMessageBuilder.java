@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.clockwork.ebms.model;
+package nl.clockwork.ebms;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,8 +30,16 @@ import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.SyncReply;
 import org.w3._2000._09.xmldsig.SignatureType;
 
 import lombok.NonNull;
-import nl.clockwork.ebms.EbMSAction;
 import nl.clockwork.ebms.cpa.CPAUtils;
+import nl.clockwork.ebms.model.EbMSAcknowledgment;
+import nl.clockwork.ebms.model.EbMSAttachment;
+import nl.clockwork.ebms.model.EbMSBaseMessage;
+import nl.clockwork.ebms.model.EbMSMessage;
+import nl.clockwork.ebms.model.EbMSMessageError;
+import nl.clockwork.ebms.model.EbMSPing;
+import nl.clockwork.ebms.model.EbMSPong;
+import nl.clockwork.ebms.model.EbMSStatusRequest;
+import nl.clockwork.ebms.model.EbMSStatusResponse;
 import nl.clockwork.ebms.processor.EbMSProcessingException;
 
 public class EbMSMessageBuilder
@@ -154,6 +162,10 @@ public class EbMSMessageBuilder
 				return new EbMSPong(messageHeader,signature);
 			else
 				throw new EbMSProcessingException("Unable to build message from service " + CPAUtils.toString(messageHeader.getService()) + " and action " + messageHeader.getAction());
+		}
+		catch (EbMSProcessingException e)
+		{
+			throw e;
 		}
 		catch (Exception e)
 		{
