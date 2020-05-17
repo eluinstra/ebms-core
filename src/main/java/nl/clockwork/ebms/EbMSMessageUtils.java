@@ -58,9 +58,9 @@ import org.xmlsoap.schemas.soap.envelope.Fault;
 import org.xmlsoap.schemas.soap.envelope.Header;
 
 import lombok.val;
-import nl.clockwork.ebms.common.JAXBParser;
 import nl.clockwork.ebms.cpa.CPAUtils;
 import nl.clockwork.ebms.jaxb.EbMSNamespaceMapper;
+import nl.clockwork.ebms.jaxb.JAXBParser;
 import nl.clockwork.ebms.model.EbMSAcknowledgment;
 import nl.clockwork.ebms.model.EbMSAttachment;
 import nl.clockwork.ebms.model.EbMSBaseMessage;
