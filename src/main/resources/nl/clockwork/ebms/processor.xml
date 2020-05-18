@@ -217,11 +217,9 @@
 				<!--value>.*existsCPA</value>
 				<value>.*getCPA</value>
 				<value>.*getCPAIds</value-->
-				<value>.*existsParty</value>
+				<value>.*existsPartyId</value>
 				<value>.*getEbMSPartyInfo</value>
 				<value>.*getPartyInfo</value>
-				<value>.*getFromParty</value>
-				<value>.*getToParty</value>
 				<value>.*getFromPartyInfo</value>
 				<value>.*getToPartyInfoByFromPartyActionBinding</value>
 				<value>.*getToPartyInfo</value>
