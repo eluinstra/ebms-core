@@ -27,7 +27,10 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NonNull;
+import lombok.val;
 import lombok.experimental.FieldDefaults;
+import lombok.experimental.NonFinal;
+import nl.clockwork.ebms.RecycleBin;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor
@@ -42,7 +45,7 @@ public class CachedEbMSAttachment implements EbMSAttachment
 	@NonNull
 	@Getter
 	String contentType;
-	@NonNull
+	@NonFinal
 	CachedOutputStream content;
 
 	@Override
@@ -68,11 +71,21 @@ public class CachedEbMSAttachment implements EbMSAttachment
 	{
 		try
 		{
-			content.close();
+			val c = content;
+			content = null;
+			c.close();
 		}
 		catch (IOException e)
 		{
 			//do nothing
 		}
+	}
+
+	@Override
+	protected void finalize() throws Throwable
+	{
+		if (content != null)
+			RecycleBin.markForDeletion(content);
+		super.finalize();
 	}
 }
