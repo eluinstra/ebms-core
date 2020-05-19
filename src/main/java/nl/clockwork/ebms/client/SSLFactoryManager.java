@@ -229,10 +229,7 @@ public class SSLFactoryManager
 		if (enabledProtocols.length > 0)
 			result.setProtocols(enabledProtocols);
 		if (enabledProtocols.length > 0)
-		{
 			result.setCipherSuites(enabledCipherSuites);
-			result.setUseCipherSuitesOrder(true);
-		}
 		return result;
 	}
 
