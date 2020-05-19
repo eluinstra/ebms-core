@@ -23,8 +23,8 @@ ebms-core-2.17.0.jar:
 - removed properties:
 	- removed operations:
 		- SendMessageWithAttachments (use SendMessage from ebmsMTOM instead)
+		- GetMassageStatus is replaced by GetMessageStatusByMessageId, old GetMessageStatus is removed
 		- ProcessMessages (use ProcessMessage instead)
-		- GetMessageStatusByMessageId (GetMassageStatus is now  replaced by GetMessageStatusByMessageId)
 		- ProcessMessageEvents (use ProcessMessageEvent instead)
 	- split up CPAService into CPAService and URLMapper
 - changed default properties
