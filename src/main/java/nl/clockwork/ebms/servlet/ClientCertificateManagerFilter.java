@@ -29,6 +29,7 @@ import javax.servlet.FilterConfig;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
+import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -58,7 +59,7 @@ public class ClientCertificateManagerFilter implements Filter
 			}
 			else
 			{
-				X509Certificate certificate = decode(request.getAttribute(x509CertificateHeader));
+				X509Certificate certificate = decode(((HttpServletRequest)request).getHeader(x509CertificateHeader));
 				ClientCertificateManager.setCertificate(certificate);
 			}
 			chain.doFilter(request,response);
@@ -69,31 +70,17 @@ public class ClientCertificateManagerFilter implements Filter
 		}
 	}
 
-	private X509Certificate decode(Object certificate) throws CertificateException
+	private X509Certificate decode(String certificate) throws CertificateException
 	{
-		if (certificate != null)
-		{
-			if (certificate instanceof String)
-			{
-				String s = (String)certificate;
-				if (StringUtils.isNotBlank(s))
-				{
-					InputStream is = new ByteArrayInputStream(s.getBytes(Charset.defaultCharset()));
-					CertificateFactory cf = CertificateFactory.getInstance("X509");
-					return (X509Certificate)cf.generateCertificate(is);
-				}
-			}
-			else if (certificate instanceof X509Certificate)
-			{
-				return (X509Certificate)certificate;
-			}
-		}
-		return null;
+		if (StringUtils.isBlank(certificate))
+			return null;
+		InputStream is = new ByteArrayInputStream(certificate.getBytes(Charset.defaultCharset()));
+		CertificateFactory cf = CertificateFactory.getInstance("X509");
+		return (X509Certificate)cf.generateCertificate(is);
 	}
 
 	@Override
 	public void destroy()
 	{
 	}
-
 }
