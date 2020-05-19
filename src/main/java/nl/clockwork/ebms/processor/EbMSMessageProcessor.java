@@ -451,7 +451,7 @@ public class EbMSMessageProcessor
 						}
 					}
 			);
-			if (deliveryChannel == null)
+			if (!messageValidator.isSyncReply(message) && deliveryChannel == null)
 				throw new ValidationException(DOMUtils.toString(messageError.getMessage()));
 			return messageValidator.isSyncReply(message) ? new EbMSDocument(messageError.getContentId(),messageError.getMessage()) : null;
 		}
