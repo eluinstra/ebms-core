@@ -18,22 +18,30 @@ For the ebms-admin console see https://sourceforge.net/projects/javaebmsadmin/
 ================
 ebms-core-2.17.0.jar:
 - added option to use SSL clientCerttificate defined in the CPA to send messages (https.useClientCertificate)
-	+ CertificateMapper to override defined SSL clientCertificate
+	- added CertificateMapper SOAP service to override defined SSL clientCertificate
 - cleaned up and split up SOAP interfaces
 - removed properties:
-	- ebms.allowMultipleServers (leave property ebms.serverId empty to set allowMultipleServers to false)
-	- patch.digipoort.enable (not necessary anymore)
-	- patch.oracle.enable (not necessary anymore)
-	- patch.cleo.enable (not necessary anymore)
-- changed default value of property
-	- http.base64Writer to false
-	- https.clientCertificateAuthentication to false
-- added properties:
-	- https.useClientCertificate=false
-	- client.keystore.keyPassword=${client.keystore.password}
-	- client.keystore.defaultAlias=
-	- signature.keystore.keyPassword=${signature.keystore.password}
-	- encryption.keystore.keyPassword=${encryption.keystore.password}
+	- removed operations:
+		- SendMessageWithAttachments (use SendMessage from ebmsMTOM instead)
+		- ProcessMessages (use ProcessMessage instead)
+		- GetMessageStatusByMessageId (GetMassageStatus is now  replaced by GetMessageStatusByMessageId)
+		- ProcessMessageEvents (use ProcessMessageEvent instead)
+	- split up CPAService into CPAService and URLMapper
+- changed default properties
+	- removed properties:
+		- ebms.allowMultipleServers (leave property ebms.serverId empty to set allowMultipleServers to false)
+		- patch.digipoort.enable (not necessary anymore)
+		- patch.oracle.enable (not necessary anymore)
+		- patch.cleo.enable (not necessary anymore)
+	- changed default value of property
+		- http.base64Writer to false
+		- https.clientCertificateAuthentication to false
+	- added properties:
+		- https.useClientCertificate=false
+		- client.keystore.keyPassword=${client.keystore.password}
+		- client.keystore.defaultAlias=
+		- signature.keystore.keyPassword=${signature.keystore.password}
+		- encryption.keystore.keyPassword=${encryption.keystore.password}
 - coding improvements
 	- added lombok
 	- made objects immutable where possible

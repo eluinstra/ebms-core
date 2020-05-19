@@ -15,8 +15,6 @@
  */
 package nl.clockwork.ebms.validation;
 
-import java.util.Optional;
-
 import org.apache.commons.lang3.StringUtils;
 
 import lombok.AccessLevel;
@@ -26,8 +24,8 @@ import lombok.val;
 import lombok.experimental.FieldDefaults;
 import nl.clockwork.ebms.cpa.CPAManager;
 import nl.clockwork.ebms.dao.DAOException;
-import nl.clockwork.ebms.model.ToPartyInfo;
 import nl.clockwork.ebms.service.model.EbMSMessageContext;
+import nl.clockwork.ebms.service.model.Party;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor
@@ -66,6 +64,8 @@ public class EbMSMessageContextValidator
 		{
 			if (StringUtils.isEmpty(context.getCpaId()))
 				throw new ValidationException("context.cpaId cannot be empty!");
+			if (isEmpty(context.getFromParty()))
+				throw new ValidationException("context.fromParty cannot be empty!");
 			if (StringUtils.isEmpty(context.getService()))
 				throw new ValidationException("context.service cannot be empty!");
 			if (StringUtils.isEmpty(context.getAction()))
@@ -91,10 +91,8 @@ public class EbMSMessageContextValidator
 				throw new ValidationException(msg.toString());
 			}
 
-			//ToPartyInfo otherPartyInfo = CPAUtils.getToPartyInfo(cpa,(ActionBindingType)fromPartyInfo.getCanSend().getOtherPartyActionBinding());
-			Optional<ToPartyInfo> toPartyInfo =
+			val toPartyInfo =
 					cpaManager.getToPartyInfo(context.getCpaId(),context.getToParty(),context.getService(),context.getAction());
-			//if (otherPartyInfo == null && toPartyInfo == null)
 			if (fromPartyInfo.get().getCanSend().getOtherPartyActionBinding() == null && !toPartyInfo.isPresent())
 			{
 				val msg = new StringBuffer();
@@ -114,7 +112,6 @@ public class EbMSMessageContextValidator
 				msg.append(", context.action=").append(context.getAction());
 				throw new ValidationException(msg.toString());
 			}
-			//else if (toPartyInfo != null && toPartyInfo1 != null && !toPartyInfo.getCanReceive().getThisPartyActionBinding().equals(toPartyInfo1.getCanReceive().getThisPartyActionBinding()))
 			else if (fromPartyInfo.get().getCanSend().getOtherPartyActionBinding() != null
 					&& toPartyInfo.isPresent()
 					&& !fromPartyInfo.get().getCanSend().getOtherPartyActionBinding().equals(toPartyInfo.get().getCanReceive().getThisPartyActionBinding()))
@@ -134,7 +131,7 @@ public class EbMSMessageContextValidator
 				}
 				msg.append(", context.service=").append(context.getService());
 				msg.append(", context.action=").append(context.getAction());
-				msg.append(". Leave context.ToParty empty!");
+				msg.append(". context.ToParty is optional!");
 				throw new ValidationException(msg.toString());
 			}
 		}
@@ -142,6 +139,11 @@ public class EbMSMessageContextValidator
 		{
 			throw new ValidatorException(e);
 		}
+	}
+
+	private boolean isEmpty(Party party)
+	{
+		return party == null || StringUtils.isEmpty(party.getPartyId()) || StringUtils.isEmpty(party.getRole()) ;
 	}
 
 }
