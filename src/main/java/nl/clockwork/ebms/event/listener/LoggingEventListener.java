@@ -15,9 +15,9 @@
  */
 package nl.clockwork.ebms.event.listener;
 
-import lombok.extern.apachecommons.CommonsLog;
+import lombok.extern.slf4j.Slf4j;
 
-@CommonsLog
+@Slf4j
 class LoggingEventListener implements EventListener
 {
 	@Override

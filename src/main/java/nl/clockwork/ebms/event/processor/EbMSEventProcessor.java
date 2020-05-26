@@ -35,7 +35,7 @@ import lombok.Builder;
 import lombok.NonNull;
 import lombok.val;
 import lombok.experimental.FieldDefaults;
-import lombok.extern.apachecommons.CommonsLog;
+import lombok.extern.slf4j.Slf4j;
 import nl.clockwork.ebms.EbMSMessageStatus;
 import nl.clockwork.ebms.client.EbMSClient;
 import nl.clockwork.ebms.client.EbMSHttpClientFactory;
@@ -53,7 +53,7 @@ import nl.clockwork.ebms.processor.EbMSMessageProcessor;
 import nl.clockwork.ebms.processor.EbMSProcessingException;
 import nl.clockwork.ebms.util.StreamUtils;
 
-@CommonsLog
+@Slf4j
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class EbMSEventProcessor implements Runnable
 {
@@ -325,7 +325,7 @@ public class EbMSEventProcessor implements Runnable
 		}
 		catch (InterruptedException e)
 		{
-			log.trace(e);
+			log.trace("",e);
 		}
 	}
 }

@@ -22,10 +22,10 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
-import lombok.extern.apachecommons.CommonsLog;
+import lombok.extern.slf4j.Slf4j;
 import nl.clockwork.ebms.cpa.CertificateMapper;
 
-@CommonsLog
+@Slf4j
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor
 public class CertificateMappingServiceImpl implements CertificateMappingService
@@ -39,7 +39,7 @@ public class CertificateMappingServiceImpl implements CertificateMappingService
 		try
 		{
 			if (log.isDebugEnabled())
-				log.debug("SetCertificateMapping" + certificateMapping);
+				log.debug("SetCertificateMapping " + certificateMapping);
 			certificateMapper.setCertificateMapping(certificateMapping);
 		}
 		catch (Exception e)

@@ -38,7 +38,7 @@ import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.val;
 import lombok.experimental.FieldDefaults;
-import lombok.extern.apachecommons.CommonsLog;
+import lombok.extern.slf4j.Slf4j;
 import nl.clockwork.ebms.EbMSErrorCode;
 import nl.clockwork.ebms.EbMSMessageUtils;
 import nl.clockwork.ebms.cpa.CPAManager;
@@ -47,7 +47,7 @@ import nl.clockwork.ebms.model.EbMSMessage;
 import nl.clockwork.ebms.util.SecurityUtils;
 import nl.clockwork.ebms.util.StreamUtils;
 
-@CommonsLog
+@Slf4j
 @FieldDefaults(level = AccessLevel.PROTECTED, makeFinal = true)
 @AllArgsConstructor
 public class CPAValidator

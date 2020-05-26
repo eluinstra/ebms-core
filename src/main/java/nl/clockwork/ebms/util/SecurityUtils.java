@@ -32,12 +32,12 @@ import javax.crypto.SecretKey;
 import org.apache.xml.security.encryption.XMLCipher;
 
 import lombok.val;
-import lombok.extern.apachecommons.CommonsLog;
+import lombok.extern.slf4j.Slf4j;
 import nl.clockwork.ebms.security.EbMSKeyStore;
 import nl.clockwork.ebms.security.EbMSTrustStore;
 import nl.clockwork.ebms.validation.ValidationException;
 
-@CommonsLog
+@Slf4j
 public class SecurityUtils
 {
 	private static final int KEYSIZE_192 = 192;
