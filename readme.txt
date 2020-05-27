@@ -20,8 +20,11 @@ ebms-core-2.17.0.jar:
 - added option to use SSL clientCerttificate defined in the CPA to send messages (https.useClientCertificate)
 	- added CertificateMapper SOAP service to override defined SSL clientCertificate
 - cleaned up and split up SOAP interfaces
-- removed properties:
-	- removed operations:
+- changed SOAP Services:
+	- renamed operations from EbMSMessageService:
+		- GetMessageIds to GetUnprocessedMessageIds
+		- GetMessageEvents to GetUnprocessedMessageEvents
+	- removed operations from EbMSMessageService:
 		- SendMessageWithAttachments (use SendMessage from ebmsMTOM instead)
 		- GetMassageStatus is replaced by GetMessageStatusByMessageId, old GetMessageStatus is removed
 		- ProcessMessages (use ProcessMessage instead)

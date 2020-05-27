@@ -165,7 +165,7 @@ public class EbMSMessageServiceImpl implements EbMSMessageService
 	}
 
 	@Override
-	public List<String> getMessageIds(EbMSMessageContext messageContext, Integer maxNr) throws EbMSMessageServiceException
+	public List<String> getUnprocessedMessageIds(EbMSMessageContext messageContext, Integer maxNr) throws EbMSMessageServiceException
 	{
 		try
 		{
@@ -267,7 +267,7 @@ public class EbMSMessageServiceImpl implements EbMSMessageService
 	}
 
 	@Override
-	public List<EbMSMessageEvent> getMessageEvents(EbMSMessageContext messageContext, EbMSMessageEventType[] eventTypes, Integer maxNr) throws EbMSMessageServiceException
+	public List<EbMSMessageEvent> getUnprocessedMessageEvents(EbMSMessageContext messageContext, EbMSMessageEventType[] eventTypes, Integer maxNr) throws EbMSMessageServiceException
 	{
 		try
 		{

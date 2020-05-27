@@ -72,9 +72,9 @@ public class EbMSMessageServiceMTOMImpl implements EbMSMessageServiceMTOM
 	}
 
 	@Override
-	public List<String> getMessageIds(EbMSMessageContext messageContext, Integer maxNr) throws EbMSMessageServiceException
+	public List<String> getUnprocessedMessageIds(EbMSMessageContext messageContext, Integer maxNr) throws EbMSMessageServiceException
 	{
-		return ebMSMessageService.getMessageIds(messageContext,maxNr);
+		return ebMSMessageService.getUnprocessedMessageIds(messageContext,maxNr);
 	}
 
 	@Override
@@ -107,9 +107,9 @@ public class EbMSMessageServiceMTOMImpl implements EbMSMessageServiceMTOM
 	}
 
 	@Override
-	public List<EbMSMessageEvent> getMessageEvents(EbMSMessageContext messageContext, EbMSMessageEventType[] eventTypes, Integer maxNr) throws EbMSMessageServiceException
+	public List<EbMSMessageEvent> getUnprocessedMessageEvents(EbMSMessageContext messageContext, EbMSMessageEventType[] eventTypes, Integer maxNr) throws EbMSMessageServiceException
 	{
-		return ebMSMessageService.getMessageEvents(messageContext,eventTypes,maxNr);
+		return ebMSMessageService.getUnprocessedMessageEvents(messageContext,eventTypes,maxNr);
 	}
 
 	@Override

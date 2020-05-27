@@ -76,8 +76,8 @@ public interface EbMSMessageServiceMTOM
 	 * @throws EbMSMessageServiceException
 	 */
 	@WebResult(name="MessageIds")
-	@WebMethod(operationName="GetMessageIds")
-	List<String> getMessageIds(@WebParam(name="MessageContext") @XmlElement(required=true) EbMSMessageContext messageContext, @WebParam(name="MaxNr") Integer maxNr) throws EbMSMessageServiceException;
+	@WebMethod(operationName="GetUnprocessedMessageIds")
+	List<String> getUnprocessedMessageIds(@WebParam(name="MessageContext") @XmlElement(required=true) EbMSMessageContext messageContext, @WebParam(name="MaxNr") Integer maxNr) throws EbMSMessageServiceException;
 
 	/**
 	 * Gets the message content of the message identified by messageId using MTOM/XOP. If process is true, the message is given the status PROCESSED, which means that it is no longer returned in the list of getMessageIds
@@ -92,7 +92,7 @@ public interface EbMSMessageServiceMTOM
 	EbMSMessageContentMTOM getMessageMTOM(@WebParam(name="MessageId") @XmlElement(required=true) String messageId, @WebParam(name="Process") Boolean process) throws EbMSMessageServiceException;
 
 	/**
-	 * Sets the status of the message identified by messageId to PROCESSED, so that it is no longer returned in the list of getMessageIds
+	 * Sets the status of the message identified by messageId to PROCESSED, so that it is no longer returned in the list of getUnprocessedMessageIds
 	 * 
 	 * @param messageId
 	 * @throws EbMSMessageServiceException
@@ -125,11 +125,11 @@ public interface EbMSMessageServiceMTOM
 	 * @throws EbMSMessageServiceException
 	 */
 	@WebResult(name="MessageEvents")
-	@WebMethod(operationName="GetMessageEvents")
-	List<EbMSMessageEvent> getMessageEvents(@WebParam(name="MessageContext") @XmlElement(required=true) EbMSMessageContext messageContext, @WebParam(name="EventType") @XmlElement(required=true) EbMSMessageEventType[] eventTypes, @WebParam(name="MaxNr") Integer maxNr) throws EbMSMessageServiceException;
+	@WebMethod(operationName="GetUnprocessedMessageEvents")
+	List<EbMSMessageEvent> getUnprocessedMessageEvents(@WebParam(name="MessageContext") @XmlElement(required=true) EbMSMessageContext messageContext, @WebParam(name="EventType") @XmlElement(required=true) EbMSMessageEventType[] eventTypes, @WebParam(name="MaxNr") Integer maxNr) throws EbMSMessageServiceException;
 
 	/**
-	 * Sets processed to true for all the current events for the message identified by messageId, so that it is no longer returned in the list of getMessageEvents (and getMessageIds)
+	 * Sets processed to true for all the current events for the message identified by messageId, so that it is no longer returned in the list of getUnprocessedMessageEvents (and getUnprocessedMessageIds)
 	 * 
 	 * @param messageId
 	 * @throws EbMSMessageServiceException
