@@ -265,7 +265,6 @@
 		<constructor-arg name="ebMSDAO" ref="ebMSDAO"/>
 		<constructor-arg name="cpaManager" ref="cpaManager"/>
 		<constructor-arg name="serverId" value="${ebms.serverId}"/>
-		<constructor-arg name="autoRetryResponse" value="${ebmsMessage.autoRetryResponse:false}"/>
 		<constructor-arg name="nrAutoRetries" value="${ebmsMessage.nrAutoRetries:0}"/>
 		<constructor-arg name="autoRetryInterval" value="${ebmsMessage.autoRetryInterval:15}"/>
 	</bean>
