@@ -165,10 +165,11 @@ public class EbMSEventProcessor implements Runnable
 
 		private EbMSClient createClient(EbMSEvent event) throws CertificateException
 		{
+			String cpaId = event.getCpaId();
 			val sendDeliveryChannel = event.getSendDeliveryChannelId() != null ?
-					cpaManager.getDeliveryChannel(event.getCpaId(),event.getSendDeliveryChannelId())
+					cpaManager.getDeliveryChannel(cpaId,event.getSendDeliveryChannelId())
 					.orElse(null) : null;
-			return ebMSClientFactory.getEbMSClient(sendDeliveryChannel);
+			return ebMSClientFactory.getEbMSClient(cpaId,sendDeliveryChannel);
 		}
 
 		private void expireEvent(final EbMSEvent event)

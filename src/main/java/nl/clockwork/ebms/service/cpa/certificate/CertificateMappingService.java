@@ -46,7 +46,7 @@ public interface CertificateMappingService
 	 * @throws CertificateMappingServiceException
 	 */
 	@WebMethod(operationName="DeleteCertificateMapping")
-	void deleteCertificateMapping(@WebParam(name="SourceCertificate") @XmlElement(required=true) @XmlJavaTypeAdapter(X509CertificateAdapter.class) X509Certificate source) throws CertificateMappingServiceException;
+	void deleteCertificateMapping(@WebParam(name="SourceCertificate") @XmlElement(required=true) @XmlJavaTypeAdapter(X509CertificateAdapter.class) X509Certificate source, @WebParam(name="CPAId") String cpaId) throws CertificateMappingServiceException;
 
 	/**
 	 * Gets all Certificate mappings that are stored in the database

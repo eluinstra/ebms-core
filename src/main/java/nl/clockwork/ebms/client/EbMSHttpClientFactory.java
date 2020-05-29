@@ -91,11 +91,11 @@ public class EbMSHttpClientFactory
 		return clients.get(key);
 	}
 
-	public EbMSClient getEbMSClient(DeliveryChannel sendDeliveryChannel)
+	public EbMSClient getEbMSClient(String cpaId, DeliveryChannel sendDeliveryChannel)
 	{
 		try
 		{
-			val clientCertificate = getClientCertificate(sendDeliveryChannel);
+			val clientCertificate = getClientCertificate(cpaId,sendDeliveryChannel);
 			val clientAlias = clientCertificate != null ? keyStore.getCertificateAlias(clientCertificate) : null;
 			return getEbMSClient(clientAlias);
 		}
@@ -110,9 +110,9 @@ public class EbMSHttpClientFactory
 		return clientAlias == null && StringUtils.isNotEmpty(keyStore.getDefaultAlias()) ? keyStore.getDefaultAlias() : clientAlias;
 	}
 
-	private X509Certificate getClientCertificate(DeliveryChannel deliveryChannel) throws CertificateException
+	private X509Certificate getClientCertificate(String cpaId, DeliveryChannel deliveryChannel) throws CertificateException
 	{
-		return useClientCertificate && deliveryChannel != null ? certificateMapper.getCertificate(CPAUtils.getX509Certificate(CPAUtils.getClientCertificate(deliveryChannel))) : null;
+		return useClientCertificate && deliveryChannel != null ? certificateMapper.getCertificate(CPAUtils.getX509Certificate(CPAUtils.getClientCertificate(deliveryChannel)),cpaId) : null;
 	}
 
 	private SSLFactoryManager createSslFactoryManager(String clientAlias) throws Exception

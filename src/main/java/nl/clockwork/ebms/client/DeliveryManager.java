@@ -185,14 +185,15 @@ public class DeliveryManager //DeliveryService
 
 	protected EbMSClient createClient(MessageHeader messageHeader) throws CertificateException
 	{
+		String cpaId = messageHeader.getCPAId();
 		val sendDeliveryChannel = 
 				cpaManager.getSendDeliveryChannel(
-						messageHeader.getCPAId(),
+						cpaId,
 						new CacheablePartyId(messageHeader.getFrom().getPartyId()),
 						messageHeader.getFrom().getRole(),
 						CPAUtils.toString(messageHeader.getService()),
 						messageHeader.getAction())
 				.orElse(null);
-		return ebMSClientFactory.getEbMSClient(sendDeliveryChannel);
+		return ebMSClientFactory.getEbMSClient(cpaId,sendDeliveryChannel);
 	}
 }

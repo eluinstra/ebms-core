@@ -15,7 +15,6 @@
  */
 package nl.clockwork.ebms.service.cpa;
 
-import java.security.cert.X509Certificate;
 import java.util.List;
 
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CollaborationProtocolAgreement;
@@ -30,15 +29,13 @@ import nl.clockwork.ebms.cpa.CPAManager;
 import nl.clockwork.ebms.cpa.CertificateMapper;
 import nl.clockwork.ebms.cpa.URLMapper;
 import nl.clockwork.ebms.jaxb.JAXBParser;
-import nl.clockwork.ebms.service.cpa.certificate.CertificateMapping;
-import nl.clockwork.ebms.service.cpa.certificate.CertificateMappingService;
 import nl.clockwork.ebms.validation.CPAValidator;
 import nl.clockwork.ebms.validation.XSDValidator;
 
 @Slf4j
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor
-public class CPAServiceImpl implements CPAService, CertificateMappingService
+public class CPAServiceImpl implements CPAService
 {
   @NonNull
 	CPAManager cpaManager;
@@ -149,53 +146,6 @@ public class CPAServiceImpl implements CPAService, CertificateMappingService
 		catch (Exception e)
 		{
 			log.error("GetCPAId " + cpaId,e);
-			throw new CPAServiceException(e);
-		}
-	}
-
-	@Override
-	public void setCertificateMapping(CertificateMapping certificateMapping) throws CPAServiceException
-	{
-		try
-		{
-			if (log.isDebugEnabled())
-				log.debug("SetCertificateMapping" + certificateMapping);
-			certificateMapper.setCertificateMapping(certificateMapping);
-		}
-		catch (Exception e)
-		{
-			log.error("SetCertificateMapping " + certificateMapping,e);
-			throw new CPAServiceException(e);
-		}
-	}
-
-	@Override
-	public void deleteCertificateMapping(X509Certificate source) throws CPAServiceException
-	{
-		try
-		{
-			if (log.isDebugEnabled())
-				log.debug("SetCertificateMapping" + source);
-			certificateMapper.deleteCertificateMapping(source);
-		}
-		catch (Exception e)
-		{
-			log.error("SetCertificateMapping" + source,e);
-			throw new CPAServiceException(e);
-		}
-	}
-
-	@Override
-	public List<CertificateMapping> getCertificateMappings() throws CPAServiceException
-	{
-		try
-		{
-			log.debug("SetCertificateMapping");
-			return certificateMapper.getCertificates();
-		}
-		catch (Exception e)
-		{
-			log.error("SetCertificateMapping",e);
 			throw new CPAServiceException(e);
 		}
 	}

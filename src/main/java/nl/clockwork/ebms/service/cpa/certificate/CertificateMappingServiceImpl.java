@@ -50,13 +50,13 @@ public class CertificateMappingServiceImpl implements CertificateMappingService
 	}
 
 	@Override
-	public void deleteCertificateMapping(X509Certificate source) throws CertificateMappingServiceException
+	public void deleteCertificateMapping(X509Certificate source, String cpaId) throws CertificateMappingServiceException
 	{
 		try
 		{
 			if (log.isDebugEnabled())
 				log.debug("SetCertificateMapping" + source);
-			certificateMapper.deleteCertificateMapping(source);
+			certificateMapper.deleteCertificateMapping(source,cpaId);
 		}
 		catch (Exception e)
 		{

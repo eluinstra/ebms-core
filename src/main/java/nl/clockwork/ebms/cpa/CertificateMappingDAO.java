@@ -24,11 +24,11 @@ import nl.clockwork.ebms.service.cpa.certificate.CertificateMapping;
 
 public interface CertificateMappingDAO
 {
-	boolean existsCertificateMapping(String id) throws DAOException;
-	Optional<X509Certificate> getCertificateMapping(String id) throws DAOException;
+	boolean existsCertificateMapping(String id, String cpaId) throws DAOException;
+	Optional<X509Certificate> getCertificateMapping(String id, String cpaId) throws DAOException;
 	List<CertificateMapping> getCertificateMappings() throws DAOException;
 	void insertCertificateMapping(String id, CertificateMapping mapping) throws DAOException;
 	int updateCertificateMapping(String id, CertificateMapping mapping) throws DAOException;
-	int deleteCertificateMapping(String id) throws DAOException;
+	int deleteCertificateMapping(String id, String cpaId) throws DAOException;
 	String getTargetName();
 }

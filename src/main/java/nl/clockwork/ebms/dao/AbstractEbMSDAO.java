@@ -198,8 +198,8 @@ abstract class AbstractEbMSDAO implements EbMSDAO, CPADAO, URLMappingDAO, Certif
 				"select count(*)" +
 				" from cpa" +
 				" where cpa_id = ?",
-				new Object[]{cpaId},
-				Integer.class
+				Integer.class,
+				cpaId
 			) > 0;
 		}
 		catch (DataAccessException e)
@@ -318,8 +318,8 @@ abstract class AbstractEbMSDAO implements EbMSDAO, CPADAO, URLMappingDAO, Certif
 				"select count(*)" +
 				" from url_mapping" +
 				" where source = ?",
-				new Object[]{source},
-				Integer.class
+				Integer.class,
+				source
 			) > 0;
 		}
 		catch (DataAccessException e)
@@ -436,16 +436,19 @@ abstract class AbstractEbMSDAO implements EbMSDAO, CPADAO, URLMappingDAO, Certif
 	}
 
 	@Override
-	public boolean existsCertificateMapping(String id) throws DAOException
+	public boolean existsCertificateMapping(String id, String cpaId) throws DAOException
 	{
 		try
 		{
 			return jdbcTemplate.queryForObject(
 				"select count(*)" +
 				" from certificate_mapping" +
-				" where id = ?",
-				new Object[]{id},
-				Integer.class
+				" where id = ?" +
+				" and (cpa_id = ? or (cpa_id is null and ? is null))",
+				Integer.class,
+				id,
+				cpaId,
+				cpaId
 			) > 0;
 		}
 		catch (DataAccessException e)
@@ -455,14 +458,15 @@ abstract class AbstractEbMSDAO implements EbMSDAO, CPADAO, URLMappingDAO, Certif
 	}
 
 	@Override
-	public Optional<X509Certificate> getCertificateMapping(String id) throws DAOException
+	public Optional<X509Certificate> getCertificateMapping(String id, String cpaId) throws DAOException
 	{
 		try
 		{
 			return Optional.of(jdbcTemplate.queryForObject(
 				"select destination" +
 				" from certificate_mapping" +
-				" where id = ?",
+				" where id = ?" +
+				" and (cpa_id = ? or (cpa_id is null and ? is null))",
 				new RowMapper<X509Certificate>()
 				{
 					@Override
@@ -479,7 +483,9 @@ abstract class AbstractEbMSDAO implements EbMSDAO, CPADAO, URLMappingDAO, Certif
 						}
 					}
 				},
-				id
+				id,
+				cpaId,
+				cpaId
 			));
 		}
 		catch(EmptyResultDataAccessException e)
@@ -498,7 +504,7 @@ abstract class AbstractEbMSDAO implements EbMSDAO, CPADAO, URLMappingDAO, Certif
 		try
 		{
 			return jdbcTemplate.query(
-				"select source, destination" +
+				"select source, destination, cpa_id" +
 				" from certificate_mapping",
 				new RowMapper<CertificateMapping>()
 				{
@@ -510,7 +516,8 @@ abstract class AbstractEbMSDAO implements EbMSDAO, CPADAO, URLMappingDAO, Certif
 							val certificateFactory = CertificateFactory.getInstance("X509");
 							val source = (X509Certificate)certificateFactory.generateCertificate(rs.getBinaryStream("source"));
 							val destination = (X509Certificate)certificateFactory.generateCertificate(rs.getBinaryStream("destination"));
-							return new CertificateMapping(source,destination);
+							val cpaId = rs.getString("cpa_id");
+							return new CertificateMapping(source,destination,cpaId);
 						}
 						catch (CertificateException e)
 						{
@@ -536,11 +543,13 @@ abstract class AbstractEbMSDAO implements EbMSDAO, CPADAO, URLMappingDAO, Certif
 				"insert into certificate_mapping (" +
 					"id," +
 					"source," +
-					"destination" +
-				") values (?,?,?)",
+					"destination," +
+					"cpa_id" +
+				") values (?,?,?,?)",
 				id,
 				mapping.getSource().getEncoded(),
-				mapping.getDestination().getEncoded()
+				mapping.getDestination().getEncoded(),
+				mapping.getCpaId()
 			);
 		}
 		catch (CertificateEncodingException | DataAccessException e)
@@ -558,9 +567,12 @@ abstract class AbstractEbMSDAO implements EbMSDAO, CPADAO, URLMappingDAO, Certif
 			(
 				"update certificate_mapping set" +
 				" destination = ?" +
-				" where id = ?",
+				" where id = ?" +
+				" and (cpa_id = ? or (cpa_id is null and ? is null))",
 				mapping.getDestination().getEncoded(),
-				id
+				id,
+				mapping.getCpaId(),
+				mapping.getCpaId()
 			);
 		}
 		catch (CertificateEncodingException | DataAccessException e)
@@ -570,15 +582,18 @@ abstract class AbstractEbMSDAO implements EbMSDAO, CPADAO, URLMappingDAO, Certif
 	}
 
 	@Override
-	public int deleteCertificateMapping(String id) throws DAOException
+	public int deleteCertificateMapping(String id, String cpaId) throws DAOException
 	{
 		try
 		{
 			return jdbcTemplate.update
 			(
 				"delete from certificate_mapping" +
-				" where id = ?",
-				id
+				" where id = ?" +
+				" and (cpa_id = ? or (cpa_id is null and ? is null))",
+				id,
+				cpaId,
+				cpaId
 			);
 		}
 		catch (DataAccessException e)
@@ -597,8 +612,8 @@ abstract class AbstractEbMSDAO implements EbMSDAO, CPADAO, URLMappingDAO, Certif
 				" from ebms_message" +
 				" where message_id = ?" +
 				" and message_nr = 0",
-				new Object[]{messageId},
-				Integer.class
+				Integer.class,
+				messageId
 			) > 0;
 		}
 		catch (DataAccessException e)
@@ -622,15 +637,13 @@ abstract class AbstractEbMSDAO implements EbMSDAO, CPADAO, URLMappingDAO, Certif
 				" and to_role = ?" +
 				" and service = ?" +
 				" and action = ?"*/,
-				new Object[]{
-					message.getMessageHeader().getMessageData().getMessageId(),
-					message.getMessageHeader().getCPAId()/*,
-					message.getMessageHeader().getFrom().getRole(),
-					message.getMessageHeader().getTo().getRole(),
-					message.getMessageHeader().getService(),
-					message.getMessageHeader().getAction()*/
-				},
-				Integer.class
+				Integer.class,
+				message.getMessageHeader().getMessageData().getMessageId(),
+				message.getMessageHeader().getCPAId()/*,
+				message.getMessageHeader().getFrom().getRole(),
+				message.getMessageHeader().getTo().getRole(),
+				message.getMessageHeader().getService(),
+				message.getMessageHeader().getAction()*/
 			) > 0;
 		}
 		catch (DataAccessException e)

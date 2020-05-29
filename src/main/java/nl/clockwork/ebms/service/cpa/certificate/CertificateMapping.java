@@ -51,6 +51,8 @@ public class CertificateMapping implements Serializable
 	@XmlSchemaType(name="base64Binary")
 	@NonNull
 	X509Certificate destination;
+	@XmlElement
+	String cpaId;
 
 	@Override
 	public String toString()
