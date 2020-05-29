@@ -1,6 +1,7 @@
 package nl.clockwork.ebms.jms;
 
-import java.util.HashMap;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.jms.Destination;
 
@@ -37,10 +38,9 @@ public class JMSUtils
 		return result;
 	}
 
-	public static HashMap<String,Destination> createDestinations(boolean jmsVirtualTopics)
+	public static Map<String,Destination> createDestinations(JMSDestinationType jmsDestinationType)
 	{
-		val result = new HashMap<String,Destination>();
-		EbMSMessageEventType.stream().forEach(e -> result.put(e.name(),jmsVirtualTopics ? new ActiveMQTopic("VirtualTopic." + e.name()) : new ActiveMQQueue(e.name())));
-		return result;
+		return EbMSMessageEventType.stream()
+				.collect(Collectors.toMap(e -> e.name(),e -> jmsDestinationType == JMSDestinationType.QUEUE ? new ActiveMQQueue(e.name()) : new ActiveMQTopic("VirtualTopic." + e.name())));
 	}
 }

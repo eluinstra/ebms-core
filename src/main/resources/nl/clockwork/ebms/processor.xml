@@ -337,7 +337,7 @@
 		<property name="ebMSDAO" ref="ebMSDAO" />
 		<property name="ebMSMessageEventDAO" ref="ebMSDAO" />
 		<property name="jmsBrokerURL" value="${jms.brokerURL}" />
-		<property name="jmsVirtualTopics" value="${jms.virtualTopics:false}" />
+		<property name="jmsDestinationType" value="${jms.destinationType}" />
 	</bean>
 
 	<bean class="org.springframework.beans.factory.config.MethodInvokingBean">

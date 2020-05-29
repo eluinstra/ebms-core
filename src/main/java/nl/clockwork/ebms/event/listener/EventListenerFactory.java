@@ -22,6 +22,7 @@ import lombok.Builder;
 import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
 import nl.clockwork.ebms.dao.EbMSDAO;
+import nl.clockwork.ebms.jms.JMSDestinationType;
 import nl.clockwork.ebms.jms.JMSUtils;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -36,7 +37,7 @@ public class EventListenerFactory implements FactoryBean<EventListener>
 	EventListener listener;
 
 	@Builder(setterPrefix = "set")
-	public EventListenerFactory(@NonNull EventListenerType type, @NonNull EbMSDAO ebMSDAO, @NonNull EbMSMessageEventDAO ebMSMessageEventDAO, @NonNull String jmsBrokerURL, boolean jmsVirtualTopics) throws Exception
+	public EventListenerFactory(@NonNull EventListenerType type, @NonNull EbMSDAO ebMSDAO, @NonNull EbMSMessageEventDAO ebMSMessageEventDAO, @NonNull String jmsBrokerURL, JMSDestinationType jmsDestinationType) throws Exception
 	{
 		switch (type)
 		{
@@ -44,13 +45,13 @@ public class EventListenerFactory implements FactoryBean<EventListener>
 				listener = new DAOEventListener(ebMSMessageEventDAO);
 				break;
 			case SIMPLE_JMS:
-				listener = new SimpleJMSEventListener(JMSUtils.createJmsTemplate(jmsBrokerURL),JMSUtils.createDestinations(jmsVirtualTopics));
+				listener = new SimpleJMSEventListener(JMSUtils.createJmsTemplate(jmsBrokerURL),JMSUtils.createDestinations(jmsDestinationType));
 				break;
 			case JMS:
-				listener = new JMSEventListener(ebMSDAO,JMSUtils.createJmsTemplate(jmsBrokerURL),JMSUtils.createDestinations(jmsVirtualTopics));
+				listener = new JMSEventListener(ebMSDAO,JMSUtils.createJmsTemplate(jmsBrokerURL),JMSUtils.createDestinations(jmsDestinationType));
 				break;
 			case JMS_TEXT:
-				listener = new JMSTextEventListener(ebMSDAO,JMSUtils.createJmsTemplate(jmsBrokerURL),JMSUtils.createDestinations(jmsVirtualTopics));
+				listener = new JMSTextEventListener(ebMSDAO,JMSUtils.createJmsTemplate(jmsBrokerURL),JMSUtils.createDestinations(jmsDestinationType));
 				break;
 			default:
 				listener = new LoggingEventListener();
