@@ -33,7 +33,7 @@ import lombok.val;
 import lombok.experimental.FieldDefaults;
 import net.sf.ehcache.Ehcache;
 import nl.clockwork.ebms.EbMSAction;
-import nl.clockwork.ebms.cache.MethodCacheInterceptor;
+import nl.clockwork.ebms.cache.EhCacheMethodCacheInterceptor;
 import nl.clockwork.ebms.model.EbMSPartyInfo;
 import nl.clockwork.ebms.model.FromPartyInfo;
 import nl.clockwork.ebms.model.ToPartyInfo;
@@ -324,9 +324,9 @@ public class CPAManager
 	private void flushCPAMethodCache(String cpaId)
 	{
 		//val targetName = cpaDAO.toString().replaceFirst("^(.*\\.)*([^@]*)@.*$","$2");
-		daoMethodCache.remove(MethodCacheInterceptor.getKey(cpaDAO.getTargetName(),"existsCPA",cpaId));
-		daoMethodCache.remove(MethodCacheInterceptor.getKey(cpaDAO.getTargetName(),"getCPA",cpaId));
-		daoMethodCache.remove(MethodCacheInterceptor.getKey(cpaDAO.getTargetName(),"getCPAIds"));
+		daoMethodCache.remove(EhCacheMethodCacheInterceptor.getKey(cpaDAO.getTargetName(),"existsCPA",cpaId));
+		daoMethodCache.remove(EhCacheMethodCacheInterceptor.getKey(cpaDAO.getTargetName(),"getCPA",cpaId));
+		daoMethodCache.remove(EhCacheMethodCacheInterceptor.getKey(cpaDAO.getTargetName(),"getCPAIds"));
 		cpaMethodCache.removeAll();
 	}
 }

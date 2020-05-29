@@ -24,7 +24,7 @@ import lombok.NonNull;
 import lombok.val;
 import lombok.experimental.FieldDefaults;
 import net.sf.ehcache.Ehcache;
-import nl.clockwork.ebms.cache.MethodCacheInterceptor;
+import nl.clockwork.ebms.cache.EhCacheMethodCacheInterceptor;
 import nl.clockwork.ebms.service.cpa.certificate.CertificateMapping;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -76,8 +76,8 @@ public class CertificateMapper
 	private void flushDAOMethodCache(String key)
 	{
 		//val targetName = certificateMappingDAO.toString().replaceFirst("^(.*\\.)*([^@]*)@.*$","$2");
-		daoMethodCache.remove(MethodCacheInterceptor.getKey(certificateMappingDAO.getTargetName(),"existsCertificateMapping",key));
-		daoMethodCache.remove(MethodCacheInterceptor.getKey(certificateMappingDAO.getTargetName(),"getCertificateMapping",key));
-		daoMethodCache.remove(MethodCacheInterceptor.getKey(certificateMappingDAO.getTargetName(),"getCertificateMappings"));
+		daoMethodCache.remove(EhCacheMethodCacheInterceptor.getKey(certificateMappingDAO.getTargetName(),"existsCertificateMapping",key));
+		daoMethodCache.remove(EhCacheMethodCacheInterceptor.getKey(certificateMappingDAO.getTargetName(),"getCertificateMapping",key));
+		daoMethodCache.remove(EhCacheMethodCacheInterceptor.getKey(certificateMappingDAO.getTargetName(),"getCertificateMappings"));
 	}
 }

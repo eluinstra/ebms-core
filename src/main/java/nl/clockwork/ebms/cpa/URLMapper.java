@@ -26,7 +26,7 @@ import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
 import net.sf.ehcache.Ehcache;
-import nl.clockwork.ebms.cache.MethodCacheInterceptor;
+import nl.clockwork.ebms.cache.EhCacheMethodCacheInterceptor;
 import nl.clockwork.ebms.service.cpa.url.URLMapping;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -95,8 +95,8 @@ public class URLMapper
 	private void flushDAOMethodCache(String source)
 	{
 		//val targetName = urlMappingDAO.toString().replaceFirst("^(.*\\.)*([^@]*)@.*$","$2");
-		daoMethodCache.remove(MethodCacheInterceptor.getKey(urlMappingDAO.getTargetName(),"existsURLMapping",source));
-		daoMethodCache.remove(MethodCacheInterceptor.getKey(urlMappingDAO.getTargetName(),"getURLMapping",source));
-		daoMethodCache.remove(MethodCacheInterceptor.getKey(urlMappingDAO.getTargetName(),"getURLMappings"));
+		daoMethodCache.remove(EhCacheMethodCacheInterceptor.getKey(urlMappingDAO.getTargetName(),"existsURLMapping",source));
+		daoMethodCache.remove(EhCacheMethodCacheInterceptor.getKey(urlMappingDAO.getTargetName(),"getURLMapping",source));
+		daoMethodCache.remove(EhCacheMethodCacheInterceptor.getKey(urlMappingDAO.getTargetName(),"getURLMappings"));
 	}
 }

@@ -46,7 +46,7 @@
 		<constructor-arg name="advice" ref="ebMSDAOMethodCacheInterceptor"/>
 	</bean>
 
-	<bean id="ebMSDAOMethodCacheInterceptor" class="nl.clockwork.ebms.cache.MethodCacheInterceptor">
+	<bean id="ebMSDAOMethodCacheInterceptor" class="nl.clockwork.ebms.cache.EhCacheMethodCacheInterceptor">
 		<constructor-arg name="cache" ref="ebMSDAOMethodCache" />
 	</bean>
 

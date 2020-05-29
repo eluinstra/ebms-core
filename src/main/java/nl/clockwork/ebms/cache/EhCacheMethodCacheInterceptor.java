@@ -32,7 +32,7 @@ import net.sf.ehcache.Element;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor
-public class MethodCacheInterceptor implements MethodInterceptor
+public class EhCacheMethodCacheInterceptor implements MethodInterceptor
 {
 	@NonNull
 	Cache cache;
