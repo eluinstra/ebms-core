@@ -38,10 +38,11 @@ public class EventManager
 	EbMSEventDAO ebMSeventDAO;
 	@NonNull
 	CPAManager cpaManager;
+	String serverId;
 
 	public void createEvent(String cpaId, DeliveryChannel sendDeliveryChannel, DeliveryChannel receiveDeliveryChannel, String messageId, Instant timeToLive, Instant timestamp, boolean isConfidential)
 	{
-		ebMSeventDAO.insertEvent(new EbMSEvent(cpaId,sendDeliveryChannel.getChannelId(),receiveDeliveryChannel.getChannelId(), messageId, timeToLive, timestamp, isConfidential, 0));
+		ebMSeventDAO.insertEvent(new EbMSEvent(cpaId,sendDeliveryChannel.getChannelId(),receiveDeliveryChannel.getChannelId(), messageId, timeToLive, timestamp, isConfidential, 0),serverId);
 	}
 
 	public void updateEvent(final EbMSEvent event, final String url, final EbMSEventStatus status)
@@ -109,11 +110,11 @@ public class EventManager
 
 	public List<EbMSEvent> getEventsBefore(Instant timestamp)
 	{
-		return ebMSeventDAO.getEventsBefore(timestamp);
+		return ebMSeventDAO.getEventsBefore(timestamp,serverId);
 	}
 
 	public List<EbMSEvent> getEventsBefore(Instant timestamp, int maxEvents)
 	{
-		return ebMSeventDAO.getEventsBefore(timestamp,maxEvents);
+		return ebMSeventDAO.getEventsBefore(timestamp,serverId,maxEvents);
 	}
 }

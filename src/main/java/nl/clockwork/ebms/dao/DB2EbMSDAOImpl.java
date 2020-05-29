@@ -45,9 +45,9 @@ import nl.clockwork.ebms.util.DOMUtils;
 
 class DB2EbMSDAOImpl extends nl.clockwork.ebms.dao.PostgreSQLEbMSDAOImpl
 {
-	public DB2EbMSDAOImpl(TransactionTemplate transactionTemplate, JdbcTemplate jdbcTemplate, String serverId)
+	public DB2EbMSDAOImpl(TransactionTemplate transactionTemplate, JdbcTemplate jdbcTemplate)
 	{
-		super(transactionTemplate,jdbcTemplate,serverId);
+		super(transactionTemplate,jdbcTemplate);
 	}
 
 	@Override
@@ -235,7 +235,7 @@ class DB2EbMSDAOImpl extends nl.clockwork.ebms.dao.PostgreSQLEbMSDAOImpl
 	}
 
 	@Override
-	public String getEventsBeforeQuery(int maxNr)
+	public String getEventsBeforeQuery(String serverId, int maxNr)
 	{
 		return "select cpa_id, send_channel_id, receive_channel_id, message_id, time_to_live, time_stamp, is_confidential, retries" +
 			" from ebms_event" +

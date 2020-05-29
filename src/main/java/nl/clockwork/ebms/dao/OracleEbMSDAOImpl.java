@@ -23,9 +23,9 @@ import nl.clockwork.ebms.event.listener.EbMSMessageEventType;
 
 class OracleEbMSDAOImpl extends AbstractEbMSDAO
 {
-	public OracleEbMSDAOImpl(TransactionTemplate transactionTemplate, JdbcTemplate jdbcTemplate, String serverId)
+	public OracleEbMSDAOImpl(TransactionTemplate transactionTemplate, JdbcTemplate jdbcTemplate)
 	{
-		super(transactionTemplate,jdbcTemplate,serverId);
+		super(transactionTemplate,jdbcTemplate);
 	}
 
 	@Override
@@ -42,7 +42,7 @@ class OracleEbMSDAOImpl extends AbstractEbMSDAO
 	}
 
 	@Override
-	public String getEventsBeforeQuery(int maxNr)
+	public String getEventsBeforeQuery(String serverId, int maxNr)
 	{
 		return "select * from (" +
 			"select cpa_id, send_channel_id, receive_channel_id, message_id, time_to_live, time_stamp, is_confidential, retries" +

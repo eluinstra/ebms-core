@@ -164,7 +164,6 @@ abstract class AbstractEbMSDAO implements EbMSDAO, CPADAO, URLMappingDAO, Certif
 	TransactionTemplate transactionTemplate;
 	@NonNull
 	JdbcTemplate jdbcTemplate;
-	String serverId;
 	
 	@Override
 	public void executeTransaction(final DAOTransactionCallback callback) throws DAOException
@@ -1224,7 +1223,7 @@ abstract class AbstractEbMSDAO implements EbMSDAO, CPADAO, URLMappingDAO, Certif
 	}
 
 	@Override
-	public List<EbMSEvent> getEventsBefore(Instant timestamp) throws DAOException
+	public List<EbMSEvent> getEventsBefore(Instant timestamp, String serverId) throws DAOException
 	{
 		try
 		{
@@ -1245,15 +1244,15 @@ abstract class AbstractEbMSDAO implements EbMSDAO, CPADAO, URLMappingDAO, Certif
 		}
 	}
 	
-	public abstract String getEventsBeforeQuery(int maxNr);
+	public abstract String getEventsBeforeQuery(String serverId, int maxNr);
 
 	@Override
-	public List<EbMSEvent> getEventsBefore(Instant timestamp, int maxNr) throws DAOException
+	public List<EbMSEvent> getEventsBefore(Instant timestamp, String serverId, int maxNr) throws DAOException
 	{
 		try
 		{
 			return jdbcTemplate.query(
-				getEventsBeforeQuery(maxNr),
+				getEventsBeforeQuery(serverId,maxNr),
 				new EbMSEventRowMapper(this),
 				Timestamp.from(timestamp)
 			);
@@ -1265,7 +1264,7 @@ abstract class AbstractEbMSDAO implements EbMSDAO, CPADAO, URLMappingDAO, Certif
 	}
 	
 	@Override
-	public void insertEvent(EbMSEvent event) throws DAOException
+	public void insertEvent(EbMSEvent event, String serverId) throws DAOException
 	{
 		try
 		{

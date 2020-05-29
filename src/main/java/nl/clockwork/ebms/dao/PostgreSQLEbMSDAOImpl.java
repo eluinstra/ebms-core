@@ -89,9 +89,9 @@ class PostgreSQLEbMSDAOImpl extends AbstractEbMSDAO
 		}
 	}
 
-	public PostgreSQLEbMSDAOImpl(TransactionTemplate transactionTemplate, JdbcTemplate jdbcTemplate, String serverId)
+	public PostgreSQLEbMSDAOImpl(TransactionTemplate transactionTemplate, JdbcTemplate jdbcTemplate)
 	{
-		super(transactionTemplate,jdbcTemplate,serverId);
+		super(transactionTemplate,jdbcTemplate);
 	}
 
 	@Override
@@ -307,7 +307,7 @@ class PostgreSQLEbMSDAOImpl extends AbstractEbMSDAO
 	}
 
 	@Override
-	public String getEventsBeforeQuery(int maxNr)
+	public String getEventsBeforeQuery(String serverId, int maxNr)
 	{
 		return "select cpa_id, send_channel_id, receive_channel_id, message_id, time_to_live, time_stamp, is_confidential, retries" +
 			" from ebms_event" +

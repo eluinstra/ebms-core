@@ -49,9 +49,9 @@ import nl.clockwork.ebms.util.DOMUtils;
 
 class MySQLEbMSDAOImpl extends AbstractEbMSDAO
 {
-	public MySQLEbMSDAOImpl(TransactionTemplate transactionTemplate, JdbcTemplate jdbcTemplate, String serverId)
+	public MySQLEbMSDAOImpl(TransactionTemplate transactionTemplate, JdbcTemplate jdbcTemplate)
 	{
-		super(transactionTemplate,jdbcTemplate,serverId);
+		super(transactionTemplate,jdbcTemplate);
 	}
 
 	@Override
@@ -303,7 +303,7 @@ class MySQLEbMSDAOImpl extends AbstractEbMSDAO
 	}
 
 	@Override
-	public String getEventsBeforeQuery(int maxNr)
+	public String getEventsBeforeQuery(String serverId, int maxNr)
 	{
 		return "select cpa_id, send_channel_id, receive_channel_id, message_id, time_to_live, time_stamp, is_confidential, retries" +
 			" from ebms_event" +

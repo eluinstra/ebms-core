@@ -29,9 +29,9 @@ public class EventManagerRetryAck extends EventManager
 	int nrAutoRetries;
 	int autoRetryInterval;
 
-	public EventManagerRetryAck(EbMSEventDAO ebMSEventDAO, CPAManager cpaManager, int nrAutoRetries, int autoRetryInterval)
+	public EventManagerRetryAck(EbMSEventDAO ebMSEventDAO, CPAManager cpaManager, String serverId, int nrAutoRetries, int autoRetryInterval)
 	{
-		super(ebMSEventDAO,cpaManager);
+		super(ebMSEventDAO,cpaManager,serverId);
 		this.nrAutoRetries = nrAutoRetries;
 		this.autoRetryInterval = autoRetryInterval;
 	}

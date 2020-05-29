@@ -31,6 +31,7 @@ public class EventManagerFactory implements FactoryBean<EventManager>
 	EbMSEventDAO ebMSEventDAO;
 	@NonNull
 	CPAManager cpaManager;
+	String serverId;
 	boolean autoRetryResponse;
 	int nrAutoRetries;
 	int autoRetryInterval;
@@ -38,7 +39,7 @@ public class EventManagerFactory implements FactoryBean<EventManager>
 	@Override
 	public EventManager getObject() throws Exception
 	{
-		return autoRetryResponse ? new EventManagerRetryAck(ebMSEventDAO,cpaManager,nrAutoRetries,autoRetryInterval) : new EventManager(ebMSEventDAO,cpaManager);
+		return autoRetryResponse ? new EventManagerRetryAck(ebMSEventDAO,cpaManager,serverId,nrAutoRetries,autoRetryInterval) : new EventManager(ebMSEventDAO,cpaManager,serverId);
 	}
 	
 	@Override

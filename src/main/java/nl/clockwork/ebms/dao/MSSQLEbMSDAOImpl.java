@@ -45,9 +45,9 @@ import nl.clockwork.ebms.util.DOMUtils;
 
 class MSSQLEbMSDAOImpl extends nl.clockwork.ebms.dao.MySQLEbMSDAOImpl
 {
-	public MSSQLEbMSDAOImpl(TransactionTemplate transactionTemplate, JdbcTemplate jdbcTemplate, String serverId)
+	public MSSQLEbMSDAOImpl(TransactionTemplate transactionTemplate, JdbcTemplate jdbcTemplate)
 	{
-		super(transactionTemplate,jdbcTemplate,serverId);
+		super(transactionTemplate,jdbcTemplate);
 	}
 
 	@Override
@@ -142,7 +142,7 @@ class MSSQLEbMSDAOImpl extends nl.clockwork.ebms.dao.MySQLEbMSDAOImpl
 	}
 
 	@Override
-	public String getEventsBeforeQuery(int maxNr)
+	public String getEventsBeforeQuery(String serverId, int maxNr)
 	{
 		return "select top " + maxNr + " cpa_id, send_channel_id, receive_channel_id, message_id, time_to_live, time_stamp, is_confidential, retries" +
 			" from ebms_event" +
