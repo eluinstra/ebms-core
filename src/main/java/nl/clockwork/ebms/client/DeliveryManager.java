@@ -51,7 +51,7 @@ import nl.clockwork.ebms.processor.EbMSProcessorException;
 
 @Slf4j
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-public class DeliveryManager //DeliveryService
+public class DeliveryManager
 {
 	@NonNull
 	MessageQueue<EbMSResponseMessage> messageQueue;
@@ -67,7 +67,7 @@ public class DeliveryManager //DeliveryService
 		this(null,null,null,messageQueue,cpaManager,ebMSClientFactory);
 	}
 
-	@Builder(setterPrefix = "set")
+	@Builder
 	public DeliveryManager(
 			Integer maxThreads,
 			Integer processorsScaleFactor,

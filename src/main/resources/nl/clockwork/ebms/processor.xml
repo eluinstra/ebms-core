@@ -94,13 +94,15 @@
 	</bean>
 
 	<bean id="deliveryManager" factory-bean="deliveryManagerBuilder" factory-method="build"/>
-	<bean id="deliveryManagerBuilder" class="nl.clockwork.ebms.client.DeliveryManager$DeliveryManagerBuilder">
+	<bean id="deliveryManagerBuilder" class="nl.clockwork.ebms.client.DeliveryManagerFactory$DeliveryManagerFactoryBuilder">
+		<property name="type" value="${deliveryManager.type}" />
 		<property name="maxThreads" value="${deliveryManager.maxTreads}"/>
 		<property name="processorsScaleFactor" value="${deliveryManager.processorsScaleFactor}"/>
 		<property name="queueScaleFactor" value="${deliveryManager.queueScaleFactor}"/>
 		<property name="messageQueue" ref="messageQueue"/>
 		<property name="cpaManager" ref="cpaManager"/>
 		<property name="ebMSClientFactory" ref="ebMSHttpClientFactory"/>
+		<property name="jmsBrokerURL" value="${jms.brokerURL}" />
 	</bean>
 
 	<bean id="messageQueue" class="nl.clockwork.ebms.client.EbMSMessageQueue">
@@ -334,10 +336,18 @@
 		<property name="type" value="${eventListener.type}" />
 		<property name="ebMSDAO" ref="ebMSDAO" />
 		<property name="ebMSMessageEventDAO" ref="ebMSDAO" />
-		<property name="jmsBrokerConfig" value="${jms.broker.config}" />
-		<property name="jmsBrokerStart" value="${jms.broker.start}" />
 		<property name="jmsBrokerURL" value="${jms.brokerURL}" />
 		<property name="jmsVirtualTopics" value="${jms.virtualTopics:false}" />
+	</bean>
+
+	<bean class="org.springframework.beans.factory.config.MethodInvokingBean">
+		<property name="staticMethod" value="nl.clockwork.ebms.jms.EbMSBrokerFactoryBean.init" />
+		<property name="arguments">
+			<list>
+				<value>${jms.broker.start}</value>
+				<value>${jms.broker.config}</value>
+			</list>
+		</property>
 	</bean>
 
 </beans>

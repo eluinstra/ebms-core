@@ -33,6 +33,7 @@ import org.springframework.jms.core.MessagePostProcessor;
 import org.xml.sax.SAXException;
 
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.NonNull;
 import lombok.val;
 import lombok.experimental.FieldDefaults;
@@ -54,6 +55,7 @@ public class JMSDeliveryManager extends DeliveryManager
 	@NonNull
 	JmsTemplate jmsTemplate;
 
+	@Builder(builderMethodName = "jmsDeliveryManagerBuilder")
 	public JMSDeliveryManager(
 			Integer maxThreads,
 			Integer processorsScaleFactor,
