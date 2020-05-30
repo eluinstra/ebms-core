@@ -21,10 +21,10 @@
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
 	<bean id="cacheManager" class="nl.clockwork.ebms.cache.EbMSCacheManager">
-		<constructor-arg name="type" value="${cache.type}"/>
-		<constructor-arg name="configLocation" value="${cache.configLocation}"/>
-		<constructor-arg name="enableNearCache" value="${cache.enableNearCache}"/>
-		<constructor-arg name="maxSize" value="${cache.maxSize}"/>
+		<constructor-arg name="type" value="${cache.type}" />
+		<constructor-arg name="configLocation" value="${cache.configLocation}" />
+		<constructor-arg name="enableNearCache" value="${cache.enableNearCache}" />
+		<constructor-arg name="maxSize" value="${cache.maxSize}" />
 	</bean>
 
 </beans>

@@ -8,8 +8,10 @@ import org.apache.ignite.Ignition;
 import org.apache.ignite.cache.eviction.lru.LruEvictionPolicy;
 import org.apache.ignite.configuration.NearCacheConfiguration;
 import org.ehcache.CacheManager;
+import org.ehcache.config.builders.CacheConfigurationBuilder;
 import org.ehcache.config.builders.CacheManagerBuilder;
 import org.ehcache.xml.XmlConfiguration;
+import org.ehcache.xml.exceptions.XmlConfigurationException;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 
@@ -51,6 +53,7 @@ public class EbMSCacheManager
 		{
 			case EHCACHE:
 				ehcache = CacheManagerBuilder.newCacheManager(new XmlConfiguration(configLocation.getURL()));
+				ehcache.init();
 				ignite = null;
 				break;
 			case IGNITE:
@@ -68,10 +71,7 @@ public class EbMSCacheManager
 		switch (type)
 		{
 			case EHCACHE:
-//				XmlConfiguration xmlConfiguration = new XmlConfiguration(getClass().getResource("/nl/clockwork/ebms/ehcache.xml"));
-//				CacheConfigurationBuilder<String,Object> configurationBuilder = xmlConfiguration.newCacheConfigurationBuilderFromTemplate("default",String.class,Object.class); 
-//				return new EhCacheMethodCacheInterceptor(ehcache.createCache(cacheName,configurationBuilder));
-			return new EhCacheMethodCacheInterceptor(ehcache.getCache(cacheName,String.class,Object.class));
+				return new EhCacheMethodCacheInterceptor(ehcache.getCache(cacheName,String.class,Object.class));
 			case IGNITE:
 				return new JMethodCacheInterceptor(createNearCache(ignite,cacheName));
 			default:
@@ -84,9 +84,10 @@ public class EbMSCacheManager
 	{
 		if (enableNearCache)
 		{
-			NearCacheConfiguration<String,Object> nearCfg = new NearCacheConfiguration<>();
-			nearCfg.setNearEvictionPolicy(new LruEvictionPolicy<>(maxSize));
-			return ignite.getOrCreateNearCache(cacheName,nearCfg);
+			NearCacheConfiguration<String,Object> nearConfig = new NearCacheConfiguration<>();
+			nearConfig.setNearEvictionPolicy(new LruEvictionPolicy<>(maxSize));
+			//nearConfig.setNearEvictionPolicyFactory(nearEvictPlcFactory)
+			return ignite.getOrCreateNearCache(cacheName,nearConfig);
 		}
 		else
 			return ignite.getOrCreateCache(cacheName);

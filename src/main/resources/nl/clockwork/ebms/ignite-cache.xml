@@ -3,12 +3,27 @@
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
 	<bean class="org.apache.ignite.configuration.IgniteConfiguration">
-		<property name="gridName" value="ebMSGrid"/>
-		<!--property name="dynamicNearCacheConfiguration">
-			<bean class="org.apache.ignite.configuration.NearCacheConfiguration">
-				<property name="nearStartSize" value="10000"/>
+		<property name="gridName" value="ebMSGrid" />
+		<property name="cacheConfiguration">
+			<bean class="org.apache.ignite.configuration.CacheConfiguration">
+				<property name="name" value="nl.clockwork.ebms.dao.METHOD_CACHE" />
+				<property name="nearConfiguration" ref="nearConfiguration" />
 			</bean>
-		</property-->
+		</property>
+		<property name="cacheConfiguration">
+			<bean class="org.apache.ignite.configuration.CacheConfiguration">
+				<property name="name" value="nl.clockwork.ebms.cpa.METHOD_CACHE" />
+				<property name="nearConfiguration" ref="nearConfiguration" />
+			</bean>
+		</property>
+	</bean>
+
+	<bean name="nearConfiguration" class="org.apache.ignite.configuration.NearCacheConfiguration">
+		<property name="nearEvictionPolicyFactory">
+			<bean class="org.apache.ignite.cache.eviction.lru.LruEvictionPolicyFactory">
+				<property name="maxSize" value="100000" />
+			</bean>
+		</property>
 	</bean>
 
 </beans>
