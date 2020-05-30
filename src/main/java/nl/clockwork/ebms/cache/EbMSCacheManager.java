@@ -4,22 +4,20 @@ import java.io.IOException;
 
 import org.aopalliance.intercept.MethodInterceptor;
 import org.apache.ignite.Ignite;
-import org.apache.ignite.IgniteCache;
 import org.apache.ignite.Ignition;
 import org.apache.ignite.cache.eviction.lru.LruEvictionPolicy;
 import org.apache.ignite.configuration.NearCacheConfiguration;
+import org.ehcache.CacheManager;
+import org.ehcache.config.builders.CacheManagerBuilder;
+import org.ehcache.xml.XmlConfiguration;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NonNull;
-import lombok.val;
 import lombok.experimental.FieldDefaults;
-import net.sf.ehcache.Cache;
-import net.sf.ehcache.CacheException;
-import net.sf.ehcache.CacheManager;
-import net.sf.ehcache.store.LruPolicy;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class EbMSCacheManager
@@ -52,7 +50,7 @@ public class EbMSCacheManager
 		switch (type)
 		{
 			case EHCACHE:
-				ehcache = CacheManager.newInstance(configLocation.getURL());
+				ehcache = CacheManagerBuilder.newCacheManager(new XmlConfiguration(configLocation.getURL()));
 				ignite = null;
 				break;
 			case IGNITE:
@@ -70,7 +68,10 @@ public class EbMSCacheManager
 		switch (type)
 		{
 			case EHCACHE:
-				return new EhCacheMethodCacheInterceptor(createCache(cacheName));
+//				XmlConfiguration xmlConfiguration = new XmlConfiguration(getClass().getResource("/nl/clockwork/ebms/ehcache.xml"));
+//				CacheConfigurationBuilder<String,Object> configurationBuilder = xmlConfiguration.newCacheConfigurationBuilderFromTemplate("default",String.class,Object.class); 
+//				return new EhCacheMethodCacheInterceptor(ehcache.createCache(cacheName,configurationBuilder));
+			return new EhCacheMethodCacheInterceptor(ehcache.getCache(cacheName,String.class,Object.class));
 			case IGNITE:
 				return new JMethodCacheInterceptor(createNearCache(ignite,cacheName));
 			default:
@@ -80,19 +81,6 @@ public class EbMSCacheManager
 
 	@SuppressWarnings("deprecation")
 	private javax.cache.Cache<String,Object> createNearCache(Ignite ignite, String cacheName)
-	{
-		val result = ehcache.getCache(cacheName);
-		if (enableNearCache)
-		{
-			result.setMemoryStoreEvictionPolicy(new LruPolicy());
-			result.getCacheConfiguration().setMemoryStoreEvictionPolicy("LRU");
-			result.getCacheConfiguration().setMaxElementsInMemory(maxSize);
-		}
-		return result;
-	}
-
-	@SuppressWarnings("deprecation")
-	private IgniteCache<String,Object> createNearCache(String cacheName)
 	{
 		if (enableNearCache)
 		{
