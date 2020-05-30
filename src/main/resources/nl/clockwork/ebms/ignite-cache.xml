@@ -4,6 +4,9 @@
 
 	<bean class="org.apache.ignite.configuration.IgniteConfiguration">
 		<property name="gridName" value="ebMSGrid" />
+		<property name="gridLogger">
+			<bean class="org.apache.ignite.logger.slf4j.Slf4jLogger"/>
+		</property>
 		<property name="cacheConfiguration">
 			<list>
 				<bean class="org.apache.ignite.configuration.CacheConfiguration">
