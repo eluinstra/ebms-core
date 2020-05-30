@@ -20,22 +20,20 @@ import java.util.stream.Stream;
 
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
+import org.ehcache.Cache;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.val;
-import lombok.var;
 import lombok.experimental.FieldDefaults;
-import net.sf.ehcache.Cache;
-import net.sf.ehcache.Element;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor
 public class EhCacheMethodCacheInterceptor implements MethodInterceptor, RemovableCache
 {
 	@NonNull
-	Cache cache;
+	Cache<String,Object> cache;
 
 	public Object invoke(MethodInvocation invocation) throws Throwable
 	{
@@ -43,14 +41,9 @@ public class EhCacheMethodCacheInterceptor implements MethodInterceptor, Removab
 		val methodName = invocation.getMethod().getName();
 		val arguments = invocation.getArguments();
 		val key = getKey(targetName,methodName,arguments);
-		var o = cache.get(key);
-		if (o == null)
-		{
-			val result = invocation.proceed();
-			o = new Element(key,result);
-			cache.put(o);
-		}
-		return o.getObjectValue();
+		if (!cache.containsKey(key))
+			cache.put(key,invocation.proceed());
+		return cache.get(key);
 	}
 
 	public static String getKey(String targetName, String methodName, Object...arguments)
@@ -70,6 +63,6 @@ public class EhCacheMethodCacheInterceptor implements MethodInterceptor, Removab
 	@Override
 	public void removeAll()
 	{
-		cache.removeAll();
+		cache.clear();
 	}
 }

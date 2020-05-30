@@ -5,8 +5,9 @@ import java.io.IOException;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.apache.ignite.Ignite;
 import org.apache.ignite.Ignition;
-import org.apache.ignite.cache.eviction.lru.LruEvictionPolicy;
-import org.apache.ignite.configuration.NearCacheConfiguration;
+import org.ehcache.CacheManager;
+import org.ehcache.config.builders.CacheManagerBuilder;
+import org.ehcache.xml.XmlConfiguration;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 
@@ -14,11 +15,7 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NonNull;
-import lombok.val;
 import lombok.experimental.FieldDefaults;
-import net.sf.ehcache.Cache;
-import net.sf.ehcache.CacheManager;
-import net.sf.ehcache.store.LruPolicy;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class EbMSCacheManager
@@ -37,21 +34,18 @@ public class EbMSCacheManager
 
 	@NonNull
 	CacheType type;
-	boolean enableNearCache;
-	int maxSize;
 	CacheManager ehcache;
 	Ignite ignite;
 
-	public EbMSCacheManager(@NonNull CacheType type, Resource configLocation, boolean enableNearCache, int maxSize) throws IOException
+	public EbMSCacheManager(@NonNull CacheType type, Resource configLocation) throws IOException
 	{
 		this.type = type;
 		configLocation = configLocation == null ? new ClassPathResource(type.defaultConfigLocation) : configLocation;
-		this.enableNearCache = enableNearCache;
-		this.maxSize = maxSize;
 		switch (type)
 		{
 			case EHCACHE:
-				ehcache = CacheManager.newInstance(configLocation.getURL());
+				ehcache = CacheManagerBuilder.newCacheManager(new XmlConfiguration(configLocation.getURL()));
+				ehcache.init();
 				ignite = null;
 				break;
 			case IGNITE:
@@ -69,39 +63,11 @@ public class EbMSCacheManager
 		switch (type)
 		{
 			case EHCACHE:
-				return new EhCacheMethodCacheInterceptor(createCache(cacheName));
+				return new EhCacheMethodCacheInterceptor(ehcache.getCache(cacheName,String.class,Object.class));
 			case IGNITE:
-				return new JMethodCacheInterceptor(createNearCache(cacheName));
+				return new JMethodCacheInterceptor(ignite.getOrCreateCache(cacheName));
 			default:
 				return new DisabledMethodCacheInterceptor();
 		}
-	}
-
-	@SuppressWarnings("deprecation")
-	private Cache createCache(String cacheName)
-	{
-		if (!ehcache.cacheExists(cacheName))
-			ehcache.addCache(cacheName);
-		val result = ehcache.getCache(cacheName);
-		if (enableNearCache)
-		{
-			result.setMemoryStoreEvictionPolicy(new LruPolicy());
-			result.getCacheConfiguration().setMemoryStoreEvictionPolicy("LRU");
-			result.getCacheConfiguration().setMaxElementsInMemory(maxSize);
-		}
-		return result;
-	}
-
-	@SuppressWarnings("deprecation")
-	private javax.cache.Cache<String,Object> createNearCache(String cacheName)
-	{
-		if (enableNearCache)
-		{
-			NearCacheConfiguration<String,Object> nearCfg = new NearCacheConfiguration<>();
-			nearCfg.setNearEvictionPolicy(new LruEvictionPolicy<>(maxSize));
-			return ignite.getOrCreateNearCache(cacheName,nearCfg);
-		}
-		else
-			return ignite.getOrCreateCache(cacheName);
 	}
 }
