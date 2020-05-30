@@ -80,6 +80,8 @@ public class EbMSCacheManager
 	@SuppressWarnings("deprecation")
 	private Cache createCache(String cacheName)
 	{
+		if (!ehcache.cacheExists(cacheName))
+			ehcache.addCache(cacheName);
 		val result = ehcache.getCache(cacheName);
 		if (enableNearCache)
 		{
