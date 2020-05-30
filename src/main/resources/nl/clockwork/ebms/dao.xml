@@ -46,20 +46,9 @@
 		<constructor-arg name="advice" ref="ebMSDAOMethodCacheInterceptor"/>
 	</bean>
 
-	<bean id="ebMSDAOMethodCacheInterceptor" class="nl.clockwork.ebms.cache.EhCacheMethodCacheInterceptor">
-		<constructor-arg name="cache" ref="ebMSDAOMethodCache" />
-	</bean>
-
-	<bean id="ebMSDAOMethodCache" class="org.springframework.cache.ehcache.EhCacheFactoryBean">
-		<property name="cacheManager" ref="cacheManager"/>
-		<property name="cacheName" value="nl.clockwork.ebms.dao.METHOD_CACHE"/>
-		<property name="disabled" value="${cache.disabled}"/>
-		<property name="memoryStoreEvictionPolicy" value="${cache.memoryStoreEvictionPolicy}"/>
-		<property name="timeToIdle" value="${cache.timeToIdle}"/>
-		<property name="timeToLive" value="${cache.timeToLive}"/>
-		<property name="overflowToDisk" value="${cache.overflowToDisk}"/>
-		<property name="maxElementsInMemory" value="${cache.maxElementsInMemory}"/>
-		<property name="maxElementsOnDisk" value="${cache.maxElementsOnDisk}"/>
+	<bean id="ebMSDAOMethodCacheInterceptor" class="nl.clockwork.ebms.cache.CachingMethodInterceptorFactory">
+		<constructor-arg name="cacheManager" ref="cacheManager"/>
+		<constructor-arg name="cacheName" value="nl.clockwork.ebms.dao.METHOD_CACHE"/>
 	</bean>
 
 	<bean id="_ebMSDAO" class="nl.clockwork.ebms.dao.EbMSDAOFactory">

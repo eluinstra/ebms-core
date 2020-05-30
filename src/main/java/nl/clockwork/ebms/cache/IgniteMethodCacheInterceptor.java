@@ -16,7 +16,7 @@ import lombok.experimental.FieldDefaults;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor
-public class IgniteMethodCacheInterceptor implements MethodInterceptor
+public class IgniteMethodCacheInterceptor implements MethodInterceptor, RemovableCache
 {
 	@NonNull
 	IgniteCache<String,Object> cache;
@@ -43,5 +43,17 @@ public class IgniteMethodCacheInterceptor implements MethodInterceptor
 		sb.append(targetName).append(".").append(methodName);
 		sb.append(Stream.of(arguments).map(a -> String.valueOf(a)).collect(Collectors.joining(",","(",")")));
 		return sb.toString();
+	}
+
+	@Override
+	public void remove(String key)
+	{
+		cache.remove(key);
+	}
+
+	@Override
+	public void removeAll()
+	{
+		cache.removeAll();
 	}
 }

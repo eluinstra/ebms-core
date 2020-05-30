@@ -32,7 +32,7 @@ import net.sf.ehcache.Element;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor
-public class EhCacheMethodCacheInterceptor implements MethodInterceptor
+public class EhCacheMethodCacheInterceptor implements MethodInterceptor, RemovableCache
 {
 	@NonNull
 	Cache cache;
@@ -59,5 +59,17 @@ public class EhCacheMethodCacheInterceptor implements MethodInterceptor
 		sb.append(targetName).append(".").append(methodName);
 		sb.append(Stream.of(arguments).map(a -> String.valueOf(a)).collect(Collectors.joining(",","(",")")));
 		return sb.toString();
+	}
+
+	@Override
+	public void remove(String key)
+	{
+		cache.remove(key);
+	}
+
+	@Override
+	public void removeAll()
+	{
+		cache.removeAll();
 	}
 }

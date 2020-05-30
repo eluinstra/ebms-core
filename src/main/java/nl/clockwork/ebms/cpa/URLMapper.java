@@ -25,8 +25,8 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
-import net.sf.ehcache.Ehcache;
 import nl.clockwork.ebms.cache.EhCacheMethodCacheInterceptor;
+import nl.clockwork.ebms.cache.RemovableCache;
 import nl.clockwork.ebms.service.cpa.url.URLMapping;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -34,7 +34,7 @@ import nl.clockwork.ebms.service.cpa.url.URLMapping;
 public class URLMapper
 {
 	@NonNull
-	Ehcache daoMethodCache;
+	RemovableCache daoMethodCache;
 	@NonNull
 	URLMappingDAO urlMappingDAO;
 

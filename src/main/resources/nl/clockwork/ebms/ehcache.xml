@@ -25,6 +25,5 @@
 		overflowToDisk="true"
 		maxElementsOnDisk="10000000"
 		diskExpiryThreadIntervalSeconds="120"
-		memoryStoreEvictionPolicy="LRU"
-	/>
+		memoryStoreEvictionPolicy="LRU"/>
 </ehcache>

@@ -18,8 +18,7 @@
 -->
 <beans xmlns="http://www.springframework.org/schema/beans"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd"
->
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 	<bean class="org.springframework.beans.factory.config.MethodInvokingBean">
 		<property name="staticMethod" value="org.apache.xml.security.Init.init" />
 	</bean>
@@ -188,18 +187,18 @@
 	</bean>
 
 	<bean id="urlMapper" class="nl.clockwork.ebms.cpa.URLMapper">
-		<constructor-arg name="daoMethodCache" ref="ebMSDAOMethodCache"/>
+		<constructor-arg name="daoMethodCache" ref="ebMSDAOMethodCacheInterceptor"/>
 		<constructor-arg name="ebMSDAO" ref="ebMSDAO"/>
 	</bean>
 
 	<bean id="certificateMapper" class="nl.clockwork.ebms.cpa.CertificateMapper">
-		<constructor-arg name="daoMethodCache" ref="ebMSDAOMethodCache"/>
+		<constructor-arg name="daoMethodCache" ref="ebMSDAOMethodCacheInterceptor"/>
 		<constructor-arg name="ebMSDAO" ref="ebMSDAO"/>
 	</bean>
 
 	<bean id="_cpaManager" class="nl.clockwork.ebms.cpa.CPAManager">
-		<constructor-arg name="daoMethodCache" ref="ebMSDAOMethodCache"/>
-		<constructor-arg name="cpaMethodCache" ref="cpaMethodCache"/>
+		<constructor-arg name="daoMethodCache" ref="ebMSDAOMethodCacheInterceptor"/>
+		<constructor-arg name="cpaMethodCache" ref="cpaMethodCacheInterceptor"/>
 		<constructor-arg name="ebMSDAO" ref="ebMSDAO"/>
 		<constructor-arg name="urlMapper" ref="urlMapper"/>
 	</bean>
@@ -240,20 +239,9 @@
 		<constructor-arg name="advice" ref="cpaMethodCacheInterceptor"/>
 	</bean>
 
-	<bean id="cpaMethodCacheInterceptor" class="nl.clockwork.ebms.cache.EhCacheMethodCacheInterceptor">
-		<constructor-arg name="cache" ref="cpaMethodCache" />
-	</bean>
-
-	<bean id="cpaMethodCache" class="org.springframework.cache.ehcache.EhCacheFactoryBean">
-		<property name="cacheManager" ref="cacheManager"/>
-		<property name="cacheName" value="nl.clockwork.ebms.cpa.METHOD_CACHE"/>
-		<property name="disabled" value="${cache.disabled}"/>
-		<property name="memoryStoreEvictionPolicy" value="${cache.memoryStoreEvictionPolicy}"/>
-		<property name="timeToIdle" value="${cache.timeToIdle}"/>
-		<property name="timeToLive" value="${cache.timeToLive}"/>
-		<property name="overflowToDisk" value="${cache.overflowToDisk}"/>
-		<property name="maxElementsInMemory" value="${cache.maxElementsInMemory}"/>
-		<property name="maxElementsOnDisk" value="${cache.maxElementsOnDisk}"/>
+	<bean id="cpaMethodCacheInterceptor" class="nl.clockwork.ebms.cache.CachingMethodInterceptorFactory">
+		<constructor-arg name="cacheManager" ref="cacheManager"/>
+		<constructor-arg name="cacheName" value="nl.clockwork.ebms.dao.METHOD_CACHE"/>
 	</bean>
 
 	<bean id="ebMSMessageFactory" class="nl.clockwork.ebms.EbMSMessageFactory">

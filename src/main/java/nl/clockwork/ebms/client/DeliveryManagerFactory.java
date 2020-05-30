@@ -69,4 +69,9 @@ public class DeliveryManagerFactory implements FactoryBean<DeliveryManager>
 		return DeliveryManager.class;
 	}
 
+	@Override
+	public boolean isSingleton()
+	{
+		return true;
+	}
 }

@@ -19,7 +19,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.io.IOException;
-import java.io.Serializable;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
@@ -36,7 +35,6 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestInstance.Lifecycle;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CollaborationProtocolAgreement;
@@ -45,10 +43,10 @@ import org.xml.sax.SAXException;
 import lombok.AccessLevel;
 import lombok.val;
 import lombok.experimental.FieldDefaults;
-import net.sf.ehcache.Ehcache;
 import nl.clockwork.ebms.EbMSAttachmentFactory;
 import nl.clockwork.ebms.EbMSIdGenerator;
 import nl.clockwork.ebms.EbMSMessageFactory;
+import nl.clockwork.ebms.cache.DisabledMethodCacheInterceptor;
 import nl.clockwork.ebms.cpa.CPADAO;
 import nl.clockwork.ebms.cpa.CPAManager;
 import nl.clockwork.ebms.cpa.URLMapper;
@@ -81,8 +79,6 @@ public class EncryptionTest
 	String keyStorePassword = "password";
 	EbMSMessageEncrypter messageEncrypter;
 	EbMSMessageDecrypter messageDecrypter;
-	@Mock
-	Ehcache ehCacheMock;
 
 	@BeforeAll
 	public void init() throws Exception
@@ -157,11 +153,9 @@ public class EncryptionTest
 		return new CPAManager(initMethodCacheMock(),initMethodCacheMock(),initCPADAOMock(),new URLMapper(initMethodCacheMock(),initURLMappingDAOMock()));
 	}
 
-	private Ehcache initMethodCacheMock()
+	private DisabledMethodCacheInterceptor initMethodCacheMock()
 	{
-		val result = Mockito.mock(Ehcache.class);
-		Mockito.when(result.remove((Serializable)Mockito.any(Serializable.class))).thenReturn(true);
-		return result;
+		return Mockito.mock(DisabledMethodCacheInterceptor.class);
 	}
 
 	private CPADAO initCPADAOMock() throws DAOException, IOException, JAXBException

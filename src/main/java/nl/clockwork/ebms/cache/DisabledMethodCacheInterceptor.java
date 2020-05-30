@@ -24,10 +24,20 @@ import lombok.experimental.FieldDefaults;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @NoArgsConstructor
-public class NoMethodCacheInterceptor implements MethodInterceptor
+public class DisabledMethodCacheInterceptor implements MethodInterceptor, RemovableCache
 {
 	public Object invoke(MethodInvocation invocation) throws Throwable
 	{
 		return invocation.proceed();
+	}
+
+	@Override
+	public void remove(String key)
+	{
+	}
+
+	@Override
+	public void removeAll()
+	{
 	}
 }

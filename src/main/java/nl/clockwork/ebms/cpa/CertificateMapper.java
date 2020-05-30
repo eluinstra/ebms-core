@@ -23,8 +23,8 @@ import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.val;
 import lombok.experimental.FieldDefaults;
-import net.sf.ehcache.Ehcache;
 import nl.clockwork.ebms.cache.EhCacheMethodCacheInterceptor;
+import nl.clockwork.ebms.cache.RemovableCache;
 import nl.clockwork.ebms.service.cpa.certificate.CertificateMapping;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -32,7 +32,7 @@ import nl.clockwork.ebms.service.cpa.certificate.CertificateMapping;
 public class CertificateMapper
 {
 	@NonNull
-	Ehcache daoMethodCache;
+	RemovableCache daoMethodCache;
 	@NonNull
 	CertificateMappingDAO certificateMappingDAO;
 
