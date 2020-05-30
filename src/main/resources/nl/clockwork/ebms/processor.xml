@@ -241,7 +241,7 @@
 
 	<bean id="cpaMethodCacheInterceptor" class="nl.clockwork.ebms.cache.CachingMethodInterceptorFactory">
 		<constructor-arg name="cacheManager" ref="cacheManager"/>
-		<constructor-arg name="cacheName" value="nl.clockwork.ebms.dao.METHOD_CACHE"/>
+		<constructor-arg name="cacheName" value="nl.clockwork.ebms.cpa.METHOD_CACHE"/>
 	</bean>
 
 	<bean id="ebMSMessageFactory" class="nl.clockwork.ebms.EbMSMessageFactory">

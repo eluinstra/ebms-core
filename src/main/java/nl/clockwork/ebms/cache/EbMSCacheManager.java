@@ -30,25 +30,23 @@ public class EbMSCacheManager
 	public enum CacheType
 	{
 		NONE(""),
-		EHCACHE("classpath:nl/clockwork/ebms/ehcache.xml"),
-		IGNITE("classpath:nl/clockwork/ebms/ignite-cache.xml");
+		EHCACHE("nl/clockwork/ebms/ehcache.xml"),
+		IGNITE("nl/clockwork/ebms/ignite-cache.xml");
 		
 		String defaultConfigLocation;
 	}
 
 	@NonNull
 	CacheType type;
-	@NonNull
-	Resource configLocation;
 	boolean enableNearCache;
 	int maxSize;
 	CacheManager ehcache;
 	Ignite ignite;
 
-	public EbMSCacheManager(@NonNull CacheType type, @NonNull Resource configLocation, boolean enableNearCache, int maxSize) throws CacheException, IOException
+	public EbMSCacheManager(@NonNull CacheType type, Resource configLocation, boolean enableNearCache, int maxSize) throws IOException
 	{
 		this.type = type;
-		this.configLocation = configLocation;
+		configLocation = configLocation == null ? new ClassPathResource(type.defaultConfigLocation) : configLocation;
 		this.enableNearCache = enableNearCache;
 		this.maxSize = maxSize;
 		switch (type)
@@ -74,14 +72,14 @@ public class EbMSCacheManager
 			case EHCACHE:
 				return new EhCacheMethodCacheInterceptor(createCache(cacheName));
 			case IGNITE:
-				return new IgniteMethodCacheInterceptor(createNearCache(cacheName));
+				return new JMethodCacheInterceptor(createNearCache(ignite,cacheName));
 			default:
 				return new DisabledMethodCacheInterceptor();
 		}
 	}
 
 	@SuppressWarnings("deprecation")
-	private Cache createCache(String cacheName)
+	private javax.cache.Cache<String,Object> createNearCache(Ignite ignite, String cacheName)
 	{
 		val result = ehcache.getCache(cacheName);
 		if (enableNearCache)
