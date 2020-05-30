@@ -4,10 +4,10 @@ import java.io.IOException;
 
 import org.aopalliance.intercept.MethodInterceptor;
 import org.apache.ignite.Ignite;
-import org.apache.ignite.IgniteCache;
 import org.apache.ignite.Ignition;
 import org.apache.ignite.cache.eviction.lru.LruEvictionPolicy;
 import org.apache.ignite.configuration.NearCacheConfiguration;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 
 import lombok.AccessLevel;
@@ -17,7 +17,6 @@ import lombok.NonNull;
 import lombok.val;
 import lombok.experimental.FieldDefaults;
 import net.sf.ehcache.Cache;
-import net.sf.ehcache.CacheException;
 import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.store.LruPolicy;
 
@@ -72,14 +71,14 @@ public class EbMSCacheManager
 			case EHCACHE:
 				return new EhCacheMethodCacheInterceptor(createCache(cacheName));
 			case IGNITE:
-				return new JMethodCacheInterceptor(createNearCache(ignite,cacheName));
+				return new JMethodCacheInterceptor(createNearCache(cacheName));
 			default:
 				return new DisabledMethodCacheInterceptor();
 		}
 	}
 
 	@SuppressWarnings("deprecation")
-	private javax.cache.Cache<String,Object> createNearCache(Ignite ignite, String cacheName)
+	private Cache createCache(String cacheName)
 	{
 		val result = ehcache.getCache(cacheName);
 		if (enableNearCache)
@@ -92,7 +91,7 @@ public class EbMSCacheManager
 	}
 
 	@SuppressWarnings("deprecation")
-	private IgniteCache<String,Object> createNearCache(String cacheName)
+	private javax.cache.Cache<String,Object> createNearCache(String cacheName)
 	{
 		if (enableNearCache)
 		{
