@@ -28,12 +28,13 @@ public class JMSEventProcessor implements Runnable
 
 	@Builder(setterPrefix = "set")
 	public JMSEventProcessor(
+			boolean startEbMSClient,
 			@NonNull EventManagerType type,
 			@NonNull String jmsBrokerUrl,
 			int maxThreads,
 			@NonNull HandleEventTask.HandleEventTaskBuilder handleEventTaskPrototype)
 	{
-		if (type == EventManagerType.JMS)
+		if (startEbMSClient && type == EventManagerType.JMS)
 		{
 			jmsTemplate = createJmsTemplate(jmsBrokerUrl);
 			IntStream.range(0,maxThreads).forEach(i -> startDeamon());

@@ -275,6 +275,7 @@
 
 	<bean id="ebMSEventProcessor" factory-bean="ebMSEventProcessorBuilder" factory-method="build"/>
 	<bean id="ebMSEventProcessorBuilder" class="nl.clockwork.ebms.event.processor.EbMSEventProcessor$EbMSEventProcessorBuilder">
+		<property name="startEbMSClient" value="${ebms.startEbMSClient}"/>
 		<property name="type" value="${eventManager.type}"/>
 		<property name="period" value="${eventProcessor.period}"/>
 		<property name="maxEvents" value="${eventProcessor.maxEvents}"/>
@@ -290,6 +291,7 @@
 
 	<bean id="jmsEventProcessor" factory-bean="jmsEventProcessorBuilder" factory-method="build" depends-on="brokerFactory"/>
 	<bean id="jmsEventProcessorBuilder" class="nl.clockwork.ebms.event.processor.JMSEventProcessor$JMSEventProcessorBuilder">
+		<property name="startEbMSClient" value="${ebms.startEbMSClient}"/>
 		<property name="type" value="${eventManager.type}"/>
 		<property name="jmsBrokerUrl" value="${jms.brokerURL}"/>
 		<property name="maxThreads" value="${eventProcessor.maxTreads}"/>

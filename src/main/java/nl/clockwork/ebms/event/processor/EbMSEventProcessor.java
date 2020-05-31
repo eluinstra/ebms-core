@@ -46,6 +46,7 @@ public class EbMSEventProcessor implements Runnable
 
 	@Builder(setterPrefix = "set")
 	public EbMSEventProcessor(
+			boolean startEbMSClient,
 			@NonNull EventManagerType type,
 			int period,
 			int maxEvents,
@@ -59,7 +60,7 @@ public class EbMSEventProcessor implements Runnable
 		this.ebMSEventDAO = ebMSEventDAO;
 		this.handleEventTaskPrototype = handleEventTaskPrototype;
 		this.serverId = serverId;
-		if (type == EventManagerType.DEFAULT)
+		if (startEbMSClient && type == EventManagerType.DEFAULT)
 		{
 			this.executorService = ebMSThreadPoolExecutor.createInstance();
 			val thread = new Thread(this);
