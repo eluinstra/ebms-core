@@ -24,6 +24,8 @@ import lombok.NonNull;
 
 public class EbMSPing extends EbMSRequestMessage
 {
+	private static final long serialVersionUID = 1L;
+
 	@Builder
 	public EbMSPing(@NonNull MessageHeader messageHeader, SignatureType signature, SyncReply syncReply)
 	{

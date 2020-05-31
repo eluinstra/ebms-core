@@ -21,8 +21,9 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
+import nl.clockwork.ebms.EbMSThreadPoolExecutor;
 import nl.clockwork.ebms.cpa.CPAManager;
-import nl.clockwork.ebms.jms.JMSUtils;
+import nl.clockwork.ebms.jms.JmsTemplateFactory;
 import nl.clockwork.ebms.model.EbMSResponseMessage;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -36,9 +37,7 @@ public class DeliveryManagerFactory implements FactoryBean<DeliveryManager>
 	@Builder(setterPrefix = "set")
 	public DeliveryManagerFactory(
 			@NonNull DeliveryManagerType type,
-			Integer maxThreads,
-			Integer processorsScaleFactor,
-			Integer queueScaleFactor,
+			@NonNull EbMSThreadPoolExecutor ebMSThreadPoolExecutor,
 			@NonNull MessageQueue<EbMSResponseMessage> messageQueue,
 			@NonNull CPAManager cpaManager,
 			@NonNull EbMSHttpClientFactory ebMSClientFactory,
@@ -48,20 +47,16 @@ public class DeliveryManagerFactory implements FactoryBean<DeliveryManager>
 		{
 			case JMS:
 				deliveryManager = JMSDeliveryManager.jmsDeliveryManagerBuilder()
-						.maxThreads(maxThreads)
-						.processorsScaleFactor(processorsScaleFactor)
-						.queueScaleFactor(queueScaleFactor)
+						.ebMSThreadPoolExecutor(ebMSThreadPoolExecutor)
 						.messageQueue(messageQueue)
 						.cpaManager(cpaManager)
 						.ebMSClientFactory(ebMSClientFactory)
-						.jmsTemplate(JMSUtils.createJmsTemplate(jmsBrokerURL))
+						.jmsTemplate(JmsTemplateFactory.getInstance(jmsBrokerURL))
 						.build();
 				break;
 			default:
 				deliveryManager = DeliveryManager.builder()
-						.maxThreads(maxThreads)
-						.processorsScaleFactor(processorsScaleFactor)
-						.queueScaleFactor(queueScaleFactor)
+						.ebMSThreadPoolExecutor(ebMSThreadPoolExecutor)
 						.messageQueue(messageQueue)
 						.cpaManager(cpaManager)
 						.ebMSClientFactory(ebMSClientFactory)

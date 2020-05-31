@@ -28,6 +28,7 @@ import lombok.experimental.FieldDefaults;
 @Getter
 public abstract class EbMSRequestMessage extends EbMSBaseMessage
 {
+	private static final long serialVersionUID = 1L;
 	SyncReply syncReply;
 
 	public EbMSRequestMessage(@NonNull MessageHeader messageHeader, SignatureType signature, SyncReply syncReply)

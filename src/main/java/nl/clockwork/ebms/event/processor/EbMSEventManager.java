@@ -15,7 +15,13 @@
  */
 package nl.clockwork.ebms.event.processor;
 
+import java.time.Instant;
+
+import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DeliveryChannel;
+
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.NonNull;
 import lombok.val;
 import lombok.experimental.FieldDefaults;
 import nl.clockwork.ebms.cpa.CPAManager;
@@ -23,17 +29,28 @@ import nl.clockwork.ebms.cpa.CPAUtils;
 import nl.clockwork.ebms.dao.DAOTransactionCallback;
 import nl.clockwork.ebms.util.StreamUtils;
 
-@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-public class EventManagerRetryAck extends EventManager
+@FieldDefaults(level = AccessLevel.PROTECTED, makeFinal = true)
+@AllArgsConstructor
+public class EbMSEventManager implements EventManager
 {
+	@NonNull
+	EbMSEventDAO ebMSeventDAO;
+	@NonNull
+	CPAManager cpaManager;
+	String serverId;
 	int nrAutoRetries;
 	int autoRetryInterval;
 
-	public EventManagerRetryAck(EbMSEventDAO ebMSEventDAO, CPAManager cpaManager, String serverId, int nrAutoRetries, int autoRetryInterval)
+	@Override
+	public void createEvent(String cpaId, DeliveryChannel sendDeliveryChannel, DeliveryChannel receiveDeliveryChannel, String messageId, Instant timeToLive, Instant timestamp, boolean isConfidential)
 	{
-		super(ebMSEventDAO,cpaManager,serverId);
-		this.nrAutoRetries = nrAutoRetries;
-		this.autoRetryInterval = autoRetryInterval;
+		ebMSeventDAO.insertEvent(new EbMSEvent(cpaId,sendDeliveryChannel.getChannelId(),receiveDeliveryChannel.getChannelId(), messageId, timeToLive, timestamp, isConfidential, 0),serverId);
+	}
+
+	@Override
+	public void updateEvent(final EbMSEvent event, final String url, final EbMSEventStatus status)
+	{
+		updateEvent(event,url,status,null);
 	}
 
 	@Override
@@ -51,9 +68,7 @@ public class EventManagerRetryAck extends EventManager
 				{
 					ebMSeventDAO.insertEventLog(event.getMessageId(),event.getTimestamp(),url,status,errorMessage);
 					if (event.getTimeToLive() != null && CPAUtils.isReliableMessaging(deliveryChannel))
-					{
-						ebMSeventDAO.updateEvent(createNewEvent(event,deliveryChannel));
-					}
+						ebMSeventDAO.updateEvent(EventManagerFactory.createNextEvent(event,deliveryChannel));
 					else
 					{
 						switch(ebMSeventDAO.getMessageAction(event.getMessageId()).orElse(null))
@@ -62,14 +77,9 @@ public class EventManagerRetryAck extends EventManager
 							case MESSAGE_ERROR:
 								if (event.getRetries() < nrAutoRetries)
 								{
-									ebMSeventDAO.updateEvent(retryEvent(event, autoRetryInterval));
+									ebMSeventDAO.updateEvent(EventManagerFactory.createNextEvent(event,autoRetryInterval));
 									break;
 								}
-								else
-								{
-									ebMSeventDAO.insertEventLog(event.getMessageId(),event.getTimestamp(),url,status, "Stopped retrying acknowledge");
-								}
-
 							default:
 								ebMSeventDAO.deleteEvent(event.getMessageId());
 						}
@@ -77,5 +87,11 @@ public class EventManagerRetryAck extends EventManager
 				}
 			}
 		);
+	}
+
+	@Override
+	public void deleteEvent(String messageId)
+	{
+		ebMSeventDAO.deleteEvent(messageId);
 	}
 }

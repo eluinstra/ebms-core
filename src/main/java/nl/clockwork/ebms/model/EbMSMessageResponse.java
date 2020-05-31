@@ -20,6 +20,8 @@ import org.w3._2000._09.xmldsig.SignatureType;
 
 public abstract class EbMSMessageResponse extends EbMSResponseMessage
 {
+	private static final long serialVersionUID = 1L;
+
 	public EbMSMessageResponse(MessageHeader messageHeader, SignatureType signature)
 	{
 		super(messageHeader,signature);

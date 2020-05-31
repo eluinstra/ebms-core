@@ -23,6 +23,8 @@ import lombok.NonNull;
 
 public class EbMSPong extends EbMSResponseMessage
 {
+	private static final long serialVersionUID = 1L;
+
 	@Builder
 	public EbMSPong(@NonNull MessageHeader messageHeader, SignatureType signature)
 	{

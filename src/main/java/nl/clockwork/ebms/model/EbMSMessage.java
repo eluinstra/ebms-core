@@ -35,6 +35,7 @@ import lombok.experimental.FieldDefaults;
 @Getter
 public class EbMSMessage extends EbMSRequestMessage
 {
+	private static final long serialVersionUID = 1L;
 	MessageOrder messageOrder;
 	AckRequested ackRequested;
 	Manifest manifest;

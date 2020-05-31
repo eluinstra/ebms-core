@@ -37,6 +37,20 @@ public class EbMSEvent
 	Instant timeToLive;
 	@NonNull
 	Instant timestamp;
-	boolean isConfidential;
+	boolean confidential;
 	int retries;
+
+	public EbMSEvent createNextEvent(Instant timestamp)
+	{
+		return EbMSEvent.builder()
+				.cpaId(cpaId)
+				.sendDeliveryChannelId(sendDeliveryChannelId)
+				.receiveDeliveryChannelId(receiveDeliveryChannelId)
+				.messageId(messageId)
+				.timeToLive(timeToLive)
+				.timestamp(timestamp)
+				.confidential(confidential)
+				.retries(retries + 1)
+				.build();
+	}
 }

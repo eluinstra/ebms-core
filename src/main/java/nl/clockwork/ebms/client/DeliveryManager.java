@@ -18,10 +18,7 @@ package nl.clockwork.ebms.client;
 import java.io.IOException;
 import java.security.cert.CertificateException;
 import java.util.Optional;
-import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 
 import javax.xml.bind.JAXBException;
 import javax.xml.parsers.ParserConfigurationException;
@@ -40,6 +37,7 @@ import lombok.val;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import nl.clockwork.ebms.EbMSMessageUtils;
+import nl.clockwork.ebms.EbMSThreadPoolExecutor;
 import nl.clockwork.ebms.cpa.CPAManager;
 import nl.clockwork.ebms.cpa.CPAUtils;
 import nl.clockwork.ebms.cpa.CacheablePartyId;
@@ -62,43 +60,14 @@ public class DeliveryManager
 	@NonNull
 	protected ExecutorService executorService;
 
-	public DeliveryManager(MessageQueue<EbMSResponseMessage> messageQueue, CPAManager cpaManager, EbMSHttpClientFactory ebMSClientFactory)
-	{
-		this(null,null,null,messageQueue,cpaManager,ebMSClientFactory);
-	}
-
 	@Builder
 	public DeliveryManager(
-			Integer maxThreads,
-			Integer processorsScaleFactor,
-			Integer queueScaleFactor,
+			@NonNull EbMSThreadPoolExecutor ebMSThreadPoolExecutor,
 			@NonNull MessageQueue<EbMSResponseMessage> messageQueue,
 			@NonNull CPAManager cpaManager,
 			@NonNull EbMSHttpClientFactory ebMSClientFactory)
 	{
-		//executorService = Executors.newFixedThreadPool(maxThreads);
-		if (processorsScaleFactor == null || processorsScaleFactor <= 0)
-		{
-			processorsScaleFactor = 1;
-			log.info(this.getClass().getName() + " using processors scale factor " + processorsScaleFactor);
-		}
-		if (maxThreads == null || maxThreads <= 0)
-		{
-			maxThreads = Runtime.getRuntime().availableProcessors() * processorsScaleFactor;
-			log.info(this.getClass().getName() + " using " + maxThreads + " threads");
-		}
-		if (queueScaleFactor == null || queueScaleFactor <= 0)
-		{
-			queueScaleFactor = 1;
-			log.info(this.getClass().getName() + " using queue scale factor " + queueScaleFactor);
-		}
-		executorService = new ThreadPoolExecutor(
-				maxThreads,
-				maxThreads,
-				1,
-				TimeUnit.MINUTES,
-				new ArrayBlockingQueue<>(maxThreads * queueScaleFactor,true),
-				new ThreadPoolExecutor.CallerRunsPolicy());
+		this.executorService = ebMSThreadPoolExecutor.createInstance();
 		this.messageQueue = messageQueue;
 		this.cpaManager = cpaManager;
 		this.ebMSClientFactory = ebMSClientFactory;

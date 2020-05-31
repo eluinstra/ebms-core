@@ -146,7 +146,7 @@ abstract class AbstractEbMSDAO implements EbMSDAO, CPADAO, URLMappingDAO, Certif
 					.messageId(rs.getString("message_id"))
 					.timeToLive(ebMSDAO.toInstant(rs.getTimestamp("time_to_live")))
 					.timestamp(ebMSDAO.toInstant(rs.getTimestamp("time_stamp")))
-					.isConfidential(rs.getBoolean("is_confidential"))
+					.confidential(rs.getBoolean("is_confidential"))
 					.retries(rs.getInt("retries"))
 					.build();
 		}

@@ -92,12 +92,16 @@
 		<constructor-arg name="ebMSMessageService" ref="ebMSMessageService"/>
 	</bean>
 
-	<bean id="deliveryManager" factory-bean="deliveryManagerBuilder" factory-method="build"/>
+	<bean id="deliveryManager" factory-bean="deliveryManagerBuilder" factory-method="build" depends-on="brokerFactory"/>
 	<bean id="deliveryManagerBuilder" class="nl.clockwork.ebms.client.DeliveryManagerFactory$DeliveryManagerFactoryBuilder">
 		<property name="type" value="${deliveryManager.type}" />
-		<property name="maxThreads" value="${deliveryManager.maxTreads}"/>
-		<property name="processorsScaleFactor" value="${deliveryManager.processorsScaleFactor}"/>
-		<property name="queueScaleFactor" value="${deliveryManager.queueScaleFactor}"/>
+		<property name="ebMSThreadPoolExecutor">
+			<bean class="nl.clockwork.ebms.EbMSThreadPoolExecutor">
+				<constructor-arg name="maxThreads" value="${eventProcessor.maxTreads}"/>
+				<constructor-arg name="processorsScaleFactor" value="${eventProcessor.processorsScaleFactor}"/>
+				<constructor-arg name="queueScaleFactor" value="${eventProcessor.queueScaleFactor}"/>
+			</bean>
+		</property>
 		<property name="messageQueue" ref="messageQueue"/>
 		<property name="cpaManager" ref="cpaManager"/>
 		<property name="ebMSClientFactory" ref="ebMSHttpClientFactory"/>
@@ -249,23 +253,17 @@
 		<constructor-arg name="ebMSIdGenerator" ref="ebMSIdGenerator"/>
 	</bean>
 	
-	<bean id="eventManager" class="nl.clockwork.ebms.event.processor.EventManagerFactory">
+	<bean id="eventManager" class="nl.clockwork.ebms.event.processor.EventManagerFactory" depends-on="brokerFactory">
+		<constructor-arg name="type" value="${eventManager.type}"/>
 		<constructor-arg name="ebMSDAO" ref="ebMSDAO"/>
 		<constructor-arg name="cpaManager" ref="cpaManager"/>
 		<constructor-arg name="serverId" value="${ebms.serverId}"/>
+		<constructor-arg name="jmsBrokerUrl" value="${jms.brokerURL}"/>
 		<constructor-arg name="nrAutoRetries" value="${ebmsMessage.nrAutoRetries:0}"/>
 		<constructor-arg name="autoRetryInterval" value="${ebmsMessage.autoRetryInterval:15}"/>
 	</bean>
 
-	<bean id="ebMSEventProcessor" factory-bean="ebMSEventProcessorBuilder" factory-method="build"/>
-	<bean id="ebMSEventProcessorBuilder" class="nl.clockwork.ebms.event.processor.EbMSEventProcessor$EbMSEventProcessorBuilder">
-		<property name="enabled" value="${eventProcessor.enabled}"/>
-		<property name="delay" value="${eventProcessor.delay}"/>
-		<property name="period" value="${eventProcessor.period}"/>
-		<property name="maxThreads" value="${eventProcessor.maxTreads}"/>
-		<property name="processorsScaleFactor" value="${eventProcessor.processorsScaleFactor}"/>
-		<property name="queueScaleFactor" value="${eventProcessor.queueScaleFactor}"/>
-		<property name="maxEvents" value="${eventProcessor.maxEvents}"/>
+	<bean id="handleEventTaskPrototype" class="nl.clockwork.ebms.event.processor.HandleEventTask.HandleEventTaskBuilder">
 		<property name="eventListener" ref="eventListener"/>
 		<property name="ebMSDAO" ref="ebMSDAO"/>
 		<property name="cpaManager" ref="cpaManager"/>
@@ -275,6 +273,32 @@
 		<property name="messageEncrypter" ref="messageEncrypter"/>
 		<property name="messageProcessor" ref="messageProcessor"/>
 		<property name="deleteEbMSAttachmentsOnMessageProcessed" value="${ebmsMessage.deleteContentOnProcessed}"/>
+	</bean>
+
+	<bean id="ebMSEventProcessor" factory-bean="ebMSEventProcessorBuilder" factory-method="build"/>
+	<bean id="ebMSEventProcessorBuilder" class="nl.clockwork.ebms.event.processor.EbMSEventProcessor$EbMSEventProcessorBuilder">
+		<property name="type" value="${eventManager.type}"/>
+		<property name="delay" value="${eventProcessor.delay}"/>
+		<property name="period" value="${eventProcessor.period}"/>
+		<property name="maxEvents" value="${eventProcessor.maxEvents}"/>
+		<property name="ebMSThreadPoolExecutor">
+			<bean class="nl.clockwork.ebms.EbMSThreadPoolExecutor">
+				<constructor-arg name="maxThreads" value="${eventProcessor.maxTreads}"/>
+				<constructor-arg name="processorsScaleFactor" value="${eventProcessor.processorsScaleFactor}"/>
+				<constructor-arg name="queueScaleFactor" value="${eventProcessor.queueScaleFactor}"/>
+			</bean>
+		</property>
+		<property name="ebMSEventDAO" ref="ebMSDAO" />
+		<property name="handleEventTaskPrototype" ref="handleEventTaskPrototype"/>
+		<property name="serverId" value="${ebms.serverId}"/>
+	</bean>
+
+	<bean id="jmsEventProcessor" factory-bean="jmsEventProcessorBuilder" factory-method="build" depends-on="brokerFactory"/>
+	<bean id="jmsEventProcessorBuilder" class="nl.clockwork.ebms.event.processor.JMSEventProcessor$JMSEventProcessorBuilder">
+		<property name="type" value="${eventManager.type}"/>
+		<property name="jmsBrokerUrl" value="${jms.brokerURL}"/>
+		<property name="maxThreads" value="${eventProcessor.maxTreads}"/>
+		<property name="handleEventTaskPrototype" ref="handleEventTaskPrototype"/>
 	</bean>
 
 	<bean id="signatureGenerator" class="nl.clockwork.ebms.signing.EbMSSignatureGenerator">
@@ -319,7 +343,7 @@
 		<property name="useClientCertificate" value="${https.useClientCertificate}"/>
 	</bean>
 
-	<bean id="eventListener" factory-bean="eventListenerBuilder" factory-method="build"/>
+	<bean id="eventListener" factory-bean="eventListenerBuilder" factory-method="build" depends-on="brokerFactory"/>
 	<bean id="eventListenerBuilder" class="nl.clockwork.ebms.event.listener.EventListenerFactory$EventListenerFactoryBuilder">
 		<property name="type" value="${eventListener.type}" />
 		<property name="ebMSDAO" ref="ebMSDAO" />
@@ -328,7 +352,7 @@
 		<property name="jmsDestinationType" value="${jms.destinationType}" />
 	</bean>
 
-	<bean class="org.springframework.beans.factory.config.MethodInvokingBean">
+	<bean id="brokerFactory" class="org.springframework.beans.factory.config.MethodInvokingBean">
 		<property name="staticMethod" value="nl.clockwork.ebms.jms.EbMSBrokerFactoryBean.init" />
 		<property name="arguments">
 			<list>

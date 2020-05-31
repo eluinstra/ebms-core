@@ -15,6 +15,13 @@
  */
 package nl.clockwork.ebms.event.listener;
 
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import javax.jms.Destination;
+
+import org.apache.activemq.command.ActiveMQQueue;
+import org.apache.activemq.command.ActiveMQTopic;
 import org.springframework.beans.factory.FactoryBean;
 
 import lombok.AccessLevel;
@@ -23,7 +30,7 @@ import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
 import nl.clockwork.ebms.dao.EbMSDAO;
 import nl.clockwork.ebms.jms.JMSDestinationType;
-import nl.clockwork.ebms.jms.JMSUtils;
+import nl.clockwork.ebms.jms.JmsTemplateFactory;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class EventListenerFactory implements FactoryBean<EventListener>
@@ -45,17 +52,23 @@ public class EventListenerFactory implements FactoryBean<EventListener>
 				listener = new DAOEventListener(ebMSMessageEventDAO);
 				break;
 			case SIMPLE_JMS:
-				listener = new SimpleJMSEventListener(JMSUtils.createJmsTemplate(jmsBrokerURL),JMSUtils.createDestinations(jmsDestinationType));
+				listener = new SimpleJMSEventListener(JmsTemplateFactory.getInstance(jmsBrokerURL),createEbMSMessageEventDestinations(jmsDestinationType));
 				break;
 			case JMS:
-				listener = new JMSEventListener(ebMSDAO,JMSUtils.createJmsTemplate(jmsBrokerURL),JMSUtils.createDestinations(jmsDestinationType));
+				listener = new JMSEventListener(ebMSDAO,JmsTemplateFactory.getInstance(jmsBrokerURL),createEbMSMessageEventDestinations(jmsDestinationType));
 				break;
 			case JMS_TEXT:
-				listener = new JMSTextEventListener(ebMSDAO,JMSUtils.createJmsTemplate(jmsBrokerURL),JMSUtils.createDestinations(jmsDestinationType));
+				listener = new JMSTextEventListener(ebMSDAO,JmsTemplateFactory.getInstance(jmsBrokerURL),createEbMSMessageEventDestinations(jmsDestinationType));
 				break;
 			default:
 				listener = new LoggingEventListener();
 		}
+	}
+
+	public static Map<String,Destination> createEbMSMessageEventDestinations(JMSDestinationType jmsDestinationType)
+	{
+		return EbMSMessageEventType.stream()
+				.collect(Collectors.toMap(e -> e.name(),e -> jmsDestinationType == JMSDestinationType.QUEUE ? new ActiveMQQueue(e.name()) : new ActiveMQTopic("VirtualTopic." + e.name())));
 	}
 
 	@Override

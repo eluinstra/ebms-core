@@ -40,6 +40,7 @@ import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import nl.clockwork.ebms.Constants;
 import nl.clockwork.ebms.EbMSMessageUtils;
+import nl.clockwork.ebms.EbMSThreadPoolExecutor;
 import nl.clockwork.ebms.cpa.CPAManager;
 import nl.clockwork.ebms.model.EbMSBaseMessage;
 import nl.clockwork.ebms.model.EbMSRequestMessage;
@@ -51,21 +52,19 @@ import nl.clockwork.ebms.processor.EbMSProcessorException;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class JMSDeliveryManager extends DeliveryManager
 {
-	private static final String MESSAGE = "MESSAGE";
+	private static final String JMS_DESTINATION_NAME = "MESSAGE";
 	@NonNull
 	JmsTemplate jmsTemplate;
 
 	@Builder(builderMethodName = "jmsDeliveryManagerBuilder")
 	public JMSDeliveryManager(
-			Integer maxThreads,
-			Integer processorsScaleFactor,
-			Integer queueScaleFactor,
-			MessageQueue<EbMSResponseMessage> messageQueue,
-			CPAManager cpaManager,
-			EbMSHttpClientFactory ebMSClientFactory,
+			@NonNull EbMSThreadPoolExecutor ebMSThreadPoolExecutor,
+			@NonNull MessageQueue<EbMSResponseMessage> messageQueue,
+			@NonNull CPAManager cpaManager,
+			@NonNull EbMSHttpClientFactory ebMSClientFactory,
 			@NonNull JmsTemplate jmsTemplate)
 	{
-		super(maxThreads,processorsScaleFactor,queueScaleFactor,messageQueue,cpaManager,ebMSClientFactory);
+		super(ebMSThreadPoolExecutor,messageQueue,cpaManager,ebMSClientFactory);
 		this.jmsTemplate = jmsTemplate;
 	}
 
@@ -83,7 +82,7 @@ public class JMSDeliveryManager extends DeliveryManager
 			else if (message.getSyncReply() == null)
 			{
 				jmsTemplate.setReceiveTimeout(3 * Constants.MINUTE_IN_MILLIS);
-				return Optional.ofNullable((EbMSResponseMessage)jmsTemplate.receiveSelectedAndConvert(MESSAGE,"JMSCorrelationID='" + messageHeader.getMessageData().getMessageId() + "'"));
+				return Optional.ofNullable((EbMSResponseMessage)jmsTemplate.receiveSelectedAndConvert(JMS_DESTINATION_NAME,"JMSCorrelationID='" + messageHeader.getMessageData().getMessageId() + "'"));
 			}
 			return Optional.empty();
 		}
@@ -102,7 +101,7 @@ public class JMSDeliveryManager extends DeliveryManager
 	{
 		jmsTemplate.setExplicitQosEnabled(true);
 		jmsTemplate.setTimeToLive(Constants.MINUTE_IN_MILLIS);
-		jmsTemplate.convertAndSend(MESSAGE,message,new MessagePostProcessor()
+		jmsTemplate.convertAndSend(JMS_DESTINATION_NAME,message,new MessagePostProcessor()
 		{
 			@Override
 			public Message postProcessMessage(Message m) throws JMSException

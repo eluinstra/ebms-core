@@ -15,30 +15,52 @@
  */
 package nl.clockwork.ebms.event.processor;
 
+import java.time.Instant;
+
+import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DeliveryChannel;
 import org.springframework.beans.factory.FactoryBean;
 
 import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import lombok.NonNull;
+import lombok.val;
 import lombok.experimental.FieldDefaults;
 import nl.clockwork.ebms.cpa.CPAManager;
+import nl.clockwork.ebms.cpa.CPAUtils;
+import nl.clockwork.ebms.jms.JmsTemplateFactory;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-@AllArgsConstructor
 public class EventManagerFactory implements FactoryBean<EventManager>
 {
-	@NonNull
-	EbMSEventDAO ebMSEventDAO;
-	@NonNull
-	CPAManager cpaManager;
-	String serverId;
-	int nrAutoRetries;
-	int autoRetryInterval;
+	public enum EventManagerType
+	{
+		DEFAULT, JMS;
+	}
+
+	EventManager eventManager;
+
+	public EventManagerFactory(
+			@NonNull EventManagerType type,
+			@NonNull EbMSEventDAO ebMSEventDAO,
+			@NonNull CPAManager cpaManager,
+			String serverId,
+			@NonNull String jmsBrokerUrl,
+			int nrAutoRetries,
+			int autoRetryInterval)
+	{
+		switch(type)
+		{
+			case JMS:
+				eventManager = new JMSEventManager(JmsTemplateFactory.getInstance(jmsBrokerUrl),ebMSEventDAO,cpaManager,nrAutoRetries,autoRetryInterval);
+				break;
+			default:
+				eventManager = new EbMSEventManager(ebMSEventDAO,cpaManager,serverId,nrAutoRetries,autoRetryInterval);
+		}
+	}
 	
 	@Override
 	public EventManager getObject() throws Exception
 	{
-		return nrAutoRetries > 0 ? new EventManagerRetryAck(ebMSEventDAO,cpaManager,serverId,nrAutoRetries,autoRetryInterval) : new EventManager(ebMSEventDAO,cpaManager,serverId);
+		return eventManager;
 	}
 	
 	@Override
@@ -53,4 +75,16 @@ public class EventManagerFactory implements FactoryBean<EventManager>
 		return true;
 	}
 	
+	public static EbMSEvent createNextEvent(EbMSEvent event, DeliveryChannel deliveryChannel)
+	{
+		val rm = CPAUtils.getReceiverReliableMessaging(deliveryChannel);
+		val timestamp = event.getRetries() < rm.getRetries().intValue() ? Instant.now().plus(rm.getRetryInterval()) : event.getTimeToLive();
+		return event.createNextEvent(timestamp);
+	}
+
+	public static EbMSEvent createNextEvent(EbMSEvent event, long retryInterval)
+	{
+		val timestamp = Instant.now().plusSeconds(60 * retryInterval);
+		return event.createNextEvent(timestamp);
+	}
 }

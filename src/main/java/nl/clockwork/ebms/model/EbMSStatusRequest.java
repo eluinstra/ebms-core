@@ -30,6 +30,7 @@ import lombok.experimental.FieldDefaults;
 @Getter
 public class EbMSStatusRequest extends EbMSRequestMessage
 {
+	private static final long serialVersionUID = 1L;
 	@NonNull
 	StatusRequest statusRequest;
 

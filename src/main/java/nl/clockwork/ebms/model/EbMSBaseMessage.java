@@ -15,6 +15,8 @@
  */
 package nl.clockwork.ebms.model;
 
+import java.io.Serializable;
+
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageHeader;
 import org.w3._2000._09.xmldsig.SignatureType;
 
@@ -27,8 +29,9 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor
 @Getter
-public abstract class EbMSBaseMessage
+public abstract class EbMSBaseMessage implements Serializable
 {
+	private static final long serialVersionUID = 1L;
 	@NonNull
 	MessageHeader messageHeader;
 	SignatureType signature;
