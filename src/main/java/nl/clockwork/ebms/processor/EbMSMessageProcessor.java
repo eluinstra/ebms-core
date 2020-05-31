@@ -68,19 +68,11 @@ import nl.clockwork.ebms.validation.XSDValidator;
 public class EbMSMessageProcessor
 {
   @NonNull
-  DeliveryManager deliveryManager;
-  @NonNull
   EventListener eventListener;
   @NonNull
 	EbMSDAO ebMSDAO;
   @NonNull
 	CPAManager cpaManager;
-  @NonNull
-	EbMSMessageFactory ebMSMessageFactory;
-  @NonNull
-	EventManager eventManager;
-  @NonNull
-	EbMSSignatureGenerator signatureGenerator;
   @NonNull
 	EbMSMessageValidator messageValidator;
   @NonNull
@@ -96,13 +88,9 @@ public class EbMSMessageProcessor
 	public EbMSMessageProcessor(@NonNull DeliveryManager deliveryManager, @NonNull EventListener eventListener, @NonNull EbMSDAO ebMSDAO, @NonNull CPAManager cpaManager, @NonNull EbMSMessageFactory ebMSMessageFactory, @NonNull EventManager eventManager, @NonNull EbMSSignatureGenerator signatureGenerator, @NonNull EbMSMessageValidator messageValidator, @NonNull DuplicateMessageHandler duplicateMessageHandler, boolean deleteEbMSAttachmentsOnMessageProcessed)
 	{
 		super();
-		this.deliveryManager = deliveryManager;
 		this.eventListener = eventListener;
 		this.ebMSDAO = ebMSDAO;
 		this.cpaManager = cpaManager;
-		this.ebMSMessageFactory = ebMSMessageFactory;
-		this.eventManager = eventManager;
-		this.signatureGenerator = signatureGenerator;
 		this.messageValidator = messageValidator;
 		this.duplicateMessageHandler = duplicateMessageHandler;
 		this.deleteEbMSAttachmentsOnMessageProcessed = deleteEbMSAttachmentsOnMessageProcessed;
