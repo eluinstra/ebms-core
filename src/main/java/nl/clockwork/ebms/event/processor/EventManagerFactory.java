@@ -33,7 +33,7 @@ public class EventManagerFactory implements FactoryBean<EventManager>
 {
 	public enum EventManagerType
 	{
-		DEFAULT, JMS;
+		NONE, DEFAULT, JMS;
 	}
 
 	EventManager eventManager;
@@ -49,11 +49,14 @@ public class EventManagerFactory implements FactoryBean<EventManager>
 	{
 		switch(type)
 		{
+			case DEFAULT:
+				eventManager = new EbMSEventManager(ebMSEventDAO,cpaManager,serverId,nrAutoRetries,autoRetryInterval);
+				break;
 			case JMS:
 				eventManager = new JMSEventManager(JmsTemplateFactory.getInstance(jmsBrokerUrl),ebMSEventDAO,cpaManager,nrAutoRetries,autoRetryInterval);
 				break;
 			default:
-				eventManager = new EbMSEventManager(ebMSEventDAO,cpaManager,serverId,nrAutoRetries,autoRetryInterval);
+				eventManager = null;
 		}
 	}
 	
