@@ -9,7 +9,6 @@ import javax.jms.MessageListener;
 import javax.jms.Session;
 
 import org.apache.activemq.pool.PooledConnectionFactory;
-import org.springframework.jms.JmsException;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jms.listener.DefaultMessageListenerContainer;
 
@@ -18,9 +17,11 @@ import lombok.Builder;
 import lombok.NonNull;
 import lombok.val;
 import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 import nl.clockwork.ebms.event.processor.EventManagerFactory.EventManagerType;
 import nl.clockwork.ebms.jms.JmsTemplateFactory;
 
+@Slf4j
 @FieldDefaults(level = AccessLevel.PROTECTED, makeFinal = true)
 public class JMSEventProcessor implements Runnable
 {
@@ -87,6 +88,7 @@ public class JMSEventProcessor implements Runnable
 
 		});
 		container.setSessionTransacted(true);
+		container.setSessionAcknowledgeMode(Session.CLIENT_ACKNOWLEDGE);
 		container.setConcurrentConsumers(maxThreads);
 		return container;
 	}
@@ -105,6 +107,7 @@ public class JMSEventProcessor implements Runnable
 			}
 			catch (Exception e)
 			{
+				log.trace("",e);
 			}
   	}
   }
