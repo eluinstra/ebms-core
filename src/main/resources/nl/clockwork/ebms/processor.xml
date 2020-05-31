@@ -278,7 +278,6 @@
 	<bean id="ebMSEventProcessor" factory-bean="ebMSEventProcessorBuilder" factory-method="build"/>
 	<bean id="ebMSEventProcessorBuilder" class="nl.clockwork.ebms.event.processor.EbMSEventProcessor$EbMSEventProcessorBuilder">
 		<property name="type" value="${eventManager.type}"/>
-		<property name="delay" value="${eventProcessor.delay}"/>
 		<property name="period" value="${eventProcessor.period}"/>
 		<property name="maxEvents" value="${eventProcessor.maxEvents}"/>
 		<property name="ebMSThreadPoolExecutor">

@@ -35,7 +35,6 @@ import nl.clockwork.ebms.event.processor.EventManagerFactory.EventManagerType;
 @FieldDefaults(level = AccessLevel.PROTECTED, makeFinal = true)
 public class EbMSEventProcessor implements Runnable
 {
-	int delay;
 	int period;
 	int maxEvents;
 	@NonNull
@@ -48,7 +47,6 @@ public class EbMSEventProcessor implements Runnable
 	@Builder(setterPrefix = "set")
 	public EbMSEventProcessor(
 			@NonNull EventManagerType type,
-			int delay,
 			int period,
 			int maxEvents,
 			@NonNull EbMSThreadPoolExecutor ebMSThreadPoolExecutor,
@@ -56,7 +54,6 @@ public class EbMSEventProcessor implements Runnable
 			@NonNull HandleEventTask.HandleEventTaskBuilder handleEventTaskPrototype,
 			String serverId)
 	{
-		this.delay = delay;
 		this.period = period;
 		this.maxEvents = maxEvents;
 		this.ebMSEventDAO = ebMSEventDAO;
@@ -75,7 +72,6 @@ public class EbMSEventProcessor implements Runnable
 
   public void run()
   {
-		sleep(delay);
   	while (true)
   	{
   		val start = Instant.now();
