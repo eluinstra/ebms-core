@@ -5,12 +5,9 @@ import java.util.stream.IntStream;
 
 import javax.jms.JMSException;
 import javax.jms.Message;
-import javax.jms.MessageListener;
 import javax.jms.Session;
 
-import org.apache.activemq.pool.PooledConnectionFactory;
 import org.springframework.jms.core.JmsTemplate;
-import org.springframework.jms.listener.DefaultMessageListenerContainer;
 
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -38,21 +35,12 @@ public class JMSEventProcessor implements Runnable
 	{
 		if (type == EventManagerType.JMS)
 		{
-//			val container = createMessageListenerContainer(jmsBrokerUrl,maxThreads);
-//			container.initialize();
 			jmsTemplate = createJmsTemplate(jmsBrokerUrl);
 			IntStream.range(0,maxThreads).forEach(i -> startDeamon());
 		}
 		else
 			this.jmsTemplate = null;
 		this.handleEventTaskPrototype = handleEventTaskPrototype;
-	}
-
-	private void startDeamon()
-	{
-		val thread = new Thread(this);
-		thread.setDaemon(true);
-		thread.start();
 	}
 
 	private JmsTemplate createJmsTemplate(String jmsBrokerUrl)
@@ -63,34 +51,11 @@ public class JMSEventProcessor implements Runnable
 		return jmsTemplate;
 	}
 
-	private DefaultMessageListenerContainer createMessageListenerContainer(String jmsBrokerUrl, int maxThreads)
+	private void startDeamon()
 	{
-		val container = new DefaultMessageListenerContainer();
-		container.setConnectionFactory(new PooledConnectionFactory(jmsBrokerUrl));
-		container.setDestinationName(JMSEventManager.JMS_DESTINATION_NAME);
-		container.setMessageListener(new MessageListener()
-		{
-			@Override
-			public void onMessage(Message message)
-			{
-				try
-				{
-					val event = createEvent(message);
-					val task = handleEventTaskPrototype.setEvent(event).build();
-					task.run();
-					message.acknowledge();
-				}
-				catch (JMSException e)
-				{
-					throw new RuntimeException(e);
-				}
-			}
-
-		});
-		container.setSessionTransacted(true);
-		container.setSessionAcknowledgeMode(Session.CLIENT_ACKNOWLEDGE);
-		container.setConcurrentConsumers(maxThreads);
-		return container;
+		val thread = new Thread(this);
+		thread.setDaemon(true);
+		thread.start();
 	}
 
   public void run()
