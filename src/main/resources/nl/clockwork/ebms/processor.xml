@@ -98,8 +98,6 @@
 		<property name="ebMSThreadPoolExecutor">
 			<bean class="nl.clockwork.ebms.EbMSThreadPoolExecutor">
 				<constructor-arg name="maxThreads" value="${eventProcessor.maxTreads}"/>
-				<constructor-arg name="processorsScaleFactor" value="${eventProcessor.processorsScaleFactor}"/>
-				<constructor-arg name="queueScaleFactor" value="${eventProcessor.queueScaleFactor}"/>
 			</bean>
 		</property>
 		<property name="messageQueue" ref="messageQueue"/>
@@ -283,8 +281,6 @@
 		<property name="ebMSThreadPoolExecutor">
 			<bean class="nl.clockwork.ebms.EbMSThreadPoolExecutor">
 				<constructor-arg name="maxThreads" value="${eventProcessor.maxTreads}"/>
-				<constructor-arg name="processorsScaleFactor" value="${eventProcessor.processorsScaleFactor}"/>
-				<constructor-arg name="queueScaleFactor" value="${eventProcessor.queueScaleFactor}"/>
 			</bean>
 		</property>
 		<property name="ebMSEventDAO" ref="ebMSDAO" />

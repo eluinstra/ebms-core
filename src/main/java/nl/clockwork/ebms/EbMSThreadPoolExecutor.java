@@ -15,29 +15,14 @@ public class EbMSThreadPoolExecutor
 {
 	@NonNull
 	Integer maxThreads;
-	@NonNull
-	Integer queueScaleFactor;
 
-	public EbMSThreadPoolExecutor(@NonNull Integer maxThreads, @NonNull Integer processorsScaleFactor, @NonNull Integer queueScaleFactor)
+	public EbMSThreadPoolExecutor(@NonNull Integer maxThreads)
 	{
-		if (processorsScaleFactor <= 0)
-		{
-			processorsScaleFactor = 1;
-			log.info(this.getClass().getName() + " using processors scale factor " + processorsScaleFactor);
-		}
 		maxThreads = maxThreads--;
 		if (maxThreads <= 0)
-		{
-			maxThreads = Runtime.getRuntime().availableProcessors() * processorsScaleFactor - 1;
-			log.info(this.getClass().getName() + " using " + maxThreads + " threads");
-		}
-		if (queueScaleFactor <= 0)
-		{
-			queueScaleFactor = 1;
-			log.info(this.getClass().getName() + " using queue scale factor " + queueScaleFactor);
-		}
+			maxThreads = Runtime.getRuntime().availableProcessors() - 1;
+		log.info(this.getClass().getName() + " using " + maxThreads + " threads");
 		this.maxThreads = maxThreads;
-		this.queueScaleFactor = queueScaleFactor;
 	}
 
 	public ThreadPoolExecutor createInstance()
@@ -47,7 +32,7 @@ public class EbMSThreadPoolExecutor
 				maxThreads,
 				1,
 				TimeUnit.MINUTES,
-				new ArrayBlockingQueue<>(maxThreads * queueScaleFactor,true),
+				new ArrayBlockingQueue<>(maxThreads * 4,true),
 				new ThreadPoolExecutor.CallerRunsPolicy());
 	}
 }
