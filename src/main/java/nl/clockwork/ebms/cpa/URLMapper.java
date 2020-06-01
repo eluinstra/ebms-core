@@ -37,6 +37,7 @@ public class URLMapper
 	RemovableCache daoMethodCache;
 	@NonNull
 	URLMappingDAO urlMappingDAO;
+	Object urlMonitor = new Object();
 
 	public List<URLMapping> getURLs()
 	{
@@ -53,17 +54,20 @@ public class URLMapper
 
 	public void setURLMapping(URLMapping urlMapping)
 	{
-		if (StringUtils.isEmpty(urlMapping.getDestination()))
-			urlMappingDAO.deleteURLMapping(urlMapping.getSource());
-		else
+		synchronized (urlMonitor)
 		{
-			validate(urlMapping);
-			if (urlMappingDAO.existsURLMapping(urlMapping.getSource()))
-				urlMappingDAO.updateURLMapping(urlMapping);
+			if (StringUtils.isEmpty(urlMapping.getDestination()))
+				urlMappingDAO.deleteURLMapping(urlMapping.getSource());
 			else
-				urlMappingDAO.insertURLMapping(urlMapping);
+			{
+				validate(urlMapping);
+				if (urlMappingDAO.existsURLMapping(urlMapping.getSource()))
+					urlMappingDAO.updateURLMapping(urlMapping);
+				else
+					urlMappingDAO.insertURLMapping(urlMapping);
+			}
+			flushDAOMethodCache(urlMapping.getSource());
 		}
-		flushDAOMethodCache(urlMapping.getSource());
 	}
 
 	private void validate(URLMapping urlMapping)
@@ -88,8 +92,11 @@ public class URLMapper
 
 	public void deleteURLMapping(String source)
 	{
-		urlMappingDAO.deleteURLMapping(source);
-		flushDAOMethodCache(source);
+		synchronized (urlMonitor)
+		{
+			urlMappingDAO.deleteURLMapping(source);
+			flushDAOMethodCache(source);
+		}
 	}
 
 	private void flushDAOMethodCache(String source)

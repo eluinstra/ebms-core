@@ -35,6 +35,7 @@ public class CertificateMapper
 	RemovableCache daoMethodCache;
 	@NonNull
 	CertificateMappingDAO certificateMappingDAO;
+	Object certificateMonitor = new Object();
 
 	public static String getId(X509Certificate certificate)
 	{
@@ -53,24 +54,30 @@ public class CertificateMapper
 
 	public void setCertificateMapping(CertificateMapping mapping)
 	{
-		val id = getId(mapping.getSource());
-		if (mapping.getDestination() == null)
-			certificateMappingDAO.deleteCertificateMapping(id,mapping.getCpaId());
-		else
+		synchronized (certificateMonitor)
 		{
-			if (certificateMappingDAO.existsCertificateMapping(id,mapping.getCpaId()))
-				certificateMappingDAO.updateCertificateMapping(id,mapping);
+			val id = getId(mapping.getSource());
+			if (mapping.getDestination() == null)
+				certificateMappingDAO.deleteCertificateMapping(id,mapping.getCpaId());
 			else
-				certificateMappingDAO.insertCertificateMapping(id,mapping);
+			{
+				if (certificateMappingDAO.existsCertificateMapping(id,mapping.getCpaId()))
+					certificateMappingDAO.updateCertificateMapping(id,mapping);
+				else
+					certificateMappingDAO.insertCertificateMapping(id,mapping);
+			}
+			flushDAOMethodCache(id);
 		}
-		flushDAOMethodCache(id);
 	}
 
 	public void deleteCertificateMapping(X509Certificate source, String cpaId)
 	{
-		val key = getId(source);
-		certificateMappingDAO.deleteCertificateMapping(key,cpaId);
-		flushDAOMethodCache(key);
+		synchronized (certificateMonitor)
+		{
+			val key = getId(source);
+			certificateMappingDAO.deleteCertificateMapping(key,cpaId);
+			flushDAOMethodCache(key);
+		}
 	}
 	
 	private void flushDAOMethodCache(String key)
