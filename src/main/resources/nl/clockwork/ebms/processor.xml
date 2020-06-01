@@ -271,14 +271,15 @@
 		<property name="messageEncrypter" ref="messageEncrypter"/>
 		<property name="messageProcessor" ref="messageProcessor"/>
 		<property name="deleteEbMSAttachmentsOnMessageProcessed" value="${ebmsMessage.deleteContentOnProcessed}"/>
+		<property name="executionInterval" value="${handleEventTask.executionInterval}"/>
 	</bean>
 
 	<bean id="ebMSEventProcessor" factory-bean="ebMSEventProcessorBuilder" factory-method="build"/>
 	<bean id="ebMSEventProcessorBuilder" class="nl.clockwork.ebms.event.processor.EbMSEventProcessor$EbMSEventProcessorBuilder">
-		<property name="startEbMSClient" value="${ebms.startEbMSClient}"/>
+		<property name="start" value="${eventProcessor.start}"/>
 		<property name="type" value="${eventManager.type}"/>
-		<property name="period" value="${eventProcessor.period}"/>
 		<property name="maxEvents" value="${eventProcessor.maxEvents}"/>
+		<property name="executionInterval" value="${eventProcessor.executionInterval}"/>
 		<property name="ebMSThreadPoolExecutor">
 			<bean class="nl.clockwork.ebms.EbMSThreadPoolExecutor">
 				<constructor-arg name="maxThreads" value="${eventProcessor.maxTreads}"/>
@@ -291,9 +292,10 @@
 
 	<bean id="jmsEventProcessor" factory-bean="jmsEventProcessorBuilder" factory-method="build" depends-on="brokerFactory"/>
 	<bean id="jmsEventProcessorBuilder" class="nl.clockwork.ebms.event.processor.JMSEventProcessor$JMSEventProcessorBuilder">
-		<property name="startEbMSClient" value="${ebms.startEbMSClient}"/>
+		<property name="start" value="${eventProcessor.start}"/>
 		<property name="type" value="${eventManager.type}"/>
 		<property name="jmsBrokerUrl" value="${jms.brokerURL}"/>
+		<property name="jmsDestinationName" value="${eventProcessor.jms.destinationName}"/>
 		<property name="maxThreads" value="${eventProcessor.maxTreads}"/>
 		<property name="handleEventTaskPrototype" ref="handleEventTaskPrototype"/>
 	</bean>

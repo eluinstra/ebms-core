@@ -16,7 +16,6 @@
 package nl.clockwork.ebms.event.processor;
 
 import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
@@ -28,6 +27,7 @@ import lombok.NonNull;
 import lombok.val;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import nl.clockwork.ebms.Action;
 import nl.clockwork.ebms.EbMSThreadPoolExecutor;
 import nl.clockwork.ebms.event.processor.EventManagerFactory.EventManagerType;
 
@@ -35,7 +35,7 @@ import nl.clockwork.ebms.event.processor.EventManagerFactory.EventManagerType;
 @FieldDefaults(level = AccessLevel.PROTECTED, makeFinal = true)
 public class EbMSEventProcessor implements Runnable
 {
-	int period;
+	int executionInterval;
 	int maxEvents;
 	@NonNull
 	EbMSEventDAO ebMSEventDAO;
@@ -46,21 +46,21 @@ public class EbMSEventProcessor implements Runnable
 
 	@Builder(setterPrefix = "set")
 	public EbMSEventProcessor(
-			boolean startEbMSClient,
+			boolean start,
 			@NonNull EventManagerType type,
-			int period,
 			int maxEvents,
+			int executionInterval,
 			@NonNull EbMSThreadPoolExecutor ebMSThreadPoolExecutor,
 			@NonNull EbMSEventDAO ebMSEventDAO,
 			@NonNull HandleEventTask.HandleEventTaskBuilder handleEventTaskPrototype,
 			String serverId)
 	{
-		this.period = period;
+		this.executionInterval = executionInterval;
 		this.maxEvents = maxEvents;
 		this.ebMSEventDAO = ebMSEventDAO;
 		this.handleEventTaskPrototype = handleEventTaskPrototype;
 		this.serverId = serverId;
-		if (startEbMSClient && type == EventManagerType.DEFAULT)
+		if (start && type == EventManagerType.DEFAULT)
 		{
 			this.executorService = ebMSThreadPoolExecutor.createInstance();
 			val thread = new Thread(this);
@@ -73,9 +73,8 @@ public class EbMSEventProcessor implements Runnable
 
   public void run()
   {
-  	while (true)
-  	{
-  		val start = Instant.now();
+		Action action = () ->
+		{
 			val futures = new ArrayList<Future<?>>();
 			try
 			{
@@ -89,22 +88,11 @@ public class EbMSEventProcessor implements Runnable
 				log.error("",e);
 			}
 			futures.forEach(f -> Try.of(() -> f.get()).onFailure(e -> log.error("",e)));
-			val end = Instant.now();
-			val sleep = period - ChronoUnit.MILLIS.between(start,end);
-			sleep(sleep);
+		};
+		TimedAction timedAction = new TimedAction(action,executionInterval);
+  	while (true)
+  	{
+  		timedAction.run();
   	}
   }
-
-	private void sleep(long millis)
-	{
-		try
-		{
-			if (millis > 0)
-				Thread.sleep(millis);
-		}
-		catch (InterruptedException e)
-		{
-			log.trace("",e);
-		}
-	}
 }

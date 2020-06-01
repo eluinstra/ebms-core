@@ -7,6 +7,7 @@ import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.Session;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.jms.core.JmsTemplate;
 
 import lombok.AccessLevel;
@@ -25,22 +26,27 @@ public class JMSEventProcessor implements Runnable
 	JmsTemplate jmsTemplate;
 	@NonNull
 	HandleEventTask.HandleEventTaskBuilder handleEventTaskPrototype;
+	private String jmsDestinationName;
 
 	@Builder(setterPrefix = "set")
 	public JMSEventProcessor(
-			boolean startEbMSClient,
+			boolean start,
 			@NonNull EventManagerType type,
 			@NonNull String jmsBrokerUrl,
+			String jmsDestinationName,
 			int maxThreads,
 			@NonNull HandleEventTask.HandleEventTaskBuilder handleEventTaskPrototype)
 	{
-		if (startEbMSClient && type == EventManagerType.JMS)
+		if (start && type == EventManagerType.JMS)
 		{
 			jmsTemplate = createJmsTemplate(jmsBrokerUrl);
+			//jmsTemplate.setDefaultDestinationName(jmsDestinationName);
 			IntStream.range(0,maxThreads).forEach(i -> startDeamon());
+			
 		}
 		else
 			this.jmsTemplate = null;
+		this.jmsDestinationName = StringUtils.isEmpty(jmsDestinationName) ? JMSEventManager.JMS_DESTINATION_NAME : jmsDestinationName;
 		this.handleEventTaskPrototype = handleEventTaskPrototype;
 	}
 
@@ -65,7 +71,7 @@ public class JMSEventProcessor implements Runnable
   	{
 			try
 			{
-				val message = jmsTemplate.receive(JMSEventManager.JMS_DESTINATION_NAME);
+				val message = jmsTemplate.receive(jmsDestinationName);
 				val event = createEvent(message);
 				val task = handleEventTaskPrototype.setEvent(event).build();
 				task.run();

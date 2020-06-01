@@ -7,12 +7,12 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DeliveryChannel;
 
 import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.NonNull;
 import lombok.val;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import nl.clockwork.ebms.Action;
 import nl.clockwork.ebms.EbMSMessageStatus;
 import nl.clockwork.ebms.client.EbMSClient;
 import nl.clockwork.ebms.client.EbMSHttpClientFactory;
@@ -31,9 +31,7 @@ import nl.clockwork.ebms.processor.EbMSProcessingException;
 import nl.clockwork.ebms.util.StreamUtils;
 
 @Slf4j
-@Builder(setterPrefix = "set")
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-@AllArgsConstructor
 public class HandleEventTask implements Runnable
 {
 	@NonNull
@@ -55,14 +53,37 @@ public class HandleEventTask implements Runnable
 	boolean deleteEbMSAttachmentsOnMessageProcessed;
 	@NonNull
 	EbMSEvent event;
-	
+	@NonNull
+	TimedAction timedAction;
+
+	@Builder(setterPrefix = "set")
+	public HandleEventTask(@NonNull EventListener eventListener, @NonNull EbMSDAO ebMSDAO, @NonNull CPAManager cpaManager, @NonNull URLMapper urlMapper, @NonNull EventManager eventManager, @NonNull EbMSHttpClientFactory ebMSClientFactory, @NonNull EbMSMessageEncrypter messageEncrypter, @NonNull EbMSMessageProcessor messageProcessor, boolean deleteEbMSAttachmentsOnMessageProcessed, @NonNull EbMSEvent event, long executionInterval)
+	{
+		super();
+		this.eventListener = eventListener;
+		this.ebMSDAO = ebMSDAO;
+		this.cpaManager = cpaManager;
+		this.urlMapper = urlMapper;
+		this.eventManager = eventManager;
+		this.ebMSClientFactory = ebMSClientFactory;
+		this.messageEncrypter = messageEncrypter;
+		this.messageProcessor = messageProcessor;
+		this.deleteEbMSAttachmentsOnMessageProcessed = deleteEbMSAttachmentsOnMessageProcessed;
+		this.event = event;
+		Action action = () ->
+		{
+			if (event.getTimeToLive() == null || Instant.now().isBefore(event.getTimeToLive()))
+				sendEvent(event);
+			else
+				expireEvent(event);
+		};
+		timedAction = new TimedAction(action,executionInterval);
+	}
+
 	@Override
 	public void run()
 	{
-		if (event.getTimeToLive() == null || Instant.now().isBefore(event.getTimeToLive()))
-			sendEvent(event);
-		else
-			expireEvent(event);
+		timedAction.run();
 	}
 
 	private void sendEvent(final EbMSEvent event)
