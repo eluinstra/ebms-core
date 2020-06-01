@@ -62,7 +62,7 @@ public class JMSEventManager implements EventManager
 			result.setStringProperty("sendDeliveryChannelId",event.getSendDeliveryChannelId());
 			result.setStringProperty("receiveDeliveryChannelId",event.getReceiveDeliveryChannelId());
 			result.setStringProperty("messageId",event.getMessageId());
-			result.setStringProperty("timeToLive",event.getTimeToLive().toString());
+			result.setStringProperty("timeToLive",event.getTimeToLive() != null ? event.getTimeToLive().toString() : null);
 			result.setStringProperty("timestamp",event.getTimestamp().toString());
 			result.setBooleanProperty("confidential",event.isConfidential());
 			result.setIntProperty("retries",event.getRetries());

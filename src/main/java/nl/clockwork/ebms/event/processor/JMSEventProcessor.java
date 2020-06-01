@@ -87,10 +87,13 @@ public class JMSEventProcessor implements Runnable
 			try
 			{
 				val message = jmsTemplate.receive(jmsDestinationName);
-				val event = createEvent(message);
-				val task = handleEventTaskPrototype.setEvent(event).build();
-				task.run();
-				message.acknowledge();
+				if (message != null)
+				{
+					val event = createEvent(message);
+					val task = handleEventTaskPrototype.setEvent(event).build();
+					task.run();
+					message.acknowledge();
+				}
 			}
 			catch (Exception e)
 			{
@@ -106,7 +109,7 @@ public class JMSEventProcessor implements Runnable
 				.sendDeliveryChannelId(message.getStringProperty("sendDeliveryChannelId"))
 				.receiveDeliveryChannelId(message.getStringProperty("receiveDeliveryChannelId"))
 				.messageId(message.getStringProperty("messageId"))
-				.timeToLive(Instant.parse(message.getStringProperty("timeToLive")))
+				.timeToLive(message.getStringProperty("timeToLive") != null ? Instant.parse(message.getStringProperty("timeToLive")) : null)
 				.timestamp(Instant.parse(message.getStringProperty("timestamp")))
 				.confidential(message.getBooleanProperty("confidential"))
 				.retries(message.getIntProperty("retries"))
