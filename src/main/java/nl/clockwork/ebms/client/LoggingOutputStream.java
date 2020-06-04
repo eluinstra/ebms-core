@@ -21,19 +21,18 @@ import java.io.OutputStream;
 import java.util.List;
 import java.util.Map;
 
-import nl.clockwork.ebms.Constants;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import lombok.AccessLevel;
 import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
+import nl.clockwork.ebms.Constants;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 class LoggingOutputStream extends FilterOutputStream
 {
-	transient Log messageLogger = LogFactory.getLog(Constants.MESSAGE_LOG);
+	private static final Logger messageLog = LoggerFactory.getLogger(Constants.MESSAGE_LOG);
 	@NonNull
 	Map<String,List<String>> properties;
 	@NonNull
@@ -55,7 +54,7 @@ class LoggingOutputStream extends FilterOutputStream
 	@Override
 	public void write(int b) throws IOException
 	{
-		if (messageLogger.isDebugEnabled())
+		if (messageLog.isDebugEnabled())
 			sb.append(b);
 		out.write(b);
 	}
@@ -63,7 +62,7 @@ class LoggingOutputStream extends FilterOutputStream
 	@Override
 	public void write(byte[] b) throws IOException
 	{
-		if (messageLogger.isDebugEnabled())
+		if (messageLog.isDebugEnabled())
 			sb.append(new String(b,charset));
 		out.write(b);
 	}
@@ -71,7 +70,7 @@ class LoggingOutputStream extends FilterOutputStream
 	@Override
 	public void write(byte[] b, int off, int len) throws IOException
 	{
-		if (messageLogger.isDebugEnabled())
+		if (messageLog.isDebugEnabled())
 			sb.append(new String(b,off,len,charset));
 		out.write(b,off,len);
 	}
@@ -79,7 +78,7 @@ class LoggingOutputStream extends FilterOutputStream
 	@Override
 	public void close() throws IOException
 	{
-		messageLogger.debug(">>>>\n" + HTTPUtils.toString(this.properties) + "\n" + sb.toString());
+		messageLog.debug(">>>>\n" + HTTPUtils.toString(this.properties) + "\n" + sb.toString());
 		super.close();
 	}
 

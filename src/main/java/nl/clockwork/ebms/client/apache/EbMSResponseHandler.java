@@ -22,13 +22,13 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.ResponseHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 
 import lombok.AccessLevel;
@@ -44,7 +44,7 @@ import nl.clockwork.ebms.processor.EbMSProcessingException;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 class EbMSResponseHandler implements ResponseHandler<EbMSDocument>
 {
-	transient Log messageLogger = LogFactory.getLog(Constants.MESSAGE_LOG);
+	private static final Logger messageLog = LoggerFactory.getLogger(Constants.MESSAGE_LOG);
 
 	@Override
 	public EbMSDocument handleResponse(HttpResponse response) throws ClientProtocolException, IOException
@@ -56,7 +56,7 @@ class EbMSResponseHandler implements ResponseHandler<EbMSDocument>
 				val entity = response.getEntity();
 				if (response.getStatusLine().getStatusCode() == HttpStatusCode.SC_NOCONTENT.getCode() || entity == null || entity.getContentLength() == 0)
 				{
-					messageLogger.info("<<<< statusCode = " + response.getStatusLine().getStatusCode());
+					messageLog.info("<<<< statusCode = " + response.getStatusLine().getStatusCode());
 					return null;
 				}
 				else
@@ -65,7 +65,7 @@ class EbMSResponseHandler implements ResponseHandler<EbMSDocument>
 					{
 						val messageReader = new EbMSMessageReader(getHeaderField(response,"Content-ID"),getHeaderField(response,"Content-Type"));
 						val message = IOUtils.toString(input,getEncoding(entity));
-		      	messageLogger.info("<<<< statusCode = " + response.getStatusLine().getStatusCode() + "\n" + message);
+		      	messageLog.info("<<<< statusCode = " + response.getStatusLine().getStatusCode() + "\n" + message);
 						return messageReader.readResponse(message);
 					}
 				}

@@ -19,8 +19,8 @@ import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import lombok.AccessLevel;
 import lombok.NonNull;
@@ -31,7 +31,7 @@ import nl.clockwork.ebms.Constants;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 class LoggingInputStream extends FilterInputStream
 {
-	transient Log messageLogger = LogFactory.getLog(Constants.MESSAGE_LOG);
+	transient Logger messageLog = LoggerFactory.getLogger(Constants.MESSAGE_LOG);
 	@NonNull
 	StringBuffer sb = new StringBuffer();
 	@NonNull
@@ -52,7 +52,7 @@ class LoggingInputStream extends FilterInputStream
 	public int read() throws IOException
 	{
 		val result = super.read();
-		if (messageLogger.isDebugEnabled() && result != -1)
+		if (messageLog.isDebugEnabled() && result != -1)
 			sb.append(result);
 		return result;
 	}
@@ -61,7 +61,7 @@ class LoggingInputStream extends FilterInputStream
 	public int read(byte[] b) throws IOException
 	{
 		val len = super.read(b);
-		if (messageLogger.isDebugEnabled() && len != -1)
+		if (messageLog.isDebugEnabled() && len != -1)
 			sb.append(new String(b,0,len,charset));
 		return len;
 	}
@@ -70,7 +70,7 @@ class LoggingInputStream extends FilterInputStream
 	public int read(byte[] b, int off, int len) throws IOException
 	{
 		len = super.read(b,off,len);
-		if (messageLogger.isDebugEnabled() && len != -1)
+		if (messageLog.isDebugEnabled() && len != -1)
 			sb.append(new String(b,0,len,charset));
 		return len;
 	}
@@ -78,7 +78,7 @@ class LoggingInputStream extends FilterInputStream
 	@Override
 	public void close() throws IOException
 	{
-		messageLogger.debug("<<<<\n" + sb.toString());
+		messageLog.debug("<<<<\n" + sb.toString());
 		super.close();
 	}
 }

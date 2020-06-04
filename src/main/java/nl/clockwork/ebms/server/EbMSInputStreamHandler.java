@@ -24,8 +24,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -46,7 +46,7 @@ import nl.clockwork.ebms.util.DOMUtils;
 @AllArgsConstructor
 public abstract class EbMSInputStreamHandler
 {
-  transient Log messageLogger = LogFactory.getLog(Constants.MESSAGE_LOG);
+	private static final Logger messageLog = LoggerFactory.getLogger(Constants.MESSAGE_LOG);
   @NonNull
 	EbMSMessageProcessor messageProcessor;
 
@@ -57,33 +57,33 @@ public abstract class EbMSInputStreamHandler
 	  	val soapAction = getRequestHeader("SOAPAction");
 	  	if (!Constants.EBMS_SOAP_ACTION.equals(soapAction))
 	  	{
-				if (messageLogger.isInfoEnabled())
-					messageLogger.info("<<<<\n" + getRequestHeaders() + "\n" + IOUtils.toString(request,Charset.defaultCharset()));
+				if (messageLog.isInfoEnabled())
+					messageLog.info("<<<<\n" + getRequestHeaders() + "\n" + IOUtils.toString(request,Charset.defaultCharset()));
 				throw new EbMSProcessorException("Unable to process message! SOAPAction=" + soapAction);
 	  	}
 //	  	if (log.isDebugEnabled())
 //	  		request = new LoggingInputStream(request);
-	  	if (messageLogger.isDebugEnabled())
+	  	if (messageLog.isDebugEnabled())
 	  	{
 	  		request = new BufferedInputStream(request);
 	  		request.mark(Integer.MAX_VALUE);
-	  		messageLogger.info("<<<<\n" + getRequestHeaders() + "\n" + IOUtils.toString(request,Charset.defaultCharset()));
+	  		messageLog.info("<<<<\n" + getRequestHeaders() + "\n" + IOUtils.toString(request,Charset.defaultCharset()));
 	  		request.reset();
 	  	}
 			val messageReader = new EbMSMessageReader(getRequestHeader("Content-ID"),getRequestHeader("Content-Type"));
 			val in = messageReader.read(request);
-			if (messageLogger.isInfoEnabled() && !messageLogger.isDebugEnabled())
-				messageLogger.info("<<<<\n" + DOMUtils.toString(in.getMessage()));
+			if (messageLog.isInfoEnabled() && !messageLog.isDebugEnabled())
+				messageLog.info("<<<<\n" + DOMUtils.toString(in.getMessage()));
 			val out = messageProcessor.processRequest(in);
 			if (out == null)
 			{
-				messageLogger.info(">>>>\nstatusCode: " + HttpStatusCode.SC_NOCONTENT.getCode());
+				messageLog.info(">>>>\nstatusCode: " + HttpStatusCode.SC_NOCONTENT.getCode());
 				writeResponseStatus(HttpStatusCode.SC_NOCONTENT.getCode());
 			}
 			else
 			{
-				if (messageLogger.isInfoEnabled())
-					messageLogger.info(">>>>\nstatusCode: " + HttpStatusCode.SC_OK.getCode() + "\nContent-Type: text/xml\nSOAPAction: " + Constants.EBMS_SOAP_ACTION + "\n" + DOMUtils.toString(out.getMessage()));
+				if (messageLog.isInfoEnabled())
+					messageLog.info(">>>>\nstatusCode: " + HttpStatusCode.SC_OK.getCode() + "\nContent-Type: text/xml\nSOAPAction: " + Constants.EBMS_SOAP_ACTION + "\n" + DOMUtils.toString(out.getMessage()));
 				writeResponseStatus(HttpStatusCode.SC_OK.getCode());
 				writeResponseHeader("Content-Type","text/xml");
 				writeResponseHeader("SOAPAction",Constants.EBMS_SOAP_ACTION);
@@ -96,8 +96,8 @@ public abstract class EbMSInputStreamHandler
 			try
 			{
 				val soapFault = EbMSMessageUtils.createSOAPFault(e);
-				if (messageLogger.isInfoEnabled())
-					messageLogger.info(">>>>\nstatusCode: " + HttpStatusCode.SC_INTERNAL_SERVER_ERROR.getCode() + "\nContent-Type: text/xml\n" + DOMUtils.toString(soapFault));
+				if (messageLog.isInfoEnabled())
+					messageLog.info(">>>>\nstatusCode: " + HttpStatusCode.SC_INTERNAL_SERVER_ERROR.getCode() + "\nContent-Type: text/xml\n" + DOMUtils.toString(soapFault));
 				log.info("",e);
 				writeResponseStatus(HttpStatusCode.SC_INTERNAL_SERVER_ERROR.getCode());
 				writeResponseHeader("Content-Type","text/xml");

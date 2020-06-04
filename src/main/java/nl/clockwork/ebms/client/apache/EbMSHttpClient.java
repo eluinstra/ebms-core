@@ -45,6 +45,7 @@ import nl.clockwork.ebms.processor.EbMSProcessorException;
 @AllArgsConstructor
 public class EbMSHttpClient implements EbMSClient
 {
+	public static final String WIRE_LOG = "org.apache.http.wire";
 	@NonNull
 	SSLConnectionSocketFactory sslConnectionSocketFactory;
 	int connectTimeout;

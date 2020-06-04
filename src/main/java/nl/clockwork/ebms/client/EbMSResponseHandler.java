@@ -24,8 +24,8 @@ import java.util.List;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
 import org.xml.sax.SAXException;
 
@@ -45,7 +45,7 @@ import nl.clockwork.ebms.processor.EbMSProcessorException;
 @AllArgsConstructor
 class EbMSResponseHandler
 {
-	transient Log messageLogger = LogFactory.getLog(Constants.MESSAGE_LOG);
+	private static final Logger messageLog = LoggerFactory.getLogger(Constants.MESSAGE_LOG);
 	@NonNull
 	HttpURLConnection connection;
 	@NonNull
@@ -168,8 +168,8 @@ class EbMSResponseHandler
 
 	private void logResponse(HttpURLConnection connection, String response) throws IOException
 	{
-		val headers = connection.getResponseCode() + (messageLogger.isDebugEnabled() ? "\n" + HTTPUtils.toString(connection.getHeaderFields()) : "");
-		messageLogger.info("<<<<\nstatusCode: " + headers + (response != null ? "\n" + response : ""));
+		val headers = connection.getResponseCode() + (messageLog.isDebugEnabled() ? "\n" + HTTPUtils.toString(connection.getHeaderFields()) : "");
+		messageLog.info("<<<<\nstatusCode: " + headers + (response != null ? "\n" + response : ""));
 	}
 
 }

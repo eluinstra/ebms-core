@@ -23,8 +23,8 @@ import java.util.UUID;
 
 import javax.xml.transform.TransformerException;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
 
 import lombok.AccessLevel;
@@ -41,7 +41,7 @@ import nl.clockwork.ebms.util.DOMUtils;
 @AllArgsConstructor
 class EbMSMessageWriter
 {
-	transient Log messageLogger = LogFactory.getLog(Constants.MESSAGE_LOG);
+	private static final Logger messageLog = LoggerFactory.getLogger(Constants.MESSAGE_LOG);
 	@NonNull
 	HttpURLConnection connection;
 	
@@ -57,24 +57,24 @@ class EbMSMessageWriter
 	{
 		connection.setRequestProperty("Content-Type","text/xml; charset=UTF-8");
 		connection.setRequestProperty("SOAPAction",Constants.EBMS_SOAP_ACTION);
-		if (messageLogger.isInfoEnabled())
-			messageLogger.info(">>>>\n" + (messageLogger.isDebugEnabled() ? HTTPUtils.toString(connection.getRequestProperties()) + "\n" : "") + DOMUtils.toString(document.getMessage()));
-		//DOMUtils.write(document.getMessage(),messageLogger.isInfoEnabled() ? new LoggingOutputStream(connection.getOutputStream()) : connection.getOutputStream(),"UTF-8");
+		if (messageLog.isInfoEnabled())
+			messageLog.info(">>>>\n" + (messageLog.isDebugEnabled() ? HTTPUtils.toString(connection.getRequestProperties()) + "\n" : "") + DOMUtils.toString(document.getMessage()));
+		//DOMUtils.write(document.getMessage(),messageLog.isInfoEnabled() ? new LoggingOutputStream(connection.getOutputStream()) : connection.getOutputStream(),"UTF-8");
 		DOMUtils.write(document.getMessage(),connection.getOutputStream(),"UTF-8");
 	}
 	
 	protected void writeMimeMessage(EbMSDocument document) throws IOException, TransformerException
 	{
-		if (messageLogger.isInfoEnabled() && !messageLogger.isDebugEnabled())
-			messageLogger.info(">>>>\n" + DOMUtils.toString(document.getMessage()));
+		if (messageLog.isInfoEnabled() && !messageLog.isDebugEnabled())
+			messageLog.info(">>>>\n" + DOMUtils.toString(document.getMessage()));
 		val boundary = createBoundary();
-		String contentType = createContentType(boundary,document.getContentId());
+		val contentType = createContentType(boundary,document.getContentId());
 
 		connection.setRequestProperty("Content-Type",contentType);
 		connection.setRequestProperty("SOAPAction",Constants.EBMS_SOAP_ACTION);
 
 		val requestProperties = connection.getRequestProperties();
-		val outputStream = messageLogger.isDebugEnabled() ? new LoggingOutputStream(requestProperties,connection.getOutputStream()) : connection.getOutputStream();
+		val outputStream = messageLog.isDebugEnabled() ? new LoggingOutputStream(requestProperties,connection.getOutputStream()) : connection.getOutputStream();
 
 		try (val writer = new OutputStreamWriter(outputStream,"UTF-8"))
 		{

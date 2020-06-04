@@ -22,8 +22,6 @@ import java.nio.charset.Charset;
 import javax.xml.transform.TransformerException;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
@@ -31,6 +29,8 @@ import org.apache.http.entity.mime.FormBodyPartBuilder;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.entity.mime.content.InputStreamBody;
 import org.apache.http.entity.mime.content.StringBody;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -45,7 +45,8 @@ import nl.clockwork.ebms.util.DOMUtils;
 @AllArgsConstructor
 class EbMSMessageWriter
 {
-	transient Log messageLogger = LogFactory.getLog(Constants.MESSAGE_LOG);
+	private static final Logger messageLog = LoggerFactory.getLogger(Constants.MESSAGE_LOG);
+	private static final Logger wireLog = LoggerFactory.getLogger(EbMSHttpClient.WIRE_LOG);
 	HttpPost httpPost;
 	boolean chunkedStreamingMode;
 	
@@ -64,8 +65,8 @@ class EbMSMessageWriter
 
 	protected void writeMessage(EbMSDocument document) throws UnsupportedEncodingException, TransformerException
 	{
-		if (messageLogger.isInfoEnabled() && !LogFactory.getLog("org.apache.http.wire").isDebugEnabled())
-			messageLogger.info(">>>>\n" + DOMUtils.toString(document.getMessage()));
+		if (messageLog.isInfoEnabled() && !wireLog.isDebugEnabled())
+			messageLog.info(">>>>\n" + DOMUtils.toString(document.getMessage()));
 		httpPost.setHeader("SOAPAction",Constants.EBMS_SOAP_ACTION);
 		val entity = new StringEntity(DOMUtils.toString(document.getMessage(),"UTF-8"),"UTF-8");
 		entity.setContentType("text/xml");
@@ -75,8 +76,8 @@ class EbMSMessageWriter
 
 	protected void writeMimeMessage(EbMSDocument document) throws IOException, TransformerException
 	{
-		if (messageLogger.isInfoEnabled() && !LogFactory.getLog("org.apache.http.wire").isDebugEnabled())
-			messageLogger.info(">>>>\n" + DOMUtils.toString(document.getMessage()));
+		if (messageLog.isInfoEnabled() && !wireLog.isDebugEnabled())
+			messageLog.info(">>>>\n" + DOMUtils.toString(document.getMessage()));
 		httpPost.setHeader("SOAPAction",Constants.EBMS_SOAP_ACTION);
 		val entity = MultipartEntityBuilder.create();
 		entity.setContentType(ContentType.create("multipart/related"));
@@ -106,5 +107,4 @@ class EbMSMessageWriter
 		formBodyPartBuilder.addField("Content-ID",attachment.getContentId());
 		entity.addPart(formBodyPartBuilder.build());
 	}
-
 }

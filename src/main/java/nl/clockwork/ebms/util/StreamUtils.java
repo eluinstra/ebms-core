@@ -40,5 +40,4 @@ public class StreamUtils
 	{
 		return new IllegalStateException(message + ": " + Stream.of(elements).map(o -> o.toString()).collect(Collectors.joining(",")));
 	}
-
 }
