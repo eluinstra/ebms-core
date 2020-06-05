@@ -20,9 +20,10 @@ import java.time.Instant;
 import javax.xml.bind.JAXBException;
 import javax.xml.datatype.DatatypeConfigurationException;
 
-import org.javatuples.Pair;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageStatusType;
 
+import io.vavr.Tuple;
+import io.vavr.Tuple2;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -65,7 +66,7 @@ class StatusResponseProcessor
 	{
 		val mc = ebMSDAO.getMessageContext(statusRequest.getStatusRequest().getRefToMessageId()).orElse(null);
 		val result = createEbMSMessageStatusAndTimestamp(statusRequest,mc);
-		return ebMSMessageFactory.createEbMSStatusResponse(statusRequest,result.getValue0(),result.getValue1()); 
+		return ebMSMessageFactory.createEbMSStatusResponse(statusRequest,result._1,result._2); 
 	}
 	
   public void sendStatusResponse(final nl.clockwork.ebms.model.EbMSStatusResponse statusResponse)
@@ -95,12 +96,12 @@ class StatusResponseProcessor
 		}
 	}
 
-	private Pair<EbMSMessageStatus,Instant> createEbMSMessageStatusAndTimestamp(EbMSStatusRequest statusRequest, EbMSMessageContext messageContext)
+	private Tuple2<EbMSMessageStatus,Instant> createEbMSMessageStatusAndTimestamp(EbMSStatusRequest statusRequest, EbMSMessageContext messageContext)
 	{
 		if (messageContext == null || EbMSAction.EBMS_SERVICE_URI.equals(messageContext.getService()))
-			return new Pair<EbMSMessageStatus,Instant>(EbMSMessageStatus.NOT_RECOGNIZED,null);
+			return Tuple.of(EbMSMessageStatus.NOT_RECOGNIZED,null);
 		else if (!messageContext.getCpaId().equals(statusRequest.getMessageHeader().getCPAId()))
-			return new Pair<EbMSMessageStatus,Instant>(EbMSMessageStatus.UNAUTHORIZED,null);
+			return Tuple.of(EbMSMessageStatus.UNAUTHORIZED,null);
 		else
 		{
 			return ebMSDAO.getMessageStatus(statusRequest.getStatusRequest().getRefToMessageId())
@@ -109,14 +110,14 @@ class StatusResponseProcessor
 		}
 	}
 
-	private Pair<EbMSMessageStatus,Instant> mapEbMSMessageStatusAndTimestamp(EbMSMessageStatus status, Instant timestamp)
+	private Tuple2<EbMSMessageStatus,Instant> mapEbMSMessageStatusAndTimestamp(EbMSMessageStatus status, Instant timestamp)
 	{
 		if (status != null
 				&& (MessageStatusType.RECEIVED.equals(status.getStatusCode())
 						|| MessageStatusType.PROCESSED.equals(status.getStatusCode())
 						|| MessageStatusType.FORWARDED.equals(status.getStatusCode())))
-			return new Pair<EbMSMessageStatus,Instant>(status,timestamp);
+			return Tuple.of(status,timestamp);
 		else
-			return new Pair<EbMSMessageStatus,Instant>(EbMSMessageStatus.NOT_RECOGNIZED,null);
+			return Tuple.of(EbMSMessageStatus.NOT_RECOGNIZED,null);
 	}
 }
