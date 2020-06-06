@@ -36,21 +36,25 @@ public abstract class AbstractDAOFactory<T> implements FactoryBean<T>
 	@Override
 	public T getObject() throws Exception
 	{
-		if ("org.hsqldb.jdbcDriver".equals(((ComboPooledDataSource)dataSource).getDriverClass()))
-			return createHSqlDbDAO();
-		else if ("com.mysql.jdbc.Driver".equals(((ComboPooledDataSource)dataSource).getDriverClass()))
-			return createMySqlDAO();
-		else if ("org.mariadb.jdbc.Driver".equals(((ComboPooledDataSource)dataSource).getDriverClass()))
-			return createMySqlDAO();
-		else if ("org.postgresql.Driver".equals(((ComboPooledDataSource)dataSource).getDriverClass()))
-			return createPostgresDAO();
-		else if ("oracle.jdbc.OracleDriver".equals(((ComboPooledDataSource)dataSource).getDriverClass()))
-			return createOracleDAO();
-		else if ("com.microsoft.sqlserver.jdbc.SQLServerDriver".equals(((ComboPooledDataSource)dataSource).getDriverClass()))
-			return createMsSqlDAO();
-		else if ("com.ibm.db2.jcc.DB2Driver".equals(((ComboPooledDataSource)dataSource).getDriverClass()))
-			return createDB2DAO();
-		throw new RuntimeException("SQL Driver " + ((ComboPooledDataSource)dataSource).getDriverClass() + " not recognized!");
+		switch (((ComboPooledDataSource)dataSource).getDriverClass())
+		{
+			case "org.hsqldb.jdbcDriver":
+				return createHSqlDbDAO();
+			case "com.mysql.jdbc.Driver":
+				return createMySqlDAO();
+			case "org.mariadb.jdbc.Driver":
+				return createMySqlDAO();
+			case "org.postgresql.Driver":
+				return createPostgresDAO();
+			case "oracle.jdbc.OracleDriver":
+				return createOracleDAO();
+			case "com.microsoft.sqlserver.jdbc.SQLServerDriver":
+				return createMsSqlDAO();
+			case "com.ibm.db2.jcc.DB2Driver":
+				return createDB2DAO();
+			default:
+				throw new RuntimeException("SQL Driver " + ((ComboPooledDataSource)dataSource).getDriverClass() + " not recognized!");
+		}
 	}
 
 	@Override

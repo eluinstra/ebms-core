@@ -57,6 +57,8 @@ import org.xmlsoap.schemas.soap.envelope.Envelope;
 import org.xmlsoap.schemas.soap.envelope.Fault;
 import org.xmlsoap.schemas.soap.envelope.Header;
 
+import static io.vavr.API.*;
+import static io.vavr.Predicates.*;
 import lombok.val;
 import nl.clockwork.ebms.cpa.CPAUtils;
 import nl.clockwork.ebms.jaxb.EbMSNamespaceMapper;
@@ -107,28 +109,23 @@ public class EbMSMessageUtils
 	}
 
 	@SuppressWarnings("unchecked")
-	private static void setEbMSMessageBuilder(EbMSMessageBuilder result, Object e)
+	private static void setEbMSMessageBuilder(EbMSMessageBuilder result, Object o)
 	{
-		if (e instanceof MessageHeader)
-			result.messageHeader((MessageHeader)e);
-		else if (e instanceof SyncReply)
-			result.syncReply((SyncReply)e);
-		else if (e instanceof MessageOrder)
-			result.messageOrder((MessageOrder)e);
-		else if (e instanceof AckRequested)
-			result.ackRequested((AckRequested)e);
-		else if (e instanceof ErrorList)
-			result.errorList((ErrorList)e);
-		else if (e instanceof Acknowledgment)
-			result.acknowledgment((Acknowledgment)e);
-		if (e instanceof Manifest)
-			result.manifest((Manifest)e);
-		else if (e instanceof StatusRequest)
-			result.statusRequest((StatusRequest)e);
-		else if (e instanceof StatusResponse)
-			result.statusResponse((StatusResponse)e);
-		else if (e instanceof JAXBElement && ((JAXBElement<?>)e).getValue() instanceof SignatureType)
-			result.signature(((JAXBElement<SignatureType>)e).getValue());
+		Match(o).of(
+				Case($(instanceOf(MessageHeader.class)),i -> result.messageHeader(i)),
+				Case($(instanceOf(SyncReply.class)),i -> result.syncReply(i)),
+				Case($(instanceOf(MessageOrder.class)),i -> result.messageOrder(i)),
+				Case($(instanceOf(AckRequested.class)),i -> result.ackRequested(i)),
+				Case($(instanceOf(ErrorList.class)),i -> result.errorList((ErrorList)i)),
+				Case($(instanceOf(Acknowledgment.class)),i -> result.acknowledgment(i)),
+				Case($(instanceOf(Manifest.class)),i -> result.manifest(i)),
+				Case($(instanceOf(StatusRequest.class)),i -> result.statusRequest(i)),
+				Case($(instanceOf(StatusResponse.class)),i -> result.statusResponse(i)),
+				Case($(instanceOf(JAXBElement.class)),i -> run(() ->
+				{
+					if (((JAXBElement<?>)i).getValue() instanceof SignatureType)
+						result.signature(((JAXBElement<SignatureType>)i).getValue());
+				})));
 	}
 
 	public static String toString(PartyId partyId)

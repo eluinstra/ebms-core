@@ -109,7 +109,7 @@ public class SigningTest
 		val document = EbMSMessageUtils.getEbMSDocument(message);
 		signatureGenerator.generate(document,message);
 		changeConversationId(document);
-		assertThrows(ValidationException.class,()->signatureValidator.validate(document,message));
+		assertThrows(ValidationException.class,() -> signatureValidator.validate(document,message));
 	}
 
 	@Test
@@ -120,7 +120,7 @@ public class SigningTest
 		signatureGenerator.generate(document,message);
 		message.getAttachments().clear();
 		message.getAttachments().addAll(createAttachments(message.getMessageHeader().getMessageData().getMessageId()));
-		assertThrows(ValidationException.class,()->signatureValidator.validate(document,message));
+		assertThrows(ValidationException.class,() -> signatureValidator.validate(document,message));
 	}
 
 	private void changeConversationId(EbMSDocument message)

@@ -106,7 +106,7 @@ public class EncryptionTest
 		val message = createMessage();
 		messageEncrypter.encrypt(message);
 		changeAttachment(message);
-		assertThrows(EbMSValidationException.class,()->messageDecrypter.decrypt(message));
+		assertThrows(EbMSValidationException.class,() -> messageDecrypter.decrypt(message));
 	}
 
 	@Test
@@ -115,7 +115,7 @@ public class EncryptionTest
 		val message = createMessage();
 		messageEncrypter.encrypt(message);
 		changeAttachment1(message);
-		assertThrows(EbMSValidationException.class,()->messageDecrypter.decrypt(message));
+		assertThrows(EbMSValidationException.class,() -> messageDecrypter.decrypt(message));
 	}
 
 	@Test
@@ -125,7 +125,7 @@ public class EncryptionTest
 		messageEncrypter.encrypt(message);
 		message.getAttachments().clear();
 		message.getAttachments().addAll(createAttachments(message.getMessageHeader().getMessageData().getMessageId()));
-		assertThrows(EbMSValidationException.class,()->messageDecrypter.decrypt(message));
+		assertThrows(EbMSValidationException.class,() -> messageDecrypter.decrypt(message));
 	}
 
 	private void changeAttachment(EbMSMessage message) throws ParserConfigurationException, SAXException, IOException, TransformerException

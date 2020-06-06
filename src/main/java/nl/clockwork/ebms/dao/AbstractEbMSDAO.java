@@ -632,6 +632,14 @@ abstract class AbstractEbMSDAO implements EbMSDAO, CPADAO, URLMappingDAO, Certif
 		{
 			val dataSources = new ArrayList<EbMSDataSource>();
 			val attachments = getAttachments(messageId);
+//			val dataSources = attachments.stream()
+//					.map(a -> EbMSDataSource.builder()
+//						.name(a.getName())
+//						.contentId(a.getContentId())
+//						.contentType(a.getContentType())
+//						.content(IOUtils.toByteArray(a.getInputStream()))
+//						.build())
+//					.collect(Collectors.toList());
 			for (val attachment: attachments)
 				dataSources.add(EbMSDataSource.builder()
 						.name(attachment.getName())

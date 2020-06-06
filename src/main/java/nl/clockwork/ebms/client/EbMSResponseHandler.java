@@ -57,24 +57,25 @@ class EbMSResponseHandler
 	{
 		try
 		{
-			if (connection.getResponseCode() / 100 == 2)
+			switch(connection.getResponseCode() / 100)
 			{
-				if (connection.getResponseCode() == HttpStatusCode.SC_NOCONTENT.getCode() || connection.getContentLength() == 0)
-				{
+				case 2:
+					if (connection.getResponseCode() == HttpStatusCode.SC_NOCONTENT.getCode() || connection.getContentLength() == 0)
+					{
+						logResponse(connection);
+						return null;
+					}
+					else
+						return readSuccesResponse(connection);
+				case 1:
+				case 3:
+				case 4:
+					throw createRecoverableErrorException(connection);
+				case 5:
+					throw createUnrecoverableErrorException(connection);
+				default:
 					logResponse(connection);
-					return null;
-				}
-				else
-					return readSuccesResponse(connection);
-			}
-			else if (connection.getResponseCode() / 100 == 1 || connection.getResponseCode() / 100 == 3 || connection.getResponseCode() / 100 == 4)
-				throw createRecoverableErrorException(connection);
-			else if (connection.getResponseCode() / 100 == 5)
-				throw createUnrecoverableErrorException(connection);
-			else
-			{
-				logResponse(connection);
-				throw new EbMSUnrecoverableResponseException(connection.getResponseCode(),connection.getHeaderFields());
+					throw new EbMSUnrecoverableResponseException(connection.getResponseCode(),connection.getHeaderFields());
 			}
 		}
 		catch (IOException e)

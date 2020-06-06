@@ -15,18 +15,18 @@
  */
 package nl.clockwork.ebms.jaxb;
 
+import static io.vavr.API.*;
+
 public class EbMSNamespaceMapper extends com.sun.xml.bind.marshaller.NamespacePrefixMapper
 {
 	@Override
 	public String getPreferredPrefix(String namespaceUri, String suggestion, boolean requirePrefix)
 	{
-		if ("http://schemas.xmlsoap.org/soap/envelope/".equals(namespaceUri))
-			return "soap";
-		else if ("http://www.w3.org/1999/xlink".equals(namespaceUri))
-			return "xlink";
-		else if ("http://www.oasis-open.org/committees/ebxml-msg/schema/msg-header-2_0.xsd".equals(namespaceUri))
-			return "eb";
-		return suggestion;
+		return Match(namespaceUri).of(
+				Case($("http://schemas.xmlsoap.org/soap/envelope/"),"soap"),
+				Case($("http://www.w3.org/1999/xlink"),"xlink"),
+				Case($("http://www.oasis-open.org/committees/ebxml-msg/schema/msg-header-2_0.xsd"),"eb"),
+				Case($(),suggestion));
 	}
 	
 	@Override

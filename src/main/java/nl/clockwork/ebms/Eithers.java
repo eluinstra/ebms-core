@@ -1,6 +1,7 @@
 package nl.clockwork.ebms;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Spliterator;
 import java.util.Spliterators.AbstractSpliterator;
@@ -12,10 +13,11 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
+import io.vavr.collection.Seq;
 import io.vavr.control.Either;
 import lombok.val;
 
-public class Streams
+public class Eithers
 {
 	private static class EitherSpliterator<E,T> extends AbstractSpliterator<Either<E,T>>
 	{
@@ -43,7 +45,7 @@ public class Streams
 		}
 	}
 
-	public static <E,T> Either<E,List<T>> reduce(Stream<Either<E,T>> stream)
+	public static <E,T> Either<E,List<T>> sequenceRight(Stream<Either<E,T>> stream)
 	{
 		val identity = Either.<E,List<T>>right(new ArrayList<T>());
 		BiFunction<Either<E,List<T>>,Either<E,T>,Either<E,List<T>>> accumulator = (e,item) -> 
@@ -68,5 +70,53 @@ public class Streams
 		//return stream.reduce(identity,accumulator,combiner);
 		val spliterator = new EitherSpliterator<E,T>(stream.spliterator(),e -> e.isRight());
 		return StreamSupport.stream(spliterator,false).reduce(identity,accumulator,combiner);
+	}
+
+	public static void main(String[] args) throws Exception
+	{
+		{
+			List<Either<Exception,Integer>> input = Arrays.asList(
+					Either.<Exception,Integer>right(1),
+					Either.<Exception,Integer>right(2));
+			//Either<Exception,List<Integer>> result = reduce(r.stream());
+			val result = sequenceRight(input.stream().peek(i -> System.out.println(i)));
+			System.out.println(result.getOrElseThrow(e -> e));
+		}
+		System.out.println();
+		{
+			List<Either<Exception,Integer>> input = Arrays.asList(
+					Either.<Exception,Integer>right(1),
+					Either.<Exception,Integer>right(2));
+			val result = Either.sequenceRight(input);
+			System.out.println(result.getOrElseThrow(e -> e).asJava());
+		}
+		System.out.println();
+		try
+		{
+			List<Either<Exception,Integer>> input = Arrays.asList(
+					Either.<Exception,Integer>right(1),
+					Either.<Exception,Integer>left(new Exception("An error occurred!")),
+					Either.<Exception,Integer>right(2));
+			val result = sequenceRight(input.stream().peek(i -> System.out.println(i)));
+			System.out.println(result.getOrElseThrow(e -> e));
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
+		System.out.println();
+		try
+		{
+			List<Either<Exception,Integer>> input = Arrays.asList(
+					Either.<Exception,Integer>right(1),
+					Either.<Exception,Integer>left(new Exception("An error occurred!")),
+					Either.<Exception,Integer>right(2));
+			Either<Exception,Seq<Integer>> sequenceRight = Either.sequenceRight(input);
+			System.out.println(sequenceRight.getOrElseThrow(e -> e));
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
 	}
 }

@@ -82,7 +82,7 @@ public class DAOFactoryTest
 	public void testUnknown() throws Exception
 	{
 		ds.setDriverClass("none");
-		assertThrows(RuntimeException.class,()->daoFactory.getObject());
+		assertThrows(RuntimeException.class,() -> daoFactory.getObject());
 	}
 
 	@Test

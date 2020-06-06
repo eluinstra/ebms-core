@@ -29,6 +29,7 @@ import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.StatusResponse;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.SyncReply;
 import org.w3._2000._09.xmldsig.SignatureType;
 
+import static io.vavr.API.*;
 import lombok.NonNull;
 import nl.clockwork.ebms.cpa.CPAUtils;
 import nl.clockwork.ebms.model.EbMSAcknowledgment;
@@ -148,20 +149,15 @@ public class EbMSMessageBuilder
 						.manifest(manifest)
 						.attachments(attachments$value)
 						.build();
-			else if (EbMSAction.MESSAGE_ERROR.getAction().equals(messageHeader.getAction()))
-				return new EbMSMessageError(messageHeader,signature,errorList);
-			else if (EbMSAction.ACKNOWLEDGMENT.getAction().equals(messageHeader.getAction()))
-				return new EbMSAcknowledgment(messageHeader,signature,acknowledgment);
-			else if (EbMSAction.STATUS_REQUEST.getAction().equals(messageHeader.getAction()))
-				return new EbMSStatusRequest(messageHeader,signature,syncReply,statusRequest);
-			else if (EbMSAction.STATUS_RESPONSE.getAction().equals(messageHeader.getAction()))
-				return new EbMSStatusResponse(messageHeader,signature,statusResponse);
-			else if (EbMSAction.PING.getAction().equals(messageHeader.getAction()))
-				return new EbMSPing(messageHeader,signature,syncReply);
-			else if (EbMSAction.PONG.getAction().equals(messageHeader.getAction()))
-				return new EbMSPong(messageHeader,signature);
 			else
-				throw new EbMSProcessingException("Unable to build message from service " + CPAUtils.toString(messageHeader.getService()) + " and action " + messageHeader.getAction());
+				return Match(messageHeader.getAction()).of(
+						Case($(EbMSAction.MESSAGE_ERROR.getAction()),o -> new EbMSMessageError(messageHeader,signature,errorList)),
+						Case($(EbMSAction.ACKNOWLEDGMENT.getAction()),o -> new EbMSAcknowledgment(messageHeader,signature,acknowledgment)),
+						Case($(EbMSAction.STATUS_REQUEST.getAction()),o -> new EbMSStatusRequest(messageHeader,signature,syncReply,statusRequest)),
+						Case($(EbMSAction.STATUS_RESPONSE.getAction()),o -> new EbMSStatusResponse(messageHeader,signature,statusResponse)),
+						Case($(EbMSAction.PING.getAction()),o -> new EbMSPing(messageHeader,signature,syncReply)),
+						Case($(EbMSAction.PONG.getAction()),o -> new EbMSPong(messageHeader,signature)),
+						Case($(),o -> {throw new EbMSProcessingException("Unable to build message from service " + CPAUtils.toString(messageHeader.getService()) + " and action " + messageHeader.getAction());}));
 		}
 		catch (EbMSProcessingException e)
 		{

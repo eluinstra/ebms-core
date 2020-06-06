@@ -15,6 +15,11 @@
  */
 package nl.clockwork.ebms.jms;
 
+import static io.vavr.API.$;
+import static io.vavr.API.Case;
+import static io.vavr.API.Match;
+import static nl.clockwork.ebms.Predicates.startsWith;
+
 import java.io.IOException;
 
 import org.apache.activemq.xbean.BrokerFactoryBean;
@@ -39,11 +44,9 @@ public class EbMSBrokerFactoryBean extends BrokerFactoryBean implements Disposab
 
 	private static Resource createResource(String path) throws IOException
 	{
-		if (path.startsWith("classpath:"))
-			return new ClassPathResource(path.substring("classpath:".length()));
-		else if (path.startsWith("file:"))
-			return new FileSystemResource(path.substring("file:".length()));
-		else
-			return new FileSystemResource(path);
+		return Match(path).of(
+				Case($(startsWith("classpath:")),new ClassPathResource(path.substring("classpath:".length()))),
+				Case($(startsWith("file:")),new FileSystemResource(path.substring("file:".length()))),
+				Case($(),new FileSystemResource(path)));
 	}
 }
