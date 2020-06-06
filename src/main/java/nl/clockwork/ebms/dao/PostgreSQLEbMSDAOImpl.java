@@ -115,19 +115,15 @@ class PostgreSQLEbMSDAOImpl extends AbstractEbMSDAO
 			" where message_id = ?" +
 			" and message_nr = 0" +
 			" order by order_nr",
-			new RowMapper<EbMSAttachment>()
+			(RowMapper<EbMSAttachment>)(rs,rowNum) ->
 			{
-				@Override
-				public EbMSAttachment mapRow(ResultSet rs, int rowNum) throws SQLException
+				try
 				{
-					try
-					{
-						return EbMSAttachmentFactory.createCachedEbMSAttachment(rs.getString("name"),rs.getString("content_id"),rs.getString("content_type"),rs.getBinaryStream("content"));
-					}
-					catch (IOException e)
-					{
-						throw new EbMSProcessingException(e);
-					}
+					return EbMSAttachmentFactory.createCachedEbMSAttachment(rs.getString("name"),rs.getString("content_id"),rs.getString("content_type"),rs.getBinaryStream("content"));
+				}
+				catch (IOException e)
+				{
+					throw new EbMSProcessingException(e);
 				}
 			},
 			messageId

@@ -110,7 +110,6 @@ abstract class AbstractEbMSDAO implements EbMSDAO, CPADAO, URLMappingDAO, Certif
 				" message_id," +
 				" ref_to_message_id," +
 				" status";
-		EbMSDAO ebMSDAO;
 
 		@Override
 		public EbMSMessageContext mapRow(ResultSet rs, int rowNum) throws SQLException
@@ -121,7 +120,7 @@ abstract class AbstractEbMSDAO implements EbMSDAO, CPADAO, URLMappingDAO, Certif
 					.toParty(new Party(rs.getString("to_party_id"),rs.getString("to_role")))
 					.service(rs.getString("service"))
 					.action(rs.getString("action"))
-					.timestamp(ebMSDAO.toInstant(rs.getTimestamp("time_stamp")))
+					.timestamp(EbMSDAO.toInstant(rs.getTimestamp("time_stamp")))
 					.conversationId(rs.getString("conversation_id"))
 					.messageId(rs.getString("message_id"))
 					.refToMessageId(rs.getString("ref_to_message_id"))
@@ -129,41 +128,28 @@ abstract class AbstractEbMSDAO implements EbMSDAO, CPADAO, URLMappingDAO, Certif
 					.build();
 		}
 	}
-	@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-	@AllArgsConstructor
-	private static class EbMSEventRowMapper implements RowMapper<EbMSEvent>
-	{
-		public static final String SELECT = "select cpa_id, send_channel_id, receive_channel_id, message_id, time_to_live, time_stamp, is_confidential, retries";
-		EbMSDAO ebMSDAO;
-
-		@Override
-		public EbMSEvent mapRow(ResultSet rs, int rowNum) throws SQLException
-		{
-			return EbMSEvent.builder()
-					.cpaId(rs.getString("cpa_id"))
-					.sendDeliveryChannelId(rs.getString("send_channel_id"))
-					.receiveDeliveryChannelId(rs.getString("receive_channel_id"))
-					.messageId(rs.getString("message_id"))
-					.timeToLive(ebMSDAO.toInstant(rs.getTimestamp("time_to_live")))
-					.timestamp(ebMSDAO.toInstant(rs.getTimestamp("time_stamp")))
-					.confidential(rs.getBoolean("is_confidential"))
-					.retries(rs.getInt("retries"))
-					.build();
-		}
-	}
-	public static class EbMSMessageEventRowMapper implements RowMapper<EbMSMessageEvent>
-	{
-		@Override
-		public EbMSMessageEvent mapRow(ResultSet rs, int nr) throws SQLException
-		{
-			return new EbMSMessageEvent(rs.getString("message_id"),EbMSMessageEventType.values()[rs.getInt("event_type")]);
-		}
-	}
-
 	@NonNull
 	TransactionTemplate transactionTemplate;
 	@NonNull
 	JdbcTemplate jdbcTemplate;
+	RowMapper<EbMSEvent> ebMSEventRowMapper = (RowMapper<EbMSEvent>)(rs,rowNum) ->
+	{
+		return EbMSEvent.builder()
+				.cpaId(rs.getString("cpa_id"))
+				.sendDeliveryChannelId(rs.getString("send_channel_id"))
+				.receiveDeliveryChannelId(rs.getString("receive_channel_id"))
+				.messageId(rs.getString("message_id"))
+				.timeToLive(EbMSDAO.toInstant(rs.getTimestamp("time_to_live")))
+				.timestamp(EbMSDAO.toInstant(rs.getTimestamp("time_stamp")))
+				.confidential(rs.getBoolean("is_confidential"))
+				.retries(rs.getInt("retries"))
+				.build();
+	};
+	RowMapper<EbMSMessageEvent> ebMSMessageEventRowMapper = (RowMapper<EbMSMessageEvent>)(rs,rowNum) ->
+	{
+		return new EbMSMessageEvent(rs.getString("message_id"),EbMSMessageEventType.values()[rs.getInt("event_type")]);
+	};
+
 	
 	@Override
 	public void executeTransaction(final DAOTransactionCallback callback) throws DAOException
@@ -359,13 +345,9 @@ abstract class AbstractEbMSDAO implements EbMSDAO, CPADAO, URLMappingDAO, Certif
 				"select source, destination" +
 				" from url_mapping" +
 				" order by source asc",
-				new RowMapper<URLMapping>()
+				(RowMapper<URLMapping>)(rs,rowNum) ->
 				{
-					@Override
-					public URLMapping mapRow(ResultSet rs, int nr) throws SQLException
-					{
-						return new URLMapping(rs.getString("source"),rs.getString("destination"));
-					}
+					return new URLMapping(rs.getString("source"),rs.getString("destination"));
 				}
 			);
 		}
@@ -466,20 +448,16 @@ abstract class AbstractEbMSDAO implements EbMSDAO, CPADAO, URLMappingDAO, Certif
 				" from certificate_mapping" +
 				" where id = ?" +
 				" and (cpa_id = ? or (cpa_id is null and ? is null))",
-				new RowMapper<X509Certificate>()
+				(RowMapper<X509Certificate>)(rs,rowNum) ->
 				{
-					@Override
-					public X509Certificate mapRow(ResultSet rs, int rowNum) throws SQLException
+					try
 					{
-						try
-						{
-							CertificateFactory certificateFactory = CertificateFactory.getInstance("X509");
-							return (X509Certificate)certificateFactory.generateCertificate(rs.getBinaryStream("source"));
-						}
-						catch (CertificateException e)
-						{
-							throw new SQLException(e);
-						}
+						CertificateFactory certificateFactory = CertificateFactory.getInstance("X509");
+						return (X509Certificate)certificateFactory.generateCertificate(rs.getBinaryStream("source"));
+					}
+					catch (CertificateException e)
+					{
+						throw new SQLException(e);
 					}
 				},
 				id,
@@ -505,23 +483,19 @@ abstract class AbstractEbMSDAO implements EbMSDAO, CPADAO, URLMappingDAO, Certif
 			return jdbcTemplate.query(
 				"select source, destination, cpa_id" +
 				" from certificate_mapping",
-				new RowMapper<CertificateMapping>()
+				(RowMapper<CertificateMapping>)(rs,rowNum) ->
 				{
-					@Override
-					public CertificateMapping mapRow(ResultSet rs, int nr) throws SQLException
+					try
 					{
-						try
-						{
-							val certificateFactory = CertificateFactory.getInstance("X509");
-							val source = (X509Certificate)certificateFactory.generateCertificate(rs.getBinaryStream("source"));
-							val destination = (X509Certificate)certificateFactory.generateCertificate(rs.getBinaryStream("destination"));
-							val cpaId = rs.getString("cpa_id");
-							return new CertificateMapping(source,destination,cpaId);
-						}
-						catch (CertificateException e)
-						{
-							throw new SQLException(e);
-						}
+						val certificateFactory = CertificateFactory.getInstance("X509");
+						val source = (X509Certificate)certificateFactory.generateCertificate(rs.getBinaryStream("source"));
+						val destination = (X509Certificate)certificateFactory.generateCertificate(rs.getBinaryStream("destination"));
+						val cpaId = rs.getString("cpa_id");
+						return new CertificateMapping(source,destination,cpaId);
+					}
+					catch (CertificateException e)
+					{
+						throw new SQLException(e);
 					}
 				}
 			);
@@ -702,7 +676,7 @@ abstract class AbstractEbMSDAO implements EbMSDAO, CPADAO, URLMappingDAO, Certif
 				" from ebms_message" + 
 				" where message_id = ?" +
 				" and message_nr = 0",
-				new EbMSMessageContextRowMapper(this),
+				new EbMSMessageContextRowMapper(),
 				messageId
 			));
 		}
@@ -730,7 +704,7 @@ abstract class AbstractEbMSDAO implements EbMSDAO, CPADAO, URLMappingDAO, Certif
 				" and message_nr = 0" +
 				(actions.length == 0 ? "" : " and service = '" + EbMSAction.EBMS_SERVICE_URI + "'") +
 				(actions.length == 0 ? "" : " and action in ('" + StringUtils.join(actions,"','") + "')"),
-				new EbMSMessageContextRowMapper(this),
+				new EbMSMessageContextRowMapper(),
 				cpaId,
 				refToMessageId
 			));
@@ -813,22 +787,18 @@ abstract class AbstractEbMSDAO implements EbMSDAO, CPADAO, URLMappingDAO, Certif
 				" and message_nr = 0" +
 				(actions.length == 0 ? "" : " and service = '" + EbMSAction.EBMS_SERVICE_URI + "'") +
 				(actions.length == 0 ? "" : " and action in ('" + StringUtils.join(actions,"','") + "')"),
-				new RowMapper<EbMSDocument>()
+				(RowMapper<EbMSDocument>)(rs,rowNum) ->
 				{
-					@Override
-					public EbMSDocument mapRow(ResultSet rs, int rowNum) throws SQLException
+					try
 					{
-						try
-						{
-							return EbMSDocument.builder()
-									.contentId(rs.getString("message_id"))
-									.message(DOMUtils.read(rs.getString("content")))
-									.build();
-						}
-						catch (ParserConfigurationException | SAXException | IOException e)
-						{
-							throw new SQLException(e);
-						}
+						return EbMSDocument.builder()
+								.contentId(rs.getString("message_id"))
+								.message(DOMUtils.read(rs.getString("content")))
+								.build();
+					}
+					catch (ParserConfigurationException | SAXException | IOException e)
+					{
+						throw new SQLException(e);
 					}
 				},
 				cpaId,
@@ -861,13 +831,9 @@ abstract class AbstractEbMSDAO implements EbMSDAO, CPADAO, URLMappingDAO, Certif
 					" from ebms_message" +
 					" where message_id = ?" +
 					" and message_nr = 0",
-					new RowMapper<Integer>()
+					(RowMapper<Integer>)(rs,rowNum) ->
 					{
-						@Override
-						public Integer mapRow(ResultSet rs, int rowNum) throws SQLException
-						{
-							return rs.getObject("status",Integer.class);
-						}
+						return rs.getObject("status",Integer.class);
 					},
 					messageId
 				)
@@ -893,13 +859,9 @@ abstract class AbstractEbMSDAO implements EbMSDAO, CPADAO, URLMappingDAO, Certif
 					" from ebms_message" +
 					" where message_id = ?" +
 					" and message_nr = 0",
-					new RowMapper<EbMSAction>()
+					(RowMapper<EbMSAction>)(rs,rowNum) ->
 					{
-						@Override
-						public EbMSAction mapRow(ResultSet rs, int rowNum) throws SQLException
-						{
-							return EbMSAction.get(rs.getString("action"));
-						}
+						return EbMSAction.get(rs.getString("action"));
 					},
 					messageId
 				));
@@ -917,7 +879,7 @@ abstract class AbstractEbMSDAO implements EbMSDAO, CPADAO, URLMappingDAO, Certif
 	@Override
 	public Optional<Instant> getPersistTime(String messageId)
 	{
-		return Optional.ofNullable(toInstant(jdbcTemplate.queryForObject("select persist_time from ebms_message where message_id = ? and message_nr = 0",Timestamp.class,messageId)));
+		return Optional.ofNullable(EbMSDAO.toInstant(jdbcTemplate.queryForObject("select persist_time from ebms_message where message_id = ? and message_nr = 0",Timestamp.class,messageId)));
 	}
 
 	@Override
@@ -1228,13 +1190,13 @@ abstract class AbstractEbMSDAO implements EbMSDAO, CPADAO, URLMappingDAO, Certif
 		try
 		{
 			return jdbcTemplate.query(
-				EbMSEventRowMapper.SELECT +
+				"select *" +
 				" from ebms_event" +
 				" where time_stamp <= ?" +
 				(serverId == null ? " and server_id is null" : " and server_id = '" + serverId + "'") +
 				//" and (server_id = ? or (server_id is null and ? is null))" +
 				" order by time_stamp asc",
-				new EbMSEventRowMapper(this),
+				ebMSEventRowMapper,
 				Timestamp.from(timestamp)
 			);
 		}
@@ -1253,7 +1215,7 @@ abstract class AbstractEbMSDAO implements EbMSDAO, CPADAO, URLMappingDAO, Certif
 		{
 			return jdbcTemplate.query(
 				getEventsBeforeQuery(serverId,maxNr),
-				new EbMSEventRowMapper(this),
+				ebMSEventRowMapper,
 				Timestamp.from(timestamp)
 			);
 		}
@@ -1385,7 +1347,7 @@ abstract class AbstractEbMSDAO implements EbMSDAO, CPADAO, URLMappingDAO, Certif
 				getMessageContextFilter(messageContext,parameters) +
 				" order by ebms_message.time_stamp asc",
 				parameters.toArray(new Object[0]),
-				new EbMSMessageEventRowMapper()
+				ebMSMessageEventRowMapper
 			);
 		}
 		catch (DataAccessException e)
@@ -1406,7 +1368,7 @@ abstract class AbstractEbMSDAO implements EbMSDAO, CPADAO, URLMappingDAO, Certif
 			return jdbcTemplate.query(
 				getMessageEventsQuery(messageContextFilter,types,maxNr),
 				parameters.toArray(new Object[0]),
-				new EbMSMessageEventRowMapper()
+				ebMSMessageEventRowMapper
 			);
 		}
 		catch (DataAccessException e)
@@ -1465,19 +1427,15 @@ abstract class AbstractEbMSDAO implements EbMSDAO, CPADAO, URLMappingDAO, Certif
 			" where message_id = ?" +
 			" and message_nr = 0" +
 			" order by order_nr",
-			new RowMapper<EbMSAttachment>()
+			(RowMapper<EbMSAttachment>)(rs,rowNum) ->
 			{
-				@Override
-				public EbMSAttachment mapRow(ResultSet rs, int rowNum) throws SQLException
+				try
 				{
-					try
-					{
-						return EbMSAttachmentFactory.createCachedEbMSAttachment(rs.getString("name"),rs.getString("content_id"),rs.getString("content_type"),rs.getBinaryStream("content"));
-					}
-					catch (IOException e)
-					{
-						throw new EbMSProcessingException(e);
-					}
+					return EbMSAttachmentFactory.createCachedEbMSAttachment(rs.getString("name"),rs.getString("content_id"),rs.getString("content_type"),rs.getBinaryStream("content"));
+				}
+				catch (IOException e)
+				{
+					throw new EbMSProcessingException(e);
 				}
 			},
 			messageId

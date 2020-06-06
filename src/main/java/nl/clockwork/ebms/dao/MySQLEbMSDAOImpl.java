@@ -18,7 +18,6 @@ package nl.clockwork.ebms.dao;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.Instant;
@@ -290,13 +289,9 @@ class MySQLEbMSDAOImpl extends AbstractEbMSDAO
 			" and m.message_nr = 0" +
 			" and m.id = a.ebms_message_id" +
 			" order by a.order_nr",
-			new RowMapper<EbMSAttachment>()
+			(RowMapper<EbMSAttachment>)(rs,rowNum) ->
 			{
-				@Override
-				public EbMSAttachment mapRow(ResultSet rs, int rowNum) throws SQLException
-				{
-					return EbMSAttachmentFactory.createEbMSAttachment(rs.getString("name"),rs.getString("content_id"),rs.getString("content_type"),rs.getBytes("content"));
-				}
+				return EbMSAttachmentFactory.createEbMSAttachment(rs.getString("name"),rs.getString("content_id"),rs.getString("content_type"),rs.getBytes("content"));
 			},
 			messageId
 		);

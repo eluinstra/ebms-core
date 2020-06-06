@@ -58,7 +58,7 @@ public interface EbMSDAO
 
 	void deleteAttachments(String messageId);
 
-	default Instant toInstant(Timestamp timestamp)
+	static Instant toInstant(Timestamp timestamp)
 	{
 		return timestamp != null ? timestamp.toInstant() : null;
 	}
