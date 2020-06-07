@@ -30,7 +30,6 @@ class KeyStoreUtils
 {
 	public static KeyStore loadKeyStore(KeyStoreType type, String location, String password) throws GeneralSecurityException, IOException
 	{
-		//location = ResourceUtils.getURL(SystemPropertyUtils.resolvePlaceholders(location)).getFile();
 		try (val in = getInputStream(location))
 		{
 			val keyStore = KeyStore.getInstance(type.name());
@@ -55,5 +54,4 @@ class KeyStoreUtils
 			return result;
 		}
 	}
-
 }

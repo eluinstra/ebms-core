@@ -75,7 +75,7 @@ public class EncryptionTest
 	EbMSMessageFactory messageFactory;
 	String cpaId = "cpaStubEBF.rm.https.signed.encrypted";
 	KeyStoreType keyStoreType = KeyStoreType.JKS;
-	String keyStorePath = "keystore.jks";
+	String keyStorePath = "nl/clockwork/ebms/keystore.jks";
 	String keyStorePassword = "password";
 	EbMSMessageEncrypter messageEncrypter;
 	EbMSMessageDecrypter messageDecrypter;

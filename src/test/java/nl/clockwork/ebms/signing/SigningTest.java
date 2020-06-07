@@ -77,7 +77,7 @@ public class SigningTest
 	EbMSMessageFactory messageFactory;
 	String cpaId = "cpaStubEBF.rm.https.signed";
 	KeyStoreType keyStoreType = KeyStoreType.JKS;
-	String keyStorePath = "keystore.jks";
+	String keyStorePath = "nl/clockwork/ebms/keystore.jks";
 	String keyStorePassword = "password";
 	EbMSSignatureGenerator signatureGenerator;
 	EbMSSignatureValidator signatureValidator;
