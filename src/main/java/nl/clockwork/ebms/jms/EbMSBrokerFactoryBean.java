@@ -45,8 +45,8 @@ public class EbMSBrokerFactoryBean extends BrokerFactoryBean implements Disposab
 	private static Resource createResource(String path) throws IOException
 	{
 		return Match(path).of(
-				Case($(startsWith("classpath:")),new ClassPathResource(path.substring("classpath:".length()))),
-				Case($(startsWith("file:")),new FileSystemResource(path.substring("file:".length()))),
-				Case($(),new FileSystemResource(path)));
+				Case($(startsWith("classpath:")),o -> new ClassPathResource(path.substring("classpath:".length()))),
+				Case($(startsWith("file:")),o -> new FileSystemResource(path.substring("file:".length()))),
+				Case($(),o -> new FileSystemResource(path)));
 	}
 }

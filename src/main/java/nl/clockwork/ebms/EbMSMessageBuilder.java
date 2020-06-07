@@ -157,7 +157,9 @@ public class EbMSMessageBuilder
 						Case($(EbMSAction.STATUS_RESPONSE.getAction()),o -> new EbMSStatusResponse(messageHeader,signature,statusResponse)),
 						Case($(EbMSAction.PING.getAction()),o -> new EbMSPing(messageHeader,signature,syncReply)),
 						Case($(EbMSAction.PONG.getAction()),o -> new EbMSPong(messageHeader,signature)),
-						Case($(),o -> {throw new EbMSProcessingException("Unable to build message from service " + CPAUtils.toString(messageHeader.getService()) + " and action " + messageHeader.getAction());}));
+						Case($(),o -> {
+							throw new EbMSProcessingException("Unable to build message from service " + CPAUtils.toString(messageHeader.getService()) + " and action " + messageHeader.getAction());
+						}));
 		}
 		catch (EbMSProcessingException e)
 		{
