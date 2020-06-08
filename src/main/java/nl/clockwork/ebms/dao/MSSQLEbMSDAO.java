@@ -43,9 +43,9 @@ import nl.clockwork.ebms.model.EbMSAttachment;
 import nl.clockwork.ebms.model.EbMSBaseMessage;
 import nl.clockwork.ebms.util.DOMUtils;
 
-class MSSQLEbMSDAOImpl extends nl.clockwork.ebms.dao.MySQLEbMSDAOImpl
+class MSSQLEbMSDAO extends nl.clockwork.ebms.dao.MySQLEbMSDAO
 {
-	public MSSQLEbMSDAOImpl(TransactionTemplate transactionTemplate, JdbcTemplate jdbcTemplate)
+	public MSSQLEbMSDAO(TransactionTemplate transactionTemplate, JdbcTemplate jdbcTemplate)
 	{
 		super(transactionTemplate,jdbcTemplate);
 	}
@@ -163,11 +163,5 @@ class MSSQLEbMSDAOImpl extends nl.clockwork.ebms.dao.MySQLEbMSDAOImpl
 			" and ebms_message.message_nr = 0" +
 			messageContextFilter +
 			" order by ebms_message_event.time_stamp asc";
-	}
-
-	@Override
-	public String getTargetName()
-	{
-		return "MSSQLEbMSDAOImpl";
 	}
 }

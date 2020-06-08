@@ -22,15 +22,13 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.xml.transform.TransformerException;
 
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
-import org.springframework.jdbc.core.RowMapper;
-import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.transaction.TransactionException;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.TransactionCallbackWithoutResult;
@@ -38,7 +36,6 @@ import org.springframework.transaction.support.TransactionTemplate;
 import org.w3c.dom.Document;
 
 import lombok.val;
-import nl.clockwork.ebms.EbMSAttachmentFactory;
 import nl.clockwork.ebms.EbMSMessageStatus;
 import nl.clockwork.ebms.EbMSMessageUtils;
 import nl.clockwork.ebms.event.listener.EbMSMessageEventType;
@@ -46,9 +43,9 @@ import nl.clockwork.ebms.model.EbMSAttachment;
 import nl.clockwork.ebms.model.EbMSBaseMessage;
 import nl.clockwork.ebms.util.DOMUtils;
 
-class MySQLEbMSDAOImpl extends AbstractEbMSDAO
+class DB2EbMSDAO extends nl.clockwork.ebms.dao.PostgreSQLEbMSDAO
 {
-	public MySQLEbMSDAOImpl(TransactionTemplate transactionTemplate, JdbcTemplate jdbcTemplate)
+	public DB2EbMSDAO(TransactionTemplate transactionTemplate, JdbcTemplate jdbcTemplate)
 	{
 		super(transactionTemplate,jdbcTemplate);
 	}
@@ -58,11 +55,11 @@ class MySQLEbMSDAOImpl extends AbstractEbMSDAO
 	{
 		return "select message_id" +
 		" from ebms_message" +
-		" where message_nr = 0" +
+		" where message_nr = 0" + 
 		" and status = " + status.getId() +
 		messageContextFilter +
 		" order by time_stamp asc" +
-		" limit " + maxNr;
+		" fetch first " + maxNr + " rows only";
 	}
 
 	@Override
@@ -78,11 +75,9 @@ class MySQLEbMSDAOImpl extends AbstractEbMSDAO
 					{
 						try
 						{
-							val keyHolder = new GeneratedKeyHolder();
-							jdbcTemplate.update(
+							val keyHolder = (KeyHolder)jdbcTemplate.query(
 								new PreparedStatementCreator()
 								{
-									
 									@Override
 									public PreparedStatement createPreparedStatement(Connection connection) throws SQLException
 									{
@@ -90,6 +85,7 @@ class MySQLEbMSDAOImpl extends AbstractEbMSDAO
 										{
 											val ps = connection.prepareStatement
 											(
+												"select message_id, message_nr from final table(" +
 												"insert into ebms_message (" +
 													"time_stamp," +
 													"cpa_id," +
@@ -107,8 +103,7 @@ class MySQLEbMSDAOImpl extends AbstractEbMSDAO
 													"status," +
 													"status_time," +
 													"persist_time" +
-												") values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
-												new int[]{1}
+												") values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?))"
 											);
 											ps.setTimestamp(1,Timestamp.from(timestamp));
 											val messageHeader = message.getMessageHeader();
@@ -135,9 +130,9 @@ class MySQLEbMSDAOImpl extends AbstractEbMSDAO
 										}
 									}
 								},
-								keyHolder
+								new KeyExtractor()
 							);
-							insertAttachments(keyHolder.getKey().longValue(),attachments);
+							insertAttachments(keyHolder,attachments);
 						}
 						catch (IOException e)
 						{
@@ -152,7 +147,7 @@ class MySQLEbMSDAOImpl extends AbstractEbMSDAO
 			throw new DAOException(e);
 		}
 	}
-
+	
 	@Override
 	public void insertDuplicateMessage(final Instant timestamp, final Document document, final EbMSBaseMessage message, final List<EbMSAttachment> attachments) throws DAOException
 	{
@@ -166,11 +161,9 @@ class MySQLEbMSDAOImpl extends AbstractEbMSDAO
 					{
 						try
 						{
-							val keyHolder = new GeneratedKeyHolder();
-							jdbcTemplate.update(
+							val keyHolder = (KeyHolder)jdbcTemplate.query(
 								new PreparedStatementCreator()
 								{
-									
 									@Override
 									public PreparedStatement createPreparedStatement(Connection connection) throws SQLException
 									{
@@ -178,7 +171,8 @@ class MySQLEbMSDAOImpl extends AbstractEbMSDAO
 										{
 											val ps = connection.prepareStatement
 											(
-												"insert into ebms_message (" +
+													"select message_id, message_nr from final table(" +
+													"insert into ebms_message (" +
 													"time_stamp," +
 													"cpa_id," +
 													"conversation_id," +
@@ -193,8 +187,7 @@ class MySQLEbMSDAOImpl extends AbstractEbMSDAO
 													"service," +
 													"action," +
 													"content" +
-												") values (?,?,?,?,(select nr from (select max(message_nr) + 1 as nr from ebms_message where message_id = ?) as c),?,?,?,?,?,?,?,?,?)",
-												new int[]{1}
+												") values (?,?,?,?,(select max(message_nr) + 1 from ebms_message where message_id = ?),?,?,?,?,?,?,?,?,?))"
 											);
 											ps.setTimestamp(1,Timestamp.from(timestamp));
 											val messageHeader = message.getMessageHeader();
@@ -219,9 +212,9 @@ class MySQLEbMSDAOImpl extends AbstractEbMSDAO
 										}
 									}
 								},
-								keyHolder
+								new KeyExtractor()
 							);
-							insertAttachments(keyHolder.getKey().longValue(),attachments);
+							insertAttachments(keyHolder,attachments);
 						}
 						catch (IOException e)
 						{
@@ -231,70 +224,14 @@ class MySQLEbMSDAOImpl extends AbstractEbMSDAO
 				}
 			);
 		}
-		catch (DataAccessException | TransactionException e)
+		catch (DataAccessException e)
 		{
 			throw new DAOException(e);
 		}
-	}
-
-	protected void insertAttachments(long messageId, List<EbMSAttachment> attachments) throws DataAccessException, IOException
-	{
-		val orderNr = new AtomicInteger(0);
-		for (val attachment: attachments)
+		catch (TransactionException e)
 		{
-			jdbcTemplate.update(
-				new PreparedStatementCreator()
-				{
-					@Override
-					public PreparedStatement createPreparedStatement(Connection connection) throws SQLException
-					{
-						try (val a = attachment)
-						{
-							val ps = connection.prepareStatement
-							(
-								"insert into ebms_attachment (" +
-									"ebms_message_id," +
-									"order_nr," +
-									"name," +
-									"content_id," +
-									"content_type," +
-									"content" +
-								") values (?,?,?,?,?,?)"
-							);
-							ps.setObject(1,messageId);
-							ps.setInt(2,orderNr.getAndIncrement());
-							ps.setString(3,a.getName());
-							ps.setString(4,a.getContentId());
-							ps.setString(5,a.getContentType());
-							ps.setBlob(6,a.getInputStream());
-							return ps;
-						}
-						catch (IOException e)
-						{
-							throw new SQLException(e);
-						}
-					}
-				}
-			);
+			throw new DAOException(e);
 		}
-	}
-
-	@Override
-	protected List<EbMSAttachment> getAttachments(String messageId)
-	{
-		return jdbcTemplate.query(
-			"select a.name, a.content_id, a.content_type, a.content" + 
-			" from ebms_message m, ebms_attachment a" +
-			" where m.message_id = ?" +
-			" and m.message_nr = 0" +
-			" and m.id = a.ebms_message_id" +
-			" order by a.order_nr",
-			(RowMapper<EbMSAttachment>)(rs,rowNum) ->
-			{
-				return EbMSAttachmentFactory.createEbMSAttachment(rs.getString("name"),rs.getString("content_id"),rs.getString("content_type"),rs.getBytes("content"));
-			},
-			messageId
-		);
 	}
 
 	@Override
@@ -306,7 +243,7 @@ class MySQLEbMSDAOImpl extends AbstractEbMSDAO
 			(serverId == null ? " and server_id is null" : " and server_id = '" + serverId + "'") +
 			//" and (server_id = ? or (server_id is null and ? is null))" +
 			" order by time_stamp asc" +
-			" limit " + maxNr;
+			" fetch first " + maxNr + " rows only";
 	}
 
 	@Override
@@ -320,13 +257,6 @@ class MySQLEbMSDAOImpl extends AbstractEbMSDAO
 			" and ebms_message.message_nr = 0" +
 			messageContextFilter +
 			" order by ebms_message_event.time_stamp asc" +
-			" limit " + maxNr;
+			" fetch first " + maxNr + " rows only";
 	}
-
-	@Override
-	public String getTargetName()
-	{
-		return "MySQLEbMSDAOImpl";
-	}
-
 }

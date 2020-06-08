@@ -1519,4 +1519,10 @@ abstract class AbstractEbMSDAO implements EbMSDAO, CPADAO, URLMappingDAO, Certif
 		}
 		return result.toString();
 	}
+
+	@Override
+	public final String getTargetName()
+	{
+		return getClass().getSimpleName();
+	}
 }

@@ -21,9 +21,9 @@ import org.springframework.transaction.support.TransactionTemplate;
 import nl.clockwork.ebms.EbMSMessageStatus;
 import nl.clockwork.ebms.event.listener.EbMSMessageEventType;
 
-class HSQLDBEbMSDAOImpl extends AbstractEbMSDAO
+class HSQLDBEbMSDAO extends AbstractEbMSDAO
 {
-	public HSQLDBEbMSDAOImpl(TransactionTemplate transactionTemplate, JdbcTemplate jdbcTemplate)
+	public HSQLDBEbMSDAO(TransactionTemplate transactionTemplate, JdbcTemplate jdbcTemplate)
 	{
 		super(transactionTemplate,jdbcTemplate);
 	}
@@ -65,11 +65,4 @@ class HSQLDBEbMSDAOImpl extends AbstractEbMSDAO
 			" order by ebms_message_event.time_stamp asc" +
 			" limit " + maxNr;
 	}
-
-	@Override
-	public String getTargetName()
-	{
-		return "HSQLDBEbMSDAOImpl";
-	}
-
 }

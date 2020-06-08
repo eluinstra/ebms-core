@@ -53,7 +53,7 @@ import nl.clockwork.ebms.model.EbMSBaseMessage;
 import nl.clockwork.ebms.processor.EbMSProcessingException;
 import nl.clockwork.ebms.util.DOMUtils;
 
-class PostgreSQLEbMSDAOImpl extends AbstractEbMSDAO
+class PostgreSQLEbMSDAO extends AbstractEbMSDAO
 {
 	public class KeyExtractor implements ResultSetExtractor<KeyHolder>
 	{
@@ -89,7 +89,7 @@ class PostgreSQLEbMSDAOImpl extends AbstractEbMSDAO
 		}
 	}
 
-	public PostgreSQLEbMSDAOImpl(TransactionTemplate transactionTemplate, JdbcTemplate jdbcTemplate)
+	public PostgreSQLEbMSDAO(TransactionTemplate transactionTemplate, JdbcTemplate jdbcTemplate)
 	{
 		super(transactionTemplate,jdbcTemplate);
 	}
@@ -327,11 +327,4 @@ class PostgreSQLEbMSDAOImpl extends AbstractEbMSDAO
 			" order by ebms_message_event.time_stamp asc" +
 			" limit " + maxNr;
 	}
-
-	@Override
-	public String getTargetName()
-	{
-		return "PostgreSQLEbMSDAOImpl";
-	}
-	
 }
