@@ -39,6 +39,7 @@ public class EventManagerFactory implements FactoryBean<EventManager>
 
 	EventManager eventManager;
 
+	@Builder(setterPrefix = "set")
 	public EventManagerFactory(
 			@NonNull EventManagerType type,
 			@NonNull EbMSEventDAO ebMSEventDAO,
