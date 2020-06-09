@@ -15,7 +15,9 @@
  */
 package nl.clockwork.ebms.cache;
 
-public interface RemovableCache
+import org.aopalliance.intercept.MethodInterceptor;
+
+public interface CachingMethodInterceptor extends MethodInterceptor
 {
 	void remove(String key);
 	void removeAll();

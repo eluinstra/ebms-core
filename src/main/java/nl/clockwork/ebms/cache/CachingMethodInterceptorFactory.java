@@ -15,7 +15,6 @@
  */
 package nl.clockwork.ebms.cache;
 
-import org.aopalliance.intercept.MethodInterceptor;
 import org.springframework.beans.factory.FactoryBean;
 
 import lombok.AccessLevel;
@@ -23,10 +22,10 @@ import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-public class CachingMethodInterceptorFactory implements FactoryBean<MethodInterceptor>
+public class CachingMethodInterceptorFactory implements FactoryBean<CachingMethodInterceptor>
 {
 	@NonNull
-	MethodInterceptor methodInterceptor;
+	CachingMethodInterceptor methodInterceptor;
 
 	public CachingMethodInterceptorFactory(@NonNull EbMSCacheManager cacheManager, @NonNull String cacheName)
 	{
@@ -34,7 +33,7 @@ public class CachingMethodInterceptorFactory implements FactoryBean<MethodInterc
 	}
 
 	@Override
-	public MethodInterceptor getObject() throws Exception
+	public CachingMethodInterceptor getObject() throws Exception
 	{
 		return methodInterceptor;
 	}
@@ -42,7 +41,7 @@ public class CachingMethodInterceptorFactory implements FactoryBean<MethodInterc
 	@Override
 	public Class<?> getObjectType()
 	{
-		return MethodInterceptor.class;
+		return CachingMethodInterceptor.class;
 	}
 
 	@Override

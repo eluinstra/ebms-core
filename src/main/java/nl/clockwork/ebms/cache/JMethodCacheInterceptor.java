@@ -20,7 +20,6 @@ import java.util.stream.Stream;
 
 import javax.cache.Cache;
 
-import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 
 import lombok.AccessLevel;
@@ -31,7 +30,7 @@ import lombok.experimental.FieldDefaults;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor
-public class JMethodCacheInterceptor implements MethodInterceptor, RemovableCache
+public class JMethodCacheInterceptor implements CachingMethodInterceptor
 {
 	@NonNull
 	Cache<String,Object> cache;

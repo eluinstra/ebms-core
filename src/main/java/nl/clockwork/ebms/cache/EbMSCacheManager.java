@@ -17,7 +17,6 @@ package nl.clockwork.ebms.cache;
 
 import java.io.IOException;
 
-import org.aopalliance.intercept.MethodInterceptor;
 import org.apache.ignite.Ignite;
 import org.apache.ignite.Ignition;
 import org.ehcache.CacheManager;
@@ -73,7 +72,7 @@ public class EbMSCacheManager
 		}
 	}
 
-	public MethodInterceptor getMethodInterceptor(String cacheName)
+	public CachingMethodInterceptor getMethodInterceptor(String cacheName)
 	{
 		switch (type)
 		{

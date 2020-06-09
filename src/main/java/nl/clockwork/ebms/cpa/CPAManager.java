@@ -33,7 +33,7 @@ import lombok.val;
 import lombok.experimental.FieldDefaults;
 import nl.clockwork.ebms.EbMSAction;
 import nl.clockwork.ebms.cache.EhCacheMethodCacheInterceptor;
-import nl.clockwork.ebms.cache.RemovableCache;
+import nl.clockwork.ebms.cache.CachingMethodInterceptor;
 import nl.clockwork.ebms.model.EbMSPartyInfo;
 import nl.clockwork.ebms.model.FromPartyInfo;
 import nl.clockwork.ebms.model.ToPartyInfo;
@@ -45,9 +45,9 @@ import nl.clockwork.ebms.util.StreamUtils;
 public class CPAManager
 {
 	@NonNull
-	RemovableCache daoMethodCache;
+	CachingMethodInterceptor daoMethodCache;
 	@NonNull
-	RemovableCache cpaMethodCache;
+	CachingMethodInterceptor cpaMethodCache;
 	@NonNull
 	CPADAO cpaDAO;
 	@NonNull

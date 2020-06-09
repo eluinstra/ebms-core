@@ -18,7 +18,6 @@ package nl.clockwork.ebms.cache;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 import org.ehcache.Cache;
 
@@ -30,7 +29,7 @@ import lombok.experimental.FieldDefaults;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor
-public class EhCacheMethodCacheInterceptor implements MethodInterceptor, RemovableCache
+public class EhCacheMethodCacheInterceptor implements CachingMethodInterceptor
 {
 	@NonNull
 	Cache<String,Object> cache;

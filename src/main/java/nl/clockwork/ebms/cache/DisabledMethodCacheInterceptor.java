@@ -15,7 +15,6 @@
  */
 package nl.clockwork.ebms.cache;
 
-import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 
 import lombok.AccessLevel;
@@ -24,7 +23,7 @@ import lombok.experimental.FieldDefaults;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @NoArgsConstructor
-public class DisabledMethodCacheInterceptor implements MethodInterceptor, RemovableCache
+public class DisabledMethodCacheInterceptor implements CachingMethodInterceptor
 {
 	public Object invoke(MethodInvocation invocation) throws Throwable
 	{
