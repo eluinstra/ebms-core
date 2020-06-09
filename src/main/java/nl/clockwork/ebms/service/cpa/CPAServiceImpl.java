@@ -26,8 +26,6 @@ import lombok.val;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import nl.clockwork.ebms.cpa.CPAManager;
-import nl.clockwork.ebms.cpa.CertificateMapper;
-import nl.clockwork.ebms.cpa.URLMapper;
 import nl.clockwork.ebms.jaxb.JAXBParser;
 import nl.clockwork.ebms.validation.CPAValidator;
 import nl.clockwork.ebms.validation.XSDValidator;
@@ -39,10 +37,6 @@ public class CPAServiceImpl implements CPAService
 {
   @NonNull
 	CPAManager cpaManager;
-  @NonNull
-	URLMapper urlMapper;
-  @NonNull
-	CertificateMapper certificateMapper;
   @NonNull
 	CPAValidator cpaValidator;
 	XSDValidator xsdValidator = new XSDValidator("/nl/clockwork/ebms/xsd/cpp-cpa-2_0.xsd");
