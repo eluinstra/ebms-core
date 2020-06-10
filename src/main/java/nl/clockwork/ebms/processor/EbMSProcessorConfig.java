@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import lombok.AccessLevel;
+import lombok.val;
 import lombok.experimental.FieldDefaults;
 import nl.clockwork.ebms.EbMSMessageFactory;
 import nl.clockwork.ebms.client.DeliveryManager;
@@ -46,7 +47,7 @@ public class EbMSProcessorConfig
 	@Bean
 	public EbMSMessageProcessor messageProcessor()
 	{
-		DuplicateMessageHandler duplicateMessageHandler = DuplicateMessageHandler.builder()
+		val duplicateMessageHandler = DuplicateMessageHandler.builder()
 				.setEbMSDAO(ebMSDAO)
 				.setCpaManager(cpaManager)
 				.setEventManager(eventManager)

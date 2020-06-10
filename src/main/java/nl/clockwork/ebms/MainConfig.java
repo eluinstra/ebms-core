@@ -8,6 +8,7 @@ import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 
+import lombok.val;
 import nl.clockwork.ebms.cache.CacheConfig;
 import nl.clockwork.ebms.client.ClientConfig;
 import nl.clockwork.ebms.cpa.CPAManagerConfig;
@@ -50,8 +51,8 @@ public class MainConfig
 	@Bean
 	public PropertySourcesPlaceholderConfigurer properties()
 	{
-		PropertySourcesPlaceholderConfigurer c = new PropertySourcesPlaceholderConfigurer();
-		Resource[] resources = new Resource[]{
+		val c = new PropertySourcesPlaceholderConfigurer();
+		val resources = new Resource[]{
 				new ClassPathResource("nl/clockwork/ebms/default.properties")};
 		c.setLocations(resources);
 		c.setIgnoreUnresolvablePlaceholders(true);
