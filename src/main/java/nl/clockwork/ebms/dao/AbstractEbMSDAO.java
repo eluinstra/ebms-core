@@ -507,7 +507,7 @@ abstract class AbstractEbMSDAO implements EbMSDAO, CPADAO, URLMappingDAO, Certif
 	}
 
 	@Override
-	public void insertCertificateMapping(String id, CertificateMapping mapping) throws DAOException
+	public void insertCertificateMapping(CertificateMapping mapping) throws DAOException
 	{
 		try
 		{
@@ -519,7 +519,7 @@ abstract class AbstractEbMSDAO implements EbMSDAO, CPADAO, URLMappingDAO, Certif
 					"destination," +
 					"cpa_id" +
 				") values (?,?,?,?)",
-				id,
+				mapping.getId(),
 				mapping.getSource().getEncoded(),
 				mapping.getDestination().getEncoded(),
 				mapping.getCpaId()
@@ -532,7 +532,7 @@ abstract class AbstractEbMSDAO implements EbMSDAO, CPADAO, URLMappingDAO, Certif
 	}
 
 	@Override
-	public int updateCertificateMapping(String id, CertificateMapping mapping) throws DAOException
+	public int updateCertificateMapping(CertificateMapping mapping) throws DAOException
 	{
 		try
 		{
@@ -543,7 +543,7 @@ abstract class AbstractEbMSDAO implements EbMSDAO, CPADAO, URLMappingDAO, Certif
 				" where id = ?" +
 				" and (cpa_id = ? or (cpa_id is null and ? is null))",
 				mapping.getDestination().getEncoded(),
-				id,
+				mapping.getId(),
 				mapping.getCpaId(),
 				mapping.getCpaId()
 			);

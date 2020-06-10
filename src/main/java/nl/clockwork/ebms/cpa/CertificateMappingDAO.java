@@ -27,8 +27,8 @@ public interface CertificateMappingDAO
 	boolean existsCertificateMapping(String id, String cpaId) throws DAOException;
 	Optional<X509Certificate> getCertificateMapping(String id, String cpaId) throws DAOException;
 	List<CertificateMapping> getCertificateMappings() throws DAOException;
-	void insertCertificateMapping(String id, CertificateMapping mapping) throws DAOException;
-	int updateCertificateMapping(String id, CertificateMapping mapping) throws DAOException;
+	void insertCertificateMapping(CertificateMapping mapping) throws DAOException;
+	int updateCertificateMapping(CertificateMapping mapping) throws DAOException;
 	int deleteCertificateMapping(String id, String cpaId) throws DAOException;
 	String getTargetName();
 }

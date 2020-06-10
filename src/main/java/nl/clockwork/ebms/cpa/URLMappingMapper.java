@@ -28,16 +28,16 @@ public interface URLMappingMapper
 {
 	public static class URLMappingDSL
 	{
-		public static final URLMapping urlMapping = new URLMapping();
+		public static final URLMappingTable urlMapping = new URLMappingTable();
 		public static final SqlColumn<String> source = urlMapping.source;
 		public static final SqlColumn<String> destination = urlMapping.destination;
 
-	  public static final class URLMapping extends SqlTable
+	  public static final class URLMappingTable extends SqlTable
 	  {
 	    public final SqlColumn<String> source = column("source",JDBCType.VARCHAR);
 	    public final SqlColumn<String> destination = column("destination",JDBCType.VARCHAR);
 
-	    public URLMapping()
+	    public URLMappingTable()
 			{
 	    	super("url_mapping");
 			}
@@ -48,14 +48,14 @@ public interface URLMappingMapper
 	long count(SelectStatementProvider selectStatement);
 
 	@SelectProvider(type=SqlProviderAdapter.class, method="select")
-	@ResultMap("URLMappingResult")
-	Optional<URLMapping> selectOne(SelectStatementProvider selectStatement);
-	
-	@SelectProvider(type=SqlProviderAdapter.class, method="select")
 	@Results(id="URLMappingResult", value= {
 			@Result(column="source", property="source", jdbcType=JdbcType.VARCHAR, id=true),
 			@Result(column="destination", property="destination", jdbcType=JdbcType.VARCHAR)
 	})
+	Optional<URLMapping> selectOne(SelectStatementProvider selectStatement);
+	
+	@SelectProvider(type=SqlProviderAdapter.class, method="select")
+	@ResultMap("URLMappingResult")
 	List<URLMapping> selectMany(SelectStatementProvider selectStatement);
 	
 	@InsertProvider(type=SqlProviderAdapter.class, method="insert")

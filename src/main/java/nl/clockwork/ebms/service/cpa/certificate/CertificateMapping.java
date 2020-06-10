@@ -54,6 +54,11 @@ public class CertificateMapping implements Serializable
 	@XmlElement
 	String cpaId;
 
+	public String getId()
+	{
+		return "issuer=" + source.getIssuerX500Principal().getName() + "; serialNr=" + source.getSerialNumber().toString();
+	}
+
 	@Override
 	public String toString()
 	{

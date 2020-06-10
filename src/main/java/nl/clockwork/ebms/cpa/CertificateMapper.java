@@ -62,9 +62,9 @@ public class CertificateMapper
 			else
 			{
 				if (certificateMappingDAO.existsCertificateMapping(id,mapping.getCpaId()))
-					certificateMappingDAO.updateCertificateMapping(id,mapping);
+					certificateMappingDAO.updateCertificateMapping(mapping);
 				else
-					certificateMappingDAO.insertCertificateMapping(id,mapping);
+					certificateMappingDAO.insertCertificateMapping(mapping);
 			}
 			flushDAOMethodCache(id);
 		}
