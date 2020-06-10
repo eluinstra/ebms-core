@@ -39,7 +39,7 @@ public class CertificateMapper
 
 	public static String getId(X509Certificate certificate)
 	{
-		return "issuer=" + certificate.getIssuerX500Principal().getName() + "; serialNr=" + certificate.getSerialNumber().toString();
+		return CertificateMapping.getId.apply(certificate);
 	}
 
 	public List<CertificateMapping> getCertificates()
@@ -56,17 +56,16 @@ public class CertificateMapper
 	{
 		synchronized (certificateMonitor)
 		{
-			val id = getId(mapping.getSource());
 			if (mapping.getDestination() == null)
-				certificateMappingDAO.deleteCertificateMapping(id,mapping.getCpaId());
+				certificateMappingDAO.deleteCertificateMapping(mapping.getId(),mapping.getCpaId());
 			else
 			{
-				if (certificateMappingDAO.existsCertificateMapping(id,mapping.getCpaId()))
+				if (certificateMappingDAO.existsCertificateMapping(mapping.getId(),mapping.getCpaId()))
 					certificateMappingDAO.updateCertificateMapping(mapping);
 				else
 					certificateMappingDAO.insertCertificateMapping(mapping);
 			}
-			flushDAOMethodCache(id);
+			flushDAOMethodCache(mapping.getId());
 		}
 	}
 
