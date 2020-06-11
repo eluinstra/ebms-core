@@ -16,10 +16,6 @@
 package nl.clockwork.ebms.dao;
 
 import java.io.IOException;
-import java.security.cert.CertificateEncodingException;
-import java.security.cert.CertificateException;
-import java.security.cert.CertificateFactory;
-import java.security.cert.X509Certificate;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -66,8 +62,6 @@ import nl.clockwork.ebms.EbMSAttachmentFactory;
 import nl.clockwork.ebms.EbMSMessageStatus;
 import nl.clockwork.ebms.EbMSMessageUtils;
 import nl.clockwork.ebms.cpa.CPADAO;
-import nl.clockwork.ebms.cpa.CertificateMappingDAO;
-import nl.clockwork.ebms.cpa.URLMappingDAO;
 import nl.clockwork.ebms.event.listener.EbMSMessageEventDAO;
 import nl.clockwork.ebms.event.listener.EbMSMessageEventType;
 import nl.clockwork.ebms.event.processor.EbMSEvent;
@@ -78,8 +72,6 @@ import nl.clockwork.ebms.model.EbMSAttachment;
 import nl.clockwork.ebms.model.EbMSBaseMessage;
 import nl.clockwork.ebms.model.EbMSDocument;
 import nl.clockwork.ebms.processor.EbMSProcessingException;
-import nl.clockwork.ebms.service.cpa.certificate.CertificateMapping;
-import nl.clockwork.ebms.service.cpa.url.URLMapping;
 import nl.clockwork.ebms.service.model.EbMSDataSource;
 import nl.clockwork.ebms.service.model.EbMSDataSourceMTOM;
 import nl.clockwork.ebms.service.model.EbMSMessageContent;
@@ -91,7 +83,7 @@ import nl.clockwork.ebms.util.DOMUtils;
 
 @FieldDefaults(level = AccessLevel.PROTECTED, makeFinal = true)
 @AllArgsConstructor
-abstract class AbstractEbMSDAO implements EbMSDAO, CPADAO, URLMappingDAO, CertificateMappingDAO, EbMSEventDAO, EbMSMessageEventDAO
+abstract class AbstractEbMSDAO implements EbMSDAO, CPADAO, EbMSEventDAO, EbMSMessageEventDAO
 {
 	@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 	@AllArgsConstructor
@@ -285,287 +277,6 @@ abstract class AbstractEbMSDAO implements EbMSDAO, CPADAO, URLMappingDAO, Certif
 			(
 				"delete from cpa" +
 				" where cpa_id = ?",
-				cpaId
-			);
-		}
-		catch (DataAccessException e)
-		{
-			throw new DAOException(e);
-		}
-	}
-
-	@Override
-	public boolean existsURLMapping(String source) throws DAOException
-	{
-		try
-		{
-			return jdbcTemplate.queryForObject(
-				"select count(*)" +
-				" from url_mapping" +
-				" where source = ?",
-				Integer.class,
-				source
-			) > 0;
-		}
-		catch (DataAccessException e)
-		{
-			throw new DAOException(e);
-		}
-	}
-
-	@Override
-	public Optional<String> getURLMapping(String source)
-	{
-		try
-		{
-			return Optional.of(jdbcTemplate.queryForObject(
-				"select destination" +
-				" from url_mapping" +
-				" where source = ?",
-				String.class,
-				source
-			));
-		}
-		catch(EmptyResultDataAccessException e)
-		{
-			return Optional.empty();
-		}
-		catch (DataAccessException e)
-		{
-			throw new DAOException(e);
-		}
-	}
-
-	@Override
-	public List<URLMapping> getURLMappings() throws DAOException
-	{
-		try
-		{
-			return jdbcTemplate.query(
-				"select source, destination" +
-				" from url_mapping" +
-				" order by source asc",
-				(RowMapper<URLMapping>)(rs,rowNum) ->
-				{
-					return new URLMapping(rs.getString("source"),rs.getString("destination"));
-				}
-			);
-		}
-		catch (DataAccessException e)
-		{
-			throw new DAOException(e);
-		}
-	}
-
-	@Override
-	public void insertURLMapping(URLMapping urlMapping) throws DAOException
-	{
-		try
-		{
-			jdbcTemplate.update
-			(
-				"insert into url_mapping (" +
-					"source," +
-					"destination" +
-				") values (?,?)",
-				urlMapping.getSource(),
-				urlMapping.getDestination()
-			);
-		}
-		catch (DataAccessException e)
-		{
-			throw new DAOException(e);
-		}
-	}
-
-	@Override
-	public int updateURLMapping(URLMapping urlMapping)
-	{
-		try
-		{
-			return jdbcTemplate.update
-			(
-				"update url_mapping set" +
-				" destination = ?" +
-				" where source = ?",
-				urlMapping.getDestination(),
-				urlMapping.getSource()
-			);
-		}
-		catch (DataAccessException e)
-		{
-			throw new DAOException(e);
-		}
-	}
-
-	@Override
-	public int deleteURLMapping(String source)
-	{
-		try
-		{
-			return jdbcTemplate.update
-			(
-				"delete from url_mapping" +
-				" where source = ?",
-				source
-			);
-		}
-		catch (DataAccessException e)
-		{
-			throw new DAOException(e);
-		}
-	}
-
-	@Override
-	public boolean existsCertificateMapping(String id, String cpaId) throws DAOException
-	{
-		try
-		{
-			return jdbcTemplate.queryForObject(
-				"select count(*)" +
-				" from certificate_mapping" +
-				" where id = ?" +
-				" and (cpa_id = ? or (cpa_id is null and ? is null))",
-				Integer.class,
-				id,
-				cpaId,
-				cpaId
-			) > 0;
-		}
-		catch (DataAccessException e)
-		{
-			throw new DAOException(e);
-		}
-	}
-
-	@Override
-	public Optional<X509Certificate> getCertificateMapping(String id, String cpaId) throws DAOException
-	{
-		try
-		{
-			return Optional.of(jdbcTemplate.queryForObject(
-				"select destination" +
-				" from certificate_mapping" +
-				" where id = ?" +
-				" and (cpa_id = ? or (cpa_id is null and ? is null))",
-				(RowMapper<X509Certificate>)(rs,rowNum) ->
-				{
-					try
-					{
-						CertificateFactory certificateFactory = CertificateFactory.getInstance("X509");
-						return (X509Certificate)certificateFactory.generateCertificate(rs.getBinaryStream("source"));
-					}
-					catch (CertificateException e)
-					{
-						throw new SQLException(e);
-					}
-				},
-				id,
-				cpaId,
-				cpaId
-			));
-		}
-		catch(EmptyResultDataAccessException e)
-		{
-			return Optional.empty();
-		}
-		catch (DataAccessException e)
-		{
-			throw new DAOException(e);
-		}
-	}
-
-	@Override
-	public List<CertificateMapping> getCertificateMappings() throws DAOException
-	{
-		try
-		{
-			return jdbcTemplate.query(
-				"select source, destination, cpa_id" +
-				" from certificate_mapping",
-				(RowMapper<CertificateMapping>)(rs,rowNum) ->
-				{
-					try
-					{
-						val certificateFactory = CertificateFactory.getInstance("X509");
-						val source = (X509Certificate)certificateFactory.generateCertificate(rs.getBinaryStream("source"));
-						val destination = (X509Certificate)certificateFactory.generateCertificate(rs.getBinaryStream("destination"));
-						val cpaId = rs.getString("cpa_id");
-						return new CertificateMapping(source,destination,cpaId);
-					}
-					catch (CertificateException e)
-					{
-						throw new SQLException(e);
-					}
-				}
-			);
-		}
-		catch (DataAccessException e)
-		{
-			throw new DAOException(e);
-		}
-	}
-
-	@Override
-	public void insertCertificateMapping(CertificateMapping mapping) throws DAOException
-	{
-		try
-		{
-			jdbcTemplate.update
-			(
-				"insert into certificate_mapping (" +
-					"id," +
-					"source," +
-					"destination," +
-					"cpa_id" +
-				") values (?,?,?,?)",
-				mapping.getId(),
-				mapping.getSource().getEncoded(),
-				mapping.getDestination().getEncoded(),
-				mapping.getCpaId()
-			);
-		}
-		catch (CertificateEncodingException | DataAccessException e)
-		{
-			throw new DAOException(e);
-		}
-	}
-
-	@Override
-	public int updateCertificateMapping(CertificateMapping mapping) throws DAOException
-	{
-		try
-		{
-			return jdbcTemplate.update
-			(
-				"update certificate_mapping set" +
-				" destination = ?" +
-				" where id = ?" +
-				" and (cpa_id = ? or (cpa_id is null and ? is null))",
-				mapping.getDestination().getEncoded(),
-				mapping.getId(),
-				mapping.getCpaId(),
-				mapping.getCpaId()
-			);
-		}
-		catch (CertificateEncodingException | DataAccessException e)
-		{
-			throw new DAOException(e);
-		}
-	}
-
-	@Override
-	public int deleteCertificateMapping(String id, String cpaId) throws DAOException
-	{
-		try
-		{
-			return jdbcTemplate.update
-			(
-				"delete from certificate_mapping" +
-				" where id = ?" +
-				" and (cpa_id = ? or (cpa_id is null and ? is null))",
-				id,
-				cpaId,
 				cpaId
 			);
 		}
