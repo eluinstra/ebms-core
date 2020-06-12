@@ -15,7 +15,7 @@ import nl.clockwork.ebms.EbMSThreadPoolExecutor;
 import nl.clockwork.ebms.client.DeliveryManagerFactory.DeliveryManagerType;
 import nl.clockwork.ebms.client.EbMSHttpClientFactory.EbMSHttpClientType;
 import nl.clockwork.ebms.cpa.CPAManager;
-import nl.clockwork.ebms.cpa.CertificateMapper;
+import nl.clockwork.ebms.cpa.certificate.CertificateMapper;
 import nl.clockwork.ebms.security.EbMSKeyStore;
 import nl.clockwork.ebms.security.EbMSTrustStore;
 

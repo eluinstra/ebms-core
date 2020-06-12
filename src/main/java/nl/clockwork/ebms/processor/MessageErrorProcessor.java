@@ -41,7 +41,6 @@ import nl.clockwork.ebms.EbMSMessageUtils;
 import nl.clockwork.ebms.cpa.CPAManager;
 import nl.clockwork.ebms.cpa.CPAUtils;
 import nl.clockwork.ebms.cpa.CacheablePartyId;
-import nl.clockwork.ebms.dao.DAOTransactionCallback;
 import nl.clockwork.ebms.dao.EbMSDAO;
 import nl.clockwork.ebms.event.listener.EventListener;
 import nl.clockwork.ebms.event.processor.EventManager;
@@ -49,6 +48,7 @@ import nl.clockwork.ebms.model.EbMSDocument;
 import nl.clockwork.ebms.model.EbMSMessage;
 import nl.clockwork.ebms.model.EbMSMessageError;
 import nl.clockwork.ebms.signing.EbMSSignatureGenerator;
+import nl.clockwork.ebms.transaction.TransactionCallback;
 import nl.clockwork.ebms.util.DOMUtils;
 import nl.clockwork.ebms.validation.DuplicateMessageException;
 import nl.clockwork.ebms.validation.EbMSMessageValidator;
@@ -90,7 +90,7 @@ class MessageErrorProcessor
 		val receiveDeliveryChannel = cpaManager.getReceiveDeliveryChannel(messageHeader.getCPAId(),new CacheablePartyId(messageError.getMessageHeader().getTo().getPartyId()),messageError.getMessageHeader().getTo().getRole(),service,messageError.getMessageHeader().getAction())
 				.orElse(null);
 		ebMSDAO.executeTransaction(
-				new DAOTransactionCallback()
+				new TransactionCallback()
 				{
 					@Override
 					public void doInTransaction()
@@ -163,7 +163,7 @@ class MessageErrorProcessor
 	public void storeMessageError(final Instant timestamp, final EbMSDocument messageErrorDocument, final EbMSMessage message, final EbMSMessageError messageError)
 	{
 		ebMSDAO.executeTransaction(
-			new DAOTransactionCallback()
+			new TransactionCallback()
 			{
 				@Override
 				public void doInTransaction()

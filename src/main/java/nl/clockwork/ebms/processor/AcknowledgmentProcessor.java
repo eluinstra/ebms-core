@@ -41,7 +41,6 @@ import nl.clockwork.ebms.EbMSMessageUtils;
 import nl.clockwork.ebms.cpa.CPAManager;
 import nl.clockwork.ebms.cpa.CPAUtils;
 import nl.clockwork.ebms.cpa.CacheablePartyId;
-import nl.clockwork.ebms.dao.DAOTransactionCallback;
 import nl.clockwork.ebms.dao.EbMSDAO;
 import nl.clockwork.ebms.event.listener.EventListener;
 import nl.clockwork.ebms.event.processor.EventManager;
@@ -49,6 +48,7 @@ import nl.clockwork.ebms.model.EbMSAcknowledgment;
 import nl.clockwork.ebms.model.EbMSDocument;
 import nl.clockwork.ebms.model.EbMSMessage;
 import nl.clockwork.ebms.signing.EbMSSignatureGenerator;
+import nl.clockwork.ebms.transaction.TransactionCallback;
 import nl.clockwork.ebms.util.StreamUtils;
 import nl.clockwork.ebms.validation.DuplicateMessageException;
 import nl.clockwork.ebms.validation.EbMSMessageValidator;
@@ -84,7 +84,7 @@ class AcknowledgmentProcessor
 		val acknowledgmentDocument = EbMSMessageUtils.getEbMSDocument(acknowledgment);
 		signatureGenerator.generate(message.getAckRequested(),acknowledgmentDocument,acknowledgment);
 		ebMSDAO.executeTransaction(
-				new DAOTransactionCallback()
+				new TransactionCallback()
 				{
 					@Override
 					public void doInTransaction()
@@ -161,7 +161,7 @@ class AcknowledgmentProcessor
 	public void storeAcknowledgment(final Instant timestamp, final EbMSMessage message, final EbMSDocument acknowledgmentDocument, final EbMSAcknowledgment acknowledgment) throws EbMSProcessingException
 	{
 		ebMSDAO.executeTransaction(
-			new DAOTransactionCallback()
+			new TransactionCallback()
 			{
 				@Override
 				public void doInTransaction()

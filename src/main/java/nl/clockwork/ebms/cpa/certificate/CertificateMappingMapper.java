@@ -1,4 +1,4 @@
-package nl.clockwork.ebms.cpa;
+package nl.clockwork.ebms.cpa.certificate;
 
 import java.security.cert.X509Certificate;
 import java.sql.JDBCType;
@@ -38,9 +38,9 @@ public interface CertificateMappingMapper
 	  public static final class CertificateMappingTable extends SqlTable
 	  {
 	    public final SqlColumn<String> id = column("id",JDBCType.VARCHAR);
-	    public final SqlColumn<X509Certificate> source = column("source",JDBCType.BLOB,"nl.clockwork.ebms.cpa.X509CertificateTypeHandler");
-	    public final SqlColumn<X509Certificate> destination = column("destination",JDBCType.BLOB,"nl.clockwork.ebms.cpa.X509CertificateTypeHandler");
-	    public final SqlColumn<String> cpaId = column("cpa_id",JDBCType.BLOB);
+	    public final SqlColumn<X509Certificate> source = column("source",JDBCType.BLOB,"nl.clockwork.ebms.cpa.certificate.X509CertificateTypeHandler");
+	    public final SqlColumn<X509Certificate> destination = column("destination",JDBCType.BLOB,"nl.clockwork.ebms.cpa.certificate.X509CertificateTypeHandler");
+	    public final SqlColumn<String> cpaId = column("cpa_id",JDBCType.VARCHAR);
 
 	    public CertificateMappingTable()
 			{

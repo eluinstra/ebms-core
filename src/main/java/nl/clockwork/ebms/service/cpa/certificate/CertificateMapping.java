@@ -63,7 +63,7 @@ public class CertificateMapping implements Serializable
 	@Override
 	public String toString()
 	{
-		return this.getClass().getSimpleName() + "(" + printSource() + ", " + printDestination() + ")";
+		return this.getClass().getSimpleName() + "(" + printSource() + ", " + printDestination() + ", " + printCpaId() + ")";
 	}
 
 	private String printSource()
@@ -74,5 +74,10 @@ public class CertificateMapping implements Serializable
 	private String printDestination()
 	{
 		return "destination=" + destination.getSubjectDN() + "(" + getId.apply(destination) + ")";
+	}
+
+	private String printCpaId()
+	{
+		return "cpaId=" + cpaId != null ? cpaId : "null";
 	}
 }

@@ -15,6 +15,10 @@ import lombok.experimental.FieldDefaults;
 import nl.clockwork.ebms.cache.CachingMethodInterceptor;
 import nl.clockwork.ebms.cache.CachingMethodInterceptorFactory;
 import nl.clockwork.ebms.cache.EbMSCacheManager;
+import nl.clockwork.ebms.cpa.certificate.CertificateMapper;
+import nl.clockwork.ebms.cpa.certificate.CertificateMappingDAO;
+import nl.clockwork.ebms.cpa.url.URLMapper;
+import nl.clockwork.ebms.cpa.url.URLMappingDAO;
 
 @Configuration
 @FieldDefaults(level = AccessLevel.PRIVATE)

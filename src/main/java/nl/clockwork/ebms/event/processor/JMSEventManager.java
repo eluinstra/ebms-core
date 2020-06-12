@@ -35,7 +35,7 @@ import lombok.experimental.FieldDefaults;
 import lombok.experimental.NonFinal;
 import nl.clockwork.ebms.cpa.CPAManager;
 import nl.clockwork.ebms.cpa.CPAUtils;
-import nl.clockwork.ebms.dao.DAOTransactionCallback;
+import nl.clockwork.ebms.transaction.TransactionCallback;
 import nl.clockwork.ebms.util.StreamUtils;
 
 @FieldDefaults(level = AccessLevel.PROTECTED, makeFinal = true)
@@ -101,7 +101,7 @@ public class JMSEventManager implements EventManager
 				event.getReceiveDeliveryChannelId())
 					.orElseThrow(() -> StreamUtils.illegalStateException("DeliveryChannel",event.getCpaId(),event.getReceiveDeliveryChannelId()));
 		ebMSeventDAO.executeTransaction(
-			new DAOTransactionCallback()
+			new TransactionCallback()
 			{
 				@Override
 				public void doInTransaction()

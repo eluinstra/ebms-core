@@ -1,4 +1,4 @@
-package nl.clockwork.ebms.cpa;
+package nl.clockwork.ebms.cpa.certificate;
 
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;

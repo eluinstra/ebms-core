@@ -44,7 +44,6 @@ import nl.clockwork.ebms.cpa.CPAManager;
 import nl.clockwork.ebms.cpa.CPAUtils;
 import nl.clockwork.ebms.cpa.CacheablePartyId;
 import nl.clockwork.ebms.dao.DAOException;
-import nl.clockwork.ebms.dao.DAOTransactionCallback;
 import nl.clockwork.ebms.dao.EbMSDAO;
 import nl.clockwork.ebms.event.listener.EbMSMessageEventDAO;
 import nl.clockwork.ebms.event.listener.EbMSMessageEventType;
@@ -59,6 +58,7 @@ import nl.clockwork.ebms.service.model.EbMSMessageContext;
 import nl.clockwork.ebms.service.model.EbMSMessageEvent;
 import nl.clockwork.ebms.service.model.MessageStatus;
 import nl.clockwork.ebms.signing.EbMSSignatureGenerator;
+import nl.clockwork.ebms.transaction.TransactionCallback;
 import nl.clockwork.ebms.util.StreamUtils;
 import nl.clockwork.ebms.validation.EbMSMessageContextValidator;
 
@@ -202,7 +202,7 @@ public class EbMSMessageServiceImpl implements EbMSMessageService
 		try
 		{
 			log.debug("ProcessMessage " + messageId);
-			ebMSDAO.executeTransaction(new DAOTransactionCallback()
+			ebMSDAO.executeTransaction(new TransactionCallback()
 			{
 				@Override
 				public void doInTransaction() throws DAOException
@@ -287,7 +287,7 @@ public class EbMSMessageServiceImpl implements EbMSMessageService
 		try
 		{
 			log.debug("ProcessMessageEvent " + messageId);
-			ebMSDAO.executeTransaction(new DAOTransactionCallback()
+			ebMSDAO.executeTransaction(new TransactionCallback()
 			{
 				@Override
 				public void doInTransaction() throws DAOException
@@ -313,7 +313,7 @@ public class EbMSMessageServiceImpl implements EbMSMessageService
 
 	protected void storeMessage(Document document, EbMSMessage message) throws EbMSProcessorException
 	{
-		ebMSDAO.executeTransaction(new DAOTransactionCallback()
+		ebMSDAO.executeTransaction(new TransactionCallback()
 		{
 			@Override
 			public void doInTransaction()

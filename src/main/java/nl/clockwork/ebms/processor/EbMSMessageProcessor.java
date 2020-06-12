@@ -40,7 +40,6 @@ import nl.clockwork.ebms.EbMSMessageUtils;
 import nl.clockwork.ebms.client.DeliveryManager;
 import nl.clockwork.ebms.cpa.CPAManager;
 import nl.clockwork.ebms.dao.DAOException;
-import nl.clockwork.ebms.dao.DAOTransactionCallback;
 import nl.clockwork.ebms.dao.EbMSDAO;
 import nl.clockwork.ebms.event.listener.EventListener;
 import nl.clockwork.ebms.event.processor.EventManager;
@@ -55,6 +54,7 @@ import nl.clockwork.ebms.model.EbMSPong;
 import nl.clockwork.ebms.model.EbMSStatusRequest;
 import nl.clockwork.ebms.model.EbMSStatusResponse;
 import nl.clockwork.ebms.signing.EbMSSignatureGenerator;
+import nl.clockwork.ebms.transaction.TransactionCallback;
 import nl.clockwork.ebms.util.DOMUtils;
 import nl.clockwork.ebms.validation.DuplicateMessageException;
 import nl.clockwork.ebms.validation.EbMSMessageValidator;
@@ -287,7 +287,7 @@ public class EbMSMessageProcessor
 	private void storeMessage(final Instant timestamp, final EbMSDocument messageDocument, final EbMSMessage message)
 	{
 		ebMSDAO.executeTransaction(
-			new DAOTransactionCallback()
+			new TransactionCallback()
 			{
 				@Override
 				public void doInTransaction()
@@ -303,7 +303,7 @@ public class EbMSMessageProcessor
 	{
 		
 		ebMSDAO.executeTransaction(
-			new DAOTransactionCallback()
+			new TransactionCallback()
 			{
 				@Override
 				public void doInTransaction()

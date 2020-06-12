@@ -32,7 +32,6 @@ import nl.clockwork.ebms.cpa.CPAManager;
 import nl.clockwork.ebms.cpa.CPAUtils;
 import nl.clockwork.ebms.cpa.CacheablePartyId;
 import nl.clockwork.ebms.dao.DAOException;
-import nl.clockwork.ebms.dao.DAOTransactionCallback;
 import nl.clockwork.ebms.dao.EbMSDAO;
 import nl.clockwork.ebms.event.processor.EventManager;
 import nl.clockwork.ebms.model.EbMSAcknowledgment;
@@ -40,6 +39,7 @@ import nl.clockwork.ebms.model.EbMSBaseMessage;
 import nl.clockwork.ebms.model.EbMSDocument;
 import nl.clockwork.ebms.model.EbMSMessage;
 import nl.clockwork.ebms.model.EbMSMessageError;
+import nl.clockwork.ebms.transaction.TransactionCallback;
 import nl.clockwork.ebms.util.DOMUtils;
 import nl.clockwork.ebms.util.StreamUtils;
 import nl.clockwork.ebms.validation.EbMSMessageValidator;
@@ -96,7 +96,7 @@ class DuplicateMessageHandler
 				val receiveDeliveryChannel = cpaManager.getReceiveDeliveryChannel(messageHeader.getCPAId(),fromPartyId,messageHeader.getFrom().getRole(),service,null)
 						.orElse(null);
 				ebMSDAO.executeTransaction(
-						new DAOTransactionCallback()
+						new TransactionCallback()
 						{
 							@Override
 							public void doInTransaction()

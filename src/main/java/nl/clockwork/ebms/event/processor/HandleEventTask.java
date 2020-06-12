@@ -35,14 +35,14 @@ import nl.clockwork.ebms.client.EbMSResponseException;
 import nl.clockwork.ebms.client.EbMSUnrecoverableResponseException;
 import nl.clockwork.ebms.cpa.CPAManager;
 import nl.clockwork.ebms.cpa.CPAUtils;
-import nl.clockwork.ebms.cpa.URLMapper;
-import nl.clockwork.ebms.dao.DAOTransactionCallback;
+import nl.clockwork.ebms.cpa.url.URLMapper;
 import nl.clockwork.ebms.dao.EbMSDAO;
 import nl.clockwork.ebms.encryption.EbMSMessageEncrypter;
 import nl.clockwork.ebms.event.listener.EventListener;
 import nl.clockwork.ebms.model.EbMSDocument;
 import nl.clockwork.ebms.processor.EbMSMessageProcessor;
 import nl.clockwork.ebms.processor.EbMSProcessingException;
+import nl.clockwork.ebms.transaction.TransactionCallback;
 import nl.clockwork.ebms.util.StreamUtils;
 
 @Slf4j
@@ -119,7 +119,7 @@ public class HandleEventTask implements Runnable
 		{
 			log.error("",e);
 			ebMSDAO.executeTransaction(
-				new DAOTransactionCallback()
+				new TransactionCallback()
 				{
 					@Override
 					public void doInTransaction()
@@ -140,7 +140,7 @@ public class HandleEventTask implements Runnable
 		{
 			log.error("",e);
 			ebMSDAO.executeTransaction(
-				new DAOTransactionCallback()
+				new TransactionCallback()
 				{
 					@Override
 					public void doInTransaction()
@@ -169,7 +169,7 @@ public class HandleEventTask implements Runnable
 			val responseDocument = createClient(event).sendMessage(url,requestDocument);
 			messageProcessor.processResponse(requestDocument,responseDocument);
 			ebMSDAO.executeTransaction(
-				new DAOTransactionCallback()
+				new TransactionCallback()
 				{
 					@Override
 					public void doInTransaction()
@@ -206,7 +206,7 @@ public class HandleEventTask implements Runnable
 		{
 			log.warn("Expiring message " +  event.getMessageId());
 			ebMSDAO.executeTransaction(
-				new DAOTransactionCallback()
+				new TransactionCallback()
 				{
 					@Override
 					public void doInTransaction()

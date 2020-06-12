@@ -13,22 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.clockwork.ebms.cpa;
+package nl.clockwork.ebms.cpa.url;
 
-import java.security.cert.X509Certificate;
 import java.util.List;
 import java.util.Optional;
 
 import nl.clockwork.ebms.dao.DAOException;
-import nl.clockwork.ebms.service.cpa.certificate.CertificateMapping;
+import nl.clockwork.ebms.service.cpa.url.URLMapping;
 
-public interface CertificateMappingDAO
+public interface URLMappingDAO
 {
-	boolean existsCertificateMapping(String id, String cpaId) throws DAOException;
-	Optional<X509Certificate> getCertificateMapping(String id, String cpaId) throws DAOException;
-	List<CertificateMapping> getCertificateMappings() throws DAOException;
-	void insertCertificateMapping(CertificateMapping mapping) throws DAOException;
-	int updateCertificateMapping(CertificateMapping mapping) throws DAOException;
-	int deleteCertificateMapping(String id, String cpaId) throws DAOException;
+	boolean existsURLMapping(String source) throws DAOException;
+	Optional<String> getURLMapping(String source) throws DAOException;
+	List<URLMapping> getURLMappings() throws DAOException;
+	void insertURLMapping(URLMapping urlMapping) throws DAOException;
+	int updateURLMapping(URLMapping urlMapping) throws DAOException;
+	int deleteURLMapping(String source) throws DAOException;
 	String getTargetName();
 }

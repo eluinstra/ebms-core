@@ -4,6 +4,8 @@ import java.sql.JDBCType;
 import java.util.List;
 import java.util.Optional;
 
+import org.apache.ibatis.annotations.Arg;
+import org.apache.ibatis.annotations.ConstructorArgs;
 import org.apache.ibatis.annotations.DeleteProvider;
 import org.apache.ibatis.annotations.InsertProvider;
 import org.apache.ibatis.annotations.Mapper;
@@ -20,26 +22,25 @@ import org.mybatis.dynamic.sql.insert.render.InsertStatementProvider;
 import org.mybatis.dynamic.sql.select.render.SelectStatementProvider;
 import org.mybatis.dynamic.sql.update.render.UpdateStatementProvider;
 import org.mybatis.dynamic.sql.util.SqlProviderAdapter;
-
-import nl.clockwork.ebms.service.cpa.url.URLMapping;
+import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CollaborationProtocolAgreement;
 
 @Mapper
-public interface URLMappingMapper
+public interface CPAMapper
 {
-	public static class URLMappingDSL
+	public static class CPADSL
 	{
-		public static final URLMappingTable urlMapping = new URLMappingTable();
-		public static final SqlColumn<String> source = urlMapping.source;
-		public static final SqlColumn<String> destination = urlMapping.destination;
+		public static final cpaTable cpaTable = new cpaTable();
+		public static final SqlColumn<String> cpaId = cpaTable.cpaId;
+		public static final SqlColumn<CollaborationProtocolAgreement> cpa = cpaTable.cpa;
 
-	  public static final class URLMappingTable extends SqlTable
+	  public static final class cpaTable extends SqlTable
 	  {
-	    public final SqlColumn<String> source = column("source",JDBCType.VARCHAR);
-	    public final SqlColumn<String> destination = column("destination",JDBCType.VARCHAR);
+	    public final SqlColumn<String> cpaId = column("cpa_id",JDBCType.VARCHAR);
+	    public final SqlColumn<CollaborationProtocolAgreement> cpa = column("cpa",JDBCType.CLOB,"nl.clockwork.ebms.cpa.CollaborationProtocolAgreementTypeHandler");
 
-	    public URLMappingTable()
+	    public cpaTable()
 			{
-	    	super("url_mapping");
+	    	super("cpa");
 			}
 	  }
 	}
@@ -48,18 +49,24 @@ public interface URLMappingMapper
 	long count(SelectStatementProvider selectStatement);
 
 	@SelectProvider(type=SqlProviderAdapter.class, method="select")
-	@Results(id="URLMappingResult", value= {
-			@Result(column="source", property="source", jdbcType=JdbcType.VARCHAR, id=true),
-			@Result(column="destination", property="destination", jdbcType=JdbcType.VARCHAR)
+	@Results(id="CPAMappingResult")
+	@ConstructorArgs({
+		@Arg(column = "cpa", javaType = CollaborationProtocolAgreement.class, jdbcType=JdbcType.VARCHAR, typeHandler = CollaborationProtocolAgreementTypeHandler.class)
 	})
-	Optional<URLMapping> selectOne(SelectStatementProvider selectStatement);
+	Optional<CPA> selectOne(SelectStatementProvider selectStatement);
 	
 	@SelectProvider(type=SqlProviderAdapter.class, method="select")
-	@ResultMap("URLMappingResult")
-	List<URLMapping> selectMany(SelectStatementProvider selectStatement);
+	@ResultMap("CPAMappingResult")
+	List<String> selectMany(SelectStatementProvider selectStatement);
+	
+	@SelectProvider(type=SqlProviderAdapter.class, method="select")
+	@Results(id="CPAIds", value= {
+			@Result(column="cpa_id", property="cpaId", jdbcType=JdbcType.VARCHAR, id=true),
+	})
+	List<String> selectCpaIds(SelectStatementProvider selectStatement);
 	
 	@InsertProvider(type=SqlProviderAdapter.class, method="insert")
-	int insert(InsertStatementProvider<URLMapping> insertStatement);
+	int insert(InsertStatementProvider<CPA> insertStatement);
 
 	@UpdateProvider(type=SqlProviderAdapter.class, method="update")
 	int update(UpdateStatementProvider updateStatement);

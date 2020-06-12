@@ -1,8 +1,8 @@
-package nl.clockwork.ebms.cpa;
+package nl.clockwork.ebms.cpa.url;
 
-import static nl.clockwork.ebms.cpa.URLMappingMapper.URLMappingDSL.destination;
-import static nl.clockwork.ebms.cpa.URLMappingMapper.URLMappingDSL.source;
-import static nl.clockwork.ebms.cpa.URLMappingMapper.URLMappingDSL.urlMapping;
+import static nl.clockwork.ebms.cpa.url.URLMappingMapper.URLMappingDSL.destination;
+import static nl.clockwork.ebms.cpa.url.URLMappingMapper.URLMappingDSL.source;
+import static nl.clockwork.ebms.cpa.url.URLMappingMapper.URLMappingDSL.urlMapping;
 import static org.mybatis.dynamic.sql.SqlBuilder.count;
 import static org.mybatis.dynamic.sql.SqlBuilder.deleteFrom;
 import static org.mybatis.dynamic.sql.SqlBuilder.insert;
@@ -31,66 +31,66 @@ public class URLMappingDAOImpl implements URLMappingDAO
 	@Override
 	public boolean existsURLMapping(String source_) throws DAOException
 	{
-    val selectStatement = select(count())
+    val s = select(count())
         .from(urlMapping)
         .where(source,isEqualTo(source_))
         .build()
         .render(RenderingStrategies.MYBATIS3);
-		return mapper.count(selectStatement) > 0;
+		return mapper.count(s) > 0;
 	}
 
 	@Override
 	public Optional<String> getURLMapping(String source_) throws DAOException
 	{
-    val selectStatement = select(source,destination)
+    val s = select(source,destination)
         .from(urlMapping)
         .where(source,isEqualTo(source_))
         .build()
         .render(RenderingStrategies.MYBATIS3);
-    return mapper.selectOne(selectStatement).map(m -> m.getDestination());
+    return mapper.selectOne(s).map(m -> m.getDestination());
 	}
 
 	@Override
 	public List<URLMapping> getURLMappings() throws DAOException
 	{
-    val selectStatement = select(source,destination)
+    val s = select(source,destination)
         .from(urlMapping)
         .build()
         .render(RenderingStrategies.MYBATIS3);
-    return mapper.selectMany(selectStatement);
+    return mapper.selectMany(s);
 	}
 
 	@Override
 	public void insertURLMapping(URLMapping urlMapping_) throws DAOException
 	{
-		val insertStatement = insert(urlMapping_)
+		val s = insert(urlMapping_)
         .into(urlMapping)
         .map(source).toProperty("source")
         .map(destination).toProperty("destination")
         .build()
         .render(RenderingStrategies.MYBATIS3);
-		mapper.insert(insertStatement);
+		mapper.insert(s);
 	}
 
 	@Override
 	public int updateURLMapping(URLMapping urlMapping_) throws DAOException
 	{
-		val updateStatement = update(urlMapping)
+		val s = update(urlMapping)
         .set(destination).equalTo(urlMapping_.getDestination())
         .where(source,isEqualTo(urlMapping_.getSource()))
         .build()
         .render(RenderingStrategies.MYBATIS3);
-		return mapper.update(updateStatement);
+		return mapper.update(s);
 	}
 
 	@Override
 	public int deleteURLMapping(String source_) throws DAOException
 	{
-		val deleteStatement = deleteFrom(urlMapping)
+		val s = deleteFrom(urlMapping)
         .where(source,isEqualTo(source_))
         .build()
         .render(RenderingStrategies.MYBATIS3);
-		return mapper.delete(deleteStatement);
+		return mapper.delete(s);
 	}
 
 	@Override

@@ -189,12 +189,12 @@
 		<constructor-arg name="cpaManager" ref="cpaManager"/>
 	</bean>
 
-	<bean id="urlMapper" class="nl.clockwork.ebms.cpa.URLMapper">
+	<bean id="urlMapper" class="nl.clockwork.ebms.cpa.url.URLMapper">
 		<constructor-arg name="daoMethodCache" ref="ebMSDAOMethodCacheInterceptor"/>
 		<constructor-arg name="ebMSDAO" ref="ebMSDAO"/>
 	</bean>
 
-	<bean id="certificateMapper" class="nl.clockwork.ebms.cpa.CertificateMapper">
+	<bean id="certificateMapper" class="nl.clockwork.ebms.cpa.certificate.CertificateMapper">
 		<constructor-arg name="daoMethodCache" ref="ebMSDAOMethodCacheInterceptor"/>
 		<constructor-arg name="ebMSDAO" ref="ebMSDAO"/>
 	</bean>

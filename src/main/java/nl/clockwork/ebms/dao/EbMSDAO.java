@@ -30,10 +30,11 @@ import nl.clockwork.ebms.model.EbMSDocument;
 import nl.clockwork.ebms.service.model.EbMSMessageContent;
 import nl.clockwork.ebms.service.model.EbMSMessageContentMTOM;
 import nl.clockwork.ebms.service.model.EbMSMessageContext;
+import nl.clockwork.ebms.transaction.TransactionCallback;
 
 public interface EbMSDAO
 {
-	void executeTransaction(DAOTransactionCallback callback) throws DAOException;
+	void executeTransaction(TransactionCallback callback) throws DAOException;
 
 	boolean existsMessage(String messageId) throws DAOException;
 	boolean existsIdenticalMessage(EbMSBaseMessage message) throws DAOException;

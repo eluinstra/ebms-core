@@ -21,11 +21,11 @@ import java.util.Optional;
 
 import nl.clockwork.ebms.EbMSAction;
 import nl.clockwork.ebms.dao.DAOException;
-import nl.clockwork.ebms.dao.DAOTransactionCallback;
+import nl.clockwork.ebms.transaction.TransactionCallback;
 
 public interface EbMSEventDAO
 {
-	void executeTransaction(DAOTransactionCallback callback) throws DAOException;
+	void executeTransaction(TransactionCallback callback) throws DAOException;
 
 	Optional<EbMSAction> getMessageAction(String messageId) throws DAOException;
 	List<EbMSEvent> getEventsBefore(Instant timestamp, String serverId) throws DAOException;

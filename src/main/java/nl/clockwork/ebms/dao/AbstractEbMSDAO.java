@@ -30,13 +30,11 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.activation.DataHandler;
-import javax.xml.bind.JAXBException;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CollaborationProtocolAgreement;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
@@ -61,13 +59,11 @@ import nl.clockwork.ebms.EbMSAction;
 import nl.clockwork.ebms.EbMSAttachmentFactory;
 import nl.clockwork.ebms.EbMSMessageStatus;
 import nl.clockwork.ebms.EbMSMessageUtils;
-import nl.clockwork.ebms.cpa.CPADAO;
 import nl.clockwork.ebms.event.listener.EbMSMessageEventDAO;
 import nl.clockwork.ebms.event.listener.EbMSMessageEventType;
 import nl.clockwork.ebms.event.processor.EbMSEvent;
 import nl.clockwork.ebms.event.processor.EbMSEventDAO;
 import nl.clockwork.ebms.event.processor.EbMSEventStatus;
-import nl.clockwork.ebms.jaxb.JAXBParser;
 import nl.clockwork.ebms.model.EbMSAttachment;
 import nl.clockwork.ebms.model.EbMSBaseMessage;
 import nl.clockwork.ebms.model.EbMSDocument;
@@ -79,11 +75,12 @@ import nl.clockwork.ebms.service.model.EbMSMessageContentMTOM;
 import nl.clockwork.ebms.service.model.EbMSMessageContext;
 import nl.clockwork.ebms.service.model.EbMSMessageEvent;
 import nl.clockwork.ebms.service.model.Party;
+import nl.clockwork.ebms.transaction.TransactionCallback;
 import nl.clockwork.ebms.util.DOMUtils;
 
 @FieldDefaults(level = AccessLevel.PROTECTED, makeFinal = true)
 @AllArgsConstructor
-abstract class AbstractEbMSDAO implements EbMSDAO, CPADAO, EbMSEventDAO, EbMSMessageEventDAO
+abstract class AbstractEbMSDAO implements EbMSDAO, EbMSEventDAO, EbMSMessageEventDAO
 {
 	@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 	@AllArgsConstructor
@@ -144,146 +141,19 @@ abstract class AbstractEbMSDAO implements EbMSDAO, CPADAO, EbMSEventDAO, EbMSMes
 
 	
 	@Override
-	public void executeTransaction(final DAOTransactionCallback callback) throws DAOException
+	public void executeTransaction(final TransactionCallback callback) throws DAOException
 	{
-		try
-		{
-			transactionTemplate.execute(
-				new TransactionCallbackWithoutResult()
+		transactionTemplate.execute(
+			new TransactionCallbackWithoutResult()
+			{
+
+				@Override
+				protected void doInTransactionWithoutResult(TransactionStatus transactionStatus)
 				{
-
-					@Override
-					protected void doInTransactionWithoutResult(TransactionStatus transactionStatus)
-					{
-						callback.doInTransaction();
-					}
+					callback.doInTransaction();
 				}
-			);
-		}
-		catch (DataAccessException | TransactionException e)
-		{
-			throw new DAOException(e);
-		}
-	}
-
-	@Override
-	public boolean existsCPA(String cpaId) throws DAOException
-	{
-		try
-		{
-			return jdbcTemplate.queryForObject(
-				"select count(*)" +
-				" from cpa" +
-				" where cpa_id = ?",
-				Integer.class,
-				cpaId
-			) > 0;
-		}
-		catch (DataAccessException e)
-		{
-			throw new DAOException(e);
-		}
-	}
-	
-	@Override
-	public Optional<CollaborationProtocolAgreement> getCPA(String cpaId) throws DAOException
-	{
-		try
-		{
-			val result = jdbcTemplate.queryForObject(
-				"select cpa" +
-				" from cpa" +
-				" where cpa_id = ?",
-				String.class,
-				cpaId
-			);
-			return Optional.of(JAXBParser.getInstance(CollaborationProtocolAgreement.class).handle(result));
-		}
-		catch(EmptyResultDataAccessException e)
-		{
-			return Optional.empty();
-		}
-		catch (DataAccessException | JAXBException e)
-		{
-			throw new DAOException(e);
-		}
-	}
-
-	@Override
-	public List<String> getCPAIds() throws DAOException
-	{
-		try
-		{
-			return jdbcTemplate.queryForList(
-				"select cpa_id" +
-				" from cpa" +
-				" order by cpa_id asc",
-				String.class
-			);
-		}
-		catch (DataAccessException e)
-		{
-			throw new DAOException(e);
-		}
-	}
-
-	@Override
-	public void insertCPA(CollaborationProtocolAgreement cpa) throws DAOException
-	{
-		try
-		{
-			jdbcTemplate.update
-			(
-				"insert into cpa (" +
-					"cpa_id," +
-					"cpa" +
-				") values (?,?)",
-				cpa.getCpaid(),
-				JAXBParser.getInstance(CollaborationProtocolAgreement.class).handle(cpa)
-			);
-		}
-		catch (DataAccessException | JAXBException e)
-		{
-			throw new DAOException(e);
-		}
-	}
-
-	@Override
-	public int updateCPA(CollaborationProtocolAgreement cpa) throws DAOException
-	{
-		try
-		{
-			return jdbcTemplate.update
-			(
-				"update cpa set" +
-				" cpa = ?" +
-				" where cpa_id = ?",
-				JAXBParser.getInstance(CollaborationProtocolAgreement.class).handle(cpa),
-				cpa.getCpaid()
-			);
-		}
-		catch (DataAccessException | JAXBException e)
-		{
-			throw new DAOException(e);
-		}
-	}
-
-	@Override
-	public int deleteCPA(String cpaId) throws DAOException
-	{
-		try
-		{
-			return jdbcTemplate.update
-			(
-				"delete from cpa" +
-				" where cpa_id = ?",
-				cpaId
-			);
-		}
-		catch (DataAccessException e)
-		{
-			throw new DAOException(e);
-		}
+			}
+		);
 	}
 
 	@Override
@@ -1229,11 +1099,5 @@ abstract class AbstractEbMSDAO implements EbMSDAO, CPADAO, EbMSEventDAO, EbMSMes
 			}
 		}
 		return result.toString();
-	}
-
-	@Override
-	public final String getTargetName()
-	{
-		return getClass().getSimpleName();
 	}
 }
