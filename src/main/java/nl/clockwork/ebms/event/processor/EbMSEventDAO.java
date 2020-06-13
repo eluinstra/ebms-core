@@ -17,9 +17,7 @@ package nl.clockwork.ebms.event.processor;
 
 import java.time.Instant;
 import java.util.List;
-import java.util.Optional;
 
-import nl.clockwork.ebms.EbMSAction;
 import nl.clockwork.ebms.dao.DAOException;
 import nl.clockwork.ebms.transaction.TransactionCallback;
 
@@ -27,7 +25,6 @@ public interface EbMSEventDAO
 {
 	void executeTransaction(TransactionCallback callback) throws DAOException;
 
-	Optional<EbMSAction> getMessageAction(String messageId) throws DAOException;
 	List<EbMSEvent> getEventsBefore(Instant timestamp, String serverId) throws DAOException;
 	List<EbMSEvent> getEventsBefore(Instant timestamp, String serverId, int maxNr) throws DAOException;
 	void insertEvent(EbMSEvent event, String serverId) throws DAOException;

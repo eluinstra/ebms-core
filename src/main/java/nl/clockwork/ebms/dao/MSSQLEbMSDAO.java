@@ -142,17 +142,6 @@ class MSSQLEbMSDAO extends nl.clockwork.ebms.dao.MySQLEbMSDAO
 	}
 
 	@Override
-	public String getEventsBeforeQuery(String serverId, int maxNr)
-	{
-		return "select top " + maxNr + " cpa_id, send_channel_id, receive_channel_id, message_id, time_to_live, time_stamp, is_confidential, retries" +
-			" from ebms_event" +
-			" where time_stamp <= ?" +
-			(serverId == null ? " and server_id is null" : " and server_id = '" + serverId + "'") +
-			//" and (server_id = ? or (server_id is null and ? is null))" +
-			" order by time_stamp asc";
-	}
-
-	@Override
 	protected String getMessageEventsQuery(String messageContextFilter, EbMSMessageEventType[] types, int maxNr)
 	{
 		return "select top " + maxNr + " ebms_message_event.message_id, ebms_message_event.event_type" +

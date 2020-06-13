@@ -27,6 +27,7 @@ import lombok.val;
 import lombok.experimental.FieldDefaults;
 import nl.clockwork.ebms.cpa.CPAManager;
 import nl.clockwork.ebms.cpa.CPAUtils;
+import nl.clockwork.ebms.dao.EbMSDAO;
 import nl.clockwork.ebms.jms.JmsTemplateFactory;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -42,6 +43,7 @@ public class EventManagerFactory implements FactoryBean<EventManager>
 	@Builder(setterPrefix = "set")
 	public EventManagerFactory(
 			@NonNull EventManagerType type,
+			@NonNull EbMSDAO ebMSDAO,
 			@NonNull EbMSEventDAO ebMSEventDAO,
 			@NonNull CPAManager cpaManager,
 			String serverId,
@@ -52,10 +54,10 @@ public class EventManagerFactory implements FactoryBean<EventManager>
 		switch(type)
 		{
 			case JMS:
-				eventManager = new JMSEventManager(JmsTemplateFactory.getInstance(jmsBrokerUrl),ebMSEventDAO,cpaManager,nrAutoRetries,autoRetryInterval);
+				eventManager = new JMSEventManager(JmsTemplateFactory.getInstance(jmsBrokerUrl),ebMSDAO,ebMSEventDAO,cpaManager,nrAutoRetries,autoRetryInterval);
 				break;
 			default:
-				eventManager = new EbMSEventManager(ebMSEventDAO,cpaManager,serverId,nrAutoRetries,autoRetryInterval);
+				eventManager = new EbMSEventManager(ebMSDAO,ebMSEventDAO,cpaManager,serverId,nrAutoRetries,autoRetryInterval);
 		}
 	}
 	

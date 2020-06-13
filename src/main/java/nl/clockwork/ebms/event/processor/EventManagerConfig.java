@@ -9,6 +9,7 @@ import org.springframework.context.annotation.DependsOn;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import nl.clockwork.ebms.cpa.CPAManager;
+import nl.clockwork.ebms.dao.EbMSDAO;
 import nl.clockwork.ebms.event.processor.EventManagerFactory.EventManagerType;
 
 @Configuration(proxyBeanMethods = false)
@@ -17,6 +18,8 @@ public class EventManagerConfig
 {
 	@Value("${eventManager.type}")
 	EventManagerType eventManagerType;
+	@Autowired
+	EbMSDAO ebMSDAO;
 	@Autowired
 	EbMSEventDAO ebMSEventDAO;
 	@Autowired
@@ -36,6 +39,7 @@ public class EventManagerConfig
 	{
 		return EventManagerFactory.builder()
 				.setType(eventManagerType)
+				.setEbMSDAO(ebMSDAO)
 				.setEbMSEventDAO(ebMSEventDAO)
 				.setCpaManager(cpaManager)
 				.setServerId(serverId)

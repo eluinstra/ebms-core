@@ -28,6 +28,7 @@ import org.springframework.jms.core.MessageCreator;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
@@ -35,9 +36,11 @@ import lombok.experimental.FieldDefaults;
 import lombok.experimental.NonFinal;
 import nl.clockwork.ebms.cpa.CPAManager;
 import nl.clockwork.ebms.cpa.CPAUtils;
+import nl.clockwork.ebms.dao.EbMSDAO;
 import nl.clockwork.ebms.transaction.TransactionCallback;
 import nl.clockwork.ebms.util.StreamUtils;
 
+@Builder
 @FieldDefaults(level = AccessLevel.PROTECTED, makeFinal = true)
 @AllArgsConstructor
 public class JMSEventManager implements EventManager
@@ -74,7 +77,9 @@ public class JMSEventManager implements EventManager
 	@NonNull
 	JmsTemplate jmsTemplate;
 	@NonNull
-	EbMSEventDAO ebMSeventDAO;
+	EbMSDAO ebMSDAO;
+	@NonNull
+	EbMSEventDAO ebMSEventDAO;
 	@NonNull
 	CPAManager cpaManager;
 	int nrAutoRetries;
@@ -100,13 +105,13 @@ public class JMSEventManager implements EventManager
 				event.getCpaId(),
 				event.getReceiveDeliveryChannelId())
 					.orElseThrow(() -> StreamUtils.illegalStateException("DeliveryChannel",event.getCpaId(),event.getReceiveDeliveryChannelId()));
-		ebMSeventDAO.executeTransaction(
+		ebMSEventDAO.executeTransaction(
 			new TransactionCallback()
 			{
 				@Override
 				public void doInTransaction()
 				{
-					ebMSeventDAO.insertEventLog(event.getMessageId(),event.getTimestamp(), url, status, errorMessage);
+					ebMSEventDAO.insertEventLog(event.getMessageId(),event.getTimestamp(),url,status,errorMessage);
 					if (event.getTimeToLive() != null && CPAUtils.isReliableMessaging(deliveryChannel))
 					{
 						val nextEvent = EventManagerFactory.createNextEvent(event,deliveryChannel);
@@ -115,7 +120,7 @@ public class JMSEventManager implements EventManager
 					}
 					else
 					{
-						switch(ebMSeventDAO.getMessageAction(event.getMessageId()).orElse(null))
+						switch(ebMSDAO.getMessageAction(event.getMessageId()).orElse(null))
 						{
 							case ACKNOWLEDGMENT:
 							case MESSAGE_ERROR:

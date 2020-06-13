@@ -47,6 +47,7 @@ public interface EbMSDAO
 	Optional<EbMSDocument> getEbMSDocumentIfUnsent(String messageId) throws DAOException;
 	Optional<EbMSDocument> getEbMSDocumentByRefToMessageId(String cpaId, String refToMessageId, EbMSAction...actions) throws DAOException;
 	Optional<EbMSMessageStatus> getMessageStatus(String messageId) throws DAOException;
+	Optional<EbMSAction> getMessageAction(String messageId) throws DAOException;
 	Optional<Instant> getPersistTime(String messageId);
 
 	List<String> getMessageIds(EbMSMessageContext messageContext, EbMSMessageStatus status) throws DAOException;

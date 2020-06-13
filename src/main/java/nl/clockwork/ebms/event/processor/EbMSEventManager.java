@@ -21,20 +21,25 @@ import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DeliveryChannel;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.NonNull;
 import lombok.val;
 import lombok.experimental.FieldDefaults;
 import nl.clockwork.ebms.cpa.CPAManager;
 import nl.clockwork.ebms.cpa.CPAUtils;
+import nl.clockwork.ebms.dao.EbMSDAO;
 import nl.clockwork.ebms.transaction.TransactionCallback;
 import nl.clockwork.ebms.util.StreamUtils;
 
+@Builder
 @FieldDefaults(level = AccessLevel.PROTECTED, makeFinal = true)
 @AllArgsConstructor
 public class EbMSEventManager implements EventManager
 {
 	@NonNull
-	EbMSEventDAO ebMSeventDAO;
+	EbMSDAO ebMSDAO;
+	@NonNull
+	EbMSEventDAO ebMSEventDAO;
 	@NonNull
 	CPAManager cpaManager;
 	String serverId;
@@ -44,7 +49,7 @@ public class EbMSEventManager implements EventManager
 	@Override
 	public void createEvent(String cpaId, DeliveryChannel sendDeliveryChannel, DeliveryChannel receiveDeliveryChannel, String messageId, Instant timeToLive, Instant timestamp, boolean isConfidential)
 	{
-		ebMSeventDAO.insertEvent(new EbMSEvent(cpaId,sendDeliveryChannel.getChannelId(),receiveDeliveryChannel.getChannelId(), messageId, timeToLive, timestamp, isConfidential, 0),serverId);
+		ebMSEventDAO.insertEvent(new EbMSEvent(cpaId,sendDeliveryChannel.getChannelId(),receiveDeliveryChannel.getChannelId(), messageId, timeToLive, timestamp, isConfidential, 0),serverId);
 	}
 
 	@Override
@@ -60,28 +65,28 @@ public class EbMSEventManager implements EventManager
 				event.getCpaId(),
 				event.getReceiveDeliveryChannelId())
 					.orElseThrow(() -> StreamUtils.illegalStateException("DeliveryChannel",event.getCpaId(),event.getReceiveDeliveryChannelId()));
-		ebMSeventDAO.executeTransaction(
+		ebMSEventDAO.executeTransaction(
 			new TransactionCallback()
 			{
 				@Override
 				public void doInTransaction()
 				{
-					ebMSeventDAO.insertEventLog(event.getMessageId(),event.getTimestamp(),url,status,errorMessage);
+					ebMSEventDAO.insertEventLog(event.getMessageId(),event.getTimestamp(),url,status,errorMessage);
 					if (event.getTimeToLive() != null && CPAUtils.isReliableMessaging(deliveryChannel))
-						ebMSeventDAO.updateEvent(EventManagerFactory.createNextEvent(event,deliveryChannel));
+						ebMSEventDAO.updateEvent(EventManagerFactory.createNextEvent(event,deliveryChannel));
 					else
 					{
-						switch(ebMSeventDAO.getMessageAction(event.getMessageId()).orElse(null))
+						switch(ebMSDAO.getMessageAction(event.getMessageId()).orElse(null))
 						{
 							case ACKNOWLEDGMENT:
 							case MESSAGE_ERROR:
 								if (event.getRetries() < nrAutoRetries)
 								{
-									ebMSeventDAO.updateEvent(EventManagerFactory.createNextEvent(event,autoRetryInterval));
+									ebMSEventDAO.updateEvent(EventManagerFactory.createNextEvent(event,autoRetryInterval));
 									break;
 								}
 							default:
-								ebMSeventDAO.deleteEvent(event.getMessageId());
+								ebMSEventDAO.deleteEvent(event.getMessageId());
 						}
 					}
 				}
@@ -92,6 +97,6 @@ public class EbMSEventManager implements EventManager
 	@Override
 	public void deleteEvent(String messageId)
 	{
-		ebMSeventDAO.deleteEvent(messageId);
+		ebMSEventDAO.deleteEvent(messageId);
 	}
 }

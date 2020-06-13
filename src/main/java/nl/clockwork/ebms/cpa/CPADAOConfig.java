@@ -1,9 +1,6 @@
 package nl.clockwork.ebms.cpa;
 
-import javax.sql.DataSource;
-
 import org.apache.ibatis.session.SqlSessionFactory;
-import org.mybatis.spring.SqlSessionFactoryBean;
 import org.mybatis.spring.mapper.MapperFactoryBean;
 import org.springframework.aop.framework.ProxyFactoryBean;
 import org.springframework.aop.support.RegexpMethodPointcutAdvisor;
@@ -28,7 +25,7 @@ import nl.clockwork.ebms.cpa.url.URLMappingMapper;
 public class CPADAOConfig
 {
 	@Autowired
-	DataSource dataSource;
+	SqlSessionFactory sqlSessionFactory;
 	@Autowired
 	BeanFactory beanFactory;
 	@Autowired
@@ -38,7 +35,7 @@ public class CPADAOConfig
 	public CPADAO cpaDAO() throws Exception
 	{
 		val factoryBean = new MapperFactoryBean<CPAMapper>(CPAMapper.class);
-		factoryBean.setSqlSessionFactory(sqlSessionFactory());
+		factoryBean.setSqlSessionFactory(sqlSessionFactory);
 		return (CPADAO)createMethodCacheProxy(new CPADAOImpl(factoryBean.getObject()));
 	}
 
@@ -46,7 +43,7 @@ public class CPADAOConfig
 	public URLMappingDAO urlMappingDAO() throws Exception
 	{
 		val factoryBean = new MapperFactoryBean<URLMappingMapper>(URLMappingMapper.class);
-		factoryBean.setSqlSessionFactory(sqlSessionFactory());
+		factoryBean.setSqlSessionFactory(sqlSessionFactory);
 		return (URLMappingDAO)createMethodCacheProxy(new URLMappingDAOImpl(factoryBean.getObject()));
 	}
 
@@ -54,20 +51,8 @@ public class CPADAOConfig
 	public CertificateMappingDAO certificateMappingDAO() throws Exception
 	{
 		val factoryBean = new MapperFactoryBean<CertificateMappingMapper>(CertificateMappingMapper.class);
-		factoryBean.setSqlSessionFactory(sqlSessionFactory());
+		factoryBean.setSqlSessionFactory(sqlSessionFactory);
 		return (CertificateMappingDAO)createMethodCacheProxy(new CertificateMappingDAOImpl(factoryBean.getObject()));
-	}
-
-	@Bean
-	public SqlSessionFactory sqlSessionFactory() throws Exception
-	{
-		val factoryBean = new SqlSessionFactoryBean();
-		factoryBean.setDataSource(dataSource);
-		SqlSessionFactory result = factoryBean.getObject();
-		result.getConfiguration().addMapper(CPAMapper.class);
-		result.getConfiguration().addMapper(URLMappingMapper.class);
-		result.getConfiguration().addMapper(CertificateMappingMapper.class);
-		return result;
 	}
 
 	@Bean(name = "daoMethodCachePointCut")
