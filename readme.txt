@@ -187,27 +187,27 @@ ebms.jdbc.url=jdbc:hsqldb:mem:<dbname>
 ebms.jdbc.url=jdbc:hsqldb:file:<path>
 # or external
 ebms.jdbc.url=jdbc:hsqldb:hsql://<host>:<port>/<dbname>
-ebms.pool.preferredTestQuery=select 1 from information_schema.system_tables
+ebms.pool.testQuery=select 1 from information_schema.system_tables
 
 MySQL:
 ebms.jdbc.driverClassName=com.mysql.jdbc.Driver
 ebms.jdbc.url=jdbc:mysql://<host>:<port>/<dbname>
-ebms.pool.preferredTestQuery=select 1
+ebms.pool.testQuery=select 1
 
 MariaDB:
 ebms.jdbc.driverClassName=org.mariadb.jdbc.Driver
 ebms.jdbc.url=jdbc:mysql://localhost:3306/ebms
-ebms.pool.preferredTestQuery=select 1
+ebms.pool.testQuery=select 1
 
 PostgreSQL:
 ebms.jdbc.driverClassName=org.postgresql.Driver
 ebms.jdbc.url=jdbc:postgresql://<host>:<port>/<dbname>
-ebms.pool.preferredTestQuery=select 1
+ebms.pool.testQuery=select 1
 
 MSSQL:
 ebms.jdbc.driverClassName=com.microsoft.sqlserver.jdbc.SQLServerDriver
 ebms.jdbc.url=jdbc:sqlserver://<host>:<port>;databaseName=<dbname>;
-ebms.pool.preferredTestQuery=select 1
+ebms.pool.testQuery=select 1
 
 Oracle:
 ebms.jdbc.driverClassName=oracle.jdbc.OracleDriver
@@ -216,7 +216,7 @@ ebms.jdbc.url=jdbc:oracle:thin:@<host>:<port>:<dbname>
 DB2:
 ebms.jdbc.driverClassName=com.ibm.db2.jcc.DB2Driver
 ebms.jdbc.url=jdbc:db2://localhost:50000/ebms
-ebms.pool.preferredTestQuery=select 1 from sysibm.sysdummy1
+ebms.pool.testQuery=select 1 from sysibm.sysdummy1
 
 ==========
 = Security
