@@ -42,6 +42,14 @@ public class DataSourceConfig
 	String username;
 	@Value("${ebms.jdbc.password}")
 	String password;
+	@Value("${ebms.pool.autoCommit}")
+	boolean isAutoCommit;
+	@Value("${ebms.pool.connectionTimeout}")
+	int connectionTimeout;
+	@Value("${ebms.pool.idleTimeout}")
+	int idleTimeout;
+	@Value("${ebms.pool.maxLifetime}")
+	int maxLifetime;
 	@Value("${ebms.pool.connectionTestQuery}")
 	String connectionTestQuery;
 	@Value("${ebms.pool.minPoolSize}")
@@ -57,6 +65,10 @@ public class DataSourceConfig
 		config.setJdbcUrl(jdbcUrl);
 		config.setUsername(username);
 		config.setPassword(password);
+		config.setAutoCommit(isAutoCommit);
+		config.setConnectionTimeout(connectionTimeout);
+		config.setIdleTimeout(idleTimeout);
+		config.setMaxLifetime(maxLifetime);
 		config.setConnectionTestQuery(connectionTestQuery);
 		config.setMinimumIdle(minPoolSize);
 		config.setMaximumPoolSize(maxPoolSize);
