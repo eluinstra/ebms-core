@@ -27,8 +27,8 @@ public class DataSourceConfig
 	String username;
 	@Value("${ebms.jdbc.password}")
 	String password;
-	@Value("${ebms.pool.testQuery}")
-	String testQuery;
+	@Value("${ebms.pool.connectionTestQuery}")
+	String connectionTestQuery;
 	@Value("${ebms.pool.minPoolSize}")
 	int minPoolSize;
 	@Value("${ebms.pool.maxPoolSize}")
@@ -42,8 +42,7 @@ public class DataSourceConfig
 		config.setJdbcUrl(jdbcUrl);
 		config.setUsername(username);
 		config.setPassword(password);
-		config.setConnectionInitSql(testQuery);
-		config.setConnectionTestQuery(testQuery);
+		config.setConnectionTestQuery(connectionTestQuery);
 		config.setMinimumIdle(minPoolSize);
 		config.setMaximumPoolSize(maxPoolSize);
 		return new HikariDataSource(config);
