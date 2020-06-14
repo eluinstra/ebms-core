@@ -16,6 +16,7 @@
 package nl.clockwork.ebms.client;
 
 import org.springframework.beans.factory.FactoryBean;
+import org.springframework.jms.core.JmsTemplate;
 
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -23,7 +24,6 @@ import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
 import nl.clockwork.ebms.EbMSThreadPoolExecutor;
 import nl.clockwork.ebms.cpa.CPAManager;
-import nl.clockwork.ebms.jms.JmsTemplateFactory;
 import nl.clockwork.ebms.model.EbMSResponseMessage;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -41,7 +41,7 @@ public class DeliveryManagerFactory implements FactoryBean<DeliveryManager>
 			@NonNull MessageQueue<EbMSResponseMessage> messageQueue,
 			@NonNull CPAManager cpaManager,
 			@NonNull EbMSHttpClientFactory ebMSClientFactory,
-			@NonNull String jmsBrokerURL)
+			@NonNull JmsTemplate jmsTemplate)
 	{
 		switch(type)
 		{
@@ -51,7 +51,7 @@ public class DeliveryManagerFactory implements FactoryBean<DeliveryManager>
 						.messageQueue(messageQueue)
 						.cpaManager(cpaManager)
 						.ebMSClientFactory(ebMSClientFactory)
-						.jmsTemplate(JmsTemplateFactory.getInstance(jmsBrokerURL))
+						.jmsTemplate(jmsTemplate)
 						.build();
 				break;
 			default:

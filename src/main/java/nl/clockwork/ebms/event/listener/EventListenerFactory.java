@@ -23,6 +23,7 @@ import javax.jms.Destination;
 import org.apache.activemq.command.ActiveMQQueue;
 import org.apache.activemq.command.ActiveMQTopic;
 import org.springframework.beans.factory.FactoryBean;
+import org.springframework.jms.core.JmsTemplate;
 
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -30,7 +31,6 @@ import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
 import nl.clockwork.ebms.dao.EbMSDAO;
 import nl.clockwork.ebms.jms.JMSDestinationType;
-import nl.clockwork.ebms.jms.JmsTemplateFactory;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class EventListenerFactory implements FactoryBean<EventListener>
@@ -44,7 +44,12 @@ public class EventListenerFactory implements FactoryBean<EventListener>
 	EventListener listener;
 
 	@Builder(setterPrefix = "set")
-	public EventListenerFactory(@NonNull EventListenerType type, @NonNull EbMSDAO ebMSDAO, @NonNull EbMSMessageEventDAO ebMSMessageEventDAO, @NonNull String jmsBrokerURL, JMSDestinationType jmsDestinationType) throws Exception
+	public EventListenerFactory(
+			@NonNull EventListenerType type,
+			@NonNull EbMSDAO ebMSDAO,
+			@NonNull EbMSMessageEventDAO ebMSMessageEventDAO,
+			@NonNull JmsTemplate jmsTemplate,
+			JMSDestinationType jmsDestinationType) throws Exception
 	{
 		switch (type)
 		{
@@ -52,13 +57,13 @@ public class EventListenerFactory implements FactoryBean<EventListener>
 				listener = new DAOEventListener(ebMSMessageEventDAO);
 				break;
 			case SIMPLE_JMS:
-				listener = new SimpleJMSEventListener(JmsTemplateFactory.getInstance(jmsBrokerURL),createEbMSMessageEventDestinations(jmsDestinationType));
+				listener = new SimpleJMSEventListener(jmsTemplate,createEbMSMessageEventDestinations(jmsDestinationType));
 				break;
 			case JMS:
-				listener = new JMSEventListener(ebMSDAO,JmsTemplateFactory.getInstance(jmsBrokerURL),createEbMSMessageEventDestinations(jmsDestinationType));
+				listener = new JMSEventListener(ebMSDAO,jmsTemplate,createEbMSMessageEventDestinations(jmsDestinationType));
 				break;
 			case JMS_TEXT:
-				listener = new JMSTextEventListener(ebMSDAO,JmsTemplateFactory.getInstance(jmsBrokerURL),createEbMSMessageEventDestinations(jmsDestinationType));
+				listener = new JMSTextEventListener(ebMSDAO,jmsTemplate,createEbMSMessageEventDestinations(jmsDestinationType));
 				break;
 			default:
 				listener = new LoggingEventListener();

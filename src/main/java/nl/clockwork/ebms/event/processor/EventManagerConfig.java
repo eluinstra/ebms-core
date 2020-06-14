@@ -16,10 +16,11 @@
 package nl.clockwork.ebms.event.processor;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.DependsOn;
+import org.springframework.jms.core.JmsTemplate;
 
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
@@ -38,15 +39,15 @@ public class EventManagerConfig
 	CPAManager cpaManager;
 	@Value("${ebms.serverId}")
 	String serverId;
-	@Value("${jms.brokerURL}")
-	String jmsBrokerUrl;
+	@Autowired()
+	@Qualifier("jmsTemplate")
+	JmsTemplate jmsTemplate;
 	@Value("${ebmsMessage.nrAutoRetries}")
 	int nrAutoRetries;
 	@Value("${ebmsMessage.autoRetryInterval}")
 	int autoRetryInterval;
 
 	@Bean()
-	@DependsOn("brokerFactory")
 	public EventManager eventManager() throws Exception
 	{
 		return EventManagerFactory.builder()
@@ -54,7 +55,7 @@ public class EventManagerConfig
 				.setEbMSEventDAO(ebMSEventDAO)
 				.setCpaManager(cpaManager)
 				.setServerId(serverId)
-				.setJmsBrokerUrl(jmsBrokerUrl)
+				.setJmsTemplate(jmsTemplate)
 				.setNrAutoRetries(nrAutoRetries)
 				.setAutoRetryInterval(autoRetryInterval)
 				.build()

@@ -19,6 +19,7 @@ import java.time.Instant;
 
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DeliveryChannel;
 import org.springframework.beans.factory.FactoryBean;
+import org.springframework.jms.core.JmsTemplate;
 
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -27,7 +28,6 @@ import lombok.val;
 import lombok.experimental.FieldDefaults;
 import nl.clockwork.ebms.cpa.CPAManager;
 import nl.clockwork.ebms.cpa.CPAUtils;
-import nl.clockwork.ebms.jms.JmsTemplateFactory;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class EventManagerFactory implements FactoryBean<EventManager>
@@ -45,14 +45,14 @@ public class EventManagerFactory implements FactoryBean<EventManager>
 			@NonNull EbMSEventDAO ebMSEventDAO,
 			@NonNull CPAManager cpaManager,
 			String serverId,
-			@NonNull String jmsBrokerUrl,
+			@NonNull JmsTemplate jmsTemplate,
 			int nrAutoRetries,
 			int autoRetryInterval)
 	{
 		switch(type)
 		{
 			case JMS:
-				eventManager = new JMSEventManager(JmsTemplateFactory.getInstance(jmsBrokerUrl),ebMSEventDAO,cpaManager,nrAutoRetries,autoRetryInterval);
+				eventManager = new JMSEventManager(jmsTemplate,ebMSEventDAO,cpaManager,nrAutoRetries,autoRetryInterval);
 				break;
 			default:
 				eventManager = new EbMSEventManager(ebMSEventDAO,cpaManager,serverId,nrAutoRetries,autoRetryInterval);
