@@ -1,9 +1,11 @@
 package nl.clockwork.ebms.event.listener;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.jms.core.JmsTemplate;
 
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
@@ -21,8 +23,9 @@ public class EventListenerConfig
 	EbMSDAO ebMSDAO;
 	@Autowired
 	EbMSMessageEventDAO ebMSMessageEventDAO;
-	@Value("${jms.brokerURL}")
-	String jmsBrokerURL;
+	@Autowired
+	@Qualifier("jmsTemplate")
+	JmsTemplate jmsTemplate;
 	@Value("${jms.destinationType}")
 	JMSDestinationType jmsDestinationType;
 
@@ -33,7 +36,7 @@ public class EventListenerConfig
 				.setType(eventListenerType)
 				.setEbMSDAO(ebMSDAO)
 				.setEbMSMessageEventDAO(ebMSMessageEventDAO)
-				.setJmsBrokerURL(jmsBrokerURL)
+				.setJmsTemplate(jmsTemplate)
 				.setJmsDestinationType(jmsDestinationType)
 				.build()
 				.getObject();

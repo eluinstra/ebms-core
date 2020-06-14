@@ -1,9 +1,11 @@
 package nl.clockwork.ebms.event.processor;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.jms.core.JmsTemplate;
 
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
@@ -29,8 +31,9 @@ public class EventProcessorConfig
 	CPAManager cpaManager;
 	@Value("${ebms.serverId}")
 	String serverId;
-	@Value("${jms.brokerURL}")
-	String jmsBrokerUrl;
+	@Autowired
+	@Qualifier("transactedJmsTemplate")
+	JmsTemplate jmsTemplate;
 	@Value("${eventProcessor.start}")
 	boolean startEventProcessor;
 	@Value("${eventProcessor.jms.destinationName}")
@@ -80,7 +83,7 @@ public class EventProcessorConfig
 					JMSEventProcessor.builder()
 							.setStart(startEventProcessor)
 							.setType(eventManagerType)
-							.setJmsBrokerUrl(jmsBrokerUrl)
+							.setJmsTemplate(jmsTemplate)
 							.setJmsDestinationName(jmsDestinationName)
 							.setMaxThreads(maxThreads)
 							.setHandleEventTaskPrototype(handleEventTaskPrototype)

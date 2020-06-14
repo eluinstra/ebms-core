@@ -20,7 +20,6 @@ import java.util.stream.IntStream;
 
 import javax.jms.JMSException;
 import javax.jms.Message;
-import javax.jms.Session;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.jms.core.JmsTemplate;
@@ -32,7 +31,6 @@ import lombok.val;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import nl.clockwork.ebms.event.processor.EventManagerFactory.EventManagerType;
-import nl.clockwork.ebms.jms.JmsTemplateFactory;
 
 @Slf4j
 @FieldDefaults(level = AccessLevel.PROTECTED, makeFinal = true)
@@ -47,14 +45,14 @@ public class JMSEventProcessor implements Runnable
 	public JMSEventProcessor(
 			boolean start,
 			@NonNull EventManagerType type,
-			@NonNull String jmsBrokerUrl,
+			@NonNull JmsTemplate jmsTemplate,
 			String jmsDestinationName,
 			int maxThreads,
 			@NonNull HandleEventTask.HandleEventTaskBuilder handleEventTaskPrototype)
 	{
 		if (start && type == EventManagerType.JMS)
 		{
-			jmsTemplate = createJmsTemplate(jmsBrokerUrl);
+			this.jmsTemplate = jmsTemplate;
 			//jmsTemplate.setDefaultDestinationName(jmsDestinationName);
 			IntStream.range(0,maxThreads).forEach(i -> startDeamon());
 			
@@ -63,14 +61,6 @@ public class JMSEventProcessor implements Runnable
 			this.jmsTemplate = null;
 		this.jmsDestinationName = StringUtils.isEmpty(jmsDestinationName) ? JMSEventManager.JMS_DESTINATION_NAME : jmsDestinationName;
 		this.handleEventTaskPrototype = handleEventTaskPrototype;
-	}
-
-	private JmsTemplate createJmsTemplate(String jmsBrokerUrl)
-	{
-		val jmsTemplate = JmsTemplateFactory.getInstance(jmsBrokerUrl);
-		jmsTemplate.setSessionTransacted(true);
-		jmsTemplate.setSessionAcknowledgeMode(Session.CLIENT_ACKNOWLEDGE);
-		return jmsTemplate;
 	}
 
 	private void startDeamon()

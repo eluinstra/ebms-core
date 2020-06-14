@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.jms.core.JmsTemplate;
 
 import lombok.AccessLevel;
 import lombok.val;
@@ -66,7 +67,7 @@ public class ClientConfig
 	boolean useClientCertificate;
 	@Value("${deliveryManager.type}")
 	DeliveryManagerType deliveryManagerType;
-	@Value("${eventProcessor.maxTreads}")
+	@Value("${deliveryManager.maxTreads}")
 	Integer maxThreads;
 	@Value("${messageQueue.maxEntries}")
 	int maxEntries;
@@ -74,8 +75,8 @@ public class ClientConfig
 	int timeout;
 	@Autowired
 	CPAManager cpaManager;
-	@Value("${jms.brokerURL}")
-	String jmsBrokerURL;
+	@Autowired
+	JmsTemplate jmsTemplate;
 
 	@Bean
 	public EbMSHttpClientFactory ebMSClientFactory() throws Exception
@@ -108,7 +109,7 @@ public class ClientConfig
 				.setMessageQueue(new EbMSMessageQueue(maxEntries,timeout))
 				.setCpaManager(cpaManager)
 				.setEbMSClientFactory(ebMSClientFactory())
-				.setJmsBrokerURL(jmsBrokerURL)
+				.setJmsTemplate(jmsTemplate)
 				.build()
 				.getObject();
 	}
