@@ -18,39 +18,10 @@ package nl.clockwork.ebms.dao;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.transaction.support.TransactionTemplate;
 
-import nl.clockwork.ebms.EbMSMessageStatus;
-import nl.clockwork.ebms.event.listener.EbMSMessageEventType;
-
 class HSQLDBEbMSDAO extends AbstractEbMSDAO
 {
-	public HSQLDBEbMSDAO(TransactionTemplate transactionTemplate, JdbcTemplate jdbcTemplate)
+	public HSQLDBEbMSDAO(TransactionTemplate transactionTemplate, JdbcTemplate jdbcTemplate, EbMSMessageMapper ebMSMessageMapper)
 	{
-		super(transactionTemplate,jdbcTemplate);
-	}
-
-	@Override
-	public String getMessageIdsQuery(String messageContextFilter, EbMSMessageStatus status, int maxNr)
-	{
-		return "select message_id" +
-		" from ebms_message" +
-		" where message_nr = 0" + 
-		" and status = " + status.getId() +
-		messageContextFilter +
-		" order by time_stamp asc" +
-		" limit " + maxNr;
-	}
-
-	@Override
-	protected String getMessageEventsQuery(String messageContextFilter, EbMSMessageEventType[] types, int maxNr)
-	{
-		return "select ebms_message_event.message_id, ebms_message_event.event_type" +
-			" from ebms_message_event, ebms_message" +
-			" where ebms_message_event.processed = 0" +
-			" and ebms_message_event.event_type in (" + join(types == null ? EbMSMessageEventType.values() : types,",") + ")" +
-			" and ebms_message_event.message_id = ebms_message.message_id" +
-			" and ebms_message.message_nr = 0" +
-			messageContextFilter +
-			" order by ebms_message_event.time_stamp asc" +
-			" limit " + maxNr;
+		super(transactionTemplate,jdbcTemplate,ebMSMessageMapper);
 	}
 }

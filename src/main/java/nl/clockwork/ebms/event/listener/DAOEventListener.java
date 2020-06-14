@@ -15,10 +15,13 @@
  */
 package nl.clockwork.ebms.event.listener;
 
+import java.time.Instant;
+
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
+import nl.clockwork.ebms.service.model.EbMSMessageEvent;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor
@@ -30,28 +33,28 @@ class DAOEventListener extends LoggingEventListener
 	@Override
 	public void onMessageReceived(String messageId) throws EventException
 	{
-		ebMSMessageEventDAO.insertEbMSMessageEvent(messageId,EbMSMessageEventType.RECEIVED);
+		ebMSMessageEventDAO.insertEbMSMessageEvent(EbMSMessageEvent.of(messageId,EbMSMessageEventType.RECEIVED,Instant.now()));
 		super.onMessageReceived(messageId);
 	}
 
 	@Override
 	public void onMessageDelivered(String messageId) throws EventException
 	{
-		ebMSMessageEventDAO.insertEbMSMessageEvent(messageId,EbMSMessageEventType.DELIVERED);
+		ebMSMessageEventDAO.insertEbMSMessageEvent(EbMSMessageEvent.of(messageId,EbMSMessageEventType.DELIVERED,Instant.now()));
 		super.onMessageDelivered(messageId);
 	}
 	
 	@Override
 	public void onMessageFailed(String messageId) throws EventException
 	{
-		ebMSMessageEventDAO.insertEbMSMessageEvent(messageId,EbMSMessageEventType.FAILED);
+		ebMSMessageEventDAO.insertEbMSMessageEvent(EbMSMessageEvent.of(messageId,EbMSMessageEventType.FAILED,Instant.now()));
 		super.onMessageFailed(messageId);
 	}
 
 	@Override
 	public void onMessageExpired(String messageId) throws EventException
 	{
-		ebMSMessageEventDAO.insertEbMSMessageEvent(messageId,EbMSMessageEventType.EXPIRED);
+		ebMSMessageEventDAO.insertEbMSMessageEvent(EbMSMessageEvent.of(messageId,EbMSMessageEventType.EXPIRED,Instant.now()));
 		super.onMessageExpired(messageId);
 	}
 }

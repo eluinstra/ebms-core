@@ -13,6 +13,7 @@ import org.springframework.transaction.support.TransactionTemplate;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.NonNull;
 import lombok.val;
 import lombok.experimental.FieldDefaults;
 import nl.clockwork.ebms.dao.DAOException;
@@ -22,7 +23,9 @@ import nl.clockwork.ebms.transaction.TransactionCallback;
 @AllArgsConstructor
 public class EbMSEventDAOImpl implements EbMSEventDAO
 {
+	@NonNull
 	TransactionTemplate transactionTemplate;
+	@NonNull
 	EbMSEventMapper mapper;
 
 	@Override
@@ -41,39 +44,39 @@ public class EbMSEventDAOImpl implements EbMSEventDAO
 	}
 
 	@Override
-	public List<EbMSEvent> getEventsBefore(Instant timestamp_, String serverId_) throws DAOException
+	public List<EbMSEvent> getEventsBefore(Instant timestamp, String serverId) throws DAOException
 	{
-		val s = select(all)
-				.from(ebMSEvent)
-				.where(timestamp,isLessThanOrEqualTo(timestamp_))
-				.and(serverId,isNull().when(() -> serverId_ == null))
-				.and(serverId,isEqualTo(serverId_).when(id -> id != null))
-				.orderBy(timestamp)
+		val s = select(ebMSEventTable.all)
+				.from(ebMSEventTable)
+				.where(ebMSEventTable.timestamp,isLessThanOrEqualTo(timestamp))
+				.and(ebMSEventTable.serverId,isNull().when(() -> serverId == null))
+				.and(ebMSEventTable.serverId,isEqualTo(serverId).when(id -> id != null))
+				.orderBy(ebMSEventTable.timestamp)
 				.build()
 				.render(RenderingStrategies.MYBATIS3);
 		return mapper.selectMany(s);
 	}
 
 	@Override
-	public List<EbMSEvent> getEventsBefore(Instant timestamp_, String serverId_, int maxNr_) throws DAOException
+	public List<EbMSEvent> getEventsBefore(Instant timestamp, String serverId, int maxNr) throws DAOException
 	{
-		val s = select(all)
-				.from(ebMSEvent)
-				.where(timestamp,isLessThanOrEqualTo(timestamp_))
-				.and(serverId,isNull().when(() -> serverId_ == null))
-				.and(serverId,isEqualTo(serverId_).when(id -> id != null))
-				.orderBy(timestamp)
-				.limit(maxNr_)
+		val s = select(ebMSEventTable.all)
+				.from(ebMSEventTable)
+				.where(ebMSEventTable.timestamp,isLessThanOrEqualTo(timestamp))
+				.and(ebMSEventTable.serverId,isNull().when(() -> serverId == null))
+				.and(ebMSEventTable.serverId,isEqualTo(serverId).when(id -> id != null))
+				.orderBy(ebMSEventTable.timestamp)
+				.limit(maxNr)
 				.build()
 				.render(RenderingStrategies.MYBATIS3);
 		return mapper.selectMany(s);
 	}
 
 	@Override
-	public void insertEvent(EbMSEvent event, String serverId_) throws DAOException
+	public void insertEvent(EbMSEvent event, String serverId) throws DAOException
 	{
 		val s = insert(event)
-				.into(ebMSEvent)
+				.into(ebMSEventTable)
 				.map(cpaId).toProperty("cpaId")
 				.map(sendDeliveryChannelId).toProperty("sendDeliveryChannelId")
 				.map(receiveDeliveryChannelId).toProperty("receiveDeliveryChannelId")
@@ -82,22 +85,22 @@ public class EbMSEventDAOImpl implements EbMSEventDAO
 				.map(timestamp).toProperty("timestamp")
 				.map(confidential).toProperty("confidential")
 				.map(retries).toProperty("retries")
-				.map(serverId).toStringConstant(serverId_)
+				.map(ebMSEventTable.serverId).toStringConstant(serverId)
 				.build()
 				.render(RenderingStrategies.MYBATIS3);
 		mapper.insert(s);
 	}
 
 	@Override
-	public void insertEventLog(String messageId_, Instant timestamp_, String uri_, EbMSEventStatus status_, String errorMessage_) throws DAOException
+	public void insertEventLog(String messageId, Instant timestamp, String uri, EbMSEventStatus status, String errorMessage) throws DAOException
 	{
-		val s = insert(EbMSEventLog.of(messageId_,timestamp_,uri_,status_,errorMessage_))
+		val s = insert(EbMSEventLog.of(messageId,timestamp,uri,status,errorMessage))
 				.into(ebMSEventLog)
-				.map(messageId).toProperty("messageId")
-				.map(timestamp).toProperty("timestamp")
-				.map(uri).toProperty("confidential")
-				.map(status).toProperty("retries")
-				.map(errorMessage).toProperty("errorMessage")
+				.map(ebMSEventLog.messageId).toProperty("messageId")
+				.map(ebMSEventLog.timestamp).toProperty("timestamp")
+				.map(ebMSEventLog.uri).toProperty("confidential")
+				.map(ebMSEventLog.status).toProperty("retries")
+				.map(ebMSEventLog.errorMessage).toProperty("errorMessage")
 				.build()
 				.render(RenderingStrategies.MYBATIS3);
 		mapper.insertLog(s);
@@ -106,7 +109,7 @@ public class EbMSEventDAOImpl implements EbMSEventDAO
 	@Override
 	public void updateEvent(EbMSEvent event) throws DAOException
 	{
-		val s = update(ebMSEvent)
+		val s = update(ebMSEventTable)
 				.set(timestamp).equalTo(event.getTimestamp())
 				.set(retries).equalTo(event.getRetries())
 				.where(messageId,isEqualTo(event.getMessageId()))
@@ -116,10 +119,10 @@ public class EbMSEventDAOImpl implements EbMSEventDAO
 	}
 
 	@Override
-	public void deleteEvent(String messageId_) throws DAOException
+	public void deleteEvent(String messageId) throws DAOException
 	{
-		val s = deleteFrom(ebMSEvent)
-				.where(messageId,isEqualTo(messageId_))
+		val s = deleteFrom(ebMSEventTable)
+				.where(ebMSEventTable.messageId,isEqualTo(messageId))
 				.build()
 				.render(RenderingStrategies.MYBATIS3);
 		mapper.delete(s);

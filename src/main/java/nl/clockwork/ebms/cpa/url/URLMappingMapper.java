@@ -13,6 +13,7 @@ import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.annotations.UpdateProvider;
 import org.apache.ibatis.type.JdbcType;
+import org.mybatis.dynamic.sql.BasicColumn;
 import org.mybatis.dynamic.sql.SqlColumn;
 import org.mybatis.dynamic.sql.SqlTable;
 import org.mybatis.dynamic.sql.delete.render.DeleteStatementProvider;
@@ -28,14 +29,15 @@ public interface URLMappingMapper
 {
 	public static class URLMappingDSL
 	{
-		public static final URLMappingTable urlMapping = new URLMappingTable();
-		public static final SqlColumn<String> source = urlMapping.source;
-		public static final SqlColumn<String> destination = urlMapping.destination;
+		public static final URLMappingTable urlMappingTable = new URLMappingTable();
+		public static final SqlColumn<String> source = urlMappingTable.source;
+		public static final SqlColumn<String> destination = urlMappingTable.destination;
 
 	  public static final class URLMappingTable extends SqlTable
 	  {
 	    public final SqlColumn<String> source = column("source",JDBCType.VARCHAR);
 	    public final SqlColumn<String> destination = column("destination",JDBCType.VARCHAR);
+	    public final BasicColumn[] all = BasicColumn.columnList(source,destination);
 
 	    public URLMappingTable()
 			{

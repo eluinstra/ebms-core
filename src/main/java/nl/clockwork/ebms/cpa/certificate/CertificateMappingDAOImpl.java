@@ -11,6 +11,7 @@ import org.mybatis.dynamic.sql.render.RenderingStrategies;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.NonNull;
 import lombok.val;
 import lombok.experimental.FieldDefaults;
 import nl.clockwork.ebms.dao.DAOException;
@@ -20,29 +21,30 @@ import nl.clockwork.ebms.service.cpa.certificate.CertificateMapping;
 @AllArgsConstructor
 public class CertificateMappingDAOImpl implements CertificateMappingDAO
 {
+	@NonNull
 	CertificateMappingMapper mapper;
 	
 	@Override
-	public boolean existsCertificateMapping(String id_, String cpaId_) throws DAOException
+	public boolean existsCertificateMapping(String id, String cpaId) throws DAOException
 	{
     val s = select(count())
-        .from(certificateMapping)
-        .where(id,isEqualTo(id_))
-        .and(cpaId,isNull().when(() -> cpaId_ == null))
-        .and(cpaId,isEqualTo(cpaId_).when(id -> id != null))
+        .from(certificateMappingTable)
+        .where(certificateMappingTable.id,isEqualTo(id))
+        .and(certificateMappingTable.cpaId,isNull().when(() -> cpaId == null))
+        .and(certificateMappingTable.cpaId,isEqualTo(cpaId).when(v -> v != null))
         .build()
         .render(RenderingStrategies.MYBATIS3);
 		return mapper.count(s) > 0;
 	}
 
 	@Override
-	public Optional<X509Certificate> getCertificateMapping(String id_, String cpaId_) throws DAOException
+	public Optional<X509Certificate> getCertificateMapping(String id, String cpaId) throws DAOException
 	{
-    val s = select(source,destination,cpaId)
-        .from(certificateMapping)
-        .where(id,isEqualTo(id_))
-        .and(cpaId,isNull().when(() -> cpaId_ == null))
-        .and(cpaId,isEqualTo(cpaId_).when(id -> id != null))
+    val s = select(certificateMappingTable.all)
+        .from(certificateMappingTable)
+        .where(certificateMappingTable.id,isEqualTo(id))
+        .and(certificateMappingTable.cpaId,isNull().when(() -> cpaId == null))
+        .and(certificateMappingTable.cpaId,isEqualTo(cpaId).when(v -> v != null))
         .build()
         .render(RenderingStrategies.MYBATIS3);
     return mapper.selectOne(s).map(m -> m.getDestination());
@@ -51,8 +53,8 @@ public class CertificateMappingDAOImpl implements CertificateMappingDAO
 	@Override
 	public List<CertificateMapping> getCertificateMappings() throws DAOException
 	{
-    val s = select(source,destination,cpaId)
-        .from(certificateMapping)
+    val s = select(certificateMappingTable.all)
+        .from(certificateMappingTable)
         .build()
         .render(RenderingStrategies.MYBATIS3);
     List<CertificateMapping> selectMany = mapper.selectMany(s);
@@ -60,10 +62,10 @@ public class CertificateMappingDAOImpl implements CertificateMappingDAO
 	}
 
 	@Override
-	public void insertCertificateMapping(CertificateMapping mapping_) throws DAOException
+	public void insertCertificateMapping(CertificateMapping mapping) throws DAOException
 	{
-		val s = insert(mapping_)
-        .into(certificateMapping)
+		val s = insert(mapping)
+        .into(certificateMappingTable)
         .map(id).toProperty("id")
         .map(source).toProperty("source")
         .map(destination).toProperty("destination")
@@ -74,26 +76,26 @@ public class CertificateMappingDAOImpl implements CertificateMappingDAO
 	}
 
 	@Override
-	public int updateCertificateMapping(CertificateMapping mapping_) throws DAOException
+	public int updateCertificateMapping(CertificateMapping mapping) throws DAOException
 	{
-		val s = update(certificateMapping)
-        .set(destination).equalTo(mapping_.getDestination())
-        .set(cpaId).equalTo(mapping_.getCpaId())
-        .where(id,isEqualTo(mapping_.getId()))
-        .and(cpaId,isNull().when(() -> mapping_.getCpaId() == null))
-        .and(cpaId,isEqualTo(mapping_.getCpaId()).when(id -> id != null))
+		val s = update(certificateMappingTable)
+        .set(destination).equalTo(mapping.getDestination())
+        .set(cpaId).equalTo(mapping.getCpaId())
+        .where(id,isEqualTo(mapping.getId()))
+        .and(cpaId,isNull().when(() -> mapping.getCpaId() == null))
+        .and(cpaId,isEqualTo(mapping.getCpaId()).when(v -> v != null))
         .build()
         .render(RenderingStrategies.MYBATIS3);
 		return mapper.update(s);
 	}
 
 	@Override
-	public int deleteCertificateMapping(String id_, String cpaId_) throws DAOException
+	public int deleteCertificateMapping(String id, String cpaId) throws DAOException
 	{
-		val s = deleteFrom(certificateMapping)
-        .where(id,isEqualTo(id_))
-        .and(cpaId,isNull().when(() -> cpaId_ == null))
-        .and(cpaId,isEqualTo(cpaId_).when(id -> id != null))
+		val s = deleteFrom(certificateMappingTable)
+        .where(certificateMappingTable.id,isEqualTo(id))
+        .and(certificateMappingTable.cpaId,isNull().when(() -> cpaId == null))
+        .and(certificateMappingTable.cpaId,isEqualTo(cpaId).when(v -> v != null))
         .build()
         .render(RenderingStrategies.MYBATIS3);
 		return mapper.delete(s);

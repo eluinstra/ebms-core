@@ -50,9 +50,9 @@ public interface CPAMapper
 
 	@SelectProvider(type=SqlProviderAdapter.class, method="select")
 	@Results(id="CPAMappingResult")
-	@ConstructorArgs({
-		@Arg(column = "cpa", javaType = CollaborationProtocolAgreement.class, jdbcType=JdbcType.VARCHAR, typeHandler = CollaborationProtocolAgreementTypeHandler.class)
-	})
+	@ConstructorArgs(
+		@Arg(column = "cpa", javaType = CollaborationProtocolAgreement.class, jdbcType=JdbcType.CLOB, typeHandler = CollaborationProtocolAgreementTypeHandler.class)
+	)
 	Optional<CPA> selectOne(SelectStatementProvider selectStatement);
 	
 	@SelectProvider(type=SqlProviderAdapter.class, method="select")
@@ -61,7 +61,7 @@ public interface CPAMapper
 	
 	@SelectProvider(type=SqlProviderAdapter.class, method="select")
 	@Results(id="CPAIds", value= {
-			@Result(column="cpa_id", property="cpaId", jdbcType=JdbcType.VARCHAR, id=true),
+			@Result(column="cpa_id", jdbcType=JdbcType.VARCHAR, id=true),
 	})
 	List<String> selectCpaIds(SelectStatementProvider selectStatement);
 	

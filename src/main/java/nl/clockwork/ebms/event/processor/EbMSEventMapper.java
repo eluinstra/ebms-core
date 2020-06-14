@@ -28,17 +28,16 @@ public interface EbMSEventMapper
 {
 	public static class EbMSEventDSL
 	{
-		public static final EbMSEventTable ebMSEvent = new EbMSEventTable();
-		public static final SqlColumn<String> cpaId = ebMSEvent.cpaId;
-		public static final SqlColumn<String> sendDeliveryChannelId = ebMSEvent.sendDeliveryChannelId;
-		public static final SqlColumn<String> receiveDeliveryChannelId = ebMSEvent.receiveDeliveryChannelId;
-		public static final SqlColumn<String> messageId = ebMSEvent.messageId;
-		public static final SqlColumn<Instant> timeToLive = ebMSEvent.timeToLive;
-		public static final SqlColumn<Instant> timestamp = ebMSEvent.timestamp;
-		public static final SqlColumn<Boolean> confidential = ebMSEvent.confidential;
-		public static final SqlColumn<Integer> retries = ebMSEvent.retries;
-		public static final SqlColumn<String> serverId = ebMSEvent.serverId;
-		public static final BasicColumn[] all = BasicColumn.columnList(cpaId,sendDeliveryChannelId,receiveDeliveryChannelId,messageId,timeToLive,timestamp,confidential,retries);
+		public static final EbMSEventTable ebMSEventTable = new EbMSEventTable();
+		public static final SqlColumn<String> cpaId = ebMSEventTable.cpaId;
+		public static final SqlColumn<String> sendDeliveryChannelId = ebMSEventTable.sendDeliveryChannelId;
+		public static final SqlColumn<String> receiveDeliveryChannelId = ebMSEventTable.receiveDeliveryChannelId;
+		public static final SqlColumn<String> messageId = ebMSEventTable.messageId;
+		public static final SqlColumn<Instant> timeToLive = ebMSEventTable.timeToLive;
+		public static final SqlColumn<Instant> timestamp = ebMSEventTable.timestamp;
+		public static final SqlColumn<Boolean> confidential = ebMSEventTable.confidential;
+		public static final SqlColumn<Integer> retries = ebMSEventTable.retries;
+		public static final SqlColumn<String> serverId = ebMSEventTable.serverId;
 
 	  public static final class EbMSEventTable extends SqlTable
 	  {
@@ -49,8 +48,9 @@ public interface EbMSEventMapper
 	    public final SqlColumn<Instant> timeToLive = column("time_to_live",JDBCType.TIMESTAMP);
 	    public final SqlColumn<Instant> timestamp = column("timestamp",JDBCType.TIMESTAMP);
 	    public final SqlColumn<Boolean> confidential = column("is_confidential",JDBCType.BOOLEAN);
-	    public final SqlColumn<Integer> retries = column("retries",JDBCType.INTEGER);
+	    public final SqlColumn<Integer> retries = column("retries",JDBCType.SMALLINT);
 	    public final SqlColumn<String> serverId = column("server_id",JDBCType.VARCHAR);
+			public final BasicColumn[] all = BasicColumn.columnList(cpaId,sendDeliveryChannelId,receiveDeliveryChannelId,messageId,timeToLive,timestamp,confidential,retries);
 
 	    public EbMSEventTable()
 			{
@@ -59,9 +59,6 @@ public interface EbMSEventMapper
 	  }
 
 		public static final EbMSEventLogTable ebMSEventLog = new EbMSEventLogTable();
-		public static final SqlColumn<String> uri = ebMSEventLog.uri;
-		public static final SqlColumn<EbMSEventStatus> status = ebMSEventLog.status;
-		public static final SqlColumn<String> errorMessage = ebMSEventLog.errorMessage;
 
 		public static final class EbMSEventLogTable extends SqlTable
 	  {
@@ -85,12 +82,12 @@ public interface EbMSEventMapper
 	@Results(id="EbMSEventResult", value= {
 			@Result(column="cpaId", property="source", jdbcType=JdbcType.VARCHAR),
 			@Result(column="sendDeliveryChannelId", property="destination", jdbcType=JdbcType.VARCHAR),
-			@Result(column="receiveDeliveryChannelId", property="source", jdbcType=JdbcType.VARCHAR, id=true),
+			@Result(column="receiveDeliveryChannelId", property="source", jdbcType=JdbcType.VARCHAR),
 			@Result(column="messageId", property="destination", jdbcType=JdbcType.VARCHAR),
-			@Result(column="timeToLive", property="source", jdbcType=JdbcType.VARCHAR, id=true),
-			@Result(column="timestamp", property="destination", jdbcType=JdbcType.VARCHAR),
-			@Result(column="confidential", property="source", jdbcType=JdbcType.VARCHAR, id=true),
-			@Result(column="retries", property="destination", jdbcType=JdbcType.VARCHAR)
+			@Result(column="timeToLive", property="source", jdbcType=JdbcType.TIMESTAMP),
+			@Result(column="timestamp", property="destination", jdbcType=JdbcType.TIMESTAMP),
+			@Result(column="confidential", property="source", jdbcType=JdbcType.VARCHAR),
+			@Result(column="retries", property="destination", jdbcType=JdbcType.SMALLINT)
 	})
 	Optional<EbMSEvent> selectOne(SelectStatementProvider selectStatement);
 	

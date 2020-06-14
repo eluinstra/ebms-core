@@ -31,53 +31,56 @@ public class EbMSDAOFactory extends AbstractDAOFactory<EbMSDAO>
 	TransactionTemplate transactionTemplate;
 	@NonNull
 	JdbcTemplate jdbcTemplate;
+	@NonNull
+	EbMSMessageMapper ebMSMessageMapper;
 
-	public EbMSDAOFactory(DataSource dataSource, @NonNull TransactionTemplate transactionTemplate, @NonNull JdbcTemplate jdbcTemplate)
+	public EbMSDAOFactory(DataSource dataSource, @NonNull TransactionTemplate transactionTemplate, @NonNull JdbcTemplate jdbcTemplate, @NonNull EbMSMessageMapper ebMSMessageMapper)
 	{
 		super(dataSource);
 		this.transactionTemplate = transactionTemplate;
 		this.jdbcTemplate = jdbcTemplate;
+		this.ebMSMessageMapper = ebMSMessageMapper;
 	}
 
 	@Override
 	public Class<EbMSDAO> getObjectType()
 	{
-		return nl.clockwork.ebms.dao.EbMSDAO.class;
+		return EbMSDAO.class;
 	}
 
 	@Override
 	public EbMSDAO createHSqlDbDAO()
 	{
-		return new nl.clockwork.ebms.dao.HSQLDBEbMSDAO(transactionTemplate,jdbcTemplate);
+		return new HSQLDBEbMSDAO(transactionTemplate,jdbcTemplate,ebMSMessageMapper);
 	}
 
 	@Override
 	public EbMSDAO createMySqlDAO()
 	{
-		return new nl.clockwork.ebms.dao.MySQLEbMSDAO(transactionTemplate,jdbcTemplate);
+		return new MySQLEbMSDAO(transactionTemplate,jdbcTemplate,ebMSMessageMapper);
 	}
 
 	@Override
 	public EbMSDAO createPostgresDAO()
 	{
-		return new nl.clockwork.ebms.dao.PostgreSQLEbMSDAO(transactionTemplate,jdbcTemplate);
+		return new PostgreSQLEbMSDAO(transactionTemplate,jdbcTemplate,ebMSMessageMapper);
 	}
 
 	@Override
 	public EbMSDAO createOracleDAO()
 	{
-		return new nl.clockwork.ebms.dao.OracleEbMSDAO(transactionTemplate,jdbcTemplate);
+		return new OracleEbMSDAO(transactionTemplate,jdbcTemplate,ebMSMessageMapper);
 	}
 
 	@Override
 	public EbMSDAO createMsSqlDAO()
 	{
-		return new nl.clockwork.ebms.dao.MSSQLEbMSDAO(transactionTemplate,jdbcTemplate);
+		return new MSSQLEbMSDAO(transactionTemplate,jdbcTemplate,ebMSMessageMapper);
 	}
 
 	@Override
 	public EbMSDAO createDB2DAO()
 	{
-		return new nl.clockwork.ebms.dao.DB2EbMSDAO(transactionTemplate,jdbcTemplate);
+		return new DB2EbMSDAO(transactionTemplate,jdbcTemplate,ebMSMessageMapper);
 	}
 }

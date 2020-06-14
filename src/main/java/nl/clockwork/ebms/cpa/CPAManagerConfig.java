@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
+import org.springframework.context.annotation.Import;
 
 import lombok.AccessLevel;
 import lombok.val;
@@ -21,6 +22,7 @@ import nl.clockwork.ebms.cpa.url.URLMapper;
 import nl.clockwork.ebms.cpa.url.URLMappingDAO;
 
 @Configuration
+@Import({CPADAOConfig.class})
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class CPAManagerConfig
 {

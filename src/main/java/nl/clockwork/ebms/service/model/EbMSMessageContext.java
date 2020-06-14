@@ -28,6 +28,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.NonNull;
 import lombok.ToString;
 import lombok.experimental.FieldDefaults;
 import nl.clockwork.ebms.EbMSMessageStatus;
@@ -63,4 +64,30 @@ public class EbMSMessageContext implements Serializable
 	String messageId;
 	String refToMessageId;
 	EbMSMessageStatus messageStatus;
+
+	public EbMSMessageContext(
+			@NonNull String cpaId,
+			String fromPartyId,
+			String fromRole,
+			String toPartyId,
+			String toRole,
+			@NonNull String service,
+			@NonNull String action,
+			@NonNull Instant timestamp,
+			@NonNull String conversationId,
+			@NonNull String messageId,
+			String refToMessageId,
+			EbMSMessageStatus messageStatus)
+	{
+		this.cpaId = cpaId;
+		this.fromParty = new Party(fromPartyId,fromRole);
+		this.toParty = new Party(toPartyId,toRole);
+		this.service = service;
+		this.action = action;
+		this.timestamp = timestamp;
+		this.conversationId = conversationId;
+		this.messageId = messageId;
+		this.refToMessageId = refToMessageId;
+		this.messageStatus = messageStatus;
+	}
 }

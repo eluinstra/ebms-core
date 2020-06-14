@@ -22,6 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mybatis.spring.mapper.MapperFactoryBean;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.transaction.support.TransactionTemplate;
@@ -40,12 +41,13 @@ public class DAOFactoryTest
 	EbMSDAO dao;
 	
 	@BeforeEach
-	public void init()
+	public void init() throws Exception
 	{
 		ds = new ComboPooledDataSource();
 		val tt = new TransactionTemplate(new DataSourceTransactionManager(ds));
 		val jt = new JdbcTemplate(ds);
-		daoFactory = new EbMSDAOFactory(ds,tt,jt);
+		val m = new MapperFactoryBean<EbMSMessageMapper>(EbMSMessageMapper.class).getObject();
+		daoFactory = new EbMSDAOFactory(ds,tt,jt,m);
 	}
 
 	@Test

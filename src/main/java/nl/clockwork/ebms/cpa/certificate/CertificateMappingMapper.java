@@ -14,6 +14,7 @@ import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.annotations.UpdateProvider;
 import org.apache.ibatis.type.JdbcType;
+import org.mybatis.dynamic.sql.BasicColumn;
 import org.mybatis.dynamic.sql.SqlColumn;
 import org.mybatis.dynamic.sql.SqlTable;
 import org.mybatis.dynamic.sql.delete.render.DeleteStatementProvider;
@@ -29,11 +30,11 @@ public interface CertificateMappingMapper
 {
 	public static class CertificateMappingDSL
 	{
-		public static final CertificateMappingTable certificateMapping = new CertificateMappingTable();
-		public static final SqlColumn<String> id = certificateMapping.id;
-		public static final SqlColumn<X509Certificate> source = certificateMapping.source;
-		public static final SqlColumn<X509Certificate> destination = certificateMapping.destination;
-		public static final SqlColumn<String> cpaId = certificateMapping.cpaId;
+		public static final CertificateMappingTable certificateMappingTable = new CertificateMappingTable();
+		public static final SqlColumn<String> id = certificateMappingTable.id;
+		public static final SqlColumn<X509Certificate> source = certificateMappingTable.source;
+		public static final SqlColumn<X509Certificate> destination = certificateMappingTable.destination;
+		public static final SqlColumn<String> cpaId = certificateMappingTable.cpaId;
 
 	  public static final class CertificateMappingTable extends SqlTable
 	  {
@@ -41,6 +42,7 @@ public interface CertificateMappingMapper
 	    public final SqlColumn<X509Certificate> source = column("source",JDBCType.BLOB,"nl.clockwork.ebms.cpa.certificate.X509CertificateTypeHandler");
 	    public final SqlColumn<X509Certificate> destination = column("destination",JDBCType.BLOB,"nl.clockwork.ebms.cpa.certificate.X509CertificateTypeHandler");
 	    public final SqlColumn<String> cpaId = column("cpa_id",JDBCType.VARCHAR);
+	    public final BasicColumn[] all = BasicColumn.columnList(source,destination,cpaId);
 
 	    public CertificateMappingTable()
 			{

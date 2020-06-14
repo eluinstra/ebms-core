@@ -35,4 +35,9 @@ public enum EbMSMessageEventType
 	{
 		return Stream.of(EbMSMessageEventType.values());
 	}
+
+	public static EbMSMessageEventType get(int id)
+	{
+		return stream().filter(s -> s.getId() == id).findFirst().orElse(null);
+	}
 }

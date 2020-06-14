@@ -38,6 +38,6 @@ public enum EbMSEventStatus
 
 	public static final EbMSEventStatus get(int id)
 	{
-		return EbMSEventStatus.stream().filter(s -> s.getId() == id).findFirst().orElse(null);
+		return stream().filter(s -> s.getId() == id).findFirst().orElse(null);
 	}
 }

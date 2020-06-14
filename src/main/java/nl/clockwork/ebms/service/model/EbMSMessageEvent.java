@@ -16,10 +16,13 @@
 package nl.clockwork.ebms.service.model;
 
 import java.io.Serializable;
+import java.time.Instant;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlSchemaType;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -30,13 +33,14 @@ import lombok.NonNull;
 import lombok.ToString;
 import lombok.experimental.FieldDefaults;
 import nl.clockwork.ebms.event.listener.EbMSMessageEventType;
+import nl.clockwork.ebms.jaxb.InstantAdapter;
 
 @XmlAccessorType(XmlAccessType.FIELD)
 @Builder
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @NoArgsConstructor
-@AllArgsConstructor
+@AllArgsConstructor(staticName = "of")
 @ToString
 public class EbMSMessageEvent implements Serializable
 {
@@ -47,4 +51,9 @@ public class EbMSMessageEvent implements Serializable
 	@XmlElement(required=true)
 	@NonNull
 	EbMSMessageEventType type;
+	@XmlElement(required=true)
+	@XmlJavaTypeAdapter(InstantAdapter.class)
+	@XmlSchemaType(name="dateTime")
+	@NonNull
+	Instant timestamp;
 }

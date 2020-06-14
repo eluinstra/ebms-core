@@ -16,7 +16,6 @@ import nl.clockwork.ebms.dao.DAOConfig;
 import nl.clockwork.ebms.dao.DataSourceConfig;
 import nl.clockwork.ebms.encryption.EncryptionConfig;
 import nl.clockwork.ebms.event.listener.EventListenerConfig;
-import nl.clockwork.ebms.event.processor.EventDAOConfig;
 import nl.clockwork.ebms.event.processor.EventManagerConfig;
 import nl.clockwork.ebms.event.processor.EventProcessorConfig;
 import nl.clockwork.ebms.jms.JMSConfig;
@@ -38,7 +37,6 @@ import nl.clockwork.ebms.validation.ValidationConfig;
 	EbMSProcessorConfig.class,
 	EncryptionConfig.class,
 	EventListenerConfig.class,
-	EventDAOConfig.class,
 	EventManagerConfig.class,
 	EventProcessorConfig.class,
 	JMSConfig.class,

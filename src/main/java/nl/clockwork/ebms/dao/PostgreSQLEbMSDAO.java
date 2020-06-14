@@ -47,7 +47,6 @@ import lombok.val;
 import nl.clockwork.ebms.EbMSAttachmentFactory;
 import nl.clockwork.ebms.EbMSMessageStatus;
 import nl.clockwork.ebms.EbMSMessageUtils;
-import nl.clockwork.ebms.event.listener.EbMSMessageEventType;
 import nl.clockwork.ebms.model.EbMSAttachment;
 import nl.clockwork.ebms.model.EbMSBaseMessage;
 import nl.clockwork.ebms.processor.EbMSProcessingException;
@@ -89,21 +88,9 @@ class PostgreSQLEbMSDAO extends AbstractEbMSDAO
 		}
 	}
 
-	public PostgreSQLEbMSDAO(TransactionTemplate transactionTemplate, JdbcTemplate jdbcTemplate)
+	public PostgreSQLEbMSDAO(TransactionTemplate transactionTemplate, JdbcTemplate jdbcTemplate, EbMSMessageMapper ebMSMessageMapper)
 	{
-		super(transactionTemplate,jdbcTemplate);
-	}
-
-	@Override
-	public String getMessageIdsQuery(String messageContextFilter, EbMSMessageStatus status, int maxNr)
-	{
-		return "select message_id" +
-		" from ebms_message" +
-		" where message_nr = 0" +
-		" and status=" + status.getId() +
-		messageContextFilter +
-		" order by time_stamp asc" +
-		" limit " + maxNr;
+		super(transactionTemplate,jdbcTemplate,ebMSMessageMapper);
 	}
 
 	@Override
@@ -300,19 +287,5 @@ class PostgreSQLEbMSDAO extends AbstractEbMSDAO
 		{
 			throw new DAOException(e);
 		}
-	}
-
-	@Override
-	protected String getMessageEventsQuery(String messageContextFilter, EbMSMessageEventType[] types, int maxNr)
-	{
-		return "select ebms_message_event.message_id, ebms_message_event.event_type" +
-			" from ebms_message_event, ebms_message" +
-			" where ebms_message_event.processed = 0" +
-			" and ebms_message_event.event_type in (" + join(types == null ? EbMSMessageEventType.values() : types,",") + ")" +
-			" and ebms_message_event.message_id = ebms_message.message_id" +
-			" and ebms_message.message_nr = 0" +
-			messageContextFilter +
-			" order by ebms_message_event.time_stamp asc" +
-			" limit " + maxNr;
 	}
 }

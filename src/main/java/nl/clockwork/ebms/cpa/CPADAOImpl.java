@@ -11,6 +11,7 @@ import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CollaborationProt
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.NonNull;
 import lombok.val;
 import lombok.experimental.FieldDefaults;
 import nl.clockwork.ebms.dao.DAOException;
@@ -19,25 +20,26 @@ import nl.clockwork.ebms.dao.DAOException;
 @AllArgsConstructor
 public class CPADAOImpl implements CPADAO
 {
+	@NonNull
 	CPAMapper mapper;
 
 	@Override
-	public boolean existsCPA(String cpaId_) throws DAOException
+	public boolean existsCPA(String cpaId) throws DAOException
 	{
     val s = select(count())
         .from(cpaTable)
-        .where(cpaId,isEqualTo(cpaId_))
+        .where(cpaTable.cpaId,isEqualTo(cpaId))
         .build()
         .render(RenderingStrategies.MYBATIS3);
 		return mapper.count(s) > 0;
 	}
 
 	@Override
-	public Optional<CollaborationProtocolAgreement> getCPA(String cpaId_) throws DAOException
+	public Optional<CollaborationProtocolAgreement> getCPA(String cpaId) throws DAOException
 	{
-		val s = select(cpa)
+		val s = select(cpaTable.cpa)
         .from(cpaTable)
-        .where(cpaId,isEqualTo(cpaId_))
+        .where(cpaTable.cpaId,isEqualTo(cpaId))
         .build()
         .render(RenderingStrategies.MYBATIS3);
 		return mapper.selectOne(s).flatMap(c -> Optional.of(c.getCpa()));
@@ -54,33 +56,33 @@ public class CPADAOImpl implements CPADAO
 	}
 
 	@Override
-	public void insertCPA(CollaborationProtocolAgreement cpa_) throws DAOException
+	public void insertCPA(CollaborationProtocolAgreement cpa) throws DAOException
 	{
-		val s = insert(new CPA(cpa_))
+		val s = insert(new CPA(cpa))
 				.into(cpaTable)
-				.map(cpaId).toProperty("cpaId")
-				.map(cpa).toProperty("cpa")
+				.map(cpaTable.cpaId).toProperty("cpaId")
+				.map(cpaTable.cpa).toProperty("cpa")
         .build()
         .render(RenderingStrategies.MYBATIS3);
 		mapper.insert(s);
 	}
 
 	@Override
-	public int updateCPA(CollaborationProtocolAgreement cpa_) throws DAOException
+	public int updateCPA(CollaborationProtocolAgreement cpa) throws DAOException
 	{
 		val s = update(cpaTable)
-				.set(cpa).equalTo(cpa_)
-				.where(cpaId,isEqualTo(cpa_.getCpaid()))
+				.set(cpaTable.cpa).equalTo(cpa)
+				.where(cpaTable.cpaId,isEqualTo(cpa.getCpaid()))
         .build()
         .render(RenderingStrategies.MYBATIS3);
 		return mapper.update(s);
 	}
 
 	@Override
-	public int deleteCPA(String cpaId_) throws DAOException
+	public int deleteCPA(String cpaId) throws DAOException
 	{
 		val s = deleteFrom(cpaTable)
-				.where(cpaId,isEqualTo(cpaId_))
+				.where(cpaTable.cpaId,isEqualTo(cpaId))
         .build()
         .render(RenderingStrategies.MYBATIS3);
 		return mapper.delete(s);
