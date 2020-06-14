@@ -16,6 +16,7 @@
 package nl.clockwork.ebms;
 
 import java.util.EnumSet;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
 
@@ -58,20 +59,19 @@ public enum EbMSMessageStatus
 		return Stream.of(EbMSMessageStatus.values());
 	}
 
-	public static final EbMSMessageStatus get(int id)
+	public static final Optional<EbMSMessageStatus> get(int id)
 	{
-		return EbMSMessageStatus.stream().filter(s -> s.getId() == id).findFirst().orElse(null);
-		//orElseThrow(() -> new IllegalStateException("Unsupported EbMSMessageStatus Id: " + id));
+		return EbMSMessageStatus.stream().filter(s -> s.getId() == id).findFirst();
 	}
 
-	public static final EbMSMessageStatus get(String name)
+	public static final Optional<EbMSMessageStatus> get(String name)
 	{
-		return EbMSMessageStatus.stream().filter(s -> s.name().equals(name)).findFirst().orElse(null);
+		return EbMSMessageStatus.stream().filter(s -> s.name().equals(name)).findFirst();
 	}
 
-	public static final EbMSMessageStatus get(MessageStatusType statusCode)
+	public static final Optional<EbMSMessageStatus> get(MessageStatusType statusCode)
 	{
-		return EbMSMessageStatus.stream().filter(s -> s.statusCode.equals(statusCode)).findFirst().orElse(null);
+		return EbMSMessageStatus.stream().filter(s -> s.statusCode.equals(statusCode)).findFirst();
 	}
 
 	public static final EbMSMessageStatus[] getReceiveStatus()

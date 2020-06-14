@@ -259,7 +259,8 @@ public class EbMSMessageServiceImpl implements EbMSMessageService
 		if (message instanceof EbMSStatusResponse)
 		{
 			val timestamp = ((EbMSStatusResponse)message).getStatusResponse().getTimestamp() == null ? null : ((EbMSStatusResponse)message).getStatusResponse().getTimestamp();
-			val status = EbMSMessageStatus.get(((EbMSStatusResponse)message).getStatusResponse().getMessageStatus());
+			val messageStatus = ((EbMSStatusResponse)message).getStatusResponse().getMessageStatus();
+			val status = EbMSMessageStatus.get(messageStatus).orElseThrow(() -> new IllegalStateException("No EbMSMessageStatus found for " + messageStatus));
 			return new MessageStatus(timestamp,status);
 		}
 		else

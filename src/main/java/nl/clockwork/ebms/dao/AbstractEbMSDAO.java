@@ -124,7 +124,7 @@ abstract class AbstractEbMSDAO implements EbMSDAO, CPADAO, URLMappingDAO, Certif
 					.conversationId(rs.getString("conversation_id"))
 					.messageId(rs.getString("message_id"))
 					.refToMessageId(rs.getString("ref_to_message_id"))
-					.messageStatus(rs.getObject("status") == null ? null : EbMSMessageStatus.get(rs.getInt("status")))
+					.messageStatus(rs.getObject("status") == null ? null : EbMSMessageStatus.get(rs.getInt("status")).orElse(null))
 					.build();
 		}
 	}
@@ -833,7 +833,7 @@ abstract class AbstractEbMSDAO implements EbMSDAO, CPADAO, URLMappingDAO, Certif
 	{
 		try
 		{
-			return Optional.of(EbMSMessageStatus.get(
+			return EbMSMessageStatus.get(
 				jdbcTemplate.queryForObject(
 					"select status" +
 					" from ebms_message" +
@@ -845,7 +845,7 @@ abstract class AbstractEbMSDAO implements EbMSDAO, CPADAO, URLMappingDAO, Certif
 					},
 					messageId
 				)
-			));
+			);
 		}
 		catch(EmptyResultDataAccessException e)
 		{
@@ -862,17 +862,17 @@ abstract class AbstractEbMSDAO implements EbMSDAO, CPADAO, URLMappingDAO, Certif
 	{
 		try
 		{
-			return Optional.of(jdbcTemplate.queryForObject(
+			return jdbcTemplate.queryForObject(
 					"select action" +
 					" from ebms_message" +
 					" where message_id = ?" +
 					" and message_nr = 0",
-					(RowMapper<EbMSAction>)(rs,rowNum) ->
+					(RowMapper<Optional<EbMSAction>>)(rs,rowNum) ->
 					{
 						return EbMSAction.get(rs.getString("action"));
 					},
 					messageId
-				));
+				);
 		}
 		catch(EmptyResultDataAccessException e)
 		{

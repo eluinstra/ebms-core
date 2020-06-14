@@ -15,6 +15,7 @@
  */
 package nl.clockwork.ebms.event.processor;
 
+import java.util.Optional;
 import java.util.stream.Stream;
 
 import lombok.AccessLevel;
@@ -36,8 +37,8 @@ public enum EbMSEventStatus
 		return Stream.of(EbMSEventStatus.values());
 	}
 
-	public static final EbMSEventStatus get(int id)
+	public static final Optional<EbMSEventStatus> get(int id)
 	{
-		return EbMSEventStatus.stream().filter(s -> s.getId() == id).findFirst().orElse(null);
+		return EbMSEventStatus.stream().filter(s -> s.getId() == id).findFirst();
 	}
 }
