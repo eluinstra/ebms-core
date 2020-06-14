@@ -115,7 +115,7 @@ class PostgreSQLEbMSDAO extends AbstractEbMSDAO
 			" where message_id = ?" +
 			" and message_nr = 0" +
 			" order by order_nr",
-			(RowMapper<EbMSAttachment>)(rs,rowNum) ->
+			(rs,rowNum) ->
 			{
 				try
 				{

@@ -132,7 +132,7 @@ abstract class AbstractEbMSDAO implements EbMSDAO, CPADAO, URLMappingDAO, Certif
 	TransactionTemplate transactionTemplate;
 	@NonNull
 	JdbcTemplate jdbcTemplate;
-	RowMapper<EbMSEvent> ebMSEventRowMapper = (RowMapper<EbMSEvent>)(rs,rowNum) ->
+	RowMapper<EbMSEvent> ebMSEventRowMapper = (rs,rowNum) ->
 	{
 		return EbMSEvent.builder()
 				.cpaId(rs.getString("cpa_id"))
@@ -145,7 +145,7 @@ abstract class AbstractEbMSDAO implements EbMSDAO, CPADAO, URLMappingDAO, Certif
 				.retries(rs.getInt("retries"))
 				.build();
 	};
-	RowMapper<EbMSMessageEvent> ebMSMessageEventRowMapper = (RowMapper<EbMSMessageEvent>)(rs,rowNum) ->
+	RowMapper<EbMSMessageEvent> ebMSMessageEventRowMapper = (rs,rowNum) ->
 	{
 		return new EbMSMessageEvent(rs.getString("message_id"),EbMSMessageEventType.values()[rs.getInt("event_type")]);
 	};
@@ -345,7 +345,7 @@ abstract class AbstractEbMSDAO implements EbMSDAO, CPADAO, URLMappingDAO, Certif
 				"select source, destination" +
 				" from url_mapping" +
 				" order by source asc",
-				(RowMapper<URLMapping>)(rs,rowNum) ->
+				(rs,rowNum) ->
 				{
 					return new URLMapping(rs.getString("source"),rs.getString("destination"));
 				}
@@ -448,7 +448,7 @@ abstract class AbstractEbMSDAO implements EbMSDAO, CPADAO, URLMappingDAO, Certif
 				" from certificate_mapping" +
 				" where id = ?" +
 				" and (cpa_id = ? or (cpa_id is null and ? is null))",
-				(RowMapper<X509Certificate>)(rs,rowNum) ->
+				(rs,rowNum) ->
 				{
 					try
 					{
@@ -483,7 +483,7 @@ abstract class AbstractEbMSDAO implements EbMSDAO, CPADAO, URLMappingDAO, Certif
 			return jdbcTemplate.query(
 				"select source, destination, cpa_id" +
 				" from certificate_mapping",
-				(RowMapper<CertificateMapping>)(rs,rowNum) ->
+				(rs,rowNum) ->
 				{
 					try
 					{
@@ -795,7 +795,7 @@ abstract class AbstractEbMSDAO implements EbMSDAO, CPADAO, URLMappingDAO, Certif
 				" and message_nr = 0" +
 				(actions.length == 0 ? "" : " and service = '" + EbMSAction.EBMS_SERVICE_URI + "'") +
 				(actions.length == 0 ? "" : " and action in ('" + StringUtils.join(actions,"','") + "')"),
-				(RowMapper<EbMSDocument>)(rs,rowNum) ->
+				(rs,rowNum) ->
 				{
 					try
 					{
@@ -839,7 +839,7 @@ abstract class AbstractEbMSDAO implements EbMSDAO, CPADAO, URLMappingDAO, Certif
 					" from ebms_message" +
 					" where message_id = ?" +
 					" and message_nr = 0",
-					(RowMapper<Integer>)(rs,rowNum) ->
+					(rs,rowNum) ->
 					{
 						return rs.getObject("status",Integer.class);
 					},
@@ -867,7 +867,7 @@ abstract class AbstractEbMSDAO implements EbMSDAO, CPADAO, URLMappingDAO, Certif
 					" from ebms_message" +
 					" where message_id = ?" +
 					" and message_nr = 0",
-					(RowMapper<Optional<EbMSAction>>)(rs,rowNum) ->
+					(rs,rowNum) ->
 					{
 						return EbMSAction.get(rs.getString("action"));
 					},
@@ -1435,7 +1435,7 @@ abstract class AbstractEbMSDAO implements EbMSDAO, CPADAO, URLMappingDAO, Certif
 			" where message_id = ?" +
 			" and message_nr = 0" +
 			" order by order_nr",
-			(RowMapper<EbMSAttachment>)(rs,rowNum) ->
+			(rs,rowNum) ->
 			{
 				try
 				{

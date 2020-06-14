@@ -289,7 +289,7 @@ class MySQLEbMSDAO extends AbstractEbMSDAO
 			" and m.message_nr = 0" +
 			" and m.id = a.ebms_message_id" +
 			" order by a.order_nr",
-			(RowMapper<EbMSAttachment>)(rs,rowNum) ->
+			(rs,rowNum) ->
 			{
 				return EbMSAttachmentFactory.createEbMSAttachment(rs.getString("name"),rs.getString("content_id"),rs.getString("content_type"),rs.getBytes("content"));
 			},
