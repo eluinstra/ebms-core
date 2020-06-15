@@ -144,11 +144,10 @@ public class EbMSMessageContextValidator
 
 	private boolean equals(ActionBindingType thisPartyActionBinding, Object otherPartyActionBinding)
 	{
-		if (thisPartyActionBinding == null && otherPartyActionBinding == null)
+		if (thisPartyActionBinding == otherPartyActionBinding)
 			return true;
-		else if (thisPartyActionBinding != null)
-			if (otherPartyActionBinding != null && otherPartyActionBinding instanceof ActionBindingType)
-				return thisPartyActionBinding.getId().equals(((ActionBindingType)otherPartyActionBinding).getId());
+		else if (thisPartyActionBinding != null && otherPartyActionBinding != null && otherPartyActionBinding instanceof ActionBindingType)
+			return thisPartyActionBinding.getId().equals(((ActionBindingType)otherPartyActionBinding).getId());
 		return false;
 	}
 
