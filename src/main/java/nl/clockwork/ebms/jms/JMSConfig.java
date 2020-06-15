@@ -15,8 +15,6 @@
  */
 package nl.clockwork.ebms.jms;
 
-import javax.jms.Session;
-
 import org.apache.activemq.pool.PooledConnectionFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -28,7 +26,7 @@ import lombok.AccessLevel;
 import lombok.val;
 import lombok.experimental.FieldDefaults;
 
-@Configuration(proxyBeanMethods = false)
+@Configuration
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class JMSConfig
 {
@@ -47,24 +45,18 @@ public class JMSConfig
 		EbMSBrokerFactoryBean.init(jmsBrokerStart,jmsBrokerConfig);
 	}
 
-	@Bean(name="jmsTemplate")
-	@DependsOn("brokerFactory")
+	@Bean
 	public JmsTemplate jmsTemplate()
 	{
-		val pooledConnectionFactory = new PooledConnectionFactory(jmsBrokerUrl);
-		pooledConnectionFactory.setMaxConnections(maxConnections);
-		return new JmsTemplate(pooledConnectionFactory);
+		return new JmsTemplate(connectionFactory());
 	}
 
-	@Bean(name="transactedJmsTemplate")
+	@Bean
 	@DependsOn("brokerFactory")
-	public JmsTemplate transactedJmsTemplate()
+	public PooledConnectionFactory connectionFactory()
 	{
 		val pooledConnectionFactory = new PooledConnectionFactory(jmsBrokerUrl);
 		pooledConnectionFactory.setMaxConnections(maxConnections);
-		val jmsTemplate = new JmsTemplate(pooledConnectionFactory);
-		jmsTemplate.setSessionTransacted(true);
-		jmsTemplate.setSessionAcknowledgeMode(Session.CLIENT_ACKNOWLEDGE);
-		return jmsTemplate;
+		return pooledConnectionFactory;
 	}
 }

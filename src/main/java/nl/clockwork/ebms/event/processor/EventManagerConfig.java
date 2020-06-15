@@ -16,7 +16,6 @@
 package nl.clockwork.ebms.event.processor;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -40,7 +39,6 @@ public class EventManagerConfig
 	@Value("${ebms.serverId}")
 	String serverId;
 	@Autowired()
-	@Qualifier("jmsTemplate")
 	JmsTemplate jmsTemplate;
 	@Value("${ebmsMessage.nrAutoRetries}")
 	int nrAutoRetries;

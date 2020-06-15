@@ -15,14 +15,17 @@
  */
 package nl.clockwork.ebms.event.processor;
 
+import javax.jms.ConnectionFactory;
+
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.jms.core.JmsTemplate;
+import org.springframework.jms.listener.DefaultMessageListenerContainer;
 
 import lombok.AccessLevel;
+import lombok.val;
 import lombok.experimental.FieldDefaults;
 import nl.clockwork.ebms.EbMSThreadPoolExecutor;
 import nl.clockwork.ebms.client.EbMSHttpClientFactory;
@@ -46,9 +49,8 @@ public class EventProcessorConfig
 	CPAManager cpaManager;
 	@Value("${ebms.serverId}")
 	String serverId;
-	@Autowired
-	@Qualifier("transactedJmsTemplate")
-	JmsTemplate jmsTemplate;
+//	@Autowired
+//	JmsTemplate jmsTemplate;
 	@Value("${eventProcessor.start}")
 	boolean startEventProcessor;
 	@Value("${eventProcessor.jms.destinationName}")
@@ -75,35 +77,25 @@ public class EventProcessorConfig
 	EbMSMessageProcessor messageProcessor;
 	@Value("${ebmsMessage.deleteContentOnProcessed}")
 	boolean deleteEbMSAttachmentsOnMessageProcessed;
+	@Autowired
+	ConnectionFactory connectionFactory;
+	@Value("${eventProcessor.jms.destinationName}")
+	String destinationName;
 
 	@Bean
-	public void eventProcessor() throws Exception
+	public Object eventProcessor() throws Exception
 	{
 		if (startEventProcessor)
 		{
-			HandleEventTask.HandleEventTaskBuilder handleEventTaskPrototype = HandleEventTask.builder()
-					.setEventListener(eventListener)
-					.setEbMSDAO(ebMSDAO)
-					.setCpaManager(cpaManager)
-					.setUrlMapper(urlMapper)
-					.setEventManager(eventManager)
-					.setEbMSClientFactory(ebMSClientFactory)
-					.setMessageEncrypter(messageEncrypter)
-					.setMessageProcessor(messageProcessor)
-					.setDeleteEbMSAttachmentsOnMessageProcessed(deleteEbMSAttachmentsOnMessageProcessed)
-					.setExecutionInterval(executionInterval);
 			switch(eventManagerType)
 			{
 				case JMS:
-					JMSEventProcessor.builder()
-							.setStart(startEventProcessor)
-							.setType(eventManagerType)
-							.setJmsTemplate(jmsTemplate)
-							.setJmsDestinationName(jmsDestinationName)
-							.setMaxThreads(maxThreads)
-							.setHandleEventTaskPrototype(handleEventTaskPrototype)
-							.build();
-					break;
+					val result = new DefaultMessageListenerContainer();
+					result.setConnectionFactory(connectionFactory);
+					result.setMaxConcurrentConsumers(maxThreads);
+					result.setDestinationName(StringUtils.isEmpty(jmsDestinationName) ? JMSEventManager.JMS_DESTINATION_NAME : jmsDestinationName);
+					result.setMessageListener(new EbMSSendEventListener(handleEventTaskPrototype()));
+					return result;
 				default:
 					EbMSEventProcessor.builder()
 							.setStart(startEventProcessor)
@@ -112,10 +104,27 @@ public class EventProcessorConfig
 							.setExecutionInterval(executionInterval)
 							.setEbMSThreadPoolExecutor(new EbMSThreadPoolExecutor(maxThreads))
 							.setEbMSEventDAO(ebMSEventDAO)
-							.setHandleEventTaskPrototype(handleEventTaskPrototype)
+							.setHandleEventTaskPrototype(handleEventTaskPrototype())
 							.setServerId(serverId)
 							.build();
 			}
 		}
+		return null;
+	}
+
+	private HandleEventTask.HandleEventTaskBuilder handleEventTaskPrototype()
+	{
+		HandleEventTask.HandleEventTaskBuilder handleEventTaskPrototype = HandleEventTask.builder()
+				.setEventListener(eventListener)
+				.setEbMSDAO(ebMSDAO)
+				.setCpaManager(cpaManager)
+				.setUrlMapper(urlMapper)
+				.setEventManager(eventManager)
+				.setEbMSClientFactory(ebMSClientFactory)
+				.setMessageEncrypter(messageEncrypter)
+				.setMessageProcessor(messageProcessor)
+				.setDeleteEbMSAttachmentsOnMessageProcessed(deleteEbMSAttachmentsOnMessageProcessed)
+				.setExecutionInterval(executionInterval);
+		return handleEventTaskPrototype;
 	}
 }

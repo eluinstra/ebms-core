@@ -16,81 +16,41 @@
 package nl.clockwork.ebms.event.processor;
 
 import java.time.Instant;
-import java.util.stream.IntStream;
 
 import javax.jms.JMSException;
 import javax.jms.Message;
-
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.jms.core.JmsTemplate;
+import javax.jms.MessageListener;
 
 import lombok.AccessLevel;
-import lombok.Builder;
+import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.val;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import nl.clockwork.ebms.event.processor.EventManagerFactory.EventManagerType;
 
 @Slf4j
 @FieldDefaults(level = AccessLevel.PROTECTED, makeFinal = true)
-public class JMSEventProcessor implements Runnable
+@AllArgsConstructor
+public class EbMSSendEventListener implements MessageListener
 {
-	JmsTemplate jmsTemplate;
 	@NonNull
 	HandleEventTask.HandleEventTaskBuilder handleEventTaskPrototype;
-	private String jmsDestinationName;
 
-	@Builder(setterPrefix = "set")
-	public JMSEventProcessor(
-			boolean start,
-			@NonNull EventManagerType type,
-			@NonNull JmsTemplate jmsTemplate,
-			String jmsDestinationName,
-			int maxThreads,
-			@NonNull HandleEventTask.HandleEventTaskBuilder handleEventTaskPrototype)
+	@Override
+	public void onMessage(Message message)
 	{
-		if (start && type == EventManagerType.JMS)
+		try
 		{
-			this.jmsTemplate = jmsTemplate;
-			//jmsTemplate.setDefaultDestinationName(jmsDestinationName);
-			IntStream.range(0,maxThreads).forEach(i -> startDeamon());
-			
+			val event = createEvent(message);
+			val task = handleEventTaskPrototype.setEvent(event).build();
+			task.run();
 		}
-		else
-			this.jmsTemplate = null;
-		this.jmsDestinationName = StringUtils.isEmpty(jmsDestinationName) ? JMSEventManager.JMS_DESTINATION_NAME : jmsDestinationName;
-		this.handleEventTaskPrototype = handleEventTaskPrototype;
+		catch (JMSException e)
+		{
+			log.error("",e);
+			throw new RuntimeException(e);
+		}
 	}
-
-	private void startDeamon()
-	{
-		val thread = new Thread(this);
-		thread.setDaemon(true);
-		thread.start();
-	}
-
-  public void run()
-  {
-  	while (true)
-  	{
-			try
-			{
-				val message = jmsTemplate.receive(jmsDestinationName);
-				if (message != null)
-				{
-					val event = createEvent(message);
-					val task = handleEventTaskPrototype.setEvent(event).build();
-					task.run();
-					message.acknowledge();
-				}
-			}
-			catch (Exception e)
-			{
-				log.trace("",e);
-			}
-  	}
-  }
 
 	private EbMSEvent createEvent(Message message) throws JMSException
 	{
