@@ -16,6 +16,7 @@
 package nl.clockwork.ebms.validation;
 
 import org.apache.commons.lang3.StringUtils;
+import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.ActionBindingType;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -114,7 +115,7 @@ public class EbMSMessageContextValidator
 			}
 			else if (fromPartyInfo.get().getCanSend().getOtherPartyActionBinding() != null
 					&& toPartyInfo.isPresent()
-					&& !fromPartyInfo.get().getCanSend().getOtherPartyActionBinding().equals(toPartyInfo.get().getCanReceive().getThisPartyActionBinding()))
+					&& !equals(toPartyInfo.get().getCanReceive().getThisPartyActionBinding(),fromPartyInfo.get().getCanSend().getOtherPartyActionBinding()))
 			{
 				val msg = new StringBuffer();
 				msg.append("Action for to party does not match action for from party for:");
@@ -139,6 +140,16 @@ public class EbMSMessageContextValidator
 		{
 			throw new ValidatorException(e);
 		}
+	}
+
+	private boolean equals(ActionBindingType thisPartyActionBinding, Object otherPartyActionBinding)
+	{
+		if (thisPartyActionBinding == null && otherPartyActionBinding == null)
+			return true;
+		else if (thisPartyActionBinding != null)
+			if (otherPartyActionBinding != null && otherPartyActionBinding instanceof ActionBindingType)
+				return thisPartyActionBinding.getId().equals(((ActionBindingType)otherPartyActionBinding).getId());
+		return false;
 	}
 
 	private boolean isEmpty(Party party)
