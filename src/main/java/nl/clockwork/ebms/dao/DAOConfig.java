@@ -31,7 +31,6 @@ import lombok.AccessLevel;
 import lombok.val;
 import lombok.experimental.FieldDefaults;
 import nl.clockwork.ebms.cache.CachingMethodInterceptor;
-import nl.clockwork.ebms.cache.CachingMethodInterceptorFactory;
 import nl.clockwork.ebms.cache.EbMSCacheManager;
 import nl.clockwork.ebms.cpa.CPADAO;
 import nl.clockwork.ebms.cpa.CertificateMappingDAO;
@@ -138,6 +137,6 @@ public abstract class DAOConfig
 	@Bean
 	public CachingMethodInterceptor ebMSDAOMethodCacheInterceptor() throws Exception
 	{
-		return new CachingMethodInterceptorFactory(cacheManager,"nl.clockwork.ebms.dao.METHOD_CACHE").getObject();
+		return cacheManager.getMethodInterceptor("nl.clockwork.ebms.dao.METHOD_CACHE");
 	}
 }

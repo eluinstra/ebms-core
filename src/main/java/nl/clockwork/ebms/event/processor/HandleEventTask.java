@@ -70,7 +70,7 @@ public class HandleEventTask implements Runnable
 	@NonNull
 	TimedAction timedAction;
 
-	@Builder(setterPrefix = "set")
+	@Builder
 	public HandleEventTask(@NonNull EventListener eventListener, @NonNull EbMSDAO ebMSDAO, @NonNull CPAManager cpaManager, @NonNull URLMapper urlMapper, @NonNull EventManager eventManager, @NonNull EbMSHttpClientFactory ebMSClientFactory, @NonNull EbMSMessageEncrypter messageEncrypter, @NonNull EbMSMessageProcessor messageProcessor, boolean deleteEbMSAttachmentsOnMessageProcessed, @NonNull EbMSEvent event, long executionInterval)
 	{
 		super();

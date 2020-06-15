@@ -84,7 +84,7 @@ public class EbMSMessageProcessor
 	StatusResponseProcessor statusResponseProcessor;
 	PongProcessor pongProcessor;
 
-	@Builder(setterPrefix = "set")
+	@Builder
 	public EbMSMessageProcessor(@NonNull DeliveryManager deliveryManager, @NonNull EventListener eventListener, @NonNull EbMSDAO ebMSDAO, @NonNull CPAManager cpaManager, @NonNull EbMSMessageFactory ebMSMessageFactory, @NonNull EventManager eventManager, @NonNull EbMSSignatureGenerator signatureGenerator, @NonNull EbMSMessageValidator messageValidator, @NonNull DuplicateMessageHandler duplicateMessageHandler, boolean deleteEbMSAttachmentsOnMessageProcessed)
 	{
 		super();

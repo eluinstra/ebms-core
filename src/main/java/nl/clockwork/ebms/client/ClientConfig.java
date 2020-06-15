@@ -99,19 +99,19 @@ public class ClientConfig
 		val ebMSProxy = new EbMSProxyFactory(proxyHost,poxyPort,proxyUsername,proxyPassword,nonProxyHosts).getObject();
 		val httpErrors = new HttpErrors(recoverableInformationalHttpErrors,recoverableRedirectionHttpErrors,recoverableClientHttpErrors,unrecoverableServerHttpErrors);
 		return EbMSHttpClientFactory.builder()
-				.setType(ebMSHttpClientType)
-				.setConnectTimeout(connectTimeout)
-				.setChunkedStreamingMode(chunkedStreamingMode)
-				.setBase64Writer(base64Writer)
-				.setProxy(ebMSProxy)
-				.setEnabledProtocols(enabledProtocols)
-				.setEnabledCipherSuites(enabledCipherSuites)
-				.setVerifyHostnames(verifyHostnames)
-				.setKeyStore(clientKeyStore)
-				.setTrustStore(trustStore)
-				.setHttpErrors(httpErrors)
-				.setCertificateMapper(certificateMapper)
-				.setUseClientCertificate(useClientCertificate)
+				.type(ebMSHttpClientType)
+				.connectTimeout(connectTimeout)
+				.chunkedStreamingMode(chunkedStreamingMode)
+				.base64Writer(base64Writer)
+				.proxy(ebMSProxy)
+				.enabledProtocols(enabledProtocols)
+				.enabledCipherSuites(enabledCipherSuites)
+				.verifyHostnames(verifyHostnames)
+				.keyStore(clientKeyStore)
+				.trustStore(trustStore)
+				.httpErrors(httpErrors)
+				.certificateMapper(certificateMapper)
+				.useClientCertificate(useClientCertificate)
 				.build();
 	}
 

@@ -52,14 +52,14 @@ public class ValidationConfig
 	public EbMSMessageValidator messageValidator()
 	{
 		return EbMSMessageValidator.builder()
-				.setEbMSDAO(ebMSDAO)
-				.setCpaManager(cpaManager)
-				.setClientCertificateValidator(ClientCertificateValidator.of(cpaManager,clientCertificateValidatorEnabled))
-				.setCpaValidator(cpaValidator())
-				.setMessageHeaderValidator(new MessageHeaderValidator(ebMSDAO,cpaManager))
-				.setManifestValidator(new ManifestValidator())
-				.setSignatureValidator(new SignatureValidator(cpaManager,signatureValidator))
-				.setMessageDecrypter(messageDecrypter)
+				.ebMSDAO(ebMSDAO)
+				.cpaManager(cpaManager)
+				.clientCertificateValidator(ClientCertificateValidator.of(cpaManager,clientCertificateValidatorEnabled))
+				.cpaValidator(cpaValidator())
+				.messageHeaderValidator(new MessageHeaderValidator(ebMSDAO,cpaManager))
+				.manifestValidator(new ManifestValidator())
+				.signatureValidator(new SignatureValidator(cpaManager,signatureValidator))
+				.messageDecrypter(messageDecrypter)
 				.build();
 	}
 

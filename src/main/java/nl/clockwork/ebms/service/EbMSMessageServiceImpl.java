@@ -63,7 +63,7 @@ import nl.clockwork.ebms.util.StreamUtils;
 import nl.clockwork.ebms.validation.EbMSMessageContextValidator;
 
 @Slf4j
-@Builder(setterPrefix = "set")
+@Builder
 @FieldDefaults(level = AccessLevel.PACKAGE, makeFinal = true)
 @AllArgsConstructor
 public class EbMSMessageServiceImpl implements EbMSMessageService

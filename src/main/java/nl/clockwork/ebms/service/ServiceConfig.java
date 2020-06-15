@@ -91,15 +91,15 @@ public class ServiceConfig
 	public EbMSMessageServiceImpl ebMSMessageService()
 	{
 		return EbMSMessageServiceImpl.builder()
-				.setDeliveryManager(deliveryManager)
-				.setEbMSDAO(ebMSDAO)
-				.setEbMSMessageEventDAO(ebMSMessageEventDAO)
-				.setCpaManager(cpaManager)
-				.setEbMSMessageFactory(ebMSMessageFactory)
-				.setEventManager(eventManager)
-				.setEbMSMessageContextValidator(ebMSMessageContextValidator)
-				.setSignatureGenerator(signatureGenerator)
-				.setDeleteEbMSAttachmentsOnMessageProcessed(deleteEbMSAttachmentsOnMessageProcessed)
+				.deliveryManager(deliveryManager)
+				.ebMSDAO(ebMSDAO)
+				.ebMSMessageEventDAO(ebMSMessageEventDAO)
+				.cpaManager(cpaManager)
+				.ebMSMessageFactory(ebMSMessageFactory)
+				.eventManager(eventManager)
+				.ebMSMessageContextValidator(ebMSMessageContextValidator)
+				.signatureGenerator(signatureGenerator)
+				.deleteEbMSAttachmentsOnMessageProcessed(deleteEbMSAttachmentsOnMessageProcessed)
 				.build();
 	}
 

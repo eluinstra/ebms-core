@@ -46,7 +46,7 @@ import nl.clockwork.ebms.validation.EbMSMessageValidator;
 import nl.clockwork.ebms.validation.ValidationException;
 
 @Slf4j
-@Builder(setterPrefix = "set")
+@Builder
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor
 class DuplicateMessageHandler

@@ -34,7 +34,7 @@ import lombok.extern.slf4j.Slf4j;
 public class EbMSSendEventListener implements MessageListener
 {
 	@NonNull
-	HandleEventTask.HandleEventTaskBuilder handleEventTaskPrototype;
+	HandleEventTask.HandleEventTaskBuilder handleEventTaskBuilder;
 
 	@Override
 	public void onMessage(Message message)
@@ -42,7 +42,7 @@ public class EbMSSendEventListener implements MessageListener
 		try
 		{
 			val event = createEvent(message);
-			val task = handleEventTaskPrototype.setEvent(event).build();
+			val task = handleEventTaskBuilder.event(event).build();
 			task.run();
 		}
 		catch (JMSException e)

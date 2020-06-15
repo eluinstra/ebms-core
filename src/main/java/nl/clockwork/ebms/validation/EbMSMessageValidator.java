@@ -39,7 +39,7 @@ import nl.clockwork.ebms.model.EbMSMessageError;
 import nl.clockwork.ebms.model.EbMSRequestMessage;
 import nl.clockwork.ebms.util.StreamUtils;
 
-@Builder(setterPrefix = "set")
+@Builder
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor
 public class EbMSMessageValidator

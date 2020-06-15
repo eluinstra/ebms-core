@@ -28,7 +28,6 @@ import lombok.AccessLevel;
 import lombok.val;
 import lombok.experimental.FieldDefaults;
 import nl.clockwork.ebms.cache.CachingMethodInterceptor;
-import nl.clockwork.ebms.cache.CachingMethodInterceptorFactory;
 import nl.clockwork.ebms.cache.EbMSCacheManager;
 
 @Configuration
@@ -90,7 +89,7 @@ public class CPAManagerConfig
 	@Bean
 	public CachingMethodInterceptor cpaMethodCacheInterceptor() throws Exception
 	{
-		return new CachingMethodInterceptorFactory(cacheManager,"nl.clockwork.ebms.cpa.METHOD_CACHE").getObject();
+		return cacheManager.getMethodInterceptor("nl.clockwork.ebms.cpa.METHOD_CACHE");
 	}
 
 	@Bean

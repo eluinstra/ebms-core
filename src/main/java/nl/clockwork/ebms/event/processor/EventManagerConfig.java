@@ -24,14 +24,14 @@ import org.springframework.jms.core.JmsTemplate;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import nl.clockwork.ebms.cpa.CPAManager;
-import nl.clockwork.ebms.event.processor.EventManagerFactory.EventManagerType;
+import nl.clockwork.ebms.event.processor.EventProcessorConfig.EventProcessorType;
 
 @Configuration(proxyBeanMethods = false)
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class EventManagerConfig
 {
-	@Value("${eventManager.type}")
-	EventManagerType eventManagerType;
+	@Value("${eventProcessor.type}")
+	EventProcessorType eventProcessorType;
 	@Autowired
 	EbMSEventDAO ebMSEventDAO;
 	@Autowired
@@ -48,15 +48,14 @@ public class EventManagerConfig
 	@Bean()
 	public EventManager eventManager() throws Exception
 	{
-		return EventManagerFactory.builder()
-				.setType(eventManagerType)
-				.setEbMSEventDAO(ebMSEventDAO)
-				.setCpaManager(cpaManager)
-				.setServerId(serverId)
-				.setJmsTemplate(jmsTemplate)
-				.setNrAutoRetries(nrAutoRetries)
-				.setAutoRetryInterval(autoRetryInterval)
-				.build()
-				.getObject();
+		switch(eventProcessorType)
+		{
+			case DAO:
+				return new EbMSEventManager(ebMSEventDAO,cpaManager,serverId,nrAutoRetries,autoRetryInterval);
+			case JMS:
+				return new JMSEventManager(jmsTemplate,ebMSEventDAO,cpaManager,nrAutoRetries,autoRetryInterval);
+			default:
+				return null;
+		}
 	}
 }

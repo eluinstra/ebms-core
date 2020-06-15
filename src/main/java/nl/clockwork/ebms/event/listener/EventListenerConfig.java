@@ -15,6 +15,13 @@
  */
 package nl.clockwork.ebms.event.listener;
 
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import javax.jms.Destination;
+
+import org.apache.activemq.command.ActiveMQQueue;
+import org.apache.activemq.command.ActiveMQTopic;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -24,13 +31,16 @@ import org.springframework.jms.core.JmsTemplate;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import nl.clockwork.ebms.dao.EbMSDAO;
-import nl.clockwork.ebms.event.listener.EventListenerFactory.EventListenerType;
 import nl.clockwork.ebms.jms.JMSDestinationType;
 
 @Configuration(proxyBeanMethods = false)
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class EventListenerConfig
 {
+	public enum EventListenerType
+	{
+		DEFAULT, DAO, SIMPLE_JMS, JMS, JMS_TEXT;
+	}
 	@Value("${eventListener.type}")
 	EventListenerType eventListenerType;
 	@Autowired
@@ -45,13 +55,29 @@ public class EventListenerConfig
 	@Bean
 	public EventListener eventListener() throws Exception
 	{
-		return EventListenerFactory.builder()
-				.setType(eventListenerType)
-				.setEbMSDAO(ebMSDAO)
-				.setEbMSMessageEventDAO(ebMSMessageEventDAO)
-				.setJmsTemplate(jmsTemplate)
-				.setJmsDestinationType(jmsDestinationType)
-				.build()
-				.getObject();
+		switch (eventListenerType)
+		{
+			case DAO:
+				return new DAOEventListener(ebMSMessageEventDAO);
+			case SIMPLE_JMS:
+				return new SimpleJMSEventListener(jmsTemplate,createEbMSMessageEventDestinations(jmsDestinationType));
+			case JMS:
+				return new JMSEventListener(ebMSDAO,jmsTemplate,createEbMSMessageEventDestinations(jmsDestinationType));
+			case JMS_TEXT:
+				return new JMSTextEventListener(ebMSDAO,jmsTemplate,createEbMSMessageEventDestinations(jmsDestinationType));
+			default:
+				return new LoggingEventListener();
+		}
+	}
+
+	private Map<String,Destination> createEbMSMessageEventDestinations(JMSDestinationType jmsDestinationType)
+	{
+		return EbMSMessageEventType.stream()
+				.collect(Collectors.toMap(e -> e.name(),e -> createDestination(jmsDestinationType,e)));
+	}
+
+	private Destination createDestination(JMSDestinationType jmsDestinationType, EbMSMessageEventType e)
+	{
+		return jmsDestinationType == JMSDestinationType.QUEUE ? new ActiveMQQueue(e.name()) : new ActiveMQTopic("VirtualTopic." + e.name());
 	}
 }

@@ -64,7 +64,7 @@ public class EbMSEventManager implements EventManager
 		{
 			ebMSeventDAO.insertEventLog(event.getMessageId(),event.getTimestamp(),url,status,errorMessage);
 			if (event.getTimeToLive() != null && CPAUtils.isReliableMessaging(deliveryChannel))
-				ebMSeventDAO.updateEvent(EventManagerFactory.createNextEvent(event,deliveryChannel));
+				ebMSeventDAO.updateEvent(createNextEvent(event,deliveryChannel));
 			else
 			{
 				switch(ebMSeventDAO.getMessageAction(event.getMessageId()).orElse(null))
@@ -73,7 +73,7 @@ public class EbMSEventManager implements EventManager
 					case MESSAGE_ERROR:
 						if (event.getRetries() < nrAutoRetries)
 						{
-							ebMSeventDAO.updateEvent(EventManagerFactory.createNextEvent(event,autoRetryInterval));
+							ebMSeventDAO.updateEvent(createNextEvent(event,autoRetryInterval));
 							break;
 						}
 					default:

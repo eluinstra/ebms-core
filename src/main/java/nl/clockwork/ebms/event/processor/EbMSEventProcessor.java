@@ -29,7 +29,6 @@ import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import nl.clockwork.ebms.Action;
 import nl.clockwork.ebms.EbMSThreadPoolExecutor;
-import nl.clockwork.ebms.event.processor.EventManagerFactory.EventManagerType;
 
 @Slf4j
 @FieldDefaults(level = AccessLevel.PROTECTED, makeFinal = true)
@@ -40,35 +39,28 @@ public class EbMSEventProcessor implements Runnable
 	@NonNull
 	EbMSEventDAO ebMSEventDAO;
 	@NonNull
-	HandleEventTask.HandleEventTaskBuilder handleEventTaskPrototype;
+	HandleEventTask.HandleEventTaskBuilder handleEventTaskBuilder;
 	ExecutorService executorService;
 	String serverId;
 
-	@Builder(setterPrefix = "set")
+	@Builder
 	public EbMSEventProcessor(
-			boolean start,
-			@NonNull EventManagerType type,
 			int maxEvents,
 			int executionInterval,
 			@NonNull EbMSThreadPoolExecutor ebMSThreadPoolExecutor,
 			@NonNull EbMSEventDAO ebMSEventDAO,
-			@NonNull HandleEventTask.HandleEventTaskBuilder handleEventTaskPrototype,
+			@NonNull HandleEventTask.HandleEventTaskBuilder handleEventTaskBuilder,
 			String serverId)
 	{
 		this.executionInterval = executionInterval;
 		this.maxEvents = maxEvents;
 		this.ebMSEventDAO = ebMSEventDAO;
-		this.handleEventTaskPrototype = handleEventTaskPrototype;
+		this.handleEventTaskBuilder = handleEventTaskBuilder;
 		this.serverId = serverId;
-		if (start && type == EventManagerType.DEFAULT)
-		{
-			this.executorService = ebMSThreadPoolExecutor.createInstance();
-			val thread = new Thread(this);
-			thread.setDaemon(true);
-			thread.start();
-		}
-		else
-			this.executorService = null;
+		this.executorService = ebMSThreadPoolExecutor.createInstance();
+		val thread = new Thread(this);
+		thread.setDaemon(true);
+		thread.start();
 	}
 
   public void run()
@@ -81,7 +73,7 @@ public class EbMSEventProcessor implements Runnable
 				val timestamp = Instant.now();
 				val events = maxEvents > 0 ? ebMSEventDAO.getEventsBefore(timestamp,serverId,maxEvents) : ebMSEventDAO.getEventsBefore(timestamp,serverId);
 				for (EbMSEvent event : events)
-					futures.add(executorService.submit(handleEventTaskPrototype.setEvent(event).build()));
+					futures.add(executorService.submit(handleEventTaskBuilder.event(event).build()));
 			}
 			catch (Exception e)
 			{

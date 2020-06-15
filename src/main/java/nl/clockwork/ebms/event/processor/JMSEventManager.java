@@ -105,7 +105,7 @@ public class JMSEventManager implements EventManager
 			ebMSeventDAO.insertEventLog(event.getMessageId(),event.getTimestamp(), url, status, errorMessage);
 			if (event.getTimeToLive() != null && CPAUtils.isReliableMessaging(deliveryChannel))
 			{
-				val nextEvent = EventManagerFactory.createNextEvent(event,deliveryChannel);
+				val nextEvent = createNextEvent(event,deliveryChannel);
 				//jmsTemplate.setDeliveryDelay(calculateDelay(nextEvent));
 				jmsTemplate.send(JMS_DESTINATION_NAME,new EventMessageCreator(nextEvent,calculateDelay(nextEvent)));
 			}
@@ -117,7 +117,7 @@ public class JMSEventManager implements EventManager
 					case MESSAGE_ERROR:
 						if (event.getRetries() < nrAutoRetries)
 						{
-							val nextEvent = EventManagerFactory.createNextEvent(event,autoRetryInterval);
+							val nextEvent = createNextEvent(event,autoRetryInterval);
 							//jmsTemplate.setDeliveryDelay(autoRetryInterval);
 							jmsTemplate.send(JMS_DESTINATION_NAME,new EventMessageCreator(nextEvent,autoRetryInterval));
 							break;

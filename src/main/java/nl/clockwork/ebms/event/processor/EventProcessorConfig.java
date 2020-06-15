@@ -34,25 +34,24 @@ import nl.clockwork.ebms.cpa.URLMapper;
 import nl.clockwork.ebms.dao.EbMSDAO;
 import nl.clockwork.ebms.encryption.EbMSMessageEncrypter;
 import nl.clockwork.ebms.event.listener.EventListener;
-import nl.clockwork.ebms.event.processor.EventManagerFactory.EventManagerType;
 import nl.clockwork.ebms.processor.EbMSMessageProcessor;
 
 @Configuration(proxyBeanMethods = false)
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class EventProcessorConfig
 {
-	@Value("${eventManager.type}")
-	EventManagerType eventManagerType;
+	public enum EventProcessorType
+	{
+		NONE, DAO, JMS;
+	}
+	@Value("${eventProcessor.type}")
+	EventProcessorType eventProcessorType;
 	@Autowired
 	EbMSEventDAO ebMSEventDAO;
 	@Autowired
 	CPAManager cpaManager;
 	@Value("${ebms.serverId}")
 	String serverId;
-//	@Autowired
-//	JmsTemplate jmsTemplate;
-	@Value("${eventProcessor.start}")
-	boolean startEventProcessor;
 	@Value("${eventProcessor.jms.destinationName}")
 	String jmsDestinationName;
 	@Value("${eventProcessor.maxTreads}")
@@ -85,46 +84,43 @@ public class EventProcessorConfig
 	@Bean
 	public Object eventProcessor() throws Exception
 	{
-		if (startEventProcessor)
+		switch(eventProcessorType)
 		{
-			switch(eventManagerType)
-			{
-				case JMS:
-					val result = new DefaultMessageListenerContainer();
-					result.setConnectionFactory(connectionFactory);
-					result.setMaxConcurrentConsumers(maxThreads);
-					result.setDestinationName(StringUtils.isEmpty(jmsDestinationName) ? JMSEventManager.JMS_DESTINATION_NAME : jmsDestinationName);
-					result.setMessageListener(new EbMSSendEventListener(handleEventTaskPrototype()));
-					return result;
-				default:
-					EbMSEventProcessor.builder()
-							.setStart(startEventProcessor)
-							.setType(eventManagerType)
-							.setMaxEvents(maxEvents)
-							.setExecutionInterval(executionInterval)
-							.setEbMSThreadPoolExecutor(new EbMSThreadPoolExecutor(maxThreads))
-							.setEbMSEventDAO(ebMSEventDAO)
-							.setHandleEventTaskPrototype(handleEventTaskPrototype())
-							.setServerId(serverId)
-							.build();
-			}
+			case DAO:
+				EbMSEventProcessor.builder()
+				.maxEvents(maxEvents)
+				.executionInterval(executionInterval)
+				.ebMSThreadPoolExecutor(new EbMSThreadPoolExecutor(maxThreads))
+				.ebMSEventDAO(ebMSEventDAO)
+				.handleEventTaskBuilder(handleEventTaskBuilder())
+				.serverId(serverId)
+				.build();
+				return null;
+			case JMS:
+				val result = new DefaultMessageListenerContainer();
+				result.setConnectionFactory(connectionFactory);
+				result.setMaxConcurrentConsumers(maxThreads);
+				result.setDestinationName(StringUtils.isEmpty(jmsDestinationName) ? JMSEventManager.JMS_DESTINATION_NAME : jmsDestinationName);
+				result.setMessageListener(new EbMSSendEventListener(handleEventTaskBuilder()));
+				return result;
+			default:
+				return null;
 		}
-		return null;
 	}
 
-	private HandleEventTask.HandleEventTaskBuilder handleEventTaskPrototype()
+	private HandleEventTask.HandleEventTaskBuilder handleEventTaskBuilder()
 	{
-		HandleEventTask.HandleEventTaskBuilder handleEventTaskPrototype = HandleEventTask.builder()
-				.setEventListener(eventListener)
-				.setEbMSDAO(ebMSDAO)
-				.setCpaManager(cpaManager)
-				.setUrlMapper(urlMapper)
-				.setEventManager(eventManager)
-				.setEbMSClientFactory(ebMSClientFactory)
-				.setMessageEncrypter(messageEncrypter)
-				.setMessageProcessor(messageProcessor)
-				.setDeleteEbMSAttachmentsOnMessageProcessed(deleteEbMSAttachmentsOnMessageProcessed)
-				.setExecutionInterval(executionInterval);
-		return handleEventTaskPrototype;
+		HandleEventTask.HandleEventTaskBuilder handleEventTaskBuilder = HandleEventTask.builder()
+				.eventListener(eventListener)
+				.ebMSDAO(ebMSDAO)
+				.cpaManager(cpaManager)
+				.urlMapper(urlMapper)
+				.eventManager(eventManager)
+				.ebMSClientFactory(ebMSClientFactory)
+				.messageEncrypter(messageEncrypter)
+				.messageProcessor(messageProcessor)
+				.deleteEbMSAttachmentsOnMessageProcessed(deleteEbMSAttachmentsOnMessageProcessed)
+				.executionInterval(executionInterval);
+		return handleEventTaskBuilder;
 	}
 }

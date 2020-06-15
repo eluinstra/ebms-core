@@ -36,7 +36,7 @@ import nl.clockwork.ebms.cpa.CertificateMapper;
 import nl.clockwork.ebms.security.EbMSKeyStore;
 import nl.clockwork.ebms.security.EbMSTrustStore;
 
-@Builder(setterPrefix = "set")
+@Builder
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor
 public class EbMSHttpClientFactory
