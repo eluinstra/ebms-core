@@ -36,7 +36,6 @@ import nl.clockwork.ebms.client.EbMSUnrecoverableResponseException;
 import nl.clockwork.ebms.cpa.CPAManager;
 import nl.clockwork.ebms.cpa.CPAUtils;
 import nl.clockwork.ebms.cpa.URLMapper;
-import nl.clockwork.ebms.dao.DAOTransactionCallback;
 import nl.clockwork.ebms.dao.EbMSDAO;
 import nl.clockwork.ebms.encryption.EbMSMessageEncrypter;
 import nl.clockwork.ebms.event.listener.EventListener;
@@ -118,44 +117,34 @@ public class HandleEventTask implements Runnable
 		catch (final EbMSResponseException e)
 		{
 			log.error("",e);
-			ebMSDAO.executeTransaction(
-				new DAOTransactionCallback()
-				{
-					@Override
-					public void doInTransaction()
+			Action action = () ->
+			{
+				eventManager.updateEvent(event,url,EbMSEventStatus.FAILED,e.getMessage());
+				if ((e instanceof EbMSUnrecoverableResponseException) || !CPAUtils.isReliableMessaging(receiveDeliveryChannel))
+					if (ebMSDAO.updateMessage(event.getMessageId(),EbMSMessageStatus.SENDING,EbMSMessageStatus.DELIVERY_FAILED) > 0)
 					{
-						eventManager.updateEvent(event,url,EbMSEventStatus.FAILED,e.getMessage());
-						if ((e instanceof EbMSUnrecoverableResponseException) || !CPAUtils.isReliableMessaging(receiveDeliveryChannel))
-							if (ebMSDAO.updateMessage(event.getMessageId(),EbMSMessageStatus.SENDING,EbMSMessageStatus.DELIVERY_FAILED) > 0)
-							{
-								eventListener.onMessageFailed(event.getMessageId());
-								if (deleteEbMSAttachmentsOnMessageProcessed)
-									ebMSDAO.deleteAttachments(event.getMessageId());
-							}
+						eventListener.onMessageFailed(event.getMessageId());
+						if (deleteEbMSAttachmentsOnMessageProcessed)
+							ebMSDAO.deleteAttachments(event.getMessageId());
 					}
-				}
-			);
+			};
+			ebMSDAO.executeTransaction(action);
 		}
 		catch (final Exception e)
 		{
 			log.error("",e);
-			ebMSDAO.executeTransaction(
-				new DAOTransactionCallback()
-				{
-					@Override
-					public void doInTransaction()
+			Action action = () ->
+			{
+				eventManager.updateEvent(event,url,EbMSEventStatus.FAILED,ExceptionUtils.getStackTrace(e));
+				if (!CPAUtils.isReliableMessaging(receiveDeliveryChannel))
+					if (ebMSDAO.updateMessage(event.getMessageId(),EbMSMessageStatus.SENDING,EbMSMessageStatus.DELIVERY_FAILED) > 0)
 					{
-						eventManager.updateEvent(event,url,EbMSEventStatus.FAILED,ExceptionUtils.getStackTrace(e));
-						if (!CPAUtils.isReliableMessaging(receiveDeliveryChannel))
-							if (ebMSDAO.updateMessage(event.getMessageId(),EbMSMessageStatus.SENDING,EbMSMessageStatus.DELIVERY_FAILED) > 0)
-							{
-								eventListener.onMessageFailed(event.getMessageId());
-								if (deleteEbMSAttachmentsOnMessageProcessed)
-									ebMSDAO.deleteAttachments(event.getMessageId());
-							}
+						eventListener.onMessageFailed(event.getMessageId());
+						if (deleteEbMSAttachmentsOnMessageProcessed)
+							ebMSDAO.deleteAttachments(event.getMessageId());
 					}
-				}
-			);
+			};
+			ebMSDAO.executeTransaction(action);
 		}
 	}
 
@@ -168,22 +157,18 @@ public class HandleEventTask implements Runnable
 			log.info("Sending message " + event.getMessageId() + " to " + url);
 			val responseDocument = createClient(event).sendMessage(url,requestDocument);
 			messageProcessor.processResponse(requestDocument,responseDocument);
-			ebMSDAO.executeTransaction(
-				new DAOTransactionCallback()
-				{
-					@Override
-					public void doInTransaction()
+			Action action = () ->
+			{
+				eventManager.updateEvent(event,url,EbMSEventStatus.SUCCEEDED);
+				if (!CPAUtils.isReliableMessaging(receiveDeliveryChannel))
+					if (ebMSDAO.updateMessage(event.getMessageId(),EbMSMessageStatus.SENDING,EbMSMessageStatus.DELIVERED) > 0)
 					{
-						eventManager.updateEvent(event,url,EbMSEventStatus.SUCCEEDED);
-						if (!CPAUtils.isReliableMessaging(receiveDeliveryChannel))
-							if (ebMSDAO.updateMessage(event.getMessageId(),EbMSMessageStatus.SENDING,EbMSMessageStatus.DELIVERED) > 0)
-							{
-								eventListener.onMessageDelivered(event.getMessageId());
-								if (deleteEbMSAttachmentsOnMessageProcessed)
-									ebMSDAO.deleteAttachments(event.getMessageId());
-							}
+						eventListener.onMessageDelivered(event.getMessageId());
+						if (deleteEbMSAttachmentsOnMessageProcessed)
+							ebMSDAO.deleteAttachments(event.getMessageId());
 					}
-				});
+			};
+			ebMSDAO.executeTransaction(action);
 		}
 		catch (CertificateException e)
 		{
@@ -205,31 +190,26 @@ public class HandleEventTask implements Runnable
 		try
 		{
 			log.warn("Expiring message " +  event.getMessageId());
-			ebMSDAO.executeTransaction(
-				new DAOTransactionCallback()
-				{
-					@Override
-					public void doInTransaction()
-					{
-						ebMSDAO.getEbMSDocumentIfUnsent(event.getMessageId()).ifPresent(d -> updateMessage(event.getMessageId()));
-						eventManager.deleteEvent(event.getMessageId());
-					}
-
-					private void updateMessage(final String messageId)
-					{
-						if (ebMSDAO.updateMessage(messageId,EbMSMessageStatus.SENDING,EbMSMessageStatus.EXPIRED) > 0)
-						{
-							eventListener.onMessageExpired(messageId);
-							if (deleteEbMSAttachmentsOnMessageProcessed)
-								ebMSDAO.deleteAttachments(messageId);
-						}
-					}
-				}
-			);
+			Action action = () ->
+			{
+				ebMSDAO.getEbMSDocumentIfUnsent(event.getMessageId()).ifPresent(d -> updateMessage(event.getMessageId()));
+				eventManager.deleteEvent(event.getMessageId());
+			};
+			ebMSDAO.executeTransaction(action);
 		}
 		catch (Exception e)
 		{
 			log.error("",e);
+		}
+	}
+
+	private void updateMessage(final String messageId)
+	{
+		if (ebMSDAO.updateMessage(messageId,EbMSMessageStatus.SENDING,EbMSMessageStatus.EXPIRED) > 0)
+		{
+			eventListener.onMessageExpired(messageId);
+			if (deleteEbMSAttachmentsOnMessageProcessed)
+				ebMSDAO.deleteAttachments(messageId);
 		}
 	}
 }

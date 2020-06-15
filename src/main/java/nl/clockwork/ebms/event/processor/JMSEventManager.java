@@ -33,9 +33,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.val;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.NonFinal;
+import nl.clockwork.ebms.Action;
 import nl.clockwork.ebms.cpa.CPAManager;
 import nl.clockwork.ebms.cpa.CPAUtils;
-import nl.clockwork.ebms.dao.DAOTransactionCallback;
 import nl.clockwork.ebms.util.StreamUtils;
 
 @FieldDefaults(level = AccessLevel.PROTECTED, makeFinal = true)
@@ -100,44 +100,39 @@ public class JMSEventManager implements EventManager
 				event.getCpaId(),
 				event.getReceiveDeliveryChannelId())
 					.orElseThrow(() -> StreamUtils.illegalStateException("DeliveryChannel",event.getCpaId(),event.getReceiveDeliveryChannelId()));
-		ebMSeventDAO.executeTransaction(
-			new DAOTransactionCallback()
+		Action action = () ->
+		{
+			ebMSeventDAO.insertEventLog(event.getMessageId(),event.getTimestamp(), url, status, errorMessage);
+			if (event.getTimeToLive() != null && CPAUtils.isReliableMessaging(deliveryChannel))
 			{
-				@Override
-				public void doInTransaction()
+				val nextEvent = EventManagerFactory.createNextEvent(event,deliveryChannel);
+				//jmsTemplate.setDeliveryDelay(calculateDelay(nextEvent));
+				jmsTemplate.send(JMS_DESTINATION_NAME,new EventMessageCreator(nextEvent,calculateDelay(nextEvent)));
+			}
+			else
+			{
+				switch(ebMSeventDAO.getMessageAction(event.getMessageId()).orElse(null))
 				{
-					ebMSeventDAO.insertEventLog(event.getMessageId(),event.getTimestamp(), url, status, errorMessage);
-					if (event.getTimeToLive() != null && CPAUtils.isReliableMessaging(deliveryChannel))
-					{
-						val nextEvent = EventManagerFactory.createNextEvent(event,deliveryChannel);
-						//jmsTemplate.setDeliveryDelay(calculateDelay(nextEvent));
-						jmsTemplate.send(JMS_DESTINATION_NAME,new EventMessageCreator(nextEvent,calculateDelay(nextEvent)));
-					}
-					else
-					{
-						switch(ebMSeventDAO.getMessageAction(event.getMessageId()).orElse(null))
+					case ACKNOWLEDGMENT:
+					case MESSAGE_ERROR:
+						if (event.getRetries() < nrAutoRetries)
 						{
-							case ACKNOWLEDGMENT:
-							case MESSAGE_ERROR:
-								if (event.getRetries() < nrAutoRetries)
-								{
-									val nextEvent = EventManagerFactory.createNextEvent(event,autoRetryInterval);
-									//jmsTemplate.setDeliveryDelay(autoRetryInterval);
-									jmsTemplate.send(JMS_DESTINATION_NAME,new EventMessageCreator(nextEvent,autoRetryInterval));
-									break;
-								}
-							default:
+							val nextEvent = EventManagerFactory.createNextEvent(event,autoRetryInterval);
+							//jmsTemplate.setDeliveryDelay(autoRetryInterval);
+							jmsTemplate.send(JMS_DESTINATION_NAME,new EventMessageCreator(nextEvent,autoRetryInterval));
+							break;
 						}
-					}
-				}
-
-				private long calculateDelay(final EbMSEvent event)
-				{
-					val result = event.getTimestamp().toEpochMilli() - Instant.now().toEpochMilli();
-					return result <= 0 ? -1 : result;
+					default:
 				}
 			}
-		);
+		};
+		ebMSeventDAO.executeTransaction(action);
+	}
+
+	private long calculateDelay(final EbMSEvent event)
+	{
+		val result = event.getTimestamp().toEpochMilli() - Instant.now().toEpochMilli();
+		return result <= 0 ? -1 : result;
 	}
 
 	@Override

@@ -35,6 +35,7 @@ import lombok.NonNull;
 import lombok.val;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import nl.clockwork.ebms.Action;
 import nl.clockwork.ebms.EbMSAction;
 import nl.clockwork.ebms.EbMSMessageFactory;
 import nl.clockwork.ebms.EbMSMessageStatus;
@@ -44,7 +45,6 @@ import nl.clockwork.ebms.cpa.CPAManager;
 import nl.clockwork.ebms.cpa.CPAUtils;
 import nl.clockwork.ebms.cpa.CacheablePartyId;
 import nl.clockwork.ebms.dao.DAOException;
-import nl.clockwork.ebms.dao.DAOTransactionCallback;
 import nl.clockwork.ebms.dao.EbMSDAO;
 import nl.clockwork.ebms.event.listener.EbMSMessageEventDAO;
 import nl.clockwork.ebms.event.listener.EbMSMessageEventType;
@@ -202,19 +202,16 @@ public class EbMSMessageServiceImpl implements EbMSMessageService
 		try
 		{
 			log.debug("ProcessMessage " + messageId);
-			ebMSDAO.executeTransaction(new DAOTransactionCallback()
+			Action action = () ->
 			{
-				@Override
-				public void doInTransaction() throws DAOException
+				if (ebMSDAO.updateMessage(messageId,EbMSMessageStatus.RECEIVED,EbMSMessageStatus.PROCESSED) > 0)
 				{
-					if (ebMSDAO.updateMessage(messageId,EbMSMessageStatus.RECEIVED,EbMSMessageStatus.PROCESSED) > 0)
-					{
-						if (deleteEbMSAttachmentsOnMessageProcessed)
-							ebMSDAO.deleteAttachments(messageId);
-						log.info("Message " + messageId + " processed");
-					}
+					if (deleteEbMSAttachmentsOnMessageProcessed)
+						ebMSDAO.deleteAttachments(messageId);
+					log.info("Message " + messageId + " processed");
 				}
-			});
+			};
+			ebMSDAO.executeTransaction(action);
 		}
 		catch (Exception e)
 		{
@@ -288,15 +285,12 @@ public class EbMSMessageServiceImpl implements EbMSMessageService
 		try
 		{
 			log.debug("ProcessMessageEvent " + messageId);
-			ebMSDAO.executeTransaction(new DAOTransactionCallback()
+			Action action = () ->
 			{
-				@Override
-				public void doInTransaction() throws DAOException
-				{
-					ebMSMessageEventDAO.processEbMSMessageEvent(messageId);
-					processMessage(messageId);
-				}
-			});
+				ebMSMessageEventDAO.processEbMSMessageEvent(messageId);
+				processMessage(messageId);
+			};
+			ebMSDAO.executeTransaction(action);
 		}
 		catch (Exception e)
 		{
@@ -314,30 +308,27 @@ public class EbMSMessageServiceImpl implements EbMSMessageService
 
 	protected void storeMessage(Document document, EbMSMessage message) throws EbMSProcessorException
 	{
-		ebMSDAO.executeTransaction(new DAOTransactionCallback()
+		Action action = () ->
 		{
-			@Override
-			public void doInTransaction()
+			try
 			{
-				try
-				{
-					val timestamp = Instant.now();
-					val messageHeader = message.getMessageHeader();
-					val fromPartyId = new CacheablePartyId(messageHeader.getFrom().getPartyId());
-					val toPartyId = new CacheablePartyId(messageHeader.getTo().getPartyId());
-					val service = CPAUtils.toString(messageHeader.getService());
-					val sendDeliveryChannel = cpaManager.getSendDeliveryChannel(messageHeader.getCPAId(),fromPartyId,messageHeader.getFrom().getRole(),service,messageHeader.getAction()).orElseThrow(() -> StreamUtils.illegalStateException("SendDeliveryChannel",messageHeader.getCPAId(),fromPartyId,messageHeader.getFrom().getRole(),service,messageHeader.getAction()));
-					val receiveDeliveryChannel = cpaManager.getReceiveDeliveryChannel(messageHeader.getCPAId(),toPartyId,messageHeader.getTo().getRole(),service,messageHeader.getAction()).orElseThrow(() -> StreamUtils.illegalStateException("ReceiveDeliveryChannel",messageHeader.getCPAId(),toPartyId,messageHeader.getTo().getRole(),service,messageHeader.getAction()));
-					val persistTime = CPAUtils.getPersistTime(timestamp,receiveDeliveryChannel);
-					val confidential = cpaManager.isConfidential(messageHeader.getCPAId(),fromPartyId,messageHeader.getFrom().getRole(),service,messageHeader.getAction());
-					ebMSDAO.insertMessage(timestamp,persistTime,document,message,message.getAttachments(),EbMSMessageStatus.SENDING);
-					eventManager.createEvent(messageHeader.getCPAId(),sendDeliveryChannel,receiveDeliveryChannel,messageHeader.getMessageData().getMessageId(),messageHeader.getMessageData().getTimeToLive(),messageHeader.getMessageData().getTimestamp(),confidential);
-				}
-				catch (IllegalStateException | DAOException | TransformerFactoryConfigurationError e)
-				{
-					throw new EbMSProcessorException();
-				}
+				val timestamp = Instant.now();
+				val messageHeader = message.getMessageHeader();
+				val fromPartyId = new CacheablePartyId(messageHeader.getFrom().getPartyId());
+				val toPartyId = new CacheablePartyId(messageHeader.getTo().getPartyId());
+				val service = CPAUtils.toString(messageHeader.getService());
+				val sendDeliveryChannel = cpaManager.getSendDeliveryChannel(messageHeader.getCPAId(),fromPartyId,messageHeader.getFrom().getRole(),service,messageHeader.getAction()).orElseThrow(() -> StreamUtils.illegalStateException("SendDeliveryChannel",messageHeader.getCPAId(),fromPartyId,messageHeader.getFrom().getRole(),service,messageHeader.getAction()));
+				val receiveDeliveryChannel = cpaManager.getReceiveDeliveryChannel(messageHeader.getCPAId(),toPartyId,messageHeader.getTo().getRole(),service,messageHeader.getAction()).orElseThrow(() -> StreamUtils.illegalStateException("ReceiveDeliveryChannel",messageHeader.getCPAId(),toPartyId,messageHeader.getTo().getRole(),service,messageHeader.getAction()));
+				val persistTime = CPAUtils.getPersistTime(timestamp,receiveDeliveryChannel);
+				val confidential = cpaManager.isConfidential(messageHeader.getCPAId(),fromPartyId,messageHeader.getFrom().getRole(),service,messageHeader.getAction());
+				ebMSDAO.insertMessage(timestamp,persistTime,document,message,message.getAttachments(),EbMSMessageStatus.SENDING);
+				eventManager.createEvent(messageHeader.getCPAId(),sendDeliveryChannel,receiveDeliveryChannel,messageHeader.getMessageData().getMessageId(),messageHeader.getMessageData().getTimeToLive(),messageHeader.getMessageData().getTimestamp(),confidential);
 			}
-		});
+			catch (IllegalStateException | DAOException | TransformerFactoryConfigurationError e)
+			{
+				throw new EbMSProcessorException();
+			}
+		};
+		ebMSDAO.executeTransaction(action);
 	}
 }

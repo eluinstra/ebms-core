@@ -22,6 +22,7 @@ import java.util.Optional;
 
 import org.w3c.dom.Document;
 
+import nl.clockwork.ebms.Action;
 import nl.clockwork.ebms.EbMSAction;
 import nl.clockwork.ebms.EbMSMessageStatus;
 import nl.clockwork.ebms.model.EbMSAttachment;
@@ -33,7 +34,7 @@ import nl.clockwork.ebms.service.model.EbMSMessageContext;
 
 public interface EbMSDAO
 {
-	void executeTransaction(DAOTransactionCallback callback) throws DAOException;
+	void executeTransaction(Action action) throws DAOException;
 
 	boolean existsMessage(String messageId) throws DAOException;
 	boolean existsIdenticalMessage(EbMSBaseMessage message) throws DAOException;

@@ -35,13 +35,13 @@ import lombok.NonNull;
 import lombok.val;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import nl.clockwork.ebms.Action;
 import nl.clockwork.ebms.EbMSMessageFactory;
 import nl.clockwork.ebms.EbMSMessageStatus;
 import nl.clockwork.ebms.EbMSMessageUtils;
 import nl.clockwork.ebms.cpa.CPAManager;
 import nl.clockwork.ebms.cpa.CPAUtils;
 import nl.clockwork.ebms.cpa.CacheablePartyId;
-import nl.clockwork.ebms.dao.DAOTransactionCallback;
 import nl.clockwork.ebms.dao.EbMSDAO;
 import nl.clockwork.ebms.event.listener.EventListener;
 import nl.clockwork.ebms.event.processor.EventManager;
@@ -83,55 +83,50 @@ class AcknowledgmentProcessor
 		val acknowledgment = createAcknowledgment(timestamp,messageDocument,message);
 		val acknowledgmentDocument = EbMSMessageUtils.getEbMSDocument(acknowledgment);
 		signatureGenerator.generate(message.getAckRequested(),acknowledgmentDocument,acknowledgment);
-		ebMSDAO.executeTransaction(
-				new DAOTransactionCallback()
-				{
-					@Override
-					public void doInTransaction()
-					{
-						storeMessages(timestamp,messageDocument,message,acknowledgmentDocument,acknowledgment);
-						storeEvent(message,acknowledgment,isSyncReply);
-						eventListener.onMessageReceived(message.getMessageHeader().getMessageData().getMessageId());
-					}
-
-					private void storeMessages(Instant timestamp, EbMSDocument messageDocument, EbMSMessage message, EbMSDocument acknowledgmentDocument, EbMSAcknowledgment acknowledgment)
-					{
-						val messageHeader = message.getMessageHeader();
-						val toPartyId = new CacheablePartyId(message.getMessageHeader().getTo().getPartyId());
-						val service = CPAUtils.toString(message.getMessageHeader().getService());
-						val deliveryChannel =
-								cpaManager.getReceiveDeliveryChannel(messageHeader .getCPAId(),toPartyId,messageHeader.getTo().getRole(),service,messageHeader.getAction())
-								.orElseThrow(() -> StreamUtils.illegalStateException("ReceiveDeliveryChannel",messageHeader.getCPAId(),toPartyId,messageHeader.getTo().getRole(),service,messageHeader.getAction()));
-						val persistTime = CPAUtils.getPersistTime(messageHeader.getMessageData().getTimestamp(),deliveryChannel);
-						ebMSDAO.insertMessage(timestamp,persistTime,messageDocument.getMessage(),message,message.getAttachments(),EbMSMessageStatus.RECEIVED);
-						ebMSDAO.insertMessage(timestamp,persistTime,acknowledgmentDocument.getMessage(),acknowledgment,Collections.emptyList(),null);
-					}
-
-					private void storeEvent(EbMSMessage message, EbMSAcknowledgment acknowledgment, boolean isSyncReply)
-					{
-						val messageHeader = message.getMessageHeader();
-						val fromPartyId = new CacheablePartyId(acknowledgment.getMessageHeader().getFrom().getPartyId());
-						val toPartyId = new CacheablePartyId(acknowledgment.getMessageHeader().getTo().getPartyId());
-						val service = CPAUtils.toString(acknowledgment.getMessageHeader().getService());
-						val sendDeliveryChannel =
-								cpaManager.getReceiveDeliveryChannel(messageHeader.getCPAId(),fromPartyId,acknowledgment.getMessageHeader().getFrom().getRole(),service,acknowledgment.getMessageHeader().getAction())
-								.orElseThrow(() -> StreamUtils.illegalStateException("SendDeliveryChannel",messageHeader.getCPAId(),fromPartyId,acknowledgment.getMessageHeader().getFrom().getRole(),service,acknowledgment.getMessageHeader().getAction()));
-						val receiveDeliveryChannel =
-								cpaManager.getReceiveDeliveryChannel(messageHeader.getCPAId(),toPartyId,acknowledgment.getMessageHeader().getTo().getRole(),service,acknowledgment.getMessageHeader().getAction())
-								.orElseThrow(() -> StreamUtils.illegalStateException("ReceiveDeliveryChannel",messageHeader.getCPAId(),toPartyId,acknowledgment.getMessageHeader().getTo().getRole(),service,acknowledgment.getMessageHeader().getAction()));
-						if (!isSyncReply)
-							eventManager.createEvent(
-									messageHeader.getCPAId(),
-									sendDeliveryChannel,
-									receiveDeliveryChannel,
-									acknowledgment.getMessageHeader().getMessageData().getMessageId(),
-									acknowledgment.getMessageHeader().getMessageData().getTimeToLive(),
-									acknowledgment.getMessageHeader().getMessageData().getTimestamp(),
-									false);
-					}
-				}
-		);
+		Action action = () ->
+		{
+			storeMessages(timestamp,messageDocument,message,acknowledgmentDocument,acknowledgment);
+			storeEvent(message,acknowledgment,isSyncReply);
+			eventListener.onMessageReceived(message.getMessageHeader().getMessageData().getMessageId());
+		};
+		ebMSDAO.executeTransaction(action);
 		return acknowledgmentDocument;
+	}
+
+	private void storeMessages(Instant timestamp, EbMSDocument messageDocument, EbMSMessage message, EbMSDocument acknowledgmentDocument, EbMSAcknowledgment acknowledgment)
+	{
+		val messageHeader = message.getMessageHeader();
+		val toPartyId = new CacheablePartyId(message.getMessageHeader().getTo().getPartyId());
+		val service = CPAUtils.toString(message.getMessageHeader().getService());
+		val deliveryChannel =
+				cpaManager.getReceiveDeliveryChannel(messageHeader .getCPAId(),toPartyId,messageHeader.getTo().getRole(),service,messageHeader.getAction())
+				.orElseThrow(() -> StreamUtils.illegalStateException("ReceiveDeliveryChannel",messageHeader.getCPAId(),toPartyId,messageHeader.getTo().getRole(),service,messageHeader.getAction()));
+		val persistTime = CPAUtils.getPersistTime(messageHeader.getMessageData().getTimestamp(),deliveryChannel);
+		ebMSDAO.insertMessage(timestamp,persistTime,messageDocument.getMessage(),message,message.getAttachments(),EbMSMessageStatus.RECEIVED);
+		ebMSDAO.insertMessage(timestamp,persistTime,acknowledgmentDocument.getMessage(),acknowledgment,Collections.emptyList(),null);
+	}
+
+	private void storeEvent(EbMSMessage message, EbMSAcknowledgment acknowledgment, boolean isSyncReply)
+	{
+		val messageHeader = message.getMessageHeader();
+		val fromPartyId = new CacheablePartyId(acknowledgment.getMessageHeader().getFrom().getPartyId());
+		val toPartyId = new CacheablePartyId(acknowledgment.getMessageHeader().getTo().getPartyId());
+		val service = CPAUtils.toString(acknowledgment.getMessageHeader().getService());
+		val sendDeliveryChannel =
+				cpaManager.getReceiveDeliveryChannel(messageHeader.getCPAId(),fromPartyId,acknowledgment.getMessageHeader().getFrom().getRole(),service,acknowledgment.getMessageHeader().getAction())
+				.orElseThrow(() -> StreamUtils.illegalStateException("SendDeliveryChannel",messageHeader.getCPAId(),fromPartyId,acknowledgment.getMessageHeader().getFrom().getRole(),service,acknowledgment.getMessageHeader().getAction()));
+		val receiveDeliveryChannel =
+				cpaManager.getReceiveDeliveryChannel(messageHeader.getCPAId(),toPartyId,acknowledgment.getMessageHeader().getTo().getRole(),service,acknowledgment.getMessageHeader().getAction())
+				.orElseThrow(() -> StreamUtils.illegalStateException("ReceiveDeliveryChannel",messageHeader.getCPAId(),toPartyId,acknowledgment.getMessageHeader().getTo().getRole(),service,acknowledgment.getMessageHeader().getAction()));
+		if (!isSyncReply)
+			eventManager.createEvent(
+					messageHeader.getCPAId(),
+					sendDeliveryChannel,
+					receiveDeliveryChannel,
+					acknowledgment.getMessageHeader().getMessageData().getMessageId(),
+					acknowledgment.getMessageHeader().getMessageData().getTimeToLive(),
+					acknowledgment.getMessageHeader().getMessageData().getTimestamp(),
+					false);
 	}
 
 	public void processAcknowledgment(Instant timestamp, EbMSDocument acknowledgmentDocument, EbMSMessage requestMessage, EbMSAcknowledgment acknowledgment) throws XPathExpressionException, JAXBException, ParserConfigurationException, SAXException, IOException
@@ -160,26 +155,21 @@ class AcknowledgmentProcessor
 
 	public void storeAcknowledgment(final Instant timestamp, final EbMSMessage message, final EbMSDocument acknowledgmentDocument, final EbMSAcknowledgment acknowledgment) throws EbMSProcessingException
 	{
-		ebMSDAO.executeTransaction(
-			new DAOTransactionCallback()
+		Action action = () ->
+		{
+			val responseMessageHeader = acknowledgment.getMessageHeader();
+			val persistTime = ebMSDAO.getPersistTime(responseMessageHeader.getMessageData().getRefToMessageId());
+			ebMSDAO.insertMessage(timestamp,persistTime.orElse(null),acknowledgmentDocument.getMessage(),acknowledgment,Collections.emptyList(),null);
+			if (ebMSDAO.updateMessage(
+					responseMessageHeader.getMessageData().getRefToMessageId(),
+					EbMSMessageStatus.SENDING,
+					EbMSMessageStatus.DELIVERED) > 0)
 			{
-				@Override
-				public void doInTransaction()
-				{
-					val responseMessageHeader = acknowledgment.getMessageHeader();
-					val persistTime = ebMSDAO.getPersistTime(responseMessageHeader.getMessageData().getRefToMessageId());
-					ebMSDAO.insertMessage(timestamp,persistTime.orElse(null),acknowledgmentDocument.getMessage(),acknowledgment,Collections.emptyList(),null);
-					if (ebMSDAO.updateMessage(
-							responseMessageHeader.getMessageData().getRefToMessageId(),
-							EbMSMessageStatus.SENDING,
-							EbMSMessageStatus.DELIVERED) > 0)
-					{
-						eventListener.onMessageDelivered(responseMessageHeader.getMessageData().getRefToMessageId());
-						if (deleteEbMSAttachmentsOnMessageProcessed)
-							ebMSDAO.deleteAttachments(responseMessageHeader.getMessageData().getRefToMessageId());
-					}
-				}
+				eventListener.onMessageDelivered(responseMessageHeader.getMessageData().getRefToMessageId());
+				if (deleteEbMSAttachmentsOnMessageProcessed)
+					ebMSDAO.deleteAttachments(responseMessageHeader.getMessageData().getRefToMessageId());
 			}
-		);
+		};
+		ebMSDAO.executeTransaction(action);
 	}
 }

@@ -34,13 +34,13 @@ import lombok.NonNull;
 import lombok.val;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import nl.clockwork.ebms.Action;
 import nl.clockwork.ebms.EbMSMessageFactory;
 import nl.clockwork.ebms.EbMSMessageStatus;
 import nl.clockwork.ebms.EbMSMessageUtils;
 import nl.clockwork.ebms.client.DeliveryManager;
 import nl.clockwork.ebms.cpa.CPAManager;
 import nl.clockwork.ebms.dao.DAOException;
-import nl.clockwork.ebms.dao.DAOTransactionCallback;
 import nl.clockwork.ebms.dao.EbMSDAO;
 import nl.clockwork.ebms.event.listener.EventListener;
 import nl.clockwork.ebms.event.processor.EventManager;
@@ -286,41 +286,30 @@ public class EbMSMessageProcessor
 
 	private void storeMessage(final Instant timestamp, final EbMSDocument messageDocument, final EbMSMessage message)
 	{
-		ebMSDAO.executeTransaction(
-			new DAOTransactionCallback()
-			{
-				@Override
-				public void doInTransaction()
-				{
-					ebMSDAO.insertMessage(timestamp,null,messageDocument.getMessage(),message,message.getAttachments(),EbMSMessageStatus.RECEIVED);
-					eventListener.onMessageReceived(message.getMessageHeader().getMessageData().getMessageId());
-				}
-			}
-		);
+		Action action = () ->
+		{
+			ebMSDAO.insertMessage(timestamp,null,messageDocument.getMessage(),message,message.getAttachments(),EbMSMessageStatus.RECEIVED);
+			eventListener.onMessageReceived(message.getMessageHeader().getMessageData().getMessageId());
+		};
+		ebMSDAO.executeTransaction(action);
 	}
 
 	private void processMessage(final EbMSMessage message)
 	{
-		
-		ebMSDAO.executeTransaction(
-			new DAOTransactionCallback()
+		Action action = () ->
+		{
+			val messageHeader = message.getMessageHeader();
+			if (ebMSDAO.updateMessage(
+					messageHeader .getMessageData().getMessageId(),
+					EbMSMessageStatus.SENDING,
+					EbMSMessageStatus.DELIVERED) > 0)
 			{
-				@Override
-				public void doInTransaction()
-				{
-					val messageHeader = message.getMessageHeader();
-					if (ebMSDAO.updateMessage(
-							messageHeader .getMessageData().getMessageId(),
-							EbMSMessageStatus.SENDING,
-							EbMSMessageStatus.DELIVERED) > 0)
-					{
-						eventListener.onMessageDelivered(messageHeader.getMessageData().getMessageId());
-						if (deleteEbMSAttachmentsOnMessageProcessed)
-							ebMSDAO.deleteAttachments(messageHeader.getMessageData().getMessageId());
-					}
-				}
+				eventListener.onMessageDelivered(messageHeader.getMessageData().getMessageId());
+				if (deleteEbMSAttachmentsOnMessageProcessed)
+					ebMSDAO.deleteAttachments(messageHeader.getMessageData().getMessageId());
 			}
-		);
+		};
+		ebMSDAO.executeTransaction(action);
 	}
 
 	private EbMSDocument processStatusRequest(Instant timestamp, EbMSStatusRequest statusRequest) throws DatatypeConfigurationException, JAXBException, SOAPException, ParserConfigurationException, SAXException, IOException, TransformerFactoryConfigurationError, TransformerException

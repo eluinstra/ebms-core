@@ -27,12 +27,12 @@ import lombok.NonNull;
 import lombok.val;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import nl.clockwork.ebms.Action;
 import nl.clockwork.ebms.EbMSAction;
 import nl.clockwork.ebms.cpa.CPAManager;
 import nl.clockwork.ebms.cpa.CPAUtils;
 import nl.clockwork.ebms.cpa.CacheablePartyId;
 import nl.clockwork.ebms.dao.DAOException;
-import nl.clockwork.ebms.dao.DAOTransactionCallback;
 import nl.clockwork.ebms.dao.EbMSDAO;
 import nl.clockwork.ebms.event.processor.EventManager;
 import nl.clockwork.ebms.model.EbMSAcknowledgment;
@@ -95,19 +95,14 @@ class DuplicateMessageHandler
 						.orElse(null);
 				val receiveDeliveryChannel = cpaManager.getReceiveDeliveryChannel(messageHeader.getCPAId(),fromPartyId,messageHeader.getFrom().getRole(),service,null)
 						.orElse(null);
-				ebMSDAO.executeTransaction(
-						new DAOTransactionCallback()
-						{
-							@Override
-							public void doInTransaction()
-							{
-								if (storeDuplicateMessage)
-									ebMSDAO.insertDuplicateMessage(timestamp,document.getMessage(),message,storeDuplicateMessageAttachments ? message.getAttachments() : Collections.emptyList());
-								if (receiveDeliveryChannel != null && context.isPresent())
-									eventManager.createEvent(messageHeader.getCPAId(),sendDeliveryChannel,receiveDeliveryChannel,context.get().getMessageId(),messageHeader.getMessageData().getTimeToLive(),context.get().getTimestamp(),false);
-							}
-						}
-				);
+				Action action = () ->
+				{
+					if (storeDuplicateMessage)
+						ebMSDAO.insertDuplicateMessage(timestamp,document.getMessage(),message,storeDuplicateMessageAttachments ? message.getAttachments() : Collections.emptyList());
+					if (receiveDeliveryChannel != null && context.isPresent())
+						eventManager.createEvent(messageHeader.getCPAId(),sendDeliveryChannel,receiveDeliveryChannel,context.get().getMessageId(),messageHeader.getMessageData().getTimeToLive(),context.get().getTimestamp(),false);
+				};
+				ebMSDAO.executeTransaction(action);
 				if (receiveDeliveryChannel == null && context.isPresent())
 					try
 					{

@@ -61,6 +61,7 @@ import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.val;
 import lombok.experimental.FieldDefaults;
+import nl.clockwork.ebms.Action;
 import nl.clockwork.ebms.EbMSAction;
 import nl.clockwork.ebms.EbMSAttachmentFactory;
 import nl.clockwork.ebms.EbMSMessageStatus;
@@ -152,7 +153,7 @@ abstract class AbstractEbMSDAO implements EbMSDAO, CPADAO, URLMappingDAO, Certif
 
 	
 	@Override
-	public void executeTransaction(final DAOTransactionCallback callback) throws DAOException
+	public void executeTransaction(final Action action) throws DAOException
 	{
 		try
 		{
@@ -163,7 +164,7 @@ abstract class AbstractEbMSDAO implements EbMSDAO, CPADAO, URLMappingDAO, Certif
 					@Override
 					protected void doInTransactionWithoutResult(TransactionStatus transactionStatus)
 					{
-						callback.doInTransaction();
+						action.run();;
 					}
 				}
 			);

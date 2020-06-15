@@ -24,9 +24,9 @@ import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.val;
 import lombok.experimental.FieldDefaults;
+import nl.clockwork.ebms.Action;
 import nl.clockwork.ebms.cpa.CPAManager;
 import nl.clockwork.ebms.cpa.CPAUtils;
-import nl.clockwork.ebms.dao.DAOTransactionCallback;
 import nl.clockwork.ebms.util.StreamUtils;
 
 @FieldDefaults(level = AccessLevel.PROTECTED, makeFinal = true)
@@ -60,33 +60,28 @@ public class EbMSEventManager implements EventManager
 				event.getCpaId(),
 				event.getReceiveDeliveryChannelId())
 					.orElseThrow(() -> StreamUtils.illegalStateException("DeliveryChannel",event.getCpaId(),event.getReceiveDeliveryChannelId()));
-		ebMSeventDAO.executeTransaction(
-			new DAOTransactionCallback()
+		Action action = () ->
+		{
+			ebMSeventDAO.insertEventLog(event.getMessageId(),event.getTimestamp(),url,status,errorMessage);
+			if (event.getTimeToLive() != null && CPAUtils.isReliableMessaging(deliveryChannel))
+				ebMSeventDAO.updateEvent(EventManagerFactory.createNextEvent(event,deliveryChannel));
+			else
 			{
-				@Override
-				public void doInTransaction()
+				switch(ebMSeventDAO.getMessageAction(event.getMessageId()).orElse(null))
 				{
-					ebMSeventDAO.insertEventLog(event.getMessageId(),event.getTimestamp(),url,status,errorMessage);
-					if (event.getTimeToLive() != null && CPAUtils.isReliableMessaging(deliveryChannel))
-						ebMSeventDAO.updateEvent(EventManagerFactory.createNextEvent(event,deliveryChannel));
-					else
-					{
-						switch(ebMSeventDAO.getMessageAction(event.getMessageId()).orElse(null))
+					case ACKNOWLEDGMENT:
+					case MESSAGE_ERROR:
+						if (event.getRetries() < nrAutoRetries)
 						{
-							case ACKNOWLEDGMENT:
-							case MESSAGE_ERROR:
-								if (event.getRetries() < nrAutoRetries)
-								{
-									ebMSeventDAO.updateEvent(EventManagerFactory.createNextEvent(event,autoRetryInterval));
-									break;
-								}
-							default:
-								ebMSeventDAO.deleteEvent(event.getMessageId());
+							ebMSeventDAO.updateEvent(EventManagerFactory.createNextEvent(event,autoRetryInterval));
+							break;
 						}
-					}
+					default:
+						ebMSeventDAO.deleteEvent(event.getMessageId());
 				}
 			}
-		);
+		};
+		ebMSeventDAO.executeTransaction(action);
 	}
 
 	@Override

@@ -26,6 +26,7 @@ import javax.xml.soap.SOAPException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactoryConfigurationError;
 
+import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DeliveryChannel;
 import org.xml.sax.SAXException;
 
 import lombok.AccessLevel;
@@ -35,13 +36,13 @@ import lombok.NonNull;
 import lombok.val;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import nl.clockwork.ebms.Action;
 import nl.clockwork.ebms.EbMSMessageFactory;
 import nl.clockwork.ebms.EbMSMessageStatus;
 import nl.clockwork.ebms.EbMSMessageUtils;
 import nl.clockwork.ebms.cpa.CPAManager;
 import nl.clockwork.ebms.cpa.CPAUtils;
 import nl.clockwork.ebms.cpa.CacheablePartyId;
-import nl.clockwork.ebms.dao.DAOTransactionCallback;
 import nl.clockwork.ebms.dao.EbMSDAO;
 import nl.clockwork.ebms.event.listener.EventListener;
 import nl.clockwork.ebms.event.processor.EventManager;
@@ -89,50 +90,44 @@ class MessageErrorProcessor
 				.orElse(null);
 		val receiveDeliveryChannel = cpaManager.getReceiveDeliveryChannel(messageHeader.getCPAId(),new CacheablePartyId(messageError.getMessageHeader().getTo().getPartyId()),messageError.getMessageHeader().getTo().getRole(),service,messageError.getMessageHeader().getAction())
 				.orElse(null);
-		ebMSDAO.executeTransaction(
-				new DAOTransactionCallback()
-				{
-					@Override
-					public void doInTransaction()
-					{
-						storeMessages(timestamp,messageDocument,message,result,messageError);
-						if (receiveDeliveryChannel != null)
-							storeEvent(message,messageError,e,isSyncReply);
-					}
-
-					private void storeMessages(Instant timestamp, EbMSDocument messageDocument, EbMSMessage message, EbMSDocument messageErrorDocument, EbMSMessageError messageError)
-					{
-						val messageHeader = message.getMessageHeader();
-						val toPartyId = new CacheablePartyId(message.getMessageHeader().getTo().getPartyId());
-						val service = CPAUtils.toString(message.getMessageHeader().getService());
-						val deliveryChannel = cpaManager.getReceiveDeliveryChannel(messageHeader.getCPAId(),toPartyId,messageHeader.getTo().getRole(),service,messageHeader.getAction())
-								.orElse(null);
-						val persistTime = deliveryChannel != null ? CPAUtils.getPersistTime(timestamp,deliveryChannel) : null;
-						ebMSDAO.insertMessage(timestamp,persistTime,messageDocument.getMessage(),message,message.getAttachments(),EbMSMessageStatus.FAILED);
-						ebMSDAO.insertMessage(timestamp,persistTime,messageErrorDocument.getMessage(),messageError,Collections.emptyList(),null);
-					}
-
-					private void storeEvent(EbMSMessage message, EbMSMessageError messageError, EbMSValidationException e, boolean isSyncReply)
-					{
-						if (!isSyncReply)
-						{
-							eventManager.createEvent(
-									messageHeader.getCPAId(),
-									sendDeliveryChannel,
-									receiveDeliveryChannel,
-									messageError.getMessageHeader().getMessageData().getMessageId(),
-									messageError.getMessageHeader().getMessageData().getTimeToLive(),
-									messageError.getMessageHeader().getMessageData().getTimestamp(),
-									false);
-						}
-					}
-				}
-		);
+		Action action = () ->
+		{
+			storeMessages(timestamp,messageDocument,message,result,messageError);
+			if (receiveDeliveryChannel != null)
+				storeEvent(messageHeader.getCPAId(),sendDeliveryChannel,receiveDeliveryChannel,messageError,isSyncReply);
+		};
+		ebMSDAO.executeTransaction(action);
 		if (!isSyncReply && receiveDeliveryChannel == null)
 			throw new ValidationException(DOMUtils.toString(result.getMessage()));
 		return result;
 	}
 
+	private void storeMessages(Instant timestamp, EbMSDocument messageDocument, EbMSMessage message, EbMSDocument messageErrorDocument, EbMSMessageError messageError)
+	{
+		val messageHeader = message.getMessageHeader();
+		val toPartyId = new CacheablePartyId(message.getMessageHeader().getTo().getPartyId());
+		val service = CPAUtils.toString(message.getMessageHeader().getService());
+		val deliveryChannel = cpaManager.getReceiveDeliveryChannel(messageHeader.getCPAId(),toPartyId,messageHeader.getTo().getRole(),service,messageHeader.getAction())
+				.orElse(null);
+		val persistTime = deliveryChannel != null ? CPAUtils.getPersistTime(timestamp,deliveryChannel) : null;
+		ebMSDAO.insertMessage(timestamp,persistTime,messageDocument.getMessage(),message,message.getAttachments(),EbMSMessageStatus.FAILED);
+		ebMSDAO.insertMessage(timestamp,persistTime,messageErrorDocument.getMessage(),messageError,Collections.emptyList(),null);
+	}
+
+	private void storeEvent(String cpaId, DeliveryChannel sendDeliveryChannel, DeliveryChannel receiveDeliveryChannel, EbMSMessageError messageError, boolean isSyncReply)
+	{
+		if (!isSyncReply)
+		{
+			eventManager.createEvent(
+					cpaId,
+					sendDeliveryChannel,
+					receiveDeliveryChannel,
+					messageError.getMessageHeader().getMessageData().getMessageId(),
+					messageError.getMessageHeader().getMessageData().getTimeToLive(),
+					messageError.getMessageHeader().getMessageData().getTimestamp(),
+					false);
+		}
+	}
 	public void processMessageError(Instant timestamp, EbMSDocument response, EbMSMessage requestMessage, EbMSMessageError messageError) throws TransformerException
 	{
 		try
@@ -162,26 +157,21 @@ class MessageErrorProcessor
 
 	public void storeMessageError(final Instant timestamp, final EbMSDocument messageErrorDocument, final EbMSMessage message, final EbMSMessageError messageError)
 	{
-		ebMSDAO.executeTransaction(
-			new DAOTransactionCallback()
+		Action action = () ->
+		{
+			val responseMessageHeader = messageError.getMessageHeader();
+			val persistTime = ebMSDAO.getPersistTime(responseMessageHeader.getMessageData().getRefToMessageId());
+			ebMSDAO.insertMessage(timestamp,persistTime.orElse(null),messageErrorDocument.getMessage(),messageError,Collections.emptyList(),null);
+			if (ebMSDAO.updateMessage(
+					responseMessageHeader.getMessageData().getRefToMessageId(),
+					EbMSMessageStatus.SENDING,
+					EbMSMessageStatus.DELIVERY_FAILED) > 0)
 			{
-				@Override
-				public void doInTransaction()
-				{
-					val responseMessageHeader = messageError.getMessageHeader();
-					val persistTime = ebMSDAO.getPersistTime(responseMessageHeader.getMessageData().getRefToMessageId());
-					ebMSDAO.insertMessage(timestamp,persistTime.orElse(null),messageErrorDocument.getMessage(),messageError,Collections.emptyList(),null);
-					if (ebMSDAO.updateMessage(
-							responseMessageHeader.getMessageData().getRefToMessageId(),
-							EbMSMessageStatus.SENDING,
-							EbMSMessageStatus.DELIVERY_FAILED) > 0)
-					{
-						eventListener.onMessageFailed(responseMessageHeader.getMessageData().getRefToMessageId());
-						if (deleteEbMSAttachmentsOnMessageProcessed)
-							ebMSDAO.deleteAttachments(responseMessageHeader.getMessageData().getRefToMessageId());
-					}
-				}
+				eventListener.onMessageFailed(responseMessageHeader.getMessageData().getRefToMessageId());
+				if (deleteEbMSAttachmentsOnMessageProcessed)
+					ebMSDAO.deleteAttachments(responseMessageHeader.getMessageData().getRefToMessageId());
 			}
-		);
+		};
+		ebMSDAO.executeTransaction(action);
 	}
 }
