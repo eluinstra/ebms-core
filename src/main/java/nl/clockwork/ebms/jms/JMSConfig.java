@@ -37,14 +37,15 @@ import bitronix.tm.resource.jms.PoolingConnectionFactory;
 import lombok.AccessLevel;
 import lombok.val;
 import lombok.experimental.FieldDefaults;
-import nl.clockwork.ebms.dao.DAOConfig.TransactionManagerType;
+import nl.clockwork.ebms.transaction.TransactionManagerConfig;
+import nl.clockwork.ebms.transaction.TransactionManagerConfig.TransactionManagerType;
 
 @Configuration
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class JMSConfig
 {
 	@Value("${transactionManager.type}")
-	TransactionManagerType transactionManagerType;
+	TransactionManagerConfig.TransactionManagerType transactionManagerType;
 	@Value("${jms.broker.start}")
 	boolean jmsBrokerStart;
 	@Value("${jms.broker.config}")

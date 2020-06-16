@@ -39,6 +39,7 @@ import nl.clockwork.ebms.security.KeyStoreConfig;
 import nl.clockwork.ebms.server.ServerConfig;
 import nl.clockwork.ebms.service.ServiceConfig;
 import nl.clockwork.ebms.signing.SigningConfig;
+import nl.clockwork.ebms.transaction.TransactionManagerConfig;
 import nl.clockwork.ebms.validation.ValidationConfig;
 
 @Configuration(proxyBeanMethods = false)
@@ -59,6 +60,7 @@ import nl.clockwork.ebms.validation.ValidationConfig;
 	ServerConfig.class,
 	ServiceConfig.class,
 	SigningConfig.class,
+	TransactionManagerConfig.class,
 	ValidationConfig.class
 	})
 public class MainConfig

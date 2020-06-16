@@ -30,7 +30,7 @@ import com.zaxxer.hikari.HikariDataSource;
 import lombok.AccessLevel;
 import lombok.val;
 import lombok.experimental.FieldDefaults;
-import nl.clockwork.ebms.dao.DAOConfig.TransactionManagerType;
+import nl.clockwork.ebms.transaction.TransactionManagerConfig.TransactionManagerType;
 
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class DAOFactoryTest
@@ -42,11 +42,11 @@ public class DAOFactoryTest
 	@BeforeEach
 	public void init()
 	{
+		TransactionManagerType type = TransactionManagerType.DEFAULT;
 		ds = new HikariDataSource();
-		val type = TransactionManagerType.DEFAULT;
-		val tt = new TransactionTemplate(new DataSourceTransactionManager(ds));
-		val jt = new JdbcTemplate(ds);
-		daoFactory = new EbMSDAOFactory(type,ds,tt,jt);
+		val transactionTemplage = new TransactionTemplate(new DataSourceTransactionManager(ds));
+		val jdbcTemplate = new JdbcTemplate(ds);
+		daoFactory = new EbMSDAOFactory(type,ds,transactionTemplage,jdbcTemplate);
 	}
 
 	@Test
@@ -61,7 +61,7 @@ public class DAOFactoryTest
 		ds.setDriverClassName("org.hsqldb.jdbcDriver");
 		dao = daoFactory.getObject();
 		assertNotNull(dao);
-		assertEquals(nl.clockwork.ebms.dao.HSQLDBEbMSDAO.class, dao.getClass());	
+		assertEquals(HSQLDBEbMSDAO.class,dao.getClass());	
 	}
 	
 	
@@ -71,12 +71,12 @@ public class DAOFactoryTest
 		ds.setDriverClassName("com.mysql.jdbc.Driver");
 		dao = daoFactory.getObject();
 		assertNotNull(dao);
-		assertEquals(nl.clockwork.ebms.dao.MySQLEbMSDAO.class, dao.getClass());
+		assertEquals(MySQLEbMSDAO.class,dao.getClass());
 		
 		ds.setDriverClassName("org.mariadb.jdbc.Driver");
 		dao = daoFactory.getObject();
 		assertNotNull(dao);
-		assertEquals(nl.clockwork.ebms.dao.MySQLEbMSDAO.class, dao.getClass());
+		assertEquals(MySQLEbMSDAO.class,dao.getClass());
 	}
 	
 	@Test
@@ -85,7 +85,7 @@ public class DAOFactoryTest
 		ds.setDriverClassName("org.postgresql.Driver");
 		dao = daoFactory.getObject();
 		assertNotNull(dao);
-		assertEquals(nl.clockwork.ebms.dao.PostgreSQLEbMSDAO.class, dao.getClass());
+		assertEquals(PostgreSQLEbMSDAO.class,dao.getClass());
 	}
 
 	
@@ -95,7 +95,7 @@ public class DAOFactoryTest
 		ds.setDriverClassName("oracle.jdbc.OracleDriver");
 		dao = daoFactory.getObject();
 		assertNotNull(dao);
-		assertEquals(nl.clockwork.ebms.dao.OracleEbMSDAO.class, dao.getClass());
+		assertEquals(OracleEbMSDAO.class,dao.getClass());
 	}
 
 	@Test
@@ -104,7 +104,7 @@ public class DAOFactoryTest
 		ds.setDriverClassName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
 		dao = daoFactory.getObject();
 		assertNotNull(dao);
-		assertEquals(nl.clockwork.ebms.dao.MSSQLEbMSDAO.class, dao.getClass());
+		assertEquals(MSSQLEbMSDAO.class,dao.getClass());
 	}
 	
 	@Test
@@ -113,7 +113,7 @@ public class DAOFactoryTest
 		ds.setDriverClassName("com.ibm.db2.jcc.DB2Driver");
 		dao = daoFactory.getObject();
 		assertNotNull(dao);
-		assertEquals(nl.clockwork.ebms.dao.DB2EbMSDAO.class, dao.getClass());
+		assertEquals(DB2EbMSDAO.class,dao.getClass());
 	}
 	
 }

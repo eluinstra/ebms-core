@@ -22,17 +22,14 @@ import org.springframework.aop.framework.ProxyFactoryBean;
 import org.springframework.aop.support.RegexpMethodPointcutAdvisor;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.DependsOn;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.jta.JtaTransactionManager;
 import org.springframework.transaction.support.TransactionTemplate;
-
-import com.atomikos.icatch.jta.UserTransactionManager;
 
 import bitronix.tm.TransactionManagerServices;
 import lombok.AccessLevel;
@@ -45,15 +42,12 @@ import nl.clockwork.ebms.cpa.CertificateMappingDAO;
 import nl.clockwork.ebms.cpa.URLMappingDAO;
 import nl.clockwork.ebms.event.listener.EbMSMessageEventDAO;
 import nl.clockwork.ebms.event.processor.EbMSEventDAO;
+import nl.clockwork.ebms.transaction.TransactionManagerConfig.TransactionManagerType;
 
 @Configuration
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public abstract class DAOConfig
 {
-	public enum TransactionManagerType
-	{
-		DEFAULT,BITRONIX,ATOMIKOS;
-	}
 	@Value("${transactionManager.type}")
 	TransactionManagerType transactionManagerType;
 	@Autowired
@@ -62,6 +56,9 @@ public abstract class DAOConfig
 	BeanFactory beanFactory;
 	@Autowired
 	EbMSCacheManager cacheManager;
+	@Autowired
+	@Qualifier("jtaTransactionManager")
+	PlatformTransactionManager jtaTransactionManager;
 
 	@Bean
 	public CPADAO cpaDAO() throws Exception
@@ -136,28 +133,9 @@ public abstract class DAOConfig
 		{
 			case BITRONIX:
 			case ATOMIKOS:
-				return jtaTransactionManager();
+				return jtaTransactionManager;
 			default:
 				return new DataSourceTransactionManager(dataSource);
-		}
-	}
-
-	@Bean("jtaTransactionManager")
-	@DependsOn("btmConfig")
-	public PlatformTransactionManager jtaTransactionManager() throws SystemException
-	{
-		switch (transactionManagerType)
-		{
-			case BITRONIX:
-				val transactionManager = TransactionManagerServices.getTransactionManager();
-				return new JtaTransactionManager(transactionManager,transactionManager);
-			case ATOMIKOS:
-				val userTransactionManager = new UserTransactionManager();
-				userTransactionManager.setTransactionTimeout(300);
-				userTransactionManager.setForceShutdown(true);
-				return new JtaTransactionManager(userTransactionManager,userTransactionManager);
-			default:
-				return null;
 		}
 	}
 

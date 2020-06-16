@@ -43,7 +43,7 @@ import nl.clockwork.ebms.model.EbMSAttachment;
 import nl.clockwork.ebms.model.EbMSBaseMessage;
 import nl.clockwork.ebms.util.DOMUtils;
 
-class MSSQLEbMSDAO extends nl.clockwork.ebms.dao.MySQLEbMSDAO
+class MSSQLEbMSDAO extends MySQLEbMSDAO
 {
 	public MSSQLEbMSDAO(TransactionTemplate transactionTemplate, JdbcTemplate jdbcTemplate)
 	{

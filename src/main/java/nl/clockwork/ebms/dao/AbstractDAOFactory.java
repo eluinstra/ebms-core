@@ -28,14 +28,15 @@ import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.val;
 import lombok.experimental.FieldDefaults;
-import nl.clockwork.ebms.dao.DAOConfig.TransactionManagerType;
+import nl.clockwork.ebms.transaction.TransactionManagerConfig;
+import nl.clockwork.ebms.transaction.TransactionManagerConfig.TransactionManagerType;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor
 public abstract class AbstractDAOFactory<T> implements FactoryBean<T>
 {
 	@NonNull
-	TransactionManagerType transactionManagerType;
+	TransactionManagerConfig.TransactionManagerType transactionManagerType;
 	@NonNull
 	DataSource dataSource;
 

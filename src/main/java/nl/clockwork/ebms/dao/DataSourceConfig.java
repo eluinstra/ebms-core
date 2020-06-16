@@ -33,7 +33,7 @@ import bitronix.tm.resource.jdbc.PoolingDataSource;
 import lombok.AccessLevel;
 import lombok.val;
 import lombok.experimental.FieldDefaults;
-import nl.clockwork.ebms.dao.DAOConfig.TransactionManagerType;
+import nl.clockwork.ebms.transaction.TransactionManagerConfig.TransactionManagerType;
 
 @Configuration(proxyBeanMethods = false)
 @FieldDefaults(level = AccessLevel.PRIVATE)
