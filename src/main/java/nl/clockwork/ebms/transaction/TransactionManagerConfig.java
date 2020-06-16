@@ -1,3 +1,18 @@
+/**
+ * Copyright 2011 Clockwork
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package nl.clockwork.ebms.transaction;
 
 import javax.transaction.SystemException;
@@ -17,6 +32,8 @@ public class TransactionManagerConfig
 {
 	@Value("${transactionManager.type}")
 	TransactionManagerType transactionManagerType;
+	@Value("${transactionManager.transactionTimeout}")
+	int transactionTimeout;
 
 	public enum TransactionManagerType
 	{
@@ -34,7 +51,7 @@ public class TransactionManagerConfig
 				return new JtaTransactionManager(transactionManager,transactionManager);
 			case ATOMIKOS:
 				val userTransactionManager = new UserTransactionManager();
-				userTransactionManager.setTransactionTimeout(300);
+				userTransactionManager.setTransactionTimeout(transactionTimeout);
 				userTransactionManager.setForceShutdown(true);
 				return new JtaTransactionManager(userTransactionManager,userTransactionManager);
 			default:
@@ -47,6 +64,6 @@ public class TransactionManagerConfig
 	{
 		bitronix.tm.Configuration config = TransactionManagerServices.getConfiguration();
 		config.setServerId("EbMSTransactionManager");
-		config.setDefaultTransactionTimeout(300);
+		config.setDefaultTransactionTimeout(transactionTimeout);
 	}
 }

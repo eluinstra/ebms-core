@@ -37,7 +37,6 @@ import bitronix.tm.resource.jms.PoolingConnectionFactory;
 import lombok.AccessLevel;
 import lombok.val;
 import lombok.experimental.FieldDefaults;
-import nl.clockwork.ebms.transaction.TransactionManagerConfig;
 import nl.clockwork.ebms.transaction.TransactionManagerConfig.TransactionManagerType;
 
 @Configuration
@@ -45,13 +44,19 @@ import nl.clockwork.ebms.transaction.TransactionManagerConfig.TransactionManager
 public class JMSConfig
 {
 	@Value("${transactionManager.type}")
-	TransactionManagerConfig.TransactionManagerType transactionManagerType;
+	TransactionManagerType transactionManagerType;
 	@Value("${jms.broker.start}")
 	boolean jmsBrokerStart;
 	@Value("${jms.broker.config}")
 	String jmsBrokerConfig;
 	@Value("${jms.brokerURL}")
 	String jmsBrokerUrl;
+	@Value("${jms.broker.username}")
+	String username;
+	@Value("${jms.broker.password}")
+	String password;
+	@Value("${jms.pool.minPoolSize}")
+	int minPoolSize;
 	@Value("${jms.pool.maxPoolSize}")
 	int maxPoolSize;
 	@Autowired
@@ -81,6 +86,7 @@ public class JMSConfig
 				bitronixCF.setUniqueName("EbMSJMSConnection");
 				bitronixCF.setClassName("org.apache.activemq.ActiveMQXAConnectionFactory");
 				bitronixCF.setAllowLocalTransactions(true);
+				bitronixCF.setMinPoolSize(minPoolSize);
 				bitronixCF.setMaxPoolSize(maxPoolSize);
 				bitronixCF.setDriverProperties(createDriverProperties());
 				bitronixCF.init();
@@ -104,9 +110,9 @@ public class JMSConfig
 	private Properties createDriverProperties()
 	{
 		val result = new Properties();
-//		result.put("userName",value);
-//		result.put("password",value);
 		result.put("brokerURL",jmsBrokerUrl);
+		result.put("username",username);
+		result.put("password",password);
 		return result ;
 	}
 

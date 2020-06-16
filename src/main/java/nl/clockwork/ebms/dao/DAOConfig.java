@@ -21,6 +21,7 @@ import org.springframework.aop.framework.ProxyFactoryBean;
 import org.springframework.aop.support.RegexpMethodPointcutAdvisor;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -46,6 +47,8 @@ public abstract class DAOConfig
 {
 	@Value("${transactionManager.type}")
 	TransactionManagerType transactionManagerType;
+	@Autowired
+	@Qualifier("dataSourceTransactionManager")
 	PlatformTransactionManager dataSourceTransactionManager;
 	@Autowired
 	DataSource dataSource;

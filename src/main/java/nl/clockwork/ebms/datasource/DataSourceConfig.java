@@ -21,6 +21,7 @@ import java.util.Properties;
 import javax.sql.DataSource;
 import javax.transaction.SystemException;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -100,8 +101,8 @@ public class DataSourceConfig
 		    bitronixDS.setMaxIdleTime(maxIdleTime);
 		    bitronixDS.setMinPoolSize(minPoolSize);
 		    bitronixDS.setMaxPoolSize(maxPoolSize);
-		//    result.setEnableJdbc4ConnectionTest(StringUtils.isEmpty(testQuery));
-		//    result.setTestQuery(testQuery);
+		    bitronixDS.setEnableJdbc4ConnectionTest(StringUtils.isEmpty(testQuery));
+		    bitronixDS.setTestQuery(testQuery);
 		    bitronixDS.init();
 		    return bitronixDS;
 			case ATOMIKOS:
