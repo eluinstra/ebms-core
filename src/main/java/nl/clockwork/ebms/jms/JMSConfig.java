@@ -16,6 +16,7 @@
 package nl.clockwork.ebms.jms;
 
 import java.util.Properties;
+import java.util.UUID;
 
 import javax.jms.ConnectionFactory;
 import javax.jms.JMSException;
@@ -83,7 +84,7 @@ public class JMSConfig
 		{
 			case BITRONIX:
 				val bitronixCF = new PoolingConnectionFactory();
-				bitronixCF.setUniqueName("EbMSJMSConnection");
+				bitronixCF.setUniqueName(UUID.randomUUID().toString());
 				bitronixCF.setClassName("org.apache.activemq.ActiveMQXAConnectionFactory");
 				bitronixCF.setAllowLocalTransactions(true);
 				bitronixCF.setMinPoolSize(minPoolSize);
@@ -93,7 +94,7 @@ public class JMSConfig
 				return bitronixCF;
 			case ATOMIKOS:
 				val atomikosCF = new AtomikosConnectionFactoryBean();
-				atomikosCF.setUniqueResourceName("EbMSJMSConnection");
+				atomikosCF.setUniqueResourceName(UUID.randomUUID().toString());
 				atomikosCF.setXaConnectionFactoryClassName("org.apache.activemq.ActiveMQXAConnectionFactory");
 				atomikosCF.setLocalTransactionMode(true);
 				atomikosCF.setMaxPoolSize(maxPoolSize);
@@ -111,7 +112,7 @@ public class JMSConfig
 	{
 		val result = new Properties();
 		result.put("brokerURL",jmsBrokerUrl);
-		result.put("username",username);
+		result.put("userName",username);
 		result.put("password",password);
 		return result ;
 	}
@@ -128,5 +129,4 @@ public class JMSConfig
 				return new JmsTransactionManager(connectionFactory());
 		}
 	}
-
 }

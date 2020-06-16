@@ -15,6 +15,8 @@
  */
 package nl.clockwork.ebms.transaction;
 
+import java.util.UUID;
+
 import javax.transaction.SystemException;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -63,7 +65,7 @@ public class TransactionManagerConfig
 	public void btmConfig()
 	{
 		bitronix.tm.Configuration config = TransactionManagerServices.getConfiguration();
-		config.setServerId("EbMSTransactionManager");
+		config.setServerId(UUID.randomUUID().toString());
 		config.setDefaultTransactionTimeout(transactionTimeout);
 	}
 }

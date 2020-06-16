@@ -17,6 +17,7 @@ package nl.clockwork.ebms.datasource;
 
 import java.beans.PropertyVetoException;
 import java.util.Properties;
+import java.util.UUID;
 
 import javax.sql.DataSource;
 import javax.transaction.SystemException;
@@ -93,7 +94,7 @@ public class DataSourceConfig
 		{
 			case BITRONIX:
 				val bitronixDS = new PoolingDataSource();
-				bitronixDS.setUniqueName("EbMSDataSource");
+				bitronixDS.setUniqueName(UUID.randomUUID().toString());
 				bitronixDS.setClassName(driverClassName);
 		    //result.setLocalAutoCommit(isAutoCommit);
 		    bitronixDS.setAllowLocalTransactions(true);
@@ -107,7 +108,7 @@ public class DataSourceConfig
 		    return bitronixDS;
 			case ATOMIKOS:
 				val atomikosDS = new AtomikosDataSourceBean();
-				atomikosDS.setUniqueResourceName("EbMSDataSource");
+				atomikosDS.setUniqueResourceName(UUID.randomUUID().toString());
 				atomikosDS.setXaDataSourceClassName(driverClassName);
 				atomikosDS.setXaProperties(createDriverProperties());
 				atomikosDS.setLocalTransactionMode(true);
