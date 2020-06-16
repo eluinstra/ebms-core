@@ -15,12 +15,16 @@
  */
 package nl.clockwork.ebms.jms;
 
+import javax.jms.ConnectionFactory;
+
 import org.apache.activemq.pool.PooledConnectionFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
+import org.springframework.jms.connection.JmsTransactionManager;
 import org.springframework.jms.core.JmsTemplate;
+import org.springframework.transaction.PlatformTransactionManager;
 
 import lombok.AccessLevel;
 import lombok.val;
@@ -53,10 +57,17 @@ public class JMSConfig
 
 	@Bean
 	@DependsOn("brokerFactory")
-	public PooledConnectionFactory connectionFactory()
+	public ConnectionFactory connectionFactory()
 	{
-		val pooledConnectionFactory = new PooledConnectionFactory(jmsBrokerUrl);
-		pooledConnectionFactory.setMaxConnections(maxConnections);
-		return pooledConnectionFactory;
+		val result = new PooledConnectionFactory(jmsBrokerUrl);
+		result.setMaxConnections(maxConnections);
+		return result;
 	}
+
+	@Bean("jmsTransactionManager")
+	public PlatformTransactionManager jmsTransactionManager()
+	{
+		return new JmsTransactionManager(connectionFactory());
+	}
+
 }

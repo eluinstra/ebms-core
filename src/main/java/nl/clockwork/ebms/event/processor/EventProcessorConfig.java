@@ -19,11 +19,12 @@ import javax.jms.ConnectionFactory;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.jms.connection.JmsTransactionManager;
 import org.springframework.jms.listener.DefaultMessageListenerContainer;
+import org.springframework.transaction.PlatformTransactionManager;
 
 import lombok.AccessLevel;
 import lombok.val;
@@ -79,6 +80,9 @@ public class EventProcessorConfig
 	boolean deleteEbMSAttachmentsOnMessageProcessed;
 	@Autowired
 	ConnectionFactory connectionFactory;
+	@Autowired
+	@Qualifier("jmsTransactionManager")
+	PlatformTransactionManager jmsTransactionManager;
 	@Value("${eventProcessor.jms.destinationName}")
 	String destinationName;
 
@@ -100,7 +104,7 @@ public class EventProcessorConfig
 			case JMS:
 				val result = new DefaultMessageListenerContainer();
 				result.setConnectionFactory(connectionFactory);
-				result.setTransactionManager(new JmsTransactionManager(connectionFactory));
+				result.setTransactionManager(jmsTransactionManager);
 				result.setMaxConcurrentConsumers(maxThreads);
 				result.setDestinationName(StringUtils.isEmpty(jmsDestinationName) ? JMSEventManager.JMS_DESTINATION_NAME : jmsDestinationName);
 				result.setMessageListener(new EbMSSendEventListener(handleEventTaskBuilder()));
