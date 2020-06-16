@@ -21,6 +21,7 @@ import org.springframework.beans.factory.FactoryBean;
 
 import com.zaxxer.hikari.HikariDataSource;
 
+import bitronix.tm.resource.jdbc.PoolingDataSource;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
@@ -36,9 +37,11 @@ public abstract class AbstractDAOFactory<T> implements FactoryBean<T>
 	@Override
 	public T getObject() throws Exception
 	{
-		switch (((HikariDataSource)dataSource).getDriverClassName())
+		//switch (((HikariDataSource)dataSource).getDriverClassName())
+		switch (((PoolingDataSource)dataSource).getClassName())
 		{
-			case "org.hsqldb.jdbcDriver":
+			//case "org.hsqldb.jdbcDriver":
+			case "org.hsqldb.jdbc.pool.JDBCXADataSource":
 				return createHSqlDbDAO();
 			case "com.mysql.jdbc.Driver":
 				return createMySqlDAO();
@@ -53,7 +56,8 @@ public abstract class AbstractDAOFactory<T> implements FactoryBean<T>
 			case "com.ibm.db2.jcc.DB2Driver":
 				return createDB2DAO();
 			default:
-				throw new RuntimeException("SQL Driver " + ((HikariDataSource)dataSource).getDriverClassName() + " not recognized!");
+				//throw new RuntimeException("SQL Driver " + ((HikariDataSource)dataSource).getDriverClassName() + " not recognized!");
+				throw new RuntimeException("SQL Driver " + ((PoolingDataSource)dataSource).getClassName() + " not recognized!");
 		}
 	}
 

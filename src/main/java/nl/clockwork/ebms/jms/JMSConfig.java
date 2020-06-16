@@ -15,9 +15,13 @@
  */
 package nl.clockwork.ebms.jms;
 
+import java.util.Properties;
+
 import javax.jms.ConnectionFactory;
 
 import org.apache.activemq.pool.PooledConnectionFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -26,6 +30,7 @@ import org.springframework.jms.connection.JmsTransactionManager;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.transaction.PlatformTransactionManager;
 
+import bitronix.tm.resource.jms.PoolingConnectionFactory;
 import lombok.AccessLevel;
 import lombok.val;
 import lombok.experimental.FieldDefaults;
@@ -40,8 +45,11 @@ public class JMSConfig
 	String jmsBrokerConfig;
 	@Value("${jms.brokerURL}")
 	String jmsBrokerUrl;
-	@Value("${jms.pool.maxConnections}")
-	int maxConnections;
+	@Value("${jms.pool.maxPoolSize}")
+	int maxPoolSize;
+	@Autowired
+	@Qualifier("jtaTransactionManager")
+	PlatformTransactionManager jtaTransactionManager;
 
 	@Bean("brokerFactory")
 	public void brokerFactory() throws Exception
@@ -59,15 +67,33 @@ public class JMSConfig
 	@DependsOn("brokerFactory")
 	public ConnectionFactory connectionFactory()
 	{
-		val result = new PooledConnectionFactory(jmsBrokerUrl);
-		result.setMaxConnections(maxConnections);
+//		val result = new PooledConnectionFactory(jmsBrokerUrl);
+//		result.setMaxConnections(maxPoolSize);
+//		return result;
+		val result = new PoolingConnectionFactory();
+		result.setUniqueName("EbMSJMSConnectopnPool");
+		result.setClassName("org.apache.activemq.ActiveMQXAConnectionFactory");
+		result.setAllowLocalTransactions(true);
+		result.setMaxPoolSize(maxPoolSize);
+		result.setDriverProperties(createDriverProperties());
+		result.init();
 		return result;
+	}
+
+	private Properties createDriverProperties()
+	{
+		val result = new Properties();
+//		result.put("userName",value);
+//		result.put("password",value);
+		result.put("brokerURL",jmsBrokerUrl);
+		return result ;
 	}
 
 	@Bean("jmsTransactionManager")
 	public PlatformTransactionManager jmsTransactionManager()
 	{
-		return new JmsTransactionManager(connectionFactory());
+		//TODO: JTA return new JmsTransactionManager(connectionFactory());
+		return jtaTransactionManager;
 	}
 
 }

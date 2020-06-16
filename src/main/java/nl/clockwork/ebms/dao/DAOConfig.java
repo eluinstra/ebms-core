@@ -23,10 +23,14 @@ import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.jta.JtaTransactionManager;
 import org.springframework.transaction.support.TransactionTemplate;
 
+import bitronix.tm.TransactionManagerServices;
 import lombok.AccessLevel;
 import lombok.val;
 import lombok.experimental.FieldDefaults;
@@ -116,9 +120,26 @@ public abstract class DAOConfig
 	}
 
 	@Bean("dataSourceTransactionManager")
-	public DataSourceTransactionManager dataSourceTransactionManager()
+	public PlatformTransactionManager dataSourceTransactionManager()
 	{
-		return new DataSourceTransactionManager(dataSource);
+		//TODO: JTA return new DataSourceTransactionManager(dataSource);
+		return jtaTransactionManager();
+	}
+
+	@Bean("jtaTransactionManager")
+	@DependsOn("btmConfig")
+	public PlatformTransactionManager jtaTransactionManager()
+	{
+		val transactionManager = TransactionManagerServices.getTransactionManager();
+		return new JtaTransactionManager(transactionManager,transactionManager);
+	}
+
+	@Bean("btmConfig")
+	public void btmConfig()
+	{
+		bitronix.tm.Configuration config = TransactionManagerServices.getConfiguration();
+		config.setServerId("EbMSDAOConnectopnPool");
+		config.setDefaultTransactionTimeout(300);
 	}
 
 	@Bean(name = "ebMSDAOMethodCachePointCut")
