@@ -16,22 +16,18 @@
 package nl.clockwork.ebms.dao;
 
 import javax.sql.DataSource;
-import javax.transaction.SystemException;
 
 import org.springframework.aop.framework.ProxyFactoryBean;
 import org.springframework.aop.support.RegexpMethodPointcutAdvisor;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.support.TransactionTemplate;
 
-import bitronix.tm.TransactionManagerServices;
 import lombok.AccessLevel;
 import lombok.val;
 import lombok.experimental.FieldDefaults;
@@ -50,22 +46,19 @@ public abstract class DAOConfig
 {
 	@Value("${transactionManager.type}")
 	TransactionManagerType transactionManagerType;
+	PlatformTransactionManager dataSourceTransactionManager;
 	@Autowired
 	DataSource dataSource;
 	@Autowired
 	BeanFactory beanFactory;
 	@Autowired
 	EbMSCacheManager cacheManager;
-	@Autowired
-	@Qualifier("jtaTransactionManager")
-	PlatformTransactionManager jtaTransactionManager;
 
 	@Bean
 	public CPADAO cpaDAO() throws Exception
 	{
 		val result = new ProxyFactoryBean();
-		val transactionManager = dataSourceTransactionManager();
-		val transactionTemplate = new TransactionTemplate(transactionManager);
+		val transactionTemplate = new TransactionTemplate(dataSourceTransactionManager);
 		val jdbcTemplate = new JdbcTemplate(dataSource);
 		val dao = new EbMSDAOFactory(transactionManagerType,dataSource,transactionTemplate,jdbcTemplate).getObject();
 		result.setBeanFactory(beanFactory);
@@ -78,8 +71,7 @@ public abstract class DAOConfig
 	public URLMappingDAO urlMappingDAO() throws Exception
 	{
 		val result = new ProxyFactoryBean();
-		val transactionManager = dataSourceTransactionManager();
-		val transactionTemplate = new TransactionTemplate(transactionManager);
+		val transactionTemplate = new TransactionTemplate(dataSourceTransactionManager);
 		val jdbcTemplate = new JdbcTemplate(dataSource);
 		val dao = new EbMSDAOFactory(transactionManagerType,dataSource,transactionTemplate,jdbcTemplate).getObject();
 		result.setBeanFactory(beanFactory);
@@ -92,8 +84,7 @@ public abstract class DAOConfig
 	public CertificateMappingDAO certificateMappingDAO() throws Exception
 	{
 		val result = new ProxyFactoryBean();
-		val transactionManager = dataSourceTransactionManager();
-		val transactionTemplate = new TransactionTemplate(transactionManager);
+		val transactionTemplate = new TransactionTemplate(dataSourceTransactionManager);
 		val jdbcTemplate = new JdbcTemplate(dataSource);
 		val dao = new EbMSDAOFactory(transactionManagerType,dataSource,transactionTemplate,jdbcTemplate).getObject();
 		result.setBeanFactory(beanFactory);
@@ -105,7 +96,7 @@ public abstract class DAOConfig
 	@Bean
 	public EbMSDAO ebMSDAO() throws Exception
 	{
-		val transactionTemplate = new TransactionTemplate(dataSourceTransactionManager());
+		val transactionTemplate = new TransactionTemplate(dataSourceTransactionManager);
 		val jdbcTemplate = new JdbcTemplate(dataSource);
 		return new EbMSDAOFactory(transactionManagerType,dataSource,transactionTemplate,jdbcTemplate).getObject();
 	}
@@ -113,7 +104,7 @@ public abstract class DAOConfig
 	@Bean
 	public EbMSMessageEventDAO ebMSMessageEventDAO() throws Exception
 	{
-		val transactionTemplate = new TransactionTemplate(dataSourceTransactionManager());
+		val transactionTemplate = new TransactionTemplate(dataSourceTransactionManager);
 		val jdbcTemplate = new JdbcTemplate(dataSource);
 		return (EbMSMessageEventDAO)new EbMSDAOFactory(transactionManagerType,dataSource,transactionTemplate,jdbcTemplate).getObject();
 	}
@@ -121,30 +112,9 @@ public abstract class DAOConfig
 	@Bean
 	public EbMSEventDAO ebMSEventDAO() throws Exception
 	{
-		val transactionTemplate = new TransactionTemplate(dataSourceTransactionManager());
+		val transactionTemplate = new TransactionTemplate(dataSourceTransactionManager);
 		val jdbcTemplate = new JdbcTemplate(dataSource);
 		return (EbMSEventDAO)new EbMSDAOFactory(transactionManagerType,dataSource,transactionTemplate,jdbcTemplate).getObject();
-	}
-
-	@Bean("dataSourceTransactionManager")
-	public PlatformTransactionManager dataSourceTransactionManager() throws SystemException
-	{
-		switch (transactionManagerType)
-		{
-			case BITRONIX:
-			case ATOMIKOS:
-				return jtaTransactionManager;
-			default:
-				return new DataSourceTransactionManager(dataSource);
-		}
-	}
-
-	@Bean("btmConfig")
-	public void btmConfig()
-	{
-		bitronix.tm.Configuration config = TransactionManagerServices.getConfiguration();
-		config.setServerId("EbMSTransactionManager");
-		config.setDefaultTransactionTimeout(300);
 	}
 
 	@Bean(name = "ebMSDAOMethodCachePointCut")

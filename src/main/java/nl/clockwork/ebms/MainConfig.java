@@ -28,7 +28,7 @@ import nl.clockwork.ebms.cache.CacheConfig;
 import nl.clockwork.ebms.client.ClientConfig;
 import nl.clockwork.ebms.cpa.CPAManagerConfig;
 import nl.clockwork.ebms.dao.DAOConfig;
-import nl.clockwork.ebms.dao.DataSourceConfig;
+import nl.clockwork.ebms.datasource.DataSourceConfig;
 import nl.clockwork.ebms.encryption.EncryptionConfig;
 import nl.clockwork.ebms.event.listener.EventListenerConfig;
 import nl.clockwork.ebms.event.processor.EventManagerConfig;

@@ -13,16 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.clockwork.ebms.dao;
+package nl.clockwork.ebms.datasource;
 
 import java.beans.PropertyVetoException;
 import java.util.Properties;
 
 import javax.sql.DataSource;
+import javax.transaction.SystemException;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
+import org.springframework.transaction.PlatformTransactionManager;
 
 import com.atomikos.jdbc.AtomikosDataSourceBean;
 import com.atomikos.jdbc.internal.AtomikosSQLException;
@@ -41,6 +46,9 @@ public class DataSourceConfig
 {
 	@Value("${transactionManager.type}")
 	TransactionManagerType transactionManagerType;
+	@Autowired
+	@Qualifier("jtaTransactionManager")
+	PlatformTransactionManager jtaTransactionManager;
 	@Value("${ebms.jdbc.driverClassName}")
 	String driverClassName;
 	@Value("${ebms.jdbc.url}")
@@ -64,6 +72,19 @@ public class DataSourceConfig
 	@Value("${ebms.pool.maxPoolSize}")
 	int maxPoolSize;
 	
+	@Bean("dataSourceTransactionManager")
+	public PlatformTransactionManager dataSourceTransactionManager() throws SystemException, AtomikosSQLException, PropertyVetoException
+	{
+		switch (transactionManagerType)
+		{
+			case BITRONIX:
+			case ATOMIKOS:
+				return jtaTransactionManager;
+			default:
+				return new DataSourceTransactionManager(dataSource());
+		}
+	}
+
 	@Bean(destroyMethod = "close")
 	public DataSource dataSource() throws PropertyVetoException, AtomikosSQLException
 	{
