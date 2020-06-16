@@ -60,17 +60,18 @@ public abstract class AbstractDAOFactory<T> implements FactoryBean<T>
 		{
 			case "org.hsqldb.jdbc.pool.JDBCXADataSource":
 				return createHSqlDbDAO();
-			case "com.mysql.jdbc.Driver":
+			case "com.mysql.jdbc.jdbc2.optional.MysqlXADataSource":
 				return createMySqlDAO();
-			case "org.mariadb.jdbc.Driver":
+			case "org.mariadb.jdbc.MySQLDataSource":
 				return createMySqlDAO();
-			case "org.postgresql.Driver":
+			case "org.postgresql.xa.PGXADataSource":
 				return createPostgresDAO();
-			case "oracle.jdbc.OracleDriver":
+			case "oracle.jdbc.xa.client.OracleXADataSource":
 				return createOracleDAO();
-			case "com.microsoft.sqlserver.jdbc.SQLServerDriver":
+			case "com.microsoft.sqlserver.jdbc.SQLServerXAResource":
+			case "com.microsoft.sqlserver.jdbc.SQLServerXADataSource":
 				return createMsSqlDAO();
-			case "com.ibm.db2.jcc.DB2Driver":
+			case "com.ibm.db2.jcc.DB2XADataSource":
 				return createDB2DAO();
 			default:
 				throw new RuntimeException("SQL Driver " + driverClassName + " not recognized!");
