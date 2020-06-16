@@ -20,11 +20,12 @@ import java.util.Properties;
 
 import javax.sql.DataSource;
 
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import com.atomikos.jdbc.AtomikosDataSourceBean;
+import com.atomikos.jdbc.internal.AtomikosSQLException;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 
@@ -32,11 +33,14 @@ import bitronix.tm.resource.jdbc.PoolingDataSource;
 import lombok.AccessLevel;
 import lombok.val;
 import lombok.experimental.FieldDefaults;
+import nl.clockwork.ebms.dao.DAOConfig.TransactionManagerType;
 
 @Configuration(proxyBeanMethods = false)
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class DataSourceConfig
 {
+	@Value("${transactionManager.type}")
+	TransactionManagerType transactionManagerType;
 	@Value("${ebms.jdbc.driverClassName}")
 	String driverClassName;
 	@Value("${ebms.jdbc.url}")
@@ -49,8 +53,8 @@ public class DataSourceConfig
 	boolean isAutoCommit;
 	@Value("${ebms.pool.connectionTimeout}")
 	int connectionTimeout;
-	@Value("${ebms.pool.idleTimeout}")
-	int idleTimeout;
+	@Value("${ebms.pool.maxIdleTime}")
+	int maxIdleTime;
 	@Value("${ebms.pool.maxLifetime}")
 	int maxLifetime;
 	@Value("${ebms.pool.testQuery}")
@@ -61,35 +65,52 @@ public class DataSourceConfig
 	int maxPoolSize;
 	
 	@Bean(destroyMethod = "close")
-	public DataSource dataSource() throws PropertyVetoException
+	public DataSource dataSource() throws PropertyVetoException, AtomikosSQLException
 	{
-		//TODO: JTA
-//		val config = new HikariConfig();
-//		config.setDriverClassName(driverClassName);
-//		config.setJdbcUrl(jdbcUrl);
-//		config.setUsername(username);
-//		config.setPassword(password);
-//		config.setAutoCommit(isAutoCommit);
-//		config.setConnectionTimeout(connectionTimeout);
-//		config.setIdleTimeout(idleTimeout);
-//		config.setMaxLifetime(maxLifetime);
-//		config.setConnectionTestQuery(testQuery);
-//		config.setMinimumIdle(minPoolSize);
-//		config.setMaximumPoolSize(maxPoolSize);
-//		return new HikariDataSource(config);
-		val result = new PoolingDataSource();
-		result.setUniqueName("EbMS");
-		result.setClassName(driverClassName);
-    //result.setLocalAutoCommit(isAutoCommit);
-    result.setAllowLocalTransactions(true);
-    result.setDriverProperties(createDriverProperties());
-    result.setMaxIdleTime(idleTimeout);
-    result.setMinPoolSize(minPoolSize);
-    result.setMaxPoolSize(maxPoolSize);
-//    result.setEnableJdbc4ConnectionTest(StringUtils.isEmpty(testQuery));
-//    result.setTestQuery(testQuery);
-    result.init();
-    return result;
+		switch (transactionManagerType)
+		{
+			case BITRONIX:
+				val bitronixDS = new PoolingDataSource();
+				bitronixDS.setUniqueName("EbMSDataSource");
+				bitronixDS.setClassName(driverClassName);
+		    //result.setLocalAutoCommit(isAutoCommit);
+		    bitronixDS.setAllowLocalTransactions(true);
+		    bitronixDS.setDriverProperties(createDriverProperties());
+		    bitronixDS.setMaxIdleTime(maxIdleTime);
+		    bitronixDS.setMinPoolSize(minPoolSize);
+		    bitronixDS.setMaxPoolSize(maxPoolSize);
+		//    result.setEnableJdbc4ConnectionTest(StringUtils.isEmpty(testQuery));
+		//    result.setTestQuery(testQuery);
+		    bitronixDS.init();
+		    return bitronixDS;
+			case ATOMIKOS:
+				val atomikosDS = new AtomikosDataSourceBean();
+				atomikosDS.setUniqueResourceName("EbMSDataSource");
+				atomikosDS.setXaDataSourceClassName(driverClassName);
+				atomikosDS.setXaProperties(createDriverProperties());
+				atomikosDS.setLocalTransactionMode(true);
+				atomikosDS.setMaxIdleTime(maxIdleTime);
+				atomikosDS.setMaxLifetime(maxLifetime);
+				atomikosDS.setMinPoolSize(minPoolSize);
+				atomikosDS.setMaxPoolSize(maxPoolSize);
+				atomikosDS.setTestQuery(testQuery);
+				atomikosDS.init();
+				return atomikosDS;
+			default:
+				val config = new HikariConfig();
+				config.setDriverClassName(driverClassName);
+				config.setJdbcUrl(jdbcUrl);
+				config.setUsername(username);
+				config.setPassword(password);
+				config.setAutoCommit(isAutoCommit);
+				config.setConnectionTimeout(connectionTimeout);
+				config.setIdleTimeout(maxIdleTime);
+				config.setMaxLifetime(maxLifetime);
+				config.setConnectionTestQuery(testQuery);
+				config.setMinimumIdle(minPoolSize);
+				config.setMaximumPoolSize(maxPoolSize);
+				return new HikariDataSource(config);
+		}
 	}
 
 	private Properties createDriverProperties()

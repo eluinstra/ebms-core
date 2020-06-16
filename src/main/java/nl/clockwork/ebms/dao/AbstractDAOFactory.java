@@ -19,28 +19,44 @@ import javax.sql.DataSource;
 
 import org.springframework.beans.factory.FactoryBean;
 
+import com.atomikos.jdbc.AtomikosDataSourceBean;
 import com.zaxxer.hikari.HikariDataSource;
 
 import bitronix.tm.resource.jdbc.PoolingDataSource;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
+import lombok.val;
 import lombok.experimental.FieldDefaults;
+import nl.clockwork.ebms.dao.DAOConfig.TransactionManagerType;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor
 public abstract class AbstractDAOFactory<T> implements FactoryBean<T>
 {
 	@NonNull
+	TransactionManagerType transactionManagerType;
+	@NonNull
 	DataSource dataSource;
 
 	@Override
 	public T getObject() throws Exception
 	{
-		//switch (((HikariDataSource)dataSource).getDriverClassName())
-		switch (((PoolingDataSource)dataSource).getClassName())
+		switch(transactionManagerType)
 		{
-			//case "org.hsqldb.jdbcDriver":
+			case BITRONIX:
+			case ATOMIKOS:
+				return createXADataSource();
+			default:
+				return createDefaultDataSource();
+		}
+	}
+
+	private T createXADataSource()
+	{
+		val driverClassName = dataSource instanceof PoolingDataSource ? ((PoolingDataSource)dataSource).getClassName() : ((AtomikosDataSourceBean)dataSource).getXaDataSourceClassName();
+		switch (driverClassName)
+		{
 			case "org.hsqldb.jdbc.pool.JDBCXADataSource":
 				return createHSqlDbDAO();
 			case "com.mysql.jdbc.Driver":
@@ -56,8 +72,30 @@ public abstract class AbstractDAOFactory<T> implements FactoryBean<T>
 			case "com.ibm.db2.jcc.DB2Driver":
 				return createDB2DAO();
 			default:
-				//throw new RuntimeException("SQL Driver " + ((HikariDataSource)dataSource).getDriverClassName() + " not recognized!");
-				throw new RuntimeException("SQL Driver " + ((PoolingDataSource)dataSource).getClassName() + " not recognized!");
+				throw new RuntimeException("SQL Driver " + driverClassName + " not recognized!");
+		}
+	}
+
+	private T createDefaultDataSource()
+	{
+		switch (((HikariDataSource)dataSource).getDriverClassName())
+		{
+			case "org.hsqldb.jdbcDriver":
+				return createHSqlDbDAO();
+			case "com.mysql.jdbc.Driver":
+				return createMySqlDAO();
+			case "org.mariadb.jdbc.Driver":
+				return createMySqlDAO();
+			case "org.postgresql.Driver":
+				return createPostgresDAO();
+			case "oracle.jdbc.OracleDriver":
+				return createOracleDAO();
+			case "com.microsoft.sqlserver.jdbc.SQLServerDriver":
+				return createMsSqlDAO();
+			case "com.ibm.db2.jcc.DB2Driver":
+				return createDB2DAO();
+			default:
+				throw new RuntimeException("SQL Driver " + ((HikariDataSource)dataSource).getDriverClassName() + " not recognized!");
 		}
 	}
 
@@ -84,9 +122,9 @@ public abstract class AbstractDAOFactory<T> implements FactoryBean<T>
 
 	public abstract static class DefaultDAOFactory<U> extends AbstractDAOFactory<U>
 	{
-		public DefaultDAOFactory(@NonNull DataSource dataSource)
+		public DefaultDAOFactory(@NonNull TransactionManagerType transactionManagerType, @NonNull DataSource dataSource)
 		{
-			super(dataSource);
+			super(transactionManagerType,dataSource);
 		}
 
 		@Override

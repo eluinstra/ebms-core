@@ -18,6 +18,7 @@ package nl.clockwork.ebms.jms;
 import java.util.Properties;
 
 import javax.jms.ConnectionFactory;
+import javax.jms.JMSException;
 
 import org.apache.activemq.pool.PooledConnectionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,15 +31,20 @@ import org.springframework.jms.connection.JmsTransactionManager;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.transaction.PlatformTransactionManager;
 
+import com.atomikos.jms.AtomikosConnectionFactoryBean;
+
 import bitronix.tm.resource.jms.PoolingConnectionFactory;
 import lombok.AccessLevel;
 import lombok.val;
 import lombok.experimental.FieldDefaults;
+import nl.clockwork.ebms.dao.DAOConfig.TransactionManagerType;
 
 @Configuration
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class JMSConfig
 {
+	@Value("${transactionManager.type}")
+	TransactionManagerType transactionManagerType;
 	@Value("${jms.broker.start}")
 	boolean jmsBrokerStart;
 	@Value("${jms.broker.config}")
@@ -58,26 +64,40 @@ public class JMSConfig
 	}
 
 	@Bean
-	public JmsTemplate jmsTemplate()
+	public JmsTemplate jmsTemplate() throws JMSException
 	{
 		return new JmsTemplate(connectionFactory());
 	}
 
 	@Bean
 	@DependsOn("brokerFactory")
-	public ConnectionFactory connectionFactory()
+	public ConnectionFactory connectionFactory() throws JMSException
 	{
-//		val result = new PooledConnectionFactory(jmsBrokerUrl);
-//		result.setMaxConnections(maxPoolSize);
-//		return result;
-		val result = new PoolingConnectionFactory();
-		result.setUniqueName("EbMSJMSConnectopnPool");
-		result.setClassName("org.apache.activemq.ActiveMQXAConnectionFactory");
-		result.setAllowLocalTransactions(true);
-		result.setMaxPoolSize(maxPoolSize);
-		result.setDriverProperties(createDriverProperties());
-		result.init();
-		return result;
+		switch (transactionManagerType)
+		{
+			case BITRONIX:
+				val bitronixCF = new PoolingConnectionFactory();
+				bitronixCF.setUniqueName("EbMSJMSConnection");
+				bitronixCF.setClassName("org.apache.activemq.ActiveMQXAConnectionFactory");
+				bitronixCF.setAllowLocalTransactions(true);
+				bitronixCF.setMaxPoolSize(maxPoolSize);
+				bitronixCF.setDriverProperties(createDriverProperties());
+				bitronixCF.init();
+				return bitronixCF;
+			case ATOMIKOS:
+				val atomikosCF = new AtomikosConnectionFactoryBean();
+				atomikosCF.setUniqueResourceName("EbMSJMSConnection");
+				atomikosCF.setXaConnectionFactoryClassName("org.apache.activemq.ActiveMQXAConnectionFactory");
+				atomikosCF.setLocalTransactionMode(true);
+				atomikosCF.setMaxPoolSize(maxPoolSize);
+				atomikosCF.setXaProperties(createDriverProperties());
+				atomikosCF.init();
+				return atomikosCF;
+			default:
+				val defaultCF = new PooledConnectionFactory(jmsBrokerUrl);
+				defaultCF.setMaxConnections(maxPoolSize);
+				return defaultCF;
+		}
 	}
 
 	private Properties createDriverProperties()
@@ -90,10 +110,16 @@ public class JMSConfig
 	}
 
 	@Bean("jmsTransactionManager")
-	public PlatformTransactionManager jmsTransactionManager()
+	public PlatformTransactionManager jmsTransactionManager() throws JMSException
 	{
-		//TODO: JTA return new JmsTransactionManager(connectionFactory());
-		return jtaTransactionManager;
+		switch (transactionManagerType)
+		{
+			case BITRONIX:
+			case ATOMIKOS:
+				return jtaTransactionManager;
+			default:
+				return new JmsTransactionManager(connectionFactory());
+		}
 	}
 
 }

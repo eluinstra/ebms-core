@@ -23,6 +23,7 @@ import org.springframework.transaction.support.TransactionTemplate;
 import lombok.AccessLevel;
 import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
+import nl.clockwork.ebms.dao.DAOConfig.TransactionManagerType;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class EbMSDAOFactory extends AbstractDAOFactory<EbMSDAO>
@@ -32,9 +33,13 @@ public class EbMSDAOFactory extends AbstractDAOFactory<EbMSDAO>
 	@NonNull
 	JdbcTemplate jdbcTemplate;
 
-	public EbMSDAOFactory(DataSource dataSource, @NonNull TransactionTemplate transactionTemplate, @NonNull JdbcTemplate jdbcTemplate)
+	public EbMSDAOFactory(
+			TransactionManagerType transactionManagerType,
+			DataSource dataSource,
+			@NonNull TransactionTemplate transactionTemplate,
+			@NonNull JdbcTemplate jdbcTemplate)
 	{
-		super(dataSource);
+		super(transactionManagerType,dataSource);
 		this.transactionTemplate = transactionTemplate;
 		this.jdbcTemplate = jdbcTemplate;
 	}

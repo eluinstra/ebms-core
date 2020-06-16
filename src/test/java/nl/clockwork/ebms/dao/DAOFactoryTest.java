@@ -30,6 +30,7 @@ import com.zaxxer.hikari.HikariDataSource;
 import lombok.AccessLevel;
 import lombok.val;
 import lombok.experimental.FieldDefaults;
+import nl.clockwork.ebms.dao.DAOConfig.TransactionManagerType;
 
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class DAOFactoryTest
@@ -42,9 +43,10 @@ public class DAOFactoryTest
 	public void init()
 	{
 		ds = new HikariDataSource();
+		val type = TransactionManagerType.DEFAULT;
 		val tt = new TransactionTemplate(new DataSourceTransactionManager(ds));
 		val jt = new JdbcTemplate(ds);
-		daoFactory = new EbMSDAOFactory(ds,tt,jt);
+		daoFactory = new EbMSDAOFactory(type,ds,tt,jt);
 	}
 
 	@Test
