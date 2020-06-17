@@ -27,7 +27,7 @@ import lombok.experimental.FieldDefaults;
 @Getter
 public enum EbMSMessageEventType
 {
-	RECEIVED(0),DELIVERED(1),FAILED(2),EXPIRED(3);
+	RECEIVED(0), DELIVERED(1), FAILED(2), EXPIRED(3);
 
 	int id;
 

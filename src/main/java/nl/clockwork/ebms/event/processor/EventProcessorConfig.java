@@ -56,7 +56,9 @@ public class EventProcessorConfig
 	String serverId;
 	@Value("${eventProcessor.jms.destinationName}")
 	String jmsDestinationName;
-	@Value("${eventProcessor.maxTreads}")
+	@Value("${eventProcessor.minThreads}")
+	int minThreads;
+	@Value("${eventProcessor.maxThreads}")
 	int maxThreads;
 	@Value("${eventProcessor.maxEvents}")
 	int maxEvents;
@@ -95,7 +97,7 @@ public class EventProcessorConfig
 				EbMSEventProcessor.builder()
 				.maxEvents(maxEvents)
 				.executionInterval(executionInterval)
-				.ebMSThreadPoolExecutor(new EbMSThreadPoolExecutor(maxThreads))
+				.ebMSThreadPoolExecutor(new EbMSThreadPoolExecutor(minThreads,maxThreads))
 				.ebMSEventDAO(ebMSEventDAO)
 				.handleEventTaskBuilder(handleEventTaskBuilder())
 				.serverId(serverId)
@@ -105,6 +107,7 @@ public class EventProcessorConfig
 				val result = new DefaultMessageListenerContainer();
 				result.setConnectionFactory(connectionFactory);
 				result.setTransactionManager(jmsTransactionManager);
+				result.setConcurrentConsumers(minThreads);
 				result.setMaxConcurrentConsumers(maxThreads);
 				result.setDestinationName(StringUtils.isEmpty(jmsDestinationName) ? JMSEventManager.JMS_DESTINATION_NAME : jmsDestinationName);
 				result.setMessageListener(new EbMSSendEventListener(handleEventTaskBuilder()));

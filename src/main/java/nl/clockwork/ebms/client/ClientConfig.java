@@ -82,7 +82,9 @@ public class ClientConfig
 	boolean useClientCertificate;
 	@Value("${deliveryManager.type}")
 	DeliveryManagerType deliveryManagerType;
-	@Value("${deliveryManager.maxTreads}")
+	@Value("${deliveryManager.minThreads}")
+	Integer minThreads;
+	@Value("${deliveryManager.maxThreads}")
 	Integer maxThreads;
 	@Value("${messageQueue.maxEntries}")
 	int maxEntries;
@@ -120,7 +122,7 @@ public class ClientConfig
 	{
 		return DeliveryManagerFactory.builder()
 				.setType(deliveryManagerType)
-				.setEbMSThreadPoolExecutor(new EbMSThreadPoolExecutor(maxThreads))
+				.setEbMSThreadPoolExecutor(new EbMSThreadPoolExecutor(minThreads,maxThreads))
 				.setMessageQueue(new EbMSMessageQueue(maxEntries,timeout))
 				.setCpaManager(cpaManager)
 				.setEbMSClientFactory(ebMSClientFactory())

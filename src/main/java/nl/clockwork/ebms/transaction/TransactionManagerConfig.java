@@ -39,7 +39,7 @@ public class TransactionManagerConfig
 
 	public enum TransactionManagerType
 	{
-		DEFAULT,BITRONIX,ATOMIKOS;
+		DEFAULT, BITRONIX, ATOMIKOS;
 	}
 
 	@Bean("jtaTransactionManager")
