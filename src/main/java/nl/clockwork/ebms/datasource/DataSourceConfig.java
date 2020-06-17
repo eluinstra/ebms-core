@@ -16,9 +16,12 @@
 package nl.clockwork.ebms.datasource;
 
 import java.beans.PropertyVetoException;
+import java.sql.Connection;
+import java.sql.Types;
 import java.util.Properties;
 import java.util.UUID;
 
+import javax.inject.Provider;
 import javax.sql.DataSource;
 import javax.transaction.SystemException;
 
@@ -30,9 +33,15 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import com.atomikos.jdbc.AtomikosDataSourceBean;
 import com.atomikos.jdbc.internal.AtomikosSQLException;
+import com.querydsl.sql.HSQLDBTemplates;
+import com.querydsl.sql.SQLQueryFactory;
+import com.querydsl.sql.SQLTemplates;
+import com.querydsl.sql.spring.SpringConnectionProvider;
+import com.querydsl.sql.spring.SpringExceptionTranslator;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 
@@ -40,9 +49,11 @@ import bitronix.tm.resource.jdbc.PoolingDataSource;
 import lombok.AccessLevel;
 import lombok.val;
 import lombok.experimental.FieldDefaults;
+import nl.clockwork.ebms.querydsl.X509CertificateType;
 import nl.clockwork.ebms.transaction.TransactionManagerConfig.TransactionManagerType;
 
-@Configuration(proxyBeanMethods = false)
+@Configuration
+@EnableTransactionManagement
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class DataSourceConfig
 {
@@ -74,7 +85,84 @@ public class DataSourceConfig
 	@Value("${ebms.pool.maxPoolSize}")
 	int maxPoolSize;
 	
-	@Bean("dataSourceTransactionManager")
+//	@Bean
+//	public SQLQueryFactory queryFactory() throws AtomikosSQLException, PropertyVetoException
+//	{
+//		Provider<Connection> provider = new SpringConnectionProvider(dataSource());
+//		return new SQLQueryFactory(querydslConfiguration(),provider);
+//	}
+//
+//	@Bean
+//	public com.querydsl.sql.Configuration querydslConfiguration() throws AtomikosSQLException, PropertyVetoException
+//	{
+//		SQLTemplates templates = HSQLDBTemplates.builder().build(); // change to your Templates
+//		com.querydsl.sql.Configuration configuration = new com.querydsl.sql.Configuration(templates);
+//		configuration.setExceptionTranslator(new SpringExceptionTranslator());
+//		configuration.register("CERTIFICATE_MAPPING","source",new X509CertificateType(Types.BLOB));
+//		configuration.register("CERTIFICATE_MAPPING","destination",new X509CertificateType(Types.BLOB));
+//		return configuration;
+//	}
+//
+//	private SQLTemplates getSQLTemplates() throws AtomikosSQLException, PropertyVetoException
+//	{
+//		switch(transactionManagerType)
+//		{
+//			case BITRONIX:
+//			case ATOMIKOS:
+//				return createXASQLTemplates();
+//			default:
+//				return createDefaultSQLTemplates();
+//		}
+//	}
+//
+//	private SQLTemplates createXASQLTemplates() throws AtomikosSQLException, PropertyVetoException
+//	{
+//		val dataSource = dataSource();
+//		val driverClassName = dataSource  instanceof PoolingDataSource ? ((PoolingDataSource)dataSource).getClassName() : ((AtomikosDataSourceBean)dataSource).getXaDataSourceClassName();
+//		switch (driverClassName)
+//		{
+//			case "org.hsqldb.jdbc.pool.JDBCXADataSource":
+//				return HSQLDBTemplates.builder().build();
+//			case "com.mysql.jdbc.jdbc2.optional.MysqlXADataSource":
+//			case "org.mariadb.jdbc.MySQLDataSource":
+//				return MySQLTemplates.builder().build();
+//			case "org.postgresql.xa.PGXADataSource":
+//				return PostgreSQLTemplates.builder().build();
+//			case "oracle.jdbc.xa.client.OracleXADataSource":
+//				return OracleTemplates.builder().build();
+//			case "com.microsoft.sqlserver.jdbc.SQLServerXAResource":
+//			case "com.microsoft.sqlserver.jdbc.SQLServerXADataSource":
+//				return SQLServerTemplates.builder().build();
+//			case "com.ibm.db2.jcc.DB2XADataSource":
+//				return DB2Templates.builder().build();
+//			default:
+//				throw new RuntimeException("SQL Driver " + driverClassName + " not recognized!");
+//		}
+//	}
+//
+//	private SQLTemplates createDefaultSQLTemplates() throws AtomikosSQLException, PropertyVetoException
+//	{
+//		switch (((HikariDataSource)dataSource()).getDriverClassName())
+//		{
+//			case "org.hsqldb.jdbcDriver":
+//				return HSQLDBTemplates.builder().build();
+//			case "com.mysql.jdbc.Driver":
+//			case "org.mariadb.jdbc.Driver":
+//				return MySQLTemplates.builder().build();
+//			case "org.postgresql.Driver":
+//				return PostgreSQLTemplates.builder().build();
+//			case "oracle.jdbc.OracleDriver":
+//				return OracleTemplates.builder().build();
+//			case "com.microsoft.sqlserver.jdbc.SQLServerDriver":
+//				return SQLServerTemplates.builder().build();
+//			case "com.ibm.db2.jcc.DB2Driver":
+//				return DB2Templates.builder().build();
+//			default:
+//				throw new RuntimeException("SQL Driver " + ((HikariDataSource)dataSource()).getDriverClassName() + " not recognized!");
+//		}
+//	}
+//
+	@Bean(name = {"transactionManager","dataSourceTransactionManager"})
 	public PlatformTransactionManager dataSourceTransactionManager() throws SystemException, AtomikosSQLException, PropertyVetoException
 	{
 		switch (transactionManagerType)

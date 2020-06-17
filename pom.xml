@@ -192,6 +192,27 @@
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
+			<groupId>javax.persistence</groupId>
+			<artifactId>javax.persistence-api</artifactId>
+			<version>2.2</version>
+		</dependency>
+		<dependency>
+			<groupId>com.querydsl</groupId>
+			<artifactId>querydsl-sql</artifactId>
+			<version>4.3.1</version>
+		</dependency>
+		<dependency>
+			<groupId>com.querydsl</groupId>
+			<artifactId>querydsl-sql-spring</artifactId>
+			<version>4.3.1</version>
+		</dependency>
+		<dependency>
+			<groupId>com.querydsl</groupId>
+			<artifactId>querydsl-sql-codegen</artifactId>
+			<version>4.3.1</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-lang3</artifactId>
 			<version>3.10</version>
@@ -454,6 +475,46 @@
 <!-- 					</execution> -->
 <!-- 				</executions> -->
 <!-- 			</plugin> -->
+			<!--plugin>
+				<groupId>com.querydsl</groupId>
+				<artifactId>querydsl-maven-plugin</artifactId>
+				<version>4.3.1</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>export</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<jdbcDriver>org.hsqldb.jdbcDriver</jdbcDriver>
+					<jdbcUrl>jdbc:hsqldb:hsql://localhost:9001/ebms</jdbcUrl>
+					<packageName>nl.clockwork.ebms.querydsl.model</packageName>
+					<targetFolder>${project.basedir}/target/generated-sources/java</targetFolder>
+					<customTypes>
+						<customType>nl.clockwork.ebms.querydsl.X509CertificateType</customType>
+					</customTypes>
+					<typeMappings>
+						<typeMapping>
+							<table>CERTIFICATE_MAPPING</table>
+							<column>source</column>
+							<type>java.security.cert.X509Certificate</type>
+						</typeMapping>
+						<typeMapping>
+							<table>CERTIFICATE_MAPPING</table>
+							<column>destination</column>
+							<type>java.security.cert.X509Certificate</type>
+						</typeMapping>
+					</typeMappings>
+				</configuration>
+				<dependencies>
+					<dependency>
+						<groupId>org.hsqldb</groupId>
+						<artifactId>hsqldb</artifactId>
+						<version>2.5.0</version>
+					</dependency>
+				</dependencies>
+			</plugin-->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>

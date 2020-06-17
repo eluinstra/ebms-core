@@ -35,8 +35,6 @@ import lombok.experimental.FieldDefaults;
 import nl.clockwork.ebms.cache.CachingMethodInterceptor;
 import nl.clockwork.ebms.cache.EbMSCacheManager;
 import nl.clockwork.ebms.cpa.CPADAO;
-import nl.clockwork.ebms.cpa.CertificateMappingDAO;
-import nl.clockwork.ebms.cpa.URLMappingDAO;
 import nl.clockwork.ebms.event.listener.EbMSMessageEventDAO;
 import nl.clockwork.ebms.event.processor.EbMSEventDAO;
 import nl.clockwork.ebms.transaction.TransactionManagerConfig.TransactionManagerType;
@@ -68,32 +66,6 @@ public abstract class DAOConfig
 		result.setTarget(dao);
 		result.setInterceptorNames("ebMSDAOMethodCachePointCut");
 		return (CPADAO)result.getObject();
-	}
-
-	@Bean
-	public URLMappingDAO urlMappingDAO() throws Exception
-	{
-		val result = new ProxyFactoryBean();
-		val transactionTemplate = new TransactionTemplate(dataSourceTransactionManager);
-		val jdbcTemplate = new JdbcTemplate(dataSource);
-		val dao = new EbMSDAOFactory(transactionManagerType,dataSource,transactionTemplate,jdbcTemplate).getObject();
-		result.setBeanFactory(beanFactory);
-		result.setTarget(dao);
-		result.setInterceptorNames("ebMSDAOMethodCachePointCut");
-		return (URLMappingDAO)result.getObject();
-	}
-
-	@Bean
-	public CertificateMappingDAO certificateMappingDAO() throws Exception
-	{
-		val result = new ProxyFactoryBean();
-		val transactionTemplate = new TransactionTemplate(dataSourceTransactionManager);
-		val jdbcTemplate = new JdbcTemplate(dataSource);
-		val dao = new EbMSDAOFactory(transactionManagerType,dataSource,transactionTemplate,jdbcTemplate).getObject();
-		result.setBeanFactory(beanFactory);
-		result.setTarget(dao);
-		result.setInterceptorNames("ebMSDAOMethodCachePointCut");
-		return (CertificateMappingDAO)result.getObject();
 	}
 
 	@Bean

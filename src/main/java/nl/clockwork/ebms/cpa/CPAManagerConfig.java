@@ -15,6 +15,12 @@
  */
 package nl.clockwork.ebms.cpa;
 
+import java.sql.Connection;
+import java.sql.Types;
+
+import javax.inject.Provider;
+import javax.sql.DataSource;
+
 import org.springframework.aop.framework.ProxyFactoryBean;
 import org.springframework.aop.support.RegexpMethodPointcutAdvisor;
 import org.springframework.beans.factory.BeanFactory;
@@ -23,12 +29,20 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
+import org.springframework.jdbc.core.JdbcTemplate;
+
+import com.querydsl.sql.HSQLDBTemplates;
+import com.querydsl.sql.SQLQueryFactory;
+import com.querydsl.sql.SQLTemplates;
+import com.querydsl.sql.spring.SpringConnectionProvider;
+import com.querydsl.sql.spring.SpringExceptionTranslator;
 
 import lombok.AccessLevel;
 import lombok.val;
 import lombok.experimental.FieldDefaults;
 import nl.clockwork.ebms.cache.CachingMethodInterceptor;
 import nl.clockwork.ebms.cache.EbMSCacheManager;
+import nl.clockwork.ebms.querydsl.X509CertificateType;
 
 @Configuration
 @FieldDefaults(level = AccessLevel.PRIVATE)
@@ -44,9 +58,7 @@ public class CPAManagerConfig
 	@Autowired
 	EbMSCacheManager cacheManager;
 	@Autowired
-	URLMappingDAO urlMappingDAO;
-	@Autowired
-	CertificateMappingDAO certificateMappingDAO;
+	DataSource dataSource;
 
 	@Bean
 	@DependsOn("cpaManagerMethodCachePointCut")
@@ -93,14 +105,56 @@ public class CPAManagerConfig
 	}
 
 	@Bean
-	public URLMapper urlMapper()
+	public URLMapper urlMapper() throws Exception
 	{
-		return new URLMapper(daoMethodCache,urlMappingDAO);
+		return new URLMapper(daoMethodCache,urlMappingDAO());
 	}
 
 	@Bean
-	public CertificateMapper certificateMapper()
+	public CertificateMapper certificateMapper() throws Exception
 	{
-		return new CertificateMapper(daoMethodCache,certificateMappingDAO);
+		return new CertificateMapper(daoMethodCache,certificateMappingDAO());
+	}
+
+	@Bean
+	public URLMappingDAO urlMappingDAO() throws Exception
+	{
+		val result = new ProxyFactoryBean();
+		JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
+		val dao = new URLMappingDAOImpl(jdbcTemplate,queryFactory());
+		result.setBeanFactory(beanFactory);
+		result.setTarget(dao);
+		result.setInterceptorNames("ebMSDAOMethodCachePointCut");
+		return (URLMappingDAO)result.getObject();
+	}
+
+	@Bean
+	public CertificateMappingDAO certificateMappingDAO() throws Exception
+	{
+//		val result = new ProxyFactoryBean();
+		val dao = new CertificateMappingDAOImpl(queryFactory());
+		return dao;
+//		result.setBeanFactory(beanFactory);
+//		result.setTarget(dao);
+//		result.setInterceptorNames("ebMSDAOMethodCachePointCut");
+//		return (CertificateMappingDAO)result.getObject();
+	}
+
+	@Bean
+	public SQLQueryFactory queryFactory()
+	{
+		Provider<Connection> provider = new SpringConnectionProvider(dataSource);
+		return new SQLQueryFactory(querydslConfiguration(),provider);
+	}
+
+	@Bean
+	public com.querydsl.sql.Configuration querydslConfiguration()
+	{
+		SQLTemplates templates = HSQLDBTemplates.builder().build(); // change to your Templates
+		com.querydsl.sql.Configuration configuration = new com.querydsl.sql.Configuration(templates);
+		configuration.setExceptionTranslator(new SpringExceptionTranslator());
+		configuration.register("CERTIFICATE_MAPPING","source",new X509CertificateType(Types.BLOB));
+		configuration.register("CERTIFICATE_MAPPING","destination",new X509CertificateType(Types.BLOB));
+		return configuration;
 	}
 }
