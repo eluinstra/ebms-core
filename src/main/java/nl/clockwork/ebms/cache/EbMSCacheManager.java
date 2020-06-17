@@ -22,6 +22,7 @@ import org.apache.ignite.Ignition;
 import org.ehcache.CacheManager;
 import org.ehcache.config.builders.CacheManagerBuilder;
 import org.ehcache.xml.XmlConfiguration;
+import org.springframework.beans.factory.DisposableBean;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 
@@ -32,7 +33,7 @@ import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-public class EbMSCacheManager
+public class EbMSCacheManager implements DisposableBean
 {
 	@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 	@AllArgsConstructor
@@ -83,5 +84,14 @@ public class EbMSCacheManager
 			default:
 				return new DisabledMethodCacheInterceptor();
 		}
+	}
+
+	@Override
+	public void destroy() throws Exception
+	{
+		if (ehcache != null)
+			ehcache.close();
+		if (ignite != null)
+			ignite.close();
 	}
 }

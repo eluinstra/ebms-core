@@ -35,7 +35,7 @@ public class CacheConfig
 	@Value("${cache.configLocation}")
 	Resource configLocation;
 
-	@Bean
+	@Bean(destroyMethod = "destroy")
 	public EbMSCacheManager ebMSCacheManager() throws IOException
 	{
 		return new EbMSCacheManager(type,configLocation);
