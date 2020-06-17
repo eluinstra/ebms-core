@@ -28,16 +28,16 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 
-public class EbMSBrokerFactoryBean extends BrokerFactoryBean implements DisposableBean
+public class EbMSBrokerFactoryBean implements DisposableBean
 {
-	private static BrokerFactoryBean brokerFactoryBean;
+	private BrokerFactoryBean brokerFactoryBean;
 
-	public static void init(boolean jmsBrokerStart, String jmsBrokerConfig) throws Exception
+	public EbMSBrokerFactoryBean(boolean jmsBrokerStart, String jmsBrokerConfig) throws Exception
 	{
-		if (brokerFactoryBean == null && jmsBrokerStart)
+		if (jmsBrokerStart)
 		{
 			brokerFactoryBean = new BrokerFactoryBean(createResource(jmsBrokerConfig));
-			brokerFactoryBean.setStart(jmsBrokerStart);
+			brokerFactoryBean.setStart(true);
 			brokerFactoryBean.afterPropertiesSet();
 		}
 	}
@@ -48,5 +48,12 @@ public class EbMSBrokerFactoryBean extends BrokerFactoryBean implements Disposab
 				Case($(startsWith("classpath:")),o -> new ClassPathResource(path.substring("classpath:".length()))),
 				Case($(startsWith("file:")),o -> new FileSystemResource(path.substring("file:".length()))),
 				Case($(),o -> new FileSystemResource(path)));
+	}
+
+	@Override
+	public void destroy() throws Exception
+	{
+		if (brokerFactoryBean != null)
+			brokerFactoryBean.destroy();
 	}
 }

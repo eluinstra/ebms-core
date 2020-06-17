@@ -21,7 +21,6 @@ import java.util.UUID;
 import javax.jms.ConnectionFactory;
 import javax.jms.JMSException;
 
-import org.apache.activemq.pool.PooledConnectionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -64,10 +63,10 @@ public class JMSConfig
 	@Qualifier("jtaTransactionManager")
 	PlatformTransactionManager jtaTransactionManager;
 
-	@Bean("brokerFactory")
-	public void brokerFactory() throws Exception
+	@Bean(name = "brokerFactory", destroyMethod = "destroy")
+	public EbMSBrokerFactoryBean brokerFactory() throws Exception
 	{
-		EbMSBrokerFactoryBean.init(jmsBrokerStart,jmsBrokerConfig);
+		return new EbMSBrokerFactoryBean(jmsBrokerStart,jmsBrokerUrl);
 	}
 
 	@Bean
@@ -76,7 +75,7 @@ public class JMSConfig
 		return new JmsTemplate(connectionFactory());
 	}
 
-	@Bean
+	@Bean(destroyMethod = "close")
 	@DependsOn("brokerFactory")
 	public ConnectionFactory connectionFactory() throws JMSException
 	{
@@ -102,7 +101,7 @@ public class JMSConfig
 				atomikosCF.init();
 				return atomikosCF;
 			default:
-				val defaultCF = new PooledConnectionFactory(jmsBrokerUrl);
+				val defaultCF = new CloseablePooledConnectionFactory(jmsBrokerUrl);
 				defaultCF.setMaxConnections(maxPoolSize);
 				return defaultCF;
 		}
