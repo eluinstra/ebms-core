@@ -44,7 +44,7 @@ public class EventProcessorConfig
 {
 	public enum EventProcessorType
 	{
-		NONE, DAO, JMS;
+		NONE, DEFAULT, JMS;
 	}
 	@Value("${eventProcessor.type}")
 	EventProcessorType eventProcessorType;
@@ -93,15 +93,7 @@ public class EventProcessorConfig
 	{
 		switch(eventProcessorType)
 		{
-			case DAO:
-				EbMSEventProcessor.builder()
-				.maxEvents(maxEvents)
-				.executionInterval(executionInterval)
-				.ebMSThreadPoolExecutor(new EbMSThreadPoolExecutor(minThreads,maxThreads))
-				.ebMSEventDAO(ebMSEventDAO)
-				.handleEventTaskBuilder(handleEventTaskBuilder())
-				.serverId(serverId)
-				.build();
+			case NONE:
 				return null;
 			case JMS:
 				val result = new DefaultMessageListenerContainer();
@@ -113,6 +105,14 @@ public class EventProcessorConfig
 				result.setMessageListener(new EbMSSendEventListener(handleEventTaskBuilder()));
 				return result;
 			default:
+				EbMSEventProcessor.builder()
+						.maxEvents(maxEvents)
+						.executionInterval(executionInterval)
+						.ebMSThreadPoolExecutor(new EbMSThreadPoolExecutor(minThreads,maxThreads))
+						.ebMSEventDAO(ebMSEventDAO)
+						.handleEventTaskBuilder(handleEventTaskBuilder())
+						.serverId(serverId)
+						.build();
 				return null;
 		}
 	}

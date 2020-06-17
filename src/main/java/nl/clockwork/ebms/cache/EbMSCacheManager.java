@@ -40,7 +40,7 @@ public class EbMSCacheManager
 	public enum CacheType
 	{
 		NONE(""),
-		EHCACHE("nl/clockwork/ebms/ehcache.xml"),
+		DEFAULT("nl/clockwork/ebms/ehcache.xml"),
 		IGNITE("nl/clockwork/ebms/ignite-cache.xml");
 		
 		String defaultConfigLocation;
@@ -57,9 +57,8 @@ public class EbMSCacheManager
 		configLocation = configLocation == null ? new ClassPathResource(type.defaultConfigLocation) : configLocation;
 		switch (type)
 		{
-			case EHCACHE:
-				ehcache = CacheManagerBuilder.newCacheManager(new XmlConfiguration(configLocation.getURL()));
-				ehcache.init();
+			case NONE:
+				ehcache = null;
 				ignite = null;
 				break;
 			case IGNITE:
@@ -67,7 +66,8 @@ public class EbMSCacheManager
 				ignite = Ignition.start(configLocation.getURL());
 				break;
 			default:
-				ehcache = null;
+				ehcache = CacheManagerBuilder.newCacheManager(new XmlConfiguration(configLocation.getURL()));
+				ehcache.init();
 				ignite = null;
 		}
 	}
@@ -76,7 +76,7 @@ public class EbMSCacheManager
 	{
 		switch (type)
 		{
-			case EHCACHE:
+			case DEFAULT:
 				return new EhCacheMethodCacheInterceptor(ehcache.getCache(cacheName,String.class,Object.class));
 			case IGNITE:
 				return new JMethodCacheInterceptor(ignite.getOrCreateCache(cacheName));
