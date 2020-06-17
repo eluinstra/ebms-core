@@ -57,7 +57,7 @@ public class TransactionManagerConfig
 				userTransactionManager.setForceShutdown(true);
 				return new JtaTransactionManager(userTransactionManager,userTransactionManager);
 			default:
-				return new NoneTransactionManager();
+				return new DummyTransactionManager();
 		}
 	}
 

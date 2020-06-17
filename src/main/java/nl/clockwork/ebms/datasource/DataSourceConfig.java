@@ -116,7 +116,8 @@ public class DataSourceConfig
 				atomikosDS.setMaxLifetime(maxLifetime);
 				atomikosDS.setMinPoolSize(minPoolSize);
 				atomikosDS.setMaxPoolSize(maxPoolSize);
-				atomikosDS.setTestQuery(testQuery);
+				if (StringUtils.isNotEmpty(testQuery))
+					atomikosDS.setTestQuery(testQuery);
 				atomikosDS.init();
 				return atomikosDS;
 			default:

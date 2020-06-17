@@ -20,7 +20,7 @@ import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.TransactionException;
 import org.springframework.transaction.TransactionStatus;
 
-public class NoneTransactionManager implements PlatformTransactionManager
+public class DummyTransactionManager implements PlatformTransactionManager
 {
 	@Override
 	public void rollback(TransactionStatus status) throws TransactionException
