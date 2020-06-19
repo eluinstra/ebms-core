@@ -33,8 +33,8 @@ import nl.clockwork.ebms.service.cpa.url.URLMapping;
 @AllArgsConstructor
 public class URLMapper
 {
-	@NonNull
-	CachingMethodInterceptor daoMethodCache;
+//	@NonNull
+//	CachingMethodInterceptor daoMethodCache;
 	@NonNull
 	URLMappingDAO urlMappingDAO;
 	Object urlMonitor = new Object();
@@ -101,8 +101,8 @@ public class URLMapper
 
 	private void flushDAOMethodCache(String source)
 	{
-		daoMethodCache.remove(EhCacheMethodCacheInterceptor.getKey("URLMapingDAOImpl","existsURLMapping",source));
-		daoMethodCache.remove(EhCacheMethodCacheInterceptor.getKey("URLMapingDAOImpl","getURLMapping",source));
-		daoMethodCache.remove(EhCacheMethodCacheInterceptor.getKey("URLMapingDAOImpl","getURLMappings"));
+//		daoMethodCache.remove(EhCacheMethodCacheInterceptor.getKey("URLMapingDAOImpl","existsURLMapping",source));
+//		daoMethodCache.remove(EhCacheMethodCacheInterceptor.getKey("URLMapingDAOImpl","getURLMapping",source));
+//		daoMethodCache.remove(EhCacheMethodCacheInterceptor.getKey("URLMapingDAOImpl","getURLMappings"));
 	}
 }

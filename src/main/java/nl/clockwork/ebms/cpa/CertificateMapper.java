@@ -31,8 +31,8 @@ import nl.clockwork.ebms.service.cpa.certificate.CertificateMapping;
 @AllArgsConstructor
 public class CertificateMapper
 {
-	@NonNull
-	CachingMethodInterceptor daoMethodCache;
+//	@NonNull
+//	CachingMethodInterceptor daoMethodCache;
 	@NonNull
 	CertificateMappingDAO certificateMappingDAO;
 	Object certificateMonitor = new Object();
@@ -76,8 +76,8 @@ public class CertificateMapper
 	
 	private void flushDAOMethodCache(String key)
 	{
-		daoMethodCache.remove(EhCacheMethodCacheInterceptor.getKey("CertificateMappingDAOImpl","existsCertificateMapping",key));
-		daoMethodCache.remove(EhCacheMethodCacheInterceptor.getKey("CertificateMappingDAOImpl","getCertificateMapping",key));
-		daoMethodCache.remove(EhCacheMethodCacheInterceptor.getKey("CertificateMappingDAOImpl","getCertificateMappings"));
+//		daoMethodCache.remove(EhCacheMethodCacheInterceptor.getKey("CertificateMappingDAOImpl","existsCertificateMapping",key));
+//		daoMethodCache.remove(EhCacheMethodCacheInterceptor.getKey("CertificateMappingDAOImpl","getCertificateMapping",key));
+//		daoMethodCache.remove(EhCacheMethodCacheInterceptor.getKey("CertificateMappingDAOImpl","getCertificateMappings"));
 	}
 }

@@ -15,18 +15,16 @@
     limitations under the License.
 
 -->
-<config
-    xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
-    xmlns='http://www.ehcache.org/v3'
-    xsi:schemaLocation="http://www.ehcache.org/v3 http://www.ehcache.org/schema/ehcache-core.xsd">
-
-	<cache alias="nl.clockwork.ebms.dao.METHOD_CACHE" uses-template="default" />
-	<cache alias="nl.clockwork.ebms.cpa.METHOD_CACHE" uses-template="default" />
-
-	<cache-template name="default">
-		<key-type>java.lang.String</key-type>
-		<value-type>java.lang.Object</value-type>
-		<heap unit="entries">10000</heap>
-	</cache-template>
-
-</config>
+<ehcache>
+  <diskStore path="java.io.tmpdir"/>
+	<defaultCache
+		maxElementsInMemory="10000"
+		eternal="false"
+		timeToIdleSeconds="120"
+		timeToLiveSeconds="120"
+		overflowToDisk="true"
+		maxElementsOnDisk="10000000"
+		diskExpiryThreadIntervalSeconds="120"
+		memoryStoreEvictionPolicy="LRU"
+	/>
+</ehcache>

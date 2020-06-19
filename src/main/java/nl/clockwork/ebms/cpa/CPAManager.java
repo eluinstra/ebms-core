@@ -19,12 +19,18 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
+import javax.cache.annotation.CacheRemove;
+import javax.cache.annotation.CacheRemoveAll;
+import javax.cache.annotation.CacheResult;
+
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CollaborationProtocolAgreement;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DeliveryChannel;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.PartyInfo;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.PersistenceLevelType;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.StatusValueType;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.SyncReplyModeType;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -47,24 +53,28 @@ public class CPAManager
 	CPADAO cpaDAO;
 	@NonNull
 	URLMapper urlMapper;
-	@NonNull
-	CachingMethodInterceptor cpaMethodCache;
+//	@NonNull
+//	CachingMethodInterceptor cpaMethodCache;
 
+	@CacheResult(cacheName = "existsCPA")
 	public boolean existsCPA(String cpaId)
 	{
 		return cpaDAO.existsCPA(cpaId);
 	}
 
+	@CacheResult(cacheName = "CPA")
 	public Optional<CollaborationProtocolAgreement> getCPA(String cpaId)
 	{
 		return cpaDAO.getCPA(cpaId);
 	}
 
+	@Cacheable(cacheNames = "CPAIds")
 	public List<String> getCPAIds()
 	{
 		return cpaDAO.getCPAIds();
 	}
 
+	@CacheEvict(cacheNames = {"existsCPA","CPA","CPAIds"}, allEntries = true)
 	public void insertCPA(CollaborationProtocolAgreement cpa)
 	{
 		cpaDAO.insertCPA(cpa);
@@ -320,6 +330,6 @@ public class CPAManager
 
 	private void flushCPAMethodCache(String cpaId)
 	{
-		cpaMethodCache.removeAll();
+		//cpaMethodCache.removeAll();
 	}
 }
