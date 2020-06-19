@@ -37,11 +37,6 @@ public class CertificateMapper
 	CertificateMappingDAO certificateMappingDAO;
 	Object certificateMonitor = new Object();
 
-	public static String getId(X509Certificate certificate)
-	{
-		return "issuer=" + certificate.getIssuerX500Principal().getName() + "; serialNr=" + certificate.getSerialNumber().toString();
-	}
-
 	public List<CertificateMapping> getCertificates()
 	{
 		return certificateMappingDAO.getCertificateMappings();
@@ -49,24 +44,23 @@ public class CertificateMapper
 
 	public X509Certificate getCertificate(X509Certificate certificate, String cpaId)
 	{
-		return certificate != null ? certificateMappingDAO.getCertificateMapping(getId(certificate),cpaId).orElse(certificate) : null;
+		return certificate != null ? certificateMappingDAO.getCertificateMapping(CertificateMapping.getId.apply(certificate),cpaId).orElse(certificate) : null;
 	}
 
 	public void setCertificateMapping(CertificateMapping mapping)
 	{
 		synchronized (certificateMonitor)
 		{
-			val id = getId(mapping.getSource());
 			if (mapping.getDestination() == null)
-				certificateMappingDAO.deleteCertificateMapping(id,mapping.getCpaId());
+				certificateMappingDAO.deleteCertificateMapping(mapping.getId(),mapping.getCpaId());
 			else
 			{
-				if (certificateMappingDAO.existsCertificateMapping(id,mapping.getCpaId()))
-					certificateMappingDAO.updateCertificateMapping(id,mapping);
+				if (certificateMappingDAO.existsCertificateMapping(mapping.getId(),mapping.getCpaId()))
+					certificateMappingDAO.updateCertificateMapping(mapping);
 				else
-					certificateMappingDAO.insertCertificateMapping(id,mapping);
+					certificateMappingDAO.insertCertificateMapping(mapping);
 			}
-			flushDAOMethodCache(id);
+			flushDAOMethodCache(mapping.getId());
 		}
 	}
 
@@ -74,7 +68,7 @@ public class CertificateMapper
 	{
 		synchronized (certificateMonitor)
 		{
-			val key = getId(source);
+			val key = CertificateMapping.getId.apply(source);
 			certificateMappingDAO.deleteCertificateMapping(key,cpaId);
 			flushDAOMethodCache(key);
 		}
@@ -82,9 +76,8 @@ public class CertificateMapper
 	
 	private void flushDAOMethodCache(String key)
 	{
-		//val targetName = certificateMappingDAO.toString().replaceFirst("^(.*\\.)*([^@]*)@.*$","$2");
-		daoMethodCache.remove(EhCacheMethodCacheInterceptor.getKey(certificateMappingDAO.getTargetName(),"existsCertificateMapping",key));
-		daoMethodCache.remove(EhCacheMethodCacheInterceptor.getKey(certificateMappingDAO.getTargetName(),"getCertificateMapping",key));
-		daoMethodCache.remove(EhCacheMethodCacheInterceptor.getKey(certificateMappingDAO.getTargetName(),"getCertificateMappings"));
+		daoMethodCache.remove(EhCacheMethodCacheInterceptor.getKey("CertificateMappingDAOImpl","existsCertificateMapping",key));
+		daoMethodCache.remove(EhCacheMethodCacheInterceptor.getKey("CertificateMappingDAOImpl","getCertificateMapping",key));
+		daoMethodCache.remove(EhCacheMethodCacheInterceptor.getKey("CertificateMappingDAOImpl","getCertificateMappings"));
 	}
 }

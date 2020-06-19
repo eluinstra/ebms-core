@@ -1,0 +1,64 @@
+package nl.clockwork.ebms.querydsl.model;
+
+import static com.querydsl.core.types.PathMetadataFactory.*;
+
+import com.querydsl.core.types.dsl.*;
+
+import com.querydsl.core.types.PathMetadata;
+import javax.annotation.Generated;
+
+import com.querydsl.core.types.Path;
+
+import com.querydsl.sql.ColumnMetadata;
+import java.sql.Types;
+
+
+
+
+/**
+ * QCpa is a Querydsl query type for QCpa
+ */
+@Generated("com.querydsl.sql.codegen.MetaDataSerializer")
+public class QCpa extends com.querydsl.sql.RelationalPathBase<QCpa> {
+
+    private static final long serialVersionUID = 1655323765;
+
+    public static final QCpa cpa1 = new QCpa("CPA");
+
+    public final SimplePath<org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CollaborationProtocolAgreement> cpa =
+    		createSimple("cpa", org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CollaborationProtocolAgreement.class);
+
+    public final StringPath cpaId = createString("cpaId");
+
+    public QCpa(String variable) {
+        super(QCpa.class, forVariable(variable), "PUBLIC", "CPA");
+        addMetadata();
+    }
+
+    public QCpa(String variable, String schema, String table) {
+        super(QCpa.class, forVariable(variable), schema, table);
+        addMetadata();
+    }
+
+    public QCpa(String variable, String schema) {
+        super(QCpa.class, forVariable(variable), schema, "CPA");
+        addMetadata();
+    }
+
+    public QCpa(Path<? extends QCpa> path) {
+        super(path.getType(), path.getMetadata(), "PUBLIC", "CPA");
+        addMetadata();
+    }
+
+    public QCpa(PathMetadata metadata) {
+        super(QCpa.class, metadata, "PUBLIC", "CPA");
+        addMetadata();
+    }
+
+    public void addMetadata() {
+        addMetadata(cpa, ColumnMetadata.named("CPA").withIndex(2).ofType(Types.CLOB).withSize(1073741824).notNull());
+        addMetadata(cpaId, ColumnMetadata.named("CPA_ID").withIndex(1).ofType(Types.VARCHAR).withSize(256).notNull());
+    }
+
+}
+

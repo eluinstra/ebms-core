@@ -424,57 +424,57 @@
 					</execution>
 				</executions>
 			</plugin>
-<!-- 			<plugin> -->
-<!-- 				<groupId>org.codehaus.mojo</groupId> -->
-<!-- 				<artifactId>jaxb2-maven-plugin</artifactId> -->
-<!-- 				<version>2.5.0</version> -->
-<!-- 				<executions> -->
-<!-- 					<execution> -->
-<!-- 						<goals> -->
-<!-- 							<goal>xjc</goal> -->
-<!-- 						</goals> -->
-<!-- 						<configuration> -->
-<!-- 							<target>2.1</target> -->
-<!-- 							<sources> -->
-<!-- 								<source>src/main/resources/nl/clockwork/ebms/xsd/cpp-cpa-2_0.xsd</source> -->
-<!-- 								<source>src/main/resources/nl/clockwork/ebms/xsd/msg-header-2_0.xsd</source> -->
-<!-- 							</sources> -->
-<!-- 							<xjbSources> -->
-<!-- 								<xjbSource>src/main/resources/nl/clockwork/ebms/xsd/cpp-cpa-2_0.xjb</xjbSource> -->
-<!-- 								<xjbSource>src/main/resources/nl/clockwork/ebms/xsd/msg-header-2_0.xjb</xjbSource> -->
-<!-- 							</xjbSources> -->
-<!-- 							<extension>true</extension> -->
-<!-- 							<clearOutputDir>false</clearOutputDir> -->
-<!-- 							<verbose>false</verbose> -->
-<!-- 						</configuration> -->
-<!-- 					</execution> -->
-<!-- 				</executions> -->
-<!-- 			</plugin> -->
-<!-- 			<plugin> -->
-<!-- 				<groupId>org.jvnet.jaxb2.maven2</groupId> -->
-<!-- 				<artifactId>maven-jaxb2-plugin</artifactId> -->
-<!-- 				<version>0.14.0</version> -->
-<!-- 				<executions> -->
-<!-- 					<execution> -->
-<!-- 						<goals> -->
-<!-- 							<goal>generate</goal> -->
-<!-- 						</goals> -->
-<!-- 						<configuration> -->
-<!-- 							<schemaDirectory>${project.basedir}/src/main/resources/nl/clockwork/ebms/xsd/</schemaDirectory> -->
-<!-- 							<schemaIncludes> -->
-<!-- 								<include>*.xsd</include> -->
-<!-- 							</schemaIncludes> -->
-<!-- 							<bindingDirectory>${project.basedir}/src/main/resources/nl/clockwork/ebms/xsd/</bindingDirectory> -->
-<!-- 							<bindingIncludes> -->
-<!-- 								<include>*.xjb</include> -->
-<!-- 							</bindingIncludes> -->
-<!-- 							<extension>true</extension> -->
-<!-- 							<clearOutputDir>false</clearOutputDir> -->
-<!-- 							<verbose>false</verbose> -->
-<!-- 						</configuration> -->
-<!-- 					</execution> -->
-<!-- 				</executions> -->
-<!-- 			</plugin> -->
+			<!--plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>jaxb2-maven-plugin</artifactId>
+				<version>2.5.0</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>xjc</goal>
+						</goals>
+						<configuration>
+							<target>2.1</target>
+							<sources>
+								<source>src/main/resources/nl/clockwork/ebms/xsd/cpp-cpa-2_0.xsd</source>
+								<source>src/main/resources/nl/clockwork/ebms/xsd/msg-header-2_0.xsd</source>
+							</sources>
+							<xjbSources>
+								<xjbSource>src/main/resources/nl/clockwork/ebms/xsd/cpp-cpa-2_0.xjb</xjbSource>
+								<xjbSource>src/main/resources/nl/clockwork/ebms/xsd/msg-header-2_0.xjb</xjbSource>
+							</xjbSources>
+							<extension>true</extension>
+							<clearOutputDir>false</clearOutputDir>
+							<verbose>false</verbose>
+						</configuration>
+					</execution>
+ 				</executions>
+			</plugin-->
+			<!--plugin>
+				<groupId>org.jvnet.jaxb2.maven2</groupId>
+				<artifactId>maven-jaxb2-plugin</artifactId>
+				<version>0.14.0</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>generate</goal>
+						</goals>
+						<configuration>
+							<schemaDirectory>${project.basedir}/src/main/resources/nl/clockwork/ebms/xsd/</schemaDirectory>
+							<schemaIncludes>
+								<include>*.xsd</include>
+							</schemaIncludes>
+							<bindingDirectory>${project.basedir}/src/main/resources/nl/clockwork/ebms/xsd/</bindingDirectory>
+							<bindingIncludes>
+								<include>*.xjb</include>
+							</bindingIncludes>
+							<extension>true</extension>
+							<clearOutputDir>false</clearOutputDir>
+							<verbose>false</verbose>
+						</configuration>
+					</execution>
+ 				</executions>
+			</plugin-->
 			<!--plugin>
 				<groupId>com.querydsl</groupId>
 				<artifactId>querydsl-maven-plugin</artifactId>
@@ -492,17 +492,23 @@
 					<packageName>nl.clockwork.ebms.querydsl.model</packageName>
 					<targetFolder>${project.basedir}/target/generated-sources/java</targetFolder>
 					<customTypes>
+						<customType>nl.clockwork.ebms.querydsl.CollaborationProtocolAgreementType</customType>
 						<customType>nl.clockwork.ebms.querydsl.X509CertificateType</customType>
 					</customTypes>
 					<typeMappings>
 						<typeMapping>
+							<table>CPA</table>
+							<column>CPA</column>
+							<type>org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CollaborationProtocolAgreement</type>
+						</typeMapping>
+						<typeMapping>
 							<table>CERTIFICATE_MAPPING</table>
-							<column>source</column>
+							<column>SOURCE</column>
 							<type>java.security.cert.X509Certificate</type>
 						</typeMapping>
 						<typeMapping>
 							<table>CERTIFICATE_MAPPING</table>
-							<column>destination</column>
+							<column>DESTINATION</column>
 							<type>java.security.cert.X509Certificate</type>
 						</typeMapping>
 					</typeMappings>

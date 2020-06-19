@@ -24,7 +24,6 @@ import lombok.NonNull;
 import lombok.val;
 import lombok.experimental.FieldDefaults;
 import nl.clockwork.ebms.cpa.CPAManager;
-import nl.clockwork.ebms.dao.DAOException;
 import nl.clockwork.ebms.service.model.EbMSMessageContext;
 import nl.clockwork.ebms.service.model.Party;
 
@@ -61,84 +60,77 @@ public class EbMSMessageContextValidator
 
 	public void validate(EbMSMessageContext context) throws ValidatorException
 	{
-		try
+		if (StringUtils.isEmpty(context.getCpaId()))
+			throw new ValidationException("context.cpaId cannot be empty!");
+		if (isEmpty(context.getFromParty()))
+			throw new ValidationException("context.fromParty cannot be empty!");
+		if (StringUtils.isEmpty(context.getService()))
+			throw new ValidationException("context.service cannot be empty!");
+		if (StringUtils.isEmpty(context.getAction()))
+			throw new ValidationException("context.action cannot be empty!");
+
+		if (!cpaManager.existsCPA(context.getCpaId()))
+			throw new ValidationException("No CPA found for: context.cpaId=" + context.getCpaId());
+
+		val fromPartyInfo =
+				cpaManager.getFromPartyInfo(context.getCpaId(),context.getFromParty(),context.getService(),context.getAction());
+		if (!fromPartyInfo.isPresent())
 		{
-			if (StringUtils.isEmpty(context.getCpaId()))
-				throw new ValidationException("context.cpaId cannot be empty!");
-			if (isEmpty(context.getFromParty()))
-				throw new ValidationException("context.fromParty cannot be empty!");
-			if (StringUtils.isEmpty(context.getService()))
-				throw new ValidationException("context.service cannot be empty!");
-			if (StringUtils.isEmpty(context.getAction()))
-				throw new ValidationException("context.action cannot be empty!");
-
-			if (!cpaManager.existsCPA(context.getCpaId()))
-				throw new ValidationException("No CPA found for: context.cpaId=" + context.getCpaId());
-
-			val fromPartyInfo =
-					cpaManager.getFromPartyInfo(context.getCpaId(),context.getFromParty(),context.getService(),context.getAction());
-			if (!fromPartyInfo.isPresent())
+			val msg = new StringBuffer();
+			msg.append("No CanSend action found for:");
+			msg.append(" context.cpaId=").append(context.getCpaId());
+			if (context.getFromParty() != null)
 			{
-				val msg = new StringBuffer();
-				msg.append("No CanSend action found for:");
-				msg.append(" context.cpaId=").append(context.getCpaId());
-				if (context.getFromParty() != null)
-				{
-					msg.append(", context.FromParty.partyId=").append(context.getFromParty().getPartyId());
-					msg.append(", context.FromParty.role=").append(context.getFromParty().getRole());
-				}
-				msg.append(", context.service=").append(context.getService());
-				msg.append(", context.action=").append(context.getAction());
-				throw new ValidationException(msg.toString());
+				msg.append(", context.FromParty.partyId=").append(context.getFromParty().getPartyId());
+				msg.append(", context.FromParty.role=").append(context.getFromParty().getRole());
 			}
-
-			val toPartyInfo =
-					cpaManager.getToPartyInfo(context.getCpaId(),context.getToParty(),context.getService(),context.getAction());
-			if (fromPartyInfo.get().getCanSend().getOtherPartyActionBinding() == null && !toPartyInfo.isPresent())
-			{
-				val msg = new StringBuffer();
-				msg.append("No CanReceive action found for:");
-				msg.append(" context.cpaId=").append(context.getCpaId());
-				if (fromPartyInfo.get().getCanSend().getOtherPartyActionBinding() != null && context.getFromParty() != null)
-				{
-					msg.append(", context.FromParty.partyId=").append(context.getFromParty().getPartyId());
-					msg.append(", context.FromParty.role=").append(context.getFromParty().getRole());
-				}
-				if (context.getToParty() != null)
-				{
-					msg.append(", context.ToParty.partyId=").append(context.getToParty().getPartyId());
-					msg.append(", context.ToParty.role=").append(context.getToParty().getRole());
-				}
-				msg.append(", context.service=").append(context.getService());
-				msg.append(", context.action=").append(context.getAction());
-				throw new ValidationException(msg.toString());
-			}
-			else if (fromPartyInfo.get().getCanSend().getOtherPartyActionBinding() != null
-					&& toPartyInfo.isPresent()
-					&& !equals(toPartyInfo.get().getCanReceive().getThisPartyActionBinding(),fromPartyInfo.get().getCanSend().getOtherPartyActionBinding()))
-			{
-				val msg = new StringBuffer();
-				msg.append("Action for to party does not match action for from party for:");
-				msg.append(" context.cpaId=").append(context.getCpaId());
-				if (fromPartyInfo.get().getCanSend().getOtherPartyActionBinding() != null && context.getFromParty() != null)
-				{
-					msg.append(", context.FromParty.partyId=").append(context.getFromParty().getPartyId());
-					msg.append(", context.FromParty.role=").append(context.getFromParty().getRole());
-				}
-				if (context.getToParty() != null)
-				{
-					msg.append(", context.ToParty.partyId=").append(context.getToParty().getPartyId());
-					msg.append(", context.ToParty.role=").append(context.getToParty().getRole());
-				}
-				msg.append(", context.service=").append(context.getService());
-				msg.append(", context.action=").append(context.getAction());
-				msg.append(". context.ToParty is optional!");
-				throw new ValidationException(msg.toString());
-			}
+			msg.append(", context.service=").append(context.getService());
+			msg.append(", context.action=").append(context.getAction());
+			throw new ValidationException(msg.toString());
 		}
-		catch (DAOException e)
+
+		val toPartyInfo =
+				cpaManager.getToPartyInfo(context.getCpaId(),context.getToParty(),context.getService(),context.getAction());
+		if (fromPartyInfo.get().getCanSend().getOtherPartyActionBinding() == null && !toPartyInfo.isPresent())
 		{
-			throw new ValidatorException(e);
+			val msg = new StringBuffer();
+			msg.append("No CanReceive action found for:");
+			msg.append(" context.cpaId=").append(context.getCpaId());
+			if (fromPartyInfo.get().getCanSend().getOtherPartyActionBinding() != null && context.getFromParty() != null)
+			{
+				msg.append(", context.FromParty.partyId=").append(context.getFromParty().getPartyId());
+				msg.append(", context.FromParty.role=").append(context.getFromParty().getRole());
+			}
+			if (context.getToParty() != null)
+			{
+				msg.append(", context.ToParty.partyId=").append(context.getToParty().getPartyId());
+				msg.append(", context.ToParty.role=").append(context.getToParty().getRole());
+			}
+			msg.append(", context.service=").append(context.getService());
+			msg.append(", context.action=").append(context.getAction());
+			throw new ValidationException(msg.toString());
+		}
+		else if (fromPartyInfo.get().getCanSend().getOtherPartyActionBinding() != null
+				&& toPartyInfo.isPresent()
+				&& !equals(toPartyInfo.get().getCanReceive().getThisPartyActionBinding(),fromPartyInfo.get().getCanSend().getOtherPartyActionBinding()))
+		{
+			val msg = new StringBuffer();
+			msg.append("Action for to party does not match action for from party for:");
+			msg.append(" context.cpaId=").append(context.getCpaId());
+			if (fromPartyInfo.get().getCanSend().getOtherPartyActionBinding() != null && context.getFromParty() != null)
+			{
+				msg.append(", context.FromParty.partyId=").append(context.getFromParty().getPartyId());
+				msg.append(", context.FromParty.role=").append(context.getFromParty().getRole());
+			}
+			if (context.getToParty() != null)
+			{
+				msg.append(", context.ToParty.partyId=").append(context.getToParty().getPartyId());
+				msg.append(", context.ToParty.role=").append(context.getToParty().getRole());
+			}
+			msg.append(", context.service=").append(context.getService());
+			msg.append(", context.action=").append(context.getAction());
+			msg.append(". context.ToParty is optional!");
+			throw new ValidationException(msg.toString());
 		}
 	}
 

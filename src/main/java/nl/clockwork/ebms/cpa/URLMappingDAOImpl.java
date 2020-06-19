@@ -18,17 +18,17 @@ package nl.clockwork.ebms.cpa;
 import java.util.List;
 import java.util.Optional;
 
-import org.springframework.dao.DataAccessException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.querydsl.sql.SQLQueryFactory;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.NonNull;
 import lombok.val;
 import lombok.experimental.FieldDefaults;
-import nl.clockwork.ebms.dao.DAOException;
 import nl.clockwork.ebms.querydsl.model.QUrlMapping;
 import nl.clockwork.ebms.service.cpa.url.URLMapping;
 
@@ -36,143 +36,90 @@ import nl.clockwork.ebms.service.cpa.url.URLMapping;
 @AllArgsConstructor
 public class URLMappingDAOImpl implements URLMappingDAO
 {
+	@NonNull
 	JdbcTemplate jdbcTemplate;
+	@NonNull
 	SQLQueryFactory queryFactory;
 	QUrlMapping table = QUrlMapping.urlMapping;
 
 	@Override
-	public boolean existsURLMapping(String source) throws DAOException
+	public boolean existsURLMapping(String source)
 	{
+		//"select count(*) from url_mapping where source = ?"
 		val query = queryFactory.select(table.source.count())
 				.from(table)
 				.where(table.source.eq(source))
 				.getSQL();
-		try
-		{
-			return jdbcTemplate.queryForObject(
+		return jdbcTemplate.queryForObject(
 				query.getSQL(),
 				Integer.class,
-				query.getNullFriendlyBindings().toArray()
-			) > 0;
-		}
-		catch (DataAccessException e)
-		{
-			throw new DAOException(e);
-		}
+				query.getNullFriendlyBindings().toArray()) > 0;
 	}
 
 	@Override
-	public Optional<String> getURLMapping(String source) throws DAOException
+	public Optional<String> getURLMapping(String source)
 	{
-		val query = queryFactory.select(table.source)
-				.from(table)
-				.where(table.source.eq(source))
-				.getSQL();
 		try
 		{
+			//"select destination from url_mapping where source = ?"
+			val query = queryFactory.select(table.source)
+					.from(table)
+					.where(table.source.eq(source))
+					.getSQL();
 			return Optional.of(jdbcTemplate.queryForObject(
-				query.getSQL(),
-				String.class,
-				query.getNullFriendlyBindings().toArray()
-			));
+					query.getSQL(),
+					String.class,
+					query.getNullFriendlyBindings().toArray()));
 		}
 		catch(EmptyResultDataAccessException e)
 		{
 			return Optional.empty();
 		}
-		catch (DataAccessException e)
-		{
-			throw new DAOException(e);
-		}
 	}
 
 	@Override
-	public List<URLMapping> getURLMappings() throws DAOException
+	public List<URLMapping> getURLMappings()
 	{
+		//"select source, destination from url_mapping order by source asc"
 		val query = queryFactory.select(table.source,table.destination)
 				.from(table)
+				.orderBy(table.source.asc())
 				.getSQL();
-		try
-		{
-			return jdbcTemplate.query(
+		return jdbcTemplate.query(
 				query.getSQL(),
 				(rs,rowNum) ->
 				{
 					return new URLMapping(rs.getString("source"),rs.getString("destination"));
-				}
-			);
-		}
-		catch (DataAccessException e)
-		{
-			throw new DAOException(e);
-		}
+				},
+				query.getNullFriendlyBindings().toArray());
 	}
 
 	@Override
-	public void insertURLMapping(URLMapping urlMapping) throws DAOException
+	@Transactional(transactionManager = "dataSourceTransactionManager")
+	public long insertURLMapping(URLMapping urlMapping)
 	{
-		val query = queryFactory.insert(table)
+		return queryFactory.insert(table)
 				.set(table.source,urlMapping.getSource())
 				.set(table.destination,urlMapping.getDestination())
-				.getSQL();
-		try
-		{
-			jdbcTemplate.update
-			(
-				query.get(0).getSQL(),
-				query.get(0).getNullFriendlyBindings().toArray()
-			);
-		}
-		catch (DataAccessException e)
-		{
-			throw new DAOException(e);
-		}
+				.execute();
 	}
 
 	@Override
-	public int updateURLMapping(URLMapping urlMapping) throws DAOException
+	@Transactional(transactionManager = "dataSourceTransactionManager")
+	public long updateURLMapping(URLMapping urlMapping)
 	{
-		val query = queryFactory.update(table)
+		return queryFactory.update(table)
 				.set(table.destination,urlMapping.getDestination())
 				.where(table.source.eq(urlMapping.getSource()))
-				.getSQL();
-		try
-		{
-			return jdbcTemplate.update
-			(
-				query.get(0).getSQL(),
-				query.get(0).getNullFriendlyBindings().toArray()
-			);
-		}
-		catch (DataAccessException e)
-		{
-			throw new DAOException(e);
-		}
+				.execute();
 	}
 
 	@Override
-	public int deleteURLMapping(String source) throws DAOException
+	@Transactional(transactionManager = "dataSourceTransactionManager")
+	public long deleteURLMapping(String source)
 	{
-		val query = queryFactory.delete(table)
+		return queryFactory.delete(table)
 				.where(table.source.eq(source))
-				.getSQL();
-		try
-		{
-			return jdbcTemplate.update
-			(
-				query.get(0).getSQL(),
-				query.get(0).getNullFriendlyBindings().toArray()
-			);
-		}
-		catch (DataAccessException e)
-		{
-			throw new DAOException(e);
-		}
-	}
-
-	@Override
-	public final String getTargetName()
-	{
-		return getClass().getSimpleName();
+				.execute();
 	}
 }

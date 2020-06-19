@@ -44,7 +44,6 @@ import nl.clockwork.ebms.client.DeliveryManager;
 import nl.clockwork.ebms.cpa.CPAManager;
 import nl.clockwork.ebms.cpa.CPAUtils;
 import nl.clockwork.ebms.cpa.CacheablePartyId;
-import nl.clockwork.ebms.dao.DAOException;
 import nl.clockwork.ebms.dao.EbMSDAO;
 import nl.clockwork.ebms.event.listener.EbMSMessageEventDAO;
 import nl.clockwork.ebms.event.listener.EbMSMessageEventType;
@@ -324,9 +323,9 @@ public class EbMSMessageServiceImpl implements EbMSMessageService
 				ebMSDAO.insertMessage(timestamp,persistTime,document,message,message.getAttachments(),EbMSMessageStatus.SENDING);
 				eventManager.createEvent(messageHeader.getCPAId(),sendDeliveryChannel,receiveDeliveryChannel,messageHeader.getMessageData().getMessageId(),messageHeader.getMessageData().getTimeToLive(),messageHeader.getMessageData().getTimestamp(),confidential);
 			}
-			catch (IllegalStateException | DAOException | TransformerFactoryConfigurationError e)
+			catch (IllegalStateException | TransformerFactoryConfigurationError e)
 			{
-				throw new EbMSProcessorException();
+				throw new EbMSProcessorException(e);
 			}
 		};
 		ebMSDAO.executeTransaction(action);

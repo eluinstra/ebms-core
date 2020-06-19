@@ -18,16 +18,14 @@ package nl.clockwork.ebms.cpa;
 import java.util.List;
 import java.util.Optional;
 
-import nl.clockwork.ebms.dao.DAOException;
 import nl.clockwork.ebms.service.cpa.url.URLMapping;
 
 public interface URLMappingDAO
 {
-	boolean existsURLMapping(String source) throws DAOException;
-	Optional<String> getURLMapping(String source) throws DAOException;
-	List<URLMapping> getURLMappings() throws DAOException;
-	void insertURLMapping(URLMapping urlMapping) throws DAOException;
-	int updateURLMapping(URLMapping urlMapping) throws DAOException;
-	int deleteURLMapping(String source) throws DAOException;
-	String getTargetName();
+	boolean existsURLMapping(String source);
+	Optional<String> getURLMapping(String source);
+	List<URLMapping> getURLMappings();
+	long insertURLMapping(URLMapping urlMapping);
+	long updateURLMapping(URLMapping urlMapping);
+	long deleteURLMapping(String source);
 }

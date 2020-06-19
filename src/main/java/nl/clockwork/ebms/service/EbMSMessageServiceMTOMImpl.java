@@ -23,7 +23,6 @@ import lombok.val;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import nl.clockwork.ebms.EbMSMessageUtils;
-import nl.clockwork.ebms.dao.DAOException;
 import nl.clockwork.ebms.event.listener.EbMSMessageEventType;
 import nl.clockwork.ebms.service.model.EbMSMessageContentMTOM;
 import nl.clockwork.ebms.service.model.EbMSMessageContext;
@@ -87,7 +86,7 @@ public class EbMSMessageServiceMTOMImpl implements EbMSMessageServiceMTOM
 				processMessage(messageId);
 			return ebMSMessageService.ebMSDAO.getMessageContentMTOM(messageId).orElse(null);
 		}
-		catch (DAOException e)
+		catch (Exception e)
 		{
 			log.error("GetMessage " + messageId,e);
 			throw new EbMSMessageServiceException(e);

@@ -34,28 +34,28 @@ import nl.clockwork.ebms.service.model.EbMSMessageContext;
 
 public interface EbMSDAO
 {
-	void executeTransaction(Action action) throws DAOException;
+	void executeTransaction(Action action);
 
-	boolean existsMessage(String messageId) throws DAOException;
-	boolean existsIdenticalMessage(EbMSBaseMessage message) throws DAOException;
+	boolean existsMessage(String messageId);
+	boolean existsIdenticalMessage(EbMSBaseMessage message);
 
-	Optional<EbMSMessageContent> getMessageContent(String messageId) throws DAOException;
-	Optional<EbMSMessageContentMTOM> getMessageContentMTOM(String messageId) throws DAOException;
-	Optional<EbMSMessageContext> getMessageContext(String messageId) throws DAOException;
-	Optional<EbMSMessageContext> getMessageContextByRefToMessageId(String cpaId, String refToMessageId, EbMSAction...actions) throws DAOException;
-	Optional<Document> getDocument(String messageId) throws DAOException;
-	Optional<EbMSDocument> getEbMSDocumentIfUnsent(String messageId) throws DAOException;
-	Optional<EbMSDocument> getEbMSDocumentByRefToMessageId(String cpaId, String refToMessageId, EbMSAction...actions) throws DAOException;
-	Optional<EbMSMessageStatus> getMessageStatus(String messageId) throws DAOException;
+	Optional<EbMSMessageContent> getMessageContent(String messageId);
+	Optional<EbMSMessageContentMTOM> getMessageContentMTOM(String messageId);
+	Optional<EbMSMessageContext> getMessageContext(String messageId);
+	Optional<EbMSMessageContext> getMessageContextByRefToMessageId(String cpaId, String refToMessageId, EbMSAction...actions);
+	Optional<Document> getDocument(String messageId);
+	Optional<EbMSDocument> getEbMSDocumentIfUnsent(String messageId);
+	Optional<EbMSDocument> getEbMSDocumentByRefToMessageId(String cpaId, String refToMessageId, EbMSAction...actions);
+	Optional<EbMSMessageStatus> getMessageStatus(String messageId);
 	Optional<Instant> getPersistTime(String messageId);
 
-	List<String> getMessageIds(EbMSMessageContext messageContext, EbMSMessageStatus status) throws DAOException;
-	List<String> getMessageIds(EbMSMessageContext messageContext, EbMSMessageStatus status, int maxNr) throws DAOException;
+	List<String> getMessageIds(EbMSMessageContext messageContext, EbMSMessageStatus status);
+	List<String> getMessageIds(EbMSMessageContext messageContext, EbMSMessageStatus status, int maxNr);
 
-	void insertMessage(Instant timestamp, Instant persistTime, Document document, EbMSBaseMessage message, List<EbMSAttachment> attachments, EbMSMessageStatus status) throws DAOException;
-	void insertDuplicateMessage(Instant timestamp, Document document, EbMSBaseMessage message, List<EbMSAttachment> attachments) throws DAOException;
+	void insertMessage(Instant timestamp, Instant persistTime, Document document, EbMSBaseMessage message, List<EbMSAttachment> attachments, EbMSMessageStatus status);
+	void insertDuplicateMessage(Instant timestamp, Document document, EbMSBaseMessage message, List<EbMSAttachment> attachments);
 
-	int updateMessage(String messageId, EbMSMessageStatus oldStatus, EbMSMessageStatus newStatus) throws DAOException;
+	int updateMessage(String messageId, EbMSMessageStatus oldStatus, EbMSMessageStatus newStatus);
 
 	void deleteAttachments(String messageId);
 

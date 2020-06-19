@@ -15,57 +15,44 @@
  */
 package nl.clockwork.ebms.cpa;
 
-import java.sql.Connection;
-import java.sql.Types;
-
-import javax.inject.Provider;
 import javax.sql.DataSource;
 
 import org.springframework.aop.framework.ProxyFactoryBean;
 import org.springframework.aop.support.RegexpMethodPointcutAdvisor;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.jdbc.core.JdbcTemplate;
 
-import com.querydsl.sql.HSQLDBTemplates;
 import com.querydsl.sql.SQLQueryFactory;
-import com.querydsl.sql.SQLTemplates;
-import com.querydsl.sql.spring.SpringConnectionProvider;
-import com.querydsl.sql.spring.SpringExceptionTranslator;
 
 import lombok.AccessLevel;
 import lombok.val;
 import lombok.experimental.FieldDefaults;
 import nl.clockwork.ebms.cache.CachingMethodInterceptor;
 import nl.clockwork.ebms.cache.EbMSCacheManager;
-import nl.clockwork.ebms.querydsl.X509CertificateType;
 
 @Configuration
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class CPAManagerConfig
 {
 	@Autowired
-	CPADAO cpaDAO;
-	@Autowired
-	@Qualifier("ebMSDAOMethodCacheInterceptor")
-	CachingMethodInterceptor daoMethodCache;
-	@Autowired
 	BeanFactory beanFactory;
 	@Autowired
 	EbMSCacheManager cacheManager;
 	@Autowired
 	DataSource dataSource;
+	@Autowired
+	SQLQueryFactory queryFactory;
 
 	@Bean
 	@DependsOn("cpaManagerMethodCachePointCut")
 	public CPAManager cpaManager() throws Exception
 	{
 		val result = new ProxyFactoryBean();
-		val cpaManager = new CPAManager(daoMethodCache,cpaMethodCacheInterceptor(),cpaDAO,urlMapper());
+		val cpaManager = new CPAManager(cpaDAO(),urlMapper(),cpaMethodCacheInterceptor());
 		result.setBeanFactory(beanFactory);
 		result.setTarget(cpaManager);
 		result.setInterceptorNames("cpaManagerMethodCachePointCut");
@@ -76,9 +63,9 @@ public class CPAManagerConfig
 	public RegexpMethodPointcutAdvisor cpaManagerMethodCachePointCut() throws Exception
 	{
 		val patterns = new String[]{
-				//".*existsCPA",
-				//".*getCPA",
-				//".*getCPAIds,
+				".*existsCPA",
+				".*getCPA",
+				".*getCPAIds",
 				".*existsPartyId",
 				".*getEbMSPartyInfo",
 				".*getPartyInfo",
@@ -107,32 +94,41 @@ public class CPAManagerConfig
 	@Bean
 	public URLMapper urlMapper() throws Exception
 	{
-		return new URLMapper(daoMethodCache,urlMappingDAO());
+		return new URLMapper(ebMSDAOMethodCacheInterceptor(),urlMappingDAO());
 	}
 
 	@Bean
 	public CertificateMapper certificateMapper() throws Exception
 	{
-		return new CertificateMapper(daoMethodCache,certificateMappingDAO());
+		return new CertificateMapper(ebMSDAOMethodCacheInterceptor(),certificateMappingDAO());
+	}
+
+	@Bean
+	public CPADAO cpaDAO() throws Exception
+	{
+		val jdbcTemplate = new JdbcTemplate(dataSource);
+		return new CPADAOImpl(jdbcTemplate,queryFactory);
 	}
 
 	@Bean
 	public URLMappingDAO urlMappingDAO() throws Exception
 	{
-		val result = new ProxyFactoryBean();
+//		val result = new ProxyFactoryBean();
 		JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
-		val dao = new URLMappingDAOImpl(jdbcTemplate,queryFactory());
-		result.setBeanFactory(beanFactory);
-		result.setTarget(dao);
-		result.setInterceptorNames("ebMSDAOMethodCachePointCut");
-		return (URLMappingDAO)result.getObject();
+		val dao = new URLMappingDAOImpl(jdbcTemplate,queryFactory);
+		return dao;
+//		result.setBeanFactory(beanFactory);
+//		result.setTarget(dao);
+//		result.setInterceptorNames("ebMSDAOMethodCachePointCut");
+//		return (URLMappingDAO)result.getObject();
 	}
 
 	@Bean
 	public CertificateMappingDAO certificateMappingDAO() throws Exception
 	{
 //		val result = new ProxyFactoryBean();
-		val dao = new CertificateMappingDAOImpl(queryFactory());
+		JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
+		val dao = new CertificateMappingDAOImpl(jdbcTemplate,queryFactory);
 		return dao;
 //		result.setBeanFactory(beanFactory);
 //		result.setTarget(dao);
@@ -140,21 +136,25 @@ public class CPAManagerConfig
 //		return (CertificateMappingDAO)result.getObject();
 	}
 
-	@Bean
-	public SQLQueryFactory queryFactory()
+	@Bean(name = "ebMSDAOMethodCachePointCut")
+	public RegexpMethodPointcutAdvisor ebMSDAOMethodCachePointCut() throws Exception
 	{
-		Provider<Connection> provider = new SpringConnectionProvider(dataSource);
-		return new SQLQueryFactory(querydslConfiguration(),provider);
+		val patterns = new String[]{
+//				".*existsCPA",
+//				".*getCPA",
+//				".*getCPAIds",
+				".*existsURLMapping",
+				".*getURLMapping",
+				".*getURLMappings",
+				".*existsCertificateMapping",
+				".*getCertificateMapping",
+				".*getCertificateMappings"};
+		return new RegexpMethodPointcutAdvisor(patterns,ebMSDAOMethodCacheInterceptor());
 	}
 
 	@Bean
-	public com.querydsl.sql.Configuration querydslConfiguration()
+	public CachingMethodInterceptor ebMSDAOMethodCacheInterceptor() throws Exception
 	{
-		SQLTemplates templates = HSQLDBTemplates.builder().build(); // change to your Templates
-		com.querydsl.sql.Configuration configuration = new com.querydsl.sql.Configuration(templates);
-		configuration.setExceptionTranslator(new SpringExceptionTranslator());
-		configuration.register("CERTIFICATE_MAPPING","source",new X509CertificateType(Types.BLOB));
-		configuration.register("CERTIFICATE_MAPPING","destination",new X509CertificateType(Types.BLOB));
-		return configuration;
+		return cacheManager.getMethodInterceptor("nl.clockwork.ebms.dao.METHOD_CACHE");
 	}
 }

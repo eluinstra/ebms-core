@@ -51,7 +51,6 @@ import nl.clockwork.ebms.cpa.CPADAO;
 import nl.clockwork.ebms.cpa.CPAManager;
 import nl.clockwork.ebms.cpa.URLMapper;
 import nl.clockwork.ebms.cpa.URLMappingDAO;
-import nl.clockwork.ebms.dao.DAOException;
 import nl.clockwork.ebms.jaxb.JAXBParser;
 import nl.clockwork.ebms.model.EbMSAttachment;
 import nl.clockwork.ebms.model.EbMSMessage;
@@ -148,9 +147,9 @@ public class EncryptionTest
 		message.getAttachments().add(EbMSAttachmentFactory.createEbMSAttachment(attachment.getName(),attachment.getContentId(),"application/xml",DOMUtils.toString(d).getBytes("UTF-8")));
 	}
 
-	private CPAManager initCPAManager() throws DAOException, IOException, JAXBException
+	private CPAManager initCPAManager() throws IOException, JAXBException
 	{
-		return new CPAManager(initMethodCacheMock(),initMethodCacheMock(),initCPADAOMock(),new URLMapper(initMethodCacheMock(),initURLMappingDAOMock()));
+		return new CPAManager(initCPADAOMock(),new URLMapper(initMethodCacheMock(),initURLMappingDAOMock()),initMethodCacheMock());
 	}
 
 	private DisabledMethodCacheInterceptor initMethodCacheMock()
@@ -158,7 +157,7 @@ public class EncryptionTest
 		return Mockito.mock(DisabledMethodCacheInterceptor.class);
 	}
 
-	private CPADAO initCPADAOMock() throws DAOException, IOException, JAXBException
+	private CPADAO initCPADAOMock() throws IOException, JAXBException
 	{
 		val result = Mockito.mock(CPADAO.class);
 		Mockito.when(result.getCPA(cpaId)).thenReturn(loadCPA(cpaId));

@@ -19,16 +19,14 @@ import java.security.cert.X509Certificate;
 import java.util.List;
 import java.util.Optional;
 
-import nl.clockwork.ebms.dao.DAOException;
 import nl.clockwork.ebms.service.cpa.certificate.CertificateMapping;
 
 public interface CertificateMappingDAO
 {
-	boolean existsCertificateMapping(String id, String cpaId) throws DAOException;
-	Optional<X509Certificate> getCertificateMapping(String id, String cpaId) throws DAOException;
-	List<CertificateMapping> getCertificateMappings() throws DAOException;
-	void insertCertificateMapping(String id, CertificateMapping mapping) throws DAOException;
-	int updateCertificateMapping(String id, CertificateMapping mapping) throws DAOException;
-	int deleteCertificateMapping(String id, String cpaId) throws DAOException;
-	String getTargetName();
+	boolean existsCertificateMapping(String id, String cpaId);
+	Optional<X509Certificate> getCertificateMapping(String id, String cpaId);
+	List<CertificateMapping> getCertificateMappings();
+	void insertCertificateMapping(CertificateMapping mapping);
+	int updateCertificateMapping(CertificateMapping mapping);
+	int deleteCertificateMapping(String id, String cpaId);
 }

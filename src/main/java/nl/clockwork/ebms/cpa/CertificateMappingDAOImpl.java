@@ -15,11 +15,15 @@
  */
 package nl.clockwork.ebms.cpa;
 
+import java.security.cert.CertificateException;
+import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
+import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.querydsl.sql.SQLQueryFactory;
@@ -29,57 +33,101 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
 import lombok.experimental.FieldDefaults;
-import nl.clockwork.ebms.dao.DAOException;
 import nl.clockwork.ebms.querydsl.model.QCertificateMapping;
 import nl.clockwork.ebms.service.cpa.certificate.CertificateMapping;
 
-@Transactional(transactionManager = "transactionManager")
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @RequiredArgsConstructor
 public class CertificateMappingDAOImpl implements CertificateMappingDAO
 {
+	@NonNull
+	JdbcTemplate jdbcTemplate;
 	@NonNull
 	SQLQueryFactory queryFactory;
 	@NonNull
 	QCertificateMapping table = QCertificateMapping.certificateMapping;
 
 	@Override
-	public boolean existsCertificateMapping(String id, String cpaId) throws DAOException
+	public boolean existsCertificateMapping(String id, String cpaId)
 	{
-		return queryFactory.select(table.source.count())
+		//"select count(*) from certificate_mapping where id = ? and (cpa_id = ? or (cpa_id is null and ? is null))"
+		val query = queryFactory.select(table.source.count())
 				.from(table)
 				.where(table.id.eq(id)
 						.and(cpaId == null ? table.cpaId.isNull() : table.cpaId.eq(cpaId)))
-				.fetchOne() > 0L;
+				.getSQL();
+		return jdbcTemplate.queryForObject(
+				query.getSQL(),
+				Integer.class,
+				query.getNullFriendlyBindings().toArray()) > 0;
 	}
 
 	@Override
-	public Optional<X509Certificate> getCertificateMapping(String id, String cpaId) throws DAOException
+	public Optional<X509Certificate> getCertificateMapping(String id, String cpaId)
 	{
-		val result = queryFactory.select(table.source)
-				.from(table)
-				.where(table.id.eq(id)
-						.and(cpaId == null ? table.cpaId.isNull() : table.cpaId.eq(cpaId)))
-				.fetchOne();
-		return Optional.of(result);
+		try
+		{
+			//"select destination from certificate_mapping where id = ? and (cpa_id = ? or (cpa_id is null and ? is null))"
+			val query = queryFactory.select(table.source)
+					.from(table)
+					.where(table.id.eq(id)
+							.and(cpaId == null ? table.cpaId.isNull() : table.cpaId.eq(cpaId)))
+					.getSQL();
+			return Optional.of(jdbcTemplate.queryForObject(
+					query.getSQL(),
+					(rs,rowNum) ->
+					{
+						try
+						{
+							CertificateFactory certificateFactory = CertificateFactory.getInstance("X509");
+							return (X509Certificate)certificateFactory.generateCertificate(rs.getBinaryStream("source"));
+						}
+						catch (CertificateException e)
+						{
+							throw new SQLException(e);
+						}
+					},
+					query.getNullFriendlyBindings().toArray()));
+		}
+		catch(EmptyResultDataAccessException e)
+		{
+			return Optional.empty();
+		}
 	}
 
 	@Override
-	public List<CertificateMapping> getCertificateMappings() throws DAOException
+	public List<CertificateMapping> getCertificateMappings()
 	{
-		val result = queryFactory.select(table.source,table.destination,table.cpaId)
+		//"select source, destination, cpa_id from certificate_mapping"
+		val query = queryFactory.select(table.source,table.destination,table.cpaId)
 				.from(table)
-				.fetch();
-		return result.stream()
-				.map(t -> new CertificateMapping(t.get(table.source),t.get(table.destination),t.get(table.cpaId)))
-				.collect(Collectors.toList());
+				.getSQL();
+		return jdbcTemplate.query(
+				query.getSQL(),
+				(rs,rowNum) ->
+				{
+					try
+					{
+						val certificateFactory = CertificateFactory.getInstance("X509");
+						val source = (X509Certificate)certificateFactory.generateCertificate(rs.getBinaryStream("source"));
+						val destination = (X509Certificate)certificateFactory.generateCertificate(rs.getBinaryStream("destination"));
+						val cpaId = rs.getString("cpa_id");
+						return new CertificateMapping(source,destination,cpaId);
+					}
+					catch (CertificateException e)
+					{
+						throw new SQLException(e);
+					}
+				},
+				query.getNullFriendlyBindings().toArray());
 	}
 
 	@Override
-	public void insertCertificateMapping(String id, CertificateMapping mapping) throws DAOException
+	@Transactional(transactionManager = "dataSourceTransactionManager")
+	public void insertCertificateMapping(CertificateMapping mapping)
 	{
 		queryFactory.insert(table)
-				.set(table.id,id)
+				.set(table.id,mapping.getId())
 				.set(table.source,mapping.getSource())
 				.set(table.destination,mapping.getDestination())
 				.set(table.cpaId,mapping.getCpaId())
@@ -87,28 +135,24 @@ public class CertificateMappingDAOImpl implements CertificateMappingDAO
 	}
 
 	@Override
-	public int updateCertificateMapping(String id, CertificateMapping mapping) throws DAOException
+	@Transactional(transactionManager = "dataSourceTransactionManager")
+	public int updateCertificateMapping(CertificateMapping mapping)
 	{
 		return (int)queryFactory.update(table)
 				.set(table.destination,mapping.getDestination())
 				.set(table.cpaId,mapping.getCpaId())
-				.where(table.id.eq(id)
+				.where(table.id.eq(mapping.getId())
 						.and(mapping.getCpaId() == null ? table.cpaId.isNull() : table.cpaId.eq(mapping.getCpaId())))
 				.execute();
 	}
 
 	@Override
-	public int deleteCertificateMapping(String id, String cpaId) throws DAOException
+	@Transactional(transactionManager = "dataSourceTransactionManager")
+	public int deleteCertificateMapping(String id, String cpaId)
 	{
 		return (int)queryFactory.delete(table)
 				.where(table.id.eq(id)
 						.and(cpaId == null ? table.cpaId.isNull() : table.cpaId.eq(cpaId)))
 				.execute();
-	}
-
-	@Override
-	public String getTargetName()
-	{
-		return getClass().getSimpleName();
 	}
 }

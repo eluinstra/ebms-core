@@ -32,7 +32,6 @@ import nl.clockwork.ebms.EbMSAction;
 import nl.clockwork.ebms.cpa.CPAManager;
 import nl.clockwork.ebms.cpa.CPAUtils;
 import nl.clockwork.ebms.cpa.CacheablePartyId;
-import nl.clockwork.ebms.dao.DAOException;
 import nl.clockwork.ebms.dao.EbMSDAO;
 import nl.clockwork.ebms.event.processor.EventManager;
 import nl.clockwork.ebms.model.EbMSAcknowledgment;
@@ -109,9 +108,9 @@ class DuplicateMessageHandler
 						val result = ebMSDAO.getDocument(context.get().getMessageId());
 						throw new ValidationException(DOMUtils.toString(result.get()));
 					}
-					catch (DAOException | TransformerException e)
+					catch (TransformerException e)
 					{
-						throw new EbMSProcessingException("Error creating response message for MessageId " + messageHeader.getMessageData().getMessageId() + "!");
+						throw new EbMSProcessingException("Error creating response message for MessageId " + messageHeader.getMessageData().getMessageId() + "!",e);
 					}
 				return null;
 			}

@@ -32,7 +32,6 @@ import lombok.NonNull;
 import lombok.val;
 import lombok.experimental.FieldDefaults;
 import nl.clockwork.ebms.EbMSAction;
-import nl.clockwork.ebms.cache.EhCacheMethodCacheInterceptor;
 import nl.clockwork.ebms.cache.CachingMethodInterceptor;
 import nl.clockwork.ebms.model.EbMSPartyInfo;
 import nl.clockwork.ebms.model.FromPartyInfo;
@@ -45,13 +44,11 @@ import nl.clockwork.ebms.util.StreamUtils;
 public class CPAManager
 {
 	@NonNull
-	CachingMethodInterceptor daoMethodCache;
-	@NonNull
-	CachingMethodInterceptor cpaMethodCache;
-	@NonNull
 	CPADAO cpaDAO;
 	@NonNull
 	URLMapper urlMapper;
+	@NonNull
+	CachingMethodInterceptor cpaMethodCache;
 
 	public boolean existsCPA(String cpaId)
 	{
@@ -74,14 +71,14 @@ public class CPAManager
 		flushCPAMethodCache(cpa.getCpaid());
 	}
 
-	public int updateCPA(CollaborationProtocolAgreement cpa)
+	public long updateCPA(CollaborationProtocolAgreement cpa)
 	{
 		val result = cpaDAO.updateCPA(cpa);
 		flushCPAMethodCache(cpa.getCpaid());
 		return result;
 	}
 
-	public int deleteCPA(String cpaId)
+	public long deleteCPA(String cpaId)
 	{
 		val result = cpaDAO.deleteCPA(cpaId);
 		flushCPAMethodCache(cpaId);
@@ -323,10 +320,6 @@ public class CPAManager
 
 	private void flushCPAMethodCache(String cpaId)
 	{
-		//val targetName = cpaDAO.toString().replaceFirst("^(.*\\.)*([^@]*)@.*$","$2");
-		daoMethodCache.remove(EhCacheMethodCacheInterceptor.getKey(cpaDAO.getTargetName(),"existsCPA",cpaId));
-		daoMethodCache.remove(EhCacheMethodCacheInterceptor.getKey(cpaDAO.getTargetName(),"getCPA",cpaId));
-		daoMethodCache.remove(EhCacheMethodCacheInterceptor.getKey(cpaDAO.getTargetName(),"getCPAIds"));
 		cpaMethodCache.removeAll();
 	}
 }

@@ -21,17 +21,16 @@ import java.util.Optional;
 
 import nl.clockwork.ebms.Action;
 import nl.clockwork.ebms.EbMSAction;
-import nl.clockwork.ebms.dao.DAOException;
 
 public interface EbMSEventDAO
 {
-	void executeTransaction(Action action) throws DAOException;
+	void executeTransaction(Action action);
 
-	Optional<EbMSAction> getMessageAction(String messageId) throws DAOException;
-	List<EbMSEvent> getEventsBefore(Instant timestamp, String serverId) throws DAOException;
-	List<EbMSEvent> getEventsBefore(Instant timestamp, String serverId, int maxNr) throws DAOException;
-	void insertEvent(EbMSEvent event, String serverId) throws DAOException;
-	void insertEventLog(String messageId, Instant timestamp, String uri, EbMSEventStatus status, String errorMessage) throws DAOException;
-	void updateEvent(EbMSEvent event) throws DAOException;
-	void deleteEvent(String messageId) throws DAOException;
+	Optional<EbMSAction> getMessageAction(String messageId);
+	List<EbMSEvent> getEventsBefore(Instant timestamp, String serverId);
+	List<EbMSEvent> getEventsBefore(Instant timestamp, String serverId, int maxNr);
+	void insertEvent(EbMSEvent event, String serverId);
+	void insertEventLog(String messageId, Instant timestamp, String uri, EbMSEventStatus status, String errorMessage);
+	void updateEvent(EbMSEvent event);
+	void deleteEvent(String messageId);
 }

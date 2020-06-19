@@ -40,7 +40,6 @@ import nl.clockwork.ebms.EbMSMessageStatus;
 import nl.clockwork.ebms.EbMSMessageUtils;
 import nl.clockwork.ebms.client.DeliveryManager;
 import nl.clockwork.ebms.cpa.CPAManager;
-import nl.clockwork.ebms.dao.DAOException;
 import nl.clockwork.ebms.dao.EbMSDAO;
 import nl.clockwork.ebms.event.listener.EventListener;
 import nl.clockwork.ebms.event.processor.EventManager;
@@ -256,7 +255,7 @@ public class EbMSMessageProcessor
 		}
 	}
 
-	private EbMSDocument processMessage(final Instant timestamp, final EbMSDocument messageDocument, final EbMSMessage message) throws DAOException, ValidatorException, DatatypeConfigurationException, JAXBException, SOAPException, ParserConfigurationException, SAXException, IOException, TransformerFactoryConfigurationError, TransformerException, EbMSProcessorException
+	private EbMSDocument processMessage(final Instant timestamp, final EbMSDocument messageDocument, final EbMSMessage message) throws ValidatorException, DatatypeConfigurationException, JAXBException, SOAPException, ParserConfigurationException, SAXException, IOException, TransformerFactoryConfigurationError, TransformerException, EbMSProcessorException
 	{
 		try
 		{

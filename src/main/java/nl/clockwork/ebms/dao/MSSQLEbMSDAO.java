@@ -25,17 +25,15 @@ import java.util.List;
 
 import javax.xml.transform.TransformerException;
 
-import org.springframework.dao.DataAccessException;
+import org.springframework.dao.DataRetrievalFailureException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
-import org.springframework.transaction.TransactionException;
-import org.springframework.transaction.TransactionStatus;
-import org.springframework.transaction.support.TransactionCallbackWithoutResult;
 import org.springframework.transaction.support.TransactionTemplate;
 import org.w3c.dom.Document;
 
 import lombok.val;
+import nl.clockwork.ebms.Action;
 import nl.clockwork.ebms.EbMSMessageStatus;
 import nl.clockwork.ebms.EbMSMessageUtils;
 import nl.clockwork.ebms.event.listener.EbMSMessageEventType;
@@ -62,83 +60,71 @@ class MSSQLEbMSDAO extends MySQLEbMSDAO
 	}
 
 	@Override
-	public void insertDuplicateMessage(final Instant timestamp, final Document document, final EbMSBaseMessage message, final List<EbMSAttachment> attachments) throws DAOException
+	public void insertDuplicateMessage(final Instant timestamp, final Document document, final EbMSBaseMessage message, final List<EbMSAttachment> attachments)
 	{
-		try
+		Action action = () ->
 		{
-			transactionTemplate.execute(
-				new TransactionCallbackWithoutResult()
-				{
-					@Override
-					public void doInTransactionWithoutResult(TransactionStatus arg0)
+			try
+			{
+				val keyHolder = new GeneratedKeyHolder();
+				jdbcTemplate.update(
+					new PreparedStatementCreator()
 					{
-						try
+						
+						@Override
+						public PreparedStatement createPreparedStatement(Connection connection) throws SQLException
 						{
-							val keyHolder = new GeneratedKeyHolder();
-							jdbcTemplate.update(
-								new PreparedStatementCreator()
-								{
-									
-									@Override
-									public PreparedStatement createPreparedStatement(Connection connection) throws SQLException
-									{
-										try
-										{
-											val ps = connection.prepareStatement
-											(
-												"insert into ebms_message (" +
-													"time_stamp," +
-													"cpa_id," +
-													"conversation_id," +
-													"message_id," +
-													"message_nr," +
-													"ref_to_message_id," +
-													"time_to_live," +
-													"from_role," +
-													"to_role," +
-													"service," +
-													"action," +
-													"content" +
-												") values (?,?,?,?,(select max(message_nr) + 1 as nr from ebms_message where message_id = ?),?,?,?,?,?,?,?)",
-												new int[]{1}
-											);
-											ps.setTimestamp(1,Timestamp.from(timestamp));
-											val messageHeader = message.getMessageHeader();
-											ps.setString(2,messageHeader.getCPAId());
-											ps.setString(3,messageHeader.getConversationId());
-											ps.setString(4,messageHeader.getMessageData().getMessageId());
-											ps.setString(5,messageHeader.getMessageData().getMessageId());
-											ps.setString(6,messageHeader.getMessageData().getRefToMessageId());
-											ps.setTimestamp(7,messageHeader.getMessageData().getTimeToLive() == null ? null : Timestamp.from(messageHeader.getMessageData().getTimeToLive()));
-											ps.setString(8,messageHeader.getFrom().getRole());
-											ps.setString(9,messageHeader.getTo().getRole());
-											ps.setString(10,EbMSMessageUtils.toString(messageHeader.getService()));
-											ps.setString(11,messageHeader.getAction());
-											ps.setString(12,DOMUtils.toString(document,"UTF-8"));
-											return ps;
-										}
-										catch (TransformerException e)
-										{
-											throw new SQLException(e);
-										}
-									}
-								},
-								keyHolder
-							);
-							insertAttachments(keyHolder.getKey().longValue(),attachments);
+							try
+							{
+								val ps = connection.prepareStatement
+								(
+									"insert into ebms_message (" +
+										"time_stamp," +
+										"cpa_id," +
+										"conversation_id," +
+										"message_id," +
+										"message_nr," +
+										"ref_to_message_id," +
+										"time_to_live," +
+										"from_role," +
+										"to_role," +
+										"service," +
+										"action," +
+										"content" +
+									") values (?,?,?,?,(select max(message_nr) + 1 as nr from ebms_message where message_id = ?),?,?,?,?,?,?,?)",
+									new int[]{1}
+								);
+								ps.setTimestamp(1,Timestamp.from(timestamp));
+								val messageHeader = message.getMessageHeader();
+								ps.setString(2,messageHeader.getCPAId());
+								ps.setString(3,messageHeader.getConversationId());
+								ps.setString(4,messageHeader.getMessageData().getMessageId());
+								ps.setString(5,messageHeader.getMessageData().getMessageId());
+								ps.setString(6,messageHeader.getMessageData().getRefToMessageId());
+								ps.setTimestamp(7,messageHeader.getMessageData().getTimeToLive() == null ? null : Timestamp.from(messageHeader.getMessageData().getTimeToLive()));
+								ps.setString(8,messageHeader.getFrom().getRole());
+								ps.setString(9,messageHeader.getTo().getRole());
+								ps.setString(10,EbMSMessageUtils.toString(messageHeader.getService()));
+								ps.setString(11,messageHeader.getAction());
+								ps.setString(12,DOMUtils.toString(document,"UTF-8"));
+								return ps;
+							}
+							catch (TransformerException e)
+							{
+								throw new SQLException(e);
+							}
 						}
-						catch (IOException e)
-						{
-							throw new DAOException(e);
-						}
-					}
-				}
-			);
-		}
-		catch (DataAccessException | TransactionException e)
-		{
-			throw new DAOException(e);
-		}
+					},
+					keyHolder
+				);
+				insertAttachments(keyHolder.getKey().longValue(),attachments);
+			}
+			catch (IOException e)
+			{
+				throw new DataRetrievalFailureException("",e);
+			}
+		};
+		executeTransaction(action);
 	}
 
 	@Override
