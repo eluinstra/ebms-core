@@ -45,7 +45,7 @@ public class URLMappingDAOImpl implements URLMappingDAO
 	QUrlMapping table = QUrlMapping.urlMapping;
 
 	@Override
-	@Cacheable(cacheNames = "existsURLMapping")
+	@Cacheable(cacheNames = "URLMapping", keyGenerator = "ebMSKeyGenerator")
 	public boolean existsURLMapping(String source)
 	{
 		//"select count(*) from url_mapping where source = ?"
@@ -60,7 +60,7 @@ public class URLMappingDAOImpl implements URLMappingDAO
 	}
 
 	@Override
-	@Cacheable(cacheNames = "URLMapping")
+	@Cacheable(cacheNames = "URLMapping", keyGenerator = "ebMSKeyGenerator")
 	public Optional<String> getURLMapping(String source)
 	{
 		try
@@ -82,7 +82,7 @@ public class URLMappingDAOImpl implements URLMappingDAO
 	}
 
 	@Override
-	@Cacheable(cacheNames = "URLMappings")
+	@Cacheable(cacheNames = "URLMapping", keyGenerator = "ebMSKeyGenerator")
 	public List<URLMapping> getURLMappings()
 	{
 		//"select source, destination from url_mapping order by source asc"
@@ -101,7 +101,7 @@ public class URLMappingDAOImpl implements URLMappingDAO
 
 	@Override
 	@Transactional(transactionManager = "dataSourceTransactionManager")
-	@CacheEvict(cacheNames = {"existsURLMapping","URLMapping","URLMappings"}, allEntries = true)
+	@CacheEvict(cacheNames = "URLMapping", allEntries = true)
 	public long insertURLMapping(URLMapping urlMapping)
 	{
 		return queryFactory.insert(table)
@@ -112,7 +112,7 @@ public class URLMappingDAOImpl implements URLMappingDAO
 
 	@Override
 	@Transactional(transactionManager = "dataSourceTransactionManager")
-	@CacheEvict(cacheNames = {"existsURLMapping","URLMapping","URLMappings"}, allEntries = true)
+	@CacheEvict(cacheNames = "URLMapping", allEntries = true)
 	public long updateURLMapping(URLMapping urlMapping)
 	{
 		return queryFactory.update(table)
@@ -123,7 +123,7 @@ public class URLMappingDAOImpl implements URLMappingDAO
 
 	@Override
 	@Transactional(transactionManager = "dataSourceTransactionManager")
-	@CacheEvict(cacheNames = {"existsURLMapping","URLMapping","URLMappings"}, allEntries = true)
+	@CacheEvict(cacheNames = "URLMapping", allEntries = true)
 	public long deleteURLMapping(String source)
 	{
 		return queryFactory.delete(table)

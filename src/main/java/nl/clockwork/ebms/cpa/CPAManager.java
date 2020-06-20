@@ -89,7 +89,7 @@ public class CPAManager
 				.orElse(false);
 	}
 
-	@Cacheable(cacheNames = "existsPartyId")
+	@Cacheable(cacheNames = "CPA", keyGenerator = "ebMSKeyGenerator")
 	public boolean existsPartyId(String cpaId, String partyId)
 	{
 		return getCPA(cpaId)
@@ -99,7 +99,7 @@ public class CPAManager
 				.orElse(false);
 	}
 
-	@Cacheable(cacheNames = "getEbMSPartyInfo")
+	@Cacheable(cacheNames = "CPA", keyGenerator = "ebMSKeyGenerator")
 	public Optional<EbMSPartyInfo> getEbMSPartyInfo(String cpaId, String partyId)
 	{
 		return getCPA(cpaId)
@@ -119,7 +119,7 @@ public class CPAManager
 		return result;
 	}
 
-	@Cacheable(cacheNames = "getPartyInfo")
+	@Cacheable(cacheNames = "CPA", keyGenerator = "ebMSKeyGenerator")
 	public Optional<PartyInfo> getPartyInfo(String cpaId, List<PartyId> partyId)
 	{
 		return getCPA(cpaId)
@@ -129,7 +129,7 @@ public class CPAManager
 						.orElse(null));
 	}
 	
-	@Cacheable(cacheNames = "getFromPartyInfo")
+	@Cacheable(cacheNames = "CPA", keyGenerator = "ebMSKeyGenerator")
 	public Optional<FromPartyInfo> getFromPartyInfo(String cpaId, Party fromParty, String service, String action)
 	{
 		return getCPA(cpaId)
@@ -144,7 +144,7 @@ public class CPAManager
 						.orElse(null));
 	}
 
-	@Cacheable(cacheNames = "getToPartyInfoByFromPartyActionBinding")
+	@Cacheable(cacheNames = "CPA", keyGenerator = "ebMSKeyGenerator")
 	public Optional<ToPartyInfo> getToPartyInfoByFromPartyActionBinding(String cpaId, Party fromParty, String service, String action)
 	{
 		return getFromPartyInfo(cpaId,fromParty,service,action)
@@ -159,7 +159,7 @@ public class CPAManager
 					.orElse(null));
 	}
 
-	@Cacheable(cacheNames = "getToPartyInfo")
+	@Cacheable(cacheNames = "CPA", keyGenerator = "ebMSKeyGenerator")
 	public Optional<ToPartyInfo> getToPartyInfo(String cpaId, Party toParty, String service, String action)
 	{
 		return getCPA(cpaId)
@@ -174,7 +174,7 @@ public class CPAManager
 						.orElse(null));
 	}
 
-	@Cacheable(cacheNames = "canSend")
+	@Cacheable(cacheNames = "CPA", keyGenerator = "ebMSKeyGenerator")
 	public boolean canSend(String cpaId, List<PartyId> partyId, String role, String service, String action)
 	{
 		return getCPA(cpaId)
@@ -187,7 +187,7 @@ public class CPAManager
 				.orElse(null);
 	}
 
-	@Cacheable(cacheNames = "canReceive")
+	@Cacheable(cacheNames = "CPA", keyGenerator = "ebMSKeyGenerator")
 	public boolean canReceive(String cpaId, List<PartyId> partyId, String role, String service, String action)
 	{
 		return getCPA(cpaId)
@@ -200,7 +200,7 @@ public class CPAManager
 				.orElse(null);
 	}
 
-	@Cacheable(cacheNames = "getDeliveryChannel")
+	@Cacheable(cacheNames = "CPA", keyGenerator = "ebMSKeyGenerator")
 	public Optional<DeliveryChannel> getDeliveryChannel(String cpaId, String deliveryChannelId)
 	{
 		return getCPA(cpaId)
@@ -211,7 +211,7 @@ public class CPAManager
 					.orElse(null));
 	}
 
-	@Cacheable(cacheNames = "getDefaultDeliveryChannel")
+	@Cacheable(cacheNames = "CPA", keyGenerator = "ebMSKeyGenerator")
 	public Optional<DeliveryChannel> getDefaultDeliveryChannel(String cpaId, List<PartyId> partyId, String action)
 	{
 //		return getCPA(cpaId)
@@ -234,7 +234,7 @@ public class CPAManager
 					.orElse((DeliveryChannel)p.getDefaultMshChannelId()));
 	}
 
-	@Cacheable(cacheNames = "getSendDeliveryChannel")
+	@Cacheable(cacheNames = "CPA", keyGenerator = "ebMSKeyGenerator")
 	public Optional<DeliveryChannel> getSendDeliveryChannel(String cpaId, List<PartyId> partyId, String role, String service, String action)
 	{
 		if (EbMSAction.EBMS_SERVICE_URI.equals(service))
@@ -252,7 +252,7 @@ public class CPAManager
 		}
 	}
 	
-	@Cacheable(cacheNames = "getReceiveDeliveryChannel")
+	@Cacheable(cacheNames = "CPA", keyGenerator = "ebMSKeyGenerator")
 	public Optional<DeliveryChannel> getReceiveDeliveryChannel(String cpaId, List<PartyId> partyId, String role, String service, String action)
 	{
 		if (EbMSAction.EBMS_SERVICE_URI.equals(service))
@@ -268,7 +268,7 @@ public class CPAManager
 							.orElse(null));
 	}
 	
-	@Cacheable(cacheNames = "isNonRepudiationRequired")
+	@Cacheable(cacheNames = "CPA", keyGenerator = "ebMSKeyGenerator")
 	public boolean isNonRepudiationRequired(String cpaId, List<PartyId> partyId, String role, String service, String action)
 	{
 		val canSend =  getCPA(cpaId)
@@ -290,7 +290,7 @@ public class CPAManager
 				.orElse(null);
 	}
 
-	@Cacheable(cacheNames = "isConfidential")
+	@Cacheable(cacheNames = "CPA", keyGenerator = "ebMSKeyGenerator")
 	public boolean isConfidential(String cpaId, List<PartyId> partyId, String role, String service, String action)
 	{
 		val canSend =  getCPA(cpaId)

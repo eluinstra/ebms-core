@@ -35,7 +35,7 @@ public class CPADAOImpl implements CPADAO
 	QCpa table = QCpa.cpa1;
 
 	@Override
-	@Cacheable(cacheNames = "existsCPA")
+	@Cacheable(cacheNames = "CPA", keyGenerator = "ebMSKeyGenerator")
 	public boolean existsCPA(String cpaId)
 	{
 		//"select count(*) from cpa where cpa_id = ?"
@@ -50,7 +50,7 @@ public class CPADAOImpl implements CPADAO
 	}
 	
 	@Override
-	@Cacheable(cacheNames = "CPA")
+	@Cacheable(cacheNames = "CPA", keyGenerator = "ebMSKeyGenerator")
 	public Optional<CollaborationProtocolAgreement> getCPA(String cpaId)
 	{
 		try
@@ -77,7 +77,7 @@ public class CPADAOImpl implements CPADAO
 	}
 
 	@Override
-	@Cacheable(cacheNames = "CPAIds")
+	@Cacheable(cacheNames = "CPA", keyGenerator = "ebMSKeyGenerator")
 	public List<String> getCPAIds()
 	{
 		//"select cpa_id from cpa order by cpa_id asc"
@@ -93,7 +93,7 @@ public class CPADAOImpl implements CPADAO
 
 	@Override
 	@Transactional(transactionManager = "dataSourceTransactionManager")
-	@CacheEvict(cacheNames = {"existsCPA","CPA","CPAIds","existsPartyId","getEbMSPartyInfo","getPartyInfo","getFromPartyInfo","getToPartyInfoByFromPartyActionBinding","getToPartyInfo","canSend","canReceive","getDeliveryChannel","getDefaultDeliveryChannel","getSendDeliveryChannel","getReceiveDeliveryChannel","isNonRepudiationRequired","isConfidential","getSyncReply","existsURLMapping","URLMapping","URLMappings","existsCertificateMapping","CertificateMapping","CertificateMappings"}, allEntries = true)
+	@CacheEvict(cacheNames = "CPA", allEntries = true)
 	public long insertCPA(CollaborationProtocolAgreement cpa)
 	{
 		return queryFactory.insert(table)
@@ -104,7 +104,7 @@ public class CPADAOImpl implements CPADAO
 
 	@Override
 	@Transactional(transactionManager = "dataSourceTransactionManager")
-	@CacheEvict(cacheNames = {"existsCPA","CPA","CPAIds","existsPartyId","getEbMSPartyInfo","getPartyInfo","getFromPartyInfo","getToPartyInfoByFromPartyActionBinding","getToPartyInfo","canSend","canReceive","getDeliveryChannel","getDefaultDeliveryChannel","getSendDeliveryChannel","getReceiveDeliveryChannel","isNonRepudiationRequired","isConfidential","getSyncReply","existsURLMapping","URLMapping","URLMappings","existsCertificateMapping","CertificateMapping","CertificateMappings"}, allEntries = true)
+	@CacheEvict(cacheNames = "CPA", allEntries = true)
 	public long updateCPA(CollaborationProtocolAgreement cpa)
 	{
 		return queryFactory.update(table)
@@ -115,7 +115,7 @@ public class CPADAOImpl implements CPADAO
 
 	@Override
 	@Transactional(transactionManager = "dataSourceTransactionManager")
-	@CacheEvict(cacheNames = {"existsCPA","CPA","CPAIds","existsPartyId","getEbMSPartyInfo","getPartyInfo","getFromPartyInfo","getToPartyInfoByFromPartyActionBinding","getToPartyInfo","canSend","canReceive","getDeliveryChannel","getDefaultDeliveryChannel","getSendDeliveryChannel","getReceiveDeliveryChannel","isNonRepudiationRequired","isConfidential","getSyncReply","existsURLMapping","URLMapping","URLMappings","existsCertificateMapping","CertificateMapping","CertificateMappings"}, allEntries = true)
+	@CacheEvict(cacheNames = "CPA", allEntries = true)
 	public long deleteCPA(String cpaId)
 	{
 		return queryFactory.delete(table)

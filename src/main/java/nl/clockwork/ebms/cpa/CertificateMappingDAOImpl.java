@@ -50,7 +50,7 @@ public class CertificateMappingDAOImpl implements CertificateMappingDAO
 	QCertificateMapping table = QCertificateMapping.certificateMapping;
 
 	@Override
-	@Cacheable(cacheNames = "existsCertificateMapping")
+	@Cacheable(cacheNames = "CertificateMapping", keyGenerator = "ebMSKeyGenerator")
 	public boolean existsCertificateMapping(String id, String cpaId)
 	{
 		//"select count(*) from certificate_mapping where id = ? and (cpa_id = ? or (cpa_id is null and ? is null))"
@@ -66,7 +66,7 @@ public class CertificateMappingDAOImpl implements CertificateMappingDAO
 	}
 
 	@Override
-	@Cacheable(cacheNames = "CertificateMapping")
+	@Cacheable(cacheNames = "CertificateMapping", keyGenerator = "ebMSKeyGenerator")
 	public Optional<X509Certificate> getCertificateMapping(String id, String cpaId)
 	{
 		try
@@ -100,7 +100,7 @@ public class CertificateMappingDAOImpl implements CertificateMappingDAO
 	}
 
 	@Override
-	@Cacheable(cacheNames = "CertificateMappings")
+	@Cacheable(cacheNames = "CertificateMapping", keyGenerator = "ebMSKeyGenerator")
 	public List<CertificateMapping> getCertificateMappings()
 	{
 		//"select source, destination, cpa_id from certificate_mapping"
@@ -129,7 +129,7 @@ public class CertificateMappingDAOImpl implements CertificateMappingDAO
 
 	@Override
 	@Transactional(transactionManager = "dataSourceTransactionManager")
-	@CacheEvict(cacheNames = {"existsCertificateMapping","CertificateMapping","CertificateMappings"}, allEntries = true)
+	@CacheEvict(cacheNames = "CertificateMapping", allEntries = true)
 	public void insertCertificateMapping(CertificateMapping mapping)
 	{
 		queryFactory.insert(table)
@@ -142,7 +142,7 @@ public class CertificateMappingDAOImpl implements CertificateMappingDAO
 
 	@Override
 	@Transactional(transactionManager = "dataSourceTransactionManager")
-	@CacheEvict(cacheNames = {"existsCertificateMapping","CertificateMapping","CertificateMappings"}, allEntries = true)
+	@CacheEvict(cacheNames = "CertificateMapping", allEntries = true)
 	public int updateCertificateMapping(CertificateMapping mapping)
 	{
 		return (int)queryFactory.update(table)
@@ -155,7 +155,7 @@ public class CertificateMappingDAOImpl implements CertificateMappingDAO
 
 	@Override
 	@Transactional(transactionManager = "dataSourceTransactionManager")
-	@CacheEvict(cacheNames = {"existsCertificateMapping","CertificateMapping","CertificateMappings"}, allEntries = true)
+	@CacheEvict(cacheNames = "CertificateMapping", allEntries = true)
 	public int deleteCertificateMapping(String id, String cpaId)
 	{
 		return (int)queryFactory.delete(table)

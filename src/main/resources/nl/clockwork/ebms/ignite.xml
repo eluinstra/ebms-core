@@ -27,11 +27,15 @@
 		<property name="cacheConfiguration">
 			<list>
 				<bean class="org.apache.ignite.configuration.CacheConfiguration">
-					<property name="name" value="nl.clockwork.ebms.dao.METHOD_CACHE" />
+					<property name="name" value="CPA" />
 					<property name="nearConfiguration" ref="nearConfiguration" />
 				</bean>
 				<bean class="org.apache.ignite.configuration.CacheConfiguration">
-					<property name="name" value="nl.clockwork.ebms.cpa.METHOD_CACHE" />
+					<property name="name" value="URLMapping" />
+					<property name="nearConfiguration" ref="nearConfiguration" />
+				</bean>
+				<bean class="org.apache.ignite.configuration.CacheConfiguration">
+					<property name="name" value="CertificateMapping" />
 					<property name="nearConfiguration" ref="nearConfiguration" />
 				</bean>
 			</list>

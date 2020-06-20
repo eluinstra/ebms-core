@@ -26,9 +26,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.EnableCaching;
-import org.springframework.cache.concurrent.ConcurrentMapCacheFactoryBean;
+import org.springframework.cache.concurrent.ConcurrentMapCache;
 import org.springframework.cache.ehcache.EhCacheCacheManager;
 import org.springframework.cache.ehcache.EhCacheManagerFactoryBean;
+import org.springframework.cache.interceptor.KeyGenerator;
 import org.springframework.cache.support.SimpleCacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -51,8 +52,8 @@ public class CacheConfig
 	@Getter
 	public enum CacheType
 	{
-		NONE(""),
-		DEFAULT("nl/clockwork/ebms/ehcache.xml"),
+		DEFAULT(""),
+		EHCACHE("nl/clockwork/ebms/ehcache.xml"),
 		IGNITE("nl/clockwork/ebms/ignite.xml");
 		
 		String defaultConfigLocation;
@@ -68,58 +69,40 @@ public class CacheConfig
 	{
 		switch (type)
 		{
-			case NONE:
-				val s = new SimpleCacheManager();
-				Collection<Cache> caches = new ArrayList<>();
-				caches.add(createCache("existsCPA"));
-				caches.add(createCache("CPA"));
-				caches.add(createCache("CPAIds"));
-				caches.add(createCache("existsPartyId"));
-				caches.add(createCache("getEbMSPartyInfo"));
-				caches.add(createCache("getPartyInfo"));
-				caches.add(createCache("getFromPartyInfo"));
-				caches.add(createCache("getToPartyInfoByFromPartyActionBinding"));
-				caches.add(createCache("getToPartyInfo"));
-				caches.add(createCache("canSend"));
-				caches.add(createCache("canReceive"));
-				caches.add(createCache("getDeliveryChannel"));
-				caches.add(createCache("getDefaultDeliveryChannel"));
-				caches.add(createCache("getSendDeliveryChannel"));
-				caches.add(createCache("getReceiveDeliveryChannel"));
-				caches.add(createCache("isNonRepudiationRequired"));
-				caches.add(createCache("isConfidential"));
-				caches.add(createCache("getSyncReply"));
-				caches.add(createCache("existsURLMapping"));
-				caches.add(createCache("URLMapping"));
-				caches.add(createCache("URLMappings"));
-				caches.add(createCache("existsCertificateMapping"));
-				caches.add(createCache("CertificateMapping"));
-				caches.add(createCache("CertificateMappings"));
-				s.setCaches(caches);
-				return s;
+			case EHCACHE:
+				val ehcacheCacheManager = new EhCacheCacheManager();
+				val ehCacheManagerFactory = new EhCacheManagerFactoryBean();
+				ehCacheManagerFactory.setConfigLocation(getConfigLocation());
+				ehCacheManagerFactory.afterPropertiesSet();
+				net.sf.ehcache.CacheManager ehcacheManager = ehCacheManagerFactory.getObject();
+				ehcacheManager.addCache("CPA");
+				ehcacheManager.addCache("URLMapping");
+				ehcacheManager.addCache("CertificateMapping");
+				ehcacheCacheManager.setCacheManager(ehcacheManager);
+				return ehcacheCacheManager;
 			case IGNITE:
-				val ignite = new SpringCacheManager();
-				ignite.setConfigurationPath(getConfigLocation().getURL().toString());
-				ignite.setDynamicNearCacheConfiguration(createDynamicNearCacheConfiguration());
-				return ignite;
+				val igniteCacheManager = new SpringCacheManager();
+				igniteCacheManager.setConfigurationPath(getConfigLocation().getURL().toString());
+				igniteCacheManager.setDynamicNearCacheConfiguration(createDynamicNearCacheConfiguration());
+				return igniteCacheManager;
 			default:
-				val ehcache = new EhCacheCacheManager();
-				val factory = new EhCacheManagerFactoryBean();
-				factory.setConfigLocation(configLocation);
-				ehcache.setCacheManager(factory.getObject());
-				return ehcache;
+				val cacheManager = new SimpleCacheManager();
+				Collection<Cache> caches = new ArrayList<>();
+				caches.add(new ConcurrentMapCache("CPA"));
+				caches.add(new ConcurrentMapCache("URLMapping"));
+				caches.add(new ConcurrentMapCache("CertificateMapping"));
+				cacheManager.setCaches(caches);
+				return cacheManager;
 		}
 	}
 
-	private Cache createCache(String name)
+	@Bean("ebMSKeyGenerator")
+	public KeyGenerator keyGenerator()
 	{
-		val result = new ConcurrentMapCacheFactoryBean();
-		result.setName(name);
-		result.afterPropertiesSet();
-		return result.getObject();
+		return new EbMSKeyGenerator();
 	}
 
-	private Resource getConfigLocation()
+  private Resource getConfigLocation()
 	{
 		return configLocation == null ? new ClassPathResource(type.defaultConfigLocation) : configLocation;
 	}
