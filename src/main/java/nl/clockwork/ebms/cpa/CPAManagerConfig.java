@@ -17,13 +17,9 @@ package nl.clockwork.ebms.cpa;
 
 import javax.sql.DataSource;
 
-import org.springframework.aop.framework.ProxyFactoryBean;
-import org.springframework.aop.support.RegexpMethodPointcutAdvisor;
-import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.DependsOn;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import com.querydsl.sql.SQLQueryFactory;
@@ -31,77 +27,20 @@ import com.querydsl.sql.SQLQueryFactory;
 import lombok.AccessLevel;
 import lombok.val;
 import lombok.experimental.FieldDefaults;
-import nl.clockwork.ebms.cache.CachingMethodInterceptor;
-//import nl.clockwork.ebms.cache.EbMSCacheManager;
 
 @Configuration
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class CPAManagerConfig
 {
 	@Autowired
-	BeanFactory beanFactory;
-//	@Autowired
-//	EbMSCacheManager cacheManager;
-	@Autowired
 	DataSource dataSource;
 	@Autowired
 	SQLQueryFactory queryFactory;
 
 	@Bean
-//	@DependsOn("cpaManagerMethodCachePointCut")
 	public CPAManager cpaManager() throws Exception
 	{
-//		val result = new ProxyFactoryBean();
-		val cpaManager = new CPAManager(cpaDAO(),urlMapper());//,cpaMethodCacheInterceptor());
-		return cpaManager;
-//		result.setBeanFactory(beanFactory);
-//		result.setTarget(cpaManager);
-//		result.setInterceptorNames("cpaManagerMethodCachePointCut");
-//		return (CPAManager)result.getObject();
-	}
-
-//	@Bean(name = "cpaManagerMethodCachePointCut")
-//	public RegexpMethodPointcutAdvisor cpaManagerMethodCachePointCut() throws Exception
-//	{
-//		val patterns = new String[]{
-//				".*existsCPA",
-//				".*getCPA",
-//				".*getCPAIds",
-//				".*existsPartyId",
-//				".*getEbMSPartyInfo",
-//				".*getPartyInfo",
-//				".*getFromPartyInfo",
-//				".*getToPartyInfoByFromPartyActionBinding",
-//				".*getToPartyInfo",
-//				".*canSend",
-//				".*canReceive",
-//				".*getDeliveryChannel",
-//				".*getDefaultDeliveryChannel",
-//				".*getSendDeliveryChannel",
-//				".*getReceiveDeliveryChannel",
-//				".*isNonRepudiationRequired",
-//				".*isConfidential",
-//				//".*getUri,
-//				".*getSyncReply"};
-//		return new RegexpMethodPointcutAdvisor(patterns,cpaMethodCacheInterceptor());
-//	}
-//
-//	@Bean
-//	public CachingMethodInterceptor cpaMethodCacheInterceptor() throws Exception
-//	{
-//		return null;//cacheManager.getMethodInterceptor("nl.clockwork.ebms.cpa.METHOD_CACHE");
-//	}
-//
-	@Bean
-	public URLMapper urlMapper() throws Exception
-	{
-		return new URLMapper(urlMappingDAO());
-	}
-
-	@Bean
-	public CertificateMapper certificateMapper() throws Exception
-	{
-		return new CertificateMapper(certificateMappingDAO());
+		return new CPAManager(cpaDAO(),urlMapper());
 	}
 
 	@Bean
@@ -112,50 +51,28 @@ public class CPAManagerConfig
 	}
 
 	@Bean
+	public URLMapper urlMapper() throws Exception
+	{
+		return new URLMapper(urlMappingDAO());
+	}
+
+	@Bean
 	public URLMappingDAO urlMappingDAO() throws Exception
 	{
-//		val result = new ProxyFactoryBean();
 		JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
-		val dao = new URLMappingDAOImpl(jdbcTemplate,queryFactory);
-		return dao;
-//		result.setBeanFactory(beanFactory);
-//		result.setTarget(dao);
-//		result.setInterceptorNames("ebMSDAOMethodCachePointCut");
-//		return (URLMappingDAO)result.getObject();
+		return new URLMappingDAOImpl(jdbcTemplate,queryFactory);
+	}
+
+	@Bean
+	public CertificateMapper certificateMapper() throws Exception
+	{
+		return new CertificateMapper(certificateMappingDAO());
 	}
 
 	@Bean
 	public CertificateMappingDAO certificateMappingDAO() throws Exception
 	{
-//		val result = new ProxyFactoryBean();
 		JdbcTemplate jdbcTemplate = new JdbcTemplate(dataSource);
-		val dao = new CertificateMappingDAOImpl(jdbcTemplate,queryFactory);
-		return dao;
-//		result.setBeanFactory(beanFactory);
-//		result.setTarget(dao);
-//		result.setInterceptorNames("ebMSDAOMethodCachePointCut");
-//		return (CertificateMappingDAO)result.getObject();
+		return new CertificateMappingDAOImpl(jdbcTemplate,queryFactory);
 	}
-
-//	@Bean(name = "ebMSDAOMethodCachePointCut")
-//	public RegexpMethodPointcutAdvisor ebMSDAOMethodCachePointCut() throws Exception
-//	{
-//		val patterns = new String[]{
-////				".*existsCPA",
-////				".*getCPA",
-////				".*getCPAIds",
-//				".*existsURLMapping",
-//				".*getURLMapping",
-//				".*getURLMappings",
-//				".*existsCertificateMapping",
-//				".*getCertificateMapping",
-//				".*getCertificateMappings"};
-//		return new RegexpMethodPointcutAdvisor(patterns,ebMSDAOMethodCacheInterceptor());
-//	}
-//
-//	@Bean
-//	public CachingMethodInterceptor ebMSDAOMethodCacheInterceptor() throws Exception
-//	{
-//		return null; //cacheManager.getMethodInterceptor("nl.clockwork.ebms.dao.METHOD_CACHE");
-//	}
 }

@@ -41,7 +41,6 @@ import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import nl.clockwork.ebms.cpa.CPAManager;
 import nl.clockwork.ebms.cpa.CPAUtils;
-import nl.clockwork.ebms.cpa.CacheablePartyId;
 import nl.clockwork.ebms.model.EbMSAcknowledgment;
 import nl.clockwork.ebms.model.EbMSAttachment;
 import nl.clockwork.ebms.model.EbMSDocument;
@@ -68,13 +67,11 @@ public class EbMSSignatureValidator
 		try
 		{
 			val messageHeader = message.getMessageHeader();
-			val fromPartyId = new CacheablePartyId(messageHeader.getFrom().getPartyId());
-			val service = CPAUtils.toString(messageHeader.getService());
 			if (cpaManager.isNonRepudiationRequired(
 					messageHeader.getCPAId(),
-					fromPartyId,
+					messageHeader.getFrom().getPartyId(),
 					messageHeader.getFrom().getRole(),
-					service,
+					CPAUtils.toString(messageHeader.getService()),
 					messageHeader.getAction()))
 			{
 				val signatureNodeList = document.getMessage().getElementsByTagNameNS(Constants.SignatureSpecNS,Constants._TAG_SIGNATURE);
@@ -152,10 +149,9 @@ public class EbMSSignatureValidator
 	{
 		try
 		{
-			val fromPartyId = new CacheablePartyId(messageHeader.getFrom().getPartyId());
 			val service = CPAUtils.toString(messageHeader.getService());
-			val deliveryChannel = cpaManager.getSendDeliveryChannel(messageHeader.getCPAId(),fromPartyId,messageHeader.getFrom().getRole(),service,messageHeader.getAction())
-					.orElseThrow(() -> StreamUtils.illegalStateException("SendDeliveryChannel",messageHeader.getCPAId(),fromPartyId,messageHeader.getFrom().getRole(),service,messageHeader.getAction()));
+			val deliveryChannel = cpaManager.getSendDeliveryChannel(messageHeader.getCPAId(),messageHeader.getFrom().getPartyId(),messageHeader.getFrom().getRole(),service,messageHeader.getAction())
+					.orElseThrow(() -> StreamUtils.illegalStateException("SendDeliveryChannel",messageHeader.getCPAId(),messageHeader.getFrom().getPartyId(),messageHeader.getFrom().getRole(),service,messageHeader.getAction()));
 			if (deliveryChannel != null)
 				return CPAUtils.getX509Certificate(CPAUtils.getSigningCertificate(deliveryChannel));
 			return null;

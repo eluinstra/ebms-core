@@ -31,7 +31,6 @@ import nl.clockwork.ebms.Action;
 import nl.clockwork.ebms.EbMSAction;
 import nl.clockwork.ebms.cpa.CPAManager;
 import nl.clockwork.ebms.cpa.CPAUtils;
-import nl.clockwork.ebms.cpa.CacheablePartyId;
 import nl.clockwork.ebms.dao.EbMSDAO;
 import nl.clockwork.ebms.event.processor.EventManager;
 import nl.clockwork.ebms.model.EbMSAcknowledgment;
@@ -87,12 +86,10 @@ class DuplicateMessageHandler
 						EbMSAction.MESSAGE_ERROR,
 						EbMSAction.ACKNOWLEDGMENT);
 				StreamUtils.ifNotPresent(context, () -> log.warn("No response found for duplicate message " + messageHeader.getMessageData().getMessageId() + "!"));
-				val toPartyId = new CacheablePartyId(messageHeader.getTo().getPartyId());
-				val fromPartyId = new CacheablePartyId(messageHeader.getFrom().getPartyId());
 				val service = CPAUtils.toString(CPAUtils.createEbMSMessageService());
-				val sendDeliveryChannel =	cpaManager.getSendDeliveryChannel(messageHeader.getCPAId(),toPartyId,messageHeader.getTo().getRole(),service,null)
+				val sendDeliveryChannel =	cpaManager.getSendDeliveryChannel(messageHeader.getCPAId(),messageHeader.getTo().getPartyId(),messageHeader.getTo().getRole(),service,null)
 						.orElse(null);
-				val receiveDeliveryChannel = cpaManager.getReceiveDeliveryChannel(messageHeader.getCPAId(),fromPartyId,messageHeader.getFrom().getRole(),service,null)
+				val receiveDeliveryChannel = cpaManager.getReceiveDeliveryChannel(messageHeader.getCPAId(),messageHeader.getFrom().getPartyId(),messageHeader.getFrom().getRole(),service,null)
 						.orElse(null);
 				Action action = () ->
 				{

@@ -44,7 +44,6 @@ import nl.clockwork.ebms.EbMSErrorCode;
 import nl.clockwork.ebms.EbMSMessageUtils;
 import nl.clockwork.ebms.cpa.CPAManager;
 import nl.clockwork.ebms.cpa.CPAUtils;
-import nl.clockwork.ebms.cpa.CacheablePartyId;
 import nl.clockwork.ebms.dao.EbMSDAO;
 import nl.clockwork.ebms.model.EbMSAcknowledgment;
 import nl.clockwork.ebms.model.EbMSBaseMessage;
@@ -71,7 +70,7 @@ class MessageHeaderValidator
 		val messageHeader = message.getMessageHeader();
 		validateMessageHeader(messageHeader);
 		//TODO: remove???
-		cpaManager.getSendDeliveryChannel(messageHeader.getCPAId(),new CacheablePartyId(messageHeader.getFrom().getPartyId()),messageHeader.getFrom().getRole(),CPAUtils.toString(messageHeader.getService()),messageHeader.getAction())
+		cpaManager.getSendDeliveryChannel(messageHeader.getCPAId(),messageHeader.getFrom().getPartyId(),messageHeader.getFrom().getRole(),CPAUtils.toString(messageHeader.getService()),messageHeader.getAction())
 				.orElseThrow(() -> new EbMSValidationException(EbMSMessageUtils.createError(EbMSErrorCode.UNKNOWN.getErrorCode(),EbMSErrorCode.UNKNOWN,"No DeliveryChannel found.")));
 	}
 
@@ -117,8 +116,8 @@ class MessageHeaderValidator
 		if (!EbMSAction.EBMS_SERVICE_URI.equals(messageHeader.getService().getValue()) && StringUtils.isEmpty(messageHeader.getFrom().getRole()))
 			throw new EbMSValidationException(
 					EbMSMessageUtils.createError("//Header/MessageHeader/From/Role",EbMSErrorCode.INCONSISTENT,"Invalid value."));
-		val fromPartyId = new CacheablePartyId(messageHeader.getFrom().getPartyId());
-		cpaManager.getPartyInfo(messageHeader.getCPAId(),fromPartyId).orElseThrow(() -> new EbMSValidationException(EbMSMessageUtils.createError("//Header/MessageHeader/From/PartyId",EbMSErrorCode.INCONSISTENT,"Value not found.")));
+		cpaManager.getPartyInfo(messageHeader.getCPAId(),messageHeader.getFrom().getPartyId())
+				.orElseThrow(() -> new EbMSValidationException(EbMSMessageUtils.createError("//Header/MessageHeader/From/PartyId",EbMSErrorCode.INCONSISTENT,"Value not found.")));
 	}
 
 	private void validateTo(MessageHeader messageHeader)
@@ -129,8 +128,8 @@ class MessageHeaderValidator
 		if (!EbMSAction.EBMS_SERVICE_URI.equals(messageHeader.getService().getValue()) && StringUtils.isEmpty(messageHeader.getTo().getRole()))
 			throw new EbMSValidationException(
 					EbMSMessageUtils.createError("//Header/MessageHeader/To/Role",EbMSErrorCode.INCONSISTENT,"Invalid value."));
-		val toPartyId = new CacheablePartyId(messageHeader.getTo().getPartyId());
-		cpaManager.getPartyInfo(messageHeader.getCPAId(),toPartyId).orElseThrow(() -> new EbMSValidationException(EbMSMessageUtils.createError("//Header/MessageHeader/To/PartyId",EbMSErrorCode.INCONSISTENT,"Value not found.")));
+		cpaManager.getPartyInfo(messageHeader.getCPAId(),messageHeader.getTo().getPartyId())
+				.orElseThrow(() -> new EbMSValidationException(EbMSMessageUtils.createError("//Header/MessageHeader/To/PartyId",EbMSErrorCode.INCONSISTENT,"Value not found.")));
 	}
 
 	private void validateServiceAction(MessageHeader messageHeader)
@@ -149,7 +148,7 @@ class MessageHeaderValidator
 		val service = CPAUtils.toString(messageHeader.getService());
 		validateService(messageHeader,service);
 		validateMessageData(timestamp,messageHeader);
-		val deliveryChannel = cpaManager.getSendDeliveryChannel(messageHeader.getCPAId(),new CacheablePartyId(messageHeader.getFrom().getPartyId()),messageHeader.getFrom().getRole(),CPAUtils.toString(messageHeader.getService()),messageHeader.getAction())
+		val deliveryChannel = cpaManager.getSendDeliveryChannel(messageHeader.getCPAId(),messageHeader.getFrom().getPartyId(),messageHeader.getFrom().getRole(),CPAUtils.toString(messageHeader.getService()),messageHeader.getAction())
 				.orElseThrow(() -> new EbMSValidationException(EbMSMessageUtils.createError(EbMSErrorCode.UNKNOWN.getErrorCode(),EbMSErrorCode.UNKNOWN,"No DeliveryChannel found.")));
 		validateDuplicateElimination(deliveryChannel,messageHeader);
 		val ackRequested = message.getAckRequested();
@@ -162,10 +161,10 @@ class MessageHeaderValidator
 
 	private void validateService(MessageHeader messageHeader, String service)
 	{
-		if (!cpaManager.canSend(messageHeader.getCPAId(),new CacheablePartyId(messageHeader.getFrom().getPartyId()),messageHeader.getFrom().getRole(),service,messageHeader.getAction()))
+		if (!cpaManager.canSend(messageHeader.getCPAId(),messageHeader.getFrom().getPartyId(),messageHeader.getFrom().getRole(),service,messageHeader.getAction()))
 			throw new EbMSValidationException(
 					EbMSMessageUtils.createError("//Header/MessageHeader/Action",EbMSErrorCode.VALUE_NOT_RECOGNIZED,"Value not found."));
-		if (!cpaManager.canReceive(messageHeader.getCPAId(),new CacheablePartyId(messageHeader.getTo().getPartyId()),messageHeader.getTo().getRole(),service,messageHeader.getAction()))
+		if (!cpaManager.canReceive(messageHeader.getCPAId(),messageHeader.getTo().getPartyId(),messageHeader.getTo().getRole(),service,messageHeader.getAction()))
 			throw new EbMSValidationException(
 					EbMSMessageUtils.createError("//Header/MessageHeader/Action",EbMSErrorCode.VALUE_NOT_RECOGNIZED,"Value not found."));
 	}
@@ -234,7 +233,7 @@ class MessageHeaderValidator
 	private void validateAcknowledgment(EbMSAcknowledgment message)
 	{
 		val messageHeader = message.getMessageHeader();
-		val deliveryChannel = cpaManager.getSendDeliveryChannel(messageHeader.getCPAId(),new CacheablePartyId(messageHeader.getFrom().getPartyId()),messageHeader.getFrom().getRole(),CPAUtils.toString(messageHeader.getService()),messageHeader.getAction())
+		val deliveryChannel = cpaManager.getSendDeliveryChannel(messageHeader.getCPAId(),messageHeader.getFrom().getPartyId(),messageHeader.getFrom().getRole(),CPAUtils.toString(messageHeader.getService()),messageHeader.getAction())
 				.orElseThrow(() -> new EbMSValidationException(EbMSMessageUtils.createError(EbMSErrorCode.UNKNOWN.getErrorCode(),EbMSErrorCode.UNKNOWN,"No DeliveryChannel found.")));
 		val acknowledgment = message.getAcknowledgment();
 		if (acknowledgment != null && !Constants.EBMS_VERSION.equals(acknowledgment.getVersion()))

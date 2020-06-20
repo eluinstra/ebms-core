@@ -23,16 +23,12 @@ import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.val;
 import lombok.experimental.FieldDefaults;
-import nl.clockwork.ebms.cache.EhCacheMethodCacheInterceptor;
-import nl.clockwork.ebms.cache.CachingMethodInterceptor;
 import nl.clockwork.ebms.service.cpa.certificate.CertificateMapping;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor
 public class CertificateMapper
 {
-//	@NonNull
-//	CachingMethodInterceptor daoMethodCache;
 	@NonNull
 	CertificateMappingDAO certificateMappingDAO;
 	Object certificateMonitor = new Object();
@@ -60,24 +56,12 @@ public class CertificateMapper
 				else
 					certificateMappingDAO.insertCertificateMapping(mapping);
 			}
-			flushDAOMethodCache(mapping.getId());
 		}
 	}
 
 	public void deleteCertificateMapping(X509Certificate source, String cpaId)
 	{
-		synchronized (certificateMonitor)
-		{
-			val key = CertificateMapping.getId.apply(source);
-			certificateMappingDAO.deleteCertificateMapping(key,cpaId);
-			flushDAOMethodCache(key);
-		}
-	}
-	
-	private void flushDAOMethodCache(String key)
-	{
-//		daoMethodCache.remove(EhCacheMethodCacheInterceptor.getKey("CertificateMappingDAOImpl","existsCertificateMapping",key));
-//		daoMethodCache.remove(EhCacheMethodCacheInterceptor.getKey("CertificateMappingDAOImpl","getCertificateMapping",key));
-//		daoMethodCache.remove(EhCacheMethodCacheInterceptor.getKey("CertificateMappingDAOImpl","getCertificateMappings"));
+		val key = CertificateMapping.getId.apply(source);
+		certificateMappingDAO.deleteCertificateMapping(key,cpaId);
 	}
 }

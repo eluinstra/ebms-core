@@ -19,17 +19,13 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
-import javax.cache.annotation.CacheRemove;
-import javax.cache.annotation.CacheRemoveAll;
-import javax.cache.annotation.CacheResult;
-
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CollaborationProtocolAgreement;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DeliveryChannel;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.PartyInfo;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.PersistenceLevelType;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.StatusValueType;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.SyncReplyModeType;
-import org.springframework.cache.annotation.CacheEvict;
+import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.PartyId;
 import org.springframework.cache.annotation.Cacheable;
 
 import lombok.AccessLevel;
@@ -38,7 +34,6 @@ import lombok.NonNull;
 import lombok.val;
 import lombok.experimental.FieldDefaults;
 import nl.clockwork.ebms.EbMSAction;
-import nl.clockwork.ebms.cache.CachingMethodInterceptor;
 import nl.clockwork.ebms.model.EbMSPartyInfo;
 import nl.clockwork.ebms.model.FromPartyInfo;
 import nl.clockwork.ebms.model.ToPartyInfo;
@@ -53,46 +48,35 @@ public class CPAManager
 	CPADAO cpaDAO;
 	@NonNull
 	URLMapper urlMapper;
-//	@NonNull
-//	CachingMethodInterceptor cpaMethodCache;
 
-	@CacheResult(cacheName = "existsCPA")
 	public boolean existsCPA(String cpaId)
 	{
 		return cpaDAO.existsCPA(cpaId);
 	}
 
-	@CacheResult(cacheName = "CPA")
 	public Optional<CollaborationProtocolAgreement> getCPA(String cpaId)
 	{
 		return cpaDAO.getCPA(cpaId);
 	}
 
-	@Cacheable(cacheNames = "CPAIds")
 	public List<String> getCPAIds()
 	{
 		return cpaDAO.getCPAIds();
 	}
 
-	@CacheEvict(cacheNames = {"existsCPA","CPA","CPAIds"}, allEntries = true)
 	public void insertCPA(CollaborationProtocolAgreement cpa)
 	{
 		cpaDAO.insertCPA(cpa);
-		flushCPAMethodCache(cpa.getCpaid());
 	}
 
 	public long updateCPA(CollaborationProtocolAgreement cpa)
 	{
-		val result = cpaDAO.updateCPA(cpa);
-		flushCPAMethodCache(cpa.getCpaid());
-		return result;
+		return cpaDAO.updateCPA(cpa);
 	}
 
 	public long deleteCPA(String cpaId)
 	{
-		val result = cpaDAO.deleteCPA(cpaId);
-		flushCPAMethodCache(cpaId);
-		return result;
+		return cpaDAO.deleteCPA(cpaId);
 	}
 
 	public boolean isValid(String cpaId, Instant timestamp)
@@ -105,6 +89,7 @@ public class CPAManager
 				.orElse(false);
 	}
 
+	@Cacheable(cacheNames = "existsPartyId")
 	public boolean existsPartyId(String cpaId, String partyId)
 	{
 		return getCPA(cpaId)
@@ -114,6 +99,7 @@ public class CPAManager
 				.orElse(false);
 	}
 
+	@Cacheable(cacheNames = "getEbMSPartyInfo")
 	public Optional<EbMSPartyInfo> getEbMSPartyInfo(String cpaId, String partyId)
 	{
 		return getCPA(cpaId)
@@ -133,7 +119,8 @@ public class CPAManager
 		return result;
 	}
 
-	public Optional<PartyInfo> getPartyInfo(String cpaId, CacheablePartyId partyId)
+	@Cacheable(cacheNames = "getPartyInfo")
+	public Optional<PartyInfo> getPartyInfo(String cpaId, List<PartyId> partyId)
 	{
 		return getCPA(cpaId)
 				.map(c -> c.getPartyInfo().stream()
@@ -142,6 +129,7 @@ public class CPAManager
 						.orElse(null));
 	}
 	
+	@Cacheable(cacheNames = "getFromPartyInfo")
 	public Optional<FromPartyInfo> getFromPartyInfo(String cpaId, Party fromParty, String service, String action)
 	{
 		return getCPA(cpaId)
@@ -156,6 +144,7 @@ public class CPAManager
 						.orElse(null));
 	}
 
+	@Cacheable(cacheNames = "getToPartyInfoByFromPartyActionBinding")
 	public Optional<ToPartyInfo> getToPartyInfoByFromPartyActionBinding(String cpaId, Party fromParty, String service, String action)
 	{
 		return getFromPartyInfo(cpaId,fromParty,service,action)
@@ -170,6 +159,7 @@ public class CPAManager
 					.orElse(null));
 	}
 
+	@Cacheable(cacheNames = "getToPartyInfo")
 	public Optional<ToPartyInfo> getToPartyInfo(String cpaId, Party toParty, String service, String action)
 	{
 		return getCPA(cpaId)
@@ -184,7 +174,8 @@ public class CPAManager
 						.orElse(null));
 	}
 
-	public boolean canSend(String cpaId, CacheablePartyId partyId, String role, String service, String action)
+	@Cacheable(cacheNames = "canSend")
+	public boolean canSend(String cpaId, List<PartyId> partyId, String role, String service, String action)
 	{
 		return getCPA(cpaId)
 				.map(c -> c.getPartyInfo().stream()
@@ -196,7 +187,8 @@ public class CPAManager
 				.orElse(null);
 	}
 
-	public boolean canReceive(String cpaId, CacheablePartyId partyId, String role, String service, String action)
+	@Cacheable(cacheNames = "canReceive")
+	public boolean canReceive(String cpaId, List<PartyId> partyId, String role, String service, String action)
 	{
 		return getCPA(cpaId)
 				.map(c -> c.getPartyInfo().stream()
@@ -208,6 +200,7 @@ public class CPAManager
 				.orElse(null);
 	}
 
+	@Cacheable(cacheNames = "getDeliveryChannel")
 	public Optional<DeliveryChannel> getDeliveryChannel(String cpaId, String deliveryChannelId)
 	{
 		return getCPA(cpaId)
@@ -218,7 +211,8 @@ public class CPAManager
 					.orElse(null));
 	}
 
-	public Optional<DeliveryChannel> getDefaultDeliveryChannel(String cpaId, CacheablePartyId partyId, String action)
+	@Cacheable(cacheNames = "getDefaultDeliveryChannel")
+	public Optional<DeliveryChannel> getDefaultDeliveryChannel(String cpaId, List<PartyId> partyId, String action)
 	{
 //		return getCPA(cpaId)
 //				.map(c -> c.getPartyInfo().stream()
@@ -240,7 +234,8 @@ public class CPAManager
 					.orElse((DeliveryChannel)p.getDefaultMshChannelId()));
 	}
 
-	public Optional<DeliveryChannel> getSendDeliveryChannel(String cpaId, CacheablePartyId partyId, String role, String service, String action)
+	@Cacheable(cacheNames = "getSendDeliveryChannel")
+	public Optional<DeliveryChannel> getSendDeliveryChannel(String cpaId, List<PartyId> partyId, String role, String service, String action)
 	{
 		if (EbMSAction.EBMS_SERVICE_URI.equals(service))
 			return getDefaultDeliveryChannel(cpaId,partyId,action);
@@ -257,7 +252,8 @@ public class CPAManager
 		}
 	}
 	
-	public Optional<DeliveryChannel> getReceiveDeliveryChannel(String cpaId, CacheablePartyId partyId, String role, String service, String action)
+	@Cacheable(cacheNames = "getReceiveDeliveryChannel")
+	public Optional<DeliveryChannel> getReceiveDeliveryChannel(String cpaId, List<PartyId> partyId, String role, String service, String action)
 	{
 		if (EbMSAction.EBMS_SERVICE_URI.equals(service))
 			return getDefaultDeliveryChannel(cpaId,partyId,action);
@@ -272,7 +268,8 @@ public class CPAManager
 							.orElse(null));
 	}
 	
-	public boolean isNonRepudiationRequired(String cpaId, CacheablePartyId partyId, String role, String service, String action)
+	@Cacheable(cacheNames = "isNonRepudiationRequired")
+	public boolean isNonRepudiationRequired(String cpaId, List<PartyId> partyId, String role, String service, String action)
 	{
 		val canSend =  getCPA(cpaId)
 				.map(c -> c.getPartyInfo().stream()
@@ -293,7 +290,8 @@ public class CPAManager
 				.orElse(null);
 	}
 
-	public boolean isConfidential(String cpaId, CacheablePartyId partyId, String role, String service, String action)
+	@Cacheable(cacheNames = "isConfidential")
+	public boolean isConfidential(String cpaId, List<PartyId> partyId, String role, String service, String action)
 	{
 		val canSend =  getCPA(cpaId)
 				.map(c -> c.getPartyInfo().stream()
@@ -314,7 +312,7 @@ public class CPAManager
 				.orElse(false);
 	}
 
-	public String getUri(String cpaId, CacheablePartyId partyId, String role, String service, String action)
+	public String getUri(String cpaId, List<PartyId> partyId, String role, String service, String action)
 	{
 		return urlMapper.getURL(CPAUtils.getUri(
 				getReceiveDeliveryChannel(cpaId,partyId,role,service,action)
@@ -322,14 +320,10 @@ public class CPAManager
 		));
 	}
 
-	public Optional<SyncReplyModeType> getSyncReply(String cpaId, CacheablePartyId partyId, String role, String service, String action)
+	@Cacheable(cacheNames = "getSyncReply")
+	public Optional<SyncReplyModeType> getSyncReply(String cpaId, List<PartyId> partyId, String role, String service, String action)
 	{
 		return getSendDeliveryChannel(cpaId,partyId,role,service,action)
 				.map(c -> c.getMessagingCharacteristics().getSyncReplyMode());
-	}
-
-	private void flushCPAMethodCache(String cpaId)
-	{
-		//cpaMethodCache.removeAll();
 	}
 }

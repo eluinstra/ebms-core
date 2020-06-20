@@ -40,7 +40,6 @@ import nl.clockwork.ebms.EbMSMessageUtils;
 import nl.clockwork.ebms.EbMSThreadPoolExecutor;
 import nl.clockwork.ebms.cpa.CPAManager;
 import nl.clockwork.ebms.cpa.CPAUtils;
-import nl.clockwork.ebms.cpa.CacheablePartyId;
 import nl.clockwork.ebms.model.EbMSBaseMessage;
 import nl.clockwork.ebms.model.EbMSRequestMessage;
 import nl.clockwork.ebms.model.EbMSResponseMessage;
@@ -123,7 +122,7 @@ public class DeliveryManager
 	{
 		return cpaManager.getUri(
 				messageHeader.getCPAId(),
-				new CacheablePartyId(messageHeader.getTo().getPartyId()),
+				messageHeader.getTo().getPartyId(),
 				messageHeader.getTo().getRole(),
 				CPAUtils.toString(messageHeader.getService()),
 				messageHeader.getAction());
@@ -158,7 +157,7 @@ public class DeliveryManager
 		val sendDeliveryChannel = 
 				cpaManager.getSendDeliveryChannel(
 						cpaId,
-						new CacheablePartyId(messageHeader.getFrom().getPartyId()),
+						messageHeader.getFrom().getPartyId(),
 						messageHeader.getFrom().getRole(),
 						CPAUtils.toString(messageHeader.getService()),
 						messageHeader.getAction())

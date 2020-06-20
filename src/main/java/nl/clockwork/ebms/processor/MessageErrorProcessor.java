@@ -42,7 +42,6 @@ import nl.clockwork.ebms.EbMSMessageStatus;
 import nl.clockwork.ebms.EbMSMessageUtils;
 import nl.clockwork.ebms.cpa.CPAManager;
 import nl.clockwork.ebms.cpa.CPAUtils;
-import nl.clockwork.ebms.cpa.CacheablePartyId;
 import nl.clockwork.ebms.dao.EbMSDAO;
 import nl.clockwork.ebms.event.listener.EventListener;
 import nl.clockwork.ebms.event.processor.EventManager;
@@ -86,9 +85,9 @@ class MessageErrorProcessor
 		val result = EbMSMessageUtils.getEbMSDocument(messageError);
 		val messageHeader = message.getMessageHeader();
 		val service = CPAUtils.toString(messageError.getMessageHeader().getService());
-		val sendDeliveryChannel = cpaManager.getSendDeliveryChannel(messageHeader.getCPAId(),new CacheablePartyId(messageError.getMessageHeader().getFrom().getPartyId()),messageError.getMessageHeader().getFrom().getRole(),service,messageError.getMessageHeader().getAction())
+		val sendDeliveryChannel = cpaManager.getSendDeliveryChannel(messageHeader.getCPAId(),messageError.getMessageHeader().getFrom().getPartyId(),messageError.getMessageHeader().getFrom().getRole(),service,messageError.getMessageHeader().getAction())
 				.orElse(null);
-		val receiveDeliveryChannel = cpaManager.getReceiveDeliveryChannel(messageHeader.getCPAId(),new CacheablePartyId(messageError.getMessageHeader().getTo().getPartyId()),messageError.getMessageHeader().getTo().getRole(),service,messageError.getMessageHeader().getAction())
+		val receiveDeliveryChannel = cpaManager.getReceiveDeliveryChannel(messageHeader.getCPAId(),messageError.getMessageHeader().getTo().getPartyId(),messageError.getMessageHeader().getTo().getRole(),service,messageError.getMessageHeader().getAction())
 				.orElse(null);
 		Action action = () ->
 		{
@@ -105,9 +104,8 @@ class MessageErrorProcessor
 	private void storeMessages(Instant timestamp, EbMSDocument messageDocument, EbMSMessage message, EbMSDocument messageErrorDocument, EbMSMessageError messageError)
 	{
 		val messageHeader = message.getMessageHeader();
-		val toPartyId = new CacheablePartyId(message.getMessageHeader().getTo().getPartyId());
 		val service = CPAUtils.toString(message.getMessageHeader().getService());
-		val deliveryChannel = cpaManager.getReceiveDeliveryChannel(messageHeader.getCPAId(),toPartyId,messageHeader.getTo().getRole(),service,messageHeader.getAction())
+		val deliveryChannel = cpaManager.getReceiveDeliveryChannel(messageHeader.getCPAId(),messageHeader.getTo().getPartyId(),messageHeader.getTo().getRole(),service,messageHeader.getAction())
 				.orElse(null);
 		val persistTime = deliveryChannel != null ? CPAUtils.getPersistTime(timestamp,deliveryChannel) : null;
 		ebMSDAO.insertMessage(timestamp,persistTime,messageDocument.getMessage(),message,message.getAttachments(),EbMSMessageStatus.FAILED);

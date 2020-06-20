@@ -16,16 +16,23 @@
 package nl.clockwork.ebms.cache;
 
 import java.io.IOException;
-import java.net.URL;
+import java.util.ArrayList;
+import java.util.Collection;
 
+import org.apache.ignite.cache.eviction.lru.LruEvictionPolicyFactory;
 import org.apache.ignite.cache.spring.SpringCacheManager;
+import org.apache.ignite.configuration.NearCacheConfiguration;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.EnableCaching;
+import org.springframework.cache.concurrent.ConcurrentMapCacheFactoryBean;
 import org.springframework.cache.ehcache.EhCacheCacheManager;
+import org.springframework.cache.ehcache.EhCacheManagerFactoryBean;
 import org.springframework.cache.support.SimpleCacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 
 import lombok.AccessLevel;
@@ -33,7 +40,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.val;
 import lombok.experimental.FieldDefaults;
-//import nl.clockwork.ebms.cache.EbMSCacheManager.CacheType;
 
 @Configuration(proxyBeanMethods = false)
 @EnableCaching
@@ -47,7 +53,7 @@ public class CacheConfig
 	{
 		NONE(""),
 		DEFAULT("nl/clockwork/ebms/ehcache.xml"),
-		IGNITE("nl/clockwork/ebms/ignite-cache.xml");
+		IGNITE("nl/clockwork/ebms/ignite.xml");
 		
 		String defaultConfigLocation;
 	}
@@ -57,25 +63,73 @@ public class CacheConfig
 	@Value("${cache.configLocation}")
 	Resource configLocation;
 
-	@Bean//(destroyMethod = "destroy")
+	@Bean
 	public CacheManager ebMSCacheManager() throws IOException
 	{
-		//return new EbMSCacheManager(type,configLocation);
 		switch (type)
 		{
 			case NONE:
-				return new SimpleCacheManager();
+				val s = new SimpleCacheManager();
+				Collection<Cache> caches = new ArrayList<>();
+				caches.add(createCache("existsCPA"));
+				caches.add(createCache("CPA"));
+				caches.add(createCache("CPAIds"));
+				caches.add(createCache("existsPartyId"));
+				caches.add(createCache("getEbMSPartyInfo"));
+				caches.add(createCache("getPartyInfo"));
+				caches.add(createCache("getFromPartyInfo"));
+				caches.add(createCache("getToPartyInfoByFromPartyActionBinding"));
+				caches.add(createCache("getToPartyInfo"));
+				caches.add(createCache("canSend"));
+				caches.add(createCache("canReceive"));
+				caches.add(createCache("getDeliveryChannel"));
+				caches.add(createCache("getDefaultDeliveryChannel"));
+				caches.add(createCache("getSendDeliveryChannel"));
+				caches.add(createCache("getReceiveDeliveryChannel"));
+				caches.add(createCache("isNonRepudiationRequired"));
+				caches.add(createCache("isConfidential"));
+				caches.add(createCache("getSyncReply"));
+				caches.add(createCache("existsURLMapping"));
+				caches.add(createCache("URLMapping"));
+				caches.add(createCache("URLMappings"));
+				caches.add(createCache("existsCertificateMapping"));
+				caches.add(createCache("CertificateMapping"));
+				caches.add(createCache("CertificateMappings"));
+				s.setCaches(caches);
+				return s;
 			case IGNITE:
 				val ignite = new SpringCacheManager();
-				ignite.setConfigurationPath("classpath:nl/clockwork/ebms/ignite.xml");
+				ignite.setConfigurationPath(getConfigLocation().getURL().toString());
+				ignite.setDynamicNearCacheConfiguration(createDynamicNearCacheConfiguration());
 				return ignite;
 			default:
 				val ehcache = new EhCacheCacheManager();
-				net.sf.ehcache.CacheManager c = new net.sf.ehcache.CacheManager(getClass().getResourceAsStream("/nl/clockwork/ebms/ehcache.xml"));
-				ehcache.setCacheManager(c);
-				//ehcache.setConfigLocation(new ClassPathResource("nl/clockwork/ebms/ehcache.xml"));
+				val factory = new EhCacheManagerFactoryBean();
+				factory.setConfigLocation(configLocation);
+				ehcache.setCacheManager(factory.getObject());
 				return ehcache;
-				
 		}
+	}
+
+	private Cache createCache(String name)
+	{
+		val result = new ConcurrentMapCacheFactoryBean();
+		result.setName(name);
+		result.afterPropertiesSet();
+		return result.getObject();
+	}
+
+	private Resource getConfigLocation()
+	{
+		return configLocation == null ? new ClassPathResource(type.defaultConfigLocation) : configLocation;
+	}
+
+	private NearCacheConfiguration<Object,Object> createDynamicNearCacheConfiguration()
+	{
+		val result = new NearCacheConfiguration<Object,Object>();
+		LruEvictionPolicyFactory<Object,Object> nearEvictPlcFactory = new LruEvictionPolicyFactory<Object,Object>();
+		nearEvictPlcFactory.setMaxSize(100000);
+		result.setNearEvictionPolicyFactory(nearEvictPlcFactory);
+		return result;
 	}
 }

@@ -28,7 +28,6 @@ import nl.clockwork.ebms.EbMSMessageFactory;
 import nl.clockwork.ebms.client.DeliveryManager;
 import nl.clockwork.ebms.cpa.CPAManager;
 import nl.clockwork.ebms.cpa.CPAUtils;
-import nl.clockwork.ebms.cpa.CacheablePartyId;
 import nl.clockwork.ebms.model.EbMSPing;
 import nl.clockwork.ebms.model.EbMSPong;
 import nl.clockwork.ebms.validation.EbMSMessageValidator;
@@ -57,13 +56,11 @@ class PongProcessor
   public void sendPong(final nl.clockwork.ebms.model.EbMSPong pong)
 	{
 		val responseMessageHeader = pong.getMessageHeader();
-		val toPartyId = new CacheablePartyId(responseMessageHeader.getTo().getPartyId());
-		val service = CPAUtils.toString(responseMessageHeader.getService());
 		val uri = cpaManager.getUri(
 				responseMessageHeader.getCPAId(),
-				toPartyId,
+				responseMessageHeader.getTo().getPartyId(),
 				responseMessageHeader.getTo().getRole(),
-				service,
+				CPAUtils.toString(responseMessageHeader.getService()),
 				responseMessageHeader.getAction());
 		deliveryManager.sendResponseMessage(uri,pong);
 	}

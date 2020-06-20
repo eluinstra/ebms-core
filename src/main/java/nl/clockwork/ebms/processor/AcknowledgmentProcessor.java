@@ -26,6 +26,7 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.xpath.XPathExpressionException;
 
+import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageHeader;
 import org.xml.sax.SAXException;
 
 import lombok.AccessLevel;
@@ -41,7 +42,6 @@ import nl.clockwork.ebms.EbMSMessageStatus;
 import nl.clockwork.ebms.EbMSMessageUtils;
 import nl.clockwork.ebms.cpa.CPAManager;
 import nl.clockwork.ebms.cpa.CPAUtils;
-import nl.clockwork.ebms.cpa.CacheablePartyId;
 import nl.clockwork.ebms.dao.EbMSDAO;
 import nl.clockwork.ebms.event.listener.EventListener;
 import nl.clockwork.ebms.event.processor.EventManager;
@@ -86,7 +86,7 @@ class AcknowledgmentProcessor
 		Action action = () ->
 		{
 			storeMessages(timestamp,messageDocument,message,acknowledgmentDocument,acknowledgment);
-			storeEvent(message,acknowledgment,isSyncReply);
+			storeEvent(acknowledgment,isSyncReply);
 			eventListener.onMessageReceived(message.getMessageHeader().getMessageData().getMessageId());
 		};
 		ebMSDAO.executeTransaction(action);
@@ -96,36 +96,33 @@ class AcknowledgmentProcessor
 	private void storeMessages(Instant timestamp, EbMSDocument messageDocument, EbMSMessage message, EbMSDocument acknowledgmentDocument, EbMSAcknowledgment acknowledgment)
 	{
 		val messageHeader = message.getMessageHeader();
-		val toPartyId = new CacheablePartyId(message.getMessageHeader().getTo().getPartyId());
 		val service = CPAUtils.toString(message.getMessageHeader().getService());
 		val deliveryChannel =
-				cpaManager.getReceiveDeliveryChannel(messageHeader .getCPAId(),toPartyId,messageHeader.getTo().getRole(),service,messageHeader.getAction())
-				.orElseThrow(() -> StreamUtils.illegalStateException("ReceiveDeliveryChannel",messageHeader.getCPAId(),toPartyId,messageHeader.getTo().getRole(),service,messageHeader.getAction()));
+				cpaManager.getReceiveDeliveryChannel(messageHeader.getCPAId(),messageHeader.getTo().getPartyId(),messageHeader.getTo().getRole(),service,messageHeader.getAction())
+				.orElseThrow(() -> StreamUtils.illegalStateException("ReceiveDeliveryChannel",messageHeader.getCPAId(),messageHeader.getTo().getPartyId(),messageHeader.getTo().getRole(),service,messageHeader.getAction()));
 		val persistTime = CPAUtils.getPersistTime(messageHeader.getMessageData().getTimestamp(),deliveryChannel);
 		ebMSDAO.insertMessage(timestamp,persistTime,messageDocument.getMessage(),message,message.getAttachments(),EbMSMessageStatus.RECEIVED);
 		ebMSDAO.insertMessage(timestamp,persistTime,acknowledgmentDocument.getMessage(),acknowledgment,Collections.emptyList(),null);
 	}
 
-	private void storeEvent(EbMSMessage message, EbMSAcknowledgment acknowledgment, boolean isSyncReply)
+	private void storeEvent(EbMSAcknowledgment acknowledgment, boolean isSyncReply)
 	{
-		val messageHeader = message.getMessageHeader();
-		val fromPartyId = new CacheablePartyId(acknowledgment.getMessageHeader().getFrom().getPartyId());
-		val toPartyId = new CacheablePartyId(acknowledgment.getMessageHeader().getTo().getPartyId());
-		val service = CPAUtils.toString(acknowledgment.getMessageHeader().getService());
+		MessageHeader messageHeader = acknowledgment.getMessageHeader();
+		val service = CPAUtils.toString(messageHeader.getService());
 		val sendDeliveryChannel =
-				cpaManager.getReceiveDeliveryChannel(messageHeader.getCPAId(),fromPartyId,acknowledgment.getMessageHeader().getFrom().getRole(),service,acknowledgment.getMessageHeader().getAction())
-				.orElseThrow(() -> StreamUtils.illegalStateException("SendDeliveryChannel",messageHeader.getCPAId(),fromPartyId,acknowledgment.getMessageHeader().getFrom().getRole(),service,acknowledgment.getMessageHeader().getAction()));
+				cpaManager.getReceiveDeliveryChannel(messageHeader.getCPAId(),messageHeader.getFrom().getPartyId(),messageHeader.getFrom().getRole(),service,messageHeader.getAction())
+				.orElseThrow(() -> StreamUtils.illegalStateException("SendDeliveryChannel",messageHeader.getCPAId(),messageHeader.getFrom().getPartyId(),messageHeader.getFrom().getRole(),service,messageHeader.getAction()));
 		val receiveDeliveryChannel =
-				cpaManager.getReceiveDeliveryChannel(messageHeader.getCPAId(),toPartyId,acknowledgment.getMessageHeader().getTo().getRole(),service,acknowledgment.getMessageHeader().getAction())
-				.orElseThrow(() -> StreamUtils.illegalStateException("ReceiveDeliveryChannel",messageHeader.getCPAId(),toPartyId,acknowledgment.getMessageHeader().getTo().getRole(),service,acknowledgment.getMessageHeader().getAction()));
+				cpaManager.getReceiveDeliveryChannel(messageHeader.getCPAId(),messageHeader.getTo().getPartyId(),messageHeader.getTo().getRole(),service,messageHeader.getAction())
+				.orElseThrow(() -> StreamUtils.illegalStateException("ReceiveDeliveryChannel",messageHeader.getCPAId(),messageHeader.getTo().getPartyId(),messageHeader.getTo().getRole(),service,messageHeader.getAction()));
 		if (!isSyncReply)
 			eventManager.createEvent(
 					messageHeader.getCPAId(),
 					sendDeliveryChannel,
 					receiveDeliveryChannel,
-					acknowledgment.getMessageHeader().getMessageData().getMessageId(),
-					acknowledgment.getMessageHeader().getMessageData().getTimeToLive(),
-					acknowledgment.getMessageHeader().getMessageData().getTimestamp(),
+					messageHeader.getMessageData().getMessageId(),
+					messageHeader.getMessageData().getTimeToLive(),
+					messageHeader.getMessageData().getTimestamp(),
 					false);
 	}
 

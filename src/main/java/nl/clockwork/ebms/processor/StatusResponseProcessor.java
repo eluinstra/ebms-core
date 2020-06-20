@@ -37,7 +37,6 @@ import nl.clockwork.ebms.EbMSMessageStatus;
 import nl.clockwork.ebms.client.DeliveryManager;
 import nl.clockwork.ebms.cpa.CPAManager;
 import nl.clockwork.ebms.cpa.CPAUtils;
-import nl.clockwork.ebms.cpa.CacheablePartyId;
 import nl.clockwork.ebms.dao.EbMSDAO;
 import nl.clockwork.ebms.model.EbMSStatusRequest;
 import nl.clockwork.ebms.model.EbMSStatusResponse;
@@ -72,13 +71,11 @@ class StatusResponseProcessor
   public void sendStatusResponse(final nl.clockwork.ebms.model.EbMSStatusResponse statusResponse)
 	{
 		val messageHeader = statusResponse.getMessageHeader();
-		val toPartyId = new CacheablePartyId(messageHeader.getTo().getPartyId());
-		val service = CPAUtils.toString(messageHeader.getService());
 		val uri = cpaManager.getUri(
 				messageHeader.getCPAId(),
-				toPartyId,
+				messageHeader.getTo().getPartyId(),
 				messageHeader.getTo().getRole(),
-				service,
+				CPAUtils.toString(messageHeader.getService()),
 				messageHeader.getAction());
 		deliveryManager.sendResponseMessage(uri,statusResponse);
 	}

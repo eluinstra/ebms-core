@@ -60,7 +60,6 @@ import lombok.extern.slf4j.Slf4j;
 import nl.clockwork.ebms.EbMSAttachmentFactory;
 import nl.clockwork.ebms.cpa.CPAManager;
 import nl.clockwork.ebms.cpa.CPAUtils;
-import nl.clockwork.ebms.cpa.CacheablePartyId;
 import nl.clockwork.ebms.model.EbMSAttachment;
 import nl.clockwork.ebms.model.EbMSDocument;
 import nl.clockwork.ebms.model.EbMSMessage;
@@ -87,11 +86,10 @@ public class EbMSMessageEncrypter
 		try
 		{
 			val messageHeader = message.getMessageHeader();
-			val fromPartyId = new CacheablePartyId(messageHeader.getFrom().getPartyId());
 			val service = CPAUtils.toString(messageHeader.getService());
-			if (cpaManager.isConfidential(messageHeader.getCPAId(),fromPartyId,messageHeader.getFrom().getRole(),service,messageHeader.getAction()))
+			if (cpaManager.isConfidential(messageHeader.getCPAId(),messageHeader.getFrom().getPartyId(),messageHeader.getFrom().getRole(),service,messageHeader.getAction()))
 			{
-				val toPartyId = new CacheablePartyId(messageHeader.getTo().getPartyId());
+				val toPartyId = messageHeader.getTo().getPartyId();
 				val deliveryChannel = cpaManager.getReceiveDeliveryChannel(messageHeader.getCPAId(),toPartyId,messageHeader.getTo().getRole(),service,messageHeader.getAction())
 						.orElseThrow(() -> StreamUtils.illegalStateException("ReceiveDeliveryChannel",messageHeader.getCPAId(),toPartyId,messageHeader.getTo().getRole(),service,messageHeader.getAction()));
 				val certificate = CPAUtils.getX509Certificate(CPAUtils.getEncryptionCertificate(deliveryChannel));

@@ -25,16 +25,12 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
-import nl.clockwork.ebms.cache.EhCacheMethodCacheInterceptor;
-import nl.clockwork.ebms.cache.CachingMethodInterceptor;
 import nl.clockwork.ebms.service.cpa.url.URLMapping;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor
 public class URLMapper
 {
-//	@NonNull
-//	CachingMethodInterceptor daoMethodCache;
 	@NonNull
 	URLMappingDAO urlMappingDAO;
 	Object urlMonitor = new Object();
@@ -66,43 +62,29 @@ public class URLMapper
 				else
 					urlMappingDAO.insertURLMapping(urlMapping);
 			}
-			flushDAOMethodCache(urlMapping.getSource());
 		}
 	}
 
 	private void validate(URLMapping urlMapping)
 	{
+		validateUrl(urlMapping.getSource(),"Source");
+		validateUrl(urlMapping.getDestination(),"Destination");
+	}
+
+	private void validateUrl(String url, String propertyName)
+	{
 		try
 		{
-			new URL(urlMapping.getSource());
+			new URL(url);
 		}
 		catch (MalformedURLException e)
 		{
-			throw new IllegalArgumentException("Source invalid",e);
-		}
-		try
-		{
-			new URL(urlMapping.getDestination());
-		}
-		catch (MalformedURLException e)
-		{
-			throw new IllegalArgumentException("Destination invalid",e);
+			throw new IllegalArgumentException(propertyName + " invalid",e);
 		}
 	}
 
 	public void deleteURLMapping(String source)
 	{
-		synchronized (urlMonitor)
-		{
-			urlMappingDAO.deleteURLMapping(source);
-			flushDAOMethodCache(source);
-		}
-	}
-
-	private void flushDAOMethodCache(String source)
-	{
-//		daoMethodCache.remove(EhCacheMethodCacheInterceptor.getKey("URLMapingDAOImpl","existsURLMapping",source));
-//		daoMethodCache.remove(EhCacheMethodCacheInterceptor.getKey("URLMapingDAOImpl","getURLMapping",source));
-//		daoMethodCache.remove(EhCacheMethodCacheInterceptor.getKey("URLMapingDAOImpl","getURLMappings"));
+		urlMappingDAO.deleteURLMapping(source);
 	}
 }

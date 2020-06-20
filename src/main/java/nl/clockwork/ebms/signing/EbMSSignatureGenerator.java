@@ -39,7 +39,6 @@ import lombok.experimental.FieldDefaults;
 import nl.clockwork.ebms.Constants;
 import nl.clockwork.ebms.cpa.CPAManager;
 import nl.clockwork.ebms.cpa.CPAUtils;
-import nl.clockwork.ebms.cpa.CacheablePartyId;
 import nl.clockwork.ebms.model.EbMSAttachment;
 import nl.clockwork.ebms.model.EbMSBaseMessage;
 import nl.clockwork.ebms.model.EbMSDocument;
@@ -69,13 +68,11 @@ public class EbMSSignatureGenerator
 		try
 		{
 			val messageHeader = message.getMessageHeader();
-			val fromPartyId = new CacheablePartyId(messageHeader.getFrom().getPartyId());
-			val service = CPAUtils.toString(messageHeader.getService());
 			if (cpaManager.isNonRepudiationRequired(
 					messageHeader.getCPAId(),
-					fromPartyId,
+					messageHeader.getFrom().getPartyId(),
 					messageHeader.getFrom().getRole(),
-					service,
+					CPAUtils.toString(messageHeader.getService()),
 					messageHeader.getAction()))
 				sign(document,message,message.getAttachments());
 		}
@@ -111,10 +108,9 @@ public class EbMSSignatureGenerator
 	private void sign(EbMSDocument document, EbMSBaseMessage message, List<EbMSAttachment> attachments) throws EbMSProcessorException, GeneralSecurityException, XMLSecurityException
 	{
 		val messageHeader = message.getMessageHeader();
-		val fromPartyId = new CacheablePartyId(messageHeader.getFrom().getPartyId());
 		val service = CPAUtils.toString(messageHeader.getService());
-		val deliveryChannel = cpaManager.getSendDeliveryChannel(messageHeader.getCPAId(),fromPartyId,messageHeader.getFrom().getRole(),service,messageHeader.getAction())
-				.orElseThrow(() -> StreamUtils.illegalStateException("SendDeliveryChannel",messageHeader.getCPAId(),fromPartyId,messageHeader.getFrom().getRole(),service,messageHeader.getAction()));
+		val deliveryChannel = cpaManager.getSendDeliveryChannel(messageHeader.getCPAId(),messageHeader.getFrom().getPartyId(),messageHeader.getFrom().getRole(),service,messageHeader.getAction())
+				.orElseThrow(() -> StreamUtils.illegalStateException("SendDeliveryChannel",messageHeader.getCPAId(),messageHeader.getFrom().getPartyId(),messageHeader.getFrom().getRole(),service,messageHeader.getAction()));
 		val certificate = CPAUtils.getX509Certificate(CPAUtils.getSigningCertificate(deliveryChannel));
 		if (certificate == null)
 			throw new EbMSProcessingException(

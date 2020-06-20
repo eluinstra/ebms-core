@@ -28,7 +28,6 @@ import lombok.val;
 import lombok.experimental.FieldDefaults;
 import nl.clockwork.ebms.cpa.CPAManager;
 import nl.clockwork.ebms.cpa.CPAUtils;
-import nl.clockwork.ebms.cpa.CacheablePartyId;
 import nl.clockwork.ebms.dao.EbMSDAO;
 import nl.clockwork.ebms.encryption.EbMSMessageDecrypter;
 import nl.clockwork.ebms.model.EbMSAcknowledgment;
@@ -105,10 +104,9 @@ public class EbMSMessageValidator
 		{
 			//return message.getSyncReply() != null;
 			val messageHeader = message.getMessageHeader();
-			val fromPartyId = new CacheablePartyId(messageHeader.getFrom().getPartyId());
 			val service = CPAUtils.toString(messageHeader.getService());
-			val syncReply = cpaManager.getSyncReply(messageHeader.getCPAId(),fromPartyId,messageHeader.getFrom().getRole(),service,messageHeader.getAction())
-					.orElseThrow(() -> StreamUtils.illegalStateException("SyncReply",messageHeader.getCPAId(),fromPartyId,messageHeader.getFrom().getRole(),service,messageHeader.getAction()));
+			val syncReply = cpaManager.getSyncReply(messageHeader.getCPAId(),messageHeader.getFrom().getPartyId(),messageHeader.getFrom().getRole(),service,messageHeader.getAction())
+					.orElseThrow(() -> StreamUtils.illegalStateException("SyncReply",messageHeader.getCPAId(),messageHeader.getFrom().getPartyId(),messageHeader.getFrom().getRole(),service,messageHeader.getAction()));
 			return syncReply != null && !syncReply.equals(SyncReplyModeType.NONE);
 		}
 		catch (Exception e)

@@ -46,7 +46,6 @@ import lombok.experimental.FieldDefaults;
 import nl.clockwork.ebms.EbMSAttachmentFactory;
 import nl.clockwork.ebms.EbMSIdGenerator;
 import nl.clockwork.ebms.EbMSMessageFactory;
-import nl.clockwork.ebms.cache.DisabledMethodCacheInterceptor;
 import nl.clockwork.ebms.cpa.CPADAO;
 import nl.clockwork.ebms.cpa.CPAManager;
 import nl.clockwork.ebms.cpa.URLMapper;
@@ -149,12 +148,7 @@ public class EncryptionTest
 
 	private CPAManager initCPAManager() throws IOException, JAXBException
 	{
-		return new CPAManager(initCPADAOMock(),new URLMapper(initMethodCacheMock(),initURLMappingDAOMock()),initMethodCacheMock());
-	}
-
-	private DisabledMethodCacheInterceptor initMethodCacheMock()
-	{
-		return Mockito.mock(DisabledMethodCacheInterceptor.class);
+		return new CPAManager(initCPADAOMock(),new URLMapper(initURLMappingDAOMock()));
 	}
 
 	private CPADAO initCPADAOMock() throws IOException, JAXBException

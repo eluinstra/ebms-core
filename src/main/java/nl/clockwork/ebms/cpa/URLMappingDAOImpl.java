@@ -18,6 +18,8 @@ package nl.clockwork.ebms.cpa;
 import java.util.List;
 import java.util.Optional;
 
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.transaction.annotation.Transactional;
@@ -43,6 +45,7 @@ public class URLMappingDAOImpl implements URLMappingDAO
 	QUrlMapping table = QUrlMapping.urlMapping;
 
 	@Override
+	@Cacheable(cacheNames = "existsURLMapping")
 	public boolean existsURLMapping(String source)
 	{
 		//"select count(*) from url_mapping where source = ?"
@@ -57,6 +60,7 @@ public class URLMappingDAOImpl implements URLMappingDAO
 	}
 
 	@Override
+	@Cacheable(cacheNames = "URLMapping")
 	public Optional<String> getURLMapping(String source)
 	{
 		try
@@ -78,6 +82,7 @@ public class URLMappingDAOImpl implements URLMappingDAO
 	}
 
 	@Override
+	@Cacheable(cacheNames = "URLMappings")
 	public List<URLMapping> getURLMappings()
 	{
 		//"select source, destination from url_mapping order by source asc"
@@ -96,6 +101,7 @@ public class URLMappingDAOImpl implements URLMappingDAO
 
 	@Override
 	@Transactional(transactionManager = "dataSourceTransactionManager")
+	@CacheEvict(cacheNames = {"existsURLMapping","URLMapping","URLMappings"}, allEntries = true)
 	public long insertURLMapping(URLMapping urlMapping)
 	{
 		return queryFactory.insert(table)
@@ -106,6 +112,7 @@ public class URLMappingDAOImpl implements URLMappingDAO
 
 	@Override
 	@Transactional(transactionManager = "dataSourceTransactionManager")
+	@CacheEvict(cacheNames = {"existsURLMapping","URLMapping","URLMappings"}, allEntries = true)
 	public long updateURLMapping(URLMapping urlMapping)
 	{
 		return queryFactory.update(table)
@@ -116,6 +123,7 @@ public class URLMappingDAOImpl implements URLMappingDAO
 
 	@Override
 	@Transactional(transactionManager = "dataSourceTransactionManager")
+	@CacheEvict(cacheNames = {"existsURLMapping","URLMapping","URLMappings"}, allEntries = true)
 	public long deleteURLMapping(String source)
 	{
 		return queryFactory.delete(table)
