@@ -9,6 +9,7 @@ import javax.annotation.Generated;
 import com.querydsl.core.types.Path;
 
 import com.querydsl.sql.ColumnMetadata;
+
 import java.sql.Types;
 
 
@@ -24,11 +25,11 @@ public class QEbmsMessageEvent extends com.querydsl.sql.RelationalPathBase<QEbms
 
     public static final QEbmsMessageEvent ebmsMessageEvent = new QEbmsMessageEvent("EBMS_MESSAGE_EVENT");
 
-    public final NumberPath<Short> eventType = createNumber("eventType", Short.class);
+    public final SimplePath<nl.clockwork.ebms.event.listener.EbMSMessageEventType> eventType = createSimple("eventType", nl.clockwork.ebms.event.listener.EbMSMessageEventType.class);
 
     public final StringPath messageId = createString("messageId");
 
-    public final NumberPath<Short> processed = createNumber("processed", Short.class);
+    public final BooleanPath processed = createBoolean("processed");
 
     public final DateTimePath<java.sql.Timestamp> timeStamp = createDateTime("timeStamp", java.sql.Timestamp.class);
 

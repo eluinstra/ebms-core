@@ -24,6 +24,6 @@ public interface EbMSMessageEventDAO
 {
 	List<EbMSMessageEvent> getEbMSMessageEvents(EbMSMessageContext messageContext, EbMSMessageEventType[] types);
 	List<EbMSMessageEvent> getEbMSMessageEvents(EbMSMessageContext messageContext, EbMSMessageEventType[] types, int maxNr);
-	void insertEbMSMessageEvent(String messageId, EbMSMessageEventType eventType);
-	int processEbMSMessageEvent(String messageId);
+	long insertEbMSMessageEvent(String messageId, EbMSMessageEventType eventType);
+	long processEbMSMessageEvent(String messageId);
 }

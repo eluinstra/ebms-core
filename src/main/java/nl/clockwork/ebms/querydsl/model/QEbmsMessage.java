@@ -40,7 +40,7 @@ public class QEbmsMessage extends com.querydsl.sql.RelationalPathBase<QEbmsMessa
 
     public final StringPath messageId = createString("messageId");
 
-    public final NumberPath<Short> messageNr = createNumber("messageNr", Short.class);
+    public final NumberPath<Integer> messageNr = createNumber("messageNr", Integer.class);
 
     public final DateTimePath<java.sql.Timestamp> persistTime = createDateTime("persistTime", java.sql.Timestamp.class);
 

@@ -27,7 +27,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import javax.activation.DataHandler;
 import javax.xml.parsers.ParserConfigurationException;
@@ -59,8 +58,6 @@ import nl.clockwork.ebms.EbMSAction;
 import nl.clockwork.ebms.EbMSAttachmentFactory;
 import nl.clockwork.ebms.EbMSMessageStatus;
 import nl.clockwork.ebms.EbMSMessageUtils;
-import nl.clockwork.ebms.event.listener.EbMSMessageEventDAO;
-import nl.clockwork.ebms.event.listener.EbMSMessageEventType;
 import nl.clockwork.ebms.event.processor.EbMSEvent;
 import nl.clockwork.ebms.event.processor.EbMSEventDAO;
 import nl.clockwork.ebms.event.processor.EbMSEventStatus;
@@ -72,13 +69,12 @@ import nl.clockwork.ebms.service.model.EbMSDataSourceMTOM;
 import nl.clockwork.ebms.service.model.EbMSMessageContent;
 import nl.clockwork.ebms.service.model.EbMSMessageContentMTOM;
 import nl.clockwork.ebms.service.model.EbMSMessageContext;
-import nl.clockwork.ebms.service.model.EbMSMessageEvent;
 import nl.clockwork.ebms.service.model.Party;
 import nl.clockwork.ebms.util.DOMUtils;
 
 @FieldDefaults(level = AccessLevel.PROTECTED, makeFinal = true)
 @AllArgsConstructor
-abstract class AbstractEbMSDAO implements EbMSDAO, EbMSEventDAO, EbMSMessageEventDAO
+abstract class AbstractEbMSDAO implements EbMSDAO, EbMSEventDAO
 {
 	@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 	@AllArgsConstructor
@@ -132,11 +128,6 @@ abstract class AbstractEbMSDAO implements EbMSDAO, EbMSEventDAO, EbMSMessageEven
 				.retries(rs.getInt("retries"))
 				.build();
 	};
-	RowMapper<EbMSMessageEvent> ebMSMessageEventRowMapper = (rs,rowNum) ->
-	{
-		return new EbMSMessageEvent(rs.getString("message_id"),EbMSMessageEventType.values()[rs.getInt("event_type")]);
-	};
-
 	
 	@Override
 	public void executeTransaction(final Action action)
@@ -772,74 +763,6 @@ abstract class AbstractEbMSDAO implements EbMSDAO, EbMSEventDAO, EbMSMessageEven
 			uri,
 			status.getId(),
 			errorMessage
-		);
-	}
-
-	protected String join(EbMSMessageEventType[] array, String delimiter)
-	{
-		return Stream.of(array)
-				.mapToInt(e -> e.getId())
-				.mapToObj(String::valueOf)
-				.collect(Collectors.joining(delimiter));
-	}
-	
-	@Override
-	public List<EbMSMessageEvent> getEbMSMessageEvents(EbMSMessageContext messageContext, EbMSMessageEventType[] types)
-	{
-		val parameters = new ArrayList<Object>();
-		return jdbcTemplate.query(
-			"select ebms_message_event.message_id, ebms_message_event.event_type" +
-			" from ebms_message_event, ebms_message" +
-			" where ebms_message_event.processed = 0" +
-			" and ebms_message_event.event_type in (" + join(types == null ? EbMSMessageEventType.values() : types,",") + ")" +
-			" and ebms_message_event.message_id = ebms_message.message_id" +
-			" and ebms_message.message_nr = 0" +
-			getMessageContextFilter(messageContext,parameters) +
-			" order by ebms_message.time_stamp asc",
-			parameters.toArray(new Object[0]),
-			ebMSMessageEventRowMapper
-		);
-	}
-
-	protected abstract String getMessageEventsQuery(String messageContextFilter, EbMSMessageEventType[] types, int maxNr);
-
-	@Override
-	public List<EbMSMessageEvent> getEbMSMessageEvents(EbMSMessageContext messageContext, EbMSMessageEventType[] types, int maxNr)
-	{
-		val parameters = new ArrayList<Object>();
-		val messageContextFilter = getMessageContextFilter(messageContext,parameters);
-		return jdbcTemplate.query(
-			getMessageEventsQuery(messageContextFilter,types,maxNr),
-			parameters.toArray(new Object[0]),
-			ebMSMessageEventRowMapper
-		);
-	}
-
-	@Override
-	public void insertEbMSMessageEvent(String messageId, EbMSMessageEventType type)
-	{
-		jdbcTemplate.update
-		(
-			"insert into ebms_message_event (" +
-				"message_id," +
-				"event_type," +
-				"time_stamp" +
-			") values (?,?,?)",
-			messageId,
-			type.getId(),
-			Timestamp.from(Instant.now())
-		);
-	}
-
-	@Override
-	public int processEbMSMessageEvent(String messageId)
-	{
-		return jdbcTemplate.update
-		(
-			"update ebms_message_event" +
-			" set processed = 1" +
-			" where message_id = ?",
-			messageId
 		);
 	}
 

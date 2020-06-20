@@ -53,6 +53,7 @@ import lombok.AccessLevel;
 import lombok.val;
 import lombok.experimental.FieldDefaults;
 import nl.clockwork.ebms.querydsl.CollaborationProtocolAgreementType;
+import nl.clockwork.ebms.querydsl.EbMSMessageEventTypeType;
 import nl.clockwork.ebms.querydsl.X509CertificateType;
 import nl.clockwork.ebms.transaction.TransactionManagerConfig.TransactionManagerType;
 
@@ -105,6 +106,7 @@ public class DataSourceConfig
 		configuration.register("CPA","CPA",new CollaborationProtocolAgreementType(Types.CLOB));
 		configuration.register("CERTIFICATE_MAPPING","SOURCE",new X509CertificateType(Types.BLOB));
 		configuration.register("CERTIFICATE_MAPPING","DESTINATION",new X509CertificateType(Types.BLOB));
+		configuration.register("EBMS_MESSAGE_EVENT","EVENT_TYPE",new EbMSMessageEventTypeType(Types.SMALLINT));
 		return configuration;
 	}
 
