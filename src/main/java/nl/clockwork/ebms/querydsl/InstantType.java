@@ -33,14 +33,13 @@ public class InstantType extends AbstractType<Instant>
 		st.setTimestamp(startIndex,toTimestamp(value));
 	}
 
-	private Instant toInstant(Timestamp timestamp)
+	public static Instant toInstant(Timestamp timestamp)
 	{
 		return timestamp != null ? timestamp.toInstant() : null;
 	}
 
-	private Timestamp toTimestamp(Instant instant)
+	public static Timestamp toTimestamp(Instant instant)
 	{
 		return instant != null ? Timestamp.from(instant) : null;
 	}
-
 }

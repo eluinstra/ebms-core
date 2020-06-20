@@ -6,6 +6,7 @@ import java.sql.SQLException;
 
 import com.querydsl.sql.types.AbstractType;
 
+import lombok.val;
 import nl.clockwork.ebms.event.processor.EbMSEventStatus;
 
 public class EbMSEventStatusType extends AbstractType<EbMSEventStatus>
@@ -24,12 +25,13 @@ public class EbMSEventStatusType extends AbstractType<EbMSEventStatus>
 	@Override
 	public EbMSEventStatus getValue(ResultSet rs, int startIndex) throws SQLException
 	{
-		return EbMSEventStatus.values()[rs.getInt(startIndex)];
+		val id = rs.getObject(startIndex,Integer.class);
+		return id != null ? EbMSEventStatus.get(id).orElseThrow(() -> new IllegalArgumentException("" + id + " is not a valid EbMSEventStatus id!")) : null;
 	}
 
 	@Override
 	public void setValue(PreparedStatement st, int startIndex, EbMSEventStatus value) throws SQLException
 	{
-		st.setInt(startIndex,value.getId());
+		st.setInt(startIndex,value != null ? value.getId() : null);
 	}
 }

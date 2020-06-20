@@ -34,11 +34,11 @@ public enum EbMSEventStatus
 
 	public static Stream<EbMSEventStatus> stream()
 	{
-		return Stream.of(EbMSEventStatus.values());
+		return Stream.of(values());
 	}
 
 	public static final Optional<EbMSEventStatus> get(int id)
 	{
-		return EbMSEventStatus.stream().filter(s -> s.getId() == id).findFirst();
+		return stream().filter(s -> s.getId() == id).findFirst();
 	}
 }

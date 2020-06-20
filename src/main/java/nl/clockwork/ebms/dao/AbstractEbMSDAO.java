@@ -60,6 +60,7 @@ import nl.clockwork.ebms.EbMSMessageUtils;
 import nl.clockwork.ebms.model.EbMSAttachment;
 import nl.clockwork.ebms.model.EbMSBaseMessage;
 import nl.clockwork.ebms.model.EbMSDocument;
+import nl.clockwork.ebms.querydsl.InstantType;
 import nl.clockwork.ebms.service.model.EbMSDataSource;
 import nl.clockwork.ebms.service.model.EbMSDataSourceMTOM;
 import nl.clockwork.ebms.service.model.EbMSMessageContent;
@@ -99,7 +100,7 @@ abstract class AbstractEbMSDAO implements EbMSDAO
 					.toParty(new Party(rs.getString("to_party_id"),rs.getString("to_role")))
 					.service(rs.getString("service"))
 					.action(rs.getString("action"))
-					.timestamp(EbMSDAO.toInstant(rs.getTimestamp("time_stamp")))
+					.timestamp(InstantType.toInstant(rs.getTimestamp("time_stamp")))
 					.conversationId(rs.getString("conversation_id"))
 					.messageId(rs.getString("message_id"))
 					.refToMessageId(rs.getString("ref_to_message_id"))
@@ -368,7 +369,7 @@ abstract class AbstractEbMSDAO implements EbMSDAO
 	@Override
 	public Optional<Instant> getPersistTime(String messageId)
 	{
-		return Optional.ofNullable(EbMSDAO.toInstant(jdbcTemplate.queryForObject("select persist_time from ebms_message where message_id = ? and message_nr = 0",Timestamp.class,messageId)));
+		return Optional.ofNullable(InstantType.toInstant(jdbcTemplate.queryForObject("select persist_time from ebms_message where message_id = ? and message_nr = 0",Timestamp.class,messageId)));
 	}
 
 	@Override

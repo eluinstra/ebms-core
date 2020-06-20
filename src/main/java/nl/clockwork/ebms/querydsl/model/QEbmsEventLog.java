@@ -28,7 +28,7 @@ public class QEbmsEventLog extends com.querydsl.sql.RelationalPathBase<QEbmsEven
 
     public final StringPath messageId = createString("messageId");
 
-    public final SimplePath<nl.clockwork.ebms.event.processor.EbMSEventStatus> status = createSimple("status", nl.clockwork.ebms.event.processor.EbMSEventStatus.class);
+    public final EnumPath<nl.clockwork.ebms.event.processor.EbMSEventStatus> status = createEnum("status", nl.clockwork.ebms.event.processor.EbMSEventStatus.class);
 
     public final DateTimePath<java.time.Instant> timeStamp = createDateTime("timeStamp", java.time.Instant.class);
 

@@ -56,22 +56,22 @@ public enum EbMSMessageStatus
 	
 	public static Stream<EbMSMessageStatus> stream()
 	{
-		return Stream.of(EbMSMessageStatus.values());
+		return Stream.of(values());
 	}
 
 	public static final Optional<EbMSMessageStatus> get(int id)
 	{
-		return EbMSMessageStatus.stream().filter(s -> s.getId() == id).findFirst();
+		return stream().filter(s -> s.getId() == id).findFirst();
 	}
 
 	public static final Optional<EbMSMessageStatus> get(String name)
 	{
-		return EbMSMessageStatus.stream().filter(s -> s.name().equals(name)).findFirst();
+		return stream().filter(s -> s.name().equals(name)).findFirst();
 	}
 
 	public static final Optional<EbMSMessageStatus> get(MessageStatusType statusCode)
 	{
-		return EbMSMessageStatus.stream().filter(s -> s.statusCode.equals(statusCode)).findFirst();
+		return stream().filter(s -> s.statusCode.equals(statusCode)).findFirst();
 	}
 
 	public static final EbMSMessageStatus[] getReceiveStatus()
@@ -81,6 +81,6 @@ public enum EbMSMessageStatus
 
 	public static final EbMSMessageStatus[] getSendStatus()
 	{
-		return SEND_STATUS.toArray(new EbMSMessageStatus[] {});
+		return SEND_STATUS.toArray(new EbMSMessageStatus[]{});
 	}
 }

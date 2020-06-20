@@ -15,6 +15,7 @@
  */
 package nl.clockwork.ebms.event.listener;
 
+import java.util.Optional;
 import java.util.stream.Stream;
 
 import lombok.AccessLevel;
@@ -33,6 +34,11 @@ public enum EbMSMessageEventType
 
 	public static Stream<EbMSMessageEventType> stream()
 	{
-		return Stream.of(EbMSMessageEventType.values());
+		return Stream.of(values());
+	}
+
+	public static final Optional<EbMSMessageEventType> get(int id)
+	{
+		return stream().filter(s -> s.getId() == id).findFirst();
 	}
 }

@@ -16,7 +16,7 @@ import lombok.NonNull;
 import lombok.val;
 import lombok.experimental.FieldDefaults;
 import nl.clockwork.ebms.Action;
-import nl.clockwork.ebms.dao.EbMSDAO;
+import nl.clockwork.ebms.querydsl.InstantType;
 import nl.clockwork.ebms.querydsl.model.QEbmsEvent;
 import nl.clockwork.ebms.querydsl.model.QEbmsEventLog;
 
@@ -39,8 +39,8 @@ public class EbMSEventDAOImpl implements EbMSEventDAO
 				.sendDeliveryChannelId(rs.getString("send_channel_id"))
 				.receiveDeliveryChannelId(rs.getString("receive_channel_id"))
 				.messageId(rs.getString("message_id"))
-				.timeToLive(EbMSDAO.toInstant(rs.getTimestamp("time_to_live")))
-				.timestamp(EbMSDAO.toInstant(rs.getTimestamp("time_stamp")))
+				.timeToLive(InstantType.toInstant(rs.getTimestamp("time_to_live")))
+				.timestamp(InstantType.toInstant(rs.getTimestamp("time_stamp")))
 				.confidential(rs.getBoolean("is_confidential"))
 				.retries(rs.getInt("retries"))
 				.build();

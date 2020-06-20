@@ -53,7 +53,10 @@ import lombok.AccessLevel;
 import lombok.val;
 import lombok.experimental.FieldDefaults;
 import nl.clockwork.ebms.querydsl.CollaborationProtocolAgreementType;
+import nl.clockwork.ebms.querydsl.EbMSEventStatusType;
 import nl.clockwork.ebms.querydsl.EbMSMessageEventTypeType;
+import nl.clockwork.ebms.querydsl.EbMSMessageStatusType;
+import nl.clockwork.ebms.querydsl.InstantType;
 import nl.clockwork.ebms.querydsl.X509CertificateType;
 import nl.clockwork.ebms.transaction.TransactionManagerConfig.TransactionManagerType;
 
@@ -107,10 +110,11 @@ public class DataSourceConfig
 		configuration.register("CERTIFICATE_MAPPING","SOURCE",new X509CertificateType(Types.BLOB));
 		configuration.register("CERTIFICATE_MAPPING","DESTINATION",new X509CertificateType(Types.BLOB));
 		configuration.register("EBMS_MESSAGE_EVENT","EVENT_TYPE",new EbMSMessageEventTypeType(Types.SMALLINT));
-		configuration.register("EBMS_EVENT","TIME_TO_LIVE",new EbMSMessageEventTypeType(Types.TIMESTAMP));
-		configuration.register("EBMS_EVENT","TIME_STAMP",new EbMSMessageEventTypeType(Types.TIMESTAMP));
-		configuration.register("EBMS_EVENT_LOG","STATUS",new EbMSMessageEventTypeType(Types.SMALLINT));
-		configuration.register("EBMS_EVENT_LOG","TIME_STAMP",new EbMSMessageEventTypeType(Types.TIMESTAMP));
+		configuration.register("EBMS_EVENT","TIME_TO_LIVE",new InstantType(Types.TIMESTAMP));
+		configuration.register("EBMS_EVENT","TIME_STAMP",new InstantType(Types.TIMESTAMP));
+		configuration.register("EBMS_EVENT_LOG","STATUS",new EbMSEventStatusType(Types.SMALLINT));
+		configuration.register("EBMS_EVENT_LOG","TIME_STAMP",new InstantType(Types.TIMESTAMP));
+		configuration.register("EBMS_MESSAGE","STATUS",new EbMSMessageStatusType(Types.SMALLINT));
 		return configuration;
 	}
 

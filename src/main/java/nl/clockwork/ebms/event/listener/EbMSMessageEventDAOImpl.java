@@ -14,7 +14,9 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.val;
+import lombok.var;
 import lombok.experimental.FieldDefaults;
+import nl.clockwork.ebms.dao.EbMSDAO;
 import nl.clockwork.ebms.querydsl.model.QEbmsMessage;
 import nl.clockwork.ebms.querydsl.model.QEbmsMessageEvent;
 import nl.clockwork.ebms.service.model.EbMSMessageContext;
@@ -58,14 +60,14 @@ public class EbMSMessageEventDAOImpl implements EbMSMessageEventDAO
 	@Override
 	public List<EbMSMessageEvent> getEbMSMessageEvents(EbMSMessageContext messageContext, EbMSMessageEventType[] types, int maxNr)
 	{
+		var whereClause = messageTable.messageId.eq(messageContext.getMessageId())
+				.and(messageTable.messageNr.eq(0))
+				.and(table.processed.eq(false))
+				.and(table.eventType.in(types == null ? EbMSMessageEventType.values() : types));
+		whereClause = EbMSDAO.createFilter(messageTable,messageContext,whereClause);
 		val query = queryFactory.select(table.messageId,table.eventType)
 				.from(table,messageTable)
-				.where(messageTable.messageId.eq(messageContext.getMessageId())
-						.and(messageTable.messageNr.eq(0))
-						.and(table.processed.eq(false))
-						.and(table.eventType.in(types == null ? EbMSMessageEventType.values() : types))
-						//to filter
-						)
+				.where(whereClause)
 				.orderBy(messageTable.timeStamp.asc())
 				.limit(maxNr)
 				.getSQL();

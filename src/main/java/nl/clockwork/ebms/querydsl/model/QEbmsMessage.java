@@ -48,7 +48,7 @@ public class QEbmsMessage extends com.querydsl.sql.RelationalPathBase<QEbmsMessa
 
     public final StringPath service = createString("service");
 
-    public final NumberPath<Short> status = createNumber("status", Short.class);
+    public final EnumPath<nl.clockwork.ebms.EbMSMessageStatus> status = createEnum("status", nl.clockwork.ebms.EbMSMessageStatus.class);
 
     public final DateTimePath<java.sql.Timestamp> statusTime = createDateTime("statusTime", java.sql.Timestamp.class);
 
