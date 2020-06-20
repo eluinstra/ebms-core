@@ -26,6 +26,8 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.support.TransactionTemplate;
 
+import com.querydsl.sql.SQLQueryFactory;
+
 import lombok.AccessLevel;
 import lombok.val;
 import lombok.experimental.FieldDefaults;
@@ -42,12 +44,14 @@ public abstract class DAOConfig
 	PlatformTransactionManager dataSourceTransactionManager;
 	@Autowired
 	DataSource dataSource;
+	@Autowired
+	SQLQueryFactory queryFactory;
 
 	@Bean
-	public EbMSDAO ebMSDAO() throws Exception
+	public EbMSDAOFactory ebMSDAO() throws Exception
 	{
 		val transactionTemplate = new TransactionTemplate(dataSourceTransactionManager);
 		val jdbcTemplate = new JdbcTemplate(dataSource);
-		return new EbMSDAOFactory(transactionManagerType,dataSource,transactionTemplate,jdbcTemplate).getObject();
+		return new EbMSDAOFactory(transactionManagerType,dataSource,transactionTemplate,jdbcTemplate,queryFactory);
 	}
 }

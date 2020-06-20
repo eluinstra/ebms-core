@@ -41,14 +41,14 @@ public class EbMSMessageEventDAOImpl implements EbMSMessageEventDAO
 	@Override
 	public List<EbMSMessageEvent> getEbMSMessageEvents(EbMSMessageContext messageContext, EbMSMessageEventType[] types)
 	{
+		var whereClause = messageTable.messageId.eq(table.messageId)
+				.and(messageTable.messageNr.eq(0))
+				.and(table.processed.eq(false))
+				.and(table.eventType.in(types == null ? EbMSMessageEventType.values() : types));
+		whereClause = EbMSDAO.applyFilter(messageTable,messageContext,whereClause);
 		val query = queryFactory.select(table.messageId,table.eventType)
 				.from(table,messageTable)
-				.where(messageTable.messageId.eq(messageContext.getMessageId())
-						.and(messageTable.messageNr.eq(0))
-						.and(table.processed.eq(false))
-						.and(table.eventType.in(types == null ? EbMSMessageEventType.values() : types))
-						//to filter
-						)
+				.where(whereClause)
 				.orderBy(messageTable.timeStamp.asc())
 				.getSQL();
 		return jdbcTemplate.query(
@@ -60,11 +60,11 @@ public class EbMSMessageEventDAOImpl implements EbMSMessageEventDAO
 	@Override
 	public List<EbMSMessageEvent> getEbMSMessageEvents(EbMSMessageContext messageContext, EbMSMessageEventType[] types, int maxNr)
 	{
-		var whereClause = messageTable.messageId.eq(messageContext.getMessageId())
+		var whereClause = messageTable.messageId.eq(table.messageId)
 				.and(messageTable.messageNr.eq(0))
 				.and(table.processed.eq(false))
 				.and(table.eventType.in(types == null ? EbMSMessageEventType.values() : types));
-		whereClause = EbMSDAO.createFilter(messageTable,messageContext,whereClause);
+		whereClause = EbMSDAO.applyFilter(messageTable,messageContext,whereClause);
 		val query = queryFactory.select(table.messageId,table.eventType)
 				.from(table,messageTable)
 				.where(whereClause)

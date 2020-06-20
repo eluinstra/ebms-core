@@ -15,7 +15,10 @@
  */
 package nl.clockwork.ebms;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import lombok.AccessLevel;
@@ -40,12 +43,17 @@ public enum EbMSAction
 
 	public static Stream<EbMSAction> stream()
 	{
-		return Stream.of(EbMSAction.values());
+		return Stream.of(values());
 	}
 	
-	public static final Optional<EbMSAction> get(String action)
+	public static Optional<EbMSAction> get(String action)
 	{
-		return EbMSAction.stream().filter(a -> a.action.equals(action)).findFirst();
+		return stream().filter(a -> a.action.equals(action)).findFirst();
+	}
+
+	public static List<String> getActions(EbMSAction[] actions)
+	{
+		return Arrays.stream(actions).map(a -> a.action).collect(Collectors.toList());
 	}
 
 	public String getServiceUri()

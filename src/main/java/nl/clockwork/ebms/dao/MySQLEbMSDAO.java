@@ -30,12 +30,14 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataRetrievalFailureException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.transaction.support.TransactionTemplate;
 import org.w3c.dom.Document;
 
+import com.querydsl.sql.SQLQueryFactory;
+
 import lombok.val;
-import nl.clockwork.ebms.EbMSAttachmentFactory;
 import nl.clockwork.ebms.EbMSMessageStatus;
 import nl.clockwork.ebms.EbMSMessageUtils;
 import nl.clockwork.ebms.model.EbMSAttachment;
@@ -44,21 +46,9 @@ import nl.clockwork.ebms.util.DOMUtils;
 
 class MySQLEbMSDAO extends AbstractEbMSDAO
 {
-	public MySQLEbMSDAO(TransactionTemplate transactionTemplate, JdbcTemplate jdbcTemplate)
+	public MySQLEbMSDAO(TransactionTemplate transactionTemplate, JdbcTemplate jdbcTemplate, SQLQueryFactory queryFactory)
 	{
-		super(transactionTemplate,jdbcTemplate);
-	}
-
-	@Override
-	public String getMessageIdsQuery(String messageContextFilter, EbMSMessageStatus status, int maxNr)
-	{
-		return "select message_id" +
-		" from ebms_message" +
-		" where message_nr = 0" +
-		" and status = " + status.getId() +
-		messageContextFilter +
-		" order by time_stamp asc" +
-		" limit " + maxNr;
+		super(transactionTemplate,jdbcTemplate,queryFactory);
 	}
 
 	@Override
@@ -244,7 +234,7 @@ class MySQLEbMSDAO extends AbstractEbMSDAO
 	}
 
 	@Override
-	protected List<EbMSAttachment> getAttachments(String messageId)
+	protected <T> List<T> getAttachments(String messageId, RowMapper<T> rowMapper)
 	{
 		return jdbcTemplate.query(
 			"select a.name, a.content_id, a.content_type, a.content" + 
@@ -253,10 +243,7 @@ class MySQLEbMSDAO extends AbstractEbMSDAO
 			" and m.message_nr = 0" +
 			" and m.id = a.ebms_message_id" +
 			" order by a.order_nr",
-			(rs,rowNum) ->
-			{
-				return EbMSAttachmentFactory.createEbMSAttachment(rs.getString("name"),rs.getString("content_id"),rs.getString("content_type"),rs.getBytes("content"));
-			},
+			rowMapper,
 			messageId
 		);
 	}

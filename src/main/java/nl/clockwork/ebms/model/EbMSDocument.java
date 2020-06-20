@@ -30,7 +30,7 @@ import lombok.experimental.FieldDefaults;
 
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@AllArgsConstructor
 @Getter
 public class EbMSDocument
 {

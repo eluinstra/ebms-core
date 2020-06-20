@@ -62,7 +62,7 @@ public interface EbMSDAO
 
 	void deleteAttachments(String messageId);
 
-	static BooleanExpression createFilter(QEbmsMessage messageTable, EbMSMessageContext messageContext, BooleanExpression whereClause)
+	static BooleanExpression applyFilter(QEbmsMessage messageTable, EbMSMessageContext messageContext, BooleanExpression whereClause)
 	{
 		if (messageContext != null)
 		{

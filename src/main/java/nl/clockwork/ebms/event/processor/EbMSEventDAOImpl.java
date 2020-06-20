@@ -85,6 +85,7 @@ public class EbMSEventDAOImpl implements EbMSEventDAO
 	}
 	
 	@Override
+	@Transactional(transactionManager = "dataSourceTransactionManager")
 	public long insertEvent(EbMSEvent event, String serverId)
 	{
 		return queryFactory.insert(table)
@@ -101,6 +102,7 @@ public class EbMSEventDAOImpl implements EbMSEventDAO
 	}
 
 	@Override
+	@Transactional(transactionManager = "dataSourceTransactionManager")
 	public long updateEvent(EbMSEvent event)
 	{
 		return queryFactory.update(table)
@@ -111,6 +113,7 @@ public class EbMSEventDAOImpl implements EbMSEventDAO
 	}
 	
 	@Override
+	@Transactional(transactionManager = "dataSourceTransactionManager")
 	public long deleteEvent(String messageId)
 	{
 		return queryFactory.delete(table)
@@ -119,6 +122,7 @@ public class EbMSEventDAOImpl implements EbMSEventDAO
 	}
 
 	@Override
+	@Transactional(transactionManager = "dataSourceTransactionManager")
 	public long insertEventLog(String messageId, Instant timestamp, String uri, EbMSEventStatus status, String errorMessage)
 	{
 		return queryFactory.insert(logTable)

@@ -39,13 +39,13 @@ import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.transaction.support.TransactionTemplate;
 import org.w3c.dom.Document;
 
+import com.querydsl.sql.SQLQueryFactory;
+
 import lombok.val;
-import nl.clockwork.ebms.EbMSAttachmentFactory;
 import nl.clockwork.ebms.EbMSMessageStatus;
 import nl.clockwork.ebms.EbMSMessageUtils;
 import nl.clockwork.ebms.model.EbMSAttachment;
 import nl.clockwork.ebms.model.EbMSBaseMessage;
-import nl.clockwork.ebms.processor.EbMSProcessingException;
 import nl.clockwork.ebms.util.DOMUtils;
 
 class PostgreSQLEbMSDAO extends AbstractEbMSDAO
@@ -84,45 +84,9 @@ class PostgreSQLEbMSDAO extends AbstractEbMSDAO
 		}
 	}
 
-	public PostgreSQLEbMSDAO(TransactionTemplate transactionTemplate, JdbcTemplate jdbcTemplate)
+	public PostgreSQLEbMSDAO(TransactionTemplate transactionTemplate, JdbcTemplate jdbcTemplate, SQLQueryFactory queryFactory)
 	{
-		super(transactionTemplate,jdbcTemplate);
-	}
-
-	@Override
-	public String getMessageIdsQuery(String messageContextFilter, EbMSMessageStatus status, int maxNr)
-	{
-		return "select message_id" +
-		" from ebms_message" +
-		" where message_nr = 0" +
-		" and status=" + status.getId() +
-		messageContextFilter +
-		" order by time_stamp asc" +
-		" limit " + maxNr;
-	}
-
-	@Override
-	protected List<EbMSAttachment> getAttachments(String messageId)
-	{
-		return jdbcTemplate.query(
-			"select name, content_id, content_type, content" + 
-			" from ebms_attachment" + 
-			" where message_id = ?" +
-			" and message_nr = 0" +
-			" order by order_nr",
-			(rs,rowNum) ->
-			{
-				try
-				{
-					return EbMSAttachmentFactory.createCachedEbMSAttachment(rs.getString("name"),rs.getString("content_id"),rs.getString("content_type"),rs.getBinaryStream("content"));
-				}
-				catch (IOException e)
-				{
-					throw new EbMSProcessingException(e);
-				}
-			},
-			messageId
-		);
+		super(transactionTemplate,jdbcTemplate,queryFactory);
 	}
 
 	@Override

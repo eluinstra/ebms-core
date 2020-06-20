@@ -5,6 +5,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.Instant;
+import java.util.Optional;
 
 import com.querydsl.sql.types.AbstractType;
 
@@ -36,6 +37,11 @@ public class InstantType extends AbstractType<Instant>
 	public static Instant toInstant(Timestamp timestamp)
 	{
 		return timestamp != null ? timestamp.toInstant() : null;
+	}
+
+	public static Optional<Instant> toOptionalInstant(Timestamp timestamp)
+	{
+		return timestamp != null ? Optional.of(timestamp.toInstant()) : Optional.empty();
 	}
 
 	public static Timestamp toTimestamp(Instant instant)
