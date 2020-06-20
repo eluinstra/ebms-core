@@ -10,6 +10,6 @@ public class EbMSKeyGenerator implements KeyGenerator
 	@Override
 	public Object generate(Object target, Method method, Object...params)
 	{
-		return method.getName() + SimpleKeyGenerator.generateKey(params);
+		return method.getName() + SimpleKeyGenerator.generateKey(params).hashCode();
 	}
 }
