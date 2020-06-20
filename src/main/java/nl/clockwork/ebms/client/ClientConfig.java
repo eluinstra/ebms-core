@@ -35,7 +35,7 @@ import nl.clockwork.ebms.cpa.CertificateMapper;
 import nl.clockwork.ebms.security.EbMSKeyStore;
 import nl.clockwork.ebms.security.EbMSTrustStore;
 
-@Configuration(proxyBeanMethods = false)
+@Configuration
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class ClientConfig
 {

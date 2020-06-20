@@ -61,8 +61,8 @@ public class CertificateMappingDAOImpl implements CertificateMappingDAO
 				.getSQL();
 		return jdbcTemplate.queryForObject(
 				query.getSQL(),
-				Integer.class,
-				query.getNullFriendlyBindings().toArray()) > 0;
+				query.getNullFriendlyBindings().toArray(),
+				Integer.class) > 0;
 	}
 
 	@Override
@@ -79,6 +79,7 @@ public class CertificateMappingDAOImpl implements CertificateMappingDAO
 					.getSQL();
 			return Optional.of(jdbcTemplate.queryForObject(
 					query.getSQL(),
+					query.getNullFriendlyBindings().toArray(),
 					(rs,rowNum) ->
 					{
 						try
@@ -90,8 +91,7 @@ public class CertificateMappingDAOImpl implements CertificateMappingDAO
 						{
 							throw new SQLException(e);
 						}
-					},
-					query.getNullFriendlyBindings().toArray()));
+					}));
 		}
 		catch(EmptyResultDataAccessException e)
 		{
@@ -109,6 +109,7 @@ public class CertificateMappingDAOImpl implements CertificateMappingDAO
 				.getSQL();
 		return jdbcTemplate.query(
 				query.getSQL(),
+				query.getNullFriendlyBindings().toArray(),
 				(rs,rowNum) ->
 				{
 					try
@@ -123,8 +124,7 @@ public class CertificateMappingDAOImpl implements CertificateMappingDAO
 					{
 						throw new SQLException(e);
 					}
-				},
-				query.getNullFriendlyBindings().toArray());
+				});
 	}
 
 	@Override

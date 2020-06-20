@@ -55,8 +55,8 @@ public class URLMappingDAOImpl implements URLMappingDAO
 				.getSQL();
 		return jdbcTemplate.queryForObject(
 				query.getSQL(),
-				Integer.class,
-				query.getNullFriendlyBindings().toArray()) > 0;
+				query.getNullFriendlyBindings().toArray(),
+				Integer.class) > 0;
 	}
 
 	@Override
@@ -72,8 +72,8 @@ public class URLMappingDAOImpl implements URLMappingDAO
 					.getSQL();
 			return Optional.of(jdbcTemplate.queryForObject(
 					query.getSQL(),
-					String.class,
-					query.getNullFriendlyBindings().toArray()));
+					query.getNullFriendlyBindings().toArray(),
+					String.class));
 		}
 		catch(EmptyResultDataAccessException e)
 		{
@@ -92,11 +92,11 @@ public class URLMappingDAOImpl implements URLMappingDAO
 				.getSQL();
 		return jdbcTemplate.query(
 				query.getSQL(),
+				query.getNullFriendlyBindings().toArray(),
 				(rs,rowNum) ->
 				{
 					return new URLMapping(rs.getString("source"),rs.getString("destination"));
-				},
-				query.getNullFriendlyBindings().toArray());
+				});
 	}
 
 	@Override

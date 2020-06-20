@@ -17,20 +17,17 @@ package nl.clockwork.ebms.event.processor;
 
 import java.time.Instant;
 import java.util.List;
-import java.util.Optional;
 
 import nl.clockwork.ebms.Action;
-import nl.clockwork.ebms.EbMSAction;
 
 public interface EbMSEventDAO
 {
 	void executeTransaction(Action action);
 
-	Optional<EbMSAction> getMessageAction(String messageId);
 	List<EbMSEvent> getEventsBefore(Instant timestamp, String serverId);
 	List<EbMSEvent> getEventsBefore(Instant timestamp, String serverId, int maxNr);
-	void insertEvent(EbMSEvent event, String serverId);
-	void insertEventLog(String messageId, Instant timestamp, String uri, EbMSEventStatus status, String errorMessage);
-	void updateEvent(EbMSEvent event);
-	void deleteEvent(String messageId);
+	long insertEvent(EbMSEvent event, String serverId);
+	long insertEventLog(String messageId, Instant timestamp, String uri, EbMSEventStatus status, String errorMessage);
+	long updateEvent(EbMSEvent event);
+	long deleteEvent(String messageId);
 }

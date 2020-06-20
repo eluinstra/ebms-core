@@ -42,7 +42,7 @@ import lombok.Getter;
 import lombok.val;
 import lombok.experimental.FieldDefaults;
 
-@Configuration(proxyBeanMethods = false)
+@Configuration
 @EnableCaching
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class CacheConfig

@@ -36,6 +36,7 @@ import lombok.experimental.NonFinal;
 import nl.clockwork.ebms.Action;
 import nl.clockwork.ebms.cpa.CPAManager;
 import nl.clockwork.ebms.cpa.CPAUtils;
+import nl.clockwork.ebms.dao.EbMSDAO;
 import nl.clockwork.ebms.util.StreamUtils;
 
 @FieldDefaults(level = AccessLevel.PROTECTED, makeFinal = true)
@@ -74,7 +75,9 @@ public class JMSEventManager implements EventManager
 	@NonNull
 	JmsTemplate jmsTemplate;
 	@NonNull
-	EbMSEventDAO ebMSeventDAO;
+	EbMSDAO ebMSDAO;
+	@NonNull
+	EbMSEventDAO ebMSEventDAO;
 	@NonNull
 	CPAManager cpaManager;
 	int nrAutoRetries;
@@ -102,7 +105,7 @@ public class JMSEventManager implements EventManager
 					.orElseThrow(() -> StreamUtils.illegalStateException("DeliveryChannel",event.getCpaId(),event.getReceiveDeliveryChannelId()));
 		Action action = () ->
 		{
-			ebMSeventDAO.insertEventLog(event.getMessageId(),event.getTimestamp(), url, status, errorMessage);
+			ebMSEventDAO.insertEventLog(event.getMessageId(),event.getTimestamp(), url, status, errorMessage);
 			if (event.getTimeToLive() != null && CPAUtils.isReliableMessaging(deliveryChannel))
 			{
 				val nextEvent = createNextEvent(event,deliveryChannel);
@@ -111,7 +114,7 @@ public class JMSEventManager implements EventManager
 			}
 			else
 			{
-				switch(ebMSeventDAO.getMessageAction(event.getMessageId()).orElse(null))
+				switch(ebMSDAO.getMessageAction(event.getMessageId()).orElse(null))
 				{
 					case ACKNOWLEDGMENT:
 					case MESSAGE_ERROR:
@@ -126,7 +129,7 @@ public class JMSEventManager implements EventManager
 				}
 			}
 		};
-		ebMSeventDAO.executeTransaction(action);
+		ebMSEventDAO.executeTransaction(action);
 	}
 
 	private long calculateDelay(final EbMSEvent event)

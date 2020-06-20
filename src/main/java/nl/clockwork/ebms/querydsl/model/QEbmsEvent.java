@@ -1,15 +1,18 @@
 package nl.clockwork.ebms.querydsl.model;
 
-import static com.querydsl.core.types.PathMetadataFactory.*;
+import static com.querydsl.core.types.PathMetadataFactory.forVariable;
 
-import com.querydsl.core.types.dsl.*;
-
-import com.querydsl.core.types.PathMetadata;
-import javax.annotation.Generated;
-import com.querydsl.core.types.Path;
-
-import com.querydsl.sql.ColumnMetadata;
 import java.sql.Types;
+
+import javax.annotation.Generated;
+
+import com.querydsl.core.types.Path;
+import com.querydsl.core.types.PathMetadata;
+import com.querydsl.core.types.dsl.BooleanPath;
+import com.querydsl.core.types.dsl.DateTimePath;
+import com.querydsl.core.types.dsl.NumberPath;
+import com.querydsl.core.types.dsl.StringPath;
+import com.querydsl.sql.ColumnMetadata;
 
 
 
@@ -32,15 +35,15 @@ public class QEbmsEvent extends com.querydsl.sql.RelationalPathBase<QEbmsEvent> 
 
     public final StringPath receiveChannelId = createString("receiveChannelId");
 
-    public final NumberPath<Short> retries = createNumber("retries", Short.class);
+    public final NumberPath<Integer> retries = createNumber("retries", Integer.class);
 
     public final StringPath sendChannelId = createString("sendChannelId");
 
     public final StringPath serverId = createString("serverId");
 
-    public final DateTimePath<java.sql.Timestamp> timeStamp = createDateTime("timeStamp", java.sql.Timestamp.class);
+    public final DateTimePath<java.time.Instant> timeStamp = createDateTime("timeStamp", java.time.Instant.class);
 
-    public final DateTimePath<java.sql.Timestamp> timeToLive = createDateTime("timeToLive", java.sql.Timestamp.class);
+    public final DateTimePath<java.time.Instant> timeToLive = createDateTime("timeToLive", java.time.Instant.class);
 
     public QEbmsEvent(String variable) {
         super(QEbmsEvent.class, forVariable(variable), "PUBLIC", "EBMS_EVENT");

@@ -25,7 +25,7 @@ import org.springframework.context.annotation.Configuration;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 
-@Configuration(proxyBeanMethods = false)
+@Configuration
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class KeyStoreConfig
 {

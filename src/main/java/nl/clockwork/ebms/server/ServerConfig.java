@@ -23,7 +23,7 @@ import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import nl.clockwork.ebms.processor.EbMSMessageProcessor;
 
-@Configuration(proxyBeanMethods = false)
+@Configuration
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class ServerConfig
 {

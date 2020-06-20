@@ -48,6 +48,7 @@ public interface EbMSDAO
 	Optional<EbMSDocument> getEbMSDocumentByRefToMessageId(String cpaId, String refToMessageId, EbMSAction...actions);
 	Optional<EbMSMessageStatus> getMessageStatus(String messageId);
 	Optional<Instant> getPersistTime(String messageId);
+	Optional<EbMSAction> getMessageAction(String messageId);
 
 	List<String> getMessageIds(EbMSMessageContext messageContext, EbMSMessageStatus status);
 	List<String> getMessageIds(EbMSMessageContext messageContext, EbMSMessageStatus status, int maxNr);

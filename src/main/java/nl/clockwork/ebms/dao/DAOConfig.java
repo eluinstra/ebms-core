@@ -29,8 +29,6 @@ import org.springframework.transaction.support.TransactionTemplate;
 import lombok.AccessLevel;
 import lombok.val;
 import lombok.experimental.FieldDefaults;
-import nl.clockwork.ebms.event.listener.EbMSMessageEventDAO;
-import nl.clockwork.ebms.event.processor.EbMSEventDAO;
 import nl.clockwork.ebms.transaction.TransactionManagerConfig.TransactionManagerType;
 
 @Configuration
@@ -51,21 +49,5 @@ public abstract class DAOConfig
 		val transactionTemplate = new TransactionTemplate(dataSourceTransactionManager);
 		val jdbcTemplate = new JdbcTemplate(dataSource);
 		return new EbMSDAOFactory(transactionManagerType,dataSource,transactionTemplate,jdbcTemplate).getObject();
-	}
-
-	@Bean
-	public EbMSMessageEventDAO ebMSMessageEventDAO() throws Exception
-	{
-		val transactionTemplate = new TransactionTemplate(dataSourceTransactionManager);
-		val jdbcTemplate = new JdbcTemplate(dataSource);
-		return (EbMSMessageEventDAO)new EbMSDAOFactory(transactionManagerType,dataSource,transactionTemplate,jdbcTemplate).getObject();
-	}
-
-	@Bean
-	public EbMSEventDAO ebMSEventDAO() throws Exception
-	{
-		val transactionTemplate = new TransactionTemplate(dataSourceTransactionManager);
-		val jdbcTemplate = new JdbcTemplate(dataSource);
-		return (EbMSEventDAO)new EbMSDAOFactory(transactionManagerType,dataSource,transactionTemplate,jdbcTemplate).getObject();
 	}
 }

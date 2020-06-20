@@ -15,25 +15,33 @@
  */
 package nl.clockwork.ebms.event.processor;
 
+import javax.sql.DataSource;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jms.core.JmsTemplate;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.support.TransactionTemplate;
+
+import com.querydsl.sql.SQLQueryFactory;
 
 import lombok.AccessLevel;
+import lombok.val;
 import lombok.experimental.FieldDefaults;
 import nl.clockwork.ebms.cpa.CPAManager;
+import nl.clockwork.ebms.dao.EbMSDAO;
 import nl.clockwork.ebms.event.processor.EventProcessorConfig.EventProcessorType;
 
-@Configuration(proxyBeanMethods = false)
+@Configuration
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class EventManagerConfig
 {
 	@Value("${eventProcessor.type}")
 	EventProcessorType eventProcessorType;
-	@Autowired
-	EbMSEventDAO ebMSEventDAO;
 	@Autowired
 	CPAManager cpaManager;
 	@Value("${ebms.serverId}")
@@ -44,6 +52,15 @@ public class EventManagerConfig
 	int nrAutoRetries;
 	@Value("${ebmsMessage.autoRetryInterval}")
 	int autoRetryInterval;
+	@Autowired
+	EbMSDAO ebMSDAO;
+	@Autowired
+	@Qualifier("dataSourceTransactionManager")
+	PlatformTransactionManager dataSourceTransactionManager;
+	@Autowired
+	DataSource dataSource;
+	@Autowired
+	SQLQueryFactory queryFactory;
 
 	@Bean()
 	public EventManager eventManager() throws Exception
@@ -53,9 +70,17 @@ public class EventManagerConfig
 			case NONE:
 				return null;
 			case JMS:
-				return new JMSEventManager(jmsTemplate,ebMSEventDAO,cpaManager,nrAutoRetries,autoRetryInterval);
+				return new JMSEventManager(jmsTemplate,ebMSDAO,ebMSEventDAO(),cpaManager,nrAutoRetries,autoRetryInterval);
 			default:
-				return new EbMSEventManager(ebMSEventDAO,cpaManager,serverId,nrAutoRetries,autoRetryInterval);
+				return new EbMSEventManager(ebMSDAO,ebMSEventDAO(),cpaManager,serverId,nrAutoRetries,autoRetryInterval);
 		}
+	}
+
+	@Bean
+	public EbMSEventDAO ebMSEventDAO() throws Exception
+	{
+		val transactionTemplate = new TransactionTemplate(dataSourceTransactionManager);
+		val jdbcTemplate = new JdbcTemplate(dataSource);
+		return new EbMSEventDAOImpl(transactionTemplate,jdbcTemplate,queryFactory);
 	}
 }

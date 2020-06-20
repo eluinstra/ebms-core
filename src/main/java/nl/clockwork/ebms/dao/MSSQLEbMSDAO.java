@@ -33,7 +33,6 @@ import org.springframework.transaction.support.TransactionTemplate;
 import org.w3c.dom.Document;
 
 import lombok.val;
-import nl.clockwork.ebms.Action;
 import nl.clockwork.ebms.EbMSMessageStatus;
 import nl.clockwork.ebms.EbMSMessageUtils;
 import nl.clockwork.ebms.model.EbMSAttachment;
@@ -61,79 +60,64 @@ class MSSQLEbMSDAO extends MySQLEbMSDAO
 	@Override
 	public void insertDuplicateMessage(final Instant timestamp, final Document document, final EbMSBaseMessage message, final List<EbMSAttachment> attachments)
 	{
-		Action action = () ->
+		try
 		{
-			try
-			{
-				val keyHolder = new GeneratedKeyHolder();
-				jdbcTemplate.update(
-					new PreparedStatementCreator()
+			val keyHolder = new GeneratedKeyHolder();
+			jdbcTemplate.update(
+				new PreparedStatementCreator()
+				{
+					
+					@Override
+					public PreparedStatement createPreparedStatement(Connection connection) throws SQLException
 					{
-						
-						@Override
-						public PreparedStatement createPreparedStatement(Connection connection) throws SQLException
+						try
 						{
-							try
-							{
-								val ps = connection.prepareStatement
-								(
-									"insert into ebms_message (" +
-										"time_stamp," +
-										"cpa_id," +
-										"conversation_id," +
-										"message_id," +
-										"message_nr," +
-										"ref_to_message_id," +
-										"time_to_live," +
-										"from_role," +
-										"to_role," +
-										"service," +
-										"action," +
-										"content" +
-									") values (?,?,?,?,(select max(message_nr) + 1 as nr from ebms_message where message_id = ?),?,?,?,?,?,?,?)",
-									new int[]{1}
-								);
-								ps.setTimestamp(1,Timestamp.from(timestamp));
-								val messageHeader = message.getMessageHeader();
-								ps.setString(2,messageHeader.getCPAId());
-								ps.setString(3,messageHeader.getConversationId());
-								ps.setString(4,messageHeader.getMessageData().getMessageId());
-								ps.setString(5,messageHeader.getMessageData().getMessageId());
-								ps.setString(6,messageHeader.getMessageData().getRefToMessageId());
-								ps.setTimestamp(7,messageHeader.getMessageData().getTimeToLive() == null ? null : Timestamp.from(messageHeader.getMessageData().getTimeToLive()));
-								ps.setString(8,messageHeader.getFrom().getRole());
-								ps.setString(9,messageHeader.getTo().getRole());
-								ps.setString(10,EbMSMessageUtils.toString(messageHeader.getService()));
-								ps.setString(11,messageHeader.getAction());
-								ps.setString(12,DOMUtils.toString(document,"UTF-8"));
-								return ps;
-							}
-							catch (TransformerException e)
-							{
-								throw new SQLException(e);
-							}
+							val ps = connection.prepareStatement
+							(
+								"insert into ebms_message (" +
+									"time_stamp," +
+									"cpa_id," +
+									"conversation_id," +
+									"message_id," +
+									"message_nr," +
+									"ref_to_message_id," +
+									"time_to_live," +
+									"from_role," +
+									"to_role," +
+									"service," +
+									"action," +
+									"content" +
+								") values (?,?,?,?,(select max(message_nr) + 1 as nr from ebms_message where message_id = ?),?,?,?,?,?,?,?)",
+								new int[]{1}
+							);
+							ps.setTimestamp(1,Timestamp.from(timestamp));
+							val messageHeader = message.getMessageHeader();
+							ps.setString(2,messageHeader.getCPAId());
+							ps.setString(3,messageHeader.getConversationId());
+							ps.setString(4,messageHeader.getMessageData().getMessageId());
+							ps.setString(5,messageHeader.getMessageData().getMessageId());
+							ps.setString(6,messageHeader.getMessageData().getRefToMessageId());
+							ps.setTimestamp(7,messageHeader.getMessageData().getTimeToLive() == null ? null : Timestamp.from(messageHeader.getMessageData().getTimeToLive()));
+							ps.setString(8,messageHeader.getFrom().getRole());
+							ps.setString(9,messageHeader.getTo().getRole());
+							ps.setString(10,EbMSMessageUtils.toString(messageHeader.getService()));
+							ps.setString(11,messageHeader.getAction());
+							ps.setString(12,DOMUtils.toString(document,"UTF-8"));
+							return ps;
 						}
-					},
-					keyHolder
-				);
-				insertAttachments(keyHolder.getKey().longValue(),attachments);
-			}
-			catch (IOException e)
-			{
-				throw new DataRetrievalFailureException("",e);
-			}
-		};
-		executeTransaction(action);
-	}
-
-	@Override
-	public String getEventsBeforeQuery(String serverId, int maxNr)
-	{
-		return "select top " + maxNr + " cpa_id, send_channel_id, receive_channel_id, message_id, time_to_live, time_stamp, is_confidential, retries" +
-			" from ebms_event" +
-			" where time_stamp <= ?" +
-			(serverId == null ? " and server_id is null" : " and server_id = '" + serverId + "'") +
-			//" and (server_id = ? or (server_id is null and ? is null))" +
-			" order by time_stamp asc";
+						catch (TransformerException e)
+						{
+							throw new SQLException(e);
+						}
+					}
+				},
+				keyHolder
+			);
+			insertAttachments(keyHolder.getKey().longValue(),attachments);
+		}
+		catch (IOException e)
+		{
+			throw new DataRetrievalFailureException("",e);
+		}
 	}
 }

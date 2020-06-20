@@ -107,6 +107,10 @@ public class DataSourceConfig
 		configuration.register("CERTIFICATE_MAPPING","SOURCE",new X509CertificateType(Types.BLOB));
 		configuration.register("CERTIFICATE_MAPPING","DESTINATION",new X509CertificateType(Types.BLOB));
 		configuration.register("EBMS_MESSAGE_EVENT","EVENT_TYPE",new EbMSMessageEventTypeType(Types.SMALLINT));
+		configuration.register("EBMS_EVENT","TIME_TO_LIVE",new EbMSMessageEventTypeType(Types.TIMESTAMP));
+		configuration.register("EBMS_EVENT","TIME_STAMP",new EbMSMessageEventTypeType(Types.TIMESTAMP));
+		configuration.register("EBMS_EVENT_LOG","STATUS",new EbMSMessageEventTypeType(Types.SMALLINT));
+		configuration.register("EBMS_EVENT_LOG","TIME_STAMP",new EbMSMessageEventTypeType(Types.TIMESTAMP));
 		return configuration;
 	}
 

@@ -42,7 +42,7 @@ import nl.clockwork.ebms.signing.SigningConfig;
 import nl.clockwork.ebms.transaction.TransactionManagerConfig;
 import nl.clockwork.ebms.validation.ValidationConfig;
 
-@Configuration(proxyBeanMethods = false)
+@Configuration
 @Import({
 	CacheConfig.class,
 	ClientConfig.class,

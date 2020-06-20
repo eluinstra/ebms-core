@@ -38,16 +38,4 @@ class HSQLDBEbMSDAO extends AbstractEbMSDAO
 		" order by time_stamp asc" +
 		" limit " + maxNr;
 	}
-
-	@Override
-	public String getEventsBeforeQuery(String serverId, int maxNr)
-	{
-		return "select cpa_id, send_channel_id, receive_channel_id, message_id, time_to_live, time_stamp, is_confidential, retries" +
-			" from ebms_event" +
-			" where time_stamp <= ?" +
-			(serverId == null ? " and server_id is null" : " and server_id = '" + serverId + "'") +
-			//" and (server_id = ? or (server_id is null and ? is null))" +
-			" order by time_stamp asc" +
-			" limit " + maxNr;
-	}
 }

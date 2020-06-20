@@ -45,8 +45,8 @@ public class CPADAOImpl implements CPADAO
 				.getSQL();
 		return jdbcTemplate.queryForObject(
 				query.getSQL(),
-				Integer.class,
-				query.getNullFriendlyBindings().toArray()) > 0;
+				query.getNullFriendlyBindings().toArray(),
+				Integer.class) > 0;
 	}
 	
 	@Override
@@ -62,8 +62,8 @@ public class CPADAOImpl implements CPADAO
 					.getSQL();
 			val cpa = jdbcTemplate.queryForObject(
 					query.getSQL(),
-					String.class,
-					query.getNullFriendlyBindings().toArray());
+					query.getNullFriendlyBindings().toArray(),
+					String.class);
 			return Optional.of(JAXBParser.getInstance(CollaborationProtocolAgreement.class).handle(cpa));
 		}
 		catch(EmptyResultDataAccessException e)
@@ -87,8 +87,8 @@ public class CPADAOImpl implements CPADAO
 				.getSQL();
 		return jdbcTemplate.queryForList(
 				query.getSQL(),
-				String.class,
-				query.getNullFriendlyBindings().toArray());
+				query.getNullFriendlyBindings().toArray(),
+				String.class);
 	}
 
 	@Override

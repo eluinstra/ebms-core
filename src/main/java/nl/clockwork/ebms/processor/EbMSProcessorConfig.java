@@ -32,7 +32,7 @@ import nl.clockwork.ebms.event.processor.EventManager;
 import nl.clockwork.ebms.signing.EbMSSignatureGenerator;
 import nl.clockwork.ebms.validation.EbMSMessageValidator;
 
-@Configuration(proxyBeanMethods = false)
+@Configuration
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class EbMSProcessorConfig
 {

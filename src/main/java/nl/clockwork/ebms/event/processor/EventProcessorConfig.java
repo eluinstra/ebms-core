@@ -38,7 +38,7 @@ import nl.clockwork.ebms.encryption.EbMSMessageEncrypter;
 import nl.clockwork.ebms.event.listener.EventListener;
 import nl.clockwork.ebms.processor.EbMSMessageProcessor;
 
-@Configuration(proxyBeanMethods = false)
+@Configuration
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class EventProcessorConfig
 {
