@@ -119,7 +119,7 @@ public class CPAManager
 		return result;
 	}
 
-	@Cacheable(cacheNames = "CPA", keyGenerator = "ebMSKeyGenerator")
+	@Cacheable(cacheNames = "CPA", key = "#root.methodName+#cpaId+T(nl.clockwork.ebms.cpa.CPAUtils).toString(#partyId)")
 	public Optional<PartyInfo> getPartyInfo(String cpaId, List<PartyId> partyId)
 	{
 		return getCPA(cpaId)
@@ -174,7 +174,7 @@ public class CPAManager
 						.orElse(null));
 	}
 
-	@Cacheable(cacheNames = "CPA", keyGenerator = "ebMSKeyGenerator")
+	@Cacheable(cacheNames = "CPA", key = "#root.methodName+#cpaId+T(nl.clockwork.ebms.cpa.CPAUtils).toString(#partyId)+#role+#service+#action")
 	public boolean canSend(String cpaId, List<PartyId> partyId, String role, String service, String action)
 	{
 		return getCPA(cpaId)
@@ -187,7 +187,7 @@ public class CPAManager
 				.orElse(null);
 	}
 
-	@Cacheable(cacheNames = "CPA", keyGenerator = "ebMSKeyGenerator")
+	@Cacheable(cacheNames = "CPA", key = "#root.methodName+#cpaId+T(nl.clockwork.ebms.cpa.CPAUtils).toString(#partyId)+#role+#service+#action")
 	public boolean canReceive(String cpaId, List<PartyId> partyId, String role, String service, String action)
 	{
 		return getCPA(cpaId)
@@ -211,21 +211,9 @@ public class CPAManager
 					.orElse(null));
 	}
 
-	@Cacheable(cacheNames = "CPA", keyGenerator = "ebMSKeyGenerator")
+	@Cacheable(cacheNames = "CPA", key = "#root.methodName+#cpaId+T(nl.clockwork.ebms.cpa.CPAUtils).toString(#partyId)+#action")
 	public Optional<DeliveryChannel> getDefaultDeliveryChannel(String cpaId, List<PartyId> partyId, String action)
 	{
-//		return getCPA(cpaId)
-//				.map(c -> c.getPartyInfo().stream()
-//					.filter(p -> CPAUtils.equals(p.getPartyId(),partyId))
-//					.flatMap(p -> p.getOverrideMshActionBinding().stream())
-//					.filter(b -> b.getAction().equals(action))
-//					.findFirst()
-//					.map(b -> (DeliveryChannel)b.getChannelId())
-//					.orElse(c.getPartyInfo().stream()
-//							.filter(p -> CPAUtils.equals(p.getPartyId(),partyId))
-//							.map(p -> (DeliveryChannel)p.getDefaultMshChannelId())
-//							.findFirst()
-//							.orElse(null)));
 		return getPartyInfo(cpaId,partyId)
 				.map(p -> p.getOverrideMshActionBinding().stream()
 					.filter(b -> b.getAction().equals(action))
@@ -234,7 +222,7 @@ public class CPAManager
 					.orElse((DeliveryChannel)p.getDefaultMshChannelId()));
 	}
 
-	@Cacheable(cacheNames = "CPA", keyGenerator = "ebMSKeyGenerator")
+	@Cacheable(cacheNames = "CPA", key = "#root.methodName+#cpaId+T(nl.clockwork.ebms.cpa.CPAUtils).toString(#partyId)+#role+#service+#action")
 	public Optional<DeliveryChannel> getSendDeliveryChannel(String cpaId, List<PartyId> partyId, String role, String service, String action)
 	{
 		if (EbMSAction.EBMS_SERVICE_URI.equals(service))
@@ -252,7 +240,7 @@ public class CPAManager
 		}
 	}
 	
-	@Cacheable(cacheNames = "CPA", keyGenerator = "ebMSKeyGenerator")
+	@Cacheable(cacheNames = "CPA", key = "#root.methodName+#cpaId+T(nl.clockwork.ebms.cpa.CPAUtils).toString(#partyId)+#role+#service+#action")
 	public Optional<DeliveryChannel> getReceiveDeliveryChannel(String cpaId, List<PartyId> partyId, String role, String service, String action)
 	{
 		if (EbMSAction.EBMS_SERVICE_URI.equals(service))
@@ -268,7 +256,7 @@ public class CPAManager
 							.orElse(null));
 	}
 	
-	@Cacheable(cacheNames = "CPA", keyGenerator = "ebMSKeyGenerator")
+	@Cacheable(cacheNames = "CPA", key = "#root.methodName+#cpaId+T(nl.clockwork.ebms.cpa.CPAUtils).toString(#partyId)+#role+#service+#action")
 	public boolean isNonRepudiationRequired(String cpaId, List<PartyId> partyId, String role, String service, String action)
 	{
 		val canSend =  getCPA(cpaId)
@@ -290,7 +278,7 @@ public class CPAManager
 				.orElse(null);
 	}
 
-	@Cacheable(cacheNames = "CPA", keyGenerator = "ebMSKeyGenerator")
+	@Cacheable(cacheNames = "CPA", key = "#root.methodName+#cpaId+T(nl.clockwork.ebms.cpa.CPAUtils).toString(#partyId)+#role+#service+#action")
 	public boolean isConfidential(String cpaId, List<PartyId> partyId, String role, String service, String action)
 	{
 		val canSend =  getCPA(cpaId)
@@ -320,7 +308,7 @@ public class CPAManager
 		));
 	}
 
-	@Cacheable(cacheNames = "getSyncReply")
+	@Cacheable(cacheNames = "CPA", key = "#root.methodName+#cpaId+T(nl.clockwork.ebms.cpa.CPAUtils).toString(#partyId)+#role+#service+#action")
 	public Optional<SyncReplyModeType> getSyncReply(String cpaId, List<PartyId> partyId, String role, String service, String action)
 	{
 		return getSendDeliveryChannel(cpaId,partyId,role,service,action)

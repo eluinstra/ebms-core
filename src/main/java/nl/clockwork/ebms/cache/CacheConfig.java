@@ -71,10 +71,7 @@ public class CacheConfig
 		{
 			case EHCACHE:
 				val ehcacheCacheManager = new EhCacheCacheManager();
-				val ehCacheManagerFactory = new EhCacheManagerFactoryBean();
-				ehCacheManagerFactory.setConfigLocation(getConfigLocation());
-				ehCacheManagerFactory.afterPropertiesSet();
-				net.sf.ehcache.CacheManager ehcacheManager = ehCacheManagerFactory.getObject();
+				net.sf.ehcache.CacheManager ehcacheManager = createEhCacheManager(getConfigLocation());
 				ehcacheManager.addCache("CPA");
 				ehcacheManager.addCache("URLMapping");
 				ehcacheManager.addCache("CertificateMapping");
@@ -100,6 +97,15 @@ public class CacheConfig
 	public KeyGenerator keyGenerator()
 	{
 		return new EbMSKeyGenerator();
+	}
+
+	private net.sf.ehcache.CacheManager createEhCacheManager(Resource configLocation)
+	{
+		val ehCacheManagerFactory = new EhCacheManagerFactoryBean();
+		ehCacheManagerFactory.setConfigLocation(configLocation);
+		ehCacheManagerFactory.afterPropertiesSet();
+		net.sf.ehcache.CacheManager ehcacheManager = ehCacheManagerFactory.getObject();
+		return ehcacheManager;
 	}
 
   private Resource getConfigLocation()

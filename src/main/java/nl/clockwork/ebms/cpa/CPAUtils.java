@@ -25,6 +25,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.xml.bind.JAXBElement;
 
@@ -65,6 +66,11 @@ public class CPAUtils
 	public static String toString(org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.PartyId partyId)
 	{
 		return (partyId.getType() == null ? "" : partyId.getType() + ":") + partyId.getValue();
+	}
+
+	public static String toString(List<org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.PartyId> partyId)
+	{
+		return partyId.stream().map(id -> toString(id)).collect(Collectors.joining(","));
 	}
 
 	public static String toString(ServiceType service)
