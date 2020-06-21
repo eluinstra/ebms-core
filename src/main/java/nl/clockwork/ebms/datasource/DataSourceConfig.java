@@ -31,7 +31,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import com.atomikos.jdbc.AtomikosDataSourceBean;
 import com.atomikos.jdbc.internal.AtomikosSQLException;
@@ -62,7 +61,6 @@ import nl.clockwork.ebms.querydsl.X509CertificateType;
 import nl.clockwork.ebms.transaction.TransactionManagerConfig.TransactionManagerType;
 
 @Configuration
-@EnableTransactionManagement
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class DataSourceConfig
 {

@@ -21,15 +21,22 @@ import javax.transaction.SystemException;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.transaction.jta.JtaTransactionManager;
 
 import com.atomikos.icatch.jta.UserTransactionManager;
 
 import bitronix.tm.TransactionManagerServices;
+import lombok.AccessLevel;
 import lombok.val;
+import lombok.experimental.FieldDefaults;
 
+@Configuration
+@EnableTransactionManagement
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class TransactionManagerConfig
 {
 	@Value("${transactionManager.type}")
