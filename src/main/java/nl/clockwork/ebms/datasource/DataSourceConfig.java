@@ -52,6 +52,7 @@ import bitronix.tm.resource.jdbc.PoolingDataSource;
 import lombok.AccessLevel;
 import lombok.val;
 import lombok.experimental.FieldDefaults;
+import nl.clockwork.ebms.querydsl.CachedOutputStreamType;
 import nl.clockwork.ebms.querydsl.CollaborationProtocolAgreementType;
 import nl.clockwork.ebms.querydsl.EbMSEventStatusType;
 import nl.clockwork.ebms.querydsl.EbMSMessageEventTypeType;
@@ -119,6 +120,7 @@ public class DataSourceConfig
 		configuration.register("EBMS_MESSAGE","PERSIST_TIME",new InstantType(Types.TIMESTAMP));
 		configuration.register("EBMS_MESSAGE","STATUS",new EbMSMessageStatusType(Types.SMALLINT));
 		configuration.register("EBMS_MESSAGE","STATUS_TIME",new InstantType(Types.TIMESTAMP));
+		configuration.register("EBMS_ATTACHMENT","CONTENT",new CachedOutputStreamType(Types.BLOB));
 		return configuration;
 	}
 

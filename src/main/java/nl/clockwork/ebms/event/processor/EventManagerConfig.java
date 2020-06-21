@@ -15,14 +15,11 @@
  */
 package nl.clockwork.ebms.event.processor;
 
-import javax.sql.DataSource;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.support.TransactionTemplate;
@@ -58,8 +55,6 @@ public class EventManagerConfig
 	@Qualifier("dataSourceTransactionManager")
 	PlatformTransactionManager dataSourceTransactionManager;
 	@Autowired
-	DataSource dataSource;
-	@Autowired
 	SQLQueryFactory queryFactory;
 
 	@Bean()
@@ -80,7 +75,6 @@ public class EventManagerConfig
 	public EbMSEventDAO ebMSEventDAO() throws Exception
 	{
 		val transactionTemplate = new TransactionTemplate(dataSourceTransactionManager);
-		val jdbcTemplate = new JdbcTemplate(dataSource);
-		return new EbMSEventDAOImpl(transactionTemplate,jdbcTemplate,queryFactory);
+		return new EbMSEventDAOImpl(transactionTemplate,queryFactory);
 	}
 }

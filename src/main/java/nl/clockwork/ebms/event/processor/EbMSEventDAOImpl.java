@@ -15,24 +15,21 @@
  */
 package nl.clockwork.ebms.event.processor;
 
-import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.List;
 
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.RowMapper;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionTemplate;
 
+import com.querydsl.core.types.ConstructorExpression;
+import com.querydsl.core.types.Projections;
 import com.querydsl.sql.SQLQueryFactory;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
-import lombok.val;
 import lombok.experimental.FieldDefaults;
 import nl.clockwork.ebms.Action;
-import nl.clockwork.ebms.querydsl.InstantType;
 import nl.clockwork.ebms.querydsl.model.QEbmsEvent;
 import nl.clockwork.ebms.querydsl.model.QEbmsEventLog;
 
@@ -43,24 +40,9 @@ public class EbMSEventDAOImpl implements EbMSEventDAO
 	@NonNull
 	TransactionTemplate transactionTemplate;
 	@NonNull
-	JdbcTemplate jdbcTemplate;
-	@NonNull
 	SQLQueryFactory queryFactory;
 	QEbmsEvent table = QEbmsEvent.ebmsEvent;
 	QEbmsEventLog logTable = QEbmsEventLog.ebmsEventLog;
-	RowMapper<EbMSEvent> ebMSEventRowMapper = (rs,rowNum) ->
-	{
-		return EbMSEvent.builder()
-				.cpaId(rs.getString("cpa_id"))
-				.sendDeliveryChannelId(rs.getString("send_channel_id"))
-				.receiveDeliveryChannelId(rs.getString("receive_channel_id"))
-				.messageId(rs.getString("message_id"))
-				.timeToLive(InstantType.toInstant(rs.getTimestamp("time_to_live")))
-				.timestamp(InstantType.toInstant(rs.getTimestamp("time_stamp")))
-				.confidential(rs.getBoolean("is_confidential"))
-				.retries(rs.getInt("retries"))
-				.build();
-	};
 
 	@Override
 	@Transactional(transactionManager = "dataSourceTransactionManager")
@@ -70,34 +52,28 @@ public class EbMSEventDAOImpl implements EbMSEventDAO
 	}
 
 	@Override
+	@Transactional(transactionManager = "dataSourceTransactionManager")
 	public List<EbMSEvent> getEventsBefore(Instant timestamp, String serverId)
 	{
-		val query = queryFactory.select(table.all())
+		return queryFactory.select(createEbMSEventProjection())
 				.from(table)
 				.where(table.timeStamp.loe(timestamp)
 						.and(serverId == null ? table.serverId.isNull() : table.serverId.eq(serverId)))
 				.orderBy(table.timeStamp.asc())
-				.getSQL();
-		return jdbcTemplate.query(
-				query.getSQL(),
-				query.getNullFriendlyBindings().toArray(),
-				ebMSEventRowMapper);
+				.fetch();
 	}
-	
+
 	@Override
+	@Transactional(transactionManager = "dataSourceTransactionManager")
 	public List<EbMSEvent> getEventsBefore(Instant timestamp, String serverId, int maxNr)
 	{
-		val query = queryFactory.select(table.all())
+		return queryFactory.select(createEbMSEventProjection())
 				.from(table)
-				.where(table.timeStampRaw.loe(Timestamp.from(timestamp))
+				.where(table.timeStamp.loe(timestamp)
 						.and(serverId == null ? table.serverId.isNull() : table.serverId.eq(serverId)))
 				.orderBy(table.timeStamp.asc())
 				.limit(maxNr)
-				.getSQL();
-		return jdbcTemplate.query(
-				query.getSQL(),
-				query.getNullFriendlyBindings().toArray(),
-				ebMSEventRowMapper);
+				.fetch();
 	}
 	
 	@Override
@@ -148,5 +124,11 @@ public class EbMSEventDAOImpl implements EbMSEventDAO
 				.set(logTable.status,status)
 				.set(logTable.errorMessage,errorMessage)
 				.execute();
+	}
+
+	private ConstructorExpression<EbMSEvent> createEbMSEventProjection()
+	{
+		return Projections.constructor(
+				EbMSEvent.class,table.cpaId,table.sendChannelId,table.receiveChannelId,table.messageId,table.timeToLive,table.timeStamp,table.isConfidential,table.retries);
 	}
 }

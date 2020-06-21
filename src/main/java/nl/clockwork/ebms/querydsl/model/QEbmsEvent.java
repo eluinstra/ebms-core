@@ -56,8 +56,6 @@ public class QEbmsEvent extends com.querydsl.sql.RelationalPathBase<QEbmsEvent> 
 
     public final StringPath serverId = createString("serverId");
 
-    public final DateTimePath<java.sql.Timestamp> timeStampRaw = createDateTime("timeStamp", java.sql.Timestamp.class);
-
     public final DateTimePath<java.time.Instant> timeStamp = createDateTime("timeStamp", java.time.Instant.class);
 
     public final DateTimePath<java.time.Instant> timeToLive = createDateTime("timeToLive", java.time.Instant.class);
