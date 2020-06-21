@@ -15,9 +15,12 @@
  */
 package nl.clockwork.ebms;
 
+import java.util.Arrays;
 import java.util.EnumSet;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageStatusType;
@@ -59,28 +62,38 @@ public enum EbMSMessageStatus
 		return Stream.of(values());
 	}
 
-	public static final Optional<EbMSMessageStatus> get(int id)
+	public static Optional<EbMSMessageStatus> get(int id)
 	{
 		return stream().filter(s -> s.getId() == id).findFirst();
 	}
 
-	public static final Optional<EbMSMessageStatus> get(String name)
+	public static Optional<EbMSMessageStatus> get(String name)
 	{
 		return stream().filter(s -> s.name().equals(name)).findFirst();
 	}
 
-	public static final Optional<EbMSMessageStatus> get(MessageStatusType statusCode)
+	public static Optional<EbMSMessageStatus> get(MessageStatusType statusCode)
 	{
 		return stream().filter(s -> s.statusCode.equals(statusCode)).findFirst();
 	}
 
-	public static final EbMSMessageStatus[] getReceiveStatus()
+	public static EbMSMessageStatus[] getReceiveStatus()
 	{
 		return RECEIVE_STATUS.toArray(new EbMSMessageStatus[]{});
 	}
 
-	public static final EbMSMessageStatus[] getSendStatus()
+	public static EbMSMessageStatus[] getSendStatus()
 	{
 		return SEND_STATUS.toArray(new EbMSMessageStatus[]{});
+	}
+
+	public static List<Integer> getIds(EbMSMessageStatus...statuses)
+	{
+		return Arrays.stream(statuses).map(s -> s.getId()).collect(Collectors.toList());
+	}
+
+	public static List<Integer> getIds(List<EbMSMessageStatus> statuses)
+	{
+		return statuses.stream().map(s -> s.getId()).collect(Collectors.toList());
 	}
 }

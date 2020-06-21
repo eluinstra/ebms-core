@@ -1,3 +1,18 @@
+/**
+ * Copyright 2011 Clockwork
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package nl.clockwork.ebms.event.listener;
 
 import java.sql.Timestamp;
@@ -8,6 +23,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.querydsl.core.BooleanBuilder;
 import com.querydsl.sql.SQLQueryFactory;
 
 import lombok.AccessLevel;
@@ -42,10 +58,10 @@ public class EbMSMessageEventDAOImpl implements EbMSMessageEventDAO
 	@Override
 	public List<EbMSMessageEvent> getEbMSMessageEvents(EbMSMessageContext messageContext, EbMSMessageEventType[] types)
 	{
-		var whereClause = messageTable.messageId.eq(table.messageId)
+		var whereClause = new BooleanBuilder(messageTable.messageId.eq(table.messageId)
 				.and(messageTable.messageNr.eq(0))
 				.and(table.processed.eq(false))
-				.and(table.eventTypeRaw.in(types == null ? EbMSMessageEventType.getIds() : EbMSMessageEventType.getIds(types)));
+				.and(table.eventTypeRaw.in(types == null ? EbMSMessageEventType.getIds() : EbMSMessageEventType.getIds(types))));
 		whereClause = EbMSDAO.applyFilter(messageTable,messageContext,whereClause);
 		val query = queryFactory.select(table.messageId,table.eventType)
 				.from(table,messageTable)
@@ -61,10 +77,10 @@ public class EbMSMessageEventDAOImpl implements EbMSMessageEventDAO
 	@Override
 	public List<EbMSMessageEvent> getEbMSMessageEvents(EbMSMessageContext messageContext, EbMSMessageEventType[] types, int maxNr)
 	{
-		var whereClause = messageTable.messageId.eq(table.messageId)
+		var whereClause = new BooleanBuilder(messageTable.messageId.eq(table.messageId)
 				.and(messageTable.messageNr.eq(0))
 				.and(table.processed.eq(false))
-				.and(table.eventTypeRaw.in(types == null ? EbMSMessageEventType.getIds() : EbMSMessageEventType.getIds(types)));
+				.and(table.eventTypeRaw.in(types == null ? EbMSMessageEventType.getIds() : EbMSMessageEventType.getIds(types))));
 		whereClause = EbMSDAO.applyFilter(messageTable,messageContext,whereClause);
 		val query = queryFactory.select(table.messageId,table.eventType)
 				.from(table,messageTable)

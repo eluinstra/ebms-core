@@ -112,9 +112,13 @@ public class DataSourceConfig
 		configuration.register("EBMS_MESSAGE_EVENT","EVENT_TYPE",new EbMSMessageEventTypeType(Types.SMALLINT));
 		configuration.register("EBMS_EVENT","TIME_TO_LIVE",new InstantType(Types.TIMESTAMP));
 		configuration.register("EBMS_EVENT","TIME_STAMP",new InstantType(Types.TIMESTAMP));
-		configuration.register("EBMS_EVENT_LOG","STATUS",new EbMSEventStatusType(Types.SMALLINT));
 		configuration.register("EBMS_EVENT_LOG","TIME_STAMP",new InstantType(Types.TIMESTAMP));
+		configuration.register("EBMS_EVENT_LOG","STATUS",new EbMSEventStatusType(Types.SMALLINT));
+		configuration.register("EBMS_MESSAGE","TIME_STAMP",new InstantType(Types.TIMESTAMP));
+		configuration.register("EBMS_MESSAGE","TIME_TO_LIVE",new InstantType(Types.TIMESTAMP));
+		configuration.register("EBMS_MESSAGE","PERSIST_TIME",new InstantType(Types.TIMESTAMP));
 		configuration.register("EBMS_MESSAGE","STATUS",new EbMSMessageStatusType(Types.SMALLINT));
+		configuration.register("EBMS_MESSAGE","STATUS_TIME",new InstantType(Types.TIMESTAMP));
 		return configuration;
 	}
 

@@ -90,7 +90,7 @@ class PostgreSQLEbMSDAO extends AbstractEbMSDAO
 	}
 
 	@Override
-	public void insertMessage(final Instant timestamp, final Instant persistTime, final Document document, final EbMSBaseMessage message, final List<EbMSAttachment> attachments, final EbMSMessageStatus status)
+	public long insertMessage(final Instant timestamp, final Instant persistTime, final Document document, final EbMSBaseMessage message, final List<EbMSAttachment> attachments, final EbMSMessageStatus status)
 	{
 		try
 		{
@@ -152,6 +152,7 @@ class PostgreSQLEbMSDAO extends AbstractEbMSDAO
 				new KeyExtractor()
 			);
 			insertAttachments(keyHolder,attachments);
+			return keyHolder.getKeyList().size();
 		}
 		catch (IOException e)
 		{
@@ -160,7 +161,7 @@ class PostgreSQLEbMSDAO extends AbstractEbMSDAO
 	}
 	
 	@Override
-	public void insertDuplicateMessage(final Instant timestamp, final Document document, final EbMSBaseMessage message, final List<EbMSAttachment> attachments)
+	public long insertDuplicateMessage(final Instant timestamp, final Document document, final EbMSBaseMessage message, final List<EbMSAttachment> attachments)
 	{
 		try
 		{
@@ -218,6 +219,7 @@ class PostgreSQLEbMSDAO extends AbstractEbMSDAO
 				new KeyExtractor()
 			);
 			insertAttachments(keyHolder,attachments);
+			return keyHolder.getKeyList().size();
 		}
 		catch (IOException e)
 		{

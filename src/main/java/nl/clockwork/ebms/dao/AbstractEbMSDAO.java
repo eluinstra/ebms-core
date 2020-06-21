@@ -43,6 +43,7 @@ import org.springframework.transaction.support.TransactionTemplate;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
+import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Expression;
 import com.querydsl.sql.SQLQueryFactory;
 
@@ -61,6 +62,7 @@ import nl.clockwork.ebms.model.EbMSAttachment;
 import nl.clockwork.ebms.model.EbMSBaseMessage;
 import nl.clockwork.ebms.model.EbMSDocument;
 import nl.clockwork.ebms.querydsl.InstantType;
+import nl.clockwork.ebms.querydsl.model.QEbmsAttachment;
 import nl.clockwork.ebms.querydsl.model.QEbmsMessage;
 import nl.clockwork.ebms.service.model.EbMSDataSource;
 import nl.clockwork.ebms.service.model.EbMSDataSourceMTOM;
@@ -81,6 +83,7 @@ abstract class AbstractEbMSDAO implements EbMSDAO
 	@NonNull
 	SQLQueryFactory queryFactory;
 	QEbmsMessage table = QEbmsMessage.ebmsMessage;
+	QEbmsAttachment attachmentTable = QEbmsAttachment.ebmsAttachment;
 	Expression<?>[] ebMSMessageContextColumns = {table.cpaId,table.fromPartyId,table.fromRole,table.toPartyId,table.toRole,table.service,table.action,table.timeStamp,table.conversationId,table.messageId,table.refToMessageId,table.status};
 	RowMapper<EbMSMessageContext> ebMSMessageContextRowMapper = (rs,rowNum) -> 
 	{
@@ -399,8 +402,8 @@ abstract class AbstractEbMSDAO implements EbMSDAO
 	@Override
 	public List<String> getMessageIds(EbMSMessageContext messageContext, EbMSMessageStatus status)
 	{
-		var whereClause = table.messageNr.eq(0)
-				.and(table.statusRaw.eq(status.getId()));
+		var whereClause = new BooleanBuilder(table.messageNr.eq(0)
+				.and(table.statusRaw.eq(status.getId()))); 
 		whereClause = EbMSDAO.applyFilter(table,messageContext,whereClause);
 		val query = queryFactory.select(table.status)
 				.from(table)
@@ -416,8 +419,8 @@ abstract class AbstractEbMSDAO implements EbMSDAO
 	@Override
 	public List<String> getMessageIds(EbMSMessageContext messageContext, EbMSMessageStatus status, int maxNr)
 	{
-		var whereClause = table.messageNr.eq(0)
-				.and(table.statusRaw.eq(status.getId()));
+		var whereClause = new BooleanBuilder(table.messageNr.eq(0)
+				.and(table.statusRaw.eq(status.getId())));
 		whereClause = EbMSDAO.applyFilter(table,messageContext,whereClause);
 		val query = queryFactory.select(table.status)
 				.from(table)
@@ -433,12 +436,12 @@ abstract class AbstractEbMSDAO implements EbMSDAO
 
 	@Override
 	@Transactional(transactionManager = "dataSourceTransactionManager")
-	public void insertMessage(final Instant timestamp, final Instant persistTime, final Document document, final EbMSBaseMessage message, final List<EbMSAttachment> attachments, final EbMSMessageStatus status)
+	public long insertMessage(final Instant timestamp, final Instant persistTime, final Document document, final EbMSBaseMessage message, final List<EbMSAttachment> attachments, final EbMSMessageStatus status)
 	{
 		try
 		{
 			val keyHolder = new GeneratedKeyHolder();
-			jdbcTemplate.update(
+			int rowsAffected = jdbcTemplate.update(
 				new PreparedStatementCreator()
 				{
 					
@@ -497,6 +500,7 @@ abstract class AbstractEbMSDAO implements EbMSDAO
 				keyHolder
 			);
 			insertAttachments(keyHolder,attachments);
+			return rowsAffected;
 		}
 		catch (IOException e)
 		{
@@ -506,12 +510,12 @@ abstract class AbstractEbMSDAO implements EbMSDAO
 
 	@Override
 	@Transactional(transactionManager = "dataSourceTransactionManager")
-	public void insertDuplicateMessage(final Instant timestamp, final Document document, final EbMSBaseMessage message, final List<EbMSAttachment> attachments)
+	public long insertDuplicateMessage(final Instant timestamp, final Document document, final EbMSBaseMessage message, final List<EbMSAttachment> attachments)
 	{
 		try
 		{
 			val keyHolder = new GeneratedKeyHolder();
-			jdbcTemplate.update(
+			int rowsAffected = jdbcTemplate.update(
 				new PreparedStatementCreator()
 				{
 					
@@ -566,6 +570,7 @@ abstract class AbstractEbMSDAO implements EbMSDAO
 				keyHolder
 			);
 			insertAttachments(keyHolder,attachments);
+			return rowsAffected;
 		}
 		catch (IOException e)
 		{
@@ -618,44 +623,39 @@ abstract class AbstractEbMSDAO implements EbMSDAO
 	}
 
 	@Override
-	public int updateMessage(String messageId, EbMSMessageStatus oldStatus, EbMSMessageStatus newStatus)
+	@Transactional(transactionManager = "dataSourceTransactionManager")
+	public long updateMessage(String messageId, EbMSMessageStatus oldStatus, EbMSMessageStatus newStatus)
 	{
-		return jdbcTemplate.update
-		(
-			"update ebms_message" +
-			" set status = ?," +
-			" status_time = ?" +
-			" where message_id = ?" +
-			" and message_nr = 0" +
-			" and status = ?",
-			newStatus.getId(),
-			Timestamp.from(Instant.now()),
-			messageId,
-			oldStatus != null ? oldStatus.getId() : null
-		);
+		return queryFactory.update(table)
+				.set(table.status,newStatus)
+				.set(table.statusTime,Instant.now())
+				.where(table.messageId.eq(messageId)
+						.and(table.messageNr.eq(0))
+						.and(oldStatus == null ? table.status.isNull() : table.status.eq(oldStatus)))
+				.execute();
 	}
 
 	@Override
-	public void deleteAttachments(String messageId)
+	@Transactional(transactionManager = "dataSourceTransactionManager")
+	public long deleteAttachments(String messageId)
 	{
-		jdbcTemplate.update(
-			"delete from ebms_attachment" +
-			" where message_id = ?",
-			messageId
-		);
+		return queryFactory.delete(attachmentTable)
+				.where(attachmentTable.messageId.eq(messageId))
+				.execute();
 	}
 
 	protected <T> List<T> getAttachments(String messageId, RowMapper<T> rowMapper)
 	{
+		val query = queryFactory.select(attachmentTable.name,attachmentTable.contentId,attachmentTable.contentType,attachmentTable.content)
+				.from(attachmentTable)
+				.where(attachmentTable.messageId.eq(messageId)
+						.and(attachmentTable.messageNr.eq(0)))
+				.orderBy(attachmentTable.orderNr.asc())
+				.getSQL();
 		return jdbcTemplate.query(
-			"select name, content_id, content_type, content" + 
-			" from ebms_attachment" + 
-			" where message_id = ?" +
-			" and message_nr = 0" +
-			" order by order_nr",
-			rowMapper,
-			messageId
-		);
+				query.getSQL(),
+				query.getNullFriendlyBindings().toArray(),
+				rowMapper);
 	}
 
 	private EbMSMessageStatus getEbMSMessageStatus(Integer id)

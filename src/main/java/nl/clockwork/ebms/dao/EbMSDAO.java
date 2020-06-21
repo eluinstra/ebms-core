@@ -21,7 +21,7 @@ import java.util.Optional;
 
 import org.w3c.dom.Document;
 
-import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.core.BooleanBuilder;
 
 import nl.clockwork.ebms.Action;
 import nl.clockwork.ebms.EbMSAction;
@@ -55,46 +55,46 @@ public interface EbMSDAO
 	List<String> getMessageIds(EbMSMessageContext messageContext, EbMSMessageStatus status);
 	List<String> getMessageIds(EbMSMessageContext messageContext, EbMSMessageStatus status, int maxNr);
 
-	void insertMessage(Instant timestamp, Instant persistTime, Document document, EbMSBaseMessage message, List<EbMSAttachment> attachments, EbMSMessageStatus status);
-	void insertDuplicateMessage(Instant timestamp, Document document, EbMSBaseMessage message, List<EbMSAttachment> attachments);
+	long insertMessage(Instant timestamp, Instant persistTime, Document document, EbMSBaseMessage message, List<EbMSAttachment> attachments, EbMSMessageStatus status);
+	long insertDuplicateMessage(Instant timestamp, Document document, EbMSBaseMessage message, List<EbMSAttachment> attachments);
 
-	int updateMessage(String messageId, EbMSMessageStatus oldStatus, EbMSMessageStatus newStatus);
+	long updateMessage(String messageId, EbMSMessageStatus oldStatus, EbMSMessageStatus newStatus);
 
-	void deleteAttachments(String messageId);
+	long deleteAttachments(String messageId);
 
-	static BooleanExpression applyFilter(QEbmsMessage messageTable, EbMSMessageContext messageContext, BooleanExpression whereClause)
+	static BooleanBuilder applyFilter(QEbmsMessage table, EbMSMessageContext messageContext, BooleanBuilder builder)
 	{
 		if (messageContext != null)
 		{
 			if (messageContext.getCpaId() != null)
-				whereClause.and(messageTable.cpaId.eq(messageContext.getCpaId()));
+				builder.and(table.cpaId.eq(messageContext.getCpaId()));
 			if (messageContext.getFromParty() != null)
 			{
 				if (messageContext.getFromParty().getPartyId() != null)
-					whereClause.and(messageTable.fromPartyId.eq(messageContext.getFromParty().getPartyId()));
+					builder.and(table.fromPartyId.eq(messageContext.getFromParty().getPartyId()));
 				if (messageContext.getFromParty().getRole() != null)
-					whereClause.and(messageTable.fromRole.eq(messageContext.getFromParty().getRole()));
+					builder.and(table.fromRole.eq(messageContext.getFromParty().getRole()));
 			}
 			if (messageContext.getToParty() != null)
 			{
 				if (messageContext.getToParty().getPartyId() != null)
-					whereClause.and(messageTable.toPartyId.eq(messageContext.getToParty().getPartyId()));
+					builder.and(table.toPartyId.eq(messageContext.getToParty().getPartyId()));
 				if (messageContext.getToParty().getRole() != null)
-					whereClause.and(messageTable.toRole.eq(messageContext.getToParty().getRole()));
+					builder.and(table.toRole.eq(messageContext.getToParty().getRole()));
 			}
 			if (messageContext.getService() != null)
-				whereClause.and(messageTable.service.eq(messageContext.getService()));
+				builder.and(table.service.eq(messageContext.getService()));
 			if (messageContext.getAction() != null)
-				whereClause.and(messageTable.action.eq(messageContext.getAction()));
+				builder.and(table.action.eq(messageContext.getAction()));
 			if (messageContext.getConversationId() != null)
-				whereClause.and(messageTable.conversationId.eq(messageContext.getConversationId()));
+				builder.and(table.conversationId.eq(messageContext.getConversationId()));
 			if (messageContext.getMessageId() != null)
-				whereClause.and(messageTable.messageId.eq(messageContext.getMessageId()));
+				builder.and(table.messageId.eq(messageContext.getMessageId()));
 			if (messageContext.getRefToMessageId() != null)
-				whereClause.and(messageTable.refToMessageId.eq(messageContext.getRefToMessageId()));
+				builder.and(table.refToMessageId.eq(messageContext.getRefToMessageId()));
 			if (messageContext.getMessageStatus() != null)
-				whereClause.and(messageTable.statusRaw.eq(messageContext.getMessageStatus().getId()));
+				builder.and(table.statusRaw.eq(messageContext.getMessageStatus().getId()));
 		}
-		return whereClause;
+		return builder;
 	}
 }

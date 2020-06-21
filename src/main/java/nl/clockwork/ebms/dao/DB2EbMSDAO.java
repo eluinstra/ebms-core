@@ -51,7 +51,7 @@ class DB2EbMSDAO extends nl.clockwork.ebms.dao.PostgreSQLEbMSDAO
 
 	@Override
 	@Transactional(transactionManager = "dataSourceTransactionManager")
-	public void insertMessage(final Instant timestamp, final Instant persistTime, final Document document, final EbMSBaseMessage message, final List<EbMSAttachment> attachments, final EbMSMessageStatus status)
+	public long insertMessage(final Instant timestamp, final Instant persistTime, final Document document, final EbMSBaseMessage message, final List<EbMSAttachment> attachments, final EbMSMessageStatus status)
 	{
 		try
 		{
@@ -113,6 +113,7 @@ class DB2EbMSDAO extends nl.clockwork.ebms.dao.PostgreSQLEbMSDAO
 				new KeyExtractor()
 			);
 			insertAttachments(keyHolder,attachments);
+			return keyHolder.getKeyList().size();
 		}
 		catch (IOException e)
 		{
@@ -122,7 +123,7 @@ class DB2EbMSDAO extends nl.clockwork.ebms.dao.PostgreSQLEbMSDAO
 	
 	@Override
 	@Transactional(transactionManager = "dataSourceTransactionManager")
-	public void insertDuplicateMessage(final Instant timestamp, final Document document, final EbMSBaseMessage message, final List<EbMSAttachment> attachments)
+	public long insertDuplicateMessage(final Instant timestamp, final Document document, final EbMSBaseMessage message, final List<EbMSAttachment> attachments)
 	{
 		try
 		{
@@ -180,6 +181,7 @@ class DB2EbMSDAO extends nl.clockwork.ebms.dao.PostgreSQLEbMSDAO
 				new KeyExtractor()
 			);
 			insertAttachments(keyHolder,attachments);
+			return keyHolder.getKeyList().size();
 		}
 		catch (IOException e)
 		{
