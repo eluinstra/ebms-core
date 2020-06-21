@@ -20,7 +20,7 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 
-import org.apache.commons.codec.binary.Base64OutputStream;
+import org.apache.james.mime4j.codec.Base64OutputStream;
 import org.springframework.util.StringUtils;
 
 import lombok.val;

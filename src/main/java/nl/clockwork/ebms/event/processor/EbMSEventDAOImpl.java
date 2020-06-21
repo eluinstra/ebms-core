@@ -15,6 +15,7 @@
  */
 package nl.clockwork.ebms.event.processor;
 
+import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.List;
 
@@ -73,7 +74,7 @@ public class EbMSEventDAOImpl implements EbMSEventDAO
 	{
 		val query = queryFactory.select(table.all())
 				.from(table)
-				.where(table.timeStamp.eq(timestamp)
+				.where(table.timeStamp.loe(timestamp)
 						.and(serverId == null ? table.serverId.isNull() : table.serverId.eq(serverId)))
 				.orderBy(table.timeStamp.asc())
 				.getSQL();
@@ -88,7 +89,7 @@ public class EbMSEventDAOImpl implements EbMSEventDAO
 	{
 		val query = queryFactory.select(table.all())
 				.from(table)
-				.where(table.timeStamp.eq(timestamp)
+				.where(table.timeStampRaw.loe(Timestamp.from(timestamp))
 						.and(serverId == null ? table.serverId.isNull() : table.serverId.eq(serverId)))
 				.orderBy(table.timeStamp.asc())
 				.limit(maxNr)
