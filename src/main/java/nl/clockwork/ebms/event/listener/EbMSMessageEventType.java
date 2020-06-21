@@ -15,7 +15,10 @@
  */
 package nl.clockwork.ebms.event.listener;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import lombok.AccessLevel;
@@ -30,6 +33,7 @@ public enum EbMSMessageEventType
 {
 	RECEIVED(0), DELIVERED(1), FAILED(2), EXPIRED(3);
 
+	private static final List<Integer> IDS = Collections.unmodifiableList(stream().map(t -> t.id).collect(Collectors.toList()));
 	int id;
 
 	public static Stream<EbMSMessageEventType> stream()
@@ -37,8 +41,18 @@ public enum EbMSMessageEventType
 		return Stream.of(values());
 	}
 
-	public static final Optional<EbMSMessageEventType> get(int id)
+	public static Optional<EbMSMessageEventType> get(int id)
 	{
 		return stream().filter(s -> s.getId() == id).findFirst();
+	}
+
+	public static List<Integer> getIds()
+	{
+		return IDS;
+	}
+
+	public static List<Integer> getIds(EbMSMessageEventType...types)
+	{
+		return Stream.of(types).map(t -> t.id).collect(Collectors.toList());
 	}
 }

@@ -26,7 +26,7 @@ public class EbMSMessageEventTypeType extends AbstractType<EbMSMessageEventType>
 	public EbMSMessageEventType getValue(ResultSet rs, int startIndex) throws SQLException
 	{
 		val id = rs.getObject(startIndex,Integer.class);
-		return id != null ? EbMSMessageEventType.get(id).orElseThrow(() -> new IllegalArgumentException("" + id + " is not a valid EbMSMessageEventType id!")) : null;
+		return id != null ? EbMSMessageEventType.get(id).orElseThrow(() -> new IllegalArgumentException("EbMSMessageEventType " + id + " is not valid!")) : null;
 	}
 
 	@Override

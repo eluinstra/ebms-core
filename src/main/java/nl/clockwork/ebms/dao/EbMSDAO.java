@@ -93,7 +93,7 @@ public interface EbMSDAO
 			if (messageContext.getRefToMessageId() != null)
 				whereClause.and(messageTable.refToMessageId.eq(messageContext.getRefToMessageId()));
 			if (messageContext.getMessageStatus() != null)
-				whereClause.and(messageTable.status.eq(messageContext.getMessageStatus()));
+				whereClause.and(messageTable.statusRaw.eq(messageContext.getMessageStatus().getId()));
 		}
 		return whereClause;
 	}

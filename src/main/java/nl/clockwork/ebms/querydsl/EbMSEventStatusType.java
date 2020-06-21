@@ -26,7 +26,7 @@ public class EbMSEventStatusType extends AbstractType<EbMSEventStatus>
 	public EbMSEventStatus getValue(ResultSet rs, int startIndex) throws SQLException
 	{
 		val id = rs.getObject(startIndex,Integer.class);
-		return id != null ? EbMSEventStatus.get(id).orElseThrow(() -> new IllegalArgumentException("" + id + " is not a valid EbMSEventStatus id!")) : null;
+		return id != null ? EbMSEventStatus.get(id).orElseThrow(() -> new IllegalArgumentException("EbMSEventStatus " + id + " is not valid!")) : null;
 	}
 
 	@Override

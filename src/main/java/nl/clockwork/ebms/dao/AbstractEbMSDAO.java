@@ -94,7 +94,7 @@ abstract class AbstractEbMSDAO implements EbMSDAO
 				.conversationId(rs.getString("conversation_id"))
 				.messageId(rs.getString("message_id"))
 				.refToMessageId(rs.getString("ref_to_message_id"))
-				.messageStatus(rs.getObject("status") == null ? null : EbMSMessageStatus.get(rs.getInt("status")).orElse(null))
+				.messageStatus(getEbMSMessageStatus(rs.getObject("status",Integer.class)))
 				.build();
 	};
 	RowMapper<EbMSAttachment> ebMSAttachmentRowMapper =	(rs,rowNum) ->
@@ -268,7 +268,7 @@ abstract class AbstractEbMSDAO implements EbMSDAO
 					.from(table)
 					.where(table.messageId.eq(messageId)
 							.and(table.messageNr.eq(0))
-							.and(table.status.isNull().or(table.statusRaw.eq(EbMSMessageStatus.SENDING.getId()))))
+							.and(table.statusRaw.isNull().or(table.statusRaw.eq(EbMSMessageStatus.SENDING.getId()))))
 					.getSQL();
 			val content = jdbcTemplate.queryForObject(
 					query.getSQL(),
@@ -656,5 +656,10 @@ abstract class AbstractEbMSDAO implements EbMSDAO
 			rowMapper,
 			messageId
 		);
+	}
+
+	private EbMSMessageStatus getEbMSMessageStatus(Integer id)
+	{
+		return id != null ? EbMSMessageStatus.get(id).orElseThrow(() -> new IllegalArgumentException("EbMSMessageStatus " + id + " is not valid!")) : null;
 	}
 }

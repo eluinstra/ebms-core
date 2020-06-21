@@ -35,7 +35,8 @@ public class EbMSMessageEventDAOImpl implements EbMSMessageEventDAO
 
 	RowMapper<EbMSMessageEvent> ebMSMessageEventRowMapper = (rs,rowNum) ->
 	{
-		return new EbMSMessageEvent(rs.getString("message_id"),EbMSMessageEventType.values()[rs.getInt("event_type")]);
+		val id = rs.getObject("event_type",Integer.class);
+		return new EbMSMessageEvent(rs.getString("message_id"),getEventType(id));
 	};
 
 	@Override
@@ -44,7 +45,7 @@ public class EbMSMessageEventDAOImpl implements EbMSMessageEventDAO
 		var whereClause = messageTable.messageId.eq(table.messageId)
 				.and(messageTable.messageNr.eq(0))
 				.and(table.processed.eq(false))
-				.and(table.eventType.in(types == null ? EbMSMessageEventType.values() : types));
+				.and(table.eventTypeRaw.in(types == null ? EbMSMessageEventType.getIds() : EbMSMessageEventType.getIds(types)));
 		whereClause = EbMSDAO.applyFilter(messageTable,messageContext,whereClause);
 		val query = queryFactory.select(table.messageId,table.eventType)
 				.from(table,messageTable)
@@ -63,7 +64,7 @@ public class EbMSMessageEventDAOImpl implements EbMSMessageEventDAO
 		var whereClause = messageTable.messageId.eq(table.messageId)
 				.and(messageTable.messageNr.eq(0))
 				.and(table.processed.eq(false))
-				.and(table.eventType.in(types == null ? EbMSMessageEventType.values() : types));
+				.and(table.eventTypeRaw.in(types == null ? EbMSMessageEventType.getIds() : EbMSMessageEventType.getIds(types)));
 		whereClause = EbMSDAO.applyFilter(messageTable,messageContext,whereClause);
 		val query = queryFactory.select(table.messageId,table.eventType)
 				.from(table,messageTable)
@@ -95,5 +96,13 @@ public class EbMSMessageEventDAOImpl implements EbMSMessageEventDAO
 		return queryFactory.update(table)
 				.set(table.processed,true)
 				.execute();
+	}
+
+	private EbMSMessageEventType getEventType(Integer id)
+	{
+		if (id == null)
+			throw new IllegalArgumentException("EbMSMessageEventType is null");
+		else
+			return EbMSMessageEventType.get(id).orElseThrow(() -> new IllegalArgumentException("EbMSMessageEventType " + id + " is not valid!"));
 	}
 }
