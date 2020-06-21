@@ -48,6 +48,7 @@ public class CPAManager
 	CPADAO cpaDAO;
 	@NonNull
 	URLMapper urlMapper;
+	Object cpaMonitor = new Object();
 
 	public boolean existsCPA(String cpaId)
 	{
@@ -64,14 +65,23 @@ public class CPAManager
 		return cpaDAO.getCPAIds();
 	}
 
-	public void insertCPA(CollaborationProtocolAgreement cpa)
+	public void setCPA(CollaborationProtocolAgreement cpa, Boolean overwrite)
 	{
-		cpaDAO.insertCPA(cpa);
-	}
-
-	public long updateCPA(CollaborationProtocolAgreement cpa)
-	{
-		return cpaDAO.updateCPA(cpa);
+		synchronized (cpaMonitor)
+		{
+			if (cpaDAO.existsCPA(cpa.getCpaid()))
+			{
+				if (overwrite != null && overwrite)
+				{
+					if (cpaDAO.updateCPA(cpa) == 0)
+						throw new IllegalArgumentException("Could not update CPA " + cpa.getCpaid() + "! CPA does not exists.");
+				}
+				else
+					throw new IllegalArgumentException("Did not insert CPA " + cpa.getCpaid() + "! CPA already exists.");
+			}
+			else
+				cpaDAO.insertCPA(cpa);
+		}
 	}
 
 	public long deleteCPA(String cpaId)

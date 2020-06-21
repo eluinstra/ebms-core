@@ -40,7 +40,6 @@ public class CPAServiceImpl implements CPAService
   @NonNull
 	CPAValidator cpaValidator;
 	XSDValidator xsdValidator = new XSDValidator("/nl/clockwork/ebms/xsd/cpp-cpa-2_0.xsd");
-	Object cpaMonitor = new Object();
 
 	@Override
 	public void validateCPA(/*CollaborationProtocolAgreement*/String cpa) throws CPAServiceException
@@ -68,23 +67,8 @@ public class CPAServiceImpl implements CPAService
 			log.debug("InsertCPA");
 			xsdValidator.validate(cpa);
 			val cpa_ = JAXBParser.getInstance(CollaborationProtocolAgreement.class).handle(cpa);
-			val currentValidator = new CPAValidator(cpaManager);
-			currentValidator.validate(cpa_);
-			synchronized (cpaMonitor)
-			{
-				if (cpaManager.existsCPA(cpa_.getCpaid()))
-				{
-					if (overwrite != null && overwrite)
-					{
-						if (cpaManager.updateCPA(cpa_) == 0)
-							throw new IllegalArgumentException("Could not update CPA " + cpa_.getCpaid() + "! CPA does not exists.");
-					}
-					else
-						throw new IllegalArgumentException("Did not insert CPA " + cpa_.getCpaid() + "! CPA already exists.");
-				}
-				else
-					cpaManager.insertCPA(cpa_);
-			}
+			new CPAValidator(cpaManager).validate(cpa_);
+			cpaManager.setCPA(cpa_,overwrite);
 			log.debug("InsertCPA done");
 			return cpa_.getCpaid();
 		}
@@ -101,11 +85,8 @@ public class CPAServiceImpl implements CPAService
 		try
 		{
 			log.debug("DeleteCPA " + cpaId);
-			synchronized(cpaMonitor)
-			{
-				if (cpaManager.deleteCPA(cpaId) == 0)
-					throw new IllegalArgumentException("Could not delete CPA " + cpaId + "! CPA does not exists.");
-			}
+			if (cpaManager.deleteCPA(cpaId) == 0)
+				throw new IllegalArgumentException("Could not delete CPA " + cpaId + "! CPA does not exists.");
 		}
 		catch (Exception e)
 		{
