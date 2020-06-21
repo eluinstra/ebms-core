@@ -26,6 +26,7 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.querydsl.sql.SQLQueryFactory;
@@ -72,26 +73,30 @@ public class CertificateMappingDAOImpl implements CertificateMappingDAO
 		try
 		{
 			//"select destination from certificate_mapping where id = ? and (cpa_id = ? or (cpa_id is null and ? is null))"
-			val query = queryFactory.select(table.source)
+			val query = queryFactory.select(table.source,table.cpaId)
 					.from(table)
 					.where(table.id.eq(id)
-							.and(cpaId == null ? table.cpaId.isNull() : table.cpaId.eq(cpaId)))
+							.and(cpaId == null ? table.cpaId.isNull() : table.cpaId.eq(cpaId).or(table.cpaId.isNull())))
 					.getSQL();
-			return Optional.of(jdbcTemplate.queryForObject(
+			return jdbcTemplate.query(
 					query.getSQL(),
 					query.getNullFriendlyBindings().toArray(),
-					(rs,rowNum) ->
+					(ResultSetExtractor<Optional<X509Certificate>>)(rs) ->
 					{
+						if (!rs.next())
+							return Optional.empty();
+						while (rs.getString("cpaId") == null && !rs.isLast())
+							rs.next();
 						try
 						{
 							CertificateFactory certificateFactory = CertificateFactory.getInstance("X509");
-							return (X509Certificate)certificateFactory.generateCertificate(rs.getBinaryStream("source"));
+							return Optional.of((X509Certificate)certificateFactory.generateCertificate(rs.getBinaryStream("source")));
 						}
 						catch (CertificateException e)
 						{
 							throw new SQLException(e);
 						}
-					}));
+					});
 		}
 		catch(EmptyResultDataAccessException e)
 		{
