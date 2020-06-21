@@ -19,17 +19,15 @@ import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.List;
 
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.RowMapper;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.Projections;
 import com.querydsl.sql.SQLQueryFactory;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
-import lombok.val;
 import lombok.var;
 import lombok.experimental.FieldDefaults;
 import nl.clockwork.ebms.dao.EbMSDAO;
@@ -43,55 +41,41 @@ import nl.clockwork.ebms.service.model.EbMSMessageEvent;
 public class EbMSMessageEventDAOImpl implements EbMSMessageEventDAO
 {
 	@NonNull
-	JdbcTemplate jdbcTemplate;
-	@NonNull
 	SQLQueryFactory queryFactory;
 	QEbmsMessageEvent table = QEbmsMessageEvent.ebmsMessageEvent;
 	QEbmsMessage messageTable = QEbmsMessage.ebmsMessage;
 
-	RowMapper<EbMSMessageEvent> ebMSMessageEventRowMapper = (rs,rowNum) ->
-	{
-		val id = rs.getObject("event_type",Integer.class);
-		return new EbMSMessageEvent(rs.getString("message_id"),getEventType(id));
-	};
-
 	@Override
+	@Transactional(transactionManager = "dataSourceTransactionManager")
 	public List<EbMSMessageEvent> getEbMSMessageEvents(EbMSMessageContext messageContext, EbMSMessageEventType[] types)
 	{
 		var whereClause = new BooleanBuilder(messageTable.messageId.eq(table.messageId)
 				.and(messageTable.messageNr.eq(0))
 				.and(table.processed.eq(false))
-				.and(table.eventTypeRaw.in(types == null ? EbMSMessageEventType.getIds() : EbMSMessageEventType.getIds(types))));
+				.and(table.eventType.in(types == null ? EbMSMessageEventType.values() : types)));
 		whereClause = EbMSDAO.applyFilter(messageTable,messageContext,whereClause);
-		val query = queryFactory.select(table.messageId,table.eventType)
+		return queryFactory.select(Projections.constructor(EbMSMessageEvent.class,table.messageId,table.eventType))
 				.from(table,messageTable)
 				.where(whereClause)
 				.orderBy(messageTable.timeStamp.asc())
-				.getSQL();
-		return jdbcTemplate.query(
-				query.getSQL(),
-				query.getNullFriendlyBindings().toArray(),
-				ebMSMessageEventRowMapper);
+				.fetch();
 	}
 
 	@Override
+	@Transactional(transactionManager = "dataSourceTransactionManager")
 	public List<EbMSMessageEvent> getEbMSMessageEvents(EbMSMessageContext messageContext, EbMSMessageEventType[] types, int maxNr)
 	{
 		var whereClause = new BooleanBuilder(messageTable.messageId.eq(table.messageId)
 				.and(messageTable.messageNr.eq(0))
 				.and(table.processed.eq(false))
-				.and(table.eventTypeRaw.in(types == null ? EbMSMessageEventType.getIds() : EbMSMessageEventType.getIds(types))));
+				.and(table.eventType.in(types == null ? EbMSMessageEventType.values() : types)));
 		whereClause = EbMSDAO.applyFilter(messageTable,messageContext,whereClause);
-		val query = queryFactory.select(table.messageId,table.eventType)
+		return queryFactory.select(Projections.constructor(EbMSMessageEvent.class,table.messageId,table.eventType))
 				.from(table,messageTable)
 				.where(whereClause)
 				.orderBy(messageTable.timeStamp.asc())
 				.limit(maxNr)
-				.getSQL();
-		return jdbcTemplate.query(
-				query.getSQL(),
-				query.getNullFriendlyBindings().toArray(),
-				ebMSMessageEventRowMapper);
+				.fetch();
 	}
 
 	@Override
@@ -112,13 +96,5 @@ public class EbMSMessageEventDAOImpl implements EbMSMessageEventDAO
 		return queryFactory.update(table)
 				.set(table.processed,true)
 				.execute();
-	}
-
-	private EbMSMessageEventType getEventType(Integer id)
-	{
-		if (id == null)
-			throw new IllegalArgumentException("EbMSMessageEventType is null");
-		else
-			return EbMSMessageEventType.get(id).orElseThrow(() -> new IllegalArgumentException("EbMSMessageEventType " + id + " is not valid!"));
 	}
 }

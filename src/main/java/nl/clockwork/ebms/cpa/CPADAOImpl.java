@@ -18,14 +18,9 @@ package nl.clockwork.ebms.cpa;
 import java.util.List;
 import java.util.Optional;
 
-import javax.xml.bind.JAXBException;
-
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CollaborationProtocolAgreement;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.dao.DataRetrievalFailureException;
-import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.querydsl.sql.SQLQueryFactory;
@@ -33,9 +28,7 @@ import com.querydsl.sql.SQLQueryFactory;
 import lombok.AccessLevel;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import lombok.val;
 import lombok.experimental.FieldDefaults;
-import nl.clockwork.ebms.jaxb.JAXBParser;
 import nl.clockwork.ebms.querydsl.model.QCpa;
 
 @FieldDefaults(level = AccessLevel.PROTECTED, makeFinal = true)
@@ -43,67 +36,41 @@ import nl.clockwork.ebms.querydsl.model.QCpa;
 public class CPADAOImpl implements CPADAO
 {
 	@NonNull
-	JdbcTemplate jdbcTemplate;
-	@NonNull
 	SQLQueryFactory queryFactory;
 	@NonNull
 	QCpa table = QCpa.cpa1;
 
 	@Override
+	@Transactional(transactionManager = "dataSourceTransactionManager")
 	@Cacheable(cacheNames = "CPA", keyGenerator = "ebMSKeyGenerator")
 	public boolean existsCPA(String cpaId)
 	{
-		//"select count(*) from cpa where cpa_id = ?"
-		val query = queryFactory.select(table.cpaId.count())
+		return queryFactory.select(table.cpaId.count())
 				.from(table)
 				.where(table.cpaId.eq(cpaId))
-				.getSQL();
-		return jdbcTemplate.queryForObject(
-				query.getSQL(),
-				query.getNullFriendlyBindings().toArray(),
-				Integer.class) > 0;
+				.fetchOne() > 0;
 	}
 	
 	@Override
+	@Transactional(transactionManager = "dataSourceTransactionManager")
 	@Cacheable(cacheNames = "CPA", keyGenerator = "ebMSKeyGenerator")
 	public Optional<CollaborationProtocolAgreement> getCPA(String cpaId)
 	{
-		try
-		{
-			//"select cpa from cpa where cpa_id = ?"
-			val query = queryFactory.select(table.cpa)
-					.from(table)
-					.where(table.cpaId.eq(cpaId))
-					.getSQL();
-			val cpa = jdbcTemplate.queryForObject(
-					query.getSQL(),
-					query.getNullFriendlyBindings().toArray(),
-					String.class);
-			return Optional.of(JAXBParser.getInstance(CollaborationProtocolAgreement.class).handle(cpa));
-		}
-		catch(EmptyResultDataAccessException e)
-		{
-			return Optional.empty();
-		}
-		catch (JAXBException e)
-		{
-			throw new DataRetrievalFailureException("",e);
-		}
+		return Optional.ofNullable(queryFactory.select(table.cpa)
+				.from(table)
+				.where(table.cpaId.eq(cpaId))
+				.fetchOne());
 	}
 
 	@Override
+	@Transactional(transactionManager = "dataSourceTransactionManager")
 	@Cacheable(cacheNames = "CPA", keyGenerator = "ebMSKeyGenerator")
 	public List<String> getCPAIds()
 	{
-		//"select cpa_id from cpa order by cpa_id asc"
-		val query = queryFactory.select(table.cpaId)
+		return queryFactory.select(table.cpaId)
 				.from(table)
 				.orderBy(table.cpaId.asc())
-				.getSQL();
-		return jdbcTemplate.queryForList(
-				query.getSQL(),
-				query.getNullFriendlyBindings().toArray(),
-				String.class);
+				.fetch();
 	}
 
 	@Override

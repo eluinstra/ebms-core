@@ -19,7 +19,6 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import javax.jms.Destination;
-import javax.sql.DataSource;
 
 import org.apache.activemq.command.ActiveMQQueue;
 import org.apache.activemq.command.ActiveMQTopic;
@@ -27,13 +26,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jms.core.JmsTemplate;
 
 import com.querydsl.sql.SQLQueryFactory;
 
 import lombok.AccessLevel;
-import lombok.val;
 import lombok.experimental.FieldDefaults;
 import nl.clockwork.ebms.dao.EbMSDAO;
 import nl.clockwork.ebms.jms.JMSDestinationType;
@@ -54,8 +51,6 @@ public class EventListenerConfig
 	JmsTemplate jmsTemplate;
 	@Value("${jms.destinationType}")
 	JMSDestinationType jmsDestinationType;
-	@Autowired
-	DataSource dataSource;
 	@Autowired
 	SQLQueryFactory queryFactory;
 
@@ -80,8 +75,7 @@ public class EventListenerConfig
 	@Bean
 	public EbMSMessageEventDAO ebMSMessageEventDAO() throws Exception
 	{
-		val jdbcTemplate = new JdbcTemplate(dataSource);
-		return new EbMSMessageEventDAOImpl(jdbcTemplate,queryFactory);
+		return new EbMSMessageEventDAOImpl(queryFactory);
 	}
 
 	private Map<String,Destination> createEbMSMessageEventDestinations(JMSDestinationType jmsDestinationType)

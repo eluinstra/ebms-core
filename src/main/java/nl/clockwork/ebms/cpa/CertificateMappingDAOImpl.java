@@ -15,20 +15,15 @@
  */
 package nl.clockwork.ebms.cpa;
 
-import java.security.cert.CertificateException;
-import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
-import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.querydsl.core.types.Projections;
 import com.querydsl.sql.SQLQueryFactory;
 
 import lombok.AccessLevel;
@@ -44,92 +39,48 @@ import nl.clockwork.ebms.service.cpa.certificate.CertificateMapping;
 public class CertificateMappingDAOImpl implements CertificateMappingDAO
 {
 	@NonNull
-	JdbcTemplate jdbcTemplate;
-	@NonNull
 	SQLQueryFactory queryFactory;
 	@NonNull
 	QCertificateMapping table = QCertificateMapping.certificateMapping;
 
 	@Override
+	@Transactional(transactionManager = "dataSourceTransactionManager")
 	@Cacheable(cacheNames = "CertificateMapping", keyGenerator = "ebMSKeyGenerator")
 	public boolean existsCertificateMapping(String id, String cpaId)
 	{
-		//"select count(*) from certificate_mapping where id = ? and (cpa_id = ? or (cpa_id is null and ? is null))"
-		val query = queryFactory.select(table.source.count())
+		return queryFactory.select(table.source.count())
 				.from(table)
 				.where(table.id.eq(id)
 						.and(cpaId == null ? table.cpaId.isNull() : table.cpaId.eq(cpaId)))
-				.getSQL();
-		return jdbcTemplate.queryForObject(
-				query.getSQL(),
-				query.getNullFriendlyBindings().toArray(),
-				Integer.class) > 0;
+				.fetchOne() > 0;
 	}
 
 	@Override
+	@Transactional(transactionManager = "dataSourceTransactionManager")
 	@Cacheable(cacheNames = "CertificateMapping", keyGenerator = "ebMSKeyGenerator")
 	public Optional<X509Certificate> getCertificateMapping(String id, String cpaId)
 	{
-		try
-		{
-			//"select destination from certificate_mapping where id = ? and (cpa_id = ? or (cpa_id is null and ? is null))"
-			val query = queryFactory.select(table.source,table.cpaId)
-					.from(table)
-					.where(table.id.eq(id)
-							.and(cpaId == null ? table.cpaId.isNull() : table.cpaId.eq(cpaId).or(table.cpaId.isNull())))
-					.getSQL();
-			return jdbcTemplate.query(
-					query.getSQL(),
-					query.getNullFriendlyBindings().toArray(),
-					(ResultSetExtractor<Optional<X509Certificate>>)(rs) ->
-					{
-						if (!rs.next())
-							return Optional.empty();
-						while (rs.getString("cpaId") == null && !rs.isLast())
-							rs.next();
-						try
-						{
-							CertificateFactory certificateFactory = CertificateFactory.getInstance("X509");
-							return Optional.of((X509Certificate)certificateFactory.generateCertificate(rs.getBinaryStream("source")));
-						}
-						catch (CertificateException e)
-						{
-							throw new SQLException(e);
-						}
-					});
-		}
-		catch(EmptyResultDataAccessException e)
-		{
+		val result = queryFactory.select(table.destination,table.cpaId)
+				.from(table)
+				.where(table.id.eq(id)
+						.and(cpaId == null ? table.cpaId.isNull() : table.cpaId.eq(cpaId).or(table.cpaId.isNull())))
+				.fetch();
+		if (result.size() == 0)
 			return Optional.empty();
-		}
+		else if (result.size() == 1)
+			return Optional.of(result.get(0).get(table.destination));
+		else
+			return result.stream().filter(t -> t.get(table.cpaId) != null).findFirst().map(t -> t.get(table.destination));
 	}
 
 	@Override
+	@Transactional(transactionManager = "dataSourceTransactionManager")
 	@Cacheable(cacheNames = "CertificateMapping", keyGenerator = "ebMSKeyGenerator")
 	public List<CertificateMapping> getCertificateMappings()
 	{
-		//"select source, destination, cpa_id from certificate_mapping"
-		val query = queryFactory.select(table.source,table.destination,table.cpaId)
+		return queryFactory.select(Projections.constructor(CertificateMapping.class,table.source,table.destination,table.cpaId))
 				.from(table)
-				.getSQL();
-		return jdbcTemplate.query(
-				query.getSQL(),
-				query.getNullFriendlyBindings().toArray(),
-				(rs,rowNum) ->
-				{
-					try
-					{
-						val certificateFactory = CertificateFactory.getInstance("X509");
-						val source = (X509Certificate)certificateFactory.generateCertificate(rs.getBinaryStream("source"));
-						val destination = (X509Certificate)certificateFactory.generateCertificate(rs.getBinaryStream("destination"));
-						val cpaId = rs.getString("cpa_id");
-						return new CertificateMapping(source,destination,cpaId);
-					}
-					catch (CertificateException e)
-					{
-						throw new SQLException(e);
-					}
-				});
+				.fetch();
 	}
 
 	@Override

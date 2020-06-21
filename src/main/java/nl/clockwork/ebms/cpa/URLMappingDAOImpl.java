@@ -20,16 +20,14 @@ import java.util.Optional;
 
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.querydsl.core.types.Projections;
 import com.querydsl.sql.SQLQueryFactory;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
-import lombok.val;
 import lombok.experimental.FieldDefaults;
 import nl.clockwork.ebms.querydsl.model.QUrlMapping;
 import nl.clockwork.ebms.service.cpa.url.URLMapping;
@@ -39,64 +37,40 @@ import nl.clockwork.ebms.service.cpa.url.URLMapping;
 public class URLMappingDAOImpl implements URLMappingDAO
 {
 	@NonNull
-	JdbcTemplate jdbcTemplate;
-	@NonNull
 	SQLQueryFactory queryFactory;
 	QUrlMapping table = QUrlMapping.urlMapping;
 
 	@Override
+	@Transactional(transactionManager = "dataSourceTransactionManager")
 	@Cacheable(cacheNames = "URLMapping", keyGenerator = "ebMSKeyGenerator")
 	public boolean existsURLMapping(String source)
 	{
-		//"select count(*) from url_mapping where source = ?"
-		val query = queryFactory.select(table.source.count())
+		return queryFactory.select(table.source.count())
 				.from(table)
 				.where(table.source.eq(source))
-				.getSQL();
-		return jdbcTemplate.queryForObject(
-				query.getSQL(),
-				query.getNullFriendlyBindings().toArray(),
-				Integer.class) > 0;
+				.fetchOne() > 0;
 	}
 
 	@Override
+	@Transactional(transactionManager = "dataSourceTransactionManager")
 	@Cacheable(cacheNames = "URLMapping", keyGenerator = "ebMSKeyGenerator")
 	public Optional<String> getURLMapping(String source)
 	{
-		try
-		{
-			//"select destination from url_mapping where source = ?"
-			val query = queryFactory.select(table.source)
-					.from(table)
-					.where(table.source.eq(source))
-					.getSQL();
-			return Optional.of(jdbcTemplate.queryForObject(
-					query.getSQL(),
-					query.getNullFriendlyBindings().toArray(),
-					String.class));
-		}
-		catch(EmptyResultDataAccessException e)
-		{
-			return Optional.empty();
-		}
+		return Optional.ofNullable(queryFactory.select(table.source)
+				.from(table)
+				.where(table.source.eq(source))
+				.fetchOne());
 	}
 
 	@Override
+	@Transactional(transactionManager = "dataSourceTransactionManager")
 	@Cacheable(cacheNames = "URLMapping", keyGenerator = "ebMSKeyGenerator")
 	public List<URLMapping> getURLMappings()
 	{
-		//"select source, destination from url_mapping order by source asc"
-		val query = queryFactory.select(table.source,table.destination)
+		return queryFactory.select(Projections.constructor(URLMapping.class,table.source,table.destination))
 				.from(table)
 				.orderBy(table.source.asc())
-				.getSQL();
-		return jdbcTemplate.query(
-				query.getSQL(),
-				query.getNullFriendlyBindings().toArray(),
-				(rs,rowNum) ->
-				{
-					return new URLMapping(rs.getString("source"),rs.getString("destination"));
-				});
+				.fetch();
 	}
 
 	@Override
