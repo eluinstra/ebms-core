@@ -16,14 +16,13 @@
 package nl.clockwork.ebms.dao;
 
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.transaction.support.TransactionTemplate;
 
 import com.querydsl.sql.SQLQueryFactory;
 
 class OracleEbMSDAO extends AbstractEbMSDAO
 {
-	public OracleEbMSDAO(TransactionTemplate transactionTemplate, JdbcTemplate jdbcTemplate, SQLQueryFactory queryFactory)
+	public OracleEbMSDAO(JdbcTemplate jdbcTemplate, SQLQueryFactory queryFactory)
 	{
-		super(transactionTemplate,jdbcTemplate,queryFactory);
+		super(jdbcTemplate,queryFactory);
 	}
 }

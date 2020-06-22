@@ -23,7 +23,6 @@ import org.w3c.dom.Document;
 
 import com.querydsl.core.BooleanBuilder;
 
-import nl.clockwork.ebms.Action;
 import nl.clockwork.ebms.EbMSAction;
 import nl.clockwork.ebms.EbMSMessageStatus;
 import nl.clockwork.ebms.model.EbMSAttachment;
@@ -36,8 +35,6 @@ import nl.clockwork.ebms.service.model.EbMSMessageContext;
 
 public interface EbMSDAO
 {
-	void executeTransaction(Action action);
-
 	boolean existsMessage(String messageId);
 	boolean existsIdenticalMessage(EbMSBaseMessage message);
 

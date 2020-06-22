@@ -21,7 +21,6 @@ import java.util.Optional;
 
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.transaction.annotation.Transactional;
 
 import com.querydsl.core.types.Projections;
 import com.querydsl.sql.SQLQueryFactory;
@@ -44,7 +43,6 @@ public class CertificateMappingDAOImpl implements CertificateMappingDAO
 	QCertificateMapping table = QCertificateMapping.certificateMapping;
 
 	@Override
-	@Transactional(transactionManager = "dataSourceTransactionManager")
 	@Cacheable(cacheNames = "CertificateMapping", keyGenerator = "ebMSKeyGenerator")
 	public boolean existsCertificateMapping(String id, String cpaId)
 	{
@@ -56,14 +54,13 @@ public class CertificateMappingDAOImpl implements CertificateMappingDAO
 	}
 
 	@Override
-	@Transactional(transactionManager = "dataSourceTransactionManager")
 	@Cacheable(cacheNames = "CertificateMapping", keyGenerator = "ebMSKeyGenerator")
-	public Optional<X509Certificate> getCertificateMapping(String id, String cpaId)
+	public Optional<X509Certificate> getCertificateMapping(String id, String cpaId, boolean getSpecific)
 	{
 		val result = queryFactory.select(table.destination,table.cpaId)
 				.from(table)
 				.where(table.id.eq(id)
-						.and(cpaId == null ? table.cpaId.isNull() : table.cpaId.eq(cpaId).or(table.cpaId.isNull())))
+						.and(cpaId == null ? table.cpaId.isNull() : getSpecific ? table.cpaId.eq(cpaId) : table.cpaId.eq(cpaId).or(table.cpaId.isNull())))
 				.fetch();
 		if (result.size() == 0)
 			return Optional.empty();
@@ -74,7 +71,6 @@ public class CertificateMappingDAOImpl implements CertificateMappingDAO
 	}
 
 	@Override
-	@Transactional(transactionManager = "dataSourceTransactionManager")
 	@Cacheable(cacheNames = "CertificateMapping", keyGenerator = "ebMSKeyGenerator")
 	public List<CertificateMapping> getCertificateMappings()
 	{
@@ -84,7 +80,6 @@ public class CertificateMappingDAOImpl implements CertificateMappingDAO
 	}
 
 	@Override
-	@Transactional(transactionManager = "dataSourceTransactionManager")
 	@CacheEvict(cacheNames = "CertificateMapping", allEntries = true)
 	public void insertCertificateMapping(CertificateMapping mapping)
 	{
@@ -97,7 +92,6 @@ public class CertificateMappingDAOImpl implements CertificateMappingDAO
 	}
 
 	@Override
-	@Transactional(transactionManager = "dataSourceTransactionManager")
 	@CacheEvict(cacheNames = "CertificateMapping", allEntries = true)
 	public int updateCertificateMapping(CertificateMapping mapping)
 	{
@@ -110,7 +104,6 @@ public class CertificateMappingDAOImpl implements CertificateMappingDAO
 	}
 
 	@Override
-	@Transactional(transactionManager = "dataSourceTransactionManager")
 	@CacheEvict(cacheNames = "CertificateMapping", allEntries = true)
 	public int deleteCertificateMapping(String id, String cpaId)
 	{

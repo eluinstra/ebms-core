@@ -21,7 +21,6 @@ import java.util.Optional;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CollaborationProtocolAgreement;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.transaction.annotation.Transactional;
 
 import com.querydsl.sql.SQLQueryFactory;
 
@@ -41,7 +40,6 @@ public class CPADAOImpl implements CPADAO
 	QCpa table = QCpa.cpa1;
 
 	@Override
-	@Transactional(transactionManager = "dataSourceTransactionManager")
 	@Cacheable(cacheNames = "CPA", keyGenerator = "ebMSKeyGenerator")
 	public boolean existsCPA(String cpaId)
 	{
@@ -52,7 +50,6 @@ public class CPADAOImpl implements CPADAO
 	}
 	
 	@Override
-	@Transactional(transactionManager = "dataSourceTransactionManager")
 	@Cacheable(cacheNames = "CPA", keyGenerator = "ebMSKeyGenerator")
 	public Optional<CollaborationProtocolAgreement> getCPA(String cpaId)
 	{
@@ -63,7 +60,6 @@ public class CPADAOImpl implements CPADAO
 	}
 
 	@Override
-	@Transactional(transactionManager = "dataSourceTransactionManager")
 	@Cacheable(cacheNames = "CPA", keyGenerator = "ebMSKeyGenerator")
 	public List<String> getCPAIds()
 	{
@@ -74,7 +70,6 @@ public class CPADAOImpl implements CPADAO
 	}
 
 	@Override
-	@Transactional(transactionManager = "dataSourceTransactionManager")
 	@CacheEvict(cacheNames = "CPA", allEntries = true)
 	public long insertCPA(CollaborationProtocolAgreement cpa)
 	{
@@ -85,7 +80,6 @@ public class CPADAOImpl implements CPADAO
 	}
 
 	@Override
-	@Transactional(transactionManager = "dataSourceTransactionManager")
 	@CacheEvict(cacheNames = "CPA", allEntries = true)
 	public long updateCPA(CollaborationProtocolAgreement cpa)
 	{
@@ -96,7 +90,6 @@ public class CPADAOImpl implements CPADAO
 	}
 
 	@Override
-	@Transactional(transactionManager = "dataSourceTransactionManager")
 	@CacheEvict(cacheNames = "CPA", allEntries = true)
 	public long deleteCPA(String cpaId)
 	{

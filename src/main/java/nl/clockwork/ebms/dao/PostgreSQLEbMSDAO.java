@@ -36,7 +36,6 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.support.KeyHolder;
-import org.springframework.transaction.support.TransactionTemplate;
 import org.w3c.dom.Document;
 
 import com.querydsl.sql.SQLQueryFactory;
@@ -84,9 +83,9 @@ class PostgreSQLEbMSDAO extends AbstractEbMSDAO
 		}
 	}
 
-	public PostgreSQLEbMSDAO(TransactionTemplate transactionTemplate, JdbcTemplate jdbcTemplate, SQLQueryFactory queryFactory)
+	public PostgreSQLEbMSDAO(JdbcTemplate jdbcTemplate, SQLQueryFactory queryFactory)
 	{
-		super(transactionTemplate,jdbcTemplate,queryFactory);
+		super(jdbcTemplate,queryFactory);
 	}
 
 	@Override

@@ -29,8 +29,6 @@ import org.springframework.dao.DataRetrievalFailureException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.support.KeyHolder;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.support.TransactionTemplate;
 import org.w3c.dom.Document;
 
 import com.querydsl.sql.SQLQueryFactory;
@@ -44,13 +42,12 @@ import nl.clockwork.ebms.util.DOMUtils;
 
 class DB2EbMSDAO extends nl.clockwork.ebms.dao.PostgreSQLEbMSDAO
 {
-	public DB2EbMSDAO(TransactionTemplate transactionTemplate, JdbcTemplate jdbcTemplate, SQLQueryFactory queryFactory)
+	public DB2EbMSDAO(JdbcTemplate jdbcTemplate, SQLQueryFactory queryFactory)
 	{
-		super(transactionTemplate,jdbcTemplate,queryFactory);
+		super(jdbcTemplate,queryFactory);
 	}
 
 	@Override
-	@Transactional(transactionManager = "dataSourceTransactionManager")
 	public long insertMessage(final Instant timestamp, final Instant persistTime, final Document document, final EbMSBaseMessage message, final List<EbMSAttachment> attachments, final EbMSMessageStatus status)
 	{
 		try
@@ -122,7 +119,6 @@ class DB2EbMSDAO extends nl.clockwork.ebms.dao.PostgreSQLEbMSDAO
 	}
 	
 	@Override
-	@Transactional(transactionManager = "dataSourceTransactionManager")
 	public long insertDuplicateMessage(final Instant timestamp, final Document document, final EbMSBaseMessage message, final List<EbMSAttachment> attachments)
 	{
 		try

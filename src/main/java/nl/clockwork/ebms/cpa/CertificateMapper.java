@@ -40,7 +40,7 @@ public class CertificateMapper
 
 	public X509Certificate getCertificate(X509Certificate certificate, String cpaId)
 	{
-		return certificate != null ? certificateMappingDAO.getCertificateMapping(CertificateMapping.getId.apply(certificate),cpaId).orElse(certificate) : null;
+		return certificate != null ? certificateMappingDAO.getCertificateMapping(CertificateMapping.getId.apply(certificate),cpaId,false).orElse(certificate) : null;
 	}
 
 	public void setCertificateMapping(CertificateMapping mapping)

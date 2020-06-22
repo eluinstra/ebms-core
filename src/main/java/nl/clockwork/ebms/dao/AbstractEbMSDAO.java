@@ -38,8 +38,6 @@ import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.support.TransactionTemplate;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
@@ -53,7 +51,6 @@ import lombok.NonNull;
 import lombok.val;
 import lombok.var;
 import lombok.experimental.FieldDefaults;
-import nl.clockwork.ebms.Action;
 import nl.clockwork.ebms.EbMSAction;
 import nl.clockwork.ebms.EbMSAttachmentFactory;
 import nl.clockwork.ebms.EbMSMessageStatus;
@@ -76,8 +73,6 @@ import nl.clockwork.ebms.util.DOMUtils;
 @AllArgsConstructor
 abstract class AbstractEbMSDAO implements EbMSDAO
 {
-	@NonNull
-	TransactionTemplate transactionTemplate;
 	@NonNull
 	JdbcTemplate jdbcTemplate;
 	@NonNull
@@ -134,13 +129,6 @@ abstract class AbstractEbMSDAO implements EbMSDAO
 			throw new DataRetrievalFailureException("",e);
 		}
 	};
-
-	@Override
-	@Transactional(transactionManager = "dataSourceTransactionManager")
-	public void executeTransaction(final Action action)
-	{
-		action.run();
-	}
 
 	@Override
 	public boolean existsMessage(String messageId)
@@ -435,7 +423,6 @@ abstract class AbstractEbMSDAO implements EbMSDAO
 	}
 
 	@Override
-	@Transactional(transactionManager = "dataSourceTransactionManager")
 	public long insertMessage(final Instant timestamp, final Instant persistTime, final Document document, final EbMSBaseMessage message, final List<EbMSAttachment> attachments, final EbMSMessageStatus status)
 	{
 		try
@@ -509,7 +496,6 @@ abstract class AbstractEbMSDAO implements EbMSDAO
 	}
 
 	@Override
-	@Transactional(transactionManager = "dataSourceTransactionManager")
 	public long insertDuplicateMessage(final Instant timestamp, final Document document, final EbMSBaseMessage message, final List<EbMSAttachment> attachments)
 	{
 		try
@@ -623,7 +609,6 @@ abstract class AbstractEbMSDAO implements EbMSDAO
 	}
 
 	@Override
-	@Transactional(transactionManager = "dataSourceTransactionManager")
 	public long updateMessage(String messageId, EbMSMessageStatus oldStatus, EbMSMessageStatus newStatus)
 	{
 		return queryFactory.update(table)
@@ -636,7 +621,6 @@ abstract class AbstractEbMSDAO implements EbMSDAO
 	}
 
 	@Override
-	@Transactional(transactionManager = "dataSourceTransactionManager")
 	public long deleteAttachments(String messageId)
 	{
 		return queryFactory.delete(attachmentTable)

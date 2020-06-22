@@ -33,7 +33,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.val;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.NonFinal;
-import nl.clockwork.ebms.Action;
 import nl.clockwork.ebms.cpa.CPAManager;
 import nl.clockwork.ebms.cpa.CPAUtils;
 import nl.clockwork.ebms.dao.EbMSDAO;
@@ -103,33 +102,29 @@ public class JMSEventManager implements EventManager
 				event.getCpaId(),
 				event.getReceiveDeliveryChannelId())
 					.orElseThrow(() -> StreamUtils.illegalStateException("DeliveryChannel",event.getCpaId(),event.getReceiveDeliveryChannelId()));
-		Action action = () ->
+		ebMSEventDAO.insertEventLog(event.getMessageId(),event.getTimestamp(), url, status, errorMessage);
+		if (event.getTimeToLive() != null && CPAUtils.isReliableMessaging(deliveryChannel))
 		{
-			ebMSEventDAO.insertEventLog(event.getMessageId(),event.getTimestamp(), url, status, errorMessage);
-			if (event.getTimeToLive() != null && CPAUtils.isReliableMessaging(deliveryChannel))
+			val nextEvent = createNextEvent(event,deliveryChannel);
+			//jmsTemplate.setDeliveryDelay(calculateDelay(nextEvent));
+			jmsTemplate.send(JMS_DESTINATION_NAME,new EventMessageCreator(nextEvent,calculateDelay(nextEvent)));
+		}
+		else
+		{
+			switch(ebMSDAO.getMessageAction(event.getMessageId()).orElse(null))
 			{
-				val nextEvent = createNextEvent(event,deliveryChannel);
-				//jmsTemplate.setDeliveryDelay(calculateDelay(nextEvent));
-				jmsTemplate.send(JMS_DESTINATION_NAME,new EventMessageCreator(nextEvent,calculateDelay(nextEvent)));
+				case ACKNOWLEDGMENT:
+				case MESSAGE_ERROR:
+					if (event.getRetries() < nrAutoRetries)
+					{
+						val nextEvent = createNextEvent(event,autoRetryInterval);
+						//jmsTemplate.setDeliveryDelay(autoRetryInterval);
+						jmsTemplate.send(JMS_DESTINATION_NAME,new EventMessageCreator(nextEvent,autoRetryInterval));
+						break;
+					}
+				default:
 			}
-			else
-			{
-				switch(ebMSDAO.getMessageAction(event.getMessageId()).orElse(null))
-				{
-					case ACKNOWLEDGMENT:
-					case MESSAGE_ERROR:
-						if (event.getRetries() < nrAutoRetries)
-						{
-							val nextEvent = createNextEvent(event,autoRetryInterval);
-							//jmsTemplate.setDeliveryDelay(autoRetryInterval);
-							jmsTemplate.send(JMS_DESTINATION_NAME,new EventMessageCreator(nextEvent,autoRetryInterval));
-							break;
-						}
-					default:
-				}
-			}
-		};
-		ebMSEventDAO.executeTransaction(action);
+		}
 	}
 
 	private long calculateDelay(final EbMSEvent event)

@@ -18,6 +18,8 @@ package nl.clockwork.ebms.service.cpa.certificate;
 import java.security.cert.X509Certificate;
 import java.util.List;
 
+import org.springframework.transaction.annotation.Transactional;
+
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
@@ -34,6 +36,7 @@ public class CertificateMappingServiceImpl implements CertificateMappingService
 	CertificateMapper certificateMapper;
 
 	@Override
+	@Transactional(transactionManager = "dataSourceTransactionManager")
 	public void setCertificateMapping(CertificateMapping certificateMapping) throws CertificateMappingServiceException
 	{
 		try
@@ -50,6 +53,7 @@ public class CertificateMappingServiceImpl implements CertificateMappingService
 	}
 
 	@Override
+	@Transactional(transactionManager = "dataSourceTransactionManager")
 	public void deleteCertificateMapping(X509Certificate source, String cpaId) throws CertificateMappingServiceException
 	{
 		try
@@ -66,6 +70,7 @@ public class CertificateMappingServiceImpl implements CertificateMappingService
 	}
 
 	@Override
+	@Transactional(transactionManager = "dataSourceTransactionManager")
 	public List<CertificateMapping> getCertificateMappings() throws CertificateMappingServiceException
 	{
 		try

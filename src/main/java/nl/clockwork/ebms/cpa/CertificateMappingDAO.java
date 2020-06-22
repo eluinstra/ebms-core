@@ -24,7 +24,7 @@ import nl.clockwork.ebms.service.cpa.certificate.CertificateMapping;
 public interface CertificateMappingDAO
 {
 	boolean existsCertificateMapping(String id, String cpaId);
-	Optional<X509Certificate> getCertificateMapping(String id, String cpaId);
+	Optional<X509Certificate> getCertificateMapping(String id, String cpaId, boolean getSpecific);
 	List<CertificateMapping> getCertificateMappings();
 	void insertCertificateMapping(CertificateMapping mapping);
 	int updateCertificateMapping(CertificateMapping mapping);

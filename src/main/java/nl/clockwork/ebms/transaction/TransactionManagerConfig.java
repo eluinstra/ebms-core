@@ -24,8 +24,10 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.transaction.jta.JtaTransactionManager;
+import org.springframework.transaction.support.DefaultTransactionDefinition;
 
 import com.atomikos.icatch.jta.UserTransactionManager;
 
@@ -74,5 +76,13 @@ public class TransactionManagerConfig
 		bitronix.tm.Configuration config = TransactionManagerServices.getConfiguration();
 		config.setServerId(UUID.randomUUID().toString());
 		config.setDefaultTransactionTimeout(transactionTimeout);
+	}
+
+	public static TransactionDefinition createTransactionDefinition()
+	{
+		val result = new DefaultTransactionDefinition();
+		result.setName(UUID.randomUUID().toString());
+		result.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRED);
+		return result;
 	}
 }

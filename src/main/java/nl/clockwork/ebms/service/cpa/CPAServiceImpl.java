@@ -18,6 +18,7 @@ package nl.clockwork.ebms.service.cpa;
 import java.util.List;
 
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CollaborationProtocolAgreement;
+import org.springframework.transaction.annotation.Transactional;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -42,6 +43,7 @@ public class CPAServiceImpl implements CPAService
 	XSDValidator xsdValidator = new XSDValidator("/nl/clockwork/ebms/xsd/cpp-cpa-2_0.xsd");
 
 	@Override
+	@Transactional(transactionManager = "dataSourceTransactionManager")
 	public void validateCPA(/*CollaborationProtocolAgreement*/String cpa) throws CPAServiceException
 	{
 		try
@@ -60,6 +62,7 @@ public class CPAServiceImpl implements CPAService
 	}
 	
 	@Override
+	@Transactional(transactionManager = "dataSourceTransactionManager")
 	public String insertCPA(/*CollaborationProtocolAgreement*/String cpa, Boolean overwrite) throws CPAServiceException
 	{
 		try
@@ -80,6 +83,7 @@ public class CPAServiceImpl implements CPAService
 	}
 
 	@Override
+	@Transactional(transactionManager = "dataSourceTransactionManager")
 	public void deleteCPA(String cpaId) throws CPAServiceException
 	{
 		try
@@ -96,6 +100,7 @@ public class CPAServiceImpl implements CPAService
 	}
 
 	@Override
+	@Transactional(transactionManager = "dataSourceTransactionManager")
 	public List<String> getCPAIds() throws CPAServiceException
 	{
 		try
@@ -111,6 +116,7 @@ public class CPAServiceImpl implements CPAService
 	}
 
 	@Override
+	@Transactional(transactionManager = "dataSourceTransactionManager")
 	public /*CollaborationProtocolAgreement*/String getCPA(String cpaId) throws CPAServiceException
 	{
 		try

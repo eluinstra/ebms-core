@@ -19,101 +19,70 @@ import java.util.List;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
-import lombok.val;
 import lombok.experimental.FieldDefaults;
-import lombok.extern.slf4j.Slf4j;
-import nl.clockwork.ebms.EbMSMessageUtils;
 import nl.clockwork.ebms.event.listener.EbMSMessageEventType;
 import nl.clockwork.ebms.service.model.EbMSMessageContentMTOM;
 import nl.clockwork.ebms.service.model.EbMSMessageContext;
 import nl.clockwork.ebms.service.model.EbMSMessageEvent;
 import nl.clockwork.ebms.service.model.MessageStatus;
 
-@Slf4j
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor
 public class EbMSMessageServiceMTOMImpl implements EbMSMessageServiceMTOM
 {
-	EbMSMessageServiceImpl ebMSMessageService;
+	EbMSMessageServiceHandler serviceHandler;
 
 	@Override
 	public void ping(String cpaId, String fromPartyId, String toPartyId) throws EbMSMessageServiceException
 	{
-		ebMSMessageService.ping(cpaId,fromPartyId,toPartyId);
+		serviceHandler.ping(cpaId,fromPartyId,toPartyId);
 	}
 
 	@Override
 	public String sendMessageMTOM(EbMSMessageContentMTOM messageContent) throws EbMSMessageServiceException
 	{
-		try
-		{
-			log.debug("SendMessage");
-			ebMSMessageService.ebMSMessageContextValidator.validate(messageContent.getContext());
-			val message = ebMSMessageService.ebMSMessageFactory.createEbMSMessageMTOM(messageContent);
-			val document = EbMSMessageUtils.getEbMSDocument(message);
-			ebMSMessageService.signatureGenerator.generate(document,message);
-			ebMSMessageService.storeMessage(document.getMessage(),message);
-			String result = message.getMessageHeader().getMessageData().getMessageId();
-			log.info("Sending message " + result);
-			return result;
-		}
-		catch (Exception e)
-		{
-			log.error("SendMessage " + messageContent,e);
-			throw new EbMSMessageServiceException(e);
-		}
+		return serviceHandler.sendMessageMTOM(messageContent);
 	}
 
 	@Override
 	public String resendMessage(String messageId) throws EbMSMessageServiceException
 	{
-		return ebMSMessageService.resendMessage(messageId);
+		return serviceHandler.resendMessage(messageId);
 	}
 
 	@Override
 	public List<String> getUnprocessedMessageIds(EbMSMessageContext messageContext, Integer maxNr) throws EbMSMessageServiceException
 	{
-		return ebMSMessageService.getUnprocessedMessageIds(messageContext,maxNr);
+		return serviceHandler.getUnprocessedMessageIds(messageContext,maxNr);
 	}
 
 	@Override
 	public EbMSMessageContentMTOM getMessageMTOM(String messageId, Boolean process) throws EbMSMessageServiceException
 	{
-		try
-		{
-			log.debug("GetMessage " + messageId);
-			if (process != null && process)
-				processMessage(messageId);
-			return ebMSMessageService.ebMSDAO.getMessageContentMTOM(messageId).orElse(null);
-		}
-		catch (Exception e)
-		{
-			log.error("GetMessage " + messageId,e);
-			throw new EbMSMessageServiceException(e);
-		}
+		return serviceHandler.getMessageMTOM(messageId,process);
 	}
 
 	@Override
 	public void processMessage(String messageId) throws EbMSMessageServiceException
 	{
-		ebMSMessageService.processMessage(messageId);
+		serviceHandler.processMessage(messageId);
 	}
 
 	@Override
 	public MessageStatus getMessageStatus(String messageId) throws EbMSMessageServiceException
 	{
-		return ebMSMessageService.getMessageStatus(messageId);
+		return serviceHandler.getMessageStatus(messageId);
 	}
 
 	@Override
 	public List<EbMSMessageEvent> getUnprocessedMessageEvents(EbMSMessageContext messageContext, EbMSMessageEventType[] eventTypes, Integer maxNr) throws EbMSMessageServiceException
 	{
-		return ebMSMessageService.getUnprocessedMessageEvents(messageContext,eventTypes,maxNr);
+		return serviceHandler.getUnprocessedMessageEvents(messageContext,eventTypes,maxNr);
 	}
 
 	@Override
 	public void processMessageEvent(String messageId) throws EbMSMessageServiceException
 	{
-		ebMSMessageService.processMessageEvent(messageId);
+		serviceHandler.processMessageEvent(messageId);
 	}
 }

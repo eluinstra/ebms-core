@@ -90,7 +90,19 @@ public class ServiceConfig
 	@Bean
 	public EbMSMessageServiceImpl ebMSMessageService()
 	{
-		return EbMSMessageServiceImpl.builder()
+		return new EbMSMessageServiceImpl(ebMSMessageServiceHandler());
+	}
+
+	@Bean
+	public EbMSMessageServiceMTOM ebMSMessageServiceMTOM()
+	{
+		return new EbMSMessageServiceMTOMImpl(ebMSMessageServiceHandler());
+	}
+
+	@Bean
+	public EbMSMessageServiceHandler ebMSMessageServiceHandler()
+	{
+		return EbMSMessageServiceHandler.builder()
 				.deliveryManager(deliveryManager)
 				.ebMSDAO(ebMSDAO)
 				.ebMSMessageEventDAO(ebMSMessageEventDAO)
@@ -101,11 +113,5 @@ public class ServiceConfig
 				.signatureGenerator(signatureGenerator)
 				.deleteEbMSAttachmentsOnMessageProcessed(deleteEbMSAttachmentsOnMessageProcessed)
 				.build();
-	}
-
-	@Bean
-	public EbMSMessageServiceMTOM ebMSMessageServiceMTOM()
-	{
-		return new EbMSMessageServiceMTOMImpl(ebMSMessageService());
 	}
 }

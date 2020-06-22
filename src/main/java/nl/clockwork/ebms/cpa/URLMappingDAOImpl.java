@@ -20,7 +20,6 @@ import java.util.Optional;
 
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.transaction.annotation.Transactional;
 
 import com.querydsl.core.types.Projections;
 import com.querydsl.sql.SQLQueryFactory;
@@ -41,7 +40,6 @@ public class URLMappingDAOImpl implements URLMappingDAO
 	QUrlMapping table = QUrlMapping.urlMapping;
 
 	@Override
-	@Transactional(transactionManager = "dataSourceTransactionManager")
 	@Cacheable(cacheNames = "URLMapping", keyGenerator = "ebMSKeyGenerator")
 	public boolean existsURLMapping(String source)
 	{
@@ -52,7 +50,6 @@ public class URLMappingDAOImpl implements URLMappingDAO
 	}
 
 	@Override
-	@Transactional(transactionManager = "dataSourceTransactionManager")
 	@Cacheable(cacheNames = "URLMapping", keyGenerator = "ebMSKeyGenerator")
 	public Optional<String> getURLMapping(String source)
 	{
@@ -63,7 +60,6 @@ public class URLMappingDAOImpl implements URLMappingDAO
 	}
 
 	@Override
-	@Transactional(transactionManager = "dataSourceTransactionManager")
 	@Cacheable(cacheNames = "URLMapping", keyGenerator = "ebMSKeyGenerator")
 	public List<URLMapping> getURLMappings()
 	{
@@ -74,7 +70,6 @@ public class URLMappingDAOImpl implements URLMappingDAO
 	}
 
 	@Override
-	@Transactional(transactionManager = "dataSourceTransactionManager")
 	@CacheEvict(cacheNames = "URLMapping", allEntries = true)
 	public long insertURLMapping(URLMapping urlMapping)
 	{
@@ -85,7 +80,6 @@ public class URLMappingDAOImpl implements URLMappingDAO
 	}
 
 	@Override
-	@Transactional(transactionManager = "dataSourceTransactionManager")
 	@CacheEvict(cacheNames = "URLMapping", allEntries = true)
 	public long updateURLMapping(URLMapping urlMapping)
 	{
@@ -96,7 +90,6 @@ public class URLMappingDAOImpl implements URLMappingDAO
 	}
 
 	@Override
-	@Transactional(transactionManager = "dataSourceTransactionManager")
 	@CacheEvict(cacheNames = "URLMapping", allEntries = true)
 	public long deleteURLMapping(String source)
 	{

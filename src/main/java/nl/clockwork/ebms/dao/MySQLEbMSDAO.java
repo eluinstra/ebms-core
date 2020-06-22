@@ -32,7 +32,6 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
-import org.springframework.transaction.support.TransactionTemplate;
 import org.w3c.dom.Document;
 
 import com.querydsl.sql.SQLQueryFactory;
@@ -46,9 +45,9 @@ import nl.clockwork.ebms.util.DOMUtils;
 
 class MySQLEbMSDAO extends AbstractEbMSDAO
 {
-	public MySQLEbMSDAO(TransactionTemplate transactionTemplate, JdbcTemplate jdbcTemplate, SQLQueryFactory queryFactory)
+	public MySQLEbMSDAO(JdbcTemplate jdbcTemplate, SQLQueryFactory queryFactory)
 	{
-		super(transactionTemplate,jdbcTemplate,queryFactory);
+		super(jdbcTemplate,queryFactory);
 	}
 
 	@Override

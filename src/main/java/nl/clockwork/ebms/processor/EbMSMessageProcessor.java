@@ -26,6 +26,7 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.xpath.XPathExpressionException;
 
+import org.springframework.transaction.annotation.Transactional;
 import org.xml.sax.SAXException;
 
 import lombok.AccessLevel;
@@ -34,7 +35,6 @@ import lombok.NonNull;
 import lombok.val;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import nl.clockwork.ebms.Action;
 import nl.clockwork.ebms.EbMSMessageFactory;
 import nl.clockwork.ebms.EbMSMessageStatus;
 import nl.clockwork.ebms.EbMSMessageUtils;
@@ -130,6 +130,7 @@ public class EbMSMessageProcessor
 				.build();
 	}
 
+	@Transactional(transactionManager = "dataSourceTransactionManager")
 	public EbMSDocument processRequest(EbMSDocument document) throws EbMSProcessorException
 	{
 		try
@@ -201,6 +202,7 @@ public class EbMSMessageProcessor
 					"\nand Action=" + message.getMessageHeader().getAction());
 	}
 
+	@Transactional(transactionManager = "dataSourceTransactionManager")
 	public void processResponse(EbMSDocument request, EbMSDocument response) throws EbMSProcessorException
 	{
 		try
@@ -285,30 +287,22 @@ public class EbMSMessageProcessor
 
 	private void storeMessage(final Instant timestamp, final EbMSDocument messageDocument, final EbMSMessage message)
 	{
-		Action action = () ->
-		{
-			ebMSDAO.insertMessage(timestamp,null,messageDocument.getMessage(),message,message.getAttachments(),EbMSMessageStatus.RECEIVED);
-			eventListener.onMessageReceived(message.getMessageHeader().getMessageData().getMessageId());
-		};
-		ebMSDAO.executeTransaction(action);
+		ebMSDAO.insertMessage(timestamp,null,messageDocument.getMessage(),message,message.getAttachments(),EbMSMessageStatus.RECEIVED);
+		eventListener.onMessageReceived(message.getMessageHeader().getMessageData().getMessageId());
 	}
 
 	private void processMessage(final EbMSMessage message)
 	{
-		Action action = () ->
+		val messageHeader = message.getMessageHeader();
+		if (ebMSDAO.updateMessage(
+				messageHeader .getMessageData().getMessageId(),
+				EbMSMessageStatus.SENDING,
+				EbMSMessageStatus.DELIVERED) > 0)
 		{
-			val messageHeader = message.getMessageHeader();
-			if (ebMSDAO.updateMessage(
-					messageHeader .getMessageData().getMessageId(),
-					EbMSMessageStatus.SENDING,
-					EbMSMessageStatus.DELIVERED) > 0)
-			{
-				eventListener.onMessageDelivered(messageHeader.getMessageData().getMessageId());
-				if (deleteEbMSAttachmentsOnMessageProcessed)
-					ebMSDAO.deleteAttachments(messageHeader.getMessageData().getMessageId());
-			}
-		};
-		ebMSDAO.executeTransaction(action);
+			eventListener.onMessageDelivered(messageHeader.getMessageData().getMessageId());
+			if (deleteEbMSAttachmentsOnMessageProcessed)
+				ebMSDAO.deleteAttachments(messageHeader.getMessageData().getMessageId());
+		}
 	}
 
 	private EbMSDocument processStatusRequest(Instant timestamp, EbMSStatusRequest statusRequest) throws DatatypeConfigurationException, JAXBException, SOAPException, ParserConfigurationException, SAXException, IOException, TransformerFactoryConfigurationError, TransformerException

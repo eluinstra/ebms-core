@@ -18,9 +18,6 @@ package nl.clockwork.ebms.event.processor;
 import java.time.Instant;
 import java.util.List;
 
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.support.TransactionTemplate;
-
 import com.querydsl.core.types.ConstructorExpression;
 import com.querydsl.core.types.Projections;
 import com.querydsl.sql.SQLQueryFactory;
@@ -29,7 +26,6 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
-import nl.clockwork.ebms.Action;
 import nl.clockwork.ebms.querydsl.model.QEbmsEvent;
 import nl.clockwork.ebms.querydsl.model.QEbmsEventLog;
 
@@ -38,21 +34,11 @@ import nl.clockwork.ebms.querydsl.model.QEbmsEventLog;
 public class EbMSEventDAOImpl implements EbMSEventDAO
 {
 	@NonNull
-	TransactionTemplate transactionTemplate;
-	@NonNull
 	SQLQueryFactory queryFactory;
 	QEbmsEvent table = QEbmsEvent.ebmsEvent;
 	QEbmsEventLog logTable = QEbmsEventLog.ebmsEventLog;
 
 	@Override
-	@Transactional(transactionManager = "dataSourceTransactionManager")
-	public void executeTransaction(final Action action)
-	{
-		action.run();
-	}
-
-	@Override
-	@Transactional(transactionManager = "dataSourceTransactionManager")
 	public List<EbMSEvent> getEventsBefore(Instant timestamp, String serverId)
 	{
 		return queryFactory.select(createEbMSEventProjection())
@@ -64,7 +50,6 @@ public class EbMSEventDAOImpl implements EbMSEventDAO
 	}
 
 	@Override
-	@Transactional(transactionManager = "dataSourceTransactionManager")
 	public List<EbMSEvent> getEventsBefore(Instant timestamp, String serverId, int maxNr)
 	{
 		return queryFactory.select(createEbMSEventProjection())
@@ -77,7 +62,6 @@ public class EbMSEventDAOImpl implements EbMSEventDAO
 	}
 	
 	@Override
-	@Transactional(transactionManager = "dataSourceTransactionManager")
 	public long insertEvent(EbMSEvent event, String serverId)
 	{
 		return queryFactory.insert(table)
@@ -94,7 +78,6 @@ public class EbMSEventDAOImpl implements EbMSEventDAO
 	}
 
 	@Override
-	@Transactional(transactionManager = "dataSourceTransactionManager")
 	public long updateEvent(EbMSEvent event)
 	{
 		return queryFactory.update(table)
@@ -105,7 +88,6 @@ public class EbMSEventDAOImpl implements EbMSEventDAO
 	}
 	
 	@Override
-	@Transactional(transactionManager = "dataSourceTransactionManager")
 	public long deleteEvent(String messageId)
 	{
 		return queryFactory.delete(table)
@@ -114,7 +96,6 @@ public class EbMSEventDAOImpl implements EbMSEventDAO
 	}
 
 	@Override
-	@Transactional(transactionManager = "dataSourceTransactionManager")
 	public long insertEventLog(String messageId, Instant timestamp, String uri, EbMSEventStatus status, String errorMessage)
 	{
 		return queryFactory.insert(logTable)

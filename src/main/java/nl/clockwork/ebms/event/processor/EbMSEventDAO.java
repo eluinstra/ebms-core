@@ -18,12 +18,8 @@ package nl.clockwork.ebms.event.processor;
 import java.time.Instant;
 import java.util.List;
 
-import nl.clockwork.ebms.Action;
-
 public interface EbMSEventDAO
 {
-	void executeTransaction(Action action);
-
 	List<EbMSEvent> getEventsBefore(Instant timestamp, String serverId);
 	List<EbMSEvent> getEventsBefore(Instant timestamp, String serverId, int maxNr);
 	long insertEvent(EbMSEvent event, String serverId);

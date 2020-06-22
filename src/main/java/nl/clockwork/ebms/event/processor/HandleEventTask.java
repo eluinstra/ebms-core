@@ -20,6 +20,7 @@ import java.time.Instant;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DeliveryChannel;
+import org.springframework.transaction.PlatformTransactionManager;
 
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -42,12 +43,15 @@ import nl.clockwork.ebms.event.listener.EventListener;
 import nl.clockwork.ebms.model.EbMSDocument;
 import nl.clockwork.ebms.processor.EbMSMessageProcessor;
 import nl.clockwork.ebms.processor.EbMSProcessingException;
+import nl.clockwork.ebms.transaction.TransactionManagerConfig;
 import nl.clockwork.ebms.util.StreamUtils;
 
 @Slf4j
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class HandleEventTask implements Runnable
 {
+	@NonNull
+	PlatformTransactionManager transactionManager;
 	@NonNull
 	EventListener eventListener;
 	@NonNull
@@ -71,9 +75,10 @@ public class HandleEventTask implements Runnable
 	TimedAction timedAction;
 
 	@Builder
-	public HandleEventTask(@NonNull EventListener eventListener, @NonNull EbMSDAO ebMSDAO, @NonNull CPAManager cpaManager, @NonNull URLMapper urlMapper, @NonNull EventManager eventManager, @NonNull EbMSHttpClientFactory ebMSClientFactory, @NonNull EbMSMessageEncrypter messageEncrypter, @NonNull EbMSMessageProcessor messageProcessor, boolean deleteEbMSAttachmentsOnMessageProcessed, @NonNull EbMSEvent event, long executionInterval)
+	public HandleEventTask(@NonNull PlatformTransactionManager transactionManager, @NonNull EventListener eventListener, @NonNull EbMSDAO ebMSDAO, @NonNull CPAManager cpaManager, @NonNull URLMapper urlMapper, @NonNull EventManager eventManager, @NonNull EbMSHttpClientFactory ebMSClientFactory, @NonNull EbMSMessageEncrypter messageEncrypter, @NonNull EbMSMessageProcessor messageProcessor, boolean deleteEbMSAttachmentsOnMessageProcessed, @NonNull EbMSEvent event, long executionInterval)
 	{
 		super();
+		this.transactionManager = transactionManager;
 		this.eventListener = eventListener;
 		this.ebMSDAO = ebMSDAO;
 		this.cpaManager = cpaManager;
@@ -97,7 +102,16 @@ public class HandleEventTask implements Runnable
 	@Override
 	public void run()
 	{
-		timedAction.run();
+		val status = transactionManager.getTransaction(TransactionManagerConfig.createTransactionDefinition());
+		try
+		{
+			timedAction.run();
+		}
+		catch (Exception e)
+		{
+			transactionManager.rollback(status);
+		}
+		transactionManager.commit(status);
 	}
 
 	private void sendEvent(final EbMSEvent event)
@@ -117,34 +131,26 @@ public class HandleEventTask implements Runnable
 		catch (final EbMSResponseException e)
 		{
 			log.error("",e);
-			Action action = () ->
-			{
-				eventManager.updateEvent(event,url,EbMSEventStatus.FAILED,e.getMessage());
-				if ((e instanceof EbMSUnrecoverableResponseException) || !CPAUtils.isReliableMessaging(receiveDeliveryChannel))
-					if (ebMSDAO.updateMessage(event.getMessageId(),EbMSMessageStatus.SENDING,EbMSMessageStatus.DELIVERY_FAILED) > 0)
-					{
-						eventListener.onMessageFailed(event.getMessageId());
-						if (deleteEbMSAttachmentsOnMessageProcessed)
-							ebMSDAO.deleteAttachments(event.getMessageId());
-					}
-			};
-			ebMSDAO.executeTransaction(action);
+			eventManager.updateEvent(event,url,EbMSEventStatus.FAILED,e.getMessage());
+			if ((e instanceof EbMSUnrecoverableResponseException) || !CPAUtils.isReliableMessaging(receiveDeliveryChannel))
+				if (ebMSDAO.updateMessage(event.getMessageId(),EbMSMessageStatus.SENDING,EbMSMessageStatus.DELIVERY_FAILED) > 0)
+				{
+					eventListener.onMessageFailed(event.getMessageId());
+					if (deleteEbMSAttachmentsOnMessageProcessed)
+						ebMSDAO.deleteAttachments(event.getMessageId());
+				}
 		}
 		catch (final Exception e)
 		{
 			log.error("",e);
-			Action action = () ->
-			{
-				eventManager.updateEvent(event,url,EbMSEventStatus.FAILED,ExceptionUtils.getStackTrace(e));
-				if (!CPAUtils.isReliableMessaging(receiveDeliveryChannel))
-					if (ebMSDAO.updateMessage(event.getMessageId(),EbMSMessageStatus.SENDING,EbMSMessageStatus.DELIVERY_FAILED) > 0)
-					{
-						eventListener.onMessageFailed(event.getMessageId());
-						if (deleteEbMSAttachmentsOnMessageProcessed)
-							ebMSDAO.deleteAttachments(event.getMessageId());
-					}
-			};
-			ebMSDAO.executeTransaction(action);
+			eventManager.updateEvent(event,url,EbMSEventStatus.FAILED,ExceptionUtils.getStackTrace(e));
+			if (!CPAUtils.isReliableMessaging(receiveDeliveryChannel))
+				if (ebMSDAO.updateMessage(event.getMessageId(),EbMSMessageStatus.SENDING,EbMSMessageStatus.DELIVERY_FAILED) > 0)
+				{
+					eventListener.onMessageFailed(event.getMessageId());
+					if (deleteEbMSAttachmentsOnMessageProcessed)
+						ebMSDAO.deleteAttachments(event.getMessageId());
+				}
 		}
 	}
 
@@ -157,18 +163,14 @@ public class HandleEventTask implements Runnable
 			log.info("Sending message " + event.getMessageId() + " to " + url);
 			val responseDocument = createClient(event).sendMessage(url,requestDocument);
 			messageProcessor.processResponse(requestDocument,responseDocument);
-			Action action = () ->
-			{
-				eventManager.updateEvent(event,url,EbMSEventStatus.SUCCEEDED);
-				if (!CPAUtils.isReliableMessaging(receiveDeliveryChannel))
-					if (ebMSDAO.updateMessage(event.getMessageId(),EbMSMessageStatus.SENDING,EbMSMessageStatus.DELIVERED) > 0)
-					{
-						eventListener.onMessageDelivered(event.getMessageId());
-						if (deleteEbMSAttachmentsOnMessageProcessed)
-							ebMSDAO.deleteAttachments(event.getMessageId());
-					}
-			};
-			ebMSDAO.executeTransaction(action);
+			eventManager.updateEvent(event,url,EbMSEventStatus.SUCCEEDED);
+			if (!CPAUtils.isReliableMessaging(receiveDeliveryChannel))
+				if (ebMSDAO.updateMessage(event.getMessageId(),EbMSMessageStatus.SENDING,EbMSMessageStatus.DELIVERED) > 0)
+				{
+					eventListener.onMessageDelivered(event.getMessageId());
+					if (deleteEbMSAttachmentsOnMessageProcessed)
+						ebMSDAO.deleteAttachments(event.getMessageId());
+				}
 		}
 		catch (CertificateException e)
 		{
@@ -190,12 +192,8 @@ public class HandleEventTask implements Runnable
 		try
 		{
 			log.warn("Expiring message " +  event.getMessageId());
-			Action action = () ->
-			{
-				ebMSDAO.getEbMSDocumentIfUnsent(event.getMessageId()).ifPresent(d -> updateMessage(event.getMessageId()));
-				eventManager.deleteEvent(event.getMessageId());
-			};
-			ebMSDAO.executeTransaction(action);
+			ebMSDAO.getEbMSDocumentIfUnsent(event.getMessageId()).ifPresent(d -> updateMessage(event.getMessageId()));
+			eventManager.deleteEvent(event.getMessageId());
 		}
 		catch (Exception e)
 		{

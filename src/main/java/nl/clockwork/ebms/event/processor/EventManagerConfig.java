@@ -22,12 +22,10 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.support.TransactionTemplate;
 
 import com.querydsl.sql.SQLQueryFactory;
 
 import lombok.AccessLevel;
-import lombok.val;
 import lombok.experimental.FieldDefaults;
 import nl.clockwork.ebms.cpa.CPAManager;
 import nl.clockwork.ebms.dao.EbMSDAO;
@@ -74,7 +72,6 @@ public class EventManagerConfig
 	@Bean
 	public EbMSEventDAO ebMSEventDAO() throws Exception
 	{
-		val transactionTemplate = new TransactionTemplate(dataSourceTransactionManager);
-		return new EbMSEventDAOImpl(transactionTemplate,queryFactory);
+		return new EbMSEventDAOImpl(queryFactory);
 	}
 }
