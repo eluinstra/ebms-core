@@ -55,6 +55,7 @@ import nl.clockwork.ebms.EbMSAction;
 import nl.clockwork.ebms.EbMSAttachmentFactory;
 import nl.clockwork.ebms.EbMSMessageStatus;
 import nl.clockwork.ebms.EbMSMessageUtils;
+import nl.clockwork.ebms.model.CachedEbMSAttachment;
 import nl.clockwork.ebms.model.EbMSAttachment;
 import nl.clockwork.ebms.model.EbMSBaseMessage;
 import nl.clockwork.ebms.model.EbMSDocument;
@@ -81,17 +82,8 @@ abstract class AbstractEbMSDAO implements EbMSDAO
 	ConstructorExpression<EbMSMessageContext> ebMSMessageContextProjection =
 			Projections.constructor(EbMSMessageContext.class,ebMSMessageContextColumns);
 	Expression<?>[] attachmentColumns = {attachmentTable.name,attachmentTable.contentId,attachmentTable.contentType,attachmentTable.content};
-	RowMapper<EbMSAttachment> ebMSAttachmentRowMapper =	(rs,rowNum) ->
-	{
-		try
-		{
-			return EbMSAttachmentFactory.createCachedEbMSAttachment(rs.getString("name"),rs.getString("content_id"),rs.getString("content_type"),rs.getBinaryStream("content"));
-		}
-		catch (IOException e)
-		{
-			throw new DataRetrievalFailureException("",e);
-		}
-	};
+	ConstructorExpression<CachedEbMSAttachment> ebMSAttachmentProjection = 
+			Projections.constructor(CachedEbMSAttachment.class,attachmentTable.name,attachmentTable.contentId,attachmentTable.contentType,attachmentTable.content);
 	RowMapper<EbMSDataSource> ebMSDataSourceRowMapper =	(rs,rowNum) ->
 	{
 		try
@@ -204,7 +196,7 @@ abstract class AbstractEbMSDAO implements EbMSDAO
 			val builder = EbMSDocument.builder()
 				.contentId(messageId)
 				.message(content)
-				.attachments(getAttachments(messageId,ebMSAttachmentRowMapper));
+				.attachments(getAttachments(messageId,ebMSAttachmentProjection).stream().map(a -> a).collect(Collectors.toList()));
 			return Optional.of(builder.build());
 		}
 		else
@@ -233,7 +225,7 @@ abstract class AbstractEbMSDAO implements EbMSDAO
 			val builder = EbMSDocument.builder()
 					.contentId(document.getContentId())
 					.message(document.getMessage())
-					.attachments(getAttachments(refToMessageId,ebMSAttachmentRowMapper).stream().map(a -> a).collect(Collectors.toList()));
+					.attachments(getAttachments(refToMessageId,ebMSAttachmentProjection).stream().map(a -> a).collect(Collectors.toList()));
 			return Optional.of(builder.build());
 		}
 		else
@@ -501,6 +493,16 @@ abstract class AbstractEbMSDAO implements EbMSDAO
 		return queryFactory.delete(attachmentTable)
 				.where(attachmentTable.messageId.eq(messageId))
 				.execute();
+	}
+
+	protected <T> List<T> getAttachments(String messageId, ConstructorExpression<T> projection)
+	{
+		return queryFactory.select(projection)
+				.from(attachmentTable)
+				.where(attachmentTable.messageId.eq(messageId)
+						.and(attachmentTable.messageNr.eq(0)))
+				.orderBy(attachmentTable.orderNr.asc())
+				.fetch();
 	}
 
 	protected <T> List<T> getAttachments(String messageId, RowMapper<T> rowMapper)

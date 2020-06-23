@@ -41,7 +41,7 @@ public class QEbmsAttachment extends com.querydsl.sql.RelationalPathBase<QEbmsAt
 
     public static final QEbmsAttachment ebmsAttachment = new QEbmsAttachment("EBMS_ATTACHMENT");
 
-    public final SimplePath<java.io.InputStream> content = createSimple("content", java.io.InputStream.class);
+    public final SimplePath<org.apache.cxf.io.CachedOutputStream> content = createSimple("content", org.apache.cxf.io.CachedOutputStream.class);
 
     public final StringPath contentId = createString("contentId");
 
