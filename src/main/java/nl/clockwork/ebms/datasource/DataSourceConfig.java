@@ -122,7 +122,7 @@ public class DataSourceConfig
 		return configuration;
 	}
 
-	@Bean(name = {"dataSourceTransactionManager"})
+	@Bean("dataSourceTransactionManager")
 	public PlatformTransactionManager dataSourceTransactionManager() throws SystemException, AtomikosSQLException, PropertyVetoException
 	{
 		switch (transactionManagerType)

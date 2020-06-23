@@ -20,8 +20,6 @@ import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 
-import org.springframework.transaction.PlatformTransactionManager;
-
 import io.vavr.control.Try;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -31,7 +29,6 @@ import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import nl.clockwork.ebms.Action;
 import nl.clockwork.ebms.EbMSThreadPoolExecutor;
-import nl.clockwork.ebms.transaction.TransactionManagerConfig;
 
 @Slf4j
 @FieldDefaults(level = AccessLevel.PROTECTED, makeFinal = true)
@@ -40,7 +37,7 @@ public class EbMSEventProcessor implements Runnable
 	int executionInterval;
 	int maxEvents;
 	@NonNull
-	PlatformTransactionManager transactionManager;
+	TransactionTemplate transactionTemplate;
 	@NonNull
 	EbMSEventDAO ebMSEventDAO;
 	@NonNull
@@ -52,7 +49,7 @@ public class EbMSEventProcessor implements Runnable
 	public EbMSEventProcessor(
 			int maxEvents,
 			int executionInterval,
-			@NonNull PlatformTransactionManager transactionManager,
+			@NonNull TransactionTemplate transactionTemplate,
 			@NonNull EbMSThreadPoolExecutor ebMSThreadPoolExecutor,
 			@NonNull EbMSEventDAO ebMSEventDAO,
 			@NonNull HandleEventTask.HandleEventTaskBuilder handleEventTaskBuilder,
@@ -60,7 +57,7 @@ public class EbMSEventProcessor implements Runnable
 	{
 		this.executionInterval = executionInterval;
 		this.maxEvents = maxEvents;
-		this.transactionManager = transactionManager;
+		this.transactionTemplate = transactionTemplate;
 		this.ebMSEventDAO = ebMSEventDAO;
 		this.handleEventTaskBuilder = handleEventTaskBuilder;
 		this.serverId = serverId;
@@ -90,17 +87,6 @@ public class EbMSEventProcessor implements Runnable
 		};
 		TimedAction timedAction = new TimedAction(action,executionInterval);
   	while (true)
-  	{
-  		val status = transactionManager.getTransaction(TransactionManagerConfig.createTransactionDefinition());
-  		try
-  		{
-  			timedAction.run();
-  		}
-  		catch (Exception e)
-  		{
-  			transactionManager.rollback(status);
-  		}
-			transactionManager.commit(status);
-  	}
+  		transactionTemplate.executeTransaction(() -> timedAction.run());
   }
 }

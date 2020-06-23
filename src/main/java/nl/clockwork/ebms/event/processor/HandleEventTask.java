@@ -20,7 +20,6 @@ import java.time.Instant;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DeliveryChannel;
-import org.springframework.transaction.PlatformTransactionManager;
 
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -43,7 +42,6 @@ import nl.clockwork.ebms.event.listener.EventListener;
 import nl.clockwork.ebms.model.EbMSDocument;
 import nl.clockwork.ebms.processor.EbMSMessageProcessor;
 import nl.clockwork.ebms.processor.EbMSProcessingException;
-import nl.clockwork.ebms.transaction.TransactionManagerConfig;
 import nl.clockwork.ebms.util.StreamUtils;
 
 @Slf4j
@@ -51,7 +49,7 @@ import nl.clockwork.ebms.util.StreamUtils;
 public class HandleEventTask implements Runnable
 {
 	@NonNull
-	PlatformTransactionManager transactionManager;
+	TransactionTemplate transactionTemplate;
 	@NonNull
 	EventListener eventListener;
 	@NonNull
@@ -75,10 +73,10 @@ public class HandleEventTask implements Runnable
 	TimedAction timedAction;
 
 	@Builder
-	public HandleEventTask(@NonNull PlatformTransactionManager transactionManager, @NonNull EventListener eventListener, @NonNull EbMSDAO ebMSDAO, @NonNull CPAManager cpaManager, @NonNull URLMapper urlMapper, @NonNull EventManager eventManager, @NonNull EbMSHttpClientFactory ebMSClientFactory, @NonNull EbMSMessageEncrypter messageEncrypter, @NonNull EbMSMessageProcessor messageProcessor, boolean deleteEbMSAttachmentsOnMessageProcessed, @NonNull EbMSEvent event, long executionInterval)
+	public HandleEventTask(@NonNull TransactionTemplate transactionTemplate, @NonNull EventListener eventListener, @NonNull EbMSDAO ebMSDAO, @NonNull CPAManager cpaManager, @NonNull URLMapper urlMapper, @NonNull EventManager eventManager, @NonNull EbMSHttpClientFactory ebMSClientFactory, @NonNull EbMSMessageEncrypter messageEncrypter, @NonNull EbMSMessageProcessor messageProcessor, boolean deleteEbMSAttachmentsOnMessageProcessed, @NonNull EbMSEvent event, long executionInterval)
 	{
 		super();
-		this.transactionManager = transactionManager;
+		this.transactionTemplate = transactionTemplate;
 		this.eventListener = eventListener;
 		this.ebMSDAO = ebMSDAO;
 		this.cpaManager = cpaManager;
@@ -102,16 +100,7 @@ public class HandleEventTask implements Runnable
 	@Override
 	public void run()
 	{
-		val status = transactionManager.getTransaction(TransactionManagerConfig.createTransactionDefinition());
-		try
-		{
-			timedAction.run();
-		}
-		catch (Exception e)
-		{
-			transactionManager.rollback(status);
-		}
-		transactionManager.commit(status);
+		transactionTemplate.executeTransaction(() -> timedAction.run());
 	}
 
 	private void sendEvent(final EbMSEvent event)

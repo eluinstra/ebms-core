@@ -46,9 +46,6 @@ public class EventProcessorConfig
 	{
 		NONE, DEFAULT, JMS;
 	}
-	@Autowired
-	@Qualifier("dataSourceTransactionManager")
-	PlatformTransactionManager dataSourceTransactionManager;
 	@Value("${eventProcessor.type}")
 	EventProcessorType eventProcessorType;
 	@Autowired
@@ -75,6 +72,8 @@ public class EventProcessorConfig
 	URLMapper urlMapper;
 	@Autowired
 	EventManager eventManager;
+	@Autowired
+	TransactionTemplate transactionTemplate;
 	@Autowired
 	EbMSHttpClientFactory ebMSClientFactory;
 	@Autowired
@@ -111,7 +110,7 @@ public class EventProcessorConfig
 				EbMSEventProcessor.builder()
 						.maxEvents(maxEvents)
 						.executionInterval(executionInterval)
-						.transactionManager(dataSourceTransactionManager)
+						.transactionTemplate(transactionTemplate)
 						.ebMSThreadPoolExecutor(new EbMSThreadPoolExecutor(minThreads,maxThreads))
 						.ebMSEventDAO(ebMSEventDAO)
 						.handleEventTaskBuilder(handleEventTaskBuilder())
@@ -124,7 +123,7 @@ public class EventProcessorConfig
 	private HandleEventTask.HandleEventTaskBuilder handleEventTaskBuilder()
 	{
 		HandleEventTask.HandleEventTaskBuilder handleEventTaskBuilder = HandleEventTask.builder()
-				.transactionManager(dataSourceTransactionManager)
+				.transactionTemplate(transactionTemplate)
 				.eventListener(eventListener)
 				.ebMSDAO(ebMSDAO)
 				.cpaManager(cpaManager)
