@@ -43,7 +43,7 @@ public class QEbmsMessage extends com.querydsl.sql.RelationalPathBase<QEbmsMessa
 
     public final StringPath action = createString("action");
 
-    public final StringPath content = createString("content");
+    public final SimplePath<org.w3c.dom.Document> content = createSimple("content", org.w3c.dom.Document.class);
 
     public final StringPath conversationId = createString("conversationId");
 
@@ -63,13 +63,9 @@ public class QEbmsMessage extends com.querydsl.sql.RelationalPathBase<QEbmsMessa
 
     public final StringPath service = createString("service");
 
-    public final NumberPath<Integer> statusRaw = createNumber("status", Integer.class);
-
     public final EnumPath<nl.clockwork.ebms.EbMSMessageStatus> status = createEnum("status", nl.clockwork.ebms.EbMSMessageStatus.class);
 
     public final DateTimePath<java.time.Instant> statusTime = createDateTime("statusTime", java.time.Instant.class);
-
-    public final DateTimePath<java.sql.Timestamp> timeStampRaw = createDateTime("timeStamp", java.sql.Timestamp.class);
 
     public final DateTimePath<java.time.Instant> timeStamp = createDateTime("timeStamp", java.time.Instant.class);
 

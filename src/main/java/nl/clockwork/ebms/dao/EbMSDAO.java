@@ -90,7 +90,7 @@ public interface EbMSDAO
 			if (messageContext.getRefToMessageId() != null)
 				builder.and(table.refToMessageId.eq(messageContext.getRefToMessageId()));
 			if (messageContext.getMessageStatus() != null)
-				builder.and(table.statusRaw.eq(messageContext.getMessageStatus().getId()));
+				builder.and(table.status.eq(messageContext.getMessageStatus()));
 		}
 		return builder;
 	}

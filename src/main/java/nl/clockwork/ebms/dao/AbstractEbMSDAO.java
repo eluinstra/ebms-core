@@ -24,14 +24,13 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 import javax.activation.DataHandler;
-import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
 import org.apache.commons.io.IOUtils;
 import org.springframework.dao.DataRetrievalFailureException;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
@@ -39,10 +38,11 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.w3c.dom.Document;
-import org.xml.sax.SAXException;
 
 import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.ConstructorExpression;
 import com.querydsl.core.types.Expression;
+import com.querydsl.core.types.Projections;
 import com.querydsl.sql.SQLQueryFactory;
 
 import lombok.AccessLevel;
@@ -58,7 +58,6 @@ import nl.clockwork.ebms.EbMSMessageUtils;
 import nl.clockwork.ebms.model.EbMSAttachment;
 import nl.clockwork.ebms.model.EbMSBaseMessage;
 import nl.clockwork.ebms.model.EbMSDocument;
-import nl.clockwork.ebms.querydsl.InstantType;
 import nl.clockwork.ebms.querydsl.model.QEbmsAttachment;
 import nl.clockwork.ebms.querydsl.model.QEbmsMessage;
 import nl.clockwork.ebms.service.model.EbMSDataSource;
@@ -66,7 +65,6 @@ import nl.clockwork.ebms.service.model.EbMSDataSourceMTOM;
 import nl.clockwork.ebms.service.model.EbMSMessageContent;
 import nl.clockwork.ebms.service.model.EbMSMessageContentMTOM;
 import nl.clockwork.ebms.service.model.EbMSMessageContext;
-import nl.clockwork.ebms.service.model.Party;
 import nl.clockwork.ebms.util.DOMUtils;
 
 @FieldDefaults(level = AccessLevel.PROTECTED, makeFinal = true)
@@ -80,21 +78,9 @@ abstract class AbstractEbMSDAO implements EbMSDAO
 	QEbmsMessage table = QEbmsMessage.ebmsMessage;
 	QEbmsAttachment attachmentTable = QEbmsAttachment.ebmsAttachment;
 	Expression<?>[] ebMSMessageContextColumns = {table.cpaId,table.fromPartyId,table.fromRole,table.toPartyId,table.toRole,table.service,table.action,table.timeStamp,table.conversationId,table.messageId,table.refToMessageId,table.status};
-	RowMapper<EbMSMessageContext> ebMSMessageContextRowMapper = (rs,rowNum) -> 
-	{
-		return EbMSMessageContext.builder()
-				.cpaId(rs.getString("cpa_id"))
-				.fromParty(new Party(rs.getString("from_party_id"),rs.getString("from_role")))
-				.toParty(new Party(rs.getString("to_party_id"),rs.getString("to_role")))
-				.service(rs.getString("service"))
-				.action(rs.getString("action"))
-				.timestamp(InstantType.toInstant(rs.getTimestamp("time_stamp")))
-				.conversationId(rs.getString("conversation_id"))
-				.messageId(rs.getString("message_id"))
-				.refToMessageId(rs.getString("ref_to_message_id"))
-				.messageStatus(getEbMSMessageStatus(rs.getObject("status",Integer.class)))
-				.build();
-	};
+	ConstructorExpression<EbMSMessageContext> ebMSMessageContextProjection =
+			Projections.constructor(EbMSMessageContext.class,ebMSMessageContextColumns);
+	Expression<?>[] attachmentColumns = {attachmentTable.name,attachmentTable.contentId,attachmentTable.contentType,attachmentTable.content};
 	RowMapper<EbMSAttachment> ebMSAttachmentRowMapper =	(rs,rowNum) ->
 	{
 		try
@@ -133,21 +119,17 @@ abstract class AbstractEbMSDAO implements EbMSDAO
 	@Override
 	public boolean existsMessage(String messageId)
 	{
-		val query = queryFactory.select(table.messageId.count())
+		return queryFactory.select(table.messageId.count())
 				.from(table)
 				.where(table.messageId.eq(messageId)
 						.and(table.messageNr.eq(0)))
-				.getSQL();
-		return jdbcTemplate.queryForObject(
-				query.getSQL(),
-				query.getNullFriendlyBindings().toArray(),
-				Integer.class) > 0;
+				.fetchOne() > 0;
 	}
 
 	@Override
 	public boolean existsIdenticalMessage(EbMSBaseMessage message)
 	{
-		val query = queryFactory.select(table.messageId.count())
+		return queryFactory.select(table.messageId.count())
 				.from(table)
 				.where(table.messageId.eq(message.getMessageHeader().getMessageData().getMessageId())
 						.and(table.messageNr.eq(0))
@@ -156,11 +138,7 @@ abstract class AbstractEbMSDAO implements EbMSDAO
 						.and(table.toRole.eq(message.getMessageHeader().getTo().getRole()))
 						.and(table.service.eq(message.getMessageHeader().getService()))
 						.and(table.action.eq(message.getMessageHeader().getAction()))*/)
-				.getSQL();
-		return jdbcTemplate.queryForObject(
-				query.getSQL(),
-				query.getNullFriendlyBindings().toArray(),
-			Integer.class) > 0;
+				.fetchOne() > 0;
 	}
 
 	@Override
@@ -180,246 +158,143 @@ abstract class AbstractEbMSDAO implements EbMSDAO
 	@Override
 	public Optional<EbMSMessageContext> getMessageContext(String messageId)
 	{
-		try
-		{
-			val query = queryFactory.select(ebMSMessageContextColumns)
-					.from(table)
-					.where(table.messageId.eq(messageId)
-							.and(table.messageNr.eq(0)))
-					.getSQL();
-			return Optional.of(jdbcTemplate.queryForObject(
-					query.getSQL(),
-					query.getNullFriendlyBindings().toArray(),
-					ebMSMessageContextRowMapper));
-		}
-		catch(EmptyResultDataAccessException e)
-		{
-			return Optional.empty();
-		}
+		return Optional.ofNullable(queryFactory.select(ebMSMessageContextProjection)
+				.from(table)
+				.where(table.messageId.eq(messageId)
+						.and(table.messageNr.eq(0)))
+				.fetchOne());
 	}
 
 	@Override
 	public Optional<EbMSMessageContext> getMessageContextByRefToMessageId(String cpaId, String refToMessageId, EbMSAction...actions)
 	{
-		try
-		{
-			var whereClause = table.cpaId.eq(cpaId)
-					.and(table.refToMessageId.eq(refToMessageId))
-					.and(table.messageNr.eq(0));
-			if (actions.length > 0)
-				whereClause.and(table.service.eq(EbMSAction.EBMS_SERVICE_URI))
-						.and(table.action.in(EbMSAction.getActions(actions)));
-			val query = queryFactory.select(ebMSMessageContextColumns)
-					.from(table)
-					.where(whereClause)
-					.getSQL();
-			return Optional.of(jdbcTemplate.queryForObject(
-					query.getSQL(),
-					query.getNullFriendlyBindings().toArray(),
-					ebMSMessageContextRowMapper));
-		}
-		catch(EmptyResultDataAccessException e)
-		{
-			return Optional.empty();
-		}
+		var whereClause = table.cpaId.eq(cpaId)
+				.and(table.refToMessageId.eq(refToMessageId))
+				.and(table.messageNr.eq(0));
+		if (actions.length > 0)
+			whereClause.and(table.service.eq(EbMSAction.EBMS_SERVICE_URI))
+					.and(table.action.in(EbMSAction.getActions(actions)));
+		return Optional.ofNullable(queryFactory.select(ebMSMessageContextProjection)
+				.from(table)
+				.where(whereClause)
+				.fetchOne());
 	}
 	
 	@Override
 	public Optional<Document> getDocument(String messageId)
 	{
-		try
-		{
-			val query = queryFactory.select(table.content)
-					.from(table)
-					.where(table.messageId.eq(messageId)
-							.and(table.messageNr.eq(0)))
-					.getSQL();
-			return Optional.of(DOMUtils.read(
-					jdbcTemplate.queryForObject(
-							query.getSQL(),
-							query.getNullFriendlyBindings().toArray(),
-							String.class)));
-		}
-		catch(EmptyResultDataAccessException e)
-		{
-			return Optional.empty();
-		}
-		catch (ParserConfigurationException | SAXException | IOException  e)
-		{
-			throw new DataRetrievalFailureException("",e);
-		}
+		return Optional.ofNullable(queryFactory.select(table.content)
+				.from(table)
+				.where(table.messageId.eq(messageId)
+						.and(table.messageNr.eq(0)))
+				.fetchOne());
 	}
 	
 	@Override
 	public Optional<EbMSDocument> getEbMSDocumentIfUnsent(String messageId)
 	{
-		try
+		val content = queryFactory.select(table.content)
+				.from(table)
+				.where(table.messageId.eq(messageId)
+						.and(table.messageNr.eq(0))
+						.and(table.status.isNull().or(table.status.eq(EbMSMessageStatus.SENDING))))
+				.fetchOne();
+		if (content != null)
 		{
-			val query = queryFactory.select(table.content)
-					.from(table)
-					.where(table.messageId.eq(messageId)
-							.and(table.messageNr.eq(0))
-							.and(table.statusRaw.isNull().or(table.statusRaw.eq(EbMSMessageStatus.SENDING.getId()))))
-					.getSQL();
-			val content = jdbcTemplate.queryForObject(
-					query.getSQL(),
-					query.getNullFriendlyBindings().toArray(),
-					String.class);
 			val builder = EbMSDocument.builder()
 				.contentId(messageId)
-				.message(DOMUtils.read(content))
+				.message(content)
 				.attachments(getAttachments(messageId,ebMSAttachmentRowMapper));
 			return Optional.of(builder.build());
 		}
-		catch(EmptyResultDataAccessException e)
-		{
+		else
 			return Optional.empty();
-		}
-		catch (ParserConfigurationException | SAXException | IOException  e)
-		{
-			throw new DataRetrievalFailureException("",e);
-		}
 	}
 	
 	@Override
 	public Optional<EbMSDocument> getEbMSDocumentByRefToMessageId(String cpaId, String refToMessageId, EbMSAction...actions)
 	{
-		try
+		var whereClause = table.cpaId.eq(cpaId)
+				.and(table.refToMessageId.eq(refToMessageId))
+				.and(table.messageNr.eq(0));
+		if (actions.length > 0)
+			whereClause.and(table.service.eq(EbMSAction.EBMS_SERVICE_URI))
+					.and(table.action.in(EbMSAction.getActions(actions)));
+		val result = queryFactory.select(table.messageId,table.content)
+				.from(table)
+				.where(whereClause)
+				.fetchOne();
+		if (result != null)
 		{
-			var whereClause = table.cpaId.eq(cpaId)
-					.and(table.refToMessageId.eq(refToMessageId))
-					.and(table.messageNr.eq(0));
-			if (actions.length > 0)
-				whereClause.and(table.service.eq(EbMSAction.EBMS_SERVICE_URI))
-						.and(table.action.in(EbMSAction.getActions(actions)));
-			val query = queryFactory.select(table.messageId,table.content)
-					.from(table)
-					.where(whereClause)
-					.getSQL();
-			val document = jdbcTemplate.queryForObject(
-					query.getSQL(),
-					query.getNullFriendlyBindings().toArray(),
-					(rs,rowNum) ->
-					{
-						try
-						{
-							return EbMSDocument.builder()
-									.contentId(rs.getString("message_id"))
-									.message(DOMUtils.read(rs.getString("content")))
-									.build();
-						}
-						catch (ParserConfigurationException | SAXException | IOException e)
-						{
-							throw new SQLException(e);
-						}
-					});
+			val document = EbMSDocument.builder()
+					.contentId(result.get(table.messageId))
+					.message(result.get(table.content))
+					.build();
 			val builder = EbMSDocument.builder()
 					.contentId(document.getContentId())
 					.message(document.getMessage())
-					.attachments(getAttachments(refToMessageId,ebMSAttachmentRowMapper));
+					.attachments(getAttachments(refToMessageId,ebMSAttachmentRowMapper).stream().map(a -> a).collect(Collectors.toList()));
 			return Optional.of(builder.build());
 		}
-		catch(EmptyResultDataAccessException e)
-		{
+		else
 			return Optional.empty();
-		}
 	}
 	
 	@Override
 	public Optional<EbMSMessageStatus> getMessageStatus(String messageId)
 	{
-		try
-		{
-			val query = queryFactory.select(table.status)
-					.from(table)
-					.where(table.messageId.eq(messageId)
-							.and(table.messageNr.eq(0)))
-					.getSQL();
-			return EbMSMessageStatus.get(jdbcTemplate.queryForObject(
-					query.getSQL(),
-					query.getNullFriendlyBindings().toArray(),
-					(rs,rowNum) ->
-					{
-						return rs.getObject("status",Integer.class);
-					}));
-		}
-		catch(EmptyResultDataAccessException e)
-		{
-			return Optional.empty();
-		}
+		return Optional.ofNullable(queryFactory.select(table.status)
+				.from(table)
+				.where(table.messageId.eq(messageId)
+						.and(table.messageNr.eq(0)))
+				.fetchOne());
 	}
 
 	@Override
 	public Optional<Instant> getPersistTime(String messageId)
 	{
-		val query = queryFactory.select(table.persistTime)
+		return Optional.ofNullable(queryFactory.select(table.persistTime)
 				.from(table)
 				.where(table.messageId.eq(messageId)
 						.and(table.messageNr.eq(0)))
-				.getSQL();
-		return InstantType.toOptionalInstant(jdbcTemplate.queryForObject(
-				query.getSQL(),
-				query.getNullFriendlyBindings().toArray(),
-				Timestamp.class));
+				.fetchOne());
 	}
 
 	@Override
 	public Optional<EbMSAction> getMessageAction(String messageId)
 	{
-		try
-		{
-			val query = queryFactory.select(table.action)
-					.from(table)
-					.where(table.messageId.eq(messageId)
-							.and(table.messageNr.eq(0)))
-					.getSQL();
-			return jdbcTemplate.queryForObject(
-					query.getSQL(),
-					query.getNullFriendlyBindings().toArray(),
-					(rs,rowNum) ->
-					{
-						return EbMSAction.get(rs.getString("action"));
-					});
-		}
-		catch(EmptyResultDataAccessException e)
-		{
-			return Optional.empty();
-		}
+		return EbMSAction.get(queryFactory.select(table.action)
+				.from(table)
+				.where(table.messageId.eq(messageId)
+						.and(table.messageNr.eq(0)))
+				.fetchOne());
 	}
 	
 	@Override
 	public List<String> getMessageIds(EbMSMessageContext messageContext, EbMSMessageStatus status)
 	{
 		var whereClause = new BooleanBuilder(table.messageNr.eq(0)
-				.and(table.statusRaw.eq(status.getId()))); 
+				.and(table.status.eq(status))); 
 		whereClause = EbMSDAO.applyFilter(table,messageContext,whereClause);
-		val query = queryFactory.select(table.status)
+		return queryFactory.select(table.messageId)
 				.from(table)
 				.where(whereClause)
 				.orderBy(table.timeStamp.asc())
-				.getSQL();
-		return jdbcTemplate.queryForList(
-				query.getSQL(),
-				query.getNullFriendlyBindings().toArray(),
-				String.class);
+				.fetch();
 	}
 
 	@Override
 	public List<String> getMessageIds(EbMSMessageContext messageContext, EbMSMessageStatus status, int maxNr)
 	{
 		var whereClause = new BooleanBuilder(table.messageNr.eq(0)
-				.and(table.statusRaw.eq(status.getId())));
+				.and(table.status.eq(status)));
 		whereClause = EbMSDAO.applyFilter(table,messageContext,whereClause);
-		val query = queryFactory.select(table.status)
+		return queryFactory.select(table.messageId)
 				.from(table)
 				.where(whereClause)
 				.orderBy(table.timeStamp.asc())
 				.limit(maxNr)
-				.getSQL();
-		return jdbcTemplate.queryForList(
-				query.getSQL(),
-				query.getNullFriendlyBindings().toArray(),
-				String.class);
+				.fetch();
 	}
 
 	@Override
@@ -437,6 +312,7 @@ abstract class AbstractEbMSDAO implements EbMSDAO
 					{
 						try
 						{
+							val messageHeader = message.getMessageHeader();
 							val ps = connection.prepareStatement
 							(
 								"insert into ebms_message (" +
@@ -460,7 +336,6 @@ abstract class AbstractEbMSDAO implements EbMSDAO
 								new int[]{4,5}
 							);
 							ps.setTimestamp(1,Timestamp.from(timestamp));
-							val messageHeader = message.getMessageHeader();
 							ps.setString(2,messageHeader.getCPAId());
 							ps.setString(3,messageHeader.getConversationId());
 							ps.setString(4,messageHeader.getMessageData().getMessageId());
@@ -510,6 +385,7 @@ abstract class AbstractEbMSDAO implements EbMSDAO
 					{
 						try
 						{
+							val messageHeader = message.getMessageHeader();
 							val ps = connection.prepareStatement
 							(
 								"insert into ebms_message (" +
@@ -531,7 +407,6 @@ abstract class AbstractEbMSDAO implements EbMSDAO
 								new int[]{4,5}
 							);
 							ps.setTimestamp(1,Timestamp.from(timestamp));
-							val messageHeader = message.getMessageHeader();
 							ps.setString(2,messageHeader.getCPAId());
 							ps.setString(3,messageHeader.getConversationId());
 							ps.setString(4,messageHeader.getMessageData().getMessageId());
@@ -640,10 +515,5 @@ abstract class AbstractEbMSDAO implements EbMSDAO
 				query.getSQL(),
 				query.getNullFriendlyBindings().toArray(),
 				rowMapper);
-	}
-
-	private EbMSMessageStatus getEbMSMessageStatus(Integer id)
-	{
-		return id != null ? EbMSMessageStatus.get(id).orElseThrow(() -> new IllegalArgumentException("EbMSMessageStatus " + id + " is not valid!")) : null;
 	}
 }

@@ -63,4 +63,19 @@ public class EbMSMessageContext implements Serializable
 	String messageId;
 	String refToMessageId;
 	EbMSMessageStatus messageStatus;
+
+	public EbMSMessageContext(String cpaId, String fromPartyId, String fromRole, String toPartyId, String toRole, String service, String action, Instant timestamp, String conversationId, String messageId, String refToMessageId, EbMSMessageStatus messageStatus)
+	{
+		super();
+		this.cpaId = cpaId;
+		this.fromParty = new Party(fromPartyId,fromRole);
+		this.toParty = new Party(toPartyId,toRole);
+		this.service = service;
+		this.action = action;
+		this.timestamp = timestamp;
+		this.conversationId = conversationId;
+		this.messageId = messageId;
+		this.refToMessageId = refToMessageId;
+		this.messageStatus = messageStatus;
+	}
 }
