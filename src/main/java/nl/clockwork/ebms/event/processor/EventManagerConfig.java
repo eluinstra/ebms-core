@@ -60,10 +60,9 @@ public class EventManagerConfig
 	{
 		switch(eventProcessorType)
 		{
-			case NONE:
-				return null;
 			case JMS:
 				return new JMSEventManager(jmsTemplate,ebMSDAO,ebMSEventDAO(),cpaManager,nrAutoRetries,autoRetryInterval);
+			case NONE:
 			default:
 				return new EbMSEventManager(ebMSDAO,ebMSEventDAO(),cpaManager,serverId,nrAutoRetries,autoRetryInterval);
 		}

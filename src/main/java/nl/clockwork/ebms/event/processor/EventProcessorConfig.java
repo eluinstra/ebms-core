@@ -107,7 +107,7 @@ public class EventProcessorConfig
 				result.setMessageListener(new EbMSSendEventListener(handleEventTaskBuilder()));
 				return result;
 			default:
-				EbMSEventProcessor.builder()
+				return EbMSEventProcessor.builder()
 						.maxEvents(maxEvents)
 						.executionInterval(executionInterval)
 						.transactionTemplate(transactionTemplate)
@@ -116,7 +116,6 @@ public class EventProcessorConfig
 						.handleEventTaskBuilder(handleEventTaskBuilder())
 						.serverId(serverId)
 						.build();
-				return null;
 		}
 	}
 
