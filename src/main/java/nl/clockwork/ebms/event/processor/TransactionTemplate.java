@@ -19,9 +19,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import nl.clockwork.ebms.Action;
 
+@Transactional(transactionManager = "dataSourceTransactionManager")
 public class TransactionTemplate
 {
-	@Transactional(transactionManager = "dataSourceTransactionManager")
 	public void executeTransaction(Action action)
 	{
 		action.run();

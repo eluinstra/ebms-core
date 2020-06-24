@@ -65,6 +65,7 @@ import nl.clockwork.ebms.validation.EbMSMessageContextValidator;
 @Builder
 @FieldDefaults(level = AccessLevel.PACKAGE, makeFinal = true)
 @AllArgsConstructor
+@Transactional(transactionManager = "dataSourceTransactionManager")
 public class EbMSMessageServiceHandler
 {
   @NonNull
@@ -85,7 +86,6 @@ public class EbMSMessageServiceHandler
 	EbMSSignatureGenerator signatureGenerator;
 	boolean deleteEbMSAttachmentsOnMessageProcessed;
 
-	@Transactional(transactionManager = "dataSourceTransactionManager")
 	public void ping(String cpaId, String fromPartyId, String toPartyId) throws EbMSMessageServiceException
 	{
 		try
@@ -109,7 +109,6 @@ public class EbMSMessageServiceHandler
 		}
 	}
 
-	@Transactional(transactionManager = "dataSourceTransactionManager")
 	public String sendMessage(EbMSMessageContent messageContent) throws EbMSMessageServiceException
 	{
 		try
@@ -131,7 +130,6 @@ public class EbMSMessageServiceHandler
 		}
 	}
 
-	@Transactional(transactionManager = "dataSourceTransactionManager")
 	public String sendMessageMTOM(EbMSMessageContentMTOM messageContent) throws EbMSMessageServiceException
 	{
 		try
@@ -153,7 +151,6 @@ public class EbMSMessageServiceHandler
 		}
 	}
 
-	@Transactional(transactionManager = "dataSourceTransactionManager")
 	public String resendMessage(String messageId) throws EbMSMessageServiceException
 	{
 		try
@@ -185,7 +182,6 @@ public class EbMSMessageServiceHandler
 		}
 	}
 
-	@Transactional(transactionManager = "dataSourceTransactionManager")
 	public List<String> getUnprocessedMessageIds(EbMSMessageContext messageContext, Integer maxNr) throws EbMSMessageServiceException
 	{
 		try
@@ -200,7 +196,6 @@ public class EbMSMessageServiceHandler
 		}
 	}
 
-	@Transactional(transactionManager = "dataSourceTransactionManager")
 	public EbMSMessageContent getMessage(final String messageId, Boolean process) throws EbMSMessageServiceException
 	{
 		try
@@ -217,7 +212,6 @@ public class EbMSMessageServiceHandler
 		}
 	}
 
-	@Transactional(transactionManager = "dataSourceTransactionManager")
 	public EbMSMessageContentMTOM getMessageMTOM(String messageId, Boolean process) throws EbMSMessageServiceException
 	{
 		try
@@ -234,7 +228,6 @@ public class EbMSMessageServiceHandler
 		}
 	}
 
-	@Transactional(transactionManager = "dataSourceTransactionManager")
 	public void processMessage(final String messageId) throws EbMSMessageServiceException
 	{
 		try
@@ -254,7 +247,6 @@ public class EbMSMessageServiceHandler
 		}
 	}
 
-	@Transactional(transactionManager = "dataSourceTransactionManager")
 	public MessageStatus getMessageStatus(String messageId) throws EbMSMessageServiceException
 	{
 		try
@@ -298,7 +290,6 @@ public class EbMSMessageServiceHandler
 			throw new EbMSMessageServiceException("No valid response received!");
 	}
 
-	@Transactional(transactionManager = "dataSourceTransactionManager")
 	public List<EbMSMessageEvent> getUnprocessedMessageEvents(EbMSMessageContext messageContext, EbMSMessageEventType[] eventTypes, Integer maxNr) throws EbMSMessageServiceException
 	{
 		try
@@ -313,7 +304,6 @@ public class EbMSMessageServiceHandler
 		}
 	}
 
-	@Transactional(transactionManager = "dataSourceTransactionManager")
 	public void processMessageEvent(final String messageId) throws EbMSMessageServiceException
 	{
 		try

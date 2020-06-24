@@ -64,6 +64,7 @@ import nl.clockwork.ebms.validation.XSDValidator;
 
 @Slf4j
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@Transactional(transactionManager = "dataSourceTransactionManager")
 public class EbMSMessageProcessor
 {
   @NonNull
@@ -130,7 +131,6 @@ public class EbMSMessageProcessor
 				.build();
 	}
 
-	@Transactional(transactionManager = "dataSourceTransactionManager")
 	public EbMSDocument processRequest(EbMSDocument document) throws EbMSProcessorException
 	{
 		try
@@ -202,7 +202,6 @@ public class EbMSMessageProcessor
 					"\nand Action=" + message.getMessageHeader().getAction());
 	}
 
-	@Transactional(transactionManager = "dataSourceTransactionManager")
 	public void processResponse(EbMSDocument request, EbMSDocument response) throws EbMSProcessorException
 	{
 		try
@@ -347,5 +346,4 @@ public class EbMSMessageProcessor
 		return requestMessage
 				.orElseThrow(() -> new EbMSProcessingException("No EbMSMessage found for messageResponse " + messageResponse.getMessageHeader().getMessageData().getMessageId()));
 	}
-
 }

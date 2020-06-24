@@ -17,6 +17,8 @@ package nl.clockwork.ebms.client;
 
 import java.util.Set;
 
+import javax.jms.ConnectionFactory;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -93,7 +95,7 @@ public class ClientConfig
 	@Autowired
 	CPAManager cpaManager;
 	@Autowired
-	JmsTemplate jmsTemplate;
+	ConnectionFactory connectionFactory;
 
 	@Bean
 	public EbMSHttpClientFactory ebMSClientFactory() throws Exception
@@ -126,7 +128,7 @@ public class ClientConfig
 				.setMessageQueue(new EbMSMessageQueue(maxEntries,timeout))
 				.setCpaManager(cpaManager)
 				.setEbMSClientFactory(ebMSClientFactory())
-				.setJmsTemplate(jmsTemplate)
+				.setJmsTemplate(new JmsTemplate(connectionFactory))
 				.build()
 				.getObject();
 	}

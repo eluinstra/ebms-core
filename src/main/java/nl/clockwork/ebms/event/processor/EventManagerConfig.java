@@ -15,6 +15,8 @@
  */
 package nl.clockwork.ebms.event.processor;
 
+import javax.jms.ConnectionFactory;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -41,8 +43,8 @@ public class EventManagerConfig
 	CPAManager cpaManager;
 	@Value("${ebms.serverId}")
 	String serverId;
-	@Autowired()
-	JmsTemplate jmsTemplate;
+	@Autowired
+	ConnectionFactory connectionFactory;
 	@Value("${ebmsMessage.nrAutoRetries}")
 	int nrAutoRetries;
 	@Value("${ebmsMessage.autoRetryInterval}")
@@ -61,7 +63,7 @@ public class EventManagerConfig
 		switch(eventProcessorType)
 		{
 			case JMS:
-				return new JMSEventManager(jmsTemplate,ebMSDAO,ebMSEventDAO(),cpaManager,nrAutoRetries,autoRetryInterval);
+				return new JMSEventManager(new JmsTemplate(connectionFactory),ebMSDAO,ebMSEventDAO(),cpaManager,nrAutoRetries,autoRetryInterval);
 			case NONE:
 			default:
 				return new EbMSEventManager(ebMSDAO,ebMSEventDAO(),cpaManager,serverId,nrAutoRetries,autoRetryInterval);

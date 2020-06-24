@@ -18,7 +18,7 @@ package nl.clockwork.ebms.dao;
 import static io.vavr.API.$;
 import static io.vavr.API.Case;
 import static io.vavr.API.Match;
-import static nl.clockwork.ebms.Predicates.startsWith;
+import static nl.clockwork.ebms.Predicates.contains;
 
 import java.beans.PropertyVetoException;
 
@@ -26,13 +26,15 @@ import javax.sql.DataSource;
 
 import org.springframework.beans.factory.FactoryBean;
 
+import com.atomikos.jdbc.AtomikosDataSourceBean;
 import com.atomikos.jdbc.internal.AtomikosSQLException;
+import com.zaxxer.hikari.HikariDataSource;
 
+import bitronix.tm.resource.jdbc.PoolingDataSource;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
-import nl.clockwork.ebms.datasource.DataSourceConfig;
 import nl.clockwork.ebms.transaction.TransactionManagerConfig;
 import nl.clockwork.ebms.transaction.TransactionManagerConfig.TransactionManagerType;
 
@@ -53,17 +55,23 @@ public abstract class AbstractDAOFactory<T> implements FactoryBean<T>
 
 	private T createDAO(DataSource dataSource) throws AtomikosSQLException, PropertyVetoException
 	{
-		String jdbcUrl = DataSourceConfig.getJdbcUrl(dataSource);
-		return Match(jdbcUrl).of(
-				Case($(startsWith("jdbc:db2:")),o -> createDB2DAO()),
-				Case($(startsWith("jdbc:hsqldb:")),o -> createHSqlDbDAO()),
-				Case($(startsWith("jdbc:mysql:")),o -> createMySqlDAO()),
-				Case($(startsWith("jdbc:oracle:")),o -> createOracleDAO()),
-				Case($(startsWith("jdbc:postgresql:")),o -> createPostgresDAO()),
-				Case($(startsWith("jdbc:sqlserver:")),o -> createMsSqlDAO()),
+		String driverClassName = getJdbcUrl(dataSource);
+		return Match(driverClassName).of(
+				Case($(contains("db2.")),o -> createDB2DAO()),
+				Case($(contains("hsqldb")),o -> createHSqlDbDAO()),
+				Case($(contains("mysql")),o -> createMySqlDAO()),
+				Case($(contains("oracle")),o -> createOracleDAO()),
+				Case($(contains("postgresql")),o -> createPostgresDAO()),
+				Case($(contains("sqlserver")),o -> createMsSqlDAO()),
 				Case($(),o -> {
-					throw new RuntimeException("Jdbc url " + jdbcUrl + " not recognized!");
+					throw new RuntimeException("Jdbc url " + driverClassName + " not recognized!");
 				}));
+	}
+
+	private String getJdbcUrl(DataSource dataSource) throws PropertyVetoException, AtomikosSQLException
+	{
+		return dataSource instanceof HikariDataSource ? ((HikariDataSource)dataSource).getDriverClassName() : 
+			dataSource  instanceof PoolingDataSource ? ((PoolingDataSource)dataSource).getClassName() : ((AtomikosDataSourceBean)dataSource).getXaDataSourceClassName();
 	}
 
 	@Override

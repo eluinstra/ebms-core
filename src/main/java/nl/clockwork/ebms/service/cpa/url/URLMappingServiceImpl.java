@@ -29,13 +29,13 @@ import nl.clockwork.ebms.cpa.URLMapper;
 @Slf4j
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor
+@Transactional(transactionManager = "dataSourceTransactionManager")
 public class URLMappingServiceImpl implements URLMappingService
 {
   @NonNull
 	URLMapper urlMapper;
 
 	@Override
-	@Transactional(transactionManager = "dataSourceTransactionManager")
 	public void setURLMapping(URLMapping urlMapping) throws URLMappingServiceException
 	{
 		try
@@ -52,7 +52,6 @@ public class URLMappingServiceImpl implements URLMappingService
 	}
 
 	@Override
-	@Transactional(transactionManager = "dataSourceTransactionManager")
 	public void deleteURLMapping(String source) throws URLMappingServiceException
 	{
 		try
@@ -68,7 +67,6 @@ public class URLMappingServiceImpl implements URLMappingService
 	}
 
 	@Override
-	@Transactional(transactionManager = "dataSourceTransactionManager")
 	public List<URLMapping> getURLMappings() throws URLMappingServiceException
 	{
 		try

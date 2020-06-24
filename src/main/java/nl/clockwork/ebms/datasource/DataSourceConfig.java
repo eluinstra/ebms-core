@@ -191,7 +191,6 @@ public class DataSourceConfig
 
 	private SQLTemplates createSQLTemplates(DataSource dataSource) throws AtomikosSQLException, PropertyVetoException
 	{
-		String jdbcUrl = getJdbcUrl(dataSource);
 		return Match(jdbcUrl).of(
 				Case($(startsWith("jdbc:db2:")),o -> DB2Templates.builder().build()),
 				Case($(startsWith("jdbc:hsqldb:")),o -> HSQLDBTemplates.builder().build()),
@@ -202,12 +201,6 @@ public class DataSourceConfig
 				Case($(),o -> {
 					throw new RuntimeException("Jdbc url " + jdbcUrl + " not recognized!");
 				}));
-	}
-
-	public static String getJdbcUrl(DataSource dataSource) throws PropertyVetoException, AtomikosSQLException
-	{
-		return dataSource instanceof HikariDataSource ? ((HikariDataSource)dataSource).getJdbcUrl() : 
-			dataSource  instanceof PoolingDataSource ? ((PoolingDataSource)dataSource).getClassName() : ((AtomikosDataSourceBean)dataSource).getXaDataSourceClassName();
 	}
 
 	private Properties createDriverProperties()

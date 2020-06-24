@@ -19,6 +19,11 @@ import java.util.function.Predicate;
 
 public final class Predicates
 {
+	public static Predicate<String> contains(String value)
+	{
+		return obj -> obj.contains(value);
+	}
+
 	public static Predicate<String> startsWith(String value)
 	{
 		return obj -> obj.startsWith(value);
