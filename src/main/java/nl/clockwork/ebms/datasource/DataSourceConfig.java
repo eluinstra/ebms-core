@@ -15,6 +15,9 @@
  */
 package nl.clockwork.ebms.datasource;
 
+import static io.vavr.API.*;
+import static nl.clockwork.ebms.Predicates.startsWith;
+
 import java.beans.PropertyVetoException;
 import java.sql.Types;
 import java.util.Properties;
@@ -183,61 +186,28 @@ public class DataSourceConfig
 
 	private SQLTemplates getSQLTemplates() throws AtomikosSQLException, PropertyVetoException
 	{
-		switch(transactionManagerType)
-		{
-			case BITRONIX:
-			case ATOMIKOS:
-				return createXASQLTemplates();
-			default:
-				return createDefaultSQLTemplates();
-		}
+		return createSQLTemplates(dataSource());
 	}
 
-	private SQLTemplates createXASQLTemplates() throws AtomikosSQLException, PropertyVetoException
+	private SQLTemplates createSQLTemplates(DataSource dataSource) throws AtomikosSQLException, PropertyVetoException
 	{
-		val dataSource = dataSource();
-		val driverClassName = dataSource  instanceof PoolingDataSource ? ((PoolingDataSource)dataSource).getClassName() : ((AtomikosDataSourceBean)dataSource).getXaDataSourceClassName();
-		switch (driverClassName)
-		{
-			case "org.hsqldb.jdbc.pool.JDBCXADataSource":
-				return HSQLDBTemplates.builder().build();
-			case "com.mysql.jdbc.jdbc2.optional.MysqlXADataSource":
-			case "org.mariadb.jdbc.MySQLDataSource":
-				return MySQLTemplates.builder().build();
-			case "org.postgresql.xa.PGXADataSource":
-				return PostgreSQLTemplates.builder().build();
-			case "oracle.jdbc.xa.client.OracleXADataSource":
-				return OracleTemplates.builder().build();
-			case "com.microsoft.sqlserver.jdbc.SQLServerXAResource":
-			case "com.microsoft.sqlserver.jdbc.SQLServerXADataSource":
-				return SQLServerTemplates.builder().build();
-			case "com.ibm.db2.jcc.DB2XADataSource":
-				return DB2Templates.builder().build();
-			default:
-				throw new RuntimeException("SQL Driver " + driverClassName + " not recognized!");
-		}
+		String jdbcUrl = getJdbcUrl(dataSource);
+		return Match(jdbcUrl).of(
+				Case($(startsWith("jdbc:db2:")),o -> DB2Templates.builder().build()),
+				Case($(startsWith("jdbc:hsqldb:")),o -> HSQLDBTemplates.builder().build()),
+				Case($(startsWith("jdbc:mysql:")),o -> MySQLTemplates.builder().build()),
+				Case($(startsWith("jdbc:oracle:")),o -> OracleTemplates.builder().build()),
+				Case($(startsWith("jdbc:postgresql:")),o -> PostgreSQLTemplates.builder().build()),
+				Case($(startsWith("jdbc:sqlserver:")),o -> SQLServerTemplates.builder().build()),
+				Case($(),o -> {
+					throw new RuntimeException("Jdbc url " + jdbcUrl + " not recognized!");
+				}));
 	}
 
-	private SQLTemplates createDefaultSQLTemplates() throws AtomikosSQLException, PropertyVetoException
+	public static String getJdbcUrl(DataSource dataSource) throws PropertyVetoException, AtomikosSQLException
 	{
-		switch (((HikariDataSource)dataSource()).getDriverClassName())
-		{
-			case "org.hsqldb.jdbcDriver":
-				return HSQLDBTemplates.builder().build();
-			case "com.mysql.jdbc.Driver":
-			case "org.mariadb.jdbc.Driver":
-				return MySQLTemplates.builder().build();
-			case "org.postgresql.Driver":
-				return PostgreSQLTemplates.builder().build();
-			case "oracle.jdbc.OracleDriver":
-				return OracleTemplates.builder().build();
-			case "com.microsoft.sqlserver.jdbc.SQLServerDriver":
-				return SQLServerTemplates.builder().build();
-			case "com.ibm.db2.jcc.DB2Driver":
-				return DB2Templates.builder().build();
-			default:
-				throw new RuntimeException("SQL Driver " + ((HikariDataSource)dataSource()).getDriverClassName() + " not recognized!");
-		}
+		return dataSource instanceof HikariDataSource ? ((HikariDataSource)dataSource).getJdbcUrl() : 
+			dataSource  instanceof PoolingDataSource ? ((PoolingDataSource)dataSource).getClassName() : ((AtomikosDataSourceBean)dataSource).getXaDataSourceClassName();
 	}
 
 	private Properties createDriverProperties()
