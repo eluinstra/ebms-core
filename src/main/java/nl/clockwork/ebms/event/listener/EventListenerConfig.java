@@ -18,6 +18,7 @@ package nl.clockwork.ebms.event.listener;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import javax.jms.ConnectionFactory;
 import javax.jms.Destination;
 
 import org.apache.activemq.command.ActiveMQQueue;
@@ -29,6 +30,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.jms.core.JmsTemplate;
 
 import lombok.AccessLevel;
+import lombok.val;
 import lombok.experimental.FieldDefaults;
 import nl.clockwork.ebms.dao.EbMSDAO;
 import nl.clockwork.ebms.jms.JMSDestinationType;
@@ -48,13 +50,14 @@ public class EventListenerConfig
 	@Autowired
 	EbMSMessageEventDAO ebMSMessageEventDAO;
 	@Autowired
-	JmsTemplate jmsTemplate;
+	ConnectionFactory connectionFactory;
 	@Value("${jms.destinationType}")
 	JMSDestinationType jmsDestinationType;
 
 	@Bean
 	public EventListener eventListener() throws Exception
 	{
+		val jmsTemplate = new JmsTemplate(connectionFactory);
 		switch (eventListenerType)
 		{
 			case DAO:

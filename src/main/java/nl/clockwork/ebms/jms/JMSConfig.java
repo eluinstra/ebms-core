@@ -28,7 +28,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.jms.connection.JmsTransactionManager;
-import org.springframework.jms.core.JmsTemplate;
 import org.springframework.transaction.PlatformTransactionManager;
 
 import com.atomikos.jms.AtomikosConnectionFactoryBean;
@@ -67,12 +66,6 @@ public class JMSConfig
 	public EbMSBrokerFactoryBean brokerFactory() throws Exception
 	{
 		return new EbMSBrokerFactoryBean(jmsBrokerStart,jmsBrokerConfig);
-	}
-
-	@Bean
-	public JmsTemplate jmsTemplate() throws JMSException
-	{
-		return new JmsTemplate(connectionFactory());
 	}
 
 	@Bean(destroyMethod = "close")
