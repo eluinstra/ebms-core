@@ -66,8 +66,6 @@ public class HandleEventTask implements Runnable
 	EbMSMessageProcessor messageProcessor;
 	boolean deleteEbMSAttachmentsOnMessageProcessed;
 	@NonNull
-	EbMSEvent event;
-	@NonNull
 	TimedAction timedAction;
 
 	@Builder
@@ -83,7 +81,6 @@ public class HandleEventTask implements Runnable
 		this.messageEncrypter = messageEncrypter;
 		this.messageProcessor = messageProcessor;
 		this.deleteEbMSAttachmentsOnMessageProcessed = deleteEbMSAttachmentsOnMessageProcessed;
-		this.event = event;
 		Action action = () ->
 		{
 			if (event.getTimeToLive() == null || Instant.now().isBefore(event.getTimeToLive()))

@@ -26,9 +26,7 @@ import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.val;
 import lombok.experimental.FieldDefaults;
-import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
 @FieldDefaults(level = AccessLevel.PROTECTED, makeFinal = true)
 @AllArgsConstructor
 public class EbMSSendEventListener implements MessageListener
@@ -42,13 +40,20 @@ public class EbMSSendEventListener implements MessageListener
 		try
 		{
 			val event = createEvent(message);
-			val task = handleEventTaskBuilder.event(event).build();
+			val task = createTask(event);
 			task.run();
 		}
 		catch (JMSException e)
 		{
-			log.error("",e);
 			throw new RuntimeException(e);
+		}
+	}
+
+	private HandleEventTask createTask(final nl.clockwork.ebms.event.processor.EbMSEvent event)
+	{
+		synchronized (this)
+		{
+			return handleEventTaskBuilder.event(event).build();
 		}
 	}
 
