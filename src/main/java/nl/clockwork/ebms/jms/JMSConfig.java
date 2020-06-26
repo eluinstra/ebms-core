@@ -68,7 +68,7 @@ public class JMSConfig
 		return new EbMSBrokerFactoryBean(jmsBrokerStart,jmsBrokerConfig);
 	}
 
-	@Bean(destroyMethod = "close")
+	@Bean(initMethod = "init", destroyMethod = "close")
 	@DependsOn("brokerFactory")
 	public ConnectionFactory connectionFactory() throws JMSException
 	{
@@ -78,20 +78,20 @@ public class JMSConfig
 				val bitronixCF = new PoolingConnectionFactory();
 				bitronixCF.setUniqueName(UUID.randomUUID().toString());
 				bitronixCF.setClassName("org.apache.activemq.ActiveMQXAConnectionFactory");
-				bitronixCF.setAllowLocalTransactions(true);
+				bitronixCF.setAllowLocalTransactions(false);
 				bitronixCF.setMinPoolSize(minPoolSize);
 				bitronixCF.setMaxPoolSize(maxPoolSize);
 				bitronixCF.setDriverProperties(createDriverProperties());
-				bitronixCF.init();
 				return bitronixCF;
 			case ATOMIKOS:
 				val atomikosCF = new AtomikosConnectionFactoryBean();
 				atomikosCF.setUniqueResourceName(UUID.randomUUID().toString());
 				atomikosCF.setXaConnectionFactoryClassName("org.apache.activemq.ActiveMQXAConnectionFactory");
-				atomikosCF.setLocalTransactionMode(true);
+				atomikosCF.setLocalTransactionMode(false);
+				atomikosCF.setIgnoreSessionTransactedFlag(true);
+				atomikosCF.setMinPoolSize(minPoolSize);
 				atomikosCF.setMaxPoolSize(maxPoolSize);
 				atomikosCF.setXaProperties(createDriverProperties());
-				atomikosCF.init();
 				return atomikosCF;
 			default:
 				val defaultCF = new CloseablePooledConnectionFactory(jmsBrokerUrl);
