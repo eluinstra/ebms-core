@@ -56,6 +56,8 @@ public class EventProcessorConfig
 	String serverId;
 	@Value("${eventProcessor.jms.destinationName}")
 	String jmsDestinationName;
+	@Value("${eventProcessor.jms.receiveTimeout}")
+	long receiveTimeout;
 	@Value("${eventProcessor.minThreads}")
 	int minThreads;
 	@Value("${eventProcessor.maxThreads}")
@@ -99,11 +101,13 @@ public class EventProcessorConfig
 				return null;
 			case JMS:
 				val result = new DefaultMessageListenerContainer();
+				
 				result.setConnectionFactory(connectionFactory);
 				result.setTransactionManager(jmsTransactionManager);
 				result.setSessionTransacted(true);
 				result.setConcurrentConsumers(minThreads);
 				result.setMaxConcurrentConsumers(maxThreads);
+				result.setReceiveTimeout(receiveTimeout);
 				result.setDestinationName(StringUtils.isEmpty(jmsDestinationName) ? JMSEventManager.JMS_DESTINATION_NAME : jmsDestinationName);
 				result.setMessageListener(new EbMSSendEventListener(handleEventTaskBuilder()));
 				return result;

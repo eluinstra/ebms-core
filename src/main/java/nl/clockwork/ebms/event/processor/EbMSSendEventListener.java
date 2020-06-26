@@ -26,9 +26,7 @@ import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.val;
 import lombok.experimental.FieldDefaults;
-import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
 @FieldDefaults(level = AccessLevel.PROTECTED, makeFinal = true)
 @AllArgsConstructor
 public class EbMSSendEventListener implements MessageListener
@@ -47,7 +45,6 @@ public class EbMSSendEventListener implements MessageListener
 		}
 		catch (JMSException e)
 		{
-			log.error("",e);
 			throw new RuntimeException(e);
 		}
 	}

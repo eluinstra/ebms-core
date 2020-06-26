@@ -20,7 +20,10 @@ import java.util.UUID;
 
 import javax.jms.ConnectionFactory;
 import javax.jms.JMSException;
+import javax.jms.XAConnectionFactory;
 
+import org.apache.activemq.ActiveMQXAConnectionFactory;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -86,27 +89,17 @@ public class JMSConfig
 			case ATOMIKOS:
 				val atomikosCF = new AtomikosConnectionFactoryBean();
 				atomikosCF.setUniqueResourceName(UUID.randomUUID().toString());
-				atomikosCF.setXaConnectionFactoryClassName("org.apache.activemq.ActiveMQXAConnectionFactory");
+				atomikosCF.setXaConnectionFactory(createXAConnectionFactory());
 				atomikosCF.setLocalTransactionMode(false);
 				atomikosCF.setIgnoreSessionTransactedFlag(true);
 				atomikosCF.setMinPoolSize(minPoolSize);
 				atomikosCF.setMaxPoolSize(maxPoolSize);
-				atomikosCF.setXaProperties(createDriverProperties());
 				return atomikosCF;
 			default:
 				val defaultCF = new CloseablePooledConnectionFactory(jmsBrokerUrl);
 				defaultCF.setMaxConnections(maxPoolSize);
 				return defaultCF;
 		}
-	}
-
-	private Properties createDriverProperties()
-	{
-		val result = new Properties();
-		result.put("brokerURL",jmsBrokerUrl);
-		result.put("userName",username);
-		result.put("password",password);
-		return result ;
 	}
 
 	@Bean("jmsTransactionManager")
@@ -120,5 +113,28 @@ public class JMSConfig
 			default:
 				return new JmsTransactionManager(connectionFactory());
 		}
+	}
+
+	private Properties createDriverProperties()
+	{
+		val result = new Properties();
+		result.put("brokerURL",jmsBrokerUrl);
+		if (StringUtils.isNotEmpty(username))
+		{
+			result.put("userName",username);
+			result.put("password",password);
+		}
+		return result ;
+	}
+
+	private XAConnectionFactory createXAConnectionFactory()
+	{
+		val result = new ActiveMQXAConnectionFactory(jmsBrokerUrl);
+		if (StringUtils.isNotEmpty(username))
+		{
+			result.setUserName(username);
+			result.setPassword(password);
+		}
+		return result;
 	}
 }
