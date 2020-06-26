@@ -32,7 +32,7 @@ import lombok.experimental.FieldDefaults;
 public class EbMSSendEventListener implements MessageListener
 {
 	@NonNull
-	HandleEventTask.HandleEventTaskBuilder handleEventTaskBuilder;
+	EventHandler eventHandler;
 
 	@Override
 	public void onMessage(Message message)
@@ -40,20 +40,11 @@ public class EbMSSendEventListener implements MessageListener
 		try
 		{
 			val event = createEvent(message);
-			val task = createTask(event);
-			task.run();
+			eventHandler.handle(event);
 		}
 		catch (JMSException e)
 		{
 			throw new RuntimeException(e);
-		}
-	}
-
-	private HandleEventTask createTask(final nl.clockwork.ebms.event.processor.EbMSEvent event)
-	{
-		synchronized (this)
-		{
-			return handleEventTaskBuilder.event(event).build();
 		}
 	}
 

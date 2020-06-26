@@ -34,7 +34,6 @@ import nl.clockwork.ebms.EbMSThreadPoolExecutor;
 @FieldDefaults(level = AccessLevel.PROTECTED, makeFinal = true)
 public class EbMSEventProcessor implements Runnable
 {
-	int executionInterval;
 	int maxEvents;
 	@NonNull
 	TransactionTemplate transactionTemplate;
@@ -48,14 +47,12 @@ public class EbMSEventProcessor implements Runnable
 	@Builder
 	public EbMSEventProcessor(
 			int maxEvents,
-			int executionInterval,
 			@NonNull TransactionTemplate transactionTemplate,
 			@NonNull EbMSThreadPoolExecutor ebMSThreadPoolExecutor,
 			@NonNull EbMSEventDAO ebMSEventDAO,
 			@NonNull HandleEventTask.HandleEventTaskBuilder handleEventTaskBuilder,
 			String serverId)
 	{
-		this.executionInterval = executionInterval;
 		this.maxEvents = maxEvents;
 		this.transactionTemplate = transactionTemplate;
 		this.ebMSEventDAO = ebMSEventDAO;
@@ -85,8 +82,7 @@ public class EbMSEventProcessor implements Runnable
 			}
 			futures.forEach(f -> Try.of(() -> f.get()).onFailure(e -> log.error("",e)));
 		};
-		TimedAction timedAction = new TimedAction(action,executionInterval);
   	while (true)
-  		transactionTemplate.executeTransaction(() -> timedAction.run());
+  		transactionTemplate.executeTransaction(() -> action.run());
   }
 }

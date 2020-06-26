@@ -30,10 +30,9 @@ import nl.clockwork.ebms.Action;
 @AllArgsConstructor
 public class TimedAction
 {
-	Action action;
 	long executionInterval;
 	
-	public void run()
+	public void run(Action action)
 	{
 		if (executionInterval > 0)
 		{

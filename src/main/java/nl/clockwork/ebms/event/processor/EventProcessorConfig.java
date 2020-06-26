@@ -109,12 +109,11 @@ public class EventProcessorConfig
 				result.setMaxConcurrentConsumers(maxThreads);
 				result.setReceiveTimeout(receiveTimeout);
 				result.setDestinationName(StringUtils.isEmpty(jmsDestinationName) ? JMSEventManager.JMS_DESTINATION_NAME : jmsDestinationName);
-				result.setMessageListener(new EbMSSendEventListener(handleEventTaskBuilder()));
+				result.setMessageListener(new EbMSSendEventListener(eventHandler()));
 				return result;
 			default:
 				return EbMSEventProcessor.builder()
 						.maxEvents(maxEvents)
-						.executionInterval(executionInterval)
 						.transactionTemplate(transactionTemplate)
 						.ebMSThreadPoolExecutor(new EbMSThreadPoolExecutor(minThreads,maxThreads))
 						.ebMSEventDAO(ebMSEventDAO)
@@ -124,9 +123,9 @@ public class EventProcessorConfig
 		}
 	}
 
-	private HandleEventTask.HandleEventTaskBuilder handleEventTaskBuilder()
+	private EventHandler eventHandler()
 	{
-		HandleEventTask.HandleEventTaskBuilder handleEventTaskBuilder = HandleEventTask.builder()
+		return EventHandler.builder()
 				.transactionTemplate(transactionTemplate)
 				.eventListener(eventListener)
 				.ebMSDAO(ebMSDAO)
@@ -137,7 +136,14 @@ public class EventProcessorConfig
 				.messageEncrypter(messageEncrypter)
 				.messageProcessor(messageProcessor)
 				.deleteEbMSAttachmentsOnMessageProcessed(deleteEbMSAttachmentsOnMessageProcessed)
-				.executionInterval(executionInterval);
-		return handleEventTaskBuilder;
+				.executionInterval(executionInterval)
+				.build();
+	}
+
+	private HandleEventTask.HandleEventTaskBuilder handleEventTaskBuilder()
+	{
+		return HandleEventTask.builder()
+				.transactionTemplate(transactionTemplate)
+				.eventHandler(eventHandler());
 	}
 }
