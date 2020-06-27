@@ -126,7 +126,6 @@ public class EventProcessorConfig
 	private EventHandler eventHandler()
 	{
 		return EventHandler.builder()
-				.transactionTemplate(transactionTemplate)
 				.eventListener(eventListener)
 				.ebMSDAO(ebMSDAO)
 				.cpaManager(cpaManager)

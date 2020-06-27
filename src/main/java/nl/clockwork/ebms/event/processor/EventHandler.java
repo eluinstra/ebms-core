@@ -49,8 +49,6 @@ import nl.clockwork.ebms.util.StreamUtils;
 public class EventHandler
 {
 	@NonNull
-	TransactionTemplate transactionTemplate;
-	@NonNull
 	EventListener eventListener;
 	@NonNull
 	EbMSDAO ebMSDAO;
@@ -70,9 +68,8 @@ public class EventHandler
 	TimedAction timedAction;
 
 	@Builder
-	public EventHandler(@NonNull TransactionTemplate transactionTemplate, @NonNull EventListener eventListener, @NonNull EbMSDAO ebMSDAO, @NonNull CPAManager cpaManager, @NonNull URLMapper urlMapper, @NonNull EventManager eventManager, @NonNull EbMSHttpClientFactory ebMSClientFactory, @NonNull EbMSMessageEncrypter messageEncrypter, @NonNull EbMSMessageProcessor messageProcessor, long executionInterval, boolean deleteEbMSAttachmentsOnMessageProcessed)
+	public EventHandler(@NonNull EventListener eventListener, @NonNull EbMSDAO ebMSDAO, @NonNull CPAManager cpaManager, @NonNull URLMapper urlMapper, @NonNull EventManager eventManager, @NonNull EbMSHttpClientFactory ebMSClientFactory, @NonNull EbMSMessageEncrypter messageEncrypter, @NonNull EbMSMessageProcessor messageProcessor, long executionInterval, boolean deleteEbMSAttachmentsOnMessageProcessed)
 	{
-		this.transactionTemplate = transactionTemplate;
 		this.eventListener = eventListener;
 		this.ebMSDAO = ebMSDAO;
 		this.cpaManager = cpaManager;

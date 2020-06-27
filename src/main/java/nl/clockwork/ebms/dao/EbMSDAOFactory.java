@@ -18,34 +18,27 @@ package nl.clockwork.ebms.dao;
 import javax.sql.DataSource;
 
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.transaction.support.TransactionTemplate;
 
 import com.querydsl.sql.SQLQueryFactory;
 
 import lombok.AccessLevel;
 import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
-import nl.clockwork.ebms.transaction.TransactionManagerConfig.TransactionManagerType;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class EbMSDAOFactory extends AbstractDAOFactory<EbMSDAO>
 {
-	@NonNull
-	TransactionTemplate transactionTemplate;
 	@NonNull
 	JdbcTemplate jdbcTemplate;
 	@NonNull
 	SQLQueryFactory queryFactory;
 
 	public EbMSDAOFactory(
-			TransactionManagerType transactionManagerType,
 			DataSource dataSource,
-			@NonNull TransactionTemplate transactionTemplate,
 			@NonNull JdbcTemplate jdbcTemplate,
 			@NonNull SQLQueryFactory queryFactory)
 	{
-		super(transactionManagerType,dataSource);
-		this.transactionTemplate = transactionTemplate;
+		super(dataSource);
 		this.jdbcTemplate = jdbcTemplate;
 		this.queryFactory = queryFactory;
 	}

@@ -35,15 +35,11 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
-import nl.clockwork.ebms.transaction.TransactionManagerConfig;
-import nl.clockwork.ebms.transaction.TransactionManagerConfig.TransactionManagerType;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor
 public abstract class AbstractDAOFactory<T> implements FactoryBean<T>
 {
-	@NonNull
-	TransactionManagerConfig.TransactionManagerType transactionManagerType;
 	@NonNull
 	DataSource dataSource;
 
@@ -97,9 +93,9 @@ public abstract class AbstractDAOFactory<T> implements FactoryBean<T>
 
 	public abstract static class DefaultDAOFactory<U> extends AbstractDAOFactory<U>
 	{
-		public DefaultDAOFactory(@NonNull TransactionManagerType transactionManagerType, @NonNull DataSource dataSource)
+		public DefaultDAOFactory(@NonNull DataSource dataSource)
 		{
-			super(transactionManagerType,dataSource);
+			super(dataSource);
 		}
 
 		@Override
