@@ -15,7 +15,9 @@
  */
 package nl.clockwork.ebms.datasource;
 
-import static io.vavr.API.*;
+import static io.vavr.API.$;
+import static io.vavr.API.Case;
+import static io.vavr.API.Match;
 import static nl.clockwork.ebms.Predicates.startsWith;
 
 import java.beans.PropertyVetoException;
@@ -49,6 +51,7 @@ import com.querydsl.sql.spring.SpringConnectionProvider;
 import com.querydsl.sql.spring.SpringExceptionTranslator;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
+import com.zaxxer.hikari.util.IsolationLevel;
 
 import bitronix.tm.resource.jdbc.PoolingDataSource;
 import lombok.AccessLevel;
@@ -73,6 +76,8 @@ public class DataSourceConfig
 	@Autowired
 	@Qualifier("jtaTransactionManager")
 	PlatformTransactionManager jtaTransactionManager;
+	@Value("${transactionManager.isolationLevel}")
+	IsolationLevel isolationLevel;
 	@Value("${ebms.jdbc.driverClassName}")
 	String driverClassName;
 	@Value("${ebms.jdbc.url}")
@@ -143,8 +148,9 @@ public class DataSourceConfig
 				val bitronixDS = new PoolingDataSource();
 				bitronixDS.setUniqueName(UUID.randomUUID().toString());
 				bitronixDS.setClassName(driverClassName);
-		    //result.setLocalAutoCommit(isAutoCommit);
-		    bitronixDS.setAllowLocalTransactions(true);
+				if (isolationLevel != null)
+					bitronixDS.setIsolationLevel(isolationLevel.name());
+		    bitronixDS.setAllowLocalTransactions(false);
 		    bitronixDS.setDriverProperties(createDriverProperties());
 		    bitronixDS.setMaxIdleTime(maxIdleTime);
 		    bitronixDS.setMinPoolSize(minPoolSize);
@@ -158,7 +164,9 @@ public class DataSourceConfig
 				atomikosDS.setUniqueResourceName(UUID.randomUUID().toString());
 				atomikosDS.setXaDataSourceClassName(driverClassName);
 				atomikosDS.setXaProperties(createDriverProperties());
-				atomikosDS.setLocalTransactionMode(true);
+				if (isolationLevel != null)
+					atomikosDS.setDefaultIsolationLevel(isolationLevel.getLevelId());
+				atomikosDS.setLocalTransactionMode(false);
 				atomikosDS.setMaxIdleTime(maxIdleTime);
 				atomikosDS.setMaxLifetime(maxLifetime);
 				atomikosDS.setMinPoolSize(minPoolSize);
