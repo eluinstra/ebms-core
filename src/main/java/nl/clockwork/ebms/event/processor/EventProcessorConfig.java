@@ -24,12 +24,13 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jms.listener.DefaultMessageListenerContainer;
+import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.transaction.PlatformTransactionManager;
 
 import lombok.AccessLevel;
 import lombok.val;
 import lombok.experimental.FieldDefaults;
-import nl.clockwork.ebms.EbMSThreadPoolExecutor;
 import nl.clockwork.ebms.client.EbMSHttpClientFactory;
 import nl.clockwork.ebms.cpa.CPAManager;
 import nl.clockwork.ebms.cpa.URLMapper;
@@ -39,6 +40,7 @@ import nl.clockwork.ebms.event.listener.EventListener;
 import nl.clockwork.ebms.processor.EbMSMessageProcessor;
 
 @Configuration
+@EnableAsync
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class EventProcessorConfig
 {
@@ -75,8 +77,6 @@ public class EventProcessorConfig
 	@Autowired
 	EventManager eventManager;
 	@Autowired
-	TransactionTemplate transactionTemplate;
-	@Autowired
 	EbMSHttpClientFactory ebMSClientFactory;
 	@Autowired
 	EbMSMessageEncrypter messageEncrypter;
@@ -112,18 +112,22 @@ public class EventProcessorConfig
 				result.setMessageListener(new EbMSSendEventListener(eventHandler()));
 				return result;
 			default:
-				return EbMSEventProcessor.builder()
-						.maxEvents(maxEvents)
-						.transactionTemplate(transactionTemplate)
-						.ebMSThreadPoolExecutor(new EbMSThreadPoolExecutor(minThreads,maxThreads))
-						.ebMSEventDAO(ebMSEventDAO)
-						.handleEventTaskBuilder(handleEventTaskBuilder())
-						.serverId(serverId)
-						.build();
+				val executor = new ThreadPoolTaskExecutor();
+				executor.setCorePoolSize(minThreads);
+				executor.setMaxPoolSize(maxThreads);
+				executor.setWaitForTasksToCompleteOnShutdown(true);
+				return executor;
 		}
 	}
 
-	private EventHandler eventHandler()
+	@Bean
+	public EventTaskExecutor eventTaskExecutor()
+	{
+		return new EventTaskExecutor(maxEvents,ebMSEventDAO,eventHandler(),serverId);
+	}
+
+	@Bean
+  public EventHandler eventHandler()
 	{
 		return EventHandler.builder()
 				.eventListener(eventListener)
@@ -134,15 +138,14 @@ public class EventProcessorConfig
 				.ebMSClientFactory(ebMSClientFactory)
 				.messageEncrypter(messageEncrypter)
 				.messageProcessor(messageProcessor)
+				.timedAction(timedAction())
 				.deleteEbMSAttachmentsOnMessageProcessed(deleteEbMSAttachmentsOnMessageProcessed)
-				.executionInterval(executionInterval)
 				.build();
 	}
 
-	private HandleEventTask.HandleEventTaskBuilder handleEventTaskBuilder()
+	@Bean
+	public TimedAction timedAction()
 	{
-		return HandleEventTask.builder()
-				.transactionTemplate(transactionTemplate)
-				.eventHandler(eventHandler());
+		return new TimedAction(executionInterval);
 	}
 }

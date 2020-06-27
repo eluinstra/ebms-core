@@ -75,10 +75,4 @@ public class EventManagerConfig
 	{
 		return new EbMSEventDAOImpl(queryFactory);
 	}
-
-	@Bean
-	public TransactionTemplate transactionTemplate()
-	{
-		return new TransactionTemplate();
-	}
 }

@@ -17,9 +17,11 @@ package nl.clockwork.ebms.event.processor;
 
 import java.security.cert.CertificateException;
 import java.time.Instant;
+import java.util.concurrent.CompletableFuture;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DeliveryChannel;
+import org.springframework.scheduling.annotation.Async;
 
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -64,11 +66,11 @@ public class EventHandler
 	EbMSMessageEncrypter messageEncrypter;
 	@NonNull
 	EbMSMessageProcessor messageProcessor;
-	boolean deleteEbMSAttachmentsOnMessageProcessed;
 	TimedAction timedAction;
+	boolean deleteEbMSAttachmentsOnMessageProcessed;
 
 	@Builder
-	public EventHandler(@NonNull EventListener eventListener, @NonNull EbMSDAO ebMSDAO, @NonNull CPAManager cpaManager, @NonNull URLMapper urlMapper, @NonNull EventManager eventManager, @NonNull EbMSHttpClientFactory ebMSClientFactory, @NonNull EbMSMessageEncrypter messageEncrypter, @NonNull EbMSMessageProcessor messageProcessor, long executionInterval, boolean deleteEbMSAttachmentsOnMessageProcessed)
+	public EventHandler(@NonNull EventListener eventListener, @NonNull EbMSDAO ebMSDAO, @NonNull CPAManager cpaManager, @NonNull URLMapper urlMapper, @NonNull EventManager eventManager, @NonNull EbMSHttpClientFactory ebMSClientFactory, @NonNull EbMSMessageEncrypter messageEncrypter, @NonNull EbMSMessageProcessor messageProcessor, TimedAction timedAction, boolean deleteEbMSAttachmentsOnMessageProcessed)
 	{
 		this.eventListener = eventListener;
 		this.ebMSDAO = ebMSDAO;
@@ -79,7 +81,7 @@ public class EventHandler
 		this.messageEncrypter = messageEncrypter;
 		this.messageProcessor = messageProcessor;
 		this.deleteEbMSAttachmentsOnMessageProcessed = deleteEbMSAttachmentsOnMessageProcessed;
-		this.timedAction = new TimedAction(executionInterval);
+		this.timedAction = timedAction;
 	}
 
 	public void handle(EbMSEvent event)
@@ -92,6 +94,20 @@ public class EventHandler
 				expireEvent(event);
 		};
 		timedAction.run(action);
+	}
+
+	@Async
+	public CompletableFuture<Object> handleAsync(EbMSEvent event)
+	{
+		Action action = () ->
+		{
+			if (event.getTimeToLive() == null || Instant.now().isBefore(event.getTimeToLive()))
+				sendEvent(event);
+			else
+				expireEvent(event);
+		};
+		timedAction.run(action);
+		return CompletableFuture.completedFuture(new Object());
 	}
 
 	private void sendEvent(final EbMSEvent event)

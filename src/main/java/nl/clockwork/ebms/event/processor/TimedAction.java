@@ -18,6 +18,8 @@ package nl.clockwork.ebms.event.processor;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 
+import org.springframework.transaction.annotation.Transactional;
+
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.val;
@@ -32,6 +34,7 @@ public class TimedAction
 {
 	long executionInterval;
 	
+	@Transactional(transactionManager = "dataSourceTransactionManager")
 	public void run(Action action)
 	{
 		if (executionInterval > 0)
