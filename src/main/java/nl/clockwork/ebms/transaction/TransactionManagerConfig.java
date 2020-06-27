@@ -25,6 +25,7 @@ import org.springframework.context.annotation.DependsOn;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.jta.JtaTransactionManager;
 
+import com.atomikos.icatch.jta.UserTransactionImp;
 import com.atomikos.icatch.jta.UserTransactionManager;
 
 import bitronix.tm.TransactionManagerServices;
@@ -54,8 +55,10 @@ public class TransactionManagerConfig
 			case ATOMIKOS:
 				val userTransactionManager = new UserTransactionManager();
 				userTransactionManager.setTransactionTimeout(transactionTimeout);
-				userTransactionManager.setForceShutdown(true);
-				return new JtaTransactionManager(userTransactionManager,userTransactionManager);
+				userTransactionManager.setForceShutdown(false);
+				val userTransaction = new UserTransactionImp();
+				userTransaction.setTransactionTimeout(transactionTimeout);
+				return new JtaTransactionManager(userTransaction,userTransactionManager);
 			default:
 				return new DummyTransactionManager();
 		}
@@ -64,7 +67,7 @@ public class TransactionManagerConfig
 	@Bean("btmConfig")
 	public void btmConfig()
 	{
-		bitronix.tm.Configuration config = TransactionManagerServices.getConfiguration();
+		val config = TransactionManagerServices.getConfiguration();
 		config.setServerId(UUID.randomUUID().toString());
 		config.setDefaultTransactionTimeout(transactionTimeout);
 	}

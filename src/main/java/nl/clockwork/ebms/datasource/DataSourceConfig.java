@@ -96,7 +96,6 @@ public class DataSourceConfig
 				val bitronixDS = new PoolingDataSource();
 				bitronixDS.setUniqueName(UUID.randomUUID().toString());
 				bitronixDS.setClassName(driverClassName);
-		    //result.setLocalAutoCommit(isAutoCommit);
 		    bitronixDS.setAllowLocalTransactions(true);
 		    bitronixDS.setDriverProperties(createDriverProperties());
 		    bitronixDS.setMaxIdleTime(maxIdleTime);

@@ -99,8 +99,10 @@ public class EventProcessorConfig
 				val result = new DefaultMessageListenerContainer();
 				result.setConnectionFactory(connectionFactory);
 				result.setTransactionManager(jmsTransactionManager);
+				result.setSessionTransacted(true);
 				result.setConcurrentConsumers(minThreads);
 				result.setMaxConcurrentConsumers(maxThreads);
+				result.setReceiveTimeout(3000);
 				result.setDestinationName(StringUtils.isEmpty(jmsDestinationName) ? JMSEventManager.JMS_DESTINATION_NAME : jmsDestinationName);
 				result.setMessageListener(new EbMSSendEventListener(handleEventTaskBuilder()));
 				return result;

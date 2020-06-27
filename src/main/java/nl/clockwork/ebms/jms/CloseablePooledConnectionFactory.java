@@ -35,6 +35,10 @@ public class CloseablePooledConnectionFactory extends PooledConnectionFactory im
 		super(brokerURL);
 	}
 
+	public void init()
+	{
+	}
+
 	@Override
 	public void close() throws Exception
 	{
