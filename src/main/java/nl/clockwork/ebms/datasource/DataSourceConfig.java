@@ -18,7 +18,7 @@ package nl.clockwork.ebms.datasource;
 import static io.vavr.API.$;
 import static io.vavr.API.Case;
 import static io.vavr.API.Match;
-import static nl.clockwork.ebms.Predicates.startsWith;
+import static nl.clockwork.ebms.Predicates.contains;
 
 import java.beans.PropertyVetoException;
 import java.sql.Types;
@@ -57,6 +57,7 @@ import bitronix.tm.resource.jdbc.PoolingDataSource;
 import lombok.AccessLevel;
 import lombok.val;
 import lombok.experimental.FieldDefaults;
+import nl.clockwork.ebms.dao.AbstractDAOFactory;
 import nl.clockwork.ebms.querydsl.CachedOutputStreamType;
 import nl.clockwork.ebms.querydsl.CollaborationProtocolAgreementType;
 import nl.clockwork.ebms.querydsl.DocumentType;
@@ -199,13 +200,14 @@ public class DataSourceConfig
 
 	private SQLTemplates createSQLTemplates(DataSource dataSource) throws AtomikosSQLException, PropertyVetoException
 	{
+		String jdbcUrl = AbstractDAOFactory.getDriverClassName(dataSource);
 		return Match(jdbcUrl).of(
-				Case($(startsWith("jdbc:db2:")),o -> DB2Templates.builder().build()),
-				Case($(startsWith("jdbc:hsqldb:")),o -> HSQLDBTemplates.builder().build()),
-				Case($(startsWith("jdbc:mysql:")),o -> MySQLTemplates.builder().build()),
-				Case($(startsWith("jdbc:oracle:")),o -> OracleTemplates.builder().build()),
-				Case($(startsWith("jdbc:postgresql:")),o -> PostgreSQLTemplates.builder().build()),
-				Case($(startsWith("jdbc:sqlserver:")),o -> SQLServerTemplates.builder().build()),
+				Case($(contains("db2")),o -> DB2Templates.builder().build()),
+				Case($(contains("hsqldb")),o -> HSQLDBTemplates.builder().build()),
+				Case($(contains("mysql")),o -> MySQLTemplates.builder().build()),
+				Case($(contains("oracle")),o -> OracleTemplates.builder().build()),
+				Case($(contains("postgresql")),o -> PostgreSQLTemplates.builder().build()),
+				Case($(contains("sqlserver")),o -> SQLServerTemplates.builder().build()),
 				Case($(),o -> {
 					throw new RuntimeException("Jdbc url " + jdbcUrl + " not recognized!");
 				}));

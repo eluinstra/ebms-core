@@ -51,9 +51,9 @@ public abstract class AbstractDAOFactory<T> implements FactoryBean<T>
 
 	private T createDAO(DataSource dataSource) throws AtomikosSQLException, PropertyVetoException
 	{
-		String driverClassName = getJdbcUrl(dataSource);
+		String driverClassName = getDriverClassName(dataSource);
 		return Match(driverClassName).of(
-				Case($(contains("db2.")),o -> createDB2DAO()),
+				Case($(contains("db2")),o -> createDB2DAO()),
 				Case($(contains("hsqldb")),o -> createHSqlDbDAO()),
 				Case($(contains("mysql")),o -> createMySqlDAO()),
 				Case($(contains("oracle")),o -> createOracleDAO()),
@@ -64,7 +64,7 @@ public abstract class AbstractDAOFactory<T> implements FactoryBean<T>
 				}));
 	}
 
-	private String getJdbcUrl(DataSource dataSource) throws PropertyVetoException, AtomikosSQLException
+	public static String getDriverClassName(DataSource dataSource) throws PropertyVetoException, AtomikosSQLException
 	{
 		return dataSource instanceof HikariDataSource ? ((HikariDataSource)dataSource).getDriverClassName() : 
 			dataSource  instanceof PoolingDataSource ? ((PoolingDataSource)dataSource).getClassName() : ((AtomikosDataSourceBean)dataSource).getXaDataSourceClassName();
