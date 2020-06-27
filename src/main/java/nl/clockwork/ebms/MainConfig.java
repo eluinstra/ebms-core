@@ -16,14 +16,10 @@
 package nl.clockwork.ebms;
 
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
-import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.Resource;
+import org.springframework.context.annotation.PropertySource;
 
-import lombok.val;
 import nl.clockwork.ebms.cache.CacheConfig;
 import nl.clockwork.ebms.client.ClientConfig;
 import nl.clockwork.ebms.cpa.CPAManagerConfig;
@@ -61,21 +57,10 @@ import nl.clockwork.ebms.validation.ValidationConfig;
 	ServiceConfig.class,
 	SigningConfig.class,
 	TransactionManagerConfig.class,
-	ValidationConfig.class
-	})
+	ValidationConfig.class})
+@PropertySource(value = {"classpath:nl/clockwork/ebms/default.properties"}, ignoreResourceNotFound = true)
 public class MainConfig
 {
-	@Bean
-	public PropertySourcesPlaceholderConfigurer properties()
-	{
-		val c = new PropertySourcesPlaceholderConfigurer();
-		val resources = new Resource[]{
-				new ClassPathResource("nl/clockwork/ebms/default.properties")};
-		c.setLocations(resources);
-		c.setIgnoreUnresolvablePlaceholders(true);
-		return c;
-	}
-
 	public static void main(String[] args)
 	{
 		try(AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(MainConfig.class))

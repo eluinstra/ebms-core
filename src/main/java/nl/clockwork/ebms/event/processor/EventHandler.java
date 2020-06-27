@@ -22,6 +22,7 @@ import java.util.concurrent.CompletableFuture;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DeliveryChannel;
 import org.springframework.scheduling.annotation.Async;
+import org.springframework.transaction.PlatformTransactionManager;
 
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -51,6 +52,8 @@ import nl.clockwork.ebms.util.StreamUtils;
 public class EventHandler
 {
 	@NonNull
+	PlatformTransactionManager transactionManager;
+	@NonNull
 	EventListener eventListener;
 	@NonNull
 	EbMSDAO ebMSDAO;
@@ -70,8 +73,9 @@ public class EventHandler
 	boolean deleteEbMSAttachmentsOnMessageProcessed;
 
 	@Builder
-	public EventHandler(@NonNull EventListener eventListener, @NonNull EbMSDAO ebMSDAO, @NonNull CPAManager cpaManager, @NonNull URLMapper urlMapper, @NonNull EventManager eventManager, @NonNull EbMSHttpClientFactory ebMSClientFactory, @NonNull EbMSMessageEncrypter messageEncrypter, @NonNull EbMSMessageProcessor messageProcessor, TimedAction timedAction, boolean deleteEbMSAttachmentsOnMessageProcessed)
+	public EventHandler(@NonNull PlatformTransactionManager transactionManager, @NonNull EventListener eventListener, @NonNull EbMSDAO ebMSDAO, @NonNull CPAManager cpaManager, @NonNull URLMapper urlMapper, @NonNull EventManager eventManager, @NonNull EbMSHttpClientFactory ebMSClientFactory, @NonNull EbMSMessageEncrypter messageEncrypter, @NonNull EbMSMessageProcessor messageProcessor, TimedAction timedAction, boolean deleteEbMSAttachmentsOnMessageProcessed)
 	{
+		this.transactionManager = transactionManager;
 		this.eventListener = eventListener;
 		this.ebMSDAO = ebMSDAO;
 		this.cpaManager = cpaManager;
@@ -96,7 +100,7 @@ public class EventHandler
 		timedAction.run(action);
 	}
 
-	@Async
+	@Async("threadPoolTaskExecutor")
 	public CompletableFuture<Object> handleAsync(EbMSEvent event)
 	{
 		Action action = () ->
@@ -112,42 +116,52 @@ public class EventHandler
 
 	private void sendEvent(final EbMSEvent event)
 	{
-		val receiveDeliveryChannel = cpaManager.getDeliveryChannel(
-				event.getCpaId(),
-				event.getReceiveDeliveryChannelId())
-					.orElseThrow(() -> StreamUtils.illegalStateException("ReceiveDeliveryChannel",event.getCpaId(),event.getReceiveDeliveryChannelId()));
-		val url = urlMapper.getURL(CPAUtils.getUri(receiveDeliveryChannel));
+		val status = transactionManager.getTransaction(null);
 		try
 		{
-			val requestDocument = ebMSDAO.getEbMSDocumentIfUnsent(event.getMessageId());
-			StreamUtils.ifPresentOrElse(requestDocument,
-					d -> sendMessage(event,receiveDeliveryChannel,url,d),
-					() -> eventManager.deleteEvent(event.getMessageId()));
+			val receiveDeliveryChannel = cpaManager.getDeliveryChannel(
+					event.getCpaId(),
+					event.getReceiveDeliveryChannelId())
+						.orElseThrow(() -> StreamUtils.illegalStateException("ReceiveDeliveryChannel",event.getCpaId(),event.getReceiveDeliveryChannelId()));
+			val url = urlMapper.getURL(CPAUtils.getUri(receiveDeliveryChannel));
+			try
+			{
+				val requestDocument = ebMSDAO.getEbMSDocumentIfUnsent(event.getMessageId());
+				StreamUtils.ifPresentOrElse(requestDocument,
+						d -> sendMessage(event,receiveDeliveryChannel,url,d),
+						() -> eventManager.deleteEvent(event.getMessageId()));
+			}
+			catch (final EbMSResponseException e)
+			{
+				log.error("",e);
+				eventManager.updateEvent(event,url,EbMSEventStatus.FAILED,e.getMessage());
+				if ((e instanceof EbMSUnrecoverableResponseException) || !CPAUtils.isReliableMessaging(receiveDeliveryChannel))
+					if (ebMSDAO.updateMessage(event.getMessageId(),EbMSMessageStatus.SENDING,EbMSMessageStatus.DELIVERY_FAILED) > 0)
+					{
+						eventListener.onMessageFailed(event.getMessageId());
+						if (deleteEbMSAttachmentsOnMessageProcessed)
+							ebMSDAO.deleteAttachments(event.getMessageId());
+					}
+			}
+			catch (final Exception e)
+			{
+				log.error("",e);
+				eventManager.updateEvent(event,url,EbMSEventStatus.FAILED,ExceptionUtils.getStackTrace(e));
+				if (!CPAUtils.isReliableMessaging(receiveDeliveryChannel))
+					if (ebMSDAO.updateMessage(event.getMessageId(),EbMSMessageStatus.SENDING,EbMSMessageStatus.DELIVERY_FAILED) > 0)
+					{
+						eventListener.onMessageFailed(event.getMessageId());
+						if (deleteEbMSAttachmentsOnMessageProcessed)
+							ebMSDAO.deleteAttachments(event.getMessageId());
+					}
+			}
 		}
-		catch (final EbMSResponseException e)
+		catch(Exception e)
 		{
-			log.error("",e);
-			eventManager.updateEvent(event,url,EbMSEventStatus.FAILED,e.getMessage());
-			if ((e instanceof EbMSUnrecoverableResponseException) || !CPAUtils.isReliableMessaging(receiveDeliveryChannel))
-				if (ebMSDAO.updateMessage(event.getMessageId(),EbMSMessageStatus.SENDING,EbMSMessageStatus.DELIVERY_FAILED) > 0)
-				{
-					eventListener.onMessageFailed(event.getMessageId());
-					if (deleteEbMSAttachmentsOnMessageProcessed)
-						ebMSDAO.deleteAttachments(event.getMessageId());
-				}
+			transactionManager.rollback(status);
+			throw e;
 		}
-		catch (final Exception e)
-		{
-			log.error("",e);
-			eventManager.updateEvent(event,url,EbMSEventStatus.FAILED,ExceptionUtils.getStackTrace(e));
-			if (!CPAUtils.isReliableMessaging(receiveDeliveryChannel))
-				if (ebMSDAO.updateMessage(event.getMessageId(),EbMSMessageStatus.SENDING,EbMSMessageStatus.DELIVERY_FAILED) > 0)
-				{
-					eventListener.onMessageFailed(event.getMessageId());
-					if (deleteEbMSAttachmentsOnMessageProcessed)
-						ebMSDAO.deleteAttachments(event.getMessageId());
-				}
-		}
+		transactionManager.commit(status);
 	}
 
 	private void sendMessage(final EbMSEvent event, DeliveryChannel receiveDeliveryChannel, final String url, EbMSDocument requestDocument)
@@ -185,6 +199,7 @@ public class EventHandler
 
 	private void expireEvent(final EbMSEvent event)
 	{
+		val status = transactionManager.getTransaction(null);
 		try
 		{
 			log.warn("Expiring message " +  event.getMessageId());
@@ -193,8 +208,10 @@ public class EventHandler
 		}
 		catch (Exception e)
 		{
+			transactionManager.rollback(status);
 			log.error("",e);
 		}
+		transactionManager.commit(status);
 	}
 
 	private void updateMessage(final String messageId)

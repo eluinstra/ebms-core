@@ -22,7 +22,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Condition;
+import org.springframework.context.annotation.ConditionContext;
+import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.type.AnnotatedTypeMetadata;
 import org.springframework.jms.listener.DefaultMessageListenerContainer;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
@@ -47,6 +51,22 @@ public class EventProcessorConfig
 	public enum EventProcessorType
 	{
 		NONE, DEFAULT, JMS;
+	}
+	public static class DefaultEventProcessorType implements Condition
+	{
+		@Override
+		public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata)
+		{
+			return context.getEnvironment().getProperty("eventProcessor.type",EventProcessorType.class,EventProcessorType.NONE) == EventProcessorType.DEFAULT;
+		}
+	}
+	public static class JmsEventProcessorType implements Condition
+	{
+		@Override
+		public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata)
+		{
+			return context.getEnvironment().getProperty("eventProcessor.type",EventProcessorType.class,EventProcessorType.NONE) == EventProcessorType.JMS;
+		}
 	}
 	@Value("${eventProcessor.type}")
 	EventProcessorType eventProcessorType;
@@ -87,49 +107,71 @@ public class EventProcessorConfig
 	@Autowired
 	ConnectionFactory connectionFactory;
 	@Autowired
+	@Qualifier("dataSourceTransactionManager")
+	PlatformTransactionManager dataSourceTransactionManager;
+	@Autowired
 	@Qualifier("jmsTransactionManager")
 	PlatformTransactionManager jmsTransactionManager;
 	@Value("${eventProcessor.jms.destinationName}")
 	String destinationName;
 
-	@Bean
-	public Object eventProcessor() throws Exception
+	@Bean("threadPoolTaskExecutor")
+	@Conditional(DefaultEventProcessorType.class)
+	public ThreadPoolTaskExecutor defaultProcessor() throws Exception
 	{
-		switch(eventProcessorType)
-		{
-			case NONE:
-				return null;
-			case JMS:
-				val result = new DefaultMessageListenerContainer();
-				
-				result.setConnectionFactory(connectionFactory);
-				result.setTransactionManager(jmsTransactionManager);
-				result.setSessionTransacted(true);
-				result.setConcurrentConsumers(minThreads);
-				result.setMaxConcurrentConsumers(maxThreads);
-				result.setReceiveTimeout(receiveTimeout);
-				result.setDestinationName(StringUtils.isEmpty(jmsDestinationName) ? JMSEventManager.JMS_DESTINATION_NAME : jmsDestinationName);
-				result.setMessageListener(new EbMSSendEventListener(eventHandler()));
-				return result;
-			default:
-				val executor = new ThreadPoolTaskExecutor();
-				executor.setCorePoolSize(minThreads);
-				executor.setMaxPoolSize(maxThreads);
-				executor.setWaitForTasksToCompleteOnShutdown(true);
-				return executor;
-		}
+		val result = new ThreadPoolTaskExecutor();
+		result.setCorePoolSize(minThreads);
+		result.setMaxPoolSize(maxThreads);
+		result.setQueueCapacity(maxThreads * 4);
+		result.setWaitForTasksToCompleteOnShutdown(true);
+		return result;
 	}
 
 	@Bean
+	@Conditional(JmsEventProcessorType.class)
+	public DefaultMessageListenerContainer eventProcessor() throws Exception
+	{
+		val result = new DefaultMessageListenerContainer();
+		result.setConnectionFactory(connectionFactory);
+		result.setTransactionManager(jmsTransactionManager);
+		result.setSessionTransacted(true);
+		result.setConcurrentConsumers(minThreads);
+		result.setMaxConcurrentConsumers(maxThreads);
+		result.setReceiveTimeout(receiveTimeout);
+		result.setDestinationName(StringUtils.isEmpty(jmsDestinationName) ? JMSEventManager.JMS_DESTINATION_NAME : jmsDestinationName);
+		result.setMessageListener(new EbMSSendEventListener(eventHandler()));
+		return result;
+	}
+/*
+	@Bean("threadPoolDaemonExecutor")
+	@Conditional(DefaultEventProcessorType.class)
+	public Object threadPoolDeamonExecutor() throws Exception
+	{
+		val result = new ThreadPoolTaskExecutor();
+		result.setDaemon(true);
+		result.setMaxPoolSize(1);
+		return result;
+	}
+*/
+	@Bean//(initMethod = "handleEvents")
+	@Conditional(DefaultEventProcessorType.class)
+	//@DependsOn(value = {"threadPoolDaemonExecutor","dataSourceTransactionManager"})
 	public EventTaskExecutor eventTaskExecutor()
 	{
-		return new EventTaskExecutor(maxEvents,ebMSEventDAO,eventHandler(),serverId);
+		return EventTaskExecutor.builder()
+				.transactionManager(dataSourceTransactionManager)
+				.ebMSEventDAO(ebMSEventDAO)
+				.eventHandler(eventHandler())
+				.maxEvents(maxEvents)
+				.serverId(serverId)
+				.build();
 	}
 
 	@Bean
   public EventHandler eventHandler()
 	{
 		return EventHandler.builder()
+				.transactionManager(dataSourceTransactionManager)
 				.eventListener(eventListener)
 				.ebMSDAO(ebMSDAO)
 				.cpaManager(cpaManager)
