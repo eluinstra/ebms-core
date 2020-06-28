@@ -18,15 +18,15 @@ ALTER TABLE cpa DROP COLUMN url;
 
 CREATE TABLE url
 (
-	source						VARCHAR(256)		NOT NULL,
-	destination				VARCHAR(256)		NOT NULL
+	source						VARCHAR(255)		NOT NULL,
+	destination				VARCHAR(255)		NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-ALTER TABLE url ADD CONSTRAINT uc_url_source UNIQUE (source(255));
+ALTER TABLE url ADD CONSTRAINT uc_url_source UNIQUE (source);
 
 CREATE TABLE ebms_message_event
 (
-	message_id				VARCHAR(256)		NOT NULL UNIQUE,
+	message_id				VARCHAR(255)		NOT NULL UNIQUE,
 	event_type				SMALLINT				NOT NULL,
 	time_stamp				TIMESTAMP				NOT NULL,
 	processed					SMALLINT				DEFAULT 0 NOT NULL

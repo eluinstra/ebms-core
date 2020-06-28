@@ -14,4 +14,4 @@
 -- limitations under the License.
 --
 
-ALTER TABLE ebms_event ADD server_id VARCHAR(256) NULL;
+ALTER TABLE ebms_event ADD server_id VARCHAR(255) NULL;

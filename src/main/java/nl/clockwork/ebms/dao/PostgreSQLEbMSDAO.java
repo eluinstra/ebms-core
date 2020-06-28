@@ -101,6 +101,7 @@ class PostgreSQLEbMSDAO extends AbstractEbMSDAO
 					{
 						try
 						{
+							val messageHeader = message.getMessageHeader();
 							val ps = connection.prepareStatement
 							(
 								"insert into ebms_message (" +
@@ -124,7 +125,6 @@ class PostgreSQLEbMSDAO extends AbstractEbMSDAO
 								" returning message_id, message_nr"
 							);
 							ps.setTimestamp(1,Timestamp.from(timestamp));
-							val messageHeader = message.getMessageHeader();
 							ps.setString(2,messageHeader.getCPAId());
 							ps.setString(3,messageHeader.getConversationId());
 							ps.setString(4,messageHeader.getMessageData().getMessageId());

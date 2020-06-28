@@ -368,7 +368,7 @@ abstract class AbstractEbMSDAO implements EbMSDAO
 		try
 		{
 			val keyHolder = new GeneratedKeyHolder();
-			int rowsAffected = jdbcTemplate.update(
+			val rowsAffected = jdbcTemplate.update(
 				new PreparedStatementCreator()
 				{
 					

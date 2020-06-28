@@ -30,3 +30,25 @@ ALTER TABLE ebms_event ADD send_channel_id VARCHAR(256) NULL;
 
 DROP INDEX i_ebms_message;
 CREATE INDEX i_ebms_ref_to_message ON ebms_message (ref_to_message_id,message_nr);
+
+EXEC sp_rename 'ebms_attachment', 'ebms_attachment_old';
+
+CREATE TABLE ebms_attachment
+(
+	message_id				VARCHAR(256)		NOT NULL,
+	message_nr				SMALLINT				NOT NULL DEFAULT 0,
+	order_nr					SMALLINT				NOT NULL,
+	name							VARCHAR(256)		NULL,
+	content_id 				VARCHAR(256) 		NOT NULL,
+	content_type			VARCHAR(255)		NOT NULL,
+	content						IMAGE						NOT NULL,
+	FOREIGN KEY (message_id,message_nr) REFERENCES ebms_message (message_id,message_nr)
+)
+AS SELECT m.message_id, m.message_nr, a.order_nr, a.name, a.content_id, a.content_type, a.content
+FROM ebms_message m, ebms_attachment_old a
+WHERE m.id = a.message_id;
+
+ALTER TABLE ebms_message DROP CONSTRAINT uc_ebms_message_id;
+ALTER TABLE ebms_message DROP PRIMARY KEY;
+ALTER TABLE ebms_message DROP COLUMN id;
+ALTER TABLE ebms_message ADD PRIMARY KEY (message_id,message_nr)

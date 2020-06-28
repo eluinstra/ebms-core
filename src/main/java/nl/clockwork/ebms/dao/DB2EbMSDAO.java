@@ -60,6 +60,7 @@ class DB2EbMSDAO extends nl.clockwork.ebms.dao.PostgreSQLEbMSDAO
 					{
 						try
 						{
+							val messageHeader = message.getMessageHeader();
 							val ps = connection.prepareStatement
 							(
 								"select message_id, message_nr from final table(" +
@@ -83,7 +84,6 @@ class DB2EbMSDAO extends nl.clockwork.ebms.dao.PostgreSQLEbMSDAO
 								") values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?))"
 							);
 							ps.setTimestamp(1,Timestamp.from(timestamp));
-							val messageHeader = message.getMessageHeader();
 							ps.setString(2,messageHeader.getCPAId());
 							ps.setString(3,messageHeader.getConversationId());
 							ps.setString(4,messageHeader.getMessageData().getMessageId());
