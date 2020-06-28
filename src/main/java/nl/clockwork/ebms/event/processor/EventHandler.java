@@ -124,14 +124,30 @@ public class EventHandler
 					event.getReceiveDeliveryChannelId())
 						.orElseThrow(() -> StreamUtils.illegalStateException("ReceiveDeliveryChannel",event.getCpaId(),event.getReceiveDeliveryChannelId()));
 			val url = urlMapper.getURL(CPAUtils.getUri(receiveDeliveryChannel));
+			val requestDocument = ebMSDAO.getEbMSDocumentIfUnsent(event.getMessageId());
+			if (!requestDocument.isPresent())
+				eventManager.deleteEvent(event.getMessageId());
+			transactionManager.commit(status);
+			requestDocument.ifPresent(d -> sendEvent(event,receiveDeliveryChannel,url,d));
+		}
+		catch(Exception e)
+		{
+			if (!status.isCompleted())
+				transactionManager.commit(status);
+			throw e;
+		}
+	}
+
+	private void sendEvent(EbMSEvent event, DeliveryChannel receiveDeliveryChannel, String url, EbMSDocument requestDocument)
+	{
+		try
+		{
+			sendMessage(event,receiveDeliveryChannel,url,requestDocument);
+		}
+		catch (final EbMSResponseException e)
+		{
+			val status = transactionManager.getTransaction(null);
 			try
-			{
-				val requestDocument = ebMSDAO.getEbMSDocumentIfUnsent(event.getMessageId());
-				StreamUtils.ifPresentOrElse(requestDocument,
-						d -> sendMessage(event,receiveDeliveryChannel,url,d),
-						() -> eventManager.deleteEvent(event.getMessageId()));
-			}
-			catch (final EbMSResponseException e)
 			{
 				log.error("",e);
 				eventManager.updateEvent(event,url,EbMSEventStatus.FAILED,e.getMessage());
@@ -143,7 +159,17 @@ public class EventHandler
 							ebMSDAO.deleteAttachments(event.getMessageId());
 					}
 			}
-			catch (final Exception e)
+			catch (Exception e1)
+			{
+				transactionManager.rollback(status);
+				throw e1;
+			}
+			transactionManager.commit(status);
+		}
+		catch (final Exception e)
+		{
+			val status = transactionManager.getTransaction(null);
+			try
 			{
 				log.error("",e);
 				eventManager.updateEvent(event,url,EbMSEventStatus.FAILED,ExceptionUtils.getStackTrace(e));
@@ -155,13 +181,13 @@ public class EventHandler
 							ebMSDAO.deleteAttachments(event.getMessageId());
 					}
 			}
+			catch (Exception e1)
+			{
+				transactionManager.rollback(status);
+				throw e1;
+			}
+			transactionManager.commit(status);
 		}
-		catch(Exception e)
-		{
-			transactionManager.rollback(status);
-			throw e;
-		}
-		transactionManager.commit(status);
 	}
 
 	private void sendMessage(final EbMSEvent event, DeliveryChannel receiveDeliveryChannel, final String url, EbMSDocument requestDocument)
@@ -172,6 +198,19 @@ public class EventHandler
 				messageEncrypter.encrypt(receiveDeliveryChannel,requestDocument);
 			log.info("Sending message " + event.getMessageId() + " to " + url);
 			val responseDocument = createClient(event).sendMessage(url,requestDocument);
+			handleResponse(event,receiveDeliveryChannel,url,requestDocument,responseDocument);
+		}
+		catch (CertificateException e)
+		{
+			throw new EbMSProcessingException(e);
+		}
+	}
+
+	private void handleResponse(final EbMSEvent event, DeliveryChannel receiveDeliveryChannel, final String url, EbMSDocument requestDocument, final nl.clockwork.ebms.model.EbMSDocument responseDocument)
+	{
+		val status = transactionManager.getTransaction(null);
+		try
+		{
 			messageProcessor.processResponse(requestDocument,responseDocument);
 			eventManager.updateEvent(event,url,EbMSEventStatus.SUCCEEDED);
 			if (!CPAUtils.isReliableMessaging(receiveDeliveryChannel))
@@ -182,10 +221,12 @@ public class EventHandler
 						ebMSDAO.deleteAttachments(event.getMessageId());
 				}
 		}
-		catch (CertificateException e)
+		catch (Exception e)
 		{
-			throw new EbMSProcessingException(e);
+			transactionManager.rollback(status);
+			throw e;
 		}
+		transactionManager.commit(status);
 	}
 
 	private EbMSClient createClient(EbMSEvent event) throws CertificateException
