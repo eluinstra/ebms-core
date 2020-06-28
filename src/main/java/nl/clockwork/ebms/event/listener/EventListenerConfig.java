@@ -35,7 +35,6 @@ import lombok.AccessLevel;
 import lombok.val;
 import lombok.experimental.FieldDefaults;
 import nl.clockwork.ebms.dao.EbMSDAO;
-import nl.clockwork.ebms.jms.JMSDestinationType;
 
 @Configuration
 @FieldDefaults(level = AccessLevel.PRIVATE)
@@ -44,6 +43,10 @@ public class EventListenerConfig
 	public enum EventListenerType
 	{
 		DEFAULT, DAO, SIMPLE_JMS, JMS, JMS_TEXT;
+	}
+	public enum JMSDestinationType
+	{
+		QUEUE, TOPIC;
 	}
 	@Value("${eventListener.type}")
 	EventListenerType eventListenerType;

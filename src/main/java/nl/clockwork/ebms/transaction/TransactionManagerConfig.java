@@ -56,8 +56,6 @@ public class TransactionManagerConfig
 	{
 		DEFAULT, BITRONIX, ATOMIKOS;
 	}
-	@Value("${transactionManager.type}")
-	TransactionManagerType transactionManagerType;
 	@Value("${transactionManager.transactionTimeout}")
 	int transactionTimeout;
 	@Autowired

@@ -52,8 +52,6 @@ public class EventProcessorConfig
 	{
 		NONE, DEFAULT, JMS;
 	}
-	@Value("${eventProcessor.type}")
-	EventProcessorType eventProcessorType;
 	@Autowired
 	EbMSEventDAO ebMSEventDAO;
 	@Autowired
