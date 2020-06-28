@@ -41,15 +41,17 @@ public class EventTaskExecutor implements Runnable
 	EbMSEventDAO ebMSEventDAO;
 	@NonNull
 	EventHandler eventHandler;
+	@NonNull TimedAction timedAction;
 	int maxEvents;
 	String serverId;
 
 	@Builder
-	public EventTaskExecutor(@NonNull PlatformTransactionManager transactionManager, @NonNull EbMSEventDAO ebMSEventDAO, @NonNull EventHandler eventHandler, int maxEvents, String serverId)
+	public EventTaskExecutor(@NonNull PlatformTransactionManager transactionManager, @NonNull EbMSEventDAO ebMSEventDAO, @NonNull EventHandler eventHandler, @NonNull TimedAction timedAction, int maxEvents, String serverId)
 	{
 		this.transactionManager = transactionManager;
 		this.ebMSEventDAO = ebMSEventDAO;
 		this.eventHandler = eventHandler;
+		this.timedAction = timedAction;
 		this.maxEvents = maxEvents;
 		this.serverId = serverId;
 		val executor = new ThreadPoolTaskExecutor();
@@ -61,7 +63,6 @@ public class EventTaskExecutor implements Runnable
 
 	public void run()
 	{
-		val timedAction = new TimedAction(1000);
   	while (true)
 		{
   		Action action = () ->
@@ -82,7 +83,14 @@ public class EventTaskExecutor implements Runnable
 				transactionManager.commit(status);
 				futures.forEach(f -> Try.of(() -> f.get()).onFailure(e -> log.error("",e)));
   		};
-  		timedAction.run(action);
+  		try
+  		{
+	  		timedAction.run(action);
+  		}
+  		catch(Exception e)
+  		{
+				log.error("",e);
+  		}
 		}
 	}
 }

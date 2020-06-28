@@ -21,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -31,7 +32,10 @@ import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import nl.clockwork.ebms.cpa.CPAManager;
 import nl.clockwork.ebms.dao.EbMSDAO;
+import nl.clockwork.ebms.event.processor.EventProcessorConfig.DefaultEventProcessorType;
 import nl.clockwork.ebms.event.processor.EventProcessorConfig.EventProcessorType;
+import nl.clockwork.ebms.event.processor.EventProcessorConfig.JmsEventProcessorType;
+import nl.clockwork.ebms.event.processor.EventProcessorConfig.NoneEventProcessorType;
 
 @Configuration
 @FieldDefaults(level = AccessLevel.PRIVATE)
@@ -57,22 +61,35 @@ public class EventManagerConfig
 	@Autowired
 	SQLQueryFactory queryFactory;
 
-	@Bean()
-	public EventManager eventManager() throws Exception
+	@Bean
+	@Conditional(DefaultEventProcessorType.class)
+	public EventManager defaultEventManager() throws Exception
 	{
-		switch(eventProcessorType)
-		{
-			case JMS:
-				return new JMSEventManager(new JmsTemplate(connectionFactory),ebMSDAO,ebMSEventDAO(),cpaManager,nrAutoRetries,autoRetryInterval);
-			case NONE:
-			default:
-				return new EbMSEventManager(ebMSDAO,ebMSEventDAO(),cpaManager,serverId,nrAutoRetries,autoRetryInterval);
-		}
+		return createDefaultEventManager();
+	}
+
+	@Bean
+	@Conditional(NoneEventProcessorType.class)
+	public EventManager noneEventManager() throws Exception
+	{
+		return createDefaultEventManager();
+	}
+
+	@Bean
+	@Conditional(JmsEventProcessorType.class)
+	public EventManager jmsEventManager() throws Exception
+	{
+		return new JMSEventManager(new JmsTemplate(connectionFactory),ebMSDAO,ebMSEventDAO(),cpaManager,nrAutoRetries,autoRetryInterval);
 	}
 
 	@Bean
 	public EbMSEventDAO ebMSEventDAO() throws Exception
 	{
 		return new EbMSEventDAOImpl(queryFactory);
+	}
+
+	private EbMSEventManager createDefaultEventManager() throws Exception
+	{
+		return new EbMSEventManager(ebMSDAO,ebMSEventDAO(),cpaManager,serverId,nrAutoRetries,autoRetryInterval);
 	}
 }

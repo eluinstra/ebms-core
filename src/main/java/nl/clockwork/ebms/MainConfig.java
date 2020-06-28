@@ -25,6 +25,7 @@ import nl.clockwork.ebms.client.ClientConfig;
 import nl.clockwork.ebms.cpa.CPAManagerConfig;
 import nl.clockwork.ebms.dao.DAOConfig;
 import nl.clockwork.ebms.datasource.DataSourceConfig;
+import nl.clockwork.ebms.datasource.QueryDSLConfig;
 import nl.clockwork.ebms.encryption.EncryptionConfig;
 import nl.clockwork.ebms.event.listener.EventListenerConfig;
 import nl.clockwork.ebms.event.processor.EventManagerConfig;
@@ -40,24 +41,25 @@ import nl.clockwork.ebms.validation.ValidationConfig;
 
 @Configuration
 @Import({
-	CacheConfig.class,
-	ClientConfig.class,
-	CommonConfig.class,
-	CPAManagerConfig.class,
-	DAOConfig.class,
-	DataSourceConfig.class,
-	EbMSProcessorConfig.class,
-	EncryptionConfig.class,
-	EventListenerConfig.class,
-	EventManagerConfig.class,
-	EventProcessorConfig.class,
-	JMSConfig.class,
-	KeyStoreConfig.class,
-	ServerConfig.class,
-	ServiceConfig.class,
-	SigningConfig.class,
-	TransactionManagerConfig.class,
-	ValidationConfig.class})
+		CacheConfig.class,
+		ClientConfig.class,
+		CommonConfig.class,
+		CPAManagerConfig.class,
+		DAOConfig.class,
+		DataSourceConfig.class,
+		EbMSProcessorConfig.class,
+		EncryptionConfig.class,
+		EventListenerConfig.class,
+		EventManagerConfig.class,
+		EventProcessorConfig.class,
+		JMSConfig.class,
+		KeyStoreConfig.class,
+		QueryDSLConfig.class,
+		ServerConfig.class,
+		ServiceConfig.class,
+		SigningConfig.class,
+		TransactionManagerConfig.class,
+		ValidationConfig.class})
 @PropertySource(value = {"classpath:nl/clockwork/ebms/default.properties"}, ignoreResourceNotFound = true)
 public class MainConfig
 {

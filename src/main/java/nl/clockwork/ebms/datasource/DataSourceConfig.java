@@ -15,40 +15,20 @@
  */
 package nl.clockwork.ebms.datasource;
 
-import static io.vavr.API.$;
-import static io.vavr.API.Case;
-import static io.vavr.API.Match;
-import static nl.clockwork.ebms.Predicates.contains;
-
 import java.beans.PropertyVetoException;
-import java.sql.Types;
 import java.util.Properties;
 import java.util.UUID;
 
 import javax.sql.DataSource;
-import javax.transaction.SystemException;
 
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.jdbc.datasource.DataSourceTransactionManager;
-import org.springframework.transaction.PlatformTransactionManager;
 
 import com.atomikos.jdbc.AtomikosDataSourceBean;
 import com.atomikos.jdbc.internal.AtomikosSQLException;
-import com.querydsl.sql.DB2Templates;
-import com.querydsl.sql.HSQLDBTemplates;
-import com.querydsl.sql.MySQLTemplates;
-import com.querydsl.sql.OracleTemplates;
-import com.querydsl.sql.PostgreSQLTemplates;
-import com.querydsl.sql.SQLQueryFactory;
-import com.querydsl.sql.SQLServerTemplates;
-import com.querydsl.sql.SQLTemplates;
-import com.querydsl.sql.spring.SpringConnectionProvider;
-import com.querydsl.sql.spring.SpringExceptionTranslator;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import com.zaxxer.hikari.util.IsolationLevel;
@@ -57,15 +37,9 @@ import bitronix.tm.resource.jdbc.PoolingDataSource;
 import lombok.AccessLevel;
 import lombok.val;
 import lombok.experimental.FieldDefaults;
-import nl.clockwork.ebms.dao.AbstractDAOFactory;
-import nl.clockwork.ebms.querydsl.CachedOutputStreamType;
-import nl.clockwork.ebms.querydsl.CollaborationProtocolAgreementType;
-import nl.clockwork.ebms.querydsl.DocumentType;
-import nl.clockwork.ebms.querydsl.EbMSEventStatusType;
-import nl.clockwork.ebms.querydsl.EbMSMessageEventTypeType;
-import nl.clockwork.ebms.querydsl.EbMSMessageStatusType;
-import nl.clockwork.ebms.querydsl.InstantType;
-import nl.clockwork.ebms.querydsl.X509CertificateType;
+import nl.clockwork.ebms.transaction.TransactionManagerConfig.AtomikosTransactionManagerType;
+import nl.clockwork.ebms.transaction.TransactionManagerConfig.BitronixTransactionManagerType;
+import nl.clockwork.ebms.transaction.TransactionManagerConfig.DefaultTransactionManagerType;
 import nl.clockwork.ebms.transaction.TransactionManagerConfig.TransactionManagerType;
 
 @Configuration
@@ -74,9 +48,6 @@ public class DataSourceConfig
 {
 	@Value("${transactionManager.type}")
 	TransactionManagerType transactionManagerType;
-	@Autowired
-	@Qualifier("jtaTransactionManager")
-	PlatformTransactionManager jtaTransactionManager;
 	@Value("${transactionManager.isolationLevel}")
 	IsolationLevel isolationLevel;
 	@Value("${ebms.jdbc.driverClassName}")
@@ -102,115 +73,64 @@ public class DataSourceConfig
 	@Value("${ebms.pool.maxPoolSize}")
 	int maxPoolSize;
 	
-	@Bean
-	public SQLQueryFactory queryFactory() throws AtomikosSQLException, PropertyVetoException
+	@Bean(destroyMethod = "close")
+	@Conditional(DefaultTransactionManagerType.class)
+	public DataSource hikariDataSource() throws PropertyVetoException, AtomikosSQLException
 	{
-		val provider = new SpringConnectionProvider(dataSource());
-		return new SQLQueryFactory(querydslConfiguration(),provider);
-	}
-
-	@Bean
-	public com.querydsl.sql.Configuration querydslConfiguration() throws AtomikosSQLException, PropertyVetoException
-	{
-		val templates = getSQLTemplates();
-		val configuration = new com.querydsl.sql.Configuration(templates);
-		configuration.setExceptionTranslator(new SpringExceptionTranslator());
-		configuration.register(new InstantType(Types.TIMESTAMP));
-		configuration.register("CPA","CPA",new CollaborationProtocolAgreementType(Types.CLOB));
-		configuration.register("CERTIFICATE_MAPPING","SOURCE",new X509CertificateType(Types.BLOB));
-		configuration.register("CERTIFICATE_MAPPING","DESTINATION",new X509CertificateType(Types.BLOB));
-		configuration.register("EBMS_MESSAGE_EVENT","EVENT_TYPE",new EbMSMessageEventTypeType(Types.SMALLINT));
-		configuration.register("EBMS_EVENT_LOG","STATUS",new EbMSEventStatusType(Types.SMALLINT));
-		configuration.register("EBMS_MESSAGE","CONTENT",new DocumentType(Types.CLOB));
-		configuration.register("EBMS_MESSAGE","STATUS",new EbMSMessageStatusType(Types.SMALLINT));
-		configuration.register("EBMS_ATTACHMENT","CONTENT",new CachedOutputStreamType(Types.BLOB));
-		return configuration;
-	}
-
-	@Bean("dataSourceTransactionManager")
-	public PlatformTransactionManager dataSourceTransactionManager() throws SystemException, AtomikosSQLException, PropertyVetoException
-	{
-		switch (transactionManagerType)
-		{
-			case BITRONIX:
-			case ATOMIKOS:
-				return jtaTransactionManager;
-			default:
-				return new DataSourceTransactionManager(dataSource());
-		}
+		val config = new HikariConfig();
+		config.setDriverClassName(driverClassName);
+		config.setJdbcUrl(jdbcUrl);
+		config.setUsername(username);
+		config.setPassword(password);
+		config.setAutoCommit(isAutoCommit);
+		config.setConnectionTimeout(connectionTimeout);
+		config.setIdleTimeout(maxIdleTime);
+		config.setMaxLifetime(maxLifetime);
+		config.setConnectionTestQuery(testQuery);
+		config.setMinimumIdle(minPoolSize);
+		config.setMaximumPoolSize(maxPoolSize);
+		return new HikariDataSource(config);
 	}
 
 	@Bean(destroyMethod = "close")
-	public DataSource dataSource() throws PropertyVetoException, AtomikosSQLException
+	@Conditional(BitronixTransactionManagerType.class)
+	public DataSource poolingDataSource() throws PropertyVetoException, AtomikosSQLException
 	{
-		switch (transactionManagerType)
-		{
-			case BITRONIX:
-				val bitronixDS = new PoolingDataSource();
-				bitronixDS.setUniqueName(UUID.randomUUID().toString());
-				bitronixDS.setClassName(driverClassName);
-				if (isolationLevel != null)
-					bitronixDS.setIsolationLevel(isolationLevel.name());
-		    bitronixDS.setAllowLocalTransactions(false);
-		    bitronixDS.setDriverProperties(createDriverProperties());
-		    bitronixDS.setMaxIdleTime(maxIdleTime);
-		    bitronixDS.setMinPoolSize(minPoolSize);
-		    bitronixDS.setMaxPoolSize(maxPoolSize);
-		    bitronixDS.setEnableJdbc4ConnectionTest(StringUtils.isEmpty(testQuery));
-		    bitronixDS.setTestQuery(testQuery);
-		    bitronixDS.init();
-		    return bitronixDS;
-			case ATOMIKOS:
-				val atomikosDS = new AtomikosDataSourceBean();
-				atomikosDS.setUniqueResourceName(UUID.randomUUID().toString());
-				atomikosDS.setXaDataSourceClassName(driverClassName);
-				atomikosDS.setXaProperties(createDriverProperties());
-				if (isolationLevel != null)
-					atomikosDS.setDefaultIsolationLevel(isolationLevel.getLevelId());
-				atomikosDS.setLocalTransactionMode(false);
-				atomikosDS.setMaxIdleTime(maxIdleTime);
-				atomikosDS.setMaxLifetime(maxLifetime);
-				atomikosDS.setMinPoolSize(minPoolSize);
-				atomikosDS.setMaxPoolSize(maxPoolSize);
-				if (StringUtils.isNotEmpty(testQuery))
-					atomikosDS.setTestQuery(testQuery);
-				atomikosDS.init();
-				return atomikosDS;
-			default:
-				val config = new HikariConfig();
-				config.setDriverClassName(driverClassName);
-				config.setJdbcUrl(jdbcUrl);
-				config.setUsername(username);
-				config.setPassword(password);
-				config.setAutoCommit(isAutoCommit);
-				config.setConnectionTimeout(connectionTimeout);
-				config.setIdleTimeout(maxIdleTime);
-				config.setMaxLifetime(maxLifetime);
-				config.setConnectionTestQuery(testQuery);
-				config.setMinimumIdle(minPoolSize);
-				config.setMaximumPoolSize(maxPoolSize);
-				return new HikariDataSource(config);
-		}
+		val result = new PoolingDataSource();
+		result.setUniqueName(UUID.randomUUID().toString());
+		result.setClassName(driverClassName);
+		if (isolationLevel != null)
+			result.setIsolationLevel(isolationLevel.name());
+    result.setAllowLocalTransactions(false);
+    result.setDriverProperties(createDriverProperties());
+    result.setMaxIdleTime(maxIdleTime);
+    result.setMinPoolSize(minPoolSize);
+    result.setMaxPoolSize(maxPoolSize);
+    result.setEnableJdbc4ConnectionTest(StringUtils.isEmpty(testQuery));
+    result.setTestQuery(testQuery);
+    result.init();
+    return result;
 	}
 
-	private SQLTemplates getSQLTemplates() throws AtomikosSQLException, PropertyVetoException
+	@Bean(destroyMethod = "close")
+	@Conditional(AtomikosTransactionManagerType.class)
+	public DataSource atomikosDataSourceBean() throws PropertyVetoException, AtomikosSQLException
 	{
-		return createSQLTemplates(dataSource());
-	}
-
-	private SQLTemplates createSQLTemplates(DataSource dataSource) throws AtomikosSQLException, PropertyVetoException
-	{
-		String jdbcUrl = AbstractDAOFactory.getDriverClassName(dataSource);
-		return Match(jdbcUrl).of(
-				Case($(contains("db2")),o -> DB2Templates.builder().build()),
-				Case($(contains("hsqldb")),o -> HSQLDBTemplates.builder().build()),
-				Case($(contains("mysql")),o -> MySQLTemplates.builder().build()),
-				Case($(contains("oracle")),o -> OracleTemplates.builder().build()),
-				Case($(contains("postgresql")),o -> PostgreSQLTemplates.builder().build()),
-				Case($(contains("sqlserver")),o -> SQLServerTemplates.builder().build()),
-				Case($(),o -> {
-					throw new RuntimeException("Jdbc url " + jdbcUrl + " not recognized!");
-				}));
+		val result = new AtomikosDataSourceBean();
+		result.setUniqueResourceName(UUID.randomUUID().toString());
+		result.setXaDataSourceClassName(driverClassName);
+		result.setXaProperties(createDriverProperties());
+		if (isolationLevel != null)
+			result.setDefaultIsolationLevel(isolationLevel.getLevelId());
+		result.setLocalTransactionMode(false);
+		result.setMaxIdleTime(maxIdleTime);
+		result.setMaxLifetime(maxLifetime);
+		result.setMinPoolSize(minPoolSize);
+		result.setMaxPoolSize(maxPoolSize);
+		if (StringUtils.isNotEmpty(testQuery))
+			result.setTestQuery(testQuery);
+		result.init();
+		return result;
 	}
 
 	private Properties createDriverProperties()

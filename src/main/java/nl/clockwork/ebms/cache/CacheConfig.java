@@ -32,9 +32,13 @@ import org.springframework.cache.ehcache.EhCacheManagerFactoryBean;
 import org.springframework.cache.interceptor.KeyGenerator;
 import org.springframework.cache.support.SimpleCacheManager;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Condition;
+import org.springframework.context.annotation.ConditionContext;
+import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
+import org.springframework.core.type.AnnotatedTypeMetadata;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -65,32 +69,39 @@ public class CacheConfig
 	Resource configLocation;
 
 	@Bean
-	public CacheManager ebMSCacheManager() throws IOException
+	@Conditional(DefaultCacheType.class)
+	public CacheManager simpleCacheManager() throws IOException
 	{
-		switch (type)
-		{
-			case EHCACHE:
-				val ehcacheCacheManager = new EhCacheCacheManager();
-				net.sf.ehcache.CacheManager ehcacheManager = createEhCacheManager(getConfigLocation());
-				ehcacheManager.addCache("CPA");
-				ehcacheManager.addCache("URLMapping");
-				ehcacheManager.addCache("CertificateMapping");
-				ehcacheCacheManager.setCacheManager(ehcacheManager);
-				return ehcacheCacheManager;
-			case IGNITE:
-				val igniteCacheManager = new SpringCacheManager();
-				igniteCacheManager.setConfigurationPath(getConfigLocation().getURL().toString());
-				igniteCacheManager.setDynamicNearCacheConfiguration(createDynamicNearCacheConfiguration());
-				return igniteCacheManager;
-			default:
-				val cacheManager = new SimpleCacheManager();
-				Collection<Cache> caches = new ArrayList<>();
-				caches.add(new ConcurrentMapCache("CPA"));
-				caches.add(new ConcurrentMapCache("URLMapping"));
-				caches.add(new ConcurrentMapCache("CertificateMapping"));
-				cacheManager.setCaches(caches);
-				return cacheManager;
-		}
+		val cacheManager = new SimpleCacheManager();
+		Collection<Cache> caches = new ArrayList<>();
+		caches.add(new ConcurrentMapCache("CPA"));
+		caches.add(new ConcurrentMapCache("URLMapping"));
+		caches.add(new ConcurrentMapCache("CertificateMapping"));
+		cacheManager.setCaches(caches);
+		return cacheManager;
+	}
+
+	@Bean
+	@Conditional(EhCacheCacheType.class)
+	public CacheManager ehcacheCacheManager() throws IOException
+	{
+		val ehcacheCacheManager = new EhCacheCacheManager();
+		net.sf.ehcache.CacheManager ehcacheManager = createEhCacheManager(getConfigLocation());
+		ehcacheManager.addCache("CPA");
+		ehcacheManager.addCache("URLMapping");
+		ehcacheManager.addCache("CertificateMapping");
+		ehcacheCacheManager.setCacheManager(ehcacheManager);
+		return ehcacheCacheManager;
+	}
+
+	@Bean
+	@Conditional(IgniteCacheType.class)
+	public CacheManager igniteCacheManager() throws IOException
+	{
+		val igniteCacheManager = new SpringCacheManager();
+		igniteCacheManager.setConfigurationPath(getConfigLocation().getURL().toString());
+		igniteCacheManager.setDynamicNearCacheConfiguration(createDynamicNearCacheConfiguration());
+		return igniteCacheManager;
 	}
 
 	@Bean("ebMSKeyGenerator")
@@ -120,5 +131,30 @@ public class CacheConfig
 		nearEvictPlcFactory.setMaxSize(100000);
 		result.setNearEvictionPolicyFactory(nearEvictPlcFactory);
 		return result;
+	}
+
+	public static class DefaultCacheType implements Condition
+	{
+		@Override
+		public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata)
+		{
+			return context.getEnvironment().getProperty("cache.type",CacheType.class,CacheType.DEFAULT) == CacheType.DEFAULT;
+		}
+	}
+	public static class EhCacheCacheType implements Condition
+	{
+		@Override
+		public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata)
+		{
+			return context.getEnvironment().getProperty("cache.type",CacheType.class,CacheType.DEFAULT) == CacheType.EHCACHE;
+		}
+	}
+	public static class IgniteCacheType implements Condition
+	{
+		@Override
+		public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata)
+		{
+			return context.getEnvironment().getProperty("cache.type",CacheType.class,CacheType.DEFAULT) == CacheType.IGNITE;
+		}
 	}
 }

@@ -23,15 +23,13 @@ import javax.jms.JMSException;
 import javax.jms.XAConnectionFactory;
 
 import org.apache.activemq.ActiveMQXAConnectionFactory;
+import org.apache.activemq.pool.PooledConnectionFactory;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
-import org.springframework.jms.connection.JmsTransactionManager;
-import org.springframework.transaction.PlatformTransactionManager;
 
 import com.atomikos.jms.AtomikosConnectionFactoryBean;
 
@@ -39,6 +37,9 @@ import bitronix.tm.resource.jms.PoolingConnectionFactory;
 import lombok.AccessLevel;
 import lombok.val;
 import lombok.experimental.FieldDefaults;
+import nl.clockwork.ebms.transaction.TransactionManagerConfig.AtomikosTransactionManagerType;
+import nl.clockwork.ebms.transaction.TransactionManagerConfig.BitronixTransactionManagerType;
+import nl.clockwork.ebms.transaction.TransactionManagerConfig.DefaultTransactionManagerType;
 import nl.clockwork.ebms.transaction.TransactionManagerConfig.TransactionManagerType;
 
 @Configuration
@@ -61,9 +62,6 @@ public class JMSConfig
 	int minPoolSize;
 	@Value("${jms.pool.maxPoolSize}")
 	int maxPoolSize;
-	@Autowired
-	@Qualifier("jtaTransactionManager")
-	PlatformTransactionManager jtaTransactionManager;
 
 	@Bean(name = "brokerFactory", destroyMethod = "destroy")
 	public EbMSBrokerFactoryBean brokerFactory() throws Exception
@@ -71,48 +69,44 @@ public class JMSConfig
 		return new EbMSBrokerFactoryBean(jmsBrokerStart,jmsBrokerConfig);
 	}
 
-	@Bean(initMethod = "init", destroyMethod = "close")
+	@Bean
+	@Conditional(DefaultTransactionManagerType.class)
 	@DependsOn("brokerFactory")
-	public ConnectionFactory connectionFactory() throws JMSException
+	public ConnectionFactory pooledConnectionFactor() throws JMSException
 	{
-		switch (transactionManagerType)
-		{
-			case BITRONIX:
-				val bitronixCF = new PoolingConnectionFactory();
-				bitronixCF.setUniqueName(UUID.randomUUID().toString());
-				bitronixCF.setClassName("org.apache.activemq.ActiveMQXAConnectionFactory");
-				bitronixCF.setAllowLocalTransactions(false);
-				bitronixCF.setMinPoolSize(minPoolSize);
-				bitronixCF.setMaxPoolSize(maxPoolSize);
-				bitronixCF.setDriverProperties(createDriverProperties());
-				return bitronixCF;
-			case ATOMIKOS:
-				val atomikosCF = new AtomikosConnectionFactoryBean();
-				atomikosCF.setUniqueResourceName(UUID.randomUUID().toString());
-				atomikosCF.setXaConnectionFactory(createXAConnectionFactory());
-				atomikosCF.setLocalTransactionMode(false);
-				atomikosCF.setIgnoreSessionTransactedFlag(true);
-				atomikosCF.setMinPoolSize(minPoolSize);
-				atomikosCF.setMaxPoolSize(maxPoolSize);
-				return atomikosCF;
-			default:
-				val defaultCF = new CloseablePooledConnectionFactory(jmsBrokerUrl);
-				defaultCF.setMaxConnections(maxPoolSize);
-				return defaultCF;
-		}
+		val result = new PooledConnectionFactory(jmsBrokerUrl);
+		result.setMaxConnections(maxPoolSize);
+		return result;
 	}
 
-	@Bean("jmsTransactionManager")
-	public PlatformTransactionManager jmsTransactionManager() throws JMSException
+	@Bean(initMethod = "init", destroyMethod = "close")
+	@Conditional(BitronixTransactionManagerType.class)
+	@DependsOn("brokerFactory")
+	public ConnectionFactory poolingConnectionFactory() throws JMSException
 	{
-		switch (transactionManagerType)
-		{
-			case BITRONIX:
-			case ATOMIKOS:
-				return jtaTransactionManager;
-			default:
-				return new JmsTransactionManager(connectionFactory());
-		}
+		val result = new PoolingConnectionFactory();
+		result.setUniqueName(UUID.randomUUID().toString());
+		result.setClassName("org.apache.activemq.ActiveMQXAConnectionFactory");
+		result.setAllowLocalTransactions(false);
+		result.setMinPoolSize(minPoolSize);
+		result.setMaxPoolSize(maxPoolSize);
+		result.setDriverProperties(createDriverProperties());
+		return result;
+	}
+
+	@Bean(initMethod = "init", destroyMethod = "close")
+	@Conditional(AtomikosTransactionManagerType.class)
+	@DependsOn("brokerFactory")
+	public ConnectionFactory atomikosConnectionFactoryBean() throws JMSException
+	{
+		val result = new AtomikosConnectionFactoryBean();
+		result.setUniqueResourceName(UUID.randomUUID().toString());
+		result.setXaConnectionFactory(createXAConnectionFactory());
+		result.setLocalTransactionMode(false);
+		result.setIgnoreSessionTransactedFlag(true);
+		result.setMinPoolSize(minPoolSize);
+		result.setMaxPoolSize(maxPoolSize);
+		return result;
 	}
 
 	private Properties createDriverProperties()

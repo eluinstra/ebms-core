@@ -52,22 +52,6 @@ public class EventProcessorConfig
 	{
 		NONE, DEFAULT, JMS;
 	}
-	public static class DefaultEventProcessorType implements Condition
-	{
-		@Override
-		public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata)
-		{
-			return context.getEnvironment().getProperty("eventProcessor.type",EventProcessorType.class,EventProcessorType.NONE) == EventProcessorType.DEFAULT;
-		}
-	}
-	public static class JmsEventProcessorType implements Condition
-	{
-		@Override
-		public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata)
-		{
-			return context.getEnvironment().getProperty("eventProcessor.type",EventProcessorType.class,EventProcessorType.NONE) == EventProcessorType.JMS;
-		}
-	}
 	@Value("${eventProcessor.type}")
 	EventProcessorType eventProcessorType;
 	@Autowired
@@ -87,7 +71,9 @@ public class EventProcessorConfig
 	@Value("${eventProcessor.maxEvents}")
 	int maxEvents;
 	@Value("${eventProcessor.executionInterval}")
-	int executionInterval;
+	int eventProcessorExecutionInterval;
+	@Value("${eventHandlerTask.executionInterval}")
+	int eventHandlerTaskExecutionInterval;
 	@Autowired
 	EventListener eventListener;
 	@Autowired
@@ -117,19 +103,33 @@ public class EventProcessorConfig
 
 	@Bean("threadPoolTaskExecutor")
 	@Conditional(DefaultEventProcessorType.class)
-	public ThreadPoolTaskExecutor defaultProcessor() throws Exception
+	public ThreadPoolTaskExecutor defaultEventProcessor() throws Exception
 	{
 		val result = new ThreadPoolTaskExecutor();
 		result.setCorePoolSize(minThreads);
 		result.setMaxPoolSize(maxThreads);
-		result.setQueueCapacity(maxThreads * 4);
+		result.setQueueCapacity(maxThreads * 2);
 		result.setWaitForTasksToCompleteOnShutdown(true);
 		return result;
 	}
 
 	@Bean
+	@Conditional(DefaultEventProcessorType.class)
+	public EventTaskExecutor eventTaskExecutor()
+	{
+		return EventTaskExecutor.builder()
+				.transactionManager(dataSourceTransactionManager)
+				.ebMSEventDAO(ebMSEventDAO)
+				.eventHandler(eventHandler())
+				.timedAction(new TimedAction(eventProcessorExecutionInterval))
+				.maxEvents(maxEvents)
+				.serverId(serverId)
+				.build();
+	}
+
+	@Bean
 	@Conditional(JmsEventProcessorType.class)
-	public DefaultMessageListenerContainer eventProcessor() throws Exception
+	public DefaultMessageListenerContainer jmsEventProcessor() throws Exception
 	{
 		val result = new DefaultMessageListenerContainer();
 		result.setConnectionFactory(connectionFactory);
@@ -141,18 +141,6 @@ public class EventProcessorConfig
 		result.setDestinationName(StringUtils.isEmpty(jmsDestinationName) ? JMSEventManager.JMS_DESTINATION_NAME : jmsDestinationName);
 		result.setMessageListener(new EbMSSendEventListener(eventHandler()));
 		return result;
-	}
-	@Bean
-	@Conditional(DefaultEventProcessorType.class)
-	public EventTaskExecutor eventTaskExecutor()
-	{
-		return EventTaskExecutor.builder()
-				.transactionManager(dataSourceTransactionManager)
-				.ebMSEventDAO(ebMSEventDAO)
-				.eventHandler(eventHandler())
-				.maxEvents(maxEvents)
-				.serverId(serverId)
-				.build();
 	}
 
 	@Bean
@@ -168,14 +156,33 @@ public class EventProcessorConfig
 				.ebMSClientFactory(ebMSClientFactory)
 				.messageEncrypter(messageEncrypter)
 				.messageProcessor(messageProcessor)
-				.timedAction(timedAction())
+				.timedAction(new TimedAction(eventHandlerTaskExecutionInterval))
 				.deleteEbMSAttachmentsOnMessageProcessed(deleteEbMSAttachmentsOnMessageProcessed)
 				.build();
 	}
 
-	@Bean
-	public TimedAction timedAction()
+	public static class DefaultEventProcessorType implements Condition
 	{
-		return new TimedAction(executionInterval);
+		@Override
+		public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata)
+		{
+			return context.getEnvironment().getProperty("eventProcessor.type",EventProcessorType.class,EventProcessorType.NONE) == EventProcessorType.DEFAULT;
+		}
+	}
+	public static class NoneEventProcessorType implements Condition
+	{
+		@Override
+		public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata)
+		{
+			return context.getEnvironment().getProperty("eventProcessor.type",EventProcessorType.class,EventProcessorType.NONE) == EventProcessorType.NONE;
+		}
+	}
+	public static class JmsEventProcessorType implements Condition
+	{
+		@Override
+		public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata)
+		{
+			return context.getEnvironment().getProperty("eventProcessor.type",EventProcessorType.class,EventProcessorType.NONE) == EventProcessorType.JMS;
+		}
 	}
 }
