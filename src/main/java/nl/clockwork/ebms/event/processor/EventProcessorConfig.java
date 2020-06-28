@@ -101,7 +101,7 @@ public class EventProcessorConfig
 	@Value("${eventProcessor.jms.destinationName}")
 	String destinationName;
 
-	@Bean("threadPoolTaskExecutor")
+	@Bean("eventHandlerTaskExecutor")
 	@Conditional(DefaultEventProcessorType.class)
 	public ThreadPoolTaskExecutor defaultEventProcessor() throws Exception
 	{

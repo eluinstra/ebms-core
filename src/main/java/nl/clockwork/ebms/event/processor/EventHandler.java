@@ -100,7 +100,7 @@ public class EventHandler
 		timedAction.run(action);
 	}
 
-	@Async("threadPoolTaskExecutor")
+	@Async("eventHandlerTaskExecutor")
 	public CompletableFuture<Object> handleAsync(EbMSEvent event)
 	{
 		Action action = () ->

@@ -30,6 +30,7 @@ import javax.xml.xpath.XPathExpressionException;
 
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jms.core.MessagePostProcessor;
+import org.springframework.scheduling.annotation.Async;
 import org.xml.sax.SAXException;
 
 import lombok.AccessLevel;
@@ -40,7 +41,6 @@ import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import nl.clockwork.ebms.Constants;
 import nl.clockwork.ebms.EbMSMessageUtils;
-import nl.clockwork.ebms.EbMSThreadPoolExecutor;
 import nl.clockwork.ebms.cpa.CPAManager;
 import nl.clockwork.ebms.model.EbMSBaseMessage;
 import nl.clockwork.ebms.model.EbMSRequestMessage;
@@ -58,13 +58,12 @@ public class JMSDeliveryManager extends DeliveryManager
 
 	@Builder(builderMethodName = "jmsDeliveryManagerBuilder")
 	public JMSDeliveryManager(
-			@NonNull EbMSThreadPoolExecutor ebMSThreadPoolExecutor,
 			@NonNull MessageQueue<EbMSResponseMessage> messageQueue,
 			@NonNull CPAManager cpaManager,
 			@NonNull EbMSHttpClientFactory ebMSClientFactory,
 			@NonNull JmsTemplate jmsTemplate)
 	{
-		super(ebMSThreadPoolExecutor,messageQueue,cpaManager,ebMSClientFactory);
+		super(messageQueue,cpaManager,ebMSClientFactory);
 		this.jmsTemplate = jmsTemplate;
 	}
 
@@ -113,21 +112,18 @@ public class JMSDeliveryManager extends DeliveryManager
 		});
 	}
 
+	@Async("deliveryManagerTaskExecutor")
 	@Override
 	public void sendResponseMessage(final String uri, final EbMSBaseMessage response) throws EbMSProcessorException
 	{
-		Runnable command = () ->
+		try
 		{
-			try
-			{
-				log.info("Sending message " + response.getMessageHeader().getMessageData().getMessageId() + " to " + uri);
-				createClient(response.getMessageHeader()).sendMessage(uri,EbMSMessageUtils.getEbMSDocument(response));
-			}
-			catch (Exception e)
-			{
-				log.error("",e);
-			}
-		};
-		executorService.execute(command);
+			log.info("Sending message " + response.getMessageHeader().getMessageData().getMessageId() + " to " + uri);
+			createClient(response.getMessageHeader()).sendMessage(uri,EbMSMessageUtils.getEbMSDocument(response));
+		}
+		catch (CertificateException | SOAPException | JAXBException | ParserConfigurationException | SAXException | IOException | TransformerFactoryConfigurationError | TransformerException e)
+		{
+			throw new EbMSProcessingException(e);
+		}
 	}
 }

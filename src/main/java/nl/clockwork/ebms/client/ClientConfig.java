@@ -23,14 +23,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Condition;
+import org.springframework.context.annotation.ConditionContext;
+import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.type.AnnotatedTypeMetadata;
 import org.springframework.jms.core.JmsTemplate;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 import lombok.AccessLevel;
 import lombok.val;
 import lombok.experimental.FieldDefaults;
-import nl.clockwork.ebms.EbMSThreadPoolExecutor;
-import nl.clockwork.ebms.client.DeliveryManagerFactory.DeliveryManagerType;
 import nl.clockwork.ebms.client.EbMSHttpClientFactory.EbMSHttpClientType;
 import nl.clockwork.ebms.cpa.CPAManager;
 import nl.clockwork.ebms.cpa.CertificateMapper;
@@ -41,6 +44,10 @@ import nl.clockwork.ebms.security.EbMSTrustStore;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class ClientConfig
 {
+	public enum DeliveryManagerType
+	{
+		DEFAULT, JMS;
+	}
 	@Value("${http.client}")
 	EbMSHttpClientType ebMSHttpClientType;
 	@Value("${http.connectTimeout}")
@@ -119,17 +126,54 @@ public class ClientConfig
 				.build();
 	}
 
-	@Bean
-	public DeliveryManager deliveryManager() throws Exception
+	@Bean("deliveryManagerTaskExecutor")
+	public ThreadPoolTaskExecutor deliveryManagerTaskExecutor() throws Exception
 	{
-		return DeliveryManagerFactory.builder()
-				.setType(deliveryManagerType)
-				.setEbMSThreadPoolExecutor(new EbMSThreadPoolExecutor(minThreads,maxThreads))
-				.setMessageQueue(new EbMSMessageQueue(maxEntries,timeout))
-				.setCpaManager(cpaManager)
-				.setEbMSClientFactory(ebMSClientFactory())
-				.setJmsTemplate(new JmsTemplate(connectionFactory))
-				.build()
-				.getObject();
+		val result = new ThreadPoolTaskExecutor();
+		result.setCorePoolSize(minThreads);
+		result.setMaxPoolSize(maxThreads);
+		result.setQueueCapacity(maxThreads * 2);
+		result.setWaitForTasksToCompleteOnShutdown(true);
+		return result;
+	}
+
+	@Bean
+	@Conditional(defaultDeliveryManagerType.class)
+	public DeliveryManager defaultDeliveryManager() throws Exception
+	{
+		return DeliveryManager.builder()
+				.messageQueue(new EbMSMessageQueue(maxEntries,timeout))
+				.cpaManager(cpaManager)
+				.ebMSClientFactory(ebMSClientFactory())
+				.build();
+	}
+
+	@Bean
+	@Conditional(jmsDeliveryManagerType.class)
+	public DeliveryManager jmsDeliveryManager() throws Exception
+	{
+		return JMSDeliveryManager.jmsDeliveryManagerBuilder()
+				.messageQueue(new EbMSMessageQueue(maxEntries,timeout))
+				.cpaManager(cpaManager)
+				.ebMSClientFactory(ebMSClientFactory())
+				.jmsTemplate(new JmsTemplate(connectionFactory))
+				.build();
+	}
+
+	public static class defaultDeliveryManagerType implements Condition
+	{
+		@Override
+		public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata)
+		{
+			return context.getEnvironment().getProperty("deliveryManager.type",DeliveryManagerType.class,DeliveryManagerType.DEFAULT) == DeliveryManagerType.DEFAULT;
+		}
+	}
+	public static class jmsDeliveryManagerType implements Condition
+	{
+		@Override
+		public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata)
+		{
+			return context.getEnvironment().getProperty("deliveryManager.type",DeliveryManagerType.class,DeliveryManagerType.DEFAULT) == DeliveryManagerType.JMS;
+		}
 	}
 }

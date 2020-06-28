@@ -18,7 +18,6 @@ package nl.clockwork.ebms.client;
 import java.io.IOException;
 import java.security.cert.CertificateException;
 import java.util.Optional;
-import java.util.concurrent.ExecutorService;
 
 import javax.xml.bind.JAXBException;
 import javax.xml.parsers.ParserConfigurationException;
@@ -28,6 +27,7 @@ import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.xpath.XPathExpressionException;
 
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageHeader;
+import org.springframework.scheduling.annotation.Async;
 import org.xml.sax.SAXException;
 
 import lombok.AccessLevel;
@@ -37,7 +37,6 @@ import lombok.val;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import nl.clockwork.ebms.EbMSMessageUtils;
-import nl.clockwork.ebms.EbMSThreadPoolExecutor;
 import nl.clockwork.ebms.cpa.CPAManager;
 import nl.clockwork.ebms.cpa.CPAUtils;
 import nl.clockwork.ebms.model.EbMSBaseMessage;
@@ -56,17 +55,13 @@ public class DeliveryManager
 	CPAManager cpaManager;
 	@NonNull
 	EbMSHttpClientFactory ebMSClientFactory;
-	@NonNull
-	protected ExecutorService executorService;
 
 	@Builder
 	public DeliveryManager(
-			@NonNull EbMSThreadPoolExecutor ebMSThreadPoolExecutor,
 			@NonNull MessageQueue<EbMSResponseMessage> messageQueue,
 			@NonNull CPAManager cpaManager,
 			@NonNull EbMSHttpClientFactory ebMSClientFactory)
 	{
-		this.executorService = ebMSThreadPoolExecutor.createInstance();
 		this.messageQueue = messageQueue;
 		this.cpaManager = cpaManager;
 		this.ebMSClientFactory = ebMSClientFactory;
@@ -132,23 +127,24 @@ public class DeliveryManager
 	{
 		messageQueue.put(message.getMessageHeader().getMessageData().getRefToMessageId(),message);
 	}
-	
+
+	@Async("deliveryManagerTaskExecutor")
 	public void sendResponseMessage(final String uri, final EbMSBaseMessage response) throws EbMSProcessorException
 	{
-		Runnable command = () ->
+		try
 		{
-			try
-			{
-				val messageHeader = response.getMessageHeader();
-				log.info("Sending message " + messageHeader.getMessageData().getMessageId() + " to " + uri);
-				createClient(messageHeader).sendMessage(uri,EbMSMessageUtils.getEbMSDocument(response));
-			}
-			catch (Exception e)
-			{
-				log.error("",e);
-			}
-		};
-		executorService.execute(command);
+			val messageHeader = response.getMessageHeader();
+			log.info("Sending message " + messageHeader.getMessageData().getMessageId() + " to " + uri);
+			createClient(messageHeader).sendMessage(uri,EbMSMessageUtils.getEbMSDocument(response));
+		}
+		catch (EbMSProcessorException e)
+		{
+			throw e;
+		}
+		catch (CertificateException | SOAPException | JAXBException | ParserConfigurationException | SAXException | IOException | TransformerFactoryConfigurationError | TransformerException e)
+		{
+			throw new EbMSProcessingException(e);
+		}
 	}
 
 	protected EbMSClient createClient(MessageHeader messageHeader) throws CertificateException
