@@ -37,7 +37,7 @@ public class QEbmsEventLog extends com.querydsl.sql.RelationalPathBase<QEbmsEven
 
     private static final long serialVersionUID = -433552212;
 
-    public static final QEbmsEventLog ebmsEventLog = new QEbmsEventLog("EBMS_EVENT_LOG");
+    public static final QEbmsEventLog ebmsEventLog = new QEbmsEventLog("ebms_event_log");
 
     public final StringPath errorMessage = createString("errorMessage");
 
@@ -50,7 +50,7 @@ public class QEbmsEventLog extends com.querydsl.sql.RelationalPathBase<QEbmsEven
     public final StringPath uri = createString("uri");
 
     public QEbmsEventLog(String variable) {
-        super(QEbmsEventLog.class, forVariable(variable), "PUBLIC", "EBMS_EVENT_LOG");
+        super(QEbmsEventLog.class, forVariable(variable), "PUBLIC", "ebms_event_log");
         addMetadata();
     }
 
@@ -60,26 +60,26 @@ public class QEbmsEventLog extends com.querydsl.sql.RelationalPathBase<QEbmsEven
     }
 
     public QEbmsEventLog(String variable, String schema) {
-        super(QEbmsEventLog.class, forVariable(variable), schema, "EBMS_EVENT_LOG");
+        super(QEbmsEventLog.class, forVariable(variable), schema, "ebms_event_log");
         addMetadata();
     }
 
     public QEbmsEventLog(Path<? extends QEbmsEventLog> path) {
-        super(path.getType(), path.getMetadata(), "PUBLIC", "EBMS_EVENT_LOG");
+        super(path.getType(), path.getMetadata(), "PUBLIC", "ebms_event_log");
         addMetadata();
     }
 
     public QEbmsEventLog(PathMetadata metadata) {
-        super(QEbmsEventLog.class, metadata, "PUBLIC", "EBMS_EVENT_LOG");
+        super(QEbmsEventLog.class, metadata, "PUBLIC", "ebms_event_log");
         addMetadata();
     }
 
     public void addMetadata() {
-        addMetadata(errorMessage, ColumnMetadata.named("ERROR_MESSAGE").withIndex(5).ofType(Types.CLOB).withSize(1073741824));
-        addMetadata(messageId, ColumnMetadata.named("MESSAGE_ID").withIndex(1).ofType(Types.VARCHAR).withSize(256).notNull());
-        addMetadata(status, ColumnMetadata.named("STATUS").withIndex(4).ofType(Types.SMALLINT).withSize(16).notNull());
-        addMetadata(timeStamp, ColumnMetadata.named("TIME_STAMP").withIndex(2).ofType(Types.TIMESTAMP).withSize(26).notNull());
-        addMetadata(uri, ColumnMetadata.named("URI").withIndex(3).ofType(Types.VARCHAR).withSize(256));
+        addMetadata(errorMessage, ColumnMetadata.named("error_message").withIndex(5).ofType(Types.CLOB).withSize(1073741824));
+        addMetadata(messageId, ColumnMetadata.named("message_id").withIndex(1).ofType(Types.VARCHAR).withSize(256).notNull());
+        addMetadata(status, ColumnMetadata.named("status").withIndex(4).ofType(Types.SMALLINT).withSize(16).notNull());
+        addMetadata(timeStamp, ColumnMetadata.named("time_stamp").withIndex(2).ofType(Types.TIMESTAMP).withSize(26).notNull());
+        addMetadata(uri, ColumnMetadata.named("uri").withIndex(3).ofType(Types.VARCHAR).withSize(256));
     }
 
 }

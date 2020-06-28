@@ -38,7 +38,7 @@ public class QEbmsMessageEvent extends com.querydsl.sql.RelationalPathBase<QEbms
 
     private static final long serialVersionUID = 1196390453;
 
-    public static final QEbmsMessageEvent ebmsMessageEvent = new QEbmsMessageEvent("EBMS_MESSAGE_EVENT");
+    public static final QEbmsMessageEvent ebmsMessageEvent = new QEbmsMessageEvent("ebms_message_event");
 
     public final EnumPath<nl.clockwork.ebms.event.listener.EbMSMessageEventType> eventType = createEnum("eventType", nl.clockwork.ebms.event.listener.EbMSMessageEventType.class);
 
@@ -49,7 +49,7 @@ public class QEbmsMessageEvent extends com.querydsl.sql.RelationalPathBase<QEbms
     public final DateTimePath<java.sql.Timestamp> timeStamp = createDateTime("timeStamp", java.sql.Timestamp.class);
 
     public QEbmsMessageEvent(String variable) {
-        super(QEbmsMessageEvent.class, forVariable(variable), "PUBLIC", "EBMS_MESSAGE_EVENT");
+        super(QEbmsMessageEvent.class, forVariable(variable), "PUBLIC", "ebms_message_event");
         addMetadata();
     }
 
@@ -59,25 +59,25 @@ public class QEbmsMessageEvent extends com.querydsl.sql.RelationalPathBase<QEbms
     }
 
     public QEbmsMessageEvent(String variable, String schema) {
-        super(QEbmsMessageEvent.class, forVariable(variable), schema, "EBMS_MESSAGE_EVENT");
+        super(QEbmsMessageEvent.class, forVariable(variable), schema, "ebms_message_event");
         addMetadata();
     }
 
     public QEbmsMessageEvent(Path<? extends QEbmsMessageEvent> path) {
-        super(path.getType(), path.getMetadata(), "PUBLIC", "EBMS_MESSAGE_EVENT");
+        super(path.getType(), path.getMetadata(), "PUBLIC", "ebms_message_event");
         addMetadata();
     }
 
     public QEbmsMessageEvent(PathMetadata metadata) {
-        super(QEbmsMessageEvent.class, metadata, "PUBLIC", "EBMS_MESSAGE_EVENT");
+        super(QEbmsMessageEvent.class, metadata, "PUBLIC", "ebms_message_event");
         addMetadata();
     }
 
     public void addMetadata() {
-        addMetadata(eventType, ColumnMetadata.named("EVENT_TYPE").withIndex(2).ofType(Types.SMALLINT).withSize(16).notNull());
-        addMetadata(messageId, ColumnMetadata.named("MESSAGE_ID").withIndex(1).ofType(Types.VARCHAR).withSize(256).notNull());
-        addMetadata(processed, ColumnMetadata.named("PROCESSED").withIndex(4).ofType(Types.SMALLINT).withSize(16).notNull());
-        addMetadata(timeStamp, ColumnMetadata.named("TIME_STAMP").withIndex(3).ofType(Types.TIMESTAMP).withSize(26).notNull());
+        addMetadata(eventType, ColumnMetadata.named("event_type").withIndex(2).ofType(Types.SMALLINT).withSize(16).notNull());
+        addMetadata(messageId, ColumnMetadata.named("message_id").withIndex(1).ofType(Types.VARCHAR).withSize(256).notNull());
+        addMetadata(processed, ColumnMetadata.named("processed").withIndex(4).ofType(Types.SMALLINT).withSize(16).notNull());
+        addMetadata(timeStamp, ColumnMetadata.named("time_stamp").withIndex(3).ofType(Types.TIMESTAMP).withSize(26).notNull());
     }
 
 }

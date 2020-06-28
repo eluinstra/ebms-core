@@ -40,7 +40,7 @@ public class QEbmsEvent extends com.querydsl.sql.RelationalPathBase<QEbmsEvent> 
 
     private static final long serialVersionUID = 462050168;
 
-    public static final QEbmsEvent ebmsEvent = new QEbmsEvent("EBMS_EVENT");
+    public static final QEbmsEvent ebmsEvent = new QEbmsEvent("ebms_event");
 
     public final StringPath cpaId = createString("cpaId");
 
@@ -61,7 +61,7 @@ public class QEbmsEvent extends com.querydsl.sql.RelationalPathBase<QEbmsEvent> 
     public final DateTimePath<java.time.Instant> timeToLive = createDateTime("timeToLive", java.time.Instant.class);
 
     public QEbmsEvent(String variable) {
-        super(QEbmsEvent.class, forVariable(variable), "PUBLIC", "EBMS_EVENT");
+        super(QEbmsEvent.class, forVariable(variable), "PUBLIC", "ebms_event");
         addMetadata();
     }
 
@@ -71,30 +71,30 @@ public class QEbmsEvent extends com.querydsl.sql.RelationalPathBase<QEbmsEvent> 
     }
 
     public QEbmsEvent(String variable, String schema) {
-        super(QEbmsEvent.class, forVariable(variable), schema, "EBMS_EVENT");
+        super(QEbmsEvent.class, forVariable(variable), schema, "ebms_event");
         addMetadata();
     }
 
     public QEbmsEvent(Path<? extends QEbmsEvent> path) {
-        super(path.getType(), path.getMetadata(), "PUBLIC", "EBMS_EVENT");
+        super(path.getType(), path.getMetadata(), "PUBLIC", "ebms_event");
         addMetadata();
     }
 
     public QEbmsEvent(PathMetadata metadata) {
-        super(QEbmsEvent.class, metadata, "PUBLIC", "EBMS_EVENT");
+        super(QEbmsEvent.class, metadata, "PUBLIC", "ebms_event");
         addMetadata();
     }
 
     public void addMetadata() {
-        addMetadata(cpaId, ColumnMetadata.named("CPA_ID").withIndex(1).ofType(Types.VARCHAR).withSize(256).notNull());
-        addMetadata(isConfidential, ColumnMetadata.named("IS_CONFIDENTIAL").withIndex(7).ofType(Types.BOOLEAN).withSize(0).notNull());
-        addMetadata(messageId, ColumnMetadata.named("MESSAGE_ID").withIndex(3).ofType(Types.VARCHAR).withSize(256).notNull());
-        addMetadata(receiveChannelId, ColumnMetadata.named("RECEIVE_CHANNEL_ID").withIndex(2).ofType(Types.VARCHAR).withSize(256).notNull());
-        addMetadata(retries, ColumnMetadata.named("RETRIES").withIndex(6).ofType(Types.SMALLINT).withSize(16).notNull());
-        addMetadata(sendChannelId, ColumnMetadata.named("SEND_CHANNEL_ID").withIndex(9).ofType(Types.VARCHAR).withSize(256));
-        addMetadata(serverId, ColumnMetadata.named("SERVER_ID").withIndex(8).ofType(Types.VARCHAR).withSize(256));
-        addMetadata(timeStamp, ColumnMetadata.named("TIME_STAMP").withIndex(5).ofType(Types.TIMESTAMP).withSize(26).notNull());
-        addMetadata(timeToLive, ColumnMetadata.named("TIME_TO_LIVE").withIndex(4).ofType(Types.TIMESTAMP).withSize(26));
+        addMetadata(cpaId, ColumnMetadata.named("cpa_id").withIndex(1).ofType(Types.VARCHAR).withSize(256).notNull());
+        addMetadata(isConfidential, ColumnMetadata.named("is_confidential").withIndex(7).ofType(Types.BOOLEAN).withSize(0).notNull());
+        addMetadata(messageId, ColumnMetadata.named("message_id").withIndex(3).ofType(Types.VARCHAR).withSize(256).notNull());
+        addMetadata(receiveChannelId, ColumnMetadata.named("receive_channel_id").withIndex(2).ofType(Types.VARCHAR).withSize(256).notNull());
+        addMetadata(retries, ColumnMetadata.named("retries").withIndex(6).ofType(Types.SMALLINT).withSize(16).notNull());
+        addMetadata(sendChannelId, ColumnMetadata.named("send_channel_id").withIndex(9).ofType(Types.VARCHAR).withSize(256));
+        addMetadata(serverId, ColumnMetadata.named("server_id").withIndex(8).ofType(Types.VARCHAR).withSize(256));
+        addMetadata(timeStamp, ColumnMetadata.named("time_stamp").withIndex(5).ofType(Types.TIMESTAMP).withSize(26).notNull());
+        addMetadata(timeToLive, ColumnMetadata.named("time_to_live").withIndex(4).ofType(Types.TIMESTAMP).withSize(26));
     }
 
 }
