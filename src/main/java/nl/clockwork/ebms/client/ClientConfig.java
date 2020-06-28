@@ -40,7 +40,7 @@ public class ClientConfig
 	int connectTimeout;
 	@Value("${http.chunkedStreamingMode}")
 	boolean chunkedStreamingMode;
-	@Value("${http.base64Writer}")
+	//@Value("${http.base64Writer}")
 	boolean base64Writer;
 	@Value("${http.proxy.host}")
 	String proxyHost;
