@@ -39,7 +39,7 @@ CREATE TABLE ebms_message
 	PRIMARY KEY (message_id,message_nr)
 );
 
-CREATE INDEX i_ebms_message ON ebms_message (cpa_id,status,message_nr);
+CREATE INDEX i_ebms_ref_to_message ON ebms_message (ref_to_message_id,message_nr);
 
 CREATE TABLE ebms_attachment
 (

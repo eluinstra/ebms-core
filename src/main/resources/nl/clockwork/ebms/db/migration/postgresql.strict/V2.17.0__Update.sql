@@ -27,3 +27,6 @@ CREATE TABLE certificate_mapping
 
 ALTER TABLE ebms_event RENAME COLUMN channel_id TO receive_channel_id;
 ALTER TABLE ebms_event ADD send_channel_id VARCHAR(256) NULL;
+
+DROP INDEX i_ebms_message;
+CREATE INDEX i_ebms_ref_to_message ON ebms_message (ref_to_message_id,message_nr);
