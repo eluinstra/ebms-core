@@ -142,20 +142,8 @@ public class EventProcessorConfig
 		result.setMessageListener(new EbMSSendEventListener(eventHandler()));
 		return result;
 	}
-/*
-	@Bean("threadPoolDaemonExecutor")
+	@Bean
 	@Conditional(DefaultEventProcessorType.class)
-	public Object threadPoolDeamonExecutor() throws Exception
-	{
-		val result = new ThreadPoolTaskExecutor();
-		result.setDaemon(true);
-		result.setMaxPoolSize(1);
-		return result;
-	}
-*/
-	@Bean//(initMethod = "handleEvents")
-	@Conditional(DefaultEventProcessorType.class)
-	//@DependsOn(value = {"threadPoolDaemonExecutor","dataSourceTransactionManager"})
 	public EventTaskExecutor eventTaskExecutor()
 	{
 		return EventTaskExecutor.builder()

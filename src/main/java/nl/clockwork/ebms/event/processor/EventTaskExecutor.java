@@ -59,8 +59,6 @@ public class EventTaskExecutor implements Runnable
 		executor.execute(this);
 	}
 
-	//@Async("threadPoolDaemonExecutor")
-	//@Transactional(transactionManager = "dataSourceTransactionManager")
 	public void run()
 	{
 		val timedAction = new TimedAction(1000);

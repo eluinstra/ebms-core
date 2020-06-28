@@ -209,7 +209,7 @@ public class EventHandler
 		catch (Exception e)
 		{
 			transactionManager.rollback(status);
-			log.error("",e);
+			throw e;
 		}
 		transactionManager.commit(status);
 	}
