@@ -8,6 +8,8 @@ DROP TABLE ebms_attachment;
 
 DROP TABLE ebms_message;
 
-DROP TABLE cpa;
+DROP TABLE certificate_mapping;
 
-DROP TABLE url;
+DROP TABLE url_mapping;
+
+DROP TABLE cpa;
