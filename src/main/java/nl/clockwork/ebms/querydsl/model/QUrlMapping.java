@@ -37,14 +37,14 @@ public class QUrlMapping extends com.querydsl.sql.RelationalPathBase<QUrlMapping
 
     private static final long serialVersionUID = -871877026;
 
-    public static final QUrlMapping urlMapping = new QUrlMapping("URL_MAPPING");
+    public static final QUrlMapping urlMapping = new QUrlMapping("url_mapping");
 
     public final StringPath destination = createString("destination");
 
     public final StringPath source = createString("source");
 
     public QUrlMapping(String variable) {
-        super(QUrlMapping.class, forVariable(variable), "PUBLIC", "URL_MAPPING");
+        super(QUrlMapping.class, forVariable(variable), "PUBLIC", "url_mapping");
         addMetadata();
     }
 
@@ -54,23 +54,23 @@ public class QUrlMapping extends com.querydsl.sql.RelationalPathBase<QUrlMapping
     }
 
     public QUrlMapping(String variable, String schema) {
-        super(QUrlMapping.class, forVariable(variable), schema, "URL_MAPPING");
+        super(QUrlMapping.class, forVariable(variable), schema, "url_mapping");
         addMetadata();
     }
 
     public QUrlMapping(Path<? extends QUrlMapping> path) {
-        super(path.getType(), path.getMetadata(), "PUBLIC", "URL_MAPPING");
+        super(path.getType(), path.getMetadata(), "PUBLIC", "url_mapping");
         addMetadata();
     }
 
     public QUrlMapping(PathMetadata metadata) {
-        super(QUrlMapping.class, metadata, "PUBLIC", "URL_MAPPING");
+        super(QUrlMapping.class, metadata, "PUBLIC", "url_mapping");
         addMetadata();
     }
 
     public void addMetadata() {
-        addMetadata(destination, ColumnMetadata.named("DESTINATION").withIndex(2).ofType(Types.VARCHAR).withSize(256).notNull());
-        addMetadata(source, ColumnMetadata.named("SOURCE").withIndex(1).ofType(Types.VARCHAR).withSize(256).notNull());
+        addMetadata(destination, ColumnMetadata.named("destination").withIndex(2).ofType(Types.VARCHAR).withSize(256).notNull());
+        addMetadata(source, ColumnMetadata.named("source").withIndex(1).ofType(Types.VARCHAR).withSize(256).notNull());
     }
 
 }

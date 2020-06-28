@@ -75,14 +75,14 @@ public class QueryDSLConfig
 		val configuration = new com.querydsl.sql.Configuration(templates);
 		configuration.setExceptionTranslator(new SpringExceptionTranslator());
 		configuration.register(new InstantType(Types.TIMESTAMP));
-		configuration.register("CPA","CPA",new CollaborationProtocolAgreementType(Types.CLOB));
-		configuration.register("CERTIFICATE_MAPPING","SOURCE",new X509CertificateType(Types.BLOB));
-		configuration.register("CERTIFICATE_MAPPING","DESTINATION",new X509CertificateType(Types.BLOB));
-		configuration.register("EBMS_MESSAGE_EVENT","EVENT_TYPE",new EbMSMessageEventTypeType(Types.SMALLINT));
-		configuration.register("EBMS_EVENT_LOG","STATUS",new EbMSEventStatusType(Types.SMALLINT));
-		configuration.register("EBMS_MESSAGE","CONTENT",new DocumentType(Types.CLOB));
-		configuration.register("EBMS_MESSAGE","STATUS",new EbMSMessageStatusType(Types.SMALLINT));
-		configuration.register("EBMS_ATTACHMENT","CONTENT",new CachedOutputStreamType(Types.BLOB));
+		configuration.register("cpa","cpa",new CollaborationProtocolAgreementType(Types.CLOB));
+		configuration.register("certificate_mapping","source",new X509CertificateType(Types.BLOB));
+		configuration.register("certificate_mapping","destination",new X509CertificateType(Types.BLOB));
+		configuration.register("ebms_message_event","event_type",new EbMSMessageEventTypeType(Types.SMALLINT));
+		configuration.register("ebms_event_log","status",new EbMSEventStatusType(Types.SMALLINT));
+		configuration.register("ebms_message","content",new DocumentType(Types.CLOB));
+		configuration.register("ebms_message","status",new EbMSMessageStatusType(Types.SMALLINT));
+		configuration.register("ebms_attachment","content",new CachedOutputStreamType(Types.BLOB));
 		return configuration;
 	}
 

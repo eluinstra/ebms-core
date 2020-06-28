@@ -39,7 +39,7 @@ public class QEbmsAttachment extends com.querydsl.sql.RelationalPathBase<QEbmsAt
 
     private static final long serialVersionUID = 1332957957;
 
-    public static final QEbmsAttachment ebmsAttachment = new QEbmsAttachment("EBMS_ATTACHMENT");
+    public static final QEbmsAttachment ebmsAttachment = new QEbmsAttachment("ebms_attachment");
 
     public final SimplePath<org.apache.cxf.io.CachedOutputStream> content = createSimple("content", org.apache.cxf.io.CachedOutputStream.class);
 
@@ -55,10 +55,10 @@ public class QEbmsAttachment extends com.querydsl.sql.RelationalPathBase<QEbmsAt
 
     public final NumberPath<Short> orderNr = createNumber("orderNr", Short.class);
 
-    public final com.querydsl.sql.ForeignKey<QEbmsMessage> sysFk10141 = createForeignKey(Arrays.asList(messageId, messageNr), Arrays.asList("MESSAGE_ID", "MESSAGE_NR"));
+    public final com.querydsl.sql.ForeignKey<QEbmsMessage> sysFk10141 = createForeignKey(Arrays.asList(messageId, messageNr), Arrays.asList("message_id", "message_nr"));
 
     public QEbmsAttachment(String variable) {
-        super(QEbmsAttachment.class, forVariable(variable), "PUBLIC", "EBMS_ATTACHMENT");
+        super(QEbmsAttachment.class, forVariable(variable), "PUBLIC", "ebms_attachment");
         addMetadata();
     }
 
@@ -68,28 +68,28 @@ public class QEbmsAttachment extends com.querydsl.sql.RelationalPathBase<QEbmsAt
     }
 
     public QEbmsAttachment(String variable, String schema) {
-        super(QEbmsAttachment.class, forVariable(variable), schema, "EBMS_ATTACHMENT");
+        super(QEbmsAttachment.class, forVariable(variable), schema, "ebms_attachment");
         addMetadata();
     }
 
     public QEbmsAttachment(Path<? extends QEbmsAttachment> path) {
-        super(path.getType(), path.getMetadata(), "PUBLIC", "EBMS_ATTACHMENT");
+        super(path.getType(), path.getMetadata(), "PUBLIC", "ebms_attachment");
         addMetadata();
     }
 
     public QEbmsAttachment(PathMetadata metadata) {
-        super(QEbmsAttachment.class, metadata, "PUBLIC", "EBMS_ATTACHMENT");
+        super(QEbmsAttachment.class, metadata, "PUBLIC", "ebms_attachment");
         addMetadata();
     }
 
     public void addMetadata() {
-        addMetadata(content, ColumnMetadata.named("CONTENT").withIndex(7).ofType(Types.BLOB).withSize(1073741824).notNull());
-        addMetadata(contentId, ColumnMetadata.named("CONTENT_ID").withIndex(5).ofType(Types.VARCHAR).withSize(256).notNull());
-        addMetadata(contentType, ColumnMetadata.named("CONTENT_TYPE").withIndex(6).ofType(Types.VARCHAR).withSize(255).notNull());
-        addMetadata(messageId, ColumnMetadata.named("MESSAGE_ID").withIndex(1).ofType(Types.VARCHAR).withSize(256).notNull());
-        addMetadata(messageNr, ColumnMetadata.named("MESSAGE_NR").withIndex(2).ofType(Types.SMALLINT).withSize(16).notNull());
-        addMetadata(name, ColumnMetadata.named("NAME").withIndex(4).ofType(Types.VARCHAR).withSize(256));
-        addMetadata(orderNr, ColumnMetadata.named("ORDER_NR").withIndex(3).ofType(Types.SMALLINT).withSize(16).notNull());
+        addMetadata(content, ColumnMetadata.named("content").withIndex(7).ofType(Types.BLOB).withSize(1073741824).notNull());
+        addMetadata(contentId, ColumnMetadata.named("content_id").withIndex(5).ofType(Types.VARCHAR).withSize(256).notNull());
+        addMetadata(contentType, ColumnMetadata.named("content_type").withIndex(6).ofType(Types.VARCHAR).withSize(255).notNull());
+        addMetadata(messageId, ColumnMetadata.named("message_id").withIndex(1).ofType(Types.VARCHAR).withSize(256).notNull());
+        addMetadata(messageNr, ColumnMetadata.named("message_nr").withIndex(2).ofType(Types.SMALLINT).withSize(16).notNull());
+        addMetadata(name, ColumnMetadata.named("name").withIndex(4).ofType(Types.VARCHAR).withSize(256));
+        addMetadata(orderNr, ColumnMetadata.named("order_nr").withIndex(3).ofType(Types.SMALLINT).withSize(16).notNull());
     }
 
 }
