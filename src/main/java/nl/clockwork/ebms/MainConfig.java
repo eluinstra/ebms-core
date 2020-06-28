@@ -22,6 +22,7 @@ import org.springframework.context.annotation.PropertySource;
 
 import nl.clockwork.ebms.cache.CacheConfig;
 import nl.clockwork.ebms.client.ClientConfig;
+import nl.clockwork.ebms.client.DeliveryManagerConfig;
 import nl.clockwork.ebms.cpa.CPAManagerConfig;
 import nl.clockwork.ebms.dao.DAOConfig;
 import nl.clockwork.ebms.datasource.DataSourceConfig;
@@ -47,6 +48,7 @@ import nl.clockwork.ebms.validation.ValidationConfig;
 		CPAManagerConfig.class,
 		DAOConfig.class,
 		DataSourceConfig.class,
+		DeliveryManagerConfig.class,
 		EbMSProcessorConfig.class,
 		EncryptionConfig.class,
 		EventListenerConfig.class,

@@ -17,25 +17,15 @@ package nl.clockwork.ebms.client;
 
 import java.util.Set;
 
-import javax.jms.ConnectionFactory;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Condition;
-import org.springframework.context.annotation.ConditionContext;
-import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.type.AnnotatedTypeMetadata;
-import org.springframework.jms.core.JmsTemplate;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 import lombok.AccessLevel;
-import lombok.val;
 import lombok.experimental.FieldDefaults;
 import nl.clockwork.ebms.client.EbMSHttpClientFactory.EbMSHttpClientType;
-import nl.clockwork.ebms.cpa.CPAManager;
 import nl.clockwork.ebms.cpa.CertificateMapper;
 import nl.clockwork.ebms.security.EbMSKeyStore;
 import nl.clockwork.ebms.security.EbMSTrustStore;
@@ -44,10 +34,6 @@ import nl.clockwork.ebms.security.EbMSTrustStore;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class ClientConfig
 {
-	public enum DeliveryManagerType
-	{
-		DEFAULT, JMS;
-	}
 	@Value("${http.client}")
 	EbMSHttpClientType ebMSHttpClientType;
 	@Value("${http.connectTimeout}")
@@ -89,91 +75,34 @@ public class ClientConfig
 	CertificateMapper certificateMapper;
 	@Value("${https.useClientCertificate}")
 	boolean useClientCertificate;
-	@Value("${deliveryManager.type}")
-	DeliveryManagerType deliveryManagerType;
-	@Value("${deliveryManager.minThreads}")
-	Integer minThreads;
-	@Value("${deliveryManager.maxThreads}")
-	Integer maxThreads;
-	@Value("${messageQueue.maxEntries}")
-	int maxEntries;
-	@Value("${messageQueue.timeout}")
-	int timeout;
-	@Autowired
-	CPAManager cpaManager;
-	@Autowired
-	ConnectionFactory connectionFactory;
 
 	@Bean
 	public EbMSHttpClientFactory ebMSClientFactory() throws Exception
 	{
-		val ebMSProxy = new EbMSProxyFactory(proxyHost,poxyPort,proxyUsername,proxyPassword,nonProxyHosts).getObject();
-		val httpErrors = new HttpErrors(recoverableInformationalHttpErrors,recoverableRedirectionHttpErrors,recoverableClientHttpErrors,unrecoverableServerHttpErrors);
 		return EbMSHttpClientFactory.builder()
 				.type(ebMSHttpClientType)
 				.connectTimeout(connectTimeout)
 				.chunkedStreamingMode(chunkedStreamingMode)
 				.base64Writer(base64Writer)
-				.proxy(ebMSProxy)
+				.proxy(createProxy())
 				.enabledProtocols(enabledProtocols)
 				.enabledCipherSuites(enabledCipherSuites)
 				.verifyHostnames(verifyHostnames)
 				.keyStore(clientKeyStore)
 				.trustStore(trustStore)
-				.httpErrors(httpErrors)
+				.httpErrors(createHttpErrors())
 				.certificateMapper(certificateMapper)
 				.useClientCertificate(useClientCertificate)
 				.build();
 	}
 
-	@Bean("deliveryManagerTaskExecutor")
-	public ThreadPoolTaskExecutor deliveryManagerTaskExecutor() throws Exception
+	private EbMSProxy createProxy() throws Exception
 	{
-		val result = new ThreadPoolTaskExecutor();
-		result.setCorePoolSize(minThreads);
-		result.setMaxPoolSize(maxThreads);
-		result.setQueueCapacity(maxThreads * 2);
-		result.setWaitForTasksToCompleteOnShutdown(true);
-		return result;
+		return new EbMSProxyFactory(proxyHost,poxyPort,proxyUsername,proxyPassword,nonProxyHosts).getObject();
 	}
 
-	@Bean
-	@Conditional(defaultDeliveryManagerType.class)
-	public DeliveryManager defaultDeliveryManager() throws Exception
+	private HttpErrors createHttpErrors()
 	{
-		return DeliveryManager.builder()
-				.messageQueue(new EbMSMessageQueue(maxEntries,timeout))
-				.cpaManager(cpaManager)
-				.ebMSClientFactory(ebMSClientFactory())
-				.build();
-	}
-
-	@Bean
-	@Conditional(jmsDeliveryManagerType.class)
-	public DeliveryManager jmsDeliveryManager() throws Exception
-	{
-		return JMSDeliveryManager.jmsDeliveryManagerBuilder()
-				.messageQueue(new EbMSMessageQueue(maxEntries,timeout))
-				.cpaManager(cpaManager)
-				.ebMSClientFactory(ebMSClientFactory())
-				.jmsTemplate(new JmsTemplate(connectionFactory))
-				.build();
-	}
-
-	public static class defaultDeliveryManagerType implements Condition
-	{
-		@Override
-		public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata)
-		{
-			return context.getEnvironment().getProperty("deliveryManager.type",DeliveryManagerType.class,DeliveryManagerType.DEFAULT) == DeliveryManagerType.DEFAULT;
-		}
-	}
-	public static class jmsDeliveryManagerType implements Condition
-	{
-		@Override
-		public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata)
-		{
-			return context.getEnvironment().getProperty("deliveryManager.type",DeliveryManagerType.class,DeliveryManagerType.DEFAULT) == DeliveryManagerType.JMS;
-		}
+		return new HttpErrors(recoverableInformationalHttpErrors,recoverableRedirectionHttpErrors,recoverableClientHttpErrors,unrecoverableServerHttpErrors);
 	}
 }
