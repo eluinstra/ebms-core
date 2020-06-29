@@ -26,8 +26,6 @@ import javax.sql.DataSource;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.datasource.DataSourceTransactionManager;
-import org.springframework.transaction.support.TransactionTemplate;
 
 import com.atomikos.jdbc.internal.AtomikosSQLException;
 import com.querydsl.sql.Configuration;
@@ -39,7 +37,6 @@ import com.zaxxer.hikari.HikariDataSource;
 import lombok.AccessLevel;
 import lombok.val;
 import lombok.experimental.FieldDefaults;
-import nl.clockwork.ebms.transaction.TransactionManagerConfig.TransactionManagerType;
 
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class DAOFactoryTest
@@ -51,11 +48,9 @@ public class DAOFactoryTest
 	@BeforeEach
 	public void init() throws AtomikosSQLException, PropertyVetoException
 	{
-		TransactionManagerType type = TransactionManagerType.DEFAULT;
 		ds = new HikariDataSource();
-		val transactionTemplage = new TransactionTemplate(new DataSourceTransactionManager(ds));
 		val jdbcTemplate = new JdbcTemplate(ds);
-		daoFactory = new EbMSDAOFactory(type,ds,transactionTemplage,jdbcTemplate,createQueryFactory(ds));
+		daoFactory = new EbMSDAOFactory(ds,jdbcTemplate,createQueryFactory(ds));
 	}
 
 	private SQLQueryFactory createQueryFactory(DataSource dataSource) throws AtomikosSQLException, PropertyVetoException

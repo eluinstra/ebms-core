@@ -136,7 +136,10 @@ public class DataSourceConfig
 	private Properties createDriverProperties()
 	{
 		val result = new Properties();
-    result.put("url",jdbcUrl);
+		if (driverClassName.contains("sqlserver"))
+			result.put("URL",jdbcUrl);
+		else
+			result.put("url",jdbcUrl);
     result.put("user",username);
     result.put("password",password);
 		return result;

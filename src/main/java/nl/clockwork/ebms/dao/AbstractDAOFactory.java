@@ -55,7 +55,7 @@ public abstract class AbstractDAOFactory<T> implements FactoryBean<T>
 		return Match(driverClassName).of(
 				Case($(contains("db2")),o -> createDB2DAO()),
 				Case($(contains("hsqldb")),o -> createHSqlDbDAO()),
-				Case($(contains("mysql")),o -> createMySqlDAO()),
+				Case($(contains("mysql","mariadb")),o -> createMySqlDAO()),
 				Case($(contains("oracle")),o -> createOracleDAO()),
 				Case($(contains("postgresql")),o -> createPostgresDAO()),
 				Case($(contains("sqlserver")),o -> createMsSqlDAO()),

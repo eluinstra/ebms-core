@@ -15,13 +15,14 @@
  */
 package nl.clockwork.ebms;
 
+import java.util.Arrays;
 import java.util.function.Predicate;
 
 public final class Predicates
 {
-	public static Predicate<String> contains(String value)
+	public static Predicate<String> contains(String...values)
 	{
-		return obj -> obj.contains(value);
+		return obj -> Arrays.stream(values).anyMatch(v -> obj.contains(v));
 	}
 
 	public static Predicate<String> startsWith(String value)

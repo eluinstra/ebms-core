@@ -84,6 +84,17 @@ abstract class AbstractEbMSDAO implements EbMSDAO
 	Expression<?>[] attachmentColumns = {attachmentTable.name,attachmentTable.contentId,attachmentTable.contentType,attachmentTable.content};
 	ConstructorExpression<CachedEbMSAttachment> ebMSAttachmentProjection = 
 			Projections.constructor(CachedEbMSAttachment.class,attachmentTable.name,attachmentTable.contentId,attachmentTable.contentType,attachmentTable.content);
+	RowMapper<EbMSAttachment> ebMSAttachmentRowMapper =	(rs,rowNum) ->
+	{
+		try
+		{
+			return EbMSAttachmentFactory.createCachedEbMSAttachment(rs.getString("name"),rs.getString("content_id"),rs.getString("content_type"),rs.getBinaryStream("content"));
+		}
+		catch (IOException e)
+		{
+			throw new DataRetrievalFailureException("",e);
+		}
+	};
 	RowMapper<EbMSDataSource> ebMSDataSourceRowMapper =	(rs,rowNum) ->
 	{
 		try
@@ -196,7 +207,8 @@ abstract class AbstractEbMSDAO implements EbMSDAO
 			val builder = EbMSDocument.builder()
 				.contentId(messageId)
 				.message(content)
-				.attachments(getAttachments(messageId,ebMSAttachmentProjection).stream().map(a -> a).collect(Collectors.toList()));
+				//.attachments(getAttachments(messageId,ebMSAttachmentProjection).stream().map(a -> a).collect(Collectors.toList()));
+				.attachments(getAttachments(messageId,ebMSAttachmentRowMapper).stream().map(a -> a).collect(Collectors.toList()));
 			return Optional.of(builder.build());
 		}
 		else
@@ -225,7 +237,8 @@ abstract class AbstractEbMSDAO implements EbMSDAO
 			val builder = EbMSDocument.builder()
 					.contentId(document.getContentId())
 					.message(document.getMessage())
-					.attachments(getAttachments(refToMessageId,ebMSAttachmentProjection).stream().map(a -> a).collect(Collectors.toList()));
+					//.attachments(getAttachments(refToMessageId,ebMSAttachmentProjection).stream().map(a -> a).collect(Collectors.toList()));
+					.attachments(getAttachments(refToMessageId,ebMSAttachmentRowMapper).stream().map(a -> a).collect(Collectors.toList()));
 			return Optional.of(builder.build());
 		}
 		else

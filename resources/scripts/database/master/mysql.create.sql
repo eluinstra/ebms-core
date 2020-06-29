@@ -12,7 +12,7 @@ CREATE TABLE url_mapping
 	destination				VARCHAR(256)		NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-ALTER TABLE url ADD CONSTRAINT uc_url_source UNIQUE (source(255));
+ALTER TABLE url_mapping ADD CONSTRAINT uc_url_source UNIQUE (source(255));
 
 CREATE TABLE certificate_mapping
 (
@@ -21,7 +21,7 @@ CREATE TABLE certificate_mapping
 	destination				BLOB					NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-ALTER TABLE client_certificate ADD CONSTRAINT uc_client_certificate_id UNIQUE (source(255));
+ALTER TABLE certificate_mapping ADD CONSTRAINT uc_certificate_mapping_id UNIQUE (id(255));
 
 CREATE TABLE ebms_message
 (

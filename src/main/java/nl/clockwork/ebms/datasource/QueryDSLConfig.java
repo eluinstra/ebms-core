@@ -36,7 +36,7 @@ import com.querydsl.sql.MySQLTemplates;
 import com.querydsl.sql.OracleTemplates;
 import com.querydsl.sql.PostgreSQLTemplates;
 import com.querydsl.sql.SQLQueryFactory;
-import com.querydsl.sql.SQLServerTemplates;
+import com.querydsl.sql.SQLServer2012Templates;
 import com.querydsl.sql.SQLTemplates;
 import com.querydsl.sql.spring.SpringConnectionProvider;
 import com.querydsl.sql.spring.SpringExceptionTranslator;
@@ -100,7 +100,7 @@ public class QueryDSLConfig
 				Case($(contains("mysql")),o -> MySQLTemplates.builder().build()),
 				Case($(contains("oracle")),o -> OracleTemplates.builder().build()),
 				Case($(contains("postgresql")),o -> PostgreSQLTemplates.builder().build()),
-				Case($(contains("sqlserver")),o -> SQLServerTemplates.builder().build()),
+				Case($(contains("sqlserver")),o -> SQLServer2012Templates.builder().build()),
 				Case($(),o -> {
 					throw new RuntimeException("Jdbc url " + jdbcUrl + " not recognized!");
 				}));
