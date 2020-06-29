@@ -325,7 +325,7 @@ abstract class AbstractEbMSDAO implements EbMSDAO
 									"status_time," +
 									"persist_time" +
 								") values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
-								new int[]{4,5}
+								new String[]{"message_id","message_nr"}
 							);
 							ps.setTimestamp(1,Timestamp.from(timestamp));
 							ps.setString(2,messageHeader.getCPAId());

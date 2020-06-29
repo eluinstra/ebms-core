@@ -18,16 +18,22 @@ package nl.clockwork.ebms.dao;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.Instant;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.xml.transform.TransformerException;
 
 import org.springframework.dao.DataRetrievalFailureException;
+import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
+import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.support.KeyHolder;
 import org.w3c.dom.Document;
 
@@ -40,8 +46,42 @@ import nl.clockwork.ebms.model.EbMSAttachment;
 import nl.clockwork.ebms.model.EbMSBaseMessage;
 import nl.clockwork.ebms.util.DOMUtils;
 
-class DB2EbMSDAO extends nl.clockwork.ebms.dao.PostgreSQLEbMSDAO
+class DB2EbMSDAO extends AbstractEbMSDAO
 {
+	public class KeyExtractor implements ResultSetExtractor<KeyHolder>
+	{
+		@Override
+		public KeyHolder extractData(ResultSet rs) throws SQLException
+		{
+			if (rs.next())
+			{
+				val keys = new HashMap<String,Object>();
+				keys.put("message_id",rs.getString("message_id"));
+				keys.put("message_nr",rs.getInt("message_nr"));
+				return new KeyHolder()
+				{
+					@Override
+					public Map<String,Object> getKeys() throws InvalidDataAccessApiUsageException
+					{
+						return keys;
+					}
+					@Override
+					public List<Map<String,Object>> getKeyList()
+					{
+						return Arrays.asList(keys);
+					}
+					@Override
+					public Number getKey() throws InvalidDataAccessApiUsageException
+					{
+						throw new InvalidDataAccessApiUsageException("");
+					}
+				};
+			}
+			else
+				return null;
+		}
+	}
+
 	public DB2EbMSDAO(JdbcTemplate jdbcTemplate, SQLQueryFactory queryFactory)
 	{
 		super(jdbcTemplate,queryFactory);
