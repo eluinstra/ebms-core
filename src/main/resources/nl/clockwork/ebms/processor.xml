@@ -288,7 +288,7 @@
 		<property name="sslFactoryManager" ref="sslFactoryManager"/>
 		<property name="connectTimeout" value="${http.connectTimeout}"/>
 		<property name="chunkedStreamingMode" value="${http.chunkedStreamingMode}"/>
-		<property name="base64Writer" value="${http.base64Writer}"/>
+		<!--property name="base64Writer" value="${http.base64Writer}"/-->
 		<property name="proxy" ref="ebMSProxy"/>
 		<property name="enabledProtocols" value="${https.protocols}"/>
 		<property name="enabledCipherSuites" value="${https.cipherSuites}"/>
