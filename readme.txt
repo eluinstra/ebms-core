@@ -6,7 +6,7 @@ ebms-core version 2.16.0 and up are released in the Central Maven repository:
 <dependency>
   <groupId>nl.clockwork.ebms</groupId>
   <artifactId>ebms-core</artifactId>
-  <version>2.16.6</version>
+  <version>2.16.7</version>
 </dependency>
 
 ebms adapter for mule and web are no longer released; use ebms-admin instead
@@ -16,6 +16,10 @@ For the ebms-admin console see https://sourceforge.net/projects/javaebmsadmin/
 ===============
 = Release Notes
 ===============
+ebms-core-2.16.7.jar:
+- disabled base64Writer because of a bug when sending base64 encoded content
+- fixed using header defined in property x509CertificateHeader
+
 ebms-core-2.16.6.jar:
 - fixed bug: the references in a signed acknowledgment is not validated correctly, which will not set the status of the message to DELIVERED but eventually to EXPIRED instead
 - fixed issue using asynchronous messaging and no receive deliveryChannel can be found. The message will be stored and returned synchronously as an error now
