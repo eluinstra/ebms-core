@@ -19,6 +19,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
 
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import lombok.AccessLevel;
@@ -29,6 +30,7 @@ import nl.clockwork.ebms.service.cpa.url.URLMapping;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor
+@Transactional(transactionManager = "dataSourceTransactionManager")
 public class URLMapper
 {
 	@NonNull
@@ -65,6 +67,11 @@ public class URLMapper
 		}
 	}
 
+	public void deleteURLMapping(String source)
+	{
+		urlMappingDAO.deleteURLMapping(source);
+	}
+
 	private void validate(URLMapping urlMapping)
 	{
 		validateUrl(urlMapping.getSource(),"Source");
@@ -81,10 +88,5 @@ public class URLMapper
 		{
 			throw new IllegalArgumentException(propertyName + " invalid",e);
 		}
-	}
-
-	public void deleteURLMapping(String source)
-	{
-		urlMappingDAO.deleteURLMapping(source);
 	}
 }

@@ -20,7 +20,6 @@ import java.util.ArrayList;
 import java.util.concurrent.Future;
 
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
-import org.springframework.transaction.PlatformTransactionManager;
 
 import io.vavr.control.Try;
 import lombok.AccessLevel;
@@ -36,9 +35,7 @@ import nl.clockwork.ebms.Action;
 public class EventTaskExecutor implements Runnable
 {
 	@NonNull
-	PlatformTransactionManager transactionManager;
-	@NonNull
-	EbMSEventDAO ebMSEventDAO;
+	EventManager eventManager;
 	@NonNull
 	EventHandler eventHandler;
 	@NonNull TimedAction timedAction;
@@ -46,10 +43,9 @@ public class EventTaskExecutor implements Runnable
 	String serverId;
 
 	@Builder
-	public EventTaskExecutor(@NonNull PlatformTransactionManager transactionManager, @NonNull EbMSEventDAO ebMSEventDAO, @NonNull EventHandler eventHandler, @NonNull TimedAction timedAction, int maxEvents, String serverId)
+	public EventTaskExecutor(@NonNull EventManager eventManager, @NonNull EventHandler eventHandler, @NonNull TimedAction timedAction, int maxEvents, String serverId)
 	{
-		this.transactionManager = transactionManager;
-		this.ebMSEventDAO = ebMSEventDAO;
+		this.eventManager = eventManager;
 		this.eventHandler = eventHandler;
 		this.timedAction = timedAction;
 		this.maxEvents = maxEvents;
@@ -68,11 +64,10 @@ public class EventTaskExecutor implements Runnable
   		Action action = () ->
   		{
 				val futures = new ArrayList<Future<?>>();
-				val status = transactionManager.getTransaction(null);
 				try
 				{
 					val timestamp = Instant.now();
-					val events = maxEvents > 0 ? ebMSEventDAO.getEventsBefore(timestamp,serverId,maxEvents) : ebMSEventDAO.getEventsBefore(timestamp,serverId);
+					val events = maxEvents > 0 ? eventManager.getEventsBefore(timestamp,serverId,maxEvents) : eventManager.getEventsBefore(timestamp,serverId);
 					for (EbMSEvent event : events)
 						futures.add(eventHandler.handleAsync(event));
 				}
@@ -80,7 +75,6 @@ public class EventTaskExecutor implements Runnable
 				{
 					log.error("",e);
 				}
-				transactionManager.commit(status);
 				futures.forEach(f -> Try.of(() -> f.get()).onFailure(e -> log.error("",e)));
   		};
   		try

@@ -25,7 +25,6 @@ import javax.xml.soap.SOAPException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactoryConfigurationError;
 
-import org.springframework.transaction.annotation.Transactional;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
@@ -36,6 +35,7 @@ import lombok.NonNull;
 import lombok.val;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import nl.clockwork.ebms.Action;
 import nl.clockwork.ebms.EbMSAction;
 import nl.clockwork.ebms.EbMSMessageFactory;
 import nl.clockwork.ebms.EbMSMessageStatus;
@@ -58,6 +58,7 @@ import nl.clockwork.ebms.service.model.EbMSMessageContext;
 import nl.clockwork.ebms.service.model.EbMSMessageEvent;
 import nl.clockwork.ebms.service.model.MessageStatus;
 import nl.clockwork.ebms.signing.EbMSSignatureGenerator;
+import nl.clockwork.ebms.transaction.TransactionTemplate;
 import nl.clockwork.ebms.util.StreamUtils;
 import nl.clockwork.ebms.validation.EbMSMessageContextValidator;
 
@@ -65,9 +66,10 @@ import nl.clockwork.ebms.validation.EbMSMessageContextValidator;
 @Builder
 @FieldDefaults(level = AccessLevel.PACKAGE, makeFinal = true)
 @AllArgsConstructor
-@Transactional(transactionManager = "dataSourceTransactionManager")
 public class EbMSMessageServiceHandler
 {
+	@NonNull
+	TransactionTemplate transactionTemplate;
   @NonNull
 	DeliveryManager deliveryManager;
   @NonNull
@@ -233,12 +235,16 @@ public class EbMSMessageServiceHandler
 		try
 		{
 			log.debug("ProcessMessage " + messageId);
-			if (ebMSDAO.updateMessage(messageId,EbMSMessageStatus.RECEIVED,EbMSMessageStatus.PROCESSED) > 0)
+			Action action = () ->
 			{
-				if (deleteEbMSAttachmentsOnMessageProcessed)
-					ebMSDAO.deleteAttachments(messageId);
-				log.info("Message " + messageId + " processed");
-			}
+				if (ebMSDAO.updateMessage(messageId,EbMSMessageStatus.RECEIVED,EbMSMessageStatus.PROCESSED) > 0)
+				{
+					if (deleteEbMSAttachmentsOnMessageProcessed)
+						ebMSDAO.deleteAttachments(messageId);
+					log.info("Message " + messageId + " processed");
+				}
+			};
+			transactionTemplate.executeTransaction(action);
 		}
 		catch (Exception e)
 		{
@@ -309,8 +315,12 @@ public class EbMSMessageServiceHandler
 		try
 		{
 			log.debug("ProcessMessageEvent " + messageId);
-			ebMSMessageEventDAO.processEbMSMessageEvent(messageId);
-			processMessage(messageId);
+			Action action = () ->
+			{
+				ebMSMessageEventDAO.processEbMSMessageEvent(messageId);
+				processMessage(messageId);
+			};
+			transactionTemplate.executeTransaction(action);
 		}
 		catch (Exception e)
 		{
@@ -328,23 +338,27 @@ public class EbMSMessageServiceHandler
 
 	private void storeMessage(Document document, EbMSMessage message) throws EbMSProcessorException
 	{
-		try
+		Action action = () ->
 		{
-			val timestamp = Instant.now();
-			val messageHeader = message.getMessageHeader();
-			val service = CPAUtils.toString(messageHeader.getService());
-			val sendDeliveryChannel = cpaManager.getSendDeliveryChannel(messageHeader.getCPAId(),messageHeader.getFrom().getPartyId(),messageHeader.getFrom().getRole(),service,messageHeader.getAction())
-							.orElseThrow(() -> StreamUtils.illegalStateException("SendDeliveryChannel",messageHeader.getCPAId(),messageHeader.getFrom().getPartyId(),messageHeader.getFrom().getRole(),service,messageHeader.getAction()));
-			val receiveDeliveryChannel = cpaManager.getReceiveDeliveryChannel(messageHeader.getCPAId(),messageHeader.getTo().getPartyId(),messageHeader.getTo().getRole(),service,messageHeader.getAction())
-							.orElseThrow(() -> StreamUtils.illegalStateException("ReceiveDeliveryChannel",messageHeader.getCPAId(),messageHeader.getTo().getPartyId(),messageHeader.getTo().getRole(),service,messageHeader.getAction()));
-			val persistTime = CPAUtils.getPersistTime(timestamp,receiveDeliveryChannel);
-			val confidential = cpaManager.isConfidential(messageHeader.getCPAId(),messageHeader.getFrom().getPartyId(),messageHeader.getFrom().getRole(),service,messageHeader.getAction());
-			ebMSDAO.insertMessage(timestamp,persistTime,document,message,message.getAttachments(),EbMSMessageStatus.SENDING);
-			eventManager.createEvent(messageHeader.getCPAId(),sendDeliveryChannel,receiveDeliveryChannel,messageHeader.getMessageData().getMessageId(),messageHeader.getMessageData().getTimeToLive(),messageHeader.getMessageData().getTimestamp(),confidential);
-		}
-		catch (IllegalStateException | TransformerFactoryConfigurationError e)
-		{
-			throw new EbMSProcessorException(e);
-		}
+			try
+			{
+				val timestamp = Instant.now();
+				val messageHeader = message.getMessageHeader();
+				val service = CPAUtils.toString(messageHeader.getService());
+				val sendDeliveryChannel = cpaManager.getSendDeliveryChannel(messageHeader.getCPAId(),messageHeader.getFrom().getPartyId(),messageHeader.getFrom().getRole(),service,messageHeader.getAction())
+								.orElseThrow(() -> StreamUtils.illegalStateException("SendDeliveryChannel",messageHeader.getCPAId(),messageHeader.getFrom().getPartyId(),messageHeader.getFrom().getRole(),service,messageHeader.getAction()));
+				val receiveDeliveryChannel = cpaManager.getReceiveDeliveryChannel(messageHeader.getCPAId(),messageHeader.getTo().getPartyId(),messageHeader.getTo().getRole(),service,messageHeader.getAction())
+								.orElseThrow(() -> StreamUtils.illegalStateException("ReceiveDeliveryChannel",messageHeader.getCPAId(),messageHeader.getTo().getPartyId(),messageHeader.getTo().getRole(),service,messageHeader.getAction()));
+				val persistTime = CPAUtils.getPersistTime(timestamp,receiveDeliveryChannel);
+				val confidential = cpaManager.isConfidential(messageHeader.getCPAId(),messageHeader.getFrom().getPartyId(),messageHeader.getFrom().getRole(),service,messageHeader.getAction());
+				ebMSDAO.insertMessage(timestamp,persistTime,document,message,message.getAttachments(),EbMSMessageStatus.SENDING);
+				eventManager.createEvent(messageHeader.getCPAId(),sendDeliveryChannel,receiveDeliveryChannel,messageHeader.getMessageData().getMessageId(),messageHeader.getMessageData().getTimeToLive(),messageHeader.getMessageData().getTimestamp(),confidential);
+			}
+			catch (IllegalStateException | TransformerFactoryConfigurationError e)
+			{
+				throw new EbMSProcessorException(e);
+			}
+		};
+		transactionTemplate.executeTransaction(action);
 	}
 }

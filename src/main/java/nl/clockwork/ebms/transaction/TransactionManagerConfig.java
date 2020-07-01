@@ -63,6 +63,12 @@ public class TransactionManagerConfig
 	@Autowired
 	ConnectionFactory connectionFactory;
 
+	@Bean
+	public DataSourceTransactionTemplate dataSourceTransactionTemplate()
+	{
+		return new DataSourceTransactionTemplate();
+	}
+
 	@Bean("dataSourceTransactionManager")
 	@Conditional(DefaultTransactionManagerType.class)
 	public PlatformTransactionManager dataSourceTransactionManager() throws SystemException, AtomikosSQLException, PropertyVetoException

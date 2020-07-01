@@ -18,6 +18,8 @@ package nl.clockwork.ebms.cpa;
 import java.security.cert.X509Certificate;
 import java.util.List;
 
+import org.springframework.transaction.annotation.Transactional;
+
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
@@ -27,6 +29,7 @@ import nl.clockwork.ebms.service.cpa.certificate.CertificateMapping;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor
+@Transactional(transactionManager = "dataSourceTransactionManager")
 public class CertificateMapper
 {
 	@NonNull

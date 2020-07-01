@@ -19,6 +19,8 @@ import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.List;
 
+import org.springframework.transaction.annotation.Transactional;
+
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Projections;
 import com.querydsl.sql.SQLQueryFactory;
@@ -44,6 +46,7 @@ public class EbMSMessageEventDAOImpl implements EbMSMessageEventDAO
 	QEbmsMessage messageTable = QEbmsMessage.ebmsMessage;
 
 	@Override
+	@Transactional(transactionManager = "dataSourceTransactionManager")
 	public List<EbMSMessageEvent> getEbMSMessageEvents(EbMSMessageContext messageContext, EbMSMessageEventType[] types)
 	{
 		var whereClause = new BooleanBuilder(messageTable.messageId.eq(table.messageId)
@@ -59,6 +62,7 @@ public class EbMSMessageEventDAOImpl implements EbMSMessageEventDAO
 	}
 
 	@Override
+	@Transactional(transactionManager = "dataSourceTransactionManager")
 	public List<EbMSMessageEvent> getEbMSMessageEvents(EbMSMessageContext messageContext, EbMSMessageEventType[] types, int maxNr)
 	{
 		var whereClause = new BooleanBuilder(messageTable.messageId.eq(table.messageId)

@@ -21,6 +21,7 @@ import java.util.Optional;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CollaborationProtocolAgreement;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.querydsl.sql.SQLQueryFactory;
 
@@ -32,6 +33,7 @@ import nl.clockwork.ebms.querydsl.model.QCpa;
 
 @FieldDefaults(level = AccessLevel.PROTECTED, makeFinal = true)
 @RequiredArgsConstructor
+@Transactional(transactionManager = "dataSourceTransactionManager")
 public class CPADAOImpl implements CPADAO
 {
 	@NonNull

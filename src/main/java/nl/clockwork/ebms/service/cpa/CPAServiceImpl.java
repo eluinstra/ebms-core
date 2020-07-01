@@ -18,7 +18,6 @@ package nl.clockwork.ebms.service.cpa;
 import java.util.List;
 
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CollaborationProtocolAgreement;
-import org.springframework.transaction.annotation.Transactional;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -34,7 +33,6 @@ import nl.clockwork.ebms.validation.XSDValidator;
 @Slf4j
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor
-@Transactional(transactionManager = "dataSourceTransactionManager")
 public class CPAServiceImpl implements CPAService
 {
   @NonNull

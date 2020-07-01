@@ -37,6 +37,7 @@ import nl.clockwork.ebms.service.cpa.certificate.CertificateMappingServiceImpl;
 import nl.clockwork.ebms.service.cpa.url.URLMappingService;
 import nl.clockwork.ebms.service.cpa.url.URLMappingServiceImpl;
 import nl.clockwork.ebms.signing.EbMSSignatureGenerator;
+import nl.clockwork.ebms.transaction.TransactionTemplate;
 import nl.clockwork.ebms.validation.CPAValidator;
 import nl.clockwork.ebms.validation.EbMSMessageContextValidator;
 
@@ -44,6 +45,8 @@ import nl.clockwork.ebms.validation.EbMSMessageContextValidator;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class ServiceConfig
 {
+	@Autowired
+	TransactionTemplate dataSourceTransactionTemplate;
 	@Autowired
 	CPAManager cpaManager;
 	@Autowired
@@ -103,6 +106,7 @@ public class ServiceConfig
 	public EbMSMessageServiceHandler ebMSMessageServiceHandler()
 	{
 		return EbMSMessageServiceHandler.builder()
+				.transactionTemplate(dataSourceTransactionTemplate)
 				.deliveryManager(deliveryManager)
 				.ebMSDAO(ebMSDAO)
 				.ebMSMessageEventDAO(ebMSMessageEventDAO)

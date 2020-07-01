@@ -42,6 +42,7 @@ import nl.clockwork.ebms.dao.EbMSDAO;
 import nl.clockwork.ebms.encryption.EbMSMessageEncrypter;
 import nl.clockwork.ebms.event.listener.EventListener;
 import nl.clockwork.ebms.processor.EbMSMessageProcessor;
+import nl.clockwork.ebms.transaction.TransactionTemplate;
 
 @Configuration
 @EnableAsync
@@ -52,8 +53,6 @@ public class EventProcessorConfig
 	{
 		NONE, DEFAULT, JMS;
 	}
-	@Autowired
-	EbMSEventDAO ebMSEventDAO;
 	@Autowired
 	CPAManager cpaManager;
 	@Value("${ebms.serverId}")
@@ -91,8 +90,7 @@ public class EventProcessorConfig
 	@Autowired
 	ConnectionFactory connectionFactory;
 	@Autowired
-	@Qualifier("dataSourceTransactionManager")
-	PlatformTransactionManager dataSourceTransactionManager;
+	TransactionTemplate dataSourceTransactionTemplate;
 	@Autowired
 	@Qualifier("jmsTransactionManager")
 	PlatformTransactionManager jmsTransactionManager;
@@ -116,8 +114,7 @@ public class EventProcessorConfig
 	public EventTaskExecutor eventTaskExecutor()
 	{
 		return EventTaskExecutor.builder()
-				.transactionManager(dataSourceTransactionManager)
-				.ebMSEventDAO(ebMSEventDAO)
+				.eventManager(eventManager)
 				.eventHandler(eventHandler())
 				.timedAction(new TimedAction(eventProcessorExecutionInterval))
 				.maxEvents(maxEvents)
@@ -145,7 +142,7 @@ public class EventProcessorConfig
   public EventHandler eventHandler()
 	{
 		return EventHandler.builder()
-				.transactionManager(dataSourceTransactionManager)
+				.transactionTemplate(dataSourceTransactionTemplate)
 				.eventListener(eventListener)
 				.ebMSDAO(ebMSDAO)
 				.cpaManager(cpaManager)

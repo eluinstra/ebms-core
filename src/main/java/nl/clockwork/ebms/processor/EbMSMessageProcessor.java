@@ -26,7 +26,6 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.xpath.XPathExpressionException;
 
-import org.springframework.transaction.annotation.Transactional;
 import org.xml.sax.SAXException;
 
 import lombok.AccessLevel;
@@ -35,6 +34,7 @@ import lombok.NonNull;
 import lombok.val;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import nl.clockwork.ebms.Action;
 import nl.clockwork.ebms.EbMSMessageFactory;
 import nl.clockwork.ebms.EbMSMessageStatus;
 import nl.clockwork.ebms.EbMSMessageUtils;
@@ -54,6 +54,7 @@ import nl.clockwork.ebms.model.EbMSPong;
 import nl.clockwork.ebms.model.EbMSStatusRequest;
 import nl.clockwork.ebms.model.EbMSStatusResponse;
 import nl.clockwork.ebms.signing.EbMSSignatureGenerator;
+import nl.clockwork.ebms.transaction.TransactionTemplate;
 import nl.clockwork.ebms.util.DOMUtils;
 import nl.clockwork.ebms.validation.DuplicateMessageException;
 import nl.clockwork.ebms.validation.EbMSMessageValidator;
@@ -64,9 +65,10 @@ import nl.clockwork.ebms.validation.XSDValidator;
 
 @Slf4j
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-@Transactional(transactionManager = "dataSourceTransactionManager")
 public class EbMSMessageProcessor
 {
+	@NonNull
+	TransactionTemplate transactionTemplate;
   @NonNull
   EventListener eventListener;
   @NonNull
@@ -85,9 +87,9 @@ public class EbMSMessageProcessor
 	PongProcessor pongProcessor;
 
 	@Builder
-	public EbMSMessageProcessor(@NonNull DeliveryManager deliveryManager, @NonNull EventListener eventListener, @NonNull EbMSDAO ebMSDAO, @NonNull CPAManager cpaManager, @NonNull EbMSMessageFactory ebMSMessageFactory, @NonNull EventManager eventManager, @NonNull EbMSSignatureGenerator signatureGenerator, @NonNull EbMSMessageValidator messageValidator, @NonNull DuplicateMessageHandler duplicateMessageHandler, boolean deleteEbMSAttachmentsOnMessageProcessed)
+	public EbMSMessageProcessor(@NonNull TransactionTemplate transactionTemplate, @NonNull DeliveryManager deliveryManager, @NonNull EventListener eventListener, @NonNull EbMSDAO ebMSDAO, @NonNull CPAManager cpaManager, @NonNull EbMSMessageFactory ebMSMessageFactory, @NonNull EventManager eventManager, @NonNull EbMSSignatureGenerator signatureGenerator, @NonNull EbMSMessageValidator messageValidator, @NonNull DuplicateMessageHandler duplicateMessageHandler, boolean deleteEbMSAttachmentsOnMessageProcessed)
 	{
-		super();
+		this.transactionTemplate = transactionTemplate;
 		this.eventListener = eventListener;
 		this.ebMSDAO = ebMSDAO;
 		this.cpaManager = cpaManager;
@@ -95,6 +97,7 @@ public class EbMSMessageProcessor
 		this.duplicateMessageHandler = duplicateMessageHandler;
 		this.deleteEbMSAttachmentsOnMessageProcessed = deleteEbMSAttachmentsOnMessageProcessed;
 		this.messageErrorProcessor = MessageErrorProcessor.builder()
+				.transactionTemplate(transactionTemplate)
 				.ebMSDAO(ebMSDAO)
 				.cpaManager(cpaManager)
 				.eventManager(eventManager)
@@ -106,6 +109,7 @@ public class EbMSMessageProcessor
 				.deleteEbMSAttachmentsOnMessageProcessed(deleteEbMSAttachmentsOnMessageProcessed)
 				.build();
 		this.acknowledgmentProcessor = AcknowledgmentProcessor.builder()
+				.transactionTemplate(transactionTemplate)
 				.ebMSDAO(ebMSDAO)
 				.cpaManager(cpaManager)
 				.eventManager(eventManager)
@@ -286,22 +290,30 @@ public class EbMSMessageProcessor
 
 	private void storeMessage(final Instant timestamp, final EbMSDocument messageDocument, final EbMSMessage message)
 	{
-		ebMSDAO.insertMessage(timestamp,null,messageDocument.getMessage(),message,message.getAttachments(),EbMSMessageStatus.RECEIVED);
-		eventListener.onMessageReceived(message.getMessageHeader().getMessageData().getMessageId());
+		Action action = () ->
+		{
+			ebMSDAO.insertMessage(timestamp,null,messageDocument.getMessage(),message,message.getAttachments(),EbMSMessageStatus.RECEIVED);
+			eventListener.onMessageReceived(message.getMessageHeader().getMessageData().getMessageId());
+		};
+		transactionTemplate.executeTransaction(action);
 	}
 
 	private void processMessage(final EbMSMessage message)
 	{
-		val messageHeader = message.getMessageHeader();
-		if (ebMSDAO.updateMessage(
-				messageHeader .getMessageData().getMessageId(),
-				EbMSMessageStatus.SENDING,
-				EbMSMessageStatus.DELIVERED) > 0)
+		Action action = () ->
 		{
-			eventListener.onMessageDelivered(messageHeader.getMessageData().getMessageId());
-			if (deleteEbMSAttachmentsOnMessageProcessed)
-				ebMSDAO.deleteAttachments(messageHeader.getMessageData().getMessageId());
-		}
+			val messageHeader = message.getMessageHeader();
+			if (ebMSDAO.updateMessage(
+					messageHeader .getMessageData().getMessageId(),
+					EbMSMessageStatus.SENDING,
+					EbMSMessageStatus.DELIVERED) > 0)
+			{
+				eventListener.onMessageDelivered(messageHeader.getMessageData().getMessageId());
+				if (deleteEbMSAttachmentsOnMessageProcessed)
+					ebMSDAO.deleteAttachments(messageHeader.getMessageData().getMessageId());
+			}
+		};
+		transactionTemplate.executeTransaction(action);
 	}
 
 	private EbMSDocument processStatusRequest(Instant timestamp, EbMSStatusRequest statusRequest) throws DatatypeConfigurationException, JAXBException, SOAPException, ParserConfigurationException, SAXException, IOException, TransformerFactoryConfigurationError, TransformerException

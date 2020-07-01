@@ -27,6 +27,7 @@ import lombok.NonNull;
 import lombok.val;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import nl.clockwork.ebms.Action;
 import nl.clockwork.ebms.EbMSAction;
 import nl.clockwork.ebms.cpa.CPAManager;
 import nl.clockwork.ebms.cpa.CPAUtils;
@@ -37,6 +38,7 @@ import nl.clockwork.ebms.model.EbMSBaseMessage;
 import nl.clockwork.ebms.model.EbMSDocument;
 import nl.clockwork.ebms.model.EbMSMessage;
 import nl.clockwork.ebms.model.EbMSMessageError;
+import nl.clockwork.ebms.transaction.TransactionTemplate;
 import nl.clockwork.ebms.util.DOMUtils;
 import nl.clockwork.ebms.util.StreamUtils;
 import nl.clockwork.ebms.validation.EbMSMessageValidator;
@@ -48,6 +50,8 @@ import nl.clockwork.ebms.validation.ValidationException;
 @AllArgsConstructor
 class DuplicateMessageHandler
 {
+	@NonNull
+	TransactionTemplate transactionTemplate;
   @NonNull
   EbMSDAO ebMSDAO;
   @NonNull
@@ -90,10 +94,14 @@ class DuplicateMessageHandler
 						.orElse(null);
 				val receiveDeliveryChannel = cpaManager.getReceiveDeliveryChannel(messageHeader.getCPAId(),messageHeader.getFrom().getPartyId(),messageHeader.getFrom().getRole(),service,null)
 						.orElse(null);
-				if (storeDuplicateMessage)
-					ebMSDAO.insertDuplicateMessage(timestamp,document.getMessage(),message,storeDuplicateMessageAttachments ? message.getAttachments() : Collections.emptyList());
-				if (receiveDeliveryChannel != null && context.isPresent())
-					eventManager.createEvent(messageHeader.getCPAId(),sendDeliveryChannel,receiveDeliveryChannel,context.get().getMessageId(),messageHeader.getMessageData().getTimeToLive(),context.get().getTimestamp(),false);
+				Action action = () ->
+				{
+					if (storeDuplicateMessage)
+						ebMSDAO.insertDuplicateMessage(timestamp,document.getMessage(),message,storeDuplicateMessageAttachments ? message.getAttachments() : Collections.emptyList());
+					if (receiveDeliveryChannel != null && context.isPresent())
+						eventManager.createEvent(messageHeader.getCPAId(),sendDeliveryChannel,receiveDeliveryChannel,context.get().getMessageId(),messageHeader.getMessageData().getTimeToLive(),context.get().getTimestamp(),false);
+				};
+				transactionTemplate.executeTransaction(action);
 				if (receiveDeliveryChannel == null && context.isPresent())
 					try
 					{

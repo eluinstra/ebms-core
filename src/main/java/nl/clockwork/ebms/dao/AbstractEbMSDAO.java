@@ -37,6 +37,7 @@ import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
+import org.springframework.transaction.annotation.Transactional;
 import org.w3c.dom.Document;
 
 import com.querydsl.core.BooleanBuilder;
@@ -120,6 +121,7 @@ abstract class AbstractEbMSDAO implements EbMSDAO
 	};
 
 	@Override
+	@Transactional(transactionManager = "dataSourceTransactionManager")
 	public boolean existsMessage(String messageId)
 	{
 		return queryFactory.select(table.messageId.count())
@@ -130,6 +132,7 @@ abstract class AbstractEbMSDAO implements EbMSDAO
 	}
 
 	@Override
+	@Transactional(transactionManager = "dataSourceTransactionManager")
 	public boolean existsIdenticalMessage(EbMSBaseMessage message)
 	{
 		return queryFactory.select(table.messageId.count())
@@ -145,6 +148,7 @@ abstract class AbstractEbMSDAO implements EbMSDAO
 	}
 
 	@Override
+	@Transactional(transactionManager = "dataSourceTransactionManager")
 	public Optional<EbMSMessageContent> getMessageContent(String messageId)
 	{
 		val dataSources = getAttachments(messageId,ebMSDataSourceRowMapper);
@@ -152,6 +156,7 @@ abstract class AbstractEbMSDAO implements EbMSDAO
 	}
 
 	@Override
+	@Transactional(transactionManager = "dataSourceTransactionManager")
 	public Optional<EbMSMessageContentMTOM> getMessageContentMTOM(String messageId)
 	{
 		val dataSources = getAttachments(messageId,ebMSDataSourceMTOMRowMapper);
@@ -159,6 +164,7 @@ abstract class AbstractEbMSDAO implements EbMSDAO
 	}
 
 	@Override
+	@Transactional(transactionManager = "dataSourceTransactionManager")
 	public Optional<EbMSMessageContext> getMessageContext(String messageId)
 	{
 		return Optional.ofNullable(queryFactory.select(ebMSMessageContextProjection)
@@ -169,6 +175,7 @@ abstract class AbstractEbMSDAO implements EbMSDAO
 	}
 
 	@Override
+	@Transactional(transactionManager = "dataSourceTransactionManager")
 	public Optional<EbMSMessageContext> getMessageContextByRefToMessageId(String cpaId, String refToMessageId, EbMSAction...actions)
 	{
 		var whereClause = table.cpaId.eq(cpaId)
@@ -184,6 +191,7 @@ abstract class AbstractEbMSDAO implements EbMSDAO
 	}
 	
 	@Override
+	@Transactional(transactionManager = "dataSourceTransactionManager")
 	public Optional<Document> getDocument(String messageId)
 	{
 		return Optional.ofNullable(queryFactory.select(table.content)
@@ -194,6 +202,7 @@ abstract class AbstractEbMSDAO implements EbMSDAO
 	}
 	
 	@Override
+	@Transactional(transactionManager = "dataSourceTransactionManager")
 	public Optional<EbMSDocument> getEbMSDocumentIfUnsent(String messageId)
 	{
 		val content = queryFactory.select(table.content)
@@ -216,6 +225,7 @@ abstract class AbstractEbMSDAO implements EbMSDAO
 	}
 	
 	@Override
+	@Transactional(transactionManager = "dataSourceTransactionManager")
 	public Optional<EbMSDocument> getEbMSDocumentByRefToMessageId(String cpaId, String refToMessageId, EbMSAction...actions)
 	{
 		var whereClause = table.cpaId.eq(cpaId)
@@ -246,6 +256,7 @@ abstract class AbstractEbMSDAO implements EbMSDAO
 	}
 	
 	@Override
+	@Transactional(transactionManager = "dataSourceTransactionManager")
 	public Optional<EbMSMessageStatus> getMessageStatus(String messageId)
 	{
 		return Optional.ofNullable(queryFactory.select(table.status)
@@ -256,6 +267,7 @@ abstract class AbstractEbMSDAO implements EbMSDAO
 	}
 
 	@Override
+	@Transactional(transactionManager = "dataSourceTransactionManager")
 	public Optional<Instant> getPersistTime(String messageId)
 	{
 		return Optional.ofNullable(queryFactory.select(table.persistTime)
@@ -276,6 +288,7 @@ abstract class AbstractEbMSDAO implements EbMSDAO
 	}
 	
 	@Override
+	@Transactional(transactionManager = "dataSourceTransactionManager")
 	public List<String> getMessageIds(EbMSMessageContext messageContext, EbMSMessageStatus status)
 	{
 		var whereClause = new BooleanBuilder(table.messageNr.eq(0)
@@ -289,6 +302,7 @@ abstract class AbstractEbMSDAO implements EbMSDAO
 	}
 
 	@Override
+	@Transactional(transactionManager = "dataSourceTransactionManager")
 	public List<String> getMessageIds(EbMSMessageContext messageContext, EbMSMessageStatus status, int maxNr)
 	{
 		var whereClause = new BooleanBuilder(table.messageNr.eq(0)
@@ -303,6 +317,7 @@ abstract class AbstractEbMSDAO implements EbMSDAO
 	}
 
 	@Override
+	@Transactional(transactionManager = "dataSourceTransactionManager")
 	public long insertMessage(final Instant timestamp, final Instant persistTime, final Document document, final EbMSBaseMessage message, final List<EbMSAttachment> attachments, final EbMSMessageStatus status)
 	{
 		try
@@ -376,6 +391,7 @@ abstract class AbstractEbMSDAO implements EbMSDAO
 	}
 
 	@Override
+	@Transactional(transactionManager = "dataSourceTransactionManager")
 	public long insertDuplicateMessage(final Instant timestamp, final Document document, final EbMSBaseMessage message, final List<EbMSAttachment> attachments)
 	{
 		try

@@ -16,6 +16,7 @@
 package nl.clockwork.ebms.event.processor;
 
 import java.time.Instant;
+import java.util.List;
 
 import javax.jms.JMSException;
 import javax.jms.Message;
@@ -25,6 +26,7 @@ import org.apache.activemq.ScheduledMessage;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DeliveryChannel;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jms.core.MessageCreator;
+import org.springframework.transaction.annotation.Transactional;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -40,6 +42,7 @@ import nl.clockwork.ebms.util.StreamUtils;
 
 @FieldDefaults(level = AccessLevel.PROTECTED, makeFinal = true)
 @AllArgsConstructor
+@Transactional(transactionManager = "dataSourceTransactionManager")
 public class JMSEventManager implements EventManager
 {
 	@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -136,5 +139,17 @@ public class JMSEventManager implements EventManager
 	@Override
 	public void deleteEvent(String messageId)
 	{
+	}
+
+	@Override
+	public List<EbMSEvent> getEventsBefore(Instant timestamp, String serverId)
+	{
+		return ebMSEventDAO.getEventsBefore(timestamp,serverId);
+	}
+
+	@Override
+	public List<EbMSEvent> getEventsBefore(Instant timestamp, String serverId, int maxEvents)
+	{
+		return ebMSEventDAO.getEventsBefore(timestamp,serverId,maxEvents);
 	}
 }

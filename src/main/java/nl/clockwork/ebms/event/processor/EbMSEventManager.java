@@ -16,8 +16,10 @@
 package nl.clockwork.ebms.event.processor;
 
 import java.time.Instant;
+import java.util.List;
 
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DeliveryChannel;
+import org.springframework.transaction.annotation.Transactional;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -83,8 +85,23 @@ public class EbMSEventManager implements EventManager
 	}
 
 	@Override
+	@Transactional(transactionManager = "dataSourceTransactionManager")
 	public void deleteEvent(String messageId)
 	{
 		ebMSEventDAO.deleteEvent(messageId);
+	}
+
+	@Override
+	@Transactional(transactionManager = "dataSourceTransactionManager")
+	public List<EbMSEvent> getEventsBefore(Instant timestamp, String serverId)
+	{
+		return ebMSEventDAO.getEventsBefore(timestamp,serverId);
+	}
+
+	@Override
+	@Transactional(transactionManager = "dataSourceTransactionManager")
+	public List<EbMSEvent> getEventsBefore(Instant timestamp, String serverId, int maxEvents)
+	{
+		return ebMSEventDAO.getEventsBefore(timestamp,serverId,maxEvents);
 	}
 }

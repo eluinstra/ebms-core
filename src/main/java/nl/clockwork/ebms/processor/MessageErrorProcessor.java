@@ -36,6 +36,7 @@ import lombok.NonNull;
 import lombok.val;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import nl.clockwork.ebms.Action;
 import nl.clockwork.ebms.EbMSMessageFactory;
 import nl.clockwork.ebms.EbMSMessageStatus;
 import nl.clockwork.ebms.EbMSMessageUtils;
@@ -48,6 +49,7 @@ import nl.clockwork.ebms.model.EbMSDocument;
 import nl.clockwork.ebms.model.EbMSMessage;
 import nl.clockwork.ebms.model.EbMSMessageError;
 import nl.clockwork.ebms.signing.EbMSSignatureGenerator;
+import nl.clockwork.ebms.transaction.TransactionTemplate;
 import nl.clockwork.ebms.util.DOMUtils;
 import nl.clockwork.ebms.validation.DuplicateMessageException;
 import nl.clockwork.ebms.validation.EbMSMessageValidator;
@@ -60,6 +62,8 @@ import nl.clockwork.ebms.validation.ValidationException;
 @AllArgsConstructor
 class MessageErrorProcessor
 {
+	@NonNull
+	TransactionTemplate transactionTemplate;
 	@NonNull
 	EbMSDAO ebMSDAO;
 	@NonNull
@@ -88,9 +92,13 @@ class MessageErrorProcessor
 				.orElse(null);
 		val receiveDeliveryChannel = cpaManager.getReceiveDeliveryChannel(messageHeader.getCPAId(),messageError.getMessageHeader().getTo().getPartyId(),messageError.getMessageHeader().getTo().getRole(),service,messageError.getMessageHeader().getAction())
 				.orElse(null);
-		storeMessages(timestamp,messageDocument,message,result,messageError);
-		if (receiveDeliveryChannel != null)
-			storeEvent(messageHeader.getCPAId(),sendDeliveryChannel,receiveDeliveryChannel,messageError,isSyncReply);
+		Action action = () ->
+		{
+			storeMessages(timestamp,messageDocument,message,result,messageError);
+			if (receiveDeliveryChannel != null)
+				storeEvent(messageHeader.getCPAId(),sendDeliveryChannel,receiveDeliveryChannel,messageError,isSyncReply);
+		};
+		transactionTemplate.executeTransaction(action);
 		if (!isSyncReply && receiveDeliveryChannel == null)
 			throw new ValidationException(DOMUtils.toString(result.getMessage()));
 		return result;
@@ -150,17 +158,21 @@ class MessageErrorProcessor
 
 	public void storeMessageError(final Instant timestamp, final EbMSDocument messageErrorDocument, final EbMSMessage message, final EbMSMessageError messageError)
 	{
-		val responseMessageHeader = messageError.getMessageHeader();
-		val persistTime = ebMSDAO.getPersistTime(responseMessageHeader.getMessageData().getRefToMessageId());
-		ebMSDAO.insertMessage(timestamp,persistTime.orElse(null),messageErrorDocument.getMessage(),messageError,Collections.emptyList(),null);
-		if (ebMSDAO.updateMessage(
-				responseMessageHeader.getMessageData().getRefToMessageId(),
-				EbMSMessageStatus.SENDING,
-				EbMSMessageStatus.DELIVERY_FAILED) > 0)
+		Action action = () ->
 		{
-			eventListener.onMessageFailed(responseMessageHeader.getMessageData().getRefToMessageId());
-			if (deleteEbMSAttachmentsOnMessageProcessed)
-				ebMSDAO.deleteAttachments(responseMessageHeader.getMessageData().getRefToMessageId());
-		}
+			val responseMessageHeader = messageError.getMessageHeader();
+			val persistTime = ebMSDAO.getPersistTime(responseMessageHeader.getMessageData().getRefToMessageId());
+			ebMSDAO.insertMessage(timestamp,persistTime.orElse(null),messageErrorDocument.getMessage(),messageError,Collections.emptyList(),null);
+			if (ebMSDAO.updateMessage(
+					responseMessageHeader.getMessageData().getRefToMessageId(),
+					EbMSMessageStatus.SENDING,
+					EbMSMessageStatus.DELIVERY_FAILED) > 0)
+			{
+				eventListener.onMessageFailed(responseMessageHeader.getMessageData().getRefToMessageId());
+				if (deleteEbMSAttachmentsOnMessageProcessed)
+					ebMSDAO.deleteAttachments(responseMessageHeader.getMessageData().getRefToMessageId());
+			}
+		};
+		transactionTemplate.executeTransaction(action);
 	}
 }

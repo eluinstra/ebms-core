@@ -30,12 +30,15 @@ import nl.clockwork.ebms.dao.EbMSDAO;
 import nl.clockwork.ebms.event.listener.EventListener;
 import nl.clockwork.ebms.event.processor.EventManager;
 import nl.clockwork.ebms.signing.EbMSSignatureGenerator;
+import nl.clockwork.ebms.transaction.TransactionTemplate;
 import nl.clockwork.ebms.validation.EbMSMessageValidator;
 
 @Configuration
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class EbMSProcessorConfig
 {
+	@Autowired
+	TransactionTemplate dataSourceTransactionTemplate;
 	@Autowired
 	DeliveryManager deliveryManager;
 	@Autowired
@@ -63,6 +66,7 @@ public class EbMSProcessorConfig
 	public EbMSMessageProcessor messageProcessor()
 	{
 		val duplicateMessageHandler = DuplicateMessageHandler.builder()
+				.transactionTemplate(dataSourceTransactionTemplate)
 				.ebMSDAO(ebMSDAO)
 				.cpaManager(cpaManager)
 				.eventManager(eventManager)
@@ -71,6 +75,7 @@ public class EbMSProcessorConfig
 				.storeDuplicateMessageAttachments(storeDuplicateMessageAttachments)
 				.build();
 		return EbMSMessageProcessor.builder()
+				.transactionTemplate(dataSourceTransactionTemplate)
 				.deliveryManager(deliveryManager)
 				.eventListener(eventListener)
 				.ebMSDAO(ebMSDAO)

@@ -18,13 +18,11 @@ package nl.clockwork.ebms.event.processor;
 import javax.jms.ConnectionFactory;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jms.core.JmsTemplate;
-import org.springframework.transaction.PlatformTransactionManager;
 
 import com.querydsl.sql.SQLQueryFactory;
 
@@ -55,9 +53,6 @@ public class EventManagerConfig
 	int autoRetryInterval;
 	@Autowired
 	EbMSDAO ebMSDAO;
-	@Autowired
-	@Qualifier("dataSourceTransactionManager")
-	PlatformTransactionManager dataSourceTransactionManager;
 	@Autowired
 	SQLQueryFactory queryFactory;
 

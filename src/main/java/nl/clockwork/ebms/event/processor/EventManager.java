@@ -16,6 +16,7 @@
 package nl.clockwork.ebms.event.processor;
 
 import java.time.Instant;
+import java.util.List;
 
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DeliveryChannel;
 
@@ -28,6 +29,8 @@ public interface EventManager
 	void updateEvent(final EbMSEvent event, final String url, final EbMSEventStatus status);
 	void updateEvent(final EbMSEvent event, final String url, final EbMSEventStatus status, final String errorMessage);
 	void deleteEvent(String messageId);
+	List<EbMSEvent> getEventsBefore(Instant timestamp, String serverId);
+	List<EbMSEvent> getEventsBefore(Instant timestamp, String serverId, int maxEvents);
 
 	default EbMSEvent createNextEvent(EbMSEvent event, DeliveryChannel deliveryChannel)
 	{

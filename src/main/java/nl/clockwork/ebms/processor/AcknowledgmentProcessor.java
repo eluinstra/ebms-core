@@ -36,6 +36,7 @@ import lombok.NonNull;
 import lombok.val;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import nl.clockwork.ebms.Action;
 import nl.clockwork.ebms.EbMSMessageFactory;
 import nl.clockwork.ebms.EbMSMessageStatus;
 import nl.clockwork.ebms.EbMSMessageUtils;
@@ -48,6 +49,7 @@ import nl.clockwork.ebms.model.EbMSAcknowledgment;
 import nl.clockwork.ebms.model.EbMSDocument;
 import nl.clockwork.ebms.model.EbMSMessage;
 import nl.clockwork.ebms.signing.EbMSSignatureGenerator;
+import nl.clockwork.ebms.transaction.TransactionTemplate;
 import nl.clockwork.ebms.util.StreamUtils;
 import nl.clockwork.ebms.validation.DuplicateMessageException;
 import nl.clockwork.ebms.validation.EbMSMessageValidator;
@@ -59,6 +61,8 @@ import nl.clockwork.ebms.validation.ValidatorException;
 @AllArgsConstructor
 class AcknowledgmentProcessor
 {
+	@NonNull
+	TransactionTemplate transactionTemplate;
 	@NonNull
 	EbMSDAO ebMSDAO;
 	@NonNull
@@ -82,9 +86,13 @@ class AcknowledgmentProcessor
 		val acknowledgment = createAcknowledgment(timestamp,messageDocument,message);
 		val acknowledgmentDocument = EbMSMessageUtils.getEbMSDocument(acknowledgment);
 		signatureGenerator.generate(message.getAckRequested(),acknowledgmentDocument,acknowledgment);
-		storeMessages(timestamp,messageDocument,message,acknowledgmentDocument,acknowledgment);
-		storeEvent(acknowledgment,isSyncReply);
-		eventListener.onMessageReceived(message.getMessageHeader().getMessageData().getMessageId());
+		Action action = () ->
+		{
+			storeMessages(timestamp,messageDocument,message,acknowledgmentDocument,acknowledgment);
+			storeEvent(acknowledgment,isSyncReply);
+			eventListener.onMessageReceived(message.getMessageHeader().getMessageData().getMessageId());
+		};
+		transactionTemplate.executeTransaction(action);
 		return acknowledgmentDocument;
 	}
 
@@ -147,17 +155,21 @@ class AcknowledgmentProcessor
 
 	public void storeAcknowledgment(final Instant timestamp, final EbMSMessage message, final EbMSDocument acknowledgmentDocument, final EbMSAcknowledgment acknowledgment) throws EbMSProcessingException
 	{
-		val responseMessageHeader = acknowledgment.getMessageHeader();
-		val persistTime = ebMSDAO.getPersistTime(responseMessageHeader.getMessageData().getRefToMessageId());
-		ebMSDAO.insertMessage(timestamp,persistTime.orElse(null),acknowledgmentDocument.getMessage(),acknowledgment,Collections.emptyList(),null);
-		if (ebMSDAO.updateMessage(
-				responseMessageHeader.getMessageData().getRefToMessageId(),
-				EbMSMessageStatus.SENDING,
-				EbMSMessageStatus.DELIVERED) > 0)
+		Action action = () ->
 		{
-			eventListener.onMessageDelivered(responseMessageHeader.getMessageData().getRefToMessageId());
-			if (deleteEbMSAttachmentsOnMessageProcessed)
-				ebMSDAO.deleteAttachments(responseMessageHeader.getMessageData().getRefToMessageId());
-		}
+			val responseMessageHeader = acknowledgment.getMessageHeader();
+			val persistTime = ebMSDAO.getPersistTime(responseMessageHeader.getMessageData().getRefToMessageId());
+			ebMSDAO.insertMessage(timestamp,persistTime.orElse(null),acknowledgmentDocument.getMessage(),acknowledgment,Collections.emptyList(),null);
+			if (ebMSDAO.updateMessage(
+					responseMessageHeader.getMessageData().getRefToMessageId(),
+					EbMSMessageStatus.SENDING,
+					EbMSMessageStatus.DELIVERED) > 0)
+			{
+				eventListener.onMessageDelivered(responseMessageHeader.getMessageData().getRefToMessageId());
+				if (deleteEbMSAttachmentsOnMessageProcessed)
+					ebMSDAO.deleteAttachments(responseMessageHeader.getMessageData().getRefToMessageId());
+			}
+		};
+		transactionTemplate.executeTransaction(action);
 	}
 }
