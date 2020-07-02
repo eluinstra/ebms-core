@@ -19,7 +19,6 @@ import java.util.Properties;
 import java.util.UUID;
 
 import javax.jms.ConnectionFactory;
-import javax.jms.JMSException;
 import javax.jms.XAConnectionFactory;
 
 import org.apache.activemq.ActiveMQXAConnectionFactory;
@@ -72,7 +71,7 @@ public class JMSConfig
 	@Bean
 	@Conditional(DefaultTransactionManagerType.class)
 	@DependsOn("brokerFactory")
-	public ConnectionFactory pooledConnectionFactor() throws JMSException
+	public ConnectionFactory pooledConnectionFactor()
 	{
 		val result = new PooledConnectionFactory(jmsBrokerUrl);
 		result.setMaxConnections(maxPoolSize);
@@ -82,7 +81,7 @@ public class JMSConfig
 	@Bean(initMethod = "init", destroyMethod = "close")
 	@Conditional(BitronixTransactionManagerType.class)
 	@DependsOn("brokerFactory")
-	public ConnectionFactory poolingConnectionFactory() throws JMSException
+	public ConnectionFactory poolingConnectionFactory()
 	{
 		val result = new PoolingConnectionFactory();
 		result.setUniqueName(UUID.randomUUID().toString());
@@ -97,7 +96,7 @@ public class JMSConfig
 	@Bean(initMethod = "init", destroyMethod = "close")
 	@Conditional(AtomikosTransactionManagerType.class)
 	@DependsOn("brokerFactory")
-	public ConnectionFactory atomikosConnectionFactoryBean() throws JMSException
+	public ConnectionFactory atomikosConnectionFactoryBean()
 	{
 		val result = new AtomikosConnectionFactoryBean();
 		result.setUniqueResourceName(UUID.randomUUID().toString());

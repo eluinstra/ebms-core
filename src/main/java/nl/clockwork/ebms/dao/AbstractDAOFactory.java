@@ -20,14 +20,11 @@ import static io.vavr.API.Case;
 import static io.vavr.API.Match;
 import static nl.clockwork.ebms.Predicates.contains;
 
-import java.beans.PropertyVetoException;
-
 import javax.sql.DataSource;
 
 import org.springframework.beans.factory.FactoryBean;
 
 import com.atomikos.jdbc.AtomikosDataSourceBean;
-import com.atomikos.jdbc.internal.AtomikosSQLException;
 import com.zaxxer.hikari.HikariDataSource;
 
 import bitronix.tm.resource.jdbc.PoolingDataSource;
@@ -44,12 +41,12 @@ public abstract class AbstractDAOFactory<T> implements FactoryBean<T>
 	DataSource dataSource;
 
 	@Override
-	public T getObject() throws Exception
+	public T getObject()
 	{
 		return createDAO(dataSource);
 	}
 
-	private T createDAO(DataSource dataSource) throws AtomikosSQLException, PropertyVetoException
+	private T createDAO(DataSource dataSource)
 	{
 		String driverClassName = getDriverClassName(dataSource);
 		return Match(driverClassName).of(
@@ -64,7 +61,7 @@ public abstract class AbstractDAOFactory<T> implements FactoryBean<T>
 				}));
 	}
 
-	public static String getDriverClassName(DataSource dataSource) throws PropertyVetoException, AtomikosSQLException
+	public static String getDriverClassName(DataSource dataSource)
 	{
 		return dataSource instanceof HikariDataSource ? ((HikariDataSource)dataSource).getDriverClassName() : 
 			dataSource  instanceof PoolingDataSource ? ((PoolingDataSource)dataSource).getClassName() : ((AtomikosDataSourceBean)dataSource).getXaDataSourceClassName();

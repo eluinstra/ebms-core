@@ -29,7 +29,6 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import lombok.AccessLevel;
 import lombok.val;
-import lombok.var;
 import lombok.experimental.FieldDefaults;
 import nl.clockwork.ebms.processor.EbMSProcessorException;
 import nl.clockwork.ebms.server.EbMSHttpHandler;
@@ -45,10 +44,7 @@ public class EbMSServlet extends GenericServlet
 	{
 		super.init(config);
 		val wac = WebApplicationContextUtils.getRequiredWebApplicationContext(getServletContext());
-		var id = config.getInitParameter("httpHandler");
-		if (id == null)
-			id = "httpHandler";
-		httpHandler = wac.getBean(id,EbMSHttpHandler.class);
+		httpHandler = wac.getBean(EbMSHttpHandler.class);
 	}
 
 	@Override

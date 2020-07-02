@@ -16,6 +16,7 @@
 package nl.clockwork.ebms.server.servlet;
 
 import java.io.IOException;
+import java.security.GeneralSecurityException;
 import java.security.KeyStoreException;
 import java.security.cert.X509Certificate;
 
@@ -27,13 +28,11 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletResponse;
 
-import org.springframework.web.context.support.WebApplicationContextUtils;
-
 import lombok.AccessLevel;
 import lombok.val;
-import lombok.var;
 import lombok.experimental.FieldDefaults;
 import nl.clockwork.ebms.security.EbMSTrustStore;
+import nl.clockwork.ebms.security.KeyStoreType;
 import nl.clockwork.ebms.validation.ClientCertificateManager;
 
 @FieldDefaults(level = AccessLevel.PRIVATE)
@@ -44,11 +43,17 @@ public class ClientCertificateAuthenticationFilter implements Filter
 	@Override
 	public void init(FilterConfig config) throws ServletException
 	{
-		val wac = WebApplicationContextUtils.getRequiredWebApplicationContext(config.getServletContext());
-		var id = config.getInitParameter("trustStore");
-		if (id == null)
-			id = "trustStore";
-		trustStore = wac.getBean(id,EbMSTrustStore.class);
+		try
+		{
+			val trustStoreType = config.getInitParameter("trustStoreType");
+			val trustStorePath = config.getInitParameter("trustStorePath");
+			val trustStorePassword = config.getInitParameter("trustStorePassword");
+			trustStore = EbMSTrustStore.of(KeyStoreType.valueOf(trustStoreType),trustStorePath,trustStorePassword);
+		}
+		catch (GeneralSecurityException | IOException e)
+		{
+			throw new ServletException(e);
+		}
 	}
 
 	@Override
@@ -77,5 +82,4 @@ public class ClientCertificateAuthenticationFilter implements Filter
 	public void destroy()
 	{
 	}
-
 }

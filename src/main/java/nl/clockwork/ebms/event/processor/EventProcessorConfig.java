@@ -101,7 +101,7 @@ public class EventProcessorConfig
 
 	@Bean("eventHandlerTaskExecutor")
 	@Conditional(DefaultEventProcessorType.class)
-	public ThreadPoolTaskExecutor defaultEventProcessor() throws Exception
+	public ThreadPoolTaskExecutor defaultEventProcessor()
 	{
 		val result = new ThreadPoolTaskExecutor();
 		result.setCorePoolSize(minThreads);
@@ -127,7 +127,7 @@ public class EventProcessorConfig
 
 	@Bean
 	@Conditional(JmsEventProcessorType.class)
-	public DefaultMessageListenerContainer jmsEventProcessor() throws Exception
+	public DefaultMessageListenerContainer jmsEventProcessor()
 	{
 		val result = new DefaultMessageListenerContainer();
 		result.setConnectionFactory(connectionFactory);

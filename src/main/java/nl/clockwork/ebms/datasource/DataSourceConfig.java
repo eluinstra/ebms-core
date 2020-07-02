@@ -15,7 +15,6 @@
  */
 package nl.clockwork.ebms.datasource;
 
-import java.beans.PropertyVetoException;
 import java.util.Properties;
 import java.util.UUID;
 
@@ -75,7 +74,7 @@ public class DataSourceConfig
 	
 	@Bean(destroyMethod = "close")
 	@Conditional(DefaultTransactionManagerType.class)
-	public DataSource hikariDataSource() throws PropertyVetoException, AtomikosSQLException
+	public DataSource hikariDataSource()
 	{
 		val config = new HikariConfig();
 		config.setDriverClassName(driverClassName);
@@ -94,7 +93,7 @@ public class DataSourceConfig
 
 	@Bean(destroyMethod = "close")
 	@Conditional(BitronixTransactionManagerType.class)
-	public DataSource poolingDataSource() throws PropertyVetoException, AtomikosSQLException
+	public DataSource poolingDataSource()
 	{
 		val result = new PoolingDataSource();
 		result.setUniqueName(UUID.randomUUID().toString());
@@ -114,7 +113,7 @@ public class DataSourceConfig
 
 	@Bean(destroyMethod = "close")
 	@Conditional(AtomikosTransactionManagerType.class)
-	public DataSource atomikosDataSourceBean() throws PropertyVetoException, AtomikosSQLException
+	public DataSource atomikosDataSourceBean() throws AtomikosSQLException
 	{
 		val result = new AtomikosDataSourceBean();
 		result.setUniqueResourceName(UUID.randomUUID().toString());

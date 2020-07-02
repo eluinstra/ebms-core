@@ -17,7 +17,6 @@ package nl.clockwork.ebms.cache;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
 
 import org.apache.ignite.cache.eviction.lru.LruEvictionPolicyFactory;
 import org.apache.ignite.cache.spring.SpringCacheManager;
@@ -70,38 +69,38 @@ public class CacheConfig
 
 	@Bean
 	@Conditional(DefaultCacheType.class)
-	public CacheManager simpleCacheManager() throws IOException
+	public CacheManager simpleCacheManager()
 	{
-		val cacheManager = new SimpleCacheManager();
-		Collection<Cache> caches = new ArrayList<>();
+		val result = new SimpleCacheManager();
+		val caches = new ArrayList<Cache>();
 		caches.add(new ConcurrentMapCache("CPA"));
 		caches.add(new ConcurrentMapCache("URLMapping"));
 		caches.add(new ConcurrentMapCache("CertificateMapping"));
-		cacheManager.setCaches(caches);
-		return cacheManager;
+		result.setCaches(caches);
+		return result;
 	}
 
 	@Bean
 	@Conditional(EhCacheCacheType.class)
-	public CacheManager ehcacheCacheManager() throws IOException
+	public CacheManager ehcacheCacheManager()
 	{
-		val ehcacheCacheManager = new EhCacheCacheManager();
-		net.sf.ehcache.CacheManager ehcacheManager = createEhCacheManager(getConfigLocation());
+		val result = new EhCacheCacheManager();
+		val ehcacheManager = createEhCacheManager(getConfigLocation());
 		ehcacheManager.addCache("CPA");
 		ehcacheManager.addCache("URLMapping");
 		ehcacheManager.addCache("CertificateMapping");
-		ehcacheCacheManager.setCacheManager(ehcacheManager);
-		return ehcacheCacheManager;
+		result.setCacheManager(ehcacheManager);
+		return result;
 	}
 
 	@Bean
 	@Conditional(IgniteCacheType.class)
 	public CacheManager igniteCacheManager() throws IOException
 	{
-		val igniteCacheManager = new SpringCacheManager();
-		igniteCacheManager.setConfigurationPath(getConfigLocation().getURL().toString());
-		igniteCacheManager.setDynamicNearCacheConfiguration(createDynamicNearCacheConfiguration());
-		return igniteCacheManager;
+		val result = new SpringCacheManager();
+		result.setConfigurationPath(getConfigLocation().getURL().toString());
+		result.setDynamicNearCacheConfiguration(createDynamicNearCacheConfiguration());
+		return result;
 	}
 
 	@Bean("ebMSKeyGenerator")
@@ -115,8 +114,7 @@ public class CacheConfig
 		val ehCacheManagerFactory = new EhCacheManagerFactoryBean();
 		ehCacheManagerFactory.setConfigLocation(configLocation);
 		ehCacheManagerFactory.afterPropertiesSet();
-		net.sf.ehcache.CacheManager ehcacheManager = ehCacheManagerFactory.getObject();
-		return ehcacheManager;
+		return ehCacheManagerFactory.getObject();
 	}
 
   private Resource getConfigLocation()
@@ -127,9 +125,14 @@ public class CacheConfig
 	private NearCacheConfiguration<Object,Object> createDynamicNearCacheConfiguration()
 	{
 		val result = new NearCacheConfiguration<Object,Object>();
-		LruEvictionPolicyFactory<Object,Object> nearEvictPlcFactory = new LruEvictionPolicyFactory<Object,Object>();
-		nearEvictPlcFactory.setMaxSize(100000);
-		result.setNearEvictionPolicyFactory(nearEvictPlcFactory);
+		result.setNearEvictionPolicyFactory(createNearEvictPlcFactory());
+		return result;
+	}
+
+	private LruEvictionPolicyFactory<Object,Object> createNearEvictPlcFactory()
+	{
+		val result = new LruEvictionPolicyFactory<Object,Object>();
+		result.setMaxSize(100000);
 		return result;
 	}
 

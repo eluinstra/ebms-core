@@ -37,7 +37,7 @@ class EbMSProxyFactory implements FactoryBean<EbMSProxy>
 	Set<String> nonProxyHosts;
 
 	@Override
-	public EbMSProxy getObject() throws Exception
+	public EbMSProxy getObject()
 	{
 		if (StringUtils.isNotBlank(host))
 			return EbMSProxy.of(host,port,username,password,nonProxyHosts);

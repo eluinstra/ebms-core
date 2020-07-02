@@ -32,37 +32,37 @@ public class CPAManagerConfig
 	SQLQueryFactory queryFactory;
 
 	@Bean
-	public CPAManager cpaManager() throws Exception
+	public CPAManager cpaManager()
 	{
 		return new CPAManager(cpaDAO(),urlMapper());
 	}
 
 	@Bean
-	public CPADAO cpaDAO() throws Exception
+	public CPADAO cpaDAO()
 	{
 		return new CPADAOImpl(queryFactory);
 	}
 
 	@Bean
-	public URLMapper urlMapper() throws Exception
+	public URLMapper urlMapper()
 	{
 		return new URLMapper(urlMappingDAO());
 	}
 
 	@Bean
-	public URLMappingDAO urlMappingDAO() throws Exception
+	public URLMappingDAO urlMappingDAO()
 	{
 		return new URLMappingDAOImpl(queryFactory);
 	}
 
 	@Bean
-	public CertificateMapper certificateMapper() throws Exception
+	public CertificateMapper certificateMapper()
 	{
 		return new CertificateMapper(certificateMappingDAO());
 	}
 
 	@Bean
-	public CertificateMappingDAO certificateMappingDAO() throws Exception
+	public CertificateMappingDAO certificateMappingDAO()
 	{
 		return new CertificateMappingDAOImpl(queryFactory);
 	}

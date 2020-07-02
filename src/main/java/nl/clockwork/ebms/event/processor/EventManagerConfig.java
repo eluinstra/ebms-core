@@ -63,32 +63,32 @@ public class EventManagerConfig
 
 	@Bean
 	@Conditional(DefaultEventProcessorType.class)
-	public EventManager defaultEventManager() throws Exception
+	public EventManager defaultEventManager()
 	{
 		return createDefaultEventManager();
 	}
 
 	@Bean
 	@Conditional(NoneEventProcessorType.class)
-	public EventManager noneEventManager() throws Exception
+	public EventManager noneEventManager()
 	{
 		return createDefaultEventManager();
 	}
 
 	@Bean
 	@Conditional(JmsEventProcessorType.class)
-	public EventManager jmsEventManager() throws Exception
+	public EventManager jmsEventManager()
 	{
 		return new JMSEventManager(new JmsTemplate(connectionFactory),ebMSDAO,ebMSEventDAO(),cpaManager,nrAutoRetries,autoRetryInterval);
 	}
 
 	@Bean
-	public EbMSEventDAO ebMSEventDAO() throws Exception
+	public EbMSEventDAO ebMSEventDAO()
 	{
 		return new EbMSEventDAOImpl(queryFactory);
 	}
 
-	private EbMSEventManager createDefaultEventManager() throws Exception
+	private EbMSEventManager createDefaultEventManager()
 	{
 		return new EbMSEventManager(ebMSDAO,ebMSEventDAO(),cpaManager,serverId,nrAutoRetries,autoRetryInterval);
 	}

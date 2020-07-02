@@ -15,11 +15,9 @@
  */
 package nl.clockwork.ebms.transaction;
 
-import java.beans.PropertyVetoException;
 import java.util.UUID;
 
 import javax.jms.ConnectionFactory;
-import javax.jms.JMSException;
 import javax.sql.DataSource;
 import javax.transaction.SystemException;
 
@@ -40,7 +38,6 @@ import org.springframework.transaction.jta.JtaTransactionManager;
 
 import com.atomikos.icatch.jta.UserTransactionImp;
 import com.atomikos.icatch.jta.UserTransactionManager;
-import com.atomikos.jdbc.internal.AtomikosSQLException;
 
 import bitronix.tm.TransactionManagerServices;
 import lombok.AccessLevel;
@@ -65,14 +62,14 @@ public class TransactionManagerConfig
 
 	@Bean("dataSourceTransactionManager")
 	@Conditional(DefaultTransactionManagerType.class)
-	public PlatformTransactionManager dataSourceTransactionManager() throws SystemException, AtomikosSQLException, PropertyVetoException
+	public PlatformTransactionManager dataSourceTransactionManager()
 	{
 		return new DataSourceTransactionManager(dataSource);
 	}
 
 	@Bean("jmsTransactionManager")
 	@Conditional(DefaultTransactionManagerType.class)
-	public PlatformTransactionManager jmsTransactionManager() throws JMSException
+	public PlatformTransactionManager jmsTransactionManager()
 	{
 		return new JmsTransactionManager(connectionFactory);
 	}
@@ -80,7 +77,7 @@ public class TransactionManagerConfig
 	@Bean(name = {"dataSourceTransactionManager","jmsTransactionManager"})
 	@Conditional(BitronixTransactionManagerType.class)
 	@DependsOn("btmConfig")
-	public PlatformTransactionManager bitronixJtaTransactionManager() throws SystemException
+	public PlatformTransactionManager bitronixJtaTransactionManager()
 	{
 		val transactionManager = TransactionManagerServices.getTransactionManager();
 		return new JtaTransactionManager(transactionManager,transactionManager);

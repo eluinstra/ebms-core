@@ -57,7 +57,7 @@ public class DeliveryManagerConfig
 	ConnectionFactory connectionFactory;
 
 	@Bean("deliveryManagerTaskExecutor")
-	public ThreadPoolTaskExecutor deliveryManagerTaskExecutor() throws Exception
+	public ThreadPoolTaskExecutor deliveryManagerTaskExecutor()
 	{
 		val result = new ThreadPoolTaskExecutor();
 		result.setCorePoolSize(minThreads);
@@ -69,7 +69,7 @@ public class DeliveryManagerConfig
 
 	@Bean
 	@Conditional(defaultDeliveryManagerType.class)
-	public DeliveryManager defaultDeliveryManager() throws Exception
+	public DeliveryManager defaultDeliveryManager()
 	{
 		return DeliveryManager.builder()
 				.messageQueue(new EbMSMessageQueue(maxEntries,timeout))
@@ -80,7 +80,7 @@ public class DeliveryManagerConfig
 
 	@Bean
 	@Conditional(jmsDeliveryManagerType.class)
-	public DeliveryManager jmsDeliveryManager() throws Exception
+	public DeliveryManager jmsDeliveryManager()
 	{
 		return JMSDeliveryManager.jmsDeliveryManagerBuilder()
 				.messageQueue(new EbMSMessageQueue(maxEntries,timeout))

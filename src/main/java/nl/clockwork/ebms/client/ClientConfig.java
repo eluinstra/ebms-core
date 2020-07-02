@@ -77,7 +77,7 @@ public class ClientConfig
 	boolean useClientCertificate;
 
 	@Bean
-	public EbMSHttpClientFactory ebMSClientFactory() throws Exception
+	public EbMSHttpClientFactory ebMSClientFactory()
 	{
 		return EbMSHttpClientFactory.builder()
 				.type(ebMSHttpClientType)
@@ -96,7 +96,7 @@ public class ClientConfig
 				.build();
 	}
 
-	private EbMSProxy createProxy() throws Exception
+	private EbMSProxy createProxy()
 	{
 		return new EbMSProxyFactory(proxyHost,poxyPort,proxyUsername,proxyPassword,nonProxyHosts).getObject();
 	}

@@ -60,7 +60,7 @@ public class EventListenerConfig
 	SQLQueryFactory queryFactory;
 
 	@Bean
-	public EventListener eventListener() throws Exception
+	public EventListener eventListener()
 	{
 		val jmsTemplate = new JmsTemplate(connectionFactory);
 		switch (eventListenerType)
@@ -79,7 +79,7 @@ public class EventListenerConfig
 	}
 
 	@Bean
-	public EbMSMessageEventDAO ebMSMessageEventDAO() throws Exception
+	public EbMSMessageEventDAO ebMSMessageEventDAO()
 	{
 		return new EbMSMessageEventDAOImpl(queryFactory);
 	}

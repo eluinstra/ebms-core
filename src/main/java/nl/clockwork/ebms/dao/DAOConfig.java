@@ -38,7 +38,7 @@ public abstract class DAOConfig
 	SQLQueryFactory queryFactory;
 
 	@Bean
-	public EbMSDAOFactory ebMSDAO() throws Exception
+	public EbMSDAOFactory ebMSDAO()
 	{
 		val jdbcTemplate = new JdbcTemplate(dataSource);
 		return new EbMSDAOFactory(dataSource,jdbcTemplate,queryFactory);

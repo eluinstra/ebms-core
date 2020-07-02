@@ -32,7 +32,6 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import lombok.AccessLevel;
 import lombok.val;
-import lombok.var;
 import lombok.experimental.FieldDefaults;
 import nl.clockwork.ebms.processor.EbMSMessageProcessor;
 import nl.clockwork.ebms.processor.EbMSProcessorException;
@@ -49,10 +48,7 @@ public class EbMSMessageServlet extends GenericServlet
 	{
 		super.init(config);
 		val wac = WebApplicationContextUtils.getRequiredWebApplicationContext(getServletContext());
-		var id = config.getInitParameter("ebMSMessageProcessor");
-		if (id == null)
-			id = "ebMSMessageProcessor";
-		ebMSMessageProcessor = wac.getBean(id,EbMSMessageProcessor.class);
+		ebMSMessageProcessor = wac.getBean(EbMSMessageProcessor.class);
 	}
 
 	@Override

@@ -20,7 +20,6 @@ import static io.vavr.API.Case;
 import static io.vavr.API.Match;
 import static nl.clockwork.ebms.Predicates.contains;
 
-import java.beans.PropertyVetoException;
 import java.sql.Types;
 
 import javax.sql.DataSource;
@@ -29,7 +28,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import com.atomikos.jdbc.internal.AtomikosSQLException;
 import com.querydsl.sql.DB2Templates;
 import com.querydsl.sql.HSQLDBTemplates;
 import com.querydsl.sql.MySQLTemplates;
@@ -62,47 +60,48 @@ public class QueryDSLConfig
 	DataSource dataSource;
 	
 	@Bean
-	public SQLQueryFactory queryFactory() throws AtomikosSQLException, PropertyVetoException
+	public SQLQueryFactory queryFactory()
 	{
 		val provider = new SpringConnectionProvider(dataSource);
 		return new SQLQueryFactory(querydslConfiguration(),provider);
 	}
 
 	@Bean
-	public com.querydsl.sql.Configuration querydslConfiguration() throws AtomikosSQLException, PropertyVetoException
+	public com.querydsl.sql.Configuration querydslConfiguration()
 	{
-		val templates = getSQLTemplates();
-		val configuration = new com.querydsl.sql.Configuration(templates);
-		configuration.setExceptionTranslator(new SpringExceptionTranslator());
-		configuration.register(new InstantType(Types.TIMESTAMP));
-		configuration.register("cpa","cpa",new CollaborationProtocolAgreementType(Types.CLOB));
-		configuration.register("certificate_mapping","source",new X509CertificateType(Types.BLOB));
-		configuration.register("certificate_mapping","destination",new X509CertificateType(Types.BLOB));
-		configuration.register("ebms_message_event","event_type",new EbMSMessageEventTypeType(Types.SMALLINT));
-		configuration.register("ebms_event_log","status",new EbMSEventStatusType(Types.SMALLINT));
-		configuration.register("ebms_message","content",new DocumentType(Types.CLOB));
-		configuration.register("ebms_message","status",new EbMSMessageStatusType(Types.SMALLINT));
-		configuration.register("ebms_attachment","content",new CachedOutputStreamType(Types.BLOB));
-		return configuration;
+		val templates = sqlTemplates();
+		val result = new com.querydsl.sql.Configuration(templates);
+		result.setExceptionTranslator(new SpringExceptionTranslator());
+		result.register(new InstantType(Types.TIMESTAMP));
+		result.register("cpa","cpa",new CollaborationProtocolAgreementType(Types.CLOB));
+		result.register("certificate_mapping","source",new X509CertificateType(Types.BLOB));
+		result.register("certificate_mapping","destination",new X509CertificateType(Types.BLOB));
+		result.register("ebms_message_event","event_type",new EbMSMessageEventTypeType(Types.SMALLINT));
+		result.register("ebms_event_log","status",new EbMSEventStatusType(Types.SMALLINT));
+		result.register("ebms_message","content",new DocumentType(Types.CLOB));
+		result.register("ebms_message","status",new EbMSMessageStatusType(Types.SMALLINT));
+		result.register("ebms_attachment","content",new CachedOutputStreamType(Types.BLOB));
+		return result;
 	}
 
-	private SQLTemplates getSQLTemplates() throws AtomikosSQLException, PropertyVetoException
+	@Bean
+	public SQLTemplates sqlTemplates()
 	{
 		return createSQLTemplates(dataSource);
 	}
 
-	private SQLTemplates createSQLTemplates(DataSource dataSource) throws AtomikosSQLException, PropertyVetoException
+	private SQLTemplates createSQLTemplates(DataSource dataSource)
 	{
-		String jdbcUrl = AbstractDAOFactory.getDriverClassName(dataSource);
-		return Match(jdbcUrl).of(
+		val driverClassName = AbstractDAOFactory.getDriverClassName(dataSource);
+		return Match(driverClassName).of(
 				Case($(contains("db2")),o -> DB2Templates.builder().build()),
 				Case($(contains("hsqldb")),o -> HSQLDBTemplates.builder().build()),
-				Case($(contains("mysql")),o -> MySQLTemplates.builder().build()),
+				Case($(contains("mysql","mariadb")),o -> MySQLTemplates.builder().build()),
 				Case($(contains("oracle")),o -> OracleTemplates.builder().build()),
 				Case($(contains("postgresql")),o -> PostgreSQLTemplates.builder().build()),
 				Case($(contains("sqlserver")),o -> SQLServer2012Templates.builder().build()),
 				Case($(),o -> {
-					throw new RuntimeException("Jdbc url " + jdbcUrl + " not recognized!");
+					throw new RuntimeException("Driver class name " + driverClassName + " not recognized!");
 				}));
 	}
 }
