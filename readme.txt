@@ -17,7 +17,7 @@ For the ebms-admin console see https://sourceforge.net/projects/javaebmsadmin/
 = Release Notes
 ================
 ebms-core-2.17.0.jar:
-- added options to enable high availability and horizontal scaling
+- added options to enable high availability and horizontal scaling (and throttling)
 - added option to use SSL clientCerttificate defined in the CPA to send messages (https.useClientCertificate)
 	- added CertificateMapper SOAP service to override defined SSL clientCertificate
 - cleaned up and split up SOAP interfaces

@@ -74,24 +74,24 @@ class DuplicateMessageHandler
 						messageHeader.getMessageData().getMessageId(),
 						EbMSAction.MESSAGE_ERROR,
 						EbMSAction.ACKNOWLEDGMENT);
-				StreamUtils.ifNotPresent(result, () -> log.warn("No response found for duplicate message " + messageHeader.getMessageData().getMessageId() + "!"));
+				StreamUtils.ifNotPresent(result,() -> log.warn("No response found for duplicate message " + messageHeader.getMessageData().getMessageId() + "!"));
 				return result.orElse(null);
 			}
 			else
 			{
+				if (storeDuplicateMessage)
+					ebMSDAO.insertDuplicateMessage(timestamp,document.getMessage(),message,storeDuplicateMessageAttachments ? message.getAttachments() : Collections.emptyList());
 				val context = ebMSDAO.getMessageContextByRefToMessageId(
 						messageHeader.getCPAId(),
 						messageHeader.getMessageData().getMessageId(),
 						EbMSAction.MESSAGE_ERROR,
 						EbMSAction.ACKNOWLEDGMENT);
-				StreamUtils.ifNotPresent(context, () -> log.warn("No response found for duplicate message " + messageHeader.getMessageData().getMessageId() + "!"));
+				StreamUtils.ifNotPresent(context,() -> log.warn("No response found for duplicate message " + messageHeader.getMessageData().getMessageId() + "!"));
 				val service = CPAUtils.toString(CPAUtils.createEbMSMessageService());
 				val sendDeliveryChannel =	cpaManager.getSendDeliveryChannel(messageHeader.getCPAId(),messageHeader.getTo().getPartyId(),messageHeader.getTo().getRole(),service,null)
 						.orElse(null);
 				val receiveDeliveryChannel = cpaManager.getReceiveDeliveryChannel(messageHeader.getCPAId(),messageHeader.getFrom().getPartyId(),messageHeader.getFrom().getRole(),service,null)
 						.orElse(null);
-				if (storeDuplicateMessage)
-					ebMSDAO.insertDuplicateMessage(timestamp,document.getMessage(),message,storeDuplicateMessageAttachments ? message.getAttachments() : Collections.emptyList());
 				if (receiveDeliveryChannel != null && context.isPresent())
 					eventManager.createEvent(messageHeader.getCPAId(),sendDeliveryChannel,receiveDeliveryChannel,context.get().getMessageId(),messageHeader.getMessageData().getTimeToLive(),context.get().getTimestamp(),false);
 				if (receiveDeliveryChannel == null && context.isPresent())

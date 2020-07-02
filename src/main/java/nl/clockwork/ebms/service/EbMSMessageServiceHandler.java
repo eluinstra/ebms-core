@@ -120,7 +120,7 @@ public class EbMSMessageServiceHandler
 			signatureGenerator.generate(document,message);
 			storeMessage(document.getMessage(),message);
 			val result = message.getMessageHeader().getMessageData().getMessageId();
-			log.info("Sending message " + result);
+			log.info("Created message " + result);
 			return result;
 		}
 		catch (Exception e)
@@ -141,7 +141,7 @@ public class EbMSMessageServiceHandler
 			signatureGenerator.generate(document,message);
 			storeMessage(document.getMessage(),message);
 			String result = message.getMessageHeader().getMessageData().getMessageId();
-			log.info("Sending message " + result);
+			log.info("Created message " + result);
 			return result;
 		}
 		catch (Exception e)
@@ -166,7 +166,7 @@ public class EbMSMessageServiceHandler
 					signatureGenerator.generate(document,message);
 					storeMessage(document.getMessage(),message);
 					val newMessageId = message.getMessageHeader().getMessageData().getMessageId();
-					log.info("Sending message " + newMessageId);
+					log.info("Created message " + newMessageId);
 					return newMessageId;
 				}
 				catch (SOAPException | JAXBException | ParserConfigurationException | SAXException | IOException | TransformerFactoryConfigurationError | TransformerException e)
