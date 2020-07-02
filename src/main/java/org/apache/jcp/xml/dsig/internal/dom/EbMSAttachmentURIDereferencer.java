@@ -62,7 +62,7 @@ public class EbMSAttachmentURIDereferencer implements URIDereferencer
 			else
 				return DOMURIDereferencer.INSTANCE.dereference(uriReference,context);
 		}
-		catch (IOException | CanonicalizationException e)
+		catch (IOException e)
 		{
 			throw new URIReferenceException(e);
 		}
