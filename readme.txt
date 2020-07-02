@@ -6,7 +6,7 @@ ebms-core version 2.16.0 and up are released in the Central Maven repository:
 <dependency>
   <groupId>nl.clockwork.ebms</groupId>
   <artifactId>ebms-core</artifactId>
-  <version>2.16.6</version>
+  <version>2.17.0</version>
 </dependency>
 
 ebms adapter for mule and web are no longer released; use ebms-admin instead
@@ -17,6 +17,7 @@ For the ebms-admin console see https://sourceforge.net/projects/javaebmsadmin/
 = Release Notes
 ================
 ebms-core-2.17.0.jar:
+- added options to enable high availability and horizontal scaling
 - added option to use SSL clientCerttificate defined in the CPA to send messages (https.useClientCertificate)
 	- added CertificateMapper SOAP service to override defined SSL clientCertificate
 - cleaned up and split up SOAP interfaces
@@ -36,8 +37,10 @@ ebms-core-2.17.0.jar:
 		- patch.digipoort.enable (not necessary anymore)
 		- patch.oracle.enable (not necessary anymore)
 		- patch.cleo.enable (not necessary anymore)
+		- cache.disabled (use cache.type instead)
+		- eventProcessor.enabled=true (use eventProcessor.type=NONE instead)
 	- changed default value of property
-		- http.base64Writer to false
+		- http.base64Writer to false (writer is disabled anyway because of an issue)
 		- https.clientCertificateAuthentication to false
 	- added properties:
 		- https.useClientCertificate=false
@@ -45,14 +48,32 @@ ebms-core-2.17.0.jar:
 		- client.keystore.defaultAlias=
 		- signature.keystore.keyPassword=${signature.keystore.password}
 		- encryption.keystore.keyPassword=${encryption.keystore.password}
-- coding improvements
-	- added lombok
+		- cache.type=DEFAULT (allowed values: DEFAULT(=SPRING) | EHCACHE | IGNITE)
+		- eventProcessor.type=DEFAULT (allowed values: NONE | DEFAULT(=DAO) | JMS)
+		- deliveryManager.type=DEFAULT (allowed types: DEFAULT(=DAO) | JMS)
+		- eventListener.type=DEFAULT (allowed values: DEFAULT(=LOGGING) | DAO | SIMPLE_JMS | JMS | JMS_TEXT)
+		- transactionManager.type=DEFAULT (allowed values: DEFAULT | ATOMIKOS)
+	* see src/main/resources/nl/clockwork/ebms/default.properties for all available properties
+- implemented JMS components (for scaling)
+- added Atomikos transaction manager (for JMS)
+- added Apache Ignite cache manager (for scaling)
+- added Flyway to install and upgrade database 
+- code improvements
+	- added lombok and vavr
 	- made objects immutable where possible
-	- changed spring bean configuration from using setters to using constructors and builders
+	- moved spring bean configuration from xml to code
 	- restructured classes and packages
+	- reconfigured caching and transactions
+	- split up DAO
+	- replaced jdbcTemplate by querydsl
+	- replace commons-logging by slf4j
 	- lots of other improvements
 - updated libraries
-- database updates
+- database updates and improved indices
+
+ebms-core-2.16.7.jar:
+- disabled base64Writer because of a bug when sending base64 encoded content
+- fixed using header defined in property x509CertificateHeader
 
 ebms-core-2.16.6.jar:
 - fixed bug: the references in a signed acknowledgment is not validated correctly, which will not set the status of the message to DELIVERED but eventually to EXPIRED instead
@@ -181,6 +202,8 @@ ebms.jdbc.password=<password>
 
 HSQLDB:
 ebms.jdbc.driverClassName=org.hsqldb.jdbcDriver
+or
+ebms.jdbc.driverClassName=org.hsqldb.jdbc.pool.JDBCXADataSource
 # In memory
 ebms.jdbc.url=jdbc:hsqldb:mem:<dbname>
 # or file
@@ -189,27 +212,39 @@ ebms.jdbc.url=jdbc:hsqldb:file:<path>
 ebms.jdbc.url=jdbc:hsqldb:hsql://<host>:<port>/<dbname>
 
 MySQL:
-ebms.jdbc.driverClassName=com.mysql.jdbc.Driver
+ebms.jdbc.driverClassName=com.mysql.cj.jdbc.Driver
+or
+ebms.jdbc.driverClassName=com.mysql.cj.jdbc.MysqlXADataSource
 ebms.jdbc.url=jdbc:mysql://<host>:<port>/<dbname>
 
 MariaDB:
 ebms.jdbc.driverClassName=org.mariadb.jdbc.Driver
+or
+ebms.jdbc.driverClassName=
 ebms.jdbc.url=jdbc:mysql://<host>:<port>/<dbname>
 
 PostgreSQL:
 ebms.jdbc.driverClassName=org.postgresql.Driver
+or
+ebms.jdbc.driverClassName=org.postgresql.xa.PGXADataSource
 ebms.jdbc.url=jdbc:postgresql://<host>:<port>/<dbname>
 
 MSSQL:
 ebms.jdbc.driverClassName=com.microsoft.sqlserver.jdbc.SQLServerDriver
+or
+ebms.jdbc.driverClassName=com.microsoft.sqlserver.jdbc.SQLServerXADataSource
 ebms.jdbc.url=jdbc:sqlserver://<host>:<port>;[instanceName=<instanceName>;]databaseName=<dbname>;
 
 Oracle:
 ebms.jdbc.driverClassName=oracle.jdbc.OracleDriver
+or
+ebms.jdbc.driverClassName=oracle.jdbc.xa.client.OracleXADataSource
 ebms.jdbc.url=jdbc:oracle:thin:@<host>:<port>:<dbname>
 
 DB2:
 ebms.jdbc.driverClassName=com.ibm.db2.jcc.DB2Driver
+or
+ebms.jdbc.driverClassName=com.ibm.db2.jcc.DB2XADataSource
 ebms.jdbc.url=jdbc:db2://<host>:<port>/<dbname>
 
 ==========
@@ -242,7 +277,8 @@ encryption.keystore.password=password
 = Resources
 ============
 the resources directory resides in https://repo.maven.apache.org/maven2/nl/clockwork/ebms/ebms-core/2.17.0/ebms-core-2.17.0-sources.jar/resources and contains the following data:
-- scripts/database/ - contains the database scripts for the supported databases
+- scripts/database/ - contains the database master scripts for the supported databases
+- src/main/resources/nl/clockwork/ebms/db/migration/ - contains the incremental database update scripts for the supported databases
 
 ===========
 = Building
