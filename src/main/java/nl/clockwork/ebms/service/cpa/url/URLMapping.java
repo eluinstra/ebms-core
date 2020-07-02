@@ -17,8 +17,6 @@ package nl.clockwork.ebms.service.cpa.url;
 
 import java.io.Serializable;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
@@ -31,7 +29,6 @@ import lombok.NonNull;
 import lombok.ToString;
 import lombok.experimental.FieldDefaults;
 
-@Entity
 @XmlAccessorType(XmlAccessType.FIELD)
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
@@ -41,7 +38,6 @@ import lombok.experimental.FieldDefaults;
 public class URLMapping implements Serializable
 {
 	private static final long serialVersionUID = 1L;
-	@Id
 	@XmlElement(required=true)
 	@NonNull
 	String source;
