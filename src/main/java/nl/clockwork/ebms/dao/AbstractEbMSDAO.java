@@ -125,7 +125,7 @@ abstract class AbstractEbMSDAO implements EbMSDAO
 		return queryFactory.select(table.messageId.count())
 				.from(table)
 				.where(table.messageId.eq(messageId)
-						.and(table.messageNr.eq(0)))
+						.and(table.messageVersion.eq(0)))
 				.fetchOne() > 0;
 	}
 
@@ -135,7 +135,7 @@ abstract class AbstractEbMSDAO implements EbMSDAO
 		return queryFactory.select(table.messageId.count())
 				.from(table)
 				.where(table.messageId.eq(message.getMessageHeader().getMessageData().getMessageId())
-						.and(table.messageNr.eq(0))
+						.and(table.messageVersion.eq(0))
 						.and(table.cpaId.eq(message.getMessageHeader().getCPAId()))
 						/*.and(table.fromRole.eq(message.getMessageHeader().getFrom().getRole()))
 						.and(table.toRole.eq(message.getMessageHeader().getTo().getRole()))
@@ -164,7 +164,7 @@ abstract class AbstractEbMSDAO implements EbMSDAO
 		return Optional.ofNullable(queryFactory.select(ebMSMessageContextProjection)
 				.from(table)
 				.where(table.messageId.eq(messageId)
-						.and(table.messageNr.eq(0)))
+						.and(table.messageVersion.eq(0)))
 				.fetchOne());
 	}
 
@@ -173,7 +173,7 @@ abstract class AbstractEbMSDAO implements EbMSDAO
 	{
 		var whereClause = table.cpaId.eq(cpaId)
 				.and(table.refToMessageId.eq(refToMessageId))
-				.and(table.messageNr.eq(0));
+				.and(table.messageVersion.eq(0));
 		if (actions.length > 0)
 			whereClause.and(table.service.eq(EbMSAction.EBMS_SERVICE_URI))
 					.and(table.action.in(EbMSAction.getActions(actions)));
@@ -189,7 +189,7 @@ abstract class AbstractEbMSDAO implements EbMSDAO
 		return Optional.ofNullable(queryFactory.select(table.content)
 				.from(table)
 				.where(table.messageId.eq(messageId)
-						.and(table.messageNr.eq(0)))
+						.and(table.messageVersion.eq(0)))
 				.fetchOne());
 	}
 	
@@ -199,7 +199,7 @@ abstract class AbstractEbMSDAO implements EbMSDAO
 		val content = queryFactory.select(table.content)
 				.from(table)
 				.where(table.messageId.eq(messageId)
-						.and(table.messageNr.eq(0))
+						.and(table.messageVersion.eq(0))
 						.and(table.status.isNull().or(table.status.eq(EbMSMessageStatus.SENDING))))
 				.fetchOne();
 		if (content != null)
@@ -220,7 +220,7 @@ abstract class AbstractEbMSDAO implements EbMSDAO
 	{
 		var whereClause = table.cpaId.eq(cpaId)
 				.and(table.refToMessageId.eq(refToMessageId))
-				.and(table.messageNr.eq(0));
+				.and(table.messageVersion.eq(0));
 		if (actions.length > 0)
 			whereClause.and(table.service.eq(EbMSAction.EBMS_SERVICE_URI))
 					.and(table.action.in(EbMSAction.getActions(actions)));
@@ -251,7 +251,7 @@ abstract class AbstractEbMSDAO implements EbMSDAO
 		return Optional.ofNullable(queryFactory.select(table.status)
 				.from(table)
 				.where(table.messageId.eq(messageId)
-						.and(table.messageNr.eq(0)))
+						.and(table.messageVersion.eq(0)))
 				.fetchOne());
 	}
 
@@ -261,7 +261,7 @@ abstract class AbstractEbMSDAO implements EbMSDAO
 		return Optional.ofNullable(queryFactory.select(table.persistTime)
 				.from(table)
 				.where(table.messageId.eq(messageId)
-						.and(table.messageNr.eq(0)))
+						.and(table.messageVersion.eq(0)))
 				.fetchOne());
 	}
 
@@ -271,14 +271,14 @@ abstract class AbstractEbMSDAO implements EbMSDAO
 		return EbMSAction.get(queryFactory.select(table.action)
 				.from(table)
 				.where(table.messageId.eq(messageId)
-						.and(table.messageNr.eq(0)))
+						.and(table.messageVersion.eq(0)))
 				.fetchOne());
 	}
 	
 	@Override
 	public List<String> getMessageIds(EbMSMessageContext messageContext, EbMSMessageStatus status)
 	{
-		var whereClause = new BooleanBuilder(table.messageNr.eq(0)
+		var whereClause = new BooleanBuilder(table.messageVersion.eq(0)
 				.and(table.status.eq(status))); 
 		whereClause = EbMSDAO.applyFilter(table,messageContext,whereClause);
 		return queryFactory.select(table.messageId)
@@ -291,7 +291,7 @@ abstract class AbstractEbMSDAO implements EbMSDAO
 	@Override
 	public List<String> getMessageIds(EbMSMessageContext messageContext, EbMSMessageStatus status, int maxNr)
 	{
-		var whereClause = new BooleanBuilder(table.messageNr.eq(0)
+		var whereClause = new BooleanBuilder(table.messageVersion.eq(0)
 				.and(table.status.eq(status)));
 		whereClause = EbMSDAO.applyFilter(table,messageContext,whereClause);
 		return queryFactory.select(table.messageId)
@@ -398,7 +398,7 @@ abstract class AbstractEbMSDAO implements EbMSDAO
 									"cpa_id," +
 									"conversation_id," +
 									"message_id," +
-									"message_nr," +
+									"message_version," +
 									"ref_to_message_id," +
 									"time_to_live," +
 									"from_party_id," +
@@ -408,7 +408,7 @@ abstract class AbstractEbMSDAO implements EbMSDAO
 									"service," +
 									"action," +
 									"content" +
-								") values (?,?,?,?,(select max(message_nr) + 1 from ebms_message where message_id = ?),?,?,?,?,?,?,?,?,?)",
+								") values (?,?,?,?,(select max(message_version) + 1 from ebms_message where message_id = ?),?,?,?,?,?,?,?,?,?)",
 								new int[]{4,5}
 							);
 							ps.setTimestamp(1,Timestamp.from(timestamp));
@@ -461,7 +461,7 @@ abstract class AbstractEbMSDAO implements EbMSDAO
 							(
 								"insert into ebms_attachment (" +
 								"message_id," +
-								"message_nr," +
+								"message_version," +
 								"order_nr," +
 								"name," +
 								"content_id," +
@@ -470,7 +470,7 @@ abstract class AbstractEbMSDAO implements EbMSDAO
 								") values (?,?,?,?,?,?,?)"
 							);
 							ps.setObject(1,keyHolder.getKeys().get("message_id"));
-							ps.setObject(2,keyHolder.getKeys().get("message_nr"));
+							ps.setObject(2,keyHolder.getKeys().get("message_version"));
 							ps.setInt(3,orderNr.getAndIncrement());
 							ps.setString(4,a.getName());
 							ps.setString(5,a.getContentId());
@@ -495,7 +495,7 @@ abstract class AbstractEbMSDAO implements EbMSDAO
 				.set(table.status,newStatus)
 				.set(table.statusTime,Instant.now())
 				.where(table.messageId.eq(messageId)
-						.and(table.messageNr.eq(0))
+						.and(table.messageVersion.eq(0))
 						.and(oldStatus == null ? table.status.isNull() : table.status.eq(oldStatus)))
 				.execute();
 	}
@@ -513,7 +513,7 @@ abstract class AbstractEbMSDAO implements EbMSDAO
 		return queryFactory.select(projection)
 				.from(attachmentTable)
 				.where(attachmentTable.messageId.eq(messageId)
-						.and(attachmentTable.messageNr.eq(0)))
+						.and(attachmentTable.messageVersion.eq(0)))
 				.orderBy(attachmentTable.orderNr.asc())
 				.fetch();
 	}
@@ -523,7 +523,7 @@ abstract class AbstractEbMSDAO implements EbMSDAO
 		val query = queryFactory.select(attachmentTable.name,attachmentTable.contentId,attachmentTable.contentType,attachmentTable.content)
 				.from(attachmentTable)
 				.where(attachmentTable.messageId.eq(messageId)
-						.and(attachmentTable.messageNr.eq(0)))
+						.and(attachmentTable.messageVersion.eq(0)))
 				.orderBy(attachmentTable.orderNr.asc())
 				.getSQL();
 		return jdbcTemplate.query(

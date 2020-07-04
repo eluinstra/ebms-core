@@ -62,7 +62,7 @@ class DB2EbMSDAO extends nl.clockwork.ebms.dao.PostgreSQLEbMSDAO
 						{
 							val ps = connection.prepareStatement
 							(
-								"select message_id, message_nr from final table(" +
+								"select message_id, message_version from final table(" +
 								"insert into ebms_message (" +
 									"time_stamp," +
 									"cpa_id," +
@@ -133,13 +133,13 @@ class DB2EbMSDAO extends nl.clockwork.ebms.dao.PostgreSQLEbMSDAO
 						{
 							val ps = connection.prepareStatement
 							(
-									"select message_id, message_nr from final table(" +
+									"select message_id, message_version from final table(" +
 									"insert into ebms_message (" +
 									"time_stamp," +
 									"cpa_id," +
 									"conversation_id," +
 									"message_id," +
-									"message_nr," +
+									"message_version," +
 									"ref_to_message_id," +
 									"time_to_live," +
 									"from_party_id," +
@@ -149,7 +149,7 @@ class DB2EbMSDAO extends nl.clockwork.ebms.dao.PostgreSQLEbMSDAO
 									"service," +
 									"action," +
 									"content" +
-								") values (?,?,?,?,(select max(message_nr) + 1 from ebms_message where message_id = ?),?,?,?,?,?,?,?,?,?))"
+								") values (?,?,?,?,(select max(message_version) + 1 from ebms_message where message_id = ?),?,?,?,?,?,?,?,?,?))"
 							);
 							ps.setTimestamp(1,Timestamp.from(timestamp));
 							val messageHeader = message.getMessageHeader();

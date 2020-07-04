@@ -145,7 +145,7 @@ class MySQLEbMSDAO extends AbstractEbMSDAO
 									"cpa_id," +
 									"conversation_id," +
 									"message_id," +
-									"message_nr," +
+									"message_version," +
 									"ref_to_message_id," +
 									"time_to_live," +
 									"from_party_id," +
@@ -155,7 +155,7 @@ class MySQLEbMSDAO extends AbstractEbMSDAO
 									"service," +
 									"action," +
 									"content" +
-								") values (?,?,?,?,(select nr from (select max(message_nr) + 1 as nr from ebms_message where message_id = ?) as c),?,?,?,?,?,?,?,?,?)",
+								") values (?,?,?,?,(select nr from (select max(message_version) + 1 as nr from ebms_message where message_id = ?) as c),?,?,?,?,?,?,?,?,?)",
 								new int[]{1}
 							);
 							ps.setTimestamp(1,Timestamp.from(timestamp));
@@ -241,7 +241,7 @@ class MySQLEbMSDAO extends AbstractEbMSDAO
 			"select a.name, a.content_id, a.content_type, a.content" + 
 			" from ebms_message m, ebms_attachment a" +
 			" where m.message_id = ?" +
-			" and m.message_nr = 0" +
+			" and m.message_version = 0" +
 			" and m.id = a.ebms_message_id" +
 			" order by a.order_nr",
 			rowMapper,

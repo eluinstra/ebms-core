@@ -58,7 +58,7 @@ class PostgreSQLEbMSDAO extends AbstractEbMSDAO
 			{
 				val keys = new HashMap<String,Object>();
 				keys.put("message_id",rs.getString("message_id"));
-				keys.put("message_nr",rs.getInt("message_nr"));
+				keys.put("message_version",rs.getInt("message_version"));
 				return new KeyHolder()
 				{
 					@Override
@@ -121,7 +121,7 @@ class PostgreSQLEbMSDAO extends AbstractEbMSDAO
 									"status_time," +
 									"persist_time" +
 								") values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)" +
-								" returning message_id, message_nr"
+								" returning message_id, message_version"
 							);
 							ps.setTimestamp(1,Timestamp.from(timestamp));
 							val messageHeader = message.getMessageHeader();
@@ -179,7 +179,7 @@ class PostgreSQLEbMSDAO extends AbstractEbMSDAO
 									"cpa_id," +
 									"conversation_id," +
 									"message_id," +
-									"message_nr," +
+									"message_version," +
 									"ref_to_message_id," +
 									"time_to_live," +
 									"from_party_id," +
@@ -189,8 +189,8 @@ class PostgreSQLEbMSDAO extends AbstractEbMSDAO
 									"service," +
 									"action," +
 									"content" +
-								") values (?,?,?,?,(select max(message_nr) + 1 from ebms_message where message_id = ?),?,?,?,?,?,?,?,?,?)" +
-								" returning message_id, message_nr"
+								") values (?,?,?,?,(select max(message_version) + 1 from ebms_message where message_id = ?),?,?,?,?,?,?,?,?,?)" +
+								" returning message_id, message_version"
 							);
 							ps.setTimestamp(1,Timestamp.from(timestamp));
 							MessageHeader messageHeader = message.getMessageHeader();

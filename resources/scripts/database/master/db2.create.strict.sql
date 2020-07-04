@@ -25,7 +25,7 @@ CREATE TABLE ebms_message
 	cpa_id						VARCHAR(256)		NOT NULL,
 	conversation_id		VARCHAR(256)		NOT NULL,
 	message_id				VARCHAR(256)		NOT NULL,
-	message_nr				SMALLINT				NOT NULL WITH DEFAULT 0,
+	message_version		SMALLINT				NOT NULL WITH DEFAULT 0,
 	ref_to_message_id	VARCHAR(256)		NULL,
 	time_to_live			TIMESTAMP				NULL,
 	persist_time			TIMESTAMP				NULL,
@@ -38,25 +38,25 @@ CREATE TABLE ebms_message
 	content						CLOB						NULL,
 	status						SMALLINT				NULL,
 	status_time				TIMESTAMP				NULL,
-	PRIMARY KEY (message_id,message_nr),
+	PRIMARY KEY (message_id,message_version),
 	FOREIGN KEY (cpa_id) REFERENCES cpa(cpa_id)
 );
 
-CREATE INDEX i_ebms_ref_to_message ON ebms_message (ref_to_message_id,message_nr);
+CREATE INDEX i_ebms_ref_to_message ON ebms_message (ref_to_message_id,message_version);
 
 CREATE TABLE ebms_attachment
 (
 	message_id				VARCHAR(256)		NOT NULL,
-	message_nr				SMALLINT				NOT NULL,
+	message_version		SMALLINT				NOT NULL,
 	order_nr					SMALLINT				NOT NULL,
 	name							VARCHAR(256)		NULL,
 	content_id 				VARCHAR(256) 		NOT NULL,
 	content_type			VARCHAR(255)		NOT NULL,
 	content						BLOB						NOT NULL,
-	FOREIGN KEY (message_id,message_nr) REFERENCES ebms_message (message_id,message_nr)
+	FOREIGN KEY (message_id,message_version) REFERENCES ebms_message (message_id,message_version)
 );
 
-ALTER TABLE ebms_attachment ADD CONSTRAINT uc_ebms_attachment UNIQUE (message_id,message_nr,order_nr);
+ALTER TABLE ebms_attachment ADD CONSTRAINT uc_ebms_attachment UNIQUE (message_id,message_version,order_nr);
 
 CREATE TABLE ebms_event
 (
@@ -64,14 +64,14 @@ CREATE TABLE ebms_event
 	send_channel_id			VARCHAR(256)		NULL,
 	receive_channel_id	VARCHAR(256)		NOT NULL,
 	message_id					VARCHAR(256)		NOT NULL,
-	message_nr					SMALLINT				NOT NULL WITH DEFAULT 0,
+	message_version			SMALLINT				NOT NULL WITH DEFAULT 0,
 	time_to_live				TIMESTAMP				NULL,
 	time_stamp					TIMESTAMP				NOT NULL,
 	is_confidential			SMALLINT				NOT NULL,
 	retries							SMALLINT				NOT NULL WITH DEFAULT 0,
 	server_id						VARCHAR(256)		NULL,
 	FOREIGN KEY (cpa_id) REFERENCES cpa(cpa_id),
-	FOREIGN KEY (message_id,message_nr) REFERENCES ebms_message (message_id,message_nr),
+	FOREIGN KEY (message_id,message_version) REFERENCES ebms_message (message_id,message_version),
 	UNIQUE(message_id)
 );
 
@@ -80,22 +80,22 @@ CREATE INDEX i_ebms_event ON ebms_event (time_stamp);
 CREATE TABLE ebms_event_log
 (
 	message_id				VARCHAR(256)		NOT NULL,
-	message_nr				SMALLINT				NOT NULL WITH DEFAULT 0,
+	message_version		SMALLINT				NOT NULL WITH DEFAULT 0,
 	time_stamp				TIMESTAMP				NOT NULL,
 	uri								VARCHAR(256)		NULL,
 	status						SMALLINT				NOT NULL,
 	error_message			CLOB						NULL,
-	FOREIGN KEY (message_id,message_nr) REFERENCES ebms_message (message_id,message_nr)
+	FOREIGN KEY (message_id,message_version) REFERENCES ebms_message (message_id,message_version)
 );
 
 CREATE TABLE ebms_message_event
 (
 	message_id				VARCHAR(256)		NOT NULL,
-	message_nr				SMALLINT				NOT NULL WITH DEFAULT 0,
+	message_version		SMALLINT				NOT NULL WITH DEFAULT 0,
 	event_type				SMALLINT				NOT NULL,
 	time_stamp				TIMESTAMP				NOT NULL,
 	processed					SMALLINT				NOT NULL WITH DEFAULT 0,
-	FOREIGN KEY (message_id,message_nr) REFERENCES ebms_message (message_id,message_nr),
+	FOREIGN KEY (message_id,message_version) REFERENCES ebms_message (message_id,message_version),
 	UNIQUE(message_id)
 );
 

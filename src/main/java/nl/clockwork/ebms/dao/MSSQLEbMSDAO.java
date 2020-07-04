@@ -68,7 +68,7 @@ class MSSQLEbMSDAO extends MySQLEbMSDAO
 									"cpa_id," +
 									"conversation_id," +
 									"message_id," +
-									"message_nr," +
+									"message_version," +
 									"ref_to_message_id," +
 									"time_to_live," +
 									"from_role," +
@@ -76,7 +76,7 @@ class MSSQLEbMSDAO extends MySQLEbMSDAO
 									"service," +
 									"action," +
 									"content" +
-								") values (?,?,?,?,(select max(message_nr) + 1 as nr from ebms_message where message_id = ?),?,?,?,?,?,?,?)",
+								") values (?,?,?,?,(select max(message_version) + 1 as nr from ebms_message where message_id = ?),?,?,?,?,?,?,?)",
 								new int[]{1}
 							);
 							ps.setTimestamp(1,Timestamp.from(timestamp));

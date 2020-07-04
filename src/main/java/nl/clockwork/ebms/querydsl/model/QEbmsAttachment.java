@@ -49,13 +49,13 @@ public class QEbmsAttachment extends com.querydsl.sql.RelationalPathBase<QEbmsAt
 
     public final StringPath messageId = createString("messageId");
 
-    public final NumberPath<Integer> messageNr = createNumber("messageNr", Integer.class);
+    public final NumberPath<Integer> messageVersion = createNumber("messageVersion", Integer.class);
 
     public final StringPath name = createString("name");
 
     public final NumberPath<Short> orderNr = createNumber("orderNr", Short.class);
 
-    public final com.querydsl.sql.ForeignKey<QEbmsMessage> sysFk10141 = createForeignKey(Arrays.asList(messageId, messageNr), Arrays.asList("message_id", "message_nr"));
+    public final com.querydsl.sql.ForeignKey<QEbmsMessage> sysFk10141 = createForeignKey(Arrays.asList(messageId, messageVersion), Arrays.asList("message_id", "message_version"));
 
     public QEbmsAttachment(String variable) {
         super(QEbmsAttachment.class, forVariable(variable), "PUBLIC", "ebms_attachment");
@@ -87,7 +87,7 @@ public class QEbmsAttachment extends com.querydsl.sql.RelationalPathBase<QEbmsAt
         addMetadata(contentId, ColumnMetadata.named("content_id").withIndex(5).ofType(Types.VARCHAR).withSize(256).notNull());
         addMetadata(contentType, ColumnMetadata.named("content_type").withIndex(6).ofType(Types.VARCHAR).withSize(255).notNull());
         addMetadata(messageId, ColumnMetadata.named("message_id").withIndex(1).ofType(Types.VARCHAR).withSize(256).notNull());
-        addMetadata(messageNr, ColumnMetadata.named("message_nr").withIndex(2).ofType(Types.SMALLINT).withSize(16).notNull());
+        addMetadata(messageVersion, ColumnMetadata.named("message_version").withIndex(2).ofType(Types.SMALLINT).withSize(16).notNull());
         addMetadata(name, ColumnMetadata.named("name").withIndex(4).ofType(Types.VARCHAR).withSize(256));
         addMetadata(orderNr, ColumnMetadata.named("order_nr").withIndex(3).ofType(Types.SMALLINT).withSize(16).notNull());
     }

@@ -24,7 +24,7 @@ CREATE TABLE ebms_message
 	cpa_id						VARCHAR(256)		NOT NULL,
 	conversation_id		VARCHAR(256)		NOT NULL,
 	message_id				VARCHAR(256)		NOT NULL,
-	message_nr				SMALLINT				NOT NULL DEFAULT 0,
+	message_version		SMALLINT				NOT NULL DEFAULT 0,
 	ref_to_message_id	VARCHAR(256)		NULL,
 	time_to_live			DATETIME				NULL,
 	persist_time			DATETIME				NULL,
@@ -39,9 +39,9 @@ CREATE TABLE ebms_message
 	status_time				DATETIME				NULL
 );
 
-ALTER TABLE ebms_message ADD CONSTRAINT uc_ebms_message_id UNIQUE (message_id,message_nr);
+ALTER TABLE ebms_message ADD CONSTRAINT uc_ebms_message_id UNIQUE (message_id,message_version);
 
-CREATE INDEX i_ebms_ref_to_message ON ebms_message (ref_to_message_id,message_nr);
+CREATE INDEX i_ebms_ref_to_message ON ebms_message (ref_to_message_id,message_version);
 
 CREATE TABLE ebms_attachment
 (
