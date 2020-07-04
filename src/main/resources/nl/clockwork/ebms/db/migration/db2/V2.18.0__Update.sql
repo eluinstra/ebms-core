@@ -16,3 +16,5 @@
 
 ALTER TABLE ebms_message RENAME COLUMN message_nr TO message_version;
 ALTER TABLE ebms_attachment RENAME COLUMN message_nr TO message_version;
+
+ALTER TABLE ebms_message ADD sequence_nr INTEGER NULL;

@@ -24,6 +24,7 @@ CREATE TABLE ebms_message
 	conversation_id		VARCHAR(256)		NOT NULL,
 	message_id				VARCHAR(256)		NOT NULL,
 	message_version		NUMBER(5)				DEFAULT 0 NOT NULL,
+	sequence_nr				NUMBER(8)				NULL,
 	ref_to_message_id	VARCHAR(256)		NULL,
 	time_to_live			TIMESTAMP				NULL,
 	persist_time			TIMESTAMP				NULL,

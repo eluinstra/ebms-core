@@ -15,3 +15,5 @@
 --
 
 ALTER TABLE ebms_message CHANGE COLUMN message_nr message_version SMALLINT NOT NULL DEFAULT 0;
+
+ALTER TABLE ebms_message ADD sequence_nr INTEGER NULL;

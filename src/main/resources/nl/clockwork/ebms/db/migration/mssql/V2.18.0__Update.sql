@@ -15,3 +15,5 @@
 --
 
 EXEC sp_rename 'ebms_message.message_nr', 'message_version', 'COLUMN';
+
+ALTER TABLE ebms_message ADD sequence_nr INTEGER NULL;
