@@ -22,7 +22,7 @@
   xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
   http://activemq.apache.org/schema/core http://activemq.apache.org/schema/core/activemq-core.xsd">
  
-    <broker xmlns="http://activemq.apache.org/schema/core" brokerName="localhost" dataDirectory="data" useJmx="true" schedulerSupport="true">
+    <broker xmlns="http://activemq.apache.org/schema/core" brokerName="localhost" dataDirectory="data" useJmx="false" schedulerSupport="true">
         <!--
             For better performances use VM cursor and small memory limit.
             For more information, see: http://activemq.apache.org/message-cursors.html
