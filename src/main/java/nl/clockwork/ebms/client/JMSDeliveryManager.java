@@ -19,8 +19,6 @@ import java.io.IOException;
 import java.security.cert.CertificateException;
 import java.util.Optional;
 
-import javax.jms.JMSException;
-import javax.jms.Message;
 import javax.xml.bind.JAXBException;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.soap.SOAPException;
@@ -29,7 +27,6 @@ import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.xpath.XPathExpressionException;
 
 import org.springframework.jms.core.JmsTemplate;
-import org.springframework.jms.core.MessagePostProcessor;
 import org.springframework.scheduling.annotation.Async;
 import org.xml.sax.SAXException;
 
@@ -100,15 +97,11 @@ public class JMSDeliveryManager extends DeliveryManager
 	{
 		jmsTemplate.setExplicitQosEnabled(true);
 		jmsTemplate.setTimeToLive(Constants.MINUTE_IN_MILLIS);
-		jmsTemplate.convertAndSend(JMS_DESTINATION_NAME,message,new MessagePostProcessor()
+		jmsTemplate.convertAndSend(JMS_DESTINATION_NAME,message,m ->
 		{
-			@Override
-			public Message postProcessMessage(Message m) throws JMSException
-			{
-				m.setJMSCorrelationID(message.getMessageHeader().getMessageData().getRefToMessageId());
-				//m.setJMSExpiration(Constants.MINUTE_IN_MILLIS);
-				return m;
-			}
+			m.setJMSCorrelationID(message.getMessageHeader().getMessageData().getRefToMessageId());
+			//m.setJMSExpiration(Constants.MINUTE_IN_MILLIS);
+			return m;
 		});
 	}
 
