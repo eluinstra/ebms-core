@@ -310,7 +310,7 @@
 			</tns:TransportSender>
 			<tns:TransportReceiver>
 				<tns:TransportProtocol tns:version="1.1">HTTP</tns:TransportProtocol>
-				<tns:Endpoint tns:uri="http://localhost:8888/digipoortStub" tns:type="allPurpose" />
+				<tns:Endpoint tns:uri="http://localhost:8888/ebms" tns:type="allPurpose" />
 			</tns:TransportReceiver>
 		</tns:Transport>
 		<tns:DocExchange tns:docExchangeId="DIGIPOORT_BestEffort">
@@ -393,7 +393,7 @@
 			</tns:TransportSender>
 			<tns:TransportReceiver>
 				<tns:TransportProtocol tns:version="1.1">HTTP</tns:TransportProtocol>
-				<tns:Endpoint tns:uri="http://localhost:8088/overheidStub" tns:type="allPurpose" />
+				<tns:Endpoint tns:uri="http://localhost:8088/ebms" tns:type="allPurpose" />
 			</tns:TransportReceiver>
 		</tns:Transport>
 		<tns:DocExchange tns:docExchangeId="OVERHEID_BestEffort">
@@ -623,7 +623,7 @@
             </ns1:TransportSender>
             <ns1:TransportReceiver>
                 <ns1:TransportProtocol ns1:version="1.1">HTTP</ns1:TransportProtocol>
-                <ns1:Endpoint ns1:uri="https://localhost:8888/digipoortStub" ns1:type="allPurpose"/>
+                <ns1:Endpoint ns1:uri="https://localhost:8888/ebms" ns1:type="allPurpose"/>
                 <ns1:TransportServerSecurity>
                     <ns1:TransportSecurityProtocol ns1:version="3.0">SSL</ns1:TransportSecurityProtocol>
                     <ns1:ServerCertificateRef ns1:certId="DIGIPOORT_ServerCert"/>
@@ -850,7 +850,7 @@
             </ns1:TransportSender>
             <ns1:TransportReceiver>
                 <ns1:TransportProtocol ns1:version="1.1">HTTP</ns1:TransportProtocol>
-                <ns1:Endpoint ns1:uri="https://localhost:8088/overheidStub" ns1:type="allPurpose"/>
+                <ns1:Endpoint ns1:uri="https://localhost:8088/ebms" ns1:type="allPurpose"/>
                 <ns1:TransportServerSecurity>
                     <ns1:TransportSecurityProtocol ns1:version="3.0">SSL</ns1:TransportSecurityProtocol>
                     <ns1:ServerCertificateRef ns1:certId="OVERHEID_ServerCert"/>
@@ -2887,7 +2887,7 @@ X2SpoHffgXmdrExQshpIDzzofex0y/Kg4mulDQUPwVuIZtbnlQ==</destination>
 			</tns:TransportSender>
 			<tns:TransportReceiver>
 				<tns:TransportProtocol tns:version="1.1">HTTP</tns:TransportProtocol>
-				<tns:Endpoint tns:uri="http://localhost:8888/digipoortStub" tns:type="allPurpose" />
+				<tns:Endpoint tns:uri="http://localhost:8888/ebms" tns:type="allPurpose" />
 			</tns:TransportReceiver>
 		</tns:Transport>
 		<tns:DocExchange tns:docExchangeId="DIGIPOORT_BestEffort">
@@ -2970,7 +2970,7 @@ X2SpoHffgXmdrExQshpIDzzofex0y/Kg4mulDQUPwVuIZtbnlQ==</destination>
 			</tns:TransportSender>
 			<tns:TransportReceiver>
 				<tns:TransportProtocol tns:version="1.1">HTTP</tns:TransportProtocol>
-				<tns:Endpoint tns:uri="http://localhost:8088/overheidStub" tns:type="allPurpose" />
+				<tns:Endpoint tns:uri="http://localhost:8088/ebms" tns:type="allPurpose" />
 			</tns:TransportReceiver>
 		</tns:Transport>
 		<tns:DocExchange tns:docExchangeId="OVERHEID_BestEffort">
