@@ -33,7 +33,7 @@ import nl.clockwork.ebms.service.cpa.url.URLMapping;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor
-public class URLMappingDAOImpl implements URLMappingDAO
+class URLMappingDAOImpl implements URLMappingDAO
 {
 	@NonNull
 	SQLQueryFactory queryFactory;

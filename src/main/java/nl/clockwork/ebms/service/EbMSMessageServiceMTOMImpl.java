@@ -28,7 +28,7 @@ import nl.clockwork.ebms.service.model.MessageStatus;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor
-public class EbMSMessageServiceMTOMImpl implements EbMSMessageServiceMTOM
+class EbMSMessageServiceMTOMImpl implements EbMSMessageServiceMTOM
 {
 	EbMSMessageServiceHandler serviceHandler;
 

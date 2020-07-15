@@ -28,7 +28,7 @@ import nl.clockwork.ebms.Action;
 @Slf4j
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor
-public class TimedAction
+class TimedAction
 {
 	long executionInterval;
 	

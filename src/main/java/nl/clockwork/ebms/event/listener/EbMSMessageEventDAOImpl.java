@@ -36,7 +36,7 @@ import nl.clockwork.ebms.service.model.EbMSMessageEvent;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor
-public class EbMSMessageEventDAOImpl implements EbMSMessageEventDAO
+class EbMSMessageEventDAOImpl implements EbMSMessageEventDAO
 {
 	@NonNull
 	SQLQueryFactory queryFactory;

@@ -18,7 +18,7 @@ package nl.clockwork.ebms.event.processor;
 import java.time.Instant;
 import java.util.List;
 
-public interface EbMSEventDAO
+interface EbMSEventDAO
 {
 	List<EbMSEvent> getEventsBefore(Instant timestamp, String serverId);
 	List<EbMSEvent> getEventsBefore(Instant timestamp, String serverId, int maxNr);

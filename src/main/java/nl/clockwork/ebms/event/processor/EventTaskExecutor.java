@@ -33,7 +33,7 @@ import nl.clockwork.ebms.Action;
 
 @Slf4j
 @FieldDefaults(level = AccessLevel.PROTECTED, makeFinal = true)
-public class EventTaskExecutor implements Runnable
+class EventTaskExecutor implements Runnable
 {
 	@NonNull
 	PlatformTransactionManager transactionManager;

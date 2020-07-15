@@ -29,7 +29,7 @@ import lombok.experimental.FieldDefaults;
 
 @FieldDefaults(level = AccessLevel.PROTECTED, makeFinal = true)
 @AllArgsConstructor
-public class EbMSSendEventListener implements MessageListener
+class EbMSSendEventListener implements MessageListener
 {
 	@NonNull
 	EventHandler eventHandler;

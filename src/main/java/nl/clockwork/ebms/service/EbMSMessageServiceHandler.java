@@ -66,7 +66,7 @@ import nl.clockwork.ebms.validation.EbMSMessageContextValidator;
 @FieldDefaults(level = AccessLevel.PACKAGE, makeFinal = true)
 @AllArgsConstructor
 @Transactional(transactionManager = "dataSourceTransactionManager")
-public class EbMSMessageServiceHandler
+class EbMSMessageServiceHandler
 {
   @NonNull
 	DeliveryManager deliveryManager;

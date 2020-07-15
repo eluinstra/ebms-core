@@ -26,7 +26,7 @@ import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-public class EbMSDAOFactory extends AbstractDAOFactory<EbMSDAO>
+class EbMSDAOFactory extends AbstractDAOFactory<EbMSDAO>
 {
 	@NonNull
 	JdbcTemplate jdbcTemplate;

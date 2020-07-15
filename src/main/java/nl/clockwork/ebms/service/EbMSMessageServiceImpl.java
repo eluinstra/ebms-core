@@ -29,7 +29,7 @@ import nl.clockwork.ebms.service.model.MessageStatus;
 
 @FieldDefaults(level = AccessLevel.PACKAGE, makeFinal = true)
 @AllArgsConstructor
-public class EbMSMessageServiceImpl implements EbMSMessageService
+class EbMSMessageServiceImpl implements EbMSMessageService
 {
 	@NonNull
 	EbMSMessageServiceHandler serviceHandler;

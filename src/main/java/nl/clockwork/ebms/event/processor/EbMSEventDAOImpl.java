@@ -31,7 +31,7 @@ import nl.clockwork.ebms.querydsl.model.QEbmsEventLog;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor
-public class EbMSEventDAOImpl implements EbMSEventDAO
+class EbMSEventDAOImpl implements EbMSEventDAO
 {
 	@NonNull
 	SQLQueryFactory queryFactory;

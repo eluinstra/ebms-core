@@ -31,7 +31,7 @@ import nl.clockwork.ebms.util.StreamUtils;
 
 @FieldDefaults(level = AccessLevel.PROTECTED, makeFinal = true)
 @AllArgsConstructor
-public class EbMSEventManager implements EventManager
+class EbMSEventManager implements EventManager
 {
 	@NonNull
 	EbMSDAO ebMSDAO;

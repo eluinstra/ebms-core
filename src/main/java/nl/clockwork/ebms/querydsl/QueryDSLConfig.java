@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.clockwork.ebms.datasource;
+package nl.clockwork.ebms.querydsl;
 
 import static io.vavr.API.$;
 import static io.vavr.API.Case;
@@ -43,14 +43,6 @@ import lombok.AccessLevel;
 import lombok.val;
 import lombok.experimental.FieldDefaults;
 import nl.clockwork.ebms.dao.AbstractDAOFactory;
-import nl.clockwork.ebms.querydsl.CachedOutputStreamType;
-import nl.clockwork.ebms.querydsl.CollaborationProtocolAgreementType;
-import nl.clockwork.ebms.querydsl.DocumentType;
-import nl.clockwork.ebms.querydsl.EbMSEventStatusType;
-import nl.clockwork.ebms.querydsl.EbMSMessageEventTypeType;
-import nl.clockwork.ebms.querydsl.EbMSMessageStatusType;
-import nl.clockwork.ebms.querydsl.InstantType;
-import nl.clockwork.ebms.querydsl.X509CertificateType;
 
 @Configuration
 @FieldDefaults(level = AccessLevel.PRIVATE)

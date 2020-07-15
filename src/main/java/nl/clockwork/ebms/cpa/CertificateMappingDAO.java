@@ -21,7 +21,7 @@ import java.util.Optional;
 
 import nl.clockwork.ebms.service.cpa.certificate.CertificateMapping;
 
-public interface CertificateMappingDAO
+interface CertificateMappingDAO
 {
 	boolean existsCertificateMapping(String id, String cpaId);
 	Optional<X509Certificate> getCertificateMapping(String id, String cpaId, boolean getSpecific);

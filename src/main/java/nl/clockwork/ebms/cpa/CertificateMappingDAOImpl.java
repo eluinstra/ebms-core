@@ -35,7 +35,7 @@ import nl.clockwork.ebms.service.cpa.certificate.CertificateMapping;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @RequiredArgsConstructor
-public class CertificateMappingDAOImpl implements CertificateMappingDAO
+class CertificateMappingDAOImpl implements CertificateMappingDAO
 {
 	@NonNull
 	SQLQueryFactory queryFactory;

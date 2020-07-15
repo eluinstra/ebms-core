@@ -28,7 +28,7 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 
-public class EbMSBrokerFactoryBean implements DisposableBean
+class EbMSBrokerFactoryBean implements DisposableBean
 {
 	private BrokerFactoryBean brokerFactoryBean;
 

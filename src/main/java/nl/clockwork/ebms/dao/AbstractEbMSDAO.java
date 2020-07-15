@@ -70,7 +70,7 @@ import nl.clockwork.ebms.util.DOMUtils;
 
 @FieldDefaults(level = AccessLevel.PROTECTED, makeFinal = true)
 @AllArgsConstructor
-abstract class AbstractEbMSDAO implements EbMSDAO
+class AbstractEbMSDAO implements EbMSDAO
 {
 	@NonNull
 	JdbcTemplate jdbcTemplate;

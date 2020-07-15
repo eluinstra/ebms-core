@@ -32,7 +32,7 @@ import nl.clockwork.ebms.querydsl.model.QCpa;
 
 @FieldDefaults(level = AccessLevel.PROTECTED, makeFinal = true)
 @RequiredArgsConstructor
-public class CPADAOImpl implements CPADAO
+class CPADAOImpl implements CPADAO
 {
 	@NonNull
 	SQLQueryFactory queryFactory;
