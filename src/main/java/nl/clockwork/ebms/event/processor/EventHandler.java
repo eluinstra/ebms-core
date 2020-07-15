@@ -199,6 +199,7 @@ class EventHandler
 			log.info("Sending message " + event.getMessageId() + " to " + url);
 			val responseDocument = createClient(event).sendMessage(url,requestDocument);
 			handleResponse(event,receiveDeliveryChannel,url,requestDocument,responseDocument);
+			log.info("Message " + event.getMessageId() + " sent");
 		}
 		catch (CertificateException e)
 		{
