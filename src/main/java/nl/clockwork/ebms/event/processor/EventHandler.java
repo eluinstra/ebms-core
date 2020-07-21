@@ -30,7 +30,6 @@ import lombok.NonNull;
 import lombok.val;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import nl.clockwork.ebms.Action;
 import nl.clockwork.ebms.EbMSMessageStatus;
 import nl.clockwork.ebms.client.EbMSClient;
 import nl.clockwork.ebms.client.EbMSHttpClientFactory;
@@ -90,20 +89,20 @@ class EventHandler
 
 	public void handle(EbMSEvent event)
 	{
-		Action action = () ->
+		Runnable runnable = () ->
 		{
 			if (event.getTimeToLive() == null || Instant.now().isBefore(event.getTimeToLive()))
 				sendEvent(event);
 			else
 				expireEvent(event);
 		};
-		timedAction.run(action);
+		timedAction.run(runnable);
 	}
 
 	@Async("eventHandlerTaskExecutor")
 	public CompletableFuture<Object> handleAsync(EbMSEvent event)
 	{
-		Action action = () ->
+		Runnable action = () ->
 		{
 			if (event.getTimeToLive() == null || Instant.now().isBefore(event.getTimeToLive()))
 				sendEvent(event);

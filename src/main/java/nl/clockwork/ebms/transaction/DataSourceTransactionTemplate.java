@@ -17,14 +17,12 @@ package nl.clockwork.ebms.transaction;
 
 import org.springframework.transaction.annotation.Transactional;
 
-import nl.clockwork.ebms.Action;
-
 public class DataSourceTransactionTemplate implements TransactionTemplate
 {
 	@Override
 	@Transactional(transactionManager = "dataSourceTransactionManager")
-	public void executeTransaction(Action action)
+	public void executeTransaction(Runnable runnable)
 	{
-		action.run();
+		runnable.run();
 	}
 }

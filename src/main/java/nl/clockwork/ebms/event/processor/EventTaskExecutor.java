@@ -29,7 +29,6 @@ import lombok.NonNull;
 import lombok.val;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import nl.clockwork.ebms.Action;
 
 @Slf4j
 @FieldDefaults(level = AccessLevel.PROTECTED, makeFinal = true)
@@ -65,7 +64,7 @@ class EventTaskExecutor implements Runnable
 	{
   	while (true)
 		{
-  		Action action = () ->
+  		Runnable runnable = () ->
   		{
 				val futures = new ArrayList<Future<?>>();
 				val status = transactionManager.getTransaction(null);
@@ -85,7 +84,7 @@ class EventTaskExecutor implements Runnable
   		};
   		try
   		{
-	  		timedAction.run(action);
+	  		timedAction.run(runnable);
   		}
   		catch(Exception e)
   		{

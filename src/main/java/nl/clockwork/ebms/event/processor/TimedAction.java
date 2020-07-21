@@ -23,7 +23,6 @@ import lombok.AllArgsConstructor;
 import lombok.val;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import nl.clockwork.ebms.Action;
 
 @Slf4j
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -32,7 +31,7 @@ class TimedAction
 {
 	long executionInterval;
 	
-	public void run(Action action)
+	public void run(Runnable action)
 	{
 		if (executionInterval > 0)
 		{

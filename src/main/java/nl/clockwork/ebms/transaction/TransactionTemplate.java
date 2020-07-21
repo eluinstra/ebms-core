@@ -15,9 +15,7 @@
  */
 package nl.clockwork.ebms.transaction;
 
-import nl.clockwork.ebms.Action;
-
 public interface TransactionTemplate
 {
-	void executeTransaction(Action action);
+	void executeTransaction(Runnable runnable);
 }
