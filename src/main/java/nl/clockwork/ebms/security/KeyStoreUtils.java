@@ -24,7 +24,6 @@ import java.security.KeyStore;
 
 import lombok.val;
 import lombok.var;
-import nl.clockwork.ebms.util.SecurityUtils;
 
 class KeyStoreUtils
 {
@@ -46,9 +45,9 @@ class KeyStoreUtils
 		}
 		catch (FileNotFoundException e)
 		{
-			var result = SecurityUtils.class.getResourceAsStream(location);
+			var result = KeyStoreUtils.class.getResourceAsStream(location);
 			if (result == null)
-				result = SecurityUtils.class.getResourceAsStream("/" + location);
+				result = KeyStoreUtils.class.getResourceAsStream("/" + location);
 			if (result == null)
 				throw e;
 			return result;

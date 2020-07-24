@@ -77,7 +77,7 @@ public class BasicAuthenticationFilter implements Filter
 		else
 		{
 			((HttpServletResponse)response).setHeader("WWW-Authenticate","Basic realm=\"" + realm + "\"");
-			((HttpServletResponse)response).sendError(HttpServletResponse.SC_UNAUTHORIZED,"Unauthorized");
+			((HttpServletResponse)response).setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 		}
 	}
 
