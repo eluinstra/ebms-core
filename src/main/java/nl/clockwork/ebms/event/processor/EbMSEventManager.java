@@ -63,7 +63,8 @@ class EbMSEventManager implements EventManager
 				event.getReceiveDeliveryChannelId())
 					.orElseThrow(() -> StreamUtils.illegalStateException("DeliveryChannel",event.getCpaId(),event.getReceiveDeliveryChannelId()));
 		ebMSEventDAO.insertEventLog(event.getMessageId(),event.getTimestamp(),url,status,errorMessage);
-		if (event.getTimeToLive() != null && CPAUtils.isReliableMessaging(deliveryChannel))
+		val reliableMessaging = CPAUtils.isReliableMessaging(deliveryChannel);
+		if (event.getTimeToLive() != null && reliableMessaging)
 			ebMSEventDAO.updateEvent(createNextEvent(event,deliveryChannel));
 		else
 		{
@@ -71,7 +72,7 @@ class EbMSEventManager implements EventManager
 			{
 				case ACKNOWLEDGMENT:
 				case MESSAGE_ERROR:
-					if (event.getRetries() < nrAutoRetries)
+					if (!reliableMessaging && event.getRetries() < nrAutoRetries)
 					{
 						ebMSEventDAO.updateEvent(createNextEvent(event,autoRetryInterval));
 						break;
