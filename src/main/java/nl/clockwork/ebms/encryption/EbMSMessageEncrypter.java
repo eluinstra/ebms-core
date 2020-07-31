@@ -98,7 +98,7 @@ public class EbMSMessageEncrypter
 				message.getAttachments().replaceAll(a -> encrypt(createDocument(),certificate,encryptionAlgorithm,a));
 			}
 		}
-		catch (CertificateException | KeyStoreException | ValidatorException e)
+		catch (CertificateException | KeyStoreException e)
 		{
 			throw new EbMSProcessorException(e);
 		}
@@ -120,7 +120,7 @@ public class EbMSMessageEncrypter
 			message.getAttachments().clear();
 			message.getAttachments().addAll(attachments);
 		}
-		catch (TransformerFactoryConfigurationError | CertificateException | KeyStoreException | ValidatorException e)
+		catch (TransformerFactoryConfigurationError | CertificateException | KeyStoreException e)
 		{
 			throw new EbMSProcessorException(e);
 		}

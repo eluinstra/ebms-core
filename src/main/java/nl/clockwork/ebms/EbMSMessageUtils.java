@@ -72,6 +72,7 @@ import nl.clockwork.ebms.model.EbMSMessageError;
 import nl.clockwork.ebms.model.EbMSStatusRequest;
 import nl.clockwork.ebms.model.EbMSStatusResponse;
 import nl.clockwork.ebms.util.DOMUtils;
+import nl.clockwork.ebms.validation.ValidationException;
 
 public class EbMSMessageUtils
 {
@@ -312,11 +313,8 @@ public class EbMSMessageUtils
 		val envelope = new Envelope();
 		envelope.setBody(new Body());
 		val fault = new Fault();
-		fault.setFaultcode(new QName("http://schemas.xmlsoap.org/soap/envelope/","Client"));
-		fault.setFaultstring(e.getMessage());
-		//fault.setDetail(new Detail());
-		//val f = new JAXBElement<String>(new QName("","String"),String.class,ExceptionUtils.getStackTrace(e));
-		//fault.getDetail().getAny().add(f);
+		fault.setFaultcode(new QName("http://schemas.xmlsoap.org/soap/envelope/",e instanceof ValidationException ? "Client" : "Server"));
+		fault.setFaultstring(e instanceof ValidationException ? e.getMessage() : "An unexpected error occurred!");
 		val f = new JAXBElement<Fault>(new QName("http://schemas.xmlsoap.org/soap/envelope/","Fault"),Fault.class,fault);
 		envelope.getBody().getAny().add(f);
 		return DOMUtils.getDocumentBuilder().parse(new ByteArrayInputStream(JAXBParser.getInstance(Envelope.class).handle(new JAXBElement<>(new QName("http://schemas.xmlsoap.org/soap/envelope/","Envelope"),Envelope.class,envelope)).getBytes()));

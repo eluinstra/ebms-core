@@ -101,7 +101,7 @@ public class EbMSMessageDecrypter
 		{
 			val document = DOMUtils.read((attachment.getInputStream()));
 			if (document.getElementsByTagNameNS(EncryptionConstants.EncryptionSpecNS,EncryptionConstants._TAG_ENCRYPTEDDATA).getLength() == 0)
-				throw new EbMSProcessingException("Attachment " + attachment.getContentId() + " not encrypted!");
+				throw new ValidationException("Attachment " + attachment.getContentId() + " not encrypted!");
 			val encryptedDataElement =
 					(Element)document.getElementsByTagNameNS(EncryptionConstants.EncryptionSpecNS,EncryptionConstants._TAG_ENCRYPTEDDATA).item(0);
 			val xmlCipher = createXmlCipher(keyPair);
@@ -113,7 +113,7 @@ public class EbMSMessageDecrypter
 		{
 			throw new ValidatorException(e);
 		}
-		catch (SAXException | IOException | EbMSProcessingException | XMLEncryptionException | IllegalArgumentException e)
+		catch (SAXException | IOException | XMLEncryptionException e)
 		{
 			throw new EbMSValidationException(
 					EbMSMessageUtils.createError("cid:" + attachment.getContentId(),EbMSErrorCode.SECURITY_FAILURE,e.getMessage()));
