@@ -143,7 +143,7 @@ public class EbMSMessageProcessor
 				throw new ValidationException("CPA " + cpaId + " not found!");
 			return processRequest(timestamp,document,message);
 		}
-		catch (ValidationException | JAXBException | SAXException | IOException | SOAPException | TransformerException e)
+		catch (JAXBException | SAXException | IOException | SOAPException | TransformerException e)
 		{
 			throw new EbMSProcessingException(e);
 		}

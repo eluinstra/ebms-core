@@ -65,6 +65,7 @@ import nl.clockwork.ebms.model.EbMSMessage;
 import nl.clockwork.ebms.model.EbMSMessageError;
 import nl.clockwork.ebms.model.EbMSStatusRequest;
 import nl.clockwork.ebms.model.EbMSStatusResponse;
+import nl.clockwork.ebms.validation.ValidationException;
 
 @TestInstance(value = Lifecycle.PER_CLASS)
 public class EbMSMessageUtilsTest
@@ -224,6 +225,15 @@ public class EbMSMessageUtilsTest
 	public void createSOAPFault() throws Exception
 	{
 		val e = new IOException("soapfault test");
+		val fault = EbMSMessageUtils.createSOAPFault(e);
+		assertEquals("Envelope", fault.getDocumentElement().getLocalName());
+		assertTrue(documentToString(fault).contains("An unexpected error occurred!"));
+	}
+	
+	@Test
+	public void createSOAPFault1() throws Exception
+	{
+		val e = new ValidationException("soapfault test");
 		val fault = EbMSMessageUtils.createSOAPFault(e);
 		assertEquals("Envelope", fault.getDocumentElement().getLocalName());
 		assertTrue(documentToString(fault).contains(e.getMessage()));

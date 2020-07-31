@@ -113,7 +113,7 @@ public class EbMSMessageDecrypter
 		{
 			throw new ValidatorException(e);
 		}
-		catch (SAXException | IOException | XMLEncryptionException e)
+		catch (SAXException | IOException | XMLEncryptionException | IllegalArgumentException e)
 		{
 			throw new EbMSValidationException(
 					EbMSMessageUtils.createError("cid:" + attachment.getContentId(),EbMSErrorCode.SECURITY_FAILURE,e.getMessage()));

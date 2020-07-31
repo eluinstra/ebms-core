@@ -40,6 +40,7 @@ import nl.clockwork.ebms.HttpStatusCode;
 import nl.clockwork.ebms.processor.EbMSMessageProcessor;
 import nl.clockwork.ebms.processor.EbMSProcessorException;
 import nl.clockwork.ebms.util.DOMUtils;
+import nl.clockwork.ebms.validation.ValidationException;
 
 @Slf4j
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -59,7 +60,7 @@ public abstract class EbMSInputStreamHandler
 	  	{
 				if (messageLog.isInfoEnabled())
 					messageLog.info("<<<<\n" + getRequestHeaders() + "\n" + IOUtils.toString(request,Charset.defaultCharset()));
-				throw new EbMSProcessorException("Unable to process message! SOAPAction=" + soapAction);
+				throw new ValidationException("Unable to process message! SOAPAction=" + soapAction);
 	  	}
 //	  	if (log.isDebugEnabled())
 //	  		request = new LoggingInputStream(request);
