@@ -95,6 +95,7 @@ public class TransactionManagerConfig
 		return new JtaTransactionManager(userTransaction,userTransactionManager);
 	}
 
+	@Conditional(BitronixTransactionManagerType.class)
 	@Bean("btmConfig")
 	public void btmConfig()
 	{

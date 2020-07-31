@@ -106,7 +106,7 @@ public class EventProcessorConfig
 		val result = new ThreadPoolTaskExecutor();
 		result.setCorePoolSize(minThreads);
 		result.setMaxPoolSize(maxThreads);
-		result.setQueueCapacity(maxThreads * 2);
+		result.setQueueCapacity(maxEvents);
 		result.setWaitForTasksToCompleteOnShutdown(true);
 		return result;
 	}
