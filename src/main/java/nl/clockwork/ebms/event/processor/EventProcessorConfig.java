@@ -164,7 +164,8 @@ public class EventProcessorConfig
 		@Override
 		public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata)
 		{
-			return context.getEnvironment().getProperty("eventProcessor.type",EventProcessorType.class,EventProcessorType.NONE) == EventProcessorType.DEFAULT;
+			return !context.getEnvironment().getProperty("eventProcessor.start",Boolean.class,true) && 
+					context.getEnvironment().getProperty("eventProcessor.type",EventProcessorType.class,EventProcessorType.NONE) == EventProcessorType.DEFAULT;
 		}
 	}
 	public static class NoneEventProcessorType implements Condition
@@ -172,7 +173,8 @@ public class EventProcessorConfig
 		@Override
 		public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata)
 		{
-			return context.getEnvironment().getProperty("eventProcessor.type",EventProcessorType.class,EventProcessorType.NONE) == EventProcessorType.NONE;
+			return context.getEnvironment().getProperty("eventProcessor.start",Boolean.class,true) && 
+					context.getEnvironment().getProperty("eventProcessor.type",EventProcessorType.class,EventProcessorType.NONE) == EventProcessorType.NONE;
 		}
 	}
 	public static class JmsEventProcessorType implements Condition
@@ -180,7 +182,8 @@ public class EventProcessorConfig
 		@Override
 		public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata)
 		{
-			return context.getEnvironment().getProperty("eventProcessor.type",EventProcessorType.class,EventProcessorType.NONE) == EventProcessorType.JMS;
+			return context.getEnvironment().getProperty("eventProcessor.start",Boolean.class,true) && 
+					context.getEnvironment().getProperty("eventProcessor.type",EventProcessorType.class,EventProcessorType.NONE) == EventProcessorType.JMS;
 		}
 	}
 }
