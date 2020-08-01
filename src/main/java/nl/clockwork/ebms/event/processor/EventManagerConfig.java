@@ -35,7 +35,6 @@ import nl.clockwork.ebms.dao.EbMSDAO;
 import nl.clockwork.ebms.event.processor.EventProcessorConfig.DefaultEventProcessorType;
 import nl.clockwork.ebms.event.processor.EventProcessorConfig.EventProcessorType;
 import nl.clockwork.ebms.event.processor.EventProcessorConfig.JmsEventProcessorType;
-import nl.clockwork.ebms.event.processor.EventProcessorConfig.NoneEventProcessorType;
 
 @Configuration
 @FieldDefaults(level = AccessLevel.PRIVATE)
@@ -64,13 +63,6 @@ public class EventManagerConfig
 	@Bean
 	@Conditional(DefaultEventProcessorType.class)
 	public EventManager defaultEventManager()
-	{
-		return createDefaultEventManager();
-	}
-
-	@Bean
-	@Conditional(NoneEventProcessorType.class)
-	public EventManager noneEventManager()
 	{
 		return createDefaultEventManager();
 	}

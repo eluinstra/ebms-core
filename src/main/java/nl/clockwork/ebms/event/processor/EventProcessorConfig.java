@@ -50,7 +50,7 @@ public class EventProcessorConfig
 {
 	public enum EventProcessorType
 	{
-		NONE, DEFAULT, JMS;
+		DEFAULT, JMS;
 	}
 	@Autowired
 	EbMSEventDAO ebMSEventDAO;
@@ -62,6 +62,8 @@ public class EventProcessorConfig
 	String jmsDestinationName;
 	@Value("${eventProcessor.jms.receiveTimeout}")
 	long receiveTimeout;
+	@Value("${eventProcessor.start}")
+	boolean startEventProcessor;
 	@Value("${eventProcessor.minThreads}")
 	int minThreads;
 	@Value("${eventProcessor.maxThreads}")
@@ -100,7 +102,7 @@ public class EventProcessorConfig
 	String destinationName;
 
 	@Bean("eventHandlerTaskExecutor")
-	@Conditional(DefaultEventProcessorType.class)
+	@Conditional(DefaultEventProcessor.class)
 	public ThreadPoolTaskExecutor defaultEventProcessor()
 	{
 		val result = new ThreadPoolTaskExecutor();
@@ -112,7 +114,7 @@ public class EventProcessorConfig
 	}
 
 	@Bean
-	@Conditional(DefaultEventProcessorType.class)
+	@Conditional(DefaultEventProcessor.class)
 	public EventTaskExecutor eventTaskExecutor()
 	{
 		return EventTaskExecutor.builder()
@@ -126,7 +128,7 @@ public class EventProcessorConfig
 	}
 
 	@Bean
-	@Conditional(JmsEventProcessorType.class)
+	@Conditional(JmsEventProcessor.class)
 	public DefaultMessageListenerContainer jmsEventProcessor()
 	{
 		val result = new DefaultMessageListenerContainer();
@@ -159,20 +161,30 @@ public class EventProcessorConfig
 				.build();
 	}
 
+	public static class DefaultEventProcessor implements Condition
+	{
+		@Override
+		public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata)
+		{
+			return context.getEnvironment().getProperty("eventProcessor.start",Boolean.class,true)
+					&& context.getEnvironment().getProperty("eventProcessor.type",EventProcessorType.class,EventProcessorType.DEFAULT) == EventProcessorType.DEFAULT;
+		}
+	}
+	public static class JmsEventProcessor implements Condition
+	{
+		@Override
+		public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata)
+		{
+			return context.getEnvironment().getProperty("eventProcessor.start",Boolean.class,true)
+					&& context.getEnvironment().getProperty("eventProcessor.type",EventProcessorType.class,EventProcessorType.DEFAULT) == EventProcessorType.JMS;
+		}
+	}
 	public static class DefaultEventProcessorType implements Condition
 	{
 		@Override
 		public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata)
 		{
-			return context.getEnvironment().getProperty("eventProcessor.type",EventProcessorType.class,EventProcessorType.NONE) == EventProcessorType.DEFAULT;
-		}
-	}
-	public static class NoneEventProcessorType implements Condition
-	{
-		@Override
-		public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata)
-		{
-			return context.getEnvironment().getProperty("eventProcessor.type",EventProcessorType.class,EventProcessorType.NONE) == EventProcessorType.NONE;
+			return context.getEnvironment().getProperty("eventProcessor.type",EventProcessorType.class,EventProcessorType.DEFAULT) == EventProcessorType.DEFAULT;
 		}
 	}
 	public static class JmsEventProcessorType implements Condition
@@ -180,7 +192,7 @@ public class EventProcessorConfig
 		@Override
 		public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata)
 		{
-			return context.getEnvironment().getProperty("eventProcessor.type",EventProcessorType.class,EventProcessorType.NONE) == EventProcessorType.JMS;
+			return context.getEnvironment().getProperty("eventProcessor.type",EventProcessorType.class,EventProcessorType.DEFAULT) == EventProcessorType.JMS;
 		}
 	}
 }
