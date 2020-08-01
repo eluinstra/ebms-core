@@ -35,8 +35,10 @@ import org.apache.commons.lang3.StringUtils;
 import lombok.AccessLevel;
 import lombok.val;
 import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 import nl.clockwork.ebms.validation.ClientCertificateManager;
 
+@Slf4j
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class ClientCertificateManagerFilter implements Filter
 {
@@ -65,6 +67,7 @@ public class ClientCertificateManagerFilter implements Filter
 				val certificate = decode(((HttpServletRequest)request).getHeader(x509CertificateHeader));
 				ClientCertificateManager.setCertificate(certificate);
 			}
+			log.info("User " + ClientCertificateManager.getCertificate().getSubjectDN().toString());
 			chain.doFilter(request,response);
 		}
 		catch (CertificateException e)
