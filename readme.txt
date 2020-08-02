@@ -21,6 +21,7 @@ ebms-core-2.17.1.jar:
 - improved error responses
 - fixed auto retry responses only if best effort
 - fixed configuration issue, that causes send events to be rejected
+- fixed server, client and api mode
 - added rate limiter
 
 ebms-core-2.17.0.jar:
