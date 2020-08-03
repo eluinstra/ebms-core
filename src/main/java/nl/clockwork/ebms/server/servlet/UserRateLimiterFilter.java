@@ -16,6 +16,8 @@
 package nl.clockwork.ebms.server.servlet;
 
 import java.io.IOException;
+import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -29,23 +31,27 @@ import com.google.common.util.concurrent.RateLimiter;
 import lombok.AccessLevel;
 import lombok.val;
 import lombok.experimental.FieldDefaults;
+import nl.clockwork.ebms.validation.ClientCertificateManager;
 
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class RateLimiterFilter implements Filter
+public class UserRateLimiterFilter implements Filter
 {
-	RateLimiter rateLimiter;
+	ConcurrentHashMap<String,RateLimiter> rateLimiters = new ConcurrentHashMap<>();
+	double queriesPerSecond;
 
 	@Override
 	public void init(FilterConfig filterConfig) throws ServletException
 	{
-		val queriesPerSecond = Double.parseDouble(filterConfig.getInitParameter("queriesPerSecond"));
-		rateLimiter = RateLimiter.create(queriesPerSecond);
+		this.queriesPerSecond = Double.parseDouble(filterConfig.getInitParameter("queriesPerSecond"));
 	}
 
 	@Override
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException
 	{
-		rateLimiter.acquire();
+		val subject = Optional.ofNullable(ClientCertificateManager.getCertificate()).map(c -> c.getSubjectDN().toString()).orElse("");
+		if (!rateLimiters.containsKey(subject))
+			rateLimiters.put(subject,RateLimiter.create(queriesPerSecond));
+		rateLimiters.get(subject).acquire();
 		chain.doFilter(request,response);
-}
+	}
 }

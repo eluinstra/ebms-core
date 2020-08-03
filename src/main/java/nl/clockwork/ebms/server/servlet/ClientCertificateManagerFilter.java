@@ -67,7 +67,7 @@ public class ClientCertificateManagerFilter implements Filter
 				val certificate = decode(((HttpServletRequest)request).getHeader(x509CertificateHeader));
 				ClientCertificateManager.setCertificate(certificate);
 			}
-			log.info("User " + ClientCertificateManager.getCertificate().getSubjectDN().toString());
+			log.info("User " + ClientCertificateManager.getCertificate() != null ? ClientCertificateManager.getCertificate().getSubjectDN().toString() : "unknown!");
 			chain.doFilter(request,response);
 		}
 		catch (CertificateException e)

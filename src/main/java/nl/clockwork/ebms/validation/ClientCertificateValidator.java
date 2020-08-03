@@ -66,7 +66,7 @@ class ClientCertificateValidator
 				throw new ValidationException("Invalid SSL Client Certificate!");
 		}
 		else
-			log.warn("No certificates found.");
+			throw new IllegalArgumentException("No certificate found!");
 	}
 
 	private X509Certificate getClientCertificate(MessageHeader messageHeader)
