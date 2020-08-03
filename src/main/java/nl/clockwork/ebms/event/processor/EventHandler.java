@@ -17,11 +17,12 @@ package nl.clockwork.ebms.event.processor;
 
 import java.security.cert.CertificateException;
 import java.time.Instant;
-import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Future;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DeliveryChannel;
 import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.transaction.PlatformTransactionManager;
 
 import lombok.AccessLevel;
@@ -100,7 +101,7 @@ class EventHandler
 	}
 
 	@Async("eventHandlerTaskExecutor")
-	public CompletableFuture<Object> handleAsync(EbMSEvent event)
+	public Future<Void> handleAsync(EbMSEvent event)
 	{
 		Runnable runnable = () ->
 		{
@@ -110,7 +111,7 @@ class EventHandler
 				expireEvent(event);
 		};
 		timedTask.run(runnable);
-		return CompletableFuture.completedFuture(new Object());
+		return new AsyncResult<Void>(null);
 	}
 
 	private void sendEvent(final EbMSEvent event)
