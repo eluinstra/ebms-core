@@ -15,6 +15,11 @@
  */
 package nl.clockwork.ebms.event.listener;
 
+import static io.vavr.API.$;
+import static io.vavr.API.Case;
+import static io.vavr.API.Match;
+
+import java.util.EnumSet;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -29,6 +34,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jms.core.JmsTemplate;
 
+import com.google.common.base.Splitter;
 import com.querydsl.sql.SQLQueryFactory;
 
 import lombok.AccessLevel;
@@ -50,6 +56,8 @@ public class EventListenerConfig
 	}
 	@Value("${eventListener.type}")
 	EventListenerType eventListenerType;
+	@Value("${eventListener.filter}")
+	String eventListenerFilter;
 	@Autowired
 	EbMSDAO ebMSDAO;
 	@Autowired
@@ -63,19 +71,16 @@ public class EventListenerConfig
 	public EventListener eventListener()
 	{
 		val jmsTemplate = new JmsTemplate(connectionFactory);
-		switch (eventListenerType)
-		{
-			case DAO:
-				return new DAOEventListener(ebMSMessageEventDAO());
-			case SIMPLE_JMS:
-				return new SimpleJMSEventListener(jmsTemplate,createEbMSMessageEventDestinations(jmsDestinationType));
-			case JMS:
-				return new JMSEventListener(ebMSDAO,jmsTemplate,createEbMSMessageEventDestinations(jmsDestinationType));
-			case JMS_TEXT:
-				return new JMSTextEventListener(ebMSDAO,jmsTemplate,createEbMSMessageEventDestinations(jmsDestinationType));
-			default:
-				return new LoggingEventListener();
-		}
+		val filter = Splitter.on(',').trimResults().omitEmptyStrings().splitToStream(eventListenerFilter)
+			.map(e -> EbMSMessageEventType.valueOf(e))
+			.collect(Collectors.toCollection(() -> EnumSet.noneOf(EbMSMessageEventType.class)));
+		val eventListener = Match(eventListenerType).of(
+				Case($(EventListenerType.DAO),o -> new DAOEventListener(ebMSMessageEventDAO())),
+				Case($(EventListenerType.SIMPLE_JMS),o -> new SimpleJMSEventListener(jmsTemplate,createEbMSMessageEventDestinations(jmsDestinationType))),
+				Case($(EventListenerType.JMS),o -> new JMSEventListener(ebMSDAO,jmsTemplate,createEbMSMessageEventDestinations(jmsDestinationType))),
+				Case($(EventListenerType.JMS_TEXT),o -> new JMSTextEventListener(ebMSDAO,jmsTemplate,createEbMSMessageEventDestinations(jmsDestinationType))),
+				Case($(),o -> new LoggingEventListener()));
+		return filter.size() > 0 ? new EventListenerFilter(filter,eventListener): eventListener;
 	}
 
 	@Bean
