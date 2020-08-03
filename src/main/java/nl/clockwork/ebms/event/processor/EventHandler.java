@@ -68,11 +68,11 @@ class EventHandler
 	EbMSMessageEncrypter messageEncrypter;
 	@NonNull
 	EbMSMessageProcessor messageProcessor;
-	TimedAction timedAction;
+	TimedTask timedTask;
 	boolean deleteEbMSAttachmentsOnMessageProcessed;
 
 	@Builder
-	public EventHandler(@NonNull PlatformTransactionManager transactionManager, @NonNull EventListener eventListener, @NonNull EbMSDAO ebMSDAO, @NonNull CPAManager cpaManager, @NonNull URLMapper urlMapper, @NonNull EventManager eventManager, @NonNull EbMSHttpClientFactory ebMSClientFactory, @NonNull EbMSMessageEncrypter messageEncrypter, @NonNull EbMSMessageProcessor messageProcessor, TimedAction timedAction, boolean deleteEbMSAttachmentsOnMessageProcessed)
+	public EventHandler(@NonNull PlatformTransactionManager transactionManager, @NonNull EventListener eventListener, @NonNull EbMSDAO ebMSDAO, @NonNull CPAManager cpaManager, @NonNull URLMapper urlMapper, @NonNull EventManager eventManager, @NonNull EbMSHttpClientFactory ebMSClientFactory, @NonNull EbMSMessageEncrypter messageEncrypter, @NonNull EbMSMessageProcessor messageProcessor, TimedTask timedTask, boolean deleteEbMSAttachmentsOnMessageProcessed)
 	{
 		this.transactionManager = transactionManager;
 		this.eventListener = eventListener;
@@ -84,7 +84,7 @@ class EventHandler
 		this.messageEncrypter = messageEncrypter;
 		this.messageProcessor = messageProcessor;
 		this.deleteEbMSAttachmentsOnMessageProcessed = deleteEbMSAttachmentsOnMessageProcessed;
-		this.timedAction = timedAction;
+		this.timedTask = timedTask;
 	}
 
 	public void handle(EbMSEvent event)
@@ -96,20 +96,20 @@ class EventHandler
 			else
 				expireEvent(event);
 		};
-		timedAction.run(runnable);
+		timedTask.run(runnable);
 	}
 
 	@Async("eventHandlerTaskExecutor")
 	public CompletableFuture<Object> handleAsync(EbMSEvent event)
 	{
-		Runnable action = () ->
+		Runnable runnable = () ->
 		{
 			if (event.getTimeToLive() == null || Instant.now().isBefore(event.getTimeToLive()))
 				sendEvent(event);
 			else
 				expireEvent(event);
 		};
-		timedAction.run(action);
+		timedTask.run(runnable);
 		return CompletableFuture.completedFuture(new Object());
 	}
 

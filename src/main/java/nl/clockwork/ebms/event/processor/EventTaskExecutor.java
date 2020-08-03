@@ -40,17 +40,17 @@ class EventTaskExecutor implements Runnable
 	EbMSEventDAO ebMSEventDAO;
 	@NonNull
 	EventHandler eventHandler;
-	@NonNull TimedAction timedAction;
+	@NonNull TimedTask timedTask;
 	int maxEvents;
 	String serverId;
 
 	@Builder
-	public EventTaskExecutor(@NonNull PlatformTransactionManager transactionManager, @NonNull EbMSEventDAO ebMSEventDAO, @NonNull EventHandler eventHandler, @NonNull TimedAction timedAction, int maxEvents, String serverId)
+	public EventTaskExecutor(@NonNull PlatformTransactionManager transactionManager, @NonNull EbMSEventDAO ebMSEventDAO, @NonNull EventHandler eventHandler, @NonNull TimedTask timedTask, int maxEvents, String serverId)
 	{
 		this.transactionManager = transactionManager;
 		this.ebMSEventDAO = ebMSEventDAO;
 		this.eventHandler = eventHandler;
-		this.timedAction = timedAction;
+		this.timedTask = timedTask;
 		this.maxEvents = maxEvents;
 		this.serverId = serverId;
 		val executor = new ThreadPoolTaskExecutor();
@@ -84,7 +84,7 @@ class EventTaskExecutor implements Runnable
   		};
   		try
   		{
-	  		timedAction.run(runnable);
+	  		timedTask.run(runnable);
   		}
   		catch(Exception e)
   		{

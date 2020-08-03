@@ -27,22 +27,22 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor
-class TimedAction
+class TimedTask
 {
 	long executionInterval;
 	
-	public void run(Runnable action)
+	public void run(Runnable task)
 	{
 		if (executionInterval > 0)
 		{
 			val start = Instant.now();
-			action.run();
+			task.run();
 			val end = Instant.now();
 			val sleep = executionInterval - ChronoUnit.MILLIS.between(start,end);
 			sleep(sleep);
 		}
 		else
-			action.run();
+			task.run();
 	}
 
 	private void sleep(long millis)

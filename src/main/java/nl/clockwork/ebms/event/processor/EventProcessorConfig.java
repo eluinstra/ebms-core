@@ -121,7 +121,7 @@ public class EventProcessorConfig
 				.transactionManager(dataSourceTransactionManager)
 				.ebMSEventDAO(ebMSEventDAO)
 				.eventHandler(eventHandler())
-				.timedAction(new TimedAction(eventProcessorExecutionInterval))
+				.timedTask(new TimedTask(eventProcessorExecutionInterval))
 				.maxEvents(maxEvents)
 				.serverId(serverId)
 				.build();
@@ -156,7 +156,7 @@ public class EventProcessorConfig
 				.ebMSClientFactory(ebMSClientFactory)
 				.messageEncrypter(messageEncrypter)
 				.messageProcessor(messageProcessor)
-				.timedAction(new TimedAction(eventHandlerTaskExecutionInterval))
+				.timedTask(new TimedTask(eventHandlerTaskExecutionInterval))
 				.deleteEbMSAttachmentsOnMessageProcessed(deleteEbMSAttachmentsOnMessageProcessed)
 				.build();
 	}
