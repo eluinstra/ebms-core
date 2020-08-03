@@ -15,12 +15,15 @@
  */
 package nl.clockwork.ebms.datasource;
 
+import java.util.Arrays;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.UUID;
 
 import javax.sql.DataSource;
 
 import org.apache.commons.lang3.StringUtils;
+import org.flywaydb.core.Flyway;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Conditional;
@@ -34,6 +37,8 @@ import com.zaxxer.hikari.util.IsolationLevel;
 
 import bitronix.tm.resource.jdbc.PoolingDataSource;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.val;
 import lombok.experimental.FieldDefaults;
 import nl.clockwork.ebms.transaction.TransactionManagerConfig.AtomikosTransactionManagerType;
@@ -45,6 +50,40 @@ import nl.clockwork.ebms.transaction.TransactionManagerConfig.TransactionManager
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class DataSourceConfig
 {
+	public static final String BASEPATH = "classpath:/nl/clockwork/ebms/db/migration/";
+
+	@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+	@AllArgsConstructor
+	@Getter
+	public enum Location
+	{
+		DB2("jdbc:db2:",BASEPATH + "db2",false),
+		DB2_STRICT("jdbc:db2:",BASEPATH + "db2.strict",true),
+		H2("jdbc:h2:",BASEPATH + "h2",false),
+		H2_STRICT("jdbc:h2:",BASEPATH + "h2.strict",true),
+		HSQLDB("jdbc:hsqldb:",BASEPATH + "hsqldb",false),
+		HSQLDB_STRICT("jdbc:hsqldb:",BASEPATH + "hsqldb.strict",true),
+		MARIADB("jdbc:mariadb:",BASEPATH + "mysql",false),
+		MSSQL("jdbc:sqlserver:",BASEPATH + "mssql",false),
+		MYSQL("jdbc:mysql:",BASEPATH + "mysql",false),
+		ORACLE("jdbc:oracle:",BASEPATH + "oracle",false),
+		ORACLE_STRICT("jdbc:oracle:",BASEPATH + "oracle.strict",true),
+		POSTGRES("jdbc:postgresql:",BASEPATH + "postgresql",false),
+		POSTGRES_STRICT("jdbc:postgresql:",BASEPATH + "postgresql.strict",true);
+		
+		String jdbcUrl;
+		String location;
+		boolean strict;
+		
+		public static Optional<String> getLocation(String jdbcUrl, boolean strict)
+		{
+			return Arrays.stream(values())
+					.filter(l -> jdbcUrl.startsWith(l.jdbcUrl) && (l.strict == strict))
+					.map(l -> l.location)
+					.findFirst();
+		}
+	}
+
 	@Value("${transactionManager.type}")
 	TransactionManagerType transactionManagerType;
 	@Value("${transactionManager.isolationLevel}")
@@ -57,6 +96,10 @@ public class DataSourceConfig
 	String username;
 	@Value("${ebms.jdbc.password}")
 	String password;
+	@Value("${ebms.jdbc.update}")
+	boolean updateDb;
+	@Value("${ebms.jdbc.strict}")
+	boolean updateDbStrict;
 	@Value("${ebms.pool.autoCommit}")
 	boolean isAutoCommit;
 	@Value("${ebms.pool.connectionTimeout}")
@@ -130,6 +173,24 @@ public class DataSourceConfig
 			result.setTestQuery(testQuery);
 		result.init();
 		return result;
+	}
+
+	@Bean
+	public void flyway()
+	{
+		if (updateDb)
+		{
+			val locations = Location.getLocation(jdbcUrl,updateDbStrict);
+			locations.ifPresent(l ->
+			{
+				val config = Flyway.configure()
+						.dataSource(jdbcUrl,username,password)
+						.locations(l)
+						.ignoreMissingMigrations(true)
+						.outOfOrder(true);
+				config.load().migrate();
+			});
+		}
 	}
 
 	private Properties createDriverProperties()

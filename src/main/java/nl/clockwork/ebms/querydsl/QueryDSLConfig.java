@@ -29,6 +29,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import com.querydsl.sql.DB2Templates;
+import com.querydsl.sql.H2Templates;
 import com.querydsl.sql.HSQLDBTemplates;
 import com.querydsl.sql.MySQLTemplates;
 import com.querydsl.sql.OracleTemplates;
@@ -87,8 +88,9 @@ public class QueryDSLConfig
 		val driverClassName = AbstractDAOFactory.getDriverClassName(dataSource);
 		return Match(driverClassName).of(
 				Case($(contains("db2")),o -> DB2Templates.builder().build()),
+				Case($(contains("h2")),o -> H2Templates.builder().build()),
 				Case($(contains("hsqldb")),o -> HSQLDBTemplates.builder().build()),
-				Case($(contains("mysql","mariadb")),o -> MySQLTemplates.builder().build()),
+				Case($(contains("mariadb","mysql")),o -> MySQLTemplates.builder().build()),
 				Case($(contains("oracle")),o -> OracleTemplates.builder().build()),
 				Case($(contains("postgresql")),o -> PostgreSQLTemplates.builder().build()),
 				Case($(contains("sqlserver")),o -> SQLServer2012Templates.builder().build()),

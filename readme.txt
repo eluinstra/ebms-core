@@ -139,12 +139,13 @@ release 2.19.x:
 This library contains the core functionality of the EbMS adapter including:
 - a servlet to use the adapter in a servlet container
 - database support for the following databases:
-	- hsqldb
-	- mysql/mariadb
-	- postgresql
-	- mssql
-	- oracle
 	- db2
+	- h2
+	- hsqldb
+	- mssql
+	- mariadb/mysql
+	- oracle
+	- postgresql
 - CPA and EbMSMessage SOAP Services to control the EbMS adapter
 
 Implemented:
@@ -192,13 +193,14 @@ To receive ebms messages configure the servlet nl.clockwork.ebms.servlet.EbMSSer
 = EbMS Adapter Database
 ========================
 The EbMS adapter supports different databases:
-- HSQLDB
-- MySQL
-- MariaDB
-- PostgreSQL
-- MSSQL
-- Oracle
 - DB2
+- H2
+- HSQLDB
+- MariaDB
+- MSSQL
+- MySQL
+- Oracle
+- PostgreSQL
 
 The database scripts can be found in https://repo.maven.apache.org/maven2/nl/clockwork/ebms/ebms-core/2.17.0/ebms-core-2.17.0-sources.jar/resources/scripts/database/
 
@@ -207,6 +209,23 @@ You can configure the database by adding the right JDBC driver to the classpath 
 # Set username and password
 ebms.jdbc.username=<username>
 ebms.jdbc.password=<password>
+
+DB2:
+ebms.jdbc.driverClassName=com.ibm.db2.jcc.DB2Driver
+or
+ebms.jdbc.driverClassName=com.ibm.db2.jcc.DB2XADataSource
+ebms.jdbc.url=jdbc:db2://<host>:<port>/<dbname>
+
+H2:
+ebms.jdbc.driverClassName=org.h2.Driver
+or
+ebms.jdbc.driverClassName=org.h2.Driver
+# In memory
+ebms.jdbc.url=jdbc:h2:mem:<dbname>
+# or file
+ebms.jdbc.url=jdbc:h2:<path>
+# or external
+ebms.jdbc.url=jdbc:h2:tcp://<host>:<port>/<path>
 
 HSQLDB:
 ebms.jdbc.driverClassName=org.hsqldb.jdbcDriver
@@ -219,23 +238,11 @@ ebms.jdbc.url=jdbc:hsqldb:file:<path>
 # or external
 ebms.jdbc.url=jdbc:hsqldb:hsql://<host>:<port>/<dbname>
 
-MySQL:
-ebms.jdbc.driverClassName=com.mysql.cj.jdbc.Driver
-or
-ebms.jdbc.driverClassName=com.mysql.cj.jdbc.MysqlXADataSource
-ebms.jdbc.url=jdbc:mysql://<host>:<port>/<dbname>
-
 MariaDB:
 ebms.jdbc.driverClassName=org.mariadb.jdbc.Driver
 or
 ebms.jdbc.driverClassName=
 ebms.jdbc.url=jdbc:mysql://<host>:<port>/<dbname>
-
-PostgreSQL:
-ebms.jdbc.driverClassName=org.postgresql.Driver
-or
-ebms.jdbc.driverClassName=org.postgresql.xa.PGXADataSource
-ebms.jdbc.url=jdbc:postgresql://<host>:<port>/<dbname>
 
 MSSQL:
 ebms.jdbc.driverClassName=com.microsoft.sqlserver.jdbc.SQLServerDriver
@@ -243,17 +250,23 @@ or
 ebms.jdbc.driverClassName=com.microsoft.sqlserver.jdbc.SQLServerXADataSource
 ebms.jdbc.url=jdbc:sqlserver://<host>:<port>;[instanceName=<instanceName>;]databaseName=<dbname>;
 
+MySQL:
+ebms.jdbc.driverClassName=com.mysql.cj.jdbc.Driver
+or
+ebms.jdbc.driverClassName=com.mysql.cj.jdbc.MysqlXADataSource
+ebms.jdbc.url=jdbc:mysql://<host>:<port>/<dbname>
+
 Oracle:
 ebms.jdbc.driverClassName=oracle.jdbc.OracleDriver
 or
 ebms.jdbc.driverClassName=oracle.jdbc.xa.client.OracleXADataSource
 ebms.jdbc.url=jdbc:oracle:thin:@<host>:<port>:<dbname>
 
-DB2:
-ebms.jdbc.driverClassName=com.ibm.db2.jcc.DB2Driver
+PostgreSQL:
+ebms.jdbc.driverClassName=org.postgresql.Driver
 or
-ebms.jdbc.driverClassName=com.ibm.db2.jcc.DB2XADataSource
-ebms.jdbc.url=jdbc:db2://<host>:<port>/<dbname>
+ebms.jdbc.driverClassName=org.postgresql.xa.PGXADataSource
+ebms.jdbc.url=jdbc:postgresql://<host>:<port>/<dbname>
 
 ==========
 = Security

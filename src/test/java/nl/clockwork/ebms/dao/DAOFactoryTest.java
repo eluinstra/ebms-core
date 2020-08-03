@@ -66,6 +66,24 @@ public class DAOFactoryTest
 	}
 	
 	@Test
+	public void testDB2() throws Exception
+	{
+		ds.setDriverClassName("com.ibm.db2.jcc.DB2Driver");
+		dao = daoFactory.getObject();
+		assertNotNull(dao);
+		assertEquals(DB2EbMSDAO.class,dao.getClass());
+	}
+	
+	@Test
+	public void testH2() throws Exception
+	{
+		ds.setDriverClassName("org.h2.Driver");
+		dao = daoFactory.getObject();
+		assertNotNull(dao);
+		assertEquals(H2EbMSDAO.class,dao.getClass());	
+	}
+	
+	@Test
 	public void testHsql() throws Exception
 	{
 		ds.setDriverClassName("org.hsqldb.jdbcDriver");
@@ -74,6 +92,23 @@ public class DAOFactoryTest
 		assertEquals(HSQLDBEbMSDAO.class,dao.getClass());	
 	}
 	
+	@Test
+	public void testMariadb() throws Exception
+	{
+		ds.setDriverClassName("org.mariadb.jdbc.Driver");
+		dao = daoFactory.getObject();
+		assertNotNull(dao);
+		assertEquals(MySQLEbMSDAO.class,dao.getClass());
+	}
+	
+	@Test
+	public void testMssql() throws Exception
+	{
+		ds.setDriverClassName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+		dao = daoFactory.getObject();
+		assertNotNull(dao);
+		assertEquals(MSSQLEbMSDAO.class,dao.getClass());
+	}
 	
 	@Test
 	public void testMysql() throws Exception
@@ -82,22 +117,7 @@ public class DAOFactoryTest
 		dao = daoFactory.getObject();
 		assertNotNull(dao);
 		assertEquals(MySQLEbMSDAO.class,dao.getClass());
-		
-		ds.setDriverClassName("org.mariadb.jdbc.Driver");
-		dao = daoFactory.getObject();
-		assertNotNull(dao);
-		assertEquals(MySQLEbMSDAO.class,dao.getClass());
 	}
-	
-	@Test
-	public void testPostgresql() throws Exception
-	{
-		ds.setDriverClassName("org.postgresql.Driver");
-		dao = daoFactory.getObject();
-		assertNotNull(dao);
-		assertEquals(PostgreSQLEbMSDAO.class,dao.getClass());
-	}
-
 	
 	@Test
 	public void testOracle() throws Exception
@@ -109,21 +129,11 @@ public class DAOFactoryTest
 	}
 
 	@Test
-	public void testMssql() throws Exception
+	public void testPostgresql() throws Exception
 	{
-		ds.setDriverClassName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+		ds.setDriverClassName("org.postgresql.Driver");
 		dao = daoFactory.getObject();
 		assertNotNull(dao);
-		assertEquals(MSSQLEbMSDAO.class,dao.getClass());
+		assertEquals(PostgreSQLEbMSDAO.class,dao.getClass());
 	}
-	
-	@Test
-	public void testDB2() throws Exception
-	{
-		ds.setDriverClassName("com.ibm.db2.jcc.DB2Driver");
-		dao = daoFactory.getObject();
-		assertNotNull(dao);
-		assertEquals(DB2EbMSDAO.class,dao.getClass());
-	}
-	
 }

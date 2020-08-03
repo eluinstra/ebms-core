@@ -51,11 +51,12 @@ public abstract class AbstractDAOFactory<T> implements FactoryBean<T>
 		String driverClassName = getDriverClassName(dataSource);
 		return Match(driverClassName).of(
 				Case($(contains("db2")),o -> createDB2DAO()),
-				Case($(contains("hsqldb")),o -> createHSqlDbDAO()),
-				Case($(contains("mysql","mariadb")),o -> createMySqlDAO()),
+				Case($(contains("h2")),o -> createH2DAO()),
+				Case($(contains("hsqldb")),o -> createHSQLDBDAO()),
+				Case($(contains("mariadb","mysql")),o -> createMySQLDAO()),
 				Case($(contains("oracle")),o -> createOracleDAO()),
-				Case($(contains("postgresql")),o -> createPostgresDAO()),
-				Case($(contains("sqlserver")),o -> createMsSqlDAO()),
+				Case($(contains("postgresql")),o -> createPostgreSQLDAO()),
+				Case($(contains("sqlserver")),o -> createMSSQLDAO()),
 				Case($(),o -> {
 					throw new RuntimeException("Jdbc url " + driverClassName + " not recognized!");
 				}));
@@ -76,17 +77,19 @@ public abstract class AbstractDAOFactory<T> implements FactoryBean<T>
 		return true;
 	}
 
-	public abstract T createHSqlDbDAO();
+	public abstract T createDB2DAO();
 
-	public abstract T createMySqlDAO();
+	public abstract T createH2DAO();
 
-	public abstract T createPostgresDAO();
+	public abstract T createHSQLDBDAO();
+
+	public abstract T createMSSQLDAO();
+
+	public abstract T createMySQLDAO();
 
 	public abstract T createOracleDAO();
 
-	public abstract T createMsSqlDAO();
-
-	public abstract T createDB2DAO();
+	public abstract T createPostgreSQLDAO();
 
 	public abstract static class DefaultDAOFactory<U> extends AbstractDAOFactory<U>
 	{
@@ -96,21 +99,33 @@ public abstract class AbstractDAOFactory<T> implements FactoryBean<T>
 		}
 
 		@Override
-		public U createHSqlDbDAO()
+		public U createDB2DAO()
+		{
+			throw new RuntimeException("DB2 not supported!");
+		}
+
+		@Override
+		public U createH2DAO()
+		{
+			throw new RuntimeException("H2 not supported!");
+		}
+
+		@Override
+		public U createHSQLDBDAO()
 		{
 			throw new RuntimeException("HSQLDB not supported!");
 		}
 
 		@Override
-		public U createMySqlDAO()
+		public U createMSSQLDAO()
 		{
-			throw new RuntimeException("MySQL not supported!");
+			throw new RuntimeException("MSSQL not supported!");
 		}
 
 		@Override
-		public U createPostgresDAO()
+		public U createMySQLDAO()
 		{
-			throw new RuntimeException("Postgres not supported!");
+			throw new RuntimeException("MySQL not supported!");
 		}
 
 		@Override
@@ -120,17 +135,10 @@ public abstract class AbstractDAOFactory<T> implements FactoryBean<T>
 		}
 
 		@Override
-		public U createMsSqlDAO()
+		public U createPostgreSQLDAO()
 		{
-			throw new RuntimeException("MSSQL not supported!");
+			throw new RuntimeException("Postgres not supported!");
 		}
-
-		@Override
-		public U createDB2DAO()
-		{
-			throw new RuntimeException("DB2 not supported!");
-		}
-
 	}
 
 }
