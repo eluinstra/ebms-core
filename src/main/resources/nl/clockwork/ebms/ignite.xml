@@ -40,6 +40,20 @@
 				</bean>
 			</list>
 		</property>
+		<property name="discoverySpi">
+			<bean class="org.apache.ignite.spi.discovery.tcp.TcpDiscoverySpi">
+				<property name="ipFinder">
+					<bean class="org.apache.ignite.spi.discovery.tcp.ipfinder.multicast.TcpDiscoveryMulticastIpFinder">
+						<property name="multicastGroup" value="228.1.2.4" />
+						<property name="addresses">
+							<list>
+								<value>127.0.0.1:47500..47509</value>
+							</list>
+						</property>
+					</bean>
+				</property>
+			</bean>
+		</property>
 	</bean>
 
 	<bean name="nearConfiguration" class="org.apache.ignite.configuration.NearCacheConfiguration">
