@@ -110,8 +110,15 @@ class EventHandler
 			else
 				expireEvent(event);
 		};
-		timedTask.run(runnable);
-		return new AsyncResult<Void>(null);
+		try
+		{
+			timedTask.run(runnable);
+			return AsyncResult.forValue(null);
+		}
+		catch (Exception e)
+		{
+			return AsyncResult.forExecutionException(e);
+		}
 	}
 
 	private void sendEvent(final EbMSEvent event)
