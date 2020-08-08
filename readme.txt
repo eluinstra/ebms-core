@@ -16,6 +16,11 @@ For the ebms-admin console see https://sourceforge.net/projects/javaebmsadmin/
 ================
 = Release Notes
 ================
+ebms-core-2.17.2.jar:
+- added UserRateLimiterFilter
+- added EventListenerFilter
+- added h2 database support
+
 ebms-core-2.17.1.jar:
 - improved logging
 - improved error responses
