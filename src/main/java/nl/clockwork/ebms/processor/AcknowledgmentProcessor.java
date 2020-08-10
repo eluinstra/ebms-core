@@ -152,7 +152,7 @@ class AcknowledgmentProcessor
 		ebMSDAO.insertMessage(timestamp,persistTime.orElse(null),acknowledgmentDocument.getMessage(),acknowledgment,Collections.emptyList(),null);
 		if (ebMSDAO.updateMessage(
 				responseMessageHeader.getMessageData().getRefToMessageId(),
-				EbMSMessageStatus.SENDING,
+				EbMSMessageStatus.CREATED,
 				EbMSMessageStatus.DELIVERED) > 0)
 		{
 			eventListener.onMessageDelivered(responseMessageHeader.getMessageData().getRefToMessageId());

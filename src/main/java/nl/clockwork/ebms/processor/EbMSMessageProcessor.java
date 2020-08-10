@@ -295,7 +295,7 @@ public class EbMSMessageProcessor
 		val messageHeader = message.getMessageHeader();
 		if (ebMSDAO.updateMessage(
 				messageHeader .getMessageData().getMessageId(),
-				EbMSMessageStatus.SENDING,
+				EbMSMessageStatus.CREATED,
 				EbMSMessageStatus.DELIVERED) > 0)
 		{
 			eventListener.onMessageDelivered(messageHeader.getMessageData().getMessageId());

@@ -39,13 +39,13 @@ public enum EbMSMessageStatus
 	FORWARDED(4,MessageStatusType.FORWARDED),
 	FAILED(5,MessageStatusType.RECEIVED),
 	/*WAITING(6,MessageStatusType.RECEIVED),*/
-	SENDING(10),
+	CREATED(10),
 	DELIVERY_FAILED(11),
 	DELIVERED(12),
 	EXPIRED(13);
 
 	private static final Set<EbMSMessageStatus> RECEIVE_STATUS = EnumSet.of(UNAUTHORIZED,NOT_RECOGNIZED,RECEIVED,PROCESSED,FORWARDED,FAILED);
-	private static final Set<EbMSMessageStatus> SEND_STATUS = EnumSet.of(SENDING,DELIVERY_FAILED,DELIVERED,EXPIRED);
+	private static final Set<EbMSMessageStatus> SEND_STATUS = EnumSet.of(CREATED,DELIVERY_FAILED,DELIVERED,EXPIRED);
 	int id;
 	MessageStatusType statusCode;
 

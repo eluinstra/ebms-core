@@ -152,7 +152,7 @@ class EventHandler
 				log.error("",e);
 				eventManager.updateEvent(event,url,EbMSEventStatus.FAILED,e.getMessage());
 				if ((e instanceof EbMSUnrecoverableResponseException) || !CPAUtils.isReliableMessaging(receiveDeliveryChannel))
-					if (ebMSDAO.updateMessage(event.getMessageId(),EbMSMessageStatus.SENDING,EbMSMessageStatus.DELIVERY_FAILED) > 0)
+					if (ebMSDAO.updateMessage(event.getMessageId(),EbMSMessageStatus.CREATED,EbMSMessageStatus.DELIVERY_FAILED) > 0)
 					{
 						eventListener.onMessageFailed(event.getMessageId());
 						if (deleteEbMSAttachmentsOnMessageProcessed)
@@ -174,7 +174,7 @@ class EventHandler
 				log.error("",e);
 				eventManager.updateEvent(event,url,EbMSEventStatus.FAILED,ExceptionUtils.getStackTrace(e));
 				if (!CPAUtils.isReliableMessaging(receiveDeliveryChannel))
-					if (ebMSDAO.updateMessage(event.getMessageId(),EbMSMessageStatus.SENDING,EbMSMessageStatus.DELIVERY_FAILED) > 0)
+					if (ebMSDAO.updateMessage(event.getMessageId(),EbMSMessageStatus.CREATED,EbMSMessageStatus.DELIVERY_FAILED) > 0)
 					{
 						eventListener.onMessageFailed(event.getMessageId());
 						if (deleteEbMSAttachmentsOnMessageProcessed)
@@ -215,7 +215,7 @@ class EventHandler
 			messageProcessor.processResponse(requestDocument,responseDocument);
 			eventManager.updateEvent(event,url,EbMSEventStatus.SUCCEEDED);
 			if (!CPAUtils.isReliableMessaging(receiveDeliveryChannel))
-				if (ebMSDAO.updateMessage(event.getMessageId(),EbMSMessageStatus.SENDING,EbMSMessageStatus.DELIVERED) > 0)
+				if (ebMSDAO.updateMessage(event.getMessageId(),EbMSMessageStatus.CREATED,EbMSMessageStatus.DELIVERED) > 0)
 				{
 					eventListener.onMessageDelivered(event.getMessageId());
 					if (deleteEbMSAttachmentsOnMessageProcessed)
@@ -258,7 +258,7 @@ class EventHandler
 
 	private void updateMessage(final String messageId)
 	{
-		if (ebMSDAO.updateMessage(messageId,EbMSMessageStatus.SENDING,EbMSMessageStatus.EXPIRED) > 0)
+		if (ebMSDAO.updateMessage(messageId,EbMSMessageStatus.CREATED,EbMSMessageStatus.EXPIRED) > 0)
 		{
 			eventListener.onMessageExpired(messageId);
 			if (deleteEbMSAttachmentsOnMessageProcessed)

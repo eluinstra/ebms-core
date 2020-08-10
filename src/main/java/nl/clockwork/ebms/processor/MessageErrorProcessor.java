@@ -155,7 +155,7 @@ class MessageErrorProcessor
 		ebMSDAO.insertMessage(timestamp,persistTime.orElse(null),messageErrorDocument.getMessage(),messageError,Collections.emptyList(),null);
 		if (ebMSDAO.updateMessage(
 				responseMessageHeader.getMessageData().getRefToMessageId(),
-				EbMSMessageStatus.SENDING,
+				EbMSMessageStatus.CREATED,
 				EbMSMessageStatus.DELIVERY_FAILED) > 0)
 		{
 			eventListener.onMessageFailed(responseMessageHeader.getMessageData().getRefToMessageId());

@@ -200,7 +200,7 @@ class AbstractEbMSDAO implements EbMSDAO
 				.from(table)
 				.where(table.messageId.eq(messageId)
 						.and(table.messageNr.eq(0))
-						.and(table.status.isNull().or(table.status.eq(EbMSMessageStatus.SENDING))))
+						.and(table.status.isNull().or(table.status.eq(EbMSMessageStatus.CREATED))))
 				.fetchOne();
 		if (content != null)
 		{

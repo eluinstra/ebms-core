@@ -1225,7 +1225,7 @@
           <xs:enumeration value="PROCESSED"/>
           <xs:enumeration value="FORWARDED"/>
           <xs:enumeration value="FAILED"/>
-          <xs:enumeration value="SENDING"/>
+          <xs:enumeration value="CREATED"/>
           <xs:enumeration value="DELIVERY_FAILED"/>
           <xs:enumeration value="DELIVERED"/>
           <xs:enumeration value="EXPIRED"/>

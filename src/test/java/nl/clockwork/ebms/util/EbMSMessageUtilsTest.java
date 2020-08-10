@@ -150,7 +150,7 @@ public class EbMSMessageUtilsTest
 		assertEquals(MessageStatusType.PROCESSED.value(), createStatusResponse.getMessageStatus().value());
 
 		/* createStatusResponse 5 */
-		createStatusResponse = EbMSMessageUtils.createStatusResponse(statusRequest, EbMSMessageStatus.SENDING, timestamp);
+		createStatusResponse = EbMSMessageUtils.createStatusResponse(statusRequest, EbMSMessageStatus.CREATED, timestamp);
 		assertNull(createStatusResponse.getTimestamp());
 		assertNull(createStatusResponse.getMessageStatus());
 	}
