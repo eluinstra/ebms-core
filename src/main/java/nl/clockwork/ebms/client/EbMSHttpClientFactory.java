@@ -67,7 +67,7 @@ public class EbMSHttpClientFactory
 	@Default
 	Map<String,EbMSClient> clients = new ConcurrentHashMap<String,EbMSClient>();
 
-	public EbMSClient createEbMSClient(String clientAlias)
+	private EbMSClient createEbMSClient(String clientAlias)
 	{
 		try
 		{
