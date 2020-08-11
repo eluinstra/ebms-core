@@ -53,7 +53,7 @@ class URLMappingDAOImpl implements URLMappingDAO
 	@Cacheable(cacheNames = "URLMapping", keyGenerator = "ebMSKeyGenerator")
 	public Optional<String> getURLMapping(String source)
 	{
-		return Optional.ofNullable(queryFactory.select(table.source)
+		return Optional.ofNullable(queryFactory.select(table.destination)
 				.from(table)
 				.where(table.source.eq(source))
 				.fetchOne());
