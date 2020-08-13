@@ -695,13 +695,24 @@
 				</reportSets>
 			</plugin>
 			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>findbugs-maven-plugin</artifactId>
-				<version>3.0.5</version>
+				<groupId>com.github.spotbugs</groupId>
+				<artifactId>spotbugs-maven-plugin</artifactId>
+				<version>4.0.4</version>
 				<configuration>
-					<findbugsXmlOutputDirectory>${basedir}/target</findbugsXmlOutputDirectory>
+					<spotbugsXmlOutputDirectory>${basedir}/target</spotbugsXmlOutputDirectory>
 					<xmlOutput>true</xmlOutput>
 					<xmlOutputDirectory>target/site</xmlOutputDirectory>
+					<effort>Max</effort>
+					<threshold>Low</threshold>
+					<failOnError>true</failOnError>
+					<includeFilterFile>${session.executionRootDirectory}/spotbugs-security-include.xml</includeFilterFile>
+					<plugins>
+						<plugin>
+							<groupId>com.h3xstream.findsecbugs</groupId>
+							<artifactId>findsecbugs-plugin</artifactId>
+							<version>1.10.1</version>
+						</plugin>
+					</plugins>
 				</configuration>
 			</plugin>
 			<plugin>
