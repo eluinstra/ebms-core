@@ -16,14 +16,20 @@ For the ebms-admin console see https://sourceforge.net/projects/javaebmsadmin/
 ================
 = Release Notes
 ================
-ebms-core-2.17.2.jar:
+ebms-core-2.17.3.jar:
 - fixed URL Mapping
 - renamed status SENDING to CREATED
+- updated libraries
 
 ebms-core-2.17.2.jar:
 - added UserRateLimiterFilter
 - added EventListenerFilter
+	- added default property eventListener.filter=
 - added h2 database support
+- added flyway db migration
+	- added default properties
+		- ebms.jdbc.update=false
+		- ebms.jdbc.strict=false
 
 ebms-core-2.17.1.jar:
 - improved logging
@@ -32,6 +38,7 @@ ebms-core-2.17.1.jar:
 - fixed configuration issue, that causes send events to be rejected
 - fixed server, client and api mode
 - added rate limiter
+	- added default property http.requestsPerSecond=
 
 ebms-core-2.17.0.jar:
 - added options to enable high availability and horizontal scaling (and throttling)
@@ -352,8 +359,8 @@ mvn surefire:test
 mvn jxr:jxr
 mvn jxr:test-jxr
 mvn checkstyle:checkstyle
-mvn spotbugs:gui
+mvn com.github.spotbugs:spotbugs-maven-plugin:gui
 mvn pmd:pmd
 mvn jdepend:generate
 mvn cobertura:cobertura
-mvn org.owasp:dependency-check-maven:5.1.0:check
+mvn org.owasp:dependency-check-maven:check
