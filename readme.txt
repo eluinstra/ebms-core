@@ -17,6 +17,10 @@ For the ebms-admin console see https://sourceforge.net/projects/javaebmsadmin/
 = Release Notes
 ================
 ebms-core-2.17.2.jar:
+- fixed URL Mapping
+- renamed status SENDING to CREATED
+
+ebms-core-2.17.2.jar:
 - added UserRateLimiterFilter
 - added EventListenerFilter
 - added h2 database support
@@ -343,12 +347,12 @@ mvn package
 =====================
 mvn site
 
-Or to generate individual reports:
+or to generate individual reports:
 mvn surefire:test
 mvn jxr:jxr
 mvn jxr:test-jxr
 mvn checkstyle:checkstyle
-mvn findbugs:findbugs
+mvn spotbugs:gui
 mvn pmd:pmd
 mvn jdepend:generate
 mvn cobertura:cobertura
