@@ -31,6 +31,7 @@ import nl.clockwork.ebms.event.listener.EventListenerConfig;
 import nl.clockwork.ebms.event.processor.EventManagerConfig;
 import nl.clockwork.ebms.event.processor.EventProcessorConfig;
 import nl.clockwork.ebms.jms.JMSConfig;
+import nl.clockwork.ebms.metrics.MetricsConfig;
 import nl.clockwork.ebms.processor.EbMSProcessorConfig;
 import nl.clockwork.ebms.querydsl.QueryDSLConfig;
 import nl.clockwork.ebms.security.KeyStoreConfig;
@@ -56,6 +57,7 @@ import nl.clockwork.ebms.validation.ValidationConfig;
 		EventProcessorConfig.class,
 		JMSConfig.class,
 		KeyStoreConfig.class,
+		MetricsConfig.class,
 		QueryDSLConfig.class,
 		ServerConfig.class,
 		ServiceConfig.class,

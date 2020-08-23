@@ -30,6 +30,7 @@ import nl.clockwork.ebms.cpa.URLMapper;
 import nl.clockwork.ebms.dao.EbMSDAO;
 import nl.clockwork.ebms.event.listener.EbMSMessageEventDAO;
 import nl.clockwork.ebms.event.processor.EventManager;
+import nl.clockwork.ebms.metrics.MetricsService;
 import nl.clockwork.ebms.service.cpa.CPAService;
 import nl.clockwork.ebms.service.cpa.CPAServiceImpl;
 import nl.clockwork.ebms.service.cpa.certificate.CertificateMappingService;
@@ -44,6 +45,8 @@ import nl.clockwork.ebms.validation.EbMSMessageContextValidator;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class ServiceConfig
 {
+	@Autowired
+	MetricsService metricsService;
 	@Autowired
 	CPAManager cpaManager;
 	@Autowired
@@ -102,7 +105,8 @@ public class ServiceConfig
 	@Bean
 	public EbMSMessageServiceHandler ebMSMessageServiceHandler()
 	{
-		return EbMSMessageServiceHandler.builder()
+		return EbMSMessageServiceMetricsHandler.ebMSMessageServiceMetricsHandlerBuilder()
+				.metricsService(metricsService)
 				.deliveryManager(deliveryManager)
 				.ebMSDAO(ebMSDAO)
 				.ebMSMessageEventDAO(ebMSMessageEventDAO)

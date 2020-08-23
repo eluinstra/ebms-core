@@ -55,22 +55,9 @@ public abstract class EbMSInputStreamHandler
 	{
 	  try
 		{
-	  	val soapAction = getRequestHeader("SOAPAction");
-	  	if (!Constants.EBMS_SOAP_ACTION.equals(soapAction))
-	  	{
-				if (messageLog.isInfoEnabled())
-					messageLog.info("<<<<\n" + getRequestHeaders() + "\n" + IOUtils.toString(request,Charset.defaultCharset()));
-				throw new ValidationException("Unable to process message! SOAPAction=" + soapAction);
-	  	}
-//	  	if (log.isDebugEnabled())
-//	  		request = new LoggingInputStream(request);
+	  	validateSoapAction(request);
 	  	if (messageLog.isDebugEnabled())
-	  	{
-	  		request = new BufferedInputStream(request);
-	  		request.mark(Integer.MAX_VALUE);
-	  		messageLog.info("<<<<\n" + getRequestHeaders() + "\n" + IOUtils.toString(request,Charset.defaultCharset()));
-	  		request.reset();
-	  	}
+	  		request = getRequestLogger(request);
 			val messageReader = new EbMSMessageReader(getRequestHeader("Content-ID"),getRequestHeader("Content-Type"));
 			val in = messageReader.read(request);
 			if (messageLog.isInfoEnabled() && !messageLog.isDebugEnabled())
@@ -110,6 +97,26 @@ public abstract class EbMSInputStreamHandler
 				throw new EbMSProcessorException(e1);
 			}
 		}
+	}
+
+	private void validateSoapAction(InputStream request) throws IOException
+	{
+		val soapAction = getRequestHeader("SOAPAction");
+		if (!Constants.EBMS_SOAP_ACTION.equals(soapAction))
+		{
+			if (messageLog.isInfoEnabled())
+				messageLog.info("<<<<\n" + getRequestHeaders() + "\n" + IOUtils.toString(request,Charset.defaultCharset()));
+			throw new ValidationException("Unable to process message! SOAPAction=" + soapAction);
+		}
+	}
+
+	private InputStream getRequestLogger(InputStream request) throws IOException
+	{
+		request = new BufferedInputStream(request);
+		request.mark(Integer.MAX_VALUE);
+		messageLog.info("<<<<\n" + getRequestHeaders() + "\n" + IOUtils.toString(request,Charset.defaultCharset()));
+		request.reset();
+		return request;
 	}
 
 	private String getRequestHeaders()

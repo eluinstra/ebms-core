@@ -28,6 +28,7 @@ import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.val;
 import lombok.experimental.FieldDefaults;
+import nl.clockwork.ebms.metrics.MetricsService;
 import nl.clockwork.ebms.processor.EbMSMessageProcessor;
 import nl.clockwork.ebms.processor.EbMSProcessorException;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -35,13 +36,15 @@ import nl.clockwork.ebms.processor.EbMSProcessorException;
 public class EbMSHttpHandler
 {
 	@NonNull
+	MetricsService metricsService;
+	@NonNull
 	EbMSMessageProcessor messageProcessor;
 
 	public void handle(final HttpServletRequest request, final HttpServletResponse response) throws EbMSProcessorException
 	{
 		try
 		{
-			val inputStreamHandler = new EbMSInputStreamHandler(messageProcessor)
+			val inputStreamHandler = new EbMSInputStreamMetricsHandler(metricsService,messageProcessor)
 			{
 				@Override
 				public List<String> getRequestHeaderNames()
