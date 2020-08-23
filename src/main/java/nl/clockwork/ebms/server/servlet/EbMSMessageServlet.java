@@ -34,7 +34,6 @@ import lombok.AccessLevel;
 import lombok.val;
 import lombok.experimental.FieldDefaults;
 import nl.clockwork.ebms.processor.EbMSMessageProcessor;
-import nl.clockwork.ebms.processor.EbMSProcessorException;
 import nl.clockwork.ebms.server.EbMSInputStreamHandler;
 
 @FieldDefaults(level = AccessLevel.PRIVATE)
@@ -54,68 +53,59 @@ public class EbMSMessageServlet extends GenericServlet
 	@Override
 	public void service(final ServletRequest request, final ServletResponse response) throws ServletException, IOException
 	{
-		try
+		val handler = new EbMSInputStreamHandler(ebMSMessageProcessor)
 		{
-			val handler = 
-				new EbMSInputStreamHandler(ebMSMessageProcessor)
-				{
-					@Override
-					public List<String> getRequestHeaderNames()
-					{
-						val result = new ArrayList<String>();
-						val headerNames = ((HttpServletRequest)request).getHeaderNames();
-						while (headerNames.hasMoreElements())
-							result.add((String)headerNames.nextElement());
-						return result;
-					}
+			@Override
+			public List<String> getRequestHeaderNames()
+			{
+				val result = new ArrayList<String>();
+				val headerNames = ((HttpServletRequest)request).getHeaderNames();
+				while (headerNames.hasMoreElements())
+					result.add((String)headerNames.nextElement());
+				return result;
+			}
 
-					@Override
-					public List<String> getRequestHeaders(String headerName)
-					{
-						val result = new ArrayList<String>();
-						val headers = ((HttpServletRequest)request).getHeaders(headerName);
-						while(headers.hasMoreElements())
-							result.add((String)headers.nextElement());
-						return result;
-					}
+			@Override
+			public List<String> getRequestHeaders(String headerName)
+			{
+				val result = new ArrayList<String>();
+				val headers = ((HttpServletRequest)request).getHeaders(headerName);
+				while(headers.hasMoreElements())
+					result.add((String)headers.nextElement());
+				return result;
+			}
 
-					@Override
-					public String getRequestHeader(String headerName)
-					{
-						if ("Content-Type".equals(headerName))
-							return request.getContentType();
-						else
-							return ((HttpServletRequest)request).getHeader(headerName);
-					}
+			@Override
+			public String getRequestHeader(String headerName)
+			{
+				if ("Content-Type".equals(headerName))
+					return request.getContentType();
+				else
+					return ((HttpServletRequest)request).getHeader(headerName);
+			}
 
-					@Override
-					public void writeResponseStatus(int statusCode)
-					{
-						((HttpServletResponse)response).setStatus(statusCode);
-					}
+			@Override
+			public void writeResponseStatus(int statusCode)
+			{
+				((HttpServletResponse)response).setStatus(statusCode);
+			}
 
-					@Override
-					public void writeResponseHeader(String name, String value)
-					{
-						if ("Content-Type".equals(name))
-							response.setContentType(value);
-						else
-							((HttpServletResponse)response).setHeader(name,value);
-					}
-				
-					@Override
-					public OutputStream getOutputStream() throws IOException
-					{
-						return response.getOutputStream();
-					}
-				}
-			;
-			handler.handle(request.getInputStream());
-		}
-		catch (EbMSProcessorException e)
-		{
-			throw new ServletException(e);
-		}
+			@Override
+			public void writeResponseHeader(String name, String value)
+			{
+				if ("Content-Type".equals(name))
+					response.setContentType(value);
+				else
+					((HttpServletResponse)response).setHeader(name,value);
+			}
+		
+			@Override
+			public OutputStream getOutputStream() throws IOException
+			{
+				return response.getOutputStream();
+			}
+		};
+		handler.handle(request.getInputStream());
 	}
 
 	public void setEbMSMessageProcessor(EbMSMessageProcessor ebMSMessageProcessor)

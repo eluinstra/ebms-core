@@ -38,7 +38,6 @@ import nl.clockwork.ebms.EbMSMessageReader;
 import nl.clockwork.ebms.EbMSMessageUtils;
 import nl.clockwork.ebms.HttpStatusCode;
 import nl.clockwork.ebms.processor.EbMSMessageProcessor;
-import nl.clockwork.ebms.processor.EbMSProcessorException;
 import nl.clockwork.ebms.util.DOMUtils;
 import nl.clockwork.ebms.validation.ValidationException;
 
@@ -51,7 +50,7 @@ public abstract class EbMSInputStreamHandler
   @NonNull
 	EbMSMessageProcessor messageProcessor;
 
-	public void handle(InputStream request) throws EbMSProcessorException
+	public void handle(InputStream request)
 	{
 	  try
 		{
@@ -83,10 +82,10 @@ public abstract class EbMSInputStreamHandler
 		{
 			try
 			{
+				log.error("",e);
 				val soapFault = EbMSMessageUtils.createSOAPFault(e);
 				if (messageLog.isInfoEnabled())
 					messageLog.info(">>>>\nstatusCode: " + HttpStatusCode.SC_INTERNAL_SERVER_ERROR.getCode() + "\nContent-Type: text/xml\n" + DOMUtils.toString(soapFault));
-				log.info("",e);
 				writeResponseStatus(HttpStatusCode.SC_INTERNAL_SERVER_ERROR.getCode());
 				writeResponseHeader("Content-Type","text/xml");
 				val response = getOutputStream();
@@ -94,7 +93,11 @@ public abstract class EbMSInputStreamHandler
 			}
 			catch (Exception e1)
 			{
-				throw new EbMSProcessorException(e1);
+				log.error("",e1);
+				if (e instanceof ValidationException)
+					throw new IllegalStateException(e);
+				else
+					throw new IllegalStateException("An unexpected error occurred!");
 			}
 		}
 	}

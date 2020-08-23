@@ -7,7 +7,6 @@ import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
 import nl.clockwork.ebms.metrics.MetricsService;
 import nl.clockwork.ebms.processor.EbMSMessageProcessor;
-import nl.clockwork.ebms.processor.EbMSProcessorException;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public abstract class EbMSInputStreamMetricsHandler extends EbMSInputStreamHandler
@@ -22,7 +21,7 @@ public abstract class EbMSInputStreamMetricsHandler extends EbMSInputStreamHandl
 	}
 
 	@Override
-	public void handle(InputStream request) throws EbMSProcessorException
+	public void handle(InputStream request)
 	{
 		super.handle(request);
 		metricsService.increment("EbMSServer.handleRequest");
