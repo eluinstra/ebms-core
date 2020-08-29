@@ -21,6 +21,7 @@ import java.net.HttpURLConnection;
 import java.nio.charset.Charset;
 import java.util.List;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.commons.io.IOUtils;
@@ -36,7 +37,6 @@ import lombok.val;
 import lombok.experimental.FieldDefaults;
 import nl.clockwork.ebms.Constants;
 import nl.clockwork.ebms.EbMSMessageReader;
-import nl.clockwork.ebms.HttpStatusCode;
 import nl.clockwork.ebms.model.EbMSDocument;
 import nl.clockwork.ebms.processor.EbMSProcessingException;
 import nl.clockwork.ebms.processor.EbMSProcessorException;
@@ -60,7 +60,7 @@ class EbMSResponseHandler
 			switch(connection.getResponseCode() / 100)
 			{
 				case 2:
-					if (connection.getResponseCode() == HttpStatusCode.SC_NOCONTENT.getCode() || connection.getContentLength() == 0)
+					if (connection.getResponseCode() == HttpServletResponse.SC_NO_CONTENT || connection.getContentLength() == 0)
 					{
 						logResponse(connection);
 						return null;

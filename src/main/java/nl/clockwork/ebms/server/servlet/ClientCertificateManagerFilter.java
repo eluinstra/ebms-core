@@ -43,13 +43,13 @@ import nl.clockwork.ebms.validation.ClientCertificateManager;
 public class ClientCertificateManagerFilter implements Filter
 {
 	String x509CertificateHeader;
-	boolean useX509Certificate;
+	boolean useX509CertificateHeader;
 
 	@Override
 	public void init(FilterConfig filterConfig) throws ServletException
 	{
 		x509CertificateHeader = filterConfig.getInitParameter("x509CertificateHeader");
-		useX509Certificate = StringUtils.isEmpty(x509CertificateHeader);
+		useX509CertificateHeader = StringUtils.isEmpty(x509CertificateHeader);
 	}
 
 	@Override
@@ -57,7 +57,7 @@ public class ClientCertificateManagerFilter implements Filter
 	{
 		try
 		{
-			if (useX509Certificate)
+			if (useX509CertificateHeader)
 			{
 				val certificates = (X509Certificate[])request.getAttribute("javax.servlet.request.X509Certificate");
 				ClientCertificateManager.setCertificate(certificates != null && certificates.length > 0 ? certificates[0] : null);
@@ -67,7 +67,7 @@ public class ClientCertificateManagerFilter implements Filter
 				val certificate = decode(((HttpServletRequest)request).getHeader(x509CertificateHeader));
 				ClientCertificateManager.setCertificate(certificate);
 			}
-			log.info("User " + ClientCertificateManager.getCertificate() != null ? ClientCertificateManager.getCertificate().getSubjectDN().toString() : "unknown!");
+			log.info("Certificate " + ClientCertificateManager.getCertificate() != null ? ClientCertificateManager.getCertificate().getSubjectDN().toString() : "not found!");
 			chain.doFilter(request,response);
 		}
 		catch (CertificateException e)

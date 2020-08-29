@@ -13,19 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.clockwork.ebms;
+package nl.clockwork.ebms.server.servlet;
 
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.experimental.FieldDefaults;
+import java.io.IOException;
 
-@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-@AllArgsConstructor
-@Getter
-public enum HttpStatusCode
+import javax.servlet.GenericServlet;
+import javax.servlet.ServletException;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
+import javax.servlet.http.HttpServletResponse;
+
+public class HealthServlet extends GenericServlet
 {
-	SC_OK(200), SC_NOCONTENT(204), SC_BAD_REQUEST(400), SC_INTERNAL_SERVER_ERROR(500);
+	private static final long serialVersionUID = 1L;
 
-	int code;
+	@Override
+	public void service(ServletRequest req, ServletResponse res) throws ServletException, IOException
+	{
+		((HttpServletResponse)res).setStatus(HttpServletResponse.SC_OK);
+	}
 }
