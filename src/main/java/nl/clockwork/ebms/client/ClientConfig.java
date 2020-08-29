@@ -27,7 +27,6 @@ import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import nl.clockwork.ebms.client.EbMSHttpClientFactory.EbMSHttpClientType;
 import nl.clockwork.ebms.cpa.CertificateMapper;
-import nl.clockwork.ebms.metrics.MetricsService;
 import nl.clockwork.ebms.security.EbMSKeyStore;
 import nl.clockwork.ebms.security.EbMSTrustStore;
 
@@ -35,8 +34,6 @@ import nl.clockwork.ebms.security.EbMSTrustStore;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class ClientConfig
 {
-	@Autowired
-	MetricsService metricsService;
 	@Value("${http.client}")
 	EbMSHttpClientType ebMSHttpClientType;
 	@Value("${http.connectTimeout}")
@@ -96,7 +93,6 @@ public class ClientConfig
 				.httpErrors(createHttpErrors())
 				.certificateMapper(certificateMapper)
 				.useClientCertificate(useClientCertificate)
-				.metricsService(metricsService)
 				.build();
 	}
 

@@ -33,7 +33,6 @@ import lombok.val;
 import lombok.experimental.FieldDefaults;
 import nl.clockwork.ebms.cpa.CPAUtils;
 import nl.clockwork.ebms.cpa.CertificateMapper;
-import nl.clockwork.ebms.metrics.MetricsService;
 import nl.clockwork.ebms.security.EbMSKeyStore;
 import nl.clockwork.ebms.security.EbMSTrustStore;
 
@@ -65,8 +64,6 @@ public class EbMSHttpClientFactory
 	CertificateMapper certificateMapper;
 	boolean useClientCertificate;
 	@NonNull
-	MetricsService metricsService;
-	@NonNull
 	@Default
 	Map<String,EbMSClient> clients = new ConcurrentHashMap<String,EbMSClient>();
 
@@ -75,10 +72,10 @@ public class EbMSHttpClientFactory
 		try
 		{
 			val sslFactoryManager = createSslFactoryManager(getClientAlias(clientAlias));
-			val client = EbMSHttpClientType.APACHE.equals(type)
-				? new nl.clockwork.ebms.client.apache.EbMSHttpClient(sslFactoryManager,enabledProtocols,enabledCipherSuites,verifyHostnames,connectTimeout,chunkedStreamingMode,proxy)
-				: new EbMSHttpClient(sslFactoryManager,connectTimeout,chunkedStreamingMode,base64Writer,proxy,httpErrors.getRecoverableHttpErrors(),httpErrors.getUnrecoverableHttpErrors());
-			return new EbMSClientMetricsWrapper(metricsService,client);
+			if (EbMSHttpClientType.APACHE.equals(type))
+				return new nl.clockwork.ebms.client.apache.EbMSHttpClient(sslFactoryManager,enabledProtocols,enabledCipherSuites,verifyHostnames,connectTimeout,chunkedStreamingMode,proxy);
+			else
+				return new EbMSHttpClient(sslFactoryManager,connectTimeout,chunkedStreamingMode,base64Writer,proxy,httpErrors.getRecoverableHttpErrors(),httpErrors.getUnrecoverableHttpErrors());
 		}
 		catch (Exception e)
 		{

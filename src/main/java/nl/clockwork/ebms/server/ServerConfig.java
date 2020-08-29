@@ -21,7 +21,6 @@ import org.springframework.context.annotation.Configuration;
 
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
-import nl.clockwork.ebms.metrics.MetricsService;
 import nl.clockwork.ebms.processor.EbMSMessageProcessor;
 
 @Configuration
@@ -29,13 +28,11 @@ import nl.clockwork.ebms.processor.EbMSMessageProcessor;
 public class ServerConfig
 {
 	@Autowired
-	MetricsService metricsService;
-	@Autowired
 	EbMSMessageProcessor messageProcessor;
 
 	@Bean
 	public EbMSHttpHandler httpHandler()
 	{
-		return new EbMSHttpHandler(metricsService,messageProcessor);
+		return new EbMSHttpHandler(messageProcessor);
 	}
 }
