@@ -38,7 +38,7 @@ import nl.clockwork.ebms.event.listener.EbMSMessageEventType;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-public class EbMSMessageEvent implements Serializable
+public class MessageEvent implements Serializable
 {
 	private static final long serialVersionUID = 1L;
 	@XmlElement(required=true)

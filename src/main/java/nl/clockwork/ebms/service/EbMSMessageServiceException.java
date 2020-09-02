@@ -19,7 +19,7 @@ import javax.xml.ws.WebFault;
 
 import lombok.NoArgsConstructor;
 
-@WebFault(name="EbMSMessageServiceException", targetNamespace="http://www.ordina.nl/ebms/2.17")
+@WebFault(name = "EbMSMessageServiceException", targetNamespace = "http://www.ordina.nl/ebms/2.18")
 @NoArgsConstructor
 public class EbMSMessageServiceException extends RuntimeException
 {

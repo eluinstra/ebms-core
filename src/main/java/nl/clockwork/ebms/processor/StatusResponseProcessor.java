@@ -38,9 +38,9 @@ import nl.clockwork.ebms.client.DeliveryManager;
 import nl.clockwork.ebms.cpa.CPAManager;
 import nl.clockwork.ebms.cpa.CPAUtils;
 import nl.clockwork.ebms.dao.EbMSDAO;
+import nl.clockwork.ebms.model.EbMSMessageProperties;
 import nl.clockwork.ebms.model.EbMSStatusRequest;
 import nl.clockwork.ebms.model.EbMSStatusResponse;
-import nl.clockwork.ebms.service.model.EbMSMessageContext;
 import nl.clockwork.ebms.validation.EbMSMessageValidator;
 import nl.clockwork.ebms.validation.ValidatorException;
 
@@ -63,7 +63,7 @@ class StatusResponseProcessor
 
   public EbMSStatusResponse createStatusResponse(final EbMSStatusRequest statusRequest, final Instant timestamp) throws ValidatorException, DatatypeConfigurationException, JAXBException, EbMSProcessorException
 	{
-		val mc = ebMSDAO.getMessageContext(statusRequest.getStatusRequest().getRefToMessageId()).orElse(null);
+		val mc = ebMSDAO.getEbMSMessageProperties(statusRequest.getStatusRequest().getRefToMessageId()).orElse(null);
 		val result = createEbMSMessageStatusAndTimestamp(statusRequest,mc);
 		return ebMSMessageFactory.createEbMSStatusResponse(statusRequest,result._1,result._2); 
 	}
@@ -93,7 +93,7 @@ class StatusResponseProcessor
 		}
 	}
 
-	private Tuple2<EbMSMessageStatus,Instant> createEbMSMessageStatusAndTimestamp(EbMSStatusRequest statusRequest, EbMSMessageContext messageContext)
+	private Tuple2<EbMSMessageStatus,Instant> createEbMSMessageStatusAndTimestamp(EbMSStatusRequest statusRequest, EbMSMessageProperties messageContext)
 	{
 		if (messageContext == null || EbMSAction.EBMS_SERVICE_URI.equals(messageContext.getService()))
 			return Tuple.of(EbMSMessageStatus.NOT_RECOGNIZED,null);

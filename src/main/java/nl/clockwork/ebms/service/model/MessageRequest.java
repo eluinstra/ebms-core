@@ -24,26 +24,24 @@ import javax.xml.bind.annotation.XmlElement;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
-import lombok.ToString;
 import lombok.experimental.FieldDefaults;
 
 @XmlAccessorType(XmlAccessType.FIELD)
+@Builder
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @NoArgsConstructor
 @AllArgsConstructor
-@RequiredArgsConstructor
-@ToString
-public class EbMSMessageContent implements Serializable
+public class MessageRequest implements Serializable
 {
 	private static final long serialVersionUID = 1L;
-	@XmlElement(required=true)
+	@XmlElement(required = true)
 	@NonNull
-	EbMSMessageContext context;
+	MessageRequestProperties properties;
 	@XmlElement(name="dataSource")
-	List<EbMSDataSource> dataSources;
+	List<DataSource> dataSources;
 }

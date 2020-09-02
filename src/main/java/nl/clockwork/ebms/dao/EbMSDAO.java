@@ -28,20 +28,21 @@ import nl.clockwork.ebms.EbMSMessageStatus;
 import nl.clockwork.ebms.model.EbMSAttachment;
 import nl.clockwork.ebms.model.EbMSBaseMessage;
 import nl.clockwork.ebms.model.EbMSDocument;
+import nl.clockwork.ebms.model.EbMSMessageProperties;
 import nl.clockwork.ebms.querydsl.model.QEbmsMessage;
-import nl.clockwork.ebms.service.model.EbMSMessageContent;
-import nl.clockwork.ebms.service.model.EbMSMessageContentMTOM;
-import nl.clockwork.ebms.service.model.EbMSMessageContext;
+import nl.clockwork.ebms.service.model.Message;
+import nl.clockwork.ebms.service.model.MTOMMessage;
+import nl.clockwork.ebms.service.model.MessageFilter;
 
 public interface EbMSDAO
 {
 	boolean existsMessage(String messageId);
 	boolean existsIdenticalMessage(EbMSBaseMessage message);
 
-	Optional<EbMSMessageContent> getMessageContent(String messageId);
-	Optional<EbMSMessageContentMTOM> getMessageContentMTOM(String messageId);
-	Optional<EbMSMessageContext> getMessageContext(String messageId);
-	Optional<EbMSMessageContext> getMessageContextByRefToMessageId(String cpaId, String refToMessageId, EbMSAction...actions);
+	Optional<Message> getMessage(String messageId);
+	Optional<MTOMMessage> getMTOMMessage(String messageId);
+	Optional<EbMSMessageProperties> getEbMSMessageProperties(String messageId);
+	Optional<EbMSMessageProperties> getEbMSMessagePropertiesByRefToMessageId(String cpaId, String refToMessageId, EbMSAction...actions);
 	Optional<Document> getDocument(String messageId);
 	Optional<EbMSDocument> getEbMSDocumentIfUnsent(String messageId);
 	Optional<EbMSDocument> getEbMSDocumentByRefToMessageId(String cpaId, String refToMessageId, EbMSAction...actions);
@@ -49,8 +50,8 @@ public interface EbMSDAO
 	Optional<Instant> getPersistTime(String messageId);
 	Optional<EbMSAction> getMessageAction(String messageId);
 
-	List<String> getMessageIds(EbMSMessageContext messageContext, EbMSMessageStatus status);
-	List<String> getMessageIds(EbMSMessageContext messageContext, EbMSMessageStatus status, int maxNr);
+	List<String> getMessageIds(MessageFilter messageFilter, EbMSMessageStatus status);
+	List<String> getMessageIds(MessageFilter messageFilter, EbMSMessageStatus status, int maxNr);
 
 	long insertMessage(Instant timestamp, Instant persistTime, Document document, EbMSBaseMessage message, List<EbMSAttachment> attachments, EbMSMessageStatus status);
 	long insertDuplicateMessage(Instant timestamp, Document document, EbMSBaseMessage message, List<EbMSAttachment> attachments);
@@ -59,38 +60,36 @@ public interface EbMSDAO
 
 	long deleteAttachments(String messageId);
 
-	static BooleanBuilder applyFilter(QEbmsMessage table, EbMSMessageContext messageContext, BooleanBuilder builder)
+	static BooleanBuilder applyFilter(QEbmsMessage table, MessageFilter messageFilter, BooleanBuilder builder)
 	{
-		if (messageContext != null)
+		if (messageFilter != null)
 		{
-			if (messageContext.getCpaId() != null)
-				builder.and(table.cpaId.eq(messageContext.getCpaId()));
-			if (messageContext.getFromParty() != null)
+			if (messageFilter.getCpaId() != null)
+				builder.and(table.cpaId.eq(messageFilter.getCpaId()));
+			if (messageFilter.getFromParty() != null)
 			{
-				if (messageContext.getFromParty().getPartyId() != null)
-					builder.and(table.fromPartyId.eq(messageContext.getFromParty().getPartyId()));
-				if (messageContext.getFromParty().getRole() != null)
-					builder.and(table.fromRole.eq(messageContext.getFromParty().getRole()));
+				if (messageFilter.getFromParty().getPartyId() != null)
+					builder.and(table.fromPartyId.eq(messageFilter.getFromParty().getPartyId()));
+				if (messageFilter.getFromParty().getRole() != null)
+					builder.and(table.fromRole.eq(messageFilter.getFromParty().getRole()));
 			}
-			if (messageContext.getToParty() != null)
+			if (messageFilter.getToParty() != null)
 			{
-				if (messageContext.getToParty().getPartyId() != null)
-					builder.and(table.toPartyId.eq(messageContext.getToParty().getPartyId()));
-				if (messageContext.getToParty().getRole() != null)
-					builder.and(table.toRole.eq(messageContext.getToParty().getRole()));
+				if (messageFilter.getToParty().getPartyId() != null)
+					builder.and(table.toPartyId.eq(messageFilter.getToParty().getPartyId()));
+				if (messageFilter.getToParty().getRole() != null)
+					builder.and(table.toRole.eq(messageFilter.getToParty().getRole()));
 			}
-			if (messageContext.getService() != null)
-				builder.and(table.service.eq(messageContext.getService()));
-			if (messageContext.getAction() != null)
-				builder.and(table.action.eq(messageContext.getAction()));
-			if (messageContext.getConversationId() != null)
-				builder.and(table.conversationId.eq(messageContext.getConversationId()));
-			if (messageContext.getMessageId() != null)
-				builder.and(table.messageId.eq(messageContext.getMessageId()));
-			if (messageContext.getRefToMessageId() != null)
-				builder.and(table.refToMessageId.eq(messageContext.getRefToMessageId()));
-			if (messageContext.getMessageStatus() != null)
-				builder.and(table.status.eq(messageContext.getMessageStatus()));
+			if (messageFilter.getService() != null)
+				builder.and(table.service.eq(messageFilter.getService()));
+			if (messageFilter.getAction() != null)
+				builder.and(table.action.eq(messageFilter.getAction()));
+			if (messageFilter.getConversationId() != null)
+				builder.and(table.conversationId.eq(messageFilter.getConversationId()));
+			if (messageFilter.getMessageId() != null)
+				builder.and(table.messageId.eq(messageFilter.getMessageId()));
+			if (messageFilter.getRefToMessageId() != null)
+				builder.and(table.refToMessageId.eq(messageFilter.getRefToMessageId()));
 		}
 		return builder;
 	}

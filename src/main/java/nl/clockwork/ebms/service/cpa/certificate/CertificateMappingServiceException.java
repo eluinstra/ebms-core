@@ -19,7 +19,7 @@ import javax.xml.ws.WebFault;
 
 import lombok.NoArgsConstructor;
 
-@WebFault(name="CertificateMappingServiceException", targetNamespace="http://www.ordina.nl/cpa/certificateMapping/2.17")
+@WebFault(name = "CertificateMappingServiceException", targetNamespace = "http://www.ordina.nl/cpa/certificateMapping/2.18")
 @NoArgsConstructor
 public class CertificateMappingServiceException extends RuntimeException
 {

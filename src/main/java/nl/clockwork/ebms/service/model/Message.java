@@ -16,38 +16,30 @@
 package nl.clockwork.ebms.service.model;
 
 import java.io.Serializable;
+import java.util.List;
 
-import javax.activation.DataHandler;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlMimeType;
-import javax.xml.bind.annotation.XmlType;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
-import lombok.ToString;
 import lombok.experimental.FieldDefaults;
 
-@XmlType(name = "EbMSDataSource")
 @XmlAccessorType(XmlAccessType.FIELD)
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @NoArgsConstructor
 @AllArgsConstructor
-@RequiredArgsConstructor
-@ToString
-public class EbMSDataSourceMTOM implements Serializable
+public class Message implements Serializable
 {
 	private static final long serialVersionUID = 1L;
-	String contentId;
-	@XmlMimeType("application/octet-stream")
-	@XmlElement(required=true)
+	@XmlElement(required = true)
 	@NonNull
-	@ToString.Exclude
-	DataHandler attachment;
+	MessageProperties properties;
+	@XmlElement(name="dataSource")
+	List<DataSource> dataSources;
 }

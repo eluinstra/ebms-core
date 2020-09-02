@@ -16,7 +16,6 @@
 package nl.clockwork.ebms.service.model;
 
 import java.io.Serializable;
-import java.time.Instant;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -24,26 +23,34 @@ import javax.xml.bind.annotation.XmlElement;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.FieldDefaults;
-import nl.clockwork.ebms.EbMSMessageStatus;
 
 @XmlAccessorType(XmlAccessType.FIELD)
+@Builder
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @NoArgsConstructor
 @AllArgsConstructor
-@ToString
-public class MessageStatus implements Serializable
+@RequiredArgsConstructor
+@ToString()
+public class DataSource implements Serializable
 {
 	private static final long serialVersionUID = 1L;
 	@XmlElement(required=true)
 	@NonNull
-	Instant timestamp;
+	String name;
+	String contentId;
 	@XmlElement(required=true)
 	@NonNull
-	EbMSMessageStatus status;
+	String contentType;
+	@XmlElement(required=true)
+	@NonNull
+	@ToString.Exclude
+	byte[] content;
 }

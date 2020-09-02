@@ -81,7 +81,7 @@ class DuplicateMessageHandler
 			{
 				if (storeDuplicateMessage)
 					ebMSDAO.insertDuplicateMessage(timestamp,document.getMessage(),message,storeDuplicateMessageAttachments ? message.getAttachments() : Collections.emptyList());
-				val context = ebMSDAO.getMessageContextByRefToMessageId(
+				val context = ebMSDAO.getEbMSMessagePropertiesByRefToMessageId(
 						messageHeader.getCPAId(),
 						messageHeader.getMessageData().getMessageId(),
 						EbMSAction.MESSAGE_ERROR,

@@ -16,12 +16,9 @@
 package nl.clockwork.ebms.service.model;
 
 import java.io.Serializable;
-import java.time.Instant;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlSchemaType;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -30,8 +27,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.FieldDefaults;
-import nl.clockwork.ebms.EbMSMessageStatus;
-import nl.clockwork.ebms.jaxb.InstantAdapter;
 
 @XmlAccessorType(XmlAccessType.FIELD)
 @Builder
@@ -40,42 +35,15 @@ import nl.clockwork.ebms.jaxb.InstantAdapter;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-public class EbMSMessageContext implements Serializable
+public class MessageFilter implements Serializable
 {
 	private static final long serialVersionUID = 1L;
-	//@XmlElement(required=true)
-	//@NonNull
 	String cpaId;
-	//@XmlElement(required=true)
-	//@NonNull
 	Party fromParty;
 	Party toParty;
-	//@XmlElement(required=true)
-	//@NonNull
 	String service;
-	//@XmlElement(required=true)
-	//@NonNull
 	String action;
-	@XmlJavaTypeAdapter(InstantAdapter.class)
-	@XmlSchemaType(name="dateTime")
-	Instant timestamp;
 	String conversationId;
 	String messageId;
 	String refToMessageId;
-	EbMSMessageStatus messageStatus;
-
-	public EbMSMessageContext(String cpaId, String fromPartyId, String fromRole, String toPartyId, String toRole, String service, String action, Instant timestamp, String conversationId, String messageId, String refToMessageId, EbMSMessageStatus messageStatus)
-	{
-		super();
-		this.cpaId = cpaId;
-		this.fromParty = new Party(fromPartyId,fromRole);
-		this.toParty = new Party(toPartyId,toRole);
-		this.service = service;
-		this.action = action;
-		this.timestamp = timestamp;
-		this.conversationId = conversationId;
-		this.messageId = messageId;
-		this.refToMessageId = refToMessageId;
-		this.messageStatus = messageStatus;
-	}
 }

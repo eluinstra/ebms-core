@@ -22,9 +22,10 @@ import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
 import nl.clockwork.ebms.event.listener.EbMSMessageEventType;
-import nl.clockwork.ebms.service.model.EbMSMessageContent;
-import nl.clockwork.ebms.service.model.EbMSMessageContext;
-import nl.clockwork.ebms.service.model.EbMSMessageEvent;
+import nl.clockwork.ebms.service.model.MessageRequest;
+import nl.clockwork.ebms.service.model.Message;
+import nl.clockwork.ebms.service.model.MessageEvent;
+import nl.clockwork.ebms.service.model.MessageFilter;
 import nl.clockwork.ebms.service.model.MessageStatus;
 
 @FieldDefaults(level = AccessLevel.PACKAGE, makeFinal = true)
@@ -41,9 +42,9 @@ class EbMSMessageServiceImpl implements EbMSMessageService
 	}
 
 	@Override
-	public String sendMessage(EbMSMessageContent messageContent) throws EbMSMessageServiceException
+	public String sendMessage(MessageRequest messageRequest) throws EbMSMessageServiceException
 	{
-		return serviceHandler.sendMessage(messageContent);
+		return serviceHandler.sendMessage(messageRequest);
 	}
 
 	@Override
@@ -53,13 +54,13 @@ class EbMSMessageServiceImpl implements EbMSMessageService
 	}
 
 	@Override
-	public List<String> getUnprocessedMessageIds(EbMSMessageContext messageContext, Integer maxNr) throws EbMSMessageServiceException
+	public List<String> getUnprocessedMessageIds(MessageFilter messageFilter, Integer maxNr) throws EbMSMessageServiceException
 	{
-		return serviceHandler.getUnprocessedMessageIds(messageContext,maxNr);
+		return serviceHandler.getUnprocessedMessageIds(messageFilter,maxNr);
 	}
 
 	@Override
-	public EbMSMessageContent getMessage(final String messageId, Boolean process) throws EbMSMessageServiceException
+	public Message getMessage(final String messageId, Boolean process) throws EbMSMessageServiceException
 	{
 		return serviceHandler.getMessage(messageId,process);
 	}
@@ -77,9 +78,9 @@ class EbMSMessageServiceImpl implements EbMSMessageService
 	}
 
 	@Override
-	public List<EbMSMessageEvent> getUnprocessedMessageEvents(EbMSMessageContext messageContext, EbMSMessageEventType[] eventTypes, Integer maxNr) throws EbMSMessageServiceException
+	public List<MessageEvent> getUnprocessedMessageEvents(MessageFilter messageFilter, EbMSMessageEventType[] eventTypes, Integer maxNr) throws EbMSMessageServiceException
 	{
-		return serviceHandler.getUnprocessedMessageEvents(messageContext,eventTypes,maxNr);
+		return serviceHandler.getUnprocessedMessageEvents(messageFilter,eventTypes,maxNr);
 	}
 
 	@Override

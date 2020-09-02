@@ -28,6 +28,7 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
 import nl.clockwork.ebms.cpa.CPAUtils;
 
@@ -36,15 +37,14 @@ import nl.clockwork.ebms.cpa.CPAUtils;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @NoArgsConstructor
 @AllArgsConstructor
-//@RequiredArgsConstructor
 public class Party implements Serializable
 {
 	private static final long serialVersionUID = 1L;
 	@XmlElement(required=true)
-	//@NonNull
+	@NonNull
 	String partyId;
 	@XmlElement(required=true)
-	//@NonNull
+	@NonNull
 	String role;
 
 	@Override
@@ -55,22 +55,22 @@ public class Party implements Serializable
 
 	public PartyId getPartyId(List<PartyId> partyIds)
 	{
-		if (getPartyId() == null || partyIds == null)
+		if (partyId == null || partyIds == null)
 			return null;
-		return partyIds.stream().filter(id -> getPartyId().equals(CPAUtils.toString(id))).findFirst().orElse(null);
+		return partyIds.stream().filter(id -> partyId.equals(CPAUtils.toString(id))).findFirst().orElse(null);
 	}
 
 	public boolean matches(List<PartyId> partyIds)
 	{
-		if (getPartyId() == null && (partyIds == null || partyIds.size() == 0))
+		if (partyId == null && (partyIds == null || partyIds.size() == 0))
 			return true;
-		if (getPartyId() == null || partyIds == null)
+		if (partyId == null || partyIds == null)
 			return false;
-		return partyIds.stream().anyMatch(id -> getPartyId().equals(CPAUtils.toString(id)));
+		return partyIds.stream().anyMatch(id -> partyId.equals(CPAUtils.toString(id)));
 	}
 	
 	public boolean matches(org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.Role role)
 	{
-		return getRole().equals(role.getName());
+		return this.role.equals(role.getName());
 	}
 }

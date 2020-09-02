@@ -28,8 +28,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
-import lombok.ToString;
 import lombok.experimental.FieldDefaults;
 
 @XmlType(name = "EbMSMessageContent")
@@ -38,14 +36,12 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @NoArgsConstructor
 @AllArgsConstructor
-@RequiredArgsConstructor
-@ToString
-public class EbMSMessageContentMTOM implements Serializable
+public class MTOMMessage implements Serializable
 {
 	private static final long serialVersionUID = 1L;
-	@XmlElement(required=true)
+	@XmlElement(required = true)
 	@NonNull
-	EbMSMessageContext context;
+	MessageProperties properties;
 	@XmlElement(name="dataSource")
-	List<EbMSDataSourceMTOM> dataSources;
+	List<MTOMDataSource> dataSources;
 }

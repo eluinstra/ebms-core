@@ -19,7 +19,7 @@ import javax.xml.ws.WebFault;
 
 import lombok.NoArgsConstructor;
 
-@WebFault(name="EbMSEventListenerServiceException", targetNamespace="http://www.clockwork.nl/ebms/event/2.17")
+@WebFault(name = "EbMSEventListenerServiceException", targetNamespace = "http://www.ordina.nl/ebms/event/2.18")
 @NoArgsConstructor
 public class EbMSEventListenerServiceException extends EventException
 {

@@ -19,7 +19,7 @@ import javax.xml.ws.WebFault;
 
 import lombok.NoArgsConstructor;
 
-@WebFault(name="URLMappingServiceException", targetNamespace="http://www.ordina.nl/cpa/urlMapping/2.17")
+@WebFault(name = "URLMappingServiceException", targetNamespace = "http://www.ordina.nl/cpa/urlMapping/2.18")
 @NoArgsConstructor
 public class URLMappingServiceException extends RuntimeException
 {

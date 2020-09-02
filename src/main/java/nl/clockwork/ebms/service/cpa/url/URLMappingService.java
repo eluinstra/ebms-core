@@ -23,7 +23,7 @@ import javax.jws.WebResult;
 import javax.jws.WebService;
 import javax.xml.bind.annotation.XmlElement;
 
-@WebService(targetNamespace="http://www.ordina.nl/cpa/urlMapping/2.17")
+@WebService(name = "UrlMappingService", targetNamespace = "http://www.ordina.nl/cpa/urlMapping/2.18", serviceName = "UrlMappingService", endpointInterface = "UrlMappingServiceSoapBinding", portName = "UrlMappingPort")
 public interface URLMappingService
 {
 	/**
@@ -32,8 +32,8 @@ public interface URLMappingService
 	 * @param urlMapping - Maps the source URL to the destination URL
 	 * @throws URLMappingServiceException
 	 */
-	@WebMethod(operationName="SetURLMapping")
-	void setURLMapping(@WebParam(name="URLMapping") @XmlElement(required=true) URLMapping urlMapping) throws URLMappingServiceException;
+	@WebMethod(operationName = "SetURLMapping")
+	void setURLMapping(@WebParam(name = "URLMapping") @XmlElement(required = true) URLMapping urlMapping) throws URLMappingServiceException;
 
 	/**
 	 * Removes URL mapping identified by source URL source from the database
@@ -41,8 +41,8 @@ public interface URLMappingService
 	 * @param source
 	 * @throws URLMappingServiceException
 	 */
-	@WebMethod(operationName="DeleteURLMapping")
-	void deleteURLMapping(@WebParam(name="SourceURL") @XmlElement(required=true) String source) throws URLMappingServiceException;
+	@WebMethod(operationName = "DeleteURLMapping")
+	void deleteURLMapping(@WebParam(name = "SourceURL") @XmlElement(required = true) String source) throws URLMappingServiceException;
 
 	/**
 	 * Gets all URL mappings that are stored in the database
@@ -50,7 +50,7 @@ public interface URLMappingService
 	 * @return The list of URL mappings
 	 * @throws URLMappingServiceException
 	 */
-	@WebResult(name="URLs")
-	@WebMethod(operationName="GetURLMappings")
+	@WebResult(name = "URL")
+	@WebMethod(operationName = "GetURLMappings")
 	List<URLMapping> getURLMappings() throws URLMappingServiceException;
 }

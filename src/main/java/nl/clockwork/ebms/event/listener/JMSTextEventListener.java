@@ -32,7 +32,7 @@ import lombok.NonNull;
 import lombok.val;
 import lombok.experimental.FieldDefaults;
 import nl.clockwork.ebms.dao.EbMSDAO;
-import nl.clockwork.ebms.service.model.EbMSMessageContext;
+import nl.clockwork.ebms.model.EbMSMessageProperties;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor
@@ -43,7 +43,7 @@ class JMSTextEventListener extends LoggingEventListener
 	public class EventMessageCreator implements MessageCreator
 	{
 		@NonNull
-		EbMSMessageContext messageContext;
+		EbMSMessageProperties messageContext;
 
 		@Override
 		public Message createMessage(Session session) throws JMSException
@@ -76,7 +76,7 @@ class JMSTextEventListener extends LoggingEventListener
 	{
 		try
 		{
-			ebMSDAO.getMessageContext(messageId)
+			ebMSDAO.getEbMSMessageProperties(messageId)
 					.ifPresent(mc -> jmsTemplate.send(destinations.get(EbMSMessageEventType.RECEIVED.name()),new EventMessageCreator(mc)));
 			super.onMessageReceived(messageId);
 		}
@@ -91,7 +91,7 @@ class JMSTextEventListener extends LoggingEventListener
 	{
 		try
 		{
-			ebMSDAO.getMessageContext(messageId)
+			ebMSDAO.getEbMSMessageProperties(messageId)
 					.ifPresent(mc -> jmsTemplate.send(destinations.get(EbMSMessageEventType.DELIVERED.name()),new EventMessageCreator(mc)));
 			super.onMessageDelivered(messageId);
 		}
@@ -106,7 +106,7 @@ class JMSTextEventListener extends LoggingEventListener
 	{
 		try
 		{
-			ebMSDAO.getMessageContext(messageId)
+			ebMSDAO.getEbMSMessageProperties(messageId)
 					.ifPresent(mc -> jmsTemplate.send(destinations.get(EbMSMessageEventType.FAILED.name()),new EventMessageCreator(mc)));
 			super.onMessageFailed(messageId);
 		}
@@ -121,7 +121,7 @@ class JMSTextEventListener extends LoggingEventListener
 	{
 		try
 		{
-			ebMSDAO.getMessageContext(messageId)
+			ebMSDAO.getEbMSMessageProperties(messageId)
 					.ifPresent(mc -> jmsTemplate.send(destinations.get(EbMSMessageEventType.EXPIRED.name()),new EventMessageCreator(mc)));
 			super.onMessageExpired(messageId);
 		}

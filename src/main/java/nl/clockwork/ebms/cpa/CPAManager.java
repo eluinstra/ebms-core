@@ -37,7 +37,6 @@ import nl.clockwork.ebms.EbMSAction;
 import nl.clockwork.ebms.model.EbMSPartyInfo;
 import nl.clockwork.ebms.model.FromPartyInfo;
 import nl.clockwork.ebms.model.ToPartyInfo;
-import nl.clockwork.ebms.service.model.Party;
 import nl.clockwork.ebms.util.StreamUtils;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -140,7 +139,7 @@ public class CPAManager
 	}
 	
 	@Cacheable(cacheNames = "CPA", keyGenerator = "ebMSKeyGenerator")
-	public Optional<FromPartyInfo> getFromPartyInfo(String cpaId, Party fromParty, String service, String action)
+	public Optional<FromPartyInfo> getFromPartyInfo(String cpaId, nl.clockwork.ebms.service.model.Party fromParty, String service, String action)
 	{
 		return getCPA(cpaId)
 				.map(c -> c.getPartyInfo().stream()
@@ -155,7 +154,7 @@ public class CPAManager
 	}
 
 	@Cacheable(cacheNames = "CPA", keyGenerator = "ebMSKeyGenerator")
-	public Optional<ToPartyInfo> getToPartyInfoByFromPartyActionBinding(String cpaId, Party fromParty, String service, String action)
+	public Optional<ToPartyInfo> getToPartyInfoByFromPartyActionBinding(String cpaId, nl.clockwork.ebms.service.model.Party fromParty, String service, String action)
 	{
 		return getFromPartyInfo(cpaId,fromParty,service,action)
 				.map(fpi -> getCPA(cpaId)
@@ -170,7 +169,7 @@ public class CPAManager
 	}
 
 	@Cacheable(cacheNames = "CPA", keyGenerator = "ebMSKeyGenerator")
-	public Optional<ToPartyInfo> getToPartyInfo(String cpaId, Party toParty, String service, String action)
+	public Optional<ToPartyInfo> getToPartyInfo(String cpaId, nl.clockwork.ebms.service.model.Party toParty, String service, String action)
 	{
 		return getCPA(cpaId)
 				.map(c -> c.getPartyInfo().stream()

@@ -38,7 +38,7 @@ import nl.clockwork.ebms.service.cpa.url.URLMappingService;
 import nl.clockwork.ebms.service.cpa.url.URLMappingServiceImpl;
 import nl.clockwork.ebms.signing.EbMSSignatureGenerator;
 import nl.clockwork.ebms.validation.CPAValidator;
-import nl.clockwork.ebms.validation.EbMSMessageContextValidator;
+import nl.clockwork.ebms.validation.MessagePropertiesValidator;
 
 @Configuration
 @FieldDefaults(level = AccessLevel.PRIVATE)
@@ -63,7 +63,7 @@ public class ServiceConfig
 	@Autowired
 	EventManager eventManager;
 	@Autowired
-	EbMSMessageContextValidator ebMSMessageContextValidator;
+	MessagePropertiesValidator messagePropertiesValidator;
 	@Autowired
 	EbMSSignatureGenerator signatureGenerator;
 	@Value("${ebmsMessage.deleteContentOnProcessed}")
@@ -109,7 +109,7 @@ public class ServiceConfig
 				.cpaManager(cpaManager)
 				.ebMSMessageFactory(ebMSMessageFactory)
 				.eventManager(eventManager)
-				.ebMSMessageContextValidator(ebMSMessageContextValidator)
+				.messagePropertiesValidator(messagePropertiesValidator)
 				.signatureGenerator(signatureGenerator)
 				.deleteEbMSAttachmentsOnMessageProcessed(deleteEbMSAttachmentsOnMessageProcessed)
 				.build();

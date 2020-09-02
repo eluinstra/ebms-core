@@ -13,44 +13,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.clockwork.ebms.service.model;
+package nl.clockwork.ebms.model;
 
 import java.io.Serializable;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
-
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
-import lombok.ToString;
+import lombok.Value;
 import lombok.experimental.FieldDefaults;
 
-@XmlAccessorType(XmlAccessType.FIELD)
-@Builder
-@Data
-@FieldDefaults(level = AccessLevel.PRIVATE)
-@NoArgsConstructor
+@Value
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor
-@RequiredArgsConstructor
-@ToString()
-public class EbMSDataSource implements Serializable
+public class Party implements Serializable
 {
 	private static final long serialVersionUID = 1L;
-	@XmlElement(required=true)
 	@NonNull
-	String name;
-	String contentId;
-	@XmlElement(required=true)
+	String partyId;
 	@NonNull
-	String contentType;
-	@XmlElement(required=true)
-	@NonNull
-	@ToString.Exclude
-	byte[] content;
+	String role;
+
+	@Override
+	public String toString()
+	{
+		return new StringBuffer().append(partyId).append(":").append(role).toString();
+	}
 }

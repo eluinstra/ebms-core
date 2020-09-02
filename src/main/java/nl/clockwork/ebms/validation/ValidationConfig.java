@@ -64,8 +64,8 @@ public class ValidationConfig
 	}
 
 	@Bean
-	public EbMSMessageContextValidator ebMSMessageContextValidator()
+	public MessagePropertiesValidator messagePropertiesValidator()
 	{
-		return new EbMSMessageContextValidator(cpaManager);
+		return new MessagePropertiesValidator(cpaManager);
 	}
 }

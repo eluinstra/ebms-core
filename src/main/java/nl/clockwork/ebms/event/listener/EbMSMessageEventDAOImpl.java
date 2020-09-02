@@ -31,8 +31,8 @@ import lombok.experimental.FieldDefaults;
 import nl.clockwork.ebms.dao.EbMSDAO;
 import nl.clockwork.ebms.querydsl.model.QEbmsMessage;
 import nl.clockwork.ebms.querydsl.model.QEbmsMessageEvent;
-import nl.clockwork.ebms.service.model.EbMSMessageContext;
-import nl.clockwork.ebms.service.model.EbMSMessageEvent;
+import nl.clockwork.ebms.service.model.MessageEvent;
+import nl.clockwork.ebms.service.model.MessageFilter;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor
@@ -44,14 +44,14 @@ class EbMSMessageEventDAOImpl implements EbMSMessageEventDAO
 	QEbmsMessage messageTable = QEbmsMessage.ebmsMessage;
 
 	@Override
-	public List<EbMSMessageEvent> getEbMSMessageEvents(EbMSMessageContext messageContext, EbMSMessageEventType[] types)
+	public List<MessageEvent> getEbMSMessageEvents(MessageFilter messageFilter, EbMSMessageEventType[] types)
 	{
 		var whereClause = new BooleanBuilder(messageTable.messageId.eq(table.messageId)
 				.and(messageTable.messageNr.eq(0))
 				.and(table.processed.eq(false))
 				.and(table.eventType.in(types == null ? EbMSMessageEventType.values() : types)));
-		whereClause = EbMSDAO.applyFilter(messageTable,messageContext,whereClause);
-		return queryFactory.select(Projections.constructor(EbMSMessageEvent.class,table.messageId,table.eventType))
+		whereClause = EbMSDAO.applyFilter(messageTable,messageFilter,whereClause);
+		return queryFactory.select(Projections.constructor(MessageEvent.class,table.messageId,table.eventType))
 				.from(table,messageTable)
 				.where(whereClause)
 				.orderBy(messageTable.timeStamp.asc())
@@ -59,14 +59,14 @@ class EbMSMessageEventDAOImpl implements EbMSMessageEventDAO
 	}
 
 	@Override
-	public List<EbMSMessageEvent> getEbMSMessageEvents(EbMSMessageContext messageContext, EbMSMessageEventType[] types, int maxNr)
+	public List<MessageEvent> getEbMSMessageEvents(MessageFilter messageFilter, EbMSMessageEventType[] types, int maxNr)
 	{
 		var whereClause = new BooleanBuilder(messageTable.messageId.eq(table.messageId)
 				.and(messageTable.messageNr.eq(0))
 				.and(table.processed.eq(false))
 				.and(table.eventType.in(types == null ? EbMSMessageEventType.values() : types)));
-		whereClause = EbMSDAO.applyFilter(messageTable,messageContext,whereClause);
-		return queryFactory.select(Projections.constructor(EbMSMessageEvent.class,table.messageId,table.eventType))
+		whereClause = EbMSDAO.applyFilter(messageTable,messageFilter,whereClause);
+		return queryFactory.select(Projections.constructor(MessageEvent.class,table.messageId,table.eventType))
 				.from(table,messageTable)
 				.where(whereClause)
 				.orderBy(messageTable.timeStamp.asc())

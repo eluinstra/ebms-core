@@ -19,7 +19,7 @@ import javax.xml.ws.WebFault;
 
 import lombok.NoArgsConstructor;
 
-@WebFault(name="CPAServiceException", targetNamespace="http://www.ordina.nl/cpa/2.17")
+@WebFault(name = "CPAServiceException", targetNamespace = "http://www.ordina.nl/cpa/2.18")
 @NoArgsConstructor
 public class CPAServiceException extends RuntimeException
 {

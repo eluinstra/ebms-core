@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import javax.activation.DataSource;
 import javax.xml.bind.JAXBException;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.soap.SOAPException;
@@ -60,9 +59,9 @@ import nl.clockwork.ebms.processor.EbMSProcessorException;
 import nl.clockwork.ebms.security.EbMSKeyStore;
 import nl.clockwork.ebms.security.EbMSTrustStore;
 import nl.clockwork.ebms.security.KeyStoreType;
-import nl.clockwork.ebms.service.model.EbMSDataSource;
-import nl.clockwork.ebms.service.model.EbMSMessageContent;
-import nl.clockwork.ebms.service.model.EbMSMessageContext;
+import nl.clockwork.ebms.service.model.DataSource;
+import nl.clockwork.ebms.service.model.MessageRequest;
+import nl.clockwork.ebms.service.model.MessageRequestProperties;
 import nl.clockwork.ebms.service.model.Party;
 import nl.clockwork.ebms.validation.ValidationException;
 import nl.clockwork.ebms.validation.ValidatorException;
@@ -83,7 +82,7 @@ public class SigningTest
 	@BeforeAll
 	public void init() throws Exception
 	{
-		MockitoAnnotations.initMocks(this);
+		MockitoAnnotations.openMocks(this);
 		Init.init();
 		cpaManager = initCPAManager();
 		messageFactory = initMessageFactory(cpaManager);
@@ -170,22 +169,22 @@ public class SigningTest
 
 	private EbMSMessage createMessage() throws EbMSProcessorException
 	{
-		val content = createEbMSMessageContent(cpaId);
-		val result = messageFactory.createEbMSMessage(content);
+		val message = createMessage(cpaId);
+		val result = messageFactory.createEbMSMessage(message);
 		return result;
 	}
 
-	private EbMSMessageContent createEbMSMessageContent(String cpaId)
+	private MessageRequest createMessage(String cpaId)
 	{
-		val result = new EbMSMessageContent();
-		result.setContext(createEbMSMessageContext(cpaId));
+		val result = new MessageRequest();
+		result.setProperties(createMessageProperties(cpaId));
 		result.setDataSources(createDataSources());
 		return result;
 	}
 
-	private EbMSMessageContext createEbMSMessageContext(String cpaId)
+	private MessageRequestProperties createMessageProperties(String cpaId)
 	{
-		return EbMSMessageContext.builder()
+		return MessageRequestProperties.builder()
 				.cpaId(cpaId)
 				.fromParty(new Party("urn:osb:oin:00000000000000000000","DIGIPOORT"))
 				.toParty(new Party("urn:osb:oin:00000000000000000001","OVERHEID"))
@@ -194,10 +193,10 @@ public class SigningTest
 				.build();
 	}
 
-	private List<EbMSDataSource> createDataSources()
+	private List<DataSource> createDataSources()
 	{
-		val result = new ArrayList<EbMSDataSource>();
-		result.add(new EbMSDataSource("test.txt","plain/text; charset=utf-8","Dit is een test.".getBytes(Charset.forName("UTF-8"))));
+		val result = new ArrayList<DataSource>();
+		result.add(new DataSource("test.txt","plain/text; charset=utf-8","Dit is een test.".getBytes(Charset.forName("UTF-8"))));
 		return result;
 	}
 
@@ -208,7 +207,7 @@ public class SigningTest
 		return result;
 	}
 
-	private DataSource createDataSource()
+	private javax.activation.DataSource createDataSource()
 	{
 		return EbMSAttachmentFactory.createEbMSAttachment("test.txt","plain/text; charset=utf-8","Dit is een andere test.".getBytes(Charset.forName("UTF-8"))); 
 	}

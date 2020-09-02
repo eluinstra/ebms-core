@@ -17,13 +17,13 @@ package nl.clockwork.ebms.event.listener;
 
 import java.util.List;
 
-import nl.clockwork.ebms.service.model.EbMSMessageContext;
-import nl.clockwork.ebms.service.model.EbMSMessageEvent;
+import nl.clockwork.ebms.service.model.MessageEvent;
+import nl.clockwork.ebms.service.model.MessageFilter;
 
 public interface EbMSMessageEventDAO
 {
-	List<EbMSMessageEvent> getEbMSMessageEvents(EbMSMessageContext messageContext, EbMSMessageEventType[] types);
-	List<EbMSMessageEvent> getEbMSMessageEvents(EbMSMessageContext messageContext, EbMSMessageEventType[] types, int maxNr);
+	List<MessageEvent> getEbMSMessageEvents(MessageFilter messageFilter, EbMSMessageEventType[] types);
+	List<MessageEvent> getEbMSMessageEvents(MessageFilter messageFilter, EbMSMessageEventType[] types, int maxNr);
 	long insertEbMSMessageEvent(String messageId, EbMSMessageEventType eventType);
 	long processEbMSMessageEvent(String messageId);
 }
