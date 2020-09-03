@@ -69,7 +69,7 @@ public class CPAValidator
 	public void validate(CollaborationProtocolAgreement cpa) throws ValidatorException
 	{
 		if (!"2_0b".equals(cpa.getVersion()))
-			log.warn("CPA version " + cpa.getVersion() + " detected! CPA version 2_0b expected.");
+			log.debug("CPA version " + cpa.getVersion() + " detected! CPA version 2_0b expected.");
 		if (StatusValueType.PROPOSED.equals(cpa.getStatus().getValue()))
 			throw new ValidationException("CPA Status is proposed!");
 		if (!cpa.getStart().isBefore(cpa.getEnd()))
@@ -77,11 +77,11 @@ public class CPAValidator
 		if (!Instant.now().isBefore(cpa.getEnd()))
 			throw new ValidationException("CPA expired on " + cpa.getEnd());
 		if (cpa.getConversationConstraints() != null)
-			log.warn("CPA Conversation Constraints not implemented!");
+			log.debug("CPA Conversation Constraints not implemented!");
 		if (cpa.getSignature() != null)
-			log.warn("CPA Signature not implemented!");
+			log.debug("CPA Signature not implemented!");
 		if (cpa.getPackaging() != null && cpa.getPackaging().size() > 0)
-			log.warn("Packaging not implemented!");
+			log.debug("Packaging not implemented!");
 		validateActions(cpa);
 		validateChannels(cpa);
 		validateTransports(cpa);
@@ -101,33 +101,33 @@ public class CPAValidator
 	private void validateCanSend(CollaborationRole role, CanSend canSend)
 	{
 		if (canSend.getCanReceive() != null && canSend.getCanReceive().size() > 0)
-			log.warn("Nesting of actions under CanSend in Service " + CPAUtils.toString(role.getServiceBinding().getService()) +  " not supported!");
+			log.debug("Nesting of actions under CanSend in Service " + CPAUtils.toString(role.getServiceBinding().getService()) +  " not supported!");
 		if (canSend.getThisPartyActionBinding().getChannelId().size() > 1)
-			log.warn("Multiple channels per action as defined in Action " + canSend.getThisPartyActionBinding().getAction() + " of Service " + CPAUtils.toString(role.getServiceBinding().getService()) + " not supported! Using first channel.");
+			log.debug("Multiple channels per action as defined in Action " + canSend.getThisPartyActionBinding().getAction() + " of Service " + CPAUtils.toString(role.getServiceBinding().getService()) + " not supported! Using first channel.");
 		if (canSend.getThisPartyActionBinding().getBusinessTransactionCharacteristics().isIsNonRepudiationReceiptRequired()
 				|| canSend.getThisPartyActionBinding().getBusinessTransactionCharacteristics().isIsIntelligibleCheckRequired()
 				|| canSend.getThisPartyActionBinding().getBusinessTransactionCharacteristics().getTimeToAcknowledgeReceipt() != null
 				|| canSend.getThisPartyActionBinding().getBusinessTransactionCharacteristics().getTimeToAcknowledgeAcceptance() != null
 				|| canSend.getThisPartyActionBinding().getBusinessTransactionCharacteristics().getRetryCount() != null)
-			log.warn("Business signals defined in Action " + canSend.getThisPartyActionBinding().getAction() + " of Service " + CPAUtils.toString(role.getServiceBinding().getService()) + " not supported!");
+			log.debug("Business signals defined in Action " + canSend.getThisPartyActionBinding().getAction() + " of Service " + CPAUtils.toString(role.getServiceBinding().getService()) + " not supported!");
 		//if (canSend.getThisPartyActionBinding().getBusinessTransactionCharacteristics().isIsAuthorizationRequired())
-			//log.warn("Authorization Required defined in Action " + canSend.getThisPartyActionBinding().getAction() + " of Service " + CPAUtils.toString(role.getServiceBinding().getService()) + " ignored!");
+			//log.debug("Authorization Required defined in Action " + canSend.getThisPartyActionBinding().getAction() + " of Service " + CPAUtils.toString(role.getServiceBinding().getService()) + " ignored!");
 	}
 
 	private void validateCanReceive(CollaborationRole role, CanReceive canReceive)
 	{
 		if (canReceive.getCanSend() != null && canReceive.getCanSend().size() > 0)
-			log.warn("Nesting of actions under CanReceive in Service " + CPAUtils.toString(role.getServiceBinding().getService()) +  " not supported!");
+			log.debug("Nesting of actions under CanReceive in Service " + CPAUtils.toString(role.getServiceBinding().getService()) +  " not supported!");
 		if (canReceive.getThisPartyActionBinding().getChannelId().size() > 1)
-			log.warn("Multiple channels per action as defined in Action " + canReceive.getThisPartyActionBinding().getAction() + " of Service " + CPAUtils.toString(role.getServiceBinding().getService()) + " not supported! Using first channel.");
+			log.debug("Multiple channels per action as defined in Action " + canReceive.getThisPartyActionBinding().getAction() + " of Service " + CPAUtils.toString(role.getServiceBinding().getService()) + " not supported! Using first channel.");
 		if (canReceive.getThisPartyActionBinding().getBusinessTransactionCharacteristics().isIsNonRepudiationReceiptRequired()
 				|| canReceive.getThisPartyActionBinding().getBusinessTransactionCharacteristics().isIsIntelligibleCheckRequired()
 				|| canReceive.getThisPartyActionBinding().getBusinessTransactionCharacteristics().getTimeToAcknowledgeReceipt() != null
 				|| canReceive.getThisPartyActionBinding().getBusinessTransactionCharacteristics().getTimeToAcknowledgeAcceptance() != null
 				|| canReceive.getThisPartyActionBinding().getBusinessTransactionCharacteristics().getRetryCount() != null)
-			log.warn("Business signals defined in Action " + canReceive.getThisPartyActionBinding().getAction() + " of Service " + CPAUtils.toString(role.getServiceBinding().getService()) + " not supported!");
+			log.debug("Business signals defined in Action " + canReceive.getThisPartyActionBinding().getAction() + " of Service " + CPAUtils.toString(role.getServiceBinding().getService()) + " not supported!");
 		//if (canReceive.getThisPartyActionBinding().getBusinessTransactionCharacteristics().isIsAuthorizationRequired())
-			//log.warn("Authorization Required defined in Action " + canReceive.getThisPartyActionBinding().getAction() + " of Service " + CPAUtils.toString(role.getServiceBinding().getService()) + " ignored!");
+			//log.debug("Authorization Required defined in Action " + canReceive.getThisPartyActionBinding().getAction() + " of Service " + CPAUtils.toString(role.getServiceBinding().getService()) + " ignored!");
 	}
 
 	private void validateChannels(CollaborationProtocolAgreement cpa)
@@ -142,9 +142,9 @@ public class CPAValidator
 			log.warn("Message Order as defined in DocExchange " + ((DocExchange)channel.getDocExchangeId()).getDocExchangeId() + " not implemented!");
 		if (SyncReplyModeType.SIGNALS_ONLY.equals(channel.getMessagingCharacteristics().getSyncReplyMode())
 				|| SyncReplyModeType.SIGNALS_AND_RESPONSE.equals(channel.getMessagingCharacteristics().getSyncReplyMode()))
-			log.warn("Business signals defined in Channel " + channel.getChannelId() + " not supported!");
+			log.debug("Business signals defined in Channel " + channel.getChannelId() + " not supported!");
 		if (PerMessageCharacteristicsType.NEVER.equals(channel.getMessagingCharacteristics().getDuplicateElimination()))
-			log.warn("Duplicate Elimination defined in Channel " + channel.getChannelId() + " always enabled!");
+			log.debug("Duplicate Elimination defined in Channel " + channel.getChannelId() + " always enabled!");
 		if (ActorType.URN_OASIS_NAMES_TC_EBXML_MSG_ACTOR_NEXT_MSH.equals(channel.getMessagingCharacteristics().getActor()))
 			log.warn("Actor NextMSH not supported!");
 		if (((DocExchange)channel.getDocExchangeId()).getEbXMLReceiverBinding().getReceiverDigitalEnvelope() != null)
