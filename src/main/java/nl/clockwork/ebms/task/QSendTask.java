@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.clockwork.ebms.querydsl.model;
+package nl.clockwork.ebms.task;
 
 import static com.querydsl.core.types.PathMetadataFactory.forVariable;
 

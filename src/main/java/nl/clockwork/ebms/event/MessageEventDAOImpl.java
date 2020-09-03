@@ -20,6 +20,7 @@ import java.time.Instant;
 import java.util.List;
 
 import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.ConstructorExpression;
 import com.querydsl.core.types.Projections;
 import com.querydsl.sql.SQLQueryFactory;
 
@@ -29,8 +30,7 @@ import lombok.NonNull;
 import lombok.var;
 import lombok.experimental.FieldDefaults;
 import nl.clockwork.ebms.dao.EbMSDAO;
-import nl.clockwork.ebms.querydsl.model.QEbmsMessage;
-import nl.clockwork.ebms.querydsl.model.QMessageEvent;
+import nl.clockwork.ebms.model.QEbmsMessage;
 import nl.clockwork.ebms.service.model.MessageEvent;
 import nl.clockwork.ebms.service.model.MessageFilter;
 
@@ -42,6 +42,7 @@ class MessageEventDAOImpl implements MessageEventDAO
 	SQLQueryFactory queryFactory;
 	QMessageEvent table = QMessageEvent.ebmsMessageEvent;
 	QEbmsMessage messageTable = QEbmsMessage.ebmsMessage;
+	ConstructorExpression<MessageEvent> messageEventProjection = Projections.constructor(MessageEvent.class,table.messageId,table.eventType);
 
 	@Override
 	public List<MessageEvent> getEbMSMessageEvents(MessageFilter messageFilter, MessageEventType[] types)
@@ -51,7 +52,7 @@ class MessageEventDAOImpl implements MessageEventDAO
 				.and(table.processed.eq(false))
 				.and(table.eventType.in(types == null ? MessageEventType.values() : types)));
 		whereClause = EbMSDAO.applyFilter(messageTable,messageFilter,whereClause);
-		return queryFactory.select(Projections.constructor(MessageEvent.class,table.messageId,table.eventType))
+		return queryFactory.select(messageEventProjection)
 				.from(table,messageTable)
 				.where(whereClause)
 				.orderBy(messageTable.timeStamp.asc())
@@ -66,7 +67,7 @@ class MessageEventDAOImpl implements MessageEventDAO
 				.and(table.processed.eq(false))
 				.and(table.eventType.in(types == null ? MessageEventType.values() : types)));
 		whereClause = EbMSDAO.applyFilter(messageTable,messageFilter,whereClause);
-		return queryFactory.select(Projections.constructor(MessageEvent.class,table.messageId,table.eventType))
+		return queryFactory.select(messageEventProjection)
 				.from(table,messageTable)
 				.where(whereClause)
 				.orderBy(messageTable.timeStamp.asc())

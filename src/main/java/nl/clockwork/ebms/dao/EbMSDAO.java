@@ -29,7 +29,7 @@ import nl.clockwork.ebms.model.EbMSAttachment;
 import nl.clockwork.ebms.model.EbMSBaseMessage;
 import nl.clockwork.ebms.model.EbMSDocument;
 import nl.clockwork.ebms.model.EbMSMessageProperties;
-import nl.clockwork.ebms.querydsl.model.QEbmsMessage;
+import nl.clockwork.ebms.model.QEbmsMessage;
 import nl.clockwork.ebms.service.model.Message;
 import nl.clockwork.ebms.service.model.MTOMMessage;
 import nl.clockwork.ebms.service.model.MessageFilter;

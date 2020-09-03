@@ -21,6 +21,7 @@ import java.util.Optional;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 
+import com.querydsl.core.types.ConstructorExpression;
 import com.querydsl.core.types.Projections;
 import com.querydsl.sql.SQLQueryFactory;
 
@@ -28,7 +29,6 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
-import nl.clockwork.ebms.querydsl.model.QUrlMapping;
 import nl.clockwork.ebms.service.cpa.url.URLMapping;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -38,6 +38,7 @@ class URLMappingDAOImpl implements URLMappingDAO
 	@NonNull
 	SQLQueryFactory queryFactory;
 	QUrlMapping table = QUrlMapping.urlMapping;
+	ConstructorExpression<URLMapping> urlMappingProjection = Projections.constructor(URLMapping.class,table.source,table.destination);
 
 	@Override
 	@Cacheable(cacheNames = "URLMapping", keyGenerator = "ebMSKeyGenerator")
@@ -63,7 +64,7 @@ class URLMappingDAOImpl implements URLMappingDAO
 	@Cacheable(cacheNames = "URLMapping", keyGenerator = "ebMSKeyGenerator")
 	public List<URLMapping> getURLMappings()
 	{
-		return queryFactory.select(Projections.constructor(URLMapping.class,table.source,table.destination))
+		return queryFactory.select(urlMappingProjection)
 				.from(table)
 				.orderBy(table.source.asc())
 				.fetch();

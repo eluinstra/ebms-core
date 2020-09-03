@@ -22,6 +22,7 @@ import java.util.Optional;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 
+import com.querydsl.core.types.ConstructorExpression;
 import com.querydsl.core.types.Projections;
 import com.querydsl.sql.SQLQueryFactory;
 
@@ -30,7 +31,6 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
 import lombok.experimental.FieldDefaults;
-import nl.clockwork.ebms.querydsl.model.QCertificateMapping;
 import nl.clockwork.ebms.service.cpa.certificate.CertificateMapping;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -41,6 +41,7 @@ class CertificateMappingDAOImpl implements CertificateMappingDAO
 	SQLQueryFactory queryFactory;
 	@NonNull
 	QCertificateMapping table = QCertificateMapping.certificateMapping;
+	ConstructorExpression<CertificateMapping> certificateMappingProjection = Projections.constructor(CertificateMapping.class,table.source,table.destination,table.cpaId);
 
 	@Override
 	@Cacheable(cacheNames = "CertificateMapping", keyGenerator = "ebMSKeyGenerator")
@@ -74,7 +75,7 @@ class CertificateMappingDAOImpl implements CertificateMappingDAO
 	@Cacheable(cacheNames = "CertificateMapping", keyGenerator = "ebMSKeyGenerator")
 	public List<CertificateMapping> getCertificateMappings()
 	{
-		return queryFactory.select(Projections.constructor(CertificateMapping.class,table.source,table.destination,table.cpaId))
+		return queryFactory.select(certificateMappingProjection)
 				.from(table)
 				.fetch();
 	}
