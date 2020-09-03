@@ -44,8 +44,8 @@ import nl.clockwork.ebms.client.DeliveryManager;
 import nl.clockwork.ebms.cpa.CPAManager;
 import nl.clockwork.ebms.cpa.CPAUtils;
 import nl.clockwork.ebms.dao.EbMSDAO;
-import nl.clockwork.ebms.event.listener.EbMSMessageEventDAO;
-import nl.clockwork.ebms.event.listener.EbMSMessageEventType;
+import nl.clockwork.ebms.event.MessageEventDAO;
+import nl.clockwork.ebms.event.MessageEventType;
 import nl.clockwork.ebms.model.EbMSBaseMessage;
 import nl.clockwork.ebms.model.EbMSMessage;
 import nl.clockwork.ebms.model.EbMSMessageProperties;
@@ -78,7 +78,7 @@ class EbMSMessageServiceHandler
   @NonNull
 	EbMSDAO ebMSDAO;
   @NonNull
-	EbMSMessageEventDAO ebMSMessageEventDAO;
+	MessageEventDAO messageEventDAO;
   @NonNull
 	CPAManager cpaManager;
   @NonNull
@@ -295,12 +295,12 @@ class EbMSMessageServiceHandler
 			throw new EbMSMessageServiceException("No valid response received!");
 	}
 
-	public List<MessageEvent> getUnprocessedMessageEvents(MessageFilter messageFilter, EbMSMessageEventType[] eventTypes, Integer maxNr) throws EbMSMessageServiceException
+	public List<MessageEvent> getUnprocessedMessageEvents(MessageFilter messageFilter, MessageEventType[] eventTypes, Integer maxNr) throws EbMSMessageServiceException
 	{
 		try
 		{
 			log.debug("GetMessageEvents");
-			return maxNr == null || maxNr == 0 ? ebMSMessageEventDAO.getEbMSMessageEvents(messageFilter,eventTypes) : ebMSMessageEventDAO.getEbMSMessageEvents(messageFilter,eventTypes,maxNr);
+			return maxNr == null || maxNr == 0 ? messageEventDAO.getEbMSMessageEvents(messageFilter,eventTypes) : messageEventDAO.getEbMSMessageEvents(messageFilter,eventTypes,maxNr);
 		}
 		catch (Exception e)
 		{
@@ -314,7 +314,7 @@ class EbMSMessageServiceHandler
 		try
 		{
 			log.debug("ProcessMessageEvent " + messageId);
-			ebMSMessageEventDAO.processEbMSMessageEvent(messageId);
+			messageEventDAO.processEbMSMessageEvent(messageId);
 			processMessage(messageId);
 		}
 		catch (Exception e)

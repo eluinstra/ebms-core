@@ -15,4 +15,8 @@
 --
 
 EXEC sp_rename 'ebms_event', 'send_task';
+EXEC sp_rename N'i_ebms_event', N'i_send_task', N'INDEX';
 EXEC sp_rename 'ebms_event_log', 'send_log';
+EXEC sp_rename N'i_ebms_event_log', N'i_send_log', N'INDEX';
+EXEC sp_rename 'ebms_message_event', 'message_event';
+EXEC sp_rename N'i_ebms_message_event', N'i_message_event', N'INDEX';

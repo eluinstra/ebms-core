@@ -53,7 +53,7 @@ CREATE TABLE ebms_attachment
 	FOREIGN KEY (message_id,message_nr) REFERENCES ebms_message (message_id,message_nr)
 );
 
-CREATE TABLE ebms_event
+CREATE TABLE send_task
 (
 	cpa_id							VARCHAR(256)		NOT NULL,
 	send_channel_id			VARCHAR(256)		NULL,
@@ -66,9 +66,9 @@ CREATE TABLE ebms_event
 	server_id						VARCHAR(256)		NULL
 );
 
-CREATE INDEX i_ebms_event ON ebms_event (time_stamp);
+CREATE INDEX i_send_task ON send_task (time_stamp);
 
-CREATE TABLE ebms_event_log
+CREATE TABLE send_log
 (
 	message_id				VARCHAR(256)		NOT NULL,
 	time_stamp				TIMESTAMP				NOT NULL,
@@ -77,9 +77,9 @@ CREATE TABLE ebms_event_log
 	error_message			CLOB						NULL
 );
 
-CREATE INDEX i_ebms_event_log ON ebms_event_log (message_id);
+CREATE INDEX i_send_log ON send_log (message_id);
 
-CREATE TABLE ebms_message_event
+CREATE TABLE message_event
 (
 	message_id				VARCHAR(256)		NOT NULL UNIQUE,
 	event_type				SMALLINT				NOT NULL,
@@ -87,4 +87,4 @@ CREATE TABLE ebms_message_event
 	processed					SMALLINT				DEFAULT 0 NOT NULL
 );
 
-CREATE INDEX i_ebms_message_event ON ebms_message_event (time_stamp);
+CREATE INDEX i_message_event ON message_event (time_stamp);

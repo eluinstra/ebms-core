@@ -24,7 +24,7 @@ import javax.jws.WebService;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.ws.soap.MTOM;
 
-import nl.clockwork.ebms.event.listener.EbMSMessageEventType;
+import nl.clockwork.ebms.event.MessageEventType;
 import nl.clockwork.ebms.service.model.MTOMMessage;
 import nl.clockwork.ebms.service.model.MessageEvent;
 import nl.clockwork.ebms.service.model.MessageFilter;
@@ -126,7 +126,7 @@ public interface EbMSMessageServiceMTOM
 	 */
 	@WebResult(name = "MessageEvents")
 	@WebMethod(operationName = "GetUnprocessedMessageEvents")
-	List<MessageEvent> getUnprocessedMessageEvents(@WebParam(name = "MessageFilter") MessageFilter messageFilter, @WebParam(name = "EventType") EbMSMessageEventType[] eventTypes, @WebParam(name = "MaxNr") Integer maxNr) throws EbMSMessageServiceException;
+	List<MessageEvent> getUnprocessedMessageEvents(@WebParam(name = "MessageFilter") MessageFilter messageFilter, @WebParam(name = "EventType") MessageEventType[] eventTypes, @WebParam(name = "MaxNr") Integer maxNr) throws EbMSMessageServiceException;
 
 	/**
 	 * Sets processed to true for all the current events for the message identified by messageId, so that it is no longer returned in the list of

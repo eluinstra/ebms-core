@@ -42,7 +42,7 @@ import nl.clockwork.ebms.EbMSMessageUtils;
 import nl.clockwork.ebms.cpa.CPAManager;
 import nl.clockwork.ebms.cpa.CPAUtils;
 import nl.clockwork.ebms.dao.EbMSDAO;
-import nl.clockwork.ebms.event.listener.EventListener;
+import nl.clockwork.ebms.event.MessageEventListener;
 import nl.clockwork.ebms.model.EbMSAcknowledgment;
 import nl.clockwork.ebms.model.EbMSDocument;
 import nl.clockwork.ebms.model.EbMSMessage;
@@ -74,7 +74,7 @@ class AcknowledgmentProcessor
 	@NonNull
 	EbMSSignatureGenerator signatureGenerator;
 	@NonNull
-	EventListener eventListener;
+	MessageEventListener messageEventListener;
 	boolean deleteEbMSAttachmentsOnMessageProcessed;
 
 	public EbMSDocument processAcknowledgment(final Instant timestamp, final EbMSDocument messageDocument, final EbMSMessage message, final boolean isSyncReply) throws SOAPException, JAXBException, ParserConfigurationException, SAXException, IOException, TransformerFactoryConfigurationError, TransformerException
@@ -84,7 +84,7 @@ class AcknowledgmentProcessor
 		signatureGenerator.generate(message.getAckRequested(),acknowledgmentDocument,acknowledgment);
 		storeMessages(timestamp,messageDocument,message,acknowledgmentDocument,acknowledgment);
 		storeSendTask(acknowledgment,isSyncReply);
-		eventListener.onMessageReceived(message.getMessageHeader().getMessageData().getMessageId());
+		messageEventListener.onMessageReceived(message.getMessageHeader().getMessageData().getMessageId());
 		return acknowledgmentDocument;
 	}
 
@@ -155,7 +155,7 @@ class AcknowledgmentProcessor
 				EbMSMessageStatus.CREATED,
 				EbMSMessageStatus.DELIVERED) > 0)
 		{
-			eventListener.onMessageDelivered(responseMessageHeader.getMessageData().getRefToMessageId());
+			messageEventListener.onMessageDelivered(responseMessageHeader.getMessageData().getRefToMessageId());
 			if (deleteEbMSAttachmentsOnMessageProcessed)
 				ebMSDAO.deleteAttachments(responseMessageHeader.getMessageData().getRefToMessageId());
 		}

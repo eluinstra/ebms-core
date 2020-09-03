@@ -13,33 +13,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.clockwork.ebms.event.listener;
+package nl.clockwork.ebms.event;
 
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-class LoggingEventListener implements EventListener
+class LoggingMessageEventListener implements MessageEventListener
 {
 	@Override
-	public void onMessageReceived(String messageId) throws EventException
+	public void onMessageReceived(String messageId) throws MessageEventException
 	{
 		log.info("Message " + messageId + " received");
 	}
 
 	@Override
-	public void onMessageDelivered(String messageId) throws EventException
+	public void onMessageDelivered(String messageId) throws MessageEventException
 	{
 		log.info("Message " + messageId + " delivered");
 	}
 	
 	@Override
-	public void onMessageFailed(String messageId) throws EventException
+	public void onMessageFailed(String messageId) throws MessageEventException
 	{
 		log.info("Message " + messageId + " failed");
 	}
 
 	@Override
-	public void onMessageExpired(String messageId) throws EventException
+	public void onMessageExpired(String messageId) throws MessageEventException
 	{
 		log.info("Message " + messageId + " expired");
 	}

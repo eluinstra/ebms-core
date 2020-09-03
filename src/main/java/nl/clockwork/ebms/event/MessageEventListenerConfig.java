@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.clockwork.ebms.event.listener;
+package nl.clockwork.ebms.event;
 
 import static io.vavr.API.$;
 import static io.vavr.API.Case;
@@ -44,7 +44,7 @@ import nl.clockwork.ebms.dao.EbMSDAO;
 
 @Configuration
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class EventListenerConfig
+public class MessageEventListenerConfig
 {
 	public enum EventListenerType
 	{
@@ -68,34 +68,34 @@ public class EventListenerConfig
 	SQLQueryFactory queryFactory;
 
 	@Bean
-	public EventListener eventListener()
+	public MessageEventListener messageEventListener()
 	{
 		val jmsTemplate = new JmsTemplate(connectionFactory);
 		val filter = Splitter.on(',').trimResults().omitEmptyStrings().splitToStream(eventListenerFilter)
-			.map(e -> EbMSMessageEventType.valueOf(e))
-			.collect(Collectors.toCollection(() -> EnumSet.noneOf(EbMSMessageEventType.class)));
+			.map(e -> MessageEventType.valueOf(e))
+			.collect(Collectors.toCollection(() -> EnumSet.noneOf(MessageEventType.class)));
 		val eventListener = Match(eventListenerType).of(
-				Case($(EventListenerType.DAO),o -> new DAOEventListener(ebMSMessageEventDAO())),
-				Case($(EventListenerType.SIMPLE_JMS),o -> new SimpleJMSEventListener(jmsTemplate,createEbMSMessageEventDestinations(jmsDestinationType))),
-				Case($(EventListenerType.JMS),o -> new JMSEventListener(ebMSDAO,jmsTemplate,createEbMSMessageEventDestinations(jmsDestinationType))),
-				Case($(EventListenerType.JMS_TEXT),o -> new JMSTextEventListener(ebMSDAO,jmsTemplate,createEbMSMessageEventDestinations(jmsDestinationType))),
-				Case($(),o -> new LoggingEventListener()));
-		return filter.size() > 0 ? new EventListenerFilter(filter,eventListener): eventListener;
+				Case($(EventListenerType.DAO),o -> new DAOMessageEventListener(messageEventDAO())),
+				Case($(EventListenerType.SIMPLE_JMS),o -> new SimpleJMSMessageEventListener(jmsTemplate,createEbMSMessageEventDestinations(jmsDestinationType))),
+				Case($(EventListenerType.JMS),o -> new JMSMessageEventListener(ebMSDAO,jmsTemplate,createEbMSMessageEventDestinations(jmsDestinationType))),
+				Case($(EventListenerType.JMS_TEXT),o -> new JMSTextMessageEventListener(ebMSDAO,jmsTemplate,createEbMSMessageEventDestinations(jmsDestinationType))),
+				Case($(),o -> new LoggingMessageEventListener()));
+		return filter.size() > 0 ? new MessageEventListenerFilter(filter,eventListener): eventListener;
 	}
 
 	@Bean
-	public EbMSMessageEventDAO ebMSMessageEventDAO()
+	public MessageEventDAO messageEventDAO()
 	{
-		return new EbMSMessageEventDAOImpl(queryFactory);
+		return new MessageEventDAOImpl(queryFactory);
 	}
 
 	private Map<String,Destination> createEbMSMessageEventDestinations(JMSDestinationType jmsDestinationType)
 	{
-		return EbMSMessageEventType.stream()
+		return MessageEventType.stream()
 				.collect(Collectors.toMap(e -> e.name(),e -> createDestination(jmsDestinationType,e)));
 	}
 
-	private Destination createDestination(JMSDestinationType jmsDestinationType, EbMSMessageEventType e)
+	private Destination createDestination(JMSDestinationType jmsDestinationType, MessageEventType e)
 	{
 		return jmsDestinationType == JMSDestinationType.QUEUE ? new ActiveMQQueue(e.name()) : new ActiveMQTopic("VirtualTopic." + e.name());
 	}

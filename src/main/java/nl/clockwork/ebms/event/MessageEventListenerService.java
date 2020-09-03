@@ -13,28 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.clockwork.ebms.event.listener;
+package nl.clockwork.ebms.event;
 
 import javax.jws.WebMethod;
 import javax.jws.WebParam;
 import javax.jws.WebService;
 
 @WebService(targetNamespace = "http://www.ordina.nl/ebms/event/2.18")
-public interface EbMSEventListenerService extends EventListener
+public interface MessageEventListenerService extends MessageEventListener
 {
 	@Override
 	@WebMethod(operationName = "MessageReceived")
-	void onMessageReceived(@WebParam(name = "MessageId") String messageId) throws EbMSEventListenerServiceException;
+	void onMessageReceived(@WebParam(name = "MessageId") String messageId) throws MessageEventListenerServiceException;
 
 	@Override
 	@WebMethod(operationName = "MessageDelivered")
-	void onMessageDelivered(@WebParam(name = "MessageId") String messageId) throws EbMSEventListenerServiceException;
+	void onMessageDelivered(@WebParam(name = "MessageId") String messageId) throws MessageEventListenerServiceException;
 
 	@Override
 	@WebMethod(operationName = "MessageDeliveryFailed")
-	void onMessageFailed(@WebParam(name = "MessageId") String messageId) throws EbMSEventListenerServiceException;
+	void onMessageFailed(@WebParam(name = "MessageId") String messageId) throws MessageEventListenerServiceException;
 
 	@Override
 	@WebMethod(operationName = "MessageExpired")
-	void onMessageExpired(@WebParam(name = "MessageId") String messageId) throws EbMSEventListenerServiceException;
+	void onMessageExpired(@WebParam(name = "MessageId") String messageId) throws MessageEventListenerServiceException;
 }

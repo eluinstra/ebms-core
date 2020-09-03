@@ -27,7 +27,7 @@ import nl.clockwork.ebms.cpa.CPAManagerConfig;
 import nl.clockwork.ebms.dao.DAOConfig;
 import nl.clockwork.ebms.datasource.DataSourceConfig;
 import nl.clockwork.ebms.encryption.EncryptionConfig;
-import nl.clockwork.ebms.event.listener.EventListenerConfig;
+import nl.clockwork.ebms.event.MessageEventListenerConfig;
 import nl.clockwork.ebms.jms.JMSConfig;
 import nl.clockwork.ebms.processor.EbMSProcessorConfig;
 import nl.clockwork.ebms.querydsl.QueryDSLConfig;
@@ -51,9 +51,9 @@ import nl.clockwork.ebms.validation.ValidationConfig;
 		DeliveryManagerConfig.class,
 		EbMSProcessorConfig.class,
 		EncryptionConfig.class,
-		EventListenerConfig.class,
 		JMSConfig.class,
 		KeyStoreConfig.class,
+		MessageEventListenerConfig.class,
 		QueryDSLConfig.class,
 		SendTaskHandlerConfig.class,
 		SendTaskManagerConfig.class,

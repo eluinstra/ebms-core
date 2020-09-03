@@ -28,7 +28,7 @@ import nl.clockwork.ebms.cpa.CPAManager;
 import nl.clockwork.ebms.cpa.CertificateMapper;
 import nl.clockwork.ebms.cpa.URLMapper;
 import nl.clockwork.ebms.dao.EbMSDAO;
-import nl.clockwork.ebms.event.listener.EbMSMessageEventDAO;
+import nl.clockwork.ebms.event.MessageEventDAO;
 import nl.clockwork.ebms.send.SendTaskManager;
 import nl.clockwork.ebms.service.cpa.CPAService;
 import nl.clockwork.ebms.service.cpa.CPAServiceImpl;
@@ -57,7 +57,7 @@ public class ServiceConfig
 	@Autowired
 	EbMSDAO ebMSDAO;
 	@Autowired
-	EbMSMessageEventDAO ebMSMessageEventDAO;
+	MessageEventDAO messageEventDAO;
 	@Autowired
 	EbMSMessageFactory ebMSMessageFactory;
 	@Autowired
@@ -105,7 +105,7 @@ public class ServiceConfig
 		return EbMSMessageServiceHandler.builder()
 				.deliveryManager(deliveryManager)
 				.ebMSDAO(ebMSDAO)
-				.ebMSMessageEventDAO(ebMSMessageEventDAO)
+				.messageEventDAO(messageEventDAO)
 				.cpaManager(cpaManager)
 				.ebMSMessageFactory(ebMSMessageFactory)
 				.sendTaskManager(sendTaskManager)

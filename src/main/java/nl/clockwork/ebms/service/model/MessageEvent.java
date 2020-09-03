@@ -28,7 +28,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
-import nl.clockwork.ebms.event.listener.EbMSMessageEventType;
+import nl.clockwork.ebms.event.MessageEventType;
 
 @XmlAccessorType(XmlAccessType.FIELD)
 @Builder
@@ -44,5 +44,5 @@ public class MessageEvent implements Serializable
 	String messageId;
 	@XmlElement(required=true)
 	@NonNull
-	EbMSMessageEventType type;
+	MessageEventType type;
 }

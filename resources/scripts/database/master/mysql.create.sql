@@ -60,7 +60,7 @@ CREATE TABLE ebms_attachment
 	FOREIGN KEY (ebms_message_id) REFERENCES ebms_message(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-CREATE TABLE ebms_event
+CREATE TABLE send_task
 (
 	cpa_id							VARCHAR(256)		NOT NULL,
 	send_channel_id			VARCHAR(256)		NULL,
@@ -73,10 +73,10 @@ CREATE TABLE ebms_event
 	server_id						VARCHAR(256)		NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-ALTER TABLE ebms_event ADD CONSTRAINT uc_ebms_event UNIQUE (message_id(255));
-CREATE INDEX i_ebms_event ON ebms_event (time_stamp);
+ALTER TABLE send_task ADD CONSTRAINT uc_send_task UNIQUE (message_id(255));
+CREATE INDEX i_send_task ON send_task (time_stamp);
 
-CREATE TABLE ebms_event_log
+CREATE TABLE send_log
 (
 	message_id				VARCHAR(256)		NOT NULL,
 	time_stamp				TIMESTAMP				NOT NULL,
@@ -85,9 +85,9 @@ CREATE TABLE ebms_event_log
 	error_message			TEXT						NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-CREATE INDEX i_ebms_event_log ON ebms_event (message_id(255));
+CREATE INDEX i_send_log ON send (message_id(255));
 
-CREATE TABLE ebms_message_event
+CREATE TABLE message_event
 (
 	message_id				VARCHAR(256)		NOT NULL UNIQUE,
 	event_type				SMALLINT				NOT NULL,
@@ -95,4 +95,4 @@ CREATE TABLE ebms_message_event
 	processed					SMALLINT				DEFAULT 0 NOT NULL
 );
 
-CREATE INDEX i_ebms_message_event ON ebms_message_event (time_stamp);
+CREATE INDEX i_message_event ON message_event (time_stamp);

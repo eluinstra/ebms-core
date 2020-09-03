@@ -13,28 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.clockwork.ebms.event.listener;
+package nl.clockwork.ebms.event;
 
-import lombok.NoArgsConstructor;
-
-@NoArgsConstructor
-public class EventException extends RuntimeException
+public interface MessageEventListener
 {
-	private static final long serialVersionUID = 1L;
-
-	public EventException(String message, Throwable cause)
-	{
-		super(message,cause);
-	}
-
-	public EventException(String message)
-	{
-		super(message);
-	}
-
-	public EventException(Throwable cause)
-	{
-		super(cause);
-	}
-
+	void onMessageReceived(String messageId) throws MessageEventException;
+	void onMessageDelivered(String messageId) throws MessageEventException;
+	void onMessageFailed(String messageId) throws MessageEventException;
+	void onMessageExpired(String messageId) throws MessageEventException;
 }

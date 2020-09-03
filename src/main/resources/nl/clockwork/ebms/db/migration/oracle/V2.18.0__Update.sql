@@ -15,4 +15,8 @@
 --
 
 RENAME TABLE ebms_event TO send_task;
+RENAME INDEX i_ebms_event TO i_send_task;
 RENAME TABLE ebms_event_log TO send_log;
+RENAME INDEX i_ebms_event_log TO i_send_log;
+RENAME TABLE ebms_message_event TO message_event;
+RENAME INDEX i_ebms_message_event TO i_message_event;

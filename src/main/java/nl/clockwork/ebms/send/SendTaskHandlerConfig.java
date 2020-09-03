@@ -40,7 +40,7 @@ import nl.clockwork.ebms.cpa.CPAManager;
 import nl.clockwork.ebms.cpa.URLMapper;
 import nl.clockwork.ebms.dao.EbMSDAO;
 import nl.clockwork.ebms.encryption.EbMSMessageEncrypter;
-import nl.clockwork.ebms.event.listener.EventListener;
+import nl.clockwork.ebms.event.MessageEventListener;
 import nl.clockwork.ebms.processor.EbMSMessageProcessor;
 
 @Configuration
@@ -75,7 +75,7 @@ public class SendTaskHandlerConfig
 	@Value("${taskHandler.task.executionInterval}")
 	int taskHandlerTaskExecutionInterval;
 	@Autowired
-	EventListener eventListener;
+	MessageEventListener messageEventListener;
 	@Autowired
 	EbMSDAO ebMSDAO;
 	@Autowired
@@ -148,7 +148,7 @@ public class SendTaskHandlerConfig
 	{
 		return SendTaskHandler.builder()
 				.transactionManager(dataSourceTransactionManager)
-				.eventListener(eventListener)
+				.messageEventListener(messageEventListener)
 				.ebMSDAO(ebMSDAO)
 				.cpaManager(cpaManager)
 				.urlMapper(urlMapper)

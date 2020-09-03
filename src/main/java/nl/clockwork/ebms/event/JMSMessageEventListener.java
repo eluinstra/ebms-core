@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.clockwork.ebms.event.listener;
+package nl.clockwork.ebms.event;
 
 import java.util.Map;
 
@@ -36,7 +36,7 @@ import nl.clockwork.ebms.model.EbMSMessageProperties;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor
-class JMSEventListener extends LoggingEventListener
+class JMSMessageEventListener extends LoggingMessageEventListener
 {
 	@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 	@AllArgsConstructor
@@ -71,62 +71,62 @@ class JMSEventListener extends LoggingEventListener
 	Map<String,Destination> destinations;
 
 	@Override
-	public void onMessageReceived(String messageId) throws EventException
+	public void onMessageReceived(String messageId) throws MessageEventException
 	{
 		try
 		{
 			ebMSDAO.getEbMSMessageProperties(messageId)
-					.ifPresent(p -> jmsTemplate.send(destinations.get(EbMSMessageEventType.RECEIVED.name()),new EventMessageCreator(p)));
+					.ifPresent(p -> jmsTemplate.send(destinations.get(MessageEventType.RECEIVED.name()),new EventMessageCreator(p)));
 			super.onMessageReceived(messageId);
 		}
 		catch (JmsException e)
 		{
-			throw new EventException(e);
+			throw new MessageEventException(e);
 		}
 	}
 
 	@Override
-	public void onMessageDelivered(String messageId) throws EventException
+	public void onMessageDelivered(String messageId) throws MessageEventException
 	{
 		try
 		{
 			ebMSDAO.getEbMSMessageProperties(messageId)
-					.ifPresent(p -> jmsTemplate.send(destinations.get(EbMSMessageEventType.DELIVERED.name()),new EventMessageCreator(p)));
+					.ifPresent(p -> jmsTemplate.send(destinations.get(MessageEventType.DELIVERED.name()),new EventMessageCreator(p)));
 			super.onMessageDelivered(messageId);
 		}
 		catch (JmsException e)
 		{
-			throw new EventException(e);
+			throw new MessageEventException(e);
 		}
 	}
 	
 	@Override
-	public void onMessageFailed(String messageId) throws EventException
+	public void onMessageFailed(String messageId) throws MessageEventException
 	{
 		try
 		{
 			ebMSDAO.getEbMSMessageProperties(messageId)
-					.ifPresent(p -> jmsTemplate.send(destinations.get(EbMSMessageEventType.FAILED.name()),new EventMessageCreator(p)));
+					.ifPresent(p -> jmsTemplate.send(destinations.get(MessageEventType.FAILED.name()),new EventMessageCreator(p)));
 			super.onMessageFailed(messageId);
 		}
 		catch (JmsException e)
 		{
-			throw new EventException(e);
+			throw new MessageEventException(e);
 		}
 	}
 
 	@Override
-	public void onMessageExpired(String messageId) throws EventException
+	public void onMessageExpired(String messageId) throws MessageEventException
 	{
 		try
 		{
 			ebMSDAO.getEbMSMessageProperties(messageId)
-					.ifPresent(p -> jmsTemplate.send(destinations.get(EbMSMessageEventType.EXPIRED.name()),new EventMessageCreator(p)));
+					.ifPresent(p -> jmsTemplate.send(destinations.get(MessageEventType.EXPIRED.name()),new EventMessageCreator(p)));
 			super.onMessageExpired(messageId);
 		}
 		catch (JmsException e)
 		{
-			throw new EventException(e);
+			throw new MessageEventException(e);
 		}
 	}
 }

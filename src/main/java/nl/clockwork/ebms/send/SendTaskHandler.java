@@ -41,7 +41,7 @@ import nl.clockwork.ebms.cpa.CPAUtils;
 import nl.clockwork.ebms.cpa.URLMapper;
 import nl.clockwork.ebms.dao.EbMSDAO;
 import nl.clockwork.ebms.encryption.EbMSMessageEncrypter;
-import nl.clockwork.ebms.event.listener.EventListener;
+import nl.clockwork.ebms.event.MessageEventListener;
 import nl.clockwork.ebms.model.EbMSDocument;
 import nl.clockwork.ebms.processor.EbMSMessageProcessor;
 import nl.clockwork.ebms.processor.EbMSProcessingException;
@@ -54,7 +54,7 @@ class SendTaskHandler
 	@NonNull
 	PlatformTransactionManager transactionManager;
 	@NonNull
-	EventListener eventListener;
+	MessageEventListener messageEventListener;
 	@NonNull
 	EbMSDAO ebMSDAO;
 	@NonNull
@@ -73,10 +73,10 @@ class SendTaskHandler
 	boolean deleteEbMSAttachmentsOnMessageProcessed;
 
 	@Builder
-	public SendTaskHandler(@NonNull PlatformTransactionManager transactionManager, @NonNull EventListener eventListener, @NonNull EbMSDAO ebMSDAO, @NonNull CPAManager cpaManager, @NonNull URLMapper urlMapper, @NonNull SendTaskManager sendTaskManager, @NonNull EbMSHttpClientFactory ebMSClientFactory, @NonNull EbMSMessageEncrypter messageEncrypter, @NonNull EbMSMessageProcessor messageProcessor, TimedTask timedTask, boolean deleteEbMSAttachmentsOnMessageProcessed)
+	public SendTaskHandler(@NonNull PlatformTransactionManager transactionManager, @NonNull MessageEventListener messageEventListener, @NonNull EbMSDAO ebMSDAO, @NonNull CPAManager cpaManager, @NonNull URLMapper urlMapper, @NonNull SendTaskManager sendTaskManager, @NonNull EbMSHttpClientFactory ebMSClientFactory, @NonNull EbMSMessageEncrypter messageEncrypter, @NonNull EbMSMessageProcessor messageProcessor, TimedTask timedTask, boolean deleteEbMSAttachmentsOnMessageProcessed)
 	{
 		this.transactionManager = transactionManager;
-		this.eventListener = eventListener;
+		this.messageEventListener = messageEventListener;
 		this.ebMSDAO = ebMSDAO;
 		this.cpaManager = cpaManager;
 		this.urlMapper = urlMapper;
@@ -154,7 +154,7 @@ class SendTaskHandler
 				if ((e instanceof EbMSUnrecoverableResponseException) || !CPAUtils.isReliableMessaging(receiveDeliveryChannel))
 					if (ebMSDAO.updateMessage(task.getMessageId(),EbMSMessageStatus.CREATED,EbMSMessageStatus.DELIVERY_FAILED) > 0)
 					{
-						eventListener.onMessageFailed(task.getMessageId());
+						messageEventListener.onMessageFailed(task.getMessageId());
 						if (deleteEbMSAttachmentsOnMessageProcessed)
 							ebMSDAO.deleteAttachments(task.getMessageId());
 					}
@@ -176,7 +176,7 @@ class SendTaskHandler
 				if (!CPAUtils.isReliableMessaging(receiveDeliveryChannel))
 					if (ebMSDAO.updateMessage(task.getMessageId(),EbMSMessageStatus.CREATED,EbMSMessageStatus.DELIVERY_FAILED) > 0)
 					{
-						eventListener.onMessageFailed(task.getMessageId());
+						messageEventListener.onMessageFailed(task.getMessageId());
 						if (deleteEbMSAttachmentsOnMessageProcessed)
 							ebMSDAO.deleteAttachments(task.getMessageId());
 					}
@@ -217,7 +217,7 @@ class SendTaskHandler
 			if (!CPAUtils.isReliableMessaging(receiveDeliveryChannel))
 				if (ebMSDAO.updateMessage(task.getMessageId(),EbMSMessageStatus.CREATED,EbMSMessageStatus.DELIVERED) > 0)
 				{
-					eventListener.onMessageDelivered(task.getMessageId());
+					messageEventListener.onMessageDelivered(task.getMessageId());
 					if (deleteEbMSAttachmentsOnMessageProcessed)
 						ebMSDAO.deleteAttachments(task.getMessageId());
 				}
@@ -260,7 +260,7 @@ class SendTaskHandler
 	{
 		if (ebMSDAO.updateMessage(messageId,EbMSMessageStatus.CREATED,EbMSMessageStatus.EXPIRED) > 0)
 		{
-			eventListener.onMessageExpired(messageId);
+			messageEventListener.onMessageExpired(messageId);
 			if (deleteEbMSAttachmentsOnMessageProcessed)
 				ebMSDAO.deleteAttachments(messageId);
 		}

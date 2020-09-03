@@ -41,7 +41,7 @@ import nl.clockwork.ebms.EbMSMessageUtils;
 import nl.clockwork.ebms.client.DeliveryManager;
 import nl.clockwork.ebms.cpa.CPAManager;
 import nl.clockwork.ebms.dao.EbMSDAO;
-import nl.clockwork.ebms.event.listener.EventListener;
+import nl.clockwork.ebms.event.MessageEventListener;
 import nl.clockwork.ebms.model.EbMSAcknowledgment;
 import nl.clockwork.ebms.model.EbMSBaseMessage;
 import nl.clockwork.ebms.model.EbMSDocument;
@@ -68,7 +68,7 @@ import nl.clockwork.ebms.validation.XSDValidator;
 public class EbMSMessageProcessor
 {
   @NonNull
-  EventListener eventListener;
+  MessageEventListener messageEventListener;
   @NonNull
 	EbMSDAO ebMSDAO;
   @NonNull
@@ -85,10 +85,10 @@ public class EbMSMessageProcessor
 	PongProcessor pongProcessor;
 
 	@Builder
-	public EbMSMessageProcessor(@NonNull DeliveryManager deliveryManager, @NonNull EventListener eventListener, @NonNull EbMSDAO ebMSDAO, @NonNull CPAManager cpaManager, @NonNull EbMSMessageFactory ebMSMessageFactory, @NonNull SendTaskManager sendTaskManager, @NonNull EbMSSignatureGenerator signatureGenerator, @NonNull EbMSMessageValidator messageValidator, @NonNull DuplicateMessageHandler duplicateMessageHandler, boolean deleteEbMSAttachmentsOnMessageProcessed)
+	public EbMSMessageProcessor(@NonNull DeliveryManager deliveryManager, @NonNull MessageEventListener messageEventListener, @NonNull EbMSDAO ebMSDAO, @NonNull CPAManager cpaManager, @NonNull EbMSMessageFactory ebMSMessageFactory, @NonNull SendTaskManager sendTaskManager, @NonNull EbMSSignatureGenerator signatureGenerator, @NonNull EbMSMessageValidator messageValidator, @NonNull DuplicateMessageHandler duplicateMessageHandler, boolean deleteEbMSAttachmentsOnMessageProcessed)
 	{
 		super();
-		this.eventListener = eventListener;
+		this.messageEventListener = messageEventListener;
 		this.ebMSDAO = ebMSDAO;
 		this.cpaManager = cpaManager;
 		this.messageValidator = messageValidator;
@@ -102,7 +102,7 @@ public class EbMSMessageProcessor
 				.duplicateMessageHandler(duplicateMessageHandler)
 				.ebMSMessageFactory(ebMSMessageFactory)
 				.signatureGenerator(signatureGenerator)
-				.eventListener(eventListener)
+				.messageEventListener(messageEventListener)
 				.deleteEbMSAttachmentsOnMessageProcessed(deleteEbMSAttachmentsOnMessageProcessed)
 				.build();
 		this.acknowledgmentProcessor = AcknowledgmentProcessor.builder()
@@ -113,7 +113,7 @@ public class EbMSMessageProcessor
 				.duplicateMessageHandler(duplicateMessageHandler)
 				.ebMSMessageFactory(ebMSMessageFactory)
 				.signatureGenerator(signatureGenerator)
-				.eventListener(eventListener)
+				.messageEventListener(messageEventListener)
 				.deleteEbMSAttachmentsOnMessageProcessed(deleteEbMSAttachmentsOnMessageProcessed)
 				.build();
 		this.statusResponseProcessor = StatusResponseProcessor.builder()
@@ -287,7 +287,7 @@ public class EbMSMessageProcessor
 	private void storeMessage(final Instant timestamp, final EbMSDocument messageDocument, final EbMSMessage message)
 	{
 		ebMSDAO.insertMessage(timestamp,null,messageDocument.getMessage(),message,message.getAttachments(),EbMSMessageStatus.RECEIVED);
-		eventListener.onMessageReceived(message.getMessageHeader().getMessageData().getMessageId());
+		messageEventListener.onMessageReceived(message.getMessageHeader().getMessageData().getMessageId());
 	}
 
 	private void processMessage(final EbMSMessage message)
@@ -298,7 +298,7 @@ public class EbMSMessageProcessor
 				EbMSMessageStatus.CREATED,
 				EbMSMessageStatus.DELIVERED) > 0)
 		{
-			eventListener.onMessageDelivered(messageHeader.getMessageData().getMessageId());
+			messageEventListener.onMessageDelivered(messageHeader.getMessageData().getMessageId());
 			if (deleteEbMSAttachmentsOnMessageProcessed)
 				ebMSDAO.deleteAttachments(messageHeader.getMessageData().getMessageId());
 		}

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.clockwork.ebms.event.listener;
+package nl.clockwork.ebms.event;
 
 import javax.xml.ws.WebFault;
 
@@ -21,21 +21,21 @@ import lombok.NoArgsConstructor;
 
 @WebFault(name = "EbMSEventListenerServiceException", targetNamespace = "http://www.ordina.nl/ebms/event/2.18")
 @NoArgsConstructor
-public class EbMSEventListenerServiceException extends EventException
+public class MessageEventListenerServiceException extends MessageEventException
 {
 	private static final long serialVersionUID = 1L;
 
-	public EbMSEventListenerServiceException(String message, Throwable cause)
+	public MessageEventListenerServiceException(String message, Throwable cause)
 	{
 		super(message,cause);
 	}
 
-	public EbMSEventListenerServiceException(String message)
+	public MessageEventListenerServiceException(String message)
 	{
 		super(message);
 	}
 
-	public EbMSEventListenerServiceException(Throwable cause)
+	public MessageEventListenerServiceException(Throwable cause)
 	{
 		super(cause);
 	}

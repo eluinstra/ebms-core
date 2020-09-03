@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.clockwork.ebms.event.listener;
+package nl.clockwork.ebms.event;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -22,36 +22,36 @@ import lombok.experimental.FieldDefaults;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor
-class DAOEventListener extends LoggingEventListener
+class DAOMessageEventListener extends LoggingMessageEventListener
 {
 	@NonNull
-	EbMSMessageEventDAO ebMSMessageEventDAO;
+	MessageEventDAO messageEventDAO;
 
 	@Override
-	public void onMessageReceived(String messageId) throws EventException
+	public void onMessageReceived(String messageId) throws MessageEventException
 	{
-		ebMSMessageEventDAO.insertEbMSMessageEvent(messageId,EbMSMessageEventType.RECEIVED);
+		messageEventDAO.insertEbMSMessageEvent(messageId,MessageEventType.RECEIVED);
 		super.onMessageReceived(messageId);
 	}
 
 	@Override
-	public void onMessageDelivered(String messageId) throws EventException
+	public void onMessageDelivered(String messageId) throws MessageEventException
 	{
-		ebMSMessageEventDAO.insertEbMSMessageEvent(messageId,EbMSMessageEventType.DELIVERED);
+		messageEventDAO.insertEbMSMessageEvent(messageId,MessageEventType.DELIVERED);
 		super.onMessageDelivered(messageId);
 	}
 	
 	@Override
-	public void onMessageFailed(String messageId) throws EventException
+	public void onMessageFailed(String messageId) throws MessageEventException
 	{
-		ebMSMessageEventDAO.insertEbMSMessageEvent(messageId,EbMSMessageEventType.FAILED);
+		messageEventDAO.insertEbMSMessageEvent(messageId,MessageEventType.FAILED);
 		super.onMessageFailed(messageId);
 	}
 
 	@Override
-	public void onMessageExpired(String messageId) throws EventException
+	public void onMessageExpired(String messageId) throws MessageEventException
 	{
-		ebMSMessageEventDAO.insertEbMSMessageEvent(messageId,EbMSMessageEventType.EXPIRED);
+		messageEventDAO.insertEbMSMessageEvent(messageId,MessageEventType.EXPIRED);
 		super.onMessageExpired(messageId);
 	}
 }

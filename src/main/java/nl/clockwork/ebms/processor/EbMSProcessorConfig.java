@@ -27,7 +27,7 @@ import nl.clockwork.ebms.EbMSMessageFactory;
 import nl.clockwork.ebms.client.DeliveryManager;
 import nl.clockwork.ebms.cpa.CPAManager;
 import nl.clockwork.ebms.dao.EbMSDAO;
-import nl.clockwork.ebms.event.listener.EventListener;
+import nl.clockwork.ebms.event.MessageEventListener;
 import nl.clockwork.ebms.send.SendTaskManager;
 import nl.clockwork.ebms.signing.EbMSSignatureGenerator;
 import nl.clockwork.ebms.validation.EbMSMessageValidator;
@@ -39,7 +39,7 @@ public class EbMSProcessorConfig
 	@Autowired
 	DeliveryManager deliveryManager;
 	@Autowired
-	EventListener eventListener;
+	MessageEventListener messageEventListener;
 	@Autowired
 	EbMSDAO ebMSDAO;
 	@Autowired
@@ -72,7 +72,7 @@ public class EbMSProcessorConfig
 				.build();
 		return EbMSMessageProcessor.builder()
 				.deliveryManager(deliveryManager)
-				.eventListener(eventListener)
+				.messageEventListener(messageEventListener)
 				.ebMSDAO(ebMSDAO)
 				.cpaManager(cpaManager)
 				.ebMSMessageFactory(ebMSMessageFactory)

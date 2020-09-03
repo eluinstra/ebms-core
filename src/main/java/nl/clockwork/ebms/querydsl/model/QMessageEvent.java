@@ -31,16 +31,16 @@ import java.sql.Types;
 
 
 /**
- * QEbmsMessageEvent is a Querydsl query type for QEbmsMessageEvent
+ * QMessageEvent is a Querydsl query type for QMessageEvent
  */
 @Generated("com.querydsl.sql.codegen.MetaDataSerializer")
-public class QEbmsMessageEvent extends com.querydsl.sql.RelationalPathBase<QEbmsMessageEvent> {
+public class QMessageEvent extends com.querydsl.sql.RelationalPathBase<QMessageEvent> {
 
     private static final long serialVersionUID = 1196390453;
 
-    public static final QEbmsMessageEvent ebmsMessageEvent = new QEbmsMessageEvent("ebms_message_event");
+    public static final QMessageEvent ebmsMessageEvent = new QMessageEvent("message_event");
 
-    public final EnumPath<nl.clockwork.ebms.event.listener.EbMSMessageEventType> eventType = createEnum("eventType", nl.clockwork.ebms.event.listener.EbMSMessageEventType.class);
+    public final EnumPath<nl.clockwork.ebms.event.MessageEventType> eventType = createEnum("eventType", nl.clockwork.ebms.event.MessageEventType.class);
 
     public final StringPath messageId = createString("messageId");
 
@@ -48,28 +48,28 @@ public class QEbmsMessageEvent extends com.querydsl.sql.RelationalPathBase<QEbms
 
     public final DateTimePath<java.sql.Timestamp> timeStamp = createDateTime("timeStamp", java.sql.Timestamp.class);
 
-    public QEbmsMessageEvent(String variable) {
-        super(QEbmsMessageEvent.class, forVariable(variable), "PUBLIC", "ebms_message_event");
+    public QMessageEvent(String variable) {
+        super(QMessageEvent.class, forVariable(variable), "PUBLIC", "message_event");
         addMetadata();
     }
 
-    public QEbmsMessageEvent(String variable, String schema, String table) {
-        super(QEbmsMessageEvent.class, forVariable(variable), schema, table);
+    public QMessageEvent(String variable, String schema, String table) {
+        super(QMessageEvent.class, forVariable(variable), schema, table);
         addMetadata();
     }
 
-    public QEbmsMessageEvent(String variable, String schema) {
-        super(QEbmsMessageEvent.class, forVariable(variable), schema, "ebms_message_event");
+    public QMessageEvent(String variable, String schema) {
+        super(QMessageEvent.class, forVariable(variable), schema, "message_event");
         addMetadata();
     }
 
-    public QEbmsMessageEvent(Path<? extends QEbmsMessageEvent> path) {
-        super(path.getType(), path.getMetadata(), "PUBLIC", "ebms_message_event");
+    public QMessageEvent(Path<? extends QMessageEvent> path) {
+        super(path.getType(), path.getMetadata(), "PUBLIC", "message_event");
         addMetadata();
     }
 
-    public QEbmsMessageEvent(PathMetadata metadata) {
-        super(QEbmsMessageEvent.class, metadata, "PUBLIC", "ebms_message_event");
+    public QMessageEvent(PathMetadata metadata) {
+        super(QMessageEvent.class, metadata, "PUBLIC", "message_event");
         addMetadata();
     }
 

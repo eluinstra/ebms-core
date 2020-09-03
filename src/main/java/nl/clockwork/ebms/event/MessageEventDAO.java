@@ -13,17 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.clockwork.ebms.event.listener;
+package nl.clockwork.ebms.event;
 
 import java.util.List;
 
 import nl.clockwork.ebms.service.model.MessageEvent;
 import nl.clockwork.ebms.service.model.MessageFilter;
 
-public interface EbMSMessageEventDAO
+public interface MessageEventDAO
 {
-	List<MessageEvent> getEbMSMessageEvents(MessageFilter messageFilter, EbMSMessageEventType[] types);
-	List<MessageEvent> getEbMSMessageEvents(MessageFilter messageFilter, EbMSMessageEventType[] types, int maxNr);
-	long insertEbMSMessageEvent(String messageId, EbMSMessageEventType eventType);
+	List<MessageEvent> getEbMSMessageEvents(MessageFilter messageFilter, MessageEventType[] types);
+	List<MessageEvent> getEbMSMessageEvents(MessageFilter messageFilter, MessageEventType[] types, int maxNr);
+	long insertEbMSMessageEvent(String messageId, MessageEventType eventType);
 	long processEbMSMessageEvent(String messageId);
 }
