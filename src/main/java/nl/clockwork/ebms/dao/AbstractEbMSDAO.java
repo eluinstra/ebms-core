@@ -153,14 +153,14 @@ class AbstractEbMSDAO implements EbMSDAO
 	public Optional<Message> getMessage(String messageId)
 	{
 		val dataSources = getAttachments(messageId,ebMSDataSourceRowMapper);
-		return getMessageProperties(messageId).map(mc -> new Message(mc,dataSources));
+		return getMessageProperties(messageId).map(p -> new Message(p,dataSources));
 	}
 
 	@Override
 	public Optional<MTOMMessage> getMTOMMessage(String messageId)
 	{
 		val dataSources = getAttachments(messageId,ebMSDataSourceMTOMRowMapper);
-		return getMessageProperties(messageId).map(mc -> new MTOMMessage(mc,dataSources));
+		return getMessageProperties(messageId).map(p -> new MTOMMessage(p,dataSources));
 	}
 
 	protected Optional<MessageProperties> getMessageProperties(String messageId)

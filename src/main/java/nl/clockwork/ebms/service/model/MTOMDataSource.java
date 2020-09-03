@@ -40,7 +40,6 @@ import lombok.experimental.FieldDefaults;
 @NoArgsConstructor
 @AllArgsConstructor
 @RequiredArgsConstructor
-@ToString
 public class MTOMDataSource implements Serializable
 {
 	private static final long serialVersionUID = 1L;

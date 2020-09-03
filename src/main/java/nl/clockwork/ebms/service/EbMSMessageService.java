@@ -45,9 +45,9 @@ public interface EbMSMessageService
 	void ping(@WebParam(name = "CPAId") @XmlElement(required = true) String cpaId, @WebParam(name = "FromPartyId") @XmlElement(required = true) String fromPartyId, @WebParam(name = "ToPartyId") @XmlElement(required = true) String toPartyId) throws EbMSMessageServiceException;
 
 	/**
-	 * Sends the message content messageContent as an EbMS message
+	 * Sends the message content message as an EbMS message
 	 * 
-	 * @param messageContent
+	 * @param message
 	 * @return The messageId of the generated EbMS message
 	 * @throws EbMSMessageServiceException
 	 */
@@ -75,9 +75,9 @@ public interface EbMSMessageService
 	String resendMessage(@WebParam(name = "MessageId") @XmlElement(required = true) String messageId) throws EbMSMessageServiceException;
 
 	/**
-	 * Gets all messageIds of messages with the RECEIVED status that satisfy the filter messageContext. If maxNr is given, then maxNr messageIds are returned
+	 * Gets all messageIds of messages with the RECEIVED status that satisfy the filter messageFilter. If maxNr is given, then maxNr messageIds are returned
 	 * 
-	 * @param messageContext
+	 * @param messageFilter
 	 * @param maxNr
 	 * @return The list of messageIds
 	 * @throws EbMSMessageServiceException
@@ -92,7 +92,7 @@ public interface EbMSMessageService
 	 * 
 	 * @param messageId
 	 * @param process
-	 * @return The messageContent
+	 * @return The message
 	 * @throws EbMSMessageServiceException
 	 */
 	@WebResult(name = "Message")
@@ -120,11 +120,11 @@ public interface EbMSMessageService
 	MessageStatus getMessageStatus(@WebParam(name = "MessageId") @XmlElement(required = true) String messageId) throws EbMSMessageServiceException;
 
 	/**
-	 * Gets the events that satisfy the messageContext filter and the eventTypes eventTypes. If maxNr is included, then maxNr events are returned. The possible
+	 * Gets the events that satisfy the messageFilter filter and the eventTypes eventTypes. If maxNr is included, then maxNr events are returned. The possible
 	 * event types are: - RECEIVED – when a message is received - DELIVERED – if a message has been sent successfully - FAILED – if a message returns an error
 	 * while sending - EXPIRED – if a message could not be sent within the number of attempts and time agreed in the CPA
 	 * 
-	 * @param messageContext
+	 * @param messageFilter
 	 * @param eventTypes
 	 * @param maxNr
 	 * @return The list of events

@@ -63,8 +63,8 @@ class StatusResponseProcessor
 
   public EbMSStatusResponse createStatusResponse(final EbMSStatusRequest statusRequest, final Instant timestamp) throws ValidatorException, DatatypeConfigurationException, JAXBException, EbMSProcessorException
 	{
-		val mc = ebMSDAO.getEbMSMessageProperties(statusRequest.getStatusRequest().getRefToMessageId()).orElse(null);
-		val result = createEbMSMessageStatusAndTimestamp(statusRequest,mc);
+		val p = ebMSDAO.getEbMSMessageProperties(statusRequest.getStatusRequest().getRefToMessageId()).orElse(null);
+		val result = createEbMSMessageStatusAndTimestamp(statusRequest,p);
 		return ebMSMessageFactory.createEbMSStatusResponse(statusRequest,result._1,result._2); 
 	}
 	
@@ -93,16 +93,16 @@ class StatusResponseProcessor
 		}
 	}
 
-	private Tuple2<EbMSMessageStatus,Instant> createEbMSMessageStatusAndTimestamp(EbMSStatusRequest statusRequest, EbMSMessageProperties messageContext)
+	private Tuple2<EbMSMessageStatus,Instant> createEbMSMessageStatusAndTimestamp(EbMSStatusRequest statusRequest, EbMSMessageProperties messageProperties)
 	{
-		if (messageContext == null || EbMSAction.EBMS_SERVICE_URI.equals(messageContext.getService()))
+		if (messageProperties == null || EbMSAction.EBMS_SERVICE_URI.equals(messageProperties.getService()))
 			return Tuple.of(EbMSMessageStatus.NOT_RECOGNIZED,null);
-		else if (!messageContext.getCpaId().equals(statusRequest.getMessageHeader().getCPAId()))
+		else if (!messageProperties.getCpaId().equals(statusRequest.getMessageHeader().getCPAId()))
 			return Tuple.of(EbMSMessageStatus.UNAUTHORIZED,null);
 		else
 		{
 			return ebMSDAO.getMessageStatus(statusRequest.getStatusRequest().getRefToMessageId())
-					.map(s -> mapEbMSMessageStatusAndTimestamp(s,messageContext.getTimestamp()))
+					.map(s -> mapEbMSMessageStatusAndTimestamp(s,messageProperties.getTimestamp()))
 					.orElseThrow(() -> new EbMSProcessingException("Message " + statusRequest.getStatusRequest().getRefToMessageId() + " not found!"));
 		}
 	}

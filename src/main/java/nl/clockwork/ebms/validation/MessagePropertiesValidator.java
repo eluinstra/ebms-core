@@ -61,16 +61,16 @@ public class MessagePropertiesValidator
 	public void validate(MessageRequestProperties properties) throws ValidatorException
 	{
 		if (StringUtils.isEmpty(properties.getCpaId()))
-			throw new ValidationException("context.cpaId is empty!");
+			throw new ValidationException("message.cpaId is empty!");
 		if (isEmpty(properties.getFromParty()))
-			throw new ValidationException("context.fromParty is empty!");
+			throw new ValidationException("message.fromParty is empty!");
 		if (StringUtils.isEmpty(properties.getService()))
-			throw new ValidationException("context.service is empty!");
+			throw new ValidationException("message.service is empty!");
 		if (StringUtils.isEmpty(properties.getAction()))
-			throw new ValidationException("context.action is empty!");
+			throw new ValidationException("message.action is empty!");
 
 		if (!cpaManager.existsCPA(properties.getCpaId()))
-			throw new ValidationException("No CPA found for context.cpaId=" + properties.getCpaId());
+			throw new ValidationException("No CPA found for message.cpaId=" + properties.getCpaId());
 
 		val fromPartyInfo =
 				cpaManager.getFromPartyInfo(properties.getCpaId(),properties.getFromParty(),properties.getService(),properties.getAction());
@@ -78,14 +78,14 @@ public class MessagePropertiesValidator
 		{
 			val msg = new StringBuffer();
 			msg.append("No CanSend action found for");
-			msg.append(" context.cpaId=").append(properties.getCpaId());
+			msg.append(" message.cpaId=").append(properties.getCpaId());
 			if (properties.getFromParty() != null)
 			{
-				msg.append(", context.FromParty.partyId=").append(properties.getFromParty().getPartyId());
-				msg.append(", context.FromParty.role=").append(properties.getFromParty().getRole());
+				msg.append(", message.FromParty.partyId=").append(properties.getFromParty().getPartyId());
+				msg.append(", message.FromParty.role=").append(properties.getFromParty().getRole());
 			}
-			msg.append(", context.service=").append(properties.getService());
-			msg.append(", context.action=").append(properties.getAction());
+			msg.append(", message.service=").append(properties.getService());
+			msg.append(", message.action=").append(properties.getAction());
 			throw new ValidationException(msg.toString());
 		}
 
@@ -95,19 +95,19 @@ public class MessagePropertiesValidator
 		{
 			val msg = new StringBuffer();
 			msg.append("No CanReceive action found for");
-			msg.append(" context.cpaId=").append(properties.getCpaId());
+			msg.append(" message.cpaId=").append(properties.getCpaId());
 			if (fromPartyInfo.get().getCanSend().getOtherPartyActionBinding() != null && properties.getFromParty() != null)
 			{
-				msg.append(", context.FromParty.partyId=").append(properties.getFromParty().getPartyId());
-				msg.append(", context.FromParty.role=").append(properties.getFromParty().getRole());
+				msg.append(", message.FromParty.partyId=").append(properties.getFromParty().getPartyId());
+				msg.append(", message.FromParty.role=").append(properties.getFromParty().getRole());
 			}
 			if (properties.getToParty() != null)
 			{
-				msg.append(", context.ToParty.partyId=").append(properties.getToParty().getPartyId());
-				msg.append(", context.ToParty.role=").append(properties.getToParty().getRole());
+				msg.append(", message.ToParty.partyId=").append(properties.getToParty().getPartyId());
+				msg.append(", message.ToParty.role=").append(properties.getToParty().getRole());
 			}
-			msg.append(", context.service=").append(properties.getService());
-			msg.append(", context.action=").append(properties.getAction());
+			msg.append(", message.service=").append(properties.getService());
+			msg.append(", message.action=").append(properties.getAction());
 			throw new ValidationException(msg.toString());
 		}
 		else if (fromPartyInfo.get().getCanSend().getOtherPartyActionBinding() != null
@@ -116,20 +116,20 @@ public class MessagePropertiesValidator
 		{
 			val msg = new StringBuffer();
 			msg.append("Action for to party does not match action for from party for");
-			msg.append(" context.cpaId=").append(properties.getCpaId());
+			msg.append(" message.cpaId=").append(properties.getCpaId());
 			if (fromPartyInfo.get().getCanSend().getOtherPartyActionBinding() != null && properties.getFromParty() != null)
 			{
-				msg.append(", context.FromParty.partyId=").append(properties.getFromParty().getPartyId());
-				msg.append(", context.FromParty.role=").append(properties.getFromParty().getRole());
+				msg.append(", message.FromParty.partyId=").append(properties.getFromParty().getPartyId());
+				msg.append(", message.FromParty.role=").append(properties.getFromParty().getRole());
 			}
 			if (properties.getToParty() != null)
 			{
-				msg.append(", context.ToParty.partyId=").append(properties.getToParty().getPartyId());
-				msg.append(", context.ToParty.role=").append(properties.getToParty().getRole());
+				msg.append(", message.ToParty.partyId=").append(properties.getToParty().getPartyId());
+				msg.append(", message.ToParty.role=").append(properties.getToParty().getRole());
 			}
-			msg.append(", context.service=").append(properties.getService());
-			msg.append(", context.action=").append(properties.getAction());
-			msg.append(". context.ToParty is optional!");
+			msg.append(", message.service=").append(properties.getService());
+			msg.append(", message.action=").append(properties.getAction());
+			msg.append(". message.ToParty is optional!");
 			throw new ValidationException(msg.toString());
 		}
 	}

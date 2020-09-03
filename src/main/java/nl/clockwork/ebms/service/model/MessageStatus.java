@@ -27,7 +27,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
-import lombok.ToString;
 import lombok.experimental.FieldDefaults;
 import nl.clockwork.ebms.EbMSMessageStatus;
 
@@ -36,7 +35,6 @@ import nl.clockwork.ebms.EbMSMessageStatus;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @NoArgsConstructor
 @AllArgsConstructor
-@ToString
 public class MessageStatus implements Serializable
 {
 	private static final long serialVersionUID = 1L;

@@ -25,7 +25,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
 import lombok.experimental.FieldDefaults;
 
 @XmlAccessorType(XmlAccessType.FIELD)
@@ -34,7 +33,6 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @NoArgsConstructor
 @AllArgsConstructor
-@ToString
 public class MessageFilter implements Serializable
 {
 	private static final long serialVersionUID = 1L;

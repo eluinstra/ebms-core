@@ -161,12 +161,12 @@ class EbMSMessageServiceHandler
 		try
 		{
 			log.debug("ResendMessage " + messageId);
-			return ebMSDAO.getMessage(messageId).map(mc ->
+			return ebMSDAO.getMessage(messageId).map(p ->
 			{
 				try
 				{
-					resetMessage(mc.getProperties());
-					val message = ebMSMessageFactory.createEbMSMessage(MessageMapper.INSTANCE.toMessage(mc));
+					resetMessage(p.getProperties());
+					val message = ebMSMessageFactory.createEbMSMessage(MessageMapper.INSTANCE.toMessage(p));
 					val document = EbMSMessageUtils.getEbMSDocument(message);
 					signatureGenerator.generate(document,message);
 					storeMessage(document.getMessage(),message);
@@ -324,11 +324,11 @@ class EbMSMessageServiceHandler
 		}
 	}
 
-	private void resetMessage(MessageProperties context)
+	private void resetMessage(MessageProperties properties)
 	{
-		// context.setConversationId(null);
-		context.setMessageId(null);
-		context.setTimestamp(null);
+		// properties.setConversationId(null);
+		properties.setMessageId(null);
+		properties.setTimestamp(null);
 	}
 
 	private void storeMessage(Document document, EbMSMessage message) throws EbMSProcessorException

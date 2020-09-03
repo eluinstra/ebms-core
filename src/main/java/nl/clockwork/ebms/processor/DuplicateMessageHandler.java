@@ -81,23 +81,23 @@ class DuplicateMessageHandler
 			{
 				if (storeDuplicateMessage)
 					ebMSDAO.insertDuplicateMessage(timestamp,document.getMessage(),message,storeDuplicateMessageAttachments ? message.getAttachments() : Collections.emptyList());
-				val context = ebMSDAO.getEbMSMessagePropertiesByRefToMessageId(
+				val messageProperties = ebMSDAO.getEbMSMessagePropertiesByRefToMessageId(
 						messageHeader.getCPAId(),
 						messageHeader.getMessageData().getMessageId(),
 						EbMSAction.MESSAGE_ERROR,
 						EbMSAction.ACKNOWLEDGMENT);
-				StreamUtils.ifNotPresent(context,() -> log.warn("No response found for duplicate message " + messageHeader.getMessageData().getMessageId() + "!"));
+				StreamUtils.ifNotPresent(messageProperties,() -> log.warn("No response found for duplicate message " + messageHeader.getMessageData().getMessageId() + "!"));
 				val service = CPAUtils.toString(CPAUtils.createEbMSMessageService());
 				val sendDeliveryChannel =	cpaManager.getSendDeliveryChannel(messageHeader.getCPAId(),messageHeader.getTo().getPartyId(),messageHeader.getTo().getRole(),service,null)
 						.orElse(null);
 				val receiveDeliveryChannel = cpaManager.getReceiveDeliveryChannel(messageHeader.getCPAId(),messageHeader.getFrom().getPartyId(),messageHeader.getFrom().getRole(),service,null)
 						.orElse(null);
-				if (receiveDeliveryChannel != null && context.isPresent())
-					eventManager.createEvent(messageHeader.getCPAId(),sendDeliveryChannel,receiveDeliveryChannel,context.get().getMessageId(),messageHeader.getMessageData().getTimeToLive(),context.get().getTimestamp(),false);
-				if (receiveDeliveryChannel == null && context.isPresent())
+				if (receiveDeliveryChannel != null && messageProperties.isPresent())
+					eventManager.createEvent(messageHeader.getCPAId(),sendDeliveryChannel,receiveDeliveryChannel,messageProperties.get().getMessageId(),messageHeader.getMessageData().getTimeToLive(),messageProperties.get().getTimestamp(),false);
+				if (receiveDeliveryChannel == null && messageProperties.isPresent())
 					try
 					{
-						val result = ebMSDAO.getDocument(context.get().getMessageId());
+						val result = ebMSDAO.getDocument(messageProperties.get().getMessageId());
 						throw new ValidationException(DOMUtils.toString(result.get()));
 					}
 					catch (TransformerException e)
