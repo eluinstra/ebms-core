@@ -47,12 +47,6 @@ public class Party implements Serializable
 	@NonNull
 	String role;
 
-	@Override
-	public String toString()
-	{
-		return new StringBuffer().append(partyId).append(":").append(role).toString();
-	}
-
 	public PartyId getPartyId(List<PartyId> partyIds)
 	{
 		if (partyId == null || partyIds == null)

@@ -15,29 +15,30 @@
  */
 package nl.clockwork.ebms.model;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
+import java.io.Serializable;
+import java.util.List;
 
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CanSend;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.ServiceType;
+import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.PartyId;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.Builder;
 import lombok.NonNull;
+import lombok.Value;
 import lombok.experimental.FieldDefaults;
 
-@XmlAccessorType(XmlAccessType.FIELD)
-@Data
+@Builder
+@Value
 @FieldDefaults(level = AccessLevel.PRIVATE)
-@NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode(callSuper = true)
-public class FromPartyInfo extends EbMSPartyInfo
+public class FromPartyInfo implements Serializable
 {
 	private static final long serialVersionUID = 1L;
+	@NonNull
+	List<PartyId> partyIds;
+	String role;
 	@NonNull
 	ServiceType service;
 	@NonNull

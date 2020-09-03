@@ -31,12 +31,5 @@ public class Party implements Serializable
 	private static final long serialVersionUID = 1L;
 	@NonNull
 	String partyId;
-	@NonNull
 	String role;
-
-	@Override
-	public String toString()
-	{
-		return new StringBuffer().append(partyId).append(":").append(role).toString();
-	}
 }

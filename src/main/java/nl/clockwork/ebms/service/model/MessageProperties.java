@@ -11,7 +11,6 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
@@ -20,7 +19,6 @@ import nl.clockwork.ebms.EbMSMessageStatus;
 import nl.clockwork.ebms.jaxb.InstantAdapter;
 
 @XmlAccessorType(XmlAccessType.FIELD)
-@Builder
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @NoArgsConstructor

@@ -107,22 +107,22 @@ public class CPAUtils
 
 	public static FromPartyInfo getFromPartyInfo(PartyId partyId, CollaborationRole role, CanSend canSend)
 	{
-		val result = new FromPartyInfo();
-		result.setPartyIds(toPartyId(partyId));
-		result.setRole(role.getRole().getName());
-		result.setService(role.getServiceBinding().getService());
-		result.setCanSend(canSend);
-		return result;
+		return FromPartyInfo.builder()
+				.partyIds(toPartyId(partyId))
+				.role(role.getRole().getName())
+				.service(role.getServiceBinding().getService())
+				.canSend(canSend)
+				.build();
 	}
 
 	public static ToPartyInfo getToPartyInfo(PartyId partyId, CollaborationRole role, CanReceive canReceive)
 	{
-		val result = new ToPartyInfo();
-		result.setPartyIds(toPartyId(partyId));
-		result.setRole(role.getRole().getName());
-		result.setService(role.getServiceBinding().getService());
-		result.setCanReceive(canReceive);
-		return result;
+		return ToPartyInfo.builder()
+				.partyIds(toPartyId(partyId))
+				.role(role.getRole().getName())
+				.service(role.getServiceBinding().getService())
+				.canReceive(canReceive)
+				.build();
 	}
 
 	public static DeliveryChannel getDeliveryChannel(ActionBindingType bindingType)

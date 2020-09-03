@@ -122,10 +122,11 @@ public class CPAManager
 
 	private EbMSPartyInfo createEbMSPartyInfo(String partyId, PartyInfo partyInfo)
 	{
-		val result = new EbMSPartyInfo();
-		result.setPartyIds(CPAUtils.toPartyId(partyInfo.getPartyId().stream()
-				.filter(id -> partyId.equals(CPAUtils.toString(id))).findFirst().orElse(null)));
-		return result;
+		return partyInfo.getPartyId().stream()
+				.filter(id -> partyId.equals(CPAUtils.toString(id)))
+				.findFirst()
+				.map(id -> new EbMSPartyInfo(CPAUtils.toPartyId(id)))
+				.orElseThrow(() -> new IllegalStateException("PartyId " + partyId + " not found"));
 	}
 
 	@Cacheable(cacheNames = "CPA", key = "#root.methodName+#cpaId+T(nl.clockwork.ebms.cpa.CPAUtils).toString(#partyId)")

@@ -184,13 +184,11 @@ public class SigningTest
 
 	private MessageRequestProperties createMessageProperties(String cpaId)
 	{
-		return MessageRequestProperties.builder()
-				.cpaId(cpaId)
-				.fromParty(new Party("urn:osb:oin:00000000000000000000","DIGIPOORT"))
-				.toParty(new Party("urn:osb:oin:00000000000000000001","OVERHEID"))
-				.service("urn:osb:services:osb:afleveren:1.1$1.0")
-				.action("afleveren")
-				.build();
+		return new MessageRequestProperties(
+				cpaId,
+				new Party("urn:osb:oin:00000000000000000000","DIGIPOORT"),
+				"urn:osb:services:osb:afleveren:1.1$1.0",
+				"afleveren");
 	}
 
 	private List<DataSource> createDataSources()
