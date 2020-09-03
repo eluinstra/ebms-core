@@ -115,7 +115,7 @@ public class SendTaskHandlerConfig
 
 	@Bean
 	@Conditional(DefaultTaskHandler.class)
-	public SendTaskExecutor sendTaskExecutor()
+	public SendTaskExecutor taskExecutor()
 	{
 		return SendTaskExecutor.builder()
 				.transactionManager(dataSourceTransactionManager)
