@@ -11,14 +11,13 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 
 @XmlAccessorType(XmlAccessType.FIELD)
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @NoArgsConstructor
-@RequiredArgsConstructor
+//@RequiredArgsConstructor
 @AllArgsConstructor
 public class MessageRequestProperties implements Serializable
 {
@@ -31,12 +30,21 @@ public class MessageRequestProperties implements Serializable
 	Party fromParty;
 	Party toParty;
 	@XmlElement(required=true)
-	@NonNull
+	//@NonNull
 	String service;
 	@XmlElement(required=true)
-	@NonNull
+	//@NonNull
 	String action;
 	String conversationId;
 	String messageId;
 	String refToMessageId;
+
+	public MessageRequestProperties(@NonNull String cpaId, @NonNull Party fromParty, @NonNull String service, @NonNull String action)
+	{
+		super();
+		this.cpaId = cpaId;
+		this.fromParty = fromParty;
+		this.service = service;
+		this.action = action;
+	}
 }
