@@ -24,12 +24,12 @@ import lombok.AccessLevel;
 import lombok.val;
 import lombok.experimental.FieldDefaults;
 import nl.clockwork.ebms.EbMSMessageFactory;
-import nl.clockwork.ebms.client.DeliveryManager;
 import nl.clockwork.ebms.cpa.CPAManager;
 import nl.clockwork.ebms.dao.EbMSDAO;
+import nl.clockwork.ebms.delivery.DeliveryManager;
+import nl.clockwork.ebms.delivery.task.DeliveryTaskManager;
 import nl.clockwork.ebms.event.MessageEventListener;
 import nl.clockwork.ebms.signing.EbMSSignatureGenerator;
-import nl.clockwork.ebms.task.SendTaskManager;
 import nl.clockwork.ebms.validation.EbMSMessageValidator;
 
 @Configuration
@@ -47,7 +47,7 @@ public class EbMSProcessorConfig
 	@Autowired
 	EbMSMessageFactory ebMSMessageFactory;
 	@Autowired
-	SendTaskManager sendTaskManager;
+	DeliveryTaskManager deliveryTaskManager;
 	@Autowired
 	EbMSSignatureGenerator signatureGenerator;
 	@Autowired
@@ -65,7 +65,7 @@ public class EbMSProcessorConfig
 		val duplicateMessageHandler = DuplicateMessageHandler.builder()
 				.ebMSDAO(ebMSDAO)
 				.cpaManager(cpaManager)
-				.sendTaskManager(sendTaskManager)
+				.deliveryTaskManager(deliveryTaskManager)
 				.messageValidator(messageValidator)
 				.storeDuplicateMessage(storeDuplicateMessage)
 				.storeDuplicateMessageAttachments(storeDuplicateMessageAttachments)
@@ -76,7 +76,7 @@ public class EbMSProcessorConfig
 				.ebMSDAO(ebMSDAO)
 				.cpaManager(cpaManager)
 				.ebMSMessageFactory(ebMSMessageFactory)
-				.sendTaskManager(sendTaskManager)
+				.deliveryTaskManager(deliveryTaskManager)
 				.signatureGenerator(signatureGenerator)
 				.messageValidator(messageValidator)
 				.duplicateMessageHandler(duplicateMessageHandler)

@@ -40,10 +40,11 @@ import nl.clockwork.ebms.EbMSAction;
 import nl.clockwork.ebms.EbMSMessageFactory;
 import nl.clockwork.ebms.EbMSMessageStatus;
 import nl.clockwork.ebms.EbMSMessageUtils;
-import nl.clockwork.ebms.client.DeliveryManager;
 import nl.clockwork.ebms.cpa.CPAManager;
 import nl.clockwork.ebms.cpa.CPAUtils;
 import nl.clockwork.ebms.dao.EbMSDAO;
+import nl.clockwork.ebms.delivery.DeliveryManager;
+import nl.clockwork.ebms.delivery.task.DeliveryTaskManager;
 import nl.clockwork.ebms.event.MessageEventDAO;
 import nl.clockwork.ebms.event.MessageEventType;
 import nl.clockwork.ebms.model.EbMSBaseMessage;
@@ -62,7 +63,6 @@ import nl.clockwork.ebms.service.model.MTOMMessageRequest;
 import nl.clockwork.ebms.service.model.MessageRequest;
 import nl.clockwork.ebms.service.model.MessageStatus;
 import nl.clockwork.ebms.signing.EbMSSignatureGenerator;
-import nl.clockwork.ebms.task.SendTaskManager;
 import nl.clockwork.ebms.util.StreamUtils;
 import nl.clockwork.ebms.validation.MessagePropertiesValidator;
 
@@ -84,7 +84,7 @@ class EbMSMessageServiceHandler
   @NonNull
 	EbMSMessageFactory ebMSMessageFactory;
   @NonNull
-	SendTaskManager sendTaskManager;
+	DeliveryTaskManager deliveryTaskManager;
   @NonNull
 	MessagePropertiesValidator messagePropertiesValidator;
   @NonNull
@@ -345,7 +345,7 @@ class EbMSMessageServiceHandler
 			val persistTime = CPAUtils.getPersistTime(timestamp,receiveDeliveryChannel);
 			val confidential = cpaManager.isConfidential(messageHeader.getCPAId(),messageHeader.getFrom().getPartyId(),messageHeader.getFrom().getRole(),service,messageHeader.getAction());
 			ebMSDAO.insertMessage(timestamp,persistTime,document,message,message.getAttachments(),EbMSMessageStatus.CREATED);
-			sendTaskManager.createTask(messageHeader.getCPAId(),sendDeliveryChannel,receiveDeliveryChannel,messageHeader.getMessageData().getMessageId(),messageHeader.getMessageData().getTimeToLive(),messageHeader.getMessageData().getTimestamp(),confidential);
+			deliveryTaskManager.createTask(messageHeader.getCPAId(),sendDeliveryChannel,receiveDeliveryChannel,messageHeader.getMessageData().getMessageId(),messageHeader.getMessageData().getTimeToLive(),messageHeader.getMessageData().getTimestamp(),confidential);
 		}
 		catch (IllegalStateException | TransformerFactoryConfigurationError e)
 		{

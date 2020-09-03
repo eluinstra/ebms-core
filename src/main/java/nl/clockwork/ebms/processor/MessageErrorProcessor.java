@@ -42,12 +42,12 @@ import nl.clockwork.ebms.EbMSMessageUtils;
 import nl.clockwork.ebms.cpa.CPAManager;
 import nl.clockwork.ebms.cpa.CPAUtils;
 import nl.clockwork.ebms.dao.EbMSDAO;
+import nl.clockwork.ebms.delivery.task.DeliveryTaskManager;
 import nl.clockwork.ebms.event.MessageEventListener;
 import nl.clockwork.ebms.model.EbMSDocument;
 import nl.clockwork.ebms.model.EbMSMessage;
 import nl.clockwork.ebms.model.EbMSMessageError;
 import nl.clockwork.ebms.signing.EbMSSignatureGenerator;
-import nl.clockwork.ebms.task.SendTaskManager;
 import nl.clockwork.ebms.util.DOMUtils;
 import nl.clockwork.ebms.validation.DuplicateMessageException;
 import nl.clockwork.ebms.validation.EbMSMessageValidator;
@@ -65,7 +65,7 @@ class MessageErrorProcessor
 	@NonNull
 	CPAManager cpaManager;
 	@NonNull
-	SendTaskManager sendTaskManager;
+	DeliveryTaskManager deliveryTaskManager;
 	@NonNull
 	EbMSMessageValidator messageValidator;
 	@NonNull
@@ -90,7 +90,7 @@ class MessageErrorProcessor
 				.orElse(null);
 		storeMessages(timestamp,messageDocument,message,result,messageError);
 		if (receiveDeliveryChannel != null)
-			storeSendTask(messageHeader.getCPAId(),sendDeliveryChannel,receiveDeliveryChannel,messageError,isSyncReply);
+			storeDeliveryTask(messageHeader.getCPAId(),sendDeliveryChannel,receiveDeliveryChannel,messageError,isSyncReply);
 		if (!isSyncReply && receiveDeliveryChannel == null)
 			throw new ValidationException(DOMUtils.toString(result.getMessage()));
 		return result;
@@ -107,11 +107,11 @@ class MessageErrorProcessor
 		ebMSDAO.insertMessage(timestamp,persistTime,messageErrorDocument.getMessage(),messageError,Collections.emptyList(),null);
 	}
 
-	private void storeSendTask(String cpaId, DeliveryChannel sendDeliveryChannel, DeliveryChannel receiveDeliveryChannel, EbMSMessageError messageError, boolean isSyncReply)
+	private void storeDeliveryTask(String cpaId, DeliveryChannel sendDeliveryChannel, DeliveryChannel receiveDeliveryChannel, EbMSMessageError messageError, boolean isSyncReply)
 	{
 		if (!isSyncReply)
 		{
-			sendTaskManager.createTask(
+			deliveryTaskManager.createTask(
 					cpaId,
 					sendDeliveryChannel,
 					receiveDeliveryChannel,

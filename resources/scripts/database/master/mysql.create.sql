@@ -60,7 +60,7 @@ CREATE TABLE ebms_attachment
 	FOREIGN KEY (ebms_message_id) REFERENCES ebms_message(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-CREATE TABLE send_task
+CREATE TABLE delivery_task
 (
 	cpa_id							VARCHAR(256)		NOT NULL,
 	send_channel_id			VARCHAR(256)		NULL,
@@ -73,10 +73,10 @@ CREATE TABLE send_task
 	server_id						VARCHAR(256)		NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-ALTER TABLE send_task ADD CONSTRAINT uc_send_task UNIQUE (message_id(255));
-CREATE INDEX i_send_task ON send_task (time_stamp);
+ALTER TABLE delivery_task ADD CONSTRAINT uc_delivery_task UNIQUE (message_id(255));
+CREATE INDEX i_delivery_task ON delivery_task (time_stamp);
 
-CREATE TABLE send_log
+CREATE TABLE delivery_log
 (
 	message_id				VARCHAR(256)		NOT NULL,
 	time_stamp				TIMESTAMP				NOT NULL,
@@ -85,7 +85,7 @@ CREATE TABLE send_log
 	error_message			TEXT						NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-CREATE INDEX i_send_log ON send (message_id(255));
+CREATE INDEX i_delivery_log ON send (message_id(255));
 
 CREATE TABLE message_event
 (

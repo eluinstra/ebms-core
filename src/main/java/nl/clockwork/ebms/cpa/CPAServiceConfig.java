@@ -19,11 +19,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import com.querydsl.sql.SQLQueryFactory;
-
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
-import nl.clockwork.ebms.cpa.url.URLMapper;
 import nl.clockwork.ebms.validation.CPAValidator;
 
 @Configuration
@@ -31,27 +28,13 @@ import nl.clockwork.ebms.validation.CPAValidator;
 public class CPAServiceConfig
 {
 	@Autowired
+	CPAManager cpaManager;
+	@Autowired
 	CPAValidator cpaValidator;
-	@Autowired
-	URLMapper urlMapper;
-	@Autowired
-	SQLQueryFactory queryFactory;
 
 	@Bean
 	public CPAService cpaService()
 	{
-		return new CPAServiceImpl(cpaManager(),cpaValidator);
-	}
-
-	@Bean
-	public CPAManager cpaManager()
-	{
-		return new CPAManager(cpaDAO(),urlMapper);
-	}
-
-	@Bean
-	public CPADAO cpaDAO()
-	{
-		return new CPADAOImpl(queryFactory);
+		return new CPAServiceImpl(cpaManager,cpaValidator);
 	}
 }

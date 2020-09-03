@@ -69,11 +69,11 @@ public class QueryDSLConfig
 		result.register("cpa","cpa",new CollaborationProtocolAgreementType(Types.CLOB));
 		result.register("certificate_mapping","source",new X509CertificateType(Types.BLOB));
 		result.register("certificate_mapping","destination",new X509CertificateType(Types.BLOB));
+		result.register("delivery_log","status",new DeliveryTaskStatusType(Types.SMALLINT));
 		result.register("ebms_message_event","event_type",new EbMSMessageEventTypeType(Types.SMALLINT));
 		result.register("ebms_message","content",new DocumentType(Types.CLOB));
 		result.register("ebms_message","status",new EbMSMessageStatusType(Types.SMALLINT));
 		result.register("ebms_attachment","content",new CachedOutputStreamType(Types.BLOB));
-		result.register("send_log","status",new SendTaskStatusType(Types.SMALLINT));
 		return result;
 	}
 

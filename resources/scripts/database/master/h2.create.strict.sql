@@ -56,7 +56,7 @@ CREATE TABLE ebms_attachment
 
 ALTER TABLE ebms_attachment ADD CONSTRAINT uc_ebms_attachment UNIQUE (message_id,message_nr,order_nr);
 
-CREATE TABLE send_task
+CREATE TABLE delivery_task
 (
 	cpa_id							VARCHAR(256)		NOT NULL,
 	send_channel_id			VARCHAR(256)		NULL,
@@ -72,9 +72,9 @@ CREATE TABLE send_task
 	FOREIGN KEY (message_id,message_nr) REFERENCES ebms_message (message_id,message_nr)
 );
 
-CREATE INDEX i_send_task ON send_task (time_stamp);
+CREATE INDEX i_delivery_task ON delivery_task (time_stamp);
 
-CREATE TABLE send_log
+CREATE TABLE delivery_log
 (
 	message_id				VARCHAR(256)		NOT NULL,
 	message_nr				SMALLINT				DEFAULT 0 NOT NULL,

@@ -21,24 +21,25 @@ import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.PropertySource;
 
 import nl.clockwork.ebms.cache.CacheConfig;
-import nl.clockwork.ebms.client.ClientConfig;
-import nl.clockwork.ebms.client.DeliveryManagerConfig;
+import nl.clockwork.ebms.cpa.CPAManagerConfig;
 import nl.clockwork.ebms.cpa.CPAServiceConfig;
 import nl.clockwork.ebms.cpa.certificate.CertificateMappingServiceConfig;
 import nl.clockwork.ebms.cpa.url.URLMappingServiceConfig;
 import nl.clockwork.ebms.dao.DAOConfig;
 import nl.clockwork.ebms.datasource.DataSourceConfig;
+import nl.clockwork.ebms.delivery.DeliveryManagerConfig;
+import nl.clockwork.ebms.delivery.client.EbMSClientConfig;
+import nl.clockwork.ebms.delivery.task.DeliveryTaskHandlerConfig;
+import nl.clockwork.ebms.delivery.task.DeliveryTaskManagerConfig;
 import nl.clockwork.ebms.encryption.EncryptionConfig;
 import nl.clockwork.ebms.event.MessageEventListenerConfig;
 import nl.clockwork.ebms.jms.JMSConfig;
 import nl.clockwork.ebms.processor.EbMSProcessorConfig;
 import nl.clockwork.ebms.querydsl.QueryDSLConfig;
 import nl.clockwork.ebms.security.KeyStoreConfig;
-import nl.clockwork.ebms.server.ServerConfig;
-import nl.clockwork.ebms.service.ServiceConfig;
+import nl.clockwork.ebms.server.EbMSServerConfig;
+import nl.clockwork.ebms.service.EbMSMessageServiceConfig;
 import nl.clockwork.ebms.signing.SigningConfig;
-import nl.clockwork.ebms.task.SendTaskHandlerConfig;
-import nl.clockwork.ebms.task.SendTaskManagerConfig;
 import nl.clockwork.ebms.transaction.TransactionManagerConfig;
 import nl.clockwork.ebms.validation.ValidationConfig;
 
@@ -46,22 +47,23 @@ import nl.clockwork.ebms.validation.ValidationConfig;
 @Import({
 		CacheConfig.class,
 		CertificateMappingServiceConfig.class,
-		ClientConfig.class,
 		CommonConfig.class,
+		CPAManagerConfig.class,
 		CPAServiceConfig.class,
 		DAOConfig.class,
 		DataSourceConfig.class,
 		DeliveryManagerConfig.class,
+		DeliveryTaskHandlerConfig.class,
+		DeliveryTaskManagerConfig.class,
+		EbMSClientConfig.class,
+		EbMSMessageServiceConfig.class,
 		EbMSProcessorConfig.class,
+		EbMSServerConfig.class,
 		EncryptionConfig.class,
 		JMSConfig.class,
 		KeyStoreConfig.class,
 		MessageEventListenerConfig.class,
 		QueryDSLConfig.class,
-		SendTaskHandlerConfig.class,
-		SendTaskManagerConfig.class,
-		ServerConfig.class,
-		ServiceConfig.class,
 		SigningConfig.class,
 		TransactionManagerConfig.class,
 		URLMappingServiceConfig.class,

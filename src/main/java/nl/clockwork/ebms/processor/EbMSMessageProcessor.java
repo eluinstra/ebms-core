@@ -38,9 +38,10 @@ import lombok.extern.slf4j.Slf4j;
 import nl.clockwork.ebms.EbMSMessageFactory;
 import nl.clockwork.ebms.EbMSMessageStatus;
 import nl.clockwork.ebms.EbMSMessageUtils;
-import nl.clockwork.ebms.client.DeliveryManager;
 import nl.clockwork.ebms.cpa.CPAManager;
 import nl.clockwork.ebms.dao.EbMSDAO;
+import nl.clockwork.ebms.delivery.DeliveryManager;
+import nl.clockwork.ebms.delivery.task.DeliveryTaskManager;
 import nl.clockwork.ebms.event.MessageEventListener;
 import nl.clockwork.ebms.model.EbMSAcknowledgment;
 import nl.clockwork.ebms.model.EbMSBaseMessage;
@@ -53,7 +54,6 @@ import nl.clockwork.ebms.model.EbMSPong;
 import nl.clockwork.ebms.model.EbMSStatusRequest;
 import nl.clockwork.ebms.model.EbMSStatusResponse;
 import nl.clockwork.ebms.signing.EbMSSignatureGenerator;
-import nl.clockwork.ebms.task.SendTaskManager;
 import nl.clockwork.ebms.util.DOMUtils;
 import nl.clockwork.ebms.validation.DuplicateMessageException;
 import nl.clockwork.ebms.validation.EbMSMessageValidator;
@@ -85,7 +85,7 @@ public class EbMSMessageProcessor
 	PongProcessor pongProcessor;
 
 	@Builder
-	public EbMSMessageProcessor(@NonNull DeliveryManager deliveryManager, @NonNull MessageEventListener messageEventListener, @NonNull EbMSDAO ebMSDAO, @NonNull CPAManager cpaManager, @NonNull EbMSMessageFactory ebMSMessageFactory, @NonNull SendTaskManager sendTaskManager, @NonNull EbMSSignatureGenerator signatureGenerator, @NonNull EbMSMessageValidator messageValidator, @NonNull DuplicateMessageHandler duplicateMessageHandler, boolean deleteEbMSAttachmentsOnMessageProcessed)
+	public EbMSMessageProcessor(@NonNull DeliveryManager deliveryManager, @NonNull MessageEventListener messageEventListener, @NonNull EbMSDAO ebMSDAO, @NonNull CPAManager cpaManager, @NonNull EbMSMessageFactory ebMSMessageFactory, @NonNull DeliveryTaskManager deliveryTaskManager, @NonNull EbMSSignatureGenerator signatureGenerator, @NonNull EbMSMessageValidator messageValidator, @NonNull DuplicateMessageHandler duplicateMessageHandler, boolean deleteEbMSAttachmentsOnMessageProcessed)
 	{
 		super();
 		this.messageEventListener = messageEventListener;
@@ -97,7 +97,7 @@ public class EbMSMessageProcessor
 		this.messageErrorProcessor = MessageErrorProcessor.builder()
 				.ebMSDAO(ebMSDAO)
 				.cpaManager(cpaManager)
-				.sendTaskManager(sendTaskManager)
+				.deliveryTaskManager(deliveryTaskManager)
 				.messageValidator(messageValidator)
 				.duplicateMessageHandler(duplicateMessageHandler)
 				.ebMSMessageFactory(ebMSMessageFactory)
@@ -108,7 +108,7 @@ public class EbMSMessageProcessor
 		this.acknowledgmentProcessor = AcknowledgmentProcessor.builder()
 				.ebMSDAO(ebMSDAO)
 				.cpaManager(cpaManager)
-				.sendTaskManager(sendTaskManager)
+				.deliveryTaskManager(deliveryTaskManager)
 				.messageValidator(messageValidator)
 				.duplicateMessageHandler(duplicateMessageHandler)
 				.ebMSMessageFactory(ebMSMessageFactory)

@@ -14,8 +14,8 @@
 -- limitations under the License.
 --
 
-ALTER TABLE ebms_event RENAME TO send_task;
-ALTER INDEX i_ebms_event RENAME TO i_send_task;
-ALTER TABLE ebms_event_log RENAME TO send_log;
+ALTER TABLE ebms_event RENAME TO delivery_task;
+ALTER INDEX i_ebms_event RENAME TO i_delivery_task;
+ALTER TABLE ebms_event_log RENAME TO delivery_log;
 ALTER TABLE ebms_message_event RENAME TO message_event;
 ALTER INDEX i_ebms_message_event RENAME TO i_message_event;
