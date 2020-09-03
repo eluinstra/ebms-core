@@ -13,33 +13,39 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.clockwork.ebms.service.cpa.url;
+package nl.clockwork.ebms.cpa.url;
 
-import java.io.Serializable;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlElement;
+import com.querydsl.sql.SQLQueryFactory;
 
 import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
 
-@XmlAccessorType(XmlAccessType.FIELD)
-@Data
+@Configuration
 @FieldDefaults(level = AccessLevel.PRIVATE)
-@NoArgsConstructor
-@AllArgsConstructor
-public class URLMapping implements Serializable
+public class URLMappingServiceConfig
 {
-	private static final long serialVersionUID = 1L;
-	@XmlElement(required=true)
-	@NonNull
-	String source;
-	@XmlElement(required=true)
-	@NonNull
-	String destination;
+	@Autowired
+	SQLQueryFactory queryFactory;
+
+	@Bean
+	public URLMappingService urlMappingService()
+	{
+		return new URLMappingServiceImpl(urlMapper());
+	}
+
+	@Bean
+	public URLMapper urlMapper()
+	{
+		return new URLMapper(urlMappingDAO());
+	}
+
+	@Bean
+	public URLMappingDAO urlMappingDAO()
+	{
+		return new URLMappingDAOImpl(queryFactory);
+	}
 }

@@ -25,19 +25,10 @@ import lombok.experimental.FieldDefaults;
 import nl.clockwork.ebms.EbMSMessageFactory;
 import nl.clockwork.ebms.client.DeliveryManager;
 import nl.clockwork.ebms.cpa.CPAManager;
-import nl.clockwork.ebms.cpa.CertificateMapper;
-import nl.clockwork.ebms.cpa.URLMapper;
 import nl.clockwork.ebms.dao.EbMSDAO;
 import nl.clockwork.ebms.event.MessageEventDAO;
-import nl.clockwork.ebms.service.cpa.CPAService;
-import nl.clockwork.ebms.service.cpa.CPAServiceImpl;
-import nl.clockwork.ebms.service.cpa.certificate.CertificateMappingService;
-import nl.clockwork.ebms.service.cpa.certificate.CertificateMappingServiceImpl;
-import nl.clockwork.ebms.service.cpa.url.URLMappingService;
-import nl.clockwork.ebms.service.cpa.url.URLMappingServiceImpl;
 import nl.clockwork.ebms.signing.EbMSSignatureGenerator;
 import nl.clockwork.ebms.task.SendTaskManager;
-import nl.clockwork.ebms.validation.CPAValidator;
 import nl.clockwork.ebms.validation.MessagePropertiesValidator;
 
 @Configuration
@@ -46,12 +37,6 @@ public class ServiceConfig
 {
 	@Autowired
 	CPAManager cpaManager;
-	@Autowired
-	CPAValidator cpaValidator;
-	@Autowired
-	URLMapper urlMapper;
-	@Autowired
-	CertificateMapper certificateMapper;
 	@Autowired
 	DeliveryManager deliveryManager;
 	@Autowired
@@ -68,24 +53,6 @@ public class ServiceConfig
 	EbMSSignatureGenerator signatureGenerator;
 	@Value("${ebmsMessage.deleteContentOnProcessed}")
 	boolean deleteEbMSAttachmentsOnMessageProcessed;
-
-	@Bean
-	public CPAService cpaService()
-	{
-		return new CPAServiceImpl(cpaManager,cpaValidator);
-	}
-
-	@Bean
-	public URLMappingService urlMappingService()
-	{
-		return new URLMappingServiceImpl(urlMapper);
-	}
-
-	@Bean
-	public CertificateMappingService certificateMappingService()
-	{
-		return new CertificateMappingServiceImpl(certificateMapper);
-	}
 
 	@Bean
 	public EbMSMessageServiceImpl ebMSMessageService()

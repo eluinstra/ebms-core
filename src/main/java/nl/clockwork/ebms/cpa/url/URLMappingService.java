@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.clockwork.ebms.service.cpa.url;
+package nl.clockwork.ebms.cpa.url;
 
 import java.util.List;
 

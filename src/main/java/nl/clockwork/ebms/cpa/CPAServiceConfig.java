@@ -23,47 +23,35 @@ import com.querydsl.sql.SQLQueryFactory;
 
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
+import nl.clockwork.ebms.cpa.url.URLMapper;
+import nl.clockwork.ebms.validation.CPAValidator;
 
 @Configuration
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class CPAManagerConfig
+public class CPAServiceConfig
 {
+	@Autowired
+	CPAValidator cpaValidator;
+	@Autowired
+	URLMapper urlMapper;
 	@Autowired
 	SQLQueryFactory queryFactory;
 
 	@Bean
+	public CPAService cpaService()
+	{
+		return new CPAServiceImpl(cpaManager(),cpaValidator);
+	}
+
+	@Bean
 	public CPAManager cpaManager()
 	{
-		return new CPAManager(cpaDAO(),urlMapper());
+		return new CPAManager(cpaDAO(),urlMapper);
 	}
 
 	@Bean
 	public CPADAO cpaDAO()
 	{
 		return new CPADAOImpl(queryFactory);
-	}
-
-	@Bean
-	public URLMapper urlMapper()
-	{
-		return new URLMapper(urlMappingDAO());
-	}
-
-	@Bean
-	public URLMappingDAO urlMappingDAO()
-	{
-		return new URLMappingDAOImpl(queryFactory);
-	}
-
-	@Bean
-	public CertificateMapper certificateMapper()
-	{
-		return new CertificateMapper(certificateMappingDAO());
-	}
-
-	@Bean
-	public CertificateMappingDAO certificateMappingDAO()
-	{
-		return new CertificateMappingDAOImpl(queryFactory);
 	}
 }

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.clockwork.ebms.service.cpa.certificate;
+package nl.clockwork.ebms.cpa.certificate;
 
 import java.io.Serializable;
 import java.security.cert.X509Certificate;

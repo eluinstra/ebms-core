@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.clockwork.ebms.cpa;
+package nl.clockwork.ebms.cpa.url;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -25,7 +25,6 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
-import nl.clockwork.ebms.service.cpa.url.URLMapping;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor

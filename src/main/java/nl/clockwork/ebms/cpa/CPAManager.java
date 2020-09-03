@@ -34,6 +34,7 @@ import lombok.NonNull;
 import lombok.val;
 import lombok.experimental.FieldDefaults;
 import nl.clockwork.ebms.EbMSAction;
+import nl.clockwork.ebms.cpa.url.URLMapper;
 import nl.clockwork.ebms.model.EbMSPartyInfo;
 import nl.clockwork.ebms.model.FromPartyInfo;
 import nl.clockwork.ebms.model.ToPartyInfo;

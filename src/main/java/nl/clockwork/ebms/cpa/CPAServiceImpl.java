@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.clockwork.ebms.service.cpa;
+package nl.clockwork.ebms.cpa;
 
 import java.util.List;
 
@@ -26,7 +26,6 @@ import lombok.NonNull;
 import lombok.val;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import nl.clockwork.ebms.cpa.CPAManager;
 import nl.clockwork.ebms.jaxb.JAXBParser;
 import nl.clockwork.ebms.validation.CPAValidator;
 import nl.clockwork.ebms.validation.XSDValidator;

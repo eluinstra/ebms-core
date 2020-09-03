@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.clockwork.ebms.cpa;
+package nl.clockwork.ebms.cpa.url;
 
 import static com.querydsl.core.types.PathMetadataFactory.*;
 

@@ -37,7 +37,7 @@ import lombok.val;
 import lombok.experimental.FieldDefaults;
 import nl.clockwork.ebms.client.EbMSHttpClientFactory;
 import nl.clockwork.ebms.cpa.CPAManager;
-import nl.clockwork.ebms.cpa.URLMapper;
+import nl.clockwork.ebms.cpa.url.URLMapper;
 import nl.clockwork.ebms.dao.EbMSDAO;
 import nl.clockwork.ebms.encryption.EbMSMessageEncrypter;
 import nl.clockwork.ebms.event.MessageEventListener;

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.clockwork.ebms.cpa;
+package nl.clockwork.ebms.cpa.certificate;
 
 import java.security.cert.X509Certificate;
 import java.util.List;
@@ -31,7 +31,6 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
 import lombok.experimental.FieldDefaults;
-import nl.clockwork.ebms.service.cpa.certificate.CertificateMapping;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @RequiredArgsConstructor

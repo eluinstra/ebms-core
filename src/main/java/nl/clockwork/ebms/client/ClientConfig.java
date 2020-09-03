@@ -26,7 +26,7 @@ import org.springframework.context.annotation.Configuration;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import nl.clockwork.ebms.client.EbMSHttpClientFactory.EbMSHttpClientType;
-import nl.clockwork.ebms.cpa.CertificateMapper;
+import nl.clockwork.ebms.cpa.certificate.CertificateMapper;
 import nl.clockwork.ebms.security.EbMSKeyStore;
 import nl.clockwork.ebms.security.EbMSTrustStore;
 

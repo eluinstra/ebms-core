@@ -23,7 +23,9 @@ import org.springframework.context.annotation.PropertySource;
 import nl.clockwork.ebms.cache.CacheConfig;
 import nl.clockwork.ebms.client.ClientConfig;
 import nl.clockwork.ebms.client.DeliveryManagerConfig;
-import nl.clockwork.ebms.cpa.CPAManagerConfig;
+import nl.clockwork.ebms.cpa.CPAServiceConfig;
+import nl.clockwork.ebms.cpa.certificate.CertificateMappingServiceConfig;
+import nl.clockwork.ebms.cpa.url.URLMappingServiceConfig;
 import nl.clockwork.ebms.dao.DAOConfig;
 import nl.clockwork.ebms.datasource.DataSourceConfig;
 import nl.clockwork.ebms.encryption.EncryptionConfig;
@@ -43,9 +45,10 @@ import nl.clockwork.ebms.validation.ValidationConfig;
 @Configuration
 @Import({
 		CacheConfig.class,
+		CertificateMappingServiceConfig.class,
 		ClientConfig.class,
 		CommonConfig.class,
-		CPAManagerConfig.class,
+		CPAServiceConfig.class,
 		DAOConfig.class,
 		DataSourceConfig.class,
 		DeliveryManagerConfig.class,
@@ -61,6 +64,7 @@ import nl.clockwork.ebms.validation.ValidationConfig;
 		ServiceConfig.class,
 		SigningConfig.class,
 		TransactionManagerConfig.class,
+		URLMappingServiceConfig.class,
 		ValidationConfig.class})
 @PropertySource(value = {"classpath:nl/clockwork/ebms/default.properties"}, ignoreResourceNotFound = true)
 public class MainConfig

@@ -13,9 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.clockwork.ebms.service.cpa.certificate;
+package nl.clockwork.ebms.cpa.url;
 
-import java.security.cert.X509Certificate;
 import java.util.List;
 
 import org.springframework.transaction.annotation.Transactional;
@@ -25,61 +24,59 @@ import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import nl.clockwork.ebms.cpa.CertificateMapper;
 
 @Slf4j
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor
 @Transactional(transactionManager = "dataSourceTransactionManager")
-public class CertificateMappingServiceImpl implements CertificateMappingService
+public class URLMappingServiceImpl implements URLMappingService
 {
   @NonNull
-	CertificateMapper certificateMapper;
+	URLMapper urlMapper;
 
 	@Override
-	public void setCertificateMapping(CertificateMapping certificateMapping) throws CertificateMappingServiceException
+	public void setURLMapping(URLMapping urlMapping) throws URLMappingServiceException
 	{
 		try
 		{
 			if (log.isDebugEnabled())
-				log.debug("SetCertificateMapping " + certificateMapping);
-			certificateMapper.setCertificateMapping(certificateMapping);
+				log.debug("SetURLMapping " + urlMapping);
+			urlMapper.setURLMapping(urlMapping);
 		}
 		catch (Exception e)
 		{
-			log.error("SetCertificateMapping " + certificateMapping,e);
-			throw new CertificateMappingServiceException(e);
+			log.error("SetURLMapping " + urlMapping,e);
+			throw new URLMappingServiceException(e);
 		}
 	}
 
 	@Override
-	public void deleteCertificateMapping(X509Certificate source, String cpaId) throws CertificateMappingServiceException
+	public void deleteURLMapping(String source) throws URLMappingServiceException
 	{
 		try
 		{
-			if (log.isDebugEnabled())
-				log.debug("SetCertificateMapping" + source);
-			certificateMapper.deleteCertificateMapping(source,cpaId);
+			log.debug("DeleteURLMapping " + source);
+			urlMapper.deleteURLMapping(source);
 		}
 		catch (Exception e)
 		{
-			log.error("SetCertificateMapping" + source,e);
-			throw new CertificateMappingServiceException(e);
+			log.error("DeleteURLMapping " + source,e);
+			throw new URLMappingServiceException(e);
 		}
 	}
 
 	@Override
-	public List<CertificateMapping> getCertificateMappings() throws CertificateMappingServiceException
+	public List<URLMapping> getURLMappings() throws URLMappingServiceException
 	{
 		try
 		{
-			log.debug("SetCertificateMapping");
-			return certificateMapper.getCertificates();
+			log.debug("GetURLMappings");
+			return urlMapper.getURLs();
 		}
 		catch (Exception e)
 		{
-			log.error("SetCertificateMapping",e);
-			throw new CertificateMappingServiceException(e);
+			log.error("GetURLMappings",e);
+			throw new URLMappingServiceException(e);
 		}
 	}
 }

@@ -13,29 +13,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.clockwork.ebms.service.cpa.url;
+package nl.clockwork.ebms.cpa;
 
 import javax.xml.ws.WebFault;
 
 import lombok.NoArgsConstructor;
 
-@WebFault(name = "URLMappingServiceException", targetNamespace = "http://www.ordina.nl/cpa/urlMapping/2.18")
+@WebFault(name = "CPAServiceException", targetNamespace = "http://www.ordina.nl/cpa/2.18")
 @NoArgsConstructor
-public class URLMappingServiceException extends RuntimeException
+public class CPAServiceException extends RuntimeException
 {
 	private static final long serialVersionUID = 1L;
 
-	public URLMappingServiceException(String message, Throwable cause)
+	public CPAServiceException(String message, Throwable cause)
 	{
 		super(message,cause);
 	}
 
-	public URLMappingServiceException(String message)
+	public CPAServiceException(String message)
 	{
 		super(message);
 	}
 
-	public URLMappingServiceException(Throwable cause)
+	public CPAServiceException(Throwable cause)
 	{
 		super(cause);
 	}
