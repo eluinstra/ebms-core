@@ -70,7 +70,7 @@ class JMSSendTaskManager implements SendTaskManager
 		}
 	}
 
-	public static final String JMS_DESTINATION_NAME = "SEND_TASK";
+	public static final String JMS_DESTINATION_NAME = "SEND";
 	@NonNull
 	JmsTemplate jmsTemplate;
 	@NonNull
@@ -106,7 +106,6 @@ class JMSSendTaskManager implements SendTaskManager
 		if (task.getTimeToLive() != null && CPAUtils.isReliableMessaging(deliveryChannel))
 		{
 			val nextTask = createNextTask(task,deliveryChannel);
-			//jmsTemplate.setDeliveryDelay(calculateDelay(nextTask));
 			jmsTemplate.send(JMS_DESTINATION_NAME,new SendTaskMessageCreator(nextTask,calculateDelay(nextTask)));
 		}
 		else
@@ -118,7 +117,6 @@ class JMSSendTaskManager implements SendTaskManager
 					if (task.getRetries() < nrAutoRetries)
 					{
 						val nextTask = createNextTask(task,autoRetryInterval);
-						//jmsTemplate.setDeliveryDelay(autoRetryInterval);
 						jmsTemplate.send(JMS_DESTINATION_NAME,new SendTaskMessageCreator(nextTask,autoRetryInterval));
 						break;
 					}
