@@ -33,14 +33,14 @@ import com.querydsl.sql.ColumnMetadata;
 
 
 /**
- * QEbmsEvent is a Querydsl query type for QEbmsEvent
+ * QSendTask is a Querydsl query type for QSendTask
  */
 @Generated("com.querydsl.sql.codegen.MetaDataSerializer")
-public class QEbmsEvent extends com.querydsl.sql.RelationalPathBase<QEbmsEvent> {
+public class QSendTask extends com.querydsl.sql.RelationalPathBase<QSendTask> {
 
     private static final long serialVersionUID = 462050168;
 
-    public static final QEbmsEvent ebmsEvent = new QEbmsEvent("ebms_event");
+    public static final QSendTask sendTask = new QSendTask("send_task");
 
     public final StringPath cpaId = createString("cpaId");
 
@@ -60,28 +60,28 @@ public class QEbmsEvent extends com.querydsl.sql.RelationalPathBase<QEbmsEvent> 
 
     public final DateTimePath<java.time.Instant> timeToLive = createDateTime("timeToLive", java.time.Instant.class);
 
-    public QEbmsEvent(String variable) {
-        super(QEbmsEvent.class, forVariable(variable), "PUBLIC", "ebms_event");
+    public QSendTask(String variable) {
+        super(QSendTask.class, forVariable(variable), "PUBLIC", "send_task");
         addMetadata();
     }
 
-    public QEbmsEvent(String variable, String schema, String table) {
-        super(QEbmsEvent.class, forVariable(variable), schema, table);
+    public QSendTask(String variable, String schema, String table) {
+        super(QSendTask.class, forVariable(variable), schema, table);
         addMetadata();
     }
 
-    public QEbmsEvent(String variable, String schema) {
-        super(QEbmsEvent.class, forVariable(variable), schema, "ebms_event");
+    public QSendTask(String variable, String schema) {
+        super(QSendTask.class, forVariable(variable), schema, "send_task");
         addMetadata();
     }
 
-    public QEbmsEvent(Path<? extends QEbmsEvent> path) {
-        super(path.getType(), path.getMetadata(), "PUBLIC", "ebms_event");
+    public QSendTask(Path<? extends QSendTask> path) {
+        super(path.getType(), path.getMetadata(), "PUBLIC", "send_task");
         addMetadata();
     }
 
-    public QEbmsEvent(PathMetadata metadata) {
-        super(QEbmsEvent.class, metadata, "PUBLIC", "ebms_event");
+    public QSendTask(PathMetadata metadata) {
+        super(QSendTask.class, metadata, "PUBLIC", "send_task");
         addMetadata();
     }
 

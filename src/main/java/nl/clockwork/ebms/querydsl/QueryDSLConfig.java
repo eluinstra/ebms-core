@@ -70,10 +70,10 @@ public class QueryDSLConfig
 		result.register("certificate_mapping","source",new X509CertificateType(Types.BLOB));
 		result.register("certificate_mapping","destination",new X509CertificateType(Types.BLOB));
 		result.register("ebms_message_event","event_type",new EbMSMessageEventTypeType(Types.SMALLINT));
-		result.register("ebms_event_log","status",new EbMSEventStatusType(Types.SMALLINT));
 		result.register("ebms_message","content",new DocumentType(Types.CLOB));
 		result.register("ebms_message","status",new EbMSMessageStatusType(Types.SMALLINT));
 		result.register("ebms_attachment","content",new CachedOutputStreamType(Types.BLOB));
+		result.register("send_log","status",new SendTaskStatusType(Types.SMALLINT));
 		return result;
 	}
 

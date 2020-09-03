@@ -22,30 +22,30 @@ import java.sql.SQLException;
 import com.querydsl.sql.types.AbstractType;
 
 import lombok.val;
-import nl.clockwork.ebms.event.processor.EbMSEventStatus;
+import nl.clockwork.ebms.send.SendTaskStatus;
 
-public class EbMSEventStatusType extends AbstractType<EbMSEventStatus>
+public class SendTaskStatusType extends AbstractType<SendTaskStatus>
 {
-	public EbMSEventStatusType(int type)
+	public SendTaskStatusType(int type)
 	{
 		super(type);
 	}
 
 	@Override
-	public Class<EbMSEventStatus> getReturnedClass()
+	public Class<SendTaskStatus> getReturnedClass()
 	{
-		return EbMSEventStatus.class;
+		return SendTaskStatus.class;
 	}
 
 	@Override
-	public EbMSEventStatus getValue(ResultSet rs, int startIndex) throws SQLException
+	public SendTaskStatus getValue(ResultSet rs, int startIndex) throws SQLException
 	{
 		val id = rs.getObject(startIndex,Integer.class);
-		return id != null ? EbMSEventStatus.get(id).orElseThrow(() -> new IllegalArgumentException("EbMSEventStatus " + id + " is not valid!")) : null;
+		return id != null ? SendTaskStatus.get(id).orElseThrow(() -> new IllegalArgumentException("SendTaskStatus " + id + " is not valid!")) : null;
 	}
 
 	@Override
-	public void setValue(PreparedStatement st, int startIndex, EbMSEventStatus value) throws SQLException
+	public void setValue(PreparedStatement st, int startIndex, SendTaskStatus value) throws SQLException
 	{
 		st.setInt(startIndex,value != null ? value.getId() : null);
 	}

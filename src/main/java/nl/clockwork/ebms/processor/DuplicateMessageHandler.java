@@ -31,12 +31,12 @@ import nl.clockwork.ebms.EbMSAction;
 import nl.clockwork.ebms.cpa.CPAManager;
 import nl.clockwork.ebms.cpa.CPAUtils;
 import nl.clockwork.ebms.dao.EbMSDAO;
-import nl.clockwork.ebms.event.processor.EventManager;
 import nl.clockwork.ebms.model.EbMSAcknowledgment;
 import nl.clockwork.ebms.model.EbMSBaseMessage;
 import nl.clockwork.ebms.model.EbMSDocument;
 import nl.clockwork.ebms.model.EbMSMessage;
 import nl.clockwork.ebms.model.EbMSMessageError;
+import nl.clockwork.ebms.send.SendTaskManager;
 import nl.clockwork.ebms.util.DOMUtils;
 import nl.clockwork.ebms.util.StreamUtils;
 import nl.clockwork.ebms.validation.EbMSMessageValidator;
@@ -53,7 +53,7 @@ class DuplicateMessageHandler
   @NonNull
   CPAManager cpaManager;
   @NonNull
-	EventManager eventManager;
+	SendTaskManager sendTaskManager;
   @NonNull
 	EbMSMessageValidator messageValidator;
 	boolean storeDuplicateMessage;
@@ -93,7 +93,7 @@ class DuplicateMessageHandler
 				val receiveDeliveryChannel = cpaManager.getReceiveDeliveryChannel(messageHeader.getCPAId(),messageHeader.getFrom().getPartyId(),messageHeader.getFrom().getRole(),service,null)
 						.orElse(null);
 				if (receiveDeliveryChannel != null && messageProperties.isPresent())
-					eventManager.createEvent(messageHeader.getCPAId(),sendDeliveryChannel,receiveDeliveryChannel,messageProperties.get().getMessageId(),messageHeader.getMessageData().getTimeToLive(),messageProperties.get().getTimestamp(),false);
+					sendTaskManager.createTask(messageHeader.getCPAId(),sendDeliveryChannel,receiveDeliveryChannel,messageProperties.get().getMessageId(),messageHeader.getMessageData().getTimeToLive(),messageProperties.get().getTimestamp(),false);
 				if (receiveDeliveryChannel == null && messageProperties.isPresent())
 					try
 					{

@@ -28,12 +28,12 @@ import nl.clockwork.ebms.dao.DAOConfig;
 import nl.clockwork.ebms.datasource.DataSourceConfig;
 import nl.clockwork.ebms.encryption.EncryptionConfig;
 import nl.clockwork.ebms.event.listener.EventListenerConfig;
-import nl.clockwork.ebms.event.processor.EventManagerConfig;
-import nl.clockwork.ebms.event.processor.EventProcessorConfig;
 import nl.clockwork.ebms.jms.JMSConfig;
 import nl.clockwork.ebms.processor.EbMSProcessorConfig;
 import nl.clockwork.ebms.querydsl.QueryDSLConfig;
 import nl.clockwork.ebms.security.KeyStoreConfig;
+import nl.clockwork.ebms.send.SendTaskHandlerConfig;
+import nl.clockwork.ebms.send.SendTaskManagerConfig;
 import nl.clockwork.ebms.server.ServerConfig;
 import nl.clockwork.ebms.service.ServiceConfig;
 import nl.clockwork.ebms.signing.SigningConfig;
@@ -52,11 +52,11 @@ import nl.clockwork.ebms.validation.ValidationConfig;
 		EbMSProcessorConfig.class,
 		EncryptionConfig.class,
 		EventListenerConfig.class,
-		EventManagerConfig.class,
-		EventProcessorConfig.class,
 		JMSConfig.class,
 		KeyStoreConfig.class,
 		QueryDSLConfig.class,
+		SendTaskHandlerConfig.class,
+		SendTaskManagerConfig.class,
 		ServerConfig.class,
 		ServiceConfig.class,
 		SigningConfig.class,

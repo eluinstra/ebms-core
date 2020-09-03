@@ -43,10 +43,10 @@ import nl.clockwork.ebms.cpa.CPAManager;
 import nl.clockwork.ebms.cpa.CPAUtils;
 import nl.clockwork.ebms.dao.EbMSDAO;
 import nl.clockwork.ebms.event.listener.EventListener;
-import nl.clockwork.ebms.event.processor.EventManager;
 import nl.clockwork.ebms.model.EbMSAcknowledgment;
 import nl.clockwork.ebms.model.EbMSDocument;
 import nl.clockwork.ebms.model.EbMSMessage;
+import nl.clockwork.ebms.send.SendTaskManager;
 import nl.clockwork.ebms.signing.EbMSSignatureGenerator;
 import nl.clockwork.ebms.util.StreamUtils;
 import nl.clockwork.ebms.validation.DuplicateMessageException;
@@ -64,7 +64,7 @@ class AcknowledgmentProcessor
 	@NonNull
 	CPAManager cpaManager;
 	@NonNull
-	EventManager eventManager;
+	SendTaskManager sendTaskManager;
 	@NonNull
 	EbMSMessageValidator messageValidator;
 	@NonNull
@@ -83,7 +83,7 @@ class AcknowledgmentProcessor
 		val acknowledgmentDocument = EbMSMessageUtils.getEbMSDocument(acknowledgment);
 		signatureGenerator.generate(message.getAckRequested(),acknowledgmentDocument,acknowledgment);
 		storeMessages(timestamp,messageDocument,message,acknowledgmentDocument,acknowledgment);
-		storeEvent(acknowledgment,isSyncReply);
+		storeSendTask(acknowledgment,isSyncReply);
 		eventListener.onMessageReceived(message.getMessageHeader().getMessageData().getMessageId());
 		return acknowledgmentDocument;
 	}
@@ -100,7 +100,7 @@ class AcknowledgmentProcessor
 		ebMSDAO.insertMessage(timestamp,persistTime,acknowledgmentDocument.getMessage(),acknowledgment,Collections.emptyList(),null);
 	}
 
-	private void storeEvent(EbMSAcknowledgment acknowledgment, boolean isSyncReply)
+	private void storeSendTask(EbMSAcknowledgment acknowledgment, boolean isSyncReply)
 	{
 		MessageHeader messageHeader = acknowledgment.getMessageHeader();
 		val service = CPAUtils.toString(messageHeader.getService());
@@ -111,7 +111,7 @@ class AcknowledgmentProcessor
 				cpaManager.getReceiveDeliveryChannel(messageHeader.getCPAId(),messageHeader.getTo().getPartyId(),messageHeader.getTo().getRole(),service,messageHeader.getAction())
 				.orElseThrow(() -> StreamUtils.illegalStateException("ReceiveDeliveryChannel",messageHeader.getCPAId(),messageHeader.getTo().getPartyId(),messageHeader.getTo().getRole(),service,messageHeader.getAction()));
 		if (!isSyncReply)
-			eventManager.createEvent(
+			sendTaskManager.createTask(
 					messageHeader.getCPAId(),
 					sendDeliveryChannel,
 					receiveDeliveryChannel,

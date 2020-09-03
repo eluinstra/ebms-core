@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.clockwork.ebms.event.processor;
+package nl.clockwork.ebms.send;
 
 import java.time.Instant;
 
@@ -22,23 +22,23 @@ import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DeliveryChannel;
 import lombok.val;
 import nl.clockwork.ebms.cpa.CPAUtils;
 
-public interface EventManager
+public interface SendTaskManager
 {
-	void createEvent(String cpaId, DeliveryChannel sendDeliveryChannel, DeliveryChannel receiveDeliveryChannel, String messageId, Instant timeToLive, Instant timestamp, boolean isConfidential);
-	void updateEvent(final EbMSEvent event, final String url, final EbMSEventStatus status);
-	void updateEvent(final EbMSEvent event, final String url, final EbMSEventStatus status, final String errorMessage);
-	void deleteEvent(String messageId);
+	void createTask(String cpaId, DeliveryChannel sendDeliveryChannel, DeliveryChannel receiveDeliveryChannel, String messageId, Instant timeToLive, Instant timestamp, boolean isConfidential);
+	void updateTask(final SendTask task, final String url, final SendTaskStatus status);
+	void updateTask(final SendTask task, final String url, final SendTaskStatus status, final String errorMessage);
+	void deleteTask(String messageId);
 
-	default EbMSEvent createNextEvent(EbMSEvent event, DeliveryChannel deliveryChannel)
+	default SendTask createNextTask(SendTask task, DeliveryChannel deliveryChannel)
 	{
 		val rm = CPAUtils.getReceiverReliableMessaging(deliveryChannel);
-		val timestamp = event.getRetries() < rm.getRetries().intValue() ? Instant.now().plus(rm.getRetryInterval()) : event.getTimeToLive();
-		return event.createNextEvent(timestamp);
+		val timestamp = task.getRetries() < rm.getRetries().intValue() ? Instant.now().plus(rm.getRetryInterval()) : task.getTimeToLive();
+		return task.createNextTask(timestamp);
 	}
 
-	default EbMSEvent createNextEvent(EbMSEvent event, long retryInterval)
+	default SendTask createNextTask(SendTask task, long retryInterval)
 	{
 		val timestamp = Instant.now().plusSeconds(60 * retryInterval);
-		return event.createNextEvent(timestamp);
+		return task.createNextTask(timestamp);
 	}
 }

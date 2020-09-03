@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.clockwork.ebms.event.processor;
+package nl.clockwork.ebms.send;
 
 import java.time.Instant;
 
@@ -31,12 +31,12 @@ import nl.clockwork.ebms.util.StreamUtils;
 
 @FieldDefaults(level = AccessLevel.PROTECTED, makeFinal = true)
 @AllArgsConstructor
-class EbMSEventManager implements EventManager
+class DAOSendTaskManager implements SendTaskManager
 {
 	@NonNull
 	EbMSDAO ebMSDAO;
 	@NonNull
-	EbMSEventDAO ebMSEventDAO;
+	SendTaskDAO sendTaskDAO;
 	@NonNull
 	CPAManager cpaManager;
 	String serverId;
@@ -44,48 +44,48 @@ class EbMSEventManager implements EventManager
 	int autoRetryInterval;
 
 	@Override
-	public void createEvent(String cpaId, DeliveryChannel sendDeliveryChannel, DeliveryChannel receiveDeliveryChannel, String messageId, Instant timeToLive, Instant timestamp, boolean isConfidential)
+	public void createTask(String cpaId, DeliveryChannel sendDeliveryChannel, DeliveryChannel receiveDeliveryChannel, String messageId, Instant timeToLive, Instant timestamp, boolean isConfidential)
 	{
-		ebMSEventDAO.insertEvent(new EbMSEvent(cpaId,sendDeliveryChannel.getChannelId(),receiveDeliveryChannel.getChannelId(), messageId, timeToLive, timestamp, isConfidential, 0),serverId);
+		sendTaskDAO.insertTask(new SendTask(cpaId,sendDeliveryChannel.getChannelId(),receiveDeliveryChannel.getChannelId(), messageId, timeToLive, timestamp, isConfidential, 0),serverId);
 	}
 
 	@Override
-	public void updateEvent(final EbMSEvent event, final String url, final EbMSEventStatus status)
+	public void updateTask(final SendTask task, final String url, final SendTaskStatus status)
 	{
-		updateEvent(event,url,status,null);
+		updateTask(task,url,status,null);
 	}
 
 	@Override
-	public void updateEvent(final EbMSEvent event, final String url, final EbMSEventStatus status, final String errorMessage)
+	public void updateTask(final SendTask task, final String url, final SendTaskStatus status, final String errorMessage)
 	{
 		val deliveryChannel = cpaManager.getDeliveryChannel(
-				event.getCpaId(),
-				event.getReceiveDeliveryChannelId())
-					.orElseThrow(() -> StreamUtils.illegalStateException("DeliveryChannel",event.getCpaId(),event.getReceiveDeliveryChannelId()));
-		ebMSEventDAO.insertEventLog(event.getMessageId(),event.getTimestamp(),url,status,errorMessage);
+				task.getCpaId(),
+				task.getReceiveDeliveryChannelId())
+					.orElseThrow(() -> StreamUtils.illegalStateException("DeliveryChannel",task.getCpaId(),task.getReceiveDeliveryChannelId()));
+		sendTaskDAO.insertLog(task.getMessageId(),task.getTimestamp(),url,status,errorMessage);
 		val reliableMessaging = CPAUtils.isReliableMessaging(deliveryChannel);
-		if (event.getTimeToLive() != null && reliableMessaging)
-			ebMSEventDAO.updateEvent(createNextEvent(event,deliveryChannel));
+		if (task.getTimeToLive() != null && reliableMessaging)
+			sendTaskDAO.updateTask(createNextTask(task,deliveryChannel));
 		else
 		{
-			switch(ebMSDAO.getMessageAction(event.getMessageId()).orElse(null))
+			switch(ebMSDAO.getMessageAction(task.getMessageId()).orElse(null))
 			{
 				case ACKNOWLEDGMENT:
 				case MESSAGE_ERROR:
-					if (!reliableMessaging && event.getRetries() < nrAutoRetries)
+					if (!reliableMessaging && task.getRetries() < nrAutoRetries)
 					{
-						ebMSEventDAO.updateEvent(createNextEvent(event,autoRetryInterval));
+						sendTaskDAO.updateTask(createNextTask(task,autoRetryInterval));
 						break;
 					}
 				default:
-					ebMSEventDAO.deleteEvent(event.getMessageId());
+					sendTaskDAO.deleteTask(task.getMessageId());
 			}
 		}
 	}
 
 	@Override
-	public void deleteEvent(String messageId)
+	public void deleteTask(String messageId)
 	{
-		ebMSEventDAO.deleteEvent(messageId);
+		sendTaskDAO.deleteTask(messageId);
 	}
 }

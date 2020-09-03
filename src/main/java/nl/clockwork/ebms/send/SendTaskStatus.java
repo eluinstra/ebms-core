@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.clockwork.ebms.event.processor;
+package nl.clockwork.ebms.send;
 
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -26,18 +26,18 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor
 @Getter
-public enum EbMSEventStatus
+public enum SendTaskStatus
 {
 	SUCCEEDED(1), FAILED(2), EXPIRED(3);
 
 	int id;
 
-	public static Stream<EbMSEventStatus> stream()
+	public static Stream<SendTaskStatus> stream()
 	{
 		return Stream.of(values());
 	}
 
-	public static final Optional<EbMSEventStatus> get(int id)
+	public static final Optional<SendTaskStatus> get(int id)
 	{
 		return stream().filter(s -> s.getId() == id).findFirst();
 	}

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.clockwork.ebms.event.processor;
+package nl.clockwork.ebms.send;
 
 import javax.jms.ConnectionFactory;
 
@@ -46,34 +46,34 @@ import nl.clockwork.ebms.processor.EbMSMessageProcessor;
 @Configuration
 @EnableAsync
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class EventProcessorConfig
+public class SendTaskHandlerConfig
 {
-	public enum EventProcessorType
+	public enum SendTaskHandlerType
 	{
 		DEFAULT, JMS;
 	}
 	@Autowired
-	EbMSEventDAO ebMSEventDAO;
+	SendTaskDAO sendTaskDAO;
 	@Autowired
 	CPAManager cpaManager;
 	@Value("${ebms.serverId}")
 	String serverId;
-	@Value("${eventProcessor.jms.destinationName}")
+	@Value("${taskHandler.jms.destinationName}")
 	String jmsDestinationName;
-	@Value("${eventProcessor.jms.receiveTimeout}")
+	@Value("${taskHandler.jms.receiveTimeout}")
 	long receiveTimeout;
-	@Value("${eventProcessor.start}")
-	boolean startEventProcessor;
-	@Value("${eventProcessor.minThreads}")
+	@Value("${taskHandler.start}")
+	boolean startTaskHandler;
+	@Value("${taskHandler.minThreads}")
 	int minThreads;
-	@Value("${eventProcessor.maxThreads}")
+	@Value("${taskHandler.maxThreads}")
 	int maxThreads;
-	@Value("${eventProcessor.maxEvents}")
-	int maxEvents;
-	@Value("${eventProcessor.executionInterval}")
-	int eventProcessorExecutionInterval;
-	@Value("${eventHandlerTask.executionInterval}")
-	int eventHandlerTaskExecutionInterval;
+	@Value("${taskHandler.maxTasks}")
+	int maxTaksks;
+	@Value("${taskHandler.executionInterval}")
+	int taskHandlerExecutionInterval;
+	@Value("${taskHandler.task.executionInterval}")
+	int taskHandlerTaskExecutionInterval;
 	@Autowired
 	EventListener eventListener;
 	@Autowired
@@ -81,7 +81,7 @@ public class EventProcessorConfig
 	@Autowired
 	URLMapper urlMapper;
 	@Autowired
-	EventManager eventManager;
+	SendTaskManager sendTaskManager;
 	@Autowired
 	EbMSHttpClientFactory ebMSClientFactory;
 	@Autowired
@@ -98,38 +98,38 @@ public class EventProcessorConfig
 	@Autowired
 	@Qualifier("jmsTransactionManager")
 	PlatformTransactionManager jmsTransactionManager;
-	@Value("${eventProcessor.jms.destinationName}")
+	@Value("${taskHandler.jms.destinationName}")
 	String destinationName;
 
-	@Bean("eventHandlerTaskExecutor")
-	@Conditional(DefaultEventProcessor.class)
-	public ThreadPoolTaskExecutor defaultEventProcessor()
+	@Bean("sendTaskExecutor")
+	@Conditional(DefaultTaskHandler.class)
+	public ThreadPoolTaskExecutor defaultTaskProcessor()
 	{
 		val result = new ThreadPoolTaskExecutor();
 		result.setCorePoolSize(minThreads);
 		result.setMaxPoolSize(maxThreads);
-		result.setQueueCapacity(maxEvents);
+		result.setQueueCapacity(maxTaksks);
 		result.setWaitForTasksToCompleteOnShutdown(true);
 		return result;
 	}
 
 	@Bean
-	@Conditional(DefaultEventProcessor.class)
-	public EventTaskExecutor eventTaskExecutor()
+	@Conditional(DefaultTaskHandler.class)
+	public SendTaskExecutor sendTaskExecutor()
 	{
-		return EventTaskExecutor.builder()
+		return SendTaskExecutor.builder()
 				.transactionManager(dataSourceTransactionManager)
-				.ebMSEventDAO(ebMSEventDAO)
-				.eventHandler(eventHandler())
-				.timedTask(new TimedTask(eventProcessorExecutionInterval))
-				.maxEvents(maxEvents)
+				.sendTaskDAO(sendTaskDAO)
+				.sendTaskHandler(sendTaskHandler())
+				.timedTask(new TimedTask(taskHandlerExecutionInterval))
+				.maxTasks(maxTaksks)
 				.serverId(serverId)
 				.build();
 	}
 
 	@Bean
-	@Conditional(JmsEventProcessor.class)
-	public DefaultMessageListenerContainer jmsEventProcessor()
+	@Conditional(JmsTaskHandler.class)
+	public DefaultMessageListenerContainer jmsTaskProcessor()
 	{
 		val result = new DefaultMessageListenerContainer();
 		result.setConnectionFactory(connectionFactory);
@@ -138,61 +138,61 @@ public class EventProcessorConfig
 		result.setConcurrentConsumers(minThreads);
 		result.setMaxConcurrentConsumers(maxThreads);
 		result.setReceiveTimeout(receiveTimeout);
-		result.setDestinationName(StringUtils.isEmpty(jmsDestinationName) ? JMSEventManager.JMS_DESTINATION_NAME : jmsDestinationName);
-		result.setMessageListener(new EbMSSendEventListener(eventHandler()));
+		result.setDestinationName(StringUtils.isEmpty(jmsDestinationName) ? JMSSendTaskManager.JMS_DESTINATION_NAME : jmsDestinationName);
+		result.setMessageListener(new JMSSendTaskListener(sendTaskHandler()));
 		return result;
 	}
 
 	@Bean
-  public EventHandler eventHandler()
+  public SendTaskHandler sendTaskHandler()
 	{
-		return EventHandler.builder()
+		return SendTaskHandler.builder()
 				.transactionManager(dataSourceTransactionManager)
 				.eventListener(eventListener)
 				.ebMSDAO(ebMSDAO)
 				.cpaManager(cpaManager)
 				.urlMapper(urlMapper)
-				.eventManager(eventManager)
+				.sendTaskManager(sendTaskManager)
 				.ebMSClientFactory(ebMSClientFactory)
 				.messageEncrypter(messageEncrypter)
 				.messageProcessor(messageProcessor)
-				.timedTask(new TimedTask(eventHandlerTaskExecutionInterval))
+				.timedTask(new TimedTask(taskHandlerTaskExecutionInterval))
 				.deleteEbMSAttachmentsOnMessageProcessed(deleteEbMSAttachmentsOnMessageProcessed)
 				.build();
 	}
 
-	public static class DefaultEventProcessor implements Condition
+	public static class DefaultTaskHandler implements Condition
 	{
 		@Override
 		public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata)
 		{
-			return context.getEnvironment().getProperty("eventProcessor.start",Boolean.class,true)
-					&& context.getEnvironment().getProperty("eventProcessor.type",EventProcessorType.class,EventProcessorType.DEFAULT) == EventProcessorType.DEFAULT;
+			return context.getEnvironment().getProperty("taskHandler.start",Boolean.class,true)
+					&& context.getEnvironment().getProperty("taskHandler.type",SendTaskHandlerType.class,SendTaskHandlerType.DEFAULT) == SendTaskHandlerType.DEFAULT;
 		}
 	}
-	public static class JmsEventProcessor implements Condition
+	public static class JmsTaskHandler implements Condition
 	{
 		@Override
 		public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata)
 		{
-			return context.getEnvironment().getProperty("eventProcessor.start",Boolean.class,true)
-					&& context.getEnvironment().getProperty("eventProcessor.type",EventProcessorType.class,EventProcessorType.DEFAULT) == EventProcessorType.JMS;
+			return context.getEnvironment().getProperty("taskHandler.start",Boolean.class,true)
+					&& context.getEnvironment().getProperty("taskHandler.type",SendTaskHandlerType.class,SendTaskHandlerType.DEFAULT) == SendTaskHandlerType.JMS;
 		}
 	}
-	public static class DefaultEventProcessorType implements Condition
+	public static class DefaultTaskHandlerType implements Condition
 	{
 		@Override
 		public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata)
 		{
-			return context.getEnvironment().getProperty("eventProcessor.type",EventProcessorType.class,EventProcessorType.DEFAULT) == EventProcessorType.DEFAULT;
+			return context.getEnvironment().getProperty("taskHandler.type",SendTaskHandlerType.class,SendTaskHandlerType.DEFAULT) == SendTaskHandlerType.DEFAULT;
 		}
 	}
-	public static class JmsEventProcessorType implements Condition
+	public static class JmsTaskHandlerType implements Condition
 	{
 		@Override
 		public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata)
 		{
-			return context.getEnvironment().getProperty("eventProcessor.type",EventProcessorType.class,EventProcessorType.DEFAULT) == EventProcessorType.JMS;
+			return context.getEnvironment().getProperty("taskHandler.type",SendTaskHandlerType.class,SendTaskHandlerType.DEFAULT) == SendTaskHandlerType.JMS;
 		}
 	}
 }

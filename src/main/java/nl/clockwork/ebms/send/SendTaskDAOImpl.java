@@ -13,12 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.clockwork.ebms.event.processor;
+package nl.clockwork.ebms.send;
 
 import java.time.Instant;
 import java.util.List;
 
-import com.querydsl.core.types.ConstructorExpression;
+import com.querydsl.core.types.Expression;
 import com.querydsl.core.types.Projections;
 import com.querydsl.sql.SQLQueryFactory;
 
@@ -26,22 +26,24 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
-import nl.clockwork.ebms.querydsl.model.QEbmsEvent;
-import nl.clockwork.ebms.querydsl.model.QEbmsEventLog;
+import nl.clockwork.ebms.querydsl.model.QSendLog;
+import nl.clockwork.ebms.querydsl.model.QSendTask;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor
-class EbMSEventDAOImpl implements EbMSEventDAO
+class SendTaskDAOImpl implements SendTaskDAO
 {
 	@NonNull
 	SQLQueryFactory queryFactory;
-	QEbmsEvent table = QEbmsEvent.ebmsEvent;
-	QEbmsEventLog logTable = QEbmsEventLog.ebmsEventLog;
+	QSendTask table = QSendTask.sendTask;
+	QSendLog logTable = QSendLog.sendLog;
+	Expression<SendTask> createSendTaskProjection = Projections.constructor(
+			SendTask.class,table.cpaId,table.sendChannelId,table.receiveChannelId,table.messageId,table.timeToLive,table.timeStamp,table.isConfidential,table.retries);
 
 	@Override
-	public List<EbMSEvent> getEventsBefore(Instant timestamp, String serverId)
+	public List<SendTask> getTasksBefore(Instant timestamp, String serverId)
 	{
-		return queryFactory.select(createEbMSEventProjection())
+		return queryFactory.select(createSendTaskProjection)
 				.from(table)
 				.where(table.timeStamp.loe(timestamp)
 						.and(serverId == null ? table.serverId.isNull() : table.serverId.eq(serverId)))
@@ -50,9 +52,9 @@ class EbMSEventDAOImpl implements EbMSEventDAO
 	}
 
 	@Override
-	public List<EbMSEvent> getEventsBefore(Instant timestamp, String serverId, int maxNr)
+	public List<SendTask> getTasksBefore(Instant timestamp, String serverId, int maxNr)
 	{
-		return queryFactory.select(createEbMSEventProjection())
+		return queryFactory.select(createSendTaskProjection)
 				.from(table)
 				.where(table.timeStamp.loe(timestamp)
 						.and(serverId == null ? table.serverId.isNull() : table.serverId.eq(serverId)))
@@ -62,33 +64,33 @@ class EbMSEventDAOImpl implements EbMSEventDAO
 	}
 	
 	@Override
-	public long insertEvent(EbMSEvent event, String serverId)
+	public long insertTask(SendTask task, String serverId)
 	{
 		return queryFactory.insert(table)
-				.set(table.cpaId,event.getCpaId())
-				.set(table.sendChannelId,event.getSendDeliveryChannelId())
-				.set(table.receiveChannelId,event.getReceiveDeliveryChannelId())
-				.set(table.messageId,event.getMessageId())
-				.set(table.timeToLive,event.getTimeToLive())
-				.set(table.timeStamp,event.getTimestamp())
-				.set(table.isConfidential,event.isConfidential())
-				.set(table.retries,event.getRetries())
+				.set(table.cpaId,task.getCpaId())
+				.set(table.sendChannelId,task.getSendDeliveryChannelId())
+				.set(table.receiveChannelId,task.getReceiveDeliveryChannelId())
+				.set(table.messageId,task.getMessageId())
+				.set(table.timeToLive,task.getTimeToLive())
+				.set(table.timeStamp,task.getTimestamp())
+				.set(table.isConfidential,task.isConfidential())
+				.set(table.retries,task.getRetries())
 				.set(table.serverId,serverId)
 				.execute();
 	}
 
 	@Override
-	public long updateEvent(EbMSEvent event)
+	public long updateTask(SendTask task)
 	{
 		return queryFactory.update(table)
-				.set(table.timeStamp,event.getTimestamp())
-				.set(table.retries,event.getRetries())
-				.where(table.messageId.eq(event.getMessageId()))
+				.set(table.timeStamp,task.getTimestamp())
+				.set(table.retries,task.getRetries())
+				.where(table.messageId.eq(task.getMessageId()))
 				.execute();
 	}
 	
 	@Override
-	public long deleteEvent(String messageId)
+	public long deleteTask(String messageId)
 	{
 		return queryFactory.delete(table)
 				.where(table.messageId.eq(messageId))
@@ -96,7 +98,7 @@ class EbMSEventDAOImpl implements EbMSEventDAO
 	}
 
 	@Override
-	public long insertEventLog(String messageId, Instant timestamp, String uri, EbMSEventStatus status, String errorMessage)
+	public long insertLog(String messageId, Instant timestamp, String uri, SendTaskStatus status, String errorMessage)
 	{
 		return queryFactory.insert(logTable)
 				.set(logTable.messageId,messageId)
@@ -105,11 +107,5 @@ class EbMSEventDAOImpl implements EbMSEventDAO
 				.set(logTable.status,status)
 				.set(logTable.errorMessage,errorMessage)
 				.execute();
-	}
-
-	private ConstructorExpression<EbMSEvent> createEbMSEventProjection()
-	{
-		return Projections.constructor(
-				EbMSEvent.class,table.cpaId,table.sendChannelId,table.receiveChannelId,table.messageId,table.timeToLive,table.timeStamp,table.isConfidential,table.retries);
 	}
 }

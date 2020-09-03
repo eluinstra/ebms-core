@@ -30,47 +30,47 @@ import java.sql.Types;
 
 
 /**
- * QEbmsEventLog is a Querydsl query type for QEbmsEventLog
+ * QSendLog is a Querydsl query type for QSendLog
  */
 @Generated("com.querydsl.sql.codegen.MetaDataSerializer")
-public class QEbmsEventLog extends com.querydsl.sql.RelationalPathBase<QEbmsEventLog> {
+public class QSendLog extends com.querydsl.sql.RelationalPathBase<QSendLog> {
 
     private static final long serialVersionUID = -433552212;
 
-    public static final QEbmsEventLog ebmsEventLog = new QEbmsEventLog("ebms_event_log");
+    public static final QSendLog sendLog = new QSendLog("send_log");
 
     public final StringPath errorMessage = createString("errorMessage");
 
     public final StringPath messageId = createString("messageId");
 
-    public final EnumPath<nl.clockwork.ebms.event.processor.EbMSEventStatus> status = createEnum("status", nl.clockwork.ebms.event.processor.EbMSEventStatus.class);
+    public final EnumPath<nl.clockwork.ebms.send.SendTaskStatus> status = createEnum("status", nl.clockwork.ebms.send.SendTaskStatus.class);
 
     public final DateTimePath<java.time.Instant> timeStamp = createDateTime("timeStamp", java.time.Instant.class);
 
     public final StringPath uri = createString("uri");
 
-    public QEbmsEventLog(String variable) {
-        super(QEbmsEventLog.class, forVariable(variable), "PUBLIC", "ebms_event_log");
+    public QSendLog(String variable) {
+        super(QSendLog.class, forVariable(variable), "PUBLIC", "send_log");
         addMetadata();
     }
 
-    public QEbmsEventLog(String variable, String schema, String table) {
-        super(QEbmsEventLog.class, forVariable(variable), schema, table);
+    public QSendLog(String variable, String schema, String table) {
+        super(QSendLog.class, forVariable(variable), schema, table);
         addMetadata();
     }
 
-    public QEbmsEventLog(String variable, String schema) {
-        super(QEbmsEventLog.class, forVariable(variable), schema, "ebms_event_log");
+    public QSendLog(String variable, String schema) {
+        super(QSendLog.class, forVariable(variable), schema, "send_log");
         addMetadata();
     }
 
-    public QEbmsEventLog(Path<? extends QEbmsEventLog> path) {
-        super(path.getType(), path.getMetadata(), "PUBLIC", "ebms_event_log");
+    public QSendLog(Path<? extends QSendLog> path) {
+        super(path.getType(), path.getMetadata(), "PUBLIC", "send_log");
         addMetadata();
     }
 
-    public QEbmsEventLog(PathMetadata metadata) {
-        super(QEbmsEventLog.class, metadata, "PUBLIC", "ebms_event_log");
+    public QSendLog(PathMetadata metadata) {
+        super(QSendLog.class, metadata, "PUBLIC", "send_log");
         addMetadata();
     }
 

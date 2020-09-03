@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.clockwork.ebms.event.processor;
+package nl.clockwork.ebms.send;
 
 import java.time.Instant;
 
@@ -25,7 +25,7 @@ import lombok.Value;
 @Builder
 @Value
 @AllArgsConstructor
-public class EbMSEvent
+public class SendTask
 {
 	@NonNull
 	String cpaId;
@@ -40,9 +40,9 @@ public class EbMSEvent
 	boolean confidential;
 	int retries;
 
-	public EbMSEvent createNextEvent(Instant timestamp)
+	public SendTask createNextTask(Instant timestamp)
 	{
-		return EbMSEvent.builder()
+		return SendTask.builder()
 				.cpaId(cpaId)
 				.sendDeliveryChannelId(sendDeliveryChannelId)
 				.receiveDeliveryChannelId(receiveDeliveryChannelId)

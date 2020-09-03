@@ -29,7 +29,7 @@ import nl.clockwork.ebms.cpa.CertificateMapper;
 import nl.clockwork.ebms.cpa.URLMapper;
 import nl.clockwork.ebms.dao.EbMSDAO;
 import nl.clockwork.ebms.event.listener.EbMSMessageEventDAO;
-import nl.clockwork.ebms.event.processor.EventManager;
+import nl.clockwork.ebms.send.SendTaskManager;
 import nl.clockwork.ebms.service.cpa.CPAService;
 import nl.clockwork.ebms.service.cpa.CPAServiceImpl;
 import nl.clockwork.ebms.service.cpa.certificate.CertificateMappingService;
@@ -61,7 +61,7 @@ public class ServiceConfig
 	@Autowired
 	EbMSMessageFactory ebMSMessageFactory;
 	@Autowired
-	EventManager eventManager;
+	SendTaskManager sendTaskManager;
 	@Autowired
 	MessagePropertiesValidator messagePropertiesValidator;
 	@Autowired
@@ -108,7 +108,7 @@ public class ServiceConfig
 				.ebMSMessageEventDAO(ebMSMessageEventDAO)
 				.cpaManager(cpaManager)
 				.ebMSMessageFactory(ebMSMessageFactory)
-				.eventManager(eventManager)
+				.sendTaskManager(sendTaskManager)
 				.messagePropertiesValidator(messagePropertiesValidator)
 				.signatureGenerator(signatureGenerator)
 				.deleteEbMSAttachmentsOnMessageProcessed(deleteEbMSAttachmentsOnMessageProcessed)

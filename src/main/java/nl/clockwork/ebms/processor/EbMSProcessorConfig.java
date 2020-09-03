@@ -28,7 +28,7 @@ import nl.clockwork.ebms.client.DeliveryManager;
 import nl.clockwork.ebms.cpa.CPAManager;
 import nl.clockwork.ebms.dao.EbMSDAO;
 import nl.clockwork.ebms.event.listener.EventListener;
-import nl.clockwork.ebms.event.processor.EventManager;
+import nl.clockwork.ebms.send.SendTaskManager;
 import nl.clockwork.ebms.signing.EbMSSignatureGenerator;
 import nl.clockwork.ebms.validation.EbMSMessageValidator;
 
@@ -47,7 +47,7 @@ public class EbMSProcessorConfig
 	@Autowired
 	EbMSMessageFactory ebMSMessageFactory;
 	@Autowired
-	EventManager eventManager;
+	SendTaskManager sendTaskManager;
 	@Autowired
 	EbMSSignatureGenerator signatureGenerator;
 	@Autowired
@@ -65,7 +65,7 @@ public class EbMSProcessorConfig
 		val duplicateMessageHandler = DuplicateMessageHandler.builder()
 				.ebMSDAO(ebMSDAO)
 				.cpaManager(cpaManager)
-				.eventManager(eventManager)
+				.sendTaskManager(sendTaskManager)
 				.messageValidator(messageValidator)
 				.storeDuplicateMessage(storeDuplicateMessage)
 				.storeDuplicateMessageAttachments(storeDuplicateMessageAttachments)
@@ -76,7 +76,7 @@ public class EbMSProcessorConfig
 				.ebMSDAO(ebMSDAO)
 				.cpaManager(cpaManager)
 				.ebMSMessageFactory(ebMSMessageFactory)
-				.eventManager(eventManager)
+				.sendTaskManager(sendTaskManager)
 				.signatureGenerator(signatureGenerator)
 				.messageValidator(messageValidator)
 				.duplicateMessageHandler(duplicateMessageHandler)

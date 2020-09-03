@@ -13,17 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.clockwork.ebms.event.processor;
+package nl.clockwork.ebms.send;
 
 import java.time.Instant;
 import java.util.List;
 
-interface EbMSEventDAO
+interface SendTaskDAO
 {
-	List<EbMSEvent> getEventsBefore(Instant timestamp, String serverId);
-	List<EbMSEvent> getEventsBefore(Instant timestamp, String serverId, int maxNr);
-	long insertEvent(EbMSEvent event, String serverId);
-	long insertEventLog(String messageId, Instant timestamp, String uri, EbMSEventStatus status, String errorMessage);
-	long updateEvent(EbMSEvent event);
-	long deleteEvent(String messageId);
+	List<SendTask> getTasksBefore(Instant timestamp, String serverId);
+	List<SendTask> getTasksBefore(Instant timestamp, String serverId, int maxNr);
+	long insertTask(SendTask task, String serverId);
+	long insertLog(String messageId, Instant timestamp, String uri, SendTaskStatus status, String errorMessage);
+	long updateTask(SendTask task);
+	long deleteTask(String messageId);
 }

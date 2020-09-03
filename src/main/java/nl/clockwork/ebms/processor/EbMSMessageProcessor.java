@@ -42,7 +42,6 @@ import nl.clockwork.ebms.client.DeliveryManager;
 import nl.clockwork.ebms.cpa.CPAManager;
 import nl.clockwork.ebms.dao.EbMSDAO;
 import nl.clockwork.ebms.event.listener.EventListener;
-import nl.clockwork.ebms.event.processor.EventManager;
 import nl.clockwork.ebms.model.EbMSAcknowledgment;
 import nl.clockwork.ebms.model.EbMSBaseMessage;
 import nl.clockwork.ebms.model.EbMSDocument;
@@ -53,6 +52,7 @@ import nl.clockwork.ebms.model.EbMSPing;
 import nl.clockwork.ebms.model.EbMSPong;
 import nl.clockwork.ebms.model.EbMSStatusRequest;
 import nl.clockwork.ebms.model.EbMSStatusResponse;
+import nl.clockwork.ebms.send.SendTaskManager;
 import nl.clockwork.ebms.signing.EbMSSignatureGenerator;
 import nl.clockwork.ebms.util.DOMUtils;
 import nl.clockwork.ebms.validation.DuplicateMessageException;
@@ -85,7 +85,7 @@ public class EbMSMessageProcessor
 	PongProcessor pongProcessor;
 
 	@Builder
-	public EbMSMessageProcessor(@NonNull DeliveryManager deliveryManager, @NonNull EventListener eventListener, @NonNull EbMSDAO ebMSDAO, @NonNull CPAManager cpaManager, @NonNull EbMSMessageFactory ebMSMessageFactory, @NonNull EventManager eventManager, @NonNull EbMSSignatureGenerator signatureGenerator, @NonNull EbMSMessageValidator messageValidator, @NonNull DuplicateMessageHandler duplicateMessageHandler, boolean deleteEbMSAttachmentsOnMessageProcessed)
+	public EbMSMessageProcessor(@NonNull DeliveryManager deliveryManager, @NonNull EventListener eventListener, @NonNull EbMSDAO ebMSDAO, @NonNull CPAManager cpaManager, @NonNull EbMSMessageFactory ebMSMessageFactory, @NonNull SendTaskManager sendTaskManager, @NonNull EbMSSignatureGenerator signatureGenerator, @NonNull EbMSMessageValidator messageValidator, @NonNull DuplicateMessageHandler duplicateMessageHandler, boolean deleteEbMSAttachmentsOnMessageProcessed)
 	{
 		super();
 		this.eventListener = eventListener;
@@ -97,7 +97,7 @@ public class EbMSMessageProcessor
 		this.messageErrorProcessor = MessageErrorProcessor.builder()
 				.ebMSDAO(ebMSDAO)
 				.cpaManager(cpaManager)
-				.eventManager(eventManager)
+				.sendTaskManager(sendTaskManager)
 				.messageValidator(messageValidator)
 				.duplicateMessageHandler(duplicateMessageHandler)
 				.ebMSMessageFactory(ebMSMessageFactory)
@@ -108,7 +108,7 @@ public class EbMSMessageProcessor
 		this.acknowledgmentProcessor = AcknowledgmentProcessor.builder()
 				.ebMSDAO(ebMSDAO)
 				.cpaManager(cpaManager)
-				.eventManager(eventManager)
+				.sendTaskManager(sendTaskManager)
 				.messageValidator(messageValidator)
 				.duplicateMessageHandler(duplicateMessageHandler)
 				.ebMSMessageFactory(ebMSMessageFactory)

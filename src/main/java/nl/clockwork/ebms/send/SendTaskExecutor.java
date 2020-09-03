@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.clockwork.ebms.event.processor;
+package nl.clockwork.ebms.send;
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -32,26 +32,26 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @FieldDefaults(level = AccessLevel.PROTECTED, makeFinal = true)
-class EventTaskExecutor implements Runnable
+class SendTaskExecutor implements Runnable
 {
 	@NonNull
 	PlatformTransactionManager transactionManager;
 	@NonNull
-	EbMSEventDAO ebMSEventDAO;
+	SendTaskDAO sendTaskDAO;
 	@NonNull
-	EventHandler eventHandler;
+	SendTaskHandler sendTaskHandler;
 	@NonNull TimedTask timedTask;
-	int maxEvents;
+	int maxTasks;
 	String serverId;
 
 	@Builder
-	public EventTaskExecutor(@NonNull PlatformTransactionManager transactionManager, @NonNull EbMSEventDAO ebMSEventDAO, @NonNull EventHandler eventHandler, @NonNull TimedTask timedTask, int maxEvents, String serverId)
+	public SendTaskExecutor(@NonNull PlatformTransactionManager transactionManager, @NonNull SendTaskDAO sendTaskDAO, @NonNull SendTaskHandler sendTaskHandler, @NonNull TimedTask timedTask, int maxTasks, String serverId)
 	{
 		this.transactionManager = transactionManager;
-		this.ebMSEventDAO = ebMSEventDAO;
-		this.eventHandler = eventHandler;
+		this.sendTaskDAO = sendTaskDAO;
+		this.sendTaskHandler = sendTaskHandler;
 		this.timedTask = timedTask;
-		this.maxEvents = maxEvents;
+		this.maxTasks = maxTasks;
 		this.serverId = serverId;
 		val executor = new ThreadPoolTaskExecutor();
 		executor.setDaemon(true);
@@ -71,9 +71,9 @@ class EventTaskExecutor implements Runnable
 				try
 				{
 					val timestamp = Instant.now();
-					val events = maxEvents > 0 ? ebMSEventDAO.getEventsBefore(timestamp,serverId,maxEvents) : ebMSEventDAO.getEventsBefore(timestamp,serverId);
-					for (EbMSEvent event : events)
-						futures.add(eventHandler.handleAsync(event));
+					val tasks = maxTasks > 0 ? sendTaskDAO.getTasksBefore(timestamp,serverId,maxTasks) : sendTaskDAO.getTasksBefore(timestamp,serverId);
+					for (SendTask task : tasks)
+						futures.add(sendTaskHandler.handleAsync(task));
 				}
 				catch (Exception e)
 				{

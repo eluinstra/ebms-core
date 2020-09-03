@@ -46,13 +46,13 @@ import nl.clockwork.ebms.cpa.CPAUtils;
 import nl.clockwork.ebms.dao.EbMSDAO;
 import nl.clockwork.ebms.event.listener.EbMSMessageEventDAO;
 import nl.clockwork.ebms.event.listener.EbMSMessageEventType;
-import nl.clockwork.ebms.event.processor.EventManager;
 import nl.clockwork.ebms.model.EbMSBaseMessage;
 import nl.clockwork.ebms.model.EbMSMessage;
 import nl.clockwork.ebms.model.EbMSMessageProperties;
 import nl.clockwork.ebms.model.EbMSStatusResponse;
 import nl.clockwork.ebms.processor.EbMSProcessingException;
 import nl.clockwork.ebms.processor.EbMSProcessorException;
+import nl.clockwork.ebms.send.SendTaskManager;
 import nl.clockwork.ebms.service.model.Message;
 import nl.clockwork.ebms.service.model.MTOMMessage;
 import nl.clockwork.ebms.service.model.MessageEvent;
@@ -84,7 +84,7 @@ class EbMSMessageServiceHandler
   @NonNull
 	EbMSMessageFactory ebMSMessageFactory;
   @NonNull
-	EventManager eventManager;
+	SendTaskManager sendTaskManager;
   @NonNull
 	MessagePropertiesValidator messagePropertiesValidator;
   @NonNull
@@ -345,7 +345,7 @@ class EbMSMessageServiceHandler
 			val persistTime = CPAUtils.getPersistTime(timestamp,receiveDeliveryChannel);
 			val confidential = cpaManager.isConfidential(messageHeader.getCPAId(),messageHeader.getFrom().getPartyId(),messageHeader.getFrom().getRole(),service,messageHeader.getAction());
 			ebMSDAO.insertMessage(timestamp,persistTime,document,message,message.getAttachments(),EbMSMessageStatus.CREATED);
-			eventManager.createEvent(messageHeader.getCPAId(),sendDeliveryChannel,receiveDeliveryChannel,messageHeader.getMessageData().getMessageId(),messageHeader.getMessageData().getTimeToLive(),messageHeader.getMessageData().getTimestamp(),confidential);
+			sendTaskManager.createTask(messageHeader.getCPAId(),sendDeliveryChannel,receiveDeliveryChannel,messageHeader.getMessageData().getMessageId(),messageHeader.getMessageData().getTimeToLive(),messageHeader.getMessageData().getTimestamp(),confidential);
 		}
 		catch (IllegalStateException | TransformerFactoryConfigurationError e)
 		{

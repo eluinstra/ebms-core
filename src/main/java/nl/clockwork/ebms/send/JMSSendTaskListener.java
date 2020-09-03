@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.clockwork.ebms.event.processor;
+package nl.clockwork.ebms.send;
 
 import java.time.Instant;
 
@@ -29,18 +29,18 @@ import lombok.experimental.FieldDefaults;
 
 @FieldDefaults(level = AccessLevel.PROTECTED, makeFinal = true)
 @AllArgsConstructor
-class EbMSSendEventListener implements MessageListener
+class JMSSendTaskListener implements MessageListener
 {
 	@NonNull
-	EventHandler eventHandler;
+	SendTaskHandler sendTaskHandler;
 
 	@Override
 	public void onMessage(Message message)
 	{
 		try
 		{
-			val event = createEvent(message);
-			eventHandler.handle(event);
+			val task = createSendTask(message);
+			sendTaskHandler.handle(task);
 		}
 		catch (JMSException e)
 		{
@@ -48,9 +48,9 @@ class EbMSSendEventListener implements MessageListener
 		}
 	}
 
-	private EbMSEvent createEvent(Message message) throws JMSException
+	private SendTask createSendTask(Message message) throws JMSException
 	{
-		val result = EbMSEvent.builder()
+		val result = SendTask.builder()
 				.cpaId(message.getStringProperty("cpaId"))
 				.sendDeliveryChannelId(message.getStringProperty("sendDeliveryChannelId"))
 				.receiveDeliveryChannelId(message.getStringProperty("receiveDeliveryChannelId"))

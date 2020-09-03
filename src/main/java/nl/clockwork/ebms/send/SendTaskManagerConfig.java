@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.clockwork.ebms.event.processor;
+package nl.clockwork.ebms.send;
 
 import javax.jms.ConnectionFactory;
 
@@ -32,16 +32,16 @@ import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import nl.clockwork.ebms.cpa.CPAManager;
 import nl.clockwork.ebms.dao.EbMSDAO;
-import nl.clockwork.ebms.event.processor.EventProcessorConfig.DefaultEventProcessorType;
-import nl.clockwork.ebms.event.processor.EventProcessorConfig.EventProcessorType;
-import nl.clockwork.ebms.event.processor.EventProcessorConfig.JmsEventProcessorType;
+import nl.clockwork.ebms.send.SendTaskHandlerConfig.DefaultTaskHandlerType;
+import nl.clockwork.ebms.send.SendTaskHandlerConfig.SendTaskHandlerType;
+import nl.clockwork.ebms.send.SendTaskHandlerConfig.JmsTaskHandlerType;
 
 @Configuration
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class EventManagerConfig
+public class SendTaskManagerConfig
 {
-	@Value("${eventProcessor.type}")
-	EventProcessorType eventProcessorType;
+	@Value("${taskHandler.type}")
+	SendTaskHandlerType sendTaskHandlerType;
 	@Autowired
 	CPAManager cpaManager;
 	@Value("${ebms.serverId}")
@@ -61,27 +61,27 @@ public class EventManagerConfig
 	SQLQueryFactory queryFactory;
 
 	@Bean
-	@Conditional(DefaultEventProcessorType.class)
-	public EventManager defaultEventManager()
+	@Conditional(DefaultTaskHandlerType.class)
+	public SendTaskManager defaultSendTaskManager()
 	{
-		return createDefaultEventManager();
+		return createDefaultSendTaskManager();
 	}
 
 	@Bean
-	@Conditional(JmsEventProcessorType.class)
-	public EventManager jmsEventManager()
+	@Conditional(JmsTaskHandlerType.class)
+	public SendTaskManager jmsSendTaskManager()
 	{
-		return new JMSEventManager(new JmsTemplate(connectionFactory),ebMSDAO,ebMSEventDAO(),cpaManager,nrAutoRetries,autoRetryInterval);
+		return new JMSSendTaskManager(new JmsTemplate(connectionFactory),ebMSDAO,sendTaskDAO(),cpaManager,nrAutoRetries,autoRetryInterval);
 	}
 
 	@Bean
-	public EbMSEventDAO ebMSEventDAO()
+	public SendTaskDAO sendTaskDAO()
 	{
-		return new EbMSEventDAOImpl(queryFactory);
+		return new SendTaskDAOImpl(queryFactory);
 	}
 
-	private EbMSEventManager createDefaultEventManager()
+	private DAOSendTaskManager createDefaultSendTaskManager()
 	{
-		return new EbMSEventManager(ebMSDAO,ebMSEventDAO(),cpaManager,serverId,nrAutoRetries,autoRetryInterval);
+		return new DAOSendTaskManager(ebMSDAO,sendTaskDAO(),cpaManager,serverId,nrAutoRetries,autoRetryInterval);
 	}
 }
