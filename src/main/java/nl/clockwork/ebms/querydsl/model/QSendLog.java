@@ -43,7 +43,7 @@ public class QSendLog extends com.querydsl.sql.RelationalPathBase<QSendLog> {
 
     public final StringPath messageId = createString("messageId");
 
-    public final EnumPath<nl.clockwork.ebms.send.SendTaskStatus> status = createEnum("status", nl.clockwork.ebms.send.SendTaskStatus.class);
+    public final EnumPath<nl.clockwork.ebms.task.SendTaskStatus> status = createEnum("status", nl.clockwork.ebms.task.SendTaskStatus.class);
 
     public final DateTimePath<java.time.Instant> timeStamp = createDateTime("timeStamp", java.time.Instant.class);
 

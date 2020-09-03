@@ -28,8 +28,8 @@ import nl.clockwork.ebms.client.DeliveryManager;
 import nl.clockwork.ebms.cpa.CPAManager;
 import nl.clockwork.ebms.dao.EbMSDAO;
 import nl.clockwork.ebms.event.MessageEventListener;
-import nl.clockwork.ebms.send.SendTaskManager;
 import nl.clockwork.ebms.signing.EbMSSignatureGenerator;
+import nl.clockwork.ebms.task.SendTaskManager;
 import nl.clockwork.ebms.validation.EbMSMessageValidator;
 
 @Configuration

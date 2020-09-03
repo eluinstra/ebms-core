@@ -52,7 +52,6 @@ import nl.clockwork.ebms.model.EbMSMessageProperties;
 import nl.clockwork.ebms.model.EbMSStatusResponse;
 import nl.clockwork.ebms.processor.EbMSProcessingException;
 import nl.clockwork.ebms.processor.EbMSProcessorException;
-import nl.clockwork.ebms.send.SendTaskManager;
 import nl.clockwork.ebms.service.model.Message;
 import nl.clockwork.ebms.service.model.MTOMMessage;
 import nl.clockwork.ebms.service.model.MessageEvent;
@@ -63,6 +62,7 @@ import nl.clockwork.ebms.service.model.MTOMMessageRequest;
 import nl.clockwork.ebms.service.model.MessageRequest;
 import nl.clockwork.ebms.service.model.MessageStatus;
 import nl.clockwork.ebms.signing.EbMSSignatureGenerator;
+import nl.clockwork.ebms.task.SendTaskManager;
 import nl.clockwork.ebms.util.StreamUtils;
 import nl.clockwork.ebms.validation.MessagePropertiesValidator;
 

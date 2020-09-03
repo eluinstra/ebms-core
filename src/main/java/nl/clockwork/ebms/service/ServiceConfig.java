@@ -29,7 +29,6 @@ import nl.clockwork.ebms.cpa.CertificateMapper;
 import nl.clockwork.ebms.cpa.URLMapper;
 import nl.clockwork.ebms.dao.EbMSDAO;
 import nl.clockwork.ebms.event.MessageEventDAO;
-import nl.clockwork.ebms.send.SendTaskManager;
 import nl.clockwork.ebms.service.cpa.CPAService;
 import nl.clockwork.ebms.service.cpa.CPAServiceImpl;
 import nl.clockwork.ebms.service.cpa.certificate.CertificateMappingService;
@@ -37,6 +36,7 @@ import nl.clockwork.ebms.service.cpa.certificate.CertificateMappingServiceImpl;
 import nl.clockwork.ebms.service.cpa.url.URLMappingService;
 import nl.clockwork.ebms.service.cpa.url.URLMappingServiceImpl;
 import nl.clockwork.ebms.signing.EbMSSignatureGenerator;
+import nl.clockwork.ebms.task.SendTaskManager;
 import nl.clockwork.ebms.validation.CPAValidator;
 import nl.clockwork.ebms.validation.MessagePropertiesValidator;
 

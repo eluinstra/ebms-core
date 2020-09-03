@@ -36,7 +36,7 @@ import nl.clockwork.ebms.model.EbMSBaseMessage;
 import nl.clockwork.ebms.model.EbMSDocument;
 import nl.clockwork.ebms.model.EbMSMessage;
 import nl.clockwork.ebms.model.EbMSMessageError;
-import nl.clockwork.ebms.send.SendTaskManager;
+import nl.clockwork.ebms.task.SendTaskManager;
 import nl.clockwork.ebms.util.DOMUtils;
 import nl.clockwork.ebms.util.StreamUtils;
 import nl.clockwork.ebms.validation.EbMSMessageValidator;

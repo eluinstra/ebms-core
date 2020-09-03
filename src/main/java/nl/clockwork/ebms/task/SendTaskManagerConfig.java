@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.clockwork.ebms.send;
+package nl.clockwork.ebms.task;
 
 import javax.jms.ConnectionFactory;
 
@@ -32,9 +32,9 @@ import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import nl.clockwork.ebms.cpa.CPAManager;
 import nl.clockwork.ebms.dao.EbMSDAO;
-import nl.clockwork.ebms.send.SendTaskHandlerConfig.DefaultTaskHandlerType;
-import nl.clockwork.ebms.send.SendTaskHandlerConfig.SendTaskHandlerType;
-import nl.clockwork.ebms.send.SendTaskHandlerConfig.JmsTaskHandlerType;
+import nl.clockwork.ebms.task.SendTaskHandlerConfig.DefaultTaskHandlerType;
+import nl.clockwork.ebms.task.SendTaskHandlerConfig.JmsTaskHandlerType;
+import nl.clockwork.ebms.task.SendTaskHandlerConfig.SendTaskHandlerType;
 
 @Configuration
 @FieldDefaults(level = AccessLevel.PRIVATE)

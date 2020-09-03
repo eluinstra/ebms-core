@@ -22,7 +22,7 @@ import java.sql.SQLException;
 import com.querydsl.sql.types.AbstractType;
 
 import lombok.val;
-import nl.clockwork.ebms.send.SendTaskStatus;
+import nl.clockwork.ebms.task.SendTaskStatus;
 
 public class SendTaskStatusType extends AbstractType<SendTaskStatus>
 {
