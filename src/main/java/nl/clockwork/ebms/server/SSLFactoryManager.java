@@ -15,8 +15,14 @@
  */
 package nl.clockwork.ebms.server;
 
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.security.UnrecoverableKeyException;
+
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLEngine;
 import javax.net.ssl.SSLParameters;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManagerFactory;
@@ -58,24 +64,44 @@ class SSLFactoryManager
 		this.enabledProtocols = enabledProtocols == null ? new String[]{} : enabledProtocols;
 		this.enabledCipherSuites = enabledCipherSuites == null ? new String[]{} : enabledCipherSuites;
 		this.requireClientAuthentication = requireClientAuthentication;
-		//KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
-		val kmf = KeyManagerFactory.getInstance("SunX509");
-		kmf.init(keyStore.getKeyStore(),keyStore.getKeyPassword().toCharArray());
-
-		//TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
-		val tmf = TrustManagerFactory.getInstance("SunX509");
-		tmf.init(trustStore.getKeyStore());
-
-		val sslContext = SSLContext.getInstance("TLS");
-		sslContext.init(kmf.getKeyManagers(),tmf.getTrustManagers(),null);
-
-		//val engine = sslContext.createSSLEngine(hostname,port);
-		val engine = sslContext.createSSLEngine();
-		engine.setUseClientMode(false);
-		engine.setSSLParameters(createSSLParameters());
-		engine.setNeedClientAuth(requireClientAuthentication);
-
+		val kmf = createKeyManagerFactory(keyStore);
+		val tmf = createTrustManagerFactory(trustStore);
+		val sslContext = createSSLContext(kmf,tmf);
+		createEngine(requireClientAuthentication,sslContext);
 		sslSocketFactory = sslContext.getSocketFactory();
+	}
+
+	private KeyManagerFactory createKeyManagerFactory(EbMSKeyStore keyStore) throws NoSuchAlgorithmException, KeyStoreException, UnrecoverableKeyException
+	{
+		//KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
+		val result = KeyManagerFactory.getInstance("SunX509");
+		result.init(keyStore.getKeyStore(),keyStore.getKeyPassword().toCharArray());
+		return result;
+	}
+
+	private TrustManagerFactory createTrustManagerFactory(EbMSTrustStore trustStore) throws NoSuchAlgorithmException, KeyStoreException
+	{
+		//TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+		val result = TrustManagerFactory.getInstance("SunX509");
+		result.init(trustStore.getKeyStore());
+		return result;
+	}
+
+	private SSLContext createSSLContext(final KeyManagerFactory kmf, final TrustManagerFactory tmf) throws NoSuchAlgorithmException, KeyManagementException
+	{
+		val result = SSLContext.getInstance("TLS");
+		result.init(kmf.getKeyManagers(),tmf.getTrustManagers(),null);
+		return result;
+	}
+
+	private SSLEngine createEngine(boolean requireClientAuthentication, final SSLContext sslContext)
+	{
+		//val result = sslContext.createSSLEngine(hostname,port);
+		val result = sslContext.createSSLEngine();
+		result.setUseClientMode(false);
+		result.setSSLParameters(createSSLParameters());
+		result.setNeedClientAuth(requireClientAuthentication);
+		return result;
 	}
 
 	private SSLParameters createSSLParameters()
@@ -88,5 +114,4 @@ class SSLFactoryManager
 		result.setNeedClientAuth(requireClientAuthentication);
 		return result;
 	}
-
 }

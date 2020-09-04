@@ -20,14 +20,19 @@ import java.io.InputStream;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
 import java.security.Principal;
 import java.security.PrivateKey;
+import java.security.UnrecoverableKeyException;
 import java.security.cert.X509Certificate;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLEngine;
 import javax.net.ssl.SSLParameters;
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
@@ -197,31 +202,60 @@ public class SSLFactoryManager
 		this.verifyHostnames = verifyHostnames;
 		this.enabledProtocols = enabledProtocols == null ? new String[]{} : enabledProtocols;
 		this.enabledCipherSuites = enabledCipherSuites == null ? new String[]{} : enabledCipherSuites;
-		//KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
-		val kmf = KeyManagerFactory.getInstance("SunX509");
-		kmf.init(keyStore.getKeyStore(),keyStore.getKeyPassword().toCharArray());
-
-		val keyManagers = kmf.getKeyManagers();
-		for (var i = 0; i < keyManagers.length; i++)
-			if (keyManagers[i] instanceof X509KeyManager)
-				keyManagers[i] = new EbMSX509KeyManager((X509KeyManager)keyManagers[i],clientAlias);
-
-		//TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
-		val tmf = TrustManagerFactory.getInstance("SunX509");
-		tmf.init(trustStore.getKeyStore());
-
-		val sslContext = SSLContext.getInstance("TLS");
-		sslContext.init(kmf.getKeyManagers(),tmf.getTrustManagers(),null);
-
-		//val engine = sslContext.createSSLEngine(hostname,port);
-		val engine = sslContext.createSSLEngine();
-		engine.setUseClientMode(true);
-		//engine.setSSLParameters(createSSLParameters());
-
+		val kmf = createKeyManagerFactory(keyStore);
+		setClientAlias(kmf,clientAlias);
+		val tmf = createTrustManagerFactory(trustStore);
+		val sslContext = createSSLContext(kmf,tmf);
+		createEngine(sslContext);
 		//sslSocketFactory = sslContext.getSocketFactory();
 		sslSocketFactory = new SSLSocketFactoryWrapper(sslContext.getSocketFactory(),createSSLParameters());
 	}
 
+	public HostnameVerifier getHostnameVerifier(HttpsURLConnection connection)
+	{
+		return verifyHostnames ? HttpsURLConnection.getDefaultHostnameVerifier() : (h,s) -> true;
+	}
+	
+	private KeyManagerFactory createKeyManagerFactory(EbMSKeyStore keyStore) throws NoSuchAlgorithmException, KeyStoreException, UnrecoverableKeyException
+	{
+		//KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
+		val result = KeyManagerFactory.getInstance("SunX509");
+		result.init(keyStore.getKeyStore(),keyStore.getKeyPassword().toCharArray());
+		return result;
+	}
+
+	private KeyManagerFactory setClientAlias(final KeyManagerFactory kmf, String clientAlias)
+	{
+		val keyManagers = kmf.getKeyManagers();
+		for (var i = 0; i < keyManagers.length; i++)
+			if (keyManagers[i] instanceof X509KeyManager)
+				keyManagers[i] = new EbMSX509KeyManager((X509KeyManager)keyManagers[i],clientAlias);
+		return kmf;
+	}
+
+	private TrustManagerFactory createTrustManagerFactory(EbMSTrustStore trustStore) throws NoSuchAlgorithmException, KeyStoreException
+	{
+		//TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+		val result = TrustManagerFactory.getInstance("SunX509");
+		result.init(trustStore.getKeyStore());
+		return result;
+	}
+
+	private SSLContext createSSLContext(final KeyManagerFactory kmf, final TrustManagerFactory tmf) throws NoSuchAlgorithmException, KeyManagementException
+	{
+		val result = SSLContext.getInstance("TLS");
+		result.init(kmf.getKeyManagers(),tmf.getTrustManagers(),null);
+		return result;
+	}
+
+	private SSLEngine createEngine(final javax.net.ssl.SSLContext sslContext)
+	{
+		//val result = sslContext.createSSLEngine(hostname,port);
+		val result = sslContext.createSSLEngine();
+		result.setUseClientMode(true);
+		//result.setSSLParameters(createSSLParameters());
+		return result;
+	}
 	
 	private SSLParameters createSSLParameters()
 	{
@@ -232,10 +266,4 @@ public class SSLFactoryManager
 			result.setCipherSuites(enabledCipherSuites);
 		return result;
 	}
-
-	public HostnameVerifier getHostnameVerifier(HttpsURLConnection connection)
-	{
-		return verifyHostnames ? HttpsURLConnection.getDefaultHostnameVerifier() : (h,s) -> true;
-	}
-	
 }

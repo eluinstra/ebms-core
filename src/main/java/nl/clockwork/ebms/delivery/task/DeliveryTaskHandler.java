@@ -93,7 +93,7 @@ class DeliveryTaskHandler
 		Runnable runnable = () ->
 		{
 			if (task.getTimeToLive() == null || Instant.now().isBefore(task.getTimeToLive()))
-				deliveryTask(task);
+				sendTask(task);
 			else
 				expireTask(task);
 		};
@@ -103,18 +103,11 @@ class DeliveryTaskHandler
 	@Async("deliveryTaskExecutor")
 	public Future<Void> handleAsync(DeliveryTask task)
 	{
-		Runnable runnable = () ->
-		{
-			if (task.getTimeToLive() == null || Instant.now().isBefore(task.getTimeToLive()))
-				deliveryTask(task);
-			else
-				expireTask(task);
-		};
-		timedTask.run(runnable);
+		handle(task);
 		return AsyncResult.forValue(null);
 	}
 
-	private void deliveryTask(final DeliveryTask task)
+	private void sendTask(final DeliveryTask task)
 	{
 		val status = transactionManager.getTransaction(null);
 		try
@@ -128,7 +121,7 @@ class DeliveryTaskHandler
 			if (!requestDocument.isPresent())
 				deliveryTaskManager.deleteTask(task.getMessageId());
 			transactionManager.commit(status);
-			requestDocument.ifPresent(d -> deliveryTask(task,receiveDeliveryChannel,url,d));
+			requestDocument.ifPresent(d -> sendTask(task,receiveDeliveryChannel,url,d));
 		}
 		catch(Exception e)
 		{
@@ -138,7 +131,7 @@ class DeliveryTaskHandler
 		}
 	}
 
-	private void deliveryTask(DeliveryTask task, DeliveryChannel receiveDeliveryChannel, String url, EbMSDocument requestDocument)
+	private void sendTask(DeliveryTask task, DeliveryChannel receiveDeliveryChannel, String url, EbMSDocument requestDocument)
 	{
 		try
 		{
