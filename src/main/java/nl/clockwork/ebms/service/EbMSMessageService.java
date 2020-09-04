@@ -41,8 +41,8 @@ public interface EbMSMessageService
 	 * @param toPartyId
 	 * @throws EbMSMessageServiceException
 	 */
-	@WebMethod(operationName = "Ping")
-	void ping(@WebParam(name = "CPAId") @XmlElement(required = true) String cpaId, @WebParam(name = "FromPartyId") @XmlElement(required = true) String fromPartyId, @WebParam(name = "ToPartyId") @XmlElement(required = true) String toPartyId) throws EbMSMessageServiceException;
+	@WebMethod(operationName = "ping")
+	void ping(@WebParam(name = "cpaId") @XmlElement(required = true) String cpaId, @WebParam(name = "fromPartyId") @XmlElement(required = true) String fromPartyId, @WebParam(name = "toPartyId") @XmlElement(required = true) String toPartyId) throws EbMSMessageServiceException;
 
 	/**
 	 * Sends the message content message as an EbMS message
@@ -51,9 +51,9 @@ public interface EbMSMessageService
 	 * @return The messageId of the generated EbMS message
 	 * @throws EbMSMessageServiceException
 	 */
-	@WebResult(name = "MessageId")
-	@WebMethod(operationName = "SendMessage")
-	String sendMessage(@WebParam(name = "Message") @XmlElement(required = true) MessageRequest messageRequest) throws EbMSMessageServiceException;
+	@WebResult(name = "messageId")
+	@WebMethod(operationName = "sendMessage")
+	String sendMessage(@WebParam(name = "message") @XmlElement(required = true) MessageRequest messageRequest) throws EbMSMessageServiceException;
 
 	/**
 	 * Sends the message content message as an EbMS message using MTOM/XOP.
@@ -70,9 +70,9 @@ public interface EbMSMessageService
 	 * @return The messageId of the generated EbMS message
 	 * @throws EbMSMessageServiceException
 	 */
-	@WebResult(name = "MessageId")
-	@WebMethod(operationName = "ResendMessage")
-	String resendMessage(@WebParam(name = "MessageId") @XmlElement(required = true) String messageId) throws EbMSMessageServiceException;
+	@WebResult(name = "messageId")
+	@WebMethod(operationName = "resendMessage")
+	String resendMessage(@WebParam(name = "messageId") @XmlElement(required = true) String messageId) throws EbMSMessageServiceException;
 
 	/**
 	 * Gets all messageIds of messages with the RECEIVED status that satisfy the filter messageFilter. If maxNr is given, then maxNr messageIds are returned
@@ -82,9 +82,9 @@ public interface EbMSMessageService
 	 * @return The list of messageIds
 	 * @throws EbMSMessageServiceException
 	 */
-	@WebResult(name = "MessageId")
-	@WebMethod(operationName = "GetUnprocessedMessageIds")
-	List<String> getUnprocessedMessageIds(@WebParam(name = "MessageFilter") @XmlElement(required = true) MessageFilter messageFilter, @WebParam(name = "MaxNr") Integer maxNr) throws EbMSMessageServiceException;
+	@WebResult(name = "messageId")
+	@WebMethod(operationName = "getUnprocessedMessageIds")
+	List<String> getUnprocessedMessageIds(@WebParam(name = "messageFilter") MessageFilter messageFilter, @WebParam(name = "maxNr") Integer maxNr) throws EbMSMessageServiceException;
 
 	/**
 	 * Gets the message content of the message identified by messageId. If process is true, the message is given the status PROCESSED, which means that it is no
@@ -95,9 +95,9 @@ public interface EbMSMessageService
 	 * @return The message
 	 * @throws EbMSMessageServiceException
 	 */
-	@WebResult(name = "Message")
-	@WebMethod(operationName = "GetMessage")
-	Message getMessage(@WebParam(name = "MessageId") @XmlElement(required = true) String messageId, @WebParam(name = "Process") Boolean process) throws EbMSMessageServiceException;
+	@WebResult(name = "message")
+	@WebMethod(operationName = "getMessage")
+	Message getMessage(@WebParam(name = "messageId") @XmlElement(required = true) String messageId, @WebParam(name = "process") Boolean process) throws EbMSMessageServiceException;
 
 	/**
 	 * Sets the status of the message identified by messageId to PROCESSED, so that it is no longer returned in the list of getUnprocessedMessageIds
@@ -105,8 +105,8 @@ public interface EbMSMessageService
 	 * @param messageId
 	 * @throws EbMSMessageServiceException
 	 */
-	@WebMethod(operationName = "ProcessMessage")
-	void processMessage(@WebParam(name = "MessageId") @XmlElement(required = true) String messageId) throws EbMSMessageServiceException;
+	@WebMethod(operationName = "processMessage")
+	void processMessage(@WebParam(name = "messageId") @XmlElement(required = true) String messageId) throws EbMSMessageServiceException;
 
 	/**
 	 * Gets the message status of the message identified by messageId
@@ -115,9 +115,9 @@ public interface EbMSMessageService
 	 * @return The message status
 	 * @throws EbMSMessageServiceException
 	 */
-	@WebResult(name = "MessageStatus")
-	@WebMethod(operationName = "GetMessageStatus")
-	MessageStatus getMessageStatus(@WebParam(name = "MessageId") @XmlElement(required = true) String messageId) throws EbMSMessageServiceException;
+	@WebResult(name = "messageStatus")
+	@WebMethod(operationName = "getMessageStatus")
+	MessageStatus getMessageStatus(@WebParam(name = "messageId") @XmlElement(required = true) String messageId) throws EbMSMessageServiceException;
 
 	/**
 	 * Gets the events that satisfy the messageFilter filter and the eventTypes eventTypes. If maxNr is included, then maxNr events are returned. The possible
@@ -130,9 +130,9 @@ public interface EbMSMessageService
 	 * @return The list of events
 	 * @throws EbMSMessageServiceException
 	 */
-	@WebResult(name = "MessageEvent")
-	@WebMethod(operationName = "GetUnprocessedMessageEvents")
-	List<MessageEvent> getUnprocessedMessageEvents(@WebParam(name = "MessageFilter") @XmlElement(required = true) MessageFilter messageFilter, @WebParam(name = "EventType") @XmlElement(required = true) MessageEventType[] eventTypes, @WebParam(name = "MaxNr") Integer maxNr) throws EbMSMessageServiceException;
+	@WebResult(name = "messageEvent")
+	@WebMethod(operationName = "getUnprocessedMessageEvents")
+	List<MessageEvent> getUnprocessedMessageEvents(@WebParam(name = "messageFilter") MessageFilter messageFilter, @WebParam(name = "eventType") MessageEventType[] eventTypes, @WebParam(name = "maxNr") Integer maxNr) throws EbMSMessageServiceException;
 
 	/**
 	 * Sets processed to true for all the current events for the message identified by messageId, so that it is no longer returned in the list of
@@ -141,7 +141,7 @@ public interface EbMSMessageService
 	 * @param messageId
 	 * @throws EbMSMessageServiceException
 	 */
-	@WebMethod(operationName = "ProcessMessageEvent")
-	void processMessageEvent(@WebParam(name = "MessageId") @XmlElement(required = true) String messageId) throws EbMSMessageServiceException;
+	@WebMethod(operationName = "processMessageEvent")
+	void processMessageEvent(@WebParam(name = "messageId") @XmlElement(required = true) String messageId) throws EbMSMessageServiceException;
 
 }

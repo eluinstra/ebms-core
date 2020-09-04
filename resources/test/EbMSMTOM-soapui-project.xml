@@ -1,270 +1,34 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<con:soapui-project id="b46fdc96-500b-420f-9518-1217997db555" activeEnvironment="Default" name="EbMSMTOM" resourceRoot="" soapui-version="5.5.0" abortOnError="false" runType="SEQUENTIAL" xmlns:con="http://eviware.com/soapui/config"><con:settings/><con:interface xsi:type="con:WsdlInterface" id="ad078522-c95e-41b9-91eb-c84854b02ccc" wsaVersion="NONE" name="EbMSMessageServiceImplServiceSoapBinding" type="wsdl" bindingName="{http://www.springframework.org/schema/beans}EbMSMessageServiceImplServiceSoapBinding" soapVersion="1_1" anonymous="optional" definition="http://localhost:8080/service/ebmsMTOM?wsdl" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:settings/><con:definitionCache type="TEXT" rootPart="http://localhost:8080/service/ebmsMTOM?wsdl"><con:part><con:url>http://localhost:8080/service/ebmsMTOM?wsdl</con:url><con:content><![CDATA[<wsdl:definitions name="EbMSMessageServiceImplService" targetNamespace="http://www.springframework.org/schema/beans" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:tns="http://www.springframework.org/schema/beans" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:ns2="http://schemas.xmlsoap.org/soap/http" xmlns:ns1="http://www.ordina.nl/ebms/2.17">
-  <wsdl:import location="http://localhost:8080/service/ebmsMTOM?wsdl=EbMSMessageService.wsdl" namespace="http://www.ordina.nl/ebms/2.17"></wsdl:import>
-  <wsdl:binding name="EbMSMessageServiceImplServiceSoapBinding" type="ns1:EbMSMessageService">
-    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
-    <wsdl:operation name="Ping">
-      <soap:operation soapAction="" style="document"/>
-      <wsdl:input name="Ping">
-        <soap:body use="literal"/>
-      </wsdl:input>
-      <wsdl:output name="PingResponse">
-        <soap:body use="literal"/>
-      </wsdl:output>
-      <wsdl:fault name="EbMSMessageServiceException">
-        <soap:fault name="EbMSMessageServiceException" use="literal"/>
-      </wsdl:fault>
-    </wsdl:operation>
-    <wsdl:operation name="ProcessMessage">
-      <soap:operation soapAction="" style="document"/>
-      <wsdl:input name="ProcessMessage">
-        <soap:body use="literal"/>
-      </wsdl:input>
-      <wsdl:output name="ProcessMessageResponse">
-        <soap:body use="literal"/>
-      </wsdl:output>
-      <wsdl:fault name="EbMSMessageServiceException">
-        <soap:fault name="EbMSMessageServiceException" use="literal"/>
-      </wsdl:fault>
-    </wsdl:operation>
-    <wsdl:operation name="ResendMessage">
-      <soap:operation soapAction="" style="document"/>
-      <wsdl:input name="ResendMessage">
-        <soap:body use="literal"/>
-      </wsdl:input>
-      <wsdl:output name="ResendMessageResponse">
-        <soap:body use="literal"/>
-      </wsdl:output>
-      <wsdl:fault name="EbMSMessageServiceException">
-        <soap:fault name="EbMSMessageServiceException" use="literal"/>
-      </wsdl:fault>
-    </wsdl:operation>
-    <wsdl:operation name="GetMessage">
-      <soap:operation soapAction="" style="document"/>
-      <wsdl:input name="GetMessage">
-        <soap:body use="literal"/>
-      </wsdl:input>
-      <wsdl:output name="GetMessageResponse">
-        <soap:body use="literal"/>
-      </wsdl:output>
-      <wsdl:fault name="EbMSMessageServiceException">
-        <soap:fault name="EbMSMessageServiceException" use="literal"/>
-      </wsdl:fault>
-    </wsdl:operation>
-    <wsdl:operation name="ProcessMessageEvent">
-      <soap:operation soapAction="" style="document"/>
-      <wsdl:input name="ProcessMessageEvent">
-        <soap:body use="literal"/>
-      </wsdl:input>
-      <wsdl:output name="ProcessMessageEventResponse">
-        <soap:body use="literal"/>
-      </wsdl:output>
-      <wsdl:fault name="EbMSMessageServiceException">
-        <soap:fault name="EbMSMessageServiceException" use="literal"/>
-      </wsdl:fault>
-    </wsdl:operation>
-    <wsdl:operation name="GetMessageEvents">
-      <soap:operation soapAction="" style="document"/>
-      <wsdl:input name="GetMessageEvents">
-        <soap:body use="literal"/>
-      </wsdl:input>
-      <wsdl:output name="GetMessageEventsResponse">
-        <soap:body use="literal"/>
-      </wsdl:output>
-      <wsdl:fault name="EbMSMessageServiceException">
-        <soap:fault name="EbMSMessageServiceException" use="literal"/>
-      </wsdl:fault>
-    </wsdl:operation>
-    <wsdl:operation name="SendMessage">
-      <soap:operation soapAction="" style="document"/>
-      <wsdl:input name="SendMessage">
-        <soap:body use="literal"/>
-      </wsdl:input>
-      <wsdl:output name="SendMessageResponse">
-        <soap:body use="literal"/>
-      </wsdl:output>
-      <wsdl:fault name="EbMSMessageServiceException">
-        <soap:fault name="EbMSMessageServiceException" use="literal"/>
-      </wsdl:fault>
-    </wsdl:operation>
-    <wsdl:operation name="GetMessageIds">
-      <soap:operation soapAction="" style="document"/>
-      <wsdl:input name="GetMessageIds">
-        <soap:body use="literal"/>
-      </wsdl:input>
-      <wsdl:output name="GetMessageIdsResponse">
-        <soap:body use="literal"/>
-      </wsdl:output>
-      <wsdl:fault name="EbMSMessageServiceException">
-        <soap:fault name="EbMSMessageServiceException" use="literal"/>
-      </wsdl:fault>
-    </wsdl:operation>
-    <wsdl:operation name="GetMessageStatus">
-      <soap:operation soapAction="" style="document"/>
-      <wsdl:input name="GetMessageStatus">
-        <soap:body use="literal"/>
-      </wsdl:input>
-      <wsdl:output name="GetMessageStatusResponse">
-        <soap:body use="literal"/>
-      </wsdl:output>
-      <wsdl:fault name="EbMSMessageServiceException">
-        <soap:fault name="EbMSMessageServiceException" use="literal"/>
-      </wsdl:fault>
-    </wsdl:operation>
-  </wsdl:binding>
-  <wsdl:service name="EbMSMessageServiceImplService">
-    <wsdl:port binding="tns:EbMSMessageServiceImplServiceSoapBinding" name="EbMSMessageServiceImplPort">
-      <soap:address location="http://localhost:8080/service/ebmsMTOM"/>
-    </wsdl:port>
-  </wsdl:service>
-</wsdl:definitions>]]></con:content><con:type>http://schemas.xmlsoap.org/wsdl/</con:type></con:part><con:part><con:url>http://localhost:8080/service/ebmsMTOM?wsdl=EbMSMessageService.wsdl</con:url><con:content><![CDATA[<wsdl:definitions name="EbMSMessageService" targetNamespace="http://www.ordina.nl/ebms/2.17" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:ns1="http://www.ordina.nl/ebms/2.17">
+<con:soapui-project id="b46fdc96-500b-420f-9518-1217997db555" activeEnvironment="Default" name="EbMSMTOM" resourceRoot="" soapui-version="5.5.0" abortOnError="false" runType="SEQUENTIAL" xmlns:con="http://eviware.com/soapui/config"><con:settings/><con:interface xsi:type="con:WsdlInterface" id="ad078522-c95e-41b9-91eb-c84854b02ccc" wsaVersion="NONE" name="EbMSMessageServiceSoapBinding" type="wsdl" bindingName="{http://www.ordina.nl/ebms/2.18}EbMSMessageServiceSoapBinding" soapVersion="1_1" anonymous="optional" definition="http://localhost:8080/service/ebmsMTOM?wsdl" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:settings/><con:definitionCache type="TEXT" rootPart="http://localhost:8080/service/ebmsMTOM?wsdl"><con:part><con:url>http://localhost:8080/service/ebmsMTOM?wsdl</con:url><con:content><![CDATA[<wsdl:definitions name="EbMSMessageService" targetNamespace="http://www.ordina.nl/ebms/2.18" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:tns="http://www.ordina.nl/ebms/2.18" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:ns1="http://schemas.xmlsoap.org/soap/http">
   <wsdl:types>
-    <xs:schema attributeFormDefault="unqualified" elementFormDefault="unqualified" targetNamespace="http://www.ordina.nl/ebms/2.17" version="1.0" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xmime="http://www.w3.org/2005/05/xmlmime" xmlns:tns="http://www.ordina.nl/ebms/2.17">
+    <xs:schema attributeFormDefault="unqualified" elementFormDefault="unqualified" targetNamespace="http://www.ordina.nl/ebms/2.18" version="1.0" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xmime="http://www.w3.org/2005/05/xmlmime">
       <xs:import namespace="http://www.w3.org/2005/05/xmlmime"/>
-      <xs:element name="GetMessage" type="tns:GetMessage"/>
-      <xs:element name="GetMessageEvents" type="tns:GetMessageEvents"/>
-      <xs:element name="GetMessageEventsResponse" type="tns:GetMessageEventsResponse"/>
-      <xs:element name="GetMessageIds" type="tns:GetMessageIds"/>
-      <xs:element name="GetMessageIdsResponse" type="tns:GetMessageIdsResponse"/>
-      <xs:element name="GetMessageResponse" type="tns:GetMessageResponse"/>
-      <xs:element name="GetMessageStatus" type="tns:GetMessageStatus"/>
-      <xs:element name="GetMessageStatusResponse" type="tns:GetMessageStatusResponse"/>
-      <xs:element name="Ping" type="tns:Ping"/>
-      <xs:element name="PingResponse" type="tns:PingResponse"/>
-      <xs:element name="ProcessMessage" type="tns:ProcessMessage"/>
-      <xs:element name="ProcessMessageEvent" type="tns:ProcessMessageEvent"/>
-      <xs:element name="ProcessMessageEventResponse" type="tns:ProcessMessageEventResponse"/>
-      <xs:element name="ProcessMessageResponse" type="tns:ProcessMessageResponse"/>
-      <xs:element name="ResendMessage" type="tns:ResendMessage"/>
-      <xs:element name="ResendMessageResponse" type="tns:ResendMessageResponse"/>
-      <xs:element name="SendMessage" type="tns:SendMessage"/>
-      <xs:element name="SendMessageResponse" type="tns:SendMessageResponse"/>
-      <xs:complexType name="Ping">
-        <xs:sequence>
-          <xs:element name="CPAId" type="xs:string"/>
-          <xs:element name="FromPartyId" type="xs:string"/>
-          <xs:element name="ToPartyId" type="xs:string"/>
-        </xs:sequence>
-      </xs:complexType>
-      <xs:complexType name="PingResponse">
-        <xs:sequence/>
-      </xs:complexType>
-      <xs:complexType name="ProcessMessage">
-        <xs:sequence>
-          <xs:element name="MessageId" type="xs:string"/>
-        </xs:sequence>
-      </xs:complexType>
-      <xs:complexType name="ProcessMessageResponse">
-        <xs:sequence/>
-      </xs:complexType>
-      <xs:complexType name="ResendMessage">
-        <xs:sequence>
-          <xs:element name="MessageId" type="xs:string"/>
-        </xs:sequence>
-      </xs:complexType>
-      <xs:complexType name="ResendMessageResponse">
-        <xs:sequence>
-          <xs:element minOccurs="0" name="MessageId" type="xs:string"/>
-        </xs:sequence>
-      </xs:complexType>
-      <xs:complexType name="GetMessage">
-        <xs:sequence>
-          <xs:element name="MessageId" type="xs:string"/>
-          <xs:element minOccurs="0" name="Process" type="xs:boolean"/>
-        </xs:sequence>
-      </xs:complexType>
-      <xs:complexType name="GetMessageResponse">
-        <xs:sequence>
-          <xs:element minOccurs="0" name="Message" type="tns:EbMSMessageContent"/>
-        </xs:sequence>
-      </xs:complexType>
-      <xs:complexType name="EbMSMessageContent">
-        <xs:sequence>
-          <xs:element name="context" type="tns:ebMSMessageContext"/>
-          <xs:element maxOccurs="unbounded" minOccurs="0" name="dataSource" type="tns:EbMSDataSource"/>
-        </xs:sequence>
-      </xs:complexType>
-      <xs:complexType name="ebMSMessageContext">
-        <xs:sequence>
-          <xs:element minOccurs="0" name="cpaId" type="xs:string"/>
-          <xs:element minOccurs="0" name="fromParty" type="tns:party"/>
-          <xs:element minOccurs="0" name="toParty" type="tns:party"/>
-          <xs:element minOccurs="0" name="service" type="xs:string"/>
-          <xs:element minOccurs="0" name="action" type="xs:string"/>
-          <xs:element minOccurs="0" name="timestamp" type="xs:dateTime"/>
-          <xs:element minOccurs="0" name="conversationId" type="xs:string"/>
-          <xs:element minOccurs="0" name="messageId" type="xs:string"/>
-          <xs:element minOccurs="0" name="refToMessageId" type="xs:string"/>
-          <xs:element minOccurs="0" name="messageStatus" type="tns:ebMSMessageStatus"/>
-        </xs:sequence>
-      </xs:complexType>
-      <xs:complexType name="party">
-        <xs:sequence>
-          <xs:element name="partyId" type="xs:string"/>
-          <xs:element minOccurs="0" name="role" type="xs:string"/>
-        </xs:sequence>
-      </xs:complexType>
-      <xs:complexType name="EbMSDataSource">
-        <xs:sequence>
-          <xs:element minOccurs="0" name="contentId" type="xs:string"/>
-          <xs:element name="attachment" type="xs:base64Binary" xmime:expectedContentTypes="application/octet-stream"/>
-        </xs:sequence>
-      </xs:complexType>
-      <xs:complexType name="ProcessMessageEvent">
-        <xs:sequence>
-          <xs:element name="MessageId" type="xs:string"/>
-        </xs:sequence>
-      </xs:complexType>
-      <xs:complexType name="ProcessMessageEventResponse">
-        <xs:sequence/>
-      </xs:complexType>
-      <xs:complexType name="GetMessageEvents">
-        <xs:sequence>
-          <xs:element name="MessageContext" type="tns:ebMSMessageContext"/>
-          <xs:element maxOccurs="unbounded" name="EventType" type="tns:ebMSMessageEventType"/>
-          <xs:element minOccurs="0" name="MaxNr" type="xs:int"/>
-        </xs:sequence>
-      </xs:complexType>
-      <xs:complexType name="GetMessageEventsResponse">
-        <xs:sequence>
-          <xs:element maxOccurs="unbounded" minOccurs="0" name="MessageEvents" type="tns:ebMSMessageEvent"/>
-        </xs:sequence>
-      </xs:complexType>
-      <xs:complexType name="ebMSMessageEvent">
+      <xs:element name="getMessage" type="tns:getMessage"/>
+      <xs:element name="getMessageResponse" type="tns:getMessageResponse"/>
+      <xs:element name="getMessageStatus" type="tns:getMessageStatus"/>
+      <xs:element name="getMessageStatusResponse" type="tns:getMessageStatusResponse"/>
+      <xs:element name="getUnprocessedMessageEvents" type="tns:getUnprocessedMessageEvents"/>
+      <xs:element name="getUnprocessedMessageEventsResponse" type="tns:getUnprocessedMessageEventsResponse"/>
+      <xs:element name="getUnprocessedMessageIds" type="tns:getUnprocessedMessageIds"/>
+      <xs:element name="getUnprocessedMessageIdsResponse" type="tns:getUnprocessedMessageIdsResponse"/>
+      <xs:element name="ping" type="tns:ping"/>
+      <xs:element name="pingResponse" type="tns:pingResponse"/>
+      <xs:element name="processMessage" type="tns:processMessage"/>
+      <xs:element name="processMessageEvent" type="tns:processMessageEvent"/>
+      <xs:element name="processMessageEventResponse" type="tns:processMessageEventResponse"/>
+      <xs:element name="processMessageResponse" type="tns:processMessageResponse"/>
+      <xs:element name="resendMessage" type="tns:resendMessage"/>
+      <xs:element name="resendMessageResponse" type="tns:resendMessageResponse"/>
+      <xs:element name="sendMessage" type="tns:sendMessage"/>
+      <xs:element name="sendMessageResponse" type="tns:sendMessageResponse"/>
+      <xs:complexType name="getMessageStatus">
         <xs:sequence>
           <xs:element name="messageId" type="xs:string"/>
-          <xs:element name="type" type="tns:ebMSMessageEventType"/>
         </xs:sequence>
       </xs:complexType>
-      <xs:complexType name="SendMessage">
+      <xs:complexType name="getMessageStatusResponse">
         <xs:sequence>
-          <xs:element name="Message" type="tns:EbMSMessageContent"/>
-        </xs:sequence>
-      </xs:complexType>
-      <xs:complexType name="SendMessageResponse">
-        <xs:sequence>
-          <xs:element minOccurs="0" name="MessageId" type="xs:string"/>
-        </xs:sequence>
-      </xs:complexType>
-      <xs:complexType name="GetMessageIds">
-        <xs:sequence>
-          <xs:element name="MessageContext" type="tns:ebMSMessageContext"/>
-          <xs:element minOccurs="0" name="MaxNr" type="xs:int"/>
-        </xs:sequence>
-      </xs:complexType>
-      <xs:complexType name="GetMessageIdsResponse">
-        <xs:sequence>
-          <xs:element maxOccurs="unbounded" minOccurs="0" name="MessageIds" type="xs:string"/>
-        </xs:sequence>
-      </xs:complexType>
-      <xs:complexType name="GetMessageStatus">
-        <xs:sequence>
-          <xs:element name="MessageId" type="xs:string"/>
-        </xs:sequence>
-      </xs:complexType>
-      <xs:complexType name="GetMessageStatusResponse">
-        <xs:sequence>
-          <xs:element minOccurs="0" name="MessageStatus" type="tns:messageStatus"/>
+          <xs:element minOccurs="0" name="messageStatus" type="tns:messageStatus"/>
         </xs:sequence>
       </xs:complexType>
       <xs:complexType name="messageStatus">
@@ -274,6 +38,154 @@
         </xs:sequence>
       </xs:complexType>
       <xs:complexType final="extension restriction" name="instant">
+        <xs:sequence/>
+      </xs:complexType>
+      <xs:complexType name="getUnprocessedMessageEvents">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="messageFilter" type="tns:messageFilter"/>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="eventType" type="tns:messageEventType"/>
+          <xs:element minOccurs="0" name="maxNr" type="xs:int"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="messageFilter">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="cpaId" type="xs:string"/>
+          <xs:element minOccurs="0" name="fromParty" type="tns:party"/>
+          <xs:element minOccurs="0" name="toParty" type="tns:party"/>
+          <xs:element minOccurs="0" name="service" type="xs:string"/>
+          <xs:element minOccurs="0" name="action" type="xs:string"/>
+          <xs:element minOccurs="0" name="conversationId" type="xs:string"/>
+          <xs:element minOccurs="0" name="messageId" type="xs:string"/>
+          <xs:element minOccurs="0" name="refToMessageId" type="xs:string"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="party">
+        <xs:sequence>
+          <xs:element name="partyId" type="xs:string"/>
+          <xs:element name="role" type="xs:string"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="getUnprocessedMessageEventsResponse">
+        <xs:sequence>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="messageEvents" type="tns:messageEvent"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="messageEvent">
+        <xs:sequence>
+          <xs:element name="messageId" type="xs:string"/>
+          <xs:element name="type" type="tns:messageEventType"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="getMessage">
+        <xs:sequence>
+          <xs:element name="messageId" type="xs:string"/>
+          <xs:element minOccurs="0" name="process" type="xs:boolean"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="getMessageResponse">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="message" type="tns:Message"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="Message">
+        <xs:sequence>
+          <xs:element name="properties" type="tns:messageProperties"/>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="dataSource" type="tns:DataSource"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="messageProperties">
+        <xs:sequence>
+          <xs:element name="cpaId" type="xs:string"/>
+          <xs:element name="fromParty" type="tns:party"/>
+          <xs:element name="toParty" type="tns:party"/>
+          <xs:element name="service" type="xs:string"/>
+          <xs:element name="action" type="xs:string"/>
+          <xs:element name="timestamp" type="xs:dateTime"/>
+          <xs:element name="conversationId" type="xs:string"/>
+          <xs:element name="messageId" type="xs:string"/>
+          <xs:element minOccurs="0" name="refToMessageId" type="xs:string"/>
+          <xs:element name="messageStatus" type="tns:ebMSMessageStatus"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="DataSource">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="contentId" type="xs:string"/>
+          <xs:element name="attachment" type="xs:base64Binary" xmime:expectedContentTypes="application/octet-stream"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="resendMessage">
+        <xs:sequence>
+          <xs:element name="messageId" type="xs:string"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="resendMessageResponse">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="messageId" type="xs:string"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="sendMessage">
+        <xs:sequence>
+          <xs:element name="message" type="tns:MessageRequest"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="MessageRequest">
+        <xs:sequence>
+          <xs:element name="properties" type="tns:messageRequestProperties"/>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="dataSource" type="tns:DataSource"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="messageRequestProperties">
+        <xs:sequence>
+          <xs:element name="cpaId" type="xs:string"/>
+          <xs:element name="fromParty" type="tns:party"/>
+          <xs:element minOccurs="0" name="toParty" type="tns:party"/>
+          <xs:element name="service" type="xs:string"/>
+          <xs:element name="action" type="xs:string"/>
+          <xs:element minOccurs="0" name="conversationId" type="xs:string"/>
+          <xs:element minOccurs="0" name="messageId" type="xs:string"/>
+          <xs:element minOccurs="0" name="refToMessageId" type="xs:string"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="sendMessageResponse">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="messageId" type="xs:string"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="ping">
+        <xs:sequence>
+          <xs:element name="cpaId" type="xs:string"/>
+          <xs:element name="fromPartyId" type="xs:string"/>
+          <xs:element name="toPartyId" type="xs:string"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="pingResponse">
+        <xs:sequence/>
+      </xs:complexType>
+      <xs:complexType name="processMessageEvent">
+        <xs:sequence>
+          <xs:element name="messageId" type="xs:string"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="processMessageEventResponse">
+        <xs:sequence/>
+      </xs:complexType>
+      <xs:complexType name="getUnprocessedMessageIds">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="messageFilter" type="tns:messageFilter"/>
+          <xs:element minOccurs="0" name="maxNr" type="xs:int"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="getUnprocessedMessageIdsResponse">
+        <xs:sequence>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="messageIds" type="xs:string"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="processMessage">
+        <xs:sequence>
+          <xs:element name="messageId" type="xs:string"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="processMessageResponse">
         <xs:sequence/>
       </xs:complexType>
       <xs:simpleType name="ebMSMessageStatus">
@@ -290,7 +202,7 @@
           <xs:enumeration value="EXPIRED"/>
         </xs:restriction>
       </xs:simpleType>
-      <xs:simpleType name="ebMSMessageEventType">
+      <xs:simpleType name="messageEventType">
         <xs:restriction base="xs:string">
           <xs:enumeration value="RECEIVED"/>
           <xs:enumeration value="DELIVERED"/>
@@ -306,240 +218,286 @@
       </xs:complexType>
     </xs:schema>
   </wsdl:types>
+  <wsdl:message name="getMessageResponse">
+    <wsdl:part element="tns:getMessageResponse" name="parameters"></wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getMessageStatus">
+    <wsdl:part element="tns:getMessageStatus" name="parameters"></wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getMessageStatusResponse">
+    <wsdl:part element="tns:getMessageStatusResponse" name="parameters"></wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getMessage">
+    <wsdl:part element="tns:getMessage" name="parameters"></wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="resendMessage">
+    <wsdl:part element="tns:resendMessage" name="parameters"></wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="sendMessage">
+    <wsdl:part element="tns:sendMessage" name="parameters"></wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="ping">
+    <wsdl:part element="tns:ping" name="parameters"></wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getUnprocessedMessageIds">
+    <wsdl:part element="tns:getUnprocessedMessageIds" name="parameters"></wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getUnprocessedMessageEventsResponse">
+    <wsdl:part element="tns:getUnprocessedMessageEventsResponse" name="parameters"></wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="processMessage">
+    <wsdl:part element="tns:processMessage" name="parameters"></wsdl:part>
+  </wsdl:message>
   <wsdl:message name="EbMSMessageServiceException">
-    <wsdl:part element="ns1:EbMSMessageServiceException" name="EbMSMessageServiceException"></wsdl:part>
+    <wsdl:part element="tns:EbMSMessageServiceException" name="EbMSMessageServiceException"></wsdl:part>
   </wsdl:message>
-  <wsdl:message name="ResendMessage">
-    <wsdl:part element="ns1:ResendMessage" name="parameters"></wsdl:part>
+  <wsdl:message name="sendMessageResponse">
+    <wsdl:part element="tns:sendMessageResponse" name="parameters"></wsdl:part>
   </wsdl:message>
-  <wsdl:message name="GetMessageEventsResponse">
-    <wsdl:part element="ns1:GetMessageEventsResponse" name="parameters"></wsdl:part>
+  <wsdl:message name="processMessageEventResponse">
+    <wsdl:part element="tns:processMessageEventResponse" name="parameters"></wsdl:part>
   </wsdl:message>
-  <wsdl:message name="ProcessMessageEvent">
-    <wsdl:part element="ns1:ProcessMessageEvent" name="parameters"></wsdl:part>
+  <wsdl:message name="getUnprocessedMessageIdsResponse">
+    <wsdl:part element="tns:getUnprocessedMessageIdsResponse" name="parameters"></wsdl:part>
   </wsdl:message>
-  <wsdl:message name="PingResponse">
-    <wsdl:part element="ns1:PingResponse" name="parameters"></wsdl:part>
+  <wsdl:message name="pingResponse">
+    <wsdl:part element="tns:pingResponse" name="parameters"></wsdl:part>
   </wsdl:message>
-  <wsdl:message name="GetMessageEvents">
-    <wsdl:part element="ns1:GetMessageEvents" name="parameters"></wsdl:part>
+  <wsdl:message name="getUnprocessedMessageEvents">
+    <wsdl:part element="tns:getUnprocessedMessageEvents" name="parameters"></wsdl:part>
   </wsdl:message>
-  <wsdl:message name="GetMessageIdsResponse">
-    <wsdl:part element="ns1:GetMessageIdsResponse" name="parameters"></wsdl:part>
+  <wsdl:message name="resendMessageResponse">
+    <wsdl:part element="tns:resendMessageResponse" name="parameters"></wsdl:part>
   </wsdl:message>
-  <wsdl:message name="GetMessageStatus">
-    <wsdl:part element="ns1:GetMessageStatus" name="parameters"></wsdl:part>
+  <wsdl:message name="processMessageResponse">
+    <wsdl:part element="tns:processMessageResponse" name="parameters"></wsdl:part>
   </wsdl:message>
-  <wsdl:message name="ProcessMessageResponse">
-    <wsdl:part element="ns1:ProcessMessageResponse" name="parameters"></wsdl:part>
-  </wsdl:message>
-  <wsdl:message name="GetMessageResponse">
-    <wsdl:part element="ns1:GetMessageResponse" name="parameters"></wsdl:part>
-  </wsdl:message>
-  <wsdl:message name="SendMessageResponse">
-    <wsdl:part element="ns1:SendMessageResponse" name="parameters"></wsdl:part>
-  </wsdl:message>
-  <wsdl:message name="Ping">
-    <wsdl:part element="ns1:Ping" name="parameters"></wsdl:part>
-  </wsdl:message>
-  <wsdl:message name="ProcessMessage">
-    <wsdl:part element="ns1:ProcessMessage" name="parameters"></wsdl:part>
-  </wsdl:message>
-  <wsdl:message name="GetMessageStatusResponse">
-    <wsdl:part element="ns1:GetMessageStatusResponse" name="parameters"></wsdl:part>
-  </wsdl:message>
-  <wsdl:message name="ResendMessageResponse">
-    <wsdl:part element="ns1:ResendMessageResponse" name="parameters"></wsdl:part>
-  </wsdl:message>
-  <wsdl:message name="GetMessage">
-    <wsdl:part element="ns1:GetMessage" name="parameters"></wsdl:part>
-  </wsdl:message>
-  <wsdl:message name="SendMessage">
-    <wsdl:part element="ns1:SendMessage" name="parameters"></wsdl:part>
-  </wsdl:message>
-  <wsdl:message name="ProcessMessageEventResponse">
-    <wsdl:part element="ns1:ProcessMessageEventResponse" name="parameters"></wsdl:part>
-  </wsdl:message>
-  <wsdl:message name="GetMessageIds">
-    <wsdl:part element="ns1:GetMessageIds" name="parameters"></wsdl:part>
+  <wsdl:message name="processMessageEvent">
+    <wsdl:part element="tns:processMessageEvent" name="parameters"></wsdl:part>
   </wsdl:message>
   <wsdl:portType name="EbMSMessageService">
-    <wsdl:operation name="Ping">
-      <wsdl:input message="ns1:Ping" name="Ping"></wsdl:input>
-      <wsdl:output message="ns1:PingResponse" name="PingResponse"></wsdl:output>
-      <wsdl:fault message="ns1:EbMSMessageServiceException" name="EbMSMessageServiceException"></wsdl:fault>
+    <wsdl:operation name="getMessageStatus">
+      <wsdl:input message="tns:getMessageStatus" name="getMessageStatus"></wsdl:input>
+      <wsdl:output message="tns:getMessageStatusResponse" name="getMessageStatusResponse"></wsdl:output>
+      <wsdl:fault message="tns:EbMSMessageServiceException" name="EbMSMessageServiceException"></wsdl:fault>
     </wsdl:operation>
-    <wsdl:operation name="ProcessMessage">
-      <wsdl:input message="ns1:ProcessMessage" name="ProcessMessage"></wsdl:input>
-      <wsdl:output message="ns1:ProcessMessageResponse" name="ProcessMessageResponse"></wsdl:output>
-      <wsdl:fault message="ns1:EbMSMessageServiceException" name="EbMSMessageServiceException"></wsdl:fault>
+    <wsdl:operation name="getUnprocessedMessageEvents">
+      <wsdl:input message="tns:getUnprocessedMessageEvents" name="getUnprocessedMessageEvents"></wsdl:input>
+      <wsdl:output message="tns:getUnprocessedMessageEventsResponse" name="getUnprocessedMessageEventsResponse"></wsdl:output>
+      <wsdl:fault message="tns:EbMSMessageServiceException" name="EbMSMessageServiceException"></wsdl:fault>
     </wsdl:operation>
-    <wsdl:operation name="ResendMessage">
-      <wsdl:input message="ns1:ResendMessage" name="ResendMessage"></wsdl:input>
-      <wsdl:output message="ns1:ResendMessageResponse" name="ResendMessageResponse"></wsdl:output>
-      <wsdl:fault message="ns1:EbMSMessageServiceException" name="EbMSMessageServiceException"></wsdl:fault>
+    <wsdl:operation name="getMessage">
+      <wsdl:input message="tns:getMessage" name="getMessage"></wsdl:input>
+      <wsdl:output message="tns:getMessageResponse" name="getMessageResponse"></wsdl:output>
+      <wsdl:fault message="tns:EbMSMessageServiceException" name="EbMSMessageServiceException"></wsdl:fault>
     </wsdl:operation>
-    <wsdl:operation name="GetMessage">
-      <wsdl:input message="ns1:GetMessage" name="GetMessage"></wsdl:input>
-      <wsdl:output message="ns1:GetMessageResponse" name="GetMessageResponse"></wsdl:output>
-      <wsdl:fault message="ns1:EbMSMessageServiceException" name="EbMSMessageServiceException"></wsdl:fault>
+    <wsdl:operation name="resendMessage">
+      <wsdl:input message="tns:resendMessage" name="resendMessage"></wsdl:input>
+      <wsdl:output message="tns:resendMessageResponse" name="resendMessageResponse"></wsdl:output>
+      <wsdl:fault message="tns:EbMSMessageServiceException" name="EbMSMessageServiceException"></wsdl:fault>
     </wsdl:operation>
-    <wsdl:operation name="ProcessMessageEvent">
-      <wsdl:input message="ns1:ProcessMessageEvent" name="ProcessMessageEvent"></wsdl:input>
-      <wsdl:output message="ns1:ProcessMessageEventResponse" name="ProcessMessageEventResponse"></wsdl:output>
-      <wsdl:fault message="ns1:EbMSMessageServiceException" name="EbMSMessageServiceException"></wsdl:fault>
+    <wsdl:operation name="sendMessage">
+      <wsdl:input message="tns:sendMessage" name="sendMessage"></wsdl:input>
+      <wsdl:output message="tns:sendMessageResponse" name="sendMessageResponse"></wsdl:output>
+      <wsdl:fault message="tns:EbMSMessageServiceException" name="EbMSMessageServiceException"></wsdl:fault>
     </wsdl:operation>
-    <wsdl:operation name="GetMessageEvents">
-      <wsdl:input message="ns1:GetMessageEvents" name="GetMessageEvents"></wsdl:input>
-      <wsdl:output message="ns1:GetMessageEventsResponse" name="GetMessageEventsResponse"></wsdl:output>
-      <wsdl:fault message="ns1:EbMSMessageServiceException" name="EbMSMessageServiceException"></wsdl:fault>
+    <wsdl:operation name="ping">
+      <wsdl:input message="tns:ping" name="ping"></wsdl:input>
+      <wsdl:output message="tns:pingResponse" name="pingResponse"></wsdl:output>
+      <wsdl:fault message="tns:EbMSMessageServiceException" name="EbMSMessageServiceException"></wsdl:fault>
     </wsdl:operation>
-    <wsdl:operation name="SendMessage">
-      <wsdl:input message="ns1:SendMessage" name="SendMessage"></wsdl:input>
-      <wsdl:output message="ns1:SendMessageResponse" name="SendMessageResponse"></wsdl:output>
-      <wsdl:fault message="ns1:EbMSMessageServiceException" name="EbMSMessageServiceException"></wsdl:fault>
+    <wsdl:operation name="processMessageEvent">
+      <wsdl:input message="tns:processMessageEvent" name="processMessageEvent"></wsdl:input>
+      <wsdl:output message="tns:processMessageEventResponse" name="processMessageEventResponse"></wsdl:output>
+      <wsdl:fault message="tns:EbMSMessageServiceException" name="EbMSMessageServiceException"></wsdl:fault>
     </wsdl:operation>
-    <wsdl:operation name="GetMessageIds">
-      <wsdl:input message="ns1:GetMessageIds" name="GetMessageIds"></wsdl:input>
-      <wsdl:output message="ns1:GetMessageIdsResponse" name="GetMessageIdsResponse"></wsdl:output>
-      <wsdl:fault message="ns1:EbMSMessageServiceException" name="EbMSMessageServiceException"></wsdl:fault>
+    <wsdl:operation name="getUnprocessedMessageIds">
+      <wsdl:input message="tns:getUnprocessedMessageIds" name="getUnprocessedMessageIds"></wsdl:input>
+      <wsdl:output message="tns:getUnprocessedMessageIdsResponse" name="getUnprocessedMessageIdsResponse"></wsdl:output>
+      <wsdl:fault message="tns:EbMSMessageServiceException" name="EbMSMessageServiceException"></wsdl:fault>
     </wsdl:operation>
-    <wsdl:operation name="GetMessageStatus">
-      <wsdl:input message="ns1:GetMessageStatus" name="GetMessageStatus"></wsdl:input>
-      <wsdl:output message="ns1:GetMessageStatusResponse" name="GetMessageStatusResponse"></wsdl:output>
-      <wsdl:fault message="ns1:EbMSMessageServiceException" name="EbMSMessageServiceException"></wsdl:fault>
+    <wsdl:operation name="processMessage">
+      <wsdl:input message="tns:processMessage" name="processMessage"></wsdl:input>
+      <wsdl:output message="tns:processMessageResponse" name="processMessageResponse"></wsdl:output>
+      <wsdl:fault message="tns:EbMSMessageServiceException" name="EbMSMessageServiceException"></wsdl:fault>
     </wsdl:operation>
   </wsdl:portType>
-</wsdl:definitions>]]></con:content><con:type>http://schemas.xmlsoap.org/wsdl/</con:type></con:part></con:definitionCache><con:endpoints><con:endpoint>http://localhost:8080/service/ebmsMTOM</con:endpoint></con:endpoints><con:operation id="3164ab3e-7ea9-4f5a-aa8d-84dea4482ad6" isOneWay="false" action="" name="GetMessage" bindingOperationName="GetMessage" type="Request-Response" outputName="GetMessageResponse" inputName="GetMessage" receivesAttachments="false" sendsAttachments="false" anonymous="optional"><con:settings/><con:call id="0d300970-359a-47b1-8ccf-0d6b9bc66adf" name="Request 1"><con:settings/><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8080/service/ebmsMTOM</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns="http://www.ordina.nl/ebms/2.17">
+  <wsdl:binding name="EbMSMessageServiceSoapBinding" type="tns:EbMSMessageService">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsdl:operation name="getMessageStatus">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="getMessageStatus">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="getMessageStatusResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="EbMSMessageServiceException">
+        <soap:fault name="EbMSMessageServiceException" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="getUnprocessedMessageEvents">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="getUnprocessedMessageEvents">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="getUnprocessedMessageEventsResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="EbMSMessageServiceException">
+        <soap:fault name="EbMSMessageServiceException" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="getMessage">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="getMessage">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="getMessageResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="EbMSMessageServiceException">
+        <soap:fault name="EbMSMessageServiceException" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="resendMessage">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="resendMessage">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="resendMessageResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="EbMSMessageServiceException">
+        <soap:fault name="EbMSMessageServiceException" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="sendMessage">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="sendMessage">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="sendMessageResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="EbMSMessageServiceException">
+        <soap:fault name="EbMSMessageServiceException" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="ping">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="ping">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="pingResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="EbMSMessageServiceException">
+        <soap:fault name="EbMSMessageServiceException" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="processMessageEvent">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="processMessageEvent">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="processMessageEventResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="EbMSMessageServiceException">
+        <soap:fault name="EbMSMessageServiceException" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="getUnprocessedMessageIds">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="getUnprocessedMessageIds">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="getUnprocessedMessageIdsResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="EbMSMessageServiceException">
+        <soap:fault name="EbMSMessageServiceException" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="processMessage">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="processMessage">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="processMessageResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="EbMSMessageServiceException">
+        <soap:fault name="EbMSMessageServiceException" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="EbMSMessageService">
+    <wsdl:port binding="tns:EbMSMessageServiceSoapBinding" name="EbMSMessagePort">
+      <soap:address location="http://localhost:8080/service/ebmsMTOM"/>
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>]]></con:content><con:type>http://schemas.xmlsoap.org/wsdl/</con:type></con:part></con:definitionCache><con:endpoints><con:endpoint>http://localhost:8080/service/ebmsMTOM</con:endpoint></con:endpoints><con:operation id="3164ab3e-7ea9-4f5a-aa8d-84dea4482ad6" isOneWay="false" action="" name="getMessage" bindingOperationName="getMessage" type="Request-Response" outputName="getMessageResponse" inputName="getMessage" receivesAttachments="false" sendsAttachments="false" anonymous="optional"><con:settings/><con:call id="0d300970-359a-47b1-8ccf-0d6b9bc66adf" name="Request 1"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8080/service/ebmsMTOM</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns="http://www.ordina.nl/ebms/2.18">
    <soapenv:Header/>
    <soapenv:Body>
-      <ns:GetMessage>
-         <MessageId>?</MessageId>
-         <!--Optional:-->
-         <Process>?</Process>
-      </ns:GetMessage>
+      <ns:getMessage>
+         <messageId>?</messageId>
+      </ns:getMessage>
    </soapenv:Body>
-</soapenv:Envelope>]]></con:request><con:wsaConfig mustUnderstand="NONE" version="200508" action="http://www.springframework.org/schema/beans/EbMSMessageService/GetMessage"/></con:call></con:operation><con:operation id="57fc1d6b-e193-4beb-aa2e-c1d5ddc33b8d" isOneWay="false" action="" name="GetMessageEvents" bindingOperationName="GetMessageEvents" type="Request-Response" outputName="GetMessageEventsResponse" inputName="GetMessageEvents" receivesAttachments="false" sendsAttachments="false" anonymous="optional"><con:settings/><con:call id="b7670f5e-9062-4b98-bf3a-abbcb0e9c98a" name="Request 1"><con:settings/><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8080/service/ebmsMTOM</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns="http://www.ordina.nl/ebms/2.17">
+</soapenv:Envelope>]]></con:request><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508" action="http://www.springframework.org/schema/beans/EbMSMessageService/GetMessage"/><con:wsrmConfig version="1.2"/></con:call></con:operation><con:operation id="57fc1d6b-e193-4beb-aa2e-c1d5ddc33b8d" isOneWay="false" action="" name="getUnprocessedMessageEvents" bindingOperationName="getUnprocessedMessageEvents" type="Request-Response" outputName="getUnprocessedMessageEventsResponse" inputName="getUnprocessedMessageEvents" receivesAttachments="false" sendsAttachments="false" anonymous="optional"><con:settings/><con:call id="b7670f5e-9062-4b98-bf3a-abbcb0e9c98a" name="Request 1"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8080/service/ebmsMTOM</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns="http://www.ordina.nl/ebms/2.18">
    <soapenv:Header/>
    <soapenv:Body>
-      <ns:GetMessageEvents>
-         <MessageContext>
-            <!--Optional:-->
-            <cpaId>?</cpaId>
-            <!--Optional:-->
-            <fromParty>
-               <partyId>?</partyId>
-               <!--Optional:-->
-               <role>?</role>
-            </fromParty>
-            <!--Optional:-->
-            <toParty>
-               <partyId>?</partyId>
-               <!--Optional:-->
-               <role>?</role>
-            </toParty>
-            <!--Optional:-->
-            <service>?</service>
-            <!--Optional:-->
-            <action>?</action>
-            <!--Optional:-->
-            <timestamp>?</timestamp>
-            <!--Optional:-->
-            <conversationId>?</conversationId>
-            <!--Optional:-->
-            <messageId>?</messageId>
-            <!--Optional:-->
-            <refToMessageId>?</refToMessageId>
-            <!--Optional:-->
-            <messageStatus>?</messageStatus>
-         </MessageContext>
-         <!--1 or more repetitions:-->
-         <EventType>?</EventType>
-         <!--Optional:-->
-         <MaxNr>?</MaxNr>
-      </ns:GetMessageEvents>
+      <ns:getUnprocessedMessageEvents/>
    </soapenv:Body>
-</soapenv:Envelope>]]></con:request><con:wsaConfig mustUnderstand="NONE" version="200508" action="http://www.springframework.org/schema/beans/EbMSMessageService/GetMessageEvents"/></con:call></con:operation><con:operation id="002d2dbd-3a2a-45b1-b38b-cbed09ba42ed" isOneWay="false" action="" name="GetMessageIds" bindingOperationName="GetMessageIds" type="Request-Response" outputName="GetMessageIdsResponse" inputName="GetMessageIds" receivesAttachments="false" sendsAttachments="false" anonymous="optional"><con:settings/><con:call id="46b40d8a-143e-4501-b344-7d57161d4d50" name="Request 1"><con:settings/><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8080/service/ebmsMTOM</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns="http://www.ordina.nl/ebms/2.17">
+</soapenv:Envelope>]]></con:request><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508" action="http://www.springframework.org/schema/beans/EbMSMessageService/GetMessageEvents"/><con:wsrmConfig version="1.2"/></con:call></con:operation><con:operation id="002d2dbd-3a2a-45b1-b38b-cbed09ba42ed" isOneWay="false" action="" name="getUnprocessedMessageIds" bindingOperationName="getUnprocessedMessageIds" type="Request-Response" outputName="getUnprocessedMessageIdsResponse" inputName="getUnprocessedMessageIds" receivesAttachments="false" sendsAttachments="false" anonymous="optional"><con:settings/><con:call id="46b40d8a-143e-4501-b344-7d57161d4d50" name="Request 1"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8080/service/ebmsMTOM</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns="http://www.ordina.nl/ebms/2.18">
    <soapenv:Header/>
    <soapenv:Body>
-      <ns:GetMessageIds>
-         <MessageContext>
-            <!--Optional:-->
-            <cpaId>?</cpaId>
-            <!--Optional:-->
-            <fromParty>
-               <partyId>?</partyId>
-               <!--Optional:-->
-               <role>?</role>
-            </fromParty>
-            <!--Optional:-->
-            <toParty>
-               <partyId>?</partyId>
-               <!--Optional:-->
-               <role>?</role>
-            </toParty>
-            <!--Optional:-->
-            <service>?</service>
-            <!--Optional:-->
-            <action>?</action>
-            <!--Optional:-->
-            <timestamp>?</timestamp>
-            <!--Optional:-->
-            <conversationId>?</conversationId>
-            <!--Optional:-->
-            <messageId>?</messageId>
-            <!--Optional:-->
-            <refToMessageId>?</refToMessageId>
-            <!--Optional:-->
-            <messageStatus>?</messageStatus>
-         </MessageContext>
-         <!--Optional:-->
-         <MaxNr>?</MaxNr>
-      </ns:GetMessageIds>
+      <ns:getUnprocessedMessageIds/>
    </soapenv:Body>
-</soapenv:Envelope>]]></con:request><con:wsaConfig mustUnderstand="NONE" version="200508" action="http://www.springframework.org/schema/beans/EbMSMessageService/GetMessageIds"/></con:call></con:operation><con:operation id="e0b96fd7-35b2-448b-8c99-ac42593c66b1" isOneWay="false" action="" name="GetMessageStatus" bindingOperationName="GetMessageStatus" type="Request-Response" outputName="GetMessageStatusResponse" inputName="GetMessageStatus" receivesAttachments="false" sendsAttachments="false" anonymous="optional"><con:settings/><con:call id="bb62ac01-3ffd-4eed-b2b3-c7f365e4eeb0" name="Request 1"><con:settings/><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8080/service/ebmsMTOM</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns="http://www.ordina.nl/ebms/2.17">
+</soapenv:Envelope>]]></con:request><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508" action="http://www.springframework.org/schema/beans/EbMSMessageService/GetMessageIds"/><con:wsrmConfig version="1.2"/></con:call></con:operation><con:operation id="e0b96fd7-35b2-448b-8c99-ac42593c66b1" isOneWay="false" action="" name="getMessageStatus" bindingOperationName="getMessageStatus" type="Request-Response" outputName="getMessageStatusResponse" inputName="getMessageStatus" receivesAttachments="false" sendsAttachments="false" anonymous="optional"><con:settings/><con:call id="bb62ac01-3ffd-4eed-b2b3-c7f365e4eeb0" name="Request 1"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8080/service/ebmsMTOM</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns="http://www.ordina.nl/ebms/2.18">
    <soapenv:Header/>
    <soapenv:Body>
-      <ns:GetMessageStatus>
-         <MessageId>?</MessageId>
-      </ns:GetMessageStatus>
+      <ns:getMessageStatus>
+         <messageId>?</messageId>
+      </ns:getMessageStatus>
    </soapenv:Body>
-</soapenv:Envelope>]]></con:request><con:wsaConfig mustUnderstand="NONE" version="200508" action="http://www.springframework.org/schema/beans/EbMSMessageService/GetMessageStatus"/></con:call></con:operation><con:operation id="28e78f4e-ed41-4804-881a-cd68c41408ce" isOneWay="false" action="" name="Ping" bindingOperationName="Ping" type="Request-Response" outputName="PingResponse" inputName="Ping" receivesAttachments="false" sendsAttachments="false" anonymous="optional"><con:settings/><con:call id="bd674669-1381-47a3-a7d5-09fd8856782b" name="Request 1"><con:settings/><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8080/service/ebmsMTOM</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns="http://www.ordina.nl/ebms/2.17">
+</soapenv:Envelope>]]></con:request><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508" action="http://www.springframework.org/schema/beans/EbMSMessageService/GetMessageStatus"/><con:wsrmConfig version="1.2"/></con:call></con:operation><con:operation id="28e78f4e-ed41-4804-881a-cd68c41408ce" isOneWay="false" action="" name="ping" bindingOperationName="ping" type="Request-Response" outputName="pingResponse" inputName="ping" receivesAttachments="false" sendsAttachments="false" anonymous="optional"><con:settings/><con:call id="bd674669-1381-47a3-a7d5-09fd8856782b" name="Request 1"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8080/service/ebmsMTOM</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns="http://www.ordina.nl/ebms/2.18">
    <soapenv:Header/>
    <soapenv:Body>
-      <ns:Ping>
-         <CPAId>?</CPAId>
-         <FromPartyId>?</FromPartyId>
-         <ToPartyId>?</ToPartyId>
-      </ns:Ping>
+      <ns:ping>
+         <cpaId>cpaStubEBF.rm.https.signed</cpaId>
+         <fromPartyId>urn:osb:oin:00000000000000000000</fromPartyId>
+         <toPartyId>urn:osb:oin:00000000000000000001</toPartyId>
+      </ns:ping>
    </soapenv:Body>
-</soapenv:Envelope>]]></con:request><con:wsaConfig mustUnderstand="NONE" version="200508" action="http://www.springframework.org/schema/beans/EbMSMessageService/Ping"/></con:call></con:operation><con:operation id="fb585d68-8b2f-47c7-bfa8-8a9eb5ef3209" isOneWay="false" action="" name="ProcessMessage" bindingOperationName="ProcessMessage" type="Request-Response" outputName="ProcessMessageResponse" inputName="ProcessMessage" receivesAttachments="false" sendsAttachments="false" anonymous="optional"><con:settings/><con:call id="73a7d75b-0774-4508-ae66-f87583f05830" name="Request 1"><con:settings/><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8080/service/ebmsMTOM</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns="http://www.ordina.nl/ebms/2.17">
+</soapenv:Envelope>]]></con:request><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508" action="http://www.springframework.org/schema/beans/EbMSMessageService/Ping"/><con:wsrmConfig version="1.2"/></con:call></con:operation><con:operation id="fb585d68-8b2f-47c7-bfa8-8a9eb5ef3209" isOneWay="false" action="" name="processMessage" bindingOperationName="processMessage" type="Request-Response" outputName="processMessageResponse" inputName="processMessage" receivesAttachments="false" sendsAttachments="false" anonymous="optional"><con:settings/><con:call id="73a7d75b-0774-4508-ae66-f87583f05830" name="Request 1"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8080/service/ebmsMTOM</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns="http://www.ordina.nl/ebms/2.18">
    <soapenv:Header/>
    <soapenv:Body>
-      <ns:ProcessMessage>
-         <MessageId>?</MessageId>
-      </ns:ProcessMessage>
+      <ns:processMessage>
+         <messageId>?</messageId>
+      </ns:processMessage>
    </soapenv:Body>
-</soapenv:Envelope>]]></con:request><con:wsaConfig mustUnderstand="NONE" version="200508" action="http://www.springframework.org/schema/beans/EbMSMessageService/ProcessMessage"/></con:call></con:operation><con:operation id="198fbb8e-bc16-4906-875b-5106526c6eaf" isOneWay="false" action="" name="ProcessMessageEvent" bindingOperationName="ProcessMessageEvent" type="Request-Response" outputName="ProcessMessageEventResponse" inputName="ProcessMessageEvent" receivesAttachments="false" sendsAttachments="false" anonymous="optional"><con:settings/><con:call id="ad2caa33-6872-450c-9030-9729dbba1556" name="Request 1"><con:settings/><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8080/service/ebmsMTOM</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns="http://www.ordina.nl/ebms/2.17">
+</soapenv:Envelope>]]></con:request><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508" action="http://www.springframework.org/schema/beans/EbMSMessageService/ProcessMessage"/><con:wsrmConfig version="1.2"/></con:call></con:operation><con:operation id="198fbb8e-bc16-4906-875b-5106526c6eaf" isOneWay="false" action="" name="processMessageEvent" bindingOperationName="processMessageEvent" type="Request-Response" outputName="processMessageEventResponse" inputName="processMessageEvent" receivesAttachments="false" sendsAttachments="false" anonymous="optional"><con:settings/><con:call id="ad2caa33-6872-450c-9030-9729dbba1556" name="Request 1"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8080/service/ebmsMTOM</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns="http://www.ordina.nl/ebms/2.18">
    <soapenv:Header/>
    <soapenv:Body>
-      <ns:ProcessMessageEvent>
-         <MessageId>?</MessageId>
-      </ns:ProcessMessageEvent>
+      <ns:processMessageEvent>
+         <messageId>?</messageId>
+      </ns:processMessageEvent>
    </soapenv:Body>
-</soapenv:Envelope>]]></con:request><con:wsaConfig mustUnderstand="NONE" version="200508" action="http://www.springframework.org/schema/beans/EbMSMessageService/ProcessMessageEvent"/></con:call></con:operation><con:operation id="f952b95c-fa81-434f-bfe0-dd456a15792f" isOneWay="false" action="" name="ResendMessage" bindingOperationName="ResendMessage" type="Request-Response" outputName="ResendMessageResponse" inputName="ResendMessage" receivesAttachments="false" sendsAttachments="false" anonymous="optional"><con:settings/><con:call id="7914558b-f1d3-4e0a-b549-c15a5051ea55" name="Request 1"><con:settings/><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8080/service/ebmsMTOM</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns="http://www.ordina.nl/ebms/2.17">
+</soapenv:Envelope>]]></con:request><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508" action="http://www.springframework.org/schema/beans/EbMSMessageService/ProcessMessageEvent"/><con:wsrmConfig version="1.2"/></con:call></con:operation><con:operation id="f952b95c-fa81-434f-bfe0-dd456a15792f" isOneWay="false" action="" name="resendMessage" bindingOperationName="resendMessage" type="Request-Response" outputName="resendMessageResponse" inputName="resendMessage" receivesAttachments="false" sendsAttachments="false" anonymous="optional"><con:settings/><con:call id="7914558b-f1d3-4e0a-b549-c15a5051ea55" name="Request 1"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8080/service/ebmsMTOM</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns="http://www.ordina.nl/ebms/2.18">
    <soapenv:Header/>
    <soapenv:Body>
-      <ns:ResendMessage>
-         <MessageId>?</MessageId>
-      </ns:ResendMessage>
+      <ns:resendMessage>
+         <messageId>?</messageId>
+      </ns:resendMessage>
    </soapenv:Body>
-</soapenv:Envelope>]]></con:request><con:wsaConfig mustUnderstand="NONE" version="200508" action="http://www.springframework.org/schema/beans/EbMSMessageService/ResendMessage"/></con:call></con:operation><con:operation id="bd2a999d-090d-4c47-aac2-82fa8833f530" isOneWay="false" action="" name="SendMessage" bindingOperationName="SendMessage" type="Request-Response" outputName="SendMessageResponse" inputName="SendMessage" receivesAttachments="false" sendsAttachments="false" anonymous="optional"><con:settings/><con:call id="29b06526-ed4d-4f37-892c-9aec68f89c14" name="Request 1"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting><con:setting id="WsdlSettings@enable-mtom">true</con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8080/service/ebmsMTOM</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns="http://www.ordina.nl/ebms/2.17">
+</soapenv:Envelope>]]></con:request><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508" action="http://www.springframework.org/schema/beans/EbMSMessageService/ResendMessage"/><con:wsrmConfig version="1.2"/></con:call></con:operation><con:operation id="bd2a999d-090d-4c47-aac2-82fa8833f530" isOneWay="false" action="" name="sendMessage" bindingOperationName="sendMessage" type="Request-Response" outputName="sendMessageResponse" inputName="sendMessage" receivesAttachments="false" sendsAttachments="false" anonymous="optional"><con:settings/><con:call id="29b06526-ed4d-4f37-892c-9aec68f89c14" name="Request 1"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting><con:setting id="WsdlSettings@enable-mtom">true</con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:8080/service/ebmsMTOM</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns="http://www.ordina.nl/ebms/2.18">
    <soapenv:Header/>
    <soapenv:Body>
-      <ns:SendMessage>
-         <Message>
-            <context>
+      <ns:sendMessage>
+         <message>
+            <properties>
                <cpaId>cpaStubEBF.rm.https.signed</cpaId>
                <fromParty>
                   <partyId>urn:osb:oin:00000000000000000000</partyId>
@@ -551,11 +509,11 @@
                </toParty>
                <service>urn:osb:services:osb:afleveren:1.1$1.0</service>
                <action>afleveren</action>
-            </context>
+            </properties>
             <dataSource>
                <attachment>cid:790707908763</attachment>
             </dataSource>
-         </Message>
-      </ns:SendMessage>
+         </message>
+      </ns:sendMessage>
    </soapenv:Body>
 </soapenv:Envelope>]]></con:request><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:attachment><con:name>truststore.pem</con:name><con:contentType>application/octet-stream</con:contentType><con:size>887</con:size><con:contentId>790707908763</con:contentId><con:part>790707908763</con:part><con:data>UEsDBBQACAgIAFWxsFAAAAAAAAAAAAAAAAAOAAAAdHJ1c3RzdG9yZS5wZW1lU8mSokAQvfMVc+/oUBB0OPShNpClkJJF4MbSogKKIhb69YNOdExPdEXk5dWrl/myMt/fxwOJbji/EFn7hmYg4JMn+C5Qw0CxjxDIzyXgBgSlQfwOD+cHcGBZnXfVXlf5FAIWaABDkbKOIxbjkDGdcHMl+Jh4FAIdiAFBkJrrmXnLmrpPpLCna4MT8CIvCa+XeaP26UY5Jht5wK8ETihAcPJhpd4Tve5j/5vYQE0mDbdYus6ymXmh64pr/CWGyQBnxSzv4/Fe+CLYjdJRKEfYJwMdw8GEOzjnjngaMeOFjfGF8cInNgWVLjyzwR1FfsUHcgDsWdbYCB8FxT2TlDZrijo7/KsMDv/bFCj7zfHfpliEJ27erMdH5JtYN4o5XSY5l0JS7+mDJBTmLzEwUCYUoxu7+Ua4K32GETz++AWiAbCCBwZ4GVeojAkQraoQgtjugNnezHzSbd6KrB52yJ1Hx2nwWZ03MiJ5G29EQLZKurvuphmT3+rklBFdOoSPNQWCirW0ZduFCNJtFf1eH8gMx/u5+Xap5669MScr734JoO6JiJj5fGl6k97usqk0vfUNOnoC7DbVVne9FMJWTdLVpDFidWHug0tcc060Q6Z7y2OAwDgRwP85XMLTV8kQx+7Sujb9Qz7YFeHuDFXbla2+MdkedmUQLvSr24iRZVBHDoPPu+hUmhlA5SxwM4pFY3GuJ+E1sQ+h1Lg7T/SSilqFlii9b5HLxDr7qpY+9pnSWHIcrW5au8qxA2+tJUSS156W220ZNcWFDKzbtQZ+PE7bz2F6n1il3PQ1ZoHLw95IrtmxZh8fwmuNiIN/rtYfUEsHCKX1dZhuAgAAdwMAAFBLAQIUABQACAgIAFWxsFCl9XWYbgIAAHcDAAAOAAAAAAAAAAAAAAAAAAAAAAB0cnVzdHN0b3JlLnBlbVBLBQYAAAAAAQABADwAAACqAgAAAAA=</con:data><con:id>ca60b6bf-eac0-4d45-85f1-ade28031b5b7</con:id></con:attachment><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508" action="http://www.springframework.org/schema/beans/EbMSMessageService/SendMessage"/><con:wsrmConfig version="1.2"/></con:call></con:operation></con:interface><con:properties/><con:wssContainer/><con:oAuth2ProfileContainer/><con:oAuth1ProfileContainer/><con:sensitiveInformation/></con:soapui-project>

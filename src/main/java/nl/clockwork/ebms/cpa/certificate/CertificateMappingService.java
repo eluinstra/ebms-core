@@ -36,8 +36,8 @@ public interface CertificateMappingService
 	 * @param certificateMapping - Maps the source Certificate to the destination Certificate
 	 * @throws CertificateMappingServiceException
 	 */
-	@WebMethod(operationName = "SetCertificateMapping")
-	void setCertificateMapping(@WebParam(name = "CertificateMapping") @XmlElement(required = true) CertificateMapping certificateMapping) throws CertificateMappingServiceException;
+	@WebMethod(operationName = "setCertificateMapping")
+	void setCertificateMapping(@WebParam(name = "certificateMapping") @XmlElement(required = true) CertificateMapping certificateMapping) throws CertificateMappingServiceException;
 
 	/**
 	 * Removes Certificate mapping identified by source Certificate source from the database
@@ -45,8 +45,8 @@ public interface CertificateMappingService
 	 * @param source
 	 * @throws CertificateMappingServiceException
 	 */
-	@WebMethod(operationName = "DeleteCertificateMapping")
-	void deleteCertificateMapping(@WebParam(name = "SourceCertificate") @XmlElement(required = true) @XmlJavaTypeAdapter(X509CertificateAdapter.class) X509Certificate source, @WebParam(name = "CPAId") String cpaId) throws CertificateMappingServiceException;
+	@WebMethod(operationName = "deleteCertificateMapping")
+	void deleteCertificateMapping(@WebParam(name = "sourceCertificate") @XmlElement(required = true) @XmlJavaTypeAdapter(X509CertificateAdapter.class) X509Certificate source, @WebParam(name = "cpaId") String cpaId) throws CertificateMappingServiceException;
 
 	/**
 	 * Gets all Certificate mappings that are stored in the database
@@ -54,7 +54,7 @@ public interface CertificateMappingService
 	 * @return The list of Certificate mappings
 	 * @throws CertificateMappingServiceException
 	 */
-	@WebResult(name = "Certificate")
-	@WebMethod(operationName = "GetCertificateMappings")
+	@WebResult(name = "certificate")
+	@WebMethod(operationName = "getCertificateMappings")
 	List<CertificateMapping> getCertificateMappings() throws CertificateMappingServiceException;
 }

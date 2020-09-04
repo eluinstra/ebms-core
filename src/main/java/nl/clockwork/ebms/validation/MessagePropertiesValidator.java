@@ -15,7 +15,6 @@
  */
 package nl.clockwork.ebms.validation;
 
-import org.apache.commons.lang3.StringUtils;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.ActionBindingType;
 
 import lombok.AccessLevel;
@@ -25,7 +24,6 @@ import lombok.val;
 import lombok.experimental.FieldDefaults;
 import nl.clockwork.ebms.cpa.CPAManager;
 import nl.clockwork.ebms.service.model.MessageRequestProperties;
-import nl.clockwork.ebms.service.model.Party;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor
@@ -34,10 +32,8 @@ public class MessagePropertiesValidator
 	@NonNull
 	CPAManager cpaManager;
 
-	public void validate(String cpaId, String fromPartyId, String toPartyId) throws ValidationException
+	public void validate(@NonNull String cpaId, @NonNull String fromPartyId, String toPartyId) throws ValidationException
 	{
-		if (StringUtils.isEmpty(cpaId))
-			throw new ValidationException("cpaId is empty!");
 		if (!cpaManager.existsCPA(cpaId))
 			throw new ValidationException("No CPA found for cpaId=" + cpaId);
 		if (!cpaManager.existsPartyId(cpaId,fromPartyId))
@@ -60,18 +56,8 @@ public class MessagePropertiesValidator
 
 	public void validate(MessageRequestProperties properties) throws ValidatorException
 	{
-		if (StringUtils.isEmpty(properties.getCpaId()))
-			throw new ValidationException("message.cpaId is empty!");
-		if (isEmpty(properties.getFromParty()))
-			throw new ValidationException("message.fromParty is empty!");
-		if (StringUtils.isEmpty(properties.getService()))
-			throw new ValidationException("message.service is empty!");
-		if (StringUtils.isEmpty(properties.getAction()))
-			throw new ValidationException("message.action is empty!");
-
 		if (!cpaManager.existsCPA(properties.getCpaId()))
 			throw new ValidationException("No CPA found for message.cpaId=" + properties.getCpaId());
-
 		val fromPartyInfo =
 				cpaManager.getFromPartyInfo(properties.getCpaId(),properties.getFromParty(),properties.getService(),properties.getAction());
 		if (!fromPartyInfo.isPresent())
@@ -81,8 +67,8 @@ public class MessagePropertiesValidator
 			msg.append(" message.cpaId=").append(properties.getCpaId());
 			if (properties.getFromParty() != null)
 			{
-				msg.append(", message.FromParty.partyId=").append(properties.getFromParty().getPartyId());
-				msg.append(", message.FromParty.role=").append(properties.getFromParty().getRole());
+				msg.append(", message.fromParty.partyId=").append(properties.getFromParty().getPartyId());
+				msg.append(", message.fromParty.role=").append(properties.getFromParty().getRole());
 			}
 			msg.append(", message.service=").append(properties.getService());
 			msg.append(", message.action=").append(properties.getAction());
@@ -98,13 +84,13 @@ public class MessagePropertiesValidator
 			msg.append(" message.cpaId=").append(properties.getCpaId());
 			if (fromPartyInfo.get().getCanSend().getOtherPartyActionBinding() != null && properties.getFromParty() != null)
 			{
-				msg.append(", message.FromParty.partyId=").append(properties.getFromParty().getPartyId());
-				msg.append(", message.FromParty.role=").append(properties.getFromParty().getRole());
+				msg.append(", message.fromParty.partyId=").append(properties.getFromParty().getPartyId());
+				msg.append(", message.fromParty.role=").append(properties.getFromParty().getRole());
 			}
 			if (properties.getToParty() != null)
 			{
-				msg.append(", message.ToParty.partyId=").append(properties.getToParty().getPartyId());
-				msg.append(", message.ToParty.role=").append(properties.getToParty().getRole());
+				msg.append(", message.toParty.partyId=").append(properties.getToParty().getPartyId());
+				msg.append(", message.toParty.role=").append(properties.getToParty().getRole());
 			}
 			msg.append(", message.service=").append(properties.getService());
 			msg.append(", message.action=").append(properties.getAction());
@@ -119,17 +105,17 @@ public class MessagePropertiesValidator
 			msg.append(" message.cpaId=").append(properties.getCpaId());
 			if (fromPartyInfo.get().getCanSend().getOtherPartyActionBinding() != null && properties.getFromParty() != null)
 			{
-				msg.append(", message.FromParty.partyId=").append(properties.getFromParty().getPartyId());
-				msg.append(", message.FromParty.role=").append(properties.getFromParty().getRole());
+				msg.append(", message.fromParty.partyId=").append(properties.getFromParty().getPartyId());
+				msg.append(", message.fromParty.role=").append(properties.getFromParty().getRole());
 			}
 			if (properties.getToParty() != null)
 			{
-				msg.append(", message.ToParty.partyId=").append(properties.getToParty().getPartyId());
-				msg.append(", message.ToParty.role=").append(properties.getToParty().getRole());
+				msg.append(", message.toParty.partyId=").append(properties.getToParty().getPartyId());
+				msg.append(", message.toParty.role=").append(properties.getToParty().getRole());
 			}
 			msg.append(", message.service=").append(properties.getService());
 			msg.append(", message.action=").append(properties.getAction());
-			msg.append(". message.ToParty is optional!");
+			msg.append(". message.toParty is optional!");
 			throw new ValidationException(msg.toString());
 		}
 	}
@@ -142,10 +128,4 @@ public class MessagePropertiesValidator
 			return thisPartyActionBinding.getId().equals(((ActionBindingType)otherPartyActionBinding).getId());
 		return false;
 	}
-
-	private boolean isEmpty(Party party)
-	{
-		return party == null || StringUtils.isEmpty(party.getPartyId()) || StringUtils.isEmpty(party.getRole()) ;
-	}
-
 }

@@ -23,18 +23,18 @@ import javax.jws.WebService;
 public interface MessageEventListenerService extends MessageEventListener
 {
 	@Override
-	@WebMethod(operationName = "MessageReceived")
-	void onMessageReceived(@WebParam(name = "MessageId") String messageId) throws MessageEventListenerServiceException;
+	@WebMethod(operationName = "onMessageReceived")
+	void onMessageReceived(@WebParam(name = "messageId") String messageId) throws MessageEventListenerServiceException;
 
 	@Override
-	@WebMethod(operationName = "MessageDelivered")
-	void onMessageDelivered(@WebParam(name = "MessageId") String messageId) throws MessageEventListenerServiceException;
+	@WebMethod(operationName = "onMessageDelivered")
+	void onMessageDelivered(@WebParam(name = "messageId") String messageId) throws MessageEventListenerServiceException;
 
 	@Override
-	@WebMethod(operationName = "MessageDeliveryFailed")
-	void onMessageFailed(@WebParam(name = "MessageId") String messageId) throws MessageEventListenerServiceException;
+	@WebMethod(operationName = "onMessageDeliveryFailed")
+	void onMessageFailed(@WebParam(name = "messageId") String messageId) throws MessageEventListenerServiceException;
 
 	@Override
-	@WebMethod(operationName = "MessageExpired")
-	void onMessageExpired(@WebParam(name = "MessageId") String messageId) throws MessageEventListenerServiceException;
+	@WebMethod(operationName = "onMessageExpired")
+	void onMessageExpired(@WebParam(name = "messageId") String messageId) throws MessageEventListenerServiceException;
 }

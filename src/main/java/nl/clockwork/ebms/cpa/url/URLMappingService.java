@@ -32,8 +32,8 @@ public interface URLMappingService
 	 * @param urlMapping - Maps the source URL to the destination URL
 	 * @throws URLMappingServiceException
 	 */
-	@WebMethod(operationName = "SetURLMapping")
-	void setURLMapping(@WebParam(name = "URLMapping") @XmlElement(required = true) URLMapping urlMapping) throws URLMappingServiceException;
+	@WebMethod(operationName = "setURLMapping")
+	void setURLMapping(@WebParam(name = "urlMapping") @XmlElement(required = true) URLMapping urlMapping) throws URLMappingServiceException;
 
 	/**
 	 * Removes URL mapping identified by source URL source from the database
@@ -41,8 +41,8 @@ public interface URLMappingService
 	 * @param source
 	 * @throws URLMappingServiceException
 	 */
-	@WebMethod(operationName = "DeleteURLMapping")
-	void deleteURLMapping(@WebParam(name = "SourceURL") @XmlElement(required = true) String source) throws URLMappingServiceException;
+	@WebMethod(operationName = "deleteURLMapping")
+	void deleteURLMapping(@WebParam(name = "sourceURL") @XmlElement(required = true) String source) throws URLMappingServiceException;
 
 	/**
 	 * Gets all URL mappings that are stored in the database
@@ -50,7 +50,7 @@ public interface URLMappingService
 	 * @return The list of URL mappings
 	 * @throws URLMappingServiceException
 	 */
-	@WebResult(name = "URL")
-	@WebMethod(operationName = "GetURLMappings")
+	@WebResult(name = "url")
+	@WebMethod(operationName = "getURLMappings")
 	List<URLMapping> getURLMappings() throws URLMappingServiceException;
 }
