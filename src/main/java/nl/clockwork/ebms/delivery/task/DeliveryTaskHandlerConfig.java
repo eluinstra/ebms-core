@@ -17,11 +17,11 @@ package nl.clockwork.ebms.delivery.task;
 
 import javax.jms.ConnectionFactory;
 
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Condition;
 import org.springframework.context.annotation.ConditionContext;
 import org.springframework.context.annotation.Conditional;
@@ -44,13 +44,14 @@ import nl.clockwork.ebms.event.MessageEventListener;
 import nl.clockwork.ebms.processor.EbMSMessageProcessor;
 
 @Configuration
+@ComponentScan(basePackageClasses = {nl.clockwork.ebms.delivery.task.DeliveryTaskJob.class})
 @EnableAsync
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class DeliveryTaskHandlerConfig
 {
 	public enum DeliveryTaskHandlerType
 	{
-		DEFAULT, JMS;
+		DEFAULT, JMS, QUARTZ;
 	}
 	@Autowired
 	DeliveryTaskDAO deliveryTaskDAO;
@@ -68,9 +69,9 @@ public class DeliveryTaskHandlerConfig
 	int minThreads;
 	@Value("${deliveryTaskHandler.maxThreads}")
 	int maxThreads;
-	@Value("${deliveryTaskHandler.maxTasks}")
+	@Value("${deliveryTaskHandler.default.maxTasks}")
 	int maxTaksks;
-	@Value("${deliveryTaskHandler.executionInterval}")
+	@Value("${deliveryTaskHandler.default.executionInterval}")
 	int taskHandlerExecutionInterval;
 	@Value("${deliveryTaskHandler.task.executionInterval}")
 	int taskHandlerTaskExecutionInterval;
@@ -138,7 +139,7 @@ public class DeliveryTaskHandlerConfig
 		result.setConcurrentConsumers(minThreads);
 		result.setMaxConcurrentConsumers(maxThreads);
 		result.setReceiveTimeout(receiveTimeout);
-		result.setDestinationName(StringUtils.isEmpty(jmsDestinationName) ? JMSDeliveryTaskManager.JMS_DESTINATION_NAME : jmsDestinationName);
+		result.setDestinationName(jmsDestinationName == null ? JMSDeliveryTaskManager.JMS_DESTINATION_NAME : jmsDestinationName);
 		result.setMessageListener(new JMSDeliveryTaskListener(deliveryTaskHandler()));
 		return result;
 	}
@@ -179,6 +180,15 @@ public class DeliveryTaskHandlerConfig
 					&& context.getEnvironment().getProperty("deliveryTaskHandler.type",DeliveryTaskHandlerType.class,DeliveryTaskHandlerType.DEFAULT) == DeliveryTaskHandlerType.JMS;
 		}
 	}
+	public static class QuartzTaskHandler implements Condition
+	{
+		@Override
+		public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata)
+		{
+			return context.getEnvironment().getProperty("deliveryTaskHandler.start",Boolean.class,true)
+					&& context.getEnvironment().getProperty("deliveryTaskHandler.type",DeliveryTaskHandlerType.class,DeliveryTaskHandlerType.DEFAULT) == DeliveryTaskHandlerType.QUARTZ;
+		}
+	}
 	public static class DefaultTaskHandlerType implements Condition
 	{
 		@Override
@@ -193,6 +203,14 @@ public class DeliveryTaskHandlerConfig
 		public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata)
 		{
 			return context.getEnvironment().getProperty("deliveryTaskHandler.type",DeliveryTaskHandlerType.class,DeliveryTaskHandlerType.DEFAULT) == DeliveryTaskHandlerType.JMS;
+		}
+	}
+	public static class QuartzTaskHandlerType implements Condition
+	{
+		@Override
+		public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata)
+		{
+			return context.getEnvironment().getProperty("deliveryTaskHandler.type",DeliveryTaskHandlerType.class,DeliveryTaskHandlerType.DEFAULT) == DeliveryTaskHandlerType.QUARTZ;
 		}
 	}
 }

@@ -36,6 +36,7 @@ import nl.clockwork.ebms.event.MessageEventListenerConfig;
 import nl.clockwork.ebms.jms.JMSConfig;
 import nl.clockwork.ebms.processor.EbMSProcessorConfig;
 import nl.clockwork.ebms.querydsl.QueryDSLConfig;
+import nl.clockwork.ebms.scheduler.SchedulerConfig;
 import nl.clockwork.ebms.security.KeyStoreConfig;
 import nl.clockwork.ebms.server.EbMSServerConfig;
 import nl.clockwork.ebms.service.EbMSMessageServiceConfig;
@@ -64,6 +65,7 @@ import nl.clockwork.ebms.validation.ValidationConfig;
 		KeyStoreConfig.class,
 		MessageEventListenerConfig.class,
 		QueryDSLConfig.class,
+		SchedulerConfig.class,
 		SigningConfig.class,
 		TransactionManagerConfig.class,
 		URLMappingServiceConfig.class,

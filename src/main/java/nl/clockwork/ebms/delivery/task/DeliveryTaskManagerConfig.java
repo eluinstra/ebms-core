@@ -17,6 +17,7 @@ package nl.clockwork.ebms.delivery.task;
 
 import javax.jms.ConnectionFactory;
 
+import org.quartz.Scheduler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -35,6 +36,7 @@ import nl.clockwork.ebms.dao.EbMSDAO;
 import nl.clockwork.ebms.delivery.task.DeliveryTaskHandlerConfig.DefaultTaskHandlerType;
 import nl.clockwork.ebms.delivery.task.DeliveryTaskHandlerConfig.DeliveryTaskHandlerType;
 import nl.clockwork.ebms.delivery.task.DeliveryTaskHandlerConfig.JmsTaskHandlerType;
+import nl.clockwork.ebms.delivery.task.DeliveryTaskHandlerConfig.QuartzTaskHandlerType;
 
 @Configuration
 @FieldDefaults(level = AccessLevel.PRIVATE)
@@ -48,6 +50,8 @@ public class DeliveryTaskManagerConfig
 	String serverId;
 	@Autowired
 	ConnectionFactory connectionFactory;
+	@Autowired
+	Scheduler scheduler;
 	@Value("${ebmsMessage.nrAutoRetries}")
 	int nrAutoRetries;
 	@Value("${ebmsMessage.autoRetryInterval}")
@@ -72,6 +76,13 @@ public class DeliveryTaskManagerConfig
 	public DeliveryTaskManager jmsDeliveryTaskManager()
 	{
 		return new JMSDeliveryTaskManager(new JmsTemplate(connectionFactory),ebMSDAO,deliveryTaskDAO(),cpaManager,nrAutoRetries,autoRetryInterval);
+	}
+
+	@Bean
+	@Conditional(QuartzTaskHandlerType.class)
+	public DeliveryTaskManager quartzDeliveryTaskManager()
+	{
+		return new QuartzDeliveryTaskManager(scheduler,ebMSDAO,deliveryTaskDAO(),cpaManager,nrAutoRetries,autoRetryInterval);
 	}
 
 	@Bean
