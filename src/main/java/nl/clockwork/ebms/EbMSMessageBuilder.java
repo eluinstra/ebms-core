@@ -151,12 +151,12 @@ public class EbMSMessageBuilder
 						.build();
 			else
 				return Match(messageHeader.getAction()).of(
-						Case($(EbMSAction.MESSAGE_ERROR.getAction()),o -> new EbMSMessageError(messageHeader,signature,errorList)),
 						Case($(EbMSAction.ACKNOWLEDGMENT.getAction()),o -> new EbMSAcknowledgment(messageHeader,signature,acknowledgment)),
-						Case($(EbMSAction.STATUS_REQUEST.getAction()),o -> new EbMSStatusRequest(messageHeader,signature,syncReply,statusRequest)),
-						Case($(EbMSAction.STATUS_RESPONSE.getAction()),o -> new EbMSStatusResponse(messageHeader,signature,statusResponse)),
+						Case($(EbMSAction.MESSAGE_ERROR.getAction()),o -> new EbMSMessageError(messageHeader,signature,errorList)),
 						Case($(EbMSAction.PING.getAction()),o -> new EbMSPing(messageHeader,signature,syncReply)),
 						Case($(EbMSAction.PONG.getAction()),o -> new EbMSPong(messageHeader,signature)),
+						Case($(EbMSAction.STATUS_REQUEST.getAction()),o -> new EbMSStatusRequest(messageHeader,signature,syncReply,statusRequest)),
+						Case($(EbMSAction.STATUS_RESPONSE.getAction()),o -> new EbMSStatusResponse(messageHeader,signature,statusResponse)),
 						Case($(),o -> {
 							throw new EbMSProcessingException("Unable to build message from service " + CPAUtils.toString(messageHeader.getService()) + " and action " + messageHeader.getAction());
 						}));

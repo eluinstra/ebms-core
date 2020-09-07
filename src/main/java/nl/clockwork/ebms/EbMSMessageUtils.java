@@ -103,30 +103,35 @@ public class EbMSMessageUtils
 				StatusRequest.class,
 				StatusResponse.class);
 		val envelope = jaxbParser.handle(document);
-		envelope.getHeader().getAny().forEach(e -> setEbMSMessageBuilder(builder,e));
-		envelope.getBody().getAny().forEach(e -> setEbMSMessageBuilder(builder,e));
+		envelope.getHeader().getAny().forEach(e -> setEbMSMessageBuilderHeader(builder,e));
+		envelope.getBody().getAny().forEach(e -> setEbMSMessageBuilderBody(builder,e));
 		builder.attachments(attachments);
 		return builder.build();
 	}
 
 	@SuppressWarnings("unchecked")
-	private static void setEbMSMessageBuilder(EbMSMessageBuilder result, Object o)
+	private static void setEbMSMessageBuilderHeader(EbMSMessageBuilder result, Object o)
 	{
 		Match(o).of(
-				Case($(instanceOf(MessageHeader.class)),i -> result.messageHeader(i)),
-				Case($(instanceOf(SyncReply.class)),i -> result.syncReply(i)),
-				Case($(instanceOf(MessageOrder.class)),i -> result.messageOrder(i)),
-				Case($(instanceOf(AckRequested.class)),i -> result.ackRequested(i)),
-				Case($(instanceOf(ErrorList.class)),i -> result.errorList((ErrorList)i)),
-				Case($(instanceOf(Acknowledgment.class)),i -> result.acknowledgment(i)),
-				Case($(instanceOf(Manifest.class)),i -> result.manifest(i)),
-				Case($(instanceOf(StatusRequest.class)),i -> result.statusRequest(i)),
-				Case($(instanceOf(StatusResponse.class)),i -> result.statusResponse(i)),
-				Case($(instanceOf(JAXBElement.class)),i -> run(() ->
+				Case($(instanceOf(MessageHeader.class)),p -> result.messageHeader(p)),
+				Case($(instanceOf(AckRequested.class)),p -> result.ackRequested(p)),
+				Case($(instanceOf(Acknowledgment.class)),p -> result.acknowledgment(p)),
+				Case($(instanceOf(ErrorList.class)),p -> result.errorList((ErrorList)p)),
+				Case($(instanceOf(SyncReply.class)),p -> result.syncReply(p)),
+				Case($(instanceOf(MessageOrder.class)),p -> result.messageOrder(p)),
+				Case($(instanceOf(JAXBElement.class)),p -> run(() ->
 				{
-					if (((JAXBElement<?>)i).getValue() instanceof SignatureType)
-						result.signature(((JAXBElement<SignatureType>)i).getValue());
+					if (((JAXBElement<?>)p).getValue() instanceof SignatureType)
+						result.signature(((JAXBElement<SignatureType>)p).getValue());
 				})));
+	}
+
+	private static void setEbMSMessageBuilderBody(EbMSMessageBuilder result, Object o)
+	{
+		Match(o).of(
+				Case($(instanceOf(Manifest.class)),p -> result.manifest(p)),
+				Case($(instanceOf(StatusRequest.class)),p -> result.statusRequest(p)),
+				Case($(instanceOf(StatusResponse.class)),p -> result.statusResponse(p)));
 	}
 
 	public static String toString(PartyId partyId)
@@ -256,10 +261,10 @@ public class EbMSMessageUtils
 			envelope.getHeader().getAny().add(((EbMSMessage)ebMSMessage).getAckRequested());
 			envelope.getBody().getAny().add(((EbMSMessage)ebMSMessage).getManifest());
 		}
-		else if (ebMSMessage instanceof EbMSMessageError)
-			envelope.getHeader().getAny().add(((EbMSMessageError)ebMSMessage).getErrorList());
 		else if (ebMSMessage instanceof EbMSAcknowledgment)
 			envelope.getHeader().getAny().add(((EbMSAcknowledgment)ebMSMessage).getAcknowledgment());
+		else if (ebMSMessage instanceof EbMSMessageError)
+			envelope.getHeader().getAny().add(((EbMSMessageError)ebMSMessage).getErrorList());
 		else if (ebMSMessage instanceof EbMSStatusRequest)
 			envelope.getBody().getAny().add(((EbMSStatusRequest)ebMSMessage).getStatusRequest());
 		else if (ebMSMessage instanceof EbMSStatusResponse)
