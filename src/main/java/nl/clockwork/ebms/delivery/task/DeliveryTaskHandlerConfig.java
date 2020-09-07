@@ -148,7 +148,6 @@ public class DeliveryTaskHandlerConfig
   public DeliveryTaskHandler deliveryTaskHandler()
 	{
 		return DeliveryTaskHandler.builder()
-				.transactionManager(dataSourceTransactionManager)
 				.messageEventListener(messageEventListener)
 				.ebMSDAO(ebMSDAO)
 				.cpaManager(cpaManager)
