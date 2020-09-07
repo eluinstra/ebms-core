@@ -47,14 +47,16 @@ import lombok.experimental.FieldDefaults;
 
 @Configuration
 @EnableCaching
+@Conditional(SomeCacheType.class)
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class CacheConfig
 {
 	@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 	@AllArgsConstructor
 	@Getter
-	public enum CacheType
+	public static enum CacheType
 	{
+		NONE(""),
 		DEFAULT(""),
 		EHCACHE("nl/clockwork/ebms/ehcache.xml"),
 		IGNITE("nl/clockwork/ebms/ignite.xml");
