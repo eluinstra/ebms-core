@@ -59,6 +59,7 @@ import nl.clockwork.ebms.model.EbMSPing;
 import nl.clockwork.ebms.model.EbMSPong;
 import nl.clockwork.ebms.model.EbMSStatusRequest;
 import nl.clockwork.ebms.model.EbMSStatusResponse;
+import nl.clockwork.ebms.model.Party;
 import nl.clockwork.ebms.processor.EbMSProcessingException;
 import nl.clockwork.ebms.processor.EbMSProcessorException;
 import nl.clockwork.ebms.service.model.DataSource;
@@ -302,11 +303,13 @@ public class EbMSMessageFactory
 	private MessageHeader createMessageHeader(MessageRequestProperties properties) throws DatatypeConfigurationException
 	{
 		val cpaId = properties.getCpaId();
-		val fromPartyInfo = cpaManager.getFromPartyInfo(cpaId,properties.getFromParty(),properties.getService(),properties.getAction())
-				.orElseThrow(() -> StreamUtils.illegalStateException("FromPartyInfo",cpaId,properties.getFromParty(),properties.getService(),properties.getAction()));
-		val toPartyInfo = cpaManager.getToPartyInfoByFromPartyActionBinding(cpaId,properties.getFromParty(),properties.getService(),properties.getAction())
-				.orElse(cpaManager.getToPartyInfo(cpaId,properties.getToParty(),properties.getService(),properties.getAction())
-						.orElseThrow(() -> StreamUtils.illegalStateException("ToPartyInfo",cpaId,properties.getToParty(),properties.getService(),properties.getAction())));
+		val fromParty = Party.of(properties.getFromPartyId(),properties.getFromRole());
+		val fromPartyInfo = cpaManager.getFromPartyInfo(cpaId,fromParty,properties.getService(),properties.getAction())
+				.orElseThrow(() -> StreamUtils.illegalStateException("FromPartyInfo",cpaId,fromParty,properties.getService(),properties.getAction()));
+		val toParty = properties.getToPartyId() != null ? Party.of(properties.getToPartyId(),properties.getToRole()) : null;
+		val toPartyInfo = cpaManager.getToPartyInfoByFromPartyActionBinding(cpaId,fromParty,properties.getService(),properties.getAction())
+				.orElse(cpaManager.getToPartyInfo(cpaId,toParty,properties.getService(),properties.getAction())
+						.orElseThrow(() -> StreamUtils.illegalStateException("ToPartyInfo",cpaId,toParty,properties.getService(),properties.getAction())));
 		val deliveryChannel = CPAUtils.getDeliveryChannel(fromPartyInfo.getCanSend().getThisPartyActionBinding());
 		val hostname = CPAUtils.getHostname(deliveryChannel);
 		val conversationId = properties.getConversationId() == null ? ebMSIdGenerator.generateConversationId() : properties.getConversationId();
@@ -384,9 +387,10 @@ public class EbMSMessageFactory
 	private AckRequested createAckRequested(MessageRequestProperties properties)
 	{
 		val cpaId = properties.getCpaId();
-		val channel = cpaManager.getFromPartyInfo(cpaId,properties.getFromParty(),properties.getService(),properties.getAction())
+		val fromParty = Party.of(properties.getFromPartyId(),properties.getFromRole());
+		val channel = cpaManager.getFromPartyInfo(cpaId,fromParty,properties.getService(),properties.getAction())
 				.map(p -> CPAUtils.getDeliveryChannel(p.getCanSend().getThisPartyActionBinding()))
-				.orElseThrow(() -> StreamUtils.illegalStateException("FromPartyInfo",cpaId,properties.getFromParty(),properties.getService(),properties.getAction()));
+				.orElseThrow(() -> StreamUtils.illegalStateException("FromPartyInfo",cpaId,fromParty,properties.getService(),properties.getAction()));
 
 		if (PerMessageCharacteristicsType.ALWAYS.equals(channel.getMessagingCharacteristics().getAckRequested()))
 		{
@@ -412,8 +416,9 @@ public class EbMSMessageFactory
 	private SyncReply createSyncReply(MessageRequestProperties properties)
 	{
 		val cpaId = properties.getCpaId();
-		val partyId = cpaManager.getFromPartyInfo(cpaId,properties.getFromParty(),properties.getService(),properties.getAction())
-				.orElseThrow(() -> StreamUtils.illegalStateException("FromPartyInfo",cpaId,properties.getFromParty(),properties.getService(),properties.getAction()))
+		val fromParty = Party.of(properties.getFromPartyId(),properties.getFromRole());
+		val partyId = cpaManager.getFromPartyInfo(cpaId,fromParty,properties.getService(),properties.getAction())
+				.orElseThrow(() -> StreamUtils.illegalStateException("FromPartyInfo",cpaId,fromParty,properties.getService(),properties.getAction()))
 				.getPartyIds();
 		return EbMSMessageUtils.createSyncReply(cpaManager.getDefaultDeliveryChannel(cpaId,partyId,properties.getAction())
 				.orElseThrow(() -> StreamUtils.illegalStateException("DefaultDeliveryChannel",cpaId,partyId,properties.getAction())));

@@ -23,6 +23,7 @@ import lombok.NonNull;
 import lombok.val;
 import lombok.experimental.FieldDefaults;
 import nl.clockwork.ebms.cpa.CPAManager;
+import nl.clockwork.ebms.model.Party;
 import nl.clockwork.ebms.service.model.MessageRequestProperties;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -59,65 +60,18 @@ public class MessagePropertiesValidator
 		if (!cpaManager.existsCPA(properties.getCpaId()))
 			throw new ValidationException("No CPA found for message.cpaId=" + properties.getCpaId());
 		val fromPartyInfo =
-				cpaManager.getFromPartyInfo(properties.getCpaId(),properties.getFromParty(),properties.getService(),properties.getAction());
+				cpaManager.getFromPartyInfo(properties.getCpaId(),Party.of(properties.getFromPartyId(),properties.getFromRole()),properties.getService(),properties.getAction());
 		if (!fromPartyInfo.isPresent())
-		{
-			val msg = new StringBuffer();
-			msg.append("No CanSend action found for");
-			msg.append(" message.cpaId=").append(properties.getCpaId());
-			if (properties.getFromParty() != null)
-			{
-				msg.append(", message.fromParty.partyId=").append(properties.getFromParty().getPartyId());
-				msg.append(", message.fromParty.role=").append(properties.getFromParty().getRole());
-			}
-			msg.append(", message.service=").append(properties.getService());
-			msg.append(", message.action=").append(properties.getAction());
-			throw new ValidationException(msg.toString());
-		}
-
+			throw new ValidationException("No CanSend action found for " + properties);
+		val toParty = properties.getToPartyId() != null ? Party.of(properties.getToPartyId(),properties.getToRole()) : null;
 		val toPartyInfo =
-				cpaManager.getToPartyInfo(properties.getCpaId(),properties.getToParty(),properties.getService(),properties.getAction());
+				cpaManager.getToPartyInfo(properties.getCpaId(),toParty,properties.getService(),properties.getAction());
 		if (fromPartyInfo.get().getCanSend().getOtherPartyActionBinding() == null && !toPartyInfo.isPresent())
-		{
-			val msg = new StringBuffer();
-			msg.append("No CanReceive action found for");
-			msg.append(" message.cpaId=").append(properties.getCpaId());
-			if (fromPartyInfo.get().getCanSend().getOtherPartyActionBinding() != null && properties.getFromParty() != null)
-			{
-				msg.append(", message.fromParty.partyId=").append(properties.getFromParty().getPartyId());
-				msg.append(", message.fromParty.role=").append(properties.getFromParty().getRole());
-			}
-			if (properties.getToParty() != null)
-			{
-				msg.append(", message.toParty.partyId=").append(properties.getToParty().getPartyId());
-				msg.append(", message.toParty.role=").append(properties.getToParty().getRole());
-			}
-			msg.append(", message.service=").append(properties.getService());
-			msg.append(", message.action=").append(properties.getAction());
-			throw new ValidationException(msg.toString());
-		}
+			throw new ValidationException("No CanReceive action found for " + properties);
 		else if (fromPartyInfo.get().getCanSend().getOtherPartyActionBinding() != null
 				&& toPartyInfo.isPresent()
 				&& !equals(toPartyInfo.get().getCanReceive().getThisPartyActionBinding(),fromPartyInfo.get().getCanSend().getOtherPartyActionBinding()))
-		{
-			val msg = new StringBuffer();
-			msg.append("Action for to party does not match action for from party for");
-			msg.append(" message.cpaId=").append(properties.getCpaId());
-			if (fromPartyInfo.get().getCanSend().getOtherPartyActionBinding() != null && properties.getFromParty() != null)
-			{
-				msg.append(", message.fromParty.partyId=").append(properties.getFromParty().getPartyId());
-				msg.append(", message.fromParty.role=").append(properties.getFromParty().getRole());
-			}
-			if (properties.getToParty() != null)
-			{
-				msg.append(", message.toParty.partyId=").append(properties.getToParty().getPartyId());
-				msg.append(", message.toParty.role=").append(properties.getToParty().getRole());
-			}
-			msg.append(", message.service=").append(properties.getService());
-			msg.append(", message.action=").append(properties.getAction());
-			msg.append(". message.toParty is optional!");
-			throw new ValidationException(msg.toString());
-		}
+			throw new ValidationException("Action for to party does not match action for from party for " + properties);
 	}
 
 	private boolean equals(ActionBindingType thisPartyActionBinding, Object otherPartyActionBinding)

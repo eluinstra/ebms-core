@@ -999,7 +999,7 @@
       <xs:complexType name="party">
         <xs:sequence>
           <xs:element name="partyId" type="xs:string"/>
-          <xs:element name="role" type="xs:string"/>
+          <xs:element minOccurs="0" name="role" type="xs:string"/>
         </xs:sequence>
       </xs:complexType>
       <xs:complexType name="getUnprocessedMessageEventsResponse">
@@ -1076,8 +1076,10 @@
       <xs:complexType name="messageRequestProperties">
         <xs:sequence>
           <xs:element name="cpaId" type="xs:string"/>
-          <xs:element name="fromParty" type="tns:party"/>
-          <xs:element minOccurs="0" name="toParty" type="tns:party"/>
+          <xs:element name="fromPartyId" type="xs:string"/>
+          <xs:element name="fromRole" type="xs:string"/>
+          <xs:element minOccurs="0" name="toPartyId" type="xs:string"/>
+          <xs:element minOccurs="0" name="toRole" type="xs:string"/>
           <xs:element name="service" type="xs:string"/>
           <xs:element name="action" type="xs:string"/>
           <xs:element minOccurs="0" name="conversationId" type="xs:string"/>
@@ -1419,14 +1421,10 @@
          <message>
             <properties>
                <cpaId>cpaStubEBF.rm.https.signed</cpaId>
-               <fromParty>
-                  <partyId>urn:osb:oin:00000000000000000000</partyId>
-                  <role>DIGIPOORT</role>
-               </fromParty>
-               <toParty>
-                  <partyId>urn:osb:oin:00000000000000000001</partyId>
-                  <role>OVERHEID</role>
-               </toParty>
+               <fromPartyId>urn:osb:oin:00000000000000000000</fromPartyId>
+               <fromRole>DIGIPOORT</fromRole>
+               <toPartyId>urn:osb:oin:00000000000000000001</toPartyId>
+               <toRole>OVERHEID</toRole>
                <service>urn:osb:services:osb:afleveren:1.1$1.0</service>
                <action>afleveren</action>
             </properties>
@@ -1445,14 +1443,10 @@
          <message>
             <properties>
                <cpaId>cpaStubEBF.rm.https.signed</cpaId>
-               <fromParty>
-                  <partyId>urn:osb:oin:00000000000000000000</partyId>
-                  <role>DIGIPOORT</role>
-               </fromParty>
-               <toParty>
-                  <partyId>urn:osb:oin:00000000000000000001</partyId>
-                  <role>OVERHEID</role>
-               </toParty>
+               <fromPartyId>urn:osb:oin:00000000000000000000</fromPartyId>
+               <fromRole>DIGIPOORT</fromRole>
+               <toPartyId>urn:osb:oin:00000000000000000001</toPartyId>
+               <toRole>OVERHEID</toRole>
                <service>urn:osb:services:osb:afleveren:1.1$1.0</service>
                <action>afleveren</action>
             </properties>
@@ -1471,14 +1465,10 @@
          <message>
             <properties>
                <cpaId>cpaStubEBF.rm.https.signed</cpaId>
-               <fromParty>
-                  <partyId>urn:osb:oin:00000000000000000000</partyId>
-                  <role>DIGIPOORT</role>
-               </fromParty>
-               <toParty>
-                  <partyId>urn:osb:oin:00000000000000000001</partyId>
-                  <role>OVERHEID</role>
-               </toParty>
+               <fromPartyId>urn:osb:oin:00000000000000000000</fromPartyId>
+               <fromRole>DIGIPOORT</fromRole>
+               <toPartyId>urn:osb:oin:00000000000000000001</toPartyId>
+               <toRole>OVERHEID</toRole>
                <service>urn:osb:services:osb:afleveren:1.1$1.0</service>
                <action>afleveren</action>
             </properties>

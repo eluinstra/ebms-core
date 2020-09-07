@@ -16,20 +16,17 @@
 package nl.clockwork.ebms.service.model;
 
 import java.io.Serializable;
-import java.util.List;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 
-import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.PartyId;
-
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
-import nl.clockwork.ebms.cpa.CPAUtils;
 
 @XmlAccessorType(XmlAccessType.FIELD)
 @Data
@@ -40,30 +37,7 @@ public class Party implements Serializable
 {
 	private static final long serialVersionUID = 1L;
 	@XmlElement(required=true)
-	//@NonNull
+	@NonNull
 	String partyId;
-	@XmlElement(required=true)
-	//@NonNull
 	String role;
-
-	public PartyId getPartyId(List<PartyId> partyIds)
-	{
-		if (partyId == null || partyIds == null)
-			return null;
-		return partyIds.stream().filter(id -> partyId.equals(CPAUtils.toString(id))).findFirst().orElse(null);
-	}
-
-	public boolean matches(List<PartyId> partyIds)
-	{
-		if (partyId == null && (partyIds == null || partyIds.size() == 0))
-			return true;
-		if (partyId == null || partyIds == null)
-			return false;
-		return partyIds.stream().anyMatch(id -> partyId.equals(CPAUtils.toString(id)));
-	}
-	
-	public boolean matches(org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.Role role)
-	{
-		return this.role.equals(role.getName());
-	}
 }

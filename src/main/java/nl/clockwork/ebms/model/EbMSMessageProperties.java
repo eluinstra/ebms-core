@@ -46,8 +46,8 @@ public class EbMSMessageProperties implements Serializable
 	public EbMSMessageProperties(String cpaId, String fromPartyId, String fromRole, String toPartyId, String toRole, String service, String action, Instant timestamp, String conversationId, String messageId, String refToMessageId, EbMSMessageStatus messageStatus)
 	{
 		this.cpaId = cpaId;
-		this.fromParty = new Party(fromPartyId,fromRole);
-		this.toParty = new Party(toPartyId,toRole);
+		this.fromParty = Party.of(fromPartyId,fromRole);
+		this.toParty = Party.of(toPartyId,toRole);
 		this.service = service;
 		this.action = action;
 		this.timestamp = timestamp;

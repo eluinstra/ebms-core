@@ -27,6 +27,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -37,6 +38,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.val;
 import lombok.experimental.FieldDefaults;
+import nl.clockwork.ebms.delivery.task.DeliveryTaskHandlerConfig.QuartzTaskHandlerType;
 
 @Configuration
 @EnableTransactionManagement
@@ -84,6 +86,7 @@ public class SchedulerConfig
 	String isClustered;
 
 	@Bean
+	@Conditional(QuartzTaskHandlerType.class)
 	public SchedulerFactoryBean scheduler(JobFactory jobFactory)
 	{
 		val result = new SchedulerFactoryBean();
@@ -95,6 +98,7 @@ public class SchedulerConfig
 	}
 
 	@Bean
+	@Conditional(QuartzTaskHandlerType.class)
 	public JobFactory jobFactory(ApplicationContext applicationContext)
 	{
 		AutowiringSpringBeanJobFactory jobFactory = new AutowiringSpringBeanJobFactory();

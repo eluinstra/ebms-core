@@ -87,12 +87,12 @@ public class TransactionManagerConfig
 	@Conditional(AtomikosTransactionManagerType.class)
 	public JtaTransactionManager AtomikosJtaTransactionManager() throws SystemException
 	{
-		val userTransactionManager = new UserTransactionManager();
-		userTransactionManager.setTransactionTimeout(transactionTimeout);
-		userTransactionManager.setForceShutdown(false);
+		val transactionManager = new UserTransactionManager();
+		transactionManager.setTransactionTimeout(transactionTimeout);
+		transactionManager.setForceShutdown(false);
 		val userTransaction = new UserTransactionImp();
 		userTransaction.setTransactionTimeout(transactionTimeout);
-		return new JtaTransactionManager(userTransaction,userTransactionManager);
+		return new JtaTransactionManager(userTransaction,transactionManager);
 	}
 
 	@Conditional(BitronixTransactionManagerType.class)

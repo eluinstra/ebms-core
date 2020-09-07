@@ -16,20 +16,45 @@
 package nl.clockwork.ebms.model;
 
 import java.io.Serializable;
+import java.util.List;
+
+import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.PartyId;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.Value;
 import lombok.experimental.FieldDefaults;
+import nl.clockwork.ebms.cpa.CPAUtils;
 
 @Value
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-@AllArgsConstructor
+@AllArgsConstructor(staticName = "of")
 public class Party implements Serializable
 {
 	private static final long serialVersionUID = 1L;
 	@NonNull
 	String partyId;
 	String role;
+
+	public PartyId getPartyId(List<PartyId> partyIds)
+	{
+		if (partyId == null || partyIds == null)
+			return null;
+		return partyIds.stream().filter(id -> partyId.equals(CPAUtils.toString(id))).findFirst().orElse(null);
+	}
+
+	public boolean matches(List<PartyId> partyIds)
+	{
+		if (partyId == null && (partyIds == null || partyIds.size() == 0))
+			return true;
+		if (partyId == null || partyIds == null)
+			return false;
+		return partyIds.stream().anyMatch(id -> partyId.equals(CPAUtils.toString(id)));
+	}
+	
+	public boolean matches(org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.Role role)
+	{
+		return this.role.equals(role.getName());
+	}
 }

@@ -49,7 +49,7 @@ import nl.clockwork.ebms.processor.EbMSMessageProcessor;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class DeliveryTaskHandlerConfig
 {
-	public enum DeliveryTaskHandlerType
+	public static enum DeliveryTaskHandlerType
 	{
 		DEFAULT, JMS, QUARTZ;
 	}
@@ -103,7 +103,7 @@ public class DeliveryTaskHandlerConfig
 	String destinationName;
 
 	@Bean("deliveryTaskExecutor")
-	@Conditional(DefaultTaskHandler.class)
+	@Conditional(DefaultTaskHandlerType.class)
 	public ThreadPoolTaskExecutor defaultTaskProcessor()
 	{
 		val result = new ThreadPoolTaskExecutor();
@@ -115,7 +115,7 @@ public class DeliveryTaskHandlerConfig
 	}
 
 	@Bean
-	@Conditional(DefaultTaskHandler.class)
+	@Conditional(DefaultTaskHandlerType.class)
 	public DeliveryTaskExecutor taskExecutor()
 	{
 		return DeliveryTaskExecutor.builder()
@@ -129,7 +129,7 @@ public class DeliveryTaskHandlerConfig
 	}
 
 	@Bean
-	@Conditional(JmsTaskHandler.class)
+	@Conditional(JmsTaskHandlerType.class)
 	public DefaultMessageListenerContainer jmsTaskProcessor()
 	{
 		val result = new DefaultMessageListenerContainer();
@@ -162,7 +162,7 @@ public class DeliveryTaskHandlerConfig
 				.build();
 	}
 
-	public static class DefaultTaskHandler implements Condition
+	public static class DefaultTaskHandlerType implements Condition
 	{
 		@Override
 		public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata)
@@ -171,7 +171,7 @@ public class DeliveryTaskHandlerConfig
 					&& context.getEnvironment().getProperty("deliveryTaskHandler.type",DeliveryTaskHandlerType.class,DeliveryTaskHandlerType.DEFAULT) == DeliveryTaskHandlerType.DEFAULT;
 		}
 	}
-	public static class JmsTaskHandler implements Condition
+	public static class JmsTaskHandlerType implements Condition
 	{
 		@Override
 		public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata)
@@ -180,37 +180,13 @@ public class DeliveryTaskHandlerConfig
 					&& context.getEnvironment().getProperty("deliveryTaskHandler.type",DeliveryTaskHandlerType.class,DeliveryTaskHandlerType.DEFAULT) == DeliveryTaskHandlerType.JMS;
 		}
 	}
-	public static class QuartzTaskHandler implements Condition
+	public static class QuartzTaskHandlerType implements Condition
 	{
 		@Override
 		public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata)
 		{
 			return context.getEnvironment().getProperty("deliveryTaskHandler.start",Boolean.class,true)
 					&& context.getEnvironment().getProperty("deliveryTaskHandler.type",DeliveryTaskHandlerType.class,DeliveryTaskHandlerType.DEFAULT) == DeliveryTaskHandlerType.QUARTZ;
-		}
-	}
-	public static class DefaultTaskHandlerType implements Condition
-	{
-		@Override
-		public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata)
-		{
-			return context.getEnvironment().getProperty("deliveryTaskHandler.type",DeliveryTaskHandlerType.class,DeliveryTaskHandlerType.DEFAULT) == DeliveryTaskHandlerType.DEFAULT;
-		}
-	}
-	public static class JmsTaskHandlerType implements Condition
-	{
-		@Override
-		public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata)
-		{
-			return context.getEnvironment().getProperty("deliveryTaskHandler.type",DeliveryTaskHandlerType.class,DeliveryTaskHandlerType.DEFAULT) == DeliveryTaskHandlerType.JMS;
-		}
-	}
-	public static class QuartzTaskHandlerType implements Condition
-	{
-		@Override
-		public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata)
-		{
-			return context.getEnvironment().getProperty("deliveryTaskHandler.type",DeliveryTaskHandlerType.class,DeliveryTaskHandlerType.DEFAULT) == DeliveryTaskHandlerType.QUARTZ;
 		}
 	}
 }
