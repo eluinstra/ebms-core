@@ -50,7 +50,7 @@ public class DeliveryTaskManagerConfig
 	String serverId;
 	@Autowired
 	ConnectionFactory connectionFactory;
-	@Autowired
+	@Autowired(required = false)
 	Scheduler scheduler;
 	@Value("${ebmsMessage.nrAutoRetries}")
 	int nrAutoRetries;
@@ -65,24 +65,31 @@ public class DeliveryTaskManagerConfig
 	SQLQueryFactory queryFactory;
 
 	@Bean
-	@Conditional(DefaultTaskHandlerType.class)
+	@Conditional(DefaultTaskManagerType.class)
 	public DeliveryTaskManager defaultDeliveryTaskManager()
 	{
 		return createDefaultDeliveryTaskManager();
 	}
 
 	@Bean
-	@Conditional(JmsTaskHandlerType.class)
+	@Conditional(JmsTaskManagerType.class)
 	public DeliveryTaskManager jmsDeliveryTaskManager()
 	{
 		return new JMSDeliveryTaskManager(new JmsTemplate(connectionFactory),ebMSDAO,deliveryTaskDAO(),cpaManager,nrAutoRetries,autoRetryInterval);
 	}
 
 	@Bean
-	@Conditional(QuartzTaskHandlerType.class)
+	@Conditional(QuartzTaskManagerType.class)
 	public DeliveryTaskManager quartzDeliveryTaskManager()
 	{
 		return new QuartzDeliveryTaskManager(scheduler,ebMSDAO,deliveryTaskDAO(),cpaManager,nrAutoRetries,autoRetryInterval);
+	}
+
+	@Bean
+	@Conditional(QuartzJMSTaskManagerType.class)
+	public DeliveryTaskManager quartzJMSDeliveryTaskManager()
+	{
+		return new QuartzJMSDeliveryTaskManager(scheduler,ebMSDAO,deliveryTaskDAO(),cpaManager,nrAutoRetries,autoRetryInterval,new JmsTemplate(connectionFactory));
 	}
 
 	@Bean
@@ -96,7 +103,7 @@ public class DeliveryTaskManagerConfig
 		return new DAODeliveryTaskManager(ebMSDAO,deliveryTaskDAO(),cpaManager,serverId,nrAutoRetries,autoRetryInterval);
 	}
 
-	public static class DefaultTaskHandlerType implements Condition
+	public static class DefaultTaskManagerType implements Condition
 	{
 		@Override
 		public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata)
@@ -104,7 +111,7 @@ public class DeliveryTaskManagerConfig
 			return context.getEnvironment().getProperty("deliveryTaskHandler.type",DeliveryTaskHandlerType.class,DeliveryTaskHandlerType.DEFAULT) == DeliveryTaskHandlerType.DEFAULT;
 		}
 	}
-	public static class JmsTaskHandlerType implements Condition
+	public static class JmsTaskManagerType implements Condition
 	{
 		@Override
 		public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata)
@@ -112,12 +119,20 @@ public class DeliveryTaskManagerConfig
 			return context.getEnvironment().getProperty("deliveryTaskHandler.type",DeliveryTaskHandlerType.class,DeliveryTaskHandlerType.DEFAULT) == DeliveryTaskHandlerType.JMS;
 		}
 	}
-	public static class QuartzTaskHandlerType implements Condition
+	public static class QuartzTaskManagerType implements Condition
 	{
 		@Override
 		public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata)
 		{
 			return context.getEnvironment().getProperty("deliveryTaskHandler.type",DeliveryTaskHandlerType.class,DeliveryTaskHandlerType.DEFAULT) == DeliveryTaskHandlerType.QUARTZ;
+		}
+	}
+	public static class QuartzJMSTaskManagerType implements Condition
+	{
+		@Override
+		public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata)
+		{
+			return context.getEnvironment().getProperty("deliveryTaskHandler.type",DeliveryTaskHandlerType.class,DeliveryTaskHandlerType.DEFAULT) == DeliveryTaskHandlerType.QUARTZ_JMS;
 		}
 	}
 }

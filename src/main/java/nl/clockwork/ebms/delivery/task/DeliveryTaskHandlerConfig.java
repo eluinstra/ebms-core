@@ -17,6 +17,7 @@ package nl.clockwork.ebms.delivery.task;
 
 import javax.jms.ConnectionFactory;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -51,7 +52,7 @@ public class DeliveryTaskHandlerConfig
 {
 	public static enum DeliveryTaskHandlerType
 	{
-		DEFAULT, JMS, QUARTZ;
+		DEFAULT, JMS, QUARTZ, QUARTZ_JMS;
 	}
 	@Autowired
 	DeliveryTaskDAO deliveryTaskDAO;
@@ -139,7 +140,7 @@ public class DeliveryTaskHandlerConfig
 		result.setConcurrentConsumers(minThreads);
 		result.setMaxConcurrentConsumers(maxThreads);
 		result.setReceiveTimeout(receiveTimeout);
-		result.setDestinationName(jmsDestinationName == null ? JMSDeliveryTaskManager.JMS_DESTINATION_NAME : jmsDestinationName);
+		result.setDestinationName(StringUtils.isEmpty(jmsDestinationName) ? JMSDeliveryTaskManager.JMS_DESTINATION_NAME : jmsDestinationName);
 		result.setMessageListener(new JMSDeliveryTaskListener(deliveryTaskHandler()));
 		return result;
 	}
@@ -176,7 +177,8 @@ public class DeliveryTaskHandlerConfig
 		public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata)
 		{
 			return context.getEnvironment().getProperty("deliveryTaskHandler.start",Boolean.class,true)
-					&& context.getEnvironment().getProperty("deliveryTaskHandler.type",DeliveryTaskHandlerType.class,DeliveryTaskHandlerType.DEFAULT) == DeliveryTaskHandlerType.JMS;
+					&& (context.getEnvironment().getProperty("deliveryTaskHandler.type",DeliveryTaskHandlerType.class,DeliveryTaskHandlerType.DEFAULT) == DeliveryTaskHandlerType.JMS
+					|| context.getEnvironment().getProperty("deliveryTaskHandler.type",DeliveryTaskHandlerType.class,DeliveryTaskHandlerType.DEFAULT) == DeliveryTaskHandlerType.QUARTZ_JMS);
 		}
 	}
 	public static class QuartzTaskHandlerType implements Condition
@@ -185,7 +187,8 @@ public class DeliveryTaskHandlerConfig
 		public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata)
 		{
 			return context.getEnvironment().getProperty("deliveryTaskHandler.start",Boolean.class,true)
-					&& context.getEnvironment().getProperty("deliveryTaskHandler.type",DeliveryTaskHandlerType.class,DeliveryTaskHandlerType.DEFAULT) == DeliveryTaskHandlerType.QUARTZ;
+					&& (context.getEnvironment().getProperty("deliveryTaskHandler.type",DeliveryTaskHandlerType.class,DeliveryTaskHandlerType.DEFAULT) == DeliveryTaskHandlerType.QUARTZ
+					|| context.getEnvironment().getProperty("deliveryTaskHandler.type",DeliveryTaskHandlerType.class,DeliveryTaskHandlerType.DEFAULT) == DeliveryTaskHandlerType.QUARTZ_JMS);
 		}
 	}
 }

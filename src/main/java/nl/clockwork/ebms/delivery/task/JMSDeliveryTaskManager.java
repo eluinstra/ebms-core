@@ -45,7 +45,7 @@ class JMSDeliveryTaskManager implements DeliveryTaskManager
 	@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 	@AllArgsConstructor
 	@RequiredArgsConstructor
-	public class DeliveryTaskMessageCreator implements MessageCreator
+	public static class DeliveryTaskMessageCreator implements MessageCreator
 	{
 		@NonNull
 		DeliveryTask deliveryTask;
