@@ -18,8 +18,10 @@ package nl.clockwork.ebms.delivery.task;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.PlatformTransactionManager;
 
 import lombok.AccessLevel;
 import lombok.val;
@@ -29,24 +31,30 @@ import lombok.extern.slf4j.Slf4j;
 @Component
 @Slf4j
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class DeliveryTaskJob extends QuartzJobBean
+public class JMSJob extends QuartzJobBean
 {
 	@Autowired
-	DeliveryTaskHandler deliveryTaskHandler;
+	@Qualifier("jmsTransactionManager")
+	PlatformTransactionManager transactionManager;
+	@Autowired
+	DeliveryTaskManager deliveryTaskManager;
 
 	@Override
-	public void executeInternal(JobExecutionContext context) throws JobExecutionException
+	protected void executeInternal(JobExecutionContext context) throws JobExecutionException
 	{
+		val status = transactionManager.getTransaction(null);
 		try
 		{
 			val properties = context.getJobDetail().getJobDataMap();
 			val task = QuartzDeliveryTaskManager.createDeliveryTask(properties);
 			log.info("Executing task " + task);
-			deliveryTaskHandler.handle(task);
+			deliveryTaskManager.insertTask(task);
 		}
 		catch (Exception e)
 		{
-			throw new JobExecutionException(e);
-		}		
+			transactionManager.rollback(status);
+			throw new JobExecutionException();
+		}
+		transactionManager.commit(status);
 	}
 }

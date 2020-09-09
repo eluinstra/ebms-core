@@ -22,7 +22,6 @@ import javax.jms.Message;
 import javax.jms.Session;
 
 import org.apache.activemq.ScheduledMessage;
-import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DeliveryChannel;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jms.core.MessageCreator;
 
@@ -83,9 +82,8 @@ class JMSDeliveryTaskManager implements DeliveryTaskManager
 	long autoRetryInterval;
 
 	@Override
-	public void createTask(String cpaId, DeliveryChannel sendDeliveryChannel, DeliveryChannel receiveDeliveryChannel, String messageId, Instant timeToLive, Instant timestamp, boolean isConfidential)
+	public void insertTask(DeliveryTask task)
 	{
-		DeliveryTask task = new DeliveryTask(cpaId,sendDeliveryChannel.getChannelId(),receiveDeliveryChannel.getChannelId(), messageId, timeToLive, timestamp, isConfidential, 0);
 		jmsTemplate.send(JMS_DESTINATION_NAME,new DeliveryTaskMessageCreator(task));
 	}
 

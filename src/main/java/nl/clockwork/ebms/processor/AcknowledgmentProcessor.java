@@ -111,14 +111,15 @@ class AcknowledgmentProcessor
 				cpaManager.getReceiveDeliveryChannel(messageHeader.getCPAId(),messageHeader.getTo().getPartyId(),messageHeader.getTo().getRole(),service,messageHeader.getAction())
 				.orElseThrow(() -> StreamUtils.illegalStateException("ReceiveDeliveryChannel",messageHeader.getCPAId(),messageHeader.getTo().getPartyId(),messageHeader.getTo().getRole(),service,messageHeader.getAction()));
 		if (!isSyncReply)
-			deliveryTaskManager.createTask(
-					messageHeader.getCPAId(),
-					sendDeliveryChannel,
-					receiveDeliveryChannel,
-					messageHeader.getMessageData().getMessageId(),
-					messageHeader.getMessageData().getTimeToLive(),
-					messageHeader.getMessageData().getTimestamp(),
-					false);
+			deliveryTaskManager.insertTask(
+					deliveryTaskManager.createNewTask(
+							messageHeader.getCPAId(),
+							sendDeliveryChannel.getChannelId(),
+							receiveDeliveryChannel.getChannelId(),
+							messageHeader.getMessageData().getMessageId(),
+							messageHeader.getMessageData().getTimeToLive(),
+							messageHeader.getMessageData().getTimestamp(),
+							false));
 	}
 
 	public void processAcknowledgment(Instant timestamp, EbMSDocument acknowledgmentDocument, EbMSMessage requestMessage, EbMSAcknowledgment acknowledgment) throws XPathExpressionException, JAXBException, ParserConfigurationException, SAXException, IOException

@@ -32,7 +32,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @FieldDefaults(level = AccessLevel.PROTECTED, makeFinal = true)
-class DeliveryTaskExecutor implements Runnable
+class DAODeliveryTaskExecutor implements Runnable
 {
 	@NonNull
 	PlatformTransactionManager transactionManager;
@@ -45,7 +45,7 @@ class DeliveryTaskExecutor implements Runnable
 	String serverId;
 
 	@Builder
-	public DeliveryTaskExecutor(@NonNull PlatformTransactionManager transactionManager, @NonNull DeliveryTaskDAO deliveryTaskDAO, @NonNull DeliveryTaskHandler deliveryTaskHandler, @NonNull TimedTask timedTask, int maxTasks, String serverId)
+	public DAODeliveryTaskExecutor(@NonNull PlatformTransactionManager transactionManager, @NonNull DeliveryTaskDAO deliveryTaskDAO, @NonNull DeliveryTaskHandler deliveryTaskHandler, @NonNull TimedTask timedTask, int maxTasks, String serverId)
 	{
 		this.transactionManager = transactionManager;
 		this.deliveryTaskDAO = deliveryTaskDAO;
@@ -73,7 +73,10 @@ class DeliveryTaskExecutor implements Runnable
 					val timestamp = Instant.now();
 					val tasks = maxTasks > 0 ? deliveryTaskDAO.getTasksBefore(timestamp,serverId,maxTasks) : deliveryTaskDAO.getTasksBefore(timestamp,serverId);
 					for (DeliveryTask task : tasks)
+					{
+						log.info("Executing task " + task);
 						futures.add(deliveryTaskHandler.handleAsync(task));
+					}
 				}
 				catch (Exception e)
 				{

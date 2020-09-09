@@ -15,10 +15,6 @@
  */
 package nl.clockwork.ebms.delivery.task;
 
-import java.time.Instant;
-
-import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DeliveryChannel;
-
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
@@ -44,9 +40,9 @@ class DAODeliveryTaskManager implements DeliveryTaskManager
 	int autoRetryInterval;
 
 	@Override
-	public void createTask(String cpaId, DeliveryChannel sendDeliveryChannel, DeliveryChannel receiveDeliveryChannel, String messageId, Instant timeToLive, Instant timestamp, boolean isConfidential)
+	public void insertTask(DeliveryTask task)
 	{
-		deliveryTaskDAO.insertTask(new DeliveryTask(cpaId,sendDeliveryChannel.getChannelId(),receiveDeliveryChannel.getChannelId(), messageId, timeToLive, timestamp, isConfidential, 0),serverId);
+		deliveryTaskDAO.insertTask(task,serverId);
 	}
 
 	@Override
@@ -65,7 +61,10 @@ class DAODeliveryTaskManager implements DeliveryTaskManager
 		deliveryTaskDAO.insertLog(task.getMessageId(),task.getTimestamp(),url,status,errorMessage);
 		val reliableMessaging = CPAUtils.isReliableMessaging(deliveryChannel);
 		if (task.getTimeToLive() != null && reliableMessaging)
-			deliveryTaskDAO.updateTask(createNextTask(task,deliveryChannel));
+		{
+			val nextTask = createNextTask(task,deliveryChannel);
+			deliveryTaskDAO.updateTask(nextTask);
+		}
 		else
 		{
 			switch(ebMSDAO.getMessageAction(task.getMessageId()).orElse(null))
@@ -74,7 +73,8 @@ class DAODeliveryTaskManager implements DeliveryTaskManager
 				case MESSAGE_ERROR:
 					if (!reliableMessaging && task.getRetries() < nrAutoRetries)
 					{
-						deliveryTaskDAO.updateTask(createNextTask(task,autoRetryInterval));
+						val nextTask = createNextTask(task,autoRetryInterval);
+						deliveryTaskDAO.updateTask(nextTask);
 						break;
 					}
 				default:

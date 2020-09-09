@@ -15,9 +15,7 @@
  */
 package nl.clockwork.ebms.delivery.task;
 
-import java.time.Instant;
-
-import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DeliveryChannel;
+import org.quartz.Job;
 import org.quartz.Scheduler;
 import org.springframework.jms.core.JmsTemplate;
 
@@ -41,9 +39,13 @@ public class QuartzJMSDeliveryTaskManager extends QuartzDeliveryTaskManager
 	}
 
 	@Override
-	public void createTask(String cpaId, DeliveryChannel sendDeliveryChannel, DeliveryChannel receiveDeliveryChannel, String messageId, Instant timeToLive, Instant timestamp, boolean isConfidential)
+	public void insertTask(DeliveryTask task)
 	{
-		DeliveryTask task = new DeliveryTask(cpaId,sendDeliveryChannel.getChannelId(),receiveDeliveryChannel.getChannelId(), messageId, timeToLive, timestamp, isConfidential, 0);
 		jmsTemplate.send(JMSDeliveryTaskManager.JMS_DESTINATION_NAME,new DeliveryTaskMessageCreator(task));
+	}
+
+	protected Class<? extends Job> getJobClass()
+	{
+		return JMSJob.class;
 	}
 }

@@ -33,11 +33,15 @@ import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
+
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.val;
 import lombok.experimental.FieldDefaults;
+import nl.clockwork.ebms.delivery.task.DeliveryTaskHandlerConfig.DeliveryTaskHandlerType;
 import nl.clockwork.ebms.delivery.task.DeliveryTaskHandlerConfig.QuartzTaskHandlerType;
 
 @Configuration
@@ -76,8 +80,30 @@ public class SchedulerConfig
 	PlatformTransactionManager dataSourceTransactionManager;
 	@Autowired
 	DataSource dataSource;
+	@Value("${deliveryTaskHandler.type}")
+	DeliveryTaskHandlerType deliveryTaskHandlerType;
+	@Value("${deliveryTaskHandler.quartz.jdbc.driverClassName}")
+	String driverClassName;
 	@Value("${ebms.jdbc.url}")
 	String jdbcUrl;
+	@Value("${ebms.jdbc.username}")
+	String username;
+	@Value("${ebms.jdbc.password}")
+	String password;
+	@Value("${ebms.pool.autoCommit}")
+	boolean isAutoCommit;
+	@Value("${ebms.pool.connectionTimeout}")
+	int connectionTimeout;
+	@Value("${ebms.pool.maxIdleTime}")
+	int maxIdleTime;
+	@Value("${ebms.pool.maxLifetime}")
+	int maxLifetime;
+	@Value("${ebms.pool.testQuery}")
+	String testQuery;
+	@Value("${ebms.pool.minPoolSize}")
+	int minPoolSize;
+	@Value("${ebms.pool.maxPoolSize}")
+	int maxPoolSize;
 	@Value("${deliveryTaskHandler.maxThreads}")
 	String threadCount;
 	@Value("${deliveryTaskHandler.quartz.driverDelegateClass}")
@@ -94,6 +120,8 @@ public class SchedulerConfig
     result.setJobFactory(jobFactory);
     result.setTransactionManager(dataSourceTransactionManager);
 		result.setDataSource(dataSource);
+		if (deliveryTaskHandlerType == DeliveryTaskHandlerType.QUARTZ_JMS)
+			result.setNonTransactionalDataSource(hikariDataSource());
 		return result;
 	}
 
@@ -101,9 +129,9 @@ public class SchedulerConfig
 	@Conditional(QuartzTaskHandlerType.class)
 	public JobFactory jobFactory(ApplicationContext applicationContext)
 	{
-		AutowiringSpringBeanJobFactory jobFactory = new AutowiringSpringBeanJobFactory();
-		jobFactory.setApplicationContext(applicationContext);
-		return jobFactory;
+		val result = new AutowiringSpringBeanJobFactory();
+		result.setApplicationContext(applicationContext);
+		return result;
 	}
 
   private Properties quartzProperties()
@@ -115,5 +143,22 @@ public class SchedulerConfig
 		result.put("org.quartz.jobStore.driverDelegateClass",driverDelegateClass == null ? DriverDelegate.getClass(jdbcUrl) : driverDelegateClass);
 		result.put("org.quartz.jobStore.isClustered",isClustered);
 		return result;
+	}
+
+	private DataSource hikariDataSource()
+	{
+		val config = new HikariConfig();
+		config.setDriverClassName(driverClassName);
+		config.setJdbcUrl(jdbcUrl);
+		config.setUsername(username);
+		config.setPassword(password);
+		config.setAutoCommit(isAutoCommit);
+		config.setConnectionTimeout(connectionTimeout);
+		config.setIdleTimeout(maxIdleTime);
+		config.setMaxLifetime(maxLifetime);
+		config.setConnectionTestQuery(testQuery);
+		config.setMinimumIdle(minPoolSize);
+		config.setMaximumPoolSize(maxPoolSize);
+		return new HikariDataSource(config);
 	}
 }

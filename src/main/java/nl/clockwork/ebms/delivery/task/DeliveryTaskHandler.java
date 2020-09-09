@@ -116,7 +116,10 @@ class DeliveryTaskHandler
 		if (requestDocument.isPresent())
 			sendTask(task,receiveDeliveryChannel,url,requestDocument.get());
 		else
+		{
+			log.info("Finished task " + task);
 			deliveryTaskManager.deleteTask(task.getMessageId());
+		}
 	}
 
 	private void sendTask(DeliveryTask task, DeliveryChannel receiveDeliveryChannel, String url, EbMSDocument requestDocument)
@@ -194,6 +197,7 @@ class DeliveryTaskHandler
 	{
 		log.warn("Expiring message " +  task.getMessageId());
 		ebMSDAO.getEbMSDocumentIfUnsent(task.getMessageId()).ifPresent(d -> updateMessage(task.getMessageId()));
+		log.info("Finished task " + task);
 		deliveryTaskManager.deleteTask(task.getMessageId());
 	}
 

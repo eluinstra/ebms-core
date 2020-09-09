@@ -45,7 +45,7 @@ import nl.clockwork.ebms.event.MessageEventListener;
 import nl.clockwork.ebms.processor.EbMSMessageProcessor;
 
 @Configuration
-@ComponentScan(basePackageClasses = {nl.clockwork.ebms.delivery.task.DeliveryTaskJob.class})
+@ComponentScan(basePackageClasses = {nl.clockwork.ebms.delivery.task.DeliveryTaskJob.class,nl.clockwork.ebms.delivery.task.JMSJob.class})
 @EnableAsync
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class DeliveryTaskHandlerConfig
@@ -117,9 +117,9 @@ public class DeliveryTaskHandlerConfig
 
 	@Bean
 	@Conditional(DefaultTaskHandlerType.class)
-	public DeliveryTaskExecutor taskExecutor()
+	public DAODeliveryTaskExecutor taskExecutor()
 	{
-		return DeliveryTaskExecutor.builder()
+		return DAODeliveryTaskExecutor.builder()
 				.transactionManager(dataSourceTransactionManager)
 				.deliveryTaskDAO(deliveryTaskDAO)
 				.deliveryTaskHandler(deliveryTaskHandler())

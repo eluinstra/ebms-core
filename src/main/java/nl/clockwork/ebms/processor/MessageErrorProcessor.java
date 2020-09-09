@@ -111,14 +111,15 @@ class MessageErrorProcessor
 	{
 		if (!isSyncReply)
 		{
-			deliveryTaskManager.createTask(
-					cpaId,
-					sendDeliveryChannel,
-					receiveDeliveryChannel,
-					messageError.getMessageHeader().getMessageData().getMessageId(),
-					messageError.getMessageHeader().getMessageData().getTimeToLive(),
-					messageError.getMessageHeader().getMessageData().getTimestamp(),
-					false);
+			deliveryTaskManager.insertTask(
+					deliveryTaskManager.createNewTask(
+						cpaId,
+						sendDeliveryChannel.getChannelId(),
+						receiveDeliveryChannel.getChannelId(),
+						messageError.getMessageHeader().getMessageData().getMessageId(),
+						messageError.getMessageHeader().getMessageData().getTimeToLive(),
+						messageError.getMessageHeader().getMessageData().getTimestamp(),
+						false));
 		}
 	}
 	public void processMessageError(Instant timestamp, EbMSDocument response, EbMSMessage requestMessage, EbMSMessageError messageError) throws TransformerException

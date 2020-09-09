@@ -93,7 +93,15 @@ class DuplicateMessageHandler
 				val receiveDeliveryChannel = cpaManager.getReceiveDeliveryChannel(messageHeader.getCPAId(),messageHeader.getFrom().getPartyId(),messageHeader.getFrom().getRole(),service,null)
 						.orElse(null);
 				if (receiveDeliveryChannel != null && messageProperties.isPresent())
-					deliveryTaskManager.createTask(messageHeader.getCPAId(),sendDeliveryChannel,receiveDeliveryChannel,messageProperties.get().getMessageId(),messageHeader.getMessageData().getTimeToLive(),messageProperties.get().getTimestamp(),false);
+					deliveryTaskManager.insertTask(
+							deliveryTaskManager.createNewTask(
+									messageHeader.getCPAId(),
+									sendDeliveryChannel.getChannelId(),
+									receiveDeliveryChannel.getChannelId(),
+									messageProperties.get().getMessageId(),
+									messageHeader.getMessageData().getTimeToLive(),
+									messageProperties.get().getTimestamp(),
+									false));
 				if (receiveDeliveryChannel == null && messageProperties.isPresent())
 					try
 					{

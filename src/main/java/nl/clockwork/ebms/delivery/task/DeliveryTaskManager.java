@@ -24,10 +24,15 @@ import nl.clockwork.ebms.cpa.CPAUtils;
 
 public interface DeliveryTaskManager
 {
-	void createTask(String cpaId, DeliveryChannel sendDeliveryChannel, DeliveryChannel receiveDeliveryChannel, String messageId, Instant timeToLive, Instant timestamp, boolean isConfidential);
+	void insertTask(final DeliveryTask task);
 	void updateTask(final DeliveryTask task, final String url, final DeliveryTaskStatus status);
 	void updateTask(final DeliveryTask task, final String url, final DeliveryTaskStatus status, final String errorMessage);
 	void deleteTask(String messageId);
+
+	default DeliveryTask createNewTask(String cpaId, String sendDeliveryChannelId, String receiveDeliveryChannelId, String messageId, Instant timeToLive, Instant timestamp, boolean confidential)
+	{
+		return new DeliveryTask(cpaId,sendDeliveryChannelId,receiveDeliveryChannelId,messageId,timeToLive,timestamp,confidential,0);
+	}
 
 	default DeliveryTask createNextTask(DeliveryTask task, DeliveryChannel deliveryChannel)
 	{

@@ -22,7 +22,8 @@ import java.time.Instant;
 import java.util.Collections;
 import java.util.Date;
 
-import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DeliveryChannel;
+import org.quartz.Job;
+import org.quartz.JobDataMap;
 import org.quartz.JobDetail;
 import org.quartz.JobKey;
 import org.quartz.Scheduler;
@@ -54,18 +55,30 @@ public class QuartzDeliveryTaskManager implements DeliveryTaskManager
 	int nrAutoRetries;
 	int autoRetryInterval;
 
+	public static DeliveryTask createDeliveryTask(final JobDataMap properties)
+	{
+		return new DeliveryTask(properties.getString("cpaId"),
+				properties.getString("sendDeliveryChannel"),
+				properties.getString("receiveDeliveryChannel"),
+				properties.getString("messageId"),
+				properties.get("timeToLive") != null ? Instant.ofEpochMilli(properties.getLong("timeToLive")) : null,
+				Instant.ofEpochMilli(properties.getLong("timestamp")),
+				properties.getBoolean("isConfidential"),
+				properties.getInt("retries"));
+	}
+
 	@Override
-	public void createTask(String cpaId, DeliveryChannel sendDeliveryChannel, DeliveryChannel receiveDeliveryChannel, String messageId, Instant timeToLive, Instant timestamp, boolean isConfidential)
+	public void insertTask(DeliveryTask task)
 	{
 		try
 		{
-			val job = createJob(cpaId,sendDeliveryChannel.getChannelId(),receiveDeliveryChannel.getChannelId(),messageId,timeToLive,timestamp,isConfidential,0);
-			val trigger = newTrigger().withIdentity(TriggerKey.triggerKey(messageId)).startNow().build();
+			val job = createJob(task);
+			val trigger = newTrigger().withIdentity(TriggerKey.triggerKey(task.getMessageId())).startNow().build();
 			scheduler.scheduleJob(job,trigger);
 		}
 		catch (SchedulerException e)
 		{
-			new IllegalStateException(e);
+			throw new IllegalStateException(e);
 		}
 	}
 
@@ -88,22 +101,12 @@ public class QuartzDeliveryTaskManager implements DeliveryTaskManager
 			val reliableMessaging = CPAUtils.isReliableMessaging(deliveryChannel);
 			if (task.getTimeToLive() != null && reliableMessaging)
 			{
-//			JobDetail jobDetail = scheduler.getJobDetail(JobKey.jobKey(task.getMessageId()));
-//			jobDetail.getJobDataMap().putAsString("retries",jobDetail.getJobDataMap().getIntegerFromString("retries") + 1);
 				val nextTask = createNextTask(task,deliveryChannel);
 				val trigger = newTrigger()
 						.withIdentity(TriggerKey.triggerKey(nextTask.getMessageId()))
 						.startAt(Date.from(nextTask.getTimestamp()))
 						.build();
-				scheduler.scheduleJob(createJob(
-						nextTask.getCpaId(),
-						nextTask.getSendDeliveryChannelId(),
-						nextTask.getReceiveDeliveryChannelId(),
-						nextTask.getMessageId(),
-						nextTask.getTimeToLive(),
-						nextTask.getTimestamp(),
-						nextTask.isConfidential(),
-						nextTask.getRetries()),Collections.singleton(trigger),true);
+				scheduler.scheduleJob(createJob(nextTask),Collections.singleton(trigger),true);
 			}
 			else
 			{
@@ -117,15 +120,7 @@ public class QuartzDeliveryTaskManager implements DeliveryTaskManager
 							val trigger = newTrigger()
 									.startAt(Date.from(nextTask.getTimestamp()))
 									.build();
-							scheduler.scheduleJob(createJob(
-									nextTask.getCpaId(),
-									nextTask.getSendDeliveryChannelId(),
-									nextTask.getReceiveDeliveryChannelId(),
-									nextTask.getMessageId(),
-									nextTask.getTimeToLive(),
-									nextTask.getTimestamp(),
-									nextTask.isConfidential(),
-									nextTask.getRetries()),Collections.singleton(trigger),true);
+							scheduler.scheduleJob(createJob(nextTask),Collections.singleton(trigger),true);
 							break;
 						}
 					default:
@@ -134,36 +129,32 @@ public class QuartzDeliveryTaskManager implements DeliveryTaskManager
 		}
 		catch (SchedulerException e)
 		{
-			new IllegalStateException(e);
+			throw new IllegalStateException(e);
 		}
 	}
 
 	@Override
 	public void deleteTask(String messageId)
 	{
-		try
-		{
-			scheduler.deleteJob(JobKey.jobKey(messageId));
-		}
-		catch (SchedulerException e)
-		{
-			new IllegalStateException(e);
-		}
 	}
 
-	private JobDetail createJob(String cpaId, String sendDeliveryChannelId, String receiveDeliveryChannelId, String messageId, Instant timeToLive, Instant timestamp, boolean isConfidential, int retries)
+	protected Class<? extends Job> getJobClass()
 	{
-		return newJob(DeliveryTaskJob.class)
-				//.storeDurably()
-				.withIdentity(JobKey.jobKey(messageId/*,serverId*/))
-				.usingJobData("cpaId",cpaId)
-				.usingJobData("sendDeliveryChannel",sendDeliveryChannelId)
-				.usingJobData("receiveDeliveryChannel",receiveDeliveryChannelId)
-				.usingJobData("messageId",messageId)
-				.usingJobData("timeToLive",timeToLive != null ? timeToLive.toEpochMilli() : null)
-				.usingJobData("timestamp",timestamp.toEpochMilli())
-				.usingJobData("isConfidential",isConfidential)
-				.usingJobData("retries",retries)
+		return DeliveryTaskJob.class;
+	}
+
+	private JobDetail createJob(DeliveryTask task)
+	{
+		return newJob(getJobClass())
+				.withIdentity(JobKey.jobKey(task.getMessageId()))
+				.usingJobData("cpaId",task.getCpaId())
+				.usingJobData("sendDeliveryChannel",task.getSendDeliveryChannelId())
+				.usingJobData("receiveDeliveryChannel",task.getReceiveDeliveryChannelId())
+				.usingJobData("messageId",task.getMessageId())
+				.usingJobData("timeToLive",task.getTimeToLive() != null ? task.getTimeToLive().toEpochMilli() : null)
+				.usingJobData("timestamp",task.getTimestamp().toEpochMilli())
+				.usingJobData("isConfidential",task.isConfidential())
+				.usingJobData("retries",task.getRetries())
 				.build();
 	}
 }
