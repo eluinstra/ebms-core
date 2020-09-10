@@ -18,10 +18,10 @@ CREATE TABLE certificate_mapping
 (
 	id								VARCHAR(256)	NOT NULL,
 	source						BLOB					NOT NULL,
-	destination				BLOB					NOT NULL
+	destination				BLOB					NOT NULL,
+	cpa_id						VARCHAR(256)	NULL,
+	CONSTRAINT uc_certificate_mapping UNIQUE(id,cpa_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-
-ALTER TABLE certificate_mapping ADD CONSTRAINT uc_certificate_mapping_id UNIQUE (id(255));
 
 CREATE TABLE ebms_message
 (
@@ -85,7 +85,7 @@ CREATE TABLE delivery_log
 	error_message			TEXT						NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-CREATE INDEX i_delivery_log ON send (message_id(255));
+CREATE INDEX i_delivery_log ON delivery_log (message_id(255));
 
 CREATE TABLE message_event
 (

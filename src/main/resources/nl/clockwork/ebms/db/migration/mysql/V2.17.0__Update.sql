@@ -25,10 +25,11 @@ CREATE TABLE certificate_mapping
 	CONSTRAINT uc_certificate_mapping UNIQUE(id,cpa_id)
 );
 
-ALTER TABLE client_certificate ADD CONSTRAINT uc_client_certificate_id UNIQUE (source(255));
-
 ALTER TABLE ebms_event CHANGE COLUMN channel_id receive_channel_id VARCHAR(256) NOT NULL;
 ALTER TABLE ebms_event ADD send_channel_id VARCHAR(256) NULL;
 
-DROP INDEX i_ebms_message;
+DROP INDEX i_ebms_message ON ebms_message;
 CREATE INDEX i_ebms_ref_to_message ON ebms_message (ref_to_message_id(255),message_nr);
+
+DROP INDEX i_ebms_event_log ON ebms_event;
+CREATE INDEX i_ebms_event_log ON ebms_event_log (message_id(255));

@@ -21,6 +21,7 @@ import java.util.Properties;
 
 import javax.sql.DataSource;
 
+import org.apache.commons.lang3.StringUtils;
 import org.quartz.spi.JobFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -61,7 +62,7 @@ public class SchedulerConfig
 		MSSQL("jdbc:sqlserver:","org.quartz.impl.jdbcjobstore.MSSQLDelegate"),
 		MYSQL("jdbc:mysql:","org.quartz.impl.jdbcjobstore.StdJDBCDelegate"),
 		ORACLE("jdbc:oracle:","org.quartz.impl.jdbcjobstore.oracle.OracleDelegate"),
-		POSTGRES("jdbc:postgresql:","org.quartz.impl.jdbcjobstore.PostgreSQLDelegate");
+		POSTGRES("jdbc:postgresql:","org.quartz.impl.jdbcjobstore.HSQLDBDelegate");
 		
 		String jdbcUrl;
 		String driverDelegateClass;
@@ -84,6 +85,8 @@ public class SchedulerConfig
 	DeliveryTaskHandlerType deliveryTaskHandlerType;
 	@Value("${deliveryTaskHandler.quartz.jdbc.driverClassName}")
 	String driverClassName;
+	@Value("${deliveryTaskHandler.quartz.jdbc.selectWithLockSQL}")
+	String selectWithLockSQL;
 	@Value("${ebms.jdbc.url}")
 	String jdbcUrl;
 	@Value("${ebms.jdbc.username}")
@@ -141,6 +144,8 @@ public class SchedulerConfig
 		result.put("org.quartz.threadPool.threadCount",threadCount);
 		result.put("org.quartz.jobStore.class","org.quartz.impl.jdbcjobstore.JobStoreCMT");
 		result.put("org.quartz.jobStore.driverDelegateClass",driverDelegateClass == null ? DriverDelegate.getClass(jdbcUrl) : driverDelegateClass);
+		if (StringUtils.isNotEmpty(selectWithLockSQL))
+			result.put("org.quartz.jobStore.selectWithLockSQL",selectWithLockSQL);
 		result.put("org.quartz.jobStore.isClustered",isClustered);
 		return result;
 	}

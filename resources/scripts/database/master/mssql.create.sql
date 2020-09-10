@@ -12,9 +12,11 @@ CREATE TABLE url_mapping
 
 CREATE TABLE certificate_mapping
 (
-	id								VARCHAR(256)	NOT NULL UNIQUE,
+	id								VARCHAR(256)	NOT NULL,
 	source						IMAGE					NOT NULL,
-	destination				IMAGE					NOT NULL
+	destination				IMAGE					NOT NULL,
+	cpa_id						VARCHAR(256)	NULL,
+	CONSTRAINT uc_certificate_mapping UNIQUE(id,cpa_id)
 );
 
 CREATE TABLE ebms_message

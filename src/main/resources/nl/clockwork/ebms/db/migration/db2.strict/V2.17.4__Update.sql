@@ -14,19 +14,7 @@
 -- limitations under the License.
 --
 
-EXEC sp_rename 'url', 'url_mapping';
-
-CREATE TABLE certificate_mapping
-(
-	id								VARCHAR(256)	NOT NULL,
-	source						IMAGE					NOT NULL,
-	destination				IMAGE					NOT NULL,
-	cpa_id						VARCHAR(256)	NULL,
-	CONSTRAINT uc_certificate_mapping UNIQUE(id,cpa_id)
-);
-
-EXEC sp_rename 'ebms_event.channel_id', 'receive_channel_id', 'COLUMN';
-ALTER TABLE ebms_event ADD send_channel_id VARCHAR(256) NULL;
-
-DROP INDEX ebms_message.i_ebms_message;
-CREATE INDEX i_ebms_ref_to_message ON ebms_message (ref_to_message_id,message_nr);
+ALTER TABLE certificate_mapping RENAME COLUMN SOURCE TO "source";
+RENAME TABLE url_mapping TO url_mapping_old;
+CREATE TABLE url_mapping AS (SELECT SOURCE AS "source", destination FROM url_mapping_old) WITH DATA;
+DROP TABLE url_mapping_old;

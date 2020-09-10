@@ -340,9 +340,9 @@
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
-			<groupId>com.ibm.db2.jcc</groupId>
-			<artifactId>db2jcc</artifactId>
-			<version>db2jcc4</version>
+			<groupId>com.ibm.db2</groupId>
+			<artifactId>jcc</artifactId>
+			<version>11.5.4.0</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>

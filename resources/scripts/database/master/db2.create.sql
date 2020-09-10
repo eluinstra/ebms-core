@@ -2,22 +2,22 @@ CREATE TABLE cpa
 (
 	cpa_id						VARCHAR(256)		NOT NULL,
 	cpa								CLOB						NOT NULL,
-	UNIQUE(cpa_id)
+	UNIQUE (cpa_id)
 );
 
 CREATE TABLE url_mapping
 (
-	source						VARCHAR(256)		NOT NULL,
+	"source"					VARCHAR(256)		NOT NULL,
 	destination				VARCHAR(256)		NOT NULL,
-	UNIQUE(source)
+	UNIQUE ("source")
 );
 
 CREATE TABLE certificate_mapping
 (
 	id								VARCHAR(256)	NOT NULL,
-	source						BLOB					NOT NULL,
+	"source"					BLOB					NOT NULL,
 	destination				BLOB					NOT NULL,
-	UNIQUE(id)
+	cpa_id						VARCHAR(256)	NULL
 );
 
 CREATE TABLE ebms_message
@@ -67,7 +67,7 @@ CREATE TABLE delivery_task
 	is_confidential			SMALLINT				NOT NULL,
 	retries							SMALLINT				NOT NULL WITH DEFAULT 0,
 	server_id						VARCHAR(256)		NULL,
-	UNIQUE(message_id)
+	UNIQUE (message_id)
 );
 
 CREATE INDEX i_delivery_task ON delivery_task (time_stamp);
@@ -89,7 +89,7 @@ CREATE TABLE message_event
 	event_type				SMALLINT				NOT NULL,
 	time_stamp				TIMESTAMP				NOT NULL,
 	processed					SMALLINT				NOT NULL WITH DEFAULT 0,
-	UNIQUE(message_id)
+	UNIQUE (message_id)
 );
 
 CREATE INDEX i_message_event ON message_event (time_stamp);

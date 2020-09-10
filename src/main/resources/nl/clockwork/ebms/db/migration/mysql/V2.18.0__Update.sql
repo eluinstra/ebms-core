@@ -15,11 +15,11 @@
 --
 
 RENAME TABLE ebms_event TO delivery_task;
-RENAME INDEX i_ebms_event TO i_delivery_task;
+ALTER TABLE delivery_task RENAME INDEX i_ebms_event TO i_delivery_task;
 RENAME TABLE ebms_event_log TO delivery_log;
-RENAME INDEX i_ebms_event_log TO i_delivery_log;
+ALTER TABLE delivery_log RENAME INDEX i_ebms_event_log TO i_delivery_log;
 RENAME TABLE ebms_message_event TO message_event;
-RENAME INDEX i_ebms_message_event TO i_message_event;
+ALTER TABLE message_event RENAME INDEX i_ebms_message_event TO i_message_event;
 
 CREATE TABLE QRTZ_JOB_DETAILS
 	(
