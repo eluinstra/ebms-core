@@ -71,12 +71,14 @@ class MSSQLEbMSDAO extends MySQLEbMSDAO
 									"message_nr," +
 									"ref_to_message_id," +
 									"time_to_live," +
+									"from_party_id," +
 									"from_role," +
+									"to_party_id," +
 									"to_role," +
 									"service," +
 									"action," +
 									"content" +
-								") values (?,?,?,?,(select max(message_nr) + 1 as nr from ebms_message where message_id = ?),?,?,?,?,?,?,?)",
+								") values (?,?,?,?,(select max(message_nr) + 1 as nr from ebms_message where message_id = ?),?,?,?,?,?,?,?,?,?)",
 								new int[]{1}
 							);
 							ps.setTimestamp(1,Timestamp.from(timestamp));
@@ -87,7 +89,9 @@ class MSSQLEbMSDAO extends MySQLEbMSDAO
 							ps.setString(5,messageHeader.getMessageData().getMessageId());
 							ps.setString(6,messageHeader.getMessageData().getRefToMessageId());
 							ps.setTimestamp(7,messageHeader.getMessageData().getTimeToLive() == null ? null : Timestamp.from(messageHeader.getMessageData().getTimeToLive()));
+							ps.setString(8,EbMSMessageUtils.toString(messageHeader.getFrom().getPartyId().get(0)));
 							ps.setString(8,messageHeader.getFrom().getRole());
+							ps.setString(10,EbMSMessageUtils.toString(messageHeader.getTo().getPartyId().get(0)));
 							ps.setString(9,messageHeader.getTo().getRole());
 							ps.setString(10,EbMSMessageUtils.toString(messageHeader.getService()));
 							ps.setString(11,messageHeader.getAction());
