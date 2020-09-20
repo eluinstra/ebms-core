@@ -64,8 +64,6 @@ public class EbMSMessageBuilder
 
 	public EbMSMessageBuilder messageHeader(@NonNull final MessageHeader messageHeader)
 	{
-		if (messageHeader == null)
-			throw new java.lang.NullPointerException("messageHeader is marked non-null but is null");
 		this.messageHeader = messageHeader;
 		return this;
 	}
@@ -126,8 +124,6 @@ public class EbMSMessageBuilder
 
 	public EbMSMessageBuilder attachments(@NonNull final List<EbMSAttachment> attachments)
 	{
-		if (attachments == null)
-			throw new java.lang.NullPointerException("attachments is marked non-null but is null");
 		this.attachments$value = attachments;
 		attachments$set = true;
 		return this;
