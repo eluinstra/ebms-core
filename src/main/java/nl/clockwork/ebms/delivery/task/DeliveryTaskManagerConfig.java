@@ -52,9 +52,9 @@ public class DeliveryTaskManagerConfig
 	ConnectionFactory connectionFactory;
 	@Autowired(required = false)
 	Scheduler scheduler;
-	@Value("${ebmsMessage.nrAutoRetries}")
+	@Value("${deliveryTaskManager.nrAutoRetries}")
 	int nrAutoRetries;
-	@Value("${ebmsMessage.autoRetryInterval}")
+	@Value("${deliveryTaskManager.autoRetryInterval}")
 	int autoRetryInterval;
 	@Autowired
 	EbMSDAO ebMSDAO;

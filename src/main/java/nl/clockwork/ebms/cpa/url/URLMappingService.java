@@ -27,7 +27,7 @@ import javax.xml.bind.annotation.XmlElement;
 public interface URLMappingService
 {
 	/**
-	 * Stores URL mapping urlMapping in the database
+	 * Stores URL mapping urlMapping
 	 * 
 	 * @param urlMapping - Maps the source URL to the destination URL
 	 * @throws URLMappingServiceException
@@ -36,7 +36,7 @@ public interface URLMappingService
 	void setURLMapping(@WebParam(name = "urlMapping") @XmlElement(required = true) URLMapping urlMapping) throws URLMappingServiceException;
 
 	/**
-	 * Removes URL mapping identified by source URL source from the database
+	 * Removes URL mapping identified by source URL source
 	 * 
 	 * @param source
 	 * @throws URLMappingServiceException
@@ -45,7 +45,7 @@ public interface URLMappingService
 	void deleteURLMapping(@WebParam(name = "sourceURL") @XmlElement(required = true) String source) throws URLMappingServiceException;
 
 	/**
-	 * Gets all URL mappings that are stored in the database
+	 * Returns a list of all URL mappings
 	 * 
 	 * @return The list of URL mappings
 	 * @throws URLMappingServiceException

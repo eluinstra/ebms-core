@@ -62,7 +62,7 @@ public class MessageEventListenerConfig
 	EbMSDAO ebMSDAO;
 	@Autowired
 	ConnectionFactory connectionFactory;
-	@Value("${jms.destinationType}")
+	@Value("${eventListener.jms.destinationType}")
 	JMSDestinationType jmsDestinationType;
 	@Autowired
 	SQLQueryFactory queryFactory;

@@ -349,6 +349,9 @@ Replace the <username> and <password> entries with your OTN user name and passwo
 
 mvn package
 
+Eclipse:
+- install https://marketplace.eclipse.org/content/m2e-apt
+
 =====================
 = Generating reports
 =====================

@@ -36,7 +36,7 @@ public interface CPAService
 	void validateCPA(@WebParam(name = "cpa") @XmlElement(required = true) /* CollaborationProtocolAgreement */String cpa) throws CPAServiceException;
 
 	/**
-	 * Stores CPA cpa in the database. If overwrite is true and the CPA exists, the CPA will be overwritten
+	 * Stores CPA cpa. If overwrite is true and the CPA exists, the CPA will be overwritten
 	 * 
 	 * @param cpa
 	 * @param overwrite
@@ -48,7 +48,7 @@ public interface CPAService
 	String insertCPA(@WebParam(name = "cpa") @XmlElement(required = true) /* CollaborationProtocolAgreement */String cpa, @WebParam(name = "overwrite") Boolean overwrite) throws CPAServiceException;
 
 	/**
-	 * Removes CPA identified by cpaId from the database
+	 * Removes CPA identified by cpaId
 	 * 
 	 * @param cpaId
 	 * @throws CPAServiceException
@@ -57,7 +57,7 @@ public interface CPAService
 	void deleteCPA(@WebParam(name = "cpaId") @XmlElement(required = true) String cpaId) throws CPAServiceException;
 
 	/**
-	 * Returns all cpaIds that are stored in the database
+	 * Returns a list of all cpaIds
 	 * 
 	 * @return The list of cpaIds
 	 * @throws CPAServiceException
@@ -67,7 +67,7 @@ public interface CPAService
 	List<String> getCPAIds() throws CPAServiceException;
 
 	/**
-	 * Gets the CPA identified by cpaId from the database
+	 * Returns the CPA identified by cpaId
 	 * 
 	 * @param cpaId
 	 * @return The CPA

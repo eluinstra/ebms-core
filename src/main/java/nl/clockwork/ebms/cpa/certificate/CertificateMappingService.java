@@ -31,7 +31,7 @@ import nl.clockwork.ebms.jaxb.X509CertificateAdapter;
 public interface CertificateMappingService
 {
 	/**
-	 * Stores Certificate mapping certificateMapping in the database
+	 * Stores Certificate mapping certificateMapping
 	 * 
 	 * @param certificateMapping - Maps the source Certificate to the destination Certificate
 	 * @throws CertificateMappingServiceException
@@ -40,7 +40,7 @@ public interface CertificateMappingService
 	void setCertificateMapping(@WebParam(name = "certificateMapping") @XmlElement(required = true) CertificateMapping certificateMapping) throws CertificateMappingServiceException;
 
 	/**
-	 * Removes Certificate mapping identified by source Certificate source from the database
+	 * Removes Certificate mapping identified by source Certificate source
 	 * 
 	 * @param source
 	 * @throws CertificateMappingServiceException
@@ -49,7 +49,7 @@ public interface CertificateMappingService
 	void deleteCertificateMapping(@WebParam(name = "sourceCertificate") @XmlElement(required = true) @XmlJavaTypeAdapter(X509CertificateAdapter.class) X509Certificate source, @WebParam(name = "cpaId") String cpaId) throws CertificateMappingServiceException;
 
 	/**
-	 * Gets all Certificate mappings that are stored in the database
+	 * Returns a list of all Certificate mappings
 	 * 
 	 * @return The list of Certificate mappings
 	 * @throws CertificateMappingServiceException
