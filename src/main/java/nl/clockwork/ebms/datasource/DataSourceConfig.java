@@ -19,8 +19,10 @@ import java.util.Arrays;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.UUID;
+import java.util.regex.Pattern;
 
 import javax.sql.DataSource;
+import javax.sql.XADataSource;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flywaydb.core.Flyway;
@@ -31,6 +33,7 @@ import org.springframework.context.annotation.Configuration;
 
 import com.atomikos.jdbc.AtomikosDataSourceBean;
 import com.atomikos.jdbc.internal.AtomikosSQLException;
+import com.ibm.db2.jcc.DB2XADataSource;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import com.zaxxer.hikari.util.IsolationLevel;
@@ -160,8 +163,13 @@ public class DataSourceConfig
 	{
 		val result = new AtomikosDataSourceBean();
 		result.setUniqueResourceName(UUID.randomUUID().toString());
-		result.setXaDataSourceClassName(driverClassName);
-		result.setXaProperties(createDriverProperties());
+		if (jdbcUrl.contains("db2"))
+			result.setXaDataSource(createDB2XADataSource());
+		else
+		{
+			result.setXaDataSourceClassName(driverClassName);
+			result.setXaProperties(createDriverProperties());
+		}
 		if (isolationLevel != null)
 			result.setDefaultIsolationLevel(isolationLevel.getLevelId());
 		result.setLocalTransactionMode(false);
@@ -173,6 +181,21 @@ public class DataSourceConfig
 			result.setTestQuery(testQuery);
 		result.init();
 		return result;
+	}
+
+	private XADataSource createDB2XADataSource()
+	{
+		val p = Pattern.compile("^jdbc:db2://([^:]+):(\\d+)/(.*)$");
+		val m = p.matcher(jdbcUrl);
+		m.find();
+		val result = new DB2XADataSource();
+    result.setDatabaseName(m.group(3));
+    result.setUser(username);
+    result.setPassword(password);
+    result.setServerName(m.group(1));
+    result.setPortNumber(Integer.parseInt(m.group(2)));
+    result.setDriverType(4);
+    return result;
 	}
 
 	@Bean

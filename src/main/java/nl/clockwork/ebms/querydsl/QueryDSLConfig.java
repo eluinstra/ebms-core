@@ -85,7 +85,7 @@ public class QueryDSLConfig
 
 	private SQLTemplates createSQLTemplates(DataSource dataSource)
 	{
-		val driverClassName = AbstractDAOFactory.getDriverClassName(dataSource);
+		val driverClassName = AbstractDAOFactory.getDriverClassName(dataSource) == null ? "db2" : AbstractDAOFactory.getDriverClassName(dataSource);
 		return Match(driverClassName).of(
 				Case($(contains("db2")),o -> DB2Templates.builder().build()),
 				Case($(contains("h2")),o -> H2Templates.builder().build()),
