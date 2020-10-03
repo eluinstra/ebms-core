@@ -21,6 +21,7 @@ import java.util.concurrent.Future;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DeliveryChannel;
+import org.slf4j.MDC;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -45,6 +46,8 @@ import nl.clockwork.ebms.event.listener.EventListener;
 import nl.clockwork.ebms.model.EbMSDocument;
 import nl.clockwork.ebms.processor.EbMSMessageProcessor;
 import nl.clockwork.ebms.processor.EbMSProcessingException;
+import nl.clockwork.ebms.service.model.EbMSMessageContext;
+import nl.clockwork.ebms.util.LoggingUtils;
 import nl.clockwork.ebms.util.StreamUtils;
 
 @Slf4j
@@ -142,6 +145,8 @@ class EventHandler
 	{
 		try
 		{
+			EbMSMessageContext context = ebMSDAO.getMessageContext(event.getMessageId()).orElse(new EbMSMessageContext());
+			MDC.setContextMap(LoggingUtils.getPropertyMap(context));
 			sendMessage(event,receiveDeliveryChannel,url,requestDocument);
 		}
 		catch (final EbMSResponseException e)
@@ -187,6 +192,10 @@ class EventHandler
 				throw e1;
 			}
 			transactionManager.commit(status);
+		}
+		finally
+		{
+			MDC.clear();
 		}
 	}
 

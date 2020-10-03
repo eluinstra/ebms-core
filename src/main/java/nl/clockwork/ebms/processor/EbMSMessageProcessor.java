@@ -26,6 +26,7 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.xpath.XPathExpressionException;
 
+import org.slf4j.MDC;
 import org.springframework.transaction.annotation.Transactional;
 import org.xml.sax.SAXException;
 
@@ -55,6 +56,7 @@ import nl.clockwork.ebms.model.EbMSStatusRequest;
 import nl.clockwork.ebms.model.EbMSStatusResponse;
 import nl.clockwork.ebms.signing.EbMSSignatureGenerator;
 import nl.clockwork.ebms.util.DOMUtils;
+import nl.clockwork.ebms.util.LoggingUtils;
 import nl.clockwork.ebms.validation.DuplicateMessageException;
 import nl.clockwork.ebms.validation.EbMSMessageValidator;
 import nl.clockwork.ebms.validation.EbMSValidationException;
@@ -138,6 +140,7 @@ public class EbMSMessageProcessor
 			xsdValidator.validate(document.getMessage());
 			val timestamp = Instant.now();
 			val message = EbMSMessageUtils.getEbMSMessage(document);
+			MDC.setContextMap(LoggingUtils.getPropertyMap(message.getMessageHeader()));
 			val cpaId = message.getMessageHeader().getCPAId();
 			if (!cpaManager.existsCPA(cpaId))
 				throw new ValidationException("CPA " + cpaId + " not found!");
@@ -150,6 +153,10 @@ public class EbMSMessageProcessor
 		catch (XPathExpressionException | ParserConfigurationException | DatatypeConfigurationException | TransformerFactoryConfigurationError e)
 		{
 			throw new EbMSProcessorException(e);
+		}
+		finally
+		{
+			MDC.clear();
 		}
 	}
 

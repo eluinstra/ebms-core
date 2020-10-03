@@ -28,6 +28,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -65,13 +66,17 @@ public abstract class EbMSInputStreamHandler
 			val out = messageProcessor.processRequest(in);
 			if (out == null)
 			{
-				messageLog.info(">>>>\nstatusCode: " + HttpServletResponse.SC_NO_CONTENT);
+				val statusCode = Integer.toString(HttpServletResponse.SC_NO_CONTENT);
+				MDC.put("statusCode", statusCode);
+				messageLog.info(">>>>\nstatusCode: " + statusCode);
 				writeResponseStatus(HttpServletResponse.SC_NO_CONTENT);
 			}
 			else
 			{
+				val statusCode = Integer.toString(HttpServletResponse.SC_OK);
+				MDC.put("statusCode", statusCode);
 				if (messageLog.isInfoEnabled())
-					messageLog.info(">>>>\nstatusCode: " + HttpServletResponse.SC_OK + "\nContent-Type: text/xml\nSOAPAction: " + Constants.EBMS_SOAP_ACTION + "\n" + DOMUtils.toString(out.getMessage()));
+					messageLog.info(">>>>\nstatusCode: " + statusCode + "\nContent-Type: text/xml\nSOAPAction: " + Constants.EBMS_SOAP_ACTION + "\n" + DOMUtils.toString(out.getMessage()));
 				writeResponseStatus(HttpServletResponse.SC_OK);
 				writeResponseHeader("Content-Type","text/xml");
 				writeResponseHeader("SOAPAction",Constants.EBMS_SOAP_ACTION);
@@ -85,6 +90,7 @@ public abstract class EbMSInputStreamHandler
 			{
 				log.error("",e);
 				val soapFault = EbMSMessageUtils.createSOAPFault(e);
+				MDC.put("statusCode", Integer.toString(HttpServletResponse.SC_INTERNAL_SERVER_ERROR));
 				if (messageLog.isInfoEnabled())
 					messageLog.info(">>>>\nstatusCode: " + HttpServletResponse.SC_INTERNAL_SERVER_ERROR + "\nContent-Type: text/xml\n" + DOMUtils.toString(soapFault));
 				writeResponseStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
@@ -99,6 +105,10 @@ public abstract class EbMSInputStreamHandler
 					throw new IllegalStateException(e);
 				else
 					throw new IllegalStateException("An unexpected error occurred!");
+			}
+			finally
+			{
+				MDC.remove("statusCode");
 			}
 		}
 	}
