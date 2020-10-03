@@ -31,6 +31,7 @@ import bitronix.tm.resource.jdbc.PoolingDataSource;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
+import lombok.val;
 import lombok.experimental.FieldDefaults;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -48,7 +49,7 @@ public abstract class AbstractDAOFactory<T> implements FactoryBean<T>
 
 	private T createDAO(DataSource dataSource)
 	{
-		String driverClassName = getDriverClassName(dataSource);
+		val driverClassName = getDriverClassName(dataSource) == null ? "db2" : getDriverClassName(dataSource);
 		return Match(driverClassName).of(
 				Case($(contains("db2")),o -> createDB2DAO()),
 				Case($(contains("h2")),o -> createH2DAO()),
