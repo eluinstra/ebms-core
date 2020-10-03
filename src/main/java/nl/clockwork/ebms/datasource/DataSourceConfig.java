@@ -221,6 +221,8 @@ public class DataSourceConfig
 		val result = new Properties();
 		if (driverClassName.contains("sqlserver"))
 			result.put("URL",jdbcUrl);
+		else if (driverClassName.contains("oracle") && driverClassName.contains("xa"))
+			result.put("URL",jdbcUrl);
 		else
 			result.put("url",jdbcUrl);
     result.put("user",username);
