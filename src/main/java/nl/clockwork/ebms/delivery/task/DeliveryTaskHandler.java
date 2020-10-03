@@ -131,27 +131,25 @@ class DeliveryTaskHandler
 		catch (final EbMSResponseException e)
 		{
 			log.error("",e);
-			deliveryTaskManager.updateTask(task,url,DeliveryTaskStatus.FAILED,e.getMessage());
-			if ((e instanceof EbMSUnrecoverableResponseException) || !CPAUtils.isReliableMessaging(receiveDeliveryChannel))
-				if (ebMSDAO.updateMessage(task.getMessageId(),EbMSMessageStatus.CREATED,EbMSMessageStatus.DELIVERY_FAILED) > 0)
-				{
-					messageEventListener.onMessageFailed(task.getMessageId());
-					if (deleteEbMSAttachmentsOnMessageProcessed)
-						ebMSDAO.deleteAttachments(task.getMessageId());
-				}
+			handleException(task,receiveDeliveryChannel,url,e,e.getMessage());
 		}
 		catch (final Exception e)
 		{
 			log.error("",e);
-			deliveryTaskManager.updateTask(task,url,DeliveryTaskStatus.FAILED,ExceptionUtils.getStackTrace(e));
-			if (!CPAUtils.isReliableMessaging(receiveDeliveryChannel))
-				if (ebMSDAO.updateMessage(task.getMessageId(),EbMSMessageStatus.CREATED,EbMSMessageStatus.DELIVERY_FAILED) > 0)
-				{
-					messageEventListener.onMessageFailed(task.getMessageId());
-					if (deleteEbMSAttachmentsOnMessageProcessed)
-						ebMSDAO.deleteAttachments(task.getMessageId());
-				}
+			handleException(task,receiveDeliveryChannel,url,e,ExceptionUtils.getStackTrace(e));
 		}
+	}
+
+	private void handleException(DeliveryTask task, DeliveryChannel receiveDeliveryChannel, String url, final Exception e, String errorMessage)
+	{
+		deliveryTaskManager.updateTask(task,url,DeliveryTaskStatus.FAILED,errorMessage);
+		if ((e instanceof EbMSUnrecoverableResponseException) || !CPAUtils.isReliableMessaging(receiveDeliveryChannel))
+			if (ebMSDAO.updateMessage(task.getMessageId(),EbMSMessageStatus.CREATED,EbMSMessageStatus.DELIVERY_FAILED) > 0)
+			{
+				messageEventListener.onMessageFailed(task.getMessageId());
+				if (deleteEbMSAttachmentsOnMessageProcessed)
+					ebMSDAO.deleteAttachments(task.getMessageId());
+			}
 	}
 
 	private void sendMessage(final DeliveryTask task, DeliveryChannel receiveDeliveryChannel, final String url, EbMSDocument requestDocument)
