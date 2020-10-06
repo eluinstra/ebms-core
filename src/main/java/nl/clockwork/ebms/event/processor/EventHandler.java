@@ -130,6 +130,11 @@ class EventHandler
 			val requestDocument = ebMSDAO.getEbMSDocumentIfUnsent(event.getMessageId());
 			if (!requestDocument.isPresent())
 				eventManager.deleteEvent(event.getMessageId());
+			else
+			{
+				EbMSMessageContext context = ebMSDAO.getMessageContext(event.getMessageId()).orElse(new EbMSMessageContext());
+				MDC.setContextMap(LoggingUtils.getPropertyMap(context));
+			}
 			transactionManager.commit(status);
 			requestDocument.ifPresent(d -> sendEvent(event,receiveDeliveryChannel,url,d));
 		}
@@ -145,8 +150,6 @@ class EventHandler
 	{
 		try
 		{
-			EbMSMessageContext context = ebMSDAO.getMessageContext(event.getMessageId()).orElse(new EbMSMessageContext());
-			MDC.setContextMap(LoggingUtils.getPropertyMap(context));
 			sendMessage(event,receiveDeliveryChannel,url,requestDocument);
 		}
 		catch (final EbMSResponseException e)

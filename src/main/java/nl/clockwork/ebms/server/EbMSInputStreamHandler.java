@@ -106,10 +106,10 @@ public abstract class EbMSInputStreamHandler
 				else
 					throw new IllegalStateException("An unexpected error occurred!");
 			}
-			finally
-			{
-				MDC.remove("statusCode");
-			}
+		}
+		finally
+		{
+			MDC.remove("statusCode");
 		}
 	}
 
