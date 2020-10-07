@@ -26,10 +26,8 @@ import org.springframework.transaction.PlatformTransactionManager;
 import lombok.AccessLevel;
 import lombok.val;
 import lombok.experimental.FieldDefaults;
-import lombok.extern.slf4j.Slf4j;
 
 @Component
-@Slf4j
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class JMSJob extends QuartzJobBean
 {
@@ -47,7 +45,6 @@ public class JMSJob extends QuartzJobBean
 		{
 			val properties = context.getJobDetail().getJobDataMap();
 			val task = QuartzDeliveryTaskManager.createDeliveryTask(properties);
-			log.info("Executing task " + task);
 			deliveryTaskManager.insertTask(task);
 		}
 		catch (Exception e)

@@ -139,6 +139,11 @@ public class EbMSMessageUtils
 		return (partyId.getType() == null ? "" : partyId.getType() + ":") + partyId.getValue();
 	}
 
+	public static String toString(List<PartyId> partyIds)
+	{
+		return partyIds.stream().map(p -> toString(p)).findFirst().orElse(null);
+	}
+
 	public static String toString(Service service)
 	{
 		return CPAUtils.toString(service.getType(),service.getValue());

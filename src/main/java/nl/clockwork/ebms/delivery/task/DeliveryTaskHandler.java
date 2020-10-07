@@ -21,6 +21,7 @@ import java.util.concurrent.Future;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DeliveryChannel;
+import org.slf4j.MDC;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.transaction.annotation.Transactional;
@@ -45,6 +46,8 @@ import nl.clockwork.ebms.event.MessageEventListener;
 import nl.clockwork.ebms.model.EbMSDocument;
 import nl.clockwork.ebms.processor.EbMSMessageProcessor;
 import nl.clockwork.ebms.processor.EbMSProcessingException;
+import nl.clockwork.ebms.util.LoggingUtils;
+import nl.clockwork.ebms.util.LoggingUtils.Status;
 import nl.clockwork.ebms.util.StreamUtils;
 
 @Slf4j
@@ -88,6 +91,7 @@ class DeliveryTaskHandler
 
 	public void handle(DeliveryTask task)
 	{
+		log.info("Executing task " + task);
 		Runnable runnable = () ->
 		{
 			if (task.getTimeToLive() == null || Instant.now().isBefore(task.getTimeToLive()))
@@ -126,6 +130,11 @@ class DeliveryTaskHandler
 	{
 		try
 		{
+			if (LoggingUtils.mdc == Status.ENABLED)
+			{
+				val context = ebMSDAO.getEbMSMessageProperties(task.getMessageId()).orElse(null);
+				MDC.setContextMap(LoggingUtils.getPropertyMap(context));
+			}
 			sendMessage(task,receiveDeliveryChannel,url,requestDocument);
 		}
 		catch (final EbMSResponseException e)
@@ -137,6 +146,10 @@ class DeliveryTaskHandler
 		{
 			log.error("",e);
 			handleException(task,receiveDeliveryChannel,url,e,ExceptionUtils.getStackTrace(e));
+		}
+		finally
+		{
+			MDC.clear();
 		}
 	}
 
@@ -161,7 +174,7 @@ class DeliveryTaskHandler
 			log.info("Sending message " + task.getMessageId() + " to " + url);
 			val responseDocument = createClient(task).sendMessage(url,requestDocument);
 			handleResponse(task,receiveDeliveryChannel,url,requestDocument,responseDocument);
-			log.info("Message " + task.getMessageId() + " sent");
+			log.info("Sent message " + task.getMessageId());
 		}
 		catch (CertificateException e)
 		{

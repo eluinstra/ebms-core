@@ -24,6 +24,8 @@ import org.springframework.context.annotation.Configuration;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import nl.clockwork.ebms.cpa.CPAManager;
+import nl.clockwork.ebms.util.LoggingUtils;
+import nl.clockwork.ebms.util.LoggingUtils.Status;
 
 @Configuration
 @FieldDefaults(level = AccessLevel.PRIVATE)
@@ -37,6 +39,8 @@ public class CommonConfig
 	int attachmentMemoryTreshold;
 	@Value("${ebmsMessage.attachment.cipherTransformation}")
 	String attachmentCipherTransformation;
+	@Value("${logging.mdc}")
+	Status mdc;
 
 	@Bean
 	public void initXMLSecurity()
@@ -60,5 +64,11 @@ public class CommonConfig
 	public EbMSIdGenerator ebMSIdGenerator()
 	{
 		return new EbMSIdGenerator();
+	}
+
+	@Bean
+	public void configureLoggingUtils()
+	{
+		LoggingUtils.mdc = mdc;
 	}
 }

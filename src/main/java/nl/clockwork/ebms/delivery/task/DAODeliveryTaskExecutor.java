@@ -73,10 +73,7 @@ class DAODeliveryTaskExecutor implements Runnable
 					val timestamp = Instant.now();
 					val tasks = maxTasks > 0 ? deliveryTaskDAO.getTasksBefore(timestamp,serverId,maxTasks) : deliveryTaskDAO.getTasksBefore(timestamp,serverId);
 					for (DeliveryTask task : tasks)
-					{
-						log.info("Executing task " + task);
 						futures.add(deliveryTaskHandler.handleAsync(task));
-					}
 				}
 				catch (Exception e)
 				{

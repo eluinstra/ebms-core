@@ -26,9 +26,7 @@ import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.val;
 import lombok.experimental.FieldDefaults;
-import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
 @FieldDefaults(level = AccessLevel.PROTECTED, makeFinal = true)
 @AllArgsConstructor
 class JMSDeliveryTaskListener implements MessageListener
@@ -42,7 +40,6 @@ class JMSDeliveryTaskListener implements MessageListener
 		try
 		{
 			val task = createDeliveryTask(message);
-			log.info("Executing task " + task);
 			deliveryTaskHandler.handle(task);
 		}
 		catch (JMSException e)

@@ -65,13 +65,13 @@ public abstract class EbMSInputStreamHandler
 			val out = messageProcessor.processRequest(in);
 			if (out == null)
 			{
-				messageLog.info(">>>>\nstatusCode: " + HttpServletResponse.SC_NO_CONTENT);
+				messageLog.info(">>>>\nStatusCode=" + HttpServletResponse.SC_NO_CONTENT);
 				writeResponseStatus(HttpServletResponse.SC_NO_CONTENT);
 			}
 			else
 			{
 				if (messageLog.isInfoEnabled())
-					messageLog.info(">>>>\nstatusCode: " + HttpServletResponse.SC_OK + "\nContent-Type: text/xml\nSOAPAction: " + Constants.EBMS_SOAP_ACTION + "\n" + DOMUtils.toString(out.getMessage()));
+					messageLog.info(">>>>\nStatusCode=" + HttpServletResponse.SC_OK + "\nContent-Type=text/xml\nSOAPAction=" + Constants.EBMS_SOAP_ACTION + "\n" + DOMUtils.toString(out.getMessage()));
 				writeResponseStatus(HttpServletResponse.SC_OK);
 				writeResponseHeader("Content-Type","text/xml");
 				writeResponseHeader("SOAPAction",Constants.EBMS_SOAP_ACTION);
@@ -86,7 +86,7 @@ public abstract class EbMSInputStreamHandler
 				log.error("",e);
 				val soapFault = EbMSMessageUtils.createSOAPFault(e);
 				if (messageLog.isInfoEnabled())
-					messageLog.info(">>>>\nstatusCode: " + HttpServletResponse.SC_INTERNAL_SERVER_ERROR + "\nContent-Type: text/xml\n" + DOMUtils.toString(soapFault));
+					messageLog.info(">>>>\nStatusCode=" + HttpServletResponse.SC_INTERNAL_SERVER_ERROR + "\nContent-Type=text/xml\n" + DOMUtils.toString(soapFault));
 				writeResponseStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 				writeResponseHeader("Content-Type","text/xml");
 				val response = getOutputStream();
@@ -125,7 +125,7 @@ public abstract class EbMSInputStreamHandler
 
 	private String getRequestHeaders()
 	{
-		return getRequestHeaderNames().stream().flatMap(n -> getRequestHeaders(n).stream().map(h -> n + ": " + h)).collect(Collectors.joining("\n"));
+		return getRequestHeaderNames().stream().flatMap(n -> getRequestHeaders(n).stream().map(h -> n + "=" + h)).collect(Collectors.joining("\n"));
 	}
 	
 	public abstract List<String> getRequestHeaderNames();

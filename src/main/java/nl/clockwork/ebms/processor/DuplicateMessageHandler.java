@@ -64,7 +64,7 @@ class DuplicateMessageHandler
 		val messageHeader = message.getMessageHeader();
 		if (isIdenticalMessage(message))
 		{
-			log.warn("Message " + messageHeader.getMessageData().getMessageId() + " is duplicate!");
+			log.warn("Duplicate message " + messageHeader.getMessageData().getMessageId());
 			if (messageValidator.isSyncReply(message))
 			{
 				if (storeDuplicateMessage)

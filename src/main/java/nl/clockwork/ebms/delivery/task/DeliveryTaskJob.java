@@ -24,10 +24,8 @@ import org.springframework.stereotype.Component;
 import lombok.AccessLevel;
 import lombok.val;
 import lombok.experimental.FieldDefaults;
-import lombok.extern.slf4j.Slf4j;
 
 @Component
-@Slf4j
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class DeliveryTaskJob extends QuartzJobBean
 {
@@ -41,7 +39,6 @@ public class DeliveryTaskJob extends QuartzJobBean
 		{
 			val properties = context.getJobDetail().getJobDataMap();
 			val task = QuartzDeliveryTaskManager.createDeliveryTask(properties);
-			log.info("Executing task " + task);
 			deliveryTaskHandler.handle(task);
 		}
 		catch (Exception e)

@@ -74,9 +74,9 @@ class EbMSResponseHandler implements ResponseHandler<EbMSDocument>
 			{
 		    val entity = response.getEntity();
 		    if (entity != null)
-					throw new IOException("StatusCode: " + response.getStatusLine().getStatusCode() + "\n" + IOUtils.toString(entity.getContent(),Charset.defaultCharset()));
+					throw new IOException("StatusCode=" + response.getStatusLine().getStatusCode() + "\n" + IOUtils.toString(entity.getContent(),Charset.defaultCharset()));
 			}
-			throw new IOException("StatusCode: " + response.getStatusLine().getStatusCode());
+			throw new IOException("StatusCode=" + response.getStatusLine().getStatusCode());
 		}
 		catch (ParserConfigurationException | SAXException | EbMSProcessingException e)
 		{

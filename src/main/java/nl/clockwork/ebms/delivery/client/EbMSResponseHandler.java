@@ -170,7 +170,7 @@ class EbMSResponseHandler
 	private void logResponse(HttpURLConnection connection, String response) throws IOException
 	{
 		val headers = connection.getResponseCode() + (messageLog.isDebugEnabled() ? "\n" + HTTPUtils.toString(connection.getHeaderFields()) : "");
-		messageLog.info("<<<<\nstatusCode: " + headers + (response != null ? "\n" + response : ""));
+		messageLog.info("<<<<\nStatusCode=" + headers + (response != null ? "\n" + response : ""));
 	}
 
 }
