@@ -50,7 +50,7 @@ public class CollaborationProtocolAgreementType extends AbstractType<Collaborati
 	{
 		try
 		{
-			return JAXBParser.getInstance(CollaborationProtocolAgreement.class).handle(rs.getString(startIndex));
+			return JAXBParser.getInstance(CollaborationProtocolAgreement.class).handleUnsafe(rs.getString(startIndex));
 		}
 		catch (JAXBException e)
 		{

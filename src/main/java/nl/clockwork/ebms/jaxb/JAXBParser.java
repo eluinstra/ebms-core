@@ -15,8 +15,6 @@
  */
 package nl.clockwork.ebms.jaxb;
 
-import java.io.InputStream;
-import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.HashMap;
@@ -25,9 +23,6 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
-import javax.xml.stream.XMLStreamReader;
-import javax.xml.transform.stream.StreamSource;
-import javax.xml.validation.Schema;
 
 import org.apache.commons.lang3.StringUtils;
 import org.w3c.dom.Node;
@@ -46,121 +41,26 @@ public class JAXBParser<T>
 	private static HashMap<Class<?>,JAXBParser<?>> xmlHandlers = new HashMap<>();
 	JAXBContext context;
 
-	public T handle(String xml) throws JAXBException
-	{
-		return (handle(xml,null));
-	}
-
-	public T handle(String xml, Class<T> clazz) throws JAXBException
+	@SuppressWarnings("unchecked")
+	public T handleUnsafe(String xml) throws JAXBException
 	{
 		if (StringUtils.isEmpty(xml))
 			return null;
-		return handle(new StringReader(xml),clazz);
-	}
-
-	public T handle(InputStream is) throws JAXBException
-	{
-		return handle(null,is);
-	}
-
-	public T handle(Schema schema, InputStream is) throws JAXBException
-	{
-		return handle(schema,is,null);
-	}
-
-	public T handle(InputStream is, Class<T> clazz) throws JAXBException
-	{
-		return handle(null,is,clazz);
-	}
-
-	@SuppressWarnings("unchecked")
-	public T handle(Schema schema, InputStream is, Class<T> clazz) throws JAXBException
-	{
-		if (is == null)
-			return null;
+		val r = new StringReader(xml);
 		val unmarshaller = context.createUnmarshaller();
-		if (schema != null)
-			unmarshaller.setSchema(schema);
-		val o = clazz == null ? unmarshaller.unmarshal(is) : unmarshaller.unmarshal(new StreamSource(is),clazz);
+		val o = unmarshaller.unmarshal(r);
 		if (o instanceof JAXBElement<?>)
 			return ((JAXBElement<T>)o).getValue();
 		else
 			return (T)o;
 	}
 
-	public T handle(Reader r) throws JAXBException
-	{
-		return handle(null,r);
-	}
-
-	public T handle(Schema schema, Reader r) throws JAXBException
-	{
-		return handle(schema,r,null);
-	}
-
-	public T handle(Reader r, Class<T> clazz) throws JAXBException
-	{
-		return handle(null,r,clazz);
-	}
-
 	@SuppressWarnings("unchecked")
-	public T handle(Schema schema, Reader r, Class<T> clazz) throws JAXBException
-	{
-		if (r == null)
-			return null;
-		val unmarshaller = context.createUnmarshaller();
-		if (schema != null)
-			unmarshaller.setSchema(schema);
-		val o = clazz == null ? unmarshaller.unmarshal(r) : unmarshaller.unmarshal(new StreamSource(r),clazz);
-		if (o instanceof JAXBElement<?>)
-			return ((JAXBElement<T>)o).getValue();
-		else
-			return (T)o;
-	}
-
-	public T handle(XMLStreamReader r) throws JAXBException
-	{
-		return handle(null,r,null);
-	}
-
-	public T handle(Schema schema, XMLStreamReader r) throws JAXBException
-	{
-		return handle(schema,r,null);
-	}
-
-	public T handle(XMLStreamReader r, Class<T> clazz) throws JAXBException
-	{
-		return handle(null,r,clazz);
-	}
-
-	@SuppressWarnings("unchecked")
-	public T handle(Schema schema, XMLStreamReader r, Class<T> clazz) throws JAXBException
-	{
-		if (r == null)
-			return null;
-		val unmarshaller = context.createUnmarshaller();
-		if (schema != null)
-			unmarshaller.setSchema(schema);
-		val o = clazz == null ? unmarshaller.unmarshal(r) : unmarshaller.unmarshal(r,clazz);
-		if (o instanceof JAXBElement<?>)
-			return ((JAXBElement<T>)o).getValue();
-		else
-			return (T)o;
-	}
-
-	public T handle(Node n) throws JAXBException
-	{
-		return handle(null,n);
-	}
-
-	@SuppressWarnings("unchecked")
-	public T handle(Schema schema, Node n) throws JAXBException
+	public T handleUnsafe(Node n) throws JAXBException
 	{
 		if (n == null)
 			return null;
 		val unmarshaller = context.createUnmarshaller();
-		if (schema != null)
-			unmarshaller.setSchema(schema);
 		val o = unmarshaller.unmarshal(n);
 		if (o instanceof JAXBElement<?>)
 			return ((JAXBElement<T>)o).getValue();
@@ -201,19 +101,6 @@ public class JAXBParser<T>
 		val result = new StringWriter();
 		val marshaller = context.createMarshaller();
 		marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT,Boolean.TRUE);
-		marshaller.marshal(object,result);
-		result.flush();
-		return result.toString();
-	}
-
-	public String handle(T object, NamespacePrefixMapper namespacePrefixMapper) throws JAXBException
-	{
-		if (object == null)
-			return null;
-		val result = new StringWriter();
-		val marshaller = context.createMarshaller();
-		marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT,Boolean.TRUE);
-		marshaller.setProperty("com.sun.xml.bind.namespacePrefixMapper",namespacePrefixMapper);
 		marshaller.marshal(object,result);
 		result.flush();
 		return result.toString();

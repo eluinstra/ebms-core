@@ -49,7 +49,7 @@ public class CPAServiceImpl implements CPAService
 		{
 			log.debug("ValidateCPA");
 			xsdValidator.validate(cpa);
-			val cpa_ = JAXBParser.getInstance(CollaborationProtocolAgreement.class).handle(cpa);
+			val cpa_ = JAXBParser.getInstance(CollaborationProtocolAgreement.class).handleUnsafe(cpa);
 			log.info("Validating CPA " + cpa_.getCpaid());
 			cpaValidator.validate(cpa_);
 		}
@@ -67,7 +67,7 @@ public class CPAServiceImpl implements CPAService
 		{
 			log.debug("InsertCPA");
 			xsdValidator.validate(cpa);
-			val cpa_ = JAXBParser.getInstance(CollaborationProtocolAgreement.class).handle(cpa);
+			val cpa_ = JAXBParser.getInstance(CollaborationProtocolAgreement.class).handleUnsafe(cpa);
 			new CPAValidator(cpaManager).validate(cpa_);
 			cpaManager.setCPA(cpa_,overwrite);
 			log.debug("InsertCPA done");

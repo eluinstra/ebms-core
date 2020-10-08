@@ -31,7 +31,6 @@ import java.util.Collections;
 import javax.activation.DataSource;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
@@ -90,21 +89,6 @@ public class EbMSMessageUtilsTest
 		service.setType("B");
 		service.setValue("A");
 		assertEquals("B:A", EbMSMessageUtils.toString(service));
-	}
-	
-	@Test
-	public void getSoapFaultString()
-	{
-		assertNull(EbMSMessageUtils.getSOAPFault(""));
-		val fault1 = EbMSMessageUtils.getSOAPFault("<SOAP-ENV:Envelope xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\"><SOAP-ENV:Header/><SOAP-ENV:Body>" + 
-				"<SOAP-ENV:Fault><faultcode>SOAP-ENV:Client</faultcode>" + 
-				"<faultstring>Message does not have necessary info</faultstring>" + 
-				"<faultactor>http://gizmos.com/failure</faultactor><detail></detail></SOAP-ENV:Fault></SOAP-ENV:Body></SOAP-ENV:Envelope>");
-		assertEquals("Client", fault1.getFaultcode().getLocalPart());
-		assertEquals("http://gizmos.com/failure", fault1.getFaultactor());
-		assertEquals("Message does not have necessary info", fault1.getFaultstring());
-		
-		assertNull(EbMSMessageUtils.getSOAPFault("<xml/>"));
 	}
 	
 	@Test
@@ -241,8 +225,7 @@ public class EbMSMessageUtilsTest
 	
 	private String documentToString(Document document) throws TransformerException
 	{
-		val tf = TransformerFactory.newInstance();
-		val t = tf.newTransformer();
+		val t = DOMUtils.getTransformer();
 		val sw = new StringWriter();
 		t.transform(new DOMSource(document), new StreamResult(sw));
 		return sw.toString();

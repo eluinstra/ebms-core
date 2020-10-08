@@ -102,7 +102,7 @@ public class EbMSMessageUtils
 				Manifest.class,
 				StatusRequest.class,
 				StatusResponse.class);
-		val envelope = jaxbParser.handle(document);
+		val envelope = jaxbParser.handleUnsafe(document);
 		envelope.getHeader().getAny().forEach(e -> setEbMSMessageBuilderHeader(builder,e));
 		envelope.getBody().getAny().forEach(e -> setEbMSMessageBuilderBody(builder,e));
 		builder.attachments(attachments);
@@ -292,32 +292,6 @@ public class EbMSMessageUtils
 		return DOMUtils.getDocumentBuilder().parse(is);
 	}
 
-	public static Fault getSOAPFault(String s)
-	{
-		try
-		{
-			val envelope = JAXBParser.getInstance(Envelope.class).handle(s);
-			if (envelope != null)
-				return getSOAPFault(envelope);
-		}
-		catch (JAXBException e)
-		{
-			// ignore error
-		}
-		return null;
-	}
-	
-	public static Fault getSOAPFault(Envelope envelope)
-	{
-		if (envelope.getBody() != null /*&& envelope.getBody().getAny() != null*/)
-			return envelope.getBody().getAny().stream()
-					.filter(e -> ((JAXBElement<?>)e).getDeclaredType().equals(Fault.class))
-					.map(e -> (Fault)((JAXBElement<?>)e).getValue())
-					.findFirst()
-					.orElse(null);
-		return null;
-	}
-	
 	public static Document createSOAPFault(Exception e) throws ParserConfigurationException, JAXBException, SAXException, IOException
 	{
 		val envelope = new Envelope();

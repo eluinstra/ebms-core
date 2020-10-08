@@ -160,7 +160,7 @@ public class EncryptionTest
 	private Optional<CollaborationProtocolAgreement> loadCPA(String cpaId) throws IOException, JAXBException
 	{
 		val s = IOUtils.toString(this.getClass().getResourceAsStream("/nl/clockwork/ebms/cpa/" + cpaId + ".xml"),Charset.forName("UTF-8"));
-		return Optional.of(JAXBParser.getInstance(CollaborationProtocolAgreement.class).handle(s));
+		return Optional.of(JAXBParser.getInstance(CollaborationProtocolAgreement.class).handleUnsafe(s));
 	}
 
 	private URLMappingDAO initURLMappingDAOMock()
