@@ -29,6 +29,7 @@ import lombok.val;
 import nl.clockwork.ebms.model.CachedEbMSAttachment;
 import nl.clockwork.ebms.model.EbMSAttachment;
 import nl.clockwork.ebms.model.PlainEbMSAttachment;
+import nl.clockwork.ebms.util.IOUtils;
 
 public class EbMSAttachmentFactory
 {
@@ -79,9 +80,7 @@ public class EbMSAttachmentFactory
 
 	public static EbMSAttachment createCachedEbMSAttachment(String filename, String contentId, String contentType, InputStream content) throws IOException
 	{
-		val cos = new CachedOutputStream();
-		CachedOutputStream.copyStream(content,cos,4096);
-		cos.lockOutputStream();
+		val cos = IOUtils.createCachedOutputStream(content);
 		return createCachedEbMSAttachment(filename,contentId,contentType,cos);
 	}
 }

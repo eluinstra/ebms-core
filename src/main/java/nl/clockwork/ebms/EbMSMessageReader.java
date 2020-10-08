@@ -22,7 +22,6 @@ import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.parser.MimeStreamParser;
 import org.apache.james.mime4j.stream.MimeConfig;
@@ -36,6 +35,7 @@ import lombok.experimental.FieldDefaults;
 import nl.clockwork.ebms.model.EbMSAttachment;
 import nl.clockwork.ebms.model.EbMSDocument;
 import nl.clockwork.ebms.util.DOMUtils;
+import nl.clockwork.ebms.validation.XSDValidator;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor
@@ -44,6 +44,7 @@ public class EbMSMessageReader
 	String contentId;
 	@NonNull
 	String contentType;
+	XSDValidator xsdValidator = new XSDValidator("/nl/clockwork/ebms/xsd/msg-header-2_0.xsd");
 	
 	public EbMSDocument read(InputStream in) throws MimeException, IOException, ParserConfigurationException, SAXException
 	{
@@ -59,14 +60,15 @@ public class EbMSMessageReader
 			return getEbMSMessage(in);
 	}
 
-	public EbMSDocument readResponse(String message) throws IOException, ParserConfigurationException, SAXException
+	public EbMSDocument readResponse(InputStream message) throws IOException, ParserConfigurationException, SAXException
 	{
-		return StringUtils.isNotBlank(message) ? EbMSDocument.builder()
+		xsdValidator.validate(message);
+		message.reset();
+		return EbMSDocument.builder()
 				.contentId(contentId)
 				.message(DOMUtils.read(message))
 				.attachments(Collections.emptyList())
-				.build()
-				: null;
+				.build();
 	}
 
 	private void parseEbMSMessage(EbMSContentHandler handler, String contentType, InputStream in) throws MimeException, IOException
@@ -77,11 +79,13 @@ public class EbMSMessageReader
 		parser.parse(in);
 	}
 
-	private EbMSDocument getEbMSMessage(InputStream in) throws ParserConfigurationException, SAXException, IOException
+	private EbMSDocument getEbMSMessage(InputStream message) throws ParserConfigurationException, SAXException, IOException
 	{
+		xsdValidator.validate(message);
+		message.reset();
 		return EbMSDocument.builder()
 				.contentId(contentId)
-				.message(DOMUtils.read(in))
+				.message(DOMUtils.read(message))
 				.attachments(Collections.emptyList())
 				.build();
 	}
@@ -91,6 +95,7 @@ public class EbMSMessageReader
 		if (attachments.size() > 0)
 		{
 			val message = attachments.remove(0);
+			xsdValidator.validate(message.getInputStream());
 			return EbMSDocument.builder()
 					.contentId(contentId)
 					.message(DOMUtils.read((message.getInputStream())))

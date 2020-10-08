@@ -18,16 +18,14 @@ package nl.clockwork.ebms.delivery.client;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
-import java.nio.charset.Charset;
 import java.util.List;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.apache.commons.io.IOUtils;
+import org.apache.cxf.io.CachedOutputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.util.StringUtils;
 import org.xml.sax.SAXException;
 
 import lombok.AccessLevel;
@@ -40,6 +38,7 @@ import nl.clockwork.ebms.EbMSMessageReader;
 import nl.clockwork.ebms.model.EbMSDocument;
 import nl.clockwork.ebms.processor.EbMSProcessingException;
 import nl.clockwork.ebms.processor.EbMSProcessorException;
+import nl.clockwork.ebms.util.IOUtils;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor
@@ -93,14 +92,13 @@ class EbMSResponseHandler
 
 	private EbMSDocument readSuccesResponse(HttpURLConnection connection) throws IOException
 	{
-		try (val input = connection.getInputStream())
+		try (val response = IOUtils.createCachedOutputStream(connection.getInputStream()))
 		{
 			val messageReader = new EbMSMessageReader(getHeaderField("Content-ID"),getHeaderField("Content-Type"));
-			val response = IOUtils.toString(input,getEncoding());
 			logResponse(connection,response);
 			try
 			{
-				return messageReader.readResponse(response);
+				return response.size() > 0 ? messageReader.readResponse(response.getInputStream()) : null;
 			}
 			catch (ParserConfigurationException e)
 			{
@@ -108,7 +106,7 @@ class EbMSResponseHandler
 			}
 			catch (SAXException e)
 			{
-				throw new EbMSResponseException(connection.getResponseCode(),connection.getHeaderFields(),response);
+				throw new EbMSResponseException(connection.getResponseCode(),connection.getHeaderFields(),IOUtils.toString(response));
 			}
 		}
 	}
@@ -119,9 +117,9 @@ class EbMSResponseHandler
 		{
 			val response = readResponse(connection,input);
 			if (recoverableHttpErrors.contains(connection.getResponseCode()))
-				return new EbMSResponseException(connection.getResponseCode(),connection.getHeaderFields(),response);
+				return new EbMSResponseException(connection.getResponseCode(),connection.getHeaderFields(),IOUtils.toString(response));
 			else
-				return new EbMSUnrecoverableResponseException(connection.getResponseCode(),connection.getHeaderFields(),response);
+				return new EbMSUnrecoverableResponseException(connection.getResponseCode(),connection.getHeaderFields(),IOUtils.toString(response));
 		}
 	}
 
@@ -131,32 +129,17 @@ class EbMSResponseHandler
 		{
 			val response = readResponse(connection,input);
 			if (unrecoverableHttpErrors.contains(connection.getResponseCode()))
-				return new EbMSUnrecoverableResponseException(connection.getResponseCode(),connection.getHeaderFields(),response);
+				return new EbMSUnrecoverableResponseException(connection.getResponseCode(),connection.getHeaderFields(),IOUtils.toString(response));
 			else
-				return new EbMSResponseException(connection.getResponseCode(),connection.getHeaderFields(),response);
+				return new EbMSResponseException(connection.getResponseCode(),connection.getHeaderFields(),IOUtils.toString(response));
 		}
 	}
 
-	private String readResponse(HttpURLConnection connection, InputStream input) throws IOException
+	private CachedOutputStream readResponse(HttpURLConnection connection, InputStream input) throws IOException
 	{
-		String response = null;
-		if (input != null)
-		{
-			response = IOUtils.toString(input,Charset.defaultCharset());
-			logResponse(connection,response);
-		}
-		return response;
+		return input != null ? IOUtils.createCachedOutputStream(input) : null;
 	}
 
-	private String getEncoding() throws EbMSProcessingException
-	{
-		val contentType = getHeaderField("Content-Type");
-		if (!StringUtils.isEmpty(contentType))
-			return HTTPUtils.getCharSet(contentType);
-		else
-			throw new EbMSProcessingException("HTTP header Content-Type is not set!");
-	}
-	
 	private String getHeaderField(String name)
 	{
 		return connection.getHeaderField(name);
@@ -167,10 +150,10 @@ class EbMSResponseHandler
 		logResponse(connection,null);
 	}
 
-	private void logResponse(HttpURLConnection connection, String response) throws IOException
+	private void logResponse(HttpURLConnection connection, CachedOutputStream response) throws IOException
 	{
 		val headers = connection.getResponseCode() + (messageLog.isDebugEnabled() ? "\n" + HTTPUtils.toString(connection.getHeaderFields()) : "");
-		messageLog.info("<<<<\nStatusCode=" + headers + (response != null ? "\n" + response : ""));
+		messageLog.info("<<<<\nStatusCode=" + headers + (response != null ? "\n" + IOUtils.toString(response) : ""));
 	}
 
 }

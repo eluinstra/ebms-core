@@ -16,15 +16,14 @@
 package nl.clockwork.ebms.validation;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.StringReader;
 
 import javax.xml.XMLConstants;
-import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 
-import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXNotRecognizedException;
 import org.xml.sax.SAXNotSupportedException;
@@ -54,38 +53,16 @@ public class XSDValidator
 		}
 	}
 	
-	public void validate(String xml) throws ValidatorException, ValidationException
+	public void validate(String xml) throws SAXException, IOException
 	{
-		try
-		{
-			val validator = getValidator();
-			validator.validate(new StreamSource(new StringReader(xml)));
-		}
-		catch (SAXException e)
-		{
-			throw new ValidationException(e);
-		}
-		catch (IOException e)
-		{
-			throw new ValidatorException(e);
-		}
+		val validator = getValidator();
+		validator.validate(new StreamSource(new StringReader(xml)));
 	}
 
-	public void validate(Node node) throws ValidatorException, ValidationException
+	public void validate(InputStream is) throws SAXException, IOException
 	{
-		try
-		{
-			val validator = getValidator();
-			validator.validate(new DOMSource(node));
-		}
-		catch (SAXException e)
-		{
-			throw new ValidationException(e);
-		}
-		catch (IOException e)
-		{
-			throw new ValidatorException(e);
-		}
+		val validator = getValidator();
+		validator.validate(new StreamSource(is));
 	}
 
 	private javax.xml.validation.Validator getValidator() throws SAXNotRecognizedException, SAXNotSupportedException
@@ -95,5 +72,4 @@ public class XSDValidator
 		validator.setProperty(XMLConstants.ACCESS_EXTERNAL_SCHEMA,"");
 		return validator;
 	}
-
 }

@@ -15,19 +15,21 @@
  */
 package nl.clockwork.ebms.server;
 
-import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.nio.charset.Charset;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletResponse;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
 
-import org.apache.commons.io.IOUtils;
+import org.apache.cxf.io.CachedOutputStream;
+import org.apache.james.mime4j.MimeException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xml.sax.SAXException;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -38,8 +40,10 @@ import lombok.extern.slf4j.Slf4j;
 import nl.clockwork.ebms.Constants;
 import nl.clockwork.ebms.EbMSMessageReader;
 import nl.clockwork.ebms.EbMSMessageUtils;
+import nl.clockwork.ebms.model.EbMSDocument;
 import nl.clockwork.ebms.processor.EbMSMessageProcessor;
 import nl.clockwork.ebms.util.DOMUtils;
+import nl.clockwork.ebms.util.IOUtils;
 import nl.clockwork.ebms.validation.ValidationException;
 
 @Slf4j
@@ -51,83 +55,25 @@ public abstract class EbMSInputStreamHandler
   @NonNull
 	EbMSMessageProcessor messageProcessor;
 
-	public void handle(InputStream request)
+	public void handle(InputStream in)
 	{
-	  try
+	  try (val request = IOUtils.createCachedOutputStream(in))
 		{
-	  	validateSoapAction(request);
-	  	if (messageLog.isDebugEnabled())
-	  		request = getRequestLogger(request);
-			val messageReader = new EbMSMessageReader(getRequestHeader("Content-ID"),getRequestHeader("Content-Type"));
-			val in = messageReader.read(request);
-			if (messageLog.isInfoEnabled() && !messageLog.isDebugEnabled())
-				messageLog.info("<<<<\n" + DOMUtils.toString(in.getMessage()));
-			val out = messageProcessor.processRequest(in);
-			if (out == null)
-			{
-				messageLog.info(">>>>\nStatusCode=" + HttpServletResponse.SC_NO_CONTENT);
-				writeResponseStatus(HttpServletResponse.SC_NO_CONTENT);
-			}
-			else
-			{
-				if (messageLog.isInfoEnabled())
-					messageLog.info(">>>>\nStatusCode=" + HttpServletResponse.SC_OK + "\nContent-Type=text/xml\nSOAPAction=" + Constants.EBMS_SOAP_ACTION + "\n" + DOMUtils.toString(out.getMessage()));
-				writeResponseStatus(HttpServletResponse.SC_OK);
-				writeResponseHeader("Content-Type","text/xml");
-				writeResponseHeader("SOAPAction",Constants.EBMS_SOAP_ACTION);
-				val response = getOutputStream();
-				DOMUtils.write(out.getMessage(),response);
-			}
+	  	val responseDocument = handleRequest(request);
+			returnResponse(responseDocument);
+		}
+		catch (ValidationException e)
+		{
+			log.error("",e);
+			handleException(getFaultCode(e),e.getMessage());
 		}
 		catch (Exception e)
 		{
-			try
-			{
-				log.error("",e);
-				val soapFault = EbMSMessageUtils.createSOAPFault(e);
-				if (messageLog.isInfoEnabled())
-					messageLog.info(">>>>\nStatusCode=" + HttpServletResponse.SC_INTERNAL_SERVER_ERROR + "\nContent-Type=text/xml\n" + DOMUtils.toString(soapFault));
-				writeResponseStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-				writeResponseHeader("Content-Type","text/xml");
-				val response = getOutputStream();
-				DOMUtils.write(soapFault,response);
-			}
-			catch (Exception e1)
-			{
-				log.error("",e1);
-				if (e instanceof ValidationException)
-					throw new IllegalStateException(e);
-				else
-					throw new IllegalStateException("An unexpected error occurred!");
-			}
+			log.error("",e);
+			handleException(getFaultCode(e),"An unexpected error occurred!");
 		}
 	}
 
-	private void validateSoapAction(InputStream request) throws IOException
-	{
-		val soapAction = getRequestHeader("SOAPAction");
-		if (!Constants.EBMS_SOAP_ACTION.equals(soapAction))
-		{
-			if (messageLog.isInfoEnabled())
-				messageLog.info("<<<<\n" + getRequestHeaders() + "\n" + IOUtils.toString(request,Charset.defaultCharset()));
-			throw new ValidationException("Unable to process message! SOAPAction=" + soapAction);
-		}
-	}
-
-	private InputStream getRequestLogger(InputStream request) throws IOException
-	{
-		request = new BufferedInputStream(request);
-		request.mark(Integer.MAX_VALUE);
-		messageLog.info("<<<<\n" + getRequestHeaders() + "\n" + IOUtils.toString(request,Charset.defaultCharset()));
-		request.reset();
-		return request;
-	}
-
-	private String getRequestHeaders()
-	{
-		return getRequestHeaderNames().stream().flatMap(n -> getRequestHeaders(n).stream().map(h -> n + "=" + h)).collect(Collectors.joining("\n"));
-	}
-	
 	public abstract List<String> getRequestHeaderNames();
 	
 	public abstract List<String> getRequestHeaders(String headerName);
@@ -140,4 +86,70 @@ public abstract class EbMSInputStreamHandler
 
 	public abstract OutputStream getOutputStream() throws IOException;
 	
+	private EbMSDocument handleRequest(final CachedOutputStream request) throws IOException, MimeException, ParserConfigurationException, SAXException, TransformerException
+	{
+		validateSoapAction();
+		val messageReader = new EbMSMessageReader(getRequestHeader("Content-ID"),getRequestHeader("Content-Type"));
+		val requestDocument = messageReader.read(request.getInputStream());
+		if (messageLog.isInfoEnabled())
+			messageLog.info("<<<<\n" + getRequestHeaders() + "\n" + DOMUtils.toString(requestDocument.getMessage()));
+		val responseDocument = messageProcessor.processRequest(requestDocument);
+		return responseDocument;
+	}
+
+	private void validateSoapAction() throws IOException
+	{
+		val soapAction = getRequestHeader("SOAPAction");
+		if (!Constants.EBMS_SOAP_ACTION.equals(soapAction))
+			throw new ValidationException("Unable to process message! SOAPAction=" + soapAction);
+	}
+
+	private String getRequestHeaders()
+	{
+		return getRequestHeaderNames().stream().flatMap(n -> getRequestHeaders(n).stream().map(h -> n + "=" + h)).collect(Collectors.joining("\n"));
+	}
+	
+	private void returnResponse(final EbMSDocument responseDocument) throws TransformerException, IOException
+	{
+		if (responseDocument == null)
+		{
+			messageLog.info(">>>>\nStatusCode=" + HttpServletResponse.SC_NO_CONTENT);
+			writeResponseStatus(HttpServletResponse.SC_NO_CONTENT);
+		}
+		else
+		{
+			if (messageLog.isInfoEnabled())
+				messageLog.info(">>>>\nStatusCode=" + HttpServletResponse.SC_OK + "\nContent-Type=text/xml\nSOAPAction=" + Constants.EBMS_SOAP_ACTION + "\n" + DOMUtils.toString(responseDocument.getMessage()));
+			writeResponseStatus(HttpServletResponse.SC_OK);
+			writeResponseHeader("Content-Type","text/xml");
+			writeResponseHeader("SOAPAction",Constants.EBMS_SOAP_ACTION);
+			val response = getOutputStream();
+			DOMUtils.write(responseDocument.getMessage(),response);
+		}
+	}
+
+	private String getFaultCode(Exception e)
+	{
+		return e instanceof ValidationException ? "Client" : "Server";
+	}
+
+	private void handleException(String faultCode, String faultString)
+	{
+		try
+		{
+			val soapFault = EbMSMessageUtils.createSOAPFault(faultCode,faultString);
+			if (messageLog.isInfoEnabled())
+				messageLog.info(">>>>\nStatusCode=" + HttpServletResponse.SC_INTERNAL_SERVER_ERROR + "\nContent-Type=text/xml\n" + DOMUtils.toString(soapFault));
+			writeResponseStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+			writeResponseHeader("Content-Type","text/xml");
+			val response = getOutputStream();
+			DOMUtils.write(soapFault,response);
+		}
+		catch (Exception e)
+		{
+			log.error("",e);
+			throw new IllegalStateException("An unexpected error occurred!");
+		}
+	}
+
 }

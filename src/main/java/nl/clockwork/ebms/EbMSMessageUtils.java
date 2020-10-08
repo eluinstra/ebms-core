@@ -15,6 +15,12 @@
  */
 package nl.clockwork.ebms;
 
+import static io.vavr.API.$;
+import static io.vavr.API.Case;
+import static io.vavr.API.Match;
+import static io.vavr.API.run;
+import static io.vavr.Predicates.instanceOf;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.time.Instant;
@@ -57,8 +63,6 @@ import org.xmlsoap.schemas.soap.envelope.Envelope;
 import org.xmlsoap.schemas.soap.envelope.Fault;
 import org.xmlsoap.schemas.soap.envelope.Header;
 
-import static io.vavr.API.*;
-import static io.vavr.Predicates.*;
 import lombok.val;
 import nl.clockwork.ebms.cpa.CPAUtils;
 import nl.clockwork.ebms.jaxb.EbMSNamespaceMapper;
@@ -72,7 +76,6 @@ import nl.clockwork.ebms.model.EbMSMessageError;
 import nl.clockwork.ebms.model.EbMSStatusRequest;
 import nl.clockwork.ebms.model.EbMSStatusResponse;
 import nl.clockwork.ebms.util.DOMUtils;
-import nl.clockwork.ebms.validation.ValidationException;
 
 public class EbMSMessageUtils
 {
@@ -292,13 +295,13 @@ public class EbMSMessageUtils
 		return DOMUtils.getDocumentBuilder().parse(is);
 	}
 
-	public static Document createSOAPFault(Exception e) throws ParserConfigurationException, JAXBException, SAXException, IOException
+	public static Document createSOAPFault(String faultCode, String faultString) throws ParserConfigurationException, JAXBException, SAXException, IOException
 	{
 		val envelope = new Envelope();
 		envelope.setBody(new Body());
 		val fault = new Fault();
-		fault.setFaultcode(new QName("http://schemas.xmlsoap.org/soap/envelope/",e instanceof ValidationException ? "Client" : "Server"));
-		fault.setFaultstring(e instanceof ValidationException ? e.getMessage() : "An unexpected error occurred!");
+		fault.setFaultcode(new QName("http://schemas.xmlsoap.org/soap/envelope/",faultCode));
+		fault.setFaultstring(faultString);
 		val f = new JAXBElement<Fault>(new QName("http://schemas.xmlsoap.org/soap/envelope/","Fault"),Fault.class,fault);
 		envelope.getBody().getAny().add(f);
 		return DOMUtils.getDocumentBuilder().parse(new ByteArrayInputStream(JAXBParser.getInstance(Envelope.class).handle(new JAXBElement<>(new QName("http://schemas.xmlsoap.org/soap/envelope/","Envelope"),Envelope.class,envelope)).getBytes()));

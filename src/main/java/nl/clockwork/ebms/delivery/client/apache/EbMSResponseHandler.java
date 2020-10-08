@@ -22,9 +22,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.http.Header;
-import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.ResponseHandler;
@@ -37,7 +35,6 @@ import lombok.val;
 import lombok.experimental.FieldDefaults;
 import nl.clockwork.ebms.Constants;
 import nl.clockwork.ebms.EbMSMessageReader;
-import nl.clockwork.ebms.delivery.client.HTTPUtils;
 import nl.clockwork.ebms.model.EbMSDocument;
 import nl.clockwork.ebms.processor.EbMSProcessingException;
 
@@ -56,7 +53,7 @@ class EbMSResponseHandler implements ResponseHandler<EbMSDocument>
 				val entity = response.getEntity();
 				if (response.getStatusLine().getStatusCode() == HttpServletResponse.SC_NO_CONTENT || entity == null || entity.getContentLength() == 0)
 				{
-					messageLog.info("<<<< statusCode = " + response.getStatusLine().getStatusCode());
+					messageLog.info("<<<<\nStatusCode=" + response.getStatusLine().getStatusCode());
 					return null;
 				}
 				else
@@ -64,9 +61,8 @@ class EbMSResponseHandler implements ResponseHandler<EbMSDocument>
 					try (val input = entity.getContent())
 					{
 						val messageReader = new EbMSMessageReader(getHeaderField(response,"Content-ID"),getHeaderField(response,"Content-Type"));
-						val message = IOUtils.toString(input,getEncoding(entity));
-		      	messageLog.info("<<<< statusCode = " + response.getStatusLine().getStatusCode() + "\n" + message);
-						return messageReader.readResponse(message);
+		      	messageLog.info("<<<<\nStatusCode=" + response.getStatusLine().getStatusCode() + "\n" + IOUtils.toString(input,Charset.defaultCharset()));
+						return messageReader.readResponse(input);
 					}
 				}
 			}
@@ -84,15 +80,6 @@ class EbMSResponseHandler implements ResponseHandler<EbMSDocument>
 		}
 	}
 
-	private String getEncoding(HttpEntity entity) throws EbMSProcessingException
-	{
-		val contentType = entity.getContentType().getValue();
-		if (!StringUtils.isEmpty(contentType))
-			return HTTPUtils.getCharSet(contentType);
-		else
-			throw new EbMSProcessingException("HTTP header Content-Type is not set!");
-	}
-	
 	private String getHeaderField(HttpResponse response, String name)
 	{
 		Header result = response.getFirstHeader(name);
