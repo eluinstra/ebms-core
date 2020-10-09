@@ -85,6 +85,12 @@ public class EbMSMessageServlet extends GenericServlet
 			}
 
 			@Override
+			public String getRequestMethod()
+			{
+				return ((HttpServletRequest)request).getMethod();
+			}
+
+			@Override
 			public void writeResponseStatus(int statusCode)
 			{
 				((HttpServletResponse)response).setStatus(statusCode);

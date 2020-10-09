@@ -22,6 +22,7 @@ import javax.activation.DataHandler;
 import javax.activation.DataSource;
 import javax.mail.util.ByteArrayDataSource;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.cxf.io.CachedOutputStream;
 
@@ -80,7 +81,7 @@ public class EbMSAttachmentFactory
 	public static EbMSAttachment createCachedEbMSAttachment(String filename, String contentId, String contentType, InputStream content) throws IOException
 	{
 		val cos = new CachedOutputStream();
-		CachedOutputStream.copyStream(content,cos,4096);
+		CachedOutputStream.copyStream(content,cos,IOUtils.DEFAULT_BUFFER_SIZE);
 		cos.lockOutputStream();
 		return createCachedEbMSAttachment(filename,contentId,contentType,cos);
 	}
