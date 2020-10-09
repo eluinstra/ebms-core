@@ -29,12 +29,8 @@ import java.util.ArrayList;
 import java.util.Date;
 
 import javax.crypto.SecretKey;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
-import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
@@ -66,6 +62,7 @@ import nl.clockwork.ebms.model.EbMSMessage;
 import nl.clockwork.ebms.processor.EbMSProcessingException;
 import nl.clockwork.ebms.processor.EbMSProcessorException;
 import nl.clockwork.ebms.security.EbMSTrustStore;
+import nl.clockwork.ebms.util.DOMUtils;
 import nl.clockwork.ebms.util.SecurityUtils;
 import nl.clockwork.ebms.util.StreamUtils;
 import nl.clockwork.ebms.validation.ValidationException;
@@ -178,7 +175,8 @@ public class EbMSMessageEncrypter
 			setEncryptedData(document,xmlCipher,encryptedKey,certificate,attachment);
 			val encryptedData = xmlCipher.encryptData(document,null,attachment.getInputStream());
 			val content = new CachedOutputStream();
-			createTransformer().transform(new DOMSource(xmlCipher.martial(document,encryptedData)),new StreamResult(content));
+			val transformer = DOMUtils.getTransformer();
+			transformer.transform(new DOMSource(xmlCipher.martial(document,encryptedData)),new StreamResult(content));
 			content.lockOutputStream();
 			return EbMSAttachmentFactory.createCachedEbMSAttachment(attachment.getName(),attachment.getContentId(),"application/xml",content);
 		}
@@ -217,23 +215,13 @@ public class EbMSMessageEncrypter
 	{
 		try
 		{
-			val dbFactory = DocumentBuilderFactory.newInstance();
-			dbFactory.setNamespaceAware(true);
-			val builder = dbFactory.newDocumentBuilder();
+			val builder = DOMUtils.getDocumentBuilder();
 			return builder.parse(new InputSource(new StringReader("<root></root>")));
 		}
 		catch (ParserConfigurationException | SAXException | IOException e)
 		{
 			throw new EbMSProcessorException(e);
 		}
-	}
-
-	private Transformer createTransformer() throws TransformerFactoryConfigurationError, TransformerConfigurationException
-	{
-		val transormerFactory = TransformerFactory.newInstance();
-		val transformer = transormerFactory.newTransformer();
-		transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION,"yes");
-		return transformer;
 	}
 
 }

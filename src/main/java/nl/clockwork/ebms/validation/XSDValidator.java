@@ -26,6 +26,8 @@ import javax.xml.validation.SchemaFactory;
 
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
+import org.xml.sax.SAXNotRecognizedException;
+import org.xml.sax.SAXNotSupportedException;
 
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -56,7 +58,7 @@ public class XSDValidator
 	{
 		try
 		{
-			val validator = schema.newValidator();
+			val validator = getValidator();
 			validator.validate(new StreamSource(new StringReader(xml)));
 		}
 		catch (SAXException e)
@@ -73,7 +75,7 @@ public class XSDValidator
 	{
 		try
 		{
-			val validator = schema.newValidator();
+			val validator = getValidator();
 			validator.validate(new DOMSource(node));
 		}
 		catch (SAXException e)
@@ -84,6 +86,14 @@ public class XSDValidator
 		{
 			throw new ValidatorException(e);
 		}
+	}
+
+	private javax.xml.validation.Validator getValidator() throws SAXNotRecognizedException, SAXNotSupportedException
+	{
+		val validator = schema.newValidator();
+		validator.setProperty(XMLConstants.ACCESS_EXTERNAL_DTD,"");
+		validator.setProperty(XMLConstants.ACCESS_EXTERNAL_SCHEMA,"");
+		return validator;
 	}
 
 }

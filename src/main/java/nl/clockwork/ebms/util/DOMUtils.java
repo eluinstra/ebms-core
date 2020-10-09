@@ -23,6 +23,7 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
 
+import javax.xml.XMLConstants;
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilder;
@@ -54,28 +55,36 @@ public class DOMUtils
 {
 	public static DocumentBuilder getDocumentBuilder() throws ParserConfigurationException
 	{
-		val factory = DocumentBuilderFactory.newInstance();
-		factory.setNamespaceAware(true);
-		return factory.newDocumentBuilder();
+		val dbf = DocumentBuilderFactory.newInstance();
+		dbf.setFeature("http://apache.org/xml/features/disallow-doctype-decl",true);
+		dbf.setFeature("http://xml.org/sax/features/external-general-entities",false);
+		dbf.setFeature("http://xml.org/sax/features/external-parameter-entities",false);
+		dbf.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd",false);
+		dbf.setXIncludeAware(false);
+		dbf.setExpandEntityReferences(false);
+		dbf.setNamespaceAware(true);
+		return dbf.newDocumentBuilder();
 	}
 	
 	public static Transformer getTransformer() throws TransformerConfigurationException, TransformerFactoryConfigurationError
 	{
-		val result = TransformerFactory.newInstance().newTransformer();
+		val result = createTransformerFactory().newTransformer();
 		result.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION,"yes");
-		//result.setOutputProperty(OutputKeys.METHOD,"xml");
-		//result.setOutputProperty(OutputKeys.INDENT,"yes");
-		//result.setOutputProperty(OutputKeys.ENCODING,"UTF-8");
 		return result;
 	}
 
 	public static Transformer getTransformer(String xslFile) throws TransformerConfigurationException, TransformerFactoryConfigurationError
 	{
-		val result = TransformerFactory.newInstance().newTransformer(new StreamSource(DOMUtils.class.getResourceAsStream(xslFile)));
+		val result = createTransformerFactory().newTransformer(new StreamSource(DOMUtils.class.getResourceAsStream(xslFile)));
 		result.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION,"yes");
-		//result.setOutputProperty(OutputKeys.METHOD,"xml");
-		//result.setOutputProperty(OutputKeys.INDENT,"yes");
-		//result.setOutputProperty(OutputKeys.ENCODING,"UTF-8");
+		return result;
+	}
+
+	private static javax.xml.transform.TransformerFactory createTransformerFactory() throws TransformerFactoryConfigurationError
+	{
+		val result = TransformerFactory.newInstance();
+		result.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD,"");
+		result.setAttribute(XMLConstants.ACCESS_EXTERNAL_STYLESHEET,"");
 		return result;
 	}
 
@@ -117,7 +126,6 @@ public class DOMUtils
 
 	public static String toString(Document document) throws TransformerException
 	{
-		//return document.getDocumentElement().toString();
 		val writer = new StringWriter();
 		val transformer = getTransformer();
 		transformer.transform(new DOMSource(document),new StreamResult(writer));
@@ -126,7 +134,6 @@ public class DOMUtils
 
 	public static String toString(Document document, String encoding) throws TransformerException
 	{
-		//return document.getDocumentElement().toString();
 		val writer = new StringWriter();
 		val transformer = getTransformer();
 		transformer.setOutputProperty(OutputKeys.ENCODING,encoding);
