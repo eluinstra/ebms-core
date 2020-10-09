@@ -23,7 +23,6 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.FactoryBean;
 
 import nl.clockwork.ebms.common.util.Utils;
-import nl.clockwork.ebms.client.SSLFactoryManager;
 
 public class EbMSHttpClientFactory implements FactoryBean<EbMSClient>
 {

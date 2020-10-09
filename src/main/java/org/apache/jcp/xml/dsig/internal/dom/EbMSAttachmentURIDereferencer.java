@@ -25,14 +25,11 @@ import javax.xml.crypto.URIReference;
 import javax.xml.crypto.URIReferenceException;
 import javax.xml.crypto.XMLCryptoContext;
 
-import nl.clockwork.ebms.Constants;
-import nl.clockwork.ebms.model.EbMSAttachment;
-
-import org.apache.jcp.xml.dsig.internal.dom.ApacheNodeSetData;
-import org.apache.jcp.xml.dsig.internal.dom.ApacheOctetStreamData;
-import org.apache.jcp.xml.dsig.internal.dom.DOMURIDereferencer;
 import org.apache.xml.security.c14n.CanonicalizationException;
 import org.apache.xml.security.signature.XMLSignatureInput;
+
+import nl.clockwork.ebms.Constants;
+import nl.clockwork.ebms.model.EbMSAttachment;
 
 public class EbMSAttachmentURIDereferencer implements URIDereferencer
 {
