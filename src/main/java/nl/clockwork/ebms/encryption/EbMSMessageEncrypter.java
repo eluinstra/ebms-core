@@ -34,12 +34,9 @@ import java.util.List;
 
 import javax.crypto.SecretKey;
 import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
-import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
@@ -66,6 +63,7 @@ import nl.clockwork.ebms.StreamUtils;
 import nl.clockwork.ebms.common.CPAManager;
 import nl.clockwork.ebms.common.KeyStoreManager;
 import nl.clockwork.ebms.common.KeyStoreManager.KeyStoreType;
+import nl.clockwork.ebms.common.util.DOMUtils;
 import nl.clockwork.ebms.common.util.SecurityUtils;
 import nl.clockwork.ebms.model.CacheablePartyId;
 import nl.clockwork.ebms.model.EbMSAttachment;
@@ -192,7 +190,8 @@ public class EbMSMessageEncrypter implements InitializingBean
 			setEncryptedData(document,xmlCipher,encryptedKey,certificate,attachment);
 			EncryptedData encryptedData = xmlCipher.encryptData(document,null,attachment.getInputStream());
 			CachedOutputStream content = new CachedOutputStream();
-			createTransformer().transform(new DOMSource(xmlCipher.martial(document,encryptedData)),new StreamResult(content));
+			Transformer transformer = DOMUtils.getTransformer();
+			transformer.transform(new DOMSource(xmlCipher.martial(document,encryptedData)),new StreamResult(content));
 			content.lockOutputStream();
 			return EbMSAttachmentFactory.createCachedEbMSAttachment(attachment.getName(),attachment.getContentId(),"application/xml",content);
 		}
@@ -231,23 +230,13 @@ public class EbMSMessageEncrypter implements InitializingBean
 	{
 		try
 		{
-			DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-			dbFactory.setNamespaceAware(true);
-			DocumentBuilder builder = dbFactory.newDocumentBuilder();
+			DocumentBuilder builder = DOMUtils.getDocumentBuilder();
 			return builder.parse(new InputSource(new StringReader("<root></root>")));
 		}
 		catch (ParserConfigurationException | SAXException | IOException e)
 		{
 			throw new EbMSProcessorException(e);
 		}
-	}
-
-	private Transformer createTransformer() throws TransformerFactoryConfigurationError, TransformerConfigurationException
-	{
-		TransformerFactory transormerFactory = TransformerFactory.newInstance();
-		Transformer transformer = transormerFactory.newTransformer();
-		transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION,"yes");
-		return transformer;
 	}
 
 	public void setCpaManager(CPAManager cpaManager)
