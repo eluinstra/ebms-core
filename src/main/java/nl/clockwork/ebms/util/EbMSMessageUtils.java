@@ -299,19 +299,15 @@ public class EbMSMessageUtils
 		return null;
 	}
 	
-	public static Document createSOAPFault(Exception e) throws ParserConfigurationException, JAXBException, SAXException, IOException
+	public static Document createSOAPFault(String faultCode, String faultString) throws ParserConfigurationException, JAXBException, SAXException, IOException
 	{
 		Envelope envelope = new Envelope();
 		envelope.setBody(new Body());
 		Fault fault = new Fault();
-		fault.setFaultcode(new QName("http://schemas.xmlsoap.org/soap/envelope/","Client"));
-		fault.setFaultstring(e.getMessage());
-		//fault.setDetail(new Detail());
-		//JAXBElement<String> f = new JAXBElement<>(new QName("","String"),String.class,ExceptionUtils.getStackTrace(e));
-		//fault.getDetail().getAny().add(f);
+		fault.setFaultcode(new QName("http://schemas.xmlsoap.org/soap/envelope/",faultCode));
+		fault.setFaultstring(faultString);
 		JAXBElement<Fault> f = new JAXBElement<>(new QName("http://schemas.xmlsoap.org/soap/envelope/","Fault"),Fault.class,fault);
 		envelope.getBody().getAny().add(f);
-
 		return DOMUtils.getDocumentBuilder().parse(new ByteArrayInputStream(JAXBParser.getInstance(Envelope.class).handle(new JAXBElement<>(new QName("http://schemas.xmlsoap.org/soap/envelope/","Envelope"),Envelope.class,envelope)).getBytes()));
 	}
 	

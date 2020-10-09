@@ -23,17 +23,25 @@ import java.nio.charset.Charset;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import javax.servlet.http.HttpServletResponse;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
+
 import nl.clockwork.ebms.Constants;
 import nl.clockwork.ebms.common.util.DOMUtils;
 import nl.clockwork.ebms.model.EbMSDocument;
 import nl.clockwork.ebms.processor.EbMSMessageProcessor;
+import nl.clockwork.ebms.processor.EbMSProcessingException;
 import nl.clockwork.ebms.processor.EbMSProcessorException;
 import nl.clockwork.ebms.util.EbMSMessageUtils;
+import nl.clockwork.ebms.validation.ValidationException;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.james.mime4j.MimeException;
 import org.w3c.dom.Document;
+import org.xml.sax.SAXException;
 
 public abstract class EbMSInputStreamHandler
 {
@@ -50,61 +58,74 @@ public abstract class EbMSInputStreamHandler
 	{
 	  try
 		{
-	  	String soapAction = getRequestHeader("SOAPAction");
-	  	if (!Constants.EBMS_SOAP_ACTION.equals(soapAction))
-	  	{
-				if (messageLogger.isInfoEnabled())
-					messageLogger.info("<<<<\n" + getRequestHeaders() + "\n" + IOUtils.toString(request,Charset.defaultCharset()));
-				throw new EbMSProcessorException("Unable to process message! SOAPAction=" + soapAction);
-	  	}
-//	  	if (logger.isDebugEnabled())
-//	  		request = new LoggingInputStream(request);
-	  	if (messageLogger.isDebugEnabled())
-	  	{
-	  		request = new BufferedInputStream(request);
-	  		request.mark(Integer.MAX_VALUE);
-	  		messageLogger.info("<<<<\n" + getRequestHeaders() + "\n" + IOUtils.toString(request,Charset.defaultCharset()));
-	  		request.reset();
-	  	}
-			EbMSMessageReader messageReader = new EbMSMessageReader(getRequestHeader("Content-ID"),getRequestHeader("Content-Type"));
-			EbMSDocument in = messageReader.read(request);
-			if (messageLogger.isInfoEnabled() && !messageLogger.isDebugEnabled())
-				messageLogger.info("<<<<\n" + DOMUtils.toString(in.getMessage()));
-			EbMSDocument out = messageProcessor.processRequest(in);
-			if (out == null)
-			{
-				messageLogger.info(">>>>\nstatusCode: " + Constants.SC_NOCONTENT);
-				writeResponseStatus(Constants.SC_NOCONTENT);
-			}
-			else
-			{
-				if (messageLogger.isInfoEnabled())
-					messageLogger.info(">>>>\nstatusCode: " + Constants.SC_OK + "\nContent-Type: text/xml\nSOAPAction: " + Constants.EBMS_SOAP_ACTION + "\n" + DOMUtils.toString(out.getMessage()));
-				writeResponseStatus(Constants.SC_OK);
-				writeResponseHeader("Content-Type","text/xml");
-				writeResponseHeader("SOAPAction",Constants.EBMS_SOAP_ACTION);
-				OutputStream response = getOutputStream();
-				DOMUtils.write(out.getMessage(),response);
-			}
+	  	EbMSDocument responseDocument = handleRequest(request);
+			returnResponse(responseDocument);
 		}
+	  catch (ValidationException e)
+	  {
+			logger.error("",e);
+			handleException("Client",e.getMessage());
+	  }
 		catch (Exception e)
 		{
-			try
-			{
-				Document soapFault = EbMSMessageUtils.createSOAPFault(e);
-				if (messageLogger.isInfoEnabled())
-					messageLogger.info(">>>>\nstatusCode: " + Constants.SC_INTERNAL_SERVER_ERROR + "\nContent-Type: text/xml\n" + DOMUtils.toString(soapFault));
-				logger.info("",e);
-				writeResponseStatus(Constants.SC_INTERNAL_SERVER_ERROR);
-				writeResponseHeader("Content-Type","text/xml");
-				OutputStream response = getOutputStream();
-				DOMUtils.write(soapFault,response);
-			}
-			catch (Exception e1)
-			{
-				throw new EbMSProcessorException(e1);
-			}
+			logger.error("",e);
+			//handleException("Server","An unexpected error occurred!");
+			writeResponseStatus(HttpServletResponse.SC_BAD_REQUEST);
 		}
+	}
+
+	public abstract List<String> getRequestHeaderNames();
+	
+	public abstract List<String> getRequestHeaders(String headerName);
+
+	public abstract String getRequestHeader(String headerName);
+	
+	public abstract String getRequestMethod();
+
+	public abstract void writeResponseStatus(int statusCode);
+	
+	public abstract void writeResponseHeader(String name, String value);
+
+	public abstract OutputStream getOutputStream() throws IOException;
+	
+	private EbMSDocument handleRequest(InputStream request) throws IOException, MimeException, ParserConfigurationException, SAXException, TransformerException
+	{
+		validateRequest();
+		validateSoapAction(request);
+		if (messageLogger.isDebugEnabled())
+			request = getRequestLogger(request);
+		EbMSMessageReader messageReader = new EbMSMessageReader(getRequestHeader("Content-ID"),getRequestHeader("Content-Type"));
+		EbMSDocument requestDocument = messageReader.read(request);
+		if (messageLogger.isInfoEnabled() && !messageLogger.isDebugEnabled())
+			messageLogger.info("<<<<\n" + DOMUtils.toString(requestDocument.getMessage()));
+		EbMSDocument responseDocument = messageProcessor.processRequest(requestDocument);
+		return responseDocument;
+	}
+
+	private void validateRequest()
+	{
+		if (!"POST".equals(getRequestMethod()))
+			throw new EbMSProcessingException("Not allowed RequestMethod=" + getRequestMethod());
+	}
+
+	private void validateSoapAction(InputStream request) throws IOException
+	{
+		String soapAction = getRequestHeader("SOAPAction");
+		if (!Constants.EBMS_SOAP_ACTION.equals(soapAction))
+		{
+			if (messageLogger.isInfoEnabled())
+				messageLogger.info("<<<<\n" + getRequestHeaders() + "\n" + IOUtils.toString(request,Charset.defaultCharset()));
+			throw new EbMSProcessorException("Unable to process message! SOAPAction=" + soapAction);
+		}
+	}
+
+	private InputStream getRequestLogger(InputStream request) throws IOException
+	{
+		request = new BufferedInputStream(request);
+		request.mark(Integer.MAX_VALUE);
+		messageLogger.info("<<<<\n" + getRequestHeaders() + "\n" + IOUtils.toString(request,Charset.defaultCharset()));
+		request.reset();
+		return request;
 	}
 
 	private String getRequestHeaders()
@@ -112,16 +133,41 @@ public abstract class EbMSInputStreamHandler
 		return getRequestHeaderNames().stream().flatMap(n -> getRequestHeaders(n).stream().map(h -> n + ": " + h)).collect(Collectors.joining("\n"));
 	}
 	
-	public abstract List<String> getRequestHeaderNames();
-	
-	public abstract List<String> getRequestHeaders(String headerName);
+	private void returnResponse(EbMSDocument responseDocument) throws TransformerException, IOException
+	{
+		if (responseDocument == null)
+		{
+			messageLogger.info(">>>>\nstatusCode: " + Constants.SC_NOCONTENT);
+			writeResponseStatus(Constants.SC_NOCONTENT);
+		}
+		else
+		{
+			if (messageLogger.isInfoEnabled())
+				messageLogger.info(">>>>\nstatusCode: " + Constants.SC_OK + "\nContent-Type: text/xml\nSOAPAction: " + Constants.EBMS_SOAP_ACTION + "\n" + DOMUtils.toString(responseDocument.getMessage()));
+			writeResponseStatus(Constants.SC_OK);
+			writeResponseHeader("Content-Type","text/xml");
+			writeResponseHeader("SOAPAction",Constants.EBMS_SOAP_ACTION);
+			OutputStream response = getOutputStream();
+			DOMUtils.write(responseDocument.getMessage(),response);
+		}
+	}
 
-	public abstract String getRequestHeader(String headerName);
-	
-	public abstract void writeResponseStatus(int statusCode);
-	
-	public abstract void writeResponseHeader(String name, String value);
+	private void handleException(String faultCode, String faultString)
+	{
+		try
+		{
+			Document soapFault = EbMSMessageUtils.createSOAPFault(faultCode,faultString);
+			if (messageLogger.isInfoEnabled())
+				messageLogger.info(">>>>\nstatusCode: " + Constants.SC_INTERNAL_SERVER_ERROR + "\nContent-Type: text/xml\n" + DOMUtils.toString(soapFault));
+			writeResponseStatus(Constants.SC_INTERNAL_SERVER_ERROR);
+			writeResponseHeader("Content-Type","text/xml");
+			OutputStream response = getOutputStream();
+			DOMUtils.write(soapFault,response);
+		}
+		catch (Exception e1)
+		{
+			throw new EbMSProcessorException(e1);
+		}
+	}
 
-	public abstract OutputStream getOutputStream() throws IOException;
-	
 }

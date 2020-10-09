@@ -88,7 +88,7 @@ public class EbMSMessageProcessor
 			final EbMSMessage message = EbMSMessageUtils.getEbMSMessage(document);
 			MessageHeader messageHeader = message.getMessageHeader();
 			if (!cpaManager.existsCPA(messageHeader.getCPAId()))
-				throw new EbMSProcessingException("CPA " + messageHeader.getCPAId() + " not found!");
+				throw new ValidationException("CPA " + messageHeader.getCPAId() + " not found!");
 			if (!Constants.EBMS_SERVICE_URI.equals(messageHeader.getService().getValue()))
 			{
 				return process(timestamp,message);
@@ -185,11 +185,11 @@ public class EbMSMessageProcessor
 				throw new EbMSProcessingException(
 						"Unable to process message! Service=" + messageHeader.getService() + " and Action=" + messageHeader.getAction());
 		}
-		catch (ValidationException | JAXBException | SAXException | IOException | SOAPException | TransformerException e)
+		catch (JAXBException | SAXException | IOException | SOAPException | TransformerException e)
 		{
 			throw new EbMSProcessingException(e);
 		}
-		catch (ValidatorException | XPathExpressionException | ParserConfigurationException | DatatypeConfigurationException | TransformerFactoryConfigurationError e)
+		catch (XPathExpressionException | ParserConfigurationException | DatatypeConfigurationException | TransformerFactoryConfigurationError e)
 		{
 			throw new EbMSProcessorException(e);
 		}

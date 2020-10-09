@@ -215,7 +215,7 @@ public class EbMSMessageUtilsTest
 	public void createSOAPFault() throws Exception
 	{
 		Exception e = new IOException("soapfault test");
-		Document fault = EbMSMessageUtils.createSOAPFault(e);
+		Document fault = EbMSMessageUtils.createSOAPFault("Server",e.getMessage());
 		assertEquals("Envelope", fault.getDocumentElement().getLocalName());
 		assertTrue(documentToString(fault).contains(e.getMessage()));
 	}

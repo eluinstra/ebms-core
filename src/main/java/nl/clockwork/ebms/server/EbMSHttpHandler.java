@@ -71,6 +71,12 @@ public class EbMSHttpHandler
 				}
 
 				@Override
+				public String getRequestMethod()
+				{
+					return request.getMethod();
+				}
+
+				@Override
 				public void writeResponseStatus(int statusCode)
 				{
 					response.setStatus(statusCode);
