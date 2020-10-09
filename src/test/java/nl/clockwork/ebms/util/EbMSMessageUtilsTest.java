@@ -224,8 +224,7 @@ public class EbMSMessageUtilsTest
 	@Test
 	public void createSOAPFault() throws Exception
 	{
-		val e = new IOException("soapfault test");
-		val fault = EbMSMessageUtils.createSOAPFault(e);
+		val fault = EbMSMessageUtils.createSOAPFault("Server","An unexpected error occurred!");
 		assertEquals("Envelope", fault.getDocumentElement().getLocalName());
 		assertTrue(documentToString(fault).contains("An unexpected error occurred!"));
 	}
@@ -234,7 +233,7 @@ public class EbMSMessageUtilsTest
 	public void createSOAPFault1() throws Exception
 	{
 		val e = new ValidationException("soapfault test");
-		val fault = EbMSMessageUtils.createSOAPFault(e);
+		val fault = EbMSMessageUtils.createSOAPFault("Client",e.getMessage());
 		assertEquals("Envelope", fault.getDocumentElement().getLocalName());
 		assertTrue(documentToString(fault).contains(e.getMessage()));
 	}
