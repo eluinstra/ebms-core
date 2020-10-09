@@ -36,7 +36,7 @@ public class HTTPUtils
 	public static String toString(Map<String,List<String>> properties)
 	{
 		return properties.entrySet().stream()
-				.map(e -> (e.getKey() != null ? e.getKey() + ": " : "") + StringUtils.collectionToCommaDelimitedString(e.getValue()))
+				.map(e -> (e.getKey() != null ? e.getKey() + "=" : "") + StringUtils.collectionToCommaDelimitedString(e.getValue()))
 				.collect(Collectors.joining("\n"));
 	}
 }

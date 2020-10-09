@@ -38,6 +38,6 @@ public class StreamUtils
 
 	public static IllegalStateException illegalStateException(String message, Object...elements)
 	{
-		return new IllegalStateException(message + ": " + Stream.of(elements).map(o -> o.toString()).collect(Collectors.joining(",")));
+		return new IllegalStateException(message + "=" + Stream.of(elements).map(o -> o.toString()).collect(Collectors.joining(",")));
 	}
 }

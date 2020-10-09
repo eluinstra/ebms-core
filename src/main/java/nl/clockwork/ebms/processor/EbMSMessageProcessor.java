@@ -57,6 +57,7 @@ import nl.clockwork.ebms.model.EbMSStatusResponse;
 import nl.clockwork.ebms.signing.EbMSSignatureGenerator;
 import nl.clockwork.ebms.util.DOMUtils;
 import nl.clockwork.ebms.util.LoggingUtils;
+import nl.clockwork.ebms.util.LoggingUtils.Status;
 import nl.clockwork.ebms.validation.DuplicateMessageException;
 import nl.clockwork.ebms.validation.EbMSMessageValidator;
 import nl.clockwork.ebms.validation.EbMSValidationException;
@@ -140,7 +141,8 @@ public class EbMSMessageProcessor
 			xsdValidator.validate(document.getMessage());
 			val timestamp = Instant.now();
 			val message = EbMSMessageUtils.getEbMSMessage(document);
-			MDC.setContextMap(LoggingUtils.getPropertyMap(message.getMessageHeader()));
+			if (LoggingUtils.mdc == Status.ENABLED)
+				MDC.setContextMap(LoggingUtils.getPropertyMap(message.getMessageHeader()));
 			val cpaId = message.getMessageHeader().getCPAId();
 			if (!cpaManager.existsCPA(cpaId))
 				throw new ValidationException("CPA " + cpaId + " not found!");

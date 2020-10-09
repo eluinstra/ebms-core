@@ -11,35 +11,47 @@ import nl.clockwork.ebms.service.model.EbMSMessageContext;
 
 public class LoggingUtils
 {
+	public enum Status
+	{
+		DISABLED, ENABLED;
+	}
+	public static Status mdc;
+
 	public static Map<String,String> getPropertyMap(MessageHeader header)
 	{
-		val properties = new HashMap<String,String>();
-		properties.put("cpaId",header.getCPAId());
-		properties.put("fromPartyId",EbMSMessageUtils.toString(header.getFrom().getPartyId()));
-		properties.put("fromRole",header.getFrom().getRole());
-		properties.put("toPartyId",EbMSMessageUtils.toString(header.getTo().getPartyId()));
-		properties.put("toRole",header.getTo().getRole());
-		properties.put("service",EbMSMessageUtils.toString(header.getService()));
-		properties.put("action",header.getAction());
-		properties.put("messageId",header.getMessageData().getMessageId());
-		properties.put("conversationId",header.getConversationId());
-		properties.put("refToMessageId",header.getMessageData().getRefToMessageId());
-		return properties;
+		val result = new HashMap<String,String>();
+		if (header != null)
+		{
+			result.put("cpaId",header.getCPAId());
+			result.put("fromPartyId",EbMSMessageUtils.toString(header.getFrom().getPartyId()));
+			result.put("fromRole",header.getFrom().getRole());
+			result.put("toPartyId",EbMSMessageUtils.toString(header.getTo().getPartyId()));
+			result.put("toRole",header.getTo().getRole());
+			result.put("service",EbMSMessageUtils.toString(header.getService()));
+			result.put("action",header.getAction());
+			result.put("messageId",header.getMessageData().getMessageId());
+			result.put("conversationId",header.getConversationId());
+			result.put("refToMessageId",header.getMessageData().getRefToMessageId());
+		}
+		return result;
 	}
 
-	public static Map<String,String> getPropertyMap(EbMSMessageContext context)
+	public static Map<String,String> getPropertyMap(EbMSMessageContext properties)
 	{
-		val properties = new HashMap<String,String>();
-		properties.put("cpaId",context.getCpaId());
-		properties.put("fromPartyId",context.getFromParty().getPartyId());
-		properties.put("fromRole",context.getFromParty().getRole());
-		properties.put("toPartyId",context.getToParty().getPartyId());
-		properties.put("toRole",context.getToParty().getRole());
-		properties.put("service",context.getService());
-		properties.put("action",context.getAction());
-		properties.put("messageId",context.getMessageId());
-		properties.put("conversationId",context.getConversationId());
-		properties.put("refToMessageId",context.getRefToMessageId());
-		return properties;
+		val result = new HashMap<String,String>();
+		if (properties != null)
+		{
+			result.put("cpaId",properties.getCpaId());
+			result.put("fromPartyId",properties.getFromParty().getPartyId());
+			result.put("fromRole",properties.getFromParty().getRole());
+			result.put("toPartyId",properties.getToParty().getPartyId());
+			result.put("toRole",properties.getToParty().getRole());
+			result.put("service",properties.getService());
+			result.put("action",properties.getAction());
+			result.put("messageId",properties.getMessageId());
+			result.put("conversationId",properties.getConversationId());
+			result.put("refToMessageId",properties.getRefToMessageId());
+		}
+		return result;
 	}
 }

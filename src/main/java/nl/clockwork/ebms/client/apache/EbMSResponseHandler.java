@@ -56,7 +56,7 @@ class EbMSResponseHandler implements ResponseHandler<EbMSDocument>
 				val entity = response.getEntity();
 				if (response.getStatusLine().getStatusCode() == HttpServletResponse.SC_NO_CONTENT || entity == null || entity.getContentLength() == 0)
 				{
-					messageLog.info("<<<< statusCode = " + response.getStatusLine().getStatusCode());
+					messageLog.info("<<<<\nStatusCode=" + response.getStatusLine().getStatusCode());
 					return null;
 				}
 				else
@@ -65,7 +65,7 @@ class EbMSResponseHandler implements ResponseHandler<EbMSDocument>
 					{
 						val messageReader = new EbMSMessageReader(getHeaderField(response,"Content-ID"),getHeaderField(response,"Content-Type"));
 						val message = IOUtils.toString(input,getEncoding(entity));
-		      	messageLog.info("<<<< statusCode = " + response.getStatusLine().getStatusCode() + "\n" + message);
+		      	messageLog.info("<<<<\nStatusCode=" + response.getStatusLine().getStatusCode() + "\n" + message);
 						return messageReader.readResponse(message);
 					}
 				}
@@ -74,9 +74,9 @@ class EbMSResponseHandler implements ResponseHandler<EbMSDocument>
 			{
 		    val entity = response.getEntity();
 		    if (entity != null)
-					throw new IOException("StatusCode: " + response.getStatusLine().getStatusCode() + "\n" + IOUtils.toString(entity.getContent(),Charset.defaultCharset()));
+					throw new IOException("StatusCode=" + response.getStatusLine().getStatusCode() + "\n" + IOUtils.toString(entity.getContent(),Charset.defaultCharset()));
 			}
-			throw new IOException("StatusCode: " + response.getStatusLine().getStatusCode());
+			throw new IOException("StatusCode=" + response.getStatusLine().getStatusCode());
 		}
 		catch (ParserConfigurationException | SAXException | EbMSProcessingException e)
 		{

@@ -52,6 +52,6 @@ public class EbMSResponseException extends EbMSProcessingException
 	@Override
 	public String getMessage()
 	{
-		return "StatusCode: " + statusCode + "\n" + HTTPUtils.toString(headers) + "\n" + (super.getMessage() != null ? super.getMessage() : "");
+		return "StatusCode=" + statusCode + "\n" + HTTPUtils.toString(headers) + "\n" + (super.getMessage() != null ? super.getMessage() : "");
 	}
 }

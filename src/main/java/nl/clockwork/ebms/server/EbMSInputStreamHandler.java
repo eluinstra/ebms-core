@@ -28,7 +28,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.slf4j.MDC;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -67,16 +66,14 @@ public abstract class EbMSInputStreamHandler
 			if (out == null)
 			{
 				val statusCode = Integer.toString(HttpServletResponse.SC_NO_CONTENT);
-				MDC.put("statusCode", statusCode);
-				messageLog.info(">>>>\nstatusCode: " + statusCode);
+				messageLog.info(">>>>\nStatusCode=" + statusCode);
 				writeResponseStatus(HttpServletResponse.SC_NO_CONTENT);
 			}
 			else
 			{
 				val statusCode = Integer.toString(HttpServletResponse.SC_OK);
-				MDC.put("statusCode", statusCode);
 				if (messageLog.isInfoEnabled())
-					messageLog.info(">>>>\nstatusCode: " + statusCode + "\nContent-Type: text/xml\nSOAPAction: " + Constants.EBMS_SOAP_ACTION + "\n" + DOMUtils.toString(out.getMessage()));
+					messageLog.info(">>>>\nStatusCode=" + statusCode + "\nContent-Type: text/xml\nSOAPAction=" + Constants.EBMS_SOAP_ACTION + "\n" + DOMUtils.toString(out.getMessage()));
 				writeResponseStatus(HttpServletResponse.SC_OK);
 				writeResponseHeader("Content-Type","text/xml");
 				writeResponseHeader("SOAPAction",Constants.EBMS_SOAP_ACTION);
@@ -90,9 +87,8 @@ public abstract class EbMSInputStreamHandler
 			{
 				log.error("",e);
 				val soapFault = EbMSMessageUtils.createSOAPFault(e);
-				MDC.put("statusCode", Integer.toString(HttpServletResponse.SC_INTERNAL_SERVER_ERROR));
 				if (messageLog.isInfoEnabled())
-					messageLog.info(">>>>\nstatusCode: " + HttpServletResponse.SC_INTERNAL_SERVER_ERROR + "\nContent-Type: text/xml\n" + DOMUtils.toString(soapFault));
+					messageLog.info(">>>>\nStatusCode=" + HttpServletResponse.SC_INTERNAL_SERVER_ERROR + "\nContent-Type=text/xml\n" + DOMUtils.toString(soapFault));
 				writeResponseStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 				writeResponseHeader("Content-Type","text/xml");
 				val response = getOutputStream();
@@ -106,10 +102,6 @@ public abstract class EbMSInputStreamHandler
 				else
 					throw new IllegalStateException("An unexpected error occurred!");
 			}
-		}
-		finally
-		{
-			MDC.remove("statusCode");
 		}
 	}
 
@@ -135,7 +127,7 @@ public abstract class EbMSInputStreamHandler
 
 	private String getRequestHeaders()
 	{
-		return getRequestHeaderNames().stream().flatMap(n -> getRequestHeaders(n).stream().map(h -> n + ": " + h)).collect(Collectors.joining("\n"));
+		return getRequestHeaderNames().stream().flatMap(n -> getRequestHeaders(n).stream().map(h -> n + "=" + h)).collect(Collectors.joining("\n"));
 	}
 	
 	public abstract List<String> getRequestHeaderNames();

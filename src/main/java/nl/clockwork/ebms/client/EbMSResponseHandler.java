@@ -27,7 +27,6 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.slf4j.MDC;
 import org.springframework.util.StringUtils;
 import org.xml.sax.SAXException;
 
@@ -58,7 +57,6 @@ class EbMSResponseHandler
 	{
 		try
 		{
-			MDC.put("statusCode", Integer.toString(connection.getResponseCode()));
 			switch(connection.getResponseCode() / 100)
 			{
 				case 2:
@@ -90,10 +88,6 @@ class EbMSResponseHandler
 			{
 				throw new EbMSProcessingException(e);
 			}
-		}
-		finally
-		{
-			MDC.remove("statusCode");
 		}
 	}
 
@@ -176,7 +170,7 @@ class EbMSResponseHandler
 	private void logResponse(HttpURLConnection connection, String response) throws IOException
 	{
 		val headers = connection.getResponseCode() + (messageLog.isDebugEnabled() ? "\n" + HTTPUtils.toString(connection.getHeaderFields()) : "");
-		messageLog.info("<<<<\nstatusCode: " + headers + (response != null ? "\n" + response : ""));
+		messageLog.info("<<<<\nStatusCode=" + headers + (response != null ? "\n" + response : ""));
 	}
 
 }

@@ -48,6 +48,7 @@ import nl.clockwork.ebms.processor.EbMSMessageProcessor;
 import nl.clockwork.ebms.processor.EbMSProcessingException;
 import nl.clockwork.ebms.service.model.EbMSMessageContext;
 import nl.clockwork.ebms.util.LoggingUtils;
+import nl.clockwork.ebms.util.LoggingUtils.Status;
 import nl.clockwork.ebms.util.StreamUtils;
 
 @Slf4j
@@ -132,8 +133,11 @@ class EventHandler
 				eventManager.deleteEvent(event.getMessageId());
 			else
 			{
-				EbMSMessageContext context = ebMSDAO.getMessageContext(event.getMessageId()).orElse(new EbMSMessageContext());
-				MDC.setContextMap(LoggingUtils.getPropertyMap(context));
+				if (LoggingUtils.mdc == Status.ENABLED)
+				{
+					EbMSMessageContext context = ebMSDAO.getMessageContext(event.getMessageId()).orElse(new EbMSMessageContext());
+					MDC.setContextMap(LoggingUtils.getPropertyMap(context));
+				}
 			}
 			transactionManager.commit(status);
 			requestDocument.ifPresent(d -> sendEvent(event,receiveDeliveryChannel,url,d));
