@@ -29,6 +29,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
+import org.xml.sax.SAXNotRecognizedException;
+import org.xml.sax.SAXNotSupportedException;
 
 public class XSDValidator
 {
@@ -53,8 +55,7 @@ public class XSDValidator
 	{
 		try
 		{
-			Validator validator = schema.newValidator();
-			//validator.validate(new SAXSource(new InputSource(new StringReader(xml))));
+			Validator validator = getValidator();
 			validator.validate(new StreamSource(new StringReader(xml)));
 		}
 		catch (SAXException e)
@@ -71,7 +72,7 @@ public class XSDValidator
 	{
 		try
 		{
-			Validator validator = schema.newValidator();
+			Validator validator = getValidator();
 			validator.validate(new DOMSource(node));
 		}
 		catch (SAXException e)
@@ -82,6 +83,14 @@ public class XSDValidator
 		{
 			throw new ValidatorException(e);
 		}
+	}
+
+	private Validator getValidator() throws SAXNotRecognizedException, SAXNotSupportedException
+	{
+		Validator validator = schema.newValidator();
+		validator.setProperty(XMLConstants.ACCESS_EXTERNAL_DTD,"");
+		validator.setProperty(XMLConstants.ACCESS_EXTERNAL_SCHEMA,"");
+		return validator;
 	}
 
 }
