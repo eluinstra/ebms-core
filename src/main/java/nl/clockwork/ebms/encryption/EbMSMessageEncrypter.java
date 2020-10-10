@@ -37,27 +37,12 @@ import java.util.List;
 import javax.crypto.SecretKey;
 import javax.mail.util.ByteArrayDataSource;
 import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
-import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
-
-import nl.clockwork.ebms.common.CPAManager;
-import nl.clockwork.ebms.common.KeyStoreManager;
-import nl.clockwork.ebms.common.util.SecurityUtils;
-import nl.clockwork.ebms.model.CacheablePartyId;
-import nl.clockwork.ebms.model.EbMSAttachment;
-import nl.clockwork.ebms.model.EbMSDocument;
-import nl.clockwork.ebms.model.EbMSMessage;
-import nl.clockwork.ebms.processor.EbMSProcessingException;
-import nl.clockwork.ebms.processor.EbMSProcessorException;
-import nl.clockwork.ebms.util.CPAUtils;
-import nl.clockwork.ebms.validation.ValidationException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -73,6 +58,19 @@ import org.springframework.beans.factory.InitializingBean;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
+
+import nl.clockwork.ebms.common.CPAManager;
+import nl.clockwork.ebms.common.KeyStoreManager;
+import nl.clockwork.ebms.common.util.DOMUtils;
+import nl.clockwork.ebms.common.util.SecurityUtils;
+import nl.clockwork.ebms.model.CacheablePartyId;
+import nl.clockwork.ebms.model.EbMSAttachment;
+import nl.clockwork.ebms.model.EbMSDocument;
+import nl.clockwork.ebms.model.EbMSMessage;
+import nl.clockwork.ebms.processor.EbMSProcessingException;
+import nl.clockwork.ebms.processor.EbMSProcessorException;
+import nl.clockwork.ebms.util.CPAUtils;
+import nl.clockwork.ebms.validation.ValidationException;
 
 public class EbMSMessageEncrypter implements InitializingBean
 {
@@ -183,7 +181,8 @@ public class EbMSMessageEncrypter implements InitializingBean
 		setEncryptedData(document,xmlCipher,encryptedKey,certificate,attachment);
 		EncryptedData encryptedData = xmlCipher.encryptData(document,null,attachment.getInputStream());
 		StringWriter buffer = new StringWriter();
-		createTransformer().transform(new DOMSource(xmlCipher.martial(document,encryptedData)),new StreamResult(buffer));
+		Transformer transformer = DOMUtils.getTransformer();
+		transformer.transform(new DOMSource(xmlCipher.martial(document,encryptedData)),new StreamResult(buffer));
 		ByteArrayDataSource ds = new ByteArrayDataSource(buffer.toString().getBytes("UTF-8"),"application/xml");
 		ds.setName(attachment.getName());
 		return new EbMSAttachment(ds,attachment.getContentId());
@@ -214,23 +213,13 @@ public class EbMSMessageEncrypter implements InitializingBean
 	{
 		try
 		{
-			DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-			dbFactory.setNamespaceAware(true);
-			DocumentBuilder builder = dbFactory.newDocumentBuilder();
+			DocumentBuilder builder = DOMUtils.getDocumentBuilder();
 			return builder.parse(new InputSource(new StringReader("<root></root>")));
 		}
 		catch (ParserConfigurationException | SAXException | IOException e)
 		{
 			throw new EbMSProcessorException(e);
 		}
-	}
-
-	private Transformer createTransformer() throws TransformerFactoryConfigurationError, TransformerConfigurationException
-	{
-		TransformerFactory transormerFactory = TransformerFactory.newInstance();
-		Transformer transformer = transormerFactory.newTransformer();
-		transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION,"yes");
-		return transformer;
 	}
 
 	public void setCpaManager(CPAManager cpaManager)
