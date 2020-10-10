@@ -72,8 +72,7 @@ public abstract class EbMSInputStreamHandler
 		catch (Exception e)
 		{
 			log.error("",e);
-			//handleException("Server","An unexpected error occurred!");
-			writeResponseStatus(HttpServletResponse.SC_BAD_REQUEST);
+			writeResponseStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 		}
 	}
 
