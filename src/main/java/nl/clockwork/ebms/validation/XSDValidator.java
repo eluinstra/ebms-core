@@ -23,6 +23,7 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
+import javax.xml.validation.Validator;
 
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
@@ -54,41 +55,19 @@ public class XSDValidator
 		}
 	}
 	
-	public void validate(String xml) throws ValidatorException, ValidationException
+	public void validate(String xml) throws SAXException, IOException
 	{
-		try
-		{
-			val validator = getValidator();
-			validator.validate(new StreamSource(new StringReader(xml)));
-		}
-		catch (SAXException e)
-		{
-			throw new ValidationException(e);
-		}
-		catch (IOException e)
-		{
-			throw new ValidatorException(e);
-		}
+		val validator = getValidator();
+		validator.validate(new StreamSource(new StringReader(xml)));
 	}
 
-	public void validate(Node node) throws ValidatorException, ValidationException
+	public void validate(Node node) throws SAXException, IOException
 	{
-		try
-		{
-			val validator = getValidator();
-			validator.validate(new DOMSource(node));
-		}
-		catch (SAXException e)
-		{
-			throw new ValidationException(e);
-		}
-		catch (IOException e)
-		{
-			throw new ValidatorException(e);
-		}
+		val validator = getValidator();
+		validator.validate(new DOMSource(node));
 	}
 
-	private javax.xml.validation.Validator getValidator() throws SAXNotRecognizedException, SAXNotSupportedException
+	private Validator getValidator() throws SAXNotRecognizedException, SAXNotSupportedException
 	{
 		val validator = schema.newValidator();
 		validator.setProperty(XMLConstants.ACCESS_EXTERNAL_DTD,"");
