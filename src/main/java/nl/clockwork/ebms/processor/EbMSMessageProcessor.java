@@ -269,7 +269,7 @@ public class EbMSMessageProcessor
 	{
 		try
 		{
-			messageValidator.validateMessage(messageDocument,message,timestamp);
+			messageValidator.validateAndDecryptMessage(messageDocument,message,timestamp);
 			if (message.getAckRequested() == null)
 			{
 				storeMessage(timestamp,messageDocument,message);

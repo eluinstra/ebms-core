@@ -60,13 +60,13 @@ public class EbMSMessageValidator
 	@NonNull
 	ClientCertificateValidator clientCertificateValidator;
 
-	public void validateMessage(EbMSDocument document, EbMSMessage message, Instant timestamp) throws ValidatorException
+	public void validateAndDecryptMessage(EbMSDocument document, EbMSMessage message, Instant timestamp) throws ValidatorException
 	{
 		if (isDuplicateMessage(message.getMessageHeader()))
 			throw new DuplicateMessageException();
+		clientCertificateValidator.validate(message);
 		cpaValidator.validate(message);
 		messageHeaderValidator.validate(message,timestamp);
-		clientCertificateValidator.validate(message);
 		signatureValidator.validate(message);
 		manifestValidator.validate(message);
 		messageDecrypter.decrypt(message);
@@ -77,25 +77,25 @@ public class EbMSMessageValidator
 	{
 		if (isDuplicateMessage(responseMessage.getMessageHeader()))
 			throw new DuplicateMessageException();
+		clientCertificateValidator.validate(responseMessage);
 		messageHeaderValidator.validate(requestMessage,responseMessage);
 		messageHeaderValidator.validate(responseMessage,timestamp);
-		clientCertificateValidator.validate(responseMessage);
 	}
 
 	public void validateAcknowledgment(EbMSDocument responseDocument, EbMSMessage requestMessage, EbMSAcknowledgment responseMessage, Instant timestamp) throws ValidatorException
 	{
 		if (isDuplicateMessage(responseMessage.getMessageHeader()))
 			throw new DuplicateMessageException();
+		clientCertificateValidator.validate(responseMessage);
 		messageHeaderValidator.validate(requestMessage,responseMessage);
 		messageHeaderValidator.validate(responseMessage,timestamp);
-		clientCertificateValidator.validate(responseMessage);
 		signatureValidator.validate(responseDocument,requestMessage,responseMessage);
 	}
 
 	public void validate(EbMSBaseMessage message, Instant timestamp) throws ValidatorException
 	{
-		messageHeaderValidator.validate(message,timestamp);
 		clientCertificateValidator.validate(message);
+		messageHeaderValidator.validate(message,timestamp);
 	}
 
 	public boolean isSyncReply(EbMSRequestMessage message)
