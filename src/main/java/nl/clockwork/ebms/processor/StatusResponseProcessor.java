@@ -16,6 +16,7 @@
 package nl.clockwork.ebms.processor;
 
 import java.time.Instant;
+import java.util.Optional;
 
 import javax.xml.bind.JAXBException;
 import javax.xml.datatype.DatatypeConfigurationException;
@@ -101,7 +102,7 @@ class StatusResponseProcessor
 			return Tuple.of(EbMSMessageStatus.UNAUTHORIZED,null);
 		else
 		{
-			return ebMSDAO.getMessageStatus(statusRequest.getStatusRequest().getRefToMessageId())
+			return Optional.ofNullable(messageProperties.getMessageStatus())
 					.map(s -> mapEbMSMessageStatusAndTimestamp(s,messageProperties.getTimestamp()))
 					.orElseThrow(() -> new EbMSProcessingException("Not found message " + statusRequest.getStatusRequest().getRefToMessageId()));
 		}

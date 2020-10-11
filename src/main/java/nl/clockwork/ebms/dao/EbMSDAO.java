@@ -46,7 +46,6 @@ public interface EbMSDAO
 	Optional<Document> getDocument(String messageId);
 	Optional<EbMSDocument> getEbMSDocumentIfUnsent(String messageId);
 	Optional<EbMSDocument> getEbMSDocumentByRefToMessageId(String cpaId, String refToMessageId, EbMSAction...actions);
-	Optional<EbMSMessageStatus> getMessageStatus(String messageId);
 	Optional<Instant> getPersistTime(String messageId);
 	Optional<EbMSAction> getMessageAction(String messageId);
 
