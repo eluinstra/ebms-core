@@ -16,7 +16,6 @@
 package nl.clockwork.ebms.scheduler;
 
 import java.util.Arrays;
-import java.util.Optional;
 import java.util.Properties;
 
 import javax.sql.DataSource;
@@ -67,12 +66,13 @@ public class SchedulerConfig
 		String jdbcUrl;
 		String driverDelegateClass;
 		
-		public static Optional<String> getClass(String jdbcUrl)
+		public static String getClass(String jdbcUrl)
 		{
 			return Arrays.stream(values())
 					.filter(l -> jdbcUrl.startsWith(l.jdbcUrl))
 					.map(l -> l.driverDelegateClass)
-					.findFirst();
+					.findFirst()
+					.get();
 		}
 	}
 
@@ -143,7 +143,7 @@ public class SchedulerConfig
 		result.put("org.quartz.scheduler.instanceId","AUTO");
 		result.put("org.quartz.threadPool.threadCount",threadCount);
 		result.put("org.quartz.jobStore.class","org.quartz.impl.jdbcjobstore.JobStoreCMT");
-		result.put("org.quartz.jobStore.driverDelegateClass",driverDelegateClass == null ? DriverDelegate.getClass(jdbcUrl) : driverDelegateClass);
+		result.put("org.quartz.jobStore.driverDelegateClass",StringUtils.isEmpty(driverDelegateClass) ? DriverDelegate.getClass(jdbcUrl) : driverDelegateClass);
 		if (StringUtils.isNotEmpty(selectWithLockSQL))
 			result.put("org.quartz.jobStore.selectWithLockSQL",selectWithLockSQL);
 		result.put("org.quartz.jobStore.isClustered",isClustered);

@@ -14,11 +14,11 @@
 -- limitations under the License.
 --
 
-RENAME TABLE ebms_event TO delivery_task;
-RENAME INDEX i_ebms_event TO i_delivery_task;
-RENAME TABLE ebms_event_log TO delivery_log;
-RENAME TABLE ebms_message_event TO message_event;
-RENAME INDEX i_ebms_message_event TO i_message_event;
+ALTER TABLE ebms_event RENAME TO delivery_task;
+ALTER INDEX i_ebms_event RENAME TO i_delivery_task;
+ALTER TABLE ebms_event_log RENAME TO delivery_log;
+ALTER TABLE ebms_message_event RENAME TO message_event;
+ALTER INDEX i_ebms_message_event RENAME TO i_message_event;
 
 CREATE TABLE qrtz_job_details
 (

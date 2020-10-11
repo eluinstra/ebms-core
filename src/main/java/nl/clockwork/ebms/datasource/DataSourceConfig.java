@@ -66,7 +66,7 @@ public class DataSourceConfig
 		H2_STRICT("jdbc:h2:",BASEPATH + "h2.strict",true),
 		HSQLDB("jdbc:hsqldb:",BASEPATH + "hsqldb",false),
 		HSQLDB_STRICT("jdbc:hsqldb:",BASEPATH + "hsqldb.strict",true),
-		MARIADB("jdbc:mariadb:",BASEPATH + "mysql",false),
+		MARIADB("jdbc:mariadb:",BASEPATH + "mariadb",false),
 		MSSQL("jdbc:sqlserver:",BASEPATH + "mssql",false),
 		MYSQL("jdbc:mysql:",BASEPATH + "mysql",false),
 		ORACLE("jdbc:oracle:",BASEPATH + "oracle",false),
