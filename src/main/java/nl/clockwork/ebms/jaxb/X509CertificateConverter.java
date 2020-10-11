@@ -21,8 +21,11 @@ import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import lombok.val;
 
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class X509CertificateConverter
 {
 	public static X509Certificate parseCertificate(byte[] certificate) throws CertificateException

@@ -48,9 +48,12 @@ import org.w3c.dom.Node;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import lombok.val;
 import lombok.var;
 
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class DOMUtils
 {
 	public static DocumentBuilder getDocumentBuilder() throws ParserConfigurationException

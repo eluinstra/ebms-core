@@ -47,5 +47,5 @@ public class RateLimiterFilter implements Filter
 	{
 		rateLimiter.acquire();
 		chain.doFilter(request,response);
-}
+	}
 }

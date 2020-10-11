@@ -31,6 +31,8 @@ import javax.crypto.SecretKey;
 
 import org.apache.xml.security.encryption.XMLCipher;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import lombok.val;
 import lombok.extern.slf4j.Slf4j;
 import nl.clockwork.ebms.security.EbMSKeyStore;
@@ -38,6 +40,7 @@ import nl.clockwork.ebms.security.EbMSTrustStore;
 import nl.clockwork.ebms.validation.ValidationException;
 
 @Slf4j
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class SecurityUtils
 {
 	private static final int KEYSIZE_192 = 192;

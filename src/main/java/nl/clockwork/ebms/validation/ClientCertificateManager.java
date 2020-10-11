@@ -17,6 +17,10 @@ package nl.clockwork.ebms.validation;
 
 import java.security.cert.X509Certificate;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
+
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class ClientCertificateManager
 {
 	private static final ThreadLocal<X509Certificate> certificateHolder = new ThreadLocal<>();

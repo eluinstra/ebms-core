@@ -63,6 +63,8 @@ import org.xmlsoap.schemas.soap.envelope.Envelope;
 import org.xmlsoap.schemas.soap.envelope.Fault;
 import org.xmlsoap.schemas.soap.envelope.Header;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import lombok.val;
 import nl.clockwork.ebms.cpa.CPAUtils;
 import nl.clockwork.ebms.jaxb.EbMSNamespaceMapper;
@@ -77,6 +79,7 @@ import nl.clockwork.ebms.model.EbMSStatusRequest;
 import nl.clockwork.ebms.model.EbMSStatusResponse;
 import nl.clockwork.ebms.util.DOMUtils;
 
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class EbMSMessageUtils
 {
 	public static EbMSBaseMessage getEbMSMessage(Document document) throws JAXBException, XPathExpressionException, ParserConfigurationException, SAXException, IOException

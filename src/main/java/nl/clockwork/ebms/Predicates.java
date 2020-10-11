@@ -18,6 +18,10 @@ package nl.clockwork.ebms;
 import java.util.Arrays;
 import java.util.function.Predicate;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
+
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class Predicates
 {
 	public static Predicate<String> contains(String...values)

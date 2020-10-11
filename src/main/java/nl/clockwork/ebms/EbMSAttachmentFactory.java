@@ -26,11 +26,14 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.cxf.io.CachedOutputStream;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import lombok.val;
 import nl.clockwork.ebms.model.CachedEbMSAttachment;
 import nl.clockwork.ebms.model.EbMSAttachment;
 import nl.clockwork.ebms.model.PlainEbMSAttachment;
 
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class EbMSAttachmentFactory
 {
 	public static void init(String attachmentOutputDirectory, int attachmentMemoryTreshold, String attachmentCipherTransformation)

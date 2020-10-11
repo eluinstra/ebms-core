@@ -15,6 +15,10 @@
  */
 package nl.clockwork.ebms;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
+
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class Constants
 {
 	public static final String EBMS_SOAP_ACTION = "\"ebXML\"";

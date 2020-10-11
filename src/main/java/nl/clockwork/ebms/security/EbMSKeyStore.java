@@ -27,10 +27,13 @@ import java.security.cert.X509Certificate;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.Value;
 
 @Value
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class EbMSKeyStore
 {
 	private static Map<String,EbMSKeyStore> keyStores = new ConcurrentHashMap<>();

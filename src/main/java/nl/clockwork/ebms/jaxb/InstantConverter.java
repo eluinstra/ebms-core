@@ -21,8 +21,11 @@ import java.util.GregorianCalendar;
 
 import javax.xml.bind.DatatypeConverter;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import lombok.val;
 
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class InstantConverter
 {
 	public static Instant parseDateTime(String date)

@@ -45,12 +45,15 @@ import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.Transport;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.Service;
 import org.w3._2000._09.xmldsig.X509DataType;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import lombok.val;
 import nl.clockwork.ebms.EbMSAction;
 import nl.clockwork.ebms.EbMSMessageUtils;
 import nl.clockwork.ebms.model.FromPartyInfo;
 import nl.clockwork.ebms.model.ToPartyInfo;
 
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class CPAUtils
 {
 	public static boolean equals(List<PartyId> cpaPartyIds, List<org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.PartyId> headerPartyIds)
