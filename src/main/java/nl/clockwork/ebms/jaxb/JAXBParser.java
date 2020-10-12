@@ -23,9 +23,16 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.parsers.SAXParserFactory;
+import javax.xml.transform.sax.SAXSource;
 
 import org.apache.commons.lang3.StringUtils;
 import org.w3c.dom.Node;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+import org.xml.sax.SAXNotRecognizedException;
+import org.xml.sax.SAXNotSupportedException;
 
 import com.sun.xml.bind.marshaller.NamespacePrefixMapper;
 
@@ -39,7 +46,22 @@ import lombok.experimental.FieldDefaults;
 public class JAXBParser<T>
 {
 	private static HashMap<Class<?>,JAXBParser<?>> xmlHandlers = new HashMap<>();
+	private static SAXParserFactory saxParserFactory;
 	JAXBContext context;
+
+	{
+		try
+		{
+			saxParserFactory = SAXParserFactory.newInstance();
+			saxParserFactory.setFeature("http://xml.org/sax/features/external-general-entities", false);
+			saxParserFactory.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
+			saxParserFactory.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
+		}
+		catch (SAXNotRecognizedException | SAXNotSupportedException | ParserConfigurationException e)
+		{
+			throw new IllegalStateException(e);
+		}
+	}
 
 	@SuppressWarnings("unchecked")
 	public T handleUnsafe(String xml) throws JAXBException
@@ -62,6 +84,22 @@ public class JAXBParser<T>
 			return null;
 		val unmarshaller = context.createUnmarshaller();
 		val o = unmarshaller.unmarshal(n);
+		if (o instanceof JAXBElement<?>)
+			return ((JAXBElement<T>)o).getValue();
+		else
+			return (T)o;
+	}
+
+	@SuppressWarnings("unchecked")
+	public T handle(String xml) throws JAXBException, SAXException, ParserConfigurationException
+	{
+		if (StringUtils.isEmpty(xml))
+			return null;
+		val parser = saxParserFactory.newSAXParser();
+		val is = new InputSource(new StringReader(xml));
+		val s = new SAXSource(parser.getXMLReader(),is);
+		val unmarshaller = context.createUnmarshaller();
+		val o = unmarshaller.unmarshal(s);
 		if (o instanceof JAXBElement<?>)
 			return ((JAXBElement<T>)o).getValue();
 		else
