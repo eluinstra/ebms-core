@@ -23,12 +23,9 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
-import javax.xml.validation.Validator;
 
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
-import org.xml.sax.SAXNotRecognizedException;
-import org.xml.sax.SAXNotSupportedException;
 
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -46,6 +43,8 @@ public class XSDValidator
 		try
 		{
 			val factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+			factory.setProperty(XMLConstants.ACCESS_EXTERNAL_DTD,"");
+			factory.setProperty(XMLConstants.ACCESS_EXTERNAL_SCHEMA,"");
       val systemId = this.getClass().getResource(xsdFile).toString();
 			schema = factory.newSchema(new StreamSource(this.getClass().getResourceAsStream(xsdFile),systemId));
 		}
@@ -57,22 +56,13 @@ public class XSDValidator
 	
 	public void validate(String xml) throws SAXException, IOException
 	{
-		val validator = getValidator();
+		val validator = schema.newValidator();
 		validator.validate(new StreamSource(new StringReader(xml)));
 	}
 
 	public void validate(Node node) throws SAXException, IOException
 	{
-		val validator = getValidator();
+		val validator = schema.newValidator();
 		validator.validate(new DOMSource(node));
 	}
-
-	private Validator getValidator() throws SAXNotRecognizedException, SAXNotSupportedException
-	{
-		val validator = schema.newValidator();
-		validator.setProperty(XMLConstants.ACCESS_EXTERNAL_DTD,"");
-		validator.setProperty(XMLConstants.ACCESS_EXTERNAL_SCHEMA,"");
-		return validator;
-	}
-
 }
