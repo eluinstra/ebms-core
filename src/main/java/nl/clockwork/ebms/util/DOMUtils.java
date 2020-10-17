@@ -47,14 +47,18 @@ import javax.xml.xpath.XPathFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+import org.xml.sax.ErrorHandler;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.val;
 import lombok.var;
+import lombok.extern.apachecommons.CommonsLog;
 
+@CommonsLog
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class DOMUtils
 {
@@ -82,7 +86,29 @@ public class DOMUtils
 		dbf.setExpandEntityReferences(false);
 		dbf.setNamespaceAware(true);
 		dbf.setSchema(schema);
-		return dbf.newDocumentBuilder();
+		DocumentBuilder db = dbf.newDocumentBuilder();
+		db.setErrorHandler(new ErrorHandler()
+		{
+			@Override
+			public void fatalError(SAXParseException exception) throws SAXException
+			{
+				log.fatal("",exception);
+				throw exception;
+			}
+			@Override
+			public void error(SAXParseException exception) throws SAXException
+			{
+				log.error("",exception);
+				throw exception;
+			}
+
+			@Override
+			public void warning(SAXParseException exception) throws SAXException
+			{
+				log.warn("",exception);
+			}
+		});
+		return db;
 	}
 	
 	public static Transformer getTransformer() throws TransformerConfigurationException, TransformerFactoryConfigurationError
