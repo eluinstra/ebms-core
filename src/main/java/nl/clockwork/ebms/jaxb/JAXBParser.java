@@ -26,6 +26,7 @@ import javax.xml.bind.Marshaller;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParserFactory;
 import javax.xml.transform.sax.SAXSource;
+import javax.xml.validation.Schema;
 
 import org.apache.commons.lang3.StringUtils;
 import org.w3c.dom.Node;
@@ -63,13 +64,20 @@ public class JAXBParser<T>
 		}
 	}
 
-	@SuppressWarnings("unchecked")
 	public T handleUnsafe(String xml) throws JAXBException
+	{
+		return handle(null,xml);
+	}
+
+	@SuppressWarnings("unchecked")
+	public T handle(Schema schema, String xml) throws JAXBException
 	{
 		if (StringUtils.isEmpty(xml))
 			return null;
 		val r = new StringReader(xml);
 		val unmarshaller = context.createUnmarshaller();
+		if (schema != null)
+			unmarshaller.setSchema(schema);
 		val o = unmarshaller.unmarshal(r);
 		if (o instanceof JAXBElement<?>)
 			return ((JAXBElement<T>)o).getValue();

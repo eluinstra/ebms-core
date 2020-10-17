@@ -63,7 +63,6 @@ import nl.clockwork.ebms.validation.EbMSMessageValidator;
 import nl.clockwork.ebms.validation.EbMSValidationException;
 import nl.clockwork.ebms.validation.ValidationException;
 import nl.clockwork.ebms.validation.ValidatorException;
-import nl.clockwork.ebms.validation.XSDValidator;
 
 @Slf4j
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -81,7 +80,6 @@ public class EbMSMessageProcessor
   @NonNull
 	DuplicateMessageHandler duplicateMessageHandler;
 	boolean deleteEbMSAttachmentsOnMessageProcessed;
-	XSDValidator xsdValidator = new XSDValidator("/nl/clockwork/ebms/xsd/msg-header-2_0.xsd");
 	MessageErrorProcessor messageErrorProcessor;
 	AcknowledgmentProcessor acknowledgmentProcessor;
 	StatusResponseProcessor statusResponseProcessor;
@@ -138,7 +136,6 @@ public class EbMSMessageProcessor
 	{
 		try
 		{
-			xsdValidator.validate(document.getMessage());
 			val timestamp = Instant.now();
 			val message = EbMSMessageUtils.getEbMSMessage(document);
 			if (LoggingUtils.mdc == Status.ENABLED)
@@ -225,7 +222,6 @@ public class EbMSMessageProcessor
 				
 				if (response != null)
 				{
-					xsdValidator.validate(response.getMessage());
 					val timestamp = Instant.now();
 					val responseMessage = EbMSMessageUtils.getEbMSMessage(response);
 					if (responseMessage instanceof EbMSMessageError)

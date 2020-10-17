@@ -41,6 +41,7 @@ import nl.clockwork.ebms.util.DOMUtils;
 @AllArgsConstructor
 public class EbMSMessageReader
 {
+	private static final String MSG_HEADER_2_0_XSD = "/nl/clockwork/ebms/xsd/msg-header-2_0.xsd";
 	String contentId;
 	@NonNull
 	String contentType;
@@ -61,9 +62,10 @@ public class EbMSMessageReader
 
 	public EbMSDocument readResponse(String message) throws IOException, ParserConfigurationException, SAXException
 	{
+		val schema = DOMUtils.createSchema(MSG_HEADER_2_0_XSD);
 		return StringUtils.isNotBlank(message) ? EbMSDocument.builder()
 				.contentId(contentId)
-				.message(DOMUtils.read(message))
+				.message(DOMUtils.read(schema,message))
 				.attachments(Collections.emptyList())
 				.build()
 				: null;
@@ -79,9 +81,10 @@ public class EbMSMessageReader
 
 	private EbMSDocument getEbMSMessage(InputStream in) throws ParserConfigurationException, SAXException, IOException
 	{
+		val schema = DOMUtils.createSchema(MSG_HEADER_2_0_XSD);
 		return EbMSDocument.builder()
 				.contentId(contentId)
-				.message(DOMUtils.read(in))
+				.message(DOMUtils.read(schema,in))
 				.attachments(Collections.emptyList())
 				.build();
 	}
@@ -90,10 +93,11 @@ public class EbMSMessageReader
 	{
 		if (attachments.size() > 0)
 		{
+			val schema = DOMUtils.createSchema(MSG_HEADER_2_0_XSD);
 			val message = attachments.remove(0);
 			return EbMSDocument.builder()
 					.contentId(contentId)
-					.message(DOMUtils.read((message.getInputStream())))
+					.message(DOMUtils.read(schema,message.getInputStream()))
 					.attachments(attachments)
 					.build();
 		}

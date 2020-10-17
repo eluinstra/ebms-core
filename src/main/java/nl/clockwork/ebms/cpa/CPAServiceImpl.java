@@ -27,8 +27,8 @@ import lombok.val;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import nl.clockwork.ebms.jaxb.JAXBParser;
+import nl.clockwork.ebms.util.DOMUtils;
 import nl.clockwork.ebms.validation.CPAValidator;
-import nl.clockwork.ebms.validation.XSDValidator;
 
 @Slf4j
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -36,11 +36,11 @@ import nl.clockwork.ebms.validation.XSDValidator;
 @Transactional(transactionManager = "dataSourceTransactionManager")
 public class CPAServiceImpl implements CPAService
 {
+	private static final String CPP_CPA_2_0_XSD = "/nl/clockwork/ebms/xsd/cpp-cpa-2_0.xsd";
   @NonNull
 	CPAManager cpaManager;
   @NonNull
 	CPAValidator cpaValidator;
-	XSDValidator xsdValidator = new XSDValidator("/nl/clockwork/ebms/xsd/cpp-cpa-2_0.xsd");
 
 	@Override
 	public void validateCPA(/*CollaborationProtocolAgreement*/String cpa) throws CPAServiceException
@@ -48,8 +48,8 @@ public class CPAServiceImpl implements CPAService
 		try
 		{
 			log.debug("ValidateCPA");
-			xsdValidator.validate(cpa);
-			val cpa_ = JAXBParser.getInstance(CollaborationProtocolAgreement.class).handleUnsafe(cpa);
+      val schema = DOMUtils.createSchema(CPP_CPA_2_0_XSD);
+			val cpa_ = JAXBParser.getInstance(CollaborationProtocolAgreement.class).handle(schema,cpa);
 			log.info("Validating CPA " + cpa_.getCpaid());
 			cpaValidator.validate(cpa_);
 		}
@@ -66,8 +66,8 @@ public class CPAServiceImpl implements CPAService
 		try
 		{
 			log.debug("InsertCPA");
-			xsdValidator.validate(cpa);
-			val cpa_ = JAXBParser.getInstance(CollaborationProtocolAgreement.class).handleUnsafe(cpa);
+      val schema = DOMUtils.createSchema(CPP_CPA_2_0_XSD);
+			val cpa_ = JAXBParser.getInstance(CollaborationProtocolAgreement.class).handle(schema,cpa);
 			new CPAValidator(cpaManager).validate(cpa_);
 			cpaManager.setCPA(cpa_,overwrite);
 			log.debug("InsertCPA done");

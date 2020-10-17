@@ -38,6 +38,8 @@ import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
+import javax.xml.validation.Schema;
+import javax.xml.validation.SchemaFactory;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
@@ -56,7 +58,21 @@ import lombok.var;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class DOMUtils
 {
+	private static final SchemaFactory SCHEMA_FACTORY = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+
+	public static Schema createSchema(String xsdFile) throws SAXException
+	{
+		val stream = DOMUtils.class.getResourceAsStream(xsdFile);
+		val systemId = DOMUtils.class.getResource(xsdFile).toString();
+		return SCHEMA_FACTORY.newSchema(new StreamSource(stream,systemId));
+	}
+
 	public static DocumentBuilder getDocumentBuilder() throws ParserConfigurationException
+	{
+		return getDocumentBuilder(null);
+	}
+
+	public static DocumentBuilder getDocumentBuilder(Schema schema) throws ParserConfigurationException
 	{
 		val dbf = DocumentBuilderFactory.newInstance();
 		dbf.setFeature("http://apache.org/xml/features/disallow-doctype-decl",true);
@@ -66,6 +82,7 @@ public class DOMUtils
 		dbf.setXIncludeAware(false);
 		dbf.setExpandEntityReferences(false);
 		dbf.setNamespaceAware(true);
+		dbf.setSchema(schema);
 		return dbf.newDocumentBuilder();
 	}
 	
@@ -101,7 +118,12 @@ public class DOMUtils
 	
 	public static Document read(String s) throws ParserConfigurationException, SAXException, IOException
 	{
-		val db = getDocumentBuilder();
+		return read((Schema)null,s);
+	}
+
+	public static Document read(Schema schema, String s) throws ParserConfigurationException, SAXException, IOException
+	{
+		val db = getDocumentBuilder(schema);
 		return db.parse(new InputSource(new StringReader(s)));
 	}
 
@@ -115,7 +137,12 @@ public class DOMUtils
 
 	public static Document read(InputStream stream) throws ParserConfigurationException, SAXException, IOException
 	{
-		val db = getDocumentBuilder();
+		return read(null,stream);
+	}
+
+	public static Document read(Schema schema, InputStream stream) throws ParserConfigurationException, SAXException, IOException
+	{
+		val db = getDocumentBuilder(schema);
 		return db.parse(stream);
 	}
 
