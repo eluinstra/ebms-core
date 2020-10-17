@@ -58,13 +58,12 @@ import lombok.var;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class DOMUtils
 {
-	private static final SchemaFactory SCHEMA_FACTORY = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-
 	public static Schema createSchema(String xsdFile) throws SAXException
 	{
+		val sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
 		val stream = DOMUtils.class.getResourceAsStream(xsdFile);
 		val systemId = DOMUtils.class.getResource(xsdFile).toString();
-		return SCHEMA_FACTORY.newSchema(new StreamSource(stream,systemId));
+		return sf.newSchema(new StreamSource(stream,systemId));
 	}
 
 	public static DocumentBuilder getDocumentBuilder() throws ParserConfigurationException
@@ -100,7 +99,7 @@ public class DOMUtils
 		return result;
 	}
 
-	private static javax.xml.transform.TransformerFactory createTransformerFactory() throws TransformerFactoryConfigurationError
+	private static TransformerFactory createTransformerFactory() throws TransformerFactoryConfigurationError
 	{
 		val result = TransformerFactory.newInstance();
 		result.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD,"");
@@ -209,5 +208,4 @@ public class DOMUtils
 		val expr = xpath.compile(query);
 		return (Node)expr.evaluate(document,returnType);
 	}
-
 }
