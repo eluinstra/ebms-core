@@ -64,10 +64,12 @@ public class DOMUtils
 {
 	public static Schema createSchema(String xsdFile) throws SAXException
 	{
-		val sf = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+		val factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+		factory.setProperty(XMLConstants.ACCESS_EXTERNAL_DTD,"");
+		//factory.setProperty(XMLConstants.ACCESS_EXTERNAL_SCHEMA,"");
 		val stream = DOMUtils.class.getResourceAsStream(xsdFile);
 		val systemId = DOMUtils.class.getResource(xsdFile).toString();
-		return sf.newSchema(new StreamSource(stream,systemId));
+		return factory.newSchema(new StreamSource(stream,systemId));
 	}
 
 	public static DocumentBuilder getDocumentBuilder() throws ParserConfigurationException
@@ -77,17 +79,17 @@ public class DOMUtils
 
 	public static DocumentBuilder getDocumentBuilder(Schema schema) throws ParserConfigurationException
 	{
-		val dbf = DocumentBuilderFactory.newInstance();
-		dbf.setFeature("http://apache.org/xml/features/disallow-doctype-decl",true);
-		dbf.setFeature("http://xml.org/sax/features/external-general-entities",false);
-		dbf.setFeature("http://xml.org/sax/features/external-parameter-entities",false);
-		dbf.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd",false);
-		dbf.setXIncludeAware(false);
-		dbf.setExpandEntityReferences(false);
-		dbf.setNamespaceAware(true);
-		dbf.setSchema(schema);
-		DocumentBuilder db = dbf.newDocumentBuilder();
-		db.setErrorHandler(new ErrorHandler()
+		val factory = DocumentBuilderFactory.newInstance();
+		factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl",true);
+		factory.setFeature("http://xml.org/sax/features/external-general-entities",false);
+		factory.setFeature("http://xml.org/sax/features/external-parameter-entities",false);
+		factory.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd",false);
+		factory.setXIncludeAware(false);
+		factory.setExpandEntityReferences(false);
+		factory.setNamespaceAware(true);
+		factory.setSchema(schema);
+		DocumentBuilder builder = factory.newDocumentBuilder();
+		builder.setErrorHandler(new ErrorHandler()
 		{
 			@Override
 			public void fatalError(SAXParseException exception) throws SAXException
@@ -108,7 +110,7 @@ public class DOMUtils
 				log.warn("",exception);
 			}
 		});
-		return db;
+		return builder;
 	}
 	
 	public static Transformer getTransformer() throws TransformerConfigurationException, TransformerFactoryConfigurationError
@@ -148,16 +150,16 @@ public class DOMUtils
 
 	public static Document read(Schema schema, String s) throws ParserConfigurationException, SAXException, IOException
 	{
-		val db = getDocumentBuilder(schema);
-		return db.parse(new InputSource(new StringReader(s)));
+		val builder = getDocumentBuilder(schema);
+		return builder.parse(new InputSource(new StringReader(s)));
 	}
 
 	public static Document read(String s, String encoding) throws ParserConfigurationException, SAXException, IOException
 	{
-		val db = getDocumentBuilder();
-		val is = new InputSource(new ByteArrayInputStream(s.getBytes(encoding)));
-		is.setEncoding(encoding);
-		return db.parse(is);
+		val builder = getDocumentBuilder();
+		val source = new InputSource(new ByteArrayInputStream(s.getBytes(encoding)));
+		source.setEncoding(encoding);
+		return builder.parse(source);
 	}
 
 	public static Document read(InputStream stream) throws ParserConfigurationException, SAXException, IOException
@@ -167,16 +169,16 @@ public class DOMUtils
 
 	public static Document read(Schema schema, InputStream stream) throws ParserConfigurationException, SAXException, IOException
 	{
-		val db = getDocumentBuilder(schema);
-		return db.parse(stream);
+		val builder = getDocumentBuilder(schema);
+		return builder.parse(stream);
 	}
 
 	public static Document read(InputStream stream, String encoding) throws ParserConfigurationException, SAXException, IOException
 	{
-		val db = getDocumentBuilder();
-		val is = new InputSource(stream);
-		is.setEncoding(encoding);
-		return db.parse(is);
+		val buidler = getDocumentBuilder();
+		val in = new InputSource(stream);
+		in.setEncoding(encoding);
+		return buidler.parse(in);
 	}
 
 	public static String toString(Document document) throws TransformerException
