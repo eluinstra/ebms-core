@@ -33,7 +33,6 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 public class CachedEbMSAttachment implements EbMSAttachment
 {
-	@NonNull
 	@Getter
 	String name;
 	@NonNull
