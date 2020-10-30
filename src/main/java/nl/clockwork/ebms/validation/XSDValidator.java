@@ -26,8 +26,6 @@ import javax.xml.validation.SchemaFactory;
 
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
-import org.xml.sax.SAXNotRecognizedException;
-import org.xml.sax.SAXNotSupportedException;
 
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -45,6 +43,8 @@ public class XSDValidator
 		try
 		{
 			val factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+			factory.setProperty(XMLConstants.ACCESS_EXTERNAL_DTD,"");
+			//factory.setProperty(XMLConstants.ACCESS_EXTERNAL_SCHEMA,"");
       val systemId = this.getClass().getResource(xsdFile).toString();
 			schema = factory.newSchema(new StreamSource(this.getClass().getResourceAsStream(xsdFile),systemId));
 		}
@@ -54,46 +54,15 @@ public class XSDValidator
 		}
 	}
 	
-	public void validate(String xml) throws ValidatorException, ValidationException
-	{
-		try
-		{
-			val validator = getValidator();
-			validator.validate(new StreamSource(new StringReader(xml)));
-		}
-		catch (SAXException e)
-		{
-			throw new ValidationException(e);
-		}
-		catch (IOException e)
-		{
-			throw new ValidatorException(e);
-		}
-	}
-
-	public void validate(Node node) throws ValidatorException, ValidationException
-	{
-		try
-		{
-			val validator = getValidator();
-			validator.validate(new DOMSource(node));
-		}
-		catch (SAXException e)
-		{
-			throw new ValidationException(e);
-		}
-		catch (IOException e)
-		{
-			throw new ValidatorException(e);
-		}
-	}
-
-	private javax.xml.validation.Validator getValidator() throws SAXNotRecognizedException, SAXNotSupportedException
+	public void validate(String xml) throws SAXException, IOException
 	{
 		val validator = schema.newValidator();
-		validator.setProperty(XMLConstants.ACCESS_EXTERNAL_DTD,"");
-		validator.setProperty(XMLConstants.ACCESS_EXTERNAL_SCHEMA,"");
-		return validator;
+		validator.validate(new StreamSource(new StringReader(xml)));
 	}
 
+	public void validate(Node node) throws SAXException, IOException
+	{
+		val validator = schema.newValidator();
+		validator.validate(new DOMSource(node));
+	}
 }

@@ -108,7 +108,7 @@ class EbMSResponseHandler
 			}
 			catch (SAXException e)
 			{
-				throw new EbMSResponseException(connection.getResponseCode(),connection.getHeaderFields(),response);
+				throw new EbMSResponseException(connection.getResponseCode(),connection.getHeaderFields(),response,e);
 			}
 		}
 	}

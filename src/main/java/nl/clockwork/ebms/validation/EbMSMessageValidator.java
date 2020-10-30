@@ -60,7 +60,7 @@ public class EbMSMessageValidator
 	@NonNull
 	ClientCertificateValidator clientCertificateValidator;
 
-	public void validateMessage(EbMSDocument document, EbMSMessage message, Instant timestamp) throws ValidatorException
+	public void validateAndDecryptMessage(EbMSDocument document, EbMSMessage message, Instant timestamp) throws ValidatorException
 	{
 		if (isDuplicateMessage(message.getMessageHeader()))
 			throw new DuplicateMessageException();

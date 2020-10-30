@@ -246,16 +246,6 @@ class AbstractEbMSDAO implements EbMSDAO
 	}
 	
 	@Override
-	public Optional<EbMSMessageStatus> getMessageStatus(String messageId)
-	{
-		return Optional.ofNullable(queryFactory.select(table.status)
-				.from(table)
-				.where(table.messageId.eq(messageId)
-						.and(table.messageNr.eq(0)))
-				.fetchOne());
-	}
-
-	@Override
 	public Optional<Instant> getPersistTime(String messageId)
 	{
 		return Optional.ofNullable(queryFactory.select(table.persistTime)

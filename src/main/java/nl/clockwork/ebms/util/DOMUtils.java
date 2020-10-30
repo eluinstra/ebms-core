@@ -80,7 +80,7 @@ public class DOMUtils
 		return result;
 	}
 
-	private static javax.xml.transform.TransformerFactory createTransformerFactory() throws TransformerFactoryConfigurationError
+	private static TransformerFactory createTransformerFactory() throws TransformerFactoryConfigurationError
 	{
 		val result = TransformerFactory.newInstance();
 		result.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD,"");

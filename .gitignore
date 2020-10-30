@@ -1,19 +1,5 @@
 # ignore hidden files/directories
-
-hooks
-.DS_Store
-*~
-\#*
-.#*
-*.jar
-*.log
-*.vgc
-/.settings
-/.classpath
-/.project
-/target
-/findbugs
-
-# IntelliJ IDEA
-.idea
-*.iml
+.classpath
+.project
+.settings
+target

@@ -49,6 +49,13 @@ public class EbMSResponseException extends EbMSProcessingException
 		this.headers = headers;
 	}
 	
+	public EbMSResponseException(int statusCode, @NonNull Map<String,List<String>> headers, String message, Throwable cause)
+	{
+		super(message,cause);
+		this.statusCode = statusCode;
+		this.headers = headers;
+	}
+	
 	@Override
 	public String getMessage()
 	{

@@ -67,12 +67,12 @@ public abstract class EbMSInputStreamHandler
 	  catch (ValidationException e)
 	  {
 			log.error("",e);
-			handleException("Client",e.getMessage());
+			handleValidationException("Client",e.getMessage());
 		}
 		catch (Exception e)
 		{
 			log.error("",e);
-			writeResponseStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+			handleException();
 		}
 	}
 
@@ -156,7 +156,7 @@ public abstract class EbMSInputStreamHandler
 		}
 	}
 
-	private void handleException(String faultCode, String faultString)
+	private void handleValidationException(String faultCode, String faultString)
 	{
 		try
 		{
@@ -175,4 +175,10 @@ public abstract class EbMSInputStreamHandler
 		}
 	}
 
+
+	private void handleException()
+	{
+		messageLog.info(">>>>\nStatusCode=" + HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+		writeResponseStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+	}
 }
