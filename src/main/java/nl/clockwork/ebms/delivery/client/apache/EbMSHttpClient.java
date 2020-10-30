@@ -49,13 +49,14 @@ public class EbMSHttpClient implements EbMSClient
 	@NonNull
 	SSLConnectionSocketFactory sslConnectionSocketFactory;
 	int connectTimeout;
+	int socketTimeout;
 	boolean chunkedStreamingMode;
 	@NonNull
 	EbMSProxy proxy;
 
-	public EbMSHttpClient(SSLFactoryManager sslFactoryManager, String[] enabledProtocols, String[] enabledCipherSuites, boolean verifyHostnames, int connectTimeout, boolean chunkedStreamingMode, EbMSProxy proxy) throws Exception
+	public EbMSHttpClient(SSLFactoryManager sslFactoryManager, String[] enabledProtocols, String[] enabledCipherSuites, boolean verifyHostnames, int connectTimeout, int socketTimeout, boolean chunkedStreamingMode, EbMSProxy proxy) throws Exception
 	{
-		this(new SSLConnectionSocketFactoryFactory(sslFactoryManager,enabledProtocols,enabledCipherSuites,verifyHostnames).getObject(),connectTimeout,chunkedStreamingMode,proxy);
+		this(new SSLConnectionSocketFactoryFactory(sslFactoryManager,enabledProtocols,enabledCipherSuites,verifyHostnames).getObject(),connectTimeout,socketTimeout,chunkedStreamingMode,proxy);
 	}
 
 	public EbMSDocument sendMessage(String uri, EbMSDocument document) throws EbMSProcessorException
@@ -90,7 +91,7 @@ public class EbMSHttpClient implements EbMSClient
 		val result = new HttpPost(uri);
 		if (proxy != null)
 		{
-			result.setConfig(RequestConfig.custom().setConnectTimeout(connectTimeout).setProxy(new HttpHost(proxy.getHost(),proxy.getPort())).build());
+			result.setConfig(RequestConfig.custom().setConnectTimeout(connectTimeout).setSocketTimeout(socketTimeout).setProxy(new HttpHost(proxy.getHost(),proxy.getPort())).build());
 		}
 		return result;
 	}
