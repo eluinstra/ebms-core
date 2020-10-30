@@ -50,6 +50,7 @@ public class EbMSHttpClientFactory
 	@Default
 	EbMSHttpClientType type = EbMSHttpClientType.DEFAULT;
 	int connectTimeout;
+	int readTimeout;
 	boolean chunkedStreamingMode;
 	boolean base64Writer;
 	EbMSProxy proxy;
@@ -73,9 +74,9 @@ public class EbMSHttpClientFactory
 		{
 			val sslFactoryManager = createSslFactoryManager(getClientAlias(clientAlias));
 			if (EbMSHttpClientType.APACHE.equals(type))
-				return new nl.clockwork.ebms.client.apache.EbMSHttpClient(sslFactoryManager,enabledProtocols,enabledCipherSuites,verifyHostnames,connectTimeout,chunkedStreamingMode,proxy);
+				return new nl.clockwork.ebms.client.apache.EbMSHttpClient(sslFactoryManager,enabledProtocols,enabledCipherSuites,verifyHostnames,connectTimeout,readTimeout,chunkedStreamingMode,proxy);
 			else
-				return new EbMSHttpClient(sslFactoryManager,connectTimeout,chunkedStreamingMode,base64Writer,proxy,httpErrors.getRecoverableHttpErrors(),httpErrors.getUnrecoverableHttpErrors());
+				return new EbMSHttpClient(sslFactoryManager,connectTimeout,readTimeout,chunkedStreamingMode,base64Writer,proxy,httpErrors.getRecoverableHttpErrors(),httpErrors.getUnrecoverableHttpErrors());
 		}
 		catch (Exception e)
 		{

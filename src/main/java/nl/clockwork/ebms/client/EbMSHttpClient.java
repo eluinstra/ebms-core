@@ -43,6 +43,7 @@ class EbMSHttpClient implements EbMSClient
 	@NonNull
 	SSLFactoryManager sslFactoryManager;
 	int connectTimeout;
+	int readTimeout;
 	boolean chunkedStreamingMode;
 	boolean base64Writer;
 	EbMSProxy proxy;
@@ -55,6 +56,7 @@ class EbMSHttpClient implements EbMSClient
 		{
 			@Cleanup("disconnect") val connection = (HttpURLConnection)openConnection(uri);
 			connection.setConnectTimeout(connectTimeout);
+			connection.setReadTimeout(readTimeout);
 			if (chunkedStreaming(uri))
 				connection.setChunkedStreamingMode(0);
 			val writer = base64Writer ? new EbMSMessageBase64Writer(connection) : new EbMSMessageWriter(connection);

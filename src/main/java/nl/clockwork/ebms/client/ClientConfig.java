@@ -38,6 +38,8 @@ public class ClientConfig
 	EbMSHttpClientType ebMSHttpClientType;
 	@Value("${http.connectTimeout}")
 	int connectTimeout;
+	@Value("${http.readTimeout}")
+	int readTimeout;
 	@Value("${http.chunkedStreamingMode}")
 	boolean chunkedStreamingMode;
 	//@Value("${http.base64Writer}")
@@ -82,6 +84,7 @@ public class ClientConfig
 		return EbMSHttpClientFactory.builder()
 				.type(ebMSHttpClientType)
 				.connectTimeout(connectTimeout)
+				.readTimeout(readTimeout)
 				.chunkedStreamingMode(chunkedStreamingMode)
 				.base64Writer(base64Writer)
 				.proxy(createProxy())
