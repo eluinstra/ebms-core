@@ -142,7 +142,7 @@
 		<dependency>
 			<groupId>io.vavr</groupId>
 			<artifactId>vavr</artifactId>
-			<version>1.0.0-alpha-3</version>
+			<version>0.10.3</version>
 		</dependency>
 		<dependency>
 			<groupId>org.mapstruct</groupId>
@@ -446,6 +446,7 @@
 							<exclude>org.postgresql:postgresql</exclude>
 							<exclude>org.junit.jupiter:junit-jupiter-api</exclude>
 							<exclude>org.junit.jupiter:junit-jupiter-engine</exclude>
+							<exclude>io.vavr:vavr</exclude>
 						</excludes>
 					</configuration>
 				</plugin>
