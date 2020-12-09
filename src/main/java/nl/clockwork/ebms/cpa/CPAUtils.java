@@ -176,13 +176,7 @@ public class CPAUtils
 	public static Instant getPersistTime(Instant timestamp, DeliveryChannel deliveryChannel)
 	{
 		val persistDuration = CPAUtils.getDocExchange(deliveryChannel).getEbXMLReceiverBinding().getPersistDuration();
-		if (persistDuration != null)
-		{
-			val persistTime = Instant.from(timestamp);
-			return persistTime.plus(persistDuration);
-		}
-		else
-			return null;
+		return persistDuration != null ? Instant.from(timestamp).plus(persistDuration) : null;
 	}
 	public static Duration getRetryInterval(DeliveryChannel deliveryChannel)
 	{

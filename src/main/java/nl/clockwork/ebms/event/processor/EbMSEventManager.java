@@ -24,6 +24,7 @@ import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.val;
 import lombok.experimental.FieldDefaults;
+import nl.clockwork.ebms.EbMSAction;
 import nl.clockwork.ebms.cpa.CPAManager;
 import nl.clockwork.ebms.cpa.CPAUtils;
 import nl.clockwork.ebms.dao.EbMSDAO;
@@ -62,27 +63,25 @@ class EbMSEventManager implements EventManager
 				event.getCpaId(),
 				event.getReceiveDeliveryChannelId())
 					.orElseThrow(() -> StreamUtils.illegalStateException("DeliveryChannel",event.getCpaId(),event.getReceiveDeliveryChannelId()));
-		ebMSEventDAO.insertEventLog(event.getMessageId(),event.getTimestamp(),url,status,errorMessage);
 		val reliableMessaging = CPAUtils.isReliableMessaging(deliveryChannel);
+		ebMSEventDAO.insertEventLog(event.getMessageId(),event.getTimestamp(),url,status,errorMessage);
 		if (event.getTimeToLive() != null && reliableMessaging)
 			ebMSEventDAO.updateEvent(createNextEvent(event,deliveryChannel));
+		else if (mustUpdate(event,reliableMessaging))
+			ebMSEventDAO.updateEvent(createNextEvent(event,autoRetryInterval));
 		else
-		{
-			switch(ebMSDAO.getMessageAction(event.getMessageId()).orElse(null))
-			{
-				case ACKNOWLEDGMENT:
-				case MESSAGE_ERROR:
-					if (!reliableMessaging && event.getRetries() < nrAutoRetries)
-					{
-						ebMSEventDAO.updateEvent(createNextEvent(event,autoRetryInterval));
-						break;
-					}
-				default:
-					ebMSEventDAO.deleteEvent(event.getMessageId());
-			}
-		}
+			ebMSEventDAO.deleteEvent(event.getMessageId());
 	}
 
+	private boolean mustUpdate(EbMSEvent event, boolean reliableMessaging)
+	{
+		return ebMSDAO.getMessageAction(event.getMessageId()).map(a ->
+				(a.equals(EbMSAction.ACKNOWLEDGMENT) || a.equals(EbMSAction.MESSAGE_ERROR))
+				&& !reliableMessaging
+				&& event.getRetries() < nrAutoRetries)
+			.orElse(false);
+	}
+	
 	@Override
 	public void deleteEvent(String messageId)
 	{
