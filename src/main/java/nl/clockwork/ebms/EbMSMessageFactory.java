@@ -314,7 +314,7 @@ public class EbMSMessageFactory
 		val to = createTo(toPartyInfo.getPartyIds(),toPartyInfo.getRole());
 		val service = createService(fromPartyInfo.getService().getType(),fromPartyInfo.getService().getValue());
 		val action = fromPartyInfo.getCanSend().getThisPartyActionBinding().getAction();
-		val messageId = ebMSIdGenerator.createMessageId(hostname,conversationId,context.getMessageId());
+		val messageId = ebMSIdGenerator.createMessageId(hostname,context.getConversationId() == null ? conversationId : null,context.getMessageId());
 		val timestamp = Instant.now();
 		val timeToLive = createTimeToLive(deliveryChannel,timestamp);
 		val messageData = createMessageData(messageId,context.getRefToMessageId(),timestamp,timeToLive);
