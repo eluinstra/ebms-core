@@ -25,10 +25,19 @@ import java.util.Enumeration;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NonNull;
-import lombok.Value;
+import lombok.ToString;
+import lombok.experimental.FieldDefaults;
 
-@Value
+@FieldDefaults(level=AccessLevel.PROTECTED, makeFinal=true)
+@AllArgsConstructor
+@Getter
+@ToString
+@EqualsAndHashCode
 public class EbMSTrustStore
 {
 	private static Map<String,EbMSTrustStore> trustStores = new ConcurrentHashMap<>();

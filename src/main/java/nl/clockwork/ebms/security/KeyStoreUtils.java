@@ -22,8 +22,6 @@ import java.io.InputStream;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
 
-import com.azure.security.keyvault.jca.KeyVaultLoadStoreParameter;
-
 import lombok.val;
 import lombok.var;
 
@@ -37,30 +35,6 @@ class KeyStoreUtils
 			keyStore.load(in,password.toCharArray());
 			return keyStore;
 		}
-	}
-
-	public static KeyStore loadAzureKeyStore(String uri) throws GeneralSecurityException, IOException
-	{
-		val keyStore = KeyStore.getInstance(KeyStoreType.AzureKeyVault.name());
-		KeyVaultLoadStoreParameter parameter = new KeyVaultLoadStoreParameter(uri);
-		keyStore.load(parameter);
-		return keyStore;
-	}
-
-	public static KeyStore loadAzureKeyStore(String uri, String managedIdentity) throws GeneralSecurityException, IOException
-	{
-		val keyStore = KeyStore.getInstance(KeyStoreType.AzureKeyVault.name());
-		KeyVaultLoadStoreParameter parameter = new KeyVaultLoadStoreParameter(uri,managedIdentity);
-		keyStore.load(parameter);
-		return keyStore;
-	}
-
-	public static KeyStore loadAzureKeyStore(String uri, String aadAuthenticationUrl, String tenantId, String clientId, String clientSecret) throws GeneralSecurityException, IOException
-	{
-		val keyStore = KeyStore.getInstance(KeyStoreType.AzureKeyVault.name());
-		KeyVaultLoadStoreParameter parameter = new KeyVaultLoadStoreParameter(uri,aadAuthenticationUrl,tenantId,clientId,clientSecret);
-		keyStore.load(parameter);
-		return keyStore;
 	}
 
 	public static InputStream getInputStream(String location) throws FileNotFoundException

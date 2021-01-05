@@ -15,7 +15,7 @@
  */
 package nl.clockwork.ebms.security;
 
-public enum KeyStoreType
+public enum KeyStoresType
 {
-	JCEKS, JKS, DKS, PKCS11, PKCS12
+	DEFAULT, AZURE
 }

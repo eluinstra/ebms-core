@@ -27,20 +27,29 @@ import java.security.cert.X509Certificate;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NonNull;
-import lombok.Value;
+import lombok.ToString;
+import lombok.experimental.FieldDefaults;
 
-@Value
+@FieldDefaults(level=AccessLevel.PRIVATE, makeFinal=true)
+@AllArgsConstructor
+@Getter
+@ToString()
+@EqualsAndHashCode
 public class EbMSKeyStore
 {
 	private static Map<String,EbMSKeyStore> keyStores = new ConcurrentHashMap<>();
-	@NonNull
+	@ToString.Include
 	String path;
 	@NonNull
-	KeyStore keyStore;
+	protected KeyStore keyStore;
 	@NonNull
 	String keyPassword;
-	String defaultAlias;
+	protected String defaultAlias;
 
 	public static EbMSKeyStore of(@NonNull KeyStoreType type, @NonNull String path, @NonNull String password, @NonNull String keyPassword) throws GeneralSecurityException, IOException
 	{
