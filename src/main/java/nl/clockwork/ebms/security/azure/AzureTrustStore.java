@@ -17,13 +17,13 @@ package nl.clockwork.ebms.security.azure;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
-import java.security.KeyStore;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import lombok.NonNull;
+import nl.clockwork.ebms.security.EbMSTrustStore;
 
-public class EbMSTrustStore extends nl.clockwork.ebms.security.EbMSTrustStore
+public class AzureTrustStore
 {
 	private static Map<String,EbMSTrustStore> trustStores = new ConcurrentHashMap<>();
 
@@ -32,10 +32,5 @@ public class EbMSTrustStore extends nl.clockwork.ebms.security.EbMSTrustStore
 		if (!trustStores.containsKey(uri))
 			trustStores.put(uri,new EbMSTrustStore(KeyStoreUtils.loadKeyStore(uri,managedIdentity)));
 		return trustStores.get(uri);
-	}
-	
-	private EbMSTrustStore(@NonNull KeyStore keyStore) throws GeneralSecurityException, IOException
-	{
-		super(keyStore);
 	}
 }

@@ -21,15 +21,16 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import lombok.NonNull;
+import nl.clockwork.ebms.security.EbMSKeyStore;
 
-public class EbMSKeyStore extends nl.clockwork.ebms.security.EbMSKeyStore
+public class AzureKeyStore
 {
 	private static Map<String,EbMSKeyStore> keyStores = new ConcurrentHashMap<>();
 	
 	public static EbMSKeyStore of(@NonNull String uri, @NonNull String managedIdentity, String keyPassword) throws GeneralSecurityException, IOException
 	{
 		if (!keyStores.containsKey(uri))
-			keyStores.put(uri,new EbMSKeyStore(uri,managedIdentity,keyPassword,null));
+			keyStores.put(uri,new EbMSKeyStore(uri,KeyStoreUtils.loadKeyStore(uri,managedIdentity),keyPassword,null));
 		return keyStores.get(uri);
 	}
 
@@ -37,12 +38,7 @@ public class EbMSKeyStore extends nl.clockwork.ebms.security.EbMSKeyStore
 	{
 		String key = uri + defaultAlias;
 		if (!keyStores.containsKey(key))
-			keyStores.put(key,new EbMSKeyStore(uri,managedIdentity,keyPassword,defaultAlias));
+			keyStores.put(key,new EbMSKeyStore(uri,KeyStoreUtils.loadKeyStore(uri,managedIdentity),keyPassword,defaultAlias));
 		return keyStores.get(key);
-	}
-
-	private EbMSKeyStore(@NonNull String uri, @NonNull String managedIdentity, String keyPassword, String defaultAlias) throws GeneralSecurityException, IOException
-	{
-		super(uri,KeyStoreUtils.loadKeyStore(uri,managedIdentity),keyPassword,defaultAlias);
 	}
 }
