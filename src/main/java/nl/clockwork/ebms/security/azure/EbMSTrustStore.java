@@ -18,18 +18,24 @@ package nl.clockwork.ebms.security.azure;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
-import com.azure.security.keyvault.jca.KeyVaultLoadStoreParameter;
+import lombok.NonNull;
 
-import lombok.val;
-
-class KeyStoreUtils
+public class EbMSTrustStore extends nl.clockwork.ebms.security.EbMSTrustStore
 {
-	public static KeyStore loadKeyStore(String uri, String managedIdentity) throws GeneralSecurityException, IOException
+	private static Map<String,EbMSTrustStore> trustStores = new ConcurrentHashMap<>();
+
+	public static EbMSTrustStore of(@NonNull String uri, @NonNull String managedIdentity) throws GeneralSecurityException, IOException
 	{
-		val keyStore = KeyStore.getInstance("AzureKeyVault");
-		val parameter = new KeyVaultLoadStoreParameter(uri,managedIdentity);
-		keyStore.load(parameter);
-		return keyStore;
+		if (!trustStores.containsKey(uri))
+			trustStores.put(uri,new EbMSTrustStore(KeyStoreUtils.loadKeyStore(uri,managedIdentity)));
+		return trustStores.get(uri);
+	}
+	
+	private EbMSTrustStore(@NonNull KeyStore keyStore) throws GeneralSecurityException, IOException
+	{
+		super(keyStore);
 	}
 }

@@ -26,18 +26,14 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.ToString;
 import lombok.experimental.FieldDefaults;
 
 @FieldDefaults(level=AccessLevel.PROTECTED, makeFinal=true)
-@AllArgsConstructor
 @Getter
 @ToString
-@EqualsAndHashCode
 public class EbMSTrustStore
 {
 	private static Map<String,EbMSTrustStore> trustStores = new ConcurrentHashMap<>();
@@ -47,13 +43,13 @@ public class EbMSTrustStore
 	public static EbMSTrustStore of(KeyStoreType type, String path, String password) throws GeneralSecurityException, IOException
 	{
 		if (!trustStores.containsKey(path))
-			trustStores.put(path,new EbMSTrustStore(type,path,password));
+			trustStores.put(path,new EbMSTrustStore(KeyStoreUtils.loadKeyStore(type,path,password)));
 		return trustStores.get(path);
 	}
 	
-	private EbMSTrustStore(@NonNull KeyStoreType type, @NonNull String path, @NonNull String password) throws GeneralSecurityException, IOException
+	public EbMSTrustStore(@NonNull KeyStore keyStore) throws GeneralSecurityException, IOException
 	{
-		this.keyStore = KeyStoreUtils.loadKeyStore(type,path,password);
+		this.keyStore = keyStore;
 	}
 
 	public Enumeration<String> aliases() throws KeyStoreException

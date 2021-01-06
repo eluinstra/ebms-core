@@ -9,6 +9,6 @@ public class DefaultKeyStoreConfig implements Condition
 	@Override
 	public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata)
 	{
-		return context.getEnvironment().getProperty("keystores.type",KeyStoresType.class,KeyStoresType.DEFAULT) == KeyStoresType.DEFAULT;
+		return context.getEnvironment().getProperty("keystores.type",String.class,"") == "";
 	}
 }

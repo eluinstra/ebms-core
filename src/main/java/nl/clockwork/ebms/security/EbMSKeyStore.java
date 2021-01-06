@@ -28,27 +28,24 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.ToString;
 import lombok.experimental.FieldDefaults;
 
 @FieldDefaults(level=AccessLevel.PRIVATE, makeFinal=true)
-@AllArgsConstructor
 @Getter
-@ToString()
-@EqualsAndHashCode
+@ToString(onlyExplicitlyIncluded = true)
 public class EbMSKeyStore
 {
 	private static Map<String,EbMSKeyStore> keyStores = new ConcurrentHashMap<>();
+	@NonNull
 	@ToString.Include
 	String path;
 	@NonNull
 	protected KeyStore keyStore;
 	@NonNull
-	String keyPassword;
+	protected String keyPassword;
 	protected String defaultAlias;
 
 	public static EbMSKeyStore of(@NonNull KeyStoreType type, @NonNull String path, @NonNull String password, @NonNull String keyPassword) throws GeneralSecurityException, IOException
@@ -66,12 +63,20 @@ public class EbMSKeyStore
 		return keyStores.get(key);
 	}
 
-	private EbMSKeyStore(@NonNull KeyStoreType type, @NonNull String path, @NonNull String password, @NonNull String keyPassword, String defaultAlias) throws GeneralSecurityException, IOException
+	private EbMSKeyStore(@NonNull KeyStoreType type, @NonNull String path, @NonNull String password, String keyPassword, String defaultAlias) throws GeneralSecurityException, IOException
 	{
 		this.path = path;
 		this.keyPassword = keyPassword;
 		this.defaultAlias = defaultAlias;
 		this.keyStore = KeyStoreUtils.loadKeyStore(type,path,password);
+	}
+
+	protected EbMSKeyStore(@NonNull String path, @NonNull KeyStore keyStore, String keyPassword, String defaultAlias) throws GeneralSecurityException, IOException
+	{
+		this.path = path;
+		this.keyStore = keyStore;
+		this.keyPassword = keyPassword;
+		this.defaultAlias = defaultAlias;
 	}
 
 	public Certificate getCertificate(String alias) throws KeyStoreException
@@ -93,5 +98,4 @@ public class EbMSKeyStore
 	{
 		return keyStore.getKey(alias,password);
 	}
-
 }
