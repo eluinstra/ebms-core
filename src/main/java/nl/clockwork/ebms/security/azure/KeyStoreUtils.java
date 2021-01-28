@@ -23,7 +23,7 @@ import com.azure.security.keyvault.jca.KeyVaultLoadStoreParameter;
 
 import lombok.val;
 
-class KeyStoreUtils
+public class KeyStoreUtils
 {
 	public static KeyStore loadKeyStore(String uri, String managedIdentity) throws GeneralSecurityException, IOException
 	{

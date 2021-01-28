@@ -25,7 +25,7 @@ import java.security.KeyStore;
 import lombok.val;
 import lombok.var;
 
-class KeyStoreUtils
+public class KeyStoreUtils
 {
 	public static KeyStore loadKeyStore(KeyStoreType type, String location, String password) throws GeneralSecurityException, IOException
 	{
