@@ -27,12 +27,15 @@ import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import nl.clockwork.ebms.security.EbMSKeyStore;
 import nl.clockwork.ebms.security.EbMSTrustStore;
+import nl.clockwork.ebms.security.KeyStoreType;
 
 @Conditional(AzureKeyStoreConfig.class)
 @Configuration
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class KeyStoreConfig
 {
+	@Value("${truststore.type}")
+	KeyStoreType trustStoretype;
 	@Value("${truststore.path}")
 	String trustStorepath;
 	@Value("${truststore.password}")
@@ -61,7 +64,7 @@ public class KeyStoreConfig
 	@Bean
 	public EbMSTrustStore trustStore() throws GeneralSecurityException, IOException
 	{
-		return AzureTrustStore.of(trustStorepath,trustStorepassword);
+		return EbMSTrustStore.of(trustStoretype,trustStorepath,trustStorepassword);
 	}
 
 	@Bean("clientKeyStore")
