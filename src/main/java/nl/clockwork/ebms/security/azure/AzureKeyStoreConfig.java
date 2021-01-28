@@ -24,6 +24,6 @@ public class AzureKeyStoreConfig implements Condition
 	@Override
 	public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata)
 	{
-		return context.getEnvironment().getProperty("keystores.type",String.class,"") == "AZURE";
+		return context.getEnvironment().getProperty("keystores.type",String.class,"").equals("AZURE");
 	}
 }
