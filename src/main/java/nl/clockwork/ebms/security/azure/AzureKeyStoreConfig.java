@@ -15,15 +15,25 @@
  */
 package nl.clockwork.ebms.security.azure;
 
+import java.security.Security;
+
 import org.springframework.context.annotation.Condition;
 import org.springframework.context.annotation.ConditionContext;
 import org.springframework.core.type.AnnotatedTypeMetadata;
+
+import com.azure.security.keyvault.jca.KeyVaultJcaProvider;
 
 public class AzureKeyStoreConfig implements Condition
 {
 	@Override
 	public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata)
 	{
-		return context.getEnvironment().getProperty("keystores.type",String.class,"").equals("AZURE");
+		boolean useAzure = context.getEnvironment().getProperty("keystores.type",String.class,"").equals("AZURE");
+		if (useAzure)
+		{
+			KeyVaultJcaProvider provider = new KeyVaultJcaProvider();
+			Security.addProvider(provider);
+		}
+		return useAzure;
 	}
 }
