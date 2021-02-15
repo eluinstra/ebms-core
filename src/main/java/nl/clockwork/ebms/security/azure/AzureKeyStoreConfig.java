@@ -30,10 +30,7 @@ public class AzureKeyStoreConfig implements Condition
 	{
 		boolean useAzure = context.getEnvironment().getProperty("keystores.type",String.class,"").equals("AZURE");
 		if (useAzure)
-		{
-			KeyVaultJcaProvider provider = new KeyVaultJcaProvider();
-			Security.addProvider(provider);
-		}
+			Security.addProvider(new KeyVaultJcaProvider());
 		return useAzure;
 	}
 }
