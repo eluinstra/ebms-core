@@ -18,7 +18,9 @@ package nl.clockwork.ebms.security.azure;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
+import java.security.Security;
 
+import com.azure.security.keyvault.jca.KeyVaultJcaProvider;
 import com.azure.security.keyvault.jca.KeyVaultLoadStoreParameter;
 
 import lombok.val;
@@ -27,9 +29,24 @@ public class KeyStoreUtils
 {
 	public static KeyStore loadKeyStore(String uri, String managedIdentity) throws GeneralSecurityException, IOException
 	{
+		return loadKeyStore();
+	}
+	
+	public static KeyStore loadKeyStore() throws GeneralSecurityException, IOException
+	{
+		if (Security.getProvider("AzureKeyVault") == null)
+			Security.insertProviderAt(new KeyVaultJcaProvider(), 1);
+
+        val keyvaultURI = System.getProperty("azure.keyvault.uri");
+        val tennantID = System.getProperty("azure.keyvault.tenant-id");
+        val clientID = System.getProperty("azure.keyvault.client-id");
+        val clientSecret = System.getProperty("azure.keyvault.client-secret");
+		
 		val keyStore = KeyStore.getInstance("AzureKeyVault");
-		val parameter = new KeyVaultLoadStoreParameter(uri,managedIdentity);
+		// aadUri is niet verplicht, deze is alleen nodig voor de afwijkende security zones de speciale germany zone + ..
+		val parameter = new KeyVaultLoadStoreParameter(keyvaultURI, null, tennantID, clientID, clientSecret);
 		keyStore.load(parameter);
+		
 		return keyStore;
 	}
 }

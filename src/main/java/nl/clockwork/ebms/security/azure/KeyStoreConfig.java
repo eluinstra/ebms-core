@@ -40,26 +40,9 @@ public class KeyStoreConfig
 	String trustStorepath;
 	@Value("${truststore.password}")
 	String trustStorepassword;
-	@Value("${client.keystore.uri}")
-	String clientKeyStoreUri;
-	@Value("${client.keystore.managedIdentity}")
-	String clientKeyStoreManagedIdentity;
-	@Value("${client.keystore.keyPassword}")
-	String clientKeyStoreKeyPassword;
+
 	@Value("${client.keystore.defaultAlias}")
 	String clientKeyStoreDefaultAlias;
-	@Value("${signature.keystore.uri}")
-	String signatureKeyStoreUri;
-	@Value("${signature.keystore.managedIdentity}")
-	String signatureKeyStoreManagedIdentity;
-	@Value("${signature.keystore.keyPassword}")
-	String signatureKeyStoreKeyPassword;
-	@Value("${encryption.keystore.uri}")
-	String encryptionKeyStoreUri;
-	@Value("${encryption.keystore.managedIdentity}")
-	String encryptionKeyStoreManagedIdentity;
-	@Value("${encryption.keystore.keyPassword}")
-	String encryptionKeyStoreKeyPassword;
 
 	@Bean
 	public EbMSTrustStore trustStore() throws GeneralSecurityException, IOException
@@ -70,18 +53,18 @@ public class KeyStoreConfig
 	@Bean("clientKeyStore")
 	public EbMSKeyStore clientKeyStore() throws GeneralSecurityException, IOException
 	{
-		return AzureKeyStore.of(clientKeyStoreUri,clientKeyStoreManagedIdentity,clientKeyStoreKeyPassword,clientKeyStoreDefaultAlias);
+		return AzureKeyStore.of();
 	}
 
 	@Bean("signatureKeyStore")
 	public EbMSKeyStore signatureKeyStore() throws GeneralSecurityException, IOException
 	{
-		return AzureKeyStore.of(signatureKeyStoreUri,signatureKeyStoreManagedIdentity,signatureKeyStoreKeyPassword);
+		return AzureKeyStore.of();
 	}
 
 	@Bean("encryptionKeyStore")
 	public EbMSKeyStore encryptionKeyStore() throws GeneralSecurityException, IOException
 	{
-		return AzureKeyStore.of(encryptionKeyStoreUri,encryptionKeyStoreManagedIdentity,encryptionKeyStoreKeyPassword);
+		return AzureKeyStore.of();
 	}
 }
