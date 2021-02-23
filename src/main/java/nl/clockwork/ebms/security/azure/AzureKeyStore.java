@@ -25,15 +25,21 @@ public class AzureKeyStore
 	
 	public static EbMSKeyStore of() throws GeneralSecurityException, IOException
 	{
+		return of("");
+	}
+	
+	public static EbMSKeyStore of(String defaultAlias) throws GeneralSecurityException, IOException
+	{
 		if (keyStore == null)
 		{
-			keyStore = new EbMSKeyStore("azure", KeyStoreUtils.loadKeyStore(), null, null);
+			keyStore = new EbMSKeyStore("azure", KeyStoreUtils.loadKeyStore(), "", defaultAlias);
 		}
 		return keyStore;
 	}
 	
-	public static EbMSKeyStore of(String keyPassword, String defaultAlias) throws GeneralSecurityException, IOException
+	public static EbMSKeyStore of(String keystoreURI, String managedIdentity, String password, String defaultAlias) throws GeneralSecurityException, IOException
 	{
-		return of();
+		// some cleanup needed :-)
+		return of(defaultAlias);
 	}
 }
