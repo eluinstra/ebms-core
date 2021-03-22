@@ -26,11 +26,11 @@ import nl.clockwork.ebms.security.EbMSTrustStore;
 public class AzureTrustStore
 {
 	private static Map<String,EbMSTrustStore> trustStores = new ConcurrentHashMap<>();
-
-	public static EbMSTrustStore of(@NonNull String uri, @NonNull String managedIdentity) throws GeneralSecurityException, IOException
+	
+	public static EbMSTrustStore of(@NonNull String keyvaultURI, @NonNull String tennantID, @NonNull String clientID, @NonNull String clientSecret) throws GeneralSecurityException, IOException
 	{
-		if (!trustStores.containsKey(uri))
-			trustStores.put(uri,new EbMSTrustStore(KeyStoreUtils.loadKeyStore(uri,managedIdentity)));
-		return trustStores.get(uri);
+		if (!trustStores.containsKey(keyvaultURI))
+			trustStores.put(keyvaultURI, new EbMSTrustStore(KeyStoreUtils.loadKeyStore(keyvaultURI, tennantID, clientID, clientSecret)));
+		return trustStores.get(keyvaultURI);
 	}
 }

@@ -24,20 +24,27 @@ import java.util.Enumeration;
 
 import org.junit.jupiter.api.Test;
 
+import lombok.val;
 import nl.clockwork.ebms.security.azure.KeyStoreUtils;
 
 class KeyStoreUtilsTest {
 
-//	@Test
+	@Test
 	void testLoadKeyStore() throws GeneralSecurityException, IOException {
-		KeyStore ks = KeyStoreUtils.loadKeyStore(null, null);
+        val keyvaultURI = "https://ebmskvt.vault.azure.net/";
+        val tennantID = "e3c5bc88-7ed8-4978-b0d4-1b3e90ed9f06";
+        val clientID = "http://ebmsapp";
+        val clientSecret = "_17c.3xulKW~2crwjVTFRT8n-5LKo44uF5";
+        System.setProperty("azure.keyvault.uri", keyvaultURI);
+        
+		KeyStore ks = KeyStoreUtils.loadKeyStore(keyvaultURI, tennantID, clientID, clientSecret);
 		assertNotNull(ks);
 		Enumeration<String> aliases = ks.aliases();
 		while (aliases.hasMoreElements()) {
 			String alieAs = aliases.nextElement();
 			System.out.println(alieAs);
 		}
-		java.security.cert.Certificate cert = ks.getCertificate("digipoort-overheid");
+		java.security.cert.Certificate cert = ks.getCertificate("ebmskeyvault1");
 		assertNotNull(cert);
 		System.out.println(cert.getType());
 	}

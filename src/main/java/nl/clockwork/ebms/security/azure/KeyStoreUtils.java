@@ -27,20 +27,10 @@ import lombok.val;
 
 public class KeyStoreUtils
 {
-	public static KeyStore loadKeyStore(String uri, String managedIdentity) throws GeneralSecurityException, IOException
-	{
-		return loadKeyStore();
-	}
-	
-	public static KeyStore loadKeyStore() throws GeneralSecurityException, IOException
+	public static KeyStore loadKeyStore(String keyvaultURI, String tennantID, String clientID, String clientSecret) throws GeneralSecurityException, IOException
 	{
 		if (Security.getProvider("AzureKeyVault") == null)
 			Security.insertProviderAt(new KeyVaultJcaProvider(), 1);
-
-        val keyvaultURI = System.getProperty("azure.keyvault.uri");
-        val tennantID = System.getProperty("azure.keyvault.tenant-id");
-        val clientID = System.getProperty("azure.keyvault.client-id");
-        val clientSecret = System.getProperty("azure.keyvault.client-secret");
 		
 		val keyStore = KeyStore.getInstance("AzureKeyVault");
 		// aadUri is niet verplicht, deze is alleen nodig voor de afwijkende security zones de speciale germany zone + ..

@@ -24,6 +24,7 @@ import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
 
 import lombok.AccessLevel;
+import lombok.val;
 import lombok.experimental.FieldDefaults;
 import nl.clockwork.ebms.security.EbMSKeyStore;
 import nl.clockwork.ebms.security.EbMSTrustStore;
@@ -40,31 +41,41 @@ public class KeyStoreConfig
 	String trustStorepath;
 	@Value("${truststore.password}")
 	String trustStorepassword;
-
+	
+	@Value("azure.keyvault.uri")
+    String keyvaultURI;
+	@Value("azure.keyvault.tennantid")
+	String tennantID;
+	@Value("azure.keyvault.clientid")
+	String clientID;
+	@Value("azure.keyvault.client.secret")
+	String clientSecret;
+	
 	@Value("${client.keystore.defaultAlias}")
 	String clientKeyStoreDefaultAlias;
 
 	@Bean
 	public EbMSTrustStore trustStore() throws GeneralSecurityException, IOException
 	{
-		return EbMSTrustStore.of(trustStoretype,trustStorepath,trustStorepassword);
+		return AzureTrustStore.of(keyvaultURI, tennantID, clientID, clientSecret);
+//		return EbMSTrustStore.of(trustStoretype,trustStorepath,trustStorepassword);		
 	}
 
 	@Bean("clientKeyStore")
 	public EbMSKeyStore clientKeyStore() throws GeneralSecurityException, IOException
 	{
-		return AzureKeyStore.of();
+		return AzureKeyStore.of(keyvaultURI, tennantID, clientID, clientSecret, clientKeyStoreDefaultAlias);
 	}
 
 	@Bean("signatureKeyStore")
 	public EbMSKeyStore signatureKeyStore() throws GeneralSecurityException, IOException
 	{
-		return AzureKeyStore.of();
+		return AzureKeyStore.of(keyvaultURI, tennantID, clientID, clientSecret);
 	}
 
 	@Bean("encryptionKeyStore")
 	public EbMSKeyStore encryptionKeyStore() throws GeneralSecurityException, IOException
 	{
-		return AzureKeyStore.of();
+		return AzureKeyStore.of(keyvaultURI, tennantID, clientID, clientSecret);
 	}
 }
