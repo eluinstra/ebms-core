@@ -17,17 +17,14 @@ package nl.clockwork.ebms.validation;
 
 import java.time.Instant;
 
-import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.SyncReplyModeType;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageHeader;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.NonNull;
-import lombok.val;
 import lombok.experimental.FieldDefaults;
 import nl.clockwork.ebms.cpa.CPAManager;
-import nl.clockwork.ebms.cpa.CPAUtils;
 import nl.clockwork.ebms.dao.EbMSDAO;
 import nl.clockwork.ebms.encryption.EbMSMessageDecrypter;
 import nl.clockwork.ebms.model.EbMSAcknowledgment;
@@ -35,8 +32,6 @@ import nl.clockwork.ebms.model.EbMSBaseMessage;
 import nl.clockwork.ebms.model.EbMSDocument;
 import nl.clockwork.ebms.model.EbMSMessage;
 import nl.clockwork.ebms.model.EbMSMessageError;
-import nl.clockwork.ebms.model.EbMSRequestMessage;
-import nl.clockwork.ebms.util.StreamUtils;
 
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -90,29 +85,6 @@ public class EbMSMessageValidator
 		messageHeaderValidator.validate(requestMessage,responseMessage);
 		messageHeaderValidator.validate(responseMessage,timestamp);
 		signatureValidator.validate(responseDocument,requestMessage,responseMessage);
-	}
-
-	public void validate(EbMSBaseMessage message, Instant timestamp) throws ValidatorException
-	{
-		clientCertificateValidator.validate(message);
-		messageHeaderValidator.validate(message,timestamp);
-	}
-
-	public boolean isSyncReply(EbMSRequestMessage message)
-	{
-		try
-		{
-			//return message.getSyncReply() != null;
-			val messageHeader = message.getMessageHeader();
-			val service = CPAUtils.toString(messageHeader.getService());
-			val syncReply = cpaManager.getSyncReply(messageHeader.getCPAId(),messageHeader.getFrom().getPartyId(),messageHeader.getFrom().getRole(),service,messageHeader.getAction())
-					.orElseThrow(() -> StreamUtils.illegalStateException("SyncReply",messageHeader.getCPAId(),messageHeader.getFrom().getPartyId(),messageHeader.getFrom().getRole(),service,messageHeader.getAction()));
-			return syncReply != null && !syncReply.equals(SyncReplyModeType.NONE);
-		}
-		catch (Exception e)
-		{
-			return message.getSyncReply() != null;
-		}
 	}
 
 	public boolean isDuplicateMessage(MessageHeader messageHeader)

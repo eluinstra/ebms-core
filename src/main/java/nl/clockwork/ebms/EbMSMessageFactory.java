@@ -56,7 +56,6 @@ import nl.clockwork.ebms.model.EbMSAttachment;
 import nl.clockwork.ebms.model.EbMSMessage;
 import nl.clockwork.ebms.model.EbMSMessageError;
 import nl.clockwork.ebms.model.EbMSPing;
-import nl.clockwork.ebms.model.EbMSPong;
 import nl.clockwork.ebms.model.EbMSStatusRequest;
 import nl.clockwork.ebms.model.EbMSStatusResponse;
 import nl.clockwork.ebms.model.Party;
@@ -75,12 +74,10 @@ public class EbMSMessageFactory
 {
 	@NonNull
 	CPAManager cpaManager;
-	@NonNull
-	EbMSIdGenerator ebMSIdGenerator;
 
 	public EbMSMessageError createEbMSMessageError(EbMSMessage message, ErrorList errorList, Instant timestamp) throws DatatypeConfigurationException, JAXBException
 	{
-		val messageHeader = createResponseMessageHeader(message.getMessageHeader(),timestamp,EbMSAction.MESSAGE_ERROR);
+		val messageHeader = createResponseMessageHeader(cpaManager,message.getMessageHeader(),timestamp,EbMSAction.MESSAGE_ERROR);
 		if (errorList.getError().size() == 0)
 		{
 			errorList.getError().add(EbMSMessageUtils.createError(
@@ -99,7 +96,7 @@ public class EbMSMessageFactory
 	{
 		try
 		{
-			val messageHeader = createResponseMessageHeader(message.getMessageHeader(),timestamp,EbMSAction.ACKNOWLEDGMENT);
+			val messageHeader = createResponseMessageHeader(cpaManager,message.getMessageHeader(),timestamp,EbMSAction.ACKNOWLEDGMENT);
 			val acknowledgment = new Acknowledgment();
 			acknowledgment.setVersion(Constants.EBMS_VERSION);
 			acknowledgment.setMustUnderstand(true);
@@ -142,24 +139,6 @@ public class EbMSMessageFactory
 		}
 	}
 	
-	public EbMSPong createEbMSPong(EbMSPing message) throws EbMSProcessorException
-	{
-		try
-		{
-			return EbMSPong.builder()
-					.messageHeader(createResponseMessageHeader(message.getMessageHeader(),Instant.now(),EbMSAction.PONG))
-					.build();
-		}
-		catch (JAXBException e)
-		{
-			throw new EbMSProcessingException(e);
-		}
-		catch (DatatypeConfigurationException | TransformerFactoryConfigurationError e)
-		{
-			throw new EbMSProcessorException(e);
-		}
-	}
-	
 	public EbMSStatusRequest createEbMSStatusRequest(String cpaId, String fromPartyId, String toPartyId, String messageId) throws EbMSProcessorException
 	{
 		try
@@ -181,7 +160,7 @@ public class EbMSMessageFactory
 		try
 		{
 			return EbMSStatusResponse.builder()
-					.messageHeader(createResponseMessageHeader(request.getMessageHeader(),Instant.now(),EbMSAction.STATUS_RESPONSE))
+					.messageHeader(createResponseMessageHeader(cpaManager,request.getMessageHeader(),Instant.now(),EbMSAction.STATUS_RESPONSE))
 					.statusResponse(createStatusResponse(request.getStatusRequest(),status,timestamp))
 					.build();
 		}
@@ -222,7 +201,7 @@ public class EbMSMessageFactory
 
 	private EbMSAttachment createEbMSAttachment(Manifest manifest, DataSource ds)
 	{
-		val contentId = ds.getContentId() == null ? ebMSIdGenerator.generateConversationId() : ds.getContentId();
+		val contentId = ds.getContentId() == null ? EbMSIdGenerator.generateConversationId() : ds.getContentId();
 		manifest.getReference().add(EbMSMessageUtils.createReference(contentId));
 		return EbMSAttachmentFactory.createEbMSAttachment(ds.getName(),contentId,ds.getContentType(),ds.getContent());
 	}
@@ -256,7 +235,7 @@ public class EbMSMessageFactory
 	{
 		try
 		{
-			val contentId = ds.getContentId() == null ? ebMSIdGenerator.generateContentId() : ds.getContentId();
+			val contentId = ds.getContentId() == null ? EbMSIdGenerator.generateContentId() : ds.getContentId();
 			manifest.getReference().add(EbMSMessageUtils.createReference(contentId));
 			return EbMSAttachmentFactory.createCachedEbMSAttachment(contentId,ds.getAttachment());
 		}
@@ -266,7 +245,7 @@ public class EbMSMessageFactory
 		}
 	}
 
-	private MessageHeader createMessageHeader(String cpaId, String conversationId, From from, To to, Service service, String action, MessageData messageData, PerMessageCharacteristicsType duplicateElimination)
+	private static MessageHeader createMessageHeader(String cpaId, String conversationId, From from, To to, Service service, String action, MessageData messageData, PerMessageCharacteristicsType duplicateElimination)
 	{
 		val result = new MessageHeader();
 		result.setVersion(Constants.EBMS_VERSION);
@@ -291,11 +270,11 @@ public class EbMSMessageFactory
 		val hostname = CPAUtils.getHostname(
 				cpaManager.getDefaultDeliveryChannel(cpaId,fromPartyInfo.getPartyIds(),action.getAction())
 				.orElseThrow(() -> StreamUtils.illegalStateException("DefaultDeliveryChannel",cpaId,fromPartyInfo.getPartyIds(),action)));
-		val conversationId = ebMSIdGenerator.generateConversationId();
+		val conversationId = EbMSIdGenerator.generateConversationId();
 		val from = createForm(fromPartyInfo.getPartyIds(),null);
 		val to = createTo(toPartyInfo.getPartyIds(),null);
 		val service = createService(null,action.getServiceUri());
-		val messageId = ebMSIdGenerator.createMessageId(hostname,conversationId);
+		val messageId = EbMSIdGenerator.createMessageId(hostname,conversationId);
 		val messageData = createMessageData(messageId,null,Instant.now(),null);
 		return createMessageHeader(cpaId,conversationId,from,to,service,action.getAction(),messageData,null); //deliveryChannel.getMessagingCharacteristics().getDuplicateElimination()
 	}
@@ -312,19 +291,19 @@ public class EbMSMessageFactory
 						.orElseThrow(() -> StreamUtils.illegalStateException("ToPartyInfo",cpaId,toParty,properties.getService(),properties.getAction())));
 		val deliveryChannel = CPAUtils.getDeliveryChannel(fromPartyInfo.getCanSend().getThisPartyActionBinding());
 		val hostname = CPAUtils.getHostname(deliveryChannel);
-		val conversationId = properties.getConversationId() == null ? ebMSIdGenerator.generateConversationId() : properties.getConversationId();
+		val conversationId = properties.getConversationId() == null ? EbMSIdGenerator.generateConversationId() : properties.getConversationId();
 		val from = createForm(fromPartyInfo.getPartyIds(),fromPartyInfo.getRole());
 		val to = createTo(toPartyInfo.getPartyIds(),toPartyInfo.getRole());
 		val service = createService(fromPartyInfo.getService().getType(),fromPartyInfo.getService().getValue());
 		val action = fromPartyInfo.getCanSend().getThisPartyActionBinding().getAction();
-		val messageId = ebMSIdGenerator.createMessageId(hostname,conversationId,properties.getMessageId());
+		val messageId = EbMSIdGenerator.createMessageId(hostname,conversationId,properties.getMessageId());
 		val timestamp = Instant.now();
 		val timeToLive = createTimeToLive(deliveryChannel,timestamp);
 		val messageData = createMessageData(messageId,properties.getRefToMessageId(),timestamp,timeToLive);
 		return createMessageHeader(cpaId,conversationId,from,to,service,action,messageData,deliveryChannel.getMessagingCharacteristics().getDuplicateElimination());
 	}
 
-	private MessageHeader createResponseMessageHeader(MessageHeader messageHeader, Instant timestamp, EbMSAction action) throws DatatypeConfigurationException, JAXBException
+	public static MessageHeader createResponseMessageHeader(CPAManager cpaManager, MessageHeader messageHeader, Instant timestamp, EbMSAction action) throws DatatypeConfigurationException, JAXBException
 	{
 		val cpaId = messageHeader.getCPAId();
 		val deliveryChannel = cpaManager.getDefaultDeliveryChannel(cpaId,messageHeader.getTo().getPartyId(),action.getAction()).orElse(null);
@@ -332,12 +311,12 @@ public class EbMSMessageFactory
 		val from = createForm(messageHeader.getTo().getPartyId(),null);
 		val to = createTo(messageHeader.getFrom().getPartyId(),null);
 		val service = createService(null,action.getServiceUri());
-		val messageId = ebMSIdGenerator.generateMessageId(hostname);
+		val messageId = EbMSIdGenerator.generateMessageId(hostname);
 		val messageData = createMessageData(messageId,messageHeader.getMessageData().getMessageId(),timestamp,null);
 		return createMessageHeader(messageHeader.getCPAId(),messageHeader.getConversationId(),from,to,service,action.getAction(),messageData,null);
 	}
 
-	private From createForm(Collection<? extends PartyId> partyIds, String role)
+	private static From createForm(Collection<? extends PartyId> partyIds, String role)
 	{
 		val result = new From();
 		result.getPartyId().addAll(partyIds);
@@ -345,7 +324,7 @@ public class EbMSMessageFactory
 		return result;
 	}
 
-	private To createTo(List<PartyId> partyIds, String role)
+	private static To createTo(List<PartyId> partyIds, String role)
 	{
 		val result = new To();
 		result.getPartyId().addAll(partyIds);
@@ -353,7 +332,7 @@ public class EbMSMessageFactory
 		return result;
 	}
 
-	private Service createService(String type, String value)
+	private static Service createService(String type, String value)
 	{
 		val result = new Service();
 		result.setType(type);
@@ -361,7 +340,7 @@ public class EbMSMessageFactory
 		return result;
 	}
 
-	private MessageData createMessageData(String messageId, String refToMessageId, Instant timestamp, Instant timeToLive)
+	private static MessageData createMessageData(String messageId, String refToMessageId, Instant timestamp, Instant timeToLive)
 	{
 		val result = new MessageData();
 		result.setMessageId(messageId);

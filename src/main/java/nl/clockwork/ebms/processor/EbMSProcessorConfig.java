@@ -66,7 +66,6 @@ public class EbMSProcessorConfig
 				.ebMSDAO(ebMSDAO)
 				.cpaManager(cpaManager)
 				.deliveryTaskManager(deliveryTaskManager)
-				.messageValidator(messageValidator)
 				.storeDuplicateMessage(storeDuplicateMessage)
 				.storeDuplicateMessageAttachments(storeDuplicateMessageAttachments)
 				.build();

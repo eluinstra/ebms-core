@@ -39,7 +39,6 @@ import nl.clockwork.ebms.model.EbMSMessage;
 import nl.clockwork.ebms.model.EbMSMessageError;
 import nl.clockwork.ebms.util.DOMUtils;
 import nl.clockwork.ebms.util.StreamUtils;
-import nl.clockwork.ebms.validation.EbMSMessageValidator;
 import nl.clockwork.ebms.validation.ValidationException;
 
 @Slf4j
@@ -54,8 +53,6 @@ class DuplicateMessageHandler
   CPAManager cpaManager;
   @NonNull
 	DeliveryTaskManager deliveryTaskManager;
-  @NonNull
-	EbMSMessageValidator messageValidator;
 	boolean storeDuplicateMessage;
 	boolean storeDuplicateMessageAttachments;
 
@@ -65,7 +62,7 @@ class DuplicateMessageHandler
 		if (isIdenticalMessage(message))
 		{
 			log.warn("Duplicate message " + messageHeader.getMessageData().getMessageId());
-			if (messageValidator.isSyncReply(message))
+			if (message.isSyncReply(cpaManager))
 			{
 				if (storeDuplicateMessage)
 					ebMSDAO.insertDuplicateMessage(timestamp,document.getMessage(),message,storeDuplicateMessageAttachments ? message.getAttachments() : Collections.emptyList());

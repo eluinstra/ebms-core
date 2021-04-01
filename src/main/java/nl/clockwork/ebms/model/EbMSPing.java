@@ -15,12 +15,24 @@
  */
 package nl.clockwork.ebms.model;
 
+import java.time.Instant;
+
+import javax.xml.bind.JAXBException;
+import javax.xml.datatype.DatatypeConfigurationException;
+import javax.xml.transform.TransformerFactoryConfigurationError;
+
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageHeader;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.SyncReply;
 import org.w3._2000._09.xmldsig.SignatureType;
 
 import lombok.Builder;
 import lombok.NonNull;
+import nl.clockwork.ebms.EbMSAction;
+import nl.clockwork.ebms.EbMSMessageFactory;
+import nl.clockwork.ebms.cpa.CPAManager;
+import nl.clockwork.ebms.processor.EbMSProcessingException;
+import nl.clockwork.ebms.processor.EbMSProcessorException;
+import nl.clockwork.ebms.validation.ValidatorException;
 
 public class EbMSPing extends EbMSRequestMessage
 {
@@ -31,4 +43,23 @@ public class EbMSPing extends EbMSRequestMessage
 	{
 		super(messageHeader,signature,syncReply);
 	}
+
+  public EbMSPong createPong(CPAManager cpaManager, Instant timestamp) throws ValidatorException, EbMSProcessorException
+	{
+		try
+		{
+			return EbMSPong.builder()
+					.messageHeader(EbMSMessageFactory.createResponseMessageHeader(cpaManager,getMessageHeader(),timestamp,EbMSAction.PONG))
+					.build();
+		}
+		catch (JAXBException e)
+		{
+			throw new EbMSProcessingException(e);
+		}
+		catch (DatatypeConfigurationException | TransformerFactoryConfigurationError e)
+		{
+			throw new EbMSProcessorException(e);
+		}
+	}
+
 }

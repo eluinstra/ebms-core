@@ -19,27 +19,27 @@ import java.util.UUID;
 
 public class EbMSIdGenerator
 {
-	public String generateConversationId()
+	public static String generateConversationId()
 	{
 		return UUID.randomUUID().toString();
 	}
 
-	public String generateMessageId(String hostname)
+	public static String generateMessageId(String hostname)
 	{
 		return UUID.randomUUID().toString() + "@" + hostname;
 	}
 
-	public String createMessageId(String hostname, String conversationId)
+	public static String createMessageId(String hostname, String conversationId)
 	{
 		return conversationId + "@" + hostname;
 	}
 
-	public String createMessageId(String hostname, String conversationId, String messageId)
+	public static String createMessageId(String hostname, String conversationId, String messageId)
 	{
 		return (messageId == null ? conversationId : messageId) + "@" + hostname;
 	}
 
-	public String generateContentId()
+	public static String generateContentId()
 	{
 		return UUID.randomUUID().toString();
 	}

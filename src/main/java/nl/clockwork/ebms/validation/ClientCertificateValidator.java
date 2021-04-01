@@ -34,7 +34,7 @@ import nl.clockwork.ebms.util.StreamUtils;
 @Slf4j
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-class ClientCertificateValidator
+public class ClientCertificateValidator
 {
 	private static class DisabledClientCertificateValidator extends ClientCertificateValidator
 	{
@@ -46,6 +46,7 @@ class ClientCertificateValidator
 		@Override
 		public void validate(EbMSBaseMessage message) throws ValidatorException
 		{
+			// Do nothing
 		}
 	}
 

@@ -35,9 +35,7 @@ import lombok.Builder;
 import lombok.NonNull;
 import lombok.val;
 import lombok.experimental.FieldDefaults;
-import lombok.extern.slf4j.Slf4j;
 import nl.clockwork.ebms.EbMSMessageFactory;
-import nl.clockwork.ebms.EbMSMessageStatus;
 import nl.clockwork.ebms.EbMSMessageUtils;
 import nl.clockwork.ebms.cpa.CPAManager;
 import nl.clockwork.ebms.dao.EbMSDAO;
@@ -58,44 +56,37 @@ import nl.clockwork.ebms.signing.EbMSSignatureGenerator;
 import nl.clockwork.ebms.util.DOMUtils;
 import nl.clockwork.ebms.util.LoggingUtils;
 import nl.clockwork.ebms.util.LoggingUtils.Status;
-import nl.clockwork.ebms.validation.DuplicateMessageException;
 import nl.clockwork.ebms.validation.EbMSMessageValidator;
-import nl.clockwork.ebms.validation.EbMSValidationException;
 import nl.clockwork.ebms.validation.ValidationException;
-import nl.clockwork.ebms.validation.ValidatorException;
 import nl.clockwork.ebms.validation.XSDValidator;
 
-@Slf4j
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @Transactional(transactionManager = "dataSourceTransactionManager")
 public class EbMSMessageProcessor
 {
   @NonNull
-  MessageEventListener messageEventListener;
-  @NonNull
 	EbMSDAO ebMSDAO;
-  @NonNull
+	@NonNull
 	CPAManager cpaManager;
   @NonNull
 	EbMSMessageValidator messageValidator;
-  @NonNull
-	DuplicateMessageHandler duplicateMessageHandler;
 	boolean deleteEbMSAttachmentsOnMessageProcessed;
 	XSDValidator xsdValidator = new XSDValidator("/nl/clockwork/ebms/xsd/msg-header-2_0.xsd");
+	MessageProcessor messageProcessor;
 	MessageErrorProcessor messageErrorProcessor;
 	AcknowledgmentProcessor acknowledgmentProcessor;
+	StatusRequestProcessor statusRequestProcessor;
 	StatusResponseProcessor statusResponseProcessor;
+	PingProcessor pingProcessor;
 	PongProcessor pongProcessor;
 
 	@Builder
 	public EbMSMessageProcessor(@NonNull DeliveryManager deliveryManager, @NonNull MessageEventListener messageEventListener, @NonNull EbMSDAO ebMSDAO, @NonNull CPAManager cpaManager, @NonNull EbMSMessageFactory ebMSMessageFactory, @NonNull DeliveryTaskManager deliveryTaskManager, @NonNull EbMSSignatureGenerator signatureGenerator, @NonNull EbMSMessageValidator messageValidator, @NonNull DuplicateMessageHandler duplicateMessageHandler, boolean deleteEbMSAttachmentsOnMessageProcessed)
 	{
 		super();
-		this.messageEventListener = messageEventListener;
 		this.ebMSDAO = ebMSDAO;
 		this.cpaManager = cpaManager;
 		this.messageValidator = messageValidator;
-		this.duplicateMessageHandler = duplicateMessageHandler;
 		this.deleteEbMSAttachmentsOnMessageProcessed = deleteEbMSAttachmentsOnMessageProcessed;
 		this.messageErrorProcessor = MessageErrorProcessor.builder()
 				.ebMSDAO(ebMSDAO)
@@ -119,6 +110,14 @@ public class EbMSMessageProcessor
 				.messageEventListener(messageEventListener)
 				.deleteEbMSAttachmentsOnMessageProcessed(deleteEbMSAttachmentsOnMessageProcessed)
 				.build();
+		this.messageProcessor = MessageProcessor.builder()
+				.messageEventListener(messageEventListener)
+				.ebMSDAO(ebMSDAO)
+				.messageValidator(messageValidator)
+				.duplicateMessageHandler(duplicateMessageHandler)
+				.messageErrorProcessor(messageErrorProcessor)
+				.acknowledgmentProcessor(acknowledgmentProcessor)
+				.build();
 		this.statusResponseProcessor = StatusResponseProcessor.builder()
 				.ebMSDAO(ebMSDAO)
 				.cpaManager(cpaManager)
@@ -126,11 +125,19 @@ public class EbMSMessageProcessor
 				.ebMSMessageFactory(ebMSMessageFactory)
 				.deliveryManager(deliveryManager)
 				.build();
+		this.statusRequestProcessor = StatusRequestProcessor.builder()
+				.messageValidator(messageValidator)
+				.statusResponseProcessor(statusResponseProcessor)
+				.build();
 		this.pongProcessor = PongProcessor.builder()
 				.cpaManager(cpaManager)
 				.messageValidator(messageValidator)
 				.ebMSMessageFactory(ebMSMessageFactory)
 				.deliveryManager(deliveryManager)
+				.build();
+		this.pingProcessor = PingProcessor.builder()
+				.messageValidator(messageValidator)
+				.pongProcessor(pongProcessor)
 				.build();
 	}
 
@@ -165,7 +172,7 @@ public class EbMSMessageProcessor
 	private EbMSDocument processRequest(Instant timestamp, EbMSDocument document, EbMSBaseMessage message) throws DatatypeConfigurationException, JAXBException, SOAPException, ParserConfigurationException, SAXException, IOException, TransformerFactoryConfigurationError, TransformerException, XPathExpressionException
 	{
 		if (message instanceof EbMSMessage)
-			return processMessage(timestamp,document,(EbMSMessage)message);
+			return messageProcessor.processMessage(timestamp,document,(EbMSMessage)message);
 		else if (message instanceof EbMSMessageError)
 		{
 			val messageError = (EbMSMessageError)message;
@@ -186,7 +193,7 @@ public class EbMSMessageProcessor
 		}
 		else if (message instanceof EbMSStatusRequest)
 		{
-			return processStatusRequest(timestamp,(EbMSStatusRequest)message);
+			return statusRequestProcessor.processStatusRequest(timestamp,(EbMSStatusRequest)message);
 		}
 		else if (message instanceof EbMSStatusResponse)
 		{
@@ -195,7 +202,7 @@ public class EbMSMessageProcessor
 		}
 		else if (message instanceof EbMSPing)
 		{
-			return processPing(timestamp,(EbMSPing)message);
+			return pingProcessor.processPing(timestamp,(EbMSPing)message);
 		}
 		else if (message instanceof EbMSPong)
 		{
@@ -230,14 +237,14 @@ public class EbMSMessageProcessor
 					val responseMessage = EbMSMessageUtils.getEbMSMessage(response);
 					if (responseMessage instanceof EbMSMessageError)
 					{
-						if (!messageValidator.isSyncReply(requestMessage))
+						if (!requestMessage.isSyncReply(cpaManager))
 							throw new EbMSProcessingException(
 									"No sync ErrorMessage expected for message " + requestMessage.getMessageHeader().getMessageData().getMessageId() + "\n" + DOMUtils.toString(response.getMessage()));
 						messageErrorProcessor.processMessageError(timestamp,response,requestMessage,(EbMSMessageError)responseMessage);
 					}
 					else if (responseMessage instanceof EbMSAcknowledgment)
 					{
-						if (requestMessage.getAckRequested() == null || !messageValidator.isSyncReply(requestMessage))
+						if (requestMessage.getAckRequested() == null || !requestMessage.isSyncReply(cpaManager))
 							throw new EbMSProcessingException(
 									"No sync Acknowledgment expected for message " + requestMessageHeader.getMessageData().getMessageId() + "\n" + DOMUtils.toString(response.getMessage()));
 						acknowledgmentProcessor.processAcknowledgment(timestamp,response,requestMessage,(EbMSAcknowledgment)responseMessage);
@@ -248,7 +255,7 @@ public class EbMSMessageProcessor
 				}
 				else if (requestMessage.getAckRequested() == null && requestMessage.getSyncReply() != null)
 				{
-					processMessage(requestMessage);
+					messageProcessor.processDeliveredMessage(requestMessage,deleteEbMSAttachmentsOnMessageProcessed);
 				}
 			}
 			else if (response != null)
@@ -262,80 +269,6 @@ public class EbMSMessageProcessor
 		catch (XPathExpressionException | ParserConfigurationException e)
 		{
 			throw new EbMSProcessorException(e);
-		}
-	}
-
-	private EbMSDocument processMessage(final Instant timestamp, final EbMSDocument messageDocument, final EbMSMessage message) throws ValidatorException, DatatypeConfigurationException, JAXBException, SOAPException, ParserConfigurationException, SAXException, IOException, TransformerFactoryConfigurationError, TransformerException, EbMSProcessorException
-	{
-		try
-		{
-			messageValidator.validateAndDecryptMessage(messageDocument,message,timestamp);
-			if (message.getAckRequested() == null)
-			{
-				storeMessage(timestamp,messageDocument,message);
-				return null;
-			}
-			else
-			{
-				val acknowledgmentDocument = acknowledgmentProcessor.processAcknowledgment(timestamp,messageDocument,message,messageValidator.isSyncReply(message));
-				return messageValidator.isSyncReply(message) ? acknowledgmentDocument : null;
-			}
-		}
-		catch (DuplicateMessageException e)
-		{
-			return duplicateMessageHandler.handleMessage(timestamp,messageDocument,message);
-		}
-		catch (final EbMSValidationException e)
-		{
-			log.warn("Invalid message " + message.getMessageHeader().getMessageData().getMessageId() + "\n" + e.getMessage());
-			val messageErrorDocument = messageErrorProcessor.processMessageError(timestamp,messageDocument,message,messageValidator.isSyncReply(message),e);
-			return messageValidator.isSyncReply(message) ? messageErrorDocument : null;
-		}
-	}
-
-	private void storeMessage(final Instant timestamp, final EbMSDocument messageDocument, final EbMSMessage message)
-	{
-		ebMSDAO.insertMessage(timestamp,null,messageDocument.getMessage(),message,message.getAttachments(),EbMSMessageStatus.RECEIVED);
-		messageEventListener.onMessageReceived(message.getMessageHeader().getMessageData().getMessageId());
-	}
-
-	private void processMessage(final EbMSMessage message)
-	{
-		val messageHeader = message.getMessageHeader();
-		if (ebMSDAO.updateMessage(
-				messageHeader .getMessageData().getMessageId(),
-				EbMSMessageStatus.CREATED,
-				EbMSMessageStatus.DELIVERED) > 0)
-		{
-			messageEventListener.onMessageDelivered(messageHeader.getMessageData().getMessageId());
-			if (deleteEbMSAttachmentsOnMessageProcessed)
-				ebMSDAO.deleteAttachments(messageHeader.getMessageData().getMessageId());
-		}
-	}
-
-	private EbMSDocument processStatusRequest(Instant timestamp, EbMSStatusRequest statusRequest) throws DatatypeConfigurationException, JAXBException, SOAPException, ParserConfigurationException, SAXException, IOException, TransformerFactoryConfigurationError, TransformerException
-	{
-		messageValidator.validate(statusRequest,timestamp);
-		val statusResponse = statusResponseProcessor.createStatusResponse(statusRequest,timestamp);
-		if (messageValidator.isSyncReply(statusRequest))
-			return EbMSMessageUtils.getEbMSDocument(statusResponse);
-		else
-		{
-			statusResponseProcessor.sendStatusResponse(statusResponse);
-			return null;
-		}
-	}
-
-	private EbMSDocument processPing(Instant timestamp, EbMSPing ping) throws SOAPException, JAXBException, ParserConfigurationException, SAXException, IOException, TransformerFactoryConfigurationError, TransformerException
-	{
-		messageValidator.validate(ping,timestamp);
-		val pong = pongProcessor.createPong(ping,timestamp);
-		if (messageValidator.isSyncReply(ping))
-			return EbMSMessageUtils.getEbMSDocument(pong);
-		else
-		{
-			pongProcessor.sendPong(pong);
-			return null;
 		}
 	}
 
