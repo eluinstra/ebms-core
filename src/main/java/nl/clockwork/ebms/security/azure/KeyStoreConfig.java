@@ -57,8 +57,7 @@ public class KeyStoreConfig
 	@Bean
 	public EbMSTrustStore trustStore() throws GeneralSecurityException, IOException
 	{
-		return AzureTrustStore.of(keyvaultURI, tennantID, clientID, clientSecret);
-//		return EbMSTrustStore.of(trustStoretype,trustStorepath,trustStorepassword);		
+		return EbMSTrustStore.of(trustStoretype,trustStorepath,trustStorepassword);		
 	}
 
 	@Bean("clientKeyStore")
