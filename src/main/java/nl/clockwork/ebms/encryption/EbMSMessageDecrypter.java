@@ -76,7 +76,7 @@ public class EbMSMessageDecrypter
 				val alias = keyStore.getCertificateAlias(certificate);
 				if (alias == null)
 					throw new ValidationException(
-							"No certificate found with subject \"" + certificate.getSubjectDN().getName() + "\" in keystore \"" + keyStore.getPath() + "\"");
+							"No certificate found with subject \"" + certificate.getSubjectDN().getName() + "\" in keystore \"" + keyStore + "\"");
 				val keyPair = SecurityUtils.getKeyPair(keyStore,alias,keyStore.getKeyPassword());
 				message.getAttachments().replaceAll(a -> decrypt(keyPair,a));
 			}
