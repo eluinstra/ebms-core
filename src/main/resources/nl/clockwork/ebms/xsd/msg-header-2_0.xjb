@@ -4,7 +4,7 @@
 	jxb:extensionBindingPrefixes="xjc" version="2.0">
 	<jxb:globalBindings>
 		<xjc:serializable uid="1"/>
-		<jxb:javaType name="java.time.Instant" xmlType="xsd:dateTime" parseMethod="nl.clockwork.ebms.jaxb.InstantConverter.parseDateTime" printMethod="nl.clockwork.ebms.jaxb.InstantConverter.printDateTime" />
-		<jxb:javaType name="java.time.Duration" xmlType="xsd:duration" parseMethod="nl.clockwork.ebms.jaxb.DurationConverter.parseDuration" printMethod="nl.clockwork.ebms.jaxb.DurationConverter.printDuration" />
+		<xjc:javaType name="java.time.Instant" xmlType="xsd:dateTime" adapter="nl.clockwork.ebms.jaxb.InstantAdapter" />
+		<xjc:javaType name="java.time.Duration" xmlType="xsd:duration" adapter="nl.clockwork.ebms.jaxb.DurationAdapter" />
 	</jxb:globalBindings>
 </jxb:bindings>

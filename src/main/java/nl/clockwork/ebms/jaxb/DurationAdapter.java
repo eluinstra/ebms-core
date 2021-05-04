@@ -15,17 +15,16 @@
  */
 package nl.clockwork.ebms.jaxb;
 
+
 import java.util.Date;
 
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.Duration;
 
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
+import javax.xml.bind.annotation.adapters.XmlAdapter;
 
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class DurationConverter
+public class DurationAdapter extends XmlAdapter<String, java.time.Duration>
 {
 	private static DatatypeFactory datatypeFactory;
 	
@@ -40,17 +39,19 @@ public class DurationConverter
 			throw new RuntimeException(e);
 		}
 	}
-
-	public static java.time.Duration parseDuration(String duration)
+	
+	@Override
+	public java.time.Duration unmarshal(String duration) throws Exception
 	{
 		return toDuration(datatypeFactory.newDuration(duration));
 	}
 
-	public static String printDuration(java.time.Duration duration)
+	@Override
+	public String marshal(java.time.Duration duration) throws Exception
 	{
 		return duration != null ? toDuration(duration).toString() : null;
 	}
-
+	
 	private static java.time.Duration toDuration(Duration duration)
 	{
 		return java.time.Duration.ofMillis(duration.getTimeInMillis(new Date()));
