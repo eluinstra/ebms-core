@@ -28,6 +28,7 @@ import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.type.AnnotatedTypeMetadata;
 import org.springframework.jms.core.JmsTemplate;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.transaction.PlatformTransactionManager;
 
 import com.querydsl.sql.SQLQueryFactory;
@@ -63,6 +64,9 @@ public class DeliveryTaskManagerConfig
 	PlatformTransactionManager dataSourceTransactionManager;
 	@Autowired
 	SQLQueryFactory queryFactory;
+	@Autowired
+	@Qualifier("deliveryTaskKafkaTemplate")
+	KafkaTemplate<String, DeliveryTask> kafkaTemplate;
 
 	@Bean
 	@Conditional(DefaultTaskManagerType.class)
@@ -90,6 +94,13 @@ public class DeliveryTaskManagerConfig
 	public DeliveryTaskManager quartzJMSDeliveryTaskManager()
 	{
 		return new QuartzJMSDeliveryTaskManager(scheduler,ebMSDAO,deliveryTaskDAO(),cpaManager,nrAutoRetries,autoRetryInterval,new JmsTemplate(connectionFactory));
+	}
+
+	@Bean
+	@Conditional(QuartzKafkaTaskManagerType.class)
+	public DeliveryTaskManager quartzKafkaDeliveryTaskManager()
+	{
+		return new QuartzKafkaDeliveryTaskManager(scheduler, ebMSDAO, deliveryTaskDAO(), cpaManager, nrAutoRetries, autoRetryInterval, kafkaTemplate);
 	}
 
 	@Bean
@@ -133,6 +144,14 @@ public class DeliveryTaskManagerConfig
 		public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata)
 		{
 			return context.getEnvironment().getProperty("deliveryTaskHandler.type",DeliveryTaskHandlerType.class,DeliveryTaskHandlerType.DEFAULT) == DeliveryTaskHandlerType.QUARTZ_JMS;
+		}
+	}
+	public static class QuartzKafkaTaskManagerType implements Condition
+	{
+		@Override
+		public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata)
+		{
+			return context.getEnvironment().getProperty("deliveryTaskHandler.type",DeliveryTaskHandlerType.class,DeliveryTaskHandlerType.DEFAULT) == DeliveryTaskHandlerType.QUARTZ_KAFKA;
 		}
 	}
 }
