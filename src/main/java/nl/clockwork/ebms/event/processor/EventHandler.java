@@ -25,6 +25,7 @@ import org.slf4j.MDC;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.annotation.Transactional;
 
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -53,6 +54,7 @@ import nl.clockwork.ebms.util.StreamUtils;
 
 @Slf4j
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@Transactional(transactionManager = "dataSourceTransactionManager")
 class EventHandler
 {
 	@NonNull
