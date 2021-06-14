@@ -44,8 +44,8 @@ public class XSDValidator
 		{
 			val factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
 			factory.setProperty(XMLConstants.ACCESS_EXTERNAL_DTD,"");
-			factory.setProperty(XMLConstants.ACCESS_EXTERNAL_SCHEMA,"");
-      val systemId = this.getClass().getResource(xsdFile).toString();
+			factory.setProperty(XMLConstants.ACCESS_EXTERNAL_SCHEMA,"file");
+			val systemId = this.getClass().getResource(xsdFile).toString();
 			schema = factory.newSchema(new StreamSource(this.getClass().getResourceAsStream(xsdFile),systemId));
 		}
 		catch (SAXException e)
