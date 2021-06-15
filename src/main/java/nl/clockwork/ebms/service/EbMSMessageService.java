@@ -47,7 +47,7 @@ public interface EbMSMessageService
 	/**
 	 * Sends message message as an EbMS message
 	 * 
-	 * @param message
+	 * @param messageRequest
 	 * @return The messageId of the generated EbMS message
 	 * @throws EbMSMessageServiceException
 	 */

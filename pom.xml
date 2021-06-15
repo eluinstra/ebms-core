@@ -25,10 +25,12 @@
 	<version>2.18.1-SNAPSHOT</version>
 	<description>This library implements the ebXML Message Specification version 2.0, which defines a communications-protocol neutral method for exchanging electronic business messages through the exchange of XML based messages.</description>
 	<url>https://sourceforge.net/projects/muleebmsadapter/</url>
+	
 	<issueManagement>
 		<system>Tickets</system>
 		<url>https://sourceforge.net/p/muleebmsadapter/tickets/</url>
 	</issueManagement>	
+	
 	<developers>
 		<developer>
 			<id>eluinstra</id>
@@ -54,16 +56,19 @@
 			<timezone>1</timezone>
 		</developer>
 	</developers>
+	
 	<scm>
 		<connection>scm:git:https://git.code.sf.net/p/muleebmsadapter/code</connection>
 		<developerConnection>scm:git:https://git.code.sf.net/p/muleebmsadapter/code</developerConnection>
 		<url>https://sourceforge.net/projects/muleebmsadapter/</url>
 		<tag>HEAD</tag>
 	</scm>
+	
 	<organization>
 		<name>Ordina</name>
 		<url>www.ordina.nl</url>
 	</organization>
+	
 	<licenses>
 		<license>
 			<name>Apache License, Version 2.0</name>
@@ -71,19 +76,24 @@
 			<distribution>repo</distribution>
 		</license>
 	</licenses>
+	
 	<properties>
 		<jdk.version>1.8</jdk.version>
-		<lombok.version>1.18.16</lombok.version>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<lombok.version>1.18.20</lombok.version>
 		<mapstruct.version>1.4.1.Final</mapstruct.version>
-		<junit.jupiter.version>5.7.0</junit.jupiter.version>
-		<spring.version>5.2.9.RELEASE</spring.version>
-		<activemq.version>5.16.0</activemq.version>
+		<junit.jupiter.version>5.7.1</junit.jupiter.version>
+		<spring.version>5.2.14.RELEASE</spring.version>
+		<activemq.version>5.16.2</activemq.version>
 		<httpclient.version>4.5.13</httpclient.version>
+		<surefire.version>3.0.0-M5</surefire.version>
+		<querydsl.version>4.4.0</querydsl.version>
 		<checkstyle.config.location>${basedir}/resources/reporting/checkstyle.xml</checkstyle.config.location>
 		<checkstyle.header.file>${basedir}/resources/reporting/license.txt</checkstyle.header.file>
 		<checkstyle.cache.file>${project.build.directory}/checkstyle-cachefile</checkstyle.cache.file>
 		<dependency.locations.enabled>false</dependency.locations.enabled>
 	</properties>
+
 	<profiles>
 		<!-- GPG Signature on release -->
 		<profile>
@@ -113,41 +123,79 @@
 				</plugins>
 			</build>
 		</profile>
+		<profile>
+			<id>querydsl-gen</id>
+			<activation>
+				<activeByDefault>false</activeByDefault>
+			</activation>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>com.querydsl</groupId>
+						<artifactId>querydsl-maven-plugin</artifactId>
+						<version>${querydsl.version}</version>
+						<executions>
+							<execution>
+								<goals>
+									<goal>export</goal>
+								</goals>
+							</execution>
+						</executions>
+						<configuration>
+							<jdbcDriver>org.hsqldb.jdbcDriver</jdbcDriver>
+							<jdbcUrl>jdbc:hsqldb:hsql://localhost:9001/ebms</jdbcUrl>
+							<packageName>nl.clockwork.ebms.querydsl.model</packageName>
+							<targetFolder>${project.basedir}/target/generated-sources/java</targetFolder>
+							<customTypes>
+								<customType>nl.clockwork.ebms.querydsl.CollaborationProtocolAgreementType</customType>
+								<customType>nl.clockwork.ebms.querydsl.X509CertificateType</customType>
+							</customTypes>
+							<typeMappings>
+								<typeMapping>
+									<table>CPA</table>
+									<column>CPA</column>
+									<type>org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CollaborationProtocolAgreement</type>
+								</typeMapping>
+								<typeMapping>
+									<table>CERTIFICATE_MAPPING</table>
+									<column>SOURCE</column>
+									<type>java.security.cert.X509Certificate</type>
+								</typeMapping>
+								<typeMapping>
+									<table>CERTIFICATE_MAPPING</table>
+									<column>DESTINATION</column>
+									<type>java.security.cert.X509Certificate</type>
+								</typeMapping>
+							</typeMappings>
+						</configuration>
+						<dependencies>
+							<dependency>
+								<groupId>org.hsqldb</groupId>
+								<artifactId>hsqldb</artifactId>
+								<version>2.5.2</version>
+							</dependency>
+						</dependencies>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
 	</profiles>
 	<dependencies>
 		<dependency>
-			<groupId>org.junit.jupiter</groupId>
-			<artifactId>junit-jupiter-api</artifactId>
-			<version>${junit.jupiter.version}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.junit.jupiter</groupId>
-			<artifactId>junit-jupiter-engine</artifactId>
-			<version>${junit.jupiter.version}</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.mockito</groupId>
-			<artifactId>mockito-core</artifactId>
-			<version>3.5.15</version>
-			<scope>test</scope>
+			<groupId>org.mapstruct</groupId>
+			<artifactId>mapstruct</artifactId>
+			<version>${mapstruct.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
 			<version>${lombok.version}</version>
-			<scope>provided</scope>
+			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>io.vavr</groupId>
 			<artifactId>vavr</artifactId>
-			<version>0.10.3</version>
-		</dependency>
-		<dependency>
-			<groupId>org.mapstruct</groupId>
-			<artifactId>mapstruct</artifactId>
-			<version>${mapstruct.version}</version>
+			<version>1.0.0-alpha-3</version>
 		</dependency>
 		<dependency>
 			<groupId>javax.servlet</groupId>
@@ -160,6 +208,63 @@
 			<artifactId>javax.mail</artifactId>
 			<version>1.6.2</version>
 		</dependency>
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
+			<version>3.12.0</version>
+		</dependency>
+		<dependency>
+			<groupId>commons-io</groupId>
+			<artifactId>commons-io</artifactId>
+			<version>2.8.0</version>
+		</dependency>
+		<dependency>
+			<groupId>commons-codec</groupId>
+			<artifactId>commons-codec</artifactId>
+			<version>1.15</version>
+		</dependency>
+		<dependency>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava</artifactId>
+			<version>30.1.1-jre</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.apache.xbean</groupId>
+			<artifactId>xbean-spring</artifactId>
+			<version>4.19</version>
+			<scope>provided</scope>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.apache.santuario</groupId>
+			<artifactId>xmlsec</artifactId>
+			<version>2.2.1</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.james</groupId>
+			<artifactId>apache-mime4j-core</artifactId>
+			<version>0.8.4</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpclient</artifactId>
+			<version>${httpclient.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpmime</artifactId>
+			<version>${httpclient.version}</version>
+		</dependency>
+		<dependency>
+		    <groupId>org.apache.cxf</groupId>
+		    <artifactId>cxf-core</artifactId>
+		    <version>3.4.3</version>
+		    <scope>provided</scope>
+		</dependency>
+
+		
+		<!-- jaxb -->
 		<dependency>
 			<groupId>javax.xml.bind</groupId>
 			<artifactId>jaxb-api</artifactId>
@@ -175,6 +280,15 @@
 			<artifactId>jaxb-impl</artifactId>
 			<version>2.3.0.1</version>
 		</dependency>
+		
+		<dependency>
+			<groupId>org.quartz-scheduler</groupId>
+			<artifactId>quartz</artifactId>
+			<version>2.3.2</version>
+			<scope>compile</scope>
+		</dependency>
+			
+		<!-- spring -->
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-context-support</artifactId>
@@ -199,84 +313,38 @@
 			<version>${spring.version}</version>
 			<scope>provided</scope>
 		</dependency>
+		
+		<!-- querydsl -->
 		<dependency>
 			<groupId>com.querydsl</groupId>
 			<artifactId>querydsl-sql</artifactId>
-			<version>4.4.0</version>
+			<version>${querydsl.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.querydsl</groupId>
 			<artifactId>querydsl-sql-spring</artifactId>
-			<version>4.4.0</version>
+			<version>${querydsl.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.querydsl</groupId>
 			<artifactId>querydsl-sql-codegen</artifactId>
-			<version>4.4.0</version>
+			<version>${querydsl.version}</version>
 			<scope>provided</scope>
 		</dependency>
-		<dependency>
-			<groupId>org.apache.commons</groupId>
-			<artifactId>commons-lang3</artifactId>
-			<version>3.11</version>
-		</dependency>
-		<dependency>
-			<groupId>commons-io</groupId>
-			<artifactId>commons-io</artifactId>
-			<version>2.8.0</version>
-		</dependency>
-		<dependency>
-			<groupId>commons-codec</groupId>
-			<artifactId>commons-codec</artifactId>
-			<version>1.15</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.santuario</groupId>
-			<artifactId>xmlsec</artifactId>
-			<version>2.2.0</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.james</groupId>
-			<artifactId>apache-mime4j-core</artifactId>
-			<version>0.8.3</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.httpcomponents</groupId>
-			<artifactId>httpclient</artifactId>
-			<version>${httpclient.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.httpcomponents</groupId>
-			<artifactId>httpmime</artifactId>
-			<version>${httpclient.version}</version>
-		</dependency>
-		<dependency>
-		    <groupId>org.apache.cxf</groupId>
-		    <artifactId>cxf-core</artifactId>
-		    <version>3.4.0</version>
-		    <scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>com.google.guava</groupId>
-			<artifactId>guava</artifactId>
-			<version>30.0-jre</version>
-		</dependency>
+
+		<!-- caching -->
 		<dependency>
 			<groupId>net.sf.ehcache</groupId>
 			<artifactId>ehcache</artifactId>
-			<version>2.10.6</version>
+			<version>2.10.9.2</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.ignite</groupId>
 			<artifactId>ignite-spring</artifactId>
-			<version>2.9.0</version>
-		  <!--exclusions>
-		  	<exclusion>
-					<groupId>com.h2database</groupId>
-					<artifactId>h2</artifactId>
-				</exclusion>
-		  </exclusions-->
+			<version>2.10.0</version>
 		</dependency>
+		
+		<!-- transaction management -->		
 		<dependency>
 			<groupId>org.codehaus.btm</groupId>
 			<artifactId>btm</artifactId>
@@ -288,15 +356,12 @@
 			<version>5.0.8</version>
 		</dependency>
 		<dependency>
-		    <groupId>org.quartz-scheduler</groupId>
-		    <artifactId>quartz</artifactId>
-		    <version>2.3.2</version>
-		</dependency>
-		<dependency>
 			<groupId>com.atomikos</groupId>
 			<artifactId>transactions-jms</artifactId>
 			<version>5.0.8</version>
 		</dependency>
+
+		<!-- activemq -->
 		<dependency>
 			<groupId>org.apache.activemq</groupId>
 			<artifactId>activemq-broker</artifactId>
@@ -321,16 +386,12 @@
 			<version>${activemq.version}</version>
 			<scope>provided</scope>
 		</dependency>
-		<dependency>
-			<groupId>org.apache.xbean</groupId>
-			<artifactId>xbean-spring</artifactId>
-			<version>4.18</version>
-			<scope>provided</scope>
-		</dependency>
+
+		<!-- database -->
 		<dependency>
 			<groupId>org.flywaydb</groupId>
 			<artifactId>flyway-core</artifactId>
-			<version>7.0.4</version>
+			<version>7.8.2</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
@@ -340,17 +401,17 @@
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
-			<groupId>com.ibm.db2</groupId>
-			<artifactId>jcc</artifactId>
-			<version>11.5.4.0</version>
+			<groupId>com.ibm.db2.jcc</groupId>
+			<artifactId>db2jcc</artifactId>
+			<version>db2jcc4</version>
 			<scope>provided</scope>
 		</dependency>
-		<!--dependency>
+		<dependency>
 			<groupId>com.h2database</groupId>
 			<artifactId>h2</artifactId>
 			<version>1.4.200</version>
 			<scope>provided</scope>
-		</dependency-->
+		</dependency>
 		<dependency>
 			<groupId>org.hsqldb</groupId>
 			<artifactId>hsqldb</artifactId>
@@ -360,13 +421,13 @@
 		<dependency>
 			<groupId>org.mariadb.jdbc</groupId>
 			<artifactId>mariadb-java-client</artifactId>
-			<version>2.7.0</version>
+			<version>2.7.2</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>mysql</groupId>
 			<artifactId>mysql-connector-java</artifactId>
-			<version>8.0.22</version>
+			<version>8.0.24</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
@@ -378,16 +439,51 @@
 		<dependency>
 			<groupId>org.postgresql</groupId>
 			<artifactId>postgresql</artifactId>
-			<version>42.2.18</version>
+			<version>42.2.20</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>com.microsoft.sqlserver</groupId>
 			<artifactId>mssql-jdbc</artifactId>
-			<version>8.4.1.jre8</version>
+			<version>8.4.0.jre8</version>
 			<scope>provided</scope>
 		</dependency>
+		
+		<!-- test -->
+		<dependency>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter-api</artifactId>
+			<version>${junit.jupiter.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter-engine</artifactId>
+			<version>${junit.jupiter.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-core</artifactId>
+			<version>3.9.0</version>
+			<scope>test</scope>
+		</dependency>
 	</dependencies>
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>org.slf4j</groupId>
+				<artifactId>slf4j-api</artifactId>
+				<version>1.7.30</version>
+			</dependency>
+			<dependency>
+				<groupId>com.fasterxml.woodstox</groupId>
+				<artifactId>woodstox-core</artifactId>
+				<version>6.2.4</version>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+	
 	<repositories>
 		<repository>
 			<id>maven.oracle.com</id>
@@ -401,8 +497,31 @@
 			<layout>default</layout>
 		</repository>
 	</repositories>
+	
 	<build>
 		<plugins>
+			<plugin>
+				<artifactId>maven-enforcer-plugin</artifactId>
+				<version>3.0.0-M3</version>
+				<executions>
+					<execution>
+						<id>enforce-versions</id>
+						<goals>
+							<goal>enforce</goal>
+						</goals>
+						<configuration>
+							<rules>
+								<requireMavenVersion>
+									<version>[3.2.5,)</version>
+								</requireMavenVersion>
+								<requireJavaVersion>
+									<version>[1.8,)</version>
+								</requireJavaVersion>
+							</rules>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
 			<plugin>
 				<groupId>com.mycila</groupId>
 				<artifactId>license-maven-plugin</artifactId>
@@ -420,7 +539,10 @@
 						<include>src/test/resources/**/*</include>
 					</includes>
 					<excludes>
-						<include>src/main/resources/**/*.jks</include>
+						<exclude>src/**/*.jks</exclude>
+						<exclude>src/**/*.p12</exclude>
+						<exclude>src/**/*.crt</exclude>
+						<exclude>src/**/*.pem</exclude>
 						<exclude>src/main/resources/nl/clockwork/ebms/xsd/**/*</exclude>
 					</excludes>
 				</configuration>
@@ -454,7 +576,6 @@
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>jaxb2-maven-plugin</artifactId>
 				<version>1.5</version>
-				<!--version>1.6</version-->
 				<executions>
 					<execution>
 						<goals>
@@ -464,113 +585,18 @@
 							<schemaDirectory>${project.basedir}/src/main/resources/nl/clockwork/ebms/xsd/</schemaDirectory>
 							<schemaFiles>cpp-cpa-2_0.xsd,msg-header-2_0.xsd</schemaFiles>
 							<bindingDirectory>${project.basedir}/src/main/resources/nl/clockwork/ebms/xsd/</bindingDirectory>
-							<bindingFiles>cpp-cpa-2_0.xjb,msg-header-2_0.xjb</bindingFiles>
+							<bindingFiles>cpp-cpa-2_0.xjb,msg-header-2_0.xjb,xmldsig-core-schema.xjb</bindingFiles>
 							<extension>true</extension>
 							<clearOutputDir>false</clearOutputDir>
 							<verbose>false</verbose>
+							<quiet>true</quiet>
 						</configuration>
 					</execution>
 				</executions>
 			</plugin>
-			<!--plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>jaxb2-maven-plugin</artifactId>
-				<version>2.5.0</version>
-				<executions>
-					<execution>
-						<goals>
-							<goal>xjc</goal>
-						</goals>
-						<configuration>
-							<target>2.1</target>
-							<sources>
-								<source>src/main/resources/nl/clockwork/ebms/xsd/cpp-cpa-2_0.xsd</source>
-								<source>src/main/resources/nl/clockwork/ebms/xsd/msg-header-2_0.xsd</source>
-							</sources>
-							<xjbSources>
-								<xjbSource>src/main/resources/nl/clockwork/ebms/xsd/cpp-cpa-2_0.xjb</xjbSource>
-								<xjbSource>src/main/resources/nl/clockwork/ebms/xsd/msg-header-2_0.xjb</xjbSource>
-							</xjbSources>
-							<extension>true</extension>
-							<clearOutputDir>false</clearOutputDir>
-							<verbose>false</verbose>
-						</configuration>
-					</execution>
- 				</executions>
-			</plugin-->
-			<!--plugin>
-				<groupId>org.jvnet.jaxb2.maven2</groupId>
-				<artifactId>maven-jaxb2-plugin</artifactId>
-				<version>0.14.0</version>
-				<executions>
-					<execution>
-						<goals>
-							<goal>generate</goal>
-						</goals>
-						<configuration>
-							<schemaDirectory>${project.basedir}/src/main/resources/nl/clockwork/ebms/xsd/</schemaDirectory>
-							<schemaIncludes>
-								<include>*.xsd</include>
-							</schemaIncludes>
-							<bindingDirectory>${project.basedir}/src/main/resources/nl/clockwork/ebms/xsd/</bindingDirectory>
-							<bindingIncludes>
-								<include>*.xjb</include>
-							</bindingIncludes>
-							<extension>true</extension>
-							<clearOutputDir>false</clearOutputDir>
-							<verbose>false</verbose>
-						</configuration>
-					</execution>
- 				</executions>
-			</plugin-->
-			<!--plugin>
-				<groupId>com.querydsl</groupId>
-				<artifactId>querydsl-maven-plugin</artifactId>
-				<version>4.3.1</version>
-				<executions>
-					<execution>
-						<goals>
-							<goal>export</goal>
-						</goals>
-					</execution>
-				</executions>
-				<configuration>
-					<jdbcDriver>org.hsqldb.jdbcDriver</jdbcDriver>
-					<jdbcUrl>jdbc:hsqldb:hsql://localhost:9001/ebms</jdbcUrl>
-					<packageName>nl.clockwork.ebms.querydsl.model</packageName>
-					<targetFolder>${project.basedir}/target/generated-sources/java</targetFolder>
-					<customTypes>
-						<customType>nl.clockwork.ebms.querydsl.CollaborationProtocolAgreementType</customType>
-						<customType>nl.clockwork.ebms.querydsl.X509CertificateType</customType>
-					</customTypes>
-					<typeMappings>
-						<typeMapping>
-							<table>CPA</table>
-							<column>CPA</column>
-							<type>org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CollaborationProtocolAgreement</type>
-						</typeMapping>
-						<typeMapping>
-							<table>CERTIFICATE_MAPPING</table>
-							<column>SOURCE</column>
-							<type>java.security.cert.X509Certificate</type>
-						</typeMapping>
-						<typeMapping>
-							<table>CERTIFICATE_MAPPING</table>
-							<column>DESTINATION</column>
-							<type>java.security.cert.X509Certificate</type>
-						</typeMapping>
-					</typeMappings>
-				</configuration>
-				<dependencies>
-					<dependency>
-						<groupId>org.hsqldb</groupId>
-						<artifactId>hsqldb</artifactId>
-						<version>2.5.0</version>
-					</dependency>
-				</dependencies>
-			</plugin-->
+
+
 			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>3.8.1</version>
 				<configuration>
@@ -592,12 +618,10 @@
 				</configuration>
 			</plugin>
 			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
-				<version>2.22.2</version>
+				<version>${surefire.version}</version>
 			</plugin>
 			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jar-plugin</artifactId>
 				<version>3.2.0</version>
 				<configuration>
@@ -617,7 +641,6 @@
 				</configuration>
 			</plugin>
 			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-source-plugin</artifactId>
 				<version>3.2.1</version>
 				<executions>
@@ -630,12 +653,13 @@
 				</executions>
 			</plugin>
 			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-javadoc-plugin</artifactId>
-				<version>3.2.0</version>
+				<version>3.3.0</version>
 				<configuration>
 					<encoding>UTF-8</encoding>
 					<doclint>none</doclint>
+					<quiet>true</quiet>
+					<excludePackageNames>org.oasis_open.*,org.xmlsoap.*,org.w3.*</excludePackageNames>
 				</configuration>
 				<executions>
 					<execution>
@@ -647,9 +671,7 @@
 				</executions>
 			</plugin>
 			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-release-plugin</artifactId>
-				<version>2.5.3</version><!--$NO-MVN-MAN-VER$-->
 				<configuration>
 					<localCheckout>true</localCheckout>
 					<pushChanges>false</pushChanges>
@@ -671,7 +693,7 @@
 			</plugin>
 			<plugin>
 				<artifactId>maven-deploy-plugin</artifactId>
-				<version>2.8.2</version>
+				<version>3.0.0-M1</version>
 				<executions>
 					<execution>
 					<id>default-deploy</id>
@@ -698,7 +720,6 @@
 	<reporting>
 		<plugins>
 			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-javadoc-plugin</artifactId>
 				<version>3.2.0</version>
 				<configuration>
@@ -707,24 +728,19 @@
 				</configuration>
 			</plugin>
 			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-site-plugin</artifactId>
-				<version>3.9.0</version>
+				<version>3.9.1</version>
 			</plugin>
 			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-report-plugin</artifactId>
-				<version>2.22.2</version>
+				<version>${surefire.version}</version>
 			</plugin>
 			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jxr-plugin</artifactId>
-				<version>3.0.0</version>
+				<version>3.1.1</version>
 			</plugin>
 			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-checkstyle-plugin</artifactId>
-				<version>3.1.1</version>
 				<configuration>
 					<detail>true</detail>
 					<enableFilesSummary>true</enableFilesSummary>
@@ -745,7 +761,7 @@
 			<plugin>
 				<groupId>com.github.spotbugs</groupId>
 				<artifactId>spotbugs-maven-plugin</artifactId>
-				<version>4.0.4</version>
+				<version>4.2.3</version>
 				<configuration>
 					<spotbugsXmlOutputDirectory>${basedir}/target</spotbugsXmlOutputDirectory>
 					<xmlOutput>true</xmlOutput>
@@ -764,9 +780,8 @@
 				</configuration>
 			</plugin>
 			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-pmd-plugin</artifactId>
-				<version>3.13.0</version>
+				<version>3.14.0</version>
 				<configuration>
 					<linkXref>true</linkXref>
 					<targetJdk>${jdk.version}</targetJdk>
@@ -819,7 +834,7 @@
 			<plugin>
 				<groupId>org.owasp</groupId>
 				<artifactId>dependency-check-maven</artifactId>
-				<version>5.3.2</version>
+				<version>6.2.2</version>
 				<reportSets>
 					<reportSet>
 						<reports>
@@ -830,6 +845,7 @@
 			</plugin>
 		</plugins>
 	</reporting>
+
 	<distributionManagement>
 		<snapshotRepository>
 			<id>ossrh</id>
