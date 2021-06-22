@@ -28,27 +28,30 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.NonNull;
-import lombok.Value;
+import lombok.ToString;
+import lombok.experimental.FieldDefaults;
 
-@Value
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@FieldDefaults(level=AccessLevel.PRIVATE, makeFinal=true)
+@Getter
+@ToString(onlyExplicitlyIncluded = true)
 public class EbMSKeyStore
 {
 	private static Map<String,EbMSKeyStore> keyStores = new ConcurrentHashMap<>();
 	@NonNull
+	@ToString.Include
 	String path;
 	@NonNull
-	KeyStore keyStore;
+	protected KeyStore keyStore;
 	@NonNull
-	String keyPassword;
-	String defaultAlias;
+	protected String keyPassword;
+	protected String defaultAlias;
 
 	public static EbMSKeyStore of(@NonNull KeyStoreType type, @NonNull String path, @NonNull String password, @NonNull String keyPassword) throws GeneralSecurityException, IOException
 	{
 		if (!keyStores.containsKey(path))
-			keyStores.put(path,new EbMSKeyStore(type,path,password,keyPassword,null));
+			keyStores.put(path,new EbMSKeyStore(path,KeyStoreUtils.loadKeyStore(type,path,password),keyPassword,null));
 		return keyStores.get(path);
 	}
 
@@ -56,16 +59,16 @@ public class EbMSKeyStore
 	{
 		String key = path + defaultAlias;
 		if (!keyStores.containsKey(key))
-			keyStores.put(key,new EbMSKeyStore(type,path,password,keyPassword,defaultAlias));
+			keyStores.put(key,new EbMSKeyStore(path,KeyStoreUtils.loadKeyStore(type,path,password),keyPassword,defaultAlias));
 		return keyStores.get(key);
 	}
 
-	private EbMSKeyStore(@NonNull KeyStoreType type, @NonNull String path, @NonNull String password, @NonNull String keyPassword, String defaultAlias) throws GeneralSecurityException, IOException
+	public EbMSKeyStore(@NonNull String path, @NonNull KeyStore keyStore, String keyPassword, String defaultAlias) throws GeneralSecurityException, IOException
 	{
 		this.path = path;
+		this.keyStore = keyStore;
 		this.keyPassword = keyPassword;
 		this.defaultAlias = defaultAlias;
-		this.keyStore = KeyStoreUtils.loadKeyStore(type,path,password);
 	}
 
 	public Certificate getCertificate(String alias) throws KeyStoreException
@@ -87,5 +90,4 @@ public class EbMSKeyStore
 	{
 		return keyStore.getKey(alias,password);
 	}
-
 }

@@ -83,7 +83,7 @@
 		<lombok.version>1.18.20</lombok.version>
 		<mapstruct.version>1.4.1.Final</mapstruct.version>
 		<junit.jupiter.version>5.7.1</junit.jupiter.version>
-		<spring.version>5.2.14.RELEASE</spring.version>
+		<spring.version>5.2.15.RELEASE</spring.version>
 		<activemq.version>5.16.2</activemq.version>
 		<httpclient.version>4.5.13</httpclient.version>
 		<surefire.version>3.0.0-M5</surefire.version>
@@ -447,6 +447,13 @@
 			<artifactId>mssql-jdbc</artifactId>
 			<version>8.4.0.jre8</version>
 			<scope>provided</scope>
+		</dependency>
+
+		<!-- azure -->
+		<dependency>
+			<groupId>com.azure</groupId>
+			<artifactId>azure-security-keyvault-jca</artifactId>
+			<version>1.0.0-beta.7</version>
 		</dependency>
 		
 		<!-- test -->

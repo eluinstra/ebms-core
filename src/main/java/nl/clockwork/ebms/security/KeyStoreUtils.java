@@ -27,8 +27,7 @@ import lombok.NoArgsConstructor;
 import lombok.val;
 import lombok.var;
 
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
-class KeyStoreUtils
+public class KeyStoreUtils
 {
 	public static KeyStore loadKeyStore(KeyStoreType type, String location, String password) throws GeneralSecurityException, IOException
 	{
