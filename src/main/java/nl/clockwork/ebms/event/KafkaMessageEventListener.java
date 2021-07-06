@@ -25,34 +25,34 @@ import org.springframework.kafka.core.KafkaTemplate;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor
-public class KafkaMessageEventListener extends LoggingMessageEventListener {
+public class KafkaMessageEventListener extends LoggingMessageEventListener
+{
+	@NonNull
+	EbMSDAO ebMSDAO;
+	@NonNull
+	private KafkaTemplate<String,EbMSMessageProperties> kafkaTemplate;
 
-    @NonNull
-    EbMSDAO ebMSDAO;
-    @NonNull
-    private KafkaTemplate<String, EbMSMessageProperties> kafkaTemplate;
+	@Override
+	public void onMessageReceived(String messageId) throws MessageEventException
+	{
+		ebMSDAO.getEbMSMessageProperties(messageId).ifPresent(p -> kafkaTemplate.send(MessageEventType.RECEIVED.name(),p));
+	}
 
-    @Override
-    public void onMessageReceived(String messageId) throws MessageEventException {
-        ebMSDAO.getEbMSMessageProperties(messageId)
-                .ifPresent(p -> kafkaTemplate.send(MessageEventType.RECEIVED.name(), p));
-    }
+	@Override
+	public void onMessageDelivered(String messageId) throws MessageEventException
+	{
+		ebMSDAO.getEbMSMessageProperties(messageId).ifPresent(p -> kafkaTemplate.send(MessageEventType.DELIVERED.name(),p));
+	}
 
-    @Override
-    public void onMessageDelivered(String messageId) throws MessageEventException {
-        ebMSDAO.getEbMSMessageProperties(messageId)
-                .ifPresent(p -> kafkaTemplate.send(MessageEventType.DELIVERED.name(), p));
-    }
+	@Override
+	public void onMessageFailed(String messageId) throws MessageEventException
+	{
+		ebMSDAO.getEbMSMessageProperties(messageId).ifPresent(p -> kafkaTemplate.send(MessageEventType.FAILED.name(),p));
+	}
 
-    @Override
-    public void onMessageFailed(String messageId) throws MessageEventException {
-        ebMSDAO.getEbMSMessageProperties(messageId)
-                .ifPresent(p -> kafkaTemplate.send(MessageEventType.FAILED.name(), p));
-    }
-
-    @Override
-    public void onMessageExpired(String messageId) throws MessageEventException {
-        ebMSDAO.getEbMSMessageProperties(messageId)
-                .ifPresent(p -> kafkaTemplate.send(MessageEventType.EXPIRED.name(), p));
-    }
+	@Override
+	public void onMessageExpired(String messageId) throws MessageEventException
+	{
+		ebMSDAO.getEbMSMessageProperties(messageId).ifPresent(p -> kafkaTemplate.send(MessageEventType.EXPIRED.name(),p));
+	}
 }

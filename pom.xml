@@ -87,7 +87,6 @@
 		<activemq.version>5.16.2</activemq.version>
 		<httpclient.version>4.5.13</httpclient.version>
 		<surefire.version>3.0.0-M5</surefire.version>
-		<querydsl.version>4.4.0</querydsl.version>
 		<checkstyle.config.location>${basedir}/resources/reporting/checkstyle.xml</checkstyle.config.location>
 		<checkstyle.header.file>${basedir}/resources/reporting/license.txt</checkstyle.header.file>
 		<checkstyle.cache.file>${project.build.directory}/checkstyle-cachefile</checkstyle.cache.file>

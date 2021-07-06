@@ -22,14 +22,14 @@ import org.springframework.stereotype.Component;
 
 @Component
 @Conditional(DeliveryTaskHandlerConfig.KafkaTaskHandlerType.class)
-public class KafkaDeliveryTaskListener {
+public class KafkaDeliveryTaskListener
+{
+	@Autowired
+	DeliveryTaskHandler deliveryTaskHandler;
 
-    @Autowired
-    DeliveryTaskHandler deliveryTaskHandler;
-
-    @KafkaListener(topics = QuartzKafkaDeliveryTaskManager.KAFKA_TOPIC_NAME)
-    public void onMessage(DeliveryTask task) {
-        deliveryTaskHandler.handle(task);
-    }
-
+	@KafkaListener(topics = QuartzKafkaDeliveryTaskManager.KAFKA_TOPIC_NAME)
+	public void onMessage(DeliveryTask task)
+	{
+		deliveryTaskHandler.handle(task);
+	}
 }
