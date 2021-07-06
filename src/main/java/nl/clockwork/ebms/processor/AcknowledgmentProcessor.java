@@ -100,8 +100,12 @@ class AcknowledgmentProcessor
 				cpaManager.getReceiveDeliveryChannel(messageHeader.getCPAId(),messageHeader.getTo().getPartyId(),messageHeader.getTo().getRole(),service,messageHeader.getAction())
 				.orElseThrow(() -> StreamUtils.illegalStateException("ReceiveDeliveryChannel",messageHeader.getCPAId(),messageHeader.getTo().getPartyId(),messageHeader.getTo().getRole(),service,messageHeader.getAction()));
 		val persistTime = CPAUtils.getPersistTime(messageHeader.getMessageData().getTimestamp(),deliveryChannel);
-		ebMSDAO.insertMessage(timestamp,persistTime,messageDocument.getMessage(),message,message.getAttachments(),EbMSMessageStatus.RECEIVED);
-		ebMSDAO.insertMessage(timestamp,persistTime,acknowledgmentDocument.getMessage(),acknowledgment,Collections.emptyList(),null);
+		Runnable runnable = () ->
+		{
+			ebMSDAO.insertMessage(timestamp,persistTime,messageDocument.getMessage(),message,message.getAttachments(),EbMSMessageStatus.RECEIVED);
+			ebMSDAO.insertMessage(timestamp,persistTime,acknowledgmentDocument.getMessage(),acknowledgment,Collections.emptyList(),null);
+		};
+		ebMSDAO.executeTransaction(runnable);
 	}
 
 	private void storeDeliveryTask(EbMSAcknowledgment acknowledgment, boolean isSyncReply)

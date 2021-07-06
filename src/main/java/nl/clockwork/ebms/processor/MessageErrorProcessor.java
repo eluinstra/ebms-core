@@ -107,8 +107,12 @@ class MessageErrorProcessor
 		val deliveryChannel = cpaManager.getReceiveDeliveryChannel(messageHeader.getCPAId(),messageHeader.getTo().getPartyId(),messageHeader.getTo().getRole(),service,messageHeader.getAction())
 				.orElse(null);
 		val persistTime = deliveryChannel != null ? CPAUtils.getPersistTime(timestamp,deliveryChannel) : null;
-		ebMSDAO.insertMessage(timestamp,persistTime,messageDocument.getMessage(),message,message.getAttachments(),EbMSMessageStatus.FAILED);
-		ebMSDAO.insertMessage(timestamp,persistTime,messageErrorDocument.getMessage(),messageError,Collections.emptyList(),null);
+		Runnable runnable = () ->
+		{
+			ebMSDAO.insertMessage(timestamp,persistTime,messageDocument.getMessage(),message,message.getAttachments(),EbMSMessageStatus.FAILED);
+			ebMSDAO.insertMessage(timestamp,persistTime,messageErrorDocument.getMessage(),messageError,Collections.emptyList(),null);
+		};
+		ebMSDAO.executeTransaction(runnable);
 	}
 
 	private void storeDeliveryTask(String cpaId, DeliveryChannel sendDeliveryChannel, DeliveryChannel receiveDeliveryChannel, EbMSMessageError messageError, boolean isSyncReply)
