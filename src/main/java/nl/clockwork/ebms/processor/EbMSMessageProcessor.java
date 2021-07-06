@@ -27,7 +27,6 @@ import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.xpath.XPathExpressionException;
 
 import org.slf4j.MDC;
-import org.springframework.transaction.annotation.Transactional;
 import org.xml.sax.SAXException;
 
 import lombok.AccessLevel;
@@ -67,7 +66,6 @@ import nl.clockwork.ebms.validation.XSDValidator;
 
 @Slf4j
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-@Transactional(transactionManager = "dataSourceTransactionManager")
 public class EbMSMessageProcessor
 {
   @NonNull
@@ -295,22 +293,30 @@ public class EbMSMessageProcessor
 
 	private void storeMessage(final Instant timestamp, final EbMSDocument messageDocument, final EbMSMessage message)
 	{
-		ebMSDAO.insertMessage(timestamp,null,messageDocument.getMessage(),message,message.getAttachments(),EbMSMessageStatus.RECEIVED);
-		messageEventListener.onMessageReceived(message.getMessageHeader().getMessageData().getMessageId());
+		Runnable runnable = () ->
+		{
+			ebMSDAO.insertMessage(timestamp,null,messageDocument.getMessage(),message,message.getAttachments(),EbMSMessageStatus.RECEIVED);
+			messageEventListener.onMessageReceived(message.getMessageHeader().getMessageData().getMessageId());
+		};
+		ebMSDAO.executeTransaction(runnable);
 	}
 
 	private void processMessage(final EbMSMessage message)
 	{
 		val messageHeader = message.getMessageHeader();
-		if (ebMSDAO.updateMessage(
-				messageHeader .getMessageData().getMessageId(),
-				EbMSMessageStatus.CREATED,
-				EbMSMessageStatus.DELIVERED) > 0)
+		Runnable runnable = () ->
 		{
-			messageEventListener.onMessageDelivered(messageHeader.getMessageData().getMessageId());
-			if (deleteEbMSAttachmentsOnMessageProcessed)
-				ebMSDAO.deleteAttachments(messageHeader.getMessageData().getMessageId());
-		}
+			if (ebMSDAO.updateMessage(
+					messageHeader .getMessageData().getMessageId(),
+					EbMSMessageStatus.CREATED,
+					EbMSMessageStatus.DELIVERED) > 0)
+			{
+				messageEventListener.onMessageDelivered(messageHeader.getMessageData().getMessageId());
+				if (deleteEbMSAttachmentsOnMessageProcessed)
+					ebMSDAO.deleteAttachments(messageHeader.getMessageData().getMessageId());
+			}
+		};
+		ebMSDAO.executeTransaction(runnable);
 	}
 
 	private EbMSDocument processStatusRequest(Instant timestamp, EbMSStatusRequest statusRequest) throws DatatypeConfigurationException, JAXBException, SOAPException, ParserConfigurationException, SAXException, IOException, TransformerFactoryConfigurationError, TransformerException

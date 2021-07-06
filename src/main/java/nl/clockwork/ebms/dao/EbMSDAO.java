@@ -21,21 +21,22 @@ import java.util.Optional;
 
 import org.w3c.dom.Document;
 
-import com.querydsl.core.BooleanBuilder;
-
+import io.vavr.Tuple2;
+import lombok.val;
 import nl.clockwork.ebms.EbMSAction;
 import nl.clockwork.ebms.EbMSMessageStatus;
 import nl.clockwork.ebms.model.EbMSAttachment;
 import nl.clockwork.ebms.model.EbMSBaseMessage;
 import nl.clockwork.ebms.model.EbMSDocument;
 import nl.clockwork.ebms.model.EbMSMessageProperties;
-import nl.clockwork.ebms.model.QEbmsMessage;
-import nl.clockwork.ebms.service.model.Message;
 import nl.clockwork.ebms.service.model.MTOMMessage;
+import nl.clockwork.ebms.service.model.Message;
 import nl.clockwork.ebms.service.model.MessageFilter;
 
 public interface EbMSDAO
 {
+	void executeTransaction(Runnable runnable);
+
 	boolean existsMessage(String messageId);
 	boolean existsIdenticalMessage(EbMSBaseMessage message);
 
@@ -52,44 +53,75 @@ public interface EbMSDAO
 	List<String> getMessageIds(MessageFilter messageFilter, EbMSMessageStatus status);
 	List<String> getMessageIds(MessageFilter messageFilter, EbMSMessageStatus status, int maxNr);
 
-	long insertMessage(Instant timestamp, Instant persistTime, Document document, EbMSBaseMessage message, List<EbMSAttachment> attachments, EbMSMessageStatus status);
-	long insertDuplicateMessage(Instant timestamp, Document document, EbMSBaseMessage message, List<EbMSAttachment> attachments);
+	String insertMessage(Instant timestamp, Instant persistTime, Document document, EbMSBaseMessage message, List<EbMSAttachment> attachments, EbMSMessageStatus status);
+	Tuple2<String,Integer> insertDuplicateMessage(Instant timestamp, Document document, EbMSBaseMessage message, List<EbMSAttachment> attachments);
 
-	long updateMessage(String messageId, EbMSMessageStatus oldStatus, EbMSMessageStatus newStatus);
+	int updateMessage(String messageId, EbMSMessageStatus oldStatus, EbMSMessageStatus newStatus);
 
-	long deleteAttachments(String messageId);
+	int deleteAttachments(String messageId);
 
-	static BooleanBuilder applyFilter(QEbmsMessage table, MessageFilter messageFilter, BooleanBuilder builder)
+	public static String getMessageFilter(MessageFilter messageFilter, List<Object> parameters)
 	{
+		val result = new StringBuffer();
 		if (messageFilter != null)
 		{
 			if (messageFilter.getCpaId() != null)
-				builder.and(table.cpaId.eq(messageFilter.getCpaId()));
+			{
+				parameters.add(messageFilter.getCpaId());
+				result.append(" and ebms_message.cpa_id = ?");
+			}
 			if (messageFilter.getFromParty() != null)
 			{
 				if (messageFilter.getFromParty().getPartyId() != null)
-					builder.and(table.fromPartyId.eq(messageFilter.getFromParty().getPartyId()));
+				{
+					parameters.add(messageFilter.getFromParty().getPartyId());
+					result.append(" and ebms_message.from_party_id = ?");
+				}
 				if (messageFilter.getFromParty().getRole() != null)
-					builder.and(table.fromRole.eq(messageFilter.getFromParty().getRole()));
+				{
+					parameters.add(messageFilter.getFromParty().getRole());
+					result.append(" and ebms_message.from_role = ?");
+				}
 			}
 			if (messageFilter.getToParty() != null)
 			{
 				if (messageFilter.getToParty().getPartyId() != null)
-					builder.and(table.toPartyId.eq(messageFilter.getToParty().getPartyId()));
+				{
+					parameters.add(messageFilter.getToParty().getPartyId());
+					result.append(" and ebms_message.to_party_id = ?");
+				}
 				if (messageFilter.getToParty().getRole() != null)
-					builder.and(table.toRole.eq(messageFilter.getToParty().getRole()));
+				{
+					parameters.add(messageFilter.getToParty().getRole());
+					result.append(" and ebms_message.to_role = ?");
+				}
 			}
 			if (messageFilter.getService() != null)
-				builder.and(table.service.eq(messageFilter.getService()));
+			{
+				parameters.add(messageFilter.getService());
+				result.append(" and ebms_message.service = ?");
+			}
 			if (messageFilter.getAction() != null)
-				builder.and(table.action.eq(messageFilter.getAction()));
+			{
+				parameters.add(messageFilter.getAction());
+				result.append(" and ebms_message.action = ?");
+			}
 			if (messageFilter.getConversationId() != null)
-				builder.and(table.conversationId.eq(messageFilter.getConversationId()));
+			{
+				parameters.add(messageFilter.getConversationId());
+				result.append(" and ebms_message.conversation_id = ?");
+			}
 			if (messageFilter.getMessageId() != null)
-				builder.and(table.messageId.eq(messageFilter.getMessageId()));
+			{
+				parameters.add(messageFilter.getMessageId());
+				result.append(" and ebms_message.message_id = ?");
+			}
 			if (messageFilter.getRefToMessageId() != null)
-				builder.and(table.refToMessageId.eq(messageFilter.getRefToMessageId()));
+			{
+				parameters.add(messageFilter.getRefToMessageId());
+				result.append(" and ebms_message.ref_to_message_id = ?");
+			}
 		}
-		return builder;
+		return result.toString();
 	}
 }

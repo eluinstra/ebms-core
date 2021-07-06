@@ -15,13 +15,15 @@
  */
 package nl.clockwork.ebms.cpa.certificate;
 
+import javax.sql.DataSource;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
-import com.querydsl.sql.SQLQueryFactory;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 import lombok.AccessLevel;
+import lombok.val;
 import lombok.experimental.FieldDefaults;
 
 @Configuration
@@ -29,7 +31,7 @@ import lombok.experimental.FieldDefaults;
 public class CertificateMappingServiceConfig
 {
 	@Autowired
-	SQLQueryFactory queryFactory;
+	DataSource dataSource;
 
 	@Bean
 	public CertificateMappingService certificateMappingService()
@@ -46,6 +48,7 @@ public class CertificateMappingServiceConfig
 	@Bean
 	public CertificateMappingDAO certificateMappingDAO()
 	{
-		return new CertificateMappingDAOImpl(queryFactory);
+		val jdbcTemplate = new JdbcTemplate(dataSource);
+		return new CertificateMappingDAOImpl(jdbcTemplate);
 	}
 }

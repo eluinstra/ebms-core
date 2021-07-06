@@ -123,62 +123,6 @@
 				</plugins>
 			</build>
 		</profile>
-		<profile>
-			<id>querydsl-gen</id>
-			<activation>
-				<activeByDefault>false</activeByDefault>
-			</activation>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>com.querydsl</groupId>
-						<artifactId>querydsl-maven-plugin</artifactId>
-						<version>${querydsl.version}</version>
-						<executions>
-							<execution>
-								<goals>
-									<goal>export</goal>
-								</goals>
-							</execution>
-						</executions>
-						<configuration>
-							<jdbcDriver>org.hsqldb.jdbcDriver</jdbcDriver>
-							<jdbcUrl>jdbc:hsqldb:hsql://localhost:9001/ebms</jdbcUrl>
-							<packageName>nl.clockwork.ebms.querydsl.model</packageName>
-							<targetFolder>${project.basedir}/target/generated-sources/java</targetFolder>
-							<customTypes>
-								<customType>nl.clockwork.ebms.querydsl.CollaborationProtocolAgreementType</customType>
-								<customType>nl.clockwork.ebms.querydsl.X509CertificateType</customType>
-							</customTypes>
-							<typeMappings>
-								<typeMapping>
-									<table>CPA</table>
-									<column>CPA</column>
-									<type>org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CollaborationProtocolAgreement</type>
-								</typeMapping>
-								<typeMapping>
-									<table>CERTIFICATE_MAPPING</table>
-									<column>SOURCE</column>
-									<type>java.security.cert.X509Certificate</type>
-								</typeMapping>
-								<typeMapping>
-									<table>CERTIFICATE_MAPPING</table>
-									<column>DESTINATION</column>
-									<type>java.security.cert.X509Certificate</type>
-								</typeMapping>
-							</typeMappings>
-						</configuration>
-						<dependencies>
-							<dependency>
-								<groupId>org.hsqldb</groupId>
-								<artifactId>hsqldb</artifactId>
-								<version>2.5.2</version>
-							</dependency>
-						</dependencies>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
 	</profiles>
 	<dependencies>
 		<dependency>
@@ -262,7 +206,6 @@
 		    <version>3.4.3</version>
 		    <scope>provided</scope>
 		</dependency>
-
 		
 		<!-- jaxb -->
 		<dependency>
@@ -314,24 +257,6 @@
 			<scope>provided</scope>
 		</dependency>
 		
-		<!-- querydsl -->
-		<dependency>
-			<groupId>com.querydsl</groupId>
-			<artifactId>querydsl-sql</artifactId>
-			<version>${querydsl.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.querydsl</groupId>
-			<artifactId>querydsl-sql-spring</artifactId>
-			<version>${querydsl.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>com.querydsl</groupId>
-			<artifactId>querydsl-sql-codegen</artifactId>
-			<version>${querydsl.version}</version>
-			<scope>provided</scope>
-		</dependency>
-
 		<!-- caching -->
 		<dependency>
 			<groupId>net.sf.ehcache</groupId>

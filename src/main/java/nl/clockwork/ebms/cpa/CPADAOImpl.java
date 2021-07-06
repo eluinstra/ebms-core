@@ -18,82 +18,101 @@ package nl.clockwork.ebms.cpa;
 import java.util.List;
 import java.util.Optional;
 
+import javax.xml.bind.JAXBException;
+import javax.xml.parsers.ParserConfigurationException;
+
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CollaborationProtocolAgreement;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
-
-import com.querydsl.sql.SQLQueryFactory;
+import org.springframework.dao.DataRetrievalFailureException;
+import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.xml.sax.SAXException;
 
 import lombok.AccessLevel;
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import lombok.val;
 import lombok.experimental.FieldDefaults;
+import nl.clockwork.ebms.jaxb.JAXBParser;
 
-@FieldDefaults(level = AccessLevel.PROTECTED, makeFinal = true)
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @RequiredArgsConstructor
 class CPADAOImpl implements CPADAO
 {
-	@NonNull
-	SQLQueryFactory queryFactory;
-	@NonNull
-	QCpa table = QCpa.cpa1;
+	JdbcTemplate jdbcTemplate;
 
 	@Override
 	@Cacheable(cacheNames = "CPA", keyGenerator = "ebMSKeyGenerator")
 	public boolean existsCPA(String cpaId)
 	{
-		return queryFactory.select(table.cpaId.count())
-				.from(table)
-				.where(table.cpaId.eq(cpaId))
-				.fetchOne() > 0;
+		return jdbcTemplate.queryForObject("select count(*) from cpa where cpa_id = ?",Integer.class,cpaId) > 0;
 	}
 	
 	@Override
 	@Cacheable(cacheNames = "CPA", keyGenerator = "ebMSKeyGenerator")
 	public Optional<CollaborationProtocolAgreement> getCPA(String cpaId)
 	{
-		return Optional.ofNullable(queryFactory.select(table.cpa)
-				.from(table)
-				.where(table.cpaId.eq(cpaId))
-				.fetchOne());
+		try
+		{
+			val result = jdbcTemplate.queryForObject("select cpa from cpa where cpa_id = ?",String.class,cpaId);
+			return Optional.of(JAXBParser.getInstance(CollaborationProtocolAgreement.class).handle(result));
+		}
+		catch(EmptyResultDataAccessException e)
+		{
+			return Optional.empty();
+		}
+		catch (JAXBException | SAXException | ParserConfigurationException e)
+		{
+			throw new DataRetrievalFailureException("",e);
+		}
 	}
 
 	@Override
 	@Cacheable(cacheNames = "CPA", keyGenerator = "ebMSKeyGenerator")
 	public List<String> getCPAIds()
 	{
-		return queryFactory.select(table.cpaId)
-				.from(table)
-				.orderBy(table.cpaId.asc())
-				.fetch();
+		return jdbcTemplate.queryForList("select cpa_id from cpa order by cpa_id asc",String.class);
 	}
 
 	@Override
 	@CacheEvict(cacheNames = "CPA", allEntries = true)
-	public long insertCPA(CollaborationProtocolAgreement cpa)
+	public String insertCPA(CollaborationProtocolAgreement cpa)
 	{
-		return queryFactory.insert(table)
-				.set(table.cpaId,cpa.getCpaid())
-				.set(table.cpa,cpa)
-				.execute();
+		try
+		{
+			jdbcTemplate.update(
+				"insert into cpa (cpa_id,cpa) values (?,?)",
+				cpa.getCpaid(),
+				JAXBParser.getInstance(CollaborationProtocolAgreement.class).handle(cpa));
+			return cpa.getCpaid();
+		}
+		catch (JAXBException e)
+		{
+			throw new IllegalArgumentException(e);
+		}
 	}
 
 	@Override
 	@CacheEvict(cacheNames = "CPA", allEntries = true)
-	public long updateCPA(CollaborationProtocolAgreement cpa)
+	public int updateCPA(CollaborationProtocolAgreement cpa)
 	{
-		return queryFactory.update(table)
-				.set(table.cpa,cpa)
-				.where(table.cpaId.eq(cpa.getCpaid()))
-				.execute();
+		try
+		{
+			return jdbcTemplate.update(
+				"update cpa set cpa = ? where cpa_id = ?",
+				JAXBParser.getInstance(CollaborationProtocolAgreement.class).handle(cpa),
+				cpa.getCpaid());
+		}
+		catch (JAXBException e)
+		{
+			throw new IllegalArgumentException(e);
+		}
 	}
 
 	@Override
 	@CacheEvict(cacheNames = "CPA", allEntries = true)
-	public long deleteCPA(String cpaId)
+	public int deleteCPA(String cpaId)
 	{
-		return queryFactory.delete(table)
-				.where(table.cpaId.eq(cpaId))
-				.execute();
+		return jdbcTemplate.update("delete from cpa where cpa_id = ?",cpaId);
 	}
 }

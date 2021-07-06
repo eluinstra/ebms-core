@@ -16,6 +16,7 @@
 package nl.clockwork.ebms.service.model;
 
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
 @Mapper
@@ -23,5 +24,9 @@ public interface MessageMapper
 {
 	public MessageMapper INSTANCE = Mappers.getMapper(MessageMapper.class);
 
+	@Mapping(source = "properties.fromParty.partyId", target = "properties.fromPartyId")
+	@Mapping(source = "properties.fromParty.role", target = "properties.fromRole")
+	@Mapping(source = "properties.toParty.partyId", target = "properties.toPartyId")
+	@Mapping(source = "properties.toParty.role", target = "properties.toRole")
 	MessageRequest toMessage(Message message);
 }

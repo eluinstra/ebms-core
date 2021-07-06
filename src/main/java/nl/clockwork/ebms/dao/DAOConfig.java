@@ -18,11 +18,12 @@ package nl.clockwork.ebms.dao;
 import javax.sql.DataSource;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.core.JdbcTemplate;
-
-import com.querydsl.sql.SQLQueryFactory;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import lombok.AccessLevel;
 import lombok.val;
@@ -33,14 +34,16 @@ import lombok.experimental.FieldDefaults;
 public abstract class DAOConfig
 {
 	@Autowired
-	DataSource dataSource;
+	@Qualifier("dataSourceTransactionManager")
+	PlatformTransactionManager dataSourceTransactionManager;
 	@Autowired
-	SQLQueryFactory queryFactory;
+	DataSource dataSource;
 
 	@Bean
 	public EbMSDAOFactory ebMSDAO()
 	{
+		val transactionTemplate = new TransactionTemplate(dataSourceTransactionManager);
 		val jdbcTemplate = new JdbcTemplate(dataSource);
-		return new EbMSDAOFactory(dataSource,jdbcTemplate,queryFactory);
+		return new EbMSDAOFactory(dataSource,transactionTemplate,jdbcTemplate);
 	}
 }

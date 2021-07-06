@@ -82,9 +82,13 @@ class AcknowledgmentProcessor
 		val acknowledgment = createAcknowledgment(timestamp,messageDocument,message);
 		val acknowledgmentDocument = EbMSMessageUtils.getEbMSDocument(acknowledgment);
 		signatureGenerator.generate(message.getAckRequested(),acknowledgmentDocument,acknowledgment);
-		storeMessages(timestamp,messageDocument,message,acknowledgmentDocument,acknowledgment);
-		storeDeliveryTask(acknowledgment,isSyncReply);
-		messageEventListener.onMessageReceived(message.getMessageHeader().getMessageData().getMessageId());
+		Runnable runnable = () ->
+		{
+			storeMessages(timestamp,messageDocument,message,acknowledgmentDocument,acknowledgment);
+			storeDeliveryTask(acknowledgment,isSyncReply);
+			messageEventListener.onMessageReceived(message.getMessageHeader().getMessageData().getMessageId());
+		};
+		ebMSDAO.executeTransaction(runnable);
 		return acknowledgmentDocument;
 	}
 
@@ -150,15 +154,19 @@ class AcknowledgmentProcessor
 	{
 		val responseMessageHeader = acknowledgment.getMessageHeader();
 		val persistTime = ebMSDAO.getPersistTime(responseMessageHeader.getMessageData().getRefToMessageId());
-		ebMSDAO.insertMessage(timestamp,persistTime.orElse(null),acknowledgmentDocument.getMessage(),acknowledgment,Collections.emptyList(),null);
-		if (ebMSDAO.updateMessage(
-				responseMessageHeader.getMessageData().getRefToMessageId(),
-				EbMSMessageStatus.CREATED,
-				EbMSMessageStatus.DELIVERED) > 0)
+		Runnable runnable = () ->
 		{
-			messageEventListener.onMessageDelivered(responseMessageHeader.getMessageData().getRefToMessageId());
-			if (deleteEbMSAttachmentsOnMessageProcessed)
-				ebMSDAO.deleteAttachments(responseMessageHeader.getMessageData().getRefToMessageId());
-		}
+			ebMSDAO.insertMessage(timestamp,persistTime.orElse(null),acknowledgmentDocument.getMessage(),acknowledgment,Collections.emptyList(),null);
+			if (ebMSDAO.updateMessage(
+					responseMessageHeader.getMessageData().getRefToMessageId(),
+					EbMSMessageStatus.CREATED,
+					EbMSMessageStatus.DELIVERED) > 0)
+			{
+				messageEventListener.onMessageDelivered(responseMessageHeader.getMessageData().getRefToMessageId());
+				if (deleteEbMSAttachmentsOnMessageProcessed)
+					ebMSDAO.deleteAttachments(responseMessageHeader.getMessageData().getRefToMessageId());
+			}
+		};
+		ebMSDAO.executeTransaction(runnable);
 	}
 }

@@ -16,14 +16,15 @@
 package nl.clockwork.ebms.delivery.task;
 
 import java.time.Instant;
-import lombok.*;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NonNull;
 
 @Builder
-//@Value // TODO: uitgecomment voor auto creation
+@Data
 @AllArgsConstructor
-@NoArgsConstructor
-@Getter
-@Setter
 public class DeliveryTask
 {
 	@NonNull
