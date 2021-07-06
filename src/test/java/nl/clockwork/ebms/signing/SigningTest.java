@@ -83,7 +83,7 @@ public class SigningTest
 	@BeforeAll
 	public void init() throws Exception
 	{
-		MockitoAnnotations.initMocks(this);
+		MockitoAnnotations.openMocks(this);
 		Init.init();
 		cpaManager = initCPAManager();
 		messageFactory = initMessageFactory(cpaManager);

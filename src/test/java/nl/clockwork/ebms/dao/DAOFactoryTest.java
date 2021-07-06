@@ -21,17 +21,13 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.beans.PropertyVetoException;
 
-import javax.sql.DataSource;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import com.atomikos.jdbc.internal.AtomikosSQLException;
-import com.querydsl.sql.Configuration;
-import com.querydsl.sql.HSQLDBTemplates;
-import com.querydsl.sql.SQLQueryFactory;
-import com.querydsl.sql.spring.SpringConnectionProvider;
 import com.zaxxer.hikari.HikariDataSource;
 
 import lombok.AccessLevel;
@@ -49,14 +45,9 @@ public class DAOFactoryTest
 	public void init() throws AtomikosSQLException, PropertyVetoException
 	{
 		ds = new HikariDataSource();
+		val transactionTemplate = new TransactionTemplate(new DataSourceTransactionManager(ds));
 		val jdbcTemplate = new JdbcTemplate(ds);
-		daoFactory = new EbMSDAOFactory(ds,jdbcTemplate,createQueryFactory(ds));
-	}
-
-	private SQLQueryFactory createQueryFactory(DataSource dataSource) throws AtomikosSQLException, PropertyVetoException
-	{
-		val provider = new SpringConnectionProvider(dataSource);
-		return new SQLQueryFactory(new Configuration(HSQLDBTemplates.builder().build()),provider);
+		daoFactory = new EbMSDAOFactory(ds,transactionTemplate,jdbcTemplate);
 	}
 
 	@Test

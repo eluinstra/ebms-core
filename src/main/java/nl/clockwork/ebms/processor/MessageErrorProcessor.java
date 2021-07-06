@@ -88,9 +88,13 @@ class MessageErrorProcessor
 				.orElse(null);
 		val receiveDeliveryChannel = cpaManager.getReceiveDeliveryChannel(messageHeader.getCPAId(),messageError.getMessageHeader().getTo().getPartyId(),messageError.getMessageHeader().getTo().getRole(),service,messageError.getMessageHeader().getAction())
 				.orElse(null);
-		storeMessages(timestamp,messageDocument,message,result,messageError);
-		if (receiveDeliveryChannel != null)
-			storeEvent(messageHeader.getCPAId(),sendDeliveryChannel,receiveDeliveryChannel,messageError,isSyncReply);
+		Runnable runnable = () ->
+		{
+			storeMessages(timestamp,messageDocument,message,result,messageError);
+			if (receiveDeliveryChannel != null)
+				storeEvent(messageHeader.getCPAId(),sendDeliveryChannel,receiveDeliveryChannel,messageError,isSyncReply);
+		};
+		ebMSDAO.executeTransaction(runnable);
 		if (!isSyncReply && receiveDeliveryChannel == null)
 			throw new ValidationException(DOMUtils.toString(result.getMessage()));
 		return result;
@@ -103,8 +107,12 @@ class MessageErrorProcessor
 		val deliveryChannel = cpaManager.getReceiveDeliveryChannel(messageHeader.getCPAId(),messageHeader.getTo().getPartyId(),messageHeader.getTo().getRole(),service,messageHeader.getAction())
 				.orElse(null);
 		val persistTime = deliveryChannel != null ? CPAUtils.getPersistTime(timestamp,deliveryChannel) : null;
-		ebMSDAO.insertMessage(timestamp,persistTime,messageDocument.getMessage(),message,message.getAttachments(),EbMSMessageStatus.FAILED);
-		ebMSDAO.insertMessage(timestamp,persistTime,messageErrorDocument.getMessage(),messageError,Collections.emptyList(),null);
+		Runnable runnable = () ->
+		{
+			ebMSDAO.insertMessage(timestamp,persistTime,messageDocument.getMessage(),message,message.getAttachments(),EbMSMessageStatus.FAILED);
+			ebMSDAO.insertMessage(timestamp,persistTime,messageErrorDocument.getMessage(),messageError,Collections.emptyList(),null);
+		};
+		ebMSDAO.executeTransaction(runnable);
 	}
 
 	private void storeEvent(String cpaId, DeliveryChannel sendDeliveryChannel, DeliveryChannel receiveDeliveryChannel, EbMSMessageError messageError, boolean isSyncReply)
@@ -152,15 +160,19 @@ class MessageErrorProcessor
 	{
 		val responseMessageHeader = messageError.getMessageHeader();
 		val persistTime = ebMSDAO.getPersistTime(responseMessageHeader.getMessageData().getRefToMessageId());
-		ebMSDAO.insertMessage(timestamp,persistTime.orElse(null),messageErrorDocument.getMessage(),messageError,Collections.emptyList(),null);
-		if (ebMSDAO.updateMessage(
-				responseMessageHeader.getMessageData().getRefToMessageId(),
-				EbMSMessageStatus.CREATED,
-				EbMSMessageStatus.DELIVERY_FAILED) > 0)
+		Runnable runnable = () ->
 		{
-			eventListener.onMessageFailed(responseMessageHeader.getMessageData().getRefToMessageId());
-			if (deleteEbMSAttachmentsOnMessageProcessed)
-				ebMSDAO.deleteAttachments(responseMessageHeader.getMessageData().getRefToMessageId());
-		}
+			ebMSDAO.insertMessage(timestamp,persistTime.orElse(null),messageErrorDocument.getMessage(),messageError,Collections.emptyList(),null);
+			if (ebMSDAO.updateMessage(
+					responseMessageHeader.getMessageData().getRefToMessageId(),
+					EbMSMessageStatus.CREATED,
+					EbMSMessageStatus.DELIVERY_FAILED) > 0)
+			{
+				eventListener.onMessageFailed(responseMessageHeader.getMessageData().getRefToMessageId());
+				if (deleteEbMSAttachmentsOnMessageProcessed)
+					ebMSDAO.deleteAttachments(responseMessageHeader.getMessageData().getRefToMessageId());
+			}
+		};
+		ebMSDAO.executeTransaction(runnable);
 	}
 }

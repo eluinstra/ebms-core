@@ -82,9 +82,13 @@ class AcknowledgmentProcessor
 		val acknowledgment = createAcknowledgment(timestamp,messageDocument,message);
 		val acknowledgmentDocument = EbMSMessageUtils.getEbMSDocument(acknowledgment);
 		signatureGenerator.generate(message.getAckRequested(),acknowledgmentDocument,acknowledgment);
-		storeMessages(timestamp,messageDocument,message,acknowledgmentDocument,acknowledgment);
-		storeEvent(acknowledgment,isSyncReply);
-		eventListener.onMessageReceived(message.getMessageHeader().getMessageData().getMessageId());
+		Runnable runnable = () ->
+		{
+			storeMessages(timestamp,messageDocument,message,acknowledgmentDocument,acknowledgment);
+			storeEvent(acknowledgment,isSyncReply);
+			eventListener.onMessageReceived(message.getMessageHeader().getMessageData().getMessageId());
+		};
+		ebMSDAO.executeTransaction(runnable);
 		return acknowledgmentDocument;
 	}
 
@@ -96,8 +100,12 @@ class AcknowledgmentProcessor
 				cpaManager.getReceiveDeliveryChannel(messageHeader.getCPAId(),messageHeader.getTo().getPartyId(),messageHeader.getTo().getRole(),service,messageHeader.getAction())
 				.orElseThrow(() -> StreamUtils.illegalStateException("ReceiveDeliveryChannel",messageHeader.getCPAId(),messageHeader.getTo().getPartyId(),messageHeader.getTo().getRole(),service,messageHeader.getAction()));
 		val persistTime = CPAUtils.getPersistTime(messageHeader.getMessageData().getTimestamp(),deliveryChannel);
-		ebMSDAO.insertMessage(timestamp,persistTime,messageDocument.getMessage(),message,message.getAttachments(),EbMSMessageStatus.RECEIVED);
-		ebMSDAO.insertMessage(timestamp,persistTime,acknowledgmentDocument.getMessage(),acknowledgment,Collections.emptyList(),null);
+		Runnable runnable = () ->
+		{
+			ebMSDAO.insertMessage(timestamp,persistTime,messageDocument.getMessage(),message,message.getAttachments(),EbMSMessageStatus.RECEIVED);
+			ebMSDAO.insertMessage(timestamp,persistTime,acknowledgmentDocument.getMessage(),acknowledgment,Collections.emptyList(),null);
+		};
+		ebMSDAO.executeTransaction(runnable);
 	}
 
 	private void storeEvent(EbMSAcknowledgment acknowledgment, boolean isSyncReply)
@@ -149,15 +157,19 @@ class AcknowledgmentProcessor
 	{
 		val responseMessageHeader = acknowledgment.getMessageHeader();
 		val persistTime = ebMSDAO.getPersistTime(responseMessageHeader.getMessageData().getRefToMessageId());
-		ebMSDAO.insertMessage(timestamp,persistTime.orElse(null),acknowledgmentDocument.getMessage(),acknowledgment,Collections.emptyList(),null);
-		if (ebMSDAO.updateMessage(
-				responseMessageHeader.getMessageData().getRefToMessageId(),
-				EbMSMessageStatus.CREATED,
-				EbMSMessageStatus.DELIVERED) > 0)
+		Runnable runnable = () ->
 		{
-			eventListener.onMessageDelivered(responseMessageHeader.getMessageData().getRefToMessageId());
-			if (deleteEbMSAttachmentsOnMessageProcessed)
-				ebMSDAO.deleteAttachments(responseMessageHeader.getMessageData().getRefToMessageId());
-		}
+			ebMSDAO.insertMessage(timestamp,persistTime.orElse(null),acknowledgmentDocument.getMessage(),acknowledgment,Collections.emptyList(),null);
+			if (ebMSDAO.updateMessage(
+					responseMessageHeader.getMessageData().getRefToMessageId(),
+					EbMSMessageStatus.CREATED,
+					EbMSMessageStatus.DELIVERED) > 0)
+			{
+				eventListener.onMessageDelivered(responseMessageHeader.getMessageData().getRefToMessageId());
+				if (deleteEbMSAttachmentsOnMessageProcessed)
+					ebMSDAO.deleteAttachments(responseMessageHeader.getMessageData().getRefToMessageId());
+			}
+		};
+		ebMSDAO.executeTransaction(runnable);
 	}
 }

@@ -25,7 +25,6 @@ import javax.xml.soap.SOAPException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactoryConfigurationError;
 
-import org.springframework.transaction.annotation.Transactional;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
@@ -65,7 +64,6 @@ import nl.clockwork.ebms.validation.EbMSMessageContextValidator;
 @Builder
 @FieldDefaults(level = AccessLevel.PACKAGE, makeFinal = true)
 @AllArgsConstructor
-@Transactional(transactionManager = "dataSourceTransactionManager")
 class EbMSMessageServiceHandler
 {
   @NonNull
@@ -233,12 +231,16 @@ class EbMSMessageServiceHandler
 		try
 		{
 			log.debug("ProcessMessage " + messageId);
-			if (ebMSDAO.updateMessage(messageId,EbMSMessageStatus.RECEIVED,EbMSMessageStatus.PROCESSED) > 0)
+			Runnable runnable = () ->
 			{
-				if (deleteEbMSAttachmentsOnMessageProcessed)
-					ebMSDAO.deleteAttachments(messageId);
-				log.info("Message " + messageId + " processed");
-			}
+				if (ebMSDAO.updateMessage(messageId,EbMSMessageStatus.RECEIVED,EbMSMessageStatus.PROCESSED) > 0)
+				{
+					if (deleteEbMSAttachmentsOnMessageProcessed)
+						ebMSDAO.deleteAttachments(messageId);
+				}
+			};
+			ebMSDAO.executeTransaction(runnable);
+			log.info("Message " + messageId + " processed");
 		}
 		catch (Exception e)
 		{
@@ -309,8 +311,12 @@ class EbMSMessageServiceHandler
 		try
 		{
 			log.debug("ProcessMessageEvent " + messageId);
-			ebMSMessageEventDAO.processEbMSMessageEvent(messageId);
-			processMessage(messageId);
+			Runnable runnable = () ->
+			{
+				ebMSMessageEventDAO.processEbMSMessageEvent(messageId);
+				processMessage(messageId);
+			};
+			ebMSDAO.executeTransaction(runnable);
 		}
 		catch (Exception e)
 		{
@@ -339,8 +345,12 @@ class EbMSMessageServiceHandler
 							.orElseThrow(() -> StreamUtils.illegalStateException("ReceiveDeliveryChannel",messageHeader.getCPAId(),messageHeader.getTo().getPartyId(),messageHeader.getTo().getRole(),service,messageHeader.getAction()));
 			val persistTime = CPAUtils.getPersistTime(timestamp,receiveDeliveryChannel);
 			val confidential = cpaManager.isConfidential(messageHeader.getCPAId(),messageHeader.getFrom().getPartyId(),messageHeader.getFrom().getRole(),service,messageHeader.getAction());
-			ebMSDAO.insertMessage(timestamp,persistTime,document,message,message.getAttachments(),EbMSMessageStatus.CREATED);
-			eventManager.createEvent(messageHeader.getCPAId(),sendDeliveryChannel,receiveDeliveryChannel,messageHeader.getMessageData().getMessageId(),messageHeader.getMessageData().getTimeToLive(),messageHeader.getMessageData().getTimestamp(),confidential);
+			Runnable runnable = () ->
+			{
+				ebMSDAO.insertMessage(timestamp,persistTime,document,message,message.getAttachments(),EbMSMessageStatus.CREATED);
+				eventManager.createEvent(messageHeader.getCPAId(),sendDeliveryChannel,receiveDeliveryChannel,messageHeader.getMessageData().getMessageId(),messageHeader.getMessageData().getTimeToLive(),messageHeader.getMessageData().getTimestamp(),confidential);
+			};
+			ebMSDAO.executeTransaction(runnable);
 		}
 		catch (IllegalStateException | TransformerFactoryConfigurationError e)
 		{

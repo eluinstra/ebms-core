@@ -15,101 +15,108 @@
  */
 package nl.clockwork.ebms.event.processor;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.List;
 
-import com.querydsl.core.types.ConstructorExpression;
-import com.querydsl.core.types.Projections;
-import com.querydsl.sql.SQLQueryFactory;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
-import nl.clockwork.ebms.querydsl.model.QEbmsEvent;
-import nl.clockwork.ebms.querydsl.model.QEbmsEventLog;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor
-class EbMSEventDAOImpl implements EbMSEventDAO
+abstract class EbMSEventDAOImpl implements EbMSEventDAO
 {
+	@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+	@AllArgsConstructor
+	private static class EbMSEventRowMapper implements RowMapper<EbMSEvent>
+	{
+		public static final String SELECT = "select cpa_id, send_channel_id, receive_channel_id, message_id, time_to_live, time_stamp, is_confidential, retries";
+
+		@Override
+		public EbMSEvent mapRow(ResultSet rs, int rowNum) throws SQLException
+		{
+			return EbMSEvent.builder()
+					.cpaId(rs.getString("cpa_id"))
+					.sendDeliveryChannelId(rs.getString("send_channel_id"))
+					.receiveDeliveryChannelId(rs.getString("receive_channel_id"))
+					.messageId(rs.getString("message_id"))
+					.timeToLive(rs.getTimestamp("time_to_live") != null ? rs.getTimestamp("time_to_live").toInstant() : null)
+					.timestamp(rs.getTimestamp("time_stamp").toInstant())
+					.confidential(rs.getBoolean("is_confidential"))
+					.retries(rs.getInt("retries"))
+					.build();
+		}
+	}
+
 	@NonNull
-	SQLQueryFactory queryFactory;
-	QEbmsEvent table = QEbmsEvent.ebmsEvent;
-	QEbmsEventLog logTable = QEbmsEventLog.ebmsEventLog;
+	JdbcTemplate jdbcTemplate;
 
 	@Override
 	public List<EbMSEvent> getEventsBefore(Instant timestamp, String serverId)
 	{
-		return queryFactory.select(createEbMSEventProjection())
-				.from(table)
-				.where(table.timeStamp.loe(timestamp)
-						.and(serverId == null ? table.serverId.isNull() : table.serverId.eq(serverId)))
-				.orderBy(table.timeStamp.asc())
-				.fetch();
+		return jdbcTemplate.query(
+				EbMSEventRowMapper.SELECT +
+				" from ebms_event" +
+				" where time_stamp <= ?" +
+				(serverId == null ? " and server_id is null" : " and server_id = '" + serverId + "'") +
+				" order by time_stamp asc",
+				new EbMSEventRowMapper(),
+				Timestamp.from(timestamp));
 	}
+
+	public abstract String getEventsBeforeQuery(int maxNr, String serverId);
 
 	@Override
 	public List<EbMSEvent> getEventsBefore(Instant timestamp, String serverId, int maxNr)
 	{
-		return queryFactory.select(createEbMSEventProjection())
-				.from(table)
-				.where(table.timeStamp.loe(timestamp)
-						.and(serverId == null ? table.serverId.isNull() : table.serverId.eq(serverId)))
-				.orderBy(table.timeStamp.asc())
-				.limit(maxNr)
-				.fetch();
+		return jdbcTemplate.query(getEventsBeforeQuery(maxNr,serverId),new EbMSEventRowMapper(),Timestamp.from(timestamp));
 	}
 	
 	@Override
-	public long insertEvent(EbMSEvent event, String serverId)
+	public String insertEvent(EbMSEvent event, String serverId)
 	{
-		return queryFactory.insert(table)
-				.set(table.cpaId,event.getCpaId())
-				.set(table.sendChannelId,event.getSendDeliveryChannelId())
-				.set(table.receiveChannelId,event.getReceiveDeliveryChannelId())
-				.set(table.messageId,event.getMessageId())
-				.set(table.timeToLive,event.getTimeToLive())
-				.set(table.timeStamp,event.getTimestamp())
-				.set(table.isConfidential,event.isConfidential())
-				.set(table.retries,event.getRetries())
-				.set(table.serverId,serverId)
-				.execute();
+		jdbcTemplate.update(
+				"insert into ebms_event (cpa_id,send_channel_id,receive_channel_id,message_id,time_to_live,time_stamp,is_confidential,retries,server_id) values (?,?,?,?,?,?,?,?,?)",
+				event.getCpaId(),
+				event.getSendDeliveryChannelId(),
+				event.getReceiveDeliveryChannelId(),
+				event.getMessageId(),
+				event.getTimeToLive() != null ? Timestamp.from(event.getTimeToLive()) : null,
+				Timestamp.from(event.getTimestamp()),
+				event.isConfidential(),
+				event.getRetries(),
+				serverId);
+		return event.getMessageId();
 	}
 
 	@Override
-	public long updateEvent(EbMSEvent event)
+	public int updateEvent(EbMSEvent event)
 	{
-		return queryFactory.update(table)
-				.set(table.timeStamp,event.getTimestamp())
-				.set(table.retries,event.getRetries())
-				.where(table.messageId.eq(event.getMessageId()))
-				.execute();
+		return jdbcTemplate.update("update ebms_event set time_stamp = ?, retries = ? where message_id = ?",Timestamp.from(event.getTimestamp()),event.getRetries(),event.getMessageId());
 	}
 	
 	@Override
-	public long deleteEvent(String messageId)
+	public int deleteEvent(String messageId)
 	{
-		return queryFactory.delete(table)
-				.where(table.messageId.eq(messageId))
-				.execute();
+		return jdbcTemplate.update("delete from ebms_event where message_id = ?",messageId);
 	}
 
 	@Override
-	public long insertEventLog(String messageId, Instant timestamp, String uri, EbMSEventStatus status, String errorMessage)
+	public void insertEventLog(String messageId, Instant timestamp, String uri, EbMSEventStatus status, String errorMessage)
 	{
-		return queryFactory.insert(logTable)
-				.set(logTable.messageId,messageId)
-				.set(logTable.timeStamp,timestamp)
-				.set(logTable.uri,uri)
-				.set(logTable.status,status)
-				.set(logTable.errorMessage,errorMessage)
-				.execute();
-	}
-
-	private ConstructorExpression<EbMSEvent> createEbMSEventProjection()
-	{
-		return Projections.constructor(
-				EbMSEvent.class,table.cpaId,table.sendChannelId,table.receiveChannelId,table.messageId,table.timeToLive,table.timeStamp,table.isConfidential,table.retries);
+		jdbcTemplate.update(
+				"insert into ebms_event_log (message_id,time_stamp,uri,status,error_message) values (?,?,?,?,?)",
+				messageId,
+				Timestamp.from(timestamp),
+				uri,
+				status.getId(),
+				errorMessage);
 	}
 }

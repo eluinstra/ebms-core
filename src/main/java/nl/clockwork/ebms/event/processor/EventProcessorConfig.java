@@ -93,9 +93,6 @@ public class EventProcessorConfig
 	@Autowired
 	ConnectionFactory connectionFactory;
 	@Autowired
-	@Qualifier("dataSourceTransactionManager")
-	PlatformTransactionManager dataSourceTransactionManager;
-	@Autowired
 	@Qualifier("jmsTransactionManager")
 	PlatformTransactionManager jmsTransactionManager;
 	@Value("${eventProcessor.jms.destinationName}")
@@ -118,7 +115,6 @@ public class EventProcessorConfig
 	public EventTaskExecutor eventTaskExecutor()
 	{
 		return EventTaskExecutor.builder()
-				.transactionManager(dataSourceTransactionManager)
 				.ebMSEventDAO(ebMSEventDAO)
 				.eventHandler(eventHandler())
 				.timedTask(new TimedTask(eventProcessorExecutionInterval))
@@ -147,7 +143,6 @@ public class EventProcessorConfig
   public EventHandler eventHandler()
 	{
 		return EventHandler.builder()
-				.transactionManager(dataSourceTransactionManager)
 				.eventListener(eventListener)
 				.ebMSDAO(ebMSDAO)
 				.cpaManager(cpaManager)

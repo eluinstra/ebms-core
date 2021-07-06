@@ -25,7 +25,7 @@ public interface CPADAO
 	boolean existsCPA(String cpaId);
 	Optional<CollaborationProtocolAgreement> getCPA(String cpaId);
 	List<String> getCPAIds();
-	long insertCPA(CollaborationProtocolAgreement cpa);
-	long updateCPA(CollaborationProtocolAgreement cpa);
-	long deleteCPA(String cpaId);
+	String insertCPA(CollaborationProtocolAgreement cpa);
+	int updateCPA(CollaborationProtocolAgreement cpa);
+	int deleteCPA(String cpaId);
 }

@@ -22,8 +22,9 @@ interface EbMSEventDAO
 {
 	List<EbMSEvent> getEventsBefore(Instant timestamp, String serverId);
 	List<EbMSEvent> getEventsBefore(Instant timestamp, String serverId, int maxNr);
-	long insertEvent(EbMSEvent event, String serverId);
-	long insertEventLog(String messageId, Instant timestamp, String uri, EbMSEventStatus status, String errorMessage);
-	long updateEvent(EbMSEvent event);
-	long deleteEvent(String messageId);
+	String insertEvent(EbMSEvent event, String serverId);
+	int updateEvent(EbMSEvent event);
+	int deleteEvent(String messageId);
+
+	void insertEventLog(String messageId, Instant timestamp, String uri, EbMSEventStatus status, String errorMessage);
 }

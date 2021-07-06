@@ -25,6 +25,7 @@ import java.util.stream.Collectors;
 
 import javax.jms.ConnectionFactory;
 import javax.jms.Destination;
+import javax.sql.DataSource;
 
 import org.apache.activemq.command.ActiveMQQueue;
 import org.apache.activemq.command.ActiveMQTopic;
@@ -32,10 +33,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jms.core.JmsTemplate;
 
 import com.google.common.base.Splitter;
-import com.querydsl.sql.SQLQueryFactory;
 
 import lombok.AccessLevel;
 import lombok.val;
@@ -65,7 +66,7 @@ public class EventListenerConfig
 	@Value("${jms.destinationType}")
 	JMSDestinationType jmsDestinationType;
 	@Autowired
-	SQLQueryFactory queryFactory;
+	DataSource dataSource;
 
 	@Bean
 	public EventListener eventListener()
@@ -75,7 +76,7 @@ public class EventListenerConfig
 			.map(e -> EbMSMessageEventType.valueOf(e))
 			.collect(Collectors.toCollection(() -> EnumSet.noneOf(EbMSMessageEventType.class)));
 		val eventListener = Match(eventListenerType).of(
-				Case($(EventListenerType.DAO),o -> new DAOEventListener(ebMSMessageEventDAO())),
+				Case($(EventListenerType.DAO),o -> new DAOEventListener(ebMSMessageEventDAO().getObject())),
 				Case($(EventListenerType.SIMPLE_JMS),o -> new SimpleJMSEventListener(jmsTemplate,createEbMSMessageEventDestinations(jmsDestinationType))),
 				Case($(EventListenerType.JMS),o -> new JMSEventListener(ebMSDAO,jmsTemplate,createEbMSMessageEventDestinations(jmsDestinationType))),
 				Case($(EventListenerType.JMS_TEXT),o -> new JMSTextEventListener(ebMSDAO,jmsTemplate,createEbMSMessageEventDestinations(jmsDestinationType))),
@@ -84,9 +85,10 @@ public class EventListenerConfig
 	}
 
 	@Bean
-	public EbMSMessageEventDAO ebMSMessageEventDAO()
+	public EbMSMessageEventDAOFactory ebMSMessageEventDAO()
 	{
-		return new EbMSMessageEventDAOImpl(queryFactory);
+		val jdbcTemplate = new JdbcTemplate(dataSource);
+		return new EbMSMessageEventDAOFactory(dataSource,jdbcTemplate);
 	}
 
 	private Map<String,Destination> createEbMSMessageEventDestinations(JMSDestinationType jmsDestinationType)

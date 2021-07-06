@@ -20,7 +20,6 @@ import java.util.ArrayList;
 import java.util.concurrent.Future;
 
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
-import org.springframework.transaction.PlatformTransactionManager;
 
 import io.vavr.control.Try;
 import lombok.AccessLevel;
@@ -35,8 +34,6 @@ import lombok.extern.slf4j.Slf4j;
 class EventTaskExecutor implements Runnable
 {
 	@NonNull
-	PlatformTransactionManager transactionManager;
-	@NonNull
 	EbMSEventDAO ebMSEventDAO;
 	@NonNull
 	EventHandler eventHandler;
@@ -45,9 +42,8 @@ class EventTaskExecutor implements Runnable
 	String serverId;
 
 	@Builder
-	public EventTaskExecutor(@NonNull PlatformTransactionManager transactionManager, @NonNull EbMSEventDAO ebMSEventDAO, @NonNull EventHandler eventHandler, @NonNull TimedTask timedTask, int maxEvents, String serverId)
+	public EventTaskExecutor(@NonNull EbMSEventDAO ebMSEventDAO, @NonNull EventHandler eventHandler, @NonNull TimedTask timedTask, int maxEvents, String serverId)
 	{
-		this.transactionManager = transactionManager;
 		this.ebMSEventDAO = ebMSEventDAO;
 		this.eventHandler = eventHandler;
 		this.timedTask = timedTask;
@@ -67,7 +63,6 @@ class EventTaskExecutor implements Runnable
   		Runnable runnable = () ->
   		{
 				val futures = new ArrayList<Future<?>>();
-				val status = transactionManager.getTransaction(null);
 				try
 				{
 					val timestamp = Instant.now();
@@ -79,7 +74,6 @@ class EventTaskExecutor implements Runnable
 				{
 					log.error("",e);
 				}
-				transactionManager.commit(status);
 				futures.forEach(f -> Try.of(() -> f.get()).onFailure(e -> log.error("",e)));
   		};
   		try

@@ -79,8 +79,6 @@ class DuplicateMessageHandler
 			}
 			else
 			{
-				if (storeDuplicateMessage)
-					ebMSDAO.insertDuplicateMessage(timestamp,document.getMessage(),message,storeDuplicateMessageAttachments ? message.getAttachments() : Collections.emptyList());
 				val context = ebMSDAO.getMessageContextByRefToMessageId(
 						messageHeader.getCPAId(),
 						messageHeader.getMessageData().getMessageId(),
@@ -92,8 +90,14 @@ class DuplicateMessageHandler
 						.orElse(null);
 				val receiveDeliveryChannel = cpaManager.getReceiveDeliveryChannel(messageHeader.getCPAId(),messageHeader.getFrom().getPartyId(),messageHeader.getFrom().getRole(),service,null)
 						.orElse(null);
-				if (receiveDeliveryChannel != null && context.isPresent())
-					eventManager.createEvent(messageHeader.getCPAId(),sendDeliveryChannel,receiveDeliveryChannel,context.get().getMessageId(),messageHeader.getMessageData().getTimeToLive(),context.get().getTimestamp(),false);
+				Runnable runnable = () ->
+				{
+					if (storeDuplicateMessage)
+						ebMSDAO.insertDuplicateMessage(timestamp,document.getMessage(),message,storeDuplicateMessageAttachments ? message.getAttachments() : Collections.emptyList());
+					if (receiveDeliveryChannel != null && context.isPresent())
+						eventManager.createEvent(messageHeader.getCPAId(),sendDeliveryChannel,receiveDeliveryChannel,context.get().getMessageId(),messageHeader.getMessageData().getTimeToLive(),context.get().getTimestamp(),false);
+				};
+				ebMSDAO.executeTransaction(runnable);
 				if (receiveDeliveryChannel == null && context.isPresent())
 					try
 					{

@@ -15,13 +15,15 @@
  */
 package nl.clockwork.ebms.cpa;
 
+import javax.sql.DataSource;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
-import com.querydsl.sql.SQLQueryFactory;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 import lombok.AccessLevel;
+import lombok.val;
 import lombok.experimental.FieldDefaults;
 
 @Configuration
@@ -29,7 +31,7 @@ import lombok.experimental.FieldDefaults;
 public class CPAManagerConfig
 {
 	@Autowired
-	SQLQueryFactory queryFactory;
+	DataSource dataSource;
 
 	@Bean
 	public CPAManager cpaManager()
@@ -40,7 +42,8 @@ public class CPAManagerConfig
 	@Bean
 	public CPADAO cpaDAO()
 	{
-		return new CPADAOImpl(queryFactory);
+		val jdbcTemplate = new JdbcTemplate(dataSource);
+		return new CPADAOImpl(jdbcTemplate);
 	}
 
 	@Bean
@@ -52,7 +55,8 @@ public class CPAManagerConfig
 	@Bean
 	public URLMappingDAO urlMappingDAO()
 	{
-		return new URLMappingDAOImpl(queryFactory);
+		val jdbcTemplate = new JdbcTemplate(dataSource);
+		return new URLMappingDAOImpl(jdbcTemplate);
 	}
 
 	@Bean
@@ -64,6 +68,7 @@ public class CPAManagerConfig
 	@Bean
 	public CertificateMappingDAO certificateMappingDAO()
 	{
-		return new CertificateMappingDAOImpl(queryFactory);
+		val jdbcTemplate = new JdbcTemplate(dataSource);
+		return new CertificateMappingDAOImpl(jdbcTemplate);
 	}
 }

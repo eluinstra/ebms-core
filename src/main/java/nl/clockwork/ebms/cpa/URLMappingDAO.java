@@ -25,7 +25,7 @@ public interface URLMappingDAO
 	boolean existsURLMapping(String source);
 	Optional<String> getURLMapping(String source);
 	List<URLMapping> getURLMappings();
-	long insertURLMapping(URLMapping urlMapping);
-	long updateURLMapping(URLMapping urlMapping);
-	long deleteURLMapping(String source);
+	String insertURLMapping(URLMapping urlMapping);
+	int updateURLMapping(URLMapping urlMapping);
+	int deleteURLMapping(String source);
 }

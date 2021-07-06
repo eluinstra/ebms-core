@@ -16,6 +16,7 @@
 package nl.clockwork.ebms.event.processor;
 
 import javax.jms.ConnectionFactory;
+import javax.sql.DataSource;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -23,12 +24,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.transaction.PlatformTransactionManager;
 
-import com.querydsl.sql.SQLQueryFactory;
-
 import lombok.AccessLevel;
+import lombok.val;
 import lombok.experimental.FieldDefaults;
 import nl.clockwork.ebms.cpa.CPAManager;
 import nl.clockwork.ebms.dao.EbMSDAO;
@@ -58,7 +59,7 @@ public class EventManagerConfig
 	@Qualifier("dataSourceTransactionManager")
 	PlatformTransactionManager dataSourceTransactionManager;
 	@Autowired
-	SQLQueryFactory queryFactory;
+	DataSource dataSource;
 
 	@Bean
 	@Conditional(DefaultEventProcessorType.class)
@@ -71,17 +72,18 @@ public class EventManagerConfig
 	@Conditional(JmsEventProcessorType.class)
 	public EventManager jmsEventManager()
 	{
-		return new JMSEventManager(new JmsTemplate(connectionFactory),ebMSDAO,ebMSEventDAO(),cpaManager,nrAutoRetries,autoRetryInterval);
+		return new JMSEventManager(new JmsTemplate(connectionFactory),ebMSDAO,ebMSEventDAO().getObject(),cpaManager,nrAutoRetries,autoRetryInterval);
 	}
 
 	@Bean
-	public EbMSEventDAO ebMSEventDAO()
+	public EbMSEventDAOFactory ebMSEventDAO()
 	{
-		return new EbMSEventDAOImpl(queryFactory);
+		val jdbcTemplate = new JdbcTemplate(dataSource);
+		return new EbMSEventDAOFactory(dataSource,jdbcTemplate);
 	}
 
 	private EbMSEventManager createDefaultEventManager()
 	{
-		return new EbMSEventManager(ebMSDAO,ebMSEventDAO(),cpaManager,serverId,nrAutoRetries,autoRetryInterval);
+		return new EbMSEventManager(ebMSDAO,ebMSEventDAO().getObject(),cpaManager,serverId,nrAutoRetries,autoRetryInterval);
 	}
 }
