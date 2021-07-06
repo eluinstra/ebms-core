@@ -194,7 +194,7 @@ public class SigningTest
 	private List<DataSource> createDataSources()
 	{
 		val result = new ArrayList<DataSource>();
-		result.add(new DataSource("test.txt","plain/text; charset=utf-8","Dit is een test.".getBytes(Charset.forName("UTF-8"))));
+		result.add(new DataSource("test.txt",null,"plain/text; charset=utf-8","Dit is een test.".getBytes(Charset.forName("UTF-8"))));
 		return result;
 	}
 

@@ -26,8 +26,6 @@ import java.util.stream.Collectors;
 import javax.jms.ConnectionFactory;
 import javax.jms.Destination;
 
-import nl.clockwork.ebms.model.EbMSMessageProperties;
-import nl.clockwork.ebms.service.model.MessageProperties;
 import org.apache.activemq.command.ActiveMQQueue;
 import org.apache.activemq.command.ActiveMQTopic;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +34,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jms.core.JmsTemplate;
+import org.springframework.kafka.core.KafkaTemplate;
 
 import com.google.common.base.Splitter;
 import com.querydsl.sql.SQLQueryFactory;
@@ -44,7 +43,7 @@ import lombok.AccessLevel;
 import lombok.val;
 import lombok.experimental.FieldDefaults;
 import nl.clockwork.ebms.dao.EbMSDAO;
-import org.springframework.kafka.core.KafkaTemplate;
+import nl.clockwork.ebms.model.EbMSMessageProperties;
 
 @Configuration
 @FieldDefaults(level = AccessLevel.PRIVATE)

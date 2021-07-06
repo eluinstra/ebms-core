@@ -15,17 +15,17 @@
  */
 package nl.clockwork.ebms.delivery.task;
 
-import lombok.AccessLevel;
-import lombok.experimental.FieldDefaults;
-import lombok.val;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.context.annotation.DependsOn;
 import org.springframework.kafka.transaction.KafkaTransactionManager;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 import org.springframework.stereotype.Component;
+
+import lombok.AccessLevel;
+import lombok.val;
+import lombok.experimental.FieldDefaults;
 
 @Component
 @FieldDefaults(level = AccessLevel.PRIVATE)
@@ -34,7 +34,7 @@ public class KafkaJob extends QuartzJobBean {
     DeliveryTaskManager deliveryTaskManager;
     @Autowired
     @Qualifier("deliveryTaskKafkaTransactionManager")
-    KafkaTransactionManager transactionManager;
+    KafkaTransactionManager<?,?> transactionManager;
 
     @Override
     protected void executeInternal(JobExecutionContext context) throws JobExecutionException {

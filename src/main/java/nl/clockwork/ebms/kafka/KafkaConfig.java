@@ -58,30 +58,30 @@ public class KafkaConfig {
 
 
     @Bean
-    public ProducerFactory<String, EbMSMessageProperties> messagePropertiesProducerFactory() {
+    public ProducerFactory<String,EbMSMessageProperties> messagePropertiesProducerFactory() {
         return new DefaultKafkaProducerFactory<>(messageProducerConfiguration());
     }
 
     @Bean
-    public ProducerFactory<String, DeliveryTask> deliveryTaskProducerFactory() {
+    public ProducerFactory<String,DeliveryTask> deliveryTaskProducerFactory() {
         return new DefaultKafkaProducerFactory<>(deliveryTaskProducerConfiguration());
     }
 
     @Bean(name = "deliveryTaskKafkaTemplate")
-    public KafkaTemplate<String, DeliveryTask> deliveryTaskKafkaTemplate() {
+    public KafkaTemplate<String,DeliveryTask> deliveryTaskKafkaTemplate() {
         logger.info("Initializing deliveryTaskKafkaTemplate");
         return new KafkaTemplate<>(deliveryTaskProducerFactory());
     }
 
     @Bean(name = "messagePropertiesKafkaTemplate")
-    public KafkaTemplate<String, EbMSMessageProperties> messagePropertiesKafkaTemplate() {
+    public KafkaTemplate<String,EbMSMessageProperties> messagePropertiesKafkaTemplate() {
         logger.info("Initializing messagePropertiesKafkaTemplate");
         return new KafkaTemplate<>(messagePropertiesProducerFactory());
     }
 
     @Bean
-    public Map<String, Object> deliveryTaskProducerConfiguration() {
-        Map<String, Object> configurations = new HashMap<>();
+    public Map<String,Object> deliveryTaskProducerConfiguration() {
+        Map<String,Object> configurations = new HashMap<>();
         configurations.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaServerUrl);
         configurations.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
         configurations.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class);
@@ -92,8 +92,8 @@ public class KafkaConfig {
     }
 
     @Bean
-    public Map<String, Object> messageProducerConfiguration() {
-        Map<String, Object> configurations = new HashMap<>();
+    public Map<String,Object> messageProducerConfiguration() {
+        Map<String,Object> configurations = new HashMap<>();
         configurations.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaServerUrl);
         configurations.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
         configurations.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class);
@@ -104,22 +104,22 @@ public class KafkaConfig {
     }
 
     @Bean
-    ConcurrentKafkaListenerContainerFactory<String, DeliveryTask> kafkaListenerContainerFactory() {
+    ConcurrentKafkaListenerContainerFactory<String,DeliveryTask> kafkaListenerContainerFactory() {
         ConcurrentKafkaListenerContainerFactory<String, DeliveryTask> factory = new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(consumerFactory());
         return factory;
     }
 
     @Bean
-    public DefaultKafkaConsumerFactory consumerFactory() {
+    public DefaultKafkaConsumerFactory<String,DeliveryTask> consumerFactory() {
         JsonDeserializer<DeliveryTask> deliveryTaskDeserializer = new JsonDeserializer<>(DeliveryTask.class);
         deliveryTaskDeserializer.addTrustedPackages("nl.clockwork.ebms.delivery.task.DeliveryTask");
-        return new DefaultKafkaConsumerFactory(consumerConfigurations(), new StringDeserializer(), deliveryTaskDeserializer);
+        return new DefaultKafkaConsumerFactory<String,DeliveryTask>(consumerConfigurations(), new StringDeserializer(), deliveryTaskDeserializer);
     }
 
     @Bean
-    public Map<String, Object> consumerConfigurations() {
-        Map<String, Object> configurations = new HashMap<>();
+    public Map<String,Object> consumerConfigurations() {
+        Map<String,Object> configurations = new HashMap<>();
         configurations.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaServerUrl);
         configurations.put(ConsumerConfig.CLIENT_ID_CONFIG, UUID.randomUUID().toString());
         configurations.put(ConsumerConfig.GROUP_ID_CONFIG, "EBMS");
@@ -132,15 +132,15 @@ public class KafkaConfig {
     }
 
     @Bean
-    public KafkaTransactionManager deliveryTaskKafkaTransactionManager() {
-        KafkaTransactionManager ktm = new KafkaTransactionManager(deliveryTaskProducerFactory());
+    public KafkaTransactionManager<String,DeliveryTask> deliveryTaskKafkaTransactionManager() {
+        KafkaTransactionManager<String,DeliveryTask> ktm = new KafkaTransactionManager<String,DeliveryTask>(deliveryTaskProducerFactory());
         ktm.setTransactionSynchronization(AbstractPlatformTransactionManager.SYNCHRONIZATION_ON_ACTUAL_TRANSACTION);
         return ktm;
     }
 
     @Bean
-    public KafkaTransactionManager messagePropertiesKafkaTransactionManager() {
-        KafkaTransactionManager ktm = new KafkaTransactionManager(messagePropertiesProducerFactory());
+    public KafkaTransactionManager<String,EbMSMessageProperties> messagePropertiesKafkaTransactionManager() {
+        KafkaTransactionManager<String, EbMSMessageProperties> ktm = new KafkaTransactionManager<String, EbMSMessageProperties>(messagePropertiesProducerFactory());
         ktm.setTransactionSynchronization(AbstractPlatformTransactionManager.SYNCHRONIZATION_ON_ACTUAL_TRANSACTION);
         return ktm;
     }
