@@ -61,7 +61,7 @@ public class DeliveryTaskManagerConfig
 	EbMSDAO ebMSDAO;
 	@Autowired
 	DataSource dataSource;
-	@Autowired
+	@Autowired(required=false)
 	@Qualifier("deliveryTaskKafkaTemplate")
 	KafkaTemplate<String, DeliveryTask> kafkaTemplate;
 

@@ -40,6 +40,7 @@ public class DataSource implements Serializable
 	private static final long serialVersionUID = 1L;
 	@XmlElement(required=true)
 	String name;
+	
 	String contentId;
 	@XmlElement(required=true)
 	@NonNull
@@ -48,4 +49,11 @@ public class DataSource implements Serializable
 	@NonNull
 	@ToString.Exclude
 	byte[] content;
+	
+	public DataSource (String name, String contentType, byte[] content)
+	{
+		this.name = name;
+		this.contentType = contentType;
+		this.content = content;
+	}
 }

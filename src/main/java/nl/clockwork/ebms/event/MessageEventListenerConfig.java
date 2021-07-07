@@ -70,7 +70,7 @@ public class MessageEventListenerConfig
 	JMSDestinationType jmsDestinationType;
 	@Autowired
 	DataSource dataSource;
-	@Autowired
+	@Autowired(required=false)
 	@Qualifier("messagePropertiesKafkaTemplate")
 	KafkaTemplate<String, EbMSMessageProperties> kafkaTemplate;
 
