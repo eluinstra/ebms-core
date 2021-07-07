@@ -64,7 +64,8 @@ public class DeliveryTaskManagerConfig
 	PlatformTransactionManager dataSourceTransactionManager;
 	@Autowired
 	SQLQueryFactory queryFactory;
-	@Autowired
+	
+	@Autowired(required=false)
 	@Qualifier("deliveryTaskKafkaTemplate")
 	KafkaTemplate<String, DeliveryTask> kafkaTemplate;
 
