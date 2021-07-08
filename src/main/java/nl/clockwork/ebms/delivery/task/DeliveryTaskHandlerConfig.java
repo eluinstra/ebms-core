@@ -65,7 +65,7 @@ public class DeliveryTaskHandlerConfig
 	@Value("${deliveryTaskHandler.maxThreads}")
 	int maxThreads;
 	@Value("${deliveryTaskHandler.default.maxTasks}")
-	int maxTaksks;
+	int maxTasks;
 	@Value("${deliveryTaskHandler.default.executionInterval}")
 	int taskHandlerExecutionInterval;
 	@Value("${deliveryTaskHandler.task.executionInterval}")
@@ -89,9 +89,6 @@ public class DeliveryTaskHandlerConfig
 	@Autowired
 	ConnectionFactory connectionFactory;
 	@Autowired
-	@Qualifier("dataSourceTransactionManager")
-	PlatformTransactionManager dataSourceTransactionManager;
-	@Autowired
 	@Qualifier("jmsTransactionManager")
 	PlatformTransactionManager jmsTransactionManager;
 	@Value("${deliveryTaskHandler.jms.destinationName}")
@@ -104,7 +101,7 @@ public class DeliveryTaskHandlerConfig
 		val result = new ThreadPoolTaskExecutor();
 		result.setCorePoolSize(minThreads);
 		result.setMaxPoolSize(maxThreads);
-		result.setQueueCapacity(maxTaksks);
+		result.setQueueCapacity(maxTasks);
 		result.setWaitForTasksToCompleteOnShutdown(true);
 		return result;
 	}
@@ -114,11 +111,10 @@ public class DeliveryTaskHandlerConfig
 	public DAODeliveryTaskExecutor taskExecutor()
 	{
 		return DAODeliveryTaskExecutor.builder()
-				.transactionManager(dataSourceTransactionManager)
 				.deliveryTaskDAO(deliveryTaskDAO)
 				.deliveryTaskHandler(deliveryTaskHandler())
 				.timedTask(new TimedTask(taskHandlerExecutionInterval))
-				.maxTasks(maxTaksks)
+				.maxTasks(maxTasks)
 				.serverId(serverId)
 				.build();
 	}

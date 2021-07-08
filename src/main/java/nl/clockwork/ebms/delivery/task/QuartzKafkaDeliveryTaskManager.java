@@ -25,25 +25,28 @@ import org.quartz.Scheduler;
 import org.springframework.kafka.core.KafkaTemplate;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-public class QuartzKafkaDeliveryTaskManager extends QuartzDeliveryTaskManager {
-    public static final String KAFKA_TOPIC_NAME = "DELIVERY_TASK";
+public class QuartzKafkaDeliveryTaskManager extends QuartzDeliveryTaskManager
+{
+	public static final String KAFKA_TOPIC_NAME = "DELIVERY_TASK";
 
-    @NonNull
-    KafkaTemplate<String, DeliveryTask> kafkaTemplate;
+	@NonNull
+	KafkaTemplate<String,DeliveryTask> kafkaTemplate;
 
-    public QuartzKafkaDeliveryTaskManager(@NonNull Scheduler scheduler, @NonNull EbMSDAO ebMSDAO, @NonNull DeliveryTaskDAO deliveryTaskDAO, @NonNull CPAManager cpaManager, int nrAutoRetries, int autoRetryInterval, @NonNull KafkaTemplate<String, DeliveryTask> kafkaTemplate) {
-        super(scheduler, ebMSDAO, deliveryTaskDAO, cpaManager, nrAutoRetries, autoRetryInterval);
-        this.kafkaTemplate = kafkaTemplate;
-    }
+	public QuartzKafkaDeliveryTaskManager(@NonNull Scheduler scheduler, @NonNull EbMSDAO ebMSDAO, @NonNull DeliveryTaskDAO deliveryTaskDAO, @NonNull CPAManager cpaManager, int nrAutoRetries, int autoRetryInterval, @NonNull KafkaTemplate<String,DeliveryTask> kafkaTemplate)
+	{
+		super(scheduler,ebMSDAO,deliveryTaskDAO,cpaManager,nrAutoRetries,autoRetryInterval);
+		this.kafkaTemplate = kafkaTemplate;
+	}
 
-    @Override
-    public void insertTask(DeliveryTask task) {
-        kafkaTemplate.send(KAFKA_TOPIC_NAME, task);
-    }
+	@Override
+	public void insertTask(DeliveryTask task)
+	{
+		kafkaTemplate.send(KAFKA_TOPIC_NAME,task);
+	}
 
-    protected Class<? extends Job> getJobClass()
-    {
-        return KafkaJob.class;
-    }
+	protected Class<? extends Job> getJobClass()
+	{
+		return KafkaJob.class;
+	}
 
 }

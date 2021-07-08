@@ -15,15 +15,16 @@
  */
 package nl.clockwork.ebms.cpa.url;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
-
-import com.querydsl.core.types.ConstructorExpression;
-import com.querydsl.core.types.Projections;
-import com.querydsl.sql.SQLQueryFactory;
+import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -35,66 +36,70 @@ import lombok.experimental.FieldDefaults;
 class URLMappingDAOImpl implements URLMappingDAO
 {
 	@NonNull
-	SQLQueryFactory queryFactory;
-	QUrlMapping table = QUrlMapping.urlMapping;
-	ConstructorExpression<URLMapping> urlMappingProjection = Projections.constructor(URLMapping.class,table.source,table.destination);
+	JdbcTemplate jdbcTemplate;
 
 	@Override
 	@Cacheable(cacheNames = "URLMapping", keyGenerator = "ebMSKeyGenerator")
 	public boolean existsURLMapping(String source)
 	{
-		return queryFactory.select(table.source.count())
-				.from(table)
-				.where(table.source.eq(source))
-				.fetchOne() > 0;
+		return jdbcTemplate.queryForObject("select count(*) from url_mapping where source = ?",Integer.class,source) > 0;
 	}
 
 	@Override
 	@Cacheable(cacheNames = "URLMapping", keyGenerator = "ebMSKeyGenerator")
 	public Optional<String> getURLMapping(String source)
 	{
-		return Optional.ofNullable(queryFactory.select(table.destination)
-				.from(table)
-				.where(table.source.eq(source))
-				.fetchOne());
+		try
+		{
+			return Optional.of(jdbcTemplate.queryForObject("select destination from url_mapping where source = ?",String.class,source));
+		}
+		catch(EmptyResultDataAccessException e)
+		{
+			return Optional.empty();
+		}
 	}
 
 	@Override
 	@Cacheable(cacheNames = "URLMapping", keyGenerator = "ebMSKeyGenerator")
 	public List<URLMapping> getURLMappings()
 	{
-		return queryFactory.select(urlMappingProjection)
-				.from(table)
-				.orderBy(table.source.asc())
-				.fetch();
+		return jdbcTemplate.query(
+				"select source, destination from url_mapping order by source asc",
+				new RowMapper<URLMapping>()
+				{
+					@Override
+					public URLMapping mapRow(ResultSet rs, int nr) throws SQLException
+					{
+						return new URLMapping(rs.getString("source"),rs.getString("destination"));
+					}
+				});
 	}
 
 	@Override
 	@CacheEvict(cacheNames = "URLMapping", allEntries = true)
-	public long insertURLMapping(URLMapping urlMapping)
+	public String insertURLMapping(URLMapping urlMapping)
 	{
-		return queryFactory.insert(table)
-				.set(table.source,urlMapping.getSource())
-				.set(table.destination,urlMapping.getDestination())
-				.execute();
+		jdbcTemplate.update(
+				"insert into url_mapping (source,destination) values (?,?)",
+				urlMapping.getSource(),
+				urlMapping.getDestination());
+		return urlMapping.getSource();
 	}
 
 	@Override
 	@CacheEvict(cacheNames = "URLMapping", allEntries = true)
-	public long updateURLMapping(URLMapping urlMapping)
+	public int updateURLMapping(URLMapping urlMapping)
 	{
-		return queryFactory.update(table)
-				.set(table.destination,urlMapping.getDestination())
-				.where(table.source.eq(urlMapping.getSource()))
-				.execute();
+		return jdbcTemplate.update(
+				"update url_mapping set destination = ? where source = ?",
+				urlMapping.getDestination(),
+				urlMapping.getSource());
 	}
 
 	@Override
 	@CacheEvict(cacheNames = "URLMapping", allEntries = true)
-	public long deleteURLMapping(String source)
+	public int deleteURLMapping(String source)
 	{
-		return queryFactory.delete(table)
-				.where(table.source.eq(source))
-				.execute();
+		return jdbcTemplate.update("delete from url_mapping where source = ?",source);
 	}
 }

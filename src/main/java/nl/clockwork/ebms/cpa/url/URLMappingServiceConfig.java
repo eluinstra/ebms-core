@@ -15,13 +15,15 @@
  */
 package nl.clockwork.ebms.cpa.url;
 
+import javax.sql.DataSource;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
-import com.querydsl.sql.SQLQueryFactory;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 import lombok.AccessLevel;
+import lombok.val;
 import lombok.experimental.FieldDefaults;
 
 @Configuration
@@ -29,7 +31,7 @@ import lombok.experimental.FieldDefaults;
 public class URLMappingServiceConfig
 {
 	@Autowired
-	SQLQueryFactory queryFactory;
+	DataSource dataSource;
 
 	@Bean
 	public URLMappingService urlMappingService()
@@ -46,6 +48,7 @@ public class URLMappingServiceConfig
 	@Bean
 	public URLMappingDAO urlMappingDAO()
 	{
-		return new URLMappingDAOImpl(queryFactory);
+		val jdbcTemplate = new JdbcTemplate(dataSource);
+		return new URLMappingDAOImpl(jdbcTemplate);
 	}
 }

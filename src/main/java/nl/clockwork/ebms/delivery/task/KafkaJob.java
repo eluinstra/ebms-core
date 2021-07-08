@@ -32,27 +32,29 @@ import nl.clockwork.ebms.delivery.task.DeliveryTaskManagerConfig.QuartzKafkaTask
 @Component
 @Conditional(QuartzKafkaTaskManagerType.class)
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class KafkaJob extends QuartzJobBean {
-    @Autowired
-    DeliveryTaskManager deliveryTaskManager;
-    @Autowired
-    @Qualifier("deliveryTaskKafkaTransactionManager")
-    KafkaTransactionManager<?,?> transactionManager;
+public class KafkaJob extends QuartzJobBean
+{
+	@Autowired
+	DeliveryTaskManager deliveryTaskManager;
+	@Autowired
+	@Qualifier("deliveryTaskKafkaTransactionManager")
+	KafkaTransactionManager<?,?> transactionManager;
 
-    @Override
-    protected void executeInternal(JobExecutionContext context) throws JobExecutionException {
-        val status = transactionManager.getTransaction(null);
-        try
-        {
-            val properties = context.getJobDetail().getJobDataMap();
-            val task = QuartzDeliveryTaskManager.createDeliveryTask(properties);
-            deliveryTaskManager.insertTask(task);
-        }
-        catch (Exception e)
-        {
-            transactionManager.rollback(status);
-            throw new JobExecutionException();
-        }
-        transactionManager.commit(status);
-    }
+	@Override
+	protected void executeInternal(JobExecutionContext context) throws JobExecutionException
+	{
+		val status = transactionManager.getTransaction(null);
+		try
+		{
+			val properties = context.getJobDetail().getJobDataMap();
+			val task = QuartzDeliveryTaskManager.createDeliveryTask(properties);
+			deliveryTaskManager.insertTask(task);
+		}
+		catch (Exception e)
+		{
+			transactionManager.rollback(status);
+			throw new JobExecutionException();
+		}
+		transactionManager.commit(status);
+	}
 }

@@ -15,12 +15,14 @@
  */
 package nl.clockwork.ebms.delivery.task;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.List;
 
-import com.querydsl.core.types.Expression;
-import com.querydsl.core.types.Projections;
-import com.querydsl.sql.SQLQueryFactory;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -29,81 +31,92 @@ import lombok.experimental.FieldDefaults;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor
-class DeliveryTaskDAOImpl implements DeliveryTaskDAO
+abstract class DeliveryTaskDAOImpl implements DeliveryTaskDAO
 {
+	@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+	@AllArgsConstructor
+	private static class EbMSEventRowMapper implements RowMapper<DeliveryTask>
+	{
+		public static final String SELECT = "select cpa_id, send_channel_id, receive_channel_id, message_id, time_to_live, time_stamp, is_confidential, retries";
+
+		@Override
+		public DeliveryTask mapRow(ResultSet rs, int rowNum) throws SQLException
+		{
+			return DeliveryTask.builder()
+					.cpaId(rs.getString("cpa_id"))
+					.sendDeliveryChannelId(rs.getString("send_channel_id"))
+					.receiveDeliveryChannelId(rs.getString("receive_channel_id"))
+					.messageId(rs.getString("message_id"))
+					.timeToLive(rs.getTimestamp("time_to_live") != null ? rs.getTimestamp("time_to_live").toInstant() : null)
+					.timestamp(rs.getTimestamp("time_stamp").toInstant())
+					.confidential(rs.getBoolean("is_confidential"))
+					.retries(rs.getInt("retries"))
+					.build();
+		}
+	}
+
 	@NonNull
-	SQLQueryFactory queryFactory;
-	QDeliveryTask table = QDeliveryTask.deliveryTask;
-	QDeliveryLog logTable = QDeliveryLog.deliveryLog;
-	Expression<DeliveryTask> createDeliveryTaskProjection = Projections.constructor(
-			DeliveryTask.class,table.cpaId,table.sendChannelId,table.receiveChannelId,table.messageId,table.timeToLive,table.timeStamp,table.isConfidential,table.retries);
+	JdbcTemplate jdbcTemplate;
 
 	@Override
 	public List<DeliveryTask> getTasksBefore(Instant timestamp, String serverId)
 	{
-		return queryFactory.select(createDeliveryTaskProjection)
-				.from(table)
-				.where(table.timeStamp.loe(timestamp)
-						.and(serverId == null ? table.serverId.isNull() : table.serverId.eq(serverId)))
-				.orderBy(table.timeStamp.asc())
-				.fetch();
+		return jdbcTemplate.query(
+				EbMSEventRowMapper.SELECT +
+				" from delivery_task" +
+				" where time_stamp <= ?" +
+				(serverId == null ? " and server_id is null" : " and server_id = '" + serverId + "'") +
+				" order by time_stamp asc",
+				new EbMSEventRowMapper(),
+				Timestamp.from(timestamp));
 	}
+
+	public abstract String getTasksBeforeQuery(int maxNr, String serverId);
 
 	@Override
 	public List<DeliveryTask> getTasksBefore(Instant timestamp, String serverId, int maxNr)
 	{
-		return queryFactory.select(createDeliveryTaskProjection)
-				.from(table)
-				.where(table.timeStamp.loe(timestamp)
-						.and(serverId == null ? table.serverId.isNull() : table.serverId.eq(serverId)))
-				.orderBy(table.timeStamp.asc())
-				.limit(maxNr)
-				.fetch();
+		return jdbcTemplate.query(getTasksBeforeQuery(maxNr,serverId),new EbMSEventRowMapper(),Timestamp.from(timestamp));
 	}
 	
 	@Override
-	public long insertTask(DeliveryTask task, String serverId)
+	public String insertTask(DeliveryTask task, String serverId)
 	{
-		return queryFactory.insert(table)
-				.set(table.cpaId,task.getCpaId())
-				.set(table.sendChannelId,task.getSendDeliveryChannelId())
-				.set(table.receiveChannelId,task.getReceiveDeliveryChannelId())
-				.set(table.messageId,task.getMessageId())
-				.set(table.timeToLive,task.getTimeToLive())
-				.set(table.timeStamp,task.getTimestamp())
-				.set(table.isConfidential,task.isConfidential())
-				.set(table.retries,task.getRetries())
-				.set(table.serverId,serverId)
-				.execute();
+		jdbcTemplate.update(
+				"insert into delivery_task (cpa_id,send_channel_id,receive_channel_id,message_id,time_to_live,time_stamp,is_confidential,retries,server_id) values (?,?,?,?,?,?,?,?,?)",
+				task.getCpaId(),
+				task.getSendDeliveryChannelId(),
+				task.getReceiveDeliveryChannelId(),
+				task.getMessageId(),
+				task.getTimeToLive() != null ? Timestamp.from(task.getTimeToLive()) : null,
+				Timestamp.from(task.getTimestamp()),
+				task.isConfidential(),
+				task.getRetries(),
+				serverId);
+		return task.getMessageId();
 	}
 
 	@Override
-	public long updateTask(DeliveryTask task)
+	public int updateTask(DeliveryTask task)
 	{
-		return queryFactory.update(table)
-				.set(table.timeStamp,task.getTimestamp())
-				.set(table.retries,task.getRetries())
-				.where(table.messageId.eq(task.getMessageId()))
-				.execute();
+		return jdbcTemplate.update("update delivery_task set time_stamp = ?, retries = ? where message_id = ?",Timestamp.from(task.getTimestamp()),task.getRetries(),task.getMessageId());
 	}
 	
 	@Override
-	public long deleteTask(String messageId)
+	public int deleteTask(String messageId)
 	{
-		return queryFactory.delete(table)
-				.where(table.messageId.eq(messageId))
-				.execute();
+		return jdbcTemplate.update("delete from delivery_task where message_id = ?",messageId);
 	}
 
 	@Override
-	public long insertLog(String messageId, Instant timestamp, String uri, DeliveryTaskStatus status, String errorMessage)
+	public void insertLog(String messageId, Instant timestamp, String uri, DeliveryTaskStatus status, String errorMessage)
 	{
-		return queryFactory.insert(logTable)
-				.set(logTable.messageId,messageId)
-				.set(logTable.timeStamp,timestamp)
-				.set(logTable.uri,uri)
-				.set(logTable.status,status)
-				.set(logTable.errorMessage,errorMessage)
-				.execute();
+		jdbcTemplate.update(
+				"insert into delivery_log (message_id,time_stamp,uri,status,error_message) values (?,?,?,?,?)",
+				messageId,
+				Timestamp.from(timestamp),
+				uri,
+				status.getId(),
+				errorMessage);
 	}
 }

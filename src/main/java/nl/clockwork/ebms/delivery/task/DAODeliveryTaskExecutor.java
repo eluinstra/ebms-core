@@ -20,7 +20,6 @@ import java.util.ArrayList;
 import java.util.concurrent.Future;
 
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
-import org.springframework.transaction.PlatformTransactionManager;
 
 import io.vavr.control.Try;
 import lombok.AccessLevel;
@@ -35,8 +34,6 @@ import lombok.extern.slf4j.Slf4j;
 class DAODeliveryTaskExecutor implements Runnable
 {
 	@NonNull
-	PlatformTransactionManager transactionManager;
-	@NonNull
 	DeliveryTaskDAO deliveryTaskDAO;
 	@NonNull
 	DeliveryTaskHandler deliveryTaskHandler;
@@ -45,9 +42,8 @@ class DAODeliveryTaskExecutor implements Runnable
 	String serverId;
 
 	@Builder
-	public DAODeliveryTaskExecutor(@NonNull PlatformTransactionManager transactionManager, @NonNull DeliveryTaskDAO deliveryTaskDAO, @NonNull DeliveryTaskHandler deliveryTaskHandler, @NonNull TimedTask timedTask, int maxTasks, String serverId)
+	public DAODeliveryTaskExecutor(@NonNull DeliveryTaskDAO deliveryTaskDAO, @NonNull DeliveryTaskHandler deliveryTaskHandler, @NonNull TimedTask timedTask, int maxTasks, String serverId)
 	{
-		this.transactionManager = transactionManager;
 		this.deliveryTaskDAO = deliveryTaskDAO;
 		this.deliveryTaskHandler = deliveryTaskHandler;
 		this.timedTask = timedTask;
@@ -67,7 +63,6 @@ class DAODeliveryTaskExecutor implements Runnable
   		Runnable runnable = () ->
   		{
 				val futures = new ArrayList<Future<?>>();
-				val status = transactionManager.getTransaction(null);
 				try
 				{
 					val timestamp = Instant.now();
@@ -79,7 +74,6 @@ class DAODeliveryTaskExecutor implements Runnable
 				{
 					log.error("",e);
 				}
-				transactionManager.commit(status);
 				futures.forEach(f -> Try.of(() -> f.get()).onFailure(e -> log.error("",e)));
   		};
   		try

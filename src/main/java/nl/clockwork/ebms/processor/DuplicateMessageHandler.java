@@ -79,8 +79,6 @@ class DuplicateMessageHandler
 			}
 			else
 			{
-				if (storeDuplicateMessage)
-					ebMSDAO.insertDuplicateMessage(timestamp,document.getMessage(),message,storeDuplicateMessageAttachments ? message.getAttachments() : Collections.emptyList());
 				val messageProperties = ebMSDAO.getEbMSMessagePropertiesByRefToMessageId(
 						messageHeader.getCPAId(),
 						messageHeader.getMessageData().getMessageId(),
@@ -92,16 +90,22 @@ class DuplicateMessageHandler
 						.orElse(null);
 				val receiveDeliveryChannel = cpaManager.getReceiveDeliveryChannel(messageHeader.getCPAId(),messageHeader.getFrom().getPartyId(),messageHeader.getFrom().getRole(),service,null)
 						.orElse(null);
-				if (receiveDeliveryChannel != null && messageProperties.isPresent())
-					deliveryTaskManager.insertTask(
-							deliveryTaskManager.createNewTask(
-									messageHeader.getCPAId(),
-									sendDeliveryChannel.getChannelId(),
-									receiveDeliveryChannel.getChannelId(),
-									messageProperties.get().getMessageId(),
-									messageHeader.getMessageData().getTimeToLive(),
-									messageProperties.get().getTimestamp(),
-									false));
+				Runnable runnable = () ->
+				{
+					if (storeDuplicateMessage)
+						ebMSDAO.insertDuplicateMessage(timestamp,document.getMessage(),message,storeDuplicateMessageAttachments ? message.getAttachments() : Collections.emptyList());
+					if (receiveDeliveryChannel != null && messageProperties.isPresent())
+						deliveryTaskManager.insertTask(
+								deliveryTaskManager.createNewTask(
+										messageHeader.getCPAId(),
+										sendDeliveryChannel.getChannelId(),
+										receiveDeliveryChannel.getChannelId(),
+										messageProperties.get().getMessageId(),
+										messageHeader.getMessageData().getTimeToLive(),
+										messageProperties.get().getTimestamp(),
+										false));
+				};
+				ebMSDAO.executeTransaction(runnable);
 				if (receiveDeliveryChannel == null && messageProperties.isPresent())
 					try
 					{

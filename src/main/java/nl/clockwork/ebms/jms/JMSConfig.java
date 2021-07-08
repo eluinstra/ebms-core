@@ -90,6 +90,19 @@ public class JMSConfig
 		result.setMinPoolSize(minPoolSize);
 		result.setMaxPoolSize(maxPoolSize);
 		result.setDriverProperties(createDriverProperties());
+		result.setAcquireIncrement(1);
+		result.setAcquisitionInterval(1);
+		result.setAcquisitionTimeout(30);
+		result.setApplyTransactionTimeout(false);
+		result.setAutomaticEnlistingEnabled(true);
+		result.setCacheProducersConsumers(true);
+		result.setDeferConnectionRelease(true);
+		result.setDisabled(false);
+		result.setIgnoreRecoveryFailures(false);
+		result.setMaxIdleTime(60);
+		result.setShareTransactionConnections(false);
+		result.setTwoPcOrderingPosition(1);
+		result.setUseTmJoin(true);
 		return result;
 	}
 
@@ -105,6 +118,12 @@ public class JMSConfig
 		result.setIgnoreSessionTransactedFlag(true);
 		result.setMinPoolSize(minPoolSize);
 		result.setMaxPoolSize(maxPoolSize);
+		result.setBorrowConnectionTimeout(30);
+		result.setIgnoreSessionTransactedFlag(true);
+		result.setMaintenanceInterval(60);
+		result.setMaxIdleTime(60);
+		result.setMaxLifetime(0);
+		result.setReapTimeout(0);
 		return result;
 	}
 

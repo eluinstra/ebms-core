@@ -22,8 +22,8 @@ interface DeliveryTaskDAO
 {
 	List<DeliveryTask> getTasksBefore(Instant timestamp, String serverId);
 	List<DeliveryTask> getTasksBefore(Instant timestamp, String serverId, int maxNr);
-	long insertTask(DeliveryTask task, String serverId);
-	long insertLog(String messageId, Instant timestamp, String uri, DeliveryTaskStatus status, String errorMessage);
-	long updateTask(DeliveryTask task);
-	long deleteTask(String messageId);
+	String insertTask(DeliveryTask task, String serverId);
+	void insertLog(String messageId, Instant timestamp, String uri, DeliveryTaskStatus status, String errorMessage);
+	int updateTask(DeliveryTask task);
+	int deleteTask(String messageId);
 }

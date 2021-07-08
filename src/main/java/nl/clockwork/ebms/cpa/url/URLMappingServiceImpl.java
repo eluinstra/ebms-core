@@ -17,8 +17,6 @@ package nl.clockwork.ebms.cpa.url;
 
 import java.util.List;
 
-import org.springframework.transaction.annotation.Transactional;
-
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
@@ -28,7 +26,6 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor
-@Transactional(transactionManager = "dataSourceTransactionManager")
 public class URLMappingServiceImpl implements URLMappingService
 {
   @NonNull
