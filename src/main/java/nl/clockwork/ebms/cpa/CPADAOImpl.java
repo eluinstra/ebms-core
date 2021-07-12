@@ -19,7 +19,6 @@ import java.util.List;
 import java.util.Optional;
 
 import javax.xml.bind.JAXBException;
-import javax.xml.parsers.ParserConfigurationException;
 
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CollaborationProtocolAgreement;
 import org.springframework.cache.annotation.CacheEvict;
@@ -27,7 +26,6 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.dao.DataRetrievalFailureException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.xml.sax.SAXException;
 
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -55,13 +53,13 @@ class CPADAOImpl implements CPADAO
 		try
 		{
 			val result = jdbcTemplate.queryForObject("select cpa from cpa where cpa_id = ?",String.class,cpaId);
-			return Optional.of(JAXBParser.getInstance(CollaborationProtocolAgreement.class).handle(result));
+			return Optional.of(JAXBParser.getInstance(CollaborationProtocolAgreement.class).handleUnsafe(result));
 		}
 		catch(EmptyResultDataAccessException e)
 		{
 			return Optional.empty();
 		}
-		catch (JAXBException | SAXException | ParserConfigurationException e)
+		catch (JAXBException e)
 		{
 			throw new DataRetrievalFailureException("",e);
 		}
