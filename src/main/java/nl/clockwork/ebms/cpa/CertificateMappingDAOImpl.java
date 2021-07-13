@@ -50,10 +50,10 @@ class CertificateMappingDAOImpl implements CertificateMappingDAO
 	@Cacheable(cacheNames = "CertificateMapping", keyGenerator = "ebMSKeyGenerator")
 	public boolean existsCertificateMapping(String id, String cpaId)
 	{
-		//cpaId = ESAPI.encoder().encodeForSQL(new OracleCodec(),cpaId);
+//		cpaId = ESAPI.encoder().encodeForSQL(new OracleCodec(),cpaId);
 		return jdbcTemplate.queryForObject(
 				"select count(*) from certificate_mapping where id = ?" +
-						cpaId == null ? " and cpa_id is null" : " and cpa_id = " + cpaId,
+						(cpaId == null ? " and cpa_id is null" : " and cpa_id = '" + cpaId + "'"),
 				Integer.class,
 				id) > 0;
 	}
@@ -62,12 +62,12 @@ class CertificateMappingDAOImpl implements CertificateMappingDAO
 	@Cacheable(cacheNames = "CertificateMapping", keyGenerator = "ebMSKeyGenerator")
 	public Optional<X509Certificate> getCertificateMapping(String id, String cpaId, boolean getSpecific)
 	{
-		//cpaId = ESAPI.encoder().encodeForSQL(new OracleCodec(),cpaId);
+//		cpaId = ESAPI.encoder().encodeForSQL(new OracleCodec(),cpaId);
 		try
 		{
 			val result = jdbcTemplate.query(
 				"select destination, cpa_id from certificate_mapping where id = ?" +
-						cpaId == null ? " and cpa_id is null" : getSpecific ? " and cpa_id = " + cpaId : " and (cpaId = " + cpaId + " or cpaId is null)",
+						(cpaId == null ? " and cpa_id is null" : (getSpecific ? " and cpa_id = '" + cpaId + "'" : " and (cpa_id = '" + cpaId + "' or cpa_id is null)")),
 				new RowMapper<Tuple2<X509Certificate,String>>()
 				{
 					@Override
@@ -148,12 +148,12 @@ class CertificateMappingDAOImpl implements CertificateMappingDAO
 	@CacheEvict(cacheNames = "CertificateMapping", allEntries = true)
 	public int updateCertificateMapping(CertificateMapping mapping)
 	{
-		//cpaId = ESAPI.encoder().encodeForSQL(new OracleCodec(),cpaId);
+		val cpaId = mapping.getCpaId();//ESAPI.encoder().encodeForSQL(new OracleCodec(),mapping.getCpaId());
 		try
 		{
 			return jdbcTemplate.update(
 				"update certificate_mapping set destination = ? where id = ?" +
-						mapping.getCpaId() == null ? " and cpa_id is null" : " and cpa_id = " + mapping.getCpaId(),
+						(cpaId == null ? " and cpa_id is null" : " and cpa_id = '" + cpaId + "'"),
 				mapping.getDestination().getEncoded(),
 				mapping.getId()
 			);
@@ -168,10 +168,10 @@ class CertificateMappingDAOImpl implements CertificateMappingDAO
 	@CacheEvict(cacheNames = "CertificateMapping", allEntries = true)
 	public int deleteCertificateMapping(String id, String cpaId)
 	{
-		//cpaId = ESAPI.encoder().encodeForSQL(new OracleCodec(),cpaId);
+//		cpaId = ESAPI.encoder().encodeForSQL(new OracleCodec(),cpaId);
 		return jdbcTemplate.update(
 			"delete from certificate_mapping where id = ?" +
-					cpaId == null ? " and cpa_id is null" : " and cpa_id = " + cpaId,
+					(cpaId == null ? " and cpa_id is null" : " and cpa_id = '" + cpaId + "'"),
 			id);
 	}
 }
