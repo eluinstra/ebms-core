@@ -59,8 +59,8 @@ import nl.clockwork.ebms.service.model.Message;
 import nl.clockwork.ebms.service.model.MessageEvent;
 import nl.clockwork.ebms.service.model.MessageFilter;
 import nl.clockwork.ebms.service.model.MessageMapper;
-import nl.clockwork.ebms.service.model.MessageProperties;
 import nl.clockwork.ebms.service.model.MessageRequest;
+import nl.clockwork.ebms.service.model.MessageRequestProperties;
 import nl.clockwork.ebms.service.model.MessageStatus;
 import nl.clockwork.ebms.signing.EbMSSignatureGenerator;
 import nl.clockwork.ebms.util.LoggingUtils;
@@ -170,8 +170,9 @@ class EbMSMessageServiceHandler
 			{
 				try
 				{
-					resetMessage(p.getProperties());
-					val message = ebMSMessageFactory.createEbMSMessage(MessageMapper.INSTANCE.toMessage(p));
+					val messageRequest = MessageMapper.INSTANCE.toMessage(p);
+					resetMessage(messageRequest.getProperties());
+					val message = ebMSMessageFactory.createEbMSMessage(messageRequest);
 					if (LoggingUtils.mdc == Status.ENABLED)
 						MDC.setContextMap(LoggingUtils.getPropertyMap(message.getMessageHeader()));
 					val document = EbMSMessageUtils.getEbMSDocument(message);
@@ -339,11 +340,10 @@ class EbMSMessageServiceHandler
 		}
 	}
 
-	private void resetMessage(MessageProperties properties)
+	private void resetMessage(@NonNull MessageRequestProperties messageRequestProperties)
 	{
 		// properties.setConversationId(null);
-		properties.setMessageId(null);
-		properties.setTimestamp(null);
+		messageRequestProperties.setMessageId(null);
 	}
 
 	private void storeMessage(Document document, EbMSMessage message) throws EbMSProcessorException
