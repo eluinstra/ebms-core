@@ -18,9 +18,16 @@ package nl.clockwork.ebms.cpa;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.stream.Stream;
 
+import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CanReceive;
+import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CanSend;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CollaborationProtocolAgreement;
+import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CollaborationRole;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DeliveryChannel;
+import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.OverrideMshActionBinding;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.PartyInfo;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.PersistenceLevelType;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.StatusValueType;
@@ -45,6 +52,122 @@ import nl.clockwork.ebms.util.StreamUtils;
 @AllArgsConstructor
 public class CPAManager
 {
+	private static Predicate<CollaborationProtocolAgreement> isValidCPA(Instant timestamp)
+	{
+		return cpa -> StatusValueType.AGREED.equals(cpa.getStatus().getValue())
+				&& timestamp.compareTo(cpa.getStart()) >= 0
+				&& timestamp.compareTo(cpa.getEnd()) <= 0;
+	}
+	private static Predicate<org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.PartyId> matchesPartyId(String partyId)
+	{
+		return p -> partyId.equals(CPAUtils.toString(p));
+	}
+	private static Predicate<PartyInfo> matchesPartyInfo(List<PartyId> partyId)
+	{
+		return partyInfo -> CPAUtils.equals(partyInfo.getPartyId(),partyId);
+	}
+	private static Predicate<PartyInfo> matchesPartyInfo(Party fromParty)
+	{
+		return partyInfo -> fromParty == null || fromParty.matches(partyInfo.getPartyId());
+	}
+	private static Predicate<CollaborationRole> matchesRole(Party fromParty)
+	{
+		return collaborationRole -> fromParty == null || fromParty.matches(collaborationRole.getRole());
+	}
+	private static Predicate<CollaborationRole> matchesRoleByRole(String role)
+	{
+		return collaborationRole -> role.equals(collaborationRole.getRole().getName());
+	}
+	private static Predicate<CollaborationRole> matchesRoleByService(String service)
+	{
+		return collaborationRole -> CPAUtils.toString(collaborationRole.getServiceBinding().getService()).equals(service);
+	}
+
+	private static Predicate<CollaborationRole> matchesRole(Party toParty, String service)
+	{
+		return collaborationRole -> toParty == null || toParty.matches(collaborationRole.getRole()) && service.equals(CPAUtils.toString(collaborationRole.getServiceBinding().getService()));
+	}
+	private static Predicate<CanSend> matchesCanSend(String action)
+	{
+		return canSend -> action.equals(canSend.getThisPartyActionBinding().getAction());
+	}
+	private static Predicate<CanReceive> matchesCanReceive(String action)
+	{
+		return canReceive -> action.equals(canReceive.getThisPartyActionBinding().getAction());
+	}
+	private static Predicate<CanReceive> matchesCanReceive(FromPartyInfo fromPartyInfo)
+	{
+		return canReceive -> canReceive.getThisPartyActionBinding().equals(fromPartyInfo.getCanSend().getOtherPartyActionBinding());
+	}
+	private static Predicate<DeliveryChannel> matchesDeliveryChannel(String deliveryChannelId)
+	{
+		return deliveryChannel -> deliveryChannel.getChannelId().equals(deliveryChannelId);
+	}
+	private static Predicate<OverrideMshActionBinding> matchesOverrideMshActionBinding(String action)
+	{
+		return binding -> binding.getAction().equals(action);
+	}
+
+	private Predicate<CanSend> isNonRepudiationRequired(final org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DocExchange docExchange)
+	{
+		return cs -> cs.getThisPartyActionBinding().getBusinessTransactionCharacteristics().isIsNonRepudiationRequired()
+				&& docExchange.getEbXMLSenderBinding() != null
+				&& docExchange.getEbXMLSenderBinding().getSenderNonRepudiation() != null;
+	}
+	private Predicate<CanSend> isConfidential(final org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DocExchange docExchange)
+	{
+		return cs ->(PersistenceLevelType.PERSISTENT.equals(cs.getThisPartyActionBinding().getBusinessTransactionCharacteristics().getIsConfidential()) 
+				|| PersistenceLevelType.TRANSIENT_AND_PERSISTENT.equals(cs.getThisPartyActionBinding().getBusinessTransactionCharacteristics().getIsConfidential()))
+				&& docExchange.getEbXMLReceiverBinding() != null
+				&& docExchange.getEbXMLReceiverBinding().getReceiverDigitalEnvelope() != null;
+	}
+
+	private static Function<PartyInfo,Stream<CollaborationRole>> streamRole()
+	{
+		return partyInfo -> partyInfo.getCollaborationRole().stream();
+	}
+	private static Function<CollaborationRole,Stream<CanSend>> streamCanSend()
+	{
+		return collaborationRole -> collaborationRole.getServiceBinding().getCanSend().stream();
+	}
+	private static Function<CollaborationRole,Stream<CanReceive>> streamCanReceive()
+	{
+		return collaborationRole -> collaborationRole.getServiceBinding().getCanReceive().stream();
+	}
+	private static Function<PartyInfo,Stream<DeliveryChannel>> streamDeliveryChannel()
+	{
+		return partyInfo -> partyInfo.getDeliveryChannel().stream();
+	}
+
+	private static Function<org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.PartyId,EbMSPartyInfo> toEbMSPartyInfo()
+	{
+		return id -> new EbMSPartyInfo(CPAUtils.toPartyId(id));
+	}
+	private static Function<CanSend,FromPartyInfo> toFromPartyInfo(Party fromParty, PartyInfo partyInfo, CollaborationRole collaborationRole)
+	{
+		return canSend -> CPAUtils.getFromPartyInfo(fromParty == null ? partyInfo.getPartyId().get(0) : fromParty.getPartyId(partyInfo.getPartyId()),collaborationRole,canSend);
+	}
+	private static Function<CanReceive,ToPartyInfo> toToPartyInfo(PartyInfo partyInfo, CollaborationRole collaborationRole)
+	{
+		return canReceive -> CPAUtils.getToPartyInfo(partyInfo.getPartyId().get(0),collaborationRole,canReceive);
+	}
+	private static Function<CanReceive,ToPartyInfo> toToPartyInfo(Party toParty, PartyInfo partyInfo, CollaborationRole collaborationRole)
+	{
+		return canReceive -> CPAUtils.getToPartyInfo(toParty == null ? partyInfo.getPartyId().get(0) : toParty.getPartyId(partyInfo.getPartyId()),collaborationRole,canReceive);
+	}
+	private static Function<OverrideMshActionBinding,DeliveryChannel> toDeliveryChannel()
+	{
+		return binding -> (DeliveryChannel)binding.getChannelId();
+	}
+	private static Function<CanSend,DeliveryChannel> canSendToDeliveryChannel()
+	{
+		return canSend -> CPAUtils.getDeliveryChannel(canSend.getThisPartyActionBinding().getChannelId());
+	}
+	private static Function<CanReceive,DeliveryChannel> canReceiveToDeliveryChannel()
+	{
+		return canReceive -> CPAUtils.getDeliveryChannel(canReceive.getThisPartyActionBinding().getChannelId());
+	}
+
 	@NonNull
 	CPADAO cpaDAO;
 	@NonNull
@@ -92,224 +215,210 @@ public class CPAManager
 
 	public boolean isValid(String cpaId, Instant timestamp)
 	{
-		val cpa = getCPA(cpaId);
-		return cpa
-				.map(c -> StatusValueType.AGREED.equals(c.getStatus().getValue())
-						&& timestamp.compareTo(c.getStart()) >= 0
-						&& timestamp.compareTo(c.getEnd()) <= 0)
-				.orElse(false);
+		return getCPA(cpaId)
+				.filter(isValidCPA(timestamp))
+				.isPresent();
 	}
 
 	@Cacheable(cacheNames = "CPA", keyGenerator = "ebMSKeyGenerator")
 	public boolean existsPartyId(String cpaId, String partyId)
 	{
 		return getCPA(cpaId)
-				.map(c -> c.getPartyInfo().stream()
-						.flatMap(p -> p.getPartyId().stream())
-						.anyMatch(id -> partyId.equals(CPAUtils.toString(id))))
-				.orElse(false);
+				.flatMap(cpa -> cpa.getPartyInfo().stream()
+						.flatMap(partyInfo -> partyInfo.getPartyId().stream())
+						.filter(matchesPartyId(partyId))
+						.findAny())
+				.isPresent();
 	}
 
 	@Cacheable(cacheNames = "CPA", keyGenerator = "ebMSKeyGenerator")
 	public Optional<EbMSPartyInfo> getEbMSPartyInfo(String cpaId, String partyId)
 	{
 		return getCPA(cpaId)
-				.map(c -> c.getPartyInfo().stream()
-						.filter(p -> p.getPartyId().stream()
-								.anyMatch(id -> partyId.equals(CPAUtils.toString(id))))
-						.map(p -> createEbMSPartyInfo(partyId,p))
-						.findFirst()
-						.orElse(null));
+				.flatMap(cpa -> cpa.getPartyInfo().stream()
+						.filter(partyInfo -> partyInfo.getPartyId().stream()
+								.anyMatch(matchesPartyId(partyId)))
+						.map(partyInfo -> createEbMSPartyInfo(partyId,partyInfo)
+								.orElseThrow(() -> new IllegalStateException("PartyId " + partyId + " not found")))
+						.findFirst());
 	}
 
-	private EbMSPartyInfo createEbMSPartyInfo(String partyId, PartyInfo partyInfo)
+	private Optional<EbMSPartyInfo> createEbMSPartyInfo(String partyId, PartyInfo partyInfo)
 	{
 		return partyInfo.getPartyId().stream()
-				.filter(id -> partyId.equals(CPAUtils.toString(id)))
-				.findFirst()
-				.map(id -> new EbMSPartyInfo(CPAUtils.toPartyId(id)))
-				.orElseThrow(() -> new IllegalStateException("PartyId " + partyId + " not found"));
+				.filter(matchesPartyId(partyId))
+				.map(toEbMSPartyInfo())
+				.findFirst();
 	}
 
 	@Cacheable(cacheNames = "CPA", key = "#root.methodName+#cpaId+T(nl.clockwork.ebms.cpa.CPAUtils).toString(#partyId)")
 	public Optional<PartyInfo> getPartyInfo(String cpaId, List<PartyId> partyId)
 	{
 		return getCPA(cpaId)
-				.map(c -> c.getPartyInfo().stream()
-						.filter(p -> CPAUtils.equals(p.getPartyId(),partyId))
-						.findFirst()
-						.orElse(null));
+				.flatMap(cpa -> cpa.getPartyInfo().stream()
+						.filter(matchesPartyInfo(partyId))
+						.findFirst());
 	}
 	
 	@Cacheable(cacheNames = "CPA", keyGenerator = "ebMSKeyGenerator")
 	public Optional<FromPartyInfo> getFromPartyInfo(String cpaId, Party fromParty, String service, String action)
 	{
 		return getCPA(cpaId)
-				.map(c -> c.getPartyInfo().stream()
-						.filter(p -> fromParty == null || fromParty.matches(p.getPartyId()))
-						.flatMap(p -> p.getCollaborationRole().stream()
-								.filter(r -> fromParty == null || fromParty.matches(r.getRole()) && service.equals(CPAUtils.toString(r.getServiceBinding().getService())))
-								.flatMap(r -> r.getServiceBinding().getCanSend().stream()
-										.filter(cs -> action.equals(cs.getThisPartyActionBinding().getAction()))
-										.map(cs -> CPAUtils.getFromPartyInfo(fromParty == null ? p.getPartyId().get(0) : fromParty.getPartyId(p.getPartyId()),r,cs))))
-						.findFirst()
-						.orElse(null));
+				.flatMap(cpa -> cpa.getPartyInfo().stream()
+						.filter(matchesPartyInfo(fromParty))
+						.flatMap(partyInfo -> partyInfo.getCollaborationRole().stream()
+								.filter(matchesRole(fromParty))
+								.filter(matchesRoleByService(service))
+								.flatMap(collaborationRole -> collaborationRole.getServiceBinding().getCanSend().stream()
+										.filter(matchesCanSend(action))
+										.map(toFromPartyInfo(fromParty,partyInfo,collaborationRole))))
+						.findFirst());
 	}
 
 	@Cacheable(cacheNames = "CPA", keyGenerator = "ebMSKeyGenerator")
 	public Optional<ToPartyInfo> getToPartyInfoByFromPartyActionBinding(String cpaId, Party fromParty, String service, String action)
 	{
 		return getFromPartyInfo(cpaId,fromParty,service,action)
-				.map(fpi -> getCPA(cpaId)
-					.map(c -> c.getPartyInfo().stream()
-							.flatMap(p -> p.getCollaborationRole().stream()
-									.flatMap(r -> r.getServiceBinding().getCanReceive().stream()
-											.filter(cr -> cr.getThisPartyActionBinding().equals(fpi.getCanSend().getOtherPartyActionBinding()))
-											.map(cr -> CPAUtils.getToPartyInfo(p.getPartyId().get(0),r,cr))))
-							.findFirst()
-							.orElse(null))
-					.orElse(null));
+				.flatMap(fromPartyInfo -> getCPA(cpaId)
+						.flatMap(cpa -> cpa.getPartyInfo().stream()
+								.flatMap(partyInfo -> partyInfo.getCollaborationRole().stream()
+										.flatMap(collaborationRole -> collaborationRole.getServiceBinding().getCanReceive().stream()
+												.filter(matchesCanReceive(fromPartyInfo))
+												.map(toToPartyInfo(partyInfo,collaborationRole))))
+								.findFirst()));
 	}
 
 	@Cacheable(cacheNames = "CPA", keyGenerator = "ebMSKeyGenerator")
 	public Optional<ToPartyInfo> getToPartyInfo(String cpaId, Party toParty, String service, String action)
 	{
 		return getCPA(cpaId)
-				.map(c -> c.getPartyInfo().stream()
-						.filter(p -> toParty == null || toParty.matches(p.getPartyId()))
-						.flatMap(p -> p.getCollaborationRole().stream()
-								.filter(r -> toParty == null || toParty.matches(r.getRole()) && service.equals(CPAUtils.toString(r.getServiceBinding().getService())))
-								.flatMap(r -> r.getServiceBinding().getCanReceive().stream()
-									.filter(cr -> action.equals(cr.getThisPartyActionBinding().getAction()))
-									.map(cr -> CPAUtils.getToPartyInfo(toParty == null ? p.getPartyId().get(0) : toParty.getPartyId(p.getPartyId()),r,cr))))
-						.findFirst()
-						.orElse(null));
+				.flatMap(cpa -> cpa.getPartyInfo().stream()
+						.filter(matchesPartyInfo(toParty))
+						.flatMap(partyInfo -> partyInfo.getCollaborationRole().stream()
+								.filter(matchesRole(toParty,service))
+								.flatMap(collaborationRole -> collaborationRole.getServiceBinding().getCanReceive().stream()
+										.filter(matchesCanReceive(action))
+										.map(toToPartyInfo(toParty,partyInfo,collaborationRole))))
+						.findFirst());
 	}
 
 	@Cacheable(cacheNames = "CPA", key = "#root.methodName+#cpaId+T(nl.clockwork.ebms.cpa.CPAUtils).toString(#partyId)+#role+#service+#action")
 	public boolean canSend(String cpaId, List<PartyId> partyId, String role, String service, String action)
 	{
 		return getCPA(cpaId)
-				.map(c -> c.getPartyInfo().stream()
-						.filter(p -> CPAUtils.equals(p.getPartyId(),partyId))
-						.flatMap(p -> p.getCollaborationRole().stream())
-						.filter(r -> role.equals(r.getRole().getName()) && CPAUtils.toString(r.getServiceBinding().getService()).equals(service))
-						.flatMap(r -> r.getServiceBinding().getCanSend().stream())
-						.anyMatch(cs -> action.equals(cs.getThisPartyActionBinding().getAction())))
-				.orElse(null);
+				.flatMap(cpa -> cpa.getPartyInfo().stream()
+						.filter(matchesPartyInfo(partyId))
+						.flatMap(streamRole())
+						.filter(matchesRoleByRole(role))
+						.filter(matchesRoleByService(service))
+						.flatMap(streamCanSend())
+						.filter(matchesCanSend(action))
+						.findAny())
+				.isPresent();
 	}
 
 	@Cacheable(cacheNames = "CPA", key = "#root.methodName+#cpaId+T(nl.clockwork.ebms.cpa.CPAUtils).toString(#partyId)+#role+#service+#action")
 	public boolean canReceive(String cpaId, List<PartyId> partyId, String role, String service, String action)
 	{
 		return getCPA(cpaId)
-				.map(c -> c.getPartyInfo().stream()
-						.filter(p -> CPAUtils.equals(p.getPartyId(),partyId))
-						.flatMap(p -> p.getCollaborationRole().stream())
-						.filter(r -> role.equals(r.getRole().getName()) && CPAUtils.toString(r.getServiceBinding().getService()).equals(service))
-						.flatMap(r -> r.getServiceBinding().getCanReceive().stream())
-						.anyMatch(cr -> action.equals(cr.getThisPartyActionBinding().getAction())))
-				.orElse(null);
+				.flatMap(cpa -> cpa.getPartyInfo().stream()
+						.filter(matchesPartyInfo(partyId))
+						.flatMap(streamRole())
+						.filter(matchesRoleByRole(role))
+						.filter(matchesRoleByService(service))
+						.flatMap(streamCanReceive())
+						.filter(matchesCanReceive(action))
+						.findAny())
+				.isPresent();
 	}
 
 	@Cacheable(cacheNames = "CPA", keyGenerator = "ebMSKeyGenerator")
 	public Optional<DeliveryChannel> getDeliveryChannel(String cpaId, String deliveryChannelId)
 	{
 		return getCPA(cpaId)
-				.map(c -> c.getPartyInfo().stream()
-					.flatMap(p -> p.getDeliveryChannel().stream())
-					.filter(d -> d.getChannelId().equals(deliveryChannelId))
-					.findFirst()
-					.orElse(null));
+				.flatMap(cpa -> cpa.getPartyInfo().stream()
+						.flatMap(streamDeliveryChannel())
+						.filter(matchesDeliveryChannel(deliveryChannelId))
+						.findFirst());
 	}
 
 	@Cacheable(cacheNames = "CPA", key = "#root.methodName+#cpaId+T(nl.clockwork.ebms.cpa.CPAUtils).toString(#partyId)+#action")
 	public Optional<DeliveryChannel> getDefaultDeliveryChannel(String cpaId, List<PartyId> partyId, String action)
 	{
 		return getPartyInfo(cpaId,partyId)
-				.map(p -> p.getOverrideMshActionBinding().stream()
-					.filter(b -> b.getAction().equals(action))
-					.findFirst()
-					.map(b -> (DeliveryChannel)b.getChannelId())
-					.orElse((DeliveryChannel)p.getDefaultMshChannelId()));
+				.map(partyInfo -> partyInfo.getOverrideMshActionBinding().stream()
+						.filter(matchesOverrideMshActionBinding(action))
+						.map(toDeliveryChannel())
+						.findFirst()
+						.orElse((DeliveryChannel)partyInfo.getDefaultMshChannelId()));
 	}
 
 	@Cacheable(cacheNames = "CPA", key = "#root.methodName+#cpaId+T(nl.clockwork.ebms.cpa.CPAUtils).toString(#partyId)+#role+#service+#action")
 	public Optional<DeliveryChannel> getSendDeliveryChannel(String cpaId, List<PartyId> partyId, String role, String service, String action)
 	{
-		if (EbMSAction.EBMS_SERVICE_URI.equals(service))
-			return getDefaultDeliveryChannel(cpaId,partyId,action);
-		else
-		{
-			return getPartyInfo(cpaId,partyId)
-					.map(p -> p.getCollaborationRole().stream()
-							.filter(r -> role.equals(r.getRole().getName()) && CPAUtils.toString(r.getServiceBinding().getService()).equals(service))
-							.flatMap(r -> r.getServiceBinding().getCanSend().stream())
-							.filter(cs -> action.equals(cs.getThisPartyActionBinding().getAction()))
-							.findFirst()
-							.map(cs -> CPAUtils.getDeliveryChannel(cs.getThisPartyActionBinding().getChannelId()))
-							.orElse(null));
-		}
+		return EbMSAction.EBMS_SERVICE_URI.equals(service)
+				? getDefaultDeliveryChannel(cpaId,partyId,action)
+				: getPartyInfo(cpaId,partyId)
+							.flatMap(partyInfo -> partyInfo.getCollaborationRole().stream()
+									.filter(matchesRoleByRole(role))
+									.filter(matchesRoleByService(service))
+									.flatMap(streamCanSend())
+									.filter(matchesCanSend(action))
+									.map(canSendToDeliveryChannel())
+									.findFirst());
 	}
 	
 	@Cacheable(cacheNames = "CPA", key = "#root.methodName+#cpaId+T(nl.clockwork.ebms.cpa.CPAUtils).toString(#partyId)+#role+#service+#action")
 	public Optional<DeliveryChannel> getReceiveDeliveryChannel(String cpaId, List<PartyId> partyId, String role, String service, String action)
 	{
-		if (EbMSAction.EBMS_SERVICE_URI.equals(service))
-			return getDefaultDeliveryChannel(cpaId,partyId,action);
-		else
-			return getPartyInfo(cpaId,partyId)
-					.map(p -> p.getCollaborationRole().stream()
-							.filter(r -> role.equals(r.getRole().getName()) && CPAUtils.toString(r.getServiceBinding().getService()).equals(service))
-							.flatMap(r -> r.getServiceBinding().getCanReceive().stream())
-							.filter(cr -> action.equals(cr.getThisPartyActionBinding().getAction()))
-							.findFirst()
-							.map(cr -> CPAUtils.getDeliveryChannel(cr.getThisPartyActionBinding().getChannelId()))
-							.orElse(null));
+		return EbMSAction.EBMS_SERVICE_URI.equals(service)
+				? getDefaultDeliveryChannel(cpaId,partyId,action)
+				: getPartyInfo(cpaId,partyId)
+							.flatMap(partyInfo -> partyInfo.getCollaborationRole().stream()
+									.filter(matchesRoleByRole(role))
+									.filter(matchesRoleByService(service))
+									.flatMap(streamCanReceive())
+									.filter(matchesCanReceive(action))
+									.map(canReceiveToDeliveryChannel())
+									.findFirst());
 	}
 	
 	@Cacheable(cacheNames = "CPA", key = "#root.methodName+#cpaId+T(nl.clockwork.ebms.cpa.CPAUtils).toString(#partyId)+#role+#service+#action")
 	public boolean isNonRepudiationRequired(String cpaId, List<PartyId> partyId, String role, String service, String action)
 	{
-		val canSend =  getCPA(cpaId)
-				.map(c -> c.getPartyInfo().stream()
-						.filter(p -> CPAUtils.equals(p.getPartyId(),partyId))
-						.flatMap(p -> p.getCollaborationRole().stream())
-						.filter(r -> role.equals(r.getRole().getName()) && CPAUtils.toString(r.getServiceBinding().getService()).equals(service))
-						.flatMap(r -> r.getServiceBinding().getCanSend().stream())
-						.filter(cs -> action.equals(cs.getThisPartyActionBinding().getAction()))
-						.findFirst()
-						.orElse(null));
 		val docExchange = CPAUtils.getDocExchange(
 				getSendDeliveryChannel(cpaId,partyId,role,service,action)
-					.orElseThrow(() -> StreamUtils.illegalStateException("SendDeliveryChannel",cpaId,partyId,role,service,action)));
-		return canSend
-				.map(cs -> cs.getThisPartyActionBinding().getBusinessTransactionCharacteristics().isIsNonRepudiationRequired()
-					&& docExchange.getEbXMLSenderBinding() != null
-					&& docExchange.getEbXMLSenderBinding().getSenderNonRepudiation() != null)
-				.orElse(null);
+						.orElseThrow(() -> StreamUtils.illegalStateException("SendDeliveryChannel",cpaId,partyId,role,service,action)));
+		return getCPA(cpaId)
+				.flatMap(cpa -> cpa.getPartyInfo().stream()
+						.filter(matchesPartyInfo(partyId))
+						.flatMap(streamRole())
+						.filter(matchesRoleByRole(role))
+						.filter(matchesRoleByService(service))
+						.flatMap(streamCanSend())
+						.filter(matchesCanSend(action))
+						.findAny())
+				.filter(isNonRepudiationRequired(docExchange))
+				.isPresent();
 	}
 
 	@Cacheable(cacheNames = "CPA", key = "#root.methodName+#cpaId+T(nl.clockwork.ebms.cpa.CPAUtils).toString(#partyId)+#role+#service+#action")
 	public boolean isConfidential(String cpaId, List<PartyId> partyId, String role, String service, String action)
 	{
-		val canSend =  getCPA(cpaId)
-				.map(c -> c.getPartyInfo().stream()
-				.filter(p -> CPAUtils.equals(p.getPartyId(),partyId))
-				.flatMap(p -> p.getCollaborationRole().stream())
-				.filter(r -> role.equals(r.getRole().getName()) && CPAUtils.toString(r.getServiceBinding().getService()).equals(service))
-				.flatMap(r -> r.getServiceBinding().getCanSend().stream())
-				.filter(cs -> action.equals(cs.getThisPartyActionBinding().getAction()))
-				.findFirst()
-				.orElse(null));
 		val docExchange = CPAUtils.getDocExchange(
 				getSendDeliveryChannel(cpaId,partyId,role,service,action)
-					.orElseThrow(() -> StreamUtils.illegalStateException("SendDeliveryChannel",cpaId,partyId,role,service,action)));
-		return canSend.map(cs ->(PersistenceLevelType.PERSISTENT.equals(cs.getThisPartyActionBinding().getBusinessTransactionCharacteristics().getIsConfidential()) 
-				|| PersistenceLevelType.TRANSIENT_AND_PERSISTENT.equals(cs.getThisPartyActionBinding().getBusinessTransactionCharacteristics().getIsConfidential()))
-				&& docExchange.getEbXMLReceiverBinding() != null
-				&& docExchange.getEbXMLReceiverBinding().getReceiverDigitalEnvelope() != null)
-				.orElse(false);
+						.orElseThrow(() -> StreamUtils.illegalStateException("SendDeliveryChannel",cpaId,partyId,role,service,action)));
+		return getCPA(cpaId)
+				.flatMap(c -> c.getPartyInfo().stream()
+						.filter(matchesPartyInfo(partyId))
+						.flatMap(streamRole())
+						.filter(matchesRoleByRole(role))
+						.filter(matchesRoleByService(service))
+						.flatMap(streamCanSend())
+						.filter(matchesCanSend(action))
+						.findAny())
+				.filter(isConfidential(docExchange))
+				.isPresent();
 	}
 
 	public String getUri(String cpaId, List<PartyId> partyId, String role, String service, String action)

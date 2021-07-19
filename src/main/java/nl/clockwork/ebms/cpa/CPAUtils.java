@@ -299,8 +299,10 @@ public class CPAUtils
 	private static boolean containsAll(List<PartyId> cpaPartyIds, List<org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.PartyId> headerPartyIds)
 	{
 		return headerPartyIds.stream()
-				.map(h -> EbMSMessageUtils.toString(h))
-				.allMatch(h -> cpaPartyIds.stream().map(c -> toString(c)).anyMatch(c -> h.equals(c)));
+				.map(headerPartyId -> EbMSMessageUtils.toString(headerPartyId))
+				.allMatch(headerPartyId -> cpaPartyIds.stream()
+						.map(cpaPartyId -> toString(cpaPartyId))
+						.anyMatch(cpaPartyId -> headerPartyId.equals(cpaPartyId)));
 	}
 
 }

@@ -79,7 +79,7 @@ public class MessageEventListenerConfig
 	{
 		val jmsTemplate = new JmsTemplate(connectionFactory);
 		val filter = Splitter.on(',').trimResults().omitEmptyStrings().splitToStream(eventListenerFilter)
-			.map(e -> MessageEventType.valueOf(e))
+			.map(MessageEventType::valueOf)
 			.collect(Collectors.toCollection(() -> EnumSet.noneOf(MessageEventType.class)));
 		val eventListener = Match(eventListenerType).of(
 				Case($(EventListenerType.DAO),o -> new DAOMessageEventListener(messageEventDAO().getObject())),

@@ -27,16 +27,16 @@ public class HTTPUtils
 	public static String getCharSet(String contentType)
 	{
 		return Stream.of(contentType.replace(" ","").split(";"))
-				.filter(p -> p.startsWith("charset="))
+				.filter(part -> part.startsWith("charset="))
+				.map(part -> part.split("=",2)[1])
 				.findFirst()
-				.map(p -> p.split("=",2)[1])
 				.orElse(null);
 	}
 
 	public static String toString(Map<String,List<String>> properties)
 	{
 		return properties.entrySet().stream()
-				.map(e -> (e.getKey() != null ? e.getKey() + "=" : "") + StringUtils.collectionToCommaDelimitedString(e.getValue()))
+				.map(entry -> (entry.getKey() != null ? entry.getKey() + "=" : "") + StringUtils.collectionToCommaDelimitedString(entry.getValue()))
 				.collect(Collectors.joining("\n"));
 	}
 }
