@@ -122,19 +122,19 @@ public class CPAManager
 				&& docExchange.getEbXMLReceiverBinding().getReceiverDigitalEnvelope() != null;
 	}
 
-	private static Function<PartyInfo,Stream<CollaborationRole>> streamRole()
+	private static Function<PartyInfo,Stream<CollaborationRole>> streamRoles()
 	{
 		return partyInfo -> partyInfo.getCollaborationRole().stream();
 	}
-	private static Function<CollaborationRole,Stream<CanSend>> streamCanSend()
+	private static Function<CollaborationRole,Stream<CanSend>> streamCanSends()
 	{
 		return collaborationRole -> collaborationRole.getServiceBinding().getCanSend().stream();
 	}
-	private static Function<CollaborationRole,Stream<CanReceive>> streamCanReceive()
+	private static Function<CollaborationRole,Stream<CanReceive>> streamCanReceives()
 	{
 		return collaborationRole -> collaborationRole.getServiceBinding().getCanReceive().stream();
 	}
-	private static Function<PartyInfo,Stream<DeliveryChannel>> streamDeliveryChannel()
+	private static Function<PartyInfo,Stream<DeliveryChannel>> streamDeliveryChannels()
 	{
 		return partyInfo -> partyInfo.getDeliveryChannel().stream();
 	}
@@ -308,10 +308,10 @@ public class CPAManager
 		return getCPA(cpaId)
 				.flatMap(cpa -> cpa.getPartyInfo().stream()
 						.filter(matchesPartyInfo(partyId))
-						.flatMap(streamRole())
+						.flatMap(streamRoles())
 						.filter(matchesRoleByRole(role))
 						.filter(matchesRoleByService(service))
-						.flatMap(streamCanSend())
+						.flatMap(streamCanSends())
 						.filter(matchesCanSend(action))
 						.findAny())
 				.isPresent();
@@ -323,10 +323,10 @@ public class CPAManager
 		return getCPA(cpaId)
 				.flatMap(cpa -> cpa.getPartyInfo().stream()
 						.filter(matchesPartyInfo(partyId))
-						.flatMap(streamRole())
+						.flatMap(streamRoles())
 						.filter(matchesRoleByRole(role))
 						.filter(matchesRoleByService(service))
-						.flatMap(streamCanReceive())
+						.flatMap(streamCanReceives())
 						.filter(matchesCanReceive(action))
 						.findAny())
 				.isPresent();
@@ -337,7 +337,7 @@ public class CPAManager
 	{
 		return getCPA(cpaId)
 				.flatMap(cpa -> cpa.getPartyInfo().stream()
-						.flatMap(streamDeliveryChannel())
+						.flatMap(streamDeliveryChannels())
 						.filter(matchesDeliveryChannel(deliveryChannelId))
 						.findFirst());
 	}
@@ -362,7 +362,7 @@ public class CPAManager
 							.flatMap(partyInfo -> partyInfo.getCollaborationRole().stream()
 									.filter(matchesRoleByRole(role))
 									.filter(matchesRoleByService(service))
-									.flatMap(streamCanSend())
+									.flatMap(streamCanSends())
 									.filter(matchesCanSend(action))
 									.map(canSendToDeliveryChannel())
 									.findFirst());
@@ -377,7 +377,7 @@ public class CPAManager
 							.flatMap(partyInfo -> partyInfo.getCollaborationRole().stream()
 									.filter(matchesRoleByRole(role))
 									.filter(matchesRoleByService(service))
-									.flatMap(streamCanReceive())
+									.flatMap(streamCanReceives())
 									.filter(matchesCanReceive(action))
 									.map(canReceiveToDeliveryChannel())
 									.findFirst());
@@ -392,10 +392,10 @@ public class CPAManager
 		return getCPA(cpaId)
 				.flatMap(cpa -> cpa.getPartyInfo().stream()
 						.filter(matchesPartyInfo(partyId))
-						.flatMap(streamRole())
+						.flatMap(streamRoles())
 						.filter(matchesRoleByRole(role))
 						.filter(matchesRoleByService(service))
-						.flatMap(streamCanSend())
+						.flatMap(streamCanSends())
 						.filter(matchesCanSend(action))
 						.findAny())
 				.filter(isNonRepudiationRequired(docExchange))
@@ -411,10 +411,10 @@ public class CPAManager
 		return getCPA(cpaId)
 				.flatMap(c -> c.getPartyInfo().stream()
 						.filter(matchesPartyInfo(partyId))
-						.flatMap(streamRole())
+						.flatMap(streamRoles())
 						.filter(matchesRoleByRole(role))
 						.filter(matchesRoleByService(service))
-						.flatMap(streamCanSend())
+						.flatMap(streamCanSends())
 						.filter(matchesCanSend(action))
 						.findAny())
 				.filter(isConfidential(docExchange))
