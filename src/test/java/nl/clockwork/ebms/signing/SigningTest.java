@@ -15,7 +15,7 @@
  */
 package nl.clockwork.ebms.signing;
 
-import static nl.clockwork.ebms.cpa.CPATestUtils.loadCPA;
+import static nl.clockwork.ebms.cpa.CPATestUtils.cpaCache;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -133,7 +133,7 @@ public class SigningTest
 	private CPADAO initCPADAOMock() throws IOException, JAXBException
 	{
 		val result = mock(CPADAO.class);
-		when(result.getCPA(cpaId)).thenReturn(loadCPA(cpaId));
+		when(result.getCPA(cpaId)).thenReturn(cpaCache.apply(cpaId));
 		return result;
 	}
 

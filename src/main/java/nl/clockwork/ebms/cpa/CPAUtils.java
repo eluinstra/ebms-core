@@ -58,7 +58,7 @@ public class CPAUtils
 {
 	public static boolean equals(List<PartyId> cpaPartyIds, List<org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.PartyId> headerPartyIds)
 	{
-		return headerPartyIds.size() <= cpaPartyIds.size() && containsAll(cpaPartyIds,headerPartyIds);
+		return headerPartyIds.size() > 0 && headerPartyIds.size() <= cpaPartyIds.size() && containsAll(cpaPartyIds,headerPartyIds);
 	}
 
 	public static String toString(PartyId partyId)

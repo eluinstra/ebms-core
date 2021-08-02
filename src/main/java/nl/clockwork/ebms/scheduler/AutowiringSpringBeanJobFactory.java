@@ -22,14 +22,13 @@ import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.MutablePropertyValues;
 import org.springframework.beans.PropertyAccessorFactory;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
 import org.springframework.scheduling.quartz.SpringBeanJobFactory;
 
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class AutowiringSpringBeanJobFactory extends SpringBeanJobFactory implements ApplicationContextAware
+public class AutowiringSpringBeanJobFactory extends SpringBeanJobFactory
 {
 	ApplicationContext applicationContext;
 	SchedulerContext schedulerContext;

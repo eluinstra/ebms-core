@@ -60,40 +60,40 @@ public class CPAManager
 	}
 	private static Predicate<org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.PartyId> matchesPartyId(String partyId)
 	{
-		return p -> partyId.equals(CPAUtils.toString(p));
+		return p -> CPAUtils.toString(p).equals(partyId);
 	}
 	private static Predicate<PartyInfo> matchesPartyInfo(List<PartyId> partyId)
 	{
 		return partyInfo -> CPAUtils.equals(partyInfo.getPartyId(),partyId);
 	}
-	private static Predicate<PartyInfo> matchesPartyInfo(Party fromParty)
+	private static Predicate<PartyInfo> isEmptyOrMatchesPartyInfo(Party fromParty)
 	{
 		return partyInfo -> fromParty == null || fromParty.matches(partyInfo.getPartyId());
 	}
-	private static Predicate<CollaborationRole> matchesRole(Party fromParty)
+	private static Predicate<CollaborationRole> isEmptyOrMatchesRole(Party fromParty)
 	{
 		return collaborationRole -> fromParty == null || fromParty.matches(collaborationRole.getRole());
 	}
 	private static Predicate<CollaborationRole> matchesRoleByRole(String role)
 	{
-		return collaborationRole -> role.equals(collaborationRole.getRole().getName());
+		return collaborationRole -> collaborationRole.getRole().getName().equals(role);
 	}
 	private static Predicate<CollaborationRole> matchesRoleByService(String service)
 	{
 		return collaborationRole -> CPAUtils.toString(collaborationRole.getServiceBinding().getService()).equals(service);
 	}
 
-	private static Predicate<CollaborationRole> matchesRole(Party toParty, String service)
+	private static Predicate<CollaborationRole> isEmptyOrMatchesRole(Party toParty, String service)
 	{
 		return collaborationRole -> toParty == null || toParty.matches(collaborationRole.getRole()) && service.equals(CPAUtils.toString(collaborationRole.getServiceBinding().getService()));
 	}
 	private static Predicate<CanSend> matchesCanSend(String action)
 	{
-		return canSend -> action.equals(canSend.getThisPartyActionBinding().getAction());
+		return canSend -> canSend.getThisPartyActionBinding().getAction().equals(action);
 	}
 	private static Predicate<CanReceive> matchesCanReceive(String action)
 	{
-		return canReceive -> action.equals(canReceive.getThisPartyActionBinding().getAction());
+		return canReceive -> canReceive.getThisPartyActionBinding().getAction().equals(action);
 	}
 	private static Predicate<CanReceive> matchesCanReceive(FromPartyInfo fromPartyInfo)
 	{
@@ -265,10 +265,9 @@ public class CPAManager
 	{
 		return getCPA(cpaId)
 				.flatMap(cpa -> cpa.getPartyInfo().stream()
-						.filter(matchesPartyInfo(fromParty))
+						.filter(isEmptyOrMatchesPartyInfo(fromParty))
 						.flatMap(partyInfo -> partyInfo.getCollaborationRole().stream()
-								.filter(matchesRole(fromParty))
-								.filter(matchesRoleByService(service))
+								.filter(isEmptyOrMatchesRole(fromParty).and(matchesRoleByService(service)))
 								.flatMap(collaborationRole -> collaborationRole.getServiceBinding().getCanSend().stream()
 										.filter(matchesCanSend(action))
 										.map(toFromPartyInfo(fromParty,partyInfo,collaborationRole))))
@@ -293,9 +292,9 @@ public class CPAManager
 	{
 		return getCPA(cpaId)
 				.flatMap(cpa -> cpa.getPartyInfo().stream()
-						.filter(matchesPartyInfo(toParty))
+						.filter(isEmptyOrMatchesPartyInfo(toParty))
 						.flatMap(partyInfo -> partyInfo.getCollaborationRole().stream()
-								.filter(matchesRole(toParty,service))
+								.filter(isEmptyOrMatchesRole(toParty,service))
 								.flatMap(collaborationRole -> collaborationRole.getServiceBinding().getCanReceive().stream()
 										.filter(matchesCanReceive(action))
 										.map(toToPartyInfo(toParty,partyInfo,collaborationRole))))
