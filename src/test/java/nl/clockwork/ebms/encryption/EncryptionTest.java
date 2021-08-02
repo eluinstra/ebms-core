@@ -15,14 +15,16 @@
  */
 package nl.clockwork.ebms.encryption;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static nl.clockwork.ebms.cpa.CPATestUtils.loadCPA;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import javax.xml.bind.JAXBException;
 import javax.xml.parsers.ParserConfigurationException;
@@ -34,9 +36,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestInstance.Lifecycle;
-import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CollaborationProtocolAgreement;
 import org.xml.sax.SAXException;
 
 import lombok.AccessLevel;
@@ -49,7 +49,6 @@ import nl.clockwork.ebms.cpa.CPADAO;
 import nl.clockwork.ebms.cpa.CPAManager;
 import nl.clockwork.ebms.cpa.url.URLMapper;
 import nl.clockwork.ebms.cpa.url.URLMappingDAO;
-import nl.clockwork.ebms.jaxb.JAXBParser;
 import nl.clockwork.ebms.model.EbMSAttachment;
 import nl.clockwork.ebms.model.EbMSMessage;
 import nl.clockwork.ebms.processor.EbMSProcessorException;
@@ -94,7 +93,7 @@ public class EncryptionTest
 		val message = createMessage();
 		messageEncrypter.encrypt(message);
 		messageDecrypter.decrypt(message);
-		assertEquals("Dit is een test.",IOUtils.toString(message.getAttachments().get(0).getInputStream(),Charset.forName("UTF-8")));
+		assertThat(IOUtils.toString(message.getAttachments().get(0).getInputStream(),Charset.forName("UTF-8"))).isEqualTo("Dit is een test.");
 	}
 
 	@Test
@@ -103,7 +102,7 @@ public class EncryptionTest
 		val message = createMessage();
 		messageEncrypter.encrypt(message);
 		changeAttachment(message);
-		assertThrows(EbMSValidationException.class,() -> messageDecrypter.decrypt(message));
+		assertThatThrownBy(() -> messageDecrypter.decrypt(message)).isInstanceOf(EbMSValidationException.class);
 	}
 
 	@Test
@@ -112,7 +111,7 @@ public class EncryptionTest
 		val message = createMessage();
 		messageEncrypter.encrypt(message);
 		changeAttachment1(message);
-		assertThrows(EbMSValidationException.class,() -> messageDecrypter.decrypt(message));
+		assertThatThrownBy(() -> messageDecrypter.decrypt(message)).isInstanceOf(EbMSValidationException.class);
 	}
 
 	@Test
@@ -122,7 +121,7 @@ public class EncryptionTest
 		messageEncrypter.encrypt(message);
 		message.getAttachments().clear();
 		message.getAttachments().addAll(createAttachments(message.getMessageHeader().getMessageData().getMessageId()));
-		assertThrows(EbMSValidationException.class,() -> messageDecrypter.decrypt(message));
+		assertThatThrownBy(() -> messageDecrypter.decrypt(message)).isInstanceOf(EbMSValidationException.class);
 	}
 
 	private void changeAttachment(EbMSMessage message) throws ParserConfigurationException, SAXException, IOException, TransformerException
@@ -152,21 +151,14 @@ public class EncryptionTest
 
 	private CPADAO initCPADAOMock() throws IOException, JAXBException
 	{
-		val result = Mockito.mock(CPADAO.class);
-		Mockito.when(result.getCPA(cpaId)).thenReturn(loadCPA(cpaId));
+		val result = mock(CPADAO.class);
+		when(result.getCPA(cpaId)).thenReturn(loadCPA(cpaId));
 		return result;
-	}
-
-	private Optional<CollaborationProtocolAgreement> loadCPA(String cpaId) throws IOException, JAXBException
-	{
-		val s = IOUtils.toString(this.getClass().getResourceAsStream("/nl/clockwork/ebms/cpa/" + cpaId + ".xml"),Charset.forName("UTF-8"));
-		return Optional.of(JAXBParser.getInstance(CollaborationProtocolAgreement.class).handleUnsafe(s));
 	}
 
 	private URLMappingDAO initURLMappingDAOMock()
 	{
-		val result = Mockito.mock(URLMappingDAO.class);
-		return result;
+		return mock(URLMappingDAO.class);
 	}
 
 	private EbMSMessageFactory initMessageFactory(CPAManager cpaManager)
@@ -189,8 +181,7 @@ public class EncryptionTest
 	private EbMSMessage createMessage() throws EbMSProcessorException
 	{
 		val message = createMessage(cpaId);
-		val result = messageFactory.createEbMSMessage(message);
-		return result;
+		return messageFactory.createEbMSMessage(message);
 	}
 
 	private MessageRequest createMessage(String cpaId)

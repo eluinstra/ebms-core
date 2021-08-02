@@ -15,13 +15,15 @@
  */
 package nl.clockwork.ebms.signing;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static nl.clockwork.ebms.cpa.CPATestUtils.loadCPA;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import javax.xml.bind.JAXBException;
 import javax.xml.parsers.ParserConfigurationException;
@@ -29,15 +31,12 @@ import javax.xml.soap.SOAPException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactoryConfigurationError;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.xml.security.Init;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestInstance.Lifecycle;
-import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CollaborationProtocolAgreement;
 import org.xml.sax.SAXException;
 
 import lombok.AccessLevel;
@@ -51,7 +50,6 @@ import nl.clockwork.ebms.cpa.CPADAO;
 import nl.clockwork.ebms.cpa.CPAManager;
 import nl.clockwork.ebms.cpa.url.URLMapper;
 import nl.clockwork.ebms.cpa.url.URLMappingDAO;
-import nl.clockwork.ebms.jaxb.JAXBParser;
 import nl.clockwork.ebms.model.EbMSAttachment;
 import nl.clockwork.ebms.model.EbMSDocument;
 import nl.clockwork.ebms.model.EbMSMessage;
@@ -106,7 +104,7 @@ public class SigningTest
 		val document = EbMSMessageUtils.getEbMSDocument(message);
 		signatureGenerator.generate(document,message);
 		changeConversationId(document);
-		assertThrows(ValidationException.class,() -> signatureValidator.validate(document,message));
+		assertThatThrownBy(() -> signatureValidator.validate(document,message)).isInstanceOf(ValidationException.class);
 	}
 
 	@Test
@@ -117,7 +115,7 @@ public class SigningTest
 		signatureGenerator.generate(document,message);
 		message.getAttachments().clear();
 		message.getAttachments().addAll(createAttachments(message.getMessageHeader().getMessageData().getMessageId()));
-		assertThrows(ValidationException.class,() -> signatureValidator.validate(document,message));
+		assertThatThrownBy(() -> signatureValidator.validate(document,message)).isInstanceOf(ValidationException.class);
 	}
 
 	private void changeConversationId(EbMSDocument message)
@@ -134,20 +132,14 @@ public class SigningTest
 
 	private CPADAO initCPADAOMock() throws IOException, JAXBException
 	{
-		val result = Mockito.mock(CPADAO.class);
-		Mockito.when(result.getCPA(cpaId)).thenReturn(loadCPA(cpaId));
+		val result = mock(CPADAO.class);
+		when(result.getCPA(cpaId)).thenReturn(loadCPA(cpaId));
 		return result;
-	}
-
-	private Optional<CollaborationProtocolAgreement> loadCPA(String cpaId) throws IOException, JAXBException
-	{
-		val s = IOUtils.toString(this.getClass().getResourceAsStream("/nl/clockwork/ebms/cpa/" + cpaId + ".xml"),Charset.forName("UTF-8"));
-		return Optional.of(JAXBParser.getInstance(CollaborationProtocolAgreement.class).handleUnsafe(s));
 	}
 
 	private URLMappingDAO initURLMappingDAOMock()
 	{
-		val result = Mockito.mock(URLMappingDAO.class);
+		val result = mock(URLMappingDAO.class);
 		return result;
 	}
 
