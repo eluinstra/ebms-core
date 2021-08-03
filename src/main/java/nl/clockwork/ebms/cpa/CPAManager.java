@@ -27,6 +27,7 @@ import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CanSend;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CollaborationProtocolAgreement;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CollaborationRole;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DeliveryChannel;
+import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.MessagingCharacteristics;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.OverrideMshActionBinding;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.PartyInfo;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.PersistenceLevelType;
@@ -426,6 +427,7 @@ public class CPAManager
 	public Optional<SyncReplyModeType> getSyncReply(String cpaId, List<PartyId> partyId, String role, String service, String action)
 	{
 		return getSendDeliveryChannel(cpaId,partyId,role,service,action)
-				.map(c -> c.getMessagingCharacteristics().getSyncReplyMode());
+				.map(DeliveryChannel::getMessagingCharacteristics)
+				.map(MessagingCharacteristics::getSyncReplyMode);
 	}
 }
