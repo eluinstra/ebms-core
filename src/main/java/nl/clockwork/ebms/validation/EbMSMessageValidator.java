@@ -105,7 +105,7 @@ public class EbMSMessageValidator
 			//return message.getSyncReply() != null;
 			val messageHeader = message.getMessageHeader();
 			val service = CPAUtils.toString(messageHeader.getService());
-			val syncReply = cpaManager.getSyncReply(messageHeader.getCPAId(),messageHeader.getFrom().getPartyId(),messageHeader.getFrom().getRole(),service,messageHeader.getAction())
+			val syncReply = cpaManager.getSendSyncReply(messageHeader.getCPAId(),messageHeader.getFrom().getPartyId(),messageHeader.getFrom().getRole(),service,messageHeader.getAction())
 					.orElseThrow(() -> StreamUtils.illegalStateException("SyncReply",messageHeader.getCPAId(),messageHeader.getFrom().getPartyId(),messageHeader.getFrom().getRole(),service,messageHeader.getAction()));
 			return syncReply != null && !syncReply.equals(SyncReplyModeType.NONE);
 		}

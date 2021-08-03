@@ -64,7 +64,7 @@ public class EbMSMessageDecrypter
 		{
 			val messageHeader = message.getMessageHeader();
 			val service = CPAUtils.toString(messageHeader.getService());
-			if (cpaManager.isConfidential(messageHeader.getCPAId(),messageHeader.getFrom().getPartyId(),messageHeader.getFrom().getRole(),service,messageHeader.getAction()))
+			if (cpaManager.isSendingConfidential(messageHeader.getCPAId(),messageHeader.getFrom().getPartyId(),messageHeader.getFrom().getRole(),service,messageHeader.getAction()))
 			{
 				val toPartyId = messageHeader.getTo().getPartyId();
 				val deliveryChannel = cpaManager.getReceiveDeliveryChannel(messageHeader.getCPAId(),toPartyId,messageHeader.getTo().getRole(),service,messageHeader.getAction())

@@ -380,7 +380,7 @@ public class CPAManager
 	}
 	
 	@Cacheable(cacheNames = "CPA", key = "#root.methodName+#cpaId+T(nl.clockwork.ebms.cpa.CPAUtils).toString(#partyId)+#role+#service+#action")
-	public boolean isNonRepudiationRequired(String cpaId, List<PartyId> partyId, String role, String service, String action)
+	public boolean isSendingNonRepudiationRequired(String cpaId, List<PartyId> partyId, String role, String service, String action)
 	{
 		val docExchange = CPAUtils.getDocExchange(
 				getSendDeliveryChannel(cpaId,partyId,role,service,action)
@@ -398,7 +398,7 @@ public class CPAManager
 	}
 
 	@Cacheable(cacheNames = "CPA", key = "#root.methodName+#cpaId+T(nl.clockwork.ebms.cpa.CPAUtils).toString(#partyId)+#role+#service+#action")
-	public boolean isConfidential(String cpaId, List<PartyId> partyId, String role, String service, String action)
+	public boolean isSendingConfidential(String cpaId, List<PartyId> partyId, String role, String service, String action)
 	{
 		val docExchange = CPAUtils.getDocExchange(
 				getSendDeliveryChannel(cpaId,partyId,role,service,action)
@@ -415,7 +415,7 @@ public class CPAManager
 				.isPresent();
 	}
 
-	public String getUri(String cpaId, List<PartyId> partyId, String role, String service, String action)
+	public String getReceivingUri(String cpaId, List<PartyId> partyId, String role, String service, String action)
 	{
 		return urlMapper.getURL(CPAUtils.getUri(
 				getReceiveDeliveryChannel(cpaId,partyId,role,service,action)
@@ -424,7 +424,7 @@ public class CPAManager
 	}
 
 	@Cacheable(cacheNames = "CPA", key = "#root.methodName+#cpaId+T(nl.clockwork.ebms.cpa.CPAUtils).toString(#partyId)+#role+#service+#action")
-	public Optional<SyncReplyModeType> getSyncReply(String cpaId, List<PartyId> partyId, String role, String service, String action)
+	public Optional<SyncReplyModeType> getSendSyncReply(String cpaId, List<PartyId> partyId, String role, String service, String action)
 	{
 		return getSendDeliveryChannel(cpaId,partyId,role,service,action)
 				.map(DeliveryChannel::getMessagingCharacteristics)

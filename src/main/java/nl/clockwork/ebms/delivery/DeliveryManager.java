@@ -117,7 +117,7 @@ public class DeliveryManager
 
 	protected String getUri(MessageHeader messageHeader)
 	{
-		return cpaManager.getUri(
+		return cpaManager.getReceivingUri(
 				messageHeader.getCPAId(),
 				messageHeader.getTo().getPartyId(),
 				messageHeader.getTo().getRole(),

@@ -72,7 +72,7 @@ class StatusResponseProcessor
   public void sendStatusResponse(final nl.clockwork.ebms.model.EbMSStatusResponse statusResponse)
 	{
 		val messageHeader = statusResponse.getMessageHeader();
-		val uri = cpaManager.getUri(
+		val uri = cpaManager.getReceivingUri(
 				messageHeader.getCPAId(),
 				messageHeader.getTo().getPartyId(),
 				messageHeader.getTo().getRole(),

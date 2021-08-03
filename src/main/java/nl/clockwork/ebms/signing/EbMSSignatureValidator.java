@@ -67,7 +67,7 @@ public class EbMSSignatureValidator
 		try
 		{
 			val messageHeader = message.getMessageHeader();
-			if (cpaManager.isNonRepudiationRequired(
+			if (cpaManager.isSendingNonRepudiationRequired(
 					messageHeader.getCPAId(),
 					messageHeader.getFrom().getPartyId(),
 					messageHeader.getFrom().getRole(),

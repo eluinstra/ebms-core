@@ -33,7 +33,6 @@ import nl.clockwork.ebms.cpa.CPAUtils;
 
 public class CPAUtilsTest {
 	
-	@SuppressWarnings("serial")
 	class MsgPartyId extends org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.PartyId
 	{
 		

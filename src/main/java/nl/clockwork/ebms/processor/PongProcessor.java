@@ -56,7 +56,7 @@ class PongProcessor
   public void sendPong(final nl.clockwork.ebms.model.EbMSPong pong)
 	{
 		val responseMessageHeader = pong.getMessageHeader();
-		val uri = cpaManager.getUri(
+		val uri = cpaManager.getReceivingUri(
 				responseMessageHeader.getCPAId(),
 				responseMessageHeader.getTo().getPartyId(),
 				responseMessageHeader.getTo().getRole(),
