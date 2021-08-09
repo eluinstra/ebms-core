@@ -36,13 +36,13 @@ import nl.clockwork.ebms.jaxrs.WithService;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor
 @Path("urlMapping")
+@Produces(MediaType.APPLICATION_JSON)
 public class URLMappingServiceImpl implements URLMappingService, WithService
 {
   @NonNull
 	URLMapper urlMapper;
 
 	@POST
-	@Produces(MediaType.APPLICATION_JSON)
 	@Override
 	public void setURLMapping(URLMapping urlMapping) throws URLMappingServiceException
 	{
@@ -61,7 +61,6 @@ public class URLMappingServiceImpl implements URLMappingService, WithService
 
   @DELETE
 	@Path("{id}")
-	@Produces(MediaType.APPLICATION_JSON)
 	@Override
 	public void deleteURLMapping(@PathParam("id") String source) throws URLMappingServiceException
 	{
@@ -78,7 +77,6 @@ public class URLMappingServiceImpl implements URLMappingService, WithService
 	}
 
 	@GET
-	@Produces(MediaType.APPLICATION_JSON)
 	@Override
 	public List<URLMapping> getURLMappings() throws URLMappingServiceException
 	{

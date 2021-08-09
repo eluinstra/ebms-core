@@ -17,6 +17,7 @@ package nl.clockwork.ebms.cpa;
 
 import java.util.List;
 
+import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -42,6 +43,7 @@ import nl.clockwork.ebms.validation.XSDValidator;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor
 @Path("cpa")
+@Produces(MediaType.APPLICATION_JSON)
 public class CPAServiceImpl implements CPAService, WithService
 {
   @NonNull
@@ -52,7 +54,6 @@ public class CPAServiceImpl implements CPAService, WithService
 
 	@POST
 	@Path("validate")
-	@Produces(MediaType.APPLICATION_JSON)
 	@Override
 	public void validateCPA(/*CollaborationProtocolAgreement*/String cpa) throws CPAServiceException
 	{
@@ -72,9 +73,9 @@ public class CPAServiceImpl implements CPAService, WithService
 	}
 	
 	@POST
-	@Produces(MediaType.APPLICATION_JSON)
+	@Path("{overwrite}")
 	@Override
-	public String insertCPA(/*CollaborationProtocolAgreement*/String cpa, Boolean overwrite) throws CPAServiceException
+	public String insertCPA(/*CollaborationProtocolAgreement*/String cpa, @PathParam("overwrite") Boolean overwrite) throws CPAServiceException
 	{
 		try
 		{
@@ -96,7 +97,6 @@ public class CPAServiceImpl implements CPAService, WithService
 
 	@DELETE
 	@Path("{cpaId}")
-	@Produces(MediaType.APPLICATION_JSON)
 	@Override
 	public void deleteCPA(@PathParam("cpaId") String cpaId) throws CPAServiceException
 	{
@@ -114,7 +114,6 @@ public class CPAServiceImpl implements CPAService, WithService
 	}
 
 	@GET
-	@Produces(MediaType.APPLICATION_JSON)
 	@Override
 	public List<String> getCPAIds() throws CPAServiceException
 	{
@@ -133,7 +132,6 @@ public class CPAServiceImpl implements CPAService, WithService
 
 	@GET
 	@Path("{cpaId}")
-	@Produces(MediaType.APPLICATION_JSON)
 	@Override
 	public /*CollaborationProtocolAgreement*/String getCPA(@PathParam("cpaId") String cpaId) throws CPAServiceException
 	{
