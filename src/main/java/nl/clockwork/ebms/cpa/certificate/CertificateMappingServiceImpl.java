@@ -18,20 +18,32 @@ package nl.clockwork.ebms.cpa.certificate;
 import java.security.cert.X509Certificate;
 import java.util.List;
 
+import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
+
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import nl.clockwork.ebms.jaxrs.WithService;
 
 @Slf4j
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor
-public class CertificateMappingServiceImpl implements CertificateMappingService
+@Path("certificateMapping")
+public class CertificateMappingServiceImpl implements CertificateMappingService, WithService
 {
   @NonNull
 	CertificateMapper certificateMapper;
 
+	@POST
+	@Produces(MediaType.APPLICATION_JSON)
 	@Override
 	public void setCertificateMapping(CertificateMapping certificateMapping) throws CertificateMappingServiceException
 	{
@@ -44,12 +56,15 @@ public class CertificateMappingServiceImpl implements CertificateMappingService
 		catch (Exception e)
 		{
 			log.error("SetCertificateMapping " + certificateMapping,e);
-			throw new CertificateMappingServiceException(e);
+			throwServiceException(new CertificateMappingServiceException(e));
 		}
 	}
 
+	@DELETE
+	@Path("{id}/{cpaId}")
+	@Produces(MediaType.APPLICATION_JSON)
 	@Override
-	public void deleteCertificateMapping(X509Certificate source, String cpaId) throws CertificateMappingServiceException
+	public void deleteCertificateMapping(@PathParam("id") X509Certificate source, @PathParam("cpaId") String cpaId) throws CertificateMappingServiceException
 	{
 		try
 		{
@@ -60,10 +75,12 @@ public class CertificateMappingServiceImpl implements CertificateMappingService
 		catch (Exception e)
 		{
 			log.error("SetCertificateMapping" + source,e);
-			throw new CertificateMappingServiceException(e);
+			throwServiceException(new CertificateMappingServiceException(e));
 		}
 	}
 
+	@GET
+	@Produces(MediaType.APPLICATION_JSON)
 	@Override
 	public List<CertificateMapping> getCertificateMappings() throws CertificateMappingServiceException
 	{
@@ -75,7 +92,8 @@ public class CertificateMappingServiceImpl implements CertificateMappingService
 		catch (Exception e)
 		{
 			log.error("SetCertificateMapping",e);
-			throw new CertificateMappingServiceException(e);
+			throwServiceException(new CertificateMappingServiceException(e));
+			return null;
 		}
 	}
 }
