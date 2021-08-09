@@ -15,22 +15,41 @@
  */
 package nl.clockwork.ebms.cpa.url;
 
+import static javax.ws.rs.core.Response.Status.INTERNAL_SERVER_ERROR;
+
 import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+
+import org.apache.cxf.phase.PhaseInterceptorChain;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
+import lombok.val;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor
+@Path("/urlMapping")
 public class URLMappingServiceImpl implements URLMappingService
 {
   @NonNull
 	URLMapper urlMapper;
 
+	@POST
+  @Produces(MediaType.APPLICATION_JSON)
 	@Override
 	public void setURLMapping(URLMapping urlMapping) throws URLMappingServiceException
 	{
@@ -43,12 +62,31 @@ public class URLMappingServiceImpl implements URLMappingService
 		catch (Exception e)
 		{
 			log.error("SetURLMapping " + urlMapping,e);
-			throw new URLMappingServiceException(e);
+			throwServiceException(new URLMappingServiceException(e));
 		}
 	}
 
+  private static <T extends Exception> void throwServiceException(T exception) throws T
+	{
+    val message = PhaseInterceptorChain.getCurrentMessage();
+    val servletRequest = (HttpServletRequest)message.get("HTTP.REQUEST");
+    if (servletRequest.getContentType().equals("application/json"))
+		{
+      val response = Response.status(INTERNAL_SERVER_ERROR)
+					.type("application/json")
+					.entity(exception.getMessage())
+					.build();
+      throw new WebApplicationException(response);
+    }
+		else
+      throw exception;
+  }
+
+	@DELETE
+	@Path("{id}")
+  @Produces(MediaType.APPLICATION_JSON)
 	@Override
-	public void deleteURLMapping(String source) throws URLMappingServiceException
+	public void deleteURLMapping(@PathParam("id") String source) throws URLMappingServiceException
 	{
 		try
 		{
@@ -58,10 +96,12 @@ public class URLMappingServiceImpl implements URLMappingService
 		catch (Exception e)
 		{
 			log.error("DeleteURLMapping " + source,e);
-			throw new URLMappingServiceException(e);
+			throwServiceException(new URLMappingServiceException(e));
 		}
 	}
 
+	@GET
+  @Produces(MediaType.APPLICATION_JSON)
 	@Override
 	public List<URLMapping> getURLMappings() throws URLMappingServiceException
 	{
@@ -73,7 +113,8 @@ public class URLMappingServiceImpl implements URLMappingService
 		catch (Exception e)
 		{
 			log.error("GetURLMappings",e);
-			throw new URLMappingServiceException(e);
+			throwServiceException(new URLMappingServiceException(e));
+			return null;
 		}
 	}
 }
