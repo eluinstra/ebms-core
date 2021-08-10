@@ -1,3 +1,5 @@
+### validateCPA
+
 POST http://localhost:8080/service/rest/cpas/validate
 Content-Type: application/json
 
@@ -443,7 +445,7 @@ Content-Type: application/json
 	</tns:Packaging>
 </tns:CollaborationProtocolAgreement>
 
-###
+### insertCPA
 
 POST http://localhost:8080/service/rest/cpas/true
 Content-Type: application/json
@@ -890,19 +892,19 @@ Content-Type: application/json
 	</tns:Packaging>
 </tns:CollaborationProtocolAgreement>
 
-###
+### deleteCPA
 
 DELETE http://localhost:8080/service/rest/cpas/cpaStubEBF.rm.https.signed
 
-###
+### getCPAIds
 
 GET http://localhost:8080/service/rest/cpas
 
-###
+### getCPA
 
 GET http://localhost:8080/service/rest/cpas/cpaStubEBF.rm.https.signed
 
-###
+### setURLMapping
 
 POST http://localhost:8080/service/rest/urlMappings
 Content-Type: application/json
@@ -912,15 +914,15 @@ Content-Type: application/json
   "destination": "http://www.b.com"
 }
 
-###
+### getURLMappings
 
 GET http://localhost:8080/service/rest/urlMappings
 
-###
+### deleteURLMapping
 
 DELETE http://localhost:8080/service/rest/urlMappings/http%3A%2F%2Fwww.a.com
 
-###
+### setCertificateMapping
 
 POST http://localhost:8080/service/rest/certificateMappings
 Content-Type: application/json
@@ -930,20 +932,20 @@ Content-Type: application/json
   "destination": "MIICYTCCAcqgAwIBAgIETsDxqzANBgkqhkiG9w0BAQUFADB1MQswCQYDVQQGEwJO TDESMBAGA1UECBMJR3JvbmluZ2VuMRIwEAYDVQQHEwlHcm9uaW5nZW4xDzANBgNV BAoTBk9yZGluYTESMBAGA1UECxMJQ2xvY2t3b3JrMRkwFwYDVQQDExB3d3cuY2xv Y2t3b3JrLm5sMB4XDTExMTExNDEwNDcwN1oXDTIxMTExMTEwNDcwN1owdTELMAkG A1UEBhMCTkwxEjAQBgNVBAgTCUdyb25pbmdlbjESMBAGA1UEBxMJR3JvbmluZ2Vu MQ8wDQYDVQQKEwZPcmRpbmExEjAQBgNVBAsTCUNsb2Nrd29yazEZMBcGA1UEAxMQ d3d3LmNsb2Nrd29yay5ubDCBnzANBgkqhkiG9w0BAQEFAAOBjQAwgYkCgYEA1Kkd UYLsAJpvJc/sW+dblxhCP6Xn0UekqW4CEcpYW1AEf5ahth0bQ4+lZobEG2jVzRMA 9DFapQf71AafkX8RjE3DYi6J+rl6PLWJ/OSyrUBGS1CEJc6HJS/uLsb020vumCnS BsWkfGPSaBBp9ZaO/mIY97JiUrYlwwEFjbGSHnUCAwEAATANBgkqhkiG9w0BAQUF AAOBgQCwDPHKtmuz4jLkEwP3CkfOL9+Q4LxhgUV7GtPm1XKIMN4VUey1NkFJUB5q wJXY1I7ql/VtZLjV2mPhS1SZkMKdFZ5uTKEr/KqT9Fazib5mK4YXOvFpOcDNBvpK X2SpoHffgXmdrExQshpIDzzofex0y/Kg4mulDQUPwVuIZtbnlQ=="
 }
 
-###
+### getCertificateMappings
 
 GET http://localhost:8080/service/rest/certificateMappings
 
-###
+### deleteCertificateMapping
 
 DELETE http://localhost:8080/service/rest/certificateMappings/MIICYTCCAcqgAwIBAgIETsDxqzANBgkqhkiG9w0BAQUFADB1MQswCQYDVQQGEwJO%20TDESMBAGA1UECBMJR3JvbmluZ2VuMRIwEAYDVQQHEwlHcm9uaW5nZW4xDzANBgNV%20BAoTBk9yZGluYTESMBAGA1UECxMJQ2xvY2t3b3JrMRkwFwYDVQQDExB3d3cuY2xv%20Y2t3b3JrLm5sMB4XDTExMTExNDEwNDcwN1oXDTIxMTExMTEwNDcwN1owdTELMAkG%20A1UEBhMCTkwxEjAQBgNVBAgTCUdyb25pbmdlbjESMBAGA1UEBxMJR3JvbmluZ2Vu%20MQ8wDQYDVQQKEwZPcmRpbmExEjAQBgNVBAsTCUNsb2Nrd29yazEZMBcGA1UEAxMQ%20d3d3LmNsb2Nrd29yay5ubDCBnzANBgkqhkiG9w0BAQEFAAOBjQAwgYkCgYEA1Kkd%20UYLsAJpvJc%2FsW%2BdblxhCP6Xn0UekqW4CEcpYW1AEf5ahth0bQ4%2BlZobEG2jVzRMA%209DFapQf71AafkX8RjE3DYi6J%2Brl6PLWJ%2FOSyrUBGS1CEJc6HJS%2FuLsb020vumCnS%20BsWkfGPSaBBp9ZaO%2FmIY97JiUrYlwwEFjbGSHnUCAwEAATANBgkqhkiG9w0BAQUF%20AAOBgQCwDPHKtmuz4jLkEwP3CkfOL9%2BQ4LxhgUV7GtPm1XKIMN4VUey1NkFJUB5q%20wJXY1I7ql%2FVtZLjV2mPhS1SZkMKdFZ5uTKEr%2FKqT9Fazib5mK4YXOvFpOcDNBvpK%20X2SpoHffgXmdrExQshpIDzzofex0y%2FKg4mulDQUPwVuIZtbnlQ%3D%3D/null
 
-###
+### ping
 
 POST http://localhost:8080/service/rest/ebms/ping/cpaStubEBF.rm.https.signed/from/urn:osb:oin:00000000000000000000/to/urn:osb:oin:00000000000000000001
 Content-Type: application/json
 
-###
+### sendMessage
 
 POST http://localhost:8080/service/rest/ebms/messages
 Content-Type: application/json
@@ -961,7 +963,7 @@ Content-Type: application/json
   "dataSources": []
 }
 
-###
+### sendMessage
 
 POST http://localhost:8080/service/rest/ebms/messages
 Content-Type: application/json
@@ -983,7 +985,7 @@ Content-Type: application/json
   }]
 }
 
-###
+### sendMessageMTOM
 
 POST http://localhost:8080/service/rest/ebms/messages/mtom
 Content-Type: multipart/form-data; boundary=-=cTIBJ6SPK7J5=-
@@ -1015,34 +1017,34 @@ Content-Transfer-Encoding: base64
 U2FtcGxlIG1lc3NhZ2Uu
 ---=cTIBJ6SPK7J5=---
 
-###
+### resendMessage
 
 PUT http://localhost:8080/service/rest/ebms/messages/?
 Content-Type: application/json
 
-###
+### getUnprocessedMessageIds
 
 POST http://localhost:8080/service/rest/ebms/messages/0
 Content-Type: application/json
 
 {}
 
-###
+### getMessage
 
 GET http://localhost:8080/service/rest/ebms/messages/?/false
 
-###
+### processMessage
 
 PATCH http://localhost:8080/service/rest/ebms/messages/?
 
-###
+### getMessageStatus
 
 GET http://localhost:8080/service/rest/ebms/messages/?/status
 
-###
+### getUnprocessedMessageEvents
 
 POST http://localhost:8080/service/rest/ebms/events/eventTypes%5B%5D/0
 
-###
+### processMessageEvent
 
 PATCH  http://localhost:8080/service/rest/ebms/events/?

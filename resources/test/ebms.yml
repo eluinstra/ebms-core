@@ -1,0 +1,706 @@
+openapi: '3.0.2'
+info:
+  title: EbMS Service
+  version: '1.0'
+servers:
+  - url: http://localhost:8080/service/rest
+  - url: https://localhost:8443/service/rest
+
+components:
+  schemas:
+    CertificateMapping:
+      type: object
+      properties:
+        source:
+          type: string
+          format: byte
+        destination:
+          type: string
+          format: byte
+      required:
+        - source
+        - destination
+    DataSource:
+      type: object
+      properties:
+        name:
+          type: string
+        contentId:
+          type: string
+        contentType:
+          type: string
+        content:
+          type: string
+          format: byte
+      required:
+        - name
+        - contentType
+        - content
+    Error:
+      type: object
+      properties:
+        message:
+          type: string
+      required:
+        - message
+    Message:
+      type: object
+      properties:
+        properties:
+          $ref: '#/components/schemas/MessageProperties'
+        dataSources:
+          type: array
+          items:
+            $ref: '#/components/schemas/DataSource'
+      required:
+        - properties
+        - dataSources
+    MessageEvent:
+      type: object
+      properties:
+        messageId:
+          type: string
+        type:
+          $ref: '#/components/schemas/MessageEventType'
+      required:
+        - messageId
+        - type
+    MessageEventType:
+      type: string
+      enum:
+        - RECEIVED
+        - DELIVERED
+        - FAILED
+        - EXPIRED
+    MessageFilter:
+      type: object
+      properties:
+        cpaId:
+          type: string
+        fromParty:
+          $ref: '#/components/schemas/Party'
+        toParty:
+          $ref: '#/components/schemas/Party'
+        service:
+          type: string
+        action:
+          type: string
+        conversationId:
+          type: string
+        messageId:
+          type: string
+        refToMessageId:
+          type: string
+    MessageProperties:
+      type: object
+      properties:
+        cpaId:
+          type: string
+        fromParty:
+          $ref: '#/components/schemas/Party'
+        toParty:
+          $ref: '#/components/schemas/Party'
+        service:
+          type: string
+        action:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
+        conversationId:
+          type: string
+        messageId:
+          type: string
+        refToMessageId:
+          type: string
+        messageStatus:
+          $ref: '#/components/schemas/MessageStatus'
+      required:
+        - cpaId
+        - fromPartyId
+        - fromRole
+        - service
+        - action
+        - timestamp
+        - conversationId
+        - messageId
+        - messageStatus
+    MessageRequest:
+      type: object
+      properties:
+        properties:
+          $ref: '#/components/schemas/MessageRequestProperties'
+        dataSources:
+          type: array
+          items:
+            $ref: '#/components/schemas/DataSource'
+      required:
+        - properties
+        - dataSources
+    MessageRequestProperties:
+      type: object
+      properties:
+        cpaId:
+          type: string
+        fromPartyId:
+          type: string
+        fromRole:
+          type: string
+        toPartyId:
+          type: string
+        toRole:
+          type: string
+        service:
+          type: string
+        action:
+          type: string
+        conversationId:
+          type: string
+        messageId:
+          type: string
+        refToMessageId:
+          type: string
+      required:
+        - cpaId
+        - fromPartyId
+        - fromRole
+        - service
+        - action
+    MessageStatus:
+      type: string
+      enum:
+        - UNAUTHORIZED
+        - NOT_RECOGNIZED
+        - RECEIVED
+        - PROCESSED
+        - FORWARDED
+        - FAILED
+        - CREATED
+        - DELIVERY_FAILED
+        - DELIVERED
+        - EXPIRED
+    Party:
+      type: object
+      properties:
+        partyId:
+          type: string
+        role:
+          type: string
+      required:
+        - partyId
+    URLMapping:
+      type: object
+      properties:
+        source:
+          type: string
+        destination:
+          type: string
+      required:
+        - source
+        - destination
+paths:
+  /cpas/validate:
+    post:
+      tags:
+        - CPA
+      description: Validates the CPA
+      operationId: validateCPA
+      requestBody:
+        content:
+          'application/json':
+            schema:
+              type: string
+      responses:
+        '200':
+          description: OK
+        default:
+          description: Error
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/Error'
+  /cpas/{overwrite}:
+    post:
+      tags:
+        - CPA
+      description: Stores the CPA. If overwrite is true and the CPA exists, the CPA will be overwritten
+      operationId: insertCPA
+      requestBody:
+        content:
+          'application/json':
+            schema:
+              type: string
+      responses:
+        '200':
+          description: The cpaId of the CPA
+          content:
+            'text/plain':
+              schema:
+                type: string
+        default:
+          description: Error
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/Error'
+    parameters:
+      - name: overwrite
+        in: path
+        required: true
+        schema:
+          type: boolean
+  /cpas/{cpaId}:
+    get:
+      tags:
+        - CPA
+      description: Returns the CPA identified by cpaId
+      operationId: getCPA
+      responses:
+        '200':
+          description: The CPA
+          content:
+            'text/xml':
+              schema:
+                type: string
+        default:
+          description: Error
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/Error'
+
+    delete:
+      tags:
+        - CPA
+      description: Removes CPA identified by cpaId
+      operationId: deleteCPA
+      responses:
+        '200':
+          description: OK
+        default:
+          description: Error
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/Error'
+    parameters:
+      - name: cpaId
+        in: path
+        required: true
+        schema:
+          type: string
+  /cpas:
+    get:
+      tags:
+        - CPA
+      description: Returns a list of all cpaIds
+      operationId: getCPAIds
+      responses:
+        '200':
+          description: The list of cpaIds
+          content:
+            'application/json':
+              schema:
+                type: array
+                items:
+                  type: string
+        default:
+          description: Error
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/Error'
+  /urlMappings:
+    get:
+      tags:
+        - URLs
+      description: Returns a list of all URL mappings
+      operationId: getURLMappings
+      responses:
+        '200':
+          description: The list of URL mappings
+          content:
+            'application/json':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/URLMapping'
+        default:
+          description: Error
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/Error'
+
+    post:
+      tags:
+        - URLs
+      description: Stores the URL mapping
+      operationId: setURLMapping
+      requestBody:
+        description: Maps the source URL to the destination URL
+        content:
+          'application/json':
+            schema:
+              $ref: '#/components/schemas/URLMapping'
+      responses:
+        '200':
+          description: OK
+        default:
+          description: Error
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/Error'
+  /urlMappings/{sourceURL}:
+    get:
+      tags:
+        - URLs
+      description: Removes URL mapping identified by source URL id
+      operationId: deleteURLMapping
+      responses:
+        '200':
+          description: OK
+        default:
+          description: Error
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/Error'
+    parameters:
+      - name: sourceURL
+        in: path
+        required: true
+        schema:
+          type: string
+  /certificateMappings:
+    get:
+      tags:
+        - Certificates
+      description: Returns a list of all Certificate mappings
+      operationId: getCertificateMappings
+      responses:
+        '200':
+          description: The list of Certificate mappings
+          content:
+            'application/json':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CertificateMapping'
+        default:
+          description: Error
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/Error'
+
+    post:
+      tags:
+        - Certificates
+      description: Stores the Certificate mapping
+      operationId: setCertificateMapping
+      requestBody:
+        description: Maps the source Certificate to the destination Certificate
+        content:
+          'application/json':
+            schema:
+              $ref: '#/components/schemas/CertificateMapping'
+      responses:
+        '200':
+          description: OK
+        default:
+          description: Error
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/Error'
+  /certificateMappings/{source}:
+    get:
+      tags:
+        - Certificates
+      description: Removes Certificate mapping identified by source Certificate id
+      operationId: deleteCertificateMapping
+      responses:
+        '200':
+          description: OK
+        default:
+          description: Error
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/Error'
+    parameters:
+      - name: source
+        in: path
+        required: true
+        schema:
+          type: string
+  /ebms/ping/{cpaId}/from/{fromPartyId}/to/{toPartyId}:
+    get:
+      tags:
+        - EbMS
+      description: Performs an EbMS ping action for CPA cpaId, from party fromPartyId to party toPartyId
+      operationId: ping
+      responses:
+        '200':
+          description: OK
+        default:
+          description: Error
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/Error'
+    parameters:
+      - name: cpaId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: fromPartyId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: toPartyId
+        in: path
+        required: true
+        schema:
+          type: string
+  /messages:
+    post:
+      tags:
+        - EbMS
+      description: Sends message message as an EbMS message
+      operationId: sendMessage
+      requestBody:
+        content:
+          'application/json':
+            schema:
+              $ref: '#/components/schemas/MessageRequest'
+      responses:
+        '200':
+          description: The messageId of the generated EbMS message
+          content:
+            'text/plain':
+              schema:
+                type: string
+        default:
+          description: Error
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/Error'
+  /messages/mtom:
+    post:
+      tags:
+        - EbMS
+      description: Sends message message as an EbMS message
+      operationId: sendMessageMTOM
+      requestBody:
+        content:
+          'multipart/form-data':
+            schema:
+              type: object
+              properties:
+                requestProperties:
+                  $ref: '#/components/schemas/MessageRequestProperties'
+                attachments:
+                  type: array
+                  items:
+                    type: string
+                    format: binary
+      responses:
+        '200':
+          description: The messageId of the generated EbMS message
+          content:
+            'text/plain':
+              schema:
+                type: string
+        default:
+          description: Error
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/Error'
+  /messages/{messageId}:
+    put:
+      tags:
+        - EbMS
+      description: Resends the message identified by messageId as an EbMS message
+      operationId: resendMessage
+      responses:
+        '200':
+          description: The messageId of the generated EbMS message
+          content:
+            'text/plain':
+              schema:
+                type: string
+        default:
+          description: Error
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/Error'
+
+    patch:
+      tags:
+        - EbMS
+      description: Sets the status of the message identified by messageId to PROCESSED, so that it is no longer returned in the list of getUnprocessedMessageIds
+      operationId: processMessage
+      responses:
+        '200':
+          description: OK
+        default:
+          description: Error
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/Error'
+    parameters:
+      - name: messageId
+        in: path
+        required: true
+        schema:
+          type: string
+  /messages/{maxNr}:
+    post:
+      tags:
+        - EbMS
+      description: Returns all messageIds of messages with status RECEIVED that satisfy filter messageFilter. If maxNr is given, then maxNr messageIds are returned
+      operationId: getUnprocessedMessageIds
+      requestBody:
+        content:
+          'application/json':
+            schema:
+              $ref: '#/components/schemas/MessageFilter'
+      responses:
+        '200':
+          description: The list of messageIds
+          content:
+            'application/json':
+              schema:
+                type: array
+                items:
+                  type: string
+        default:
+          description: Error
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/Error'
+    parameters:
+      - name: maxNr
+        in: path
+        required: true
+        schema:
+          type: number
+  /messages/{messageId}/{process}:
+    get:
+      tags:
+        - EbMS
+      description: Returns the message identified by messageId. If process is true, the message is given the status PROCESSED, which means that it is no longer returned in the list of getUnprocessedMessageIds
+      operationId: getMessage
+      responses:
+        '200':
+          description: The message
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/Message'
+        default:
+          description: Error
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/Error'
+    parameters:
+      - name: messageId
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: process
+        in: path
+        required: true
+        schema:
+          type: boolean
+  /messages/{messageId}/status:
+    get:
+      tags:
+        - EbMS
+      description: Returns the message status of the message identified by messageId
+      operationId: getMessageStatus
+      responses:
+        '200':
+          description: The message status
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/MessageStatus'
+        default:
+          description: Error
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/Error'
+    parameters:
+      - name: messageId
+        in: path
+        required: true
+        schema:
+          type: string
+  /events/{eventTypes}/{maxNr}:
+    post:
+      tags:
+        - EbMS
+      description: Returns the events that satisfy filter messageFilter and event types eventTypes. If maxNr is given, then maxNr events are returned.
+      operationId: getUnprocessedMessageEvents
+      requestBody:
+        content:
+          'application/json':
+            schema:
+              $ref: '#/components/schemas/MessageFilter'
+      responses:
+        '200':
+          description: The list of events
+          content:
+            'application/json':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/MessageEvent'
+        default:
+          description: Error
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/Error'
+    parameters:
+      - name: eventTypes
+        in: path
+        required: true
+        schema:
+          type: array
+          items:
+            $ref: '#/components/schemas/MessageEventType'
+      - name: maxNr
+        in: path
+        required: true
+        schema:
+          type: number
+  /events/{messageId}:
+    patch:
+      tags:
+        - EbMS
+      description: Sets processed to true for the event of the message identified by messageId, so that it is no longer returned in the list of getUnprocessedMessageEvents (and getUnprocessedMessageIds in case of a RECEIVED event)
+      operationId: processMessageEvent
+      responses:
+        '200':
+          description: OK
+        default:
+          description: Error
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/Error'

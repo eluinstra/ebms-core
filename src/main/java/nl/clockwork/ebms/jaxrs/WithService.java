@@ -8,6 +8,7 @@ import javax.ws.rs.core.Response;
 
 import org.apache.cxf.phase.PhaseInterceptorChain;
 
+import lombok.NonNull;
 import lombok.Value;
 import lombok.val;
 
@@ -16,6 +17,7 @@ public interface WithService
   @Value
   public class Error
   {
+    @NonNull
     String message;
   }
 
