@@ -50,7 +50,7 @@ class CertificateMappingDAOImpl implements CertificateMappingDAO
 			try
 			{
 				CertificateFactory certificateFactory = CertificateFactory.getInstance("X509");
-				return Tuple.of((X509Certificate)certificateFactory.generateCertificate(rs.getBinaryStream("source")),rs.getString("cpa_id"));
+				return Tuple.of((X509Certificate)certificateFactory.generateCertificate(rs.getBinaryStream("destination")),rs.getString("cpa_id"));
 			}
 			catch (CertificateException e)
 			{

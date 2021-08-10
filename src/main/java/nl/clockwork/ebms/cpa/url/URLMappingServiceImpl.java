@@ -35,7 +35,7 @@ import nl.clockwork.ebms.jaxrs.WithService;
 @Slf4j
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor
-@Path("urlMapping")
+@Path("urlMappings")
 @Produces(MediaType.APPLICATION_JSON)
 public class URLMappingServiceImpl implements URLMappingService, WithService
 {

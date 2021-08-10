@@ -17,7 +17,6 @@ package nl.clockwork.ebms.cpa;
 
 import java.util.List;
 
-import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -42,7 +41,7 @@ import nl.clockwork.ebms.validation.XSDValidator;
 @Slf4j
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor
-@Path("cpa")
+@Path("cpas")
 @Produces(MediaType.APPLICATION_JSON)
 public class CPAServiceImpl implements CPAService, WithService
 {
@@ -74,6 +73,7 @@ public class CPAServiceImpl implements CPAService, WithService
 	
 	@POST
 	@Path("{overwrite}")
+	@Produces("text/plain")
 	@Override
 	public String insertCPA(/*CollaborationProtocolAgreement*/String cpa, @PathParam("overwrite") Boolean overwrite) throws CPAServiceException
 	{
@@ -132,6 +132,7 @@ public class CPAServiceImpl implements CPAService, WithService
 
 	@GET
 	@Path("{cpaId}")
+	@Produces("text/xml")
 	@Override
 	public /*CollaborationProtocolAgreement*/String getCPA(@PathParam("cpaId") String cpaId) throws CPAServiceException
 	{

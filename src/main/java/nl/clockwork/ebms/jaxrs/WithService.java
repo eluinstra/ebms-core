@@ -8,10 +8,16 @@ import javax.ws.rs.core.Response;
 
 import org.apache.cxf.phase.PhaseInterceptorChain;
 
+import lombok.Value;
 import lombok.val;
 
 public interface WithService
 {
+  @Value
+  public class Error
+  {
+    String message;
+  }
 
   default <T extends Exception> void throwServiceException(T exception) throws T
   {
@@ -21,7 +27,7 @@ public interface WithService
   	{
       val response = Response.status(INTERNAL_SERVER_ERROR)
   				.type("application/json")
-  				.entity(exception.getMessage())
+  				.entity(new Error(exception.getMessage()))
   				.build();
       throw new WebApplicationException(response);
     }

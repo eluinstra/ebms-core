@@ -31,12 +31,13 @@ import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import nl.clockwork.ebms.jaxb.X509CertificateConverter;
 import nl.clockwork.ebms.jaxrs.WithService;
 
 @Slf4j
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor
-@Path("certificateMapping")
+@Path("certificateMappings")
 @Produces(MediaType.APPLICATION_JSON)
 public class CertificateMappingServiceImpl implements CertificateMappingService, WithService
 {
@@ -62,18 +63,31 @@ public class CertificateMappingServiceImpl implements CertificateMappingService,
 
 	@DELETE
 	@Path("{id}/{cpaId}")
+	public void deleteCertificateMappingRest(@PathParam("id") byte[] source, @PathParam("cpaId") String cpaId) throws CertificateMappingServiceException
+	{
+		try
+		{
+			deleteCertificateMapping(X509CertificateConverter.parseCertificate(source),cpaId);
+		}
+		catch (Exception e)
+		{
+			log.error("DeleteCertificateMappingRest " + source,e);
+			throwServiceException(new CertificateMappingServiceException(e));
+		}
+	}
+
 	@Override
-	public void deleteCertificateMapping(@PathParam("id") X509Certificate source, @PathParam("cpaId") String cpaId) throws CertificateMappingServiceException
+	public void deleteCertificateMapping(X509Certificate source, String cpaId) throws CertificateMappingServiceException
 	{
 		try
 		{
 			if (log.isDebugEnabled())
-				log.debug("SetCertificateMapping" + source);
+				log.debug("DeleteCertificateMapping " + source);
 			certificateMapper.deleteCertificateMapping(source,cpaId);
 		}
 		catch (Exception e)
 		{
-			log.error("SetCertificateMapping" + source,e);
+			log.error("DeleteCertificateMapping " + source,e);
 			throwServiceException(new CertificateMappingServiceException(e));
 		}
 	}
@@ -84,12 +98,12 @@ public class CertificateMappingServiceImpl implements CertificateMappingService,
 	{
 		try
 		{
-			log.debug("SetCertificateMapping");
+			log.debug("GetCertificateMappings");
 			return certificateMapper.getCertificates();
 		}
 		catch (Exception e)
 		{
-			log.error("SetCertificateMapping",e);
+			log.error("GetCertificateMappings",e);
 			throwServiceException(new CertificateMappingServiceException(e));
 			return null;
 		}

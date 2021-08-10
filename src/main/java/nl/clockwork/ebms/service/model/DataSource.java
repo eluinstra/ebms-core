@@ -40,7 +40,6 @@ public class DataSource implements Serializable
 	private static final long serialVersionUID = 1L;
 	@XmlElement(required=true)
 	String name;
-	
 	String contentId;
 	@XmlElement(required=true)
 	@NonNull

@@ -1,22 +1,13 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!--
+POST http://localhost:8080/service/cpa HTTP/1.1
+Content-Type: text/xml;charset=UTF-8
+SOAPAction: ""
 
-    Copyright 2011 Clockwork
-
-    Licensed under the Apache License, Version 2.0 (the "License");
-    you may not use this file except in compliance with the License.
-    You may obtain a copy of the License at
-
-      http://www.apache.org/licenses/LICENSE-2.0
-
-    Unless required by applicable law or agreed to in writing, software
-    distributed under the License is distributed on an "AS IS" BASIS,
-    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-    See the License for the specific language governing permissions and
-    limitations under the License.
-
--->
-<tns:CollaborationProtocolAgreement xmlns:axsl="http://www.w3.org/1999/XSL/TransformAlias" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:functx="http://www.functx.com" xmlns:tns="http://www.oasis-open.org/committees/ebxml-cppa/schema/cpp-cpa-2_0.xsd" xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns:xlink="http://www.w3.org/1999/xlink" xsi:schemaLocation="http://www.oasis-open.org/committees/ebxml-cppa/schema/cpp-cpa-2_0.xsd http://www.oasis-open.org/committees/ebxml-cppa/schema/cpp-cpa-2_0.xsd" tns:cpaid="cpaStubEBF.rm.https.signed.sync" tns:version="1.0">
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns="http://www.ordina.nl/cpa/2.18">
+   <soapenv:Header/>
+   <soapenv:Body>
+      <ns:validateCPA>
+         <cpa><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
+<tns:CollaborationProtocolAgreement xmlns:axsl="http://www.w3.org/1999/XSL/TransformAlias" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:functx="http://www.functx.com" xmlns:tns="http://www.oasis-open.org/committees/ebxml-cppa/schema/cpp-cpa-2_0.xsd" xmlns:ds="http://www.w3.org/2000/09/xmldsig#" xmlns:xlink="http://www.w3.org/1999/xlink" xsi:schemaLocation="http://www.oasis-open.org/committees/ebxml-cppa/schema/cpp-cpa-2_0.xsd http://www.oasis-open.org/committees/ebxml-cppa/schema/cpp-cpa-2_0.xsd" tns:cpaid="cpaStubEBF.rm.https.signed" tns:version="1.0">
 	<tns:Status tns:value="agreed" />
 	<tns:Start>2011-01-01T00:00:00Z</tns:Start>
 	<tns:End>2031-01-01T00:00:00Z</tns:End>
@@ -154,10 +145,10 @@
 			</tns:TrustAnchors>
 		</tns:SecurityDetails>
 		<tns:DeliveryChannel tns:channelId="DIGIPOORT_defaultDeliveryChannel_ProfileBestEffortSigned" tns:docExchangeId="DIGIPOORT_SIGNED_BestEffort" tns:transportId="DIGIPOORT_transport_HTTPS">
-			<tns:MessagingCharacteristics tns:syncReplyMode="signalsAndResponse" tns:ackRequested="never" tns:actor="urn:oasis:names:tc:ebxml-msg:actor:toPartyMSH" tns:ackSignatureRequested="never" tns:duplicateElimination="never" />
+			<tns:MessagingCharacteristics tns:syncReplyMode="none" tns:ackRequested="never" tns:actor="urn:oasis:names:tc:ebxml-msg:actor:toPartyMSH" tns:ackSignatureRequested="never" tns:duplicateElimination="never" />
 		</tns:DeliveryChannel>
 		<tns:DeliveryChannel tns:channelId="DIGIPOORT_defaultDeliveryChannel_ProfileReliableMessagingSigned" tns:docExchangeId="DIGIPOORT_SIGNED_ReliableMessaging" tns:transportId="DIGIPOORT_transport_HTTPS">
-			<tns:MessagingCharacteristics tns:syncReplyMode="signalsAndResponse" tns:ackRequested="always" tns:actor="urn:oasis:names:tc:ebxml-msg:actor:toPartyMSH" tns:ackSignatureRequested="never" tns:duplicateElimination="always" />
+			<tns:MessagingCharacteristics tns:syncReplyMode="none" tns:ackRequested="always" tns:actor="urn:oasis:names:tc:ebxml-msg:actor:toPartyMSH" tns:ackSignatureRequested="never" tns:duplicateElimination="always" />
 		</tns:DeliveryChannel>
 		<tns:Transport tns:transportId="DIGIPOORT_transport_HTTPS">
 			<tns:TransportSender>
@@ -203,7 +194,7 @@
 					<tns:RetryInterval>PT5M</tns:RetryInterval>
 					<tns:MessageOrderSemantics>NotGuaranteed</tns:MessageOrderSemantics>
 				</tns:ReliableMessaging>
-				<tns:PersistDuration>PT25M</tns:PersistDuration>
+				<tns:PersistDuration>PT30M</tns:PersistDuration>
 				<tns:SenderNonRepudiation>
 					<tns:NonRepudiationProtocol>http://www.w3.org/2000/09/xmldsig#</tns:NonRepudiationProtocol>
 					<tns:HashFunction>http://www.w3.org/2000/09/xmldsig#sha1</tns:HashFunction>
@@ -217,7 +208,7 @@
 					<tns:RetryInterval>PT5M</tns:RetryInterval>
 					<tns:MessageOrderSemantics>NotGuaranteed</tns:MessageOrderSemantics>
 				</tns:ReliableMessaging>
-				<tns:PersistDuration>PT25M</tns:PersistDuration>
+				<tns:PersistDuration>PT30M</tns:PersistDuration>
 				<tns:ReceiverNonRepudiation>
 					<tns:NonRepudiationProtocol>http://www.w3.org/2000/09/xmldsig#</tns:NonRepudiationProtocol>
 					<tns:HashFunction>http://www.w3.org/2000/09/xmldsig#sha1</tns:HashFunction>
@@ -361,10 +352,10 @@
 			</tns:TrustAnchors>
 		</tns:SecurityDetails>
 		<tns:DeliveryChannel tns:channelId="OVERHEID_defaultDeliveryChannel_ProfileBestEffortSigned" tns:docExchangeId="OVERHEID_SIGNED_BestEffort" tns:transportId="OVERHEID_transport_HTTPS">
-			<tns:MessagingCharacteristics tns:syncReplyMode="signalsAndResponse" tns:ackRequested="never" tns:actor="urn:oasis:names:tc:ebxml-msg:actor:toPartyMSH" tns:ackSignatureRequested="never" tns:duplicateElimination="never" />
+			<tns:MessagingCharacteristics tns:syncReplyMode="none" tns:ackRequested="never" tns:actor="urn:oasis:names:tc:ebxml-msg:actor:toPartyMSH" tns:ackSignatureRequested="never" tns:duplicateElimination="never" />
 		</tns:DeliveryChannel>
 		<tns:DeliveryChannel tns:channelId="OVERHEID_defaultDeliveryChannel_ProfileReliableMessagingSigned" tns:docExchangeId="OVERHEID_SIGNED_ReliableMessaging" tns:transportId="OVERHEID_transport_HTTPS">
-			<tns:MessagingCharacteristics tns:syncReplyMode="signalsAndResponse" tns:ackRequested="always" tns:actor="urn:oasis:names:tc:ebxml-msg:actor:toPartyMSH" tns:ackSignatureRequested="never" tns:duplicateElimination="always" />
+			<tns:MessagingCharacteristics tns:syncReplyMode="none" tns:ackRequested="always" tns:actor="urn:oasis:names:tc:ebxml-msg:actor:toPartyMSH" tns:ackSignatureRequested="never" tns:duplicateElimination="always" />
 		</tns:DeliveryChannel>
 		<tns:Transport tns:transportId="OVERHEID_transport_HTTPS">
 			<tns:TransportSender>
@@ -410,7 +401,7 @@
 					<tns:RetryInterval>PT5M</tns:RetryInterval>
 					<tns:MessageOrderSemantics>NotGuaranteed</tns:MessageOrderSemantics>
 				</tns:ReliableMessaging>
-				<tns:PersistDuration>PT25M</tns:PersistDuration>
+				<tns:PersistDuration>PT30M</tns:PersistDuration>
 				<tns:SenderNonRepudiation>
 					<tns:NonRepudiationProtocol>http://www.w3.org/2000/09/xmldsig#</tns:NonRepudiationProtocol>
 					<tns:HashFunction>http://www.w3.org/2000/09/xmldsig#sha1</tns:HashFunction>
@@ -424,7 +415,7 @@
 					<tns:RetryInterval>PT5M</tns:RetryInterval>
 					<tns:MessageOrderSemantics>NotGuaranteed</tns:MessageOrderSemantics>
 				</tns:ReliableMessaging>
-				<tns:PersistDuration>PT25M</tns:PersistDuration>
+				<tns:PersistDuration>PT30M</tns:PersistDuration>
 				<tns:ReceiverNonRepudiation>
 					<tns:NonRepudiationProtocol>http://www.w3.org/2000/09/xmldsig#</tns:NonRepudiationProtocol>
 					<tns:HashFunction>http://www.w3.org/2000/09/xmldsig#sha1</tns:HashFunction>
@@ -455,4 +446,7 @@
 			</tns:Composite>
 		</tns:CompositeList>
 	</tns:Packaging>
-</tns:CollaborationProtocolAgreement>
+</tns:CollaborationProtocolAgreement>]]></cpa>
+      </ns:validateCPA>
+   </soapenv:Body>
+</soapenv:Envelope>
