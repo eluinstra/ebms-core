@@ -23,6 +23,7 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CollaborationProtocolAgreement;
@@ -72,10 +73,10 @@ public class CPAServiceImpl implements CPAService, WithService
 	}
 	
 	@POST
-	@Path("{overwrite}")
+	@Path("?overwrite={overwrite}")
 	@Produces("text/plain")
 	@Override
-	public String insertCPA(/*CollaborationProtocolAgreement*/String cpa, @PathParam("overwrite") Boolean overwrite) throws CPAServiceException
+	public String insertCPA(/*CollaborationProtocolAgreement*/String cpa, @QueryParam("overwrite") Boolean overwrite) throws CPAServiceException
 	{
 		try
 		{

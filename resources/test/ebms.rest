@@ -447,7 +447,7 @@ Content-Type: application/json
 
 ### insertCPA
 
-POST http://localhost:8080/service/rest/v18/cpas/true
+POST http://localhost:8080/service/rest/v18/cpas?overwrite=true
 Content-Type: application/json
 
 <?xml version="1.0" encoding="UTF-8"?>
@@ -1024,14 +1024,18 @@ Content-Type: application/json
 
 ### getUnprocessedMessageIds
 
-POST http://localhost:8080/service/rest/v18/ebms/messages/0
+POST http://localhost:8080/service/rest/v18/ebms/messages?maxNr=
 Content-Type: application/json
 
 {}
 
 ### getMessage
 
-GET http://localhost:8080/service/rest/v18/ebms/messages/?/false
+GET http://localhost:8080/service/rest/v18/ebms/messages/??process=false
+
+### getMessageMTOM
+
+GET http://localhost:8080/service/rest/v18/ebms/messages/mtom/??process=false
 
 ### processMessage
 
@@ -1043,7 +1047,7 @@ GET http://localhost:8080/service/rest/v18/ebms/messages/?/status
 
 ### getUnprocessedMessageEvents
 
-POST http://localhost:8080/service/rest/v18/ebms/events/eventTypes%5B%5D/0
+POST http://localhost:8080/service/rest/v18/ebms/events?eventTypes=&maxNr=
 
 ### processMessageEvent
 

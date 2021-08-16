@@ -15,6 +15,7 @@
  */
 package nl.clockwork.ebms.service;
 
+import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -27,22 +28,28 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedHashMap;
 
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.apache.cxf.jaxrs.ext.multipart.Multipart;
+import org.apache.cxf.jaxrs.ext.multipart.MultipartBody;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
+import lombok.val;
 import lombok.experimental.FieldDefaults;
 import nl.clockwork.ebms.event.MessageEventType;
 import nl.clockwork.ebms.jaxrs.WithService;
 import nl.clockwork.ebms.service.model.MTOMDataSource;
+import nl.clockwork.ebms.service.model.MTOMMessage;
 import nl.clockwork.ebms.service.model.MTOMMessageRequest;
 import nl.clockwork.ebms.service.model.Message;
 import nl.clockwork.ebms.service.model.MessageEvent;
 import nl.clockwork.ebms.service.model.MessageFilter;
+import nl.clockwork.ebms.service.model.MessageProperties;
 import nl.clockwork.ebms.service.model.MessageRequest;
 import nl.clockwork.ebms.service.model.MessageRequestProperties;
 import nl.clockwork.ebms.service.model.MessageStatus;
@@ -128,9 +135,9 @@ public class EbMSMessageServiceImpl implements EbMSMessageService, WithService
 	}
 
 	@POST
-	@Path("messages/{maxNr}")
+	@Path("messages?maxNr={maxNr}")
 	@Override
-	public List<String> getUnprocessedMessageIds(MessageFilter messageFilter, @PathParam("maxNr") Integer maxNr) throws EbMSMessageServiceException
+	public List<String> getUnprocessedMessageIds(MessageFilter messageFilter, @QueryParam("maxNr") Integer maxNr) throws EbMSMessageServiceException
 	{
 		try
 		{
@@ -144,9 +151,9 @@ public class EbMSMessageServiceImpl implements EbMSMessageService, WithService
 	}
 
 	@GET
-	@Path("messages/{messageId}/{process}")
+	@Path("messages/{messageId}?process={process}")
 	@Override
-	public Message getMessage(@PathParam("messageId") final String messageId, @PathParam("process") Boolean process) throws EbMSMessageServiceException
+	public Message getMessage(@PathParam("messageId") final String messageId, @QueryParam("process") Boolean process) throws EbMSMessageServiceException
 	{
 		try
 		{
@@ -157,6 +164,40 @@ public class EbMSMessageServiceImpl implements EbMSMessageService, WithService
 			throwServiceException(e);
 			return null;
 		}
+	}
+
+	@GET
+	@Path("messages/mtom/{messageId}?process={process}")
+	@Produces("multipart/mixed")
+	public MultipartBody getMessageRest(@PathParam("messageId") final String messageId, @QueryParam("process") Boolean process) throws EbMSMessageServiceException
+	{
+		try
+		{
+			return toMultipartBody(serviceHandler.getMessageMTOM(messageId,process));
+		}
+		catch(EbMSMessageServiceException e)
+		{
+			throwServiceException(e);
+			return null;
+		}
+	}
+
+	private MultipartBody toMultipartBody(MTOMMessage message)
+	{
+		val attachments = new LinkedList<Attachment>();
+		attachments.add(toAttachment(message.getProperties()));
+		attachments.addAll(message.getDataSources().stream().map(this::toAttachment).collect(Collectors.toList()));
+		return new MultipartBody(attachments, true);  
+	}
+
+	private Attachment toAttachment(MessageProperties messageProperties)
+	{
+		return new Attachment("properties","application/json",messageProperties);
+	}
+
+	private Attachment toAttachment(MTOMDataSource dataSource)
+	{
+		return new Attachment(dataSource.getContentId(),dataSource.getAttachment(),new MultivaluedHashMap<String,String>());
 	}
 
 	@PATCH
@@ -183,9 +224,9 @@ public class EbMSMessageServiceImpl implements EbMSMessageService, WithService
 	}
 
 	@POST
-	@Path("events/{eventTypes}/{maxNr}")
+	@Path("events?eventTypes={eventTypes}&maxNr={maxNr}")
 	@Override
-	public List<MessageEvent> getUnprocessedMessageEvents(MessageFilter messageFilter, @PathParam("eventTypes") MessageEventType[] eventTypes, @PathParam("maxNr") Integer maxNr) throws EbMSMessageServiceException
+	public List<MessageEvent> getUnprocessedMessageEvents(MessageFilter messageFilter, @QueryParam("eventTypes") MessageEventType[] eventTypes, @QueryParam("maxNr") Integer maxNr) throws EbMSMessageServiceException
 	{
 		return serviceHandler.getUnprocessedMessageEvents(messageFilter,eventTypes,maxNr);
 	}

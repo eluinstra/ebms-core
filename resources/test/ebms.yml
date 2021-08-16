@@ -219,7 +219,7 @@ paths:
             'application/json':
               schema:
                 $ref: '#/components/schemas/Error'
-  /cpas/{overwrite}:
+  /cpas?overwrite={overwrite}:
     post:
       tags:
         - CPA
@@ -245,8 +245,8 @@ paths:
                 $ref: '#/components/schemas/Error'
     parameters:
       - name: overwrite
-        in: path
-        required: true
+        in: query
+        required: false
         schema:
           type: boolean
   /cpas/{cpaId}:
@@ -563,7 +563,7 @@ paths:
         required: true
         schema:
           type: string
-  /messages/{maxNr}:
+  /messages?maxNr={maxNr}:
     post:
       tags:
         - EbMS
@@ -591,11 +591,11 @@ paths:
                 $ref: '#/components/schemas/Error'
     parameters:
       - name: maxNr
-        in: path
-        required: true
+        in: query
+        required: false
         schema:
           type: number
-  /messages/{messageId}/{process}:
+  /messages/{messageId}?process={process}:
     get:
       tags:
         - EbMS
@@ -621,8 +621,38 @@ paths:
         schema:
           type: string
       - name: process
+        in: query
+        required: false
+        schema:
+          type: boolean
+  /messages/mtom/{messageId}?process={process}:
+    get:
+      tags:
+        - EbMS
+      description: Returns the message identified by messageId. If process is true, the message is given the status PROCESSED, which means that it is no longer returned in the list of getUnprocessedMessageIds
+      operationId: getMessage
+      responses:
+        '200':
+          description: The message
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/Message'
+        default:
+          description: Error
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/Error'
+    parameters:
+      - name: messageId
         in: path
         required: true
+        schema:
+          type: string
+      - name: process
+        in: query
+        required: false
         schema:
           type: boolean
   /messages/{messageId}/status:
@@ -650,7 +680,7 @@ paths:
         required: true
         schema:
           type: string
-  /events/{eventTypes}/{maxNr}:
+  /events?eventTypes={eventTypes}&maxNr={maxNr}:
     post:
       tags:
         - EbMS
@@ -678,15 +708,15 @@ paths:
                 $ref: '#/components/schemas/Error'
     parameters:
       - name: eventTypes
-        in: path
-        required: true
+        in: query
+        required: false
         schema:
           type: array
           items:
             $ref: '#/components/schemas/MessageEventType'
       - name: maxNr
-        in: path
-        required: true
+        in: query
+        required: false
         schema:
           type: number
   /events/{messageId}:
