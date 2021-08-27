@@ -40,7 +40,7 @@ class MessageEventDAOFactory extends AbstractDAOFactory<MessageEventDAO>
 			return "select message_event.message_id, message_event.event_type" +
 					" from message_event, ebms_message" +
 					" where message_event.processed = 0" +
-					" and message_event.event_type in (" + join(types == null ? MessageEventType.values() : types,",") + ")" +
+					" and message_event.event_type in (" + join(types == null || types.length == 0 ? MessageEventType.values() : types,",") + ")" +
 					" and message_event.message_id = ebms_message.message_id" +
 					" and ebms_message.message_nr = 0" +
 					messageContextFilter +
@@ -61,7 +61,7 @@ class MessageEventDAOFactory extends AbstractDAOFactory<MessageEventDAO>
 			return "select message_event.message_id, message_event.event_type" +
 					" from message_event, ebms_message" +
 					" where message_event.processed = 0" +
-					" and message_event.event_type in (" + join(types == null ? MessageEventType.values() : types,",") + ")" +
+					" and message_event.event_type in (" + join(types == null || types.length == 0 ? MessageEventType.values() : types,",") + ")" +
 					" and message_event.message_id = ebms_message.message_id" +
 					" and ebms_message.message_nr = 0" +
 					messageContextFilter +
@@ -82,7 +82,7 @@ class MessageEventDAOFactory extends AbstractDAOFactory<MessageEventDAO>
 			return "select message_event.message_id, message_event.event_type" +
 					" from message_event, ebms_message" +
 					" where message_event.processed = 0" +
-					" and message_event.event_type in (" + join(types == null ? MessageEventType.values() : types,",") + ")" +
+					" and message_event.event_type in (" + join(types == null || types.length == 0 ? MessageEventType.values() : types,",") + ")" +
 					" and message_event.message_id = ebms_message.message_id" +
 					" and ebms_message.message_nr = 0" +
 					messageContextFilter +
@@ -103,7 +103,7 @@ class MessageEventDAOFactory extends AbstractDAOFactory<MessageEventDAO>
 			return "select top " + maxNr + " message_event.message_id, message_event.event_type" +
 					" from message_event, ebms_message" +
 					" where message_event.processed = 0" +
-					" and message_event.event_type in (" + join(types == null ? MessageEventType.values() : types,",") + ")" +
+					" and message_event.event_type in (" + join(types == null || types.length == 0 ? MessageEventType.values() : types,",") + ")" +
 					" and message_event.message_id = ebms_message.message_id" +
 					" and ebms_message.message_nr = 0" +
 					messageContextFilter +
@@ -123,7 +123,7 @@ class MessageEventDAOFactory extends AbstractDAOFactory<MessageEventDAO>
 			return "select message_event.message_id, message_event.event_type" +
 					" from message_event, ebms_message" +
 					" where message_event.processed = 0" +
-					" and message_event.event_type in (" + join(types == null ? MessageEventType.values() : types,",") + ")" +
+					" and message_event.event_type in (" + join(types == null || types.length == 0 ? MessageEventType.values() : types,",") + ")" +
 					" and message_event.message_id = ebms_message.message_id" +
 					" and ebms_message.message_nr = 0" +
 					messageContextFilter +
@@ -145,7 +145,7 @@ class MessageEventDAOFactory extends AbstractDAOFactory<MessageEventDAO>
 					"select message_event.message_id, message_event.event_type" +
 					" from message_event, ebms_message" +
 					" where message_event.processed = 0" +
-					" and message_event.event_type in (" + join(types == null ? MessageEventType.values() : types,",") + ")" +
+					" and message_event.event_type in (" + join(types == null || types.length == 0 ? MessageEventType.values() : types,",") + ")" +
 					" and message_event.message_id = ebms_message.message_id" +
 					" and ebms_message.message_nr = 0" +
 					messageContextFilter +
@@ -166,7 +166,7 @@ class MessageEventDAOFactory extends AbstractDAOFactory<MessageEventDAO>
 			return "select message_event.message_id, message_event.event_type" +
 					" from message_event, ebms_message" +
 					" where message_event.processed = 0" +
-					" and message_event.event_type in (" + join(types == null ? MessageEventType.values() : types,",") + ")" +
+					" and message_event.event_type in (" + join(types == null || types.length == 0 ? MessageEventType.values() : types,",") + ")" +
 					" and message_event.message_id = ebms_message.message_id" +
 					" and ebms_message.message_nr = 0" +
 					messageContextFilter +

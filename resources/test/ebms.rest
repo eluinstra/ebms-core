@@ -1024,7 +1024,7 @@ Content-Type: application/json
 
 ### getUnprocessedMessageIds
 
-POST http://localhost:8080/service/rest/v18/ebms/messages?maxNr=
+POST http://localhost:8080/service/rest/v18/ebms/messages?maxNr=0
 Content-Type: application/json
 
 {}
@@ -1047,7 +1047,10 @@ GET http://localhost:8080/service/rest/v18/ebms/messages/?/status
 
 ### getUnprocessedMessageEvents
 
-POST http://localhost:8080/service/rest/v18/ebms/events?eventTypes=&maxNr=
+POST http://localhost:8080/service/rest/v18/ebms/events
+Content-Type: application/json
+
+{}
 
 ### processMessageEvent
 

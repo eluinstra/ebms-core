@@ -15,12 +15,14 @@
  */
 package nl.clockwork.ebms.service;
 
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.PATCH;
 import javax.ws.rs.POST;
@@ -135,9 +137,9 @@ public class EbMSMessageServiceImpl implements EbMSMessageService, WithService
 	}
 
 	@POST
-	@Path("messages?maxNr={maxNr}")
+	@Path("messages")
 	@Override
-	public List<String> getUnprocessedMessageIds(MessageFilter messageFilter, @QueryParam("maxNr") Integer maxNr) throws EbMSMessageServiceException
+	public List<String> getUnprocessedMessageIds(MessageFilter messageFilter, @DefaultValue("0") @QueryParam("maxNr") Integer maxNr) throws EbMSMessageServiceException
 	{
 		try
 		{
@@ -146,14 +148,14 @@ public class EbMSMessageServiceImpl implements EbMSMessageService, WithService
 		catch(EbMSMessageServiceException e)
 		{
 			throwServiceException(e);
-			return null;
+			return Collections.emptyList();
 		}
 	}
 
 	@GET
-	@Path("messages/{messageId}?process={process}")
+	@Path("messages/{messageId}")
 	@Override
-	public Message getMessage(@PathParam("messageId") final String messageId, @QueryParam("process") Boolean process) throws EbMSMessageServiceException
+	public Message getMessage(@PathParam("messageId") final String messageId, @DefaultValue("false") @QueryParam("process") Boolean process) throws EbMSMessageServiceException
 	{
 		try
 		{
@@ -167,9 +169,9 @@ public class EbMSMessageServiceImpl implements EbMSMessageService, WithService
 	}
 
 	@GET
-	@Path("messages/mtom/{messageId}?process={process}")
+	@Path("messages/mtom/{messageId}")
 	@Produces("multipart/mixed")
-	public MultipartBody getMessageRest(@PathParam("messageId") final String messageId, @QueryParam("process") Boolean process) throws EbMSMessageServiceException
+	public MultipartBody getMessageRest(@PathParam("messageId") final String messageId, @DefaultValue("false") @QueryParam("process") Boolean process) throws EbMSMessageServiceException
 	{
 		try
 		{
@@ -197,13 +199,13 @@ public class EbMSMessageServiceImpl implements EbMSMessageService, WithService
 
 	private Attachment toAttachment(MTOMDataSource dataSource)
 	{
-		return new Attachment(dataSource.getContentId(),dataSource.getAttachment(),new MultivaluedHashMap<String,String>());
+		return new Attachment(dataSource.getContentId(),dataSource.getAttachment(),new MultivaluedHashMap<>());
 	}
 
 	@PATCH
 	@Path("messages/{messageId}")
 	@Override
-	public void processMessage(final String messageId) throws EbMSMessageServiceException
+	public void processMessage(@PathParam("messageId") final String messageId) throws EbMSMessageServiceException
 	{
 		try
 		{
@@ -218,24 +220,47 @@ public class EbMSMessageServiceImpl implements EbMSMessageService, WithService
 	@GET
 	@Path("messages/{messageId}/status")
 	@Override
-	public MessageStatus getMessageStatus(String messageId) throws EbMSMessageServiceException
+	public MessageStatus getMessageStatus(@PathParam("messageId") String messageId) throws EbMSMessageServiceException
 	{
-		return serviceHandler.getMessageStatus(messageId);
+		try
+		{
+			return serviceHandler.getMessageStatus(messageId);
+		}
+		catch(EbMSMessageServiceException e)
+		{
+			throwServiceException(e);
+			return null;
+		}
 	}
 
 	@POST
-	@Path("events?eventTypes={eventTypes}&maxNr={maxNr}")
+	@Path("events")
 	@Override
-	public List<MessageEvent> getUnprocessedMessageEvents(MessageFilter messageFilter, @QueryParam("eventTypes") MessageEventType[] eventTypes, @QueryParam("maxNr") Integer maxNr) throws EbMSMessageServiceException
+	public List<MessageEvent> getUnprocessedMessageEvents(MessageFilter messageFilter, @QueryParam("eventTypes") MessageEventType[] eventTypes, @DefaultValue("0") @QueryParam("maxNr") Integer maxNr) throws EbMSMessageServiceException
 	{
-		return serviceHandler.getUnprocessedMessageEvents(messageFilter,eventTypes,maxNr);
+		try
+		{
+			return serviceHandler.getUnprocessedMessageEvents(messageFilter,eventTypes,maxNr);
+		}
+		catch(EbMSMessageServiceException e)
+		{
+			throwServiceException(e);
+			return Collections.emptyList();
+		}
 	}
 
 	@PATCH
 	@Path("events/{messageId}")
 	@Override
-	public void processMessageEvent(final String messageId) throws EbMSMessageServiceException
+	public void processMessageEvent(@PathParam("messageId") final String messageId) throws EbMSMessageServiceException
 	{
-		serviceHandler.processMessageEvent(messageId);
+		try
+		{
+			serviceHandler.processMessageEvent(messageId);
+		}
+		catch(EbMSMessageServiceException e)
+		{
+			throwServiceException(e);
+		}
 	}
 }

@@ -16,6 +16,7 @@
 package nl.clockwork.ebms.cpa.certificate;
 
 import java.security.cert.X509Certificate;
+import java.util.Collections;
 import java.util.List;
 
 import javax.ws.rs.DELETE;
@@ -105,7 +106,7 @@ public class CertificateMappingServiceImpl implements CertificateMappingService,
 		{
 			log.error("GetCertificateMappings",e);
 			throwServiceException(new CertificateMappingServiceException(e));
-			return null;
+			return Collections.emptyList();
 		}
 	}
 }

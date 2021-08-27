@@ -248,11 +248,8 @@ class EbMSMessageServiceHandler
 			log.debug("ProcessMessage " + messageId);
 			Runnable runnable = () ->
 			{
-				if (ebMSDAO.updateMessage(messageId,EbMSMessageStatus.RECEIVED,EbMSMessageStatus.PROCESSED) > 0)
-				{
-					if (deleteEbMSAttachmentsOnMessageProcessed)
-						ebMSDAO.deleteAttachments(messageId);
-				}
+				if (ebMSDAO.updateMessage(messageId,EbMSMessageStatus.RECEIVED,EbMSMessageStatus.PROCESSED) > 0 && deleteEbMSAttachmentsOnMessageProcessed)
+					ebMSDAO.deleteAttachments(messageId);
 			};
 			ebMSDAO.executeTransaction(runnable);
 			log.info("Processed message " + messageId);

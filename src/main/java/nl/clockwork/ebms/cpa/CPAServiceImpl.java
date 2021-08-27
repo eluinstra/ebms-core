@@ -15,9 +15,11 @@
  */
 package nl.clockwork.ebms.cpa;
 
+import java.util.Collections;
 import java.util.List;
 
 import javax.ws.rs.DELETE;
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -73,10 +75,9 @@ public class CPAServiceImpl implements CPAService, WithService
 	}
 	
 	@POST
-	@Path("?overwrite={overwrite}")
 	@Produces("text/plain")
 	@Override
-	public String insertCPA(/*CollaborationProtocolAgreement*/String cpa, @QueryParam("overwrite") Boolean overwrite) throws CPAServiceException
+	public String insertCPA(/*CollaborationProtocolAgreement*/String cpa, @DefaultValue("false") @QueryParam("overwrite") Boolean overwrite) throws CPAServiceException
 	{
 		try
 		{
@@ -127,7 +128,7 @@ public class CPAServiceImpl implements CPAService, WithService
 		{
 			log.error("GetCPAIds",e);
 			throwServiceException(new CPAServiceException(e));
-			return null;
+			return Collections.emptyList();
 		}
 	}
 
