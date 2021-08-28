@@ -13,10 +13,8 @@ components:
       properties:
         source:
           type: string
-          format: byte
         destination:
           type: string
-          format: byte
       required:
         - source
         - destination
@@ -226,6 +224,7 @@ paths:
       description: Stores the CPA. If overwrite is true and the CPA exists, the CPA will be overwritten
       operationId: insertCPA
       requestBody:
+        description: The CPA
         content:
           'application/json':
             schema:
@@ -246,7 +245,6 @@ paths:
     parameters:
       - name: overwrite
         in: query
-        required: false
         schema:
           type: boolean
   /cpas/{cpaId}:
@@ -356,7 +354,7 @@ paths:
     get:
       tags:
         - URLs
-      description: Removes URL mapping identified by source URL id
+      description: Removes URL mapping identified by source URL sourceURL
       operationId: deleteURLMapping
       responses:
         '200':
@@ -401,7 +399,7 @@ paths:
       description: Stores the Certificate mapping
       operationId: setCertificateMapping
       requestBody:
-        description: Maps the source Certificate to the destination Certificate
+        description: The Certificate mapping
         content:
           'application/json':
             schema:
@@ -415,12 +413,18 @@ paths:
             'application/json':
               schema:
                 $ref: '#/components/schemas/Error'
-  /certificateMappings/{source}:
-    get:
+  /certificateMappings?cpaId={cpaId}:
+    delete:
       tags:
         - Certificates
-      description: Removes Certificate mapping identified by source Certificate id
+      description: Removes Certificate mapping identified by source Certificate and optional CPA Id cpaId
       operationId: deleteCertificateMapping
+      requestBody:
+        description: The source Certificate
+        content:
+          'application/json':
+            schema:
+              type: string
       responses:
         '200':
           description: OK
@@ -431,9 +435,8 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
     parameters:
-      - name: source
-        in: path
-        required: true
+      - name: cpaId
+        in: query
         schema:
           type: string
   /ebms/ping/{cpaId}/from/{fromPartyId}/to/{toPartyId}:
@@ -592,7 +595,6 @@ paths:
     parameters:
       - name: maxNr
         in: query
-        required: false
         schema:
           type: number
   /messages/{messageId}?process={process}:
@@ -622,7 +624,6 @@ paths:
           type: string
       - name: process
         in: query
-        required: false
         schema:
           type: boolean
   /messages/mtom/{messageId}?process={process}:
@@ -652,7 +653,6 @@ paths:
           type: string
       - name: process
         in: query
-        required: false
         schema:
           type: boolean
   /messages/{messageId}/status:
@@ -709,14 +709,12 @@ paths:
     parameters:
       - name: eventTypes
         in: query
-        required: false
         schema:
           type: array
           items:
             $ref: '#/components/schemas/MessageEventType'
       - name: maxNr
         in: query
-        required: false
         schema:
           type: number
   /events/{messageId}:
@@ -734,3 +732,9 @@ paths:
             'application/json':
               schema:
                 $ref: '#/components/schemas/Error'
+    parameters:
+      - name: messageId
+        in: path
+        required: true
+        schema:
+          type: string
