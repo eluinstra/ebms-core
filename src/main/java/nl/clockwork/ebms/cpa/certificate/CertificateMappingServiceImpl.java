@@ -15,9 +15,16 @@
  */
 package nl.clockwork.ebms.cpa.certificate;
 
+import static nl.clockwork.ebms.jaxb.X509CertificateConverter.parseCertificate;
+import static org.apache.commons.codec.binary.Base64.decodeBase64;
+import static org.apache.commons.codec.binary.Base64.encodeBase64String;
+
+import java.security.cert.CertificateEncodingException;
+import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -30,8 +37,8 @@ import javax.ws.rs.core.MediaType;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.NonNull;
-import lombok.val;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import nl.clockwork.ebms.jaxrs.WithService;
@@ -44,18 +51,60 @@ import nl.clockwork.ebms.jaxrs.WithService;
 public class CertificateMappingServiceImpl implements CertificateMappingService, WithService
 {
 	@Data
-	private static class SourceCertificate
+	@NoArgsConstructor
+	@AllArgsConstructor
+	private static class CertificateMapping
 	{
 		@NonNull
-		X509Certificate source;
+		String source;
+		@NonNull
+		String destination;
+		String cpaId;
+
+		static CertificateMapping of(nl.clockwork.ebms.cpa.certificate.CertificateMapping m)
+		{
+			try
+			{
+				return new CertificateMapping(encodeBase64String(m.getSource().getEncoded()),encodeBase64String(m.getDestination().getEncoded()),m.getCpaId());
+			}
+			catch (CertificateEncodingException e)
+			{
+				throw new IllegalStateException(e);
+			}
+		}
+
+		nl.clockwork.ebms.cpa.certificate.CertificateMapping toCertificateMapping()
+		{
+			try
+			{
+				return new nl.clockwork.ebms.cpa.certificate.CertificateMapping(parseCertificate(decodeBase64(source)),parseCertificate(decodeBase64(destination)),cpaId);
+			}
+			catch (CertificateException e)
+			{
+				throw new IllegalStateException(e);
+			}
+		}
 	}
 
   @NonNull
 	CertificateMapper certificateMapper;
 
 	@POST
-	@Override
 	public void setCertificateMapping(CertificateMapping certificateMapping) throws CertificateMappingServiceException
+	{
+		try
+		{
+			setCertificateMapping(certificateMapping.toCertificateMapping());
+		}
+		catch (Exception e)
+		{
+			log.error("SetCertificateMapping " + certificateMapping,e);
+			throwServiceException(new CertificateMappingServiceException(e));
+		}
+	}
+
+	@Override
+	public void setCertificateMapping(nl.clockwork.ebms.cpa.certificate.CertificateMapping certificateMapping) throws CertificateMappingServiceException
 	{
 		try
 		{
@@ -71,16 +120,15 @@ public class CertificateMappingServiceImpl implements CertificateMappingService,
 	}
 
 	@DELETE
-	public void deleteCertificateMapping(SourceCertificate certificateMapping, @QueryParam("cpaId") String cpaId) throws CertificateMappingServiceException
+	public void deleteCertificateMapping(String source, @QueryParam("cpaId") String cpaId) throws CertificateMappingServiceException
 	{
-		val source = certificateMapping.getSource();
 		try
 		{
-			deleteCertificateMapping(source,cpaId);
+			deleteCertificateMapping(parseCertificate(decodeBase64(source)),cpaId);
 		}
 		catch (Exception e)
 		{
-			log.error("DeleteCertificateMappingRest " + source,e);
+			log.error("DeleteCertificateMapping " + source,e);
 			throwServiceException(new CertificateMappingServiceException(e));
 		}
 	}
@@ -102,8 +150,22 @@ public class CertificateMappingServiceImpl implements CertificateMappingService,
 	}
 
 	@GET
+	public List<CertificateMapping> getCertificateMappingsRest() throws CertificateMappingServiceException
+	{
+		try
+		{
+			return getCertificateMappings().stream().map(m -> CertificateMapping.of(m)).collect(Collectors.toList());
+		}
+		catch (Exception e)
+		{
+			log.error("GetCertificateMappings",e);
+			throwServiceException(new CertificateMappingServiceException(e));
+			return Collections.emptyList();
+		}
+	}
+
 	@Override
-	public List<CertificateMapping> getCertificateMappings() throws CertificateMappingServiceException
+	public List<nl.clockwork.ebms.cpa.certificate.CertificateMapping> getCertificateMappings() throws CertificateMappingServiceException
 	{
 		try
 		{

@@ -17,7 +17,6 @@ package nl.clockwork.ebms.cpa.certificate;
 
 import java.io.Serializable;
 import java.security.cert.X509Certificate;
-import java.util.function.Function;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
