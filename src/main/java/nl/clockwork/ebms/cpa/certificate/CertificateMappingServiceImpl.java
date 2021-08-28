@@ -23,16 +23,17 @@ import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.NonNull;
+import lombok.val;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import nl.clockwork.ebms.jaxb.X509CertificateConverter;
 import nl.clockwork.ebms.jaxrs.WithService;
 
 @Slf4j
@@ -42,6 +43,13 @@ import nl.clockwork.ebms.jaxrs.WithService;
 @Produces(MediaType.APPLICATION_JSON)
 public class CertificateMappingServiceImpl implements CertificateMappingService, WithService
 {
+	@Data
+	private static class SourceCertificate
+	{
+		@NonNull
+		X509Certificate source;
+	}
+
   @NonNull
 	CertificateMapper certificateMapper;
 
@@ -63,12 +71,12 @@ public class CertificateMappingServiceImpl implements CertificateMappingService,
 	}
 
 	@DELETE
-	@Path("{id}/{cpaId}")
-	public void deleteCertificateMappingRest(@PathParam("id") byte[] source, @PathParam("cpaId") String cpaId) throws CertificateMappingServiceException
+	public void deleteCertificateMapping(SourceCertificate certificateMapping, @QueryParam("cpaId") String cpaId) throws CertificateMappingServiceException
 	{
+		val source = certificateMapping.getSource();
 		try
 		{
-			deleteCertificateMapping(X509CertificateConverter.parseCertificate(source),cpaId);
+			deleteCertificateMapping(source,cpaId);
 		}
 		catch (Exception e)
 		{

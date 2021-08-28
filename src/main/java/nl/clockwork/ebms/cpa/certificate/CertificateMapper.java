@@ -39,28 +39,23 @@ public class CertificateMapper
 
 	public X509Certificate getCertificate(X509Certificate certificate, String cpaId)
 	{
-		return certificate != null ? certificateMappingDAO.getCertificateMapping(CertificateMapping.getId.apply(certificate),cpaId,false).orElse(certificate) : null;
+		return certificate != null ? certificateMappingDAO.getCertificateMapping(CertificateMapping.getCertificateId(certificate),cpaId,false).orElse(certificate) : null;
 	}
 
 	public void setCertificateMapping(CertificateMapping mapping)
 	{
 		synchronized (certificateMonitor)
 		{
-			if (mapping.getDestination() == null)
-				certificateMappingDAO.deleteCertificateMapping(mapping.getId(),mapping.getCpaId());
+			if (certificateMappingDAO.existsCertificateMapping(mapping.getId(),mapping.getCpaId()))
+				certificateMappingDAO.updateCertificateMapping(mapping);
 			else
-			{
-				if (certificateMappingDAO.existsCertificateMapping(mapping.getId(),mapping.getCpaId()))
-					certificateMappingDAO.updateCertificateMapping(mapping);
-				else
-					certificateMappingDAO.insertCertificateMapping(mapping);
-			}
+				certificateMappingDAO.insertCertificateMapping(mapping);
 		}
 	}
 
 	public void deleteCertificateMapping(X509Certificate source, String cpaId)
 	{
-		val key = CertificateMapping.getId.apply(source);
+		val key = CertificateMapping.getCertificateId(source);
 		certificateMappingDAO.deleteCertificateMapping(key,cpaId);
 	}
 }
