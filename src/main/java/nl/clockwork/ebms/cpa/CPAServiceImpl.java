@@ -44,7 +44,6 @@ import nl.clockwork.ebms.validation.XSDValidator;
 @Slf4j
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor
-@Path("cpas")
 @Produces(MediaType.APPLICATION_JSON)
 public class CPAServiceImpl implements CPAService, WithService
 {
@@ -75,6 +74,7 @@ public class CPAServiceImpl implements CPAService, WithService
 	}
 	
 	@POST
+	@Path("")
 	@Produces("text/plain")
 	@Override
 	public String insertCPA(/*CollaborationProtocolAgreement*/String cpa, @DefaultValue("false") @QueryParam("overwrite") Boolean overwrite) throws CPAServiceException
@@ -116,6 +116,7 @@ public class CPAServiceImpl implements CPAService, WithService
 	}
 
 	@GET
+	@Path("")
 	@Override
 	public List<String> getCPAIds() throws CPAServiceException
 	{

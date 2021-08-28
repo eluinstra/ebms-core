@@ -58,7 +58,6 @@ import nl.clockwork.ebms.service.model.MessageStatus;
 
 @FieldDefaults(level = AccessLevel.PACKAGE, makeFinal = true)
 @AllArgsConstructor
-@Path("ebms")
 @Produces(MediaType.APPLICATION_JSON)
 public class EbMSMessageServiceImpl implements EbMSMessageService, WithService
 {

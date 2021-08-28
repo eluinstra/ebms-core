@@ -46,7 +46,6 @@ import nl.clockwork.ebms.jaxrs.WithService;
 @Slf4j
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor
-@Path("certificateMappings")
 @Produces(MediaType.APPLICATION_JSON)
 public class CertificateMappingServiceImpl implements CertificateMappingService, WithService
 {
@@ -90,6 +89,7 @@ public class CertificateMappingServiceImpl implements CertificateMappingService,
 	CertificateMapper certificateMapper;
 
 	@POST
+	@Path("")
 	public void setCertificateMapping(CertificateMapping certificateMapping) throws CertificateMappingServiceException
 	{
 		try
@@ -120,6 +120,7 @@ public class CertificateMappingServiceImpl implements CertificateMappingService,
 	}
 
 	@DELETE
+	@Path("")
 	public void deleteCertificateMapping(String source, @QueryParam("cpaId") String cpaId) throws CertificateMappingServiceException
 	{
 		try
@@ -134,7 +135,7 @@ public class CertificateMappingServiceImpl implements CertificateMappingService,
 	}
 
 	@Override
-	public void deleteCertificateMapping(X509Certificate source, String cpaId) throws CertificateMappingServiceException
+	public void deleteCertificateMapping(X509Certificate source, @QueryParam("cpaId") String cpaId) throws CertificateMappingServiceException
 	{
 		try
 		{
@@ -150,6 +151,7 @@ public class CertificateMappingServiceImpl implements CertificateMappingService,
 	}
 
 	@GET
+	@Path("")
 	public List<CertificateMapping> getCertificateMappingsRest() throws CertificateMappingServiceException
 	{
 		try
