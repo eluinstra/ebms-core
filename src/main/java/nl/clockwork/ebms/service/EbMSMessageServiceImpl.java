@@ -15,7 +15,6 @@
  */
 package nl.clockwork.ebms.service;
 
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Function;
@@ -75,13 +74,13 @@ public class EbMSMessageServiceImpl implements EbMSMessageService, WithService
 		}
 		catch(EbMSMessageServiceException e)
 		{
-			throwServiceException(e);
+			throw toServiceException(e);
 		}
 	}
 
 	@POST
 	@Path("messages")
-	@Produces("text/plain")
+	@Produces(MediaType.TEXT_PLAIN)
 	@Override
 	public String sendMessage(MessageRequest messageRequest) throws EbMSMessageServiceException
 	{
@@ -91,15 +90,14 @@ public class EbMSMessageServiceImpl implements EbMSMessageService, WithService
 		}
 		catch(EbMSMessageServiceException e)
 		{
-			throwServiceException(e);
-			return null;
+			throw toServiceException(e);
 		}
 	}
 
 	@POST
 	@Path("messages/mtom")
-	@Produces("text/plain")
-	@Consumes("multipart/form-data")
+	@Produces(MediaType.TEXT_PLAIN)
+	@Consumes(MediaType.MULTIPART_FORM_DATA)
 	public String sendMessage(@Multipart("requestProperties") MessageRequestProperties requestProperties, @Multipart("attachment") List<Attachment> attachments) throws EbMSMessageServiceException
 	{
 		try
@@ -108,8 +106,7 @@ public class EbMSMessageServiceImpl implements EbMSMessageService, WithService
 		}
 		catch(EbMSMessageServiceException e)
 		{
-			throwServiceException(e);
-			return null;
+			throw toServiceException(e);
 		}
 	}
 
@@ -120,7 +117,7 @@ public class EbMSMessageServiceImpl implements EbMSMessageService, WithService
 
 	@PUT
 	@Path("messages/{messageId}")
-	@Produces("text/plain")
+	@Produces(MediaType.TEXT_PLAIN)
 	@Override
 	public String resendMessage(@PathParam("messageId") String messageId) throws EbMSMessageServiceException
 	{
@@ -130,8 +127,7 @@ public class EbMSMessageServiceImpl implements EbMSMessageService, WithService
 		}
 		catch(EbMSMessageServiceException e)
 		{
-			throwServiceException(e);
-			return null;
+			throw toServiceException(e);
 		}
 	}
 
@@ -146,8 +142,7 @@ public class EbMSMessageServiceImpl implements EbMSMessageService, WithService
 		}
 		catch(EbMSMessageServiceException e)
 		{
-			throwServiceException(e);
-			return Collections.emptyList();
+			throw toServiceException(e);
 		}
 	}
 
@@ -162,14 +157,13 @@ public class EbMSMessageServiceImpl implements EbMSMessageService, WithService
 		}
 		catch(EbMSMessageServiceException e)
 		{
-			throwServiceException(e);
-			return null;
+			throw toServiceException(e);
 		}
 	}
 
 	@GET
 	@Path("messages/mtom/{messageId}")
-	@Produces("multipart/mixed")
+	@Produces(MediaType.MULTIPART_FORM_DATA)
 	public MultipartBody getMessageRest(@PathParam("messageId") final String messageId, @DefaultValue("false") @QueryParam("process") Boolean process) throws EbMSMessageServiceException
 	{
 		try
@@ -178,8 +172,7 @@ public class EbMSMessageServiceImpl implements EbMSMessageService, WithService
 		}
 		catch(EbMSMessageServiceException e)
 		{
-			throwServiceException(e);
-			return null;
+			throw toServiceException(e);
 		}
 	}
 
@@ -212,7 +205,7 @@ public class EbMSMessageServiceImpl implements EbMSMessageService, WithService
 		}
 		catch(EbMSMessageServiceException e)
 		{
-			throwServiceException(e);
+			throw toServiceException(e);
 		}
 	}
 
@@ -227,8 +220,7 @@ public class EbMSMessageServiceImpl implements EbMSMessageService, WithService
 		}
 		catch(EbMSMessageServiceException e)
 		{
-			throwServiceException(e);
-			return null;
+			throw toServiceException(e);
 		}
 	}
 
@@ -243,8 +235,7 @@ public class EbMSMessageServiceImpl implements EbMSMessageService, WithService
 		}
 		catch(EbMSMessageServiceException e)
 		{
-			throwServiceException(e);
-			return Collections.emptyList();
+			throw toServiceException(e);
 		}
 	}
 
@@ -259,7 +250,7 @@ public class EbMSMessageServiceImpl implements EbMSMessageService, WithService
 		}
 		catch(EbMSMessageServiceException e)
 		{
-			throwServiceException(e);
+			throw toServiceException(e);
 		}
 	}
 }

@@ -209,7 +209,7 @@ public class CPAManager
 		}
 	}
 
-	public long deleteCPA(String cpaId)
+	public int deleteCPA(String cpaId)
 	{
 		return cpaDAO.deleteCPA(cpaId);
 	}

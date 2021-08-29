@@ -15,7 +15,6 @@
  */
 package nl.clockwork.ebms.cpa.url;
 
-import java.util.Collections;
 import java.util.List;
 
 import javax.ws.rs.DELETE;
@@ -56,7 +55,7 @@ public class URLMappingServiceImpl implements URLMappingService, WithService
 		catch (Exception e)
 		{
 			log.error("SetURLMapping " + urlMapping,e);
-			throwServiceException(new URLMappingServiceException(e));
+			throw toServiceException(new URLMappingServiceException(e));
 		}
 	}
 
@@ -68,12 +67,18 @@ public class URLMappingServiceImpl implements URLMappingService, WithService
 		try
 		{
 			log.debug("DeleteURLMapping " + source);
-			urlMapper.deleteURLMapping(source);
+			if (urlMapper.deleteURLMapping(source) == 0)
+				throw new URLNotFoundException();
+		}
+		catch (URLMappingServiceException e)
+		{
+			log.error("DeleteURLMapping " + source,e);
+			throw toServiceException(e);
 		}
 		catch (Exception e)
 		{
 			log.error("DeleteURLMapping " + source,e);
-			throwServiceException(new URLMappingServiceException(e));
+			throw toServiceException(new URLMappingServiceException(e));
 		}
 	}
 
@@ -90,8 +95,7 @@ public class URLMappingServiceImpl implements URLMappingService, WithService
 		catch (Exception e)
 		{
 			log.error("GetURLMappings",e);
-			throwServiceException(new URLMappingServiceException(e));
-			return Collections.emptyList();
+			throw toServiceException(new URLMappingServiceException(e));
 		}
 	}
 }

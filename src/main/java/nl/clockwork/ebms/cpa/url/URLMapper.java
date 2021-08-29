@@ -82,8 +82,8 @@ public class URLMapper
 		}
 	}
 
-	public void deleteURLMapping(String source)
+	public int deleteURLMapping(String source)
 	{
-		urlMappingDAO.deleteURLMapping(source);
+		return urlMappingDAO.deleteURLMapping(source);
 	}
 }

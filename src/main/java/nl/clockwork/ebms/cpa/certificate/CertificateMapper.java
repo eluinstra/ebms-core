@@ -53,9 +53,9 @@ public class CertificateMapper
 		}
 	}
 
-	public void deleteCertificateMapping(X509Certificate source, String cpaId)
+	public int deleteCertificateMapping(X509Certificate source, String cpaId)
 	{
 		val key = CertificateMapping.getCertificateId(source);
-		certificateMappingDAO.deleteCertificateMapping(key,cpaId);
+		return certificateMappingDAO.deleteCertificateMapping(key,cpaId);
 	}
 }

@@ -186,7 +186,12 @@ class EbMSMessageServiceHandler
 				{
 					throw new EbMSProcessorException(e);
 				}
-			}).orElseThrow(() -> new EbMSMessageServiceException("Not found message " + messageId));
+			}).orElseThrow(() -> new NotFoundException("Not found message " + messageId));
+		}
+		catch (EbMSMessageServiceException e)
+		{
+			log.error("ResendMessage " + messageId);
+			throw e;
 		}
 		catch (Exception e)
 		{
@@ -216,7 +221,12 @@ class EbMSMessageServiceHandler
 			log.debug("GetMessage " + messageId);
 			if (process != null && process)
 				processMessage(messageId);
-			return ebMSDAO.getMessage(messageId).orElse(null);
+			return ebMSDAO.getMessage(messageId).orElseThrow(NotFoundException::new);
+		}
+		catch (EbMSMessageServiceException e)
+		{
+			log.error("GetMessage " + messageId,e);
+			throw e;
 		}
 		catch (Exception e)
 		{
@@ -232,7 +242,12 @@ class EbMSMessageServiceHandler
 			log.debug("GetMessage " + messageId);
 			if (process != null && process)
 				processMessage(messageId);
-			return ebMSDAO.getMTOMMessage(messageId).orElse(null);
+			return ebMSDAO.getMTOMMessage(messageId).orElseThrow(NotFoundException::new);
+		}
+		catch (EbMSMessageServiceException e)
+		{
+			log.error("GetMessage " + messageId,e);
+			throw e;
 		}
 		catch (Exception e)
 		{
@@ -268,7 +283,12 @@ class EbMSMessageServiceHandler
 			log.debug("GetMessageStatus " + messageId);
 			return ebMSDAO.getEbMSMessageProperties(messageId)
 					.map(p -> getMessageStatus(messageId,p))
-					.orElseThrow(() -> new EbMSMessageServiceException("No message found with messageId " + messageId + "!"));
+					.orElseThrow(() -> new NotFoundException("No message found with messageId " + messageId + "!"));
+		}
+		catch (EbMSMessageServiceException e)
+		{
+			log.error("GetMessageStatus " + messageId,e);
+			throw e;
 		}
 		catch (Exception e)
 		{
@@ -297,7 +317,7 @@ class EbMSMessageServiceHandler
 		{
 			val timestamp = ((EbMSStatusResponse)message).getStatusResponse().getTimestamp() == null ? null : ((EbMSStatusResponse)message).getStatusResponse().getTimestamp();
 			val messageStatus = ((EbMSStatusResponse)message).getStatusResponse().getMessageStatus();
-			val status = EbMSMessageStatus.get(messageStatus).orElseThrow(() -> new IllegalStateException("No EbMSMessageStatus found for " + messageStatus));
+			val status = EbMSMessageStatus.get(messageStatus).orElseThrow(() -> new NotFoundException("No EbMSMessageStatus found for " + messageStatus));
 			return new MessageStatus(timestamp,status);
 		}
 		else

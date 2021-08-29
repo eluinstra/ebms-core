@@ -15,7 +15,6 @@
  */
 package nl.clockwork.ebms.cpa;
 
-import java.util.Collections;
 import java.util.List;
 
 import javax.ws.rs.DELETE;
@@ -69,13 +68,13 @@ public class CPAServiceImpl implements CPAService, WithService
 		catch (Exception e)
 		{
 			log.error("ValidateCPA\n" + cpa,e);
-			throwServiceException(new CPAServiceException(e));
+			throw toServiceException(new CPAServiceException(e));
 		}
 	}
 	
 	@POST
 	@Path("")
-	@Produces("text/plain")
+	@Produces(MediaType.TEXT_PLAIN)
 	@Override
 	public String insertCPA(/*CollaborationProtocolAgreement*/String cpa, @DefaultValue("false") @QueryParam("overwrite") Boolean overwrite) throws CPAServiceException
 	{
@@ -92,8 +91,7 @@ public class CPAServiceImpl implements CPAService, WithService
 		catch (Exception e)
 		{
 			log.error("InsertCPA\n" + cpa,e);
-			throwServiceException(new CPAServiceException(e));
-			return null;
+			throw toServiceException(new CPAServiceException(e));
 		}
 	}
 
@@ -106,12 +104,17 @@ public class CPAServiceImpl implements CPAService, WithService
 		{
 			log.debug("DeleteCPA " + cpaId);
 			if (cpaManager.deleteCPA(cpaId) == 0)
-				throw new IllegalArgumentException("Could not delete CPA " + cpaId + "! CPA does not exists.");
+				throw new CPANotFoundException();
+		}
+		catch (CPAServiceException e)
+		{
+			log.error("DeleteCPA " + cpaId,e);
+			throw toServiceException(e);
 		}
 		catch (Exception e)
 		{
 			log.error("DeleteCPA " + cpaId,e);
-			throwServiceException(new CPAServiceException(e));
+			throw toServiceException(new CPAServiceException(e));
 		}
 	}
 
@@ -128,14 +131,13 @@ public class CPAServiceImpl implements CPAService, WithService
 		catch (Exception e)
 		{
 			log.error("GetCPAIds",e);
-			throwServiceException(new CPAServiceException(e));
-			return Collections.emptyList();
+			throw toServiceException(new CPAServiceException(e));
 		}
 	}
 
 	@GET
 	@Path("{cpaId}")
-	@Produces("text/xml")
+	@Produces(MediaType.TEXT_XML)
 	@Override
 	public /*CollaborationProtocolAgreement*/String getCPA(@PathParam("cpaId") String cpaId) throws CPAServiceException
 	{
@@ -147,8 +149,7 @@ public class CPAServiceImpl implements CPAService, WithService
 		catch (Exception e)
 		{
 			log.error("GetCPAId " + cpaId,e);
-			throwServiceException(new CPAServiceException(e));
-			return null;
+			throw toServiceException(new CPAServiceException(e));
 		}
 	}
 }

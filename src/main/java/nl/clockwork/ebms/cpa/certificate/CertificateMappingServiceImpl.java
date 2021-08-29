@@ -22,7 +22,6 @@ import static org.apache.commons.codec.binary.Base64.encodeBase64String;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -99,7 +98,7 @@ public class CertificateMappingServiceImpl implements CertificateMappingService,
 		catch (Exception e)
 		{
 			log.error("SetCertificateMapping " + certificateMapping,e);
-			throwServiceException(new CertificateMappingServiceException(e));
+			throw toServiceException(new CertificateMappingServiceException(e));
 		}
 	}
 
@@ -115,7 +114,7 @@ public class CertificateMappingServiceImpl implements CertificateMappingService,
 		catch (Exception e)
 		{
 			log.error("SetCertificateMapping " + certificateMapping,e);
-			throwServiceException(new CertificateMappingServiceException(e));
+			throw toServiceException(new CertificateMappingServiceException(e));
 		}
 	}
 
@@ -130,7 +129,7 @@ public class CertificateMappingServiceImpl implements CertificateMappingService,
 		catch (Exception e)
 		{
 			log.error("DeleteCertificateMapping " + source,e);
-			throwServiceException(new CertificateMappingServiceException(e));
+			throw toServiceException(new CertificateMappingServiceException(e));
 		}
 	}
 
@@ -141,12 +140,18 @@ public class CertificateMappingServiceImpl implements CertificateMappingService,
 		{
 			if (log.isDebugEnabled())
 				log.debug("DeleteCertificateMapping " + source);
-			certificateMapper.deleteCertificateMapping(source,cpaId);
+			if (certificateMapper.deleteCertificateMapping(source,cpaId) == 0)
+				throw new CertificateNotFoundException();
+		}
+		catch (CertificateMappingServiceException e)
+		{
+			log.error("GetCertificateMappings",e);
+			throw toServiceException(e);
 		}
 		catch (Exception e)
 		{
 			log.error("DeleteCertificateMapping " + source,e);
-			throwServiceException(new CertificateMappingServiceException(e));
+			throw toServiceException(new CertificateMappingServiceException(e));
 		}
 	}
 
@@ -161,8 +166,7 @@ public class CertificateMappingServiceImpl implements CertificateMappingService,
 		catch (Exception e)
 		{
 			log.error("GetCertificateMappings",e);
-			throwServiceException(new CertificateMappingServiceException(e));
-			return Collections.emptyList();
+			throw toServiceException(new CertificateMappingServiceException(e));
 		}
 	}
 
@@ -177,8 +181,7 @@ public class CertificateMappingServiceImpl implements CertificateMappingService,
 		catch (Exception e)
 		{
 			log.error("GetCertificateMappings",e);
-			throwServiceException(new CertificateMappingServiceException(e));
-			return Collections.emptyList();
+			throw toServiceException(new CertificateMappingServiceException(e));
 		}
 	}
 }
