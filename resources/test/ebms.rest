@@ -1027,18 +1027,18 @@ Content-Type: application/json
 
 ### getUnprocessedMessageIds
 
-POST http://localhost:8080/service/rest/v18/ebms/messages?maxNr=0
+POST http://localhost:8080/service/rest/v18/ebms/messages/unprocessed
 Content-Type: application/json
 
 {}
 
 ### getMessage
 
-GET http://localhost:8080/service/rest/v18/ebms/messages/??process=false
+GET http://localhost:8080/service/rest/v18/ebms/messages/?
 
 ### getMessageMTOM
 
-GET http://localhost:8080/service/rest/v18/ebms/messages/mtom/??process=false
+GET http://localhost:8080/service/rest/v18/ebms/messages/mtom/?
 
 ### processMessage
 
@@ -1050,7 +1050,7 @@ GET http://localhost:8080/service/rest/v18/ebms/messages/?/status
 
 ### getUnprocessedMessageEvents
 
-POST http://localhost:8080/service/rest/v18/ebms/events
+POST http://localhost:8080/service/rest/v18/ebms/events/unprocessed
 Content-Type: application/json
 
 {}

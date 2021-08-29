@@ -132,7 +132,7 @@ public class EbMSMessageServiceImpl implements EbMSMessageService, WithService
 	}
 
 	@POST
-	@Path("messages")
+	@Path("messages/unprocessed")
 	@Override
 	public List<String> getUnprocessedMessageIds(MessageFilter messageFilter, @DefaultValue("0") @QueryParam("maxNr") Integer maxNr) throws EbMSMessageServiceException
 	{
@@ -225,7 +225,7 @@ public class EbMSMessageServiceImpl implements EbMSMessageService, WithService
 	}
 
 	@POST
-	@Path("events")
+	@Path("events/unprocessed")
 	@Override
 	public List<MessageEvent> getUnprocessedMessageEvents(MessageFilter messageFilter, @QueryParam("eventTypes") MessageEventType[] eventTypes, @DefaultValue("0") @QueryParam("maxNr") Integer maxNr) throws EbMSMessageServiceException
 	{
