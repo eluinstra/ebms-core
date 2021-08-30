@@ -27,7 +27,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import nl.clockwork.ebms.jaxb.X509CertificateAdapter;
 
-@WebService(name = "CertificateMappingService", targetNamespace = "http://www.ordina.nl/cpa/certificateMapping/2.18", serviceName = "CertificateMappingService", endpointInterface = "CertificateMappingServiceSoapBinding", portName = "CertificateMappingPort")
+@WebService(name = "CertificateMappingService", targetNamespace = "http://www.ordina.nl/cpa/certificateMapping/2.18", serviceName = "CertificateMappingService", portName = "CertificateMappingPort")
 public interface CertificateMappingService
 {
 	/**

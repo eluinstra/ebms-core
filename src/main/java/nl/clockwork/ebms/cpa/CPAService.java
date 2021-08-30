@@ -23,7 +23,7 @@ import javax.jws.WebResult;
 import javax.jws.WebService;
 import javax.xml.bind.annotation.XmlElement;
 
-@WebService(name = "CPAService", targetNamespace = "http://www.ordina.nl/cpa/2.18", serviceName = "CPAService", endpointInterface = "CPAServiceSoapBinding", portName = "CPAPort")
+@WebService(name = "CPAService", targetNamespace = "http://www.ordina.nl/cpa/2.18", serviceName = "CPAService", portName = "CPAPort")
 public interface CPAService
 {
 	/**
