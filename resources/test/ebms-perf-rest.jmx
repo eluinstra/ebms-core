@@ -1,0 +1,1081 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jmeterTestPlan version="1.2" properties="5.0" jmeter="5.4.1">
+  <hashTree>
+    <TestPlan guiclass="TestPlanGui" testclass="TestPlan" testname="EbMS performance tests" enabled="true">
+      <stringProp name="TestPlan.comments">performance testing using REST interface</stringProp>
+      <boolProp name="TestPlan.functional_mode">false</boolProp>
+      <boolProp name="TestPlan.serialize_threadgroups">false</boolProp>
+      <elementProp name="TestPlan.user_defined_variables" elementType="Arguments" guiclass="ArgumentsPanel" testclass="Arguments" testname="User Defined Variables" enabled="true">
+        <collectionProp name="Arguments.arguments"/>
+      </elementProp>
+      <stringProp name="TestPlan.user_define_classpath"></stringProp>
+    </TestPlan>
+    <hashTree>
+      <Arguments guiclass="ArgumentsPanel" testclass="Arguments" testname="environment-variables" enabled="true">
+        <collectionProp name="Arguments.arguments">
+          <elementProp name="digipoort-host" elementType="Argument">
+            <stringProp name="Argument.name">digipoort-host</stringProp>
+            <stringProp name="Argument.value">localhost</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+            <stringProp name="Argument.desc">digipoort hostname</stringProp>
+          </elementProp>
+          <elementProp name="digipoort-service-port" elementType="Argument">
+            <stringProp name="Argument.name">digipoort-service-port</stringProp>
+            <stringProp name="Argument.value">8080</stringProp>
+            <stringProp name="Argument.desc">digipoort ebms webservices port</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="overheid-host" elementType="Argument">
+            <stringProp name="Argument.name">overheid-host</stringProp>
+            <stringProp name="Argument.value">localhost</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+            <stringProp name="Argument.desc">overheid hostname</stringProp>
+          </elementProp>
+          <elementProp name="overheid-service-port" elementType="Argument">
+            <stringProp name="Argument.name">overheid-service-port</stringProp>
+            <stringProp name="Argument.value">8000</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+            <stringProp name="Argument.desc">overheid ebms webservices port</stringProp>
+          </elementProp>
+          <elementProp name="cpaId" elementType="Argument">
+            <stringProp name="Argument.name">cpaId</stringProp>
+            <stringProp name="Argument.value">cpaStubEBF.rm.http.unsigned.sync</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+            <stringProp name="Argument.desc">CPA id for requests and CPA</stringProp>
+          </elementProp>
+          <elementProp name="digipoort-ebms-url" elementType="Argument">
+            <stringProp name="Argument.name">digipoort-ebms-url</stringProp>
+            <stringProp name="Argument.value">https://ebms-digipoort:8888/ebms</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+            <stringProp name="Argument.desc">endpoint used in CPA</stringProp>
+          </elementProp>
+          <elementProp name="overheid-ebms-url" elementType="Argument">
+            <stringProp name="Argument.name">overheid-ebms-url</stringProp>
+            <stringProp name="Argument.value">https://ebms-overheid:8088/ebms</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+            <stringProp name="Argument.desc">endpoint used in CPA</stringProp>
+          </elementProp>
+          <elementProp name="filecontentssmall" elementType="Argument">
+            <stringProp name="Argument.name">filecontentssmall</stringProp>
+            <stringProp name="Argument.value">${__RandomString(2048,ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvxyz)}</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="filecontentslarge" elementType="Argument">
+            <stringProp name="Argument.name">filecontentslarge</stringProp>
+            <stringProp name="Argument.value">${__RandomString(1048576,ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvxyz)}</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="threads" elementType="Argument">
+            <stringProp name="Argument.name">threads</stringProp>
+            <stringProp name="Argument.value">3</stringProp>
+            <stringProp name="Argument.desc">number of threads per threadgroup</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="max-loop-count" elementType="Argument">
+            <stringProp name="Argument.name">max-loop-count</stringProp>
+            <stringProp name="Argument.value">5000</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+        </collectionProp>
+      </Arguments>
+      <hashTree/>
+      <SetupThreadGroup guiclass="SetupThreadGroupGui" testclass="SetupThreadGroup" testname="setUp" enabled="true">
+        <stringProp name="ThreadGroup.on_sample_error">stoptest</stringProp>
+        <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller" enabled="true">
+          <boolProp name="LoopController.continue_forever">false</boolProp>
+          <stringProp name="LoopController.loops">1</stringProp>
+        </elementProp>
+        <stringProp name="ThreadGroup.num_threads">1</stringProp>
+        <stringProp name="ThreadGroup.ramp_time">1</stringProp>
+        <boolProp name="ThreadGroup.scheduler">false</boolProp>
+        <stringProp name="ThreadGroup.duration"></stringProp>
+        <stringProp name="ThreadGroup.delay"></stringProp>
+        <boolProp name="ThreadGroup.same_user_on_next_iteration">true</boolProp>
+      </SetupThreadGroup>
+      <hashTree>
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="insert CPA digipoort" enabled="true">
+          <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
+          <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
+            <collectionProp name="Arguments.arguments">
+              <elementProp name="" elementType="HTTPArgument">
+                <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                <stringProp name="Argument.value">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;&#xd;
+&lt;tns:CollaborationProtocolAgreement xmlns:axsl=&quot;http://www.w3.org/1999/XSL/TransformAlias&quot; xmlns:xs=&quot;http://www.w3.org/2001/XMLSchema&quot; xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot; xmlns:functx=&quot;http://www.functx.com&quot; xmlns:tns=&quot;http://www.oasis-open.org/committees/ebxml-cppa/schema/cpp-cpa-2_0.xsd&quot; xmlns:ds=&quot;http://www.w3.org/2000/09/xmldsig#&quot; xmlns:xlink=&quot;http://www.w3.org/1999/xlink&quot; xsi:schemaLocation=&quot;http://www.oasis-open.org/committees/ebxml-cppa/schema/cpp-cpa-2_0.xsd http://www.oasis-open.org/committees/ebxml-cppa/schema/cpp-cpa-2_0.xsd&quot; tns:cpaid=&quot;${cpaId}&quot; tns:version=&quot;1.0&quot;&gt;&#xd;
+	&lt;tns:Status tns:value=&quot;agreed&quot; /&gt;&#xd;
+	&lt;tns:Start&gt;2011-01-01T00:00:00Z&lt;/tns:Start&gt;&#xd;
+	&lt;tns:End&gt;2031-01-01T00:00:00Z&lt;/tns:End&gt;&#xd;
+	&lt;tns:PartyInfo tns:partyName=&quot;Logius&quot; tns:defaultMshChannelId=&quot;DIGIPOORT_defaultDeliveryChannel_ProfileBestEffortSigned&quot; tns:defaultMshPackageId=&quot;MshSignalPackage&quot;&gt;&#xd;
+		&lt;tns:PartyId tns:type=&quot;urn:osb:oin&quot;&gt;00000000000000000000&lt;/tns:PartyId&gt;&#xd;
+		&lt;tns:PartyRef xlink:href=&quot;&quot; /&gt;&#xd;
+		&lt;tns:CollaborationRole&gt;&#xd;
+			&lt;tns:ProcessSpecification tns:name=&quot;afleveren&quot; tns:version=&quot;1.0&quot; xlink:href=&quot;http://www.overheidsservicebus.nl/osr/Afleveren&quot; tns:uuid=&quot;urn:overheidsservicebus.nl:osr:Afleveren:OsbAfleveren11$10&quot; /&gt;&#xd;
+			&lt;tns:Role tns:name=&quot;DIGIPOORT&quot; xlink:href=&quot;http://www.overheidsservicebus.nl/osr/&quot; /&gt;&#xd;
+			&lt;tns:ServiceBinding&gt;&#xd;
+				&lt;tns:Service tns:type=&quot;urn:osb:services&quot;&gt;osb:afleveren:1.1$1.0&lt;/tns:Service&gt;&#xd;
+				&lt;tns:CanSend&gt;&#xd;
+					&lt;tns:ThisPartyActionBinding tns:id=&quot;DIGIPOORT_S_Afleveren&quot; tns:action=&quot;afleveren&quot; tns:packageId=&quot;XMLMessagePackage&quot;&gt;&#xd;
+						&lt;tns:BusinessTransactionCharacteristics tns:isAuthenticated=&quot;transient&quot; tns:timeToPerform=&quot;P2D&quot; tns:isAuthorizationRequired=&quot;true&quot; tns:isConfidential=&quot;transient&quot; tns:isIntelligibleCheckRequired=&quot;false&quot; tns:isNonRepudiationReceiptRequired=&quot;false&quot; tns:isNonRepudiationRequired=&quot;false&quot; tns:isTamperProof=&quot;transient&quot; /&gt;&#xd;
+						&lt;tns:ChannelId&gt;DIGIPOORT_defaultDeliveryChannel_ProfileReliableMessaging&lt;/tns:ChannelId&gt;&#xd;
+					&lt;/tns:ThisPartyActionBinding&gt;&#xd;
+					&lt;tns:OtherPartyActionBinding&gt;OVERHEID_R_Afleveren&lt;/tns:OtherPartyActionBinding&gt;&#xd;
+				&lt;/tns:CanSend&gt;&#xd;
+				&lt;tns:CanReceive&gt;&#xd;
+					&lt;tns:ThisPartyActionBinding tns:id=&quot;DIGIPOORT_R_BevestigAfleveren&quot; tns:action=&quot;bevestigAfleveren&quot; tns:packageId=&quot;XMLMessagePackage&quot;&gt;&#xd;
+						&lt;tns:BusinessTransactionCharacteristics tns:isAuthenticated=&quot;transient&quot; tns:timeToPerform=&quot;P2D&quot; tns:isAuthorizationRequired=&quot;true&quot; tns:isConfidential=&quot;transient&quot; tns:isIntelligibleCheckRequired=&quot;false&quot; tns:isNonRepudiationReceiptRequired=&quot;false&quot; tns:isNonRepudiationRequired=&quot;false&quot; tns:isTamperProof=&quot;transient&quot; /&gt;&#xd;
+						&lt;tns:ChannelId&gt;DIGIPOORT_defaultDeliveryChannel_ProfileReliableMessaging&lt;/tns:ChannelId&gt;&#xd;
+					&lt;/tns:ThisPartyActionBinding&gt;&#xd;
+					&lt;tns:OtherPartyActionBinding&gt;OVERHEID_S_BevestigAfleveren&lt;/tns:OtherPartyActionBinding&gt;&#xd;
+				&lt;/tns:CanReceive&gt;&#xd;
+			&lt;/tns:ServiceBinding&gt;&#xd;
+		&lt;/tns:CollaborationRole&gt;&#xd;
+		&lt;tns:CollaborationRole&gt;&#xd;
+			&lt;tns:ProcessSpecification tns:name=&quot;aanleveren&quot; tns:version=&quot;1.0&quot; xlink:href=&quot;http://www.overheidsservicebus.nl/osr/Aanleveren&quot; tns:uuid=&quot;urn:overheidsservicebus.nl:osr:Aanleveren:OsbAanleveren10$10&quot; /&gt;&#xd;
+			&lt;tns:Role tns:name=&quot;DIGIPOORT&quot; xlink:href=&quot;http://www.overheidsservicebus.nl/osr/&quot; /&gt;&#xd;
+			&lt;tns:ServiceBinding&gt;&#xd;
+				&lt;tns:Service tns:type=&quot;urn:osb:services&quot;&gt;osb:aanleveren:1.1$1.0&lt;/tns:Service&gt;&#xd;
+				&lt;tns:CanSend&gt;&#xd;
+					&lt;tns:ThisPartyActionBinding tns:id=&quot;DIGIPOORT_S_BevestigAanleveren&quot; tns:action=&quot;bevestigAanleveren&quot; tns:packageId=&quot;XMLMessagePackage&quot;&gt;&#xd;
+						&lt;tns:BusinessTransactionCharacteristics tns:isAuthenticated=&quot;transient&quot; tns:timeToPerform=&quot;P2D&quot; tns:isAuthorizationRequired=&quot;true&quot; tns:isConfidential=&quot;transient&quot; tns:isIntelligibleCheckRequired=&quot;false&quot; tns:isNonRepudiationReceiptRequired=&quot;false&quot; tns:isNonRepudiationRequired=&quot;false&quot; tns:isTamperProof=&quot;transient&quot; /&gt;&#xd;
+						&lt;tns:ChannelId&gt;DIGIPOORT_defaultDeliveryChannel_ProfileReliableMessaging&lt;/tns:ChannelId&gt;&#xd;
+					&lt;/tns:ThisPartyActionBinding&gt;&#xd;
+					&lt;tns:OtherPartyActionBinding&gt;OVERHEID_R_BevestigAanleveren&lt;/tns:OtherPartyActionBinding&gt;&#xd;
+				&lt;/tns:CanSend&gt;&#xd;
+				&lt;tns:CanReceive&gt;&#xd;
+					&lt;tns:ThisPartyActionBinding tns:id=&quot;DIGIPOORT_R_Aanleveren&quot; tns:action=&quot;aanleveren&quot; tns:packageId=&quot;XMLMessagePackage&quot;&gt;&#xd;
+						&lt;tns:BusinessTransactionCharacteristics tns:isAuthenticated=&quot;transient&quot; tns:timeToPerform=&quot;P2D&quot; tns:isAuthorizationRequired=&quot;true&quot; tns:isConfidential=&quot;transient&quot; tns:isIntelligibleCheckRequired=&quot;false&quot; tns:isNonRepudiationReceiptRequired=&quot;false&quot; tns:isNonRepudiationRequired=&quot;false&quot; tns:isTamperProof=&quot;transient&quot; /&gt;&#xd;
+						&lt;tns:ChannelId&gt;DIGIPOORT_defaultDeliveryChannel_ProfileReliableMessaging&lt;/tns:ChannelId&gt;&#xd;
+					&lt;/tns:ThisPartyActionBinding&gt;&#xd;
+					&lt;tns:OtherPartyActionBinding&gt;OVERHEID_S_Aanleveren&lt;/tns:OtherPartyActionBinding&gt;&#xd;
+				&lt;/tns:CanReceive&gt;&#xd;
+			&lt;/tns:ServiceBinding&gt;&#xd;
+		&lt;/tns:CollaborationRole&gt;&#xd;
+		&lt;tns:DeliveryChannel tns:channelId=&quot;DIGIPOORT_defaultDeliveryChannel_ProfileBestEffortSigned&quot; tns:docExchangeId=&quot;DIGIPOORT_BestEffort&quot; tns:transportId=&quot;DIGIPOORT_transport_HTTP&quot;&gt;&#xd;
+			&lt;tns:MessagingCharacteristics tns:syncReplyMode=&quot;signalsAndResponse&quot; tns:ackRequested=&quot;never&quot; tns:actor=&quot;urn:oasis:names:tc:ebxml-msg:actor:toPartyMSH&quot; tns:ackSignatureRequested=&quot;never&quot; tns:duplicateElimination=&quot;never&quot; /&gt;&#xd;
+		&lt;/tns:DeliveryChannel&gt;&#xd;
+		&lt;tns:DeliveryChannel tns:channelId=&quot;DIGIPOORT_defaultDeliveryChannel_ProfileReliableMessaging&quot; tns:docExchangeId=&quot;DIGIPOORT_ReliableMessaging&quot; tns:transportId=&quot;DIGIPOORT_transport_HTTP&quot;&gt;&#xd;
+			&lt;tns:MessagingCharacteristics tns:syncReplyMode=&quot;signalsAndResponse&quot; tns:ackRequested=&quot;always&quot; tns:actor=&quot;urn:oasis:names:tc:ebxml-msg:actor:toPartyMSH&quot; tns:ackSignatureRequested=&quot;never&quot; tns:duplicateElimination=&quot;always&quot; /&gt;&#xd;
+		&lt;/tns:DeliveryChannel&gt;&#xd;
+		&lt;tns:Transport tns:transportId=&quot;DIGIPOORT_transport_HTTP&quot;&gt;&#xd;
+			&lt;tns:TransportSender&gt;&#xd;
+				&lt;tns:TransportProtocol tns:version=&quot;1.1&quot;&gt;HTTP&lt;/tns:TransportProtocol&gt;&#xd;
+			&lt;/tns:TransportSender&gt;&#xd;
+			&lt;tns:TransportReceiver&gt;&#xd;
+				&lt;tns:TransportProtocol tns:version=&quot;1.1&quot;&gt;HTTP&lt;/tns:TransportProtocol&gt;&#xd;
+				&lt;tns:Endpoint tns:uri=&quot;${digipoort-ebms-url}&quot; tns:type=&quot;allPurpose&quot; /&gt;&#xd;
+			&lt;/tns:TransportReceiver&gt;&#xd;
+		&lt;/tns:Transport&gt;&#xd;
+		&lt;tns:DocExchange tns:docExchangeId=&quot;DIGIPOORT_BestEffort&quot;&gt;&#xd;
+			&lt;tns:ebXMLSenderBinding tns:version=&quot;2.0&quot; /&gt;&#xd;
+			&lt;tns:ebXMLReceiverBinding tns:version=&quot;2.0&quot; /&gt;&#xd;
+		&lt;/tns:DocExchange&gt;&#xd;
+		&lt;tns:DocExchange tns:docExchangeId=&quot;DIGIPOORT_ReliableMessaging&quot;&gt;&#xd;
+			&lt;tns:ebXMLSenderBinding tns:version=&quot;2.0&quot;&gt;&#xd;
+				&lt;tns:ReliableMessaging&gt;&#xd;
+					&lt;tns:Retries&gt;5&lt;/tns:Retries&gt;&#xd;
+					&lt;tns:RetryInterval&gt;PT5M&lt;/tns:RetryInterval&gt;&#xd;
+					&lt;tns:MessageOrderSemantics&gt;NotGuaranteed&lt;/tns:MessageOrderSemantics&gt;&#xd;
+				&lt;/tns:ReliableMessaging&gt;&#xd;
+				&lt;tns:PersistDuration&gt;PT30M&lt;/tns:PersistDuration&gt;&#xd;
+			&lt;/tns:ebXMLSenderBinding&gt;&#xd;
+			&lt;tns:ebXMLReceiverBinding tns:version=&quot;2.0&quot;&gt;&#xd;
+				&lt;tns:ReliableMessaging&gt;&#xd;
+					&lt;tns:Retries&gt;5&lt;/tns:Retries&gt;&#xd;
+					&lt;tns:RetryInterval&gt;PT5M&lt;/tns:RetryInterval&gt;&#xd;
+					&lt;tns:MessageOrderSemantics&gt;NotGuaranteed&lt;/tns:MessageOrderSemantics&gt;&#xd;
+				&lt;/tns:ReliableMessaging&gt;&#xd;
+				&lt;tns:PersistDuration&gt;PT30M&lt;/tns:PersistDuration&gt;&#xd;
+			&lt;/tns:ebXMLReceiverBinding&gt;&#xd;
+		&lt;/tns:DocExchange&gt;&#xd;
+	&lt;/tns:PartyInfo&gt;&#xd;
+	&lt;tns:PartyInfo tns:partyName=&quot;Overheid&quot; tns:defaultMshChannelId=&quot;OVERHEID_defaultDeliveryChannel_ProfileBestEffortSigned&quot; tns:defaultMshPackageId=&quot;MshSignalPackage&quot;&gt;&#xd;
+		&lt;tns:PartyId tns:type=&quot;urn:osb:oin&quot;&gt;00000000000000000001&lt;/tns:PartyId&gt;&#xd;
+		&lt;tns:PartyRef xlink:href=&quot;&quot; /&gt;&#xd;
+		&lt;tns:CollaborationRole&gt;&#xd;
+			&lt;tns:ProcessSpecification tns:name=&quot;afleveren&quot; tns:version=&quot;1.0&quot; xlink:href=&quot;http://www.overheidsservicebus.nl/osr/Afleveren&quot; tns:uuid=&quot;urn:overheidsservicebus.nl:osr:Afleveren:OsbAfleveren11$10&quot; /&gt;&#xd;
+			&lt;tns:Role tns:name=&quot;OVERHEID&quot; xlink:href=&quot;http://www.overheidsservicebus.nl/osr/&quot; /&gt;&#xd;
+			&lt;tns:ServiceBinding&gt;&#xd;
+				&lt;tns:Service tns:type=&quot;urn:osb:services&quot;&gt;osb:afleveren:1.1$1.0&lt;/tns:Service&gt;&#xd;
+				&lt;tns:CanSend&gt;&#xd;
+					&lt;tns:ThisPartyActionBinding tns:id=&quot;OVERHEID_S_BevestigAfleveren&quot; tns:action=&quot;bevestigAfleveren&quot; tns:packageId=&quot;XMLMessagePackage&quot;&gt;&#xd;
+						&lt;tns:BusinessTransactionCharacteristics tns:isAuthenticated=&quot;transient&quot; tns:timeToPerform=&quot;P2D&quot; tns:isAuthorizationRequired=&quot;true&quot; tns:isConfidential=&quot;transient&quot; tns:isIntelligibleCheckRequired=&quot;false&quot; tns:isNonRepudiationReceiptRequired=&quot;false&quot; tns:isNonRepudiationRequired=&quot;false&quot; tns:isTamperProof=&quot;transient&quot; /&gt;&#xd;
+						&lt;tns:ChannelId&gt;OVERHEID_defaultDeliveryChannel_ProfileReliableMessaging&lt;/tns:ChannelId&gt;&#xd;
+					&lt;/tns:ThisPartyActionBinding&gt;&#xd;
+					&lt;tns:OtherPartyActionBinding&gt;DIGIPOORT_R_BevestigAfleveren&lt;/tns:OtherPartyActionBinding&gt;&#xd;
+				&lt;/tns:CanSend&gt;&#xd;
+				&lt;tns:CanReceive&gt;&#xd;
+					&lt;tns:ThisPartyActionBinding tns:id=&quot;OVERHEID_R_Afleveren&quot; tns:action=&quot;afleveren&quot; tns:packageId=&quot;XMLMessagePackage&quot;&gt;&#xd;
+						&lt;tns:BusinessTransactionCharacteristics tns:isAuthenticated=&quot;transient&quot; tns:timeToPerform=&quot;P2D&quot; tns:isAuthorizationRequired=&quot;true&quot; tns:isConfidential=&quot;transient&quot; tns:isIntelligibleCheckRequired=&quot;false&quot; tns:isNonRepudiationReceiptRequired=&quot;false&quot; tns:isNonRepudiationRequired=&quot;false&quot; tns:isTamperProof=&quot;transient&quot; /&gt;&#xd;
+						&lt;tns:ChannelId&gt;OVERHEID_defaultDeliveryChannel_ProfileReliableMessaging&lt;/tns:ChannelId&gt;&#xd;
+					&lt;/tns:ThisPartyActionBinding&gt;&#xd;
+					&lt;tns:OtherPartyActionBinding&gt;DIGIPOORT_S_Afleveren&lt;/tns:OtherPartyActionBinding&gt;&#xd;
+				&lt;/tns:CanReceive&gt;&#xd;
+			&lt;/tns:ServiceBinding&gt;&#xd;
+		&lt;/tns:CollaborationRole&gt;&#xd;
+		&lt;tns:CollaborationRole&gt;&#xd;
+			&lt;tns:ProcessSpecification tns:name=&quot;aanleveren&quot; tns:version=&quot;1.0&quot; xlink:href=&quot;http://www.overheidsservicebus.nl/osr/Aanleveren&quot; tns:uuid=&quot;urn:overheidsservicebus.nl:osr:Aanleveren:OsbAanleveren10$10&quot; /&gt;&#xd;
+			&lt;tns:Role tns:name=&quot;OVERHEID&quot; xlink:href=&quot;http://www.overheidsservicebus.nl/osr/&quot; /&gt;&#xd;
+			&lt;tns:ServiceBinding&gt;&#xd;
+				&lt;tns:Service tns:type=&quot;urn:osb:services&quot;&gt;osb:aanleveren:1.1$1.0&lt;/tns:Service&gt;&#xd;
+				&lt;tns:CanSend&gt;&#xd;
+					&lt;tns:ThisPartyActionBinding tns:id=&quot;OVERHEID_S_Aanleveren&quot; tns:action=&quot;aanleveren&quot; tns:packageId=&quot;XMLMessagePackage&quot;&gt;&#xd;
+						&lt;tns:BusinessTransactionCharacteristics tns:isAuthenticated=&quot;transient&quot; tns:timeToPerform=&quot;P2D&quot; tns:isAuthorizationRequired=&quot;true&quot; tns:isConfidential=&quot;transient&quot; tns:isIntelligibleCheckRequired=&quot;false&quot; tns:isNonRepudiationReceiptRequired=&quot;false&quot; tns:isNonRepudiationRequired=&quot;false&quot; tns:isTamperProof=&quot;transient&quot; /&gt;&#xd;
+						&lt;tns:ChannelId&gt;OVERHEID_defaultDeliveryChannel_ProfileReliableMessaging&lt;/tns:ChannelId&gt;&#xd;
+					&lt;/tns:ThisPartyActionBinding&gt;&#xd;
+					&lt;tns:OtherPartyActionBinding&gt;DIGIPOORT_R_Aanleveren&lt;/tns:OtherPartyActionBinding&gt;&#xd;
+				&lt;/tns:CanSend&gt;&#xd;
+				&lt;tns:CanReceive&gt;&#xd;
+					&lt;tns:ThisPartyActionBinding tns:id=&quot;OVERHEID_R_BevestigAanleveren&quot; tns:action=&quot;bevestigAanleveren&quot; tns:packageId=&quot;XMLMessagePackage&quot;&gt;&#xd;
+						&lt;tns:BusinessTransactionCharacteristics tns:isAuthenticated=&quot;transient&quot; tns:timeToPerform=&quot;P2D&quot; tns:isAuthorizationRequired=&quot;true&quot; tns:isConfidential=&quot;transient&quot; tns:isIntelligibleCheckRequired=&quot;false&quot; tns:isNonRepudiationReceiptRequired=&quot;false&quot; tns:isNonRepudiationRequired=&quot;false&quot; tns:isTamperProof=&quot;transient&quot; /&gt;&#xd;
+						&lt;tns:ChannelId&gt;OVERHEID_defaultDeliveryChannel_ProfileReliableMessaging&lt;/tns:ChannelId&gt;&#xd;
+					&lt;/tns:ThisPartyActionBinding&gt;&#xd;
+					&lt;tns:OtherPartyActionBinding&gt;DIGIPOORT_S_BevestigAanleveren&lt;/tns:OtherPartyActionBinding&gt;&#xd;
+				&lt;/tns:CanReceive&gt;&#xd;
+			&lt;/tns:ServiceBinding&gt;&#xd;
+		&lt;/tns:CollaborationRole&gt;&#xd;
+		&lt;tns:DeliveryChannel tns:channelId=&quot;OVERHEID_defaultDeliveryChannel_ProfileBestEffortSigned&quot; tns:docExchangeId=&quot;OVERHEID_BestEffort&quot; tns:transportId=&quot;OVERHEID_transport_HTTP&quot;&gt;&#xd;
+			&lt;tns:MessagingCharacteristics tns:syncReplyMode=&quot;signalsAndResponse&quot; tns:ackRequested=&quot;never&quot; tns:actor=&quot;urn:oasis:names:tc:ebxml-msg:actor:toPartyMSH&quot; tns:ackSignatureRequested=&quot;never&quot; tns:duplicateElimination=&quot;never&quot; /&gt;&#xd;
+		&lt;/tns:DeliveryChannel&gt;&#xd;
+		&lt;tns:DeliveryChannel tns:channelId=&quot;OVERHEID_defaultDeliveryChannel_ProfileReliableMessaging&quot; tns:docExchangeId=&quot;OVERHEID_ReliableMessaging&quot; tns:transportId=&quot;OVERHEID_transport_HTTP&quot;&gt;&#xd;
+			&lt;tns:MessagingCharacteristics tns:syncReplyMode=&quot;signalsAndResponse&quot; tns:ackRequested=&quot;always&quot; tns:actor=&quot;urn:oasis:names:tc:ebxml-msg:actor:toPartyMSH&quot; tns:ackSignatureRequested=&quot;never&quot; tns:duplicateElimination=&quot;always&quot; /&gt;&#xd;
+		&lt;/tns:DeliveryChannel&gt;&#xd;
+		&lt;tns:Transport tns:transportId=&quot;OVERHEID_transport_HTTP&quot;&gt;&#xd;
+			&lt;tns:TransportSender&gt;&#xd;
+				&lt;tns:TransportProtocol tns:version=&quot;1.1&quot;&gt;HTTP&lt;/tns:TransportProtocol&gt;&#xd;
+			&lt;/tns:TransportSender&gt;&#xd;
+			&lt;tns:TransportReceiver&gt;&#xd;
+				&lt;tns:TransportProtocol tns:version=&quot;1.1&quot;&gt;HTTP&lt;/tns:TransportProtocol&gt;&#xd;
+				&lt;tns:Endpoint tns:uri=&quot;${overheid-ebms-url}&quot; tns:type=&quot;allPurpose&quot; /&gt;&#xd;
+			&lt;/tns:TransportReceiver&gt;&#xd;
+		&lt;/tns:Transport&gt;&#xd;
+		&lt;tns:DocExchange tns:docExchangeId=&quot;OVERHEID_BestEffort&quot;&gt;&#xd;
+			&lt;tns:ebXMLSenderBinding tns:version=&quot;2.0&quot; /&gt;&#xd;
+			&lt;tns:ebXMLReceiverBinding tns:version=&quot;2.0&quot; /&gt;&#xd;
+		&lt;/tns:DocExchange&gt;&#xd;
+		&lt;tns:DocExchange tns:docExchangeId=&quot;OVERHEID_ReliableMessaging&quot;&gt;&#xd;
+			&lt;tns:ebXMLSenderBinding tns:version=&quot;2.0&quot;&gt;&#xd;
+				&lt;tns:ReliableMessaging&gt;&#xd;
+					&lt;tns:Retries&gt;5&lt;/tns:Retries&gt;&#xd;
+					&lt;tns:RetryInterval&gt;PT5M&lt;/tns:RetryInterval&gt;&#xd;
+					&lt;tns:MessageOrderSemantics&gt;NotGuaranteed&lt;/tns:MessageOrderSemantics&gt;&#xd;
+				&lt;/tns:ReliableMessaging&gt;&#xd;
+				&lt;tns:PersistDuration&gt;PT30M&lt;/tns:PersistDuration&gt;&#xd;
+			&lt;/tns:ebXMLSenderBinding&gt;&#xd;
+			&lt;tns:ebXMLReceiverBinding tns:version=&quot;2.0&quot;&gt;&#xd;
+				&lt;tns:ReliableMessaging&gt;&#xd;
+					&lt;tns:Retries&gt;5&lt;/tns:Retries&gt;&#xd;
+					&lt;tns:RetryInterval&gt;PT5M&lt;/tns:RetryInterval&gt;&#xd;
+					&lt;tns:MessageOrderSemantics&gt;NotGuaranteed&lt;/tns:MessageOrderSemantics&gt;&#xd;
+				&lt;/tns:ReliableMessaging&gt;&#xd;
+				&lt;tns:PersistDuration&gt;PT30M&lt;/tns:PersistDuration&gt;&#xd;
+			&lt;/tns:ebXMLReceiverBinding&gt;&#xd;
+		&lt;/tns:DocExchange&gt;&#xd;
+	&lt;/tns:PartyInfo&gt;&#xd;
+	&lt;tns:SimplePart tns:id=&quot;MsgHdr&quot; tns:mimetype=&quot;text/xml&quot;&gt;&#xd;
+		&lt;tns:NamespaceSupported tns:location=&quot;http://www.oasis-open.org/committees/ebxml-msg/schema/msg-header-2_0.xsd&quot; tns:version=&quot;2.0&quot;&gt;http://www.oasis-open.org/committees/ebxml-msg/schema/msg-header-2_0.xsd&lt;/tns:NamespaceSupported&gt;&#xd;
+	&lt;/tns:SimplePart&gt;&#xd;
+	&lt;tns:SimplePart tns:id=&quot;XMLMsg&quot; tns:mimetype=&quot;application/xml&quot; /&gt;&#xd;
+	&lt;tns:Packaging tns:id=&quot;MshSignalPackage&quot;&gt;&#xd;
+		&lt;tns:ProcessingCapabilities tns:parse=&quot;true&quot; tns:generate=&quot;true&quot; /&gt;&#xd;
+		&lt;tns:CompositeList&gt;&#xd;
+			&lt;tns:Composite tns:id=&quot;MshSignal&quot; tns:mimetype=&quot;multipart/related&quot; tns:mimeparameters=&quot;type=text/xml&quot;&gt;&#xd;
+				&lt;tns:Constituent tns:idref=&quot;MsgHdr&quot; /&gt;&#xd;
+			&lt;/tns:Composite&gt;&#xd;
+		&lt;/tns:CompositeList&gt;&#xd;
+	&lt;/tns:Packaging&gt;&#xd;
+	&lt;tns:Packaging tns:id=&quot;XMLMessagePackage&quot;&gt;&#xd;
+		&lt;tns:ProcessingCapabilities tns:parse=&quot;true&quot; tns:generate=&quot;true&quot; /&gt;&#xd;
+		&lt;tns:CompositeList&gt;&#xd;
+			&lt;tns:Composite tns:id=&quot;Message&quot; tns:mimetype=&quot;multipart/related&quot; tns:mimeparameters=&quot;type=text/xml&quot;&gt;&#xd;
+				&lt;tns:Constituent tns:idref=&quot;MsgHdr&quot; /&gt;&#xd;
+				&lt;tns:Constituent tns:idref=&quot;XMLMsg&quot; /&gt;&#xd;
+			&lt;/tns:Composite&gt;&#xd;
+		&lt;/tns:CompositeList&gt;&#xd;
+	&lt;/tns:Packaging&gt;&#xd;
+&lt;/tns:CollaborationProtocolAgreement&gt;</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+            </collectionProp>
+          </elementProp>
+          <stringProp name="HTTPSampler.domain">${digipoort-host}</stringProp>
+          <stringProp name="HTTPSampler.port">${digipoort-service-port}</stringProp>
+          <stringProp name="HTTPSampler.protocol"></stringProp>
+          <stringProp name="HTTPSampler.contentEncoding"></stringProp>
+          <stringProp name="HTTPSampler.path">/service/rest/v18/cpas?overwrite=true</stringProp>
+          <stringProp name="HTTPSampler.method">POST</stringProp>
+          <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+          <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
+          <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+          <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
+          <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
+          <stringProp name="HTTPSampler.connect_timeout"></stringProp>
+          <stringProp name="HTTPSampler.response_timeout"></stringProp>
+        </HTTPSamplerProxy>
+        <hashTree>
+          <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="assert statuscode 200" enabled="true">
+            <collectionProp name="Asserion.test_strings">
+              <stringProp name="49586">200</stringProp>
+            </collectionProp>
+            <stringProp name="Assertion.custom_message"></stringProp>
+            <stringProp name="Assertion.test_field">Assertion.response_code</stringProp>
+            <boolProp name="Assertion.assume_success">false</boolProp>
+            <intProp name="Assertion.test_type">16</intProp>
+          </ResponseAssertion>
+          <hashTree/>
+          <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="check cpa name" enabled="true">
+            <collectionProp name="Asserion.test_strings">
+              <stringProp name="-1248850907">${cpaId}</stringProp>
+            </collectionProp>
+            <stringProp name="Assertion.custom_message"></stringProp>
+            <stringProp name="Assertion.test_field">Assertion.response_data</stringProp>
+            <boolProp name="Assertion.assume_success">false</boolProp>
+            <intProp name="Assertion.test_type">16</intProp>
+          </ResponseAssertion>
+          <hashTree/>
+        </hashTree>
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="insert CPA overheid" enabled="true">
+          <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
+          <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
+            <collectionProp name="Arguments.arguments">
+              <elementProp name="" elementType="HTTPArgument">
+                <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                <stringProp name="Argument.value">&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;&#xd;
+&lt;tns:CollaborationProtocolAgreement xmlns:axsl=&quot;http://www.w3.org/1999/XSL/TransformAlias&quot; xmlns:xs=&quot;http://www.w3.org/2001/XMLSchema&quot; xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot; xmlns:functx=&quot;http://www.functx.com&quot; xmlns:tns=&quot;http://www.oasis-open.org/committees/ebxml-cppa/schema/cpp-cpa-2_0.xsd&quot; xmlns:ds=&quot;http://www.w3.org/2000/09/xmldsig#&quot; xmlns:xlink=&quot;http://www.w3.org/1999/xlink&quot; xsi:schemaLocation=&quot;http://www.oasis-open.org/committees/ebxml-cppa/schema/cpp-cpa-2_0.xsd http://www.oasis-open.org/committees/ebxml-cppa/schema/cpp-cpa-2_0.xsd&quot; tns:cpaid=&quot;${cpaId}&quot; tns:version=&quot;1.0&quot;&gt;&#xd;
+	&lt;tns:Status tns:value=&quot;agreed&quot; /&gt;&#xd;
+	&lt;tns:Start&gt;2011-01-01T00:00:00Z&lt;/tns:Start&gt;&#xd;
+	&lt;tns:End&gt;2031-01-01T00:00:00Z&lt;/tns:End&gt;&#xd;
+	&lt;tns:PartyInfo tns:partyName=&quot;Logius&quot; tns:defaultMshChannelId=&quot;DIGIPOORT_defaultDeliveryChannel_ProfileBestEffortSigned&quot; tns:defaultMshPackageId=&quot;MshSignalPackage&quot;&gt;&#xd;
+		&lt;tns:PartyId tns:type=&quot;urn:osb:oin&quot;&gt;00000000000000000000&lt;/tns:PartyId&gt;&#xd;
+		&lt;tns:PartyRef xlink:href=&quot;&quot; /&gt;&#xd;
+		&lt;tns:CollaborationRole&gt;&#xd;
+			&lt;tns:ProcessSpecification tns:name=&quot;afleveren&quot; tns:version=&quot;1.0&quot; xlink:href=&quot;http://www.overheidsservicebus.nl/osr/Afleveren&quot; tns:uuid=&quot;urn:overheidsservicebus.nl:osr:Afleveren:OsbAfleveren11$10&quot; /&gt;&#xd;
+			&lt;tns:Role tns:name=&quot;DIGIPOORT&quot; xlink:href=&quot;http://www.overheidsservicebus.nl/osr/&quot; /&gt;&#xd;
+			&lt;tns:ServiceBinding&gt;&#xd;
+				&lt;tns:Service tns:type=&quot;urn:osb:services&quot;&gt;osb:afleveren:1.1$1.0&lt;/tns:Service&gt;&#xd;
+				&lt;tns:CanSend&gt;&#xd;
+					&lt;tns:ThisPartyActionBinding tns:id=&quot;DIGIPOORT_S_Afleveren&quot; tns:action=&quot;afleveren&quot; tns:packageId=&quot;XMLMessagePackage&quot;&gt;&#xd;
+						&lt;tns:BusinessTransactionCharacteristics tns:isAuthenticated=&quot;transient&quot; tns:timeToPerform=&quot;P2D&quot; tns:isAuthorizationRequired=&quot;true&quot; tns:isConfidential=&quot;transient&quot; tns:isIntelligibleCheckRequired=&quot;false&quot; tns:isNonRepudiationReceiptRequired=&quot;false&quot; tns:isNonRepudiationRequired=&quot;false&quot; tns:isTamperProof=&quot;transient&quot; /&gt;&#xd;
+						&lt;tns:ChannelId&gt;DIGIPOORT_defaultDeliveryChannel_ProfileReliableMessaging&lt;/tns:ChannelId&gt;&#xd;
+					&lt;/tns:ThisPartyActionBinding&gt;&#xd;
+					&lt;tns:OtherPartyActionBinding&gt;OVERHEID_R_Afleveren&lt;/tns:OtherPartyActionBinding&gt;&#xd;
+				&lt;/tns:CanSend&gt;&#xd;
+				&lt;tns:CanReceive&gt;&#xd;
+					&lt;tns:ThisPartyActionBinding tns:id=&quot;DIGIPOORT_R_BevestigAfleveren&quot; tns:action=&quot;bevestigAfleveren&quot; tns:packageId=&quot;XMLMessagePackage&quot;&gt;&#xd;
+						&lt;tns:BusinessTransactionCharacteristics tns:isAuthenticated=&quot;transient&quot; tns:timeToPerform=&quot;P2D&quot; tns:isAuthorizationRequired=&quot;true&quot; tns:isConfidential=&quot;transient&quot; tns:isIntelligibleCheckRequired=&quot;false&quot; tns:isNonRepudiationReceiptRequired=&quot;false&quot; tns:isNonRepudiationRequired=&quot;false&quot; tns:isTamperProof=&quot;transient&quot; /&gt;&#xd;
+						&lt;tns:ChannelId&gt;DIGIPOORT_defaultDeliveryChannel_ProfileReliableMessaging&lt;/tns:ChannelId&gt;&#xd;
+					&lt;/tns:ThisPartyActionBinding&gt;&#xd;
+					&lt;tns:OtherPartyActionBinding&gt;OVERHEID_S_BevestigAfleveren&lt;/tns:OtherPartyActionBinding&gt;&#xd;
+				&lt;/tns:CanReceive&gt;&#xd;
+			&lt;/tns:ServiceBinding&gt;&#xd;
+		&lt;/tns:CollaborationRole&gt;&#xd;
+		&lt;tns:CollaborationRole&gt;&#xd;
+			&lt;tns:ProcessSpecification tns:name=&quot;aanleveren&quot; tns:version=&quot;1.0&quot; xlink:href=&quot;http://www.overheidsservicebus.nl/osr/Aanleveren&quot; tns:uuid=&quot;urn:overheidsservicebus.nl:osr:Aanleveren:OsbAanleveren10$10&quot; /&gt;&#xd;
+			&lt;tns:Role tns:name=&quot;DIGIPOORT&quot; xlink:href=&quot;http://www.overheidsservicebus.nl/osr/&quot; /&gt;&#xd;
+			&lt;tns:ServiceBinding&gt;&#xd;
+				&lt;tns:Service tns:type=&quot;urn:osb:services&quot;&gt;osb:aanleveren:1.1$1.0&lt;/tns:Service&gt;&#xd;
+				&lt;tns:CanSend&gt;&#xd;
+					&lt;tns:ThisPartyActionBinding tns:id=&quot;DIGIPOORT_S_BevestigAanleveren&quot; tns:action=&quot;bevestigAanleveren&quot; tns:packageId=&quot;XMLMessagePackage&quot;&gt;&#xd;
+						&lt;tns:BusinessTransactionCharacteristics tns:isAuthenticated=&quot;transient&quot; tns:timeToPerform=&quot;P2D&quot; tns:isAuthorizationRequired=&quot;true&quot; tns:isConfidential=&quot;transient&quot; tns:isIntelligibleCheckRequired=&quot;false&quot; tns:isNonRepudiationReceiptRequired=&quot;false&quot; tns:isNonRepudiationRequired=&quot;false&quot; tns:isTamperProof=&quot;transient&quot; /&gt;&#xd;
+						&lt;tns:ChannelId&gt;DIGIPOORT_defaultDeliveryChannel_ProfileReliableMessaging&lt;/tns:ChannelId&gt;&#xd;
+					&lt;/tns:ThisPartyActionBinding&gt;&#xd;
+					&lt;tns:OtherPartyActionBinding&gt;OVERHEID_R_BevestigAanleveren&lt;/tns:OtherPartyActionBinding&gt;&#xd;
+				&lt;/tns:CanSend&gt;&#xd;
+				&lt;tns:CanReceive&gt;&#xd;
+					&lt;tns:ThisPartyActionBinding tns:id=&quot;DIGIPOORT_R_Aanleveren&quot; tns:action=&quot;aanleveren&quot; tns:packageId=&quot;XMLMessagePackage&quot;&gt;&#xd;
+						&lt;tns:BusinessTransactionCharacteristics tns:isAuthenticated=&quot;transient&quot; tns:timeToPerform=&quot;P2D&quot; tns:isAuthorizationRequired=&quot;true&quot; tns:isConfidential=&quot;transient&quot; tns:isIntelligibleCheckRequired=&quot;false&quot; tns:isNonRepudiationReceiptRequired=&quot;false&quot; tns:isNonRepudiationRequired=&quot;false&quot; tns:isTamperProof=&quot;transient&quot; /&gt;&#xd;
+						&lt;tns:ChannelId&gt;DIGIPOORT_defaultDeliveryChannel_ProfileReliableMessaging&lt;/tns:ChannelId&gt;&#xd;
+					&lt;/tns:ThisPartyActionBinding&gt;&#xd;
+					&lt;tns:OtherPartyActionBinding&gt;OVERHEID_S_Aanleveren&lt;/tns:OtherPartyActionBinding&gt;&#xd;
+				&lt;/tns:CanReceive&gt;&#xd;
+			&lt;/tns:ServiceBinding&gt;&#xd;
+		&lt;/tns:CollaborationRole&gt;&#xd;
+		&lt;tns:DeliveryChannel tns:channelId=&quot;DIGIPOORT_defaultDeliveryChannel_ProfileBestEffortSigned&quot; tns:docExchangeId=&quot;DIGIPOORT_BestEffort&quot; tns:transportId=&quot;DIGIPOORT_transport_HTTP&quot;&gt;&#xd;
+			&lt;tns:MessagingCharacteristics tns:syncReplyMode=&quot;signalsAndResponse&quot; tns:ackRequested=&quot;never&quot; tns:actor=&quot;urn:oasis:names:tc:ebxml-msg:actor:toPartyMSH&quot; tns:ackSignatureRequested=&quot;never&quot; tns:duplicateElimination=&quot;never&quot; /&gt;&#xd;
+		&lt;/tns:DeliveryChannel&gt;&#xd;
+		&lt;tns:DeliveryChannel tns:channelId=&quot;DIGIPOORT_defaultDeliveryChannel_ProfileReliableMessaging&quot; tns:docExchangeId=&quot;DIGIPOORT_ReliableMessaging&quot; tns:transportId=&quot;DIGIPOORT_transport_HTTP&quot;&gt;&#xd;
+			&lt;tns:MessagingCharacteristics tns:syncReplyMode=&quot;signalsAndResponse&quot; tns:ackRequested=&quot;always&quot; tns:actor=&quot;urn:oasis:names:tc:ebxml-msg:actor:toPartyMSH&quot; tns:ackSignatureRequested=&quot;never&quot; tns:duplicateElimination=&quot;always&quot; /&gt;&#xd;
+		&lt;/tns:DeliveryChannel&gt;&#xd;
+		&lt;tns:Transport tns:transportId=&quot;DIGIPOORT_transport_HTTP&quot;&gt;&#xd;
+			&lt;tns:TransportSender&gt;&#xd;
+				&lt;tns:TransportProtocol tns:version=&quot;1.1&quot;&gt;HTTP&lt;/tns:TransportProtocol&gt;&#xd;
+			&lt;/tns:TransportSender&gt;&#xd;
+			&lt;tns:TransportReceiver&gt;&#xd;
+				&lt;tns:TransportProtocol tns:version=&quot;1.1&quot;&gt;HTTP&lt;/tns:TransportProtocol&gt;&#xd;
+				&lt;tns:Endpoint tns:uri=&quot;${digipoort-ebms-url}&quot; tns:type=&quot;allPurpose&quot; /&gt;&#xd;
+			&lt;/tns:TransportReceiver&gt;&#xd;
+		&lt;/tns:Transport&gt;&#xd;
+		&lt;tns:DocExchange tns:docExchangeId=&quot;DIGIPOORT_BestEffort&quot;&gt;&#xd;
+			&lt;tns:ebXMLSenderBinding tns:version=&quot;2.0&quot; /&gt;&#xd;
+			&lt;tns:ebXMLReceiverBinding tns:version=&quot;2.0&quot; /&gt;&#xd;
+		&lt;/tns:DocExchange&gt;&#xd;
+		&lt;tns:DocExchange tns:docExchangeId=&quot;DIGIPOORT_ReliableMessaging&quot;&gt;&#xd;
+			&lt;tns:ebXMLSenderBinding tns:version=&quot;2.0&quot;&gt;&#xd;
+				&lt;tns:ReliableMessaging&gt;&#xd;
+					&lt;tns:Retries&gt;5&lt;/tns:Retries&gt;&#xd;
+					&lt;tns:RetryInterval&gt;PT5M&lt;/tns:RetryInterval&gt;&#xd;
+					&lt;tns:MessageOrderSemantics&gt;NotGuaranteed&lt;/tns:MessageOrderSemantics&gt;&#xd;
+				&lt;/tns:ReliableMessaging&gt;&#xd;
+				&lt;tns:PersistDuration&gt;PT30M&lt;/tns:PersistDuration&gt;&#xd;
+			&lt;/tns:ebXMLSenderBinding&gt;&#xd;
+			&lt;tns:ebXMLReceiverBinding tns:version=&quot;2.0&quot;&gt;&#xd;
+				&lt;tns:ReliableMessaging&gt;&#xd;
+					&lt;tns:Retries&gt;5&lt;/tns:Retries&gt;&#xd;
+					&lt;tns:RetryInterval&gt;PT5M&lt;/tns:RetryInterval&gt;&#xd;
+					&lt;tns:MessageOrderSemantics&gt;NotGuaranteed&lt;/tns:MessageOrderSemantics&gt;&#xd;
+				&lt;/tns:ReliableMessaging&gt;&#xd;
+				&lt;tns:PersistDuration&gt;PT30M&lt;/tns:PersistDuration&gt;&#xd;
+			&lt;/tns:ebXMLReceiverBinding&gt;&#xd;
+		&lt;/tns:DocExchange&gt;&#xd;
+	&lt;/tns:PartyInfo&gt;&#xd;
+	&lt;tns:PartyInfo tns:partyName=&quot;Overheid&quot; tns:defaultMshChannelId=&quot;OVERHEID_defaultDeliveryChannel_ProfileBestEffortSigned&quot; tns:defaultMshPackageId=&quot;MshSignalPackage&quot;&gt;&#xd;
+		&lt;tns:PartyId tns:type=&quot;urn:osb:oin&quot;&gt;00000000000000000001&lt;/tns:PartyId&gt;&#xd;
+		&lt;tns:PartyRef xlink:href=&quot;&quot; /&gt;&#xd;
+		&lt;tns:CollaborationRole&gt;&#xd;
+			&lt;tns:ProcessSpecification tns:name=&quot;afleveren&quot; tns:version=&quot;1.0&quot; xlink:href=&quot;http://www.overheidsservicebus.nl/osr/Afleveren&quot; tns:uuid=&quot;urn:overheidsservicebus.nl:osr:Afleveren:OsbAfleveren11$10&quot; /&gt;&#xd;
+			&lt;tns:Role tns:name=&quot;OVERHEID&quot; xlink:href=&quot;http://www.overheidsservicebus.nl/osr/&quot; /&gt;&#xd;
+			&lt;tns:ServiceBinding&gt;&#xd;
+				&lt;tns:Service tns:type=&quot;urn:osb:services&quot;&gt;osb:afleveren:1.1$1.0&lt;/tns:Service&gt;&#xd;
+				&lt;tns:CanSend&gt;&#xd;
+					&lt;tns:ThisPartyActionBinding tns:id=&quot;OVERHEID_S_BevestigAfleveren&quot; tns:action=&quot;bevestigAfleveren&quot; tns:packageId=&quot;XMLMessagePackage&quot;&gt;&#xd;
+						&lt;tns:BusinessTransactionCharacteristics tns:isAuthenticated=&quot;transient&quot; tns:timeToPerform=&quot;P2D&quot; tns:isAuthorizationRequired=&quot;true&quot; tns:isConfidential=&quot;transient&quot; tns:isIntelligibleCheckRequired=&quot;false&quot; tns:isNonRepudiationReceiptRequired=&quot;false&quot; tns:isNonRepudiationRequired=&quot;false&quot; tns:isTamperProof=&quot;transient&quot; /&gt;&#xd;
+						&lt;tns:ChannelId&gt;OVERHEID_defaultDeliveryChannel_ProfileReliableMessaging&lt;/tns:ChannelId&gt;&#xd;
+					&lt;/tns:ThisPartyActionBinding&gt;&#xd;
+					&lt;tns:OtherPartyActionBinding&gt;DIGIPOORT_R_BevestigAfleveren&lt;/tns:OtherPartyActionBinding&gt;&#xd;
+				&lt;/tns:CanSend&gt;&#xd;
+				&lt;tns:CanReceive&gt;&#xd;
+					&lt;tns:ThisPartyActionBinding tns:id=&quot;OVERHEID_R_Afleveren&quot; tns:action=&quot;afleveren&quot; tns:packageId=&quot;XMLMessagePackage&quot;&gt;&#xd;
+						&lt;tns:BusinessTransactionCharacteristics tns:isAuthenticated=&quot;transient&quot; tns:timeToPerform=&quot;P2D&quot; tns:isAuthorizationRequired=&quot;true&quot; tns:isConfidential=&quot;transient&quot; tns:isIntelligibleCheckRequired=&quot;false&quot; tns:isNonRepudiationReceiptRequired=&quot;false&quot; tns:isNonRepudiationRequired=&quot;false&quot; tns:isTamperProof=&quot;transient&quot; /&gt;&#xd;
+						&lt;tns:ChannelId&gt;OVERHEID_defaultDeliveryChannel_ProfileReliableMessaging&lt;/tns:ChannelId&gt;&#xd;
+					&lt;/tns:ThisPartyActionBinding&gt;&#xd;
+					&lt;tns:OtherPartyActionBinding&gt;DIGIPOORT_S_Afleveren&lt;/tns:OtherPartyActionBinding&gt;&#xd;
+				&lt;/tns:CanReceive&gt;&#xd;
+			&lt;/tns:ServiceBinding&gt;&#xd;
+		&lt;/tns:CollaborationRole&gt;&#xd;
+		&lt;tns:CollaborationRole&gt;&#xd;
+			&lt;tns:ProcessSpecification tns:name=&quot;aanleveren&quot; tns:version=&quot;1.0&quot; xlink:href=&quot;http://www.overheidsservicebus.nl/osr/Aanleveren&quot; tns:uuid=&quot;urn:overheidsservicebus.nl:osr:Aanleveren:OsbAanleveren10$10&quot; /&gt;&#xd;
+			&lt;tns:Role tns:name=&quot;OVERHEID&quot; xlink:href=&quot;http://www.overheidsservicebus.nl/osr/&quot; /&gt;&#xd;
+			&lt;tns:ServiceBinding&gt;&#xd;
+				&lt;tns:Service tns:type=&quot;urn:osb:services&quot;&gt;osb:aanleveren:1.1$1.0&lt;/tns:Service&gt;&#xd;
+				&lt;tns:CanSend&gt;&#xd;
+					&lt;tns:ThisPartyActionBinding tns:id=&quot;OVERHEID_S_Aanleveren&quot; tns:action=&quot;aanleveren&quot; tns:packageId=&quot;XMLMessagePackage&quot;&gt;&#xd;
+						&lt;tns:BusinessTransactionCharacteristics tns:isAuthenticated=&quot;transient&quot; tns:timeToPerform=&quot;P2D&quot; tns:isAuthorizationRequired=&quot;true&quot; tns:isConfidential=&quot;transient&quot; tns:isIntelligibleCheckRequired=&quot;false&quot; tns:isNonRepudiationReceiptRequired=&quot;false&quot; tns:isNonRepudiationRequired=&quot;false&quot; tns:isTamperProof=&quot;transient&quot; /&gt;&#xd;
+						&lt;tns:ChannelId&gt;OVERHEID_defaultDeliveryChannel_ProfileReliableMessaging&lt;/tns:ChannelId&gt;&#xd;
+					&lt;/tns:ThisPartyActionBinding&gt;&#xd;
+					&lt;tns:OtherPartyActionBinding&gt;DIGIPOORT_R_Aanleveren&lt;/tns:OtherPartyActionBinding&gt;&#xd;
+				&lt;/tns:CanSend&gt;&#xd;
+				&lt;tns:CanReceive&gt;&#xd;
+					&lt;tns:ThisPartyActionBinding tns:id=&quot;OVERHEID_R_BevestigAanleveren&quot; tns:action=&quot;bevestigAanleveren&quot; tns:packageId=&quot;XMLMessagePackage&quot;&gt;&#xd;
+						&lt;tns:BusinessTransactionCharacteristics tns:isAuthenticated=&quot;transient&quot; tns:timeToPerform=&quot;P2D&quot; tns:isAuthorizationRequired=&quot;true&quot; tns:isConfidential=&quot;transient&quot; tns:isIntelligibleCheckRequired=&quot;false&quot; tns:isNonRepudiationReceiptRequired=&quot;false&quot; tns:isNonRepudiationRequired=&quot;false&quot; tns:isTamperProof=&quot;transient&quot; /&gt;&#xd;
+						&lt;tns:ChannelId&gt;OVERHEID_defaultDeliveryChannel_ProfileReliableMessaging&lt;/tns:ChannelId&gt;&#xd;
+					&lt;/tns:ThisPartyActionBinding&gt;&#xd;
+					&lt;tns:OtherPartyActionBinding&gt;DIGIPOORT_S_BevestigAanleveren&lt;/tns:OtherPartyActionBinding&gt;&#xd;
+				&lt;/tns:CanReceive&gt;&#xd;
+			&lt;/tns:ServiceBinding&gt;&#xd;
+		&lt;/tns:CollaborationRole&gt;&#xd;
+		&lt;tns:DeliveryChannel tns:channelId=&quot;OVERHEID_defaultDeliveryChannel_ProfileBestEffortSigned&quot; tns:docExchangeId=&quot;OVERHEID_BestEffort&quot; tns:transportId=&quot;OVERHEID_transport_HTTP&quot;&gt;&#xd;
+			&lt;tns:MessagingCharacteristics tns:syncReplyMode=&quot;signalsAndResponse&quot; tns:ackRequested=&quot;never&quot; tns:actor=&quot;urn:oasis:names:tc:ebxml-msg:actor:toPartyMSH&quot; tns:ackSignatureRequested=&quot;never&quot; tns:duplicateElimination=&quot;never&quot; /&gt;&#xd;
+		&lt;/tns:DeliveryChannel&gt;&#xd;
+		&lt;tns:DeliveryChannel tns:channelId=&quot;OVERHEID_defaultDeliveryChannel_ProfileReliableMessaging&quot; tns:docExchangeId=&quot;OVERHEID_ReliableMessaging&quot; tns:transportId=&quot;OVERHEID_transport_HTTP&quot;&gt;&#xd;
+			&lt;tns:MessagingCharacteristics tns:syncReplyMode=&quot;signalsAndResponse&quot; tns:ackRequested=&quot;always&quot; tns:actor=&quot;urn:oasis:names:tc:ebxml-msg:actor:toPartyMSH&quot; tns:ackSignatureRequested=&quot;never&quot; tns:duplicateElimination=&quot;always&quot; /&gt;&#xd;
+		&lt;/tns:DeliveryChannel&gt;&#xd;
+		&lt;tns:Transport tns:transportId=&quot;OVERHEID_transport_HTTP&quot;&gt;&#xd;
+			&lt;tns:TransportSender&gt;&#xd;
+				&lt;tns:TransportProtocol tns:version=&quot;1.1&quot;&gt;HTTP&lt;/tns:TransportProtocol&gt;&#xd;
+			&lt;/tns:TransportSender&gt;&#xd;
+			&lt;tns:TransportReceiver&gt;&#xd;
+				&lt;tns:TransportProtocol tns:version=&quot;1.1&quot;&gt;HTTP&lt;/tns:TransportProtocol&gt;&#xd;
+				&lt;tns:Endpoint tns:uri=&quot;${overheid-ebms-url}&quot; tns:type=&quot;allPurpose&quot; /&gt;&#xd;
+			&lt;/tns:TransportReceiver&gt;&#xd;
+		&lt;/tns:Transport&gt;&#xd;
+		&lt;tns:DocExchange tns:docExchangeId=&quot;OVERHEID_BestEffort&quot;&gt;&#xd;
+			&lt;tns:ebXMLSenderBinding tns:version=&quot;2.0&quot; /&gt;&#xd;
+			&lt;tns:ebXMLReceiverBinding tns:version=&quot;2.0&quot; /&gt;&#xd;
+		&lt;/tns:DocExchange&gt;&#xd;
+		&lt;tns:DocExchange tns:docExchangeId=&quot;OVERHEID_ReliableMessaging&quot;&gt;&#xd;
+			&lt;tns:ebXMLSenderBinding tns:version=&quot;2.0&quot;&gt;&#xd;
+				&lt;tns:ReliableMessaging&gt;&#xd;
+					&lt;tns:Retries&gt;5&lt;/tns:Retries&gt;&#xd;
+					&lt;tns:RetryInterval&gt;PT5M&lt;/tns:RetryInterval&gt;&#xd;
+					&lt;tns:MessageOrderSemantics&gt;NotGuaranteed&lt;/tns:MessageOrderSemantics&gt;&#xd;
+				&lt;/tns:ReliableMessaging&gt;&#xd;
+				&lt;tns:PersistDuration&gt;PT30M&lt;/tns:PersistDuration&gt;&#xd;
+			&lt;/tns:ebXMLSenderBinding&gt;&#xd;
+			&lt;tns:ebXMLReceiverBinding tns:version=&quot;2.0&quot;&gt;&#xd;
+				&lt;tns:ReliableMessaging&gt;&#xd;
+					&lt;tns:Retries&gt;5&lt;/tns:Retries&gt;&#xd;
+					&lt;tns:RetryInterval&gt;PT5M&lt;/tns:RetryInterval&gt;&#xd;
+					&lt;tns:MessageOrderSemantics&gt;NotGuaranteed&lt;/tns:MessageOrderSemantics&gt;&#xd;
+				&lt;/tns:ReliableMessaging&gt;&#xd;
+				&lt;tns:PersistDuration&gt;PT30M&lt;/tns:PersistDuration&gt;&#xd;
+			&lt;/tns:ebXMLReceiverBinding&gt;&#xd;
+		&lt;/tns:DocExchange&gt;&#xd;
+	&lt;/tns:PartyInfo&gt;&#xd;
+	&lt;tns:SimplePart tns:id=&quot;MsgHdr&quot; tns:mimetype=&quot;text/xml&quot;&gt;&#xd;
+		&lt;tns:NamespaceSupported tns:location=&quot;http://www.oasis-open.org/committees/ebxml-msg/schema/msg-header-2_0.xsd&quot; tns:version=&quot;2.0&quot;&gt;http://www.oasis-open.org/committees/ebxml-msg/schema/msg-header-2_0.xsd&lt;/tns:NamespaceSupported&gt;&#xd;
+	&lt;/tns:SimplePart&gt;&#xd;
+	&lt;tns:SimplePart tns:id=&quot;XMLMsg&quot; tns:mimetype=&quot;application/xml&quot; /&gt;&#xd;
+	&lt;tns:Packaging tns:id=&quot;MshSignalPackage&quot;&gt;&#xd;
+		&lt;tns:ProcessingCapabilities tns:parse=&quot;true&quot; tns:generate=&quot;true&quot; /&gt;&#xd;
+		&lt;tns:CompositeList&gt;&#xd;
+			&lt;tns:Composite tns:id=&quot;MshSignal&quot; tns:mimetype=&quot;multipart/related&quot; tns:mimeparameters=&quot;type=text/xml&quot;&gt;&#xd;
+				&lt;tns:Constituent tns:idref=&quot;MsgHdr&quot; /&gt;&#xd;
+			&lt;/tns:Composite&gt;&#xd;
+		&lt;/tns:CompositeList&gt;&#xd;
+	&lt;/tns:Packaging&gt;&#xd;
+	&lt;tns:Packaging tns:id=&quot;XMLMessagePackage&quot;&gt;&#xd;
+		&lt;tns:ProcessingCapabilities tns:parse=&quot;true&quot; tns:generate=&quot;true&quot; /&gt;&#xd;
+		&lt;tns:CompositeList&gt;&#xd;
+			&lt;tns:Composite tns:id=&quot;Message&quot; tns:mimetype=&quot;multipart/related&quot; tns:mimeparameters=&quot;type=text/xml&quot;&gt;&#xd;
+				&lt;tns:Constituent tns:idref=&quot;MsgHdr&quot; /&gt;&#xd;
+				&lt;tns:Constituent tns:idref=&quot;XMLMsg&quot; /&gt;&#xd;
+			&lt;/tns:Composite&gt;&#xd;
+		&lt;/tns:CompositeList&gt;&#xd;
+	&lt;/tns:Packaging&gt;&#xd;
+&lt;/tns:CollaborationProtocolAgreement&gt;</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+            </collectionProp>
+          </elementProp>
+          <stringProp name="HTTPSampler.domain">${overheid-host}</stringProp>
+          <stringProp name="HTTPSampler.port">${overheid-service-port}</stringProp>
+          <stringProp name="HTTPSampler.protocol"></stringProp>
+          <stringProp name="HTTPSampler.contentEncoding"></stringProp>
+          <stringProp name="HTTPSampler.path">/service/rest/v18/cpas?overwrite=true</stringProp>
+          <stringProp name="HTTPSampler.method">POST</stringProp>
+          <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+          <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
+          <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+          <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
+          <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
+          <stringProp name="HTTPSampler.connect_timeout"></stringProp>
+          <stringProp name="HTTPSampler.response_timeout"></stringProp>
+        </HTTPSamplerProxy>
+        <hashTree>
+          <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="assert statuscode 200" enabled="true">
+            <collectionProp name="Asserion.test_strings">
+              <stringProp name="49586">200</stringProp>
+            </collectionProp>
+            <stringProp name="Assertion.custom_message"></stringProp>
+            <stringProp name="Assertion.test_field">Assertion.response_code</stringProp>
+            <boolProp name="Assertion.assume_success">false</boolProp>
+            <intProp name="Assertion.test_type">16</intProp>
+          </ResponseAssertion>
+          <hashTree/>
+          <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="check cpa name" enabled="true">
+            <collectionProp name="Asserion.test_strings">
+              <stringProp name="-1248850907">${cpaId}</stringProp>
+            </collectionProp>
+            <stringProp name="Assertion.custom_message"></stringProp>
+            <stringProp name="Assertion.test_field">Assertion.response_data</stringProp>
+            <boolProp name="Assertion.assume_success">false</boolProp>
+            <intProp name="Assertion.test_type">16</intProp>
+          </ResponseAssertion>
+          <hashTree/>
+        </hashTree>
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="ping request digipoort - overheid" enabled="true">
+          <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables" enabled="true">
+            <collectionProp name="Arguments.arguments"/>
+          </elementProp>
+          <stringProp name="HTTPSampler.domain">${digipoort-host}</stringProp>
+          <stringProp name="HTTPSampler.port">${digipoort-service-port}</stringProp>
+          <stringProp name="HTTPSampler.protocol"></stringProp>
+          <stringProp name="HTTPSampler.contentEncoding"></stringProp>
+          <stringProp name="HTTPSampler.path">/service/rest/v18/ebms/ping/${cpaId}/from/urn:osb:oin:00000000000000000000/to/urn:osb:oin:00000000000000000001</stringProp>
+          <stringProp name="HTTPSampler.method">POST</stringProp>
+          <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+          <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
+          <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+          <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
+          <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
+          <stringProp name="HTTPSampler.connect_timeout"></stringProp>
+          <stringProp name="HTTPSampler.response_timeout"></stringProp>
+        </HTTPSamplerProxy>
+        <hashTree>
+          <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="response code 204" enabled="true">
+            <collectionProp name="Asserion.test_strings">
+              <stringProp name="49590">204</stringProp>
+            </collectionProp>
+            <stringProp name="Assertion.custom_message"></stringProp>
+            <stringProp name="Assertion.test_field">Assertion.response_code</stringProp>
+            <boolProp name="Assertion.assume_success">false</boolProp>
+            <intProp name="Assertion.test_type">16</intProp>
+          </ResponseAssertion>
+          <hashTree/>
+        </hashTree>
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="ping request overheid - digipoort" enabled="true">
+          <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables" enabled="true">
+            <collectionProp name="Arguments.arguments"/>
+          </elementProp>
+          <stringProp name="HTTPSampler.domain">${overheid-host}</stringProp>
+          <stringProp name="HTTPSampler.port">${overheid-service-port}</stringProp>
+          <stringProp name="HTTPSampler.protocol"></stringProp>
+          <stringProp name="HTTPSampler.contentEncoding"></stringProp>
+          <stringProp name="HTTPSampler.path">/service/rest/v18/ebms/ping/${cpaId}/from/urn:osb:oin:00000000000000000001/to/urn:osb:oin:00000000000000000000</stringProp>
+          <stringProp name="HTTPSampler.method">POST</stringProp>
+          <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+          <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
+          <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+          <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
+          <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
+          <stringProp name="HTTPSampler.connect_timeout"></stringProp>
+          <stringProp name="HTTPSampler.response_timeout"></stringProp>
+        </HTTPSamplerProxy>
+        <hashTree>
+          <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="response code 204" enabled="true">
+            <collectionProp name="Asserion.test_strings">
+              <stringProp name="49590">204</stringProp>
+            </collectionProp>
+            <stringProp name="Assertion.custom_message"></stringProp>
+            <stringProp name="Assertion.test_field">Assertion.response_code</stringProp>
+            <boolProp name="Assertion.assume_success">false</boolProp>
+            <intProp name="Assertion.test_type">16</intProp>
+          </ResponseAssertion>
+          <hashTree/>
+        </hashTree>
+      </hashTree>
+      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="digipoort" enabled="true">
+        <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
+        <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller" enabled="true">
+          <boolProp name="LoopController.continue_forever">false</boolProp>
+          <stringProp name="LoopController.loops">${max-loop-count}</stringProp>
+        </elementProp>
+        <stringProp name="ThreadGroup.num_threads">${threads}</stringProp>
+        <stringProp name="ThreadGroup.ramp_time">1</stringProp>
+        <boolProp name="ThreadGroup.scheduler">false</boolProp>
+        <stringProp name="ThreadGroup.duration"></stringProp>
+        <stringProp name="ThreadGroup.delay"></stringProp>
+        <boolProp name="ThreadGroup.same_user_on_next_iteration">true</boolProp>
+        <boolProp name="ThreadGroup.delayedStart">true</boolProp>
+      </ThreadGroup>
+      <hashTree>
+        <ThroughputController guiclass="ThroughputControllerGui" testclass="ThroughputController" testname="mostly small" enabled="true">
+          <intProp name="ThroughputController.style">1</intProp>
+          <boolProp name="ThroughputController.perThread">false</boolProp>
+          <intProp name="ThroughputController.maxThroughput">1</intProp>
+          <FloatProperty>
+            <name>ThroughputController.percentThroughput</name>
+            <value>85.0</value>
+            <savedValue>0.0</savedValue>
+          </FloatProperty>
+        </ThroughputController>
+        <hashTree>
+          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="digipoort send request small" enabled="true">
+            <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
+            <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
+              <collectionProp name="Arguments.arguments">
+                <elementProp name="" elementType="HTTPArgument">
+                  <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                  <stringProp name="Argument.value">{&#xd;
+  &quot;properties&quot;: {&#xd;
+    &quot;cpaId&quot;: &quot;${cpaId}&quot;,&#xd;
+    &quot;fromPartyId&quot;: &quot;urn:osb:oin:00000000000000000000&quot;,&#xd;
+    &quot;fromRole&quot;: &quot;DIGIPOORT&quot;,&#xd;
+    &quot;toPartyId&quot;: &quot;urn:osb:oin:00000000000000000001&quot;,&#xd;
+    &quot;toRole&quot;: &quot;OVERHEID&quot;,&#xd;
+    &quot;service&quot;: &quot;urn:osb:services:osb:afleveren:1.1$1.0&quot;,&#xd;
+    &quot;action&quot;: &quot;afleveren&quot;&#xd;
+  },&#xd;
+  &quot;dataSources&quot;: [{&#xd;
+    &quot;name&quot;: &quot;digipoort-small.txt&quot;,&#xd;
+    &quot;contentType&quot;: &quot;text/plain&quot;,&#xd;
+    &quot;content&quot;: &quot;${__V(filecontentssmall, notfound)}&quot;&#xd;
+  }]&#xd;
+}</stringProp>
+                  <stringProp name="Argument.metadata">=</stringProp>
+                </elementProp>
+              </collectionProp>
+            </elementProp>
+            <stringProp name="HTTPSampler.domain">${digipoort-host}</stringProp>
+            <stringProp name="HTTPSampler.port">${digipoort-service-port}</stringProp>
+            <stringProp name="HTTPSampler.protocol"></stringProp>
+            <stringProp name="HTTPSampler.contentEncoding"></stringProp>
+            <stringProp name="HTTPSampler.path">/service/rest/v18/ebms/messages</stringProp>
+            <stringProp name="HTTPSampler.method">POST</stringProp>
+            <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+            <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
+            <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+            <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
+            <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
+            <stringProp name="HTTPSampler.connect_timeout"></stringProp>
+            <stringProp name="HTTPSampler.response_timeout"></stringProp>
+            <stringProp name="TestPlan.comments">1k attachment</stringProp>
+          </HTTPSamplerProxy>
+          <hashTree>
+            <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="rest headers" enabled="true">
+              <collectionProp name="HeaderManager.headers">
+                <elementProp name="" elementType="Header">
+                  <stringProp name="Header.name">Content-Type</stringProp>
+                  <stringProp name="Header.value">application/json</stringProp>
+                </elementProp>
+              </collectionProp>
+            </HeaderManager>
+            <hashTree/>
+            <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="assert statuscode 200" enabled="true">
+              <collectionProp name="Asserion.test_strings">
+                <stringProp name="49586">200</stringProp>
+              </collectionProp>
+              <stringProp name="Assertion.custom_message"></stringProp>
+              <stringProp name="Assertion.test_field">Assertion.response_code</stringProp>
+              <boolProp name="Assertion.assume_success">false</boolProp>
+              <intProp name="Assertion.test_type">16</intProp>
+              <stringProp name="Assertion.scope">children</stringProp>
+            </ResponseAssertion>
+            <hashTree/>
+            <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="test messageid format" enabled="true">
+              <collectionProp name="Asserion.test_strings">
+                <stringProp name="1189827470">[a-z0-9\-]*@[a-z0-9\-]*</stringProp>
+              </collectionProp>
+              <stringProp name="Assertion.custom_message"></stringProp>
+              <stringProp name="Assertion.test_field">Assertion.response_data</stringProp>
+              <boolProp name="Assertion.assume_success">false</boolProp>
+              <intProp name="Assertion.test_type">1</intProp>
+              <stringProp name="Assertion.scope">children</stringProp>
+            </ResponseAssertion>
+            <hashTree/>
+          </hashTree>
+        </hashTree>
+        <ThroughputController guiclass="ThroughputControllerGui" testclass="ThroughputController" testname="some large" enabled="true">
+          <intProp name="ThroughputController.style">1</intProp>
+          <boolProp name="ThroughputController.perThread">false</boolProp>
+          <intProp name="ThroughputController.maxThroughput">1</intProp>
+          <FloatProperty>
+            <name>ThroughputController.percentThroughput</name>
+            <value>15.0</value>
+            <savedValue>0.0</savedValue>
+          </FloatProperty>
+        </ThroughputController>
+        <hashTree>
+          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="digipoort send request large" enabled="true">
+            <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
+            <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
+              <collectionProp name="Arguments.arguments">
+                <elementProp name="" elementType="HTTPArgument">
+                  <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                  <stringProp name="Argument.value">{&#xd;
+  &quot;properties&quot;: {&#xd;
+    &quot;cpaId&quot;: &quot;${cpaId}&quot;,&#xd;
+    &quot;fromPartyId&quot;: &quot;urn:osb:oin:00000000000000000000&quot;,&#xd;
+    &quot;fromRole&quot;: &quot;DIGIPOORT&quot;,&#xd;
+    &quot;toPartyId&quot;: &quot;urn:osb:oin:00000000000000000001&quot;,&#xd;
+    &quot;toRole&quot;: &quot;OVERHEID&quot;,&#xd;
+    &quot;service&quot;: &quot;urn:osb:services:osb:afleveren:1.1$1.0&quot;,&#xd;
+    &quot;action&quot;: &quot;afleveren&quot;&#xd;
+  },&#xd;
+  &quot;dataSources&quot;: [{&#xd;
+    &quot;name&quot;: &quot;digipoort-large.txt&quot;,&#xd;
+    &quot;contentType&quot;: &quot;text/plain&quot;,&#xd;
+    &quot;content&quot;: &quot;${__V(filecontentslarge, notfound)}&quot;&#xd;
+  }]&#xd;
+}</stringProp>
+                  <stringProp name="Argument.metadata">=</stringProp>
+                </elementProp>
+              </collectionProp>
+            </elementProp>
+            <stringProp name="HTTPSampler.domain">${digipoort-host}</stringProp>
+            <stringProp name="HTTPSampler.port">${digipoort-service-port}</stringProp>
+            <stringProp name="HTTPSampler.protocol"></stringProp>
+            <stringProp name="HTTPSampler.contentEncoding"></stringProp>
+            <stringProp name="HTTPSampler.path">/service/rest/v18/ebms/messages</stringProp>
+            <stringProp name="HTTPSampler.method">POST</stringProp>
+            <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+            <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
+            <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+            <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
+            <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
+            <stringProp name="HTTPSampler.connect_timeout"></stringProp>
+            <stringProp name="HTTPSampler.response_timeout"></stringProp>
+            <stringProp name="TestPlan.comments">1m attachment</stringProp>
+          </HTTPSamplerProxy>
+          <hashTree>
+            <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="rest headers" enabled="true">
+              <collectionProp name="HeaderManager.headers">
+                <elementProp name="" elementType="Header">
+                  <stringProp name="Header.name">Content-Type</stringProp>
+                  <stringProp name="Header.value">application/json</stringProp>
+                </elementProp>
+              </collectionProp>
+            </HeaderManager>
+            <hashTree/>
+            <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="assert statuscode 200" enabled="true">
+              <collectionProp name="Asserion.test_strings">
+                <stringProp name="49586">200</stringProp>
+              </collectionProp>
+              <stringProp name="Assertion.custom_message"></stringProp>
+              <stringProp name="Assertion.test_field">Assertion.response_code</stringProp>
+              <boolProp name="Assertion.assume_success">false</boolProp>
+              <intProp name="Assertion.test_type">16</intProp>
+              <stringProp name="Assertion.scope">children</stringProp>
+            </ResponseAssertion>
+            <hashTree/>
+            <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="test messageid format" enabled="true">
+              <collectionProp name="Asserion.test_strings">
+                <stringProp name="1189827470">[a-z0-9\-]*@[a-z0-9\-]*</stringProp>
+              </collectionProp>
+              <stringProp name="Assertion.custom_message"></stringProp>
+              <stringProp name="Assertion.test_field">Assertion.response_data</stringProp>
+              <boolProp name="Assertion.assume_success">false</boolProp>
+              <intProp name="Assertion.test_type">1</intProp>
+              <stringProp name="Assertion.scope">children</stringProp>
+            </ResponseAssertion>
+            <hashTree/>
+          </hashTree>
+        </hashTree>
+      </hashTree>
+      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="overheid" enabled="true">
+        <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
+        <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller" enabled="true">
+          <boolProp name="LoopController.continue_forever">false</boolProp>
+          <stringProp name="LoopController.loops">${max-loop-count}</stringProp>
+        </elementProp>
+        <stringProp name="ThreadGroup.num_threads">${threads}</stringProp>
+        <stringProp name="ThreadGroup.ramp_time">1</stringProp>
+        <boolProp name="ThreadGroup.scheduler">false</boolProp>
+        <stringProp name="ThreadGroup.duration"></stringProp>
+        <stringProp name="ThreadGroup.delay"></stringProp>
+        <boolProp name="ThreadGroup.same_user_on_next_iteration">true</boolProp>
+        <boolProp name="ThreadGroup.delayedStart">true</boolProp>
+      </ThreadGroup>
+      <hashTree>
+        <ThroughputController guiclass="ThroughputControllerGui" testclass="ThroughputController" testname="mostly small" enabled="true">
+          <intProp name="ThroughputController.style">1</intProp>
+          <boolProp name="ThroughputController.perThread">false</boolProp>
+          <intProp name="ThroughputController.maxThroughput">1</intProp>
+          <FloatProperty>
+            <name>ThroughputController.percentThroughput</name>
+            <value>85.0</value>
+            <savedValue>0.0</savedValue>
+          </FloatProperty>
+        </ThroughputController>
+        <hashTree>
+          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="overheid send request small" enabled="true">
+            <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
+            <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
+              <collectionProp name="Arguments.arguments">
+                <elementProp name="" elementType="HTTPArgument">
+                  <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                  <stringProp name="Argument.value">{&#xd;
+  &quot;properties&quot;: {&#xd;
+    &quot;cpaId&quot;: &quot;${cpaId}&quot;,&#xd;
+    &quot;fromPartyId&quot;: &quot;urn:osb:oin:00000000000000000001&quot;,&#xd;
+    &quot;fromRole&quot;: &quot;OVERHEID&quot;,&#xd;
+    &quot;toPartyId&quot;: &quot;urn:osb:oin:00000000000000000000&quot;,&#xd;
+    &quot;toRole&quot;: &quot;DIGIPOORT&quot;,&#xd;
+    &quot;service&quot;: &quot;urn:osb:services:osb:afleveren:1.1$1.0&quot;,&#xd;
+    &quot;action&quot;: &quot;bevestigAfleveren&quot;&#xd;
+  },&#xd;
+  &quot;dataSources&quot;: [{&#xd;
+    &quot;name&quot;: &quot;overheid-small.txt&quot;,&#xd;
+    &quot;contentType&quot;: &quot;text/plain&quot;,&#xd;
+    &quot;content&quot;: &quot;${__V(filecontentssmall, notfound)}&quot;&#xd;
+  }]&#xd;
+}</stringProp>
+                  <stringProp name="Argument.metadata">=</stringProp>
+                </elementProp>
+              </collectionProp>
+            </elementProp>
+            <stringProp name="HTTPSampler.domain">${overheid-host}</stringProp>
+            <stringProp name="HTTPSampler.port">${overheid-service-port}</stringProp>
+            <stringProp name="HTTPSampler.protocol"></stringProp>
+            <stringProp name="HTTPSampler.contentEncoding"></stringProp>
+            <stringProp name="HTTPSampler.path">/service/rest/v18/ebms/messages</stringProp>
+            <stringProp name="HTTPSampler.method">POST</stringProp>
+            <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+            <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
+            <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+            <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
+            <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
+            <stringProp name="HTTPSampler.connect_timeout"></stringProp>
+            <stringProp name="HTTPSampler.response_timeout"></stringProp>
+            <stringProp name="TestPlan.comments">1k</stringProp>
+          </HTTPSamplerProxy>
+          <hashTree>
+            <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="assert statuscode 200" enabled="true">
+              <collectionProp name="Asserion.test_strings">
+                <stringProp name="49586">200</stringProp>
+              </collectionProp>
+              <stringProp name="Assertion.custom_message"></stringProp>
+              <stringProp name="Assertion.test_field">Assertion.response_code</stringProp>
+              <boolProp name="Assertion.assume_success">false</boolProp>
+              <intProp name="Assertion.test_type">16</intProp>
+            </ResponseAssertion>
+            <hashTree/>
+            <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="rest headers" enabled="true">
+              <collectionProp name="HeaderManager.headers">
+                <elementProp name="" elementType="Header">
+                  <stringProp name="Header.name">Content-Type</stringProp>
+                  <stringProp name="Header.value">application/json</stringProp>
+                </elementProp>
+              </collectionProp>
+            </HeaderManager>
+            <hashTree/>
+            <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="test messageid format" enabled="true">
+              <collectionProp name="Asserion.test_strings">
+                <stringProp name="1189827470">[a-z0-9\-]*@[a-z0-9\-]*</stringProp>
+              </collectionProp>
+              <stringProp name="Assertion.custom_message"></stringProp>
+              <stringProp name="Assertion.test_field">Assertion.response_data</stringProp>
+              <boolProp name="Assertion.assume_success">false</boolProp>
+              <intProp name="Assertion.test_type">1</intProp>
+              <stringProp name="Assertion.scope">children</stringProp>
+            </ResponseAssertion>
+            <hashTree/>
+          </hashTree>
+        </hashTree>
+        <ThroughputController guiclass="ThroughputControllerGui" testclass="ThroughputController" testname="some large" enabled="true">
+          <intProp name="ThroughputController.style">1</intProp>
+          <boolProp name="ThroughputController.perThread">false</boolProp>
+          <intProp name="ThroughputController.maxThroughput">1</intProp>
+          <FloatProperty>
+            <name>ThroughputController.percentThroughput</name>
+            <value>15.0</value>
+            <savedValue>0.0</savedValue>
+          </FloatProperty>
+        </ThroughputController>
+        <hashTree>
+          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="overheid send request large" enabled="true">
+            <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
+            <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
+              <collectionProp name="Arguments.arguments">
+                <elementProp name="" elementType="HTTPArgument">
+                  <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                  <stringProp name="Argument.value">{&#xd;
+  &quot;properties&quot;: {&#xd;
+    &quot;cpaId&quot;: &quot;${cpaId}&quot;,&#xd;
+    &quot;fromPartyId&quot;: &quot;urn:osb:oin:00000000000000000001&quot;,&#xd;
+    &quot;fromRole&quot;: &quot;OVERHEID&quot;,&#xd;
+    &quot;toPartyId&quot;: &quot;urn:osb:oin:00000000000000000000&quot;,&#xd;
+    &quot;toRole&quot;: &quot;DIGIPOORT&quot;,&#xd;
+    &quot;service&quot;: &quot;urn:osb:services:osb:afleveren:1.1$1.0&quot;,&#xd;
+    &quot;action&quot;: &quot;bevestigAfleveren&quot;&#xd;
+  },&#xd;
+  &quot;dataSources&quot;: [{&#xd;
+    &quot;name&quot;: &quot;overheid-large.txt&quot;,&#xd;
+    &quot;contentType&quot;: &quot;text/plain&quot;,&#xd;
+    &quot;content&quot;: &quot;${__V(filecontentslarge, notfound)}&quot;&#xd;
+  }]&#xd;
+}</stringProp>
+                  <stringProp name="Argument.metadata">=</stringProp>
+                </elementProp>
+              </collectionProp>
+            </elementProp>
+            <stringProp name="HTTPSampler.domain">${overheid-host}</stringProp>
+            <stringProp name="HTTPSampler.port">${overheid-service-port}</stringProp>
+            <stringProp name="HTTPSampler.protocol"></stringProp>
+            <stringProp name="HTTPSampler.contentEncoding"></stringProp>
+            <stringProp name="HTTPSampler.path">/service/rest/v18/ebms/messages</stringProp>
+            <stringProp name="HTTPSampler.method">POST</stringProp>
+            <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+            <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
+            <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+            <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
+            <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
+            <stringProp name="HTTPSampler.connect_timeout"></stringProp>
+            <stringProp name="HTTPSampler.response_timeout"></stringProp>
+            <stringProp name="TestPlan.comments">1m</stringProp>
+          </HTTPSamplerProxy>
+          <hashTree>
+            <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="assert statuscode 200" enabled="true">
+              <collectionProp name="Asserion.test_strings">
+                <stringProp name="49586">200</stringProp>
+              </collectionProp>
+              <stringProp name="Assertion.custom_message"></stringProp>
+              <stringProp name="Assertion.test_field">Assertion.response_code</stringProp>
+              <boolProp name="Assertion.assume_success">false</boolProp>
+              <intProp name="Assertion.test_type">16</intProp>
+            </ResponseAssertion>
+            <hashTree/>
+            <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="rest headers" enabled="true">
+              <collectionProp name="HeaderManager.headers">
+                <elementProp name="" elementType="Header">
+                  <stringProp name="Header.name">Content-Type</stringProp>
+                  <stringProp name="Header.value">application/json</stringProp>
+                </elementProp>
+              </collectionProp>
+            </HeaderManager>
+            <hashTree/>
+            <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="test messageid format" enabled="true">
+              <collectionProp name="Asserion.test_strings">
+                <stringProp name="1189827470">[a-z0-9\-]*@[a-z0-9\-]*</stringProp>
+              </collectionProp>
+              <stringProp name="Assertion.custom_message"></stringProp>
+              <stringProp name="Assertion.test_field">Assertion.response_data</stringProp>
+              <boolProp name="Assertion.assume_success">false</boolProp>
+              <intProp name="Assertion.test_type">1</intProp>
+              <stringProp name="Assertion.scope">children</stringProp>
+            </ResponseAssertion>
+            <hashTree/>
+          </hashTree>
+        </hashTree>
+      </hashTree>
+      <ResultCollector guiclass="ViewResultsFullVisualizer" testclass="ResultCollector" testname="View Results Tree" enabled="false">
+        <boolProp name="ResultCollector.error_logging">false</boolProp>
+        <objProp>
+          <name>saveConfig</name>
+          <value class="SampleSaveConfiguration">
+            <time>true</time>
+            <latency>true</latency>
+            <timestamp>true</timestamp>
+            <success>true</success>
+            <label>true</label>
+            <code>true</code>
+            <message>true</message>
+            <threadName>true</threadName>
+            <dataType>true</dataType>
+            <encoding>false</encoding>
+            <assertions>true</assertions>
+            <subresults>true</subresults>
+            <responseData>false</responseData>
+            <samplerData>false</samplerData>
+            <xml>false</xml>
+            <fieldNames>true</fieldNames>
+            <responseHeaders>false</responseHeaders>
+            <requestHeaders>false</requestHeaders>
+            <responseDataOnError>false</responseDataOnError>
+            <saveAssertionResultsFailureMessage>true</saveAssertionResultsFailureMessage>
+            <assertionsResultsToSave>0</assertionsResultsToSave>
+            <bytes>true</bytes>
+            <sentBytes>true</sentBytes>
+            <url>true</url>
+            <threadCounts>true</threadCounts>
+            <idleTime>true</idleTime>
+            <connectTime>true</connectTime>
+          </value>
+        </objProp>
+        <stringProp name="filename"></stringProp>
+      </ResultCollector>
+      <hashTree/>
+      <ResultCollector guiclass="SummaryReport" testclass="ResultCollector" testname="Summary Report" enabled="false">
+        <boolProp name="ResultCollector.error_logging">false</boolProp>
+        <objProp>
+          <name>saveConfig</name>
+          <value class="SampleSaveConfiguration">
+            <time>true</time>
+            <latency>true</latency>
+            <timestamp>true</timestamp>
+            <success>true</success>
+            <label>true</label>
+            <code>true</code>
+            <message>false</message>
+            <threadName>true</threadName>
+            <dataType>false</dataType>
+            <encoding>false</encoding>
+            <assertions>true</assertions>
+            <subresults>false</subresults>
+            <responseData>false</responseData>
+            <samplerData>false</samplerData>
+            <xml>false</xml>
+            <fieldNames>false</fieldNames>
+            <responseHeaders>false</responseHeaders>
+            <requestHeaders>false</requestHeaders>
+            <responseDataOnError>false</responseDataOnError>
+            <saveAssertionResultsFailureMessage>true</saveAssertionResultsFailureMessage>
+            <assertionsResultsToSave>0</assertionsResultsToSave>
+            <sentBytes>true</sentBytes>
+            <idleTime>true</idleTime>
+          </value>
+        </objProp>
+        <stringProp name="filename">rest-perftests.txt</stringProp>
+      </ResultCollector>
+      <hashTree/>
+    </hashTree>
+  </hashTree>
+</jmeterTestPlan>
