@@ -65,11 +65,6 @@
             <stringProp name="Argument.value">${__RandomString(1048576,ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvxyz)}</stringProp>
             <stringProp name="Argument.metadata">=</stringProp>
           </elementProp>
-          <elementProp name="duration" elementType="Argument">
-            <stringProp name="Argument.name">duration</stringProp>
-            <stringProp name="Argument.value">30</stringProp>
-            <stringProp name="Argument.metadata">=</stringProp>
-          </elementProp>
           <elementProp name="threads" elementType="Argument">
             <stringProp name="Argument.name">threads</stringProp>
             <stringProp name="Argument.value">3</stringProp>
@@ -705,14 +700,14 @@ ns2=http://www.ordina.nl/cpa/2.18</stringProp>
           <hashTree/>
         </hashTree>
       </hashTree>
-      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="overheid" enabled="true">
-        <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
+      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="digipoort" enabled="true">
+        <stringProp name="ThreadGroup.on_sample_error">startnextloop</stringProp>
         <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller" enabled="true">
           <boolProp name="LoopController.continue_forever">false</boolProp>
           <stringProp name="LoopController.loops">${max-loop-count}</stringProp>
         </elementProp>
         <stringProp name="ThreadGroup.num_threads">${threads}</stringProp>
-        <stringProp name="ThreadGroup.ramp_time"></stringProp>
+        <stringProp name="ThreadGroup.ramp_time">1</stringProp>
         <boolProp name="ThreadGroup.scheduler">false</boolProp>
         <stringProp name="ThreadGroup.duration"></stringProp>
         <stringProp name="ThreadGroup.delay"></stringProp>
@@ -722,209 +717,7 @@ ns2=http://www.ordina.nl/cpa/2.18</stringProp>
       <hashTree>
         <ThroughputController guiclass="ThroughputControllerGui" testclass="ThroughputController" testname="mostly small" enabled="true">
           <intProp name="ThroughputController.style">1</intProp>
-          <boolProp name="ThroughputController.perThread">true</boolProp>
-          <intProp name="ThroughputController.maxThroughput">1</intProp>
-          <FloatProperty>
-            <name>ThroughputController.percentThroughput</name>
-            <value>85.0</value>
-            <savedValue>0.0</savedValue>
-          </FloatProperty>
-        </ThroughputController>
-        <hashTree>
-          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="overheid send request small" enabled="true">
-            <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
-            <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
-              <collectionProp name="Arguments.arguments">
-                <elementProp name="" elementType="HTTPArgument">
-                  <boolProp name="HTTPArgument.always_encode">false</boolProp>
-                  <stringProp name="Argument.value">&lt;soapenv:Envelope xmlns:soapenv=&quot;http://schemas.xmlsoap.org/soap/envelope/&quot; xmlns:ns=&quot;http://www.ordina.nl/ebms/2.18&quot;&gt;&#xd;
-   &lt;soapenv:Header/&gt;&#xd;
-   &lt;soapenv:Body&gt;&#xd;
-      &lt;ns:sendMessage&gt;&#xd;
-         &lt;message&gt;&#xd;
-            &lt;properties&gt;&#xd;
-               &lt;cpaId&gt;${cpaId}&lt;/cpaId&gt;&#xd;
-               &lt;fromPartyId&gt;urn:osb:oin:00000000000000000001&lt;/fromPartyId&gt;&#xd;
-               &lt;fromRole&gt;OVERHEID&lt;/fromRole&gt;&#xd;
-               &lt;toPartyId&gt;urn:osb:oin:00000000000000000000&lt;/toPartyId&gt;&#xd;
-               &lt;toRole&gt;DIGIPOORT&lt;/toRole&gt;&#xd;
-               &lt;service&gt;urn:osb:services:osb:afleveren:1.1$1.0&lt;/service&gt;&#xd;
-               &lt;action&gt;bevestigAfleveren&lt;/action&gt;&#xd;
-            &lt;/properties&gt;&#xd;
-            &lt;dataSource&gt;&#xd;
-               &lt;name&gt;overheid-small.txt&lt;/name&gt;&#xd;
-               &lt;contentType&gt;text/plain&lt;/contentType&gt;&#xd;
-               &lt;content&gt;${__V(filecontentssmall, notfound)}&lt;/content&gt;&#xd;
-            &lt;/dataSource&gt;&#xd;
-         &lt;/message&gt;&#xd;
-      &lt;/ns:sendMessage&gt;&#xd;
-   &lt;/soapenv:Body&gt;&#xd;
-&lt;/soapenv:Envelope&gt;</stringProp>
-                  <stringProp name="Argument.metadata">=</stringProp>
-                </elementProp>
-              </collectionProp>
-            </elementProp>
-            <stringProp name="HTTPSampler.domain">${overheid-host}</stringProp>
-            <stringProp name="HTTPSampler.port">${overheid-service-port}</stringProp>
-            <stringProp name="HTTPSampler.protocol"></stringProp>
-            <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-            <stringProp name="HTTPSampler.path">service/ebms</stringProp>
-            <stringProp name="HTTPSampler.method">POST</stringProp>
-            <boolProp name="HTTPSampler.follow_redirects">false</boolProp>
-            <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
-            <boolProp name="HTTPSampler.use_keepalive">false</boolProp>
-            <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
-            <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
-            <stringProp name="HTTPSampler.connect_timeout"></stringProp>
-            <stringProp name="HTTPSampler.response_timeout"></stringProp>
-            <stringProp name="TestPlan.comments">2k</stringProp>
-          </HTTPSamplerProxy>
-          <hashTree>
-            <XMLAssertion guiclass="XMLAssertionGui" testclass="XMLAssertion" testname="assert xml response" enabled="true"/>
-            <hashTree/>
-            <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="assert statuscode 200" enabled="true">
-              <collectionProp name="Asserion.test_strings">
-                <stringProp name="49586">200</stringProp>
-              </collectionProp>
-              <stringProp name="Assertion.custom_message"></stringProp>
-              <stringProp name="Assertion.test_field">Assertion.response_code</stringProp>
-              <boolProp name="Assertion.assume_success">false</boolProp>
-              <intProp name="Assertion.test_type">16</intProp>
-            </ResponseAssertion>
-            <hashTree/>
-            <XPathAssertion guiclass="XPathAssertionGui" testclass="XPathAssertion" testname="assert has messageid" enabled="true">
-              <boolProp name="XPath.negate">false</boolProp>
-              <stringProp name="XPath.xpath">//*[local-name() = &apos;messageId&apos;]</stringProp>
-              <boolProp name="XPath.validate">false</boolProp>
-              <boolProp name="XPath.whitespace">false</boolProp>
-              <boolProp name="XPath.tolerant">false</boolProp>
-              <boolProp name="XPath.namespace">false</boolProp>
-              <stringProp name="Assertion.scope">children</stringProp>
-            </XPathAssertion>
-            <hashTree/>
-            <XPath2Extractor guiclass="XPath2ExtractorGui" testclass="XPath2Extractor" testname="xpath messageId" enabled="true">
-              <stringProp name="XPathExtractor2.default"></stringProp>
-              <stringProp name="XPathExtractor2.refname">messageid</stringProp>
-              <stringProp name="XPathExtractor2.matchNumber">1</stringProp>
-              <stringProp name="XPathExtractor2.xpathQuery">//*[local-name() = &apos;messageId&apos;]</stringProp>
-              <stringProp name="XPathExtractor2.namespaces"></stringProp>
-              <stringProp name="Sample.scope">children</stringProp>
-            </XPath2Extractor>
-            <hashTree/>
-          </hashTree>
-        </hashTree>
-        <ThroughputController guiclass="ThroughputControllerGui" testclass="ThroughputController" testname="some large" enabled="true">
-          <intProp name="ThroughputController.style">1</intProp>
-          <boolProp name="ThroughputController.perThread">true</boolProp>
-          <intProp name="ThroughputController.maxThroughput">1</intProp>
-          <FloatProperty>
-            <name>ThroughputController.percentThroughput</name>
-            <value>15.0</value>
-            <savedValue>0.0</savedValue>
-          </FloatProperty>
-        </ThroughputController>
-        <hashTree>
-          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="overheid send request large" enabled="true">
-            <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
-            <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
-              <collectionProp name="Arguments.arguments">
-                <elementProp name="" elementType="HTTPArgument">
-                  <boolProp name="HTTPArgument.always_encode">false</boolProp>
-                  <stringProp name="Argument.value">&lt;soapenv:Envelope xmlns:soapenv=&quot;http://schemas.xmlsoap.org/soap/envelope/&quot; xmlns:ns=&quot;http://www.ordina.nl/ebms/2.18&quot;&gt;&#xd;
-   &lt;soapenv:Header/&gt;&#xd;
-   &lt;soapenv:Body&gt;&#xd;
-      &lt;ns:sendMessage&gt;&#xd;
-         &lt;message&gt;&#xd;
-            &lt;properties&gt;&#xd;
-               &lt;cpaId&gt;${cpaId}&lt;/cpaId&gt;&#xd;
-               &lt;fromPartyId&gt;urn:osb:oin:00000000000000000001&lt;/fromPartyId&gt;&#xd;
-               &lt;fromRole&gt;OVERHEID&lt;/fromRole&gt;&#xd;
-               &lt;toPartyId&gt;urn:osb:oin:00000000000000000000&lt;/toPartyId&gt;&#xd;
-               &lt;toRole&gt;DIGIPOORT&lt;/toRole&gt;&#xd;
-               &lt;service&gt;urn:osb:services:osb:afleveren:1.1$1.0&lt;/service&gt;&#xd;
-               &lt;action&gt;bevestigAfleveren&lt;/action&gt;&#xd;
-            &lt;/properties&gt;&#xd;
-            &lt;dataSource&gt;&#xd;
-               &lt;name&gt;overheid-large.txt&lt;/name&gt;&#xd;
-               &lt;contentType&gt;text/plain&lt;/contentType&gt;&#xd;
-               &lt;content&gt;${__V(filecontentslarge, notfound)}&lt;/content&gt;&#xd;
-            &lt;/dataSource&gt;&#xd;
-         &lt;/message&gt;&#xd;
-      &lt;/ns:sendMessage&gt;&#xd;
-   &lt;/soapenv:Body&gt;&#xd;
-&lt;/soapenv:Envelope&gt;</stringProp>
-                  <stringProp name="Argument.metadata">=</stringProp>
-                </elementProp>
-              </collectionProp>
-            </elementProp>
-            <stringProp name="HTTPSampler.domain">${overheid-host}</stringProp>
-            <stringProp name="HTTPSampler.port">${overheid-service-port}</stringProp>
-            <stringProp name="HTTPSampler.protocol"></stringProp>
-            <stringProp name="HTTPSampler.contentEncoding"></stringProp>
-            <stringProp name="HTTPSampler.path">service/ebms</stringProp>
-            <stringProp name="HTTPSampler.method">POST</stringProp>
-            <boolProp name="HTTPSampler.follow_redirects">false</boolProp>
-            <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
-            <boolProp name="HTTPSampler.use_keepalive">false</boolProp>
-            <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
-            <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
-            <stringProp name="HTTPSampler.connect_timeout"></stringProp>
-            <stringProp name="HTTPSampler.response_timeout"></stringProp>
-            <stringProp name="TestPlan.comments">1m</stringProp>
-          </HTTPSamplerProxy>
-          <hashTree>
-            <XMLAssertion guiclass="XMLAssertionGui" testclass="XMLAssertion" testname="assert xml response" enabled="true"/>
-            <hashTree/>
-            <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="assert statuscode 200" enabled="true">
-              <collectionProp name="Asserion.test_strings">
-                <stringProp name="49586">200</stringProp>
-              </collectionProp>
-              <stringProp name="Assertion.custom_message"></stringProp>
-              <stringProp name="Assertion.test_field">Assertion.response_code</stringProp>
-              <boolProp name="Assertion.assume_success">false</boolProp>
-              <intProp name="Assertion.test_type">16</intProp>
-            </ResponseAssertion>
-            <hashTree/>
-            <XPath2Extractor guiclass="XPath2ExtractorGui" testclass="XPath2Extractor" testname="xpath messageId" enabled="true">
-              <stringProp name="XPathExtractor2.default"></stringProp>
-              <stringProp name="XPathExtractor2.refname">messageid</stringProp>
-              <stringProp name="XPathExtractor2.matchNumber">1</stringProp>
-              <stringProp name="XPathExtractor2.xpathQuery">//*[local-name() = &apos;messageId&apos;]</stringProp>
-              <stringProp name="XPathExtractor2.namespaces"></stringProp>
-              <stringProp name="Sample.scope">children</stringProp>
-            </XPath2Extractor>
-            <hashTree/>
-            <XPathAssertion guiclass="XPathAssertionGui" testclass="XPathAssertion" testname="assert has messageid" enabled="true">
-              <boolProp name="XPath.negate">false</boolProp>
-              <stringProp name="XPath.xpath">//*[local-name() = &apos;messageId&apos;]</stringProp>
-              <boolProp name="XPath.validate">false</boolProp>
-              <boolProp name="XPath.whitespace">false</boolProp>
-              <boolProp name="XPath.tolerant">false</boolProp>
-              <boolProp name="XPath.namespace">false</boolProp>
-              <stringProp name="Assertion.scope">children</stringProp>
-            </XPathAssertion>
-            <hashTree/>
-          </hashTree>
-        </hashTree>
-      </hashTree>
-      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="digipoort" enabled="true">
-        <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
-        <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller" enabled="true">
-          <boolProp name="LoopController.continue_forever">false</boolProp>
-          <stringProp name="LoopController.loops">#{max-loop-count}</stringProp>
-        </elementProp>
-        <stringProp name="ThreadGroup.num_threads">${threads}</stringProp>
-        <stringProp name="ThreadGroup.ramp_time">5</stringProp>
-        <boolProp name="ThreadGroup.scheduler">false</boolProp>
-        <stringProp name="ThreadGroup.duration"></stringProp>
-        <stringProp name="ThreadGroup.delay"></stringProp>
-        <boolProp name="ThreadGroup.same_user_on_next_iteration">true</boolProp>
-        <boolProp name="ThreadGroup.delayedStart">true</boolProp>
-      </ThreadGroup>
-      <hashTree>
-        <ThroughputController guiclass="ThroughputControllerGui" testclass="ThroughputController" testname="mostly small" enabled="true">
-          <intProp name="ThroughputController.style">1</intProp>
-          <boolProp name="ThroughputController.perThread">true</boolProp>
+          <boolProp name="ThroughputController.perThread">false</boolProp>
           <intProp name="ThroughputController.maxThroughput">1</intProp>
           <FloatProperty>
             <name>ThroughputController.percentThroughput</name>
@@ -1017,7 +810,7 @@ ns2=http://www.ordina.nl/cpa/2.18</stringProp>
         </hashTree>
         <ThroughputController guiclass="ThroughputControllerGui" testclass="ThroughputController" testname="some large" enabled="true">
           <intProp name="ThroughputController.style">1</intProp>
-          <boolProp name="ThroughputController.perThread">true</boolProp>
+          <boolProp name="ThroughputController.perThread">false</boolProp>
           <intProp name="ThroughputController.maxThroughput">1</intProp>
           <FloatProperty>
             <name>ThroughputController.percentThroughput</name>
@@ -1061,6 +854,208 @@ ns2=http://www.ordina.nl/cpa/2.18</stringProp>
             </elementProp>
             <stringProp name="HTTPSampler.domain">${digipoort-host}</stringProp>
             <stringProp name="HTTPSampler.port">${digipoort-service-port}</stringProp>
+            <stringProp name="HTTPSampler.protocol"></stringProp>
+            <stringProp name="HTTPSampler.contentEncoding"></stringProp>
+            <stringProp name="HTTPSampler.path">service/ebms</stringProp>
+            <stringProp name="HTTPSampler.method">POST</stringProp>
+            <boolProp name="HTTPSampler.follow_redirects">false</boolProp>
+            <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
+            <boolProp name="HTTPSampler.use_keepalive">false</boolProp>
+            <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
+            <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
+            <stringProp name="HTTPSampler.connect_timeout"></stringProp>
+            <stringProp name="HTTPSampler.response_timeout"></stringProp>
+            <stringProp name="TestPlan.comments">1m</stringProp>
+          </HTTPSamplerProxy>
+          <hashTree>
+            <XMLAssertion guiclass="XMLAssertionGui" testclass="XMLAssertion" testname="assert xml response" enabled="true"/>
+            <hashTree/>
+            <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="assert statuscode 200" enabled="true">
+              <collectionProp name="Asserion.test_strings">
+                <stringProp name="49586">200</stringProp>
+              </collectionProp>
+              <stringProp name="Assertion.custom_message"></stringProp>
+              <stringProp name="Assertion.test_field">Assertion.response_code</stringProp>
+              <boolProp name="Assertion.assume_success">false</boolProp>
+              <intProp name="Assertion.test_type">16</intProp>
+            </ResponseAssertion>
+            <hashTree/>
+            <XPath2Extractor guiclass="XPath2ExtractorGui" testclass="XPath2Extractor" testname="xpath messageId" enabled="true">
+              <stringProp name="XPathExtractor2.default"></stringProp>
+              <stringProp name="XPathExtractor2.refname">messageid</stringProp>
+              <stringProp name="XPathExtractor2.matchNumber">1</stringProp>
+              <stringProp name="XPathExtractor2.xpathQuery">//*[local-name() = &apos;messageId&apos;]</stringProp>
+              <stringProp name="XPathExtractor2.namespaces"></stringProp>
+              <stringProp name="Sample.scope">children</stringProp>
+            </XPath2Extractor>
+            <hashTree/>
+            <XPathAssertion guiclass="XPathAssertionGui" testclass="XPathAssertion" testname="assert has messageid" enabled="true">
+              <boolProp name="XPath.negate">false</boolProp>
+              <stringProp name="XPath.xpath">//*[local-name() = &apos;messageId&apos;]</stringProp>
+              <boolProp name="XPath.validate">false</boolProp>
+              <boolProp name="XPath.whitespace">false</boolProp>
+              <boolProp name="XPath.tolerant">false</boolProp>
+              <boolProp name="XPath.namespace">false</boolProp>
+              <stringProp name="Assertion.scope">children</stringProp>
+            </XPathAssertion>
+            <hashTree/>
+          </hashTree>
+        </hashTree>
+      </hashTree>
+      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="overheid" enabled="true">
+        <stringProp name="ThreadGroup.on_sample_error">startnextloop</stringProp>
+        <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller" enabled="true">
+          <boolProp name="LoopController.continue_forever">false</boolProp>
+          <stringProp name="LoopController.loops">${max-loop-count}</stringProp>
+        </elementProp>
+        <stringProp name="ThreadGroup.num_threads">${threads}</stringProp>
+        <stringProp name="ThreadGroup.ramp_time">1</stringProp>
+        <boolProp name="ThreadGroup.scheduler">false</boolProp>
+        <stringProp name="ThreadGroup.duration"></stringProp>
+        <stringProp name="ThreadGroup.delay"></stringProp>
+        <boolProp name="ThreadGroup.same_user_on_next_iteration">true</boolProp>
+        <boolProp name="ThreadGroup.delayedStart">true</boolProp>
+      </ThreadGroup>
+      <hashTree>
+        <ThroughputController guiclass="ThroughputControllerGui" testclass="ThroughputController" testname="mostly small" enabled="true">
+          <intProp name="ThroughputController.style">1</intProp>
+          <boolProp name="ThroughputController.perThread">false</boolProp>
+          <intProp name="ThroughputController.maxThroughput">1</intProp>
+          <FloatProperty>
+            <name>ThroughputController.percentThroughput</name>
+            <value>85.0</value>
+            <savedValue>0.0</savedValue>
+          </FloatProperty>
+        </ThroughputController>
+        <hashTree>
+          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="overheid send request small" enabled="true">
+            <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
+            <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
+              <collectionProp name="Arguments.arguments">
+                <elementProp name="" elementType="HTTPArgument">
+                  <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                  <stringProp name="Argument.value">&lt;soapenv:Envelope xmlns:soapenv=&quot;http://schemas.xmlsoap.org/soap/envelope/&quot; xmlns:ns=&quot;http://www.ordina.nl/ebms/2.18&quot;&gt;&#xd;
+   &lt;soapenv:Header/&gt;&#xd;
+   &lt;soapenv:Body&gt;&#xd;
+      &lt;ns:sendMessage&gt;&#xd;
+         &lt;message&gt;&#xd;
+            &lt;properties&gt;&#xd;
+               &lt;cpaId&gt;${cpaId}&lt;/cpaId&gt;&#xd;
+               &lt;fromPartyId&gt;urn:osb:oin:00000000000000000001&lt;/fromPartyId&gt;&#xd;
+               &lt;fromRole&gt;OVERHEID&lt;/fromRole&gt;&#xd;
+               &lt;toPartyId&gt;urn:osb:oin:00000000000000000000&lt;/toPartyId&gt;&#xd;
+               &lt;toRole&gt;DIGIPOORT&lt;/toRole&gt;&#xd;
+               &lt;service&gt;urn:osb:services:osb:afleveren:1.1$1.0&lt;/service&gt;&#xd;
+               &lt;action&gt;bevestigAfleveren&lt;/action&gt;&#xd;
+            &lt;/properties&gt;&#xd;
+            &lt;dataSource&gt;&#xd;
+               &lt;name&gt;overheid-small.txt&lt;/name&gt;&#xd;
+               &lt;contentType&gt;text/plain&lt;/contentType&gt;&#xd;
+               &lt;content&gt;${__V(filecontentssmall, notfound)}&lt;/content&gt;&#xd;
+            &lt;/dataSource&gt;&#xd;
+         &lt;/message&gt;&#xd;
+      &lt;/ns:sendMessage&gt;&#xd;
+   &lt;/soapenv:Body&gt;&#xd;
+&lt;/soapenv:Envelope&gt;</stringProp>
+                  <stringProp name="Argument.metadata">=</stringProp>
+                </elementProp>
+              </collectionProp>
+            </elementProp>
+            <stringProp name="HTTPSampler.domain">${overheid-host}</stringProp>
+            <stringProp name="HTTPSampler.port">${overheid-service-port}</stringProp>
+            <stringProp name="HTTPSampler.protocol"></stringProp>
+            <stringProp name="HTTPSampler.contentEncoding"></stringProp>
+            <stringProp name="HTTPSampler.path">service/ebms</stringProp>
+            <stringProp name="HTTPSampler.method">POST</stringProp>
+            <boolProp name="HTTPSampler.follow_redirects">false</boolProp>
+            <boolProp name="HTTPSampler.auto_redirects">false</boolProp>
+            <boolProp name="HTTPSampler.use_keepalive">false</boolProp>
+            <boolProp name="HTTPSampler.DO_MULTIPART_POST">false</boolProp>
+            <stringProp name="HTTPSampler.embedded_url_re"></stringProp>
+            <stringProp name="HTTPSampler.connect_timeout"></stringProp>
+            <stringProp name="HTTPSampler.response_timeout"></stringProp>
+            <stringProp name="TestPlan.comments">2k</stringProp>
+          </HTTPSamplerProxy>
+          <hashTree>
+            <XMLAssertion guiclass="XMLAssertionGui" testclass="XMLAssertion" testname="assert xml response" enabled="true"/>
+            <hashTree/>
+            <ResponseAssertion guiclass="AssertionGui" testclass="ResponseAssertion" testname="assert statuscode 200" enabled="true">
+              <collectionProp name="Asserion.test_strings">
+                <stringProp name="49586">200</stringProp>
+              </collectionProp>
+              <stringProp name="Assertion.custom_message"></stringProp>
+              <stringProp name="Assertion.test_field">Assertion.response_code</stringProp>
+              <boolProp name="Assertion.assume_success">false</boolProp>
+              <intProp name="Assertion.test_type">16</intProp>
+            </ResponseAssertion>
+            <hashTree/>
+            <XPathAssertion guiclass="XPathAssertionGui" testclass="XPathAssertion" testname="assert has messageid" enabled="true">
+              <boolProp name="XPath.negate">false</boolProp>
+              <stringProp name="XPath.xpath">//*[local-name() = &apos;messageId&apos;]</stringProp>
+              <boolProp name="XPath.validate">false</boolProp>
+              <boolProp name="XPath.whitespace">false</boolProp>
+              <boolProp name="XPath.tolerant">false</boolProp>
+              <boolProp name="XPath.namespace">false</boolProp>
+              <stringProp name="Assertion.scope">children</stringProp>
+            </XPathAssertion>
+            <hashTree/>
+            <XPath2Extractor guiclass="XPath2ExtractorGui" testclass="XPath2Extractor" testname="xpath messageId" enabled="true">
+              <stringProp name="XPathExtractor2.default"></stringProp>
+              <stringProp name="XPathExtractor2.refname">messageid</stringProp>
+              <stringProp name="XPathExtractor2.matchNumber">1</stringProp>
+              <stringProp name="XPathExtractor2.xpathQuery">//*[local-name() = &apos;messageId&apos;]</stringProp>
+              <stringProp name="XPathExtractor2.namespaces"></stringProp>
+              <stringProp name="Sample.scope">children</stringProp>
+            </XPath2Extractor>
+            <hashTree/>
+          </hashTree>
+        </hashTree>
+        <ThroughputController guiclass="ThroughputControllerGui" testclass="ThroughputController" testname="some large" enabled="true">
+          <intProp name="ThroughputController.style">1</intProp>
+          <boolProp name="ThroughputController.perThread">false</boolProp>
+          <intProp name="ThroughputController.maxThroughput">1</intProp>
+          <FloatProperty>
+            <name>ThroughputController.percentThroughput</name>
+            <value>15.0</value>
+            <savedValue>0.0</savedValue>
+          </FloatProperty>
+        </ThroughputController>
+        <hashTree>
+          <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="overheid send request large" enabled="true">
+            <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
+            <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
+              <collectionProp name="Arguments.arguments">
+                <elementProp name="" elementType="HTTPArgument">
+                  <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                  <stringProp name="Argument.value">&lt;soapenv:Envelope xmlns:soapenv=&quot;http://schemas.xmlsoap.org/soap/envelope/&quot; xmlns:ns=&quot;http://www.ordina.nl/ebms/2.18&quot;&gt;&#xd;
+   &lt;soapenv:Header/&gt;&#xd;
+   &lt;soapenv:Body&gt;&#xd;
+      &lt;ns:sendMessage&gt;&#xd;
+         &lt;message&gt;&#xd;
+            &lt;properties&gt;&#xd;
+               &lt;cpaId&gt;${cpaId}&lt;/cpaId&gt;&#xd;
+               &lt;fromPartyId&gt;urn:osb:oin:00000000000000000001&lt;/fromPartyId&gt;&#xd;
+               &lt;fromRole&gt;OVERHEID&lt;/fromRole&gt;&#xd;
+               &lt;toPartyId&gt;urn:osb:oin:00000000000000000000&lt;/toPartyId&gt;&#xd;
+               &lt;toRole&gt;DIGIPOORT&lt;/toRole&gt;&#xd;
+               &lt;service&gt;urn:osb:services:osb:afleveren:1.1$1.0&lt;/service&gt;&#xd;
+               &lt;action&gt;bevestigAfleveren&lt;/action&gt;&#xd;
+            &lt;/properties&gt;&#xd;
+            &lt;dataSource&gt;&#xd;
+               &lt;name&gt;overheid-large.txt&lt;/name&gt;&#xd;
+               &lt;contentType&gt;text/plain&lt;/contentType&gt;&#xd;
+               &lt;content&gt;${__V(filecontentslarge, notfound)}&lt;/content&gt;&#xd;
+            &lt;/dataSource&gt;&#xd;
+         &lt;/message&gt;&#xd;
+      &lt;/ns:sendMessage&gt;&#xd;
+   &lt;/soapenv:Body&gt;&#xd;
+&lt;/soapenv:Envelope&gt;</stringProp>
+                  <stringProp name="Argument.metadata">=</stringProp>
+                </elementProp>
+              </collectionProp>
+            </elementProp>
+            <stringProp name="HTTPSampler.domain">${overheid-host}</stringProp>
+            <stringProp name="HTTPSampler.port">${overheid-service-port}</stringProp>
             <stringProp name="HTTPSampler.protocol"></stringProp>
             <stringProp name="HTTPSampler.contentEncoding"></stringProp>
             <stringProp name="HTTPSampler.path">service/ebms</stringProp>
