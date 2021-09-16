@@ -43,7 +43,6 @@ public class EbMSDataSource implements Serializable
 {
 	private static final long serialVersionUID = 1L;
 	@XmlElement(required=true)
-	@NonNull
 	String name;
 	String contentId;
 	@XmlElement(required=true)

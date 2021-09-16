@@ -197,7 +197,12 @@ public class SigningTest
 	private List<EbMSDataSource> createDataSources()
 	{
 		val result = new ArrayList<EbMSDataSource>();
-		result.add(new EbMSDataSource("test.txt","plain/text; charset=utf-8","Dit is een test.".getBytes(Charset.forName("UTF-8"))));
+		result.add(
+			EbMSDataSource.builder()
+				.name("test.txt")
+				.contentType("plain/text; charset=utf-8")
+				.content("Dit is een test.".getBytes(Charset.forName("UTF-8")))
+				.build() );
 		return result;
 	}
 
