@@ -54,6 +54,7 @@ import nl.clockwork.ebms.service.model.MessageProperties;
 import nl.clockwork.ebms.service.model.MessageRequest;
 import nl.clockwork.ebms.service.model.MessageRequestProperties;
 import nl.clockwork.ebms.service.model.MessageStatus;
+import nl.clockwork.ebms.service.model.Party;
 
 @FieldDefaults(level = AccessLevel.PACKAGE, makeFinal = true)
 @AllArgsConstructor
@@ -131,10 +132,37 @@ public class EbMSMessageServiceImpl implements EbMSMessageService, WithService
 		}
 	}
 
-	@POST
+	@GET
 	@Path("messages/unprocessed")
+	public List<String> getUnprocessedMessageIds(
+			@QueryParam("cpaId") String cpaId,
+			@QueryParam("fromPartyId") String fromPartyId,
+			@QueryParam("fromRole") String fromRole,
+			@QueryParam("toPartyId") String toPartyId,
+			@QueryParam("toRole") String toRole,
+			@QueryParam("service") String service,
+			@QueryParam("action") String action,
+			@QueryParam("conversationId") String conversationId,
+			@QueryParam("messageId") String messageId,
+			@QueryParam("refToMessageId") String refToMessageId,
+			@QueryParam("maxNr") @DefaultValue("0") Integer maxNr) throws EbMSMessageServiceException
+	{
+		return getUnprocessedMessageIds(
+			MessageFilter.builder()
+					.cpaId(cpaId)
+					.fromParty(fromPartyId == null ? null : new Party(fromPartyId,fromRole))
+					.toParty(toPartyId == null ? null : new Party(toPartyId,toRole))
+					.service(service)
+					.action(action)
+					.conversationId(conversationId)
+					.messageId(messageId)
+					.refToMessageId(refToMessageId)
+					.build(),
+			maxNr);
+	}
+
 	@Override
-	public List<String> getUnprocessedMessageIds(MessageFilter messageFilter, @DefaultValue("0") @QueryParam("maxNr") Integer maxNr) throws EbMSMessageServiceException
+	public List<String> getUnprocessedMessageIds(MessageFilter messageFilter, Integer maxNr) throws EbMSMessageServiceException
 	{
 		try
 		{
@@ -149,7 +177,7 @@ public class EbMSMessageServiceImpl implements EbMSMessageService, WithService
 	@GET
 	@Path("messages/{messageId}")
 	@Override
-	public Message getMessage(@PathParam("messageId") final String messageId, @DefaultValue("false") @QueryParam("process") Boolean process) throws EbMSMessageServiceException
+	public Message getMessage(@PathParam("messageId") final String messageId, @QueryParam("process") @DefaultValue("false") Boolean process) throws EbMSMessageServiceException
 	{
 		try
 		{
@@ -164,7 +192,7 @@ public class EbMSMessageServiceImpl implements EbMSMessageService, WithService
 	@GET
 	@Path("messages/mtom/{messageId}")
 	@Produces(MediaType.MULTIPART_FORM_DATA)
-	public MultipartBody getMessageRest(@PathParam("messageId") final String messageId, @DefaultValue("false") @QueryParam("process") Boolean process) throws EbMSMessageServiceException
+	public MultipartBody getMessageRest(@PathParam("messageId") final String messageId, @QueryParam("process") @DefaultValue("false") Boolean process) throws EbMSMessageServiceException
 	{
 		try
 		{
@@ -224,10 +252,39 @@ public class EbMSMessageServiceImpl implements EbMSMessageService, WithService
 		}
 	}
 
-	@POST
+	@GET
 	@Path("events/unprocessed")
+	public List<MessageEvent> getUnprocessedMessageEvents(
+		@QueryParam("cpaId") String cpaId,
+		@QueryParam("fromPartyId") String fromPartyId,
+		@QueryParam("fromRole") String fromRole,
+		@QueryParam("toPartyId") String toPartyId,
+		@QueryParam("toRole") String toRole,
+		@QueryParam("service") String service,
+		@QueryParam("action") String action,
+		@QueryParam("conversationId") String conversationId,
+		@QueryParam("messageId") String messageId,
+		@QueryParam("refToMessageId") String refToMessageId,
+		@QueryParam("eventTypes") MessageEventType[] eventTypes,
+		@QueryParam("maxNr") @DefaultValue("0") Integer maxNr) throws EbMSMessageServiceException
+	{
+		return getUnprocessedMessageEvents(
+			MessageFilter.builder()
+					.cpaId(cpaId)
+					.fromParty(fromPartyId == null ? null : new Party(fromPartyId,fromRole))
+					.toParty(toPartyId == null ? null : new Party(toPartyId,toRole))
+					.service(service)
+					.action(action)
+					.conversationId(conversationId)
+					.messageId(messageId)
+					.refToMessageId(refToMessageId)
+					.build(),
+			eventTypes,
+			maxNr);
+	}
+
 	@Override
-	public List<MessageEvent> getUnprocessedMessageEvents(MessageFilter messageFilter, @QueryParam("eventTypes") MessageEventType[] eventTypes, @DefaultValue("0") @QueryParam("maxNr") Integer maxNr) throws EbMSMessageServiceException
+	public List<MessageEvent> getUnprocessedMessageEvents(MessageFilter messageFilter, MessageEventType[] eventTypes, Integer maxNr) throws EbMSMessageServiceException
 	{
 		try
 		{

@@ -70,25 +70,6 @@ components:
         - DELIVERED
         - FAILED
         - EXPIRED
-    MessageFilter:
-      type: object
-      properties:
-        cpaId:
-          type: string
-        fromParty:
-          $ref: '#/components/schemas/Party'
-        toParty:
-          $ref: '#/components/schemas/Party'
-        service:
-          type: string
-        action:
-          type: string
-        conversationId:
-          type: string
-        messageId:
-          type: string
-        refToMessageId:
-          type: string
     MessageProperties:
       type: object
       properties:
@@ -566,17 +547,12 @@ paths:
         required: true
         schema:
           type: string
-  /messages?maxNr={maxNr}:
-    post:
+  /messages?cpaId={cpaId}&fromPartyId={fromPartyId}&fromRole={fromRole}&toPartyId={toPartyId}&toRole={toRole}&service={service}&action={action}&conversationId={conversationId}&messageId={messageId}&refToMessageId={refToMessageId}&maxNr={maxNr}:
+    get:
       tags:
         - EbMS
-      description: Returns all messageIds of messages with status RECEIVED that satisfy filter messageFilter. If maxNr is given, then maxNr messageIds are returned
+      description: Returns all messageIds of messages with status RECEIVED that satisfy the query string filter parameters. If maxNr is given, then maxNr messageIds are returned
       operationId: getUnprocessedMessageIds
-      requestBody:
-        content:
-          'application/json':
-            schema:
-              $ref: '#/components/schemas/MessageFilter'
       responses:
         '200':
           description: The list of messageIds
@@ -593,6 +569,46 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
     parameters:
+      - name: cpaId
+        in: query
+        schema:
+          type: string
+      - name: fromPartyId
+        in: query
+        schema:
+          type: string
+      - name: fromRole
+        in: query
+        schema:
+          type: string
+      - name: toPartyId
+        in: query
+        schema:
+          type: string
+      - name: toRole
+        in: query
+        schema:
+          type: string
+      - name: service
+        in: query
+        schema:
+          type: string
+      - name: action
+        in: query
+        schema:
+          type: string
+      - name: conversationId
+        in: query
+        schema:
+          type: string
+      - name: messageId
+        in: query
+        schema:
+          type: string
+      - name: refToMessageId
+        in: query
+        schema:
+          type: string
       - name: maxNr
         in: query
         schema:
@@ -680,17 +696,12 @@ paths:
         required: true
         schema:
           type: string
-  /events?eventTypes={eventTypes}&maxNr={maxNr}:
-    post:
+  /events?cpaId={cpaId}&fromPartyId={fromPartyId}&fromRole={fromRole}&toPartyId={toPartyId}&toRole={toRole}&service={service}&action={action}&conversationId={conversationId}&messageId={messageId}&refToMessageId={refToMessageId}&eventTypes={eventTypes}&maxNr={maxNr}:
+    get:
       tags:
         - EbMS
-      description: Returns the events that satisfy filter messageFilter and event types eventTypes. If maxNr is given, then maxNr events are returned.
+      description: Returns the events that satisfy the query string filter parameters. If maxNr is given, then maxNr events are returned.
       operationId: getUnprocessedMessageEvents
-      requestBody:
-        content:
-          'application/json':
-            schema:
-              $ref: '#/components/schemas/MessageFilter'
       responses:
         '200':
           description: The list of events
@@ -707,6 +718,46 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error'
     parameters:
+      - name: cpaId
+        in: query
+        schema:
+          type: string
+      - name: fromPartyId
+        in: query
+        schema:
+          type: string
+      - name: fromRole
+        in: query
+        schema:
+          type: string
+      - name: toPartyId
+        in: query
+        schema:
+          type: string
+      - name: toRole
+        in: query
+        schema:
+          type: string
+      - name: service
+        in: query
+        schema:
+          type: string
+      - name: action
+        in: query
+        schema:
+          type: string
+      - name: conversationId
+        in: query
+        schema:
+          type: string
+      - name: messageId
+        in: query
+        schema:
+          type: string
+      - name: refToMessageId
+        in: query
+        schema:
+          type: string
       - name: eventTypes
         in: query
         schema:

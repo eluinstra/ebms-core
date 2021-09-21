@@ -1027,10 +1027,8 @@ Content-Type: application/json
 
 ### getUnprocessedMessageIds
 
-POST http://localhost:8080/service/rest/v18/ebms/messages/unprocessed
+GET http://localhost:8080/service/rest/v18/ebms/messages/unprocessed
 Content-Type: application/json
-
-{}
 
 ### getMessage
 
@@ -1050,10 +1048,8 @@ GET http://localhost:8080/service/rest/v18/ebms/messages/?/status
 
 ### getUnprocessedMessageEvents
 
-POST http://localhost:8080/service/rest/v18/ebms/events/unprocessed
+GET http://localhost:8080/service/rest/v18/ebms/events/unprocessed
 Content-Type: application/json
-
-{}
 
 ### processMessageEvent
 
