@@ -38,8 +38,6 @@ import nl.clockwork.ebms.EbMSMessageStatus;
 public class MessageStatus implements Serializable
 {
 	private static final long serialVersionUID = 1L;
-	@XmlElement(required=true)
-	@NonNull
 	Instant timestamp;
 	@XmlElement(required=true)
 	@NonNull
