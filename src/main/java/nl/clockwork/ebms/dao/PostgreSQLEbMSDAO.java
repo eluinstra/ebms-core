@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright 2011 Clockwork
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -64,13 +64,21 @@ class PostgreSQLEbMSDAO extends AbstractEbMSDAO
 					{
 						return keys;
 					}
+
 					@Override
 					public List<Map<String,Object>> getKeyList()
 					{
 						return Arrays.asList(keys);
 					}
+
 					@Override
 					public Number getKey() throws InvalidDataAccessApiUsageException
+					{
+						throw new InvalidDataAccessApiUsageException("");
+					}
+
+					@Override
+					public <T> T getKeyAs(Class<T> keyType) throws InvalidDataAccessApiUsageException
 					{
 						throw new InvalidDataAccessApiUsageException("");
 					}
