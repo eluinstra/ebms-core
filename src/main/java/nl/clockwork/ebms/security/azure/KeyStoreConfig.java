@@ -41,13 +41,13 @@ public class KeyStoreConfig
 	@Value("${truststore.password}")
 	String trustStorepassword;
 	
-	@Value("azure.keyvault.uri")
+	@Value("${azure.keyvault.uri}")
     String keyvaultURI;
-	@Value("azure.keyvault.tennantid")
+	@Value("${azure.keyvault.tennantid}")
 	String tennantID;
-	@Value("azure.keyvault.clientid")
+	@Value("${azure.keyvault.clientid}")
 	String clientID;
-	@Value("azure.keyvault.client.secret")
+	@Value("${azure.keyvault.client.secret}")
 	String clientSecret;
 	
 	@Value("${client.keystore.defaultAlias}")

@@ -30,7 +30,7 @@ public class KeyStoreUtils
 	public static KeyStore loadKeyStore(String keyvaultURI, String tennantID, String clientID, String clientSecret) throws GeneralSecurityException, IOException
 	{
 		if (Security.getProvider("AzureKeyVault") == null)
-			Security.insertProviderAt(new KeyVaultJcaProvider(), 1);
+			Security.addProvider(new KeyVaultJcaProvider());
 		
 		val keyStore = KeyStore.getInstance("AzureKeyVault");
 		// aadUri is niet verplicht, deze is alleen nodig voor de afwijkende security zones de speciale germany zone + ..
