@@ -61,9 +61,9 @@ public class CPAServiceImpl implements CPAService, WithService
 		{
 			log.debug("ValidateCPA");
 			xsdValidator.validate(cpa);
-			val cpa_ = JAXBParser.getInstance(CollaborationProtocolAgreement.class).handleUnsafe(cpa);
-			log.info("Validating CPA " + cpa_.getCpaid());
-			cpaValidator.validate(cpa_);
+			val parsedCpa = JAXBParser.getInstance(CollaborationProtocolAgreement.class).handleUnsafe(cpa);
+			log.info("Validating CPA " + parsedCpa.getCpaid());
+			cpaValidator.validate(parsedCpa);
 		}
 		catch (Exception e)
 		{
@@ -74,7 +74,7 @@ public class CPAServiceImpl implements CPAService, WithService
 	
 	@POST
 	@Path("")
-	@Produces(MediaType.TEXT_PLAIN)
+	@Produces(MediaType.APPLICATION_JSON)
 	@Override
 	public String insertCPA(/*CollaborationProtocolAgreement*/String cpa, @DefaultValue("false") @QueryParam("overwrite") Boolean overwrite) throws CPAServiceException
 	{
@@ -82,11 +82,11 @@ public class CPAServiceImpl implements CPAService, WithService
 		{
 			log.debug("InsertCPA");
 			xsdValidator.validate(cpa);
-			val cpa_ = JAXBParser.getInstance(CollaborationProtocolAgreement.class).handleUnsafe(cpa);
-			new CPAValidator(cpaManager).validate(cpa_);
-			cpaManager.setCPA(cpa_,overwrite);
+			val parsedCpa = JAXBParser.getInstance(CollaborationProtocolAgreement.class).handleUnsafe(cpa);
+			new CPAValidator(cpaManager).validate(parsedCpa);
+			cpaManager.setCPA(parsedCpa,overwrite);
 			log.debug("InsertCPA done");
-			return cpa_.getCpaid();
+			return parsedCpa.getCpaid();
 		}
 		catch (Exception e)
 		{
@@ -137,7 +137,7 @@ public class CPAServiceImpl implements CPAService, WithService
 
 	@GET
 	@Path("{cpaId}")
-	@Produces(MediaType.TEXT_XML)
+	@Produces(MediaType.APPLICATION_JSON)
 	@Override
 	public /*CollaborationProtocolAgreement*/String getCPA(@PathParam("cpaId") String cpaId) throws CPAServiceException
 	{
