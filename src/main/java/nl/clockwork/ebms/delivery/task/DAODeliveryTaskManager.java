@@ -20,6 +20,7 @@ import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.val;
 import lombok.experimental.FieldDefaults;
+import nl.clockwork.ebms.EbMSAction;
 import nl.clockwork.ebms.cpa.CPAManager;
 import nl.clockwork.ebms.cpa.CPAUtils;
 import nl.clockwork.ebms.dao.EbMSDAO;
@@ -67,19 +68,14 @@ class DAODeliveryTaskManager implements DeliveryTaskManager
 		}
 		else
 		{
-			switch(ebMSDAO.getMessageAction(task.getMessageId()).orElse(null))
+			val action = ebMSDAO.getMessageAction(task.getMessageId()).orElse(null);
+			if ((action == EbMSAction.ACKNOWLEDGMENT || action == EbMSAction.MESSAGE_ERROR) && !reliableMessaging && task.getRetries() < nrAutoRetries)
 			{
-				case ACKNOWLEDGMENT:
-				case MESSAGE_ERROR:
-					if (!reliableMessaging && task.getRetries() < nrAutoRetries)
-					{
-						val nextTask = createNextTask(task,autoRetryInterval);
-						deliveryTaskDAO.updateTask(nextTask);
-						break;
-					}
-				default:
-					deliveryTaskDAO.deleteTask(task.getMessageId());
+				val nextTask = createNextTask(task,autoRetryInterval);
+				deliveryTaskDAO.updateTask(nextTask);
 			}
+			else
+				deliveryTaskDAO.deleteTask(task.getMessageId());
 		}
 	}
 
