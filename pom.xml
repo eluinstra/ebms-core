@@ -80,7 +80,7 @@
 	<properties>
 		<jdk.version>1.8</jdk.version>
 		<junit.jupiter.version>5.7.1</junit.jupiter.version>
-		<spring.version>5.2.18.RELEASE</spring.version>
+		<spring.version>5.2.20.RELEASE</spring.version>
 		<activemq.version>5.16.3</activemq.version>
 		<httpclient.version>4.5.13</httpclient.version>
 		<surefire.version>3.0.0-M5</surefire.version>
@@ -340,7 +340,7 @@
 		<dependency>
 			<groupId>mysql</groupId>
 			<artifactId>mysql-connector-java</artifactId>
-			<version>8.0.27</version>
+			<version>8.0.28</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
@@ -352,7 +352,7 @@
 		<dependency>
 			<groupId>org.postgresql</groupId>
 			<artifactId>postgresql</artifactId>
-			<version>42.3.1</version>
+			<version>42.3.3</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
