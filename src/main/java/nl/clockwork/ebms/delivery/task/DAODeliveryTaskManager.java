@@ -66,19 +66,24 @@ class DAODeliveryTaskManager implements DeliveryTaskManager
 			val nextTask = createNextTask(task,deliveryChannel);
 			deliveryTaskDAO.updateTask(nextTask);
 		}
-		else
+		else if (mustUpdate(task, reliableMessaging))
 		{
-			val action = ebMSDAO.getMessageAction(task.getMessageId()).orElse(null);
-			if ((action == EbMSAction.ACKNOWLEDGMENT || action == EbMSAction.MESSAGE_ERROR) && !reliableMessaging && task.getRetries() < nrAutoRetries)
-			{
-				val nextTask = createNextTask(task,autoRetryInterval);
-				deliveryTaskDAO.updateTask(nextTask);
-			}
-			else
-				deliveryTaskDAO.deleteTask(task.getMessageId());
+			val nextTask = createNextTask(task,autoRetryInterval);
+			deliveryTaskDAO.updateTask(nextTask);
 		}
+		else
+			deliveryTaskDAO.deleteTask(task.getMessageId());
 	}
 
+	private boolean mustUpdate(DeliveryTask event, boolean reliableMessaging)
+	{
+		return ebMSDAO.getMessageAction(event.getMessageId()).map(a ->
+				(a.equals(EbMSAction.ACKNOWLEDGMENT) || a.equals(EbMSAction.MESSAGE_ERROR))
+				&& !reliableMessaging
+				&& event.getRetries() < nrAutoRetries)
+			.orElse(false);
+	}
+	
 	@Override
 	public void deleteTask(String messageId)
 	{
