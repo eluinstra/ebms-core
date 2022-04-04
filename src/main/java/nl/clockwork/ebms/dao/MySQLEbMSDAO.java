@@ -228,4 +228,14 @@ class MySQLEbMSDAO extends AbstractEbMSDAO
 			messageId
 		);
 	}
+
+	@Override
+	public int deleteAttachments(String messageId)
+	{
+		return jdbcTemplate.update(
+				"delete from ebms_attachment" +
+				" where ebms_message_id = ?",
+				messageId
+			);
+	}
 }
