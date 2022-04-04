@@ -40,7 +40,7 @@ class EbMSEventDAOFactory extends AbstractDAOFactory<EbMSEventDAO>
 			return "select cpa_id, send_channel_id, receive_channel_id, message_id, time_to_live, time_stamp, is_confidential, retries" +
 					" from ebms_event" +
 					" where time_stamp <= ?" +
-					(serverId == null ? " and server_id is null" : " and server_id = '" + serverId + "'") +
+					(serverId == null ? "" : " and server_id = '" + serverId + "'") +
 					" order by time_stamp asc" +
 					" fetch first " + maxNr + " rows only";
 		}
@@ -58,7 +58,7 @@ class EbMSEventDAOFactory extends AbstractDAOFactory<EbMSEventDAO>
 			return "select cpa_id, send_channel_id, receive_channel_id, message_id, time_to_live, time_stamp, is_confidential, retries" +
 					" from ebms_event" +
 					" where time_stamp <= ?" +
-					(serverId == null ? " and server_id is null" : " and server_id = '" + serverId + "'") +
+					(serverId == null ? "" : " and server_id = '" + serverId + "'") +
 					" order by time_stamp asc" +
 					" fetch first " + maxNr + " rows only";
 		}
@@ -76,7 +76,7 @@ class EbMSEventDAOFactory extends AbstractDAOFactory<EbMSEventDAO>
 			return "select cpa_id, send_channel_id, receive_channel_id, message_id, time_to_live, time_stamp, is_confidential, retries" +
 					" from ebms_event" +
 					" where time_stamp <= ?" +
-					(serverId == null ? " and server_id is null" : " and server_id = '" + serverId + "'") +
+					(serverId == null ? "" : " and server_id = '" + serverId + "'") +
 					" order by time_stamp asc" +
 					" limit " + maxNr;
 		}
@@ -94,7 +94,7 @@ class EbMSEventDAOFactory extends AbstractDAOFactory<EbMSEventDAO>
 			return "select top " + maxNr + " cpa_id, send_channel_id, receive_channel_id, message_id, time_to_live, time_stamp, is_confidential, retries" +
 					" from ebms_event" +
 					" where time_stamp <= ?" +
-					(serverId == null ? " and server_id is null" : " and server_id = '" + serverId + "'") +
+					(serverId == null ? "" : " and server_id = '" + serverId + "'") +
 					" order by time_stamp asc";
 		}
 	}
@@ -111,7 +111,7 @@ class EbMSEventDAOFactory extends AbstractDAOFactory<EbMSEventDAO>
 			return "select cpa_id, send_channel_id, receive_channel_id, message_id, time_to_live, time_stamp, is_confidential, retries" +
 					" from ebms_event" +
 					" where time_stamp <= ?" +
-					(serverId == null ? " and server_id is null" : " and server_id = '" + serverId + "'") +
+					(serverId == null ? "" : " and server_id = '" + serverId + "'") +
 					" order by time_stamp asc" +
 					" limit " + maxNr;
 		}
@@ -130,7 +130,7 @@ class EbMSEventDAOFactory extends AbstractDAOFactory<EbMSEventDAO>
 					"select cpa_id, send_channel_id, receive_channel_id, message_id, time_to_live, time_stamp, is_confidential, retries" +
 					" from ebms_event" +
 					" where time_stamp <= ?" +
-					(serverId == null ? " and server_id is null" : " and server_id = '" + serverId + "'") +
+					(serverId == null ? "" : " and server_id = '" + serverId + "'") +
 					" order by time_stamp asc)" +
 					" where ROWNUM <= " + maxNr;
 		}
@@ -148,7 +148,7 @@ class EbMSEventDAOFactory extends AbstractDAOFactory<EbMSEventDAO>
 			return "select cpa_id, send_channel_id, receive_channel_id, message_id, time_to_live, time_stamp, is_confidential, retries" +
 					" from ebms_event" +
 					" where time_stamp <= ?" +
-					(serverId == null ? " and server_id is null" : " and server_id = '" + serverId + "'") +
+					(serverId == null ? "" : " and server_id = '" + serverId + "'") +
 					" order by time_stamp asc" +
 					" limit " + maxNr;
 		}

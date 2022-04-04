@@ -56,7 +56,7 @@ public class EventProcessorConfig
 	EbMSEventDAO ebMSEventDAO;
 	@Autowired
 	CPAManager cpaManager;
-	@Value("${ebms.serverId}")
+	@Value("${ebms.serverId:#{null}}")
 	String serverId;
 	@Value("${eventProcessor.jms.destinationName}")
 	String jmsDestinationName;

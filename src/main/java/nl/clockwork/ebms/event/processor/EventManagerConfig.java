@@ -45,7 +45,7 @@ public class EventManagerConfig
 	EventProcessorType eventProcessorType;
 	@Autowired
 	CPAManager cpaManager;
-	@Value("${ebms.serverId}")
+	@Value("${ebms.serverId:#{null}}")
 	String serverId;
 	@Autowired
 	ConnectionFactory connectionFactory;

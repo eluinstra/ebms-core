@@ -65,7 +65,7 @@ abstract class EbMSEventDAOImpl implements EbMSEventDAO
 				EbMSEventRowMapper.SELECT +
 				" from ebms_event" +
 				" where time_stamp <= ?" +
-				(serverId == null ? " and server_id is null" : " and server_id = '" + serverId + "'") +
+				(serverId == null ? "" : " and server_id = '" + serverId + "'") +
 				" order by time_stamp asc",
 				new EbMSEventRowMapper(),
 				Timestamp.from(timestamp));
