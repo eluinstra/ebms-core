@@ -52,7 +52,7 @@ public class DeliveryTaskHandlerConfig
 	DeliveryTaskDAO deliveryTaskDAO;
 	@Autowired
 	CPAManager cpaManager;
-	@Value("${ebms.serverId}")
+	@Value("${ebms.serverId:#{null}}")
 	String serverId;
 	@Value("${deliveryTaskHandler.jms.destinationName}")
 	String jmsDestinationName;

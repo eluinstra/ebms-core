@@ -47,7 +47,7 @@ public class DeliveryTaskManagerConfig
 	DeliveryTaskHandlerType deliveryTaskHandlerType;
 	@Autowired
 	CPAManager cpaManager;
-	@Value("${ebms.serverId}")
+	@Value("${ebms.serverId:#{null}}")
 	String serverId;
 	@Autowired
 	ConnectionFactory connectionFactory;
