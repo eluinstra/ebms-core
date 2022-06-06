@@ -34,6 +34,7 @@ import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.PersistenceLevelT
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.StatusValueType;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.SyncReplyModeType;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.PartyId;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 
 import lombok.AccessLevel;
@@ -174,6 +175,12 @@ public class CPAManager
 	@NonNull
 	URLMapper urlMapper;
 	Object cpaMonitor = new Object();
+
+	@CacheEvict(cacheNames = "CPA", allEntries = true)
+	public void clearCache()
+	{
+		//do nothing
+	}
 
 	public boolean existsCPA(String cpaId)
 	{

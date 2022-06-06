@@ -63,6 +63,13 @@ class CertificateMappingDAOImpl implements CertificateMappingDAO
 	JdbcTemplate jdbcTemplate;
 
 	@Override
+	@CacheEvict(cacheNames = "CPA", allEntries = true)
+	public void clearCache()
+	{
+		//do nothing
+	}
+
+	@Override
 	@Cacheable(cacheNames = "CertificateMapping", keyGenerator = "ebMSKeyGenerator")
 	public boolean existsCertificateMapping(String id, String cpaId)
 	{

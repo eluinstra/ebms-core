@@ -152,4 +152,12 @@ public class CPAServiceImpl implements CPAService, WithService
 			throw toServiceException(new CPAServiceException(e));
 		}
 	}
+
+	@DELETE
+	@Path("cache")
+	@Override
+	public void deleteCache()
+	{
+		cpaManager.clearCache();
+	}
 }

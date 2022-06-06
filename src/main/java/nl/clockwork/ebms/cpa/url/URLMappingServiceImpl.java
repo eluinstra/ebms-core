@@ -98,4 +98,12 @@ public class URLMappingServiceImpl implements URLMappingService, WithService
 			throw toServiceException(new URLMappingServiceException(e));
 		}
 	}
+
+	@DELETE
+	@Path("cache")
+	@Override
+	public void deleteCache()
+	{
+		urlMapper.deleteCache();
+	}
 }

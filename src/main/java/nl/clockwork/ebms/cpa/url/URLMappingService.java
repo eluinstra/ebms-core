@@ -53,4 +53,12 @@ public interface URLMappingService
 	@WebResult(name = "url")
 	@WebMethod(operationName = "getURLMappings")
 	List<URLMapping> getURLMappings() throws URLMappingServiceException;
+
+	/**
+	 * Deletes the URL mapping cache
+	 * 
+	 * @throws URLMappingServiceException
+	 */
+	@WebMethod(operationName = "deleteCache")
+	void deleteCache() throws URLMappingServiceException;
 }

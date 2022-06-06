@@ -58,4 +58,9 @@ public class CertificateMapper
 		val key = CertificateMapping.getCertificateId(source);
 		return certificateMappingDAO.deleteCertificateMapping(key,cpaId);
 	}
+
+	public void deleteCache()
+	{
+		certificateMappingDAO.clearCache();
+	}
 }

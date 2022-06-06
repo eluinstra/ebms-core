@@ -20,6 +20,7 @@ import java.util.Optional;
 
 public interface URLMappingDAO
 {
+	void clearCache();
 	boolean existsURLMapping(String source);
 	Optional<String> getURLMapping(String source);
 	List<URLMapping> getURLMappings();

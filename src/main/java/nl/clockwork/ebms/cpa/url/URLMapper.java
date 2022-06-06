@@ -86,4 +86,9 @@ public class URLMapper
 	{
 		return urlMappingDAO.deleteURLMapping(source);
 	}
+
+	public void deleteCache()
+	{
+		urlMappingDAO.clearCache();
+	}
 }

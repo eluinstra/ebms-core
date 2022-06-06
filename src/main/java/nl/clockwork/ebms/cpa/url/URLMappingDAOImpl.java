@@ -39,6 +39,13 @@ class URLMappingDAOImpl implements URLMappingDAO
 	JdbcTemplate jdbcTemplate;
 
 	@Override
+	@CacheEvict(cacheNames = "CPA", allEntries = true)
+	public void clearCache()
+	{
+		//do nothing
+	}
+
+	@Override
 	@Cacheable(cacheNames = "URLMapping", keyGenerator = "ebMSKeyGenerator")
 	public boolean existsURLMapping(String source)
 	{

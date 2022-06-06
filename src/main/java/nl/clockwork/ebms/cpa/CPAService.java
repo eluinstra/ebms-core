@@ -76,4 +76,12 @@ public interface CPAService
 	@WebResult(name = "cpa")
 	@WebMethod(operationName = "getCPA")
 	/* CollaborationProtocolAgreement */String getCPA(@WebParam(name = "cpaId") @XmlElement(required = true) String cpaId) throws CPAServiceException;
+
+	/**
+	 * Deletes the CPA cache
+	 * 
+	 * @throws CPAServiceException
+	 */
+	@WebMethod(operationName = "deleteCache")
+	void deleteCache() throws CPAServiceException;
 }

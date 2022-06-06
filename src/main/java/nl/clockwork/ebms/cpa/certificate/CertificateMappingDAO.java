@@ -21,6 +21,7 @@ import java.util.Optional;
 
 interface CertificateMappingDAO
 {
+	void clearCache();
 	boolean existsCertificateMapping(String id, String cpaId);
 	Optional<X509Certificate> getCertificateMapping(String id, String cpaId, boolean getSpecific);
 	List<CertificateMapping> getCertificateMappings();

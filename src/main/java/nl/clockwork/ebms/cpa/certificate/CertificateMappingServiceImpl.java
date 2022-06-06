@@ -184,4 +184,12 @@ public class CertificateMappingServiceImpl implements CertificateMappingService,
 			throw toServiceException(new CertificateMappingServiceException(e));
 		}
 	}
+
+	@DELETE
+	@Path("cache")
+	@Override
+	public void deleteCache()
+	{
+		certificateMapper.deleteCache();
+	}
 }

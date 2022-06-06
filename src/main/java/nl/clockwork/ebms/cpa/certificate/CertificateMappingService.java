@@ -57,4 +57,12 @@ public interface CertificateMappingService
 	@WebResult(name = "certificate")
 	@WebMethod(operationName = "getCertificateMappings")
 	List<CertificateMapping> getCertificateMappings() throws CertificateMappingServiceException;
+
+	/**
+	 * Deletes the Certificate mapping cache
+	 * 
+	 * @throws CertificateMappingServiceException
+	 */
+	@WebMethod(operationName = "deleteCache")
+	void deleteCache() throws CertificateMappingServiceException;
 }
