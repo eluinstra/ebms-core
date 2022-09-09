@@ -17,6 +17,8 @@ package nl.clockwork.ebms.server.servlet;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.nio.charset.Charset;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
@@ -76,11 +78,13 @@ public class ClientCertificateManagerFilter implements Filter
 		}
 	}
 
-	private X509Certificate decode(String certificate) throws CertificateException
-	{
+	private X509Certificate decode(String certificate) throws CertificateException, UnsupportedEncodingException {
 		if (StringUtils.isBlank(certificate))
 			return null;
-		val is = new ByteArrayInputStream(certificate.getBytes(Charset.defaultCharset()));
+
+		val charset = Charset.defaultCharset();
+		val decodedCertificate = URLDecoder.decode(certificate, charset.toString());
+		val is = new ByteArrayInputStream(decodedCertificate.getBytes(charset));
 		val cf = CertificateFactory.getInstance("X509");
 		return (X509Certificate)cf.generateCertificate(is);
 	}
