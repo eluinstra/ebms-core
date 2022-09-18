@@ -17,6 +17,7 @@ package nl.clockwork.ebms.server.servlet;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.net.URLDecoder;
 import java.nio.charset.Charset;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
@@ -64,10 +65,11 @@ public class ClientCertificateManagerFilter implements Filter
 			}
 			else
 			{
-				val certificate = decode(((HttpServletRequest)request).getHeader(x509CertificateHeader));
+				String header = ((HttpServletRequest)request).getHeader(x509CertificateHeader);
+				val certificate = decode(URLDecoder.decode(header, Charset.defaultCharset().toString()));
 				ClientCertificateManager.setCertificate(certificate);
 			}
-			log.info("Certificate " + ClientCertificateManager.getCertificate() != null ? ClientCertificateManager.getCertificate().getSubjectDN().toString() : " not found!");
+			log.info("Certificate " + (ClientCertificateManager.getCertificate() != null ? ClientCertificateManager.getCertificate().getSubjectDN().toString() : " not found!"));
 			chain.doFilter(request,response);
 		}
 		catch (CertificateException e)
