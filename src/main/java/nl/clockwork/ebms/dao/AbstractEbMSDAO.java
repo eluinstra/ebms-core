@@ -16,6 +16,7 @@
 package nl.clockwork.ebms.dao;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
@@ -571,12 +572,23 @@ abstract class AbstractEbMSDAO implements EbMSDAO
 			},
 			keyHolder);
 			insertAttachments(keyHolder,attachments);
-			return Tuple.of((String)keyHolder.getKeys().get("message_id"),(Integer)keyHolder.getKeys().get("message_nr"));
+			return Tuple.of((String)keyHolder.getKeys().get("message_id"),getMessageNr(keyHolder));
 		}
 		catch (IOException e)
 		{
 			throw new DataRetrievalFailureException("",e);
 		}
+	}
+
+	private Integer getMessageNr(final org.springframework.jdbc.support.GeneratedKeyHolder keyHolder)
+	{
+		val messageNr = keyHolder.getKeys().get("message_nr");
+		if (messageNr instanceof Integer)
+			return (Integer)keyHolder.getKeys().get("message_nr");
+		else if (messageNr instanceof BigDecimal)
+			return ((BigDecimal)keyHolder.getKeys().get("message_nr")).intValue();
+		else
+			throw new IllegalStateException();
 	}
 
 	protected void insertAttachments(KeyHolder keyHolder, List<EbMSAttachment> attachments) throws InvalidDataAccessApiUsageException, IOException
