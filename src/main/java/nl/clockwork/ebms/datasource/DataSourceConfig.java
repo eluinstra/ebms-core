@@ -229,7 +229,7 @@ public class DataSourceConfig
 				val config = Flyway.configure()
 						.dataSource(jdbcUrl,username,password)
 						.locations(l)
-						.ignoreMissingMigrations(true)
+						.ignoreMigrationPatterns("*:missing")
 						.outOfOrder(true);
 				config.load().migrate();
 			});

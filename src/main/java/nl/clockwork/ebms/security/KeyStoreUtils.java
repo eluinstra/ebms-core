@@ -23,7 +23,6 @@ import java.security.GeneralSecurityException;
 import java.security.KeyStore;
 
 import lombok.val;
-import lombok.var;
 
 public class KeyStoreUtils
 {

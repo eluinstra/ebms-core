@@ -51,7 +51,6 @@ import org.xml.sax.SAXException;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.val;
-import lombok.var;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class DOMUtils

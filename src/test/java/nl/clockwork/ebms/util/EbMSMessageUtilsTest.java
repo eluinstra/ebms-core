@@ -52,7 +52,6 @@ import org.w3._2000._09.xmldsig.SignatureType;
 import org.w3c.dom.Document;
 
 import lombok.val;
-import lombok.var;
 import nl.clockwork.ebms.Constants;
 import nl.clockwork.ebms.EbMSAttachmentFactory;
 import nl.clockwork.ebms.EbMSErrorCode;

@@ -30,7 +30,6 @@ import org.apache.james.mime4j.stream.Field;
 
 import lombok.AccessLevel;
 import lombok.val;
-import lombok.var;
 import lombok.experimental.FieldDefaults;
 import nl.clockwork.ebms.model.EbMSAttachment;
 
