@@ -114,7 +114,7 @@ public class BasicAuthenticationFilter implements Filter
 			return password.equals(savedPassword);
 	}
 
-	private String toMD5(String s) throws NoSuchAlgorithmException, UnsupportedEncodingException
+	private String toMD5(String s)
 	{
 		return "MD5:" + DigestUtils.md5Hex(s);
 	}
@@ -122,6 +122,7 @@ public class BasicAuthenticationFilter implements Filter
 	@Override
 	public void destroy()
 	{
+		// do nothing
 	}
 
 }

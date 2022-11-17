@@ -23,6 +23,7 @@ import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
 import java.util.Enumeration;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 import lombok.AccessLevel;
@@ -47,7 +48,7 @@ public class EbMSTrustStore
 		return trustStores.get(path);
 	}
 	
-	public EbMSTrustStore(@NonNull KeyStore keyStore) throws GeneralSecurityException, IOException
+	public EbMSTrustStore(@NonNull KeyStore keyStore)
 	{
 		this.keyStore = keyStore;
 	}
@@ -57,13 +58,13 @@ public class EbMSTrustStore
 		return keyStore.aliases();
 	}
 
-	public Certificate getCertificate(String alias) throws KeyStoreException
+	public Optional<Certificate> getCertificate(String alias) throws KeyStoreException
 	{
-		return keyStore.getCertificate(alias);
+		return Optional.ofNullable(keyStore.getCertificate(alias));
 	}
 
-	public String getCertificateAlias(X509Certificate cert) throws KeyStoreException
+	public Optional<String> getCertificateAlias(X509Certificate cert) throws KeyStoreException
 	{
-		return keyStore.getCertificateAlias(cert);
+		return Optional.ofNullable(keyStore.getCertificateAlias(cert));
 	}
 }

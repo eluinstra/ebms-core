@@ -32,13 +32,13 @@ import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.val;
 import lombok.experimental.FieldDefaults;
-import nl.clockwork.ebms.dao.EbMSDAO;
+import nl.clockwork.ebms.dao.WithMessageFilter;
 import nl.clockwork.ebms.service.model.MessageEvent;
 import nl.clockwork.ebms.service.model.MessageFilter;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor
-abstract class MessageEventDAOImpl implements MessageEventDAO
+abstract class MessageEventDAOImpl implements MessageEventDAO, WithMessageFilter
 {
 	public static class EbMSMessageEventRowMapper implements RowMapper<MessageEvent>
 	{
@@ -63,10 +63,10 @@ abstract class MessageEventDAOImpl implements MessageEventDAO
 			" and message_event.event_type in (" + join(types == null || types.length == 0 ? MessageEventType.values() : types,",") + ")" +
 			" and message_event.message_id = ebms_message.message_id" +
 			" and ebms_message.message_nr = 0" +
-			EbMSDAO.getMessageFilter(messageFilter,parameters) +
+			getMessageFilter(messageFilter,parameters) +
 			" order by ebms_message.time_stamp asc",
-			parameters.toArray(new Object[0]),
-			new EbMSMessageEventRowMapper()
+			new EbMSMessageEventRowMapper(),
+			parameters.toArray(new Object[0])
 		);
 	}
 
@@ -76,11 +76,11 @@ abstract class MessageEventDAOImpl implements MessageEventDAO
 	public List<MessageEvent> getEbMSMessageEvents(MessageFilter messageFilter, MessageEventType[] types, int maxNr)
 	{
 		val parameters = new ArrayList<Object>();
-		val messageContextFilter = EbMSDAO.getMessageFilter(messageFilter,parameters);
+		val messageContextFilter = getMessageFilter(messageFilter,parameters);
 		return jdbcTemplate.query(
 			getMessageEventsQuery(messageContextFilter,types,maxNr),
-			parameters.toArray(new Object[0]),
-			new EbMSMessageEventRowMapper()
+			new EbMSMessageEventRowMapper(),
+			parameters.toArray(new Object[0])
 		);
 	}
 

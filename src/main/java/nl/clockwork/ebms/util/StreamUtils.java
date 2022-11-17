@@ -15,10 +15,14 @@
  */
 package nl.clockwork.ebms.util;
 
+import java.util.Iterator;
 import java.util.Optional;
+import java.util.Spliterator;
+import java.util.Spliterators;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -44,4 +48,9 @@ public class StreamUtils
 	{
 		return new IllegalStateException(message + "=" + Stream.of(elements).map(o -> o.toString()).collect(Collectors.joining(",")));
 	}
+
+  public static <T> Stream<T> toStream(Iterator<T> iterator)
+  {
+		return StreamSupport.stream(Spliterators.spliteratorUnknownSize(iterator, Spliterator.ORDERED), false);
+  }
 }

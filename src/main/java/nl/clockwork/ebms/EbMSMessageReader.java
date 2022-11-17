@@ -61,11 +61,12 @@ public class EbMSMessageReader
 
 	public EbMSDocument readResponse(String message) throws IOException, ParserConfigurationException, SAXException
 	{
-		return StringUtils.isNotBlank(message) ? EbMSDocument.builder()
-				.contentId(contentId)
-				.message(DOMUtils.read(message))
-				.attachments(Collections.emptyList())
-				.build()
+		return StringUtils.isNotBlank(message)
+				? EbMSDocument.builder()
+						.contentId(contentId)
+						.message(DOMUtils.read(message))
+						.attachments(Collections.emptyList())
+						.build()
 				: null;
 	}
 
@@ -88,7 +89,7 @@ public class EbMSMessageReader
 
 	private EbMSDocument getEbMSMessage(List<EbMSAttachment> attachments) throws ParserConfigurationException, SAXException, IOException
 	{
-		if (attachments.size() > 0)
+		if (!attachments.isEmpty())
 		{
 			val message = attachments.remove(0);
 			return EbMSDocument.builder()

@@ -17,7 +17,6 @@ package nl.clockwork.ebms.cpa.certificate;
 
 import javax.sql.DataSource;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -30,23 +29,19 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class CertificateMappingServiceConfig
 {
-	@Autowired
-	DataSource dataSource;
-
 	@Bean
-	public CertificateMappingService certificateMappingService()
+	public CertificateMappingService certificateMappingService(CertificateMapper certificateMapper)
 	{
-		return new CertificateMappingServiceImpl(certificateMapper());
+		return new CertificateMappingServiceImpl(certificateMapper);
 	}
 
 	@Bean
-	public CertificateMapper certificateMapper()
+	public CertificateMapper certificateMapper(DataSource dataSource)
 	{
-		return new CertificateMapper(certificateMappingDAO());
+		return new CertificateMapper(certificateMappingDAO(dataSource));
 	}
 
-	@Bean
-	public CertificateMappingDAO certificateMappingDAO()
+	private CertificateMappingDAO certificateMappingDAO(DataSource dataSource)
 	{
 		val jdbcTemplate = new JdbcTemplate(dataSource);
 		return new CertificateMappingDAOImpl(jdbcTemplate);

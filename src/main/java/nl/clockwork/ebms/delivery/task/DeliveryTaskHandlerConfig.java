@@ -15,9 +15,26 @@
  */
 package nl.clockwork.ebms.delivery.task;
 
+import javax.jms.ConnectionFactory;
+
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Condition;
+import org.springframework.context.annotation.ConditionContext;
+import org.springframework.context.annotation.Conditional;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.core.type.AnnotatedTypeMetadata;
+import org.springframework.jms.listener.DefaultMessageListenerContainer;
+import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+import org.springframework.transaction.PlatformTransactionManager;
+
 import lombok.AccessLevel;
-import lombok.experimental.FieldDefaults;
 import lombok.val;
+import lombok.experimental.FieldDefaults;
 import nl.clockwork.ebms.cpa.CPAManager;
 import nl.clockwork.ebms.cpa.url.URLMapper;
 import nl.clockwork.ebms.dao.EbMSDAO;
@@ -25,18 +42,6 @@ import nl.clockwork.ebms.delivery.client.EbMSHttpClientFactory;
 import nl.clockwork.ebms.encryption.EbMSMessageEncrypter;
 import nl.clockwork.ebms.event.MessageEventListener;
 import nl.clockwork.ebms.processor.EbMSMessageProcessor;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.*;
-import org.springframework.core.type.AnnotatedTypeMetadata;
-import org.springframework.jms.listener.DefaultMessageListenerContainer;
-import org.springframework.scheduling.annotation.EnableAsync;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
-import org.springframework.transaction.PlatformTransactionManager;
-
-import javax.jms.ConnectionFactory;
 
 @Configuration
 @ComponentScan(basePackageClasses = {nl.clockwork.ebms.delivery.task.DeliveryTaskJob.class,nl.clockwork.ebms.delivery.task.JMSJob.class})
@@ -44,14 +49,11 @@ import javax.jms.ConnectionFactory;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class DeliveryTaskHandlerConfig
 {
-	public static enum DeliveryTaskHandlerType
+	public enum DeliveryTaskHandlerType
 	{
 		DEFAULT, JMS, QUARTZ, QUARTZ_JMS, QUARTZ_KAFKA;
 	}
-	@Autowired
-	DeliveryTaskDAO deliveryTaskDAO;
-	@Autowired
-	CPAManager cpaManager;
+
 	@Value("${ebms.serverId:#{null}}")
 	String serverId;
 	@Value("${deliveryTaskHandler.jms.destinationName}")
@@ -70,27 +72,8 @@ public class DeliveryTaskHandlerConfig
 	int taskHandlerExecutionInterval;
 	@Value("${deliveryTaskHandler.task.executionInterval}")
 	int taskHandlerTaskExecutionInterval;
-	@Autowired
-	MessageEventListener messageEventListener;
-	@Autowired
-	EbMSDAO ebMSDAO;
-	@Autowired
-	URLMapper urlMapper;
-	@Autowired
-	DeliveryTaskManager deliveryTaskManager;
-	@Autowired
-	EbMSHttpClientFactory ebMSClientFactory;
-	@Autowired
-	EbMSMessageEncrypter messageEncrypter;
-	@Autowired
-	EbMSMessageProcessor messageProcessor;
 	@Value("${ebmsMessage.deleteContentOnProcessed}")
 	boolean deleteEbMSAttachmentsOnMessageProcessed;
-	@Autowired
-	ConnectionFactory connectionFactory;
-	@Autowired
-	@Qualifier("jmsTransactionManager")
-	PlatformTransactionManager jmsTransactionManager;
 	@Value("${deliveryTaskHandler.jms.destinationName}")
 	String destinationName;
 
@@ -108,11 +91,11 @@ public class DeliveryTaskHandlerConfig
 
 	@Bean
 	@Conditional(DefaultTaskHandlerType.class)
-	public DAODeliveryTaskExecutor taskExecutor()
+	public DAODeliveryTaskExecutor taskExecutor(DeliveryTaskDAO deliveryTaskDAO, DeliveryTaskHandler deliveryTaskHandler)
 	{
 		return DAODeliveryTaskExecutor.builder()
 				.deliveryTaskDAO(deliveryTaskDAO)
-				.deliveryTaskHandler(deliveryTaskHandler())
+				.deliveryTaskHandler(deliveryTaskHandler)
 				.timedTask(new TimedTask(taskHandlerExecutionInterval))
 				.maxTasks(maxTasks)
 				.serverId(serverId)
@@ -121,7 +104,10 @@ public class DeliveryTaskHandlerConfig
 
 	@Bean
 	@Conditional(JmsTaskHandlerType.class)
-	public DefaultMessageListenerContainer jmsTaskProcessor()
+	public DefaultMessageListenerContainer jmsTaskProcessor(
+		ConnectionFactory connectionFactory,
+		@Qualifier("jmsTransactionManager") PlatformTransactionManager jmsTransactionManager,
+		DeliveryTaskHandler deliveryTaskHandler)
 	{
 		val result = new DefaultMessageListenerContainer();
 		result.setConnectionFactory(connectionFactory);
@@ -131,12 +117,20 @@ public class DeliveryTaskHandlerConfig
 		result.setMaxConcurrentConsumers(maxThreads);
 		result.setReceiveTimeout(receiveTimeout);
 		result.setDestinationName(StringUtils.isEmpty(jmsDestinationName) ? JMSDeliveryTaskManager.JMS_DESTINATION_NAME : jmsDestinationName);
-		result.setMessageListener(new JMSDeliveryTaskListener(deliveryTaskHandler()));
+		result.setMessageListener(new JMSDeliveryTaskListener(deliveryTaskHandler));
 		return result;
 	}
 
 	@Bean
-  public DeliveryTaskHandler deliveryTaskHandler()
+  public DeliveryTaskHandler deliveryTaskHandler(
+		MessageEventListener messageEventListener,
+		EbMSDAO ebMSDAO,
+		CPAManager cpaManager,
+		URLMapper urlMapper,
+		DeliveryTaskManager deliveryTaskManager,
+		EbMSHttpClientFactory ebMSClientFactory,
+		EbMSMessageEncrypter messageEncrypter,
+		EbMSMessageProcessor messageProcessor)
 	{
 		return DeliveryTaskHandler.builder()
 				.messageEventListener(messageEventListener)

@@ -65,7 +65,7 @@ class MessageHeaderValidator
 		validateMessage(message,timestamp);
 	}
 
-	public void validate(EbMSBaseMessage message, Instant timestamp) throws EbMSValidationException
+	public void validate(EbMSBaseMessage message) throws EbMSValidationException
 	{
 		val messageHeader = message.getMessageHeader();
 		validateMessageHeader(messageHeader);
@@ -74,7 +74,7 @@ class MessageHeaderValidator
 				.orElseThrow(() -> new EbMSValidationException(EbMSMessageUtils.createError(EbMSErrorCode.UNKNOWN.getErrorCode(),EbMSErrorCode.UNKNOWN,"No DeliveryChannel found.")));
 	}
 
-	public void validate(EbMSAcknowledgment acknowledgment, Instant timestamp) throws EbMSValidationException
+	public void validate(EbMSAcknowledgment acknowledgment) throws EbMSValidationException
 	{
 		val messageHeader = acknowledgment.getMessageHeader();
 		validateMessageHeader(messageHeader);
@@ -336,8 +336,8 @@ class MessageHeaderValidator
 	private void compare(List<PartyId> requestPartyIds, List<PartyId> responsePartyIds) throws ValidationException
 	{
 		val anyMatch = requestPartyIds.stream()
-				.map(req -> EbMSMessageUtils.toString(req))
-				.anyMatch(req -> responsePartyIds.stream().map(res -> EbMSMessageUtils.toString(res)).anyMatch(res -> req.equals(res)));
+				.map(EbMSMessageUtils::toString)
+				.anyMatch(req -> responsePartyIds.stream().map(EbMSMessageUtils::toString).anyMatch(req::equals));
 		if (!anyMatch)
 			throw new ValidationException("Request PartyIds do not match response PartyIds");
     

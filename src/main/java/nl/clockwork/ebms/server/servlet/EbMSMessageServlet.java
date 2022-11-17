@@ -78,10 +78,9 @@ public class EbMSMessageServlet extends GenericServlet
 			@Override
 			public String getRequestHeader(String headerName)
 			{
-				if ("Content-Type".equals(headerName))
-					return request.getContentType();
-				else
-					return ((HttpServletRequest)request).getHeader(headerName);
+				return "Content-Type".equals(headerName)
+						? request.getContentType()
+						: ((HttpServletRequest)request).getHeader(headerName);
 			}
 
 			@Override

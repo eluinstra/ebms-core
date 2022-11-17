@@ -31,16 +31,10 @@ import lombok.experimental.FieldDefaults;
 
 @Configuration
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public abstract class DAOConfig
+public class DAOConfig
 {
-	@Autowired
-	@Qualifier("dataSourceTransactionManager")
-	PlatformTransactionManager dataSourceTransactionManager;
-	@Autowired
-	DataSource dataSource;
-
 	@Bean
-	public EbMSDAOFactory ebMSDAO()
+	public EbMSDAOFactory ebMSDAO(@Qualifier("dataSourceTransactionManager") PlatformTransactionManager dataSourceTransactionManager, DataSource dataSource)
 	{
 		val transactionTemplate = new TransactionTemplate(dataSourceTransactionManager);
 		val jdbcTemplate = new JdbcTemplate(dataSource);

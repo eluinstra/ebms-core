@@ -30,14 +30,14 @@ import lombok.experimental.FieldDefaults;
 import nl.clockwork.ebms.Constants;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-class LoggingOutputStream extends FilterOutputStream
+class LoggingOutputStream extends FilterOutputStream implements WithHTTP
 {
 	private static final Logger messageLog = LoggerFactory.getLogger(Constants.MESSAGE_LOG);
 	@NonNull
 	Map<String,List<String>> properties;
 	@NonNull
 	String charset;
-	StringBuffer sb = new StringBuffer();
+	StringBuilder sb = new StringBuilder();
 
 	public LoggingOutputStream(Map<String,List<String>> properties, OutputStream out)
 	{
@@ -78,7 +78,8 @@ class LoggingOutputStream extends FilterOutputStream
 	@Override
 	public void close() throws IOException
 	{
-		messageLog.debug(">>>>\n" + HTTPUtils.toString(this.properties) + "\n" + sb.toString());
+		if (messageLog.isDebugEnabled())
+			messageLog.debug(">>>>\n{}\n{}",toString(this.properties),sb);
 		super.close();
 	}
 

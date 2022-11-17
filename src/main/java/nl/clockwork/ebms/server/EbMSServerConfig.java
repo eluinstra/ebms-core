@@ -15,7 +15,6 @@
  */
 package nl.clockwork.ebms.server;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -27,11 +26,8 @@ import nl.clockwork.ebms.processor.EbMSMessageProcessor;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class EbMSServerConfig
 {
-	@Autowired
-	EbMSMessageProcessor messageProcessor;
-
 	@Bean
-	public EbMSHttpHandler httpHandler()
+	public EbMSHttpHandler httpHandler(EbMSMessageProcessor messageProcessor)
 	{
 		return new EbMSHttpHandler(messageProcessor);
 	}

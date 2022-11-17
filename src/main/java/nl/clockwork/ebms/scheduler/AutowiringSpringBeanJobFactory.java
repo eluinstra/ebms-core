@@ -15,7 +15,6 @@
  */
 package nl.clockwork.ebms.scheduler;
 
-import org.quartz.Job;
 import org.quartz.SchedulerContext;
 import org.quartz.spi.TriggerFiredBundle;
 import org.springframework.beans.BeanWrapper;
@@ -25,6 +24,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.scheduling.quartz.SpringBeanJobFactory;
 
 import lombok.AccessLevel;
+import lombok.val;
 import lombok.experimental.FieldDefaults;
 
 @FieldDefaults(level = AccessLevel.PRIVATE)
@@ -36,15 +36,21 @@ public class AutowiringSpringBeanJobFactory extends SpringBeanJobFactory
 	@Override
 	protected Object createJobInstance(TriggerFiredBundle bundle) throws Exception
 	{
-		Job job = applicationContext.getBean(bundle.getJobDetail().getJobClass());
-		BeanWrapper beanWrapper = PropertyAccessorFactory.forBeanPropertyAccess(job);
-		MutablePropertyValues propertyValues = new MutablePropertyValues();
-		propertyValues.addPropertyValues(bundle.getJobDetail().getJobDataMap());
-		propertyValues.addPropertyValues(bundle.getTrigger().getJobDataMap());
-		if (schedulerContext != null)
-			propertyValues.addPropertyValues(schedulerContext);
+		val job = applicationContext.getBean(bundle.getJobDetail().getJobClass());
+		val beanWrapper = PropertyAccessorFactory.forBeanPropertyAccess(job);
+		val propertyValues = createPropertyValues(bundle);
 		beanWrapper.setPropertyValues(propertyValues,true);
 		return job;
+	}
+
+	private MutablePropertyValues createPropertyValues(TriggerFiredBundle bundle)
+	{
+		val result = new MutablePropertyValues();
+		result.addPropertyValues(bundle.getJobDetail().getJobDataMap());
+		result.addPropertyValues(bundle.getTrigger().getJobDataMap());
+		if (schedulerContext != null)
+			result.addPropertyValues(schedulerContext);
+		return result;
 	}
 
 	@Override
@@ -53,6 +59,7 @@ public class AutowiringSpringBeanJobFactory extends SpringBeanJobFactory
 		this.applicationContext = applicationContext;
 	}
 	
+	@Override
 	public void setSchedulerContext(SchedulerContext schedulerContext)
 	{
 		this.schedulerContext = schedulerContext;

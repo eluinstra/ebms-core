@@ -71,10 +71,9 @@ public class JAXBParser<T>
 		val r = new StringReader(xml);
 		val unmarshaller = context.createUnmarshaller();
 		val o = unmarshaller.unmarshal(r);
-		if (o instanceof JAXBElement<?>)
-			return ((JAXBElement<T>)o).getValue();
-		else
-			return (T)o;
+		return o instanceof JAXBElement<?>
+				? ((JAXBElement<T>)o).getValue()
+				: (T)o;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -84,10 +83,9 @@ public class JAXBParser<T>
 			return null;
 		val unmarshaller = context.createUnmarshaller();
 		val o = unmarshaller.unmarshal(n);
-		if (o instanceof JAXBElement<?>)
-			return ((JAXBElement<T>)o).getValue();
-		else
-			return (T)o;
+		return o instanceof JAXBElement<?>
+				? ((JAXBElement<T>)o).getValue()
+				: (T)o;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -100,10 +98,9 @@ public class JAXBParser<T>
 		val s = new SAXSource(parser.getXMLReader(),is);
 		val unmarshaller = context.createUnmarshaller();
 		val o = unmarshaller.unmarshal(s);
-		if (o instanceof JAXBElement<?>)
-			return ((JAXBElement<T>)o).getValue();
-		else
-			return (T)o;
+		return o instanceof JAXBElement<?>
+				? ((JAXBElement<T>)o).getValue()
+				: (T)o;
 	}
 
 	public String handle(JAXBElement<T> e) throws JAXBException
@@ -147,22 +144,14 @@ public class JAXBParser<T>
 	@SuppressWarnings("unchecked")
 	public static <L> JAXBParser<L> getInstance(Class<L> clazz) throws JAXBException
 	{
-		if (xmlHandlers.get(clazz) == null)
-		{
-			val context = JAXBContext.newInstance(clazz);
-			xmlHandlers.put(clazz,new JAXBParser<L>(context));
-		}
+		xmlHandlers.putIfAbsent(clazz,new JAXBParser<L>(JAXBContext.newInstance(clazz)));
 		return (JAXBParser<L>)xmlHandlers.get(clazz);
 	}
 
 	@SuppressWarnings("unchecked")
 	public static <L> JAXBParser<L> getInstance(Class<L> clazz, Class<?>...clazzes) throws JAXBException
 	{
-		if (xmlHandlers.get(clazz) == null)
-		{
-			val context = JAXBContext.newInstance(clazzes);
-			xmlHandlers.put(clazz,new JAXBParser<L>(context));
-		}
+		xmlHandlers.putIfAbsent(clazz,new JAXBParser<L>(JAXBContext.newInstance(clazzes)));
 		return (JAXBParser<L>)xmlHandlers.get(clazz);
 	}
 

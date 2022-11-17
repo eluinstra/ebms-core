@@ -19,8 +19,10 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
 
-import org.springframework.util.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
+import io.vavr.control.Either;
+import io.vavr.control.Option;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
@@ -54,33 +56,37 @@ public class URLMapper
 			if (StringUtils.isEmpty(urlMapping.getDestination()))
 				urlMappingDAO.deleteURLMapping(urlMapping.getSource());
 			else
-			{
-				validate(urlMapping);
-				if (urlMappingDAO.existsURLMapping(urlMapping.getSource()))
-					urlMappingDAO.updateURLMapping(urlMapping);
-				else
-					urlMappingDAO.insertURLMapping(urlMapping);
-			}
+				validate(urlMapping).peek(this::save).getOrElseThrow(e -> e);
 		}
 	}
 
-	private void validate(URLMapping urlMapping)
+	private Either<IllegalArgumentException,URLMapping> validate(URLMapping urlMapping)
 	{
-		validateUrl(urlMapping.getSource(),"Source");
-		validateUrl(urlMapping.getDestination(),"Destination");
+		return isValid(urlMapping.getSource()).map(e -> new IllegalArgumentException("Source invalid",e))
+				.orElse(() -> isValid(urlMapping.getDestination()).map(e -> new IllegalArgumentException("Destination invalid",e)))
+				.toEither(urlMapping).swap();
 	}
 
-	private void validateUrl(String url, String propertyName)
+	private Option<MalformedURLException> isValid(String url)
 	{
 		try
 		{
 			new URL(url);
+			return Option.none();
 		}
 		catch (MalformedURLException e)
 		{
-			throw new IllegalArgumentException(propertyName + " invalid",e);
+			return Option.some(e);
 		}
 	}
+
+	private void save(URLMapping urlMapping)
+	{
+		if (urlMappingDAO.existsURLMapping(urlMapping.getSource()))
+			urlMappingDAO.updateURLMapping(urlMapping);
+		else
+			urlMappingDAO.insertURLMapping(urlMapping);
+}
 
 	public int deleteURLMapping(String source)
 	{
@@ -91,4 +97,5 @@ public class URLMapper
 	{
 		urlMappingDAO.clearCache();
 	}
+
 }

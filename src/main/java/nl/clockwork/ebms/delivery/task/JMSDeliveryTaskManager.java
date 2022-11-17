@@ -32,6 +32,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.val;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.NonFinal;
+import nl.clockwork.ebms.EbMSAction;
 import nl.clockwork.ebms.cpa.CPAManager;
 import nl.clockwork.ebms.cpa.CPAUtils;
 import nl.clockwork.ebms.dao.EbMSDAO;
@@ -108,18 +109,16 @@ class JMSDeliveryTaskManager implements DeliveryTaskManager
 		}
 		else
 		{
-			switch(ebMSDAO.getMessageAction(task.getMessageId()).orElse(null))
-			{
-				case ACKNOWLEDGMENT:
-				case MESSAGE_ERROR:
-					if (task.getRetries() < nrAutoRetries)
+			ebMSDAO.getMessageAction(task.getMessageId())
+					.filter(action -> action == EbMSAction.ACKNOWLEDGMENT || action == EbMSAction.MESSAGE_ERROR)
+					.ifPresent(action ->
 					{
-						val nextTask = createNextTask(task,autoRetryInterval);
-						jmsTemplate.send(JMS_DESTINATION_NAME,new DeliveryTaskMessageCreator(nextTask,autoRetryInterval));
-						break;
-					}
-				default:
-			}
+						if (task.getRetries() < nrAutoRetries)
+						{
+							val nextTask = createNextTask(task,autoRetryInterval);
+							jmsTemplate.send(JMS_DESTINATION_NAME,new DeliveryTaskMessageCreator(nextTask,autoRetryInterval));
+						}
+					});
 		}
 	}
 
@@ -132,5 +131,6 @@ class JMSDeliveryTaskManager implements DeliveryTaskManager
 	@Override
 	public void deleteTask(String messageId)
 	{
-	}
+   	// do nothing
+ 	}
 }

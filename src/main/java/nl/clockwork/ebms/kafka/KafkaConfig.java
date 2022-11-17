@@ -52,7 +52,6 @@ public class KafkaConfig
 
 	@Value("${kafka.serverUrl}")
 	private String kafkaServerUrl;
-	private String OFFSET = "earliest";
 
 	@PostConstruct
 	public void init()
@@ -89,35 +88,35 @@ public class KafkaConfig
 	@Bean
 	public Map<String,Object> deliveryTaskProducerConfiguration()
 	{
-		val configurations = new HashMap<String,Object>();
-		configurations.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG,kafkaServerUrl);
-		configurations.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG,StringSerializer.class);
-		configurations.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG,JsonSerializer.class);
-		configurations.put(ProducerConfig.ENABLE_IDEMPOTENCE_CONFIG,true);
-		configurations.put(ProducerConfig.CLIENT_ID_CONFIG,UUID.randomUUID().toString());
-		configurations.put(ProducerConfig.TRANSACTIONAL_ID_CONFIG,"delivery-task-transaction");
-		return configurations;
+		val result = new HashMap<String,Object>();
+		result.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG,kafkaServerUrl);
+		result.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG,StringSerializer.class);
+		result.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG,JsonSerializer.class);
+		result.put(ProducerConfig.ENABLE_IDEMPOTENCE_CONFIG,true);
+		result.put(ProducerConfig.CLIENT_ID_CONFIG,UUID.randomUUID().toString());
+		result.put(ProducerConfig.TRANSACTIONAL_ID_CONFIG,"delivery-task-transaction");
+		return result;
 	}
 
 	@Bean
 	public Map<String,Object> messageProducerConfiguration()
 	{
-		val configurations = new HashMap<String,Object>();
-		configurations.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG,kafkaServerUrl);
-		configurations.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG,StringSerializer.class);
-		configurations.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG,JsonSerializer.class);
-		configurations.put(ProducerConfig.ENABLE_IDEMPOTENCE_CONFIG,true);
-		configurations.put(ProducerConfig.CLIENT_ID_CONFIG,UUID.randomUUID().toString());
-		configurations.put(ProducerConfig.TRANSACTIONAL_ID_CONFIG,"message-property-transaction");
-		return configurations;
+		val result = new HashMap<String,Object>();
+		result.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG,kafkaServerUrl);
+		result.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG,StringSerializer.class);
+		result.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG,JsonSerializer.class);
+		result.put(ProducerConfig.ENABLE_IDEMPOTENCE_CONFIG,true);
+		result.put(ProducerConfig.CLIENT_ID_CONFIG,UUID.randomUUID().toString());
+		result.put(ProducerConfig.TRANSACTIONAL_ID_CONFIG,"message-property-transaction");
+		return result;
 	}
 
 	@Bean
 	ConcurrentKafkaListenerContainerFactory<String,DeliveryTask> kafkaListenerContainerFactory()
 	{
-		val factory = new ConcurrentKafkaListenerContainerFactory<String,DeliveryTask>();
-		factory.setConsumerFactory(consumerFactory());
-		return factory;
+		val result = new ConcurrentKafkaListenerContainerFactory<String,DeliveryTask>();
+		result.setConsumerFactory(consumerFactory());
+		return result;
 	}
 
 	@Bean
@@ -125,37 +124,37 @@ public class KafkaConfig
 	{
 		val deliveryTaskDeserializer = new JsonDeserializer<>(DeliveryTask.class);
 		deliveryTaskDeserializer.addTrustedPackages("nl.clockwork.ebms.delivery.task.DeliveryTask");
-		return new DefaultKafkaConsumerFactory<String,DeliveryTask>(consumerConfigurations(),new StringDeserializer(),deliveryTaskDeserializer);
+		return new DefaultKafkaConsumerFactory<>(consumerConfigurations(),new StringDeserializer(),deliveryTaskDeserializer);
 	}
 
 	@Bean
 	public Map<String,Object> consumerConfigurations()
 	{
-		val configurations = new HashMap<String,Object>();
-		configurations.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG,kafkaServerUrl);
-		configurations.put(ConsumerConfig.CLIENT_ID_CONFIG,UUID.randomUUID().toString());
-		configurations.put(ConsumerConfig.GROUP_ID_CONFIG,"EBMS");
-		configurations.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG,StringDeserializer.class);
-		configurations.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG,JsonDeserializer.class);
-		configurations.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG,OFFSET);
-		configurations.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG,false);
-		configurations.put(ConsumerConfig.ISOLATION_LEVEL_CONFIG,"read_committed");
-		return configurations;
+		val result = new HashMap<String,Object>();
+		result.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG,kafkaServerUrl);
+		result.put(ConsumerConfig.CLIENT_ID_CONFIG,UUID.randomUUID().toString());
+		result.put(ConsumerConfig.GROUP_ID_CONFIG,"EBMS");
+		result.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG,StringDeserializer.class);
+		result.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG,JsonDeserializer.class);
+		result.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG,"earliest");
+		result.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG,false);
+		result.put(ConsumerConfig.ISOLATION_LEVEL_CONFIG,"read_committed");
+		return result;
 	}
 
 	@Bean
 	public KafkaTransactionManager<String,DeliveryTask> deliveryTaskKafkaTransactionManager()
 	{
-		KafkaTransactionManager<String,DeliveryTask> ktm = new KafkaTransactionManager<String,DeliveryTask>(deliveryTaskProducerFactory());
-		ktm.setTransactionSynchronization(AbstractPlatformTransactionManager.SYNCHRONIZATION_ON_ACTUAL_TRANSACTION);
-		return ktm;
+		KafkaTransactionManager<String,DeliveryTask> result = new KafkaTransactionManager<>(deliveryTaskProducerFactory());
+		result.setTransactionSynchronization(AbstractPlatformTransactionManager.SYNCHRONIZATION_ON_ACTUAL_TRANSACTION);
+		return result;
 	}
 
 	@Bean
 	public KafkaTransactionManager<String,EbMSMessageProperties> messagePropertiesKafkaTransactionManager()
 	{
-		KafkaTransactionManager<String,EbMSMessageProperties> ktm = new KafkaTransactionManager<String,EbMSMessageProperties>(messagePropertiesProducerFactory());
-		ktm.setTransactionSynchronization(AbstractPlatformTransactionManager.SYNCHRONIZATION_ON_ACTUAL_TRANSACTION);
-		return ktm;
+		KafkaTransactionManager<String,EbMSMessageProperties> result = new KafkaTransactionManager<>(messagePropertiesProducerFactory());
+		result.setTransactionSynchronization(AbstractPlatformTransactionManager.SYNCHRONIZATION_ON_ACTUAL_TRANSACTION);
+		return result;
 	}
 }

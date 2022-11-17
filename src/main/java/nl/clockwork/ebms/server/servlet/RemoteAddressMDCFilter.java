@@ -37,6 +37,7 @@ public class RemoteAddressMDCFilter implements Filter
 	@Override
 	public void init(FilterConfig filterConfig) throws ServletException
 	{
+		// do nothing
 	}
 
 	@Override

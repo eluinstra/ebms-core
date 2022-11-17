@@ -22,6 +22,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import lombok.AccessLevel;
+import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
 import nl.clockwork.ebms.cpa.CPAManager;
 import nl.clockwork.ebms.util.LoggingUtils;
@@ -31,8 +32,6 @@ import nl.clockwork.ebms.util.LoggingUtils.Status;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class CommonConfig
 {
-	@Autowired
-	CPAManager cpaManager;
 	@Value("${ebmsMessage.attachment.outputDirectory}")
 	String attachmentOutputDirectory;
 	@Value("${ebmsMessage.attachment.memoryTreshold}")
@@ -49,13 +48,13 @@ public class CommonConfig
 	}
 
 	@Bean
-	public EbMSMessageFactory ebMSMessageFactory()
+	public EbMSMessageFactory ebMSMessageFactory(CPAManager cpaManager, EbMSIdGenerator ebMSIdGenerator)
 	{
-		return new EbMSMessageFactory(cpaManager,ebMSIdGenerator());
+		return new EbMSMessageFactory(cpaManager,ebMSIdGenerator);
 	}
 
 	@Bean
-	public void EbMSAttachmentFactory()
+	public void ebMSAttachmentFactory()
 	{
 		EbMSAttachmentFactory.init(attachmentOutputDirectory,attachmentMemoryTreshold,attachmentCipherTransformation);
 	}

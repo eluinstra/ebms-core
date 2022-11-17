@@ -37,17 +37,17 @@ import lombok.val;
 import lombok.experimental.FieldDefaults;
 import nl.clockwork.ebms.Constants;
 import nl.clockwork.ebms.EbMSMessageReader;
-import nl.clockwork.ebms.delivery.client.HTTPUtils;
+import nl.clockwork.ebms.delivery.client.WithHTTP;
 import nl.clockwork.ebms.model.EbMSDocument;
 import nl.clockwork.ebms.processor.EbMSProcessingException;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-class EbMSResponseHandler implements ResponseHandler<EbMSDocument>
+class EbMSResponseHandler implements ResponseHandler<EbMSDocument>, WithHTTP
 {
 	private static final Logger messageLog = LoggerFactory.getLogger(Constants.MESSAGE_LOG);
 
 	@Override
-	public EbMSDocument handleResponse(HttpResponse response) throws ClientProtocolException, IOException
+	public EbMSDocument handleResponse(HttpResponse response) throws IOException
 	{
 		try
 		{
@@ -56,7 +56,7 @@ class EbMSResponseHandler implements ResponseHandler<EbMSDocument>
 				val entity = response.getEntity();
 				if (response.getStatusLine().getStatusCode() == HttpServletResponse.SC_NO_CONTENT || entity == null || entity.getContentLength() == 0)
 				{
-					messageLog.info("<<<<\nStatusCode=" + response.getStatusLine().getStatusCode());
+					messageLog.info("<<<<\nStatusCode={}",response.getStatusLine().getStatusCode());
 					return null;
 				}
 				else
@@ -65,7 +65,7 @@ class EbMSResponseHandler implements ResponseHandler<EbMSDocument>
 					{
 						val messageReader = new EbMSMessageReader(getHeaderField(response,"Content-ID"),getHeaderField(response,"Content-Type"));
 						val message = IOUtils.toString(input,getEncoding(entity));
-		      	messageLog.info("<<<<\nStatusCode=" + response.getStatusLine().getStatusCode() + "\n" + message);
+		      	messageLog.info("<<<<\nStatusCode={}\n{}",response.getStatusLine().getStatusCode(),message);
 						return messageReader.readResponse(message);
 					}
 				}
@@ -73,7 +73,7 @@ class EbMSResponseHandler implements ResponseHandler<EbMSDocument>
 			else if (response.getStatusLine().getStatusCode() >= HttpServletResponse.SC_BAD_REQUEST)
 			{
 		    val entity = response.getEntity();
-		    if (entity != null)
+				if (entity != null)
 					throw new IOException("StatusCode=" + response.getStatusLine().getStatusCode() + "\n" + IOUtils.toString(entity.getContent(),Charset.defaultCharset()));
 			}
 			throw new IOException("StatusCode=" + response.getStatusLine().getStatusCode());
@@ -88,14 +88,14 @@ class EbMSResponseHandler implements ResponseHandler<EbMSDocument>
 	{
 		val contentType = entity.getContentType().getValue();
 		if (!StringUtils.isEmpty(contentType))
-			return HTTPUtils.getCharSet(contentType);
+			return getCharSet(contentType);
 		else
 			throw new EbMSProcessingException("HTTP header Content-Type is not set!");
 	}
 	
 	private String getHeaderField(HttpResponse response, String name)
 	{
-		Header result = response.getFirstHeader(name);
-		return result != null ? result.getValue() : null;
+		val result = response.getFirstHeader(name);
+		return result != null ? result.getValue() : "";
 	}
 }

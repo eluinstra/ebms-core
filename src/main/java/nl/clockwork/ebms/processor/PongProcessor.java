@@ -15,8 +15,6 @@
  */
 package nl.clockwork.ebms.processor;
 
-import java.time.Instant;
-
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -48,7 +46,7 @@ class PongProcessor
   @NonNull
   DeliveryManager deliveryManager;
 
-  public EbMSPong createPong(EbMSPing message, Instant timestamp) throws ValidatorException, EbMSProcessorException
+  public EbMSPong createPong(EbMSPing message) throws ValidatorException, EbMSProcessorException
 	{
 		return ebMSMessageFactory.createEbMSPong(message);
 	}
@@ -65,11 +63,11 @@ class PongProcessor
 		deliveryManager.sendResponseMessage(uri,pong);
 	}
 
-  public void processPong(Instant timestamp, EbMSPong pong)
+  public void processPong(EbMSPong pong)
 	{
 		try
 		{
-			messageValidator.validate(pong,timestamp);
+			messageValidator.validate(pong);
 			deliveryManager.handleResponseMessage(pong);
 		}
 		catch (ValidatorException e)

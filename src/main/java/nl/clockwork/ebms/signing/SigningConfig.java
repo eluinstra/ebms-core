@@ -32,20 +32,15 @@ public class SigningConfig
 {
 	@Autowired
 	CPAManager cpaManager;
-	@Autowired
-	@Qualifier("signatureKeyStore")
-	EbMSKeyStore keyStore;
-	@Autowired
-	EbMSTrustStore trustStore;
 
 	@Bean
-	public EbMSSignatureGenerator signatureGenerator()
+	public EbMSSignatureGenerator signatureGenerator(@Qualifier("signatureKeyStore") EbMSKeyStore keyStore)
 	{
 		return new EbMSSignatureGenerator(cpaManager,keyStore);
 	}
 
 	@Bean
-	public EbMSSignatureValidator signatureValidator()
+	public EbMSSignatureValidator signatureValidator(EbMSTrustStore trustStore)
 	{
 		return new EbMSSignatureValidator(cpaManager,trustStore);
 	}

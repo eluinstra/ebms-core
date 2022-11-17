@@ -19,7 +19,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.InetAddress;
 import java.net.Socket;
-import java.net.UnknownHostException;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -143,7 +142,7 @@ public class SSLFactoryManager
 		}
 
 		@Override
-		public Socket createSocket(String host, int port) throws IOException, UnknownHostException
+		public Socket createSocket(String host, int port) throws IOException
 		{
 			val socket = (SSLSocket)sslSocketFactory.createSocket(host,port);
 			socket.setSSLParameters(sslParameters);
@@ -159,7 +158,7 @@ public class SSLFactoryManager
 		}
 
 		@Override
-		public Socket createSocket(String host, int port, InetAddress localHost, int localPort) throws IOException, UnknownHostException
+		public Socket createSocket(String host, int port, InetAddress localHost, int localPort) throws IOException
 		{
 			val socket = (SSLSocket)sslSocketFactory.createSocket(host,port,localHost,localPort);
 			socket.setSSLParameters(sslParameters);
@@ -210,7 +209,7 @@ public class SSLFactoryManager
 		sslSocketFactory = new SSLSocketFactoryWrapper(sslContext.getSocketFactory(),createSSLParameters());
 	}
 
-	public HostnameVerifier getHostnameVerifier(HttpsURLConnection connection)
+	public HostnameVerifier getHostnameVerifier()
 	{
 		return verifyHostnames ? HttpsURLConnection.getDefaultHostnameVerifier() : (h,s) -> true;
 	}

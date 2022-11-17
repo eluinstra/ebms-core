@@ -15,7 +15,6 @@
  */
 package nl.clockwork.ebms.validation;
 
-import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageHeader;
@@ -25,13 +24,11 @@ import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.val;
 import lombok.experimental.FieldDefaults;
-import lombok.extern.slf4j.Slf4j;
 import nl.clockwork.ebms.cpa.CPAManager;
 import nl.clockwork.ebms.cpa.CPAUtils;
 import nl.clockwork.ebms.model.EbMSBaseMessage;
 import nl.clockwork.ebms.util.StreamUtils;
 
-@Slf4j
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 class ClientCertificateValidator
@@ -46,6 +43,7 @@ class ClientCertificateValidator
 		@Override
 		public void validate(EbMSBaseMessage message) throws ValidatorException
 		{
+			// do nothing
 		}
 	}
 
@@ -71,18 +69,10 @@ class ClientCertificateValidator
 
 	private X509Certificate getClientCertificate(MessageHeader messageHeader)
 	{
-		try
-		{
-			val service = CPAUtils.toString(messageHeader.getService());
-			val deliveryChannel = cpaManager.getSendDeliveryChannel(messageHeader.getCPAId(),messageHeader.getFrom().getPartyId(),messageHeader.getFrom().getRole(),service,messageHeader.getAction())
-					.orElseThrow(() -> StreamUtils.illegalStateException("SendDeliveryChannel",messageHeader.getCPAId(),messageHeader.getFrom().getPartyId(),messageHeader.getFrom().getRole(),service,messageHeader.getAction()));
-			return CPAUtils.getX509Certificate(CPAUtils.getClientCertificate(deliveryChannel));
-		}
-		catch (CertificateException e)
-		{
-			log.warn("",e);
-			return null;
-		}
+		val service = CPAUtils.toString(messageHeader.getService());
+		val deliveryChannel = cpaManager.getSendDeliveryChannel(messageHeader.getCPAId(),messageHeader.getFrom().getPartyId(),messageHeader.getFrom().getRole(),service,messageHeader.getAction())
+				.orElseThrow(() -> StreamUtils.illegalStateException("SendDeliveryChannel",messageHeader.getCPAId(),messageHeader.getFrom().getPartyId(),messageHeader.getFrom().getRole(),service,messageHeader.getAction()));
+		return CPAUtils.getX509Certificate(CPAUtils.getClientCertificate(deliveryChannel));
 	}
 
 }

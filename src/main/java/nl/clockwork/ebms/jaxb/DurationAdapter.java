@@ -36,7 +36,7 @@ public class DurationAdapter extends XmlAdapter<String, java.time.Duration>
 		}
 		catch (DatatypeConfigurationException e)
 		{
-			throw new RuntimeException(e);
+			throw new IllegalStateException(e);
 		}
 	}
 	

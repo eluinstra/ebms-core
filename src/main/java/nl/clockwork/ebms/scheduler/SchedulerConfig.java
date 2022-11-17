@@ -22,7 +22,6 @@ import javax.sql.DataSource;
 
 import org.apache.commons.lang3.StringUtils;
 import org.quartz.spi.JobFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
@@ -76,11 +75,6 @@ public class SchedulerConfig
 		}
 	}
 
-	@Autowired
-	@Qualifier("dataSourceTransactionManager")
-	PlatformTransactionManager dataSourceTransactionManager;
-	@Autowired
-	DataSource dataSource;
 	@Value("${deliveryTaskHandler.type}")
 	DeliveryTaskHandlerType deliveryTaskHandlerType;
 	@Value("${deliveryTaskHandler.quartz.jdbc.driverClassName}")
@@ -116,7 +110,10 @@ public class SchedulerConfig
 
 	@Bean
 	@Conditional(QuartzTaskHandlerType.class)
-	public SchedulerFactoryBean scheduler(JobFactory jobFactory)
+	public SchedulerFactoryBean scheduler(
+		JobFactory jobFactory,
+		@Qualifier("dataSourceTransactionManager") PlatformTransactionManager dataSourceTransactionManager,
+		DataSource dataSource)
 	{
 		val result = new SchedulerFactoryBean();
     result.setQuartzProperties(quartzProperties());

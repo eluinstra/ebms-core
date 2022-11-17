@@ -119,12 +119,12 @@ public class EbMSMessageUtils
 	private static void setEbMSMessageBuilderHeader(EbMSMessageBuilder result, Object o)
 	{
 		Match(o).of(
-				Case($(instanceOf(MessageHeader.class)),p -> result.messageHeader(p)),
-				Case($(instanceOf(AckRequested.class)),p -> result.ackRequested(p)),
-				Case($(instanceOf(Acknowledgment.class)),p -> result.acknowledgment(p)),
-				Case($(instanceOf(ErrorList.class)),p -> result.errorList((ErrorList)p)),
-				Case($(instanceOf(SyncReply.class)),p -> result.syncReply(p)),
-				Case($(instanceOf(MessageOrder.class)),p -> result.messageOrder(p)),
+				Case($(instanceOf(MessageHeader.class)),result::messageHeader),
+				Case($(instanceOf(AckRequested.class)),result::ackRequested),
+				Case($(instanceOf(Acknowledgment.class)),result::acknowledgment),
+				Case($(instanceOf(ErrorList.class)),result::errorList),
+				Case($(instanceOf(SyncReply.class)),result::syncReply),
+				Case($(instanceOf(MessageOrder.class)),result::messageOrder),
 				Case($(instanceOf(JAXBElement.class)),p -> run(() ->
 				{
 					if (((JAXBElement<?>)p).getValue() instanceof SignatureType)
@@ -135,9 +135,9 @@ public class EbMSMessageUtils
 	private static void setEbMSMessageBuilderBody(EbMSMessageBuilder result, Object o)
 	{
 		Match(o).of(
-				Case($(instanceOf(Manifest.class)),p -> result.manifest(p)),
-				Case($(instanceOf(StatusRequest.class)),p -> result.statusRequest(p)),
-				Case($(instanceOf(StatusResponse.class)),p -> result.statusResponse(p)));
+				Case($(instanceOf(Manifest.class)),result::manifest),
+				Case($(instanceOf(StatusRequest.class)),result::statusRequest),
+				Case($(instanceOf(StatusResponse.class)),result::statusResponse));
 	}
 
 	public static String toString(PartyId partyId)
@@ -147,7 +147,7 @@ public class EbMSMessageUtils
 
 	public static String toString(List<PartyId> partyIds)
 	{
-		return partyIds.stream().map(p -> toString(p)).findFirst().orElse(null);
+		return partyIds.stream().map(EbMSMessageUtils::toString).findFirst().orElse(null);
 	}
 
 	public static String toString(Service service)
@@ -262,9 +262,7 @@ public class EbMSMessageUtils
 		val envelope = new Envelope();
 		envelope.setHeader(new Header());
 		envelope.setBody(new Body());
-		
 		envelope.getHeader().getAny().add(ebMSMessage.getMessageHeader());
-
 		if (ebMSMessage instanceof EbMSMessage)
 		{
 			envelope.getHeader().getAny().add(((EbMSMessage)ebMSMessage).getSyncReply());
@@ -280,7 +278,6 @@ public class EbMSMessageUtils
 			envelope.getBody().getAny().add(((EbMSStatusRequest)ebMSMessage).getStatusRequest());
 		else if (ebMSMessage instanceof EbMSStatusResponse)
 			envelope.getBody().getAny().add(((EbMSStatusResponse)ebMSMessage).getStatusResponse());
-		
 		val parser = JAXBParser.getInstance(
 				Envelope.class,
 				Envelope.class,

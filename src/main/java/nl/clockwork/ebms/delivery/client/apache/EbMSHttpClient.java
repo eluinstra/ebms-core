@@ -61,7 +61,7 @@ public class EbMSHttpClient implements EbMSClient
 
 	public EbMSDocument sendMessage(String uri, EbMSDocument document) throws EbMSProcessorException
 	{
-		try (val httpClient = getHttpClient(uri))
+		try (val httpClient = getHttpClient())
 		{
 			val httpPost = getHttpPost(uri);
 			val ebMSMessageWriter = new EbMSMessageWriter(httpPost,chunkedStreamingMode);
@@ -74,7 +74,7 @@ public class EbMSHttpClient implements EbMSClient
 		}
 	}
 	
-	private CloseableHttpClient getHttpClient(String uri)
+	private CloseableHttpClient getHttpClient()
 	{
 		val custom = HttpClients.custom().setSSLSocketFactory(sslConnectionSocketFactory);
 		if (proxy != null && proxy.useProxyAuthorization())

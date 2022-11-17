@@ -45,7 +45,6 @@ class EbMSHttpClient implements EbMSClient
 	int connectTimeout;
 	int readTimeout;
 	boolean chunkedStreamingMode;
-	boolean base64Writer;
 	EbMSProxy proxy;
 	List<Integer> recoverableHttpErrors;
 	List<Integer> unrecoverableHttpErrors;
@@ -54,37 +53,35 @@ class EbMSHttpClient implements EbMSClient
 	{
 		try
 		{
-			@Cleanup("disconnect") val connection = (HttpURLConnection)openConnection(uri);
-			connection.setConnectTimeout(connectTimeout);
-			connection.setReadTimeout(readTimeout);
-			if (chunkedStreaming(uri))
-				connection.setChunkedStreamingMode(0);
-			val writer = base64Writer ? new EbMSMessageBase64Writer(connection) : new EbMSMessageWriter(connection);
-			writer.write(document);
+			@Cleanup("disconnect") val connection = createConnection(uri);
+			new EbMSMessageWriter(connection).write(document);
 			connection.connect();
-			val handler = new EbMSResponseHandler(connection,recoverableHttpErrors,unrecoverableHttpErrors);
-			return handler.read();
+			return new EbMSResponseHandler(connection,recoverableHttpErrors,unrecoverableHttpErrors).read();
 		}
 		catch (IOException | TransformerException e)
 		{
 			throw new EbMSProcessingException(e);
 		}
 	}
-	
-	public boolean chunkedStreaming(String uri)
-	{
-		return chunkedStreamingMode;
-	}
 
+	private HttpURLConnection createConnection(String uri) throws IOException
+	{
+		val result = (HttpURLConnection)openConnection(uri);
+		result.setConnectTimeout(connectTimeout);
+		result.setReadTimeout(readTimeout);
+		if (chunkedStreamingMode)
+			result.setChunkedStreamingMode(0);
+		return result;
+	}
+	
 	private URLConnection openConnection(String uri) throws IOException
 	{
-		val url = new URL(uri);
-		val connection = openConnection(url);
+		val connection = openConnection(new URL(uri));
 		connection.setDoOutput(true);
 		//connection.setMethod("POST");
 		if (connection instanceof HttpsURLConnection)
 		{
-			((HttpsURLConnection)connection).setHostnameVerifier(sslFactoryManager.getHostnameVerifier((HttpsURLConnection)connection));
+			((HttpsURLConnection)connection).setHostnameVerifier(sslFactoryManager.getHostnameVerifier());
 			((HttpsURLConnection)connection).setSSLSocketFactory(sslFactoryManager.getSslSocketFactory());
 		}
 		return connection;

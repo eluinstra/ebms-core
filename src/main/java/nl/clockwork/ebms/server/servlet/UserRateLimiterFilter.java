@@ -49,8 +49,7 @@ public class UserRateLimiterFilter implements Filter
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException
 	{
 		val subject = Optional.ofNullable(ClientCertificateManager.getCertificate()).map(c -> c.getSubjectDN().toString()).orElse("");
-		if (!rateLimiters.containsKey(subject))
-			rateLimiters.put(subject,RateLimiter.create(queriesPerSecond));
+		rateLimiters.computeIfAbsent(subject,s -> RateLimiter.create(queriesPerSecond));
 		rateLimiters.get(subject).acquire();
 		chain.doFilter(request,response);
 	}

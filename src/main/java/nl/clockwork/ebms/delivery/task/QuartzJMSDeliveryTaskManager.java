@@ -44,6 +44,7 @@ public class QuartzJMSDeliveryTaskManager extends QuartzDeliveryTaskManager
 		jmsTemplate.send(JMSDeliveryTaskManager.JMS_DESTINATION_NAME,new DeliveryTaskMessageCreator(task));
 	}
 
+	@Override
 	protected Class<? extends Job> getJobClass()
 	{
 		return JMSJob.class;

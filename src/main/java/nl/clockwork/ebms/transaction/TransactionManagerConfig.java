@@ -21,7 +21,6 @@ import javax.jms.ConnectionFactory;
 import javax.sql.DataSource;
 import javax.transaction.SystemException;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Condition;
@@ -53,23 +52,20 @@ public class TransactionManagerConfig
 	{
 		DEFAULT, BITRONIX, ATOMIKOS;
 	}
+
 	@Value("${transactionManager.transactionTimeout}")
 	int transactionTimeout;
-	@Autowired
-	DataSource dataSource;
-	@Autowired
-	ConnectionFactory connectionFactory;
 
 	@Bean("dataSourceTransactionManager")
 	@Conditional(DefaultTransactionManagerType.class)
-	public PlatformTransactionManager dataSourceTransactionManager()
+	public PlatformTransactionManager dataSourceTransactionManager(DataSource dataSource)
 	{
 		return new DataSourceTransactionManager(dataSource);
 	}
 
 	@Bean("jmsTransactionManager")
 	@Conditional(DefaultTransactionManagerType.class)
-	public PlatformTransactionManager jmsTransactionManager()
+	public PlatformTransactionManager jmsTransactionManager(ConnectionFactory connectionFactory)
 	{
 		return new JmsTransactionManager(connectionFactory);
 	}
@@ -85,14 +81,24 @@ public class TransactionManagerConfig
 
 	@Bean(name = {"dataSourceTransactionManager","jmsTransactionManager"})
 	@Conditional(AtomikosTransactionManagerType.class)
-	public JtaTransactionManager AtomikosJtaTransactionManager() throws SystemException
+	public JtaTransactionManager atomikosJtaTransactionManager() throws SystemException
 	{
-		val transactionManager = new UserTransactionManager();
-		transactionManager.setTransactionTimeout(transactionTimeout);
-		transactionManager.setForceShutdown(false);
-		val userTransaction = new UserTransactionImp();
-		userTransaction.setTransactionTimeout(transactionTimeout);
-		return new JtaTransactionManager(userTransaction,transactionManager);
+		return new JtaTransactionManager(createUserTransaction(),createTransactionManager());
+	}
+
+	private UserTransactionImp createUserTransaction() throws SystemException
+	{
+		val result = new UserTransactionImp();
+		result.setTransactionTimeout(transactionTimeout);
+		return result;
+	}
+
+	private UserTransactionManager createTransactionManager() throws SystemException
+	{
+		val result = new UserTransactionManager();
+		result.setTransactionTimeout(transactionTimeout);
+		result.setForceShutdown(false);
+		return result;
 	}
 
 	@Conditional(BitronixTransactionManagerType.class)

@@ -16,7 +16,6 @@
 package nl.clockwork.ebms.delivery;
 
 import java.io.IOException;
-import java.security.cert.CertificateException;
 import java.util.Optional;
 
 import javax.xml.bind.JAXBException;
@@ -83,7 +82,7 @@ public class JMSDeliveryManager extends DeliveryManager
 			}
 			return Optional.empty();
 		}
-		catch (SOAPException | JAXBException | SAXException | IOException | TransformerException | CertificateException e)
+		catch (SOAPException | JAXBException | SAXException | IOException | TransformerException e)
 		{
 			throw new EbMSProcessingException(e);
 		}
@@ -115,7 +114,7 @@ public class JMSDeliveryManager extends DeliveryManager
 			log.info("Sending message " + response.getMessageHeader().getMessageData().getMessageId() + " to " + uri);
 			createClient(response.getMessageHeader()).sendMessage(uri,EbMSMessageUtils.getEbMSDocument(response));
 		}
-		catch (CertificateException | SOAPException | JAXBException | ParserConfigurationException | SAXException | IOException | TransformerFactoryConfigurationError | TransformerException e)
+		catch (SOAPException | JAXBException | ParserConfigurationException | SAXException | IOException | TransformerFactoryConfigurationError | TransformerException e)
 		{
 			throw new EbMSProcessingException(e);
 		}

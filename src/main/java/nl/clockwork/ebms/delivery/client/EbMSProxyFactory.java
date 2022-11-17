@@ -39,10 +39,7 @@ class EbMSProxyFactory implements FactoryBean<EbMSProxy>
 	@Override
 	public EbMSProxy getObject()
 	{
-		if (StringUtils.isNotBlank(host))
-			return EbMSProxy.of(host,port,username,password,nonProxyHosts);
-		else
-			return null;
+		return StringUtils.isNotBlank(host) ? EbMSProxy.of(host,port,username,password,nonProxyHosts) : null;
 	}
 
 	@Override

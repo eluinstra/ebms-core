@@ -69,7 +69,7 @@ public class CPAValidator
 	public void validate(CollaborationProtocolAgreement cpa) throws ValidatorException
 	{
 		if (!"2_0b".equals(cpa.getVersion()))
-			log.debug("CPA version " + cpa.getVersion() + " detected! CPA version 2_0b expected.");
+			log.debug("CPA version {} detected! CPA version 2_0b expected.", cpa.getVersion());
 		if (StatusValueType.PROPOSED.equals(cpa.getStatus().getValue()))
 			throw new ValidationException("CPA Status is proposed!");
 		if (!cpa.getStart().isBefore(cpa.getEnd()))
@@ -80,7 +80,7 @@ public class CPAValidator
 			log.debug("CPA Conversation Constraints not implemented!");
 		if (cpa.getSignature() != null)
 			log.debug("CPA Signature not implemented!");
-		if (cpa.getPackaging() != null && cpa.getPackaging().size() > 0)
+		if (cpa.getPackaging() != null && !cpa.getPackaging().isEmpty())
 			log.debug("Packaging not implemented!");
 		validateActions(cpa);
 		validateChannels(cpa);
@@ -100,34 +100,34 @@ public class CPAValidator
 
 	private void validateCanSend(CollaborationRole role, CanSend canSend)
 	{
-		if (canSend.getCanReceive() != null && canSend.getCanReceive().size() > 0)
-			log.debug("Nesting of actions under CanSend in Service " + CPAUtils.toString(role.getServiceBinding().getService()) +  " not supported!");
+		if (canSend.getCanReceive() != null && !canSend.getCanReceive().isEmpty())
+			log.debug("Nesting of actions under CanSend in Service {} not supported!",CPAUtils.toString(role.getServiceBinding().getService()));
 		if (canSend.getThisPartyActionBinding().getChannelId().size() > 1)
-			log.debug("Multiple channels per action as defined in Action " + canSend.getThisPartyActionBinding().getAction() + " of Service " + CPAUtils.toString(role.getServiceBinding().getService()) + " not supported! Using first channel.");
+			log.debug("Multiple channels per action as defined in Action {} of Service {} not supported! Using first channel.",canSend.getThisPartyActionBinding().getAction(),CPAUtils.toString(role.getServiceBinding().getService()));
 		if (canSend.getThisPartyActionBinding().getBusinessTransactionCharacteristics().isIsNonRepudiationReceiptRequired()
 				|| canSend.getThisPartyActionBinding().getBusinessTransactionCharacteristics().isIsIntelligibleCheckRequired()
 				|| canSend.getThisPartyActionBinding().getBusinessTransactionCharacteristics().getTimeToAcknowledgeReceipt() != null
 				|| canSend.getThisPartyActionBinding().getBusinessTransactionCharacteristics().getTimeToAcknowledgeAcceptance() != null
 				|| canSend.getThisPartyActionBinding().getBusinessTransactionCharacteristics().getRetryCount() != null)
-			log.debug("Business signals defined in Action " + canSend.getThisPartyActionBinding().getAction() + " of Service " + CPAUtils.toString(role.getServiceBinding().getService()) + " not supported!");
+			log.debug("Business signals defined in Action {} of Service {} not supported!",canSend.getThisPartyActionBinding().getAction(),CPAUtils.toString(role.getServiceBinding().getService()));
 		//if (canSend.getThisPartyActionBinding().getBusinessTransactionCharacteristics().isIsAuthorizationRequired())
-			//log.debug("Authorization Required defined in Action " + canSend.getThisPartyActionBinding().getAction() + " of Service " + CPAUtils.toString(role.getServiceBinding().getService()) + " ignored!");
+			// log.debug("Authorization Required defined in Action {} of Service {} ignored!",canSend.getThisPartyActionBinding().getAction(),CPAUtils.toString(role.getServiceBinding().getService()));
 	}
 
 	private void validateCanReceive(CollaborationRole role, CanReceive canReceive)
 	{
-		if (canReceive.getCanSend() != null && canReceive.getCanSend().size() > 0)
-			log.debug("Nesting of actions under CanReceive in Service " + CPAUtils.toString(role.getServiceBinding().getService()) +  " not supported!");
+		if (canReceive.getCanSend() != null && !canReceive.getCanSend().isEmpty())
+			log.debug("Nesting of actions under CanReceive in Service {} not supported!",CPAUtils.toString(role.getServiceBinding().getService()));
 		if (canReceive.getThisPartyActionBinding().getChannelId().size() > 1)
-			log.debug("Multiple channels per action as defined in Action " + canReceive.getThisPartyActionBinding().getAction() + " of Service " + CPAUtils.toString(role.getServiceBinding().getService()) + " not supported! Using first channel.");
+			log.debug("Multiple channels per action as defined in Action {} of Service {} not supported! Using first channel.",canReceive.getThisPartyActionBinding().getAction(),CPAUtils.toString(role.getServiceBinding().getService()));
 		if (canReceive.getThisPartyActionBinding().getBusinessTransactionCharacteristics().isIsNonRepudiationReceiptRequired()
 				|| canReceive.getThisPartyActionBinding().getBusinessTransactionCharacteristics().isIsIntelligibleCheckRequired()
 				|| canReceive.getThisPartyActionBinding().getBusinessTransactionCharacteristics().getTimeToAcknowledgeReceipt() != null
 				|| canReceive.getThisPartyActionBinding().getBusinessTransactionCharacteristics().getTimeToAcknowledgeAcceptance() != null
 				|| canReceive.getThisPartyActionBinding().getBusinessTransactionCharacteristics().getRetryCount() != null)
-			log.debug("Business signals defined in Action " + canReceive.getThisPartyActionBinding().getAction() + " of Service " + CPAUtils.toString(role.getServiceBinding().getService()) + " not supported!");
+			log.debug("Business signals defined in Action {} of Service {} not supported!",canReceive.getThisPartyActionBinding().getAction(),CPAUtils.toString(role.getServiceBinding().getService()));
 		//if (canReceive.getThisPartyActionBinding().getBusinessTransactionCharacteristics().isIsAuthorizationRequired())
-			//log.debug("Authorization Required defined in Action " + canReceive.getThisPartyActionBinding().getAction() + " of Service " + CPAUtils.toString(role.getServiceBinding().getService()) + " ignored!");
+			// log.debug("Authorization Required defined in Action {} of Service {} ignored!",canReceive.getThisPartyActionBinding().getAction(),CPAUtils.toString(role.getServiceBinding().getService()));
 	}
 
 	private void validateChannels(CollaborationProtocolAgreement cpa)
@@ -139,25 +139,25 @@ public class CPAValidator
 	{
 		if (((DocExchange)channel.getDocExchangeId()).getEbXMLSenderBinding().getReliableMessaging() != null
 				&& MessageOrderSemanticsType.GUARANTEED.equals(((DocExchange)channel.getDocExchangeId()).getEbXMLSenderBinding().getReliableMessaging().getMessageOrderSemantics()))
-			log.warn("Message Order as defined in DocExchange " + ((DocExchange)channel.getDocExchangeId()).getDocExchangeId() + " not implemented!");
+			log.warn("Message Order as defined in DocExchange {} not implemented!",((DocExchange)channel.getDocExchangeId()).getDocExchangeId());
 		if (SyncReplyModeType.SIGNALS_ONLY.equals(channel.getMessagingCharacteristics().getSyncReplyMode())
 				|| SyncReplyModeType.SIGNALS_AND_RESPONSE.equals(channel.getMessagingCharacteristics().getSyncReplyMode()))
-			log.debug("Business signals defined in Channel " + channel.getChannelId() + " not supported!");
+			log.debug("Business signals defined in Channel {} not supported!",channel.getChannelId());
 		if (PerMessageCharacteristicsType.NEVER.equals(channel.getMessagingCharacteristics().getDuplicateElimination()))
-			log.debug("Duplicate Elimination defined in Channel " + channel.getChannelId() + " always enabled!");
+			log.debug("Duplicate Elimination defined in Channel {} always enabled!",channel.getChannelId());
 		if (ActorType.URN_OASIS_NAMES_TC_EBXML_MSG_ACTOR_NEXT_MSH.equals(channel.getMessagingCharacteristics().getActor()))
 			log.warn("Actor NextMSH not supported!");
 		if (((DocExchange)channel.getDocExchangeId()).getEbXMLReceiverBinding().getReceiverDigitalEnvelope() != null)
 		{
 			if (((DocExchange)channel.getDocExchangeId()).getEbXMLReceiverBinding().getReceiverDigitalEnvelope().getDigitalEnvelopeProtocol() != null
 					&& !"XMLENC".equals(((DocExchange)channel.getDocExchangeId()).getEbXMLReceiverBinding().getReceiverDigitalEnvelope().getDigitalEnvelopeProtocol().getValue()))
-				log.warn("Digital Envelope Protocol" + ((DocExchange)channel.getDocExchangeId()).getEbXMLReceiverBinding().getReceiverDigitalEnvelope().getDigitalEnvelopeProtocol().getValue() + " not supported!");
+				log.warn("Digital Envelope Protocol {} not supported!",((DocExchange)channel.getDocExchangeId()).getEbXMLReceiverBinding().getReceiverDigitalEnvelope().getDigitalEnvelopeProtocol().getValue());
 			val encryptionAlgorithm = getEncryptionAlgorithm(((DocExchange)channel.getDocExchangeId()).getEbXMLReceiverBinding().getReceiverDigitalEnvelope().getEncryptionAlgorithm());
 			if (encryptionAlgorithm != null)
 				try
 				{
 					if (SecurityUtils.generateKey(encryptionAlgorithm) == null)
-						log.warn("Encryption Algorithm " + encryptionAlgorithm + " not supported!");
+						log.warn("Encryption Algorithm {} not supported!",encryptionAlgorithm);
 				}
 				catch (NoSuchAlgorithmException e)
 				{
@@ -168,7 +168,7 @@ public class CPAValidator
 
 	private String getEncryptionAlgorithm(List<EncryptionAlgorithm> encryptionAlgorithm)
 	{
-		if (encryptionAlgorithm != null && encryptionAlgorithm.size() > 0)
+		if (encryptionAlgorithm != null && !encryptionAlgorithm.isEmpty())
 			return encryptionAlgorithm.get(0).getW3C() == null ? encryptionAlgorithm.get(0).getValue() : encryptionAlgorithm.get(0).getW3C();
 		else
 			return null;
@@ -176,7 +176,7 @@ public class CPAValidator
 
 	private void validateTransports(CollaborationProtocolAgreement cpa)
 	{
-		cpa.getPartyInfo().stream().flatMap(p -> p.getTransport().stream()).forEach(t -> validateTransport(t));
+		cpa.getPartyInfo().stream().flatMap(p -> p.getTransport().stream()).forEach(this::validateTransport);
 	}
 
 	private void validateTransport(Transport t)
@@ -187,6 +187,5 @@ public class CPAValidator
 			log.warn("Transport protocol " + t.getTransportReceiver().getTransportProtocol().getValue() + " defined in TransportReceiver of Transport " + t.getTransportId() + " not implemented!");
 		if (t.getTransportReceiver().getEndpoint().size() > 1)
 			log.warn("Multiple endpoints defined in TransportReceiver of Transport " + t.getTransportId() + "not supported! Only allPurpose endpoint supported. Using first endpoint.");
-			return;
 	}
 }

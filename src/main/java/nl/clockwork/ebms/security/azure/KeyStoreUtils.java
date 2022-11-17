@@ -23,20 +23,21 @@ import java.security.Security;
 import com.azure.security.keyvault.jca.KeyVaultJcaProvider;
 import com.azure.security.keyvault.jca.KeyVaultLoadStoreParameter;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import lombok.val;
 
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class KeyStoreUtils
 {
 	public static KeyStore loadKeyStore(String keyvaultURI, String tennantID, String clientID, String clientSecret) throws GeneralSecurityException, IOException
 	{
 		if (Security.getProvider("AzureKeyVault") == null)
 			Security.addProvider(new KeyVaultJcaProvider());
-		
-		val keyStore = KeyStore.getInstance("AzureKeyVault");
+		val result = KeyStore.getInstance("AzureKeyVault");
 		// aadUri is niet verplicht, deze is alleen nodig voor de afwijkende security zones de speciale germany zone + ..
 		val parameter = new KeyVaultLoadStoreParameter(keyvaultURI, tennantID, clientID, clientSecret);
-		keyStore.load(parameter);
-		
-		return keyStore;
+		result.load(parameter);
+		return result;
 	}
 }

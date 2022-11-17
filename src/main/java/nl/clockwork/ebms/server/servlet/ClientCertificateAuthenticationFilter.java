@@ -75,11 +75,12 @@ public class ClientCertificateAuthenticationFilter implements Filter
 
 	private boolean validate(EbMSTrustStore trustStore, X509Certificate x509Certificate) throws KeyStoreException
 	{
-		return x509Certificate != null && trustStore.getCertificateAlias(x509Certificate) != null;
+		return x509Certificate != null && trustStore.getCertificateAlias(x509Certificate).isPresent();
 	}
 
 	@Override
 	public void destroy()
 	{
+		// do nothing
 	}
 }

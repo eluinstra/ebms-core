@@ -18,9 +18,6 @@ package nl.clockwork.ebms.processor;
 import java.time.Instant;
 import java.util.Optional;
 
-import javax.xml.bind.JAXBException;
-import javax.xml.datatype.DatatypeConfigurationException;
-
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageStatusType;
 
 import io.vavr.Tuple;
@@ -62,7 +59,7 @@ class StatusResponseProcessor
   @NonNull
   DeliveryManager deliveryManager;
 
-  public EbMSStatusResponse createStatusResponse(final EbMSStatusRequest statusRequest, final Instant timestamp) throws ValidatorException, DatatypeConfigurationException, JAXBException, EbMSProcessorException
+  public EbMSStatusResponse createStatusResponse(final EbMSStatusRequest statusRequest) throws ValidatorException, EbMSProcessorException
 	{
 		val p = ebMSDAO.getEbMSMessageProperties(statusRequest.getStatusRequest().getRefToMessageId()).orElse(null);
 		val result = createEbMSMessageStatusAndTimestamp(statusRequest,p);
@@ -81,11 +78,11 @@ class StatusResponseProcessor
 		deliveryManager.sendResponseMessage(uri,statusResponse);
 	}
 	
-  public void processStatusResponse(Instant timestamp, EbMSStatusResponse statusResponse)
+  public void processStatusResponse(EbMSStatusResponse statusResponse)
 	{
 		try
 		{
-			messageValidator.validate(statusResponse,timestamp);
+			messageValidator.validate(statusResponse);
 			deliveryManager.handleResponseMessage(statusResponse);
 		}
 		catch (ValidatorException e)

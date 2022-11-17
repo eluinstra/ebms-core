@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.codec.Base64InputStream;
@@ -42,26 +43,31 @@ class EbMSContentHandler implements ContentHandler
 	@Override
 	public void startMessage() throws MimeException
 	{
+		// do nothing
 	}
 
 	@Override
 	public void endMessage() throws MimeException
 	{
+		// do nothing
 	}
 
 	@Override
 	public void startBodyPart() throws MimeException
 	{
+		// do nothing
 	}
 
 	@Override
 	public void endBodyPart() throws MimeException
 	{
+		// do nothing
 	}
 
 	@Override
 	public void startHeader() throws MimeException
 	{
+		// do nothing
 	}
 
 	@Override
@@ -73,26 +79,31 @@ class EbMSContentHandler implements ContentHandler
 	@Override
 	public void endHeader() throws MimeException
 	{
+		// do nothing
 	}
 
 	@Override
 	public void preamble(InputStream is) throws MimeException, IOException
 	{
+		// do nothing
 	}
 
 	@Override
 	public void epilogue(InputStream is) throws MimeException, IOException
 	{
+		// do nothing
 	}
 
 	@Override
 	public void startMultipart(BodyDescriptor bd) throws MimeException
 	{
+		// do nothing
 	}
 
 	@Override
 	public void endMultipart() throws MimeException
 	{
+		// do nothing
 	}
 
 	@Override
@@ -102,7 +113,7 @@ class EbMSContentHandler implements ContentHandler
 		val contentId = getContentId();
 		val contentType = getContentType();
 		val content = applyTransferEncoding(is);
-		if (attachments.size() == 0)
+		if (attachments.isEmpty())
 			attachments.add(EbMSAttachmentFactory.createEbMSAttachment(filename,contentId,contentType,content));
 		else
 			attachments.add(EbMSAttachmentFactory.createCachedEbMSAttachment(filename,contentId,contentType,content));
@@ -112,6 +123,7 @@ class EbMSContentHandler implements ContentHandler
 	@Override
 	public void raw(InputStream is) throws MimeException, IOException
 	{
+		// do nothing
 	}
 
 	public List<EbMSAttachment> getAttachments()
@@ -123,7 +135,7 @@ class EbMSContentHandler implements ContentHandler
 	{
 		var result = headers.get(headerName);
 		if (result == null)
-			result = headers.entrySet().stream().filter(e -> headerName.equalsIgnoreCase(e.getKey())).findFirst().map(e -> e.getValue()).orElse(null);
+			result = headers.entrySet().stream().filter(e -> headerName.equalsIgnoreCase(e.getKey())).findFirst().map(Entry::getValue).orElse(null);
 		return result;
 	}
 

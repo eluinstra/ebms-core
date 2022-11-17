@@ -90,7 +90,7 @@ class DuplicateMessageHandler
 						.orElse(null);
 				val receiveDeliveryChannel = cpaManager.getReceiveDeliveryChannel(messageHeader.getCPAId(),messageHeader.getFrom().getPartyId(),messageHeader.getFrom().getRole(),service,null)
 						.orElse(null);
-				Runnable runnable = () ->
+				Runnable storeMessage = () ->
 				{
 					if (storeDuplicateMessage)
 						ebMSDAO.insertDuplicateMessage(timestamp,document.getMessage(),message,storeDuplicateMessageAttachments ? message.getAttachments() : Collections.emptyList());
@@ -105,7 +105,7 @@ class DuplicateMessageHandler
 										messageProperties.get().getTimestamp(),
 										false));
 				};
-				ebMSDAO.executeTransaction(runnable);
+				ebMSDAO.executeTransaction(storeMessage);
 				if (receiveDeliveryChannel == null && messageProperties.isPresent())
 					try
 					{

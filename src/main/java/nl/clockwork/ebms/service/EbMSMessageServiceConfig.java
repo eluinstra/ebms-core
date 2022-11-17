@@ -15,7 +15,6 @@
  */
 package nl.clockwork.ebms.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -35,39 +34,31 @@ import nl.clockwork.ebms.validation.MessagePropertiesValidator;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class EbMSMessageServiceConfig
 {
-	@Autowired
-	CPAManager cpaManager;
-	@Autowired
-	DeliveryManager deliveryManager;
-	@Autowired
-	EbMSDAO ebMSDAO;
-	@Autowired
-	MessageEventDAO messageEventDAO;
-	@Autowired
-	EbMSMessageFactory ebMSMessageFactory;
-	@Autowired
-	DeliveryTaskManager deliveryTaskManager;
-	@Autowired
-	MessagePropertiesValidator messagePropertiesValidator;
-	@Autowired
-	EbMSSignatureGenerator signatureGenerator;
 	@Value("${ebmsMessage.deleteContentOnProcessed}")
 	boolean deleteEbMSAttachmentsOnMessageProcessed;
 
 	@Bean
-	public EbMSMessageServiceImpl ebMSMessageService()
+	public EbMSMessageServiceImpl ebMSMessageService(EbMSMessageServiceHandler ebMSMessageServiceHandler)
 	{
-		return new EbMSMessageServiceImpl(ebMSMessageServiceHandler());
+		return new EbMSMessageServiceImpl(ebMSMessageServiceHandler);
 	}
 
 	@Bean
-	public EbMSMessageServiceMTOM ebMSMessageServiceMTOM()
+	public EbMSMessageServiceMTOM ebMSMessageServiceMTOM(EbMSMessageServiceHandler ebMSMessageServiceHandler)
 	{
-		return new EbMSMessageServiceMTOMImpl(ebMSMessageServiceHandler());
+		return new EbMSMessageServiceMTOMImpl(ebMSMessageServiceHandler);
 	}
 
 	@Bean
-	public EbMSMessageServiceHandler ebMSMessageServiceHandler()
+	public EbMSMessageServiceHandler ebMSMessageServiceHandler(
+		DeliveryManager deliveryManager,
+		EbMSDAO ebMSDAO,
+		MessageEventDAO messageEventDAO,
+		CPAManager cpaManager,
+		EbMSMessageFactory ebMSMessageFactory,
+		DeliveryTaskManager deliveryTaskManager,
+		MessagePropertiesValidator messagePropertiesValidator,
+		EbMSSignatureGenerator signatureGenerator)
 	{
 		return EbMSMessageServiceHandler.builder()
 				.deliveryManager(deliveryManager)

@@ -81,7 +81,7 @@ public class EbMSMessageFactory
 	public EbMSMessageError createEbMSMessageError(EbMSMessage message, ErrorList errorList, Instant timestamp) throws DatatypeConfigurationException, JAXBException
 	{
 		val messageHeader = createResponseMessageHeader(message.getMessageHeader(),timestamp,EbMSAction.MESSAGE_ERROR);
-		if (errorList.getError().size() == 0)
+		if (errorList.getError().isEmpty())
 		{
 			errorList.getError().add(EbMSMessageUtils.createError(
 					EbMSErrorCode.UNKNOWN.getErrorCode(),
@@ -203,7 +203,7 @@ public class EbMSMessageFactory
 					.messageHeader(createMessageHeader(messageRequest.getProperties()))
 					.ackRequested(createAckRequested(messageRequest.getProperties()))
 					.syncReply(createSyncReply(messageRequest.getProperties()));
-			if (messageRequest.getDataSources() != null && messageRequest.getDataSources().size() > 0)
+			if (messageRequest.getDataSources() != null && !messageRequest.getDataSources().isEmpty())
 			{
 				val manifest = EbMSMessageUtils.createManifest();
 				val attachments = messageRequest.getDataSources().stream()
@@ -235,7 +235,7 @@ public class EbMSMessageFactory
 					.messageHeader(createMessageHeader(message.getProperties()))
 					.ackRequested(createAckRequested(message.getProperties()))
 					.syncReply(createSyncReply(message.getProperties()));
-			if (message.getDataSources() != null && message.getDataSources().size() > 0)
+			if (message.getDataSources() != null && !message.getDataSources().isEmpty())
 			{
 				val manifest = EbMSMessageUtils.createManifest();
 				val attachments = message.getDataSources().stream()

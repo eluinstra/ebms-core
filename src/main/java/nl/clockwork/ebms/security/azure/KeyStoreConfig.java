@@ -40,16 +40,14 @@ public class KeyStoreConfig
 	String trustStorepath;
 	@Value("${truststore.password}")
 	String trustStorepassword;
-	
 	@Value("${azure.keyvault.uri}")
-    String keyvaultURI;
+  String keyvaultURI;
 	@Value("${azure.keyvault.tennantid}")
 	String tennantID;
 	@Value("${azure.keyvault.clientid}")
 	String clientID;
 	@Value("${azure.keyvault.client.secret}")
 	String clientSecret;
-	
 	@Value("${client.keystore.defaultAlias}")
 	String clientKeyStoreDefaultAlias;
 

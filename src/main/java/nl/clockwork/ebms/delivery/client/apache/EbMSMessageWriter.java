@@ -55,18 +55,18 @@ class EbMSMessageWriter
 		this(httpPost,true);
 	}
 
-	public void write(EbMSDocument document) throws IOException, TransformerException, UnsupportedEncodingException
+	public void write(EbMSDocument document) throws IOException, TransformerException
 	{
-		if (document.getAttachments().size() > 0)
-			writeMimeMessage(document);
-		else
+		if (document.getAttachments().isEmpty())
 			writeMessage(document);
+		else
+			writeMimeMessage(document);
 	}
 
 	protected void writeMessage(EbMSDocument document) throws UnsupportedEncodingException, TransformerException
 	{
 		if (messageLog.isInfoEnabled() && !wireLog.isDebugEnabled())
-			messageLog.info(">>>>\n" + DOMUtils.toString(document.getMessage()));
+			messageLog.info(">>>>\n{}",DOMUtils.toString(document.getMessage()));
 		httpPost.setHeader("SOAPAction",Constants.EBMS_SOAP_ACTION);
 		val entity = new StringEntity(DOMUtils.toString(document.getMessage(),"UTF-8"),"UTF-8");
 		entity.setContentType("text/xml");
@@ -77,19 +77,22 @@ class EbMSMessageWriter
 	protected void writeMimeMessage(EbMSDocument document) throws IOException, TransformerException
 	{
 		if (messageLog.isInfoEnabled() && !wireLog.isDebugEnabled())
-			messageLog.info(">>>>\n" + DOMUtils.toString(document.getMessage()));
+			messageLog.info(">>>>\n{}",DOMUtils.toString(document.getMessage()));
 		httpPost.setHeader("SOAPAction",Constants.EBMS_SOAP_ACTION);
 		val entity = MultipartEntityBuilder.create();
 		entity.setContentType(ContentType.create("multipart/related"));
 		entity.addPart(document.getContentId(),new StringBody(DOMUtils.toString(document.getMessage(),"UTF-8"),ContentType.create("text/xml")));
 		for (val attachment: document.getAttachments())
-		{
-			if (attachment.getContentType().matches("^(text/.*|.*/xml)$"))
-				writeTextAttachment(entity,attachment);
-			else
-				writeBinaryAttachment(entity,attachment);
-		}
+			writeAttachment(entity,attachment);
 		httpPost.setEntity(entity.build());
+	}
+
+	private void writeAttachment(final MultipartEntityBuilder entity, final EbMSAttachment attachment) throws IOException
+	{
+		if (attachment.getContentType().matches("^(text/.*|.*/xml)$"))
+			writeTextAttachment(entity,attachment);
+		else
+			writeBinaryAttachment(entity,attachment);
 	}
 
 	protected void writeTextAttachment(MultipartEntityBuilder entity, EbMSAttachment attachment) throws IOException

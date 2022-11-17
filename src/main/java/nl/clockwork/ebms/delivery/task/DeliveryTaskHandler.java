@@ -15,7 +15,6 @@
  */
 package nl.clockwork.ebms.delivery.task;
 
-import java.security.cert.CertificateException;
 import java.time.Instant;
 import java.util.concurrent.Future;
 
@@ -44,7 +43,6 @@ import nl.clockwork.ebms.encryption.EbMSMessageEncrypter;
 import nl.clockwork.ebms.event.MessageEventListener;
 import nl.clockwork.ebms.model.EbMSDocument;
 import nl.clockwork.ebms.processor.EbMSMessageProcessor;
-import nl.clockwork.ebms.processor.EbMSProcessingException;
 import nl.clockwork.ebms.util.LoggingUtils;
 import nl.clockwork.ebms.util.LoggingUtils.Status;
 import nl.clockwork.ebms.util.StreamUtils;
@@ -168,19 +166,12 @@ class DeliveryTaskHandler
 
 	private void sendMessage(final DeliveryTask task, DeliveryChannel receiveDeliveryChannel, final String url, EbMSDocument requestDocument)
 	{
-		try
-		{
-			if (task.isConfidential())
-				messageEncrypter.encrypt(receiveDeliveryChannel,requestDocument);
-			log.info("Sending message " + task.getMessageId() + " to " + url);
-			val responseDocument = createClient(task).sendMessage(url,requestDocument);
-			handleResponse(task,receiveDeliveryChannel,url,requestDocument,responseDocument);
-			log.info("Sent message " + task.getMessageId());
-		}
-		catch (CertificateException e)
-		{
-			throw new EbMSProcessingException(e);
-		}
+		if (task.isConfidential())
+			messageEncrypter.encrypt(receiveDeliveryChannel,requestDocument);
+		log.info("Sending message {} to {}",task.getMessageId(),url);
+		val responseDocument = createClient(task).sendMessage(url,requestDocument);
+		handleResponse(task,receiveDeliveryChannel,url,requestDocument,responseDocument);
+		log.info("Sent message {}",task.getMessageId());
 	}
 
 	private void handleResponse(final DeliveryTask task, DeliveryChannel receiveDeliveryChannel, final String url, EbMSDocument requestDocument, final nl.clockwork.ebms.model.EbMSDocument responseDocument)
@@ -200,12 +191,12 @@ class DeliveryTaskHandler
 		ebMSDAO.executeTransaction(runnable);
 	}
 
-	private EbMSClient createClient(DeliveryTask task) throws CertificateException
+	private EbMSClient createClient(DeliveryTask task)
 	{
 		String cpaId = task.getCpaId();
-		val sendDeliveryChannel = task.getSendDeliveryChannelId() != null ?
-				cpaManager.getDeliveryChannel(cpaId,task.getSendDeliveryChannelId())
-				.orElse(null) : null;
+		val sendDeliveryChannel = task.getSendDeliveryChannelId() != null
+				? cpaManager.getDeliveryChannel(cpaId,task.getSendDeliveryChannelId()).orElse(null)
+				: null;
 		return ebMSClientFactory.getEbMSClient(cpaId,sendDeliveryChannel);
 	}
 
@@ -213,9 +204,9 @@ class DeliveryTaskHandler
 	{
 		Runnable runnable = () ->
 		{
-			log.warn("Expiring message " +  task.getMessageId());
+			log.warn("Expiring message {}",task.getMessageId());
 			ebMSDAO.getEbMSDocumentIfUnsent(task.getMessageId()).ifPresent(d -> updateMessage(task.getMessageId()));
-			log.info("Finished task " + task);
+			log.info("Finished task {}",task);
 			deliveryTaskManager.deleteTask(task.getMessageId());
 		};
 		ebMSDAO.executeTransaction(runnable);

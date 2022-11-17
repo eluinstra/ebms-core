@@ -65,7 +65,7 @@ public class MessageQueue<T>
 		synchronized (queue)
 		{
 			if (queue.containsKey(correlationId))
-				throw new RuntimeException("key " + correlationId + " already exists!");
+				throw new IllegalStateException("key " + correlationId + " already exists!");
 			queue.put(correlationId,new QueueEntry<>(Thread.currentThread()));
 		}
 	}

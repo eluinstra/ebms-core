@@ -20,8 +20,6 @@ import static io.vavr.API.Case;
 import static io.vavr.API.Match;
 import static nl.clockwork.ebms.Predicates.startsWith;
 
-import java.io.IOException;
-
 import org.apache.activemq.xbean.BrokerFactoryBean;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.core.io.ClassPathResource;
@@ -42,7 +40,7 @@ class EbMSBrokerFactoryBean implements DisposableBean
 		}
 	}
 
-	private static Resource createResource(String path) throws IOException
+	private static Resource createResource(String path)
 	{
 		return Match(path).of(
 				Case($(startsWith("classpath:")),o -> new ClassPathResource(path.substring("classpath:".length()))),

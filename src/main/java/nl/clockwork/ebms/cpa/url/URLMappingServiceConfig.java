@@ -17,7 +17,6 @@ package nl.clockwork.ebms.cpa.url;
 
 import javax.sql.DataSource;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -30,23 +29,19 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class URLMappingServiceConfig
 {
-	@Autowired
-	DataSource dataSource;
-
 	@Bean
-	public URLMappingService urlMappingService()
+	public URLMappingService urlMappingService(URLMapper urlMapper)
 	{
-		return new URLMappingServiceImpl(urlMapper());
+		return new URLMappingServiceImpl(urlMapper);
 	}
 
 	@Bean
-	public URLMapper urlMapper()
+	public URLMapper urlMapper(DataSource dataSource)
 	{
-		return new URLMapper(urlMappingDAO());
+		return new URLMapper(urlMappingDAO(dataSource));
 	}
 
-	@Bean
-	public URLMappingDAO urlMappingDAO()
+	private URLMappingDAO urlMappingDAO(DataSource dataSource)
 	{
 		val jdbcTemplate = new JdbcTemplate(dataSource);
 		return new URLMappingDAOImpl(jdbcTemplate);

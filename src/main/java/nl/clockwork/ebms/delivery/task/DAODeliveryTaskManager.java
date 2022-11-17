@@ -62,15 +62,9 @@ class DAODeliveryTaskManager implements DeliveryTaskManager
 		deliveryTaskDAO.insertLog(task.getMessageId(),task.getTimestamp(),url,status,errorMessage);
 		val reliableMessaging = CPAUtils.isReliableMessaging(deliveryChannel);
 		if (task.getTimeToLive() != null && reliableMessaging)
-		{
-			val nextTask = createNextTask(task,deliveryChannel);
-			deliveryTaskDAO.updateTask(nextTask);
-		}
+			deliveryTaskDAO.updateTask(createNextTask(task,deliveryChannel));
 		else if (mustUpdate(task, reliableMessaging))
-		{
-			val nextTask = createNextTask(task,autoRetryInterval);
-			deliveryTaskDAO.updateTask(nextTask);
-		}
+			deliveryTaskDAO.updateTask(createNextTask(task,autoRetryInterval));
 		else
 			deliveryTaskDAO.deleteTask(task.getMessageId());
 	}

@@ -37,13 +37,14 @@ public interface DeliveryTaskManager
 	default DeliveryTask createNextTask(DeliveryTask task, DeliveryChannel deliveryChannel)
 	{
 		val rm = CPAUtils.getReceiverReliableMessaging(deliveryChannel);
-		val timestamp = task.getRetries() < rm.getRetries().intValue() ? Instant.now().plus(rm.getRetryInterval()) : task.getTimeToLive();
+		val timestamp = task.getRetries() < rm.getRetries().intValue()
+				? Instant.now().plus(rm.getRetryInterval())
+				: task.getTimeToLive();
 		return task.createNextTask(timestamp);
 	}
 
 	default DeliveryTask createNextTask(DeliveryTask task, long retryInterval)
 	{
-		val timestamp = Instant.now().plusSeconds(60 * retryInterval);
-		return task.createNextTask(timestamp);
+		return task.createNextTask(Instant.now().plusSeconds(60 * retryInterval));
 	}
 }

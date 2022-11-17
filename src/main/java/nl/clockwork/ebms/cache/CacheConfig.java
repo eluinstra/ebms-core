@@ -54,7 +54,7 @@ public class CacheConfig
 	@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 	@AllArgsConstructor
 	@Getter
-	public static enum CacheType
+	public enum CacheType
 	{
 		NONE(""),
 		DEFAULT(""),
@@ -74,11 +74,16 @@ public class CacheConfig
 	public CacheManager simpleCacheManager()
 	{
 		val result = new SimpleCacheManager();
-		val caches = new ArrayList<Cache>();
-		caches.add(new ConcurrentMapCache("CPA"));
-		caches.add(new ConcurrentMapCache("URLMapping"));
-		caches.add(new ConcurrentMapCache("CertificateMapping"));
-		result.setCaches(caches);
+		result.setCaches(createCaches());
+		return result;
+	}
+
+	private ArrayList<Cache> createCaches()
+	{
+		val result = new ArrayList<Cache>();
+		result.add(new ConcurrentMapCache("CPA"));
+		result.add(new ConcurrentMapCache("URLMapping"));
+		result.add(new ConcurrentMapCache("CertificateMapping"));
 		return result;
 	}
 
@@ -87,11 +92,16 @@ public class CacheConfig
 	public CacheManager ehcacheCacheManager()
 	{
 		val result = new EhCacheCacheManager();
-		val ehcacheManager = createEhCacheManager(getConfigLocation());
-		ehcacheManager.addCache("CPA");
-		ehcacheManager.addCache("URLMapping");
-		ehcacheManager.addCache("CertificateMapping");
-		result.setCacheManager(ehcacheManager);
+		result.setCacheManager(createCacheManager());
+		return result;
+	}
+
+	private net.sf.ehcache.CacheManager createCacheManager()
+	{
+		val result = createEhCacheManager(getConfigLocation());
+		result.addCache("CPA");
+		result.addCache("URLMapping");
+		result.addCache("CertificateMapping");
 		return result;
 	}
 

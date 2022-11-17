@@ -24,6 +24,7 @@ import java.util.List;
 
 import org.apache.xml.security.exceptions.XMLSecurityException;
 import org.apache.xml.security.signature.XMLSignature;
+import org.apache.xml.security.transforms.TransformationException;
 import org.apache.xml.security.transforms.Transforms;
 import org.apache.xml.security.transforms.params.XPathContainer;
 import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.AckRequested;
@@ -126,37 +127,54 @@ public class EbMSSignatureGenerator
 	
 	private void sign(EbMSKeyStore keyStore, KeyPair keyPair, String alias, Document document, List<EbMSAttachment> attachments, String signatureMethodAlgorithm, String digestAlgorithm) throws XMLSecurityException, KeyStoreException
 	{
-		val signature = new XMLSignature(document,null,signatureMethodAlgorithm,canonicalizationMethodAlgorithm);
-
-		val soapHeader = DOMUtils.getFirstChildElement(document.getDocumentElement());
-		soapHeader.appendChild(signature.getElement());
-		
-		val resolver = new EbMSAttachmentResolver(attachments);
-		signature.getSignedInfo().addResourceResolver(resolver);
-			
-		val transforms = new Transforms(document);
-		transforms.addTransform(Transforms.TRANSFORM_ENVELOPED_SIGNATURE);
-		transforms.addTransform(Transforms.TRANSFORM_XPATH,getXPathTransform(document));
-		transforms.addTransform(transformAlgorithm);
-		
-		signature.addDocument("",transforms,digestAlgorithm);
-		
+		val signature = createSignature(document,signatureMethodAlgorithm);
+		appendSignature(document,signature);
+		addAttachmentResolver(signature,attachments);
+		signature.addDocument("",createTransforms(document),digestAlgorithm);
 		for (val attachment: attachments)
 			signature.addDocument(Constants.CID + attachment.getContentId(),null,digestAlgorithm);
-		
 		signature.addKeyInfo(keyPair.getPublic());
-		
+		addCertificate(signature,keyStore,alias);
+		signature.sign(keyPair.getPrivate());
+	}
+
+	private XMLSignature createSignature(Document document, String signatureMethodAlgorithm) throws XMLSecurityException
+	{
+		return new XMLSignature(document,null,signatureMethodAlgorithm,canonicalizationMethodAlgorithm);
+	}
+
+	private void appendSignature(Document document, final XMLSignature signature)
+	{
+		val soapHeader = DOMUtils.getFirstChildElement(document.getDocumentElement());
+		soapHeader.appendChild(signature.getElement());
+	}
+
+	private void addAttachmentResolver(final XMLSignature signature, List<EbMSAttachment> attachments)
+	{
+		val resolver = new EbMSAttachmentResolver(attachments);
+		signature.getSignedInfo().addResourceResolver(resolver);
+	}
+
+	private Transforms createTransforms(Document document) throws XMLSecurityException
+	{
+		val result = new Transforms(document);
+		result.addTransform(Transforms.TRANSFORM_ENVELOPED_SIGNATURE);
+		result.addTransform(Transforms.TRANSFORM_XPATH,getXPathTransform(document));
+		result.addTransform(transformAlgorithm);
+		return result;
+	}
+	
+	private void addCertificate(final XMLSignature signature, EbMSKeyStore keyStore, String alias) throws KeyStoreException, XMLSecurityException
+	{
 		val certificates = keyStore.getCertificateChain(alias);
 		//Stream.of(certificates).forEach(ThrowingConsumer.throwingConsumerWrapper(c -> signature.addKeyInfo((X509Certificate)c)));
 		signature.addKeyInfo((X509Certificate)certificates[0]);
-
-		signature.sign(keyPair.getPrivate());
 	}
-	
+
 	private NodeList getXPathTransform(Document document) throws XMLSecurityException
 	{
-		var prefix = document.lookupPrefix(Constants.NSURI_SOAP_ENVELOPE);
-		prefix = prefix == null ? "" : prefix + ":";
+		val rawPrefix = document.lookupPrefix(Constants.NSURI_SOAP_ENVELOPE);
+		val prefix = rawPrefix == null ? "" : rawPrefix + ":";
 		val container = new XPathContainer(document);
 		//container.setXPathNamespaceContext(prefix,Constants.NSURI_SOAP_ENVELOPE);
 		container.setXPath("not(ancestor-or-self::node()[@" + prefix + "actor=\"urn:oasis:names:tc:ebxml-msg:actor:nextMSH\"]|ancestor-or-self::node()[@" + prefix + "actor=\"" + Constants.NSURI_SOAP_NEXT_ACTOR + "\"])");

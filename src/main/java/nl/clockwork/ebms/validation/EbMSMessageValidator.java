@@ -73,29 +73,29 @@ public class EbMSMessageValidator
 		signatureValidator.validateSignature(document,message);
 	}
 
-	public void validateMessageError(EbMSMessage requestMessage, EbMSMessageError responseMessage, Instant timestamp) throws ValidatorException
+	public void validateMessageError(EbMSMessage requestMessage, EbMSMessageError responseMessage) throws ValidatorException
 	{
 		if (isDuplicateMessage(responseMessage.getMessageHeader()))
 			throw new DuplicateMessageException();
 		clientCertificateValidator.validate(responseMessage);
 		messageHeaderValidator.validate(requestMessage,responseMessage);
-		messageHeaderValidator.validate(responseMessage,timestamp);
+		messageHeaderValidator.validate(responseMessage);
 	}
 
-	public void validateAcknowledgment(EbMSDocument responseDocument, EbMSMessage requestMessage, EbMSAcknowledgment responseMessage, Instant timestamp) throws ValidatorException
+	public void validateAcknowledgment(EbMSDocument responseDocument, EbMSMessage requestMessage, EbMSAcknowledgment responseMessage) throws ValidatorException
 	{
 		if (isDuplicateMessage(responseMessage.getMessageHeader()))
 			throw new DuplicateMessageException();
 		clientCertificateValidator.validate(responseMessage);
 		messageHeaderValidator.validate(requestMessage,responseMessage);
-		messageHeaderValidator.validate(responseMessage,timestamp);
+		messageHeaderValidator.validate(responseMessage);
 		signatureValidator.validate(responseDocument,requestMessage,responseMessage);
 	}
 
-	public void validate(EbMSBaseMessage message, Instant timestamp) throws ValidatorException
+	public void validate(EbMSBaseMessage message) throws ValidatorException
 	{
 		clientCertificateValidator.validate(message);
-		messageHeaderValidator.validate(message,timestamp);
+		messageHeaderValidator.validate(message);
 	}
 
 	public boolean isSyncReply(EbMSRequestMessage message)

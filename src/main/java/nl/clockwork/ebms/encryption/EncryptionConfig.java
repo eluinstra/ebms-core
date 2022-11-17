@@ -32,20 +32,15 @@ public class EncryptionConfig
 {
 	@Autowired
 	CPAManager cpaManager;
-	@Autowired
-	EbMSTrustStore trustStore;
-	@Autowired
-	@Qualifier("encryptionKeyStore")
-	EbMSKeyStore keyStore;
 
 	@Bean
-	public EbMSMessageEncrypter messageEncrypter()
+	public EbMSMessageEncrypter messageEncrypter(EbMSTrustStore trustStore)
 	{
 		return new EbMSMessageEncrypter(cpaManager,trustStore);
 	}
 
 	@Bean
-	public EbMSMessageDecrypter messageDecrypter()
+	public EbMSMessageDecrypter messageDecrypter(@Qualifier("encryptionKeyStore") EbMSKeyStore keyStore)
 	{
 		return new EbMSMessageDecrypter(cpaManager,keyStore);
 	}

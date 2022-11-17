@@ -90,5 +90,6 @@ public class ClientCertificateManagerFilter implements Filter
 	@Override
 	public void destroy()
 	{
+		// do nothing
 	}
 }

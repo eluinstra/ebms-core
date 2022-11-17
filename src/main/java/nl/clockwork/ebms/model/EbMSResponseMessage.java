@@ -22,7 +22,7 @@ public abstract class EbMSResponseMessage extends EbMSBaseMessage
 {
 	private static final long serialVersionUID = 1L;
 
-	public EbMSResponseMessage(MessageHeader messageHeader, SignatureType signature)
+	protected EbMSResponseMessage(MessageHeader messageHeader, SignatureType signature)
 	{
 		super(messageHeader,signature);
 	}

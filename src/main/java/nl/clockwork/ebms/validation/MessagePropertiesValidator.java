@@ -39,7 +39,7 @@ public class MessagePropertiesValidator
 			throw new ValidationException("No CPA found for cpaId=" + cpaId);
 		if (!cpaManager.existsPartyId(cpaId,fromPartyId))
 		{
-			val msg = new StringBuffer();
+			val msg = new StringBuilder();
 			msg.append("No fromParty found for");
 			msg.append(" cpaId=").append(cpaId);
 			msg.append(", fromPartyId=").append(fromPartyId);
@@ -47,7 +47,7 @@ public class MessagePropertiesValidator
 		}
 		if (!cpaManager.existsPartyId(cpaId,toPartyId))
 		{
-			val msg = new StringBuffer();
+			val msg = new StringBuilder();
 			msg.append("No toParty found for");
 			msg.append(" cpaId=").append(cpaId);
 			msg.append(", toPartyId=").append(toPartyId);

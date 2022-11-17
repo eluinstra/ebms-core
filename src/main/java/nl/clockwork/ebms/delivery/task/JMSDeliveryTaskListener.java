@@ -44,13 +44,13 @@ class JMSDeliveryTaskListener implements MessageListener
 		}
 		catch (JMSException e)
 		{
-			throw new RuntimeException(e);
+			throw new IllegalStateException(e);
 		}
 	}
 
 	private DeliveryTask createDeliveryTask(Message message) throws JMSException
 	{
-		val result = DeliveryTask.builder()
+		return DeliveryTask.builder()
 				.cpaId(message.getStringProperty("cpaId"))
 				.sendDeliveryChannelId(message.getStringProperty("sendDeliveryChannelId"))
 				.receiveDeliveryChannelId(message.getStringProperty("receiveDeliveryChannelId"))
@@ -60,6 +60,5 @@ class JMSDeliveryTaskListener implements MessageListener
 				.confidential(message.getBooleanProperty("confidential"))
 				.retries(message.getIntProperty("retries"))
 				.build();
-		return result;
 	}
 }

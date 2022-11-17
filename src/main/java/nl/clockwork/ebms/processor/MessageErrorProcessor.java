@@ -88,13 +88,13 @@ class MessageErrorProcessor
 				.orElse(null);
 		val receiveDeliveryChannel = cpaManager.getReceiveDeliveryChannel(messageHeader.getCPAId(),messageError.getMessageHeader().getTo().getPartyId(),messageError.getMessageHeader().getTo().getRole(),service,messageError.getMessageHeader().getAction())
 				.orElse(null);
-		Runnable runnable = () ->
+		Runnable storeMessage = () ->
 		{
 			storeMessages(timestamp,messageDocument,message,result,messageError);
 			if (receiveDeliveryChannel != null)
 				storeDeliveryTask(messageHeader.getCPAId(),sendDeliveryChannel,receiveDeliveryChannel,messageError,isSyncReply);
 		};
-		ebMSDAO.executeTransaction(runnable);
+		ebMSDAO.executeTransaction(storeMessage);
 		if (!isSyncReply && receiveDeliveryChannel == null)
 			throw new ValidationException(DOMUtils.toString(result.getMessage()));
 		return result;
@@ -130,8 +130,8 @@ class MessageErrorProcessor
 	{
 		try
 		{
-			messageValidator.validateMessageError(requestMessage,messageError,timestamp);
-			storeMessageError(timestamp,response,requestMessage,messageError);
+			messageValidator.validateMessageError(requestMessage,messageError);
+			storeMessageError(timestamp,response,messageError);
 		}
 		catch (DuplicateMessageException e)
 		{
@@ -149,15 +149,14 @@ class MessageErrorProcessor
 	{
 		val errorList = EbMSMessageUtils.createErrorList();
 		errorList.getError().add(e.getError());
-		val messageError = ebMSMessageFactory.createEbMSMessageError(message,errorList,timestamp);
-		return messageError;
+		return ebMSMessageFactory.createEbMSMessageError(message,errorList,timestamp);
 	}
 
-	public void storeMessageError(final Instant timestamp, final EbMSDocument messageErrorDocument, final EbMSMessage message, final EbMSMessageError messageError)
+	public void storeMessageError(final Instant timestamp, final EbMSDocument messageErrorDocument, final EbMSMessageError messageError)
 	{
 		val responseMessageHeader = messageError.getMessageHeader();
 		val persistTime = ebMSDAO.getPersistTime(responseMessageHeader.getMessageData().getRefToMessageId());
-		Runnable runnable = () ->
+		Runnable insertMessage = () ->
 		{
 			ebMSDAO.insertMessage(timestamp,persistTime.orElse(null),messageErrorDocument.getMessage(),messageError,Collections.emptyList(),null);
 			if (ebMSDAO.updateMessage(
@@ -170,6 +169,6 @@ class MessageErrorProcessor
 					ebMSDAO.deleteAttachments(responseMessageHeader.getMessageData().getRefToMessageId());
 			}
 		};
-		ebMSDAO.executeTransaction(runnable);
+		ebMSDAO.executeTransaction(insertMessage);
 	}
 }

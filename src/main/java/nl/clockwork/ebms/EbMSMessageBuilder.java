@@ -30,7 +30,11 @@ import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.SyncReply;
 import org.w3._2000._09.xmldsig.SignatureType;
 
 import static io.vavr.API.*;
+
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import lombok.NonNull;
+import lombok.experimental.FieldDefaults;
 import nl.clockwork.ebms.cpa.CPAUtils;
 import nl.clockwork.ebms.model.EbMSAcknowledgment;
 import nl.clockwork.ebms.model.EbMSAttachment;
@@ -43,24 +47,22 @@ import nl.clockwork.ebms.model.EbMSStatusRequest;
 import nl.clockwork.ebms.model.EbMSStatusResponse;
 import nl.clockwork.ebms.processor.EbMSProcessingException;
 
+@NoArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class EbMSMessageBuilder
 {
-	private MessageHeader messageHeader;
-	private SyncReply syncReply;
-	private MessageOrder messageOrder;
-	private AckRequested ackRequested;
-	private ErrorList errorList;
-	private Acknowledgment acknowledgment;
-	private Manifest manifest;
-	private StatusRequest statusRequest;
-	private StatusResponse statusResponse;
-	private SignatureType signature;
-	private boolean attachments$set;
-	private List<EbMSAttachment> attachments$value;
-
-	public EbMSMessageBuilder()
-	{
-	}
+	MessageHeader messageHeader;
+	SyncReply syncReply;
+	MessageOrder messageOrder;
+	AckRequested ackRequested;
+	ErrorList errorList;
+	Acknowledgment acknowledgment;
+	Manifest manifest;
+	StatusRequest statusRequest;
+	StatusResponse statusResponse;
+	SignatureType signature;
+	boolean attachments$set;
+	List<EbMSAttachment> attachments$value;
 
 	public EbMSMessageBuilder messageHeader(@NonNull final MessageHeader messageHeader)
 	{
@@ -134,7 +136,7 @@ public class EbMSMessageBuilder
 		try
 		{
 			List<EbMSAttachment> attachments$value = this.attachments$value;
-			if (!this.attachments$set) attachments$value = new ArrayList<EbMSAttachment>();
+			if (!this.attachments$set) attachments$value = new ArrayList<>();
 			if (!EbMSAction.EBMS_SERVICE_URI.equals(messageHeader.getService().getValue()))
 				return EbMSMessage.builder()
 						.messageHeader(messageHeader)

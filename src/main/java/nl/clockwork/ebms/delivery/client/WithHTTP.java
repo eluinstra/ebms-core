@@ -22,9 +22,9 @@ import java.util.stream.Stream;
 
 import org.springframework.util.StringUtils;
 
-public class HTTPUtils
+public interface WithHTTP
 {
-	public static String getCharSet(String contentType)
+	default String getCharSet(String contentType)
 	{
 		return Stream.of(contentType.replace(" ","").split(";"))
 				.filter(part -> part.startsWith("charset="))
@@ -33,7 +33,7 @@ public class HTTPUtils
 				.orElse(null);
 	}
 
-	public static String toString(Map<String,List<String>> properties)
+	default String toString(Map<String,List<String>> properties)
 	{
 		return properties.entrySet().stream()
 				.map(entry -> (entry.getKey() != null ? entry.getKey() + "=" : "") + StringUtils.collectionToCommaDelimitedString(entry.getValue()))

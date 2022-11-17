@@ -71,6 +71,7 @@ public class PlainEbMSAttachment implements EbMSAttachment
 	@Override
 	public void close()
 	{
+		// do nothing
 	}
 
 }

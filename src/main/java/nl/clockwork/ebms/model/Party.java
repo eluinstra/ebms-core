@@ -46,7 +46,7 @@ public class Party implements Serializable
 
 	public boolean matches(List<PartyId> partyIds)
 	{
-		if (partyId == null && (partyIds == null || partyIds.size() == 0))
+		if (partyId == null && (partyIds == null || partyIds.isEmpty()))
 			return true;
 		if (partyId == null || partyIds == null)
 			return false;

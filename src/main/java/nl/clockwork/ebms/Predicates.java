@@ -26,7 +26,7 @@ public final class Predicates
 {
 	public static Predicate<String> contains(String...values)
 	{
-		return obj -> Arrays.stream(values).anyMatch(v -> obj.contains(v));
+		return obj -> Arrays.stream(values).anyMatch(obj::contains);
 	}
 
 	public static Predicate<String> startsWith(String value)

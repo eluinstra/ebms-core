@@ -17,7 +17,6 @@ package nl.clockwork.ebms.delivery.client;
 
 import java.util.Set;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -42,8 +41,6 @@ public class EbMSClientConfig
 	int readTimeout;
 	@Value("${http.chunkedStreamingMode}")
 	boolean chunkedStreamingMode;
-	//@Value("${http.base64Writer}")
-	boolean base64Writer;
 	@Value("${http.proxy.host}")
 	String proxyHost;
 	@Value("${http.proxy.port}")
@@ -60,11 +57,6 @@ public class EbMSClientConfig
 	String[] enabledCipherSuites;
 	@Value("${https.verifyHostnames}")
 	boolean verifyHostnames;
-	@Autowired
-	@Qualifier("clientKeyStore")
-	EbMSKeyStore clientKeyStore;
-	@Autowired
-	EbMSTrustStore trustStore;
 	@Value("${http.errors.informational.recoverable}")
 	String recoverableInformationalHttpErrors;
 	@Value("${http.errors.redirection.recoverable}")
@@ -73,20 +65,20 @@ public class EbMSClientConfig
 	String recoverableClientHttpErrors;
 	@Value("${http.errors.server.unrecoverable}")
 	String unrecoverableServerHttpErrors;
-	@Autowired
-	CertificateMapper certificateMapper;
 	@Value("${https.useClientCertificate}")
 	boolean useClientCertificate;
 
 	@Bean
-	public EbMSHttpClientFactory ebMSClientFactory()
+	public EbMSHttpClientFactory ebMSClientFactory(
+		@Qualifier("clientKeyStore") EbMSKeyStore clientKeyStore,
+		EbMSTrustStore trustStore,
+		CertificateMapper certificateMapper)
 	{
 		return EbMSHttpClientFactory.builder()
 				.type(ebMSHttpClientType)
 				.connectTimeout(connectTimeout)
 				.readTimeout(readTimeout)
 				.chunkedStreamingMode(chunkedStreamingMode)
-				.base64Writer(base64Writer)
 				.proxy(createProxy())
 				.enabledProtocols(enabledProtocols)
 				.enabledCipherSuites(enabledCipherSuites)

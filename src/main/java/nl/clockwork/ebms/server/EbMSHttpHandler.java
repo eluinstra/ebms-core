@@ -57,7 +57,7 @@ public class EbMSHttpHandler
 				public List<String> getRequestHeaders(String headerName)
 				{
 					val result = new ArrayList<String>();
-					val headers = ((HttpServletRequest)request).getHeaders(headerName);
+					val headers = request.getHeaders(headerName);
 					while(headers.hasMoreElements())
 						result.add((String)headers.nextElement());
 					return result;

@@ -63,7 +63,7 @@ public class EbMSKeyStore
 		return keyStores.get(key);
 	}
 
-	public EbMSKeyStore(@NonNull String path, @NonNull KeyStore keyStore, String keyPassword, String defaultAlias) throws GeneralSecurityException, IOException
+	public EbMSKeyStore(@NonNull String path, @NonNull KeyStore keyStore, String keyPassword, String defaultAlias)
 	{
 		this.path = path;
 		this.keyStore = keyStore;

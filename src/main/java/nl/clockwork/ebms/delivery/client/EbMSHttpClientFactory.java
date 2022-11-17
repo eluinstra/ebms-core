@@ -16,7 +16,6 @@
 package nl.clockwork.ebms.delivery.client;
 
 import java.security.KeyStoreException;
-import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -52,7 +51,6 @@ public class EbMSHttpClientFactory
 	int connectTimeout;
 	int readTimeout;
 	boolean chunkedStreamingMode;
-	boolean base64Writer;
 	EbMSProxy proxy;
 	String[] enabledProtocols;
 	String[] enabledCipherSuites;
@@ -66,7 +64,7 @@ public class EbMSHttpClientFactory
 	boolean useClientCertificate;
 	@NonNull
 	@Default
-	Map<String,EbMSClient> clients = new ConcurrentHashMap<String,EbMSClient>();
+	Map<String,EbMSClient> clients = new ConcurrentHashMap<>();
 
 	private EbMSClient createEbMSClient(String clientAlias)
 	{
@@ -76,19 +74,18 @@ public class EbMSHttpClientFactory
 			if (EbMSHttpClientType.APACHE.equals(type))
 				return new nl.clockwork.ebms.delivery.client.apache.EbMSHttpClient(sslFactoryManager,enabledProtocols,enabledCipherSuites,verifyHostnames,connectTimeout,readTimeout,chunkedStreamingMode,proxy);
 			else
-				return new EbMSHttpClient(sslFactoryManager,connectTimeout,readTimeout,chunkedStreamingMode,base64Writer,proxy,httpErrors.getRecoverableHttpErrors(),httpErrors.getUnrecoverableHttpErrors());
+				return new EbMSHttpClient(sslFactoryManager,connectTimeout,readTimeout,chunkedStreamingMode,proxy,httpErrors.getRecoverableHttpErrors(),httpErrors.getUnrecoverableHttpErrors());
 		}
 		catch (Exception e)
 		{
-			throw new RuntimeException(e);
+			throw new IllegalStateException(e);
 		}
 	}
 
 	public EbMSClient getEbMSClient(String clientAlias)
 	{
 		val key = clientAlias == null ? "" : clientAlias;
-		if (!clients.containsKey(key))
-			clients.put(key,createEbMSClient(clientAlias));
+		clients.computeIfAbsent(key, k -> createEbMSClient(clientAlias));
 		return clients.get(key);
 	}
 
@@ -100,20 +97,24 @@ public class EbMSHttpClientFactory
 			val clientAlias = clientCertificate != null ? keyStore.getCertificateAlias(clientCertificate) : null;
 			return getEbMSClient(clientAlias);
 		}
-		catch (CertificateException | KeyStoreException e)
+		catch (KeyStoreException e)
 		{
-			throw new RuntimeException(e);
+			throw new IllegalStateException(e);
 		}
 	}
 
 	private String getClientAlias(String clientAlias)
 	{
-		return clientAlias == null && StringUtils.isNotEmpty(keyStore.getDefaultAlias()) ? keyStore.getDefaultAlias() : clientAlias;
+		return clientAlias == null && StringUtils.isNotEmpty(keyStore.getDefaultAlias())
+				? keyStore.getDefaultAlias()
+				: clientAlias;
 	}
 
-	private X509Certificate getClientCertificate(String cpaId, DeliveryChannel deliveryChannel) throws CertificateException
+	private X509Certificate getClientCertificate(String cpaId, DeliveryChannel deliveryChannel)
 	{
-		return useClientCertificate && deliveryChannel != null ? certificateMapper.getCertificate(CPAUtils.getX509Certificate(CPAUtils.getClientCertificate(deliveryChannel)),cpaId) : null;
+		return useClientCertificate && deliveryChannel != null
+				? certificateMapper.getCertificate(CPAUtils.getX509Certificate(CPAUtils.getClientCertificate(deliveryChannel)),cpaId)
+				: null;
 	}
 
 	private SSLFactoryManager createSslFactoryManager(String clientAlias) throws Exception

@@ -15,7 +15,6 @@
  */
 package nl.clockwork.ebms.cpa;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -27,13 +26,8 @@ import nl.clockwork.ebms.validation.CPAValidator;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class CPAServiceConfig
 {
-	@Autowired
-	CPAManager cpaManager;
-	@Autowired
-	CPAValidator cpaValidator;
-
 	@Bean
-	public CPAService cpaService()
+	public CPAService cpaService(CPAManager cpaManager, CPAValidator cpaValidator)
 	{
 		return new CPAServiceImpl(cpaManager,cpaValidator);
 	}

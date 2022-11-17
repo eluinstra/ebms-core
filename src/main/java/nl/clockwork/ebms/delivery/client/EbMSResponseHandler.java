@@ -25,9 +25,9 @@ import javax.servlet.http.HttpServletResponse;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.util.StringUtils;
 import org.xml.sax.SAXException;
 
 import lombok.AccessLevel;
@@ -43,7 +43,7 @@ import nl.clockwork.ebms.processor.EbMSProcessorException;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor
-class EbMSResponseHandler
+class EbMSResponseHandler implements WithHTTP
 {
 	private static final Logger messageLog = LoggerFactory.getLogger(Constants.MESSAGE_LOG);
 	@NonNull
@@ -118,10 +118,9 @@ class EbMSResponseHandler
 		try (val input = connection.getErrorStream())
 		{
 			val response = readResponse(connection,input);
-			if (recoverableHttpErrors.contains(connection.getResponseCode()))
-				return new EbMSResponseException(connection.getResponseCode(),connection.getHeaderFields(),response);
-			else
-				return new EbMSUnrecoverableResponseException(connection.getResponseCode(),connection.getHeaderFields(),response);
+			return recoverableHttpErrors.contains(connection.getResponseCode())
+					? new EbMSResponseException(connection.getResponseCode(),connection.getHeaderFields(),response)
+					: new EbMSUnrecoverableResponseException(connection.getResponseCode(),connection.getHeaderFields(),response);
 		}
 	}
 
@@ -130,10 +129,9 @@ class EbMSResponseHandler
 		try (val input = connection.getErrorStream())
 		{
 			val response = readResponse(connection,input);
-			if (unrecoverableHttpErrors.contains(connection.getResponseCode()))
-				return new EbMSUnrecoverableResponseException(connection.getResponseCode(),connection.getHeaderFields(),response);
-			else
-				return new EbMSResponseException(connection.getResponseCode(),connection.getHeaderFields(),response);
+			return unrecoverableHttpErrors.contains(connection.getResponseCode())
+					? new EbMSUnrecoverableResponseException(connection.getResponseCode(),connection.getHeaderFields(),response)
+					: new EbMSResponseException(connection.getResponseCode(),connection.getHeaderFields(),response);
 		}
 	}
 
@@ -152,7 +150,7 @@ class EbMSResponseHandler
 	{
 		val contentType = getHeaderField("Content-Type");
 		if (!StringUtils.isEmpty(contentType))
-			return HTTPUtils.getCharSet(contentType);
+			return getCharSet(contentType);
 		else
 			throw new EbMSProcessingException("HTTP header Content-Type is not set!");
 	}
@@ -169,8 +167,8 @@ class EbMSResponseHandler
 
 	private void logResponse(HttpURLConnection connection, String response) throws IOException
 	{
-		val headers = connection.getResponseCode() + (messageLog.isDebugEnabled() ? "\n" + HTTPUtils.toString(connection.getHeaderFields()) : "");
-		messageLog.info("<<<<\nStatusCode=" + headers + (response != null ? "\n" + response : ""));
+		val headers = connection.getResponseCode() + (messageLog.isDebugEnabled() ? "\n" + toString(connection.getHeaderFields()) : "");
+		messageLog.info("<<<<\nStatusCode={}{}",headers,(response != null ? "\n" + response : ""));
 	}
 
 }

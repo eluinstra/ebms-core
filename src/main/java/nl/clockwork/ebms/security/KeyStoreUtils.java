@@ -22,17 +22,20 @@ import java.io.InputStream;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import lombok.val;
 
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class KeyStoreUtils
 {
 	public static KeyStore loadKeyStore(KeyStoreType type, String location, String password) throws GeneralSecurityException, IOException
 	{
 		try (val in = getInputStream(location))
 		{
-			val keyStore = KeyStore.getInstance(type.name());
-			keyStore.load(in,password.toCharArray());
-			return keyStore;
+			val result = KeyStore.getInstance(type.name());
+			result.load(in,password.toCharArray());
+			return result;
 		}
 	}
 

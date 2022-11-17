@@ -44,6 +44,7 @@ public class QuartzKafkaDeliveryTaskManager extends QuartzDeliveryTaskManager
 		kafkaTemplate.send(KAFKA_TOPIC_NAME,task);
 	}
 
+	@Override
 	protected Class<? extends Job> getJobClass()
 	{
 		return KafkaJob.class;

@@ -18,9 +18,12 @@ package nl.clockwork.ebms.security.azure;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import nl.clockwork.ebms.security.EbMSKeyStore;
 
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class AzureKeyStore
 {
 	private static EbMSKeyStore keyStore = null;

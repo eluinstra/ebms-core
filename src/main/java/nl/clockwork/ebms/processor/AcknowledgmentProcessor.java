@@ -79,16 +79,16 @@ class AcknowledgmentProcessor
 
 	public EbMSDocument processAcknowledgment(final Instant timestamp, final EbMSDocument messageDocument, final EbMSMessage message, final boolean isSyncReply) throws SOAPException, JAXBException, ParserConfigurationException, SAXException, IOException, TransformerFactoryConfigurationError, TransformerException
 	{
-		val acknowledgment = createAcknowledgment(timestamp,messageDocument,message);
+		val acknowledgment = createAcknowledgment(timestamp,message);
 		val acknowledgmentDocument = EbMSMessageUtils.getEbMSDocument(acknowledgment);
 		signatureGenerator.generate(message.getAckRequested(),acknowledgmentDocument,acknowledgment);
-		Runnable runnable = () ->
+		Runnable storeMessages = () ->
 		{
 			storeMessages(timestamp,messageDocument,message,acknowledgmentDocument,acknowledgment);
 			storeDeliveryTask(acknowledgment,isSyncReply);
 			messageEventListener.onMessageReceived(message.getMessageHeader().getMessageData().getMessageId());
 		};
-		ebMSDAO.executeTransaction(runnable);
+		ebMSDAO.executeTransaction(storeMessages);
 		return acknowledgmentDocument;
 	}
 
@@ -130,8 +130,8 @@ class AcknowledgmentProcessor
 	{
 		try
 		{
-			messageValidator.validateAcknowledgment(acknowledgmentDocument,requestMessage,acknowledgment,timestamp);
-			storeAcknowledgment(timestamp,requestMessage,acknowledgmentDocument,acknowledgment);
+			messageValidator.validateAcknowledgment(acknowledgmentDocument,requestMessage,acknowledgment);
+			storeAcknowledgment(timestamp,acknowledgmentDocument,acknowledgment);
 		}
 		catch (DuplicateMessageException e)
 		{
@@ -145,16 +145,16 @@ class AcknowledgmentProcessor
 		}
 	}
 
-	public EbMSAcknowledgment createAcknowledgment(final Instant timestamp, final EbMSDocument messageDocument, final EbMSMessage message)
+	public EbMSAcknowledgment createAcknowledgment(final Instant timestamp, final EbMSMessage message)
 	{
 		return ebMSMessageFactory.createEbMSAcknowledgment(message,timestamp);
 	}
 
-	public void storeAcknowledgment(final Instant timestamp, final EbMSMessage message, final EbMSDocument acknowledgmentDocument, final EbMSAcknowledgment acknowledgment) throws EbMSProcessingException
+	public void storeAcknowledgment(final Instant timestamp, final EbMSDocument acknowledgmentDocument, final EbMSAcknowledgment acknowledgment) throws EbMSProcessingException
 	{
 		val responseMessageHeader = acknowledgment.getMessageHeader();
 		val persistTime = ebMSDAO.getPersistTime(responseMessageHeader.getMessageData().getRefToMessageId());
-		Runnable runnable = () ->
+		Runnable storeMessage = () ->
 		{
 			ebMSDAO.insertMessage(timestamp,persistTime.orElse(null),acknowledgmentDocument.getMessage(),acknowledgment,Collections.emptyList(),null);
 			if (ebMSDAO.updateMessage(
@@ -167,6 +167,6 @@ class AcknowledgmentProcessor
 					ebMSDAO.deleteAttachments(responseMessageHeader.getMessageData().getRefToMessageId());
 			}
 		};
-		ebMSDAO.executeTransaction(runnable);
+		ebMSDAO.executeTransaction(storeMessage);
 	}
 }

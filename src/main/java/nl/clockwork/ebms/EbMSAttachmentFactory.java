@@ -76,7 +76,7 @@ public class EbMSAttachmentFactory
 		return createCachedEbMSAttachment(dataHandler.getName(),contentId,dataHandler.getContentType(),dataHandler.getInputStream());
 	}
 
-	public static EbMSAttachment createCachedEbMSAttachment(String filename, String contentId, String contentType, CachedOutputStream content) throws IOException
+	public static EbMSAttachment createCachedEbMSAttachment(String filename, String contentId, String contentType, CachedOutputStream content)
 	{
 		return new CachedEbMSAttachment(filename,contentId,contentType,content);
 	}

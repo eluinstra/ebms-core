@@ -50,7 +50,7 @@ public class XSDValidator
 		}
 		catch (SAXException e)
 		{
-			throw new RuntimeException(e);
+			throw new IllegalStateException(e);
 		}
 	}
 	

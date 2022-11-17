@@ -20,11 +20,15 @@ import java.security.KeyPair;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
+import java.security.cert.Certificate;
 import java.security.cert.CertificateExpiredException;
 import java.security.cert.CertificateNotYetValidException;
 import java.security.cert.X509Certificate;
 import java.time.Instant;
 import java.util.Date;
+import java.util.Optional;
+import java.util.function.Function;
+import java.util.function.Predicate;
 
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
@@ -35,6 +39,7 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.val;
 import lombok.extern.slf4j.Slf4j;
+import nl.clockwork.ebms.processor.EbMSProcessorException;
 import nl.clockwork.ebms.security.EbMSKeyStore;
 import nl.clockwork.ebms.security.EbMSTrustStore;
 import nl.clockwork.ebms.validation.ValidationException;
@@ -66,31 +71,56 @@ public class SecurityUtils
 		{
 			certificate.checkValidity(Date.from(date));
 			val aliases = trustStore.aliases();
-			while (aliases.hasMoreElements())
-			{
-				try
-				{
-					val c = trustStore.getCertificate(aliases.nextElement());
-					if (c instanceof X509Certificate)
-						if (certificate.getIssuerDN().getName().equals(((X509Certificate)c).getSubjectDN().getName()))
-						{
-							certificate.verify(c.getPublicKey());
-							return;
-						}
-				}
-				catch (GeneralSecurityException e)
-				{
-					log.trace("",e);
-				}
-			}
-			throw new ValidationException("Certificate " + certificate.getIssuerDN() + " not found!");
+			StreamUtils.toStream(aliases.asIterator())
+					.map(findCertificate(trustStore))
+					.flatMap(Optional::stream)
+					.filter(matches(certificate))
+					.filter(verifyWith(certificate))
+					.findAny()
+					.orElseThrow(() -> new ValidationException("Certificate " + certificate.getIssuerDN() + " not found!"));
 		}
 		catch (CertificateExpiredException | CertificateNotYetValidException e)
 		{
 			throw new ValidationException(e);
 		}
 	}
+
+	private static Function<String,Optional<Certificate>> findCertificate(EbMSTrustStore trustStore)
+	{
+		return alias -> {
+			try
+			{
+				return trustStore.getCertificate(alias);
+			}
+			catch (KeyStoreException e)
+			{
+				throw new EbMSProcessorException(e);
+			}
+		};
+	}
+
+	private static Predicate<? super Certificate> matches(X509Certificate certificate)
+	{
+		return c -> c instanceof X509Certificate && certificate.getIssuerDN().getName().equals(((X509Certificate)c).getSubjectDN().getName());
+	}
 	
+	private static Predicate<? super Certificate> verifyWith(X509Certificate certificate)
+	{
+		return c -> 
+		{
+			try
+			{
+				certificate.verify(c.getPublicKey());
+				return true;
+			}
+			catch (GeneralSecurityException e)
+			{
+				log.warn("",e);
+				return false;
+			}
+		};
+	}
+
 	public static SecretKey generateKey(String encryptionAlgorithm) throws NoSuchAlgorithmException
 	{
 		switch (encryptionAlgorithm)

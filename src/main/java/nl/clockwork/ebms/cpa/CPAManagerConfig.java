@@ -17,7 +17,6 @@ package nl.clockwork.ebms.cpa;
 
 import javax.sql.DataSource;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -31,19 +30,13 @@ import nl.clockwork.ebms.cpa.url.URLMapper;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class CPAManagerConfig
 {
-	@Autowired
-	URLMapper urlMapper;
-	@Autowired
-	DataSource dataSource;
-
 	@Bean
-	public CPAManager cpaManager()
+	public CPAManager cpaManager(DataSource dataSource, URLMapper urlMapper)
 	{
-		return new CPAManager(cpaDAO(),urlMapper);
+		return new CPAManager(cpaDAO(dataSource),urlMapper);
 	}
 
-	@Bean
-	public CPADAO cpaDAO()
+	private CPADAO cpaDAO(DataSource dataSource)
 	{
 		val jdbcTemplate = new JdbcTemplate(dataSource);
 		return new CPADAOImpl(jdbcTemplate);

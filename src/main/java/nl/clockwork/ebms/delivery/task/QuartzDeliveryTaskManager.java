@@ -22,6 +22,7 @@ import java.time.Instant;
 import java.util.Collections;
 import java.util.Date;
 
+import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DeliveryChannel;
 import org.quartz.Job;
 import org.quartz.JobDataMap;
 import org.quartz.JobDetail;
@@ -35,6 +36,7 @@ import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.val;
 import lombok.experimental.FieldDefaults;
+import nl.clockwork.ebms.EbMSAction;
 import nl.clockwork.ebms.cpa.CPAManager;
 import nl.clockwork.ebms.cpa.CPAUtils;
 import nl.clockwork.ebms.dao.EbMSDAO;
@@ -91,41 +93,52 @@ public class QuartzDeliveryTaskManager implements DeliveryTaskManager
 	@Override
 	public void updateTask(DeliveryTask task, String url, DeliveryTaskStatus status, String errorMessage)
 	{
+		val deliveryChannel = cpaManager.getDeliveryChannel(
+				task.getCpaId(),
+				task.getReceiveDeliveryChannelId())
+					.orElseThrow(() -> StreamUtils.illegalStateException("DeliveryChannel",task.getCpaId(),task.getReceiveDeliveryChannelId()));
+		deliveryTaskDAO.insertLog(task.getMessageId(),task.getTimestamp(),url,status,errorMessage);
+		val reliableMessaging = CPAUtils.isReliableMessaging(deliveryChannel);
+		if (task.getTimeToLive() != null && reliableMessaging)
+			scheduleNextTask(task,deliveryChannel);
+		else
+		{
+			ebMSDAO.getMessageAction(task.getMessageId())
+					.filter(action -> action == EbMSAction.ACKNOWLEDGMENT || action == EbMSAction.MESSAGE_ERROR)
+					.ifPresent(action ->
+					{
+						if (!reliableMessaging && task.getRetries() < nrAutoRetries)
+							scheduleNextTask(task);
+					});
+		}
+	}
+
+	private void scheduleNextTask(DeliveryTask task, final DeliveryChannel deliveryChannel)
+	{
+		val nextTask = createNextTask(task,deliveryChannel);
+		val trigger = newTrigger()
+				.withIdentity(TriggerKey.triggerKey(nextTask.getMessageId()))
+				.startAt(Date.from(nextTask.getTimestamp()))
+				.build();
 		try
 		{
-			val deliveryChannel = cpaManager.getDeliveryChannel(
-					task.getCpaId(),
-					task.getReceiveDeliveryChannelId())
-						.orElseThrow(() -> StreamUtils.illegalStateException("DeliveryChannel",task.getCpaId(),task.getReceiveDeliveryChannelId()));
-			deliveryTaskDAO.insertLog(task.getMessageId(),task.getTimestamp(),url,status,errorMessage);
-			val reliableMessaging = CPAUtils.isReliableMessaging(deliveryChannel);
-			if (task.getTimeToLive() != null && reliableMessaging)
-			{
-				val nextTask = createNextTask(task,deliveryChannel);
-				val trigger = newTrigger()
-						.withIdentity(TriggerKey.triggerKey(nextTask.getMessageId()))
-						.startAt(Date.from(nextTask.getTimestamp()))
-						.build();
-				scheduler.scheduleJob(createJob(nextTask),Collections.singleton(trigger),true);
-			}
-			else
-			{
-				switch(ebMSDAO.getMessageAction(task.getMessageId()).orElse(null))
-				{
-					case ACKNOWLEDGMENT:
-					case MESSAGE_ERROR:
-						if (!reliableMessaging && task.getRetries() < nrAutoRetries)
-						{
-							val nextTask = createNextTask(task,autoRetryInterval);
-							val trigger = newTrigger()
-									.startAt(Date.from(nextTask.getTimestamp()))
-									.build();
-							scheduler.scheduleJob(createJob(nextTask),Collections.singleton(trigger),true);
-							break;
-						}
-					default:
-				}
-			}
+			scheduler.scheduleJob(createJob(nextTask),Collections.singleton(trigger),true);
+		}
+		catch (SchedulerException e)
+		{
+			throw new IllegalStateException(e);
+		}
+	}
+
+	private void scheduleNextTask(DeliveryTask task)
+	{
+		val nextTask = createNextTask(task,autoRetryInterval);
+		val trigger = newTrigger()
+				.startAt(Date.from(nextTask.getTimestamp()))
+				.build();
+		try
+		{
+			scheduler.scheduleJob(createJob(nextTask),Collections.singleton(trigger),true);
 		}
 		catch (SchedulerException e)
 		{
@@ -136,6 +149,7 @@ public class QuartzDeliveryTaskManager implements DeliveryTaskManager
 	@Override
 	public void deleteTask(String messageId)
 	{
+		// do nothing
 	}
 
 	protected Class<? extends Job> getJobClass()

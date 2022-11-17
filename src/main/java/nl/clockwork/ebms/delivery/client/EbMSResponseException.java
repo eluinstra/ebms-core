@@ -28,7 +28,7 @@ import nl.clockwork.ebms.processor.EbMSProcessingException;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor
 @Getter
-public class EbMSResponseException extends EbMSProcessingException
+public class EbMSResponseException extends EbMSProcessingException implements WithHTTP
 {
 	private static final long serialVersionUID = 1L;
 	int statusCode;
@@ -59,6 +59,6 @@ public class EbMSResponseException extends EbMSProcessingException
 	@Override
 	public String getMessage()
 	{
-		return "StatusCode=" + statusCode + "\n" + HTTPUtils.toString(headers) + "\n" + (super.getMessage() != null ? super.getMessage() : "");
+		return "StatusCode=" + statusCode + "\n" + toString(headers) + "\n" + (super.getMessage() != null ? super.getMessage() : "");
 	}
 }

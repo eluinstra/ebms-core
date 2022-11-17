@@ -17,16 +17,12 @@ package nl.clockwork.ebms.encryption;
 
 import java.io.IOException;
 import java.io.StringReader;
-import java.security.GeneralSecurityException;
 import java.security.Key;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
-import java.security.cert.CertificateException;
-import java.security.cert.CertificateExpiredException;
-import java.security.cert.CertificateNotYetValidException;
 import java.security.cert.X509Certificate;
+import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Date;
 
 import javax.crypto.SecretKey;
 import javax.xml.parsers.ParserConfigurationException;
@@ -52,7 +48,6 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
 import lombok.experimental.FieldDefaults;
-import lombok.extern.slf4j.Slf4j;
 import nl.clockwork.ebms.EbMSAttachmentFactory;
 import nl.clockwork.ebms.cpa.CPAManager;
 import nl.clockwork.ebms.cpa.CPAUtils;
@@ -68,7 +63,6 @@ import nl.clockwork.ebms.util.StreamUtils;
 import nl.clockwork.ebms.validation.ValidationException;
 import nl.clockwork.ebms.validation.ValidatorException;
 
-@Slf4j
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @RequiredArgsConstructor
 public class EbMSMessageEncrypter
@@ -90,12 +84,12 @@ public class EbMSMessageEncrypter
 				val deliveryChannel = cpaManager.getReceiveDeliveryChannel(messageHeader.getCPAId(),toPartyId,messageHeader.getTo().getRole(),service,messageHeader.getAction())
 						.orElseThrow(() -> StreamUtils.illegalStateException("ReceiveDeliveryChannel",messageHeader.getCPAId(),toPartyId,messageHeader.getTo().getRole(),service,messageHeader.getAction()));
 				val certificate = CPAUtils.getX509Certificate(CPAUtils.getEncryptionCertificate(deliveryChannel));
-				validateCertificate(trustStore,certificate);
+				SecurityUtils.validateCertificate(trustStore,certificate,Instant.now());
 				val encryptionAlgorithm = CPAUtils.getEncryptionAlgorithm(deliveryChannel);
 				message.getAttachments().replaceAll(a -> encrypt(createDocument(),certificate,encryptionAlgorithm,a));
 			}
 		}
-		catch (CertificateException | KeyStoreException e)
+		catch (KeyStoreException e)
 		{
 			throw new EbMSProcessorException(e);
 		}
@@ -110,14 +104,14 @@ public class EbMSMessageEncrypter
 		try
 		{
 			val certificate = CPAUtils.getX509Certificate(CPAUtils.getEncryptionCertificate(deliveryChannel));
-			validateCertificate(trustStore,certificate);
+			SecurityUtils.validateCertificate(trustStore,certificate,Instant.now());
 			val encryptionAlgorithm = CPAUtils.getEncryptionAlgorithm(deliveryChannel);
 			val attachments = new ArrayList<EbMSAttachment>();
 			message.getAttachments().forEach(a -> attachments.add(encrypt(createDocument(),certificate,encryptionAlgorithm,a)));
 			message.getAttachments().clear();
 			message.getAttachments().addAll(attachments);
 		}
-		catch (TransformerFactoryConfigurationError | CertificateException | KeyStoreException e)
+		catch (TransformerFactoryConfigurationError | KeyStoreException e)
 		{
 			throw new EbMSProcessorException(e);
 		}
@@ -132,37 +126,6 @@ public class EbMSMessageEncrypter
 		val result = XMLCipher.getInstance(encryptionAlgorithm);
 		result.init(XMLCipher.ENCRYPT_MODE,secretKey);
 		return result;
-	}
-
-	private void validateCertificate(EbMSTrustStore trustStore, X509Certificate certificate) throws KeyStoreException, ValidationException
-	{
-		try
-		{
-			certificate.checkValidity(new Date());
-			val aliases = trustStore.aliases();
-			while (aliases.hasMoreElements())
-			{
-				try
-				{
-					val c = trustStore.getCertificate(aliases.nextElement());
-					if (c instanceof X509Certificate)
-						if (certificate.getIssuerDN().getName().equals(((X509Certificate)c).getSubjectDN().getName()))
-						{
-							certificate.verify(c.getPublicKey());
-							return;
-						}
-				}
-				catch (GeneralSecurityException e)
-				{
-					log.trace("",e);
-				}
-			}
-			throw new ValidationException("Certificate " + certificate.getIssuerDN() + " not found!");
-		}
-		catch (CertificateExpiredException | CertificateNotYetValidException e)
-		{
-			throw new ValidationException(e);
-		}
 	}
 
 	private EbMSAttachment encrypt(Document document, X509Certificate certificate, String encryptionAlgorithm, EbMSAttachment attachment) throws ValidatorException

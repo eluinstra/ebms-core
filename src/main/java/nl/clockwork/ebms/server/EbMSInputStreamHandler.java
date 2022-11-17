@@ -99,9 +99,8 @@ public abstract class EbMSInputStreamHandler
 		val messageReader = new EbMSMessageReader(getRequestHeader("Content-ID"),getRequestHeader("Content-Type"));
 		val requestDocument = messageReader.read(request);
 		if (messageLog.isInfoEnabled() && !messageLog.isDebugEnabled())
-			messageLog.info("<<<<\n" + DOMUtils.toString(requestDocument.getMessage()));
-		val responseDocument = messageProcessor.processRequest(requestDocument);
-		return responseDocument;
+			messageLog.info("<<<<\n{}",DOMUtils.toString(requestDocument.getMessage()));
+		return messageProcessor.processRequest(requestDocument);
 	}
 
 	private void validateRequest()
@@ -116,18 +115,18 @@ public abstract class EbMSInputStreamHandler
 		if (!Constants.EBMS_SOAP_ACTION.equals(soapAction))
 		{
 			if (messageLog.isInfoEnabled())
-				messageLog.info("<<<<\n" + getRequestHeaders() + "\n" + IOUtils.toString(request,Charset.defaultCharset()));
+				messageLog.info("<<<<\n{}\n{}",getRequestHeaders(),IOUtils.toString(request,Charset.defaultCharset()));
 			throw new ValidationException("Unable to process message! SOAPAction=" + soapAction);
 		}
 	}
 
 	private InputStream getRequestLogger(InputStream request) throws IOException
 	{
-		request = new BufferedInputStream(request);
-		request.mark(Integer.MAX_VALUE);
-		messageLog.info("<<<<\n" + getRequestHeaders() + "\n" + IOUtils.toString(request,Charset.defaultCharset()));
-		request.reset();
-		return request;
+		val result = new BufferedInputStream(request);
+		result.mark(Integer.MAX_VALUE);
+		messageLog.info("<<<<\n{}\n{}",getRequestHeaders(),IOUtils.toString(result,Charset.defaultCharset()));
+		result.reset();
+		return result;
 	}
 
 	private String getRequestHeaders()
@@ -139,13 +138,13 @@ public abstract class EbMSInputStreamHandler
 	{
 		if (responseDocument == null)
 		{
-			messageLog.info(">>>>\nStatusCode=" + HttpServletResponse.SC_NO_CONTENT);
+			messageLog.info(">>>>\nStatusCode={}",HttpServletResponse.SC_NO_CONTENT);
 			writeResponseStatus(HttpServletResponse.SC_NO_CONTENT);
 		}
 		else
 		{
 			if (messageLog.isInfoEnabled())
-				messageLog.info(">>>>\nStatusCode=" + HttpServletResponse.SC_OK + "\nContent-Type=text/xml\nSOAPAction=" + Constants.EBMS_SOAP_ACTION + "\n" + DOMUtils.toString(responseDocument.getMessage()));
+				messageLog.info(">>>>\nStatusCode={}\nContent-Type=text/xml\nSOAPAction={}\n{}",HttpServletResponse.SC_OK,Constants.EBMS_SOAP_ACTION,DOMUtils.toString(responseDocument.getMessage()));
 			writeResponseStatus(HttpServletResponse.SC_OK);
 			writeResponseHeader("Content-Type","text/xml");
 			writeResponseHeader("SOAPAction",Constants.EBMS_SOAP_ACTION);
@@ -160,7 +159,7 @@ public abstract class EbMSInputStreamHandler
 		{
 			val soapFault = EbMSMessageUtils.createSOAPFault(faultCode,faultString);
 			if (messageLog.isInfoEnabled())
-				messageLog.info(">>>>\nStatusCode=" + HttpServletResponse.SC_INTERNAL_SERVER_ERROR + "\nContent-Type=text/xml\n" + DOMUtils.toString(soapFault));
+				messageLog.info(">>>>\nStatusCode={}\nContent-Type=text/xml\n{}",HttpServletResponse.SC_INTERNAL_SERVER_ERROR,DOMUtils.toString(soapFault));
 			writeResponseStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 			writeResponseHeader("Content-Type","text/xml");
 			val response = getOutputStream();
@@ -175,7 +174,7 @@ public abstract class EbMSInputStreamHandler
 
 	private void handleException()
 	{
-		messageLog.info(">>>>\nStatusCode=" + HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+		messageLog.info(">>>>\nStatusCode={}",HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 		writeResponseStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 	}
 }

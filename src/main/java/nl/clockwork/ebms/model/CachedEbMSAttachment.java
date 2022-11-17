@@ -47,13 +47,13 @@ public class CachedEbMSAttachment implements EbMSAttachment
 	@Override
 	public InputStream getInputStream() throws IOException
 	{
-		return new CloseShieldInputStream(content.getInputStream());
+		return CloseShieldInputStream.wrap(content.getInputStream());
 	}
 
 	@Override
 	public OutputStream getOutputStream() throws IOException
 	{
-		return new CloseShieldOutputStream(content.getOut());
+		return CloseShieldOutputStream.wrap(content.getOut());
 	}
 
 	@Override
