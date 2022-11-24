@@ -135,7 +135,7 @@ class AcknowledgmentProcessor
 		}
 		catch (DuplicateMessageException e)
 		{
-			duplicateMessageHandler.handleAcknowledgment(timestamp,acknowledgmentDocument,acknowledgment);
+			duplicateMessageHandler.handleAcknowledgment(acknowledgment);
 		}
 		catch (ValidatorException e)
 		{

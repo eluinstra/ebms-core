@@ -54,7 +54,6 @@ public interface EbMSDAO
 	List<String> getMessageIds(MessageFilter messageFilter, EbMSMessageStatus status, int maxNr);
 
 	String insertMessage(Instant timestamp, Instant persistTime, Document document, EbMSBaseMessage message, List<EbMSAttachment> attachments, EbMSMessageStatus status);
-	Tuple2<String,Integer> insertDuplicateMessage(Instant timestamp, Document document, EbMSBaseMessage message, List<EbMSAttachment> attachments);
 
 	int updateMessage(String messageId, EbMSMessageStatus oldStatus, EbMSMessageStatus newStatus);
 

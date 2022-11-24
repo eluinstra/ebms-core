@@ -37,10 +37,6 @@ public class EbMSProcessorConfig
 {
 	@Value("${ebmsMessage.deleteContentOnProcessed}")
 	boolean deleteEbMSAttachmentsOnMessageProcessed;
-	@Value("${ebmsMessage.storeDuplicate}")
-	boolean storeDuplicateMessage;
-	@Value("${ebmsMessage.storeDuplicateContent}")
-	boolean storeDuplicateMessageAttachments;
 	
 	@Bean
 	public EbMSMessageProcessor messageProcessor(
@@ -58,8 +54,6 @@ public class EbMSProcessorConfig
 				.cpaManager(cpaManager)
 				.deliveryTaskManager(deliveryTaskManager)
 				.messageValidator(messageValidator)
-				.storeDuplicateMessage(storeDuplicateMessage)
-				.storeDuplicateMessageAttachments(storeDuplicateMessageAttachments)
 				.build();
 		return EbMSMessageProcessor.builder()
 				.deliveryManager(deliveryManager)

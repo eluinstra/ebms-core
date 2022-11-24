@@ -26,7 +26,6 @@ import java.util.Map;
 
 import javax.xml.transform.TransformerException;
 
-import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageHeader;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.ResultSetExtractor;
@@ -34,8 +33,6 @@ import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.transaction.support.TransactionTemplate;
 import org.w3c.dom.Document;
 
-import io.vavr.Tuple;
-import io.vavr.Tuple2;
 import lombok.val;
 import nl.clockwork.ebms.EbMSMessageStatus;
 import nl.clockwork.ebms.EbMSMessageUtils;
@@ -161,58 +158,4 @@ class PostgreSQLEbMSDAO extends AbstractEbMSDAO
 		insertAttachments(keyHolder,attachments);
 		return (String)keyHolder.getKeys().get("message_id");
 	}
-	
-	@Override
-	public Tuple2<String,Integer> insertDuplicateMessage(final Instant timestamp, final Document document, final EbMSBaseMessage message, final List<EbMSAttachment> attachments)
-	{
-		val keyHolder = jdbcTemplate.query(c ->
-		{
-			try
-			{
-				val ps = c.prepareStatement
-				(
-					"insert into ebms_message (" +
-						"time_stamp," +
-						"cpa_id," +
-						"conversation_id," +
-						"message_id," +
-						"message_nr," +
-						"ref_to_message_id," +
-						"time_to_live," +
-						"from_party_id," +
-						"from_role," +
-						"to_party_id," +
-						"to_role," +
-						"service," +
-						"action," +
-						"content" +
-					") values (?,?,?,?,(select max(message_nr) + 1 from ebms_message where message_id = ?),?,?,?,?,?,?,?,?,?)" +
-					" returning message_id, message_nr"
-				);
-				ps.setTimestamp(1,Timestamp.from(timestamp));
-				MessageHeader messageHeader = message.getMessageHeader();
-				ps.setString(2,messageHeader.getCPAId());
-				ps.setString(3,messageHeader.getConversationId());
-				ps.setString(4,messageHeader.getMessageData().getMessageId());
-				ps.setString(5,messageHeader.getMessageData().getMessageId());
-				ps.setString(6,messageHeader.getMessageData().getRefToMessageId());
-				ps.setTimestamp(7,messageHeader.getMessageData().getTimeToLive() == null ? null : Timestamp.from(messageHeader.getMessageData().getTimeToLive()));
-				ps.setString(8,EbMSMessageUtils.toString(messageHeader.getFrom().getPartyId().get(0)));
-				ps.setString(9,messageHeader.getFrom().getRole());
-				ps.setString(10,EbMSMessageUtils.toString(messageHeader.getTo().getPartyId().get(0)));
-				ps.setString(11,messageHeader.getTo().getRole());
-				ps.setString(12,EbMSMessageUtils.toString(messageHeader.getService()));
-				ps.setString(13,messageHeader.getAction());
-				ps.setString(14,DOMUtils.toString(document,"UTF-8"));
-				return ps;
-			}
-			catch (TransformerException e)
-			{
-				throw new SQLException(e);
-			}
-		},
-		new KeyExtractor());
-		insertAttachments(keyHolder,attachments);
-		return Tuple.of((String)keyHolder.getKeys().get("message_id"),(Integer)keyHolder.getKeys().get("message_nr"));
 	}
-}

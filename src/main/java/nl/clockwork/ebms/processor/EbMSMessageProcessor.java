@@ -282,7 +282,7 @@ public class EbMSMessageProcessor
 		}
 		catch (DuplicateMessageException e)
 		{
-			return duplicateMessageHandler.handleMessage(timestamp,messageDocument,message);
+			return duplicateMessageHandler.handleMessage(message);
 		}
 		catch (final EbMSValidationException e)
 		{

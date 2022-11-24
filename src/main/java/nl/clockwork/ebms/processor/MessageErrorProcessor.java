@@ -135,7 +135,7 @@ class MessageErrorProcessor
 		}
 		catch (DuplicateMessageException e)
 		{
-			duplicateMessageHandler.handleMessageError(timestamp,response,messageError);
+			duplicateMessageHandler.handleMessageError(messageError);
 		}
 		catch (ValidationException e)
 		{

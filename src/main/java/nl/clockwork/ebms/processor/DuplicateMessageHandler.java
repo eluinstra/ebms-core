@@ -15,9 +15,6 @@
  */
 package nl.clockwork.ebms.processor;
 
-import java.time.Instant;
-import java.util.Collections;
-
 import javax.xml.transform.TransformerException;
 
 import lombok.AccessLevel;
@@ -56,10 +53,8 @@ class DuplicateMessageHandler
 	DeliveryTaskManager deliveryTaskManager;
   @NonNull
 	EbMSMessageValidator messageValidator;
-	boolean storeDuplicateMessage;
-	boolean storeDuplicateMessageAttachments;
 
-	public EbMSDocument handleMessage(final Instant timestamp, EbMSDocument document, final EbMSMessage message) throws EbMSProcessingException
+	public EbMSDocument handleMessage(final EbMSMessage message) throws EbMSProcessingException
 	{
 		val messageHeader = message.getMessageHeader();
 		if (isIdenticalMessage(message))
@@ -67,8 +62,6 @@ class DuplicateMessageHandler
 			log.warn("Duplicate message " + messageHeader.getMessageData().getMessageId());
 			if (messageValidator.isSyncReply(message))
 			{
-				if (storeDuplicateMessage)
-					ebMSDAO.insertDuplicateMessage(timestamp,document.getMessage(),message,storeDuplicateMessageAttachments ? message.getAttachments() : Collections.emptyList());
 				val result = ebMSDAO.getEbMSDocumentByRefToMessageId(
 						messageHeader.getCPAId(),
 						messageHeader.getMessageData().getMessageId(),
@@ -92,8 +85,6 @@ class DuplicateMessageHandler
 						.orElse(null);
 				Runnable storeMessage = () ->
 				{
-					if (storeDuplicateMessage)
-						ebMSDAO.insertDuplicateMessage(timestamp,document.getMessage(),message,storeDuplicateMessageAttachments ? message.getAttachments() : Collections.emptyList());
 					if (receiveDeliveryChannel != null && messageProperties.isPresent())
 						deliveryTaskManager.insertTask(
 								deliveryTaskManager.createNewTask(
@@ -123,26 +114,18 @@ class DuplicateMessageHandler
 			throw new EbMSProcessingException("MessageId " + messageHeader.getMessageData().getMessageId() + " already used!");
 	}
 
-	public void handleMessageError(final Instant timestamp, EbMSDocument responseDocument, final EbMSMessageError responseMessage) throws EbMSProcessingException
+	public void handleMessageError(final EbMSMessageError responseMessage) throws EbMSProcessingException
 	{
 		if (isIdenticalMessage(responseMessage))
-		{
 			log.warn("MessageError " + responseMessage.getMessageHeader().getMessageData().getMessageId() + " is duplicate!");
-			if (storeDuplicateMessage)
-				ebMSDAO.insertDuplicateMessage(timestamp,responseDocument.getMessage(),responseMessage,Collections.emptyList());
-		}
 		else
 			throw new EbMSProcessingException("MessageId " + responseMessage.getMessageHeader().getMessageData().getMessageId() + " already used!");
 	}
 	
-	public void handleAcknowledgment(final Instant timestamp, EbMSDocument responseDocument, final EbMSAcknowledgment responseMessage) throws EbMSProcessingException
+	public void handleAcknowledgment(final EbMSAcknowledgment responseMessage) throws EbMSProcessingException
 	{
 		if (isIdenticalMessage(responseMessage))
-		{
 			log.warn("Acknowledgment " + responseMessage.getMessageHeader().getMessageData().getMessageId() + " is duplicate!");
-			if (storeDuplicateMessage)
-				ebMSDAO.insertDuplicateMessage(timestamp,responseDocument.getMessage(),responseMessage,Collections.emptyList());
-		}
 		else
 			throw new EbMSProcessingException("MessageId " + responseMessage.getMessageHeader().getMessageData().getMessageId() + " already used!");
 	}
