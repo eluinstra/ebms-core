@@ -20,21 +20,10 @@ import org.springframework.transaction.support.TransactionTemplate;
 
 import nl.clockwork.ebms.EbMSMessageStatus;
 
-class MSSQLEbMSDAO extends MySQLEbMSDAO
+class MSSQLEbMSDAO extends MariaDBEbMSDAO
 {
 	public MSSQLEbMSDAO(TransactionTemplate transactionTemplate, JdbcTemplate jdbcTemplate)
 	{
 		super(transactionTemplate,jdbcTemplate);
-	}
-
-	@Override
-	public String getMessageIdsQuery(String messageContextFilter, EbMSMessageStatus status, int maxNr)
-	{
-		return "select top " + maxNr + " message_id" +
-		" from ebms_message" +
-		" where message_nr = 0" +
-		" and status = " + status.getId() +
-		messageContextFilter +
-		" order by time_stamp asc";
 	}
 }

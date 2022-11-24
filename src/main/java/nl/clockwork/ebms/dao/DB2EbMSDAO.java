@@ -41,18 +41,6 @@ class DB2EbMSDAO extends nl.clockwork.ebms.dao.PostgreSQLEbMSDAO
 	}
 
 	@Override
-	public String getMessageIdsQuery(String messageContextFilter, EbMSMessageStatus status, int maxNr)
-	{
-		return "select message_id" +
-		" from ebms_message" +
-		" where message_nr = 0" + 
-		" and status = " + status.getId() +
-		messageContextFilter +
-		" order by time_stamp asc" +
-		" fetch first " + maxNr + " rows only";
-	}
-	
-	@Override
 	public String insertMessage(final Instant timestamp, final Instant persistTime, final Document document, final EbMSBaseMessage message, final List<EbMSAttachment> attachments, final EbMSMessageStatus status)
 	{
 		val keyHolder = jdbcTemplate.query(c ->

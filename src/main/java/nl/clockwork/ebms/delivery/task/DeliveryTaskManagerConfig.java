@@ -99,10 +99,9 @@ public class DeliveryTaskManagerConfig
 	}
 
 	@Bean
-	public DeliveryTaskDAOFactory deliveryTaskDAO(DataSource dataSource)
+	public DeliveryTaskDAO deliveryTaskDAO(DataSource dataSource)
 	{
-		val jdbcTemplate = new JdbcTemplate(dataSource);
-		return new DeliveryTaskDAOFactory(dataSource,jdbcTemplate);
+		return new DeliveryTaskDAOImpl(new JdbcTemplate(dataSource));
 	}
 
 	private DAODeliveryTaskManager createDefaultDeliveryTaskManager(AbstractDAOFactory<DeliveryTaskDAO> deliveryTaskDAO)

@@ -89,7 +89,7 @@ public class DAOFactoryTest
 		ds.setDriverClassName("org.mariadb.jdbc.Driver");
 		dao = daoFactory.getObject();
 		assertNotNull(dao);
-		assertEquals(MySQLEbMSDAO.class,dao.getClass());
+		assertEquals(MariaDBEbMSDAO.class,dao.getClass());
 	}
 	
 	@Test
@@ -99,15 +99,6 @@ public class DAOFactoryTest
 		dao = daoFactory.getObject();
 		assertNotNull(dao);
 		assertEquals(MSSQLEbMSDAO.class,dao.getClass());
-	}
-	
-	@Test
-	public void testMysql() throws Exception
-	{
-		ds.setDriverClassName("com.mysql.cj.jdbc.Driver");
-		dao = daoFactory.getObject();
-		assertNotNull(dao);
-		assertEquals(MySQLEbMSDAO.class,dao.getClass());
 	}
 	
 	@Test

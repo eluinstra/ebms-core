@@ -58,7 +58,6 @@ public class SchedulerConfig
 		HSQLDB("jdbc:hsqldb:","org.quartz.impl.jdbcjobstore.HSQLDBDelegate"),
 		MARIADB("jdbc:mariadb:","org.quartz.impl.jdbcjobstore.StdJDBCDelegate"),
 		MSSQL("jdbc:sqlserver:","org.quartz.impl.jdbcjobstore.MSSQLDelegate"),
-		MYSQL("jdbc:mysql:","org.quartz.impl.jdbcjobstore.StdJDBCDelegate"),
 		ORACLE("jdbc:oracle:","org.quartz.impl.jdbcjobstore.oracle.OracleDelegate"),
 		POSTGRES("jdbc:postgresql:","org.quartz.impl.jdbcjobstore.HSQLDBDelegate");
 		

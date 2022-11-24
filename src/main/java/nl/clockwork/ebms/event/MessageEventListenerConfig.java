@@ -88,10 +88,9 @@ public class MessageEventListenerConfig
 	}
 
 	@Bean
-	public MessageEventDAOFactory messageEventDAO(DataSource dataSource)
+	public MessageEventDAO messageEventDAO(DataSource dataSource)
 	{
-		val jdbcTemplate = new JdbcTemplate(dataSource);
-		return new MessageEventDAOFactory(dataSource,jdbcTemplate);
+		return new MessageEventDAOImpl(new JdbcTemplate(dataSource));
 	}
 
 	private Map<String,Destination> createMessageEventDestinations(JMSDestinationType jmsDestinationType)

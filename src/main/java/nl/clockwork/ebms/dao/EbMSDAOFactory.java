@@ -70,9 +70,9 @@ class EbMSDAOFactory extends AbstractDAOFactory<EbMSDAO>
 	}
 
 	@Override
-	public EbMSDAO createMySQLDAO()
+	public EbMSDAO createMariaDBDAO()
 	{
-		return new MySQLEbMSDAO(transactionTemplate,jdbcTemplate);
+		return new MariaDBEbMSDAO(transactionTemplate,jdbcTemplate);
 	}
 
 	@Override

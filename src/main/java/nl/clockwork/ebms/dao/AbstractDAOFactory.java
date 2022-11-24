@@ -54,7 +54,7 @@ public abstract class AbstractDAOFactory<T> implements FactoryBean<T>
 				Case($(contains("db2")),o -> createDB2DAO()),
 				Case($(contains("h2")),o -> createH2DAO()),
 				Case($(contains("hsqldb")),o -> createHSQLDBDAO()),
-				Case($(contains("mariadb","mysql")),o -> createMySQLDAO()),
+				Case($(contains("mariadb")),o -> createMariaDBDAO()),
 				Case($(contains("oracle")),o -> createOracleDAO()),
 				Case($(contains("postgresql")),o -> createPostgreSQLDAO()),
 				Case($(contains("sqlserver")),o -> createMSSQLDAO()),
@@ -87,7 +87,7 @@ public abstract class AbstractDAOFactory<T> implements FactoryBean<T>
 
 	public abstract T createMSSQLDAO();
 
-	public abstract T createMySQLDAO();
+	public abstract T createMariaDBDAO();
 
 	public abstract T createOracleDAO();
 
@@ -125,9 +125,9 @@ public abstract class AbstractDAOFactory<T> implements FactoryBean<T>
 		}
 
 		@Override
-		public U createMySQLDAO()
+		public U createMariaDBDAO()
 		{
-			throw new IllegalStateException("MySQL not supported!");
+			throw new IllegalStateException("MariaDB not supported!");
 		}
 
 		@Override

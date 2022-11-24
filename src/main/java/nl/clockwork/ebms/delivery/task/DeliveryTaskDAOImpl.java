@@ -31,7 +31,7 @@ import lombok.experimental.FieldDefaults;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor
-abstract class DeliveryTaskDAOImpl implements DeliveryTaskDAO
+class DeliveryTaskDAOImpl implements DeliveryTaskDAO
 {
 	@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 	@AllArgsConstructor
@@ -71,12 +71,18 @@ abstract class DeliveryTaskDAOImpl implements DeliveryTaskDAO
 				Timestamp.from(timestamp));
 	}
 
-	public abstract String getTasksBeforeQuery(int maxNr, String serverId);
-
 	@Override
 	public List<DeliveryTask> getTasksBefore(Instant timestamp, String serverId, int maxNr)
 	{
-		return jdbcTemplate.query(getTasksBeforeQuery(maxNr,serverId),new EbMSEventRowMapper(),Timestamp.from(timestamp));
+		return jdbcTemplate.query(
+			EbMSEventRowMapper.SELECT +
+				" from delivery_task" +
+				" where time_stamp <= ?" +
+				(serverId == null ? "" : " and server_id = '" + serverId + "'") +
+				" order by time_stamp asc" +
+				" offset 0 rows" +
+				" fetch first (" + maxNr + ") rows only",
+			new EbMSEventRowMapper(),Timestamp.from(timestamp));
 	}
 	
 	@Override
