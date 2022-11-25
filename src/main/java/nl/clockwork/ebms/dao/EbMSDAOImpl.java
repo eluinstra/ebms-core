@@ -16,7 +16,6 @@
 package nl.clockwork.ebms.dao;
 
 import java.io.IOException;
-import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -37,10 +36,9 @@ import org.apache.commons.io.IOUtils;
 import org.springframework.dao.DataRetrievalFailureException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
+import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
-import org.springframework.jdbc.support.GeneratedKeyHolder;
-import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.transaction.support.TransactionTemplate;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
@@ -69,7 +67,7 @@ import nl.clockwork.ebms.util.DOMUtils;
 
 @FieldDefaults(level = AccessLevel.PROTECTED, makeFinal = true)
 @AllArgsConstructor
-abstract class AbstractEbMSDAO implements EbMSDAO, WithMessageFilter
+class EbMSDAOImpl implements EbMSDAO, WithMessageFilter
 {
 	@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 	@AllArgsConstructor
@@ -138,7 +136,7 @@ abstract class AbstractEbMSDAO implements EbMSDAO, WithMessageFilter
 					.conversationId(rs.getString("conversation_id"))
 					.messageId(rs.getString("message_id"))
 					.refToMessageId(rs.getString("ref_to_message_id"))
-					.messageStatus(EbMSMessageStatus.get(rs.getInt("status")).get())
+					.messageStatus(EbMSMessageStatus.get(rs.getInt("status")).orElseThrow())
 					.build();
 		}
 	}
@@ -192,7 +190,7 @@ abstract class AbstractEbMSDAO implements EbMSDAO, WithMessageFilter
 	@Override
 	public boolean existsMessage(String messageId)
 	{
-		return jdbcTemplate.queryForObject("select count(message_id) from ebms_message where message_id = ? and message_nr = 0",Integer.class,messageId) > 0;
+		return jdbcTemplate.queryForObject("select count(message_id) from ebms_message where message_id = ?",Integer.class,messageId) > 0;
 	}
 
 	@Override
@@ -202,7 +200,6 @@ abstract class AbstractEbMSDAO implements EbMSDAO, WithMessageFilter
 				"select count(message_id)" +
 				" from ebms_message" +
 				" where message_id = ?" +
-				" and message_nr = 0" +
 				" and cpa_id = ?" /*+
 				" and from_role =?" +
 				" and to_role = ?" +
@@ -237,7 +234,7 @@ abstract class AbstractEbMSDAO implements EbMSDAO, WithMessageFilter
 		try
 		{
 			return Optional.of(jdbcTemplate.queryForObject(
-				MessageContextRowMapper.SELECT + " from ebms_message where message_id = ? and message_nr = 0",
+				MessageContextRowMapper.SELECT + " from ebms_message where message_id = ?",
 				new MessageContextRowMapper(),
 				messageId
 			));
@@ -254,7 +251,7 @@ abstract class AbstractEbMSDAO implements EbMSDAO, WithMessageFilter
 		try
 		{
 			return Optional.of(jdbcTemplate.queryForObject(
-				EbMSMessageContextRowMapper.SELECT + " from ebms_message where message_id = ? and message_nr = 0",
+				EbMSMessageContextRowMapper.SELECT + " from ebms_message where message_id = ?",
 				new EbMSMessageContextRowMapper(),
 				messageId
 			));
@@ -275,7 +272,6 @@ abstract class AbstractEbMSDAO implements EbMSDAO, WithMessageFilter
 				" from ebms_message" + 
 				" where cpa_id = ?" +
 				" and ref_to_message_id = ?" +
-				" and message_nr = 0" +
 				(actions.length == 0 
 						? "" 
 						: " and service = '" + EbMSAction.EBMS_SERVICE_URI + "' and action in ('" + Arrays.stream(actions).map(EbMSAction::getAction).collect(Collectors.joining("','")) + "')"),
@@ -299,8 +295,7 @@ abstract class AbstractEbMSDAO implements EbMSDAO, WithMessageFilter
 					jdbcTemplate.queryForObject(
 							"select content" +
 							" from ebms_message" +
-							" where message_id = ?" +
-							" and message_nr = 0",
+							" where message_id = ?",
 							String.class,
 							messageId
 						)
@@ -325,7 +320,6 @@ abstract class AbstractEbMSDAO implements EbMSDAO, WithMessageFilter
 					"select content" +
 					" from ebms_message" +
 					" where message_id = ?" +
-					" and message_nr = 0" +
 					" and (status is null or status = " + EbMSMessageStatus.CREATED.getId() + ")",
 					String.class,
 					messageId);
@@ -355,7 +349,6 @@ abstract class AbstractEbMSDAO implements EbMSDAO, WithMessageFilter
 					" from ebms_message" +
 					" where cpa_id = ?" +
 					" and ref_to_message_id = ?" +
-					" and message_nr = 0" +
 					(actions.length == 0 
 							? "" 
 							: " and service = '" + EbMSAction.EBMS_SERVICE_URI + "' and action in ('" + Arrays.stream(actions).map(EbMSAction::getAction).collect(Collectors.joining("','")) + "')"),
@@ -395,7 +388,7 @@ abstract class AbstractEbMSDAO implements EbMSDAO, WithMessageFilter
 	@Override
 	public Optional<Instant> getPersistTime(String messageId)
 	{
-		return Optional.ofNullable(jdbcTemplate.queryForObject("select persist_time from ebms_message where message_id = ? and message_nr = 0",Timestamp.class,messageId))
+		return Optional.ofNullable(jdbcTemplate.queryForObject("select persist_time from ebms_message where message_id = ?",Timestamp.class,messageId))
 				.map(Timestamp::toInstant);
 	}
 
@@ -404,7 +397,7 @@ abstract class AbstractEbMSDAO implements EbMSDAO, WithMessageFilter
 	{
 		try
 		{
-			return EbMSAction.get(jdbcTemplate.queryForObject("select action from ebms_message where message_id = ? and message_nr = 0",String.class,messageId));
+			return EbMSAction.get(jdbcTemplate.queryForObject("select action from ebms_message where message_id = ?",String.class,messageId));
 		}
 		catch(EmptyResultDataAccessException e)
 		{
@@ -419,8 +412,7 @@ abstract class AbstractEbMSDAO implements EbMSDAO, WithMessageFilter
 		return jdbcTemplate.queryForList(
 				"select message_id" +
 				" from ebms_message" +
-				" where message_nr = 0" +
-				" and status = " + status.getId() +
+				" where status = " + status.getId() +
 				getMessageFilter(messageFilter,parameters) +
 				" order by time_stamp asc",
 				String.class,
@@ -436,8 +428,7 @@ abstract class AbstractEbMSDAO implements EbMSDAO, WithMessageFilter
 		return jdbcTemplate.queryForList(
 			"select message_id" +
 			" from ebms_message" +
-			" where message_nr = 0" + 
-			" and status = " + status.getId() +
+			" where status = " + status.getId() +
 			messageContextFilter +
 			" order by time_stamp asc" +
 			" offset 0 rows" +
@@ -449,12 +440,11 @@ abstract class AbstractEbMSDAO implements EbMSDAO, WithMessageFilter
 	@Override
 	public String insertMessage(final Instant timestamp, final Instant persistTime, final Document document, final EbMSBaseMessage message, final List<EbMSAttachment> attachments, final EbMSMessageStatus status)
 	{
-		val keyHolder = new GeneratedKeyHolder();
+		val messageHeader = message.getMessageHeader();
 		jdbcTemplate.update(c ->
 		{
 			try
 			{
-				val messageHeader = message.getMessageHeader();
 				val ps = c.prepareStatement
 				(
 					"insert into ebms_message (" +
@@ -474,9 +464,7 @@ abstract class AbstractEbMSDAO implements EbMSDAO, WithMessageFilter
 						"status," +
 						"status_time," +
 						"persist_time" +
-					") values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
-					new int[]{4,5}
-				);
+					") values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
 				ps.setTimestamp(1,Timestamp.from(timestamp));
 				ps.setString(2,messageHeader.getCPAId());
 				ps.setString(3,messageHeader.getConversationId());
@@ -499,36 +487,40 @@ abstract class AbstractEbMSDAO implements EbMSDAO, WithMessageFilter
 			{
 				throw new SQLException(e);
 			}
-		},
-		keyHolder);
-		insertAttachments(keyHolder,attachments);
-		return (String)keyHolder.getKeys().get("message_id");
+		});
+		insertAttachments(messageHeader.getMessageData().getMessageId(),attachments);
+		return messageHeader.getMessageData().getMessageId();
 	}
 
-	protected void insertAttachments(KeyHolder keyHolder, List<EbMSAttachment> attachments) throws InvalidDataAccessApiUsageException
+	protected void insertAttachments(String messageId, List<EbMSAttachment> attachments) throws InvalidDataAccessApiUsageException
 	{
 		val orderNr = new AtomicInteger();
-		attachments.forEach(attachment -> jdbcTemplate.update(c -> insertAttachment(keyHolder,orderNr,attachment,c)));
-	}
+		jdbcTemplate.batchUpdate("insert into ebms_attachment (message_id,order_nr,name,content_id,content_type,content) values (?,?,?,?,?,?)",new BatchPreparedStatementSetter()
+		{
+			@Override
+			public void setValues(PreparedStatement ps, int i) throws SQLException
+			{
+				try
+				{
+					ps.setObject(1,messageId);
+					ps.setInt(2,orderNr.getAndIncrement());
+					ps.setString(3,attachments.get(i).getName());
+					ps.setString(4,attachments.get(i).getContentId());
+					ps.setString(5,attachments.get(i).getContentType());
+					ps.setBinaryStream(6,attachments.get(i).getInputStream());
+				}
+				catch (IOException e)
+				{
+					throw new SQLException(e);
+				}
+			}
 
-	private PreparedStatement insertAttachment(KeyHolder keyHolder, final AtomicInteger orderNr, final EbMSAttachment attachment, Connection c) throws SQLException
-	{
-		try
-		{
-			val result = c.prepareStatement("insert into ebms_attachment (message_id,message_nr,order_nr,name,content_id,content_type,content) values (?,?,?,?,?,?,?)");
-			result.setObject(1,keyHolder.getKeys().get("message_id"));
-			result.setObject(2,keyHolder.getKeys().get("message_nr"));
-			result.setInt(3,orderNr.getAndIncrement());
-			result.setString(4,attachment.getName());
-			result.setString(5,attachment.getContentId());
-			result.setString(6,attachment.getContentType());
-			result.setBinaryStream(7,attachment.getInputStream());
-			return result;
-		}
-		catch (IOException e)
-		{
-			throw new SQLException(e);
-		}
+			@Override
+			public int getBatchSize()
+			{
+				return attachments.size();
+			}
+		});
 	}
 
 	@Override
@@ -540,7 +532,6 @@ abstract class AbstractEbMSDAO implements EbMSDAO, WithMessageFilter
 			" set status = ?," +
 			" status_time = ?" +
 			" where message_id = ?" +
-			" and message_nr = 0" +
 			" and status = ?",
 			newStatus.getId(),
 			Timestamp.from(Instant.now()),
@@ -565,7 +556,6 @@ abstract class AbstractEbMSDAO implements EbMSDAO, WithMessageFilter
 				"select name, content_id, content_type, content" + 
 						" from ebms_attachment" + 
 						" where message_id = ?" +
-						" and message_nr = 0" +
 						" order by order_nr",
 						rowMapper,
 						messageId

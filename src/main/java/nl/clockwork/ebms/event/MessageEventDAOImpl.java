@@ -62,7 +62,6 @@ class MessageEventDAOImpl implements MessageEventDAO, WithMessageFilter
 			" where message_event.processed = 0" +
 			" and message_event.event_type in (" + join(types == null || types.length == 0 ? MessageEventType.values() : types,",") + ")" +
 			" and message_event.message_id = ebms_message.message_id" +
-			" and ebms_message.message_nr = 0" +
 			getMessageFilter(messageFilter,parameters) +
 			" order by ebms_message.time_stamp asc",
 			new EbMSMessageEventRowMapper(),
@@ -77,7 +76,6 @@ class MessageEventDAOImpl implements MessageEventDAO, WithMessageFilter
 				" where message_event.processed = 0" +
 				" and message_event.event_type in (" + join(types == null || types.length == 0 ? MessageEventType.values() : types,",") + ")" +
 				" and message_event.message_id = ebms_message.message_id" +
-				" and ebms_message.message_nr = 0" +
 				messageContextFilter +
 				" order by message_event.time_stamp asc" +
 				" offset 0 rows" +

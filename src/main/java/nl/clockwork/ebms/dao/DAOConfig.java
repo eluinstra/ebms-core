@@ -34,10 +34,10 @@ import lombok.experimental.FieldDefaults;
 public class DAOConfig
 {
 	@Bean
-	public EbMSDAOFactory ebMSDAO(@Qualifier("dataSourceTransactionManager") PlatformTransactionManager dataSourceTransactionManager, DataSource dataSource)
+	public EbMSDAOImpl ebMSDAO(@Qualifier("dataSourceTransactionManager") PlatformTransactionManager dataSourceTransactionManager, DataSource dataSource)
 	{
 		val transactionTemplate = new TransactionTemplate(dataSourceTransactionManager);
 		val jdbcTemplate = new JdbcTemplate(dataSource);
-		return new EbMSDAOFactory(dataSource,transactionTemplate,jdbcTemplate);
+		return new EbMSDAOImpl(transactionTemplate,jdbcTemplate);
 	}
 }

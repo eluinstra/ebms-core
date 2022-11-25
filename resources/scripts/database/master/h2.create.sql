@@ -26,7 +26,6 @@ CREATE TABLE ebms_message
 	cpa_id						VARCHAR(256)		NOT NULL,
 	conversation_id		VARCHAR(256)		NOT NULL,
 	message_id				VARCHAR(256)		NOT NULL,
-	message_nr				SMALLINT				DEFAULT 0 NOT NULL,
 	ref_to_message_id	VARCHAR(256)		NULL,
 	time_to_live			TIMESTAMP				NULL,
 	persist_time			TIMESTAMP				NULL,
@@ -41,9 +40,9 @@ CREATE TABLE ebms_message
 	status_time				TIMESTAMP				NULL
 );
 
-CREATE INDEX i_ebms_message ON ebms_message (message_id,message_nr);
+CREATE INDEX i_ebms_message ON ebms_message (message_id);
 
-CREATE INDEX i_ebms_ref_to_message ON ebms_message (ref_to_message_id,message_nr);
+CREATE INDEX i_ebms_ref_to_message ON ebms_message (ref_to_message_id);
 
 CREATE TABLE ebms_attachment
 (

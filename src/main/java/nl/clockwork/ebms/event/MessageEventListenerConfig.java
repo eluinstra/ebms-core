@@ -43,7 +43,6 @@ import com.google.common.base.Splitter;
 import lombok.AccessLevel;
 import lombok.val;
 import lombok.experimental.FieldDefaults;
-import nl.clockwork.ebms.dao.AbstractDAOFactory;
 import nl.clockwork.ebms.dao.EbMSDAO;
 import nl.clockwork.ebms.model.EbMSMessageProperties;
 
@@ -69,7 +68,7 @@ public class MessageEventListenerConfig
 	@Bean
 	public MessageEventListener messageEventListener(
 		ConnectionFactory connectionFactory,
-		AbstractDAOFactory<MessageEventDAO> messageEventDAO,
+		MessageEventDAO messageEventDAO,
 		EbMSDAO ebMSDAO,
 		@Autowired(required=false)@Qualifier("messagePropertiesKafkaTemplate") KafkaTemplate<String, EbMSMessageProperties> kafkaTemplate)
 	{
@@ -78,7 +77,7 @@ public class MessageEventListenerConfig
 			.map(MessageEventType::valueOf)
 			.collect(Collectors.toCollection(() -> EnumSet.noneOf(MessageEventType.class)));
 		val eventListener = Match(eventListenerType).of(
-				Case($(EventListenerType.DAO),o -> new DAOMessageEventListener(messageEventDAO.getObject())),
+				Case($(EventListenerType.DAO),o -> new DAOMessageEventListener(messageEventDAO)),
 				Case($(EventListenerType.SIMPLE_JMS),o -> new SimpleJMSMessageEventListener(jmsTemplate,createMessageEventDestinations(jmsDestinationType))),
 				Case($(EventListenerType.JMS),o -> new JMSMessageEventListener(ebMSDAO,jmsTemplate,createMessageEventDestinations(jmsDestinationType))),
 				Case($(EventListenerType.JMS_TEXT),o -> new JMSTextMessageEventListener(ebMSDAO,jmsTemplate,createMessageEventDestinations(jmsDestinationType))),
