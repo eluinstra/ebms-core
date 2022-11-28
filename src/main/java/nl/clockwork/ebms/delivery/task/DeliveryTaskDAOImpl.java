@@ -81,7 +81,7 @@ class DeliveryTaskDAOImpl implements DeliveryTaskDAO
 				(serverId == null ? "" : " and server_id = '" + serverId + "'") +
 				" order by time_stamp asc" +
 				" offset 0 rows" +
-				" fetch first (" + maxNr + ") rows only",
+				" fetch first " + maxNr + " rows only",
 			new EbMSEventRowMapper(),Timestamp.from(timestamp));
 	}
 	

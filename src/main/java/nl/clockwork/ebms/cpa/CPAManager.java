@@ -45,7 +45,7 @@ import nl.clockwork.ebms.util.StreamUtils;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor
-public class CPAManager implements WithCPA
+public class CPAManager
 {
 	@NonNull
 	CPADAO cpaDAO;
@@ -100,31 +100,31 @@ public class CPAManager implements WithCPA
 
 	public boolean isValid(String cpaId, Instant timestamp)
 	{
-		return getCPA(cpaId).filter(isValidCPA(timestamp)).isPresent();
+		return getCPA(cpaId).filter(CPAQuery.isValidCPA(timestamp)).isPresent();
 	}
 
 	@Cacheable(cacheNames = "CPA", keyGenerator = "ebMSKeyGenerator")
 	public boolean existsPartyId(String cpaId, String partyId)
 	{
-		return getCPA(cpaId).map(existsPartyId(partyId)).orElse(false);
+		return getCPA(cpaId).map(CPAQuery.existsPartyId(partyId)).orElse(false);
 	}
 
 	@Cacheable(cacheNames = "CPA", keyGenerator = "ebMSKeyGenerator")
 	public Optional<EbMSPartyInfo> getEbMSPartyInfo(String cpaId, String partyId)
 	{
-		return getCPA(cpaId).map(getEbMSPartyInfo(partyId)).orElse(empty());
+		return getCPA(cpaId).map(CPAQuery.getEbMSPartyInfo(partyId)).orElse(empty());
 	}
 
 	@Cacheable(cacheNames = "CPA", key = "#root.methodName+#cpaId+T(nl.clockwork.ebms.cpa.CPAUtils).toString(#partyId)")
 	public Optional<PartyInfo> getPartyInfo(String cpaId, List<PartyId> partyId)
 	{
-		return getCPA(cpaId).map(getPartyInfo(partyId)).orElse(empty());
+		return getCPA(cpaId).map(CPAQuery.getPartyInfo(partyId)).orElse(empty());
 	}
 
 	@Cacheable(cacheNames = "CPA", keyGenerator = "ebMSKeyGenerator")
 	public Optional<FromPartyInfo> getFromPartyInfo(String cpaId, Party fromParty, String service, String action)
 	{
-		return getCPA(cpaId).map(getFromPartyInfo(fromParty,service,action)).orElse(empty());
+		return getCPA(cpaId).map(CPAQuery.getFromPartyInfo(fromParty,service,action)).orElse(empty());
 	}
 
 	@Cacheable(cacheNames = "CPA", keyGenerator = "ebMSKeyGenerator")
@@ -132,38 +132,38 @@ public class CPAManager implements WithCPA
 	{
 		return getFromPartyInfo(cpaId,fromParty,service,action)
 				.flatMap(fromPartyInfo -> getCPA(cpaId)
-						.map(getToPartyInfoByFromPartyActionBinding(fromPartyInfo,fromParty,service,action)))
+						.map(CPAQuery.getToPartyInfoByFromPartyActionBinding(fromPartyInfo,fromParty,service,action)))
 				.orElse(empty());
 	}
 
 	@Cacheable(cacheNames = "CPA", keyGenerator = "ebMSKeyGenerator")
 	public Optional<ToPartyInfo> getToPartyInfo(String cpaId, Party toParty, String service, String action)
 	{
-		return getCPA(cpaId).map(getToPartyInfo(toParty,service,action)).orElse(empty());
+		return getCPA(cpaId).map(CPAQuery.getToPartyInfo(toParty,service,action)).orElse(empty());
 	}
 
 	@Cacheable(cacheNames = "CPA", key = "#root.methodName+#cpaId+T(nl.clockwork.ebms.cpa.CPAUtils).toString(#partyId)+#role+#service+#action")
 	public boolean canSend(String cpaId, List<PartyId> partyId, String role, String service, String action)
 	{
-		return getCPA(cpaId).map(canSend(partyId,role,service,action)).orElse(false);
+		return getCPA(cpaId).map(CPAQuery.canSend(partyId,role,service,action)).orElse(false);
 	}
 
 	@Cacheable(cacheNames = "CPA", key = "#root.methodName+#cpaId+T(nl.clockwork.ebms.cpa.CPAUtils).toString(#partyId)+#role+#service+#action")
 	public boolean canReceive(String cpaId, List<PartyId> partyId, String role, String service, String action)
 	{
-		return getCPA(cpaId).map(canReceive(partyId,role,service,action)).orElse(false);
+		return getCPA(cpaId).map(CPAQuery.canReceive(partyId,role,service,action)).orElse(false);
 	}
 
 	@Cacheable(cacheNames = "CPA", keyGenerator = "ebMSKeyGenerator")
 	public Optional<DeliveryChannel> getDeliveryChannel(String cpaId, String deliveryChannelId)
 	{
-		return getCPA(cpaId).map(getDeliveryChannel(deliveryChannelId)).orElse(empty());
+		return getCPA(cpaId).map(CPAQuery.getDeliveryChannel(deliveryChannelId)).orElse(empty());
 	}
 
 	@Cacheable(cacheNames = "CPA", key = "#root.methodName+#cpaId+T(nl.clockwork.ebms.cpa.CPAUtils).toString(#partyId)+#action")
 	public Optional<DeliveryChannel> getDefaultDeliveryChannel(String cpaId, List<PartyId> partyId, String action)
 	{
-		return getPartyInfo(cpaId,partyId).map(getDefaultDeliveryChannel(action)).orElse(empty());
+		return getPartyInfo(cpaId,partyId).map(CPAQuery.getDefaultDeliveryChannel(action)).orElse(empty());
 	}
 
 	@Cacheable(cacheNames = "CPA", key = "#root.methodName+#cpaId+T(nl.clockwork.ebms.cpa.CPAUtils).toString(#partyId)+#role+#service+#action")
@@ -172,7 +172,7 @@ public class CPAManager implements WithCPA
 		return EbMSAction.EBMS_SERVICE_URI.equals(service)
 				? getDefaultDeliveryChannel(cpaId,partyId,action)
 				: getPartyInfo(cpaId,partyId)
-							.flatMap(getSendDeliveryChannel(role, service, action));
+							.flatMap(CPAQuery.getSendDeliveryChannel(role, service, action));
 	}
 
 	@Cacheable(cacheNames = "CPA", key = "#root.methodName+#cpaId+T(nl.clockwork.ebms.cpa.CPAUtils).toString(#partyId)+#role+#service+#action")
@@ -181,7 +181,7 @@ public class CPAManager implements WithCPA
 		return EbMSAction.EBMS_SERVICE_URI.equals(service)
 				? getDefaultDeliveryChannel(cpaId,partyId,action)
 				: getPartyInfo(cpaId,partyId)
-							.flatMap(getReceiveDeliveryChannel(role, service, action));
+							.flatMap(CPAQuery.getReceiveDeliveryChannel(role, service, action));
 	}
 
 	@Cacheable(cacheNames = "CPA", key = "#root.methodName+#cpaId+T(nl.clockwork.ebms.cpa.CPAUtils).toString(#partyId)+#role+#service+#action")
@@ -191,7 +191,7 @@ public class CPAManager implements WithCPA
 				getSendDeliveryChannel(cpaId,partyId,role,service,action)
 						.orElseThrow(() -> StreamUtils.illegalStateException("SendDeliveryChannel",cpaId,partyId,role,service,action)));
 		return getCPA(cpaId)
-				.map(isSendingNonRepudiationRequired(docExchange, partyId, role, service, action))
+				.map(CPAQuery.isSendingNonRepudiationRequired(docExchange, partyId, role, service, action))
 				.orElse(false);
 	}
 
@@ -202,7 +202,7 @@ public class CPAManager implements WithCPA
 				getSendDeliveryChannel(cpaId,partyId,role,service,action)
 						.orElseThrow(() -> StreamUtils.illegalStateException("SendDeliveryChannel",cpaId,partyId,role,service,action)));
 		return getCPA(cpaId)
-				.map(isSendingConfidential(docExchange, partyId, role, service, action))
+				.map(CPAQuery.isSendingConfidential(docExchange, partyId, role, service, action))
 				.orElse(false);
 	}
 

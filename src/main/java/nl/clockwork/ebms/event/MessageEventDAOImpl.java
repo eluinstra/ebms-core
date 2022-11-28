@@ -79,7 +79,7 @@ class MessageEventDAOImpl implements MessageEventDAO, WithMessageFilter
 				messageContextFilter +
 				" order by message_event.time_stamp asc" +
 				" offset 0 rows" +
-				" fetch first (" + maxNr + ") rows only";
+				" fetch first " + maxNr + " rows only";
 	}
 
 	@Override

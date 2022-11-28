@@ -39,78 +39,78 @@ import nl.clockwork.ebms.model.FromPartyInfo;
 import nl.clockwork.ebms.model.Party;
 import nl.clockwork.ebms.model.ToPartyInfo;
 
-public interface WithCPA {
+public class CPAQuery {
 	
-	default Predicate<CollaborationProtocolAgreement> isValidCPA(Instant timestamp)
+	static Predicate<CollaborationProtocolAgreement> isValidCPA(Instant timestamp)
 	{
 		return cpa -> StatusValueType.AGREED.equals(cpa.getStatus().getValue())
 				&& timestamp.compareTo(cpa.getStart()) >= 0
 				&& timestamp.compareTo(cpa.getEnd()) <= 0;
 	}
 
-	private Predicate<org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.PartyId> matchesPartyId(String partyId)
+	private static Predicate<org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.PartyId> matchesPartyId(String partyId)
 	{
 		return p -> CPAUtils.toString(p).equals(partyId);
 	}
 
-	private Predicate<PartyInfo> matchesPartyInfo(List<PartyId> partyId)
+	private static Predicate<PartyInfo> matchesPartyInfo(List<PartyId> partyId)
 	{
 		return partyInfo -> CPAUtils.equals(partyInfo.getPartyId(),partyId);
 	}
 
-	private Predicate<PartyInfo> isEmptyOrMatchesPartyInfo(Party fromParty)
+	private static Predicate<PartyInfo> isEmptyOrMatchesPartyInfo(Party fromParty)
 	{
 		return partyInfo -> fromParty == null || fromParty.matches(partyInfo.getPartyId());
 	}
 
-	private Predicate<CollaborationRole> isEmptyOrMatchesRole(Party fromParty)
+	private static Predicate<CollaborationRole> isEmptyOrMatchesRole(Party fromParty)
 	{
 		return collaborationRole -> fromParty == null || fromParty.matches(collaborationRole.getRole());
 	}
 
-	private Predicate<CollaborationRole> matchesRoleByRole(String role)
+	private static Predicate<CollaborationRole> matchesRoleByRole(String role)
 	{
 		return collaborationRole -> collaborationRole.getRole().getName().equals(role);
 	}
 
-	private Predicate<CollaborationRole> matchesRoleByService(String service)
+	private static Predicate<CollaborationRole> matchesRoleByService(String service)
 	{
 		return collaborationRole -> CPAUtils.toString(collaborationRole.getServiceBinding().getService()).equals(service);
 	}
 
-	private Predicate<CanSend> matchesCanSend(String action)
+	private static Predicate<CanSend> matchesCanSend(String action)
 	{
 		return canSend -> canSend.getThisPartyActionBinding().getAction().equals(action);
 	}
 
-	private Predicate<CanReceive> matchesCanReceive(String action)
+	private static Predicate<CanReceive> matchesCanReceive(String action)
 	{
 		return canReceive -> canReceive.getThisPartyActionBinding().getAction().equals(action);
 	}
 
-	private Predicate<CanReceive> matchesCanReceive(FromPartyInfo fromPartyInfo)
+	private static Predicate<CanReceive> matchesCanReceive(FromPartyInfo fromPartyInfo)
 	{
 		return canReceive -> canReceive.getThisPartyActionBinding().equals(fromPartyInfo.getCanSend().getOtherPartyActionBinding());
 	}
 
-	private Predicate<DeliveryChannel> matchesDeliveryChannel(String deliveryChannelId)
+	private static Predicate<DeliveryChannel> matchesDeliveryChannel(String deliveryChannelId)
 	{
 		return deliveryChannel -> deliveryChannel.getChannelId().equals(deliveryChannelId);
 	}
 
-	private Predicate<OverrideMshActionBinding> matchesOverrideMshActionBinding(String action)
+	private static Predicate<OverrideMshActionBinding> matchesOverrideMshActionBinding(String action)
 	{
 		return binding -> binding.getAction().equals(action);
 	}
 
-	private Predicate<CanSend> isNonRepudiationRequired(DocExchange docExchange)
+	private static Predicate<CanSend> isNonRepudiationRequired(DocExchange docExchange)
 	{
 		return canSend -> canSend.getThisPartyActionBinding().getBusinessTransactionCharacteristics().isIsNonRepudiationRequired()
 				&& docExchange.getEbXMLSenderBinding() != null
 				&& docExchange.getEbXMLSenderBinding().getSenderNonRepudiation() != null;
 	}
 
-	private Predicate<CanSend> isConfidential(DocExchange docExchange)
+	private static Predicate<CanSend> isConfidential(DocExchange docExchange)
 	{
 		return canSend -> (PersistenceLevelType.PERSISTENT.equals(canSend.getThisPartyActionBinding().getBusinessTransactionCharacteristics().getIsConfidential()) 
 				|| PersistenceLevelType.TRANSIENT_AND_PERSISTENT.equals(canSend.getThisPartyActionBinding().getBusinessTransactionCharacteristics().getIsConfidential()))
@@ -118,7 +118,7 @@ public interface WithCPA {
 				&& docExchange.getEbXMLReceiverBinding().getReceiverDigitalEnvelope() != null;
 	}
 
-	private Function<CollaborationProtocolAgreement, Stream<CollaborationRole>> findRoles(List<PartyId> partyId, String role, String service)
+	private static Function<CollaborationProtocolAgreement, Stream<CollaborationRole>> findRoles(List<PartyId> partyId, String role, String service)
 	{
 		return cpa -> cpa.getPartyInfo().stream()
 				.filter(matchesPartyInfo(partyId))
@@ -126,7 +126,7 @@ public interface WithCPA {
 				.filter(matchesRoleByRole(role).and(matchesRoleByService(service)));
 	}
 
-	private Optional<EbMSPartyInfo> findEbMSPartyInfo(String partyId, PartyInfo partyInfo)
+	private static Optional<EbMSPartyInfo> findEbMSPartyInfo(String partyId, PartyInfo partyInfo)
 	{
 		return partyInfo.getPartyId().stream()
 				.filter(matchesPartyId(partyId))
@@ -134,75 +134,75 @@ public interface WithCPA {
 				.findFirst();
 	}
 
-	private Function<PartyInfo, Stream<CollaborationRole>> findRoles(String role, String service)
+	private static Function<PartyInfo, Stream<CollaborationRole>> findRoles(String role, String service)
 	{
 		return partyInfo -> partyInfo.getCollaborationRole().stream()
 				.filter(matchesRoleByRole(role).and(matchesRoleByService(service)));
 	}
 	
-	private Function<PartyInfo,Stream<CollaborationRole>> streamRoles()
+	private static Function<PartyInfo,Stream<CollaborationRole>> streamRoles()
 	{
 		return partyInfo -> partyInfo.getCollaborationRole().stream();
 	}
 
-	private Function<CollaborationRole,Stream<CanSend>> streamCanSends()
+	private static Function<CollaborationRole,Stream<CanSend>> streamCanSends()
 	{
 		 return collaborationRole -> collaborationRole.getServiceBinding().getCanSend().stream();
 	}
 
-	private Function<CollaborationRole,Stream<CanReceive>> streamCanReceives()
+	private static Function<CollaborationRole,Stream<CanReceive>> streamCanReceives()
 	{
 		return collaborationRole -> collaborationRole.getServiceBinding().getCanReceive().stream();
 	}
 
-	private Function<PartyInfo,Stream<DeliveryChannel>> streamDeliveryChannels()
+	private static Function<PartyInfo,Stream<DeliveryChannel>> streamDeliveryChannels()
 	{
 		return partyInfo -> partyInfo.getDeliveryChannel().stream();
 	}
 
-	private Function<org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.PartyId,EbMSPartyInfo> toEbMSPartyInfo()
+	private static Function<org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.PartyId,EbMSPartyInfo> toEbMSPartyInfo()
 	{
 		return id -> new EbMSPartyInfo(CPAUtils.toPartyId(id));
 	}
 
-	private Function<CanSend,FromPartyInfo> toFromPartyInfo(Party fromParty, PartyInfo partyInfo, CollaborationRole collaborationRole)
+	private static Function<CanSend,FromPartyInfo> toFromPartyInfo(Party fromParty, PartyInfo partyInfo, CollaborationRole collaborationRole)
 	{
 		return canSend -> CPAUtils.getFromPartyInfo(fromParty == null ? partyInfo.getPartyId().get(0) : fromParty.getPartyId(partyInfo.getPartyId()),collaborationRole,canSend);
 	}
 
-	private Function<CanReceive,ToPartyInfo> toToPartyInfo(PartyInfo partyInfo, CollaborationRole collaborationRole)
+	private static Function<CanReceive,ToPartyInfo> toToPartyInfo(PartyInfo partyInfo, CollaborationRole collaborationRole)
 	{
 		return canReceive -> CPAUtils.getToPartyInfo(partyInfo.getPartyId().get(0),collaborationRole,canReceive);
 	}
 
-	private Function<CanReceive,ToPartyInfo> toToPartyInfo(Party toParty, PartyInfo partyInfo, CollaborationRole collaborationRole)
+	private static Function<CanReceive,ToPartyInfo> toToPartyInfo(Party toParty, PartyInfo partyInfo, CollaborationRole collaborationRole)
 	{
 		return canReceive -> CPAUtils.getToPartyInfo(toParty == null ? partyInfo.getPartyId().get(0) : toParty.getPartyId(partyInfo.getPartyId()),collaborationRole,canReceive);
 	}
 
-	private Function<OverrideMshActionBinding,DeliveryChannel> toDeliveryChannel()
+	private static Function<OverrideMshActionBinding,DeliveryChannel> toDeliveryChannel()
 	{
 		return binding -> (DeliveryChannel)binding.getChannelId();
 	}
 
-	private Function<CanSend,DeliveryChannel> canSendToDeliveryChannel()
+	private static Function<CanSend,DeliveryChannel> canSendToDeliveryChannel()
 	{
 		return canSend -> CPAUtils.getDeliveryChannel(canSend.getThisPartyActionBinding().getChannelId());
 	}
 
-	private Function<CanReceive,DeliveryChannel> canReceiveToDeliveryChannel()
+	private static Function<CanReceive,DeliveryChannel> canReceiveToDeliveryChannel()
 	{
 		return canReceive -> CPAUtils.getDeliveryChannel(canReceive.getThisPartyActionBinding().getChannelId());
 	}
 
-	default Function<CollaborationProtocolAgreement, Boolean> existsPartyId(String partyId)
+	static Function<CollaborationProtocolAgreement, Boolean> existsPartyId(String partyId)
 	{
 		return cpa -> cpa.getPartyInfo().stream()
 				.flatMap(partyInfo -> partyInfo.getPartyId().stream())
 				.anyMatch(matchesPartyId(partyId));
 	}
 
-	default Function<CollaborationProtocolAgreement, Optional<EbMSPartyInfo>> getEbMSPartyInfo(String partyId)
+	static Function<CollaborationProtocolAgreement, Optional<EbMSPartyInfo>> getEbMSPartyInfo(String partyId)
 	{
 		return cpa -> cpa.getPartyInfo().stream()
 				.filter(partyInfo -> partyInfo.getPartyId().stream()
@@ -212,14 +212,14 @@ public interface WithCPA {
 				.findFirst();
 	}
 
-	default Function<CollaborationProtocolAgreement, Optional<PartyInfo>> getPartyInfo(List<PartyId> partyId)
+	static Function<CollaborationProtocolAgreement, Optional<PartyInfo>> getPartyInfo(List<PartyId> partyId)
 	{
 		return cpa -> cpa.getPartyInfo().stream()
 				.filter(matchesPartyInfo(partyId))
 				.findFirst();
 	}
 
-	default Function<CollaborationProtocolAgreement, Optional<FromPartyInfo>> getFromPartyInfo(Party fromParty, String service, String action)
+	static Function<CollaborationProtocolAgreement, Optional<FromPartyInfo>> getFromPartyInfo(Party fromParty, String service, String action)
 	{
 		return cpa -> cpa.getPartyInfo().stream()
 				.filter(isEmptyOrMatchesPartyInfo(fromParty))
@@ -231,7 +231,7 @@ public interface WithCPA {
 				.findFirst();
 	}
 
-	default Function<CollaborationProtocolAgreement, Optional<ToPartyInfo>> getToPartyInfoByFromPartyActionBinding(FromPartyInfo fromPartyInfo, Party fromParty, String service, String action)
+	static Function<CollaborationProtocolAgreement, Optional<ToPartyInfo>> getToPartyInfoByFromPartyActionBinding(FromPartyInfo fromPartyInfo, Party fromParty, String service, String action)
 	{
 		return cpa -> cpa.getPartyInfo().stream()
 						.flatMap(partyInfo -> partyInfo.getCollaborationRole().stream()
@@ -241,7 +241,7 @@ public interface WithCPA {
 						.findFirst();
 	}
 
-	default Function<CollaborationProtocolAgreement, Optional<ToPartyInfo>> getToPartyInfo(Party toParty, String service, String action)
+	static Function<CollaborationProtocolAgreement, Optional<ToPartyInfo>> getToPartyInfo(Party toParty, String service, String action)
 	{
 		return cpa -> cpa.getPartyInfo().stream()
 				.filter(isEmptyOrMatchesPartyInfo(toParty))
@@ -253,21 +253,21 @@ public interface WithCPA {
 				.findFirst();
 	}
 
-	default Function<CollaborationProtocolAgreement, Boolean> canSend(List<PartyId> partyId, String role, String service, String action)
+	static Function<CollaborationProtocolAgreement, Boolean> canSend(List<PartyId> partyId, String role, String service, String action)
 	{
 		return cpa -> findRoles(partyId,role,service).apply(cpa)
 				.flatMap(streamCanSends())
 				.anyMatch(matchesCanSend(action));
 	}
 
-	default Function<CollaborationProtocolAgreement, Boolean> canReceive(List<PartyId> partyId, String role, String service, String action)
+	static Function<CollaborationProtocolAgreement, Boolean> canReceive(List<PartyId> partyId, String role, String service, String action)
 	{
 		return cpa -> findRoles(partyId,role,service).apply(cpa)
 				.flatMap(streamCanReceives())
 				.anyMatch(matchesCanReceive(action));
 	}
 
-	default Function<CollaborationProtocolAgreement, Optional<DeliveryChannel>> getDeliveryChannel(String deliveryChannelId)
+	static Function<CollaborationProtocolAgreement, Optional<DeliveryChannel>> getDeliveryChannel(String deliveryChannelId)
 	{
 		return cpa -> cpa.getPartyInfo().stream()
 			.flatMap(streamDeliveryChannels())
@@ -275,7 +275,7 @@ public interface WithCPA {
 			.findFirst();
 	}
 
-	default Function<PartyInfo, Optional<DeliveryChannel>> getDefaultDeliveryChannel(String action)
+	static Function<PartyInfo, Optional<DeliveryChannel>> getDefaultDeliveryChannel(String action)
 	{
 		return partyInfo -> partyInfo.getOverrideMshActionBinding().stream()
 				.filter(matchesOverrideMshActionBinding(action))
@@ -284,7 +284,7 @@ public interface WithCPA {
 				.or(() -> Optional.ofNullable((DeliveryChannel)partyInfo.getDefaultMshChannelId()));
 	}
 
-	default Function<PartyInfo, Optional<DeliveryChannel>> getSendDeliveryChannel(String role, String service, String action)
+	static Function<PartyInfo, Optional<DeliveryChannel>> getSendDeliveryChannel(String role, String service, String action)
 	{
 		return partyInfo -> findRoles(role,service).apply(partyInfo)
 				.flatMap(streamCanSends())
@@ -293,7 +293,7 @@ public interface WithCPA {
 				.findFirst();
 	}
 
-	default Function<PartyInfo, Optional<DeliveryChannel>> getReceiveDeliveryChannel(String role, String service, String action)
+	static Function<PartyInfo, Optional<DeliveryChannel>> getReceiveDeliveryChannel(String role, String service, String action)
 	{
 		return partyInfo -> findRoles(role,service).apply(partyInfo)
 				.flatMap(streamCanReceives())
@@ -302,7 +302,7 @@ public interface WithCPA {
 				.findFirst();
 	}
 
-	default Function<CollaborationProtocolAgreement, Boolean> isSendingNonRepudiationRequired(DocExchange docExchange, List<PartyId> partyId, String role, String service, String action)
+	static Function<CollaborationProtocolAgreement, Boolean> isSendingNonRepudiationRequired(DocExchange docExchange, List<PartyId> partyId, String role, String service, String action)
 	{
 		return cpa -> findRoles(partyId,role,service).apply(cpa)
 				.flatMap(streamCanSends())
@@ -310,7 +310,7 @@ public interface WithCPA {
 				.anyMatch(isNonRepudiationRequired(docExchange));
 	}
 
-	default Function<CollaborationProtocolAgreement, Boolean> isSendingConfidential(DocExchange docExchange, List<PartyId> partyId, String role, String service, String action)
+	static Function<CollaborationProtocolAgreement, Boolean> isSendingConfidential(DocExchange docExchange, List<PartyId> partyId, String role, String service, String action)
 	{
 		return cpa -> findRoles(partyId,role,service).apply(cpa)
 				.flatMap(streamCanSends())
