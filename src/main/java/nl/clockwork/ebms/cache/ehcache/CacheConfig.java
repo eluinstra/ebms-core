@@ -13,28 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.clockwork.ebms.cache;
-
-import java.util.ArrayList;
+package nl.clockwork.ebms.cache.ehcache;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.EnableCaching;
-import org.springframework.cache.concurrent.ConcurrentMapCache;
-import org.springframework.cache.interceptor.KeyGenerator;
-import org.springframework.cache.support.SimpleCacheManager;
+import org.springframework.cache.ehcache.EhCacheCacheManager;
+import org.springframework.cache.ehcache.EhCacheManagerFactoryBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Condition;
 import org.springframework.context.annotation.ConditionContext;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.type.AnnotatedTypeMetadata;
 
 import lombok.AccessLevel;
 import lombok.val;
 import lombok.experimental.FieldDefaults;
+import nl.clockwork.ebms.cache.SomeCacheType;
 
 @Configuration
 @EnableCaching
@@ -42,33 +40,44 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class CacheConfig
 {
-	private static final String CACHE_TYPE = "DEFAULT";
+	private static final String CACHE_TYPE = "EHCACHE";
+	private static final String DEFAULT_CONFIG_LOCATION = "nl/clockwork/ebms/ehcache.xml";
+
+	@Value("${cache.configLocation}")
+	Resource configLocation;
 
 	@Bean
-	@Conditional(DefaultCacheType.class)
-	public CacheManager simpleCacheManager()
+	@Conditional(EhCacheCacheType.class)
+	public CacheManager ehcacheCacheManager()
 	{
-		val result = new SimpleCacheManager();
-		result.setCaches(createCaches());
+		val result = new EhCacheCacheManager();
+		result.setCacheManager(createCacheManager());
 		return result;
 	}
 
-	private ArrayList<Cache> createCaches()
+	private net.sf.ehcache.CacheManager createCacheManager()
 	{
-		val result = new ArrayList<Cache>();
-		result.add(new ConcurrentMapCache("CPA"));
-		result.add(new ConcurrentMapCache("URLMapping"));
-		result.add(new ConcurrentMapCache("CertificateMapping"));
+		val result = createEhCacheManager(getConfigLocation());
+		result.addCache("CPA");
+		result.addCache("URLMapping");
+		result.addCache("CertificateMapping");
 		return result;
 	}
 
-	@Bean("ebMSKeyGenerator")
-	public KeyGenerator keyGenerator()
+	private net.sf.ehcache.CacheManager createEhCacheManager(Resource configLocation)
 	{
-		return new EbMSKeyGenerator();
+		val ehCacheManagerFactory = new EhCacheManagerFactoryBean();
+		ehCacheManagerFactory.setConfigLocation(configLocation);
+		ehCacheManagerFactory.afterPropertiesSet();
+		return ehCacheManagerFactory.getObject();
 	}
 
-	public static class DefaultCacheType implements Condition
+  private Resource getConfigLocation()
+	{
+		return configLocation == null ? new ClassPathResource(DEFAULT_CONFIG_LOCATION) : configLocation;
+	}
+
+	public static class EhCacheCacheType implements Condition
 	{
 		@Override
 		public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata)

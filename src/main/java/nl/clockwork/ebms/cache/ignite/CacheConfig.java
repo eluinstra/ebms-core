@@ -13,28 +13,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.clockwork.ebms.cache;
+package nl.clockwork.ebms.cache.ignite;
 
-import java.util.ArrayList;
+import java.io.IOException;
 
+import org.apache.ignite.cache.eviction.lru.LruEvictionPolicyFactory;
+import org.apache.ignite.cache.spring.SpringCacheManager;
+import org.apache.ignite.configuration.NearCacheConfiguration;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.EnableCaching;
-import org.springframework.cache.concurrent.ConcurrentMapCache;
-import org.springframework.cache.interceptor.KeyGenerator;
-import org.springframework.cache.support.SimpleCacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Condition;
 import org.springframework.context.annotation.ConditionContext;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.type.AnnotatedTypeMetadata;
 
 import lombok.AccessLevel;
 import lombok.val;
 import lombok.experimental.FieldDefaults;
+import nl.clockwork.ebms.cache.SomeCacheType;
 
 @Configuration
 @EnableCaching
@@ -42,33 +43,42 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class CacheConfig
 {
-	private static final String CACHE_TYPE = "DEFAULT";
+	private static final String CACHE_TYPE = "IGNITE";
+	private static final String DEFAULT_CONFIG_LOCATION = "nl/clockwork/ebms/ignite.xml";
+
+	@Value("${cache.configLocation}")
+	Resource configLocation;
 
 	@Bean
-	@Conditional(DefaultCacheType.class)
-	public CacheManager simpleCacheManager()
+	@Conditional(IgniteCacheType.class)
+	public CacheManager igniteCacheManager() throws IOException
 	{
-		val result = new SimpleCacheManager();
-		result.setCaches(createCaches());
+		val result = new SpringCacheManager();
+		result.setConfigurationPath(getConfigLocation().getURL().toString());
+		result.setDynamicNearCacheConfiguration(createDynamicNearCacheConfiguration());
 		return result;
 	}
 
-	private ArrayList<Cache> createCaches()
+  private Resource getConfigLocation()
 	{
-		val result = new ArrayList<Cache>();
-		result.add(new ConcurrentMapCache("CPA"));
-		result.add(new ConcurrentMapCache("URLMapping"));
-		result.add(new ConcurrentMapCache("CertificateMapping"));
+		return configLocation == null ? new ClassPathResource(DEFAULT_CONFIG_LOCATION) : configLocation;
+	}
+
+	private NearCacheConfiguration<Object,Object> createDynamicNearCacheConfiguration()
+	{
+		val result = new NearCacheConfiguration<Object,Object>();
+		result.setNearEvictionPolicyFactory(createNearEvictPlcFactory());
 		return result;
 	}
 
-	@Bean("ebMSKeyGenerator")
-	public KeyGenerator keyGenerator()
+	private LruEvictionPolicyFactory<Object,Object> createNearEvictPlcFactory()
 	{
-		return new EbMSKeyGenerator();
+		val result = new LruEvictionPolicyFactory<Object,Object>();
+		result.setMaxSize(100000);
+		return result;
 	}
 
-	public static class DefaultCacheType implements Condition
+	public static class IgniteCacheType implements Condition
 	{
 		@Override
 		public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata)
