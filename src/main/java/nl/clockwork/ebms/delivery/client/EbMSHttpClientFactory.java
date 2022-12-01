@@ -40,14 +40,6 @@ import nl.clockwork.ebms.security.EbMSTrustStore;
 @AllArgsConstructor
 public class EbMSHttpClientFactory
 {
-	public enum EbMSHttpClientType
-	{
-		DEFAULT, APACHE;
-	}
-
-	@NonNull
-	@Default
-	EbMSHttpClientType type = EbMSHttpClientType.DEFAULT;
 	int connectTimeout;
 	int readTimeout;
 	boolean chunkedStreamingMode;
@@ -71,10 +63,7 @@ public class EbMSHttpClientFactory
 		try
 		{
 			val sslFactoryManager = createSslFactoryManager(getClientAlias(clientAlias));
-			if (EbMSHttpClientType.APACHE.equals(type))
-				return new nl.clockwork.ebms.delivery.client.apache.EbMSHttpClient(sslFactoryManager,enabledProtocols,enabledCipherSuites,verifyHostnames,connectTimeout,readTimeout,chunkedStreamingMode,proxy);
-			else
-				return new EbMSHttpClient(sslFactoryManager,connectTimeout,readTimeout,chunkedStreamingMode,proxy,httpErrors.getRecoverableHttpErrors(),httpErrors.getUnrecoverableHttpErrors());
+			return new EbMSHttpClient(sslFactoryManager,connectTimeout,readTimeout,chunkedStreamingMode,proxy,httpErrors.getRecoverableHttpErrors(),httpErrors.getUnrecoverableHttpErrors());
 		}
 		catch (Exception e)
 		{

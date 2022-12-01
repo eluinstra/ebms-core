@@ -25,7 +25,6 @@ import org.springframework.context.annotation.Configuration;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import nl.clockwork.ebms.cpa.certificate.CertificateMapper;
-import nl.clockwork.ebms.delivery.client.EbMSHttpClientFactory.EbMSHttpClientType;
 import nl.clockwork.ebms.security.EbMSKeyStore;
 import nl.clockwork.ebms.security.EbMSTrustStore;
 
@@ -33,8 +32,6 @@ import nl.clockwork.ebms.security.EbMSTrustStore;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class EbMSClientConfig
 {
-	@Value("${http.client}")
-	EbMSHttpClientType ebMSHttpClientType;
 	@Value("${http.connectTimeout}")
 	int connectTimeout;
 	@Value("${http.readTimeout}")
@@ -75,7 +72,6 @@ public class EbMSClientConfig
 		CertificateMapper certificateMapper)
 	{
 		return EbMSHttpClientFactory.builder()
-				.type(ebMSHttpClientType)
 				.connectTimeout(connectTimeout)
 				.readTimeout(readTimeout)
 				.chunkedStreamingMode(chunkedStreamingMode)
