@@ -15,154 +15,59 @@
  */
 package nl.clockwork.ebms.delivery.client;
 
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.net.HttpURLConnection;
-import java.util.UUID;
+import java.net.http.HttpRequest.BodyPublishers;
+import java.net.http.HttpRequest.Builder;
+import java.nio.charset.StandardCharsets;
 
 import javax.xml.transform.TransformerException;
 
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
-import lombok.NonNull;
 import lombok.val;
 import lombok.experimental.FieldDefaults;
 import nl.clockwork.ebms.Constants;
-import nl.clockwork.ebms.model.EbMSAttachment;
 import nl.clockwork.ebms.model.EbMSDocument;
 import nl.clockwork.ebms.util.DOMUtils;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor
-class EbMSMessageWriter implements WithHTTP
+class EbMSMessageWriter
 {
 	private static final Logger messageLog = LoggerFactory.getLogger(Constants.MESSAGE_LOG);
-	@NonNull
-	HttpURLConnection connection;
 	
-	public void write(EbMSDocument document) throws IOException, TransformerException
+	public Builder write(Builder request, EbMSDocument document) throws TransformerException
 	{
-		if (document.getAttachments().isEmpty())
-			writeMessage(document);
-		else
-			writeMimeMessage(document);
+		return document.getAttachments().isEmpty()
+				? writeMessage(request, document)
+				: writeMimeMessage(request, document);
 	}
 
-	protected void writeMessage(EbMSDocument document) throws IOException, TransformerException
+	protected Builder writeMessage(Builder request, EbMSDocument document) throws TransformerException
 	{
-		connection.setRequestProperty("Content-Type","text/xml; charset=UTF-8");
-		connection.setRequestProperty("SOAPAction",Constants.EBMS_SOAP_ACTION);
+		val message = DOMUtils.toString(document.getMessage(),"UTF-8");
 		if (messageLog.isInfoEnabled())
-			messageLog.info(">>>>\n{}{}",(messageLog.isDebugEnabled() ? toString(connection.getRequestProperties()) + "\n" : ""),DOMUtils.toString(document.getMessage()));
-		//DOMUtils.write(document.getMessage(),messageLog.isInfoEnabled() ? new LoggingOutputStream(connection.getOutputStream()) : connection.getOutputStream(),"UTF-8");
-		DOMUtils.write(document.getMessage(),connection.getOutputStream(),"UTF-8");
+			messageLog.info(">>>>\n{}",message);
+		return request
+			.setHeader("Content-Type","text/xml; charset=UTF-8")
+			.setHeader("SOAPAction",Constants.EBMS_SOAP_ACTION)
+		  .POST(BodyPublishers.ofString(message,StandardCharsets.UTF_8));
 	}
 	
-	protected void writeMimeMessage(EbMSDocument document) throws IOException, TransformerException
+	protected Builder writeMimeMessage(Builder request, EbMSDocument document) throws TransformerException
 	{
-		if (messageLog.isInfoEnabled() && !messageLog.isDebugEnabled())
-			messageLog.info(">>>>\n{}",DOMUtils.toString(document.getMessage()));
-		val boundary = createBoundary();
-		val contentType = createContentType(boundary,document.getContentId());
+		val message = DOMUtils.toString(document.getMessage(),"UTF-8");
+		if (messageLog.isInfoEnabled())
+			messageLog.info(">>>>\n{}",message);
 
-		connection.setRequestProperty("Content-Type",contentType);
-		connection.setRequestProperty("SOAPAction",Constants.EBMS_SOAP_ACTION);
-
-		val requestProperties = connection.getRequestProperties();
-		val outputStream = messageLog.isDebugEnabled() ? new LoggingOutputStream(requestProperties,connection.getOutputStream()) : connection.getOutputStream();
-
-		try (val writer = new OutputStreamWriter(outputStream,"UTF-8"))
-		{
-			writer.write("--");
-			writer.write(boundary);
-			writer.write("\r\n");
-
-			writer.write("Content-Type: text/xml; charset=UTF-8");
-			writer.write("\r\n");
-			writer.write("Content-ID: <" + document.getContentId() + ">");
-			writer.write("\r\n");
-			writer.write("\r\n");
-			DOMUtils.write(document.getMessage(),writer,"UTF-8");
-			writer.write("\r\n");
-			writer.write("--");
-			writer.write(boundary);
-
-			for (val attachment: document.getAttachments())
-				writeAttachment(boundary,outputStream,writer,attachment);
-
-			writer.write("--");
-		}
+		val publisher = new MultipartBodyPublisher(document.getContentId())
+				.addXml(document.getContentId(),message);
+		document.getAttachments().stream().forEach(publisher::addAttachment);
+		return request
+				.setHeader("Content-Type",publisher.contentType())
+				.setHeader("SOAPAction",Constants.EBMS_SOAP_ACTION)
+				.POST(publisher);
 	}
-
-	private void writeAttachment(final String boundary, final OutputStream outputStream, OutputStreamWriter writer, final EbMSAttachment attachment) throws IOException
-	{
-		if (attachment.getContentType().matches("^(text/.*|.*/xml)$"))
-			writeTextAttachment(boundary,outputStream,writer,attachment);
-		else
-			writeBinaryAttachment(boundary,outputStream,writer,attachment);
-	}
-
-	protected void writeTextAttachment(String boundary, OutputStream outputStream, OutputStreamWriter writer, EbMSAttachment attachment) throws IOException
-	{
-		try (val a = attachment)
-		{
-			writer.write("\r\n");
-			writer.write("Content-Type: " + a.getContentType());
-			writer.write("\r\n");
-			if (!StringUtils.isEmpty(a.getName()))
-			{
-				writer.write("Content-Disposition: attachment; filename=\"" + a.getName() + "\"");
-				writer.write("\r\n");
-			}
-			writer.write("Content-ID: <" + a.getContentId() + ">");
-			writer.write("\r\n");
-			writer.write("\r\n");
-			writer.flush();
-			a.writeTo(outputStream);
-			writer.write("\r\n");
-			writer.write("--");
-			writer.write(boundary);
-		}
-	}
-
-	protected void writeBinaryAttachment(String boundary, OutputStream outputStream, OutputStreamWriter writer, EbMSAttachment attachment) throws IOException
-	{
-		try (val a = attachment)
-		{
-			writer.write("\r\n");
-			writer.write("Content-Type: " + a.getContentType());
-			writer.write("\r\n");
-			if (!StringUtils.isEmpty(a.getName()))
-			{
-				writer.write("Content-Disposition: attachment; filename=\"" + a.getName() + "\"");
-				writer.write("\r\n");
-			}
-			writer.write("Content-Transfer-Encoding: binary");
-			writer.write("\r\n");
-			writer.write("Content-ID: <" + a.getContentId() + ">");
-			writer.write("\r\n");
-			writer.write("\r\n");
-			writer.flush();
-			a.writeTo(outputStream);
-			writer.write("\r\n");
-			writer.write("--");
-			writer.write(boundary);
-		}
-	}
-
-	protected String createBoundary()
-	{
-		return "-=" + UUID.randomUUID() + "=-";
-	}
-
-	protected String createContentType(String boundary, String contentId)
-	{
-		return "multipart/related; boundary=\"" + boundary + "\"; type=\"text/xml\"; start=\"<" + contentId + ">\"; start-info=\"text/xml\"";
-	}
-
 }

@@ -59,17 +59,6 @@ public class EbMSMessageReader
 			return getEbMSMessage(in);
 	}
 
-	public EbMSDocument readResponse(String message) throws IOException, ParserConfigurationException, SAXException
-	{
-		return StringUtils.isNotBlank(message)
-				? EbMSDocument.builder()
-						.contentId(contentId)
-						.message(DOMUtils.read(message))
-						.attachments(Collections.emptyList())
-						.build()
-				: null;
-	}
-
 	private void parseEbMSMessage(EbMSContentHandler handler, String contentType, InputStream in) throws MimeException, IOException
 	{
 		val mimeConfig = MimeConfig.custom().setHeadlessParsing(contentType).build();

@@ -15,8 +15,8 @@
  */
 package nl.clockwork.ebms.delivery.client;
 
-import java.util.List;
-import java.util.Map;
+import java.net.http.HttpHeaders;
+import java.net.http.HttpResponse;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -28,37 +28,32 @@ import nl.clockwork.ebms.processor.EbMSProcessingException;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor
 @Getter
-public class EbMSResponseException extends EbMSProcessingException implements WithHTTP
+public class EbMSResponseException extends EbMSProcessingException
 {
 	private static final long serialVersionUID = 1L;
-	int statusCode;
-	@NonNull
-	Map<String,List<String>> headers;
+	HttpResponse<String> repsonse;
 
-	public EbMSResponseException(int statusCode, @NonNull Map<String,List<String>> headers, String message)
+	public EbMSResponseException(@NonNull HttpResponse<String> repsonse, String message)
 	{
 		super(message);
-		this.statusCode = statusCode;
-		this.headers = headers;
+		this.repsonse = repsonse;
 	}
 	
-	public EbMSResponseException(int statusCode, @NonNull Map<String,List<String>> headers, Throwable cause)
+	public EbMSResponseException(@NonNull HttpResponse<String> repsonse, Throwable cause)
 	{
 		super(cause);
-		this.statusCode = statusCode;
-		this.headers = headers;
+		this.repsonse = repsonse;
 	}
 	
-	public EbMSResponseException(int statusCode, @NonNull Map<String,List<String>> headers, String message, Throwable cause)
+	public EbMSResponseException(@NonNull HttpResponse<String> repsonse, String message, Throwable cause)
 	{
 		super(message,cause);
-		this.statusCode = statusCode;
-		this.headers = headers;
+		this.repsonse = repsonse;
 	}
 	
 	@Override
 	public String getMessage()
 	{
-		return "StatusCode=" + statusCode + "\n" + toString(headers) + "\n" + (super.getMessage() != null ? super.getMessage() : "");
+		return "StatusCode=" + repsonse.statusCode() + "\nHeaders=" + repsonse.headers().toString() + "\n" + (super.getMessage() != null ? super.getMessage() : "");
 	}
 }

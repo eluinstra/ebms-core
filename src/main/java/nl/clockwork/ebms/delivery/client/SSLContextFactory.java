@@ -15,9 +15,6 @@
  */
 package nl.clockwork.ebms.delivery.client;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.InetAddress;
 import java.net.Socket;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
@@ -27,14 +24,9 @@ import java.security.PrivateKey;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.X509Certificate;
 
-import javax.net.ssl.HostnameVerifier;
-import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLEngine;
-import javax.net.ssl.SSLParameters;
-import javax.net.ssl.SSLSocket;
-import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManagerFactory;
 import javax.net.ssl.X509KeyManager;
 
@@ -49,7 +41,7 @@ import nl.clockwork.ebms.security.EbMSKeyStore;
 import nl.clockwork.ebms.security.EbMSTrustStore;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-public class SSLFactoryManager
+public class SSLContextFactory
 {
 	@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 	@AllArgsConstructor
@@ -96,127 +88,30 @@ public class SSLFactoryManager
 		}
 	}
 
-	@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-	@AllArgsConstructor
-	public class SSLSocketFactoryWrapper extends SSLSocketFactory
-	{
-		@NonNull
-		SSLSocketFactory sslSocketFactory;
-		@NonNull
-		SSLParameters sslParameters;
-
-		@Override
-		public Socket createSocket() throws IOException
-		{
-			val socket = (SSLSocket)sslSocketFactory.createSocket();
-			socket.setSSLParameters(sslParameters);
-			return socket;
-		}
-
-		@Override
-		public Socket createSocket(Socket s, InputStream consumed, boolean autoClose) throws IOException
-		{
-			val socket = (SSLSocket)sslSocketFactory.createSocket(s,consumed,autoClose);
-			socket.setSSLParameters(sslParameters);
-			return socket;
-		}
-
-		@Override
-		public Socket createSocket(Socket s, String host, int port, boolean autoClose) throws IOException
-		{
-			val socket = (SSLSocket)sslSocketFactory.createSocket(s,host,port,autoClose);
-			socket.setSSLParameters(sslParameters);
-			return socket;
-		}
-
-		@Override
-		public String[] getDefaultCipherSuites()
-		{
-			return sslSocketFactory.getDefaultCipherSuites();
-		}
-
-		@Override
-		public String[] getSupportedCipherSuites()
-		{
-			return sslSocketFactory.getSupportedCipherSuites();
-		}
-
-		@Override
-		public Socket createSocket(String host, int port) throws IOException
-		{
-			val socket = (SSLSocket)sslSocketFactory.createSocket(host,port);
-			socket.setSSLParameters(sslParameters);
-			return socket;
-		}
-
-		@Override
-		public Socket createSocket(InetAddress host, int port) throws IOException
-		{
-			val socket = (SSLSocket)sslSocketFactory.createSocket(host,port);
-			socket.setSSLParameters(sslParameters);
-			return socket;
-		}
-
-		@Override
-		public Socket createSocket(String host, int port, InetAddress localHost, int localPort) throws IOException
-		{
-			val socket = (SSLSocket)sslSocketFactory.createSocket(host,port,localHost,localPort);
-			socket.setSSLParameters(sslParameters);
-			return socket;
-		}
-
-		@Override
-		public Socket createSocket(InetAddress address, int port, InetAddress localAddress, int localPort) throws IOException
-		{
-			val socket = (SSLSocket)sslSocketFactory.createSocket(address,port,localAddress,localPort);
-			socket.setSSLParameters(sslParameters);
-			return socket;
-		}
-	}
-
 	@NonNull
 	EbMSKeyStore keyStore;
 	@NonNull
 	EbMSTrustStore trustStore;
-	boolean verifyHostnames;
-	@NonNull
-	String[] enabledProtocols;
-	@NonNull
-	String[] enabledCipherSuites;
 	@Getter
-	SSLSocketFactory sslSocketFactory;
+	SSLContext sslContext;
 
 	@Builder
-	public SSLFactoryManager(
+	public SSLContextFactory(
 			@NonNull EbMSKeyStore keyStore,
 			@NonNull EbMSTrustStore trustStore,
-			boolean verifyHostnames,
-			String[] enabledProtocols,
-			String[] enabledCipherSuites,
-			String clientAlias) throws Exception
+			String clientAlias) throws UnrecoverableKeyException, NoSuchAlgorithmException, KeyStoreException, KeyManagementException
 	{
 		this.keyStore = keyStore;
 		this.trustStore = trustStore;
-		this.verifyHostnames = verifyHostnames;
-		this.enabledProtocols = enabledProtocols == null ? new String[]{} : enabledProtocols;
-		this.enabledCipherSuites = enabledCipherSuites == null ? new String[]{} : enabledCipherSuites;
 		val kmf = createKeyManagerFactory(keyStore);
 		setClientAlias(kmf,clientAlias);
 		val tmf = createTrustManagerFactory(trustStore);
-		val sslContext = createSSLContext(kmf,tmf);
+		sslContext = createSSLContext(kmf,tmf);
 		createEngine(sslContext);
-		//sslSocketFactory = sslContext.getSocketFactory();
-		sslSocketFactory = new SSLSocketFactoryWrapper(sslContext.getSocketFactory(),createSSLParameters());
 	}
 
-	public HostnameVerifier getHostnameVerifier()
-	{
-		return verifyHostnames ? HttpsURLConnection.getDefaultHostnameVerifier() : (h,s) -> true;
-	}
-	
 	private KeyManagerFactory createKeyManagerFactory(EbMSKeyStore keyStore) throws NoSuchAlgorithmException, KeyStoreException, UnrecoverableKeyException
 	{
-		//KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
 		val result = KeyManagerFactory.getInstance("SunX509");
 		result.init(keyStore.getKeyStore(),keyStore.getKeyPassword().toCharArray());
 		return result;
@@ -233,7 +128,6 @@ public class SSLFactoryManager
 
 	private TrustManagerFactory createTrustManagerFactory(EbMSTrustStore trustStore) throws NoSuchAlgorithmException, KeyStoreException
 	{
-		//TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
 		val result = TrustManagerFactory.getInstance("SunX509");
 		result.init(trustStore.getKeyStore());
 		return result;
@@ -248,20 +142,9 @@ public class SSLFactoryManager
 
 	private SSLEngine createEngine(final javax.net.ssl.SSLContext sslContext)
 	{
-		//val result = sslContext.createSSLEngine(hostname,port);
 		val result = sslContext.createSSLEngine();
 		result.setUseClientMode(true);
 		//result.setSSLParameters(createSSLParameters());
-		return result;
-	}
-	
-	private SSLParameters createSSLParameters()
-	{
-		val result = new SSLParameters();
-		if (enabledProtocols.length > 0)
-			result.setProtocols(enabledProtocols);
-		if (enabledProtocols.length > 0)
-			result.setCipherSuites(enabledCipherSuites);
 		return result;
 	}
 }

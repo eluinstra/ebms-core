@@ -15,21 +15,20 @@
  */
 package nl.clockwork.ebms.delivery.client;
 
-import java.util.List;
-import java.util.Map;
+import java.net.http.HttpResponse;
 
 public class EbMSUnrecoverableResponseException extends EbMSResponseException
 {
 	private static final long serialVersionUID = 1L;
 
-	public EbMSUnrecoverableResponseException(int statusCode, Map<String,List<String>> headers)
+	public EbMSUnrecoverableResponseException(HttpResponse<String> repsonse)
 	{
-		super(statusCode,headers);
+		super(repsonse);
 	}
 	
-	public EbMSUnrecoverableResponseException(int statusCode, Map<String,List<String>> headers, String message)
+	public EbMSUnrecoverableResponseException(HttpResponse<String> repsonse, String message)
 	{
-		super(statusCode,headers,message);
+		super(repsonse,message);
 	}
 	
 }

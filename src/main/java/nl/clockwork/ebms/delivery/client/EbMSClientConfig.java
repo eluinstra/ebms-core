@@ -17,10 +17,13 @@ package nl.clockwork.ebms.delivery.client;
 
 import java.util.Set;
 
+import javax.net.ssl.SSLParameters;
+
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.DependsOn;
 
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
@@ -36,8 +39,6 @@ public class EbMSClientConfig
 	int connectTimeout;
 	@Value("${http.readTimeout}")
 	int readTimeout;
-	@Value("${http.chunkedStreamingMode}")
-	boolean chunkedStreamingMode;
 	@Value("${http.proxy.host}")
 	String proxyHost;
 	@Value("${http.proxy.port}")
@@ -66,7 +67,10 @@ public class EbMSClientConfig
 	boolean useClientCertificate;
 
 	@Bean
+	@DependsOn("ebMSProxyFactory")
 	public EbMSHttpClientFactory ebMSClientFactory(
+		EbMSProxy ebMSProxy,
+		SSLParameters sslParameters,
 		@Qualifier("clientKeyStore") EbMSKeyStore clientKeyStore,
 		EbMSTrustStore trustStore,
 		CertificateMapper certificateMapper)
@@ -74,26 +78,31 @@ public class EbMSClientConfig
 		return EbMSHttpClientFactory.builder()
 				.connectTimeout(connectTimeout)
 				.readTimeout(readTimeout)
-				.chunkedStreamingMode(chunkedStreamingMode)
-				.proxy(createProxy())
-				.enabledProtocols(enabledProtocols)
-				.enabledCipherSuites(enabledCipherSuites)
+				.proxy(ebMSProxy)
+				.sslParameters(sslParameters)
 				.verifyHostnames(verifyHostnames)
 				.keyStore(clientKeyStore)
 				.trustStore(trustStore)
-				.httpErrors(createHttpErrors())
+				.httpErrors(httpErrors())
 				.certificateMapper(certificateMapper)
 				.useClientCertificate(useClientCertificate)
 				.build();
 	}
 
-	private EbMSProxy createProxy()
-	{
-		return new EbMSProxyFactory(proxyHost,poxyPort,proxyUsername,proxyPassword,nonProxyHosts).getObject();
-	}
-
-	private HttpErrors createHttpErrors()
+	private HttpErrors httpErrors()
 	{
 		return new HttpErrors(recoverableInformationalHttpErrors,recoverableRedirectionHttpErrors,recoverableClientHttpErrors,unrecoverableServerHttpErrors);
+	}
+
+	@Bean
+	public EbMSProxyFactory ebMSProxyFactory()
+	{
+		return new EbMSProxyFactory(proxyHost,poxyPort,proxyUsername,proxyPassword,nonProxyHosts);
+	}
+
+	@Bean
+	public SSLParametersFactory sslParametersFactory()
+	{
+		return new SSLParametersFactory(enabledProtocols, enabledCipherSuites);
 	}
 }
