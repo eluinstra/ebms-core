@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.clockwork.ebms.kafka;
+package nl.clockwork.ebms.delivery.task.kafka;
 
 import nl.clockwork.ebms.delivery.task.DeliveryTask;
 import nl.clockwork.ebms.delivery.task.DeliveryTaskHandlerConfig;
@@ -48,16 +48,8 @@ import java.util.UUID;
 @EnableKafka
 public class KafkaConfig
 {
-	private static final Logger logger = LoggerFactory.getLogger(KafkaConfig.class);
-
 	@Value("${kafka.serverUrl}")
 	private String kafkaServerUrl;
-
-	@PostConstruct
-	public void init()
-	{
-		logger.info("init<KafkaConfig>");
-	}
 
 	@Bean
 	public ProducerFactory<String,EbMSMessageProperties> messagePropertiesProducerFactory()
@@ -74,14 +66,12 @@ public class KafkaConfig
 	@Bean(name = "deliveryTaskKafkaTemplate")
 	public KafkaTemplate<String,DeliveryTask> deliveryTaskKafkaTemplate()
 	{
-		logger.info("Initializing deliveryTaskKafkaTemplate");
 		return new KafkaTemplate<>(deliveryTaskProducerFactory());
 	}
 
 	@Bean(name = "messagePropertiesKafkaTemplate")
 	public KafkaTemplate<String,EbMSMessageProperties> messagePropertiesKafkaTemplate()
 	{
-		logger.info("Initializing messagePropertiesKafkaTemplate");
 		return new KafkaTemplate<>(messagePropertiesProducerFactory());
 	}
 
@@ -145,7 +135,7 @@ public class KafkaConfig
 	@Bean
 	public KafkaTransactionManager<String,DeliveryTask> deliveryTaskKafkaTransactionManager()
 	{
-		KafkaTransactionManager<String,DeliveryTask> result = new KafkaTransactionManager<>(deliveryTaskProducerFactory());
+		val result = new KafkaTransactionManager<String,DeliveryTask>(deliveryTaskProducerFactory());
 		result.setTransactionSynchronization(AbstractPlatformTransactionManager.SYNCHRONIZATION_ON_ACTUAL_TRANSACTION);
 		return result;
 	}
@@ -153,7 +143,7 @@ public class KafkaConfig
 	@Bean
 	public KafkaTransactionManager<String,EbMSMessageProperties> messagePropertiesKafkaTransactionManager()
 	{
-		KafkaTransactionManager<String,EbMSMessageProperties> result = new KafkaTransactionManager<>(messagePropertiesProducerFactory());
+		val result = new KafkaTransactionManager<String,EbMSMessageProperties>(messagePropertiesProducerFactory());
 		result.setTransactionSynchronization(AbstractPlatformTransactionManager.SYNCHRONIZATION_ON_ACTUAL_TRANSACTION);
 		return result;
 	}

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.clockwork.ebms.scheduler;
+package nl.clockwork.ebms.delivery.task.quartz;
 
 import org.quartz.SchedulerContext;
 import org.quartz.spi.TriggerFiredBundle;

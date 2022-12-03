@@ -13,13 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.clockwork.ebms.delivery.task;
+package nl.clockwork.ebms.delivery.task.quartz;
 
 import lombok.AccessLevel;
 import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
 import nl.clockwork.ebms.cpa.CPAManager;
 import nl.clockwork.ebms.dao.EbMSDAO;
+import nl.clockwork.ebms.delivery.task.DeliveryTask;
+import nl.clockwork.ebms.delivery.task.DeliveryTaskDAO;
+import nl.clockwork.ebms.delivery.task.kafka.KafkaJob;
+
 import org.quartz.Job;
 import org.quartz.Scheduler;
 import org.springframework.kafka.core.KafkaTemplate;

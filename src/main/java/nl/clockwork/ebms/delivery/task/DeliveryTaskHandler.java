@@ -49,6 +49,7 @@ import nl.clockwork.ebms.util.StreamUtils;
 
 @Slf4j
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+public
 class DeliveryTaskHandler
 {
 	@NonNull

@@ -13,29 +13,35 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.clockwork.ebms.delivery.task;
+package nl.clockwork.ebms.delivery.task.kafka;
 
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.Conditional;
+import org.springframework.kafka.transaction.KafkaTransactionManager;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.PlatformTransactionManager;
 
 import lombok.AccessLevel;
 import lombok.val;
 import lombok.experimental.FieldDefaults;
+import nl.clockwork.ebms.delivery.task.DeliveryTaskManager;
+import nl.clockwork.ebms.delivery.task.DeliveryTaskManagerConfig;
+import nl.clockwork.ebms.delivery.task.DeliveryTaskManagerConfig.QuartzKafkaTaskManagerType;
+import nl.clockwork.ebms.delivery.task.quartz.QuartzDeliveryTaskManager;
 
 @Component
+@Conditional(QuartzKafkaTaskManagerType.class)
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class JMSJob extends QuartzJobBean
+public class KafkaJob extends QuartzJobBean
 {
 	@Autowired
-	@Qualifier("jmsTransactionManager")
-	PlatformTransactionManager transactionManager;
-	@Autowired
 	DeliveryTaskManager deliveryTaskManager;
+	@Autowired
+	@Qualifier("deliveryTaskKafkaTransactionManager")
+	KafkaTransactionManager<?,?> transactionManager;
 
 	@Override
 	protected void executeInternal(JobExecutionContext context) throws JobExecutionException

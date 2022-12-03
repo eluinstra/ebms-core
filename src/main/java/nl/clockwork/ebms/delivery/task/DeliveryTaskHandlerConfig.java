@@ -15,10 +15,8 @@
  */
 package nl.clockwork.ebms.delivery.task;
 
-import javax.jms.ConnectionFactory;
+import javax.sql.DataSource;
 
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -27,10 +25,9 @@ import org.springframework.context.annotation.ConditionContext;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.type.AnnotatedTypeMetadata;
-import org.springframework.jms.listener.DefaultMessageListenerContainer;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
-import org.springframework.transaction.PlatformTransactionManager;
 
 import lombok.AccessLevel;
 import lombok.val;
@@ -44,24 +41,14 @@ import nl.clockwork.ebms.event.MessageEventListener;
 import nl.clockwork.ebms.processor.EbMSMessageProcessor;
 
 @Configuration
-@ComponentScan(basePackageClasses = {nl.clockwork.ebms.delivery.task.DeliveryTaskJob.class,nl.clockwork.ebms.delivery.task.JMSJob.class})
 @EnableAsync
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class DeliveryTaskHandlerConfig
 {
-	public enum DeliveryTaskHandlerType
-	{
-		DEFAULT, JMS, QUARTZ, QUARTZ_JMS, QUARTZ_KAFKA;
-	}
+	public static final String DELIVERY_TASK_HANDLER_TYPE = "DEFAULT";
 
 	@Value("${ebms.serverId:#{null}}")
 	String serverId;
-	@Value("${deliveryTaskHandler.jms.destinationName}")
-	String jmsDestinationName;
-	@Value("${deliveryTaskHandler.jms.receiveTimeout}")
-	long receiveTimeout;
-	@Value("${deliveryTaskHandler.start}")
-	boolean startTaskHandler;
 	@Value("${deliveryTaskHandler.minThreads}")
 	int minThreads;
 	@Value("${deliveryTaskHandler.maxThreads}")
@@ -74,8 +61,10 @@ public class DeliveryTaskHandlerConfig
 	int taskHandlerTaskExecutionInterval;
 	@Value("${ebmsMessage.deleteContentOnProcessed}")
 	boolean deleteEbMSAttachmentsOnMessageProcessed;
-	@Value("${deliveryTaskHandler.jms.destinationName}")
-	String destinationName;
+	@Value("${deliveryTaskManager.nrAutoRetries}")
+	int nrAutoRetries;
+	@Value("${deliveryTaskManager.autoRetryInterval}")
+	int autoRetryInterval;
 
 	@Bean("deliveryTaskExecutor")
 	@Conditional(DefaultTaskHandlerType.class)
@@ -103,25 +92,6 @@ public class DeliveryTaskHandlerConfig
 	}
 
 	@Bean
-	@Conditional(JmsTaskHandlerType.class)
-	public DefaultMessageListenerContainer jmsTaskProcessor(
-		ConnectionFactory connectionFactory,
-		@Qualifier("jmsTransactionManager") PlatformTransactionManager jmsTransactionManager,
-		DeliveryTaskHandler deliveryTaskHandler)
-	{
-		val result = new DefaultMessageListenerContainer();
-		result.setConnectionFactory(connectionFactory);
-		result.setTransactionManager(jmsTransactionManager);
-		result.setSessionTransacted(true);
-		result.setConcurrentConsumers(minThreads);
-		result.setMaxConcurrentConsumers(maxThreads);
-		result.setReceiveTimeout(receiveTimeout);
-		result.setDestinationName(StringUtils.isEmpty(jmsDestinationName) ? JMSDeliveryTaskManager.JMS_DESTINATION_NAME : jmsDestinationName);
-		result.setMessageListener(new JMSDeliveryTaskListener(deliveryTaskHandler));
-		return result;
-	}
-
-	@Bean
   public DeliveryTaskHandler deliveryTaskHandler(
 		MessageEventListener messageEventListener,
 		EbMSDAO ebMSDAO,
@@ -146,43 +116,34 @@ public class DeliveryTaskHandlerConfig
 				.build();
 	}
 
+	@Bean
+	@Conditional(DefaultTaskManagerType.class)
+	public DeliveryTaskManager defaultDeliveryTaskManager(EbMSDAO ebMSDAO, DeliveryTaskDAO deliveryTaskDAO, CPAManager cpaManager)
+	{
+		return new DAODeliveryTaskManager(ebMSDAO,deliveryTaskDAO,cpaManager,serverId,nrAutoRetries,autoRetryInterval);
+	}
+
+	@Bean
+	public DeliveryTaskDAO deliveryTaskDAO(DataSource dataSource)
+	{
+		return new DeliveryTaskDAOImpl(new JdbcTemplate(dataSource));
+	}
+
 	public static class DefaultTaskHandlerType implements Condition
 	{
 		@Override
 		public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata)
 		{
 			return context.getEnvironment().getProperty("deliveryTaskHandler.start",Boolean.class,true)
-					&& context.getEnvironment().getProperty("deliveryTaskHandler.type",DeliveryTaskHandlerType.class,DeliveryTaskHandlerType.DEFAULT) == DeliveryTaskHandlerType.DEFAULT;
+					&& context.getEnvironment().getProperty("deliveryTaskHandler.type",String.class,"").equals(DELIVERY_TASK_HANDLER_TYPE);
 		}
 	}
-	public static class JmsTaskHandlerType implements Condition
+	public static class DefaultTaskManagerType implements Condition
 	{
 		@Override
 		public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata)
 		{
-			return context.getEnvironment().getProperty("deliveryTaskHandler.start",Boolean.class,true)
-					&& (context.getEnvironment().getProperty("deliveryTaskHandler.type",DeliveryTaskHandlerType.class,DeliveryTaskHandlerType.DEFAULT) == DeliveryTaskHandlerType.JMS
-					|| context.getEnvironment().getProperty("deliveryTaskHandler.type",DeliveryTaskHandlerType.class,DeliveryTaskHandlerType.DEFAULT) == DeliveryTaskHandlerType.QUARTZ_JMS);
-		}
-	}
-	public static class QuartzTaskHandlerType implements Condition
-	{
-		@Override
-		public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata)
-		{
-			return context.getEnvironment().getProperty("deliveryTaskHandler.start",Boolean.class,true)
-					&& (context.getEnvironment().getProperty("deliveryTaskHandler.type",DeliveryTaskHandlerType.class,DeliveryTaskHandlerType.DEFAULT) == DeliveryTaskHandlerType.QUARTZ
-					|| context.getEnvironment().getProperty("deliveryTaskHandler.type",DeliveryTaskHandlerType.class,DeliveryTaskHandlerType.DEFAULT) == DeliveryTaskHandlerType.QUARTZ_JMS
-					|| context.getEnvironment().getProperty("deliveryTaskHandler.type",DeliveryTaskHandlerType.class,DeliveryTaskHandlerType.DEFAULT) == DeliveryTaskHandlerType.QUARTZ_KAFKA);
-		}
-	}
-	public static class KafkaTaskHandlerType implements Condition
-	{
-		@Override
-		public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata)
-		{
-			return context.getEnvironment().getProperty("deliveryTaskHandler.start",Boolean.class,true)
-					&& context.getEnvironment().getProperty("deliveryTaskHandler.type",DeliveryTaskHandlerType.class,DeliveryTaskHandlerType.DEFAULT) == DeliveryTaskHandlerType.QUARTZ_KAFKA;
+			return context.getEnvironment().getProperty("deliveryTaskHandler.type",String.class,"").equals(DELIVERY_TASK_HANDLER_TYPE);
 		}
 	}
 }

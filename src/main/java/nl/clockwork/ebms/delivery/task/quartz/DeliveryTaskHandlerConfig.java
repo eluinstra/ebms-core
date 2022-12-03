@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.clockwork.ebms.scheduler;
+package nl.clockwork.ebms.delivery.task.quartz;
 
 import java.util.Arrays;
 import java.util.Properties;
@@ -26,11 +26,13 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Condition;
+import org.springframework.context.annotation.ConditionContext;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.type.AnnotatedTypeMetadata;
 import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
@@ -40,14 +42,23 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.val;
 import lombok.experimental.FieldDefaults;
-import nl.clockwork.ebms.delivery.task.DeliveryTaskHandlerConfig.DeliveryTaskHandlerType;
-import nl.clockwork.ebms.delivery.task.DeliveryTaskHandlerConfig.QuartzTaskHandlerType;
 
 @Configuration
-@EnableTransactionManagement
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class SchedulerConfig
+public class DeliveryTaskHandlerConfig
 {
+	public static final String DELIVERY_TASK_HANDLER_TYPE = "QUARTZ";
+
+	public static class QuartzTaskHandlerType implements Condition
+	{
+		@Override
+		public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata)
+		{
+			return context.getEnvironment().getProperty("deliveryTaskHandler.start",Boolean.class,true)
+					&& (context.getEnvironment().getProperty("deliveryTaskHandler.type",String.class,"").contains(DELIVERY_TASK_HANDLER_TYPE));
+		}
+	}
+
 	@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 	@AllArgsConstructor
 	@Getter
@@ -74,8 +85,6 @@ public class SchedulerConfig
 		}
 	}
 
-	@Value("${deliveryTaskHandler.type}")
-	DeliveryTaskHandlerType deliveryTaskHandlerType;
 	@Value("${deliveryTaskHandler.quartz.jdbc.driverClassName}")
 	String driverClassName;
 	@Value("${deliveryTaskHandler.quartz.jdbc.selectWithLockSQL}")

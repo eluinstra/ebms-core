@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.clockwork.ebms.delivery.task;
+package nl.clockwork.ebms.delivery.task.jms;
 
 import java.time.Instant;
 
@@ -26,6 +26,8 @@ import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.val;
 import lombok.experimental.FieldDefaults;
+import nl.clockwork.ebms.delivery.task.DeliveryTask;
+import nl.clockwork.ebms.delivery.task.DeliveryTaskHandler;
 
 @FieldDefaults(level = AccessLevel.PROTECTED, makeFinal = true)
 @AllArgsConstructor

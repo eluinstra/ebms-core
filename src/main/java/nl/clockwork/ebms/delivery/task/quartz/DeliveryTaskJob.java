@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.clockwork.ebms.delivery.task;
+package nl.clockwork.ebms.delivery.task.quartz;
 
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
@@ -24,6 +24,7 @@ import org.springframework.stereotype.Component;
 import lombok.AccessLevel;
 import lombok.val;
 import lombok.experimental.FieldDefaults;
+import nl.clockwork.ebms.delivery.task.DeliveryTaskHandler;
 
 @Component
 @FieldDefaults(level = AccessLevel.PRIVATE)

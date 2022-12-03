@@ -13,12 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.clockwork.ebms.delivery.task;
+package nl.clockwork.ebms.delivery.task.kafka;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
+
+import nl.clockwork.ebms.delivery.task.DeliveryTask;
+import nl.clockwork.ebms.delivery.task.DeliveryTaskHandler;
+import nl.clockwork.ebms.delivery.task.DeliveryTaskHandlerConfig;
+import nl.clockwork.ebms.delivery.task.quartz.QuartzKafkaDeliveryTaskManager;
 
 @Component
 @Conditional(DeliveryTaskHandlerConfig.KafkaTaskHandlerType.class)

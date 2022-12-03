@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.clockwork.ebms.delivery.task;
+package nl.clockwork.ebms.delivery.task.quartz;
 
 import org.quartz.Job;
 import org.quartz.Scheduler;
@@ -24,7 +24,11 @@ import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
 import nl.clockwork.ebms.cpa.CPAManager;
 import nl.clockwork.ebms.dao.EbMSDAO;
-import nl.clockwork.ebms.delivery.task.JMSDeliveryTaskManager.DeliveryTaskMessageCreator;
+import nl.clockwork.ebms.delivery.task.DeliveryTask;
+import nl.clockwork.ebms.delivery.task.DeliveryTaskDAO;
+import nl.clockwork.ebms.delivery.task.jms.JMSDeliveryTaskManager;
+import nl.clockwork.ebms.delivery.task.jms.JMSJob;
+import nl.clockwork.ebms.delivery.task.jms.JMSDeliveryTaskManager.DeliveryTaskMessageCreator;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class QuartzJMSDeliveryTaskManager extends QuartzDeliveryTaskManager

@@ -37,6 +37,10 @@ import lombok.experimental.FieldDefaults;
 import nl.clockwork.ebms.cpa.CPAManager;
 import nl.clockwork.ebms.dao.EbMSDAO;
 import nl.clockwork.ebms.delivery.task.DeliveryTaskHandlerConfig.DeliveryTaskHandlerType;
+import nl.clockwork.ebms.delivery.task.jms.JMSDeliveryTaskManager;
+import nl.clockwork.ebms.delivery.task.quartz.QuartzDeliveryTaskManager;
+import nl.clockwork.ebms.delivery.task.quartz.QuartzJMSDeliveryTaskManager;
+import nl.clockwork.ebms.delivery.task.quartz.QuartzKafkaDeliveryTaskManager;
 
 @Configuration
 @FieldDefaults(level = AccessLevel.PRIVATE)
@@ -58,13 +62,6 @@ public class DeliveryTaskManagerConfig
 	int autoRetryInterval;
 	@Autowired
 	EbMSDAO ebMSDAO;
-
-	@Bean
-	@Conditional(DefaultTaskManagerType.class)
-	public DeliveryTaskManager defaultDeliveryTaskManager(DeliveryTaskDAO deliveryTaskDAO)
-	{
-		return createDefaultDeliveryTaskManager(deliveryTaskDAO);
-	}
 
 	@Bean
 	@Conditional(JmsTaskManagerType.class)
@@ -96,25 +93,6 @@ public class DeliveryTaskManagerConfig
 		return new QuartzKafkaDeliveryTaskManager(scheduler,ebMSDAO,deliveryTaskDAO,cpaManager,nrAutoRetries,autoRetryInterval,kafkaTemplate);
 	}
 
-	@Bean
-	public DeliveryTaskDAO deliveryTaskDAO(DataSource dataSource)
-	{
-		return new DeliveryTaskDAOImpl(new JdbcTemplate(dataSource));
-	}
-
-	private DAODeliveryTaskManager createDefaultDeliveryTaskManager(DeliveryTaskDAO deliveryTaskDAO)
-	{
-		return new DAODeliveryTaskManager(ebMSDAO,deliveryTaskDAO,cpaManager,serverId,nrAutoRetries,autoRetryInterval);
-	}
-
-	public static class DefaultTaskManagerType implements Condition
-	{
-		@Override
-		public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata)
-		{
-			return context.getEnvironment().getProperty("deliveryTaskHandler.type",DeliveryTaskHandlerType.class,DeliveryTaskHandlerType.DEFAULT) == DeliveryTaskHandlerType.DEFAULT;
-		}
-	}
 	public static class JmsTaskManagerType implements Condition
 	{
 		@Override
