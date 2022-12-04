@@ -39,14 +39,12 @@ import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import com.zaxxer.hikari.util.IsolationLevel;
 
-import bitronix.tm.resource.jdbc.PoolingDataSource;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.val;
 import lombok.experimental.FieldDefaults;
 import nl.clockwork.ebms.transaction.TransactionManagerConfig.AtomikosTransactionManagerType;
-import nl.clockwork.ebms.transaction.TransactionManagerConfig.BitronixTransactionManagerType;
 import nl.clockwork.ebms.transaction.TransactionManagerConfig.DefaultTransactionManagerType;
 import nl.clockwork.ebms.transaction.TransactionManagerConfig.TransactionManagerType;
 
@@ -135,39 +133,6 @@ public class DataSourceConfig
 		config.setMinimumIdle(minPoolSize);
 		config.setMaximumPoolSize(maxPoolSize);
 		return new HikariDataSource(config);
-	}
-
-	@Bean(destroyMethod = "close")
-	@Conditional(BitronixTransactionManagerType.class)
-	public DataSource poolingDataSource()
-	{
-		val result = new PoolingDataSource();
-		result.setUniqueName(UUID.randomUUID().toString());
-		result.setClassName(driverClassName);
-		if (isolationLevel != null)
-			result.setIsolationLevel(isolationLevel.name());
-    result.setAllowLocalTransactions(true); //false
-    result.setDriverProperties(createDriverProperties());
-    result.setMaxIdleTime(maxIdleTime);
-    result.setMinPoolSize(minPoolSize);
-    result.setMaxPoolSize(maxPoolSize);
-    result.setEnableJdbc4ConnectionTest(StringUtils.isEmpty(testQuery));
-    result.setTestQuery(testQuery);
-		result.setAcquireIncrement(1);
-		result.setAcquisitionInterval(1);
-		result.setAcquisitionTimeout(30);
-    result.setApplyTransactionTimeout(false);
-		result.setAutomaticEnlistingEnabled(true);
-		result.setDeferConnectionRelease(true);
-		result.setDisabled(false);
-		result.setIgnoreRecoveryFailures(false);
-		result.setMaxIdleTime(60);
-		result.setPreparedStatementCacheSize(0);
-		result.setShareTransactionConnections(false);
-		result.setTwoPcOrderingPosition(1);
-		result.setUseTmJoin(true);
-    result.init();
-    return result;
 	}
 
 	@Bean(destroyMethod = "close")

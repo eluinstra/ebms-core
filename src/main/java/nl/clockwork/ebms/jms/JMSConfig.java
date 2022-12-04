@@ -15,7 +15,6 @@
  */
 package nl.clockwork.ebms.jms;
 
-import java.util.Properties;
 import java.util.UUID;
 
 import javax.jms.ConnectionFactory;
@@ -32,12 +31,10 @@ import org.springframework.context.annotation.DependsOn;
 
 import com.atomikos.jms.AtomikosConnectionFactoryBean;
 
-import bitronix.tm.resource.jms.PoolingConnectionFactory;
 import lombok.AccessLevel;
 import lombok.val;
 import lombok.experimental.FieldDefaults;
 import nl.clockwork.ebms.transaction.TransactionManagerConfig.AtomikosTransactionManagerType;
-import nl.clockwork.ebms.transaction.TransactionManagerConfig.BitronixTransactionManagerType;
 import nl.clockwork.ebms.transaction.TransactionManagerConfig.DefaultTransactionManagerType;
 import nl.clockwork.ebms.transaction.TransactionManagerConfig.TransactionManagerType;
 
@@ -79,34 +76,6 @@ public class JMSConfig
 	}
 
 	@Bean(initMethod = "init", destroyMethod = "close")
-	@Conditional(BitronixTransactionManagerType.class)
-	@DependsOn("brokerFactory")
-	public ConnectionFactory poolingConnectionFactory()
-	{
-		val result = new PoolingConnectionFactory();
-		result.setUniqueName(UUID.randomUUID().toString());
-		result.setClassName("org.apache.activemq.ActiveMQXAConnectionFactory");
-		result.setAllowLocalTransactions(false);
-		result.setMinPoolSize(minPoolSize);
-		result.setMaxPoolSize(maxPoolSize);
-		result.setDriverProperties(createDriverProperties());
-		result.setAcquireIncrement(1);
-		result.setAcquisitionInterval(1);
-		result.setAcquisitionTimeout(30);
-		result.setApplyTransactionTimeout(false);
-		result.setAutomaticEnlistingEnabled(true);
-		result.setCacheProducersConsumers(true);
-		result.setDeferConnectionRelease(true);
-		result.setDisabled(false);
-		result.setIgnoreRecoveryFailures(false);
-		result.setMaxIdleTime(60);
-		result.setShareTransactionConnections(false);
-		result.setTwoPcOrderingPosition(1);
-		result.setUseTmJoin(true);
-		return result;
-	}
-
-	@Bean(initMethod = "init", destroyMethod = "close")
 	@Conditional(AtomikosTransactionManagerType.class)
 	@DependsOn("brokerFactory")
 	public ConnectionFactory atomikosConnectionFactoryBean()
@@ -125,18 +94,6 @@ public class JMSConfig
 		result.setMaxLifetime(0);
 		result.setReapTimeout(0);
 		return result;
-	}
-
-	private Properties createDriverProperties()
-	{
-		val result = new Properties();
-		result.put("brokerURL",jmsBrokerUrl);
-		if (StringUtils.isNotEmpty(username))
-		{
-			result.put("userName",username);
-			result.put("password",password);
-		}
-		return result ;
 	}
 
 	private XAConnectionFactory createXAConnectionFactory()

@@ -15,8 +15,6 @@
  */
 package nl.clockwork.ebms.transaction;
 
-import java.util.UUID;
-
 import javax.jms.ConnectionFactory;
 import javax.sql.DataSource;
 import javax.transaction.SystemException;
@@ -27,7 +25,6 @@ import org.springframework.context.annotation.Condition;
 import org.springframework.context.annotation.ConditionContext;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.DependsOn;
 import org.springframework.core.type.AnnotatedTypeMetadata;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.jms.connection.JmsTransactionManager;
@@ -38,7 +35,6 @@ import org.springframework.transaction.jta.JtaTransactionManager;
 import com.atomikos.icatch.jta.UserTransactionImp;
 import com.atomikos.icatch.jta.UserTransactionManager;
 
-import bitronix.tm.TransactionManagerServices;
 import lombok.AccessLevel;
 import lombok.val;
 import lombok.experimental.FieldDefaults;
@@ -50,7 +46,7 @@ public class TransactionManagerConfig
 {
 	public enum TransactionManagerType
 	{
-		DEFAULT, BITRONIX, ATOMIKOS;
+		DEFAULT, ATOMIKOS;
 	}
 
 	@Value("${transactionManager.transactionTimeout}")
@@ -68,15 +64,6 @@ public class TransactionManagerConfig
 	public PlatformTransactionManager jmsTransactionManager(ConnectionFactory connectionFactory)
 	{
 		return new JmsTransactionManager(connectionFactory);
-	}
-
-	@Bean(name = {"dataSourceTransactionManager","jmsTransactionManager"})
-	@Conditional(BitronixTransactionManagerType.class)
-	@DependsOn("btmConfig")
-	public PlatformTransactionManager bitronixJtaTransactionManager()
-	{
-		val transactionManager = TransactionManagerServices.getTransactionManager();
-		return new JtaTransactionManager(transactionManager,transactionManager);
 	}
 
 	@Bean(name = {"dataSourceTransactionManager","jmsTransactionManager"})
@@ -101,29 +88,12 @@ public class TransactionManagerConfig
 		return result;
 	}
 
-	@Conditional(BitronixTransactionManagerType.class)
-	@Bean("btmConfig")
-	public void btmConfig()
-	{
-		val config = TransactionManagerServices.getConfiguration();
-		config.setServerId(UUID.randomUUID().toString());
-		config.setDefaultTransactionTimeout(transactionTimeout);
-	}
-
 	public static class DefaultTransactionManagerType implements Condition
 	{
 		@Override
 		public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata)
 		{
 			return context.getEnvironment().getProperty("transactionManager.type",TransactionManagerType.class,TransactionManagerType.DEFAULT) == TransactionManagerType.DEFAULT;
-		}
-	}
-	public static class BitronixTransactionManagerType implements Condition
-	{
-		@Override
-		public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata)
-		{
-			return context.getEnvironment().getProperty("transactionManager.type",TransactionManagerType.class,TransactionManagerType.DEFAULT) == TransactionManagerType.BITRONIX;
 		}
 	}
 	public static class AtomikosTransactionManagerType implements Condition
