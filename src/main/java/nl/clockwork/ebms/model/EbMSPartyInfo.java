@@ -15,17 +15,16 @@
  */
 package nl.clockwork.ebms.model;
 
+
 import java.io.Serializable;
 import java.util.List;
-
-import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.PartyId;
-
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.Value;
 import lombok.experimental.FieldDefaults;
+import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.PartyId;
 
 @Value
 @FieldDefaults(level = AccessLevel.PRIVATE)

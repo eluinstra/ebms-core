@@ -15,6 +15,7 @@
  */
 package nl.clockwork.ebms.server.servlet;
 
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.URLDecoder;
@@ -22,7 +23,6 @@ import java.nio.charset.Charset;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
-
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
@@ -30,14 +30,12 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
-
-import org.apache.commons.lang3.StringUtils;
-
 import lombok.AccessLevel;
-import lombok.val;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 import nl.clockwork.ebms.validation.ClientCertificateManager;
+import org.apache.commons.lang3.StringUtils;
 
 @Slf4j
 @FieldDefaults(level = AccessLevel.PRIVATE)
@@ -69,8 +67,10 @@ public class ClientCertificateManagerFilter implements Filter
 				val certificate = decode(URLDecoder.decode(header, Charset.defaultCharset().toString()));
 				ClientCertificateManager.setCertificate(certificate);
 			}
-			log.info("Certificate " + (ClientCertificateManager.getCertificate() != null ? ClientCertificateManager.getCertificate().getSubjectDN().toString() : " not found!"));
-			chain.doFilter(request,response);
+			log.info(
+					"Certificate "
+							+ (ClientCertificateManager.getCertificate() != null ? ClientCertificateManager.getCertificate().getSubjectDN().toString() : " not found!"));
+			chain.doFilter(request, response);
 		}
 		catch (CertificateException e)
 		{

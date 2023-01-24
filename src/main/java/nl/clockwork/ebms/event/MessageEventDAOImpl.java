@@ -15,6 +15,7 @@
  */
 package nl.clockwork.ebms.event;
 
+
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
@@ -23,18 +24,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.RowMapper;
-
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
-import lombok.val;
 import lombok.experimental.FieldDefaults;
+import lombok.val;
 import nl.clockwork.ebms.dao.EbMSDAO;
 import nl.clockwork.ebms.service.model.MessageEvent;
 import nl.clockwork.ebms.service.model.MessageFilter;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor
@@ -45,7 +44,7 @@ abstract class MessageEventDAOImpl implements MessageEventDAO
 		@Override
 		public MessageEvent mapRow(ResultSet rs, int nr) throws SQLException
 		{
-			return new MessageEvent(rs.getString("message_id"),MessageEventType.values()[rs.getInt("event_type")]);
+			return new MessageEvent(rs.getString("message_id"), MessageEventType.values()[rs.getInt("event_type")]);
 		}
 	}
 
@@ -57,17 +56,18 @@ abstract class MessageEventDAOImpl implements MessageEventDAO
 	{
 		val parameters = new ArrayList<Object>();
 		return jdbcTemplate.query(
-			"select message_event.message_id, message_event.event_type" +
-			" from message_event, ebms_message" +
-			" where message_event.processed = 0" +
-			" and message_event.event_type in (" + join(types == null || types.length == 0 ? MessageEventType.values() : types,",") + ")" +
-			" and message_event.message_id = ebms_message.message_id" +
-			" and ebms_message.message_nr = 0" +
-			EbMSDAO.getMessageFilter(messageFilter,parameters) +
-			" order by ebms_message.time_stamp asc",
-			parameters.toArray(new Object[0]),
-			new EbMSMessageEventRowMapper()
-		);
+				"select message_event.message_id, message_event.event_type"
+						+ " from message_event, ebms_message"
+						+ " where message_event.processed = 0"
+						+ " and message_event.event_type in ("
+						+ join(types == null || types.length == 0 ? MessageEventType.values() : types, ",")
+						+ ")"
+						+ " and message_event.message_id = ebms_message.message_id"
+						+ " and ebms_message.message_nr = 0"
+						+ EbMSDAO.getMessageFilter(messageFilter, parameters)
+						+ " order by ebms_message.time_stamp asc",
+				parameters.toArray(new Object[0]),
+				new EbMSMessageEventRowMapper());
 	}
 
 	protected abstract String getMessageEventsQuery(String messageContextFilter, MessageEventType[] types, int maxNr);
@@ -76,41 +76,25 @@ abstract class MessageEventDAOImpl implements MessageEventDAO
 	public List<MessageEvent> getEbMSMessageEvents(MessageFilter messageFilter, MessageEventType[] types, int maxNr)
 	{
 		val parameters = new ArrayList<Object>();
-		val messageContextFilter = EbMSDAO.getMessageFilter(messageFilter,parameters);
-		return jdbcTemplate.query(
-			getMessageEventsQuery(messageContextFilter,types,maxNr),
-			parameters.toArray(new Object[0]),
-			new EbMSMessageEventRowMapper()
-		);
+		val messageContextFilter = EbMSDAO.getMessageFilter(messageFilter, parameters);
+		return jdbcTemplate.query(getMessageEventsQuery(messageContextFilter, types, maxNr), parameters.toArray(new Object[0]), new EbMSMessageEventRowMapper());
 	}
 
 	@Override
 	public String insertEbMSMessageEvent(String messageId, MessageEventType type)
 	{
-		jdbcTemplate.update
-		(
-			"insert into message_event (" +
-				"message_id," +
-				"event_type," +
-				"time_stamp" +
-			") values (?,?,?)",
-			messageId,
-			type.getId(),
-			Timestamp.from(Instant.now())
-		);
+		jdbcTemplate.update(
+				"insert into message_event (" + "message_id," + "event_type," + "time_stamp" + ") values (?,?,?)",
+				messageId,
+				type.getId(),
+				Timestamp.from(Instant.now()));
 		return messageId;
 	}
 
 	@Override
 	public int processEbMSMessageEvent(String messageId)
 	{
-		return jdbcTemplate.update
-		(
-			"update message_event" +
-			" set processed = 1" +
-			" where message_id = ?",
-			messageId
-		);
+		return jdbcTemplate.update("update message_event" + " set processed = 1" + " where message_id = ?", messageId);
 	}
 
 	protected String join(MessageEventType[] array, String delimiter)

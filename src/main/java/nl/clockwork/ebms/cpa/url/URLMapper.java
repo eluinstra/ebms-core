@@ -15,16 +15,15 @@
  */
 package nl.clockwork.ebms.cpa.url;
 
+
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
-
-import org.springframework.util.StringUtils;
-
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
+import org.springframework.util.StringUtils;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor
@@ -66,8 +65,8 @@ public class URLMapper
 
 	private void validate(URLMapping urlMapping)
 	{
-		validateUrl(urlMapping.getSource(),"Source");
-		validateUrl(urlMapping.getDestination(),"Destination");
+		validateUrl(urlMapping.getSource(), "Source");
+		validateUrl(urlMapping.getDestination(), "Destination");
 	}
 
 	private void validateUrl(String url, String propertyName)
@@ -78,7 +77,7 @@ public class URLMapper
 		}
 		catch (MalformedURLException e)
 		{
-			throw new IllegalArgumentException(propertyName + " invalid",e);
+			throw new IllegalArgumentException(propertyName + " invalid", e);
 		}
 	}
 

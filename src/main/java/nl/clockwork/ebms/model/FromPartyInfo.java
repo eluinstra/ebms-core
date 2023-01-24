@@ -15,19 +15,18 @@
  */
 package nl.clockwork.ebms.model;
 
+
 import java.io.Serializable;
 import java.util.List;
-
-import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CanSend;
-import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.ServiceType;
-import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.PartyId;
-
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.NonNull;
 import lombok.Value;
 import lombok.experimental.FieldDefaults;
+import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CanSend;
+import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.ServiceType;
+import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.PartyId;
 
 @Builder
 @Value

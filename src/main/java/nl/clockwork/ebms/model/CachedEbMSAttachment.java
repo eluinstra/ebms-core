@@ -15,19 +15,18 @@
  */
 package nl.clockwork.ebms.model;
 
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-
-import org.apache.commons.io.input.CloseShieldInputStream;
-import org.apache.commons.io.output.CloseShieldOutputStream;
-import org.apache.cxf.io.CachedOutputStream;
-
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
+import org.apache.commons.io.input.CloseShieldInputStream;
+import org.apache.commons.io.output.CloseShieldOutputStream;
+import org.apache.cxf.io.CachedOutputStream;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor
@@ -71,7 +70,7 @@ public class CachedEbMSAttachment implements EbMSAttachment
 		}
 		catch (IOException e)
 		{
-			//do nothing
+			// do nothing
 		}
 	}
 }

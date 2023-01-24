@@ -24,24 +24,14 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
-
 import javax.xml.bind.JAXBException;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.soap.SOAPException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactoryConfigurationError;
-
-import org.apache.xml.security.Init;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
-import org.junit.jupiter.api.TestInstance.Lifecycle;
-import org.mockito.MockitoAnnotations;
-import org.xml.sax.SAXException;
-
 import lombok.AccessLevel;
-import lombok.val;
 import lombok.experimental.FieldDefaults;
+import lombok.val;
 import nl.clockwork.ebms.EbMSAttachmentFactory;
 import nl.clockwork.ebms.EbMSIdGenerator;
 import nl.clockwork.ebms.EbMSMessageFactory;
@@ -63,6 +53,13 @@ import nl.clockwork.ebms.service.model.MessageRequestProperties;
 import nl.clockwork.ebms.service.model.Party;
 import nl.clockwork.ebms.validation.ValidationException;
 import nl.clockwork.ebms.validation.ValidatorException;
+import org.apache.xml.security.Init;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.TestInstance.Lifecycle;
+import org.mockito.MockitoAnnotations;
+import org.xml.sax.SAXException;
 
 @TestInstance(value = Lifecycle.PER_CLASS)
 @FieldDefaults(level = AccessLevel.PRIVATE)
@@ -89,45 +86,48 @@ public class SigningTest
 	}
 
 	@Test
-	public void testSiging() throws EbMSProcessorException, ValidatorException, SOAPException, JAXBException, ParserConfigurationException, SAXException, IOException, TransformerFactoryConfigurationError, TransformerException
+	public void testSiging() throws EbMSProcessorException, ValidatorException, SOAPException, JAXBException, ParserConfigurationException, SAXException,
+			IOException, TransformerFactoryConfigurationError, TransformerException
 	{
 		val message = createMessage();
 		val document = EbMSMessageUtils.getEbMSDocument(message);
-		signatureGenerator.generate(document,message);
-		signatureValidator.validate(document,message);
+		signatureGenerator.generate(document, message);
+		signatureValidator.validate(document, message);
 	}
 
 	@Test
-	public void testSigingHeaderValidationFailure() throws EbMSProcessorException, ValidatorException, SOAPException, JAXBException, ParserConfigurationException, SAXException, IOException, TransformerFactoryConfigurationError, TransformerException
+	public void testSigingHeaderValidationFailure() throws EbMSProcessorException, ValidatorException, SOAPException, JAXBException, ParserConfigurationException,
+			SAXException, IOException, TransformerFactoryConfigurationError, TransformerException
 	{
 		val message = createMessage();
 		val document = EbMSMessageUtils.getEbMSDocument(message);
-		signatureGenerator.generate(document,message);
+		signatureGenerator.generate(document, message);
 		changeConversationId(document);
-		assertThatThrownBy(() -> signatureValidator.validate(document,message)).isInstanceOf(ValidationException.class);
+		assertThatThrownBy(() -> signatureValidator.validate(document, message)).isInstanceOf(ValidationException.class);
 	}
 
 	@Test
-	public void testSigingAttachmentValidationFailure() throws EbMSProcessorException, ValidatorException, SOAPException, JAXBException, ParserConfigurationException, SAXException, IOException, TransformerFactoryConfigurationError, TransformerException
+	public void testSigingAttachmentValidationFailure() throws EbMSProcessorException, ValidatorException, SOAPException, JAXBException,
+			ParserConfigurationException, SAXException, IOException, TransformerFactoryConfigurationError, TransformerException
 	{
 		val message = createMessage();
 		val document = EbMSMessageUtils.getEbMSDocument(message);
-		signatureGenerator.generate(document,message);
+		signatureGenerator.generate(document, message);
 		message.getAttachments().clear();
 		message.getAttachments().addAll(createAttachments(message.getMessageHeader().getMessageData().getMessageId()));
-		assertThatThrownBy(() -> signatureValidator.validate(document,message)).isInstanceOf(ValidationException.class);
+		assertThatThrownBy(() -> signatureValidator.validate(document, message)).isInstanceOf(ValidationException.class);
 	}
 
 	private void changeConversationId(EbMSDocument message)
 	{
 		val d = message.getMessage();
-		val conversationId = d.getElementsByTagNameNS("http://www.oasis-open.org/committees/ebxml-msg/schema/msg-header-2_0.xsd","ConversationId").item(0);
+		val conversationId = d.getElementsByTagNameNS("http://www.oasis-open.org/committees/ebxml-msg/schema/msg-header-2_0.xsd", "ConversationId").item(0);
 		conversationId.setTextContent(conversationId.getTextContent() + "0");
 	}
 
 	private CPAManager initCPAManager() throws IOException, JAXBException
 	{
-		return new CPAManager(initCPADAOMock(),new URLMapper(initURLMappingDAOMock()));
+		return new CPAManager(initCPADAOMock(), new URLMapper(initURLMappingDAOMock()));
 	}
 
 	private CPADAO initCPADAOMock() throws IOException, JAXBException
@@ -145,18 +145,18 @@ public class SigningTest
 
 	private EbMSMessageFactory initMessageFactory(CPAManager cpaManager)
 	{
-		return new EbMSMessageFactory(cpaManager,new EbMSIdGenerator());
+		return new EbMSMessageFactory(cpaManager, new EbMSIdGenerator());
 	}
 
 	private EbMSSignatureGenerator initSignatureGenerator(CPAManager cpaManager) throws Exception
 	{
-		return new EbMSSignatureGenerator(cpaManager,EbMSKeyStore.of(keyStoreType,keyStorePath,keyStorePassword,keyStorePassword));
+		return new EbMSSignatureGenerator(cpaManager, EbMSKeyStore.of(keyStoreType, keyStorePath, keyStorePassword, keyStorePassword));
 	}
 
 	private EbMSSignatureValidator initSignatureValidator(CPAManager cpaManager) throws Exception
 	{
-		val trustStore = EbMSTrustStore.of(keyStoreType,keyStorePath,keyStorePassword);
-		return new EbMSSignatureValidator(cpaManager,trustStore);
+		val trustStore = EbMSTrustStore.of(keyStoreType, keyStorePath, keyStorePassword);
+		return new EbMSSignatureValidator(cpaManager, trustStore);
 	}
 
 	private EbMSMessage createMessage() throws EbMSProcessorException
@@ -178,7 +178,7 @@ public class SigningTest
 	{
 		return new MessageRequestProperties(
 				cpaId,
-				new Party("urn:osb:oin:00000000000000000000","DIGIPOORT"),
+				new Party("urn:osb:oin:00000000000000000000", "DIGIPOORT"),
 				"urn:osb:services:osb:afleveren:1.1$1.0",
 				"afleveren");
 	}
@@ -186,25 +186,25 @@ public class SigningTest
 	private List<DataSource> createDataSources()
 	{
 		val result = new ArrayList<DataSource>();
-		result.add(new DataSource("test.txt",null,"plain/text; charset=utf-8","Dit is een test.".getBytes(Charset.forName("UTF-8"))));
+		result.add(new DataSource("test.txt", null, "plain/text; charset=utf-8", "Dit is een test.".getBytes(Charset.forName("UTF-8"))));
 		return result;
 	}
 
 	private List<EbMSAttachment> createAttachments(String messageId)
 	{
 		val result = new ArrayList<EbMSAttachment>();
-		result.add(EbMSAttachmentFactory.createEbMSAttachment(createContentId(messageId,1),createDataSource()));
+		result.add(EbMSAttachmentFactory.createEbMSAttachment(createContentId(messageId, 1), createDataSource()));
 		return result;
 	}
 
 	private javax.activation.DataSource createDataSource()
 	{
-		return EbMSAttachmentFactory.createEbMSAttachment("test.txt","plain/text; charset=utf-8","Dit is een andere test.".getBytes(Charset.forName("UTF-8"))); 
+		return EbMSAttachmentFactory.createEbMSAttachment("test.txt", "plain/text; charset=utf-8", "Dit is een andere test.".getBytes(Charset.forName("UTF-8")));
 	}
 
 	private String createContentId(String messageId, int i)
 	{
-		return messageId.replaceAll("^([^@]+)@(.+)$","$1-" + i + "@$2");
+		return messageId.replaceAll("^([^@]+)@(.+)$", "$1-" + i + "@$2");
 	}
 
 }

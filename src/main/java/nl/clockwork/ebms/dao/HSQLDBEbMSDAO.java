@@ -15,27 +15,29 @@
  */
 package nl.clockwork.ebms.dao;
 
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.transaction.support.TransactionTemplate;
 
 import nl.clockwork.ebms.EbMSMessageStatus;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.transaction.support.TransactionTemplate;
 
 class HSQLDBEbMSDAO extends AbstractEbMSDAO
 {
 	public HSQLDBEbMSDAO(TransactionTemplate transactionTemplate, JdbcTemplate jdbcTemplate)
-	{	
-		super(transactionTemplate,jdbcTemplate);
+	{
+		super(transactionTemplate, jdbcTemplate);
 	}
 
 	@Override
 	public String getMessageIdsQuery(String messageContextFilter, EbMSMessageStatus status, int maxNr)
 	{
-		return "select message_id" +
-		" from ebms_message" +
-		" where message_nr = 0" + 
-		" and status = " + status.getId() +
-		messageContextFilter +
-		" order by time_stamp asc" +
-		" limit " + maxNr;
+		return "select message_id"
+				+ " from ebms_message"
+				+ " where message_nr = 0"
+				+ " and status = "
+				+ status.getId()
+				+ messageContextFilter
+				+ " order by time_stamp asc"
+				+ " limit "
+				+ maxNr;
 	}
 }

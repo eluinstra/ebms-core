@@ -15,11 +15,11 @@
  */
 package nl.clockwork.ebms.util;
 
+
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 

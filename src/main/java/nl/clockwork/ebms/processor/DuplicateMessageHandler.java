@@ -15,18 +15,17 @@
  */
 package nl.clockwork.ebms.processor;
 
+
 import java.time.Instant;
 import java.util.Collections;
-
 import javax.xml.transform.TransformerException;
-
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.NonNull;
-import lombok.val;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 import nl.clockwork.ebms.EbMSAction;
 import nl.clockwork.ebms.cpa.CPAManager;
 import nl.clockwork.ebms.cpa.CPAUtils;
@@ -48,13 +47,13 @@ import nl.clockwork.ebms.validation.ValidationException;
 @AllArgsConstructor
 class DuplicateMessageHandler
 {
-  @NonNull
-  EbMSDAO ebMSDAO;
-  @NonNull
-  CPAManager cpaManager;
-  @NonNull
+	@NonNull
+	EbMSDAO ebMSDAO;
+	@NonNull
+	CPAManager cpaManager;
+	@NonNull
 	DeliveryTaskManager deliveryTaskManager;
-  @NonNull
+	@NonNull
 	EbMSMessageValidator messageValidator;
 	boolean storeDuplicateMessage;
 	boolean storeDuplicateMessageAttachments;
@@ -68,13 +67,17 @@ class DuplicateMessageHandler
 			if (messageValidator.isSyncReply(message))
 			{
 				if (storeDuplicateMessage)
-					ebMSDAO.insertDuplicateMessage(timestamp,document.getMessage(),message,storeDuplicateMessageAttachments ? message.getAttachments() : Collections.emptyList());
+					ebMSDAO.insertDuplicateMessage(
+							timestamp,
+							document.getMessage(),
+							message,
+							storeDuplicateMessageAttachments ? message.getAttachments() : Collections.emptyList());
 				val result = ebMSDAO.getEbMSDocumentByRefToMessageId(
 						messageHeader.getCPAId(),
 						messageHeader.getMessageData().getMessageId(),
 						EbMSAction.MESSAGE_ERROR,
 						EbMSAction.ACKNOWLEDGMENT);
-				StreamUtils.ifNotPresent(result,() -> log.warn("No response found for duplicate message " + messageHeader.getMessageData().getMessageId() + "!"));
+				StreamUtils.ifNotPresent(result, () -> log.warn("No response found for duplicate message " + messageHeader.getMessageData().getMessageId() + "!"));
 				return result.orElse(null);
 			}
 			else
@@ -84,16 +87,23 @@ class DuplicateMessageHandler
 						messageHeader.getMessageData().getMessageId(),
 						EbMSAction.MESSAGE_ERROR,
 						EbMSAction.ACKNOWLEDGMENT);
-				StreamUtils.ifNotPresent(messageProperties,() -> log.warn("No response found for duplicate message " + messageHeader.getMessageData().getMessageId() + "!"));
+				StreamUtils
+						.ifNotPresent(messageProperties, () -> log.warn("No response found for duplicate message " + messageHeader.getMessageData().getMessageId() + "!"));
 				val service = CPAUtils.toString(CPAUtils.createEbMSMessageService());
-				val sendDeliveryChannel =	cpaManager.getSendDeliveryChannel(messageHeader.getCPAId(),messageHeader.getTo().getPartyId(),messageHeader.getTo().getRole(),service,null)
-						.orElse(null);
-				val receiveDeliveryChannel = cpaManager.getReceiveDeliveryChannel(messageHeader.getCPAId(),messageHeader.getFrom().getPartyId(),messageHeader.getFrom().getRole(),service,null)
+				val sendDeliveryChannel =
+						cpaManager.getSendDeliveryChannel(messageHeader.getCPAId(), messageHeader.getTo().getPartyId(), messageHeader.getTo().getRole(), service, null)
+								.orElse(null);
+				val receiveDeliveryChannel = cpaManager
+						.getReceiveDeliveryChannel(messageHeader.getCPAId(), messageHeader.getFrom().getPartyId(), messageHeader.getFrom().getRole(), service, null)
 						.orElse(null);
 				Runnable runnable = () ->
 				{
 					if (storeDuplicateMessage)
-						ebMSDAO.insertDuplicateMessage(timestamp,document.getMessage(),message,storeDuplicateMessageAttachments ? message.getAttachments() : Collections.emptyList());
+						ebMSDAO.insertDuplicateMessage(
+								timestamp,
+								document.getMessage(),
+								message,
+								storeDuplicateMessageAttachments ? message.getAttachments() : Collections.emptyList());
 					if (receiveDeliveryChannel != null && messageProperties.isPresent())
 						deliveryTaskManager.insertTask(
 								deliveryTaskManager.createNewTask(
@@ -114,7 +124,7 @@ class DuplicateMessageHandler
 					}
 					catch (TransformerException e)
 					{
-						throw new EbMSProcessingException("Error creating response message for MessageId " + messageHeader.getMessageData().getMessageId() + "!",e);
+						throw new EbMSProcessingException("Error creating response message for MessageId " + messageHeader.getMessageData().getMessageId() + "!", e);
 					}
 				return null;
 			}
@@ -129,24 +139,25 @@ class DuplicateMessageHandler
 		{
 			log.warn("MessageError " + responseMessage.getMessageHeader().getMessageData().getMessageId() + " is duplicate!");
 			if (storeDuplicateMessage)
-				ebMSDAO.insertDuplicateMessage(timestamp,responseDocument.getMessage(),responseMessage,Collections.emptyList());
+				ebMSDAO.insertDuplicateMessage(timestamp, responseDocument.getMessage(), responseMessage, Collections.emptyList());
 		}
 		else
 			throw new EbMSProcessingException("MessageId " + responseMessage.getMessageHeader().getMessageData().getMessageId() + " already used!");
 	}
-	
-	public void handleAcknowledgment(final Instant timestamp, EbMSDocument responseDocument, final EbMSAcknowledgment responseMessage) throws EbMSProcessingException
+
+	public void handleAcknowledgment(final Instant timestamp, EbMSDocument responseDocument, final EbMSAcknowledgment responseMessage)
+			throws EbMSProcessingException
 	{
 		if (isIdenticalMessage(responseMessage))
 		{
 			log.warn("Acknowledgment " + responseMessage.getMessageHeader().getMessageData().getMessageId() + " is duplicate!");
 			if (storeDuplicateMessage)
-				ebMSDAO.insertDuplicateMessage(timestamp,responseDocument.getMessage(),responseMessage,Collections.emptyList());
+				ebMSDAO.insertDuplicateMessage(timestamp, responseDocument.getMessage(), responseMessage, Collections.emptyList());
 		}
 		else
 			throw new EbMSProcessingException("MessageId " + responseMessage.getMessageHeader().getMessageData().getMessageId() + " already used!");
 	}
-	
+
 	private boolean isIdenticalMessage(EbMSBaseMessage message)
 	{
 		return ebMSDAO.existsIdenticalMessage(message);

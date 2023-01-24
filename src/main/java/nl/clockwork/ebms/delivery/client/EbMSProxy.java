@@ -15,13 +15,12 @@
  */
 package nl.clockwork.ebms.delivery.client;
 
+
 import java.util.Set;
-
-import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.lang3.StringUtils;
-
 import lombok.NonNull;
 import lombok.Value;
+import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.lang3.StringUtils;
 
 @Value(staticConstructor = "of")
 public class EbMSProxy
@@ -37,10 +36,12 @@ public class EbMSProxy
 	{
 		return StringUtils.isNotBlank(username);
 	}
+
 	public String getProxyAuthorizationKey()
 	{
 		return "Proxy-Authorization";
 	}
+
 	public String getProxyAuthorizationValue()
 	{
 		return "Basic " + Base64.encodeBase64String((username + ":" + password).getBytes());

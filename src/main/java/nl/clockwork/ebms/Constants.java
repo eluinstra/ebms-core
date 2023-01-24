@@ -15,6 +15,7 @@
  */
 package nl.clockwork.ebms;
 
+
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
@@ -28,8 +29,8 @@ public class Constants
 	public static final String NSURI_SOAP_ENVELOPE = "http://schemas.xmlsoap.org/soap/envelope/";
 	public static final String NSURI_SOAP_NEXT_ACTOR = "http://schemas.xmlsoap.org/soap/actor/next";
 	public static final String CID = "cid:";
-	
+
 	public static final int MINUTE_IN_MILLIS = 60000;
-	
+
 	public static final String MESSAGE_LOG = "nl.clockwork.ebms.message";
 }

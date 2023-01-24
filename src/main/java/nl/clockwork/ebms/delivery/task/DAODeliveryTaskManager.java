@@ -15,11 +15,12 @@
  */
 package nl.clockwork.ebms.delivery.task;
 
+
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
-import lombok.val;
 import lombok.experimental.FieldDefaults;
+import lombok.val;
 import nl.clockwork.ebms.EbMSAction;
 import nl.clockwork.ebms.cpa.CPAManager;
 import nl.clockwork.ebms.cpa.CPAUtils;
@@ -43,32 +44,30 @@ class DAODeliveryTaskManager implements DeliveryTaskManager
 	@Override
 	public void insertTask(DeliveryTask task)
 	{
-		deliveryTaskDAO.insertTask(task,serverId);
+		deliveryTaskDAO.insertTask(task, serverId);
 	}
 
 	@Override
 	public void updateTask(final DeliveryTask task, final String url, final DeliveryTaskStatus status)
 	{
-		updateTask(task,url,status,null);
+		updateTask(task, url, status, null);
 	}
 
 	@Override
 	public void updateTask(final DeliveryTask task, final String url, final DeliveryTaskStatus status, final String errorMessage)
 	{
-		val deliveryChannel = cpaManager.getDeliveryChannel(
-				task.getCpaId(),
-				task.getReceiveDeliveryChannelId())
-					.orElseThrow(() -> StreamUtils.illegalStateException("DeliveryChannel",task.getCpaId(),task.getReceiveDeliveryChannelId()));
-		deliveryTaskDAO.insertLog(task.getMessageId(),task.getTimestamp(),url,status,errorMessage);
+		val deliveryChannel = cpaManager.getDeliveryChannel(task.getCpaId(), task.getReceiveDeliveryChannelId())
+				.orElseThrow(() -> StreamUtils.illegalStateException("DeliveryChannel", task.getCpaId(), task.getReceiveDeliveryChannelId()));
+		deliveryTaskDAO.insertLog(task.getMessageId(), task.getTimestamp(), url, status, errorMessage);
 		val reliableMessaging = CPAUtils.isReliableMessaging(deliveryChannel);
 		if (task.getTimeToLive() != null && reliableMessaging)
 		{
-			val nextTask = createNextTask(task,deliveryChannel);
+			val nextTask = createNextTask(task, deliveryChannel);
 			deliveryTaskDAO.updateTask(nextTask);
 		}
 		else if (mustUpdate(task, reliableMessaging))
 		{
-			val nextTask = createNextTask(task,autoRetryInterval);
+			val nextTask = createNextTask(task, autoRetryInterval);
 			deliveryTaskDAO.updateTask(nextTask);
 		}
 		else
@@ -77,13 +76,11 @@ class DAODeliveryTaskManager implements DeliveryTaskManager
 
 	private boolean mustUpdate(DeliveryTask event, boolean reliableMessaging)
 	{
-		return ebMSDAO.getMessageAction(event.getMessageId()).map(a ->
-				(a.equals(EbMSAction.ACKNOWLEDGMENT) || a.equals(EbMSAction.MESSAGE_ERROR))
-				&& !reliableMessaging
-				&& event.getRetries() < nrAutoRetries)
-			.orElse(false);
+		return ebMSDAO.getMessageAction(event.getMessageId())
+				.map(a -> (a.equals(EbMSAction.ACKNOWLEDGMENT) || a.equals(EbMSAction.MESSAGE_ERROR)) && !reliableMessaging && event.getRetries() < nrAutoRetries)
+				.orElse(false);
 	}
-	
+
 	@Override
 	public void deleteTask(String messageId)
 	{

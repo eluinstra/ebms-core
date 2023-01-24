@@ -15,36 +15,35 @@
  */
 package nl.clockwork.ebms.delivery.client;
 
+
 import java.io.FilterOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.List;
 import java.util.Map;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import lombok.AccessLevel;
 import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
 import nl.clockwork.ebms.Constants;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 class LoggingOutputStream extends FilterOutputStream
 {
 	private static final Logger messageLog = LoggerFactory.getLogger(Constants.MESSAGE_LOG);
 	@NonNull
-	Map<String,List<String>> properties;
+	Map<String, List<String>> properties;
 	@NonNull
 	String charset;
 	StringBuffer sb = new StringBuffer();
 
-	public LoggingOutputStream(Map<String,List<String>> properties, OutputStream out)
+	public LoggingOutputStream(Map<String, List<String>> properties, OutputStream out)
 	{
-		this(properties,out,"UTF-8");
+		this(properties, out, "UTF-8");
 	}
 
-	public LoggingOutputStream(@NonNull Map<String,List<String>> properties, @NonNull OutputStream out, @NonNull String charset)
+	public LoggingOutputStream(@NonNull Map<String, List<String>> properties, @NonNull OutputStream out, @NonNull String charset)
 	{
 		super(out);
 		this.properties = properties;
@@ -63,7 +62,7 @@ class LoggingOutputStream extends FilterOutputStream
 	public void write(byte[] b) throws IOException
 	{
 		if (messageLog.isDebugEnabled())
-			sb.append(new String(b,charset));
+			sb.append(new String(b, charset));
 		out.write(b);
 	}
 
@@ -71,8 +70,8 @@ class LoggingOutputStream extends FilterOutputStream
 	public void write(byte[] b, int off, int len) throws IOException
 	{
 		if (messageLog.isDebugEnabled())
-			sb.append(new String(b,off,len,charset));
-		out.write(b,off,len);
+			sb.append(new String(b, off, len, charset));
+		out.write(b, off, len);
 	}
 
 	@Override

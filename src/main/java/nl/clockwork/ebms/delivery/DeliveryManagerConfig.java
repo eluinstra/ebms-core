@@ -15,8 +15,13 @@
  */
 package nl.clockwork.ebms.delivery;
 
-import javax.jms.ConnectionFactory;
 
+import javax.jms.ConnectionFactory;
+import lombok.AccessLevel;
+import lombok.experimental.FieldDefaults;
+import lombok.val;
+import nl.clockwork.ebms.cpa.CPAManager;
+import nl.clockwork.ebms.delivery.client.EbMSHttpClientFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -28,12 +33,6 @@ import org.springframework.core.type.AnnotatedTypeMetadata;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
-import lombok.AccessLevel;
-import lombok.val;
-import lombok.experimental.FieldDefaults;
-import nl.clockwork.ebms.cpa.CPAManager;
-import nl.clockwork.ebms.delivery.client.EbMSHttpClientFactory;
-
 @Configuration
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class DeliveryManagerConfig
@@ -42,6 +41,7 @@ public class DeliveryManagerConfig
 	{
 		DEFAULT, JMS;
 	}
+
 	@Value("${deliveryManager.minThreads}")
 	Integer minThreads;
 	@Value("${deliveryManager.maxThreads}")
@@ -73,7 +73,7 @@ public class DeliveryManagerConfig
 	public DeliveryManager defaultDeliveryManager()
 	{
 		return DeliveryManager.builder()
-				.messageQueue(new EbMSMessageQueue(maxEntries,timeout))
+				.messageQueue(new EbMSMessageQueue(maxEntries, timeout))
 				.cpaManager(cpaManager)
 				.ebMSClientFactory(ebMSClientFactory)
 				.build();
@@ -84,7 +84,7 @@ public class DeliveryManagerConfig
 	public DeliveryManager jmsDeliveryManager()
 	{
 		return JMSDeliveryManager.jmsDeliveryManagerBuilder()
-				.messageQueue(new EbMSMessageQueue(maxEntries,timeout))
+				.messageQueue(new EbMSMessageQueue(maxEntries, timeout))
 				.cpaManager(cpaManager)
 				.ebMSClientFactory(ebMSClientFactory)
 				.jmsTemplate(new JmsTemplate(connectionFactory))
@@ -96,15 +96,17 @@ public class DeliveryManagerConfig
 		@Override
 		public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata)
 		{
-			return context.getEnvironment().getProperty("deliveryManager.type",DeliveryManagerType.class,DeliveryManagerType.DEFAULT) == DeliveryManagerType.DEFAULT;
+			return context.getEnvironment().getProperty("deliveryManager.type", DeliveryManagerType.class, DeliveryManagerType.DEFAULT)
+					== DeliveryManagerType.DEFAULT;
 		}
 	}
+
 	public static class jmsDeliveryManagerType implements Condition
 	{
 		@Override
 		public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata)
 		{
-			return context.getEnvironment().getProperty("deliveryManager.type",DeliveryManagerType.class,DeliveryManagerType.DEFAULT) == DeliveryManagerType.JMS;
+			return context.getEnvironment().getProperty("deliveryManager.type", DeliveryManagerType.class, DeliveryManagerType.DEFAULT) == DeliveryManagerType.JMS;
 		}
 	}
 }

@@ -15,12 +15,11 @@
  */
 package nl.clockwork.ebms.service.model;
 
-import java.io.Serializable;
 
+import java.io.Serializable;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -38,18 +37,18 @@ import lombok.ToString;
 public class DataSource implements Serializable
 {
 	private static final long serialVersionUID = 1L;
-	@XmlElement(required=true)
+	@XmlElement(required = true)
 	String name;
 	String contentId;
-	@XmlElement(required=true)
+	@XmlElement(required = true)
 	@NonNull
 	String contentType;
-	@XmlElement(required=true)
+	@XmlElement(required = true)
 	@NonNull
 	@ToString.Exclude
 	byte[] content;
-	
-	public DataSource (String name, String contentType, byte[] content)
+
+	public DataSource(String name, String contentType, byte[] content)
 	{
 		this.name = name;
 		this.contentType = contentType;

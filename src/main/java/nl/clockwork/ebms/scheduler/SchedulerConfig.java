@@ -15,11 +15,19 @@
  */
 package nl.clockwork.ebms.scheduler;
 
+
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
 import java.util.Arrays;
 import java.util.Properties;
-
 import javax.sql.DataSource;
-
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.experimental.FieldDefaults;
+import lombok.val;
+import nl.clockwork.ebms.delivery.task.DeliveryTaskHandlerConfig.DeliveryTaskHandlerType;
+import nl.clockwork.ebms.delivery.task.DeliveryTaskHandlerConfig.QuartzTaskHandlerType;
 import org.apache.commons.lang3.StringUtils;
 import org.quartz.spi.JobFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,17 +41,6 @@ import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
-import com.zaxxer.hikari.HikariConfig;
-import com.zaxxer.hikari.HikariDataSource;
-
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.val;
-import lombok.experimental.FieldDefaults;
-import nl.clockwork.ebms.delivery.task.DeliveryTaskHandlerConfig.DeliveryTaskHandlerType;
-import nl.clockwork.ebms.delivery.task.DeliveryTaskHandlerConfig.QuartzTaskHandlerType;
-
 @Configuration
 @EnableTransactionManagement
 @FieldDefaults(level = AccessLevel.PRIVATE)
@@ -54,25 +51,21 @@ public class SchedulerConfig
 	@Getter
 	public enum DriverDelegate
 	{
-		DB2("jdbc:db2:","org.quartz.impl.jdbcjobstore.DB2v8Delegate"),
-		H2("jdbc:h2:","org.quartz.impl.jdbcjobstore.StdJDBCDelegate"),
-		HSQLDB("jdbc:hsqldb:","org.quartz.impl.jdbcjobstore.HSQLDBDelegate"),
-		MARIADB("jdbc:mariadb:","org.quartz.impl.jdbcjobstore.StdJDBCDelegate"),
-		MSSQL("jdbc:sqlserver:","org.quartz.impl.jdbcjobstore.MSSQLDelegate"),
-		MYSQL("jdbc:mysql:","org.quartz.impl.jdbcjobstore.StdJDBCDelegate"),
-		ORACLE("jdbc:oracle:","org.quartz.impl.jdbcjobstore.oracle.OracleDelegate"),
-		POSTGRES("jdbc:postgresql:","org.quartz.impl.jdbcjobstore.HSQLDBDelegate");
-		
+		DB2("jdbc:db2:", "org.quartz.impl.jdbcjobstore.DB2v8Delegate"),
+		H2("jdbc:h2:", "org.quartz.impl.jdbcjobstore.StdJDBCDelegate"),
+		HSQLDB("jdbc:hsqldb:", "org.quartz.impl.jdbcjobstore.HSQLDBDelegate"),
+		MARIADB("jdbc:mariadb:", "org.quartz.impl.jdbcjobstore.StdJDBCDelegate"),
+		MSSQL("jdbc:sqlserver:", "org.quartz.impl.jdbcjobstore.MSSQLDelegate"),
+		MYSQL("jdbc:mysql:", "org.quartz.impl.jdbcjobstore.StdJDBCDelegate"),
+		ORACLE("jdbc:oracle:", "org.quartz.impl.jdbcjobstore.oracle.OracleDelegate"),
+		POSTGRES("jdbc:postgresql:", "org.quartz.impl.jdbcjobstore.HSQLDBDelegate");
+
 		String jdbcUrl;
 		String driverDelegateClass;
-		
+
 		public static String getClass(String jdbcUrl)
 		{
-			return Arrays.stream(values())
-					.filter(l -> jdbcUrl.startsWith(l.jdbcUrl))
-					.map(l -> l.driverDelegateClass)
-					.findFirst()
-					.get();
+			return Arrays.stream(values()).filter(l -> jdbcUrl.startsWith(l.jdbcUrl)).map(l -> l.driverDelegateClass).findFirst().get();
 		}
 	}
 
@@ -119,9 +112,9 @@ public class SchedulerConfig
 	public SchedulerFactoryBean scheduler(JobFactory jobFactory)
 	{
 		val result = new SchedulerFactoryBean();
-    result.setQuartzProperties(quartzProperties());
-    result.setJobFactory(jobFactory);
-    result.setTransactionManager(dataSourceTransactionManager);
+		result.setQuartzProperties(quartzProperties());
+		result.setJobFactory(jobFactory);
+		result.setTransactionManager(dataSourceTransactionManager);
 		result.setDataSource(dataSource);
 		if (deliveryTaskHandlerType == DeliveryTaskHandlerType.QUARTZ_JMS)
 			result.setNonTransactionalDataSource(hikariDataSource());
@@ -137,16 +130,16 @@ public class SchedulerConfig
 		return result;
 	}
 
-  private Properties quartzProperties()
+	private Properties quartzProperties()
 	{
 		val result = new Properties();
-		result.put("org.quartz.scheduler.instanceId","AUTO");
-		result.put("org.quartz.threadPool.threadCount",threadCount);
-		result.put("org.quartz.jobStore.class","org.quartz.impl.jdbcjobstore.JobStoreCMT");
-		result.put("org.quartz.jobStore.driverDelegateClass",StringUtils.isEmpty(driverDelegateClass) ? DriverDelegate.getClass(jdbcUrl) : driverDelegateClass);
+		result.put("org.quartz.scheduler.instanceId", "AUTO");
+		result.put("org.quartz.threadPool.threadCount", threadCount);
+		result.put("org.quartz.jobStore.class", "org.quartz.impl.jdbcjobstore.JobStoreCMT");
+		result.put("org.quartz.jobStore.driverDelegateClass", StringUtils.isEmpty(driverDelegateClass) ? DriverDelegate.getClass(jdbcUrl) : driverDelegateClass);
 		if (StringUtils.isNotEmpty(selectWithLockSQL))
-			result.put("org.quartz.jobStore.selectWithLockSQL",selectWithLockSQL);
-		result.put("org.quartz.jobStore.isClustered",isClustered);
+			result.put("org.quartz.jobStore.selectWithLockSQL", selectWithLockSQL);
+		result.put("org.quartz.jobStore.isClustered", isClustered);
 		return result;
 	}
 

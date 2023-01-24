@@ -15,12 +15,19 @@
  */
 package nl.clockwork.ebms.delivery.client.apache;
 
+
 import java.io.IOException;
 import java.nio.charset.Charset;
-
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.parsers.ParserConfigurationException;
-
+import lombok.AccessLevel;
+import lombok.experimental.FieldDefaults;
+import lombok.val;
+import nl.clockwork.ebms.Constants;
+import nl.clockwork.ebms.EbMSMessageReader;
+import nl.clockwork.ebms.delivery.client.HTTPUtils;
+import nl.clockwork.ebms.model.EbMSDocument;
+import nl.clockwork.ebms.processor.EbMSProcessingException;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.Header;
@@ -31,15 +38,6 @@ import org.apache.http.client.ResponseHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
-
-import lombok.AccessLevel;
-import lombok.val;
-import lombok.experimental.FieldDefaults;
-import nl.clockwork.ebms.Constants;
-import nl.clockwork.ebms.EbMSMessageReader;
-import nl.clockwork.ebms.delivery.client.HTTPUtils;
-import nl.clockwork.ebms.model.EbMSDocument;
-import nl.clockwork.ebms.processor.EbMSProcessingException;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 class EbMSResponseHandler implements ResponseHandler<EbMSDocument>
@@ -63,18 +61,19 @@ class EbMSResponseHandler implements ResponseHandler<EbMSDocument>
 				{
 					try (val input = entity.getContent())
 					{
-						val messageReader = new EbMSMessageReader(getHeaderField(response,"Content-ID"),getHeaderField(response,"Content-Type"));
-						val message = IOUtils.toString(input,getEncoding(entity));
-		      	messageLog.info("<<<<\nStatusCode=" + response.getStatusLine().getStatusCode() + "\n" + message);
+						val messageReader = new EbMSMessageReader(getHeaderField(response, "Content-ID"), getHeaderField(response, "Content-Type"));
+						val message = IOUtils.toString(input, getEncoding(entity));
+						messageLog.info("<<<<\nStatusCode=" + response.getStatusLine().getStatusCode() + "\n" + message);
 						return messageReader.readResponse(message);
 					}
 				}
 			}
 			else if (response.getStatusLine().getStatusCode() >= HttpServletResponse.SC_BAD_REQUEST)
 			{
-		    val entity = response.getEntity();
-		    if (entity != null)
-					throw new IOException("StatusCode=" + response.getStatusLine().getStatusCode() + "\n" + IOUtils.toString(entity.getContent(),Charset.defaultCharset()));
+				val entity = response.getEntity();
+				if (entity != null)
+					throw new IOException(
+							"StatusCode=" + response.getStatusLine().getStatusCode() + "\n" + IOUtils.toString(entity.getContent(), Charset.defaultCharset()));
 			}
 			throw new IOException("StatusCode=" + response.getStatusLine().getStatusCode());
 		}
@@ -92,7 +91,7 @@ class EbMSResponseHandler implements ResponseHandler<EbMSDocument>
 		else
 			throw new EbMSProcessingException("HTTP header Content-Type is not set!");
 	}
-	
+
 	private String getHeaderField(HttpResponse response, String name)
 	{
 		Header result = response.getFirstHeader(name);

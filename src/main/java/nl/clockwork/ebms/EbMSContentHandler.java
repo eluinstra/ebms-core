@@ -15,29 +15,27 @@
  */
 package nl.clockwork.ebms;
 
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
+import lombok.AccessLevel;
+import lombok.experimental.FieldDefaults;
+import lombok.val;
+import nl.clockwork.ebms.model.EbMSAttachment;
 import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.codec.Base64InputStream;
 import org.apache.james.mime4j.parser.ContentHandler;
 import org.apache.james.mime4j.stream.BodyDescriptor;
 import org.apache.james.mime4j.stream.Field;
 
-import lombok.AccessLevel;
-import lombok.val;
-import lombok.var;
-import lombok.experimental.FieldDefaults;
-import nl.clockwork.ebms.model.EbMSAttachment;
-
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 class EbMSContentHandler implements ContentHandler
 {
-	Map<String,String> headers = new HashMap<>();
+	Map<String, String> headers = new HashMap<>();
 	List<EbMSAttachment> attachments = new ArrayList<>();
 
 	@Override
@@ -68,7 +66,7 @@ class EbMSContentHandler implements ContentHandler
 	@Override
 	public void field(Field rawField) throws MimeException
 	{
-		headers.put(rawField.getName(),rawField.getBody());
+		headers.put(rawField.getName(), rawField.getBody());
 	}
 
 	@Override
@@ -104,9 +102,9 @@ class EbMSContentHandler implements ContentHandler
 		val contentType = getContentType();
 		val content = applyTransferEncoding(is);
 		if (attachments.size() == 0)
-			attachments.add(EbMSAttachmentFactory.createEbMSAttachment(filename,contentId,contentType,content));
+			attachments.add(EbMSAttachmentFactory.createEbMSAttachment(filename, contentId, contentType, content));
 		else
-			attachments.add(EbMSAttachmentFactory.createCachedEbMSAttachment(filename,contentId,contentType,content));
+			attachments.add(EbMSAttachmentFactory.createCachedEbMSAttachment(filename, contentId, contentType, content));
 		headers.clear();
 	}
 
@@ -122,7 +120,7 @@ class EbMSContentHandler implements ContentHandler
 
 	private String getHeader(String headerName)
 	{
-		var result = headers.get(headerName);
+		String result = headers.get(headerName);
 		if (result == null)
 			result = headers.entrySet().stream().filter(e -> headerName.equalsIgnoreCase(e.getKey())).findFirst().map(e -> e.getValue()).orElse(null);
 		return result;
@@ -138,17 +136,17 @@ class EbMSContentHandler implements ContentHandler
 
 	private String getFilename()
 	{
-		var result = getHeader("Content-Disposition");
+		String result = getHeader("Content-Disposition");
 		if (result != null && result.startsWith("attachment"))
-			result = result.replaceAll("^attachment;\\s+filename=\"?([^\"]*)\"?$","$1");
+			result = result.replaceAll("^attachment;\\s+filename=\"?([^\"]*)\"?$", "$1");
 		return result;
 	}
 
 	private String getContentId()
 	{
-		var result = getHeader("Content-ID");
+		String result = getHeader("Content-ID");
 		if (result != null)
-			result = result.replaceAll("^<(.*)>$|^(.*)$","$1$2");
+			result = result.replaceAll("^<(.*)>$|^(.*)$", "$1$2");
 		return result;
 	}
 

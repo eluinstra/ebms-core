@@ -15,12 +15,20 @@
  */
 package nl.clockwork.ebms.jms;
 
+
+import bitronix.tm.resource.jms.PoolingConnectionFactory;
+import com.atomikos.jms.AtomikosConnectionFactoryBean;
 import java.util.Properties;
 import java.util.UUID;
-
 import javax.jms.ConnectionFactory;
 import javax.jms.XAConnectionFactory;
-
+import lombok.AccessLevel;
+import lombok.experimental.FieldDefaults;
+import lombok.val;
+import nl.clockwork.ebms.transaction.TransactionManagerConfig.AtomikosTransactionManagerType;
+import nl.clockwork.ebms.transaction.TransactionManagerConfig.BitronixTransactionManagerType;
+import nl.clockwork.ebms.transaction.TransactionManagerConfig.DefaultTransactionManagerType;
+import nl.clockwork.ebms.transaction.TransactionManagerConfig.TransactionManagerType;
 import org.apache.activemq.ActiveMQXAConnectionFactory;
 import org.apache.activemq.pool.PooledConnectionFactory;
 import org.apache.commons.lang3.StringUtils;
@@ -29,17 +37,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
-
-import com.atomikos.jms.AtomikosConnectionFactoryBean;
-
-import bitronix.tm.resource.jms.PoolingConnectionFactory;
-import lombok.AccessLevel;
-import lombok.val;
-import lombok.experimental.FieldDefaults;
-import nl.clockwork.ebms.transaction.TransactionManagerConfig.AtomikosTransactionManagerType;
-import nl.clockwork.ebms.transaction.TransactionManagerConfig.BitronixTransactionManagerType;
-import nl.clockwork.ebms.transaction.TransactionManagerConfig.DefaultTransactionManagerType;
-import nl.clockwork.ebms.transaction.TransactionManagerConfig.TransactionManagerType;
 
 @Configuration
 @FieldDefaults(level = AccessLevel.PRIVATE)
@@ -65,7 +62,7 @@ public class JMSConfig
 	@Bean(name = "brokerFactory", destroyMethod = "destroy")
 	public EbMSBrokerFactoryBean brokerFactory() throws Exception
 	{
-		return new EbMSBrokerFactoryBean(jmsBrokerStart,jmsBrokerConfig);
+		return new EbMSBrokerFactoryBean(jmsBrokerStart, jmsBrokerConfig);
 	}
 
 	@Bean
@@ -130,13 +127,13 @@ public class JMSConfig
 	private Properties createDriverProperties()
 	{
 		val result = new Properties();
-		result.put("brokerURL",jmsBrokerUrl);
+		result.put("brokerURL", jmsBrokerUrl);
 		if (StringUtils.isNotEmpty(username))
 		{
-			result.put("userName",username);
-			result.put("password",password);
+			result.put("userName", username);
+			result.put("password", password);
 		}
-		return result ;
+		return result;
 	}
 
 	private XAConnectionFactory createXAConnectionFactory()

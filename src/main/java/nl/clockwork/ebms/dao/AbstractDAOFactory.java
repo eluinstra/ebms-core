@@ -20,19 +20,16 @@ import static io.vavr.API.Case;
 import static io.vavr.API.Match;
 import static nl.clockwork.ebms.Predicates.contains;
 
-import javax.sql.DataSource;
-
-import org.springframework.beans.factory.FactoryBean;
-
+import bitronix.tm.resource.jdbc.PoolingDataSource;
 import com.atomikos.jdbc.AtomikosDataSourceBean;
 import com.zaxxer.hikari.HikariDataSource;
-
-import bitronix.tm.resource.jdbc.PoolingDataSource;
+import javax.sql.DataSource;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
-import lombok.val;
 import lombok.experimental.FieldDefaults;
+import lombok.val;
+import org.springframework.beans.factory.FactoryBean;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor
@@ -51,22 +48,26 @@ public abstract class AbstractDAOFactory<T> implements FactoryBean<T>
 	{
 		val driverClassName = getDriverClassName(dataSource) == null ? "db2" : getDriverClassName(dataSource);
 		return Match(driverClassName).of(
-				Case($(contains("db2")),o -> createDB2DAO()),
-				Case($(contains("h2")),o -> createH2DAO()),
-				Case($(contains("hsqldb")),o -> createHSQLDBDAO()),
-				Case($(contains("mariadb","mysql")),o -> createMySQLDAO()),
-				Case($(contains("oracle")),o -> createOracleDAO()),
-				Case($(contains("postgresql")),o -> createPostgreSQLDAO()),
-				Case($(contains("sqlserver")),o -> createMSSQLDAO()),
-				Case($(),o -> {
+				Case($(contains("db2")), o -> createDB2DAO()),
+				Case($(contains("h2")), o -> createH2DAO()),
+				Case($(contains("hsqldb")), o -> createHSQLDBDAO()),
+				Case($(contains("mariadb", "mysql")), o -> createMySQLDAO()),
+				Case($(contains("oracle")), o -> createOracleDAO()),
+				Case($(contains("postgresql")), o -> createPostgreSQLDAO()),
+				Case($(contains("sqlserver")), o -> createMSSQLDAO()),
+				Case($(), o ->
+				{
 					throw new RuntimeException("Jdbc url " + driverClassName + " not recognized!");
 				}));
 	}
 
 	public static String getDriverClassName(DataSource dataSource)
 	{
-		return dataSource instanceof HikariDataSource ? ((HikariDataSource)dataSource).getDriverClassName() : 
-			dataSource  instanceof PoolingDataSource ? ((PoolingDataSource)dataSource).getClassName() : ((AtomikosDataSourceBean)dataSource).getXaDataSourceClassName();
+		return dataSource instanceof HikariDataSource
+				? ((HikariDataSource)dataSource).getDriverClassName()
+				: dataSource instanceof PoolingDataSource
+						? ((PoolingDataSource)dataSource).getClassName()
+						: ((AtomikosDataSourceBean)dataSource).getXaDataSourceClassName();
 	}
 
 	@Override

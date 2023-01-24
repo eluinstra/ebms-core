@@ -15,15 +15,19 @@
  */
 package nl.clockwork.ebms.cpa.url;
 
-import java.util.List;
 
+import java.util.List;
 import javax.jws.WebMethod;
 import javax.jws.WebParam;
 import javax.jws.WebResult;
 import javax.jws.WebService;
 import javax.xml.bind.annotation.XmlElement;
 
-@WebService(name = "UrlMappingService", targetNamespace = "http://www.ordina.nl/cpa/urlMapping/2.18", serviceName = "UrlMappingService", portName = "UrlMappingPort")
+@WebService(
+		name = "UrlMappingService",
+		targetNamespace = "http://www.ordina.nl/cpa/urlMapping/2.18",
+		serviceName = "UrlMappingService",
+		portName = "UrlMappingPort")
 public interface URLMappingService
 {
 	/**

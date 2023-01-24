@@ -15,22 +15,16 @@
  */
 package nl.clockwork.ebms.delivery.task;
 
+
 import java.security.cert.CertificateException;
 import java.time.Instant;
 import java.util.concurrent.Future;
-
-import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DeliveryChannel;
-import org.slf4j.MDC;
-import org.springframework.scheduling.annotation.Async;
-import org.springframework.scheduling.annotation.AsyncResult;
-
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.NonNull;
-import lombok.val;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 import nl.clockwork.ebms.EbMSMessageStatus;
 import nl.clockwork.ebms.cpa.CPAManager;
 import nl.clockwork.ebms.cpa.CPAUtils;
@@ -48,6 +42,11 @@ import nl.clockwork.ebms.processor.EbMSProcessingException;
 import nl.clockwork.ebms.util.LoggingUtils;
 import nl.clockwork.ebms.util.LoggingUtils.Status;
 import nl.clockwork.ebms.util.StreamUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DeliveryChannel;
+import org.slf4j.MDC;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.AsyncResult;
 
 @Slf4j
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -73,7 +72,17 @@ class DeliveryTaskHandler
 	boolean deleteEbMSAttachmentsOnMessageProcessed;
 
 	@Builder
-	public DeliveryTaskHandler(@NonNull MessageEventListener messageEventListener, @NonNull EbMSDAO ebMSDAO, @NonNull CPAManager cpaManager, @NonNull URLMapper urlMapper, @NonNull DeliveryTaskManager deliveryTaskManager, @NonNull EbMSHttpClientFactory ebMSClientFactory, @NonNull EbMSMessageEncrypter messageEncrypter, @NonNull EbMSMessageProcessor messageProcessor, TimedTask timedTask, boolean deleteEbMSAttachmentsOnMessageProcessed)
+	public DeliveryTaskHandler(
+			@NonNull MessageEventListener messageEventListener,
+			@NonNull EbMSDAO ebMSDAO,
+			@NonNull CPAManager cpaManager,
+			@NonNull URLMapper urlMapper,
+			@NonNull DeliveryTaskManager deliveryTaskManager,
+			@NonNull EbMSHttpClientFactory ebMSClientFactory,
+			@NonNull EbMSMessageEncrypter messageEncrypter,
+			@NonNull EbMSMessageProcessor messageProcessor,
+			TimedTask timedTask,
+			boolean deleteEbMSAttachmentsOnMessageProcessed)
 	{
 		this.messageEventListener = messageEventListener;
 		this.ebMSDAO = ebMSDAO;
@@ -109,18 +118,15 @@ class DeliveryTaskHandler
 
 	private void sendTask(final DeliveryTask task)
 	{
-		val receiveDeliveryChannel = cpaManager.getDeliveryChannel(
-				task.getCpaId(),
-				task.getReceiveDeliveryChannelId())
-					.orElseThrow(() -> StreamUtils.illegalStateException("ReceiveDeliveryChannel",task.getCpaId(),task.getReceiveDeliveryChannelId()));
+		val receiveDeliveryChannel = cpaManager.getDeliveryChannel(task.getCpaId(), task.getReceiveDeliveryChannelId())
+				.orElseThrow(() -> StreamUtils.illegalStateException("ReceiveDeliveryChannel", task.getCpaId(), task.getReceiveDeliveryChannelId()));
 		val url = urlMapper.getURL(CPAUtils.getUri(receiveDeliveryChannel));
 		val requestDocument = ebMSDAO.getEbMSDocumentIfUnsent(task.getMessageId());
-		StreamUtils.ifPresentOrElse(requestDocument,
-				d -> sendTask(task,receiveDeliveryChannel,url,d),
-				() -> {
-					log.info("Finished task " + task);
-					deliveryTaskManager.deleteTask(task.getMessageId());
-				});
+		StreamUtils.ifPresentOrElse(requestDocument, d -> sendTask(task, receiveDeliveryChannel, url, d), () ->
+		{
+			log.info("Finished task " + task);
+			deliveryTaskManager.deleteTask(task.getMessageId());
+		});
 	}
 
 	private void sendTask(DeliveryTask task, DeliveryChannel receiveDeliveryChannel, String url, EbMSDocument requestDocument)
@@ -132,17 +138,17 @@ class DeliveryTaskHandler
 				val context = ebMSDAO.getEbMSMessageProperties(task.getMessageId()).orElse(null);
 				MDC.setContextMap(LoggingUtils.getPropertyMap(context));
 			}
-			sendMessage(task,receiveDeliveryChannel,url,requestDocument);
+			sendMessage(task, receiveDeliveryChannel, url, requestDocument);
 		}
 		catch (final EbMSResponseException e)
 		{
-			log.error("",e);
-			handleException(task,receiveDeliveryChannel,url,e,e.getMessage());
+			log.error("", e);
+			handleException(task, receiveDeliveryChannel, url, e, e.getMessage());
 		}
 		catch (final Exception e)
 		{
-			log.error("",e);
-			handleException(task,receiveDeliveryChannel,url,e,ExceptionUtils.getStackTrace(e));
+			log.error("", e);
+			handleException(task, receiveDeliveryChannel, url, e, ExceptionUtils.getStackTrace(e));
 		}
 		finally
 		{
@@ -154,9 +160,9 @@ class DeliveryTaskHandler
 	{
 		Runnable runnable = () ->
 		{
-			deliveryTaskManager.updateTask(task,url,DeliveryTaskStatus.FAILED,errorMessage);
+			deliveryTaskManager.updateTask(task, url, DeliveryTaskStatus.FAILED, errorMessage);
 			if ((e instanceof EbMSUnrecoverableResponseException) || !CPAUtils.isReliableMessaging(receiveDeliveryChannel))
-				if (ebMSDAO.updateMessage(task.getMessageId(),EbMSMessageStatus.CREATED,EbMSMessageStatus.DELIVERY_FAILED) > 0)
+				if (ebMSDAO.updateMessage(task.getMessageId(), EbMSMessageStatus.CREATED, EbMSMessageStatus.DELIVERY_FAILED) > 0)
 				{
 					messageEventListener.onMessageFailed(task.getMessageId());
 					if (deleteEbMSAttachmentsOnMessageProcessed)
@@ -171,10 +177,10 @@ class DeliveryTaskHandler
 		try
 		{
 			if (task.isConfidential())
-				messageEncrypter.encrypt(receiveDeliveryChannel,requestDocument);
+				messageEncrypter.encrypt(receiveDeliveryChannel, requestDocument);
 			log.info("Sending message " + task.getMessageId() + " to " + url);
-			val responseDocument = createClient(task).sendMessage(url,requestDocument);
-			handleResponse(task,receiveDeliveryChannel,url,requestDocument,responseDocument);
+			val responseDocument = createClient(task).sendMessage(url, requestDocument);
+			handleResponse(task, receiveDeliveryChannel, url, requestDocument, responseDocument);
 			log.info("Sent message " + task.getMessageId());
 		}
 		catch (CertificateException e)
@@ -183,14 +189,19 @@ class DeliveryTaskHandler
 		}
 	}
 
-	private void handleResponse(final DeliveryTask task, DeliveryChannel receiveDeliveryChannel, final String url, EbMSDocument requestDocument, final nl.clockwork.ebms.model.EbMSDocument responseDocument)
+	private void handleResponse(
+			final DeliveryTask task,
+			DeliveryChannel receiveDeliveryChannel,
+			final String url,
+			EbMSDocument requestDocument,
+			final nl.clockwork.ebms.model.EbMSDocument responseDocument)
 	{
 		Runnable runnable = () ->
 		{
-			messageProcessor.processResponse(requestDocument,responseDocument);
-			deliveryTaskManager.updateTask(task,url,DeliveryTaskStatus.SUCCEEDED);
+			messageProcessor.processResponse(requestDocument, responseDocument);
+			deliveryTaskManager.updateTask(task, url, DeliveryTaskStatus.SUCCEEDED);
 			if (!CPAUtils.isReliableMessaging(receiveDeliveryChannel))
-				if (ebMSDAO.updateMessage(task.getMessageId(),EbMSMessageStatus.CREATED,EbMSMessageStatus.DELIVERED) > 0)
+				if (ebMSDAO.updateMessage(task.getMessageId(), EbMSMessageStatus.CREATED, EbMSMessageStatus.DELIVERED) > 0)
 				{
 					messageEventListener.onMessageDelivered(task.getMessageId());
 					if (deleteEbMSAttachmentsOnMessageProcessed)
@@ -203,17 +214,16 @@ class DeliveryTaskHandler
 	private EbMSClient createClient(DeliveryTask task) throws CertificateException
 	{
 		String cpaId = task.getCpaId();
-		val sendDeliveryChannel = task.getSendDeliveryChannelId() != null ?
-				cpaManager.getDeliveryChannel(cpaId,task.getSendDeliveryChannelId())
-				.orElse(null) : null;
-		return ebMSClientFactory.getEbMSClient(cpaId,sendDeliveryChannel);
+		val sendDeliveryChannel =
+				task.getSendDeliveryChannelId() != null ? cpaManager.getDeliveryChannel(cpaId, task.getSendDeliveryChannelId()).orElse(null) : null;
+		return ebMSClientFactory.getEbMSClient(cpaId, sendDeliveryChannel);
 	}
 
 	private void expireTask(final DeliveryTask task)
 	{
 		Runnable runnable = () ->
 		{
-			log.warn("Expiring message " +  task.getMessageId());
+			log.warn("Expiring message " + task.getMessageId());
 			ebMSDAO.getEbMSDocumentIfUnsent(task.getMessageId()).ifPresent(d -> updateMessage(task.getMessageId()));
 			log.info("Finished task " + task);
 			deliveryTaskManager.deleteTask(task.getMessageId());
@@ -223,7 +233,7 @@ class DeliveryTaskHandler
 
 	private void updateMessage(final String messageId)
 	{
-		if (ebMSDAO.updateMessage(messageId,EbMSMessageStatus.CREATED,EbMSMessageStatus.EXPIRED) > 0)
+		if (ebMSDAO.updateMessage(messageId, EbMSMessageStatus.CREATED, EbMSMessageStatus.EXPIRED) > 0)
 		{
 			messageEventListener.onMessageExpired(messageId);
 			if (deleteEbMSAttachmentsOnMessageProcessed)

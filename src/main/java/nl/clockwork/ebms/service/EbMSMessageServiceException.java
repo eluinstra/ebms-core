@@ -15,8 +15,8 @@
  */
 package nl.clockwork.ebms.service;
 
-import javax.xml.ws.WebFault;
 
+import javax.xml.ws.WebFault;
 import lombok.NoArgsConstructor;
 
 @WebFault(name = "EbMSMessageServiceException", targetNamespace = "http://www.ordina.nl/ebms/2.18")
@@ -27,7 +27,7 @@ public class EbMSMessageServiceException extends RuntimeException
 
 	public EbMSMessageServiceException(String message, Throwable cause)
 	{
-		super(message,cause);
+		super(message, cause);
 	}
 
 	public EbMSMessageServiceException(String message)

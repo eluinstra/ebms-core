@@ -15,10 +15,20 @@
  */
 package nl.clockwork.ebms.delivery.client.apache;
 
+
 import java.io.IOException;
-
 import javax.xml.transform.TransformerException;
-
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.NonNull;
+import lombok.experimental.FieldDefaults;
+import lombok.val;
+import nl.clockwork.ebms.delivery.client.EbMSClient;
+import nl.clockwork.ebms.delivery.client.EbMSProxy;
+import nl.clockwork.ebms.delivery.client.SSLFactoryManager;
+import nl.clockwork.ebms.model.EbMSDocument;
+import nl.clockwork.ebms.processor.EbMSProcessingException;
+import nl.clockwork.ebms.processor.EbMSProcessorException;
 import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
@@ -28,18 +38,6 @@ import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
-
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.NonNull;
-import lombok.val;
-import lombok.experimental.FieldDefaults;
-import nl.clockwork.ebms.delivery.client.EbMSClient;
-import nl.clockwork.ebms.delivery.client.EbMSProxy;
-import nl.clockwork.ebms.delivery.client.SSLFactoryManager;
-import nl.clockwork.ebms.model.EbMSDocument;
-import nl.clockwork.ebms.processor.EbMSProcessingException;
-import nl.clockwork.ebms.processor.EbMSProcessorException;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor
@@ -54,9 +52,22 @@ public class EbMSHttpClient implements EbMSClient
 	@NonNull
 	EbMSProxy proxy;
 
-	public EbMSHttpClient(SSLFactoryManager sslFactoryManager, String[] enabledProtocols, String[] enabledCipherSuites, boolean verifyHostnames, int connectTimeout, int socketTimeout, boolean chunkedStreamingMode, EbMSProxy proxy) throws Exception
+	public EbMSHttpClient(
+			SSLFactoryManager sslFactoryManager,
+			String[] enabledProtocols,
+			String[] enabledCipherSuites,
+			boolean verifyHostnames,
+			int connectTimeout,
+			int socketTimeout,
+			boolean chunkedStreamingMode,
+			EbMSProxy proxy) throws Exception
 	{
-		this(new SSLConnectionSocketFactoryFactory(sslFactoryManager,enabledProtocols,enabledCipherSuites,verifyHostnames).getObject(),connectTimeout,socketTimeout,chunkedStreamingMode,proxy);
+		this(
+				new SSLConnectionSocketFactoryFactory(sslFactoryManager, enabledProtocols, enabledCipherSuites, verifyHostnames).getObject(),
+				connectTimeout,
+				socketTimeout,
+				chunkedStreamingMode,
+				proxy);
 	}
 
 	public EbMSDocument sendMessage(String uri, EbMSDocument document) throws EbMSProcessorException
@@ -64,23 +75,23 @@ public class EbMSHttpClient implements EbMSClient
 		try (val httpClient = getHttpClient(uri))
 		{
 			val httpPost = getHttpPost(uri);
-			val ebMSMessageWriter = new EbMSMessageWriter(httpPost,chunkedStreamingMode);
+			val ebMSMessageWriter = new EbMSMessageWriter(httpPost, chunkedStreamingMode);
 			ebMSMessageWriter.write(document);
-			return httpClient.execute(httpPost,new EbMSResponseHandler());
+			return httpClient.execute(httpPost, new EbMSResponseHandler());
 		}
 		catch (TransformerException | IOException e)
 		{
 			throw new EbMSProcessingException(e);
 		}
 	}
-	
+
 	private CloseableHttpClient getHttpClient(String uri)
 	{
 		val custom = HttpClients.custom().setSSLSocketFactory(sslConnectionSocketFactory);
 		if (proxy != null && proxy.useProxyAuthorization())
 		{
 			val credsProvider = new BasicCredentialsProvider();
-			credsProvider.setCredentials(new AuthScope(proxy.getHost(),proxy.getPort()),new UsernamePasswordCredentials(proxy.getUsername(),proxy.getPassword()));
+			credsProvider.setCredentials(new AuthScope(proxy.getHost(), proxy.getPort()), new UsernamePasswordCredentials(proxy.getUsername(), proxy.getPassword()));
 			custom.setDefaultCredentialsProvider(credsProvider);
 		}
 		return custom.build();
@@ -91,7 +102,12 @@ public class EbMSHttpClient implements EbMSClient
 		val result = new HttpPost(uri);
 		if (proxy != null)
 		{
-			result.setConfig(RequestConfig.custom().setConnectTimeout(connectTimeout).setSocketTimeout(socketTimeout).setProxy(new HttpHost(proxy.getHost(),proxy.getPort())).build());
+			result.setConfig(
+					RequestConfig.custom()
+							.setConnectTimeout(connectTimeout)
+							.setSocketTimeout(socketTimeout)
+							.setProxy(new HttpHost(proxy.getHost(), proxy.getPort()))
+							.build());
 		}
 		return result;
 	}

@@ -15,27 +15,25 @@
  */
 package nl.clockwork.ebms;
 
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collections;
 import java.util.List;
-
 import javax.xml.parsers.ParserConfigurationException;
-
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.NonNull;
+import lombok.experimental.FieldDefaults;
+import lombok.val;
+import nl.clockwork.ebms.model.EbMSAttachment;
+import nl.clockwork.ebms.model.EbMSDocument;
+import nl.clockwork.ebms.util.DOMUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.james.mime4j.MimeException;
 import org.apache.james.mime4j.parser.MimeStreamParser;
 import org.apache.james.mime4j.stream.MimeConfig;
 import org.xml.sax.SAXException;
-
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.NonNull;
-import lombok.val;
-import lombok.experimental.FieldDefaults;
-import nl.clockwork.ebms.model.EbMSAttachment;
-import nl.clockwork.ebms.model.EbMSDocument;
-import nl.clockwork.ebms.util.DOMUtils;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor
@@ -44,14 +42,14 @@ public class EbMSMessageReader
 	String contentId;
 	@NonNull
 	String contentType;
-	
+
 	public EbMSDocument read(InputStream in) throws MimeException, IOException, ParserConfigurationException, SAXException
 	{
-		
+
 		if (contentType.startsWith("multipart"))
 		{
 			val handler = new EbMSContentHandler();
-			parseEbMSMessage(handler,contentType,in);
+			parseEbMSMessage(handler, contentType, in);
 			val attachments = handler.getAttachments();
 			return getEbMSMessage(attachments);
 		}
@@ -61,29 +59,22 @@ public class EbMSMessageReader
 
 	public EbMSDocument readResponse(String message) throws IOException, ParserConfigurationException, SAXException
 	{
-		return StringUtils.isNotBlank(message) ? EbMSDocument.builder()
-				.contentId(contentId)
-				.message(DOMUtils.read(message))
-				.attachments(Collections.emptyList())
-				.build()
+		return StringUtils.isNotBlank(message)
+				? EbMSDocument.builder().contentId(contentId).message(DOMUtils.read(message)).attachments(Collections.emptyList()).build()
 				: null;
 	}
 
 	private void parseEbMSMessage(EbMSContentHandler handler, String contentType, InputStream in) throws MimeException, IOException
 	{
 		val mimeConfig = MimeConfig.custom().setHeadlessParsing(contentType).build();
-	  val parser = new MimeStreamParser(mimeConfig);
-	  parser.setContentHandler(handler);
+		val parser = new MimeStreamParser(mimeConfig);
+		parser.setContentHandler(handler);
 		parser.parse(in);
 	}
 
 	private EbMSDocument getEbMSMessage(InputStream in) throws ParserConfigurationException, SAXException, IOException
 	{
-		return EbMSDocument.builder()
-				.contentId(contentId)
-				.message(DOMUtils.read(in))
-				.attachments(Collections.emptyList())
-				.build();
+		return EbMSDocument.builder().contentId(contentId).message(DOMUtils.read(in)).attachments(Collections.emptyList()).build();
 	}
 
 	private EbMSDocument getEbMSMessage(List<EbMSAttachment> attachments) throws ParserConfigurationException, SAXException, IOException
@@ -91,11 +82,7 @@ public class EbMSMessageReader
 		if (attachments.size() > 0)
 		{
 			val message = attachments.remove(0);
-			return EbMSDocument.builder()
-					.contentId(contentId)
-					.message(DOMUtils.read((message.getInputStream())))
-					.attachments(attachments)
-					.build();
+			return EbMSDocument.builder().contentId(contentId).message(DOMUtils.read((message.getInputStream()))).attachments(attachments).build();
 		}
 		return null;
 	}

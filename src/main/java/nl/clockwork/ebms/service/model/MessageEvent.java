@@ -15,12 +15,11 @@
  */
 package nl.clockwork.ebms.service.model;
 
-import java.io.Serializable;
 
+import java.io.Serializable;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -34,10 +33,10 @@ import nl.clockwork.ebms.event.MessageEventType;
 public class MessageEvent implements Serializable
 {
 	private static final long serialVersionUID = 1L;
-	@XmlElement(required=true)
+	@XmlElement(required = true)
 	@NonNull
 	String messageId;
-	@XmlElement(required=true)
+	@XmlElement(required = true)
 	@NonNull
 	MessageEventType type;
 }

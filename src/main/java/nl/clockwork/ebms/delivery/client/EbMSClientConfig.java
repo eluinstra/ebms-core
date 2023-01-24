@@ -15,20 +15,19 @@
  */
 package nl.clockwork.ebms.delivery.client;
 
+
 import java.util.Set;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import nl.clockwork.ebms.cpa.certificate.CertificateMapper;
 import nl.clockwork.ebms.delivery.client.EbMSHttpClientFactory.EbMSHttpClientType;
 import nl.clockwork.ebms.security.EbMSKeyStore;
 import nl.clockwork.ebms.security.EbMSTrustStore;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @FieldDefaults(level = AccessLevel.PRIVATE)
@@ -42,7 +41,7 @@ public class EbMSClientConfig
 	int readTimeout;
 	@Value("${http.chunkedStreamingMode}")
 	boolean chunkedStreamingMode;
-	//@Value("${http.base64Writer}")
+	// @Value("${http.base64Writer}")
 	boolean base64Writer;
 	@Value("${http.proxy.host}")
 	String proxyHost;
@@ -101,11 +100,11 @@ public class EbMSClientConfig
 
 	private EbMSProxy createProxy()
 	{
-		return new EbMSProxyFactory(proxyHost,poxyPort,proxyUsername,proxyPassword,nonProxyHosts).getObject();
+		return new EbMSProxyFactory(proxyHost, poxyPort, proxyUsername, proxyPassword, nonProxyHosts).getObject();
 	}
 
 	private HttpErrors createHttpErrors()
 	{
-		return new HttpErrors(recoverableInformationalHttpErrors,recoverableRedirectionHttpErrors,recoverableClientHttpErrors,unrecoverableServerHttpErrors);
+		return new HttpErrors(recoverableInformationalHttpErrors, recoverableRedirectionHttpErrors, recoverableClientHttpErrors, unrecoverableServerHttpErrors);
 	}
 }

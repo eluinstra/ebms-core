@@ -15,16 +15,23 @@
  */
 package nl.clockwork.ebms.cpa.url;
 
+
 import java.util.List;
 import java.util.Optional;
 
 public interface URLMappingDAO
 {
 	void clearCache();
+
 	boolean existsURLMapping(String source);
+
 	Optional<String> getURLMapping(String source);
+
 	List<URLMapping> getURLMappings();
+
 	String insertURLMapping(URLMapping urlMapping);
+
 	int updateURLMapping(URLMapping urlMapping);
+
 	int deleteURLMapping(String source);
 }

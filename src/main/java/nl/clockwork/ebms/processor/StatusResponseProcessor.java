@@ -15,23 +15,20 @@
  */
 package nl.clockwork.ebms.processor;
 
-import java.time.Instant;
-import java.util.Optional;
-
-import javax.xml.bind.JAXBException;
-import javax.xml.datatype.DatatypeConfigurationException;
-
-import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageStatusType;
 
 import io.vavr.Tuple;
 import io.vavr.Tuple2;
+import java.time.Instant;
+import java.util.Optional;
+import javax.xml.bind.JAXBException;
+import javax.xml.datatype.DatatypeConfigurationException;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.NonNull;
-import lombok.val;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 import nl.clockwork.ebms.EbMSAction;
 import nl.clockwork.ebms.EbMSMessageFactory;
 import nl.clockwork.ebms.EbMSMessageStatus;
@@ -44,6 +41,7 @@ import nl.clockwork.ebms.model.EbMSStatusRequest;
 import nl.clockwork.ebms.model.EbMSStatusResponse;
 import nl.clockwork.ebms.validation.EbMSMessageValidator;
 import nl.clockwork.ebms.validation.ValidatorException;
+import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageStatusType;
 
 @Slf4j
 @Builder
@@ -51,25 +49,26 @@ import nl.clockwork.ebms.validation.ValidatorException;
 @AllArgsConstructor
 class StatusResponseProcessor
 {
-  @NonNull
+	@NonNull
 	EbMSDAO ebMSDAO;
-  @NonNull
+	@NonNull
 	CPAManager cpaManager;
-  @NonNull
+	@NonNull
 	EbMSMessageValidator messageValidator;
-  @NonNull
+	@NonNull
 	EbMSMessageFactory ebMSMessageFactory;
-  @NonNull
-  DeliveryManager deliveryManager;
+	@NonNull
+	DeliveryManager deliveryManager;
 
-  public EbMSStatusResponse createStatusResponse(final EbMSStatusRequest statusRequest, final Instant timestamp) throws ValidatorException, DatatypeConfigurationException, JAXBException, EbMSProcessorException
+	public EbMSStatusResponse createStatusResponse(final EbMSStatusRequest statusRequest, final Instant timestamp)
+			throws ValidatorException, DatatypeConfigurationException, JAXBException, EbMSProcessorException
 	{
 		val p = ebMSDAO.getEbMSMessageProperties(statusRequest.getStatusRequest().getRefToMessageId()).orElse(null);
-		val result = createEbMSMessageStatusAndTimestamp(statusRequest,p);
-		return ebMSMessageFactory.createEbMSStatusResponse(statusRequest,result._1,result._2); 
+		val result = createEbMSMessageStatusAndTimestamp(statusRequest, p);
+		return ebMSMessageFactory.createEbMSStatusResponse(statusRequest, result._1, result._2);
 	}
-	
-  public void sendStatusResponse(final nl.clockwork.ebms.model.EbMSStatusResponse statusResponse)
+
+	public void sendStatusResponse(final nl.clockwork.ebms.model.EbMSStatusResponse statusResponse)
 	{
 		val messageHeader = statusResponse.getMessageHeader();
 		val uri = cpaManager.getReceivingUri(
@@ -78,44 +77,44 @@ class StatusResponseProcessor
 				messageHeader.getTo().getRole(),
 				CPAUtils.toString(messageHeader.getService()),
 				messageHeader.getAction());
-		deliveryManager.sendResponseMessage(uri,statusResponse);
+		deliveryManager.sendResponseMessage(uri, statusResponse);
 	}
-	
-  public void processStatusResponse(Instant timestamp, EbMSStatusResponse statusResponse)
+
+	public void processStatusResponse(Instant timestamp, EbMSStatusResponse statusResponse)
 	{
 		try
 		{
-			messageValidator.validate(statusResponse,timestamp);
+			messageValidator.validate(statusResponse, timestamp);
 			deliveryManager.handleResponseMessage(statusResponse);
 		}
 		catch (ValidatorException e)
 		{
-			log.warn("Unable to process StatusResponse " + statusResponse.getMessageHeader().getMessageData().getMessageId(),e);
+			log.warn("Unable to process StatusResponse " + statusResponse.getMessageHeader().getMessageData().getMessageId(), e);
 		}
 	}
 
-	private Tuple2<EbMSMessageStatus,Instant> createEbMSMessageStatusAndTimestamp(EbMSStatusRequest statusRequest, EbMSMessageProperties messageProperties)
+	private Tuple2<EbMSMessageStatus, Instant> createEbMSMessageStatusAndTimestamp(EbMSStatusRequest statusRequest, EbMSMessageProperties messageProperties)
 	{
 		if (messageProperties == null || EbMSAction.EBMS_SERVICE_URI.equals(messageProperties.getService()))
-			return Tuple.of(EbMSMessageStatus.NOT_RECOGNIZED,null);
+			return Tuple.of(EbMSMessageStatus.NOT_RECOGNIZED, null);
 		else if (!messageProperties.getCpaId().equals(statusRequest.getMessageHeader().getCPAId()))
-			return Tuple.of(EbMSMessageStatus.UNAUTHORIZED,null);
+			return Tuple.of(EbMSMessageStatus.UNAUTHORIZED, null);
 		else
 		{
 			return Optional.ofNullable(messageProperties.getMessageStatus())
-					.map(s -> mapEbMSMessageStatusAndTimestamp(s,messageProperties.getTimestamp()))
+					.map(s -> mapEbMSMessageStatusAndTimestamp(s, messageProperties.getTimestamp()))
 					.orElseThrow(() -> new EbMSProcessingException("Not found message " + statusRequest.getStatusRequest().getRefToMessageId()));
 		}
 	}
 
-	private Tuple2<EbMSMessageStatus,Instant> mapEbMSMessageStatusAndTimestamp(EbMSMessageStatus status, Instant timestamp)
+	private Tuple2<EbMSMessageStatus, Instant> mapEbMSMessageStatusAndTimestamp(EbMSMessageStatus status, Instant timestamp)
 	{
 		if (status != null
 				&& (MessageStatusType.RECEIVED.equals(status.getStatusCode())
 						|| MessageStatusType.PROCESSED.equals(status.getStatusCode())
 						|| MessageStatusType.FORWARDED.equals(status.getStatusCode())))
-			return Tuple.of(status,timestamp);
+			return Tuple.of(status, timestamp);
 		else
-			return Tuple.of(EbMSMessageStatus.NOT_RECOGNIZED,null);
+			return Tuple.of(EbMSMessageStatus.NOT_RECOGNIZED, null);
 	}
 }

@@ -15,9 +15,9 @@
  */
 package nl.clockwork.ebms;
 
+
 import java.util.Arrays;
 import java.util.function.Predicate;
-
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 

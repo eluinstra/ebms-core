@@ -15,12 +15,12 @@
  */
 package nl.clockwork.ebms.jaxb;
 
+
 import java.io.ByteArrayInputStream;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
-
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.val;

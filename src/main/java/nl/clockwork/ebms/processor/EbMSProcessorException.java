@@ -15,6 +15,7 @@
  */
 package nl.clockwork.ebms.processor;
 
+
 import lombok.NoArgsConstructor;
 
 @NoArgsConstructor
@@ -24,7 +25,7 @@ public class EbMSProcessorException extends RuntimeException
 
 	public EbMSProcessorException(String message, Throwable cause)
 	{
-		super(message,cause);
+		super(message, cause);
 	}
 
 	public EbMSProcessorException(String message)

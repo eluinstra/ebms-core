@@ -15,18 +15,17 @@
  */
 package nl.clockwork.ebms.delivery.client.apache;
 
+
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
-
-import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
-import org.springframework.beans.factory.FactoryBean;
-
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Builder.Default;
 import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
 import nl.clockwork.ebms.delivery.client.SSLFactoryManager;
+import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
+import org.springframework.beans.factory.FactoryBean;
 
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -45,14 +44,18 @@ class SSLConnectionSocketFactoryFactory implements FactoryBean<SSLConnectionSock
 	@Override
 	public SSLConnectionSocketFactory getObject() throws Exception
 	{
-		return new SSLConnectionSocketFactory(sslFactoryManager.getSslSocketFactory(),enabledProtocols.length == 0 ? null : enabledProtocols,enabledCipherSuites.length == 0 ? null : enabledCipherSuites,getHostnameVerifier());
+		return new SSLConnectionSocketFactory(
+				sslFactoryManager.getSslSocketFactory(),
+				enabledProtocols.length == 0 ? null : enabledProtocols,
+				enabledCipherSuites.length == 0 ? null : enabledCipherSuites,
+				getHostnameVerifier());
 	}
 
 	private HostnameVerifier getHostnameVerifier()
 	{
-		return verifyHostnames ? HttpsURLConnection.getDefaultHostnameVerifier() : (h,s) -> true;
+		return verifyHostnames ? HttpsURLConnection.getDefaultHostnameVerifier() : (h, s) -> true;
 	}
-	
+
 	@Override
 	public Class<?> getObjectType()
 	{

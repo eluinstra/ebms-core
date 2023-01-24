@@ -15,17 +15,22 @@
  */
 package nl.clockwork.ebms.cpa;
 
+
 import java.util.List;
 import java.util.Optional;
-
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CollaborationProtocolAgreement;
 
 public interface CPADAO
 {
 	boolean existsCPA(String cpaId);
+
 	Optional<CollaborationProtocolAgreement> getCPA(String cpaId);
+
 	List<String> getCPAIds();
+
 	String insertCPA(CollaborationProtocolAgreement cpa);
+
 	int updateCPA(CollaborationProtocolAgreement cpa);
+
 	int deleteCPA(String cpaId);
 }

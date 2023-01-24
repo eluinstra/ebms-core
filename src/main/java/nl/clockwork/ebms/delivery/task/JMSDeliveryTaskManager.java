@@ -15,27 +15,25 @@
  */
 package nl.clockwork.ebms.delivery.task;
 
-import java.time.Instant;
 
+import java.time.Instant;
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.Session;
-
-import org.apache.activemq.ScheduledMessage;
-import org.springframework.jms.core.JmsTemplate;
-import org.springframework.jms.core.MessageCreator;
-
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import lombok.val;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.NonFinal;
+import lombok.val;
 import nl.clockwork.ebms.cpa.CPAManager;
 import nl.clockwork.ebms.cpa.CPAUtils;
 import nl.clockwork.ebms.dao.EbMSDAO;
 import nl.clockwork.ebms.util.StreamUtils;
+import org.apache.activemq.ScheduledMessage;
+import org.springframework.jms.core.JmsTemplate;
+import org.springframework.jms.core.MessageCreator;
 
 @FieldDefaults(level = AccessLevel.PROTECTED, makeFinal = true)
 @AllArgsConstructor
@@ -56,15 +54,15 @@ class JMSDeliveryTaskManager implements DeliveryTaskManager
 		{
 			val result = session.createMessage();
 			if (delay != null)
-				result.setLongProperty(ScheduledMessage.AMQ_SCHEDULED_DELAY,delay);
-			result.setStringProperty("cpaId",deliveryTask.getCpaId());
-			result.setStringProperty("sendDeliveryChannelId",deliveryTask.getSendDeliveryChannelId());
-			result.setStringProperty("receiveDeliveryChannelId",deliveryTask.getReceiveDeliveryChannelId());
-			result.setStringProperty("messageId",deliveryTask.getMessageId());
-			result.setStringProperty("timeToLive",deliveryTask.getTimeToLive() != null ? deliveryTask.getTimeToLive().toString() : null);
-			result.setStringProperty("timestamp",deliveryTask.getTimestamp().toString());
-			result.setBooleanProperty("confidential",deliveryTask.isConfidential());
-			result.setIntProperty("retries",deliveryTask.getRetries());
+				result.setLongProperty(ScheduledMessage.AMQ_SCHEDULED_DELAY, delay);
+			result.setStringProperty("cpaId", deliveryTask.getCpaId());
+			result.setStringProperty("sendDeliveryChannelId", deliveryTask.getSendDeliveryChannelId());
+			result.setStringProperty("receiveDeliveryChannelId", deliveryTask.getReceiveDeliveryChannelId());
+			result.setStringProperty("messageId", deliveryTask.getMessageId());
+			result.setStringProperty("timeToLive", deliveryTask.getTimeToLive() != null ? deliveryTask.getTimeToLive().toString() : null);
+			result.setStringProperty("timestamp", deliveryTask.getTimestamp().toString());
+			result.setBooleanProperty("confidential", deliveryTask.isConfidential());
+			result.setIntProperty("retries", deliveryTask.getRetries());
 			return result;
 		}
 	}
@@ -84,38 +82,36 @@ class JMSDeliveryTaskManager implements DeliveryTaskManager
 	@Override
 	public void insertTask(DeliveryTask task)
 	{
-		jmsTemplate.send(JMS_DESTINATION_NAME,new DeliveryTaskMessageCreator(task));
+		jmsTemplate.send(JMS_DESTINATION_NAME, new DeliveryTaskMessageCreator(task));
 	}
 
 	@Override
 	public void updateTask(DeliveryTask task, String url, DeliveryTaskStatus status)
 	{
-		updateTask(task,url,status,null);
+		updateTask(task, url, status, null);
 	}
 
 	@Override
 	public void updateTask(DeliveryTask task, String url, DeliveryTaskStatus status, String errorMessage)
 	{
-		val deliveryChannel = cpaManager.getDeliveryChannel(
-				task.getCpaId(),
-				task.getReceiveDeliveryChannelId())
-					.orElseThrow(() -> StreamUtils.illegalStateException("DeliveryChannel",task.getCpaId(),task.getReceiveDeliveryChannelId()));
-		deliveryTaskDAO.insertLog(task.getMessageId(),task.getTimestamp(), url, status, errorMessage);
+		val deliveryChannel = cpaManager.getDeliveryChannel(task.getCpaId(), task.getReceiveDeliveryChannelId())
+				.orElseThrow(() -> StreamUtils.illegalStateException("DeliveryChannel", task.getCpaId(), task.getReceiveDeliveryChannelId()));
+		deliveryTaskDAO.insertLog(task.getMessageId(), task.getTimestamp(), url, status, errorMessage);
 		if (task.getTimeToLive() != null && CPAUtils.isReliableMessaging(deliveryChannel))
 		{
-			val nextTask = createNextTask(task,deliveryChannel);
-			jmsTemplate.send(JMS_DESTINATION_NAME,new DeliveryTaskMessageCreator(nextTask,calculateDelay(nextTask)));
+			val nextTask = createNextTask(task, deliveryChannel);
+			jmsTemplate.send(JMS_DESTINATION_NAME, new DeliveryTaskMessageCreator(nextTask, calculateDelay(nextTask)));
 		}
 		else
 		{
-			switch(ebMSDAO.getMessageAction(task.getMessageId()).orElse(null))
+			switch (ebMSDAO.getMessageAction(task.getMessageId()).orElse(null))
 			{
 				case ACKNOWLEDGMENT:
 				case MESSAGE_ERROR:
 					if (task.getRetries() < nrAutoRetries)
 					{
-						val nextTask = createNextTask(task,autoRetryInterval);
-						jmsTemplate.send(JMS_DESTINATION_NAME,new DeliveryTaskMessageCreator(nextTask,autoRetryInterval));
+						val nextTask = createNextTask(task, autoRetryInterval);
+						jmsTemplate.send(JMS_DESTINATION_NAME, new DeliveryTaskMessageCreator(nextTask, autoRetryInterval));
 						break;
 					}
 				default:

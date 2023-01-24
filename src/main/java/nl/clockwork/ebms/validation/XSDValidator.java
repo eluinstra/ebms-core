@@ -15,22 +15,20 @@
  */
 package nl.clockwork.ebms.validation;
 
+
 import java.io.IOException;
 import java.io.StringReader;
-
 import javax.xml.XMLConstants;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
-
-import org.w3c.dom.Node;
-import org.xml.sax.SAXException;
-
 import lombok.AccessLevel;
 import lombok.Builder;
-import lombok.val;
 import lombok.experimental.FieldDefaults;
+import lombok.val;
+import org.w3c.dom.Node;
+import org.xml.sax.SAXException;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class XSDValidator
@@ -43,17 +41,17 @@ public class XSDValidator
 		try
 		{
 			val factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-			factory.setProperty(XMLConstants.ACCESS_EXTERNAL_DTD,"");
-			factory.setProperty(XMLConstants.ACCESS_EXTERNAL_SCHEMA,"file");
+			factory.setProperty(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+			factory.setProperty(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "file");
 			val systemId = this.getClass().getResource(xsdFile).toString();
-			schema = factory.newSchema(new StreamSource(this.getClass().getResourceAsStream(xsdFile),systemId));
+			schema = factory.newSchema(new StreamSource(this.getClass().getResourceAsStream(xsdFile), systemId));
 		}
 		catch (SAXException e)
 		{
 			throw new RuntimeException(e);
 		}
 	}
-	
+
 	public void validate(String xml) throws SAXException, IOException
 	{
 		val validator = schema.newValidator();

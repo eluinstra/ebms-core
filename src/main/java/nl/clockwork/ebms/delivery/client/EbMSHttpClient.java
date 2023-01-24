@@ -15,6 +15,7 @@
  */
 package nl.clockwork.ebms.delivery.client;
 
+
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.InetSocketAddress;
@@ -22,16 +23,14 @@ import java.net.Proxy;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.List;
-
 import javax.net.ssl.HttpsURLConnection;
 import javax.xml.transform.TransformerException;
-
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Cleanup;
 import lombok.NonNull;
-import lombok.val;
 import lombok.experimental.FieldDefaults;
+import lombok.val;
 import nl.clockwork.ebms.model.EbMSDocument;
 import nl.clockwork.ebms.processor.EbMSProcessingException;
 import nl.clockwork.ebms.processor.EbMSProcessorException;
@@ -54,7 +53,8 @@ class EbMSHttpClient implements EbMSClient
 	{
 		try
 		{
-			@Cleanup("disconnect") val connection = (HttpURLConnection)openConnection(uri);
+			@Cleanup("disconnect")
+			val connection = (HttpURLConnection)openConnection(uri);
 			connection.setConnectTimeout(connectTimeout);
 			connection.setReadTimeout(readTimeout);
 			if (chunkedStreaming(uri))
@@ -62,7 +62,7 @@ class EbMSHttpClient implements EbMSClient
 			val writer = base64Writer ? new EbMSMessageBase64Writer(connection) : new EbMSMessageWriter(connection);
 			writer.write(document);
 			connection.connect();
-			val handler = new EbMSResponseHandler(connection,recoverableHttpErrors,unrecoverableHttpErrors);
+			val handler = new EbMSResponseHandler(connection, recoverableHttpErrors, unrecoverableHttpErrors);
 			return handler.read();
 		}
 		catch (IOException | TransformerException e)
@@ -70,7 +70,7 @@ class EbMSHttpClient implements EbMSClient
 			throw new EbMSProcessingException(e);
 		}
 	}
-	
+
 	public boolean chunkedStreaming(String uri)
 	{
 		return chunkedStreamingMode;
@@ -81,7 +81,7 @@ class EbMSHttpClient implements EbMSClient
 		val url = new URL(uri);
 		val connection = openConnection(url);
 		connection.setDoOutput(true);
-		//connection.setMethod("POST");
+		// connection.setMethod("POST");
 		if (connection instanceof HttpsURLConnection)
 		{
 			((HttpsURLConnection)connection).setHostnameVerifier(sslFactoryManager.getHostnameVerifier((HttpsURLConnection)connection));
@@ -94,11 +94,11 @@ class EbMSHttpClient implements EbMSClient
 	{
 		if (this.proxy != null)
 		{
-			val connectionProxy = new Proxy(Proxy.Type.HTTP,new InetSocketAddress(this.proxy.getHost(),this.proxy.getPort()));
+			val connectionProxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress(this.proxy.getHost(), this.proxy.getPort()));
 			if (this.proxy.useProxyAuthorization())
 			{
 				val connection = url.openConnection(connectionProxy);
-				connection.setRequestProperty(this.proxy.getProxyAuthorizationKey(),this.proxy.getProxyAuthorizationValue());
+				connection.setRequestProperty(this.proxy.getProxyAuthorizationKey(), this.proxy.getProxyAuthorizationValue());
 				return connection;
 			}
 			else

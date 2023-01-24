@@ -15,6 +15,7 @@
  */
 package nl.clockwork.ebms.event;
 
+
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
@@ -30,29 +31,29 @@ public class KafkaMessageEventListener extends LoggingMessageEventListener
 	@NonNull
 	EbMSDAO ebMSDAO;
 	@NonNull
-	private KafkaTemplate<String,EbMSMessageProperties> kafkaTemplate;
+	private KafkaTemplate<String, EbMSMessageProperties> kafkaTemplate;
 
 	@Override
 	public void onMessageReceived(String messageId) throws MessageEventException
 	{
-		ebMSDAO.getEbMSMessageProperties(messageId).ifPresent(p -> kafkaTemplate.send(MessageEventType.RECEIVED.name(),p));
+		ebMSDAO.getEbMSMessageProperties(messageId).ifPresent(p -> kafkaTemplate.send(MessageEventType.RECEIVED.name(), p));
 	}
 
 	@Override
 	public void onMessageDelivered(String messageId) throws MessageEventException
 	{
-		ebMSDAO.getEbMSMessageProperties(messageId).ifPresent(p -> kafkaTemplate.send(MessageEventType.DELIVERED.name(),p));
+		ebMSDAO.getEbMSMessageProperties(messageId).ifPresent(p -> kafkaTemplate.send(MessageEventType.DELIVERED.name(), p));
 	}
 
 	@Override
 	public void onMessageFailed(String messageId) throws MessageEventException
 	{
-		ebMSDAO.getEbMSMessageProperties(messageId).ifPresent(p -> kafkaTemplate.send(MessageEventType.FAILED.name(),p));
+		ebMSDAO.getEbMSMessageProperties(messageId).ifPresent(p -> kafkaTemplate.send(MessageEventType.FAILED.name(), p));
 	}
 
 	@Override
 	public void onMessageExpired(String messageId) throws MessageEventException
 	{
-		ebMSDAO.getEbMSMessageProperties(messageId).ifPresent(p -> kafkaTemplate.send(MessageEventType.EXPIRED.name(),p));
+		ebMSDAO.getEbMSMessageProperties(messageId).ifPresent(p -> kafkaTemplate.send(MessageEventType.EXPIRED.name(), p));
 	}
 }

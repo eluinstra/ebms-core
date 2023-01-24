@@ -15,15 +15,14 @@
  */
 package nl.clockwork.ebms.delivery.client;
 
+
 import java.util.Set;
-
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.FactoryBean;
-
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.experimental.FieldDefaults;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.FactoryBean;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @Getter
@@ -40,7 +39,7 @@ class EbMSProxyFactory implements FactoryBean<EbMSProxy>
 	public EbMSProxy getObject()
 	{
 		if (StringUtils.isNotBlank(host))
-			return EbMSProxy.of(host,port,username,password,nonProxyHosts);
+			return EbMSProxy.of(host, port, username, password, nonProxyHosts);
 		else
 			return null;
 	}

@@ -17,17 +17,15 @@ package nl.clockwork.ebms.jaxb;
 
 
 import java.util.Date;
-
+import javax.xml.bind.annotation.adapters.XmlAdapter;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.Duration;
 
-import javax.xml.bind.annotation.adapters.XmlAdapter;
-
 public class DurationAdapter extends XmlAdapter<String, java.time.Duration>
 {
 	private static DatatypeFactory datatypeFactory;
-	
+
 	static
 	{
 		try
@@ -39,7 +37,7 @@ public class DurationAdapter extends XmlAdapter<String, java.time.Duration>
 			throw new RuntimeException(e);
 		}
 	}
-	
+
 	@Override
 	public java.time.Duration unmarshal(String duration) throws Exception
 	{
@@ -51,12 +49,12 @@ public class DurationAdapter extends XmlAdapter<String, java.time.Duration>
 	{
 		return duration != null ? toDuration(duration).toString() : null;
 	}
-	
+
 	private static java.time.Duration toDuration(Duration duration)
 	{
 		return java.time.Duration.ofMillis(duration.getTimeInMillis(new Date()));
 	}
-	
+
 	private static Duration toDuration(java.time.Duration duration)
 	{
 		return duration != null ? datatypeFactory.newDuration(duration.toMillis()) : null;

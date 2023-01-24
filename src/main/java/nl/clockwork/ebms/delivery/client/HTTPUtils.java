@@ -15,27 +15,28 @@
  */
 package nl.clockwork.ebms.delivery.client;
 
+
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
 import org.springframework.util.StringUtils;
 
 public class HTTPUtils
 {
 	public static String getCharSet(String contentType)
 	{
-		return Stream.of(contentType.replace(" ","").split(";"))
+		return Stream.of(contentType.replace(" ", "").split(";"))
 				.filter(part -> part.startsWith("charset="))
-				.map(part -> part.split("=",2)[1])
+				.map(part -> part.split("=", 2)[1])
 				.findFirst()
 				.orElse(null);
 	}
 
-	public static String toString(Map<String,List<String>> properties)
+	public static String toString(Map<String, List<String>> properties)
 	{
-		return properties.entrySet().stream()
+		return properties.entrySet()
+				.stream()
 				.map(entry -> (entry.getKey() != null ? entry.getKey() + "=" : "") + StringUtils.collectionToCommaDelimitedString(entry.getValue()))
 				.collect(Collectors.joining("\n"));
 	}

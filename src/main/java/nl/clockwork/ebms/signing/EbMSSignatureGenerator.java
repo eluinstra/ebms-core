@@ -15,27 +15,18 @@
  */
 package nl.clockwork.ebms.signing;
 
+
 import java.security.GeneralSecurityException;
 import java.security.KeyPair;
 import java.security.KeyStoreException;
 import java.security.cert.X509Certificate;
 import java.util.Collections;
 import java.util.List;
-
-import org.apache.xml.security.exceptions.XMLSecurityException;
-import org.apache.xml.security.signature.XMLSignature;
-import org.apache.xml.security.transforms.Transforms;
-import org.apache.xml.security.transforms.params.XPathContainer;
-import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.AckRequested;
-import org.w3c.dom.Document;
-import org.w3c.dom.NodeList;
-
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
-import lombok.val;
-import lombok.var;
 import lombok.experimental.FieldDefaults;
+import lombok.val;
 import nl.clockwork.ebms.Constants;
 import nl.clockwork.ebms.cpa.CPAManager;
 import nl.clockwork.ebms.cpa.CPAUtils;
@@ -51,6 +42,13 @@ import nl.clockwork.ebms.util.DOMUtils;
 import nl.clockwork.ebms.util.SecurityUtils;
 import nl.clockwork.ebms.util.StreamUtils;
 import nl.clockwork.ebms.xml.dsig.EbMSAttachmentResolver;
+import org.apache.xml.security.exceptions.XMLSecurityException;
+import org.apache.xml.security.signature.XMLSignature;
+import org.apache.xml.security.transforms.Transforms;
+import org.apache.xml.security.transforms.params.XPathContainer;
+import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.AckRequested;
+import org.w3c.dom.Document;
+import org.w3c.dom.NodeList;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor
@@ -74,7 +72,7 @@ public class EbMSSignatureGenerator
 					messageHeader.getFrom().getRole(),
 					CPAUtils.toString(messageHeader.getService()),
 					messageHeader.getAction()))
-				sign(document,message,message.getAttachments());
+				sign(document, message, message.getAttachments());
 		}
 		catch (GeneralSecurityException e)
 		{
@@ -92,7 +90,7 @@ public class EbMSSignatureGenerator
 		{
 			if (ackRequested != null && ackRequested.isSigned())
 			{
-				sign(document,message,Collections.emptyList());
+				sign(document, message, Collections.emptyList());
 			}
 		}
 		catch (GeneralSecurityException e)
@@ -105,12 +103,26 @@ public class EbMSSignatureGenerator
 		}
 	}
 
-	private void sign(EbMSDocument document, EbMSBaseMessage message, List<EbMSAttachment> attachments) throws EbMSProcessorException, GeneralSecurityException, XMLSecurityException
+	private void sign(EbMSDocument document, EbMSBaseMessage message, List<EbMSAttachment> attachments)
+			throws EbMSProcessorException, GeneralSecurityException, XMLSecurityException
 	{
 		val messageHeader = message.getMessageHeader();
 		val service = CPAUtils.toString(messageHeader.getService());
-		val deliveryChannel = cpaManager.getSendDeliveryChannel(messageHeader.getCPAId(),messageHeader.getFrom().getPartyId(),messageHeader.getFrom().getRole(),service,messageHeader.getAction())
-				.orElseThrow(() -> StreamUtils.illegalStateException("SendDeliveryChannel",messageHeader.getCPAId(),messageHeader.getFrom().getPartyId(),messageHeader.getFrom().getRole(),service,messageHeader.getAction()));
+		val deliveryChannel = cpaManager
+				.getSendDeliveryChannel(
+						messageHeader.getCPAId(),
+						messageHeader.getFrom().getPartyId(),
+						messageHeader.getFrom().getRole(),
+						service,
+						messageHeader.getAction())
+				.orElseThrow(
+						() -> StreamUtils.illegalStateException(
+								"SendDeliveryChannel",
+								messageHeader.getCPAId(),
+								messageHeader.getFrom().getPartyId(),
+								messageHeader.getFrom().getRole(),
+								service,
+								messageHeader.getAction()));
 		val certificate = CPAUtils.getX509Certificate(CPAUtils.getSigningCertificate(deliveryChannel));
 		if (certificate == null)
 			throw new EbMSProcessingException(
@@ -119,48 +131,66 @@ public class EbMSSignatureGenerator
 		if (alias == null)
 			throw new EbMSProcessorException(
 					"No certificate found with subject \"" + certificate.getSubjectDN().getName() + "\" in keystore \"" + keyStore.getPath() + "\"");
-		val keyPair = SecurityUtils.getKeyPair(keyStore,alias,keyStore.getKeyPassword());
+		val keyPair = SecurityUtils.getKeyPair(keyStore, alias, keyStore.getKeyPassword());
 		val signatureAlgorithm = CPAUtils.getSignatureAlgorithm(deliveryChannel);
 		val hashFunction = CPAUtils.getHashFunction(deliveryChannel);
-		sign(keyStore,keyPair,alias,document.getMessage(),attachments,signatureAlgorithm,hashFunction);
+		sign(keyStore, keyPair, alias, document.getMessage(), attachments, signatureAlgorithm, hashFunction);
 	}
-	
-	private void sign(EbMSKeyStore keyStore, KeyPair keyPair, String alias, Document document, List<EbMSAttachment> attachments, String signatureMethodAlgorithm, String digestAlgorithm) throws XMLSecurityException, KeyStoreException
+
+	private void sign(
+			EbMSKeyStore keyStore,
+			KeyPair keyPair,
+			String alias,
+			Document document,
+			List<EbMSAttachment> attachments,
+			String signatureMethodAlgorithm,
+			String digestAlgorithm) throws XMLSecurityException, KeyStoreException
 	{
-		val signature = new XMLSignature(document,null,signatureMethodAlgorithm,canonicalizationMethodAlgorithm);
+		val signature = new XMLSignature(document, null, signatureMethodAlgorithm, canonicalizationMethodAlgorithm);
 
 		val soapHeader = DOMUtils.getFirstChildElement(document.getDocumentElement());
 		soapHeader.appendChild(signature.getElement());
-		
+
 		val resolver = new EbMSAttachmentResolver(attachments);
 		signature.getSignedInfo().addResourceResolver(resolver);
-			
+
 		val transforms = new Transforms(document);
 		transforms.addTransform(Transforms.TRANSFORM_ENVELOPED_SIGNATURE);
-		transforms.addTransform(Transforms.TRANSFORM_XPATH,getXPathTransform(document));
+		transforms.addTransform(Transforms.TRANSFORM_XPATH, getXPathTransform(document));
 		transforms.addTransform(transformAlgorithm);
-		
-		signature.addDocument("",transforms,digestAlgorithm);
-		
-		for (val attachment: attachments)
-			signature.addDocument(Constants.CID + attachment.getContentId(),null,digestAlgorithm);
-		
+
+		signature.addDocument("", transforms, digestAlgorithm);
+
+		for (val attachment : attachments)
+			signature.addDocument(Constants.CID + attachment.getContentId(), null, digestAlgorithm);
+
 		signature.addKeyInfo(keyPair.getPublic());
-		
+
 		val certificates = keyStore.getCertificateChain(alias);
-		//Stream.of(certificates).forEach(ThrowingConsumer.throwingConsumerWrapper(c -> signature.addKeyInfo((X509Certificate)c)));
+		// Stream.of(certificates).forEach(ThrowingConsumer.throwingConsumerWrapper(c -> signature.addKeyInfo((X509Certificate)c)));
 		signature.addKeyInfo((X509Certificate)certificates[0]);
 
 		signature.sign(keyPair.getPrivate());
 	}
-	
+
 	private NodeList getXPathTransform(Document document) throws XMLSecurityException
 	{
-		var prefix = document.lookupPrefix(Constants.NSURI_SOAP_ENVELOPE);
-		prefix = prefix == null ? "" : prefix + ":";
+		val prefix = createPrefix(document.lookupPrefix(Constants.NSURI_SOAP_ENVELOPE));
 		val container = new XPathContainer(document);
-		//container.setXPathNamespaceContext(prefix,Constants.NSURI_SOAP_ENVELOPE);
-		container.setXPath("not(ancestor-or-self::node()[@" + prefix + "actor=\"urn:oasis:names:tc:ebxml-msg:actor:nextMSH\"]|ancestor-or-self::node()[@" + prefix + "actor=\"" + Constants.NSURI_SOAP_NEXT_ACTOR + "\"])");
+		// container.setXPathNamespaceContext(prefix,Constants.NSURI_SOAP_ENVELOPE);
+		container.setXPath(
+				"not(ancestor-or-self::node()[@"
+						+ prefix
+						+ "actor=\"urn:oasis:names:tc:ebxml-msg:actor:nextMSH\"]|ancestor-or-self::node()[@"
+						+ prefix
+						+ "actor=\""
+						+ Constants.NSURI_SOAP_NEXT_ACTOR
+						+ "\"])");
 		return container.getElementPlusReturns();
+	}
+
+	private String createPrefix(String prefix)
+	{
+		return prefix == null ? "" : prefix + ":";
 	}
 }

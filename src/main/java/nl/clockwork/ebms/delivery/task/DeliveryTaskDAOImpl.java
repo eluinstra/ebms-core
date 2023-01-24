@@ -15,19 +15,18 @@
  */
 package nl.clockwork.ebms.delivery.task;
 
+
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.List;
-
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.RowMapper;
-
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor
@@ -62,11 +61,11 @@ abstract class DeliveryTaskDAOImpl implements DeliveryTaskDAO
 	public List<DeliveryTask> getTasksBefore(Instant timestamp, String serverId)
 	{
 		return jdbcTemplate.query(
-				EbMSEventRowMapper.SELECT +
-				" from delivery_task" +
-				" where time_stamp <= ?" +
-				(serverId == null ? "" : " and server_id = '" + serverId + "'") +
-				" order by time_stamp asc",
+				EbMSEventRowMapper.SELECT
+						+ " from delivery_task"
+						+ " where time_stamp <= ?"
+						+ (serverId == null ? "" : " and server_id = '" + serverId + "'")
+						+ " order by time_stamp asc",
 				new EbMSEventRowMapper(),
 				Timestamp.from(timestamp));
 	}
@@ -76,9 +75,9 @@ abstract class DeliveryTaskDAOImpl implements DeliveryTaskDAO
 	@Override
 	public List<DeliveryTask> getTasksBefore(Instant timestamp, String serverId, int maxNr)
 	{
-		return jdbcTemplate.query(getTasksBeforeQuery(maxNr,serverId),new EbMSEventRowMapper(),Timestamp.from(timestamp));
+		return jdbcTemplate.query(getTasksBeforeQuery(maxNr, serverId), new EbMSEventRowMapper(), Timestamp.from(timestamp));
 	}
-	
+
 	@Override
 	public String insertTask(DeliveryTask task, String serverId)
 	{
@@ -99,13 +98,17 @@ abstract class DeliveryTaskDAOImpl implements DeliveryTaskDAO
 	@Override
 	public int updateTask(DeliveryTask task)
 	{
-		return jdbcTemplate.update("update delivery_task set time_stamp = ?, retries = ? where message_id = ?",Timestamp.from(task.getTimestamp()),task.getRetries(),task.getMessageId());
+		return jdbcTemplate.update(
+				"update delivery_task set time_stamp = ?, retries = ? where message_id = ?",
+				Timestamp.from(task.getTimestamp()),
+				task.getRetries(),
+				task.getMessageId());
 	}
-	
+
 	@Override
 	public int deleteTask(String messageId)
 	{
-		return jdbcTemplate.update("delete from delivery_task where message_id = ?",messageId);
+		return jdbcTemplate.update("delete from delivery_task where message_id = ?", messageId);
 	}
 
 	@Override

@@ -15,9 +15,9 @@
  */
 package nl.clockwork.ebms.delivery.client;
 
+
 import java.util.List;
 import java.util.Map;
-
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -33,29 +33,29 @@ public class EbMSResponseException extends EbMSProcessingException
 	private static final long serialVersionUID = 1L;
 	int statusCode;
 	@NonNull
-	Map<String,List<String>> headers;
+	Map<String, List<String>> headers;
 
-	public EbMSResponseException(int statusCode, @NonNull Map<String,List<String>> headers, String message)
+	public EbMSResponseException(int statusCode, @NonNull Map<String, List<String>> headers, String message)
 	{
 		super(message);
 		this.statusCode = statusCode;
 		this.headers = headers;
 	}
-	
-	public EbMSResponseException(int statusCode, @NonNull Map<String,List<String>> headers, Throwable cause)
+
+	public EbMSResponseException(int statusCode, @NonNull Map<String, List<String>> headers, Throwable cause)
 	{
 		super(cause);
 		this.statusCode = statusCode;
 		this.headers = headers;
 	}
-	
-	public EbMSResponseException(int statusCode, @NonNull Map<String,List<String>> headers, String message, Throwable cause)
+
+	public EbMSResponseException(int statusCode, @NonNull Map<String, List<String>> headers, String message, Throwable cause)
 	{
-		super(message,cause);
+		super(message, cause);
 		this.statusCode = statusCode;
 		this.headers = headers;
 	}
-	
+
 	@Override
 	public String getMessage()
 	{

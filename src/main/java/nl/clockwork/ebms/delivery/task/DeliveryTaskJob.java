@@ -15,15 +15,15 @@
  */
 package nl.clockwork.ebms.delivery.task;
 
+
+import lombok.AccessLevel;
+import lombok.experimental.FieldDefaults;
+import lombok.val;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 import org.springframework.stereotype.Component;
-
-import lombok.AccessLevel;
-import lombok.val;
-import lombok.experimental.FieldDefaults;
 
 @Component
 @FieldDefaults(level = AccessLevel.PRIVATE)
@@ -44,6 +44,6 @@ public class DeliveryTaskJob extends QuartzJobBean
 		catch (Exception e)
 		{
 			throw new JobExecutionException(e);
-		}		
+		}
 	}
 }

@@ -24,7 +24,6 @@ import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.List;
 import java.util.stream.Collectors;
-
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -32,7 +31,6 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
-
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -63,7 +61,7 @@ public class CertificateMappingServiceImpl implements CertificateMappingService,
 		{
 			try
 			{
-				return new CertificateMapping(encodeBase64String(m.getSource().getEncoded()),encodeBase64String(m.getDestination().getEncoded()),m.getCpaId());
+				return new CertificateMapping(encodeBase64String(m.getSource().getEncoded()), encodeBase64String(m.getDestination().getEncoded()), m.getCpaId());
 			}
 			catch (CertificateEncodingException e)
 			{
@@ -75,7 +73,10 @@ public class CertificateMappingServiceImpl implements CertificateMappingService,
 		{
 			try
 			{
-				return new nl.clockwork.ebms.cpa.certificate.CertificateMapping(parseCertificate(decodeBase64(source)),parseCertificate(decodeBase64(destination)),cpaId);
+				return new nl.clockwork.ebms.cpa.certificate.CertificateMapping(
+						parseCertificate(decodeBase64(source)),
+						parseCertificate(decodeBase64(destination)),
+						cpaId);
 			}
 			catch (CertificateException e)
 			{
@@ -84,7 +85,7 @@ public class CertificateMappingServiceImpl implements CertificateMappingService,
 		}
 	}
 
-  @NonNull
+	@NonNull
 	CertificateMapper certificateMapper;
 
 	@POST
@@ -97,7 +98,7 @@ public class CertificateMappingServiceImpl implements CertificateMappingService,
 		}
 		catch (Exception e)
 		{
-			log.error("SetCertificateMapping " + certificateMapping,e);
+			log.error("SetCertificateMapping " + certificateMapping, e);
 			throw toServiceException(new CertificateMappingServiceException(e));
 		}
 	}
@@ -113,7 +114,7 @@ public class CertificateMappingServiceImpl implements CertificateMappingService,
 		}
 		catch (Exception e)
 		{
-			log.error("SetCertificateMapping " + certificateMapping,e);
+			log.error("SetCertificateMapping " + certificateMapping, e);
 			throw toServiceException(new CertificateMappingServiceException(e));
 		}
 	}
@@ -124,11 +125,11 @@ public class CertificateMappingServiceImpl implements CertificateMappingService,
 	{
 		try
 		{
-			deleteCertificateMapping(parseCertificate(decodeBase64(source)),cpaId);
+			deleteCertificateMapping(parseCertificate(decodeBase64(source)), cpaId);
 		}
 		catch (Exception e)
 		{
-			log.error("DeleteCertificateMapping " + source,e);
+			log.error("DeleteCertificateMapping " + source, e);
 			throw toServiceException(new CertificateMappingServiceException(e));
 		}
 	}
@@ -140,17 +141,17 @@ public class CertificateMappingServiceImpl implements CertificateMappingService,
 		{
 			if (log.isDebugEnabled())
 				log.debug("DeleteCertificateMapping " + source);
-			if (certificateMapper.deleteCertificateMapping(source,cpaId) == 0)
+			if (certificateMapper.deleteCertificateMapping(source, cpaId) == 0)
 				throw new CertificateNotFoundException();
 		}
 		catch (CertificateMappingServiceException e)
 		{
-			log.error("GetCertificateMappings",e);
+			log.error("GetCertificateMappings", e);
 			throw toServiceException(e);
 		}
 		catch (Exception e)
 		{
-			log.error("DeleteCertificateMapping " + source,e);
+			log.error("DeleteCertificateMapping " + source, e);
 			throw toServiceException(new CertificateMappingServiceException(e));
 		}
 	}
@@ -165,7 +166,7 @@ public class CertificateMappingServiceImpl implements CertificateMappingService,
 		}
 		catch (Exception e)
 		{
-			log.error("GetCertificateMappings",e);
+			log.error("GetCertificateMappings", e);
 			throw toServiceException(new CertificateMappingServiceException(e));
 		}
 	}
@@ -180,7 +181,7 @@ public class CertificateMappingServiceImpl implements CertificateMappingService,
 		}
 		catch (Exception e)
 		{
-			log.error("GetCertificateMappings",e);
+			log.error("GetCertificateMappings", e);
 			throw toServiceException(new CertificateMappingServiceException(e));
 		}
 	}

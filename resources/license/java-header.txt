@@ -13,26 +13,3 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.clockwork.ebms.server;
-
-
-import lombok.AccessLevel;
-import lombok.experimental.FieldDefaults;
-import nl.clockwork.ebms.processor.EbMSMessageProcessor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-
-@Configuration
-@FieldDefaults(level = AccessLevel.PRIVATE)
-public class EbMSServerConfig
-{
-	@Autowired
-	EbMSMessageProcessor messageProcessor;
-
-	@Bean
-	public EbMSHttpHandler httpHandler()
-	{
-		return new EbMSHttpHandler(messageProcessor);
-	}
-}

@@ -15,11 +15,9 @@
  */
 package nl.clockwork.ebms.model;
 
+
 import java.util.Collections;
 import java.util.List;
-
-import org.w3c.dom.Document;
-
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -27,6 +25,7 @@ import lombok.Builder.Default;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
+import org.w3c.dom.Document;
 
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)

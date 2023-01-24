@@ -15,27 +15,22 @@
  */
 package nl.clockwork.ebms.service;
 
+
 import java.io.IOException;
 import java.time.Instant;
 import java.util.List;
-
 import javax.xml.bind.JAXBException;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.soap.SOAPException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactoryConfigurationError;
-
-import org.slf4j.MDC;
-import org.w3c.dom.Document;
-import org.xml.sax.SAXException;
-
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.NonNull;
-import lombok.val;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 import nl.clockwork.ebms.EbMSAction;
 import nl.clockwork.ebms.EbMSMessageFactory;
 import nl.clockwork.ebms.EbMSMessageStatus;
@@ -67,6 +62,9 @@ import nl.clockwork.ebms.util.LoggingUtils;
 import nl.clockwork.ebms.util.LoggingUtils.Status;
 import nl.clockwork.ebms.util.StreamUtils;
 import nl.clockwork.ebms.validation.MessagePropertiesValidator;
+import org.slf4j.MDC;
+import org.w3c.dom.Document;
+import org.xml.sax.SAXException;
 
 @Slf4j
 @Builder
@@ -74,21 +72,21 @@ import nl.clockwork.ebms.validation.MessagePropertiesValidator;
 @AllArgsConstructor
 class EbMSMessageServiceHandler
 {
-  @NonNull
+	@NonNull
 	DeliveryManager deliveryManager;
-  @NonNull
+	@NonNull
 	EbMSDAO ebMSDAO;
-  @NonNull
+	@NonNull
 	MessageEventDAO messageEventDAO;
-  @NonNull
+	@NonNull
 	CPAManager cpaManager;
-  @NonNull
+	@NonNull
 	EbMSMessageFactory ebMSMessageFactory;
-  @NonNull
+	@NonNull
 	DeliveryTaskManager deliveryTaskManager;
-  @NonNull
+	@NonNull
 	MessagePropertiesValidator messagePropertiesValidator;
-  @NonNull
+	@NonNull
 	EbMSSignatureGenerator signatureGenerator;
 	boolean deleteEbMSAttachmentsOnMessageProcessed;
 
@@ -97,8 +95,8 @@ class EbMSMessageServiceHandler
 		try
 		{
 			log.debug("Ping " + cpaId);
-			messagePropertiesValidator.validate(cpaId,fromPartyId,toPartyId);
-			val request = ebMSMessageFactory.createEbMSPing(cpaId,fromPartyId,toPartyId);
+			messagePropertiesValidator.validate(cpaId, fromPartyId, toPartyId);
+			val request = ebMSMessageFactory.createEbMSPing(cpaId, fromPartyId, toPartyId);
 			val response = deliveryManager.sendMessage(request);
 			if (response.isPresent())
 			{
@@ -110,7 +108,7 @@ class EbMSMessageServiceHandler
 		}
 		catch (Exception e)
 		{
-			log.error("Ping " + cpaId,e);
+			log.error("Ping " + cpaId, e);
 			throw new EbMSMessageServiceException(e);
 		}
 	}
@@ -125,15 +123,15 @@ class EbMSMessageServiceHandler
 			if (LoggingUtils.mdc == Status.ENABLED)
 				MDC.setContextMap(LoggingUtils.getPropertyMap(message.getMessageHeader()));
 			val document = EbMSMessageUtils.getEbMSDocument(message);
-			signatureGenerator.generate(document,message);
-			storeMessage(document.getMessage(),message);
+			signatureGenerator.generate(document, message);
+			storeMessage(document.getMessage(), message);
 			val result = message.getMessageHeader().getMessageData().getMessageId();
 			log.info("Created message " + result);
 			return result;
 		}
 		catch (Exception e)
 		{
-			log.error("SendMessage " + messageRequest,e);
+			log.error("SendMessage " + messageRequest, e);
 			throw new EbMSMessageServiceException(e);
 		}
 	}
@@ -148,15 +146,15 @@ class EbMSMessageServiceHandler
 			if (LoggingUtils.mdc == Status.ENABLED)
 				MDC.setContextMap(LoggingUtils.getPropertyMap(message.getMessageHeader()));
 			val document = EbMSMessageUtils.getEbMSDocument(message);
-			signatureGenerator.generate(document,message);
-			storeMessage(document.getMessage(),message);
+			signatureGenerator.generate(document, message);
+			storeMessage(document.getMessage(), message);
 			String result = message.getMessageHeader().getMessageData().getMessageId();
 			log.info("Created message " + result);
 			return result;
 		}
 		catch (Exception e)
 		{
-			log.error("SendMessage " + messageRequest,e);
+			log.error("SendMessage " + messageRequest, e);
 			throw new EbMSMessageServiceException(e);
 		}
 	}
@@ -176,13 +174,14 @@ class EbMSMessageServiceHandler
 					if (LoggingUtils.mdc == Status.ENABLED)
 						MDC.setContextMap(LoggingUtils.getPropertyMap(message.getMessageHeader()));
 					val document = EbMSMessageUtils.getEbMSDocument(message);
-					signatureGenerator.generate(document,message);
-					storeMessage(document.getMessage(),message);
+					signatureGenerator.generate(document, message);
+					storeMessage(document.getMessage(), message);
 					val newMessageId = message.getMessageHeader().getMessageData().getMessageId();
 					log.info("Created message " + newMessageId);
 					return newMessageId;
 				}
-				catch (SOAPException | JAXBException | ParserConfigurationException | SAXException | IOException | TransformerFactoryConfigurationError | TransformerException e)
+				catch (SOAPException | JAXBException | ParserConfigurationException | SAXException | IOException | TransformerFactoryConfigurationError
+						| TransformerException e)
 				{
 					throw new EbMSProcessorException(e);
 				}
@@ -205,11 +204,13 @@ class EbMSMessageServiceHandler
 		try
 		{
 			log.debug("GetMessageIds");
-			return maxNr == null || maxNr == 0 ? ebMSDAO.getMessageIds(messageFilter,EbMSMessageStatus.RECEIVED) : ebMSDAO.getMessageIds(messageFilter,EbMSMessageStatus.RECEIVED,maxNr);
+			return maxNr == null || maxNr == 0
+					? ebMSDAO.getMessageIds(messageFilter, EbMSMessageStatus.RECEIVED)
+					: ebMSDAO.getMessageIds(messageFilter, EbMSMessageStatus.RECEIVED, maxNr);
 		}
 		catch (Exception e)
 		{
-			log.error("GetMessageIds " + messageFilter,e);
+			log.error("GetMessageIds " + messageFilter, e);
 			throw new EbMSMessageServiceException(e);
 		}
 	}
@@ -225,12 +226,12 @@ class EbMSMessageServiceHandler
 		}
 		catch (EbMSMessageServiceException e)
 		{
-			log.error("GetMessage " + messageId,e);
+			log.error("GetMessage " + messageId, e);
 			throw e;
 		}
 		catch (Exception e)
 		{
-			log.error("GetMessage " + messageId,e);
+			log.error("GetMessage " + messageId, e);
 			throw new EbMSMessageServiceException(e);
 		}
 	}
@@ -246,12 +247,12 @@ class EbMSMessageServiceHandler
 		}
 		catch (EbMSMessageServiceException e)
 		{
-			log.error("GetMessage " + messageId,e);
+			log.error("GetMessage " + messageId, e);
 			throw e;
 		}
 		catch (Exception e)
 		{
-			log.error("GetMessage " + messageId,e);
+			log.error("GetMessage " + messageId, e);
 			throw new EbMSMessageServiceException(e);
 		}
 	}
@@ -263,7 +264,7 @@ class EbMSMessageServiceHandler
 			log.debug("ProcessMessage " + messageId);
 			Runnable runnable = () ->
 			{
-				if (ebMSDAO.updateMessage(messageId,EbMSMessageStatus.RECEIVED,EbMSMessageStatus.PROCESSED) > 0 && deleteEbMSAttachmentsOnMessageProcessed)
+				if (ebMSDAO.updateMessage(messageId, EbMSMessageStatus.RECEIVED, EbMSMessageStatus.PROCESSED) > 0 && deleteEbMSAttachmentsOnMessageProcessed)
 					ebMSDAO.deleteAttachments(messageId);
 			};
 			ebMSDAO.executeTransaction(runnable);
@@ -271,7 +272,7 @@ class EbMSMessageServiceHandler
 		}
 		catch (Exception e)
 		{
-			log.error("ProcessMessage " + messageId,e);
+			log.error("ProcessMessage " + messageId, e);
 			throw new EbMSMessageServiceException(e);
 		}
 	}
@@ -282,17 +283,17 @@ class EbMSMessageServiceHandler
 		{
 			log.debug("GetMessageStatus " + messageId);
 			return ebMSDAO.getEbMSMessageProperties(messageId)
-					.map(p -> getMessageStatus(messageId,p))
+					.map(p -> getMessageStatus(messageId, p))
 					.orElseThrow(() -> new NotFoundException("No message found with messageId " + messageId + "!"));
 		}
 		catch (EbMSMessageServiceException e)
 		{
-			log.error("GetMessageStatus " + messageId,e);
+			log.error("GetMessageStatus " + messageId, e);
 			throw e;
 		}
 		catch (Exception e)
 		{
-			log.error("GetMessageStatus " + messageId,e);
+			log.error("GetMessageStatus " + messageId, e);
 			throw new EbMSMessageServiceException(e);
 		}
 	}
@@ -305,7 +306,7 @@ class EbMSMessageServiceHandler
 		{
 			val fromPartyId = messageProperties.getFromParty().getPartyId();
 			val toPartyId = messageProperties.getToParty().getPartyId();
-			val request = ebMSMessageFactory.createEbMSStatusRequest(messageProperties.getCpaId(),fromPartyId,toPartyId,messageId);
+			val request = ebMSMessageFactory.createEbMSStatusRequest(messageProperties.getCpaId(), fromPartyId, toPartyId, messageId);
 			val response = deliveryManager.sendMessage(request);
 			return response.map(r -> (createMessageStatus(r))).orElseThrow(() -> new EbMSMessageServiceException("No response received!"));
 		}
@@ -315,25 +316,29 @@ class EbMSMessageServiceHandler
 	{
 		if (message instanceof EbMSStatusResponse)
 		{
-			val timestamp = ((EbMSStatusResponse)message).getStatusResponse().getTimestamp() == null ? null : ((EbMSStatusResponse)message).getStatusResponse().getTimestamp();
+			val timestamp =
+					((EbMSStatusResponse)message).getStatusResponse().getTimestamp() == null ? null : ((EbMSStatusResponse)message).getStatusResponse().getTimestamp();
 			val messageStatus = ((EbMSStatusResponse)message).getStatusResponse().getMessageStatus();
 			val status = EbMSMessageStatus.get(messageStatus).orElseThrow(() -> new NotFoundException("No EbMSMessageStatus found for " + messageStatus));
-			return new MessageStatus(timestamp,status);
+			return new MessageStatus(timestamp, status);
 		}
 		else
 			throw new EbMSMessageServiceException("No valid response received!");
 	}
 
-	public List<MessageEvent> getUnprocessedMessageEvents(MessageFilter messageFilter, MessageEventType[] eventTypes, Integer maxNr) throws EbMSMessageServiceException
+	public List<MessageEvent> getUnprocessedMessageEvents(MessageFilter messageFilter, MessageEventType[] eventTypes, Integer maxNr)
+			throws EbMSMessageServiceException
 	{
 		try
 		{
 			log.debug("GetMessageEvents");
-			return maxNr == null || maxNr == 0 ? messageEventDAO.getEbMSMessageEvents(messageFilter,eventTypes) : messageEventDAO.getEbMSMessageEvents(messageFilter,eventTypes,maxNr);
+			return maxNr == null || maxNr == 0
+					? messageEventDAO.getEbMSMessageEvents(messageFilter, eventTypes)
+					: messageEventDAO.getEbMSMessageEvents(messageFilter, eventTypes, maxNr);
 		}
 		catch (Exception e)
 		{
-			log.error("GetMessageEvents" + messageFilter,e);
+			log.error("GetMessageEvents" + messageFilter, e);
 			throw new EbMSMessageServiceException(e);
 		}
 	}
@@ -352,7 +357,7 @@ class EbMSMessageServiceHandler
 		}
 		catch (Exception e)
 		{
-			log.error("ProcessMessageEvent " + messageId,e);
+			log.error("ProcessMessageEvent " + messageId, e);
 			throw new EbMSMessageServiceException(e);
 		}
 	}
@@ -370,24 +375,55 @@ class EbMSMessageServiceHandler
 			val timestamp = Instant.now();
 			val messageHeader = message.getMessageHeader();
 			val service = CPAUtils.toString(messageHeader.getService());
-			val sendDeliveryChannel = cpaManager.getSendDeliveryChannel(messageHeader.getCPAId(),messageHeader.getFrom().getPartyId(),messageHeader.getFrom().getRole(),service,messageHeader.getAction())
-							.orElseThrow(() -> StreamUtils.illegalStateException("SendDeliveryChannel",messageHeader.getCPAId(),messageHeader.getFrom().getPartyId(),messageHeader.getFrom().getRole(),service,messageHeader.getAction()));
-			val receiveDeliveryChannel = cpaManager.getReceiveDeliveryChannel(messageHeader.getCPAId(),messageHeader.getTo().getPartyId(),messageHeader.getTo().getRole(),service,messageHeader.getAction())
-							.orElseThrow(() -> StreamUtils.illegalStateException("ReceiveDeliveryChannel",messageHeader.getCPAId(),messageHeader.getTo().getPartyId(),messageHeader.getTo().getRole(),service,messageHeader.getAction()));
-			val persistTime = CPAUtils.getPersistTime(timestamp,receiveDeliveryChannel);
-			val confidential = cpaManager.isSendingConfidential(messageHeader.getCPAId(),messageHeader.getFrom().getPartyId(),messageHeader.getFrom().getRole(),service,messageHeader.getAction());
+			val sendDeliveryChannel = cpaManager
+					.getSendDeliveryChannel(
+							messageHeader.getCPAId(),
+							messageHeader.getFrom().getPartyId(),
+							messageHeader.getFrom().getRole(),
+							service,
+							messageHeader.getAction())
+					.orElseThrow(
+							() -> StreamUtils.illegalStateException(
+									"SendDeliveryChannel",
+									messageHeader.getCPAId(),
+									messageHeader.getFrom().getPartyId(),
+									messageHeader.getFrom().getRole(),
+									service,
+									messageHeader.getAction()));
+			val receiveDeliveryChannel = cpaManager
+					.getReceiveDeliveryChannel(
+							messageHeader.getCPAId(),
+							messageHeader.getTo().getPartyId(),
+							messageHeader.getTo().getRole(),
+							service,
+							messageHeader.getAction())
+					.orElseThrow(
+							() -> StreamUtils.illegalStateException(
+									"ReceiveDeliveryChannel",
+									messageHeader.getCPAId(),
+									messageHeader.getTo().getPartyId(),
+									messageHeader.getTo().getRole(),
+									service,
+									messageHeader.getAction()));
+			val persistTime = CPAUtils.getPersistTime(timestamp, receiveDeliveryChannel);
+			val confidential = cpaManager.isSendingConfidential(
+					messageHeader.getCPAId(),
+					messageHeader.getFrom().getPartyId(),
+					messageHeader.getFrom().getRole(),
+					service,
+					messageHeader.getAction());
 			Runnable runnable = () ->
 			{
-				ebMSDAO.insertMessage(timestamp,persistTime,document,message,message.getAttachments(),EbMSMessageStatus.CREATED);
+				ebMSDAO.insertMessage(timestamp, persistTime, document, message, message.getAttachments(), EbMSMessageStatus.CREATED);
 				deliveryTaskManager.insertTask(
 						deliveryTaskManager.createNewTask(
-							messageHeader.getCPAId(),
-							sendDeliveryChannel.getChannelId(),
-							receiveDeliveryChannel.getChannelId(),
-							messageHeader.getMessageData().getMessageId(),
-							messageHeader.getMessageData().getTimeToLive(),
-							messageHeader.getMessageData().getTimestamp(),
-							confidential));
+								messageHeader.getCPAId(),
+								sendDeliveryChannel.getChannelId(),
+								receiveDeliveryChannel.getChannelId(),
+								messageHeader.getMessageData().getMessageId(),
+								messageHeader.getMessageData().getTimeToLive(),
+								messageHeader.getMessageData().getTimestamp(),
+								confidential));
 			};
 			ebMSDAO.executeTransaction(runnable);
 		}

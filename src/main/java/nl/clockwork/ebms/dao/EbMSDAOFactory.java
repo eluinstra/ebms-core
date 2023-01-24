@@ -15,20 +15,19 @@
  */
 package nl.clockwork.ebms.dao;
 
+
 import javax.sql.DataSource;
-
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.transaction.support.TransactionTemplate;
-
 import lombok.AccessLevel;
 import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.transaction.support.TransactionTemplate;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 class EbMSDAOFactory extends AbstractDAOFactory<EbMSDAO>
 {
 	@NonNull
-	TransactionTemplate transactionTemplate; 
+	TransactionTemplate transactionTemplate;
 	@NonNull
 	JdbcTemplate jdbcTemplate;
 
@@ -48,42 +47,42 @@ class EbMSDAOFactory extends AbstractDAOFactory<EbMSDAO>
 	@Override
 	public EbMSDAO createDB2DAO()
 	{
-		return new DB2EbMSDAO(transactionTemplate,jdbcTemplate);
+		return new DB2EbMSDAO(transactionTemplate, jdbcTemplate);
 	}
 
 	@Override
 	public EbMSDAO createH2DAO()
 	{
-		return new H2EbMSDAO(transactionTemplate,jdbcTemplate);
+		return new H2EbMSDAO(transactionTemplate, jdbcTemplate);
 	}
 
 	@Override
 	public EbMSDAO createHSQLDBDAO()
 	{
-		return new HSQLDBEbMSDAO(transactionTemplate,jdbcTemplate);
+		return new HSQLDBEbMSDAO(transactionTemplate, jdbcTemplate);
 	}
 
 	@Override
 	public EbMSDAO createMSSQLDAO()
 	{
-		return new MSSQLEbMSDAO(transactionTemplate,jdbcTemplate);
+		return new MSSQLEbMSDAO(transactionTemplate, jdbcTemplate);
 	}
 
 	@Override
 	public EbMSDAO createMySQLDAO()
 	{
-		return new MySQLEbMSDAO(transactionTemplate,jdbcTemplate);
+		return new MySQLEbMSDAO(transactionTemplate, jdbcTemplate);
 	}
 
 	@Override
 	public EbMSDAO createOracleDAO()
 	{
-		return new OracleEbMSDAO(transactionTemplate,jdbcTemplate);
+		return new OracleEbMSDAO(transactionTemplate, jdbcTemplate);
 	}
 
 	@Override
 	public EbMSDAO createPostgreSQLDAO()
 	{
-		return new PostgreSQLEbMSDAO(transactionTemplate,jdbcTemplate);
+		return new PostgreSQLEbMSDAO(transactionTemplate, jdbcTemplate);
 	}
 }

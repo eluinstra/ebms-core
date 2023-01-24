@@ -15,10 +15,11 @@
  */
 package nl.clockwork.ebms.jaxb;
 
+
+import com.sun.xml.bind.marshaller.NamespacePrefixMapper;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.HashMap;
-
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
@@ -26,7 +27,10 @@ import javax.xml.bind.Marshaller;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParserFactory;
 import javax.xml.transform.sax.SAXSource;
-
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.experimental.FieldDefaults;
+import lombok.val;
 import org.apache.commons.lang3.StringUtils;
 import org.w3c.dom.Node;
 import org.xml.sax.InputSource;
@@ -34,18 +38,11 @@ import org.xml.sax.SAXException;
 import org.xml.sax.SAXNotRecognizedException;
 import org.xml.sax.SAXNotSupportedException;
 
-import com.sun.xml.bind.marshaller.NamespacePrefixMapper;
-
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.val;
-import lombok.experimental.FieldDefaults;
-
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class JAXBParser<T>
 {
-	private static HashMap<Class<?>,JAXBParser<?>> xmlHandlers = new HashMap<>();
+	private static HashMap<Class<?>, JAXBParser<?>> xmlHandlers = new HashMap<>();
 	private static SAXParserFactory saxParserFactory;
 	JAXBContext context;
 
@@ -97,7 +94,7 @@ public class JAXBParser<T>
 			return null;
 		val parser = saxParserFactory.newSAXParser();
 		val is = new InputSource(new StringReader(xml));
-		val s = new SAXSource(parser.getXMLReader(),is);
+		val s = new SAXSource(parser.getXMLReader(), is);
 		val unmarshaller = context.createUnmarshaller();
 		val o = unmarshaller.unmarshal(s);
 		if (o instanceof JAXBElement<?>)
@@ -112,8 +109,8 @@ public class JAXBParser<T>
 			return null;
 		val result = new StringWriter();
 		val marshaller = context.createMarshaller();
-		marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT,Boolean.TRUE);
-		marshaller.marshal(e,result);
+		marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
+		marshaller.marshal(e, result);
 		result.flush();
 		return result.toString();
 	}
@@ -124,10 +121,10 @@ public class JAXBParser<T>
 			return null;
 		val result = new StringWriter();
 		val marshaller = context.createMarshaller();
-		marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT,Boolean.TRUE);
+		marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
 		if (namespacePrefixMapper != null)
-			marshaller.setProperty("com.sun.xml.bind.namespacePrefixMapper",namespacePrefixMapper);
-		marshaller.marshal(e,result);
+			marshaller.setProperty("com.sun.xml.bind.namespacePrefixMapper", namespacePrefixMapper);
+		marshaller.marshal(e, result);
 		result.flush();
 		return result.toString();
 	}
@@ -138,8 +135,8 @@ public class JAXBParser<T>
 			return null;
 		val result = new StringWriter();
 		val marshaller = context.createMarshaller();
-		marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT,Boolean.TRUE);
-		marshaller.marshal(object,result);
+		marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
+		marshaller.marshal(object, result);
 		result.flush();
 		return result.toString();
 	}
@@ -150,7 +147,7 @@ public class JAXBParser<T>
 		if (xmlHandlers.get(clazz) == null)
 		{
 			val context = JAXBContext.newInstance(clazz);
-			xmlHandlers.put(clazz,new JAXBParser<L>(context));
+			xmlHandlers.put(clazz, new JAXBParser<L>(context));
 		}
 		return (JAXBParser<L>)xmlHandlers.get(clazz);
 	}
@@ -161,7 +158,7 @@ public class JAXBParser<T>
 		if (xmlHandlers.get(clazz) == null)
 		{
 			val context = JAXBContext.newInstance(clazzes);
-			xmlHandlers.put(clazz,new JAXBParser<L>(context));
+			xmlHandlers.put(clazz, new JAXBParser<L>(context));
 		}
 		return (JAXBParser<L>)xmlHandlers.get(clazz);
 	}

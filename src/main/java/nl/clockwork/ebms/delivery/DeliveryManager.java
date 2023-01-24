@@ -15,27 +15,22 @@
  */
 package nl.clockwork.ebms.delivery;
 
+
 import java.io.IOException;
 import java.security.cert.CertificateException;
 import java.util.Optional;
-
 import javax.xml.bind.JAXBException;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.soap.SOAPException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.xpath.XPathExpressionException;
-
-import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageHeader;
-import org.springframework.scheduling.annotation.Async;
-import org.xml.sax.SAXException;
-
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.NonNull;
-import lombok.val;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 import nl.clockwork.ebms.EbMSMessageUtils;
 import nl.clockwork.ebms.cpa.CPAManager;
 import nl.clockwork.ebms.cpa.CPAUtils;
@@ -46,6 +41,9 @@ import nl.clockwork.ebms.model.EbMSRequestMessage;
 import nl.clockwork.ebms.model.EbMSResponseMessage;
 import nl.clockwork.ebms.processor.EbMSProcessingException;
 import nl.clockwork.ebms.processor.EbMSProcessorException;
+import org.oasis_open.committees.ebxml_msg.schema.msg_header_2_0.MessageHeader;
+import org.springframework.scheduling.annotation.Async;
+import org.xml.sax.SAXException;
 
 @Slf4j
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -81,7 +79,7 @@ public class DeliveryManager
 				{
 					messageQueue.register(messageHeader.getMessageData().getMessageId());
 					log.info("Sending message " + messageHeader.getMessageData().getMessageId() + " to " + uri);
-					val response = createClient(messageHeader).sendMessage(uri,EbMSMessageUtils.getEbMSDocument(message));
+					val response = createClient(messageHeader).sendMessage(uri, EbMSMessageUtils.getEbMSDocument(message));
 					if (response == null)
 						return messageQueue.get(messageHeader.getMessageData().getMessageId());
 					else
@@ -99,7 +97,7 @@ public class DeliveryManager
 			else
 			{
 				log.info("Sending message " + messageHeader.getMessageData().getMessageId() + " to " + uri);
-				val response = createClient(messageHeader).sendMessage(uri,EbMSMessageUtils.getEbMSDocument(message));
+				val response = createClient(messageHeader).sendMessage(uri, EbMSMessageUtils.getEbMSDocument(message));
 				if (response != null)
 					return Optional.of((EbMSResponseMessage)EbMSMessageUtils.getEbMSMessage(response));
 			}
@@ -127,7 +125,7 @@ public class DeliveryManager
 
 	public void handleResponseMessage(final EbMSResponseMessage message) throws EbMSProcessorException
 	{
-		messageQueue.put(message.getMessageHeader().getMessageData().getRefToMessageId(),message);
+		messageQueue.put(message.getMessageHeader().getMessageData().getRefToMessageId(), message);
 	}
 
 	@Async("deliveryManagerTaskExecutor")
@@ -137,13 +135,14 @@ public class DeliveryManager
 		{
 			val messageHeader = response.getMessageHeader();
 			log.info("Sending message " + messageHeader.getMessageData().getMessageId() + " to " + uri);
-			createClient(messageHeader).sendMessage(uri,EbMSMessageUtils.getEbMSDocument(response));
+			createClient(messageHeader).sendMessage(uri, EbMSMessageUtils.getEbMSDocument(response));
 		}
 		catch (EbMSProcessorException e)
 		{
 			throw e;
 		}
-		catch (CertificateException | SOAPException | JAXBException | ParserConfigurationException | SAXException | IOException | TransformerFactoryConfigurationError | TransformerException e)
+		catch (CertificateException | SOAPException | JAXBException | ParserConfigurationException | SAXException | IOException
+				| TransformerFactoryConfigurationError | TransformerException e)
 		{
 			throw new EbMSProcessingException(e);
 		}
@@ -152,14 +151,15 @@ public class DeliveryManager
 	protected EbMSClient createClient(MessageHeader messageHeader) throws CertificateException
 	{
 		String cpaId = messageHeader.getCPAId();
-		val sendDeliveryChannel = 
-				cpaManager.getSendDeliveryChannel(
-						cpaId,
-						messageHeader.getFrom().getPartyId(),
-						messageHeader.getFrom().getRole(),
-						CPAUtils.toString(messageHeader.getService()),
-						messageHeader.getAction())
-				.orElse(null);
-		return ebMSClientFactory.getEbMSClient(cpaId,sendDeliveryChannel);
+		val sendDeliveryChannel =
+				cpaManager
+						.getSendDeliveryChannel(
+								cpaId,
+								messageHeader.getFrom().getPartyId(),
+								messageHeader.getFrom().getRole(),
+								CPAUtils.toString(messageHeader.getService()),
+								messageHeader.getAction())
+						.orElse(null);
+		return ebMSClientFactory.getEbMSClient(cpaId, sendDeliveryChannel);
 	}
 }

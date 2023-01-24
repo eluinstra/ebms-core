@@ -15,27 +15,25 @@
  */
 package nl.clockwork.ebms.delivery.client;
 
+
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.util.UUID;
-
 import javax.xml.transform.TransformerException;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.util.StringUtils;
-
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
-import lombok.val;
 import lombok.experimental.FieldDefaults;
+import lombok.val;
 import nl.clockwork.ebms.Constants;
 import nl.clockwork.ebms.model.EbMSAttachment;
 import nl.clockwork.ebms.model.EbMSDocument;
 import nl.clockwork.ebms.util.DOMUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.util.StringUtils;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor
@@ -44,7 +42,7 @@ class EbMSMessageWriter
 	private static final Logger messageLog = LoggerFactory.getLogger(Constants.MESSAGE_LOG);
 	@NonNull
 	HttpURLConnection connection;
-	
+
 	public void write(EbMSDocument document) throws IOException, TransformerException
 	{
 		if (document.getAttachments().size() > 0)
@@ -55,28 +53,32 @@ class EbMSMessageWriter
 
 	protected void writeMessage(EbMSDocument document) throws IOException, TransformerException
 	{
-		connection.setRequestProperty("Content-Type","text/xml; charset=UTF-8");
-		connection.setRequestProperty("SOAPAction",Constants.EBMS_SOAP_ACTION);
+		connection.setRequestProperty("Content-Type", "text/xml; charset=UTF-8");
+		connection.setRequestProperty("SOAPAction", Constants.EBMS_SOAP_ACTION);
 		if (messageLog.isInfoEnabled())
-			messageLog.info(">>>>\n" + (messageLog.isDebugEnabled() ? HTTPUtils.toString(connection.getRequestProperties()) + "\n" : "") + DOMUtils.toString(document.getMessage()));
-		//DOMUtils.write(document.getMessage(),messageLog.isInfoEnabled() ? new LoggingOutputStream(connection.getOutputStream()) : connection.getOutputStream(),"UTF-8");
-		DOMUtils.write(document.getMessage(),connection.getOutputStream(),"UTF-8");
+			messageLog.info(
+					">>>>\n"
+							+ (messageLog.isDebugEnabled() ? HTTPUtils.toString(connection.getRequestProperties()) + "\n" : "")
+							+ DOMUtils.toString(document.getMessage()));
+		// DOMUtils.write(document.getMessage(),messageLog.isInfoEnabled() ? new LoggingOutputStream(connection.getOutputStream()) :
+		// connection.getOutputStream(),"UTF-8");
+		DOMUtils.write(document.getMessage(), connection.getOutputStream(), "UTF-8");
 	}
-	
+
 	protected void writeMimeMessage(EbMSDocument document) throws IOException, TransformerException
 	{
 		if (messageLog.isInfoEnabled() && !messageLog.isDebugEnabled())
 			messageLog.info(">>>>\n" + DOMUtils.toString(document.getMessage()));
 		val boundary = createBoundary();
-		val contentType = createContentType(boundary,document.getContentId());
+		val contentType = createContentType(boundary, document.getContentId());
 
-		connection.setRequestProperty("Content-Type",contentType);
-		connection.setRequestProperty("SOAPAction",Constants.EBMS_SOAP_ACTION);
+		connection.setRequestProperty("Content-Type", contentType);
+		connection.setRequestProperty("SOAPAction", Constants.EBMS_SOAP_ACTION);
 
 		val requestProperties = connection.getRequestProperties();
-		val outputStream = messageLog.isDebugEnabled() ? new LoggingOutputStream(requestProperties,connection.getOutputStream()) : connection.getOutputStream();
+		val outputStream = messageLog.isDebugEnabled() ? new LoggingOutputStream(requestProperties, connection.getOutputStream()) : connection.getOutputStream();
 
-		try (val writer = new OutputStreamWriter(outputStream,"UTF-8"))
+		try (val writer = new OutputStreamWriter(outputStream, "UTF-8"))
 		{
 			writer.write("--");
 			writer.write(boundary);
@@ -87,17 +89,17 @@ class EbMSMessageWriter
 			writer.write("Content-ID: <" + document.getContentId() + ">");
 			writer.write("\r\n");
 			writer.write("\r\n");
-			DOMUtils.write(document.getMessage(),writer,"UTF-8");
+			DOMUtils.write(document.getMessage(), writer, "UTF-8");
 			writer.write("\r\n");
 			writer.write("--");
 			writer.write(boundary);
 
-			for (val attachment: document.getAttachments())
+			for (val attachment : document.getAttachments())
 			{
 				if (attachment.getContentType().matches("^(text/.*|.*/xml)$"))
-					writeTextAttachment(boundary,outputStream,writer,attachment);
+					writeTextAttachment(boundary, outputStream, writer, attachment);
 				else
-					writeBinaryAttachment(boundary,outputStream,writer,attachment);
+					writeBinaryAttachment(boundary, outputStream, writer, attachment);
 			}
 
 			writer.write("--");

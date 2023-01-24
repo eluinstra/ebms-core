@@ -15,9 +15,14 @@
  */
 package nl.clockwork.ebms.cache;
 
+
 import java.io.IOException;
 import java.util.ArrayList;
-
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.experimental.FieldDefaults;
+import lombok.val;
 import org.apache.ignite.cache.eviction.lru.LruEvictionPolicyFactory;
 import org.apache.ignite.cache.spring.SpringCacheManager;
 import org.apache.ignite.configuration.NearCacheConfiguration;
@@ -39,12 +44,6 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.type.AnnotatedTypeMetadata;
 
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.val;
-import lombok.experimental.FieldDefaults;
-
 @Configuration
 @EnableCaching
 @Conditional(SomeCacheType.class)
@@ -56,11 +55,8 @@ public class CacheConfig
 	@Getter
 	public static enum CacheType
 	{
-		NONE(""),
-		DEFAULT(""),
-		EHCACHE("nl/clockwork/ebms/ehcache.xml"),
-		IGNITE("nl/clockwork/ebms/ignite.xml");
-		
+		NONE(""), DEFAULT(""), EHCACHE("nl/clockwork/ebms/ehcache.xml"), IGNITE("nl/clockwork/ebms/ignite.xml");
+
 		String defaultConfigLocation;
 	}
 
@@ -119,21 +115,21 @@ public class CacheConfig
 		return ehCacheManagerFactory.getObject();
 	}
 
-  private Resource getConfigLocation()
+	private Resource getConfigLocation()
 	{
 		return configLocation == null ? new ClassPathResource(type.defaultConfigLocation) : configLocation;
 	}
 
-	private NearCacheConfiguration<Object,Object> createDynamicNearCacheConfiguration()
+	private NearCacheConfiguration<Object, Object> createDynamicNearCacheConfiguration()
 	{
-		val result = new NearCacheConfiguration<Object,Object>();
+		val result = new NearCacheConfiguration<Object, Object>();
 		result.setNearEvictionPolicyFactory(createNearEvictPlcFactory());
 		return result;
 	}
 
-	private LruEvictionPolicyFactory<Object,Object> createNearEvictPlcFactory()
+	private LruEvictionPolicyFactory<Object, Object> createNearEvictPlcFactory()
 	{
-		val result = new LruEvictionPolicyFactory<Object,Object>();
+		val result = new LruEvictionPolicyFactory<Object, Object>();
 		result.setMaxSize(100000);
 		return result;
 	}
@@ -143,23 +139,25 @@ public class CacheConfig
 		@Override
 		public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata)
 		{
-			return context.getEnvironment().getProperty("cache.type",CacheType.class,CacheType.DEFAULT) == CacheType.DEFAULT;
+			return context.getEnvironment().getProperty("cache.type", CacheType.class, CacheType.DEFAULT) == CacheType.DEFAULT;
 		}
 	}
+
 	public static class EhCacheCacheType implements Condition
 	{
 		@Override
 		public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata)
 		{
-			return context.getEnvironment().getProperty("cache.type",CacheType.class,CacheType.DEFAULT) == CacheType.EHCACHE;
+			return context.getEnvironment().getProperty("cache.type", CacheType.class, CacheType.DEFAULT) == CacheType.EHCACHE;
 		}
 	}
+
 	public static class IgniteCacheType implements Condition
 	{
 		@Override
 		public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata)
 		{
-			return context.getEnvironment().getProperty("cache.type",CacheType.class,CacheType.DEFAULT) == CacheType.IGNITE;
+			return context.getEnvironment().getProperty("cache.type", CacheType.class, CacheType.DEFAULT) == CacheType.IGNITE;
 		}
 	}
 }

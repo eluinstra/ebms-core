@@ -15,14 +15,14 @@
  */
 package nl.clockwork.ebms.delivery.task;
 
+
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
-import lombok.val;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 
 @Slf4j
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -30,7 +30,7 @@ import lombok.extern.slf4j.Slf4j;
 class TimedTask
 {
 	long executionInterval;
-	
+
 	public void run(Runnable task)
 	{
 		if (executionInterval > 0)
@@ -38,7 +38,7 @@ class TimedTask
 			val start = Instant.now();
 			task.run();
 			val end = Instant.now();
-			val sleep = executionInterval - ChronoUnit.MILLIS.between(start,end);
+			val sleep = executionInterval - ChronoUnit.MILLIS.between(start, end);
 			sleep(sleep);
 		}
 		else
@@ -54,7 +54,7 @@ class TimedTask
 		}
 		catch (InterruptedException e)
 		{
-			log.trace("",e);
+			log.trace("", e);
 		}
 	}
 }

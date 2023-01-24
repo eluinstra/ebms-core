@@ -15,14 +15,13 @@
  */
 package nl.clockwork.ebms.event;
 
+
 import javax.sql.DataSource;
-
-import org.springframework.jdbc.core.JdbcTemplate;
-
 import lombok.AccessLevel;
 import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
 import nl.clockwork.ebms.dao.AbstractDAOFactory;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 class MessageEventDAOFactory extends AbstractDAOFactory<MessageEventDAO>
@@ -37,17 +36,22 @@ class MessageEventDAOFactory extends AbstractDAOFactory<MessageEventDAO>
 		@Override
 		protected String getMessageEventsQuery(String messageContextFilter, MessageEventType[] types, int maxNr)
 		{
-			return "select message_event.message_id, message_event.event_type" +
-					" from message_event, ebms_message" +
-					" where message_event.processed = 0" +
-					" and message_event.event_type in (" + join(types == null || types.length == 0 ? MessageEventType.values() : types,",") + ")" +
-					" and message_event.message_id = ebms_message.message_id" +
-					" and ebms_message.message_nr = 0" +
-					messageContextFilter +
-					" order by message_event.time_stamp asc" +
-					" fetch first " + maxNr + " rows only";
+			return "select message_event.message_id, message_event.event_type"
+					+ " from message_event, ebms_message"
+					+ " where message_event.processed = 0"
+					+ " and message_event.event_type in ("
+					+ join(types == null || types.length == 0 ? MessageEventType.values() : types, ",")
+					+ ")"
+					+ " and message_event.message_id = ebms_message.message_id"
+					+ " and ebms_message.message_nr = 0"
+					+ messageContextFilter
+					+ " order by message_event.time_stamp asc"
+					+ " fetch first "
+					+ maxNr
+					+ " rows only";
 		}
 	}
+
 	private static class H2MessageEventDAO extends MessageEventDAOImpl
 	{
 		public H2MessageEventDAO(@NonNull JdbcTemplate jdbcTemplate)
@@ -58,17 +62,21 @@ class MessageEventDAOFactory extends AbstractDAOFactory<MessageEventDAO>
 		@Override
 		protected String getMessageEventsQuery(String messageContextFilter, MessageEventType[] types, int maxNr)
 		{
-			return "select message_event.message_id, message_event.event_type" +
-					" from message_event, ebms_message" +
-					" where message_event.processed = 0" +
-					" and message_event.event_type in (" + join(types == null || types.length == 0 ? MessageEventType.values() : types,",") + ")" +
-					" and message_event.message_id = ebms_message.message_id" +
-					" and ebms_message.message_nr = 0" +
-					messageContextFilter +
-					" order by message_event.time_stamp asc" +
-					" limit " + maxNr;
+			return "select message_event.message_id, message_event.event_type"
+					+ " from message_event, ebms_message"
+					+ " where message_event.processed = 0"
+					+ " and message_event.event_type in ("
+					+ join(types == null || types.length == 0 ? MessageEventType.values() : types, ",")
+					+ ")"
+					+ " and message_event.message_id = ebms_message.message_id"
+					+ " and ebms_message.message_nr = 0"
+					+ messageContextFilter
+					+ " order by message_event.time_stamp asc"
+					+ " limit "
+					+ maxNr;
 		}
 	}
+
 	private static class HSQLDBMessageEventDAO extends MessageEventDAOImpl
 	{
 		public HSQLDBMessageEventDAO(@NonNull JdbcTemplate jdbcTemplate)
@@ -79,17 +87,21 @@ class MessageEventDAOFactory extends AbstractDAOFactory<MessageEventDAO>
 		@Override
 		protected String getMessageEventsQuery(String messageContextFilter, MessageEventType[] types, int maxNr)
 		{
-			return "select message_event.message_id, message_event.event_type" +
-					" from message_event, ebms_message" +
-					" where message_event.processed = 0" +
-					" and message_event.event_type in (" + join(types == null || types.length == 0 ? MessageEventType.values() : types,",") + ")" +
-					" and message_event.message_id = ebms_message.message_id" +
-					" and ebms_message.message_nr = 0" +
-					messageContextFilter +
-					" order by message_event.time_stamp asc" +
-					" limit " + maxNr;
+			return "select message_event.message_id, message_event.event_type"
+					+ " from message_event, ebms_message"
+					+ " where message_event.processed = 0"
+					+ " and message_event.event_type in ("
+					+ join(types == null || types.length == 0 ? MessageEventType.values() : types, ",")
+					+ ")"
+					+ " and message_event.message_id = ebms_message.message_id"
+					+ " and ebms_message.message_nr = 0"
+					+ messageContextFilter
+					+ " order by message_event.time_stamp asc"
+					+ " limit "
+					+ maxNr;
 		}
 	}
+
 	private static class MSSQLMessageEventDAO extends MessageEventDAOImpl
 	{
 		public MSSQLMessageEventDAO(@NonNull JdbcTemplate jdbcTemplate)
@@ -100,16 +112,21 @@ class MessageEventDAOFactory extends AbstractDAOFactory<MessageEventDAO>
 		@Override
 		protected String getMessageEventsQuery(String messageContextFilter, MessageEventType[] types, int maxNr)
 		{
-			return "select top " + maxNr + " message_event.message_id, message_event.event_type" +
-					" from message_event, ebms_message" +
-					" where message_event.processed = 0" +
-					" and message_event.event_type in (" + join(types == null || types.length == 0 ? MessageEventType.values() : types,",") + ")" +
-					" and message_event.message_id = ebms_message.message_id" +
-					" and ebms_message.message_nr = 0" +
-					messageContextFilter +
-					" order by message_event.time_stamp asc";
+			return "select top "
+					+ maxNr
+					+ " message_event.message_id, message_event.event_type"
+					+ " from message_event, ebms_message"
+					+ " where message_event.processed = 0"
+					+ " and message_event.event_type in ("
+					+ join(types == null || types.length == 0 ? MessageEventType.values() : types, ",")
+					+ ")"
+					+ " and message_event.message_id = ebms_message.message_id"
+					+ " and ebms_message.message_nr = 0"
+					+ messageContextFilter
+					+ " order by message_event.time_stamp asc";
 		}
 	}
+
 	private static class MySQLMessageEventDAO extends MessageEventDAOImpl
 	{
 		public MySQLMessageEventDAO(@NonNull JdbcTemplate jdbcTemplate)
@@ -120,17 +137,21 @@ class MessageEventDAOFactory extends AbstractDAOFactory<MessageEventDAO>
 		@Override
 		protected String getMessageEventsQuery(String messageContextFilter, MessageEventType[] types, int maxNr)
 		{
-			return "select message_event.message_id, message_event.event_type" +
-					" from message_event, ebms_message" +
-					" where message_event.processed = 0" +
-					" and message_event.event_type in (" + join(types == null || types.length == 0 ? MessageEventType.values() : types,",") + ")" +
-					" and message_event.message_id = ebms_message.message_id" +
-					" and ebms_message.message_nr = 0" +
-					messageContextFilter +
-					" order by message_event.time_stamp asc" +
-					" limit " + maxNr;
+			return "select message_event.message_id, message_event.event_type"
+					+ " from message_event, ebms_message"
+					+ " where message_event.processed = 0"
+					+ " and message_event.event_type in ("
+					+ join(types == null || types.length == 0 ? MessageEventType.values() : types, ",")
+					+ ")"
+					+ " and message_event.message_id = ebms_message.message_id"
+					+ " and ebms_message.message_nr = 0"
+					+ messageContextFilter
+					+ " order by message_event.time_stamp asc"
+					+ " limit "
+					+ maxNr;
 		}
 	}
+
 	private static class OracleMessageEventDAO extends MessageEventDAOImpl
 	{
 		public OracleMessageEventDAO(@NonNull JdbcTemplate jdbcTemplate)
@@ -141,18 +162,22 @@ class MessageEventDAOFactory extends AbstractDAOFactory<MessageEventDAO>
 		@Override
 		protected String getMessageEventsQuery(String messageContextFilter, MessageEventType[] types, int maxNr)
 		{
-			return "select * from (" +
-					"select message_event.message_id, message_event.event_type" +
-					" from message_event, ebms_message" +
-					" where message_event.processed = 0" +
-					" and message_event.event_type in (" + join(types == null || types.length == 0 ? MessageEventType.values() : types,",") + ")" +
-					" and message_event.message_id = ebms_message.message_id" +
-					" and ebms_message.message_nr = 0" +
-					messageContextFilter +
-					" order by message_event.time_stamp asc)" +
-					" where ROWNUM <= " + maxNr;
+			return "select * from ("
+					+ "select message_event.message_id, message_event.event_type"
+					+ " from message_event, ebms_message"
+					+ " where message_event.processed = 0"
+					+ " and message_event.event_type in ("
+					+ join(types == null || types.length == 0 ? MessageEventType.values() : types, ",")
+					+ ")"
+					+ " and message_event.message_id = ebms_message.message_id"
+					+ " and ebms_message.message_nr = 0"
+					+ messageContextFilter
+					+ " order by message_event.time_stamp asc)"
+					+ " where ROWNUM <= "
+					+ maxNr;
 		}
 	}
+
 	private static class PostgreSQLMessageEventDAO extends MessageEventDAOImpl
 	{
 		public PostgreSQLMessageEventDAO(@NonNull JdbcTemplate jdbcTemplate)
@@ -163,21 +188,25 @@ class MessageEventDAOFactory extends AbstractDAOFactory<MessageEventDAO>
 		@Override
 		protected String getMessageEventsQuery(String messageContextFilter, MessageEventType[] types, int maxNr)
 		{
-			return "select message_event.message_id, message_event.event_type" +
-					" from message_event, ebms_message" +
-					" where message_event.processed = 0" +
-					" and message_event.event_type in (" + join(types == null || types.length == 0 ? MessageEventType.values() : types,",") + ")" +
-					" and message_event.message_id = ebms_message.message_id" +
-					" and ebms_message.message_nr = 0" +
-					messageContextFilter +
-					" order by message_event.time_stamp asc" +
-					" limit " + maxNr;
+			return "select message_event.message_id, message_event.event_type"
+					+ " from message_event, ebms_message"
+					+ " where message_event.processed = 0"
+					+ " and message_event.event_type in ("
+					+ join(types == null || types.length == 0 ? MessageEventType.values() : types, ",")
+					+ ")"
+					+ " and message_event.message_id = ebms_message.message_id"
+					+ " and ebms_message.message_nr = 0"
+					+ messageContextFilter
+					+ " order by message_event.time_stamp asc"
+					+ " limit "
+					+ maxNr;
 		}
 	}
+
 	@NonNull
 	JdbcTemplate jdbcTemplate;
 
-	public MessageEventDAOFactory(DataSource dataSource,	@NonNull JdbcTemplate jdbcTemplate)
+	public MessageEventDAOFactory(DataSource dataSource, @NonNull JdbcTemplate jdbcTemplate)
 	{
 		super(dataSource);
 		this.jdbcTemplate = jdbcTemplate;

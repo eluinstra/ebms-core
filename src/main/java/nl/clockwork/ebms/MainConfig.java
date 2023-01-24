@@ -15,10 +15,6 @@
  */
 package nl.clockwork.ebms;
 
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
-import org.springframework.context.annotation.PropertySource;
 
 import nl.clockwork.ebms.cache.CacheConfig;
 import nl.clockwork.ebms.cpa.CPAManagerConfig;
@@ -43,41 +39,25 @@ import nl.clockwork.ebms.service.EbMSMessageServiceConfig;
 import nl.clockwork.ebms.signing.SigningConfig;
 import nl.clockwork.ebms.transaction.TransactionManagerConfig;
 import nl.clockwork.ebms.validation.ValidationConfig;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
+import org.springframework.context.annotation.PropertySource;
 
 @Configuration
-@Import({
-		CacheConfig.class,
-		CertificateMappingServiceConfig.class,
-		CommonConfig.class,
-		CPAManagerConfig.class,
-		CPAServiceConfig.class,
-		DAOConfig.class,
-		DataSourceConfig.class,
-		DeliveryManagerConfig.class,
-		DeliveryTaskHandlerConfig.class,
-		DeliveryTaskManagerConfig.class,
-		EbMSClientConfig.class,
-		EbMSMessageServiceConfig.class,
-		EbMSProcessorConfig.class,
-		EbMSServerConfig.class,
-		EncryptionConfig.class,
-		JMSConfig.class,
-		KafkaConfig.class,
-		KeyStoreConfig.class,
-		MessageEventListenerConfig.class,
-		SchedulerConfig.class,
-		SigningConfig.class,
-		TransactionManagerConfig.class,
-		URLMappingServiceConfig.class,
-		ValidationConfig.class})
+@Import({CacheConfig.class, CertificateMappingServiceConfig.class, CommonConfig.class, CPAManagerConfig.class, CPAServiceConfig.class, DAOConfig.class,
+		DataSourceConfig.class, DeliveryManagerConfig.class, DeliveryTaskHandlerConfig.class, DeliveryTaskManagerConfig.class, EbMSClientConfig.class,
+		EbMSMessageServiceConfig.class, EbMSProcessorConfig.class, EbMSServerConfig.class, EncryptionConfig.class, JMSConfig.class, KafkaConfig.class,
+		KeyStoreConfig.class, MessageEventListenerConfig.class, SchedulerConfig.class, SigningConfig.class, TransactionManagerConfig.class,
+		URLMappingServiceConfig.class, ValidationConfig.class})
 @PropertySource(value = {"classpath:nl/clockwork/ebms/default.properties"}, ignoreResourceNotFound = true)
 public class MainConfig
 {
 	public static void main(String[] args)
 	{
-		try(AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(MainConfig.class))
+		try (AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(MainConfig.class))
 		{
-			
+
 		}
 	}
 }

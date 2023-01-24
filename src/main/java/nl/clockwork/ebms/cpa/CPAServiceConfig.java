@@ -15,13 +15,13 @@
  */
 package nl.clockwork.ebms.cpa;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import nl.clockwork.ebms.validation.CPAValidator;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @FieldDefaults(level = AccessLevel.PRIVATE)
@@ -35,6 +35,6 @@ public class CPAServiceConfig
 	@Bean
 	public CPAService cpaService()
 	{
-		return new CPAServiceImpl(cpaManager,cpaValidator);
+		return new CPAServiceImpl(cpaManager, cpaValidator);
 	}
 }

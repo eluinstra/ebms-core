@@ -15,6 +15,7 @@
  */
 package nl.clockwork.ebms.server.servlet;
 
+
 import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -23,7 +24,6 @@ import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
 import java.util.Map;
 import java.util.stream.Collectors;
-
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
@@ -32,20 +32,18 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
+import lombok.AccessLevel;
+import lombok.experimental.FieldDefaults;
+import lombok.val;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
-
-import lombok.AccessLevel;
-import lombok.val;
-import lombok.experimental.FieldDefaults;
 
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class BasicAuthenticationFilter implements Filter
 {
 	String realm;
-	Map<String,String> users;
+	Map<String, String> users;
 
 	@Override
 	public void init(FilterConfig filterConfig) throws ServletException
@@ -54,13 +52,13 @@ public class BasicAuthenticationFilter implements Filter
 		{
 			realm = filterConfig.getInitParameter("realm");
 			val realmFile = new File(filterConfig.getInitParameter("realmFile"));
-			val lines = FileUtils.readLines(realmFile,Charset.defaultCharset());
+			val lines = FileUtils.readLines(realmFile, Charset.defaultCharset());
 			users = lines.stream()
-					.map(s -> StringUtils.split(s,","))
+					.map(s -> StringUtils.split(s, ","))
 					.filter(a -> a.length == 2 && "user".equals(a[1]))
-					.map(a -> StringUtils.split(a[0],":"))
+					.map(a -> StringUtils.split(a[0], ":"))
 					.filter(u -> u.length == 2)
-					.collect(Collectors.toMap(u -> u[0],u -> u[1]));
+					.collect(Collectors.toMap(u -> u[0], u -> u[1]));
 		}
 		catch (IOException e)
 		{
@@ -72,16 +70,16 @@ public class BasicAuthenticationFilter implements Filter
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException
 	{
 		val authorization = ((HttpServletRequest)request).getHeader("Authorization");
-		if (validate(users,authorization))
-			chain.doFilter(request,response);
+		if (validate(users, authorization))
+			chain.doFilter(request, response);
 		else
 		{
-			((HttpServletResponse)response).setHeader("WWW-Authenticate","Basic realm=\"" + realm + "\"");
+			((HttpServletResponse)response).setHeader("WWW-Authenticate", "Basic realm=\"" + realm + "\"");
 			((HttpServletResponse)response).setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 		}
 	}
 
-	private boolean validate(Map<String,String> users, String authorization) throws ServletException
+	private boolean validate(Map<String, String> users, String authorization) throws ServletException
 	{
 		try
 		{
@@ -89,9 +87,9 @@ public class BasicAuthenticationFilter implements Filter
 			{
 				authorization = authorization.substring("basic".length()).trim();
 				authorization = new String(Base64.getDecoder().decode(authorization));
-				val credenitals = StringUtils.split(authorization,":");
+				val credenitals = StringUtils.split(authorization, ":");
 				if (credenitals.length == 2)
-					return validate(users.get(credenitals[0]),credenitals[1]);
+					return validate(users.get(credenitals[0]), credenitals[1]);
 			}
 			return false;
 		}
@@ -101,7 +99,7 @@ public class BasicAuthenticationFilter implements Filter
 		}
 	}
 
-	//TODO: support all allowed password encodings
+	// TODO: support all allowed password encodings
 	private boolean validate(String savedPassword, String password) throws NoSuchAlgorithmException, UnsupportedEncodingException
 	{
 		if (savedPassword.startsWith("MD5:"))

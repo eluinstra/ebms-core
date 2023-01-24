@@ -15,8 +15,8 @@
  */
 package nl.clockwork.ebms.cpa.certificate;
 
-import javax.xml.ws.WebFault;
 
+import javax.xml.ws.WebFault;
 import lombok.NoArgsConstructor;
 
 @WebFault(name = "CertificateMappingServiceException", targetNamespace = "http://www.ordina.nl/cpa/certificateMapping/2.18")
@@ -27,7 +27,7 @@ public class CertificateMappingServiceException extends RuntimeException
 
 	public CertificateMappingServiceException(String message, Throwable cause)
 	{
-		super(message,cause);
+		super(message, cause);
 	}
 
 	public CertificateMappingServiceException(String message)

@@ -15,17 +15,16 @@
  */
 package nl.clockwork.ebms.model;
 
+
 import java.io.Serializable;
 import java.util.List;
-
-import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.PartyId;
-
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.Value;
 import lombok.experimental.FieldDefaults;
 import nl.clockwork.ebms.cpa.CPAUtils;
+import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.PartyId;
 
 @Value
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -52,7 +51,7 @@ public class Party implements Serializable
 			return false;
 		return partyIds.stream().anyMatch(id -> partyId.equals(CPAUtils.toString(id)));
 	}
-	
+
 	public boolean matches(org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.Role role)
 	{
 		return this.role.equals(role.getName());

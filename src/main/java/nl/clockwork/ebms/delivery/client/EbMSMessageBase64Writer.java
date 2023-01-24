@@ -15,16 +15,15 @@
  */
 package nl.clockwork.ebms.delivery.client;
 
+
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
-
-import org.apache.james.mime4j.codec.Base64OutputStream;
-import org.springframework.util.StringUtils;
-
 import lombok.val;
 import nl.clockwork.ebms.model.EbMSAttachment;
+import org.apache.james.mime4j.codec.Base64OutputStream;
+import org.springframework.util.StringUtils;
 
 class EbMSMessageBase64Writer extends EbMSMessageWriter
 {

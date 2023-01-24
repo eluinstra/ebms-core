@@ -15,14 +15,13 @@
  */
 package nl.clockwork.ebms.delivery.task;
 
+
 import javax.sql.DataSource;
-
-import org.springframework.jdbc.core.JdbcTemplate;
-
 import lombok.AccessLevel;
 import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
 import nl.clockwork.ebms.dao.AbstractDAOFactory;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 class DeliveryTaskDAOFactory extends AbstractDAOFactory<DeliveryTaskDAO>
@@ -37,14 +36,17 @@ class DeliveryTaskDAOFactory extends AbstractDAOFactory<DeliveryTaskDAO>
 		@Override
 		public String getTasksBeforeQuery(int maxNr, String serverId)
 		{
-			return "select cpa_id, send_channel_id, receive_channel_id, message_id, time_to_live, time_stamp, is_confidential, retries" +
-					" from delivery_task" +
-					" where time_stamp <= ?" +
-					(serverId == null ? "" : " and server_id = '" + serverId + "'") +
-					" order by time_stamp asc" +
-					" fetch first " + maxNr + " rows only";
+			return "select cpa_id, send_channel_id, receive_channel_id, message_id, time_to_live, time_stamp, is_confidential, retries"
+					+ " from delivery_task"
+					+ " where time_stamp <= ?"
+					+ (serverId == null ? "" : " and server_id = '" + serverId + "'")
+					+ " order by time_stamp asc"
+					+ " fetch first "
+					+ maxNr
+					+ " rows only";
 		}
 	}
+
 	private static class H2DeliveryTaskDAO extends DeliveryTaskDAOImpl
 	{
 		public H2DeliveryTaskDAO(@NonNull JdbcTemplate jdbcTemplate)
@@ -55,14 +57,16 @@ class DeliveryTaskDAOFactory extends AbstractDAOFactory<DeliveryTaskDAO>
 		@Override
 		public String getTasksBeforeQuery(int maxNr, String serverId)
 		{
-			return "select cpa_id, send_channel_id, receive_channel_id, message_id, time_to_live, time_stamp, is_confidential, retries" +
-					" from delivery_task" +
-					" where time_stamp <= ?" +
-					(serverId == null ? "" : " and server_id = '" + serverId + "'") +
-					" order by time_stamp asc" +
-					" limit " + maxNr;
+			return "select cpa_id, send_channel_id, receive_channel_id, message_id, time_to_live, time_stamp, is_confidential, retries"
+					+ " from delivery_task"
+					+ " where time_stamp <= ?"
+					+ (serverId == null ? "" : " and server_id = '" + serverId + "'")
+					+ " order by time_stamp asc"
+					+ " limit "
+					+ maxNr;
 		}
 	}
+
 	private static class HSQLDBDeliveryTaskDAO extends DeliveryTaskDAOImpl
 	{
 		public HSQLDBDeliveryTaskDAO(@NonNull JdbcTemplate jdbcTemplate)
@@ -73,14 +77,16 @@ class DeliveryTaskDAOFactory extends AbstractDAOFactory<DeliveryTaskDAO>
 		@Override
 		public String getTasksBeforeQuery(int maxNr, String serverId)
 		{
-			return "select cpa_id, send_channel_id, receive_channel_id, message_id, time_to_live, time_stamp, is_confidential, retries" +
-					" from delivery_task" +
-					" where time_stamp <= ?" +
-					(serverId == null ? "" : " and server_id = '" + serverId + "'") +
-					" order by time_stamp asc" +
-					" limit " + maxNr;
+			return "select cpa_id, send_channel_id, receive_channel_id, message_id, time_to_live, time_stamp, is_confidential, retries"
+					+ " from delivery_task"
+					+ " where time_stamp <= ?"
+					+ (serverId == null ? "" : " and server_id = '" + serverId + "'")
+					+ " order by time_stamp asc"
+					+ " limit "
+					+ maxNr;
 		}
 	}
+
 	private static class MSSQLDeliveryTaskDAO extends DeliveryTaskDAOImpl
 	{
 		public MSSQLDeliveryTaskDAO(@NonNull JdbcTemplate jdbcTemplate)
@@ -91,13 +97,16 @@ class DeliveryTaskDAOFactory extends AbstractDAOFactory<DeliveryTaskDAO>
 		@Override
 		public String getTasksBeforeQuery(int maxNr, String serverId)
 		{
-			return "select top " + maxNr + " cpa_id, send_channel_id, receive_channel_id, message_id, time_to_live, time_stamp, is_confidential, retries" +
-					" from delivery_task" +
-					" where time_stamp <= ?" +
-					(serverId == null ? "" : " and server_id = '" + serverId + "'") +
-					" order by time_stamp asc";
+			return "select top "
+					+ maxNr
+					+ " cpa_id, send_channel_id, receive_channel_id, message_id, time_to_live, time_stamp, is_confidential, retries"
+					+ " from delivery_task"
+					+ " where time_stamp <= ?"
+					+ (serverId == null ? "" : " and server_id = '" + serverId + "'")
+					+ " order by time_stamp asc";
 		}
 	}
+
 	private static class MySQLDeliveryTaskDAO extends DeliveryTaskDAOImpl
 	{
 		public MySQLDeliveryTaskDAO(@NonNull JdbcTemplate jdbcTemplate)
@@ -108,14 +117,16 @@ class DeliveryTaskDAOFactory extends AbstractDAOFactory<DeliveryTaskDAO>
 		@Override
 		public String getTasksBeforeQuery(int maxNr, String serverId)
 		{
-			return "select cpa_id, send_channel_id, receive_channel_id, message_id, time_to_live, time_stamp, is_confidential, retries" +
-					" from delivery_task" +
-					" where time_stamp <= ?" +
-					(serverId == null ? "" : " and server_id = '" + serverId + "'") +
-					" order by time_stamp asc" +
-					" limit " + maxNr;
+			return "select cpa_id, send_channel_id, receive_channel_id, message_id, time_to_live, time_stamp, is_confidential, retries"
+					+ " from delivery_task"
+					+ " where time_stamp <= ?"
+					+ (serverId == null ? "" : " and server_id = '" + serverId + "'")
+					+ " order by time_stamp asc"
+					+ " limit "
+					+ maxNr;
 		}
 	}
+
 	private static class OracleDeliveryTaskDAO extends DeliveryTaskDAOImpl
 	{
 		public OracleDeliveryTaskDAO(@NonNull JdbcTemplate jdbcTemplate)
@@ -126,15 +137,17 @@ class DeliveryTaskDAOFactory extends AbstractDAOFactory<DeliveryTaskDAO>
 		@Override
 		public String getTasksBeforeQuery(int maxNr, String serverId)
 		{
-			return "select * from (" +
-					"select cpa_id, send_channel_id, receive_channel_id, message_id, time_to_live, time_stamp, is_confidential, retries" +
-					" from delivery_task" +
-					" where time_stamp <= ?" +
-					(serverId == null ? "" : " and server_id = '" + serverId + "'") +
-					" order by time_stamp asc)" +
-					" where ROWNUM <= " + maxNr;
+			return "select * from ("
+					+ "select cpa_id, send_channel_id, receive_channel_id, message_id, time_to_live, time_stamp, is_confidential, retries"
+					+ " from delivery_task"
+					+ " where time_stamp <= ?"
+					+ (serverId == null ? "" : " and server_id = '" + serverId + "'")
+					+ " order by time_stamp asc)"
+					+ " where ROWNUM <= "
+					+ maxNr;
 		}
 	}
+
 	private static class PostgreSQLDeliveryTaskDAO extends DeliveryTaskDAOImpl
 	{
 		public PostgreSQLDeliveryTaskDAO(@NonNull JdbcTemplate jdbcTemplate)
@@ -145,18 +158,20 @@ class DeliveryTaskDAOFactory extends AbstractDAOFactory<DeliveryTaskDAO>
 		@Override
 		public String getTasksBeforeQuery(int maxNr, String serverId)
 		{
-			return "select cpa_id, send_channel_id, receive_channel_id, message_id, time_to_live, time_stamp, is_confidential, retries" +
-					" from delivery_task" +
-					" where time_stamp <= ?" +
-					(serverId == null ? "" : " and server_id = '" + serverId + "'") +
-					" order by time_stamp asc" +
-					" limit " + maxNr;
+			return "select cpa_id, send_channel_id, receive_channel_id, message_id, time_to_live, time_stamp, is_confidential, retries"
+					+ " from delivery_task"
+					+ " where time_stamp <= ?"
+					+ (serverId == null ? "" : " and server_id = '" + serverId + "'")
+					+ " order by time_stamp asc"
+					+ " limit "
+					+ maxNr;
 		}
 	}
+
 	@NonNull
 	JdbcTemplate jdbcTemplate;
 
-	public DeliveryTaskDAOFactory(DataSource dataSource,	@NonNull JdbcTemplate jdbcTemplate)
+	public DeliveryTaskDAOFactory(DataSource dataSource, @NonNull JdbcTemplate jdbcTemplate)
 	{
 		super(dataSource);
 		this.jdbcTemplate = jdbcTemplate;

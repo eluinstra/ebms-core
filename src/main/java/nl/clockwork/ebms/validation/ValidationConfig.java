@@ -15,10 +15,6 @@
  */
 package nl.clockwork.ebms.validation;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
@@ -26,6 +22,10 @@ import nl.clockwork.ebms.cpa.CPAManager;
 import nl.clockwork.ebms.dao.EbMSDAO;
 import nl.clockwork.ebms.encryption.EbMSMessageDecrypter;
 import nl.clockwork.ebms.signing.EbMSSignatureValidator;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @FieldDefaults(level = AccessLevel.PRIVATE)
@@ -54,11 +54,11 @@ public class ValidationConfig
 		return EbMSMessageValidator.builder()
 				.ebMSDAO(ebMSDAO)
 				.cpaManager(cpaManager)
-				.clientCertificateValidator(ClientCertificateValidator.of(cpaManager,clientCertificateValidatorEnabled))
+				.clientCertificateValidator(ClientCertificateValidator.of(cpaManager, clientCertificateValidatorEnabled))
 				.cpaValidator(cpaValidator())
-				.messageHeaderValidator(new MessageHeaderValidator(ebMSDAO,cpaManager))
+				.messageHeaderValidator(new MessageHeaderValidator(ebMSDAO, cpaManager))
 				.manifestValidator(new ManifestValidator())
-				.signatureValidator(new SignatureValidator(cpaManager,signatureValidator))
+				.signatureValidator(new SignatureValidator(cpaManager, signatureValidator))
 				.messageDecrypter(messageDecrypter)
 				.build();
 	}

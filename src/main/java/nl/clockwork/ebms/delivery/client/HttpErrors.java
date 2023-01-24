@@ -15,20 +15,19 @@
  */
 package nl.clockwork.ebms.delivery.client;
 
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
-
-import org.apache.commons.lang3.StringUtils;
-
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NonNull;
-import lombok.val;
 import lombok.experimental.FieldDefaults;
+import lombok.val;
+import org.apache.commons.lang3.StringUtils;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor
@@ -40,9 +39,17 @@ class HttpErrors
 	@NonNull
 	List<Integer> unrecoverableHttpErrors;
 
-	public HttpErrors(String recoverableInformationalHttpErrors, String recoverableRedirectionHttpErrors, String recoverableClientHttpErrors, String unrecoverableServerHttpErrors)
+	public HttpErrors(
+			String recoverableInformationalHttpErrors,
+			String recoverableRedirectionHttpErrors,
+			String recoverableClientHttpErrors,
+			String unrecoverableServerHttpErrors)
 	{
-		this(getIntegerList(recoverableInformationalHttpErrors),getIntegerList(recoverableRedirectionHttpErrors),getIntegerList(recoverableClientHttpErrors),getIntegerList(unrecoverableServerHttpErrors));
+		this(
+				getIntegerList(recoverableInformationalHttpErrors),
+				getIntegerList(recoverableRedirectionHttpErrors),
+				getIntegerList(recoverableClientHttpErrors),
+				getIntegerList(unrecoverableServerHttpErrors));
 	}
 
 	public HttpErrors(
@@ -61,6 +68,6 @@ class HttpErrors
 
 	private static List<Integer> getIntegerList(String input)
 	{
-		return Arrays.stream(StringUtils.split(input,',')).map(s -> Integer.parseInt(s.trim())).collect(Collectors.toList());
+		return Arrays.stream(StringUtils.split(input, ',')).map(s -> Integer.parseInt(s.trim())).collect(Collectors.toList());
 	}
 }

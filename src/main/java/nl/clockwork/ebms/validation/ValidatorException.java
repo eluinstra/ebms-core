@@ -15,6 +15,7 @@
  */
 package nl.clockwork.ebms.validation;
 
+
 import lombok.NoArgsConstructor;
 
 @NoArgsConstructor
@@ -24,7 +25,7 @@ public class ValidatorException extends RuntimeException
 
 	public ValidatorException(String message, Throwable cause)
 	{
-		super(message,cause);
+		super(message, cause);
 	}
 
 	public ValidatorException(String message)

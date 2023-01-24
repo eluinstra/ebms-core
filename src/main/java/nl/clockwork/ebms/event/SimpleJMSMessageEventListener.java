@@ -15,22 +15,20 @@
  */
 package nl.clockwork.ebms.event;
 
-import java.util.Map;
 
+import java.util.Map;
 import javax.jms.Destination;
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.Session;
-
-import org.springframework.jms.JmsException;
-import org.springframework.jms.core.JmsTemplate;
-import org.springframework.jms.core.MessageCreator;
-
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
-import lombok.val;
 import lombok.experimental.FieldDefaults;
+import lombok.val;
+import org.springframework.jms.JmsException;
+import org.springframework.jms.core.JmsTemplate;
+import org.springframework.jms.core.MessageCreator;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor
@@ -47,7 +45,7 @@ class SimpleJMSMessageEventListener extends LoggingMessageEventListener
 		public Message createMessage(Session session) throws JMSException
 		{
 			val result = session.createMessage();
-			result.setStringProperty("messageId",messageId);
+			result.setStringProperty("messageId", messageId);
 			return result;
 		}
 	}
@@ -55,14 +53,14 @@ class SimpleJMSMessageEventListener extends LoggingMessageEventListener
 	@NonNull
 	JmsTemplate jmsTemplate;
 	@NonNull
-	Map<String,Destination> destinations;
+	Map<String, Destination> destinations;
 
 	@Override
 	public void onMessageReceived(String messageId) throws MessageEventException
 	{
 		try
 		{
-			jmsTemplate.send(destinations.get(MessageEventType.RECEIVED.name()),new EventMessageCreator(messageId));
+			jmsTemplate.send(destinations.get(MessageEventType.RECEIVED.name()), new EventMessageCreator(messageId));
 			super.onMessageReceived(messageId);
 		}
 		catch (JmsException e)
@@ -76,7 +74,7 @@ class SimpleJMSMessageEventListener extends LoggingMessageEventListener
 	{
 		try
 		{
-			jmsTemplate.send(destinations.get(MessageEventType.DELIVERED.name()),new EventMessageCreator(messageId));
+			jmsTemplate.send(destinations.get(MessageEventType.DELIVERED.name()), new EventMessageCreator(messageId));
 			super.onMessageDelivered(messageId);
 		}
 		catch (JmsException e)
@@ -84,13 +82,13 @@ class SimpleJMSMessageEventListener extends LoggingMessageEventListener
 			throw new MessageEventException(e);
 		}
 	}
-	
+
 	@Override
 	public void onMessageFailed(String messageId) throws MessageEventException
 	{
 		try
 		{
-			jmsTemplate.send(destinations.get(MessageEventType.FAILED.name()),new EventMessageCreator(messageId));
+			jmsTemplate.send(destinations.get(MessageEventType.FAILED.name()), new EventMessageCreator(messageId));
 			super.onMessageFailed(messageId);
 		}
 		catch (JmsException e)
@@ -104,7 +102,7 @@ class SimpleJMSMessageEventListener extends LoggingMessageEventListener
 	{
 		try
 		{
-			jmsTemplate.send(destinations.get(MessageEventType.EXPIRED.name()),new EventMessageCreator(messageId));
+			jmsTemplate.send(destinations.get(MessageEventType.EXPIRED.name()), new EventMessageCreator(messageId));
 			super.onMessageExpired(messageId);
 		}
 		catch (JmsException e)

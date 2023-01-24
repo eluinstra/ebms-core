@@ -15,19 +15,22 @@
  */
 package nl.clockwork.ebms.cpa.certificate;
 
+
 import java.security.cert.X509Certificate;
 import java.util.List;
-
 import javax.jws.WebMethod;
 import javax.jws.WebParam;
 import javax.jws.WebResult;
 import javax.jws.WebService;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-
 import nl.clockwork.ebms.jaxb.X509CertificateAdapter;
 
-@WebService(name = "CertificateMappingService", targetNamespace = "http://www.ordina.nl/cpa/certificateMapping/2.18", serviceName = "CertificateMappingService", portName = "CertificateMappingPort")
+@WebService(
+		name = "CertificateMappingService",
+		targetNamespace = "http://www.ordina.nl/cpa/certificateMapping/2.18",
+		serviceName = "CertificateMappingService",
+		portName = "CertificateMappingPort")
 public interface CertificateMappingService
 {
 	/**
@@ -37,7 +40,8 @@ public interface CertificateMappingService
 	 * @throws CertificateMappingServiceException
 	 */
 	@WebMethod(operationName = "setCertificateMapping")
-	void setCertificateMapping(@WebParam(name = "certificateMapping") @XmlElement(required = true) CertificateMapping certificateMapping) throws CertificateMappingServiceException;
+	void setCertificateMapping(@WebParam(name = "certificateMapping") @XmlElement(required = true) CertificateMapping certificateMapping)
+			throws CertificateMappingServiceException;
 
 	/**
 	 * Removes Certificate mapping identified by source Certificate source
@@ -46,7 +50,9 @@ public interface CertificateMappingService
 	 * @throws CertificateMappingServiceException
 	 */
 	@WebMethod(operationName = "deleteCertificateMapping")
-	void deleteCertificateMapping(@WebParam(name = "sourceCertificate") @XmlElement(required = true) @XmlJavaTypeAdapter(X509CertificateAdapter.class) X509Certificate source, @WebParam(name = "cpaId") String cpaId) throws CertificateMappingServiceException;
+	void deleteCertificateMapping(
+			@WebParam(name = "sourceCertificate") @XmlElement(required = true) @XmlJavaTypeAdapter(X509CertificateAdapter.class) X509Certificate source,
+			@WebParam(name = "cpaId") String cpaId) throws CertificateMappingServiceException;
 
 	/**
 	 * Returns a list of all Certificate mappings

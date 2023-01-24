@@ -15,8 +15,8 @@
  */
 package nl.clockwork.ebms.server.servlet;
 
-import java.io.IOException;
 
+import java.io.IOException;
 import javax.servlet.GenericServlet;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -24,14 +24,12 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import org.springframework.web.context.support.WebApplicationContextUtils;
-
 import lombok.AccessLevel;
-import lombok.val;
 import lombok.experimental.FieldDefaults;
+import lombok.val;
 import nl.clockwork.ebms.processor.EbMSProcessorException;
 import nl.clockwork.ebms.server.EbMSHttpHandler;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class EbMSServlet extends GenericServlet
@@ -52,7 +50,7 @@ public class EbMSServlet extends GenericServlet
 	{
 		try
 		{
-			httpHandler.handle((HttpServletRequest)request,(HttpServletResponse)response);
+			httpHandler.handle((HttpServletRequest)request, (HttpServletResponse)response);
 		}
 		catch (EbMSProcessorException e)
 		{

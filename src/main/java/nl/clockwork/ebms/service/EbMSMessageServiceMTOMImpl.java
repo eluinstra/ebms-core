@@ -15,16 +15,16 @@
  */
 package nl.clockwork.ebms.service;
 
-import java.util.List;
 
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import nl.clockwork.ebms.event.MessageEventType;
 import nl.clockwork.ebms.service.model.MTOMMessage;
+import nl.clockwork.ebms.service.model.MTOMMessageRequest;
 import nl.clockwork.ebms.service.model.MessageEvent;
 import nl.clockwork.ebms.service.model.MessageFilter;
-import nl.clockwork.ebms.service.model.MTOMMessageRequest;
 import nl.clockwork.ebms.service.model.MessageStatus;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -36,7 +36,7 @@ class EbMSMessageServiceMTOMImpl implements EbMSMessageServiceMTOM
 	@Override
 	public void ping(String cpaId, String fromPartyId, String toPartyId) throws EbMSMessageServiceException
 	{
-		serviceHandler.ping(cpaId,fromPartyId,toPartyId);
+		serviceHandler.ping(cpaId, fromPartyId, toPartyId);
 	}
 
 	@Override
@@ -54,13 +54,13 @@ class EbMSMessageServiceMTOMImpl implements EbMSMessageServiceMTOM
 	@Override
 	public List<String> getUnprocessedMessageIds(MessageFilter messageFilter, Integer maxNr) throws EbMSMessageServiceException
 	{
-		return serviceHandler.getUnprocessedMessageIds(messageFilter,maxNr);
+		return serviceHandler.getUnprocessedMessageIds(messageFilter, maxNr);
 	}
 
 	@Override
 	public MTOMMessage getMessageMTOM(String messageId, Boolean process) throws EbMSMessageServiceException
 	{
-		return serviceHandler.getMessageMTOM(messageId,process);
+		return serviceHandler.getMessageMTOM(messageId, process);
 	}
 
 	@Override
@@ -76,9 +76,10 @@ class EbMSMessageServiceMTOMImpl implements EbMSMessageServiceMTOM
 	}
 
 	@Override
-	public List<MessageEvent> getUnprocessedMessageEvents(MessageFilter messageFilter, MessageEventType[] eventTypes, Integer maxNr) throws EbMSMessageServiceException
+	public List<MessageEvent> getUnprocessedMessageEvents(MessageFilter messageFilter, MessageEventType[] eventTypes, Integer maxNr)
+			throws EbMSMessageServiceException
 	{
-		return serviceHandler.getUnprocessedMessageEvents(messageFilter,eventTypes,maxNr);
+		return serviceHandler.getUnprocessedMessageEvents(messageFilter, eventTypes, maxNr);
 	}
 
 	@Override

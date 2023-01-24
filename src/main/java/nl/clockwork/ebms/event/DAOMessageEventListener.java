@@ -15,6 +15,7 @@
  */
 package nl.clockwork.ebms.event;
 
+
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
@@ -30,28 +31,28 @@ class DAOMessageEventListener extends LoggingMessageEventListener
 	@Override
 	public void onMessageReceived(String messageId) throws MessageEventException
 	{
-		messageEventDAO.insertEbMSMessageEvent(messageId,MessageEventType.RECEIVED);
+		messageEventDAO.insertEbMSMessageEvent(messageId, MessageEventType.RECEIVED);
 		super.onMessageReceived(messageId);
 	}
 
 	@Override
 	public void onMessageDelivered(String messageId) throws MessageEventException
 	{
-		messageEventDAO.insertEbMSMessageEvent(messageId,MessageEventType.DELIVERED);
+		messageEventDAO.insertEbMSMessageEvent(messageId, MessageEventType.DELIVERED);
 		super.onMessageDelivered(messageId);
 	}
-	
+
 	@Override
 	public void onMessageFailed(String messageId) throws MessageEventException
 	{
-		messageEventDAO.insertEbMSMessageEvent(messageId,MessageEventType.FAILED);
+		messageEventDAO.insertEbMSMessageEvent(messageId, MessageEventType.FAILED);
 		super.onMessageFailed(messageId);
 	}
 
 	@Override
 	public void onMessageExpired(String messageId) throws MessageEventException
 	{
-		messageEventDAO.insertEbMSMessageEvent(messageId,MessageEventType.EXPIRED);
+		messageEventDAO.insertEbMSMessageEvent(messageId, MessageEventType.EXPIRED);
 		super.onMessageExpired(messageId);
 	}
 }

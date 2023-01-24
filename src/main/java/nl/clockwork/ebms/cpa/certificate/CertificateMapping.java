@@ -15,15 +15,14 @@
  */
 package nl.clockwork.ebms.cpa.certificate;
 
+
 import java.io.Serializable;
 import java.security.cert.X509Certificate;
-
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -40,14 +39,14 @@ import nl.clockwork.ebms.jaxb.X509CertificateAdapter;
 public class CertificateMapping implements Serializable
 {
 	private static final long serialVersionUID = 1L;
-	@XmlElement(required=true)
+	@XmlElement(required = true)
 	@XmlJavaTypeAdapter(X509CertificateAdapter.class)
-	@XmlSchemaType(name="base64Binary")
+	@XmlSchemaType(name = "base64Binary")
 	@NonNull
 	X509Certificate source;
-	@XmlElement(required=true)
+	@XmlElement(required = true)
 	@XmlJavaTypeAdapter(X509CertificateAdapter.class)
-	@XmlSchemaType(name="base64Binary")
+	@XmlSchemaType(name = "base64Binary")
 	@NonNull
 	X509Certificate destination;
 	@XmlElement
@@ -73,6 +72,7 @@ public class CertificateMapping implements Serializable
 	{
 		return "source=" + source.getSubjectDN() + "(" + getCertificateId(source) + ")";
 	}
+
 	private String printDestination()
 	{
 		return "destination=" + destination.getSubjectDN() + "(" + getCertificateId(destination) + ")";

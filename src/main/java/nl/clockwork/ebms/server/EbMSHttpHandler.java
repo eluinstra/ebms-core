@@ -15,21 +15,21 @@
  */
 package nl.clockwork.ebms.server;
 
+
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
-import lombok.val;
 import lombok.experimental.FieldDefaults;
+import lombok.val;
 import nl.clockwork.ebms.processor.EbMSMessageProcessor;
 import nl.clockwork.ebms.processor.EbMSProcessorException;
+
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor
 public class EbMSHttpHandler
@@ -58,7 +58,7 @@ public class EbMSHttpHandler
 				{
 					val result = new ArrayList<String>();
 					val headers = ((HttpServletRequest)request).getHeaders(headerName);
-					while(headers.hasMoreElements())
+					while (headers.hasMoreElements())
 						result.add((String)headers.nextElement());
 					return result;
 				}
@@ -83,22 +83,22 @@ public class EbMSHttpHandler
 				{
 					response.setStatus(statusCode);
 				}
-				
+
 				@Override
 				public void writeResponseHeader(String name, String value)
 				{
 					if ("Content-Type".equals(name))
 						response.setContentType(value);
 					else
-						response.setHeader(name,value);
+						response.setHeader(name, value);
 				}
-				
+
 				@Override
 				public OutputStream getOutputStream() throws IOException
 				{
 					return response.getOutputStream();
 				}
-				
+
 			};
 			inputStreamHandler.handle(request.getInputStream());
 		}

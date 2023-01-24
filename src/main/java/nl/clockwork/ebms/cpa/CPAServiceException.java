@@ -15,8 +15,8 @@
  */
 package nl.clockwork.ebms.cpa;
 
-import javax.xml.ws.WebFault;
 
+import javax.xml.ws.WebFault;
 import lombok.NoArgsConstructor;
 
 @WebFault(name = "CPAServiceException", targetNamespace = "http://www.ordina.nl/cpa/2.18")
@@ -27,7 +27,7 @@ public class CPAServiceException extends RuntimeException
 
 	public CPAServiceException(String message, Throwable cause)
 	{
-		super(message,cause);
+		super(message, cause);
 	}
 
 	public CPAServiceException(String message)

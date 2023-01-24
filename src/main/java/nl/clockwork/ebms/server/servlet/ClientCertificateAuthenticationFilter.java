@@ -15,11 +15,11 @@
  */
 package nl.clockwork.ebms.server.servlet;
 
+
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.security.KeyStoreException;
 import java.security.cert.X509Certificate;
-
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
@@ -27,10 +27,9 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletResponse;
-
 import lombok.AccessLevel;
-import lombok.val;
 import lombok.experimental.FieldDefaults;
+import lombok.val;
 import nl.clockwork.ebms.security.EbMSTrustStore;
 import nl.clockwork.ebms.security.KeyStoreType;
 import nl.clockwork.ebms.validation.ClientCertificateManager;
@@ -48,7 +47,7 @@ public class ClientCertificateAuthenticationFilter implements Filter
 			val trustStoreType = config.getInitParameter("trustStoreType");
 			val trustStorePath = config.getInitParameter("trustStorePath");
 			val trustStorePassword = config.getInitParameter("trustStorePassword");
-			trustStore = EbMSTrustStore.of(KeyStoreType.valueOf(trustStoreType),trustStorePath,trustStorePassword);
+			trustStore = EbMSTrustStore.of(KeyStoreType.valueOf(trustStoreType), trustStorePath, trustStorePassword);
 		}
 		catch (GeneralSecurityException | IOException e)
 		{
@@ -62,8 +61,8 @@ public class ClientCertificateAuthenticationFilter implements Filter
 		try
 		{
 			val certificate = ClientCertificateManager.getCertificate();
-			if (validate(trustStore,certificate))
-				chain.doFilter(request,response);
+			if (validate(trustStore, certificate))
+				chain.doFilter(request, response);
 			else
 				((HttpServletResponse)response).setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 		}

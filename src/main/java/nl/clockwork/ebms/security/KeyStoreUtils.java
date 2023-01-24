@@ -15,15 +15,14 @@
  */
 package nl.clockwork.ebms.security;
 
+
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
-
 import lombok.val;
-import lombok.var;
 
 public class KeyStoreUtils
 {
@@ -32,7 +31,7 @@ public class KeyStoreUtils
 		try (val in = getInputStream(location))
 		{
 			val keyStore = KeyStore.getInstance(type.name());
-			keyStore.load(in,password.toCharArray());
+			keyStore.load(in, password.toCharArray());
 			return keyStore;
 		}
 	}
@@ -45,7 +44,7 @@ public class KeyStoreUtils
 		}
 		catch (FileNotFoundException e)
 		{
-			var result = KeyStoreUtils.class.getResourceAsStream(location);
+			InputStream result = KeyStoreUtils.class.getResourceAsStream(location);
 			if (result == null)
 				result = KeyStoreUtils.class.getResourceAsStream("/" + location);
 			if (result == null)

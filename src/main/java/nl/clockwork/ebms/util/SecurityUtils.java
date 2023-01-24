@@ -15,6 +15,7 @@
  */
 package nl.clockwork.ebms.util;
 
+
 import java.security.GeneralSecurityException;
 import java.security.KeyPair;
 import java.security.KeyStoreException;
@@ -25,19 +26,16 @@ import java.security.cert.CertificateNotYetValidException;
 import java.security.cert.X509Certificate;
 import java.time.Instant;
 import java.util.Date;
-
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
-
-import org.apache.xml.security.encryption.XMLCipher;
-
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-import lombok.val;
 import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 import nl.clockwork.ebms.security.EbMSKeyStore;
 import nl.clockwork.ebms.security.EbMSTrustStore;
 import nl.clockwork.ebms.validation.ValidationException;
+import org.apache.xml.security.encryption.XMLCipher;
 
 @Slf4j
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -46,16 +44,15 @@ public class SecurityUtils
 	private static final int KEYSIZE_192 = 192;
 	private static final int KEYSIZE_128 = 128;
 	private static final int KEYSIZE_256 = 256;
-	
 
 	public static KeyPair getKeyPair(EbMSKeyStore keyStore, String alias, String password) throws GeneralSecurityException
 	{
-		val key = keyStore.getKey(alias,password.toCharArray());
+		val key = keyStore.getKey(alias, password.toCharArray());
 		if (key instanceof PrivateKey)
 		{
 			val cert = keyStore.getCertificate(alias);
 			val publicKey = cert.getPublicKey();
-			return new KeyPair(publicKey,(PrivateKey)key);
+			return new KeyPair(publicKey, (PrivateKey)key);
 		}
 		return null;
 	}
@@ -80,7 +77,7 @@ public class SecurityUtils
 				}
 				catch (GeneralSecurityException e)
 				{
-					log.trace("",e);
+					log.trace("", e);
 				}
 			}
 			throw new ValidationException("Certificate " + certificate.getIssuerDN() + " not found!");
@@ -90,19 +87,19 @@ public class SecurityUtils
 			throw new ValidationException(e);
 		}
 	}
-	
+
 	public static SecretKey generateKey(String encryptionAlgorithm) throws NoSuchAlgorithmException
 	{
 		switch (encryptionAlgorithm)
 		{
 			case XMLCipher.AES_128:
-				return generateKey("AES",KEYSIZE_128);
+				return generateKey("AES", KEYSIZE_128);
 			case XMLCipher.AES_192:
-				return generateKey("AES",KEYSIZE_192);
+				return generateKey("AES", KEYSIZE_192);
 			case XMLCipher.AES_256:
-				return generateKey("AES",KEYSIZE_256);
+				return generateKey("AES", KEYSIZE_256);
 			case XMLCipher.TRIPLEDES:
-				return generateKey("DESede",KEYSIZE_192);
+				return generateKey("DESede", KEYSIZE_192);
 			default:
 				throw new NoSuchAlgorithmException(encryptionAlgorithm);
 		}

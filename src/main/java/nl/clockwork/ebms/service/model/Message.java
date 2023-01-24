@@ -15,13 +15,12 @@
  */
 package nl.clockwork.ebms.service.model;
 
+
 import java.io.Serializable;
 import java.util.List;
-
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
-
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -40,6 +39,6 @@ public class Message implements Serializable
 	@XmlElement(required = true)
 	@NonNull
 	MessageProperties properties;
-	@XmlElement(name="dataSource")
+	@XmlElement(name = "dataSource")
 	List<DataSource> dataSources;
 }

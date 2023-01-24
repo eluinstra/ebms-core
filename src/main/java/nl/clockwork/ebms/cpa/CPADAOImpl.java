@@ -15,23 +15,21 @@
  */
 package nl.clockwork.ebms.cpa;
 
+
 import java.util.List;
 import java.util.Optional;
-
 import javax.xml.bind.JAXBException;
-
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
+import lombok.val;
+import nl.clockwork.ebms.jaxb.JAXBParser;
 import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.CollaborationProtocolAgreement;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.dao.DataRetrievalFailureException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
-
-import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
-import lombok.val;
-import lombok.experimental.FieldDefaults;
-import nl.clockwork.ebms.jaxb.JAXBParser;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @RequiredArgsConstructor
@@ -43,25 +41,25 @@ class CPADAOImpl implements CPADAO
 	@Cacheable(cacheNames = "CPA", keyGenerator = "ebMSKeyGenerator")
 	public boolean existsCPA(String cpaId)
 	{
-		return jdbcTemplate.queryForObject("select count(*) from cpa where cpa_id = ?",Integer.class,cpaId) > 0;
+		return jdbcTemplate.queryForObject("select count(*) from cpa where cpa_id = ?", Integer.class, cpaId) > 0;
 	}
-	
+
 	@Override
 	@Cacheable(cacheNames = "CPA", keyGenerator = "ebMSKeyGenerator")
 	public Optional<CollaborationProtocolAgreement> getCPA(String cpaId)
 	{
 		try
 		{
-			val result = jdbcTemplate.queryForObject("select cpa from cpa where cpa_id = ?",String.class,cpaId);
+			val result = jdbcTemplate.queryForObject("select cpa from cpa where cpa_id = ?", String.class, cpaId);
 			return Optional.of(JAXBParser.getInstance(CollaborationProtocolAgreement.class).handleUnsafe(result));
 		}
-		catch(EmptyResultDataAccessException e)
+		catch (EmptyResultDataAccessException e)
 		{
 			return Optional.empty();
 		}
 		catch (JAXBException e)
 		{
-			throw new DataRetrievalFailureException("",e);
+			throw new DataRetrievalFailureException("", e);
 		}
 	}
 
@@ -69,7 +67,7 @@ class CPADAOImpl implements CPADAO
 	@Cacheable(cacheNames = "CPA", keyGenerator = "ebMSKeyGenerator")
 	public List<String> getCPAIds()
 	{
-		return jdbcTemplate.queryForList("select cpa_id from cpa order by cpa_id asc",String.class);
+		return jdbcTemplate.queryForList("select cpa_id from cpa order by cpa_id asc", String.class);
 	}
 
 	@Override
@@ -78,10 +76,8 @@ class CPADAOImpl implements CPADAO
 	{
 		try
 		{
-			jdbcTemplate.update(
-				"insert into cpa (cpa_id,cpa) values (?,?)",
-				cpa.getCpaid(),
-				JAXBParser.getInstance(CollaborationProtocolAgreement.class).handle(cpa));
+			jdbcTemplate
+					.update("insert into cpa (cpa_id,cpa) values (?,?)", cpa.getCpaid(), JAXBParser.getInstance(CollaborationProtocolAgreement.class).handle(cpa));
 			return cpa.getCpaid();
 		}
 		catch (JAXBException e)
@@ -96,10 +92,8 @@ class CPADAOImpl implements CPADAO
 	{
 		try
 		{
-			return jdbcTemplate.update(
-				"update cpa set cpa = ? where cpa_id = ?",
-				JAXBParser.getInstance(CollaborationProtocolAgreement.class).handle(cpa),
-				cpa.getCpaid());
+			return jdbcTemplate
+					.update("update cpa set cpa = ? where cpa_id = ?", JAXBParser.getInstance(CollaborationProtocolAgreement.class).handle(cpa), cpa.getCpaid());
 		}
 		catch (JAXBException e)
 		{
@@ -111,6 +105,6 @@ class CPADAOImpl implements CPADAO
 	@CacheEvict(cacheNames = "CPA", allEntries = true)
 	public int deleteCPA(String cpaId)
 	{
-		return jdbcTemplate.update("delete from cpa where cpa_id = ?",cpaId);
+		return jdbcTemplate.update("delete from cpa where cpa_id = ?", cpaId);
 	}
 }

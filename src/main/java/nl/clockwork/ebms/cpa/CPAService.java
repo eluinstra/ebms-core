@@ -15,8 +15,8 @@
  */
 package nl.clockwork.ebms.cpa;
 
-import java.util.List;
 
+import java.util.List;
 import javax.jws.WebMethod;
 import javax.jws.WebParam;
 import javax.jws.WebResult;
@@ -45,7 +45,9 @@ public interface CPAService
 	 */
 	@WebResult(name = "cpaId")
 	@WebMethod(operationName = "insertCPA")
-	String insertCPA(@WebParam(name = "cpa") @XmlElement(required = true) /* CollaborationProtocolAgreement */String cpa, @WebParam(name = "overwrite") Boolean overwrite) throws CPAServiceException;
+	String insertCPA(
+			@WebParam(name = "cpa") @XmlElement(required = true) /* CollaborationProtocolAgreement */String cpa,
+			@WebParam(name = "overwrite") Boolean overwrite) throws CPAServiceException;
 
 	/**
 	 * Removes CPA identified by cpaId

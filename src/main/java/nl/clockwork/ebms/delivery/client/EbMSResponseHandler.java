@@ -15,31 +15,29 @@
  */
 package nl.clockwork.ebms.delivery.client;
 
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.nio.charset.Charset;
 import java.util.List;
-
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.parsers.ParserConfigurationException;
-
-import org.apache.commons.io.IOUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.util.StringUtils;
-import org.xml.sax.SAXException;
-
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
-import lombok.val;
 import lombok.experimental.FieldDefaults;
+import lombok.val;
 import nl.clockwork.ebms.Constants;
 import nl.clockwork.ebms.EbMSMessageReader;
 import nl.clockwork.ebms.model.EbMSDocument;
 import nl.clockwork.ebms.processor.EbMSProcessingException;
 import nl.clockwork.ebms.processor.EbMSProcessorException;
+import org.apache.commons.io.IOUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.util.StringUtils;
+import org.xml.sax.SAXException;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @AllArgsConstructor
@@ -52,12 +50,12 @@ class EbMSResponseHandler
 	List<Integer> recoverableHttpErrors;
 	@NonNull
 	List<Integer> unrecoverableHttpErrors;
-	
+
 	public EbMSDocument read() throws EbMSProcessorException
 	{
 		try
 		{
-			switch(connection.getResponseCode() / 100)
+			switch (connection.getResponseCode() / 100)
 			{
 				case 2:
 					if (connection.getResponseCode() == HttpServletResponse.SC_NO_CONTENT || connection.getContentLength() == 0)
@@ -75,14 +73,14 @@ class EbMSResponseHandler
 					throw createUnrecoverableErrorException(connection);
 				default:
 					logResponse(connection);
-					throw new EbMSUnrecoverableResponseException(connection.getResponseCode(),connection.getHeaderFields());
+					throw new EbMSUnrecoverableResponseException(connection.getResponseCode(), connection.getHeaderFields());
 			}
 		}
 		catch (IOException e)
 		{
 			try
 			{
-				throw new EbMSResponseException(connection.getResponseCode(),connection.getHeaderFields(),e);
+				throw new EbMSResponseException(connection.getResponseCode(), connection.getHeaderFields(), e);
 			}
 			catch (IOException e1)
 			{
@@ -95,9 +93,9 @@ class EbMSResponseHandler
 	{
 		try (val input = connection.getInputStream())
 		{
-			val messageReader = new EbMSMessageReader(getHeaderField("Content-ID"),getHeaderField("Content-Type"));
-			val response = IOUtils.toString(input,getEncoding());
-			logResponse(connection,response);
+			val messageReader = new EbMSMessageReader(getHeaderField("Content-ID"), getHeaderField("Content-Type"));
+			val response = IOUtils.toString(input, getEncoding());
+			logResponse(connection, response);
 			try
 			{
 				return messageReader.readResponse(response);
@@ -108,7 +106,7 @@ class EbMSResponseHandler
 			}
 			catch (SAXException e)
 			{
-				throw new EbMSResponseException(connection.getResponseCode(),connection.getHeaderFields(),response,e);
+				throw new EbMSResponseException(connection.getResponseCode(), connection.getHeaderFields(), response, e);
 			}
 		}
 	}
@@ -117,11 +115,11 @@ class EbMSResponseHandler
 	{
 		try (val input = connection.getErrorStream())
 		{
-			val response = readResponse(connection,input);
+			val response = readResponse(connection, input);
 			if (recoverableHttpErrors.contains(connection.getResponseCode()))
-				return new EbMSResponseException(connection.getResponseCode(),connection.getHeaderFields(),response);
+				return new EbMSResponseException(connection.getResponseCode(), connection.getHeaderFields(), response);
 			else
-				return new EbMSUnrecoverableResponseException(connection.getResponseCode(),connection.getHeaderFields(),response);
+				return new EbMSUnrecoverableResponseException(connection.getResponseCode(), connection.getHeaderFields(), response);
 		}
 	}
 
@@ -129,11 +127,11 @@ class EbMSResponseHandler
 	{
 		try (val input = connection.getErrorStream())
 		{
-			val response = readResponse(connection,input);
+			val response = readResponse(connection, input);
 			if (unrecoverableHttpErrors.contains(connection.getResponseCode()))
-				return new EbMSUnrecoverableResponseException(connection.getResponseCode(),connection.getHeaderFields(),response);
+				return new EbMSUnrecoverableResponseException(connection.getResponseCode(), connection.getHeaderFields(), response);
 			else
-				return new EbMSResponseException(connection.getResponseCode(),connection.getHeaderFields(),response);
+				return new EbMSResponseException(connection.getResponseCode(), connection.getHeaderFields(), response);
 		}
 	}
 
@@ -142,8 +140,8 @@ class EbMSResponseHandler
 		String response = null;
 		if (input != null)
 		{
-			response = IOUtils.toString(input,Charset.defaultCharset());
-			logResponse(connection,response);
+			response = IOUtils.toString(input, Charset.defaultCharset());
+			logResponse(connection, response);
 		}
 		return response;
 	}
@@ -156,7 +154,7 @@ class EbMSResponseHandler
 		else
 			throw new EbMSProcessingException("HTTP header Content-Type is not set!");
 	}
-	
+
 	private String getHeaderField(String name)
 	{
 		return connection.getHeaderField(name);
@@ -164,7 +162,7 @@ class EbMSResponseHandler
 
 	private void logResponse(HttpURLConnection connection) throws IOException
 	{
-		logResponse(connection,null);
+		logResponse(connection, null);
 	}
 
 	private void logResponse(HttpURLConnection connection, String response) throws IOException

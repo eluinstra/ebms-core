@@ -15,13 +15,12 @@
  */
 package nl.clockwork.ebms.service.model;
 
+
 import java.io.Serializable;
 import java.time.Instant;
-
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
-
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -39,7 +38,7 @@ public class MessageStatus implements Serializable
 {
 	private static final long serialVersionUID = 1L;
 	Instant timestamp;
-	@XmlElement(required=true)
+	@XmlElement(required = true)
 	@NonNull
 	EbMSMessageStatus status;
 }

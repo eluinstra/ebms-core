@@ -15,9 +15,6 @@
  */
 package nl.clockwork.ebms.delivery.task;
 
-import org.quartz.Job;
-import org.quartz.Scheduler;
-import org.springframework.jms.core.JmsTemplate;
 
 import lombok.AccessLevel;
 import lombok.NonNull;
@@ -25,6 +22,9 @@ import lombok.experimental.FieldDefaults;
 import nl.clockwork.ebms.cpa.CPAManager;
 import nl.clockwork.ebms.dao.EbMSDAO;
 import nl.clockwork.ebms.delivery.task.JMSDeliveryTaskManager.DeliveryTaskMessageCreator;
+import org.quartz.Job;
+import org.quartz.Scheduler;
+import org.springframework.jms.core.JmsTemplate;
 
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class QuartzJMSDeliveryTaskManager extends QuartzDeliveryTaskManager
@@ -32,16 +32,23 @@ public class QuartzJMSDeliveryTaskManager extends QuartzDeliveryTaskManager
 	@NonNull
 	JmsTemplate jmsTemplate;
 
-	public QuartzJMSDeliveryTaskManager(@NonNull Scheduler scheduler, @NonNull EbMSDAO ebMSDAO, @NonNull DeliveryTaskDAO deliveryTaskDAO, @NonNull CPAManager cpaManager, int nrAutoRetries, int autoRetryInterval, @NonNull JmsTemplate jmsTemplate)
+	public QuartzJMSDeliveryTaskManager(
+			@NonNull Scheduler scheduler,
+			@NonNull EbMSDAO ebMSDAO,
+			@NonNull DeliveryTaskDAO deliveryTaskDAO,
+			@NonNull CPAManager cpaManager,
+			int nrAutoRetries,
+			int autoRetryInterval,
+			@NonNull JmsTemplate jmsTemplate)
 	{
-		super(scheduler,ebMSDAO,deliveryTaskDAO,cpaManager,nrAutoRetries,autoRetryInterval);
+		super(scheduler, ebMSDAO, deliveryTaskDAO, cpaManager, nrAutoRetries, autoRetryInterval);
 		this.jmsTemplate = jmsTemplate;
 	}
 
 	@Override
 	public void insertTask(DeliveryTask task)
 	{
-		jmsTemplate.send(JMSDeliveryTaskManager.JMS_DESTINATION_NAME,new DeliveryTaskMessageCreator(task));
+		jmsTemplate.send(JMSDeliveryTaskManager.JMS_DESTINATION_NAME, new DeliveryTaskMessageCreator(task));
 	}
 
 	protected Class<? extends Job> getJobClass()

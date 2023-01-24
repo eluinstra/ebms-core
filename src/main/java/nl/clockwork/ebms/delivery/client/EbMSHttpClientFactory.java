@@ -15,26 +15,25 @@
  */
 package nl.clockwork.ebms.delivery.client;
 
+
 import java.security.KeyStoreException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-
-import org.apache.commons.lang3.StringUtils;
-import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DeliveryChannel;
-
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Builder.Default;
 import lombok.NonNull;
-import lombok.val;
 import lombok.experimental.FieldDefaults;
+import lombok.val;
 import nl.clockwork.ebms.cpa.CPAUtils;
 import nl.clockwork.ebms.cpa.certificate.CertificateMapper;
 import nl.clockwork.ebms.security.EbMSKeyStore;
 import nl.clockwork.ebms.security.EbMSTrustStore;
+import org.apache.commons.lang3.StringUtils;
+import org.oasis_open.committees.ebxml_cppa.schema.cpp_cpa_2_0.DeliveryChannel;
 
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -66,7 +65,7 @@ public class EbMSHttpClientFactory
 	boolean useClientCertificate;
 	@NonNull
 	@Default
-	Map<String,EbMSClient> clients = new ConcurrentHashMap<String,EbMSClient>();
+	Map<String, EbMSClient> clients = new ConcurrentHashMap<String, EbMSClient>();
 
 	private EbMSClient createEbMSClient(String clientAlias)
 	{
@@ -74,9 +73,25 @@ public class EbMSHttpClientFactory
 		{
 			val sslFactoryManager = createSslFactoryManager(getClientAlias(clientAlias));
 			if (EbMSHttpClientType.APACHE.equals(type))
-				return new nl.clockwork.ebms.delivery.client.apache.EbMSHttpClient(sslFactoryManager,enabledProtocols,enabledCipherSuites,verifyHostnames,connectTimeout,readTimeout,chunkedStreamingMode,proxy);
+				return new nl.clockwork.ebms.delivery.client.apache.EbMSHttpClient(
+						sslFactoryManager,
+						enabledProtocols,
+						enabledCipherSuites,
+						verifyHostnames,
+						connectTimeout,
+						readTimeout,
+						chunkedStreamingMode,
+						proxy);
 			else
-				return new EbMSHttpClient(sslFactoryManager,connectTimeout,readTimeout,chunkedStreamingMode,base64Writer,proxy,httpErrors.getRecoverableHttpErrors(),httpErrors.getUnrecoverableHttpErrors());
+				return new EbMSHttpClient(
+						sslFactoryManager,
+						connectTimeout,
+						readTimeout,
+						chunkedStreamingMode,
+						base64Writer,
+						proxy,
+						httpErrors.getRecoverableHttpErrors(),
+						httpErrors.getUnrecoverableHttpErrors());
 		}
 		catch (Exception e)
 		{
@@ -88,7 +103,7 @@ public class EbMSHttpClientFactory
 	{
 		val key = clientAlias == null ? "" : clientAlias;
 		if (!clients.containsKey(key))
-			clients.put(key,createEbMSClient(clientAlias));
+			clients.put(key, createEbMSClient(clientAlias));
 		return clients.get(key);
 	}
 
@@ -96,7 +111,7 @@ public class EbMSHttpClientFactory
 	{
 		try
 		{
-			val clientCertificate = getClientCertificate(cpaId,sendDeliveryChannel);
+			val clientCertificate = getClientCertificate(cpaId, sendDeliveryChannel);
 			val clientAlias = clientCertificate != null ? keyStore.getCertificateAlias(clientCertificate) : null;
 			return getEbMSClient(clientAlias);
 		}
@@ -113,7 +128,9 @@ public class EbMSHttpClientFactory
 
 	private X509Certificate getClientCertificate(String cpaId, DeliveryChannel deliveryChannel) throws CertificateException
 	{
-		return useClientCertificate && deliveryChannel != null ? certificateMapper.getCertificate(CPAUtils.getX509Certificate(CPAUtils.getClientCertificate(deliveryChannel)),cpaId) : null;
+		return useClientCertificate && deliveryChannel != null
+				? certificateMapper.getCertificate(CPAUtils.getX509Certificate(CPAUtils.getClientCertificate(deliveryChannel)), cpaId)
+				: null;
 	}
 
 	private SSLFactoryManager createSslFactoryManager(String clientAlias) throws Exception

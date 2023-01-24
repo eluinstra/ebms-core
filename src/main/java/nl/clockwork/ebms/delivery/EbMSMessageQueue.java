@@ -15,12 +15,13 @@
  */
 package nl.clockwork.ebms.delivery;
 
+
 import nl.clockwork.ebms.model.EbMSResponseMessage;
 
 class EbMSMessageQueue extends MessageQueue<EbMSResponseMessage>
 {
 	public EbMSMessageQueue(int maxEntries, int timeout)
 	{
-		super(maxEntries,timeout);
+		super(maxEntries, timeout);
 	}
 }
